@@ -1,7 +1,26 @@
 Changes for 1.1beta8:
 
+ - added "Data overview" for screens
+ - added "Triggers overview" for screens (Eugene)
+ - added blinking into Trigger overview (Eugene)
+ - added screen displaying in other screen (Eugene)
+ - improved Overview table header, vertical text added (Eugene)
+ - developed "ZABBIX Clock" module for screens (Eugene)
+ - developed "ZABBIX server info" module for screens (Eugene)
+ - developed "Triggers info" module for screens (Eugene)
+ - developed "Host info" module for screens (Eugene)
+ - improved screens displaying, added item alignment (Eugene)
+ - improved ZABBIX server report (Eugene)
+ - improved images configuration (Eugene)
+ - added onserver image resizing for thumbs by php (Eugene)
+ - developed acknowledges system (Eugene)
+ - added icons displaying for maps (Eugene)
+ - added maps displaying for maps (Eugene)
+ - improved maps (Eugene)
+
 Changes for 1.1beta7:
 
+ - added selected item history cleaning (Eugene)
  - improved housekeeper (Alexei)
  - added group operations for actions (Eugene)
  - frontend support for action status (Eugene)

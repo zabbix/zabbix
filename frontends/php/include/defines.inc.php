@@ -95,9 +95,9 @@
 	define("GRAPH_YAXIS_SIDE_LEFT",0);
 	define("GRAPH_YAXIS_SIDE_RIGHT",1);
 
-	define("MAP_LABEL_TYPE_HOSTLABEL",0);
+	define("MAP_LABEL_TYPE_LABEL",0);
 	define("MAP_LABEL_TYPE_IP",1);
-	define("MAP_LABEL_TYPE_HOSTNAME",2);
+	define("MAP_LABEL_TYPE_NAME",2);
 	define("MAP_LABEL_TYPE_STATUS",3);
 	define("MAP_LABEL_TYPE_NOTHING",4);
 
@@ -105,6 +105,10 @@
 	define("MAP_LABEL_LOC_LEFT",		1);
 	define("MAP_LABEL_LOC_RIGHT",		2);
 	define("MAP_LABEL_LOC_TOP",		3);
+
+	define("SYSMAP_ELEMENT_TYPE_HOST",	0);
+	define("SYSMAP_ELEMENT_TYPE_MAP",	1);
+	define("SYSMAP_ELEMENT_TYPE_IMAGE",	2);
 
 	define("ITEM_TYPE_ZABBIX",0);
 	define("ITEM_TYPE_SNMPV1",1);
@@ -154,6 +158,38 @@
 	define("LOGFILE_SEVERITY_DISASTER",5);
 	define("LOGFILE_SEVERITY_AUDIT_SUCCESS",6);
 	define("LOGFILE_SEVERITY_AUDIT_FAILURE",7);
+
+	define("SCREEN_RESOURCE_GRAPH", 0);
+	define("SCREEN_RESOURCE_SIMPLE_GRAPH", 1);
+	define("SCREEN_RESOURCE_MAP", 2);
+	define("SCREEN_RESOURCE_PLAIN_TEXT", 3);
+	define("SCREEN_RESOURCE_HOSTS_INFO", 4);
+	define("SCREEN_RESOURCE_TRIGGERS_INFO", 5);
+	define("SCREEN_RESOURCE_SERVER_INFO", 6);
+	define("SCREEN_RESOURCE_CLOCK", 7);
+	define("SCREEN_RESOURCE_SCREEN", 8);
+	define("SCREEN_RESOURCE_TRIGGERS_OVERVIEW", 9);
+	define("SCREEN_RESOURCE_DATA_OVERVIEW", 10);
+	define("SCREEN_RESOURCE_URL", 11);
+
+/* alignes */
+	define("HALIGN_DEFAULT",0);
+	define("HALIGN_CENTER",	0);
+	define("HALIGN_LEFT",	1);
+	define("HALIGN_RIGHT",	2);
+
+	define("VALIGN_DEFAULT",0);
+	define("VALIGN_MIDDLE",	0);
+	define("VALIGN_TOP",	1);
+	define("VALIGN_BOTTOM",	2);
+
+/* info module style */
+	define("STYLE_HORISONTAL",	0);
+	define("STYLE_VERTICAL",	1);
+
+/* time module tipe */
+        define("TIME_TYPE_LOCAL",	0);
+        define("TIME_TYPE_SERVER",	1);
 
 /* Support for PHP5. PHP5 does not have $HTTP_..._VARS */
 	if (!function_exists('version_compare'))

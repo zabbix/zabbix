@@ -56,7 +56,7 @@
 		}
 
 // Private
-		function showHeader($class="tborder")
+		function showHeader($class="tableinfo")
 		{
 			echo "<table class=\"$class\" border=0 width=\"100%\" bgcolor='#AAAAAA' cellspacing=1 cellpadding=3>";
 			echo "\n";

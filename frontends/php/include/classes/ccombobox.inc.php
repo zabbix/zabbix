@@ -22,17 +22,23 @@
 	class CComboItem extends CTag
 	{
 /* public */
-		function CComboItem($value,$caption=NULL,$selected='no')
+		function CComboItem($value,$caption=NULL,$selected=NULL, $enabled=NULL)
 		{
 			parent::CTag('option','yes');
 			$this->tag_body_start = "";
 			$this->SetCaption($caption);
 			$this->SetValue($value);
 			$this->SetSelected($selected);
+			$this->SetEnabled($enabled);
+
 		}
 		function SetValue($value)
 		{
 			return parent::AddOption('value',$value);
+		}
+		function GetValue()
+		{
+			return parent::GetOption('value');
 		}
 		function SetCaption($value=NULL)
 		{
@@ -47,7 +53,7 @@
 		function SetSelected($value='yes')
 		{
 			if(is_null($value))
-				return 0;
+				return $this->DelOption('selected');
 			elseif((is_string($value) && ($value == 'yes' || $value == "selected" || $value=='on'))
 				|| (is_int($value) && $value<>0))
 				return $this->AddOption('selected','selected');
@@ -111,21 +117,26 @@
 		}
 		function AddItem($value, $caption, $selected=NULL, $enabled='yes')
 		{
-			if(is_null($selected))
-			{
-				$selected = 'no'; 
-				if(!is_null($this->value))
-					if($this->value==$value)
-						$selected = 'yes';
-			}
-
 //			if($enabled=='no') return;	/* disable item method 1 */
 
-			$cmbItem = new CComboItem($value,$caption,$selected);
-
-			$cmbItem->SetEnable($enabled);	/* disable item method 2 */
-
+			$cmbItem = new CComboItem($value,$caption,$selected,$enabled);
 			return parent::AddItem($cmbItem);
+		}
+
+		function SetSelectedByValue(&$item)
+		{
+			if(!is_null($this->value))
+			{
+				$selected = 'no';
+				if($item->GetValue() == $this->value)		$selected = 'yes';
+				$item->SetSelected($selected);
+			}
+		}
+
+		function ShowTagItem(&$item)
+		{
+			$this->SetSelectedByValue($item);
+			parent::ShowTagItem($item);
 		}
 		function Show()
 		{

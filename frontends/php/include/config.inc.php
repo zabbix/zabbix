@@ -18,7 +18,7 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
+function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 
 ?>
 <?php
@@ -42,6 +42,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 	include_once 	"include/locales.inc.php";
 
 	include_once 	"include/audit.inc.php";
+	include_once 	"include/acknow.inc.php";
 	include_once 	"include/autoregistration.inc.php";
 	include_once 	"include/escalations.inc.php";
 	include_once 	"include/hosts.inc.php";
@@ -80,6 +81,14 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 	include_once("include/classes/clistbox.inc.php");
 	include_once("include/classes/cform.inc.php");
 	include_once("include/classes/cformtable.inc.php");
+	include_once("include/classes/cmap.inc.php");
+	include_once("include/classes/cflash.inc.php");
+
+// Include Tactical Overview modules
+	include_once("include/classes/chostsinfo.mod.php");
+	include_once("include/classes/ctriggerinfo.mod.php");
+	include_once("include/classes/cserverinfo.mod.php");
+	include_once("include/classes/cflashclock.mod.php");
 
 	function zbx_stripslashes($value){
 		if(is_array($value)){
@@ -1042,7 +1051,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=<?php echo S_HTML_CHARSET; ?>">
-<meta name="Author" content="Alexei Vladishev">
+<meta name="Author" content="Alexei Vladishev, Eugene Grigorjev">
 <link rel="stylesheet" href="css.css">
 <?php
 //	if($USER_DETAILS['alias']=='guest')
@@ -1052,7 +1061,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 	if(defined($title))	$title=constant($title);
 	if($dorefresh && $USER_DETAILS["refresh"])
 	{
-		echo "	<meta http-equiv=\"refresh\" content=\"".$USER_DETAILS["refresh"]."\"/>\n";
+		echo "	<meta http-equiv=\"refresh\" content=\"".$USER_DETAILS["refresh"]."\">\n";
 		echo "	<title>$title [refreshed every ".$USER_DETAILS["refresh"]." sec]</title>\n";
 	}
 	else
@@ -1069,7 +1078,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 	$menu=array(
 		"view"=>array(
 				"label"=>S_MONITORING,
-				"pages"=>array("overview.php","latest.php","tr_status.php","queue.php","events.php","actions.php","maps.php","charts.php","screens.php","srv_status.php","alarms.php","history.php","tr_comments.php","report3.php","profile.php"),
+				"pages"=>array("overview.php","latest.php","tr_status.php","queue.php","events.php","actions.php","maps.php","charts.php","screens.php","srv_status.php","alarms.php","history.php","tr_comments.php","report3.php","profile.php","acknow.php"),
 				"level2"=>array(
 					array("label"=>S_OVERVIEW,"url"=>"overview.php"),
 					array("label"=>S_LATEST_DATA,"url"=>"latest.php"),
@@ -1262,22 +1271,11 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
                 $result=DBselect($sql);
 
 		$table = new CTableInfo();
-		$table->SetHeader(array(S_TIMESTAMP,$item["description"]));
-//		table_begin();
-//		table_header(array(S_TIMESTAMP,$item["description"]));
-//		$col=0;
+		$table->SetHeader(array(S_TIMESTAMP,item_description($item["description"],$item["key_"])));
 		while($row=DBfetch($result))
 		{
-			$table->AddRow(array(
-				date(S_DATE_FORMAT_YMDHMS,$row["clock"]),
-				$row["value"])
-				);
-//			table_row(array(
-//				date(S_DATE_FORMAT_YMDHMS,$row["clock"]),
-//				$row["value"],
-//				),$col++);
+			$table->AddRow(array(date(S_DATE_FORMAT_YMDHMS,$row["clock"]),	$row["value"]));
 		}
-//		table_end();
 		return $table;
 	}
 
@@ -1483,14 +1481,18 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 		return $exp;
 	}*/
 
-	function	add_image($name,$imagetype,$files)
+	function	add_image($name,$imagetype,$file)
 	{
-		if(isset($files))
+		if(!is_null($file))
 		{
-			if($files["image"]["error"]==0)
-			if($files["image"]["size"]<1024*1024)
+			if($file["error"] != 0 || $file["size"]==0)
 			{
-				$image=fread(fopen($files["image"]["tmp_name"],"r"),filesize($files["image"]["tmp_name"]));
+				error("Incorrect Image");
+				return FALSE;
+			}
+			if($file["size"]<1024*1024)
+			{
+				$image=fread(fopen($file["tmp_name"],"r"),filesize($file["tmp_name"]));
 				$sql="insert into images (name,imagetype,image) values (".zbx_dbstr($name).",$imagetype,".zbx_dbstr($image).")";
 				return	DBexecute($sql);
 			}
@@ -1507,14 +1509,18 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 		}
 	}
 
-	function	update_image($imageid,$name,$imagetype,$files)
+	function	update_image($imageid,$name,$imagetype,$file)
 	{
-		if(isset($files))
+		if(!is_null($file))
 		{
-			if($files["image"]["error"]==0)
-			if($files["image"]["size"]<1024*1024)
+			if($file["error"] != 0 || $file["size"]==0)
 			{
-				$image=fread(fopen($files["image"]["tmp_name"],"r"),filesize($files["image"]["tmp_name"]));
+				error("Incorrect Image");
+				return FALSE;
+			}
+			if($file["size"]<1024*1024)
+			{
+				$image=fread(fopen($file["tmp_name"],"r"),filesize($file["tmp_name"]));
 				$sql="update images set name=".zbx_dbstr($name).",imagetype=".zbx_dbstr($imagetype).",image=".zbx_dbstr($image)." where imageid=$imageid";
 				return	DBexecute($sql);
 			}
@@ -1526,8 +1532,8 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 		}
 		else
 		{
-			error("Select image to download");
-			return FALSE;
+				$sql="update images set name=".zbx_dbstr($name).",imagetype=".zbx_dbstr($imagetype)." where imageid=$imageid";
+				return	DBexecute($sql);
 		}
 	}
 
@@ -1612,6 +1618,12 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 		$now=time();
 		$sql="insert into alarms(triggerid,clock,value) values($triggerid,$now,$value)";
 		return	DBexecute($sql);
+	}
+
+	function	get_alarm_by_alarmid($alarmid)
+	{
+		$db_alarms = DBselect("select * from alarms where alarmid=$alarmid");
+		return DBfetch($db_alarms);
 	}
 
 	# Reset nextcheck for related items
@@ -2328,95 +2340,114 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 		echo "</html>\n";
 	}
 
-	function	get_stats()
+	function	get_status()
 	{
-	global $DB_TYPE;
-	if ($DB_TYPE == "MYSQL")
-	{
-	        $result=DBselect("show table status like 'history'");
-		$row=DBfetch($result);
-		$stat["history_count"]=$row["Rows"];
+		global $DB_TYPE;
+		$status = array();
+// server
+		if( (exec("ps -ef|grep zabbix_server|grep -v grep|wc -l")>0) || (exec("ps -ax|grep zabbix_server|grep -v grep|wc -l")>0) )
+		{
+			$status["zabbix_server"] = S_YES;
+		}
+		else
+		{
+			$status["zabbix_server"] = S_NO;
+		}
 
-	        $result=DBselect("show table status like 'trends'");
-		$row=DBfetch($result);
-		$stat["trends_count"]=$row["Rows"];
-	}
-	else
-	{
-	        $result=DBselect("select count(itemid) as cnt from history");
-		$row=DBfetch($result);
-		$stat["history_count"]=$row["cnt"];
+// history & trends
+		if ($DB_TYPE == "MYSQL")
+		{
+			$row=DBfetch(DBselect("show table status like 'history'"));
+			$status["history_count"]  = $row["Rows"];
+			$row=DBfetch(DBselect("show table status like 'history_log'"));
+			$status["history_count"] += $row["Rows"];
+			$row=DBfetch(DBselect("show table status like 'history_str'"));
+			$status["history_count"] += $row["Rows"];
+			$row=DBfetch(DBselect("show table status like 'history_uint'"));
+			$status["history_count"] += $row["Rows"];
 
-	        $result=DBselect("select count(itemid) as cnt from trends");
-		$row=DBfetch($result);
-		$stat["trends_count"]=$row["cnt"];
-	}
+			$row=DBfetch(DBselect("show table status like 'trends'"));
+			$status["trends_count"] = $row["Rows"];
+		}
+		else
+		{
+			$row=DBfetch(DBselect("select count(itemid) as cnt from history"));
+			$status["history_count"]  = $row["cnt"];
+			$row=DBfetch(DBselect("select count(itemid) as cnt from history_log"));
+			$status["history_count"] += $row["cnt"];
+			$row=DBfetch(DBselect("select count(itemid) as cnt from history_str"));
+			$status["history_count"] += $row["cnt"];
+			$row=DBfetch(DBselect("select count(itemid) as cnt from history_uint"));
+			$status["history_count"] += $row["cnt"];
 
-	        $result=DBselect("select count(alarmid) as cnt from alarms");
-		$row=DBfetch($result);
-		$stat["alarms_count"]=$row["cnt"];
+			$result=DBselect("select count(itemid) as cnt from trends");
+			$row=DBfetch($result);
+			$status["trends_count"]=$row["cnt"];
+		}
+// alarms
+		$row=DBfetch(DBselect("select count(alarmid) as cnt from alarms"));
+		$status["alarms_count"]=$row["cnt"];
+// alerts
+		$row=DBfetch(DBselect("select count(alertid) as cnt from alerts"));
+		$status["alerts_count"]=$row["cnt"];
+// triggers
+		$sql = "select count(t.triggerid) as cnt from triggers t, functions f, items i, hosts h".
+			" where t.triggerid=f.triggerid and f.itemid=i.itemid and i.status=0 and i.hostid=h.hostid and h.status=".HOST_STATUS_MONITORED;
+		$row=DBfetch(DBselect($sql));
+		$status["triggers_count"]=$row["cnt"];
 
-	        $result=DBselect("select count(alertid) as cnt from alerts");
-		$row=DBfetch($result);
-		$stat["alerts_count"]=$row["cnt"];
+		$row=DBfetch(DBselect($sql." and t.status=0"));
+		$status["triggers_count_enabled"]=$row["cnt"];
 
-	        $result=DBselect("select count(triggerid) as cnt from triggers");
-		$row=DBfetch($result);
-		$stat["triggers_count"]=$row["cnt"];
+		$row=DBfetch(DBselect($sql." and t.status=1"));
+		$status["triggers_count_disabled"]=$row["cnt"];
 
-	        $result=DBselect("select count(triggerid) as cnt from triggers where status=0");
-		$row=DBfetch($result);
-		$stat["triggers_count_enabled"]=$row["cnt"];
+		$row=DBfetch(DBselect($sql." and t.status=0 and t.value=0"));
+		$status["triggers_count_off"]=$row["cnt"];
 
-	        $result=DBselect("select count(triggerid) as cnt from triggers where status=1");
-		$row=DBfetch($result);
-		$stat["triggers_count_disabled"]=$row["cnt"];
+		$row=DBfetch(DBselect($sql." and t.status=0 and t.value=1"));
+		$status["triggers_count_on"]=$row["cnt"];
 
-	        $result=DBselect("select count(itemid) as cnt from items");
-		$row=DBfetch($result);
-		$stat["items_count"]=$row["cnt"];
+		$row=DBfetch(DBselect($sql." and t.status=0 and t.value=2"));
+		$status["triggers_count_unknown"]=$row["cnt"];
+// items 
+		$sql = "select count(i.itemid) as cnt from items i, hosts h where i.hostid=h.hostid and h.status=".HOST_STATUS_MONITORED;
+		$row=DBfetch(DBselect($sql));
+		$status["items_count"]=$row["cnt"];
 
-	        $result=DBselect("select count(itemid) as cnt from items where status=0");
-		$row=DBfetch($result);
-		$stat["items_count_active"]=$row["cnt"];
+		$row=DBfetch(DBselect($sql." and i.status=0"));
+		$status["items_count_monitored"]=$row["cnt"];
 
-	        $result=DBselect("select count(itemid) as cnt from items where status=1");
-		$row=DBfetch($result);
-		$stat["items_count_not_active"]=$row["cnt"];
+		$row=DBfetch(DBselect($sql." and i.status=1"));
+		$status["items_count_disabled"]=$row["cnt"];
 
-	        $result=DBselect("select count(itemid) as cnt from items where status=3");
-		$row=DBfetch($result);
-		$stat["items_count_not_supported"]=$row["cnt"];
+		$row=DBfetch(DBselect($sql." and i.status=3"));
+		$status["items_count_not_supported"]=$row["cnt"];
 
-	        $result=DBselect("select count(itemid) as cnt from items where type=2");
-		$row=DBfetch($result);
-		$stat["items_count_trapper"]=$row["cnt"];
+		$row=DBfetch(DBselect($sql." and i.type=2"));
+		$status["items_count_trapper"]=$row["cnt"];
+// hosts
+		$row=DBfetch(DBselect("select count(hostid) as cnt from hosts"));
+		$status["hosts_count"]=$row["cnt"];
 
-	        $result=DBselect("select count(hostid) as cnt from hosts");
-		$row=DBfetch($result);
-		$stat["hosts_count"]=$row["cnt"];
+		$row=DBfetch(DBselect("select count(hostid) as cnt from hosts where status=".HOST_STATUS_MONITORED));
+		$status["hosts_count_monitored"]=$row["cnt"];
 
-	        $result=DBselect("select count(hostid) as cnt from hosts where status=".HOST_STATUS_MONITORED);
-		$row=DBfetch($result);
-		$stat["hosts_count_monitored"]=$row["cnt"];
+		$row=DBfetch(DBselect("select count(hostid) as cnt from hosts where status=".HOST_STATUS_NOT_MONITORED));
+		$status["hosts_count_not_monitored"]=$row["cnt"];
 
-	        $result=DBselect("select count(hostid) as cnt from hosts where status!=".HOST_STATUS_MONITORED);
-		$row=DBfetch($result);
-		$stat["hosts_count_not_monitored"]=$row["cnt"];
+		$row=DBfetch(DBselect("select count(hostid) as cnt from hosts where status=".HOST_STATUS_TEMPLATE));
+		$status["hosts_count_template"]=$row["cnt"];
 
-	        $result=DBselect("select count(hostid) as cnt from hosts where status=".HOST_STATUS_TEMPLATE);
-		$row=DBfetch($result);
-		$stat["hosts_count_template"]=$row["cnt"];
+		$row=DBfetch(DBselect("select count(hostid) as cnt from hosts where status=".HOST_STATUS_DELETED));
+		$status["hosts_count_deleted"]=$row["cnt"];
+// users
+		$row=DBfetch(DBselect("select count(userid) as cnt from users"));
+		$status["users_count"]=$row["cnt"];
+		
+		$status["users_online"]=DBnum_rows(DBselect("select distinct s.userid from sessions s, users u where u.userid=s.userid and (s.lastaccess+u.autologout)>".time()));
 
-	        $result=DBselect("select count(hostid) as cnt from hosts where status=".HOST_STATUS_DELETED);
-		$row=DBfetch($result);
-		$stat["hosts_count_deleted"]=$row["cnt"];
-
-	        $result=DBselect("select count(userid) as cnt from users");
-		$row=DBfetch($result);
-		$stat["users_count"]=$row["cnt"];
-
-		return $stat;
+		return $status;
 	}
 
 	// If $period_start=$period_end=0, then take maximum period
@@ -2707,6 +2738,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 	{
 		echo "
 <script language=\"JavaScript\" type=\"text/javascript\">
+<!--
 	function Confirm(msg)
 	{
 		if(confirm(msg,'title'))
@@ -2736,16 +2768,68 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 			frmForm.elements[i].checked = value;
 		}
 	}
+//-->
 </script>
 		";
+	}
+	function insert_javascript_clock($form, $field)
+	{
+		echo "
+<script language=\"JavaScript\" type=\"text/javascript\">
+<!--
+	function show_clock()
+	{
+		var thetime=new Date();
+
+		var nhours=thetime.getHours();
+		var nmins=thetime.getMinutes();
+		var nsecn=thetime.getSeconds();
+		var AorP=\" \";
+
+		var year = thetime.getFullYear();
+		var nmonth = thetime.getMonth()+1;
+		var ndate = thetime.getDate();
+		
+		if (nhours>=12)		AorP=\"PM\";
+		else			AorP=\"AM\";
+
+		if (nhours>=13)		nhours-=12;
+		if (nhours==0)		nhours=12;
+
+		if (nsecn<10)		nsecn=\"0\"+nsecn;
+		if (nmins<10)		nmins=\"0\"+nmins;
+		if (nmonth<10)		nmonth=\"0\"+nmonth;
+		if (ndate<10)		ndate=\"0\"+ndate;
+
+		document.forms['$form'].elements['$field'].value=ndate+\"-\"+nmonth+\"-\"+year+\" \"+nhours+\":\"+nmins+\":\"+nsecn+\" \"+AorP;
+
+		setTimeout('show_clock()',1000);
+	} 
+//-->
+</script>
+";
+	}
+
+	function	start_javascript_clock()
+	{
+		echo "
+<script language=\"JavaScript\" type=\"text/javascript\">
+<!--
+	show_clock();
+//-->
+</script>
+";
 	}
 
 	function	SetFocus($frm_name, $fld_name)
 	{
-		echo 
-		"<script language=\"JavaScript\" type=\"text/javascript\">\n".
-		"	document.forms['$frm_name'].elements['$fld_name'].focus();\n".
-		"</script>";
+		echo "
+<script language=\"JavaScript\" type=\"text/javascript\">
+<!--
+	document.forms['$frm_name'].elements['$fld_name'].focus();
+//-->
+</script>
+";
 	}
 
 /* Use ImageSetStyle+ImageLIne instead of bugged ImageDashedLine */
@@ -2983,8 +3067,12 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } # DEBUG INFO!!!
 
 	function	Alert($msg)
 	{
-		echo "<script language=\"JavaScript\" type=\"text/javascript\">";
-		echo "alert('$msg');";
-		echo "</script>";
+		echo "
+<script language=\"JavaScript\" type=\"text/javascript\">
+<!--
+	alert('$msg');
+//-->
+</script>
+";
 	}
 ?>

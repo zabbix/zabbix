@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-	function	get_map_by_sysmapid($sysmapid)
+	function	get_sysmap_by_sysmapid($sysmapid)
 	{
 		$sql="select * from sysmaps where sysmapid=$sysmapid"; 
 		$result=DBselect($sql);
@@ -34,9 +34,9 @@
 		return	$result;
 	}
 
-	function	get_sysmaps_hosts_by_shostid($shostid)
+	function	get_sysmaps_element_by_selementid($selementid)
 	{
-		$sql="select * from sysmaps_hosts where shostid=$shostid"; 
+		$sql="select * from sysmaps_elements where selementid=$selementid"; 
 		$result=DBselect($sql);
 		if(DBnum_rows($result) == 1)
 		{
@@ -44,7 +44,7 @@
 		}
 		else
 		{
-			error("No sysmap host with shostid=[$shostid]");
+			error("No sysmap element with selementid=[$selementid]");
 		}
 		return	$result;
 	}
@@ -53,20 +53,16 @@
 
 	function	delete_sysmap( $sysmapid )
 	{
-		$sql="delete from sysmaps where sysmapid=$sysmapid";
-		$result=DBexecute($sql);
-		if(!$result)
-		{
-			return	$result;
-		}
-		$sql="delete from sysmaps_hosts where sysmapid=$sysmapid";
-		$result=DBexecute($sql);
-		if(!$result)
-		{
-			return	$result;
-		}
-		$sql="delete from sysmaps_links where sysmapid=$sysmapid";
-		return	DBexecute($sql);
+		$result = delete_sysmaps_elements_with_sysmapid($sysmapid);
+		if(!$result)	return	$result;
+
+		$result = DBexecute("delete from sysmaps_links where sysmapid=$sysmapid");
+		if(!$result)	return	$result;
+
+		$result = DBexecute("delete from sysmaps_elements where sysmapid=$sysmapid");
+		if(!$result)	return	$result;
+
+		return DBexecute("delete from sysmaps where sysmapid=$sysmapid");
 	}
 
 	# Update System Map
@@ -79,8 +75,9 @@
 			return 0;
 		}
 
-		$sql="update sysmaps set name=".zbx_dbstr($name).",width=$width,height=$height,background=".zbx_dbstr($background).",label_type=$label_type,label_location=$label_location where sysmapid=$sysmapid";
-		return	DBexecute($sql);
+		return	DBexecute("update sysmaps set name=".zbx_dbstr($name).",width=$width,height=$height,".
+			"background=".zbx_dbstr($background).",label_type=$label_type,".
+			"label_location=$label_location where sysmapid=$sysmapid");
 	}
 
 	# Add System Map
@@ -93,115 +90,340 @@
 			return 0;
 		}
 
-		$sql="insert into sysmaps (name,width,height,background,label_type,label_location) values (".zbx_dbstr($name).",$width,$height,".zbx_dbstr($background).",$label_type,$label_location)";
-		return	DBexecute($sql);
+		return	DBexecute("insert into sysmaps (name,width,height,background,label_type,label_location)".
+			" values (".zbx_dbstr($name).",$width,$height,".zbx_dbstr($background).",$label_type,
+			$label_location)");
 	}
 
-	function	add_link($sysmapid,$shostid1,$shostid2,$triggerid,$drawtype_off,$color_off,$drawtype_on,$color_on)
+	function	add_link($sysmapid,$selementid1,$selementid2,$triggerid,$drawtype_off,$color_off,$drawtype_on,$color_on)
 	{
-		if($triggerid == 0)
-		{
-			$sql="insert into sysmaps_links (sysmapid,shostid1,shostid2,triggerid,drawtype_off,color_off,drawtype_on,color_on) values ($sysmapid,$shostid1,$shostid2,NULL,$drawtype_off,".zbx_dbstr($color_off).",$drawtype_on,".zbx_dbstr($color_on).")";
-		}
-		else
-		{
-			$sql="insert into sysmaps_links (sysmapid,shostid1,shostid2,triggerid,drawtype_off,color_off,drawtype_on,color_on) values ($sysmapid,$shostid1,$shostid2,$triggerid,$drawtype_off,".zbx_dbstr($color_off).",$drawtype_on,".zbx_dbstr($color_on).")";
-		}
-		return	DBexecute($sql);
+		if($triggerid == 0)	$triggerid = 'NULL';
+
+		return	DBexecute("insert into sysmaps_links".
+			" (sysmapid,selementid1,selementid2,triggerid,drawtype_off,".
+			"color_off,drawtype_on,color_on)".
+			" values ($sysmapid,$selementid1,$selementid2,$triggerid,$drawtype_off,".
+			zbx_dbstr($color_off).",$drawtype_on,".zbx_dbstr($color_on).")");
+	}
+
+	function	update_link($linkid,$sysmapid,$selementid1,$selementid2,$triggerid,$drawtype_off,$color_off,$drawtype_on,$color_on)
+	{
+		return	DBexecute("update sysmaps_links set ".
+			"sysmapid=$sysmapid,selementid1=$selementid1,selementid2=$selementid2,".
+			"triggerid=$triggerid,drawtype_off=$drawtype_off,color_off=".zbx_dbstr($color_off).",".
+			"drawtype_on=$drawtype_on,color_on=".zbx_dbstr($color_on).
+			" where linkid=$linkid");
 	}
 
 	function	delete_link($linkid)
 	{
-		$sql="delete from sysmaps_links where linkid=$linkid";
-		return	DBexecute($sql);
+		return	DBexecute("delete from sysmaps_links where linkid=$linkid");
 	}
 
-	# Add Host to system map
-
-	function add_host_to_sysmap($sysmapid,$hostid,$label,$x,$y,$icon,$url,$icon_on)
+	function	check_circle_elements_link($sysmapid,$elementid,$elementtype)
 	{
-		$sql="insert into sysmaps_hosts (sysmapid,hostid,label,x,y,icon,url,icon_on) values ($sysmapid,$hostid,".zbx_dbstr($label).",$x,$y,".zbx_dbstr($icon).",".zbx_dbstr($url).",".zbx_dbstr($icon_on).")";
-		return	DBexecute($sql);
-	}
+		if($elementtype!=SYSMAP_ELEMENT_TYPE_MAP)	return FALSE;
 
-	function	update_sysmap_host($shostid,$sysmapid,$hostid,$label,$x,$y,$icon,$url,$icon_on)
-	{
-		$sql="update sysmaps_hosts set hostid=$hostid,label=".zbx_dbstr($label).",x=$x,y=$y,icon=".zbx_dbstr($icon).",url=".zbx_dbstr($url).",icon_on=".zbx_dbstr($icon_on)." where shostid=$shostid";
-		return	DBexecute($sql);
-	}
+		if($sysmapid == $elementid)	return TRUE;
 
-	function	delete_sysmaps_host_by_hostid($hostid)
-	{
-		$sql="select shostid from sysmaps_hosts where hostid=$hostid";
-		$result=DBselect($sql);
-		while($row=DBfetch($result))
+		$db_elements = DBselect("select elementid, elementtype from sysmaps_elements".
+			" where sysmapid=$elementid");
+
+		while($element = DBfetch($db_elements))
 		{
-			$sql="delete from sysmaps_links where shostid1=".$row["shostid"]." or shostid2=".$row["shostid"];
-			DBexecute($sql);
+			if(check_circle_elements_link($sysmapid,$element["elementid"],$element["elementtype"]))
+				return TRUE;
 		}
-		$sql="delete from sysmaps_hosts where hostid=$hostid";
-		return DBexecute($sql);
+		return FALSE;
 	}
 
-	# Delete Host from sysmap definition
+	# Add Element to system map
 
-	function	delete_sysmaps_host($shostid)
+	function add_element_to_sysmap($sysmapid,$elementid,$elementtype,
+						$label,$x,$y,$icon,$url,$icon_on,$label_location)
 	{
-		$sql="delete from sysmaps_links where shostid1=$shostid or shostid2=$shostid";
-		$result=DBexecute($sql);
-		if(!$result)
+		if($label_location<0) $label_location='null';
+		if(check_circle_elements_link($sysmapid,$elementid,$elementtype))
 		{
-			return	$result;
+			error("Circle link can't be created");
+			return FALSE;
 		}
-		$sql="delete from sysmaps_hosts where shostid=$shostid";
-		return	DBexecute($sql);
+
+		return	DBexecute("insert into sysmaps_elements".
+			" (sysmapid,elementid,elementtype,label,x,y,icon,url,icon_on,label_location)".
+			" values ($sysmapid,$elementid,$elementtype,".zbx_dbstr($label).",
+			$x,$y,".zbx_dbstr($icon).",".zbx_dbstr($url).",".zbx_dbstr($icon_on).",".
+			"$label_location)");
 	}
 
-	function get_map_imagemap($sysmapid)
-	{
-		$map="\n<map name=links$sysmapid>";
-		$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,sh.y,h.status,sh.icon,sh.url from sysmaps_hosts sh,hosts h where sh.sysmapid=$sysmapid and h.hostid=sh.hostid");
-		while($row=DBfetch($result))
-		{
-			$host=$row["host"];
-			$shostid=$row["shostid"];
-			$sysmapid=$row["sysmapid"];
-			$hostid=$row["hostid"];
-			$label=$row["label"];
-			$x=$row["x"];
-			$y=$row["y"];
-			$status=$row["status"];
-			$icon=$row["icon"];
-			$url=$row["url"];
+	# Update Element from system map
 
-			if($status==HOST_STATUS_MONITORED)
+	function	update_sysmap_element($selementid,$sysmapid,$elementid,$elementtype,
+						$label,$x,$y,$icon,$url,$icon_on,$label_location)
+	{
+		if($label_location<0) $label_location='null';
+		if(check_circle_elements_link($sysmapid,$elementid,$elementtype))
+		{
+			error("Circle link can't be created");
+			return FALSE;
+		}
+
+		return	DBexecute("update sysmaps_elements set elementid=$elementid,elementtype=$elementtype,".
+			"label=".zbx_dbstr($label).",x=$x,y=$y,icon=".zbx_dbstr($icon).",url=".zbx_dbstr($url).
+			",icon_on=".zbx_dbstr($icon_on).",label_location=$label_location".
+			" where selementid=$selementid");
+	}
+
+	# Delete Element from sysmap definition
+
+	function	delete_sysmaps_element($selementid)
+	{
+		$result=DBexecute("delete from sysmaps_links".
+			" where selementid1=$selementid or selementid2=$selementid");
+
+		if(!$result)		return	$result;
+
+		return	DBexecute("delete from sysmaps_elements where selementid=$selementid");
+	}
+
+	function	delete_sysmaps_elements_with_hostid($hostid)
+	{
+		$db_elements = DBselect("select selementid from sysmaps_elements".
+			" where elementid=$hostid and elementtype=".SYSMAP_ELEMENT_TYPE_HOST);
+		while($db_element = DBfetch($db_elements))
+		{
+			delete_sysmaps_element($db_element["selementid"]);
+		}
+		return TRUE;
+	}
+	function	delete_sysmaps_elements_with_sysmapid($sysmapid)
+	{
+		$db_elements = DBselect("select selementid from sysmaps_elements".
+			" where elementid=$sysmapid and elementtype=".SYSMAP_ELEMENT_TYPE_MAP);
+		while($db_element = DBfetch($db_elements))
+		{
+			delete_sysmaps_element($db_element["selementid"]);
+		}
+		return TRUE;
+	}
+	function	delete_sysmaps_elements_with_triggerid($triggerid)
+	{
+		$db_elements = DBselect("select selementid from sysmaps_elements".
+			" where elementid=$triggerid and elementtype=".SYSMAP_ELEMENT_TYPE_IMAGE);
+		while($db_element = DBfetch($db_elements))
+		{
+			delete_sysmaps_element($db_element["selementid"]);
+		}
+		return TRUE;
+	}
+
+	function get_png_by_selementid($selementid)
+	{
+		$elements = DBselect("select * from sysmaps_elements where selementid=$selementid");
+		if(!$elements)	return FALSE;
+
+		$element = DBfetch($elements);
+		if(!$element)	return FALSE;
+
+		$status = "off";
+		if(get_info_by_selementid($element["selementid"],$info,$color)!="")
+			$status = "on";
+
+		if($status == "on")
+			$icon = $element["icon_on"];
+		else
+			$icon = $element["icon"];
+
+		$images = DBselect("select image from images where imagetype=1 and name=".zbx_dbstr($icon));
+		if(!$images)	return FALSE;
+
+		$image = DBfetch($images);
+		if(!$image)	return FALSE;
+
+		return imagecreatefromstring($image["image"]);
+	}
+
+	function	get_info_by_selementid($selementid, &$out_info, &$out_color)
+	{
+		global $colors;
+
+		$info = "";
+		$count = 0;
+		$color= $colors["Dark Green"];
+		
+		$db_element = get_sysmaps_element_by_selementid($selementid);
+		if($db_element["elementtype"]==SYSMAP_ELEMENT_TYPE_HOST)
+		{
+			$db_triggers = DBselect("select distinct t.triggerid, t.priority".
+				" from items i,functions f,triggers t,hosts h where h.hostid=i.hostid".
+				" and i.hostid=".$db_element["elementid"]." and i.itemid=f.itemid".
+				" and f.triggerid=t.triggerid and t.value=1 and t.status=0".
+				" and h.status=".HOST_STATUS_MONITORED." and i.status=0");
+			$count = DBnum_rows($db_triggers);
+
+			if($count == 1)
 			{
-				$sql="select image from images where imagetype=1 and name=".zbx_dbstr($icon);
-				$result2=DBselect($sql);
-				if(DBnum_rows($result2)==1)
+				$trigger = DBfetch($db_triggers);
+				if ($trigger["priority"] > 3)           $color=$colors["Red"];
+				else                                    $color=$colors["Dark Yellow"];
+				$info = expand_trigger_description_simple($trigger["triggerid"]);
+			}
+			elseif($count==0)
+			{
+				$host = get_host_by_hostid($db_element["elementid"]);
+				if($host["status"] == HOST_STATUS_TEMPLATE)
 				{
-					$row2=DBfetch($result2);
-					$back=ImageCreateFromString($row2["image"]);
-					$sizex = imagesx($back);
-					$sizey = imagesy($back);
-					if($url=="")
-					{
-						$url="tr_status.php?hostid=$hostid&noactions=true&onlytrue=true&compact=true";
-					}
-					$map=$map."\n<area shape=rect coords=$x,$y,".($x+$sizex).",".($y+$sizey)." href=\"$url\" alt=\"Host: $host Label: $label\">";
-				}
-
-/*				if(function_exists("imagecreatetruecolor")&&@imagecreatetruecolor(1,1))
-				{
-					$map=$map."\n<area shape=rect coords=$x,$y,".($x+48).",".($y+48)." href=\"tr_status.php?hostid=$hostid&noactions=true&onlytrue=true&compact=true\" alt=\"$host\">";
+					$color = $colors["Gray"];
+					$info = "template";
 				}
 				else
 				{
-					$map=$map."\n<area shape=rect coords=$x,$y,".($x+32).",".($y+32)." href=\"tr_status.php?hostid=$hostid&noactions=true&onlytrue=true&compact=true\" alt=\"$host\">";
-				}*/
+					$info	= S_OK_BIG;
+					$color	= $colors["Dark Green"];
+				}
 			}
 		}
-		$map=$map."\n</map>";
-		return $map;
+		elseif($db_element["elementtype"]==SYSMAP_ELEMENT_TYPE_MAP)
+		{
+			$db_subelements = DBselect("select selementid from sysmaps_elements".
+				" where sysmapid=".$db_element["elementid"]);
+			while($db_subelement = DBfetch($db_subelements))
+			{// recursion
+				$count += get_info_by_selementid($db_subelement["selementid"],$info,$color);
+			}
+
+			if($count==0)
+			{
+				$out_info	= S_OK_BIG;
+				$out_color	= $colors["Dark Green"];
+			}
+		}
+		elseif($db_element["elementtype"]==SYSMAP_ELEMENT_TYPE_IMAGE)
+		{
+			if($db_element["elementid"]>0){
+				$trigger=get_trigger_by_triggerid($db_element["elementid"]);
+				if($trigger["value"] == TRIGGER_VALUE_TRUE)
+				{
+					$info=S_TRUE_BIG;
+					$color=$colors["Red"];
+					$count = 1;
+				}
+			}
+		}
+
+		if($count>1)
+		{
+			$out_info	= $count." ".S_PROBLEMS_SMALL;
+			$out_color	= $colors["Red"];
+		}
+		else
+		{
+			$out_info	= $info;
+			$out_color	= $color;
+		}
+
+		return $count;
+	}
+
+	function get_action_map_by_sysmapid($sysmapid)
+	{
+		$action_map = new CMap("links$sysmapid");
+
+		$db_elements=DBselect("select * from sysmaps_elements where sysmapid=$sysmapid");
+		while($db_element = DBfetch($db_elements))
+		{
+			$url	= $db_element["url"];
+			$alt	= "Label: ".$db_element["label"];
+
+			if($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_HOST)
+			{
+				$host = get_host_by_hostid($db_element["elementid"]);
+				if($host["status"] != HOST_STATUS_MONITORED)	continue;
+
+			
+				if($url=="")
+					$url="tr_status.php?hostid=".$db_element["elementid"].
+						"&noactions=true&onlytrue=true&compact=true";
+
+				$alt = "Host: ".$host["host"]." ".$alt;
+			}
+			elseif($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_MAP)
+			{
+				$map = get_sysmap_by_sysmapid($db_element["elementid"]);
+
+				if($url=="")
+					$url="maps.php?sysmapid=".$db_element["elementid"];
+
+				$alt = "Host: ".$map["name"]." ".$alt;
+			}
+			elseif($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_IMAGE)
+			{
+				if($url=="" && $db_element["elementid"]!=0)
+					$url="alarms.php?triggerid=".$db_element["elementid"];
+			}
+
+			if($url=="")	continue;
+
+			$back = get_png_by_selementid($db_element["selementid"]);
+			if(!$back)	continue;
+
+			$x1_		= $db_element["x"];
+			$y1_		= $db_element["y"];
+			$x2_		= $db_element["x"] + imagesx($back);
+			$y2_		= $db_element["y"] + imagesy($back);
+
+			$action_map->AddRectArea($x1_,$y1_,$x2_,$y2_, $url, $alt);
+		}
+		return $action_map;
+	}
+
+	function	get_icon_center_by_selementid($selementid)
+	{
+		$element = get_sysmaps_element_by_selementid($selementid);
+		$x = $element["x"];
+		$y = $element["y"];
+
+		$image = get_png_by_selementid($selementid);
+		if($image)
+		{
+			$x += imagesx($image) / 2;
+			$y += imagesy($image) / 2;
+		}
+
+		return array($x, $y);
+	}
+
+	function	MyDrawLine($image,$x1,$y1,$x2,$y2,$color,$drawtype)
+	{
+		if($drawtype == GRAPH_DRAW_TYPE_BOLDLINE)
+		{
+			ImageLine($image,$x1,$y1,$x2,$y2,$color);
+			if(($x1-$x2) < ($y1-$y2))
+			{
+				$x1++;		$x2++;
+			}
+			else
+			{
+				$y1++;		$y2++;
+			}
+			ImageLine($image,$x1,$y1,$x2,$y2,$color);
+		}
+		else if($drawtype == GRAPH_DRAW_TYPE_DASHEDLINE)
+		{
+			if(function_exists("imagesetstyle"))
+			{ /* Use ImageSetStyle+ImageLIne instead of bugged ImageDashedLine */
+				$style = array($color, $color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT);
+				ImageSetStyle($image, $style);
+				ImageLine($image,$x1,$y1,$x2,$y2,IMG_COLOR_STYLED);
+			}
+			else
+			{
+				ImageDashedLine($image,$x1,$y1,$x2,$y2,$color);
+			}
+		}
+		else
+		{
+			ImageLine($image,$x1,$y1,$x2,$y2,$color);
+		}
 	}
 ?>

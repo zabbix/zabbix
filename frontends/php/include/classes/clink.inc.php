@@ -22,7 +22,7 @@
 	class CLink extends CTag
 	{
 /* public */
-		function CLink($item="www.zabbix.com",$url="http://www.zabbix.com",$class=NULL)
+		function CLink($item=NULL,$url=NULL,$class=NULL)
 		{
 			parent::CTag("a","yes");
 
@@ -37,7 +37,11 @@
 		}
 		function SetUrl($value)
 		{
-			if(!is_string($value))
+			if(is_null($value))
+			{
+				return $this->DelOption("href");
+			}
+			elseif(!is_string($value))
 			{
 				return $this->error("Incorrect value for SetUrl [$value]");
 			}

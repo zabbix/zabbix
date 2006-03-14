@@ -56,7 +56,7 @@
 	if(isset($_REQUEST["start"]))   {
 		$form->AddVar("start",$_REQUEST["start"]);
 	} else {
-		$btnPrev->SetEnable('no');
+		$btnPrev->SetEnabled('no');
 	}
 	$form->AddItem($btnPrev);
 

@@ -23,6 +23,13 @@
 	define("SPACE","&nbsp;");
 	define("RARR","&rArr;");
 
+	function do_vertival_text($str)
+	{
+		for($i=0,$out = ""; $i<strlen($str); $i++)	$out .= $str[$i].BR;
+		$str = $out;
+		return $str;
+	}
+
 	function	bold($str)
 	{
 		if(is_array($str)){
@@ -38,7 +45,7 @@
 	function	bfirst($str) // mark first symbol of string as bold
 	{
 		$res = bold($str[0]);
-		for($i=1; $i<strlen($str); $i++) $res .= $str[$i];
+		for($i=1; $i<strlen($str); $i++)	$res .= $str[$i];
 		$str = $res;
 		return $str;	
 	}
@@ -99,7 +106,7 @@
 		}
 	}
 
-	function table_begin($class="tborder")
+	function table_begin($class="tableinfo")
 	{
 		echo "<table class=\"$class\" border=0 width=\"100%\" bgcolor='#AAAAAA' cellspacing=1 cellpadding=3>";
 		echo "\n";

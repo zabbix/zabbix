@@ -411,7 +411,7 @@
 	}
 	else
 	{
-//		show_table_header("<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&fullscreen=1&sort=$sort\">".S_TRIGGERS_BIG." $time</A>");
+		show_table_header(new CLink(S_TRIGGERS_BIG." $time","tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&fullscreen=1&sort=$sort"));
 	}
 
 	$table  = new CTableInfo();
@@ -616,7 +616,32 @@
 			$comments=new CLink(S_ADD,"tr_comments.php?triggerid=".$row["triggerid"],"action");
 		}
 
-		$ack=S_NO;
+		$ack = "-";
+		if($row["value"] == 1)
+		{
+			$alarm = get_last_alarm_by_triggerid($row["triggerid"]);
+			if($alarm["acknowledged"] == 1)
+			{
+				$db_acks = get_acknowledges_by_alarmid($alarm["alarmid"]);
+				$ack=array(
+					new CSpan(S_YES,"off"),
+					SPACE."(".DBnum_rows($db_acks).SPACE,
+					new CLink(S_SHOW,
+						"acknow.php?alarmid=".$alarm["alarmid"],"action"),
+					")"
+					);
+			}
+			else
+			{
+				$ack=array(
+					new CSpan(S_NO,"on"),
+					SPACE."(",
+					new CLink(S_ACK,
+						"acknow.php?alarmid=".$alarm["alarmid"],"action"),
+					")"
+					);
+			}
+		}
 
 		$table->AddRow(array(
 				$description,
@@ -624,7 +649,7 @@
 				new CCol($priority,$priority_style),
 				$lastchange,
 				$actions,
-				$ack,
+				new CCol($ack,"center"),
 				$comments
 				));
 		$col++;

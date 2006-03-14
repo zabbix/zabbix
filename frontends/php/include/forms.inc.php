@@ -19,9 +19,40 @@
 **/
 ?>
 <?php
+// TODO !!! Correcr the help links !!! TODO
+
 	include_once 	"include/defines.inc.php";
 	include_once 	"include/db.inc.php";
-//	include_once 	"include/local_en.inc.php";
+
+	function	insert_new_message_form()
+	{
+		global $USER_DETAILS;
+		global $_REQUEST;
+
+		$db_acks = get_acknowledges_by_alarmid($_REQUEST["alarmid"]);
+		if(DBnum_rows($db_acks)==0)
+		{
+			$title = S_ACKNOWLEDGE_ALARM_BY;
+			$btn_txt = S_ACKNOWLEDGE;
+		}
+		else
+		{
+			$title = S_ADD_COMMENT_BY;
+			$btn_txt = S_SAVE;
+		}
+
+		$frmMsg= new CFormTable($title." \"".$USER_DETAILS["alias"]."\"");
+		$frmMsg->SetHelp("manual.php");
+		$frmMsg->AddVar("alarmid",get_request("alarmid",0));
+
+		$frmMsg->AddRow(S_MESSAGE, new CTextArea("message","",80,6));
+
+		$frmMsg->AddItemToBottomRow(new CButton("save",$btn_txt));
+
+		$frmMsg->Show();
+
+		SetFocus($frmMsg->GetName(),"message");
+	}
 
 	# Insert form for User
 	function	insert_user_form($userid,$profile=0)
@@ -217,7 +248,7 @@
 	{
 		global  $_REQUEST;
 
-		$frmItem = new CFormTable(S_ITEM,"items.php#form");
+		$frmItem = new CFormTable(S_ITEM,"items.php");
 		$frmItem->SetHelp("web.items.item.php");
 
 		if(isset($_REQUEST["groupid"]))
@@ -1485,7 +1516,6 @@
 	{
 		$frmImages = new CFormTable(S_IMAGE,"config.php","post","multipart/form-data");
 		$frmImages->SetHelp("web.config.images.php");
-		$frmImages->AddVar("MAX_FILE_SIZE",(1024*1024));	
 		$frmImages->AddVar("config",get_request("config",3));
 
 		if(isset($_REQUEST["imageid"]))
@@ -1508,6 +1538,7 @@
 		{
 			$name		= get_request("name","");
 			$imagetype	= get_request("imagetype",1);
+			$imageid	= get_request("imageid",0);
 		}
 
 		$frmImages->AddRow(S_NAME,new CTextBox("name",$name,64));
@@ -1516,7 +1547,15 @@
 		$cmbImg->AddItem(1,S_ICON);
 		$cmbImg->AddItem(2,S_BACKGROUND);
 		$frmImages->AddRow(S_TYPE,$cmbImg);
+
 		$frmImages->AddRow(S_UPLOAD,new CFile("image"));
+
+		if($imageid > 0)
+		{
+			$frmImages->AddRow(S_IMAGE,new CLink(
+				new CImg("image.php?width=640&height=480&imageid=".$imageid,"no image",NULL),
+				"image.php?imageid=".$row["imageid"]));
+		}
 
 		$frmImages->AddItemToBottomRow(new CButton("save",S_SAVE));
 		if(isset($_REQUEST["imageid"]))
@@ -1581,7 +1620,7 @@
 	{
 		global $_REQUEST;
 
-		$form = new CFormTable(S_SCREEN_CELL_CONFIGURATION,"screenedit.php");
+		$form = new CFormTable(S_SCREEN_CELL_CONFIGURATION,"screenedit.php#form");
 		$form->SetHelp("web.screenedit.cell.php");
 
 		if(isset($_REQUEST["screenitemid"]))
@@ -1606,7 +1645,9 @@
 			$colspan	= $irow["colspan"];
 			$rowspan	= $irow["rowspan"];
 			$elements	= $irow["elements"];
-
+			$valign		= $irow["valign"];
+			$halign		= $irow["halign"];
+			$style		= $irow["style"];
 		}
 		else
 		{
@@ -1617,25 +1658,35 @@
 			$colspan	= get_request("colspan",	0);
 			$rowspan	= get_request("rowspan",	0);
 			$elements	= get_request("elements",	25);
+			$valign		= get_request("valign",		VALIGN_DEFAULT);
+			$halign		= get_request("halign",		HALIGN_DEFAULT);
+			$style		= get_request("style",		0);
 		}
 
 
 		$form->AddVar("screenid",$_REQUEST["screenid"]);
 
 		$cmbRes = new CCombobox("resource",$resource,"submit()");
-		$cmbRes->AddItem(0,S_GRAPH);
-		$cmbRes->AddItem(1,S_SIMPLE_GRAPH);
-		$cmbRes->AddItem(2,S_MAP);
-		$cmbRes->AddItem(3,S_PLAIN_TEXT);
+		$cmbRes->AddItem(SCREEN_RESOURCE_GRAPH,		S_GRAPH);
+		$cmbRes->AddItem(SCREEN_RESOURCE_SIMPLE_GRAPH,	S_SIMPLE_GRAPH);
+		$cmbRes->AddItem(SCREEN_RESOURCE_PLAIN_TEXT,	S_PLAIN_TEXT);
+		$cmbRes->AddItem(SCREEN_RESOURCE_MAP,		S_MAP);
+		$cmbRes->AddItem(SCREEN_RESOURCE_SCREEN,	S_SCREEN);
+		$cmbRes->AddItem(SCREEN_RESOURCE_SERVER_INFO,	S_SERVER_INFO);
+		$cmbRes->AddItem(SCREEN_RESOURCE_HOSTS_INFO,	S_HOSTS_INFO);
+		$cmbRes->AddItem(SCREEN_RESOURCE_TRIGGERS_INFO,	S_TRIGGERS_INFO);
+		$cmbRes->AddItem(SCREEN_RESOURCE_TRIGGERS_OVERVIEW,	S_TRIGGERS_OVERVIEW);
+		$cmbRes->AddItem(SCREEN_RESOURCE_DATA_OVERVIEW,		S_DATA_OVERVIEW);
+		$cmbRes->AddItem(SCREEN_RESOURCE_CLOCK,		S_CLOCK);
+//		$cmbRes->AddItem(SCREEN_RESOURCE_URL,		S_URL);
 		$form->AddRow(S_RESOURCE,$cmbRes);
 
-		if($resource == 0)
+		if($resource == SCREEN_RESOURCE_GRAPH)
 		{
 	// User-defined graph
 			$result=DBselect("select graphid,name from graphs order by name");
 
 			$cmbGraphs = new CComboBox("resourceid",$resourceid);
-			$cmbGraphs->AddItem(0,"(none)");
 			while($row=DBfetch($result))
 			{
 				$db_hosts = get_hosts_by_graphid($row["graphid"]);
@@ -1653,7 +1704,7 @@
 
 			$form->AddRow(S_GRAPH_NAME,$cmbGraphs);
 		}
-		elseif($resource == 1)
+		elseif($resource == SCREEN_RESOURCE_SIMPLE_GRAPH)
 		{
 	// Simple graph
 			$result=DBselect("select h.host,i.description,i.itemid,i.key_".
@@ -1663,7 +1714,6 @@
 
 
 			$cmbItems = new CCombobox("resourceid",$resourceid);
-			$cmbItems->AddItem(0,"(none)");
 			while($row=DBfetch($result))
 			{
 				$description_=item_description($row["description"],$row["key_"]);
@@ -1672,13 +1722,12 @@
 			}
 			$form->AddRow(S_PARAMETER,$cmbItems);
 		}
-		else if($resource == 2)
+		elseif($resource == SCREEN_RESOURCE_MAP)
 		{
 	// Map
 			$result=DBselect("select sysmapid,name from sysmaps order by name");
 
 			$cmbMaps = new CComboBox("resourceid",$resourceid);
-			$cmbMaps->AddItem(0,"(none)");
 			while($row=DBfetch($result))
 			{
 				$cmbMaps->AddItem($row["sysmapid"],$row["name"]);
@@ -1686,7 +1735,7 @@
 
 			$form->AddRow(S_MAP,$cmbMaps);
 		}
-		else if($resource == 3)
+		elseif($resource == SCREEN_RESOURCE_PLAIN_TEXT)
 		{
 	// Plain text
 			$result=DBselect("select h.host,i.description,i.itemid,i.key_".
@@ -1695,7 +1744,6 @@
 				" order by h.host,i.description");
 
 			$cmbHosts = new CComboBox("resourceid",$resourceid);
-			$cmbHosts->AddItem(0,"(none)");
 			while($row=DBfetch($result))
 			{
 				$description_=item_description($row["description"],$row["key_"]);
@@ -1706,21 +1754,102 @@
 			$form->AddRow(S_PARAMETER,$cmbHosts);
 			$form->AddRow(S_SHOW_LINES, new CTextBox("elements",$elements,2));
 		}
-		else
+		elseif(in_array($resource,array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW,SCREEN_RESOURCE_DATA_OVERVIEW)))
 		{
-			$form->AddVar("resouceid",$resourceid);
+	// Overiews
+			$cmbGroup = new CComboBox("resourceid",$resourceid);
+
+			$cmbGroup->AddItem(0,S_ALL_SMALL);
+			$result=DBselect("select groupid,name from groups order by name");
+			while($row=DBfetch($result))
+			{
+				$cmbGroup = new CComboBox("resourceid",$resourceid);
+
+				$cmbGroup->AddItem(0,S_ALL_SMALL);
+				$result=DBselect("select groupid,name from groups order by name");
+				while($row=DBfetch($result))
+				{
+					$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg where".
+						" h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$row["groupid"].
+						" and hg.hostid=h.hostid group by h.hostid,h.host order by h.host");
+					while($row2=DBfetch($result2))
+					{
+						if(!check_right("Host","R",$row2["hostid"]))    continue;
+						$cmbGroup->AddItem($row["groupid"],$row["name"]);
+						break;
+					}
+				}
+			}
+			$form->AddRow(S_GROUP,$cmbGroup);
+
+		}
+		elseif($resource == SCREEN_RESOURCE_SCREEN)
+		{
+			$cmbScreens = new CComboBox("resourceid",$resourceid);
+			$result=DBselect("select screenid,name from screens");
+			while($row=DBfetch($result))
+			{
+				if(check_screen_recursion($_REQUEST["screenid"],$row["screenid"]))
+					continue;
+				$cmbScreens->AddItem($row["screenid"],$row["name"]);
+
+			}
+
+			$form->AddRow(S_SCREEN,$cmbScreens);
+		}
+		else // SCREEN_RESOURCE_HOSTS_INFO,  SCREEN_RESOURCE_TRIGGERS_INFO,  SCREEN_RESOURCE_CLOCK
+		{
+			$form->AddVar("resourceid",0);
 		}
 
-		if($resource!=3)
+		if(in_array($resource,array(SCREEN_RESOURCE_HOSTS_INFO,SCREEN_RESOURCE_TRIGGERS_INFO)))
+		{
+			$cmbStyle = new CComboBox("style", $style);
+			$cmbStyle->AddItem(STYLE_HORISONTAL,	S_HORISONTAL);
+			$cmbStyle->AddItem(STYLE_VERTICAL,	S_VERTICAL);
+			$form->AddRow(S_STYLE,	$cmbStyle);
+		}
+		elseif($resource == SCREEN_RESOURCE_CLOCK)
+		{
+			$cmbStyle = new CComboBox("style", $style);
+			$cmbStyle->AddItem(TIME_TYPE_LOCAL,	S_LOCAL_TIME);
+			$cmbStyle->AddItem(TIME_TYPE_SERVER,	S_SERVER_TIME);
+			$form->AddRow(S_TIME_TYPE,	$cmbStyle);
+		}
+		else
+		{
+			$form->AddVar("style",	0);
+		}
+
+		if(in_array($resource,array(SCREEN_RESOURCE_GRAPH,SCREEN_RESOURCE_SIMPLE_GRAPH,SCREEN_RESOURCE_CLOCK)))
 		{
 			$form->AddRow(S_WIDTH,	new CTextBox("width",$width,5));
 			$form->AddRow(S_HEIGHT,	new CTextBox("height",$height,5));
 		}
 		else
 		{
-			$form->AddVar("width",	$width);
-			$form->AddVar("height",	$height);
+			$form->AddVar("width",	0);
+			$form->AddVar("height",	0);
 		}
+
+		if(in_array($resource,array(SCREEN_RESOURCE_GRAPH,SCREEN_RESOURCE_SIMPLE_GRAPH,SCREEN_RESOURCE_MAP,SCREEN_RESOURCE_CLOCK)))
+		{
+			$cmbHalign = new CComboBox("halign",$halign);
+			$cmbHalign->AddItem(HALIGN_CENTER,	S_CENTER);
+			$cmbHalign->AddItem(HALIGN_LEFT,	S_LEFT);
+			$cmbHalign->AddItem(HALIGN_RIGHT,	S_RIGHT);
+			$form->AddRow(S_HORISONTAL_ALIGN,	$cmbHalign);
+		}
+		else
+		{
+			$form->AddVar("halign",	0);
+		}
+
+		$cmbValign = new CComboBox("valign",$valign);
+		$cmbValign->AddItem(VALIGN_MIDDLE,	S_MIDDLE);
+		$cmbValign->AddItem(VALIGN_TOP,		S_TOP);
+		$cmbValign->AddItem(VALIGN_BOTTOM,	S_BOTTOM);
+		$form->AddRow(S_VERTICAL_ALIGN,	$cmbValign);
 
 		$form->AddRow(S_COLUMN_SPAN,	new CTextBox("colspan",$colspan,2));
 		$form->AddRow(S_ROW_SPAN,	new CTextBox("rowspan",$rowspan,2));
@@ -2107,13 +2236,12 @@
 
 		$frmHostG->AddRow(S_GROUP_NAME,new CTextBox("gname",$name,30));
 
-		$cmbHosts = new CListBox("hosts[]",10);
+		$cmbHosts = new CListBox("hosts[]",$hosts,10);
 		$db_hosts=DBselect("select distinct hostid,host from hosts".
 			" where status<>".HOST_STATUS_DELETED." order by host");
 		while($db_host=DBfetch($db_hosts))
 		{
-			$cmbHosts->AddItem($db_host["hostid"],$db_host["host"],
-				in_array($db_host["hostid"],$hosts) ? 'yes' : 'no');
+			$cmbHosts->AddItem($db_host["hostid"],$db_host["host"]);
 		}
 		$frmHostG->AddRow(S_HOSTS,$cmbHosts);
 
@@ -2225,9 +2353,9 @@
 		$frmMap->AddRow(S_BACKGROUND_IMAGE,$cmbImg);
 
 		$cmbLabel = new CComboBox("label_type",$label_type);
-		$cmbLabel->AddItem(0,S_HOST_LABEL);
+		$cmbLabel->AddItem(0,S_LABEL);
 		$cmbLabel->AddItem(1,S_IP_ADDRESS);
-		$cmbLabel->AddItem(2,S_HOST_NAME);
+		$cmbLabel->AddItem(2,S_ELEMENT_NAME);
 		$cmbLabel->AddItem(3,S_STATUS_ONLY);
 		$cmbLabel->AddItem(4,S_NOTHING);
 		$frmMap->AddRow(S_ICON_LABEL_TYPE,$cmbLabel);
@@ -2254,86 +2382,149 @@
 		
 	}
 
-	function insert_map_host_form()
+	function insert_map_element_form()
 	{
-		if(isset($_REQUEST["shostid"]))
-		{
-			$shost=get_sysmaps_hosts_by_shostid($_REQUEST["shostid"]);
+		$frmEl = new CFormTable("New map element","sysmap.php");
+		$frmEl->SetHelp("web.sysmap.host.php");
+		$frmEl->AddVar("sysmapid",$_REQUEST["sysmapid"]);
 
-			$hostid	= $shost["hostid"];
-			$label	= $shost["label"];
-			$x	= $shost["x"];
-			$y	= $shost["y"];
-			$icon	= $shost["icon"];
-			$url	= $shost["url"];
-			$icon_on= $shost["icon_on"];
+		if(isset($_REQUEST["selementid"]))
+		{
+			$frmEl->AddVar("selementid",$_REQUEST["selementid"]);
+
+			$element = get_sysmaps_element_by_selementid($_REQUEST["selementid"]);
+			$frmEl->SetTitle("Map element \"".$element["label"]."\"");
+		}
+
+		if(isset($_REQUEST["selementid"]) && !isset($_REQUEST["form_refresh"]))
+		{
+			$elementid	= $element["elementid"];
+			$elementtype	= $element["elementtype"];
+			$label		= $element["label"];
+			$x		= $element["x"];
+			$y		= $element["y"];
+			$icon		= $element["icon"];
+			$url		= $element["url"];
+			$icon_on	= $element["icon_on"];
+			$label_location	= $element["label_location"];
+			if(is_null($label_location)) $label_location = -1;
 		}
 		else
 		{
-			$hostid	= 0;
-
-			$label	= "";
-			$x	= 0;
-			$y	= 0;
-			$icon	= "";
-			$url	= "";
-			$icon_on= "";
+			$elementid 	= get_request("elementid", 	0);
+			$elementtype	= get_request("elementtype", 	SYSMAP_ELEMENT_TYPE_HOST);
+			$label		= get_request("label",		"");
+			$x		= get_request("x",		0);
+			$y		= get_request("y",		0);
+			$icon		= get_request("icon",		"");
+			$url		= get_request("url",		"");
+			$icon_on	= get_request("icon_on",	"");
+			$label_location	= get_request("label_location",	"-1");
 		}
-		if($hostid) 
+
+		$cmbType = new CComboBox("elementtype",$elementtype,"submit()");
+
+		$db_hosts = DBselect("select hostid from hosts");
+		if(DBnum_rows($db_hosts)>0)
+			$cmbType->AddItem(SYSMAP_ELEMENT_TYPE_HOST,	S_HOST);
+
+		$db_maps = DBselect("select sysmapid from sysmaps where sysmapid!=".$_REQUEST["sysmapid"]);
+		if(DBnum_rows($db_maps)>0)
+			$cmbType->AddItem(SYSMAP_ELEMENT_TYPE_MAP,	S_MAP);
+
+		$cmbType->AddItem(SYSMAP_ELEMENT_TYPE_IMAGE,	S_IMAGE);
+
+		$frmEl->AddRow(S_TYPE,$cmbType);
+
+		$frmEl->AddRow("Label", new CTextBox("label", $label, 32));
+
+		$cmbLocation = new CComboBox("label_location",$label_location);
+		$cmbLocation->AddItem(-1,'-');
+		$cmbLocation->AddItem(0,S_BOTTOM);
+		$cmbLocation->AddItem(1,S_LEFT);
+		$cmbLocation->AddItem(2,S_RIGHT);
+		$cmbLocation->AddItem(3,S_TOP);
+		$frmEl->AddRow(S_LABEL_LOCATION,$cmbLocation);
+
+		if($elementtype==SYSMAP_ELEMENT_TYPE_HOST) 
 		{
-			$host_info = get_host_by_hostid($hostid);
-			$host = $host_info["host"];
-		} else {
 			$host = "";
-		}
+			$host_info = 0;
 
-		$frmHost = new CFormTable("New host to display","sysmap.php");
-		$frmHost->SetHelp("web.sysmap.host.php");
-		if(isset($_REQUEST["shostid"]))
-		{
-			$frmHost->AddVar("shostid",$_REQUEST["shostid"]);
-		}
-		if(isset($_REQUEST["sysmapid"]))
-		{
-			$frmHost->AddVar("sysmapid",$_REQUEST["sysmapid"]);
-		}
+			$db_hosts = DBselect("select host from hosts where hostid=$elementid");
+			$host_info = DBfetch($db_hosts);
+			if($host_info)
+				$host = $host_info["host"];
+			else
+				$elementid=0;
 
-		$frmHost->AddVar("hostid",$hostid);
-		$frmHost->AddRow("Host",array(
-			new CTextBox("host",$host,32,NULL,'yes'),
-			new CButton("btn1","Select","return PopUp('popup.php?form=".$frmHost->GetName().
-				"&field1=hostid&field2=host','new_win',".
-				"'width=450,height=450,resizable=1,scrollbars=1');","T")
-		));
+			if($elementid==0)
+			{
+				$db_hosts = DBselect("select hostid,host from hosts limit 1");
+				$db_host = DBfetch($db_hosts);
+				$host = $db_host["host"];
+				$elementid = $db_host["hostid"];
+			}
+
+			$frmEl->AddVar("elementid",$elementid);
+			$frmEl->AddRow(S_HOST, array(
+				new CTextBox("host",$host,32,NULL,'yes'),
+				new CButton("btn1","Select","return PopUp('popup.php?form=".$frmEl->GetName().
+					"&field1=elementid&field2=host','new_win',".
+					"'width=450,height=450,resizable=1,scrollbars=1');","T")
+			));
+		}
+		elseif($elementtype==SYSMAP_ELEMENT_TYPE_MAP)
+		{
+			$cmbMaps = new CComboBox("elementid",$elementid);
+			$db_maps = DBselect("select sysmapid,name from sysmaps");
+			while($db_map = DBfetch($db_maps))
+			{
+				$cmbMaps->AddItem($db_map["sysmapid"],$db_map["name"]);
+			}
+			$frmEl->AddRow(S_MAP, $cmbMaps);
+		}
+		elseif($elementtype==SYSMAP_ELEMENT_TYPE_IMAGE)
+		{
+			$cmbTriggers= new CComboBox("elementid",$elementid);
+			$cmbTriggers->AddItem(0,"-");
+			$db_triggers = DBselect("select triggerid from triggers");
+			while($db_trigger = DBfetch($db_triggers))
+			{
+				$cmbTriggers->AddItem(
+					$db_trigger["triggerid"],
+					expand_trigger_description($db_trigger["triggerid"]));
+			}
+			$frmEl->AddRow(S_TRIGGER, $cmbTriggers);
+		}
 
 		$cmbIcon = new CComboBox("icon",$icon);
 		$result=DBselect("select name from images where imagetype=1 order by name");
 		while($row=DBfetch($result))
 			$cmbIcon->AddItem($row["name"],$row["name"]);
-		$frmHost->AddRow("Icon (OFF)",$cmbIcon);
+		$frmEl->AddRow("Icon (OFF)",$cmbIcon);
 
 		$cmbIcon = new CComboBox("icon_on",$icon_on);
 		$result=DBselect("select name from images where imagetype=1 order by name");
 		while($row=DBfetch($result))
 			$cmbIcon->AddItem($row["name"],$row["name"]);
-		$frmHost->AddRow("Icon (ON)",$cmbIcon);
+		$frmEl->AddRow("Icon (ON)",$cmbIcon);
 
-		$frmHost->AddRow("Label", new CTextBox("label", $label, 32));
+		$frmEl->AddRow("Coordinate X", new CTextBox("x", $x, 5));
+		$frmEl->AddRow("Coordinate Y", new CTextBox("y", $y, 5));
+		$frmEl->AddRow("URL", new CTextBox("url", $url, 64));
 
-		$frmHost->AddRow("Coordinate X", new CTextBox("x", $x, 5));
-		$frmHost->AddRow("Coordinate Y", new CTextBox("y", $y, 5));
-		$frmHost->AddRow("URL", new CTextBox("url", $url, 64));
-
-		$frmHost->AddItemToBottomRow(new CButton("register","add"));
-		if(isset($_REQUEST["shostid"]))
+		$frmEl->AddItemToBottomRow(new CButton("save",S_SAVE));
+		if(isset($_REQUEST["selementid"]))
 		{
-			$frmHost->AddItemToBottomRow(SPACE);
-			$frmHost->AddItemToBottomRow(new CButton("register","update"));
+			$frmEl->AddItemToBottomRow(SPACE);
+			$frmEl->AddItemToBottomRow(new CButtonDelete("Delete element?",url_param("form").
+				url_param("selementid").url_param("sysmapid")));
 		}
-		$frmHost->AddItemToBottomRow(SPACE);
-		$frmHost->AddItemToBottomRow(new CButtonCancel(url_param("sysmapid")));
+		$frmEl->AddItemToBottomRow(SPACE);
+		$frmEl->AddItemToBottomRow(new CButtonCancel(url_param("sysmapid")));
 
-		$frmHost->Show();
+		$frmEl->Show();
 	}
 
 	function insert_map_link_form()
@@ -2342,41 +2533,77 @@
 		$frmCnct->SetHelp("web.sysmap.connector.php");
 		$frmCnct->AddVar("sysmapid",$_REQUEST["sysmapid"]);
 
-		$cmbHosts = new CComboBox("shostid1");
-
-		$result=DBselect("select h.host,sh.shostid,sh.sysmapid,sh.hostid,sh.label,sh.x,".
-			"sh.y,sh.icon from sysmaps_hosts sh,hosts h".
-			" where sh.sysmapid=".$_REQUEST["sysmapid"].
-			" and h.status not in (".HOST_STATUS_DELETED.") and h.hostid=sh.hostid".
-			" order by h.host");
-
-		while($row=DBfetch($result))
+		if(isset($_REQUEST["linkid"]))
 		{
-			$host=get_host_by_hostid($row["hostid"]);
-			$cmbHosts->AddItem($row["shostid"],$host["host"].": ".$row["label"]);
+			$frmCnct->AddVar("linkid",$_REQUEST["linkid"]);
+			$db_links = DBselect("select * from sysmaps_links where linkid=".$_REQUEST["linkid"]);
+			$db_link = DBfetch($db_links);
 		}
-		$frmCnct->AddRow("Host 1",$cmbHosts);
 
-		$cmbHosts->SetName("shostid2");
-		$frmCnct->AddRow("Host 2",$cmbHosts);
+		if(isset($_REQUEST["linkid"]) && !isset($_REQUEST["form_refresh"]))
+		{
+			$selementid1	= $db_link["selementid1"];
+			$selementid2	= $db_link["selementid2"];
+			$triggerid	= $db_link["triggerid"];
+			$drawtype_off	= $db_link["drawtype_off"];
+			$drawtype_on	= $db_link["drawtype_on"];
+			$color_off	= $db_link["color_off"];
+			$color_on	= $db_link["color_on"];
+		}
+		else
+		{
+			$selementid1	= get_request("selementid1",	0);
+			$selementid2	= get_request("selementid2",	0);
+			$triggerid	= get_request("triggerid",	0);
+			$drawtype_off	= get_request("drawtype_off",	0);
+			$drawtype_on	= get_request("drawtype_on",	0);
+			$color_off	= get_request("color_off",	0);
+			$color_on	= get_request("color_on",	0);
+		}
 
-		$cmbIndic = new CComboBox("triggerid");
+/* START comboboxes preparations */
+		$cmbElements = new CComboBox("selementid1",$selementid1);
+		$db_selements = DBselect("select selementid,label,elementid,elementtype from sysmaps_elements".
+			" where sysmapid=".$_REQUEST["sysmapid"]);
+		while($db_selement = DBfetch($db_selements))
+		{
+			$label = $db_selement["label"];
+			if($db_selement["elementtype"] == SYSMAP_ELEMENT_TYPE_HOST)
+			{
+				$db_host = get_host_by_hostid($db_selement["elementid"]);
+				$label .= ":".$db_host["host"];
+			}
+			elseif($db_selement["elementtype"] == SYSMAP_ELEMENT_TYPE_MAP)
+			{
+				$db_map = get_sysmap_by_sysmapid($db_selement["elementid"]);
+				$label .= ":".$db_map["host"];
+			}
+			elseif($db_selement["elementtype"] == SYSMAP_ELEMENT_TYPE_IMAGE)
+			{
+				if($db_selement["elementid"]>0)
+				{
+					$label .= ":".expand_trigger_description($db_selement["elementid"]);
+				}
+			}
+			$cmbElements->AddItem($db_selement["selementid"],$label);
+		}
+
+		$cmbIndic = new CComboBox("triggerid",$triggerid);
 		$cmbIndic->AddItem(0,"-");
 	        $result=DBselect("select triggerid from triggers order by description");
 		while($row=DBfetch($result))
 	        {
 			$cmbIndic->AddItem($row["triggerid"],expand_trigger_description($row["triggerid"]));
 	        }
-		$frmCnct->AddRow("Link status indicator",$cmbIndic);
 
-		$cmbType = new CComboBox("drawtype_off");
+		$cmbType = new CComboBox("drawtype_off",$drawtype_off);
 		$cmbType->AddItem(0,get_drawtype_description(0));
 		$cmbType->AddItem(1,get_drawtype_description(1));
 		$cmbType->AddItem(2,get_drawtype_description(2));
 		$cmbType->AddItem(3,get_drawtype_description(3));
 		$cmbType->AddItem(4,get_drawtype_description(4));
 
-		$cmbColor = new CComboBox("color_off");
+		$cmbColor = new CComboBox("color_off",$color_off);
 		$cmbColor->AddItem('Black',"Black");
 		$cmbColor->AddItem('Blue',"Blue");
 		$cmbColor->AddItem('Cyan',"Cyan");
@@ -2388,17 +2615,34 @@
 		$cmbColor->AddItem('Red',"Red");
 		$cmbColor->AddItem('White',"White");
 		$cmbColor->AddItem('Yellow',"Yellow");
+/* END preparation */
+
+		$frmCnct->AddRow("Element 1",$cmbElements);
+
+		$cmbElements->SetName("selementid2");	// rename without recreation
+		$cmbElements->SetValue($selementid2);	// rename without recreation
+		$frmCnct->AddRow("Element 2",$cmbElements);
+
+		$frmCnct->AddRow("Link status indicator",$cmbIndic);
 
 		$frmCnct->AddRow("Type (OFF)",$cmbType);
 		$frmCnct->AddRow("Color (OFF)",$cmbColor);
 
-		$cmbType->SetName("drawtype_on");
-		$cmbColor->SetName("color_on");
-
+		$cmbType->SetName("drawtype_on"); 	// rename without recreation
+		$cmbType->SetValue($drawtype_on);	// rename without recreation
 		$frmCnct->AddRow("Type (ON)",$cmbType);
+
+		$cmbColor->SetName("color_on");		// rename without recreation
+		$cmbColor->SetValue($color_on);		// rename without recreation
 		$frmCnct->AddRow("Color (ON)",$cmbColor);
 
-		$frmCnct->AddItemToBottomRow(new CButton("register","add link"));
+		$frmCnct->AddItemToBottomRow(new CButton("save_link",S_SAVE));
+		if(isset($_REQUEST["linkid"]))
+		{
+			$frmCnct->AddItemToBottomRow(SPACE);
+			$frmCnct->AddItemToBottomRow(new CButtonDelete("Delete link?",
+				url_param("linkid").url_param("sysmapid")));
+		}
 		$frmCnct->AddItemToBottomRow(SPACE);
 		$frmCnct->AddItemToBottomRow(new CButtonCancel(url_param("sysmapid")));
 		

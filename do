@@ -5,7 +5,7 @@ copy="no"
 tgz="no"
 configure="no"
 domake="no"
-config_param="--enable-agent --prefix=`pwd`"
+config_param="--prefix=`pwd`"
 dotest="no"
 cleanwarnings="no"
 docat="yes"
@@ -27,6 +27,7 @@ do
     tar )     tgz="yes"; noparam=1;;
     nocat )   docat="no"; noparam=1;;
     cat )   docat="yes"; noparam=1;;
+    def ) config_param="$config_param --with-ldap --enable-agent --enable-server --with-mysql --with-net-snmp";;
     --enable-* ) config_param="$config_param $cmd";; 
     --with-* ) config_param="$config_param $cmd";;
     --prefix=* ) config_param="$config_param $cmd";;
@@ -41,10 +42,10 @@ if [ "$help" = "yes" ] || [ $noparam = 0 ]
 then
         echo
         echo "Usage:"
-        echo "  $0 [copy|cpy] [premake|pre] [configure|config|conf] [make] [test] [tar] [cat] [nocat] [--enable-*] [--with-*]"
+        echo "  $0 [copy|cpy] [premake|pre] [configure|config|conf] [make] [def] [test] [tar] [cat] [nocat] [--enable-*] [--with-*]"
         echo
         echo "Examples:"
-        echo "  $0 conf make test            - compyle, test, and hsow report"
+        echo "  $0 conf make def test            - compyle, test, and hsow report"
         echo "  $0 cpy tar nocat             - make archive .tar.gz and don't show report"
         echo "  $0 cat                       - cat last REPORT"
         echo "  $0                           - show this help"
