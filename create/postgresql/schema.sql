@@ -433,7 +433,7 @@ CREATE UNIQUE INDEX sysmaps_name on sysmaps (name);
 --
 
 CREATE TABLE sysmaps_elements (
-  iselementid		serial,
+  selementid		serial,
   sysmapid		int4		DEFAULT '0' NOT NULL,
   elementid		int4		DEFAULT '0' NOT NULL,
   elementtype		int4		DEFAULT '0' NOT NULL,
