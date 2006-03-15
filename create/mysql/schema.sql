@@ -104,7 +104,7 @@ CREATE TABLE sysmaps_links (
 --
 
 CREATE TABLE sysmaps_elements (
-  elementid		int(4)		NOT NULL auto_increment,
+  selementid		int(4)		NOT NULL auto_increment,
   sysmapid		int(4)		DEFAULT '0' NOT NULL,
   elementid		int(4)		DEFAULT '0' NOT NULL,
   elementtype		int(4)		DEFAULT '0' NOT NULL,
