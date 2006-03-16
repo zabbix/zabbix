@@ -35,6 +35,18 @@
 			$this->AddItem($item);
 			$this->SetUrl($url);
 		}
+		function SetAction($value=NULL)
+		{
+			if(is_null($value))
+			{
+				return $this->AddOption("action",$page["file"]);
+			}
+			elseif(!is_string($value))
+			{
+				return $this->error("Incorrect value for SetAction [$value]");
+			}
+			return $this->AddOption("onClick",$value);
+		}
 		function SetUrl($value)
 		{
 			if(is_null($value))

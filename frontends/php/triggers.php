@@ -268,14 +268,11 @@
 		$form->SetName('triggers');
 		$form->AddVar('hostid',$_REQUEST["hostid"]);
 
-		$table = new CTableInfo();
+		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
 		$table->setHeader(array(
-//			array(	new CCheckBox("all_items",NULL,NULL,
-//					"CheckAll('".$form->GetName()."','all_items');")
-//				,S_ID
-//			),
-			array(	new CCheckBox("all_items",NULL,NULL,
-					"CheckAll('".$form->GetName()."','all_items');")
+			$_REQUEST["hostid"] > 0 ? NULL : S_HOST,
+			array(	new CCheckBox("all_triggers",NULL,NULL,
+					"CheckAll('".$form->GetName()."','all_triggers');")
 				,S_NAME
 			),
 			S_EXPRESSION, S_SEVERITY, S_STATUS, S_ERROR));
@@ -296,16 +293,6 @@
 			{
 				continue;
 			}
-
-//			$id= array(
-//				new CCheckBox(
-//					"g_triggerid[]",	/* name */
-//					NULL,			/* checked */
-//					NULL,			/* caption */
-//					NULL,			/* action */
-//					$row["triggerid"])	/* value */
-//				, $row["triggerid"]
-//				);
 
 			$description = array(
 				new CCheckBox(
@@ -394,7 +381,7 @@
 			if($row["error"]=="")		$row["error"]=SPACE;
 
 			$table->addRow(array(
-//				$id,
+				$_REQUEST["hostid"] > 0 ? NULL : $row["host"],
 				$description,
 				explode_exp($row["expression"],1),
 				$priority,
@@ -412,7 +399,7 @@
 		array_push($footerButtons, SPACE);
 		array_push($footerButtons, new CButton('group_delete','Delete selected',
 			"return Confirm('".S_DELETE_SELECTED_TRIGGERS_Q."');"));
-		$table->SetFooter(new CCol($footerButtons),'table_footer');
+		$table->SetFooter(new CCol($footerButtons));
 
 		$form->AddItem($table);
 		$form->Show();

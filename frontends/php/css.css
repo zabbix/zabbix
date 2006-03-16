@@ -631,9 +631,11 @@ A.action:visited 	{	color:#3C3089;	text-decoration: none; }
 A.action:hover 		{	color:#3C3089;	text-decoration: underline; }
 A.action:active 	{	color:#3C3089;	text-decoration: underline;}
 
+.enabled		{	color: #00AA00;	}
+.disabled	{	color: #AA0000;	}
+.unknown	{	color: #AAAAAA;	}
 .on		{	color: #AA0000;	}
 .off		{	color: #00AA00;	}
-.unknown	{	color: #AAAAAA;	}
 
 .disaster	{	background-color: #FF0000;	}
 .high		{	background-color: #FF8888;	}
@@ -713,4 +715,8 @@ ul
 .rarr
 {
 	font-size: 16px;
+}
+
+.bold {
+	font-weight: bold;
 }

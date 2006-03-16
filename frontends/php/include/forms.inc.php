@@ -1036,9 +1036,9 @@
 		$frmAutoReg->AddRow(S_PRIORITY,new CTextBox("priority",$priority,4));
 		$frmAutoReg->AddRow(S_HOST,array(
 			new CTextBox("host",$host,32,NULL,'yes'),
-			new CButton("btn1","Select",
-				"return PopUp('popup.php?form=".$frmAutoReg->GetName().
-				"&field1=hostid&field2=host','new_win',".
+			new CButton("btn1",S_SELECT,
+				"return PopUp('popup.php?dstfrm=".$frmAutoReg->GetName().
+				"&dstfld1=hostid&dstfld2=host&srctbl=hosts&srcfld1=hostid&srcfld2=host','new_win',".
 				"'width=450,height=450,resizable=1,scrollbars=1');",
 				'T')
 			));
@@ -1315,9 +1315,9 @@
 			$txtCondVal = new CTextBox('host','',20);
 			$txtCondVal->SetReadonly('yes');
 
-			$btnSelect = new CButton('btn1','Select',
-				"return PopUp('popup.php?form=".$frmAction->GetName().
-				"&field1=new_condition_value&field2=host','new_win',".
+			$btnSelect = new CButton('btn1',S_SELECT,
+				"return PopUp('popup.php?dstfrm=".$frmAction->GetName().
+				"&dstfld1=new_condition_value&dstfld2=host&srctbl=hosts&srcfld1=hostid&srcfld2=host','new_win',".
 				"'width=450,height=450,resizable=1,scrollbars=1');");
 			$btnSelect->SetAccessKey('T');
 
@@ -1325,17 +1325,17 @@
 		}
 		else if($new_condition_type == CONDITION_TYPE_TRIGGER)
 		{
-			$cmbCondVal = new CComboBox('new_condition_value');
-			$triggers = DBselect("select distinct h.host,t.triggerid,t.description".
-				" from triggers t, functions f,items i, hosts h".
-				" where t.triggerid=f.triggerid and f.itemid=i.itemid".
-				" and h.hostid=i.hostid order by h.host");
-			while($trigger = DBfetch($triggers))
-			{
-				$cmbCondVal->AddItem($trigger["triggerid"],
-					$trigger["host"].":".SPACE.$trigger["description"]);
-			}
-			array_push($rowCondition,$cmbCondVal);
+			$frmAction->AddVar('new_condition_value','0');
+
+			$txtCondVal = new CTextBox('trigger','',20);
+			$txtCondVal->SetReadonly('yes');
+
+			$btnSelect = new CButton('btn1',S_SELECT,
+				"return PopUp('popup.php?dstfrm=".$frmAction->GetName().
+				"&dstfld1=new_condition_value&dstfld2=trigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description','new_win',".
+				"'width=600,height=450,resizable=1,scrollbars=1');");
+			$btnSelect->SetAccessKey('T');
+			array_push($rowCondition, $txtCondVal, $btnSelect);
 		}
 		else if($new_condition_type == CONDITION_TYPE_TRIGGER_NAME)
 		{
@@ -2469,8 +2469,8 @@
 			$frmEl->AddVar("elementid",$elementid);
 			$frmEl->AddRow(S_HOST, array(
 				new CTextBox("host",$host,32,NULL,'yes'),
-				new CButton("btn1","Select","return PopUp('popup.php?form=".$frmEl->GetName().
-					"&field1=elementid&field2=host','new_win',".
+				new CButton("btn1",S_SELECT,"return PopUp('popup.php?dstfrm=".$frmEl->GetName().
+					"&dstfld1=elementid&dstfld2=host&srctbl=hosts&srcfld1=hostid&srcfld2=host','new_win',".
 					"'width=450,height=450,resizable=1,scrollbars=1');","T")
 			));
 		}
@@ -2588,14 +2588,6 @@
 			$cmbElements->AddItem($db_selement["selementid"],$label);
 		}
 
-		$cmbIndic = new CComboBox("triggerid",$triggerid);
-		$cmbIndic->AddItem(0,"-");
-	        $result=DBselect("select triggerid from triggers order by description");
-		while($row=DBfetch($result))
-	        {
-			$cmbIndic->AddItem($row["triggerid"],expand_trigger_description($row["triggerid"]));
-	        }
-
 		$cmbType = new CComboBox("drawtype_off",$drawtype_off);
 		$cmbType->AddItem(0,get_drawtype_description(0));
 		$cmbType->AddItem(1,get_drawtype_description(1));
@@ -2623,7 +2615,22 @@
 		$cmbElements->SetValue($selementid2);	// rename without recreation
 		$frmCnct->AddRow("Element 2",$cmbElements);
 
-		$frmCnct->AddRow("Link status indicator",$cmbIndic);
+		$frmCnct->AddVar('triggerid',$triggerid);
+
+		if($triggerid > 0)
+			$trigger = expand_trigger_description($triggerid);
+		else
+			$trigger = "";
+
+		$txtTrigger = new CTextBox('trigger',$trigger,60);
+		$txtTrigger->SetReadonly('yes');
+
+		$btnSelect = new CButton('btn1',S_SELECT,
+			"return PopUp('popup.php?dstfrm=".$frmCnct->GetName().
+			"&dstfld1=triggerid&dstfld2=trigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description','new_win',".
+			"'width=600,height=450,resizable=1,scrollbars=1');");
+		$btnSelect->SetAccessKey('T');
+		$frmCnct->AddRow("Link status indicator",array($txtTrigger, $btnSelect));
 
 		$frmCnct->AddRow("Type (OFF)",$cmbType);
 		$frmCnct->AddRow("Color (OFF)",$cmbColor);

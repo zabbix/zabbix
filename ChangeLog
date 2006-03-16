@@ -1,6 +1,9 @@
 Changes for 1.1beta8:
 
- - added "Data overview" for screens
+ - added trigger selecton from popup (Eugene)
+ - improved popup selection (Eugene)
+ - improved "IT services" configuration (Eugene)
+ - added "Data overview" for screens (Eugene)
  - added "Triggers overview" for screens (Eugene)
  - added blinking into Trigger overview (Eugene)
  - added screen displaying in other screen (Eugene)

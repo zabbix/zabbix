@@ -298,8 +298,7 @@
 		}
 		if($conditiontype==CONDITION_TYPE_TRIGGER)
 		{
-			$trigger=get_trigger_by_triggerid($value);
-			if($trigger) $desc=S_TRIGGER." $op "."\"".$trigger["description"]."\"";
+			$desc=S_TRIGGER." $op "."\"".expand_trigger_description($value)."\"";
 		}
 		else if($conditiontype==CONDITION_TYPE_HOST)
 		{
