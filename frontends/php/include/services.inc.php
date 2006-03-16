@@ -19,46 +19,26 @@
 **/
 ?>
 <?php
-	function	add_service($serviceid,$name,$triggerid,$linktrigger,$algorithm,$showsla,$goodsla,$sortorder)
+	function	add_service($name,$triggerid,$algorithm,$showsla,$goodsla,$sortorder)
 	{
-		if( isset($showsla)&&($showsla=="on") )
-		{
-			$showsla=1;
-		}
-		else
-		{
-			$showsla=0;
-		}
-		if( isset($linktrigger)&&($linktrigger=="on") )
-		{
-			if(!isset($triggerid))
-			{
-				error("Choose trigger first");
-				return false;
-			}
-//			$trigger=get_trigger_by_triggerid($triggerid);
-//			$description=$trigger["description"];
-//			if( strstr($description,"%s"))
-//			{
-				$description=expand_trigger_description($triggerid);
-//			}
-			$sql="insert into services (name,triggerid,status,algorithm,showsla,goodsla,sortorder) values (".zbx_dbstr($description).",$triggerid,0,$algorithm,$showsla,$goodsla,$sortorder)";
-		}
-		else
-		{
-			$sql="insert into services (name,status,algorithm,showsla,goodsla,sortorder) values (".zbx_dbstr($name).",0,$algorithm,$showsla,$goodsla,$sortorder)";
-		}
+		if(is_null($triggerid)) $triggerid = 'NULL';
+
+		$sql="insert into services (name,status,triggerid,algorithm,showsla,goodsla,sortorder)".
+			" values (".zbx_dbstr($name).",0,$triggerid,$algorithm,$showsla,$goodsla,$sortorder)";
 		$result=DBexecute($sql);
 		if(!$result)
 		{
 			return FALSE;
 		}
-		$id=DBinsert_id($result,"services","serviceid");
-		if(isset($serviceid))
-		{
-			add_service_link($id,$serviceid,0);
-		}
-		return $id;
+		return DBinsert_id($result,"services","serviceid");
+	}
+
+	function	update_service($serviceid,$name,$triggerid,$algorithm,$showsla,$goodsla,$sortorder)
+	{
+		if(is_null($triggerid)) $triggerid = 'NULL';
+
+		$sql="update services set name=".zbx_dbstr($name).",triggerid=$triggerid,status=0,algorithm=$algorithm,showsla=$showsla,goodsla=$goodsla,sortorder=$sortorder where serviceid=$serviceid";
+		return	DBexecute($sql);
 	}
 
 	function	add_host_to_services($hostid,$serviceid)
@@ -67,8 +47,8 @@
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
-			$serviceid2=add_service($serviceid,$row["description"],$row["triggerid"],"on",0,"off",99,0);
-//			add_service_link($serviceid2,$serviceid,0);
+			$serviceid2=add_service($row["description"],$row["triggerid"],"on",0,"off",99,0);
+			add_service_link($serviceid2,$serviceid,0);
 		}
 		return	1;
 	}
@@ -160,44 +140,37 @@
 		return	TRUE;
 	}
 
-	function	update_service($serviceid,$name,$triggerid,$linktrigger,$algorithm,$showsla,$goodsla,$sortorder)
-	{
-		if( isset($linktrigger)&&($linktrigger=="on") )
-		{
-			// No mistake here
-			$triggerid=$triggerid;
-		}
-		else
-		{
-			$triggerid='NULL';
-		}
-		if( isset($showsla)&&($showsla=="on") )
-		{
-			$showsla=1;
-		}
-		else
-		{
-			$showsla=0;
-		}
-		$sql="update services set name=".zbx_dbstr($name).",triggerid=$triggerid,status=0,algorithm=$algorithm,showsla=$showsla,goodsla=$goodsla,sortorder=$sortorder where serviceid=$serviceid";
-		return	DBexecute($sql);
-	}
-
 	function	add_service_link($servicedownid,$serviceupid,$softlink)
 	{
-		if( ($softlink==0) && (is_service_hardlinked($servicedownid)==TRUE) )
+		if( ($softlink==0) && (is_service_hardlinked($servicedownid)==true) )
 		{
-			return	FALSE;
+			return	false;
 		}
 
 		if($servicedownid==$serviceupid)
 		{
-			error("Cannot link service to itself.");
-			return	FALSE;
+			error("cannot link service to itself.");
+			return	false;
 		}
 
 		$sql="insert into services_links (servicedownid,serviceupid,soft) values ($servicedownid,$serviceupid,$softlink)";
-		return	DBexecute($sql);
+		return	dbexecute($sql);
+	}
+	function	update_service_link($linkid,$servicedownid,$serviceupid,$softlink)
+	{
+		if( ($softlink==0) && (is_service_hardlinked($servicedownid)==true) )
+		{
+			return	false;
+		}
+
+		if($servicedownid==$serviceupid)
+		{
+			error("cannot link service to itself.");
+			return	false;
+		}
+
+		$sql="update services_links set servicedownid=$servicedownid, serviceupid=$serviceupid, soft=$softlink where linkid=$linkid";
+		return	dbexecute($sql);
 	}
 
 	function	get_last_service_value($serviceid,$clock)
@@ -350,5 +323,36 @@
 			error("No service with serviceid=[$serviceid]");
 		}
 		return	FALSE;
+	}
+
+	function	get_services_links_by_linkid($linkid)
+	{
+		$result=DBselect("select * from services_links where linkid=$linkid");
+		if(Dbnum_rows($result) == 1)
+		{
+			return	DBfetch($result);
+		}
+		else
+		{
+			error("No service linkage with linkid=[$linkid]");
+		}
+		return	FALSE;
+	}
+
+	function algorithm2str($algorithm)
+	{
+		if($algorithm == SERVICE_ALGORITHM_NONE)
+		{
+			return S_NONE;
+		}
+		elseif($algorithm == SERVICE_ALGORITHM_MAX)
+		{
+			return S_MAX_OF_CHILDS;
+		}
+		elseif($algorithm == SERVICE_ALGORITHM_MIN)
+		{
+			return S_MIN_OF_CHILDS;
+		}
+		return S_UNKNOWN;
 	}
 ?>

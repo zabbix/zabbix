@@ -359,7 +359,7 @@
 		show_header2(S_CONFIGURATION_OF_ITEMS_BIG, $form);
 
 // TABLE
-		$form = new CForm('items.php');
+		$form = new CForm();
 		$form->SetName('items');
 		$form->AddVar('hostid',$_REQUEST["hostid"]);
 
@@ -462,7 +462,7 @@
 		array_push($footerButtons, SPACE);
 		array_push($footerButtons, new CButton('group_task','Delete selected',
 			"return Confirm('".S_DELETE_SELECTED_ITEMS_Q."');"));
-		$table->SetFooter(new CCol($footerButtons),'table_footer');
+		$table->SetFooter(new CCol($footerButtons));
 
 		$form->AddItem($table);
 		$form->Show();
