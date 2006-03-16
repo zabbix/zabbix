@@ -749,6 +749,7 @@
 	"S_SERVER"=>				"Server",
 	"S_DELETE"=>				"Delete",
 	"S_DELETE_SELECTED_SERVICES"=>		"Delete selected services?",
+	"S_DELETE_SELECTED_LINKS"=>		"Delete selected links?",
 	"S_SERVICES_DELETED"=>			"Services deleted",
 	"S_CANNOT_DELETE_SERVICES"=>		"Cannot delete services",
 
@@ -761,6 +762,7 @@
 	"S_TRIGGER_BIG"=>			"TRIGGER",
 
 //	triggers.php
+	"S_NO_TRIGGERS_DEFINED"=>		"No triggers defined",
 	"S_CONFIGURATION_OF_TRIGGERS"=>		"Configuration of triggers",
 	"S_CONFIGURATION_OF_TRIGGERS_BIG"=>	"CONFIGURATION OF TRIGGERS",
 	"S_DEPENDENCY_ADDED"=>			"Dependency added",
@@ -917,6 +919,9 @@
 	"S_BULKLOADER_IMPORT_TRIGGERS"=>	"Import Triggers",
 	"S_BULKLOADER_IMPORT_ACTIONS"=>		"Import Actions",
 	"S_BULKLOADER_IMPORT_ITSERVICES"=>	"Import IT Services",
+
+//	popup.php
+	"S_EMPTY"=>				"Empty",
 
 //	Menu
 

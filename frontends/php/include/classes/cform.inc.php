@@ -39,8 +39,16 @@
 		}
 		function SetAction($value=NULL)
 		{
+			global $page;
+
 			if(is_null($value))
+			{
+				if(isset($page["file"]))	
+				{
+					return $this->AddOption("action",$page["file"]);
+				}
 				return 1;
+			}
 			elseif(!is_string($value))
 			{
 				return $this->error("Incorrect value for SetAction [$value]");

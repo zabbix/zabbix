@@ -314,7 +314,7 @@
 		array_push($footerButtons, SPACE);
 		array_push($footerButtons, new CButton('group_delete','Delete selected',
 			"return Confirm('Delete selected action?');"));
-		$tblActions->SetFooter(new CCol($footerButtons),'table_footer');
+		$tblActions->SetFooter(new CCol($footerButtons));
 
 		$form->AddItem($tblActions);
 		$form->Show();

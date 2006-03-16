@@ -119,7 +119,7 @@
 			}
 			if(!is_string($value) && !is_int($value) && !is_float($value))
 			{
-				return $this->error("Incorrect value for AddOption [$value]");
+				return $this->error("Incorrect value for AddOption [$name] [$value]");
 			}
 			
 			$this->options[$name] = htmlspecialchars(strval($value)); 

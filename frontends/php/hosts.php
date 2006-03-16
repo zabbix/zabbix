@@ -495,7 +495,7 @@
 				$show_only_tmp ? NULL : SPACE,
 				new CButton('delete','Delete selected',
 					"return Confirm('".S_DELETE_SELECTED_HOSTS_Q."');"));
-			$table->SetFooter(new CCol($footerButtons),'table_footer');
+			$table->SetFooter(new CCol($footerButtons));
 
 			$form->AddItem($table);
 			$form->Show();
@@ -568,7 +568,7 @@
 			array_push($footerButtons, SPACE);
 			array_push($footerButtons, new CButton('delete','Delete selected',
 				"return Confirm('".S_DELETE_SELECTED_GROUPS_Q."');"));
-			$table->SetFooter(new CCol($footerButtons),'table_footer');
+			$table->SetFooter(new CCol($footerButtons));
 
 			$form->AddItem($table);
 			$form->Show();
