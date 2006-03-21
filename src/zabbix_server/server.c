@@ -450,7 +450,7 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-#define USE_TEST_FUNCTION 1
+//#define USE_TEST_FUNCTION 1
 
 #ifdef USE_TEST_FUNCTION
 
@@ -458,20 +458,6 @@ void    run_commands(DB_TRIGGER *trigger,DB_ACTION *action);
 
 void test()
 {
-	DB_ACTION action;
-	DB_TRIGGER trigger;
-
-	DB_RESULT *result;
-	int i = 0;
-
-	result = DBselect("select distinct scripts from actions where scripts<>''");
-	for(i=0;i<DBnum_rows(result);i++)
-	{	
-		strscpy(action.scripts,DBget_field(result,i,0));
-		run_commands(&trigger,&action);
-	}
-	
-	DBfree_result(result);
 }
 #endif
 
