@@ -372,7 +372,7 @@
 		foreach($cmd_list as $cmd)
 		{
 			$cmd = trim($cmd, "\x00..\x1F");
-			if(!ereg("^([a-zA-Z0-9]{1,})(:|#)(([a-zA-Z]\:|/){0,1}([a-zA-Z0-9_\.\\/]{3,}))$",$cmd,$cmd_items)){
+			if(!ereg("^([a-zA-Z0-9]{1,})(:|#)[a-zA-Z/][0-9a-zA-Z\"\'\\/_\|\:\.><\}\*-\&\`\;\{[:space:]]*$",$cmd,$cmd_items)){
 				error("incorrect command: '$cmd'");
 				return FALSE;
 			}
