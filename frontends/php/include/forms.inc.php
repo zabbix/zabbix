@@ -1173,6 +1173,7 @@
 			$maxrepeats	= $action["maxrepeats"];
 			$repeatdelay	= $action["repeatdelay"];
 			$status 	= $action["status"];
+			$scripts 	= $action["scripts"];
 
 			if(isset($_REQUEST["repeat"]))
 			{
@@ -1203,7 +1204,7 @@
 		else
 		{
 			$source		= get_request("source",0);
-			$actiontype	= get_request("actiontype",0);
+			$actiontype	= get_request("actiontype",ACTION_TYPE_MESSAGE);
 
 			$delay		= get_request("delay",30);
 			$subject	= get_request("subject","{TRIGGER.NAME}: {STATUS}");
@@ -1215,13 +1216,16 @@
 			$repeatdelay	= get_request("repeatdelay",600);
 			$repeat		= get_request("repeat",0);
 			$status		= get_request("status",ACTION_STATUS_ENABLED);
-
-			if($recipient==RECIPIENT_TYPE_GROUP)
-				$uid = get_request("usrgrpid",NULL);
-			else
-				$uid = get_request("userid",NULL);
+			$uid 		= get_request("userid",0);
+			$scripts	= get_request("scripts","");
 
 		}
+
+		$cmbActionType = new CComboBox('actiontype', $actiontype,'submit()');
+		$cmbActionType->AddItem(ACTION_TYPE_MESSAGE,S_SEND_MESSAGE);
+		$cmbActionType->AddItem(ACTION_TYPE_COMMAND,S_REMOTE_COMMAND);
+		$frmAction->AddRow(S_ACTION_TYPE, $cmbActionType);
+
 
 // prepare condition list
 		$cond_el=array();
@@ -1369,49 +1373,56 @@
 // end of new condition preparation
 		$frmAction->AddRow(S_CONDITION, $rowCondition);
 
-		$cmbActionType = new CComboBox('actiontype', $actiontype,'submit()');
-		$cmbActionType->AddItem(0,S_SEND_MESSAGE);
-		$cmbActionType->AddItem(1,S_REMOTE_COMMAND,NULL,'no');
+		$frmAction->AddRow(
+			$actiontype == ACTION_TYPE_MESSAGE ? S_DELAY_BETWEEN_MESSAGES_IN_SEC : S_DELAY_BETWEEN_EXECUTIONS_IN_SEC,
+			new CTextBox('delay',$delay,5));
 
-		$frmAction->AddRow(S_ACTION_TYPE, $cmbActionType);
-
-		$cmbRecipient = new CComboBox('recipient', $recipient,'submit()');
-		$cmbRecipient->AddItem(0,S_SINGLE_USER);
-		$cmbRecipient->AddItem(1,S_USER_GROUP);
-
-		$frmAction->AddRow(S_SEND_MESSAGE_TO, $cmbRecipient);
-
-		if($recipient==RECIPIENT_TYPE_GROUP)
+		if($actiontype == ACTION_TYPE_MESSAGE)
 		{
-			
-			$cmbGroups = new CComboBox('userid', $uid);
-	
-			$sql="select usrgrpid,name from usrgrp order by name";
-			$groups=DBselect($sql);
-			while($group=DBfetch($groups))
-			{
-				$cmbGroups->AddItem($group['usrgrpid'],$group['name']);
-			}
+			$cmbRecipient = new CComboBox('recipient', $recipient,'submit()');
+			$cmbRecipient->AddItem(0,S_SINGLE_USER);
+			$cmbRecipient->AddItem(1,S_USER_GROUP);
+			$frmAction->AddRow(S_SEND_MESSAGE_TO, $cmbRecipient);
 
-			$frmAction->AddRow(S_GROUP, $cmbGroups);
+			if($recipient==RECIPIENT_TYPE_GROUP)
+			{
+				
+				$cmbGroups = new CComboBox('userid', $uid);
+		
+				$sql="select usrgrpid,name from usrgrp order by name";
+				$groups=DBselect($sql);
+				while($group=DBfetch($groups))
+				{
+					$cmbGroups->AddItem($group['usrgrpid'],$group['name']);
+				}
+
+				$frmAction->AddRow(S_GROUP, $cmbGroups);
+			}
+			else
+			{
+				$cmbUser = new CComboBox('userid', $uid);
+				
+				$sql="select userid,alias from users order by alias";
+				$users=DBselect($sql);
+				while($user=DBfetch($users))
+				{
+					$cmbUser->AddItem($user['userid'],$user['alias']);
+				}
+
+				$frmAction->AddRow(S_USER, $cmbUser);
+			}
+			$frmAction->AddRow(S_SUBJECT, new CTextBox('subject',$subject,80));
+			$frmAction->AddRow(S_MESSAGE, new CTextArea('message',$message,77,7));
+			$frmAction->AddVar("scripts",$scripts); 
 		}
 		else
 		{
-			$cmbUser = new CComboBox('userid', $uid);
-			
-			$sql="select userid,alias from users order by alias";
-			$users=DBselect($sql);
-			while($user=DBfetch($users))
-			{
-				$cmbUser->AddItem($user['userid'],$user['alias']);
-			}
-
-			$frmAction->AddRow(S_USER, $cmbUser);
+			$frmAction->AddRow(S_REMOTE_COMMAND, new CTextArea('scripts',$scripts,77,7));
+			$frmAction->AddVar("recipient",$recipient);
+			$frmAction->AddVar("userid",$uid);
+			$frmAction->AddVar("subject",$subject);
+			$frmAction->AddVar("message",$message);
 		}
-
-		$frmAction->AddRow(S_DELAY_BETWEEN_MESSAGES_IN_SEC, new CTextBox('delay',$delay,5));
-		$frmAction->AddRow(S_SUBJECT, new CTextBox('subject',$subject,80));
-		$frmAction->AddRow(S_MESSAGE, new CTextArea('message',$message,77,7));
 
 		$cmbRepeat = new CComboBox('repeat',$repeat,'submit()');
 		$cmbRepeat->AddItem(0,S_NO_REPEATS);
@@ -1648,6 +1659,7 @@
 			$valign		= $irow["valign"];
 			$halign		= $irow["halign"];
 			$style		= $irow["style"];
+			$url		= $irow["url"];
 		}
 		else
 		{
@@ -1661,8 +1673,8 @@
 			$valign		= get_request("valign",		VALIGN_DEFAULT);
 			$halign		= get_request("halign",		HALIGN_DEFAULT);
 			$style		= get_request("style",		0);
+			$url		= get_request("url",		"");
 		}
-
 
 		$form->AddVar("screenid",$_REQUEST["screenid"]);
 
@@ -1678,7 +1690,7 @@
 		$cmbRes->AddItem(SCREEN_RESOURCE_TRIGGERS_OVERVIEW,	S_TRIGGERS_OVERVIEW);
 		$cmbRes->AddItem(SCREEN_RESOURCE_DATA_OVERVIEW,		S_DATA_OVERVIEW);
 		$cmbRes->AddItem(SCREEN_RESOURCE_CLOCK,		S_CLOCK);
-//		$cmbRes->AddItem(SCREEN_RESOURCE_URL,		S_URL);
+		$cmbRes->AddItem(SCREEN_RESOURCE_URL,		S_URL);
 		$form->AddRow(S_RESOURCE,$cmbRes);
 
 		if($resource == SCREEN_RESOURCE_GRAPH)
@@ -1821,7 +1833,12 @@
 			$form->AddVar("style",	0);
 		}
 
-		if(in_array($resource,array(SCREEN_RESOURCE_GRAPH,SCREEN_RESOURCE_SIMPLE_GRAPH,SCREEN_RESOURCE_CLOCK)))
+		if(in_array($resource,array(SCREEN_RESOURCE_URL)))
+		{
+			$form->AddRow(S_URL, new CTextBox("url",$url,60));
+		}
+
+		if(in_array($resource,array(SCREEN_RESOURCE_GRAPH,SCREEN_RESOURCE_SIMPLE_GRAPH,SCREEN_RESOURCE_CLOCK,SCREEN_RESOURCE_URL)))
 		{
 			$form->AddRow(S_WIDTH,	new CTextBox("width",$width,5));
 			$form->AddRow(S_HEIGHT,	new CTextBox("height",$height,5));
@@ -1832,7 +1849,8 @@
 			$form->AddVar("height",	0);
 		}
 
-		if(in_array($resource,array(SCREEN_RESOURCE_GRAPH,SCREEN_RESOURCE_SIMPLE_GRAPH,SCREEN_RESOURCE_MAP,SCREEN_RESOURCE_CLOCK)))
+		if(in_array($resource,array(SCREEN_RESOURCE_GRAPH,SCREEN_RESOURCE_SIMPLE_GRAPH,SCREEN_RESOURCE_MAP,
+			SCREEN_RESOURCE_CLOCK,SCREEN_RESOURCE_URL)))
 		{
 			$cmbHalign = new CComboBox("halign",$halign);
 			$cmbHalign->AddItem(HALIGN_CENTER,	S_CENTER);

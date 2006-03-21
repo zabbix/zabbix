@@ -216,6 +216,7 @@ CREATE TABLE actions (
   source		int(1)		DEFAULT '0' NOT NULL,
   actiontype		int(1)		DEFAULT '0' NOT NULL,
   status		int(1)		DEFAULT '0' NOT NULL,
+  scripts		blob		DEFAULT '' NOT NULL,
   PRIMARY KEY (actionid)
 ) type=InnoDB;
 
@@ -600,6 +601,7 @@ CREATE TABLE screens_items (
 	valign		int(2)		DEFAULT '0' NOT NULL,
 	halign		int(2)		DEFAULT '0' NOT NULL,
 	style		int(4)		DEFAULT '0' NOT NULL,
+	url		varchar(255)	DEFAULT '' NOT NULL,
 	  PRIMARY KEY  (screenitemid)
 ) TYPE=InnoDB;
 

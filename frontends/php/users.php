@@ -225,9 +225,9 @@
 					" where userid=".$db_user["userid"]." and lastaccess-600<".time());
 				$db_ses_cnt=DBfetch($db_sessions);
 				if($db_ses_cnt["count"]>0)
-					$online=new CCol(S_YES,"on");
+					$online=new CCol(S_YES,"enabled");
 				else
-					$online=new CCol(S_NO,"off");
+					$online=new CCol(S_NO,"disabled");
 		
 		        	if(check_right("User","U",$db_user["userid"]))
 				{

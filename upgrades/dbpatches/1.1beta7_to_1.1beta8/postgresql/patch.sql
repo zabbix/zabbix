@@ -30,4 +30,6 @@ CREATE INDEX acknowledges_alarmid ON acknowledgeid (alarmid);
 ALTER TABLE screens_items ADD		valign	int2	DEFAULT '0' NOT NULL;
 ALTER TABLE screens_items ADD		halign	int2	DEFAULT '0' NOT NULL;
 ALTER TABLE screens_items ADD		style	int4	DEFAULT '0' NOT NULL;
+ALTER TABLE screens_items ADD		url	varchar(255)	DEFAULT '' NOT NULL;
 
+ALTER TABLE actions ADD			scripts	text		DEFAULT '' NOT NULL;

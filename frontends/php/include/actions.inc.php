@@ -36,7 +36,7 @@
 
 	# Add Action
 
-	function	add_action($id,$delay,$subject,$message,$recipient,$maxrepeats,$repeatdelay,$status)
+	function	add_action($actiontype,$userid,$delay,$subject,$message,$recipient,$maxrepeats,$repeatdelay,$status,$scripts)
 	{
 //		if(!check_right_on_trigger("A",$triggerid))
 //		{
@@ -44,24 +44,46 @@
 //                      return 0;
 //		}
 
-		$sql="insert into actions (userid,delay,nextcheck,subject,message,recipient,".
-			"maxrepeats,repeatdelay,status) values ($id,$delay,0,".zbx_dbstr($subject).",".
-			zbx_dbstr($message).",$recipient,$maxrepeats,$repeatdelay,$status)";
+		if($actiontype == ACTION_TYPE_MESSAGE)
+		{
+			$scripts = "";
+		}
+		elseif($actiontype == ACTION_TYPE_COMMAND)
+		{
+			$subject = $message = "";
+			$userid = 0;			
+			$recipient = 0;	
+			if(!check_commands($scripts))	return FALSE;
+		}
+		$sql="insert into actions (actiontype,userid,delay,nextcheck,subject,message,recipient,".
+			"maxrepeats,repeatdelay,status,scripts) values ($actiontype,$userid,$delay,0,".zbx_dbstr($subject).",".
+			zbx_dbstr($message).",$recipient,$maxrepeats,$repeatdelay,$status,".zbx_dbstr($scripts).")";
 		$result=DBexecute($sql);
 		return DBinsert_id($result,"actions","actionid");
 	}
 
 	# Update Action
 
-	function	update_action($actionid, $id, $delay, $subject, $message, $recipient, $maxrepeats, $repeatdelay, $status)
+	function	update_action($actionid,$actiontype,$userid,$delay,$subject,$message,$recipient,$maxrepeats,$repeatdelay,$status,$scripts)
 	{
 //		if(!check_right_on_trigger("U",$triggerid))
 //		{
 //                      error("Insufficient permissions");
 //                      return 0;
 //		}
+		if($actiontype == ACTION_TYPE_MESSAGE)
+		{
+			$scripts = "";
+		}
+		elseif($actiontype == ACTION_TYPE_COMMAND)
+		{
+			$subject = $message = "";
+			$userid = 0;
+			$recipient = 0;	
+			if(!check_commands($scripts))	return FALSE;
+		}
 
-		$result=DBexecute("update actions set userid=$id,delay=$delay,nextcheck=0,subject=".zbx_dbstr($subject).",message=".zbx_dbstr($message).",recipient=$recipient,maxrepeats=$maxrepeats, repeatdelay=$repeatdelay,status=$status where actionid=$actionid");
+		$result=DBexecute("update actions set actiontype=$actiontype,userid=$userid,delay=$delay,nextcheck=0,subject=".zbx_dbstr($subject).",message=".zbx_dbstr($message).",recipient=$recipient,maxrepeats=$maxrepeats, repeatdelay=$repeatdelay,status=$status,scripts=".zbx_dbstr($scripts)." where actionid=$actionid");
 		return $result;
 	}
 
@@ -145,10 +167,10 @@
 				$message=str_replace("{".$host_template["host"].":", "{".$host["host"].":",
 					$action["message"]);
 
-				add_action($row2["triggerid"], $action["userid"], $action["good"], 
+				add_action($action["actiontype"],$row2["triggerid"], $action["userid"], $action["good"], 
 					$action["delay"], $action["subject"], $message, $action["scope"],
 					$action["severity"], $action["recipient"], $action["maxrepeats"],
-					$action["repeatdelay"]);
+					$action["repeatdelay"],$action["scripts"]);
 			}
 		}
 	}
@@ -242,7 +264,7 @@
 				{
 					$host=get_host_by_hostid($row["hostid"]);
 					$message=str_replace("{".$host_template["host"].":", "{".$host["host"].":", $action["message"]);
-					update_action($row3["actionid"], $row2["triggerid"], $action["userid"], $action["good"], $action["delay"], $action["subject"], $message, $action["scope"], $action["severity"], $action["recipient"], $action["maxrepeats"],$action["repeatdelay"]);
+					update_action($row3["actionid"], $action["actiontype"],$row2["triggerid"], $action["userid"], $action["good"], $action["delay"], $action["subject"], $message, $action["scope"], $action["severity"], $action["recipient"], $action["maxrepeats"],$action["repeatdelay"],$action["scripts"]);
 
 				}
 			}
@@ -342,5 +364,35 @@
 	function	update_action_status($actionid, $status)
 	{
 		return DBexecute("update actions set status=$status where actionid=$actionid");
+	}
+
+	function check_commands($commands)
+	{
+		$cmd_list = split("\n",$commands);
+		foreach($cmd_list as $cmd)
+		{
+			$cmd = trim($cmd, "\x00..\x1F");
+			if(!ereg("^([a-zA-Z0-9]{1,})(:|#)(([a-zA-Z]\:|/){0,1}([a-zA-Z0-9_\.\\/]{3,}))$",$cmd,$cmd_items)){
+				error("incorrect command: '$cmd'");
+				return FALSE;
+			}
+			if($cmd_items[2] == "#")
+			{ // group
+				if(DBnum_rows(DBselect("select groupid from groups where name=".zbx_dbstr($cmd_items[1])))!=1)
+				{
+					error("Uncnown group name: '".$cmd_items[1]."' in command ".$cmd."'");
+					return FALSE;
+				}
+			}
+			elseif($cmd_items[2] == ":")
+			{ // host
+				if(DBnum_rows(DBselect("select hostid from hosts where host=".zbx_dbstr($cmd_items[1])))!=1)
+				{
+					error("Uncnown host name '".$cmd_items[1]."' in command '".$cmd."'");
+					return FALSE;
+				}
+			}
+		}
+		return TRUE;
 	}
 ?>

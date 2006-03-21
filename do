@@ -42,10 +42,10 @@ if [ "$help" = "yes" ] || [ $noparam = 0 ]
 then
         echo
         echo "Usage:"
-        echo "  $0 [copy|cpy] [premake|pre] [configure|config|conf] [make] [def] [test] [tar] [cat] [nocat] [--enable-*] [--with-*]"
+        echo "  $0 [copy|cpy] [premake|pre] [configure|config|conf] [def] [make] [test] [tar] [cat] [nocat] [--enable-*] [--with-*]"
         echo
         echo "Examples:"
-        echo "  $0 conf make def test            - compyle, test, and hsow report"
+        echo "  $0 conf def make test        - compyle, test, and sow report"
         echo "  $0 cpy tar nocat             - make archive .tar.gz and don't show report"
         echo "  $0 cat                       - cat last REPORT"
         echo "  $0                           - show this help"

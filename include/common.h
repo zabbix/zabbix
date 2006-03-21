@@ -22,8 +22,6 @@
 
 #include "sysinc.h"
 
-
-
 #if defined(WIN32)
 #	pragma warning (disable: 4100)
 
@@ -252,6 +250,10 @@
 #define ACTION_STATUS_ACTIVE	0
 #define ACTION_STATUS_DISABLED	1
 
+/* Action type */
+#define ACTION_TYPE_MESSAGE	0
+#define ACTION_TYPE_COMMAND	1
+
 /* Algorithms for service status calculation */
 #define SERVICE_ALGORITHM_NONE	0
 #define SERVICE_ALGORITHM_MAX	1
@@ -400,4 +402,5 @@ char    *zbx_regexp_match(const char *string, const char *pattern, int *len);
 int	cmp_double(double a,double b);
 
 int       SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+
 #endif

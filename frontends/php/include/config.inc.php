@@ -83,6 +83,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 	include_once("include/classes/cformtable.inc.php");
 	include_once("include/classes/cmap.inc.php");
 	include_once("include/classes/cflash.inc.php");
+	include_once("include/classes/ciframe.inc.php");
 
 // Include Tactical Overview modules
 	include_once("include/classes/chostsinfo.mod.php");
@@ -1145,7 +1146,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 	}
 
 	$table->AddRow(array(
-		new CCol(new CLink(new CImg("images/general/zabbix.png","ZABBIX")),
+		new CCol(new CLink(new CImg("images/general/zabbix.png","ZABBIX"),"http://www.zabbix.com"),
 			"page_header_l"),
 		new CCol($col_r,
 			"page_header_r")));
@@ -3075,4 +3076,5 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 </script>
 ";
 	}
+
 ?>
