@@ -156,6 +156,7 @@ table.screen_edit td
 	text-align: center;
 	vertical-align: middle;
 }
+
 table.screen_edit td.def_def {		text-align: center;	vertical-align: middle;		}
 table.screen_edit td.def_top {		text-align: center;	vertical-align: top;		}
 table.screen_edit td.def_mdl {		text-align: center;	vertical-align: middle;		}
@@ -186,6 +187,10 @@ table.screen_view td
 	border: 1px #DDDDDD;
 	text-align: center;
 	vertical-align: middle;
+}
+
+table.screen_view iframe {
+	border: 0px;
 }
 
 table.screen_view td.def_def {		text-align: center;	vertical-align: middle;		}

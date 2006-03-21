@@ -1,5 +1,7 @@
 Changes for 1.1beta8:
 
+ - developed remote commads execution on specific actions (Eugene)
+ - added "URL" module for screens (Eugene)
  - added trigger selecton from popup (Eugene)
  - improved popup selection (Eugene)
  - improved "IT services" configuration (Eugene)

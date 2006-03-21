@@ -217,6 +217,7 @@ CREATE TABLE actions (
   source		int2		DEFAULT '0' NOT NULL,
   actiontype		int2		DEFAULT '0' NOT NULL,
   status		int2		DEFAULT '0' NOT NULL,
+  scripts		text		DEFAULT '' NOT NULL,
   PRIMARY KEY (actionid)
 --  depends on scope. Could be hostid or 0.
 --  FOREIGN KEY (triggerid) REFERENCES triggers
@@ -616,6 +617,7 @@ CREATE TABLE screens_items (
 	valign		int2		DEFAULT '0' NOT NULL,
 	halign		int2		DEFAULT '0' NOT NULL,
 	style		int4		DEFAULT '0' NOT NULL,
+	url		varchar(255)	DEFAULT '' NOT NULL,
   PRIMARY KEY  (screenitemid)
 );
 

@@ -81,6 +81,7 @@
 	"S_USER"=>				"User",
 	"S_ON_OR_OFF"=>				"ON or OFF",
 	"S_DELAY_BETWEEN_MESSAGES_IN_SEC"=>	"Delay between messages (in sec)",
+	"S_DELAY_BETWEEN_EXECUTIONS_IN_SEC"=>			"Delay between executions (in sec)",
 	"S_MESSAGE"=>				"Message",
 	"S_THIS_TRIGGER_ONLY"=>			"This trigger only",
 	"S_ALL_TRIGGERS_OF_THIS_HOST"=>		"All triggers of this host",

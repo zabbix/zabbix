@@ -365,20 +365,29 @@
 			$soft		= get_request("soft",1);
 		}
 
-		$cmbServices = new CComboBox("serviceupid",$serviceupid);
-		$result=DBselect("select serviceid,triggerid,name from services order by name");
+		$frmLink->AddVar("serviceupid",$_REQUEST["serviceid"]);
+
+		$service = get_service_by_serviceid($_REQUEST["serviceid"]);
+		$name = $service["name"];
+		if(isset($service["triggerid"]))
+			$name .= ": ".expand_trigger_description($service["triggerid"]);
+		$frmLink->AddRow(S_SERVICE_1, new CTextBox("service",$name,60,NULL,'yes'));
+
+		$cmbServices = new CComboBox("servicedownid",$servicedownid);
+		$result=DBselect("select serviceid,triggerid,name from services where serviceid<>$serviceupid order by name");
 		while($row=Dbfetch($result))
 		{
+			if(DBnum_rows(DBselect("select linkid from services_links".
+				" where servicedownid<>$servicedownid and serviceupid=$serviceupid and servicedownid=".$row["serviceid"])))
+				continue;
+
 			$name = $row["name"];
 			if(isset($row["triggerid"]))
 				$name .= ": ".expand_trigger_description($row["triggerid"]);
 			
 			$cmbServices->AddItem($row["serviceid"],$name);
 		}
-		$frmLink->AddRow(S_SERVICE_1, $cmbServices);
 
-		$cmbServices->SetName("servicedownid");
-		$cmbServices->SetValue($servicedownid);
 		$frmLink->AddRow(S_SERVICE_2, $cmbServices);
 
 		$frmLink->AddRow(S_SOFT_LINK_Q, new CCheckBox("soft",$soft));
