@@ -93,3 +93,33 @@ LONG H_Execute(char *cmd,char *arg,char **value)
 
    return SYSINFO_RC_SUCCESS;
 }
+
+LONG H_RunCommand(char *cmd,char *arg,char **value)
+{
+	STARTUPINFO    si;
+	PROCESS_INFORMATION  pi;
+	char *ptr1,*ptr2;
+
+	// Extract command line
+	ptr1=strchr(cmd,'[');
+	ptr2=strchr(cmd,']');
+	ptr1++;
+	*ptr2=0;
+
+
+    GetStartupInfo(&si);
+
+    printf("Running Notepad with CreateProcess\n");
+    CreateProcess(NULL, 
+		ptr1,	// Name of app to launch
+		NULL,	// Default process security attributes
+		NULL,	// Default thread security attributes
+		FALSE,	// Don't inherit handles from the parent
+		0,		// Normal priority
+		NULL,	// Use the same environment as the parent
+		NULL,	// Launch in the current directory
+		&si,	// Startup Information
+		&pi);	// Process information stored upon return
+
+	return SYSINFO_RC_SUCCESS;
+}
