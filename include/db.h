@@ -255,6 +255,7 @@ DB_TRIGGER
 DB_ACTION
 {
 	int	actionid;
+	int	actiontype;
 	int	userid;
 	int	delay;
 	int	lastcheck;
@@ -263,6 +264,7 @@ DB_ACTION
 	char	message[MAX_STRING_LEN];
 	int	maxrepeats;
 	int	repeatdelay;
+	char	scripts[MAX_STRING_LEN];
 };
 
 DB_CONDITION

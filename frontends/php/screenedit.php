@@ -49,7 +49,7 @@
 					$_REQUEST["resource"],$_REQUEST["resourceid"],$_REQUEST["width"],
 					$_REQUEST["height"],$_REQUEST["colspan"],$_REQUEST["rowspan"],
 					$_REQUEST["elements"],$_REQUEST["valign"],
-					$_REQUEST["halign"],$_REQUEST["style"]);
+					$_REQUEST["halign"],$_REQUEST["style"],$_REQUEST["url"]);
 
 				show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 			}
@@ -60,7 +60,7 @@
 					$_REQUEST["x"],$_REQUEST["y"],$_REQUEST["resourceid"],
 					$_REQUEST["width"],$_REQUEST["height"],$_REQUEST["colspan"],
 					$_REQUEST["rowspan"],$_REQUEST["elements"],$_REQUEST["valign"],
-					$_REQUEST["halign"],$_REQUEST["style"]);
+					$_REQUEST["halign"],$_REQUEST["style"],$_REQUEST["url"]);
 
 				show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 			}

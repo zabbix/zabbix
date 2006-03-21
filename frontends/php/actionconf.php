@@ -28,28 +28,29 @@
 ?>
 
 <?php
-	$_REQUEST["actiontype"] = get_request("actiontype",0);
+        if(!check_anyright("Configuration of Zabbix","U"))
+        {
+                show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
+                show_page_footer();
+                exit;
+        }
 
-	update_profile("web.menu.config.last",$page["file"]);
-//	if(($_REQUEST["triggerid"]!=0)&&!check_right_on_trigger("U",$_REQUEST["triggerid"]))
-//	{
-//		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-//		show_page_footer();
-//		exit;
-//	}
+	$_REQUEST["actiontype"] = get_request("actiontype",get_profile("web.actionconf.actiontype",0));
+
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"actiontype"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0,1"),	NULL),
+		"actiontype"=>	array(T_ZBX_INT, O_MAND, NULL,	IN("0,1"),	NULL),
 
 		"actionid"=>	array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,		NULL),
 		"source"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0"),	'isset({save})'),
 		"recipient"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0,1"), 	'isset({save})'),
 		"userid"=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID, 		'isset({save})'),
 		"delay"=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),'isset({save})'),
-		"subject"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,	'isset({save})'),
-		"message"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,	'isset({save})'),
+		"subject"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,	'{actiontype}==0&&isset({save})'),
+		"message"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,	'{actiontype}==0&&isset({save})'),
+		"scripts"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,	'{actiontype}==1&&isset({save})'),
 		"repeat"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0,1"), 	'isset({save})'),
 		"status"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0,1"), 	'isset({save})'),
 
@@ -90,6 +91,11 @@
 ?>
 
 <?php
+	update_profile("web.actionconf.actiontype",$_REQUEST["actiontype"]);
+	update_profile("web.menu.config.last",$page["file"]);
+?>
+
+<?php
 	if(isset($_REQUEST["save"]))
 	{
 		if($_REQUEST["repeat"]==0)
@@ -101,15 +107,19 @@
 		if(isset($_REQUEST["actionid"]))
 		{
 			$actionid=$_REQUEST["actionid"];
-			$result = update_action($actionid, $_REQUEST['userid'], $_REQUEST["delay"],
+			$result = update_action($actionid,
+				$_REQUEST['actiontype'],$_REQUEST['userid'],$_REQUEST["delay"],
 				$_REQUEST["subject"], $_REQUEST["message"],$_REQUEST["recipient"],
-				$_REQUEST["maxrepeats"],$_REQUEST["repeatdelay"],$_REQUEST["status"]);
+				$_REQUEST["maxrepeats"],$_REQUEST["repeatdelay"],$_REQUEST["status"],
+				$_REQUEST["scripts"]);
 
 			show_messages($result,S_ACTION_UPDATED,S_CANNOT_UPDATE_ACTION);
 		} else {
-			$actionid=add_action($_REQUEST['userid'], $_REQUEST["delay"], 
+			$actionid=add_action(
+				$_REQUEST['actiontype'],$_REQUEST['userid'],$_REQUEST["delay"], 
 				$_REQUEST["subject"],$_REQUEST["message"],$_REQUEST["recipient"],
-				$_REQUEST["maxrepeats"],$_REQUEST["repeatdelay"],$_REQUEST["status"]);
+				$_REQUEST["maxrepeats"],$_REQUEST["repeatdelay"],$_REQUEST["status"],
+				$_REQUEST["scripts"]);
 			$result=$actionid;
 
 			show_messages($result,S_ACTION_ADDED,S_CANNOT_ADD_ACTION);
@@ -124,18 +134,13 @@
 			if(isset($_REQUEST["conditions"])) foreach($_REQUEST["conditions"] as $val)
 				add_action_condition($actionid,$val["type"],$val["operator"],$val["value"]);
 
-			if($_REQUEST["recipient"] == RECIPIENT_TYPE_USER)
-			{
-				$user=get_user_by_userid($_REQUEST["userid"]);
-				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_ACTION,
-					"User [".$user["alias"]."] subject [".$_REQUEST["subject"]."]");
-			}
+			if($_REQUEST["actiontype"] == ACTION_TYPE_MESSAGE)
+				$msg =  "subject [".$_REQUEST["subject"]."]";
 			else
-			{
-				$group=get_usergroup_by_groupid($_REQUEST["userid"]);
-				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_ACTION,
-					"User [".$group["name"]."] subject [".$_REQUEST["subject"]."]");
-			}
+				$msg = "command [".$_REQUEST["scripts"]."]";
+
+			add_audit(!isset($_REQUEST["actionid"]) ? AUDIT_ACTION_ADD : AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ACTION, $msg);
+
 			unset($_REQUEST["form"]);
 		}
 	}
@@ -218,8 +223,8 @@
 		$form = new CForm();
 
 		$cmbType = new CComboBox("actiontype",$_REQUEST["actiontype"],"submit()");
-		$cmbType->AddItem(0,S_SEND_MESSAGE);
-		$cmbType->AddItem(1,S_REMOTE_COMMAND,NULL,'no');
+		$cmbType->AddItem(ACTION_TYPE_MESSAGE,S_SEND_MESSAGE);
+		$cmbType->AddItem(ACTION_TYPE_COMMAND,S_REMOTE_COMMAND);
 		$form->AddItem($cmbType);
 
 		$form->AddItem(SPACE."|".SPACE);
@@ -237,18 +242,14 @@
 					"CheckAll('".$form->GetName()."','all_items');"),
 				S_SOURCE
 			),
-			S_CONDITIONS,S_SEND_MESSAGE_TO,
-			S_DELAY,S_SUBJECT,S_REPEATS,S_STATUS));
+			S_CONDITIONS,
+			$_REQUEST["actiontype"] == ACTION_TYPE_MESSAGE ? S_SEND_MESSAGE_TO : S_REMOTE_COMMAND,
+			S_DELAY,
+			$_REQUEST["actiontype"] == ACTION_TYPE_MESSAGE ? S_SUBJECT : NULL,
+			S_REPEATS,
+			S_STATUS));
 
-		if(isset($_REQUEST["actiontype"])&&($_REQUEST["actiontype"]==1))
-		{
-			$sql="select * from actions where actiontype=1 order by actiontype, source";
-		}
-		else
-		{
-			$sql="select * from actions where actiontype=0 order by actiontype, source";
-		}
-		$result=DBselect($sql);
+		$result=DBselect("select * from actions where actiontype=".$_REQUEST["actiontype"]." order by actiontype, source");
 		while($row=DBfetch($result))
 		{
 			$conditions="";
@@ -259,28 +260,37 @@
 				$conditions=$conditions.get_condition_desc($condition["conditiontype"],
 					$condition["operator"],$condition["value"]).BR;
 			}
-	
-			if($row["recipient"] == RECIPIENT_TYPE_USER)
+
+				
+			if($_REQUEST["actiontype"] == ACTION_TYPE_MESSAGE)
+			{			
+				if($row["recipient"] == RECIPIENT_TYPE_USER)
+				{
+					$user=get_user_by_userid($row["userid"]);
+					$recipient=$user["alias"];
+				}
+				else
+				{
+					$groupd=get_usergroup_by_groupid($row["userid"]);
+					$recipient=$groupd["name"];
+				}
+				$subject = htmlspecialchars($row["subject"]);
+			}elseif($_REQUEST["actiontype"] == ACTION_TYPE_COMMAND)
 			{
-				$user=get_user_by_userid($row["userid"]);
-				$recipient=$user["alias"];
-			}
-			else
-			{
-				$groupd=get_usergroup_by_groupid($row["userid"]);
-				$recipient=$groupd["name"];
+				$recipient = nl2br(htmlspecialchars($row["scripts"]));
+				$subject = NULL;
 			}
 
 			if($row["status"] == ACTION_STATUS_DISABLED)
 			{
 				$status= new CLink(S_DISABLED,
-					"actionconf.php?group_enable=1&g_actionid%5B%5D=".$row["actionid"],
+					"actionconf.php?group_enable=1&g_actionid%5B%5D=".$row["actionid"].url_param("actiontype"),
 					'disabled');
 			}
 			else if($row["status"] == ACTION_STATUS_ENABLED)
 			{
 				$status= new CLink(S_ENABLED,
-					"actionconf.php?group_disable=1&g_actionid%5B%5D=".$row["actionid"],
+					"actionconf.php?group_disable=1&g_actionid%5B%5D=".$row["actionid"].url_param("actiontype"),
 					'enabled');
 			}
 
@@ -300,7 +310,7 @@
 				$conditions,
 				$recipient,
 				htmlspecialchars($row["delay"]),
-				htmlspecialchars($row["subject"]),
+				$subject,
 				$row["maxrepeats"] == 0 ? S_NO_REPEATS : $row["maxrepeats"],
 				$status
 				));	

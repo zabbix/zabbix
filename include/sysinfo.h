@@ -108,6 +108,7 @@ int	CHECK_SERVICE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 int	CHECK_SERVICE_PERF(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	CHECK_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
 /* internal system functions */
 int	EXECUTE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);

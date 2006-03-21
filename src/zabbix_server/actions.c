@@ -47,6 +47,9 @@
 #include "actions.h"
 #include "expression.h"
 
+#include "poller/poller.h"
+#include "poller/checks_agent.h"
+
 /******************************************************************************
  *                                                                            *
  * Function: check_time_period                                                *
@@ -204,7 +207,6 @@ static	void	send_to_user(DB_TRIGGER *trigger,DB_ACTION *action)
 		zabbix_syslog("Unknown recipient type [%d] for actionid [%d]",action->recipient,action->actionid);
 	}
 }
-
 /*
 void	apply_actions_new(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 {
@@ -373,6 +375,202 @@ void	apply_actions_original(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 	DBfree_result(result);
 }
 */
+
+
+/******************************************************************************
+ *                                                                            *
+ * Function: run_remote_commands                                              *
+ *                                                                            *
+ * Purpose: run remote command on specific host                               *
+ *                                                                            *
+ * Parameters: host_name - host name                                          *
+ *             command - remote command                                       *
+ *                                                                            *
+ * Return value: nothing                                                      *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+
+static void run_remote_command(char* host_name, char* command)
+{
+	int ret = 9;
+	
+	AGENT_RESULT	agent_result;
+	DB_ITEM         item;
+	DB_RESULT	*result;
+	
+	char sql[MAX_STRING_LEN];
+	assert(host_name);
+	assert(command);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "run_remote_command START [hostname: '%s', command: '%s']", host_name, command);
+
+	snprintf(sql,sizeof(sql)-1,"select distinct host,ip,useip,port from hosts where host='%s'", host_name);
+	result = DBselect(sql);
+	if(DBnum_rows(result) == 1)
+	{
+		item.host = DBget_field(result,0,0);
+		item.ip=DBget_field(result,0,1);
+		item.useip=atoi(DBget_field(result,0,2));
+		item.port=atoi(DBget_field(result,0,3));
+		
+		snprintf(item.key,ITEM_KEY_LEN_MAX-1,"system.run[%s]",command);
+		
+		alarm(CONFIG_TIMEOUT);
+		
+		ret = get_value_agent(&item, &agent_result);
+
+		alarm(0);
+	}
+	DBfree_result(result);
+	
+	zabbix_log(LOG_LEVEL_DEBUG, "run_remote_command [result:%i]", ret);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_next_command                                                 *
+ *                                                                            *
+ * Purpose: parse action script on remote commands                            *
+ *                                                                            *
+ * Parameters: command_list - command list                                    *
+ *             alias - (output) of host name or group name                    *
+ *             is_group - (output) 0 if alias is a host name                  *
+ *                               1 if alias is a group name                   *
+ *             command - (output) remote command                              *
+ *                                                                            *
+ * Return value: 0 - correct comand is readed                                 *
+ *               1 - EOL                                                      *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+
+#define CMD_ALIAS 0
+#define CMD_REM_COMMAND 1
+
+static int get_next_command(char** command_list, char** alias, int* is_group, char** command)
+{
+	int state = CMD_ALIAS;
+	int len = 0;
+	int i = 0;
+	
+	assert(alias);
+	assert(is_group);
+	assert(command);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "get_next_command START [command_list: '%s']", *command_list);
+
+	*alias = NULL;
+	*is_group = 0;
+	*command = NULL;
+	
+
+	if((*command_list)[0] == '\0' || (*command_list)==NULL) {
+		zabbix_log(LOG_LEVEL_DEBUG, "Result get_next_command [EOL]");
+		return 1;
+	}
+
+	*alias = *command_list;
+	len = strlen(*command_list);
+
+	for(i=0; i < len; i++)
+	{
+		if(state == CMD_ALIAS)
+		{
+			if((*command_list)[i] == '#'){
+				*is_group = 1;
+				(*command_list)[i] = '\0';
+				state = CMD_REM_COMMAND;
+				*command = &(*command_list)[i+1];
+			}else if((*command_list)[i] == ':'){
+				*is_group = 0;
+				(*command_list)[i] = '\0';
+				state = CMD_REM_COMMAND;
+				*command = &(*command_list)[i+1];
+			}
+		} else if(state == CMD_REM_COMMAND) {
+			if((*command_list)[i] == '\r')
+			{
+				(*command_list)[i] = '\0';
+			} else if((*command_list)[i] == '\n')
+			{
+				(*command_list)[i] = '\0';
+				(*command_list) = &(*command_list)[i+1];
+				break;
+			}
+		}
+		if((*command_list)[i+1] == '\0')
+		{
+			(*command_list) = &(*command_list)[i+1];
+			break;
+		}
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "Result of get_next_command [alias:%s, is_group:%i, command:%s]", *alias, *is_group, *command);
+	
+	return 0;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: run_commands                                                     *
+ *                                                                            *
+ * Purpose: run remote commandlist for specific action                        *
+ *                                                                            *
+ * Parameters: trigger - trigger data                                         *
+ *             action  - action data                                          *
+ *                                                                            *
+ * Return value: nothing                                                      *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: commands devided with newline                                    *
+ *                                                                            *
+ ******************************************************************************/
+/*static*/	void	run_commands(DB_TRIGGER *trigger,DB_ACTION *action)
+{
+	assert(trigger);
+	assert(action);
+	
+	DB_RESULT *result;
+
+	char sql[MAX_STRING_LEN];
+	char *cmd_list = NULL;
+	char *alias = NULL;
+	char *command = NULL;
+	int is_group = 0;
+	int i = 0;
+	
+	cmd_list = action->scripts;
+	zabbix_log( LOG_LEVEL_DEBUG, "Run remote commands START [actionid:%d]", action->actionid);
+	while(get_next_command(&cmd_list,&alias,&is_group,&command)!=1)
+	{
+		if(!alias || !command) continue;
+		if(alias == '\0' || command == '\0') continue;
+		if(is_group)
+		{
+			snprintf(sql,sizeof(sql)-1,"select distinct h.host from hosts_groups hg,hosts h, groups g where hg.hostid=h.hostid and hg.groupid=g.groupid and g.name='%s'", alias);
+	                result = DBselect(sql);
+			for(i=0;i<DBnum_rows(result);i++)
+			{
+				run_remote_command(DBget_field(result,i,0), command);
+			}
+			
+			DBfree_result(result);
+		}
+		else
+		{
+			run_remote_command(alias, command);
+		}
+	}
+	zabbix_log( LOG_LEVEL_DEBUG, "Run remote commands END");
+}
 
 static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigger_value, DB_CONDITION *condition)
 {
@@ -663,7 +861,7 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 	now = time(NULL);
 
 /*	snprintf(sql,sizeof(sql)-1,"select actionid,userid,delay,subject,message,scope,severity,recipient,good from actions where (scope=%d and triggerid=%d and good=%d and nextcheck<=%d) or (scope=%d and good=%d) or (scope=%d and good=%d)",ACTION_SCOPE_TRIGGER,trigger->triggerid,trigger_value,now,ACTION_SCOPE_HOST,trigger_value,ACTION_SCOPE_HOSTS,trigger_value);*/
-	snprintf(sql,sizeof(sql)-1,"select actionid,userid,delay,subject,message,recipient,maxrepeats,repeatdelay from actions where nextcheck<=%d and status=%d", now, ACTION_STATUS_ACTIVE);
+	snprintf(sql,sizeof(sql)-1,"select actionid,userid,delay,subject,message,recipient,maxrepeats,repeatdelay,scripts,actiontype from actions where nextcheck<=%d and status=%d", now, ACTION_STATUS_ACTIVE);
 	result = DBselect(sql);
 	zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]", sql);
 
@@ -673,18 +871,25 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 
 		if(check_action_conditions(trigger, alarmid, trigger_value, action.actionid) == SUCCEED)
 		{
+			action.actiontype=atoi(DBget_field(result,i,9));
 			action.userid=atoi(DBget_field(result,i,1));
 			action.delay=atoi(DBget_field(result,i,2));
+			
 			strscpy(action.subject,DBget_field(result,i,3));
 			strscpy(action.message,DBget_field(result,i,4));
-			action.recipient=atoi(DBget_field(result,i,5));
-			action.maxrepeats=atoi(DBget_field(result,i,6));
-			action.repeatdelay=atoi(DBget_field(result,i,7));
-
 			substitute_macros(trigger, &action, action.message);
 			substitute_macros(trigger, &action, action.subject);
 
-			send_to_user(trigger,&action);
+			action.recipient=atoi(DBget_field(result,i,5));
+			action.maxrepeats=atoi(DBget_field(result,i,6));
+			action.repeatdelay=atoi(DBget_field(result,i,7));
+			strscpy(action.scripts,DBget_field(result,i,8));
+
+			if(action.actiontype == ACTION_TYPE_MESSAGE)
+				send_to_user(trigger,&action);
+			else
+				run_commands(trigger,&action);
+
 			snprintf(sql,sizeof(sql)-1,"update actions set nextcheck=%d where actionid=%d",now+action.delay,action.actionid);
 			DBexecute(sql);
 		}

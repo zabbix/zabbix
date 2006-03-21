@@ -31,12 +31,13 @@ extern ZBX_METRIC parameters_specific[];
 ZBX_METRIC	parameters_common[]=
 /*      KEY                     FLAG    FUNCTION        ADD_PARAM       TEST_PARAM */
 	{
-	{"system.localtime",	0,	SYSTEM_LOCALTIME,	0,	0},
+	{"system.localtime",	0,		SYSTEM_LOCALTIME,	0,	0},
 	{"vfs.file.exists",	CF_USEUPARAM,	VFS_FILE_EXISTS,	0,	"/etc/passwd"},
 	{"vfs.file.time",       CF_USEUPARAM,   VFS_FILE_TIME,          0,      "/etc/passwd,modify"},
 	{"vfs.file.size",	CF_USEUPARAM,	VFS_FILE_SIZE, 		0,	"/etc/passwd"},
 	{"vfs.file.regexp",	CF_USEUPARAM,	VFS_FILE_REGEXP,	0,	"/etc/passwd,root"},
 	{"vfs.file.regmatch",	CF_USEUPARAM,	VFS_FILE_REGMATCH, 	0,	"/etc/passwd,root"},
+	{"system.run",		CF_USEUPARAM,	RUN_COMMAND,	 	0,	"echo -n"},
 	{0}
 	};
 
@@ -1213,6 +1214,50 @@ int	EXECUTE(const char *cmd, const char *command, unsigned flags, AGENT_RESULT *
 	return	SYSINFO_RET_OK;
 }
 
+int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	char	command[MAX_STRING_LEN];
+	pid_t	pid;
+
+        assert(result);
+
+	init_result(result);
+
+        if(num_param(param) > 1)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+        
+	if(get_param(param, 1, command, MAX_STRING_LEN) != 0)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+
+	if(command[0] == '\0')
+	{
+		return SYSINFO_RET_FAIL;
+	}
+	
+	zabbix_log(LOG_LEVEL_DEBUG, "Run remote command '%s'", command);
+	
+	pid = fork();
+	switch(pid)
+	{
+		case -1:
+			zabbix_log(LOG_LEVEL_WARNING, "fork failed for '%s'",command);
+			return SYSINFO_RET_FAIL;
+		case 0:
+			if(execl("/bin/sh", "sh", "-c", command, (char *)0))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "execl failed for '%s'",command);
+				return SYSINFO_RET_FAIL;
+			}
+	}
+
+	SET_UI64_RESULT(result, 0);
+	
+	return	SYSINFO_RET_OK;
+}
 int	forward_request(char *proxy, char *command, int port, unsigned flags, AGENT_RESULT *result)
 {
 	char	*haddr;

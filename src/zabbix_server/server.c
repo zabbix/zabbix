@@ -437,6 +437,46 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
 
 /******************************************************************************
  *                                                                            *
+ * Function: test                                                             *
+ *                                                                            *
+ * Purpose: test a custom developed functions                                 *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+#define USE_TEST_FUNCTION 1
+
+#ifdef USE_TEST_FUNCTION
+
+void    run_commands(DB_TRIGGER *trigger,DB_ACTION *action);
+
+void test()
+{
+	DB_ACTION action;
+	DB_TRIGGER trigger;
+
+	DB_RESULT *result;
+	int i = 0;
+
+	result = DBselect("select distinct scripts from actions where scripts<>''");
+	for(i=0;i<DBnum_rows(result);i++)
+	{	
+		strscpy(action.scripts,DBget_field(result,i,0));
+		run_commands(&trigger,&action);
+	}
+	
+	DBfree_result(result);
+}
+#endif
+
+/******************************************************************************
+ *                                                                            *
  * Function: main                                                             *
  *                                                                            *
  * Purpose: executes server processes                                         *
@@ -485,6 +525,27 @@ int main(int argc, char **argv)
 
 	init_config();
 
+#ifdef USE_TEST_FUNCTION
+	if(CONFIG_LOG_FILE == NULL)
+	{
+		zabbix_open_log(LOG_TYPE_SYSLOG,CONFIG_LOG_LEVEL,NULL);
+	}
+	else
+	{
+		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,CONFIG_LOG_FILE);
+	}
+
+	if( FAIL == create_pid_file(CONFIG_PID_FILE))
+	{
+		exit(FAIL);
+	}
+	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_server. ZABBIX %s.", ZABBIX_VERSION);
+	DBconnect();
+	test();
+	DBclose();
+	return 0;
+#endif
+	
 	daemon_init();
 
 	phan.sa_handler = &signal_handler; /* set up sig handler using sigaction() */
@@ -550,8 +611,6 @@ int main(int argc, char **argv)
 	}
 
 /*	zabbix_log( LOG_LEVEL_WARNING, "zabbix_server #%d started",server_num);*/
-
-
 
 	if( server_num == 0)
 	{
