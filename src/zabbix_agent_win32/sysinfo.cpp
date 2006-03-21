@@ -28,6 +28,7 @@
 //
 
 LONG H_ProcInfo(char *cmd,char *arg,double *value);
+LONG H_RunCommand(char *cmd,char *arg,char **value);
 LONG H_Execute(char *cmd,char *arg,char **value);
 LONG H_CheckTcpPort(char *cmd,char *arg,double *value);
 
@@ -684,6 +685,7 @@ static AGENT_COMMAND commands[]=
 {
    { "__exec{*}",NULL,H_Execute,NULL },
    { "__usercnt{*}",H_UserCounter,NULL,NULL },
+   { "system.run[*]",NULL,H_RunCommand,NULL },
    { "agent[avg_collector_time]",H_NumericPtr,NULL,(char *)&statAvgCollectorTime },
    { "agent[max_collector_time]",H_NumericPtr,NULL,(char *)&statMaxCollectorTime },
    { "agent[accepted_requests]",H_NumericPtr,NULL,(char *)&statAcceptedRequests },
@@ -767,11 +769,8 @@ INIT_CHECK_MEMORY(main);
    }
 
    // Find match for command in internal command list
-   for(i=0;;i++)
+   for(i=0; commands[i].name[0]; i++)
    {
-      if (commands[i].name[0]==0)
-         break;
-
       if (MatchString(commands[i].name,cmd))
       {
          if (commands[i].handler_float!=NULL)
