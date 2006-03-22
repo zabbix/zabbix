@@ -28,7 +28,7 @@
 //
 
 LONG H_ProcInfo(char *cmd,char *arg,double *value);
-LONG H_RunCommand(char *cmd,char *arg,char **value);
+LONG H_RunCommand(char *cmd,char *arg,double *value);
 LONG H_Execute(char *cmd,char *arg,char **value);
 LONG H_CheckTcpPort(char *cmd,char *arg,double *value);
 
@@ -685,7 +685,7 @@ static AGENT_COMMAND commands[]=
 {
    { "__exec{*}",NULL,H_Execute,NULL },
    { "__usercnt{*}",H_UserCounter,NULL,NULL },
-   { "system.run[*]",NULL,H_RunCommand,NULL },
+   { "system.run[*]",H_RunCommand,NULL,NULL },
    { "agent[avg_collector_time]",H_NumericPtr,NULL,(char *)&statAvgCollectorTime },
    { "agent[max_collector_time]",H_NumericPtr,NULL,(char *)&statMaxCollectorTime },
    { "agent[accepted_requests]",H_NumericPtr,NULL,(char *)&statAcceptedRequests },
@@ -741,6 +741,15 @@ void ProcessCommand(char *received_cmd,char *result)
 
 INIT_CHECK_MEMORY(main);
 
+	for(i=0; received_cmd[i]!='\0'; i++)
+	{
+		if(received_cmd[i] == '\r' || received_cmd[i] == '\n')
+		{
+			received_cmd[i] = '\0';
+			break;
+		}
+		}
+
    ExpandAlias(received_cmd,cmd);
 
    // Find match for command in subagents
@@ -757,9 +766,8 @@ INIT_CHECK_MEMORY(main);
             {
                iRC=sbi->cmdList[i].handler_float(cmd,&fResult);
             }
-            else
-            {
-               if (sbi->cmdList[i].handler_string!=NULL)
+            else if (sbi->cmdList[i].handler_string!=NULL)
+			{
                   iRC=sbi->cmdList[i].handler_string(cmd,&strResult);
             }
             isSubagentCommand=TRUE;
@@ -769,7 +777,7 @@ INIT_CHECK_MEMORY(main);
    }
 
    // Find match for command in internal command list
-   for(i=0; commands[i].name[0]; i++)
+   for(i=0; commands[i].name[0]!='\0'; i++)
    {
       if (MatchString(commands[i].name,cmd))
       {
@@ -777,9 +785,8 @@ INIT_CHECK_MEMORY(main);
          {
             iRC=commands[i].handler_float(cmd,commands[i].arg,&fResult);
          }
-         else
-         {
-            if (commands[i].handler_string!=NULL)
+         else if (commands[i].handler_string!=NULL)
+		 {
                iRC=commands[i].handler_string(cmd,commands[i].arg,&strResult);
          }
          break;
@@ -787,6 +794,7 @@ INIT_CHECK_MEMORY(main);
    }
 
 finish_cmd_processing:;
+
    switch(iRC)
    {
       case SYSINFO_RC_SUCCESS:
