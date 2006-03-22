@@ -114,6 +114,9 @@ LONG H_RunCommand(char *cmd,char *arg,double *value)
 
 	sprintf(command,"cmd /C \"%s\"",ptr1);
 
+LOG_DEBUG_INFO("s","H_RunCommand");
+LOG_DEBUG_INFO("s",command);
+
     GetStartupInfo(&si);
 
     (*value) = (double)CreateProcess(
@@ -128,8 +131,17 @@ LONG H_RunCommand(char *cmd,char *arg,double *value)
 		&si,	// Startup Information
 		&pi);	// Process information stored upon return
 
-	CloseHandle(pi.hProcess);
-	CloseHandle(pi.hThread);
+	if(!(*value))
+	{
+LOG_DEBUG_INFO("s","ERROR");
+LOG_DEBUG_INFO("e",GetLastError());
+	}
+	else
+	{
+LOG_DEBUG_INFO("s","H_RunCommand");
+		CloseHandle(pi.hProcess);
+		CloseHandle(pi.hThread);
+	}
 
 	return SYSINFO_RC_SUCCESS;
 }
