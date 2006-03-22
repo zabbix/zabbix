@@ -94,11 +94,16 @@ LONG H_Execute(char *cmd,char *arg,char **value)
    return SYSINFO_RC_SUCCESS;
 }
 
-LONG H_RunCommand(char *cmd,char *arg,char **value)
+LONG H_RunCommand(char *cmd,char *arg,double *value)
 {
 	STARTUPINFO    si;
 	PROCESS_INFORMATION  pi;
 	char *ptr1,*ptr2;
+	char command[MAX_ZABBIX_CMD_LEN];
+
+	ZeroMemory(&si, sizeof(si) );
+	si.cb = sizeof(si);
+	ZeroMemory(&pi, sizeof(pi) );
 
 	// Extract command line
 	ptr1=strchr(cmd,'[');
@@ -107,11 +112,13 @@ LONG H_RunCommand(char *cmd,char *arg,char **value)
 	*ptr2=0;
 
 
+	sprintf(command,"cmd /C \"%s\"",ptr1);
+
     GetStartupInfo(&si);
 
-    printf("Running Notepad with CreateProcess\n");
-    CreateProcess(NULL, 
-		ptr1,	// Name of app to launch
+    (*value) = (double)CreateProcess(
+		NULL,	// No module name (use command line)
+		command,// Name of app to launch
 		NULL,	// Default process security attributes
 		NULL,	// Default thread security attributes
 		FALSE,	// Don't inherit handles from the parent
@@ -120,6 +127,9 @@ LONG H_RunCommand(char *cmd,char *arg,char **value)
 		NULL,	// Launch in the current directory
 		&si,	// Startup Information
 		&pi);	// Process information stored upon return
+
+	CloseHandle(pi.hProcess);
+	CloseHandle(pi.hThread);
 
 	return SYSINFO_RC_SUCCESS;
 }
