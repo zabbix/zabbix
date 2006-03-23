@@ -19,6 +19,8 @@
 
 #include "config.h"
 
+#include <sys/wait.h>
+
 #include "common.h"
 #include "sysinfo.h"
 
@@ -1240,18 +1242,35 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	
 	zabbix_log(LOG_LEVEL_DEBUG, "Run remote command '%s'", command);
 	
-	pid = fork();
+	pid = fork(); // run new thread 1
 	switch(pid)
 	{
+	case -1:
+		zabbix_log(LOG_LEVEL_WARNING, "fork failed for '%s'",command);
+		return SYSINFO_RET_FAIL;
+	case 0:
+		pid = fork(); // run new tread 2 to replace by command
+		switch(pid)
+		{
 		case -1:
-			zabbix_log(LOG_LEVEL_WARNING, "fork failed for '%s'",command);
+			zabbix_log(LOG_LEVEL_WARNING, "fork2 failed for '%s'",command);
 			return SYSINFO_RET_FAIL;
-		case 0:
+		case 0: // replace thread 2
 			if(execl("/bin/sh", "sh", "-c", command, (char *)0))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "execl failed for '%s'",command);
-				return SYSINFO_RET_FAIL;
+				exit(1);
 			}
+			/* In normal case the program will never reach this point */
+			exit(0);
+		default:
+			waitpid(pid, NULL, WNOHANG); // NO WAIT for thread 2 closing
+			exit(0); // close thread 1 and transmit thread 2 to system (solve zombie state)
+			break;
+		}
+	default:
+		waitpid(pid, NULL, 0); // wait thread 1 closing
+		break;
 	}
 
 	SET_UI64_RESULT(result, 0);
