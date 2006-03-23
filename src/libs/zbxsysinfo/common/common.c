@@ -1273,7 +1273,7 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		break;
 	}
 
-	SET_UI64_RESULT(result, 0);
+	SET_UI64_RESULT(result, 1);
 	
 	return	SYSINFO_RET_OK;
 }
