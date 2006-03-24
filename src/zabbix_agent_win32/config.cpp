@@ -408,7 +408,11 @@ CHECK_MEMORY(main, "ReadConfig", "fopen==NULL");
       }
       else if (!stricmp(buffer,"LogLevel"))
       {
-         g_dwLogLevel = strtoul(buffer, NULL, 0);
+         g_dwLogLevel = strtoul(ptr, NULL, 0);
+      }
+      else if (!stricmp(buffer,"EnableRemoteCommands"))
+      {
+         confEnableRemoteCommands = strtoul(ptr, NULL, 0);
       }
       else if (!stricmp(buffer,"PerfCounter"))
       {

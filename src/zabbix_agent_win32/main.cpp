@@ -43,6 +43,7 @@ DWORD confServerAddr[MAX_SERVERS];
 DWORD confServerCount=0;
 DWORD confTimeout=3000;    // 3 seconds default timeout
 DWORD confMaxProcTime=1000; // 1000 milliseconds is default acceptable collector sample processing time
+DWORD confEnableRemoteCommands=0; // by default disabled
 DWORD g_dwLogLevel = EVENTLOG_ERROR_TYPE | EVENTLOG_WARNING_TYPE | EVENTLOG_INFORMATION_TYPE;
 
 SUBAGENT *subagentList;    // List of loaded subagents
