@@ -101,6 +101,12 @@ LONG H_RunCommand(char *cmd,char *arg,double *value)
 	char *ptr1,*ptr2;
 	char command[MAX_ZABBIX_CMD_LEN];
 
+	if(confEnableRemoteCommands != 1)
+	{
+		*value = 0;
+		return SYSINFO_RC_NOTSUPPORTED;
+	}
+
 	ZeroMemory(&si, sizeof(si) );
 	si.cb = sizeof(si);
 	ZeroMemory(&pi, sizeof(pi) );

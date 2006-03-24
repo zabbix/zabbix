@@ -1,5 +1,12 @@
 #!/bin/sh
 
+#
+# Description:
+#	ZABBIX compilateion script
+# Author:
+#	Eugene Grigorjev
+#
+
 premake="no"
 copy="no"
 tgz="no"
@@ -11,6 +18,7 @@ cleanwarnings="no"
 docat="yes"
 help="no"
 noparam=0;
+def="--with-ldap --enable-agent --enable-server --with-mysql --with-net-snmp"
 
 for cmd
 do
@@ -27,7 +35,7 @@ do
     tar )     tgz="yes"; noparam=1;;
     nocat )   docat="no"; noparam=1;;
     cat )   docat="yes"; noparam=1;;
-    def ) config_param="$config_param --with-ldap --enable-agent --enable-server --with-mysql --with-net-snmp";;
+    def ) config_param="$config_param $def";;
     --enable-* ) config_param="$config_param $cmd";; 
     --with-* ) config_param="$config_param $cmd";;
     --prefix=* ) config_param="$config_param $cmd";;
@@ -43,6 +51,8 @@ then
         echo
         echo "Usage:"
         echo "  $0 [copy|cpy] [premake|pre] [configure|config|conf] [def] [make] [test] [tar] [cat] [nocat] [--enable-*] [--with-*]"
+        echo
+	echo "  def = $def"
         echo
         echo "Examples:"
         echo "  $0 conf def make test        - compyle, test, and sow report"

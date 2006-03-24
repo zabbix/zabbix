@@ -39,7 +39,7 @@ ZBX_METRIC	parameters_common[]=
 	{"vfs.file.size",	CF_USEUPARAM,	VFS_FILE_SIZE, 		0,	"/etc/passwd"},
 	{"vfs.file.regexp",	CF_USEUPARAM,	VFS_FILE_REGEXP,	0,	"/etc/passwd,root"},
 	{"vfs.file.regmatch",	CF_USEUPARAM,	VFS_FILE_REGMATCH, 	0,	"/etc/passwd,root"},
-	{"system.run",		CF_USEUPARAM,	RUN_COMMAND,	 	0,	"echo -n"},
+	{"system.run",		CF_USEUPARAM,	RUN_COMMAND,	 	0,	"echo test"},
 	{0}
 	};
 
@@ -1225,6 +1225,12 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 	init_result(result);
 
+	if(CONFIG_ENABLE_REMOTE_COMMANDS != 1)
+	{
+		SET_MSG_RESULT(result, strdup("ZBX_NOTSUPPORTED"));
+		return  SYSINFO_RET_FAIL;
+	}
+	
         if(num_param(param) > 1)
         {
                 return SYSINFO_RET_FAIL;

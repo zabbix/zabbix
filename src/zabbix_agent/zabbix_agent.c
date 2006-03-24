@@ -28,6 +28,7 @@
 
 static	char	*CONFIG_HOSTS_ALLOWED	= NULL;
 static	int	CONFIG_TIMEOUT		= AGENT_TIMEOUT;
+int		CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
 
 void	signal_handler( int sig )
 {

@@ -21,6 +21,8 @@
 #ifndef ZABBIX_SYSINFO_H
 #define ZABBIX_SYSINFO_H
 
+extern int	CONFIG_ENABLE_REMOTE_COMMANDS;
+
 /* #define TEST_PARAMETERS */
 
 #define	SYSINFO_RET_OK		0
