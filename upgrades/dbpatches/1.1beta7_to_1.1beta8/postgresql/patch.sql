@@ -32,4 +32,6 @@ ALTER TABLE screens_items ADD		halign	int2	DEFAULT '0' NOT NULL;
 ALTER TABLE screens_items ADD		style	int4	DEFAULT '0' NOT NULL;
 ALTER TABLE screens_items ADD		url	varchar(255)	DEFAULT '' NOT NULL;
 
+CREATE INDEX rights_userid on rights (userid);
+
 ALTER TABLE actions ADD			scripts	text		DEFAULT '' NOT NULL;

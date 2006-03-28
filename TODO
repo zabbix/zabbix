@@ -1,4 +1,7 @@
 1.1beta8:
+ - performance problem while checking permissions
+ - a separate poller for unreachable hosts
+
  - execution of commands on monitored hosts in case of pre-defined events
  - tactical overview screen
  - better loading of images.sql

@@ -24,6 +24,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 <?php
 // GLOBALS
 	$USER_DETAILS	="";
+	$USER_RIGHTS	="";
 	$ERROR_MSG	="";
 	$INFO_MSG	="";
 // END OF GLOBALS
@@ -424,7 +425,31 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 
 	function	check_right($right,$permission,$id)
 	{
-		global $USER_DETAILS;
+//		global $USER_DETAILS;
+		global $USER_RIGHTS;
+
+		$default_permission="H";
+		$group_permission="";
+		$id_permission="";
+//		echo $id,"<br>";
+//		echo DBnum_rows($rights),"<br>";
+		if(isset($USER_RIGHTS[0]["name"]))
+		{
+			$default_permission="";
+			for($i=0;isset($USER_RIGHTS[$i]["name"]);$i++)
+			{	
+//				echo "*";
+				if($USER_RIGHTS[$i]["name"] == 'Default permission')
+					$default_permission=$default_permission.$USER_RIGHTS[$i]["permission"];
+				if(($USER_RIGHTS[$i]["name"] == $right)&&($row["id"]==0))
+					$group_permission=$group_permission.$USER_RIGHTS[$i]["permission"];
+				if(($USER_RIGHTS[$i]["name"] == $right)&&($row["id"]==$id))
+					$id_permission=$id_permission.$USER_RIGHTS[$i]["permission"];
+			}
+		}
+//		echo $default_permission,"<br>";
+
+/*
 
 		$sql="select permission from rights where name='Default permission' and userid=".$USER_DETAILS["userid"];
 		$result=DBselect($sql);
@@ -466,6 +491,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 				}
 			}
 		}
+*/
 # id_permission
 //		echo "$id_permission|$group_permission|$default_permission<br>";
 
@@ -980,6 +1006,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 		global	$page;
 		global	$PHP_AUTH_USER,$PHP_AUTH_PW;
 		global	$USER_DETAILS;
+		global	$USER_RIGHTS;
 		global	$_COOKIE;
 		global	$_REQUEST;
 //		global	$sessionid;
@@ -1004,6 +1031,16 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 				$sql="update sessions set lastaccess=".time()." where sessionid=".zbx_dbstr($sessionid);
 				DBexecute($sql);
 				$USER_DETAILS=DBfetch($result);
+
+				$result2=DBselect("select * from rights where userid=".$USER_DETAILS["userid"]);
+				$i=0;
+				while($row=DBfetch($result2))
+				{
+					$USER_RIGHTS[$i]["name"]=$row["name"];
+					$USER_RIGHTS[$i]["id"]=$row["id"];
+					$USER_RIGHTS[$i]["permission"]=$row["permission"];
+					$i++;
+				}
 				return;
 			}
 			else
@@ -1018,6 +1055,15 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
                 if(DBnum_rows($result)==1)
                 {
 			$USER_DETAILS=DBfetch($result);
+			$result2=DBselect("select * from rights where userid=".$USER_DETAILS["userid"]);
+			$i=0;
+			while($row=DBfetch($result2))
+			{
+				$USER_RIGHTS[$i]["name"]=$row["name"];
+				$USER_RIGHTS[$i]["id"]=$row["id"];
+				$USER_RIGHTS[$i]["permission"]=$row["permission"];
+				$i++;
+			}
 			return;
 		}
 

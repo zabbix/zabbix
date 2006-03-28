@@ -665,7 +665,6 @@
 		
 		$db_actions = DBselect("select distinct c.actionid from conditions c, triggers t".
 			" where c.conditiontype=".CONDITION_TYPE_TRIGGER.
-			" where c.conditiontype=CONDITION_TYPE_TRIGGER".
 			" and c.value=t.triggerid");
 		while($db_action = DBfetch($db_actions))
 		{
@@ -980,7 +979,7 @@
 			foreach($hosts as $hostid)
 			{
 				$style = NULL;
-				$db_host_triggers = DBselect("select t.value,t.lastchange from triggers t,functions f,items i".
+				$db_host_triggers = DBselect("select distinct t.value,t.lastchange from triggers t,functions f,items i".
 					" where f.triggerid=t.triggerid and i.itemid=f.itemid and t.status=".TRIGGER_STATUS_ENABLED.
 					" and i.hostid=$hostid and t.description=".zbx_dbstr($triggers["description"]));
 				if(DBnum_rows($db_host_triggers)==1)
@@ -992,7 +991,7 @@
 					else							$style = "high";
 
 					if((time(NULL)-$host_trigger["lastchange"])<300) 	$style .= "_blink1";
-					elseif((time(NULL)-$host_trigger["lastchange"])<900) 	$style .= "_blink3";
+					elseif((time(NULL)-$host_trigger["lastchange"])<900) 	$style .= "_blink2";
 				}
 				array_push($table_row,new CCol(SPACE,$style));
 			}
