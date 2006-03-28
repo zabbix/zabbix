@@ -136,11 +136,11 @@
 
 	if(isset($_REQUEST["hostid"]))
 	{
-		$sql="select distinct t.description,a.clock,a.value,t.triggerid,t.priority from alarms a,triggers t,hosts h,items i,functions f where t.triggerid=a.triggerid and f.triggerid=t.triggerid and f.itemid=i.itemid and i.hostid=h.hostid and h.hostid=".$_REQUEST["hostid"]." order by clock desc limit ".(10*($_REQUEST["start"]+100));
+		$sql="select distinct a.clock,a.value,t.triggerid from alarms a,triggers t,hosts h,items i,functions f where t.triggerid=a.triggerid and f.triggerid=t.triggerid and f.itemid=i.itemid and i.hostid=h.hostid and h.hostid=".$_REQUEST["hostid"]." order by clock desc limit ".(10*($_REQUEST["start"]+100));
 	}
 	else
 	{
-		$sql="select distinct t.description,a.clock,a.value,t.triggerid,t.priority from alarms a,triggers t,hosts h,items i,functions f where t.triggerid=a.triggerid and f.triggerid=t.triggerid and f.itemid=i.itemid and i.hostid=h.hostid order by clock desc limit ".(10*($_REQUEST["start"]+100));
+		$sql="select distinct a.clock,a.value,t.triggerid from alarms a,triggers t,hosts h,items i,functions f where t.triggerid=a.triggerid and f.triggerid=t.triggerid and f.itemid=i.itemid and i.hostid=h.hostid order by clock desc limit ".(10*($_REQUEST["start"]+100));
 	}
 
 	$result=DBselect($sql);
@@ -176,13 +176,16 @@
 		{
 			$value=new CCol(S_UNKNOWN_BIG,"unknown");
 		}
-		if($row["priority"]==0)		$priority=S_NOT_CLASSIFIED;
-		elseif($row["priority"]==1)	$priority=S_INFORMATION;
-		elseif($row["priority"]==2)	$priority=S_WARNING;
-		elseif($row["priority"]==3)	$priority=new CCol(S_AVERAGE,"average");
-		elseif($row["priority"]==4)	$priority=new CCol(S_HIGH,"high");
-		elseif($row["priority"]==5)	$priority=new CCol(S_DISASTER,"disaster");
-		else				$priority=$row["priority"];
+
+		$trigger = get_trigger_by_triggerid($row["triggerid"]);
+
+		if($trigger["priority"]==0)	$priority=S_NOT_CLASSIFIED;
+		elseif($trigger["priority"]==1)	$priority=S_INFORMATION;
+		elseif($trigger["priority"]==2)	$priority=S_WARNING;
+		elseif($trigger["priority"]==3)	$priority=new CCol(S_AVERAGE,"average");
+		elseif($trigger["priority"]==4)	$priority=new CCol(S_HIGH,"high");
+		elseif($trigger["priority"]==5)	$priority=new CCol(S_DISASTER,"disaster");
+		else				$priority=$trigger["priority"];
 
 		$table->addRow(array(
 			date("Y.M.d H:i:s",$row["clock"]),
