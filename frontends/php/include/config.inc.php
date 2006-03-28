@@ -441,9 +441,9 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 //				echo "*";
 				if($USER_RIGHTS[$i]["name"] == 'Default permission')
 					$default_permission=$default_permission.$USER_RIGHTS[$i]["permission"];
-				if(($USER_RIGHTS[$i]["name"] == $right)&&($row["id"]==0))
+				if(($USER_RIGHTS[$i]["name"] == $right)&&($USER_RIGHTS[$i]["id"]==0))
 					$group_permission=$group_permission.$USER_RIGHTS[$i]["permission"];
-				if(($USER_RIGHTS[$i]["name"] == $right)&&($row["id"]==$id))
+				if(($USER_RIGHTS[$i]["name"] == $right)&&($USER_RIGHTS[$i]["id"]==$id))
 					$id_permission=$id_permission.$USER_RIGHTS[$i]["permission"];
 			}
 		}
