@@ -1,5 +1,6 @@
 Changes for 1.1beta8:
 
+ - moved installation of images to data.sql (Alexei)
  - fixed highly unefficient check of permissions (Alexei)
  - developed remote commads execution on specific actions (Eugene)
  - added "URL" module for screens (Eugene)
