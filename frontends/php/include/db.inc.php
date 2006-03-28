@@ -25,8 +25,8 @@
 //	$DB_TYPE	="POSTGRESQL";
 	$DB_TYPE	="MYSQL";
 	$DB_SERVER	="localhost";
-//	$DB_DATABASE	="zabbix";
-	$DB_DATABASE	="osmiy";
+	$DB_DATABASE	="zabbix";
+//	$DB_DATABASE	="osmiy";
 	$DB_USER	="root";
 	$DB_PASSWORD	="";
 // END OF DATABASE CONFIGURATION
@@ -58,7 +58,7 @@
 	{
 		global $DB,$DB_TYPE;
 
-#		echo $query,"<br>";
+//		echo $query,"<br>";
 
 		if($DB_TYPE == "MYSQL")
 		{

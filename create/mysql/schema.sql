@@ -115,7 +115,7 @@ CREATE TABLE sysmaps_elements (
   x			int(4)		DEFAULT '0' NOT NULL,
   y			int(4)		DEFAULT '0' NOT NULL,
   url			varchar(255)	DEFAULT '' NOT NULL,
-  PRIMARY KEY (shostid)
+  PRIMARY KEY (selementid)
 ) type=InnoDB;
 
 --
@@ -494,7 +494,8 @@ CREATE TABLE rights (
   name			char(255)	DEFAULT '' NOT NULL,
   permission		char(1)		DEFAULT '' NOT NULL,
   id			int(4),
-  PRIMARY KEY (rightid)
+  PRIMARY KEY (rightid),
+  KEY (userid)
 ) type=InnoDB;
 
 --
