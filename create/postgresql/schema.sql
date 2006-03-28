@@ -548,6 +548,8 @@ CREATE TABLE rights (
   PRIMARY KEY (rightid)
 );
 
+CREATE INDEX rights_userid on rights (userid);
+
 CREATE TABLE sessions (
 	sessionid	varchar(32)	DEFAULT '' NOT NULL,
 	userid		int4		DEFAULT '0' NOT NULL,

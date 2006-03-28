@@ -136,11 +136,11 @@
 
 	if(isset($_REQUEST["hostid"]))
 	{
-		$sql="select t.description,a.clock,a.value,t.triggerid,t.priority from alarms a,triggers t,hosts h,items i,functions f where t.triggerid=a.triggerid and f.triggerid=t.triggerid and f.itemid=i.itemid and i.hostid=h.hostid and h.hostid=".$_REQUEST["hostid"]." order by clock desc limit ".(10*($_REQUEST["start"]+100));
+		$sql="select distinct t.description,a.clock,a.value,t.triggerid,t.priority from alarms a,triggers t,hosts h,items i,functions f where t.triggerid=a.triggerid and f.triggerid=t.triggerid and f.itemid=i.itemid and i.hostid=h.hostid and h.hostid=".$_REQUEST["hostid"]." order by clock desc limit ".(10*($_REQUEST["start"]+100));
 	}
 	else
 	{
-		$sql="select t.description,a.clock,a.value,t.triggerid,t.priority from alarms a,triggers t,hosts h,items i,functions f where t.triggerid=a.triggerid and f.triggerid=t.triggerid and f.itemid=i.itemid and i.hostid=h.hostid order by clock desc limit ".(10*($_REQUEST["start"]+100));
+		$sql="select distinct t.description,a.clock,a.value,t.triggerid,t.priority from alarms a,triggers t,hosts h,items i,functions f where t.triggerid=a.triggerid and f.triggerid=t.triggerid and f.itemid=i.itemid and i.hostid=h.hostid order by clock desc limit ".(10*($_REQUEST["start"]+100));
 	}
 
 	$result=DBselect($sql);

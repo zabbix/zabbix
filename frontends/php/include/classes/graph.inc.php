@@ -296,7 +296,7 @@
 
 			$str=$str.$this->period2str($this->period);
 
-			if($this->sizeX < 300)
+			if($this->sizeX < 500)
 			{
 				$fontnum = 2;
 			}
