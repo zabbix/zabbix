@@ -558,7 +558,7 @@
 			}
 			else
 			{
-				sql_push($sql_arr,
+				array_push($sql_arr,
 					"select itemid,round(900*((clock+$z)%($p))/($p),0) as i,sum(num) as count,avg(value_avg) as avg,min(value_min) as min,max(value_max) as max,max(clock) as clock from trends where itemid in ($str) and clock>=".$this->from_time." and clock<=".$this->to_time." group by itemid,round(900*((clock+$z)%($p))/($p),0)");
 			}
 //			echo "<br>",$sql,"<br>";
