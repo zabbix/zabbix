@@ -27,6 +27,7 @@
 		var $paired;
 /* protected */
 		var $items = array();
+		var $items_max_count;
 
 		var $tag_body_start;
 		var $tag_body_end;
@@ -34,14 +35,27 @@
 		var $tag_end;
 
 /* public */
-		function CTag($name=NULL, $paired='no')
+		function CTag($name=NULL, $paired='no', $body=NULL)
 		{
 			$this->SetTagName($name);
 			$this->SetPaired($paired);
-			$this->tag_start= "";
-			$this->tag_end = "\n";
-			$this->tag_body_start = "\n";
-			$this->tag_body_end = "";
+			$this->SetMaxLength(0);
+
+			$this->tag_start=$this->tag_end=$this->tag_body_start=$this->tag_body_end= "";
+
+			if(is_null($body)) $this->tag_end = "\n";
+			if(is_null($body)) $this->tag_body_start = "\n";
+
+			CTag::AddItem($body);
+
+		}
+		function SetMaxLength($value)
+		{
+			if(!is_int($value))
+				return $this->error("Incorrect value for SetMaxLength [$value]");
+
+			$this->items_max_count = $value;
+			return 0;
 		}
 		function Show()
 		{
@@ -129,6 +143,10 @@
 		{
 			$this->items = array();
 		}
+		function GetItemsCount()
+		{
+			return count($this->items);
+		}
 		function AddItem($value)
 		{
 			if(is_null($value))
@@ -138,10 +156,19 @@
 			elseif(is_array($value))
 			{
 				foreach($value as $item)
+				{
+					if($this->items_max_count > 0)
+						if(count($this->items) >= $this->items_max_count)
+							return $this->error("Maximal tag lenght '".$this->items_max_count."' is achived");
 					array_push($this->items,$item);
+				}
 			}
 			else
 			{
+				if($this->items_max_count > 0)
+					if(count($this->items) >= $this->items_max_count)
+						return $this->error("Maximal tag lenght '".$this->items_max_count."' is achived");
+
 				array_push($this->items,$value);
 			}
 			return 0;

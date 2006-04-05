@@ -251,6 +251,7 @@
 		$frmItem = new CFormTable(S_ITEM,"items.php");
 		$frmItem->SetHelp("web.items.item.php");
 
+		$frmItem->AddVar("config",get_request("config",0));
 		if(isset($_REQUEST["groupid"]))
 			$frmItem->AddVar("groupid",$_REQUEST["groupid"]);
 
@@ -504,13 +505,13 @@
 			array_push($frmRow,
 				SPACE,
 				new CButtonDelete("Delete selected item?",
-					url_param("form").url_param("groupid").url_param("hostid").
+					url_param("form").url_param("groupid").url_param("hostid").url_param("config").
 					url_param("itemid"))
 			);
 		}
 		array_push($frmRow,
 			SPACE,
-			new CButtonCancel(url_param("groupid").url_param("hostid")));
+			new CButtonCancel(url_param("groupid").url_param("hostid").url_param("config")));
 
 		$frmItem->AddSpanRow($frmRow,"form_row_last");
 
@@ -560,54 +561,6 @@
 		SetFocus($frmLogin->GetName(),"name");
 	}
 
-/*
-	# Insert form for Problem
-	function	insert_problem_form($problemid)
-	{
-		show_form_begin();
-		echo "Problem definition";
-		show_table2_v_delimiter();
-		echo "<form method=\"post\" action=\"helpdesk.php\">";
-		echo "<input name=\"problemid\" type=hidden value=$problemid size=8>";
-		echo "Description";
-		show_table2_h_delimiter();
-		echo "<input name=\"description\" value=\"$description\" size=70>";
-
-		show_table2_v_delimiter();
-		echo "Severity";
-		show_table2_h_delimiter();
-		echo "<SELECT NAME=\"priority\" size=\"1\">";
-		echo "<OPTION VALUE=\"0\" "; if($priority==0) echo "SELECTED"; echo ">Not classified";
-		echo "<OPTION VALUE=\"1\" "; if($priority==1) echo "SELECTED"; echo ">Information";
-		echo "<OPTION VALUE=\"2\" "; if($priority==2) echo "SELECTED"; echo ">Warning";
-		echo "<OPTION VALUE=\"3\" "; if($priority==3) echo "SELECTED"; echo ">Average";
-		echo "<OPTION VALUE=\"4\" "; if($priority==4) echo "SELECTED"; echo ">High";
-		echo "<OPTION VALUE=\"5\" "; if($priority==5) echo "SELECTED"; echo ">Disaster";
-		echo "</SELECT>";
-
-		show_table2_v_delimiter();
-		echo "Status";
-		show_table2_h_delimiter();
-		echo "<SELECT NAME=\"status\" value=\"$status\" size=\"1\">";
-		echo "<OPTION VALUE=\"0\"";
-		if($status==0) echo "SELECTED";
-		echo ">Opened";
-		echo "<OPTION VALUE=\"1\"";
-		if($status==1) echo "SELECTED";
-		echo ">Closed";
-		echo "</SELECT>";
-
-		show_table2_v_delimiter2();
-		echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"add\">";
-		if(isset($problemid))
-		{
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
-			echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"delete\">";
-		}
-
-		show_table2_header_end();
-	}
-*/
 	# Insert form for Trigger
 	function	insert_trigger_form()
 	{
@@ -709,7 +662,7 @@
 
 		$frmTrig->AddRow(S_COMMENTS,new CTextArea("comments",$comments,70,7));
 		$frmTrig->AddRow(S_URL,new CTextBox("url",$url,70));
-		$frmTrig->AddRow(S_DISABLED,new CCheckBox("disabled",$status));
+		$frmTrig->AddRow(S_DISABLED,new CCheckBox("status",$status));
  
 		$frmTrig->AddItemToBottomRow(new CButton("save",S_SAVE));
 		if(isset($_REQUEST["triggerid"]))
@@ -722,6 +675,20 @@
 		$frmTrig->AddItemToBottomRow(SPACE);
 		$frmTrig->AddItemToBottomRow(new CButtonCancel(url_param("groupid").url_param("hostid")));
 		$frmTrig->Show();
+	}
+
+	function insert_trigger_comment_form($triggerid)
+	{
+		$trigger=get_trigger_by_triggerid($triggerid);
+		$comments=stripslashes($trigger["comments"]);
+
+		$frmComent = new CFormTable(S_COMMENTS." for \"".expand_trigger_description_simple($triggerid)."\"");
+		$frmComent->SetHelp("web.tr_comments.comments.php");
+		$frmComent->AddVar("triggerid",$triggerid);
+		$frmComent->AddRow(S_COMMENTS,new CTextArea("comments",$comments,100,25));
+		$frmComent->AddItemToBottomRow(new CButton("register","update"));
+
+		$frmComent->Show();
 	}
 
 	function	insert_graph_form()
@@ -900,103 +867,7 @@
 		$frmGItem->AddItemToBottomRow(new CButtonCancel(url_param("graphid")));
 		$frmGItem->Show();
 	}
-/*
-	# Insert escalation form
-	function	insert_escalation_form($escalationid)
-	{
-		if(isset($escalationid))
-		{
-			$result=DBselect("select * from escalations  where escalationid=$escalationid");
 
-			$row=DBfetch($result);
-	
-			$name=$row["name"];
-			$dflt=$row["dflt"];
-		}
-		else
-		{
-			$name="";
-			$dflt=0;
-		}
-
-		$frmEscal = new CFormTable(S_ESCALATION,"config.php");
-		$frmEscal->SetHelp("web.escalations.php");
-
-		$frmEscal->AddVar("config",$_REQUEST["config"]);
-
-		if(isset($escalationid))
-		{
-			$frmEscal->AddVar("escalationid",$escalationid);
-		}
-
-		$frmEscal->AddRow(S_NAME,new CTextBox("name",$name,32));
-		$frmEscal->AddRow(S_IS_DEFAULT,new CCheckBox("dflt",$dflt));
-
-		$frmEscal->AddItemToBottomRow(new CButton("register","add escalation"));
-		if(isset($escalationid))
-		{
-			$frmEscal->AddItemToBottomRow(SPACE);
-			$frmEscal->AddItemToBottomRow(new CButton("register","update escalation"));
-			$frmEscal->AddItemToBottomRow(SPACE);
-			$frmEscal->AddItemToBottomRow(new CButton("register","delete escalation",
-				"return Confirm('Delete selected escalation?');"));
-		}
-		$frmEscal->Show();
-	}
-
-	# Insert escalation rule form
-	function	insert_escalation_rule_form($escalationid,$escalationruleid)
-	{
-		if(isset($escalationruleid))
-		{
-			$result=DBselect("select * from escalation_rules  where escalationruleid=$escalationruleid");
-
-			$row=DBfetch($result);
-	
-			$level=$row["level"];
-			$period=$row["period"];
-			$delay=$row["delay"];
-			$actiontype=$row["actiontype"];
-		}
-		else
-		{
-			$level=1;
-			$period="1-7,00:00-23:59";
-			$delay=0;
-			$actiontype=0;
-		}
-
-		$frmEacalRul = new CFormTable(S_ESCALATION_RULE,"config.php");
-		$frmEacalRul->SetHelp("web.escalationrule.php");
-		$frmEacalRul->AddVar("config",$_REQUEST["config"]);
-		$frmEacalRul->AddVar("escalationid",$escalationid);
-		if(isset($escalationruleid))
-		{
-			$frmEacalRul->AddVar("calationruleid",$escalationruleid);
-		}
-
-		$frmEacalRul->AddRow(S_LEVEL,new CTextBox("level",$level,2));
-		$frmEacalRul->AddRow(S_PERIOD,new CTextBox("period",$period,32));
-		$frmEacalRul->AddRow(S_DELAY,new CTextBox("delay",$delay,32));
-
-		$cmbAction = new CComboBox("actiontype",$actiontype);
-		$cmbAction->AddItem(0,"Do nothing");
-		$cmbAction->AddItem(1,"Execute actions");
-		$cmbAction->AddItem(2,"Increase severity");
-		$cmbAction->AddItem(3,"Increase administrative hierarcy");
-		$frmEacalRul->AddRow(S_DO,$cmbAction);
-
-		$frmEacalRul->AddItemToBottomRow(new CButton("register","add rule"));
-		if(isset($escalationid))
-		{
-			$frmEacalRul->AddItemToBottomRow(SPACE);
-			$frmEacalRul->AddItemToBottomRow(new CButton("register","update rule"));
-			$frmEacalRul->AddItemToBottomRow(SPACE);
-			$frmEacalRul->AddItemToBottomRow(new CButton("register","delete rule","return Confirm('Delete selected escalation rule?');"));
-		}
-		$frmEacalRul->Show();
-	}
-*/
 	# Insert autoregistration form
 	function	insert_autoregistration_form()
 	{

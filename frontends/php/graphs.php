@@ -27,10 +27,6 @@
 	insert_confirm_javascript();
 ?>
 <?php
-	show_table_header(S_CONFIGURATION_OF_GRAPHS_BIG);
-	echo BR;
-?>
-<?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		"groupid"=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	NULL),
@@ -116,6 +112,12 @@
 	}
 ?>
 <?php
+	$form = new CForm();
+	$form->AddItem(new CButton("form",S_CREATE_GRAPH));
+
+	show_table_header(S_CONFIGURATION_OF_GRAPHS_BIG,$form);
+	echo BR;
+
 	if(isset($_REQUEST["form"]))
 	{
 		insert_graph_form();
@@ -125,23 +127,7 @@
 		{
 			unset($_REQUEST["graphid"]);
 		}
-/*
-		if(isset($_REQUEST["graphid"]))
-		{
-			$result=DBselect("select name from graphs where graphid=".$_REQUEST["graphid"]);
-			$row=DBfetch($result);
-			$graph=$row["name"];
-			$h1=iif(isset($_REQUEST["fullscreen"]),
-			"<a href=\"charts.php?graphid=".$_REQUEST["graphid"]."\">".$graph."</a>",
-			"<a href=\"charts.php?graphid=".$_REQUEST["graphid"]."&fullscreen=1\">".$graph."</a>");
-		}
-		else
-		{
-			$h1=S_SELECT_GRAPH_TO_DISPLAY;
-		}
 
-		$h1=S_GRAPHS_BIG.nbsp(" / ").$h1;
-*/
 		$form = new CForm();
 		$form->AddItem(S_GROUP.SPACE);
 		$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit()");
@@ -197,9 +183,6 @@
 		$form->AddItem($cmbHosts);
 		if(!$host_ok && $_REQUEST["hostid"]!=0)
 			$_REQUEST["hostid"] = $first_host;
-
-		$form->AddItem(SPACE."|".SPACE);
-		$form->AddItem(new CButton("form",S_CREATE_GRAPH));
 
 		show_header2(S_GRAPHS_BIG, $form);
 

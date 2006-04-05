@@ -1326,40 +1326,6 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 		return $table;
 	}
 
-	# Show values in plain text
-
-	function	show_plaintext($itemid, $from, $till)
-	{
-		$item=get_item_by_itemid($itemid);
-		if($item["value_type"]==ITEM_VALUE_TYPE_FLOAT)
-		{
-			$sql="select clock,value from history where itemid=$itemid and clock>$from and clock<$till order by clock";
-		}
-		else if($item["value_type"]==ITEM_VALUE_TYPE_UINT64)
-		{
-			$sql="select clock,value from history_uint where itemid=$itemid and clock>$from and clock<$till order by clock";
-		}
-		else if($item["value_type"]==ITEM_VALUE_TYPE_LOG)
-		{
-			$sql="select clock,value from history_log where itemid=$itemid and clock>$from and clock<$till order by clock";
-		}
-		else
-		{
-			$sql="select clock,value from history_str where itemid=$itemid and clock>$from and clock<$till order by clock";
-		}
-                $result=DBselect($sql);
-
-		echo "<PRE>\n";
-		while($row=DBfetch($result))
-		{
-			$clock=$row["clock"];
-			$value=$row["value"];
-			echo date("Y-m-d H:i:s",$clock);
-			echo "\t$clock\t$value\n";
-		}
-	}
- 
-
 	# Translate {10}>10 to something like localhost:procload.last(0)>10
 
 	function	explode_exp ($expression, $html)
@@ -1392,7 +1358,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 					$item=get_item_by_itemid($row1["itemid"]);
 					if($item["value_type"] ==0) 
 					{
-						$exp=$exp."{<A HREF=\"history.php?action=showhistory&itemid=".$row1["itemid"]."\">".$row1["host"].":".$row1["key_"]."</A>.<B>".$row1["function"]."(</B>".$row1["parameter"]."<B>)</B>}";
+						$exp=$exp."{<A HREF=\"history.php?action=showgraph&itemid=".$row1["itemid"]."\">".$row1["host"].":".$row1["key_"]."</A>.<B>".$row1["function"]."(</B>".$row1["parameter"]."<B>)</B>}";
 					}
 					else
 					{
@@ -1889,199 +1855,11 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 		return DBexecute($sql);
 	}
 
-	function	show_table_h_delimiter()
-	{
-//		echo "</font>";
-		cr();
-		echo "</td>";
-		cr();
-		echo "<td colspan=1 bgcolor=FFFFFF align=center valign=\"top\">";
-		cr();
-//		echo "	<font size=2>";
-		cr();
-	}
-
-	function	show_table2_h_delimiter()
-	{
-//		echo "</font>";
-		cr();
-		echo "</td>";
-		cr();
-//		echo "<td colspan=1 bgcolor=CCCCCC align=left valign=\"top\">";
-		echo "<td class=\"form_row_r\" height=24>";
-		cr();
-//		echo "	<font size=-1>";
-		cr();
-	}
-
-	function	show_table3_h_delimiter($width=10)
-	{
-?>
-        </td><td class="sub_menu" height=24 colspan=9 nowrap="nowrap" width="<?php echo $width;?>%">
-<?php
-/*
-		cr();
-		echo "</td>";
-		cr();
-		echo "<td width=$width% colspan=1 bgcolor=6d88ad align=right valign=\"top\">";
-		cr();
-		cr();
-*/
-	}
-
-
-	function	show_table_v_delimiter($colspan=1)
-	{
-//		echo "</font>";
-		cr();
-		echo "</td>";
-		cr();
-		echo "</tr>";
-		cr();
-		echo "<tr>";
-		cr();
-		echo "<td colspan=$colspan bgcolor=FFFFFF align=center valign=\"top\">";
-		cr();
-//		echo "<font size=2>";
-		cr();
-	}
-
-	function	show_table2_v_delimiter($rownum=0)
-	{
-//		echo "</font>";
-		cr();
-		echo "</td>";
-		cr();
-		echo "</tr>";
-		cr();
-		if($rownum%2 == 1)	{ echo "<TR BGCOLOR=\"#DFDFDF\">"; }
-		else			{ echo "<TR BGCOLOR=\"#D8D8D8\">"; }
-		cr();
-//		echo "<td colspan=1 bgcolor=CCCCCC align=left valign=\"top\">";
-		echo "<td class=\"form_row_l\" height=24>";
-		cr();
-//		echo "<font size=-1>";
-		cr();
-	}
-
-	function	show_table3_v_delimiter()
-	{
-?>
-        </td><td class="sub_nemu" height=24 colspan=9>
-
-<?php
-/*		cr();
-		echo "</td>";
-		cr();
-		echo "</tr>";
-		cr();
-		echo "<tr>";
-		cr();
-		echo "<td colspan=1 bgcolor=#6d88ad align=left valign=\"top\">";
-		cr();
-		cr();*/
-	}
-
-
-	function	show_table2_v_delimiter2()
-	{
-//		echo "</font>";
-		cr();
-		echo "</td>";
-		cr();
-		echo "</tr>";
-		cr();
-		echo "<tr>";
-		cr();
-//		echo "<td colspan=2 bgcolor=\"99AABB\" align=right valign=\"top\">";
-		echo "<td class=\"form_row_last\" colspan=2 align=right>";
-		cr();
-//		echo "<font size=-1>";
-		cr();
-	}
-
-
-//	function	show_table2_header_begin()
-	function	show_form_begin($help="")
-	{
-?>
-<p align=center>
-<table class="form" width="50%" cellspacing=0 cellpadding=1>
-<tr>
-<td class="form_row_first" height=24 colspan=2>
-<?php
-		if($help!="")
-		{
-			echo "<a style=\"float:right\" href=\"http://www.zabbix.com/manual/v1.1/web.$help.php\"><img src=\"images/general/help.gif\" border=0 alt=\"?\"></a>";
-		}
-	}
-
-	function	show_table_header_begin()
-	{
-		echo "<table border=0 align=center cellspacing=0 cellpadding=0 width=100% bgcolor=000000>";
-		cr();
-		echo "<tr>";
-		cr();
-		echo "<td valign=\"top\">";
-		cr();
-		echo "<table width=100% border=0 cellspacing=1 cellpadding=3>";
-		cr();
-		echo "<tr>";
-		cr();
-//		echo "<td colspan=1 bgcolor=99AABB align=center valign=\"top\">";
-		echo "<td colspan=1 bgcolor=6d88ad align=center valign=\"top\">";
-		cr();
-//		echo "	<font size=+1>";
-		cr();
-	}
-
 	function	show_header2($col1, $col2=SPACE, $before="", $after="")
 	{
 		echo $before; 
 		show_table_header($col1, $col2);
 		echo $after;
-	}
-
-	function	show_table3_header_begin()
-	{
-?>
-	<table class="menu" cellspacing=0 cellpadding=1 width="100%">
-	<tr>
-<?php
-		echo "<td class=\"sub_menu\" height=24 colspan=9 nowrap=\"nowrap\">";
-	}
-
-
-	function	show_table2_header_end()
-	{
-//		cr();
-//		echo "</td>";
-//		cr();
-//		echo "</tr>";
-//		cr();
-//		echo "</table>";
-		cr();
-		echo "</td>";
-		cr();
-		echo "</tr>";
-		cr();
-		echo "</table>";
-//		echo "</p>";
-		cr();
-	}
-
-	function	show_table_header_end()
-	{
-/*		cr();
-		echo "</td>";
-		cr();
-		echo "</tr>";
-		cr();
-		echo "</table>";
-		cr();*/
-		echo "</td>";
-		echo "</tr>";
-		echo "</table>";
 	}
 
 	function	show_table_header($col1, $col2=SPACE)
@@ -2124,7 +1902,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 
 		echo "<form method=\"put\" action=\"history.php\">";
 		echo "<input name=\"itemid\" type=\"hidden\" value=$itemid size=8>";
-		echo "<input name=\"action\" type=\"hidden\" value=\"showhistory\" size=8>";
+		echo "<input name=\"action\" type=\"hidden\" value=\"showgraph\" size=8>";
 
 		echo "Year";
 		echo "<select name=\"year\">";
@@ -2238,7 +2016,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 		}
 		echo "</select>";
 
-		echo "<input class=\"button\" type=\"submit\" name=\"action\" value=\"showhistory\">";
+		echo "<input class=\"button\" type=\"submit\" name=\"action\" value=\"showgraph\">";
 
 		echo "</form>";
 	}
@@ -2247,31 +2025,11 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 
 	function	show_history($itemid,$from,$period)
 	{
-		if (!isset($from))
-		{
-			$from=0;
-			$till="NOW";
-		}
-		else
-		{
-			$till=time(NULL)-$from*3600;
-			$till=date(S_DATE_FORMAT_YMDHMS,$till);   
-		}
+		$till=date(S_DATE_FORMAT_YMDHMS,time(NULL)-$from*3600);   
+		show_table_header("TILL $till (".($period/3600)." HOURs)");
 
-		if (!isset($period))
-		{ 
-			$period=3600;
-			show_table_header("TILL $till (LAST HOUR)");
-		}
-		else
-		{
-			$tmp=$period/3600;
-			show_table_header("TILL $till ($tmp HOURs)");
-		}
-//		echo("<hr>");
 		echo "<center>";
 		echo "<TABLE BORDER=0 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-		echo "<TR BGCOLOR=#EEEEEE>";
 		echo "<TR BGCOLOR=#DDDDDD>";
 		echo "<TD ALIGN=CENTER>";
 
@@ -2294,71 +2052,6 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 		echo "</TR>";
 		echo "</TABLE>";
 		echo "</center>";
-
-		navigation_bar("history.php");
-	}
-
-	# Show history
-	function	show_freehist($itemid,$period)
-	{
-		show_form_begin("history.period");
-		echo "Choose period";
-
-		show_table2_v_delimiter();
-		echo "<form method=\"get\" action=\"history.php\">";
-		echo "<input name=\"itemid\" type=\"hidden\" value=$itemid size=8>";
-		echo "Period in seconds";
-		show_table2_h_delimiter();
-		echo "<input name=\"period\" value=\"7200\" size=8>";
-
-		show_table2_v_delimiter();
-		echo "From (in hours)";
-		show_table2_h_delimiter();
-		echo "<input name=\"from\" value=\"24\" size=8>";
-
-		show_table2_v_delimiter2();
-		echo "Press ";
-		echo "<input class=\"button\" type=\"submit\" name=\"action\" value=\"showvalues\"> to see values in plain text";
-
-		show_table2_header_end();
-
-		show_page_footer();
-	}
-
-	# Show in plain text
-	function	show_plaintxt($itemid,$period)
-	{
-		show_form_begin("history.plaim");
-		echo "Data in plain text format";
-
-		show_table2_v_delimiter();
-		echo "<form method=\"get\" action=\"history.php\">";
-		echo "<input name=\"itemid\" type=\"Hidden\" value=$itemid size=8>";
-		echo "<input name=\"itemid\" type=\"Hidden\" value=$itemid size=8>";
-		echo "From: (yyyy/mm/dd - HH:MM)";
-		show_table2_h_delimiter();
-		echo "<input name=\"fromyear\" value=\"",date("Y"),"\" size=5>/";
-		echo "<input name=\"frommonth\" value=\"",date("m"),"\" size=3>/";
-		echo "<input name=\"fromday\" value=\"",date("d"),"\" size=3> - ";
-		echo "<input name=\"fromhour\" value=\"0\" size=3>:";
-		echo "<input name=\"frommin\" value=\"00\" size=3>";
-
-		show_table2_v_delimiter();
-		echo "Till: (yyyy/mm/dd - HH:MM)";
-		show_table2_h_delimiter();
-		echo "<input name=\"tillyear\" value=\"",date("Y"),"\" size=5>/";
-		echo "<input name=\"tillmonth\" value=\"",date("m"),"\" size=3>/";
-		echo "<input name=\"tillday\" value=\"",date("d"),"\" size=3> - ";
-		echo "<input name=\"tillhour\" value=\"23\" size=3>:";
-		echo "<input name=\"tillmin\" value=\"59\" size=3>";
-
-		show_table2_v_delimiter2();
-		echo "Press to see data in ";
-		echo "<input class=\"button\" type=\"submit\" name=\"action\" value=\"plaintext\">";
-
-		show_table2_header_end();
-
-		show_page_footer();
 	}
 
 	function	show_page_footer()

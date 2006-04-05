@@ -141,6 +141,45 @@ table.formtable td.form_row_r { /* right cell */
 	text-align: left;
 }
 
+/************ HISTORY LOG TABLE ***********/
+table.log_history_table {
+/*	background-color: #AAAAAA; */
+	color: #000000;
+	width: 100%;
+	border-width: 0px;
+	border-style: solid;
+	border-color: #0B198C; 
+}
+table.log_history_table td {
+	white-space: nowrap;
+	word-spacing: nowrap;
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-size:8pt;
+	text-decoration: none;
+	border-width: 0px;
+	border-style: solid;
+	border-color: #0B198C;
+}
+
+/* table.log_history_table tr:hover td		{	background-color: #EEEEFE; } */
+
+table.log_history_table tr.mark_as_red td	{	background-color: #FFBBBB; }
+table.log_history_table tr.mark_as_green td	{	background-color: #BBFFBB; }
+table.log_history_table tr.mark_as_blue td	{	background-color: #BBBBFF; }
+
+table.log_history_table tr.header td {
+	padding-right: 5px;
+	padding-left: 5px;
+	white-space: nowrap;
+	word-spacing: nowrap;
+	text-align: center;
+	font-weight: bold; 
+	background-color:#CCCCCC;
+}
+table.log_history_table td.message {
+	text-align: center;
+}
+
 /************* SCREEN TABLE ***************/
 table.screen_edit
 {

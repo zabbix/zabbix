@@ -491,253 +491,124 @@
 
 	function	navigation_bar_calc()
 	{
-		$workingperiod = 3600;
+//		$workingperiod = 3600;
 
 		if(!isset($_REQUEST["period"]))	$_REQUEST["period"]=3600;
 		if(!isset($_REQUEST["from"]))	$_REQUEST["from"]=0;
 
-		if(isset($_REQUEST["inc"]))		$workingperiod= $_REQUEST["period"]+$_REQUEST["inc"];
-		if(isset($_REQUEST["dec"]))		$workingperiod= $workingperiod-$_REQUEST["dec"];
-		//if(isset($_REQUEST["inc"]))		$_REQUEST["period"]= $_REQUEST["period"]+$_REQUEST["inc"];
-		//if(isset($_REQUEST["dec"]))		$_REQUEST["period"]= $_REQUEST["period"]-$_REQUEST["dec"];
+//		if(isset($_REQUEST["inc"]))		$workingperiod= $_REQUEST["period"]+$_REQUEST["inc"];
+//		if(isset($_REQUEST["dec"]))		$workingperiod= $workingperiod-$_REQUEST["dec"];
+		if(isset($_REQUEST["inc"]))	$_REQUEST["period"] += $_REQUEST["inc"];
+		if(isset($_REQUEST["dec"]))	$_REQUEST["period"] -= $_REQUEST["dec"];
 
-		if(isset($_REQUEST["left"]))	$_REQUEST["from"]= $_REQUEST["from"]+$_REQUEST["left"];
-		if(isset($_REQUEST["right"]))	$_REQUEST["from"]= $_REQUEST["from"]-$_REQUEST["right"];
+		if(isset($_REQUEST["left"]))	$_REQUEST["from"] += $_REQUEST["left"];
+		if(isset($_REQUEST["right"]))	$_REQUEST["from"] -= $_REQUEST["right"];
 
 		//unset($_REQUEST["inc"]);
 		//unset($_REQUEST["dec"]);
 		unset($_REQUEST["left"]);
 		unset($_REQUEST["right"]);
 
-		if($_REQUEST["from"]<=0)		$_REQUEST["from"]=0;
-		if($_REQUEST["period"]<=0)		$_REQUEST["period"]=3600;
+		if($_REQUEST["from"] <= 0)		$_REQUEST["from"]	= 0;
+		if($_REQUEST["period"] <= 3600)		$_REQUEST["period"]	= 3600;
 
 		if(isset($_REQUEST["reset"]))
 		{
-			$_REQUEST["period"]=3600;
-			$_REQUEST["from"]=0;
-			$workingperiod=3600;
+			$_REQUEST["period"]	= 3600;
+			$_REQUEST["from"]	= 0;
+//			$workingperiod		= 3600;
 		}
-		return $workingperiod;
+
+		return $_REQUEST["period"];
+//		return $workingperiod;
 	}
 
-	function	navigation_bar($url)
+	function	navigation_bar($url,$ext_saved_request=NULL)
 	{
-		$h1=S_NAVIGATE;
-		$h2=S_PERIOD.SPACE;
-		$h2=$h2."<select class=\"biginput\" name=\"period\" onChange=\"submit()\">";
-		$h2=$h2.form_select("period",3600,"1h");
-		$h2=$h2.form_select("period",2*3600,"2h");
-		$h2=$h2.form_select("period",4*3600,"4h");
-		$h2=$h2.form_select("period",8*3600,"8h");
-		$h2=$h2.form_select("period",12*3600,"12h");
-		$h2=$h2.form_select("period",24*3600,"24h");
-		$h2=$h2.form_select("period",7*24*3600,"week");
-		$h2=$h2.form_select("period",31*24*3600,"month");
-		$h2=$h2.form_select("period",365*24*3600,"year");
-		$h2=$h2."</select>";
-		$h2=$h2."<select class=\"biginput\" name=\"dec\" onChange=\"submit()\">";
-		$h2=$h2.form_select(NULL,0,S_DECREASE);
-		$h2=$h2.form_select(NULL,3600,"-1h");
-		$h2=$h2.form_select(NULL,4*3600,"-4h");
-		$h2=$h2.form_select(NULL,24*3600,"-24h");
-		$h2=$h2.form_select(NULL,7*24*3600,"-week");
-		$h2=$h2.form_select(NULL,31*24*3600,"-month");
-		$h2=$h2.form_select(NULL,365*24*3600,"-year");
-		$h2=$h2."</select>";
-		$h2=$h2."<select class=\"biginput\" name=\"inc\" onChange=\"submit()\">";
-		$h2=$h2.form_select(NULL,0,S_INCREASE);
-		$h2=$h2.form_select(NULL,3600,"+1h");
-		$h2=$h2.form_select(NULL,4*3600,"+4h");
-		$h2=$h2.form_select(NULL,24*3600,"+24h");
-		$h2=$h2.form_select(NULL,7*24*3600,"+week");
-		$h2=$h2.form_select(NULL,31*24*3600,"+month");
-		$h2=$h2.form_select(NULL,365*24*3600,"+year");
-		$h2=$h2."</select>";
-		$h2=$h2.SPACE.S_MOVE.SPACE;
-		$h2=$h2."<select class=\"biginput\" name=\"left\" onChange=\"submit()\">";
-		$h2=$h2.form_select(NULL,0,S_LEFT_DIR);
-		$h2=$h2.form_select(NULL,1,"-1h");
-		$h2=$h2.form_select(NULL,4,"-4h");
-		$h2=$h2.form_select(NULL,24,"-24h");
-		$h2=$h2.form_select(NULL,7*24,"-week");
-		$h2=$h2.form_select(NULL,31*24,"-month");
-		$h2=$h2.form_select(NULL,365*24,"-year");
-		$h2=$h2."</select>";
-		$h2=$h2."<select class=\"biginput\" name=\"right\" onChange=\"submit()\">";
-		$h2=$h2.form_select(NULL,0,S_RIGHT_DIR);
-		$h2=$h2.form_select(NULL,1,"+1h");
-		$h2=$h2.form_select(NULL,4,"+4h");
-		$h2=$h2.form_select(NULL,24,"+24h");
-		$h2=$h2.form_select(NULL,7*24,"+week");
-		$h2=$h2.form_select(NULL,31*24,"+month");
-		$h2=$h2.form_select(NULL,365*24,"+year");
-		$h2=$h2."</select>";
-		$h2=$h2.SPACE;
-		$h2=$h2."<input name=\"stime\" size=18 class=\"biginput\" value=\"yyyymmddhhmm\" size=12>";
-		$h2=$h2.SPACE;
-		$h2=$h2."<input class=\"button\" type=\"submit\" name=\"action\" value=\"go\">";
-		$h2=$h2."<input class=\"button\" type=\"submit\" name=\"reset\" value=\"reset\">";
+		$saved_request = array("graphid","screenid","itemid","action","from","fullscreen");
 
-		if(isset($_REQUEST["graphid"])&&($_REQUEST["graphid"]!=0))
-		{
-			$h2=$h2."<input name=\"graphid\" type=\"hidden\" value=\"".$_REQUEST["graphid"]."\" size=12>";
-		}
-		if(isset($_REQUEST["screenid"])&&($_REQUEST["screenid"]!=0))
-		{
-			$h2=$h2."<input name=\"screenid\" type=\"hidden\" value=\"".$_REQUEST["screenid"]."\" size=12>";
-		}
-		if(isset($_REQUEST["itemid"])&&($_REQUEST["itemid"]!=0))
-		{
-			$h2=$h2."<input name=\"itemid\" type=\"hidden\" value=\"".$_REQUEST["itemid"]."\" size=12>";
-		}
-		if(isset($_REQUEST["action"]))
-		{
-			$h2=$h2."<input name=\"action\" type=\"hidden\" value=\"".$_REQUEST["action"]."\" size=22>";
-		}
-		if(isset($_REQUEST["from"]))
-		{
-			$h2=$h2."<input name=\"from\" type=\"hidden\" value=\"".$_REQUEST["from"]."\" size=22>";
-		}
-		if(isset($_REQUEST["fullscreen"]))
-		{
-			$h2=$h2."<input name=\"fullscreen\" type=\"hidden\" value=\"".$_REQUEST["fullscreen"]."\" size=22>";
-		}
+		if(is_array($ext_saved_request))
+			$saved_request = array_merge($saved_request, $ext_saved_request);
+		elseif(is_string($ext_saved_request))
+			array_push($saved_request,$ext_saved_request);
 
-		show_header2($h1,$h2,"<form name=\"form2\" method=\"get\" action=\"$url\">","</form>");
+		$form = new CForm($url);
+
+		$form->AddItem(S_PERIOD.SPACE);
+
+		if(in_array($_REQUEST["period"],array(3600,2*3600,4*3600,8*3600,12*3600,24*3600,7*24*3600,31*24*3600,365*24*3600)))
+			$custom_per = 3*3600;
+		else
+			$custom_per = $_REQUEST["period"];
+
+		$cmbPeriod = new CComboBox("period",$_REQUEST["period"],"submit()");
+		$cmbPeriod->AddItem($custom_per,"custom");
+		$cmbPeriod->AddItem(3600,"1h");
+		$cmbPeriod->AddItem(2*3600,"2h");
+		$cmbPeriod->AddItem(4*3600,"4h");
+		$cmbPeriod->AddItem(8*3600,"8h");
+		$cmbPeriod->AddItem(12*3600,"12h");
+		$cmbPeriod->AddItem(24*3600,"24h");
+		$cmbPeriod->AddItem(7*24*3600,"week");
+		$cmbPeriod->AddItem(31*24*3600,"month");
+		$cmbPeriod->AddItem(365*24*3600,"year");
+		$form->AddItem($cmbPeriod);
+
+		$cmbDec = new CComboBox("dec",0,"submit()");
+		$cmbDec->AddItem(0,S_DECREASE);
+		$cmbDec->AddItem(3600,"-1h");
+		$cmbDec->AddItem(4*3600,"-4h");
+		$cmbDec->AddItem(24*3600,"-24h");
+		$cmbDec->AddItem(7*24*3600,"-week");
+		$cmbDec->AddItem(31*24*3600,"-month");
+		$cmbDec->AddItem(365*24*3600,"-year");
+		$form->AddItem($cmbDec);
+
+		$cmbInc = new CComboBox("inc",0,"submit()");
+		$cmbInc->AddItem(0,S_INCREASE);
+		$cmbInc->AddItem(3600,"+1h");
+		$cmbInc->AddItem(4*3600,"+4h");
+		$cmbInc->AddItem(24*3600,"+24h");
+		$cmbInc->AddItem(7*24*3600,"+week");
+		$cmbInc->AddItem(31*24*3600,"+month");
+		$cmbInc->AddItem(365*24*3600,"+year");
+		$form->AddItem($cmbInc);
+
+		$form->AddItem(SPACE.S_MOVE.SPACE);
+
+		$cmbLeft = new CComboBox("left",0,"submit()");
+		$cmbLeft->AddItem(0,S_LEFT_DIR);
+		$cmbLeft->AddItem(1,"-1h");
+		$cmbLeft->AddItem(4,"-4h");
+		$cmbLeft->AddItem(24,"-24h");
+		$cmbLeft->AddItem(7*24,"-week");
+		$cmbLeft->AddItem(31*24,"-month");
+		$cmbLeft->AddItem(365*24,"-year");
+		$form->AddItem($cmbLeft);
+
+		$cmbRight = new CComboBox("right",0,"submit()");
+		$cmbRight->AddItem(0,S_RIGHT_DIR);
+		$cmbRight->AddItem(1,"+1h");
+		$cmbRight->AddItem(4,"+4h");
+		$cmbRight->AddItem(24,"+24h");
+		$cmbRight->AddItem(7*24,"+week");
+		$cmbRight->AddItem(31*24,"+month");
+		$cmbRight->AddItem(365*24,"+year");
+		$form->AddItem($cmbRight);
+
+		$form->AddItem(array(SPACE,
+			new CTextBox("stime","yyyymmddhhmm",12),SPACE,
+			new CButton("action","go"),
+			new CButton("reset","reset")));
+
+		foreach($saved_request as $item)
+			if(isset($_REQUEST[$item]))
+				$form->AddVar($item,$_REQUEST[$item]);
+
+		show_header2(
+			S_NAVIGATE,
+			$form);
 
 		return;
-
-		echo "<TABLE BORDER=0 align=center COLS=2 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=1>";
-		echo "<TR BGCOLOR=#FFFFFF>";
-		echo "<TD ALIGN=LEFT>";
-
-		echo "<div align=left>";
-		echo "<b>".S_PERIOD.":</b>".SPACE;
-
-		$hour=3600;
-		
-		$a=array(S_1H=>3600,S_2H=>2*3600,S_4H=>4*3600,S_8H=>8*3600,S_12H=>12*3600,
-			S_24H=>24*3600,S_WEEK_SMALL=>7*24*3600,S_MONTH_SMALL=>31*24*3600,S_YEAR_SMALL=>365*24*3600);
-		foreach($a as $label=>$sec)
-		{
-			echo "[";
-			if($_REQUEST["period"]>$sec)
-			{
-				$tmp=$_REQUEST["period"]-$sec;
-				echo("<A HREF=\"$url&period=$tmp".url_param("graphid").url_param("stime").url_param("from").url_param("keep").url_param("fullscreen")."\">-</A>");
-			}
-			else
-			{
-				echo "-";
-			}
-
-			echo("<A HREF=\"$url?period=$sec".url_param("graphid").url_param("stime").url_param("from").url_param("keep").url_param("fullscreen")."\">");
-			echo($label."</A>");
-
-			$tmp=$_REQUEST["period"]+$sec;
-			echo("<A HREF=\"$url?period=$tmp".url_param("graphid").url_param("stime").url_param("from").url_param("keep").url_param("fullscreen")."\">+</A>");
-
-			echo "]".SPACE;
-		}
-
-		echo("</div>");
-
-		echo "</TD>";
-		echo "<TD BGCOLOR=#FFFFFF WIDTH=15% ALIGN=RIGHT>";
-		echo "<b>".nbsp(S_KEEP_PERIOD).":</b>".SPACE;
-		if($_REQUEST["keep"] == 1)
-		{
-			echo("[<A HREF=\"$url?keep=0".url_param("graphid").url_param("from").url_param("period").url_param("fullscreen")."\">".S_ON_C."</a>]");
-		}
-		else
-		{
-			echo("[<A HREF=\"$url?keep=1".url_param("graphid").url_param("from").url_param("period").url_param("fullscreen")."\">".S_OFF_C."</a>]");
-		}
-		echo "</TD>";
-		echo "</TR>";
-		echo "<TR BGCOLOR=#FFFFFF>";
-		echo "<TD>";
-		if(isset($_REQUEST["stime"]))
-		{
-			echo "<div align=left>" ;
-			echo "<b>".S_MOVE.":</b>".SPACE;
-
-			$day=24;
-// $a already defined
-			$a=array("1h"=>1,"2h"=>2,"4h"=>4,"8h"=>8,"12h"=>12,
-				"24h"=>24,"week"=>7*24,"month"=>31*24,"year"=>365*24);
-			foreach($a as $label=>$hours)
-			{
-				echo "[";
-
-				$stime=$_REQUEST["stime"];
-				$tmp=mktime(substr($stime,8,2),substr($stime,10,2),0,substr($stime,4,2),substr($stime,6,2),substr($stime,0,4));
-				$tmp=$tmp-3600*$hours;
-				$tmp=date("YmdHi",$tmp);
-				echo("<A HREF=\"$url?stime=$tmp".url_param("graphid").url_param("period").url_param("keep").url_param("fullscreen")."\">-</A>");
-	
-				echo($label);
-	
-				$stime=$_REQUEST["stime"];
-				$tmp=mktime(substr($stime,8,2),substr($stime,10,2),0,substr($stime,4,2),substr($stime,6,2),substr($stime,0,4));
-				$tmp=$tmp+3600*$hours;
-				$tmp=date("YmdHi",$tmp);
-				echo("<A HREF=\"$url?stime=$tmp".url_param("graphid").url_param("period").url_param("keep").url_param("fullscreen")."\">+</A>");
-	
-				echo "]".SPACE;
-			}
-			echo("</div>");
-		}
-		else
-		{
-			echo "<div align=left>";
-			echo "<b>".S_MOVE.":</b>".SPACE;
-	
-			$day=24;
-// $a already defined
-			$a=array("1h"=>1,"2h"=>2,"4h"=>4,"8h"=>8,"12h"=>12,
-				"24h"=>24,"week"=>7*24,"month"=>31*24,"year"=>365*24);
-			foreach($a as $label=>$hours)
-			{
-				echo "[";
-				$tmp=$_REQUEST["from"]+$hours;
-				echo("<A HREF=\"$url?from=$tmp".url_param("graphid").url_param("period").url_param("keep").url_param("fullscreen")."\">-</A>");
-
-				echo($label);
-
-				if($_REQUEST["from"]>=$hours)
-				{
-					$tmp=$_REQUEST["from"]-$hours;
-					echo("<A HREF=\"$url?from=$tmp".url_param("graphid").url_param("period").url_param("keep").url_param("fullscreen")."\">+</A>");
-				}
-				else
-				{
-					echo "+";
-				}
-
-				echo "]".SPACE;
-			}
-			echo("</div>");
-		}
-		echo "</TD>";
-		echo "<TD BGCOLOR=#FFFFFF WIDTH=15% ALIGN=RIGHT>";
-		echo "<form method=\"put\" action=\"$url\">";
-		echo "<input name=\"graphid\" type=\"hidden\" value=\"".$_REQUEST["graphid"]."\" size=12>";
-		echo "<input name=\"period\" type=\"hidden\" value=\"".(9*3600)."\" size=12>";
-		if(isset($_REQUEST["stime"]))
-		{
-			echo "<input name=\"stime\" class=\"biginput\" value=\"".$_REQUEST["stime"]."\" size=12>";
-		}
-		else
-		{
-			echo "<input name=\"stime\" class=\"biginput\" value=\"yyyymmddhhmm\" size=12>";
-		}
-		echo SPACE;
-		echo "<input class=\"button\" type=\"submit\" name=\"action\" value=\"go\">";
-		echo "</form>";
-		echo "</TD>";
-		echo "</TR>";
-		echo "</TABLE>";
 	}
 ?>
