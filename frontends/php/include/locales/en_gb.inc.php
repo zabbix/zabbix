@@ -37,6 +37,8 @@
 	"S_ALARM_ACKNOWLEDGES_BIG"=>		"ALARM ACKNOWLEDGES",
 
 //	actionconf.php
+	"S_CONFIGURATION_OF_ACTIONS"=>		"Configuration of actions",
+	"S_CONFIGURATION_OF_ACTIONS_BIG"=>	"CONFIGURATION OF ACTIONS",
 	"S_FILTER_HOST_GROUP"=>			"Filter: Host group",
 	"S_FILTER_HOST"=>			"Filter: Host",
 	"S_FILTER_TRIGGER"=>			"Filter: Trigger",
@@ -61,6 +63,7 @@
 
 //	actions.php
 	"S_ACTIONS"=>				"Actions",
+	"S_ACTIONS_BIG"=>			"ACTIONS",
 	"S_ACTION_ADDED"=>			"Action added",
 	"S_CANNOT_ADD_ACTION"=>			"Cannot add action",
 	"S_ACTION_UPDATED"=>			"Action updated",
@@ -319,11 +322,21 @@
 	"S_LAST_HOUR_GRAPH"=>			"Last hour graph",
 	"S_VALUES_OF_LAST_HOUR"=>		"Values of last hour",
 	"S_500_LATEST_VALUES"=>			"500 latest values",
+	"S_GRAPH_OF_SPECIFIED_PERIOD"=>		"Graph of specified period",
 	"S_VALUES_OF_SPECIFIED_PERIOD"=>	"Values of specified period",
 	"S_VALUES_IN_PLAIN_TEXT_FORMAT"=>	"Values in plain text format",
 	"S_TIMESTAMP"=>				"Timestamp",
 	"S_LOCAL"=>				"Local",
 	"S_SOURCE"=>				"Source",
+
+	"S_SHOW_SELECTED"=>			"Show selected",
+	"S_HIDE_SELECTED"=>			"Hide selectede",
+	"S_MARK_SELECTED"=>			"Mark selected",
+	"S_MARK_OTHERS"=>			"Mark others",
+
+	"S_AS_RED"=>				"as Red",
+	"S_AS_GREEN"=>				"as Green",
+	"S_AS_BLUE"=>				"as Blue",
 
 //	hosts.php
 	"S_HOSTS"=>				"Hosts",
@@ -417,6 +430,7 @@
 	"S_HOSTS"=>				"Hosts",
 
 //	items.php
+	"S_NO_ITEMS_DEFINED"=>			"No itemss defined",
 	"S_HISTORY_CLEANED"=>			"History cleaned",
 	"S_CANNOT_CLEAN_HISTORY"=>		"Cannot clean history",
 	"S_CONFIGURATION_OF_ITEMS"=>		"Configuration of items",
@@ -512,6 +526,7 @@
 	"S_CONFIGURATION_OF_NETWORK_MAPS"=>	"Configuration of network maps",
 
 //	sysmaps.php
+	"S_MAPS_BIG"=>				"MAPS",
 	"S_NO_MAPS_DEFINED"=>			"No maps defined",
 	"S_CONFIGURATION_OF_NETWORK_MAPS"=>	"CONFIGURATION OF NETWORK MAPS",
 	"S_CREATE_MAP"=>			"Create Map",
@@ -677,7 +692,7 @@
 
 //	screenedit.php
 	"S_MAP"=>				"Map",
-	"S_PLAIN_TEXT"=>			"Plain text",
+	"S_AS_PLAIN_TEXT"=>			"As plain text",
 	"S_COLUMN_SPAN"=>			"Column span",
 	"S_ROW_SPAN"=>				"Row span",
 	"S_SHOW_LINES"=>			"Show lines",

@@ -1,3 +1,8 @@
+Changes for 1.1beta9:
+
+ - added latest values filtring/marking of log history (Eugene)
+ - developed multiple log history viewing (Eugene)
+
 Changes for 1.1beta8:
 
  - moved installation of images to data.sql (Alexei)
