@@ -270,46 +270,12 @@
 	}
 	$h2=$h2.nbsp(" ");
   	$h2=$h2."<input class=\"button\" type=\"submit\" name=\"do\" value=\"select\">";
-//	show_table_header_end();
 	show_header2($h1, $h2, "<form name=\"form2\" method=\"get\" action=\"tr_status.php\">", "</form>");
 ?>
 
 <?php
 	if(!isset($_REQUEST["fullscreen"]))
 	{
-/*		show_table_header_begin();
-		echo S_STATUS_OF_TRIGGERS_BIG;
-	        show_table_v_delimiter();
-
-	        $result=DBselect("select hostid,host from hosts where status in (0,2) order by host");
-	        if(isset($_REQUEST["hostid"]))
-	        {
-	                echo "<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&sort=$sort\">".S_ALL_SMALL."</A>  ";
-	        }
-	        else
-	        {
-	                echo "<b>[<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&sort=$sort\">".S_ALL_SMALL."</A>]</b>  ";
-	        }
-		while($row=DBfetch($result))
-	        {
-        		if(!check_right("Host","R",$row["hostid"]))
-		        {
-				continue;
-			}
-	                if(isset($_REQUEST["hostid"]) && ($row["hostid"] == $_REQUEST["hostid"]))
-	                {
-	                        echo "<b>[<A HREF=\"tr_status.php?hostid=".$row["hostid"]."&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&sort=$sort\">".$row["host"]."</A>]</b>  ";
-	                }
-	                else
-	                {
-	                        echo "<A HREF=\"tr_status.php?hostid=".$row["hostid"]."&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&sort=$sort\">".$row["host"]."</A>  ";
-	                }
-	        }*/
-//		show_table_v_delimiter(2);
-//		show_table_header_begin();
-?>
-
-<?php
 		$h1="";
 		if(isset($_REQUEST["hostid"]))
 		{

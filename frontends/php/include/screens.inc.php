@@ -225,7 +225,7 @@
 				elseif( ($screenitemid!=0) && ($resource==SCREEN_RESOURCE_SIMPLE_GRAPH) )
 				{
 					if($editmode == 0)
-						$action = "history.php?action=showhistory&itemid=$resourceid".
+						$action = "history.php?action=showgraph&itemid=$resourceid".
                                                         url_param("period").url_param("inc").url_param("dec");
 
 					$item = new CLink(

@@ -104,16 +104,17 @@
 	$form = new CForm();
 	$form->AddItem(new CButton("form",S_CREATE_MAP));
 	show_header2(S_CONFIGURATION_OF_NETWORK_MAPS, $form);
+	echo BR;
 ?>
 
 <?php
 	if(isset($_REQUEST["form"]))
 	{
-		echo BR;
 		insert_map_form();
 	}
 	else
 	{
+		show_header2(S_MAPS_BIG);
 		$table = new CTableInfo(S_NO_MAPS_DEFINED);
 		$table->setHeader(array(S_ID,S_NAME,S_WIDTH,S_HEIGHT,S_MAP));
 

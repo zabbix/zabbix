@@ -31,6 +31,7 @@
 
 	if($srctbl == "hosts")	{  $page["title"] = "S_HOSTS_BIG";	$right_src = "Host"; }
 	if($srctbl == "triggers"){ $page["title"] = "S_TRIGGERS_BIG";	$right_src = "Triggers"; }
+	if($srctbl == "logitems"){ $page["title"] = "S_ITEMS_BIG";	$right_src = "Items"; }
 
 	if(!isset($page["title"]))
 	{
@@ -65,7 +66,7 @@
 	$frmTitle->AddVar("srcfld2",	$srcfld2);
 	
 	
-	if(in_array($srctbl,array("hosts","triggers")))
+	if(in_array($srctbl,array("hosts","triggers","logitems")))
 	{
 		$groupid = get_request("groupid",get_profile("web.popup.groupid",0));
 		$cmbGroups = new CComboBox("groupid",$groupid,"submit()");
@@ -84,11 +85,11 @@
 			}
 		}
 		$frmTitle->AddItem(array(S_GROUP,SPACE,$cmbGroups));
+		update_profile("web.popup.groupid",$groupid);
 		if($groupid == 0) unset($groupid);
-		else update_profile("web.popup.groupid",$groupid);
 	}
 
-	if(in_array($srctbl,array("triggers")))
+	if(in_array($srctbl,array("triggers","logitems")))
 	{
 		$hostid = get_request("hostid",get_profile("web.popup.hostid",0));
 		$cmbHosts = new CComboBox("hostid",$hostid,"submit()");
@@ -107,21 +108,23 @@
 			if($hostid == $host["hostid"]) $correct_host = 1;
 			if($first_hostid == 0)	$first_hostid = $host["hostid"];
 		}
-		if(!isset($correct_host))
-		{
-			if($hostid != 0) $hostid = $first_hostid;
+		if(!isset($correct_host) && isset($groupid)){
+			$hostid = $first_hostid;
 			$cmbHosts->SetValue($hostid);
 		}
 		$frmTitle->AddItem(array(SPACE,S_HOST,SPACE,$cmbHosts));
+		update_profile("web.popup.hostid",$hostid);
 		if($hostid == 0) unset($hostid);
-		else update_profile("web.popup.hostid",$hostid);
 	}
 
-	$btnEmpty = new CButton("empty",S_EMPTY,"window.opener.document.forms[\"$dstfrm\"].$dstfld1.value=\"0\";".
-		" window.opener.document.forms[\"$dstfrm\"].$dstfld2.value=\"\";".
-		" window.close();");
+	if(in_array($srctbl,array("triggers","hosts")))
+	{
+		$btnEmpty = new CButton("empty",S_EMPTY,"window.opener.document.forms[\"$dstfrm\"].$dstfld1.value=\"0\";".
+			" window.opener.document.forms[\"$dstfrm\"].$dstfld2.value=\"\";".
+			" window.close();");
 
-	$frmTitle->AddItem(array(SPACE,$btnEmpty));
+		$frmTitle->AddItem(array(SPACE,$btnEmpty));
+	}
 
 	show_header2($page["title"], $frmTitle);
 ?>
@@ -174,7 +177,7 @@
 		}
 		$table->show();
 	}
-	if($srctbl == "triggers")
+	elseif($srctbl == "triggers")
 	{
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
 		$table->setHeader(array(
@@ -254,5 +257,88 @@
 			));
 		}
 		$table->show();
+	}
+	elseif($srctbl == "logitems")
+	{
+?>
+
+<script language="JavaScript" type="text/javascript">
+<!--
+function add_variable(formname,value)
+{
+        var msg = '';
+        var form = window.opener.document.forms[formname];
+        if(!form)
+        {
+                alert('form '+formname+' not exist');
+                window.close();
+        }
+
+        new_variable = window.opener.document.createElement('input');
+        new_variable.type = 'hidden';
+        new_variable.name = 'itemid[]';
+        new_variable.value = value;
+
+        form.appendChild(new_variable);
+
+        var element = form.elements['itemid'];
+        if(element)     element.name = 'itemid[]';
+
+//        alert('add_variable - ok');
+
+        form.submit();
+	window.close();
+        return true;
+}
+-->
+</script>
+
+<?php
+		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
+
+		$table->setHeader(array(
+			!isset($hostid) ? S_HOST : NULL,
+			S_DESCRIPTION,S_KEY,nbsp(S_UPDATE_INTERVAL),
+			S_STATUS));
+		if(isset($hostid))
+		{
+			$sql = "select i.* from items i where $hostid=i.hostid".
+				" and i.value_type=".ITEM_VALUE_TYPE_LOG.
+				" order by i.description, i.key_";
+		}
+		else
+		{
+			$sql = "select h.host,i.* from items i,hosts h".
+				" where i.value_type=".ITEM_VALUE_TYPE_LOG." and h.hostid=i.hostid order by i.description, i.key_";
+		}
+
+		$db_items = DBselect($sql);
+		while($db_item = DBfetch($db_items))
+		{
+			if(!check_right("Item","R",$db_item["itemid"]))
+			{
+				continue;
+			}
+
+			$description = new CLink(item_description($db_item["description"],$db_item["key_"]),"#","action");
+			$description->SetAction("return add_variable('".$dstfrm."',".$db_item["itemid"].");");
+
+			switch($db_item["status"]){
+			case 0: $status=new CCol(S_ACTIVE,"enabled");		break;
+			case 1: $status=new CCol(S_DISABLED,"disabled");	break;
+			case 3: $status=new CCol(S_NOT_SUPPORTED,"unknown");	break;
+			default:$status=S_UNKNOWN;
+			}
+
+			$table->AddRow(array(
+				!isset($hostid) ? $db_item["host"] : NULL,
+				$description,
+				$db_item["key_"],
+				$db_item["delay"],
+				$status
+				));
+		}
+		$table->Show();
+
 	}
 ?>

@@ -194,6 +194,15 @@
         define("TIME_TYPE_LOCAL",	0);
         define("TIME_TYPE_SERVER",	1);
 
+	define("FILTER_TAST_SHOW",	0);
+	define("FILTER_TAST_HIDE",	1);
+	define("FILTER_TAST_MARK",	2);
+	define("FILTER_TAST_INVERT_MARK", 3);
+
+	define("MARK_COLOR_RED",	1);
+	define("MARK_COLOR_GREEN",	2);
+	define("MARK_COLOR_BLUE",	3);
+
 /* Support for PHP5. PHP5 does not have $HTTP_..._VARS */
 	if (!function_exists('version_compare'))
 	{

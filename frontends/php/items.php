@@ -287,6 +287,15 @@
 
 <?php
 
+	$form = new CForm();
+
+	$form->AddVar("hostid",$_REQUEST["hostid"]);
+
+	$form->AddItem(new CButton("form",S_CREATE_ITEM));
+
+	show_header2(S_CONFIGURATION_OF_ITEMS_BIG, $form);
+	echo BR;
+
 	$db_hosts=DBselect("select hostid from hosts");
 	if(isset($_REQUEST["form"])&&isset($_REQUEST["hostid"])&&DBnum_rows($db_hosts)>0)
 	{
@@ -353,10 +362,8 @@
 
 		$form->AddItem(SPACE.S_HOST.SPACE);
 		$form->AddItem($cmbHosts);
-		$form->AddItem(SPACE."|".SPACE);
-		$form->AddItem(new CButton("form",S_CREATE_ITEM));
 		
-		show_header2(S_CONFIGURATION_OF_ITEMS_BIG, $form);
+		show_header2(S_ITEMS_BIG, $form);
 
 // TABLE
 		$form = new CForm();
@@ -382,7 +389,9 @@
 
 			if($db_item["templateid"]==0)
 			{
-				$description = new CLink($db_item["description"],"items.php?form=update&itemid=".
+				$description = new CLink(
+					item_description($db_item["description"],$db_item["key_"]),
+					"items.php?form=update&itemid=".
 					$db_item["itemid"].url_param("hostid").url_param("groupid"),
 					'action');
 			} else {
@@ -392,7 +401,7 @@
 						"hostid=".$template_host["hostid"],
 						'action'),
 					":",
-					$db_item["description"]
+					item_description($db_item["description"],$db_item["key_"]),
 					);
 			}
 

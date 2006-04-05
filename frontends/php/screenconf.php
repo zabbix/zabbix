@@ -64,15 +64,18 @@
 ?>
 
 <?php
+	$form = new CForm("screenconf.php");
+	$form->AddItem(new CButton("form",S_CREATE_SCREEN));
+	show_header2(S_CONFIGURATION_OF_SCREENS_BIG, $form);
+	echo BR;
+
 	if(isset($_REQUEST["form"]))
 	{
 		insert_screen_form();
 	}
 	else
 	{
-		$form = new CForm("screenconf.php");
-		$form->AddItem(new CButton("form",S_CREATE_SCREEN));
-		show_header2(S_CONFIGURATION_OF_SCREENS_BIG, $form);
+		show_header2(S_SCREENS_BIG);
 
 		$table = new CTableInfo(S_NO_SCREENS_DEFINED);
 		$table->setHeader(array(S_ID,S_NAME,S_DIMENSION_COLS_ROWS,S_SCREEN));

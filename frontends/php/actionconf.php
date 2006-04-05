@@ -21,7 +21,7 @@
 <?php
 	include "include/config.inc.php";
 	include "include/forms.inc.php";
-	$page["title"]="S_ACTIONS";
+	$page["title"]="S_CONFIGURATION_OF_ACTIONS";
 	$page["file"]="actionconf.php";
 	show_header($page["title"],0,0);
 	insert_confirm_javascript();
@@ -213,25 +213,28 @@
 ?>
 
 <?php
+/* header */
+	$form = new CForm();
+
+	$cmbType = new CComboBox("actiontype",$_REQUEST["actiontype"],"submit()");
+	$cmbType->AddItem(ACTION_TYPE_MESSAGE,S_SEND_MESSAGE);
+	$cmbType->AddItem(ACTION_TYPE_COMMAND,S_REMOTE_COMMAND);
+	$form->AddItem($cmbType);
+
+	$form->AddItem(SPACE."|".SPACE);
+	$form->AddItem(new CButton("form",S_CREATE_ACTION));
+
+	show_header2(S_CONFIGURATION_OF_ACTIONS_BIG, $form);
+	echo BR;
+
 	if(isset($_REQUEST["form"]))
 	{
+/* form */
 		insert_action_form();
 	}
 	else
 	{
-/* table header */
-		$form = new CForm();
-
-		$cmbType = new CComboBox("actiontype",$_REQUEST["actiontype"],"submit()");
-		$cmbType->AddItem(ACTION_TYPE_MESSAGE,S_SEND_MESSAGE);
-		$cmbType->AddItem(ACTION_TYPE_COMMAND,S_REMOTE_COMMAND);
-		$form->AddItem($cmbType);
-
-		$form->AddItem(SPACE."|".SPACE);
-		$form->AddItem(new CButton("form",S_CREATE_ACTION));
-
-		show_header2(S_ACTIONS, $form);
-
+		show_header2(S_ACTIONS_BIG);
 /* table */
 		$form = new CForm();
 		$form->SetName('actions');

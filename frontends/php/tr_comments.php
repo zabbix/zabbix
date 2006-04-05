@@ -20,6 +20,8 @@
 ?>
 <?php
 	include "include/config.inc.php";
+	include "include/forms.inc.php";
+
 	$page["title"] = "S_TRIGGER_COMMENTS";
 	$page["file"] = "tr_comments.php";
 	show_header($page["title"],0,0);
@@ -47,25 +49,8 @@
 ?>
 
 <?php
-	$trigger=get_trigger_by_triggerid($_REQUEST["triggerid"]);
-	$comments=stripslashes($trigger["comments"]);
-?>
-
-<?php
-	show_form_begin("tr_comments.comments");
-	echo S_COMMENTS;
-
-	show_table2_v_delimiter();
-	echo "<form method=\"get\" action=\"tr_comments.php\">";
-	echo "<input name=\"triggerid\" type=\"hidden\" value=".$_REQUEST["triggerid"].">";
-	echo S_COMMENTS;
-	show_table2_h_delimiter();
-	echo "<textarea name=\"comments\" cols=100 ROWS=\"25\" wrap=\"soft\">$comments</TEXTAREA>";
-
-	show_table2_v_delimiter2();
-	echo "<input class=\"button\" type=\"submit\" name=\"register\" value=\"update\">";
-
-	show_table2_header_end();
+	echo BR;
+	insert_trigger_comment_form($_REQUEST["triggerid"]);
 ?>
 
 <?php

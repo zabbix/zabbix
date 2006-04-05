@@ -52,7 +52,7 @@
 		"priority"=>	array(T_ZBX_INT, O_OPT,  NULL,  IN("0,1,2,3,4,5"),'isset({save})'),
 		"comments"=>	array(T_ZBX_STR, O_OPT,  NULL,	NULL,'isset({save})'),
 		"url"=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,'isset({save})'),
-		"disabled"=>	array(T_ZBX_STR, O_OPT,  NULL,	NULL,NULL),
+		"status"=>	array(T_ZBX_STR, O_OPT,  NULL,	NULL,NULL),
 
 		"dependences"=>		array(T_ZBX_INT, O_OPT,  NULL,	DB_ID, NULL),
 		"new_dependence"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,'isset({add_dependence})'),
@@ -77,10 +77,10 @@
 	check_fields($fields);
 ?>
 <?php
-	$_REQUEST["hostid"]=get_request("hostid",get_profile("web.latest.hostid",0));
-	$_REQUEST["groupid"]=get_request("groupid",get_profile("web.latest.groupid",0));
-	update_profile("web.latest.hostid",$_REQUEST["hostid"]);
-	update_profile("web.latest.groupid",$_REQUEST["groupid"]);
+	$_REQUEST["hostid"]=get_request("hostid",get_profile("web.triggers.hostid",0));
+	$_REQUEST["groupid"]=get_request("groupid",get_profile("web.triggers.groupid",0));
+	update_profile("web.triggers.hostid",$_REQUEST["hostid"]);
+	update_profile("web.triggers.groupid",$_REQUEST["groupid"]);
 	update_profile("web.menu.config.last",$page["file"]);
 ?>
 
@@ -90,7 +90,7 @@
 	if(isset($_REQUEST["save"]))
 	{
 		$now=mktime();
-		if(isset($_REQUEST["disabled"]))	{ $status=1; }
+		if(isset($_REQUEST["status"]))	{ $status=1; }
 		else			{ $status=0; }
 
 		$deps = get_request("dependences",array());
@@ -193,6 +193,14 @@
 
 <?php
 
+	$form = new CForm();
+
+	$form->AddVar("hostid",$_REQUEST["hostid"]);
+	$form->AddItem(new CButton("form",S_CREATE_TRIGGER));
+
+	show_header2(S_CONFIGURATION_OF_TRIGGERS_BIG, $form);
+	echo BR;
+
 	if(!isset($_REQUEST["form"]))
 	{
 /* filter panel */
@@ -258,10 +266,8 @@
 
 		$form->AddItem(SPACE.S_HOST.SPACE);
 		$form->AddItem($cmbHosts);
-		$form->AddItem(SPACE."|".SPACE);
-		$form->AddItem(new CButton("form",S_CREATE_TRIGGER));
 
-		show_header2(S_CONFIGURATION_OF_TRIGGERS_BIG, $form);
+		show_header2(S_TRIGGERS_BIG, $form);
 
 /* TABLE */
 		$form = new CForm('triggers.php');
