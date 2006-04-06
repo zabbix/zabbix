@@ -1,5 +1,6 @@
 1.1beta8:
 
+ - item key popup, trigger expression builder
  - remember different default values in different forms
  - create triggers from items
  - a separate poller for unreachable hosts
