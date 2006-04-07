@@ -36,8 +36,6 @@
 
 	$_REQUEST["config"] = get_request("config",get_profile("web.hosts.config",0));
 
-	update_profile("web.hosts.config",$_REQUEST["config"]);
-	update_profile("web.menu.config.last",$page["file"]);
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -86,6 +84,11 @@
 	);
 
 	check_fields($fields);
+
+	validate_group("U");
+
+	update_profile("web.hosts.config",$_REQUEST["config"]);
+	update_profile("web.menu.config.last",$page["file"]);
 ?>
 <?php
 

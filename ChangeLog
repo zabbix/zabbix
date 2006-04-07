@@ -1,5 +1,6 @@
 Changes for 1.1beta9:
 
+ - improved filter by hosts and groups (Eugene)
  - fixed processing of trapped items when a key contains '\' (Alexei)
  - added latest values filtring/marking of log history (Eugene)
  - developed multiple log history viewing (Eugene)

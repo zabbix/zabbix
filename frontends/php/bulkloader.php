@@ -32,6 +32,8 @@
 	}
 	insert_confirm_javascript();
 	
+	update_profile("web.menu.config.last",$page["file"]);
+
 	if(isset($_FILES['uploadfile']))
 	{
 		$fileName     = $_FILES['uploadfile']['name'];
