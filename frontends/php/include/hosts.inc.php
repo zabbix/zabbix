@@ -391,4 +391,149 @@
 		$tmp_host = get_host_by_hostid($host["templateid"]);	
 		return get_template_path($tmp_host["hostid"]).$tmp_host["host"]."/";
 	}
+
+	function get_correct_group_and_host($a_groupid=NULL, $a_hostid=NULL, $right="U", $options = array())
+	{
+		if(!is_array($options))
+		{
+			error("Incorrest options for get_correct_group_and_host");
+			show_page_footer();
+			exit;
+		}
+		
+		$first_hostig_in_group = 0;
+
+		$allow_all_hosts = (in_array("allow_all_hosts",$options)) ? 1 : 0;
+
+		if(in_array("monitored_hosts",$options))
+			$with_host_status = " and h.status=".HOST_STATUS_MONITORED;
+		else
+			$with_host_status = "";
+
+		if(in_array("with_monitored_items",$options)){
+			$item_table = ",items i";	$with_items = " and h.hostid=i.hostid and i.status=".ITEM_STATUS_ACTIVE;
+		}elseif(in_array("with_items",$options)){
+			$item_table = ",items i";	$with_items = " and h.hostid=i.hostid";
+		} else {
+			$item_table = "";		$with_items = "";
+		}
+
+		if(is_null($a_groupid))
+		{
+			$groupid = 0;
+		}
+		else
+		{
+			$groupid = $a_groupid;
+
+			if($groupid > 0) 
+				if(DBnum_rows(DBselect("select hg.groupid from hosts_groups hg".
+					" where hg.groupid=".$groupid." group by hg.groupid")) != 1)
+						$groupid = 0;
+
+			if($groupid > 0)
+			{
+				// Check if at least one host with read permission exists for this group
+				$sql = "select h.hostid,h.host from hosts h,hosts_groups hg".$item_table.
+					" where hg.groupid=".$groupid." and hg.hostid=h.hostid and".
+					" h.status<>".HOST_STATUS_DELETED.$with_host_status.$with_items.
+					" group by h.hostid order by h.host";
+
+				$db_hosts = DBselect($sql);
+				while($db_host = DBfetch($db_hosts))
+				{
+					if(!check_right("Host",$right,$db_host["hostid"]))	continue;
+					$first_hostig_in_group = $db_host["hostid"];
+					break;
+				}
+				if($first_hostig_in_group == 0)	$groupid = 0;
+			}
+
+		}
+		if(is_null($a_hostid))
+		{
+			$hostid = 0;
+		}
+		else
+		{
+			$hostid = $a_hostid;
+
+			if($groupid == 0)
+			{
+				$sql = "select h.hostid,h.host from hosts h".$item_table.
+					" where h.status<>".HOST_STATUS_DELETED.$with_host_status.$with_items.
+					" group by h.hostid order by h.host";
+
+				$db_hosts = DBselect($sql);
+				while($db_host = DBfetch($db_hosts))
+				{
+					if(!check_right("Host",$right,$db_host["hostid"]))	continue;
+					$first_hostig_in_group = $db_host["hostid"];
+					break;
+				}
+				if($first_hostig_in_group == 0)	$hostid = 0;
+			}
+
+			if($groupid > 0)
+			{ 
+				if(DBnum_rows(DBselect("select hg.hostid from hosts_groups hg".
+					" where hg.groupid=".$groupid." and hg.hostid=".$hostid)) != 1)
+						$hostid = 0;
+			}
+
+			if(!check_right("Host",$right,$hostid)) $hostid = 0;
+
+			if($hostid > 0)
+			{
+				if(DBnum_rows(DBselect("select distinct h.hostid from hosts h".$item_table.
+					" where h.status<>".HOST_STATUS_DELETED.$with_host_status.$with_items.
+					" and h.hostid=".$hostid)) != 1)
+						$hostid = 0;
+			}
+
+			if($hostid == 0 && !($allow_all_hosts ==1 && $groupid==0)) 
+			{
+				$hostid = $first_hostig_in_group;
+			}
+		}
+
+		$host_correct = ($hostid == $a_hostid) ? 1 : 0;
+		$group_correct = ($groupid == $a_groupid) ? 1 : 0;
+		$correct = ($group_correct && $host_correct) ? 1 : 0;
+
+		$result = array(
+			"groupid"	=> $groupid,
+			"group_correct"	=> $group_correct,
+			"hostid"	=> $hostid,
+			"host_correct"	=> $host_correct,
+			"correct"	=> $correct
+			);
+
+		return $result;
+	}
+
+	function	validate_group_with_host($right, $options = array())
+	{
+		$_REQUEST["groupid"]    = get_request("groupid",get_profile("web.latest.groupid",0));
+		$_REQUEST["hostid"]     = get_request("hostid",get_profile("web.latest.hostid",0));
+
+		$result = get_correct_group_and_host($_REQUEST["groupid"],$_REQUEST["hostid"], $right, $options);
+
+		$_REQUEST["groupid"]    = $result["groupid"];
+		$_REQUEST["hostid"]     = $result["hostid"];
+
+		update_profile("web.latest.hostid",$_REQUEST["hostid"]);
+		update_profile("web.latest.groupid",$_REQUEST["groupid"]);
+	}
+
+	function	validate_group($right, $options = array())
+	{
+		$_REQUEST["groupid"]    = get_request("groupid",get_profile("web.latest.groupid",0));
+
+		$result = get_correct_group_and_host($_REQUEST["groupid"],NULL,$right,$options);
+
+		$_REQUEST["groupid"]    = $result["groupid"];
+
+		update_profile("web.latest.groupid",$_REQUEST["groupid"]);
+	}
 ?>

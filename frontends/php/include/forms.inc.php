@@ -447,10 +447,10 @@
 		$frmItem->AddRow(S_KEEP_TRENDS_IN_DAYS, new CTextBox("trends",$trends,8));
 
 		$cmbStatus = new CComboBox("status",$status);
-		$cmbStatus->AddItem(0,S_MONITORED);
-		$cmbStatus->AddItem(1,S_DISABLED);
+		$cmbStatus->AddItem(ITEM_STATUS_ACTIVE,S_MONITORED);
+		$cmbStatus->AddItem(ITEM_STATUS_DISABLED,S_DISABLED);
 #		$cmbStatus->AddItem(2,"Trapper");
-		$cmbStatus->AddItem(3,S_NOT_SUPPORTED);
+		$cmbStatus->AddItem(ITEM_STATUS_NOTSUPPORTED,S_NOT_SUPPORTED);
 		$frmItem->AddRow(S_STATUS,$cmbStatus);
 
 		if($value_type==ITEM_VALUE_TYPE_LOG)
@@ -1592,7 +1592,7 @@
 	// Simple graph
 			$result=DBselect("select h.host,i.description,i.itemid,i.key_".
 				" from hosts h,items i where h.hostid=i.hostid".
-				" and h.status=".HOST_STATUS_MONITORED." and i.status=0".
+				" and h.status=".HOST_STATUS_MONITORED." and i.status=".ITEM_STATUS_ACTIVE.
 				" order by h.host,i.description");
 
 
@@ -1623,7 +1623,7 @@
 	// Plain text
 			$result=DBselect("select h.host,i.description,i.itemid,i.key_".
 				" from hosts h,items i where h.hostid=i.hostid".
-				" and h.status=".HOST_STATUS_MONITORED." and i.status=0".
+				" and h.status=".HOST_STATUS_MONITORED." and i.status=".ITEM_STATUS_ACTIVE.
 				" order by h.host,i.description");
 
 			$cmbHosts = new CComboBox("resourceid",$resourceid);

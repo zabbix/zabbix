@@ -1246,9 +1246,15 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 
 		if($url=="0")	$url=$sub["level2"][0]["url"];
 		if($active==1) 
+		{
+			global $page;
 			$class = "horizontal_menu";
+			$url	= $page["file"];
+		}
 		else
+		{
 			$class = "horizontal_menu_n";
+		}
 
 		echo "<td class=\"$class\" height=24 colspan=9><b><a href=\"$url\" class=\"highlight\">".$sub["label"]."</a></b></td>\n";
 		$i++;

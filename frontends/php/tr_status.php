@@ -94,13 +94,16 @@
 	}
 ?>
 <?php
+	validate_group_with_host("R",array("allow_all_hosts","monitored_hosts","with_monitored_items"));
+?>
+<?php
 	if(!check_anyright("Host","R"))
 	{
 		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
 		show_page_footer();
 		exit;
 	}
-	if(isset($_REQUEST["hostid"])&&!check_right("Host","R",$_REQUEST["hostid"]))
+	if(!check_right("Host","R",$_REQUEST["hostid"]))
 	{
 		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
 		show_page_footer();
@@ -174,17 +177,6 @@
 	}
 ?>
 
-
-
-
-
-<?php
-	if(isset($_REQUEST["groupid"])&&($_REQUEST["groupid"]==0))
-	{
-		unset($_REQUEST["groupid"]);
-	}
-?>
-
 <?php
 	$h1=SPACE.S_STATUS_OF_TRIGGERS_BIG;
 
@@ -199,7 +191,9 @@
 	while($row=DBfetch($result))
 	{
 // Check if at least one host with read permission exists for this group
-		$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host");
+		$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg".
+			" where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$row["groupid"].
+			" and i.status=".ITEM_STATUS_ACTIVE." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host");
 		$cnt=0;
 		while($row2=DBfetch($result2))
 		{
@@ -218,9 +212,11 @@
 
 	$h2=$h2.SPACE.S_HOST.SPACE;
 	$h2=$h2."<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
-	$h2=$h2.form_select("hostid",0,S_SELECT_HOST_DOT_DOT_DOT);
 
-	if(isset($_REQUEST["groupid"])&&($_REQUEST["groupid"]!=0))
+	if($_REQUEST["groupid"]==0)
+		$h2=$h2.form_select("hostid",0,S_ALL_SMALL);
+
+	if($_REQUEST["groupid"] > 0)
 	{
 		$groupcond=" and hg.hostid=h.hostid and hg.groupid=".$_REQUEST["groupid"]." ";
 		$groupname=",hosts_groups hg";
@@ -230,18 +226,9 @@
 		$groupcond="";
 		$groupname="";
 	}
-	$sql="select h.hostid,h.host from hosts h,items i".$groupname." where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid $groupcond group by h.hostid,h.host order by h.host";
-
-/*
-	if(isset($_REQUEST["groupid"]))
-	{
-		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
-	}
-	else
-	{
-		$sql="select h.hostid,h.host from hosts h,items i where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid group by h.hostid,h.host order by h.host";
-	}
-*/
+	$sql="select h.hostid,h.host from hosts h,items i".$groupname.
+		" where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid $groupcond".
+		" and i.status=".ITEM_STATUS_ACTIVE." group by h.hostid,h.host order by h.host";
 
 	$result=DBselect($sql);
 	while($row=DBfetch($result))
@@ -277,7 +264,7 @@
 	if(!isset($_REQUEST["fullscreen"]))
 	{
 		$h1="";
-		if(isset($_REQUEST["hostid"]))
+		if($_REQUEST["hostid"] > 0)
 		{
 			$cond="&hostid=".$_REQUEST["hostid"];
 		}
@@ -338,18 +325,24 @@
 		show_table_header("<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&sort=$sort\">".S_TRIGGERS_BIG." $time</A>");
 
 		$cond="";
-		if(isset($_REQUEST["hostid"]))
+		if($_REQUEST["hostid"] > 0)
 		{
 			$cond=" and h.hostid=".$_REQUEST["hostid"]." ";
 		}
 
 		if($onlytrue=='true')
 		{
-			$sql="select t.priority,count(*) as cnt from triggers t,hosts h,items i,functions f".$groupname."  where t.value=1 and t.status=0 and f.itemid=i.itemid and h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and t.triggerid=f.triggerid and t.description $select_cond and i.status=0 $cond $groupcond group by 1";
+			$sql="select t.priority,count(*) as cnt from triggers t,hosts h,items i,functions f".$groupname.
+				" where t.value=1 and t.status=0 and f.itemid=i.itemid and h.hostid=i.hostid".
+				" and h.status=".HOST_STATUS_MONITORED." and i.status=".ITEM_STATUS_ACTIVE.
+				" and t.triggerid=f.triggerid and t.description $select_cond and $cond $groupcond group by 1";
 		}
 		else
 		{
-			$sql="select t.priority,count(*) as cnt from triggers t,hosts h,items i,functions f".$groupname." where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.status=0 and h.status=".HOST_STATUS_MONITORED." and t.description $select_cond and i.status=0 $cond $groupcond group by 1";
+			$sql="select t.priority,count(*) as cnt from triggers t,hosts h,items i,functions f".$groupname.
+				" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.status=0".
+				" and h.status=".HOST_STATUS_MONITORED." and i.status=".ITEM_STATUS_ACTIVE.
+				" and t.description $select_cond $cond $groupcond group by 1";
 		}
 		$result=DBselect($sql);
 		$p0=$p1=$p2=$p3=$p4=$p5=0;
@@ -445,7 +438,7 @@
 	$table->setHeader($header);
 	unset($header);
 
-	if(isset($_REQUEST["hostid"]))
+	if($_REQUEST["hostid"] > 0)
 	{
 		$cond=" and h.hostid=".$_REQUEST["hostid"]." ";
 	}
@@ -476,11 +469,19 @@
 
 	if($onlytrue=='true')
 	{
-		$result=DBselect("select distinct t.triggerid,t.status,t.description,t.expression,t.priority,t.lastchange,t.comments,t.url,t.value from triggers t,hosts h,items i,functions f".$groupname." where t.value=1 and t.status=0 and f.itemid=i.itemid and h.hostid=i.hostid and t.description $select_cond and t.triggerid=f.triggerid and i.status in (0,2) and h.status=".HOST_STATUS_MONITORED." $cond $groupcond $sort");
+		$result=DBselect("select distinct t.triggerid,t.status,t.description,t.expression,t.priority,".
+			"t.lastchange,t.comments,t.url,t.value from triggers t,hosts h,items i,functions f".$groupname.
+			" where t.value=1 and t.status=0 and f.itemid=i.itemid and h.hostid=i.hostid and t.description".
+			" $select_cond and t.triggerid=f.triggerid and i.status=".ITEM_STATUS_ACTIVE.
+			" and h.status=".HOST_STATUS_MONITORED." $cond $groupcond $sort");
 	}
 	else
 	{
-		$result=DBselect("select distinct t.triggerid,t.status,t.description,t.expression,t.priority,t.lastchange,t.comments,t.url,t.value from triggers t,hosts h,items i,functions f".$groupname." where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.status=0 and t.description $select_cond and i.status in (0,2) and h.status=".HOST_STATUS_MONITORED." $cond $groupcond $sort");
+		$result=DBselect("select distinct t.triggerid,t.status,t.description,t.expression,t.priority,".
+			"t.lastchange,t.comments,t.url,t.value from triggers t,hosts h,items i,functions f".$groupname.
+			" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.status=0".
+			" and t.description $select_cond and i.status=".ITEM_STATUS_ACTIVE." and h.status=".HOST_STATUS_MONITORED.
+			" $cond $groupcond $sort");
 	}
 
 	$col=0;
@@ -563,7 +564,7 @@
 //			$actions="<A HREF=\"actions.php?triggerid=".$row["triggerid"]."\">".S_SHOW_ACTIONS."</A> - ";
 			$actions=array(new CLink(S_HISTORY,"alarms.php?triggerid=".$row["triggerid"],"action"));
 			array_push($actions, " - ");
-			if(isset($_REQUEST["hostid"]))
+			if($_REQUEST["hostid"] > 0)
 			{
 				array_push($actions, new CLink(S_CHANGE,"triggers.php?hostid=".$_REQUEST["hostid"]."&triggerid=".$row["triggerid"]."#form","action"));
 			}

@@ -28,18 +28,18 @@
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"groupid"=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	BETWEEN(0,65535),	NULL),
-		"hostid"=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	BETWEEN(0,65535),	NULL),
+		"groupid"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(0,65535),	NULL),
+		"hostid"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(0,65535),	NULL),
 		"start"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(0,65535)."({}%100==0)",	NULL),
 		"next"=>		array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
 		"prev"=>		array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL)
 	);
 
-	$_REQUEST["hostid"]=@iif(isset($_REQUEST["hostid"]),$_REQUEST["hostid"],get_profile("web.latest.hostid",0));
-	update_profile("web.latest.hostid",$_REQUEST["hostid"]);
-	update_profile("web.menu.view.last",$page["file"]);
-
 	check_fields($fields);
+
+	validate_group_with_host("R", array("allow_all_hosts","monitored_hosts","with_items"));
+
+	update_profile("web.menu.view.last",$page["file"]);
 ?>
 
 
@@ -92,9 +92,11 @@
 
 	$h2=$h2.SPACE.S_HOST.SPACE;
 	$h2=$h2."<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
-	$h2=$h2.form_select("hostid",0,S_SELECT_HOST_DOT_DOT_DOT);
 
-	if(isset($_REQUEST["groupid"]))
+	if($_REQUEST["groupid"] == 0)
+		$h2=$h2.form_select("hostid",0,S_ALL_SMALL);
+
+	if($_REQUEST["groupid"] > 0)
 	{
 		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
 	}
@@ -134,9 +136,13 @@
 		$_REQUEST["start"]=0;
 	}
 
-	if(isset($_REQUEST["hostid"]))
+	if($_REQUEST["hostid"] > 0)
 	{
 		$sql="select distinct a.clock,a.value,a.triggerid from alarms a,functions f,items i where a.triggerid=f.triggerid and f.itemid=i.itemid and i.hostid=".$_REQUEST["hostid"]." order by clock desc limit ".(10*($_REQUEST["start"]+100));
+	}
+	elseif($_REQUEST["groupid"] > 0)
+	{
+		$sql="select distinct a.clock,a.value,a.triggerid from alarms a,functions f,items i where a.triggerid=f.triggerid and f.itemid=i.itemid and i.hostid=hg.hostid and hg.groupid=".$_REQUEST["groupid"]." order by clock desc limit ".(10*($_REQUEST["start"]+100));
 	}
 	else
 	{

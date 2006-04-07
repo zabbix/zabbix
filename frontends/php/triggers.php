@@ -75,12 +75,10 @@
 	);
 
 	check_fields($fields);
+
+	validate_group_with_host("U",array("allow_all_hosts","with_items"));
 ?>
 <?php
-	$_REQUEST["hostid"]=get_request("hostid",get_profile("web.triggers.hostid",0));
-	$_REQUEST["groupid"]=get_request("groupid",get_profile("web.triggers.groupid",0));
-	update_profile("web.triggers.hostid",$_REQUEST["hostid"]);
-	update_profile("web.triggers.groupid",$_REQUEST["groupid"]);
 	update_profile("web.menu.config.last",$page["file"]);
 ?>
 
@@ -213,9 +211,9 @@
 		while($row=DBfetch($result))
 		{
 	// Check if at least one host with read permission exists for this group
-			$result2=DBselect("select h.hostid,h.host from hosts h,hosts_groups hg".
-				" where hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid and".
-				" h.status<>".HOST_STATUS_DELETED." group by h.hostid,h.host order by h.host");
+			$result2=DBselect("select h.hostid,h.host from hosts h,hosts_groups hg,items i".
+				" where hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid and i.hostid=h.hostid".
+				" and h.status<>".HOST_STATUS_DELETED." group by h.hostid,h.host order by h.host");
 			while($row2=DBfetch($result2))
 			{
 				if(!check_right("Host","U",$row2["hostid"]))	continue;
@@ -228,13 +226,13 @@
 
 		if(isset($_REQUEST["groupid"]) && $_REQUEST["groupid"]>0)
 		{
-			$sql="select h.hostid,h.host from hosts h,hosts_groups hg".
-				" where hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid and".
-				" h.status<>".HOST_STATUS_DELETED." group by h.hostid,h.host order by h.host";
+			$sql="select h.hostid,h.host from hosts h,hosts_groups hg,items i".
+				" where hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid and i.hostid=h.hostid".
+				" and h.status<>".HOST_STATUS_DELETED." group by h.hostid,h.host order by h.host";
 		}
 		else
 		{
-			$sql="select h.hostid,h.host from hosts h where h.status<>".HOST_STATUS_DELETED.
+			$sql="select h.hostid,h.host from hosts h,items i where i.hostid=h.hostid and h.status<>".HOST_STATUS_DELETED.
 				" group by h.hostid,h.host order by h.host";
 		}
 

@@ -90,12 +90,11 @@
 	);
 
 	check_fields($fields);
+
+	validate_group_with_host("U");
 ?>
 
 <?php
-	$_REQUEST["hostid"]=get_request("hostid",get_profile("web.latest.hostid",0));
-
-	update_profile("web.latest.hostid",$_REQUEST["hostid"]);
 	update_profile("web.menu.config.last",$page["file"]);
 ?>
 
@@ -306,7 +305,6 @@
 // Table HEADER
 		$form = new CForm();
 
-		$_REQUEST["groupid"] = get_request("groupid",0);
 		$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit();");
 		$cmbGroup->AddItem(0,S_ALL_SMALL);
 		$result=DBselect("select groupid,name from groups order by name");
