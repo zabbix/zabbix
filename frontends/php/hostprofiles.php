@@ -43,15 +43,10 @@
 ?>
 
 <?php
-	if(isset($_REQUEST["groupid"])&&($_REQUEST["groupid"]==0))
-	{
-		unset($_REQUEST["groupid"]);
-	}
+	validate_group_with_host("R", array("allow_all_hosts","monitored_hosts","with_items"));
 ?>
 
 <?php
-	$_REQUEST["hostid"]=@iif(isset($_REQUEST["hostid"]),$_REQUEST["hostid"],get_profile("web.latest.hostid",0));
-	update_profile("web.latest.hostid",$_REQUEST["hostid"]);
 	update_profile("web.menu.cm.last",$page["file"]);
 ?>
 
@@ -82,9 +77,8 @@
 	$form->AddItem(SPACE.S_HOST.SPACE);
 
 	$cmbHost = new CComboBox("hostid",get_request("hostid",0),"submit()");
-	$cmbHost->AddItem(0,S_SELECT_HOST_DOT_DOT_DOT);
 
-	if(isset($_REQUEST["groupid"]))
+	if($_REQUEST["groupid"] > 0)
 	{
 		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg".
 			" where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and".
@@ -93,6 +87,7 @@
 	}
 	else
 	{
+		$cmbHost->AddItem(0,S_ALL_SMALL);
 		$sql="select h.hostid,h.host from hosts h,items i where h.status=".HOST_STATUS_MONITORED.
 			" and h.hostid=i.hostid group by h.hostid,h.host order by h.host";
 	}
@@ -109,7 +104,7 @@
 ?>
 
 <?php
-	if(isset($_REQUEST["hostid"])&&($_REQUEST["hostid"]!=0))
+	if($_REQUEST["hostid"] > 0)
 	{
 		echo BR;
 		insert_host_profile_form();
@@ -119,7 +114,7 @@
 		$table = new CTableInfo();
 		$table->setHeader(array(S_HOST,S_NAME,S_OS,S_SERIALNO,S_TAG,S_MACADDRESS));
 
-		if(isset($_REQUEST["groupid"])&&($_REQUEST["groupid"]!=0))
+		if($_REQUEST["groupid"] > 0)
 		{
 			$sql="select h.hostid,h.host,p.name,p.os,p.serialno,p.tag,p.macaddress".
 				" from hosts h,hosts_profiles p,hosts_groups hg where h.hostid=p.hostid".

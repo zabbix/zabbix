@@ -43,10 +43,12 @@
 	);
 
 //	check_fields($fields);
+
+	validate_group_with_host("R",array("allow_all_hosts","monitored_hosts","with_monitored_items"));
 ?>
 
 <?php
-        if(isset($_REQUEST["hostid"])&&!check_right("Host","R",$_REQUEST["hostid"]))
+        if(!check_right("Host","R",$_REQUEST["hostid"]))
         {
                 show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
                 show_page_footer();
@@ -54,21 +56,10 @@
         }
 ?>
 <?php
-	$_REQUEST["groupid"] = get_request("groupid",0);
+
 	$_REQUEST["select"] = get_request("select","");
-	$_REQUEST["hostid"]=get_request("hostid",get_profile("web.latest.hostid",0));
-	update_profile("web.latest.hostid",$_REQUEST["hostid"]);
+
 	update_profile("web.menu.view.last",$page["file"]);
-
-	if($_REQUEST["hostid"] > 0)
-	{
-		$result=DBselect("select host from hosts where hostid=".$_REQUEST["hostid"]);
-		if(DBnum_rows($result)==0)
-		{
-			$_REQUEST["hostid"] = 0;
-		}
-	}
-
 ?>
 
 <?php
@@ -84,8 +75,8 @@
 // Check if at least one host with read permission exists for this group
 		$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg".
 			" where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid".
-			" and hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host".
-			" order by h.host");
+			" and i.status=".ITEM_STATUS_ACTIVE." and hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid".
+			" group by h.hostid,h.host order by h.host");
 		while($row2=DBfetch($result2))
 		{
 			if(!check_right("Host","R",$row2["hostid"]))
@@ -102,13 +93,13 @@
 	{
 		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED.
 			" and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid".
-			" group by h.hostid,h.host order by h.host";
+			" and i.status=".ITEM_STATUS_ACTIVE." group by h.hostid,h.host order by h.host";
 	}
 	else
 	{
 		$cmbHosts->AddItem(0,S_ALL_SMALL);
 		$sql="select h.hostid,h.host from hosts h,items i where h.status=".HOST_STATUS_MONITORED.
-			" and h.hostid=i.hostid group by h.hostid,h.host order by h.host";
+			" and i.status=".ITEM_STATUS_ACTIVE." and h.hostid=i.hostid group by h.hostid,h.host order by h.host";
 	}
 	$result=DBselect($sql);
 	$first_hostid = -1;
@@ -162,7 +153,7 @@
 
 	$sql="select h.host,i.*,h.hostid from items i,hosts h".
 		" where h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED.
-		" and i.status=0".$compare_description.$compare_host.
+		" and i.status=".ITEM_STATUS_ACTIVE.$compare_description.$compare_host.
 		" order by i.description";
 
 	$result=DBselect($sql);

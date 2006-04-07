@@ -60,14 +60,14 @@
 	);
 
 	check_fields($fields);
+
+	validate_group("R",array("allow_all_hosts","monitored_hosts","with_monitored_items"));
 ?>
 
 <?php
-	$_REQUEST["groupid"] = get_request("groupid",get_profile("web.overview.groupid",0));
 	$_REQUEST["type"] = get_request("type",get_profile("web.overview.type",0));
 
 	update_profile("web.menu.view.last",$page["file"]);
-	update_profile("web.overview.groupid",$_REQUEST["groupid"]);
 	update_profile("web.overview.type",$_REQUEST["type"]);
 ?>
 
@@ -82,7 +82,7 @@
 	{
 		$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg where".
 			" h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$row["groupid"].
-			" and hg.hostid=h.hostid group by h.hostid,h.host order by h.host");
+			" and i.status=".ITEM_STATUS_ACTIVE." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host");
 		while($row2=DBfetch($result2))
 		{
 			if(!check_right("Host","R",$row2["hostid"]))	continue;

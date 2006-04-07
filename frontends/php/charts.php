@@ -57,12 +57,11 @@
 	);
 
 	check_fields($fields);
+
+	validate_group_with_host("R",array("allow_all_hosts","monitored_hosts","with_items"));
 ?>
 
-
 <?php
-	$_REQUEST["hostid"]=@iif(isset($_REQUEST["hostid"]),$_REQUEST["hostid"],get_profile("web.latest.hostid",0));
-	update_profile("web.latest.hostid",$_REQUEST["hostid"]);
 	update_profile("web.menu.view.last",$page["file"]);
 ?>
 
@@ -79,11 +78,6 @@
 	if(!isset($_REQUEST["keep"]))
 	{
 		$_REQUEST["keep"]=1;
-	}
-
-	if(isset($_REQUEST["groupid"])&&($_REQUEST["groupid"]==0))
-	{
-		unset($_REQUEST["groupid"]);
 	}
 
 	if(isset($_REQUEST["graphid"])&&($_REQUEST["graphid"]==0))
@@ -133,14 +127,15 @@
 
 	$h2=$h2.SPACE.S_HOST.SPACE;
 	$h2=$h2."<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
-	$h2=$h2.form_select("hostid",0,S_SELECT_HOST_DOT_DOT_DOT);
 
-	if(isset($_REQUEST["groupid"]))
+	if($_REQUEST["groupid"] > 0)
 	{
 		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
 	}
 	else
 	{
+		$h2=$h2.form_select("hostid",0,S_ALL_SMALL);
+
 		$sql="select h.hostid,h.host from hosts h,items i where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid group by h.hostid,h.host order by h.host";
 	}
 
@@ -169,17 +164,30 @@
 	$h2=$h2."<select class=\"biginput\" name=\"graphid\" onChange=\"submit()\">";
 	$h2=$h2.form_select("graphid",0,S_SELECT_GRAPH_DOT_DOT_DOT);
 
-	if(isset($_REQUEST["hostid"])&&($_REQUEST["hostid"]!=0))
+	if($_REQUEST["hostid"] > 0)
 	{
-		$result=DBselect("select distinct g.graphid,g.name from graphs g,graphs_items gi,items i where i.itemid=gi.itemid and g.graphid=gi.graphid and i.hostid=".$_REQUEST["hostid"]." order by g.name");
-		while($row=DBfetch($result))
+		$sql = "select distinct g.graphid,g.name from graphs g,graphs_items gi,items i".
+			" where i.itemid=gi.itemid and g.graphid=gi.graphid and i.hostid=".$_REQUEST["hostid"]." order by g.name";
+	}
+	elseif ($_REQUEST["groupid"] > 0)
+	{
+		$sql = "select distinct g.graphid,g.name from graphs g,graphs_items gi,items i,hosts_groups hg".
+			" where i.itemid=gi.itemid and g.graphid=gi.graphid and i.hostid=gh.hostid and gh.groupid=".$_REQUEST["groupid"].
+			" order by g.name";
+	}
+	else
+	{
+		$sql = "select distinct g.graphid,g.name from graphs g";
+	}
+
+	$result=DBselect($sql);
+	while($row=DBfetch($result))
+	{
+		if(!check_right("Graph","R",$row["graphid"]))
 		{
-			if(!check_right("Graph","R",$row["graphid"]))
-			{
-				continue;
-			}
-			$h2=$h2.form_select("graphid",$row["graphid"],$row["name"]);
+			continue;
 		}
+		$h2=$h2.form_select("graphid",$row["graphid"],$row["name"]);
 	}
 	$h2=$h2."</select>";
 

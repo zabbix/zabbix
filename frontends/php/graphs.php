@@ -50,6 +50,8 @@
 	);
 
 	check_fields($fields);
+
+	validate_group_with_host("U",array("allow_all_hosts"));
 ?>
 <?php
 	if(!check_anyright("Graph","U"))
@@ -59,11 +61,6 @@
 		exit;
 	}
 
-	$_REQUEST["hostid"]=get_request("hostid",get_profile("web.latest.hostid",0));
-	$_REQUEST["groupid"]=get_request("groupid",get_profile("web.latest.groupid",0));
-
-	update_profile("web.latest.hostid",$_REQUEST["hostid"]);
-	update_profile("web.latest.groupid",$_REQUEST["groupid"]);
 	update_profile("web.menu.config.last",$page["file"]);
 ?>
 <?php
@@ -156,7 +153,7 @@
 		if($_REQUEST["groupid"]==0)
 			$cmbHosts->AddItem(0,S_ALL_SMALL);
 
-		if(isset($_REQUEST["groupid"]) && $_REQUEST["groupid"] > 0)
+		if($_REQUEST["groupid"] > 0)
 		{
 			$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg".
 				" where h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"].
@@ -191,7 +188,7 @@
 		$table->setHeader(array(S_ID,
 			$_REQUEST["hostid"] != 0 ? NULL : S_HOSTS, S_NAME,S_WIDTH,S_HEIGHT,S_GRAPH));
 
-		if(isset($_REQUEST["hostid"])&&($_REQUEST["hostid"]!=0))
+		if($_REQUEST["hostid"] > 0)
 		{
 			$result=DBselect("select distinct g.* from graphs g,items i".
 				",graphs_items gi where gi.itemid=i.itemid and g.graphid=gi.graphid".
@@ -204,15 +201,6 @@
 		while($row=DBfetch($result))
 		{
 			if(!check_right("Graph","U",$row["graphid"]))		continue;
-
-/*
-			if(!isset($_REQUEST["hostid"]))
-			{
-				$sql="select * from graphs_items where graphid=".$row["graphid"];
-				$result2=DBselect($sql);
-				if(DBnum_rows($result2)>0)	continue;
-			}
-*/
 
 			if($_REQUEST["hostid"] != 0)
 			{
