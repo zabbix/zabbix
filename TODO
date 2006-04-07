@@ -1,5 +1,6 @@
 1.1beta8:
 
+ - check if applying of actions works
  - item key popup, trigger expression builder
  - remember different default values in different forms
  - create triggers from items
