@@ -1,5 +1,6 @@
 1.1beta8:
 
+ - configurable port number for MySQL and PostgreSQL
  - check if applying of actions works
  - item key popup, trigger expression builder
  - remember different default values in different forms
