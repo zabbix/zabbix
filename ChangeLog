@@ -1,5 +1,6 @@
 Changes for 1.1beta9:
 
+ - fixed items status changing of parent hosts (Eugene)
  - one separated poller process for unreachable hosts (Alexei)
  - minimum value of StartSuckers increased to 7 (Alexei)
  - better function is_double() (Alexei)
