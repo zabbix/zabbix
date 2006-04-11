@@ -1,5 +1,7 @@
 Changes for 1.1beta9:
 
+ - one separated poller process for unreachable hosts (Alexei)
+ - minimum value of StartSuckers increased to 7 (Alexei)
  - better function is_double() (Alexei)
  - fixed host conditions in actions (Alexei)
  - improved filter by hosts and groups (Eugene)

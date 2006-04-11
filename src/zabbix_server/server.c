@@ -313,7 +313,7 @@ void	init_config(void)
 	static struct cfg_line cfg[]=
 	{
 /*		 PARAMETER	,VAR	,FUNC,	TYPE(0i,1s),MANDATORY,MIN,MAX	*/
-		{"StartSuckers",&CONFIG_SUCKERD_FORKS,0,TYPE_INT,PARM_OPT,6,255},
+		{"StartSuckers",&CONFIG_SUCKERD_FORKS,0,TYPE_INT,PARM_OPT,7,255},
 		{"HousekeepingFrequency",&CONFIG_HOUSEKEEPING_FREQUENCY,0,TYPE_INT,PARM_OPT,1,24},
 		{"SenderFrequency",&CONFIG_SENDER_FREQUENCY,0,TYPE_INT,PARM_OPT,5,3600},
 		{"PingerFrequency",&CONFIG_PINGER_FREQUENCY,0,TYPE_INT,PARM_OPT,1,3600},
@@ -650,6 +650,17 @@ int main(int argc, char **argv)
 /* Fourth instance of zabbix_server escalates notifications */
 		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Escalator]",server_num);
 		main_escalator_loop();
+	}
+	else if(server_num == 5)
+	{
+#ifdef HAVE_SNMP
+		init_snmp("zabbix_server");
+		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Poller for unreachable hosts. SNMP:ON]",server_num);
+#else
+		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Poller for unreachable hosts. SNMP:OFF]",server_num);
+#endif
+
+		main_poller_loop();
 	}
 	else
 	{
