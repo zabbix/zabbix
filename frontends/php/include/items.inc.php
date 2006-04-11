@@ -179,12 +179,14 @@
                         error("Insufficient permissions");
                         return 0;
 		}
+
 		if($status==ITEM_STATUS_ACTIVE)
 			$sql="update items set status=$status,error='' where itemid=$itemid";
 		else
 			$sql="update items set status=$status where itemid=$itemid";
 
-		return	DBexecute($sql);
+		$result = DBexecute($sql);
+		return $result;
 	}
 
 	# Update Item definition
@@ -334,14 +336,32 @@
 
 	function	activate_item($itemid)
 	{
-		return	DBexecute("update items set status=".ITEM_STATUS_ACTIVE." where itemid=$itemid");
+		 // first update status for child items
+		$db_tmp_items = DBselect("select itemid, hostid from items where templateid=$itemid");
+		while($db_tmp_item = DBfetch($db_tmp_items))
+		{
+		// recursion
+			activate_item($db_tmp_item["itemid"]);
+		}
+
+		$result = DBexecute("update items set status=".ITEM_STATUS_ACTIVE.",error='' where itemid=$itemid");
+		return $result;
 	}
 
 	# Disable Item
 
 	function	disable_item($itemid)
 	{
-		return	DBexecute("update items set status=".ITEM_STATUS_DISABLED." where itemid=$itemid");
+		 // first update status for child items
+		$db_tmp_items = DBselect("select itemid, hostid from items where templateid=$itemid");
+		while($db_tmp_item = DBfetch($db_tmp_items))
+		{
+		// recursion
+			disable_item($db_tmp_item["itemid"]);
+		}
+
+		$result = DBexecute("update items set status=".ITEM_STATUS_DISABLED." where itemid=$itemid");
+		return $result;
 	}
 
 	function	get_items_by_hostid($hostid)
