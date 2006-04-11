@@ -3,7 +3,6 @@
  - fix bulkloader
  - item key popup, trigger expression builder
  - remember different default values in different forms
- - create triggers from items
  - a separate poller for unreachable hosts
  - timeout-immune poller
  - autodiscovery: http://www.zabbix.com/forum/showthread.php?t=2137
