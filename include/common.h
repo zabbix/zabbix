@@ -264,7 +264,7 @@
 #define	TRAPPERD_FORKS	5
 #define	SUCKER_FORKS	11
 
-#define	POLLER_DELAY	1
+#define	POLLER_DELAY	5
 
 #define	SUCKER_TIMEOUT	5
 /* Do not perform more than this number of checks during unavailability period */
