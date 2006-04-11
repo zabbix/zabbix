@@ -369,7 +369,7 @@ void   	free_result(AGENT_RESULT *result);
 
 char	*string_replace(char *str, const char *sub_str1, const char *sub_str2);
 void	del_zeroes(char *s);
-int	is_double_prefix(char *c);
+int	is_double_prefix(char *str);
 int	is_double(char *c);
 int	is_uint(char *c);
 void	lrtrim_spaces(char *c);

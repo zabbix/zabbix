@@ -120,6 +120,19 @@ int	is_double_prefix(char *c)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
+int is_double(char *str)
+{
+	const char *endstr = str + strlen(str);
+	char *endptr = NULL;
+	double x = strtod(str, &endptr);
+
+	if(endptr == str || errno != 0)
+		return FAIL;
+	if (endptr == endstr)
+		return SUCCEED;
+	return FAIL;
+}
+/*
 int	is_double(char *c)
 {
 	int i;
@@ -145,7 +158,7 @@ int	is_double(char *c)
 		return FAIL;
 	}
 	return SUCCEED;
-}
+}*/
 
 /******************************************************************************
  *                                                                            *
