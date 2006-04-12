@@ -491,7 +491,7 @@
 						$hostid = 0;
 			}
 
-			if($hostid == 0 && !($allow_all_hosts ==1 && $groupid==0)) 
+			if(($hostid < 0) || ($hostid == 0 && !($allow_all_hosts ==1 && $groupid==0)))
 			{
 				$hostid = $first_hostig_in_group;
 			}
@@ -515,7 +515,8 @@
 	function	validate_group_with_host($right, $options = array())
 	{
 		$_REQUEST["groupid"]    = get_request("groupid",get_profile("web.latest.groupid",0));
-		$_REQUEST["hostid"]     = get_request("hostid",get_profile("web.latest.hostid",0));
+		$_REQUEST["hostid"]     = get_request("hostid",get_profile("web.latest.hostid",
+			(in_array("always_select_first_host",$options)) ? -1 : 0));
 
 		$result = get_correct_group_and_host($_REQUEST["groupid"],$_REQUEST["hostid"], $right, $options);
 
