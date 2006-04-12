@@ -2438,6 +2438,8 @@
 			$drawtype_on	= $db_link["drawtype_on"];
 			$color_off	= $db_link["color_off"];
 			$color_on	= $db_link["color_on"];
+
+			if(is_null($triggerid)) $triggerid = 0;
 		}
 		else
 		{
