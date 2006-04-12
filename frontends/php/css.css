@@ -280,6 +280,8 @@ table.tableinfo tr.header td {
 }
 table.tableinfo tr.vertical_header td {
 	padding: 0;
+	padding-top: 5;
+	padding-bottom: 5;
 	margin: 0;
 	white-space: nowrap;
 	word-spacing: nowrap;
