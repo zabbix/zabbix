@@ -108,6 +108,8 @@
 
 	function	update_link($linkid,$sysmapid,$selementid1,$selementid2,$triggerid,$drawtype_off,$color_off,$drawtype_on,$color_on)
 	{
+		if($triggerid == 0)	$triggerid = 'NULL';
+
 		return	DBexecute("update sysmaps_links set ".
 			"sysmapid=$sysmapid,selementid1=$selementid1,selementid2=$selementid2,".
 			"triggerid=$triggerid,drawtype_off=$drawtype_off,color_off=".zbx_dbstr($color_off).",".
