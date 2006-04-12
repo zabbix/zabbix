@@ -2465,7 +2465,7 @@
 			elseif($db_selement["elementtype"] == SYSMAP_ELEMENT_TYPE_MAP)
 			{
 				$db_map = get_sysmap_by_sysmapid($db_selement["elementid"]);
-				$label .= ":".$db_map["host"];
+				$label .= ":".$db_map["name"];
 			}
 			elseif($db_selement["elementtype"] == SYSMAP_ELEMENT_TYPE_IMAGE)
 			{
