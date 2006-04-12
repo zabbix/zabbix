@@ -964,7 +964,7 @@
 			" group by h.host,h.hostid order by h.host");
 		while($row=DBfetch($result))
 		{
-			$header=array_merge($header,array(do_vertival_text($row["host"])));
+			$header=array_merge($header,array(new CImg("vtext.php?text=".$row["host"])));
 			$hosts=array_merge($hosts,array($row["hostid"]));
 		}
 		$table->SetHeader($header,"vertical_header");
