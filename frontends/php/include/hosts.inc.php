@@ -512,10 +512,13 @@
 		return $result;
 	}
 
-	function	validate_group_with_host($right, $options = array())
+	function	validate_group_with_host($right, $options = array(),$group_var=NULL,$host_var=NULL)
 	{
-		$_REQUEST["groupid"]    = get_request("groupid",get_profile("web.latest.groupid",0));
-		$_REQUEST["hostid"]     = get_request("hostid",get_profile("web.latest.hostid",
+		if(is_null($group_var)) $group_var = "web.latest.groupid";
+		if(is_null($host_var))  $host_var = "web.latest.hostid";
+
+		$_REQUEST["groupid"]    = get_request("groupid",get_profile($group_var,0));
+		$_REQUEST["hostid"]     = get_request("hostid",get_profile($host_var,
 			(in_array("always_select_first_host",$options)) ? -1 : 0));
 
 		$result = get_correct_group_and_host($_REQUEST["groupid"],$_REQUEST["hostid"], $right, $options);
@@ -523,18 +526,20 @@
 		$_REQUEST["groupid"]    = $result["groupid"];
 		$_REQUEST["hostid"]     = $result["hostid"];
 
-		update_profile("web.latest.hostid",$_REQUEST["hostid"]);
-		update_profile("web.latest.groupid",$_REQUEST["groupid"]);
+		update_profile($host_var,$_REQUEST["hostid"]);
+		update_profile($group_var,$_REQUEST["groupid"]);
 	}
 
-	function	validate_group($right, $options = array())
+	function	validate_group($right, $options = array(),$group_var=NULL)
 	{
-		$_REQUEST["groupid"]    = get_request("groupid",get_profile("web.latest.groupid",0));
+		if(is_null($group_var)) $group_var = "web.latest.groupid";
+
+		$_REQUEST["groupid"]    = get_request("groupid",get_profile($group_var,0));
 
 		$result = get_correct_group_and_host($_REQUEST["groupid"],NULL,$right,$options);
 
 		$_REQUEST["groupid"]    = $result["groupid"];
 
-		update_profile("web.latest.groupid",$_REQUEST["groupid"]);
+		update_profile($group_var,$_REQUEST["groupid"]);
 	}
 ?>

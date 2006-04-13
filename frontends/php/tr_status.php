@@ -94,7 +94,7 @@
 	}
 ?>
 <?php
-	validate_group_with_host("R",array("allow_all_hosts","monitored_hosts","with_monitored_items"));
+	validate_group_with_host("R",array("allow_all_hosts","monitored_hosts","with_monitored_items"),"web.tr_status.groupid","web.tr_status.hostid");
 ?>
 <?php
 	if(!check_anyright("Host","R"))
