@@ -562,6 +562,13 @@
 
 	function	update_trigger_status($triggerid,$status)
 	{
+		// first update status for child triggers
+		$db_chd_triggers = get_triggers_by_templateid($triggerid);
+		while($db_chd_trigger = DBfetch($db_chd_triggers))
+		{
+			update_trigger_status($db_chd_trigger["triggerid"],$status);
+		}
+
 		if(!check_right_on_trigger("U",$triggerid))
 		{
                         error("Insufficient permissions");
