@@ -968,6 +968,7 @@
 		$hosts=array();
 		$result=DBselect("select h.hostid,h.host from hosts h,items i,triggers t, functions f $group_where".
 			" h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid".
+			" and t.status=".TRIGGER_STATUS_ENABLED.
 			" group by h.host,h.hostid order by h.host");
 		while($row=DBfetch($result))
 		{
@@ -979,6 +980,7 @@
 
 		$db_triggers = DBselect("select distinct t.description from hosts h,items i,triggers t,functions f $group_where".
 			" h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid".
+			" and t.status=".TRIGGER_STATUS_ENABLED.
 			" group by 1");
 		while($triggers = DBfetch($db_triggers))
 		{
