@@ -535,9 +535,6 @@ static int get_next_command(char** command_list, char** alias, int* is_group, ch
  ******************************************************************************/
 /*static*/	void	run_commands(DB_TRIGGER *trigger,DB_ACTION *action)
 {
-	assert(trigger);
-	assert(action);
-	
 	DB_RESULT *result;
 
 	char sql[MAX_STRING_LEN];
@@ -547,6 +544,9 @@ static int get_next_command(char** command_list, char** alias, int* is_group, ch
 	int is_group = 0;
 	int i = 0;
 	
+	assert(trigger);
+	assert(action);
+
 	cmd_list = action->scripts;
 	zabbix_log( LOG_LEVEL_DEBUG, "Run remote commands START [actionid:%d]", action->actionid);
 	while(get_next_command(&cmd_list,&alias,&is_group,&command)!=1)
