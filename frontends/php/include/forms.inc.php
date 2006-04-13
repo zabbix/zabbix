@@ -1708,6 +1708,10 @@
 		{
 			$form->AddRow(S_URL, new CTextBox("url",$url,60));
 		}
+		else
+		{
+			$form->AddVar("url",	"");
+		}
 
 		if(in_array($resource,array(SCREEN_RESOURCE_GRAPH,SCREEN_RESOURCE_SIMPLE_GRAPH,SCREEN_RESOURCE_CLOCK,SCREEN_RESOURCE_URL)))
 		{
