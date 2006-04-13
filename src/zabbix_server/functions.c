@@ -836,7 +836,11 @@ void	process_new_value(DB_ITEM *item, AGENT_RESULT *value)
 		{
 			if(is_uint(item->formula))
 			{
+#ifdef HAVE_ATOLL
 				SET_UI64_RESULT(value, value->ui64 * (zbx_uint64_t)atoll(item->formula));
+#else
+				SET_UI64_RESULT(value, value->ui64 * (zbx_uint64_t)atol(item->formula));
+#endif
 			}
 			else
 			{

@@ -124,7 +124,9 @@ int is_double(char *str)
 {
 	const char *endstr = str + strlen(str);
 	char *endptr = NULL;
-	double x = strtod(str, &endptr);
+	double x;
+       
+	x = strtod(str, &endptr);
 
 	if(endptr == str || errno != 0)
 		return FAIL;
@@ -201,7 +203,11 @@ int	set_result_type(AGENT_RESULT *result, int value_type, char *c)
 		del_zeroes(c);
 		if(is_uint(c) == SUCCEED)
 		{
+#ifdef HAVE_ATOLL
 			SET_UI64_RESULT(result, atoll(c));
+#else
+			SET_UI64_RESULT(result, atol(c));
+#endif
 			ret = SUCCEED;
 		}
 	}
