@@ -470,20 +470,24 @@
 
 		$hosts=array();
 		$result=DBselect("select h.hostid,h.host from hosts h,items i $group_where".
-			" h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid".
+			" h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and i.status=".ITEM_STATUS_ACTIVE.
 			" group by h.host,h.hostid order by h.host");
 		while($row=DBfetch($result))
 		{
-			$header=array_merge($header,array(new CImg("vtext.php?text=".$row["host"])));
-			$hosts=array_merge($hosts,array($row["hostid"]));
+			if(!check_right("Host","R",$row["hostid"])) continue; //TODO optimize duplication check !!!! see buttom
+
+			array_push($header,new CImg("vtext.php?text=".$row["host"]));
+			array_push($hosts,$row["hostid"]);
 		}
 		$table->SetHeader($header,"vertical_header");
-		
 
-		$db_items = DBselect("select distinct i.description from hosts h,items i $group_where".
-			" h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid order by 1");
+		$db_items = DBselect("select distinct i.description,h.hostid from hosts h,items i $group_where".
+			" h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and i.status=".ITEM_STATUS_ACTIVE.
+			" order by 1");
 		while($item = DBfetch($db_items))
 		{
+			if(!check_right("Host","R",$row["hostid"])) continue; //TODO optimize duplication check !!!! see top
+
 			$table_row = array(nbsp($item["description"]));
 			foreach($hosts as $hostid)
 			{
@@ -495,6 +499,9 @@
 					continue;
 				}
 				$host_item = DBfetch($db_host_items);
+
+				if(!check_right("Item","R",$host_item["itemid"])) continue;
+
 				if(!isset($host_item["lastvalue"]))
 				{
 					array_push($table_row,"-");

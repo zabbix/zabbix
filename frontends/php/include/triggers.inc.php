@@ -972,18 +972,20 @@
 			" group by h.host,h.hostid order by h.host");
 		while($row=DBfetch($result))
 		{
+			if(!check_right("Host","R",$row["hostid"])) continue; //TODO optimize duplication check !!!! see top
 			$header=array_merge($header,array(new CImg("vtext.php?text=".$row["host"])));
 			$hosts=array_merge($hosts,array($row["hostid"]));
 		}
 		$table->SetHeader($header,"vertical_header");
 	
 
-		$db_triggers = DBselect("select distinct t.description from hosts h,items i,triggers t,functions f $group_where".
+		$db_triggers = DBselect("select distinct t.description,h.hostid from hosts h,items i,triggers t,functions f $group_where".
 			" h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid".
 			" and t.status=".TRIGGER_STATUS_ENABLED.
 			" group by 1");
 		while($triggers = DBfetch($db_triggers))
 		{
+			if(!check_right("Host","R",$row["hostid"])) continue; //TODO optimize duplication check !!!! see top
 			$table_row = array(nbsp($triggers["description"]));
 			foreach($hosts as $hostid)
 			{
