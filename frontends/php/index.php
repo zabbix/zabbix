@@ -39,76 +39,43 @@
 	check_fields($fields);
 ?>
 <?php
-	if(isset($_REQUEST["password"]))
-	{
-		$password=$_REQUEST["password"];
-	}
-	else
-	{
-		unset($password);
-	}
-	if(isset($_REQUEST["name"]))
-	{
-		$name=$_REQUEST["name"];
-	}
-	else
-	{
-		unset($name);
-	}
-	if(isset($_REQUEST["enter"]))
-	{
-		$enter=$_REQUEST["enter"];
-	}
-	else
-	{
-		unset($enter);
-	}
-	if(isset($_REQUEST["reconnect"]))
-	{
-		$reconnect=$_REQUEST["reconnect"];
-	}
-	else
-	{
-		unset($reconnect);
-	}
+
 	if(isset($_COOKIE["sessionid"]))
-	{
 		$sessionid=$_COOKIE["sessionid"];
-	}
 	else
-	{
 		unset($sessionid);
-	}
 
-
-	if(isset($reconnect) && isset($sessionid))
+	if(isset($_REQUEST["reconnect"]) && isset($sessionid))
 	{
-		$sql="delete from sessions where sessionid=".zbx_dbstr($sessionid);
-		DBexecute($sql);
+		DBexecute("delete from sessions where sessionid=".zbx_dbstr($sessionid));
 		setcookie("sessionid",$sessionid,time()-3600);
+		unset($_COOKIE["sessionid"]);
 		unset($sessionid);
 	}
 
-	if(isset($enter)&&($enter=="Enter"))
+	if(isset($_REQUEST["enter"])&&($_REQUEST["enter"]=="Enter"))
 	{
-		$password=md5($password);
-		$sql="select u.userid,u.alias,u.name,u.surname,u.url,u.refresh from users u where u.alias=".zbx_dbstr($name)." and u.passwd=".zbx_dbstr($password);
-		$result=DBselect($sql);
+		$name = get_request("name","");
+		$password = md5(get_request("password",""));
+
+		$result=DBselect("select u.userid,u.alias,u.name,u.surname,u.url,u.refresh from users u where".
+			" u.alias=".zbx_dbstr($name)." and u.passwd=".zbx_dbstr($password));
+
 		if(DBnum_rows($result)==1)
 		{
 			$row=DBfetch($result);
-			$USER_DETAILS["userid"]=$row["userid"];
-			$USER_DETAILS["alias"]=$row["alias"];
-			$USER_DETAILS["name"]=$row["name"];
-			$USER_DETAILS["surname"]=$row["surname"];
-			$USER_DETAILS["url"]=$row["url"];
-			$USER_DETAILS["refresh"]=$row["refresh"];
+			$USER_DETAILS["userid"]	= $row["userid"];
+			$USER_DETAILS["alias"]	= $row["alias"];
+			$USER_DETAILS["name"]	= $row["name"];
+			$USER_DETAILS["surname"]= $row["surname"];
+			$USER_DETAILS["url"]	= $row["url"];
+			$USER_DETAILS["refresh"]= $row["refresh"];
 			$sessionid=md5(time().$password.$name.rand(0,10000000));
 			setcookie("sessionid",$sessionid,time()+3600);
 // Required !
-			$_COOKIE["sessionid"]=$sessionid;
-			$sql="insert into sessions (sessionid,userid,lastaccess) values (".zbx_dbstr($sessionid).",".$USER_DETAILS["userid"].",".time().")";
-			DBexecute($sql);
+			$_COOKIE["sessionid"]	= $sessionid;
+			DBexecute("insert into sessions (sessionid,userid,lastaccess)".
+				" values (".zbx_dbstr($sessionid).",".$USER_DETAILS["userid"].",".time().")");
 
 			if($USER_DETAILS["url"] != '')
 			{
@@ -128,7 +95,6 @@
 	{
 //		echo "-",$_COOKIE["sessionid"],"-<br>";
 		insert_login_form();
-		show_messages();
 	}
 	else
 	{
