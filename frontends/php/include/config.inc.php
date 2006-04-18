@@ -41,6 +41,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 	include_once 	"include/db.inc.php";
 	include_once 	"include/html.inc.php";
 	include_once 	"include/locales.inc.php";
+	include_once 	"include/perm.inc.php";
 
 	include_once 	"include/audit.inc.php";
 	include_once 	"include/acknow.inc.php";
@@ -332,7 +333,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 
 		return $cnt; 
 	}
-
+/*
 	function	check_anyright($right,$permission)
 	{
 		global $USER_DETAILS;
@@ -422,7 +423,8 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 		}
 		return 0;
 	}
-
+*/
+/*
 	function	check_right($right,$permission,$id)
 	{
 //		global $USER_DETAILS;
@@ -449,49 +451,6 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 		}
 //		echo $default_permission,"<br>";
 
-/*
-
-		$sql="select permission from rights where name='Default permission' and userid=".$USER_DETAILS["userid"];
-		$result=DBselect($sql);
-
-		$default_permission="H";
-		if(DBnum_rows($result)>0)
-		{
-			$default_permission="";
-			while($row=DBfetch($result))
-			{
-				$default_permission=$default_permission.$row["permission"];
-			}
-		}
-# default_permission
-
-		$sql="select permission from rights where name=".zbx_dbstr($right)." and id=0 and userid=".$USER_DETAILS["userid"];
-		$result=DBselect($sql);
-
-		$group_permission="";
-		if(DBnum_rows($result)>0)
-		{
-			while($row=DBfetch($result))
-			{
-				$group_permission=$group_permission.$row["permission"];
-			}
-		}
-# group_permission
-
-		$id_permission="";
-		if($id!=0)
-		{
-			$sql="select permission from rights where name=".zbx_dbstr($right)." and id=$id and userid=".$USER_DETAILS["userid"];
-			$result=DBselect($sql);
-			if(DBnum_rows($result)>0)
-			{
-				while($row=DBfetch($result))
-				{
-					$id_permission=$id_permission.$row["permission"];
-				}
-			}
-		}
-*/
 # id_permission
 //		echo "$id_permission|$group_permission|$default_permission<br>";
 
@@ -590,74 +549,6 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 				return 0;
 		}
 		return 0;
-	}
-
-
-/*	function	check_right($right,$permission,$id)
-	{
-		global $USER_DETAILS;
-
-		if($id!=0)
-		{
-			$sql="select * from rights where name='$right' and permission in ('H') and id=$id and userid=".$USER_DETAILS["userid"];
-			$result=DBselect($sql);
-			if(DBnum_rows($result)>0)
-			{
-				return	0;
-			}
-		}
-
-		$sql="select permission from rights where name='Default permission' and userid=".$USER_DETAILS["userid"];
-		$result=DBselect($sql);
-
-		$default_permission="H";
-		if(DBnum_rows($result)>0)
-		{
-			$default_permission="";
-			while($row=DBfetch($result))
-			{
-				$default_permission=$default_permission.$row["permission"];
-			}
-		}
-
-		if($permission=='R')
-		{
-			$cond="'R','U'";
-		}
-		else
-		{
-			$cond="'".$permission."'";
-		}
-
-		$sql="select * from rights where name='$right' and permission in ($cond) and (id=$id or id=0) and userid=".$USER_DETAILS["userid"];
-//		echo $sql;
-
-		$result=DBselect($sql);
-
-		if(DBnum_rows($result)>0)
-		{
-			return	1;
-		}
-		else
-		{
-			if(strstr($default_permission,"A")&&($permission=="A"))
-			{
-				return 1;
-			}
-			if(strstr($default_permission,"R")&&($permission=="R"))
-			{
-				return 1;
-			}
-			if(strstr($default_permission,"U")&&($permission=="R"))
-			{
-				return 1;
-			}
-			if(strstr($default_permission,"U")&&($permission=="U"))
-			{
-				return 1;
-			}
-			return	0;
-		}
 	}
 */
 
@@ -1000,7 +891,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 	{
 		echo "\n";
 	}
-
+/*
 	function	check_authorisation()
 	{
 		global	$page;
@@ -1077,6 +968,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 		show_page_footer();
 		exit;
 	}
+*/
 
 	# Header for HTML pages
 
