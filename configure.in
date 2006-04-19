@@ -900,7 +900,7 @@ AC_SUBST(ARCH)
 AC_OUTPUT(Makefile src/Makefile src/libs/Makefile src/libs/zbxlog/Makefile src/libs/zbxcrypto/Makefile  \
 	src/libs/zbxpid/Makefile src/libs/zbxnet/Makefile src/libs/zbxconf/Makefile src/zabbix_sender/Makefile \
 	src/libs/zbxdbhigh/Makefile src/libs/zbxemail/Makefile src/libs/zbxsysinfo/Makefile \
-	src/zabbix_server/pinger/Makefile src/zabbix_server/escalator/Makefile src/zabbix_agent/Makefile \
+	src/zabbix_server/pinger/Makefile src/zabbix_agent/Makefile \
 	src/zabbix_server/housekeeper/Makefile src/zabbix_server/alerter/Makefile src/zabbix_server/Makefile \
 	src/zabbix_server/trapper/Makefile src/zabbix_server/poller/Makefile src/zabbix_server/timer/Makefile \
 	src/zabbix_get/Makefile src/libs/zbxcommon/Makefile src/libs/zbxsysinfo/linux/Makefile \

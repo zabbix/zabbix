@@ -52,7 +52,6 @@
 #include "sysinfo.h"
 
 #include "alerter/alerter.h"
-#include "escalator/escalator.h"
 #include "housekeeper/housekeeper.h"
 #include "pinger/pinger.h"
 #include "poller/poller.h"
@@ -313,7 +312,7 @@ void	init_config(void)
 	static struct cfg_line cfg[]=
 	{
 /*		 PARAMETER	,VAR	,FUNC,	TYPE(0i,1s),MANDATORY,MIN,MAX	*/
-		{"StartSuckers",&CONFIG_SUCKERD_FORKS,0,TYPE_INT,PARM_OPT,7,255},
+		{"StartSuckers",&CONFIG_SUCKERD_FORKS,0,TYPE_INT,PARM_OPT,6,255},
 		{"HousekeepingFrequency",&CONFIG_HOUSEKEEPING_FREQUENCY,0,TYPE_INT,PARM_OPT,1,24},
 		{"SenderFrequency",&CONFIG_SENDER_FREQUENCY,0,TYPE_INT,PARM_OPT,5,3600},
 		{"PingerFrequency",&CONFIG_PINGER_FREQUENCY,0,TYPE_INT,PARM_OPT,1,3600},
@@ -645,13 +644,13 @@ int main(int argc, char **argv)
 		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [ICMP pinger]",server_num);
 		main_pinger_loop();
 	}
-	else if(server_num == 4)
+/* Fifth instance of zabbix_server escalates notifications */
+/*	else if(server_num == 4)
 	{
-/* Fourth instance of zabbix_server escalates notifications */
 		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Escalator]",server_num);
 		main_escalator_loop();
-	}
-	else if(server_num == 5)
+	}*/
+	else if(server_num == 4)
 	{
 #ifdef HAVE_SNMP
 		init_snmp("zabbix_server");
