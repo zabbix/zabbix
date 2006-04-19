@@ -67,9 +67,7 @@
 			$expression = str_replace('{'.$f.'}','$_REQUEST["'.$f.'"]',$expression);
 //$debug .= $f." = ".$_REQUEST[$f].BR;
 		}
-		$expression=rtrim($expression,"&");
-		if($expression[strlen($expression)-1]=='&')	$expression[strlen($expression)-1]=0;
-		if($expression[strlen($expression)-1]=='&')	$expression[strlen($expression)-1]=0;
+		$expression = trim($expression,"& ");
 		$exec = "return (".$expression.") ? 1 : 0;";
 
 		$ret = eval($exec);
@@ -269,7 +267,7 @@
 			{
 				if($flags&P_SYS)
 				{
-					info("Critical error. Incorrect value for [".$field."]");
+					info("Critical error. Incorrect value for [".$field."] = '".$_REQUEST[$field]."'");
 					return ZBX_VALID_ERROR;
 				}
 				else

@@ -141,7 +141,7 @@
 		function Show()
 		{
 			if(isset($this->caption))
-				print ($this->caption." ");
+				echo $this->caption." ";
 			parent::Show();
 		}
 	}

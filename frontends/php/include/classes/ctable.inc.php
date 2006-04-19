@@ -242,5 +242,12 @@
 
                         return parent::AddItem($value);
 		}
+/*		function Show()
+		{
+			ob_start();
+			parent::Show();
+			ob_end_flush();
+		}
+*/
 	}
 ?>
