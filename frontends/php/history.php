@@ -74,7 +74,7 @@
 	if(!isset($_REQUEST["plaintext"]))
 		insert_confirm_javascript();
 	else
-		print($main_header.BR);
+		echo $main_header.BR;
 
 	if(is_array($_REQUEST["itemid"]))
 	{
@@ -282,7 +282,7 @@
 		}
 		else
 		{
-			print $l_header."\n";
+			echo $l_header."\n";
 		}
 
 		$cond_clock = "";
@@ -340,7 +340,7 @@
 			}
 			else
 			{
-				print("<PRE>\n");
+				echo "<PRE>\n";
 			}
 
 			while($row=DBfetch($result))
@@ -427,14 +427,14 @@
 				}
 				else
 				{
-					print(date("Y-m-d H:i:s",$row["clock"]));
-					print("\t".$row["clock"]."\t".$row["value"]."\n");
+					echo date("Y-m-d H:i:s",$row["clock"]);
+					echo "\t".$row["clock"]."\t".$row["value"]."\n";
 				}
 			}
 			if(!isset($_REQUEST["plaintext"]))
 				$table->ShowTagEnd();	// to solve memory leak we call 'Show' method by steps
 			else
-				print("</PRE>");
+				echo "</PRE>";
 		}
 		else
 		{
@@ -462,7 +462,7 @@
 			}
 			else
 			{
-				print("<PRE>\n");
+				echo "<PRE>\n";
 			}
 
 			$i=0;
@@ -498,7 +498,7 @@
 			if(!isset($_REQUEST["plaintext"]))
 				$table->ShowTagEnd();	// to solve memory leak we call 'Show' method by steps
 			else
-				print("</PRE>");
+				echo "</PRE>";
 		}
 	}
 

@@ -22,6 +22,8 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 
 ?>
 <?php
+	include_once("include/copt.lib.php");
+
 // GLOBALS
 	$USER_DETAILS	="";
 	$USER_RIGHTS	="";
@@ -92,6 +94,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 	include_once("include/classes/ctriggerinfo.mod.php");
 	include_once("include/classes/cserverinfo.mod.php");
 	include_once("include/classes/cflashclock.mod.php");
+
 
 	function zbx_stripslashes($value){
 		if(is_array($value)){
@@ -976,6 +979,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 	{
 		global $page;
 		global $USER_DETAILS;
+COpt::profiling_start("page");
 
 		if($noauth==0)
 		{
@@ -1224,174 +1228,6 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 		}
 		return $table;
 	}
-
-	# Translate {10}>10 to something like localhost:procload.last(0)>10
-
-	function	explode_exp ($expression, $html)
-	{
-#		echo "EXPRESSION:",$expression,"<Br>";
-
-		$functionid='';
-		$exp='';
-		$state='';
-		for($i=0;$i<strlen($expression);$i++)
-		{
-			if($expression[$i] == '{')
-			{
-				$functionid='';
-				$state='FUNCTIONID';
-				continue;
-			}
-			if($expression[$i] == '}')
-			{
-				$state='';
-				$sql="select h.host,i.key_,f.function,f.parameter,i.itemid from items i,functions f,hosts h where functionid=$functionid and i.itemid=f.itemid and h.hostid=i.hostid";
-				$res1=DBselect($sql);
-				$row1=DBfetch($res1);
-				if($html == 0)
-				{
-					$exp=$exp."{".$row1["host"].":".$row1["key_"].".".$row1["function"]."(".$row1["parameter"].")}";
-				}
-				else
-				{
-					$item=get_item_by_itemid($row1["itemid"]);
-					if($item["value_type"] ==0) 
-					{
-						$exp=$exp."{<A HREF=\"history.php?action=showgraph&itemid=".$row1["itemid"]."\">".$row1["host"].":".$row1["key_"]."</A>.<B>".$row1["function"]."(</B>".$row1["parameter"]."<B>)</B>}";
-					}
-					else
-					{
-						$exp=$exp."{<A HREF=\"history.php?action=showvalues&period=3600&itemid=".$row1["itemid"]."\">".$row1["host"].":".$row1["key_"]."</A>.<B>".$row1["function"]."(</B>".$row1["parameter"]."<B>)</B>}";
-					}
-				}
-				continue;
-			}
-			if($state == "FUNCTIONID")
-			{
-				$functionid=$functionid.$expression[$i];
-				continue;
-			}
-			$exp=$exp.$expression[$i];
-		}
-#		echo "EXP:",$exp,"<Br>";
-		return $exp;
-	}
-
-	# Translate localhost:procload.last(0)>10 to {12}>10
-
-	/*function	implode_exp ($expression, $triggerid)
-	{
-//		echo "Expression:$expression<br>";
-		$exp='';
-		$state="";
-		for($i=0;$i<strlen($expression);$i++)
-		{
-			if($expression[$i] == '{')
-			{
-				if($state=="")
-				{
-					$host='';
-					$key='';
-					$function='';
-					$parameter='';
-					$state='HOST';
-					continue;
-				}
-			}
-			if( ($expression[$i] == '}')&&($state=="") )
-			{
-//				echo "HOST:$host<BR>";
-//				echo "KEY:$key<BR>";
-//				echo "FUNCTION:$function<BR>";
-//				echo "PARAMETER:$parameter<BR>";
-				$state='';
-		
-				$sql="select i.itemid from items i,hosts h where i.key_=".zbx_dbstr($key).
-					" and h.host=".zbx_dbstr($host)." and h.hostid=i.hostid";
-#				echo $sql,"<Br>";
-				$res=DBselect($sql);
-				$row=DBfetch($res);
-
-				$itemid=$row["itemid"];
-#				echo "ITEMID:$itemid<BR>";
-	
-				$sql="insert into functions (itemid,triggerid,function,parameter)".
-					" values ($itemid,$triggerid,".zbx_dbstr($function).",".
-					zbx_dbstr($parameter).")";
-#				echo $sql,"<Br>";
-				$res=DBexecute($sql);
-				if(!$res)
-				{
-#					echo "ERROR<br>";
-					return	$res;
-				}
-				$functionid=DBinsert_id($res,"functions","functionid");
-
-				$exp=$exp.'{'.$functionid.'}';
-
-				continue;
-			}
-			if($expression[$i] == '(')
-			{
-				if($state == "FUNCTION")
-				{
-					$state='PARAMETER';
-					continue;
-				}
-			}
-			if($expression[$i] == ')')
-			{
-				if($state == "PARAMETER")
-				{
-					$state='';
-					continue;
-				}
-			}
-			if(($expression[$i] == ':') && ($state == "HOST"))
-			{
-				$state="KEY";
-				continue;
-			}
-			if($expression[$i] == '.')
-			{
-				if($state == "KEY")
-				{
-					$state="FUNCTION";
-					continue;
-				}
-				// Support for '.' in KEY
-				if($state == "FUNCTION")
-				{
-					$state="FUNCTION";
-					$key=$key.".".$function;
-					$function="";
-					continue;
-				}
-			}
-			if($state == "HOST")
-			{
-				$host=$host.$expression[$i];
-				continue;
-			}
-			if($state == "KEY")
-			{
-				$key=$key.$expression[$i];
-				continue;
-			}
-			if($state == "FUNCTION")
-			{
-				$function=$function.$expression[$i];
-				continue;
-			}
-			if($state == "PARAMETER")
-			{
-				$parameter=$parameter.$expression[$i];
-				continue;
-			}
-			$exp=$exp.$expression[$i];
-		}
-		return $exp;
-	}*/
 
 	function	add_image($name,$imagetype,$file)
 	{
@@ -1975,6 +1811,9 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 				"page_footer_r")
 			));
 		$table->Show();
+
+		COpt::profiling_stop("page");
+
 		echo "</body>\n";
 		echo "</html>\n";
 	}

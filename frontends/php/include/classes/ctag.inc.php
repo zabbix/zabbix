@@ -176,25 +176,25 @@
 /* protected */
 		function ShowTagStart()
 		{
-			print ($this->tag_start);
-			print("<".$this->name);
+			echo $this->tag_start;
+			echo "<".$this->name;
 			foreach($this->options as $key => $value)
 			{
-				print (" $key=\"$value\"");
+				echo " $key=\"$value\"";
 			}
 
 			if($this->paired=='yes')
-				print (">");
+				echo ">";
 			else	
-				print ("/>");	
+				echo "/>";
 
-			print ($this->tag_body_start);
+			echo $this->tag_body_start;
 		}
 		function ShowTagItem(&$item)
 		{
 			if(is_null($item))	return;
 			elseif(is_object($item))$item->Show();
-			else			print (strval($item));
+			else			echo strval($item);
 		}
 		function ShowTagBody()
 		{
@@ -203,12 +203,12 @@
 		}
 		function ShowTagEnd()
 		{
-			print ($this->tag_body_end);
+			echo $this->tag_body_end;
 
 			if($this->paired=='yes')
 			{
-				print ("</".$this->name.">");
-				print ($this->tag_end);
+				echo "</".$this->name.">";
+				echo $this->tag_end;
 			}
 		}
 		function SetEnabled($value='yes')
