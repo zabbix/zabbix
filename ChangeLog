@@ -1,11 +1,12 @@
 Changes for 1.1beta9:
 
+ - removed unused escalator (Alexei)
+ - removed escalation tables (Alexei)
  - fix compilation if no function atoll() (Alexei)
  - fixed compilation issue in run_command() (Alexei)
  - added vertical text for OVERVIEW (Eugene)
  - fixed items status changing of parent hosts (Eugene)
  - one separated poller process for unreachable hosts (Alexei)
- - minimum value of StartSuckers increased to 7 (Alexei)
  - better function is_double() (Alexei)
  - fixed host conditions in actions (Alexei)
  - improved filter by hosts and groups (Eugene)
