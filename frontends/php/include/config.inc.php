@@ -1104,6 +1104,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 			if(	!check_anyright("Configuration of Zabbix","U")
 				&&!check_anyright("User","U")
 				&&!check_anyright("Host","U")
+				&&!check_anyright("Item","U")
 				&&!check_anyright("Graph","U")
 				&&!check_anyright("Screen","U")
 				&&!check_anyright("Network map","U")
@@ -1179,7 +1180,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 		if(($sub["url"]=="media.php")&&!check_anyright("User","U"))							continue;
 		if(($sub["url"]=="audit.php")&&!check_anyright("Audit","U"))							continue;
 		if(($sub["url"]=="hosts.php")&&!check_anyright("Host","U"))							continue;
-		if(($sub["url"]=="items.php")&&!check_anyright("Host","U"))							continue;
+		if(($sub["url"]=="items.php")&&!check_anyright("Item","U"))							continue;
 		if(($sub["url"]=="triggers.php")&&!check_anyright("Host","U"))							continue;
 		if(($sub["url"]=="sysmaps.php")&&!check_anyright("Network map","U"))						continue;
 		if(($sub["url"]=="sysmap.php")&&!check_anyright("Network map","U"))						continue;

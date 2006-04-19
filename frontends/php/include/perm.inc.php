@@ -157,11 +157,13 @@ define("GROUP_RIGHT",		0);
 			}
 		}
 
-		$access = permission_min($default_permission,$group_permission);
 		if($id == ANY_ELEMENT_RIGHT)
-			$access = permission_min($access,$any_permission);
+			$access = $any_permission;
 		else
-			$access = permission_min($access,$id_permission);
+			$access = $id_permission;
+		
+		if(is_null($access))	$access = $group_permission;
+		if(is_null($access))    $access = $default_permission;
 
 //SDI($right.": ".$access." >= ".$permission);
 		return (($access >= $permission) ? 1 : 0);
