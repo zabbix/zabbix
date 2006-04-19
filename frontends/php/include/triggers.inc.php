@@ -97,7 +97,7 @@
 		$state="";
 		$host="";
 		$hosts=array();
-		for($i=0;$i<strlen($expression);$i++)
+		for($i=0,$max=strlen($expression); $i<$max; $i++)
 		{
 			if($expression[$i] == '{' && $state=="")
 			{
@@ -435,13 +435,65 @@
 		return $newtriggerid;
 	}
 	
+	# Translate {10}>10 to something like localhost:procload.last(0)>10
+
+	function	explode_exp ($expression, $html)
+	{
+#		echo "EXPRESSION:",$expression,"<Br>";
+
+		$functionid='';
+		$exp='';
+		$state='';
+		for($i=0,$max=strlen($expression); $i<$max; $i++)
+		{
+			if($expression[$i] == '{')
+			{
+				$functionid='';
+				$state='FUNCTIONID';
+				continue;
+			}
+			if($expression[$i] == '}')
+			{
+				$state='';
+				$sql="select h.host,i.key_,f.function,f.parameter,i.itemid from items i,functions f,hosts h where functionid=$functionid and i.itemid=f.itemid and h.hostid=i.hostid";
+				$res1=DBselect($sql);
+				$row1=DBfetch($res1);
+				if($html == 0)
+				{
+					$exp=$exp."{".$row1["host"].":".$row1["key_"].".".$row1["function"]."(".$row1["parameter"].")}";
+				}
+				else
+				{
+					$item=get_item_by_itemid($row1["itemid"]);
+					if($item["value_type"] ==0) 
+					{
+						$exp=$exp."{<A HREF=\"history.php?action=showgraph&itemid=".$row1["itemid"]."\">".$row1["host"].":".$row1["key_"]."</A>.<B>".$row1["function"]."(</B>".$row1["parameter"]."<B>)</B>}";
+					}
+					else
+					{
+						$exp=$exp."{<A HREF=\"history.php?action=showvalues&period=3600&itemid=".$row1["itemid"]."\">".$row1["host"].":".$row1["key_"]."</A>.<B>".$row1["function"]."(</B>".$row1["parameter"]."<B>)</B>}";
+					}
+				}
+				continue;
+			}
+			if($state == "FUNCTIONID")
+			{
+				$functionid=$functionid.$expression[$i];
+				continue;
+			}
+			$exp=$exp.$expression[$i];
+		}
+#		echo "EXP:",$exp,"<Br>";
+		return $exp;
+	}
+
 	function	implode_exp ($expression, $triggerid)
 	# Translate localhost:procload.last(0)>10 to {12}>10
 	{
 //		echo "Expression:$expression<br>";
 		$exp='';
 		$state="";
-		for($i=0;$i<strlen($expression);$i++)
+		for($i=0,$max=strlen($expression); $i<$max; $i++)
 		{
 			if($expression[$i] == '{')
 			{
@@ -972,20 +1024,19 @@
 			" group by h.host,h.hostid order by h.host");
 		while($row=DBfetch($result))
 		{
-			if(!check_right("Host","R",$row["hostid"])) continue; //TODO optimize duplication check !!!! see top
+			if(!check_right("Host","R",$row["hostid"])) continue;
 			$header=array_merge($header,array(new CImg("vtext.php?text=".$row["host"])));
 			$hosts=array_merge($hosts,array($row["hostid"]));
 		}
 		$table->SetHeader($header,"vertical_header");
 	
 
-		$db_triggers = DBselect("select distinct t.description,h.hostid from hosts h,items i,triggers t,functions f $group_where".
+		$db_triggers = DBselect("select distinct t.description from hosts h,items i,triggers t,functions f $group_where".
 			" h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid".
 			" and t.status=".TRIGGER_STATUS_ENABLED.
 			" group by 1");
 		while($triggers = DBfetch($db_triggers))
 		{
-			if(!check_right("Host","R",$row["hostid"])) continue; //TODO optimize duplication check !!!! see top
 			$table_row = array(nbsp($triggers["description"]));
 			foreach($hosts as $hostid)
 			{

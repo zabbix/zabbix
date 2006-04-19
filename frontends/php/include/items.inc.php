@@ -469,26 +469,25 @@
 		$header=array(new CCol(S_ITEMS,"center"));
 
 		$hosts=array();
-		$result=DBselect("select h.hostid,h.host from hosts h,items i $group_where".
+		$result=DBselect("select distinct h.hostid,h.host from hosts h,items i $group_where".
 			" h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and i.status=".ITEM_STATUS_ACTIVE.
 			" group by h.host,h.hostid order by h.host");
 		while($row=DBfetch($result))
 		{
-			if(!check_right("Host","R",$row["hostid"])) continue; //TODO optimize duplication check !!!! see buttom
+			if(!check_right("Host","R",$row["hostid"])) continue;
 
 			array_push($header,new CImg("vtext.php?text=".$row["host"]));
 			array_push($hosts,$row["hostid"]);
 		}
 		$table->SetHeader($header,"vertical_header");
 
-		$db_items = DBselect("select distinct i.description,h.hostid from hosts h,items i $group_where".
+		$db_items = DBselect("select distinct i.description from hosts h,items i $group_where".
 			" h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and i.status=".ITEM_STATUS_ACTIVE.
 			" order by 1");
 		while($item = DBfetch($db_items))
 		{
-			if(!check_right("Host","R",$row["hostid"])) continue; //TODO optimize duplication check !!!! see top
-
 			$table_row = array(nbsp($item["description"]));
+			$host_added = 0;
 			foreach($hosts as $hostid)
 			{
 				$db_host_items = DBselect("select itemid,value_type,lastvalue,units from items where".
@@ -502,6 +501,7 @@
 
 				if(!check_right("Item","R",$host_item["itemid"])) continue;
 
+				++$host_added; // added corect host item;
 				if(!isset($host_item["lastvalue"]))
 				{
 					array_push($table_row,"-");
@@ -521,7 +521,7 @@
 				array_push($table_row,new CCol(nbsp($value),$style));
 			}
 
-			$table->AddRow($table_row);
+			if($host_added > 0) $table->AddRow($table_row);
 		}
 		return $table;
 	}
