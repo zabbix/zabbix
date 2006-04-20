@@ -40,52 +40,39 @@
 int	get_value_aggregate(DB_ITEM *item, AGENT_RESULT *result)
 {
 	zbx_uint64_t	i;
-	char		error[MAX_STRING_LEN];
+	char	error[MAX_STRING_LEN];
+	char	function_grp[MAX_STRING_LEN];
+	char	function_item[MAX_STRING_LEN];
+	char	group[MAX_STRING_LEN];
+	char	key[MAX_STRING_LEN];
+	char	parameter[MAX_STRING_LEN];
+
+	int	l;
+
+	int 	ret = SUCCEED;
 
 	init_result(result);
 
-	if(strcmp(item->key,"zabbix[triggers]")==0)
+	l=find_char(item->key,'(');
+
+	if(l == FAIL)
 	{
-		i = (zbx_uint64_t)DBget_triggers_count();
-		SET_UI64_RESULT(result, i);
+		ret = NOTSUPPORTED;
 	}
-	else if(strcmp(item->key,"zabbix[items]")==0)
-	{
-		i = (zbx_uint64_t)DBget_items_count();
-		SET_UI64_RESULT(result, i);
-	}
-	else if(strcmp(item->key,"zabbix[items_unsupported]")==0)
-	{
-		i=DBget_items_unsupported_count();
-		SET_UI64_RESULT(result, i);
-	}
-	else if(strcmp(item->key,"zabbix[history]")==0)
-	{
-		i=DBget_history_count();
-		SET_UI64_RESULT(result, i);
-	}
-	else if(strcmp(item->key,"zabbix[history_str]")==0)
-	{
-		i=DBget_history_str_count();
-		SET_UI64_RESULT(result, i);
-	}
-	else if(strcmp(item->key,"zabbix[trends]")==0)
-	{
-		i=DBget_trends_count();
-		SET_UI64_RESULT(result, i);
-	}
-	else if(strcmp(item->key,"zabbix[queue]")==0)
-	{
-		i=DBget_queue_count();
-		SET_UI64_RESULT(result, i);
-	}
-	else
+	strscpy(function_grp, item->key);
+	function_grp[l]=0;
+
+	SET_UI64_RESULT(result, 0);
+
+	zabbix_log( LOG_LEVEL_WARNING, "Evaluating aggregate [%s] grpfunc [%s]",item->key, function_grp);
+
+/*	else
 	{
 		snprintf(error,MAX_STRING_LEN-1,"Internal check [%s] is not supported", item->key);
 		zabbix_log( LOG_LEVEL_WARNING, error);
 		SET_STR_RESULT(result, strdup(error));
 		return NOTSUPPORTED;
-	}
+	}*/
 
-	return SUCCEED;
+	return ret;
 }
