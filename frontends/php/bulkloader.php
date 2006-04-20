@@ -86,8 +86,8 @@
 				}
 
 				//  Determine which template, if any this host is linked to
-				$sql="select distinct(hostid) from hosts where status<>". HOST_STATUS_DELETED ." and host=".zbx_dbstr($tmpHostTemplate);
-				$sqlResult=DBselect($sql);
+				$sqlResult=DBselect("select distinct(hostid) from hosts where status=". HOST_STATUS_TEMPLATE .
+					" and host=".zbx_dbstr($tmpHostTemplate));
 				if(DBnum_rows($sqlResult)==1)
 				{
 					$row=DBfetch($sqlResult);
@@ -98,24 +98,20 @@
 					$hostTemplate=0;
 				}
 
+				// get groups
+				$groups = array();
+				foreach(explode(',',rtrim(rtrim($tmpHostGroups," "),"\n")) as $group_name)
+				{
+					add_host_group($group_name);
+					$groupid = DBfetch(DBselect("select groupid from groups where name=".zbx_dbstr($group_name)));
+					if(!$groupid) continue;
+					array_push($groups,$groupid["groupid"]);
+				}
+
 				//  Now that we have all the values we need process them for this host
-				$result=add_host($tmpHost,$hostPort,$hostStat,$hostUseIP,$tmpHostIP,$hostTemplate,'','');
+				$result=add_host($tmpHost,$hostPort,$hostStat,$hostUseIP,$tmpHostIP,$hostTemplate,'',$groups);
 				show_messages($result,'Host added: '. $tmpHost,'Cannot add host: '. $tmpHost);;
 
-				//  Here we update the hosts_groups manually.  This will create new groups if needed
-				//  And add this host to any group listed.
-				$row=DBfetch(DBselect("select distinct(hostid) from hosts where host='$tmpHost'"));
-				$tmpHostID=$row["hostid"];
-				if($tmpHostID)
-				{
-					foreach(explode(',',rtrim(rtrim($tmpHostGroups," "),"\n")) as $tmpGroup)
-					{
-						$tmpGroupID=create_Host_Group($tmpGroup);
-						add_Host_To_Group($tmpGroupID,$tmpHostID);
-					}
-					add_template_linkage($tmpHostID,$hostTemplate,7,7,7,7,7);
-					sync_host_with_template($tmpHostID,$hostTemplate,7,7,7,7,7);
-				}
 				break;
 			case "USER":
 				list($tmpName,$tmpSurname,$tmpAlias,$tmpPasswd,$tmpURL,$tmpAutologout,$tmpLang,$tmpRefresh,$tmpUserGroups) = explode(",",$tmpField,9);
@@ -131,8 +127,8 @@
 				{
 					foreach(explode(',',rtrim(rtrim($tmpUserGroups," "),"\n")) as $tmpGroup)
 					{
-						$tmpGroupID=create_User_Group($tmpGroup);
-						add_User_To_Group($tmpGroupID,$tmpUserID);
+						$tmpGroupID=add_user_group($tmpGroup);
+						update_user_groups($tmpGroupID,array($tmpUserID));
 					}
 				}
 				break;
