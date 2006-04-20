@@ -1,5 +1,8 @@
 Changes for 1.1beta9:
 
+ - added 'command line' parameter for Linux proc.mem[] (Eugene)
+ - added parameter '-t key' for ZABBIX agent (Eugene)
+ - added parameters '-h' '-v' for all ZABBIX applications (Eugene)
  - added support of aggregate items (Alexei)
  - do not display disabled triggers and items in overview screens (Eugene)
  - vertical hostnames in overview screens (Eugene)

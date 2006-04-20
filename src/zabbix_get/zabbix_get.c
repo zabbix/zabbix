@@ -43,6 +43,22 @@
 
 #include "common.h"
 
+char *progname = NULL;
+char title_message[] = "ZABBIX get - Communicate with ZABBIX agent";
+char usage_message[] = "[-hv] -s<host name or IP> [-p<port number>] -k<key>";
+char *help_message[] = {
+        "Options:",
+	"  -p <port number>       Specify port number of agent running on the host. Default is 10050.",
+	"  -s <host name or IP>   Specify host name or IP address of a host.",
+	"  -k <key of metric>     Specify metric name (key) we want to retrieve.",
+	"  -h                     give this help",
+	"  -v                     display version number",
+	"",
+	"Example: zabbix_get -s127.0.0.1 -p10050 -k\"system[procload]\"",
+        0 /* end of text */
+};
+
+
 /******************************************************************************
  *                                                                            *
  * Function: signal_handler                                                   *
@@ -72,35 +88,6 @@ static void    signal_handler( int sig )
 	}
 	exit( FAIL );
 }
-
-/******************************************************************************
- *                                                                            *
- * Function: usage                                                            *
- *                                                                            *
- * Purpose: print information about command line parameters and exit          *
- *                                                                            *
- * Parameters: prog - name of process, normally 'zabbix_get'                  *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static void usage(char *prog)
-{
-	printf("zabbix_get - Communicate with ZABBIX agent %s\n", ZABBIX_VERSION);
-	printf("Usage: %s [-h] -s<host name or IP> [-p<port number>] -k<key>\n", prog);
-	printf("\nOptions:\n");
-	printf("  -p <port number>       Specify port number of agent running on the host. Default is 10050.\n");
-	printf("  -s <host name or IP>   Specify host name or IP address of a host.\n");
-	printf("  -k <key of metric>     Specify metric name (key) we want to retrieve.\n");
-	printf("  -h                     Help\n");
-	printf("\nExample: zabbix_get -s127.0.0.1 -p10050 -k\"system[procload]\"\n");
-	exit(-1);
-}
-
 
 /******************************************************************************
  *                                                                            *
@@ -218,8 +205,10 @@ int main(int argc, char **argv)
 	char	*key=NULL;
 	int	ch;
 
+	progname = argv[0];
+
 	/* Parse the command-line. */
-	while ((ch = getopt(argc, argv, "k:p:s:h")) != EOF)
+	while ((ch = getopt(argc, argv, "k:p:s:hv")) != EOF)
 	switch ((char) ch) {
 		case 'k':
 			key = optarg;
@@ -231,16 +220,22 @@ int main(int argc, char **argv)
 			host = optarg;
 			break;
 		case 'h':
-			usage(argv[0]);
+			help();
+			exit(-1);
+			break;
+		case 'v':
+			version();
+			exit(-1);
 			break;
 		default:
-			usage(argv[0]);
-		break;
+			usage();
+			exit(-1);
+			break;
 	}
 
 	if( (host==NULL) || (key==NULL))
 	{
-		usage(argv[0]);
+		usage();
 		ret = FAIL;
 	}
 

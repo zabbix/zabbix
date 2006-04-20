@@ -306,6 +306,35 @@ int parse_command( /* return value: 0 - error; 1 - command without parameters; 2
 	return ret;
 }
 
+void	test_parameter(char* key)
+{
+	AGENT_RESULT	result;
+
+	memset(&result, 0, sizeof(AGENT_RESULT));
+	process(key, PROCESS_TEST, &result);
+	if(result.type & AR_DOUBLE)
+	{
+		printf(" [d|" ZBX_FS_DBL "]", result.dbl);
+	}
+	if(result.type & AR_UINT64)
+	{
+		printf(" [u|" ZBX_FS_UI64 "]", result.ui64);
+	}
+	if(result.type & AR_STRING)
+	{
+		printf(" [s|%s]", result.str);
+	}
+	if(result.type & AR_MESSAGE)
+	{
+		printf(" [m|%s]", result.msg);
+	}
+
+	free_result(&result);
+	printf("\n");
+
+	fflush(stdout);
+}
+
 void	test_parameters(void)
 {
 	int	i;
@@ -315,7 +344,7 @@ void	test_parameters(void)
 	
 	for(i=0; 0 != commands[i].key; i++)
 	{
-		process(commands[i].key, PF_TEST, &result);
+		process(commands[i].key, PROCESS_TEST | PROCESS_USE_TEST_PARAM, &result);
 		if(result.type & AR_DOUBLE)
 		{
 			printf(" [d|" ZBX_FS_DBL "]", result.dbl);
@@ -443,7 +472,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 		
 		if(commands[i].flags & CF_USEUPARAM)
 		{
-			if(flags & PF_TEST && commands[i].test_param)
+			if((flags & PROCESS_TEST) && (flags & PROCESS_USE_TEST_PARAM) && commands[i].test_param)
 			{
 				strncpy(usr_param, commands[i].test_param, MAX_STRING_LEN);
 			}
@@ -481,7 +510,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 		err = NOTSUPPORTED;
 	}
 	
-	if(flags & PF_TEST)
+	if(flags & PROCESS_TEST)
 	{
 		printf("%s", usr_cmd);
 		if(commands[i].flags & CF_USEUPARAM)
@@ -491,10 +520,10 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 		} else	i = 0;
 		i += strlen(usr_cmd);
 		
-#define COLUMN_2_X 45
+#define COLUMN_2_X 45 // max of spaces count
 		i = i > COLUMN_2_X ? 1 : (COLUMN_2_X - i);
 	
-		printf("%-*.*s", i, i, " ");
+		printf("%-*.*s", i, i, " "); // print spaces
 	}
 
 	if(err == NOTSUPPORTED)

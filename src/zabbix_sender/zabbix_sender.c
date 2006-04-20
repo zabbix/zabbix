@@ -39,6 +39,18 @@
 
 #include "common.h"
 
+char *progname = NULL;
+char title_message[] = "ZABBIX send";
+char usage_message[] = "[<Zabbix server> <port> <server> <key> <value>]";
+char *help_message[] = {
+	"",
+	"  If no arguments are given, zabbix_sender expects list of parameters",
+	"  from standard input.",
+	"",
+        0 /* end of text */
+};
+
+
 void    signal_handler( int sig )
 {
 	if( SIGALRM == sig )
@@ -155,6 +167,8 @@ int main(int argc, char **argv)
 	char	value[MAX_STRING_LEN];
 	char	*s;
 
+	progname = argv[0];
+
 	signal( SIGINT,  signal_handler );
 	signal( SIGQUIT, signal_handler );
 	signal( SIGTERM, signal_handler );
@@ -194,10 +208,7 @@ int main(int argc, char **argv)
 	}
 	else
 	{
-		printf("Usage: zabbix_sender <Zabbix server> <port> <server> <key> <value>\n");
-		printf("If no arguments are given, zabbix_sender expects list of parameters\n");
-		printf("from standard input.\n");
-		
+		help();
 		ret = FAIL;
 	}
 

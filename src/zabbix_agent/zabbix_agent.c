@@ -26,6 +26,20 @@
 #include "security.h"
 #include "zabbix_agent.h"
 
+char *progname = NULL;
+char title_message[] = "ZABBIX Agent";
+char usage_message[] = "[-vhp] [-c file] [-t metric]";
+char *help_message[] = {
+	"Options:",
+	"  -c file     Specify configuration file",
+	"  -h          give this help",
+	"  -v          display version number",
+	"  -p          print supported metrics and exit",
+	"  -t          test specified metric and exit",
+	0 /* end of text */
+};
+
+char	*CONFIG_FILE			= NULL;
 static	char	*CONFIG_HOSTS_ALLOWED	= NULL;
 static	int	CONFIG_TIMEOUT		= AGENT_TIMEOUT;
 int		CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
@@ -70,28 +84,56 @@ void    init_config(void)
 		{0}
 	};
 
-	parse_cfg_file("/etc/zabbix/zabbix_agent.conf",cfg);
+	if(CONFIG_FILE == NULL)
+	{
+		CONFIG_FILE = strdup("/etc/zabbix/zabbix_agentd.conf");
+	}
+	
+	parse_cfg_file(CONFIG_FILE,cfg);
 }
 
-int	main()
+int	main(int argc, char **argv)
 {
-	char	s[MAX_STRING_LEN];
-	char	value[MAX_STRING_LEN];
+	char		s[MAX_STRING_LEN];
+	char		value[MAX_STRING_LEN];
+	int             ch;
+	int		task = ZBX_TASK_START;
+	char		*TEST_METRIC = NULL;
 	AGENT_RESULT	result;
-	
+
 	memset(&result, 0, sizeof(AGENT_RESULT));
 
-#ifdef	TEST_PARAMETERS
-	init_metrics();
-/*	init_config();*/
-	test_parameters();
-	return	SUCCEED;
-#endif
+	progname = argv[0];
 
-	signal( SIGINT,  signal_handler );
-	signal( SIGQUIT, signal_handler );
-	signal( SIGTERM, signal_handler );
-	signal( SIGALRM, signal_handler );
+/* Parse the command-line. */
+	while ((ch = getopt(argc, argv, "c:hvpt:")) != EOF)
+		switch ((char) ch) {
+		case 'c':
+			CONFIG_FILE = optarg;
+			break;
+		case 'h':
+			help();
+			exit(-1);
+			break;
+		case 'v':
+			version();
+			exit(-1);
+			break;
+		case 'p':
+			if(task == ZBX_TASK_START)
+				task = ZBX_TASK_PRINT_SUPPORTED;
+			break;
+		case 't':
+			if(task == ZBX_TASK_START)
+			{
+				task = ZBX_TASK_TEST_METRIC;
+				TEST_METRIC = optarg;
+			}
+			break;
+		default:
+			task = ZBX_TASK_SHOW_USAGE;
+			break;
+	}
 
 /* Must be before init_config() */
 	init_metrics();
@@ -99,6 +141,27 @@ int	main()
 
 /* Do not create debug files */
 	zabbix_open_log(LOG_TYPE_SYSLOG,LOG_LEVEL_EMPTY,NULL);
+
+        switch(task)
+        {
+                case ZBX_TASK_PRINT_SUPPORTED:
+                        test_parameters();
+                        exit(-1);
+                        break;
+                case ZBX_TASK_TEST_METRIC:
+                        test_parameter(TEST_METRIC);
+                        exit(-1);
+                        break;
+                case ZBX_TASK_SHOW_USAGE:
+                        usage();
+                        exit(-1);
+                        break;
+        }
+
+	signal( SIGINT,  signal_handler );
+	signal( SIGQUIT, signal_handler );
+	signal( SIGTERM, signal_handler );
+	signal( SIGALRM, signal_handler );
 
 	alarm(CONFIG_TIMEOUT);
 
