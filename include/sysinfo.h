@@ -44,13 +44,15 @@ ZBX_METRIC
 
 /* flags for process */
 
-#define PF_TEST	1
+#define PROCESS_TEST		1
+#define PROCESS_USE_TEST_PARAM	2
 
 int	process(const char *in_command, unsigned flags, AGENT_RESULT *result);
 void	init_metrics();
 
 void    add_user_parameter(char *key,char *command);
 void	test_parameters(void);
+void	test_parameter(char* key);
 
 int     check_ntp(char *host, int port, int *value_int);
 
