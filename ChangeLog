@@ -1,6 +1,7 @@
 Changes for 1.1beta9:
 
- - parameter SatrtSuckers renamed to StartPollers (Alexei)
+ - fixed agregate functions to work with uint data type (Alexei)
+ - parameter StartSuckers renamed to StartPollers (Alexei)
  - dropped support of experimental parameter NoTimeWait (Alexei)
  - removed unused escalator (Alexei)
  - removed escalation tables (Alexei)

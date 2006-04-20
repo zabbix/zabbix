@@ -177,7 +177,7 @@ static int evaluate_COUNT(char *value, DB_ITEM *item, int parameter)
 	int		now;
 	int		res = SUCCEED;
 
-	if(item->value_type != ITEM_VALUE_TYPE_FLOAT)
+	if( (item->value_type != ITEM_VALUE_TYPE_FLOAT) && (item->value_type != ITEM_VALUE_TYPE_UINT64))
 	{
 		return	FAIL;
 	}
@@ -228,7 +228,7 @@ static int evaluate_SUM(char *value, DB_ITEM *item, int parameter, int flag)
 	int		i;
 	double		sum=0;
 
-	if(item->value_type != ITEM_VALUE_TYPE_FLOAT)
+	if( (item->value_type != ITEM_VALUE_TYPE_FLOAT) && (item->value_type != ITEM_VALUE_TYPE_UINT64))
 	{
 		return	FAIL;
 	}
@@ -387,7 +387,7 @@ static int evaluate_MIN(char *value,DB_ITEM	*item,int parameter, int flag)
 	double		min=0;
 	double		f;
 
-	if(item->value_type != ITEM_VALUE_TYPE_FLOAT)
+	if( (item->value_type != ITEM_VALUE_TYPE_FLOAT) && (item->value_type != ITEM_VALUE_TYPE_UINT64))
 	{
 		return	FAIL;
 	}
@@ -468,7 +468,7 @@ static int evaluate_MAX(char *value,DB_ITEM *item,int parameter,int flag)
 	double		f;
 	double		max;
 
-	if(item->value_type != ITEM_VALUE_TYPE_FLOAT)
+	if( (item->value_type != ITEM_VALUE_TYPE_FLOAT) && (item->value_type != ITEM_VALUE_TYPE_UINT64))
 	{
 		return	FAIL;
 	}
@@ -689,7 +689,7 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 		}
 		else
 		{
-			if(item->value_type==ITEM_VALUE_TYPE_FLOAT)
+			if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) || (item->value_type==ITEM_VALUE_TYPE_UINT64))
 			{
 				zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 1");
 				snprintf(value,MAX_STRING_LEN-1,"%f",item->lastvalue);
@@ -713,7 +713,7 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 		}
 		else
 		{
-			if(item->value_type==ITEM_VALUE_TYPE_FLOAT)
+			if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) || (item->value_type==ITEM_VALUE_TYPE_UINT64))
 			{
 				snprintf(value,MAX_STRING_LEN-1,"%f",item->prevvalue);
 				del_zeroes(value);
@@ -796,7 +796,7 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 		}
 		else
 		{
-			if(item->value_type==ITEM_VALUE_TYPE_FLOAT)
+			if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) || (item->value_type==ITEM_VALUE_TYPE_UINT64))
 			{
 				snprintf(value,MAX_STRING_LEN-1,"%f",(float)abs(item->lastvalue-item->prevvalue));
 				del_zeroes(value);
@@ -849,7 +849,7 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 		}
 		else
 		{
-			if(item->value_type==ITEM_VALUE_TYPE_FLOAT)
+			if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) || (item->value_type==ITEM_VALUE_TYPE_UINT64))
 			{
 				if(cmp_double(item->lastvalue, item->prevvalue) == 0)
 				{
