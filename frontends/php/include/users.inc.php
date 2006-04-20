@@ -140,7 +140,7 @@
 		return	$result;
 	}
 
-	function	add_user_group($name,$users)
+	function	add_user_group($name,$users=array())
 	{
 		if(!check_right("Host","A",0))
 		{
@@ -175,7 +175,7 @@
 		return $result;
 	}
 
-	function	update_user_group($usrgrpid,$name,$users)
+	function	update_user_group($usrgrpid,$name,$users=array())
 	{
 		if(!check_right("Host","U",0))
 		{
@@ -216,7 +216,7 @@
 		return DBexecute($sql);
 	}
 
-	function	update_user_groups($usrgrpid,$users)
+	function	update_user_groups($usrgrpid,$users=array())
 	{
 		$count=count($users);
 

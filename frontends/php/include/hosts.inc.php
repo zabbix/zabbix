@@ -88,7 +88,7 @@
 		}
 	}
 
-	function	add_host_group($name,$hosts)
+	function	add_host_group($name,$hosts=array())
 	{
 //		if(!check_right("Host","A",0))
 //		{
