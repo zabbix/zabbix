@@ -33,6 +33,9 @@ define("GROUP_RIGHT",		0);
 		global	$_COOKIE;
 		global	$_REQUEST;
 
+		$USER_DETAILS = array("alias"=>"- uncnown -","userid"=>0);
+		$USER_RIGHTS = array();
+
 		if(isset($_COOKIE["sessionid"]))	$sessionid = $_COOKIE["sessionid"];
 		else					unset($sessionid);
 
@@ -84,8 +87,9 @@ define("GROUP_RIGHT",		0);
 		if($page["file"]!="index.php")
 		{
 			echo "<meta http-equiv=\"refresh\" content=\"0; url=index.php\">";
+			exit;
 		}
-		show_header("Login",0,1,1);
+		show_header("Login",0,0,1);
 		show_error_message("Login name or password is incorrect");
 		insert_login_form();
 		show_page_footer();
