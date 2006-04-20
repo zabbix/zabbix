@@ -1,5 +1,7 @@
 Changes for 1.1beta9:
 
+ - do not display disabled triggers and items in overview screens (Eugene)
+ - vertical hostnames in overview screens (Eugene)
  - disabling/enabling template items (Eugene)
  - fixed agregate functions to work with uint data type (Alexei)
  - parameter StartSuckers renamed to StartPollers (Alexei)
