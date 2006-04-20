@@ -3,6 +3,34 @@
 #include <string.h>
 #include <stdlib.h>
 
+/******************************************************************************
+ *                                                                            *
+ * Function: find_char                                                        *
+ *                                                                            *
+ * Purpose: locate a character in the string                                  *
+ *                                                                            *
+ * Parameters: str - string                                                   *
+ *             c - character to find                                          *
+ *                                                                            *
+ * Return value:  position of the character                                   *
+ *                FAIL - otherwise                                            *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	find_char(char *str,char c)
+{
+	int i;
+
+	for(i=0;str[i]!=0;i++)
+	{
+		if(str[i]==c) return i;
+	}
+	return	FAIL;
+}
+
 /* Has to be rewritten to avoi malloc */
 char *string_replace(char *str, const char *sub_str1, const char *sub_str2)
 {

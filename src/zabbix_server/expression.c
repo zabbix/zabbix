@@ -105,36 +105,6 @@ void	delete_spaces(char *c)
 
 /******************************************************************************
  *                                                                            *
- * Function: find_char                                                        *
- *                                                                            *
- * Purpose: locate a character in the string                                  *
- *                                                                            *
- * Parameters: str - string                                                   *
- *             c - character to find                                          *
- *                                                                            *
- * Return value:  position of the character                                   *
- *                FAIL - otherwise                                            *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-int	find_char(char *str,char c)
-{
-	int i;
-
-	zabbix_log( LOG_LEVEL_DEBUG, "Before find_char:%s[%c]", str, c );
-
-	for(i=0;str[i]!=0;i++)
-	{
-		if(str[i]==c) return i;
-	}
-	return	FAIL;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: evaluate_simple                                                  *
  *                                                                            *
  * Purpose: evaluate simple expression                                        *
