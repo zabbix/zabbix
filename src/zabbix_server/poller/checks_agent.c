@@ -85,7 +85,7 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 	servaddr_in.sin_port=htons(item->port);
 
 	s=socket(AF_INET,SOCK_STREAM,0);
-
+/*
 	if(CONFIG_NOTIMEWAIT == 1)
 	{
 		ling.l_onoff=1;
@@ -94,7 +94,7 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Cannot setsockopt SO_LINGER [%s]", strerror(errno));
 		}
-	}
+	}*/
 	if(s == -1)
 	{
 		snprintf(error,MAX_STRING_LEN-1,"Cannot create socket [%s]", strerror(errno));
