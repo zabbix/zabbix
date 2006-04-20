@@ -65,14 +65,14 @@ pid_t	*pids=NULL;
 
 int	server_num=0;
 
-int	CONFIG_SUCKERD_FORKS		=SUCKER_FORKS;
+int	CONFIG_POLLER_FORKS		= POLLER_FORKS;
 /* For trapper */
 int	CONFIG_TRAPPERD_FORKS		= TRAPPERD_FORKS;
 int	CONFIG_LISTEN_PORT		= 10051;
 int	CONFIG_TRAPPER_TIMEOUT		= TRAPPER_TIMEOUT;
 /**/
 /*int	CONFIG_NOTIMEWAIT		=0;*/
-int	CONFIG_TIMEOUT			=SUCKER_TIMEOUT;
+int	CONFIG_TIMEOUT			= POLLER_TIMEOUT;
 int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
 int	CONFIG_SENDER_FREQUENCY		= 30;
 int	CONFIG_PINGER_FREQUENCY		= 60;
@@ -119,7 +119,7 @@ void	uninit(void)
 	{
 		if(pids != NULL)
 		{
-			for(i=0;i<CONFIG_SUCKERD_FORKS+CONFIG_TRAPPERD_FORKS-1;i++)
+			for(i=0;i<CONFIG_POLLER_FORKS+CONFIG_TRAPPERD_FORKS-1;i++)
 			{
 				if(kill(pids[i],SIGTERM) !=0 )
 				{
@@ -312,7 +312,7 @@ void	init_config(void)
 	static struct cfg_line cfg[]=
 	{
 /*		 PARAMETER	,VAR	,FUNC,	TYPE(0i,1s),MANDATORY,MIN,MAX	*/
-		{"StartSuckers",&CONFIG_SUCKERD_FORKS,0,TYPE_INT,PARM_OPT,6,255},
+		{"StartPollers",&CONFIG_POLLER_FORKS,0,TYPE_INT,PARM_OPT,6,255},
 		{"HousekeepingFrequency",&CONFIG_HOUSEKEEPING_FREQUENCY,0,TYPE_INT,PARM_OPT,1,24},
 		{"SenderFrequency",&CONFIG_SENDER_FREQUENCY,0,TYPE_INT,PARM_OPT,5,3600},
 		{"PingerFrequency",&CONFIG_PINGER_FREQUENCY,0,TYPE_INT,PARM_OPT,1,3600},
@@ -581,9 +581,9 @@ int main(int argc, char **argv)
 	return 0;
 #endif
 	DBclose();
-	pids=calloc(CONFIG_SUCKERD_FORKS+CONFIG_TRAPPERD_FORKS-1,sizeof(pid_t));
+	pids=calloc(CONFIG_POLLER_FORKS+CONFIG_TRAPPERD_FORKS-1,sizeof(pid_t));
 
-	for(i=1;i<CONFIG_SUCKERD_FORKS;i++)
+	for(i=1;i<CONFIG_POLLER_FORKS;i++)
 	{
 		if((pid = fork()) == 0)
 		{
@@ -610,7 +610,7 @@ int main(int argc, char **argv)
 
 		listenfd = tcp_listen(host,CONFIG_LISTEN_PORT,&addrlen);
 
-		for(i = CONFIG_SUCKERD_FORKS; i< CONFIG_SUCKERD_FORKS+CONFIG_TRAPPERD_FORKS; i++)
+		for(i = CONFIG_POLLER_FORKS; i< CONFIG_POLLER_FORKS+CONFIG_TRAPPERD_FORKS; i++)
 		{
 			pids[i-1] = child_trapper_make(i, listenfd, addrlen);
 		}
@@ -618,7 +618,7 @@ int main(int argc, char **argv)
 /* First instance of zabbix_server performs housekeeping procedures */
 		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Housekeeper]",server_num);
 
-		for(i=0;i<CONFIG_SUCKERD_FORKS+CONFIG_TRAPPERD_FORKS-1;i++)
+		for(i=0;i<CONFIG_POLLER_FORKS+CONFIG_TRAPPERD_FORKS-1;i++)
 		{
 				zabbix_log( LOG_LEVEL_DEBUG, "%d. PID=[%d]", i, pids[i]);
 		}

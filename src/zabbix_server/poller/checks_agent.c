@@ -50,7 +50,7 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 
 	struct sockaddr_in servaddr_in;
 
-	struct linger ling;
+/*	struct linger ling;*/
 
 	init_result(result);
 
