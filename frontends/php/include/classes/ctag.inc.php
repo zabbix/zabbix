@@ -194,7 +194,9 @@
 		{
 			if(is_null($item))	return;
 			elseif(is_object($item))$item->Show();
-			else			echo strval($item);
+			elseif(is_array($item)) {
+				foreach($item as $i)	$this->ShowTagItem($i); // Attention, recursion !!!
+			} else			echo strval($item);
 		}
 		function ShowTagBody()
 		{
