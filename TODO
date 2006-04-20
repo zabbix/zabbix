@@ -1,6 +1,5 @@
 1.1beta9:
 
- - fix bulkloader
  - item key popup, trigger expression builder
  - remember different default values in different forms
  - autodiscovery: http://www.zabbix.com/forum/showthread.php?t=2137
