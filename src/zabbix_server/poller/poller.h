@@ -24,7 +24,7 @@ extern	void	signal_handler(int);
 extern  int     server_num;
 
 extern  int     CONFIG_TIMEOUT;
-extern  int     CONFIG_SUCKERD_FORKS;
+extern  int     CONFIG_POLLER_FORKS;
 extern  int     CONFIG_REFRESH_UNSUPPORTED;
 extern  int     CONFIG_UNAVAILABLE_PERIOD;
 
