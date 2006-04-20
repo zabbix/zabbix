@@ -98,6 +98,7 @@
 
 #define	ZBX_FS_DBL	"%f"
 
+#define	ZABBIX_REVDATE	"19 Apr 2006"
 #define	ZABBIX_VERSION	"1.1beta8"
 
 #define MAX_LOG_FILE_LEN (1024*1024)
@@ -363,6 +364,23 @@ AGENT_RESULT {
 	{ \
 	(res)->type &= ~AR_MESSAGE; \
 	}
+
+extern char *progname;
+extern char title_message[];
+extern char usage_message[];
+extern char *help_message[];
+
+void	help();
+void	usage();
+void	version();
+
+#define ZBX_TASK_START           0
+#define ZBX_TASK_SHOW_HELP       1
+#define ZBX_TASK_SHOW_VERSION    2
+#define ZBX_TASK_PRINT_SUPPORTED 3
+#define ZBX_TASK_TEST_METRIC     4
+#define ZBX_TASK_SHOW_USAGE      5
+
 
 void   	init_result(AGENT_RESULT *result);
 int    	copy_result(AGENT_RESULT *src, AGENT_RESULT *dist);

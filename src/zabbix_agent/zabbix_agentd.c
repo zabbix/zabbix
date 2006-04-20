@@ -61,10 +61,25 @@
 
 #define	LISTENQ 1024
 
+
+char *progname = NULL;
+char title_message[] = "ZABBIX Agent (daemon)";
+char usage_message[] = "[-vhp] [-c file] [-t metric]";
+char *help_message[] = {
+	"Options:",
+	"  -c file     Specify configuration file",
+	"  -h          give this help",
+	"  -v          display version number",
+	"  -p          print supported metrics and exit",
+	"  -t          test specified metric and exit",
+	0 /* end of text */
+};
+
 static	pid_t	*pids=NULL;
 int	parent=0;
 /* Number of processed requests */
 int	stats_request=0;
+
 
 char	*CONFIG_HOSTS_ALLOWED		= NULL;
 char	*CONFIG_HOSTNAME		= NULL;
@@ -219,17 +234,6 @@ int     add_parameter(char *value)
 	return  SUCCEED;
 }
 
-void usage(char *prog)
-{
-	printf("zabbix_agentd - ZABBIX agent (daemon) v1.1\n");
-	printf("Usage: %s [-h] [-c <file>] [-p]\n", prog);
-	printf("\nOptions:\n");
-	printf("  -c <file>   Specify configuration file\n");
-	printf("  -p          Print supported metrics and exit\n");
-	printf("  -h          Help\n");
-	exit(-1);
-}
-
 void    init_config(void)
 {
 	struct cfg_line cfg[]=
@@ -259,7 +263,7 @@ void    init_config(void)
 	
 	if(CONFIG_FILE == NULL)
 	{
-		CONFIG_FILE=strdup("/etc/zabbix/zabbix_agentd.conf");
+		CONFIG_FILE = strdup("/etc/zabbix/zabbix_agentd.conf");
 	}
 
 	parse_cfg_file(CONFIG_FILE,cfg);
@@ -466,10 +470,6 @@ pid_t	child_passive_make(int i,int listenfd, int addrlen)
 	return 0;
 }
 
-#define ZBX_START_DAEMON	0
-#define ZBX_USAGE 		1
-#define ZBX_SUPPORTED 		2
-
 int	main(int argc, char **argv)
 {
 	int		listenfd;
@@ -479,24 +479,40 @@ int	main(int argc, char **argv)
 	char		host[128];
 	int		ch;
 	char		*s;
-	int		task = ZBX_START_DAEMON;
+	int		task = ZBX_TASK_START;
+	char		*TEST_METRIC = NULL;
 
         static struct  sigaction phan;
 
+	progname = argv[0];
+
 /* Parse the command-line. */
-	while ((ch = getopt(argc, argv, "c:hp")) != EOF)
+	while ((ch = getopt(argc, argv, "c:hvpt:")) != EOF)
 		switch ((char) ch) {
 		case 'c':
 			CONFIG_FILE = optarg;
 			break;
 		case 'h':
-			task = ZBX_USAGE;
+			help();
+			exit(-1);
+			break;
+		case 'v':
+			version();
+			exit(-1);
 			break;
 		case 'p':
-			task = ZBX_SUPPORTED;
+			if(task == ZBX_TASK_START)
+				task = ZBX_TASK_PRINT_SUPPORTED;
+			break;
+		case 't':
+			if(task == ZBX_TASK_START) 
+			{
+				task = ZBX_TASK_TEST_METRIC;
+				TEST_METRIC = optarg;
+			}
 			break;
 		default:
-			task = ZBX_USAGE;
+			task = ZBX_TASK_SHOW_USAGE;
 			break;
 	}
 
@@ -513,12 +529,17 @@ int	main(int argc, char **argv)
 	
 	switch(task)
 	{
-		case ZBX_SUPPORTED:
+		case ZBX_TASK_PRINT_SUPPORTED:
 			test_parameters();
 			exit(-1);
 			break;
-		case ZBX_USAGE:
-			usage(argv[0]);
+		case ZBX_TASK_TEST_METRIC:
+			test_parameter(TEST_METRIC);
+			exit(-1);
+			break;
+		case ZBX_TASK_SHOW_USAGE:
+			usage();
+			exit(-1);
 			break;
 	}
 	

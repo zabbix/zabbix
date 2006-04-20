@@ -3,6 +3,80 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "common.h"
+
+/******************************************************************************
+ *                                                                            *
+ * Function: app_title                                                        *
+ *                                                                            *
+ * Purpose: print title of application on stdout                              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:  title_message - is global variable which must be initialized    *
+ *                            in each zabbix application                      *
+ *                                                                            *
+ ******************************************************************************/
+static void app_title()
+{
+	printf("%s v%s (%s)\n", title_message, ZABBIX_VERSION, ZABBIX_REVDATE);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: version                                                          *
+ *                                                                            *
+ * Purpose: print version and compilation time of application on stdout       *
+ *          by application request with parameter '-v'                        *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ ******************************************************************************/
+void version()
+{
+	app_title();
+	printf("Compilation time:  %s %s\n", __DATE__, __TIME__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: usage                                                            *
+ *                                                                            *
+ * Purpose: print applicatin parameters on stdout                             *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:  usage_message - is global variable which must be initialized    *
+ *                            in each zabbix application                      *
+ *                                                                            *
+ ******************************************************************************/
+void usage()
+{
+	printf("usage: %s %s\n", progname, usage_message);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: help                                                             *
+ *                                                                            *
+ * Purpose: print help of applicatin parameters on stdout by application      *
+ *          request with parameter '-h'                                       *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:  help_message - is global variable which must be initialized     *
+ *                            in each zabbix application                      *
+ *                                                                            *
+ ******************************************************************************/
+void help()
+{
+	char **p = help_message;
+	
+	app_title();
+	usage();
+	while (*p) printf("%s\n", *p++);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: find_char                                                        *
@@ -10,26 +84,25 @@
  * Purpose: locate a character in the string                                  *
  *                                                                            *
  * Parameters: str - string                                                   *
- *             c - character to find                                          *
+ *             c   - character to find                                        *
  *                                                                            *
  * Return value:  position of the character                                   *
  *                FAIL - otherwise                                            *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments:                                                                  *
+ * Comments: !!! beter use system functions like 'strchr' !!!                  *
  *                                                                            *
  ******************************************************************************/
 int	find_char(char *str,char c)
 {
-	int i;
+	char *p;
+	for(p = str; *p; p++) 
+		if(*p == c) return (p - str);
 
-	for(i=0;str[i]!=0;i++)
-	{
-		if(str[i]==c) return i;
-	}
 	return	FAIL;
 }
+
 
 /* Has to be rewritten to avoi malloc */
 char *string_replace(char *str, const char *sub_str1, const char *sub_str2)
@@ -121,6 +194,25 @@ void del_zeroes(char *s)
 }
 
 
+/******************************************************************************
+ *                                                                            *
+ * Function: get_param                                                        *
+ *                                                                            *
+ * Purpose: return parameter by index (num) from parameter list (param)       *
+ *                                                                            *
+ * Parameters:                                                                *
+ * 	param  - parameter list                                               *
+ *      num    - requested parameter index                                    *
+ *      buf    - pointer og output buffer                                     *
+ *      maxlem - size of output buffer                                        *
+ *                                                                            *
+ * Return value: 1 - on error                                                 *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:  delimeter vor parameters is ','                                 *
+ *                                                                            *
+ ******************************************************************************/
 int	get_param(const char *param, int num, char *buf, int maxlen)
 {
 	char	tmp[MAX_STRING_LEN];
@@ -142,7 +234,7 @@ int	get_param(const char *param, int num, char *buf, int maxlen)
 			{
 				tmp[i]='\0';
 				strncpy(buf, s, maxlen);
-				tmp[i]=',';
+				tmp[i]=','; // restore source string
 				ret = 0;
 				break;
 				
@@ -164,32 +256,22 @@ int	get_param(const char *param, int num, char *buf, int maxlen)
 	return ret;
 }
 
-/*
-int	get_param(const char *param, int num, char *buf, int maxlen)
-{
-	char	tmp[MAX_STRING_LEN];
-	char	*s;
-	int	ret = 1;
-	int	i=0;
-
-	strscpy(tmp,param);
-	s=(char *)strtok(tmp,",");
-	while(s!=NULL)
-	{
-		i++;
-		if(i == num)
-		{
-			strncpy(buf,s,maxlen);
-			ret = 0;
-			break;
-		}
-		s=(char *)strtok(NULL,",");
-	}
-
-	return ret;
-}
-*/
-
+/******************************************************************************
+ *                                                                            *
+ * Function: num_param                                                        *
+ *                                                                            *
+ * Purpose: calculate count of parameters from parameter list (param)         *
+ *                                                                            *
+ * Parameters:                                                                *
+ * 	param  - parameter list                                               *
+ *                                                                            *
+ * Return value: count of parameters                                          *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:  delimeter vor parameters is ','                                 *
+ *                                                                            *
+ ******************************************************************************/
 int	num_param(const char *param)
 {
 	int	i;

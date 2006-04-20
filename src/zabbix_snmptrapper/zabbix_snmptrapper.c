@@ -41,6 +41,17 @@
 #include "log.h"
 #include "cfg.h"
 
+char *progname = NULL;
+char title_message[] = "ZABBIX SNMP trapper";
+char usage_message[] = "[<Zabbix server> <port> <server:key> <value>]";
+char *help_message[] = {
+	"",
+	"  If no arguments are given, zabbix_sender expects list of parameters",
+	"  from standard input.",
+	"",
+        0 /* end of text */
+};
+
 int     CONFIG_SUCKERD_FORKS            =SUCKER_FORKS;
 int     CONFIG_NOTIMEWAIT               =0;
 int     CONFIG_TIMEOUT                  =SUCKER_TIMEOUT;
@@ -216,6 +227,8 @@ int main(int argc, char **argv)
 	printf("The binary is no ready yet! To be available in Zabbix 1.0beta11.\n");
 	exit(-1);
 
+	progname = argv[0];
+
 	signal( SIGINT,  signal_handler );
 	signal( SIGQUIT, signal_handler );
 	signal( SIGTERM, signal_handler );
@@ -268,11 +281,7 @@ int main(int argc, char **argv)
 /* No parameters are given */	
 	else
 	{
-		printf("Number of parameters given [%d], expected [7]\n", argc);
-		printf("Usage: zabbix_sender <Zabbix server> <port> <server:key> <value>\n");
-		printf("If no arguments are given, zabbix_sender expects list of parameters\n");
-		printf("from standard input.\n");
-		
+		help();
 		ret = FAIL;
 	}
 

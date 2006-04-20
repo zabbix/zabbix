@@ -61,6 +61,17 @@
 
 #define       LISTENQ 1024
 
+char *progname = NULL;
+char title_message[] = "ZABBIX Server (daemon)";
+char usage_message[] = "[-hv] [-c <file>]";
+char *help_message[] = {
+        "Options:",
+        "  -c file     Specify configuration file",
+        "  -h          give this help",
+        "  -v          display version number",
+        0 /* end of text */
+};
+
 pid_t	*pids=NULL;
 
 int	server_num=0;
@@ -269,31 +280,6 @@ void	daemon_init(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: usage                                                            *
- *                                                                            *
- * Purpose: print infor about command line parameters and exit                *
- *                                                                            *
- * Parameters: prog - name of process, normally 'zabbix_server'               *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-void usage(char *prog)
-{
-	printf("zabbix_server - ZABBIX server process %s\n", ZABBIX_VERSION);
-	printf("Usage: %s [-h] [-c <file>]\n", prog);
-	printf("\nOptions:\n");
-	printf("  -c <file>   Specify configuration file. Default is /etc/zabbix/zabbix_server.conf\n");
-	printf("  -h          Help\n");
-	exit(-1);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: init_config                                                      *
  *                                                                            *
  * Purpose: parse config file and update configuration parameters             *
@@ -492,18 +478,25 @@ int main(int argc, char **argv)
 	char sql[MAX_STRING_LEN];
 	DB_RESULT	*result;
 
+	progname = argv[0];
 
 /* Parse the command-line. */
-	while ((ch = getopt(argc, argv, "c:h")) != EOF)
+	while ((ch = getopt(argc, argv, "c:hv")) != EOF)
 	switch ((char) ch) {
 		case 'c':
 			CONFIG_FILE = optarg;
 			break;
 		case 'h':
-			usage(argv[0]);
+			help();
+			exit(-1);
+			break;
+		case 'v':
+			version();
+			exit(-1);
 			break;
 		default:
-			usage(argv[0]);
+			usage();
+			exit(-1);
 			break;
         }
 
