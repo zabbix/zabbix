@@ -1,5 +1,6 @@
 Changes for 1.1beta9:
 
+ - dropped support of experimental parameter NoTimeWait (Alexei)
  - removed unused escalator (Alexei)
  - removed escalation tables (Alexei)
  - fix compilation if no function atoll() (Alexei)

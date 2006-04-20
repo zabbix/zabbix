@@ -72,7 +72,7 @@ char	*CONFIG_FILE			= NULL;
 char	*CONFIG_PID_FILE		= NULL;
 char	*CONFIG_LOG_FILE		= NULL;
 int	CONFIG_AGENTD_FORKS		= AGENTD_FORKS;
-int	CONFIG_NOTIMEWAIT		= 0;
+/*int	CONFIG_NOTIMEWAIT		= 0;*/
 int	CONFIG_DISABLE_ACTIVE		= 0;
 int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
 int	CONFIG_TIMEOUT			= AGENT_TIMEOUT;
@@ -244,7 +244,7 @@ void    init_config(void)
 		{"DisableActive",&CONFIG_DISABLE_ACTIVE,0,TYPE_INT,PARM_OPT,0,1},
 		{"EnableRemoteCommands",&CONFIG_ENABLE_REMOTE_COMMANDS,0,TYPE_INT,PARM_OPT,0,1},
 		{"Timeout",&CONFIG_TIMEOUT,0,TYPE_INT,PARM_OPT,1,30},
-		{"NoTimeWait",&CONFIG_NOTIMEWAIT,0,TYPE_INT,PARM_OPT,0,1},
+/*		{"NoTimeWait",&CONFIG_NOTIMEWAIT,0,TYPE_INT,PARM_OPT,0,1},*/
 		{"ListenPort",&CONFIG_LISTEN_PORT,0,TYPE_INT,PARM_OPT,1024,32767},
 		{"ServerPort",&CONFIG_SERVER_PORT,0,TYPE_INT,PARM_OPT,1024,32767},
 		{"ListenIP",&CONFIG_LISTEN_IP,0,TYPE_STRING,PARM_OPT,0,0},
@@ -374,7 +374,7 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
 	int			sockfd;
 	struct sockaddr_in	serv_addr;
 
-	struct linger ling;
+/*	struct linger ling;*/
 
 	if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 	{
@@ -382,6 +382,7 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
 		exit(1);
 	}
 
+	/*
 	if(CONFIG_NOTIMEWAIT == 1)
 	{
 		ling.l_onoff=1;
@@ -390,7 +391,7 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Cannot setsockopt SO_LINGER [%s]", strerror(errno));
 		}
-	}
+	}*/
 
 
 	bzero((char *) &serv_addr, sizeof(serv_addr));

@@ -71,7 +71,7 @@ int	CONFIG_TRAPPERD_FORKS		= TRAPPERD_FORKS;
 int	CONFIG_LISTEN_PORT		= 10051;
 int	CONFIG_TRAPPER_TIMEOUT		= TRAPPER_TIMEOUT;
 /**/
-int	CONFIG_NOTIMEWAIT		=0;
+/*int	CONFIG_NOTIMEWAIT		=0;*/
 int	CONFIG_TIMEOUT			=SUCKER_TIMEOUT;
 int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
 int	CONFIG_SENDER_FREQUENCY		= 30;
@@ -322,7 +322,7 @@ void	init_config(void)
 		{"TrapperTimeout",&CONFIG_TRAPPER_TIMEOUT,0,TYPE_INT,PARM_OPT,1,30},
 		{"UnavailablePeriod",&CONFIG_UNAVAILABLE_PERIOD,0,TYPE_INT,PARM_OPT,1,3600},
 		{"ListenPort",&CONFIG_LISTEN_PORT,0,TYPE_INT,PARM_OPT,1024,32768},
-		{"NoTimeWait",&CONFIG_NOTIMEWAIT,0,TYPE_INT,PARM_OPT,0,1},
+/*		{"NoTimeWait",&CONFIG_NOTIMEWAIT,0,TYPE_INT,PARM_OPT,0,1},*/
 		{"DisablePinger",&CONFIG_DISABLE_PINGER,0,TYPE_INT,PARM_OPT,0,1},
 		{"DisableHousekeeping",&CONFIG_DISABLE_HOUSEKEEPING,0,TYPE_INT,PARM_OPT,0,1},
 		{"DebugLevel",&CONFIG_LOG_LEVEL,0,TYPE_INT,PARM_OPT,0,4},
@@ -395,7 +395,7 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
 {
 	int	sockfd;
 	struct	sockaddr_in      serv_addr;
-	struct linger ling;
+/*	struct linger ling;*/
 
 	if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 	{
@@ -403,7 +403,7 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
 		exit(1);
 	}
 
-	if(CONFIG_NOTIMEWAIT == 1)
+/*	if(CONFIG_NOTIMEWAIT == 1)
 	{
 		ling.l_onoff=1;
 		ling.l_linger=0;
@@ -411,7 +411,7 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Cannot setsockopt SO_LINGER [%s]", strerror(errno));
 		}
-	}
+	}*/
 
 	bzero((char *) &serv_addr, sizeof(serv_addr));
 	serv_addr.sin_family      = AF_INET;
