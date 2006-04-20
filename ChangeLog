@@ -1,5 +1,6 @@
 Changes for 1.1beta9:
 
+ - added support of aggregate items (Alexei)
  - do not display disabled triggers and items in overview screens (Eugene)
  - vertical hostnames in overview screens (Eugene)
  - disabling/enabling template items (Eugene)
