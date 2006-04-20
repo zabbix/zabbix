@@ -3,14 +3,11 @@
  - fix bulkloader
  - item key popup, trigger expression builder
  - remember different default values in different forms
- - a separate poller for unreachable hosts
- - timeout-immune poller
  - autodiscovery: http://www.zabbix.com/forum/showthread.php?t=2137
  - server side checks (new type of check)
  - aggregate statistics: http://www.zabbix.com/forum/showthread.php?t=2151
 
  - apply const in function prototypes where required
- - agregate function work only float data type.
  - action code: http://www.zabbix.com/forum/showthread.php?t=2171
  - windows agent $1-$9: http://www.zabbix.com/forum/showthread.php?t=2163
  - screen period: http://www.zabbix.com/forum/showthread.php?t=2162
