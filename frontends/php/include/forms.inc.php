@@ -257,7 +257,7 @@
 
 		$frmItem->AddVar("hostid",$_REQUEST["hostid"]);
 
-		$description	= get_request("description"	,"new");
+		$description	= get_request("description"	,"");
 		$key		= get_request("key"		,"");
 		$host		= get_request("host",		NULL);
 		$delay		= get_request("delay"		,30);
@@ -340,14 +340,15 @@
 
 
 		$cmbType = new CComboBox("type",$type,"submit()");
-		$cmbType->AddItem(ITEM_TYPE_ZABBIX,'Zabbix agent');
-		$cmbType->AddItem(ITEM_TYPE_ZABBIX_ACTIVE,'Zabbix agent (active)');
-		$cmbType->AddItem(ITEM_TYPE_SIMPLE,'Simple check');
-		$cmbType->AddItem(ITEM_TYPE_SNMPV1,'SNMPv1 agent');
-		$cmbType->AddItem(ITEM_TYPE_SNMPV2C,'SNMPv2 agent');
-		$cmbType->AddItem(ITEM_TYPE_SNMPV3,'SNMPv3 agent');
-		$cmbType->AddItem(ITEM_TYPE_TRAPPER,'Zabbix trapper');
-		$cmbType->AddItem(ITEM_TYPE_INTERNAL,'Zabbix internal');
+		$cmbType->AddItem(ITEM_TYPE_ZABBIX,S_ZABBIX_AGENT);
+		$cmbType->AddItem(ITEM_TYPE_ZABBIX_ACTIVE,S_ZABBIX_AGENT_ACTIVE);
+		$cmbType->AddItem(ITEM_TYPE_SIMPLE,S_SIMPLE_CHECK);
+		$cmbType->AddItem(ITEM_TYPE_SNMPV1,S_SNMPV1_AGENT);
+		$cmbType->AddItem(ITEM_TYPE_SNMPV2C,S_SNMPV2_AGENT);
+		$cmbType->AddItem(ITEM_TYPE_SNMPV3,S_SNMPV3_AGENT);
+		$cmbType->AddItem(ITEM_TYPE_TRAPPER,S_ZABBIX_TRAPPER);
+		$cmbType->AddItem(ITEM_TYPE_INTERNAL,S_ZABBIX_INTERNAL);
+		$cmbType->AddItem(ITEM_TYPE_AGGREGATE,S_ZABBIX_AGGREGATE);
 		$frmItem->AddRow(S_TYPE, $cmbType);
 
 

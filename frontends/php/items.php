@@ -54,7 +54,7 @@
 		"delay"=>	array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,65535),'isset({save})&&{type}!=2'),
 		"history"=>	array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,65535),'isset({save})'),
 		"status"=>	array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,65535),'isset({save})'),
-		"type"=>	array(T_ZBX_INT, O_OPT,  NULL,  IN("0,1,2,3,4,5,6,7"),'isset({save})'),
+		"type"=>	array(T_ZBX_INT, O_OPT,  NULL,  IN("0,1,2,3,4,5,6,7,8"),'isset({save})'),
 		"trends"=>	array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,65535),'isset({save})'),
 		"value_type"=>	array(T_ZBX_INT, O_OPT,  NULL,  IN("0,1,2,3"),'isset({save})'),
 		"valuemapid"=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,'isset({save})'),
@@ -412,6 +412,7 @@
 			case 4:	$type = S_SNMPV2_AGENT;			break;
 			case 6:	$type = S_SNMPV3_AGENT;			break;
 			case 5:	$type = S_ZABBIX_INTERNAL;		break;
+			case 8:	$type = S_ZABBIX_AGGREGATE;		break;
 			default:$type = S_UNKNOWN;			break;
 			}
 
