@@ -159,7 +159,7 @@ static	void	send_to_user_medias(DB_TRIGGER *trigger,DB_ACTION *action, int useri
 			continue;
 		}
 
-		DBadd_alert(action->actionid,trigger->triggerid, media.mediatypeid,media.sendto,action->subject,action->message, action->maxrepeats, action->repeatdelay);
+		DBadd_alert(action->actionid,trigger->triggerid, userid, media.mediatypeid,media.sendto,action->subject,action->message, action->maxrepeats, action->repeatdelay);
 	}
 	DBfree_result(result);
 }
