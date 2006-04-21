@@ -344,7 +344,7 @@ int	DBadd_history_log(int itemid, char *value, int clock, int timestamp, char *s
 int	DBadd_history_str(int itemid, char *value, int clock);
 int	DBadd_history_uint(int itemid, zbx_uint64_t value, int clock);
 int	DBadd_service_alarm(int serviceid,int status,int clock);
-int	DBadd_alert(int actionid, int triggerid, int mediatypeid, char *sendto, char *subject, char *message, int maxrepeats, int repeatdelay);
+int	DBadd_alert(int actionid, int triggerid, int userid, int mediatypeid, char *sendto, char *subject, char *message, int maxrepeats, int repeatdelay);
 void	DBupdate_triggers_status_after_restart(void);
 int	DBget_prev_trigger_value(int triggerid);
 /*int	DBupdate_trigger_value(int triggerid,int value,int clock);*/

@@ -48,6 +48,7 @@
 #include "poller.h"
 
 #include "checks_agent.h"
+#include "checks_aggregate.h"
 #include "checks_internal.h"
 #include "checks_simple.h"
 #include "checks_snmp.h"
