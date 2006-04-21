@@ -20,6 +20,7 @@
 
 function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 
+
 ?>
 <?php
 	include_once("include/copt.lib.php");
@@ -2533,6 +2534,8 @@ COpt::profiling_start("page");
 
 	function	replace_value_by_map($value, $valuemapid)
 	{
+		if($valuemapid < 1) return $value;
+
 		$result = DBselect("select newvalue from mappings".
 			" where valuemapid=".zbx_dbstr($valuemapid)." and value=".zbx_dbstr($value));
 		if(DBnum_rows($result))
