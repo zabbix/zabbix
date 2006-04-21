@@ -46,16 +46,40 @@
 char *progname = NULL;
 char title_message[] = "ZABBIX get - Communicate with ZABBIX agent";
 char usage_message[] = "[-hv] -s<host name or IP> [-p<port number>] -k<key>";
+#ifndef HAVE_GETOPT_LONG
 char *help_message[] = {
         "Options:",
-	"  -p <port number>       Specify port number of agent running on the host. Default is 10050.",
-	"  -s <host name or IP>   Specify host name or IP address of a host.",
-	"  -k <key of metric>     Specify metric name (key) we want to retrieve.",
-	"  -h                     give this help",
-	"  -v                     display version number",
+	"  -p <port number>         Specify port number of agent running on the host. Default is 10050.",
+	"  -s <host name or IP>     Specify host name or IP address of a host.",
+	"  -k <key of metric>       Specify metric name (key) we want to retrieve.",
+	"  -h                       give this help",
+	"  -v                       display version number",
 	"",
 	"Example: zabbix_get -s127.0.0.1 -p10050 -k\"system[procload]\"",
         0 /* end of text */
+};
+#else
+char *help_message[] = {
+        "Options:",
+	"  -p --port <port number>        Specify port number of agent running on the host. Default is 10050.",
+	"  -s --host <host name or IP>    Specify host name or IP address of a host.",
+	"  -k --key <key of metric>       Specify metric name (key) we want to retrieve.",
+	"  -h --help                      give this help",
+	"  -v --version                   display version number",
+	"",
+	"Example: zabbix_get -s127.0.0.1 -p10050 -k\"system[procload]\"",
+        0 /* end of text */
+};
+#endif
+
+struct option longopts[] =
+{
+	{"port",	1,	0,	'p'},
+	{"host",	1,	0,	's'},
+	{"key",		1,	0,	'k'},
+	{"help",	0,	0,	'h'},
+	{"version",	0,	0,	'v'},
+	{0,0,0,0}
 };
 
 
@@ -208,7 +232,7 @@ int main(int argc, char **argv)
 	progname = argv[0];
 
 	/* Parse the command-line. */
-	while ((ch = getopt(argc, argv, "k:p:s:hv")) != EOF)
+	while ((ch = getopt_long(argc, argv, "k:p:s:hv", longopts, NULL)) != EOF)
 	switch ((char) ch) {
 		case 'k':
 			key = optarg;

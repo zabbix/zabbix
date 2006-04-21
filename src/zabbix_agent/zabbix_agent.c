@@ -28,15 +28,37 @@
 
 char *progname = NULL;
 char title_message[] = "ZABBIX Agent";
-char usage_message[] = "[-vhp] [-c file] [-t metric]";
+char usage_message[] = "[-vhp] [-c <file>] [-t <metric>]";
+#ifndef HAVE_GETOPT_LONG
 char *help_message[] = {
 	"Options:",
-	"  -c file     Specify configuration file",
-	"  -h          give this help",
-	"  -v          display version number",
-	"  -p          print supported metrics and exit",
-	"  -t          test specified metric and exit",
+	"  -c <file>     Specify configuration file",
+	"  -h            give this help",
+	"  -v            display version number",
+	"  -p            print supported metrics and exit",
+	"  -t <metric>   test specified metric and exit",
 	0 /* end of text */
+};
+#else
+char *help_message[] = {
+	"Options:",
+	"  -c --config <file>  Specify configuration file",
+	"  -h --help           give this help",
+	"  -v --version        display version number",
+	"  -p --print          print supported metrics and exit",
+	"  -t --test <metric>  test specified metric and exit",
+	0 /* end of text */
+};
+#endif
+
+struct option longopts[] =
+{
+	{"config",	1,	0,	'c'},
+	{"help",	0,	0,	'h'},
+	{"version",	0,	0,	'v'},
+	{"print",	0,	0,	'p'},
+	{"test",	1,	0,	't'},
+	{0,0,0,0}
 };
 
 char	*CONFIG_FILE			= NULL;
@@ -106,7 +128,7 @@ int	main(int argc, char **argv)
 	progname = argv[0];
 
 /* Parse the command-line. */
-	while ((ch = getopt(argc, argv, "c:hvpt:")) != EOF)
+	while ((ch = getopt_long(argc, argv, "c:hvpt:", longopts, NULL)) != EOF)
 		switch ((char) ch) {
 		case 'c':
 			CONFIG_FILE = optarg;
