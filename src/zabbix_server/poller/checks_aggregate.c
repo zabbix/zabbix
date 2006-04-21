@@ -45,6 +45,16 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
 	{
 		snprintf(sql,sizeof(sql)-1,"select items.itemid,items.value_type,items.lastvalue from items,hosts_groups,hosts,groups where hosts_groups.groupid=groups.groupid and items.hostid=hosts.hostid and hosts_groups.hostid=hosts.hostid and items.lastvalue is not NULL and groups.name='%s' and items.key_='%s'",hostgroup_esc, itemkey_esc);
 	}
+	else if(strcmp(itemfunc,"min") == 0)
+	{
+		snprintf(sql,sizeof(sql)-1,"select items.itemid,items.value_type,sum(items.lastvalue) from items,hosts_groups,hosts,groups where hosts_groups.groupid=groups.groupid and items.hostid=hosts.hostid and hosts_groups.hostid=hosts.hostid and items.lastvalue is not NULL and groups.name='%s' and items.key_='%s' group by 1,2",hostgroup_esc, itemkey_esc);
+	}
+	else
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "No values for group[%s] key[%s])",hostgroup,itemkey);
+		DBfree_result(result);
+		return FAIL;
+	}
 	zabbix_log( LOG_LEVEL_WARNING, "SQL [%s]",sql);
 
 	result = DBselect(sql);
