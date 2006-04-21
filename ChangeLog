@@ -1,5 +1,6 @@
 Changes for 1.1beta9:
 
+ - added column alerts.userid (Alexei)
  - slightly optimised code in evaluate_simple (Alexei)
  - added 'command line' parameter for Linux proc.mem[] (Eugene)
  - added parameter '-t key' for ZABBIX agent (Eugene)

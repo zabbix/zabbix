@@ -40,27 +40,27 @@
 int	get_value_aggregate(DB_ITEM *item, AGENT_RESULT *result)
 {
 	zbx_uint64_t	i;
-	char	error[MAX_STRING_LEN];
 	char	function_grp[MAX_STRING_LEN];
-	char	function_item[MAX_STRING_LEN];
-	char	group[MAX_STRING_LEN];
 	char	key[MAX_STRING_LEN];
-	char	parameter[MAX_STRING_LEN];
-
-	int	l;
+	char	*p;
 
 	int 	ret = SUCCEED;
 
+
+	zabbix_log( LOG_LEVEL_WARNING, "In get_value_affgregate([%s])",item->key);
+
 	init_result(result);
 
-	l=find_char(item->key,'(');
-
-	if(l == FAIL)
+	strscpy(key, item->key);
+	p=strstr(key,"(");
+	if(p!=NULL)
 	{
-		ret = NOTSUPPORTED;
+		*p=0;
+		strscpy(function_grp,key);
+		*p='(';
+		p++;
 	}
-	strscpy(function_grp, item->key);
-	function_grp[l]=0;
+	else	ret = NOTSUPPORTED;
 
 	SET_UI64_RESULT(result, 0);
 

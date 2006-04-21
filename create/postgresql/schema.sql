@@ -264,6 +264,7 @@ CREATE TABLE alerts (
   alertid		serial,
   actionid		int4		DEFAULT '0' NOT NULL,
   triggerid		int4		DEFAULT '0' NOT NULL,
+  userid		int4		DEFAULT '0' NOT NULL,
   clock			int4		DEFAULT '0' NOT NULL,
 --  type		varchar(10)	DEFAULT '' NOT NULL,
   mediatypeid		int4		DEFAULT '0' NOT NULL,
@@ -286,6 +287,7 @@ CREATE TABLE alerts (
 CREATE INDEX alerts_actionid on alerts (actionid);
 CREATE INDEX alerts_clock on alerts (clock);
 CREATE INDEX alerts_status_retires on alerts (status,retries);
+CREATE INDEX alerts_userid on alerts (userid);
 
 --
 -- Table structure for table 'alarms'

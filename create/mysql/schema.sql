@@ -177,6 +177,7 @@ CREATE TABLE alerts (
   alertid		int(4)		NOT NULL auto_increment,
   actionid		int(4)		DEFAULT '0' NOT NULL,
   triggerid		int(4)		DEFAULT '0' NOT NULL,
+  userid		int(4)		DEFAULT '0' NOT NULL,
   clock			int(4)		DEFAULT '0' NOT NULL,
 --  type		varchar(10)	DEFAULT '' NOT NULL,
   mediatypeid		int(4)		DEFAULT '0' NOT NULL,
@@ -196,7 +197,8 @@ CREATE TABLE alerts (
   KEY clock (clock),
   KEY triggerid (triggerid),
   KEY status_retries (status, retries),
-  KEY mediatypeid (mediatypeid)
+  KEY mediatypeid (mediatypeid),
+  KEY userid (userid)
 ) type=InnoDB;
 
 --
