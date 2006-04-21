@@ -27,16 +27,21 @@
 static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, char *itemkey, char *itemfunc, char *param)
 {
 	char		sql[MAX_STRING_LEN];
+	char		hostgroup_esc[MAX_STRING_LEN],itemkey_esc[MAX_STRING_LEN];
  
 	DB_RESULT	*result;
 
-	int		i;
+	int		i,valuetype;
+	double		d = 0, value;
 
 	zabbix_log( LOG_LEVEL_WARNING, "In evaluate_aggregate('%s','%s','%s','%s','%s')",grpfunc,hostgroup,itemkey,itemfunc,param);
 
+	DBescape_string(itemkey,itemkey_esc,MAX_STRING_LEN);
+	DBescape_string(hostgroup,hostgroup_esc,MAX_STRING_LEN);
+
 	if(strcmp(itemfunc,"last") == 0)
 	{
-		snprintf(sql,sizeof(sql)-1,"select items.lastvalue,items.value_type from items,hosts_groups,hosts,groups where groups.groupid=1 and hosts_groups.groupid=groups.groupid and items.hostid=hosts.hostid and hosts_groups.hostid=hosts.hostid and items.lastvalue!=NULL and groups.name='%s'",hostgroup);
+		snprintf(sql,sizeof(sql)-1,"select items.lastvalue,items.value_type from items,hosts_groups,hosts,groups where hosts_groups.groupid=groups.groupid and items.hostid=hosts.hostid and hosts_groups.hostid=hosts.hostid and items.lastvalue is not NULL and groups.name='%s' and items.key_='%s'",hostgroup_esc, itemkey_esc);
 	}
 	zabbix_log( LOG_LEVEL_WARNING, "SQL [%s]",sql);
 
@@ -44,11 +49,29 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
 	
 	for(i=0;i<DBnum_rows(result);i++)
 	{
+		valuetype = atoi(DBget_field(result,i,1));
+		if(valuetype == ITEM_VALUE_TYPE_FLOAT)
+		{
+			value = atof(DBget_field(result,i,0));
+		}
+		else if(valuetype == ITEM_VALUE_TYPE_UINT64)
+		{
+#ifdef HAVE_ATOLL
+				value = (double)atoll(DBget_field(result,i,0));
+#else
+				value = (double)atol(DBget_field(result,i,0));
+#endif
+		}
+		if(strcmp(grpfunc,"grpsum") == 0)
+		{
+			d+=value;
+		}
 		zabbix_log( LOG_LEVEL_WARNING, "Item value([%s])",DBget_field(result,i,0));
 	}
 
 	DBfree_result(result);
 
+	zabbix_log( LOG_LEVEL_WARNING, "Result([%f])",d);
 	return SUCCEED;
 }
 
