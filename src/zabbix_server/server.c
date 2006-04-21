@@ -64,13 +64,33 @@
 char *progname = NULL;
 char title_message[] = "ZABBIX Server (daemon)";
 char usage_message[] = "[-hv] [-c <file>]";
+
+#ifndef HAVE_GETOPT_LONG
 char *help_message[] = {
         "Options:",
-        "  -c file     Specify configuration file",
-        "  -h          give this help",
-        "  -v          display version number",
+        "  -c <file>       Specify configuration file",
+        "  -h              give this help",
+        "  -v              display version number",
         0 /* end of text */
 };
+#else
+char *help_message[] = {
+        "Options:",
+        "  -c --config <file>    Specify configuration file",
+        "  -h --help             give this help",
+        "  -v --version          display version number",
+        0 /* end of text */
+};
+#endif
+
+struct option longopts[] =
+{
+	{"config",	1,	0,	'c'},
+	{"help",	0,	0,	'h'},
+	{"version",	0,	0,	'v'},
+	{0,0,0,0}
+};
+
 
 pid_t	*pids=NULL;
 
@@ -481,7 +501,7 @@ int main(int argc, char **argv)
 	progname = argv[0];
 
 /* Parse the command-line. */
-	while ((ch = getopt(argc, argv, "c:hv")) != EOF)
+	while ((ch = getopt_long(argc, argv, "c:hv",longopts,NULL)) != EOF)
 	switch ((char) ch) {
 		case 'c':
 			CONFIG_FILE = optarg;

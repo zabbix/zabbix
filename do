@@ -121,11 +121,11 @@ if [ "$dotest" = "yes" ]
 then
   echo "Testing..."
   echo "Testing..." >> WARNINGS
-  ./src/zabbix_agent/zabbix_agent -v >> WARNINGS
-  ./src/zabbix_agent/zabbix_agentd -v >> WARNINGS
-  ./src/zabbix_get/zabbix_get -v >> WARNINGS
-  ./src/zabbix_sender/zabbix_sender -v >> WARNINGS
-  ./src/zabbix_server/zabbix_server -v >> WARNINGS
+  ./src/zabbix_agent/zabbix_agent -h >> WARNINGS
+  ./src/zabbix_agent/zabbix_agentd -h >> WARNINGS
+  ./src/zabbix_get/zabbix_get -h >> WARNINGS
+  ./src/zabbix_sender/zabbix_sender -h >> WARNINGS
+  ./src/zabbix_server/zabbix_server -h >> WARNINGS
   echo "------------------------" >> WARNINGS 
   echo "   Agent TEST RESULTS   " >> WARNINGS 
   echo "------------------------" >> WARNINGS 
