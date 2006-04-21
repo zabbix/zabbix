@@ -39,7 +39,6 @@
  ******************************************************************************/
 int	get_value_aggregate(DB_ITEM *item, AGENT_RESULT *result)
 {
-	zbx_uint64_t	i;
 	char	function_grp[MAX_STRING_LEN];
 	char	key[MAX_STRING_LEN];
 	char	*p;
