@@ -217,6 +217,13 @@
 #	include <unistd.h>
 #endif
 
+#ifdef HAVE_GETOPT_H
+#	ifdef HAVE_GETOPT_LONG
+#		define _GNU_SOURCE
+#		include <getopt.h>
+#	endif
+#endif
+
 #ifdef HAVE_VM_VM_PARAM_H
 #	include <vm/vm_param.h>
 #endif

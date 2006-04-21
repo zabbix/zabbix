@@ -94,6 +94,16 @@
 #	endif
 #endif
 
+#ifndef HAVE_GETOPT_LONG
+	struct option {
+		const char *name;
+		int has_arg;
+		int *flag;
+		int val;
+	};
+#	define  getopt_long(argc, argv, optstring, longopts, longindex) getopt(argc, argv, optstring)
+#endif
+
 #define ZBX_UNUSED(a) ((void)0)(a)
 
 #define	ZBX_FS_DBL	"%f"
