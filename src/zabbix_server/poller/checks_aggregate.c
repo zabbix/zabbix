@@ -33,43 +33,92 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
 
 	int		i,valuetype;
 	double		d = 0, value;
+	int		num = 0;
 
 	zabbix_log( LOG_LEVEL_WARNING, "In evaluate_aggregate('%s','%s','%s','%s','%s')",grpfunc,hostgroup,itemkey,itemfunc,param);
+	init_result(res);
 
 	DBescape_string(itemkey,itemkey_esc,MAX_STRING_LEN);
 	DBescape_string(hostgroup,hostgroup_esc,MAX_STRING_LEN);
 
 	if(strcmp(itemfunc,"last") == 0)
 	{
-		snprintf(sql,sizeof(sql)-1,"select items.lastvalue,items.value_type from items,hosts_groups,hosts,groups where hosts_groups.groupid=groups.groupid and items.hostid=hosts.hostid and hosts_groups.hostid=hosts.hostid and items.lastvalue is not NULL and groups.name='%s' and items.key_='%s'",hostgroup_esc, itemkey_esc);
+		snprintf(sql,sizeof(sql)-1,"select items.itemid,items.value_type,items.lastvalue from items,hosts_groups,hosts,groups where hosts_groups.groupid=groups.groupid and items.hostid=hosts.hostid and hosts_groups.hostid=hosts.hostid and items.lastvalue is not NULL and groups.name='%s' and items.key_='%s'",hostgroup_esc, itemkey_esc);
 	}
 	zabbix_log( LOG_LEVEL_WARNING, "SQL [%s]",sql);
 
 	result = DBselect(sql);
+
 	
 	for(i=0;i<DBnum_rows(result);i++)
 	{
 		valuetype = atoi(DBget_field(result,i,1));
 		if(valuetype == ITEM_VALUE_TYPE_FLOAT)
 		{
-			value = atof(DBget_field(result,i,0));
+			value = atof(DBget_field(result,i,2));
 		}
 		else if(valuetype == ITEM_VALUE_TYPE_UINT64)
 		{
 #ifdef HAVE_ATOLL
-				value = (double)atoll(DBget_field(result,i,0));
+				value = (double)atoll(DBget_field(result,i,2));
 #else
-				value = (double)atol(DBget_field(result,i,0));
+				value = (double)atol(DBget_field(result,i,2));
 #endif
 		}
 		if(strcmp(grpfunc,"grpsum") == 0)
 		{
 			d+=value;
+			num++;
+		}
+		else if(strcmp(grpfunc,"grpavg") == 0)
+		{
+			d+=value;
+			num++;
+		}
+		else if(strcmp(grpfunc,"grpmin") == 0)
+		{
+			if(num==0)
+			{
+				d=value;
+			}
+			else if(value<d)
+			{
+				d=value;
+			}
+			num++;
+		}
+		else if(strcmp(grpfunc,"grpmax") == 0)
+		{
+			if(num==0)
+			{
+				d=value;
+			}
+			else if(value>d)
+			{
+				d=value;
+			}
+			num++;
 		}
 		zabbix_log( LOG_LEVEL_WARNING, "Item value([%s])",DBget_field(result,i,0));
 	}
 
 	DBfree_result(result);
+
+	if(num==0)
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "No values for group[%s] key[%s])",hostgroup,itemkey);
+		DBfree_result(result);
+		return FAIL;
+	}
+
+	if(strcmp(grpfunc,"grpavg") == 0)
+	{
+		SET_DBL_RESULT(res, d/num);
+	}
+	else
+	{
+		SET_DBL_RESULT(res, d);
+	}
 
 	zabbix_log( LOG_LEVEL_WARNING, "Result([%f])",d);
 	return SUCCEED;
@@ -198,11 +247,14 @@ int	get_value_aggregate(DB_ITEM *item, AGENT_RESULT *result)
 		else	ret = NOTSUPPORTED;
 	}
 
-	SET_UI64_RESULT(result, 0);
-
 	zabbix_log( LOG_LEVEL_WARNING, "Evaluating aggregate[%s] grpfunc[%s] group[%s] itemkey[%s] itemfunc [%s] parameter [%s]",item->key, function_grp, group, itemkey, function_item, parameter);
 
-	evaluate_aggregate(result,function_grp, group, itemkey, function_item, parameter);
+	if( (ret == SUCCEED) &&
+		(evaluate_aggregate(result,function_grp, group, itemkey, function_item, parameter) != SUCCEED)
+	)
+	{
+		ret = NOTSUPPORTED;
+	}
 
 	return ret;
 }
