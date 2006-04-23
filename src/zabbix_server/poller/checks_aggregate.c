@@ -22,7 +22,7 @@
 
 /*
  * grpfunc: grpmax, grpmin, grpsum, grpavg
- * itemfunc: last, min, max, avg, sum
+ * itemfunc: last, min, max, avg, sum,count
  */
 static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, char *itemkey, char *itemfunc, char *param)
 {
@@ -57,7 +57,6 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
 /*		zabbix_log( LOG_LEVEL_WARNING, "ItemIDs items[%s])",items2);*/
 	}
 	DBfree_result(result);
-	zabbix_log( LOG_LEVEL_WARNING, "ItemIDs ALL [%s])",items);
 
 	if(strcmp(itemfunc,"last") == 0)
 	{
@@ -69,6 +68,22 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
 /*		snprintf(sql,sizeof(sql)-1,"select items.itemid,items.value_type,min(history.value) from items,hosts_groups,hosts,groups,history where history.itemid=items.itemid and hosts_groups.groupid=groups.groupid and items.hostid=hosts.hostid and hosts_groups.hostid=hosts.hostid and groups.name='%s' and items.key_='%s' and history.clock>%d group by 1,2",hostgroup_esc, itemkey_esc, now - atoi(param));*/
 		snprintf(sql,sizeof(sql)-1,"select history.itemid,items.value_type,min(history.value) from items,history where history.itemid=items.itemid and history.itemid in (%s) and history.clock>%d group by 1,2",items, now - atoi(param));
 	}
+	else if(strcmp(itemfunc,"max") == 0)
+	{
+		snprintf(sql,sizeof(sql)-1,"select history.itemid,items.value_type,max(history.value) from items,history where history.itemid=items.itemid and history.itemid in (%s) and history.clock>%d group by 1,2",items, now - atoi(param));
+	}
+	else if(strcmp(itemfunc,"avg") == 0)
+	{
+		snprintf(sql,sizeof(sql)-1,"select history.itemid,items.value_type,avg(history.value) from items,history where history.itemid=items.itemid and history.itemid in (%s) and history.clock>%d group by 1,2",items, now - atoi(param));
+	}
+	else if(strcmp(itemfunc,"count") == 0)
+	{
+		snprintf(sql,sizeof(sql)-1,"select history.itemid,items.value_type,count(history.value) from items,history where history.itemid=items.itemid and history.itemid in (%s) and history.clock>%d group by 1,2",items, now - atoi(param));
+	}
+	else if(strcmp(itemfunc,"sum") == 0)
+	{
+		snprintf(sql,sizeof(sql)-1,"select history.itemid,items.value_type,sum(history.value) from items,history where history.itemid=items.itemid and history.itemid in (%s) and history.clock>%d group by 1,2",items, now - atoi(param));
+	}
 	else
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "No values for group[%s] key[%s])",hostgroup,itemkey);
@@ -79,7 +94,6 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
 
 	result = DBselect(sql);
 
-	
 	for(i=0;i<DBnum_rows(result);i++)
 	{
 		valuetype = atoi(DBget_field(result,i,1));
