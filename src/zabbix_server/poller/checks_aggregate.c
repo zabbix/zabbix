@@ -34,20 +34,40 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
 	int		i,valuetype;
 	double		d = 0, value;
 	int		num = 0;
+	int		now;
+	char		items[MAX_STRING_LEN],items2[MAX_STRING_LEN];
+
+	now=time(NULL);
 
 	zabbix_log( LOG_LEVEL_WARNING, "In evaluate_aggregate('%s','%s','%s','%s','%s')",grpfunc,hostgroup,itemkey,itemfunc,param);
 	init_result(res);
 
 	DBescape_string(itemkey,itemkey_esc,MAX_STRING_LEN);
 	DBescape_string(hostgroup,hostgroup_esc,MAX_STRING_LEN);
+/* Get list of affected item IDs */
+	strscpy(items,"0");
+	snprintf(sql,sizeof(sql)-1,"select itemid from items,hosts_groups,hosts,groups where hosts_groups.groupid=groups.groupid and items.hostid=hosts.hostid and hosts_groups.hostid=hosts.hostid and groups.name='%s' and items.key_='%s'",hostgroup_esc, itemkey_esc);
+	result = DBselect(sql);
+	
+	for(i=0;i<DBnum_rows(result);i++)
+	{
+		snprintf(items2,sizeof(items2)-1,"%s,%s",items, DBget_field(result,i,0));
+/*		zabbix_log( LOG_LEVEL_WARNING, "ItemIDs items2[%s])",items2);*/
+		strscpy(items,items2);
+/*		zabbix_log( LOG_LEVEL_WARNING, "ItemIDs items[%s])",items2);*/
+	}
+	DBfree_result(result);
+	zabbix_log( LOG_LEVEL_WARNING, "ItemIDs ALL [%s])",items);
 
 	if(strcmp(itemfunc,"last") == 0)
 	{
-		snprintf(sql,sizeof(sql)-1,"select items.itemid,items.value_type,items.lastvalue from items,hosts_groups,hosts,groups where hosts_groups.groupid=groups.groupid and items.hostid=hosts.hostid and hosts_groups.hostid=hosts.hostid and items.lastvalue is not NULL and groups.name='%s' and items.key_='%s'",hostgroup_esc, itemkey_esc);
+		snprintf(sql,sizeof(sql)-1,"select itemid,value_type,lastvalue from items where lastvalue is not NULL and items.itemid in (%s)",items);
 	}
 	else if(strcmp(itemfunc,"min") == 0)
 	{
-		snprintf(sql,sizeof(sql)-1,"select items.itemid,items.value_type,sum(items.lastvalue) from items,hosts_groups,hosts,groups where hosts_groups.groupid=groups.groupid and items.hostid=hosts.hostid and hosts_groups.hostid=hosts.hostid and items.lastvalue is not NULL and groups.name='%s' and items.key_='%s' group by 1,2",hostgroup_esc, itemkey_esc);
+		/* The SQL works very very slow on MySQL 4.0. That's why it has been split into two. */
+/*		snprintf(sql,sizeof(sql)-1,"select items.itemid,items.value_type,min(history.value) from items,hosts_groups,hosts,groups,history where history.itemid=items.itemid and hosts_groups.groupid=groups.groupid and items.hostid=hosts.hostid and hosts_groups.hostid=hosts.hostid and groups.name='%s' and items.key_='%s' and history.clock>%d group by 1,2",hostgroup_esc, itemkey_esc, now - atoi(param));*/
+		snprintf(sql,sizeof(sql)-1,"select history.itemid,items.value_type,min(history.value) from items,history where history.itemid=items.itemid and history.itemid in (%s) and history.clock>%d group by 1,2",items, now - atoi(param));
 	}
 	else
 	{
@@ -117,7 +137,6 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
 	if(num==0)
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "No values for group[%s] key[%s])",hostgroup,itemkey);
-		DBfree_result(result);
 		return FAIL;
 	}
 
