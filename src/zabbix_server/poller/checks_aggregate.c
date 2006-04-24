@@ -27,11 +27,14 @@
 static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, char *itemkey, char *itemfunc, char *param)
 {
 	char		sql[MAX_STRING_LEN];
+	char		sql2[MAX_STRING_LEN];
 	char		hostgroup_esc[MAX_STRING_LEN],itemkey_esc[MAX_STRING_LEN];
  
 	DB_RESULT	*result;
+	DB_RESULT	*r;
+	DB_RESULT	*result2;
 
-	int		i,valuetype;
+	int		i,valuetype,j;
 	double		d = 0, value;
 	int		num = 0;
 	int		now;
@@ -39,7 +42,7 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
 
 	now=time(NULL);
 
-	zabbix_log( LOG_LEVEL_WARNING, "In evaluate_aggregate('%s','%s','%s','%s','%s')",grpfunc,hostgroup,itemkey,itemfunc,param);
+	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_aggregate('%s','%s','%s','%s','%s')",grpfunc,hostgroup,itemkey,itemfunc,param);
 	init_result(res);
 
 	DBescape_string(itemkey,itemkey_esc,MAX_STRING_LEN);
@@ -62,51 +65,49 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
 	{
 		snprintf(sql,sizeof(sql)-1,"select itemid,value_type,lastvalue from items where lastvalue is not NULL and items.itemid in (%s)",items);
 	}
-	else if(strcmp(itemfunc,"min") == 0)
-	{
 		/* The SQL works very very slow on MySQL 4.0. That's why it has been split into two. */
 /*		snprintf(sql,sizeof(sql)-1,"select items.itemid,items.value_type,min(history.value) from items,hosts_groups,hosts,groups,history where history.itemid=items.itemid and hosts_groups.groupid=groups.groupid and items.hostid=hosts.hostid and hosts_groups.hostid=hosts.hostid and groups.name='%s' and items.key_='%s' and history.clock>%d group by 1,2",hostgroup_esc, itemkey_esc, now - atoi(param));*/
-		snprintf(sql,sizeof(sql)-1,"select history.itemid,items.value_type,min(history.value) from items,history where history.itemid=items.itemid and history.itemid in (%s) and history.clock>%d group by 1,2",items, now - atoi(param));
-	}
-	else if(strcmp(itemfunc,"max") == 0)
+	else if( (strcmp(itemfunc,"min") == 0) ||
+		(strcmp(itemfunc,"max") == 0) ||
+		(strcmp(itemfunc,"avg") == 0) ||
+		(strcmp(itemfunc,"count") == 0) ||
+		(strcmp(itemfunc,"sum") == 0)
+	)
 	{
-		snprintf(sql,sizeof(sql)-1,"select history.itemid,items.value_type,max(history.value) from items,history where history.itemid=items.itemid and history.itemid in (%s) and history.clock>%d group by 1,2",items, now - atoi(param));
-	}
-	else if(strcmp(itemfunc,"avg") == 0)
-	{
-		snprintf(sql,sizeof(sql)-1,"select history.itemid,items.value_type,avg(history.value) from items,history where history.itemid=items.itemid and history.itemid in (%s) and history.clock>%d group by 1,2",items, now - atoi(param));
-	}
-	else if(strcmp(itemfunc,"count") == 0)
-	{
-		snprintf(sql,sizeof(sql)-1,"select history.itemid,items.value_type,count(history.value) from items,history where history.itemid=items.itemid and history.itemid in (%s) and history.clock>%d group by 1,2",items, now - atoi(param));
-	}
-	else if(strcmp(itemfunc,"sum") == 0)
-	{
-		snprintf(sql,sizeof(sql)-1,"select history.itemid,items.value_type,sum(history.value) from items,history where history.itemid=items.itemid and history.itemid in (%s) and history.clock>%d group by 1,2",items, now - atoi(param));
+		snprintf(sql,sizeof(sql)-1,"select h.itemid,i.value_type,%s(h.value) from items i,history h where h.itemid=i.itemid and h.itemid in (%s) and h.clock>%d group by 1,2",itemfunc, items, now - atoi(param));
+		snprintf(sql2,sizeof(sql)-1,"select h.itemid,i.value_type,%s(h.value) from items i,history_uint h where h.itemid=i.itemid and h.itemid in (%s) and h.clock>%d group by 1,2",itemfunc, items, now - atoi(param));
 	}
 	else
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "No values for group[%s] key[%s])",hostgroup,itemkey);
-		DBfree_result(result);
+		zabbix_log( LOG_LEVEL_WARNING, "Unsupported item function [%s])",itemfunc);
 		return FAIL;
 	}
-	zabbix_log( LOG_LEVEL_WARNING, "SQL [%s]",sql);
+	zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]",sql);
+	zabbix_log( LOG_LEVEL_DEBUG, "SQL2 [%s]",sql2);
 
 	result = DBselect(sql);
+	result2 = DBselect(sql2);
 
-	for(i=0;i<DBnum_rows(result);i++)
+	for(i=0;i<DBnum_rows(result)+DBnum_rows(result2);i++)
 	{
-		valuetype = atoi(DBget_field(result,i,1));
+		j=i;
+		r = result;
+		if(j>=DBnum_rows(result))
+		{
+			j=i-DBnum_rows(result);
+			r = result2;
+		}
+		valuetype = atoi(DBget_field(r,i,1));
 		if(valuetype == ITEM_VALUE_TYPE_FLOAT)
 		{
-			value = atof(DBget_field(result,i,2));
+			value = atof(DBget_field(r,i,2));
 		}
 		else if(valuetype == ITEM_VALUE_TYPE_UINT64)
 		{
 #ifdef HAVE_ATOLL
-				value = (double)atoll(DBget_field(result,i,2));
+				value = (double)atoll(DBget_field(r,i,2));
 #else
-				value = (double)atol(DBget_field(result,i,2));
+				value = (double)atol(DBget_field(r,i,2));
 #endif
 		}
 		if(strcmp(grpfunc,"grpsum") == 0)
@@ -143,10 +144,17 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
 			}
 			num++;
 		}
-		zabbix_log( LOG_LEVEL_WARNING, "Item value([%s])",DBget_field(result,i,0));
+		else
+		{
+			zabbix_log( LOG_LEVEL_WARNING, "Unsupported group function [%s])",grpfunc);
+			DBfree_result(result);
+			DBfree_result(result2);
+			return FAIL;
+		}
+		zabbix_log( LOG_LEVEL_DEBUG, "Item value([%s])",DBget_field(result,i,0));
 	}
-
 	DBfree_result(result);
+	DBfree_result(result2);
 
 	if(num==0)
 	{
@@ -163,7 +171,7 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
 		SET_DBL_RESULT(res, d);
 	}
 
-	zabbix_log( LOG_LEVEL_WARNING, "Result([%f])",d);
+	zabbix_log( LOG_LEVEL_DEBUG, "Result([%f])",d);
 	return SUCCEED;
 }
 
@@ -197,7 +205,7 @@ int	get_value_aggregate(DB_ITEM *item, AGENT_RESULT *result)
 	int 	ret = SUCCEED;
 
 
-	zabbix_log( LOG_LEVEL_WARNING, "In get_value_aggregate([%s])",item->key);
+	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_aggregate([%s])",item->key);
 
 	init_result(result);
 
@@ -276,7 +284,7 @@ int	get_value_aggregate(DB_ITEM *item, AGENT_RESULT *result)
 		if((p2=strstr(p,"'")) != NULL)
 		{
 			p2++;
-			zabbix_log( LOG_LEVEL_WARNING, "p2[%s]",p2);
+			zabbix_log( LOG_LEVEL_DEBUG, "p2[%s]",p2);
 		}
 		else	ret = NOTSUPPORTED;
 
@@ -290,7 +298,7 @@ int	get_value_aggregate(DB_ITEM *item, AGENT_RESULT *result)
 		else	ret = NOTSUPPORTED;
 	}
 
-	zabbix_log( LOG_LEVEL_WARNING, "Evaluating aggregate[%s] grpfunc[%s] group[%s] itemkey[%s] itemfunc [%s] parameter [%s]",item->key, function_grp, group, itemkey, function_item, parameter);
+	zabbix_log( LOG_LEVEL_DEBUG, "Evaluating aggregate[%s] grpfunc[%s] group[%s] itemkey[%s] itemfunc [%s] parameter [%s]",item->key, function_grp, group, itemkey, function_item, parameter);
 
 	if( (ret == SUCCEED) &&
 		(evaluate_aggregate(result,function_grp, group, itemkey, function_item, parameter) != SUCCEED)
