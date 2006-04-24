@@ -104,6 +104,43 @@
 			$delta=0;
 		}
 
+		if( ($type == ITEM_TYPE_AGGREGATE) && ($value_type != ITEM_VALUE_TYPE_FLOAT))
+		{
+			error("Value type must be Float for aggregate items");
+			return FALSE;
+		}
+		if($type == ITEM_TYPE_AGGREGATE)
+		{
+			/* grpfunc('group','key','itemfunc','numeric param') */
+			if(eregi('^((.)*)(\(\'((.)*)\'\,\'((.)*)\'\,\'((.)*)\'\,\'([0-9]+)\'\))$', $key, $arr))
+			{
+				$g=$arr[1];
+				if(!in_array($g,array("grpmax","grpmin","grpsum","grpavg")))
+				{
+					error("Group function [$g] is not one of [grpmax,grpmin,grpsum,grpavg]");
+					return FALSE;
+				}
+				// Group
+				$g=$arr[4];
+				// Key
+				$g=$arr[6];
+				// Item function
+				$g=$arr[8];
+				if(!in_array($g,array("last", "min", "max", "avg", "sum","count")))
+				{
+					error("Item function [$g] is not one of [last, min, max, avg, sum,count]");
+					return FALSE;
+				}
+				// Parameter
+				$g=$arr[10];
+			}
+			else
+			{
+				error("Key does not match grpfunc('group','key','itemfunc','numeric param')");
+				return FALSE;
+			}
+		}
+
 		$db_items = DBexecute("select itemid,hostid from items".
 			" where hostid=$hostid and key_=".zbx_dbstr($key));
 		if(DBnum_rows($db_items) > 0 && $templateid == 0)
