@@ -88,6 +88,8 @@
 	
 	//define("USE_PROFILING",1);
 
+if(defined('USE_PROFILING'))
+{
 	$starttime[]=array();
 
 	class COpt
@@ -101,8 +103,6 @@
 		}
 		/* public static */ function profiling_start($type=NULL)
 		{
-			if(!defined('USE_PROFILING')) return;
-
 			global $starttime;
 			if(is_null($type)) $type="global";
 
@@ -110,8 +110,6 @@
 		}
 		/* public static */ function profiling_stop($type=NULL)
 		{
-			if(!defined('USE_PROFILING')) return;
-
 			global $starttime;
 
 			$endtime = COpt::getmicrotime();
@@ -120,5 +118,14 @@
 			echo "<br/>\nTime to execute (".$type."): ". bcsub($endtime,$starttime[$type],6)." seconds!\n<br/>";
 		}
 	}
+}
+else
+{
+	class COpt
+	{
+		/* public static */ function profiling_start($type=NULL) {}
+		/* public static */ function profiling_stop($type=NULL) {}
+	}
+}
 
 ?>
