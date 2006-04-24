@@ -28,7 +28,7 @@
 #define DO_AVG 3
 				    
 int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
+{ // usage: <function name>[ <process name>, <user name>, <mode>, <command> ]
 
 	DIR	*dir;
 	struct	dirent *entries;
@@ -52,7 +52,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	struct	passwd	*usrinfo = NULL;
 	zbx_uint64_t	llvalue = 0;
 
-	FILE    *f;
+	FILE    *f = NULL, *f2 = NULL;
 
 	zbx_uint64_t	memsize;
 	int		first=0;
@@ -134,6 +134,8 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	while((entries=readdir(dir))!=NULL)
 	{
+		if(f) fclose(f);
+
 		proc_ok = 0;
 		usr_ok = 0;
 
@@ -172,7 +174,6 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		    
 				if(proc_ok == 0) 
 				{
-					fclose(f);
 					continue;
 				}
 			}
@@ -217,14 +218,16 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 				
 				if(stat(filename,&buf)!=0)	continue;
 				
-				f=fopen(filename,"r");
-				if(f==NULL)			continue;
+				f2=fopen(filename,"r");
+				if(f2==NULL)			continue;
 				
-				if(fgets(line, MAX_STRING_LEN, f) != NULL)
+				if(fgets(line, MAX_STRING_LEN, f2) != NULL)
+				{
 					if(zbx_regexp_match(line,proccomm,NULL) != NULL)
 						comm_ok = 1;
+				}
 
-				fclose(f);
+				fclose(f2);
 			} else {
 				comm_ok = 1;
 			}
@@ -287,11 +290,9 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 					break;
 				}
 			}
-		    
-			    
-			fclose(f);
 		}
 	}
+	if(f) fclose(f);
 	closedir(dir);
 
 	if(first == 0)
@@ -312,7 +313,8 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 }
 
 int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
+{ // usage: <function name>[ <process name>, <user name>, <process state>, <command> ]
+	
 	DIR	*dir;
 	struct	dirent *entries;
 	struct	stat buf;
