@@ -28,7 +28,8 @@
 #define DO_AVG 3
 
 int	PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
+{ // usage: <function name>[ <process name>, <user name>, <mode>, <command> ]
+
     DIR     *dir;
     struct  dirent *entries;
     struct  stat buf;
@@ -37,11 +38,12 @@ int	PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
     char    procname[MAX_STRING_LEN];
     char    usrname[MAX_STRING_LEN];
     char    mode[MAX_STRING_LEN];
+    char    proccomm[MAX_STRING_LEN];
 
     int     proc_ok = 0;
     int     usr_ok = 0;
     int	    do_task = DO_SUM;
-
+    int	    comm_ok = 0;
 
     struct  passwd *usrinfo = NULL;
     long int	lvalue = 0;
@@ -52,71 +54,77 @@ int	PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
     double	memsize = -1;
     int		proccount = 0;
 
-    assert(result);
+	assert(result);
 
-    init_result(result);
+	init_result(result);
 
-    if(num_param(param) > 3)
-    {
-        return SYSINFO_RET_FAIL;
-    }
+	if(num_param(param) > 4)
+	{
+		return SYSINFO_RET_FAIL;
+	}
 
-    if(get_param(param, 1, procname, MAX_STRING_LEN) != 0)
-    {
-        return SYSINFO_RET_FAIL;
-    }
+	if(get_param(param, 1, procname, MAX_STRING_LEN) != 0)
+	{
+		return SYSINFO_RET_FAIL;
+	}
 
-    if(get_param(param, 2, usrname, MAX_STRING_LEN) != 0)
-    {
-        usrname[0] = '\0';
-    }
-	
-    if(usrname[0] == '\0')
-    {
-	usrname[0] = 0;
-    }
+	if(get_param(param, 2, usrname, MAX_STRING_LEN) != 0)
+	{
+		usrname[0] = '\0';
+	}
+	    
+	if(usrname[0] == '\0')
+	{
+		usrname[0] = 0;
+	}
 
-    if(usrname[0] != 0)
-    {
-        usrinfo = getpwnam(usrname);
-        if(usrinfo == NULL)
-        {
-            /* incorrect user name */
-            return SYSINFO_RET_FAIL;
-        }			        
-    }
+	if(usrname[0] != 0)
+	{
+		usrinfo = getpwnam(usrname);
+		if(usrinfo == NULL)
+		{
+			/* incorrect user name */
+			return SYSINFO_RET_FAIL;
+		}			        
+	}
     
 
-    if(get_param(param, 3, mode, MAX_STRING_LEN) != 0)
-    {
-	mode[0] = '\0';
-    }
-    
-    if(mode[0] == '\0')
-    {
-        strscpy(mode, "sum");
-    }
+	if(get_param(param, 3, mode, MAX_STRING_LEN) != 0)
+	{
+		mode[0] = '\0';
+	}
 
-    if(strcmp(mode,"avg") == 0)
-    {
-        do_task = DO_AVG;
-    }
-    else if(strcmp(mode,"max") == 0)
-    {
-        do_task = DO_MAX;
-    }
-    else if(strcmp(mode,"min") == 0)
-    {
-        do_task = DO_MIN;
-    }
-    else if(strcmp(mode,"sum") == 0)
-    {
-        do_task = DO_SUM;
-    }
-    else
-    {
-        return SYSINFO_RET_FAIL;
-    }
+	if(mode[0] == '\0')
+	{
+		strscpy(mode, "sum");
+	}
+
+	if(strcmp(mode,"avg") == 0)
+	{
+		do_task = DO_AVG;
+	}
+	else if(strcmp(mode,"max") == 0)
+	{
+		do_task = DO_MAX;
+	}
+	else if(strcmp(mode,"min") == 0)
+	{
+		do_task = DO_MIN;
+	}
+	else if(strcmp(mode,"sum") == 0)
+	{
+		do_task = DO_SUM;
+	}
+	else
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	if(get_param(param, 4, proccomm, MAX_STRING_LEN) != 0)
+	{
+		proccomm[0] = '\0';
+	}
+
     
     dir=opendir("/proc");
     if(NULL == dir)
@@ -128,6 +136,7 @@ int	PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
     {
         proc_ok = 0;
         usr_ok = 0;
+	comm_ok = 0;
         
         strscpy(filename,"/proc/");	
         strncat(filename,entries->d_name,MAX_STRING_LEN);
@@ -170,8 +179,20 @@ int	PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
                     {
                         usr_ok = 1;
                     }
+		    
+		    if(proccomm[0] != 0)
+		    {
+			if(zbx_regexp_match(psinfo.pr_psargs, proccomm, NULL) != NULL)
+			{
+			    comm_ok = 1;
+			}
+		    }
+		    else
+		    {
+			comm_ok = 1;
+		    }
 
-                    if(proc_ok && usr_ok)
+                    if(proc_ok && usr_ok && comm_ok)
                     {
                         lvalue = psinfo.pr_size;
                         lvalue <<= 10; /* kB to Byte */
@@ -225,7 +246,8 @@ int	PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 }
 
 int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
+{ // usage: <function name>[ <process name>, <user name>, <process state>, <command> ]
+
     DIR	*dir;
     struct	dirent *entries;
     struct	stat buf;
@@ -235,10 +257,12 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
     char    procname[MAX_STRING_LEN];
     char    usrname[MAX_STRING_LEN];
     char    procstat[MAX_STRING_LEN];
+    char    proccomm[MAX_STRING_LEN];
 
     int     proc_ok = 0;
     int     usr_ok = 0;
     int     stat_ok = 0;
+    int	    comm_ok = 0;
 
     struct  passwd *usrinfo = NULL;
     char    pr_state = 0;
@@ -253,7 +277,7 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 
         init_result(result);
  
-        if(num_param(param) > 3)
+        if(num_param(param) > 4)
         {
             return SYSINFO_RET_FAIL;
         }
@@ -314,18 +338,25 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
         {
             return SYSINFO_RET_FAIL;
         }
+
+	if(get_param(param, 4, proccomm, MAX_STRING_LEN) != 0)
+	{
+		proccomm[0] = '\0';
+	}
+
             
         dir=opendir("/proc");
         if(NULL == dir)
         {
             return SYSINFO_RET_FAIL;
         }
-    
+	
         while((entries=readdir(dir))!=NULL)
         {
             proc_ok = 0;
             usr_ok = 0;
             stat_ok = 0;
+	    comm_ok = 0;
             
             strscpy(filename,"/proc/");	
             strncat(filename,entries->d_name,MAX_STRING_LEN);
@@ -342,52 +373,64 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
                         closedir(dir);
                         return SYSINFO_RET_FAIL;
                     }
-                    else
-                    {
-                        if(procname[0] != 0)
-                        {
-                            if(strcmp(procname, psinfo.pr_fname) == 0)
-                            {
-                                proc_ok = 1;
-                            }
-                        }
-                        else
-                        {
-                            proc_ok = 1;
-                        }
-                        
-                        if(usrinfo != NULL)
-                        {
-                            /* uid_t    pr_uid;         real user id */
-                            if(usrinfo->pw_uid == psinfo.pr_uid)
-                            {
-                                usr_ok = 1;
-                            } 
-                        }
-                        else
-                        {
-                            usr_ok = 1;
-                        }
 
-                        if(procstat[0] != 0)
-                        {
-                            /*  char    pr_state;           numeric lwp state */
-                            if(psinfo.pr_lwp.pr_state == pr_state)
-                            {
-                                stat_ok = 1;
-                            } 
-                        }
-                        else
-                        {
-                            stat_ok = 1;
-                        }
-                        
-                        if(proc_ok && usr_ok && stat_ok)
-                        {
-                            proccount++;
-                        }
-                    }
                     close (fd);
+		    
+		    if(procname[0] != 0)
+		    {
+			if(strcmp(procname, psinfo.pr_fname) == 0)
+			{
+			    proc_ok = 1;
+			}
+		    }
+		    else
+		    {
+			proc_ok = 1;
+		    }
+		    
+		    if(usrinfo != NULL)
+		    {
+			/* uid_t    pr_uid;         real user id */
+			if(usrinfo->pw_uid == psinfo.pr_uid)
+			{
+			    usr_ok = 1;
+			} 
+		    }
+		    else
+		    {
+			usr_ok = 1;
+		    }
+
+		    if(procstat[0] != 0)
+		    {
+			/*  char    pr_state;           numeric lwp state */
+			if(psinfo.pr_lwp.pr_state == pr_state)
+			{
+			    stat_ok = 1;
+			} 
+		    }
+		    else
+		    {
+			stat_ok = 1;
+		    }
+		    
+		    if(proccomm[0] != 0)
+		    {
+			if(zbx_regexp_match(psinfo.pr_psargs, proccomm, NULL) != NULL)
+			{
+			    comm_ok = 1;
+			}
+		    }
+		    else
+		    {
+			comm_ok = 1;
+		    }
+		    
+		    
+		    if(proc_ok && usr_ok && stat_ok && comm_ok)
+		    {
+			proccount++;
+		    }
                 }
                 else
                 {

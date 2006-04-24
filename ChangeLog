@@ -1,3 +1,10 @@
+Changes for 1.1beta10:
+
+ - added 'command line' parameter for Tru64 proc.mem[] (Eugene)
+ - improved proc.num[] for Tru64 (Eugene)
+ - added 'command line' parameter for Solaris proc.mem[] (Eugene)
+ - added 'command line' parameter for Solaris proc.num[] (Eugene)
+ 
 Changes for 1.1beta9:
 
  - added support of long name parameters for all ZABBIX applications (Eugene)
