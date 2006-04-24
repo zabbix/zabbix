@@ -4,7 +4,6 @@
  - remember different default values in different forms
  - autodiscovery: http://www.zabbix.com/forum/showthread.php?t=2137
  - server side checks (new type of check)
- - aggregate statistics: http://www.zabbix.com/forum/showthread.php?t=2151
 
  - apply const in function prototypes where required
  - action code: http://www.zabbix.com/forum/showthread.php?t=2171
