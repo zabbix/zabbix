@@ -28,7 +28,7 @@
 #define DO_AVG 3
 				    
 int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{ // usage: <function name>[ <process name>, <user name>, <mode>, <command> ]
+{ /* usage: <function name>[ <process name>, <user name>, <mode>, <command> ] */
 	
     DIR		*dir;
     int		proc;
@@ -157,7 +157,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 			
 			proccount++;
 				
-			if(memsize < 0) // First inicialization
+			if(memsize < 0) /* First inicialization */
 			{
 				memsize = (double) (psinfo.pr_rssize * pgsize);
 			}
@@ -171,7 +171,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 				{
 					memsize = MIN(memsize, (double) (psinfo.pr_rssize * pgsize));
 				}
-				else // SUM
+				else /* SUM */
 				{
 					memsize +=  (double) (psinfo.pr_rssize * pgsize);
 				}
@@ -202,7 +202,7 @@ lbl_skip_procces:
 }
 
 int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{ // usage: <function name>[ <process name>, <user name>, <process state>, <command> ]
+{ /* usage: <function name>[ <process name>, <user name>, <process state>, <command> ] */
 	
     DIR		*dir;
     int		proc;
