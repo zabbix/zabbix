@@ -28,7 +28,7 @@
 #define DO_AVG 3
 
 int	PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{ // usage: <function name>[ <process name>, <user name>, <mode>, <command> ]
+{ /* usage: <function name>[ <process name>, <user name>, <mode>, <command> ] */
 
     DIR     *dir;
     struct  dirent *entries;
@@ -246,7 +246,7 @@ int	PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 }
 
 int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{ // usage: <function name>[ <process name>, <user name>, <process state>, <command> ]
+{ /* usage: <function name>[ <process name>, <user name>, <process state>, <command> ] */
 
     DIR	*dir;
     struct	dirent *entries;

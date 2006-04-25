@@ -456,7 +456,7 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-//#define USE_TEST_FUNCTION 1
+/*#define USE_TEST_FUNCTION 1 */
 
 #ifdef USE_TEST_FUNCTION
 

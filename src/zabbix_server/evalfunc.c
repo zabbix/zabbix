@@ -1024,7 +1024,7 @@ int	add_value_suffix(char *value, DB_ITEM *item)
 		strscpy(suffix,"G");
 		value_float=value_float/(1024*1024*1024);
 	}
-//		if(cmp_double((double)round(value_float), value_float) == 0)
+/*		if(cmp_double((double)round(value_float), value_float) == 0) */
 	if(cmp_double((int)(value_float+0.5), value_float) == 0)
 	{
 		snprintf(value, MAX_STRING_LEN-1, "%.0f %s%s", value_float, suffix, item->units);
@@ -1077,7 +1077,7 @@ int	replace_value_by_map(char *value, int valuemapid)
 	DBfree_result(result);
 
 	del_zeroes(new_value);
-	or_value = sql;	// sql variarbvle used as tmp - original value
+	or_value = sql;	/* sql variarbvle used as tmp - original value */
 	strncpy(sql,value,MAX_STRING_LEN);
 	
 	snprintf(value, MAX_STRING_LEN-1, "%s (%s)", new_value, or_value);
@@ -1132,7 +1132,7 @@ int evaluate_FUNCTION2(char *value,char *host,char *key,char *function,char *par
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Before evaluate_FUNCTION()" );
 
-//	res = evaluate_FUNCTION(value,&item,function,parameter, EVALUATE_FUNCTION_SUFFIX);
+/*	res = evaluate_FUNCTION(value,&item,function,parameter, EVALUATE_FUNCTION_SUFFIX); */
 	res = evaluate_FUNCTION(value,&item,function,parameter);
 
 	if(replace_value_by_map(value, item.valuemapid) != SUCCEED)
