@@ -665,6 +665,11 @@
 	"S_MONTHLY"=>				"Monthly",
 	"S_YEARLY"=>				"Yearly",
 
+//      report4.php
+	"S_NOTIFICATIONS"=>                     "Notifications",
+        "S_NOTIFICATIONS_BIG"=>                 "NOTIFICATIONS",
+        "S_IT_NOTIFICATIONS"=>                  "Notification report",
+
 //	screenconf.php
 	"S_SCREENS"=>				"Screens",
 	"S_SCREEN"=>				"Screen",
