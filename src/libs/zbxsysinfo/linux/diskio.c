@@ -91,7 +91,7 @@ static int get_disk_stat(const char *interface, struct disk_stat_s *result)
 	char line[MAX_STRING_LEN];
 
 	char name[MAX_STRING_LEN];
-	unsigned long tmp = 0; //for PARSE
+	unsigned long tmp = 0; /* for PARSE */
 	
 	FILE *f;
 

@@ -107,7 +107,7 @@ int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid)
 
 		snprintf(sql,sizeof(sql)-1,"select i.key_,f.parameter,f.function,f.functionid from functions f,items i where i.itemid=f.itemid and f.triggerid=%d", triggerid);
 		result2=DBselect(sql);
-		// Loop: functions
+		/* Loop: functions */
 		for(j=0;j<DBnum_rows(result2);j++)
 		{
 			snprintf(sql,sizeof(sql)-1,"select itemid from items where key_='%s' and hostid=%d", DBget_field(result2,j,0), atoi(DBget_field(result,i,0)));

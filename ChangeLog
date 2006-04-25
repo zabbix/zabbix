@@ -1,5 +1,7 @@
 Changes for 1.1beta10:
 
+ - added support of proc.mem[] for AIX (Eugene)
+ - added support of proc.num[] for AIX (Eugene)
  - added Notification Report (Martins)
  - added 'command line' parameter for Tru64 proc.mem[] (Eugene)
  - improved proc.num[] for Tru64 (Eugene)

@@ -234,7 +234,7 @@ int	get_param(const char *param, int num, char *buf, int maxlen)
 			{
 				tmp[i]='\0';
 				strncpy(buf, s, maxlen);
-				tmp[i]=','; // restore source string
+				tmp[i]=','; /* restore source string */
 				ret = 0;
 				break;
 				
