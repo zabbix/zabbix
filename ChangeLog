@@ -1,5 +1,8 @@
 Changes for 1.1beta10:
 
+ - unsupported items can be activated by one click (Eugene)
+ - each graph from history and graphs remember selected period (Eugene)
+ - fixed status changing of triggers when all displayed (Eugene)
  - added support of proc.mem[] for AIX (Eugene)
  - added support of proc.num[] for AIX (Eugene)
  - added Notification Report (Martins)

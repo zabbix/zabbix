@@ -429,7 +429,12 @@
 					"&group_task=Activate+selected",
 					"on"),"on");
 				break;
-			case 3:	$status=new CCol(S_NOT_SUPPORTED,"unknown");
+			case 3:	$status=new CCol(new CLink(S_NOT_SUPPORTED,
+					"items.php?group_itemid%5B%5D=".$db_item["itemid"].
+					"&hostid=".$_REQUEST["hostid"].
+					"&group_task=Activate+selected",
+					"action")
+					,"unknown");
 				break;
 			default:$status=S_UNKNOWN;
 			}
