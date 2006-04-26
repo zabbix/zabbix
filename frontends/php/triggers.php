@@ -148,36 +148,30 @@
 /* GROUP ACTIONS */
 	elseif(isset($_REQUEST["group_enable"])&&isset($_REQUEST["g_triggerid"]))
 	{
-		$result=DBselect("select distinct t.triggerid from triggers t,hosts h,items i,".
-			" functions f where f.itemid=i.itemid and h.hostid=i.hostid and".
-			" t.triggerid=f.triggerid and h.hostid=".$_REQUEST["hostid"]);
-		while($row=DBfetch($result))
+		foreach($_REQUEST["g_triggerid"] as $triggerid)
 		{
-			if(!in_array($row["triggerid"], $_REQUEST["g_triggerid"]))	continue;
+			$result=DBselect("select triggerid from triggers t where t.triggerid=".zbx_dbstr($triggerid));
+			if(!($row = DBfetch($result))) continue;
 			$result2=update_trigger_status($row["triggerid"],0);
 		}
 		show_messages(true, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
 	}
 	elseif(isset($_REQUEST["group_disable"])&&isset($_REQUEST["g_triggerid"]))
 	{
-		$result=DBselect("select distinct t.triggerid from triggers t,hosts h,items i".
-			" ,functions f where f.itemid=i.itemid and h.hostid=i.hostid and".
-			" t.triggerid=f.triggerid and h.hostid=".$_REQUEST["hostid"]);
-		while($row=DBfetch($result))
+		foreach($_REQUEST["g_triggerid"] as $triggerid)
 		{
-			if(!in_array($row["triggerid"], $_REQUEST["g_triggerid"]))	continue;
+			$result=DBselect("select triggerid from triggers t where t.triggerid=".zbx_dbstr($triggerid));
+			if(!($row = DBfetch($result))) continue;
 			$result2=update_trigger_status($row["triggerid"],1);
 		}
 		show_messages(true, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
 	}
 	elseif(isset($_REQUEST["group_delete"])&&isset($_REQUEST["g_triggerid"]))
 	{
-		$result=DBselect("select distinct t.* from triggers t,hosts h,items i,".
-			" functions f where f.itemid=i.itemid and h.hostid=i.hostid and".
-			" t.triggerid=f.triggerid and h.hostid=".$_REQUEST["hostid"]);
-		while($row=DBfetch($result))
+		foreach($_REQUEST["g_triggerid"] as $triggerid)
 		{
-			if(!in_array($row["triggerid"], $_REQUEST["g_triggerid"])) continue;
+			$result=DBselect("select triggerid,templateid from triggers t where t.triggerid=".zbx_dbstr($triggerid));
+			if(!($row = DBfetch($result))) continue;
 			if($row["templateid"] <> 0)	continue;
 			$del_res = delete_trigger($row["triggerid"]);
 		}
