@@ -28,7 +28,8 @@
 	{
 		$nomenu=1;
 	}
-	if(isset($_REQUEST["graphid"]) && !isset($_REQUEST["period"]) && !isset($_REQUEST["stime"]))
+
+	if(isset($_REQUEST["graphid"]) && $_REQUEST["graphid"] > 0 && !isset($_REQUEST["period"]) && !isset($_REQUEST["stime"]))
 	{
 		show_header($page["title"],1,$nomenu);
 	}
@@ -36,7 +37,6 @@
 	{
 		show_header($page["title"],0,$nomenu);
 	}
-	$effectiveperiod=navigation_bar_calc();
 
 ?>
 
@@ -58,34 +58,36 @@
 
 	check_fields($fields);
 
+	$_REQUEST["graphid"] = get_request("graphid", get_profile("web.charts.grapgid", 0));
+	$_REQUEST["keep"] = get_request("keep", 1); // possible excessed REQUEST variable !!!
+
+	$_REQUEST["period"] = get_request("period",get_profile("web.graph[".$_REQUEST["graphid"]."].period", 3600));
+	$effectiveperiod=navigation_bar_calc();
+
 	validate_group_with_host("R",array("allow_all_hosts","monitored_hosts","with_items"));
+
+	if($_REQUEST["graphid"] > 0 && $_REQUEST["hostid"] > 0)
+	{
+		$result=DBselect("select g.graphid from graphs g, graphs_items gi, items i".
+			" where i.hostid=".$_REQUEST["hostid"]." and gi.itemid = i.itemid".
+			" and gi.graphid = g.graphid and g.graphid=".$_REQUEST["graphid"]);
+		if(!DBfetch($result))
+			$_REQUEST["graphid"] = 0;
+	}
 ?>
 
 <?php
+	if($_REQUEST["graphid"] > 0 && $_REQUEST["period"] >= 3600)
+	{
+		update_profile("web.graph[".$_REQUEST["graphid"]."].period",$_REQUEST["period"]);
+	}
+
+	update_profile("web.charts.grapgid",$_REQUEST["graphid"]);
 	update_profile("web.menu.view.last",$page["file"]);
 ?>
 
 <?php
-	if(!isset($_REQUEST["from"]))
-	{
-		$_REQUEST["from"]=0;
-	}
-	if(!isset($effectiveperiod))
-	{
-		$effectiveperiod=3600;
-	}
-
-	if(!isset($_REQUEST["keep"]))
-	{
-		$_REQUEST["keep"]=1;
-	}
-
-	if(isset($_REQUEST["graphid"])&&($_REQUEST["graphid"]==0))
-	{
-		unset($_REQUEST["graphid"]);
-	}
-
-	if(isset($_REQUEST["graphid"]))
+	if($_REQUEST["graphid"] > 0)
 	{
 		$result=DBselect("select name from graphs where graphid=".$_REQUEST["graphid"]);
 		$row=DBfetch($result);
@@ -155,11 +157,6 @@
 		$h2="<input name=\"fullscreen\" type=\"hidden\" value=".$_REQUEST["fullscreen"].">";
 	}
 
-	if(isset($_REQUEST["graphid"])&&($_REQUEST["graphid"]==0))
-	{
-		unset($_REQUEST["graphid"]);
-	}
-
 	$h2=$h2.SPACE.S_GRAPH.SPACE;
 	$h2=$h2."<select class=\"biginput\" name=\"graphid\" onChange=\"submit()\">";
 	$h2=$h2.form_select("graphid",0,S_SELECT_GRAPH_DOT_DOT_DOT);
@@ -198,7 +195,7 @@
 	echo "<TABLE BORDER=0 align=center COLS=4 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
 	echo "<TR BGCOLOR=#DDDDDD>";
 	echo "<TD ALIGN=CENTER>";
-	if(isset($_REQUEST["graphid"]))
+	if($_REQUEST["graphid"] > 0)
 	{
 		echo "<script language=\"JavaScript\">";
 		echo "document.write(\"<IMG SRC='chart2.php?graphid=".$_REQUEST["graphid"].url_param("stime")."&period=".$effectiveperiod."&from=".$_REQUEST["from"]."&width=\"+(document.width-108)+\"'>\")";
@@ -212,7 +209,7 @@
 	echo "</TR>";
 	echo "</TABLE>";
 
-	if(isset($_REQUEST["graphid"])/*&&(!isset($_REQUEST["fullscreen"]))*/)
+	if($_REQUEST["graphid"] > 0/*&&(!isset($_REQUEST["fullscreen"]))*/)
 	{
 		navigation_bar("charts.php");
 	}

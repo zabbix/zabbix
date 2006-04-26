@@ -24,8 +24,7 @@
 	include "include/config.inc.php";
 	include "include/forms.inc.php";
 
-	$effectiveperiod=navigation_bar_calc();
-
+/*** Prepare page header - start ***/
 	if(is_array($_REQUEST["itemid"]))
 	{
 
@@ -60,7 +59,7 @@
 		$main_header = $item_host.": ".$item_description;
 	}
 
-	if((in_array($_REQUEST["action"],array("showgraph","showvalues")) && ($_REQUEST["from"] != 0)) || isset($_REQUEST["plaintext"]))
+	if(isset($_REQUEST["plaintext"]))
 	{
 		$auto_update = 0;
 	}
@@ -68,8 +67,18 @@
 	{
 		$auto_update = 1;
 	}
+/*** Prepare page header - end ***/
 
 	show_header($main_header,$auto_update,isset($_REQUEST["plaintext"]) ? 1 : 0);
+
+	if(!is_array($_REQUEST["itemid"] && $_REQUEST["action"]=="showgraph"))
+		$_REQUEST["period"] = get_request("period",get_profile("web.item[".$_REQUEST["itemid"]."].graph.period", 3600));
+
+	$effectiveperiod=navigation_bar_calc();
+
+	if(!is_array($_REQUEST["itemid"] && $_REQUEST["action"]=="showgraph") && $_REQUEST["period"] >= 3600)
+		update_profile("web.item[".$_REQUEST["itemid"]."].graph.period",$_REQUEST["period"]);
+
 
 	if(!isset($_REQUEST["plaintext"]))
 		insert_confirm_javascript();
