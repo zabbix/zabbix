@@ -1,5 +1,6 @@
 Changes for 1.1beta10:
 
+ - allow item delays up-to 24h (Alexei)
  - unsupported items can be activated by one click (Eugene)
  - each graph from history and graphs remember selected period (Eugene)
  - fixed status changing of triggers when all displayed (Eugene)
