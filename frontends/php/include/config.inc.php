@@ -772,7 +772,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 		$date = getdate($time);
 		$wday = $date['wday'] == 0 ? 7 : $date['wday'];
 		$curr = $date['hours']*100+$date['minutes'];
-
+//SDI("find_end: ".date('r',$time));
 		if(isset($periods[$wday]))
 		{
 			$next_h = -1;
@@ -806,7 +806,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 					return $next_time;
 			}
 		}
-		return $max_time;
+		return -1;
 	}
 
 	function	validate_period(&$str)

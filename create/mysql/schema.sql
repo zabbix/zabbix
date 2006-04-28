@@ -147,7 +147,7 @@ CREATE TABLE config (
   alert_history		int(4)		DEFAULT '0' NOT NULL,
   alarm_history		int(4)		DEFAULT '0' NOT NULL,
   refresh_unsupported	int(4)		DEFAULT '0' NOT NULL,
-  work_period		varchar(100)	DEFAULT '1-7,00:00-23:59' NOT NULL
+  work_period		varchar(100)	DEFAULT '1-5,00:00-24:00' NOT NULL
 ) type=InnoDB;
 
 --
