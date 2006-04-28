@@ -40,7 +40,7 @@
 		$graph->setBorder(0);
 	}
 
-	$result=DBselect("select name,width,height,yaxistype,yaxismin,yaxismax from graphs where graphid=".$_REQUEST["graphid"]);
+	$result=DBselect("select * from graphs where graphid=".$_REQUEST["graphid"]);
 	$row=DBfetch($result);
 	$db_hosts = get_hosts_by_graphid($_REQUEST["graphid"]);
 	$name=$row["name"];
@@ -67,6 +67,7 @@
 		$height=$row["height"];
 	}
 
+	$graph->ShowWorkPeriod($row["show_work_period"]);
 	$graph->setWidth($width);
 	$graph->setHeight($height);
 	$graph->setHeader($name);
