@@ -708,7 +708,6 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 					));
 			}
 		}
-//print_r($out);
 		return $out;
 	}
 
@@ -717,7 +716,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 		$date = getdate($time);
 		$wday = $date['wday'] == 0 ? 7 : $date['wday'];
 		$curr = $date['hours']*100+$date['minutes'];
-//$debug = 1;
+
 		if(isset($periods[$wday]))
 		{
 			$next_h = -1;
@@ -735,7 +734,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 					continue;
 				}
 				$per_end = $period['end_h']*100+$period['end_m'];
-				if($per_end < $curr) continue;
+				if($per_end <= $curr) continue;
 				return $time;
 			}
 			if($next_h >= 0 && $next_m >= 0)
@@ -768,7 +767,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 		return -1;
 	}
 
-	function	find_period_end($periods,$time)
+	function	find_period_end($periods,$time,$max_time)
 	{
 		$date = getdate($time);
 		$wday = $date['wday'] == 0 ? 7 : $date['wday'];
@@ -797,15 +796,17 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 
 				if($new_time == $time)
 					return $time;
+				if($new_time > $max_time)
+					return $max_time;
 
-				$next_time = find_period_end($periods,$new_time);
+				$next_time = find_period_end($periods,$new_time,$max_time);
 				if($next_time < 0)
 					return $new_time;
 				else
 					return $next_time;
 			}
 		}
-		return -1;
+		return $max_time;
 	}
 
 	function	validate_period(&$str)
@@ -829,9 +830,11 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 
 			if($arr[1] > $arr[2]) // check week day
 				return -1;
-			if($arr[3] > 23 || $arr[5] > 23) // check hour
+			if($arr[3] > 23 || $arr[3] < 0 || $arr[5] > 24 || $arr[5] < 0) // check hour
 				return -1;
-			if($arr[4] > 59 || $arr[6] > 59) // check min
+			if($arr[4] > 59 || $arr[4] < 0 || $arr[6] > 59 || $arr[6] < 0) // check min
+				return -1;
+			if(($arr[5]*100 + $arr[6]) > 2400) // check max time 24:00
 				return -1;
 			if(($arr[3] * 100 + $arr[4]) >= ($arr[5] * 100 + $arr[6])) // check time period
 				return -1;
