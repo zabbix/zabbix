@@ -380,7 +380,8 @@
 			}
 			$from = $this->from_time;
 			$max_time = $this->to_time;
-
+//SDI("from: ".date('r',$from));
+//SDI("max_time: ".date('r',$max_time));
 			$start = find_period_start($periods,$from);
 			$end = -1;
 			while($start < $max_time && $start > 0)
@@ -389,6 +390,8 @@
 
 				$x1 = round((($start-$from)*$this->sizeX)/$this->period) + $this->shiftXleft;
 				$x2 = round((($end-$from)*$this->sizeX)/$this->period) + $this->shiftXleft;
+//SDI("start [$x1]: ".date('r',$start));
+//SDI("end   [$x2]:".date('r',$end));
 				
 				//draw rectangle
 				ImageFilledRectangle(
