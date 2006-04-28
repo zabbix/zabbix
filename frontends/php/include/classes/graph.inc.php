@@ -99,6 +99,7 @@
 				$this->colors["White"]=			ImageColorAllocate($this->im,255,255,255);
 				$this->colors["Dark Red No Alpha"]=	ImageColorAllocate($this->im,150,0,0); 
 				$this->colors["Black No Alpha"]=	ImageColorAllocate($this->im,0,0,0); 
+				$this->colors["Not Work Period"]=	ImageColorAllocate($this->im,230,230,230); 
 			}
 			else
 			{
@@ -117,6 +118,8 @@
 
 				$this->colors["Dark Red No Alpha"]=	ImageColorAllocate($this->im,150,0,0); 
 				$this->colors["Black No Alpha"]=	ImageColorAllocate($this->im,0,0,0); 
+				$this->colors["Not Work Period"]=	ImageColorAllocate($this->im,230,230,230); 
+			
 			}
 		}
 
@@ -262,7 +265,7 @@
 
 		function drawRectangle()
 		{
-			ImageFilledRectangle($this->im,0,0,$this->sizeX+$this->shiftXleft+$this->shiftXright+1,$this->sizeY+$this->shiftY+62+12*$this->num+8,$this->colors["White"]);
+			ImageFilledRectangle($this->im,0,0,$this->sizeX+$this->shiftXleft+$this->shiftXright+1,$this->sizeY+$this->shiftY+62+12*$this->num+8,$this->colors[($this->m_showWorkPeriod != 1) ? "White" : "Not Work Period"]);
 			if($this->border==1)
 			{
 				ImageRectangle($this->im,0,0,imagesx($this->im)-1,imagesy($this->im)-1,$this->colors["Black No Alpha"]);
@@ -355,8 +358,6 @@
 			if($this->m_showWorkPeriod != 1) return;
 			if($this->period > 2678400) return; // > 31*24*3600 (month)
 
-			$workPeriodColor = ImageColorAllocate($this->im,230,230,230);
-			
 			$db_work_period = DBselect("select work_period from config");
 			$work_period = DBfetch($db_work_period);
 			if(!$work_period)
@@ -369,8 +370,6 @@
 			$now = time();
 			if(isset($this->stime))
 			{
-#				$this->to_time=$this->stime+24*3600;
-#				$this->from_time=$this->stime;
 				$this->from_time=$this->stime;
 				$this->to_time=$this->stime+$this->period;
 			}
@@ -384,11 +383,9 @@
 
 			$start = find_period_start($periods,$from);
 			$end = -1;
-
 			while($start < $max_time && $start > 0)
 			{
-				$end = find_period_end($periods,$start);
-				if($end >= ($max_time) || $end < 0)	$end = $max_time;
+				$end = find_period_end($periods,$start,$max_time);
 
 				$x1 = round((($start-$from)*$this->sizeX)/$this->period) + $this->shiftXleft;
 				$x2 = round((($end-$from)*$this->sizeX)/$this->period) + $this->shiftXleft;
@@ -400,9 +397,9 @@
 					$this->shiftY,
 					$x2,
 					$this->sizeY+$this->shiftY,
-					$workPeriodColor);
+					$this->colors["White"]);
 
-				$start = find_period_start($periods,$end+60);
+				$start = find_period_start($periods,$end);
 			}
 		}
 
