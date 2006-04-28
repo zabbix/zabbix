@@ -703,8 +703,7 @@
 		{
 			$frmGraph->AddVar("graphid",$_REQUEST["graphid"]);
 
-			$result=DBselect("select g.graphid,g.name,g.width,g.height,g.yaxistype,".
-				"g.yaxismin,g.yaxismax from graphs g where graphid=".$_REQUEST["graphid"]);
+			$result=DBselect("select * from graphs where graphid=".$_REQUEST["graphid"]);
 			$row=DBfetch($result);
 			$frmGraph->SetTitle(S_GRAPH." \"".$row["name"]."\"");
 		}
@@ -717,6 +716,7 @@
 			$yaxistype	=$row["yaxistype"];
 			$yaxismin	=$row["yaxismin"];
 			$yaxismax	=$row["yaxismax"];
+			$showworkperiod = $row["show_work_period"];
 		} else {
 			$name		=get_request("name"	,"");
 			$width		=get_request("width"	,900);
@@ -724,11 +724,14 @@
 			$yaxistype	=get_request("yaxistype",GRAPH_YAXIS_TYPE_CALCULATED);
 			$yaxismin	=get_request("yaxismin"	,0.00);
 			$yaxismax	=get_request("yaxismax"	,100.00);
+			$showworkperiod = get_request("show_work_period",1);
+			
 		}
 	
 		$frmGraph->AddRow(S_NAME,new CTextBox("name",$name,32));
 		$frmGraph->AddRow(S_WIDTH,new CTextBox("width",$width,5));
 		$frmGraph->AddRow(S_HEIGHT,new CTextBox("height",$height,5));
+		$frmGraph->AddRow(S_SHOW_WORKING_TIME,new CCheckBox("showworkperiod",$showworkperiod,NULL,NULL,1));
 
 		$cmbYType = new CComboBox("yaxistype",$yaxistype,"submit()");
 		$cmbYType->AddItem(GRAPH_YAXIS_TYPE_CALCULATED,S_CALCULATED);
@@ -1870,10 +1873,27 @@
 		$frmHouseKeep->SetHelp("web.config.housekeeper.php");
 		$frmHouseKeep->AddVar("config",get_request("config",0));
 		$frmHouseKeep->AddVar("refresh_unsupported",$config["refresh_unsupported"]);
+		$frmHouseKeep->AddVar("work_period",$config["work_period"]);
 		$frmHouseKeep->AddRow(S_DO_NOT_KEEP_ACTIONS_OLDER_THAN,
 			new CTextBox("alert_history",$config["alert_history"],8));
 		$frmHouseKeep->AddRow(S_DO_NOT_KEEP_EVENTS_OLDER_THAN,
 			new CTextBox("alarm_history",$config["alarm_history"],8));
+		$frmHouseKeep->AddItemToBottomRow(new CButton("save",S_SAVE));
+		$frmHouseKeep->Show();
+	}
+
+	function	insert_work_period_form()
+	{
+		$config=select_config();
+		
+		$frmHouseKeep = new CFormTable(S_WORKING_TIME,"config.php");
+		$frmHouseKeep->SetHelp("web.config.workperiod.php");
+		$frmHouseKeep->AddVar("config",get_request("config",7));
+		$frmHouseKeep->AddVar("alert_history",$config["alert_history"]);
+		$frmHouseKeep->AddVar("alarm_history",$config["alarm_history"]);
+		$frmHouseKeep->AddVar("refresh_unsupported",$config["refresh_unsupported"]);
+		$frmHouseKeep->AddRow(S_WORKING_TIME,
+			new CTextBox("work_period",$config["work_period"],35));
 		$frmHouseKeep->AddItemToBottomRow(new CButton("save",S_SAVE));
 		$frmHouseKeep->Show();
 	}
@@ -1887,6 +1907,7 @@
 		$frmHouseKeep->AddVar("config",get_request("config",5));
 		$frmHouseKeep->AddVar("alert_history",$config["alert_history"]);
 		$frmHouseKeep->AddVar("alarm_history",$config["alarm_history"]);
+		$frmHouseKeep->AddVar("work_period",$config["work_period"]);
 		$frmHouseKeep->AddRow(S_REFRESH_UNSUPPORTED_ITEMS,
 			new CTextBox("refresh_unsupported",$config["refresh_unsupported"],8));
 		$frmHouseKeep->AddItemToBottomRow(new CButton("save",S_SAVE));

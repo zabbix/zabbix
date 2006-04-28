@@ -31,6 +31,8 @@
 		var $shiftY;
 		var $border;
 
+		var $m_showWorkPeriod;
+
 		var $yaxistype;
 		var $yaxismin;
 		var $yaxismax;
@@ -132,6 +134,8 @@
 			$this->yaxistype=GRAPH_YAXIS_TYPE_CALCULATED;
 			$this->yaxisright=0;
 			$this->yaxisleft=0;
+			
+			$this->m_showWorkPeriod = 1;
 
 			$this->count=array();
 			$this->min=array();
@@ -153,6 +157,11 @@
 
 		}
 
+		function ShowWorkPeriod($value)
+		{
+			$this->m_showWorkPeriod = $value;
+		}
+	
 		function addItem($itemid, $axis)
 		{
 			$this->items[$this->num]=get_item_by_itemid($itemid);
@@ -338,6 +347,62 @@
 					ImageStringUp($this->im, 1,$i*$this->sizeX/24+$this->shiftXleft-3, $this->sizeY+$this->shiftY+57, date("m.d H:i",$this->from_time+$i*$this->period/24) , $this->colors["Dark Red No Alpha"]);
 
 				}
+			}
+		}
+
+		function drawWorkPeriod()
+		{
+			if($this->m_showWorkPeriod != 1) return;
+			if($this->period > 2678400) return; // > 31*24*3600 (month)
+
+			$workPeriodColor = ImageColorAllocate($this->im,230,230,230);
+			
+			$db_work_period = DBselect("select work_period from config");
+			$work_period = DBfetch($db_work_period);
+			if(!$work_period)
+				return;
+
+			$periods = parse_period($work_period['work_period']);
+			if(!$periods)
+				return;
+
+			$now = time();
+			if(isset($this->stime))
+			{
+#				$this->to_time=$this->stime+24*3600;
+#				$this->from_time=$this->stime;
+				$this->from_time=$this->stime;
+				$this->to_time=$this->stime+$this->period;
+			}
+			else
+			{
+				$this->to_time=$now-3600*$this->from;
+				$this->from_time=$this->to_time-$this->period;
+			}
+			$from = $this->from_time;
+			$max_time = $this->to_time;
+
+			$start = find_period_start($periods,$from);
+			$end = -1;
+
+			while($start < $max_time && $start > 0)
+			{
+				$end = find_period_end($periods,$start);
+				if($end >= ($max_time) || $end < 0)	$end = $max_time;
+
+				$x1 = round((($start-$from)*$this->sizeX)/$this->period) + $this->shiftXleft;
+				$x2 = round((($end-$from)*$this->sizeX)/$this->period) + $this->shiftXleft;
+				
+				//draw rectangle
+				ImageFilledRectangle(
+					$this->im,
+					$x1,
+					$this->shiftY,
+					$x2,
+					$this->sizeY+$this->shiftY,
+					$workPeriodColor);
+
+				$start = find_period_start($periods,$end+60);
 			}
 		}
 
@@ -624,9 +689,11 @@
 
 //			$this->im = imagecreate($this->sizeX+$this->shiftX+61,$this->sizeY+2*$this->shiftY+40);
 
-//			Header( "Content-type:  text/html"); 
+			Header( "Content-type:  text/html"); 
+/*
 			Header( "Content-type:  image/png"); 
 			Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
+/**/
 
 			check_authorisation();
 
@@ -654,6 +721,7 @@
 
 			$this->selectData();
 
+			$this->drawWorkPeriod();
 			$this->drawGrid();
 
 //			ImageString($this->im, 0, 100, 100, $this->shiftXright, $this->colors["Red"]);

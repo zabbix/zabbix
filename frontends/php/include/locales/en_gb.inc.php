@@ -263,6 +263,7 @@
 	"S_CREATE_MEDIA_TYPE"=>			"Create Media Type",
 	"S_CREATE_IMAGE"=>			"Create Image",
 	"S_CREATE_RULE"=>			"Create Rule",
+	"S_WORKING_TIME"=>			"Working time",
 
 //	Latest values
 	"S_LATEST_VALUES"=>			"Latest values",
@@ -317,6 +318,7 @@
 	"S_CALCULATED"=>			"Calculated",
 	"S_FIXED"=>				"Fixed",
 	"S_CREATE_GRAPH"=>			"Create Graph",
+	"S_SHOW_WORKING_TIME"=>			"Show working time",
 
 //	history.php
 	"S_LAST_HOUR_GRAPH"=>			"Last hour graph",

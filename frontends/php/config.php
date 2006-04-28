@@ -46,15 +46,17 @@
 	$fields=array(
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 
-		"config"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1,3,4,5,6"),	NULL),
+		"config"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1,3,4,5,6,7"),	NULL),
 
 // other form
 		"alert_history"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),
-						'in_array({config},array(0,5))&&({save}=="Save")'),
+						'in_array({config},array(0,5,7))&&({save}=="Save")'),
 		"alarm_history"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),
-						'in_array({config},array(0,5))&&({save}=="Save")'),
+						'in_array({config},array(0,5,7))&&({save}=="Save")'),
 		"refresh_unsupported"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),
-						'in_array({config},array(0,5))&&({save}=="Save")'),
+						'in_array({config},array(0,5,7))&&({save}=="Save")'),
+		"work_period"=>		array(T_ZBX_STR, O_NO,	NULL,	NULL,
+						'in_array({config},array(0,5,7))&&({save}=="Save")'),
 
 // media form
 		"mediatypeid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),
@@ -257,14 +259,14 @@
 			show_messages($result, S_AUTOREGISTRATION_DELETED, S_AUTOREGISTRATION_WAS_NOT_DELETED);
 		}
 	}
-	elseif(isset($_REQUEST["save"])&&in_array($_REQUEST["config"],array(0,5)))
+	elseif(isset($_REQUEST["save"])&&in_array($_REQUEST["config"],array(0,5,7)))
 	{
 
 
 
 /* OTHER ACTIONS */
 		$result=update_config($_REQUEST["alarm_history"],$_REQUEST["alert_history"],
-			$_REQUEST["refresh_unsupported"]);
+			$_REQUEST["refresh_unsupported"],$_REQUEST["work_period"]);
 
 		show_messages($result, S_CONFIGURATION_UPDATED, S_CONFIGURATION_WAS_NOT_UPDATED);
 		if($result)
@@ -346,6 +348,7 @@
 	$cmbConfig->AddItem(3,S_IMAGES);
 	$cmbConfig->AddItem(4,S_AUTOREGISTRATION);
 	$cmbConfig->AddItem(6,S_VALUE_MAPPING);
+	$cmbConfig->AddItem(7,S_WORKING_TIME);
 	$cmbConfig->AddItem(5,S_OTHER);
 	$form->AddItem($cmbConfig);
 	switch($_REQUEST["config"])
@@ -379,6 +382,10 @@
 	elseif($_REQUEST["config"]==5)
 	{
 		insert_other_parameters_form();
+	}
+	elseif($_REQUEST["config"]==7)
+	{
+		insert_work_period_form();
 	}
 	elseif($_REQUEST["config"]==1)
 	{
