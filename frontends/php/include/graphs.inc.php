@@ -94,7 +94,7 @@
 
 	# Add Graph
 
-	function	add_graph($name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$templateid=0)
+	function	add_graph($name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$templateid=0)
 	{
 		if(!check_right("Graph","A",0))
 		{
@@ -103,9 +103,9 @@
 		}
 
 		$result=DBexecute("insert into graphs".
-			" (name,width,height,yaxistype,yaxismin,yaxismax,templateid)".
+			" (name,width,height,yaxistype,yaxismin,yaxismax,templateid,show_work_period)".
 			" values (".zbx_dbstr($name).",$width,$height,$yaxistype,$yaxismin,".
-			" $yaxismax,$templateid)");
+			" $yaxismax,$templateid,$showworkperiod)");
 		$graphid =  DBinsert_id($result,"graphs","graphid");
 		if($graphid)
 		{
@@ -116,7 +116,7 @@
 
 	# Update Graph
 
-	function	update_graph($graphid,$name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$templateid=0)
+	function	update_graph($graphid,$name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$templateid=0)
 	{
 		if(!check_right("Graph","U",0))
 		{
@@ -130,14 +130,15 @@
 		while($graph = DBfetch($graphs))
 		{
 			$result = update_graph($graph["graphid"],$name,$width,
-				$height,$yaxistype,$yaxismin,$yaxismax,$graphid);
+				$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$graphid);
 			if(!$result)
 				return $result;
 		}
 
 		$result = DBexecute("update graphs set name=".zbx_dbstr($name).",width=$width,height=$height,".
-			"yaxistype=$yaxistype,yaxismin=$yaxismin,yaxismax=$yaxismax,templateid=$templateid".
-			" where graphid=$graphid");
+			"yaxistype=$yaxistype,yaxismin=$yaxismin,yaxismax=$yaxismax,templateid=$templateid,".
+			"show_work_period=$showworkperiod ".
+			"where graphid=$graphid");
 		if($result)
 		{
 			info("Graph '".$g_graph["name"]."' updated");
@@ -214,7 +215,7 @@
 				while($chd_host = DBfetch($chd_hosts))
 				{
 					$new_graphid = add_graph($graph["name"],$graph["width"],$graph["height"],
-						$graph["yaxistype"],$graph["yaxismin"],$graph["yaxismax"],
+						$graph["yaxistype"],$graph["yaxismin"],$graph["yaxismax"],$graph["show_work_period"],
 						$graph["graphid"]);
 
 					if(!$new_graphid)
@@ -449,7 +450,8 @@
 	{
 		$db_graph = get_graph_by_graphid($graphid);
 		$new_graphid = add_graph($db_graph["name"],$db_graph["width"],$db_graph["height"],
-			$db_graph["yaxistype"],$db_graph["yaxismin"],$db_graph["yaxismax"],$graphid);
+			$db_graph["yaxistype"],$db_graph["yaxismin"],$db_graph["yaxismax"],$graph["show_work_period"],
+			$graphid);
 		if(!$new_graphid)
 			return $new_graphid;
 

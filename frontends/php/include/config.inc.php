@@ -687,6 +687,162 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 		show_messages(FALSE,'',$msg);
 	}
 
+	function	parse_period($str)
+	{
+		$out = NULL;
+		$str = trim($str,';');
+		$periods = split(';',$str);
+		foreach($periods as $preiod)
+		{
+			if(!ereg('^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$', $preiod, $arr))
+				return NULL;
+			for($i = $arr[1]; $i <= $arr[2]; $i++)
+			{
+				if(!isset($out[$i])) $out[$i] = array();
+				array_push($out[$i],
+					array(
+						'start_h'	=> $arr[3],
+						'start_m'	=> $arr[4],
+						'end_h'		=> $arr[5],
+						'end_m'		=> $arr[6]
+					));
+			}
+		}
+//print_r($out);
+		return $out;
+	}
+
+	function	find_period_start($periods,$time)
+	{
+		$date = getdate($time);
+		$wday = $date['wday'] == 0 ? 7 : $date['wday'];
+		$curr = $date['hours']*100+$date['minutes'];
+//$debug = 1;
+		if(isset($periods[$wday]))
+		{
+			$next_h = -1;
+			$next_m = -1;
+			foreach($periods[$wday] as $period)
+			{
+				$per_start = $period['start_h']*100+$period['start_m'];
+				if($per_start > $curr)
+				{
+					if(($next_h == -1 && $next_m == -1) || ($per_start < ($next_h*100 + $next_m)))
+					{
+						$next_h = $period['start_h'];
+						$next_m = $period['start_m'];
+					}
+					continue;
+				}
+				$per_end = $period['end_h']*100+$period['end_m'];
+				if($per_end < $curr) continue;
+				return $time;
+			}
+			if($next_h >= 0 && $next_m >= 0)
+			{
+				return mktime($next_h, $next_m, 0, $date['mon'], $date['mday'], $date['year']);
+			}
+		}
+		for($days=1; $days < 7 ; ++$days)
+		{
+			$new_wday = (($wday + $days - 1)%7 + 1);
+			if(isset($periods[$new_wday ]))
+			{
+				$next_h = -1;
+				$next_m = -1;
+				foreach($periods[$new_wday] as $period)
+				{
+					$per_start = $period['start_h']*100+$period['start_m'];
+					if(($next_h == -1 && $next_m == -1) || ($per_start < ($next_h*100 + $next_m)))
+					{
+						$next_h = $period['start_h'];
+						$next_m = $period['start_m'];
+					}
+				}
+				if($next_h >= 0 && $next_m >= 0)
+				{
+					return mktime($next_h, $next_m, 0, $date['mon'], $date['mday'] + $days, $date['year']);
+				}
+			}
+		}
+		return -1;
+	}
+
+	function	find_period_end($periods,$time)
+	{
+		$date = getdate($time);
+		$wday = $date['wday'] == 0 ? 7 : $date['wday'];
+		$curr = $date['hours']*100+$date['minutes'];
+
+		if(isset($periods[$wday]))
+		{
+			$next_h = -1;
+			$next_m = -1;
+			foreach($periods[$wday] as $period)
+			{
+				$per_start = $period['start_h']*100+$period['start_m'];
+				$per_end = $period['end_h']*100+$period['end_m'];
+				if($per_start > $curr) continue;
+				if($per_end < $curr) continue;
+
+				if(($next_h == -1 && $next_m == -1) || ($per_end > ($next_h*100 + $next_m)))
+				{
+					$next_h = $period['end_h'];
+					$next_m = $period['end_m'];
+				}
+			}
+			if($next_h >= 0 && $next_m >= 0)
+			{
+				$new_time = mktime($next_h, $next_m, 0, $date['mon'], $date['mday'], $date['year']);
+
+				if($new_time == $time)
+					return $time;
+
+				$next_time = find_period_end($periods,$new_time);
+				if($next_time < 0)
+					return $new_time;
+				else
+					return $next_time;
+			}
+		}
+		return -1;
+	}
+
+	function	validate_period(&$str)
+	{
+/* // simple check
+		$per_expr = '[1-7]-[1-7],[0-9]{1,2}:[0-9]{1,2}-[0-9]{1,2}:[0-9]{1,2}';
+		$regexp = '^'.$per_expr.'(;'.$per_expr.')*[;]?$';
+		if(!ereg($regexp, $str, $arr))
+			return -1;
+
+		return 0;
+*/
+		$str = trim($str,';');
+		$out = "";
+		$periods = split(';',$str);
+		foreach($periods as $preiod)
+		{
+			// arr[idx]   1       2         3             4            5            6
+			if(!ereg('^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$', $preiod, $arr))
+				return -1;
+
+			if($arr[1] > $arr[2]) // check week day
+				return -1;
+			if($arr[3] > 23 || $arr[5] > 23) // check hour
+				return -1;
+			if($arr[4] > 59 || $arr[6] > 59) // check min
+				return -1;
+			if(($arr[3] * 100 + $arr[4]) >= ($arr[5] * 100 + $arr[6])) // check time period
+				return -1;
+
+			$out .= sprintf("%d-%d,%02d:%02d-%02d:%02d",$arr[1],$arr[2],$arr[3],$arr[4],$arr[5],$arr[6]).';';
+		}
+		$str = $out;
+//parse_period($str);
+		return 0;
+	}
+
 	function	validate_float($str)
 	{
 //		echo "Validating float:$str<br>";
@@ -1481,6 +1637,12 @@ COpt::profiling_start("page");
 
 	function	add_media( $userid, $mediatypeid, $sendto, $severity, $active, $period)
 	{
+		if(validate_period($period) != 0)
+		{
+			error("Icorrect time period");
+			return NULL;
+		}
+
 		$c=count($severity);
 		$s=0;
 		for($i=0;$i<$c;$i++)
@@ -1495,6 +1657,12 @@ COpt::profiling_start("page");
 
 	function	update_media($mediaid, $userid, $mediatypeid, $sendto, $severity, $active, $period)
 	{
+		if(validate_period($period) != 0)
+		{
+			error("Icorrect time period");
+			return NULL;
+		}
+
 		$c=count($severity);
 		$s=0;
 		for($i=0;$i<$c;$i++)
@@ -1530,17 +1698,23 @@ COpt::profiling_start("page");
 	# Update configuration
 
 //	function	update_config($smtp_server,$smtp_helo,$smtp_email,$alarm_history,$alert_history)
-	function	update_config($alarm_history,$alert_history,$refresh_unsupported)
+	function	update_config($alarm_history,$alert_history,$refresh_unsupported,$work_period)
 	{
 		if(!check_right("Configuration of Zabbix","U",0))
 		{
 			error("Insufficient permissions");
 			return	0;
 		}
+		if(validate_period($work_period) != 0)
+		{
+			error("Icorrect work period");
+			return NULL;
+		}
 
 
 //		$sql="update config set smtp_server='$smtp_server',smtp_helo='$smtp_helo',smtp_email='$smtp_email',alarm_history=$alarm_history,alert_history=$alert_history";
-		$sql="update config set alarm_history=$alarm_history,alert_history=$alert_history,refresh_unsupported=$refresh_unsupported";
+		$sql="update config set alarm_history=$alarm_history,alert_history=$alert_history,refresh_unsupported=$refresh_unsupported,".
+			"work_period=".zbx_dbstr($work_period);
 		return	DBexecute($sql);
 	}
 

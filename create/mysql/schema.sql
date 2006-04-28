@@ -77,6 +77,7 @@ CREATE TABLE graphs (
   yaxismin		double(16,4)	DEFAULT '0' NOT NULL,
   yaxismax		double(16,4)	DEFAULT '0' NOT NULL,
   templateid		int(4)		DEFAULT '0' NOT NULL,
+  show_work_period	int(1)		DEFAULT '1' NOT NULL,
   PRIMARY KEY (graphid),
   KEY (name)
 ) type=InnoDB;
@@ -145,7 +146,8 @@ CREATE TABLE config (
 --  password_required	int(1)		DEFAULT '0' NOT NULL,
   alert_history		int(4)		DEFAULT '0' NOT NULL,
   alarm_history		int(4)		DEFAULT '0' NOT NULL,
-  refresh_unsupported	int(4)		DEFAULT '0' NOT NULL
+  refresh_unsupported	int(4)		DEFAULT '0' NOT NULL,
+  period		varchar(100)	DEFAULT '1-7,00:00-23:59' NOT NULL
 ) type=InnoDB;
 
 --

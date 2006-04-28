@@ -101,6 +101,7 @@ CREATE TABLE config (
   alert_history		int4		DEFAULT '0' NOT NULL,
   alarm_history		int4		DEFAULT '0' NOT NULL,
   refresh_unsupported	int4		DEFAULT '0' NOT NULL
+  period		varchar(100)	DEFAULT '1-7,00:00-23:59' NOT NULL,
 );
 
 --
@@ -486,6 +487,7 @@ CREATE TABLE graphs (
   yaxismin		float8		DEFAULT '0' NOT NULL,
   yaxismax		float8		DEFAULT '0' NOT NULL,
   templateid		int4		DEFAULT '0' NOT NULL,
+  show_work_period	int2		DEFAULT '1' NOT NULL,
   PRIMARY KEY (graphid),
   UNIQUE (name)
 );
