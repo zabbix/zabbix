@@ -1563,6 +1563,8 @@
 		$cmbRes->AddItem(SCREEN_RESOURCE_DATA_OVERVIEW,		S_DATA_OVERVIEW);
 		$cmbRes->AddItem(SCREEN_RESOURCE_CLOCK,		S_CLOCK);
 		$cmbRes->AddItem(SCREEN_RESOURCE_URL,		S_URL);
+		$cmbRes->AddItem(SCREEN_RESOURCE_ACTIONS,	S_HISTORY_OF_ACTIONS);
+                $cmbRes->AddItem(SCREEN_RESOURCE_EVENTS,       S_HISTORY_OF_EVENTS);
 		$form->AddRow(S_RESOURCE,$cmbRes);
 
 		if($resource == SCREEN_RESOURCE_GRAPH)
@@ -1638,6 +1640,18 @@
 			$form->AddRow(S_PARAMETER,$cmbHosts);
 			$form->AddRow(S_SHOW_LINES, new CTextBox("elements",$elements,2));
 		}
+                elseif($resource == SCREEN_RESOURCE_ACTIONS)
+                {
+        // History of actions
+                        $form->AddRow(S_SHOW_LINES, new CTextBox("elements",$elements,2));
+			$form->AddVar("resourceid",0);
+                }
+                elseif($resource == SCREEN_RESOURCE_EVENTS)
+                {
+        // History of events
+                        $form->AddRow(S_SHOW_LINES, new CTextBox("elements",$elements,2));
+                        $form->AddVar("resourceid",0);
+                }
 		elseif(in_array($resource,array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW,SCREEN_RESOURCE_DATA_OVERVIEW)))
 		{
 	// Overiews

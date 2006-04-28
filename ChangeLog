@@ -1,5 +1,6 @@
 Changes for 1.1beta10:
 
+ - added support of history of actions and events for screens (Martins)
  - fixed server hanging in calculation of aggregate functions (Alexei)
  - allow item delays up-to 24h (Alexei)
  - unsupported items can be activated by one click (Eugene)

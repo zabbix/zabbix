@@ -291,6 +291,16 @@
 					$item = array(new CIFrame($url,$width,$height,"auto"));
 					if($editmode == 1)	array_push($item,BR,new CLink(S_CHANGE,$action));
 				}
+				elseif( ($screenitemid!=0) && ($resource==SCREEN_RESOURCE_ACTIONS) )
+				{
+					$item = array(get_history_of_actions(0, $elements));
+					if($editmode == 1)      array_push($item,new CLink(S_CHANGE,$action));
+				}
+				elseif( ($screenitemid!=0) && ($resource==SCREEN_RESOURCE_EVENTS) )
+				{
+					$item = array(get_history_of_events(0, $elements));
+					if($editmode == 1)      array_push($item,new CLink(S_CHANGE,$action));
+				}
 				else
 				{
 					$item = array(SPACE);
