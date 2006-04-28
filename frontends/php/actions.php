@@ -78,66 +78,15 @@
 	show_header2(S_HISTORY_OF_ACTIONS_BIG,$form);
 ?>
 
+<?
+        if(!isset($_REQUEST["start"]))
+        {
+                $_REQUEST["start"]=0;
+        }
 
-<FONT COLOR="#000000">
-<?php
-	if(!isset($_REQUEST["start"]))
-	{
-		$_REQUEST["start"]=0;
-	}
-	$sql="select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,".
-		"a.error from alerts a,media_type mt where mt.mediatypeid=a.mediatypeid order by a.clock".
-		" desc limit ".(10*($_REQUEST["start"]+100));
-	$result=DBselect($sql);
+        $table=get_history_of_actions($_REQUEST["start"], 100);
 
-	$table = new CTableInfo(S_NO_ACTIONS_FOUND);
-	$table->setHeader(array(S_TIME, S_TYPE, S_STATUS, S_RECIPIENTS, S_SUBJECT, S_MESSAGE, S_ERROR));
-	$col=0;
-	$skip=$_REQUEST["start"];
-	while(($row=DBfetch($result))&&($col<100))
-	{
-		if(!check_anyright("Default permission","R"))
-                {
-			continue;
-		}
-
-		if($skip > 0) {
-			$skip--;
-			continue;
-		}
-
-		$time=date("Y.M.d H:i:s",$row["clock"]);
-
-		if($row["status"] == 1)
-		{
-			$status=new CCol(S_SENT,"off");
-		}
-		else
-		{
-			$status=new CCol(S_NOT_SENT,"on");
-		}
-		$sendto=htmlspecialchars($row["sendto"]);
-		$subject="<pre>".htmlspecialchars($row["subject"])."</pre>";
-		$message="<pre>".htmlspecialchars($row["message"])."</pre>";
-		if($row["error"] == "")
-		{
-			$error=new CSpan(SPACE,"off");
-		}
-		else
-		{
-			$error=new CSpan($row["error"],"on");
-		}
-		$table->addRow(array(
-			$time,
-			$row["description"],
-			$status,
-			$sendto,
-			$subject,
-			$message,
-			$error));
-		$col++;
-	}
-	$table->show();
+	$table->Show();
 ?>
 
 <?php

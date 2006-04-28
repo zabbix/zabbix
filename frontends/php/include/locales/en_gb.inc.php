@@ -709,6 +709,8 @@
 	"S_CLOCK"=>				"Clock",
 	"S_TRIGGERS_OVERVIEW"=>			"Triggers overview",
 	"S_DATA_OVERVIEW"=>			"Data overview",
+        "S_HISTORY_OF_ACTIONS"=>                "History of actions",
+        "S_HISTORY_OF_EVENTS"=>                 "History of events",
 
 	"S_TIME_TYPE"=>				"Time type",
 	"S_SERVER_TIME"=>			"Server time",

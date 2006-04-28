@@ -26,6 +26,8 @@
 	$DB_TYPE	="MYSQL";
 	$DB_SERVER	="localhost";
 //	$DB_DATABASE	="zabbix";
+//	$DB_DATABASE	="osmiy";
+//	$DB_DATABASE	="zabbix";
 	$DB_DATABASE	="osmiy";
 //	$DB_DATABASE	="demo";
 //	$DB_DATABASE	="martinsj";
@@ -81,6 +83,8 @@
 	function	DBexecute($query, $skip_error_messages=0)
 	{
 		global $DB,$DB_TYPE;
+
+//		echo $query,"<br>";
 
 		$result = FALSE;
 
