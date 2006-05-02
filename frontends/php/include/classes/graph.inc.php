@@ -31,13 +31,19 @@
 		var $shiftY;
 		var $border;
 
+		var $fullSizeX;
+		var $fullSizeY;
+
 		var $m_showWorkPeriod;
+		var $m_showTriggers;
 
 		var $yaxistype;
 		var $yaxismin;
 		var $yaxismax;
 		var $yaxisleft;
 		var $yaxisright;
+		var $m_minY;
+		var $m_maxY;
 
 		// items[num].data.min[max|avg]
 		var $items;
@@ -58,6 +64,8 @@
 
 		var $colors;
 		var $im;
+
+		var $triggers = array();
 
 		function updateShifts()
 		{
@@ -96,10 +104,6 @@
 				$this->colors["Black"]=		ImageColorExactAlpha($this->im,0,0,0,50); 
 				$this->colors["Gray"]=		ImageColorExactAlpha($this->im,150,150,150,50);
 
-				$this->colors["White"]=			ImageColorAllocate($this->im,255,255,255);
-				$this->colors["Dark Red No Alpha"]=	ImageColorAllocate($this->im,150,0,0); 
-				$this->colors["Black No Alpha"]=	ImageColorAllocate($this->im,0,0,0); 
-				$this->colors["Not Work Period"]=	ImageColorAllocate($this->im,230,230,230); 
 			}
 			else
 			{
@@ -114,13 +118,22 @@
 				$this->colors["Cyan"]=ImageColorAllocate($this->im,0,255,255); 
 				$this->colors["Black"]=ImageColorAllocate($this->im,0,0,0); 
 				$this->colors["Gray"]=ImageColorAllocate($this->im,150,150,150); 
-				$this->colors["White"]=ImageColorAllocate($this->im,255,255,255);
-
-				$this->colors["Dark Red No Alpha"]=	ImageColorAllocate($this->im,150,0,0); 
-				$this->colors["Black No Alpha"]=	ImageColorAllocate($this->im,0,0,0); 
-				$this->colors["Not Work Period"]=	ImageColorAllocate($this->im,230,230,230); 
 			
 			}
+			$this->colors["White"]=			ImageColorAllocate($this->im,255,255,255);
+			$this->colors["Dark Red No Alpha"]=	ImageColorAllocate($this->im,150,0,0); 
+			$this->colors["Black No Alpha"]=	ImageColorAllocate($this->im,0,0,0); 
+
+			$this->colors["Priority Disaster"]=	ImageColorAllocate($this->im,255,0,0); 
+			$this->colors["Priority Hight"]=	ImageColorAllocate($this->im,255,100,100); 
+			$this->colors["Priority Average"]=	ImageColorAllocate($this->im,221,120,120); 
+			$this->colors["Priority"]=		ImageColorAllocate($this->im,100,100,100); 
+//			$this->colors["Priority Disaster"]=		$this->colors["Dark Red No Alpha"]; 
+//			$this->colors["Priority Hight"]=		$this->colors["Dark Red No Alpha"]; 
+//			$this->colors["Priority Average"]=		$this->colors["Dark Red No Alpha"]; 
+//			$this->colors["Priority"]=		$this->colors["Dark Red No Alpha"]; 
+
+			$this->colors["Not Work Period"]=	ImageColorAllocate($this->im,230,230,230); 
 		}
 
 		function Graph()
@@ -139,6 +152,7 @@
 			$this->yaxisleft=0;
 			
 			$this->m_showWorkPeriod = 1;
+			$this->m_showTriggers = 1;
 
 			$this->count=array();
 			$this->min=array();
@@ -162,7 +176,12 @@
 
 		function ShowWorkPeriod($value)
 		{
-			$this->m_showWorkPeriod = $value;
+			$this->m_showWorkPeriod = $value == 1 ? 1 : 0;
+		}
+
+		function ShowTriggers($value)
+		{
+			$this->m_showTriggers = $value == 1 ? 1 : 0;;
 		}
 	
 		function addItem($itemid, $axis)
@@ -265,10 +284,14 @@
 
 		function drawRectangle()
 		{
-			ImageFilledRectangle($this->im,0,0,$this->sizeX+$this->shiftXleft+$this->shiftXright+1,$this->sizeY+$this->shiftY+62+12*$this->num+8,$this->colors[($this->m_showWorkPeriod != 1) ? "White" : "Not Work Period"]);
+			ImageFilledRectangle($this->im,0,0,
+				$this->fullSizeX,$this->fullSizeY,
+				$this->colors["White"]);
+
+
 			if($this->border==1)
 			{
-				ImageRectangle($this->im,0,0,imagesx($this->im)-1,imagesy($this->im)-1,$this->colors["Black No Alpha"]);
+				ImageRectangle($this->im,0,0,$this->fullSizeX-1,$this->fullSizeY-1,$this->colors["Black No Alpha"]);
 			}
 		}
 
@@ -316,7 +339,7 @@
 			{
 				$fontnum = 4;
 			}
-			$x=imagesx($this->im)/2-ImageFontWidth($fontnum)*strlen($str)/2;
+			$x=$this->fullSizeX/2-ImageFontWidth($fontnum)*strlen($str)/2;
 			ImageString($this->im, $fontnum,$x,1, $str , $this->colors["Dark Red No Alpha"]);
 		}
 
@@ -367,6 +390,13 @@
 			if(!$periods)
 				return;
 
+			ImageFilledRectangle($this->im,
+				$this->shiftXleft+1,
+				$this->shiftY,
+				$this->sizeX+$this->shiftXleft,
+				$this->sizeY+$this->shiftY,
+				$this->colors["Not Work Period"]);
+
 			$now = time();
 			if(isset($this->stime))
 			{
@@ -380,8 +410,7 @@
 			}
 			$from = $this->from_time;
 			$max_time = $this->to_time;
-//SDI("from: ".date('r',$from));
-//SDI("max_time: ".date('r',$max_time));
+
 			$start = find_period_start($periods,$from);
 			$end = -1;
 			while($start < $max_time && $start > 0)
@@ -390,8 +419,6 @@
 
 				$x1 = round((($start-$from)*$this->sizeX)/$this->period) + $this->shiftXleft;
 				$x2 = round((($end-$from)*$this->sizeX)/$this->period) + $this->shiftXleft;
-//SDI("start [$x1]: ".date('r',$start));
-//SDI("end   [$x2]:".date('r',$end));
 				
 				//draw rectangle
 				ImageFilledRectangle(
@@ -404,6 +431,70 @@
 
 				$start = find_period_start($periods,$end);
 			}
+		}
+		
+		function calcTriggers()
+		{
+			$this->triggers = array();
+			if($this->m_showTriggers != 1) return;
+			if($this->num != 1) return; // skip multiple graphs
+
+			$max = 3;
+			$cnt = 0;
+
+			$db_triggers = DBselect('select distinct tr.triggerid,tr.expression,tr.priority from triggers tr,functions f,items i'.
+				' where tr.triggerid=f.triggerid and f.function in ("last","min","max") and'.
+				' tr.status='.TRIGGER_STATUS_ENABLED.' and f.itemid='.$this->items[0]["itemid"].' order by tr.priority');
+
+			while(($trigger = DBfetch($db_triggers)) && ($cnt < $max))
+			{
+				$db_fnc_cnt = DBselect('select count(*) as cnt from functions f where f.triggerid='.$trigger['triggerid']);
+				$fnc_cnt = DBfetch($db_fnc_cnt);
+				if($fnc_cnt['cnt'] != 1) continue;
+
+				if(!eregi('\{([0-9]{1,})\}([\<\>\=]{1})([0-9\.]{1,})([K|M|G]{0,1})',$trigger['expression'],$arr))
+					continue;
+
+				$val = $arr[3];
+				if(strcasecmp($arr[4],'K') == 0)	$val *= 1024;
+				else if(strcasecmp($arr[4],'M') == 0)	$val *= 1048576; //1024*1024;
+				else if(strcasecmp($arr[4],'G') == 0)	$val *= 1073741824; //1024*1024*1024;
+
+				$minY = $this->m_minY[$this->items[0]["axisside"]];
+				$maxY = $this->m_maxY[$this->items[0]["axisside"]];
+
+				if($val <= $minY || $val >= $maxY)	continue;
+
+				if($trigger['priority'] == 5)		$color = "Priority Disaster";
+				elseif($trigger['priority'] == 4)	$color = "Priority Hight";
+				elseif($trigger['priority'] == 3)	$color = "Priority Average";
+				else 					$color = "Priority";
+
+				array_push($this->triggers,array(
+					'y' => $this->sizeY - (($val-$minY) / ($maxY-$minY)) * $this->sizeY + $this->shiftY,
+					'color' => $color,
+					'description' => 'trigger: '.expand_trigger_description($trigger['triggerid']).' ['.$arr[2].' '.$arr[3].$arr[4].']'
+					));
+				++$cnt;
+			}
+			
+		}
+		function drawTriggers()
+		{
+			if($this->m_showTriggers != 1) return;
+			if($this->num != 1) return; // skip multiple graphs
+
+			foreach($this->triggers as $trigger)
+			{
+				DashedLine(
+					$this->im,
+					$this->shiftXleft,
+					$trigger['y'],
+					$this->sizeX+$this->shiftXleft,
+					$trigger['y'],
+					$this->colors[$trigger['color']]);
+			}
+			
 		}
 
 		function checkPermissions()
@@ -420,7 +511,7 @@
 
 		function drawLogo()
 		{
-			ImageStringUp($this->im,0,imagesx($this->im)-10,imagesy($this->im)-50, "http://www.zabbix.com", $this->colors["Gray"]);
+			ImageStringUp($this->im,0,$this->fullSizeX-10,$this->fullSizeY-50, "http://www.zabbix.com", $this->colors["Gray"]);
 		}
 
 		function drawLegend()
@@ -454,7 +545,39 @@
 						str_pad($this->items[$i]["description"],$max_desc_len," "));
 				}
 	
-				ImageString($this->im, 2,$this->shiftXleft+9,$this->sizeY+$this->shiftY+(62-5)+12*$i,$str, $this->colors["Black No Alpha"]);
+				ImageString($this->im, 2,
+					$this->shiftXleft+9,
+					$this->sizeY+$this->shiftY+(62-5)+12*$i,
+					$str,
+					$this->colors["Black No Alpha"]);
+			}
+
+			if($this->sizeY < 120) return;
+
+			foreach($this->triggers as $trigger)
+			{
+				ImageFilledEllipse($this->im,
+					$this->shiftXleft + 2,
+					$this->sizeY+$this->shiftY+2+62+12*$i,
+					6,
+					6,
+					$this->colors[$trigger["color"]]);
+
+				ImageEllipse($this->im,
+					$this->shiftXleft + 2,
+					$this->sizeY+$this->shiftY+2+62+12*$i,
+					6,
+					6,
+					$this->colors["Black No Alpha"]);
+
+				ImageString(
+					$this->im, 
+					2,
+					$this->shiftXleft+9,
+					$this->sizeY+$this->shiftY+(62-5)+12*$i,
+					$trigger['description'],
+					$this->colors["Black No Alpha"]);
+				++$i;
 			}
 		}
 
@@ -643,10 +766,13 @@
 			}
 		}
 
-		function DrawLeftSide($minYleft, $maxYleft)
+		function DrawLeftSide()
 		{
 			if($this->yaxisleft == 1)
 			{
+				$minY = $this->m_minY[GRAPH_YAXIS_SIDE_RIGHT];
+				$maxY = $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT];
+
 				for($item=0;$item<$this->num;$item++)
 				{
 					if($this->items[$item]["axisside"] == GRAPH_YAXIS_SIDE_LEFT)
@@ -657,16 +783,19 @@
 				}
 				for($i=0;$i<=6;$i++)
 				{
-					$str = str_pad(convert_units($this->sizeY*$i/6*($maxYleft-$minYleft)/$this->sizeY+$minYleft,$units),10," ", STR_PAD_LEFT);
+					$str = str_pad(convert_units($this->sizeY*$i/6*($maxY-$minY)/$this->sizeY+$minY,$units),10," ", STR_PAD_LEFT);
 					ImageString($this->im, 1, 5, $this->sizeY-$this->sizeY*$i/6-4+$this->shiftY, $str, $this->colors["Dark Red No Alpha"]);
 				}
 			}
 		}
 
-		function DrawRightSide($minYright, $maxYright)
+		function DrawRightSide()
 		{
 			if($this->yaxisright == 1)
 			{
+				$minY = $this->m_minY[GRAPH_YAXIS_SIDE_RIGHT];
+				$maxY = $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT];
+
 				for($item=0;$item<$this->num;$item++)
 				{
 					if($this->items[$item]["axisside"] == GRAPH_YAXIS_SIDE_RIGHT)
@@ -677,7 +806,7 @@
 				}
 				for($i=0;$i<=6;$i++)
 				{
-					$str = str_pad(convert_units($this->sizeY*$i/6*($maxYright-$minYright)/$this->sizeY+$minYright,$units),10," ");
+					$str = str_pad(convert_units($this->sizeY*$i/6*($maxY-$minY)/$this->sizeY+$minY,$units),10," ");
 					ImageString($this->im, 1, $this->sizeX+$this->shiftXleft+2, $this->sizeY-$this->sizeY*$i/6-4+$this->shiftY, $str, $this->colors["Dark Red No Alpha"]);
 				}
 			}
@@ -697,16 +826,24 @@
 
 			check_authorisation();
 
+			$this->selectData();
+
+			$this->m_minY[GRAPH_YAXIS_SIDE_LEFT]	= $this->calculateMinY(GRAPH_YAXIS_SIDE_LEFT);
+			$this->m_minY[GRAPH_YAXIS_SIDE_RIGHT]	= $this->calculateMinY(GRAPH_YAXIS_SIDE_RIGHT);
+			$this->m_maxY[GRAPH_YAXIS_SIDE_LEFT]	= $this->calculateMaxY(GRAPH_YAXIS_SIDE_LEFT);
+			$this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT]	= $this->calculateMaxY(GRAPH_YAXIS_SIDE_RIGHT);
+
 			$this->updateShifts();
+
+			$this->calcTriggers();
+
+			$this->fullSizeX = $this->sizeX+$this->shiftXleft+$this->shiftXright+1;
+			$this->fullSizeY = $this->sizeY+$this->shiftY+62+12*($this->num+ (($this->sizeY < 120) ? 0 : count($this->triggers)))+8;
 		
 			if(function_exists("ImageColorExactAlpha")&&function_exists("ImageCreateTrueColor")&&@imagecreatetruecolor(1,1))
-			{
-				$this->im = ImageCreateTrueColor($this->sizeX+$this->shiftXleft+$this->shiftXright+1,$this->sizeY+$this->shiftY+62+12*$this->num+8);
-			}
+				$this->im = ImageCreateTrueColor($this->fullSizeX,$this->fullSizeY);
 			else
-			{
-				$this->im = imagecreate($this->sizeX+$this->shiftXleft+$this->shiftXright+1,$this->sizeY+$this->shiftY+62+12*$this->num+8);
-			}
+				$this->im = imagecreate($this->fullSizeX,$this->fullSizeY);
 
 			$this->initColors();
 			$this->drawRectangle();
@@ -719,7 +856,6 @@
 
 			$this->checkPermissions();
 
-			$this->selectData();
 
 			$this->drawWorkPeriod();
 			$this->drawGrid();
@@ -730,24 +866,11 @@
 			$maxX=900;
 			$minX=0;
 
-			$minYleft=$this->calculateMinY(GRAPH_YAXIS_SIDE_LEFT);
-			$minYright=$this->calculateMinY(GRAPH_YAXIS_SIDE_RIGHT);
-			$maxYleft=$this->calculateMaxY(GRAPH_YAXIS_SIDE_LEFT);
-			$maxYright=$this->calculateMaxY(GRAPH_YAXIS_SIDE_RIGHT);
-
 			// For each metric
 			for($item=0;$item<$this->num;$item++)
 			{
-				if($this->items[$item]["axisside"] == GRAPH_YAXIS_SIDE_RIGHT)
-				{
-					$minY=$minYright;
-					$maxY=$maxYright;
-				}
-				else
-				{
-					$minY=$minYleft;
-					$maxY=$maxYleft;
-				}
+				$minY = $this->m_minY[$this->items[$item]["axisside"]];
+				$maxY = $this->m_maxY[$this->items[$item]["axisside"]];
 
 				// For each X
 				for($i=0;$i<900;$i++)
@@ -791,8 +914,9 @@
 			}
 	
 
-			$this->DrawLeftSide($minYleft, $maxYleft);
-			$this->DrawRightSide($minYright, $maxYright);
+			$this->DrawLeftSide();
+			$this->DrawRightSide();
+			$this->drawTriggers();
 
 			$this->drawLogo();
 
@@ -800,7 +924,7 @@
 		
 			$end_time=getmicrotime();
 			$str=sprintf("%0.2f",($end_time-$start_time));
-			ImageString($this->im, 0,imagesx($this->im)-120,imagesy($this->im)-12,"Generated in $str sec", $this->colors["Gray"]);
+			ImageString($this->im, 0,$this->fullSizeX-120,$this->fullSizeY-12,"Generated in $str sec", $this->colors["Gray"]);
 
 			ImageOut($this->im); 
 			ImageDestroy($this->im); 

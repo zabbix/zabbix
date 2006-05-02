@@ -717,6 +717,7 @@
 			$yaxismin	=$row["yaxismin"];
 			$yaxismax	=$row["yaxismax"];
 			$showworkperiod = $row["show_work_period"];
+			$showtriggers	= $row["show_triggers"];
 		} else {
 			$name		=get_request("name"	,"");
 			$width		=get_request("width"	,900);
@@ -724,14 +725,15 @@
 			$yaxistype	=get_request("yaxistype",GRAPH_YAXIS_TYPE_CALCULATED);
 			$yaxismin	=get_request("yaxismin"	,0.00);
 			$yaxismax	=get_request("yaxismax"	,100.00);
-			$showworkperiod = get_request("show_work_period",1);
-			
+			$showworkperiod = get_request("showworkperiod",1);
+			$showtriggers	= get_request("showtriggers",1);
 		}
 	
 		$frmGraph->AddRow(S_NAME,new CTextBox("name",$name,32));
 		$frmGraph->AddRow(S_WIDTH,new CTextBox("width",$width,5));
 		$frmGraph->AddRow(S_HEIGHT,new CTextBox("height",$height,5));
 		$frmGraph->AddRow(S_SHOW_WORKING_TIME,new CCheckBox("showworkperiod",$showworkperiod,NULL,NULL,1));
+		$frmGraph->AddRow(S_SHOW_TRIGGERS,new CCheckBox("showtriggers",$showtriggers,NULL,NULL,1));
 
 		$cmbYType = new CComboBox("yaxistype",$yaxistype,"submit()");
 		$cmbYType->AddItem(GRAPH_YAXIS_TYPE_CALCULATED,S_CALCULATED);
