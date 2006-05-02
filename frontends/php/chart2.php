@@ -68,6 +68,8 @@
 	}
 
 	$graph->ShowWorkPeriod($row["show_work_period"]);
+	$graph->ShowTriggers($row["show_triggers"]);
+
 	$graph->setWidth($width);
 	$graph->setHeight($height);
 	$graph->setHeader($name);

@@ -41,6 +41,7 @@
 		"yaxismax"=>	array(T_ZBX_DBL, O_OPT,	 NULL,	BETWEEN(-65535,65535),	'isset({save})'),
 		"yaxismax"=>	array(T_ZBX_DBL, O_OPT,	 NULL,	BETWEEN(-65535,65535),	'isset({save})'),
 		"showworkperiod"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("1"),	NULL),
+		"showtriggers"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("1"),	NULL),
 
 /* actions */
 		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -71,12 +72,16 @@
 		$showworkperiod = 0;
 		if(isset($_REQUEST["showworkperiod"]))
 			$showworkperiod = 1;
+		$showtriggers = 0;
+		if(isset($_REQUEST["showtriggers"]))
+			$showtriggers = 1;
 
 		if(isset($_REQUEST["graphid"]))
 		{
 			$result=update_graph($_REQUEST["graphid"],
 				$_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],
-				$_REQUEST["yaxistype"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"],$showworkperiod);
+				$_REQUEST["yaxistype"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"],
+				$showworkperiod,$showtriggers);
 
 			if($result)
 			{
@@ -89,7 +94,8 @@
 		else
 		{
 			$result=add_graph($_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],
-				$_REQUEST["yaxistype"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"],$showworkperiod);
+				$_REQUEST["yaxistype"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"],
+				$showworkperiod,$showtriggers);
 			if($result)
 			{
 				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH,
