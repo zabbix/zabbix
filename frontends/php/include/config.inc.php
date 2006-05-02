@@ -1205,11 +1205,12 @@ COpt::profiling_start("page");
 				),
 		"reports"=>array(
 				"label"=>S_REPORTS,
-				"pages"=>array("report1.php","report2.php","report4.php"),
+				"pages"=>array("report1.php","report2.php","report4.php","report5.php"),
 				"level2"=>array(
 					array("label"=>S_STATUS_OF_ZABBIX,"url"=>"report1.php"),
 					array("label"=>S_AVAILABILITY_REPORT,"url"=>"report2.php"),
-                                        array("label"=>S_NOTIFICATIONS,"url"=>"report4.php")
+					array("label"=>S_NOTIFICATIONS,"url"=>"report4.php"),
+					array("label"=>S_TRIGGERS_TOP_100,"url"=>"report5.php"),   
 					)
 				),
 		"configuration"=>array(

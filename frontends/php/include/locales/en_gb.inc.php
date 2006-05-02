@@ -668,10 +668,17 @@
 	"S_YEARLY"=>				"Yearly",
 
 //      report4.php
-	"S_NOTIFICATIONS"=>                     "Notifications",
-        "S_NOTIFICATIONS_BIG"=>                 "NOTIFICATIONS",
-        "S_IT_NOTIFICATIONS"=>                  "Notification report",
+	"S_NOTIFICATIONS"=>			"Notifications",
+	"S_NOTIFICATIONS_BIG"=>			"NOTIFICATIONS",
+	"S_IT_NOTIFICATIONS"=>			"Notification report",
 
+//	report5.php
+        "S_TRIGGERS_TOP_100"=>			"Most busy triggers top 100",
+	"S_TRIGGERS_TOP_100_BIG"=>		"MOST BUSY TRIGGERS TOP 100",
+	"S_NUMBER_OF_STATUS_CHANGES"=>		"Number of status changes",
+	"S_WEEK"=>				"Week",
+	"S_LAST"=>				"Last",
+ 
 //	screenconf.php
 	"S_SCREENS"=>				"Screens",
 	"S_SCREEN"=>				"Screen",

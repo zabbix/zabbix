@@ -1,5 +1,6 @@
 Changes for 1.1beta10:
 
+ - added report "Most Busy Triggers Top 100" (Martins)
  - improved graphs, added 'Working time' displaying (Eugene)
  - added 'Working time' configuration (Eugene)
  - added support of history of actions and events for screens (Martins)

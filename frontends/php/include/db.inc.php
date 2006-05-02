@@ -28,8 +28,8 @@
 //	$DB_DATABASE	="zabbix";
 //	$DB_DATABASE	="osmiy";
 //	$DB_DATABASE	="zabbix";
-	$DB_DATABASE	="osmiy";
-//	$DB_DATABASE	="demo";
+//	$DB_DATABASE	="osmiy";
+	$DB_DATABASE	="demo";
 //	$DB_DATABASE	="martinsj";
 	$DB_USER	="root";
 	$DB_PASSWORD	="";
