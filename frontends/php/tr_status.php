@@ -335,7 +335,7 @@
 			$sql="select t.priority,count(*) as cnt from triggers t,hosts h,items i,functions f".$groupname.
 				" where t.value=1 and t.status=0 and f.itemid=i.itemid and h.hostid=i.hostid".
 				" and h.status=".HOST_STATUS_MONITORED." and i.status=".ITEM_STATUS_ACTIVE.
-				" and t.triggerid=f.triggerid and t.description $select_cond and $cond $groupcond group by 1";
+				" and t.triggerid=f.triggerid and t.description $select_cond $cond $groupcond group by 1";
 		}
 		else
 		{

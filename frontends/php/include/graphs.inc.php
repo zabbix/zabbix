@@ -94,7 +94,7 @@
 
 	# Add Graph
 
-	function	add_graph($name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$templateid=0)
+	function	add_graph($name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$templateid=0)
 	{
 		if(!check_right("Graph","A",0))
 		{
@@ -103,9 +103,9 @@
 		}
 
 		$result=DBexecute("insert into graphs".
-			" (name,width,height,yaxistype,yaxismin,yaxismax,templateid,show_work_period)".
+			" (name,width,height,yaxistype,yaxismin,yaxismax,templateid,show_work_period,show_triggers)".
 			" values (".zbx_dbstr($name).",$width,$height,$yaxistype,$yaxismin,".
-			" $yaxismax,$templateid,$showworkperiod)");
+			" $yaxismax,$templateid,$showworkperiod,$showtriggers)");
 		$graphid =  DBinsert_id($result,"graphs","graphid");
 		if($graphid)
 		{
@@ -116,7 +116,7 @@
 
 	# Update Graph
 
-	function	update_graph($graphid,$name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$templateid=0)
+	function	update_graph($graphid,$name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$templateid=0)
 	{
 		if(!check_right("Graph","U",0))
 		{
@@ -130,14 +130,14 @@
 		while($graph = DBfetch($graphs))
 		{
 			$result = update_graph($graph["graphid"],$name,$width,
-				$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$graphid);
+				$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphid);
 			if(!$result)
 				return $result;
 		}
 
 		$result = DBexecute("update graphs set name=".zbx_dbstr($name).",width=$width,height=$height,".
 			"yaxistype=$yaxistype,yaxismin=$yaxismin,yaxismax=$yaxismax,templateid=$templateid,".
-			"show_work_period=$showworkperiod ".
+			"show_work_period=$showworkperiod,show_triggers=$showtriggers ".
 			"where graphid=$graphid");
 		if($result)
 		{
@@ -216,7 +216,7 @@
 				{
 					$new_graphid = add_graph($graph["name"],$graph["width"],$graph["height"],
 						$graph["yaxistype"],$graph["yaxismin"],$graph["yaxismax"],$graph["show_work_period"],
-						$graph["graphid"]);
+						$graph["show_triggers"],$graph["graphid"]);
 
 					if(!$new_graphid)
 					{
@@ -451,7 +451,8 @@
 		$db_graph = get_graph_by_graphid($graphid);
 		$new_graphid = add_graph($db_graph["name"],$db_graph["width"],$db_graph["height"],
 			$db_graph["yaxistype"],$db_graph["yaxismin"],$db_graph["yaxismax"],$graph["show_work_period"],
-			$graphid);
+			$graph["show_triggers"],$graphid);
+
 		if(!$new_graphid)
 			return $new_graphid;
 

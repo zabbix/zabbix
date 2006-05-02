@@ -319,6 +319,7 @@
 	"S_FIXED"=>				"Fixed",
 	"S_CREATE_GRAPH"=>			"Create Graph",
 	"S_SHOW_WORKING_TIME"=>			"Show working time",
+	"S_SHOW_TRIGGERS"=>			"Show triggers",
 
 //	history.php
 	"S_LAST_HOUR_GRAPH"=>			"Last hour graph",

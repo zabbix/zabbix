@@ -488,6 +488,7 @@ CREATE TABLE graphs (
   yaxismax		float8		DEFAULT '0' NOT NULL,
   templateid		int4		DEFAULT '0' NOT NULL,
   show_work_period	int2		DEFAULT '1' NOT NULL,
+  show_triggers		int2		DEFAULT '1' NOT NULL,
   PRIMARY KEY (graphid),
   UNIQUE (name)
 );
