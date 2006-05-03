@@ -26,10 +26,10 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 	include_once("include/copt.lib.php");
 
 // GLOBALS
-	$USER_DETAILS	="";
-	$USER_RIGHTS	="";
-	$ERROR_MSG	="";
-	$INFO_MSG	="";
+	$USER_DETAILS	= array();
+	$USER_RIGHTS	= array();
+	$ERROR_MSG	= array();
+	$INFO_MSG	= array();
 // END OF GLOBALS
 
 // if magic quotes on then get rid of them
@@ -556,7 +556,6 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 		return 0;
 	}
 */
-
 
 //	The hash has form <md5sum of triggerid>,<sum of priorities>
 	function	calc_trigger_hash()
@@ -2327,34 +2326,64 @@ COpt::profiling_start("page");
 				$res="All maps";
 			}
 		}
+		else if($permission=="Application")
+		{
+			if(isset($id)&&($id!=0))
+			{
+				$app = get_application_by_applicationid($id);
+				$res = $app["name"];
+			}
+			else
+			{
+				$res="All applications";
+			}
+		}
 		return $res;
 	}
 
-	function	get_profile($idx,$default_value)
+	function	not_empty($var)
+	{
+		return ($var == "" ? 0 : 1);
+	}
+
+	function	get_profile($idx,$default_value,$type=PROFILE_TYPE_UNCNOWN)
 	{
 		global $USER_DETAILS;
 
-		if($USER_DETAILS["alias"]=="guest")
+		$result = $default_value;
+		if($USER_DETAILS["alias"]!="guest")
 		{
-			return $default_value;
+			$db_profiles = DBselect("select * from profiles where userid=".$USER_DETAILS["userid"]." and idx=".zbx_dbstr($idx));
+
+			if(DBnum_rows($db_profiles)==1)
+			{
+				$profile = DBfetch($db_profiles);
+
+				if($type==PROFILE_TYPE_UNCNOWN)
+					$type = $profile["valuetype"];
+
+				$result = $profile["value"];
+			}
+		}
+		switch($type)
+		{
+			case PROFILE_TYPE_ARRAY:	$result = explode(";", $result); break;
+			case PROFILE_TYPE_INT:		$result = intval($result); break;
+			case PROFILE_TYPE_STR:		$result = strval($result); break;
 		}
 
-		$sql="select value from profiles where userid=".$USER_DETAILS["userid"]." and idx=".zbx_dbstr($idx);
-		$result=DBselect($sql);
-
-		if(DBnum_rows($result)==0)
+		if(is_array($result))
 		{
-			return $default_value;
+			$result = array_filter($result, "not_empty");
 		}
-		else
-		{
-			$row=DBfetch($result);
-			return $row["value"];
-		}
+// SDI("Get profile:".$idx." = ".$result);
+		return $result;
 	}
 
-	function	update_profile($idx,$value)
+	function	update_profile($idx,$value,$type=PROFILE_TYPE_UNCNOWN)
 	{
+// SDI("Save profile:".$idx." = ".$value);
+
 		global $USER_DETAILS;
 
 		if($USER_DETAILS["alias"]=="guest")
@@ -2362,18 +2391,30 @@ COpt::profiling_start("page");
 			return;
 		}
 
+		if($type==PROFILE_TYPE_UNCNOWN && is_array($value))	$type = PROFILE_TYPE_ARRAY;
+		if($type==PROFILE_TYPE_ARRAY && !is_array($value))	$value = array($value);
+
+		switch($type)
+		{
+			case PROFILE_TYPE_ARRAY:	$value = implode(";", $value); break;
+			default:			$value = strval($value);
+		}
+
+
 		$sql="select value from profiles where userid=".$USER_DETAILS["userid"]." and idx=".zbx_dbstr($idx);
 		$result=DBselect($sql);
 
 		if(DBnum_rows($result)==0)
 		{
-			$sql="insert into profiles (userid,idx,value) values (".$USER_DETAILS["userid"].",".zbx_dbstr($idx).",".zbx_dbstr($value).")";
+			$sql="insert into profiles (userid,idx,value,valuetype)".
+				" values (".$USER_DETAILS["userid"].",".zbx_dbstr($idx).",".zbx_dbstr($value).",".$type.")";
 			DBexecute($sql);
 		}
 		else
 		{
 			$row=DBfetch($result);
-			$sql="update profiles set value=".zbx_dbstr($value)." where userid=".$USER_DETAILS["userid"]." and idx=".zbx_dbstr($idx);
+			$sql="update profiles set value=".zbx_dbstr($value).",valuetype=".$type.
+				" where userid=".$USER_DETAILS["userid"]." and idx=".zbx_dbstr($idx);
 			DBexecute($sql);
 		}
 	}
@@ -2737,4 +2778,17 @@ COpt::profiling_start("page");
 ";
 	}
 
+	function natksort(&$array) {
+		$keys = array_keys($array);
+		natcasesort($keys);
+
+		$new_array = array();
+
+		foreach ($keys as $k) {
+			$new_array[$k] = $array[$k];
+		}
+
+		$array = $new_array;
+		return true;
+	}
 ?>

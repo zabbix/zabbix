@@ -40,10 +40,13 @@
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"config"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1,2,3"),	NULL),
+		// 0 - hosts; 1 - groups; 2 - linkages; 3 - templates; 4 - applications
+		"config"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1,2,3,4"),	NULL), 
 
+/* ARAYS */
 		"hosts"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 		"groups"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
+		"applications"=>array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 /* host */
 		"hostid"=>	array(T_ZBX_INT, O_OPT,  P_SYS,  DB_ID,		'{config}==0&&{form}=="update"'),
 		"host"=>	array(T_ZBX_STR, O_OPT,  NULL,   NOT_EMPTY,	'{config}==0&&isset({save})'),
@@ -71,6 +74,12 @@
 		"groupid"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'{config}==1&&{form}=="update"'),
 		"gname"=>	array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'{config}==1&&isset({save})'),
 
+/* application */
+		"applicationid"=>array(T_ZBX_INT,O_OPT,	P_SYS,	DB_ID,		'{config}==4&&{form}=="update"'),
+		"appname"=>	array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'{config}==4&&isset({save})'),
+		"apphostid"=>	array(T_ZBX_INT, O_OPT,  P_SYS,  DB_ID,		'{config}==4&&isset({save})'),
+		"apptemplateid"=>array(T_ZBX_INT,O_OPT,	NULL,	DB_ID,	NULL),
+
 /* actions */
 		"activate"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),	
 		"disable"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),	
@@ -85,7 +94,10 @@
 
 	check_fields($fields);
 
-	validate_group("U");
+	if($_REQUEST["config"]==4)
+		validate_group_with_host("U");
+	elseif($_REQUEST["config"]==0 || $_REQUEST["config"]==3)
+		validate_group("U");
 
 	update_profile("web.hosts.config",$_REQUEST["config"]);
 	update_profile("web.menu.config.last",$page["file"]);
@@ -298,6 +310,64 @@
 		show_messages($result, S_HOST_STATUS_UPDATED, NULL);
 		unset($_REQUEST["activate"]);
 	}
+
+	if($_REQUEST["config"]==4 && isset($_REQUEST["save"]))
+	{
+		if(isset($_REQUEST["applicationid"]))
+		{
+			$result = update_application($_REQUEST["applicationid"],$_REQUEST["appname"], $_REQUEST["apphostid"]);
+			$msg_ok		= S_APPLICATION_UPDATED;
+			$msg_fail	= S_CANNOT_UPDATE_APPLICATION;
+			$applicationid = $_REQUEST["applicationid"];
+		} else {
+			$applicationid = add_application($_REQUEST["appname"], $_REQUEST["apphostid"]);
+			$msg_ok		= S_APPLICATION_ADDED;
+			$msg_fail	= S_CANNOT_ADD_APPLICATION;
+			$result = $applicationid;
+		}
+		show_messages($result, $msg_ok, $msg_fail);
+		if($result){
+			unset($_REQUEST["form"]);
+		}
+		unset($_REQUEST["save"]);
+	}
+	elseif($_REQUEST["config"]==4 && isset($_REQUEST["delete"]))
+	{
+		if(isset($_REQUEST["applicationid"])){
+			$app = get_application_by_applicationid($_REQUEST["applicationid"]);
+			$host=get_host_by_hostid($app["hostid"]);
+			$result=delete_application($_REQUEST["applicationid"]);
+
+			show_messages($result, S_APPLICATION_DELETED, S_CANNOT_DELETE_APPLICATION);
+			if($result)
+			{
+// TODO				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_APPLICATION,
+// TODO				"Application [".$app["name"]."] from host [".$host["host"]."]");
+
+				unset($_REQUEST["form"]);
+				unset($_REQUEST["applicationid"]);
+			}
+		} else {
+/* group operations */
+			$result = 0;
+			$applications = get_request("applications",array());
+
+			$db_applications = DBselect("select applicationid from applications");
+			while($db_app = DBfetch($db_applications))
+			{
+				if(!in_array($db_app["applicationid"],$applications))	continue;
+				if(!delete_application($db_app["applicationid"]))	continue;
+				$result = 1;
+
+// TODO				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_APPLICATION,
+// TODO				"Application [".$app["name"]."] from host [".$host["host"]."]");
+			}
+			show_messages($result, S_APPLICATION_DELETED, NULL);
+		}
+		unset($_REQUEST["delete"]);
+	}
+
+
 ?>
 
 <?php
@@ -308,6 +378,9 @@
 	$cmbConf->AddItem(3,S_TEMPLATES);
 	$cmbConf->AddItem(1,S_HOST_GROUPS);
 	$cmbConf->AddItem(2,S_TEMPLATE_LINKAGE);
+
+	if(check_anyright("Application","U"))
+		$cmbConf->AddItem(4,S_APPLICATIONS);
 
 	switch($_REQUEST["config"]){
 		case 0:
@@ -320,6 +393,10 @@
 			break;
 		case 1: 
 			$btn = new CButton("form",S_CREATE_GROUP);
+			break;
+		case 4: 
+			$btn = new CButton("form",S_CREATE_APPLICATION);
+			$frmForm->AddVar("hostid",get_request("hostid",0));
 			break;
 		case 2: 
 			break;
@@ -613,6 +690,137 @@
 		}
 
 		$table->Show();
+	}
+	elseif($_REQUEST["config"]==4)
+	{
+		if(!check_anyright("Application","U"))
+		{
+			show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
+			show_page_footer();
+			exit;
+		}
+
+		if(isset($_REQUEST["form"]))
+		{
+			insert_application_form();
+		} else {
+	// Table HEADER
+			$form = new CForm();
+
+			$_REQUEST["groupid"] = get_request("groupid",0);
+			$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit();");
+			$cmbGroup->AddItem(0,S_ALL_SMALL);
+			$result=DBselect("select groupid,name from groups order by name");
+			while($row=DBfetch($result))
+			{
+		// Check if at least one host with read permission exists for this group
+				$result2=DBselect("select h.hostid,h.host from hosts h,hosts_groups hg".
+					" where hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid and".
+					" h.status<>".HOST_STATUS_DELETED." group by h.hostid,h.host order by h.host");
+				while($row2=DBfetch($result2))
+				{
+					if(!check_right("Host","U",$row2["hostid"]))	continue;
+					$cmbGroup->AddItem($row["groupid"],$row["name"]);
+					break;
+				}
+			}
+			$form->AddItem(S_GROUP.SPACE);
+			$form->AddItem($cmbGroup);
+
+			if(isset($_REQUEST["groupid"]) && $_REQUEST["groupid"]>0)
+			{
+				$sql="select h.hostid,h.host from hosts h,hosts_groups hg".
+					" where hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid and".
+					" h.status<>".HOST_STATUS_DELETED." group by h.hostid,h.host order by h.host";
+			}
+			else
+			{
+				$sql="select h.hostid,h.host from hosts h where h.status<>".HOST_STATUS_DELETED.
+					" group by h.hostid,h.host order by h.host";
+			}
+
+			$result=DBselect($sql);
+
+			$_REQUEST["hostid"] = get_request("hostid",0);
+			$cmbHosts = new CComboBox("hostid",$_REQUEST["hostid"],"submit();");
+
+			$correct_hostid='no';
+			$first_hostid = -1;
+			while($row=DBfetch($result))
+			{
+				if(!check_right("Host","U",$row["hostid"]))	continue;
+				$cmbHosts->AddItem($row["hostid"],$row["host"]);
+
+				if($_REQUEST["hostid"]!=0){
+					if($_REQUEST["hostid"]==$row["hostid"])
+						$correct_hostid = 'ok';
+				}
+				if($first_hostid <= 0)
+					$first_hostid = $row["hostid"];
+			}
+			if($correct_hostid!='ok')
+				$_REQUEST["hostid"] = $first_hostid;
+
+			$form->AddItem(SPACE.S_HOST.SPACE);
+			$form->AddItem($cmbHosts);
+			
+			show_header2(S_APPLICATIONS_BIG, $form);
+
+
+			$form = new CForm();
+			$form->SetName('applications');
+
+			$table = new CTableInfo();
+			$table->SetHeader(array(
+				array(new CCheckBox("all_applications",NULL,NULL,
+					"CheckAll('".$form->GetName()."','all_applications');"),
+				SPACE,
+				S_ID),
+				S_APPLICATION,
+				S_SHOW
+				));
+
+			$db_applications = DBselect("select * from applications where hostid=".$_REQUEST["hostid"]);
+			while($db_app = DBfetch($db_applications))
+			{
+				if($db_app["templateid"]==0)
+				{
+					$name = new CLink(
+						$db_app["name"],
+						"hosts.php?form=update&applicationid=".$db_app["applicationid"].
+						url_param("config"),'action');
+				} else {
+					$template_host = get_realhost_by_applicationid($db_app["templateid"]);
+					$name = array(		
+						new CLink($template_host["host"],
+							"hosts.php?hostid=".$template_host["hostid"].url_param("config"),
+							'action'),
+						":",
+						$db_app["name"]
+						);
+				}
+				$table->AddRow(array(
+					array(new CCheckBox("applications[]",NULL,NULL,NULL,$db_app["applicationid"]),
+					SPACE,
+					$db_app["applicationid"]),
+					$name,
+					array(new CLink(S_ITEMS,"items.php?hostid=".$db_app["hostid"],"action"),
+					SPACE."(".DBnum_rows(get_items_by_applicationid($db_app["applicationid"])).")")
+					));
+			}
+			$footerButtons = array();
+			array_push($footerButtons, new CButton('activate','Activate Items',
+				"return Confirm('".S_ACTIVATE_ITEMS_FROM_SELECTED_APPLICATIONS_Q."');"));
+			array_push($footerButtons, SPACE);
+			array_push($footerButtons, new CButton('disable','Disable Items',
+				"return Confirm('".S_DISABLE_ITEMS_FROM_SELECTED_APPLICATIONS_Q."');"));
+			array_push($footerButtons, SPACE);
+			array_push($footerButtons, new CButton('delete','Delete selected',
+				"return Confirm('".S_DELETE_SELECTED_APPLICATIONS_Q."');"));
+			$table->SetFooter(new CCol($footerButtons));
+			$form->AddItem($table);
+			$form->Show();
+		}
 	}
 ?>
 <?php
