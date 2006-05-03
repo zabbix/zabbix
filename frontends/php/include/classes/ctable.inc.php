@@ -127,6 +127,7 @@
 			}else{
 				$this->header = new CRow($value,$class);
 			}
+			return true;
 		}
 		function SetFooter($value=NULL,$class=NULL)
 		{
@@ -208,10 +209,20 @@
 			}
 		}
 /* protected */
+		function ShowHeader()
+		{
+			if(isset($this->header))
+				$this->header->Show();
+		}
+
+		function GetNumRows()
+		{
+			return $this->GetItemsCount();
+		}
+
 		function ShowTagBody()
 		{
-			if(is_a($this->header,'crow'))
-				$this->header->Show();
+			$this->ShowHeader();
 
 			if(count($this->items)==0)
 			{

@@ -89,14 +89,20 @@
 	{
 		global $_REQUEST;
 	
+		$result = "";
 		if(isset($_REQUEST[$parameter]))
 		{
-			return "&$parameter=".$_REQUEST[$parameter];
+			if(is_array($_REQUEST[$parameter]))
+			{
+				foreach($_REQUEST[$parameter] as $par)
+					$result .= "&".$parameter."[]=".$par;
+			}
+			else
+			{
+				$result = "&".$parameter."=".$_REQUEST[$parameter];
+			}
 		}
-		else
-		{
-			return "";
-		}
+		return $result;
 	}
 
 	function table_begin($class="tableinfo")

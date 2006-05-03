@@ -162,6 +162,7 @@
 		$cmbRes->AddItem("Network map","Network map");
 		$cmbRes->AddItem("Trigger comment","Trigger comment");
 		$cmbRes->AddItem("User","User");
+		$cmbRes->AddItem("Application","Application");
 		$frmPerm->AddRow(S_RESOURCE,$cmbRes);
 
 		$cmbPerm = new CComboBox("permission");
@@ -274,6 +275,7 @@
 		$multiplier	= get_request("multiplier"	,0);
 		$delta		= get_request("delta"		,0);
 		$trends		= get_request("trends"		,365);
+		$applications	= get_request("applications"	,array());
 
 		$snmpv3_securityname	= get_request("snmpv3_securityname"	,"");
 		$snmpv3_securitylevel	= get_request("snmpv3_securitylevel"	,0);
@@ -329,7 +331,17 @@
 
 			$formula	= $row["formula"];
 			$logtimefmt	= $row["logtimefmt"];
+
+			$db_applications = get_applications_by_itemid($_REQUEST["itemid"]);
+			while($db_app = DBfetch($db_applications))
+			{
+				if(in_array($db_app["applicationid"],$applications))	continue;
+				array_push($applications,$db_app["applicationid"]);
+			}
+			
 		}
+		if(count($applications)==0)  array_push($applications,0);
+
 		if(isset($_REQUEST["itemid"])) {
 			$frmItem->SetTitle(S_ITEM." '$host:".$row["description"]."'");
 		} else {
@@ -483,7 +495,10 @@
 			$db_valuemaps = DBselect("select * from valuemaps");
 			while($db_valuemap = DBfetch($db_valuemaps))
 				$cmbMap->AddItem($db_valuemap["valuemapid"],$db_valuemap["name"]);
-			$frmItem->AddRow(S_SHOW_VALUE,$cmbMap);
+
+			$link = new CLink("throw map","config.php?config=6","action");
+			$link->AddOption("target","_blank");
+			$frmItem->AddRow(array(S_SHOW_VALUE.SPACE,$link),$cmbMap);
 			
 		}
 		else
@@ -499,6 +514,16 @@
 		{
 			$frmItem->AddVar("trapper_hosts",$trapper_hosts);
 		}
+
+		$cmbApps = new CListBox("applications[]",$applications,6);
+		$cmbApps->AddItem(0,"-".S_NONE."-");
+                $db_applications = DBselect("select distinct applicationid,name from applications".
+                        " where hostid=".$_REQUEST["hostid"]." order by name");
+                while($db_app = DBfetch($db_applications))
+                {
+                        $cmbApps->AddItem($db_app["applicationid"],$db_app["name"]);
+                }
+                $frmItem->AddRow(S_APPLICATIONS,$cmbApps);
 
 		$frmRow = array(new CButton("save",S_SAVE));
 		if(isset($_REQUEST["itemid"]))
@@ -2232,6 +2257,77 @@
 			$frmHostP->AddSpanRow("Profile for this host is missing","form_row_c");
 		}
 		$frmHostP->Show();
+	}
+
+	function insert_application_form()
+	{
+		global $_REQUEST;
+
+		$frm_title = "New Application";
+
+		if(isset($_REQUEST["applicationid"]))
+		{
+			$result=DBselect("select * from applications where applicationid=".$_REQUEST["applicationid"]);
+			$row=DBfetch($result);
+			$frm_title = "Application: \"".$row["name"]."\"";
+		}
+		if(isset($_REQUEST["applicationid"]) && !isset($_REQUEST["form_refresh"]))
+		{
+			$appname = $row["name"];
+			$apphostid = $row["hostid"];
+		}
+		else
+		{
+			$appname = get_request("appname","");
+			$apphostid = get_request("apphostid",get_request("hostid",0));
+		}
+
+		$db_host = get_host_by_hostid($apphostid,1 /* no error message */);
+		if($db_host)
+		{
+			$apphost = $db_host["host"];
+		}
+		else
+		{
+			$apphost = "";
+			$apphostid = 0;
+		}
+
+		$frmApp = new CFormTable($frm_title);
+		$frmApp->SetHelp("web.applications.php");
+
+		if(isset($_REQUEST["applicationid"]))
+			$frmApp->AddVar("applicationid",$_REQUEST["applicationid"]);
+
+		$frmApp->AddRow(S_NAME,new CTextBox("appname",$appname,32));
+
+		$frmApp->AddVar("apphostid",$apphostid);
+
+		if(!isset($_REQUEST["applicationid"]))
+		{ // anly new application can select host
+			$frmApp->AddRow(S_HOST,array(
+				new CTextBox("apphost",$apphost,32,NULL,'yes'),
+				new CButton("btn1",S_SELECT,
+					"return PopUp('popup.php?dstfrm=".$frmApp->GetName().
+					"&dstfld1=apphostid&dstfld2=apphost&srctbl=hosts&srcfld1=hostid&srcfld2=host','new_win',".
+					"'width=450,height=450,resizable=1,scrollbars=1');",
+					'T')
+				));
+		}
+
+		$frmApp->AddItemToBottomRow(new CButton("save",S_SAVE));
+		if(isset($_REQUEST["applicationid"]))
+		{
+			$frmApp->AddItemToBottomRow(SPACE);
+			$frmApp->AddItemToBottomRow(new CButtonDelete("Delete this application?",
+					url_param("config").url_param("hostid").url_param("groupid").
+					url_param("form").url_param("applicationid")));
+		}
+		$frmApp->AddItemToBottomRow(SPACE);
+		$frmApp->AddItemToBottomRow(new CButtonCancel(url_param("config").url_param("hostid").url_param("groupid")));
+
+		$frmApp->Show();
+
 	}
 
 	function insert_map_form()
