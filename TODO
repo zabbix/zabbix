@@ -1,5 +1,7 @@
 1.1beta9:
 
+ - fix max,min, avg, etc for history_uint
+
  - item key popup, trigger expression builder
  - remember different default values in different forms
  - autodiscovery: http://www.zabbix.com/forum/showthread.php?t=2137
