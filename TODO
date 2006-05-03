@@ -1,5 +1,6 @@
 1.1beta9:
 
+ - add support of net.if.total
  - fix max,min, avg, etc for history_uint
 
  - item key popup, trigger expression builder
