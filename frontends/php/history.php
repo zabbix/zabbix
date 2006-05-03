@@ -457,9 +457,7 @@
 			$sql = "select h.clock,h.value,i.valuemapid from $h_table h, items i".
 				" where h.itemid=i.itemid and i.itemid=".$_REQUEST["itemid"].
 				$cond_clock." order by clock desc".$cond_limit;
-
 			$result=DBselect($sql);
-
 			if(!isset($_REQUEST["plaintext"]))
 			{
 				$tbl_msg = DBnum_rows($result) > 1 ? NULL : "...";
@@ -477,6 +475,7 @@
 			$i=0;
 			while($row=DBfetch($result))
 			{
+
 				$value = replace_value_by_map($row["value"], $row["valuemapid"]);
 
 				$new_row = array(date("Y.M.d H:i:s",$row["clock"]));
@@ -495,7 +494,7 @@
 							$table->evenRowClass :
 							$table->oddRowClass
 						); 
-					$crow->Show();	// to solve memory leak we call 'Show' method for each element
+					$crow->Show();
 					$i++;
 				}
 				else

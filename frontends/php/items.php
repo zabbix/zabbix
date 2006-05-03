@@ -76,7 +76,8 @@
 		"formula"=>	array(T_ZBX_DBL, O_OPT,  NULL,  NULL,'isset({save})&&{multiplier}==1'),
 		"logtimefmt"=>	array(T_ZBX_STR, O_OPT,  NULL,  NULL,'isset({save})&&{value_type}==2'),
                  
-		"group_itemid"=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID, NULL),
+		"group_itemid"=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID, NULL),
+		"applications"=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID, NULL),
 
 		"del_history"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 
@@ -111,6 +112,7 @@
 	}
 	else if(isset($_REQUEST["save"]))
 	{
+		$applications = get_request("applications",array());
 		if(isset($_REQUEST["itemid"]))
 		{
 			$result=update_item($_REQUEST["itemid"],
@@ -121,7 +123,7 @@
 				$_REQUEST["multiplier"],$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],
 				$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],
 				$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],
-				$_REQUEST["logtimefmt"],$_REQUEST["valuemapid"]);
+				$_REQUEST["logtimefmt"],$_REQUEST["valuemapid"],$applications);
 
 			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 		}
@@ -135,7 +137,7 @@
 				$_REQUEST["multiplier"],$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],
 				$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],
 				$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],
-				$_REQUEST["logtimefmt"],$_REQUEST["valuemapid"]);
+				$_REQUEST["logtimefmt"],$_REQUEST["valuemapid"],$applications);
 
 			$result = $itemid;
 			show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
@@ -162,6 +164,7 @@
 		{
 			if($_REQUEST["action"]=="add to group")
 			{
+				$applications = get_request("applications",array());
 				$itemid=add_item_to_group(
 					$_REQUEST["add_groupid"],$_REQUEST["description"],$_REQUEST["key"],
 					$_REQUEST["hostid"],$_REQUEST["delay"],$_REQUEST["history"],
@@ -171,7 +174,8 @@
 					$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],
 					$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],
 					$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],
-					$_REQUEST["trends"],$_REQUEST["logtimefmt"],$_REQUEST["valuemapid"]);
+					$_REQUEST["trends"],$_REQUEST["logtimefmt"],$_REQUEST["valuemapid"],
+					$applications);
 				show_messages($itemid, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 				if($itemid){
 					unset($_REQUEST["form"]);
@@ -181,6 +185,7 @@
 			}
 			if($_REQUEST["action"]=="update in group")
 			{
+				$applications = get_request("applications",array());
 				$result=update_item_in_group($_REQUEST["add_groupid"],
 					$_REQUEST["itemid"],$_REQUEST["description"],$_REQUEST["key"],
 					$_REQUEST["hostid"],$_REQUEST["delay"],$_REQUEST["history"],
@@ -190,7 +195,8 @@
 					$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],
 					$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],
 					$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],
-					$_REQUEST["trends"],$_REQUEST["logtimefmt"],$_REQUEST["valuemapid"]);
+					$_REQUEST["trends"],$_REQUEST["logtimefmt"],$_REQUEST["valuemapid"],
+					$applications);
 				show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 				if($result){
 					unset($_REQUEST["form"]);
@@ -368,19 +374,23 @@
 		$form->SetName('items');
 		$form->AddVar('hostid',$_REQUEST["hostid"]);
 
+		$show_applications = 1;
+
 		$table  = new CTableInfo();
 		$table->setHeader(array(
 			array(	new CCheckBox("all_items",NULL,NULL,
 					"CheckAll('".$form->GetName()."','all_items');"),
 				S_ID),
 			S_DESCRIPTION,S_KEY,nbsp(S_UPDATE_INTERVAL),
-			S_HISTORY,S_TRENDS,S_TYPE,S_STATUS,S_ERROR));
+			S_HISTORY,S_TRENDS,S_TYPE,S_STATUS,
+			$show_applications == 1 ? S_APPLICATIONS : NULL,
+			S_ERROR));
 
 		$db_items = DBselect("select i.* from hosts h,items i where h.hostid=i.hostid and".
 			" h.hostid=".$_REQUEST["hostid"]." order by i.description, i.key_");
 		while($db_item = DBfetch($db_items))
 		{
-			if(!check_right("Item","R",$db_item["itemid"]))
+			if(!check_right("Item","U",$db_item["itemid"]))
 			{
 				continue;
 			}
@@ -447,6 +457,14 @@
 			{
 				$error=new CCol($db_item["error"],"on");
 			}
+
+			$applications = "";
+			$db_applications = get_applications_by_itemid($db_item["itemid"]);
+			while($db_app = DBfetch($db_applications))
+			{
+				$applications .= $db_app["name"].", ";
+			}
+
 			$table->AddRow(array(
 				array(
 					new CCheckBox("group_itemid[]",NULL,NULL,NULL,$db_item["itemid"]),
@@ -459,6 +477,7 @@
 				$db_item["trends"],
 				$type,
 				$status,
+				$show_applications == 1 ? trim($applications,", ") : NULL,
 				$error
 				));
 		}

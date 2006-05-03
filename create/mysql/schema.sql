@@ -570,7 +570,8 @@ CREATE TABLE profiles (
   profileid		int(4)		NOT NULL auto_increment,
   userid		int(4)		DEFAULT '0' NOT NULL,
   idx			varchar(64)	DEFAULT '' NOT NULL,
-  value			varchar(64)	DEFAULT '' NOT NULL,
+  value			varchar(255)	DEFAULT '' NOT NULL,
+  valuetype		int(4)		DEFAULT 0 NOT NULL,
   PRIMARY KEY (profileid),
 --  KEY (userid),
   UNIQUE (userid,idx)
@@ -789,3 +790,29 @@ CREATE TABLE acknowledges (
 	KEY alarmid (alarmid),
 	KEY clock (clock)
 ) type=InnoDB;
+
+--
+-- Table structure for table 'applications'
+--
+
+CREATE TABLE applications (
+	applicationid           int(4)          NOT NULL auto_increment,
+	hostid                  int(4)          DEFAULT '0' NOT NULL,
+	name                    varchar(255)    DEFAULT '' NOT NULL,
+	templateid		int(4)		DEFAULT '0' NOT NULL,
+	PRIMARY KEY 	(applicationid),
+	KEY 		hostid (hostid),
+	KEY 		templateid (templateid),
+	UNIQUE          appname (hostid,name)
+) type=InnoDB;
+
+--
+-- Table structure for table 'items_applications'
+--
+
+CREATE TABLE items_applications (
+	applicationid           int(4)          DEFAULT '0' NOT NULL,
+	itemid                  int(4)          DEFAULT '0' NOT NULL,
+	PRIMARY KEY (applicationid,itemid)
+) type=InnoDB;
+

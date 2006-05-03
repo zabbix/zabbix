@@ -206,6 +206,11 @@
 	define("MARK_COLOR_GREEN",	2);
 	define("MARK_COLOR_BLUE",	3);
 
+	define("PROFILE_TYPE_UNCNOWN",	0);
+	define("PROFILE_TYPE_ARRAY",	1);
+	define("PROFILE_TYPE_INT",	2);
+	define("PROFILE_TYPE_STR",	3);
+
 /* Support for PHP5. PHP5 does not have $HTTP_..._VARS */
 	if (!function_exists('version_compare'))
 	{

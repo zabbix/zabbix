@@ -586,7 +586,8 @@ CREATE TABLE profiles (
   profileid		serial,
   userid		int4		DEFAULT '0' NOT NULL,
   idx			varchar(64)	DEFAULT '' NOT NULL,
-  value			varchar(64)	DEFAULT '' NOT NULL,
+  value                 varchar(255)    DEFAULT '' NOT NULL,
+  valuetype             int4            DEFAULT 0 NOT NULL,
   PRIMARY KEY (profileid)
 );
 
@@ -783,5 +784,31 @@ CREATE TABLE acknowledges (
 );
 
 CREATE INDEX acknowledges_alarmid on acknowledgeid (alarmid);
+
+--
+-- Table structure for table 'applications'
+--
+
+CREATE TABLE applications (
+        applicationid           serial,
+        hostid                  int4            DEFAULT '0' NOT NULL,
+        name                    varchar(255)    DEFAULT '' NOT NULL,
+	templateid		int4		DEFAULT '0' NOT NULL,
+        PRIMARY KEY (applicationid),
+        FOREIGN KEY hostid (hostid) REFERENCES hosts
+);
+CREATE UNIQUE INDEX applications_hostid_key on items (hostid,name);
+
+--
+-- Table structure for table 'items_applications'
+--
+
+CREATE TABLE items_applications (
+        applicationid           int4          DEFAULT '0' NOT NULL,
+        itemid                  int4          DEFAULT '0' NOT NULL,
+        PRIMARY KEY (applicationid,itemid),
+        FOREIGN KEY (applicationid) REFERENCES applications,
+        FOREIGN KEY (itemid) REFERENCES items
+);
 
 VACUUM ANALYZE;

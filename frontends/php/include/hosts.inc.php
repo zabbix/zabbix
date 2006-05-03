@@ -244,6 +244,7 @@
 		if($host["templateid"] > 0)
 		{
 // start host syncing
+			sync_applications_with_template($hostid);
 			sync_items_with_template($hostid);
 			sync_triggers_with_template($hostid);
 			sync_graphs_with_templates($hostid);
@@ -337,7 +338,7 @@
 		return	FALSE;
 	}
 
-	function	get_host_by_hostid($hostid)
+	function	get_host_by_hostid($hostid,$no_error_message=0)
 	{
 		$sql="select * from hosts where hostid=$hostid";
 		$result=DBselect($sql);
@@ -345,7 +346,8 @@
 		{
 			return DBfetch($result);
 		}
-		error("No host with hostid=[$hostid]");
+		if($no_error_message == 0)
+			error("No host with hostid=[$hostid]");
 		return	FALSE;
 	}
 
@@ -491,7 +493,7 @@
 						$hostid = 0;
 			}
 
-			if(($hostid < 0) || ($hostid == 0 && !($allow_all_hosts ==1 && $groupid==0)))
+			if(($hostid < 0) || ($hostid == 0 && !($allow_all_hosts ==1 && $groupid==0))) 
 			{
 				$hostid = $first_hostig_in_group;
 			}
@@ -515,7 +517,7 @@
 	function	validate_group_with_host($right, $options = array(),$group_var=NULL,$host_var=NULL)
 	{
 		if(is_null($group_var)) $group_var = "web.latest.groupid";
-		if(is_null($host_var))  $host_var = "web.latest.hostid";
+		if(is_null($host_var))	$host_var = "web.latest.hostid";
 
 		$_REQUEST["groupid"]    = get_request("groupid",get_profile($group_var,0));
 		$_REQUEST["hostid"]     = get_request("hostid",get_profile($host_var,
@@ -541,5 +543,186 @@
 		$_REQUEST["groupid"]    = $result["groupid"];
 
 		update_profile($group_var,$_REQUEST["groupid"]);
+	}
+
+/* APPLICATIONS */
+
+	function	db_save_application($name,$hostid,$applicationid=NULL,$templateid=0)
+	{
+		if(!is_string($name)){
+			error("incorrect parameters for 'db_save_application'");
+			return FALSE;
+		}
+	
+		if($applicationid==NULL)
+			$result = DBexecute("select * from applications where name=".zbx_dbstr($name)." and hostid=".$hostid);
+		else
+			$result = DBexecute("select * from applications where name=".zbx_dbstr($name)." and hostid=".$hostid.
+				" and applicationid<>$applicationid");
+
+		$match_cnt = DBnum_rows($result);
+		if($match_cnt > 0)
+		{
+			$db_app = DBfetch($result);;
+		}
+		if($match_cnt > 0 && $templateid==0)
+		{
+			error("Application '$name' already exists");
+			return FALSE;
+		}
+		if($match_cnt > 0 && $applicationid!=NULL)
+		{ // delete old item with same name
+			delete_application($db_app["applicationid"]);
+		}
+
+		if($match_cnt > 0 && $applicationid==NULL)
+		{ // if found application with same name update them, adding not needed
+			$applicationid = $db_app["applicationid"];
+		}
+
+		$host = get_host_by_hostid($hostid);
+		
+		if($applicationid==NULL)
+		{
+			if($result = DBexecute("insert into applications (name,hostid,templateid)".
+				" values (".zbx_dbstr($name).",$hostid,$templateid)"))
+					info("Added new application ".$host["host"].":$name");
+		}
+		else
+		{
+			$old_app = get_application_by_applicationid($applicationid);
+			if($result = DBexecute("update applications set name=".zbx_dbstr($name).",hostid=$hostid,templateid=$templateid".
+                                " where applicationid=$applicationid"))
+					info("Updated application ".$host["host"].":".$old_app["name"]);
+		}
+
+		if(!$result)	return $result;
+
+		if($applicationid==NULL)
+		{
+			$applicationid = DBinsert_id($result,"applications","applicationid");
+
+			$db_childs = get_hosts_by_templateid($hostid);
+			while($db_child = DBfetch($db_childs))
+			{// recursion
+				$result = add_application($name,$db_child["hostid"],$applicationid);
+				if(!$result) break;
+			}
+		}
+		else
+		{
+			$db_applications = get_applications_by_templateid($applicationid);
+			while($db_app = DBfetch($db_applications))
+			{// recursion
+				$result = update_application($db_app["applicationid"],$name,$db_app["hostid"],$applicationid);
+				if(!$result) break;
+			}
+		}
+
+		if($result)
+			return $applicationid;
+
+		if($templateid == 0){
+			delete_application($itemid);
+		}
+
+	}
+	function	add_application($name,$hostid,$templateid=0)
+	{
+		return db_save_application($name,$hostid,NULL,$templateid);
+	}
+
+	function	update_application($applicationid,$name,$hostid,$templateid=0)
+	{
+		return db_save_application($name,$hostid,$applicationid,$templateid);
+	}
+	
+	function	delete_application($applicationid)
+	{
+		$app = get_application_by_applicationid($applicationid);
+		$host = get_host_by_hostid($app["hostid"]);
+
+		// first delete child applications
+		$db_applications = DBselect("select applicationid from applications where templateid=$applicationid");
+		while($db_app = DBfetch($db_applications))
+		{// recursion
+			$result = delete_application($db_app["applicationid"]);
+			if(!$result)	return	$result;
+		}
+ 
+		$result = DBexecute("delete from items_applications where applicationid=$applicationid");
+
+		$result = DBexecute("delete from applications where applicationid=$applicationid");
+		if($result)
+		{
+			info("Application '".$host["host"].":".$app["name"]."' deleted");
+		}
+		return $result;
+	}
+
+	function	get_application_by_applicationid($applicationid,$no_error_message=0)
+	{
+		$result = DBselect("select * from applications where applicationid=".$applicationid);
+		if(DBnum_rows($result) == 1)
+		{
+			return DBfetch($result);
+		}
+		if($no_error_message == 0)
+			error("No application with id=[$applicationid]");
+		return	FALSE;
+		
+	}
+
+	function	get_applications_by_templateid($applicationid)
+	{
+		return DBselect("select * from applications where templateid=".$applicationid);
+	}
+
+	function	get_realhost_by_applicationid($applicationid)
+	{
+		$application = get_application_by_applicationid($applicationid);
+		if($application["templateid"] > 0)
+			return get_realhost_by_applicationid($application["templateid"]);
+
+		return get_host_by_applicationid($applicationid);
+	}
+
+	function	get_host_by_applicationid($applicationid)
+	{
+		$sql="select h.* from hosts h, applications a where a.hostid=h.hostid and a.applicationid=$applicationid";
+		$result=DBselect($sql);
+		if(DBnum_rows($result) == 1)
+		{
+			return DBfetch($result);
+		}
+		error("No host with applicationid=[$applicationid]");
+		return	FALSE;
+	}
+
+	function	get_items_by_applicationid($applicationid)
+	{
+		return DBselect("select i.* from items i,items_applications ia where i.itemid=ia.itemid and ia.applicationid=$applicationid");
+	}
+
+	function	get_applications_by_hostid($hostid)
+	{
+		return DBselect("select * from applications where hostid=$hostid");
+	}
+
+	function	sync_applications_with_template($hostid)
+	{
+		$host = get_host_by_hostid($hostid);
+
+//SDI("sync host: ".$host['host']);
+
+		$db_tmp_applications = get_applications_by_hostid($host["templateid"]);
+
+		while($db_tmp_app = DBfetch($db_tmp_applications))
+		{
+			add_application(
+				$db_tmp_app["name"],
+				$hostid,
+				$db_tmp_app["applicationid"]);
+		}
 	}
 ?>

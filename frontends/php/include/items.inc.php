@@ -21,13 +21,13 @@
 <?php
 	# Update Item definition for selected group
 
-	function	update_item_in_group($groupid,$itemid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid)
+	function	update_item_in_group($groupid,$itemid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid,$applications)
 	{
 		$sql="select i.itemid,i.hostid from hosts_groups hg,items i where hg.groupid=$groupid and i.key_=".zbx_dbstr($key)." and hg.hostid=i.hostid";
 		$result=DBexecute($sql);
 		while($row=DBfetch($result))
 		{
-			update_item($row["itemid"],$description,$key,$row["hostid"],$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid);
+			update_item($row["itemid"],$description,$key,$row["hostid"],$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid,$applications);
 		}
 		return 1;
 	}
@@ -60,13 +60,13 @@
 
 	# Add Item definition to selected group
 
-	function	add_item_to_group($groupid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid)
+	function	add_item_to_group($groupid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid,$applications)
 	{
 		$sql="select hostid from hosts_groups where groupid=$groupid";
 		$result=DBexecute($sql);
 		while($row=DBfetch($result))
 		{
-			add_item($description,$key,$row["hostid"],$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid);
+			add_item($description,$key,$row["hostid"],$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid,$applications);
 		}
 		return 1;
 	}
@@ -77,7 +77,7 @@
 		$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,
 		$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,
 		$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,
-		$valuemapid,$templateid=0)
+		$valuemapid,$applications,$templateid=0)
 	{
 		$host=get_host_by_hostid($hostid);
 
@@ -86,6 +86,9 @@
 			error("Insufficient permissions to item '".$host["host"].":$key'");
 			return FALSE;
 		}
+
+		if(($i = array_search(0,$applications)) !== FALSE)
+			unset($applications[$i]);
 
 		if($delay<1)
 		{
@@ -157,7 +160,9 @@
 				$value_type, $trapper_hosts, $snmp_port, $units, $multiplier,
 				$delta, $snmpv3_securityname, $snmpv3_securitylevel,
 				$snmpv3_authpassphrase, $snmpv3_privpassphrase, $formula,
-				$trends, $logtimefmt, $valuemapid, $templateid);
+				$trends, $logtimefmt, $valuemapid, 
+				get_same_applications_for_host($applications, $db_item["hostid"]),
+				$templateid);
 
 			return $result;
 		}
@@ -180,6 +185,12 @@
 			return $result;
 
 		$itemid =  DBinsert_id($result,"items","itemid");
+
+		foreach($applications as $appid)
+		{
+			DBexecute("insert into items_applications (itemid,applicationid) values(".$itemid.",".$appid.")");
+		}
+
 		info("Added new item ".$host["host"].":$key");
 
 // add items to child hosts
@@ -193,7 +204,9 @@
 				$value_type, $trapper_hosts, $snmp_port, $units, $multiplier,
 				$delta, $snmpv3_securityname, $snmpv3_securitylevel,
 				$snmpv3_authpassphrase, $snmpv3_privpassphrase, $formula,
-				$trends, $logtimefmt, $valuemapid, $itemid);
+				$trends, $logtimefmt, $valuemapid,				
+				get_same_applications_for_host($applications, $db_host["hostid"]),
+				$itemid);
 			if(!$result)
 				break;
 		}
@@ -231,7 +244,7 @@
 	function	update_item($itemid,$description,$key,$hostid,$delay,$history,$status,$type,
 		$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,
 		$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,
-		$formula,$trends,$logtimefmt,$valuemapid,$templateid=0)
+		$formula,$trends,$logtimefmt,$valuemapid,$applications,$templateid=0)
 	{
 		$host = get_host_by_hostid($hostid);
 
@@ -240,6 +253,9 @@
 			error("Insufficient permissions to item '".$host["host"].":$key'");
 			return FALSE;
 		}
+
+		if(($i = array_search(0,$applications)) !== FALSE)
+			unset($applications[$i]);
 
 		if($delay<1)
 		{
@@ -258,7 +274,7 @@
 			$delta=0;
 		}
 
-		$db_items = DBexecute("select itemid as cnt from items".
+		$db_items = DBexecute("select itemid from items".
 			" where hostid=$hostid and itemid<>$itemid and key_=".zbx_dbstr($key));
 		if(DBnum_rows($db_items) > 0 && $templateid == 0)
 		{
@@ -278,7 +294,10 @@
 				$value_type, $trapper_hosts, $snmp_port, $units, $multiplier,
 				$delta, $snmpv3_securityname, $snmpv3_securitylevel,
 				$snmpv3_authpassphrase, $snmpv3_privpassphrase, $formula,
-				$trends, $logtimefmt, $valuemapid, $itemid);
+				$trends, $logtimefmt, $valuemapid,
+				get_same_applications_for_host($applications, $db_tmp_item["hostid"]),
+				$itemid);
+
 
 			if(!$result)
 				return $result;
@@ -286,13 +305,12 @@
 
 		if(DBnum_rows($db_items) > 0 && $templateid != 0)
 		{
-			$result = delete_item($itemid);
+			$db_item = DBfetch($db_items);
+			$result = delete_item($db_item["itemid"]);
 			if(!$result) {
 				error("Can't update item '".$host["host"].":$key'");
 				return FALSE;
 			}
-			$db_item = DBfetch($db_items);
-			$itemid = $db_item("itemid");
 		}
 
 		DBexecute("update items set lastlogsize=0 where itemid=$itemid and key_<>".zbx_dbstr($key));
@@ -300,6 +318,10 @@
 		if($templateid==0){
 			update_item_status($itemid, $status);
 		}
+
+		$result = DBexecute("delete from items_applications where itemid=$itemid");
+		foreach($applications as $appid)
+			DBexecute("insert into items_applications (itemid,applicationid) values(".$itemid.",".$appid.")");
 
 		$result=DBexecute(
 			"update items set description=".zbx_dbstr($description).",key_=".zbx_dbstr($key).",".
@@ -341,6 +363,13 @@
 
 		while($db_tmp_item = DBfetch($db_tmp_items))
 		{
+			$parrent_applications = array();
+			$db_applications = get_applications_by_itemid($db_tmp_item["itemid"]);
+			while($db_application = DBfetch($db_applications))
+				array_push($parrent_applications,$db_application["applicationid"]);
+
+			$applications = get_same_applications_for_host($parrent_applications,$hostid);
+
 			add_item(
 				$db_tmp_item["description"],
 				$db_tmp_item["key_"],
@@ -365,6 +394,7 @@
 				$db_tmp_item["trends"],
 				$db_tmp_item["logtimefmt"],
 				$db_tmp_item["valuemapid"],
+				$applications,
 				$db_tmp_item["itemid"]);
 		}
 	}
@@ -446,6 +476,9 @@
 		if(!$result)	return	$result;
 
 
+		$result = DBexecute("delete from items_applications where itemid=$itemid");
+		if(!$result)	return	$result;
+
 		$result = DBexecute("delete from items where itemid=$itemid");
 		if($result)
 		{
@@ -524,11 +557,11 @@
 		while($item = DBfetch($db_items))
 		{
 			$table_row = array(nbsp($item["description"]));
-			$host_added = 0;
+			$hosts_added = 0;
 			foreach($hosts as $hostid)
 			{
 				$db_host_items = DBselect("select itemid,value_type,lastvalue,units from items where".
-					" hostid=$hostid and description=".zbx_dbstr($item["description"]));
+					" hostid=$hostid and status=".ITEM_STATUS_ACTIVE." and description=".zbx_dbstr($item["description"]));
 				if(DBnum_rows($db_host_items)!=1)
 				{
 					array_push($table_row,"-");
@@ -538,7 +571,23 @@
 
 				if(!check_right("Item","R",$host_item["itemid"])) continue;
 
-				++$host_added; // added corect host item;
+				$access = 0;
+				$db_applications = get_applications_by_itemid($host_item["itemid"]);
+				while($db_app = DBfetch($db_applications))
+				{
+					if(!check_right("Application","R",$db_app["applicationid"]))
+						$access |= 1;
+					else
+						$access |= 2;
+				}
+				if($access == 1) 
+				{
+					array_push($table_row,"-");
+					continue;
+				}
+
+				$hosts_added++; // exist item in host
+
 				if(!isset($host_item["lastvalue"]))
 				{
 					array_push($table_row,"-");
@@ -558,8 +607,29 @@
 				array_push($table_row,new CCol(nbsp($value),$style));
 			}
 
-			if($host_added > 0) $table->AddRow($table_row);
+			if($hosts_added > 0) $table->AddRow($table_row);
 		}
 		return $table;
+	}
+
+	function get_same_applications_for_host($applications, $hostid)
+	{
+		$child_applications = array();
+
+		foreach($applications as $appid)
+		{
+			$db_apps = DBselect("select a1.applicationid from applications a1, applications a2".
+					" where a1.name=a2.name and a1.hostid=".$hostid." and a2.applicationid=".$appid);
+			$db_app = DBfetch($db_apps);
+			if(!$db_app) continue;
+			array_push($child_applications,$db_app["applicationid"]);
+		}
+		return $child_applications;
+	}
+
+	function get_applications_by_itemid($itemid)
+	{
+		return DBselect("select distinct app.* from applications app, items_applications ia".
+			" where app.applicationid=ia.applicationid and ia.itemid=".$itemid);
 	}
 ?>

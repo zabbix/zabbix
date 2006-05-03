@@ -151,6 +151,8 @@
 	{
 		global $DB_TYPE;
 	
+		if(!$result) return 0;
+
 		if($DB_TYPE == "MYSQL")
 		{
 			return mysql_num_rows($result);

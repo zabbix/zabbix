@@ -19,6 +19,14 @@
 **/
 ?>
 <?php
+		function fnc($c)
+		{
+			$ret = '<tr>';
+			foreach($c as $cc)
+				$ret .= '<td>'.$cc.'</td>';
+			$ret .= '</tr>';
+			return $ret;
+		}
 	class CTag
 	{
 /* private */
@@ -33,6 +41,15 @@
 		var $tag_body_end;
 		var $tag_start;
 		var $tag_end;
+
+		function fnc($c)
+		{
+			$ret = '<tr>';
+			foreach($c as $cc)
+				$ret .= '<td>'.$cc.'</td>';
+			$ret .= '</tr>';
+			return $ret;
+		}
 
 /* public */
 		function CTag($name=NULL, $paired='no', $body=NULL)
