@@ -273,8 +273,13 @@ INIT_CHECK_MEMORY(main);
    cfg=fopen(confFile,"r");
    if (cfg==NULL)
    {
-      if (IsStandalone())
-         printf("Unable to open configuration file: %s\n",strerror(errno));
+	   if (IsStandalone())
+	   {
+			printf("Unable to open configuration file: %s\n",strerror(errno));
+			if(test_cmd) 
+				return TRUE;
+	   }
+
 CHECK_MEMORY(main, "ReadConfig", "fopen==NULL");
       return FALSE;
    }

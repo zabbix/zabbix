@@ -215,7 +215,7 @@ BOOL Initialize(void)
 
    // Internal command aliases
    sprintf(counterPath,"perf_counter[\\%s\\%s]",GetCounterName(PCI_SYSTEM),GetCounterName(PCI_SYSTEM_UP_TIME));
-	if(AddAlias("system[uptime]",counterPath))
+	if(AddAlias("system.uptime",counterPath))
 	{
 LOG_DEBUG_INFO("s","AddAlias == OK");
 	}
@@ -319,7 +319,14 @@ INIT_CHECK_MEMORY(main);
 	     ret = 1;
 		 goto lbl_End;
       }
-      Main();
+	  if(test_cmd)
+	  {
+		TestCommand();
+	  }
+	  else
+	  {
+		Main();
+	  }
    }
 
 lbl_End:
