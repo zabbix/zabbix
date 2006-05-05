@@ -280,8 +280,8 @@
 
 #define	POLLER_TIMEOUT	5
 /* Do not perform more than this number of checks during unavailability period */
-#define SLEEP_ON_UNREACHABLE		60
-#define CHECKS_PER_UNAVAILABLE_PERIOD	4
+/*#define SLEEP_ON_UNREACHABLE		60*/
+/*#define CHECKS_PER_UNAVAILABLE_PERIOD	4*/
 
 #define	AGENT_TIMEOUT	3
 
