@@ -56,6 +56,9 @@ void	DBclose(void)
 #ifdef	HAVE_PGSQL
 	PQfinish(conn);
 #endif
+#ifdef	HAVE_ORACLE
+	sqlo_finish(oracle);
+#endif
 }
 
 /*
@@ -163,6 +166,14 @@ int	DBexecute(char *query)
 	}
 	PQclear(result);
 #endif
+#ifdef	HAVE_ORACLE
+	if ( sqlo_exec(oracle, query)<0 )
+	{
+		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
+		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", sqlo_geterror(connect) );
+		return FAIL;
+	}
+#endif
 /*	zabbix_set_log_level(LOG_LEVEL_WARNING);*/
 	return	SUCCEED;
 }
@@ -171,7 +182,7 @@ int	DBexecute(char *query)
  * Execute SQL statement. For select statements only.
  * If fails, program terminates.
  */ 
-DB_RESULT *DBselect(char *query)
+DB_RESULT DBselect(char *query)
 {
 /* Do not include any code here. Will break HAVE_PGSQL section */
 #ifdef	HAVE_MYSQL
@@ -215,6 +226,9 @@ DB_RESULT *DBselect(char *query)
 	}
 	return result;
 #endif
+#ifdef	HAVE_ORACLE
+	return FAIL;
+#endif
 }
 
 /*
@@ -238,6 +252,9 @@ char	*DBget_field(DB_RESULT *result, int rownum, int fieldnum)
 #ifdef	HAVE_PGSQL
 	return PQgetvalue(result, rownum, fieldnum);
 #endif
+#ifdef	HAVE_ORACLE
+	return FAIL;
+#endif
 }
 
 /*
@@ -252,6 +269,9 @@ int	DBinsert_id()
 #ifdef	HAVE_PGSQL
 #error	SUPPORT OF POSTGRESQL NOT IMPLEMENTED YET
 #endif
+#ifdef	HAVE_ORACLE
+	return FAIL;
+#endif
 }
 
 /*
@@ -265,6 +285,9 @@ long    DBaffected_rows()
 #endif
 #ifdef  HAVE_PGSQL
 	NOT IMPLEMENTED YET
+#endif
+#ifdef	HAVE_ORACLE
+	return FAIL;
 #endif
 }
 
