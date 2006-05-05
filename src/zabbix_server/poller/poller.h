@@ -27,6 +27,7 @@ extern  int     CONFIG_TIMEOUT;
 extern  int     CONFIG_POLLER_FORKS;
 extern  int     CONFIG_REFRESH_UNSUPPORTED;
 extern  int     CONFIG_UNAVAILABLE_PERIOD;
+extern  int     CONFIG_UNAVAILABLE_DELAY;
 
 void main_poller_loop();
 

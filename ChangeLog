@@ -1,5 +1,7 @@
 Changes for 1.1beta10:
 
+ - fixed wrong logic in processing of timeouts and network errors (Alexei)
+ - added server's parameter UnavailableDelay (Alexei)
  - improved support of proc.num[<process>,<user name>] for win32 agent (Eugene)
  - replaced old naming of items by new naming for win32 agent (Eugene)
  - fixed action adding (Eugene)
