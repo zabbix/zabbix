@@ -35,24 +35,40 @@ LONG H_CheckTcpPort(char *cmd,char *arg,double *value)
    SOCKET sock;
    struct sockaddr_in sa;
    struct hostent *hs;
-   char instance[256],*arg_host,*arg_port;
+   char 
+	   param[MAX_STRING_LEN],
+	   host[MAX_STRING_LEN],
+	   str_port[15];
    int port;
 
    // Parse arguments
-   GetParameterInstance(cmd,instance,256);
-   arg_port=strchr(instance,',');
-   if (arg_port==NULL)
-   {
-      arg_port=instance;
-      arg_host="127.0.0.1";
-   }
-   else
-   {
-      *arg_port=0;
-      arg_port++;
-      arg_host=instance;
-   }
-   port=atoi(arg_port);
+   GetParameterInstance(cmd,param,256);
+
+    if(num_param(param) != 2)
+    {
+            return SYSINFO_RC_NOTSUPPORTED;
+    }
+
+    if(get_param(param, 1, host, MAX_STRING_LEN) != 0)
+    {
+            return SYSINFO_RC_NOTSUPPORTED;
+    }
+    if(host[0] == '\0')
+    {
+            /* default parameter */
+            sprintf(host, "127.0.0.1");
+    }
+
+    if(get_param(param, 2, str_port, 15) != 0)
+    {
+            str_port[0] = '\0';
+    }
+    if(str_port[0] == '\0')
+    {
+            return SYSINFO_RC_NOTSUPPORTED;
+    }
+
+   port=atoi(str_port);
    if ((port<1)||(port>655535))
       return SYSINFO_RC_NOTSUPPORTED;
 
@@ -62,13 +78,13 @@ LONG H_CheckTcpPort(char *cmd,char *arg,double *value)
    sa.sin_port=htons((unsigned short)port);
 
    // Get host address
-   hs=gethostbyname(arg_host);
+   hs=gethostbyname(host);
    if (hs==NULL)
    {
-      sa.sin_addr.s_addr=inet_addr(arg_host);
+      sa.sin_addr.s_addr=inet_addr(host);
       if (sa.sin_addr.s_addr==INADDR_NONE)
       {
-         WriteLog(MSG_DNS_LOOKUP_FAILED,EVENTLOG_ERROR_TYPE,"s",arg_host);
+         WriteLog(MSG_DNS_LOOKUP_FAILED,EVENTLOG_ERROR_TYPE,"s",host);
          return SYSINFO_RC_NOTSUPPORTED;
       }
    }
@@ -81,6 +97,7 @@ LONG H_CheckTcpPort(char *cmd,char *arg,double *value)
    sock=socket(AF_INET,SOCK_STREAM,0);   
    if (sock==-1)
    {
+printf("error1 %e\n",WSAGetLastError());
       WriteLog(MSG_SOCKET_ERROR,EVENTLOG_ERROR_TYPE,"e",WSAGetLastError());
       return SYSINFO_RC_ERROR;
    }
@@ -97,6 +114,7 @@ LONG H_CheckTcpPort(char *cmd,char *arg,double *value)
          *value=1;      // Port unreacheable
          return SYSINFO_RC_SUCCESS;
       }
+printf("error2\n");
       return SYSINFO_RC_ERROR;
    }
 

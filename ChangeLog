@@ -1,5 +1,7 @@
 Changes for 1.1beta10:
 
+ - improved support of proc.num[<process>,<user name>] for win32 agent (Eugene)
+ - replaced old naming of items by new naming for win32 agent (Eugene)
  - fixed action adding (Eugene)
  - improved 'Latest data' sreen, items grouped by applications (Eugene)
  - added applications for hosts (Eugene)
