@@ -306,20 +306,20 @@ int get_values(void)
 			/* First error */
 			if(item.host_errors_from==0)
 			{
-				zabbix_log( LOG_LEVEL_WARNING, "Host [%s]: first network error, wait for %d seconds", item.host, CONFIG_UNAVAILABLE_DELAY);
-				zabbix_syslog("Host [%s]: first network error, wait for %d seconds", item.host, CONFIG_UNAVAILABLE_DELAY);
+				zabbix_log( LOG_LEVEL_WARNING, "Host [%s]: first network error, wait for %d seconds", item.host, CONFIG_UNREACHABLE_DELAY);
+				zabbix_syslog("Host [%s]: first network error, wait for %d seconds", item.host, CONFIG_UNREACHABLE_DELAY);
 
 				item.host_errors_from=now;
-				snprintf(sql,sizeof(sql)-1,"update hosts set errors_from=%d,disable_until=%d where hostid=%d", now, now+CONFIG_UNAVAILABLE_DELAY, item.hostid);
+				snprintf(sql,sizeof(sql)-1,"update hosts set errors_from=%d,disable_until=%d where hostid=%d", now, now+CONFIG_UNREACHABLE_DELAY, item.hostid);
 				zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]", sql);
 				DBexecute(sql);
 			}
 			else
 			{
-				if(now-item.host_errors_from>CONFIG_UNAVAILABLE_PERIOD)
+				if(now-item.host_errors_from>CONFIG_UNREACHABLE_PERIOD)
 				{
-					zabbix_log( LOG_LEVEL_WARNING, "Host [%s] will be checked after [%d] seconds", item.host, CONFIG_UNAVAILABLE_PERIOD);
-					zabbix_syslog("Host [%s] will be checked after [%d] seconds", item.host, CONFIG_UNAVAILABLE_PERIOD);
+					zabbix_log( LOG_LEVEL_WARNING, "Host [%s] will be checked after %d seconds", item.host, CONFIG_UNAVAILABLE_DELAY);
+					zabbix_syslog("Host [%s] will be checked after %d seconds", item.host, CONFIG_UNAVAILABLE_DELAY);
 
 					DBupdate_host_availability(item.hostid,HOST_AVAILABLE_FALSE,now,agent.msg);
 					update_key_status(item.hostid,HOST_AVAILABLE_FALSE); /* 2 */
@@ -332,10 +332,10 @@ int get_values(void)
 				/* Still unavailable, but won't change status to UNAVAILABLE yet */
 				else
 				{
-					zabbix_log( LOG_LEVEL_WARNING, "Host [%s]: another network error, wait for %d seconds", item.host, CONFIG_UNAVAILABLE_DELAY);
-					zabbix_syslog("Host [%s]: another network error, wait for %d seconds", item.host, CONFIG_UNAVAILABLE_DELAY);
+					zabbix_log( LOG_LEVEL_WARNING, "Host [%s]: another network error, wait for %d seconds", item.host, CONFIG_UNREACHABLE_DELAY);
+					zabbix_syslog("Host [%s]: another network error, wait for %d seconds", item.host, CONFIG_UNREACHABLE_DELAY);
 
-					snprintf(sql,sizeof(sql)-1,"update hosts set disable_until=%d where hostid=%d", now+CONFIG_UNAVAILABLE_DELAY, item.hostid);
+					snprintf(sql,sizeof(sql)-1,"update hosts set disable_until=%d where hostid=%d", now+CONFIG_UNREACHABLE_DELAY, item.hostid);
 					zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]", sql);
 					DBexecute(sql);
 				}
