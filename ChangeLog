@@ -1,5 +1,7 @@
 Changes for 1.1beta10:
 
+ - added server's parameter UnreachableDelay (Alexei)
+ - added server's parameter UnreachablePeriod (Alexei)
  - fixed wrong logic in processing of timeouts and network errors (Alexei)
  - added server's parameter UnavailableDelay (Alexei)
  - improved support of proc.num[<process>,<user name>] for win32 agent (Eugene)

@@ -869,16 +869,16 @@ void DBupdate_host_availability(int hostid,int available,int clock, char *error)
 
 	if(available == atoi(DBget_field(result,0,0)))
 	{
-		if((available==HOST_AVAILABLE_FALSE) 
-		&&(clock+SLEEP_ON_UNREACHABLE>disable_until) )
+/*		if((available==HOST_AVAILABLE_FALSE) 
+		&&(clock+CONFIG_UNREACHABLE_PERIOD>disable_until) )
 		{
 		}
 		else
-		{
+		{*/
 			zabbix_log(LOG_LEVEL_DEBUG, "Host already has availability [%d]",available);
 			DBfree_result(result);
 			return;
-		}
+/*		}*/
 	}
 
 	DBfree_result(result);
@@ -891,14 +891,15 @@ void DBupdate_host_availability(int hostid,int available,int clock, char *error)
 	}
 	else if(available==HOST_AVAILABLE_FALSE)
 	{
-		if(disable_until+SLEEP_ON_UNREACHABLE>clock)
+/*		if(disable_until+CONFIG_UNREACHABLE_PERIOD>clock)
 		{
-			snprintf(sql,sizeof(sql)-1,"update hosts set available=%d,disable_until=disable_until+%d,error='%s' where hostid=%d",HOST_AVAILABLE_FALSE,SLEEP_ON_UNREACHABLE,error_esc,hostid);
+			snprintf(sql,sizeof(sql)-1,"update hosts set available=%d,disable_until=disable_until+%d,error='%s' where hostid=%d",HOST_AVAILABLE_FALSE,CONFIG_UNREACHABLE_DELAY,error_esc,hostid);
 		}
 		else
 		{
-			snprintf(sql,sizeof(sql)-1,"update hosts set available=%d,disable_until=%d,error='%s' where hostid=%d",HOST_AVAILABLE_FALSE,clock+SLEEP_ON_UNREACHABLE,error_esc,hostid);
-		}
+			snprintf(sql,sizeof(sql)-1,"update hosts set available=%d,disable_until=%d,error='%s' where hostid=%d",HOST_AVAILABLE_FALSE,clock+CONFIG_UNREACHABLE_DELAY,error_esc,hostid);
+		}*/
+		snprintf(sql,sizeof(sql)-1,"update hosts set available=%d,error='%s' where hostid=%d",HOST_AVAILABLE_FALSE,error_esc,hostid);
 		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 		DBexecute(sql);
 	}
