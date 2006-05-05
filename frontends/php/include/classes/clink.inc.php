@@ -31,9 +31,9 @@
 			$this->tag_body_start = "";
 			$this->tag_body_end = "";
 
-			$this->SetClass($class);
-			$this->AddItem($item);
-			$this->SetUrl($url);
+			if(!is_null($class))	$this->SetClass($class);
+			if(!is_null($item))	$this->AddItem($item);
+			if(!is_null($url))	$this->SetUrl($url);
 		}
 		function SetAction($value=NULL)
 		{
@@ -59,6 +59,19 @@
 			}
 			
 			$this->AddOption("href",$value);
+		}
+		function SetTarget($value=NULL)
+		{
+			if(is_null($value))
+			{
+				return $this->DelOption("target");
+			}
+			elseif(!is_string($value))
+			{
+				return $this->error("Incorrect value for SetTarget [$value]");
+			}
+			
+			$this->AddOption("target",$value);
 		}
 	}
 ?>

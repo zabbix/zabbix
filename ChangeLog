@@ -1,5 +1,6 @@
 Changes for 1.1beta10:
 
+ - fixed action adding (Eugene)
  - improved 'Latest data' sreen, items grouped by applications (Eugene)
  - added applications for hosts (Eugene)
  - added trigger displaying on graphs (Eugene)

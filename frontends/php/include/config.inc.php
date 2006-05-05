@@ -1243,17 +1243,17 @@ COpt::profiling_start("page");
 	$table->SetCellSpacing(0);
 	$table->SetCellPadding(5);
 
-	$col_r = array(new CLink(S_HELP, "http://www.zabbix.com/manual/v1.1/index.php", "small_font"));
+	$help = new CLink(S_HELP, "http://www.zabbix.com/manual/v1.1/index.php", "small_font");
+	$help->SetTarget('_blank');
+	$col_r = array($help);
 	if($USER_DETAILS["alias"]!="guest") {
 		array_push($col_r, "|");		
 		array_push($col_r, new CLink(S_PROFILE, "profile.php", "small_font"));
 	}
 
-	$table->AddRow(array(
-		new CCol(new CLink(new CImg("images/general/zabbix.png","ZABBIX"),"http://www.zabbix.com"),
-			"page_header_l"),
-		new CCol($col_r,
-			"page_header_r")));
+	$logo = new CLink(new CImg("images/general/zabbix.png","ZABBIX"),"http://www.zabbix.com");
+	$logo->SetTarget('_blank');
+	$table->AddRow(array(new CCol($logo, "page_header_l"), new CCol($col_r, "page_header_r")));
 
 	$table->Show();
 ?>

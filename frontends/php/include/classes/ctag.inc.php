@@ -19,14 +19,6 @@
 **/
 ?>
 <?php
-		function fnc($c)
-		{
-			$ret = '<tr>';
-			foreach($c as $cc)
-				$ret .= '<td>'.$cc.'</td>';
-			$ret .= '</tr>';
-			return $ret;
-		}
 	class CTag
 	{
 /* private */
@@ -56,14 +48,18 @@
 		{
 			$this->SetTagName($name);
 			$this->SetPaired($paired);
-			$this->SetMaxLength(0);
+
+			$this->items_max_count = 0;
 
 			$this->tag_start=$this->tag_end=$this->tag_body_start=$this->tag_body_end= "";
 
-			if(is_null($body)) $this->tag_end = "\n";
-			if(is_null($body)) $this->tag_body_start = "\n";
-
-			CTag::AddItem($body);
+			if(is_null($body))
+			{
+				$this->tag_end = "\n";
+				$this->tag_body_start = "\n";
+			} else {
+				CTag::AddItem($body);
+			}
 
 		}
 		function SetMaxLength($value)
