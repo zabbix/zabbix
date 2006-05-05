@@ -1,5 +1,6 @@
 Changes for 1.1beta10:
 
+ - started development of Oracle support (Alexei)
  - added server's parameter UnreachableDelay (Alexei)
  - added server's parameter UnreachablePeriod (Alexei)
  - fixed wrong logic in processing of timeouts and network errors (Alexei)
