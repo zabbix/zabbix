@@ -478,10 +478,57 @@ AM_CONDITIONAL(AGENT, test x$agent = xyes)
 have_db="no"
 
 if test "$server" = "yes"; then
+	AC_MSG_CHECKING(for Oracle support)
+	AC_ARG_WITH(oracle,
+	[
+	What DBMS do you want to use (please select only one):
+	  --with-oracle[=DIR]      Include Oracle support.  DIR is the Sqlora8 base
+				 install directory, default is to search through
+				 a number of common places for the Sqlora8 files.],
+	[
+	  if test "$withval" != "no"; then
+		if test "$withval" = "yes"; then
+			if test -f /home/zabbix/sqlora8/include/sqlora.h; then
+				ORACLE_INCDIR=/home/zabbix/sqlora8/include/
+				ORACLE_LIBDIR=/home/zabbix/sqlora8/lib
+			else
+			AC_MSG_RESULT(no)
+			AC_MSG_ERROR(Invalid Oracle directory - unable to find sqlora.h)
+			fi
+		else
+			if test -f $withval/include/mysql/mysql.h; then
+				ORACLE_INCDIR=$withval/include/mysql
+				ORACLE_LIBDIR=$withval/lib/mysql
+			elif test -f $withval/include/mysql.h; then
+				ORACLE_INCDIR=$withval/include
+				ORACLE_LIBDIR=$withval/lib
+			else
+			AC_MSG_RESULT(no)
+			AC_MSG_ERROR(Invalid Oracle directory - unable to find mysql.h under $withval)
+			fi
+		fi
+		ORACLE_INCLUDE="-I$ORACLE_INCDIR -I/home/zabbix/sqlora8/lib/libsqlora8/include"
+		ORACLE_LFLAGS="-L$ORACLE_LIBDIR"
+		ORACLE_LIBS="-lsqlora8"
+
+		AC_DEFINE(HAVE_ORACLE,1,[Define to 1 if MySQL should be enabled.])
+		AC_MSG_RESULT(yes)
+		have_db="Oracle"
+
+		else
+			AC_MSG_RESULT(no)
+		fi
+	],[
+	  AC_MSG_RESULT(no)
+	])
+	AC_SUBST(ORACLE_INCLUDE)
+	AC_SUBST(ORACLE_LFLAGS)
+	AC_SUBST(ORACLE_LIBS)
+
+
 	AC_MSG_CHECKING(for MySQL support)
 	AC_ARG_WITH(mysql,
 	[
-	What DBMS do you want to use (please select only one):
 	  --with-mysql[=DIR]       Include MySQL support.  DIR is the MySQL base
 				 install directory, default is to search through
 				 a number of common places for the MySQL files.],
@@ -591,7 +638,7 @@ if test "$server" = "yes"; then
 
 	    AC_DEFINE(HAVE_PGSQL,1,[Define to 1 if PostgreSQL should be enabled.])
 	    AC_MSG_RESULT(yes)
-	    have_db="PostagreSQL"
+	    have_db="PostgreSQL"
 	  else
 	    AC_MSG_RESULT(no)
 	  fi

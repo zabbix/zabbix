@@ -41,6 +41,10 @@
 	PGconn	*conn;
 #endif
 
+#ifdef	HAVE_ORACLE
+	sqlo_db_handle_t oracle;
+#endif
+
 extern void    apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value);
 extern void    update_services(int triggerid, int status);
 
@@ -90,6 +94,21 @@ void    DBconnect(void)
 	if (PQstatus(conn) != CONNECTION_OK)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Connection to database '%s' failed.\n", CONFIG_DBNAME);
+		exit(FAIL);
+	}
+#endif
+#ifdef	HAVE_ORACLE
+	if (SQLO_SUCCESS != sqlo_init(SQLO_OFF, 1, 100))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Failed to init libsqlora8");
+		exit(FAIL);
+	}
+
+	/* login */
+	if (SQLO_SUCCESS != sqlo_connect(&oracle, "scott/tiger"))
+	{
+		printf("Cannot login with %s\n", "scott/tiger");
+		zabbix_log(LOG_LEVEL_ERR, "Cannot login with %s\n", "scott/tiger");
 		exit(FAIL);
 	}
 #endif
