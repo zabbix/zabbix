@@ -34,8 +34,8 @@
 #define	DB_HANDLE	MYSQL
 #endif
 
-#ifdef HAVE_PGSQL
-	#include "libpq-fe.h"
+#ifdef HAVE_ORACLE
+	#include "sqlora.h"
 #endif
 
 extern	char	*CONFIG_DBHOST;
@@ -71,6 +71,11 @@ extern	int	CONFIG_DBPORT;
 #ifdef HAVE_PGSQL
 	#define	DB_RESULT	PGresult
 	#define	DBfree_result	PQclear
+#endif
+
+#ifdef HAVE_ORACLE
+	#define	DB_RESULT	sqlo_stmt_handle_t
+	#define	DBfree_result	sqlo_close
 #endif
 
 #define	MAX_HOST_HOST_LEN	64
