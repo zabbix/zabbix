@@ -266,6 +266,14 @@ int get_values(void)
 
 				stop=1;
 			}
+			if(item.host_errors_from!=0)
+			{
+				snprintf(sql,sizeof(sql)-1,"update hosts set errors_from=0 where hostid=%d", item.hostid);
+				zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]", sql);
+				DBexecute(sql);
+
+				stop=1;
+			}
 		       	update_triggers(item.itemid);
 		}
 		else if(res == NOTSUPPORTED)
@@ -295,33 +303,43 @@ int get_values(void)
 		}
 		else if(res == NETWORK_ERROR)
 		{
+			/* First error */
 			if(item.host_errors_from==0)
 			{
-				zabbix_log( LOG_LEVEL_WARNING, "Started network errors for [%s]", item.host);
+				zabbix_log( LOG_LEVEL_WARNING, "Host [%s]: first network error, wait for %d seconds", item.host, CONFIG_UNAVAILABLE_DELAY);
+				zabbix_syslog("Host [%s]: first network error, wait for %d seconds", item.host, CONFIG_UNAVAILABLE_DELAY);
+
 				item.host_errors_from=now;
-				snprintf(sql,sizeof(sql)-1,"update hosts set errors_from=%d,disable_until=%d where hostid=%d", now, now+(int)(CONFIG_UNAVAILABLE_PERIOD/CHECKS_PER_UNAVAILABLE_PERIOD), item.hostid);
+				snprintf(sql,sizeof(sql)-1,"update hosts set errors_from=%d,disable_until=%d where hostid=%d", now, now+CONFIG_UNAVAILABLE_DELAY, item.hostid);
 				zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]", sql);
 				DBexecute(sql);
 			}
-
-/*			zabbix_log( LOG_LEVEL_WARNING, "errors_from [%d]+[%d]<[%d]", item.host_errors_from,CONFIG_UNAVAILABLE_PERIOD,now);*/
-			if(item.host_errors_from+CONFIG_UNAVAILABLE_PERIOD<now)
-			{
-				zabbix_log( LOG_LEVEL_WARNING, "Host [%s] will be checked after [%d] seconds", item.host, 60);
-				zabbix_syslog("Host [%s] will be checked after [%d] seconds", item.host, 60);
-				DBupdate_host_availability(item.hostid,HOST_AVAILABLE_FALSE,now,agent.msg);
-				update_key_status(item.hostid,HOST_AVAILABLE_FALSE); /* 2 */
-				item.host_available=HOST_AVAILABLE_FALSE;
-			}
-			/* Still unavailable, but won't change status to UNAVAILABLE yet */
 			else
 			{
-				zabbix_log( LOG_LEVEL_WARNING, "Host [%s]: another network error, wait for %d seconds", item.host, (int)(CONFIG_UNAVAILABLE_PERIOD/CHECKS_PER_UNAVAILABLE_PERIOD));
-				snprintf(sql,sizeof(sql)-1,"update hosts set disable_until=%d where hostid=%d", now+(int)(CONFIG_UNAVAILABLE_PERIOD/CHECKS_PER_UNAVAILABLE_PERIOD), item.hostid);
-				zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]", sql);
-				DBexecute(sql);
-			}
+				if(now-item.host_errors_from>CONFIG_UNAVAILABLE_PERIOD)
+				{
+					zabbix_log( LOG_LEVEL_WARNING, "Host [%s] will be checked after [%d] seconds", item.host, CONFIG_UNAVAILABLE_PERIOD);
+					zabbix_syslog("Host [%s] will be checked after [%d] seconds", item.host, CONFIG_UNAVAILABLE_PERIOD);
 
+					DBupdate_host_availability(item.hostid,HOST_AVAILABLE_FALSE,now,agent.msg);
+					update_key_status(item.hostid,HOST_AVAILABLE_FALSE); /* 2 */
+					item.host_available=HOST_AVAILABLE_FALSE;
+
+					snprintf(sql,sizeof(sql)-1,"update hosts set disable_until=%d where hostid=%d", now+CONFIG_UNAVAILABLE_DELAY, item.hostid);
+					zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]", sql);
+					DBexecute(sql);
+				}
+				/* Still unavailable, but won't change status to UNAVAILABLE yet */
+				else
+				{
+					zabbix_log( LOG_LEVEL_WARNING, "Host [%s]: another network error, wait for %d seconds", item.host, CONFIG_UNAVAILABLE_DELAY);
+					zabbix_syslog("Host [%s]: another network error, wait for %d seconds", item.host, CONFIG_UNAVAILABLE_DELAY);
+
+					snprintf(sql,sizeof(sql)-1,"update hosts set disable_until=%d where hostid=%d", now+CONFIG_UNAVAILABLE_DELAY, item.hostid);
+					zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]", sql);
+					DBexecute(sql);
+				}
+			}
 
 			stop=1;
 		}
