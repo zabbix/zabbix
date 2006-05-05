@@ -110,10 +110,11 @@
 			parent::CTag("table","yes");
 			$this->SetClass($class);
 			$this->message = $message;
-			$this->SetOddRowClass();
-			$this->SetEvenRowClass();
-			$this->SetHeader();
-			$this->SetFooter();
+				
+			$this->oddRowClass = NULL;
+			$this->evenRowClass = NULL;
+			$this->header = NULL;
+			$this->footer = NULL;;
 		}
 		function SetHeader($value=NULL,$class=NULL)
 		{

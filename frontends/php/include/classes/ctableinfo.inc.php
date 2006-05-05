@@ -31,8 +31,8 @@
 			$this->SetEvenRowClass('even_row');
 			$this->SetCellSpacing(1);
 			$this->SetCellPadding(3);
-			$this->SetHeader();
-			$this->SortBy();
+			
+			$this->sortby = null;
 		}
 		function SetHeader($value=NULL,$class='header')
 		{
