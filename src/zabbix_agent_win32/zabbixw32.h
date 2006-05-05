@@ -205,6 +205,9 @@ void ActiveChecksThread(void *);
 
 void ProcessCommand(char *cmd,char *result);
 
+extern char *test_cmd;
+int TestCommand(void);
+
 BOOL ReadConfig(void);
 
 BOOL AddAlias(char *name,char *value);
@@ -223,6 +226,9 @@ int	comms_create_request(char *host, char *key, char *data, char *lastlogsize,
 
 
 int xml_get_data(char *xml,char *tag, char *data, int maxlen);
+
+int	num_param(const char *param);
+int	get_param(const char *param, int num, char *buf, int maxlen);
 
 //
 // Global variables

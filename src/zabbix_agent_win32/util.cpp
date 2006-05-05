@@ -42,7 +42,8 @@ static void Help(void)
           "   remove-events   : Remove Zabbix Win32 Agent event source\n"
           "                     This is done automatically when service is being removed\n"
           "   help            : Display help information\n"
-          "   version         : Display version information\n\n"
+          "   version         : Display version information\n"
+          "   test <metric>   : Test specified metric and exit\n\n"
           "And possible options are:\n"
           "   --config <file> : Specify alternate configuration file\n"
           "                     (default is %s)\n\n", confFile);
@@ -124,6 +125,12 @@ INIT_CHECK_MEMORY(main);
          ret = ZabbixStopService();
 		 exit(ret);
 		 goto lbl_end;
+      }
+      else if (!strcmp(argv[i],"test"))
+      {
+			i++;
+			test_cmd = argv[i];
+			dwFlags|=AF_STANDALONE;
       }
       else if (!strcmp(argv[i],"check-config"))
       {
@@ -492,4 +499,98 @@ void FreeCounterList(void)
 		next = curr->next;
 		free(curr);
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_param                                                        *
+ *                                                                            *
+ * Purpose: return parameter by index (num) from parameter list (param)       *
+ *                                                                            *
+ * Parameters:                                                                *
+ * 	param  - parameter list                                               *
+ *      num    - requested parameter index                                    *
+ *      buf    - pointer og output buffer                                     *
+ *      maxlem - size of output buffer                                        *
+ *                                                                            *
+ * Return value: 1 - on error                                                 *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:  delimeter vor parameters is ','                                 *
+ *                                                                            *
+ ******************************************************************************/
+int	get_param(const char *param, int num, char *buf, int maxlen)
+{
+	char	tmp[MAX_STRING_LEN];
+	char	*s;
+	int	ret = 1;
+	int	i = 0;
+	int	idx = 0;
+
+	strscpy(tmp,param);
+
+	s = &tmp[0];
+	
+	for(i=0; tmp[i] != '\0'; i++)
+	{
+		if(tmp[i] == ',')
+		{
+			idx++;
+			if(idx == num)
+			{
+				tmp[i]='\0';
+				strncpy(buf, s, maxlen);
+				tmp[i]=','; /* restore source string */
+				ret = 0;
+				break;
+				
+			}
+			s = &tmp[i+1];
+		}
+	}
+
+	if(ret != 0)
+	{
+		idx++;
+		if(idx == num)
+		{
+			strncpy(buf, s, maxlen);
+			ret = 0;
+		}
+	}
+	
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: num_param                                                        *
+ *                                                                            *
+ * Purpose: calculate count of parameters from parameter list (param)         *
+ *                                                                            *
+ * Parameters:                                                                *
+ * 	param  - parameter list                                               *
+ *                                                                            *
+ * Return value: count of parameters                                          *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:  delimeter vor parameters is ','                                 *
+ *                                                                            *
+ ******************************************************************************/
+int	num_param(const char *param)
+{
+	int	i;
+	int	ret = 1;
+
+	if(param == NULL) 
+		return 0;
+	
+	for(i=0;param[i]!=0;i++)
+	{
+		if(param[i]==',')	ret++;
+	}
+
+	return ret;
 }

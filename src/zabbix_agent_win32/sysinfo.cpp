@@ -38,7 +38,6 @@ LONG H_CheckTcpPort(char *cmd,char *arg,double *value);
 //
 
 static DWORD procList[MAX_PROCESSES];
-static HMODULE modList[MAX_MODULES];
 
 static double statProcessedRequests=0;
 static double statFailedRequests=0;
@@ -102,164 +101,420 @@ static LONG H_NumericPtr(char *cmd,char *arg,double *value)
 
 
 //
-// Handler for cpu_load[]
+// Handler for system.cpu.util[]
 //
 
-static LONG H_ProcUtil(char *cmd,char *arg,double *value)
+static LONG H_CpuUtil(char *cmd,char *arg,double *value)
 {
-   char proc[16];
-   int procnum;
+	char cpuname[20];
+	char type[MAX_STRING_LEN];
+	char mode[MAX_STRING_LEN];
 
+	char param[MAX_STRING_LEN];
 
-   if ((DWORD)arg & 0x80)  // bit 7 is set if we are called for specific instance
-   {
-      GetParameterInstance(cmd,proc,15);
-      if (proc[0]==0)
-      {
-         procnum=1;
-      }
-      else
-      {
-         procnum=atoi(proc)+1;
-         if ((procnum<1)||(procnum>MAX_CPU))
+	int procnum;
+
+	GetParameterInstance(cmd,param,20-1);
+
+    if(num_param(param) > 3)
+    {
             return SYSINFO_RC_NOTSUPPORTED;
-      }
-   }
-   else
-   {
-      procnum=0;     // _Total
-   }
-   switch((DWORD)arg & 0x03)
-   {
-      case 0:  // procload
-         *value=statProcUtilization[procnum];
-         break;
-      case 1:  // procload5
-         *value=statProcUtilization5[procnum];
-         break;
-      case 2:  // procload15
-         *value=statProcUtilization15[procnum];
-         break;
-      default:
-         return SYSINFO_RC_NOTSUPPORTED;
-   }
-   return SYSINFO_RC_SUCCESS;
-}
+    }
 
+    if(get_param(param, 1, cpuname, MAX_STRING_LEN) != 0)
+    {
+            cpuname[0] = '\0';
+    }
+    if(cpuname[0] == '\0')
+    {
+            /* default parameter */
+            sprintf(cpuname, "all");
+    }
 
-//
-// Handler for system[proccount]
-//
-
-static LONG H_ProcCount(char *cmd,char *arg,double *value)
-{
-   DWORD dwSize;
-
-   EnumProcesses(procList,sizeof(DWORD)*MAX_PROCESSES,&dwSize);
-   *value=(double)(dwSize/sizeof(DWORD));
-   return SYSINFO_RC_SUCCESS;
-}
-
-
-//
-// Handler for proc_cnt[*]
-//
-
-static LONG H_ProcCountSpecific(char *cmd,char *arg,double *value)
-{
-   DWORD dwSize=0;
-   int i,counter,procCount;
-   char procName[MAX_PATH];
-   HANDLE hProcess;
-
-
-   GetParameterInstance(cmd,procName,MAX_PATH-1);
-   EnumProcesses(procList,sizeof(DWORD)*MAX_PROCESSES,&dwSize);
-   procCount=dwSize/sizeof(DWORD);
-   for(i=0,counter=0;i<procCount;i++)
-   {
-      hProcess=OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,FALSE,procList[i]);
-      if (hProcess!=NULL)
-      {
-         if (EnumProcessModules(hProcess,modList,sizeof(HMODULE)*MAX_MODULES,&dwSize))
-         {
-            if (dwSize>=sizeof(HMODULE))     // At least one module exist
-            {
-               char baseName[MAX_PATH];
-
-               GetModuleBaseName(hProcess,modList[0],baseName,sizeof(baseName));
-               if (!stricmp(baseName,procName))
-                  counter++;
-            }
-         }
-         CloseHandle(hProcess);
-      }
-   }
-   *value=(double)counter;
-   return SYSINFO_RC_SUCCESS;
-}
-
-
-//
-// Handler for memory[*] and swap[*] parameters
-//
-
-static LONG H_MemoryInfo(char *cmd,char *arg,double *value)
-{
-
-
-
-   if (!strcmp(cmd,"memory[cached]"))
-   {
-      PERFORMANCE_INFORMATION pfi;
-
-      if (imp_GetPerformanceInfo==NULL)
-         return SYSINFO_RC_NOTSUPPORTED;
-
-      imp_GetPerformanceInfo(&pfi,sizeof(PERFORMANCE_INFORMATION));
-      *value=(double)pfi.SystemCache*(double)pfi.PageSize;
-   }
-   else
-   {
-      if (imp_GlobalMemoryStatusEx!=NULL)
-      {
-         MEMORYSTATUSEX ms;
-
-         ms.dwLength = sizeof(MEMORYSTATUSEX);
-         imp_GlobalMemoryStatusEx(&ms);
-         if (!strcmp(cmd, "memory[total]"))
-            *value = (double)((__int64)ms.ullTotalPhys);
-         else if (!strcmp(cmd, "memory[free]"))
-            *value = (double)((__int64)ms.ullAvailPhys);
-         else if (!strcmp(cmd, "swap[total]"))
-            *value = (double)((__int64)ms.ullTotalPageFile);
-         else if (!strcmp(cmd, "swap[free]"))
-            *value = (double)((__int64)ms.ullAvailPageFile);
-         else
+    if(get_param(param, 2, type, MAX_STRING_LEN) != 0)
+    {
+            type[0] = '\0';
+    }
+    if(type[0] == '\0')
+    {
+            /* default parameter */
+            sprintf(type, "system");
+    }
+    if(strncmp(type, "system", MAX_STRING_LEN))
+    {  /* only 'system' parameter supported */
             return SYSINFO_RC_NOTSUPPORTED;
-      }
-      else
-      {
-         MEMORYSTATUS ms;
+    }
 
-         GlobalMemoryStatus(&ms);
+    if(get_param(param, 3, mode, MAX_STRING_LEN) != 0)
+    {
+            mode[0] = '\0';
+    }
 
-         if (!strcmp(cmd,"memory[total]"))
-            *value=(double)ms.dwTotalPhys;
-         else if (!strcmp(cmd,"memory[free]"))
-            *value=(double)ms.dwAvailPhys;
-         else if (!strcmp(cmd,"swap[total]"))
-            *value=(double)ms.dwTotalPageFile;
-         else if (!strcmp(cmd,"swap[free]"))
-            *value=(double)ms.dwAvailPageFile;
-         else
-            return SYSINFO_RC_NOTSUPPORTED;
-      }
-   }
-   
-   return SYSINFO_RC_SUCCESS;
+    if(mode[0] == '\0')
+    {
+            /* default parameter */
+            sprintf(mode, "avg1");
+    }
+
+	if(strcmp(cpuname,"all") == 0)
+	{
+		procnum = 0;
+	}
+	else
+	{
+		procnum = atoi(cpuname)+1;
+		if ((procnum < 1)||(procnum > MAX_CPU))
+			return SYSINFO_RC_NOTSUPPORTED;
+	}
+
+	if(strcmp(type,"system"))
+	{
+		return SYSINFO_RC_NOTSUPPORTED;
+	}
+
+	if(strcmp(mode,"avg1") == 0)
+		*value=statProcUtilization[procnum];
+	else	if(strcmp(mode,"avg5") == 0)
+		*value=statProcUtilization5[procnum];
+	else	if(strcmp(mode,"avg15") == 0)
+		*value=statProcUtilization15[procnum];
+	else
+		return SYSINFO_RC_NOTSUPPORTED;
+
+	return SYSINFO_RC_SUCCESS;
 }
 
+static LONG H_CpuLoad(char *cmd,char *arg,double *value)
+{
+	char 
+		param[28],
+		cpuname[10],
+		mode[10];
+
+	int procnum;
+
+	GetParameterInstance(cmd,param,28-1);
+
+    if(num_param(param) > 2)
+    {
+            return SYSINFO_RC_NOTSUPPORTED;
+    }
+
+    if(get_param(param, 1, cpuname, 10) != 0)
+    {
+            cpuname[0] = '\0';
+    }
+    if(cpuname[0] == '\0')
+    {
+            /* default parameter */
+            sprintf(cpuname, "all");
+    }
+
+
+    if(get_param(param, 2, mode, 10) != 0)
+    {
+            mode[0] = '\0';
+    }
+
+    if(mode[0] == '\0')
+    {
+            /* default parameter */
+            sprintf(mode, "avg1");
+    }
+
+	if(strcmp(cpuname,"all") == 0)
+	{
+		procnum = 0;
+	}
+	else
+	{
+		procnum=atoi(cpuname)+1;
+		if ((procnum<1)||(procnum>MAX_CPU))
+			return SYSINFO_RC_NOTSUPPORTED;
+	}
+
+	if(strcmp(mode,"avg1") == 0)
+		*value=statProcLoad;
+	else	if(strcmp(mode,"avg5") == 0)
+		*value=statProcLoad5;
+	else	if(strcmp(mode,"avg15") == 0)
+		*value=statProcLoad15;
+	else
+		return SYSINFO_RC_NOTSUPPORTED;
+
+	return SYSINFO_RC_SUCCESS;
+}
+
+static int GetProcessUsername(HANDLE hProcess, char *userName, int userNameLen) {
+	HANDLE		tok = 0;
+	TOKEN_USER	*ptu;
+
+	DWORD
+		nlen, 
+		dlen;
+
+	char
+		name[300],
+		dom[300],
+		tubuf[300];
+
+	int iUse;
+
+	assert(userName);
+	
+	//clean result;
+	*userName = '\0';
+
+	//open the processes token
+	if (!OpenProcessToken(hProcess,TOKEN_QUERY,&tok)) goto lbl_err;;
+
+	//get the SID of the token
+	ptu = (TOKEN_USER*)tubuf;
+	if (!GetTokenInformation(tok,(TOKEN_INFORMATION_CLASS)1,ptu,300,&nlen)) goto lbl_err;
+
+	//get the account/domain name of the SID
+	dlen = 300;	nlen = 300;
+	if (!LookupAccountSid(0, ptu->User.Sid, name, &nlen, dom, &dlen, (PSID_NAME_USE)&iUse)) goto lbl_err;
+
+	nlen = min(userNameLen-1,(int)nlen);
+
+	strncpy(userName, name, nlen);
+	userName[nlen] = 0;
+
+	return 1;
+
+lbl_err:
+	if (tok) CloseHandle(tok);
+	return 0;
+}
+
+//
+// Handler for proc.num[*]
+//
+static LONG H_ProcNum(char *cmd,char *arg,double *value)
+{
+	HANDLE	hProcess;
+	HMODULE hMod;
+
+	DWORD dwSize=0;
+
+	int 
+		i = 0,
+		counter = 0,
+		procCount = 0,
+		proc_ok = 0,
+		user_ok = 0;
+
+	char 
+		param[MAX_STRING_LEN],
+		procName[MAX_PATH],
+		userName[300],
+		baseName[MAX_PATH], 
+		uname[300];
+
+	GetParameterInstance(cmd,param,MAX_PATH-1);
+
+	if(num_param(param) > 2)
+	{
+		return SYSINFO_RC_NOTSUPPORTED;
+	}
+
+	if(get_param(param, 1, procName, MAX_PATH) != 0)
+	{
+		return SYSINFO_RC_NOTSUPPORTED;
+	}
+
+	if(get_param(param, 2, userName, 300) != 0)
+	{
+		userName[0] = '\0';
+	}
+
+
+	EnumProcesses(procList,sizeof(DWORD)*MAX_PROCESSES,&dwSize);
+
+	for(i=0,counter=0,procCount=dwSize/sizeof(DWORD); i < procCount; i++)
+	{
+		proc_ok = 0;
+		user_ok = 0;
+
+		hProcess=OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,FALSE,procList[i]);
+		if (hProcess!=NULL)
+		{
+			if (procName[0] != 0) 
+			{
+				if (EnumProcessModules(hProcess,&hMod,sizeof(hMod),&dwSize))
+				{
+					GetModuleBaseName(hProcess,hMod,baseName,sizeof(baseName));
+					if (stricmp(baseName,procName) == 0)
+					{
+						proc_ok = 1;
+					}
+				}
+			} else {
+				proc_ok = 1;
+			}
+
+			if(userName[0] != '\0')
+			{
+				if(GetProcessUsername(hProcess, uname, 300))
+				{
+					if (stricmp(uname,userName) == 0)
+						user_ok = 1;
+				}
+			} else {
+				user_ok = 1;
+			}
+
+			if(user_ok && proc_ok)		counter++;
+
+			CloseHandle(hProcess);
+		}
+	}
+
+	*value=(double)counter;
+
+	return SYSINFO_RC_SUCCESS;
+}
+
+
+//
+// Handler for vm.memory.size[*] parameters
+//
+
+static LONG H_MemorySize(char *cmd,char *arg,double *value)
+{
+	char 
+		mode[10],
+		param[15];
+
+	GetParameterInstance(cmd,param,15-1);
+
+    if(num_param(param) > 1)
+    {
+            return SYSINFO_RC_NOTSUPPORTED;
+    }
+
+    if(get_param(param, 1, mode, 10) != 0)
+    {
+            mode[0] = '\0';
+    }
+    if(mode[0] == '\0')
+    {
+            /* default parameter */
+            sprintf(mode, "total");
+    }
+
+
+	if (strcmp(mode,"cached") == 0)
+	{
+		PERFORMANCE_INFORMATION pfi;
+
+		if (imp_GetPerformanceInfo==NULL)
+			return SYSINFO_RC_NOTSUPPORTED;
+
+		imp_GetPerformanceInfo(&pfi,sizeof(PERFORMANCE_INFORMATION));
+		*value=(double)pfi.SystemCache*(double)pfi.PageSize;
+	}
+	else
+	{
+		if (imp_GlobalMemoryStatusEx!=NULL)
+		{
+			MEMORYSTATUSEX ms;
+
+			ms.dwLength = sizeof(MEMORYSTATUSEX);
+			imp_GlobalMemoryStatusEx(&ms);
+			if (strcmp(mode, "total") == 0)
+				*value = (double)((__int64)ms.ullTotalPhys);
+			else if (strcmp(mode, "free") == 0)
+				*value = (double)((__int64)ms.ullAvailPhys);
+			else
+				return SYSINFO_RC_NOTSUPPORTED;
+		}
+		else
+		{
+			MEMORYSTATUS ms;
+
+			GlobalMemoryStatus(&ms);
+
+			if (strcmp(mode,"total") == 0)
+				*value=(double)ms.dwTotalPhys;
+			else if (strcmp(mode,"free") == 0)
+				*value=(double)ms.dwAvailPhys;
+			else
+				return SYSINFO_RC_NOTSUPPORTED;
+		}
+	}
+
+	return SYSINFO_RC_SUCCESS;
+}
+
+static LONG H_SwapSize(char *cmd,char *arg,double *value)
+{
+	char param[25];
+	char swapdev[10];
+	char mode[10];
+
+	GetParameterInstance(cmd,param,25-1);
+
+    if(num_param(param) > 2)
+    {
+            return SYSINFO_RC_NOTSUPPORTED;
+    }
+
+    if(get_param(param, 1, swapdev, 10) != 0)
+    {
+            swapdev[0] = '\0';
+    }
+    if(swapdev[0] == '\0')
+    {
+            /* default parameter */
+            sprintf(swapdev, "all");
+    }
+    if(strncmp(swapdev, "all", MAX_STRING_LEN))
+    {  /* only 'all' parameter supported */
+            return SYSINFO_RC_NOTSUPPORTED;
+    }
+
+    if(get_param(param, 2, mode, 10) != 0)
+    {
+            mode[0] = '\0';
+    }
+    if(mode[0] == '\0')
+    {
+            /* default parameter */
+            sprintf(mode, "total");
+    }
+
+	if (imp_GlobalMemoryStatusEx!=NULL)
+	{
+		MEMORYSTATUSEX ms;
+
+		ms.dwLength = sizeof(MEMORYSTATUSEX);
+		imp_GlobalMemoryStatusEx(&ms);
+
+		if (strcmp(mode, "total") == 0)
+			*value = (double)((__int64)ms.ullTotalPageFile);
+		else if (strcmp(mode, "free") == 0)
+			*value = (double)((__int64)ms.ullAvailPageFile);
+		else
+			return SYSINFO_RC_NOTSUPPORTED;
+	}
+	else
+	{
+		MEMORYSTATUS ms;
+
+		GlobalMemoryStatus(&ms);
+
+		if (strcmp(mode,"total") == 0)
+			*value=(double)ms.dwTotalPageFile;
+		else if (strcmp(mode,"free") == 0)
+			*value=(double)ms.dwAvailPageFile;
+		else
+			return SYSINFO_RC_NOTSUPPORTED;
+	}
+
+	return SYSINFO_RC_SUCCESS;
+}
 
 //
 // Handler for system[hostname] parameter
@@ -279,29 +534,55 @@ static LONG H_HostName(char *cmd,char *arg,char **value)
 
 
 //
-// Handler for diskfree[*], diskused[*]  and disktotal[*] parameters
+// Handler for vfs.fs.size[*] parameters
 //
 
 static LONG H_DiskInfo(char *cmd,char *arg,double *value)
 {
-   char path[MAX_PATH];
-   ULARGE_INTEGER freeBytes,totalBytes;
+	
+	char
+		param[MAX_STRING_LEN],
+		path[MAX_PATH],
+		mode[20];
 
+	ULARGE_INTEGER freeBytes,totalBytes;
 
+	GetParameterInstance(cmd,param,MAX_STRING_LEN-1);
 
-   GetParameterInstance(cmd,path,MAX_PATH-1);
-   if (!GetDiskFreeSpaceEx(path,&freeBytes,&totalBytes,NULL))
-      return SYSINFO_RC_NOTSUPPORTED;
+    if(num_param(param) > 2)
+    {
+            return SYSINFO_RC_NOTSUPPORTED;
+    }
 
-   if (!memcmp(cmd,"diskfree[",9))
-      *value=(double)((__int64)freeBytes.QuadPart);
-   else if (!memcmp(cmd,"diskused[",9))
-      *value=(double)((__int64)totalBytes.QuadPart-(__int64)freeBytes.QuadPart);
-   else
-      *value=(double)((__int64)totalBytes.QuadPart);
-   return SYSINFO_RC_SUCCESS;
+    if(get_param(param, 1, path, MAX_PATH) != 0)
+    {
+            return SYSINFO_RC_NOTSUPPORTED;
+    }
+
+    if(get_param(param, 2, mode, 20) != 0)
+    {
+            mode[0] = '\0';
+    }
+    if(mode[0] == '\0')
+    {
+            /* default parameter */
+            sprintf(mode, "total");
+    }
+
+	if (!GetDiskFreeSpaceEx(path,&freeBytes,&totalBytes,NULL))
+		return SYSINFO_RC_NOTSUPPORTED;
+
+	if (strcmp(mode,"free") == 0)
+		*value = (double)((__int64)freeBytes.QuadPart);
+	else if (strcmp(mode,"used") == 0)
+		*value = (double)((__int64)totalBytes.QuadPart-(__int64)freeBytes.QuadPart);
+	else if (strcmp(mode,"total") == 0)
+		*value = (double)((__int64)totalBytes.QuadPart);
+	else
+		return SYSINFO_RC_NOTSUPPORTED;
+
+	return SYSINFO_RC_SUCCESS;
 }
-
 
 //
 // Handler for service_state[*] parameter
@@ -438,16 +719,38 @@ static LONG H_UserCounter(char *cmd,char *arg,double *value)
 
 static LONG H_MD5Hash(char *cmd,char *arg,char **value)
 {
-   char fileName[MAX_PATH], hashText[MD5_DIGEST_SIZE*2+1];
-   unsigned char *data=NULL, hash[MD5_DIGEST_SIZE];
-   HANDLE hFile=NULL,hFileMapping=NULL;
-   DWORD dwSize=0, dwSizeHigh=0;
+   char 
+	   *fileName,
+	   param[MAX_PATH],
+	   hashText[MD5_DIGEST_SIZE*2+1];
+
+   unsigned char 
+	   *data=NULL, 
+	   hash[MD5_DIGEST_SIZE];
+
+   HANDLE 
+	   hFile=NULL,
+	   hFileMapping=NULL;
+
+   DWORD 
+	   dwSize=0, 
+	   dwSizeHigh=0;
+
    int i=0;
 
 
 
    // Get file name from parameter name and open it
-   GetParameterInstance(cmd,fileName,MAX_PATH-1);
+   GetParameterInstance(cmd,param,MAX_PATH-1);
+
+    if(num_param(param) != 1)
+    {
+            return SYSINFO_RC_NOTSUPPORTED;
+    }
+
+	fileName = param;
+
+
    hFile=CreateFile(fileName,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,0,NULL);
    if (hFile==INVALID_HANDLE_VALUE)
       return SYSINFO_RC_NOTSUPPORTED;
@@ -507,15 +810,33 @@ static LONG H_MD5Hash(char *cmd,char *arg,char **value)
 
 static LONG H_CRC32(char *cmd,char *arg,double *value)
 {
-   char fileName[MAX_PATH];
-   HANDLE hFile = NULL, hFileMapping = NULL;
-   DWORD dwSize,dwSizeHigh,crc;
+   char 
+	   *fileName,
+	   param[MAX_PATH];
+
+   HANDLE 
+	   hFile = NULL, 
+	   hFileMapping = NULL;
+
+   DWORD 
+	   dwSize,
+	   dwSizeHigh,
+	   crc;
+
    unsigned char *data = NULL;
 
 INIT_CHECK_MEMORY(main);
 
    // Get file name from parameter name and open it
-   GetParameterInstance(cmd,fileName,MAX_PATH-1);
+   GetParameterInstance(cmd,param,MAX_PATH-1);
+
+    if(num_param(param) != 1)
+    {
+            return SYSINFO_RC_NOTSUPPORTED;
+    }
+
+	fileName = param;
+
    hFile=CreateFile(fileName,GENERIC_READ,FILE_SHARE_READ,NULL,OPEN_EXISTING,0,NULL);
    if (hFile==INVALID_HANDLE_VALUE)
       return SYSINFO_RC_NOTSUPPORTED;
@@ -574,19 +895,28 @@ CHECK_MEMORY(main, "H_FileSize","end");
 
 static LONG H_FileSize(char *cmd,char *arg,double *value)
 {
-   char fileName[MAX_PATH];
+   char 
+	   param[MAX_PATH],
+	   *fileName;
    HANDLE hFind;
    WIN32_FIND_DATA findData;
 
 INIT_CHECK_MEMORY(main);
 
-   GetParameterInstance(cmd,fileName,MAX_PATH-1);
+   GetParameterInstance(cmd,param,MAX_PATH-1);
+
+    if(num_param(param) != 1)
+    {
+            return SYSINFO_RC_NOTSUPPORTED;
+    }
+
+	fileName = param;
 
    hFind=FindFirstFile(fileName,&findData);
    if (hFind==INVALID_HANDLE_VALUE)
    {
 CHECK_MEMORY(main, "H_FileSize","INVALID_HANDLE_VALUE");
-      return SYSINFO_RC_NOTSUPPORTED;
+      return SYSINFO_RC_ERROR;
    }
    FindClose(hFind);
 
@@ -680,49 +1010,81 @@ CHECK_MEMORY(main, "H_SystemUname","end");
 //
 // Parameters and handlers
 //
+const int pingResult = 1;
 
 static AGENT_COMMAND commands[]=
-{
-   { "__exec{*}",NULL,H_Execute,NULL },
-   { "__usercnt{*}",H_UserCounter,NULL,NULL },
-   { "system.run[*]",H_RunCommand,NULL,NULL },
-   { "agent[avg_collector_time]",H_NumericPtr,NULL,(char *)&statAvgCollectorTime },
-   { "agent[max_collector_time]",H_NumericPtr,NULL,(char *)&statMaxCollectorTime },
-   { "agent[accepted_requests]",H_NumericPtr,NULL,(char *)&statAcceptedRequests },
-   { "agent[rejected_requests]",H_NumericPtr,NULL,(char *)&statRejectedRequests },
-   { "agent[timed_out_requests]",H_NumericPtr,NULL,(char *)&statTimedOutRequests },
-   { "agent[accept_errors]",H_NumericPtr,NULL,(char *)&statAcceptErrors },
-   { "agent[processed_requests]",H_NumericPtr,NULL,(char *)&statProcessedRequests },
-   { "agent[failed_requests]",H_NumericPtr,NULL,(char *)&statFailedRequests },
-   { "agent[unsupported_requests]",H_NumericPtr,NULL,(char *)&statUnsupportedRequests },
-   { "check_port[*]",H_CheckTcpPort,NULL,NULL },
-   { "cksum[*]",H_CRC32,NULL,NULL },
-   { "cpu_util",H_ProcUtil,NULL,(char *)0x00 },
-   { "cpu_util5",H_ProcUtil,NULL,(char *)0x01 },
-   { "cpu_util15",H_ProcUtil,NULL,(char *)0x02 },
-   { "cpu_util[*]",H_ProcUtil,NULL,(char *)0x80 },
-   { "cpu_util5[*]",H_ProcUtil,NULL,(char *)0x81 },
-   { "cpu_util15[*]",H_ProcUtil,NULL,(char *)0x82 },
-   { "diskfree[*]",H_DiskInfo,NULL,NULL },
-   { "disktotal[*]",H_DiskInfo,NULL,NULL },
-   { "diskused[*]",H_DiskInfo,NULL,NULL },
-   { "filesize[*]",H_FileSize,NULL,NULL },
-   { "md5_hash[*]",NULL,H_MD5Hash,NULL },
-   { "memory[*]",H_MemoryInfo,NULL,NULL },
-   { "perf_counter[*]",H_PerfCounter,NULL,NULL },
-   { "ping",H_NumericConstant,NULL,(char *)1 },
-   { "proc_cnt[*]",H_ProcCountSpecific,NULL,NULL },
-   { "proc_info[*]",H_ProcInfo,NULL,NULL },
-   { "service_state[*]",H_ServiceState,NULL,NULL },
-   { "swap[*]",H_MemoryInfo,NULL,NULL },
-   { "system[hostname]",NULL,H_HostName,NULL },
-   { "system[proccount]",H_ProcCount,NULL,NULL },
-   { "system[procload]",H_NumericPtr,NULL,(char *)&statProcLoad },
-   { "system[procload5]",H_NumericPtr,NULL,(char *)&statProcLoad5 },
-   { "system[procload15]",H_NumericPtr,NULL,(char *)&statProcLoad15 },
-   { "system[uname]",NULL,H_SystemUname,NULL },
-   { "version[zabbix_agent]",NULL,H_StringConstant,AGENT_VERSION },
-   { "",NULL,NULL,NULL }
+{  /* name							handler_float		handler_string		arg */
+	{ "__exec{*}",					NULL,				H_Execute,			NULL },
+	{ "__usercnt{*}",				H_UserCounter,		NULL,				NULL },
+	{ "system.run[*]",				H_RunCommand,		NULL,				NULL },
+
+	{ "agent.stat[avg_collector_time]",		H_NumericPtr,		NULL,				(char *)&statAvgCollectorTime },
+	{ "agent.stat[max_collector_time]",		H_NumericPtr,		NULL,				(char *)&statMaxCollectorTime },
+	{ "agent.stat[accepted_requests]",		H_NumericPtr,		NULL,				(char *)&statAcceptedRequests },
+	{ "agent.stat[rejected_requests]",		H_NumericPtr,		NULL,				(char *)&statRejectedRequests },
+	{ "agent.stat[timed_out_requests]",		H_NumericPtr,		NULL,				(char *)&statTimedOutRequests },
+	{ "agent.stat[accept_errors]",			H_NumericPtr,		NULL,				(char *)&statAcceptErrors },
+	{ "agent.stat[processed_requests]",		H_NumericPtr,		NULL,				(char *)&statProcessedRequests },
+	{ "agent.stat[failed_requests]",		H_NumericPtr,		NULL,				(char *)&statFailedRequests },
+	{ "agent.stat[unsupported_requests]",	H_NumericPtr,		NULL,				(char *)&statUnsupportedRequests },
+
+	{ "proc_info[*]",				H_ProcInfo,			NULL,				NULL }, // TODO 'new realization and naming'
+	{ "perf_counter[*]",			H_PerfCounter,		NULL,				NULL }, // TODO 'new naming'
+	{ "service_state[*]",			H_ServiceState,		NULL,				NULL }, // TODO 'new naming'
+
+//	{ "check_port[*]",				H_CheckTcpPort,		NULL,				NULL },
+	{ "net.tcp.port[*]",			H_CheckTcpPort,		NULL,				NULL },
+
+//	{ "cpu_util",					H_ProcUtil,			NULL,				(char *)0x00 },
+//	{ "cpu_util5",					H_ProcUtil,			NULL,				(char *)0x01 },
+//	{ "cpu_util15",					H_ProcUtil,			NULL,				(char *)0x02 },
+//	{ "cpu_util[*]",				H_ProcUtil,			NULL,				(char *)0x80 },
+//	{ "cpu_util5[*]",				H_ProcUtil,			NULL,				(char *)0x81 },
+//	{ "cpu_util15[*]",				H_ProcUtil,			NULL,				(char *)0x82 },
+	{ "system.cpu.util[*]",			H_CpuUtil,			NULL,				NULL},
+
+//	{ "diskfree[*]",				H_DiskInfo,			NULL,				NULL },
+//	{ "disktotal[*]",				H_DiskInfo,			NULL,				NULL },
+//	{ "diskused[*]",				H_DiskInfo,			NULL,				NULL },
+	{ "vfs.fs.size[*]",				H_DiskInfo,			NULL,				NULL },
+
+//	{ "filesize[*]",				H_FileSize,			NULL,				NULL },
+	{ "vfs.file.size[*]",			H_FileSize,			NULL,				NULL },
+
+//	{ "cksum[*]",					H_CRC32,			NULL,				NULL },
+	{ "vfs.file.cksum[*]",			H_CRC32,			NULL,				NULL },
+
+//   { "md5_hash[*]",				NULL,				H_MD5Hash,			NULL },
+	{ "vfs.file.md5sum[*]",			NULL,				H_MD5Hash,			NULL },
+
+//	{ "swap[*]",					H_MemoryInfo,		NULL,				NULL },
+	{ "system.swap.size[*]",		H_SwapSize,			NULL,				NULL },
+
+//	{ "memory[*]",					H_MemoryInfo,		NULL,				NULL },
+	{ "vm.memory.size[*]",			H_MemorySize,		NULL,				NULL },
+
+//	{ "ping",						H_NumericConstant,	NULL,				(char *)1 },
+	{ "agent.ping",					H_NumericConstant,	NULL,				(char *)&pingResult },
+
+//	{ "proc_cnt[*]",				H_ProcCountSpecific,NULL,				NULL },
+//	{ "system[proccount]",			H_ProcCount,		NULL,				NULL },
+	{ "proc.num[*]",				H_ProcNum,			NULL,				NULL },
+
+//	{ "system[procload]",			H_NumericPtr,		NULL,				(char *)&statProcLoad },
+//	{ "system[procload5]",			H_NumericPtr,		NULL,				(char *)&statProcLoad5 },
+//	{ "system[procload15]",			H_NumericPtr,		NULL,				(char *)&statProcLoad15 },
+	{ "system.cpu.load[*]",			H_CpuLoad,			NULL,				NULL},
+
+//	{ "system[uname]",				NULL,				H_SystemUname,		NULL },
+	{ "system.uname",				NULL,				H_SystemUname,		NULL },
+
+//	{ "system[hostname]",			NULL,				H_HostName,			NULL },
+	{ "system.hostname",			NULL,				H_HostName,			NULL },
+
+//	{ "version[zabbix_agent]",		NULL,				H_StringConstant,	AGENT_VERSION },
+	{ "agent.version",				NULL,				H_StringConstant,	AGENT_VERSION },
+
+	{ "",NULL,NULL,NULL }
 };
 
 
@@ -833,4 +1195,26 @@ finish_cmd_processing:;
    }
 
    CHECK_MEMORY(main, "ProcessCommand","end");
+}
+
+char *test_cmd = NULL;
+
+int TestCommand()
+{
+	char result[MAX_STRING_LEN];
+	int i = 0;
+
+	ProcessCommand(test_cmd, result);
+
+	for(i=0; result[i]!='\0'; i++)
+	{
+		if(result[i] == '\r' || result[i] == '\n')
+		{
+			result[i] = '\0';
+			break;
+		}
+	}
+
+	printf("%-35s [%s]\n",test_cmd, result);
+	return 0;
 }
