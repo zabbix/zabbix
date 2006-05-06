@@ -72,7 +72,7 @@ void main_timer_loop()
 
 	DB_ITEM	item;
 
-	DB_RESULT	*result;
+	DB_RESULT	result;
 
 	for(;;)
 	{

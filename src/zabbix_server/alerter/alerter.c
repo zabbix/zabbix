@@ -186,7 +186,7 @@ int main_alerter_loop()
 
 	struct	sigaction phan;
 
-	DB_RESULT	*result;
+	DB_RESULT	result;
 	DB_ALERT	alert;
 	DB_MEDIATYPE	mediatype;
 

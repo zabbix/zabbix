@@ -109,7 +109,7 @@ static int get_minnextcheck(int now)
 {
 	char		sql[MAX_STRING_LEN];
 
-	DB_RESULT	*result;
+	DB_RESULT	result;
 
 	int		res;
 
@@ -163,7 +163,7 @@ static void update_key_status(int hostid,int host_status)
 	AGENT_RESULT	agent;
 
 	DB_ITEM		item;
-	DB_RESULT	*result;
+	DB_RESULT	result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In update_key_status(%d,%d)",hostid,host_status);
 
@@ -214,7 +214,7 @@ int get_values(void)
 {
 	char		sql[MAX_STRING_LEN];
 
-	DB_RESULT	*result;
+	DB_RESULT	result;
 
 	int		i;
 	int		now;

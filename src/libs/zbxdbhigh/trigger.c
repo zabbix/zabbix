@@ -32,7 +32,9 @@
 int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid)
 {
 	DB_TRIGGER	trigger;
-	DB_RESULT	*result,*result2,*result3;
+	DB_RESULT	result;
+	DB_RESULT	result2;
+	DB_RESULT	result3;
 	char	sql[MAX_STRING_LEN];
 	char	old[MAX_STRING_LEN];
 	char	new[MAX_STRING_LEN];
@@ -169,7 +171,7 @@ int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid)
  ----------------------------------------------------------------------------*/
 int	DBget_trigger_by_triggerid(int triggerid,DB_TRIGGER *trigger)
 {
-	DB_RESULT	*result;
+	DB_RESULT	result;
 	char	sql[MAX_STRING_LEN];
 	int	ret = SUCCEED;
 

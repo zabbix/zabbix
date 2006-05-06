@@ -66,7 +66,7 @@
  ******************************************************************************/
 static int evaluate_LOGSOURCE(char *value, DB_ITEM *item, char *parameter)
 {
-	DB_RESULT	*result;
+	DB_RESULT	result;
 
 	char		sql[MAX_STRING_LEN];
 	int		now;
@@ -122,7 +122,7 @@ static int evaluate_LOGSOURCE(char *value, DB_ITEM *item, char *parameter)
  ******************************************************************************/
 static int evaluate_LOGSEVERITY(char *value, DB_ITEM *item, char *parameter)
 {
-	DB_RESULT	*result;
+	DB_RESULT	result;
 
 	char		sql[MAX_STRING_LEN];
 	int		now;
@@ -171,7 +171,7 @@ static int evaluate_LOGSEVERITY(char *value, DB_ITEM *item, char *parameter)
  ******************************************************************************/
 static int evaluate_COUNT(char *value, DB_ITEM *item, int parameter)
 {
-	DB_RESULT	*result;
+	DB_RESULT	result;
 
 	char		sql[MAX_STRING_LEN];
 	int		now;
@@ -220,7 +220,7 @@ static int evaluate_COUNT(char *value, DB_ITEM *item, int parameter)
  ******************************************************************************/
 static int evaluate_SUM(char *value, DB_ITEM *item, int parameter, int flag)
 {
-	DB_RESULT	*result;
+	DB_RESULT	result;
 
 	char		sql[MAX_STRING_LEN];
 	int		now;
@@ -298,7 +298,7 @@ static int evaluate_SUM(char *value, DB_ITEM *item, int parameter, int flag)
  ******************************************************************************/
 static int evaluate_AVG(char *value,DB_ITEM	*item,int parameter,int flag)
 {
-	DB_RESULT	*result;
+	DB_RESULT	result;
 
 	char		sql[MAX_STRING_LEN];
 	int		now;
@@ -377,7 +377,7 @@ static int evaluate_AVG(char *value,DB_ITEM	*item,int parameter,int flag)
  ******************************************************************************/
 static int evaluate_MIN(char *value,DB_ITEM	*item,int parameter, int flag)
 {
-	DB_RESULT	*result;
+	DB_RESULT	result;
 
 	char		sql[MAX_STRING_LEN];
 	int		now;
@@ -459,7 +459,7 @@ static int evaluate_MIN(char *value,DB_ITEM	*item,int parameter, int flag)
  ******************************************************************************/
 static int evaluate_MAX(char *value,DB_ITEM *item,int parameter,int flag)
 {
-	DB_RESULT	*result;
+	DB_RESULT	result;
 
 	char		sql[MAX_STRING_LEN];
 	int		now;
@@ -541,7 +541,7 @@ static int evaluate_MAX(char *value,DB_ITEM *item,int parameter,int flag)
  ******************************************************************************/
 static int evaluate_DELTA(char *value,DB_ITEM *item,int parameter, int flag)
 {
-	DB_RESULT	*result;
+	DB_RESULT	result;
 
 	char		sql[MAX_STRING_LEN];
 	int		now;
@@ -1057,7 +1057,7 @@ int	add_value_suffix(char *value, DB_ITEM *item)
  ******************************************************************************/
 int	replace_value_by_map(char *value, int valuemapid)
 {
-	DB_RESULT	*result;
+	DB_RESULT	result;
 
 	char new_value[MAX_STRING_LEN];
 	char sql[MAX_STRING_LEN];
@@ -1108,7 +1108,7 @@ int	replace_value_by_map(char *value, int valuemapid)
 int evaluate_FUNCTION2(char *value,char *host,char *key,char *function,char *parameter)
 {
 	DB_ITEM	item;
-	DB_RESULT *result;
+	DB_RESULT result;
 
         char	sql[MAX_STRING_LEN];
 	int	res;
