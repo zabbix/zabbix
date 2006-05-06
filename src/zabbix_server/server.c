@@ -502,6 +502,25 @@ int main(int argc, char **argv)
 
 	char sql[MAX_STRING_LEN];
 	DB_RESULT	result;
+	const char ** v;
+
+
+
+#ifdef HAVE_ORACLE
+/* */
+	DBconnect();
+/*	DBexecute("update history set value=value-10 where itemid=20272");*/
+	result = DBselect("select * from history");
+	while ( SQLO_SUCCESS == sqlo_fetch(result, 1))
+	{
+		v = sqlo_values(result, NULL, 1);
+		printf("%s %s %s\n",v[0],v[1],v[2]);
+	}
+	DBfree_result(result);
+	DBclose();
+	return 0;
+/* */
+#endif
 
 	progname = argv[0];
 
