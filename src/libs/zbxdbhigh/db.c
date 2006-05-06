@@ -1419,27 +1419,27 @@ void    DBescape_string(char *from, char *to, int maxlen)
 	to[ptr]=0;
 }
 
-void	DBget_item_from_db(DB_ITEM *item,DB_RESULT result, int row)
+void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 {
 	char	*s;
 	int	i;
 
 	i=row;
 
-	item->itemid=atoi(DBget_field(result,i,0));
-	strscpy(item->key,DBget_field(result,i,1));
-	item->host=DBget_field(result,i,2);
-	item->port=atoi(DBget_field(result,i,3));
-	item->delay=atoi(DBget_field(result,i,4));
-	item->description=DBget_field(result,i,5);
-	item->nextcheck=atoi(DBget_field(result,i,6));
-	item->type=atoi(DBget_field(result,i,7));
-	item->snmp_community=DBget_field(result,i,8);
-	item->snmp_oid=DBget_field(result,i,9);
-	item->useip=atoi(DBget_field(result,i,10));
-	item->ip=DBget_field(result,i,11);
-	item->history=atoi(DBget_field(result,i,12));
-	s=DBget_field(result,i,13);
+	item->itemid=atoi(row[0]);
+	strscpy(item->key,row[1]);
+	item->host=row[2];
+	item->port=atoi(row[3]);
+	item->delay=atoi(row[4]);
+	item->description=row[5];
+	item->nextcheck=atoi(row[6]);
+	item->type=atoi(row[7]);
+	item->snmp_community=row[8];
+	item->snmp_oid=row[9];
+	item->useip=atoi(row[10]);
+	item->ip=row[11];
+	item->history=atoi(row[12]);
+	s=row[13];
 	if(s==NULL)
 	{
 		item->lastvalue_null=1;
@@ -1450,7 +1450,7 @@ void	DBget_item_from_db(DB_ITEM *item,DB_RESULT result, int row)
 		item->lastvalue_str=s;
 		item->lastvalue=atof(s);
 	}
-	s=DBget_field(result,i,14);
+	s=row[14];
 	if(s==NULL)
 	{
 		item->prevvalue_null=1;
@@ -1461,15 +1461,15 @@ void	DBget_item_from_db(DB_ITEM *item,DB_RESULT result, int row)
 		item->prevvalue_str=s;
 		item->prevvalue=atof(s);
 	}
-	item->hostid=atoi(DBget_field(result,i,15));
-	item->host_status=atoi(DBget_field(result,i,16));
-	item->value_type=atoi(DBget_field(result,i,17));
+	item->hostid=atoi(row[15]);
+	item->host_status=atoi(row[16]);
+	item->value_type=atoi(row[17]);
 
-	item->host_errors_from=atoi(DBget_field(result,i,18));
-	item->snmp_port=atoi(DBget_field(result,i,19));
-	item->delta=atoi(DBget_field(result,i,20));
+	item->host_errors_from=atoi(row[18]);
+	item->snmp_port=atoi(row[19]);
+	item->delta=atoi(row[20]);
 
-	s=DBget_field(result,i,21);
+	s=row[21];
 	if(s==NULL)
 	{
 		item->prevorgvalue_null=1;
@@ -1479,7 +1479,7 @@ void	DBget_item_from_db(DB_ITEM *item,DB_RESULT result, int row)
 		item->prevorgvalue_null=0;
 		item->prevorgvalue=atof(s);
 	}
-	s=DBget_field(result,i,22);
+	s=row[22];
 	if(s==NULL)
 	{
 		item->lastclock=0;
@@ -1489,19 +1489,19 @@ void	DBget_item_from_db(DB_ITEM *item,DB_RESULT result, int row)
 		item->lastclock=atoi(s);
 	}
 
-	item->units=DBget_field(result,i,23);
-	item->multiplier=atoi(DBget_field(result,i,24));
+	item->units=row[23];
+	item->multiplier=atoi(row[24]);
 
-	item->snmpv3_securityname = DBget_field(result,i,25);
-	item->snmpv3_securitylevel = atoi(DBget_field(result,i,26));
-	item->snmpv3_authpassphrase = DBget_field(result,i,27);
-	item->snmpv3_privpassphrase = DBget_field(result,i,28);
-	item->formula = DBget_field(result,i,29);
-	item->host_available=atoi(DBget_field(result,i,30));
-	item->status=atoi(DBget_field(result,i,31));
-	item->trapper_hosts=DBget_field(result,i,32);
-	item->logtimefmt=DBget_field(result,i,33);
-	item->valuemapid=atoi(DBget_field(result,i,34));
+	item->snmpv3_securityname = row[25];
+	item->snmpv3_securitylevel = atoi(row[26]);
+	item->snmpv3_authpassphrase = row[27];
+	item->snmpv3_privpassphrase = row[28];
+	item->formula = row[29];
+	item->host_available=atoi(row[30]);
+	item->status=atoi(row[31]);
+	item->trapper_hosts=row[32];
+	item->logtimefmt=row[33];
+	item->valuemapid=atoi(row[34]);
 }
 
 int     DBget_default_escalation_id()

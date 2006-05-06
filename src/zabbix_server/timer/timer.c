@@ -64,7 +64,7 @@ extern void	update_functions(DB_ITEM *item);
 void main_timer_loop()
 {
 	char	sql[MAX_STRING_LEN];
-	int	i,now;
+	int	now;
 
 /*	int	itemid,functionid;
 	char	*function;
@@ -73,6 +73,7 @@ void main_timer_loop()
 	DB_ITEM	item;
 
 	DB_RESULT	result;
+	DB_ROW	row;
 
 	for(;;)
 	{
@@ -95,9 +96,9 @@ void main_timer_loop()
 
 		result = DBselect(sql);
 
-		for(i=0;i<DBnum_rows(result);i++)
+		while((row=DBfetch(result)))
 		{
-			DBget_item_from_db(&item,result, i);
+			DBget_item_from_db(&item,row);
 
 /* Update triggers will update value for NODATA */
 /*			snprintf(sql,sizeof(sql)-1,"update functions set lastvalue='1' where itemid=%d and function='%s' and parameter='%s'" , itemid, function, parameter );

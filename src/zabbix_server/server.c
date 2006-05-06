@@ -490,7 +490,7 @@ void test()
 int main(int argc, char **argv)
 {
 	int	ch;
-	int	i,j;
+	int	i;
 	pid_t	pid;
 
 	struct	sigaction phan;
