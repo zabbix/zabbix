@@ -79,7 +79,7 @@ int	DBadd_item_to_graph(int graphid,int itemid, char *color,int drawtype, int so
 
 int	DBget_graph_item_by_gitemid(int gitemid, DB_GRAPH_ITEM *graph_item)
 {
-	DB_RESULT	*result;
+	DB_RESULT	result;
 	char	sql[MAX_STRING_LEN];
 	int	ret = SUCCEED;
 
@@ -109,7 +109,7 @@ int	DBget_graph_item_by_gitemid(int gitemid, DB_GRAPH_ITEM *graph_item)
 
 int	DBget_graph_by_graphid(int graphid, DB_GRAPH *graph)
 {
-	DB_RESULT	*result;
+	DB_RESULT	result;
 	char	sql[MAX_STRING_LEN];
 	int	ret = SUCCEED;
 
@@ -144,7 +144,8 @@ int	DBadd_graph_item_to_linked_hosts(int gitemid,int hostid)
 	DB_ITEM	item;
 	DB_GRAPH_ITEM	graph_item;
 	DB_GRAPH	graph;
-	DB_RESULT	*result,*result2;
+	DB_RESULT	result;
+	DB_RESULT	result2;
 	char	sql[MAX_STRING_LEN];
 	char	name_esc[GRAPH_NAME_LEN_MAX];
 	int	i,j;

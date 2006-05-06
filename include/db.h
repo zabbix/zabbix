@@ -69,7 +69,7 @@ extern	int	CONFIG_DBPORT;
 #endif
 
 #ifdef HAVE_PGSQL
-	#define	DB_RESULT	PGresult #*
+	#define	DB_RESULT	PGresult *
 	#define	DBfree_result	PQclear
 #endif
 

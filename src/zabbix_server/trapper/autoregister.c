@@ -40,7 +40,7 @@ static void	register_new_host(char *server, int host_templateid);
 
 int	autoregister(char *server)
 {
-	DB_RESULT	*result;
+	DB_RESULT	result;
 
 	int	ret=SUCCEED;
 	char	sql[MAX_STRING_LEN];

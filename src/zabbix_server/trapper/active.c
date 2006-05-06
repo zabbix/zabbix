@@ -64,7 +64,7 @@ int	send_list_of_active_checks(int sockfd, char *host)
 {
 	char	sql[MAX_STRING_LEN];
 	char	s[MAX_STRING_LEN];
-	DB_RESULT *result;
+	DB_RESULT result;
 
 	int 	i;
 

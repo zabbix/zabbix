@@ -70,7 +70,7 @@ extern int autoregister(char *server);
 void	update_functions(DB_ITEM *item)
 {
 	DB_FUNCTION	function;
-	DB_RESULT	*result;
+	DB_RESULT	result;
 	char		sql[MAX_STRING_LEN];
 	char		value[MAX_STRING_LEN];
 	char		value_esc[MAX_STRING_LEN];
@@ -142,7 +142,8 @@ void	update_services_rec(int serviceid)
 	int	serviceupid, algorithm;
 	time_t	now;
 
-	DB_RESULT *result,*result2;
+	DB_RESULT result;
+	DB_RESULT result2;
 
 	snprintf(sql,sizeof(sql)-1,"select l.serviceupid,s.algorithm from services_links l,services s where s.serviceid=l.serviceupid and l.servicedownid=%d",serviceid);
 	result=DBselect(sql);
@@ -231,7 +232,7 @@ void	update_services(int triggerid, int status)
 	char	sql[MAX_STRING_LEN];
 	int	i;
 
-	DB_RESULT *result;
+	DB_RESULT result;
 
 	snprintf(sql,sizeof(sql)-1,"update services set status=%d where triggerid=%d",status,triggerid);
 	DBexecute(sql);
@@ -272,7 +273,7 @@ void	update_triggers(int itemid)
 	int	exp_value;
 	time_t	now;
 	DB_TRIGGER	trigger;
-	DB_RESULT	*result;
+	DB_RESULT	result;
 
 	int	i;
 
@@ -405,7 +406,7 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 	char	sql[MAX_STRING_LEN];
 	AGENT_RESULT	agent;
 
-	DB_RESULT       *result;
+	DB_RESULT       result;
 	DB_ITEM	item;
 	char	*s;
 

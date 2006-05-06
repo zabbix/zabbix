@@ -57,7 +57,7 @@ void zabbix_syslog(const char *fmt, ...)
 	char		value_str[MAX_STRING_LEN];
 
 	DB_ITEM		item;
-	DB_RESULT	*result;
+	DB_RESULT	result;
 
 	AGENT_RESULT	agent;
 

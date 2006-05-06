@@ -31,7 +31,7 @@
 
 int	DBget_item_by_itemid(int itemid,DB_ITEM *item)
 {
-	DB_RESULT	*result;
+	DB_RESULT	result;
 	char	sql[MAX_STRING_LEN];
 	int	ret = SUCCEED;
 
@@ -59,7 +59,9 @@ int	DBget_item_by_itemid(int itemid,DB_ITEM *item)
 int 	DBadd_item_to_linked_hosts(int itemid, int hostid)
 {
 	DB_ITEM	item;
-	DB_RESULT	*result,*result2,*result3;
+	DB_RESULT	result;
+	DB_RESULT	result2;
+	DB_RESULT	result3;
 	char	sql[MAX_STRING_LEN];
 	int	i;
 

@@ -62,7 +62,7 @@ int	DBadd_action(int triggerid, int userid, int delay, char *subject, char *mess
 
 int	DBget_action_by_actionid(int actionid,DB_ACTION *action)
 {
-	DB_RESULT	*result;
+	DB_RESULT	result;
 	char	sql[MAX_STRING_LEN];
 	int	ret = SUCCEED;
 

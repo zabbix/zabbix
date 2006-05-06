@@ -569,7 +569,7 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data
 	time_t  now;
 	struct  tm      *tm;
 
-	DB_RESULT *result;
+	DB_RESULT result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_simple_macros [%s]",data);
 
