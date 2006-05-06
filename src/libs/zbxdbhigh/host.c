@@ -52,7 +52,7 @@ int	DBadd_host(char *server, int port, int status, int useip, char *ip, int disa
 
 int	DBhost_exists(char *server)
 {
-	DB_RESULT	*result;
+	DB_RESULT	result;
 	char	sql[MAX_STRING_LEN];
 	int	ret = SUCCEED;
 
@@ -70,7 +70,7 @@ int	DBhost_exists(char *server)
 
 int	DBadd_templates_to_host(int hostid,int host_templateid)
 {
-	DB_RESULT	*result;
+	DB_RESULT	result;
 	char	sql[MAX_STRING_LEN];
 	int	i;
 
@@ -103,7 +103,7 @@ int	DBadd_template_linkage(int hostid,int templateid,int items,int triggers,int 
 
 int	DBsync_host_with_templates(int hostid)
 {
-	DB_RESULT	*result;
+	DB_RESULT	result;
 	char	sql[MAX_STRING_LEN];
 	int	i;
 
@@ -125,7 +125,7 @@ int	DBsync_host_with_templates(int hostid)
 
 int	DBsync_host_with_template(int hostid,int templateid,int items,int triggers,int graphs)
 {
-	DB_RESULT	*result;
+	DB_RESULT	result;
 	char	sql[MAX_STRING_LEN];
 	int	i;
 
@@ -172,7 +172,7 @@ int	DBsync_host_with_template(int hostid,int templateid,int items,int triggers,i
 
 int	DBget_host_by_hostid(int hostid,DB_HOST *host)
 {
-	DB_RESULT	*result;
+	DB_RESULT	result;
 	char	sql[MAX_STRING_LEN];
 	int	ret = SUCCEED;
 

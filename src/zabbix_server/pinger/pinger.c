@@ -124,7 +124,7 @@ static int process_value(char *key, char *host, AGENT_RESULT *value)
 {
 	char	sql[MAX_STRING_LEN];
 
-	DB_RESULT       *result;
+	DB_RESULT	result;
 	DB_ITEM	item;
 	char	*s;
 
@@ -222,7 +222,7 @@ static int create_host_file(void)
 	int	i,now;
 
 	DB_HOST	host;
-	DB_RESULT	*result;
+	DB_RESULT	result;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In create_host_file()");
 

@@ -132,7 +132,7 @@ static	void	send_to_user_medias(DB_TRIGGER *trigger,DB_ACTION *action, int useri
 {
 	DB_MEDIA media;
 	char sql[MAX_STRING_LEN];
-	DB_RESULT *result;
+	DB_RESULT result;
 
 	int	i;
 
@@ -183,7 +183,7 @@ static	void	send_to_user_medias(DB_TRIGGER *trigger,DB_ACTION *action, int useri
 static	void	send_to_user(DB_TRIGGER *trigger,DB_ACTION *action)
 {
 	char sql[MAX_STRING_LEN];
-	DB_RESULT *result;
+	DB_RESULT result;
 
 	int	i;
 
@@ -400,7 +400,7 @@ static void run_remote_command(char* host_name, char* command)
 	
 	AGENT_RESULT	agent_result;
 	DB_ITEM         item;
-	DB_RESULT	*result;
+	DB_RESULT	result;
 	
 	char sql[MAX_STRING_LEN];
 	assert(host_name);
@@ -535,7 +535,7 @@ static int get_next_command(char** command_list, char** alias, int* is_group, ch
  ******************************************************************************/
 /*static*/	void	run_commands(DB_TRIGGER *trigger,DB_ACTION *action)
 {
-	DB_RESULT *result;
+	DB_RESULT result;
 
 	char sql[MAX_STRING_LEN];
 	char *cmd_list = NULL;
@@ -574,7 +574,7 @@ static int get_next_command(char** command_list, char** alias, int* is_group, ch
 
 static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigger_value, DB_CONDITION *condition)
 {
-	DB_RESULT *result;
+	DB_RESULT result;
 	char sql[MAX_STRING_LEN];
 
 	int	i;
@@ -770,7 +770,7 @@ static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigge
 
 static int	check_action_conditions(DB_TRIGGER *trigger,int alarmid,int new_trigger_value, int actionid)
 {
-	DB_RESULT *result;
+	DB_RESULT result;
 	char sql[MAX_STRING_LEN];
 
 	DB_CONDITION	condition;
@@ -828,7 +828,7 @@ static int	check_action_conditions(DB_TRIGGER *trigger,int alarmid,int new_trigg
 
 void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 {
-	DB_RESULT *result;
+	DB_RESULT result;
 	
 	DB_ACTION action;
 

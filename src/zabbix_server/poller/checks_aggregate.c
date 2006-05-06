@@ -30,9 +30,9 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
 	char		sql2[MAX_STRING_LEN];
 	char		hostgroup_esc[MAX_STRING_LEN],itemkey_esc[MAX_STRING_LEN];
  
-	DB_RESULT	*result;
-	DB_RESULT	*r;
-	DB_RESULT	*result2;
+	DB_RESULT	result;
+	DB_RESULT	r;
+	DB_RESULT	result2;
 
 	int		i,valuetype,j;
 	double		d = 0, value;

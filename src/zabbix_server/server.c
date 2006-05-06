@@ -380,7 +380,8 @@ void	trend(void)
 {
 	char		sql[MAX_STRING_LEN];
  
-	DB_RESULT	*result,*result2;
+	DB_RESULT	result;
+	DB_RESULT	result2;
 
 	int		i,j;
 
@@ -500,7 +501,7 @@ int main(int argc, char **argv)
 	char		host[128];
 
 	char sql[MAX_STRING_LEN];
-	DB_RESULT	*result;
+	DB_RESULT	result;
 
 	progname = argv[0];
 

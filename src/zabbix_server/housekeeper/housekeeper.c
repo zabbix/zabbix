@@ -319,7 +319,7 @@ static int housekeeping_process_log()
 	char		sql[MAX_STRING_LEN];
 	DB_HOUSEKEEPER	housekeeper;
 
-	DB_RESULT	*result;
+	DB_RESULT	result;
 	int		res = SUCCEED;
 
 	int		i;
@@ -375,7 +375,7 @@ static int housekeeping_alerts(int now)
 {
 	char		sql[MAX_STRING_LEN];
 	int		alert_history;
-	DB_RESULT	*result;
+	DB_RESULT	result;
 	int		res = SUCCEED;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In housekeeping_alerts(%d)", now);
@@ -405,7 +405,8 @@ static int housekeeping_alarms(int now)
 {
 	char		sql[MAX_STRING_LEN];
 	int		alarm_history;
-	DB_RESULT	*result, *result2;
+	DB_RESULT	result;
+	DB_RESULT	result2;
 	int 		i, alarmid;
 	int		res = SUCCEED;
 
