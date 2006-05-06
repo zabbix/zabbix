@@ -66,6 +66,7 @@ extern	int	CONFIG_DBPORT;
 #ifdef HAVE_MYSQL
 	#define	DB_RESULT	MYSQL_RES *
 	#define	DBfree_result	mysql_free_result
+	#define DB_ROW		MYSQL_ROW
 #endif
 
 #ifdef HAVE_PGSQL
@@ -336,6 +337,7 @@ int	DBexecute( char *query );
 long	DBaffected_rows();
 
 DB_RESULT	DBselect(char *query);
+DB_ROW	DBfetch(DB_RESULT result);
 char	*DBget_field(DB_RESULT result, int rownum, int fieldnum);
 int	DBnum_rows(DB_RESULT result);
 int	DBinsert_id();
