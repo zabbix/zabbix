@@ -77,6 +77,7 @@ extern	int	CONFIG_DBPORT;
 #ifdef HAVE_ORACLE
 	#define	DB_RESULT	sqlo_stmt_handle_t
 	#define	DBfree_result	sqlo_close
+	#define DB_ROW		const char **
 #endif
 
 #define	MAX_HOST_HOST_LEN	64

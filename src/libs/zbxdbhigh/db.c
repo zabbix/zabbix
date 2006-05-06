@@ -186,10 +186,23 @@ DB_ROW	DBfetch(DB_RESULT result)
 	return mysql_fetch_row(result);
 #endif
 #ifdef	HAVE_ORACLE
-	if(SQLO_SUCCESS == sqlo_fetch(result, 1))
+	int res;
+
+	res = sqlo_fetch(result, 1);
+
+	if(SQLO_SUCCESS == res)
+	{
 		return sqlo_values(result, NULL, 1);
-	else 
+	}
+	else if(SQLO_NO_DATA == res)
+	{
 		return 0;
+	}
+	else
+	{
+		fprintf(stderr, "Fetch failed:%s\n", sqlo_geterror(oracle) );
+		exit(FAIL);
+	}
 #endif
 }
 
@@ -248,7 +261,13 @@ DB_RESULT DBselect(char *query)
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", sqlo_geterror(oracle));
+		fprintf(stderr, "Query::%s\n",query);
+		fprintf(stderr, "Query failed:%s\n", sqlo_geterror(oracle) );
 		exit(FAIL);
+	}
+	else
+	{
+		fprintf(stderr, "Query is ok::%s\n",query);
 	}
 	return sth;
 #endif
