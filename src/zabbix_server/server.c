@@ -502,15 +502,18 @@ int main(int argc, char **argv)
 
 	char sql[MAX_STRING_LEN];
 	DB_RESULT	result;
+#ifdef HAVE_ORACLE
+	const char ** v;
+#endif
 
 
 
-#ifdef HAVE_MYSQL
+#ifdef HAVE_ORACLE
 	DB_ROW row;
-	init_config();
+//	init_config();
 
 	DBconnect();
-	result = DBselect("select itemid,key_,description from items where 1=0");
+	result = DBselect("select * from history where itemid=20272");
 	while((row=DBfetch(result)))
 	{
 		printf("%s %s %s\n",row[0],row[1],row[2]);
@@ -521,7 +524,6 @@ int main(int argc, char **argv)
 #endif
 #ifdef HAVE_ORACLE
 /* */
-	const char ** v;
 	DBconnect();
 /*	DBexecute("update history set value=value-10 where itemid=20272");*/
 	result = DBselect("select itemid,key_,description from items");
