@@ -170,7 +170,7 @@ int	DBexecute(char *query)
 	if ( sqlo_exec(oracle, query)<0 )
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
-		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", sqlo_geterror(connect) );
+		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", sqlo_geterror(oracle) );
 		return FAIL;
 	}
 #endif
@@ -227,7 +227,15 @@ DB_RESULT DBselect(char *query)
 	return result;
 #endif
 #ifdef	HAVE_ORACLE
-	return FAIL;
+	sqlo_stmt_handle_t sth;
+
+	if(0 > (sth = (sqlo_open(oracle, query,0,NULL))))
+	{
+		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
+		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", sqlo_geterror(oracle));
+		exit(FAIL);
+	}
+	return sth;
 #endif
 }
 
@@ -348,6 +356,9 @@ int	DBnum_rows(DB_RESULT result)
 #ifdef	HAVE_PGSQL
 	zabbix_log(LOG_LEVEL_DEBUG, "In DBnum_rows");
 	return PQntuples(result);
+#endif
+#ifdef	HAVE_ORACLE
+	return sqlo_prows(result);
 #endif
 }
 
