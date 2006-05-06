@@ -490,7 +490,7 @@ void test()
 int main(int argc, char **argv)
 {
 	int	ch;
-	int	i;
+	int	i,j;
 	pid_t	pid;
 
 	struct	sigaction phan;
@@ -513,14 +513,17 @@ int main(int argc, char **argv)
 //	init_config();
 
 	DBconnect();
-	result = DBselect("select * from history where itemid=20272");
-	while((row=DBfetch(result)))
+//	result = DBselect("select * from history where itemid=20272");
+	for(i=0;i<1;i++)
 	{
-		printf("%s %s %s\n",row[0],row[1],row[2]);
+		result = DBselect("select itemid,key_,description from items");
+		while((row=DBfetch(result)))
+		{
+			printf("%s %s %s\n",row[0],row[1],row[2]);
+		}
+		DBfree_result(result);
 	}
-	DBfree_result(result);
 	DBclose();
-	return 0;
 #endif
 #ifdef HAVE_ORACLE
 /* */
@@ -534,8 +537,8 @@ int main(int argc, char **argv)
 	}
 	DBfree_result(result);
 	DBclose();
-	return 0;
 /* */
+	return 0;
 #endif
 
 	progname = argv[0];
