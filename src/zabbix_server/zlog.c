@@ -51,13 +51,13 @@
  ******************************************************************************/
 void zabbix_syslog(const char *fmt, ...)
 { 
-	int		i;
 	va_list		ap;
 	char		sql[MAX_STRING_LEN];
 	char		value_str[MAX_STRING_LEN];
 
 	DB_ITEM		item;
 	DB_RESULT	result;
+	DB_ROW	row;
 
 	AGENT_RESULT	agent;
 
@@ -66,28 +66,21 @@ void zabbix_syslog(const char *fmt, ...)
 	snprintf(sql,sizeof(sql)-1,"select %s where h.hostid=i.hostid and i.key_='%s' and i.value_type=%d", ZBX_SQL_ITEM_SELECT, SERVER_ZABBIXLOG_KEY, ITEM_VALUE_TYPE_STR);
 	result = DBselect(sql);
 
-	if( DBnum_rows(result) == 0)
+	while((row=DBfetch(result)))
 	{
-		zabbix_log( LOG_LEVEL_DEBUG, "No zabbix[log] to update.");
-	}
-	else
-	{
-		for(i=0;i<DBnum_rows(result);i++)
-		{
-			DBget_item_from_db(&item,result, i);
-	
-			va_start(ap,fmt);
-			vsprintf(value_str,fmt,ap);
-			value_str[MAX_STRING_LEN-1]=0;
-			va_end(ap);
+		DBget_item_from_db(&item,row);
 
-			init_result(&agent);
-			SET_STR_RESULT(&agent, strdup(value_str));
-			process_new_value(&item,&agent);
-			free_result(&agent);
+		va_start(ap,fmt);
+		vsprintf(value_str,fmt,ap);
+		value_str[MAX_STRING_LEN-1]=0;
+		va_end(ap);
 
-			update_triggers(item.itemid);
-		}
+		init_result(&agent);
+		SET_STR_RESULT(&agent, strdup(value_str));
+		process_new_value(&item,&agent);
+		free_result(&agent);
+
+		update_triggers(item.itemid);
 	}
 
 	DBfree_result(result);

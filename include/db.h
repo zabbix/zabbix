@@ -368,7 +368,7 @@ int	DBget_triggers_count(void);
 int	DBget_queue_count(void);
 
 void    DBescape_string(char *from, char *to, int maxlen);
-void    DBget_item_from_db(DB_ITEM *item,DB_RESULT result, int row);
+void    DBget_item_from_db(DB_ITEM *item,DB_ROW row);
 
 int	DBadd_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available);
 int	DBhost_exists(char *server);
