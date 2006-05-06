@@ -71,12 +71,12 @@ void	update_functions(DB_ITEM *item)
 {
 	DB_FUNCTION	function;
 	DB_RESULT	result;
+	DB_ROW		row;
 	char		sql[MAX_STRING_LEN];
 	char		value[MAX_STRING_LEN];
 	char		value_esc[MAX_STRING_LEN];
 	char		*lastvalue;
 	int		ret=SUCCEED;
-	int		i;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In update_functions(%d)",item->itemid);
 
@@ -84,12 +84,12 @@ void	update_functions(DB_ITEM *item)
 
 	result = DBselect(sql);
 
-	for(i=0;i<DBnum_rows(result);i++)
+	while((row=DBfetch(result)))
 	{
-		function.function=DBget_field(result,i,0);
-		function.parameter=DBget_field(result,i,1);
-		function.itemid=atoi(DBget_field(result,i,2));
-		lastvalue=DBget_field(result,i,3);
+		function.function=row[0];
+		function.parameter=row[1];
+		function.itemid=atoi(row[2]);
+		lastvalue=row[3];
 
 		zabbix_log( LOG_LEVEL_DEBUG, "ItemId:%d Evaluating %s(%d)\n",function.itemid,function.function,function.parameter);
 
@@ -230,20 +230,19 @@ void	update_services_rec(int serviceid)
 void	update_services(int triggerid, int status)
 {
 	char	sql[MAX_STRING_LEN];
-	int	i;
+	DB_ROW	row;
 
 	DB_RESULT result;
 
 	snprintf(sql,sizeof(sql)-1,"update services set status=%d where triggerid=%d",status,triggerid);
 	DBexecute(sql);
 
-
 	snprintf(sql,sizeof(sql)-1,"select serviceid from services where triggerid=%d", triggerid);
 	result = DBselect(sql);
 
-	for(i=0;i<DBnum_rows(result);i++)
+	while((row=DBfetch(result)))
 	{
-		update_services_rec(atoi(DBget_field(result,i,0)));
+		update_services_rec(atoi(row[0]));
 	}
 
 	DBfree_result(result);
@@ -274,8 +273,7 @@ void	update_triggers(int itemid)
 	time_t	now;
 	DB_TRIGGER	trigger;
 	DB_RESULT	result;
-
-	int	i;
+	DB_ROW		row;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In update_triggers [%d]", itemid);
 
@@ -286,14 +284,14 @@ void	update_triggers(int itemid)
 
 	result = DBselect(sql);
 
-	for(i=0;i<DBnum_rows(result);i++)
+	while((row==DBfetch(result)))
 	{
-		trigger.triggerid=atoi(DBget_field(result,i,0));
-		strscpy(trigger.expression,DBget_field(result,i,1));
-		trigger.status=atoi(DBget_field(result,i,2));
-		trigger.priority=atoi(DBget_field(result,i,4));
-		trigger.value=atoi(DBget_field(result,i,5));
-		strscpy(trigger.description,DBget_field(result,i,6));
+		trigger.triggerid=atoi(row[0]);
+		strscpy(trigger.expression,row[1]);
+		trigger.status=atoi(row[2]);
+		trigger.priority=atoi(row[4]);
+		trigger.value=atoi(row[5]);
+		strscpy(trigger.description,row[6]);
 
 		strscpy(exp, trigger.expression);
 		if( evaluate_expression(&exp_value, exp, error, sizeof(error)) != 0 )

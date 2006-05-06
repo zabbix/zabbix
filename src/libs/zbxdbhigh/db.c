@@ -878,13 +878,13 @@ int DBdelete_history_pertial(int itemid)
 
 void DBupdate_triggers_status_after_restart(void)
 {
-	int	i;
 	char	sql[MAX_STRING_LEN];
 	int	lastchange;
 	int	now;
 
 	DB_RESULT	result;
 	DB_RESULT	result2;
+	DB_ROW	row;
 	DB_TRIGGER	trigger;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBupdate_triggers_after_restart()");
@@ -895,10 +895,10 @@ void DBupdate_triggers_status_after_restart(void)
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	result = DBselect(sql);
 
-	for(i=0;i<DBnum_rows(result);i++)
+	while((row=DBfetch(result)))
 	{
-		trigger.triggerid=atoi(DBget_field(result,i,0));
-		trigger.value=atoi(DBget_field(result,i,1));
+		trigger.triggerid=atoi(row[0]);
+		trigger.value=atoi(row[1]);
 
 		snprintf(sql,sizeof(sql)-1,"select min(i.nextcheck+i.delay) from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and i.nextcheck<>0 and t.triggerid=%d and i.type<>%d",trigger.triggerid,ITEM_TYPE_TRAPPER);
 		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);

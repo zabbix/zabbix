@@ -182,11 +182,12 @@ int main_alerter_loop()
 	char	error[MAX_STRING_LEN];
 	char	error_esc[MAX_STRING_LEN];
 
-	int	i,res, now;
+	int	res, now;
 
 	struct	sigaction phan;
 
 	DB_RESULT	result;
+	DB_ROW		row;
 	DB_ALERT	alert;
 	DB_MEDIATYPE	mediatype;
 
@@ -204,25 +205,25 @@ int main_alerter_loop()
 		snprintf(sql,sizeof(sql)-1,"select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,a.retries,mt.mediatypeid,mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path,a.delay from alerts a,media_type mt where a.status=%d and a.retries<3 and (a.repeats<a.maxrepeats or a.maxrepeats=0) and a.nextcheck<=%d and a.mediatypeid=mt.mediatypeid order by a.clock", ALERT_STATUS_NOT_SENT, now);
 		result = DBselect(sql);
 
-		for(i=0;i<DBnum_rows(result);i++)
+		while((row=DBfetch(result)))
 		{
-			alert.alertid=atoi(DBget_field(result,i,0));
-			alert.mediatypeid=atoi(DBget_field(result,i,1));
-			alert.sendto=DBget_field(result,i,2);
-			alert.subject=DBget_field(result,i,3);
-			alert.message=DBget_field(result,i,4);
-			alert.status=atoi(DBget_field(result,i,5));
-			alert.retries=atoi(DBget_field(result,i,6));
+			alert.alertid=atoi(row[0]);
+			alert.mediatypeid=atoi(row[1]);
+			alert.sendto=row[2];
+			alert.subject=row[3];
+			alert.message=row[4];
+			alert.status=atoi(row[5]);
+			alert.retries=atoi(row[6]);
 
-			mediatype.mediatypeid=atoi(DBget_field(result,i,7));
-			mediatype.type=atoi(DBget_field(result,i,8));
-			mediatype.description=DBget_field(result,i,9);
-			mediatype.smtp_server=DBget_field(result,i,10);
-			mediatype.smtp_helo=DBget_field(result,i,11);
-			mediatype.smtp_email=DBget_field(result,i,12);
-			mediatype.exec_path=DBget_field(result,i,13);
+			mediatype.mediatypeid=atoi(row[7]);
+			mediatype.type=atoi(row[8]);
+			mediatype.description=row[9];
+			mediatype.smtp_server=row[10];
+			mediatype.smtp_helo=row[11];
+			mediatype.smtp_email=row[12];
+			mediatype.exec_path=row[13];
 
-			alert.delay=atoi(DBget_field(result,i,14));
+			alert.delay=atoi(row[14]);
 
 			phan.sa_handler = &signal_handler;
 			sigemptyset(&phan.sa_mask);
