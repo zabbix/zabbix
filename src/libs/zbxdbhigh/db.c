@@ -180,6 +180,19 @@ int	DBexecute(char *query)
 	return	SUCCEED;
 }
 
+DB_ROW	DBfetch(DB_RESULT result)
+{
+#ifdef	HAVE_MYSQL
+	return mysql_fetch_row(result);
+#endif
+#ifdef	HAVE_ORACLE
+	if(SQLO_SUCCESS == sqlo_fetch(result, 1))
+		return sqlo_values(result, NULL, 1);
+	else 
+		return 0;
+#endif
+}
+
 /*
  * Execute SQL statement. For select statements only.
  * If fails, program terminates.
