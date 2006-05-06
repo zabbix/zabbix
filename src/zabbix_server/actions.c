@@ -133,19 +133,18 @@ static	void	send_to_user_medias(DB_TRIGGER *trigger,DB_ACTION *action, int useri
 	DB_MEDIA media;
 	char sql[MAX_STRING_LEN];
 	DB_RESULT result;
-
-	int	i;
+	DB_ROW	row;
 
 	snprintf(sql,sizeof(sql)-1,"select mediatypeid,sendto,active,severity,period from media where active=%d and userid=%d",MEDIA_STATUS_ACTIVE,userid);
 	result = DBselect(sql);
 
-	for(i=0;i<DBnum_rows(result);i++)
+	while((row=DBfetch(result)))
 	{
-		media.mediatypeid=atoi(DBget_field(result,i,0));
-		media.sendto=DBget_field(result,i,1);
-		media.active=atoi(DBget_field(result,i,2));
-		media.severity=atoi(DBget_field(result,i,3));
-		media.period=DBget_field(result,i,4);
+		media.mediatypeid=atoi(row[0]);
+		media.sendto=row[1];
+		media.active=atoi(row[2]);
+		media.severity=atoi(row[3]);
+		media.period=row[4];
 
 		zabbix_log( LOG_LEVEL_DEBUG, "Trigger severity [%d] Media severity [%d] Period [%s]",trigger->priority, media.severity, media.period);
 		if(((1<<trigger->priority)&media.severity)==0)
@@ -184,8 +183,7 @@ static	void	send_to_user(DB_TRIGGER *trigger,DB_ACTION *action)
 {
 	char sql[MAX_STRING_LEN];
 	DB_RESULT result;
-
-	int	i;
+	DB_ROW	row;
 
 	if(action->recipient == RECIPIENT_TYPE_USER)
 	{
@@ -195,9 +193,9 @@ static	void	send_to_user(DB_TRIGGER *trigger,DB_ACTION *action)
 	{
 		snprintf(sql,sizeof(sql)-1,"select u.userid from users u, users_groups ug where ug.usrgrpid=%d and ug.userid=u.userid", action->userid);
 		result = DBselect(sql);
-		for(i=0;i<DBnum_rows(result);i++)
+		while((row=DBfetch(result)))
 		{
-			send_to_user_medias(trigger, action, atoi(DBget_field(result,i,0)));
+			send_to_user_medias(trigger, action, atoi(row[0]));
 		}
 		DBfree_result(result);
 	}
@@ -575,9 +573,9 @@ static int get_next_command(char** command_list, char** alias, int* is_group, ch
 static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigger_value, DB_CONDITION *condition)
 {
 	DB_RESULT result;
+	DB_ROW	row;
 	char sql[MAX_STRING_LEN];
 
-	int	i;
 	int	ret = SUCCEED;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In check_action_condition [actionid:%d,conditionid:%d:cond.value:%s]", condition->actionid, condition->conditionid, condition->value);
@@ -586,12 +584,12 @@ static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigge
 	{
 		snprintf(sql,sizeof(sql)-1,"select distinct hg.groupid from hosts_groups hg,hosts h, items i, functions f, triggers t where hg.hostid=h.hostid and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=%d", trigger->triggerid);
 		result = DBselect(sql);
-		for(i=0;i<DBnum_rows(result);i++)
+		while((row=DBfetch(result)))
 		{
 			ret = FAIL;
 			if(condition->operator == CONDITION_OPERATOR_EQUAL)
 			{
-				if(atoi(condition->value) == atoi(DBget_field(result,i,0)))
+				if(atoi(condition->value) == atoi(row[0]))
 				{
 					ret = SUCCEED;
 					break;
@@ -599,7 +597,7 @@ static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigge
 			}
 			else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
 			{
-				if(atoi(condition->value) != atoi(DBget_field(result,i,0)))
+				if(atoi(condition->value) != atoi(row[0]))
 				{
 					ret = SUCCEED;
 					break;
@@ -619,11 +617,11 @@ static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigge
 		ret = FAIL;
 		snprintf(sql,sizeof(sql)-1,"select distinct h.hostid from hosts h, items i, functions f, triggers t where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=%d", trigger->triggerid);
 		result = DBselect(sql);
-		for(i=0;i<DBnum_rows(result);i++)
+		while((row=DBfetch(result)))
 		{
 			if(condition->operator == CONDITION_OPERATOR_EQUAL)
 			{
-				if(atoi(condition->value) == atoi(DBget_field(result,i,0)))
+				if(atoi(condition->value) == atoi(row[0]))
 				{
 					ret = SUCCEED;
 					break;
@@ -631,7 +629,7 @@ static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigge
 			}
 			else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
 			{
-				if(atoi(condition->value) != atoi(DBget_field(result,i,0)))
+				if(atoi(condition->value) != atoi(row[0]))
 				{
 					ret = SUCCEED;
 					break;
@@ -771,14 +769,15 @@ static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigge
 static int	check_action_conditions(DB_TRIGGER *trigger,int alarmid,int new_trigger_value, int actionid)
 {
 	DB_RESULT result;
+	DB_ROW row;
 	char sql[MAX_STRING_LEN];
 
 	DB_CONDITION	condition;
 	
 	int	ret = SUCCEED;
-	int	i;
 	int	old_type = -1;
 	int	ret_and = SUCCEED;
+	int	i;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In check_action_conditions [actionid:%d]", actionid);
 
@@ -791,13 +790,14 @@ static int	check_action_conditions(DB_TRIGGER *trigger,int alarmid,int new_trigg
 	}
 	else
 	{
-		for(i=0;i<DBnum_rows(result);i++)
+		i=0;
+		while((row=DBfetch(result)))
 		{
-			condition.conditionid=atoi(DBget_field(result,i,0));
-			condition.actionid=atoi(DBget_field(result,i,1));
-			condition.conditiontype=atoi(DBget_field(result,i,2));
-			condition.operator=atoi(DBget_field(result,i,3));
-			condition.value=DBget_field(result,i,4);
+			condition.conditionid=atoi(row[0]);
+			condition.actionid=atoi(row[1]);
+			condition.conditiontype=atoi(row[2]);
+			condition.operator=atoi(row[3]);
+			condition.value=row[4];
 
 			/* If old AND condition is FALSE */
 			if( (condition.conditiontype != old_type) && (ret_and == FAIL))
@@ -818,6 +818,7 @@ static int	check_action_conditions(DB_TRIGGER *trigger,int alarmid,int new_trigg
 			}
 
 			old_type = condition.conditiontype;
+			i++;
 		}
 	}
 
@@ -829,12 +830,12 @@ static int	check_action_conditions(DB_TRIGGER *trigger,int alarmid,int new_trigg
 void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 {
 	DB_RESULT result;
+	DB_ROW row;
 	
 	DB_ACTION action;
 
 	char sql[MAX_STRING_LEN];
 
-	int	i;
 	int	now;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In apply_actions(triggerid:%d,alarmid:%d,trigger_value:%d)",trigger->triggerid, alarmid, trigger_value);
@@ -866,25 +867,25 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 	result = DBselect(sql);
 	zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]", sql);
 
-	for(i=0;i<DBnum_rows(result);i++)
+	while((row=DBfetch(result)))
 	{
-		action.actionid=atoi(DBget_field(result,i,0));
+		action.actionid=atoi(row[0]);
 
 		if(check_action_conditions(trigger, alarmid, trigger_value, action.actionid) == SUCCEED)
 		{
-			action.actiontype=atoi(DBget_field(result,i,9));
-			action.userid=atoi(DBget_field(result,i,1));
-			action.delay=atoi(DBget_field(result,i,2));
+			action.actiontype=atoi(row[9]);
+			action.userid=atoi(row[1]);
+			action.delay=atoi(row[2]);
 			
-			strscpy(action.subject,DBget_field(result,i,3));
-			strscpy(action.message,DBget_field(result,i,4));
+			strscpy(action.subject,row[3]);
+			strscpy(action.message,row[4]);
 			substitute_macros(trigger, &action, action.message);
 			substitute_macros(trigger, &action, action.subject);
 
-			action.recipient=atoi(DBget_field(result,i,5));
-			action.maxrepeats=atoi(DBget_field(result,i,6));
-			action.repeatdelay=atoi(DBget_field(result,i,7));
-			strscpy(action.scripts,DBget_field(result,i,8));
+			action.recipient=atoi(row[5]);
+			action.maxrepeats=atoi(row[6]);
+			action.repeatdelay=atoi(row[7]);
+			strscpy(action.scripts,row[8]);
 
 			if(action.actiontype == ACTION_TYPE_MESSAGE)
 				send_to_user(trigger,&action);
