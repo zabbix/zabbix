@@ -405,6 +405,7 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 	AGENT_RESULT	agent;
 
 	DB_RESULT       result;
+	DB_ROW	row;
 	DB_ITEM	item;
 	char	*s;
 
@@ -424,7 +425,9 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 
 	result = DBselect(sql);
 
-	if(DBnum_rows(result) == 0)
+	row=DBfetch(result);
+
+	if(!row)
 	{
 		zabbix_log( LOG_LEVEL_DEBUG, "Before checking autoregistration for [%s]",server);
 
@@ -433,7 +436,8 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 			DBfree_result(result);
 
 			result = DBselect(sql);
-			if(DBnum_rows(result) == 0)
+			row = DBfetch(result);
+			if(!row)
 			{
 				DBfree_result(result);
 				return  FAIL;
@@ -446,7 +450,7 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 		}
 	}
 
-	DBget_item_from_db(&item,result,0);
+	DBget_item_from_db(&item,row);
 
 /*	item.itemid=atoi(DBget_field(result,0,0));
 	strscpy(item.key,DBget_field(result,0,1));

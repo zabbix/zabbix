@@ -164,6 +164,7 @@ static void update_key_status(int hostid,int host_status)
 
 	DB_ITEM		item;
 	DB_RESULT	result;
+	DB_ROW		row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In update_key_status(%d,%d)",hostid,host_status);
 
@@ -171,13 +172,11 @@ static void update_key_status(int hostid,int host_status)
 	zabbix_log(LOG_LEVEL_DEBUG, "SQL [%s]", sql);
 	result = DBselect(sql);
 
-	if( DBnum_rows(result) == 0)
+	row = DBfetch(result);
+
+	if(row)
 	{
-		zabbix_log( LOG_LEVEL_DEBUG, "No items to update.");
-	}
-	else
-	{
-		DBget_item_from_db(&item,result,0);
+		DBget_item_from_db(&item,row);
 
 /* Do not process new value for status, if previous status is the same */
 		zabbix_log( LOG_LEVEL_DEBUG, "item.lastvalue[%f] new host status[%d]",item.lastvalue,host_status);
@@ -190,6 +189,10 @@ static void update_key_status(int hostid,int host_status)
 
 			update_triggers(item.itemid);
 		}
+	}
+	else
+	{
+		zabbix_log( LOG_LEVEL_DEBUG, "No items to update.");
 	}
 
 	DBfree_result(result);
@@ -215,13 +218,13 @@ int get_values(void)
 	char		sql[MAX_STRING_LEN];
 
 	DB_RESULT	result;
+	DB_ROW	row;
 
-	int		i;
 	int		now;
 	int		res;
 	DB_ITEM		item;
 	AGENT_RESULT	agent;
-	int	stop;
+	int	stop=0;
 
 	now = time(NULL);
 
@@ -243,9 +246,9 @@ int get_values(void)
 	}
 	result = DBselect(sql);
 
-	for(stop=i=0;i<DBnum_rows(result)&&stop==0;i++)
+	while((row=DBfetch(result))&&(stop==0))
 	{
-		DBget_item_from_db(&item,result, i);
+		DBget_item_from_db(&item,row);
 
 		init_result(&agent);
 		zabbix_log( LOG_LEVEL_DEBUG, "GOT VALUE TYPE [0x%X]", agent.type);

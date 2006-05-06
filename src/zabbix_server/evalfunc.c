@@ -1109,6 +1109,7 @@ int evaluate_FUNCTION2(char *value,char *host,char *key,char *function,char *par
 {
 	DB_ITEM	item;
 	DB_RESULT result;
+	DB_ROW	row;
 
         char	sql[MAX_STRING_LEN];
 	int	res;
@@ -1118,7 +1119,9 @@ int evaluate_FUNCTION2(char *value,char *host,char *key,char *function,char *par
 	snprintf(sql,sizeof(sql)-1,"select %s where h.host='%s' and h.hostid=i.hostid and i.key_='%s'", ZBX_SQL_ITEM_SELECT, host, key );
 	result = DBselect(sql);
 
-	if(DBnum_rows(result) == 0)
+	row = DBfetch(result);
+
+	if(!row)
 	{
         	DBfree_result(result);
 		zabbix_log(LOG_LEVEL_WARNING, "Query [%s] returned empty result", sql );
@@ -1126,7 +1129,7 @@ int evaluate_FUNCTION2(char *value,char *host,char *key,char *function,char *par
 		return FAIL;
 	}
 
-	DBget_item_from_db(&item,result, 0);
+	DBget_item_from_db(&item,row);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Itemid:%d", item.itemid );
 
