@@ -77,7 +77,7 @@ extern	int	CONFIG_DBPORT;
 #ifdef HAVE_ORACLE
 	#define	DB_RESULT	sqlo_stmt_handle_t
 	#define	DBfree_result	sqlo_close
-	#define DB_ROW		const char **
+	#define DB_ROW		char **
 #endif
 
 #define	MAX_HOST_HOST_LEN	64
@@ -342,6 +342,7 @@ DB_ROW	DBfetch(DB_RESULT result);
 /*char	*DBget_field(DB_RESULT result, int rownum, int fieldnum);*/
 /*int	DBnum_rows(DB_RESULT result);*/
 int	DBinsert_id();
+int	DBis_null(char *field);
 
 int	DBget_function_result(double *result,char *functionid);
 void	DBupdate_host_availability(int hostid,int available,int clock,char *error);

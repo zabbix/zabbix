@@ -454,12 +454,6 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 
 	DBget_item_from_db(&item,row);
 
-/*	item.itemid=atoi(DBget_field(result,0,0));
-	strscpy(item.key,DBget_field(result,0,1));
-	item.host=DBget_field(result,0,2);
-	item.type=atoi(DBget_field(result,0,7));
-	item.trapper_hosts=DBget_field(result,0,16);*/
-
 	if( (item.type==ITEM_TYPE_ZABBIX_ACTIVE) && (check_security(sockfd,item.trapper_hosts,1) == FAIL))
 	{
 		DBfree_result(result);
@@ -475,44 +469,6 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 			DBupdate_item_status_to_notsupported(item.itemid, "Not supported by agent");
 	}
 	
-/*	item.port=atoi(DBget_field(result,0,3));
-	item.delay=atoi(DBget_field(result,0,4));
-	item.description=DBget_field(result,0,5);
-	item.nextcheck=atoi(DBget_field(result,0,6));
-	item.snmp_community=DBget_field(result,0,8);
-	item.snmp_oid=DBget_field(result,0,9);
-	item.useip=atoi(DBget_field(result,0,10));
-	item.ip=DBget_field(result,0,11);
-	item.history=atoi(DBget_field(result,0,12));
-	s=DBget_field(result,0,13);
-	if(s==NULL)
-	{
-		item.lastvalue_null=1;
-	}
-	else
-	{
-		item.lastvalue_null=0;
-		item.lastvalue_str=s;
-		item.lastvalue=atof(s);
-	}
-	s=DBget_field(result,0,14);
-	if(s==NULL)
-	{
-		item.prevvalue_null=1;
-	}
-	else
-	{
-		item.prevvalue_null=0;
-		item.prevvalue_str=s;
-		item.prevvalue=atof(s);
-	}
-	item.value_type=atoi(DBget_field(result,0,15));
-	item.delta=atoi(DBget_field(result,0,17));
-	item.units=DBget_field(result,0,18);
-	item.multiplier=atoi(DBget_field(result,0,19));
-	item.formula=DBget_field(result,0,20);
-	item.logtimefmt=DBget_field(result,0,21);*/
-
 	s=value;
 	if(	(strncmp(item.key,"log[",4)==0) ||
 		(strncmp(item.key,"eventlog[",9)==0)

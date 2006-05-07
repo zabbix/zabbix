@@ -180,6 +180,17 @@ int	DBexecute(char *query)
 	return	SUCCEED;
 }
 
+int	DBis_null(char *field)
+{
+	int ret = FAIL;
+
+	if(field == NULL)	ret = SUCCEED;
+#ifdef	HAVE_ORACLE
+	else if(field[0] == 0)	ret = SUCCEED;
+#endif
+	return ret;
+}
+
 DB_ROW	DBfetch(DB_RESULT result)
 {
 #ifdef	HAVE_MYSQL
@@ -261,13 +272,7 @@ DB_RESULT DBselect(char *query)
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", sqlo_geterror(oracle));
-		fprintf(stderr, "Query::%s\n",query);
-		fprintf(stderr, "Query failed:%s\n", sqlo_geterror(oracle) );
 		exit(FAIL);
-	}
-	else
-	{
-		fprintf(stderr, "Query is ok::%s\n",query);
 	}
 	return sth;
 #endif
@@ -423,7 +428,7 @@ int     DBget_function_result(double *result,char *functionid)
 		zabbix_syslog("No function for functionid:[%s]", functionid );
 		res = FAIL;
 	}
-	else if(row[1] == NULL)
+	else if(DBis_null(row[1]) == SUCCEED)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "function.lastvalue==NULL [%s]", functionid );
 		res = FAIL;
@@ -1480,7 +1485,7 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 	item->ip=row[11];
 	item->history=atoi(row[12]);
 	s=row[13];
-	if(s==NULL)
+	if(DBis_null(s)==SUCCEED)
 	{
 		item->lastvalue_null=1;
 	}
@@ -1491,7 +1496,7 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 		item->lastvalue=atof(s);
 	}
 	s=row[14];
-	if(s==NULL)
+	if(DBis_null(s)==SUCCEED)
 	{
 		item->prevvalue_null=1;
 	}
@@ -1510,7 +1515,7 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 	item->delta=atoi(row[20]);
 
 	s=row[21];
-	if(s==NULL)
+	if(DBis_null(s)==SUCCEED)
 	{
 		item->prevorgvalue_null=1;
 	}
@@ -1520,7 +1525,7 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 		item->prevorgvalue=atof(s);
 	}
 	s=row[22];
-	if(s==NULL)
+	if(DBis_null(s)==SUCCEED)
 	{
 		item->lastclock=0;
 	}
