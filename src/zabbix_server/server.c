@@ -376,6 +376,7 @@ void	init_config(void)
 
 }
 
+/*
 void	trend(void)
 {
 	char		sql[MAX_STRING_LEN];
@@ -401,6 +402,7 @@ void	trend(void)
 	}
 	DBfree_result(result2);
 }
+*/
 
 int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
 {
@@ -502,28 +504,27 @@ int main(int argc, char **argv)
 
 	char sql[MAX_STRING_LEN];
 	DB_RESULT	result;
+	DB_ROW		row;
 #ifdef HAVE_ORACLE
 	const char ** v;
 #endif
 
 
 
-#ifdef HAVE_ORACLE
-	DB_ROW row;
-//	init_config();
+#ifdef HAVE_MYSQL
+	init_config();
 
 	DBconnect();
 //	result = DBselect("select * from history where itemid=20272");
-	for(i=0;i<1;i++)
+	result = DBselect("select NULL from items");
+	while((row=DBfetch(result)))
 	{
-		result = DBselect("select itemid,key_,description from items");
-		while((row=DBfetch(result)))
-		{
-			printf("%s %s %s\n",row[0],row[1],row[2]);
-		}
-		DBfree_result(result);
+		if(row[0]==NULL)
+			printf("%s\n",row[0]);
 	}
+	DBfree_result(result);
 	DBclose();
+	return 0;
 #endif
 #ifdef HAVE_ORACLE
 /* */
@@ -618,10 +619,11 @@ int main(int argc, char **argv)
 
 	snprintf(sql,sizeof(sql)-1,"select refresh_unsupported from config");
 	result = DBselect(sql);
+	row = DBfetch(result);
 
-	if(DBnum_rows(result)==1)
+	if(row)
 	{
-		CONFIG_REFRESH_UNSUPPORTED = atoi(DBget_field(result,0,0));
+		CONFIG_REFRESH_UNSUPPORTED = atoi(row[0]);
 	}
 	DBfree_result(result);
 

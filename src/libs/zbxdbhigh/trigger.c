@@ -35,10 +35,12 @@ int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid)
 	DB_RESULT	result;
 	DB_RESULT	result2;
 	DB_RESULT	result3;
+	DB_ROW		row;
+	DB_ROW		row2;
+	DB_ROW		row3;
 	char	sql[MAX_STRING_LEN];
 	char	old[MAX_STRING_LEN];
 	char	new[MAX_STRING_LEN];
-	int	i,j;
 	int	functionid, triggerid_new;
 	char	expression_old[TRIGGER_EXPRESSION_LEN_MAX];
 	char	*expression;
@@ -50,51 +52,55 @@ int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid)
 
 	snprintf(sql,sizeof(sql)-1,"select description, priority,status,comments,url,value,expression from triggers where triggerid=%d", triggerid);
 	result2=DBselect(sql);
-	if(DBnum_rows(result2)==0)
+	row2=DBfetch(result2);
+
+	if(!row2)
 	{
 		DBfree_result(result2);
 		return FAIL;
 	}
 
 	trigger.triggerid = triggerid;
-	strscpy(trigger.description, DBget_field(result2,0,0));
-	zabbix_log( LOG_LEVEL_DEBUG, "DESC1 [%s] [%s]", trigger.description, DBget_field(result2,0,0));
-	trigger.priority=atoi(DBget_field(result2,0,1));
-	trigger.status=atoi(DBget_field(result2,0,2));
-	strscpy(trigger.comments, DBget_field(result2,0,3));
-	strscpy(trigger.url, DBget_field(result2,0,4));
-	trigger.value=atoi(DBget_field(result2,0,5));
-	strscpy(trigger.expression, DBget_field(result2,0,6));
+	strscpy(trigger.description, row2[0]);
+	zabbix_log( LOG_LEVEL_DEBUG, "DESC1 [%s] [%s]", trigger.description, row2[0]);
+	trigger.priority=atoi(row2[1]);
+	trigger.status=atoi(row2[2]);
+	strscpy(trigger.comments, row2[3]);
+	strscpy(trigger.url, row2[4]);
+	trigger.value=atoi(row2[5]);
+	strscpy(trigger.expression, row2[6]);
 
 	DBfree_result(result2);
 
 	snprintf(sql,sizeof(sql)-1,"select distinct h.hostid from hosts h,functions f, items i where i.itemid=f.itemid and h.hostid=i.hostid and f.triggerid=%d", triggerid);
 	result=DBselect(sql);
 
-	if(DBnum_rows(result)!=1)
+	row=DBfetch(result);
+
+	if(!row)
 	{
 		return FAIL;
 	}
 
 	if(hostid==0)
 	{
-		snprintf(sql,sizeof(sql)-1,"select hostid,templateid,triggers from hosts_templates where templateid=%d", atoi(DBget_field(result,0,0)));
+		snprintf(sql,sizeof(sql)-1,"select hostid,templateid,triggers from hosts_templates where templateid=%d", atoi(row[0]));
 	}
 	/* Link to one host only */
 	else
 	{
-		snprintf(sql,sizeof(sql)-1,"select hostid,templateid,triggers from hosts_templates where hostid=%d and templateid=%d", hostid, atoi(DBget_field(result,0,0)));
+		snprintf(sql,sizeof(sql)-1,"select hostid,templateid,triggers from hosts_templates where hostid=%d and templateid=%d", hostid, atoi(row[0]));
 	}
 	DBfree_result(result);
 
 	result=DBselect(sql);
 
 	/* Loop: linked hosts */
-	for(i=0;i<DBnum_rows(result);i++)
+	while((row=DBfetch(result)))
 	{
 		strscpy(expression_old, trigger.expression);
 
-		if( (atoi(DBget_field(result,i,2))&1) == 0)	continue;
+		if( (atoi(row[2])&1) == 0)	continue;
 
 		DBescape_string(trigger.description,description_esc,TRIGGER_DESCRIPTION_LEN_MAX);
 		zabbix_log( LOG_LEVEL_DEBUG, "DESC2 [%s] [%s]", trigger.description, description_esc);
@@ -110,12 +116,15 @@ int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid)
 		snprintf(sql,sizeof(sql)-1,"select i.key_,f.parameter,f.function,f.functionid from functions f,items i where i.itemid=f.itemid and f.triggerid=%d", triggerid);
 		result2=DBselect(sql);
 		/* Loop: functions */
-		for(j=0;j<DBnum_rows(result2);j++)
+		while((row2=DBfetch(result2)))
 		{
-			snprintf(sql,sizeof(sql)-1,"select itemid from items where key_='%s' and hostid=%d", DBget_field(result2,j,0), atoi(DBget_field(result,i,0)));
+			snprintf(sql,sizeof(sql)-1,"select itemid from items where key_='%s' and hostid=%d", row2[0], atoi(row[0]));
 			result3=DBselect(sql);
-			if(DBnum_rows(result3)!=1)
+			row3=DBfetch(result3);
+			if(!row3)
 			{
+				DBfree_result(result3);
+
 				snprintf(sql,sizeof(sql)-1,"delete from triggers where triggerid=%d", triggerid_new);
 				DBexecute(sql);
 				snprintf(sql,sizeof(sql)-1,"delete from functions where triggerid=%d", triggerid_new);
@@ -123,7 +132,7 @@ int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid)
 				break;
 			}
 
-			snprintf(sql,sizeof(sql)-1,"insert into functions (itemid,triggerid,function,parameter) values (%d,%d,'%s','%s')", atoi(DBget_field(result3,0,0)), triggerid_new, DBget_field(result2,j,2), DBget_field(result2,j,1));
+			snprintf(sql,sizeof(sql)-1,"insert into functions (itemid,triggerid,function,parameter) values (%d,%d,'%s','%s')", atoi(row3[0]), triggerid_new, row2[2], row2[1]);
 
 			DBexecute(sql);
 			functionid=DBinsert_id();
@@ -131,7 +140,7 @@ int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid)
 			snprintf(sql,sizeof(sql)-1,"update triggers set expression='%s' where triggerid=%d", expression_old, triggerid_new );
 			DBexecute(sql);
 
-			snprintf(old, sizeof(old)-1,"{%d}", atoi(DBget_field(result2,j,3)));
+			snprintf(old, sizeof(old)-1,"{%d}", atoi(row2[3]));
 			snprintf(new, sizeof(new)-1,"{%d}", functionid);
 
 			/* Possible memory leak here as expression can be malloced */
@@ -140,10 +149,11 @@ int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid)
 			strscpy(expression_old, expression);
 
 			snprintf(sql,sizeof(sql)-1,"update triggers set expression='%s' where triggerid=%d", expression, triggerid_new );
-
 			free(expression);
 
 			DBexecute(sql);
+
+			DBfree_result(result3);
 		}
 		DBfree_result(result2);
 	}
@@ -172,6 +182,7 @@ int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid)
 int	DBget_trigger_by_triggerid(int triggerid,DB_TRIGGER *trigger)
 {
 	DB_RESULT	result;
+	DB_ROW		row;
 	char	sql[MAX_STRING_LEN];
 	int	ret = SUCCEED;
 
@@ -179,21 +190,22 @@ int	DBget_trigger_by_triggerid(int triggerid,DB_TRIGGER *trigger)
 
 	snprintf(sql,sizeof(sql)-1,"select triggerid, expression,description,url,comments,status,value,priority from triggers where triggerid=%d", triggerid);
 	result=DBselect(sql);
+	row=DBfetch(result);
 
-	if(DBnum_rows(result)==0)
+	if(!row)
 	{
 		ret = FAIL;
 	}
 	else
 	{
-		trigger->triggerid=atoi(DBget_field(result,0,0));
-		strscpy(trigger->expression,DBget_field(result,0,1));
-		strscpy(trigger->description,DBget_field(result,0,2));
-		strscpy(trigger->url,DBget_field(result,0,3));
-		strscpy(trigger->comments,DBget_field(result,0,4));
-		trigger->status=atoi(DBget_field(result,0,5));
-		trigger->value=atoi(DBget_field(result,0,6));
-		trigger->priority=atoi(DBget_field(result,0,7));
+		trigger->triggerid=atoi(row[0]);
+		strscpy(trigger->expression,row[1]);
+		strscpy(trigger->description,row[2]);
+		strscpy(trigger->url,row[3]);
+		strscpy(trigger->comments,row[4]);
+		trigger->status=atoi(row[5]);
+		trigger->value=atoi(row[6]);
+		trigger->priority=atoi(row[7]);
 	}
 
 	DBfree_result(result);

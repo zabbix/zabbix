@@ -63,6 +63,7 @@ int	DBadd_action(int triggerid, int userid, int delay, char *subject, char *mess
 int	DBget_action_by_actionid(int actionid,DB_ACTION *action)
 {
 	DB_RESULT	result;
+	DB_ROW		row;
 	char	sql[MAX_STRING_LEN];
 	int	ret = SUCCEED;
 
@@ -70,114 +71,23 @@ int	DBget_action_by_actionid(int actionid,DB_ACTION *action)
 
 	snprintf(sql,sizeof(sql)-1,"select userid,delay,recipient,subject,message from actions where actionid=%d", actionid);
 	result=DBselect(sql);
+	row=DBfetch(result);
 
-	if(DBnum_rows(result)==0)
+	if(!row)
 	{
 		ret = FAIL;
 	}
 	else
 	{
 		action->actionid=actionid;
-		action->userid=atoi(DBget_field(result,0,0));
-		action->delay=atoi(DBget_field(result,0,1));
-		action->recipient=atoi(DBget_field(result,0,2));
-		strscpy(action->subject,DBget_field(result,0,3));
-		strscpy(action->message,DBget_field(result,0,4));
+		action->userid=atoi(row[0]);
+		action->delay=atoi(row[1]);
+		action->recipient=atoi(row[2]);
+		strscpy(action->subject,row[3]);
+		strscpy(action->message,row[4]);
 	}
 
 	DBfree_result(result);
 
 	return ret;
 }
-
-/*
-int	DBadd_action_to_linked_hosts(int actionid,int hostid)
-{
-	DB_ACTION	action;
-	DB_TRIGGER	trigger;
-	DB_HOST		host;
-	DB_HOST		host_template;
-	DB_RESULT	*result,*result2;
-
-	char	sql[MAX_STRING_LEN];
-	char	description_esc[TRIGGER_DESCRIPTION_LEN_MAX];
-	char	old[MAX_STRING_LEN];
-	char	new[MAX_STRING_LEN];
-	char	*message;
-	int	i,j;
-	int	hostid_tmp;
-
-	zabbix_log( LOG_LEVEL_DEBUG, "In DBadd_action_to_linked_hosts(%d,%d)", actionid, hostid);
-
-	if(DBget_action_by_actionid(actionid,&action) == FAIL)
-	{
-		return FAIL;
-	}
-
-	if(DBget_trigger_by_triggerid(action.triggerid,&trigger) == FAIL)
-	{
-		return FAIL;
-	}
-
-	snprintf(sql,sizeof(sql)-1,"select distinct h.hostid from hosts h,functions f, items i where i.itemid=f.itemid and h.hostid=i.hostid and f.triggerid=%d", action.triggerid);
-	zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]", sql);
-	result=DBselect(sql);
-
-	if(DBnum_rows(result)!=1)
-	{
-		DBfree_result(result);
-		return FAIL;
-	}
-
-	hostid_tmp=atoi(DBget_field(result,0,0));
-
-	DBfree_result(result);
-
-	if(DBget_host_by_hostid(hostid_tmp,&host_template) == FAIL)
-	{
-		return FAIL;
-	}
-	if(hostid==0)
-	{
-		snprintf(sql,sizeof(sql)-1,"select hostid,templateid,actions from hosts_templates where templateid=%d", hostid_tmp);
-	}
-	else
-	{
-		snprintf(sql,sizeof(sql)-1,"select hostid,templateid,actions from hosts_templates where hostid=%d and templateid=%d", hostid, hostid_tmp);
-	}
-	zabbix_log( LOG_LEVEL_DEBUG, "SQL2 [%s]", sql);
-
-	result=DBselect(sql);
-	for(i=0;i<DBnum_rows(result);i++)
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "In loop [%d]", i);
-		if( (atoi(DBget_field(result,i,2))&1) == 0)	continue;
-
-		DBescape_string(trigger.description,description_esc,TRIGGER_DESCRIPTION_LEN_MAX);
-
-		snprintf(sql,sizeof(sql)-1,"select distinct f.triggerid from functions f,items i,triggers t where t.description='%s' and t.triggerid=f.triggerid and i.itemid=f.itemid and i.hostid=%d", description_esc, atoi(DBget_field(result,i,0)));
-		zabbix_log( LOG_LEVEL_DEBUG, "SQL3 [%s]", sql);
-		result2=DBselect(sql);
-		for(j=0;j<DBnum_rows(result2);j++)
-		{
-			zabbix_log( LOG_LEVEL_DEBUG, "In loop2 [%d]", j);
-			if(DBget_host_by_hostid(atoi(DBget_field(result,i,0)),&host) == FAIL)	continue;
-
-			snprintf(old,sizeof(sql)-1,"{%s:",host_template.host);
-			snprintf(new,sizeof(sql)-1,"{%s:",host.host);
-
-			message=string_replace(action.message, old, new);
-
-			zabbix_log( LOG_LEVEL_DEBUG, "Before DBadd_action");
-
-			free(message);
-
-			DBadd_action(atoi(DBget_field(result2,j,0)), action.userid, action.good, action.delay, action.subject, message, action.scope, action.severity, action.recipient, action.userid);
-		}
-		DBfree_result(result2);
-	}
-	DBfree_result(result);
-
-	return SUCCEED;
-}
-*/

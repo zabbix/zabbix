@@ -125,6 +125,7 @@ static int process_value(char *key, char *host, AGENT_RESULT *value)
 	char	sql[MAX_STRING_LEN];
 
 	DB_RESULT	result;
+	DB_ROW		row;
 	DB_ITEM	item;
 	char	*s;
 
@@ -141,27 +142,28 @@ static int process_value(char *key, char *host, AGENT_RESULT *value)
 	}
 	zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]", sql);
 	result = DBselect(sql);
+	row=DBfetch(result);
 
-	if(DBnum_rows(result) == 0)
+	if(!row)
 	{
 		DBfree_result(result);
 		return  FAIL;
 	}
 
-	item.itemid=atoi(DBget_field(result,0,0));
-	strscpy(item.key,DBget_field(result,0,1));
-	item.host=DBget_field(result,0,2);
-	item.port=atoi(DBget_field(result,0,3));
-	item.delay=atoi(DBget_field(result,0,4));
-	item.description=DBget_field(result,0,5);
-	item.nextcheck=atoi(DBget_field(result,0,6));
-	item.type=atoi(DBget_field(result,0,7));
-	item.snmp_community=DBget_field(result,0,8);
-	item.snmp_oid=DBget_field(result,0,9);
-	item.useip=atoi(DBget_field(result,0,10));
-	item.ip=DBget_field(result,0,11);
-	item.history=atoi(DBget_field(result,0,12));
-	s=DBget_field(result,0,13);
+	item.itemid=atoi(row[0]);
+	strscpy(item.key,row[1]);
+	item.host=row[2];
+	item.port=atoi(row[3]);
+	item.delay=atoi(row[4]);
+	item.description=row[5];
+	item.nextcheck=atoi(row[6]);
+	item.type=atoi(row[7]);
+	item.snmp_community=row[8];
+	item.snmp_oid=row[9];
+	item.useip=atoi(row[10]);
+	item.ip=row[11];
+	item.history=atoi(row[12]);
+	s=row[13];
 	if(s==NULL)
 	{
 		item.lastvalue_null=1;
@@ -172,7 +174,7 @@ static int process_value(char *key, char *host, AGENT_RESULT *value)
 		item.lastvalue_str=s;
 		item.lastvalue=atof(s);
 	}
-	s=DBget_field(result,0,14);
+	s=row[14];
 	if(s==NULL)
 	{
 		item.prevvalue_null=1;
@@ -183,13 +185,13 @@ static int process_value(char *key, char *host, AGENT_RESULT *value)
 		item.prevvalue_str=s;
 		item.prevvalue=atof(s);
 	}
-	item.value_type=atoi(DBget_field(result,0,15));
-	item.trapper_hosts=DBget_field(result,0,16);
-	item.delta=atoi(DBget_field(result,0,17));
+	item.value_type=atoi(row[15]);
+	item.trapper_hosts=row[16];
+	item.delta=atoi(row[17]);
 
-	item.units=DBget_field(result,0,18);
-	item.multiplier=atoi(DBget_field(result,0,19));
-	item.formula=DBget_field(result,0,20);
+	item.units=row[18];
+	item.multiplier=atoi(row[19]);
+	item.formula=row[20];
 
 	process_new_value(&item,value);
 	update_triggers(item.itemid);
@@ -219,10 +221,11 @@ static int create_host_file(void)
 {
 	char	sql[MAX_STRING_LEN];
 	FILE	*f;
-	int	i,now;
+	int	now;
 
 	DB_HOST	host;
 	DB_RESULT	result;
+	DB_ROW		row;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In create_host_file()");
 
@@ -240,9 +243,9 @@ static int create_host_file(void)
 	snprintf(sql,sizeof(sql)-1,"select distinct h.ip from hosts h,items i where i.hostid=h.hostid and (h.status=%d or (h.status=%d and h.available=%d and h.disable_until<=%d)) and (i.key_='%s' or i.key_='%s') and i.type=%d and i.status=%d and h.useip=1", HOST_STATUS_MONITORED, HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE, now, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY, ITEM_TYPE_SIMPLE, ITEM_STATUS_ACTIVE);
 	result = DBselect(sql);
 
-	for(i=0;i<DBnum_rows(result);i++)
+	while((row=DBfetch(result)))
 	{
-		strscpy(host.ip,DBget_field(result,i,0));
+		strscpy(host.ip,row[0]);
 /*		host.host=DBget_field(result,i,2);*/
 
 		fprintf(f,"%s\n",host.ip);
@@ -255,9 +258,9 @@ static int create_host_file(void)
 	snprintf(sql,sizeof(sql)-1,"select distinct h.host from hosts h,items i where i.hostid=h.hostid and (h.status=%d or (h.status=%d and h.available=%d and h.disable_until<=%d)) and (i.key_='%s' or i.key_='%s') and i.type=%d and i.status=%d and h.useip=0", HOST_STATUS_MONITORED, HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE, now, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY, ITEM_TYPE_SIMPLE, ITEM_STATUS_ACTIVE);
 	result = DBselect(sql);
 
-	for(i=0;i<DBnum_rows(result);i++)
+	while((row=DBfetch(result)))
 	{
-		strscpy(host.host,DBget_field(result,i,0));
+		strscpy(host.host,row[0]);
 
 		fprintf(f,"%s\n",host.host);
 

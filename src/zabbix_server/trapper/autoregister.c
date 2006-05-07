@@ -41,11 +41,11 @@ static void	register_new_host(char *server, int host_templateid);
 int	autoregister(char *server)
 {
 	DB_RESULT	result;
+	DB_ROW		row;
 
 	int	ret=SUCCEED;
 	char	sql[MAX_STRING_LEN];
 	char	*pattern;
-	int	i;
 	int	len;
 	int	hostid;
 	
@@ -61,10 +61,10 @@ int	autoregister(char *server)
 
 	result = DBselect(sql);
 
-	for(i=0;i<DBnum_rows(result);i++)
+	while((row=DBfetch(result)))
 	{
-		pattern=DBget_field(result,i,1);
-		hostid=atoi(DBget_field(result,i,2));
+		pattern=row[1];
+		hostid=atoi(row[2]);
 
 		if(zbx_regexp_match(server, pattern, &len) != 0)
 		{
