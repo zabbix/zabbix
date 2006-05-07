@@ -67,6 +67,7 @@
 static int evaluate_LOGSOURCE(char *value, DB_ITEM *item, char *parameter)
 {
 	DB_RESULT	result;
+	DB_ROW	row;
 
 	char		sql[MAX_STRING_LEN];
 	int		now;
@@ -82,14 +83,16 @@ static int evaluate_LOGSOURCE(char *value, DB_ITEM *item, char *parameter)
 	snprintf(sql,sizeof(sql)-1,"select source from history_log where itemid=%d order by clock desc limit 1",item->itemid);
 
 	result = DBselect(sql);
-	if(DBnum_rows(result) == 0)
+	row = DBfetch(result);
+
+	if(!row)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Result for LOGSOURCE is empty" );
 		res = FAIL;
 	}
 	else
 	{
-		if(strcmp(DBget_field(result,0,0), parameter) == 0)
+		if(strcmp(row[0], parameter) == 0)
 		{
 			strcpy(value,"1");
 		}
@@ -123,6 +126,7 @@ static int evaluate_LOGSOURCE(char *value, DB_ITEM *item, char *parameter)
 static int evaluate_LOGSEVERITY(char *value, DB_ITEM *item, char *parameter)
 {
 	DB_RESULT	result;
+	DB_ROW		row;
 
 	char		sql[MAX_STRING_LEN];
 	int		now;
@@ -138,14 +142,15 @@ static int evaluate_LOGSEVERITY(char *value, DB_ITEM *item, char *parameter)
 	snprintf(sql,sizeof(sql)-1,"select severity from history_log where itemid=%d order by clock desc limit 1",item->itemid);
 
 	result = DBselect(sql);
-	if(DBnum_rows(result) == 0)
+	row = DBfetch(result);
+	if(!row)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Result for LOGSEVERITY is empty" );
 		res = FAIL;
 	}
 	else
 	{
-		strcpy(value,DBget_field(result,0,0));
+		strcpy(value,row[0]);
 	}
 	DBfree_result(result);
 
@@ -172,6 +177,7 @@ static int evaluate_LOGSEVERITY(char *value, DB_ITEM *item, char *parameter)
 static int evaluate_COUNT(char *value, DB_ITEM *item, int parameter)
 {
 	DB_RESULT	result;
+	DB_ROW	row;
 
 	char		sql[MAX_STRING_LEN];
 	int		now;
@@ -187,14 +193,16 @@ static int evaluate_COUNT(char *value, DB_ITEM *item, int parameter)
 	snprintf(sql,sizeof(sql)-1,"select count(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
 
 	result = DBselect(sql);
-	if(DBnum_rows(result) == 0)
+	row = DBfetch(result);
+
+	if(!row)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Result for COUNT is empty" );
 		res = FAIL;
 	}
 	else
 	{
-		strcpy(value,DBget_field(result,0,0));
+		strcpy(value,row[0]);
 	}
 	DBfree_result(result);
 
