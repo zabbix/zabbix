@@ -18,13 +18,24 @@
 --
 
 --
+-- Table structure for table 'config'
+--
+
+CREATE TABLE config (
+  alert_history		number(10)	DEFAULT '0' NOT NULL,
+  alarm_history		number(10)	DEFAULT '0' NOT NULL,
+  refresh_unsupported	number(10)	DEFAULT '0' NOT NULL,
+  work_period		varchar2(100)	DEFAULT '1-5,00:00-24:00' NOT NULL
+);
+
+--
 -- Table structure for table 'history'
 --
 
 CREATE TABLE history (
-  itemid		numeric(10)	DEFAULT '0' NOT NULL,
-  clock			numeric(10)	DEFAULT '0' NOT NULL,
-  value			numeric(16,4)	DEFAULT '0.0000' NOT NULL
+  itemid		number(10)	DEFAULT '0' NOT NULL,
+  clock			number(10)	DEFAULT '0' NOT NULL,
+  value			number(16,4)	DEFAULT '0.0000' NOT NULL
 );
 
 CREATE INDEX history_itemidclock on history (itemid, clock);
@@ -35,26 +46,40 @@ CREATE INDEX history_itemidclock on history (itemid, clock);
 --
 
 CREATE TABLE services (
-  serviceid		int(4)		NOT NULL auto_increment,
-  name			varchar(128)	DEFAULT '' NOT NULL,
-  status		int(1)		DEFAULT '0' NOT NULL,
-  algorithm		int(1)		DEFAULT '0' NOT NULL,
-  triggerid		int(4),
-  showsla		int(1)		DEFAULT '0' NOT NULL,
-  goodsla		double(5,2)	DEFAULT '99.9' NOT NULL,
-  sortorder		int(4)		DEFAULT '0' NOT NULL,
-  PRIMARY KEY (serviceid)
-) type=InnoDB;
+  serviceid		number(10)		NOT NULL,
+  name			varchar2(128)	DEFAULT '' NOT NULL,
+  status		number(3)		DEFAULT '0' NOT NULL,
+  algorithm		number(3)		DEFAULT '0' NOT NULL,
+  triggerid		number(10),
+  showsla		number(3)		DEFAULT '0' NOT NULL,
+  goodsla		number(5,2)	DEFAULT '99.9' NOT NULL,
+  sortorder		number(10)		DEFAULT '0' NOT NULL,
+  CONSTRAINT services_pk PRIMARY KEY (serviceid)
+);
+
+create sequence services_serviceid 
+start with 1 
+increment by 1 
+nomaxvalue; 
+
+create trigger services_trigger
+before insert on services
+for each row
+begin
+	select service_serviceid.nextval into :new.serviceid from dual;
+end;
+/
+
 
 --
 -- Table structure for table 'services_links'
 --
 
 CREATE TABLE services_links (
-  linkid		int(4)		NOT NULL auto_increment,
-  serviceupid		int(4)		DEFAULT '0' NOT NULL,
-  servicedownid		int(4)		DEFAULT '0' NOT NULL,
-  soft			int(1)		DEFAULT '0' NOT NULL,
+  linkid		number(10)		NOT NULL auto_increment,
+  serviceupid		number(10)		DEFAULT '0' NOT NULL,
+  servicedownid		number(10)		DEFAULT '0' NOT NULL,
+  soft			number(3)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (linkid),
 --  KEY (serviceupid),
   KEY (servicedownid),
@@ -66,13 +91,13 @@ CREATE TABLE services_links (
 --
 
 CREATE TABLE graphs_items (
-  gitemid		int(4)		NOT NULL auto_increment,
-  graphid		int(4)		DEFAULT '0' NOT NULL,
-  itemid		int(4)		DEFAULT '0' NOT NULL,
-  drawtype		int(4)		DEFAULT '0' NOT NULL,
-  sortorder		int(4)		DEFAULT '0' NOT NULL,
-  color			varchar(32)	DEFAULT 'Dark Green' NOT NULL,
-  yaxisside		int(1)		DEFAULT '1' NOT NULL,
+  gitemid		number(10)		NOT NULL auto_increment,
+  graphid		number(10)		DEFAULT '0' NOT NULL,
+  itemid		number(10)		DEFAULT '0' NOT NULL,
+  drawtype		number(10)		DEFAULT '0' NOT NULL,
+  sortorder		number(10)		DEFAULT '0' NOT NULL,
+  color			varchar2(32)	DEFAULT 'Dark Green' NOT NULL,
+  yaxisside		number(3)		DEFAULT '1' NOT NULL,
   PRIMARY KEY (gitemid)
 ) type=InnoDB;
 
@@ -81,16 +106,16 @@ CREATE TABLE graphs_items (
 --
 
 CREATE TABLE graphs (
-  graphid		int(4)		NOT NULL auto_increment,
-  name			varchar(128)	DEFAULT '' NOT NULL,
-  width			int(4)		DEFAULT '0' NOT NULL,
-  height		int(4)		DEFAULT '0' NOT NULL,
-  yaxistype		int(1)		DEFAULT '0' NOT NULL,
-  yaxismin		double(16,4)	DEFAULT '0' NOT NULL,
-  yaxismax		double(16,4)	DEFAULT '0' NOT NULL,
-  templateid		int(4)		DEFAULT '0' NOT NULL,
-  show_work_period	int(1)		DEFAULT '1' NOT NULL,
-  show_triggers		int(1)		DEFAULT '1' NOT NULL,
+  graphid		number(10)		NOT NULL auto_increment,
+  name			varchar2(128)	DEFAULT '' NOT NULL,
+  width			number(10)		DEFAULT '0' NOT NULL,
+  height		number(10)		DEFAULT '0' NOT NULL,
+  yaxistype		number(3)		DEFAULT '0' NOT NULL,
+  yaxismin		number(16,4)	DEFAULT '0' NOT NULL,
+  yaxismax		number(16,4)	DEFAULT '0' NOT NULL,
+  templateid		number(10)		DEFAULT '0' NOT NULL,
+  show_work_period	number(3)		DEFAULT '1' NOT NULL,
+  show_triggers		number(3)		DEFAULT '1' NOT NULL,
   PRIMARY KEY (graphid),
   KEY (name)
 ) type=InnoDB;
@@ -100,16 +125,16 @@ CREATE TABLE graphs (
 --
 
 CREATE TABLE sysmaps_links (
-  linkid		int(4)		NOT NULL auto_increment,
-  sysmapid		int(4)		DEFAULT '0' NOT NULL,
-  selementid1		int(4)		DEFAULT '0' NOT NULL,
-  selementid2		int(4)		DEFAULT '0' NOT NULL,
+  linkid		number(10)		NOT NULL auto_increment,
+  sysmapid		number(10)		DEFAULT '0' NOT NULL,
+  selementid1		number(10)		DEFAULT '0' NOT NULL,
+  selementid2		number(10)		DEFAULT '0' NOT NULL,
  -- may be NULL 
-  triggerid		int(4),
-  drawtype_off		int(4)		DEFAULT '0' NOT NULL,
-  color_off		varchar(32)	DEFAULT 'Black' NOT NULL,
-  drawtype_on		int(4)		DEFAULT '0' NOT NULL,
-  color_on		varchar(32)	DEFAULT 'Red' NOT NULL,
+  triggerid		number(10),
+  drawtype_off		number(10)		DEFAULT '0' NOT NULL,
+  color_off		varchar2(32)	DEFAULT 'Black' NOT NULL,
+  drawtype_on		number(10)		DEFAULT '0' NOT NULL,
+  color_on		varchar2(32)	DEFAULT 'Red' NOT NULL,
   PRIMARY KEY (linkid)
 ) type=InnoDB;
 
@@ -118,17 +143,17 @@ CREATE TABLE sysmaps_links (
 --
 
 CREATE TABLE sysmaps_elements (
-  selementid		int(4)		NOT NULL auto_increment,
-  sysmapid		int(4)		DEFAULT '0' NOT NULL,
-  elementid		int(4)		DEFAULT '0' NOT NULL,
-  elementtype		int(4)		DEFAULT '0' NOT NULL,
-  icon			varchar(32)	DEFAULT 'Server' NOT NULL,
-  icon_on		varchar(32)	DEFAULT 'Server' NOT NULL,
-  label			varchar(128)	DEFAULT '' NOT NULL,
-  label_location	int(1)		DEFAULT NULL,
-  x			int(4)		DEFAULT '0' NOT NULL,
-  y			int(4)		DEFAULT '0' NOT NULL,
-  url			varchar(255)	DEFAULT '' NOT NULL,
+  selementid		number(10)		NOT NULL auto_increment,
+  sysmapid		number(10)		DEFAULT '0' NOT NULL,
+  elementid		number(10)		DEFAULT '0' NOT NULL,
+  elementtype		number(10)		DEFAULT '0' NOT NULL,
+  icon			varchar2(32)	DEFAULT 'Server' NOT NULL,
+  icon_on		varchar2(32)	DEFAULT 'Server' NOT NULL,
+  label			varchar2(128)	DEFAULT '' NOT NULL,
+  label_location	number(3)		DEFAULT NULL,
+  x			number(10)		DEFAULT '0' NOT NULL,
+  y			number(10)		DEFAULT '0' NOT NULL,
+  url			varchar2(255)	DEFAULT '' NOT NULL,
   PRIMARY KEY (selementid)
 ) type=InnoDB;
 
@@ -137,30 +162,15 @@ CREATE TABLE sysmaps_elements (
 --
 
 CREATE TABLE sysmaps (
-  sysmapid		int(4)		NOT NULL auto_increment,
-  name			varchar(128)	DEFAULT '' NOT NULL,
-  width			int(4)		DEFAULT '0' NOT NULL,
-  height		int(4)		DEFAULT '0' NOT NULL,
-  background		varchar(64)	DEFAULT '' NOT NULL,
-  label_type		int(4)		DEFAULT '0' NOT NULL,
-  label_location	int(1)		DEFAULT '0' NOT NULL,
+  sysmapid		number(10)		NOT NULL auto_increment,
+  name			varchar2(128)	DEFAULT '' NOT NULL,
+  width			number(10)		DEFAULT '0' NOT NULL,
+  height		number(10)		DEFAULT '0' NOT NULL,
+  background		varchar2(64)	DEFAULT '' NOT NULL,
+  label_type		number(10)		DEFAULT '0' NOT NULL,
+  label_location	number(3)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (sysmapid),
   UNIQUE (name)
-) type=InnoDB;
-
---
--- Table structure for table 'config'
---
-
-CREATE TABLE config (
---  smtp_server		varchar(255)	DEFAULT '' NOT NULL,
---  smtp_helo		varchar(255)	DEFAULT '' NOT NULL,
---  smtp_email		varchar(255)	DEFAULT '' NOT NULL,
---  password_required	int(1)		DEFAULT '0' NOT NULL,
-  alert_history		int(4)		DEFAULT '0' NOT NULL,
-  alarm_history		int(4)		DEFAULT '0' NOT NULL,
-  refresh_unsupported	int(4)		DEFAULT '0' NOT NULL,
-  work_period		varchar(100)	DEFAULT '1-5,00:00-24:00' NOT NULL
 ) type=InnoDB;
 
 --
@@ -168,8 +178,8 @@ CREATE TABLE config (
 --
 
 CREATE TABLE groups (
-  groupid		int(4)		NOT NULL auto_increment,
-  name			varchar(64)	DEFAULT '' NOT NULL,
+  groupid		number(10)		NOT NULL auto_increment,
+  name			varchar2(64)	DEFAULT '' NOT NULL,
   PRIMARY KEY (groupid),
   UNIQUE (name)
 ) type=InnoDB;
@@ -179,8 +189,8 @@ CREATE TABLE groups (
 --
 
 CREATE TABLE hosts_groups (
-  hostid		int(4)		DEFAULT '0' NOT NULL,
-  groupid		int(4)		DEFAULT '0' NOT NULL,
+  hostid		number(10)		DEFAULT '0' NOT NULL,
+  groupid		number(10)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (hostid,groupid)
 ) type=InnoDB;
 
@@ -189,51 +199,63 @@ CREATE TABLE hosts_groups (
 --
 
 CREATE TABLE alerts (
-  alertid		int(4)		NOT NULL auto_increment,
-  actionid		int(4)		DEFAULT '0' NOT NULL,
-  triggerid		int(4)		DEFAULT '0' NOT NULL,
-  userid		int(4)		DEFAULT '0' NOT NULL,
-  clock			int(4)		DEFAULT '0' NOT NULL,
---  type		varchar(10)	DEFAULT '' NOT NULL,
-  mediatypeid		int(4)		DEFAULT '0' NOT NULL,
-  sendto		varchar(100)	DEFAULT '' NOT NULL,
-  subject		varchar(255)	DEFAULT '' NOT NULL,
-  message		blob		DEFAULT '' NOT NULL,
-  status		int(4)		DEFAULT '0' NOT NULL,
-  retries		int(4)		DEFAULT '0' NOT NULL,
-  error			varchar(128)	DEFAULT '' NOT NULL,
-  repeats		int(4)		DEFAULT '0' NOT NULL,
-  maxrepeats		int(4)		DEFAULT '0' NOT NULL,
-  nextcheck		int(4)		DEFAULT '0' NOT NULL,
-  delay			int(4)		DEFAULT '0' NOT NULL,
+	alertid		number(10)		NOT NULL,
+	actionid	number(10)		DEFAULT '0' NOT NULL,
+	triggerid	number(10)		DEFAULT '0' NOT NULL,
+	userid		number(10)		DEFAULT '0' NOT NULL,
+	clock		number(10)		DEFAULT '0' NOT NULL,
+	mediatypeid	number(10)		DEFAULT '0' NOT NULL,
+	sendto		varchar2(100)	DEFAULT '' NOT NULL,
+	subject		varchar2(255)	DEFAULT '' NOT NULL,
+	message		varchar2(2048)		DEFAULT '' NOT NULL,
+	status		number(10)		DEFAULT '0' NOT NULL,
+	retries		number(10)		DEFAULT '0' NOT NULL,
+	error		varchar2(128)	DEFAULT '' NOT NULL,
+	repeats		number(10)		DEFAULT '0' NOT NULL,
+	maxrepeats	number(10)		DEFAULT '0' NOT NULL,
+	nextcheck	number(10)		DEFAULT '0' NOT NULL,
+	delay		number(10)		DEFAULT '0' NOT NULL,
+	CONSTRAINT 	alerts_pk PRIMARY KEY (alertid)
+);
 
-  PRIMARY KEY (alertid),
-  INDEX (actionid),
-  KEY clock (clock),
-  KEY triggerid (triggerid),
-  KEY status_retries (status, retries),
-  KEY mediatypeid (mediatypeid),
-  KEY userid (userid)
-) type=InnoDB;
+CREATE INDEX alerts_actionid on alerts (actionid);
+CREATE INDEX alerts_clock on alerts (clock);
+CREATE INDEX alerts_triggerid on alerts (triggerid);
+CREATE INDEX alerts_statusretries on alerts (status, retries);
+CREATE INDEX alerts_mediatypeid on alerts (mediatypeid);
+CREATE INDEX alerts_userid on alerts (userid);
+
+create sequence alerts_alertid 
+start with 1 
+increment by 1 
+nomaxvalue; 
+
+create trigger alerts_trigger
+before insert on alerts
+for each row
+begin
+	select alerts_alertid.nextval into :new.alertid from dual;
+end;
+/
 
 --
 -- Table structure for table 'actions'
 --
 
 CREATE TABLE actions (
-  actionid		int(4)		NOT NULL auto_increment,
-  userid		int(4)		DEFAULT '0' NOT NULL,
-  delay			int(4)		DEFAULT '0' NOT NULL,
-  subject		varchar(255)	DEFAULT '' NOT NULL,
-  message		blob		DEFAULT '' NOT NULL,
-  nextcheck		int(4)		DEFAULT '0' NOT NULL,
-  recipient		int(1)		DEFAULT '0' NOT NULL,
-  maxrepeats		int(4)		DEFAULT '0' NOT NULL,
-  repeatdelay		int(4)		DEFAULT '600' NOT NULL,
-  source		int(1)		DEFAULT '0' NOT NULL,
-  actiontype		int(1)		DEFAULT '0' NOT NULL,
-  status		int(1)		DEFAULT '0' NOT NULL,
-  scripts		blob		DEFAULT '' NOT NULL,
+  actionid		number(10)		NOT NULL auto_increment,
+  userid		number(10)		DEFAULT '0' NOT NULL,
+  delay			number(10)		DEFAULT '0' NOT NULL,
+  subject		varchar2(255)	DEFAULT '' NOT NULL,
+  message		varchar2(2048)		DEFAULT '' NOT NULL,
+  nextcheck		number(10)		DEFAULT '0' NOT NULL,
+  recipient		number(3)		DEFAULT '0' NOT NULL,
+  maxrepeats		number(10)		DEFAULT '0' NOT NULL,
+  repeatdelay		number(10)		DEFAULT '600' NOT NULL,
+  source		number(3)		DEFAULT '0' NOT NULL,
+  actiontype		number(3)		DEFAULT '0' NOT NULL,
+  status		number(3)		DEFAULT '0' NOT NULL,
+  scripts		varchar(2048)		DEFAULT '' NOT NULL,
   PRIMARY KEY (actionid)
 ) type=InnoDB;
 
@@ -242,11 +264,11 @@ CREATE TABLE actions (
 --
 
 CREATE TABLE conditions (
-  conditionid		int(4)		NOT NULL auto_increment,
-  actionid		int(4)		DEFAULT '0' NOT NULL,
-  conditiontype		int(4)		DEFAULT '0' NOT NULL,
-  operator		int(1)		DEFAULT '0' NOT NULL,
-  value			varchar(255)	DEFAULT '' NOT NULL,
+  conditionid		number(10)		NOT NULL auto_increment,
+  actionid		number(10)		DEFAULT '0' NOT NULL,
+  conditiontype		number(10)		DEFAULT '0' NOT NULL,
+  operator		number(3)		DEFAULT '0' NOT NULL,
+  value			varchar2(255)	DEFAULT '' NOT NULL,
   PRIMARY KEY (conditionid),
   KEY (actionid)
 ) type=InnoDB;
@@ -256,11 +278,11 @@ CREATE TABLE conditions (
 --
 
 CREATE TABLE alarms (
-  alarmid		int(4)		NOT NULL auto_increment,
-  triggerid		int(4)		DEFAULT '0' NOT NULL,
-  clock			int(4)		DEFAULT '0' NOT NULL,
-  value			int(4)		DEFAULT '0' NOT NULL,
-  acknowledged		int(1)		DEFAULT '0' NOT NULL,
+  alarmid		number(10)		NOT NULL auto_increment,
+  triggerid		number(10)		DEFAULT '0' NOT NULL,
+  clock			number(10)		DEFAULT '0' NOT NULL,
+  value			number(10)		DEFAULT '0' NOT NULL,
+  acknowledged		number(3)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (alarmid),
   KEY (triggerid,clock),
   KEY (clock)
@@ -271,24 +293,38 @@ CREATE TABLE alarms (
 --
 
 CREATE TABLE functions (
-  functionid		int(4)		NOT NULL auto_increment,
-  itemid		int(4)		DEFAULT '0' NOT NULL,
-  triggerid		int(4)		DEFAULT '0' NOT NULL,
-  lastvalue		varchar(255),
-  function		varchar(10)	DEFAULT '' NOT NULL,
-  parameter		varchar(255)	DEFAULT '0' NOT NULL,
-  PRIMARY KEY (functionid),
-  KEY triggerid (triggerid),
-  KEY itemidfunctionparameter (itemid,function,parameter)
-) type=InnoDB;
+	functionid	number(10)		NOT NULL,
+	itemid		number(10)		DEFAULT '0' NOT NULL,
+	triggerid	number(10)		DEFAULT '0' NOT NULL,
+	lastvalue	varchar2(255),
+	function	varchar2(10)	DEFAULT '' NOT NULL,
+	parameter	varchar2(255)	DEFAULT '0' NOT NULL,
+	CONSTRAINT 	functions_pk PRIMARY KEY (functionid)
+);
+
+CREATE INDEX functions_triggerid on functions (triggerid);
+CREATE INDEX functions_itemidfunctionparam on functions (itemid,function,parameter);
+
+create sequence functions_functionid 
+start with 1 
+increment by 1 
+nomaxvalue; 
+
+create trigger functions_trigger
+before insert on functions
+for each row
+begin
+	select functions_functionid.nextval into :new.functionid from dual;
+end;
+/
 
 --
 -- Table structure for table 'history_uint'
 --
 
 CREATE TABLE history_uint (
-  itemid		int(4)		DEFAULT '0' NOT NULL,
-  clock			int(4)		DEFAULT '0' NOT NULL,
+  itemid		number(10)		DEFAULT '0' NOT NULL,
+  clock			number(10)		DEFAULT '0' NOT NULL,
   value			bigint unsigned	DEFAULT '0' NOT NULL,
 --  PRIMARY KEY (itemid,clock)
   KEY itemidclock (itemid, clock)
@@ -299,9 +335,9 @@ CREATE TABLE history_uint (
 --
 
 CREATE TABLE history_str (
-  itemid		int(4)		DEFAULT '0' NOT NULL,
-  clock			int(4)		DEFAULT '0' NOT NULL,
-  value			varchar(255)	DEFAULT '' NOT NULL,
+  itemid		number(10)		DEFAULT '0' NOT NULL,
+  clock			number(10)		DEFAULT '0' NOT NULL,
+  value			varchar2(255)	DEFAULT '' NOT NULL,
 --  PRIMARY KEY (itemid,clock)
   KEY itemidclock (itemid, clock)
 ) type=InnoDB;
@@ -311,85 +347,109 @@ CREATE TABLE history_str (
 --
 
 CREATE TABLE hosts (
-	hostid		int(4)		NOT NULL auto_increment,
-	host		varchar(64)	DEFAULT '' NOT NULL,
-	useip		int(1)		DEFAULT '1' NOT NULL,
-	ip		varchar(15)	DEFAULT '127.0.0.1' NOT NULL,
-	port		int(4)		DEFAULT '0' NOT NULL,
-	status		int(4)		DEFAULT '0' NOT NULL,
+	hostid		number(10)		NOT NULL,
+	host		varchar2(64)	DEFAULT '' NOT NULL,
+	useip		number(3)		DEFAULT '1' NOT NULL,
+	ip		varchar2(15)	DEFAULT '127.0.0.1' NOT NULL,
+	port		number(10)		DEFAULT '0' NOT NULL,
+	status		number(10)		DEFAULT '0' NOT NULL,
 -- If status=UNREACHABLE, host will not be checked until this time
-	disable_until	int(4)		DEFAULT '0' NOT NULL,
-	error		varchar(128)	DEFAULT '' NOT NULL,
-	available	int(4)		DEFAULT '0' NOT NULL,
-	errors_from	int(4)		DEFAULT '0' NOT NULL,
-	templateid	int(4)		DEFAULT '0' NOT NULL,
-	PRIMARY KEY	(hostid),
-	UNIQUE		(host),
-	KEY		(status)
-) type=InnoDB;
+	disable_until	number(10)		DEFAULT '0' NOT NULL,
+	error		varchar2(128)	DEFAULT '' NOT NULL,
+	available	number(10)		DEFAULT '0' NOT NULL,
+	errors_from	number(10)		DEFAULT '0' NOT NULL,
+	templateid	number(10)		DEFAULT '0' NOT NULL,
+  	CONSTRAINT 	hosts_pk PRIMARY KEY (hostid)
+);
+CREATE UNIQUE INDEX hosts_host on hosts (host);
+CREATE INDEX hosts_status on hosts (status);
+
+create sequence hosts_hostid 
+start with 1 
+increment by 1 
+nomaxvalue; 
+
+create trigger hosts_trigger
+before insert on hosts
+for each row
+begin
+	select hosts_hostid.nextval into :new.hostid from dual;
+end;
+/
+
 
 --
 -- Table structure for table 'items'
 --
 
 CREATE TABLE items (
-	itemid		int(4) NOT NULL auto_increment,
-	type		int(4) DEFAULT '0' NOT NULL,
-	snmp_community	varchar(64) DEFAULT '' NOT NULL,
-	snmp_oid	varchar(255) DEFAULT '' NOT NULL,
-	snmp_port	int(4) DEFAULT '161' NOT NULL,
-	hostid		int(4) NOT NULL,
-	description	varchar(255) DEFAULT '' NOT NULL,
-	key_		varchar(64) DEFAULT '' NOT NULL,
-	delay		int(4) DEFAULT '0' NOT NULL,
-	history		int(4) DEFAULT '90' NOT NULL,
-	trends		int(4) DEFAULT '365' NOT NULL,
+	itemid		number(10) NOT NULL,
+	type		number(10) DEFAULT '0' NOT NULL,
+	snmp_community	varchar2(64) DEFAULT '' NOT NULL,
+	snmp_oid	varchar2(255) DEFAULT '' NOT NULL,
+	snmp_port	number(10) DEFAULT '161' NOT NULL,
+	hostid		number(10) NOT NULL,
+	description	varchar2(255) DEFAULT '' NOT NULL,
+	key_		varchar2(64) DEFAULT '' NOT NULL,
+	delay		number(10) DEFAULT '0' NOT NULL,
+	history		number(10) DEFAULT '90' NOT NULL,
+	trends		number(10) DEFAULT '365' NOT NULL,
 -- lastdelete is not longer required
---	lastdelete	int(4) DEFAULT '0' NOT NULL,
-	nextcheck	int(4) DEFAULT '0' NOT NULL,
-	lastvalue	varchar(255) DEFAULT NULL,
-	lastclock	int(4) DEFAULT NULL,
-	prevvalue	varchar(255) DEFAULT NULL,
-	status		int(4) DEFAULT '0' NOT NULL,
-	value_type	int(4) DEFAULT '0' NOT NULL,
-	trapper_hosts	varchar(255) DEFAULT '' NOT NULL,
-	units		varchar(10)	DEFAULT '' NOT NULL,
-	multiplier	int(4)	DEFAULT '0' NOT NULL,
-	delta		int(1)  DEFAULT '0' NOT NULL,
-	prevorgvalue	double(16,4)  DEFAULT NULL,
-	snmpv3_securityname	varchar(64) DEFAULT '' NOT NULL,
-	snmpv3_securitylevel	int(1) DEFAULT '0' NOT NULL,
-	snmpv3_authpassphrase	varchar(64) DEFAULT '' NOT NULL,
-	snmpv3_privpassphrase	varchar(64) DEFAULT '' NOT NULL,
+--	lastdelete	number(10) DEFAULT '0' NOT NULL,
+	nextcheck	number(10) DEFAULT '0' NOT NULL,
+	lastvalue	varchar2(255) DEFAULT NULL,
+	lastclock	number(10) DEFAULT NULL,
+	prevvalue	varchar2(255) DEFAULT NULL,
+	status		number(10) DEFAULT '0' NOT NULL,
+	value_type	number(10) DEFAULT '0' NOT NULL,
+	trapper_hosts	varchar2(255) DEFAULT '' NOT NULL,
+	units		varchar2(10)	DEFAULT '' NOT NULL,
+	multiplier	number(10)	DEFAULT '0' NOT NULL,
+	delta		number(3)  DEFAULT '0' NOT NULL,
+	prevorgvalue	number(16,4)  DEFAULT NULL,
+	snmpv3_securityname	varchar2(64) DEFAULT '' NOT NULL,
+	snmpv3_securitylevel	number(3) DEFAULT '0' NOT NULL,
+	snmpv3_authpassphrase	varchar2(64) DEFAULT '' NOT NULL,
+	snmpv3_privpassphrase	varchar2(64) DEFAULT '' NOT NULL,
+	formula		varchar2(255) DEFAULT '0' NOT NULL,
+	error		varchar2(128) DEFAULT '' NOT NULL,
+	lastlogsize	number(10) DEFAULT '0' NOT NULL,
+	logtimefmt	varchar2(64) DEFAULT '' NOT NULL,
+	templateid	number(10) DEFAULT '0' NOT NULL,
+	valuemapid	number(10) DEFAULT '0' NOT NULL,
+  	CONSTRAINT 	items_pk PRIMARY KEY (itemid)
+);
 
-	formula		varchar(255) DEFAULT '0' NOT NULL,
-	error		varchar(128) DEFAULT '' NOT NULL,
+CREATE UNIQUE INDEX items_hostidkey on items (hostid, key_);
+CREATE INDEX items_nextcheck on items (nextcheck);
+CREATE INDEX items_status on items (status);
 
-	lastlogsize	int(4) DEFAULT '0' NOT NULL,
-	logtimefmt	varchar(64) DEFAULT '' NOT NULL,
-	templateid	int(4) DEFAULT '0' NOT NULL,
-	valuemapid	int(4) DEFAULT '0' NOT NULL,
+create sequence items_itemid 
+start with 1 
+increment by 1 
+nomaxvalue; 
 
-	PRIMARY KEY	(itemid),
-	UNIQUE		shortname (hostid,key_),
---	KEY		(hostid),
-	KEY		(nextcheck),
-	KEY		(status)
-) type=InnoDB;
+create trigger items_trigger
+before insert on items
+for each row
+begin
+	select items_itemid.nextval into :new.itemid from dual;
+end;
+/
 
 --
 -- Table structure for table 'media'
 --
 
 CREATE TABLE media (
-	mediaid		int(4) NOT NULL auto_increment,
-	userid		int(4) DEFAULT '0' NOT NULL,
---	type		varchar(10) DEFAULT '' NOT NULL,
-	mediatypeid	int(4) DEFAULT '0' NOT NULL,
-	sendto		varchar(100) DEFAULT '' NOT NULL,
-	active		int(4) DEFAULT '0' NOT NULL,
-	severity	int(4) DEFAULT '63' NOT NULL,
-	period		varchar(100) DEFAULT '1-7,00:00-23:59' NOT NULL,
+	mediaid		number(10) NOT NULL auto_increment,
+	userid		number(10) DEFAULT '0' NOT NULL,
+--	type		varchar2(10) DEFAULT '' NOT NULL,
+	mediatypeid	number(10) DEFAULT '0' NOT NULL,
+	sendto		varchar2(100) DEFAULT '' NOT NULL,
+	active		number(10) DEFAULT '0' NOT NULL,
+	severity	number(10) DEFAULT '63' NOT NULL,
+	period		varchar2(100) DEFAULT '1-7,00:00-23:59' NOT NULL,
 	PRIMARY KEY	(mediaid),
 	KEY		(userid),
 	KEY		(mediatypeid)
@@ -400,45 +460,72 @@ CREATE TABLE media (
 --
 
 CREATE TABLE media_type (
-	mediatypeid	int(4) NOT NULL auto_increment,
-	type		int(4)		DEFAULT '0' NOT NULL,
-	description	varchar(100)	DEFAULT '' NOT NULL,
-	smtp_server	varchar(255)	DEFAULT '' NOT NULL,
-	smtp_helo	varchar(255)	DEFAULT '' NOT NULL,
-	smtp_email	varchar(255)	DEFAULT '' NOT NULL,
-	exec_path	varchar(255)	DEFAULT '' NOT NULL,
-	PRIMARY KEY	(mediatypeid)
-) type=InnoDB;
+	mediatypeid	number(10) NOT NULL,
+	type		number(10)		DEFAULT '0' NOT NULL,
+	description	varchar2(100)	DEFAULT '' NOT NULL,
+	smtp_server	varchar2(255)	DEFAULT '' NOT NULL,
+	smtp_helo	varchar2(255)	DEFAULT '' NOT NULL,
+	smtp_email	varchar2(255)	DEFAULT '' NOT NULL,
+	exec_path	varchar2(255)	DEFAULT '' NOT NULL,
+	CONSTRAINT 	media_type_pk PRIMARY KEY (mediatypeid)
+);
+
+create sequence media_type_mediatypeid 
+start with 1 
+increment by 1 
+nomaxvalue; 
+
+create trigger media_type_trigger
+before insert on media_type
+for each row
+begin
+	select media_type_mediatypeid.nextval into :new.mediatypeid from dual;
+end;
+/
 
 --
 -- Table structure for table 'triggers'
 --
 
 CREATE TABLE triggers (
-	triggerid	int(4) NOT NULL auto_increment,
-	expression	varchar(255) DEFAULT '' NOT NULL,
-	description	varchar(255) DEFAULT '' NOT NULL,
-	url		varchar(255) DEFAULT '' NOT NULL,
-	status		int(4) DEFAULT '0' NOT NULL,
-	value		int(4) DEFAULT '0' NOT NULL,
-	priority	int(2) DEFAULT '0' NOT NULL,
-	lastchange	int(4) DEFAULT '0' NOT NULL,
-	dep_level	int(2) DEFAULT '0' NOT NULL,
-	comments	blob,
-	error		varchar(128) DEFAULT '' NOT NULL,
-	templateid	int(4) DEFAULT '0' NOT NULL,
-	PRIMARY KEY	(triggerid),
-	KEY		(status),
-	KEY		(value)
-) type=InnoDB;
+	triggerid	number(10) NOT NULL,
+	expression	varchar2(255) DEFAULT '' NOT NULL,
+	description	varchar2(255) DEFAULT '' NOT NULL,
+	url		varchar2(255) DEFAULT '' NOT NULL,
+	status		number(10) DEFAULT '0' NOT NULL,
+	value		number(10) DEFAULT '0' NOT NULL,
+	priority	number(4) DEFAULT '0' NOT NULL,
+	lastchange	number(10) DEFAULT '0' NOT NULL,
+	dep_level	number(4) DEFAULT '0' NOT NULL,
+	comments	varchar2(2048),
+	error		varchar2(128) DEFAULT '' NOT NULL,
+	templateid	number(10) DEFAULT '0' NOT NULL,
+  	CONSTRAINT 	triggers_pk PRIMARY KEY (triggerid)
+);
+
+CREATE INDEX triggers_status on triggers (status);
+CREATE INDEX triggers_value on triggers (value);
+
+create sequence triggers_triggerid 
+start with 1 
+increment by 1 
+nomaxvalue; 
+
+create trigger triggers_trigger
+before insert on triggers
+for each row
+begin
+	select triggers_triggerid.nextval into :new.triggerid from dual;
+end;
+/
 
 --
 -- Table structure for table 'trigger_depends'
 --
 
 CREATE TABLE trigger_depends (
-	triggerid_down	int(4) DEFAULT '0' NOT NULL,
-	triggerid_up	int(4) DEFAULT '0' NOT NULL,
+	triggerid_down	number(10) DEFAULT '0' NOT NULL,
+	triggerid_up	number(10) DEFAULT '0' NOT NULL,
 	PRIMARY KEY	(triggerid_down, triggerid_up),
 --	KEY		(triggerid_down),
 	KEY		(triggerid_up)
@@ -449,15 +536,15 @@ CREATE TABLE trigger_depends (
 --
 
 CREATE TABLE users (
-  userid		int(4)		NOT NULL auto_increment,
-  alias			varchar(100)	DEFAULT '' NOT NULL,
-  name			varchar(100)	DEFAULT '' NOT NULL,
-  surname		varchar(100)	DEFAULT '' NOT NULL,
+  userid		number(10)		NOT NULL auto_increment,
+  alias			varchar2(100)	DEFAULT '' NOT NULL,
+  name			varchar2(100)	DEFAULT '' NOT NULL,
+  surname		varchar2(100)	DEFAULT '' NOT NULL,
   passwd		char(32)	DEFAULT '' NOT NULL,
-  url			varchar(255)	DEFAULT '' NOT NULL,
-  autologout		int(4)		DEFAULT '900' NOT NULL,
-  lang			varchar(5)	DEFAULT 'en_gb' NOT NULL,
-  refresh		int(4)		DEFAULT '30' NOT NULL,
+  url			varchar2(255)	DEFAULT '' NOT NULL,
+  autologout		number(10)		DEFAULT '900' NOT NULL,
+  lang			varchar2(5)	DEFAULT 'en_gb' NOT NULL,
+  refresh		number(10)		DEFAULT '30' NOT NULL,
   PRIMARY KEY (userid),
   UNIQUE (alias)
 ) type=InnoDB;
@@ -467,12 +554,12 @@ CREATE TABLE users (
 --
 
 CREATE TABLE audit (
-  auditid		int(4)		NOT NULL auto_increment,
-  userid		int(4)		DEFAULT '0' NOT NULL,
-  clock			int(4)		DEFAULT '0' NOT NULL,
-  action		int(4)		DEFAULT '0' NOT NULL,
-  resource		int(4)		DEFAULT '0' NOT NULL,
-  details		varchar(128)	DEFAULT '0' NOT NULL,
+  auditid		number(10)		NOT NULL auto_increment,
+  userid		number(10)		DEFAULT '0' NOT NULL,
+  clock			number(10)		DEFAULT '0' NOT NULL,
+  action		number(10)		DEFAULT '0' NOT NULL,
+  resource		number(10)		DEFAULT '0' NOT NULL,
+  details		varchar2(128)	DEFAULT '0' NOT NULL,
   PRIMARY KEY (auditid),
   KEY (userid,clock),
   KEY (clock)
@@ -483,9 +570,9 @@ CREATE TABLE audit (
 --
 
 CREATE TABLE sessions (
-  sessionid		varchar(32)	NOT NULL DEFAULT '',
-  userid		int(4)		NOT NULL DEFAULT '0',
-  lastaccess		int(4)		NOT NULL DEFAULT '0',
+  sessionid		varchar2(32)	NOT NULL DEFAULT '',
+  userid		number(10)		NOT NULL DEFAULT '0',
+  lastaccess		number(10)		NOT NULL DEFAULT '0',
   PRIMARY KEY (sessionid)
 ) type=InnoDB;
 
@@ -494,11 +581,11 @@ CREATE TABLE sessions (
 --
 
 CREATE TABLE rights (
-  rightid		int(4)		NOT NULL auto_increment,
-  userid		int(4)		DEFAULT '0' NOT NULL,
+  rightid		number(10)		NOT NULL auto_increment,
+  userid		number(10)		DEFAULT '0' NOT NULL,
   name			char(255)	DEFAULT '' NOT NULL,
   permission		char(1)		DEFAULT '' NOT NULL,
-  id			int(4),
+  id			number(10),
   PRIMARY KEY (rightid),
   KEY (userid)
 ) type=InnoDB;
@@ -508,15 +595,15 @@ CREATE TABLE rights (
 --
 
 -- CREATE TABLE problems (
---   problemid		int(4)		NOT NULL auto_increment,
---   userid		int(4)		DEFAULT '0' NOT NULL,
---   triggerid		int(4),
---   lastupdate		int(4)		DEFAULT '0' NOT NULL,
---   clock			int(4)		DEFAULT '0' NOT NULL,
---   status		int(1)		DEFAULT '0' NOT NULL,
---   description		varchar(255)	DEFAULT '' NOT NULL,
---   categoryid		int(4),
-  -- priority		int(1)		DEFAULT '0' NOT NULL,
+--   problemid		number(10)		NOT NULL auto_increment,
+--   userid		number(10)		DEFAULT '0' NOT NULL,
+--   triggerid		number(10),
+--   lastupdate		number(10)		DEFAULT '0' NOT NULL,
+--   clock			number(10)		DEFAULT '0' NOT NULL,
+--   status		number(3)		DEFAULT '0' NOT NULL,
+--   description		varchar2(255)	DEFAULT '' NOT NULL,
+--   categoryid		number(10),
+  -- priority		number(3)		DEFAULT '0' NOT NULL,
 --   PRIMARY KEY (problemid),
 --   KEY (status),
 --   KEY (categoryid),
@@ -528,8 +615,8 @@ CREATE TABLE rights (
 --
 
 -- CREATE TABLE categories (
---   categoryid		int(4)		NOT NULL auto_increment,
---   descripion		varchar(64)	DEFAULT '' NOT NULL,
+--   categoryid		number(10)		NOT NULL auto_increment,
+--   descripion		varchar2(64)	DEFAULT '' NOT NULL,
 --   PRIMARY KEY (categoryid)
 -- ) type=InnoDB;
 
@@ -538,11 +625,11 @@ CREATE TABLE rights (
 --
 
 -- CREATE TABLE problems_comments (
---   commentid		int(4)		NOT NULL auto_increment,
---   problemid		int(4)		DEFAULT '0' NOT NULL,
---   clock			int(4),
---   status_before		int(1)		DEFAULT '0' NOT NULL,
---   status_after		int(1)		DEFAULT '0' NOT NULL,
+--   commentid		number(10)		NOT NULL auto_increment,
+--   problemid		number(10)		DEFAULT '0' NOT NULL,
+--   clock			number(10),
+--   status_before		number(3)		DEFAULT '0' NOT NULL,
+--   status_after		number(3)		DEFAULT '0' NOT NULL,
 --   comment		blob,
 --   PRIMARY KEY (commentid),
 --   KEY (problemid,clock)
@@ -553,10 +640,10 @@ CREATE TABLE rights (
 --
 
 CREATE TABLE service_alarms (
-  servicealarmid	int(4)		NOT NULL auto_increment,
-  serviceid		int(4)		DEFAULT '0' NOT NULL,
-  clock			int(4)		DEFAULT '0' NOT NULL,
-  value			int(4)		DEFAULT '0' NOT NULL,
+  servicealarmid	number(10)		NOT NULL auto_increment,
+  serviceid		number(10)		DEFAULT '0' NOT NULL,
+  clock			number(10)		DEFAULT '0' NOT NULL,
+  value			number(10)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (servicealarmid),
   KEY (serviceid,clock),
   KEY (clock)
@@ -567,11 +654,11 @@ CREATE TABLE service_alarms (
 --
 
 CREATE TABLE profiles (
-  profileid		int(4)		NOT NULL auto_increment,
-  userid		int(4)		DEFAULT '0' NOT NULL,
-  idx			varchar(64)	DEFAULT '' NOT NULL,
-  value			varchar(255)	DEFAULT '' NOT NULL,
-  valuetype		int(4)		DEFAULT 0 NOT NULL,
+  profileid		number(10)		NOT NULL auto_increment,
+  userid		number(10)		DEFAULT '0' NOT NULL,
+  idx			varchar2(64)	DEFAULT '' NOT NULL,
+  value			varchar2(255)	DEFAULT '' NOT NULL,
+  valuetype		number(10)		DEFAULT 0 NOT NULL,
   PRIMARY KEY (profileid),
 --  KEY (userid),
   UNIQUE (userid,idx)
@@ -582,10 +669,10 @@ CREATE TABLE profiles (
 --
 
 CREATE TABLE screens (
-  screenid		int(4)		NOT NULL auto_increment,
-  name			varchar(255)	DEFAULT 'Screen' NOT NULL,
-  cols			int(4)		DEFAULT '1' NOT NULL,
-  rows			int(4)		DEFAULT '1' NOT NULL,
+  screenid		number(10)		NOT NULL auto_increment,
+  name			varchar2(255)	DEFAULT 'Screen' NOT NULL,
+  cols			number(10)		DEFAULT '1' NOT NULL,
+  rows			number(10)		DEFAULT '1' NOT NULL,
   PRIMARY KEY  (screenid)
 ) TYPE=InnoDB;
 
@@ -594,21 +681,21 @@ CREATE TABLE screens (
 --
 
 CREATE TABLE screens_items (
-	screenitemid	int(4)		NOT NULL auto_increment,
-	screenid	int(4)		DEFAULT '0' NOT NULL,
-	resource	int(4)		DEFAULT '0' NOT NULL,
-	resourceid	int(4)		DEFAULT '0' NOT NULL,
-	width		int(4)		DEFAULT '320' NOT NULL,
-	height		int(4)		DEFAULT '200' NOT NULL,
-	x		int(4)		DEFAULT '0' NOT NULL,
-	y		int(4)		DEFAULT '0' NOT NULL,
-	colspan		int(4)		DEFAULT '0' NOT NULL,
-	rowspan		int(4)		DEFAULT '0' NOT NULL,
-	elements	int(4)		DEFAULT '25' NOT NULL,
+	screenitemid	number(10)		NOT NULL auto_increment,
+	screenid	number(10)		DEFAULT '0' NOT NULL,
+	resource	number(10)		DEFAULT '0' NOT NULL,
+	resourceid	number(10)		DEFAULT '0' NOT NULL,
+	width		number(10)		DEFAULT '320' NOT NULL,
+	height		number(10)		DEFAULT '200' NOT NULL,
+	x		number(10)		DEFAULT '0' NOT NULL,
+	y		number(10)		DEFAULT '0' NOT NULL,
+	colspan		number(10)		DEFAULT '0' NOT NULL,
+	rowspan		number(10)		DEFAULT '0' NOT NULL,
+	elements	number(10)		DEFAULT '25' NOT NULL,
 	valign		int(2)		DEFAULT '0' NOT NULL,
 	halign		int(2)		DEFAULT '0' NOT NULL,
-	style		int(4)		DEFAULT '0' NOT NULL,
-	url		varchar(255)	DEFAULT '' NOT NULL,
+	style		number(10)		DEFAULT '0' NOT NULL,
+	url		varchar2(255)	DEFAULT '' NOT NULL,
 	  PRIMARY KEY  (screenitemid)
 ) TYPE=InnoDB;
 
@@ -617,14 +704,14 @@ CREATE TABLE screens_items (
 --
 
 CREATE TABLE stats (
-  itemid		int(4)		DEFAULT '0' NOT NULL,
-  year			int(4)		DEFAULT '0' NOT NULL,
-  month			int(4)		DEFAULT '0' NOT NULL,
-  day			int(4)		DEFAULT '0' NOT NULL,
-  hour			int(4)		DEFAULT '0' NOT NULL,
-  value_max		double(16,4)	DEFAULT '0.0000' NOT NULL,
-  value_min		double(16,4)	DEFAULT '0.0000' NOT NULL,
-  value_avg		double(16,4)	DEFAULT '0.0000' NOT NULL,
+  itemid		number(10)		DEFAULT '0' NOT NULL,
+  year			number(10)		DEFAULT '0' NOT NULL,
+  month			number(10)		DEFAULT '0' NOT NULL,
+  day			number(10)		DEFAULT '0' NOT NULL,
+  hour			number(10)		DEFAULT '0' NOT NULL,
+  value_max		number(16,4)	DEFAULT '0.0000' NOT NULL,
+  value_min		number(16,4)	DEFAULT '0.0000' NOT NULL,
+  value_avg		number(16,4)	DEFAULT '0.0000' NOT NULL,
   PRIMARY KEY (itemid,year,month,day,hour)
 ) type=InnoDB;
 
@@ -633,8 +720,8 @@ CREATE TABLE stats (
 --
 
 CREATE TABLE usrgrp (
-  usrgrpid		int(4)		NOT NULL auto_increment,
-  name			varchar(64)	DEFAULT '' NOT NULL,
+  usrgrpid		number(10)		NOT NULL auto_increment,
+  name			varchar2(64)	DEFAULT '' NOT NULL,
   PRIMARY KEY (usrgrpid),
   UNIQUE (name)
 ) type=InnoDB;
@@ -644,8 +731,8 @@ CREATE TABLE usrgrp (
 --
 
 CREATE TABLE users_groups (
-  usrgrpid		int(4)		DEFAULT '0' NOT NULL,
-  userid		int(4)		DEFAULT '0' NOT NULL,
+  usrgrpid		number(10)		DEFAULT '0' NOT NULL,
+  userid		number(10)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (usrgrpid,userid)
 ) type=InnoDB;
 
@@ -654,12 +741,12 @@ CREATE TABLE users_groups (
 --
 
 CREATE TABLE trends (
-  itemid		int(4)		DEFAULT '0' NOT NULL,
-  clock			int(4)		DEFAULT '0' NOT NULL,
+  itemid		number(10)		DEFAULT '0' NOT NULL,
+  clock			number(10)		DEFAULT '0' NOT NULL,
   num			int(2)		DEFAULT '0' NOT NULL,
-  value_min		double(16,4)	DEFAULT '0.0000' NOT NULL,
-  value_avg		double(16,4)	DEFAULT '0.0000' NOT NULL,
-  value_max		double(16,4)	DEFAULT '0.0000' NOT NULL,
+  value_min		number(16,4)	DEFAULT '0.0000' NOT NULL,
+  value_avg		number(16,4)	DEFAULT '0.0000' NOT NULL,
+  value_max		number(16,4)	DEFAULT '0.0000' NOT NULL,
   PRIMARY KEY (itemid,clock)
 ) type=InnoDB;
 
@@ -668,9 +755,9 @@ CREATE TABLE trends (
 --
 
 CREATE TABLE images (
-  imageid		int(4)		NOT NULL auto_increment,
-  imagetype		int(4)		DEFAULT '0' NOT NULL,
-  name			varchar(64)	DEFAULT '0' NOT NULL,
+  imageid		number(10)		NOT NULL auto_increment,
+  imagetype		number(10)		DEFAULT '0' NOT NULL,
+  name			varchar2(64)	DEFAULT '0' NOT NULL,
   image			longblob	DEFAULT '' NOT NULL,
   PRIMARY KEY (imageid),
   UNIQUE (imagetype, name)
@@ -681,12 +768,12 @@ CREATE TABLE images (
 --
 
 CREATE TABLE hosts_templates (
-  hosttemplateid	int(4)		NOT NULL auto_increment,
-  hostid		int(4)		DEFAULT '0' NOT NULL,
-  templateid		int(4)		DEFAULT '0' NOT NULL,
-  items			int(1)		DEFAULT '0' NOT NULL,
-  triggers		int(1)		DEFAULT '0' NOT NULL,
-  graphs		int(1)		DEFAULT '0' NOT NULL,
+  hosttemplateid	number(10)		NOT NULL auto_increment,
+  hostid		number(10)		DEFAULT '0' NOT NULL,
+  templateid		number(10)		DEFAULT '0' NOT NULL,
+  items			number(3)		DEFAULT '0' NOT NULL,
+  triggers		number(3)		DEFAULT '0' NOT NULL,
+  graphs		number(3)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (hosttemplateid),
   UNIQUE (hostid, templateid)
 ) type=InnoDB;
@@ -696,12 +783,12 @@ CREATE TABLE hosts_templates (
 --
 
 CREATE TABLE history_log (
-  id			int(4)		NOT NULL auto_increment,
-  itemid		int(4)		DEFAULT '0' NOT NULL,
-  clock			int(4)		DEFAULT '0' NOT NULL,
-  timestamp		int(4)		DEFAULT '0' NOT NULL,
-  source		varchar(64)	DEFAULT '' NOT NULL,
-  severity		int(4)		DEFAULT '0' NOT NULL,
+  id			number(10)		NOT NULL auto_increment,
+  itemid		number(10)		DEFAULT '0' NOT NULL,
+  clock			number(10)		DEFAULT '0' NOT NULL,
+  timestamp		number(10)		DEFAULT '0' NOT NULL,
+  source		varchar2(64)	DEFAULT '' NOT NULL,
+  severity		number(10)		DEFAULT '0' NOT NULL,
   value			text		DEFAULT '' NOT NULL,
   PRIMARY KEY (id),
   KEY itemidclock (itemid, clock)
@@ -712,13 +799,13 @@ CREATE TABLE history_log (
 --
 
 CREATE TABLE hosts_profiles (
-  hostid		int(4)		DEFAULT '0' NOT NULL,
-  devicetype		varchar(64)	DEFAULT '' NOT NULL,
-  name			varchar(64)	DEFAULT '' NOT NULL,
-  os			varchar(64)	DEFAULT '' NOT NULL,
-  serialno		varchar(64)	DEFAULT '' NOT NULL,
-  tag			varchar(64)	DEFAULT '' NOT NULL,
-  macaddress		varchar(64)	DEFAULT '' NOT NULL,
+  hostid		number(10)		DEFAULT '0' NOT NULL,
+  devicetype		varchar2(64)	DEFAULT '' NOT NULL,
+  name			varchar2(64)	DEFAULT '' NOT NULL,
+  os			varchar2(64)	DEFAULT '' NOT NULL,
+  serialno		varchar2(64)	DEFAULT '' NOT NULL,
+  tag			varchar2(64)	DEFAULT '' NOT NULL,
+  macaddress		varchar2(64)	DEFAULT '' NOT NULL,
   hardware		blob		DEFAULT '' NOT NULL,
   software		blob		DEFAULT '' NOT NULL,
   contact		blob		DEFAULT '' NOT NULL,
@@ -732,10 +819,10 @@ CREATE TABLE hosts_profiles (
 --
 
 CREATE TABLE autoreg (
-  id			int(4)		NOT NULL auto_increment,
-  priority		int(4)		DEFAULT '0' NOT NULL,
-  pattern		varchar(255)	DEFAULT '' NOT NULL,
-  hostid		int(4)		DEFAULT '0' NOT NULL,
+  id			number(10)		NOT NULL auto_increment,
+  priority		number(10)		DEFAULT '0' NOT NULL,
+  pattern		varchar2(255)	DEFAULT '' NOT NULL,
+  hostid		number(10)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (id)
 ) type=InnoDB;
 
@@ -744,8 +831,8 @@ CREATE TABLE autoreg (
 --
 
 CREATE TABLE valuemaps (
-  valuemapid		int(4)		NOT NULL auto_increment,
-  name			varchar(64)	DEFAULT '' NOT NULL,
+  valuemapid		number(10)		NOT NULL auto_increment,
+  name			varchar2(64)	DEFAULT '' NOT NULL,
   PRIMARY KEY (valuemapid),
   UNIQUE (name)
 ) type=InnoDB;
@@ -755,10 +842,10 @@ CREATE TABLE valuemaps (
 --
 
 CREATE TABLE mappings (
-  mappingid		int(4)		NOT NULL auto_increment,
-  valuemapid		int(4)		DEFAULT '0' NOT NULL,
-  value			varchar(64)	DEFAULT '' NOT NULL,
-  newvalue		varchar(64)	DEFAULT '' NOT NULL,
+  mappingid		number(10)		NOT NULL auto_increment,
+  valuemapid		number(10)		DEFAULT '0' NOT NULL,
+  value			varchar2(64)	DEFAULT '' NOT NULL,
+  newvalue		varchar2(64)	DEFAULT '' NOT NULL,
   PRIMARY KEY (mappingid),
   KEY valuemapid (valuemapid)
 ) type=InnoDB;
@@ -768,10 +855,10 @@ CREATE TABLE mappings (
 --
 
 CREATE TABLE housekeeper (
-  housekeeperid		int(4)		NOT NULL auto_increment,
-  tablename		varchar(64)	DEFAULT '' NOT NULL,
-  field			varchar(64)	DEFAULT '' NOT NULL,
-  value			int(4)		DEFAULT '0' NOT NULL,
+  housekeeperid		number(10)		NOT NULL auto_increment,
+  tablename		varchar2(64)	DEFAULT '' NOT NULL,
+  field			varchar2(64)	DEFAULT '' NOT NULL,
+  value			number(10)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (housekeeperid)
 ) type=InnoDB;
 
@@ -780,11 +867,11 @@ CREATE TABLE housekeeper (
 --
 
 CREATE TABLE acknowledges (
-	acknowledgeid		int(4)		NOT NULL auto_increment,
-	userid			int(4)		DEFAULT '0' NOT NULL,
-	alarmid			int(4)		DEFAULT '0' NOT NULL,
-	clock			int(4)		DEFAULT '0' NOT NULL,
-	message			varchar(255)	DEFAULT '' NOT NULL,
+	acknowledgeid		number(10)		NOT NULL auto_increment,
+	userid			number(10)		DEFAULT '0' NOT NULL,
+	alarmid			number(10)		DEFAULT '0' NOT NULL,
+	clock			number(10)		DEFAULT '0' NOT NULL,
+	message			varchar2(255)	DEFAULT '' NOT NULL,
 	PRIMARY KEY (acknowledgeid),
 	KEY userid (userid),
 	KEY alarmid (alarmid),
@@ -796,10 +883,10 @@ CREATE TABLE acknowledges (
 --
 
 CREATE TABLE applications (
-	applicationid           int(4)          NOT NULL auto_increment,
-	hostid                  int(4)          DEFAULT '0' NOT NULL,
-	name                    varchar(255)    DEFAULT '' NOT NULL,
-	templateid		int(4)		DEFAULT '0' NOT NULL,
+	applicationid           number(10)          NOT NULL auto_increment,
+	hostid                  number(10)          DEFAULT '0' NOT NULL,
+	name                    varchar2(255)    DEFAULT '' NOT NULL,
+	templateid		number(10)		DEFAULT '0' NOT NULL,
 	PRIMARY KEY 	(applicationid),
 	KEY 		hostid (hostid),
 	KEY 		templateid (templateid),
@@ -811,8 +898,8 @@ CREATE TABLE applications (
 --
 
 CREATE TABLE items_applications (
-	applicationid           int(4)          DEFAULT '0' NOT NULL,
-	itemid                  int(4)          DEFAULT '0' NOT NULL,
+	applicationid           number(10)          DEFAULT '0' NOT NULL,
+	itemid                  number(10)          DEFAULT '0' NOT NULL,
 	PRIMARY KEY (applicationid,itemid)
 ) type=InnoDB;
 

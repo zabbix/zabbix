@@ -20,7 +20,7 @@
 #include "common.h"
 #include "checks_aggregate.h"
 
-static	int	evaluate_one(double *result, int *num, char *grpfunc, char *value_str, int valuetype)
+static	int	evaluate_one(double *result, int *num, char *grpfunc, char const *value_str, int valuetype)
 {
 	int	ret = SUCCEED;
 	double	value;
@@ -41,12 +41,12 @@ static	int	evaluate_one(double *result, int *num, char *grpfunc, char *value_str
 	if(strcmp(grpfunc,"grpsum") == 0)
 	{
 		*result+=value;
-		*num++;
+		num++;
 	}
 	else if(strcmp(grpfunc,"grpavg") == 0)
 	{
 		*result+=value;
-		*num++;
+		num++;
 	}
 	else if(strcmp(grpfunc,"grpmin") == 0)
 	{
@@ -58,7 +58,7 @@ static	int	evaluate_one(double *result, int *num, char *grpfunc, char *value_str
 		{
 			*result=value;
 		}
-		*num++;
+		num++;
 	}
 	else if(strcmp(grpfunc,"grpmax") == 0)
 	{
@@ -70,7 +70,7 @@ static	int	evaluate_one(double *result, int *num, char *grpfunc, char *value_str
 		{
 			*result=value;
 		}
-		*num++;
+		num++;
 	}
 	else
 	{
@@ -96,7 +96,7 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
 
 	int		valuetype;
 	double		d = 0;
-	char		*value;
+	const		char		*value;
 	int		num = 0;
 	int		now;
 	char		items[MAX_STRING_LEN],items2[MAX_STRING_LEN];

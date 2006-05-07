@@ -164,7 +164,7 @@ static int process_value(char *key, char *host, AGENT_RESULT *value)
 	item.ip=row[11];
 	item.history=atoi(row[12]);
 	s=row[13];
-	if(s==NULL)
+	if(DBis_null(s)==SUCCEED)
 	{
 		item.lastvalue_null=1;
 	}
@@ -175,7 +175,7 @@ static int process_value(char *key, char *host, AGENT_RESULT *value)
 		item.lastvalue=atof(s);
 	}
 	s=row[14];
-	if(s==NULL)
+	if(DBis_null(s)==SUCCEED)
 	{
 		item.prevvalue_null=1;
 	}
