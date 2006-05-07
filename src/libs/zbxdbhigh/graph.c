@@ -80,6 +80,7 @@ int	DBadd_item_to_graph(int graphid,int itemid, char *color,int drawtype, int so
 int	DBget_graph_item_by_gitemid(int gitemid, DB_GRAPH_ITEM *graph_item)
 {
 	DB_RESULT	result;
+	DB_ROW		row;
 	char	sql[MAX_STRING_LEN];
 	int	ret = SUCCEED;
 
@@ -87,19 +88,20 @@ int	DBget_graph_item_by_gitemid(int gitemid, DB_GRAPH_ITEM *graph_item)
 
 	snprintf(sql,sizeof(sql)-1,"select gitemid, graphid, itemid, drawtype, sortorder, color from graphs_items where gitemid=%d", gitemid);
 	result=DBselect(sql);
+	row=DBfetch(result);
 
-	if(DBnum_rows(result)==0)
+	if(!row)
 	{
 		ret = FAIL;
 	}
 	else
 	{
-		graph_item->gitemid=atoi(DBget_field(result,0,0));
-		graph_item->graphid=atoi(DBget_field(result,0,1));
-		graph_item->itemid=atoi(DBget_field(result,0,2));
-		graph_item->drawtype=atoi(DBget_field(result,0,3));
-		graph_item->sortorder=atoi(DBget_field(result,0,4));
-		strscpy(graph_item->color,DBget_field(result,0,5));
+		graph_item->gitemid=atoi(row[0]);
+		graph_item->graphid=atoi(row[1]);
+		graph_item->itemid=atoi(row[2]);
+		graph_item->drawtype=atoi(row[3]);
+		graph_item->sortorder=atoi(row[4]);
+		strscpy(graph_item->color,row[5]);
 	}
 
 	DBfree_result(result);
@@ -110,6 +112,7 @@ int	DBget_graph_item_by_gitemid(int gitemid, DB_GRAPH_ITEM *graph_item)
 int	DBget_graph_by_graphid(int graphid, DB_GRAPH *graph)
 {
 	DB_RESULT	result;
+	DB_ROW		row;
 	char	sql[MAX_STRING_LEN];
 	int	ret = SUCCEED;
 
@@ -117,20 +120,21 @@ int	DBget_graph_by_graphid(int graphid, DB_GRAPH *graph)
 
 	snprintf(sql,sizeof(sql)-1,"select graphid,name,width,height,yaxistype,yaxismin,yaxismax from graphs where graphid=%d", graphid);
 	result=DBselect(sql);
+	row=DBfetch(result);
 
-	if(DBnum_rows(result)==0)
+	if(!row)
 	{
 		ret = FAIL;
 	}
 	else
 	{
-		graph->graphid=atoi(DBget_field(result,0,0));
-		strscpy(graph->name,DBget_field(result,0,1));
-		graph->width=atoi(DBget_field(result,0,2));
-		graph->height=atoi(DBget_field(result,0,3));
-		graph->yaxistype=atoi(DBget_field(result,0,4));
-		graph->yaxismin=atof(DBget_field(result,0,5));
-		graph->yaxismax=atof(DBget_field(result,0,6));
+		graph->graphid=atoi(row[0]);
+		strscpy(graph->name,row[1]);
+		graph->width=atoi(row[2]);
+		graph->height=atoi(row[3]);
+		graph->yaxistype=atoi(row[4]);
+		graph->yaxismin=atof(row[5]);
+		graph->yaxismax=atof(row[6]);
 	}
 
 	DBfree_result(result);
@@ -146,11 +150,13 @@ int	DBadd_graph_item_to_linked_hosts(int gitemid,int hostid)
 	DB_GRAPH	graph;
 	DB_RESULT	result;
 	DB_RESULT	result2;
+	DB_ROW		row;
+	DB_ROW		row2;
 	char	sql[MAX_STRING_LEN];
 	char	name_esc[GRAPH_NAME_LEN_MAX];
-	int	i,j;
 	int	graphid;
 	int	itemid;
+	int	rows;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In DBadd_graph_item_to_linked_hosts(%d,%d)", gitemid, hostid);
 
@@ -181,35 +187,39 @@ int	DBadd_graph_item_to_linked_hosts(int gitemid,int hostid)
 	zabbix_log( LOG_LEVEL_DEBUG, "\tSQL [%s]", sql);
 
 	result=DBselect(sql);
-	for(i=0;i<DBnum_rows(result);i++)
+	while((row=DBfetch(result)))
 	{
-		if( (atoi(DBget_field(result,i,2))&1) == 0)	continue;
+		if( (atoi(row[2])&1) == 0)	continue;
 
-		snprintf(sql,sizeof(sql)-1,"select i.itemid from items i where i.key_='%s' and i.hostid=%d", item.key, atoi(DBget_field(result,i,0)));
+		snprintf(sql,sizeof(sql)-1,"select i.itemid from items i where i.key_='%s' and i.hostid=%d", item.key, atoi(row[0]));
 		zabbix_log( LOG_LEVEL_DEBUG, "\t\tSQL [%s]", sql);
 
 		result2=DBselect(sql);
-		if(DBnum_rows(result2)==0)
+		row2=DBfetch(result2);
+
+		if(!row2)
 		{
 			DBfree_result(result2);
 			continue;
 		}
 
-		itemid=atoi(DBget_field(result2,0,0));
+		itemid=atoi(row2[0]);
 		DBfree_result(result2);
 
 		DBescape_string(graph.name,name_esc,GRAPH_NAME_LEN_MAX);
 
-		if(DBget_host_by_hostid(atoi(DBget_field(result,i,0)), &host) == FAIL)	continue;
+		if(DBget_host_by_hostid(atoi(row[0]), &host) == FAIL)	continue;
 
-		snprintf(sql,sizeof(sql)-1,"select distinct g.graphid from graphs g,graphs_items gi,items i where i.itemid=gi.itemid and i.hostid=%d and g.graphid=gi.graphid and g.name='%s'", atoi(DBget_field(result,i,0)), name_esc);
+		snprintf(sql,sizeof(sql)-1,"select distinct g.graphid from graphs g,graphs_items gi,items i where i.itemid=gi.itemid and i.hostid=%d and g.graphid=gi.graphid and g.name='%s'", atoi(row[0]), name_esc);
 		result2=DBselect(sql);
 
-		for(j=0;j<DBnum_rows(result2);j++)
+		rows=0;
+		while((row2=DBfetch(result2)))
 		{
-			DBadd_item_to_graph(atoi(DBget_field(result2,j,0)),itemid,graph_item.color,graph_item.drawtype,graph_item.sortorder);
+			DBadd_item_to_graph(atoi(row2[0]),itemid,graph_item.color,graph_item.drawtype,graph_item.sortorder);
+			rows++;
 		}
-		if(DBnum_rows(result2)==0)
+		if(rows==0)
 		{
 			graphid=DBadd_graph(graph.name,graph.width,graph.height,graph.yaxistype,graph.yaxismin,graph.yaxismax);
 			if(graphid!=FAIL)

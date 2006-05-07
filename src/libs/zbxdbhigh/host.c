@@ -53,13 +53,15 @@ int	DBadd_host(char *server, int port, int status, int useip, char *ip, int disa
 int	DBhost_exists(char *server)
 {
 	DB_RESULT	result;
+	DB_ROW		row;
 	char	sql[MAX_STRING_LEN];
 	int	ret = SUCCEED;
 
 	snprintf(sql,sizeof(sql)-1,"select hostid from hosts where host='%s'", server);
 	result = DBselect(sql);
+	row = DBfetch(result);
 
-	if(DBnum_rows(result) == 0)
+	if(!row)
 	{
 		ret = FAIL;
 	}
@@ -71,18 +73,18 @@ int	DBhost_exists(char *server)
 int	DBadd_templates_to_host(int hostid,int host_templateid)
 {
 	DB_RESULT	result;
+	DB_ROW		row;
 	char	sql[MAX_STRING_LEN];
-	int	i;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In DBadd_templates_to_host(%d,%d)", hostid, host_templateid);
 
 	snprintf(sql,sizeof(sql)-1,"select templateid,items,triggers,graphs from hosts_templates where hostid=%d", host_templateid);
 	result = DBselect(sql);
 
-	for(i=0;i<DBnum_rows(result);i++)
+	while((row=DBfetch(result)))
 	{
-		DBadd_template_linkage(hostid,atoi(DBget_field(result,i,0)),atoi(DBget_field(result,i,1)),
-					atoi(DBget_field(result,i,2)), atoi(DBget_field(result,i,3)));
+		DBadd_template_linkage(hostid,atoi(row[0]),atoi(row[1]),
+					atoi(row[2]), atoi(row[3]));
 	}
 
 	DBfree_result(result);
@@ -104,18 +106,18 @@ int	DBadd_template_linkage(int hostid,int templateid,int items,int triggers,int 
 int	DBsync_host_with_templates(int hostid)
 {
 	DB_RESULT	result;
+	DB_ROW		row;
 	char	sql[MAX_STRING_LEN];
-	int	i;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In DBsync_host_with_templates(%d)", hostid);
 
 	snprintf(sql,sizeof(sql)-1,"select templateid,items,triggers,graphs from hosts_templates where hostid=%d", hostid);
 	result = DBselect(sql);
 
-	for(i=0;i<DBnum_rows(result);i++)
+	while((row=DBfetch(result)))
 	{
-		DBsync_host_with_template(hostid,atoi(DBget_field(result,i,0)),atoi(DBget_field(result,i,1)),
-					atoi(DBget_field(result,i,2)), atoi(DBget_field(result,i,3)));
+		DBsync_host_with_template(hostid,atoi(row[0]),atoi(row[1]),
+					atoi(row[2]), atoi(row[3]));
 	}
 
 	DBfree_result(result);
@@ -126,44 +128,36 @@ int	DBsync_host_with_templates(int hostid)
 int	DBsync_host_with_template(int hostid,int templateid,int items,int triggers,int graphs)
 {
 	DB_RESULT	result;
+	DB_ROW		row;
 	char	sql[MAX_STRING_LEN];
-	int	i;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In DBsync_host_with_template(%d,%d)", hostid, templateid);
 
 	/* Sync items */
 	snprintf(sql,sizeof(sql)-1,"select itemid from items where hostid=%d", templateid);
 	result = DBselect(sql);
-	for(i=0;i<DBnum_rows(result);i++)
+
+	while((row=DBfetch(result)))
 	{
-		DBadd_item_to_linked_hosts(atoi(DBget_field(result,i,0)), hostid);
+		DBadd_item_to_linked_hosts(atoi(row[0]), hostid);
 	}
 	DBfree_result(result);
 
 	/* Sync triggers */
 	snprintf(sql,sizeof(sql)-1,"select distinct t.triggerid from hosts h, items i,triggers t,functions f where h.hostid=%d and h.hostid=i.hostid and t.triggerid=f.triggerid and i.itemid=f.itemid", templateid);
 	result = DBselect(sql);
-	for(i=0;i<DBnum_rows(result);i++)
+	while((row=DBfetch(result)))
 	{
-		DBadd_trigger_to_linked_hosts(atoi(DBget_field(result,i,0)),hostid);
+		DBadd_trigger_to_linked_hosts(atoi(row[0]),hostid);
 	}
 	DBfree_result(result);
-
-	/* Sync actions */
-/*	snprintf(sql,sizeof(sql)-1,"select distinct a.actionid from actions a,hosts h, items i,triggers t,functions f where h.hostid=%d and h.hostid=i.hostid and t.triggerid=f.triggerid and i.itemid=f.itemid", templateid);
-	result = DBselect(sql);
-	for(i=0;i<DBnum_rows(result);i++)
-	{
-		DBadd_action_to_linked_hosts(atoi(DBget_field(result,i,0)),hostid);
-	}
-	DBfree_result(result);*/
 
 	/* Sync graphs */
 	snprintf(sql,sizeof(sql)-1,"select distinct gi.gitemid from graphs g,graphs_items gi,items i where i.itemid=gi.itemid and i.hostid=%d and g.graphid=gi.graphid", templateid);
 	result = DBselect(sql);
-	for(i=0;i<DBnum_rows(result);i++)
+	while((row=DBfetch(result)))
 	{
-		DBadd_graph_item_to_linked_hosts(atoi(DBget_field(result,i,0)),hostid);
+		DBadd_graph_item_to_linked_hosts(atoi(row[0]),hostid);
 	}
 	DBfree_result(result);
 
@@ -173,6 +167,7 @@ int	DBsync_host_with_template(int hostid,int templateid,int items,int triggers,i
 int	DBget_host_by_hostid(int hostid,DB_HOST *host)
 {
 	DB_RESULT	result;
+	DB_ROW		row;
 	char	sql[MAX_STRING_LEN];
 	int	ret = SUCCEED;
 
@@ -181,22 +176,23 @@ int	DBget_host_by_hostid(int hostid,DB_HOST *host)
 	snprintf(sql,sizeof(sql)-1,"select hostid,host,useip,ip,port,status,disable_until,errors_from,error,available from hosts where hostid=%d", hostid);
 	result=DBselect(sql);
 
-	if(DBnum_rows(result)==0)
+	row=DBfetch(result);
+	if(!row)
 	{
 		ret = FAIL;
 	}
 	else
 	{
-		host->hostid=atoi(DBget_field(result,0,0));
-		strscpy(host->host,DBget_field(result,0,1));
-		host->useip=atoi(DBget_field(result,0,2));
-		strscpy(host->ip,DBget_field(result,0,3));
-		host->port=atoi(DBget_field(result,0,4));
-		host->status=atoi(DBget_field(result,0,5));
-		host->disable_until=atoi(DBget_field(result,0,6));
-		host->errors_from=atoi(DBget_field(result,0,7));
-		strscpy(host->error,DBget_field(result,0,8));
-		host->available=atoi(DBget_field(result,0,9));
+		host->hostid=atoi(row[0]);
+		strscpy(host->host,row[1]);
+		host->useip=atoi(row[2]);
+		strscpy(host->ip,row[3]);
+		host->port=atoi(row[4]);
+		host->status=atoi(row[5]);
+		host->disable_until=atoi(row[6]);
+		host->errors_from=atoi(row[7]);
+		strscpy(host->error,row[8]);
+		host->available=atoi(row[9]);
 	}
 
 	DBfree_result(result);

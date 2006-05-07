@@ -137,21 +137,22 @@ void	update_functions(DB_ITEM *item)
 void	update_services_rec(int serviceid)
 {
 	char	sql[MAX_STRING_LEN];
-	int	i;
 	int	status;
 	int	serviceupid, algorithm;
 	time_t	now;
 
 	DB_RESULT result;
 	DB_RESULT result2;
+	DB_ROW	row;
+	DB_ROW	row2;
 
 	snprintf(sql,sizeof(sql)-1,"select l.serviceupid,s.algorithm from services_links l,services s where s.serviceid=l.serviceupid and l.servicedownid=%d",serviceid);
 	result=DBselect(sql);
 	status=0;
-	for(i=0;i<DBnum_rows(result);i++)
+	while((row=DBfetch(result)))
 	{
-		serviceupid=atoi(DBget_field(result,i,0));
-		algorithm=atoi(DBget_field(result,i,1));
+		serviceupid=atoi(row[0]);
+		algorithm=atoi(row[1]);
 		if(SERVICE_ALGORITHM_NONE == algorithm)
 		{
 /* Do nothing */
@@ -182,15 +183,16 @@ void	update_services_rec(int serviceid)
 				snprintf(sql,sizeof(sql)-1,"select count(*),min(status) from services s,services_links l where l.serviceupid=%d and s.serviceid=l.servicedownid",serviceupid);
 			}
 			result2=DBselect(sql);
-			if(atoi(DBget_field(result2,0,0))!=0)
+			row2=DBfetch(result2);
+			if(atoi(row2[0])!=0)
 			{
-				status=atoi(DBget_field(result2,0,1));
+				status=atoi(row2[1]);
 			}
 			DBfree_result(result2);
 
 			now=time(NULL);
-			DBadd_service_alarm(atoi(DBget_field(result,i,0)),status,now);
-			snprintf(sql,sizeof(sql)-1,"update services set status=%d where serviceid=%d",status,atoi(DBget_field(result,i,0)));
+			DBadd_service_alarm(atoi(row[0]),status,now);
+			snprintf(sql,sizeof(sql)-1,"update services set status=%d where serviceid=%d",status,atoi(row[0]));
 			DBexecute(sql);
 		}
 		else
@@ -204,9 +206,9 @@ void	update_services_rec(int serviceid)
 	snprintf(sql,sizeof(sql)-1,"select serviceupid from services_links where servicedownid=%d",serviceid);
 	result=DBselect(sql);
 
-	for(i=0;i<DBnum_rows(result);i++)
+	while((row=DBfetch(result)))
 	{
-		update_services_rec(atoi(DBget_field(result,i,0)));
+		update_services_rec(atoi(row[0]));
 	}
 	DBfree_result(result);
 }

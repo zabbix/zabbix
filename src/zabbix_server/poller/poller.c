@@ -110,6 +110,7 @@ static int get_minnextcheck(int now)
 	char		sql[MAX_STRING_LEN];
 
 	DB_RESULT	result;
+	DB_ROW		row;
 
 	int		res;
 
@@ -133,21 +134,22 @@ static int get_minnextcheck(int now)
 	}
 
 	result = DBselect(sql);
+	row=DBfetch(result);
 
-	if( DBnum_rows(result) == 0)
+	if(!row)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "No items to update for minnextcheck.");
 		res = FAIL; 
 	}
 	else
 	{
-		if( atoi(DBget_field(result,0,0)) == 0)
+		if( atoi(row[0]) == 0)
 		{
 			res = FAIL;
 		}
 		else
 		{
-			res = atoi(DBget_field(result,0,1));
+			res = atoi(row[1]);
 		}
 	}
 	DBfree_result(result);

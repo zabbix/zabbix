@@ -570,6 +570,7 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data
 	struct  tm      *tm;
 
 	DB_RESULT result;
+	DB_ROW		row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_simple_macros [%s]",data);
 
@@ -590,8 +591,9 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data
 /*			snprintf(sql,sizeof(sql)-1,"select distinct t.description,h.host from triggers t, functions f,items i, hosts h where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid", trigger->triggerid);*/
 			snprintf(sql,sizeof(sql)-1,"select distinct h.host from triggers t, functions f,items i, hosts h where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid", trigger->triggerid);
 			result = DBselect(sql);
+			row=DBfetch(result);
 
-			if(DBnum_rows(result) == 0)
+			if(!row)
 			{
 				zabbix_log( LOG_LEVEL_ERR, "No hostname in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
 				zabbix_syslog("No hostname in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
@@ -600,7 +602,7 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data
 			}
 			else
 			{
-				strscpy(tmp,DBget_field(result,0,0));
+				strscpy(tmp,row[0]);
 
 				DBfree_result(result);
 			}
@@ -614,8 +616,9 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data
 		{
 			snprintf(sql,sizeof(sql)-1,"select distinct i.key_ from triggers t, functions f,items i, hosts h where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid order by i.key_", trigger->triggerid);
 			result = DBselect(sql);
+			row=DBfetch(result);
 
-			if(DBnum_rows(result) == 0)
+			if(!row)
 			{
 				zabbix_log( LOG_LEVEL_ERR, "No TRIGGER.KEY in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
 				zabbix_syslog("No TRIGGER.KEY in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
@@ -624,7 +627,7 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data
 			}
 			else
 			{
-				strscpy(tmp,DBget_field(result,0,0));
+				strscpy(tmp,row[0]);
 
 				DBfree_result(result);
 			}
@@ -638,8 +641,9 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data
 		{
 			snprintf(sql,sizeof(sql)-1,"select distinct h.ip from triggers t, functions f,items i, hosts h where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and h.useip=1", trigger->triggerid);
 			result = DBselect(sql);
+			row = DBfetch(result);
 
-			if(DBnum_rows(result) == 0)
+			if(!row)
 			{
 				zabbix_log( LOG_LEVEL_ERR, "No IP address in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
 				zabbix_syslog("No IP address in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
@@ -648,7 +652,7 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data
 			}
 			else
 			{
-				strscpy(tmp,DBget_field(result,0,0));
+				strscpy(tmp,row[0]);
 
 				DBfree_result(result);
 			}
