@@ -855,12 +855,25 @@ CREATE TABLE mappings (
 --
 
 CREATE TABLE housekeeper (
-  housekeeperid		number(10)		NOT NULL auto_increment,
-  tablename		varchar2(64)	DEFAULT '' NOT NULL,
-  field			varchar2(64)	DEFAULT '' NOT NULL,
-  value			number(10)		DEFAULT '0' NOT NULL,
-  PRIMARY KEY (housekeeperid)
-) type=InnoDB;
+	housekeeperid		number(10)	NOT NULL,
+	tablename		varchar2(64)	DEFAULT '' NOT NULL,
+	field			varchar2(64)	DEFAULT '' NOT NULL,
+	value			number(10)	DEFAULT '0' NOT NULL,
+  	CONSTRAINT	 	housekeeper_pk PRIMARY KEY (housekeeperid)
+);
+
+create sequence housekeeper_housekeeperid 
+start with 1 
+increment by 1 
+nomaxvalue; 
+
+create trigger housekeeper_trigger
+before insert on housekeeper
+for each row
+begin
+	select housekeeper_housekeeperid.nextval into :new.housekeeperid from dual;
+end;
+/
 
 --
 -- Table structure for table 'acknowledges'
