@@ -339,8 +339,8 @@ long	DBaffected_rows();
 
 DB_RESULT	DBselect(char *query);
 DB_ROW	DBfetch(DB_RESULT result);
-char	*DBget_field(DB_RESULT result, int rownum, int fieldnum);
-int	DBnum_rows(DB_RESULT result);
+/*char	*DBget_field(DB_RESULT result, int rownum, int fieldnum);*/
+/*int	DBnum_rows(DB_RESULT result);*/
 int	DBinsert_id();
 
 int	DBget_function_result(double *result,char *functionid);

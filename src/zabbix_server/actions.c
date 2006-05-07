@@ -205,174 +205,6 @@ static	void	send_to_user(DB_TRIGGER *trigger,DB_ACTION *action)
 		zabbix_syslog("Unknown recipient type [%d] for actionid [%d]",action->recipient,action->actionid);
 	}
 }
-/*
-void	apply_actions_new(DB_TRIGGER *trigger,int alarmid,int trigger_value)
-{
-	int escalationid;
-	char sql[MAX_STRING_LEN];
-
-	zabbix_log( LOG_LEVEL_DEBUG, "In apply_actions(triggerid:%d,alarmid:%d,trigger_value:%d)",trigger->triggerid, alarmid, trigger_value);
-
-	if((escalationid=DBget_default_escalation_id())>0)
-	{
-		snprintf(sql,sizeof(sql)-1,"insert into escalation_log (triggerid,alarmid,escalationid,level,adminlevel,nextcheck,status,actiontype) values (%d,%d,%d,%d,%d,%d,%d,%d)", trigger->triggerid, alarmid, escalationid, 0, 0, 0, 0, ESCALATION_ACTION_NOTHING);
-		DBexecute(sql);
-	}
-	else
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "No default escalation defined");
-	}
-}*/
-
-/*
- * Apply actions if any.
- */ 
-/*void	apply_actions(int triggerid,int good)*/
-/*
-void	apply_actions_original(DB_TRIGGER *trigger,int alarmid,int trigger_value)
-{
-	DB_RESULT *result,*result2,*result3;
-	
-	DB_ACTION action;
-
-	char sql[MAX_STRING_LEN];
-
-	int	i,j;
-	int	now;
-
-	zabbix_log( LOG_LEVEL_DEBUG, "In apply_actions(triggerid:%d,alarmid:%d,trigger_value:%d)",trigger->triggerid, alarmid, trigger_value);
-
-	if(TRIGGER_VALUE_TRUE == trigger_value)
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "Check dependencies");
-
-		snprintf(sql,sizeof(sql)-1,"select count(*) from trigger_depends d,triggers t where d.triggerid_down=%d and d.triggerid_up=t.triggerid and t.value=%d",trigger->triggerid, TRIGGER_VALUE_TRUE);
-		result = DBselect(sql);
-		if(DBnum_rows(result) == 1)
-		{
-			if(atoi(DBget_field(result,0,0))>0)
-			{
-				zabbix_log( LOG_LEVEL_DEBUG, "Will not apply actions");
-				DBfree_result(result);
-				return;
-			}
-		}
-		DBfree_result(result);
-	}
-
-	zabbix_log( LOG_LEVEL_DEBUG, "Applying actions");
-
-	now = time(NULL);
-
-	snprintf(sql,sizeof(sql)-1,"select actionid,userid,delay,subject,message,scope,severity,recipient,good,maxrepeats,repeatdelay from actions where (scope=%d and triggerid=%d and (good=%d or good=2) and nextcheck<=%d) or (scope=%d and (good=%d or good=2)) or (scope=%d and (good=%d or good=2))",ACTION_SCOPE_TRIGGER,trigger->triggerid,trigger_value,now,ACTION_SCOPE_HOST,trigger_value,ACTION_SCOPE_HOSTS,trigger_value);
-	result = DBselect(sql);
-	zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]", sql);
-
-	for(i=0;i<DBnum_rows(result);i++)
-	{
-
-		zabbix_log( LOG_LEVEL_DEBUG, "i=[%d]",i);
-
-		action.actionid=atoi(DBget_field(result,i,0));
-		action.userid=atoi(DBget_field(result,i,1));
-		action.delay=atoi(DBget_field(result,i,2));
-		strscpy(action.subject,DBget_field(result,i,3));
-		strscpy(action.message,DBget_field(result,i,4));
-		action.scope=atoi(DBget_field(result,i,5));
-		action.severity=atoi(DBget_field(result,i,6));
-		action.recipient=atoi(DBget_field(result,i,7));
-		action.good=atoi(DBget_field(result,i,8));
-		action.maxrepeats=atoi(DBget_field(result,i,9));
-		action.repeatdelay=atoi(DBget_field(result,i,10));
-
-		if(ACTION_SCOPE_TRIGGER==action.scope)
-		{
-
-			substitute_macros(trigger, &action, action.message);
-			substitute_macros(trigger, &action, action.subject);
-
-			send_to_user(trigger,&action);
-			snprintf(sql,sizeof(sql)-1,"update actions set nextcheck=%d where actionid=%d",now+action.delay,action.actionid);
-			DBexecute(sql);
-		}
-		else if(ACTION_SCOPE_HOST==action.scope)
-		{
-			if(trigger->priority<action.severity)
-			{
-				continue;
-			}
-
-			snprintf(sql,sizeof(sql)-1,"select distinct h.hostid from hosts h,items i,triggers t,functions f where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=%d", trigger->triggerid);
-			result2 = DBselect(sql);
-
-			for(j=0;j<DBnum_rows(result2);j++)
-			{
-				snprintf(sql,sizeof(sql)-1,"select distinct a.actionid from actions a,hosts h,items i,triggers t,functions f where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and a.triggerid=%d and a.scope=1 and a.actionid=%d and a.triggerid=h.hostid",atoi(DBget_field(result2,j,0)),action.actionid);
-				result3 = DBselect(sql);
-				if(DBnum_rows(result3)==0)
-				{
-					DBfree_result(result3);
-					continue;
-				}
-				DBfree_result(result3);
-
-				strscpy(action.subject,trigger->description);
-				if(TRIGGER_VALUE_TRUE == trigger_value)
-				{
-					strncat(action.subject," (ON)", MAX_STRING_LEN);
-				}
-				else
-				{
-					strncat(action.subject," (OFF)", MAX_STRING_LEN);
-				}
-				strscpy(action.message,action.subject);
-
-				substitute_macros(trigger, &action, action.message);
-				substitute_macros(trigger, &action, action.subject);
-
-				send_to_user(trigger,&action);
-				snprintf(sql,sizeof(sql)-1,"update actions set nextcheck=%d where actionid=%d",now+action.delay,action.actionid);
-				DBexecute(sql);
-			}
-			DBfree_result(result2);
-
-		}
-		else if(ACTION_SCOPE_HOSTS==action.scope)
-		{
-			if(trigger->priority<action.severity)
-			{
-				continue;
-			}
-
-			strscpy(action.subject,trigger->description);
-			if(TRIGGER_VALUE_TRUE == trigger_value)
-			{
-				strncat(action.subject," (ON)", MAX_STRING_LEN);
-			}
-			else
-			{
-				strncat(action.subject," (OFF)", MAX_STRING_LEN);
-			}
-			strscpy(action.message,action.subject);
-
-			substitute_macros(trigger, &action, action.message);
-			substitute_macros(trigger, &action, action.subject);
-
-			send_to_user(trigger,&action);
-			snprintf(sql,sizeof(sql)-1,"update actions set nextcheck=%d where actionid=%d",now+action.delay,action.actionid);
-			DBexecute(sql);
-		}
-		else
-		{
-			zabbix_log( LOG_LEVEL_WARNING, "Unsupported scope [%d] for actionid [%d]", action.scope, action.actionid);
-			zabbix_syslog("Unsupported scope [%d] for actionid [%d]", action.scope, action.actionid);
-		}
-
-	}
-	zabbix_log( LOG_LEVEL_DEBUG, "Actions applied for trigger %d %d", trigger->triggerid, trigger_value );
-	DBfree_result(result);
-}
-*/
 
 
 /******************************************************************************
@@ -399,8 +231,10 @@ static void run_remote_command(char* host_name, char* command)
 	AGENT_RESULT	agent_result;
 	DB_ITEM         item;
 	DB_RESULT	result;
+	DB_ROW		row;
 	
 	char sql[MAX_STRING_LEN];
+
 	assert(host_name);
 	assert(command);
 
@@ -408,12 +242,13 @@ static void run_remote_command(char* host_name, char* command)
 
 	snprintf(sql,sizeof(sql)-1,"select distinct host,ip,useip,port from hosts where host='%s'", host_name);
 	result = DBselect(sql);
-	if(DBnum_rows(result) == 1)
+	row = DBfetch(result);
+	if(row)
 	{
-		item.host = DBget_field(result,0,0);
-		item.ip=DBget_field(result,0,1);
-		item.useip=atoi(DBget_field(result,0,2));
-		item.port=atoi(DBget_field(result,0,3));
+		item.host = row[0];
+		item.ip=row[1];
+		item.useip=atoi(row[2]);
+		item.port=atoi(row[3]);
 		
 		snprintf(item.key,ITEM_KEY_LEN_MAX-1,"system.run[%s]",command);
 		
@@ -534,13 +369,13 @@ static int get_next_command(char** command_list, char** alias, int* is_group, ch
 /*static*/	void	run_commands(DB_TRIGGER *trigger,DB_ACTION *action)
 {
 	DB_RESULT result;
+	DB_ROW		row;
 
 	char sql[MAX_STRING_LEN];
 	char *cmd_list = NULL;
 	char *alias = NULL;
 	char *command = NULL;
 	int is_group = 0;
-	int i = 0;
 	
 	assert(trigger);
 	assert(action);
@@ -555,9 +390,9 @@ static int get_next_command(char** command_list, char** alias, int* is_group, ch
 		{
 			snprintf(sql,sizeof(sql)-1,"select distinct h.host from hosts_groups hg,hosts h, groups g where hg.hostid=h.hostid and hg.groupid=g.groupid and g.name='%s'", alias);
 	                result = DBselect(sql);
-			for(i=0;i<DBnum_rows(result);i++)
+			while((row=DBfetch(result)))
 			{
-				run_remote_command(DBget_field(result,i,0), command);
+				run_remote_command(row[0], command);
 			}
 			
 			DBfree_result(result);
@@ -777,50 +612,38 @@ static int	check_action_conditions(DB_TRIGGER *trigger,int alarmid,int new_trigg
 	int	ret = SUCCEED;
 	int	old_type = -1;
 	int	ret_and = SUCCEED;
-	int	i;
+	int	rows;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In check_action_conditions [actionid:%d]", actionid);
 
 	snprintf(sql,sizeof(sql)-1,"select conditionid,actionid,conditiontype,operator,value from conditions where actionid=%d order by conditiontype", actionid);
 	result = DBselect(sql);
 
-	if(DBnum_rows(result) == 0)
+	rows=0;
+	while((row=DBfetch(result)))
 	{
-		ret = FAIL;
+		condition.conditionid=atoi(row[0]);
+		condition.actionid=atoi(row[1]);
+		condition.conditiontype=atoi(row[2]);
+		condition.operator=atoi(row[3]);
+		condition.value=row[4];
+
+		ret_and = check_action_condition(trigger, alarmid, new_trigger_value, &condition);
+
+		old_type = condition.conditiontype;
+		rows++;
 	}
-	else
+	/* If last condition and AND condition is FALSE */
+	if(rows!=0)
 	{
-		i=0;
-		while((row=DBfetch(result)))
+		/* If last condition and AND condition is FALSE */
+		if( (condition.conditiontype != old_type) && (ret_and == FAIL) )
 		{
-			condition.conditionid=atoi(row[0]);
-			condition.actionid=atoi(row[1]);
-			condition.conditiontype=atoi(row[2]);
-			condition.operator=atoi(row[3]);
-			condition.value=row[4];
-
-			/* If old AND condition is FALSE */
-			if( (condition.conditiontype != old_type) && (ret_and == FAIL))
-			{
-				zabbix_log( LOG_LEVEL_DEBUG, "One of AND conditions is FALSE for [%d]", condition.conditionid);
-				ret = FAIL;
-				break;
-			}
-
-			ret_and = check_action_condition(trigger, alarmid, new_trigger_value, &condition);
-
-			/* If last condition and AND condition is FALSE */
-			if( (condition.conditiontype != old_type) && (ret_and == FAIL) && (i==DBnum_rows(result)-1) )
-			{
-				zabbix_log( LOG_LEVEL_DEBUG, "Last conditions is FALSE for [%d]", condition.conditionid);
-				ret = FAIL;
-				break;
-			}
-
-			old_type = condition.conditiontype;
-			i++;
+			zabbix_log( LOG_LEVEL_DEBUG, "Last conditions is FALSE for [%d]", condition.conditionid);
+			ret = FAIL;
 		}
 	}
+	else	ret = FAIL;
 
 	DBfree_result(result);
 
@@ -846,9 +669,10 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 
 		snprintf(sql,sizeof(sql)-1,"select count(*) from trigger_depends d,triggers t where d.triggerid_down=%d and d.triggerid_up=t.triggerid and t.value=%d",trigger->triggerid, TRIGGER_VALUE_TRUE);
 		result = DBselect(sql);
-		if(DBnum_rows(result) == 1)
+		row=DBfetch(result);
+		if(row)
 		{
-			if(atoi(DBget_field(result,0,0))>0)
+			if(atoi(row[0])>0)
 			{
 				zabbix_log( LOG_LEVEL_DEBUG, "Will not apply actions");
 				DBfree_result(result);

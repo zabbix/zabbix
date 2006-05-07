@@ -229,11 +229,11 @@ static int evaluate_COUNT(char *value, DB_ITEM *item, int parameter)
 static int evaluate_SUM(char *value, DB_ITEM *item, int parameter, int flag)
 {
 	DB_RESULT	result;
+	DB_ROW	row;
 
 	char		sql[MAX_STRING_LEN];
 	int		now;
 	int		res = SUCCEED;
-	int		i;
 	double		sum=0;
 
 	if( (item->value_type != ITEM_VALUE_TYPE_FLOAT) && (item->value_type != ITEM_VALUE_TYPE_UINT64))
@@ -248,30 +248,32 @@ static int evaluate_SUM(char *value, DB_ITEM *item, int parameter, int flag)
 		snprintf(sql,sizeof(sql)-1,"select sum(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
 
 		result = DBselect(sql);
-		if(DBnum_rows(result) == 0)
+		row = DBfetch(result);
+		if(!row)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Result for SUM is empty" );
 			res = FAIL;
 		}
 		else
 		{
-			strcpy(value,DBget_field(result,0,0));
+			strcpy(value,row[0]);
 		}
 	}
 	else if(flag == ZBX_FLAG_VALUES)
 	{
 		snprintf(sql,sizeof(sql)-1,"select value from history where itemid=%d order by clock desc limit %d",item->itemid, parameter);
 		result = DBselect(sql);
-		if(DBnum_rows(result) == 0)
+		row = DBfetch(result);
+		if(!row)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Result for SUM is empty" );
 			res = FAIL;
 		}
 		else
 		{
-			for(i=0;i<DBnum_rows(result);i++)
+			while((row=DBfetch(result)))
 			{
-				sum+=atof(DBget_field(result,i,0));
+				sum+=atof(row[0]);
 			}
 			snprintf(value,MAX_STRING_LEN-1,"%f", sum);
 		}
@@ -307,11 +309,12 @@ static int evaluate_SUM(char *value, DB_ITEM *item, int parameter, int flag)
 static int evaluate_AVG(char *value,DB_ITEM	*item,int parameter,int flag)
 {
 	DB_RESULT	result;
+	DB_ROW		row;
 
 	char		sql[MAX_STRING_LEN];
 	int		now;
 	int		res = SUCCEED;
-	int		i;
+	int		rows;
 	double		sum=0;
 
 	if(item->value_type != ITEM_VALUE_TYPE_FLOAT)
@@ -326,14 +329,15 @@ static int evaluate_AVG(char *value,DB_ITEM	*item,int parameter,int flag)
 		snprintf(sql,sizeof(sql)-1,"select avg(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
 
 		result = DBselect(sql);
-		if(DBnum_rows(result) == 0)
+		row = DBfetch(result);
+		if(!row)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Result for AVG is empty" );
 			res = FAIL;
 		}
 		else
 		{
-			strcpy(value,DBget_field(result,0,0));
+			strcpy(value,row[0]);
 			del_zeroes(value);
 		}
 	}
@@ -341,18 +345,20 @@ static int evaluate_AVG(char *value,DB_ITEM	*item,int parameter,int flag)
 	{
 		snprintf(sql,sizeof(sql)-1,"select value from history where itemid=%d order by clock desc limit %d",item->itemid, parameter);
 		result = DBselect(sql);
-		if(DBnum_rows(result) == 0)
+		rows=0;
+		while((row=DBfetch(result)))
+		{
+			sum+=atof(row[0]);
+			rows++;
+		}
+		if(rows == 0)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Result for AVG is empty" );
 			res = FAIL;
 		}
 		else
 		{
-			for(i=0;i<DBnum_rows(result);i++)
-			{
-				sum+=atof(DBget_field(result,i,0));
-			}
-			snprintf(value,MAX_STRING_LEN-1,"%f", sum/(double)DBnum_rows(result));
+			snprintf(value,MAX_STRING_LEN-1,"%f", sum/(double)rows);
 		}
 	}
 	else
@@ -386,10 +392,11 @@ static int evaluate_AVG(char *value,DB_ITEM	*item,int parameter,int flag)
 static int evaluate_MIN(char *value,DB_ITEM	*item,int parameter, int flag)
 {
 	DB_RESULT	result;
+	DB_ROW		row;
 
 	char		sql[MAX_STRING_LEN];
 	int		now;
-	int		i;
+	int		rows;
 	int		res = SUCCEED;
 
 	double		min=0;
@@ -406,14 +413,15 @@ static int evaluate_MIN(char *value,DB_ITEM	*item,int parameter, int flag)
 	{
 		snprintf(sql,sizeof(sql)-1,"select min(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
 		result = DBselect(sql);
-		if(DBnum_rows(result) == 0)
+		row = DBfetch(result);
+		if(!row)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Result for MIN is empty" );
 			res = FAIL;
 		}
 		else
 		{
-			strcpy(value,DBget_field(result,0,0));
+			strcpy(value,row[0]);
 			del_zeroes(value);
 		}
 	}
@@ -421,19 +429,23 @@ static int evaluate_MIN(char *value,DB_ITEM	*item,int parameter, int flag)
 	{
 		snprintf(sql,sizeof(sql)-1,"select value from history where itemid=%d order by clock desc limit %d",item->itemid, parameter);
 		result = DBselect(sql);
-		if(DBnum_rows(result) == 0)
+
+		rows=0;
+		while((row=DBfetch(result)))
+		{
+			f=atof(row[0]);
+			if(rows==0)	min = f;
+			else if(f<min)	min=f;
+			rows++;
+		}
+
+		if(rows==0)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Result for MIN is empty" );
 			res = FAIL;
 		}
 		else
 		{
-			for(i=0;i<DBnum_rows(result);i++)
-			{
-				f=atof(DBget_field(result,i,0));
-				if(i==0)	min = f;
-				else if(f<min)	min=f;
-			}
 			snprintf(value,MAX_STRING_LEN-1,"%f", min);
 		}
 	}
@@ -468,11 +480,12 @@ static int evaluate_MIN(char *value,DB_ITEM	*item,int parameter, int flag)
 static int evaluate_MAX(char *value,DB_ITEM *item,int parameter,int flag)
 {
 	DB_RESULT	result;
+	DB_ROW		row;
 
 	char		sql[MAX_STRING_LEN];
 	int		now;
 	int		res = SUCCEED;
-	int		i;
+	int		rows;
 	double		f;
 	double		max;
 
@@ -488,14 +501,16 @@ static int evaluate_MAX(char *value,DB_ITEM *item,int parameter,int flag)
 		snprintf(sql,sizeof(sql)-1,"select max(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
 
 		result = DBselect(sql);
-		if(DBnum_rows(result) == 0)
+		row = DBfetch(result);
+
+		if(!row)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Result for MAX is empty" );
 			res = FAIL;
 		}
 		else
 		{
-			strcpy(value,DBget_field(result,0,0));
+			strcpy(value,row[0]);
 			del_zeroes(value);
 		}
 	}
@@ -503,19 +518,21 @@ static int evaluate_MAX(char *value,DB_ITEM *item,int parameter,int flag)
 	{
 		snprintf(sql,sizeof(sql)-1,"select value from history where itemid=%d order by clock desc limit %d",item->itemid, parameter);
 		result = DBselect(sql);
-		if(DBnum_rows(result) == 0)
+		rows=0;
+		while((row=DBfetch(result)))
+		{
+			f=atof(row[0]);
+			if(rows==0)	max=f;
+			else if(f>max)	max=f;
+			rows++;
+		}
+		if(rows == 0)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Result for MAX is empty" );
 			res = FAIL;
 		}
 		else
 		{
-			for(i=0;i<DBnum_rows(result);i++)
-			{
-				f=atof(DBget_field(result,i,0));
-				if(i==0)	max=f;
-				else if(f>max)	max=f;
-			}
 			snprintf(value,MAX_STRING_LEN-1,"%f", max);
 		}
 	}
@@ -550,11 +567,12 @@ static int evaluate_MAX(char *value,DB_ITEM *item,int parameter,int flag)
 static int evaluate_DELTA(char *value,DB_ITEM *item,int parameter, int flag)
 {
 	DB_RESULT	result;
+	DB_ROW		row;
 
 	char		sql[MAX_STRING_LEN];
 	int		now;
 	int		res = SUCCEED;
-	int		i;
+	int		rows;
 	double		f;
 	double		min,max;
 
@@ -570,14 +588,15 @@ static int evaluate_DELTA(char *value,DB_ITEM *item,int parameter, int flag)
 		snprintf(sql,sizeof(sql)-1,"select max(value)-min(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
 
 		result = DBselect(sql);
-		if(DBnum_rows(result) == 0)
+		row = DBfetch(result);
+		if(!row)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Result for DELTA is empty" );
 			res = FAIL;
 		}
 		else
 		{
-			strcpy(value,DBget_field(result,0,0));
+			strcpy(value,row[0]);
 			del_zeroes(value);
 		}
 	}
@@ -585,27 +604,28 @@ static int evaluate_DELTA(char *value,DB_ITEM *item,int parameter, int flag)
 	{
 		snprintf(sql,sizeof(sql)-1,"select value from history where itemid=%d order by clock desc limit %d",item->itemid, parameter);
 		result = DBselect(sql);
-		if(DBnum_rows(result) == 0)
+		rows=0;
+		while((row=DBfetch(result)))
+		{
+			f=atof(row[0]);
+			if(rows==0)
+			{
+				min=f;
+				max=f;
+			}
+			else
+			{
+				if(f>max)	max=f;
+				if(f<min)	min=f;
+			}
+		}
+		if(rows==0)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Result for DELTA is empty" );
 			res = FAIL;
 		}
 		else
 		{
-			for(i=0;i<DBnum_rows(result);i++)
-			{
-				f=atof(DBget_field(result,i,0));
-				if(i==0)
-				{
-					min=f;
-					max=f;
-				}
-				else
-				{
-					if(f>max)	max=f;
-					if(f<min)	min=f;
-				}
-			}
 			snprintf(value,MAX_STRING_LEN-1,"%f", max-min);
 		}
 	}
@@ -1066,6 +1086,7 @@ int	add_value_suffix(char *value, DB_ITEM *item)
 int	replace_value_by_map(char *value, int valuemapid)
 {
 	DB_RESULT	result;
+	DB_ROW		row;
 
 	char new_value[MAX_STRING_LEN];
 	char sql[MAX_STRING_LEN];
@@ -1078,10 +1099,11 @@ int	replace_value_by_map(char *value, int valuemapid)
 	snprintf(sql,sizeof(sql)-1,"select newvalue from mappings where valuemapid=%d and value='%s'",
 			valuemapid, value);
 	result = DBselect(sql);
+	row = DBfetch(result);
 
-	if(DBnum_rows(result) == 0)	return FAIL;
+	if(!row)		return FAIL;
 
-	strcpy(new_value,DBget_field(result,0,0));
+	strcpy(new_value,row[0]);
 	DBfree_result(result);
 
 	del_zeroes(new_value);

@@ -20,6 +20,67 @@
 #include "common.h"
 #include "checks_aggregate.h"
 
+static	int	evaluate_one(double *result, int *num, char *grpfunc, char *value_str, int valuetype)
+{
+	int	ret = SUCCEED;
+	double	value;
+
+	if(valuetype == ITEM_VALUE_TYPE_FLOAT)
+	{
+		value = atof(value_str);
+	}
+	else if(valuetype == ITEM_VALUE_TYPE_UINT64)
+	{
+#ifdef HAVE_ATOLL
+			value = (double)atoll(value_str);
+#else
+			value = (double)atol(value_str);
+#endif
+	}
+
+	if(strcmp(grpfunc,"grpsum") == 0)
+	{
+		*result+=value;
+		*num++;
+	}
+	else if(strcmp(grpfunc,"grpavg") == 0)
+	{
+		*result+=value;
+		*num++;
+	}
+	else if(strcmp(grpfunc,"grpmin") == 0)
+	{
+		if(*num==0)
+		{
+			*result=value;
+		}
+		else if(value<*result)
+		{
+			*result=value;
+		}
+		*num++;
+	}
+	else if(strcmp(grpfunc,"grpmax") == 0)
+	{
+		if(*num==0)
+		{
+			*result=value;
+		}
+		else if(value>*result)
+		{
+			*result=value;
+		}
+		*num++;
+	}
+	else
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Unsupported group function [%s])",grpfunc);
+		ret = FAIL;
+	}
+
+	return ret;
+}
+
 /*
  * grpfunc: grpmax, grpmin, grpsum, grpavg
  * itemfunc: last, min, max, avg, sum,count
@@ -31,11 +92,11 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
 	char		hostgroup_esc[MAX_STRING_LEN],itemkey_esc[MAX_STRING_LEN];
  
 	DB_RESULT	result;
-	DB_RESULT	r;
-	DB_RESULT	result2;
+	DB_ROW		row;
 
-	int		i,valuetype,j;
-	double		d = 0, value;
+	int		valuetype;
+	double		d = 0;
+	char		*value;
 	int		num = 0;
 	int		now;
 	char		items[MAX_STRING_LEN],items2[MAX_STRING_LEN];
@@ -51,10 +112,10 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
 	strscpy(items,"0");
 	snprintf(sql,sizeof(sql)-1,"select itemid from items,hosts_groups,hosts,groups where hosts_groups.groupid=groups.groupid and items.hostid=hosts.hostid and hosts_groups.hostid=hosts.hostid and groups.name='%s' and items.key_='%s' and items.status=%d and hosts.status=%d",hostgroup_esc, itemkey_esc, ITEM_STATUS_ACTIVE, HOST_STATUS_MONITORED);
 	result = DBselect(sql);
-	
-	for(i=0;i<DBnum_rows(result);i++)
+
+	while((row=DBfetch(result)))
 	{
-		snprintf(items2,sizeof(items2)-1,"%s,%s",items, DBget_field(result,i,0));
+		snprintf(items2,sizeof(items2)-1,"%s,%s",items, row[0]);
 /*		zabbix_log( LOG_LEVEL_WARNING, "ItemIDs items2[%s])",items2);*/
 		strscpy(items,items2);
 /*		zabbix_log( LOG_LEVEL_WARNING, "ItemIDs items[%s])",items2);*/
@@ -87,75 +148,31 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
 	zabbix_log( LOG_LEVEL_DEBUG, "SQL2 [%s]",sql2);
 
 	result = DBselect(sql);
-	result2 = DBselect(sql2);
-
-	for(i=0;i<DBnum_rows(result)+DBnum_rows(result2);i++)
+	while((row=DBfetch(result)))
 	{
-		j=i;
-		r = result;
-		if(j>=DBnum_rows(result))
-		{
-			j=i-DBnum_rows(result);
-			r = result2;
-		}
-		valuetype = atoi(DBget_field(r,i,1));
-		if(valuetype == ITEM_VALUE_TYPE_FLOAT)
-		{
-			value = atof(DBget_field(r,i,2));
-		}
-		else if(valuetype == ITEM_VALUE_TYPE_UINT64)
-		{
-#ifdef HAVE_ATOLL
-				value = (double)atoll(DBget_field(r,i,2));
-#else
-				value = (double)atol(DBget_field(r,i,2));
-#endif
-		}
-		if(strcmp(grpfunc,"grpsum") == 0)
-		{
-			d+=value;
-			num++;
-		}
-		else if(strcmp(grpfunc,"grpavg") == 0)
-		{
-			d+=value;
-			num++;
-		}
-		else if(strcmp(grpfunc,"grpmin") == 0)
-		{
-			if(num==0)
-			{
-				d=value;
-			}
-			else if(value<d)
-			{
-				d=value;
-			}
-			num++;
-		}
-		else if(strcmp(grpfunc,"grpmax") == 0)
-		{
-			if(num==0)
-			{
-				d=value;
-			}
-			else if(value>d)
-			{
-				d=value;
-			}
-			num++;
-		}
-		else
+		valuetype = atoi(row[1]);
+		value = row[2];
+		if(FAIL == evaluate_one(&d, &num, grpfunc, value, valuetype))
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Unsupported group function [%s])",grpfunc);
 			DBfree_result(result);
-			DBfree_result(result2);
 			return FAIL;
 		}
-		zabbix_log( LOG_LEVEL_DEBUG, "Item value([%s])",DBget_field(result,i,0));
 	}
 	DBfree_result(result);
-	DBfree_result(result2);
+
+	result = DBselect(sql2);
+	while((row=DBfetch(result)))
+	{
+		valuetype = atoi(row[1]);
+		value = row[2];
+		if(FAIL == evaluate_one(&d, &num, grpfunc, value, valuetype))
+		{
+			zabbix_log( LOG_LEVEL_WARNING, "Unsupported group function [%s])",grpfunc);
+			DBfree_result(result);
+			return FAIL;
+		}
+	}
 
 	if(num==0)
 	{
