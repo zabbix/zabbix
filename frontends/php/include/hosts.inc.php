@@ -478,8 +478,11 @@
 
 			if($groupid > 0)
 			{ 
-				if(DBnum_rows(DBselect("select hg.hostid from hosts_groups hg".
-					" where hg.groupid=".$groupid." and hg.hostid=".$hostid)) != 1)
+//				if(DBnum_rows(DBselect("select hg.hostid from hosts_groups hg".
+//					" where hg.groupid=".$groupid." and hg.hostid=".$hostid)) != 1)
+//						$hostid = 0;
+				if(!DBfetch(DBselect("select hg.hostid from hosts_groups hg".
+					" where hg.groupid=".$groupid." and hg.hostid=".$hostid)))
 						$hostid = 0;
 			}
 
@@ -487,9 +490,13 @@
 
 			if($hostid > 0)
 			{
-				if(DBnum_rows(DBselect("select distinct h.hostid from hosts h".$item_table.
+//				if(DBnum_rows(DBselect("select distinct h.hostid from hosts h".$item_table.
+//					" where h.status<>".HOST_STATUS_DELETED.$with_host_status.$with_items.
+//					" and h.hostid=".$hostid)) != 1)
+//						$hostid = 0;
+				if(!DBfetch(DBselect("select distinct h.hostid from hosts h".$item_table.
 					" where h.status<>".HOST_STATUS_DELETED.$with_host_status.$with_items.
-					" and h.hostid=".$hostid)) != 1)
+					" and h.hostid=".$hostid)))
 						$hostid = 0;
 			}
 

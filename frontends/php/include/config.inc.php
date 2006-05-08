@@ -1139,7 +1139,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 	{
 		global $page;
 		global $USER_DETAILS;
-COpt::profiling_start("page");
+//COpt::profiling_start("page");
 
 		if($noauth==0)
 		{
