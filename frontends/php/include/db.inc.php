@@ -23,7 +23,7 @@
 // DATABASE CONFIGURATION
 
 //	$DB_TYPE	="POSTGRESQL";
-	$DB_TYPE	="MYSQL";
+	$DB_TYPE	="ORACLE";
 	$DB_SERVER	="localhost";
 //	$DB_DATABASE	="zabbix";
 //	$DB_DATABASE	="osmiy";
@@ -31,8 +31,8 @@
 	$DB_DATABASE	="osmiy";
 //	$DB_DATABASE	="demo";
 //	$DB_DATABASE	="martinsj";
-	$DB_USER	="root";
-	$DB_PASSWORD	="";
+	$DB_USER	="scott";
+	$DB_PASSWORD	="tiger";
 // END OF DATABASE CONFIGURATION
 
 //	$USER_DETAILS	="";
@@ -58,6 +58,18 @@
 		}
 	}
 
+	if($DB_TYPE == "ORACLE")
+	{
+		$DB = ocilogon($DB_USER, $DB_PASSWORD, "");
+		if(!$DB)
+		{
+			echo "Error connecting to database";
+			exit;
+		}
+	}
+
+
+
 	function	DBselect($query)
 	{
 		global $DB,$DB_TYPE;
@@ -77,6 +89,22 @@
 		{
 			$result=pg_exec($DB,$query);
 			return $result;
+		}
+		if($DB_TYPE == "ORACLE")
+		{
+			$stid=OCIParse($DB,$query);
+			if(!$stid)
+			{
+				$e=@ocierror();
+				error("SQL error [".$e["message"]."] in [".$e["sqltext"]."]");
+			}
+			$result=@OCIExecute($stid);
+			if(!$result)
+			{
+				$e=ocierror($stid);
+				error("SQL error [".$e["message"]."] in [".$e["sqltext"]."]");
+			}
+			return $stid;
 		}
 	}
 
@@ -102,25 +130,48 @@
 		{
 			$result=pg_exec($DB,$query);
 		}
+		if($DB_TYPE == "ORACLE")
+		{
+
+			return DBselect($query);
+		}
 
 //SDI("DBexecute($query) = '".$result."'");
 
 		return $result;
 	}
 
-	function	DBfetch($result)
+	function	DBfetch($cursor)
 	{
 		global $DB_TYPE;
 
 		if($DB_TYPE == "MYSQL")
 		{
-			$row=mysql_fetch_array($result);
+			$row=mysql_fetch_array($cursor);
 			return $row;
 		}
 		if($DB_TYPE == "POSTGRESQL")
 		{
-			$row=pg_fetch_array($result);
+			$row=pg_fetch_array($cursor);
 			return $row;
+		}
+		if($DB_TYPE == "ORACLE")
+		{
+//			echo "DBfetch<br>";
+			if(!ocifetchinto($cursor,$row,OCI_ASSOC))
+			{
+				return FALSE;
+			}
+			else
+			{
+				$result=array();
+				$keys = (array_keys($row));
+           			foreach ($keys as $k)
+				{
+					$result[strtolower($k)]=$row[$k];
+				}
+			}
+			return $result;
 		}
 		return FALSE;
 	}
@@ -145,6 +196,10 @@
 			}
 			return $row[$fieldnum];
 		}
+		if($DB_TYPE == "ORACLE")
+		{
+			$result=FALSE;
+		}
 	}
 
 	function	DBnum_rows($result)
@@ -160,6 +215,10 @@
 		if($DB_TYPE == "POSTGRESQL")
 		{
 			return pg_numrows($result);
+		}
+		if($DB_TYPE == "ORACLE")
+		{
+			$result=FALSE;
 		}
 		return 0;
 	}
@@ -180,6 +239,10 @@
 			$sql="select $field from $table where oid=$oid";
 			$result=DBselect($sql);
 			return get_field($result,0,0);
+		}
+		if($DB_TYPE == "ORACLE")
+		{
+			$result=FALSE;
 		}
 	}
 
