@@ -1033,8 +1033,7 @@
 
 		$db_triggers = DBselect("select distinct t.description from hosts h,items i,triggers t,functions f $group_where".
 			" h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid".
-			" and t.status=".TRIGGER_STATUS_ENABLED.
-			" group by 1");
+			" and t.status=".TRIGGER_STATUS_ENABLED);
 		while($triggers = DBfetch($db_triggers))
 		{
 			$table_row = array(nbsp($triggers["description"]));

@@ -1012,6 +1012,5 @@ end;
 CREATE TABLE items_applications (
 	applicationid           number(10)          DEFAULT '0' NOT NULL,
 	itemid                  number(10)          DEFAULT '0' NOT NULL,
-	PRIMARY KEY (applicationid,itemid)
-) type=InnoDB;
-
+  	CONSTRAINT	 	items_applications_pk	 PRIMARY KEY (applicationid,itemid)
+);

@@ -86,7 +86,7 @@
 	**     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
 	**/
 	
-	//define("USE_PROFILING",1);
+	define("USE_PROFILING",1);
 
 if(defined('USE_PROFILING'))
 {
@@ -115,9 +115,11 @@ if(defined('USE_PROFILING'))
 			$endtime = COpt::getmicrotime();
 
 			if(is_null($type)) $type="global";
-			echo "<br/>\nTime to execute (".$type."): ". bcsub($endtime,$starttime[$type],6)." seconds!\n<br/>";
+//			echo "<br/>\nTime to execute (".$type."): ". bcsub($endtime,$starttime[$type],6)." seconds!\n<br/>";
+			echo "<br/>\nTime to execute (".$type."): ".($endtime-$starttime[$type])." seconds!\n<br/>";
 		}
 	}
+	COpt::profiling_start("page");
 }
 else
 {
