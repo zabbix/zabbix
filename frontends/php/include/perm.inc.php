@@ -33,7 +33,7 @@ define("GROUP_RIGHT",		0);
 		global	$_COOKIE;
 		global	$_REQUEST;
 
-		$USER_DETAILS = array("alias"=>"- uncnown -","userid"=>0);
+		$USER_DETAILS = array("alias"=>"- unknown -","userid"=>0);
 		$USER_RIGHTS = array();
 
 		if(isset($_COOKIE["sessionid"]))	$sessionid = $_COOKIE["sessionid"];
@@ -49,7 +49,8 @@ define("GROUP_RIGHT",		0);
 		}
 
                 $db_users = DBselect($sql);
-		if(DBnum_rows($db_users) == 1)
+		$USER_DETAILS = DBfetch($db_users);
+		if($USER_DETAILS)
 		{
 			if(isset($sessionid))
 			{
@@ -57,7 +58,6 @@ define("GROUP_RIGHT",		0);
 				DBexecute("update sessions set lastaccess=".time()." where sessionid=".zbx_dbstr($sessionid));
 			}
 
-			$USER_DETAILS = DBfetch($db_users);
 			$USER_RIGHTS = array();
 
 			$db_rights = DBselect("select * from rights where userid=".$USER_DETAILS["userid"]);
@@ -73,7 +73,8 @@ define("GROUP_RIGHT",		0);
 			}
 
 			return;
-		} 
+		}
+		else	unset($USER_DETAILS);
 
 // Incorrect login
 
