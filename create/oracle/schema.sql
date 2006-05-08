@@ -550,18 +550,32 @@ CREATE TABLE trigger_depends (
 --
 
 CREATE TABLE users (
-  userid		number(10)		NOT NULL auto_increment,
-  alias			varchar2(100)	DEFAULT '' NOT NULL,
-  name			varchar2(100)	DEFAULT '' NOT NULL,
-  surname		varchar2(100)	DEFAULT '' NOT NULL,
-  passwd		char(32)	DEFAULT '' NOT NULL,
-  url			varchar2(255)	DEFAULT '' NOT NULL,
-  autologout		number(10)		DEFAULT '900' NOT NULL,
-  lang			varchar2(5)	DEFAULT 'en_gb' NOT NULL,
-  refresh		number(10)		DEFAULT '30' NOT NULL,
-  PRIMARY KEY (userid),
-  UNIQUE (alias)
-) type=InnoDB;
+	userid		number(10)	NOT NULL,
+	alias		varchar2(100)	DEFAULT '' NOT NULL,
+	name		varchar2(100)	DEFAULT '' NOT NULL,
+	surname		varchar2(100)	DEFAULT '' NOT NULL,
+	passwd		varchar2(32)	DEFAULT '' NOT NULL,
+	url		varchar2(255)	DEFAULT '' NOT NULL,
+	autologout	number(10)	DEFAULT '900' NOT NULL,
+	lang		varchar2(5)	DEFAULT 'en_gb' NOT NULL,
+	refresh		number(10)	DEFAULT '30' NOT NULL,
+  	CONSTRAINT 	users_pk PRIMARY KEY (userid)
+);
+
+CREATE UNIQUE INDEX users_alias on users (alias);
+
+create sequence users_userid 
+start with 1 
+increment by 1 
+nomaxvalue; 
+
+create trigger users_trigger
+before insert on users
+for each row
+begin
+	select users_userid.nextval into :new.userid from dual;
+end;
+/
 
 --
 -- Table structure for table 'audit'
@@ -595,14 +609,29 @@ CREATE TABLE sessions (
 --
 
 CREATE TABLE rights (
-  rightid		number(10)		NOT NULL auto_increment,
-  userid		number(10)		DEFAULT '0' NOT NULL,
-  name			char(255)	DEFAULT '' NOT NULL,
-  permission		char(1)		DEFAULT '' NOT NULL,
-  id			number(10),
-  PRIMARY KEY (rightid),
-  KEY (userid)
-) type=InnoDB;
+	rightid		number(10)	NOT NULL,
+	userid		number(10)	DEFAULT '0' NOT NULL,
+	name		varchar2(255)	DEFAULT '' NOT NULL,
+	permission	varchar2(1)	DEFAULT '' NOT NULL,
+	id		number(10),
+  	CONSTRAINT 	rights_pk PRIMARY KEY (rightid)
+);
+
+CREATE INDEX rights_userid on rights (userid);
+
+create sequence rights_rightid 
+start with 1 
+increment by 1 
+nomaxvalue; 
+
+create trigger rights_trigger
+before insert on rights
+for each row
+begin
+	select rights_rightid.nextval into :new.rightid from dual;
+end;
+/
+
 
 --
 -- Table structure for table 'problems'
@@ -668,15 +697,28 @@ CREATE TABLE service_alarms (
 --
 
 CREATE TABLE profiles (
-  profileid		number(10)		NOT NULL auto_increment,
-  userid		number(10)		DEFAULT '0' NOT NULL,
-  idx			varchar2(64)	DEFAULT '' NOT NULL,
-  value			varchar2(255)	DEFAULT '' NOT NULL,
-  valuetype		number(10)		DEFAULT 0 NOT NULL,
-  PRIMARY KEY (profileid),
---  KEY (userid),
-  UNIQUE (userid,idx)
-) type=InnoDB;
+	profileid	number(10)	NOT NULL,
+	userid		number(10)	DEFAULT '0' NOT NULL,
+	idx		varchar2(64)	DEFAULT '' NOT NULL,
+	value		varchar2(255)	DEFAULT '' NOT NULL,
+	valuetype	number(10)	DEFAULT 0 NOT NULL,
+  	CONSTRAINT 	profiles_pk PRIMARY KEY (profileid)
+);
+
+CREATE UNIQUE INDEX profiles_userididx on profiles (userid, idx);
+
+create sequence profiles_profileid 
+start with 1 
+increment by 1 
+nomaxvalue; 
+
+create trigger profiles_trigger
+before insert on profiles
+for each row
+begin
+	select profiles_profileid.nextval into :new.profileid from dual;
+end;
+/
 
 --
 -- Table structure for table 'screens'
@@ -734,11 +776,26 @@ CREATE TABLE stats (
 --
 
 CREATE TABLE usrgrp (
-  usrgrpid		number(10)		NOT NULL auto_increment,
-  name			varchar2(64)	DEFAULT '' NOT NULL,
-  PRIMARY KEY (usrgrpid),
-  UNIQUE (name)
-) type=InnoDB;
+	usrgrpid	number(10)	NOT NULL,
+	name		varchar2(64)	DEFAULT '' NOT NULL,
+  	CONSTRAINT 	usrgrp_pk PRIMARY KEY (usrgrpid)
+);
+
+CREATE UNIQUE INDEX usrgrp_name on usrgrp (name);
+
+create sequence usrgrp_usrgrpid 
+start with 1 
+increment by 1 
+nomaxvalue; 
+
+create trigger usrgrp_trigger
+before insert on usrgrp
+for each row
+begin
+	select usrgrp_usrgrpid.nextval into :new.usrgrp from dual;
+end;
+/
+
 
 --
 -- Table structure for table 'users_groups'
