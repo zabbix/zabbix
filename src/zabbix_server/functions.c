@@ -80,7 +80,9 @@ void	update_functions(DB_ITEM *item)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In update_functions(%d)",item->itemid);
 
-	snprintf(sql,sizeof(sql)-1,"select function,parameter,itemid,lastvalue from functions where itemid=%d group by 1,2,3 order by 1,2,3",item->itemid);
+/* Oracle does'n support this */
+/*	snprintf(sql,sizeof(sql)-1,"select function,parameter,itemid,lastvalue from functions where itemid=%d group by function,parameter,itemid order by function,parameter,itemid",item->itemid);*/
+	snprintf(sql,sizeof(sql)-1,"select distinct function,parameter,itemid,lastvalue from functions where itemid=%d",item->itemid);
 
 	result = DBselect(sql);
 

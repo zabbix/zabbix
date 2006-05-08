@@ -212,7 +212,7 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 
 	if(set_result_type(result, item->value_type, c) == FAIL)
 	{
-		snprintf(error,MAX_STRING_LEN-1, "Type of received value [%s] is not sutable for [%s@%s]", c, item->key, item->host);
+		snprintf(error,MAX_STRING_LEN-1, "Type of received value [%s] is not sutable for [%s@%s] having type [%d]", c, item->key, item->host, item->value_type);
 		zabbix_log( LOG_LEVEL_WARNING, error);
 		zabbix_log( LOG_LEVEL_WARNING, "Returning NOTSUPPORTED");
 		result->msg=strdup(error);

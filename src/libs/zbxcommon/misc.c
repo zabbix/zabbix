@@ -120,7 +120,7 @@ int	is_double_prefix(char *c)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int is_double(char *str)
+/*int is_double(char *str)
 {
 	const char *endstr = str + strlen(str);
 	char *endptr = NULL;
@@ -133,8 +133,8 @@ int is_double(char *str)
 	if (endptr == endstr)
 		return SUCCEED;
 	return FAIL;
-}
-/*
+}*/
+
 int	is_double(char *c)
 {
 	int i;
@@ -160,7 +160,7 @@ int	is_double(char *c)
 		return FAIL;
 	}
 	return SUCCEED;
-}*/
+}
 
 /******************************************************************************
  *                                                                            *
@@ -216,6 +216,15 @@ int	set_result_type(AGENT_RESULT *result, int value_type, char *c)
 		if(is_double(c) == SUCCEED)
 		{
 			SET_DBL_RESULT(result, atof(c));
+			ret = SUCCEED;
+		}
+		else if(is_uint(c) == SUCCEED)
+		{
+#ifdef HAVE_ATOLL
+			SET_DBL_RESULT(result, (double)atoll(c));
+#else
+			SET_DBL_RESULT(result, (double)atol(c));
+#endif
 			ret = SUCCEED;
 		}
 	}
