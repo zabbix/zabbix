@@ -114,6 +114,8 @@ void    DBconnect(void)
 		zabbix_log(LOG_LEVEL_ERR, "Cannot login with %s\n", "scott/tiger");
 		exit(FAIL);
 	}
+
+	sqlo_autocommit_on(oracle);
 #endif
 }
 
@@ -167,6 +169,7 @@ int	DBexecute(char *query)
 	PQclear(result);
 #endif
 #ifdef	HAVE_ORACLE
+	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s",query);
 	if ( sqlo_exec(oracle, query)<0 )
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
@@ -268,6 +271,7 @@ DB_RESULT DBselect(char *query)
 #ifdef	HAVE_ORACLE
 	sqlo_stmt_handle_t sth;
 
+	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s",query);
 	if(0 > (sth = (sqlo_open(oracle, query,0,NULL))))
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
@@ -1002,7 +1006,7 @@ void DBupdate_host_availability(int hostid,int available,int clock, char *error)
 
 	if(available==HOST_AVAILABLE_TRUE)
 	{
-		snprintf(sql,sizeof(sql)-1,"update hosts set available=%d,error='',errors_from=0 where hostid=%d",HOST_AVAILABLE_TRUE,hostid);
+		snprintf(sql,sizeof(sql)-1,"update hosts set available=%d,error=' ',errors_from=0 where hostid=%d",HOST_AVAILABLE_TRUE,hostid);
 		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 		DBexecute(sql);
 	}
@@ -1016,7 +1020,8 @@ void DBupdate_host_availability(int hostid,int available,int clock, char *error)
 		{
 			snprintf(sql,sizeof(sql)-1,"update hosts set available=%d,disable_until=%d,error='%s' where hostid=%d",HOST_AVAILABLE_FALSE,clock+CONFIG_UNREACHABLE_DELAY,error_esc,hostid);
 		}*/
-		snprintf(sql,sizeof(sql)-1,"update hosts set available=%d,error='%s' where hostid=%d",HOST_AVAILABLE_FALSE,error_esc,hostid);
+		/* '%s ' - space to make Oracle happy */
+		snprintf(sql,sizeof(sql)-1,"update hosts set available=%d,error='%s ' where hostid=%d",HOST_AVAILABLE_FALSE,error_esc,hostid);
 		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 		DBexecute(sql);
 	}
@@ -1049,7 +1054,8 @@ int	DBupdate_item_status_to_notsupported(int itemid, char *error)
 		strscpy(error_esc,"");
 	}
 
-	snprintf(sql,sizeof(sql)-1,"update items set status=%d,error='%s' where itemid=%d",ITEM_STATUS_NOTSUPPORTED,error_esc,itemid);
+	/* '&s ' to make Oracle happy */
+	snprintf(sql,sizeof(sql)-1,"update items set status=%d,error='%s ' where itemid=%d",ITEM_STATUS_NOTSUPPORTED,error_esc,itemid);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	DBexecute(sql);
 
