@@ -462,9 +462,9 @@
 
 			if($groupid == 0)
 			{
-				$sql = "select h.hostid,h.host from hosts h".$item_table.
+				$sql = "select distinct h.hostid,h.host from hosts h".$item_table.
 					" where h.status<>".HOST_STATUS_DELETED.$with_host_status.$with_items.
-					" group by h.hostid order by h.host";
+					" order by h.host";
 
 				$db_hosts = DBselect($sql);
 				while($db_host = DBfetch($db_hosts))
