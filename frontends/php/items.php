@@ -302,7 +302,7 @@
 	echo BR;
 
 	$db_hosts=DBselect("select hostid from hosts");
-	if(isset($_REQUEST["form"])&&isset($_REQUEST["hostid"])&&DBnum_rows($db_hosts)>0)
+	if(isset($_REQUEST["form"])&&isset($_REQUEST["hostid"])&&DBfetch($db_hosts))
 	{
 // FORM
 		insert_item_form();

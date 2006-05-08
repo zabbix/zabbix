@@ -45,9 +45,9 @@
 	$db_hosts = get_hosts_by_graphid($_REQUEST["graphid"]);
 	$name=$row["name"];
 
-	if(DBnum_rows($db_hosts)==1)
+	$db_host = DBfetch($db_hosts);
+	if($db_host)
 	{
-		$db_host = DBfetch($db_hosts);
 		$name = $db_host["host"].":".$name;
 	}
 	if(isset($_REQUEST["width"])&&$_REQUEST["width"]>0)

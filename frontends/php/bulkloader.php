@@ -88,9 +88,9 @@
 				//  Determine which template, if any this host is linked to
 				$sqlResult=DBselect("select distinct(hostid) from hosts where status=". HOST_STATUS_TEMPLATE .
 					" and host=".zbx_dbstr($tmpHostTemplate));
-				if(DBnum_rows($sqlResult)==1)
+				$row=DBfetch($sqlResult);
+				if($row)
 				{
-					$row=DBfetch($sqlResult);
 					$hostTemplate=$row["hostid"];
 				}
 				else

@@ -311,9 +311,9 @@
 					);
 			} else {
 				$real_hosts = get_realhosts_by_triggerid($row["triggerid"]);
-				if(DBnum_rows($real_hosts) == 1)
+				$real_host = DBfetch($real_hosts);
+				if($real_host)
 				{
-					$real_host = DBfetch($real_hosts);
 					array_push($description,
 						new CLink($real_host["host"],
 							"triggers.php?&hostid=".$real_host["hostid"], 'action'),

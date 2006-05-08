@@ -89,9 +89,9 @@
 		$db_images = DBselect("select image from images".
 			" where imagetype=2 and name=".zbx_dbstr($background));
 
-		if(DBnum_rows($db_images)==1)
+		$db_image = DBfetch($db_images);
+		if($db_image)
 		{
-			$db_image = DBfetch($db_images);
 			$back = ImageCreateFromString($db_image["image"]);
 			ImageCopy($im,$back,0,0,0,0,imagesx($back),imagesy($back));
 		}

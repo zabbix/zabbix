@@ -238,9 +238,9 @@
 					"graph.php?graphid=".$row["graphid"]);
 			} else {
 				$real_hosts = get_realhosts_by_graphid($row["templateid"]);
-				if(DBnum_rows($real_hosts) == 1)
+				$real_host = DBfetch($real_hosts);
+				if($real_host)
 				{
-					$real_host = DBfetch($real_hosts);
 					$name = array(
 						new CLink($real_host["host"],"graphs.php?".
 							"hostid=".$real_host["hostid"],
