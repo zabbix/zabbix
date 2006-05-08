@@ -61,9 +61,9 @@
 		$result=DBselect("select u.userid,u.alias,u.name,u.surname,u.url,u.refresh from users u where".
 			" u.alias=".zbx_dbstr($name)." and u.passwd=".zbx_dbstr($password));
 
-		if(DBnum_rows($result)==1)
+		$row=DBfetch($result);
+		if($row)
 		{
-			$row=DBfetch($result);
 			$USER_DETAILS["userid"]	= $row["userid"];
 			$USER_DETAILS["alias"]	= $row["alias"];
 			$USER_DETAILS["name"]	= $row["name"];

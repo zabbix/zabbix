@@ -668,7 +668,6 @@
 			$hosts = DBSelect("select * from hosts where templateid=".$template["hostid"].
 				" and status in (".HOST_STATUS_MONITORED.",".HOST_STATUS_NOT_MONITORED.")".
 				" order by host");
-//			if(DBnum_rows($hosts) <= 0)	continue;
 			$host_list = array();
 			while($host = DBfetch($hosts))
 			{
@@ -799,13 +798,18 @@
 						$db_app["name"]
 						);
 				}
+				$items=get_items_by_applicationid($db_app["applicationid"]);
+				$rows=0;
+				while(DBfetch($items))	$rows++;
+
+
 				$table->AddRow(array(
 					array(new CCheckBox("applications[]",NULL,NULL,NULL,$db_app["applicationid"]),
 					SPACE,
 					$db_app["applicationid"]),
 					$name,
 					array(new CLink(S_ITEMS,"items.php?hostid=".$db_app["hostid"],"action"),
-					SPACE."(".DBnum_rows(get_items_by_applicationid($db_app["applicationid"])).")")
+					SPACE."($rows)")
 					));
 			}
 			$footerButtons = array();
