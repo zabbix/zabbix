@@ -178,11 +178,25 @@ CREATE TABLE sysmaps (
 --
 
 CREATE TABLE groups (
-  groupid		number(10)		NOT NULL auto_increment,
-  name			varchar2(64)	DEFAULT '' NOT NULL,
-  PRIMARY KEY (groupid),
-  UNIQUE (name)
-) type=InnoDB;
+	groupid		number(10)	NOT NULL,
+	name		varchar2(64)	DEFAULT '' NOT NULL,
+	CONSTRAINT 	groups_pk PRIMARY KEY (groupid)
+);
+
+CREATE UNIQUE INDEX groups_name on groups (name);
+
+create sequence groups_groupid 
+start with 1 
+increment by 1 
+nomaxvalue; 
+
+create trigger groups_trigger
+before insert on groups
+for each row
+begin
+	select groups_groupid.nextval into :new.groupid from dual;
+end;
+/
 
 --
 -- Table structure for table 'hosts_groups'
@@ -967,15 +981,29 @@ CREATE TABLE acknowledges (
 --
 
 CREATE TABLE applications (
-	applicationid           number(10)          NOT NULL auto_increment,
-	hostid                  number(10)          DEFAULT '0' NOT NULL,
-	name                    varchar2(255)    DEFAULT '' NOT NULL,
-	templateid		number(10)		DEFAULT '0' NOT NULL,
-	PRIMARY KEY 	(applicationid),
-	KEY 		hostid (hostid),
-	KEY 		templateid (templateid),
-	UNIQUE          appname (hostid,name)
-) type=InnoDB;
+	applicationid           number(10)	NOT NULL,
+	hostid                  number(10)	DEFAULT '0' NOT NULL,
+	name                    varchar2(255)	DEFAULT '' NOT NULL,
+	templateid		number(10)	DEFAULT '0' NOT NULL,
+  	CONSTRAINT	 	applications_pk	 PRIMARY KEY (applicationid)
+);
+
+CREATE INDEX applications_hostid on applications (hostid);
+CREATE INDEX applications_templateid on applications (templateid);
+CREATE UNIQUE INDEX applications_name on applications (name);
+
+create sequence applications_applicationid 
+start with 1 
+increment by 1 
+nomaxvalue; 
+
+create trigger applications_trigger
+before insert on applications
+for each row
+begin
+	select applications_applicationid.nextval into :new.applicationid from dual;
+end;
+/
 
 --
 -- Table structure for table 'items_applications'
