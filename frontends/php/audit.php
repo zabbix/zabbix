@@ -70,7 +70,7 @@
 	$sql="select max(auditid) as max from audit";
 	$result=DBselect($sql);
 	$row=DBfetch($result);
-	$maxauditid=@iif(DBnum_rows($result)>0,$row["max"],0);
+	$maxauditid=@iif($row,$row["max"],0);
 
 	if(!isset($_REQUEST["start"]))
 	{

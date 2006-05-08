@@ -202,7 +202,7 @@
 		}
 	}
 
-	function	DBnum_rows($result)
+/*	function	DBnum_rows($result)
 	{
 		global $DB_TYPE;
 	
@@ -221,7 +221,7 @@
 			$result=FALSE;
 		}
 		return 0;
-	}
+	}*/
 
 	function	DBinsert_id($result,$table,$field)
 	{
