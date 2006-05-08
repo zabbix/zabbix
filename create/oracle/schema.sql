@@ -278,15 +278,29 @@ CREATE TABLE conditions (
 --
 
 CREATE TABLE alarms (
-  alarmid		number(10)		NOT NULL auto_increment,
-  triggerid		number(10)		DEFAULT '0' NOT NULL,
-  clock			number(10)		DEFAULT '0' NOT NULL,
-  value			number(10)		DEFAULT '0' NOT NULL,
-  acknowledged		number(3)		DEFAULT '0' NOT NULL,
-  PRIMARY KEY (alarmid),
-  KEY (triggerid,clock),
-  KEY (clock)
-) type=InnoDB;
+	alarmid		number(10)		NOT NULL,
+	triggerid	number(10)		DEFAULT '0' NOT NULL,
+	clock		number(10)		DEFAULT '0' NOT NULL,
+	value		number(10)		DEFAULT '0' NOT NULL,
+	acknowledged	number(3)		DEFAULT '0' NOT NULL,
+	CONSTRAINT 	alarms_pk		 PRIMARY KEY (alarmid)
+);
+
+CREATE INDEX alarms_triggeridclock on alarms (triggerid, clock);
+CREATE INDEX alarms_clock on alarms (clock);
+
+create sequence alarms_alarmid 
+start with 1 
+increment by 1 
+nomaxvalue; 
+
+create trigger alarms_trigger
+before insert on alarms
+for each row
+begin
+	select alarms_alarmid.nextval into :new.alarmid from dual;
+end;
+/
 
 --
 -- Table structure for table 'functions'
@@ -335,12 +349,12 @@ CREATE TABLE history_uint (
 --
 
 CREATE TABLE history_str (
-  itemid		number(10)		DEFAULT '0' NOT NULL,
-  clock			number(10)		DEFAULT '0' NOT NULL,
-  value			varchar2(255)	DEFAULT '' NOT NULL,
---  PRIMARY KEY (itemid,clock)
-  KEY itemidclock (itemid, clock)
-) type=InnoDB;
+	itemid		number(10)		DEFAULT '0' NOT NULL,
+	clock		number(10)		DEFAULT '0' NOT NULL,
+	value		varchar2(255)		DEFAULT '' NOT NULL
+);
+
+CREATE INDEX history_str_itemidclock on history_str (itemid, clock);
 
 --
 -- Table structure for table 'hosts'
@@ -570,11 +584,11 @@ CREATE TABLE audit (
 --
 
 CREATE TABLE sessions (
-  sessionid		varchar2(32)	NOT NULL DEFAULT '',
-  userid		number(10)		NOT NULL DEFAULT '0',
-  lastaccess		number(10)		NOT NULL DEFAULT '0',
-  PRIMARY KEY (sessionid)
-) type=InnoDB;
+	sessionid	varchar2(32)		DEFAULT '' NOT NULL,
+	userid		number(10)		DEFAULT '0' NOT NULL,
+	lastaccess	number(10)		DEFAULT '0' NOT NULL,
+	CONSTRAINT 	sessions_pk PRIMARY KEY (sessionid)
+);
 
 --
 -- Table structure for table 'rights'
@@ -741,14 +755,14 @@ CREATE TABLE users_groups (
 --
 
 CREATE TABLE trends (
-  itemid		number(10)		DEFAULT '0' NOT NULL,
-  clock			number(10)		DEFAULT '0' NOT NULL,
-  num			int(2)		DEFAULT '0' NOT NULL,
-  value_min		number(16,4)	DEFAULT '0.0000' NOT NULL,
-  value_avg		number(16,4)	DEFAULT '0.0000' NOT NULL,
-  value_max		number(16,4)	DEFAULT '0.0000' NOT NULL,
-  PRIMARY KEY (itemid,clock)
-) type=InnoDB;
+	itemid		number(10)	DEFAULT '0' NOT NULL,
+	clock		number(10)	DEFAULT '0' NOT NULL,
+	num		number(5)	DEFAULT '0' NOT NULL,
+	value_min	number(16,4)	DEFAULT '0.0000' NOT NULL,
+	value_avg	number(16,4)	DEFAULT '0.0000' NOT NULL,
+	value_max	number(16,4)	DEFAULT '0.0000' NOT NULL,
+	CONSTRAINT 	trends_pk	 PRIMARY KEY (itemid, clock)
+);
 
 --
 -- Table structure for table 'images'
