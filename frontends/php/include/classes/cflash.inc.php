@@ -19,84 +19,62 @@
 **/
 ?>
 <?php
-	class CFlashEmbed extends CTag
+	/* private */ class CFlashEmbed extends CTag
 	{
 		function CFlashEmbed($src=NULL, $width = NULL, $height = NULL)
 		{
-			parent::CTag("embed");
-			$this->AddOption("allowScriptAccess","sameDomain");
-			$this->AddOption("type","application/x-shockwave-flash");
-			$this->AddOption("pluginspage","http://www.macromedia.com/go/getflashplayer");
-			$this->AddOption("align","middle");
-			$this->AddOption("quality","high");
+			parent::CTag('embed');
+			$this->options['allowScriptAccess'] = 'sameDomain';
+			$this->options['type'] = 'application/x-shockwave-flash';
+			$this->options['pluginspage']  = 'http://www.macromedia.com/go/getflashplayer';
+			$this->options['align'] = 'middle';
+			$this->options['quality'] = 'high';
 			
-			$this->SetWidth($width);
-			$this->SetHeight($height);
-			$this->SetSrc($src);
+			$this->options['width'] = $width;
+			$this->options['height'] = $height;
+			$this->options['src'] = $src;
 		}
 		function SetWidth($value)
 		{
-			if(is_null($value))
-				return $this->DelOption("width");
-			if(!is_numeric($value))
-				return $this->error("Incorrect value for SetWidth [$value]");
-
-			$this->AddOption("width",$value);
+			$this->options['width']  = $value;
 		}
 		function SetHeight($value)
 		{
-			if(is_null($value))
-				return $this->DelOption("height");
-			if(!is_numeric($value))
-				return $this->error("Incorrect value for SetHeight [$value]");
-
-			$this->AddOption("height",$value);
+			$this->options['height'] = $value;
 		}
 		function SetSrc($value)
 		{
-			if(is_null($value))
-				return $this->DelOption("src");
-			if(!is_string($value))
-				return $this->error("Incorrect value for SetSrc[$value]");
-
-			$this->AddOption("src",$value);
+			$this->options['src'] = $value;
 		}
 	}
 
-	class CParam extends CTag
+	/* private */ class CParam extends CTag
 	{
 		function CParam($name,$value)
 		{
 			parent::CTag("param","no");
-
-			$this->SetName($name);
-			$this->SetValue($value);
-		}
-		function SetName($value)
-		{
-			$this->AddOption("name",$value);
-		}
-		function SetValue($value)
-		{
-			$this->AddOption("value",$value);
+			$this->options['name'] = $name;
+			$this->options['value'] = $value;
 		}
 	}
 
-	class CFlash extends CTag
+	/* public */ class CFlash extends CTag
 	{
-		var $timetype;
+		var $SrcParam;
+		var $EmbededFlash;
+
 		function CFlash($src=NULL, $width = NULL, $height = NULL)
 		{
 			parent::CTag("object",'yes');
-			$this->AddOption("classid","clsid:d27cdb6e-ae6d-11cf-96b8-444553540000");
-			$this->AddOption("codebase","http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0");
-			$this->AddOption("align","middle");
+			$this->options['classid'] = 'clsid:d27cdb6e-ae6d-11cf-96b8-444553540000';
+			$this->options['codebase'] = 'http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0';
+			$this->options['align'] = 'middle';
 
 			$this->AddItem(new CParam("allowScriptAccess","sameDomain"));
 			$this->AddItem(new CParam("quality","high"));
-			$this->items["src"] = new CParam("movie",$src);
 
-			$this->items["embeded"] = new CFlashEmbed();
+			$this->SrcParam = new CParam("movie",$src);
+			$this->EmbededFlash = new CFlashEmbed();
 
 			$this->SetWidth($width);
 			$this->SetHeight($height);
@@ -104,33 +82,25 @@
 		}
 		function SetWidth($value)
 		{
-			if(is_null($value))
-				return $this->DelOption("width");
-			if(!is_numeric($value))
-				return $this->error("Incorrect value for SetWidth [$value]");
-
-			$this->AddOption("width",$value);
-			$this->items["embeded"]->SetWidth($value);
+			$this->options['width'] = $value;
+			$this->EmbededFlash->options['width'] = $value;
 		}
 		function SetHeight($value)
 		{
-			if(is_null($value))
-				return $this->DelOption("height");
-			if(!is_numeric($value))
-				return $this->error("Incorrect value for SetHeight [$value]");
-
-			$this->AddOption("height",$value);
-			$this->items["embeded"]->SetHeight($value);
+			$this->options['height'] = $value;
+			$this->EmbededFlash->options['height'] = $value;
 		}
 		function SetSrc($value)
 		{
-			if(is_null($value))
-				return $this->DelOption("src");
-			if(!is_string($value))
-				return $this->error("Incorrect value for SetSrc[$value]");
-
-			$this->items["src"]->SetValue($value);
-			$this->items["embeded"]->SetSrc($value);
+			$this->SrcParam->options['value'] = $value;
+			$this->EmbededFlash->options['src'] = $value;
+		}
+		function BodyToString()
+		{
+			$ret = parent::BodyToString();
+			$ret .= $this->SrcParam->ToString();
+			$ret .= $this->EmbededFlash->ToString();
+			return $ret;
 		}
 	}
 ?>

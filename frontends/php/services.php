@@ -122,7 +122,7 @@
 
 	$table = new CTableInfo();
 	$table->SetHeader(array(
-		array(new CCheckBox("all_services",NULL,NULL,
+		array(new CCheckBox("all_services",NULL,
 			"CheckAll('".$form->GetName()."','all_services');"),
 			S_ID),
 		S_SERVICE,
@@ -147,7 +147,7 @@
 
 			$table->AddRow(array(
 				array(
-					new CCheckBox("group_serviceid[]",NULL,NULL,NULL,$_REQUEST["serviceid"]),
+					new CCheckBox("group_serviceid[]",NULL,NULL,$_REQUEST["serviceid"]),
 					$_REQUEST["serviceid"]
 				),
 				new CLink(new CSpan($service["name"]." [$childs]","bold"),"services.php?serviceid=".$_REQUEST["parentid"]."#form"),
@@ -185,7 +185,7 @@
 
 		$parrent = get_request("serviceid",0);
 		$table->AddRow(array(
-			array(new CCheckBox("group_serviceid[]",NULL,NULL,NULL,$service["serviceid"]),$service["serviceid"]),
+			array(new CCheckBox("group_serviceid[]",NULL,NULL,$service["serviceid"]),$service["serviceid"]),
 			array($prefix, new CLink($service["name"]." [$childs]",
 				"services.php?serviceid=".$service["serviceid"]."&parentid=$parrent#form")),
 			algorithm2str($service["algorithm"]),
@@ -211,7 +211,7 @@
 
 		$table = new CTableInfo();
 		$table->SetHeader(array(
-				array(new CCheckBox("all_services",NULL,NULL,
+				array(new CCheckBox("all_services",NULL,
 					"CheckAll('".$form->GetName()."','all_services');"),
 					S_LINK),
 				S_SERVICE_1,
@@ -229,7 +229,7 @@
 		{
 			$table->AddRow(array(
 				array(
-					new CCheckBox("group_linkid[]",NULL,NULL,NULL,$row["linkid"]),
+					new CCheckBox("group_linkid[]",NULL,NULL,$row["linkid"]),
 					new CLink(S_LINK.SPACE.$i++,
 						"services.php?form=update&linkid=".$row["linkid"].url_param("serviceid"),
 						"action"),
@@ -295,14 +295,14 @@
 	$cmbAlg->AddItem(2,S_MIN_BIG);
 	$frmService->AddRow(S_STATUS_CALCULATION_ALGORITHM, $cmbAlg);
 
-	$frmService->AddRow(S_SHOW_SLA, new CCheckBox("showsla",$showsla,NULL,'submit();'));
+	$frmService->AddRow(S_SHOW_SLA, new CCheckBox("showsla",$showsla,'submit();'));
 
 	if($showsla)
 		$frmService->AddRow(S_ACCEPTABLE_SLA_IN_PERCENT,new CTextBox("goodsla",$goodsla,6));
 	else
 		$frmService->AddVar("goodsla",$goodsla);
 
-	$frmService->AddRow(S_LINK_TO_TRIGGER_Q, new CCheckBox("linktrigger",$linktrigger,NULL,"submit();"));
+	$frmService->AddRow(S_LINK_TO_TRIGGER_Q, new CCheckBox("linktrigger",$linktrigger,"submit();"));
 
 	if($linktrigger == 'yes')
 	{
@@ -312,7 +312,7 @@
 			$trigger = "";
 
 		$frmService->AddRow(S_TRIGGER,array(
-			new CTextBox("trigger",$trigger,32,NULL,'yes'),
+			new CTextBox("trigger",$trigger,32,'yes'),
 			new CButton("btn1",S_SELECT,
 				"return PopUp('popup.php?".
 				"dstfrm=".$frmService->GetName()."&dstfld1=triggerid&dstfld2=trigger".
@@ -371,7 +371,7 @@
 		$name = $service["name"];
 		if(isset($service["triggerid"]))
 			$name .= ": ".expand_trigger_description($service["triggerid"]);
-		$frmLink->AddRow(S_SERVICE_1, new CTextBox("service",$name,60,NULL,'yes'));
+		$frmLink->AddRow(S_SERVICE_1, new CTextBox("service",$name,60,'yes'));
 
 		$cmbServices = new CComboBox("servicedownid",$servicedownid);
 		$result=DBselect("select serviceid,triggerid,name from services where serviceid<>$serviceupid order by name");

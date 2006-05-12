@@ -24,70 +24,37 @@
 /* public */
 		function CButton($name="button", $caption="", $action=NULL, $accesskey=NULL)
 		{
-			parent::CTag("input","no");
-			$this->tag_body_start = "";
-			$this->AddOption("type","submit");
-//			$this->AddOption("type","button");
-			$this->SetClass("button");
+			parent::CTag('input','no');
+			$this->tag_body_start = '';
+			$this->options['type'] = 'submit';
+			$this->options['value'] = $caption;
+//			$this->options["type"] = "button";
+			$this->options['class'] = 'button';
 			$this->SetName($name);
-			$this->SetCaption($caption);
 			$this->SetAction($action);
 			$this->SetAccessKey($accesskey);
 		}
 		function SetAction($value='submit()', $event='onClick')
 		{
-			if(is_null($value))
-				return 1;
-			if(!is_string($value))
-				return $this->error("Incorrect value for SetAction [$value]");
-			if(!is_string($event))
-				return $this->error("Incorrect event for SetAction [$event]");
-			return $this->AddOption($event,$value);
+			$this->options[$event] = $value;
 		}
 		function SetTitle($value='button title')
 		{
-			if(!is_string($value))
-			{
-				return $this->error("Incorrect value for SetTitle [$value]");
-			}
-			return $this->AddOption("title",$value);
+			$this->options['title'] = $value;
 		}
 		function SetAccessKey($value='B')
 		{
-			if(is_null($value))
-				return 0;
-			elseif(!is_string($value))
-			{
-				return $this->error("Incorrect value for SetAccessKey [$value]");
-			}
+			if(!isset($this->options['title']))
+				$this->SetTitle($this->options['value'].' [Alt+$value]');
 
-			if($this->GetOption('title')==NULL)
-				$this->SetTitle($this->GetOption('value')." [Alt+$value]");
-
-			return $this->AddOption("accessKey",$value);
-		}
-		function SetName($value='button')
-		{
-			if(!is_string($value))
-			{
-				return $this->error("Incorrect value for SetName [$value]");
-			}
-			return $this->AddOption("name",$value);
-		}
-		function SetCaption($value="")
-		{
-			if(!is_string($value))
-			{
-				return $this->error("Incorrect value for SetCaption [$value]");
-			}
-			return $this->AddOption("value",$value);
+			return $this->options['accessKey'] = $value;
 		}
 	}
 
 	class CButtonCancel extends CButton
 	{
 		function CButtonCancel($vars=NULL){
-			parent::CButton("cancel",S_CANCEL);
+			parent::CButton('cancel',S_CANCEL);
 			$this->SetVars($vars);
 		}
 		function SetVars($value=NULL){

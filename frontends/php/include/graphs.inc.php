@@ -87,7 +87,7 @@
 			return	$row;
 		}
 		error("No graph with graphid=[$graphid]");
-		return	$result;
+		return	false;
 	}
 
 	function	get_graphs_by_templateid($templateid)
@@ -178,6 +178,10 @@
 		if($result)
 		{	
 			info("Graph '".$graph["name"]."' deleted");
+
+			// delete graph permisions
+			DBexecute('delete from rights where name=\'Graph\' and id='.$graphid);
+
 		}
 		return $result;
 	}

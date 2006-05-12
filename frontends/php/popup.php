@@ -99,6 +99,7 @@
 			$sql .= ",hosts_groups hg where h.hostid=hg.hostid and hg.groupid=$groupid";
 		else
 			$cmbHosts->AddItem(0,S_ALL_SMALL);
+
 		$first_hostid = 0;
 		$db_hosts = DBselect($sql);
 		while($host = DBfetch($db_hosts))
@@ -110,7 +111,6 @@
 		}
 		if(!isset($correct_host) && isset($groupid)){
 			$hostid = $first_hostid;
-			$cmbHosts->SetValue($hostid);
 		}
 		$frmTitle->AddItem(array(SPACE,S_HOST,SPACE,$cmbHosts));
 		update_profile("web.popup.hostid",$hostid);
@@ -119,8 +119,8 @@
 
 	if(in_array($srctbl,array("triggers","hosts")))
 	{
-		$btnEmpty = new CButton("empty",S_EMPTY,"window.opener.document.forms[\"$dstfrm\"].$dstfld1.value=\"0\";".
-			" window.opener.document.forms[\"$dstfrm\"].$dstfld2.value=\"\";".
+		$btnEmpty = new CButton("empty",S_EMPTY,"window.opener.document.forms['".$dstfrm."'].".$dstfld1.".value='0';".
+			" window.opener.document.forms['".$dstfrm."'].".$dstfld2.".value='';".
 			" window.close();");
 
 		$frmTitle->AddItem(array(SPACE,$btnEmpty));
@@ -145,8 +145,8 @@
 			if(!check_right("Host","R",$host["hostid"]))	continue;
 			$name = new CLink($host["host"],"#","action");
 			$name->SetAction(
-				"window.opener.document.forms[\"$dstfrm\"].$dstfld1.value=\"".$host[$srcfld1]."\";".
-				" window.opener.document.forms[\"$dstfrm\"].$dstfld2.value=\"".$host[$srcfld2]."\";".
+				"window.opener.document.forms['".$dstfrm."'].".$dstfld1.".value='".$host[$srcfld1]."';".
+				" window.opener.document.forms['".$dstfrm."'].".$dstfld2.".value='".$host[$srcfld2]."';".
 				" window.close();");
 
 			if($host["status"] == HOST_STATUS_MONITORED)	
@@ -207,8 +207,8 @@
 			$exp_desc = expand_trigger_description($row["triggerid"]);
 			$description = new CLink($exp_desc,"#","action");
 			$description->SetAction(
-				"window.opener.document.forms[\"$dstfrm\"].$dstfld1.value=\"".$row[$srcfld1]."\";".
-				" window.opener.document.forms[\"$dstfrm\"].$dstfld2.value=\"$exp_desc\";".
+				"window.opener.document.forms['".$dstfrm."'].".$dstfld1.".value='".$row[$srcfld1]."';".
+				" window.opener.document.forms['".$dstfrm."'].".$dstfld2.".value='".$exp_desc."';".
 				" window.close();");
 
 			//add dependences

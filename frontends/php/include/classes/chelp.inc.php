@@ -24,8 +24,9 @@
 /* public */
 		function CHelp($url="index.php")
 		{
-			parent::CLink(new CImg("images/general/help.gif",'?'), "http://www.zabbix.com/manual/v1.1/$url");
-			$this->AddOption("style","float:right");
+			parent::CLink(new CImg('images/general/help.gif','?'), 'http://www.zabbix.com/manual/v1.1/'.$url);
+			$this->options['style'] = 'float:right';
+			$this->options['target'] = '_blank';
 		}
 	}
 ?>

@@ -24,14 +24,14 @@
 /* public */
 		function CVar($name="",$value="0")
 		{
-			parent::CTag("input","no");
-			$this->AddOption("type","hidden");
-			$this->SetName($name);
-			$this->SetValue($value);
+			parent::CTag('input','no');
+			$this->options['type'] = 'hidden';
+			$this->options['name'] = $name;
+			$this->options['value'] = $value;
 		}
 		function SetValue($value)
 		{ 
-			return $this->AddOption("value",$value); 
+			$this->options['value'] = $value;
 		}
 	}
 ?>

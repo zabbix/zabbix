@@ -845,7 +845,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 	{
 		global $page;
 		global $USER_DETAILS;
-//COpt::profiling_start("page");
+COpt::profiling_start("page");
 
 		if($noauth==0)
 		{
@@ -1471,6 +1471,9 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 		delete_rights_by_userid($userid);
 		delete_profiles_by_userid($userid);
 
+	// delete user permisions
+		DBexecute('delete from rights where name=\'User\' and id='.$userid);
+
 		$sql="delete from users_groups where userid=$userid";
 		DBexecute($sql);
 		$sql="delete from users where userid=$userid";
@@ -1699,7 +1702,8 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 			));
 		$table->Show();
 
-		COpt::profiling_stop("page");
+COpt::profiling_stop("page");
+COpt::profiling_stop("script");
 
 		echo "</body>\n";
 		echo "</html>\n";
@@ -1968,10 +1972,10 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 		{
 			if(isset($id)&&($id!=0))
 			{
-				$host=get_graph_by_graphid($id);
-				$res=$host["name"];
+				if($graph=get_graph_by_graphid($id))
+					$res=$graph["name"];
 			}
-			else
+			elseif(!isset($id) || $id == 0)
 			{
 				$res="All graphs";
 			}
@@ -1980,10 +1984,10 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 		{
 			if(isset($id)&&($id!=0))
 			{
-				$host=get_host_by_hostid($id);
-				$res=$host["host"];
+				if($host=get_host_by_hostid($id))
+					$res=$host["host"];
 			}
-			else
+			elseif(!isset($id) || $id == 0)
 			{
 				$res="All hosts";
 			}
@@ -1992,23 +1996,23 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 		{
 			if(isset($id)&&($id!=0))
 			{
-				$screen=get_screen_by_screenid($id);
-				$res=$screen["name"];
+				if($screen=get_screen_by_screenid($id))
+					$res=$screen["name"];
 			}
-			else
+			elseif(!isset($id) || $id == 0)
 			{
-				$res="All hosts";
+				$res="All screens";
 			}
 		}
 		else if($permission=="Item")
 		{
 			if(isset($id)&&($id!=0))
 			{
-				$item=get_item_by_itemid($id);
-				$host=get_host_by_hostid($item["hostid"]);
-				$res=$host["host"].":".$item["description"];
+				if($item=get_item_by_itemid($id))
+					if($host=get_host_by_hostid($item["hostid"]))
+						$res=$host["host"].":".$item["description"];
 			}
-			else
+			elseif(!isset($id) || $id == 0)
 			{
 				$res="All items";
 			}
@@ -2017,10 +2021,10 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 		{
 			if(isset($id)&&($id!=0))
 			{
-				$user=get_user_by_userid($id);
-				$res=$user["alias"];
+				if($user=get_user_by_userid($id))
+					$res=$user["alias"];
 			}
-			else
+			elseif(!isset($id) || $id == 0)
 			{
 				$res="All users";
 			}
@@ -2029,26 +2033,42 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 		{
 			if(isset($id)&&($id!=0))
 			{
-				$user=get_map_by_sysmapid($id);
-				$res=$user["name"];
+				if($user=get_sysmap_by_sysmapid($id))
+					$res=$user["name"];
 			}
-			else
+			elseif(!isset($id) || $id == 0)
 			{
 				$res="All maps";
 			}
 		}
 		else if($permission=="Application")
 		{
-			if(isset($id)&&($id!=0))
+			if(isset($id)&&($id > 0))
 			{
-				$app = get_application_by_applicationid($id);
-				$res = $app["name"];
+				if($app = get_application_by_applicationid($id))
+					$res = $app["name"];
 			}
-			else
+			elseif(!isset($id) || $id == 0)
 			{
 				$res="All applications";
 			}
 		}
+		else if($permission=="Service")
+		{
+			if(isset($id)&&($id > 0))
+			{
+				if($service = get_service_by_serviceid($id))
+					$res = $service["name"];
+			}
+			elseif(!isset($id) || $id == 0)
+			{
+				$res="All services";
+			}
+		}
+
+		if($res == '-' && isset($id) && ($id > 0))
+			$res = $id;
+
 		return $res;
 	}
 

@@ -1,5 +1,14 @@
 Changes for 1.1beta10:
 
+ - speed improvement for Overview screens (Eugene)
+ - developed 'net.if.total[*]' parameter (Eugene)
+ - fixed new map link adding (Eugene)
+ - fixed host group adding (Eugene)
+ - fixed map displaying (Eugene)
+ - fixed 'No permissions' for 'Latest data','Triggers','Alarms' screens (Eugene)
+ - fixed permision deletion (Eugene)
+ - fixed 'get_map_by_sysmapid' function calls(Eugene)
+ - improved php code execution speed (Eugene)
  - fixed zabbix_sender for sending values from a file (Alexei)
  - integer values will not be treated a sunsupported for items having type float (Alexei)
  - fixed is_double() (Alexei)

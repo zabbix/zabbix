@@ -56,7 +56,7 @@
 ?>
 
 <?php
-        if(!check_right("Host","R",$_REQUEST["hostid"]))
+        if($_REQUEST["hostid"] > 0 && !check_right("Host","R",$_REQUEST["hostid"]))
         {
                 show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
                 show_page_footer();
@@ -165,10 +165,11 @@
 
 <?php
 	$table=new CTableInfo();
-	$header=array(
+	$table->SetHeader(array(
 		$_REQUEST["hostid"] ==0 ? S_HOST : NULL,
-		S_DESCRIPTION,S_LAST_CHECK,S_LAST_VALUE,S_CHANGE,S_HISTORY);
-	$table->SetHeader($header);
+		S_DESCRIPTION,S_LAST_CHECK,S_LAST_VALUE,S_CHANGE,S_HISTORY));
+	$table->ShowStart();
+	$table->ShowBody();
 
 	if($_REQUEST["select"] != "")
 		$compare_description = " and i.description like ".zbx_dbstr("%".$_REQUEST["select"]."%");
@@ -179,6 +180,8 @@
 		$compare_host = " and h.hostid=".$_REQUEST["hostid"];
 	else
 		$compare_host = "";
+
+	$any_app_exist = false;
 
 	$db_applications = DBselect("select h.host,h.hostid,a.* from applications a,hosts h where a.hostid=h.hostid".$compare_host.
 		" order by a.name,a.applicationid,h.host");
@@ -193,8 +196,8 @@
 			" order by i.description";
 
 		$db_items = DBselect($sql);
-
-		$currAppID = -1;
+		$app_rows = array();
+		$item_cnt = 0;
 		while($db_item = DBfetch($db_items))
 		{
 			if(!check_right("Item","R",$db_item["itemid"]))
@@ -205,30 +208,9 @@
 			{
 				continue;
 			}
-		
-			if($currAppID != $db_app["applicationid"])
-			{
-				$currAppID = $db_app["applicationid"];
 
-				if(in_array($db_app["applicationid"],$_REQUEST["applications"]))
-					$link = new CLink(new CImg("images/general/opened.gif"),
-						"latest.php?close=1&applicationid=".$db_app["applicationid"].
-						url_param("groupid").url_param("hostid").url_param("applications").
-						url_param("select"));
-				else
-					$link = new CLink(new CImg("images/general/closed.gif"),
-						"latest.php?open=1&applicationid=".$db_app["applicationid"].
-						url_param("groupid").url_param("hostid").url_param("applications").
-						url_param("select"));
-
-				$col = new CCol(array($link,SPACE,bold($db_app["name"]),
-					SPACE."(".DBnum_rows($db_items).SPACE.S_ITEMS.")"));
-				$col->SetColSpan(5);
-
-				$table->AddRow(array($_REQUEST["hostid"] > 0 ? NULL : $db_app["host"], $col));
-
-				if(!in_array($db_app["applicationid"],$_REQUEST["applications"])) break;
-			}
+			++$item_cnt;
+			if(!in_array($db_app["applicationid"],$_REQUEST["applications"])) continue;
 
 			if(isset($db_item["lastclock"]))
 				$lastclock=date(S_DATE_FORMAT_YMDHMS,$db_item["lastclock"]);
@@ -279,30 +261,48 @@
 				$actions=new CLink(S_HISTORY,"history.php?action=showvalues&period=3600&itemid=".$db_item["itemid"],"action");
 			}
 
-			$table->AddRow(array(
+			array_push($app_rows, new CRow(array(
 				$_REQUEST["hostid"] > 0 ? NULL : SPACE,
 				str_repeat(SPACE,6).item_description($db_item["description"],$db_item["key_"]),
 				$lastclock,
 				$lastvalue,
 				$change,
 				$actions
-				));
+				)));
 		}
+		if($item_cnt > 0)
+		{
+			if(in_array($db_app["applicationid"],$_REQUEST["applications"]))
+				$link = new CLink(new CImg("images/general/opened.gif"),
+					"latest.php?close=1&applicationid=".$db_app["applicationid"].
+					url_param("groupid").url_param("hostid").url_param("applications").
+					url_param("select"));
+			else
+				$link = new CLink(new CImg("images/general/closed.gif"),
+					"latest.php?open=1&applicationid=".$db_app["applicationid"].
+					url_param("groupid").url_param("hostid").url_param("applications").
+					url_param("select"));
 
+			$col = new CCol(array($link,SPACE,bold($db_app["name"]),
+				SPACE."(".$item_cnt.SPACE.S_ITEMS.")"));
+			$col->SetColSpan(5);
+
+			$table->ShowRow(array($_REQUEST["hostid"] > 0 ? NULL : $db_app["host"], $col));
+
+			$any_app_exist = true;
+		
+			foreach($app_rows as $row)
+				$table->ShowRow($row);
+		}
 	}
-
-	$show_group_other = $table->GetNumRows() > 0 ? TRUE : FALSE;
-	$space = "";
-
 	$sql="select h.host,h.hostid,i.* from hosts h, items i LEFT JOIN items_applications ia ON ia.itemid=i.itemid".
 		" where ia.itemid is NULL and h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and i.status=".ITEM_STATUS_ACTIVE.
 		$compare_description.$compare_host.
 		" order by i.description,h.host";
-
 	$db_items = DBselect($sql);
 
-	$currAppID = -1;
-	$appID = 0;
+	$app_rows = array();
+	$item_cnt = 0;
 	while($db_item = DBfetch($db_items))
 	{
 		if(!check_right("Host","R",$db_item["hostid"]))
@@ -313,30 +313,10 @@
 		{
 			continue;
 		}
-		if($currAppID != $appID && $show_group_other)
-		{
-			$currAppID = $appID;
 
-			if(in_array($appID,$_REQUEST["applications"]))
-				$link = new CLink(new CImg("images/general/opened.gif"),
-					"latest.php?close=1&applicationid=".$appID.
-					url_param("groupid").url_param("hostid").url_param("applications").
-					url_param("select"));
-			else
-				$link = new CLink(new CImg("images/general/closed.gif"),
-					"latest.php?open=1&applicationid=".$appID.
-					url_param("groupid").url_param("hostid").url_param("applications").
-					url_param("select"));
+		++$item_cnt;
+		if(!in_array(0,$_REQUEST["applications"]) && $any_app_exist) continue;
 
-			$col = new CCol(array($link,SPACE,bold(S_MINUS_OTHER_MINUS),
-				SPACE."(".DBnum_rows($db_items).SPACE.S_ITEMS.")"));
-			$col->SetColSpan(5);
-
-			$table->AddRow(array($_REQUEST["hostid"] > 0 ? NULL : SPACE, $col));
-
-			if(!in_array($appID,$_REQUEST["applications"])) break;
-			$space = str_repeat(SPACE,6); 
-		}
 
 		if(isset($db_item["lastclock"]))
 			$lastclock=date(S_DATE_FORMAT_YMDHMS,$db_item["lastclock"]);
@@ -387,16 +367,42 @@
 			$actions=new CLink(S_HISTORY,"history.php?action=showvalues&period=3600&itemid=".$db_item["itemid"],"action");
 		}
 
-		$table->AddRow(array(
+		array_push($app_rows, new CRow(array(
 			$_REQUEST["hostid"] > 0 ? NULL : $db_item["host"],
-			$space.item_description($db_item["description"],$db_item["key_"]),
+			str_repeat(SPACE, ($any_app_exist ? 6 : 0)).item_description($db_item["description"],$db_item["key_"]),
 			$lastclock,
 			$lastvalue,
 			$change,
 			$actions
-			));
+			)));
 	}
-	$table->show();
+
+	if($item_cnt > 0)
+	{
+		if($any_app_exist)
+		{
+			if(in_array(0,$_REQUEST["applications"]))
+				$link = new CLink(new CImg("images/general/opened.gif"),
+					"latest.php?close=1&applicationid=0".
+					url_param("groupid").url_param("hostid").url_param("applications").
+					url_param("select"));
+			else
+				$link = new CLink(new CImg("images/general/closed.gif"),
+					"latest.php?open=1&applicationid=0".
+					url_param("groupid").url_param("hostid").url_param("applications").
+					url_param("select"));
+
+			$col = new CCol(array($link,SPACE,bold(S_MINUS_OTHER_MINUS),
+				SPACE."(".$item_cnt.SPACE.S_ITEMS.")"));
+			$col->SetColSpan(5);
+
+			$table->ShowRow(array($_REQUEST["hostid"] > 0 ? NULL : SPACE, $col));
+		}	
+		foreach($app_rows as $row)
+			$table->ShowRow($row);
+	}
+
+	$table->ShowEnd();
 ?>
 
 <?php

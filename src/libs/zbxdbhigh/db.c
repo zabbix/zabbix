@@ -236,8 +236,8 @@ DB_RESULT DBselect(char *query)
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s [%d]", mysql_error(&mysql), mysql_errno(&mysql) );
 
 		if( (ER_SERVER_SHUTDOWN   != mysql_errno(&mysql)) && 
-            (CR_SERVER_GONE_ERROR != mysql_errno(&mysql)) &&
-            (CR_CONNECTION_ERROR  != mysql_errno(&mysql)))
+		    (CR_SERVER_GONE_ERROR != mysql_errno(&mysql)) &&
+		    (CR_CONNECTION_ERROR  != mysql_errno(&mysql)))
 		{
 			exit(FAIL);
 		}

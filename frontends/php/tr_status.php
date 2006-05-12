@@ -103,7 +103,7 @@
 		show_page_footer();
 		exit;
 	}
-	if(!check_right("Host","R",$_REQUEST["hostid"]))
+	if($_REQUEST["hostid"] > 0 && !check_right("Host","R",$_REQUEST["hostid"]))
 	{
 		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
 		show_page_footer();

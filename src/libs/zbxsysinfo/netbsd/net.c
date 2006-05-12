@@ -42,6 +42,16 @@ int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 	return SYSINFO_RET_FAIL;
 }
 
+int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+
+        assert(result);
+
+        init_result(result);
+	
+	return SYSINFO_RET_FAIL;
+}
+
 int     NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
         assert(result);

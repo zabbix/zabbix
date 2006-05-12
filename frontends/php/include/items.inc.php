@@ -483,6 +483,9 @@
 		$result = DBexecute("delete from items where itemid=$itemid");
 		if($result)
 		{
+		// delete item permisions
+			DBexecute('delete from rights where name=\'Item\' and id='.$itemid);
+
 			info("Item '".$host["host"].":".$item["key_"]."' deleted");
 		}
 		return $result;
@@ -537,79 +540,76 @@
 			$group_where = " where";
 		}
 
-		$header=array(new CCol(S_ITEMS,"center"));
+COpt::profiling_start('prepare data');
+		$result = DBselect('select distinct h.hostid, h.host,i.itemid, i.value_type, i.lastvalue, i.units, i.description'.
+			' from hosts h,items i '.$group_where.
+			' h.status='.HOST_STATUS_MONITORED.' and h.hostid=i.hostid and i.status='.ITEM_STATUS_ACTIVE.
+			' order by i.description');
 
-		$hosts=array();
-		$result=DBselect("select distinct h.hostid,h.host from hosts h,items i $group_where".
-			" h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and i.status=".ITEM_STATUS_ACTIVE.
-			" group by h.host,h.hostid order by h.host");
-		while($row=DBfetch($result))
+		unset($items);
+		unset($hosts);
+		while($row = DBfetch($result))
 		{
-			if(!check_right("Host","R",$row["hostid"])) continue;
+			if(!check_right("Item","R",$row["itemid"])) continue;
+			if(!check_right('Host','R',$row['hostid'])) continue;
 
-			array_push($header,new CImg("vtext.php?text=".$row["host"]));
-			array_push($hosts,$row["hostid"]);
-		}
-		$table->SetHeader($header,"vertical_header");
+			$access = 1;
+			$db_applications = get_applications_by_itemid($row["itemid"]);
 
-		$db_items = DBselect("select distinct i.description from hosts h,items i $group_where".
-			" h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and i.status=".ITEM_STATUS_ACTIVE.
-			" order by 1");
-		while($item = DBfetch($db_items))
-		{
-			$table_row = array(nbsp($item["description"]));
-			$hosts_added = 0;
-			foreach($hosts as $hostid)
+			while($db_app = DBfetch($db_applications))
 			{
-				$db_host_items = DBselect("select itemid,value_type,lastvalue,units from items where".
-					" hostid=$hostid and status=".ITEM_STATUS_ACTIVE." and description=".zbx_dbstr($item["description"]));
-				$host_item = DBfetch($db_host_items);
-				if(!$host_item)
+				if(check_right("Application","R",$db_app["applicationid"]))
 				{
-					array_push($table_row,"-");
-					continue;
+					$access = 1;
+					break;
 				}
-
-				if(!check_right("Item","R",$host_item["itemid"])) continue;
-
 				$access = 0;
-				$db_applications = get_applications_by_itemid($host_item["itemid"]);
-				while($db_app = DBfetch($db_applications))
-				{
-					if(!check_right("Application","R",$db_app["applicationid"]))
-						$access |= 1;
-					else
-						$access |= 2;
-				}
-				if($access == 1) 
-				{
-					array_push($table_row,"-");
-					continue;
-				}
-
-				$hosts_added++; // exist item in host
-
-				if(!isset($host_item["lastvalue"]))
-				{
-					array_push($table_row,"-");
-					continue;
-				}
-				$db_item_triggers = DBselect("select t.triggerid from triggers t, items i, functions f where".
-					" i.hostid=$hostid and i.itemid=".$host_item["itemid"]." and i.itemid=f.itemid".
-					" and t.priority>1 and t.triggerid=f.triggerid and t.value=".TRIGGER_VALUE_TRUE);
-				if(DBfetch($db_item_triggers))		$style = "high";
-				else						$style = NULL;
-
-				if($host_item["value_type"] == 0)
-					$value = convert_units($host_item["lastvalue"],$host_item["units"]);
-				else
-					$value = htmlspecialchars(substr($host_item["lastvalue"],0,20)." ...");
-
-				array_push($table_row,new CCol(nbsp($value),$style));
 			}
+			if($access == 0) continue;
 
-			if($hosts_added > 0) $table->AddRow($table_row);
+			$hosts[$row['host']] = $row['host'];
+			$items[$row['description']][$row['host']] = array(
+				'itemid'	=> $row['itemid'],
+				'value_type'	=> $row['value_type'],
+				'lastvalue'	=> $row['lastvalue'],
+				'units'		=> $row['units'],
+				'description'	=> $row['description']);
 		}
+		sort($hosts);
+COpt::profiling_stop('prepare data');
+COpt::profiling_start('prepare table');
+		$header=array(new CCol(S_TRIGGERS,'center'));
+		foreach($hosts as $hostname)
+		{
+			$header=array_merge($header,array(new CImg('vtext.php?text='.$hostname)));
+		}
+		$table->SetHeader($header,'vertical_header');
+		$curr_rime = time();
+		foreach($items as $descr => $ithosts)
+		{
+			$table_row = array(nbsp($descr));
+			foreach($hosts as $hostname)
+			{
+				$style = NULL;
+				$value = '-';
+				if(isset($ithosts[$hostname]))
+				{
+					$db_item_triggers = DBselect('select t.triggerid from triggers t, items i, functions f where'.
+						' i.itemid='.$ithosts[$hostname]['itemid'].' and i.itemid=f.itemid'.
+						' and t.priority>1 and t.triggerid=f.triggerid and t.value='.TRIGGER_VALUE_TRUE);
+					if(DBfetch($db_item_triggers))	$style = "high";
+
+					if($ithosts[$hostname]["value_type"] == 0)
+						$value = convert_units($ithosts[$hostname]["lastvalue"],$ithosts[$hostname]["units"]);
+					else
+						$value = htmlspecialchars(substr($ithosts[$hostname]["lastvalue"],0,20)." ...");
+				}
+				array_push($table_row,new CCol($value,$style));
+			}
+			$table->AddRow($table_row);
+		}
+COpt::profiling_stop('prepare table');
+
 		return $table;
 	}
 

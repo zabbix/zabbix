@@ -383,6 +383,155 @@ NET_FNCLIST
         return SYSINFO_RET_FAIL;
 }
 
+static int      NET_IF_TOTAL_BYTES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	struct ifnet value;
+	char    interface[MAX_STRING_LEN];
+	int     ret = SYSINFO_RET_FAIL;
+
+	assert(result);
+
+	init_result(result);
+
+	if(num_param(param) > 1)
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	ret = get_ifdata(interface, &value);
+	
+	if(ret == SYSINFO_RET_OK)
+	{
+		SET_UI64_RESULT(result, value.if_obytes + value.if_ibytes);
+		ret = SYSINFO_RET_OK;
+	}
+	
+	return ret;
+}
+
+static int      NET_IF_TOTAL_PACKETS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	struct ifnet value;
+	char    interface[MAX_STRING_LEN];
+	int     ret = SYSINFO_RET_FAIL;
+
+	assert(result);
+
+	init_result(result);
+
+	if(num_param(param) > 1)
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	ret = get_ifdata(interface, &value);
+	
+	if(ret == SYSINFO_RET_OK)
+	{
+		SET_UI64_RESULT(result, value.if_opackets + value.if_ipackets);
+		ret = SYSINFO_RET_OK;
+	}
+	
+	return ret;
+}
+
+static int      NET_IF_TOTAL_ERRORS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	struct ifnet value;
+	char    interface[MAX_STRING_LEN];
+	int     ret = SYSINFO_RET_FAIL;
+
+	assert(result);
+
+	init_result(result);
+
+	if(num_param(param) > 1)
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	ret = get_ifdata(interface, &value);
+	
+	if(ret == SYSINFO_RET_OK)
+	{
+		SET_UI64_RESULT(result, value.if_oerrors + value.if_ierrors);
+		ret = SYSINFO_RET_OK;
+	}
+	
+	return ret;
+}
+
+int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+#define NET_FNCLIST struct net_fnclist_s
+NET_FNCLIST
+{
+        char *mode;
+        int (*function)();
+};
+
+        NET_FNCLIST fl[] =
+        {
+                {"bytes",   NET_IF_TOTAL_BYTES},
+                {"packets", NET_IF_TOTAL_PACKETS},
+                {"errors",  NET_IF_TOTAL_ERRORS},
+                {0,         0}
+        };
+
+        char interface[MAX_STRING_LEN];
+        char mode[MAX_STRING_LEN];
+        int i;
+
+        assert(result);
+
+        init_result(result);
+
+        if(num_param(param) > 2)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+
+        if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+
+        if(get_param(param, 2, mode, MAX_STRING_LEN) != 0)
+        {
+                mode[0] = '\0';
+        }
+        if(mode[0] == '\0')
+        {
+                /* default parameter */
+                sprintf(mode, "bytes");
+        }
+
+        for(i=0; fl[i].mode!=0; i++)
+        {
+                if(strncmp(mode, fl[i].mode, MAX_STRING_LEN)==0)
+                {
+                        return (fl[i].function)(cmd, interface, flags, result);
+                }
+        }
+
+        return SYSINFO_RET_FAIL;
+}
+
 int     NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
         assert(result);

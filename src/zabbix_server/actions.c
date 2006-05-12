@@ -401,6 +401,7 @@ static int get_next_command(char** command_list, char** alias, int* is_group, ch
 		{
 			run_remote_command(alias, command);
 		}
+//		DBadd_alert(action->actionid,trigger->triggerid, userid, media.mediatypeid,media.sendto,action->subject,action->scripts, action->maxrepeats, action->repeatdelay); // TODO !!! Add alert for remote commands !!!
 	}
 	zabbix_log( LOG_LEVEL_DEBUG, "Run remote commands END");
 }
@@ -697,7 +698,6 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 
 		if(check_action_conditions(trigger, alarmid, trigger_value, action.actionid) == SUCCEED)
 		{
-			action.actiontype=atoi(row[9]);
 			action.userid=atoi(row[1]);
 			action.delay=atoi(row[2]);
 			
@@ -710,6 +710,7 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 			action.maxrepeats=atoi(row[6]);
 			action.repeatdelay=atoi(row[7]);
 			strscpy(action.scripts,row[8]);
+			action.actiontype=atoi(row[9]);
 
 			if(action.actiontype == ACTION_TYPE_MESSAGE)
 				send_to_user(trigger,&action);

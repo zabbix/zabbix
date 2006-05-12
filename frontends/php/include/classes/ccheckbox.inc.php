@@ -22,66 +22,27 @@
 	class CCheckBox extends CTag
 	{
 /* public */
-		function CCheckBox($name='checkbox',$checked='no',$caption=NULL,$action=NULL,$value='yes')
+		function CCheckBox($name='checkbox',$checked='no',$action=NULL,$value='yes')
 		{
-			parent::CTag("input","no");
-			$this->tag_body_start = "";
-			$this->AddOption('type','checkbox');
-			$this->AddOption('value','yes');
-			$this->SetName($name);
-			$this->SetCaption($caption);
+			parent::CTag('input','no');
+			$this->tag_body_start = '';
+			$this->options['type'] = 'checkbox';
+			$this->options['value'] = $value;
+			$this->options['name'] = $name;
+			$this->options['onClick'] = $action;
 			$this->SetChecked($checked);
-			$this->SetAction($action);
-			$this->SetValue($value);
-		}
-		function SetName($value='checkbox')
-		{
-			if(!is_string($value))
-			{
-				return $this->error("Incorrect value for SetName [$value]");
-			}
-			return $this->AddOption("name",$value);
-		}
-		function SetCaption($value=NULL)
-		{
-			if(is_null($value))
-				return 0;
-			elseif(is_string($value))	
-				return $this->AddItem(nbsp($value));
-			return $this->error("Incorrect value for SetCaption [$value]");
-		}
-		function SetValue($value=NULL)
-		{
-			if(is_null($value))
-				return $this->DelOption("value");
-			elseif(is_string($value) || is_numeric($value))	
-				return $this->AddOption('value',$value);
-			return $this->error("Incorrect value for SetValue [$value]");
 		}
 		function SetChecked($value="yes")
 		{
-			if(is_null($value)){
-				return 0;
-			}elseif((is_string($value)&&
-					($value=="yes" || $value=="checked" || $value=="on") || $value=="1")
-				|| (is_int($value)&&$value<>0)){
-				return $this->AddOption("checked","checked");
-			}elseif((is_string($value)&&
-					($value=="no" || $value=="unchecked" || $value=="off" || $value=="0"))
-				|| (is_int($value)&&$value==0)){
-				return $this->DelOption("checked");
-			}
-			return $this->error("Incorrect value for SetChacked [$value]");
+			if((is_string($value)&& ($value=="yes" || $value=="checked" || $value=="on") || $value=="1")
+			|| (is_int($value)&&$value<>0))
+				return $this->options['checked'] = 'checked';
+
+			$this->DelOption("checked");
 		}
 		function SetAction($value='submit()', $event='onClick')
 		{
-			if(is_null($value))
-				return 1;
-			if(!is_string($value))
-				return $this->error("Incorrect value for SetAction [$value]");
-			if(!is_string($event))
-				return $this->error("Incorrect event for SetAction [$event]");
-			return $this->AddOption($event,$value);
+			$this->options[$event] = $value;
 		}
 	}
 ?>

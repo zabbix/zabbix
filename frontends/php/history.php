@@ -170,7 +170,7 @@
 				new CButton("add_log","Add","return PopUp('popup.php?".
 					"dstfrm=".$l_header->GetName()."&srctbl=logitems','new_win',".
 					"'width=600,height=450,resizable=1,scrollbars=1');"),SPACE,
-				$cmbLogList->GetItemsCount() > 1 ? new CButton("remove_log","Remove selected") : NULL
+				$cmbLogList->ItemsCount() > 1 ? new CButton("remove_log","Remove selected") : NULL
 				));
 		}
 		else
@@ -338,14 +338,13 @@
 
 			if(!isset($_REQUEST["plaintext"]))
 			{
-				$tbl_msg = DBnum_rows($result) > 1 ? NULL : "...";
-				$table = new CTableInfo($tbl_msg,"log_history_table");
+				$table = new CTableInfo('...','log_history_table');
 				$table->SetHeader(array(S_TIMESTAMP,
 					$item_cout > 1 ? S_ITEM : NULL,
 					S_LOCAL_TIME,S_SOURCE,S_SEVERITY,S_VALUE),"header");
 
-				$table->ShowTagStart(); // to solve memory leak we call 'Show' method by steps
-				$table->ShowTagBody();	// to solve memory leak we call 'Show' method by steps
+				$table->ShowStart(); // to solve memory leak we call 'Show' method by steps
+				$table->ShowBody();	// to solve memory leak we call 'Show' method by steps
 			}
 			else
 			{
@@ -406,9 +405,9 @@
 				if($severity==0)         $severity = S_NOT_CLASSIFIED;
 				elseif($severity==1)     $severity = S_INFORMATION;
 				elseif($severity==2)     $severity = S_WARNING;
-				elseif($severity==3)     $severity = new CSpan(S_AVERAGE,"average");
-				elseif($severity==4)     $severity = new CSpan(S_HIGH,"high");
-				elseif($severity==5)     $severity = new CSpan(S_DISASTER,"disaster");
+				elseif($severity==3)     $severity = new CCol(S_AVERAGE,"average");
+				elseif($severity==4)     $severity = new CCol(S_HIGH,"high");
+				elseif($severity==5)     $severity = new CCol(S_DISASTER,"disaster");
 				elseif($severity==6)     $severity = S_AUDIT_SUCCESS;
 				elseif($severity==7)     $severity = S_AUDIT_FAILURE;
 				else                     $severity = $row["priority"];
@@ -419,7 +418,9 @@
 
 				if(!isset($_REQUEST["plaintext"]))
 				{
+
 					$crow = new CRow($new_row); 
+
 					if(is_null($color_style) && is_array($_REQUEST["itemid"]))
 					{
 						$min_color = 0x98;
@@ -441,7 +442,7 @@
 				}
 			}
 			if(!isset($_REQUEST["plaintext"]))
-				$table->ShowTagEnd();	// to solve memory leak we call 'Show' method by steps
+				$table->ShowEnd();	// to solve memory leak we call 'Show' method by steps
 			else
 				echo "</PRE>";
 		}
@@ -460,22 +461,21 @@
 			$result=DBselect($sql);
 			if(!isset($_REQUEST["plaintext"]))
 			{
-				$tbl_msg = DBnum_rows($result) > 1 ? NULL : "...";
-				$table = new CTableInfo($tbl_msg);
+				$table = new CTableInfo();
+				$table->ShowStart(); // to solve memory leak we call 'Show' method by steps
+
 				$table->SetHeader(array(S_TIMESTAMP, S_VALUE));
 
-				$table->ShowTagStart(); // to solve memory leak we call 'Show' method by steps
-				$table->ShowTagBody();	// to solve memory leak we call 'Show' method by steps
+				$table->ShowBody();	// to show Header
 			}
 			else
 			{
 				echo "<PRE>\n";
 			}
 
-			$i=0;
+COpt::profiling_start("history");
 			while($row=DBfetch($result))
 			{
-
 				$value = replace_value_by_map($row["value"], $row["valuemapid"]);
 
 				$new_row = array(date("Y.M.d H:i:s",$row["clock"]));
@@ -489,13 +489,7 @@
 				}
 				if(!isset($_REQUEST["plaintext"]))
 				{
-					$crow = new CRow($new_row,
-						($i % 2) != 0 ?
-							$table->evenRowClass :
-							$table->oddRowClass
-						); 
-					$crow->Show();
-					$i++;
+					$table->ShowRow($new_row);
 				}
 				else
 				{
@@ -504,9 +498,10 @@
 				}
 			}
 			if(!isset($_REQUEST["plaintext"]))
-				$table->ShowTagEnd();	// to solve memory leak we call 'Show' method by steps
+				$table->ShowEnd();	// to solve memory leak we call 'Show' method by steps
 			else
 				echo "</PRE>";
+COpt::profiling_stop("history");
 		}
 	}
 

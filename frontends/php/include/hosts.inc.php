@@ -303,6 +303,9 @@
 	// delete host profile
 		delete_host_profile($hostid);
 
+	// delete host permisions
+		DBexecute('delete from rights where name=\'Host\' and id='.$hostid);
+
 	// delete host
 		return DBexecute("delete from hosts where hostid=$hostid");
 	}
@@ -654,6 +657,9 @@
 		$result = DBexecute("delete from applications where applicationid=$applicationid");
 		if($result)
 		{
+		// delete application permisions
+			DBexecute('delete from rights where name=\'Application\' and id='.$applicationid);
+
 			info("Application '".$host["host"].":".$app["name"]."' deleted");
 		}
 		return $result;

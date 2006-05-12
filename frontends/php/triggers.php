@@ -269,7 +269,7 @@
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
 		$table->setHeader(array(
 			$_REQUEST["hostid"] > 0 ? NULL : S_HOST,
-			array(	new CCheckBox("all_triggers",NULL,NULL,
+			array(	new CCheckBox("all_triggers",NULL,
 					"CheckAll('".$form->GetName()."','all_triggers');")
 				,S_NAME
 			),
@@ -296,7 +296,6 @@
 				new CCheckBox(
 					"g_triggerid[]",	/* name */
 					NULL,			/* checked */
-					NULL,			/* caption */
 					NULL,			/* action */
 					$row["triggerid"]),	/* value */
 				SPACE

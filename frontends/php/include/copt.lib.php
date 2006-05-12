@@ -86,40 +86,121 @@
 	**     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
 	**/
 	
-	define("USE_PROFILING",1);
+//	define("USE_PROFILING",1);
+	define("USE_TIME_PROF",1);
+	define("USE_MEM_PROF",1);
+	define("USE_SQLREQUEST_PROF",1);
+//	define("SHOW_SQLREQUEST_DETAILS",1);
 
 if(defined('USE_PROFILING'))
 {
-	$starttime[]=array();
+	$starttime=array();
+	$memorystamp=array();
+	$sqlrequests=array();
+	$sqlmark = array();
 
 	class COpt
 	{
 		/* protected static $starttime[]=array(); */
 
+
 		/* protected static */ function getmicrotime()
 		{
-			list($usec, $sec) = explode(" ",microtime());
+			list($usec, $sec) = explode(' ',microtime());
 			return ((float)$usec + (float)$sec);
 		}
+
+		/* protected static */ function getmemoryusage()
+		{
+			return memory_get_usage('memory_limit');
+		}
+
+		/* protected static */ function mem2str($size)
+		{
+			$prefix = 'B';
+			if($size > 1048576) {	$size = $size/1048576;	$prefix = 'M'; }
+			elseif($size > 1024) {	$size = $size/1024;	$prefix = 'K'; }
+			return round($size, 6).$prefix;
+		}
+
 		/* public static */ function profiling_start($type=NULL)
 		{
 			global $starttime;
-			if(is_null($type)) $type="global";
+			global $memorystamp;
+			global $sqlmark;
+			global $sqlrequests;
 
+			if(is_null($type)) $type='global';
+
+if(defined('USE_TIME_PROF'))
+{
 			$starttime[$type] = COpt::getmicrotime();
+}
+if(defined('USE_MEM_PROF'))
+{
+			$memorystamp[$type] = COpt::getmemoryusage();
+}
+if(defined('USE_SQLREQUEST_PROF'))
+{
+			$sqlmark[$type] = count($sqlrequests);
+}
 		}
+
+		/* public static */ function savesqlrequest($sql)
+		{
+if(defined('USE_SQLREQUEST_PROF'))
+{
+			global $sqlrequests;
+			array_push($sqlrequests, $sql);
+}
+		}
+
 		/* public static */ function profiling_stop($type=NULL)
 		{
 			global $starttime;
+			global $memorystamp;
+			global $sqlrequests;
+			global $sqlmark;
 
 			$endtime = COpt::getmicrotime();
+			$memory = COpt::getmemoryusage();
 
-			if(is_null($type)) $type="global";
-//			echo "<br/>\nTime to execute (".$type."): ". bcsub($endtime,$starttime[$type],6)." seconds!\n<br/>";
-			echo "<br/>\nTime to execute (".$type."): ".($endtime-$starttime[$type])." seconds!\n<br/>";
+			if(is_null($type)) $type='global';
+
+			echo "<br>\n";
+if(defined('USE_TIME_PROF'))
+{
+			echo "(".$type.") Time to execute: ".round($endtime - $starttime[$type],6)." seconds!\n<br>\n";
+}
+if(defined('USE_MEM_PROF'))
+{
+			echo "(".$type.") Memory limit	 : ".ini_get('memory_limit')."<br>\n";
+			echo "(".$type.") Memory usage	 : ".COpt::mem2str($memorystamp[$type])." - ".COpt::mem2str($memory)."\n<br>\n";
+			echo "(".$type.") Memory leak	 : ".COpt::mem2str($memory - $memorystamp[$type])."\n<br>\n";
+}
+if(defined('USE_SQLREQUEST_PROF'))
+{
+			$requests_cnt = count($sqlrequests);
+			echo "(".$type.") SQL requests count: ".($requests_cnt - $sqlmark[$type])."<br>\n";
+	if(defined('SHOW_SQLREQUEST_DETAILS'))
+	{
+			for($i = $sqlmark[$type]; $i < $requests_cnt; $i++)
+			{
+				echo "(".$type.") SQL request    : ".$sqlrequests[$i]."<br>\n";;
+			}
+	}
+}
+		}
+
+
+		/* public static */ function set_memory_limit($limit='8M')
+		{
+			ini_set('memory_limit',$limit);
 		}
 	}
-	COpt::profiling_start("page");
+
+	COpt::set_memory_limit('8M');
+	COpt::profiling_start("script");
 }
 else
 {
@@ -127,6 +208,7 @@ else
 	{
 		/* public static */ function profiling_start($type=NULL) {}
 		/* public static */ function profiling_stop($type=NULL) {}
+		/* public static */ function savesqlrequest($sql) {}
 	}
 }
 

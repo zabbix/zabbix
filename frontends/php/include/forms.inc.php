@@ -91,7 +91,7 @@
 		}
 
 		$frmUser = new CFormTable($frm_title);
-		$frmUser->SetHelp("web.users.users.php");
+		$frmUser->SetHelp("web.users.php");
 		$frmUser->AddVar("config",get_request("config",0));
 
 		if($profile==0) 
@@ -146,7 +146,7 @@
 		global  $_REQUEST;
 
 		$frmPerm = new CFormTable("New permission","users.php");
-		$frmPerm->SetHelp("web.users.users.php");
+		$frmPerm->SetHelp("web.users.php");
 
 		$frmPerm->AddVar("userid",$_REQUEST["userid"]);
 		$frmPerm->AddVar("config",get_request("config",0));
@@ -222,11 +222,13 @@
 		while($db_user=DBfetch($db_users))
 		{
 			array_push($form_row,
-				new CCheckBox("users[]",
-					in_array($db_user["userid"],$users) ? 'yes' : 'no',
-					$db_user["alias"],	/* caption */
-					NULL,			/* action */
-					$db_user["userid"]),	/* value */
+				array(
+					new CCheckBox("users[]",
+						in_array($db_user["userid"],$users) ? 'yes' : 'no',
+						NULL,			/* action */
+						$db_user["userid"]),	/* value */
+					$db_user["alias"]
+				),
 				BR);
 		}
 		$frmUserG->AddRow(S_USERS,$form_row);
@@ -642,11 +644,10 @@
 	/* dependences */
 		foreach($dependences as $val){
 			array_push($dep_el,
-				new CCheckBox("rem_dependence[]",
-					'no'
-					,expand_trigger_description($val),
-					NULL,
-					strval($val)),
+				array(
+					new CCheckBox("rem_dependence[]", 'no', NULL, strval($val)),
+					expand_trigger_description($val)
+				),
 				BR);
 			$frmTrig->AddVar("dependences[]",strval($val));
 		}
@@ -757,8 +758,8 @@
 		$frmGraph->AddRow(S_NAME,new CTextBox("name",$name,32));
 		$frmGraph->AddRow(S_WIDTH,new CTextBox("width",$width,5));
 		$frmGraph->AddRow(S_HEIGHT,new CTextBox("height",$height,5));
-		$frmGraph->AddRow(S_SHOW_WORKING_TIME,new CCheckBox("showworkperiod",$showworkperiod,NULL,NULL,1));
-		$frmGraph->AddRow(S_SHOW_TRIGGERS,new CCheckBox("showtriggers",$showtriggers,NULL,NULL,1));
+		$frmGraph->AddRow(S_SHOW_WORKING_TIME,new CCheckBox("showworkperiod",$showworkperiod,NULL,1));
+		$frmGraph->AddRow(S_SHOW_TRIGGERS,new CCheckBox("showtriggers",$showtriggers,NULL,1));
 
 		$cmbYType = new CComboBox("yaxistype",$yaxistype,"submit()");
 		$cmbYType->AddItem(GRAPH_YAXIS_TYPE_CALCULATED,S_CALCULATED);
@@ -937,7 +938,7 @@
 		$frmAutoReg->AddRow(S_PATTERN,new CTextBox("pattern",$pattern,64));
 		$frmAutoReg->AddRow(S_PRIORITY,new CTextBox("priority",$priority,4));
 		$frmAutoReg->AddRow(S_HOST,array(
-			new CTextBox("host",$host,32,NULL,'yes'),
+			new CTextBox("host",$host,32,'yes'),
 			new CButton("btn1",S_SELECT,
 				"return PopUp('popup.php?dstfrm=".$frmAutoReg->GetName().
 				"&dstfld1=hostid&dstfld2=host&srctbl=hosts&srcfld1=hostid&srcfld2=host','new_win',".
@@ -1004,10 +1005,10 @@
 		foreach($valuemap as $value)
 		{
 			array_push($valuemap_el,
-				new CCheckBox("rem_value[]", 'no',
-					$value["value"].SPACE.RARR.SPACE.$value["newvalue"],
-					NULL,
-					$i),
+				array(
+					new CCheckBox("rem_value[]", 'no', NULL, $i),
+					$value["value"].SPACE.RARR.SPACE.$value["newvalue"]
+				),
 				BR);
 			$frmValmap->AddVar("valuemap[$i][value]",$value["value"]);
 			$frmValmap->AddVar("valuemap[$i][newvalue]",$value["newvalue"]);
@@ -1134,15 +1135,16 @@
 		$i=0;
 		foreach($conditions as $val)
 		{
-			array_push($cond_el, new CCheckBox(
-					"rem_condition[]", 'no',
+			array_push($cond_el, 
+				array(
+					new CCheckBox("rem_condition[]", 'no', NULL,$i),
 					get_condition_desc(
 						$val["type"],
 						$val["operator"],
 						$val["value"]
-					),
-					NULL,$i),BR
-				);
+					)
+				),
+				BR);
 			$frmAction->AddVar("conditions[$i][type]", 	$val["type"]);
 			$frmAction->AddVar("conditions[$i][operator]", 	$val["operator"]);
 			$frmAction->AddVar("conditions[$i][value]", 	$val["value"]);
@@ -1865,12 +1867,14 @@
 		$frm_row = array();
 		for($i=0; $i<=5; $i++){
 			array_push($frm_row, 
-				new CCheckBox(
-					"severity[]",
-					in_array($i,$severity)?'yes':'no', 
-					$label[$i],	/* label */
-					NULL,		/* action */
-					$i),		/* value */
+				array(
+					new CCheckBox(
+						"severity[]",
+						in_array($i,$severity)?'yes':'no', 
+						NULL,		/* action */
+						$i),		/* value */
+					$label[$i]
+				),
 				BR);
 		}
 		$frmMedia->AddRow(S_USE_IF_SEVERITY,$frm_row);
@@ -2035,12 +2039,14 @@
 		while($db_group=DBfetch($db_groups))
 		{
 			array_push($frm_row,
-				new CCheckBox("groups[]",
-					in_array($db_group["groupid"],$groups) ? 'yes' : 'no', 
-					$db_group["name"],
-					NULL,
-					$db_group["groupid"]
-					),
+				array(
+					new CCheckBox("groups[]",
+						in_array($db_group["groupid"],$groups) ? 'yes' : 'no', 
+						NULL,
+						$db_group["groupid"]
+						),
+					$db_group["name"]
+				),
 				BR);
 		}
 		$frmHost->AddRow(S_GROUPS,$frm_row);
@@ -2055,7 +2061,7 @@
 		}
 		else
 		{
-			$frmHost->AddRow(S_USE_IP_ADDRESS,new CCheckBox("useip",$useip,NULL,"submit()"));
+			$frmHost->AddRow(S_USE_IP_ADDRESS,new CCheckBox("useip",$useip,"submit()"));
 		}
 
 		if($useip=="yes")
@@ -2103,7 +2109,7 @@
 		}
 		else
 		{
-			$frmHost->AddRow(S_USE_PROFILE,new CCheckBox("useprofile",$useprofile,NULL,"submit()"));
+			$frmHost->AddRow(S_USE_PROFILE,new CCheckBox("useprofile",$useprofile,"submit()"));
 		}
 		if($useprofile=="yes")
 		{
@@ -2240,17 +2246,17 @@
 			$location=$row["location"];
 			$notes=$row["notes"];
 
-			$frmHostP->AddRow(S_DEVICE_TYPE,new CTextBox("devicetype",$devicetype,61,NULL,'yes'));
-			$frmHostP->AddRow(S_NAME,new CTextBox("name",$name,61,NULL,'yes'));
-			$frmHostP->AddRow(S_OS,new CTextBox("os",$os,61,NULL,'yes'));
-			$frmHostP->AddRow(S_SERIALNO,new CTextBox("serialno",$serialno,61,NULL,'yes'));
-			$frmHostP->AddRow(S_TAG,new CTextBox("tag",$tag,61,NULL,'yes'));
-			$frmHostP->AddRow(S_MACADDRESS,new CTextBox("macaddress",$macaddress,61,NULL,'yes'));
-			$frmHostP->AddRow(S_HARDWARE,new CTextArea("hardware",$hardware,60,4,NULL,'yes'));
-			$frmHostP->AddRow(S_SOFTWARE,new CTextArea("software",$software,60,4,NULL,'yes'));
-			$frmHostP->AddRow(S_CONTACT,new CTextArea("contact",$contact,60,4,NULL,'yes'));
-			$frmHostP->AddRow(S_LOCATION,new CTextArea("location",$location,60,4,NULL,'yes'));
-			$frmHostP->AddRow(S_NOTES,new CTextArea("notes",$notes,60,4,NULL,'yes'));
+			$frmHostP->AddRow(S_DEVICE_TYPE,new CTextBox("devicetype",$devicetype,61,'yes'));
+			$frmHostP->AddRow(S_NAME,new CTextBox("name",$name,61,'yes'));
+			$frmHostP->AddRow(S_OS,new CTextBox("os",$os,61,'yes'));
+			$frmHostP->AddRow(S_SERIALNO,new CTextBox("serialno",$serialno,61,'yes'));
+			$frmHostP->AddRow(S_TAG,new CTextBox("tag",$tag,61,'yes'));
+			$frmHostP->AddRow(S_MACADDRESS,new CTextBox("macaddress",$macaddress,61,'yes'));
+			$frmHostP->AddRow(S_HARDWARE,new CTextArea("hardware",$hardware,60,4,'yes'));
+			$frmHostP->AddRow(S_SOFTWARE,new CTextArea("software",$software,60,4,'yes'));
+			$frmHostP->AddRow(S_CONTACT,new CTextArea("contact",$contact,60,4,'yes'));
+			$frmHostP->AddRow(S_LOCATION,new CTextArea("location",$location,60,4,'yes'));
+			$frmHostP->AddRow(S_NOTES,new CTextArea("notes",$notes,60,4,'yes'));
 		}
 		else
 		{
@@ -2306,7 +2312,7 @@
 		if(!isset($_REQUEST["applicationid"]))
 		{ // anly new application can select host
 			$frmApp->AddRow(S_HOST,array(
-				new CTextBox("apphost",$apphost,32,NULL,'yes'),
+				new CTextBox("apphost",$apphost,32,'yes'),
 				new CButton("btn1",S_SELECT,
 					"return PopUp('popup.php?dstfrm=".$frmApp->GetName().
 					"&dstfld1=apphostid&dstfld2=apphost&srctbl=hosts&srcfld1=hostid&srcfld2=host','new_win',".
@@ -2495,7 +2501,7 @@
 
 			$frmEl->AddVar("elementid",$elementid);
 			$frmEl->AddRow(S_HOST, array(
-				new CTextBox("host",$host,32,NULL,'yes'),
+				new CTextBox("host",$host,32,'yes'),
 				new CButton("btn1",S_SELECT,"return PopUp('popup.php?dstfrm=".$frmEl->GetName().
 					"&dstfld1=elementid&dstfld2=host&srctbl=hosts&srcfld1=hostid&srcfld2=host','new_win',".
 					"'width=450,height=450,resizable=1,scrollbars=1');","T")
@@ -2591,7 +2597,8 @@
 		}
 
 /* START comboboxes preparations */
-		$cmbElements = new CComboBox("selementid1",$selementid1);
+		$cmbElements1 = new CComboBox("selementid1",$selementid1);
+		$cmbElements2 = new CComboBox("selementid2",$selementid2);
 		$db_selements = DBselect("select selementid,label,elementid,elementtype from sysmaps_elements".
 			" where sysmapid=".$_REQUEST["sysmapid"]);
 		while($db_selement = DBfetch($db_selements))
@@ -2614,35 +2621,32 @@
 					$label .= ":".expand_trigger_description($db_selement["elementid"]);
 				}
 			}
-			$cmbElements->AddItem($db_selement["selementid"],$label);
+			$cmbElements1->AddItem($db_selement["selementid"],$label);
+			$cmbElements2->AddItem($db_selement["selementid"],$label);
 		}
 
-		$cmbType = new CComboBox("drawtype_off",$drawtype_off);
-		$cmbType->AddItem(0,get_drawtype_description(0));
-		$cmbType->AddItem(1,get_drawtype_description(1));
-		$cmbType->AddItem(2,get_drawtype_description(2));
-		$cmbType->AddItem(3,get_drawtype_description(3));
-		$cmbType->AddItem(4,get_drawtype_description(4));
+		$cmbType_off = new CComboBox("drawtype_off",$drawtype_off);
+		$cmbType_on = new CComboBox("drawtype_on",$drawtype_on);
+		for($i=0; $i < 5; ++$i)
+		{
+			$value = get_drawtype_description($i);
+			$cmbType_off->AddItem($i, $value);
+			$cmbType_on->AddItem($i, $value);
+		}
 
-		$cmbColor = new CComboBox("color_off",$color_off);
-		$cmbColor->AddItem('Black',"Black");
-		$cmbColor->AddItem('Blue',"Blue");
-		$cmbColor->AddItem('Cyan',"Cyan");
-		$cmbColor->AddItem('Dark Blue',"Dark Blue");
-		$cmbColor->AddItem('Dark Green',"Dark Green");
-		$cmbColor->AddItem('Dark Red',"Dark Red");
-		$cmbColor->AddItem('Dark Yellow',"Dark Yellow");
-		$cmbColor->AddItem('Green',"Green");
-		$cmbColor->AddItem('Red',"Red");
-		$cmbColor->AddItem('White',"White");
-		$cmbColor->AddItem('Yellow',"Yellow");
+		
+		$cmbColor_off = new CComboBox("color_off",$color_off);
+		$cmbColor_on = new CComboBox("color_on",$color_on);
+		foreach(array('Black','Blue','Cyan','Dark Blue','Dark Green',
+			'Dark Red','Dark Yellow','Green','Red','White','Yellow') as $value)
+		{
+			$cmbColor_off->AddItem($value, $value);
+			$cmbColor_on->AddItem($value, $value);
+		}
 /* END preparation */
 
-		$frmCnct->AddRow("Element 1",$cmbElements);
-
-		$cmbElements->SetName("selementid2");	// rename without recreation
-		$cmbElements->SetValue($selementid2);	// rename without recreation
-		$frmCnct->AddRow("Element 2",$cmbElements);
+		$frmCnct->AddRow("Element 1",$cmbElements1);
+		$frmCnct->AddRow("Element 2",$cmbElements2);
 
 		$frmCnct->AddVar('triggerid',$triggerid);
 
@@ -2661,16 +2665,11 @@
 		$btnSelect->SetAccessKey('T');
 		$frmCnct->AddRow("Link status indicator",array($txtTrigger, $btnSelect));
 
-		$frmCnct->AddRow("Type (OFF)",$cmbType);
-		$frmCnct->AddRow("Color (OFF)",$cmbColor);
+		$frmCnct->AddRow("Type (OFF)",$cmbType_off);
+		$frmCnct->AddRow("Color (OFF)",$cmbColor_off);
 
-		$cmbType->SetName("drawtype_on"); 	// rename without recreation
-		$cmbType->SetValue($drawtype_on);	// rename without recreation
-		$frmCnct->AddRow("Type (ON)",$cmbType);
-
-		$cmbColor->SetName("color_on");		// rename without recreation
-		$cmbColor->SetValue($color_on);		// rename without recreation
-		$frmCnct->AddRow("Color (ON)",$cmbColor);
+		$frmCnct->AddRow("Type (ON)",$cmbType_on);
+		$frmCnct->AddRow("Color (ON)",$cmbColor_on);
 
 		$frmCnct->AddItemToBottomRow(new CButton("save_link",S_SAVE));
 		if(isset($_REQUEST["linkid"]))
