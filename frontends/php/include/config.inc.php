@@ -338,224 +338,6 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 
 		return $cnt; 
 	}
-/*
-	function	check_anyright($right,$permission)
-	{
-		global $USER_DETAILS;
-
-		$sql="select permission from rights where name='Default permission' and userid=".$USER_DETAILS["userid"];
-		$result=DBselect($sql);
-
-		$default_permission="H";
-		if(DBnum_rows($result)>0)
-		{
-			$default_permission="";
-			while($row=DBfetch($result))
-			{
-				$default_permission=$default_permission.$row["permission"];
-			}
-		}
-# default_permission
-
-		$sql="select permission from rights where name=".zbx_dbstr($right)." and id!=0 and userid=".$USER_DETAILS["userid"];
-		$result=DBselect($sql);
-
-		$all_permissions="";
-		if(DBnum_rows($result)>0)
-		{
-			while($row=DBfetch($result))
-			{
-				$all_permissions=$all_permissions.$row["permission"];
-			}
-		}
-# all_permissions
-
-//		echo "$all_permissions|$default_permission<br>";
-
-		switch ($permission) {
-			case 'A':
-				if(strstr($all_permissions,"A"))
-				{
-					return 1;
-				}
-				if(strstr($default_permission,"H"))
-				{
-					return 0;
-				}
-				else if(strstr($default_permission,"A"))
-				{
-					return 1;
-				}
-				break;
-			case 'R':
-				if(strstr($all_permissions,"R"))
-				{
-					return 1;
-				}
-				else if(strstr($all_permissions,"U"))
-				{
-					return 1;
-				}
-				if(strstr($default_permission,"H"))
-				{
-					return 0;
-				}
-				else if(strstr($default_permission,"R"))
-				{
-					return 1;
-				}
-				else if(strstr($default_permission,"U"))
-				{
-					return 1;
-				}
-				break;
-			case 'U':
-				if(strstr($all_permissions,"U"))
-				{
-					return 1;
-				}
-				if(strstr($default_permission,"H"))
-				{
-					return 0;
-				}
-				else if(strstr($default_permission,"U"))
-				{
-					return 1;
-				}
-				break;
-			default:
-				return 0;
-		}
-		return 0;
-	}
-*/
-/*
-	function	check_right($right,$permission,$id)
-	{
-//		global $USER_DETAILS;
-		global $USER_RIGHTS;
-
-		$default_permission="H";
-		$group_permission="";
-		$id_permission="";
-//		echo $id,"<br>";
-//		echo DBnum_rows($rights),"<br>";
-		if(isset($USER_RIGHTS[0]["name"]))
-		{
-			$default_permission="";
-			for($i=0;isset($USER_RIGHTS[$i]["name"]);$i++)
-			{	
-//				echo "*";
-				if($USER_RIGHTS[$i]["name"] == 'Default permission')
-					$default_permission=$default_permission.$USER_RIGHTS[$i]["permission"];
-				if(($USER_RIGHTS[$i]["name"] == $right)&&($USER_RIGHTS[$i]["id"]==0))
-					$group_permission=$group_permission.$USER_RIGHTS[$i]["permission"];
-				if(($USER_RIGHTS[$i]["name"] == $right)&&($USER_RIGHTS[$i]["id"]==$id))
-					$id_permission=$id_permission.$USER_RIGHTS[$i]["permission"];
-			}
-		}
-//		echo $default_permission,"<br>";
-
-# id_permission
-//		echo "$id_permission|$group_permission|$default_permission<br>";
-
-		switch ($permission) {
-			case 'A':
-				if(strstr($id_permission,"H"))
-				{
-					return 0;
-				}
-				else if(strstr($id_permission,"A"))
-				{
-					return 1;
-				}
-				if(strstr($group_permission,"H"))
-				{
-					return 0;
-				}
-				else if(strstr($group_permission,"A"))
-				{
-					return 1;
-				}
-				if(strstr($default_permission,"H"))
-				{
-					return 0;
-				}
-				else if(strstr($default_permission,"A"))
-				{
-					return 1;
-				}
-				break;
-			case 'R':
-				if(strstr($id_permission,"H"))
-				{
-					return 0;
-				}
-				else if(strstr($id_permission,"R"))
-				{
-					return 1;
-				}
-				else if(strstr($id_permission,"U"))
-				{
-					return 1;
-				}
-				if(strstr($group_permission,"H"))
-				{
-					return 0;
-				}
-				else if(strstr($group_permission,"R"))
-				{
-					return 1;
-				}
-				else if(strstr($group_permission,"U"))
-				{
-					return 1;
-				}
-				if(strstr($default_permission,"H"))
-				{
-					return 0;
-				}
-				else if(strstr($default_permission,"R"))
-				{
-					return 1;
-				}
-				else if(strstr($default_permission,"U"))
-				{
-					return 1;
-				}
-				break;
-			case 'U':
-				if(strstr($id_permission,"H"))
-				{
-					return 0;
-				}
-				else if(strstr($id_permission,"U"))
-				{
-					return 1;
-				}
-				if(strstr($group_permission,"H"))
-				{
-					return 0;
-				}
-				else if(strstr($group_permission,"U"))
-				{
-					return 1;
-				}
-				if(strstr($default_permission,"H"))
-				{
-					return 0;
-				}
-				else if(strstr($default_permission,"U"))
-				{
-					return 1;
-				}
-				break;
-			default:
-				return 0;
-		}
-		return 0;
-	}
-*/
 
 //	The hash has form <md5sum of triggerid>,<sum of priorities>
 	function	calc_trigger_hash()
@@ -582,9 +364,10 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 	{
 		$sql="select * from images where imagetype=$imagetype and name=".zbx_dbstr($name); 
 		$result=DBselect($sql);
-		if(DBnum_rows($result) == 1)
+		$row=DBfetch($result);
+		if($row)
 		{
-			return	DBfetch($result);	
+			return	$row;
 		}
 		else
 		{
@@ -596,9 +379,10 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 	{
 		$sql="select * from functions where functionid=$functionid"; 
 		$result=DBselect($sql);
-		if(DBnum_rows($result) == 1)
+		$row=DBfetch($result);
+		if($row)
 		{
-			return	DBfetch($result);
+			return	$row;
 		}
 		else
 		{
@@ -611,10 +395,10 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 	{
 		$sql="select * from config";
 		$result=DBselect($sql);
-
-		if(DBnum_rows($result) == 1)
+		$row=DBfetch($result);
+		if($row)
 		{
-			return DBfetch($result);
+			return	$row;
 		}
 		else
 		{
@@ -1054,84 +838,6 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 	{
 		echo "\n";
 	}
-/*
-	function	check_authorisation()
-	{
-		global	$page;
-		global	$PHP_AUTH_USER,$PHP_AUTH_PW;
-		global	$USER_DETAILS;
-		global	$USER_RIGHTS;
-		global	$_COOKIE;
-		global	$_REQUEST;
-//		global	$sessionid;
-
-		if(isset($_COOKIE["sessionid"]))
-		{
-			$sessionid=$_COOKIE["sessionid"];
-		}
-		else
-		{
-			unset($sessionid);
-		}
-
-		if(isset($sessionid))
-		{
-			$sql="select u.userid,u.alias,u.name,u.surname,u.lang,u.refresh from sessions s,users u where s.sessionid=".zbx_dbstr($sessionid)." and s.userid=u.userid and ((s.lastaccess+u.autologout>".time().") or (u.autologout=0))";
-			$result=DBselect($sql);
-			if(DBnum_rows($result)==1)
-			{
-//				setcookie("sessionid",$sessionid,time()+3600);
-				setcookie("sessionid",$sessionid);
-				$sql="update sessions set lastaccess=".time()." where sessionid=".zbx_dbstr($sessionid);
-				DBexecute($sql);
-				$USER_DETAILS=DBfetch($result);
-
-				$result2=DBselect("select * from rights where userid=".$USER_DETAILS["userid"]);
-				$i=0;
-				while($row=DBfetch($result2))
-				{
-					$USER_RIGHTS[$i]["name"]=$row["name"];
-					$USER_RIGHTS[$i]["id"]=$row["id"];
-					$USER_RIGHTS[$i]["permission"]=$row["permission"];
-					$i++;
-				}
-				return;
-			}
-			else
-			{
-				setcookie("sessionid",$sessionid,time()-3600);
-				unset($sessionid);
-			}
-		}
-
-                $sql="select u.userid,u.alias,u.name,u.surname,u.lang,u.refresh from users u where u.alias='guest'";
-                $result=DBselect($sql);
-                if(DBnum_rows($result)==1)
-                {
-			$USER_DETAILS=DBfetch($result);
-			$result2=DBselect("select * from rights where userid=".$USER_DETAILS["userid"]);
-			$i=0;
-			while($row=DBfetch($result2))
-			{
-				$USER_RIGHTS[$i]["name"]=$row["name"];
-				$USER_RIGHTS[$i]["id"]=$row["id"];
-				$USER_RIGHTS[$i]["permission"]=$row["permission"];
-				$i++;
-			}
-			return;
-		}
-
-		if($page["file"]!="index.php")
-		{
-			echo "<meta http-equiv=\"refresh\" content=\"0; url=index.php\">";
-		}
-		show_header("Login",0,1,1);
-		show_error_message("Login name or password is incorrect");
-		insert_login_form();
-		show_page_footer();
-		exit;
-	}
-*/
 
 	# Header for HTML pages
 
@@ -1515,9 +1221,9 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 		{
 			$sql="select value from alarms where triggerid=$triggerid and clock=".$row[0];
 			$result=DBselect($sql);
-			if(DBnum_rows($result) == 1)
+			$row=DBfetch($result);
+			if($row)
 			{
-				$row=DBfetch($result);
 				if($row["value"] == $value)
 				{
 					return 0;
@@ -1569,9 +1275,10 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 	{
 		$sql="select * from media_type where mediatypeid=$mediatypeid";
 		$result=DBselect($sql);
-		if(DBnum_rows($result) == 1)
+		$row=DBfetch($result);
+		if($row)
 		{
-			return	DBfetch($result);	
+			return	$row;
 		}
 		else
 		{
@@ -1599,7 +1306,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 
 		$sql="select * from media_type where description=".zbx_dbstr($description)." and mediatypeid!=$mediatypeid";
 		$result=DBexecute($sql);
-		if(DBnum_rows($result)>0)
+		if(DBfetch($result))
 		{
 			error("An action type with description '$description' already exists.");
 		}
@@ -1624,7 +1331,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 
 		$sql="select * from media_type where description=".zbx_dbstr($description);
 		$result=DBexecute($sql);
-		if(DBnum_rows($result)>0)
+		if(DBfetch($result))
 		{
 			error("An action type with description '$description' already exists.");
 		}
@@ -1752,7 +1459,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 	{
 		$sql="select * from users where userid=$userid and alias='guest'";
 		$result=DBselect($sql);
-		if(DBnum_rows($result) == 1)
+		if(DBfetch($result))
 		{
 			error("Cannot delete user 'guest'");
 			return	0;
@@ -1792,15 +1499,15 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 			"July","August","September","October","November","December");
 		$sql="select min(clock) as minn,max(clock) as maxx from history where itemid=$itemid";
 		$result=DBselect($sql);
+		$row=Dvfetch($result);
 
-		if(DBnum_rows($result) == 0)
+		if(!row)
 		{
 			$min=time(NULL);
 			$max=time(NULL);
 		}
 		else
 		{
-			$row=DBfetch($result);
 			$min=$row["minn"];
 			$max=$row["maxx"];
 		}
@@ -2103,7 +1810,9 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 		$row=DBfetch(DBselect("select count(userid) as cnt from users"));
 		$status["users_count"]=$row["cnt"];
 		
-		$status["users_online"]=DBnum_rows(DBselect("select distinct s.userid from sessions s, users u where u.userid=s.userid and (s.lastaccess+u.autologout)>".time()));
+		$status["users_online"]=0;
+		$result=DBselect("select distinct s.userid from sessions s, users u where u.userid=s.userid and (s.lastaccess+u.autologout)>".time());
+		while(DBfetch($result))		$status["users_online"]++;
 
 		return $status;
 	}
@@ -2164,6 +1873,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 		{
 			$max=time();
 		}
+		$rows=0;
 		while($row=DBfetch($result))
 		{
 			$clock=$row["clock"];
@@ -2204,9 +1914,10 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 				$unknown_time+=$diff;
 				$state=$value;
 			}
+			$rows++;
 		}
 
-		if(DBnum_rows($result)==0)
+		if($rows==0)
 		{
 			$false_time=$max-$min;
 		}
@@ -2354,11 +2065,10 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 		if($USER_DETAILS["alias"]!="guest")
 		{
 			$db_profiles = DBselect("select * from profiles where userid=".$USER_DETAILS["userid"]." and idx=".zbx_dbstr($idx));
+			$profile=DBfetch($db_profiles);
 
-			if(DBnum_rows($db_profiles)==1)
+			if($profile)
 			{
-				$profile = DBfetch($db_profiles);
-
 				if($type==PROFILE_TYPE_UNCNOWN)
 					$type = $profile["valuetype"];
 
@@ -2403,8 +2113,9 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 
 		$sql="select value from profiles where userid=".$USER_DETAILS["userid"]." and idx=".zbx_dbstr($idx);
 		$result=DBselect($sql);
+		$row=DBfetch($result);
 
-		if(DBnum_rows($result)==0)
+		if(!$row)
 		{
 			$sql="insert into profiles (userid,idx,value,valuetype)".
 				" values (".$USER_DETAILS["userid"].",".zbx_dbstr($idx).",".zbx_dbstr($value).",".$type.")";
@@ -2412,7 +2123,6 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 		}
 		else
 		{
-			$row=DBfetch($result);
 			$sql="update profiles set value=".zbx_dbstr($value).",valuetype=".$type.
 				" where userid=".$USER_DETAILS["userid"]." and idx=".zbx_dbstr($idx);
 			DBexecute($sql);
@@ -2759,10 +2469,10 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 
 		$result = DBselect("select newvalue from mappings".
 			" where valuemapid=".zbx_dbstr($valuemapid)." and value=".zbx_dbstr($value));
-		if(DBnum_rows($result))
+		$row = DBfetch($result);
+		if($row)
 		{
-			$result = DBfetch($result);
-			return $result["newvalue"].SPACE."($value)";
+			return $row["newvalue"].SPACE."($value)";
 		}
 		return $value;
 	}

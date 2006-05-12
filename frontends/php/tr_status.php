@@ -590,9 +590,11 @@
 			if($alarm["acknowledged"] == 1)
 			{
 				$db_acks = get_acknowledges_by_alarmid($alarm["alarmid"]);
+				$rows=0;
+				while(DBfetch($db_acks))	$rows++;
 				$ack=array(
 					new CSpan(S_YES,"off"),
-					SPACE."(".DBnum_rows($db_acks).SPACE,
+					SPACE."(".$rows.SPACE,
 					new CLink(S_SHOW,
 						"acknow.php?alarmid=".$alarm["alarmid"],"action"),
 					")"

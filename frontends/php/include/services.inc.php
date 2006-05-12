@@ -233,7 +233,7 @@
 		}
 //		echo $problem_time,"-",$ok_time,"<br>";
 
-		if(DBnum_rows($result)==0)
+		if(!DBfetch($result))
 		{
 			if(get_last_service_value($serviceid,$period_start)<=1)
 			{

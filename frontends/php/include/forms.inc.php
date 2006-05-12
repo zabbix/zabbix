@@ -30,7 +30,7 @@
 		global $_REQUEST;
 
 		$db_acks = get_acknowledges_by_alarmid($_REQUEST["alarmid"]);
-		if(DBnum_rows($db_acks)==0)
+		if(!DBfetch($db_acks))
 		{
 			$title = S_ACKNOWLEDGE_ALARM_BY;
 			$btn_txt = S_ACKNOWLEDGE;
@@ -193,7 +193,7 @@
 		if(isset($usrgrpid) && !isset($_REQUEST["form_refresh"]))
 		{
 			$name	= $usrgrp["name"];
-			$db_users=DBselect("select distinct u.userid from users u,users_groups ug ".
+			$db_users=DBselect("select distinct u.userid,u.alias from users u,users_groups ug ".
 				"where u.userid=ug.userid and ug.usrgrpid=".$usrgrpid.
 				" order by alias");
 
@@ -797,14 +797,14 @@
 		
 
 		$db_hosts = get_hosts_by_graphid($_REQUEST["graphid"]);
-		if(DBnum_rows($db_hosts)==0)
+		$db_host = DBfetch($db_hosts);
+		if(!$db_host)
 		{
 			// empty graph, can contain any item
 			$host_condition = " and h.status in(".HOST_STATUS_MONITORED.",".HOST_STATUS_TEMPLATE.")";
 		}
 		else
 		{
-			$db_host = DBfetch($db_hosts);
 			if($db_host["status"]==HOST_STATUS_TEMPLATE)
 			{// graph for template must use only one host
 				$host_condition = " and h.hostid=".$db_host["hostid"];
@@ -1606,9 +1606,9 @@
 			while($row=DBfetch($result))
 			{
 				$db_hosts = get_hosts_by_graphid($row["graphid"]);
-				if(DBnum_rows($db_hosts)==1)
+				$db_host = DBfetch($db_hosts);
+				if($db_host)
 				{
-					$db_host = DBfetch($db_hosts);
 					$name = $db_host["host"].":".$row["name"];
 				}
 				else
@@ -1998,11 +1998,11 @@
 			$db_profiles = DBselect("select * from hosts_profiles where hostid=".$_REQUEST["hostid"]);
 
 			$useprofile = "no";
-			if(DBnum_rows($db_profiles)==1)
+			$db_profile = DBfetch($db_profiles);
+			if($db_profile)
 			{
 				$useprofile = "yes";
 
-				$db_profile = DBfetch($db_profiles);
 
 				$devicetype	= $db_profile["devicetype"];
 				$name		= $db_profile["name"];
@@ -2224,9 +2224,9 @@
 
 		$result=DBselect("select * from hosts_profiles where hostid=".$_REQUEST["hostid"]);
 
-		if(DBnum_rows($result)==1)
+		$row=DBfetch($result);
+		if($row)
 		{
-			$row=DBfetch($result);
 
 			$devicetype=$row["devicetype"];
 			$name=$row["name"];
@@ -2452,11 +2452,11 @@
 		$cmbType = new CComboBox("elementtype",$elementtype,"submit()");
 
 		$db_hosts = DBselect("select hostid from hosts");
-		if(DBnum_rows($db_hosts)>0)
+		if(DBfetch($db_hosts))
 			$cmbType->AddItem(SYSMAP_ELEMENT_TYPE_HOST,	S_HOST);
 
 		$db_maps = DBselect("select sysmapid from sysmaps where sysmapid!=".$_REQUEST["sysmapid"]);
-		if(DBnum_rows($db_maps)>0)
+		if(DBfetch($db_maps))
 			$cmbType->AddItem(SYSMAP_ELEMENT_TYPE_MAP,	S_MAP);
 
 		$cmbType->AddItem(SYSMAP_ELEMENT_TYPE_IMAGE,	S_IMAGE);

@@ -90,7 +90,11 @@ static int housekeeping_process_log()
 		housekeeper.field=row[2];
 		housekeeper.value=atoi(row[3]);
 
+#ifdef HAVE_ORACLE
+		snprintf(sql,sizeof(sql)-1,"delete from %s where %s=%d and rownum<500",housekeeper.tablename, housekeeper.field,housekeeper.value);
+#else
 		snprintf(sql,sizeof(sql)-1,"delete from %s where %s=%d limit 500",housekeeper.tablename, housekeeper.field,housekeeper.value);
+#endif
 		DBexecute(sql);
 
 		if(( deleted = DBaffected_rows()) == 0)

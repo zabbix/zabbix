@@ -334,13 +334,13 @@
 			//add dependences
 			$result1=DBselect("select t.triggerid,t.description from triggers t,trigger_depends d".
 				" where t.triggerid=d.triggerid_up and d.triggerid_down=".$row["triggerid"]);
-			if(DBnum_rows($result1)>0)
+			if($row1=DBfetch($result1))
 			{
 				array_push($description,BR.BR."<strong>".S_DEPENDS_ON."</strong>".SPACE.BR);
-				while($row1=DBfetch($result1))
+				do
 				{
 					array_push($description,expand_trigger_description($row1["triggerid"]).BR);
-				}
+				} while($row1=DBfetch($result1));
 				array_push($description,BR);
 			}
 	

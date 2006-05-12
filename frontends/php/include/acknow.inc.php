@@ -23,8 +23,9 @@
 	{
 		$db_alarms = DBselect("select * from alarms where triggerid=$triggerid".
 			" order by clock desc limit 1");
-		if(DBnum_rows($db_alarms)!=1) return FALSE;
-		return DBfetch($db_alarms);
+		$row=DBfetch($db_alarms);
+		if(!$row)	return FALSE;
+		return $row;
 	}
 
 	function 	get_acknowledges_by_alarmid($alarmid)

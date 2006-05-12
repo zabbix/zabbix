@@ -900,7 +900,11 @@ int DBdelete_history_pertial(int itemid)
 {
 	char	sql[MAX_STRING_LEN];
 
+#ifdef	HAVE_ORACLE
+	snprintf(sql,sizeof(sql)-1,"delete from history where itemid=%d and rownum<500", itemid);
+#else
 	snprintf(sql,sizeof(sql)-1,"delete from history where itemid=%d limit 500", itemid);
+#endif
 	DBexecute(sql);
 
 	return DBaffected_rows();

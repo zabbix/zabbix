@@ -36,7 +36,7 @@
 
 		$sql="select * from users where alias=".zbx_dbstr($alias);
 		$result=DBexecute($sql);
-		if(DBnum_rows($result)>0)
+		if(DBfetch($result))
 		{
 			error("User '$alias' already exists");
 			return 0;
@@ -64,7 +64,7 @@
 
 		$sql="select * from users where alias=".zbx_dbstr($alias)." and userid<>$userid";
 		$result=DBexecute($sql);
-		if(DBnum_rows($result)>0)
+		if(DBfetch($result))
 		{
 			error("User '$alias' already exists");
 			return 0;
@@ -117,9 +117,10 @@
 	function	get_usergroup_by_groupid($groupid)
 	{
 		$result=DBselect("select * from usrgrp where usrgrpid=".$groupid);
-		if(DBnum_rows($result) == 1)
+		$row=DBfetch($result);
+		if($row)
 		{
-			return DBfetch($result);
+			return $row;
 		}
 		error("No user groups with usrgrpid=[$groupid]");
 		return  FALSE;
@@ -129,9 +130,10 @@
 	{
 		$sql="select * from users where userid=$userid"; 
 		$result=DBselect($sql);
-		if(DBnum_rows($result) == 1)
+		$row=DBfetch($result);
+		if($row)
 		{
-			return	DBfetch($result);	
+			return	$row;
 		}
 		else
 		{
@@ -155,7 +157,7 @@
 
 		$sql="select * from usrgrp where name=".zbx_dbstr($name);
 		$result=DBexecute($sql);
-		if(DBnum_rows($result)>0)
+		if(DBfetch($result))
 		{
 			error("Group '$name' already exists");
 			return 0;
@@ -190,7 +192,7 @@
 
 		$sql="select * from usrgrp where name=".zbx_dbstr($name)." and usrgrpid<>$usrgrpid";
 		$result=DBexecute($sql);
-		if(DBnum_rows($result)>0)
+		if(DBfetch($result))
 		{
 			error("Group '$name' already exists");
 			return 0;

@@ -170,7 +170,7 @@
 				{
 					$result[strtolower($k)]=$row[$k];
 				}
-			}
+			} 
 			return $result;
 		}
 		return FALSE;
@@ -242,7 +242,13 @@
 		}
 		if($DB_TYPE == "ORACLE")
 		{
-			$result=FALSE;
+			$sql="select max($field) from $table";
+			$parse=DBexecute($sql);
+			while(OCIFetch($parse))
+			{
+				$colvalue = OCIResult($parse, 1);
+				return $colvalue;
+			}
 		}
 	}
 

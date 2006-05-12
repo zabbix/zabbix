@@ -80,9 +80,10 @@
 	{
 		$sql="select * from screens where screenid=$screenid"; 
 		$result=DBselect($sql);
-		if(DBnum_rows($result) == 1)
+		$row=DBfetch($result);
+		if($row)
 		{
-			return	DBfetch($result);	
+			return	$row;
 		}
 		else
 		{
@@ -115,8 +116,8 @@
 			$effectiveperiod = 3600;
 
 		$result=DBselect("select name,cols,rows from screens where screenid=$screenid");
-		if(DBnum_rows($result) == 0) return new CSpan("Screen missing".BR);
 		$row=DBfetch($result);
+		if(!row) return new CSpan("Screen missing".BR);
 
 		for($r=0;$r<$row["rows"];$r++)
 		{
@@ -126,9 +127,9 @@
 
 				$sql="select * from screens_items where screenid=$screenid and x=$c and y=$r";
 				$iresult=DBSelect($sql);
-				if(DBnum_rows($iresult)>0)
+				$irow=DBfetch($iresult);
+				if($irow)
 				{
-					$irow=DBfetch($iresult);
 					$colspan=$irow["colspan"];
 					$rowspan=$irow["rowspan"];
 				} else {
@@ -158,9 +159,9 @@
 				$iresult=DBSelect("select * from screens_items".
 					" where screenid=$screenid and x=$c and y=$r");
 
-				if(DBnum_rows($iresult)>0)
+				$irow		= DBfetch($iresult);
+				if($irow)
 				{
-					$irow		= DBfetch($iresult);
 					$screenitemid	= $irow["screenitemid"];
 					$resource	= $irow["resource"];
 					$resourceid	= $irow["resourceid"];

@@ -23,9 +23,10 @@
 	{
 		$sql="select * from sysmaps where sysmapid=$sysmapid"; 
 		$result=DBselect($sql);
-		if(DBnum_rows($result) == 1)
+		$row=DBfetch($result);
+		if($row)
 		{
-			return	DBfetch($result);	
+			return	$row;
 		}
 		else
 		{
@@ -38,9 +39,10 @@
 	{
 		$sql="select * from sysmaps_elements where selementid=$selementid"; 
 		$result=DBselect($sql);
-		if(DBnum_rows($result) == 1)
+		$row=DBfetch($result);
+		if($row)
 		{
-			return	DBfetch($result);	
+			return	$row;
 		}
 		else
 		{
@@ -261,16 +263,18 @@
 				" and i.hostid=".$db_element["elementid"]." and i.itemid=f.itemid".
 				" and f.triggerid=t.triggerid and t.value=1 and t.status=0".
 				" and h.status=".HOST_STATUS_MONITORED." and i.status=0");
-			$count = DBnum_rows($db_triggers);
 
-			if($count == 1)
+			$count=0;
+			$trigger = DBfetch($db_triggers);
+			if($trigger)
 			{
-				$trigger = DBfetch($db_triggers);
+				for($count=1; DBfetch($db_triggers); $count++);
+
 				if ($trigger["priority"] > 3)           $color=$colors["Red"];
 				else                                    $color=$colors["Dark Yellow"];
 				$info = expand_trigger_description_simple($trigger["triggerid"]);
 			}
-			elseif($count==0)
+			else
 			{
 				$host = get_host_by_hostid($db_element["elementid"]);
 				if($host["status"] == HOST_STATUS_TEMPLATE)

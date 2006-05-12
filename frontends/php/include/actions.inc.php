@@ -23,9 +23,10 @@
 	{
 		$sql="select * from actions where actionid=$actionid"; 
 		$result=DBselect($sql);
-		if(DBnum_rows($result) == 1)
+		$row=DBfetch($result);
+		if($row)
 		{
-			return	DBfetch($result);	
+			return	$row;
 		}
 		else
 		{
@@ -138,11 +139,11 @@
 
 		$sql="select distinct h.hostid from hosts h,functions f, items i where i.itemid=f.itemid and h.hostid=i.hostid and f.triggerid=".$action["triggerid"];
 		$result=DBselect($sql);
-		if(DBnum_rows($result)!=1)
+		$row=DBfetch($result);
+		if(!$row)
 		{
 			return;
 		}
-		$row=DBfetch($result);
 
 		$host_template=get_host_by_hostid($row["hostid"]);
 
@@ -378,7 +379,7 @@
 			}
 			if($cmd_items[2] == "#")
 			{ // group
-				if(DBnum_rows(DBselect("select groupid from groups where name=".zbx_dbstr($cmd_items[1])))!=1)
+				if(!DBfetch(DBselect("select groupid from groups where name=".zbx_dbstr($cmd_items[1]))))
 				{
 					error("Uncnown group name: '".$cmd_items[1]."' in command ".$cmd."'");
 					return FALSE;
@@ -386,7 +387,7 @@
 			}
 			elseif($cmd_items[2] == ":")
 			{ // host
-				if(DBnum_rows(DBselect("select hostid from hosts where host=".zbx_dbstr($cmd_items[1])))!=1)
+				if(!DBfetch(DBselect("select hostid from hosts where host=".zbx_dbstr($cmd_items[1]))))
 				{
 					error("Uncnown host name '".$cmd_items[1]."' in command '".$cmd."'");
 					return FALSE;

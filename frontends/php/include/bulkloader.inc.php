@@ -29,9 +29,9 @@ include_once    "include/config.inc.php";
 	function        create_Host_Group($group)
 	{
 		$result=DBselect("select distinct(groupid) from groups where name=".zbx_dbstr($group));
-		if(DBnum_rows($result)>0)
+		$row=DBfetch($result);
+		if($row)
 		{
-			$row=DBfetch($result);
 			return $row["groupid"];
 		}
 
@@ -51,9 +51,9 @@ include_once    "include/config.inc.php";
 	function        create_User_Group($group)
 	{
 		$result=DBselect("select distinct(usrgrpid) from usrgrp where name='$group'");
-		if(DBnum_rows($result)>0)
+		$row=DBfetch($result);
+		if($row)
 		{
-			$row=DBfetch($result);
 			return $row["usrgrpid"];
 		}
 

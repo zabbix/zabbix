@@ -189,14 +189,14 @@ int main(int argc, char **argv)
 	{
 		while(fgets(line,MAX_STRING_LEN,stdin) != NULL)
 		{
-/*			printf("[%s]\n",line);*/
 			alarm(SENDER_TIMEOUT);
-
+	
+			s=(char *)strtok(line," ");
 			strscpy(zabbix_server,s);
 			s=(char *)strtok(NULL," ");
-			strscpy(port_str,s);
-			s=(char *)strtok(NULL," ");
 			strscpy(server,s);
+			s=(char *)strtok(NULL," ");
+			strscpy(port_str,s);
 			s=(char *)strtok(NULL," ");
 			strscpy(key,s);
 			s=(char *)strtok(NULL," ");
