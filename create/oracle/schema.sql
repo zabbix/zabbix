@@ -515,7 +515,7 @@ CREATE TABLE hosts (
 	hostid		number(10)	NOT NULL,
 	host		varchar2(64)	DEFAULT NULL,
 	useip		number(3)	DEFAULT '1' NOT NULL,
-	ip		varchar2(15)	DEFAULT '127.0.0.1' NOT NULL,
+	ip		varchar2(15)	DEFAULT NULL,
 	port		number(10)	DEFAULT '0' NOT NULL,
 	status		number(10)	DEFAULT '0' NOT NULL,
 -- If status=UNREACHABLE, host will not be checked until this time

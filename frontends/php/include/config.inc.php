@@ -2132,6 +2132,7 @@ COpt::profiling_stop("script");
 
 
 		$sql="select value from profiles where userid=".$USER_DETAILS["userid"]." and idx=".zbx_dbstr($idx);
+//		echo $sql."<br>";
 		$result=DBselect($sql);
 		$row=DBfetch($result);
 

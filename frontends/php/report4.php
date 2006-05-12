@@ -118,7 +118,7 @@
                 $header=array(new CCol(S_YEAR,"center"));
                 $uindex=1;
                 $result=DBselect("select * from users".
-                        " group by alias");
+                        " order by alias");
                 while($row=DBfetch($result))
                 {
                         $header=array_merge($header,array(new CImg("vtext.php?text=".$row["alias"])));
@@ -184,7 +184,7 @@
                 {
                 $header=array(new CCol(SPACE.S_MONTH,"center"));
                 $uindex=1;
-                $result=DBselect("select * from users group by alias");
+                $result=DBselect("select * from users order by alias");
                 while($row=DBfetch($result))
                 {
                         $header=array_merge($header,array(new CImg("vtext.php?text=".$row["alias"])));
@@ -249,7 +249,7 @@
         {
                 $header=array(new CCol(SPACE.S_DAY,"center"));
                 $uindex=1;
-                $result=DBselect("select * from users group by alias");
+                $result=DBselect("select * from users order by alias");
                 while($row=DBfetch($result))
                 {
                         $header=array_merge($header,array(new CImg("vtext.php?text=".$row["alias"])));
@@ -321,7 +321,7 @@
                 $year=date("Y");
                 $header=array(new CCol(SPACE.S_FROM,"center"),new CCol(SPACE.S_TILL,"center"));
                 $uindex=1;
-                $result=DBselect("select * from users group by alias");
+                $result=DBselect("select * from users order by alias");
                 while($row=DBfetch($result))
                 {
                         $header=array_merge($header,array(new CImg("vtext.php?text=".$row["alias"])));
