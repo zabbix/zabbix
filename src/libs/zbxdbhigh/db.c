@@ -620,15 +620,6 @@ int	add_alarm(int triggerid,int status,int clock,int *alarmid)
 
 	*alarmid=DBinsert_id();
 
-	/* Cancel currently active escalations */
-	if(status == TRIGGER_VALUE_FALSE || status == TRIGGER_VALUE_TRUE)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG,"Before SQL");
-		snprintf(sql,sizeof(sql)-1,"update escalation_log set status=1 where triggerid=%d and status=0", triggerid);
-		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
-		DBexecute(sql);
-	}
-
 	/* Cancel currently active alerts */
 	if(status == TRIGGER_VALUE_FALSE || status == TRIGGER_VALUE_TRUE)
 	{
@@ -1557,29 +1548,4 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 	item->trapper_hosts=row[32];
 	item->logtimefmt=row[33];
 	item->valuemapid=atoi(row[34]);
-}
-
-int     DBget_default_escalation_id()
-{
-	DB_RESULT dbresult;
-	DB_ROW		row;
-	int	res = SUCCEED;
-
-        char	sql[MAX_STRING_LEN];
-
-/* 0 is added to distinguish between lastvalue==NULL and empty result */
-	snprintf( sql, sizeof(sql)-1, "select escalationid from escalations where dflt=1");
-	dbresult = DBselect(sql);
-	row = DBfetch(dbresult);
-
-	if(!row)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "No default escalation defined");
-		zabbix_syslog("No default escalation defined");
-		res = FAIL;
-	}
-	res = atoi(row[0]);
-        DBfree_result(dbresult);
-
-	return res;
 }
