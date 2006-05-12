@@ -81,6 +81,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 int     PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int     NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     SYSTEM_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);

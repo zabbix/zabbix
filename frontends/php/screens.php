@@ -90,11 +90,9 @@
 	if($screen_correct == 0 && $first_screen != 0)
 	{
 		$_REQUEST["screenid"] = $first_screen;
-		$cmbScreens->SetValue($first_screen);
 	}
 
 	$form->AddItem($cmbScreens);
-
 	show_header2($text,$form);
 ?>
 

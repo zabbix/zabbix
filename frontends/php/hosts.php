@@ -460,8 +460,7 @@
 
 			$table = new CTableInfo(S_NO_HOSTS_DEFINED);
 			$table->setHeader(array(
-				array(new CCheckBox("all_hosts",NULL,NULL,
-					"CheckAll('".$form->GetName()."','all_hosts');"),
+				array(new CCheckBox("all_hosts",NULL,"CheckAll('".$form->GetName()."','all_hosts');"),
 					SPACE.S_NAME),
 				$show_only_tmp ? NULL : S_IP,
 				$show_only_tmp ? NULL : S_PORT,
@@ -492,7 +491,7 @@
 				if($template == "/") $template = NULL;
 				
 				$host=new CCol(array(
-					new CCheckBox("hosts[]",NULL,NULL,NULL,$row["hostid"]),
+					new CCheckBox("hosts[]",NULL,NULL,$row["hostid"]),
 					SPACE,
 					new CSpan($template,"unknown"),
 					new CLink($row["host"],"hosts.php?form=update&hostid=".
@@ -597,7 +596,7 @@
 			$table = new CTableInfo(S_NO_HOST_GROUPS_DEFINED);
 
 			$table->setHeader(array(
-				array(	new CCheckBox("all_groups",NULL,NULL,
+				array(	new CCheckBox("all_groups",NULL,
 						"CheckAll('".$form->GetName()."','all_groups');"),
 					SPACE,
 					S_NAME),
@@ -629,7 +628,7 @@
 
 				$table->AddRow(array(
 					array(
-						new CCheckBox("groups[]",NULL,NULL,NULL,$db_group["groupid"]),
+						new CCheckBox("groups[]",NULL,NULL,$db_group["groupid"]),
 						SPACE,
 						new CLink(
 							$db_group["name"],
@@ -771,7 +770,7 @@
 
 			$table = new CTableInfo();
 			$table->SetHeader(array(
-				array(new CCheckBox("all_applications",NULL,NULL,
+				array(new CCheckBox("all_applications",NULL,
 					"CheckAll('".$form->GetName()."','all_applications');"),
 				SPACE,
 				S_ID),
@@ -804,7 +803,7 @@
 
 
 				$table->AddRow(array(
-					array(new CCheckBox("applications[]",NULL,NULL,NULL,$db_app["applicationid"]),
+					array(new CCheckBox("applications[]",NULL,NULL,$db_app["applicationid"]),
 					SPACE,
 					$db_app["applicationid"]),
 					$name,

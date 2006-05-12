@@ -38,40 +38,24 @@
 		function SetAction($value=NULL)
 		{
 			if(is_null($value))
-			{
-				return $this->AddOption("action",$page["file"]);
-			}
-			elseif(!is_string($value))
-			{
-				return $this->error("Incorrect value for SetAction [$value]");
-			}
-			return $this->AddOption("onClick",$value);
+				return $this->options['action'] = $page['file'];
+
+			return $this->options['onClick'] = $value;
 		}
 		function SetUrl($value)
 		{
-			if(is_null($value))
-			{
-				return $this->DelOption("href");
-			}
-			elseif(!is_string($value))
-			{
-				return $this->error("Incorrect value for SetUrl [$value]");
-			}
-			
-			$this->AddOption("href",$value);
+			$this->options['href'] = $value;
 		}
 		function SetTarget($value=NULL)
 		{
 			if(is_null($value))
 			{
-				return $this->DelOption("target");
+				unset($this->options['target']);
 			}
-			elseif(!is_string($value))
+			else
 			{
-				return $this->error("Incorrect value for SetTarget [$value]");
+				$this->options['target'] = $value;
 			}
-			
-			$this->AddOption("target",$value);
 		}
 	}
 ?>

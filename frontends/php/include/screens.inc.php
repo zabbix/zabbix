@@ -51,6 +51,9 @@
                 $result=DBexecute("delete from screens_items where resourceid=$screenid and resource=".SCREEN_RESOURCE_SCREEN);
                 if(!$result)	return  $result;
 
+		// delete screen permisions
+		DBexecute('delete from rights where name=\'Screen\' and id='.$screenid);
+
                 return  DBexecute("delete from screens where screenid=$screenid");
         }
 
@@ -85,12 +88,8 @@
 		{
 			return	$row;
 		}
-		else
-		{
-			info("No screen with screenid=[$screenid]");
-			return FALSE;
-		}
-		return	$result;
+		error("No screen with screenid=[$screenid]");
+		return FALSE;
 	}
 
 	function	check_screen_recursion($mother_screenid, $child_screenid)

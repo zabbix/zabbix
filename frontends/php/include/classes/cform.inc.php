@@ -31,11 +31,7 @@
 		}
 		function SetMethod($value='post')
 		{
-			if(!is_string($value))
-			{
-				return $this->error("Incorrect value for SetMethod [$value]");
-			}
-			return $this->AddOption("method",$value);
+			return $this->options['method'] = $value;
 		}
 		function SetAction($value=NULL)
 		{
@@ -43,17 +39,13 @@
 
 			if(is_null($value))
 			{
-				if(isset($page["file"]))	
+				if(isset($page['file']))
 				{
-					return $this->AddOption("action",$page["file"]);
+					return $this->options['action'] = $page['file'];
 				}
 				return 1;
 			}
-			elseif(!is_string($value))
-			{
-				return $this->error("Incorrect value for SetAction [$value]");
-			}
-			return $this->AddOption("action",$value);
+			return $this->options['action'] = $value;
 		}
 		function SetEnctype($value=NULL)
 		{

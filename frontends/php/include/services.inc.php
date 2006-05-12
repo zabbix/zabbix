@@ -79,6 +79,9 @@
 		{
 			return	$result;
 		}
+	// delete service permisions
+		DBexecute('delete from rights where name=\'Service\' and id='.$serviceid);
+
 		$sql="delete from services where serviceid=$serviceid";
 		return DBexecute($sql);
 	}
@@ -314,29 +317,25 @@
 	{
 		$sql="select * from services where serviceid=$serviceid";
 		$result=DBselect($sql);
-		if(Dbnum_rows($result) == 1)
-		{
-			return	DBfetch($result);
-		}
-		else
+		$res = DBfetch($result);
+		if(!$res)
 		{
 			error("No service with serviceid=[$serviceid]");
+			return	FALSE;
 		}
-		return	FALSE;
+		return $res;
 	}
 
 	function	get_services_links_by_linkid($linkid)
 	{
 		$result=DBselect("select * from services_links where linkid=$linkid");
-		if(Dbnum_rows($result) == 1)
-		{
-			return	DBfetch($result);
-		}
-		else
+		$res = DBfetch($result);
+		if(!$res)
 		{
 			error("No service linkage with linkid=[$linkid]");
+			return	FALSE;
 		}
-		return	FALSE;
+		return $res;
 	}
 
 	function algorithm2str($algorithm)

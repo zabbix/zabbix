@@ -222,6 +222,69 @@ int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 	return ret;
 }
 
+int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	struct net_stat_s	ns;
+	
+	char	interface[MAX_STRING_LEN];
+	char	mode[MAX_STRING_LEN];
+	
+	int ret = SYSINFO_RET_FAIL;
+        
+	assert(result);
+
+        init_result(result);
+
+        if(num_param(param) > 2)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+
+        if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+	
+	if(get_param(param, 2, mode, MAX_STRING_LEN) != 0)
+        {
+                mode[0] = '\0';
+        }
+        if(mode[0] == '\0')
+	{
+		/* default parameter */
+		sprintf(mode, "bytes");
+	}
+
+	ret = get_net_stat(interface, &ns);
+	
+
+	if(ret == SYSINFO_RET_OK)
+	{
+		if(strncmp(mode, "bytes", MAX_STRING_LEN) == 0)
+		{
+			SET_UI64_RESULT(result, ns.ibytes + ns.obytes);
+		} 
+		else if(strncmp(mode, "packets", MAX_STRING_LEN) == 0)
+		{
+			SET_UI64_RESULT(result, ns.ipackets + ns.opackets);
+		}
+		else if(strncmp(mode, "errors", MAX_STRING_LEN) == 0)
+		{
+			SET_UI64_RESULT(result, ns.ierr + ns.oerr);
+		}
+		else if(strncmp(mode, "dropped", MAX_STRING_LEN) == 0)
+		{
+			SET_UI64_RESULT(result, ns.idrop + ns.odrop);
+		}
+		else
+		{
+			ret = SYSINFO_RET_FAIL;
+		}
+	}
+	
+	return ret;
+}
+
 int     NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
         assert(result);

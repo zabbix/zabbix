@@ -103,13 +103,19 @@
 <?php
 	if($_REQUEST["type"]==SHOW_DATA)
 	{
+COpt::profiling_start("get_items_data_overview");
 		$table = get_items_data_overview($_REQUEST["groupid"]);
+COpt::profiling_stop("get_items_data_overview");
 		$table->Show();
+		unset($table);
 	}
 	elseif($_REQUEST["type"]==SHOW_TRIGGERS)
 	{
+COpt::profiling_start("get_triggers_overview");
 		$table = get_triggers_overview($_REQUEST["groupid"]);
+COpt::profiling_stop("get_triggers_overview");
 		$table->Show();
+		unset($table);
 	}
 ?>
 

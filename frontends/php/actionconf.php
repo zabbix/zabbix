@@ -241,8 +241,7 @@
 
 		$tblActions = new CTableInfo(S_NO_ACTIONS_DEFINED);
 		$tblActions->SetHeader(array(
-			array(	new CCheckBox("all_items",NULL,NULL,
-					"CheckAll('".$form->GetName()."','all_items');"),
+			array(	new CCheckBox("all_items",NULL,"CheckAll('".$form->GetName()."','all_items');"),
 				S_SOURCE
 			),
 			S_CONDITIONS,
@@ -302,7 +301,6 @@
 					new CCheckBox(
 						"g_actionid[]",	/* name */
 						NULL,			/* checked */
-						NULL,			/* caption */
 						NULL,			/* action */
 						$row["actionid"]),	/* value */
 					SPACE,

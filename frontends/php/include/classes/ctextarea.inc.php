@@ -21,82 +21,38 @@
 <?php
 	class CTextArea extends CTag
 	{
-/* private */
-		var $caption;
 /* public */
-		function CTextArea($name='textarea',$value="",$cols=77,$rows=7,$caption=NULL,$readonly='no')
+		function CTextArea($name='textarea',$value="",$cols=77,$rows=7,$readonly='no')
 		{
 			parent::CTag("textarea","yes");
-			$this->SetClass("biginput");
-			$this->AddOption('wrap','soft');
-			$this->SetName($name);
-			$this->SetCols($cols);
-			$this->SetRows($rows);
-			$this->SetCaption($caption);
-			$this->SetValue($value);
+			$this->options['class'] = 'biginput';
+			$this->options['wrap'] = 'soft';
+			$this->options['name'] = $name;
+			$this->options['rows'] = $rows;
+			$this->options['cols'] = $cols;
 			$this->SetReadonly($readonly);
-		}
-		function Show()
-		{
-			if(isset($this->caption))
-				echo $this->caption." ";
-			parent::Show();
-		}
-		function SetName($value='textarea')
-		{
-			if(!is_string($value))
-			{
-				return $this->error("Incorrect value for SetName [$value]");
-			}
-			return $this->AddOption("name",$value);
-		}
-		function SetCaption($value=NULL)
-		{
-			if(is_null($value))
-				unset($this->caption);
-			elseif(is_string($value))	
-				$this->caption = $value;
-			else
-			{
-				return $this->error("Incorrect value for SetCaption [$value]");
-			}
-			return 0;
+
+			$this->AddItem($value);
 		}
 		function SetReadonly($value='yes')
 		{
-			if(is_string($value))
-			{
-				if($value=='no')
-					return $this->DelOption("readonly");
-				elseif($value=='yes')
-					return $this->AddOption("readonly",'readonly');
-			}
-			return $this->error("Incorrect value for SetReadonly [$value]");
+			if($value=='yes')
+				return $this->options['readonly'] = 'readonly';
+
+			$this->DelOption("readonly");
 		}
 		function SetValue($value="")
 		{
-			if(!is_string($value))
-			{
-				return $this->error("Incorrect value for SetValue [$value]");
-			}
 			return $this->AddItem($value);
 		}
 		function SetRows($value)
 		{
-			if(!is_numeric($value))
-			{
-				return $this->error("Incorrect value for SetRows [$value]");
-			}
-			return $this->AddOption("rows",strval($value));
+			return $this->options['rows'] = $value;
 			
 		}
 		function SetCols($value)
 		{
-			if(!is_numeric($value))
-			{
-				return $this->error("Incorrect value for SetCols [$value]");
-			}
-			return $this->AddOption("cols",strval($value));
+			return $this->options['cols'] = $value;
 			
 		}
 	}

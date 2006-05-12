@@ -19,13 +19,9 @@
 **/
 ?>
 <?php
-	class CPassBox extends CTextBox
-	{
-/* public */
-		function CPassBox($name="password",$value="",$size=20,$caption=NULL)
-		{
-			parent::CTextBox($name,$value,$size,$caption);
-			$this->AddOption("type","password");
-		}
-	}
+
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// TODO REMOVE THIS FILE FROM CVS
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 ?>

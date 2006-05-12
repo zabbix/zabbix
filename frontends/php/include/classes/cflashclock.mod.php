@@ -41,11 +41,12 @@
 
 			$this->timetype = $value;
 		}
-		function Show()
+		function BodyToString()
 		{
 			if($this->timetype == TIME_TYPE_SERVER)
 				$this->SetSrc($this->src."&timestamp=".time());
-			parent::Show();	
+
+			return parent::BodyToString();	
 		}
 	}
 ?>

@@ -26,90 +26,55 @@
 		{
 			parent::CTag('option','yes');
 			$this->tag_body_start = "";
-			$this->SetCaption($caption);
-			$this->SetValue($value);
+			$this->options['value'] = $value;
+
+			$this->AddItem($caption);
+
 			$this->SetSelected($selected);
 			$this->SetEnabled($enabled);
 
 		}
 		function SetValue($value)
 		{
-			return parent::AddOption('value',$value);
+			return $this->options['value'] = $value;
 		}
 		function GetValue()
 		{
-			return parent::GetOption('value');
+			return $this->GetOption('value');
 		}
 		function SetCaption($value=NULL)
 		{
-			if(is_null($value))
-				return 0;
-			elseif(is_string($value)){
-				parent::AddItem(nbsp($value));
-				return 0;
-			}
-			return $this->error("Incorrect value for SetCaption [$value]");
+			$this->AddItem(nbsp($value));
 		}
 		function SetSelected($value='yes')
 		{
-			if(is_null($value))
-				return $this->DelOption('selected');
-			elseif((is_string($value) && ($value == 'yes' || $value == "selected" || $value=='on'))
+			if((is_string($value) && ($value == 'yes' || $value == "selected" || $value=='on'))
 				|| (is_int($value) && $value<>0))
-				return $this->AddOption('selected','selected');
-			elseif((is_string($value) && ($value == 'no' || $value=='off'))
-				|| (is_int($value) && $value==0))
-				return $this->DelOption('selected');
-			return $this->error("Incorrect value for SetSelected [$value]");
+				return $this->options['selected'] = 'selected';
+
+			$this->DelOption('selected');
 		}
 	}
 
 	class CComboBox extends CTag
 	{
 /* private */
-		var $caption;
 		var $value;
 
 /* public */
 		function CComboBox($name='combobox',$value=NULL,$action=NULL)
 		{
-			parent::CTag("select","yes");
-			$this->tag_end = "";
-			$this->SetClass("biginput");
-			$this->SetName($name);
-			$this->SetValue($value);
-			$this->AddOption("size",1);
+			parent::CTag('select','yes');
+			$this->tag_end = '';
+			$this->options['class'] = 'biginput';
+			$this->options['name'] = $name;
+			$this->value = $value;
+			$this->options['size'] = 1;
 			$this->SetAction($action);
 		}
 		function SetAction($value='submit()', $event='onChange')
 		{
-			if(is_null($value))
-				return 1;
-			if(!is_string($value))
-				return $this->error("Incorrect value for SetAction [$value]");
-			if(!is_string($event))
-				return $this->error("Incorrect event for SetAction [$event]");
-			return $this->AddOption($event,$value);
-		}
-		function SetName($value='combobox')
-		{
-			if(!is_string($value))
-			{
-				return $this->error("Incorrect value for SetName [$value]");
-			}
-			return $this->AddOption("name",$value);
-		}
-		function SetCaption($value=NULL)
-		{
-			if(is_null($value))
-				unset($this->caption);
-			elseif(is_string($value))	
-				$this->caption = $value;
-			else
-			{
-				return $this->error("Incorrect value for SetCaption [$value]");
-			}
-			return 0;
+			$this->AddOption($event,$value);
 		}
 		function SetValue($value=NULL)
 		{
@@ -119,30 +84,31 @@
 		{
 //			if($enabled=='no') return;	/* disable item method 1 */
 
-			$cmbItem = new CComboItem($value,$caption,$selected,$enabled);
-			return parent::AddItem($cmbItem);
-		}
-
-		function SetSelectedByValue(&$item)
-		{
-			if(!is_null($this->value))
+			if(is_null($selected))
 			{
 				$selected = 'no';
-				if($item->GetValue() == $this->value)		$selected = 'yes';
-				$item->SetSelected($selected);
+				if($value == $this->value || (is_array($this->value) && in_array($value, $this->value)))
+					$selected = 'yes';
 			}
-		}
 
-		function ShowTagItem(&$item)
-		{
-			$this->SetSelectedByValue($item);
-			parent::ShowTagItem($item);
-		}
-		function Show()
-		{
-			if(isset($this->caption))
-				echo $this->caption." ";
-			parent::Show();
+			parent::AddItem(new CComboItem($value,$caption,$selected,$enabled));
 		}
 	}
+
+	class CListBox extends CComboBox
+	{
+/* public */
+		function CListBox($name='combobox',$value=NULL,$size=5,$action=NULL)
+		{
+			parent::CComboBox($name,NULL,$action);
+			$this->options['multiple'] = 'multiple';
+			$this->options['size'] = $size;
+			$this->SetValue($value);
+		}
+		function SetSize($value)
+		{
+			$this->options['size'] = $value;
+		}
+	}
+
 ?>
