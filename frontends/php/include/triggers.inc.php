@@ -1032,7 +1032,6 @@
 			$hosts[$row['host']] = $row['host'];
 			$triggers[$row['description']][$row['host']] = array('value' => $row['value'], 'lastchange' => $row['lastchange']);
 		}
-		sort($hosts);
 
 		$header=array(new CCol(S_TRIGGERS,'center'));
 		foreach($hosts as $hostname)
