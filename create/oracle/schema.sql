@@ -826,52 +826,6 @@ begin
 end;
 /
 
-
---
--- Table structure for table 'problems'
---
-
--- CREATE TABLE problems (
---   problemid		number(10)		NOT NULL auto_increment,
---   userid		number(10)		DEFAULT '0' NOT NULL,
---   triggerid		number(10),
---   lastupdate		number(10)		DEFAULT '0' NOT NULL,
---   clock			number(10)		DEFAULT '0' NOT NULL,
---   status		number(3)		DEFAULT '0' NOT NULL,
---   description		varchar2(255)	DEFAULT '' NOT NULL,
---   categoryid		number(10),
-  -- priority		number(3)		DEFAULT '0' NOT NULL,
---   PRIMARY KEY (problemid),
---   KEY (status),
---   KEY (categoryid),
---   KEY (priority)
--- ) type=InnoDB;
-
---
--- Table structure for table 'categories'
---
-
--- CREATE TABLE categories (
---   categoryid		number(10)		NOT NULL auto_increment,
---   descripion		varchar2(64)	DEFAULT '' NOT NULL,
---   PRIMARY KEY (categoryid)
--- ) type=InnoDB;
-
---
--- Table structure for table 'problems_categories'
---
-
--- CREATE TABLE problems_comments (
---   commentid		number(10)		NOT NULL auto_increment,
---   problemid		number(10)		DEFAULT '0' NOT NULL,
---   clock			number(10),
---   status_before		number(3)		DEFAULT '0' NOT NULL,
---   status_after		number(3)		DEFAULT '0' NOT NULL,
---   comment		blob,
---   PRIMARY KEY (commentid),
---   KEY (problemid,clock)
--- ) type=InnoDB;
-
 --
 -- Table structure for table 'service_alarms'
 --
@@ -1056,13 +1010,28 @@ CREATE TABLE trends (
 --
 
 CREATE TABLE images (
-  imageid		number(10)		NOT NULL auto_increment,
-  imagetype		number(10)		DEFAULT '0' NOT NULL,
-  name			varchar2(64)	DEFAULT '0' NOT NULL,
-  image			longblob	DEFAULT '' NOT NULL,
-  PRIMARY KEY (imageid),
-  UNIQUE (imagetype, name)
-) type=InnoDB;
+	imageid		number(10)	NOT NULL,
+	imagetype	number(10)	DEFAULT '0' NOT NULL,
+	name		varchar2(64)	DEFAULT '0' NOT NULL,
+	image		varchar2(2048)	DEFAULT '' NOT NULL,
+	CONSTRAINT 	images PRIMARY KEY (imageid)
+);
+
+CREATE UNIQUE INDEX images_imagetypename on images (imagetype, name);
+
+create sequence images_imageid 
+start with 1 
+increment by 1 
+nomaxvalue; 
+
+create trigger images_trigger
+before insert on images
+for each row
+begin
+	if (:new.imageid is null or :new.imageid = 0) then
+		select images_imageid.nextval into :new.imageid from dual;
+	end if;
+end;
 
 --
 -- Table structure for table 'hosts_templates'
@@ -1153,12 +1122,28 @@ CREATE TABLE hosts_profiles (
 --
 
 CREATE TABLE autoreg (
-  id			number(10)		NOT NULL auto_increment,
-  priority		number(10)		DEFAULT '0' NOT NULL,
-  pattern		varchar2(255)	DEFAULT '' NOT NULL,
-  hostid		number(10)		DEFAULT '0' NOT NULL,
-  PRIMARY KEY (id)
-) type=InnoDB;
+	id		number(10)	NOT NULL,
+	priority	number(10)	DEFAULT '0' NOT NULL,
+	pattern		varchar2(255)	DEFAULT '' NOT NULL,
+	hostid		number(10)	DEFAULT '0' NOT NULL,
+	CONSTRAINT 	autoreg_pk PRIMARY KEY (id)
+);
+
+create sequence autoreg_id 
+start with 1 
+increment by 1 
+nomaxvalue; 
+
+create trigger autoreg_trigger
+before insert on autoreg
+for each row
+begin
+	if (:new.id is null or :new.id = 0) then
+		select autoreg_id.nextval into :new.id from dual;
+	end if;
+end;
+/
+
 
 --
 -- Table structure for table 'valuemaps'
