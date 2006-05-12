@@ -57,9 +57,10 @@
 	function	get_graphitem_by_gitemid($gitemid)
 	{
 		$result=DBselect("select * from graphs_items where gitemid=$gitemid");
-		if(DBnum_rows($result) == 1)
+		$row=DBfetch($result);
+		if($row)
 		{
-			return	DBfetch($result);	
+			return	$row;
 		}
 		error("No graph item with gitemid=[$gitemid]");
 		return	$result;
@@ -68,9 +69,10 @@
 	function	get_graphitem_by_itemid($itemid)
 	{
 		$result=DBselect("select * from graphs_items where itemid=$itemid");
-		if(DBnum_rows($result) == 1)
+		$row=DBfetch($result);
+		if($row)
 		{
-			return	DBfetch($result);	
+			return	$row;
 		}
 		return	$result;
 	}
@@ -79,9 +81,10 @@
 	{
 
 		$result=DBselect("select * from graphs where graphid=$graphid");
-		if(DBnum_rows($result) == 1)
+		$row=DBfetch($result);
+		if($row)
 		{
-			return	DBfetch($result);	
+			return	$row;
 		}
 		error("No graph with graphid=[$graphid]");
 		return	$result;
@@ -209,7 +212,7 @@
 		if($gitemid && $host["status"]==HOST_STATUS_TEMPLATE)
 		{// add to child graphs
 			$gitems = get_graphitems_by_graphid($graphid);
-			if(DBnum_rows($gitems)==1)
+			if(DBfetch($gitems))
 			{// create graphs for childs with item
 				$chd_hosts = get_hosts_by_templateid($host["hostid"]);
 				while($chd_host = DBfetch($chd_hosts))
@@ -226,12 +229,12 @@
 					$db_items = DBselect("select itemid from items".
 						" where key_=".zbx_dbstr($item["key_"]).
 						" and hostid=".$chd_host["hostid"]);
-					if(DBnum_rows($db_items)==0)
+					$db_item = DBfetch($db_items);
+					if(!$db_item)
 					{
 						$result = FALSE;
 						break;
 					}
-					$db_item = DBfetch($db_items);
 				// recursion
 					$result = add_item_to_graph($new_graphid,$db_item["itemid"],
 						$color,$drawtype,$sortorder,$yaxisside);
@@ -251,12 +254,12 @@
 					$db_items = DBselect("select itemid from items".
 						" where key_=".zbx_dbstr($item["key_"]).
 						" and hostid=".$chd_host["hostid"]);
-					if(DBnum_rows($db_items)==0)
+					$db_item = DBfetch($db_items);
+					if(!$db_item)
 					{
 						$result = FALSE;
 						break;
 					}
-					$db_item = DBfetch($db_items);
 				// recursion
 					$result = add_item_to_graph($child["graphid"],$db_item["itemid"],
 						$color,$drawtype,$sortorder,$yaxisside);
@@ -294,9 +297,9 @@
 			$db_items = DBselect("select itemid from items".
 				" where key_=".zbx_dbstr($item["key_"]).
 				" and hostid=".$chd_host["hostid"]);
-			if(DBnum_rows($db_items)==0)
-				return FALSE;
 			$db_item = DBfetch($db_items);
+			if(!$db_item)
+				return FALSE;
 
 			$chd_gitems = get_graphitems_by_graphid($child["graphid"]);
 			while($chd_gitem = DBfetch($chd_gitems))
@@ -351,7 +354,7 @@
 			info("Item '".$item["description"]."' deleted from graph '".$graph["name"]."'");
 
 			$graph_items = get_graphitems_by_graphid($graph["graphid"]);
-			if($graph["templateid"]>0 && DBnum_rows($graph_items) < 1)
+			if($graph["templateid"]>0 && !DBfetch($graph_items))
 			{
 				return delete_graph($graph["graphid"]);
 			}

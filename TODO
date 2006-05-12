@@ -1,5 +1,13 @@
 1.1beta9:
 
+ - special unit "unixtime" for uptimes, etc
+ - oracle schema for table images
+ - what is table stats?
+ - rename screens_items.resource
+ - rename screens.rows
+ - rename audit.resource
+ - rename audit to auditlog
+ - remove anything related to escalations
  - http://www.zabbix.com/forum/showthread.php?t=2682
  - http://www.zabbix.com/forum/showthread.php?t=2680
  - http://www.zabbix.com/forum/showthread.php?t=2675

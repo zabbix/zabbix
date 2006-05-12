@@ -43,7 +43,7 @@
 			$result = DBexecute("select * from groups where name=".zbx_dbstr($name).
 				" and groupid<>$groupid");
 		
-		if(DBnum_rows($result)>0)
+		if(DBfetch($result))
 		{
 			error("Group '$name' already exists");
 			return FALSE;
@@ -151,7 +151,7 @@
 			$result=DBexecute("select * from hosts where host=".zbx_dbstr($host).
 				" and hostid<>$hostid");
 
-		if(DBnum_rows($result)>0)
+		if(DBfetch($result))
 		{
 			error("Host '$host' already exists");
 			return FALSE;
@@ -318,9 +318,10 @@
 	function	get_hostgroup_by_groupid($groupid)
 	{
 		$result=DBselect("select * from groups where groupid=".$groupid);
-		if(DBnum_rows($result) == 1)
+		$row=DBfetch($result);
+		if($row)
 		{
-			return DBfetch($result);
+			return $row;
 		}
 		error("No host groups with groupid=[$groupid]");
 		return  FALSE;
@@ -330,9 +331,10 @@
 	{
 		$sql="select h.* from hosts h, items i where i.hostid=h.hostid and i.itemid=$itemid";
 		$result=DBselect($sql);
-		if(DBnum_rows($result) == 1)
+		$row=DBfetch($result);
+		if($row)
 		{
-			return DBfetch($result);
+			return $row;
 		}
 		error("No host with itemid=[$itemid]");
 		return	FALSE;
@@ -342,9 +344,10 @@
 	{
 		$sql="select * from hosts where hostid=$hostid";
 		$result=DBselect($sql);
-		if(DBnum_rows($result) == 1)
+		$row=DBfetch($result);
+		if($row)
 		{
-			return DBfetch($result);
+			return $row;
 		}
 		if($no_error_message == 0)
 			error("No host with hostid=[$hostid]");
@@ -429,8 +432,8 @@
 			$groupid = $a_groupid;
 
 			if($groupid > 0) 
-				if(DBnum_rows(DBselect("select hg.groupid from hosts_groups hg".
-					" where hg.groupid=".$groupid." group by hg.groupid")) != 1)
+				if(!DBfetch(DBselect("select hg.groupid from hosts_groups hg".
+					" where hg.groupid=".$groupid." group by hg.groupid")))
 						$groupid = 0;
 
 			if($groupid > 0)
@@ -478,9 +481,6 @@
 
 			if($groupid > 0)
 			{ 
-//				if(DBnum_rows(DBselect("select hg.hostid from hosts_groups hg".
-//					" where hg.groupid=".$groupid." and hg.hostid=".$hostid)) != 1)
-//						$hostid = 0;
 				if(!DBfetch(DBselect("select hg.hostid from hosts_groups hg".
 					" where hg.groupid=".$groupid." and hg.hostid=".$hostid)))
 						$hostid = 0;
@@ -490,10 +490,6 @@
 
 			if($hostid > 0)
 			{
-//				if(DBnum_rows(DBselect("select distinct h.hostid from hosts h".$item_table.
-//					" where h.status<>".HOST_STATUS_DELETED.$with_host_status.$with_items.
-//					" and h.hostid=".$hostid)) != 1)
-//						$hostid = 0;
 				if(!DBfetch(DBselect("select distinct h.hostid from hosts h".$item_table.
 					" where h.status<>".HOST_STATUS_DELETED.$with_host_status.$with_items.
 					" and h.hostid=".$hostid)))
@@ -567,22 +563,18 @@
 			$result = DBexecute("select * from applications where name=".zbx_dbstr($name)." and hostid=".$hostid.
 				" and applicationid<>$applicationid");
 
-		$match_cnt = DBnum_rows($result);
-		if($match_cnt > 0)
-		{
-			$db_app = DBfetch($result);;
-		}
-		if($match_cnt > 0 && $templateid==0)
+		$db_app = DBfetch($result);
+		if($db_app && $templateid==0)
 		{
 			error("Application '$name' already exists");
 			return FALSE;
 		}
-		if($match_cnt > 0 && $applicationid!=NULL)
+		if($db_app && $applicationid!=NULL)
 		{ // delete old item with same name
 			delete_application($db_app["applicationid"]);
 		}
 
-		if($match_cnt > 0 && $applicationid==NULL)
+		if($db_app && $applicationid==NULL)
 		{ // if found application with same name update them, adding not needed
 			$applicationid = $db_app["applicationid"];
 		}
@@ -670,9 +662,10 @@
 	function	get_application_by_applicationid($applicationid,$no_error_message=0)
 	{
 		$result = DBselect("select * from applications where applicationid=".$applicationid);
-		if(DBnum_rows($result) == 1)
+		$row=DBfetch($result);
+		if($row)
 		{
-			return DBfetch($result);
+			return $row;
 		}
 		if($no_error_message == 0)
 			error("No application with id=[$applicationid]");
@@ -698,9 +691,10 @@
 	{
 		$sql="select h.* from hosts h, applications a where a.hostid=h.hostid and a.applicationid=$applicationid";
 		$result=DBselect($sql);
-		if(DBnum_rows($result) == 1)
+		$row=DBfetch($result);
+		if($row)
 		{
-			return DBfetch($result);
+			return $row;
 		}
 		error("No host with applicationid=[$applicationid]");
 		return	FALSE;

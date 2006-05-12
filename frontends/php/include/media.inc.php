@@ -23,9 +23,10 @@
 	{
 		$sql="select * from media where mediaid=$mediaid"; 
 		$result=DBselect($sql);
-		if(DBnum_rows($result) == 1)
+		$row=DBfetch($result);
+		if($row)
 		{
-			return	DBfetch($result);	
+			return	$row;
 		}
 		else
 		{

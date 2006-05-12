@@ -377,7 +377,7 @@
 		$result=DBselect("select serviceid,triggerid,name from services where serviceid<>$serviceupid order by name");
 		while($row=Dbfetch($result))
 		{
-			if(DBnum_rows(DBselect("select linkid from services_links".
+			if(DBfetch(DBselect("select linkid from services_links".
 				" where servicedownid<>$servicedownid and serviceupid=$serviceupid and servicedownid=".$row["serviceid"])))
 				continue;
 

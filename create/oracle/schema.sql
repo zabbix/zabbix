@@ -66,7 +66,9 @@ create trigger services_trigger
 before insert on services
 for each row
 begin
-	select service_serviceid.nextval into :new.serviceid from dual;
+	if (:new.serviceid is null or :new.serviceid = 0) then
+		select services_serviceid.nextval into :new.serviceid from dual;
+	end if;
 end;
 /
 
@@ -76,102 +78,196 @@ end;
 --
 
 CREATE TABLE services_links (
-  linkid		number(10)		NOT NULL auto_increment,
-  serviceupid		number(10)		DEFAULT '0' NOT NULL,
-  servicedownid		number(10)		DEFAULT '0' NOT NULL,
-  soft			number(3)		DEFAULT '0' NOT NULL,
-  PRIMARY KEY (linkid),
---  KEY (serviceupid),
-  KEY (servicedownid),
-  UNIQUE (serviceupid,servicedownid)
-) type=InnoDB;
+	linkid		number(10)		NOT NULL,
+	serviceupid		number(10)		DEFAULT '0' NOT NULL,
+	servicedownid		number(10)		DEFAULT '0' NOT NULL,
+	soft			number(3)		DEFAULT '0' NOT NULL,
+	CONSTRAINT		services_links_pk	PRIMARY KEY (linkid)
+);
+
+CREATE INDEX services_links_servicedownid on services_links (servicedownid);
+CREATE UNIQUE INDEX services_links_serviceupdownid on services_links (serviceupid,servicedownid);
+
+create sequence services_links_linkid 
+start with 1 
+increment by 1 
+nomaxvalue; 
+
+create trigger services_links_trigger
+before insert on services_links
+for each row
+begin
+	if (:new.linkid is null or :new.linkid = 0) then
+		select services_links_linkid.nextval into :new.linkid from dual;
+	end if;
+end;
+/
 
 --
 -- Table structure for table 'graphs_items'
 --
 
 CREATE TABLE graphs_items (
-  gitemid		number(10)		NOT NULL auto_increment,
-  graphid		number(10)		DEFAULT '0' NOT NULL,
-  itemid		number(10)		DEFAULT '0' NOT NULL,
-  drawtype		number(10)		DEFAULT '0' NOT NULL,
-  sortorder		number(10)		DEFAULT '0' NOT NULL,
-  color			varchar2(32)	DEFAULT 'Dark Green' NOT NULL,
-  yaxisside		number(3)		DEFAULT '1' NOT NULL,
-  PRIMARY KEY (gitemid)
-) type=InnoDB;
+	gitemid		number(10)		NOT NULL,
+	graphid		number(10)		DEFAULT '0' NOT NULL,
+	itemid		number(10)		DEFAULT '0' NOT NULL,
+	drawtype	number(10)		DEFAULT '0' NOT NULL,
+	sortorder	number(10)		DEFAULT '0' NOT NULL,
+	color		varchar2(32)	DEFAULT 'Dark Green' NOT NULL,
+	yaxisside	number(3)		DEFAULT '1' NOT NULL,
+	CONSTRAINT	graphs_items_pk	PRIMARY KEY (gitemid)
+);
+
+create sequence graphs_items_gitemid 
+start with 1 
+increment by 1 
+nomaxvalue; 
+
+create trigger graphs_items_trigger
+before insert on graphs_items
+for each row
+begin
+	if (:new.gitemid is null or :new.gitemid = 0) then
+		select graphs_items_gitemid.nextval into :new.gitemid from dual;
+	end if;
+end;
+/
 
 --
 -- Table structure for table 'graphs'
 --
 
 CREATE TABLE graphs (
-  graphid		number(10)		NOT NULL auto_increment,
-  name			varchar2(128)	DEFAULT '' NOT NULL,
-  width			number(10)		DEFAULT '0' NOT NULL,
-  height		number(10)		DEFAULT '0' NOT NULL,
-  yaxistype		number(3)		DEFAULT '0' NOT NULL,
-  yaxismin		number(16,4)	DEFAULT '0' NOT NULL,
-  yaxismax		number(16,4)	DEFAULT '0' NOT NULL,
-  templateid		number(10)		DEFAULT '0' NOT NULL,
-  show_work_period	number(3)		DEFAULT '1' NOT NULL,
-  show_triggers		number(3)		DEFAULT '1' NOT NULL,
-  PRIMARY KEY (graphid),
-  KEY (name)
-) type=InnoDB;
+	graphid		number(10)		NOT NULL,
+	name		varchar2(128)	DEFAULT '' NOT NULL,
+	width		number(10)		DEFAULT '0' NOT NULL,
+	height		number(10)		DEFAULT '0' NOT NULL,
+	yaxistype	number(3)		DEFAULT '0' NOT NULL,
+	yaxismin	number(16,4)	DEFAULT '0' NOT NULL,
+	yaxismax	number(16,4)	DEFAULT '0' NOT NULL,
+	templateid	number(10)		DEFAULT '0' NOT NULL,
+	show_work_period	number(3)		DEFAULT '1' NOT NULL,
+	show_triggers	number(3)		DEFAULT '1' NOT NULL,
+	CONSTRAINT	graphs_pk	PRIMARY KEY (graphid)
+);
+
+CREATE INDEX graphs_name on graphs (name);
+
+create sequence graphs_graphid
+start with 1 
+increment by 1 
+nomaxvalue; 
+
+create trigger graphs_trigger
+before insert on graphs
+for each row
+begin
+	if (:new.graphid is null or :new.graphid = 0) then
+		select graphs_graphid.nextval into :new.graphid from dual;
+	end if;
+end;
+/
+
 
 --
 -- Table structure for table 'sysmaps_links'
 --
 
 CREATE TABLE sysmaps_links (
-  linkid		number(10)		NOT NULL auto_increment,
-  sysmapid		number(10)		DEFAULT '0' NOT NULL,
-  selementid1		number(10)		DEFAULT '0' NOT NULL,
-  selementid2		number(10)		DEFAULT '0' NOT NULL,
- -- may be NULL 
-  triggerid		number(10),
-  drawtype_off		number(10)		DEFAULT '0' NOT NULL,
-  color_off		varchar2(32)	DEFAULT 'Black' NOT NULL,
-  drawtype_on		number(10)		DEFAULT '0' NOT NULL,
-  color_on		varchar2(32)	DEFAULT 'Red' NOT NULL,
-  PRIMARY KEY (linkid)
-) type=InnoDB;
+	linkid		number(10)	NOT NULL,
+	sysmapid	number(10)	DEFAULT '0' NOT NULL,
+	selementid1	number(10)	DEFAULT '0' NOT NULL,
+	selementid2	number(10)	DEFAULT '0' NOT NULL,
+ -- may be NULL
+	triggerid	number(10),
+	drawtype_off	number(10)	DEFAULT '0' NOT NULL,
+	color_off	varchar2(32)	DEFAULT 'Black' NOT NULL,
+	drawtype_on	number(10)	DEFAULT '0' NOT NULL,
+	color_on	varchar2(32)	DEFAULT 'Red' NOT NULL,
+	CONSTRAINT	sysmaps_links_pk	PRIMARY KEY (linkid)
+);
+
+create sequence sysmaps_links_linkid
+start with 1 
+increment by 1 
+nomaxvalue; 
+
+create trigger sysmaps_links_trigger
+before insert on sysmaps_links
+for each row
+begin
+	if (:new.linkid is null or :new.linkid = 0) then
+		select sysmaps_links_linkid.nextval into :new.linkid from dual;
+	end if;
+end;
+/
+
 
 --
 -- Table structure for table 'sysmaps_elements'
 --
 
 CREATE TABLE sysmaps_elements (
-  selementid		number(10)		NOT NULL auto_increment,
-  sysmapid		number(10)		DEFAULT '0' NOT NULL,
-  elementid		number(10)		DEFAULT '0' NOT NULL,
-  elementtype		number(10)		DEFAULT '0' NOT NULL,
-  icon			varchar2(32)	DEFAULT 'Server' NOT NULL,
-  icon_on		varchar2(32)	DEFAULT 'Server' NOT NULL,
-  label			varchar2(128)	DEFAULT '' NOT NULL,
-  label_location	number(3)		DEFAULT NULL,
-  x			number(10)		DEFAULT '0' NOT NULL,
-  y			number(10)		DEFAULT '0' NOT NULL,
-  url			varchar2(255)	DEFAULT '' NOT NULL,
-  PRIMARY KEY (selementid)
-) type=InnoDB;
+	selementid	number(10)		NOT NULL,
+	sysmapid	number(10)		DEFAULT '0' NOT NULL,
+	elementid	number(10)		DEFAULT '0' NOT NULL,
+	elementtype	number(10)		DEFAULT '0' NOT NULL,
+	icon		varchar2(32)	DEFAULT 'Server' NOT NULL,
+	icon_on		varchar2(32)	DEFAULT 'Server' NOT NULL,
+	label		varchar2(128)	DEFAULT '' NOT NULL,
+	label_location	number(3)		DEFAULT NULL,
+	x		number(10)		DEFAULT '0' NOT NULL,
+	y		number(10)		DEFAULT '0' NOT NULL,
+	url		varchar2(255)	DEFAULT '' NOT NULL,
+	CONSTRAINT	sysmaps_elements_pk	PRIMARY KEY (selementid)
+);
+
+create sequence sysmaps_elements_selementid
+start with 1 
+increment by 1 
+nomaxvalue; 
+
+create trigger sysmaps_elements_trigger
+before insert on sysmaps_elements
+for each row
+begin
+	if (:new.selementid is null or :new.selementid = 0) then
+		select sysmaps_elements_selementid.nextval into :new.selementid from dual;
+	end if;
+end;
+/
 
 --
 -- Table structure for table 'sysmaps'
 --
 
 CREATE TABLE sysmaps (
-  sysmapid		number(10)		NOT NULL auto_increment,
-  name			varchar2(128)	DEFAULT '' NOT NULL,
-  width			number(10)		DEFAULT '0' NOT NULL,
-  height		number(10)		DEFAULT '0' NOT NULL,
-  background		varchar2(64)	DEFAULT '' NOT NULL,
-  label_type		number(10)		DEFAULT '0' NOT NULL,
-  label_location	number(3)		DEFAULT '0' NOT NULL,
-  PRIMARY KEY (sysmapid),
-  UNIQUE (name)
-) type=InnoDB;
+	sysmapid	number(10)		NOT NULL,
+	name		varchar2(128)	DEFAULT '' NOT NULL,
+	width		number(10)		DEFAULT '0' NOT NULL,
+	height		number(10)		DEFAULT '0' NOT NULL,
+	background	varchar2(64)	DEFAULT '' NOT NULL,
+	label_type	number(10)		DEFAULT '0' NOT NULL,
+	label_location	number(3)		DEFAULT '0' NOT NULL,
+	CONSTRAINT	sysmaps_pk	PRIMARY KEY (sysmapid)
+);
+
+CREATE UNIQUE INDEX sysmaps_name on sysmaps (name);
+
+create sequence sysmaps_sysmapid
+start with 1 
+increment by 1 
+nomaxvalue; 
+
+create trigger sysmaps_trigger
+before insert on sysmaps
+for each row
+begin
+	if (:new.sysmapid is null or :new.sysmapid = 0) then
+		select sysmaps_sysmapid.nextval into :new.sysmapid from dual;
+	end if;
+end;
+/
 
 --
 -- Table structure for table 'groups'
@@ -194,7 +290,9 @@ create trigger groups_trigger
 before insert on groups
 for each row
 begin
-	select groups_groupid.nextval into :new.groupid from dual;
+	if (:new.groupid is null or :new.groupid = 0) then
+		select groups_groupid.nextval into :new.groupid from dual;
+	end if;
 end;
 /
 
@@ -203,10 +301,10 @@ end;
 --
 
 CREATE TABLE hosts_groups (
-  hostid		number(10)		DEFAULT '0' NOT NULL,
-  groupid		number(10)		DEFAULT '0' NOT NULL,
-  PRIMARY KEY (hostid,groupid)
-) type=InnoDB;
+	hostid		number(10)		DEFAULT '0' NOT NULL,
+	groupid		number(10)		DEFAULT '0' NOT NULL,
+	CONSTRAINT 	hosts_groups_pk PRIMARY KEY (hostid, groupid)
+);
 
 --
 -- Table structure for table 'alerts'
@@ -248,7 +346,9 @@ create trigger alerts_trigger
 before insert on alerts
 for each row
 begin
-	select alerts_alertid.nextval into :new.alertid from dual;
+	if (:new.alertid is null or :new.alertid = 0) then
+		select alerts_alertid.nextval into :new.alertid from dual;
+	end if;
 end;
 /
 
@@ -257,35 +357,68 @@ end;
 --
 
 CREATE TABLE actions (
-  actionid		number(10)		NOT NULL auto_increment,
-  userid		number(10)		DEFAULT '0' NOT NULL,
-  delay			number(10)		DEFAULT '0' NOT NULL,
-  subject		varchar2(255)	DEFAULT '' NOT NULL,
-  message		varchar2(2048)		DEFAULT '' NOT NULL,
-  nextcheck		number(10)		DEFAULT '0' NOT NULL,
-  recipient		number(3)		DEFAULT '0' NOT NULL,
-  maxrepeats		number(10)		DEFAULT '0' NOT NULL,
-  repeatdelay		number(10)		DEFAULT '600' NOT NULL,
-  source		number(3)		DEFAULT '0' NOT NULL,
-  actiontype		number(3)		DEFAULT '0' NOT NULL,
-  status		number(3)		DEFAULT '0' NOT NULL,
-  scripts		varchar(2048)		DEFAULT '' NOT NULL,
-  PRIMARY KEY (actionid)
-) type=InnoDB;
+	actionid	number(10),
+	userid		number(10)	DEFAULT '0' NOT NULL,
+	delay		number(10)	DEFAULT '0' NOT NULL,
+	subject		varchar2(255)	DEFAULT '' NOT NULL,
+	message		varchar2(2048)	DEFAULT '' NOT NULL,
+	nextcheck	number(10)	DEFAULT '0' NOT NULL,
+	recipient	number(3)	DEFAULT '0' NOT NULL,
+	maxrepeats	number(10)	DEFAULT '0' NOT NULL,
+	repeatdelay	number(10)	DEFAULT '600' NOT NULL,
+	source		number(3)	DEFAULT '0' NOT NULL,
+	actiontype	number(3)	DEFAULT '0' NOT NULL,
+	status		number(3)	DEFAULT '0' NOT NULL,
+	scripts		varchar(2048)	DEFAULT '' NOT NULL,
+	CONSTRAINT 	actions_pk PRIMARY KEY (actionid)
+);
+
+create sequence actions_actionid 
+start with 1 
+increment by 1 
+nomaxvalue; 
+
+create trigger actions_trigger
+before insert on actions
+for each row
+begin
+	if (:new.actionid is null or :new.actionid = 0) then
+		select actions_actionid.nextval into :new.actionid from dual;
+	end if;
+end;
+/
 
 --
 -- Table structure for table 'conditions'
 --
 
 CREATE TABLE conditions (
-  conditionid		number(10)		NOT NULL auto_increment,
-  actionid		number(10)		DEFAULT '0' NOT NULL,
-  conditiontype		number(10)		DEFAULT '0' NOT NULL,
-  operator		number(3)		DEFAULT '0' NOT NULL,
-  value			varchar2(255)	DEFAULT '' NOT NULL,
-  PRIMARY KEY (conditionid),
-  KEY (actionid)
-) type=InnoDB;
+	conditionid	number(10)	NOT NULL,
+	actionid	number(10)	DEFAULT '0' NOT NULL,
+	conditiontype	number(10)	DEFAULT '0' NOT NULL,
+	operator	number(3)	DEFAULT '0' NOT NULL,
+	value		varchar2(255)	DEFAULT '' NOT NULL,
+	CONSTRAINT 	conditions_pk	PRIMARY KEY (conditionid)
+);
+
+CREATE INDEX conditions_actionid on conditions (actionid);
+
+create sequence conditions_conditionid
+start with 1 
+increment by 1 
+nomaxvalue; 
+
+create trigger conditions_trigger
+before insert on conditions
+for each row
+begin
+	if (:new.conditionid is null or :new.conditionid = 0) then
+		select conditions_conditionid.nextval into :new.conditionid from dual;
+	end if;
+end;
+/
+
+--
 
 --
 -- Table structure for table 'alarms'
@@ -312,7 +445,9 @@ create trigger alarms_trigger
 before insert on alarms
 for each row
 begin
-	select alarms_alarmid.nextval into :new.alarmid from dual;
+	if (:new.alarmid is null or :new.alarmid = 0) then
+		select alarms_alarmid.nextval into :new.alarmid from dual;
+	end if;
 end;
 /
 
@@ -342,7 +477,9 @@ create trigger functions_trigger
 before insert on functions
 for each row
 begin
-	select functions_functionid.nextval into :new.functionid from dual;
+	if (:new.functionid is null or :new.functionid = 0) then
+		select functions_functionid.nextval into :new.functionid from dual;
+	end if;
 end;
 /
 
@@ -351,12 +488,12 @@ end;
 --
 
 CREATE TABLE history_uint (
-  itemid		number(10)		DEFAULT '0' NOT NULL,
-  clock			number(10)		DEFAULT '0' NOT NULL,
-  value			bigint unsigned	DEFAULT '0' NOT NULL,
---  PRIMARY KEY (itemid,clock)
-  KEY itemidclock (itemid, clock)
-) type=InnoDB;
+	itemid		number(10)	DEFAULT '0' NOT NULL,
+	clock		number(10)	DEFAULT '0' NOT NULL,
+	value		number(20)	DEFAULT '0' NOT NULL
+);
+
+CREATE INDEX history_uint_itemidclock on history_uint (itemid, clock);
 
 --
 -- Table structure for table 'history_str'
@@ -401,7 +538,9 @@ create trigger hosts_trigger
 before insert on hosts
 for each row
 begin
-	select hosts_hostid.nextval into :new.hostid from dual;
+	if (:new.hostid is null or :new.hostid = 0) then
+		select hosts_hostid.nextval into :new.hostid from dual;
+	end if;
 end;
 /
 
@@ -461,7 +600,9 @@ create trigger items_trigger
 before insert on items
 for each row
 begin
-	select items_itemid.nextval into :new.itemid from dual;
+	if (:new.itemid is null or :new.itemid = 0) then
+		select items_itemid.nextval into :new.itemid from dual;
+	end if;
 end;
 /
 
@@ -470,18 +611,33 @@ end;
 --
 
 CREATE TABLE media (
-	mediaid		number(10) NOT NULL auto_increment,
+	mediaid		number(10) NOT NULL,
 	userid		number(10) DEFAULT '0' NOT NULL,
---	type		varchar2(10) DEFAULT '' NOT NULL,
 	mediatypeid	number(10) DEFAULT '0' NOT NULL,
 	sendto		varchar2(100) DEFAULT '' NOT NULL,
 	active		number(10) DEFAULT '0' NOT NULL,
 	severity	number(10) DEFAULT '63' NOT NULL,
 	period		varchar2(100) DEFAULT '1-7,00:00-23:59' NOT NULL,
-	PRIMARY KEY	(mediaid),
-	KEY		(userid),
-	KEY		(mediatypeid)
-) type=InnoDB;
+  	CONSTRAINT 	media_pk PRIMARY KEY (mediaid)
+);
+
+CREATE INDEX media_userid on media (userid);
+CREATE INDEX media_mediatypeid on media (mediatypeid);
+
+create sequence media_mediaid 
+start with 1 
+increment by 1 
+nomaxvalue; 
+
+create trigger media_trigger
+before insert on media
+for each row
+begin
+	if (:new.mediaid is null or :new.mediaid = 0) then
+		select media_mediaid.nextval into :new.mediaid from dual;
+	end if;
+end;
+/
 
 --
 -- Table structure for table 'media'
@@ -489,12 +645,12 @@ CREATE TABLE media (
 
 CREATE TABLE media_type (
 	mediatypeid	number(10) NOT NULL,
-	type		number(10)		DEFAULT '0' NOT NULL,
+	type		number(10)	DEFAULT '0' NOT NULL,
 	description	varchar2(100)	DEFAULT '' NOT NULL,
-	smtp_server	varchar2(255)	DEFAULT '' NOT NULL,
-	smtp_helo	varchar2(255)	DEFAULT '' NOT NULL,
-	smtp_email	varchar2(255)	DEFAULT '' NOT NULL,
-	exec_path	varchar2(255)	DEFAULT '' NOT NULL,
+	smtp_server	varchar2(255)	DEFAULT '',
+	smtp_helo	varchar2(255)	DEFAULT '',
+	smtp_email	varchar2(255)	DEFAULT '',
+	exec_path	varchar2(255)	DEFAULT '',
 	CONSTRAINT 	media_type_pk PRIMARY KEY (mediatypeid)
 );
 
@@ -507,7 +663,9 @@ create trigger media_type_trigger
 before insert on media_type
 for each row
 begin
-	select media_type_mediatypeid.nextval into :new.mediatypeid from dual;
+	if (:new.mediatypeid is null or :new.mediatypeid = 0) then
+		select media_type_mediatypeid.nextval into :new.mediatypeid from dual;
+	end if;
 end;
 /
 
@@ -543,7 +701,9 @@ create trigger triggers_trigger
 before insert on triggers
 for each row
 begin
-	select triggers_triggerid.nextval into :new.triggerid from dual;
+	if (:new.triggerid is null or :new.triggerid = 0) then
+		select triggers_triggerid.nextval into :new.triggerid from dual;
+	end if;
 end;
 /
 
@@ -554,10 +714,10 @@ end;
 CREATE TABLE trigger_depends (
 	triggerid_down	number(10) DEFAULT '0' NOT NULL,
 	triggerid_up	number(10) DEFAULT '0' NOT NULL,
-	PRIMARY KEY	(triggerid_down, triggerid_up),
---	KEY		(triggerid_down),
-	KEY		(triggerid_up)
-) type=InnoDB;
+  	CONSTRAINT 	triggers_depends_pk PRIMARY KEY (triggerid_down, triggerid_up)
+);
+
+CREATE INDEX triggers_depends_triggerid_up on trigger_depends (triggerid_up);
 
 --
 -- Table structure for table 'users'
@@ -587,7 +747,9 @@ create trigger users_trigger
 before insert on users
 for each row
 begin
-	select users_userid.nextval into :new.userid from dual;
+	if (:new.userid is null or :new.userid = 0) then
+		select users_userid.nextval into :new.userid from dual;
+	end if;
 end;
 /
 
@@ -595,17 +757,33 @@ end;
 -- Table structure for table 'audit'
 --
 
-CREATE TABLE audit (
-  auditid		number(10)		NOT NULL auto_increment,
-  userid		number(10)		DEFAULT '0' NOT NULL,
-  clock			number(10)		DEFAULT '0' NOT NULL,
-  action		number(10)		DEFAULT '0' NOT NULL,
-  resource		number(10)		DEFAULT '0' NOT NULL,
-  details		varchar2(128)	DEFAULT '0' NOT NULL,
-  PRIMARY KEY (auditid),
-  KEY (userid,clock),
-  KEY (clock)
-) type=InnoDB;
+CREATE TABLE auditlog (
+	auditid		number(10),
+	userid		number(10)		DEFAULT '0' NOT NULL,
+	clock		number(10)		DEFAULT '0' NOT NULL,
+	action		number(10)		DEFAULT '0' NOT NULL,
+	resource	number(10)		DEFAULT '0' NOT NULL,
+	details		varchar2(128)	DEFAULT '0' NOT NULL,
+  	CONSTRAINT 	auditlog_pk PRIMARY KEY (auditid)
+);
+
+CREATE INDEX auditlog_useridclock on audit (userid,clock);
+CREATE INDEX auditlog_clock on audit (clock);
+
+create sequence auditlog_auditid 
+start with 1 
+increment by 1 
+nomaxvalue; 
+
+create trigger auditlog_trigger
+before insert on auditlog
+for each row
+begin
+	if (:new.auditid is null or :new.auditid = 0) then
+		select auditlog_trigger.nextval into :new.auditid from dual;
+	end if;
+end;
+/
 
 --
 -- Table structure for table 'sessions'
@@ -642,7 +820,9 @@ create trigger rights_trigger
 before insert on rights
 for each row
 begin
-	select rights_rightid.nextval into :new.rightid from dual;
+	if (:new.rightid is null or :new.rightid = 0) then
+		select rights_rightid.nextval into :new.rightid from dual;
+	end if;
 end;
 /
 
@@ -697,14 +877,31 @@ end;
 --
 
 CREATE TABLE service_alarms (
-  servicealarmid	number(10)		NOT NULL auto_increment,
-  serviceid		number(10)		DEFAULT '0' NOT NULL,
-  clock			number(10)		DEFAULT '0' NOT NULL,
-  value			number(10)		DEFAULT '0' NOT NULL,
-  PRIMARY KEY (servicealarmid),
-  KEY (serviceid,clock),
-  KEY (clock)
-) type=InnoDB;
+	servicealarmid	number(10)		NOT NULL,
+	serviceid	number(10)		DEFAULT '0' NOT NULL,
+	clock		number(10)		DEFAULT '0' NOT NULL,
+	value		number(10)		DEFAULT '0' NOT NULL,
+  	CONSTRAINT 	service_alarms_pk 	PRIMARY KEY (servicealarmid)
+);
+
+CREATE INDEX service_alarms_serviceidclock on service_alarms (serviceid,clock);
+CREATE INDEX service_alarms_clock on service_alarms (clock);
+
+create sequence service_alarms_servicealarmid 
+start with 1 
+increment by 1 
+nomaxvalue; 
+
+create trigger service_alarms_trigger
+before insert on service_alarms
+for each row
+begin
+	if (:new.servicealarmid is null or :new.servicealarmid = 0) then
+		select service_alarms_servicealarmid.nextval into :new.servicealarmid from dual;
+	end if;
+end;
+/
+
 
 --
 -- Table structure for table 'profiles'
@@ -730,7 +927,9 @@ create trigger profiles_trigger
 before insert on profiles
 for each row
 begin
-	select profiles_profileid.nextval into :new.profileid from dual;
+	if (:new.profileid is null or :new.profileid = 0) then
+		select profiles_profileid.nextval into :new.profileid from dual;
+	end if;
 end;
 /
 
@@ -739,51 +938,66 @@ end;
 --
 
 CREATE TABLE screens (
-  screenid		number(10)		NOT NULL auto_increment,
-  name			varchar2(255)	DEFAULT 'Screen' NOT NULL,
-  cols			number(10)		DEFAULT '1' NOT NULL,
-  rows			number(10)		DEFAULT '1' NOT NULL,
-  PRIMARY KEY  (screenid)
-) TYPE=InnoDB;
+	screenid	number(10)	NOT NULL,
+	name		varchar2(255)	DEFAULT 'Screen' NOT NULL,
+	cols		number(10)	DEFAULT '1' NOT NULL,
+	rows		number(10)	DEFAULT '1' NOT NULL,
+	CONSTRAINT 	screens_pk PRIMARY KEY (screenid)
+);
+
+create sequence screens_screenid 
+start with 1 
+increment by 1 
+nomaxvalue; 
+
+create trigger screens_trigger
+before insert on screens
+for each row
+begin
+	if (:new.screenid is null or :new.screenid = 0) then
+		select screens_screenid.nextval into :new.screenid from dual;
+	end if;
+end;
+/
+
 
 --
 -- Table structure for table 'screens_items'
 --
 
 CREATE TABLE screens_items (
-	screenitemid	number(10)		NOT NULL auto_increment,
-	screenid	number(10)		DEFAULT '0' NOT NULL,
-	resource	number(10)		DEFAULT '0' NOT NULL,
-	resourceid	number(10)		DEFAULT '0' NOT NULL,
-	width		number(10)		DEFAULT '320' NOT NULL,
-	height		number(10)		DEFAULT '200' NOT NULL,
-	x		number(10)		DEFAULT '0' NOT NULL,
-	y		number(10)		DEFAULT '0' NOT NULL,
-	colspan		number(10)		DEFAULT '0' NOT NULL,
-	rowspan		number(10)		DEFAULT '0' NOT NULL,
-	elements	number(10)		DEFAULT '25' NOT NULL,
-	valign		int(2)		DEFAULT '0' NOT NULL,
-	halign		int(2)		DEFAULT '0' NOT NULL,
-	style		number(10)		DEFAULT '0' NOT NULL,
+	screenitemid	number(10)	NOT NULL,
+	screenid	number(10)	DEFAULT '0' NOT NULL,
+	resource	number(10)	DEFAULT '0' NOT NULL,
+	resourceid	number(10)	DEFAULT '0' NOT NULL,
+	width		number(10)	DEFAULT '320' NOT NULL,
+	height		number(10)	DEFAULT '200' NOT NULL,
+	x		number(10)	DEFAULT '0' NOT NULL,
+	y		number(10)	DEFAULT '0' NOT NULL,
+	colspan		number(10)	DEFAULT '0' NOT NULL,
+	rowspan		number(10)	DEFAULT '0' NOT NULL,
+	elements	number(10)	DEFAULT '25' NOT NULL,
+	valign		number(3)	DEFAULT '0' NOT NULL,
+	halign		number(3)	DEFAULT '0' NOT NULL,
+	style		number(10)	DEFAULT '0' NOT NULL,
 	url		varchar2(255)	DEFAULT '' NOT NULL,
-	  PRIMARY KEY  (screenitemid)
-) TYPE=InnoDB;
+	CONSTRAINT 	screens_items_pk PRIMARY KEY (screenitemid)
+);
 
---
--- Table structure for table 'stats'
---
+create sequence screens_items_screenid 
+start with 1 
+increment by 1 
+nomaxvalue; 
 
-CREATE TABLE stats (
-  itemid		number(10)		DEFAULT '0' NOT NULL,
-  year			number(10)		DEFAULT '0' NOT NULL,
-  month			number(10)		DEFAULT '0' NOT NULL,
-  day			number(10)		DEFAULT '0' NOT NULL,
-  hour			number(10)		DEFAULT '0' NOT NULL,
-  value_max		number(16,4)	DEFAULT '0.0000' NOT NULL,
-  value_min		number(16,4)	DEFAULT '0.0000' NOT NULL,
-  value_avg		number(16,4)	DEFAULT '0.0000' NOT NULL,
-  PRIMARY KEY (itemid,year,month,day,hour)
-) type=InnoDB;
+create trigger screens_items_trigger
+before insert on screens_items
+for each row
+begin
+	if (:new.screenitemid is null or :new.screenitemid = 0) then
+		select screens_items_screenid.nextval into :new.screenitemid from dual;
+	end if;
+end;
+/
 
 --
 -- Table structure for table 'usrgrp'
@@ -806,7 +1020,9 @@ create trigger usrgrp_trigger
 before insert on usrgrp
 for each row
 begin
-	select usrgrp_usrgrpid.nextval into :new.usrgrp from dual;
+	if (:new.usrgrpid is null or :new.usrgrpid = 0) then
+		select usrgrp_usrgrpid.nextval into :new.usrgrpid from dual;
+	end if;
 end;
 /
 
@@ -816,10 +1032,10 @@ end;
 --
 
 CREATE TABLE users_groups (
-  usrgrpid		number(10)		DEFAULT '0' NOT NULL,
-  userid		number(10)		DEFAULT '0' NOT NULL,
-  PRIMARY KEY (usrgrpid,userid)
-) type=InnoDB;
+	usrgrpid	number(10)		DEFAULT '0' NOT NULL,
+	userid		number(10)		DEFAULT '0' NOT NULL,
+	CONSTRAINT 	users_groups_pk	 PRIMARY KEY (usrgrpid,userid)
+);
 
 --
 -- Table structure for table 'trends'
@@ -853,51 +1069,84 @@ CREATE TABLE images (
 --
 
 CREATE TABLE hosts_templates (
-  hosttemplateid	number(10)		NOT NULL auto_increment,
-  hostid		number(10)		DEFAULT '0' NOT NULL,
-  templateid		number(10)		DEFAULT '0' NOT NULL,
-  items			number(3)		DEFAULT '0' NOT NULL,
-  triggers		number(3)		DEFAULT '0' NOT NULL,
-  graphs		number(3)		DEFAULT '0' NOT NULL,
-  PRIMARY KEY (hosttemplateid),
-  UNIQUE (hostid, templateid)
-) type=InnoDB;
+	hosttemplateid	number(10)	NOT NULL,
+	hostid		number(10)	DEFAULT '0' NOT NULL,
+	templateid	number(10)	DEFAULT '0' NOT NULL,
+	items		number(3)	DEFAULT '0' NOT NULL,
+	triggers	number(3)	DEFAULT '0' NOT NULL,
+	graphs		number(3)	DEFAULT '0' NOT NULL,
+	CONSTRAINT 	hosts_templates_pk PRIMARY KEY (usrgrpid)
+);
+
+CREATE UNIQUE INDEX hosts_templates_id on hosts_templates (hostid, templateid);
+
+create sequence hosts_templates_hosttemplateid 
+start with 1 
+increment by 1 
+nomaxvalue; 
+
+create trigger hosts_templates_trigger
+before insert on hosts_templates
+for each row
+begin
+	if (:new.hosttemplateid is null or :new.hosttemplateid = 0) then
+		select hosts_templates_hosttemplateid.nextval into :new.hosttemplateid from dual;
+	end if;
+end;
+/
+
 
 --
 -- Table structure for table 'history_log'
 --
 
 CREATE TABLE history_log (
-  id			number(10)		NOT NULL auto_increment,
-  itemid		number(10)		DEFAULT '0' NOT NULL,
-  clock			number(10)		DEFAULT '0' NOT NULL,
-  timestamp		number(10)		DEFAULT '0' NOT NULL,
-  source		varchar2(64)	DEFAULT '' NOT NULL,
-  severity		number(10)		DEFAULT '0' NOT NULL,
-  value			text		DEFAULT '' NOT NULL,
-  PRIMARY KEY (id),
-  KEY itemidclock (itemid, clock)
-) type=InnoDB;
+	id		number(10)	NOT NULL,
+	itemid		number(10)	DEFAULT '0' NOT NULL,
+	clock		number(10)	DEFAULT '0' NOT NULL,
+	timestamp	number(10)	DEFAULT '0' NOT NULL,
+	source		varchar2(64)	DEFAULT '' NOT NULL,
+	severity	number(10)	DEFAULT '0' NOT NULL,
+	value		varvhar2(2048)	DEFAULT '' NOT NULL,
+	CONSTRAINT 	history_log_pk	PRIMARY KEY (id)
+);
+
+CREATE INDEX history_log_itemidclock on history_log (itemidclock);
+
+create sequence history_log_id 
+start with 1 
+increment by 1 
+nomaxvalue; 
+
+create trigger history_log_trigger
+before insert on history_log
+for each row
+begin
+	if (:new.id is null or :new.id = 0) then
+		select history_log_id.nextval into :new.id from dual;
+	end if;
+end;
+/
 
 --
 -- Table structure for table 'hosts_profiles'
 --
 
 CREATE TABLE hosts_profiles (
-  hostid		number(10)		DEFAULT '0' NOT NULL,
-  devicetype		varchar2(64)	DEFAULT '' NOT NULL,
-  name			varchar2(64)	DEFAULT '' NOT NULL,
-  os			varchar2(64)	DEFAULT '' NOT NULL,
-  serialno		varchar2(64)	DEFAULT '' NOT NULL,
-  tag			varchar2(64)	DEFAULT '' NOT NULL,
-  macaddress		varchar2(64)	DEFAULT '' NOT NULL,
-  hardware		blob		DEFAULT '' NOT NULL,
-  software		blob		DEFAULT '' NOT NULL,
-  contact		blob		DEFAULT '' NOT NULL,
-  location		blob		DEFAULT '' NOT NULL,
-  notes			blob		DEFAULT '' NOT NULL,
-  PRIMARY KEY (hostid)
-) type=InnoDB;
+	hostid		number(10)	DEFAULT '0' NOT NULL,
+	devicetype	varchar2(64)	DEFAULT '' NOT NULL,
+	name		varchar2(64)	DEFAULT '' NOT NULL,
+	os		varchar2(64)	DEFAULT '' NOT NULL,
+	serialno	varchar2(64)	DEFAULT '' NOT NULL,
+	tag		varchar2(64)	DEFAULT '' NOT NULL,
+	macaddress	varchar2(64)	DEFAULT '' NOT NULL,
+	hardware	varchar2(2048)	DEFAULT '' NOT NULL,
+	software	varchar2(2048)	DEFAULT '' NOT NULL,
+	contact		varchar2(2048)	DEFAULT '' NOT NULL,
+	location	varchar2(2048)	DEFAULT '' NOT NULL,
+	notes		varchar2(2048)	DEFAULT '' NOT NULL,
+	CONSTRAINT 	hosts_profiles_pk	PRIMARY KEY (hostid)
+);
 
 --
 -- Table structure for table 'autoreg'
@@ -916,24 +1165,57 @@ CREATE TABLE autoreg (
 --
 
 CREATE TABLE valuemaps (
-  valuemapid		number(10)		NOT NULL auto_increment,
-  name			varchar2(64)	DEFAULT '' NOT NULL,
-  PRIMARY KEY (valuemapid),
-  UNIQUE (name)
-) type=InnoDB;
+	valuemapid		number(10)	NOT NULL,
+	name			varchar2(64)	DEFAULT '' NOT NULL,
+  	CONSTRAINT	 	valuemaps_pk PRIMARY KEY (valuemapid)
+);
+
+CREATE UNIQUE INDEX valuemaps_name on valuemaps (name);
+
+create sequence valuemaps_valuemapid 
+start with 1 
+increment by 1 
+nomaxvalue; 
+
+create trigger valuemaps_trigger
+before insert on valuemaps
+for each row
+begin
+	if (:new.valuemapid is null or :new.valuemapid = 0) then
+		select valuemaps_valuemapid.nextval into :new.valuemapid from dual;
+	end if;
+end;
+/
 
 --
 -- Table structure for table 'mapping'
 --
 
 CREATE TABLE mappings (
-  mappingid		number(10)		NOT NULL auto_increment,
-  valuemapid		number(10)		DEFAULT '0' NOT NULL,
-  value			varchar2(64)	DEFAULT '' NOT NULL,
-  newvalue		varchar2(64)	DEFAULT '' NOT NULL,
-  PRIMARY KEY (mappingid),
-  KEY valuemapid (valuemapid)
-) type=InnoDB;
+	mappingid		number(10)	NOT NULL,
+	valuemapid		number(10)	DEFAULT '0' NOT NULL,
+	value			varchar2(64)	DEFAULT '' NOT NULL,
+	newvalue		varchar2(64)	DEFAULT '' NOT NULL,
+  	CONSTRAINT	 	mappings_pk PRIMARY KEY (mappingid)
+);
+
+CREATE INDEX mappings_valuemapid on mappings (valuemapid);
+
+create sequence mappings_mappingid 
+start with 1 
+increment by 1 
+nomaxvalue; 
+
+create trigger mappings_trigger
+before insert on mappings
+for each row
+begin
+	if (:new.mappingid is null or :new.mappingid = 0) then
+		select mappings_mappingid.nextval into :new.mappingid from dual;
+	end if;
+end;
+/
+
 
 --
 -- Table structure for table 'housekeeper'
@@ -956,7 +1238,9 @@ create trigger housekeeper_trigger
 before insert on housekeeper
 for each row
 begin
-	select housekeeper_housekeeperid.nextval into :new.housekeeperid from dual;
+	if (:new.housekeeperid is null or :new.housekeeperid = 0) then
+		select housekeeper_housekeeperid.nextval into :new.housekeeperid from dual;
+	end if;
 end;
 /
 
@@ -965,16 +1249,35 @@ end;
 --
 
 CREATE TABLE acknowledges (
-	acknowledgeid		number(10)		NOT NULL auto_increment,
-	userid			number(10)		DEFAULT '0' NOT NULL,
-	alarmid			number(10)		DEFAULT '0' NOT NULL,
-	clock			number(10)		DEFAULT '0' NOT NULL,
+	acknowledgeid		number(10)	NOT NULL,
+	userid			number(10)	DEFAULT '0' NOT NULL,
+	alarmid			number(10)	DEFAULT '0' NOT NULL,
+	clock			number(10)	DEFAULT '0' NOT NULL,
 	message			varchar2(255)	DEFAULT '' NOT NULL,
-	PRIMARY KEY (acknowledgeid),
-	KEY userid (userid),
-	KEY alarmid (alarmid),
-	KEY clock (clock)
-) type=InnoDB;
+  	CONSTRAINT	 	acknowledges_pk PRIMARY KEY (acknowledgeid)
+);
+
+CREATE INDEX acknowledges_userid on acknowledges (userid);
+CREATE INDEX acknowledges_alarmid on acknowledges (alarmid);
+CREATE INDEX acknowledges_clock on acknowledges (clock);
+
+create sequence acknowledges_acknowledgeid 
+start with 1 
+increment by 1 
+nomaxvalue; 
+
+create trigger acknowledges_trigger
+before insert on acknowledges
+for each row
+begin
+	if (:new.acknowledgeid is null or :new.acknowledgeid = 0) then
+		select acknowledges_acknowledgeid.nextval into :new.acknowledgeid from dual;
+	end if;
+end;
+/
+
+--
+-- Table structure for table 'acknowledges'
 
 --
 -- Table structure for table 'applications'
@@ -1001,7 +1304,9 @@ create trigger applications_trigger
 before insert on applications
 for each row
 begin
-	select applications_applicationid.nextval into :new.applicationid from dual;
+	if (:new.applicationid is null or :new.applicationid = 0) then
+		select applications_applicationid.nextval into :new.applicationid from dual;
+	end if;
 end;
 /
 
