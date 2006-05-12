@@ -30,3 +30,4 @@ CREATE TABLE items_applications (
 	PRIMARY KEY (applicationid,itemid)
 ) type=InnoDB;
 
+alter table audit rename auditlog;
