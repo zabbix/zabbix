@@ -57,8 +57,6 @@ extern	int	CONFIG_DBPORT;
 #define DB_FUNCTION	struct function_type
 #define DB_MEDIA	struct media_type
 #define DB_MEDIATYPE	struct mediatype_type
-#define DB_ESCALATION_RULE	struct escalation_rule_type
-#define DB_ESCALATION_LOG	struct escalation_log_type
 #define DB_GRAPH	struct graph_type
 #define DB_GRAPH_ITEM	struct graph_item_type
 #define DB_HOUSEKEEPER	struct housekeeper_type
@@ -298,28 +296,6 @@ DB_ALERT
 	int	delay;
 };
 
-DB_ESCALATION_RULE
-{
-	int	escalationruleid;
-	int	escalationid;
-	int	level;
-	char	*period;
-	int	delay;
-	int	actiontype;
-};
-
-DB_ESCALATION_LOG
-{
-	int 	escalationlogid;
-	int 	triggerid;
-	int	alarmid;
-	int	escalationid;
-	int	level;
-	int	adminlevel;
-	int	nextcheck;
-	int	status;
-};
-
 DB_HOUSEKEEPER
 {
 	int	housekeeperid;
@@ -358,7 +334,6 @@ void	DBupdate_triggers_status_after_restart(void);
 int	DBget_prev_trigger_value(int triggerid);
 /*int	DBupdate_trigger_value(int triggerid,int value,int clock);*/
 int     DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *reason);
-int     DBget_default_escalation_id();
 
 int	DBget_items_count(void);
 int	DBget_items_unsupported_count(void);

@@ -47,7 +47,7 @@ CREATE INDEX history_itemidclock on history (itemid, clock);
 
 CREATE TABLE services (
   serviceid		number(10)		NOT NULL,
-  name			varchar2(128)	DEFAULT '' NOT NULL,
+  name			varchar2(128)	DEFAULT NULL,
   status		number(3)		DEFAULT '0' NOT NULL,
   algorithm		number(3)		DEFAULT '0' NOT NULL,
   triggerid		number(10),
@@ -139,7 +139,7 @@ end;
 
 CREATE TABLE graphs (
 	graphid		number(10)		NOT NULL,
-	name		varchar2(128)	DEFAULT '' NOT NULL,
+	name		varchar2(128)	DEFAULT NULL,
 	width		number(10)		DEFAULT '0' NOT NULL,
 	height		number(10)		DEFAULT '0' NOT NULL,
 	yaxistype	number(3)		DEFAULT '0' NOT NULL,
@@ -208,17 +208,17 @@ end;
 --
 
 CREATE TABLE sysmaps_elements (
-	selementid	number(10)		NOT NULL,
-	sysmapid	number(10)		DEFAULT '0' NOT NULL,
-	elementid	number(10)		DEFAULT '0' NOT NULL,
-	elementtype	number(10)		DEFAULT '0' NOT NULL,
+	selementid	number(10)	NOT NULL,
+	sysmapid	number(10)	DEFAULT '0' NOT NULL,
+	elementid	number(10)	DEFAULT '0' NOT NULL,
+	elementtype	number(10)	DEFAULT '0' NOT NULL,
 	icon		varchar2(32)	DEFAULT 'Server' NOT NULL,
 	icon_on		varchar2(32)	DEFAULT 'Server' NOT NULL,
-	label		varchar2(128)	DEFAULT '' NOT NULL,
-	label_location	number(3)		DEFAULT NULL,
-	x		number(10)		DEFAULT '0' NOT NULL,
-	y		number(10)		DEFAULT '0' NOT NULL,
-	url		varchar2(255)	DEFAULT '' NOT NULL,
+	label		varchar2(128)	DEFAULT NULL,
+	label_location	number(3)	DEFAULT NULL,
+	x		number(10)	DEFAULT '0' NOT NULL,
+	y		number(10)	DEFAULT '0' NOT NULL,
+	url		varchar2(255)	DEFAULT NULL,
 	CONSTRAINT	sysmaps_elements_pk	PRIMARY KEY (selementid)
 );
 
@@ -242,13 +242,13 @@ end;
 --
 
 CREATE TABLE sysmaps (
-	sysmapid	number(10)		NOT NULL,
-	name		varchar2(128)	DEFAULT '' NOT NULL,
-	width		number(10)		DEFAULT '0' NOT NULL,
-	height		number(10)		DEFAULT '0' NOT NULL,
-	background	varchar2(64)	DEFAULT '' NOT NULL,
-	label_type	number(10)		DEFAULT '0' NOT NULL,
-	label_location	number(3)		DEFAULT '0' NOT NULL,
+	sysmapid	number(10)	NOT NULL,
+	name		varchar2(128)	DEFAULT NULL,
+	width		number(10)	DEFAULT '0' NOT NULL,
+	height		number(10)	DEFAULT '0' NOT NULL,
+	background	varchar2(64)	DEFAULT NULL,
+	label_type	number(10)	DEFAULT '0' NOT NULL,
+	label_location	number(3)	DEFAULT '0' NOT NULL,
 	CONSTRAINT	sysmaps_pk	PRIMARY KEY (sysmapid)
 );
 
@@ -275,7 +275,7 @@ end;
 
 CREATE TABLE groups (
 	groupid		number(10)	NOT NULL,
-	name		varchar2(64)	DEFAULT '' NOT NULL,
+	name		varchar2(64)	DEFAULT NULL,
 	CONSTRAINT 	groups_pk PRIMARY KEY (groupid)
 );
 
@@ -311,18 +311,18 @@ CREATE TABLE hosts_groups (
 --
 
 CREATE TABLE alerts (
-	alertid		number(10)		NOT NULL,
-	actionid	number(10)		DEFAULT '0' NOT NULL,
-	triggerid	number(10)		DEFAULT '0' NOT NULL,
-	userid		number(10)		DEFAULT '0' NOT NULL,
-	clock		number(10)		DEFAULT '0' NOT NULL,
-	mediatypeid	number(10)		DEFAULT '0' NOT NULL,
-	sendto		varchar2(100)	DEFAULT '' NOT NULL,
-	subject		varchar2(255)	DEFAULT '' NOT NULL,
-	message		varchar2(2048)		DEFAULT '' NOT NULL,
-	status		number(10)		DEFAULT '0' NOT NULL,
-	retries		number(10)		DEFAULT '0' NOT NULL,
-	error		varchar2(128)	DEFAULT '' NOT NULL,
+	alertid		number(10)	NOT NULL,
+	actionid	number(10)	DEFAULT '0' NOT NULL,
+	triggerid	number(10)	DEFAULT '0' NOT NULL,
+	userid		number(10)	DEFAULT '0' NOT NULL,
+	clock		number(10)	DEFAULT '0' NOT NULL,
+	mediatypeid	number(10)	DEFAULT '0' NOT NULL,
+	sendto		varchar2(100)	DEFAULT NULL,
+	subject		varchar2(255)	DEFAULT NULL,
+	message		varchar2(2048)	DEFAULT NULL,
+	status		number(10)	DEFAULT '0' NOT NULL,
+	retries		number(10)	DEFAULT '0' NOT NULL,
+	error		varchar2(128)	DEFAULT NULL,
 	repeats		number(10)		DEFAULT '0' NOT NULL,
 	maxrepeats	number(10)		DEFAULT '0' NOT NULL,
 	nextcheck	number(10)		DEFAULT '0' NOT NULL,
@@ -360,8 +360,8 @@ CREATE TABLE actions (
 	actionid	number(10),
 	userid		number(10)	DEFAULT '0' NOT NULL,
 	delay		number(10)	DEFAULT '0' NOT NULL,
-	subject		varchar2(255)	DEFAULT '' NOT NULL,
-	message		varchar2(2048)	DEFAULT '' NOT NULL,
+	subject		varchar2(255)	DEFAULT NULL,
+	message		varchar2(2048)	DEFAULT NULL,
 	nextcheck	number(10)	DEFAULT '0' NOT NULL,
 	recipient	number(3)	DEFAULT '0' NOT NULL,
 	maxrepeats	number(10)	DEFAULT '0' NOT NULL,
@@ -369,7 +369,7 @@ CREATE TABLE actions (
 	source		number(3)	DEFAULT '0' NOT NULL,
 	actiontype	number(3)	DEFAULT '0' NOT NULL,
 	status		number(3)	DEFAULT '0' NOT NULL,
-	scripts		varchar(2048)	DEFAULT '' NOT NULL,
+	scripts		varchar(2048)	DEFAULT NULL,
 	CONSTRAINT 	actions_pk PRIMARY KEY (actionid)
 );
 
@@ -397,7 +397,7 @@ CREATE TABLE conditions (
 	actionid	number(10)	DEFAULT '0' NOT NULL,
 	conditiontype	number(10)	DEFAULT '0' NOT NULL,
 	operator	number(3)	DEFAULT '0' NOT NULL,
-	value		varchar2(255)	DEFAULT '' NOT NULL,
+	value		varchar2(255)	DEFAULT NULL,
 	CONSTRAINT 	conditions_pk	PRIMARY KEY (conditionid)
 );
 
@@ -456,11 +456,11 @@ end;
 --
 
 CREATE TABLE functions (
-	functionid	number(10)		NOT NULL,
-	itemid		number(10)		DEFAULT '0' NOT NULL,
-	triggerid	number(10)		DEFAULT '0' NOT NULL,
+	functionid	number(10)	NOT NULL,
+	itemid		number(10)	DEFAULT '0' NOT NULL,
+	triggerid	number(10)	DEFAULT '0' NOT NULL,
 	lastvalue	varchar2(255),
-	function	varchar2(10)	DEFAULT '' NOT NULL,
+	function	varchar2(10)	DEFAULT NULL,
 	parameter	varchar2(255)	DEFAULT '0' NOT NULL,
 	CONSTRAINT 	functions_pk PRIMARY KEY (functionid)
 );
@@ -500,9 +500,9 @@ CREATE INDEX history_uint_itemidclock on history_uint (itemid, clock);
 --
 
 CREATE TABLE history_str (
-	itemid		number(10)		DEFAULT '0' NOT NULL,
-	clock		number(10)		DEFAULT '0' NOT NULL,
-	value		varchar2(255)		DEFAULT '' NOT NULL
+	itemid		number(10)	DEFAULT '0' NOT NULL,
+	clock		number(10)	DEFAULT '0' NOT NULL,
+	value		varchar2(255)	DEFAULT NULL
 );
 
 CREATE INDEX history_str_itemidclock on history_str (itemid, clock);
@@ -512,18 +512,18 @@ CREATE INDEX history_str_itemidclock on history_str (itemid, clock);
 --
 
 CREATE TABLE hosts (
-	hostid		number(10)		NOT NULL,
-	host		varchar2(64)	DEFAULT '' NOT NULL,
-	useip		number(3)		DEFAULT '1' NOT NULL,
+	hostid		number(10)	NOT NULL,
+	host		varchar2(64)	DEFAULT NULL,
+	useip		number(3)	DEFAULT '1' NOT NULL,
 	ip		varchar2(15)	DEFAULT '127.0.0.1' NOT NULL,
-	port		number(10)		DEFAULT '0' NOT NULL,
-	status		number(10)		DEFAULT '0' NOT NULL,
+	port		number(10)	DEFAULT '0' NOT NULL,
+	status		number(10)	DEFAULT '0' NOT NULL,
 -- If status=UNREACHABLE, host will not be checked until this time
-	disable_until	number(10)		DEFAULT '0' NOT NULL,
-	error		varchar2(128)	DEFAULT '' NOT NULL,
-	available	number(10)		DEFAULT '0' NOT NULL,
-	errors_from	number(10)		DEFAULT '0' NOT NULL,
-	templateid	number(10)		DEFAULT '0' NOT NULL,
+	disable_until	number(10)	DEFAULT '0' NOT NULL,
+	error		varchar2(128)	DEFAULT NULL,
+	available	number(10)	DEFAULT '0' NOT NULL,
+	errors_from	number(10)	DEFAULT '0' NOT NULL,
+	templateid	number(10)	DEFAULT '0' NOT NULL,
   	CONSTRAINT 	hosts_pk PRIMARY KEY (hostid)
 );
 CREATE UNIQUE INDEX hosts_host on hosts (host);
@@ -552,12 +552,12 @@ end;
 CREATE TABLE items (
 	itemid		number(10) NOT NULL,
 	type		number(10) DEFAULT '0' NOT NULL,
-	snmp_community	varchar2(64) DEFAULT '' NOT NULL,
-	snmp_oid	varchar2(255) DEFAULT '' NOT NULL,
+	snmp_community	varchar2(64) DEFAULT NULL,
+	snmp_oid	varchar2(255) DEFAULT NULL,
 	snmp_port	number(10) DEFAULT '161' NOT NULL,
 	hostid		number(10) NOT NULL,
-	description	varchar2(255) DEFAULT '' NOT NULL,
-	key_		varchar2(64) DEFAULT '' NOT NULL,
+	description	varchar2(255) DEFAULT NULL,
+	key_		varchar2(64) DEFAULT NULL,
 	delay		number(10) DEFAULT '0' NOT NULL,
 	history		number(10) DEFAULT '90' NOT NULL,
 	trends		number(10) DEFAULT '365' NOT NULL,
@@ -569,19 +569,19 @@ CREATE TABLE items (
 	prevvalue	varchar2(255) DEFAULT NULL,
 	status		number(10) DEFAULT '0' NOT NULL,
 	value_type	number(10) DEFAULT '0' NOT NULL,
-	trapper_hosts	varchar2(255) DEFAULT '' NOT NULL,
-	units		varchar2(10)	DEFAULT '' NOT NULL,
+	trapper_hosts	varchar2(255) DEFAULT NULL,
+	units		varchar2(10)	DEFAULT NULL,
 	multiplier	number(10)	DEFAULT '0' NOT NULL,
 	delta		number(3)  DEFAULT '0' NOT NULL,
 	prevorgvalue	number(16,4)  DEFAULT NULL,
-	snmpv3_securityname	varchar2(64) DEFAULT '' NOT NULL,
+	snmpv3_securityname	varchar2(64) DEFAULT NULL,
 	snmpv3_securitylevel	number(3) DEFAULT '0' NOT NULL,
-	snmpv3_authpassphrase	varchar2(64) DEFAULT '' NOT NULL,
-	snmpv3_privpassphrase	varchar2(64) DEFAULT '' NOT NULL,
+	snmpv3_authpassphrase	varchar2(64) DEFAULT NULL,
+	snmpv3_privpassphrase	varchar2(64) DEFAULT NULL,
 	formula		varchar2(255) DEFAULT '0' NOT NULL,
-	error		varchar2(128) DEFAULT '' NOT NULL,
+	error		varchar2(128) DEFAULT NULL,
 	lastlogsize	number(10) DEFAULT '0' NOT NULL,
-	logtimefmt	varchar2(64) DEFAULT '' NOT NULL,
+	logtimefmt	varchar2(64) DEFAULT NULL,
 	templateid	number(10) DEFAULT '0' NOT NULL,
 	valuemapid	number(10) DEFAULT '0' NOT NULL,
   	CONSTRAINT 	items_pk PRIMARY KEY (itemid)
@@ -614,7 +614,7 @@ CREATE TABLE media (
 	mediaid		number(10) NOT NULL,
 	userid		number(10) DEFAULT '0' NOT NULL,
 	mediatypeid	number(10) DEFAULT '0' NOT NULL,
-	sendto		varchar2(100) DEFAULT '' NOT NULL,
+	sendto		varchar2(100) DEFAULT NULL,
 	active		number(10) DEFAULT '0' NOT NULL,
 	severity	number(10) DEFAULT '63' NOT NULL,
 	period		varchar2(100) DEFAULT '1-7,00:00-23:59' NOT NULL,
@@ -646,11 +646,11 @@ end;
 CREATE TABLE media_type (
 	mediatypeid	number(10) NOT NULL,
 	type		number(10)	DEFAULT '0' NOT NULL,
-	description	varchar2(100)	DEFAULT '' NOT NULL,
-	smtp_server	varchar2(255)	DEFAULT '',
-	smtp_helo	varchar2(255)	DEFAULT '',
-	smtp_email	varchar2(255)	DEFAULT '',
-	exec_path	varchar2(255)	DEFAULT '',
+	description	varchar2(100)	DEFAULT NULL,
+	smtp_server	varchar2(255)	DEFAULT NULL,
+	smtp_helo	varchar2(255)	DEFAULT NULL,
+	smtp_email	varchar2(255)	DEFAULT NULL,
+	exec_path	varchar2(255)	DEFAULT NULL,
 	CONSTRAINT 	media_type_pk PRIMARY KEY (mediatypeid)
 );
 
@@ -675,16 +675,16 @@ end;
 
 CREATE TABLE triggers (
 	triggerid	number(10) NOT NULL,
-	expression	varchar2(255) DEFAULT '' NOT NULL,
-	description	varchar2(255) DEFAULT '' NOT NULL,
-	url		varchar2(255) DEFAULT '' NOT NULL,
+	expression	varchar2(255) DEFAULT NULL,
+	description	varchar2(255) DEFAULT NULL,
+	url		varchar2(255) DEFAULT NULL,
 	status		number(10) DEFAULT '0' NOT NULL,
 	value		number(10) DEFAULT '0' NOT NULL,
 	priority	number(4) DEFAULT '0' NOT NULL,
 	lastchange	number(10) DEFAULT '0' NOT NULL,
 	dep_level	number(4) DEFAULT '0' NOT NULL,
 	comments	varchar2(2048),
-	error		varchar2(128) DEFAULT '' NOT NULL,
+	error		varchar2(128) DEFAULT NULL,
 	templateid	number(10) DEFAULT '0' NOT NULL,
   	CONSTRAINT 	triggers_pk PRIMARY KEY (triggerid)
 );
@@ -725,11 +725,11 @@ CREATE INDEX triggers_depends_triggerid_up on trigger_depends (triggerid_up);
 
 CREATE TABLE users (
 	userid		number(10)	NOT NULL,
-	alias		varchar2(100)	DEFAULT '' NOT NULL,
-	name		varchar2(100)	DEFAULT '' NOT NULL,
-	surname		varchar2(100)	DEFAULT '' NOT NULL,
-	passwd		varchar2(32)	DEFAULT '' NOT NULL,
-	url		varchar2(255)	DEFAULT '' NOT NULL,
+	alias		varchar2(100)	DEFAULT NULL,
+	name		varchar2(100)	DEFAULT NULL,
+	surname		varchar2(100)	DEFAULT NULL,
+	passwd		varchar2(32)	DEFAULT NULL,
+	url		varchar2(255)	DEFAULT NULL,
 	autologout	number(10)	DEFAULT '900' NOT NULL,
 	lang		varchar2(5)	DEFAULT 'en_gb' NOT NULL,
 	refresh		number(10)	DEFAULT '30' NOT NULL,
@@ -762,13 +762,13 @@ CREATE TABLE auditlog (
 	userid		number(10)		DEFAULT '0' NOT NULL,
 	clock		number(10)		DEFAULT '0' NOT NULL,
 	action		number(10)		DEFAULT '0' NOT NULL,
-	resource	number(10)		DEFAULT '0' NOT NULL,
+	resourcetype	number(10)		DEFAULT '0' NOT NULL,
 	details		varchar2(128)	DEFAULT '0' NOT NULL,
   	CONSTRAINT 	auditlog_pk PRIMARY KEY (auditid)
 );
 
-CREATE INDEX auditlog_useridclock on audit (userid,clock);
-CREATE INDEX auditlog_clock on audit (clock);
+CREATE INDEX auditlog_useridclock on auditlog (userid,clock);
+CREATE INDEX auditlog_clock on auditlog (clock);
 
 create sequence auditlog_auditid 
 start with 1 
@@ -780,7 +780,7 @@ before insert on auditlog
 for each row
 begin
 	if (:new.auditid is null or :new.auditid = 0) then
-		select auditlog_trigger.nextval into :new.auditid from dual;
+		select auditlog_auditid.nextval into :new.auditid from dual;
 	end if;
 end;
 /
@@ -790,9 +790,9 @@ end;
 --
 
 CREATE TABLE sessions (
-	sessionid	varchar2(32)		DEFAULT '' NOT NULL,
-	userid		number(10)		DEFAULT '0' NOT NULL,
-	lastaccess	number(10)		DEFAULT '0' NOT NULL,
+	sessionid	varchar2(32)	DEFAULT NULL,
+	userid		number(10)	DEFAULT '0' NOT NULL,
+	lastaccess	number(10)	DEFAULT '0' NOT NULL,
 	CONSTRAINT 	sessions_pk PRIMARY KEY (sessionid)
 );
 
@@ -803,8 +803,8 @@ CREATE TABLE sessions (
 CREATE TABLE rights (
 	rightid		number(10)	NOT NULL,
 	userid		number(10)	DEFAULT '0' NOT NULL,
-	name		varchar2(255)	DEFAULT '' NOT NULL,
-	permission	varchar2(1)	DEFAULT '' NOT NULL,
+	name		varchar2(255)	DEFAULT NULL,
+	permission	varchar2(1)	DEFAULT NULL,
 	id		number(10),
   	CONSTRAINT 	rights_pk PRIMARY KEY (rightid)
 );
@@ -864,8 +864,8 @@ end;
 CREATE TABLE profiles (
 	profileid	number(10)	NOT NULL,
 	userid		number(10)	DEFAULT '0' NOT NULL,
-	idx		varchar2(64)	DEFAULT '' NOT NULL,
-	value		varchar2(255)	DEFAULT '' NOT NULL,
+	idx		varchar2(64)	DEFAULT NULL,
+	value		varchar2(255)	DEFAULT NULL,
 	valuetype	number(10)	DEFAULT 0 NOT NULL,
   	CONSTRAINT 	profiles_pk PRIMARY KEY (profileid)
 );
@@ -894,8 +894,8 @@ end;
 CREATE TABLE screens (
 	screenid	number(10)	NOT NULL,
 	name		varchar2(255)	DEFAULT 'Screen' NOT NULL,
-	cols		number(10)	DEFAULT '1' NOT NULL,
-	rows		number(10)	DEFAULT '1' NOT NULL,
+	hsize		number(10)	DEFAULT '1' NOT NULL,
+	vsize		number(10)	DEFAULT '1' NOT NULL,
 	CONSTRAINT 	screens_pk PRIMARY KEY (screenid)
 );
 
@@ -922,7 +922,7 @@ end;
 CREATE TABLE screens_items (
 	screenitemid	number(10)	NOT NULL,
 	screenid	number(10)	DEFAULT '0' NOT NULL,
-	resource	number(10)	DEFAULT '0' NOT NULL,
+	resourcetype	number(10)	DEFAULT '0' NOT NULL,
 	resourceid	number(10)	DEFAULT '0' NOT NULL,
 	width		number(10)	DEFAULT '320' NOT NULL,
 	height		number(10)	DEFAULT '200' NOT NULL,
@@ -934,7 +934,7 @@ CREATE TABLE screens_items (
 	valign		number(3)	DEFAULT '0' NOT NULL,
 	halign		number(3)	DEFAULT '0' NOT NULL,
 	style		number(10)	DEFAULT '0' NOT NULL,
-	url		varchar2(255)	DEFAULT '' NOT NULL,
+	url		varchar2(255)	DEFAULT NULL,
 	CONSTRAINT 	screens_items_pk PRIMARY KEY (screenitemid)
 );
 
@@ -959,7 +959,7 @@ end;
 
 CREATE TABLE usrgrp (
 	usrgrpid	number(10)	NOT NULL,
-	name		varchar2(64)	DEFAULT '' NOT NULL,
+	name		varchar2(64)	DEFAULT NULL,
   	CONSTRAINT 	usrgrp_pk PRIMARY KEY (usrgrpid)
 );
 
@@ -1013,7 +1013,7 @@ CREATE TABLE images (
 	imageid		number(10)	NOT NULL,
 	imagetype	number(10)	DEFAULT '0' NOT NULL,
 	name		varchar2(64)	DEFAULT '0' NOT NULL,
-	image		varchar2(2048)	DEFAULT '' NOT NULL,
+	image		varchar2(2048)	DEFAULT NULL,
 	CONSTRAINT 	images PRIMARY KEY (imageid)
 );
 
@@ -1032,6 +1032,7 @@ begin
 		select images_imageid.nextval into :new.imageid from dual;
 	end if;
 end;
+/
 
 --
 -- Table structure for table 'hosts_templates'
@@ -1044,7 +1045,7 @@ CREATE TABLE hosts_templates (
 	items		number(3)	DEFAULT '0' NOT NULL,
 	triggers	number(3)	DEFAULT '0' NOT NULL,
 	graphs		number(3)	DEFAULT '0' NOT NULL,
-	CONSTRAINT 	hosts_templates_pk PRIMARY KEY (usrgrpid)
+	CONSTRAINT 	hosts_templates_pk PRIMARY KEY (hosttemplateid)
 );
 
 CREATE UNIQUE INDEX hosts_templates_id on hosts_templates (hostid, templateid);
@@ -1074,9 +1075,9 @@ CREATE TABLE history_log (
 	itemid		number(10)	DEFAULT '0' NOT NULL,
 	clock		number(10)	DEFAULT '0' NOT NULL,
 	timestamp	number(10)	DEFAULT '0' NOT NULL,
-	source		varchar2(64)	DEFAULT '' NOT NULL,
+	source		varchar2(64)	DEFAULT NULL,
 	severity	number(10)	DEFAULT '0' NOT NULL,
-	value		varvhar2(2048)	DEFAULT '' NOT NULL,
+	value		varchar2(2048)	DEFAULT NULL,
 	CONSTRAINT 	history_log_pk	PRIMARY KEY (id)
 );
 
@@ -1103,17 +1104,17 @@ end;
 
 CREATE TABLE hosts_profiles (
 	hostid		number(10)	DEFAULT '0' NOT NULL,
-	devicetype	varchar2(64)	DEFAULT '' NOT NULL,
-	name		varchar2(64)	DEFAULT '' NOT NULL,
-	os		varchar2(64)	DEFAULT '' NOT NULL,
-	serialno	varchar2(64)	DEFAULT '' NOT NULL,
-	tag		varchar2(64)	DEFAULT '' NOT NULL,
-	macaddress	varchar2(64)	DEFAULT '' NOT NULL,
-	hardware	varchar2(2048)	DEFAULT '' NOT NULL,
-	software	varchar2(2048)	DEFAULT '' NOT NULL,
-	contact		varchar2(2048)	DEFAULT '' NOT NULL,
-	location	varchar2(2048)	DEFAULT '' NOT NULL,
-	notes		varchar2(2048)	DEFAULT '' NOT NULL,
+	devicetype	varchar2(64)	DEFAULT NULL,
+	name		varchar2(64)	DEFAULT NULL,
+	os		varchar2(64)	DEFAULT NULL,
+	serialno	varchar2(64)	DEFAULT NULL,
+	tag		varchar2(64)	DEFAULT NULL,
+	macaddress	varchar2(64)	DEFAULT NULL,
+	hardware	varchar2(2048)	DEFAULT NULL,
+	software	varchar2(2048)	DEFAULT NULL,
+	contact		varchar2(2048)	DEFAULT NULL,
+	location	varchar2(2048)	DEFAULT NULL,
+	notes		varchar2(2048)	DEFAULT NULL,
 	CONSTRAINT 	hosts_profiles_pk	PRIMARY KEY (hostid)
 );
 
@@ -1124,7 +1125,7 @@ CREATE TABLE hosts_profiles (
 CREATE TABLE autoreg (
 	id		number(10)	NOT NULL,
 	priority	number(10)	DEFAULT '0' NOT NULL,
-	pattern		varchar2(255)	DEFAULT '' NOT NULL,
+	pattern		varchar2(255)	DEFAULT NULL,
 	hostid		number(10)	DEFAULT '0' NOT NULL,
 	CONSTRAINT 	autoreg_pk PRIMARY KEY (id)
 );
@@ -1151,7 +1152,7 @@ end;
 
 CREATE TABLE valuemaps (
 	valuemapid		number(10)	NOT NULL,
-	name			varchar2(64)	DEFAULT '' NOT NULL,
+	name			varchar2(64)	DEFAULT NULL,
   	CONSTRAINT	 	valuemaps_pk PRIMARY KEY (valuemapid)
 );
 
@@ -1179,8 +1180,8 @@ end;
 CREATE TABLE mappings (
 	mappingid		number(10)	NOT NULL,
 	valuemapid		number(10)	DEFAULT '0' NOT NULL,
-	value			varchar2(64)	DEFAULT '' NOT NULL,
-	newvalue		varchar2(64)	DEFAULT '' NOT NULL,
+	value			varchar2(64)	DEFAULT NULL,
+	newvalue		varchar2(64)	DEFAULT NULL,
   	CONSTRAINT	 	mappings_pk PRIMARY KEY (mappingid)
 );
 
@@ -1208,8 +1209,8 @@ end;
 
 CREATE TABLE housekeeper (
 	housekeeperid		number(10)	NOT NULL,
-	tablename		varchar2(64)	DEFAULT '' NOT NULL,
-	field			varchar2(64)	DEFAULT '' NOT NULL,
+	tablename		varchar2(64)	DEFAULT NULL,
+	field			varchar2(64)	DEFAULT NULL,
 	value			number(10)	DEFAULT '0' NOT NULL,
   	CONSTRAINT	 	housekeeper_pk PRIMARY KEY (housekeeperid)
 );
@@ -1238,7 +1239,7 @@ CREATE TABLE acknowledges (
 	userid			number(10)	DEFAULT '0' NOT NULL,
 	alarmid			number(10)	DEFAULT '0' NOT NULL,
 	clock			number(10)	DEFAULT '0' NOT NULL,
-	message			varchar2(255)	DEFAULT '' NOT NULL,
+	message			varchar2(255)	DEFAULT NULL,
   	CONSTRAINT	 	acknowledges_pk PRIMARY KEY (acknowledgeid)
 );
 
@@ -1271,7 +1272,7 @@ end;
 CREATE TABLE applications (
 	applicationid           number(10)	NOT NULL,
 	hostid                  number(10)	DEFAULT '0' NOT NULL,
-	name                    varchar2(255)	DEFAULT '' NOT NULL,
+	name                    varchar2(255)	DEFAULT NULL,
 	templateid		number(10)	DEFAULT '0' NOT NULL,
   	CONSTRAINT	 	applications_pk	 PRIMARY KEY (applicationid)
 );

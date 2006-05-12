@@ -1,5 +1,8 @@
 Changes for 1.1beta10:
 
+ - removed unused table stats (Alexei)
+ - removed all references to escalations (Alexei)
+ - table audit renamed to auditlog (Alexei)
  - speed improvement for Overview screens (Eugene)
  - developed 'net.if.total[*]' parameter (Eugene)
  - fixed new map link adding (Eugene)

@@ -185,10 +185,10 @@ CREATE TABLE users (
 CREATE UNIQUE INDEX users_alias on users (alias);
 
 --
--- Table structure for table 'audit'
+-- Table structure for table 'auditlog'
 --
 
-CREATE TABLE audit (
+CREATE TABLE auditlog (
   auditid		serial,
   userid		int4		DEFAULT '0' NOT NULL,
   clock			int4		DEFAULT '0' NOT NULL,
@@ -198,8 +198,8 @@ CREATE TABLE audit (
   PRIMARY KEY (auditid)
 );
 
-CREATE INDEX audit_userid_clock on audit (userid,clock);
-CREATE INDEX audit_clock on audit (clock);
+CREATE INDEX auditlog_userid_clock on auditlog (userid,clock);
+CREATE INDEX auditlog_clock on auditlog (clock);
 
 --
 -- Table structure for table 'actions'
@@ -633,17 +633,17 @@ CREATE TABLE screens_items (
 -- Table structure for table 'stats'
 --
 
-CREATE TABLE stats (
-  itemid		int4		DEFAULT '0' NOT NULL,
-  year			int4		DEFAULT '0' NOT NULL,
-  month			int4		DEFAULT '0' NOT NULL,
-  day			int4		DEFAULT '0' NOT NULL,
-  hour			int4		DEFAULT '0' NOT NULL,
-  value_max		float8		DEFAULT '0.0000' NOT NULL,
-  value_min		float8		DEFAULT '0.0000' NOT NULL,
-  value_avg		float8		DEFAULT '0.0000' NOT NULL,
-  PRIMARY KEY (itemid,year,month,day,hour)
-);
+--CREATE TABLE stats (
+--  itemid		int4		DEFAULT '0' NOT NULL,
+--  year			int4		DEFAULT '0' NOT NULL,
+--  month			int4		DEFAULT '0' NOT NULL,
+--  day			int4		DEFAULT '0' NOT NULL,
+--  hour			int4		DEFAULT '0' NOT NULL,
+--  value_max		float8		DEFAULT '0.0000' NOT NULL,
+--  value_min		float8		DEFAULT '0.0000' NOT NULL,
+--  value_avg		float8		DEFAULT '0.0000' NOT NULL,
+--  PRIMARY KEY (itemid,year,month,day,hour)
+--);
 
 --
 -- Table structure for table 'usrgrp'

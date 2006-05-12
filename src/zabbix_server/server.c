@@ -704,12 +704,6 @@ int main(int argc, char **argv)
 		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [ICMP pinger]",server_num);
 		main_pinger_loop();
 	}
-/* Fifth instance of zabbix_server escalates notifications */
-/*	else if(server_num == 4)
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Escalator]",server_num);
-		main_escalator_loop();
-	}*/
 	else if(server_num == 4)
 	{
 #ifdef HAVE_SNMP

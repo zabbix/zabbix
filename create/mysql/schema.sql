@@ -463,10 +463,10 @@ CREATE TABLE users (
 ) type=InnoDB;
 
 --
--- Table structure for table 'audit'
+-- Table structure for table 'auditlog'
 --
 
-CREATE TABLE audit (
+CREATE TABLE auditlog (
   auditid		int(4)		NOT NULL auto_increment,
   userid		int(4)		DEFAULT '0' NOT NULL,
   clock			int(4)		DEFAULT '0' NOT NULL,
@@ -609,24 +609,24 @@ CREATE TABLE screens_items (
 	halign		int(2)		DEFAULT '0' NOT NULL,
 	style		int(4)		DEFAULT '0' NOT NULL,
 	url		varchar(255)	DEFAULT '' NOT NULL,
-	  PRIMARY KEY  (screenitemid)
+	PRIMARY KEY  (screenitemid)
 ) TYPE=InnoDB;
 
 --
 -- Table structure for table 'stats'
 --
 
-CREATE TABLE stats (
-  itemid		int(4)		DEFAULT '0' NOT NULL,
-  year			int(4)		DEFAULT '0' NOT NULL,
-  month			int(4)		DEFAULT '0' NOT NULL,
-  day			int(4)		DEFAULT '0' NOT NULL,
-  hour			int(4)		DEFAULT '0' NOT NULL,
-  value_max		double(16,4)	DEFAULT '0.0000' NOT NULL,
-  value_min		double(16,4)	DEFAULT '0.0000' NOT NULL,
-  value_avg		double(16,4)	DEFAULT '0.0000' NOT NULL,
-  PRIMARY KEY (itemid,year,month,day,hour)
-) type=InnoDB;
+--CREATE TABLE stats (
+--  itemid		int(4)		DEFAULT '0' NOT NULL,
+--  year			int(4)		DEFAULT '0' NOT NULL,
+--  month			int(4)		DEFAULT '0' NOT NULL,
+--  day			int(4)		DEFAULT '0' NOT NULL,
+--  hour			int(4)		DEFAULT '0' NOT NULL,
+--  value_max		double(16,4)	DEFAULT '0.0000' NOT NULL,
+--  value_min		double(16,4)	DEFAULT '0.0000' NOT NULL,
+--  value_avg		double(16,4)	DEFAULT '0.0000' NOT NULL,
+--  PRIMARY KEY (itemid,year,month,day,hour)
+--) type=InnoDB;
 
 --
 -- Table structure for table 'usrgrp'

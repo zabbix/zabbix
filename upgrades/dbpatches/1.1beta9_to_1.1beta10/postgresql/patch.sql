@@ -31,3 +31,4 @@ CREATE TABLE items_applications (
 	FOREIGN KEY (itemid) REFERENCES items 
 );
 
+alter table audit rename auditlog;
