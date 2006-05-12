@@ -24,73 +24,41 @@
 /* private */
 		var $caption;
 /* public */
-		function CTextBox($name='textbox',$value="",$size=20,$caption=NULL,$readonly="no")
+		function CTextBox($name='textbox',$value="",$size=20,$readonly="no")
 		{
-			parent::CTag("input","no");
-			$this->SetClass("biginput");
-			$this->SetName($name);
-			$this->SetSize($size);
-			$this->SetCaption($caption);
-			$this->SetValue($value);
+			parent::CTag('input','no');
+			$this->options['class'] = 'biginput';
+			$this->options['name'] = $name;
+			$this->options['size'] = $size;
+			$this->options['value'] = $value;
 			$this->SetReadonly($readonly);
-		}
-		function Show()
-		{
-			if(isset($this->caption))
-				echo $this->caption." ";
-			parent::Show();
 		}
 		function SetReadonly($value='yes')
 		{
-			if(is_string($value))
-			{
-				if($value=='no')
-					return $this->DelOption("readonly");
-				elseif($value=='yes')
-					return $this->AddOption("readonly",'readonly');
-			}
-			return $this->error("Incorrect value for SetReadonly [$value]");
-		}
-		function SetName($value='textbox')
-		{
-			if(!is_string($value))
-			{
-				return $this->error("Incorrect value for SetName [$value]");
-			}
-			return $this->AddOption("name",$value);
-		}
-		function SetCaption($value=NULL)
-		{
-			if(is_null($value))
-				unset($this->caption);
-			elseif(is_string($value))	
-				$this->caption = $value;
-			else
-			{
-				return $this->error("Incorrect value for SetCaption [$value]");
-			}
-			return 0;
+			if($value=='yes')
+				return $this->options['readonly'] = 'readonly';
+
+			$this->DelOption('readonly');
 		}
 		function SetValue($value=NULL)
 		{
-			if(is_null($value))	$value="";
-
-			if(is_numeric($value))	$value = strval($value);
-
-			if(is_string($value))
-			{
-				return $this->AddOption("value",$value);
-			}
-			return $this->error("Incorrect value for SetValue [$value]");
+			$this->options['value'] = $value;
 		}
 		function SetSize($value)
 		{
-			if(!is_numeric($value))
-			{
-				return $this->error("Incorrect value for SetSize [$value]");
-			}
-			return $this->AddOption("size",strval($value));
+			$this->options['size'] = $value;
 			
 		}
 	}
+
+	class CPassBox extends CTextBox
+	{
+/* public */
+		function CPassBox($name='password',$value='',$size=20)
+		{
+			parent::CTextBox($name,$value,$size);
+			$this->options['type'] = 'password';
+		}
+	}
+
 ?>

@@ -237,6 +237,7 @@ ZBX_METRIC	parameters_specific[]=
 	
 	{"net.if.in",		CF_USEUPARAM,	NET_IF_IN,	0,	"hme0,bytes"},
 	{"net.if.out",		CF_USEUPARAM,	NET_IF_OUT,	0,	"hme0,bytes"},
+	{"net.if.total",	CF_USEUPARAM,	NET_IF_TOTAL,	0,	"hme0,bytes"},
         {"net.if.collisions",   CF_USEUPARAM,	NET_IF_COLLISIONS,      0,	"hme0"},	
 
 	{"vfs.fs.size",		CF_USEUPARAM,	VFS_FS_SIZE,	0,	"/,free"},

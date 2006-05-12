@@ -135,11 +135,8 @@
 		{
 			return	$row;
 		}
-		else
-		{
-			error("No user with itemid=[$userid]");
-		}
-		return	$result;
+		error("No user with itemid=[$userid]");
+		return	false;
 	}
 
 	function	add_user_group($name,$users=array())

@@ -378,7 +378,7 @@
 
 		$table  = new CTableInfo();
 		$table->setHeader(array(
-			array(	new CCheckBox("all_items",NULL,NULL,
+			array(	new CCheckBox("all_items",NULL,
 					"CheckAll('".$form->GetName()."','all_items');"),
 				S_ID),
 			S_DESCRIPTION,S_KEY,nbsp(S_UPDATE_INTERVAL),
@@ -467,7 +467,7 @@
 
 			$table->AddRow(array(
 				array(
-					new CCheckBox("group_itemid[]",NULL,NULL,NULL,$db_item["itemid"]),
+					new CCheckBox("group_itemid[]",NULL,NULL,$db_item["itemid"]),
 					$db_item["itemid"]
 				),
 				$description,

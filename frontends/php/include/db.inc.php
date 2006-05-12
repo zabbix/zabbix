@@ -23,16 +23,15 @@
 // DATABASE CONFIGURATION
 
 //	$DB_TYPE	="POSTGRESQL";
-	$DB_TYPE	="ORACLE";
+	$DB_TYPE	="MYSQL";
+//	$DB_TYPE	="ORACLE";
 	$DB_SERVER	="localhost";
 //	$DB_DATABASE	="zabbix";
 //	$DB_DATABASE	="osmiy";
-//	$DB_DATABASE	="zabbix";
-	$DB_DATABASE	="osmiy";
-//	$DB_DATABASE	="demo";
+	$DB_DATABASE	="demo";
 //	$DB_DATABASE	="martinsj";
-	$DB_USER	="scott";
-	$DB_PASSWORD	="tiger";
+	$DB_USER	="root";
+	$DB_PASSWORD	="";
 // END OF DATABASE CONFIGURATION
 
 //	$USER_DETAILS	="";
@@ -68,13 +67,27 @@
 		}
 	}
 
+	/* NOTE:
+		LIMIT and OFFSET records
+		
+		Example: select 6-15 row.
 
+		MySQL:	
+			SELECT a FROM tbl LIMIT 5,10
+			SELECT a FROM tbl LIMIT 10 OFFSET 5
+		PostgreSQL:
+			SELECT a FROM tbl LIMIT 10 OFFSET 5
+		Oracle:
+			SELECT a FROM tbe WHERE ROWNUM < 15 // ONLY < 15
+			SELECT * FROM (SELECT ROWNUM as RN, * FROM tbl) WHERE RN BETWEEN 6 AND 15
+	*/
 
 	function	DBselect($query)
 	{
 		global $DB,$DB_TYPE;
 
 //		echo $query,"<br>";
+COpt::savesqlrequest($query);
 
 		if($DB_TYPE == "MYSQL")
 		{
@@ -113,6 +126,7 @@
 		global $DB,$DB_TYPE;
 
 //		echo $query,"<br>";
+COpt::savesqlrequest($query);
 
 		$result = FALSE;
 

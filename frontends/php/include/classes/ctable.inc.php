@@ -30,27 +30,15 @@
 		}
 		function SetAlign($value)
 		{
-			if(!is_string($value))
-			{
-				return $this->error("Incorrect value for SetAlign [$value]"); 
-			}
-			return $this->AddOption("align",$value);
+			return $this->options['align'] = $value;
 		}
 		function SetRowSpan($value)
 		{
-			if(!is_int($value) && !is_numeric($value))
-			{
-				return $this->error("Incorrect value for SetRowSpan [$value]"); 
-			}
-			return $this->AddOption("rowspan",strval($value));
+			return $this->options['rowspan'] = strval($value);
 		}
 		function SetColSpan($value)
 		{
-			if(!is_int($value) && !is_numeric($value))
-			{
-				return $this->error("Incorrect value for SetColSpan[$value]"); 
-			}
-			return $this->AddOption("colspan",strval($value));
+			return $this->options['colspan'] =strval($value);
 		}
 	}
 	
@@ -65,35 +53,30 @@
 		}
 		function SetAlign($value)
 		{
-			if(!is_string($value))
-			{
-				return $this->error("Incorrect value for SetAlign [$value]"); 
-			}
-			return $this->AddOption("align",$value);
+			return $this->options['align'] = $value;
 		}
 		function AddItem($item=NULL)
 		{
-			if(is_null($item))
-				return 0;
-                        elseif(is_a($item,'ccol'))
+                        if(is_a($item,'ccol'))
 			{
-                        	return parent::AddItem($item);
+				parent::AddItem($item);
 			}
 			elseif(is_array($item))
 			{
-				$ret = 0;
 				foreach($item as $el)
 				{
                         		if(is_a($el,'ccol'))
 					{
-                		        	$ret |= parent::AddItem($el);
+                		        	parent::AddItem($el);
 					} elseif(!is_null($el)) {
-						$ret |= parent::AddItem(new CCol($el));
+						parent::AddItem('<td>'.unpack_object($el).'</td>');
 					}
 				}
-				return $ret;
 			}
-			return parent::AddItem(new CCol($item));
+			elseif(!is_null($item))
+			{
+				parent::AddItem('<td>'.unpack_object($item).'</td>');
+			}
 		}
 	}
 
@@ -103,7 +86,11 @@
 		var $oddRowClass;
 		var $evenRowClass;
 		var $header;
+		var $headerClass;
+		var $colnum;
 		var $footer;
+		var $footerClass;
+		var $curr_row_class;
 /* public */
 		function CTable($message=NULL,$class=NULL)
 		{
@@ -113,153 +100,109 @@
 				
 			$this->oddRowClass = NULL;
 			$this->evenRowClass = NULL;
-			$this->header = NULL;
-			$this->footer = NULL;;
-		}
-		function SetHeader($value=NULL,$class=NULL)
-		{
-			if(is_null($value)){
-				$this->header = NULL;
-			}elseif(is_a($value,'crow'))
-			{
-				if(isset($class))
-					$value->SetClass($class);
-				$this->header = $value;
-			}else{
-				$this->header = new CRow($value,$class);
-			}
-			return true;
-		}
-		function SetFooter($value=NULL,$class=NULL)
-		{
-			if(is_null($value)){
-				$this->footer = NULL;
-			}elseif(is_a($value,'ccol'))
-			{
-				if(isset($this->header) && $value->GetOption('colspan')==NULL)
-					$value->SetColSpan(count($this->header->items));
 
-				$this->footer = new CRow($value,$class);
-			}elseif(is_a($value,'crow'))
-			{
-				if(isset($class))
-					$value->SetClass($class);
-				$this->footer = $value;
-			}else{
-				$this->footer = new CRow($value,$class);
-			}
+			$this->curr_row_class = NULL;
+
+			$this->header = '';
+			$this->headerClass = NULL;
+			$this->footer = '';
+			$this->footerClass = NULL;
+			$this->colnum = 0;
 		}
 		function SetOddRowClass($value=NULL)
 		{
-			if(!is_string($value) && !is_null($value))
-			{
-				return $this->error("Incorrect value for SetOddRowClass [$value]"); 
-			}
 			$this->oddRowClass = $value;
 		}
 		function SetEvenRowClass($value=NULL)
 		{
-			if(!is_string($value) && !is_null($value))
-			{
-				return $this->error("Incorrect value for SetEvenRowClass [$value]"); 
-			}
 			$this->evenRowClass = $value;
 		}
 		function SetAlign($value)
 		{
-			if(!is_string($value))
-			{
-				return $this->error("Incorrect value for SetAlign [$value]"); 
-			}
-			return $this->AddOption("align",$value);
+			return $this->options['align'] = $value;
 		}
 		function SetCellPadding($value)
 		{
-			if(!is_int($value) && !is_numeric($value))
-			{
-				return $this->error("Incorrect value for SetCellpadding [$value]"); 
-			}
-			return $this->AddOption("cellpadding",strval($value));
+			return $this->options['cellpadding'] = strval($value);
 		}
 		function SetCellSpacing($value)
 		{
-			if(!is_int($value) && !is_numeric($value))
+			return $this->options['cellspacing'] = strval($value);
+		}
+
+		function PrepareRow($item,$rowClass=NULL)
+		{
+			if(is_null($item)) return NULL;
+
+			if(is_a($item,'ccol'))
 			{
-				return $this->error("Incorrect value for SetCellSpacing [$value]"); 
+				if(isset($this->header) && !isset($item->options['colspan']))
+					$item->options['colspan'] = $this->colnum;
+
+				$item = new CRow($item,$rowClass);
 			}
-			return $this->AddOption("cellspacing",strval($value));
+			elseif(is_a($item,'crow'))
+			{
+				if(isset($rowClass))
+					$item->options['class'] = $rowClass;
+			}
+			else
+			{
+				$item = new CRow($item,$rowClass);
+			}
+			if(!isset($item->options['class']))
+			{
+				$this->curr_row_class = ($this->curr_row_class == $this->evenRowClass) ?
+                                                $this->oddRowClass:
+                                                $this->evenRowClass;
+				$item->options['class'] = $this->curr_row_class;
+			}/**/
+			return $item->ToString();
+		}
+		function SetHeader($value=NULL,$class=NULL)
+		{
+			if(is_null($class)) $class = $this->headerClass;
+
+			if(is_a($value,'crow'))
+			{
+				if(isset($class))	$value->SetClass($class);
+			}else{
+				$value = new CRow($value,$class);
+			}
+			$this->colnum = $value->ItemsCount();
+			$this->header = $value->ToString();
+		}
+		function SetFooter($value=NULL,$class=NULL)
+		{
+			if(is_null($class)) $class = $this->footerClass;
+
+			$this->footer = $this->PrepareRow($value,$class);;
 		}
 		function AddRow($item,$rowClass=NULL)
 		{
-			if(is_null($item)){
-				return 0;
-			}elseif(is_a($item,'ccol'))
-			{
-				if(isset($this->header) && $item->GetOption('colspan')==NULL)
-					$item->SetColSpan(count($this->header->items));
-
-				return $this->AddItem(new CRow($item,$rowClass));
-			}elseif(is_a($item,'crow'))
-			{
-				if(isset($rowClass))
-					$item->SetClass($rowClass);
-
-				return $this->AddItem($item);
-			}else{
-				return $this->AddItem(new CRow($item,$rowClass));
-			}
+			return $this->AddItem($this->PrepareRow($item,$rowClass));
+		}
+		function ShowRow($item,$rowClass=NULL)
+		{
+			echo $this->PrepareRow($item,$rowClass);
 		}
 /* protected */
-		function ShowHeader()
-		{
-			if(isset($this->header))
-				$this->header->Show();
-		}
-
 		function GetNumRows()
 		{
-			return $this->GetItemsCount();
+			return $this->ItemsCount();
 		}
 
-		function ShowTagBody()
+		function StartToString()
 		{
-			$this->ShowHeader();
-
-			if(count($this->items)==0)
-			{
-				if(isset($this->message)) 
-					$this->AddRow(new CCol($this->message,'message'),$this->evenRowClass);
-			} 
-
-			parent::ShowTagBody();
-
-			if(is_a($this->footer,'crow'))
-				$this->footer->Show();
+			$ret = parent::StartToString();
+			$ret .= $this->header;
+			return $ret;
 		}
-		function AddItem($value)
+		function EndToString()
 		{
-			$cname="crow";
-                        if(!is_a($value,$cname))
-			{
-				return $this->error("Incorrect value for AddItem [$value]"); 
-			}
-
-			if($value->GetOption('class')==NULL)
-			{
-				$value->SetClass(
-					((count($this->items)+1)%2==1) ?
-					 $this->evenRowClass : $this->oddRowClass
-				);
-			}
-
-                        return parent::AddItem($value);
+			$ret = $this->footer;
+			$ret .= parent::EndToString();
+			return $ret;
 		}
-/*		function Show()
-		{
-			ob_start();
-			parent::Show();
-			ob_end_flush();
-		}
-*/
 	}
 ?>

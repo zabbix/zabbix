@@ -744,6 +744,9 @@
 
 		if($result)
 		{
+		// delete trigger permisions
+			DBexecute('delete from rights where name=\'Trigger comment\' and id='.$triggerid);
+
 			$msg = "Trigger '".$trigger["description"]."' deleted";
 			$trig_host = DBfetch($trig_hosts);
 			if($trig_host)
@@ -1009,56 +1012,52 @@
 	function	get_triggers_overview($groupid)
 	{
 		$table = new CTableInfo();
-
 		if($groupid > 0)
 		{
-			$group_where = ",hosts_groups hg where hg.groupid=$groupid and hg.hostid=h.hostid and";
+			$group_where = ',hosts_groups hg where hg.groupid='.$groupid.' and hg.hostid=h.hostid and';
 		} else {
-			$group_where = " where";
+			$group_where = ' where';
 		}
 
-		$header=array(new CCol(S_TRIGGERS,"center"));
-
-		$hosts=array();
-		$result=DBselect("select h.hostid,h.host from hosts h,items i,triggers t, functions f $group_where".
-			" h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid".
-			" and t.status=".TRIGGER_STATUS_ENABLED.
-			" group by h.host,h.hostid order by h.host");
-		while($row=DBfetch($result))
+		$result=DBselect('select distinct t.description,t.value,t.lastchange,h.hostid,h.host'.
+			' from hosts h,items i,triggers t, functions f '.$group_where.
+			' h.status='.HOST_STATUS_MONITORED.' and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid'.
+			' and t.status='.TRIGGER_STATUS_ENABLED.
+			' order by t.description');
+		unset($triggers);
+		unset($hosts);
+		while($row = DBfetch($result))
 		{
-			if(!check_right("Host","R",$row["hostid"])) continue;
-			$header=array_merge($header,array(new CImg("vtext.php?text=".$row["host"])));
-			$hosts=array_merge($hosts,array($row["hostid"]));
+			if(!check_right('Host','R',$row['hostid'])) continue;
+			$hosts[$row['host']] = $row['host'];
+			$triggers[$row['description']][$row['host']] = array('value' => $row['value'], 'lastchange' => $row['lastchange']);
 		}
-		$table->SetHeader($header,"vertical_header");
-	
+		sort($hosts);
 
-		$db_triggers = DBselect("select distinct t.description from hosts h,items i,triggers t,functions f $group_where".
-			" h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid".
-			" and t.status=".TRIGGER_STATUS_ENABLED);
-		while($triggers = DBfetch($db_triggers))
+		$header=array(new CCol(S_TRIGGERS,'center'));
+		foreach($hosts as $hostname)
 		{
-			$table_row = array(nbsp($triggers["description"]));
-			foreach($hosts as $hostid)
+			$header=array_merge($header,array(new CImg('vtext.php?text='.$hostname)));
+		}
+		$table->SetHeader($header,'vertical_header');
+
+		foreach($triggers as $descr => $trhosts)
+		{
+			$table_row = array(nbsp($descr));
+			foreach($hosts as $hostname)
 			{
 				$style = NULL;
-				$db_host_triggers = DBselect("select distinct t.value,t.lastchange from triggers t,functions f,items i".
-					" where f.triggerid=t.triggerid and i.itemid=f.itemid and t.status=".TRIGGER_STATUS_ENABLED.
-					" and i.hostid=$hostid and t.description=".zbx_dbstr($triggers["description"]));
-				$host_trigger = DBfetch($db_host_triggers);
-				if($host_trigger)
+				if(isset($trhosts[$hostname]))
 				{
+					if($trhosts[$hostname]['value'] == TRIGGER_VALUE_FALSE)		$style = 'normal';
+					elseif($trhosts[$hostname]['value'] == TRIGGER_VALUE_UNKNOWN)	$style = 'unknown_trigger';
+					else								$style = 'high';
 
-					if($host_trigger["value"] == TRIGGER_VALUE_FALSE)	$style = "normal";
-					elseif($host_trigger["value"] == TRIGGER_VALUE_UNKNOWN)	$style = "unknown_trigger";
-					else							$style = "high";
-
-					if((time(NULL)-$host_trigger["lastchange"])<300) 	$style .= "_blink1";
-					elseif((time(NULL)-$host_trigger["lastchange"])<900) 	$style .= "_blink2";
+					if((time(NULL)-$trhosts[$hostname]['lastchange'])<300)	 	$style .= '_blink1';
+					elseif((time(NULL)-$trhosts[$hostname]['lastchange'])<900) 	$style .= '_blink2';
 				}
 				array_push($table_row,new CCol(SPACE,$style));
 			}
-
 			$table->AddRow($table_row);
 		}
 		return $table;

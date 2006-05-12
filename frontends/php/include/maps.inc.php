@@ -28,11 +28,8 @@
 		{
 			return	$row;
 		}
-		else
-		{
-			error("No system map with sysmapid=[$sysmapid]");
-		}
-		return	$result;
+		error("No system map with sysmapid=[$sysmapid]");
+		return false;
 	}
 
 	function	get_sysmaps_element_by_selementid($selementid)
@@ -63,6 +60,9 @@
 
 		$result = DBexecute("delete from sysmaps_elements where sysmapid=$sysmapid");
 		if(!$result)	return	$result;
+
+	// delete map permisions
+		DBexecute('delete from rights where name=\'Network map\' and id='.$sysmapid);
 
 		return DBexecute("delete from sysmaps where sysmapid=$sysmapid");
 	}
@@ -251,8 +251,8 @@
 	{
 		global $colors;
 
-		$info = "";
 		$count = 0;
+		$info = "OK";
 		$color= $colors["Dark Green"];
 		
 		$db_element = get_sysmaps_element_by_selementid($selementid);
@@ -300,8 +300,8 @@
 
 			if($count==0)
 			{
-				$out_info	= S_OK_BIG;
-				$out_color	= $colors["Dark Green"];
+				$info	= S_OK_BIG;
+				$color	= $colors["Dark Green"];
 			}
 		}
 		elseif($db_element["elementtype"]==SYSMAP_ELEMENT_TYPE_IMAGE)

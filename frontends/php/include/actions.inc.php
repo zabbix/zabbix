@@ -190,12 +190,9 @@
 
 		$sql="select distinct h.hostid from hosts h,functions f, items i where i.itemid=f.itemid and h.hostid=i.hostid and f.triggerid=".$action["triggerid"];
 		$result=dbselect($sql);
-		if(dbnum_rows($result)!=1)
-		{
-			return;
-		}
 
 		$row=dbfetch($result);
+		if(!$row)	return;
 
 		$hostid=$row["hostid"];
 

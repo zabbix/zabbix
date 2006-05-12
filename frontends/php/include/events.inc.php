@@ -19,6 +19,7 @@
 **/
 ?>
 <?php
+
 	function get_history_of_events($start,$num, $groupid=0, $hostid=0)
 	{
 		if($hostid > 0)

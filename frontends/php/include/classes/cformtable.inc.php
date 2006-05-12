@@ -40,7 +40,7 @@
 			$this->SetHelp();
 
 			$frm_link = new CLink();
-			$frm_link->SetName("formtable");
+//			$frm_link->SetName("formtable");
 			$this->AddItemToTopRow($frm_link);
 			
 			$this->AddVar("form",get_request("form",1));
@@ -58,6 +58,14 @@
 				return parent::SetAction($value);
 			else
 				return $this->error("Incorrect value for SetAction [$value]");
+		}
+		function SetName($value)
+		{
+			if(!is_string($value))
+			{
+				return $this->error("Incorrect value for SetAlign [$value]");
+			}
+			return $this->AddOption('name',$value);
 		}
 		function SetAlign($value)
 		{
@@ -128,19 +136,17 @@
 			$this->bottom_items->AddItem($value);
 		}
 /* protected */
-		function ShowTagBody()
+		function BodyToString()
 		{
-			parent::ShowTagBody();
+			parent::BodyToString();
 
 			$tbl = new CTable(NULL,'formtable');
+
 			$tbl->SetOddRowClass('form_odd_row');
 			$tbl->SetEvenRowClass('form_even_row');
 			$tbl->SetCellSpacing(0);
 			$tbl->SetCellPadding(1);
 			$tbl->SetAlign($this->align);
-# add center rows
-			foreach($this->center_items as $item)
-			        $tbl->AddRow($item);
 # add first row
 			$col = new CCol(NULL,'form_row_first');
 		        $col->SetColSpan(2);
@@ -150,7 +156,11 @@
 		        $tbl->SetHeader($col);
 # add last row
 		        $tbl->SetFooter($this->bottom_items);
-			$tbl->Show();
+# add center rows
+			foreach($this->center_items as $item)
+			        $tbl->AddRow($item);
+
+			return $tbl->ToString();
 		}
 	}
 ?>
