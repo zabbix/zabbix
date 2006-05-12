@@ -43,9 +43,10 @@
 	{
 		$sql="select * from triggers where triggerid=$triggerid";
 		$result=DBselect($sql);
-		if(DBnum_rows($result) == 1)
+		$row=DBfetch($result);
+		if($row)
 		{
-			return	DBfetch($result);	
+			return	$row;
 		}
 		error("No trigger with triggerid=[$triggerid]");
 		return FALSE;
@@ -74,7 +75,7 @@
 		while($db_trigger = DBfetch($db_triggers))
 		{
 			$db_hosts = get_hosts_by_triggerid($db_trigger["triggerid"]);
-			if(DBnum_rows($db_hosts) == 1)
+			if(DBfetch($db_hosts))
 			{
 				array_push($triggers,$db_trigger["triggerid"]);
 			}
@@ -245,22 +246,30 @@
 
 		}
 
-		$hosts_num = DBnum_rows($exp_hosts);
-		if($hosts_num == 0)
+		$exp_host = DBfetch($exp_hosts);
+		if(!$exp_host)
 		{
 			error("Incorrect trigger expression. Incorrect host is used.");
 			return 1;
 		}
-		else if(DBnum_rows($exp_hosts) <> 1)
+		else
 		{
-			while($exp_host = DBfetch($exp_hosts))
+			$rows=0;
+			unset($fail);
+			do
 			{
 				if($exp_host["status"]==HOST_STATUS_TEMPLATE)
 				{
-					error("Incorrect trigger expression. You can't use template hosts".
-						" in mixed expressions.");
-					return 1;
+					$fail=1;
 				}
+				$rows++;
+			} while($exp_host = DBfetch($exp_hosts));
+
+			if(isset($fail) && ($rows>1))
+			{
+				error("Incorrect trigger expression. You can't use template hosts".
+					" in mixed expressions.");
+				return 1;
 			}
 		}
 
@@ -308,22 +317,20 @@
 			$result = add_trigger_dependency($triggerid, $val);
 		}
 
+		$trig_hosts = get_hosts_by_triggerid($triggerid);
+		$trig_host = DBfetch($trig_hosts);
 		if($result)
 		{
-			$trig_hosts	= get_hosts_by_triggerid($triggerid);
 			$msg = "Added trigger '".$description."'";
-			if(DBnum_rows($trig_hosts) == 1)
+			if($trig_host)
 			{
-				$trig_host = DBfetch($trig_hosts);
 				$msg .= " to host '".$trig_host["host"]."'";
 			}
 			info($msg);
 		}
 
-		$trig_hosts = get_hosts_by_triggerid($triggerid);
-		if(DBnum_rows($trig_hosts) == 1)
+		if($trig_host)
 		{
-			$trig_host = DBfetch($trig_hosts);
 			$child_hosts = get_hosts_by_templateid($trig_host["hostid"]);
 			while($child_host = DBfetch($child_hosts))
 			{
@@ -392,12 +399,12 @@
 			$host_items = DBselect("select * from items".
 				" where key_=".zbx_dbstr($item["key_"]).
 				" and hostid=".$host["hostid"]);
-			if(DBnum_rows($host_items)!=1)
+			$host_item = DBfetch($host_items);
+			if(!$host_item)
 			{
 				error("Missing key '".$item["key_"]."' for host '".$host["host"]."'");
 				return FALSE;
 			}
-			$host_item = DBfetch($host_items);
 
 			$result = DBexecute("insert into functions (itemid,triggerid,function,parameter)".
 				" values (".$host_item["itemid"].",$newtriggerid,".
@@ -639,9 +646,9 @@
 			" and f.itemid=i.itemid and i.hostid=h.hostid");
 
 
-		if(DBnum_rows($result)>0)
+		$row = DBfetch($result);
+		if($row)
 		{
-			$row = DBfetch($result);
 			$description = str_replace("{HOSTNAME}", $row["host"],$row["description"]);
 		}
 		else
@@ -738,9 +745,9 @@
 		if($result)
 		{
 			$msg = "Trigger '".$trigger["description"]."' deleted";
-			if(DBnum_rows($trig_hosts) == 1)
+			$trig_host = DBfetch($trig_hosts);
+			if($trig_host)
 			{
-				$trig_host = DBfetch($trig_hosts);
 				$msg .= " from host '".$trig_host["host"]."'";
 			}
 			info($msg);
@@ -776,7 +783,7 @@
 		$exp_hosts 	= get_hosts_by_expression($expression);
 		$chd_hosts	= get_hosts_by_templateid($trig_host["hostid"]);
 
-		if(DBnum_rows($chd_hosts) > 0)
+		if(DBfetch($chd_hosts))
 		{
 			$exp_host = DBfetch($exp_hosts);
 			$db_chd_triggers = get_triggers_by_templateid($triggerid);
@@ -835,9 +842,9 @@
 		{
 			$trig_hosts	= get_hosts_by_triggerid($triggerid);
 			$msg = "Trigger '".$trigger["description"]."' updated";
-			if(DBnum_rows($trig_hosts) == 1)
+			$trig_host = DBfetch($trig_hosts);
+			if($trig_host)
 			{
-				$trig_host = DBfetch($trig_hosts);
 				$msg .= " from host '".$trig_host["host"]."'";
 			}
 			info($msg);
@@ -953,11 +960,6 @@
 		$trig2 = get_trigger_by_triggerid($triggerid2);
 
 		$trig_fnc1 = get_functions_by_triggerid($triggerid1);
-		$trig_fnc2 = get_functions_by_triggerid($triggerid2);
-		if(DBnum_rows($trig_fnc1) != DBnum_rows($trig_fnc2))
-		{
-			return 1;
-		}
 		
 		$expr1 = $trig1["expression"];
 		while($fnc1 = DBfetch($trig_fnc1))
@@ -1043,9 +1045,9 @@
 				$db_host_triggers = DBselect("select distinct t.value,t.lastchange from triggers t,functions f,items i".
 					" where f.triggerid=t.triggerid and i.itemid=f.itemid and t.status=".TRIGGER_STATUS_ENABLED.
 					" and i.hostid=$hostid and t.description=".zbx_dbstr($triggers["description"]));
-				if(DBnum_rows($db_host_triggers)==1)
+				$host_trigger = DBfetch($db_host_triggers);
+				if($host_trigger)
 				{
-					$host_trigger = DBfetch($db_host_triggers);
 
 					if($host_trigger["value"] == TRIGGER_VALUE_FALSE)	$style = "normal";
 					elseif($host_trigger["value"] == TRIGGER_VALUE_UNKNOWN)	$style = "unknown_trigger";

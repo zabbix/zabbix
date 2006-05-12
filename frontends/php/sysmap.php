@@ -159,8 +159,9 @@
 	elseif(isset($_REQUEST["form"]) && ($_REQUEST["form"]=="add_link" || 
 		($_REQUEST["form"]=="update" && isset($_REQUEST["linkid"]))))
 	{
-		$result=DBselect("select * from sysmaps_elements where sysmapid=".$_REQUEST["sysmapid"]);
-		if(DBnum_rows($result)>1)
+		$result=DBselect("select count(*) as count from sysmaps_elements where sysmapid=".$_REQUEST["sysmapid"]);
+		$row=DBfetch($result);;
+		if($row["count"]>1)
 		{
 			show_table_header("CONNECTORS");
 			echo BR;

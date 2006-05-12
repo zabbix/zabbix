@@ -33,7 +33,7 @@
 		}
 
 		$result=DBexecute("select * from hosts_profiles where hostid=$hostid");
-		if(DBnum_rows($result)>0)
+		if(DBfetch($result))
 		{
 			error("Host profile already exists");
 			return 0;

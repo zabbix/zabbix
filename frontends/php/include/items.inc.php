@@ -146,13 +146,13 @@
 
 		$db_items = DBexecute("select itemid,hostid from items".
 			" where hostid=$hostid and key_=".zbx_dbstr($key));
-		if(DBnum_rows($db_items) > 0 && $templateid == 0)
+		$db_item = DBfetch($db_items);
+		if($db_item && $templateid == 0)
 		{
 			error("An item with the same Key already exists for host ".$host["host"].".".
 				" The key must be unique.");
 			return FALSE;
-		} elseif (DBnum_rows($db_items) > 0 && $templateid != 0){
-			$db_item = DBfetch($db_items);
+		} elseif ($db_item && $templateid != 0){
 
 			$result = update_item(
 				$db_item["itemid"], $description, $key, $db_item["hostid"],
@@ -276,7 +276,8 @@
 
 		$db_items = DBexecute("select itemid from items".
 			" where hostid=$hostid and itemid<>$itemid and key_=".zbx_dbstr($key));
-		if(DBnum_rows($db_items) > 0 && $templateid == 0)
+		$db_item = DBfetch($db_items);
+		if($db_item && $templateid == 0)
 		{
 			error("An item with the same Key already exists for host ".$host["host"].".".
 				" The key must be unique.");
@@ -303,9 +304,8 @@
 				return $result;
 		}
 
-		if(DBnum_rows($db_items) > 0 && $templateid != 0)
+		if($db_item && $templateid != 0)
 		{
-			$db_item = DBfetch($db_items);
 			$result = delete_item($db_item["itemid"]);
 			if(!$result) {
 				error("Can't update item '".$host["host"].":$key'");
@@ -439,9 +439,10 @@
 	function	get_item_by_itemid($itemid)
 	{
 		$result=DBselect("select * from items where itemid=$itemid"); 
-		if(DBnum_rows($result) == 1)
+		$row=DBfetch($result);
+		if($row)
 		{
-			return	DBfetch($result);	
+			return	$row;
 		}
 		error("No item with itemid=[$itemid]");
 		return	FALSE;
@@ -562,12 +563,12 @@
 			{
 				$db_host_items = DBselect("select itemid,value_type,lastvalue,units from items where".
 					" hostid=$hostid and status=".ITEM_STATUS_ACTIVE." and description=".zbx_dbstr($item["description"]));
-				if(DBnum_rows($db_host_items)!=1)
+				$host_item = DBfetch($db_host_items);
+				if(!$host_item)
 				{
 					array_push($table_row,"-");
 					continue;
 				}
-				$host_item = DBfetch($db_host_items);
 
 				if(!check_right("Item","R",$host_item["itemid"])) continue;
 
@@ -596,7 +597,7 @@
 				$db_item_triggers = DBselect("select t.triggerid from triggers t, items i, functions f where".
 					" i.hostid=$hostid and i.itemid=".$host_item["itemid"]." and i.itemid=f.itemid".
 					" and t.priority>1 and t.triggerid=f.triggerid and t.value=".TRIGGER_VALUE_TRUE);
-				if(DBnum_rows($db_item_triggers) > 0)		$style = "high";
+				if(DBfetch($db_item_triggers))		$style = "high";
 				else						$style = NULL;
 
 				if($host_item["value_type"] == 0)
