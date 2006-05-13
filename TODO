@@ -3,7 +3,6 @@
  - add optimisation flags -O2 to configure
  - remember snmp community on per host level
  - net.if.stat collected as double, must be as uint64
- - special unit "unixtime" for uptimes, etc
  - rename screens_items.resource -> resourcetype
  - rename screens.rows ->vsize, cols -> hsize
  - rename audit.resource -> resourcetype
