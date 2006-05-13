@@ -955,7 +955,8 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 		}
 		else
 		{
-				zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() fuzzytime [%s] [%s]",value,item->lastvalue);
+			zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() fuzzytime [%s] [%s]",value,item->lastvalue);
+
 			if((item->lastvalue>=fuzlow)&&(item->lastvalue<=fuzhig))
 			{
 				strcpy(value,"1");
