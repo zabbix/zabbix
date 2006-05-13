@@ -167,6 +167,12 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 
 	function	convert_units($value,$units)
 	{
+// Special processing for unix timestamps
+		if($units=="unixtime")
+		{
+			$ret=date("Y.m.d H:i:s",$value);
+			return $ret;
+		}
 // Special processing for seconds
 		if($units=="s")
 		{
