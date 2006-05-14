@@ -74,12 +74,12 @@
 
 	if(!isset($_REQUEST["start"]))
 	{
-		$sql="select u.alias,a.clock,a.action,a.resource,a.details from auditlog a, users u".
+		$sql="select u.alias,a.clock,a.action,a.resourcetype,a.details from auditlog a, users u".
 			" where u.userid=a.userid and a.auditid>$maxauditid-200 order by clock desc limit 200";
 	}
 	else
 	{
-		$sql="select u.alias,a.clock,a.action,a.resource,a.details from auditlog a, users u".
+		$sql="select u.alias,a.clock,a.action,a.resourcetype,a.details from auditlog a, users u".
 			" where u.userid=a.userid and a.auditid>$maxauditid-".($_REQUEST["start"]+200).
 			" order by clock desc limit ".($_REQUEST["start"]+200);
 
@@ -95,19 +95,19 @@
 		if(isset($_REQUEST["start"])&&($i<$_REQUEST["start"]))	continue;
 		if($i>100)	break;
 
-		if($row["resource"]==AUDIT_RESOURCE_USER)
+		if($row["resourcetype"]==AUDIT_RESOURCE_USER)
 			$resource=S_USER;
-		else if($row["resource"]==AUDIT_RESOURCE_ZABBIX_CONFIG)
+		else if($row["resourcetype"]==AUDIT_RESOURCE_ZABBIX_CONFIG)
 			$resource=S_CONFIGURATION_OF_ZABBIX;
-		else if($row["resource"]==AUDIT_RESOURCE_MEDIA_TYPE)
+		else if($row["resourcetype"]==AUDIT_RESOURCE_MEDIA_TYPE)
 			$resource=S_MEDIA_TYPE;
-		else if($row["resource"]==AUDIT_RESOURCE_HOST)
+		else if($row["resourcetype"]==AUDIT_RESOURCE_HOST)
 			$resource=S_HOST;
-		else if($row["resource"]==AUDIT_RESOURCE_ACTION)
+		else if($row["resourcetype"]==AUDIT_RESOURCE_ACTION)
 			$resource=S_ACTION;
-		else if($row["resource"]==AUDIT_RESOURCE_GRAPH)
+		else if($row["resourcetype"]==AUDIT_RESOURCE_GRAPH)
 			$resource=S_GRAPH;
-		else if($row["resource"]==AUDIT_RESOURCE_GRAPH_ELEMENT)
+		else if($row["resourcetype"]==AUDIT_RESOURCE_GRAPH_ELEMENT)
 			$resource=S_GRAPH_ELEMENT;
 		else
 			$resource=S_UNKNOWN_RESOURCE;

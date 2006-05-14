@@ -30,4 +30,9 @@ CREATE TABLE items_applications (
 	PRIMARY KEY (applicationid,itemid)
 ) type=InnoDB;
 
+
 alter table audit rename auditlog;
+
+alter table auditlog add resourcetype          int(4)          DEFAULT '0' NOT NULL;
+update auditlog set resourcetype=resource;
+alter table auditlog drop resource;

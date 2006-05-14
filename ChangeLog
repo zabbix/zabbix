@@ -1,5 +1,6 @@
 Changes for 1.1beta10:
 
+ - renamed audit.resource -> resourcetype (Alexei)
  - fixed evaluation of max,min,count,sum for item having integer values (Alexei)
  - support of special unit "unixtime" (Alexei)
  - removed unused table stats (Alexei)
