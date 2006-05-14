@@ -4,7 +4,6 @@
  - remember snmp community on per host level
  - net.if.stat collected as double, must be as uint64
  - rename screens_items.resource -> resourcetype
- - rename screens.rows ->vsize, cols -> hsize
  - http://www.zabbix.com/forum/showthread.php?t=2682
  - http://www.zabbix.com/forum/showthread.php?t=2680
  - http://www.zabbix.com/forum/showthread.php?t=2675
