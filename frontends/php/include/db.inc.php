@@ -23,15 +23,15 @@
 // DATABASE CONFIGURATION
 
 //	$DB_TYPE	="POSTGRESQL";
-//	$DB_TYPE	="MYSQL";
-	$DB_TYPE	="ORACLE";
+	$DB_TYPE	="MYSQL";
+//	$DB_TYPE	="ORACLE";
 	$DB_SERVER	="localhost";
-//	$DB_DATABASE	="zabbix";
+	$DB_DATABASE	="zabbix";
 //	$DB_DATABASE	="osmiy";
-	$DB_DATABASE	="demo";
+//	$DB_DATABASE	="demo";
 //	$DB_DATABASE	="martinsj";
-	$DB_USER	="scott";
-	$DB_PASSWORD	="tiger";
+	$DB_USER	="root";
+	$DB_PASSWORD	="";
 // END OF DATABASE CONFIGURATION
 
 //	$USER_DETAILS	="";

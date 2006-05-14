@@ -19,13 +19,13 @@
 **/
 ?>
 <?php
-	function add_audit($action,$resource,$details)
+	function add_audit($action,$resourcetype,$details)
 	{
 		global $USER_DETAILS;
 
 		$userid=$USER_DETAILS["userid"];
 		$clock=time();
-		$sql="insert into auditlog (userid,clock,action,resource,details) values ($userid,$clock,$action,$resource,".zbx_dbstr($details).")";
+		$sql="insert into auditlog (userid,clock,action,resourcetype,details) values ($userid,$clock,$action,$resourcetype,".zbx_dbstr($details).")";
 		return DBexecute($sql);
 	}
 ?>
