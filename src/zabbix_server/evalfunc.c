@@ -46,7 +46,6 @@
 
 #include "evalfunc.h"
 
-
 /******************************************************************************
  *                                                                            *
  * Function: evaluate_LOGSOURCE                                               *
@@ -180,6 +179,7 @@ static int evaluate_COUNT(char *value, DB_ITEM *item, int parameter)
 	DB_ROW	row;
 
 	char		sql[MAX_STRING_LEN];
+	char		table[MAX_STRING_LEN];
 	int		now;
 	int		res = SUCCEED;
 
@@ -190,7 +190,15 @@ static int evaluate_COUNT(char *value, DB_ITEM *item, int parameter)
 
 	now=time(NULL);
 
-	snprintf(sql,sizeof(sql)-1,"select count(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
+	if(item->value_type == ITEM_VALUE_TYPE_UINT64)
+	{
+		strscpy(table,"history_uint");
+	}
+	else
+	{
+		strscpy(table,"history");
+	}
+	snprintf(sql,sizeof(sql)-1,"select count(value) from %s where clock>%d and itemid=%d",table,now-parameter,item->itemid);
 
 	result = DBselect(sql);
 	row = DBfetch(result);
@@ -232,9 +240,11 @@ static int evaluate_SUM(char *value, DB_ITEM *item, int parameter, int flag)
 	DB_ROW	row;
 
 	char		sql[MAX_STRING_LEN];
+	char		table[MAX_STRING_LEN];
 	int		now;
 	int		res = SUCCEED;
 	double		sum=0;
+	zbx_uint64_t	sum_uint64=0;
 
 	if( (item->value_type != ITEM_VALUE_TYPE_FLOAT) && (item->value_type != ITEM_VALUE_TYPE_UINT64))
 	{
@@ -245,7 +255,15 @@ static int evaluate_SUM(char *value, DB_ITEM *item, int parameter, int flag)
 
 	if(flag == ZBX_FLAG_SEC)
 	{
-		snprintf(sql,sizeof(sql)-1,"select sum(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
+		if(item->value_type == ITEM_VALUE_TYPE_UINT64)
+		{
+			strscpy(table,"history_uint");
+		}
+		else
+		{
+			strscpy(table,"history");
+		}
+		snprintf(sql,sizeof(sql)-1,"select sum(value) from %s where clock>%d and itemid=%d",table, now-parameter,item->itemid);
 
 		result = DBselect(sql);
 		row = DBfetch(result);
@@ -261,7 +279,15 @@ static int evaluate_SUM(char *value, DB_ITEM *item, int parameter, int flag)
 	}
 	else if(flag == ZBX_FLAG_VALUES)
 	{
-		snprintf(sql,sizeof(sql)-1,"select value from history where itemid=%d order by clock desc limit %d",item->itemid, parameter);
+		if(item->value_type == ITEM_VALUE_TYPE_UINT64)
+		{
+			strscpy(table,"history_uint");
+		}
+		else
+		{
+			strscpy(table,"history");
+		}
+		snprintf(sql,sizeof(sql)-1,"select value from %s where itemid=%d order by clock desc limit %d",table,item->itemid, parameter);
 		result = DBselect(sql);
 		row = DBfetch(result);
 		if(!row)
@@ -271,11 +297,21 @@ static int evaluate_SUM(char *value, DB_ITEM *item, int parameter, int flag)
 		}
 		else
 		{
-			while((row=DBfetch(result)))
+			if(item->value_type == ITEM_VALUE_TYPE_UINT64)
 			{
-				sum+=atof(row[0]);
+				while((row=DBfetch(result)))
+#ifdef	HAVE_ATOLL
+					sum_uint64+=atoll(row[0]);
+#else
+					sum_uint64+=atol(row[0]);
+#endif
+				snprintf(value,MAX_STRING_LEN-1,ZBX_FS_UI64, sum_uint64);
 			}
-			snprintf(value,MAX_STRING_LEN-1,"%f", sum);
+			else
+			{
+				while((row=DBfetch(result))) sum+=atof(row[0]);
+				snprintf(value,MAX_STRING_LEN-1,"%f", sum);
+			}
 		}
 	}
 	else
@@ -399,6 +435,10 @@ static int evaluate_MIN(char *value,DB_ITEM	*item,int parameter, int flag)
 	int		rows;
 	int		res = SUCCEED;
 
+	char		table[MAX_STRING_LEN];
+	zbx_uint64_t	min_uint64=0;
+	zbx_uint64_t	l;
+
 	double		min=0;
 	double		f;
 
@@ -411,7 +451,15 @@ static int evaluate_MIN(char *value,DB_ITEM	*item,int parameter, int flag)
 
 	if(flag == ZBX_FLAG_SEC)
 	{
-		snprintf(sql,sizeof(sql)-1,"select min(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
+		if(item->value_type == ITEM_VALUE_TYPE_UINT64)
+		{
+			strscpy(table,"history_uint");
+		}
+		else
+		{
+			strscpy(table,"history");
+		}
+		snprintf(sql,sizeof(sql)-1,"select min(value) from %s where clock>%d and itemid=%d",table, now-parameter,item->itemid);
 		result = DBselect(sql);
 		row = DBfetch(result);
 		if(!row)
@@ -427,15 +475,36 @@ static int evaluate_MIN(char *value,DB_ITEM	*item,int parameter, int flag)
 	}
 	else if(flag == ZBX_FLAG_VALUES)
 	{
-		snprintf(sql,sizeof(sql)-1,"select value from history where itemid=%d order by clock desc limit %d",item->itemid, parameter);
+		if(item->value_type == ITEM_VALUE_TYPE_UINT64)
+		{
+			strscpy(table,"history_uint");
+		}
+		else
+		{
+			strscpy(table,"history");
+		}
+		snprintf(sql,sizeof(sql)-1,"select value from %s where itemid=%d order by clock desc limit %d",table,item->itemid, parameter);
 		result = DBselect(sql);
 
 		rows=0;
 		while((row=DBfetch(result)))
 		{
-			f=atof(row[0]);
-			if(rows==0)	min = f;
-			else if(f<min)	min=f;
+			if(item->value_type == ITEM_VALUE_TYPE_UINT64)
+			{
+#ifdef	HAVE_ATOLL
+				l=atoll(row[0]);
+#else
+				l=atol(row[0]);
+#endif
+				if(rows==0)		min_uint64 = l;
+				else if(l<min_uint64)	min_uint64 = l;
+			}
+			else
+			{
+				f=atof(row[0]);
+				if(rows==0)	min = f;
+				else if(f<min)	min = f;
+			}
 			rows++;
 		}
 
@@ -446,7 +515,14 @@ static int evaluate_MIN(char *value,DB_ITEM	*item,int parameter, int flag)
 		}
 		else
 		{
-			snprintf(value,MAX_STRING_LEN-1,"%f", min);
+			if(item->value_type == ITEM_VALUE_TYPE_UINT64)
+			{
+				snprintf(value,MAX_STRING_LEN-1,ZBX_FS_UI64, min_uint64);
+			}
+			else
+			{
+				snprintf(value,MAX_STRING_LEN-1,"%f", min);
+			}
 		}
 	}
 	else
@@ -489,6 +565,10 @@ static int evaluate_MAX(char *value,DB_ITEM *item,int parameter,int flag)
 	double		f;
 	double		max;
 
+	char		table[MAX_STRING_LEN];
+	zbx_uint64_t	max_uint64=0;
+	zbx_uint64_t	l;
+
 	if( (item->value_type != ITEM_VALUE_TYPE_FLOAT) && (item->value_type != ITEM_VALUE_TYPE_UINT64))
 	{
 		return	FAIL;
@@ -498,7 +578,15 @@ static int evaluate_MAX(char *value,DB_ITEM *item,int parameter,int flag)
 
 	if(flag == ZBX_FLAG_SEC)
 	{
-		snprintf(sql,sizeof(sql)-1,"select max(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
+		if(item->value_type == ITEM_VALUE_TYPE_UINT64)
+		{
+			strscpy(table,"history_uint");
+		}
+		else
+		{
+			strscpy(table,"history");
+		}
+		snprintf(sql,sizeof(sql)-1,"select max(value) from %s where clock>%d and itemid=%d",table,now-parameter,item->itemid);
 
 		result = DBselect(sql);
 		row = DBfetch(result);
@@ -516,14 +604,35 @@ static int evaluate_MAX(char *value,DB_ITEM *item,int parameter,int flag)
 	}
 	else if(flag == ZBX_FLAG_VALUES)
 	{
-		snprintf(sql,sizeof(sql)-1,"select value from history where itemid=%d order by clock desc limit %d",item->itemid, parameter);
+		if(item->value_type == ITEM_VALUE_TYPE_UINT64)
+		{
+			strscpy(table,"history_uint");
+		}
+		else
+		{
+			strscpy(table,"history");
+		}
+		snprintf(sql,sizeof(sql)-1,"select value from %s where itemid=%d order by clock desc limit %d",table,item->itemid, parameter);
 		result = DBselect(sql);
 		rows=0;
 		while((row=DBfetch(result)))
 		{
-			f=atof(row[0]);
-			if(rows==0)	max=f;
-			else if(f>max)	max=f;
+			if(item->value_type == ITEM_VALUE_TYPE_UINT64)
+			{
+#ifdef	HAVE_ATOLL
+				l=atoll(row[0]);
+#else
+				l=atol(row[0]);
+#endif
+				if(rows==0)	max_uint64 = l;
+				else if(l>max)	max_uint64 = l;
+			}
+			else
+			{
+				f=atof(row[0]);
+				if(rows==0)	max=f;
+				else if(f>max)	max=f;
+			}
 			rows++;
 		}
 		if(rows == 0)
@@ -533,7 +642,14 @@ static int evaluate_MAX(char *value,DB_ITEM *item,int parameter,int flag)
 		}
 		else
 		{
-			snprintf(value,MAX_STRING_LEN-1,"%f", max);
+			if(item->value_type == ITEM_VALUE_TYPE_UINT64)
+			{
+				snprintf(value,MAX_STRING_LEN-1,ZBX_FS_UI64, max_uint64);
+			}
+			else
+			{
+				snprintf(value,MAX_STRING_LEN-1,"%f", max);
+			}
 		}
 	}
 	else
