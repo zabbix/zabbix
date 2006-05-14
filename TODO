@@ -4,13 +4,6 @@
  - remember snmp community on per host level
  - net.if.stat collected as double, must be as uint64
  - rename screens_items.resource -> resourcetype
- - http://www.zabbix.com/forum/showthread.php?t=2682
- - http://www.zabbix.com/forum/showthread.php?t=2680
- - http://www.zabbix.com/forum/showthread.php?t=2675
- - cannot add host group
- - windows agent crash
- - Action not running when trigger changes from TRUE -> UNKNOWN -> FALSE: http://www.zabbix.com/forum/showthread.php?t=2671
- - problems adding new map links: http://www.zabbix.com/forum/showthread.php?t=2604
 
  - item key popup, trigger expression builder
  - remember different default values in different forms
