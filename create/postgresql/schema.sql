@@ -193,7 +193,7 @@ CREATE TABLE auditlog (
   userid		int4		DEFAULT '0' NOT NULL,
   clock			int4		DEFAULT '0' NOT NULL,
   action		int4		DEFAULT '0' NOT NULL,
-  resource		int4		DEFAULT '0' NOT NULL,
+  resourcetype		int4		DEFAULT '0' NOT NULL,
   details		varchar(128)	DEFAULT '0' NOT NULL,
   PRIMARY KEY (auditid)
 );
