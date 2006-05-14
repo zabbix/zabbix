@@ -613,7 +613,7 @@ CREATE TABLE screens (
 CREATE TABLE screens_items (
 	screenitemid	serial,
 	screenid	int4		DEFAULT '0' NOT NULL,
-	resource	int4		DEFAULT '0' NOT NULL,
+	resourcetype	int4		DEFAULT '0' NOT NULL,
 	resourceid	int4		DEFAULT '0' NOT NULL,
 	width		int4		DEFAULT '320' NOT NULL,
 	height		int4		DEFAULT '200' NOT NULL,

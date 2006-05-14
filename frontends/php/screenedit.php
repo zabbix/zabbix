@@ -46,7 +46,7 @@
 			if(isset($_REQUEST["screenitemid"]))
 			{
 				$result=update_screen_item($_REQUEST["screenitemid"],
-					$_REQUEST["resource"],$_REQUEST["resourceid"],$_REQUEST["width"],
+					$_REQUEST["resourcetype"],$_REQUEST["resourceid"],$_REQUEST["width"],
 					$_REQUEST["height"],$_REQUEST["colspan"],$_REQUEST["rowspan"],
 					$_REQUEST["elements"],$_REQUEST["valign"],
 					$_REQUEST["halign"],$_REQUEST["style"],$_REQUEST["url"]);
@@ -56,7 +56,7 @@
 			else
 			{
 				$result=add_screen_item(
-					$_REQUEST["resource"],$_REQUEST["screenid"],
+					$_REQUEST["resourcetype"],$_REQUEST["screenid"],
 					$_REQUEST["x"],$_REQUEST["y"],$_REQUEST["resourceid"],
 					$_REQUEST["width"],$_REQUEST["height"],$_REQUEST["colspan"],
 					$_REQUEST["rowspan"],$_REQUEST["elements"],$_REQUEST["valign"],
