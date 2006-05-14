@@ -1553,7 +1553,7 @@
 		if(isset($_REQUEST["screenitemid"]) && !isset($_REQUEST["form_refresh"]))
 		{
 			$irow = DBfetch($iresult);
-			$resource	= $irow["resource"];
+			$resourcetype	= $irow["resourcetype"];
 			$resourceid	= $irow["resourceid"];
 			$width		= $irow["width"];
 			$height		= $irow["height"];
@@ -1567,7 +1567,7 @@
 		}
 		else
 		{
-			$resource	= get_request("resource",	0);
+			$resourcetype	= get_request("resourcetype",	0);
 			$resourceid	= get_request("resourceid",	0);
 			$width		= get_request("width",		500);
 			$height		= get_request("height",		100);
@@ -1582,7 +1582,7 @@
 
 		$form->AddVar("screenid",$_REQUEST["screenid"]);
 
-		$cmbRes = new CCombobox("resource",$resource,"submit()");
+		$cmbRes = new CCombobox("resourcetype",$resourcetype,"submit()");
 		$cmbRes->AddItem(SCREEN_RESOURCE_GRAPH,		S_GRAPH);
 		$cmbRes->AddItem(SCREEN_RESOURCE_SIMPLE_GRAPH,	S_SIMPLE_GRAPH);
 		$cmbRes->AddItem(SCREEN_RESOURCE_PLAIN_TEXT,	S_PLAIN_TEXT);
@@ -1599,7 +1599,7 @@
                 $cmbRes->AddItem(SCREEN_RESOURCE_EVENTS,       S_HISTORY_OF_EVENTS);
 		$form->AddRow(S_RESOURCE,$cmbRes);
 
-		if($resource == SCREEN_RESOURCE_GRAPH)
+		if($resourcetype == SCREEN_RESOURCE_GRAPH)
 		{
 	// User-defined graph
 			$result=DBselect("select graphid,name from graphs order by name");
@@ -1622,7 +1622,7 @@
 
 			$form->AddRow(S_GRAPH_NAME,$cmbGraphs);
 		}
-		elseif($resource == SCREEN_RESOURCE_SIMPLE_GRAPH)
+		elseif($resourcetype == SCREEN_RESOURCE_SIMPLE_GRAPH)
 		{
 	// Simple graph
 			$result=DBselect("select h.host,i.description,i.itemid,i.key_".
@@ -1640,7 +1640,7 @@
 			}
 			$form->AddRow(S_PARAMETER,$cmbItems);
 		}
-		elseif($resource == SCREEN_RESOURCE_MAP)
+		elseif($resourcetype == SCREEN_RESOURCE_MAP)
 		{
 	// Map
 			$result=DBselect("select sysmapid,name from sysmaps order by name");
@@ -1653,7 +1653,7 @@
 
 			$form->AddRow(S_MAP,$cmbMaps);
 		}
-		elseif($resource == SCREEN_RESOURCE_PLAIN_TEXT)
+		elseif($resourcetype == SCREEN_RESOURCE_PLAIN_TEXT)
 		{
 	// Plain text
 			$result=DBselect("select h.host,i.description,i.itemid,i.key_".
@@ -1672,19 +1672,19 @@
 			$form->AddRow(S_PARAMETER,$cmbHosts);
 			$form->AddRow(S_SHOW_LINES, new CTextBox("elements",$elements,2));
 		}
-                elseif($resource == SCREEN_RESOURCE_ACTIONS)
+                elseif($resourcetype == SCREEN_RESOURCE_ACTIONS)
                 {
         // History of actions
                         $form->AddRow(S_SHOW_LINES, new CTextBox("elements",$elements,2));
 			$form->AddVar("resourceid",0);
                 }
-                elseif($resource == SCREEN_RESOURCE_EVENTS)
+                elseif($resourcetype == SCREEN_RESOURCE_EVENTS)
                 {
         // History of events
                         $form->AddRow(S_SHOW_LINES, new CTextBox("elements",$elements,2));
                         $form->AddVar("resourceid",0);
                 }
-		elseif(in_array($resource,array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW,SCREEN_RESOURCE_DATA_OVERVIEW)))
+		elseif(in_array($resourcetype,array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW,SCREEN_RESOURCE_DATA_OVERVIEW)))
 		{
 	// Overiews
 			$cmbGroup = new CComboBox("resourceid",$resourceid);
@@ -1713,7 +1713,7 @@
 			$form->AddRow(S_GROUP,$cmbGroup);
 
 		}
-		elseif($resource == SCREEN_RESOURCE_SCREEN)
+		elseif($resourcetype == SCREEN_RESOURCE_SCREEN)
 		{
 			$cmbScreens = new CComboBox("resourceid",$resourceid);
 			$result=DBselect("select screenid,name from screens");
@@ -1732,14 +1732,14 @@
 			$form->AddVar("resourceid",0);
 		}
 
-		if(in_array($resource,array(SCREEN_RESOURCE_HOSTS_INFO,SCREEN_RESOURCE_TRIGGERS_INFO)))
+		if(in_array($resourcetype,array(SCREEN_RESOURCE_HOSTS_INFO,SCREEN_RESOURCE_TRIGGERS_INFO)))
 		{
 			$cmbStyle = new CComboBox("style", $style);
 			$cmbStyle->AddItem(STYLE_HORISONTAL,	S_HORISONTAL);
 			$cmbStyle->AddItem(STYLE_VERTICAL,	S_VERTICAL);
 			$form->AddRow(S_STYLE,	$cmbStyle);
 		}
-		elseif($resource == SCREEN_RESOURCE_CLOCK)
+		elseif($resourcetype == SCREEN_RESOURCE_CLOCK)
 		{
 			$cmbStyle = new CComboBox("style", $style);
 			$cmbStyle->AddItem(TIME_TYPE_LOCAL,	S_LOCAL_TIME);
@@ -1751,7 +1751,7 @@
 			$form->AddVar("style",	0);
 		}
 
-		if(in_array($resource,array(SCREEN_RESOURCE_URL)))
+		if(in_array($resourcetype,array(SCREEN_RESOURCE_URL)))
 		{
 			$form->AddRow(S_URL, new CTextBox("url",$url,60));
 		}
@@ -1760,7 +1760,7 @@
 			$form->AddVar("url",	"");
 		}
 
-		if(in_array($resource,array(SCREEN_RESOURCE_GRAPH,SCREEN_RESOURCE_SIMPLE_GRAPH,SCREEN_RESOURCE_CLOCK,SCREEN_RESOURCE_URL)))
+		if(in_array($resourcetype,array(SCREEN_RESOURCE_GRAPH,SCREEN_RESOURCE_SIMPLE_GRAPH,SCREEN_RESOURCE_CLOCK,SCREEN_RESOURCE_URL)))
 		{
 			$form->AddRow(S_WIDTH,	new CTextBox("width",$width,5));
 			$form->AddRow(S_HEIGHT,	new CTextBox("height",$height,5));
@@ -1771,7 +1771,7 @@
 			$form->AddVar("height",	0);
 		}
 
-		if(in_array($resource,array(SCREEN_RESOURCE_GRAPH,SCREEN_RESOURCE_SIMPLE_GRAPH,SCREEN_RESOURCE_MAP,
+		if(in_array($resourcetype,array(SCREEN_RESOURCE_GRAPH,SCREEN_RESOURCE_SIMPLE_GRAPH,SCREEN_RESOURCE_MAP,
 			SCREEN_RESOURCE_CLOCK,SCREEN_RESOURCE_URL)))
 		{
 			$cmbHalign = new CComboBox("halign",$halign);

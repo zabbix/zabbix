@@ -596,7 +596,7 @@ CREATE TABLE screens (
 CREATE TABLE screens_items (
 	screenitemid	int(4)		NOT NULL auto_increment,
 	screenid	int(4)		DEFAULT '0' NOT NULL,
-	resource	int(4)		DEFAULT '0' NOT NULL,
+	resourcetype	int(4)		DEFAULT '0' NOT NULL,
 	resourceid	int(4)		DEFAULT '0' NOT NULL,
 	width		int(4)		DEFAULT '320' NOT NULL,
 	height		int(4)		DEFAULT '200' NOT NULL,
