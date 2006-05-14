@@ -1491,7 +1491,7 @@
 		$frm_title = S_SCREEN;
 		if(isset($_REQUEST["screenid"]))
 		{
-			$result=DBselect("select screenid,name,cols,rows from screens g".
+			$result=DBselect("select screenid,name,hsize,vsize from screens g".
 				" where screenid=".$_REQUEST["screenid"]);
 			$row=DBfetch($result);
 			$frm_title = S_SCREEN." \"".$row["name"]."\"";
@@ -1499,14 +1499,14 @@
 		if(isset($_REQUEST["screenid"]) && !isset($_REQUEST["form_refresh"]))
 		{
 			$name=$row["name"];
-			$cols=$row["cols"];
-			$rows=$row["rows"];
+			$hsize=$row["hsize"];
+			$vsize=$row["vsize"];
 		}
 		else
 		{
 			$name=get_request("name","");
-			$cols=get_request("cols",1);
-			$rows=get_request("rows",1);
+			$hsize=get_request("hsize",1);
+			$vsize=get_request("bsize",1);
 		}
 		$frmScr = new CFormTable($frm_title,"screenconf.php");
 		$frmScr->SetHelp("web.screenconf.screen.php");
@@ -1516,8 +1516,8 @@
 			$frmScr->AddVar("screenid",$_REQUEST["screenid"]);
 		}
 		$frmScr->AddRow(S_NAME, new CTextBox("name",$name,32));
-		$frmScr->AddRow(S_COLUMNS, new CTextBox("cols",$cols,5));
-		$frmScr->AddRow(S_ROWS, new CTextBox("rows",$rows,5));
+		$frmScr->AddRow(S_COLUMNS, new CTextBox("hsize",$hsize,5));
+		$frmScr->AddRow(S_ROWS, new CTextBox("vsize",$vsize,5));
 
 		$frmScr->AddItemToBottomRow(new CButton("save",S_SAVE));
 		if(isset($_REQUEST["screenid"]))

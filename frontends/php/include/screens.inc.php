@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-        function        add_screen($name,$cols,$rows)
+        function        add_screen($name,$hsize,$vsize)
         {
                 if(!check_right("Screen","A",0))
                 {
@@ -27,11 +27,11 @@
                         return 0;
                 }
 
-                $sql="insert into screens (name,cols,rows) values (".zbx_dbstr($name).",$cols,$rows)";
+                $sql="insert into screens (name,hsize,vsize) values (".zbx_dbstr($name).",$hsize,$vsize)";
                 return  DBexecute($sql);
         }
 
-        function        update_screen($screenid,$name,$cols,$rows)
+        function        update_screen($screenid,$name,$hsize,$vsize)
         {
                 if(!check_right("Screen","U",0))
                 {
@@ -39,7 +39,7 @@
                         return 0;
                 }
 
-                $sql="update screens set name=".zbx_dbstr($name).",cols=$cols,rows=$rows where screenid=$screenid";
+                $sql="update screens set name=".zbx_dbstr($name).",hsize=$hsize,vsize=$vsize where screenid=$screenid";
                 return  DBexecute($sql);
         }
 
@@ -114,13 +114,13 @@
 		if(is_null($effectiveperiod)) 
 			$effectiveperiod = 3600;
 
-		$result=DBselect("select name,cols,rows from screens where screenid=$screenid");
+		$result=DBselect("select name,hsize,vsize from screens where screenid=$screenid");
 		$row=DBfetch($result);
-		if(!row) return new CSpan("Screen missing".BR);
+		if(!$row) return new CSpan("Screen missing".BR);
 
-		for($r=0;$r<$row["rows"];$r++)
+		for($r=0;$r<$row["vsize"];$r++)
 		{
-			for($c=0;$c<$row["cols"];$c++)
+			for($c=0;$c<$row["hsize"];$c++)
 			{
 				if(isset($skip_field[$r][$c]))	continue;
 
@@ -147,10 +147,10 @@
 			new CLink("No rows in screen ".$row["name"],"screenconf.php?form=update&screenid=".$screenid),
 			($editmode == 0 || $editmode == 2) ? "screen_view" : "screen_edit");
 	
-		for($r=0;$r<$row["rows"];$r++)
+		for($r=0;$r<$row["vsize"];$r++)
 		{
 			$new_cols = array();
-			for($c=0;$c<$row["cols"];$c++)
+			for($c=0;$c<$row["hsize"];$c++)
 			{
 				$item = array();
 				if(isset($skip_field[$r][$c]))		continue;

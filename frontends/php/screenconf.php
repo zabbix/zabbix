@@ -44,10 +44,10 @@
 		if(isset($_REQUEST["screenid"]))
 		{
 			$result=update_screen($_REQUEST["screenid"],
-				$_REQUEST["name"],$_REQUEST["cols"],$_REQUEST["rows"]);
+				$_REQUEST["name"],$_REQUEST["hsize"],$_REQUEST["vsize"]);
 			show_messages($result, S_SCREEN_UPDATED, S_CANNOT_UPDATE_SCREEN);
 		} else {
-			$result=add_screen($_REQUEST["name"],$_REQUEST["cols"],$_REQUEST["rows"]);
+			$result=add_screen($_REQUEST["name"],$_REQUEST["hsize"],$_REQUEST["vsize"]);
 			show_messages($result,S_SCREEN_ADDED,S_CANNOT_ADD_SCREEN);
 		}
 		if($result){
@@ -80,7 +80,7 @@
 		$table = new CTableInfo(S_NO_SCREENS_DEFINED);
 		$table->setHeader(array(S_ID,S_NAME,S_DIMENSION_COLS_ROWS,S_SCREEN));
 
-		$result=DBselect("select screenid,name,cols,rows from screens order by name");
+		$result=DBselect("select screenid,name,hsize,vsize from screens order by name");
 		while($row=DBfetch($result))
 		{
 			if(!check_right("Screen","R",$row["screenid"]))		continue;
@@ -89,7 +89,7 @@
 				$row["screenid"],
 				new CLink($row["name"],"screenconf.php?form=update&screenid=".$row["screenid"],
 					'action'),
-				$row["cols"]." x ".$row["rows"],
+				$row["hsize"]." x ".$row["vsize"],
 				new CLink(S_EDIT,"screenedit.php?screenid=".$row["screenid"])
 				));
 		}
