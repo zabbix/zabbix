@@ -1,5 +1,6 @@
 1.1beta9:
 
+ - fix simple checks
  - add optimisation flags -O2 to configure
  - remember snmp community on per host level
  - net.if.stat collected as double, must be as uint64
