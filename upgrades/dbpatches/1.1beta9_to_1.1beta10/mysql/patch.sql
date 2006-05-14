@@ -36,3 +36,10 @@ alter table audit rename auditlog;
 alter table auditlog add resourcetype          int(4)          DEFAULT '0' NOT NULL;
 update auditlog set resourcetype=resource;
 alter table auditlog drop resource;
+
+alter table screens add hsize	int(4)	DEFAULT '1' NOT NULL;
+alter table screens add vsize	int(4)	DEFAULT '1' NOT NULL;
+update screens set hsize=cols;
+update screens set vsize=rows;
+alter table screens drop cols;
+alter table screens drop rows;
