@@ -48,7 +48,7 @@
                 $result=DBexecute("delete from screens_items where screenid=$screenid");
                 if(!$result)	return  $result;
 
-                $result=DBexecute("delete from screens_items where resourceid=$screenid and resource=".SCREEN_RESOURCE_SCREEN);
+                $result=DBexecute("delete from screens_items where resourceid=$screenid and resourcetype=".SCREEN_RESOURCE_SCREEN);
                 if(!$result)	return  $result;
 
 		// delete screen permisions
@@ -57,19 +57,19 @@
                 return  DBexecute("delete from screens where screenid=$screenid");
         }
 
-        function add_screen_item($resource,$screenid,$x,$y,$resourceid,$width,$height,$colspan,$rowspan,$elements,$valign,$halign,$style,$url)
+        function add_screen_item($resourcetype,$screenid,$x,$y,$resourceid,$width,$height,$colspan,$rowspan,$elements,$valign,$halign,$style,$url)
         {
                 $sql="delete from screens_items where screenid=$screenid and x=$x and y=$y";
                 DBexecute($sql);
-                $sql="insert into screens_items (resource,screenid,x,y,resourceid,width,height,colspan,rowspan,elements,valign,halign,style,url)".
-			" values ($resource,$screenid,$x,$y,$resourceid,$width,$height,$colspan,$rowspan,$elements,$valign,$halign,$style,".
+                $sql="insert into screens_items (resourcetype,screenid,x,y,resourceid,width,height,colspan,rowspan,elements,valign,halign,style,url)".
+			" values ($resourcetype,$screenid,$x,$y,$resourceid,$width,$height,$colspan,$rowspan,$elements,$valign,$halign,$style,".
 			zbx_dbstr($url).")";
                 return  DBexecute($sql);
         }
 
-        function update_screen_item($screenitemid,$resource,$resourceid,$width,$height,$colspan,$rowspan,$elements,$valign,$halign,$style,$url)
+        function update_screen_item($screenitemid,$resourcetype,$resourceid,$width,$height,$colspan,$rowspan,$elements,$valign,$halign,$style,$url)
         {
-                $sql="update screens_items set resource=$resource,resourceid=$resourceid,width=$width,height=$height,colspan=$colspan,rowspan=$rowspan,elements=$elements,valign=$valign,halign=$halign,style=$style,url=".zbx_dbstr($url)." where screenitemid=$screenitemid";
+                $sql="update screens_items set resourcetype=$resourcetype,resourceid=$resourceid,width=$width,height=$height,colspan=$colspan,rowspan=$rowspan,elements=$elements,valign=$valign,halign=$halign,style=$style,url=".zbx_dbstr($url)." where screenitemid=$screenitemid";
                 return  DBexecute($sql);
         }
 
@@ -97,7 +97,7 @@
 			if($mother_screenid == $child_screenid)	return TRUE;
 
 			$db_scr_items = DBselect("select resourceid from screens_items where".
-				" screenid=$child_screenid and resource=".SCREEN_RESOURCE_SCREEN);
+				" screenid=$child_screenid and resourcetype=".SCREEN_RESOURCE_SCREEN);
 			while($scr_item = DBfetch($db_scr_items))
 			{
 				if(check_screen_recursion($mother_screenid,$scr_item["resourceid"]))
@@ -162,7 +162,7 @@
 				if($irow)
 				{
 					$screenitemid	= $irow["screenitemid"];
-					$resource	= $irow["resource"];
+					$resourcetype	= $irow["resourcetype"];
 					$resourceid	= $irow["resourceid"];
 					$width		= $irow["width"];
 					$height		= $irow["height"];
@@ -178,7 +178,7 @@
 				{
 					$screenitemid	= 0;
 					$screenitemid	= 0;
-					$resource	= 0;
+					$resourcetype	= 0;
 					$resourceid	= 0;
 					$width		= 0;
 					$height		= 0;
@@ -210,7 +210,7 @@
 				{ // click on element
 					$item = get_screen_item_form();
 				}
-				elseif( ($screenitemid!=0) && ($resource==SCREEN_RESOURCE_GRAPH) )
+				elseif( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_GRAPH) )
 				{
 					if($editmode == 0)
 						$action = "charts.php?graphid=$resourceid".url_param("period").
@@ -222,7 +222,7 @@
 						$action
 						);
 				}
-				elseif( ($screenitemid!=0) && ($resource==SCREEN_RESOURCE_SIMPLE_GRAPH) )
+				elseif( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_SIMPLE_GRAPH) )
 				{
 					if($editmode == 0)
 						$action = "history.php?action=showgraph&itemid=$resourceid".
@@ -234,7 +234,7 @@
 						$action
 						);
 				}
-				elseif( ($screenitemid!=0) && ($resource==SCREEN_RESOURCE_MAP) )
+				elseif( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_MAP) )
 				{
 					$image_map = new CImg("map.php?noedit=1&sysmapid=$resourceid".
 							"&width=$width&height=$height");
@@ -247,56 +247,56 @@
 						$item = new CLink($image_map, $action);
 					}
 				}
-				elseif( ($screenitemid!=0) && ($resource==SCREEN_RESOURCE_PLAIN_TEXT) )
+				elseif( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_PLAIN_TEXT) )
 				{
 					$item = array(get_screen_plaintext($resourceid,$elements));
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
-				elseif( ($screenitemid!=0) && ($resource==SCREEN_RESOURCE_HOSTS_INFO) )
+				elseif( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_HOSTS_INFO) )
 				{
 					$item = array(new CHostsInfo($style));
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
-				elseif( ($screenitemid!=0) && ($resource==SCREEN_RESOURCE_TRIGGERS_INFO) )
+				elseif( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_TRIGGERS_INFO) )
 				{
 					$item = array(new CTriggersInfo($style));
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
-				elseif( ($screenitemid!=0) && ($resource==SCREEN_RESOURCE_SERVER_INFO) )
+				elseif( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_SERVER_INFO) )
 				{
 					$item = array(new CServerInfo());
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
-				elseif( ($screenitemid!=0) && ($resource==SCREEN_RESOURCE_CLOCK) )
+				elseif( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_CLOCK) )
 				{
 					$item = new CFlashClock($width, $height, $style, $action);
 				}
-				elseif( ($screenitemid!=0) && ($resource==SCREEN_RESOURCE_SCREEN) )
+				elseif( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_SCREEN) )
 				{
 					$item = array(get_screen($resourceid, 2, $effectiveperiod));
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
-				elseif( ($screenitemid!=0) && ($resource==SCREEN_RESOURCE_TRIGGERS_OVERVIEW) )
+				elseif( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_TRIGGERS_OVERVIEW) )
 				{
 					$item = array(get_triggers_overview($resourceid));
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
-				elseif( ($screenitemid!=0) && ($resource==SCREEN_RESOURCE_DATA_OVERVIEW) )
+				elseif( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_DATA_OVERVIEW) )
 				{
 					$item = array(get_items_data_overview($resourceid));
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
-				elseif( ($screenitemid!=0) && ($resource==SCREEN_RESOURCE_URL) )
+				elseif( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_URL) )
 				{
 					$item = array(new CIFrame($url,$width,$height,"auto"));
 					if($editmode == 1)	array_push($item,BR,new CLink(S_CHANGE,$action));
 				}
-				elseif( ($screenitemid!=0) && ($resource==SCREEN_RESOURCE_ACTIONS) )
+				elseif( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_ACTIONS) )
 				{
 					$item = array(get_history_of_actions(0, $elements));
 					if($editmode == 1)      array_push($item,new CLink(S_CHANGE,$action));
 				}
-				elseif( ($screenitemid!=0) && ($resource==SCREEN_RESOURCE_EVENTS) )
+				elseif( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_EVENTS) )
 				{
 					$item = array(get_history_of_events(0, $elements));
 					if($editmode == 1)      array_push($item,new CLink(S_CHANGE,$action));
