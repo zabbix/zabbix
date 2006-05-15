@@ -1,5 +1,6 @@
 Changes for 1.1beta10:
 
+ - fixed zabbix server crash after SQL request reading (Eugene)
  - renamed screens_items.resource -> resourcetype (Alexei)
  - renamed screens.rows ->vsize, cols -> hsize (Alexei)
  - renamed audit.resource -> resourcetype (Alexei)

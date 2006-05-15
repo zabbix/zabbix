@@ -142,18 +142,18 @@ static int housekeeping_alerts(int now)
 
 	row=DBfetch(result);
 
-	if(row)
+	if(!row || DBis_null(row[0])==SUCCEED)
+	{
+		zabbix_log( LOG_LEVEL_ERR, "No records in table 'config'.");
+		res = FAIL;
+	}
+	else
 	{
 		alert_history=atoi(row[0]);
 
 		snprintf(sql,sizeof(sql)-1,"delete from alerts where clock<%d",now-24*3600*alert_history);
 		DBexecute(sql);
 		zabbix_log( LOG_LEVEL_DEBUG, "Deleted [%ld] records from table [alerts]", DBaffected_rows());
-	}
-	else
-	{
-		zabbix_log( LOG_LEVEL_ERR, "No records in table 'config'.");
-		res = FAIL;
 	}
 
 	DBfree_result(result);
@@ -177,7 +177,12 @@ static int housekeeping_alarms(int now)
 	result = DBselect(sql);
 	row1=DBfetch(result);
 	
-	if(row1)
+	if(!row1 || DBis_null(row1[0])==SUCCEED)
+	{
+		zabbix_log( LOG_LEVEL_ERR, "No records in table 'config'.");
+		res = FAIL;
+	}
+	else
 	{
 		alarm_history=atoi(row1[0]);
 
@@ -196,11 +201,6 @@ static int housekeeping_alarms(int now)
 		DBfree_result(result2);
 
 		zabbix_log( LOG_LEVEL_DEBUG, "Deleted [%ld] records from table [alarms]", DBaffected_rows());
-	}
-	else
-	{
-		zabbix_log( LOG_LEVEL_ERR, "No records in table 'config'.");
-		res = FAIL;
 	}
 	
 	DBfree_result(result);

@@ -464,7 +464,7 @@ int	DBget_prev_trigger_value(int triggerid)
 
 	row=DBfetch(result);
 
-	if(!row)
+	if(!row || DBis_null(row[0])==SUCCEED)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Result for MAX is empty" );
 		DBfree_result(result);
@@ -478,7 +478,7 @@ int	DBget_prev_trigger_value(int triggerid)
 	result = DBselect(sql);
 	row=DBfetch(result);
 
-	if(!row)
+	if(!row || DBis_null(row[0])==SUCCEED)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Result for MAX is empty" );
 		DBfree_result(result);
@@ -495,7 +495,7 @@ status changes to TRUE for te first time */
 	result = DBselect(sql);
 	row=DBfetch(result);
 
-	if(!row)
+	if(!row || DBis_null(row[0])==SUCCEED)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Result of [%s] is empty", sql );
 		DBfree_result(result);
@@ -525,7 +525,7 @@ static int	latest_alarm(int triggerid, int status)
 	result = DBselect(sql);
 	row = DBfetch(result);
 
-	if(!row)
+	if(!row || DBis_null(row[0])==SUCCEED)
         {
                 zabbix_log(LOG_LEVEL_DEBUG, "Result for MAX is empty" );
                 ret = FAIL;
@@ -539,7 +539,7 @@ static int	latest_alarm(int triggerid, int status)
 		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 		result = DBselect(sql);
 		row = DBfetch(result);
-		if(row)
+		if(row && DBis_null(row[0]) != SUCCEED)
 		{
 			if(atoi(row[0]) == status)
 			{
@@ -571,7 +571,7 @@ int	latest_service_alarm(int serviceid, int status)
 	result = DBselect(sql);
 	row = DBfetch(result);
 
-	if(!row)
+	if(!row || DBis_null(row[0])==SUCCEED)
         {
                 zabbix_log(LOG_LEVEL_DEBUG, "Result for MAX is empty" );
                 ret = FAIL;
@@ -585,7 +585,7 @@ int	latest_service_alarm(int serviceid, int status)
 		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 		result = DBselect(sql);
 		row = DBfetch(result);
-		if(row)
+		if(row && DBis_null(row[0]) != SUCCEED)
 		{
 			if(atoi(row[0]) == status)
 			{
@@ -930,7 +930,7 @@ void DBupdate_triggers_status_after_restart(void)
 		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 		result2 = DBselect(sql);
 		row2=DBfetch(result2);
-		if(!row)
+		if(!row2 || DBis_null(row2[0])==SUCCEED)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "No triggers to update (2)");
 			DBfree_result(result2);
@@ -1174,7 +1174,7 @@ int	DBget_items_count(void)
 	result=DBselect(sql);
 	row=DBfetch(result);
 
-	if(!row)
+	if(!row || DBis_null(row[0])==SUCCEED)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query [%s]", sql);
 		zabbix_syslog("Cannot execute query [%s]", sql);
@@ -1204,7 +1204,7 @@ int	DBget_triggers_count(void)
 
 	row=DBfetch(result);
 
-	if(!row)
+	if(!row || DBis_null(row[0])==SUCCEED)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query [%s]", sql);
 		zabbix_syslog("Cannot execute query [%s]", sql);
@@ -1233,7 +1233,7 @@ int	DBget_items_unsupported_count(void)
 	result=DBselect(sql);
 	row=DBfetch(result);
 
-	if(!row)
+	if(!row || DBis_null(row[0])==SUCCEED)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query [%s]", sql);
 		zabbix_syslog("Cannot execute query [%s]", sql);
@@ -1262,7 +1262,7 @@ int	DBget_history_str_count(void)
 	result=DBselect(sql);
 	row=DBfetch(result);
 
-	if(!row)
+	if(!row || DBis_null(row[0])==SUCCEED)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query [%s]", sql);
 		zabbix_syslog("Cannot execute query [%s]", sql);
@@ -1291,7 +1291,7 @@ int	DBget_history_count(void)
 	result=DBselect(sql);
 	row=DBfetch(result);
 
-	if(!row)
+	if(!row || DBis_null(row[0])==SUCCEED)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query [%s]", sql);
 		zabbix_syslog("Cannot execute query [%s]", sql);
@@ -1320,7 +1320,7 @@ int	DBget_trends_count(void)
 	result=DBselect(sql);
 	row=DBfetch(result);
 
-	if(!row)
+	if(!row || DBis_null(row[0])==SUCCEED)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query [%s]", sql);
 		zabbix_syslog("Cannot execute query [%s]", sql);
@@ -1352,7 +1352,7 @@ int	DBget_queue_count(void)
 	result=DBselect(sql);
 	row=DBfetch(result);
 
-	if(!row)
+	if(!row || DBis_null(row[0])==SUCCEED)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot execute query [%s]", sql);
 		zabbix_syslog("Cannot execute query [%s]", sql);

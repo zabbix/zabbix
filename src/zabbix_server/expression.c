@@ -593,7 +593,7 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data
 			result = DBselect(sql);
 			row=DBfetch(result);
 
-			if(!row)
+			if(!row || DBis_null(row[0])==SUCCEED)
 			{
 				zabbix_log( LOG_LEVEL_ERR, "No hostname in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
 				zabbix_syslog("No hostname in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
@@ -618,7 +618,7 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data
 			result = DBselect(sql);
 			row=DBfetch(result);
 
-			if(!row)
+			if(!row || DBis_null(row[0])==SUCCEED)
 			{
 				zabbix_log( LOG_LEVEL_ERR, "No TRIGGER.KEY in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
 				zabbix_syslog("No TRIGGER.KEY in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
@@ -643,7 +643,7 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data
 			result = DBselect(sql);
 			row = DBfetch(result);
 
-			if(!row)
+			if(!row || DBis_null(row[0])==SUCCEED)
 			{
 				zabbix_log( LOG_LEVEL_ERR, "No IP address in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
 				zabbix_syslog("No IP address in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
