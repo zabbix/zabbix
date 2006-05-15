@@ -671,7 +671,7 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 		snprintf(sql,sizeof(sql)-1,"select count(*) from trigger_depends d,triggers t where d.triggerid_down=%d and d.triggerid_up=t.triggerid and t.value=%d",trigger->triggerid, TRIGGER_VALUE_TRUE);
 		result = DBselect(sql);
 		row=DBfetch(result);
-		if(row)
+		if(row && DBis_null(row[0]) != SUCCEED)
 		{
 			if(atoi(row[0])>0)
 			{

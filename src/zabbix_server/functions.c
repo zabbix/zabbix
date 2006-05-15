@@ -186,9 +186,12 @@ void	update_services_rec(int serviceid)
 			}
 			result2=DBselect(sql);
 			row2=DBfetch(result2);
-			if(atoi(row2[0])!=0)
+			if(row2 && DBis_null(row2[0]) != SUCCEED && DBis_null(row2[1]) != SUCCEED)
 			{
-				status=atoi(row2[1]);
+				if(atoi(row2[0])!=0)
+				{
+					status=atoi(row2[1]);
+				}
 			}
 			DBfree_result(result2);
 

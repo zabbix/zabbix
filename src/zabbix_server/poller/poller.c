@@ -144,7 +144,7 @@ static int get_minnextcheck(int now)
 	result = DBselect(sql);
 	row=DBfetch(result);
 
-	if(!row)
+	if(!row || DBis_null(row[0])==SUCCEED || DBis_null(row[1])==SUCCEED)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "No items to update for minnextcheck.");
 		res = FAIL; 

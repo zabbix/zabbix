@@ -26,8 +26,8 @@
 	$DB_TYPE	="MYSQL";
 //	$DB_TYPE	="ORACLE";
 	$DB_SERVER	="localhost";
-	$DB_DATABASE	="zabbix";
-//	$DB_DATABASE	="osmiy";
+//	$DB_DATABASE	="zabbix";
+	$DB_DATABASE	="osmiy";
 //	$DB_DATABASE	="demo";
 //	$DB_DATABASE	="martinsj";
 	$DB_USER	="root";

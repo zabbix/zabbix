@@ -623,7 +623,7 @@ int main(int argc, char **argv)
 	result = DBselect(sql);
 	row = DBfetch(result);
 
-	if(row)
+	if(row && DBis_null(row[0]) != SUCCEED)
 	{
 		CONFIG_REFRESH_UNSUPPORTED = atoi(row[0]);
 	}
