@@ -599,25 +599,17 @@ INIT_CHECK_MEMORY(main);
 			count=0;
 			while(process_log(filename,&metrics[i].lastlogsize,value) == 0)
 			{
-//				sprintf(shortname, "%s:%s",confHostname,metrics[i].key);
-//				zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname);
-//				LOG_DEBUG_INFO("s",shortname);
-
-//				LOG_DEBUG_INFO("s","pac: 1");
+LOG_DEBUG_INFO("s","Active check: log[*]");
+LOG_DEBUG_INFO("s",filename);
+LOG_DEBUG_INFO("s","Active check: value");
+LOG_DEBUG_INFO("s",value);
 				sprintf(lastlogsize,"%d",metrics[i].lastlogsize);
-//				for(int j=0;j<=MAX_STRING_LEN;j++)
-//				{
-//					value[j]='0';
-//				}
-//				value[MAX_STRING_LEN-1]=0;
-				LOG_DEBUG_INFO("s","pac: 2");
-				LOG_DEBUG_INFO("s",value);
 				if(send_value(server,port,confHostname,metrics[i].key, value, lastlogsize,timestamp,source,severity) == FAIL)
 				{
 					ret = FAIL;
+//					zabbix_log( LOG_LEVEL_WARNING, "Can't send value to server for active check [%s]", metrics[i].key);
 					break;
 				}
-//				LOG_DEBUG_INFO("s","pac: 3");
 				if(strcmp(value,"ZBX_NOTSUPPORTED\n")==0)
 				{
 					metrics[i].status=ITEM_STATUS_NOTSUPPORTED;
