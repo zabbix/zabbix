@@ -39,22 +39,7 @@ int   process_log(char *filename,int *lastlogsize, char *value)
 {
 	FILE	*f;
 
-//	zabbix_log( LOG_LEVEL_DEBUG, "In process log (%s,%d)", filename, *lastlogsize);
-
-	/* Handling of file shrinking */
-/*	if(_fstat(filename,&buf) == 0)
-	{
-		if(buf.st_size<*lastlogsize)
-		{
-			*lastlogsize=0;
-		}
-	}
-			else
-	{
-//		zabbix_log( LOG_LEVEL_WARNING, "Cannot open [%s] [%s]", filename, strerror(errno));
-		snprintf(value,MAX_STRING_LEN-1,"%s","ZBX_NOTSUPPORTED\n");
-		return 1;
-	}*/
+LOG_DEBUG_INFO("s","In process_log()");
 INIT_CHECK_MEMORY(main);
 
 	f=fopen(filename,"r");
@@ -66,10 +51,15 @@ CHECK_MEMORY(main, "process_log", "fopen");
 		return 1;
 	}
 
-	if(_filelength(_fileno(f))<=*lastlogsize)
+LOG_DEBUG_INFO("d",_filelength(_fileno(f)));
+LOG_DEBUG_INFO("d",*lastlogsize);
+
+	if(_filelength(_fileno(f)) < *lastlogsize)
 	{
 		*lastlogsize=0;
 	}
+
+LOG_DEBUG_INFO("d",*lastlogsize);
 
 	if(-1 == fseek(f,*lastlogsize,SEEK_SET))
 	{
@@ -92,6 +82,7 @@ CHECK_MEMORY(main, "process_log", "fgets");
 	*lastlogsize+=strlen(value);
 
 CHECK_MEMORY(main, "process_log", "end");
+LOG_DEBUG_INFO("s","End of process_log()");
 	return 0;
 }
 

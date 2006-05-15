@@ -30,7 +30,7 @@
 
 #	ifdef _DEBUG
 #		define LOG_DEBUG_INFO(type, msg) \
-			WriteLog(MSG_GET_COMPUTER_NAME_FAILED,EVENTLOG_ERROR_TYPE, type , msg)
+			WriteLog(MSG_DEBUG_INFO,EVENTLOG_ERROR_TYPE, type , msg)
 /*#		define ENABLE_CHECK_MEMOTY */
 #	else
 #		define LOG_DEBUG_INFO(a, b) ((void)0)

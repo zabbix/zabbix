@@ -653,6 +653,9 @@ static LONG H_PerfCounter(char *cmd,char *arg,double *value)
 
    GetParameterInstance(cmd,counterName,MAX_PATH-1);
 
+LOG_DEBUG_INFO("s","H_PerfCounter: start");
+LOG_DEBUG_INFO("s", counterName);
+
    if (PdhOpenQuery(NULL,0,&query)!=ERROR_SUCCESS)
    {
       WriteLog(MSG_PDH_OPEN_QUERY_FAILED,EVENTLOG_ERROR_TYPE,"s",
@@ -684,6 +687,9 @@ static LONG H_PerfCounter(char *cmd,char *arg,double *value)
 
    PdhCloseQuery(query);
    *value=counterValue.doubleValue;
+LOG_DEBUG_INFO("s","H_PerfCounter: value");
+LOG_DEBUG_INFO("d",*value);
+LOG_DEBUG_INFO("s","H_PerfCounter: end");
    return SYSINFO_RC_SUCCESS;
 }
 
