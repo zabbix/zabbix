@@ -777,8 +777,8 @@
 		{
 			if($this->yaxisleft == 1)
 			{
-				$minY = $this->m_minY[GRAPH_YAXIS_SIDE_RIGHT];
-				$maxY = $this->m_maxY[GRAPH_YAXIS_SIDE_RIGHT];
+				$minY = $this->m_minY[GRAPH_YAXIS_SIDE_LEFT];
+				$maxY = $this->m_maxY[GRAPH_YAXIS_SIDE_LEFT];
 
 				for($item=0;$item<$this->num;$item++)
 				{
