@@ -84,7 +84,7 @@ static int evaluate_LOGSOURCE(char *value, DB_ITEM *item, char *parameter)
 	result = DBselect(sql);
 	row = DBfetch(result);
 
-	if(!row)
+	if(!row || DBis_null(row[0])==SUCCEED)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Result for LOGSOURCE is empty" );
 		res = FAIL;
@@ -142,7 +142,7 @@ static int evaluate_LOGSEVERITY(char *value, DB_ITEM *item, char *parameter)
 
 	result = DBselect(sql);
 	row = DBfetch(result);
-	if(!row)
+	if(!row || DBis_null(row[0])==SUCCEED)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Result for LOGSEVERITY is empty" );
 		res = FAIL;
@@ -203,7 +203,7 @@ static int evaluate_COUNT(char *value, DB_ITEM *item, int parameter)
 	result = DBselect(sql);
 	row = DBfetch(result);
 
-	if(!row)
+	if(!row || DBis_null(row[0])==SUCCEED)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Result for COUNT is empty" );
 		res = FAIL;
@@ -267,7 +267,7 @@ static int evaluate_SUM(char *value, DB_ITEM *item, int parameter, int flag)
 
 		result = DBselect(sql);
 		row = DBfetch(result);
-		if(!row)
+		if(!row || DBis_null(row[0])==SUCCEED)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Result for SUM is empty" );
 			res = FAIL;
@@ -290,7 +290,7 @@ static int evaluate_SUM(char *value, DB_ITEM *item, int parameter, int flag)
 		snprintf(sql,sizeof(sql)-1,"select value from %s where itemid=%d order by clock desc limit %d",table,item->itemid, parameter);
 		result = DBselect(sql);
 		row = DBfetch(result);
-		if(!row)
+		if(!row || DBis_null(row[0])==SUCCEED)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Result for SUM is empty" );
 			res = FAIL;
@@ -366,7 +366,7 @@ static int evaluate_AVG(char *value,DB_ITEM	*item,int parameter,int flag)
 
 		result = DBselect(sql);
 		row = DBfetch(result);
-		if(!row)
+		if(!row || DBis_null(row[0])==SUCCEED)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Result for AVG is empty" );
 			res = FAIL;
@@ -462,7 +462,7 @@ static int evaluate_MIN(char *value,DB_ITEM	*item,int parameter, int flag)
 		snprintf(sql,sizeof(sql)-1,"select min(value) from %s where clock>%d and itemid=%d",table, now-parameter,item->itemid);
 		result = DBselect(sql);
 		row = DBfetch(result);
-		if(!row)
+		if(!row || DBis_null(row[0])==SUCCEED)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Result for MIN is empty" );
 			res = FAIL;
@@ -568,6 +568,8 @@ static int evaluate_MAX(char *value,DB_ITEM *item,int parameter,int flag)
 	char		table[MAX_STRING_LEN];
 	zbx_uint64_t	max_uint64=0;
 	zbx_uint64_t	l;
+	
+	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_MAX()");
 
 	if( (item->value_type != ITEM_VALUE_TYPE_FLOAT) && (item->value_type != ITEM_VALUE_TYPE_UINT64))
 	{
@@ -588,17 +590,22 @@ static int evaluate_MAX(char *value,DB_ITEM *item,int parameter,int flag)
 		}
 		snprintf(sql,sizeof(sql)-1,"select max(value) from %s where clock>%d and itemid=%d",table,now-parameter,item->itemid);
 
+zabbix_log(LOG_LEVEL_DEBUG, "DBselect" );
 		result = DBselect(sql);
+zabbix_log(LOG_LEVEL_DEBUG, "DBfetch" );
 		row = DBfetch(result);
+zabbix_log(LOG_LEVEL_DEBUG, "After DBfetch" );
 
-		if(!row)
+		if(!row || DBis_null(row[0])==SUCCEED)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Result for MAX is empty" );
 			res = FAIL;
 		}
 		else
 		{
+zabbix_log(LOG_LEVEL_DEBUG, "strcpy '0x%4x'",row[0]);
 			strcpy(value,row[0]);
+zabbix_log(LOG_LEVEL_DEBUG, "del_zeroes" );
 			del_zeroes(value);
 		}
 	}
@@ -659,6 +666,8 @@ static int evaluate_MAX(char *value,DB_ITEM *item,int parameter,int flag)
 	}
 
 	DBfree_result(result);
+	
+	zabbix_log( LOG_LEVEL_DEBUG, "End of evaluate_MAX()");
 
 	return res;
 }
@@ -691,6 +700,8 @@ static int evaluate_DELTA(char *value,DB_ITEM *item,int parameter, int flag)
 	int		rows;
 	double		f;
 	double		min,max;
+	
+	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_DELTA()");
 
 	if(item->value_type != ITEM_VALUE_TYPE_FLOAT)
 	{
@@ -705,7 +716,7 @@ static int evaluate_DELTA(char *value,DB_ITEM *item,int parameter, int flag)
 
 		result = DBselect(sql);
 		row = DBfetch(result);
-		if(!row)
+		if(!row || DBis_null(row[0])==SUCCEED)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Result for DELTA is empty" );
 			res = FAIL;
@@ -752,6 +763,8 @@ static int evaluate_DELTA(char *value,DB_ITEM *item,int parameter, int flag)
 	}
 
 	DBfree_result(result);
+
+	zabbix_log( LOG_LEVEL_DEBUG, "End of evaluate_DELTA()");
 
 	return res;
 }
@@ -1218,7 +1231,7 @@ int	replace_value_by_map(char *value, int valuemapid)
 	result = DBselect(sql);
 	row = DBfetch(result);
 
-	if(!row)		return FAIL;
+	if(!row || DBis_null(row[0])==SUCCEED)		return FAIL;
 
 	strcpy(new_value,row[0]);
 	DBfree_result(result);
