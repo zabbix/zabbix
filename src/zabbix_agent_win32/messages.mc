@@ -212,4 +212,10 @@ Language=English
 PdhLookupPerfNameByIndex failed: %1
 .
 
+MessageId=
+SymbolicName=MSG_DEBUG_INFO
+Language=English
+Debug Info: %1
+.
+
 ;#endif
