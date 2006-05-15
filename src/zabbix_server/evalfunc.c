@@ -366,6 +366,7 @@ static int evaluate_AVG(char *value,DB_ITEM	*item,int parameter,int flag)
 
 		result = DBselect(sql);
 		row = DBfetch(result);
+		
 		if(!row || DBis_null(row[0])==SUCCEED)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Result for AVG is empty" );

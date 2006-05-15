@@ -291,7 +291,7 @@ void	update_triggers(int itemid)
 
 	result = DBselect(sql);
 
-	while((row==DBfetch(result)))
+	while((row=DBfetch(result)))
 	{
 		trigger.triggerid=atoi(row[0]);
 		strscpy(trigger.expression,row[1]);
@@ -317,6 +317,7 @@ void	update_triggers(int itemid)
 		DBupdate_trigger_value(&trigger, exp_value, now, NULL);
 	}
 	DBfree_result(result);
+	zabbix_log( LOG_LEVEL_DEBUG, "End of update_triggers [%d]", itemid);
 }
 
 void	calc_timestamp(char *line,int *timestamp, char *format)
