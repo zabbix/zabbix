@@ -141,6 +141,9 @@
 	define("TRIGGER_VALUE_TRUE",1);
 	define("TRIGGER_VALUE_UNKNOWN",2);
 
+	define("ALERT_STATUS_NOT_SENT",0);
+	define("ALERT_STATUS_SENT",1);
+
 	define("ACTION_STATUS_ENABLED",0);
 	define("ACTION_STATUS_DISABLED",1);
 
