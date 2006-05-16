@@ -1,5 +1,9 @@
 1.1beta9:
 
+ - does ZABBIX maintain Host availability of monitored by SNMP
+ - when unlinking a host from template, add option (Unlink&Delete, Unlink Only)
+ - Overview screen, item macros are not substituted: Free disk space on $1
+ - change size of functions.function to varchar(12) for logseverity 
  - fix simple checks
  - add optimisation flags -O2 to configure
  - remember snmp community on per host level
