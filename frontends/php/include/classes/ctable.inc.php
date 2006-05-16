@@ -91,12 +91,12 @@
 		var $footer;
 		var $footerClass;
 		var $curr_row_class;
+		var $message;
 /* public */
 		function CTable($message=NULL,$class=NULL)
 		{
 			parent::CTag("table","yes");
 			$this->SetClass($class);
-			$this->message = $message;
 				
 			$this->oddRowClass = NULL;
 			$this->evenRowClass = NULL;
@@ -108,6 +108,8 @@
 			$this->footer = '';
 			$this->footerClass = NULL;
 			$this->colnum = 0;
+
+			$this->message = $message;
 		}
 		function SetOddRowClass($value=NULL)
 		{
@@ -200,7 +202,12 @@
 		}
 		function EndToString()
 		{
-			$ret = $this->footer;
+			$ret = "";
+			if(count($this->items)==0 && isset($this->message)) 
+			{
+				$ret = $this->PrepareRow(new CCol($this->message,'message'));
+			}
+			$ret .= $this->footer;
 			$ret .= parent::EndToString();
 			return $ret;
 		}

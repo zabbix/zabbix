@@ -304,7 +304,7 @@
 		}
  
 		$triggerid = DBinsert_id($result,"triggers","triggerid");
-		add_alarm($triggerid,2);
+		add_alarm($triggerid,TRIGGER_VALUE_UNKNOWN);
  
 		$expression = implode_exp($expression,$triggerid);
 
@@ -633,7 +633,7 @@
                         error("Insufficient permissions");
                         return 0;
 		}
-		add_alarm($triggerid,2);
+		add_alarm($triggerid,TRIGGER_VALUE_UNKNOWN);
 		return	DBexecute("update triggers set status=$status where triggerid=$triggerid");
 	}
 
@@ -676,10 +676,34 @@
 			" from hosts h,items i,triggers t,functions f".
 			" where f.triggerid=t.triggerid and f.itemid=i.itemid".
 			" and h.hostid=i.hostid and h.hostid=$hostid");
+		$now = time();
 		while($row=DBfetch($result))
 		{
-			DBexecute("update triggers set value=2 where triggerid=".$row["triggerid"]);
+			if(!add_alarm($row["triggerid"],TRIGGER_VALUE_UNKNOWN,$now)) continue;
+
+			DBexecute('update triggers set value='.TRIGGER_VALUE_UNKNOWN.' where triggerid='.$row["triggerid"]);
 		}
+	}
+
+	function add_alarm($triggerid, $value, $time=NULL)
+	{
+		if(is_null($time)) $time = time();
+
+		$result = DBselect('select value from alarms where triggerid='.$triggerid.' order by clock desc limit 1');
+		$last_value = DBfetch($result);
+		if($last_value)
+		{
+			if($value == $last_value['value'])
+				return false;
+		}
+		$result = DBexecute('insert into alarms(triggerid,clock,value) values('.$triggerid.','.$time.','.$value.')');
+		if($value == TRIGGER_VALUE_FALSE || $value == TRIGGER_VALUE_TRUE)
+		{
+			$alarm_id = DBinsert_id($result,'alarms','alarmid');
+			DBexesute('update alerts set retries=3,error=\'Trigger changed its status. WIll not send repeats.\''.
+				' where triggerid='.$triggerid.' and repeats>0 and status='.ALERT_STATUS_NOT_SENT);
+		}
+		return true;
 	}
 
 	function	add_trigger_dependency($triggerid,$depid)
@@ -820,7 +844,7 @@
 		}
 
 		$expression = implode_exp($expression,$triggerid);
-		add_alarm($triggerid,2);
+		add_alarm($triggerid,TRIGGER_VALUE_UNKNOWN);
 		reset_items_nextcheck($triggerid);
 
 		$sql="update triggers set";
@@ -1011,7 +1035,7 @@
 
 	function	get_triggers_overview($groupid)
 	{
-		$table = new CTableInfo();
+		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
 		if($groupid > 0)
 		{
 			$group_where = ',hosts_groups hg where hg.groupid='.$groupid.' and hg.hostid=h.hostid and';
@@ -1031,6 +1055,10 @@
 			if(!check_right('Host','R',$row['hostid'])) continue;
 			$hosts[$row['host']] = $row['host'];
 			$triggers[$row['description']][$row['host']] = array('value' => $row['value'], 'lastchange' => $row['lastchange']);
+		}
+		if(!isset($hosts))
+		{
+			return $table;
 		}
 
 		$header=array(new CCol(S_TRIGGERS,'center'));
