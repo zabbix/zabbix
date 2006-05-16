@@ -1,5 +1,6 @@
 1.1beta9:
 
+ - http://www.zabbix.com/forum/showthread.php?t=2736
  - does ZABBIX maintain Host availability of monitored by SNMP
  - when unlinking a host from template, add option (Unlink&Delete, Unlink Only)
  - Overview screen, item macros are not substituted: Free disk space on $1
