@@ -511,40 +511,28 @@ status changes to TRUE for te first time */
 /* Rewrite required to simplify logic ?*/
 static int	latest_alarm(int triggerid, int status)
 {
-	char	sql[MAX_STRING_LEN];
-	int	clock;
+	char		sql[MAX_STRING_LEN];
 	DB_RESULT	result;
 	DB_ROW		row;
-	int ret = FAIL;
+	int 		ret = FAIL;
 
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In latest_alarm()");
 
-	snprintf(sql,sizeof(sql)-1,"select max(clock) from alarms where triggerid=%d",triggerid);
+	snprintf(sql,sizeof(sql)-1,"select value from alarms where triggerid=%d order by clock desc limit 1",triggerid);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	result = DBselect(sql);
 	row = DBfetch(result);
 
 	if(!row || DBis_null(row[0])==SUCCEED)
         {
-                zabbix_log(LOG_LEVEL_DEBUG, "Result for MAX is empty" );
-                ret = FAIL;
+                zabbix_log(LOG_LEVEL_DEBUG, "Result for last is empty" );
         }
 	else
 	{
-		clock=atoi(row[0]);
-		DBfree_result(result);
-
-		snprintf(sql,sizeof(sql)-1,"select value from alarms where triggerid=%d and clock=%d",triggerid,clock);
-		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
-		result = DBselect(sql);
-		row = DBfetch(result);
-		if(row && DBis_null(row[0]) != SUCCEED)
+		if(atoi(row[0]) == status)
 		{
-			if(atoi(row[0]) == status)
-			{
-				ret = SUCCEED;
-			}
+			ret = SUCCEED;
 		}
 	}
 

@@ -1218,30 +1218,6 @@ COpt::profiling_start("page");
 
 	# Add alarm
 
-	function	add_alarm($triggerid,$value)
-	{
-		$sql="select max(clock) from alarms where triggerid=$triggerid";
-		$result=DBselect($sql);
-		$row=DBfetch($result);
-		if($row[0]!="")
-		{
-			$sql="select value from alarms where triggerid=$triggerid and clock=".$row[0];
-			$result=DBselect($sql);
-			$row=DBfetch($result);
-			if($row)
-			{
-				if($row["value"] == $value)
-				{
-					return 0;
-				}
-			}
-		}
-
-		$now=time();
-		$sql="insert into alarms(triggerid,clock,value) values($triggerid,$now,$value)";
-		return	DBexecute($sql);
-	}
-
 	function	get_alarm_by_alarmid($alarmid)
 	{
 		$db_alarms = DBselect("select * from alarms where alarmid=$alarmid");

@@ -450,7 +450,7 @@
 	"S_HOSTS"=>				"Hosts",
 
 //	items.php
-	"S_NO_ITEMS_DEFINED"=>			"No itemss defined",
+	"S_NO_ITEMS_DEFINED"=>			"No items defined",
 	"S_HISTORY_CLEANED"=>			"History cleaned",
 	"S_CANNOT_CLEAN_HISTORY"=>		"Cannot clean history",
 	"S_CONFIGURATION_OF_ITEMS"=>		"Configuration of items",

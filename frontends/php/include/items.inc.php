@@ -531,7 +531,7 @@
 
 	function get_items_data_overview($groupid)
 	{
-		$table = new CTableInfo();
+		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 
 		if($groupid > 0)
 		{
@@ -574,6 +574,10 @@ COpt::profiling_start('prepare data');
 				'lastvalue'	=> $row['lastvalue'],
 				'units'		=> $row['units'],
 				'description'	=> $row['description']);
+		}
+		if(!isset($hosts))
+		{
+			return $table;
 		}
 		sort($hosts);
 COpt::profiling_stop('prepare data');

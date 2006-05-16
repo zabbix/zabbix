@@ -25,6 +25,7 @@
 		function CTableInfo($message='...',$class='tableinfo')
 		{
 			parent::CTable($message,$class);
+
 			$this->oddRowClass = 'odd_row';
 			$this->evenRowClass = 'even_row';
 			$this->options['cellpadding'] = 3;
