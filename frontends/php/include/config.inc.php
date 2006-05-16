@@ -1189,6 +1189,8 @@ COpt::profiling_start("page");
 		if($use_housekeeper)
 		{
 			DBexecute("insert into housekeeper (tablename,field,value)".
+				" values ('history_log','itemid',$itemid)");
+			DBexecute("insert into housekeeper (tablename,field,value)".
 				" values ('history_uint','itemid',$itemid)");
 			DBexecute("insert into housekeeper (tablename,field,value)".
 				" values ('history_str','itemid',$itemid)");
@@ -1197,6 +1199,7 @@ COpt::profiling_start("page");
 			return TRUE;
 		}
 
+		DBexecute("delete from history_log where itemid=$itemid");
 		DBexecute("delete from history_uint where itemid=$itemid");
 		DBexecute("delete from history_str where itemid=$itemid");
 		DBexecute("delete from history where itemid=$itemid");

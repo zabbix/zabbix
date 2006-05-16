@@ -276,7 +276,7 @@
 			}
 			show_messages(TRUE, S_ITEMS_DISABLED, S_CANNOT_DISABLE_ITEMS);
 		}
-		elseif($_REQUEST["group_task"]=="Clean history")
+		elseif($_REQUEST["group_task"]=='Clean history selected items')
 		{
 			$group_itemid = $_REQUEST["group_itemid"];
 			foreach($group_itemid as $id)

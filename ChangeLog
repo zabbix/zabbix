@@ -1,5 +1,6 @@
 Changes for 1.1beta10:
 
+ - fixed history cleaning for logs (Eugene)
  - fixed left axis calculation of graph (Eugene)
  - fixed Win32 ZABBIX agent log monitoring (Eugene)
  - renamed screens_items.resource -> resourcetype (Alexei)
