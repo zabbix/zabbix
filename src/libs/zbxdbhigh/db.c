@@ -101,20 +101,21 @@ void    DBconnect(void)
 	}
 #endif
 #ifdef	HAVE_ORACLE
+	char    connect[MAX_STRING_LEN];
+
 	if (SQLO_SUCCESS != sqlo_init(SQLO_OFF, 1, 100))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Failed to init libsqlora8");
 		exit(FAIL);
 	}
-
-	/* login */
-	if (SQLO_SUCCESS != sqlo_connect(&oracle, "scott/tiger"))
+			        /* login */
+	snprintf(connect,MAX_STRING_LEN-1,"%s/%s/@%s", CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME);
+	if (SQLO_SUCCESS != sqlo_connect(&oracle, connect))
 	{
-		printf("Cannot login with %s\n", "scott/tiger");
-		zabbix_log(LOG_LEVEL_ERR, "Cannot login with %s\n", "scott/tiger");
+		printf("Cannot login with %s\n", connect);
+		zabbix_log(LOG_LEVEL_ERR, "Cannot login with %s\n", connect);
 		exit(FAIL);
 	}
-
 	sqlo_autocommit_on(oracle);
 #endif
 }
