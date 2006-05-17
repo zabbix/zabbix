@@ -63,7 +63,7 @@
 		if(!$result)
 			return	$result;
 		
-		$groupid = DBinsert_id($result,"groupd","groupid");
+		$groupid = DBinsert_id($result,"groups","groupid");
 
 		return add_host_to_group($hostid, $groupid);
 	}
