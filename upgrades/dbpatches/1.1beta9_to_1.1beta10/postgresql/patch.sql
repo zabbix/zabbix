@@ -47,3 +47,5 @@ alter table screens drop rows;
 alter table screens_items add resourcetype	int4	DEFAULT '0' NOT NULL;
 update screens_items set resourcetype=resource;
 alter table screens_items drop resource;
+
+alter table functions change function function varchar(12) DEFAULT '' NOT NULL;

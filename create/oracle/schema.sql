@@ -460,7 +460,7 @@ CREATE TABLE functions (
 	itemid		number(10)	DEFAULT '0' NOT NULL,
 	triggerid	number(10)	DEFAULT '0' NOT NULL,
 	lastvalue	varchar2(255),
-	function	varchar2(10)	DEFAULT NULL,
+	function	varchar2(12)	DEFAULT NULL,
 	parameter	varchar2(255)	DEFAULT '0' NOT NULL,
 	CONSTRAINT 	functions_pk PRIMARY KEY (functionid)
 );

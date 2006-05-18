@@ -1,5 +1,7 @@
 Changes for 1.1beta10:
 
+ - fixed confugration of triggers having logseverity() (Alexei)
+ - changed size of functions.function to varchar(12) (Alexei)
  - fixed evaluation of simple checks (Alexei)
  - fixed history cleaning for logs (Eugene)
  - fixed left axis calculation of graph (Eugene)
