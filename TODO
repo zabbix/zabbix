@@ -1,5 +1,4 @@
 1.1beta9:
- - item key popup, trigger expression builder
  - fix windows agent crash
 
  - support of PostgreSQL
