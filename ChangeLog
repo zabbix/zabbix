@@ -1,5 +1,6 @@
 Changes for 1.1beta10:
 
+ - new table 'help_items' (Alexei)
  - fixed confugration of triggers having logseverity() (Alexei)
  - changed size of functions.function to varchar(12) (Alexei)
  - fixed evaluation of simple checks (Alexei)

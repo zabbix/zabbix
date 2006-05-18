@@ -29,9 +29,10 @@
 	$srcfld1	= get_request("srcfld1", 0);	// source table field [can be different from fields of source table]
 	$srcfld2	= get_request("srcfld2", 0);	// second source table field [can be different from fields of source table]
 
-	if($srctbl == "hosts")	{  $page["title"] = "S_HOSTS_BIG";	$right_src = "Host"; }
-	if($srctbl == "triggers"){ $page["title"] = "S_TRIGGERS_BIG";	$right_src = "Triggers"; }
-	if($srctbl == "logitems"){ $page["title"] = "S_ITEMS_BIG";	$right_src = "Items"; }
+	if($srctbl == "hosts")		{ $page["title"] = "S_HOSTS_BIG";	$right_src = "Host"; }
+	if($srctbl == "triggers")	{ $page["title"] = "S_TRIGGERS_BIG";	$right_src = "Triggers"; }
+	if($srctbl == "logitems")	{ $page["title"] = "S_ITEMS_BIG";	$right_src = "Items"; }
+	if($srctbl == "help_items")	{ $page["title"] = "S_STANDARD_ITEMS_BIG";	$right_src = "Standard items"; }
 
 	if(!isset($page["title"]))
 	{
@@ -173,6 +174,29 @@
 				$host["port"],
 				$status,
 				$available
+				));
+		}
+		$table->show();
+	}
+	if($srctbl == "help_items")
+	{
+		$table = new CTableInfo(S_NO_ITEMS);
+		$table->SetHeader(array(S_KEY,S_DESCRIPTION));
+
+		$sql = "select key_,key_ from items limit 10";
+
+		$result = DBselect($sql);
+		while($row = DBfetch($result))
+		{
+			$name = new CLink($row["key_"],"#","action");
+			$name->SetAction(
+				"window.opener.document.forms['".$dstfrm."'].".$dstfld1.".value='".$row[$srcfld1]."';".
+//				" window.opener.document.forms['".$dstfrm."'].".$dstfld2.".value='".$row[$srcfld2]."';".
+				" window.close();");
+
+			$table->addRow(array(
+				$name,
+				$row["key_"]
 				));
 		}
 		$table->show();

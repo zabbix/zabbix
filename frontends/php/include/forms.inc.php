@@ -411,7 +411,13 @@
 			$frmItem->AddVar("snmpv3_privpassphrase",$snmpv3_privpassphrase);
 		}
 
-		$frmItem->AddRow(S_KEY, new CTextBox("key",$key,40));
+		$btnSelect = new CButton('btn1',S_SELECT,
+			"return PopUp('popup.php?dstfrm=".$frmItem->GetName().
+			"&dstfld1=key&srctbl=help_items&srcfld1=key_','new_win',".
+			"'width=450,height=450,resizable=1,scrollbars=1');");
+		$btnSelect->SetAccessKey('T');
+
+		$frmItem->AddRow(S_KEY, array(new CTextBox("key",$key,40), $btnSelect));
 
 		$cmbValType = new CComboBox("value_type",$value_type,"submit()");
 		$cmbValType->AddItem(ITEM_VALUE_TYPE_UINT64, S_NUMERIC_UINT64);
