@@ -1305,3 +1305,14 @@ CREATE TABLE items_applications (
 	itemid                  number(10)          DEFAULT '0' NOT NULL,
   	CONSTRAINT	 	items_applications_pk	 PRIMARY KEY (applicationid,itemid)
 );
+
+--
+-- Table structure for table 'help_items'
+--
+
+CREATE TABLE help_items (
+	itemtype	number(10)	DEFAULT '0' NOT NULL,
+	key_		varchar2(64)	DEFAULT NULL,
+	description	varchar2(255)	DEFAULT NULL,
+	PRIMARY KEY	(itemtype, key_)
+);

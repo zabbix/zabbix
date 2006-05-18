@@ -974,6 +974,8 @@
 
 //	popup.php
 	"S_EMPTY"=>				"Empty",
+	"S_STANDARD_ITEMS_BIG"=>		"STANDARD ITEMS",
+	"S_NO_ITEMS"=>				"No items",
 
 //	Menu
 
