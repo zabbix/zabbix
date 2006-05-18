@@ -1,5 +1,6 @@
 1.1beta9:
 
+ - support of PostgreSQL
  - cannot add IT Service link
  - "* info" graphs on screens do not work
  - http://www.zabbix.com/forum/showthread.php?t=2736
