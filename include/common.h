@@ -28,10 +28,11 @@
 #	define zbx_uint64_t __int64
 #	define ZBX_FS_UI64 "%llu"
 
+//#undef _DEBUG
 #	ifdef _DEBUG
 #		define LOG_DEBUG_INFO(type, msg) \
-			WriteLog(MSG_DEBUG_INFO,EVENTLOG_ERROR_TYPE, type , msg)
-/*#		define ENABLE_CHECK_MEMOTY */
+			WriteLog(MSG_DEBUG_INFO,EVENTLOG_ERROR_TYPE, "d"type , GetCurrentThreadId(), msg)
+//#		define ENABLE_CHECK_MEMOTY
 #	else
 #		define LOG_DEBUG_INFO(a, b) ((void)0)
 #	endif
