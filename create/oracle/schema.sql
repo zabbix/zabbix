@@ -1081,7 +1081,7 @@ CREATE TABLE history_log (
 	CONSTRAINT 	history_log_pk	PRIMARY KEY (id)
 );
 
-CREATE INDEX history_log_itemidclock on history_log (itemidclock);
+CREATE INDEX history_log_itemidclock on history_log (itemid,clock);
 
 create sequence history_log_id 
 start with 1 
