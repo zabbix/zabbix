@@ -1,5 +1,7 @@
 Changes for 1.1beta10:
 
+ - fixed 'EventLog' monitoring for Win32 ZABBIX agent (Eugene)
+ - fixed Win32 ZABBIX agent crash (Eugene)
  - added selection button for item keys (Alexei)
  - new table 'help_items' (Alexei)
  - fixed confugration of triggers having logseverity() (Alexei)

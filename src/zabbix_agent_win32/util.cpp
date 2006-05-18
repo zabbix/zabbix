@@ -83,12 +83,12 @@ INIT_CHECK_MEMORY(main);
       {
          i++;
          strcpy(confFile,argv[i]);     // Next word should contain name of the config file
+         ret = TRUE;
       }
       else if (!strcmp(argv[i],"standalone"))  // Run in standalone mode
       {
          dwFlags|=AF_STANDALONE;
          ret = TRUE;
-		 goto lbl_end;
       }
       else if ((!strcmp(argv[i],"install"))||
                (!strcmp(argv[i],"install-events")))
@@ -131,6 +131,7 @@ INIT_CHECK_MEMORY(main);
 			i++;
 			test_cmd = argv[i];
 			dwFlags|=AF_STANDALONE;
+	        ret = TRUE;
       }
       else if (!strcmp(argv[i],"check-config"))
       {
