@@ -89,7 +89,16 @@
 		update_profile("web.popup.groupid",$groupid);
 		if($groupid == 0) unset($groupid);
 	}
-
+	if(in_array($srctbl,array("help_items")))
+	{
+		$itemtype = get_request("itemtype",get_profile("web.popup.itemtype",0));
+		$cmbTypes = new CComboBox("itemtype",$itemtype,"submit()");
+		$cmbTypes->AddItem(ITEM_TYPE_ZABBIX,S_ZABBIX_AGENT);
+		$cmbTypes->AddItem(ITEM_TYPE_SIMPLE,S_SIMPLE_CHECK);
+		$cmbTypes->AddItem(ITEM_TYPE_INTERNAL,S_ZABBIX_INTERNAL);
+		$cmbTypes->AddItem(ITEM_TYPE_AGGREGATE,S_ZABBIX_AGGREGATE);
+		$frmTitle->AddItem(array(S_TYPE,SPACE,$cmbTypes));
+	}
 	if(in_array($srctbl,array("triggers","logitems")))
 	{
 		$hostid = get_request("hostid",get_profile("web.popup.hostid",0));
@@ -183,7 +192,7 @@
 		$table = new CTableInfo(S_NO_ITEMS);
 		$table->SetHeader(array(S_KEY,S_DESCRIPTION));
 
-		$sql = "select key_,key_ from items limit 10";
+		$sql = "select * from help_items where itemtype=$itemtype order by key_";
 
 		$result = DBselect($sql);
 		while($row = DBfetch($result))
@@ -196,7 +205,7 @@
 
 			$table->addRow(array(
 				$name,
-				$row["key_"]
+				$row["description"]
 				));
 		}
 		$table->show();
