@@ -149,6 +149,7 @@ void WriteLog(DWORD msg,WORD wType,char *format...)
 {
    va_list args;
    char *strings[16],*msgBuf;
+   char *ptmp;
    int numStrings=0;
    DWORD error;
 
@@ -166,7 +167,11 @@ void WriteLog(DWORD msg,WORD wType,char *format...)
          switch(format[numStrings])
          {
             case 's':
-               strings[numStrings]=strdup(va_arg(args,char *));
+               ptmp = va_arg(args,char *);
+               if(ptmp)
+				   strings[numStrings] = strdup(ptmp);
+			   else
+				   strings[numStrings] = 0;
                break;
             case 'd':
                strings[numStrings]=(char *)malloc(16);

@@ -22,13 +22,6 @@
 
 #include "zabbixw32.h"
 
-
-//
-// Request structure
-//
-
-
-
 //
 // Global data
 //
@@ -59,78 +52,120 @@ CHECK_MEMORY(main, "IsValidServerAddr", "end");
 
 
 //
-// Request processing thread
+// Client communication
 //
 
-unsigned int __stdcall ProcessingThread(void *arg)
+void Communicate(SOCKET sock)
 {
+	TIMEVAL		timeout = {0,0};
+	FD_SET		rdfs;
+	REQUEST		rq;
+
+	int rc = 0;
+
+LOG_DEBUG_INFO("s","In Communicate()");
 INIT_CHECK_MEMORY(main);
-	ProcessCommand(((REQUEST *)arg)->cmd,((REQUEST *)arg)->result);
-CHECK_MEMORY(main, "ProcessingThread", "end");
+
+	// Wait for command from server
+	FD_ZERO(&rdfs);
+	FD_SET(sock,&rdfs);							// ignore WARNING '...whle(0)'
+
+	timeout.tv_sec	= COMMAND_TIMEOUT;
+	timeout.tv_usec	= 0;
+	rc = select(sock+1, &rdfs, (fd_set *)NULL, (fd_set *)NULL, &timeout);
+	if (rc == SOCKET_ERROR)
+	{
+		WriteLog(MSG_SELECT_ERROR,EVENTLOG_ERROR_TYPE,"e",WSAGetLastError());
+		goto end_session;
+	}
+	if(rc == 0)
+	{
+		WriteLog(MSG_COMMAND_TIMEOUT,EVENTLOG_WARNING_TYPE,NULL);
+		goto end_session;
+	}
+
+	// Init REQUEST
+	memset(&rq, 0, sizeof(REQUEST));
+	rc = recv(sock,rq.cmd,MAX_ZABBIX_CMD_LEN-1,0);
+
+	if(rc <= 0)
+	{
+		WriteLog(MSG_RECV_ERROR,EVENTLOG_ERROR_TYPE,"s",strerror(errno));
+		goto end_session;
+	}
+	rq.cmd[rc-1]=0;
+
+	ProcessCommand(rq.cmd,rq.result);
+	goto send_result;
+
+end_session:
+	sprintf(rq.result,"ERROR\n");
+
+send_result:
+	send(sock,rq.result,strlen(rq.result),0);
+
+CHECK_MEMORY(main, "Communicate", "end");
+LOG_DEBUG_INFO("s","End of Communicate()");
+}
+
+//
+// Client connector thread
+//
+
+unsigned int __stdcall AcceptThread(void *arg)
+{
+	SOCKET sock = (SOCKET)arg;
+	struct sockaddr_in servAddr;
+	int iSize=0,errorCount=0;
+
+	LOG_DEBUG_INFO("s", "In AcceptThread()");
+	INIT_CHECK_MEMORY(main);
+
+	// Wait for connection requests
+	for(;;)
+	{
+		INIT_CHECK_MEMORY(while);
+		SOCKET sockClient;
+
+		iSize = sizeof(struct sockaddr_in);
+		if ((sockClient=accept(sock,(struct sockaddr *)&servAddr,&iSize)) < 0)
+		{
+			int error = WSAGetLastError();
+
+			if (error!=WSAEINTR)
+				WriteLog(MSG_ACCEPT_ERROR,EVENTLOG_ERROR_TYPE,"e",error);
+
+			errorCount++;
+			statAcceptErrors++;
+			if (errorCount>1000)
+			{
+				WriteLog(MSG_TOO_MANY_ERRORS,EVENTLOG_WARNING_TYPE,NULL);
+				errorCount=0;
+			}
+			Sleep(500);
+			continue;
+		}
+
+		errorCount=0;     /* Reset consecutive errors counter */
+
+		if (IsValidServerAddr(servAddr.sin_addr.S_un.S_addr))
+		{
+			statAcceptedRequests++;
+			Communicate(sockClient);
+		} else {
+			statRejectedRequests++;
+		}
+
+		shutdown(sockClient,2);
+		closesocket(sockClient);
+
+		CHECK_MEMORY(while, "AcceptThread", "while");
+	}
+	CHECK_MEMORY(main, "AcceptThread", "end");
+	LOG_DEBUG_INFO("s", "End of AcceptThread()");
 
 	_endthreadex(0);
 	return 0;
-}
-
-
-//
-// Client communication thread
-//
-
-static void CommThread(void *param)
-{
-	SOCKET sock;
-	int rc;
-	REQUEST rq;
-	struct timeval timeout;
-	FD_SET rdfs;
-	HANDLE hThread=NULL;
-	unsigned int tid;
-
-//LOG_DEBUG_INFO("CommThread start");
-
-INIT_CHECK_MEMORY(main);
-   sock=(SOCKET)param;
-
-   // Wait for command from server
-	FD_ZERO(&rdfs);
-	FD_SET(sock,&rdfs);							// ignore WARNING
-	timeout.tv_sec=COMMAND_TIMEOUT;
-	timeout.tv_usec=0;
-	if (select(sock+1,&rdfs,NULL,NULL,&timeout)==0)
-	{
-		WriteLog(MSG_COMMAND_TIMEOUT,EVENTLOG_WARNING_TYPE,NULL);
-      goto end_session;
-	}
-
-   rc=recv(sock,rq.cmd,MAX_ZABBIX_CMD_LEN,0);
-   if (rc<=0)
-   {
-      WriteLog(MSG_RECV_ERROR,EVENTLOG_ERROR_TYPE,"s",strerror(errno));
-      goto end_session;
-   }
-
-   rq.cmd[rc-1]=0;
-
-   hThread=(HANDLE)_beginthreadex(NULL,0,ProcessingThread,(void *)&rq,0,&tid);
-
-   if (WaitForSingleObject(hThread,confTimeout)==WAIT_TIMEOUT)
-   {
-      strcpy(rq.result,"ZBX_ERROR\n");
-      WriteLog(MSG_REQUEST_TIMEOUT,EVENTLOG_WARNING_TYPE,"s",rq.cmd);
-      statTimedOutRequests++;
-   }
-   CloseHandle(hThread);
-
-   send(sock,rq.result,strlen(rq.result),0);
-
-   // Terminate session
-end_session:
-   shutdown(sock,2);
-   closesocket(sock);
-   _endthread();
-
-CHECK_MEMORY(main, "CommThread", "end");
 }
 
 
@@ -140,81 +175,70 @@ CHECK_MEMORY(main, "CommThread", "end");
 
 void ListenerThread(void *)
 {
-   SOCKET sock,sockClient;
-   struct sockaddr_in servAddr;
-   int iSize,errorCount=0;
+#define MAX_LISTENERS_COUNT 10
 
-INIT_CHECK_MEMORY(main);
-//LOG_DEBUG_INFO("s", "ListenerThread start");
+	HANDLE hThread[MAX_LISTENERS_COUNT];
+	unsigned int tid[MAX_LISTENERS_COUNT];
 
-   // Create socket
-   if ((sock=socket(AF_INET,SOCK_STREAM,0))==-1)
-   {
-      WriteLog(MSG_SOCKET_ERROR,EVENTLOG_ERROR_TYPE,"e",WSAGetLastError());
-	  _endthread();
-      exit(1);
-   }
+	SOCKET sock;
+	struct sockaddr_in servAddr;
+	//int iSize=0, errorCount=0;
 
-   // Fill in local address structure
-   memset(&servAddr,0,sizeof(struct sockaddr_in));
-   servAddr.sin_family=AF_INET;
-   servAddr.sin_addr.s_addr=htonl(INADDR_ANY);
-   servAddr.sin_port=htons(confListenPort);
+	int i=0;
 
-   // Bind socket
-   if (bind(sock,(struct sockaddr *)&servAddr,sizeof(struct sockaddr_in))!=0)
-   {
-      WriteLog(MSG_BIND_ERROR,EVENTLOG_ERROR_TYPE,"e",WSAGetLastError());
-	  _endthread();
-      exit(1);
-   }
+	LOG_DEBUG_INFO("s", "In ListenerThread()");
+	INIT_CHECK_MEMORY(main);
 
-   // Set up queue
-   listen(sock,SOMAXCONN);
+	// Create socket
+	if ((sock=socket(AF_INET,SOCK_STREAM,0)) == INVALID_SOCKET)
+	{
+		WriteLog(MSG_SOCKET_ERROR,EVENTLOG_ERROR_TYPE,"e",WSAGetLastError());
+		LOG_DEBUG_INFO("s", "End of ListenerThread() Error: 1");
+		_endthread();
+		exit(1);
+	}
 
-   // Wait for connection requests
-   for(;;)
-   {
-//LOG_DEBUG_INFO("s","ListenerThread while 1");
-INIT_CHECK_MEMORY(while);
+	// Fill in local address structure
+	memset(&servAddr,0,sizeof(struct sockaddr_in));
+	servAddr.sin_family			= AF_INET;
+	servAddr.sin_addr.s_addr	= htonl(INADDR_ANY);
+	servAddr.sin_port			= htons(confListenPort);
 
-      iSize=sizeof(struct sockaddr_in);
-      if ((sockClient=accept(sock,(struct sockaddr *)&servAddr,&iSize))==-1)
-      {
-         int error=WSAGetLastError();
+	// Bind socket
+	if (bind(sock,(struct sockaddr *)&servAddr,sizeof(struct sockaddr_in)) == SOCKET_ERROR)
+	{
+		WriteLog(MSG_BIND_ERROR,EVENTLOG_ERROR_TYPE,"e",WSAGetLastError());
+		LOG_DEBUG_INFO("s", "End of ListenerThread() Error: 2");
+		_endthread();
+		exit(1);
+	}
 
-         if (error!=WSAEINTR)
-            WriteLog(MSG_ACCEPT_ERROR,EVENTLOG_ERROR_TYPE,"e",error);
-         errorCount++;
-         statAcceptErrors++;
-         if (errorCount>1000)
-         {
-            WriteLog(MSG_TOO_MANY_ERRORS,EVENTLOG_WARNING_TYPE,NULL);
-            errorCount=0;
-         }
-         Sleep(500);
-      }
+	// Set up queue
+	if(listen(sock,SOMAXCONN) == SOCKET_ERROR)
+	{
+		WriteLog(MSG_LISTEN_ERROR,EVENTLOG_ERROR_TYPE,"e",WSAGetLastError());
+		LOG_DEBUG_INFO("s", "End of ListenerThread() Error: 2");
+		_endthread();
+		exit(1);
+	}
 
-      errorCount=0;     // Reset consecutive errors counter
+	for(i = 0; i < MAX_LISTENERS_COUNT; i++)
+	{
+		hThread[i] = (HANDLE)_beginthreadex(NULL,0,AcceptThread,(void *)sock,0,&(tid[i]));
+		if(hThread[i] >=0 )
+			WriteLog(MSG_INFORMATION,EVENTLOG_INFORMATION_TYPE,"ds", tid[i], ": Listen thread is Started.");
+	}
 
-      if (IsValidServerAddr(servAddr.sin_addr.S_un.S_addr))
-      {
-         statAcceptedRequests++;
+	for(i = 0; i < MAX_LISTENERS_COUNT; i++)
+	{
+		if(WaitForSingleObject(hThread[i], INFINITE) == WAIT_OBJECT_0)
+			WriteLog(MSG_INFORMATION,EVENTLOG_INFORMATION_TYPE,"ds", tid[i], ": Listen thread is Terminated.");
 
-         _beginthread(CommThread,0,(void *)sockClient);
+		CloseHandle( hThread );
+	}
 
-      }
-      else     // Unauthorized connection
-      {
-         statRejectedRequests++;
-         shutdown(sockClient,2);
-         closesocket(sockClient);
-      }
-CHECK_MEMORY(while, "ListenerThread", "while");
-   }
+	CHECK_MEMORY(main, "ListenerThread", "end");
 
-CHECK_MEMORY(main, "ListenerThread", "end");
-//WriteLog(MSG_SOCKET_ERROR,EVENTLOG_ERROR_TYPE,"s","ListenerThread end");
-
+	LOG_DEBUG_INFO("s", "End of ListenerThread()");
 	_endthread();
 }

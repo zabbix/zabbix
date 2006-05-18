@@ -79,16 +79,19 @@ METRIC	*metrics=NULL;
 
 static void	InitMetrics()
 {
+LOG_DEBUG_INFO("s","In InitMetrics()");
 	if(metrics==NULL)
 	{
 		metrics=(METRIC *)malloc(sizeof(METRIC));
 		metrics[0].key=NULL;
 	}
+LOG_DEBUG_INFO("s","End of InitMetrics()");
 }
 
 static void	FreeMetrics(void)
 {
 	int i;
+LOG_DEBUG_INFO("s","In FreeMetrics()");
 	for(i=0;;i++)
 	{
 		if(metrics[i].key == NULL)	break;
@@ -96,21 +99,22 @@ static void	FreeMetrics(void)
 		metrics[i].status = ITEM_STATUS_NOTSUPPORTED;
 	}
 	free(metrics);
+LOG_DEBUG_INFO("s","End of FreeMetrics()");
 }
 
 void	disable_all_metrics()
 {
 	int i;
+LOG_DEBUG_INFO("s","In disable_all_metrics()");
 INIT_CHECK_MEMORY(main);
-//	LOG_DEBUG_INFO("s","disable_all_metrics: start");
 	for(i=0;;i++)
 	{
 		if(metrics[i].key == NULL)	break;
 
 		metrics[i].status = ITEM_STATUS_NOTSUPPORTED;
 	}
-//	LOG_DEBUG_INFO("s","disable_all_metrics: end");
 CHECK_MEMORY(main,"disable_all_metrics","end");
+LOG_DEBUG_INFO("s","End of disable_all_metrics()");
 }
 
 int	get_min_nextcheck()
@@ -119,9 +123,8 @@ int	get_min_nextcheck()
 	int min=-1;
 	int nodata=0;
 
+LOG_DEBUG_INFO("s","In get_min_nextcheck()");
 INIT_CHECK_MEMORY(main);
-
-//	LOG_DEBUG_INFO("s","get_min_nextcheck: start");
 
 	for(i=0;;i++)
 	{
@@ -141,6 +144,7 @@ INIT_CHECK_MEMORY(main);
 	}
 
 CHECK_MEMORY(main,"add_check","end");
+LOG_DEBUG_INFO("s","End of get_min_nextcheck()");
 	return min;
 }
 
@@ -148,7 +152,7 @@ void	add_check(char *key, int refresh, int lastlogsize)
 {
 	int i;
 
-//	LOG_DEBUG_INFO("s","add_check: start");
+LOG_DEBUG_INFO("s","In add_check()");
 
 	for(i=0;;i++)
 	{
@@ -176,7 +180,7 @@ void	add_check(char *key, int refresh, int lastlogsize)
 			break;
 		}
 	}
-//	LOG_DEBUG_INFO("s","add_check: end");
+LOG_DEBUG_INFO("s","End of add_check()");
 }
 
 // Return position of Nth delimiter from right size, 0 - otherwise
@@ -185,17 +189,17 @@ int strnrchr(char *str, int num, char delim)
 	int i=0;
 	int n=0;
 
+LOG_DEBUG_INFO("s","In strnrchr()");
 INIT_CHECK_MEMORY(main);
 
-//	LOG_DEBUG_INFO("s","strnrchr: start");
 	for(i=strlen(str)-1;i>=0;i--)
 	{
 		if(str[i]==delim) n++;
 		if(n==num) break;
 	}
 	if(i==-1) i=0;
-//	LOG_DEBUG_INFO("s","strnrchr: end");
 CHECK_MEMORY(main,"strnrchr","end");
+LOG_DEBUG_INFO("s","End of strnrchr()");
 	return i;
 }
 
@@ -212,7 +216,7 @@ int	parse_list_of_checks(char *str)
 	char *str_copy;
 	int p1,p2;
 
-//	LOG_DEBUG_INFO("s","parse_list_of_checks: start");
+LOG_DEBUG_INFO("s","In parse_list_of_checks()");
 	disable_all_metrics();
 
 	str_copy=str;
@@ -257,7 +261,7 @@ int	parse_list_of_checks(char *str)
 		pos=strchr(str_copy,'\n');
 	}
 
-//	LOG_DEBUG_INFO("s","parse_list_of_checks: end");
+LOG_DEBUG_INFO("s","End of parse_list_of_checks()");
 	return SUCCEED;
 }
 
@@ -272,6 +276,7 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 
 	struct sockaddr_in servaddr_in;
 
+LOG_DEBUG_INFO("s","In get_active_checks()");
 //	zabbix_log( LOG_LEVEL_DEBUG, "get_active_checks: host[%s] port[%d]", server, port);
 
 	servaddr_in.sin_family=AF_INET;
@@ -419,6 +424,7 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 	}
 
 //	LOG_DEBUG_INFO("s","get_active_checks: end");
+LOG_DEBUG_INFO("s","End of get_active_checks()");
 	return SUCCEED;
 }
 
@@ -441,6 +447,7 @@ int	send_value(char *server,int port,char *host, char *key,char *value,char *las
 //LOG_DEBUG_INFO("s","send_value: value");
 //LOG_DEBUG_INFO("s",value);
 
+LOG_DEBUG_INFO("s","In send_value()");
 INIT_CHECK_MEMORY(main);
 
 	servaddr_in.sin_family=AF_INET;
@@ -552,16 +559,13 @@ sprintf(tmp,"Error in sendto()");
 lbl_End:
 
 CHECK_MEMORY(main, "send_value", "end");
+LOG_DEBUG_INFO("s","End of send_value()");
 	return ret;
 }
 
 int	process_active_checks(char *server, int port)
 {
-	   REQUEST rq;
-   HANDLE hThread=NULL;
-   unsigned int tid;
-
-
+	REQUEST	rq;
 	char	value[MAX_STRING_LEN];
 	char	lastlogsize[MAX_STRING_LEN];
 	char	timestamp[MAX_STRING_LEN];
@@ -574,11 +578,10 @@ int	process_active_checks(char *server, int port)
 	char	c[MAX_STRING_LEN];
 	char	*filename;
 
+LOG_DEBUG_INFO("s","In process_active_checks()");
 INIT_CHECK_MEMORY(main);
 
-//	LOG_DEBUG_INFO("s","pac: start");
 	now=time(NULL);
-
 	for(i=0;;i++)
 	{
 		if(metrics[i].key == NULL)			break;
@@ -599,10 +602,10 @@ INIT_CHECK_MEMORY(main);
 			count=0;
 			while(process_log(filename,&metrics[i].lastlogsize,value) == 0)
 			{
-LOG_DEBUG_INFO("s","Active check: log[*]");
-LOG_DEBUG_INFO("s",filename);
-LOG_DEBUG_INFO("s","Active check: value");
-LOG_DEBUG_INFO("s",value);
+//LOG_DEBUG_INFO("s","Active check: log[*]");
+//LOG_DEBUG_INFO("s",filename);
+//LOG_DEBUG_INFO("s","Active check: value");
+//LOG_DEBUG_INFO("s",value);
 				sprintf(lastlogsize,"%d",metrics[i].lastlogsize);
 				if(send_value(server,port,confHostname,metrics[i].key, value, lastlogsize,timestamp,source,severity) == FAIL)
 				{
@@ -624,15 +627,12 @@ LOG_DEBUG_INFO("s",value);
 		/* Special processing for log files */
 		else if(strncmp(metrics[i].key,"eventlog[",9) == 0)
 		{
-//	LOG_DEBUG_INFO("s","process_active_checks: 1");
-
 			strscpy(c,metrics[i].key);
 			filename=strtok(c,"[]");
 			filename=strtok(NULL,"[]");
-//	LOG_DEBUG_INFO("s","process_active_checks: 2");
 
 			count=0;
-			while(process_eventlog_new(filename,&metrics[i].lastlogsize, timestamp, source, severity, value) == 0)
+			while(process_eventlog(filename,&metrics[i].lastlogsize, timestamp, source, severity, value) == 0)
 			{
 //				sprintf(shortname, "%s:%s",confHostname,metrics[i].key);
 //				zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname);
@@ -657,10 +657,8 @@ LOG_DEBUG_INFO("s",value);
 					break;
 				}
 				count++;
-//				LOG_DEBUG_INFO("s","pac: end of loop()");
 				/* Do not flood ZABBIX server if file grows too fast */
 				if(count >= MAX_LINES_PER_SECOND*metrics[i].refresh)	break;
-//				LOG_DEBUG_INFO("s","pac: 4");
 			}
 		}
 		else
@@ -670,25 +668,15 @@ LOG_DEBUG_INFO("s",value);
 			source[0]=0;
 			severity[0]=0;
 
+			// Init REQUEST
+			memset(&rq, 0, sizeof(REQUEST));
 			strcpy(rq.cmd,metrics[i].key);
 
-			   
-		   hThread=(HANDLE)_beginthreadex(NULL,0,ProcessingThread,(void *)&rq,0,&tid);
+			ProcessCommand(rq.cmd,rq.result);
 
-		   if (WaitForSingleObject(hThread,confTimeout)==WAIT_TIMEOUT)
-		   {
-			  strcpy(rq.result,"ZBX_ERROR\n");
-			  statTimedOutRequests++;
-		   }
-		   CloseHandle(hThread);
+			ret = send_value(server,port,confHostname,metrics[i].key,rq.result,lastlogsize,timestamp,source,severity) ;
 
-   //send(sock,rq.result,strlen(rq.result),0);
-
-			//process(metrics[i].key, value);
-
-			//sprintf(shortname,"%s:%s",confHostname,metrics[i].key);
-//			zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname);
-			if(send_value(server,port,confHostname,metrics[i].key,rq.result,lastlogsize,timestamp,source,severity) == FAIL)
+			if(ret == FAIL)
 			{
 				ret = FAIL;
 				break;
@@ -697,30 +685,29 @@ LOG_DEBUG_INFO("s",value);
 			if(strcmp(value,"ZBX_NOTSUPPORTED\n")==0)
 			{
 				metrics[i].status=ITEM_STATUS_NOTSUPPORTED;
-//				zabbix_log( LOG_LEVEL_WARNING, "Active check [%s] is not supported. Disabled.", metrics[i].key);
+LOG_DEBUG_INFO("s","Active check is not supported. Disabled");
 			}
 		}
 
 		metrics[i].nextcheck=time(NULL)+metrics[i].refresh;
 	}
-//LOG_DEBUG_INFO("s","process_active_checks: end");
 CHECK_MEMORY(main, "process_active_checks", "end");
+LOG_DEBUG_INFO("s","End of process_active_checks()");
 	return ret;
 }
 
 void	refresh_metrics(char *server, int port, char *error, int max_error_len)
 {
-//	LOG_DEBUG_INFO("s","refresh_metrics: start");
-//	zabbix_log( LOG_LEVEL_DEBUG, "In refresh_metrics()");
+LOG_DEBUG_INFO("s","In refresh_metrics()");
 	while(get_active_checks(server, port, error, max_error_len) != SUCCEED)
 	{
-//		zabbix_log( LOG_LEVEL_WARNING, "Getting list of active checks failed. Will retry after 60 seconds");
+LOG_DEBUG_INFO("s","Getting list of active checks failed. Will retry after 60 seconds");
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 		setproctitle("poller [sleeping for %d seconds]", 60*1000);
 #endif
 		Sleep(60*1000);
 	}
-//	LOG_DEBUG_INFO("s","refresh_metrics: end");
+LOG_DEBUG_INFO("s","Out of refresh_metrics()");
 }
 
 void    ActiveChecksThread(void *)
@@ -729,11 +716,8 @@ void    ActiveChecksThread(void *)
 	int	sleeptime, nextcheck;
 	int	nextrefresh;
 
+LOG_DEBUG_INFO("s","In ActiveChecksThread()");
 INIT_CHECK_MEMORY(main);
-
-//	LOG_DEBUG_INFO("s", "ActiveChecksThread start");
-
-//	LOG_DEBUG_INFO("d",confServerPort);
 
 	InitMetrics();
 
@@ -743,7 +727,6 @@ INIT_CHECK_MEMORY(main);
 	for(;;)	
 	{
 INIT_CHECK_MEMORY(for);
-//LOG_DEBUG_INFO("s","ActiveChecksThread: loop 1");
 		if(process_active_checks(confServer, confServerPort) == FAIL)
 		{
 			Sleep(60*1000);
@@ -764,16 +747,12 @@ CHECK_MEMORY(for, "ActiveChecksThread", "end for 1");
 				sleeptime=0;
 			}
 		}
-//LOG_DEBUG_INFO("s","sleeptime");
-//LOG_DEBUG_INFO("d",sleeptime);
 		if(sleeptime>0)
 		{
 			if(sleeptime > 60)
 			{
 				sleeptime = 60;
 			}
-//			zabbix_log( LOG_LEVEL_DEBUG, "Sleeping for %d seconds",
-//					sleeptime );
 
 			Sleep( sleeptime*1000 );
 		}
@@ -788,14 +767,13 @@ CHECK_MEMORY(for, "ActiveChecksThread", "end for 1");
 			nextrefresh=time(NULL)+300;
 		}
 
-//		LOG_DEBUG_INFO("s","ActiveChecksThread: loop 2");
 CHECK_MEMORY(for, "ActiveChecksThread", "end for");
 	}
 /**/
 	FreeMetrics();
 
 CHECK_MEMORY(main, "ActiveChecksThread", "end");
-//LOG_DEBUG_INFO("s", "ActiveChecksThread end");
+LOG_DEBUG_INFO("s","End of ActiveChecksThread()");
 
 	_endthread();
 }

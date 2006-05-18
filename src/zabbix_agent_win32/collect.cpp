@@ -275,8 +275,10 @@ INIT_CHECK_MEMORY(do);
       // Calculate time spent on sample processing and issue warning if it exceeds threshold
       dwTicksElapsed=GetTickCount()-dwTicksStart;
       if (dwTicksElapsed>confMaxProcTime)
-         WriteLog(MSG_BIG_PROCESSING_TIME,EVENTLOG_WARNING_TYPE,"dd",
-                  confMaxProcTime,dwTicksElapsed);
+	  {
+         LOG_DEBUG_INFO("s","Processing took too many time.");
+         LOG_DEBUG_INFO("d",dwTicksElapsed);
+	  }
 
       // Save processing time to history buffer
       collectorTimesHistory[collectorTimesIdx++]=dwTicksElapsed;

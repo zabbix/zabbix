@@ -239,5 +239,9 @@ BuildCmds= \
 
 # End Source File
 # End Group
+# Begin Source File
+
+SOURCE=..\..\..\tmp\EventLog.asp
+# End Source File
 # End Target
 # End Project
