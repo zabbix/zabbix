@@ -263,7 +263,7 @@ CREATE TABLE functions (
   itemid		int(4)		DEFAULT '0' NOT NULL,
   triggerid		int(4)		DEFAULT '0' NOT NULL,
   lastvalue		varchar(255),
-  function		varchar(10)	DEFAULT '' NOT NULL,
+  function		varchar(12)	DEFAULT '' NOT NULL,
   parameter		varchar(255)	DEFAULT '0' NOT NULL,
   PRIMARY KEY (functionid),
   KEY triggerid (triggerid),
