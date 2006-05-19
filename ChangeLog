@@ -1,5 +1,6 @@
 Changes for 1.1beta11:
- - fixed oracle sql request limitation
+
+ - fixed oracle sql request limitation (Eugene)
 
 Changes for 1.1beta10:
 
