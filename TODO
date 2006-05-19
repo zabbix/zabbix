@@ -1,5 +1,6 @@
 1.1beta9:
 
+ - ./configure to detect Oracle and libora8 libs
  - make grid 0,20,40,60,80,100 in graphs
  - support of PostgreSQL
  - "* info" graphs on screens do not work
