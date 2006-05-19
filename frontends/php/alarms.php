@@ -35,15 +35,9 @@
 ?>
 
 <?php
-	if(isset($_REQUEST["limit"]) && ($_REQUEST["limit"]=="NO"))
-	{
-		$limit="";
-	}
-	else
-	{
-		$limit="limit 100";
+	get_request("limit","NO");
+	if(is_numeric($_REQUEST["limit"]))
 		$_REQUEST["limit"] = 100;
-	}
 
 	$trigger=get_trigger_by_triggerid($_REQUEST["triggerid"]);
 
@@ -64,8 +58,8 @@
 
 <?php
 	$sql="select * from alarms where triggerid=".$_REQUEST["triggerid"].
-		" order by clock desc $limit";
-	$result=DBselect($sql);
+		" order by clock desc";
+	$result=DBselect($sql, $_REQUEST["limit"]);
 
 	$table = new CTableInfo();
 	$table->setHeader(array(S_TIME,S_STATUS,S_ACKNOWLEDGED,S_DURATION,S_SUM,"%"));

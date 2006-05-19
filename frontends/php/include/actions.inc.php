@@ -398,8 +398,8 @@
 	{
 		$sql="select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,".
 		"a.error from alerts a,media_type mt where mt.mediatypeid=a.mediatypeid order by a.clock".
-		" desc limit ".(10*$start+$num);
-		$result=DBselect($sql);
+		" desc";
+		$result=DBselect($sql,10*$start+$num);
 
 		$table = new CTableInfo(S_NO_ACTIONS_FOUND);
 		$table->setHeader(array(S_TIME, S_TYPE, S_STATUS, S_RECIPIENTS, S_SUBJECT, S_MESSAGE, S_ERROR));

@@ -295,9 +295,9 @@
 		}
 
 		$cond_clock = "";
-		$cond_limit = "";
+		$limit = "NO";
 		if($_REQUEST["action"]=="showlatest"){
-			$cond_limit = " limit 500";
+			$limit = 500;
 		} elseif($_REQUEST["action"]=="showvalues"){
 			$cond_clock = " and h.clock>$time and h.clock<$till";
 		}
@@ -332,9 +332,9 @@
 			$sql = "select hst.host,i.itemid,i.key_,i.description,h.clock,h.value,i.valuemapid,h.timestamp,h.source,h.severity".
 				" from history_log h, items i, hosts hst".
 				" where hst.hostid=i.hostid and h.itemid=i.itemid".$sql_filter." and i.itemid in (".$itemid_lst.")".$cond_clock.
-				" order by clock desc".$cond_limit;
+				" order by clock desc";
 
-			$result=DBselect($sql);
+			$result=DBselect($sql,$limit);
 
 			if(!isset($_REQUEST["plaintext"]))
 			{
@@ -457,8 +457,8 @@
 
 			$sql = "select h.clock,h.value,i.valuemapid from $h_table h, items i".
 				" where h.itemid=i.itemid and i.itemid=".$_REQUEST["itemid"].
-				$cond_clock." order by clock desc".$cond_limit;
-			$result=DBselect($sql);
+				$cond_clock." order by clock desc";
+			$result=DBselect($sql, $limit);
 			if(!isset($_REQUEST["plaintext"]))
 			{
 				$table = new CTableInfo();
