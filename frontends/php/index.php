@@ -41,7 +41,9 @@
 <?php
 
 	if(isset($_COOKIE["sessionid"]))
+	{
 		$sessionid=$_COOKIE["sessionid"];
+	}
 	else
 		unset($sessionid);
 
@@ -91,9 +93,8 @@
 ?>
 
 <?php
-	if(!isset($sessionid))
+	if(!isset($_COOKIE["sessionid"]))
 	{
-//		echo "-",$_COOKIE["sessionid"],"-<br>";
 		insert_login_form();
 	}
 	else
