@@ -58,7 +58,7 @@ CREATE TABLE services (
 );
 
 create sequence services_serviceid 
-start with 1 
+start with 20000 
 increment by 1 
 nomaxvalue; 
 
@@ -89,7 +89,7 @@ CREATE INDEX services_links_servicedownid on services_links (servicedownid);
 CREATE UNIQUE INDEX services_links_serviceupdownid on services_links (serviceupid,servicedownid);
 
 create sequence services_links_linkid 
-start with 1 
+start with 20000 
 increment by 1 
 nomaxvalue; 
 
@@ -119,7 +119,7 @@ CREATE TABLE graphs_items (
 );
 
 create sequence graphs_items_gitemid 
-start with 1 
+start with 20000 
 increment by 1 
 nomaxvalue; 
 
@@ -154,7 +154,7 @@ CREATE TABLE graphs (
 CREATE INDEX graphs_name on graphs (name);
 
 create sequence graphs_graphid
-start with 1 
+start with 20000 
 increment by 1 
 nomaxvalue; 
 
@@ -188,7 +188,7 @@ CREATE TABLE sysmaps_links (
 );
 
 create sequence sysmaps_links_linkid
-start with 1 
+start with 20000 
 increment by 1 
 nomaxvalue; 
 
@@ -223,7 +223,7 @@ CREATE TABLE sysmaps_elements (
 );
 
 create sequence sysmaps_elements_selementid
-start with 1 
+start with 20000 
 increment by 1 
 nomaxvalue; 
 
@@ -255,7 +255,7 @@ CREATE TABLE sysmaps (
 CREATE UNIQUE INDEX sysmaps_name on sysmaps (name);
 
 create sequence sysmaps_sysmapid
-start with 1 
+start with 20000 
 increment by 1 
 nomaxvalue; 
 
@@ -282,7 +282,7 @@ CREATE TABLE groups (
 CREATE UNIQUE INDEX groups_name on groups (name);
 
 create sequence groups_groupid 
-start with 1 
+start with 20000 
 increment by 1 
 nomaxvalue; 
 
@@ -338,7 +338,7 @@ CREATE INDEX alerts_mediatypeid on alerts (mediatypeid);
 CREATE INDEX alerts_userid on alerts (userid);
 
 create sequence alerts_alertid 
-start with 1 
+start with 20000 
 increment by 1 
 nomaxvalue; 
 
@@ -374,7 +374,7 @@ CREATE TABLE actions (
 );
 
 create sequence actions_actionid 
-start with 1 
+start with 20000 
 increment by 1 
 nomaxvalue; 
 
@@ -404,7 +404,7 @@ CREATE TABLE conditions (
 CREATE INDEX conditions_actionid on conditions (actionid);
 
 create sequence conditions_conditionid
-start with 1 
+start with 20000 
 increment by 1 
 nomaxvalue; 
 
@@ -437,7 +437,7 @@ CREATE INDEX alarms_triggeridclock on alarms (triggerid, clock);
 CREATE INDEX alarms_clock on alarms (clock);
 
 create sequence alarms_alarmid 
-start with 1 
+start with 20000 
 increment by 1 
 nomaxvalue; 
 
@@ -469,7 +469,7 @@ CREATE INDEX functions_triggerid on functions (triggerid);
 CREATE INDEX functions_itemidfunctionparam on functions (itemid,function,parameter);
 
 create sequence functions_functionid 
-start with 1 
+start with 20000 
 increment by 1 
 nomaxvalue; 
 
@@ -530,7 +530,7 @@ CREATE UNIQUE INDEX hosts_host on hosts (host);
 CREATE INDEX hosts_status on hosts (status);
 
 create sequence hosts_hostid 
-start with 1 
+start with 20000 
 increment by 1 
 nomaxvalue; 
 
@@ -592,7 +592,7 @@ CREATE INDEX items_nextcheck on items (nextcheck);
 CREATE INDEX items_status on items (status);
 
 create sequence items_itemid 
-start with 1 
+start with 20000 
 increment by 1 
 nomaxvalue; 
 
@@ -625,7 +625,7 @@ CREATE INDEX media_userid on media (userid);
 CREATE INDEX media_mediatypeid on media (mediatypeid);
 
 create sequence media_mediaid 
-start with 1 
+start with 20000 
 increment by 1 
 nomaxvalue; 
 
@@ -655,7 +655,7 @@ CREATE TABLE media_type (
 );
 
 create sequence media_type_mediatypeid 
-start with 1 
+start with 20000 
 increment by 1 
 nomaxvalue; 
 
@@ -693,7 +693,7 @@ CREATE INDEX triggers_status on triggers (status);
 CREATE INDEX triggers_value on triggers (value);
 
 create sequence triggers_triggerid 
-start with 1 
+start with 20000 
 increment by 1 
 nomaxvalue; 
 
@@ -739,7 +739,7 @@ CREATE TABLE users (
 CREATE UNIQUE INDEX users_alias on users (alias);
 
 create sequence users_userid 
-start with 1 
+start with 20000 
 increment by 1 
 nomaxvalue; 
 
@@ -771,7 +771,7 @@ CREATE INDEX auditlog_useridclock on auditlog (userid,clock);
 CREATE INDEX auditlog_clock on auditlog (clock);
 
 create sequence auditlog_auditid 
-start with 1 
+start with 20000 
 increment by 1 
 nomaxvalue; 
 
@@ -812,7 +812,7 @@ CREATE TABLE rights (
 CREATE INDEX rights_userid on rights (userid);
 
 create sequence rights_rightid 
-start with 1 
+start with 20000 
 increment by 1 
 nomaxvalue; 
 
@@ -842,7 +842,7 @@ CREATE INDEX service_alarms_serviceidclock on service_alarms (serviceid,clock);
 CREATE INDEX service_alarms_clock on service_alarms (clock);
 
 create sequence service_alarms_servicealarmid 
-start with 1 
+start with 20000 
 increment by 1 
 nomaxvalue; 
 
@@ -873,7 +873,7 @@ CREATE TABLE profiles (
 CREATE UNIQUE INDEX profiles_userididx on profiles (userid, idx);
 
 create sequence profiles_profileid 
-start with 1 
+start with 20000 
 increment by 1 
 nomaxvalue; 
 
@@ -900,7 +900,7 @@ CREATE TABLE screens (
 );
 
 create sequence screens_screenid 
-start with 1 
+start with 20000 
 increment by 1 
 nomaxvalue; 
 
@@ -939,7 +939,7 @@ CREATE TABLE screens_items (
 );
 
 create sequence screens_items_screenid 
-start with 1 
+start with 20000 
 increment by 1 
 nomaxvalue; 
 
@@ -966,7 +966,7 @@ CREATE TABLE usrgrp (
 CREATE UNIQUE INDEX usrgrp_name on usrgrp (name);
 
 create sequence usrgrp_usrgrpid 
-start with 1 
+start with 20000 
 increment by 1 
 nomaxvalue; 
 
@@ -1020,7 +1020,7 @@ CREATE TABLE images (
 CREATE UNIQUE INDEX images_imagetypename on images (imagetype, name);
 
 create sequence images_imageid 
-start with 1 
+start with 20000 
 increment by 1 
 nomaxvalue; 
 
@@ -1051,7 +1051,7 @@ CREATE TABLE hosts_templates (
 CREATE UNIQUE INDEX hosts_templates_id on hosts_templates (hostid, templateid);
 
 create sequence hosts_templates_hosttemplateid 
-start with 1 
+start with 20000 
 increment by 1 
 nomaxvalue; 
 
@@ -1084,7 +1084,7 @@ CREATE TABLE history_log (
 CREATE INDEX history_log_itemidclock on history_log (itemid,clock);
 
 create sequence history_log_id 
-start with 1 
+start with 20000 
 increment by 1 
 nomaxvalue; 
 
@@ -1131,7 +1131,7 @@ CREATE TABLE autoreg (
 );
 
 create sequence autoreg_id 
-start with 1 
+start with 20000 
 increment by 1 
 nomaxvalue; 
 
@@ -1159,7 +1159,7 @@ CREATE TABLE valuemaps (
 CREATE UNIQUE INDEX valuemaps_name on valuemaps (name);
 
 create sequence valuemaps_valuemapid 
-start with 1 
+start with 20000 
 increment by 1 
 nomaxvalue; 
 
@@ -1188,7 +1188,7 @@ CREATE TABLE mappings (
 CREATE INDEX mappings_valuemapid on mappings (valuemapid);
 
 create sequence mappings_mappingid 
-start with 1 
+start with 20000 
 increment by 1 
 nomaxvalue; 
 
@@ -1216,7 +1216,7 @@ CREATE TABLE housekeeper (
 );
 
 create sequence housekeeper_housekeeperid 
-start with 1 
+start with 20000 
 increment by 1 
 nomaxvalue; 
 
@@ -1248,7 +1248,7 @@ CREATE INDEX acknowledges_alarmid on acknowledges (alarmid);
 CREATE INDEX acknowledges_clock on acknowledges (clock);
 
 create sequence acknowledges_acknowledgeid 
-start with 1 
+start with 20000 
 increment by 1 
 nomaxvalue; 
 
@@ -1282,7 +1282,7 @@ CREATE INDEX applications_templateid on applications (templateid);
 CREATE UNIQUE INDEX applications_name on applications (name);
 
 create sequence applications_applicationid 
-start with 1 
+start with 20000 
 increment by 1 
 nomaxvalue; 
 

@@ -1,5 +1,6 @@
 Changes for 1.1beta11:
 
+ - modified oracle schema to initialise sequences with 20000 (Alexei)
  - fixed oracle sql request limitation (Eugene)
 
 Changes for 1.1beta10:
