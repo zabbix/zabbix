@@ -88,9 +88,9 @@
 		var $header;
 		var $headerClass;
 		var $colnum;
+		var $rownum;
 		var $footer;
 		var $footerClass;
-		var $curr_row_class;
 		var $message;
 /* public */
 		function CTable($message=NULL,$class=NULL)
@@ -98,10 +98,10 @@
 			parent::CTag("table","yes");
 			$this->SetClass($class);
 				
+			$this->rownum = 0;
 			$this->oddRowClass = NULL;
 			$this->evenRowClass = NULL;
 
-			$this->curr_row_class = NULL;
 
 			$this->header = '';
 			$this->headerClass = NULL;
@@ -154,10 +154,9 @@
 			}
 			if(!isset($item->options['class']))
 			{
-				$this->curr_row_class = ($this->curr_row_class == $this->evenRowClass) ?
-                                                $this->oddRowClass:
-                                                $this->evenRowClass;
-				$item->options['class'] = $this->curr_row_class;
+				$item->options['class'] = ($this->rownum % 2) ?
+                                                $this->evenRowClass:
+                                                $this->oddRowClass;
 			}/**/
 			return $item->ToString();
 		}
@@ -182,16 +181,18 @@
 		}
 		function AddRow($item,$rowClass=NULL)
 		{
+			++$this->rownum;
 			return $this->AddItem($this->PrepareRow($item,$rowClass));
 		}
 		function ShowRow($item,$rowClass=NULL)
 		{
+			++$this->rownum;
 			echo $this->PrepareRow($item,$rowClass);
 		}
 /* protected */
 		function GetNumRows()
 		{
-			return $this->ItemsCount();
+			return $this->rownum;
 		}
 
 		function StartToString()
@@ -203,8 +204,9 @@
 		function EndToString()
 		{
 			$ret = "";
-			if(count($this->items)==0 && isset($this->message)) 
+			if($this->rownum == 0 && isset($this->message)) 
 			{
+				++$this->rownum;
 				$ret = $this->PrepareRow(new CCol($this->message,'message'));
 			}
 			$ret .= $this->footer;
