@@ -24,17 +24,17 @@
 	{
 		if($hostid > 0)
 		{
-			$sql="select distinct a.clock,a.value,a.triggerid from alarms a,functions f,items i where a.triggerid=f.triggerid and f.itemid=i.itemid and i.hostid=".$hostid." order by clock desc limit ".(10*($start+$num));
+			$sql="select distinct a.clock,a.value,a.triggerid from alarms a,functions f,items i where a.triggerid=f.triggerid and f.itemid=i.itemid and i.hostid=".$hostid." order by clock desc";
 		}
 		elseif($groupid > 0)
 		{
-			$sql="select distinct a.clock,a.value,a.triggerid from alarms a,functions f,items i where a.triggerid=f.triggerid and f.itemid=i.itemid and i.hostid=hg.hostid and hg.groupid=".$groupid." order by clock desc limit ".(10*($start+$num));
+			$sql="select distinct a.clock,a.value,a.triggerid from alarms a,functions f,items i where a.triggerid=f.triggerid and f.itemid=i.itemid and i.hostid=hg.hostid and hg.groupid=".$groupid." order by clock desc";
 		}
 		else
 		{
-			$sql="select distinct triggerid,clock,value from alarms order by clock desc limit ".(10*$start+$num);
+			$sql="select distinct triggerid,clock,value from alarms order by clock desc";
 		}
-		$result=DBselect($sql);
+		$result=DBselect($sql,10*($start+$num));
        
 		$table = new CTableInfo(S_NO_EVENTS_FOUND); 
 		$table->setHeader(array(S_TIME, S_DESCRIPTION, S_VALUE, S_SEVERITY));

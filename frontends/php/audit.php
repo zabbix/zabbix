@@ -75,16 +75,18 @@
 	if(!isset($_REQUEST["start"]))
 	{
 		$sql="select u.alias,a.clock,a.action,a.resourcetype,a.details from auditlog a, users u".
-			" where u.userid=a.userid and a.auditid>$maxauditid-200 order by clock desc limit 200";
+			" where u.userid=a.userid and a.auditid>$maxauditid-200 order by clock desc";
+		$limit = 200;
 	}
 	else
 	{
 		$sql="select u.alias,a.clock,a.action,a.resourcetype,a.details from auditlog a, users u".
 			" where u.userid=a.userid and a.auditid>$maxauditid-".($_REQUEST["start"]+200).
-			" order by clock desc limit ".($_REQUEST["start"]+200);
+			" order by clock desc";
+		$limit = $_REQUEST["start"]+200;
 
 	}
-	$result=DBselect($sql);
+	$result=DBselect($sql,$limit);
 
 	$table = new CTableInfo();
 	$table->setHeader(array(S_TIME,S_USER,S_RESOURCE,S_ACTION,S_DETAILS));

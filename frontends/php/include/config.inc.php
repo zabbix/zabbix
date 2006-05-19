@@ -1085,14 +1085,14 @@ COpt::profiling_start("page");
 		if($item["value_type"]==0)
 		{
 			$sql="select clock,value from history where itemid=$itemid".
-				" order by clock desc limit $elements";
+				" order by clock desc";
 		}
 		else
 		{
 			$sql="select clock,value from history_str where itemid=$itemid".
-				" order by clock desc limit $elements";
+				" order by clock desc";
 		}
-                $result=DBselect($sql);
+                $result=DBselect($sql,$elements);
 
 		$table = new CTableInfo();
 		$table->SetHeader(array(S_TIMESTAMP,item_description($item["description"],$item["key_"])));
