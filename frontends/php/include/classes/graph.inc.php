@@ -741,20 +741,14 @@
 			$sql_arr = array();
 			if($this->period<=24*3600)
 			{
-//				$sql="select itemid,round(900*((clock+$z)%($p))/($p),0) as i,count(*) as count,avg(value) as avg,min(value) as min,max(value) as max,max(clock) as clock from history where itemid in ($str) and clock>=".$this->from_time." and clock<=".$this->to_time." group by itemid,round(900*((clock+$z)%($p))/($p),0)";
-
-				if($DB_TYPE == "ORACLE")
-				{
-					array_push($sql_arr,
-						"select itemid,round(900*(mod((clock+$z),($p)))/($p),0) as i,count(*) as count,avg(value) as avg,min(value) as min,max(value) as max,max(clock) as clock from history where itemid in ($str) and clock>=".$this->from_time." and clock<=".$this->to_time." group by itemid,round(900*(mod((clock+$z),($p)))/($p),0)",
-						"select itemid,round(900*(mod((clock+$z),($p)))/($p),0) as i,count(*) as count,avg(value) as avg,min(value) as min,max(value) as max,max(clock) as clock from history_uint where itemid in ($str) and clock>=".$this->from_time." and clock<=".$this->to_time." group by itemid,round(900*(mod((clock+$z),($p)))/($p),0)");
-				}
-				else
-				{
-					array_push($sql_arr,
-						"select itemid,round(900*((clock+$z)%($p))/($p),0) as i,count(*) as count,avg(value) as avg,min(value) as min,max(value) as max,max(clock) as clock from history where itemid in ($str) and clock>=".$this->from_time." and clock<=".$this->to_time." group by itemid,round(900*((clock+$z)%($p))/($p),0)",
-						"select itemid,round(900*((clock+$z)%($p))/($p),0) as i,count(*) as count,avg(value) as avg,min(value) as min,max(value) as max,max(clock) as clock from history_uint where itemid in ($str) and clock>=".$this->from_time." and clock<=".$this->to_time." group by itemid,round(900*((clock+$z)%($p))/($p),0)");
-				}
+				array_push($sql_arr,
+					"select itemid,round(900*(mod(clock+$z,$p))/($p),0) as i,count(*) as count,avg(value) as avg,min(value) as min,max(value) as max,max(clock) as clock from history where itemid in ($str) and clock>=".$this->from_time." and clock<=".$this->to_time." group by itemid,round(900*(mod(clock+$z,$p))/($p),0)",
+					"select itemid,round(900*(mod(clock+$z,$p))/($p),0) as i,count(*) as count,avg(value) as avg,min(value) as min,max(value) as max,max(clock) as clock from history_uint where itemid in ($str) and clock>=".$this->from_time." and clock<=".$this->to_time." group by itemid,round(900*(mod(clock+$z,$p))/($p),0)");
+			}
+			else
+			{
+				array_push($sql_arr,
+					"select itemid,round(900*(mod(clock+$z,$p))/($p),0) as i,sum(num) as count,avg(value_avg) as avg,min(value_min) as min,max(value_max) as max,max(clock) as clock from trends where itemid in ($str) and clock>=".$this->from_time." and clock<=".$this->to_time." group by itemid,round(900*(mod(clock+$z,$p))/($p),0)");
 			}
 //			echo "<br>",$sql,"<br>";
 
