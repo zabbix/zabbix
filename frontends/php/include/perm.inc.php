@@ -50,6 +50,14 @@ define("GROUP_RIGHT",		0);
 
                 $db_users = DBselect($sql);
 		$USER_DETAILS = DBfetch($db_users);
+		if(!$USER_DETAILS)
+		{
+			unset($sessionid);
+			unset($_COOKIE["sessionid"]);	
+
+			$db_users = DBselect("select u.* from users u where u.alias='guest'");
+			$USER_DETAILS = DBfetch($db_users);
+		}
 		if($USER_DETAILS)
 		{
 			if(isset($sessionid))
@@ -74,7 +82,11 @@ define("GROUP_RIGHT",		0);
 
 			return;
 		}
-		else	unset($USER_DETAILS);
+		else
+		{
+			echo 'guest user can\'t be found';
+			exit;
+		}
 
 // Incorrect login
 
