@@ -1,3 +1,6 @@
+Changes for 1.1beta11:
+ - fixed oracle sql request limitation
+
 Changes for 1.1beta10:
 
  - fixed 'EventLog' monitoring for Win32 ZABBIX agent (Eugene)

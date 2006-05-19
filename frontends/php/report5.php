@@ -82,9 +82,9 @@
 	t.triggerid=f.triggerid and
 	t.triggerid=a.triggerid and
 	a.clock>$time_now-$time_dif
-	group by 1,2,3,4
-	order by 5 desc,1,3
-	limit 100");
+	group by h.host,t.triggerid,t.description,t.priority
+	order by 5 desc,1,3", 100);
+
         while($row=DBfetch($result))
         {
                 $priority_style=NULL;

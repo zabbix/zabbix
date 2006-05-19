@@ -22,13 +22,13 @@
 
 // DATABASE CONFIGURATION
 
-//	$DB_TYPE	="ORACLE";
+	$DB_TYPE	="ORACLE";
 //	$DB_TYPE	="POSTGRESQL";
-	$DB_TYPE	="MYSQL";
+//	$DB_TYPE	="MYSQL";
 	$DB_SERVER	="localhost";
-	$DB_DATABASE	="zabbix";
-	$DB_USER	="root";
-	$DB_PASSWORD	="";
+//	$DB_DATABASE	="zabbix";
+	$DB_USER	="scott";
+	$DB_PASSWORD	="tiger";
 // END OF DATABASE CONFIGURATION
 
 //	$USER_DETAILS	="";
@@ -79,7 +79,7 @@
 			SELECT * FROM (SELECT ROWNUM as RN, * FROM tbl) WHERE RN BETWEEN 6 AND 15
 	*/
 
-	function	DBselect($query)
+	function	DBselect($query, $limit='NO')
 	{
 		global $DB,$DB_TYPE;
 
@@ -88,6 +88,10 @@ COpt::savesqlrequest($query);
 
 		if($DB_TYPE == "MYSQL")
 		{
+			if(is_numeric($limit))
+			{
+				$query .= ' limit '.intval($limit);
+			}
 			$result=mysql_query($query,$DB);
 			if(!$result)
 			{
@@ -97,11 +101,20 @@ COpt::savesqlrequest($query);
 		}
 		if($DB_TYPE == "POSTGRESQL")
 		{
+			if(is_numeric($limit))
+			{
+				$query .= ' limit '.intval($limit);
+			}
 			$result=pg_exec($DB,$query);
 			return $result;
 		}
 		if($DB_TYPE == "ORACLE")
 		{
+			if(is_numeric($limit))
+			{
+				$query = 'select * from ('.$query.') where rownum<'.intval($limit);
+			}
+
 			$stid=OCIParse($DB,$query);
 			if(!$stid)
 			{

@@ -689,7 +689,7 @@
 	{
 		if(is_null($time)) $time = time();
 
-		$result = DBselect('select value from alarms where triggerid='.$triggerid.' order by clock desc limit 1');
+		$result = DBselect('select value from alarms where triggerid='.$triggerid.' order by clock desc',1);
 		$last_value = DBfetch($result);
 		if($last_value)
 		{

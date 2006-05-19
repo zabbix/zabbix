@@ -2499,7 +2499,7 @@
 
 			if($elementid==0)
 			{
-				$db_hosts = DBselect("select hostid,host from hosts limit 1");
+				$db_hosts = DBselect("select hostid,host from hosts",1);
 				$db_host = DBfetch($db_hosts);
 				$host = $db_host["host"];
 				$elementid = $db_host["hostid"];
