@@ -92,7 +92,7 @@
 
 	check_fields($fields);
 
-	validate_group_with_host("U");
+	validate_group_with_host("U",array("always_select_first_host"));
 ?>
 
 <?php

@@ -86,10 +86,10 @@
 	**     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
 	**/
 	
-	define("USE_PROFILING",1);
+//	define("USE_PROFILING",1);
 //	define("USE_TIME_PROF",1);
 //	define("USE_MEM_PROF",1);
-	define("USE_SQLREQUEST_PROF",1);
+//	define("USE_SQLREQUEST_PROF",1);
 //	define("SHOW_SQLREQUEST_DETAILS",1);
 
 if(defined('USE_PROFILING'))
