@@ -1,5 +1,6 @@
 Changes for 1.1beta11:
 
+ - fixed evaluation of action's conditions (Alexei)
  - fixed agent.ping in Windows agent (Alexei)
  - cleaned SQL statements to have mod() instead of % (Alexei)
  - fixed displaying of graphs for periods more than 24h (Alexei)
