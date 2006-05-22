@@ -104,15 +104,21 @@ if(defined('USE_PROFILING'))
 		/* protected static $starttime[]=array(); */
 
 
-		/* protected static */ function getmicrotime()
-		{
-			list($usec, $sec) = explode(' ',microtime());
-			return ((float)$usec + (float)$sec);
+		/* protected static */ function getmicrotime() { 
+if(defined('USE_TIME_PROF')) {
+			list($usec, $sec) = explode(' ',microtime());	return ((float)$usec + (float)$sec); 
+}else {
+			return 0;
+}
 		}
 
-		/* protected static */ function getmemoryusage()
-		{
+
+		/* protected static */ function getmemoryusage() {
+if(defined('USE_MEM_PROF')) {
 			return memory_get_usage('memory_limit');
+} else {
+			return 0;
+}
 		}
 
 		/* protected static */ function mem2str($size)
@@ -132,14 +138,8 @@ if(defined('USE_PROFILING'))
 
 			if(is_null($type)) $type='global';
 
-if(defined('USE_TIME_PROF'))
-{
 			$starttime[$type] = COpt::getmicrotime();
-}
-if(defined('USE_MEM_PROF'))
-{
 			$memorystamp[$type] = COpt::getmemoryusage();
-}
 if(defined('USE_SQLREQUEST_PROF'))
 {
 			$sqlmark[$type] = count($sqlrequests);

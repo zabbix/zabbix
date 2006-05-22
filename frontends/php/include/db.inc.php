@@ -22,14 +22,14 @@
 
 // DATABASE CONFIGURATION
 
-//	$DB_TYPE	="ORACLE";
+	$DB_TYPE	="ORACLE";
 //	$DB_TYPE	="POSTGRESQL";
-	$DB_TYPE	="MYSQL";
+//	$DB_TYPE	="MYSQL";
 	$DB_SERVER	="localhost";
-	$DB_DATABASE	="zabbix";
+//	$DB_DATABASE	="zabbix";
 //	$DB_DATABASE	="osmiy";
-	$DB_USER	="root";
-	$DB_PASSWORD	="";
+	$DB_USER	="scott";
+	$DB_PASSWORD	="tiger";
 // END OF DATABASE CONFIGURATION
 
 //	$USER_DETAILS	="";
@@ -279,6 +279,9 @@ COpt::savesqlrequest($query);
 
 	function	zbx_dbstr($var)
 	{
-		return "'".addslashes($var)."'";
+		$result = "'".addslashes($var)."'";
+//SDI($result);
+		return $result;
+		//return "'".addslashes($var)."'";
 	}
 ?>
