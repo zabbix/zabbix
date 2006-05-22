@@ -1,5 +1,7 @@
 Changes for 1.1beta11:
 
+ - fixed oracle SQL request creating (Eugene)
+ - fixed first host selection from list of accessed hosts (Eugene)
  - fixed evaluation of action's conditions (Alexei)
  - fixed agent.ping in Windows agent (Alexei)
  - cleaned SQL statements to have mod() instead of % (Alexei)

@@ -412,6 +412,7 @@
 		$first_hostig_in_group = 0;
 
 		$allow_all_hosts = (in_array("allow_all_hosts",$options)) ? 1 : 0;
+		$always_select_first_host = in_array("always_select_first_host",$options) ? 1 : 0;
 
 		if(in_array("monitored_hosts",$options))
 			$with_host_status = " and h.status=".HOST_STATUS_MONITORED;
@@ -465,43 +466,44 @@
 		else
 		{
 			$hostid = $a_hostid;
-
-			if($groupid == 0)
+			if(!($hostid == 0 && $allow_all_hosts == 1)) /* is not 'All' selected */
 			{
-				$sql = "select distinct h.hostid,h.host from hosts h".$item_table.
-					" where h.status<>".HOST_STATUS_DELETED.$with_host_status.$with_items.
-					" order by h.host";
-
-				$db_hosts = DBselect($sql);
-				while($db_host = DBfetch($db_hosts))
+				if($groupid == 0)
 				{
-					if(!check_right("Host",$right,$db_host["hostid"]))	continue;
-					$first_hostig_in_group = $db_host["hostid"];
-					break;
+					$sql = "select distinct h.hostid,h.host from hosts h".$item_table.
+						" where h.status<>".HOST_STATUS_DELETED.$with_host_status.$with_items.
+						" order by h.host";
+
+					$db_hosts = DBselect($sql);
+					while($db_host = DBfetch($db_hosts))
+					{
+						if(!check_right("Host",$right,$db_host["hostid"]))	continue;
+						$first_hostig_in_group = $db_host["hostid"];
+						break;
+					}
+					if($first_hostig_in_group == 0)	$hostid = 0;
 				}
-				if($first_hostig_in_group == 0)	$hostid = 0;
-			}
 
-			if($groupid > 0)
-			{ 
-				if(!DBfetch(DBselect("select hg.hostid from hosts_groups hg".
-					" where hg.groupid=".$groupid." and hg.hostid=".$hostid)))
-						$hostid = 0;
-			}
+				if($groupid > 0)
+				{ 
+					if(!DBfetch(DBselect("select hg.hostid from hosts_groups hg".
+						" where hg.groupid=".$groupid." and hg.hostid=".$hostid)))
+							$hostid = 0;
+				}
 
-			if(!check_right("Host",$right,$hostid)) $hostid = 0;
+				if(!check_right("Host",$right,$hostid)) $hostid = 0;
 
-			if($hostid > 0)
-			{
-				if(!DBfetch(DBselect("select distinct h.hostid from hosts h".$item_table.
-					" where h.status<>".HOST_STATUS_DELETED.$with_host_status.$with_items.
-					" and h.hostid=".$hostid)))
-						$hostid = 0;
-			}
-
-			if(($hostid < 0) || ($hostid == 0 && !($allow_all_hosts ==1 && $groupid==0))) 
-			{
-				$hostid = $first_hostig_in_group;
+				if($hostid > 0)
+				{
+					if(!DBfetch(DBselect("select distinct h.hostid from hosts h".$item_table.
+						" where h.status<>".HOST_STATUS_DELETED.$with_host_status.$with_items.
+						" and h.hostid=".$hostid)))
+							$hostid = 0;
+				}
+				if(($hostid < 0) || ($hostid == 0 && $always_select_first_host == 1)) /* incorrect host */
+				{
+					$hostid = $first_hostig_in_group;
+				}
 			}
 		}
 
