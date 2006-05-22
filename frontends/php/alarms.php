@@ -22,6 +22,8 @@
 	include "include/config.inc.php";
 	$page["title"] = "S_ALARMS";
 	$page["file"] = "alarms.php";
+	$page["menu.url"] = "tr_status.php";
+
 	show_header($page["title"],0,0);
 ?>
 
@@ -35,7 +37,7 @@
 ?>
 
 <?php
-	get_request("limit","NO");
+	$_REQUEST["limit"] = get_request("limit","NO");
 	if(is_numeric($_REQUEST["limit"]))
 		$_REQUEST["limit"] = 100;
 
