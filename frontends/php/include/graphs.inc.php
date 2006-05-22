@@ -215,8 +215,12 @@
 		$host = get_host_by_itemid($itemid);
 		if($gitemid && $host["status"]==HOST_STATUS_TEMPLATE)
 		{// add to child graphs
-			$gitems = get_graphitems_by_graphid($graphid);
-			if(DBfetch($gitems))
+			$item_num = DBfetch(DBselect(
+				'select count(*) as num from graphs_items where graphid='.$graphid.
+	                        ' order by itemid,drawtype,sortorder,color,yaxisside'
+			));
+
+			if($item_num['num'] == 1)
 			{// create graphs for childs with item
 				$chd_hosts = get_hosts_by_templateid($host["hostid"]);
 				while($chd_host = DBfetch($chd_hosts))
@@ -253,7 +257,7 @@
 				$childs = get_graphs_by_templateid($graphid);
 				while($child = DBfetch($childs))
 				{
-					$chd_hosts = get_hosts_by_graphid($child["graphid"]);
+			!		$chd_hosts = get_hosts_by_graphid($child["graphid"]);
 					$chd_host = DBfetch($chd_hosts);
 					$db_items = DBselect("select itemid from items".
 						" where key_=".zbx_dbstr($item["key_"]).

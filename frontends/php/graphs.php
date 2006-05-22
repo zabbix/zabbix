@@ -32,7 +32,7 @@
 		"groupid"=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	NULL),
 		"hostid"=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,	NULL),
 
-		"graphid"=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,	'{form}=="update"'),
+		"graphid"=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			'{form}=="update"'),
 		"name"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,		'isset({save})'),
 		"width"=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
 		"height"=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
@@ -147,7 +147,7 @@
 	// Check if at least one host with read permission exists for this group
 			$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg".
 				" where h.hostid=i.hostid and hg.groupid=".$row["groupid"].
-				" and hg.hostid=h.hostid and h.status not in (".HOST_STATUS_DELETED.")".
+				" and hg.hostid=h.hostid and h.status=".HOST_STATUS_MONITORED.
 				" group by h.hostid,h.host order by h.host");
 			while($row2=DBfetch($result2))
 			{
@@ -169,13 +169,13 @@
 		{
 			$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg".
 				" where h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"].
-				" and hg.hostid=h.hostid"." and h.status not in (".HOST_STATUS_DELETED.")".
+				" and hg.hostid=h.hostid"." and h.status=".HOST_STATUS_MONITORED.
 				" group by h.hostid,h.host order by h.host";
 		}
 		else
 		{
 			$sql="select h.hostid,h.host from hosts h,items i where h.hostid=i.hostid".
-				" and h.status not in (".HOST_STATUS_DELETED.") group by h.hostid,h.host".
+				" and h.status=".HOST_STATUS_MONITORED." group by h.hostid,h.host".
 				" order by h.host";
 		}
 
