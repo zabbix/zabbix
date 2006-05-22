@@ -1,5 +1,6 @@
 1.1beta10:
 
+ - integrate Marty's patch for HP-UX CPU stats
  - do not show all hosts in Latest
  - http://www.zabbix.com/forum/showthread.php?t=2855
  - frontend bug: http://www.zabbix.com/forum/showthread.php?t=2847
