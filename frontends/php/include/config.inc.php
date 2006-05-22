@@ -1020,7 +1020,10 @@ COpt::profiling_start("page");
 		{
 			global $page;
 			$class = "horizontal_menu";
-			$url	= $page["file"];
+			if(isset($page["menu.url"]))
+				$url = $page["menu.url"];
+			else
+				$url	= $page["file"];
 		}
 		else
 		{

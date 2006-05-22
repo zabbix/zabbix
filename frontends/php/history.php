@@ -20,6 +20,7 @@
 ?>
 <?php
 	$page["file"]="history.php";
+	$page["menu.url"]="latest.php";
 
 	include "include/config.inc.php";
 	include "include/forms.inc.php";

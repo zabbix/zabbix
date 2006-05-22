@@ -21,6 +21,7 @@
 <?php
 	$page["title"]="S_ACKNOWLEDGES";
 	$page["file"]="acknow.php";
+	$page["menu.url"] = "tr_status.php";
 
 	include "include/config.inc.php";
 	include "include/forms.inc.php";
