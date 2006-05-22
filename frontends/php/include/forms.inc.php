@@ -63,10 +63,7 @@
 			$user=get_user_by_userid($userid);
 			$frm_title = S_USER." \"".$user["alias"]."\"";
 		}
-// TMP!!!
-//    isset($_REQUEST["register"]) mus be deleted
-//    needed rewrite permisions to delete id
-// TMP!!!
+
 		if(isset($userid) && (!isset($_REQUEST["form_refresh"]) || isset($_REQUEST["register"])))
 		{
 			$alias		= $user["alias"];

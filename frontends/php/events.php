@@ -37,7 +37,7 @@
 
 	check_fields($fields);
 
-	validate_group_with_host("R", array("allow_all_hosts","monitored_hosts","with_items"));
+	validate_group_with_host("R", array("allow_all_hosts","always_select_first_host","monitored_hosts","with_items"));
 
 	update_profile("web.menu.view.last",$page["file"]);
 ?>
