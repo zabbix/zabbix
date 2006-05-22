@@ -1,5 +1,6 @@
 Changes for 1.1beta11:
 
+ - fixed graph duplication (Eugene)
  - fixed oracle SQL request creating (Eugene)
  - fixed first host selection from list of accessed hosts (Eugene)
  - fixed evaluation of action's conditions (Alexei)

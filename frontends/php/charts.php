@@ -170,13 +170,17 @@
 	}
 	elseif ($_REQUEST["groupid"] > 0)
 	{
-		$sql = "select distinct g.graphid,g.name from graphs g,graphs_items gi,items i,hosts_groups hg".
-			" where i.itemid=gi.itemid and g.graphid=gi.graphid and i.hostid=gh.hostid and gh.groupid=".$_REQUEST["groupid"].
+		$sql = "select distinct g.graphid,g.name from graphs g,graphs_items gi,items i,hosts_groups hg,hosts h".
+			" where i.itemid=gi.itemid and g.graphid=gi.graphid and i.hostid=hg.hostid and hg.groupid=".$_REQUEST["groupid"].
+			" and i.hostid=h.hostid and h.status=".HOST_STATUS_MONITORED.
 			" order by g.name";
 	}
 	else
 	{
-		$sql = "select distinct g.graphid,g.name from graphs g";
+		$sql = "select distinct g.graphid,g.name from graphs g,graphs_items gi,items i,hosts h".
+			" where i.itemid=gi.itemid and g.graphid=gi.graphid ".
+			" and i.hostid=h.hostid and h.status=".HOST_STATUS_MONITORED.
+			" order by g.name";
 	}
 
 	$result=DBselect($sql);
