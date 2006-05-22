@@ -41,8 +41,8 @@
 <?php
 	if(isset($_REQUEST["reconnect"]) && isset($_COOKIE["sessionid"]))
 	{
-		DBexecute("delete from sessions where sessionid=".zbx_dbstr($sessionid));
-		setcookie("sessionid",$sessionid,time()-3600);
+		DBexecute("delete from sessions where sessionid=".zbx_dbstr($_COOKIE["sessionid"]));
+		setcookie("sessionid",$_COOKIE["sessionid"],time()-3600);
 		unset($_COOKIE["sessionid"]);
 	}
 

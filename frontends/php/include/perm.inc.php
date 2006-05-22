@@ -57,9 +57,6 @@ define("GROUP_RIGHT",		0);
 				exit;
 			}
 		} else {
-			setcookie("sessionid",$sessionid,time()-3600);
-			unset($sessionid);
-			unset($_COOKIE["sessionid"]);
 			$USER_DETAILS = DBfetch(DBselect("select u.* from users u where u.alias='guest'"));
 		}
 
