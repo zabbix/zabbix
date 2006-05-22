@@ -1018,7 +1018,6 @@ LOG_DEBUG_INFO("s","End of H_SystemUname()");
 //
 // Parameters and handlers
 //
-const int pingResult = 1;
 
 static AGENT_COMMAND commands[]=
 {  /* name							handler_float		handler_string		arg */
@@ -1072,7 +1071,7 @@ static AGENT_COMMAND commands[]=
 	{ "vm.memory.size[*]",			H_MemorySize,		NULL,				NULL },
 
 //	{ "ping",						H_NumericConstant,	NULL,				(char *)1 },
-	{ "agent.ping",					H_NumericConstant,	NULL,				(char *)&pingResult },
+	{ "agent.ping",					H_NumericConstant,	NULL,				(char *)1 },
 
 //	{ "proc_cnt[*]",				H_ProcCountSpecific,NULL,				NULL },
 //	{ "system[proccount]",			H_ProcCount,		NULL,				NULL },
