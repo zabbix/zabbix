@@ -33,31 +33,36 @@ define("GROUP_RIGHT",		0);
 		global	$_COOKIE;
 		global	$_REQUEST;
 
-		$USER_DETAILS = array("alias"=>"- unknown -","userid"=>0);
+		$USER_DETAILS = NULL;
 		$USER_RIGHTS = array();
 
-		if(isset($_COOKIE["sessionid"]))	$sessionid = $_COOKIE["sessionid"];
-		else					unset($sessionid);
-
-		if(isset($sessionid))
+		if(isset($_COOKIE["sessionid"]))
 		{
-			$sql = "select u.* from sessions s,users u".
+			$sessionid = $_COOKIE["sessionid"];
+			$USER_DETAILS = DBfetch(DBselect("select u.*,s.* from sessions s,users u".
 				" where s.sessionid=".zbx_dbstr($sessionid)." and s.userid=u.userid".
-				" and ((s.lastaccess+u.autologout>".time().") or (u.autologout=0))";
+				" and ((s.lastaccess+u.autologout>".time().") or (u.autologout=0))"));
+
+			if(!$USER_DETAILS)
+			{
+				$USER_DETAILS = array("alias"=>"- unknown -","userid"=>0);
+
+				setcookie("sessionid",$sessionid,time()-3600);
+				unset($_COOKIE["sessionid"]);
+				unset($sessionid);
+
+				show_header("Login",0,0,1);
+				show_error_message("Session was ended, please relogin!");
+				show_page_footer();
+				exit;
+			}
 		} else {
-			$sql = "select u.* from users u where u.alias='guest'";
-		}
-
-                $db_users = DBselect($sql);
-		$USER_DETAILS = DBfetch($db_users);
-		if(!$USER_DETAILS)
-		{
+			setcookie("sessionid",$sessionid,time()-3600);
 			unset($sessionid);
-			unset($_COOKIE["sessionid"]);	
-
-			$db_users = DBselect("select u.* from users u where u.alias='guest'");
-			$USER_DETAILS = DBfetch($db_users);
+			unset($_COOKIE["sessionid"]);
+			$USER_DETAILS = DBfetch(DBselect("select u.* from users u where u.alias='guest'"));
 		}
+
 		if($USER_DETAILS)
 		{
 			if(isset($sessionid))
@@ -79,13 +84,11 @@ define("GROUP_RIGHT",		0);
 
 				array_push($USER_RIGHTS,$usr_right);
 			}
-
 			return;
 		}
 		else
 		{
-			echo 'guest user can\'t be found';
-			exit;
+			$USER_DETAILS = array("alias"=>"- unknown -","userid"=>0);
 		}
 
 // Incorrect login
@@ -96,7 +99,6 @@ define("GROUP_RIGHT",		0);
 			unset($_COOKIE["sessionid"]);
 		}
 
-		//TODO make a javascript function for redirection!!!
 		if($page["file"]!="index.php")
 		{
 			echo "<meta http-equiv=\"refresh\" content=\"0; url=index.php\">";
@@ -107,7 +109,6 @@ define("GROUP_RIGHT",		0);
 		insert_login_form();
 		show_page_footer();
 		
-		//Redirect("index.php"); //TODO make a javascript function for redirection!!!
 		//END TODO
 		exit;
 	}
