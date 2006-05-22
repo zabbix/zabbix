@@ -1,5 +1,6 @@
 Changes for 1.1beta11:
 
+ - fixed agent.ping in Windows agent (Alexei)
  - cleaned SQL statements to have mod() instead of % (Alexei)
  - fixed displaying of graphs for periods more than 24h (Alexei)
  - modified oracle schema to initialise sequences with 20000 (Alexei)
