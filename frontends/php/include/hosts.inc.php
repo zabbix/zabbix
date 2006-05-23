@@ -443,10 +443,10 @@
 			if($groupid > 0)
 			{
 				// Check if at least one host with read permission exists for this group
-				$sql = "select h.hostid,h.host from hosts h,hosts_groups hg".$item_table.
+				$sql = "select distinct h.hostid,h.host from hosts h,hosts_groups hg".$item_table.
 					" where hg.groupid=".$groupid." and hg.hostid=h.hostid and".
 					" h.status<>".HOST_STATUS_DELETED.$with_host_status.$with_items.
-					" group by h.hostid order by h.host";
+					" order by h.host";
 
 				$db_hosts = DBselect($sql);
 				while($db_host = DBfetch($db_hosts))
