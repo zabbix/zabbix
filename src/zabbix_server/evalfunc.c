@@ -79,9 +79,9 @@ static int evaluate_LOGSOURCE(char *value, DB_ITEM *item, char *parameter)
 
 	now=time(NULL);
 
-	snprintf(sql,sizeof(sql)-1,"select source from history_log where itemid=%d order by clock desc limit 1",item->itemid);
+	snprintf(sql,sizeof(sql)-1,"select source from history_log where itemid=%d order by clock desc",item->itemid);
 
-	result = DBselect(sql);
+	result = DBselectN(sql,1);
 	row = DBfetch(result);
 
 	if(!row || DBis_null(row[0])==SUCCEED)
@@ -138,9 +138,9 @@ static int evaluate_LOGSEVERITY(char *value, DB_ITEM *item, char *parameter)
 
 	now=time(NULL);
 
-	snprintf(sql,sizeof(sql)-1,"select severity from history_log where itemid=%d order by clock desc limit 1",item->itemid);
+	snprintf(sql,sizeof(sql)-1,"select severity from history_log where itemid=%d order by clock desc",item->itemid);
 
-	result = DBselect(sql);
+	result = DBselectN(sql,1);
 	row = DBfetch(result);
 	if(!row || DBis_null(row[0])==SUCCEED)
 	{
@@ -287,8 +287,8 @@ static int evaluate_SUM(char *value, DB_ITEM *item, int parameter, int flag)
 		{
 			strscpy(table,"history");
 		}
-		snprintf(sql,sizeof(sql)-1,"select value from %s where itemid=%d order by clock desc limit %d",table,item->itemid, parameter);
-		result = DBselect(sql);
+		snprintf(sql,sizeof(sql)-1,"select value from %s where itemid=%d order by clock desc",table,item->itemid);
+		result = DBselectN(sql, parameter);
 		row = DBfetch(result);
 		if(!row || DBis_null(row[0])==SUCCEED)
 		{
@@ -380,8 +380,8 @@ static int evaluate_AVG(char *value,DB_ITEM	*item,int parameter,int flag)
 	}
 	else if(flag == ZBX_FLAG_VALUES)
 	{
-		snprintf(sql,sizeof(sql)-1,"select value from history where itemid=%d order by clock desc limit %d",item->itemid, parameter);
-		result = DBselect(sql);
+		snprintf(sql,sizeof(sql)-1,"select value from history where itemid=%d order by clock desc",item->itemid);
+		result = DBselectN(sql, parameter);
 		rows=0;
 		while((row=DBfetch(result)))
 		{
@@ -484,8 +484,8 @@ static int evaluate_MIN(char *value,DB_ITEM	*item,int parameter, int flag)
 		{
 			strscpy(table,"history");
 		}
-		snprintf(sql,sizeof(sql)-1,"select value from %s where itemid=%d order by clock desc limit %d",table,item->itemid, parameter);
-		result = DBselect(sql);
+		snprintf(sql,sizeof(sql)-1,"select value from %s where itemid=%d order by clock desc",table,item->itemid);
+		result = DBselectN(sql,parameter);
 
 		rows=0;
 		while((row=DBfetch(result)))
@@ -620,8 +620,8 @@ zabbix_log(LOG_LEVEL_DEBUG, "del_zeroes" );
 		{
 			strscpy(table,"history");
 		}
-		snprintf(sql,sizeof(sql)-1,"select value from %s where itemid=%d order by clock desc limit %d",table,item->itemid, parameter);
-		result = DBselect(sql);
+		snprintf(sql,sizeof(sql)-1,"select value from %s where itemid=%d order by clock desc",table,item->itemid);
+		result = DBselectN(sql,parameter);
 		rows=0;
 		while((row=DBfetch(result)))
 		{
@@ -730,8 +730,8 @@ static int evaluate_DELTA(char *value,DB_ITEM *item,int parameter, int flag)
 	}
 	else if(flag == ZBX_FLAG_VALUES)
 	{
-		snprintf(sql,sizeof(sql)-1,"select value from history where itemid=%d order by clock desc limit %d",item->itemid, parameter);
-		result = DBselect(sql);
+		snprintf(sql,sizeof(sql)-1,"select value from history where itemid=%d order by clock desc",item->itemid);
+		result = DBselectN(sql,parameter);
 		rows=0;
 		while((row=DBfetch(result)))
 		{
