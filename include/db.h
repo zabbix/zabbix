@@ -311,7 +311,7 @@ void    DBclose(void);
 void    DBvacuum(void);
 
 int	DBexecute( char *query );
-long	DBaffected_rows();
+/*long	DBaffected_rows();*/
 
 DB_RESULT	DBselect(char *query);
 DB_RESULT	DBselectN(char *query, int n);

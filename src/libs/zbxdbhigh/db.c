@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -109,7 +109,7 @@ void    DBconnect(void)
 		exit(FAIL);
 	}
 			        /* login */
-	snprintf(connect,MAX_STRING_LEN-1,"%s/%s/@%s", CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME);
+	snprintf(connect,MAX_STRING_LEN-1,"%s/%s@%s", CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME);
 	if (SQLO_SUCCESS != sqlo_connect(&oracle, connect))
 	{
 		printf("Cannot login with %s\n", connect);
@@ -131,26 +131,18 @@ int	DBexecute(char *query)
 /*	if(strstr(query, "17828") != NULL)*/
 	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s",query);
 
-	while( mysql_query(&mysql,query) != 0)
+	if(mysql_query(&mysql,query) != 0)
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s [%d]", mysql_error(&mysql), mysql_errno(&mysql) );
-
-		if( (ER_SERVER_SHUTDOWN   != mysql_errno(&mysql)) && 
-            (CR_SERVER_GONE_ERROR != mysql_errno(&mysql)) &&
-            (CR_CONNECTION_ERROR  != mysql_errno(&mysql)))
-		{
-			return FAIL;
-		}
-
-        DBclose();
-        DBconnect();
+		return FAIL;
 	}
+	return (long)mysql_affected_rows(&mysql);
 #endif
 #ifdef	HAVE_PGSQL
 	PGresult	*result;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s",query);
+	aabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s",query);
 	result = PQexec(conn,query);
 
 	if( result==NULL)
@@ -170,18 +162,18 @@ int	DBexecute(char *query)
 	PQclear(result);
 #endif
 #ifdef	HAVE_ORACLE
+	int ret;
 	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s",query);
-	if ( sqlo_exec(oracle, query)<0 )
+	if ( (ret = sqlo_exec(oracle, query))<0 )
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", sqlo_geterror(oracle) );
 		fprintf(stderr, "Query::%s\n",query);
 		fprintf(stderr, "Query failed:%s\n", sqlo_geterror(oracle) );
-		return FAIL;
+		ret = FAIL;
 	}
+	return ret;
 #endif
-/*	zabbix_set_log_level(LOG_LEVEL_WARNING);*/
-	return	SUCCEED;
 }
 
 int	DBis_null(char *field)
@@ -231,22 +223,13 @@ DB_RESULT DBselect(char *query)
 #ifdef	HAVE_MYSQL
 	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s",query);
 
-	while(mysql_query(&mysql,query) != 0)
+	if(mysql_query(&mysql,query) != 0)
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s [%d]", mysql_error(&mysql), mysql_errno(&mysql) );
 
-		if( (ER_SERVER_SHUTDOWN   != mysql_errno(&mysql)) && 
-		    (CR_SERVER_GONE_ERROR != mysql_errno(&mysql)) &&
-		    (CR_CONNECTION_ERROR  != mysql_errno(&mysql)))
-		{
-			exit(FAIL);
-		}
-
-        DBclose();
-        DBconnect();
+		exit(FAIL);
 	}
-
 	return	mysql_store_result(&mysql);
 #endif
 #ifdef	HAVE_PGSQL
@@ -352,10 +335,10 @@ int	DBinsert_id()
 /*
  * Returs number of affected rows of last select, update, delete or replace
  */
+/*
 long    DBaffected_rows()
 {
 #ifdef  HAVE_MYSQL
-	/* It actually returns my_ulonglong */
 	return (long)mysql_affected_rows(&mysql);
 #endif
 #ifdef  HAVE_PGSQL
@@ -364,7 +347,7 @@ long    DBaffected_rows()
 #ifdef	HAVE_ORACLE
 	return FAIL;
 #endif
-}
+}*/
 
 
 /*
@@ -897,6 +880,7 @@ void DBdelete_sysmaps_hosts_by_hostid(int hostid)
 	DBexecute(sql);
 }
 
+/*
 int DBdelete_history_pertial(int itemid)
 {
 	char	sql[MAX_STRING_LEN];
@@ -910,6 +894,7 @@ int DBdelete_history_pertial(int itemid)
 
 	return DBaffected_rows();
 }
+*/
 
 void DBupdate_triggers_status_after_restart(void)
 {
