@@ -4,7 +4,6 @@
  - http://www.zabbix.com/forum/showthread.php?t=2855
  - frontend bug: http://www.zabbix.com/forum/showthread.php?t=2847
  - retest delay between messages: http://www.zabbix.com/forum/showthread.php?t=2824
- - fix displaying of "unixtime" and other units in Overview
  - ./configure to detect Oracle and libora8 libs
  - make grid 0,20,40,60,80,100 in graphs
  - support of PostgreSQL
@@ -12,7 +11,6 @@
  - http://www.zabbix.com/forum/showthread.php?t=2736
  - does ZABBIX maintain Host availability of monitored by SNMP
  - when unlinking a host from template, add option (Unlink&Delete, Unlink Only)
- - Overview screen, item macros are not substituted: Free disk space on $1
  - add optimisation flags -O2 to configure
  - remember snmp community on per host level
  - net.if.stat collected as double, must be as uint64
