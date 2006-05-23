@@ -75,9 +75,9 @@
 		$db_groups = DBselect("select groupid,name from groups order by name");
 		while($group = DBfetch($db_groups))
 		{ // Check if at least one host with read permission exists for this group
-			$db_hosts = DBselect("select distinct h.hostid from hosts h,items i,hosts_groups hg".
+			$db_hosts = DBselect("select distinct h.hostid,h.host from hosts h,items i,hosts_groups hg".
 				" where h.hostid=i.hostid and hg.groupid=".$group["groupid"]." and hg.hostid=h.hostid".
-				" and h.status not in (".HOST_STATUS_DELETED.")group by h.hostid,h.host order by h.host");
+				" and h.status not in (".HOST_STATUS_DELETED.") order by h.host");
 			while($host = DBfetch($db_hosts))
 			{
 				if(!check_right("Host","R",$host["hostid"]))	continue;
