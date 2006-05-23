@@ -1,5 +1,6 @@
 Changes for 1.1beta11:
 
+ - fixed image storing for oracle (Eugene)
  - eliminated function DBaffected_rows() (Alexei)
  - new function DBselectN() to select N records only. (Alexei)
  - fixed graph duplication (Eugene)

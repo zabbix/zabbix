@@ -51,8 +51,9 @@
 		$th_height = get_request("height",0);
 	}
 
-	$result=DBselect("select image from images where imageid=".$_REQUEST["imageid"]);
-	$row=DBfetch($result);
+	//$result=DBselect("select image from images where imageid=".$_REQUEST["imageid"]);
+	//$row=DBfetch($result);
+	$row = get_image_by_imageid($_REQUEST["imageid"]);
 
 	if($row["image"] == "") exit;
 
