@@ -1279,7 +1279,7 @@ CREATE TABLE applications (
 
 CREATE INDEX applications_hostid on applications (hostid);
 CREATE INDEX applications_templateid on applications (templateid);
-CREATE UNIQUE INDEX applications_name on applications (name);
+CREATE UNIQUE INDEX applications_hostidname on applications (hostid,name);
 
 create sequence applications_applicationid 
 start with 20000 

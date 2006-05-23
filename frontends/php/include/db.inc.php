@@ -22,14 +22,14 @@
 
 // DATABASE CONFIGURATION
 
-//	$DB_TYPE	="ORACLE";
+	$DB_TYPE	="ORACLE";
 //	$DB_TYPE	="POSTGRESQL";
-	$DB_TYPE	="MYSQL";
+//	$DB_TYPE	="MYSQL";
 	$DB_SERVER	="localhost";
 //	$DB_DATABASE	="zabbix";
-	$DB_DATABASE	="osmiy";
-	$DB_USER	="root";
-	$DB_PASSWORD	="";
+	$DB_DATABASE	="ZABBIX";
+	$DB_USER	="scott";
+	$DB_PASSWORD	="tiger";
 // END OF DATABASE CONFIGURATION
 
 //	$USER_DETAILS	="";
@@ -58,6 +58,7 @@
 	if($DB_TYPE == "ORACLE")
 	{
 		$DB = ocilogon($DB_USER, $DB_PASSWORD, "");
+//		$DB = ocilogon($DB_USER, $DB_PASSWORD, "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=$DB_SERVER)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=$DB_DATABASE)))");
 		if(!$DB)
 		{
 			echo "Error connecting to database";
