@@ -284,6 +284,27 @@ DB_RESULT DBselect(char *query)
 }
 
 /*
+ * Execute SQL statement. For select statements only.
+ * If fails, program terminates.
+ */ 
+DB_RESULT DBselectN(char *query, int n)
+{
+	char sql[MAX_STRING_LEN];
+#ifdef	HAVE_MYSQL
+	snprintf(sql,MAX_STRING_LEN-1,"%s limit %d", query, n);
+	return DBselect(query);
+#endif
+#ifdef	HAVE_PGSQL
+	snprintf(sql,MAX_STRING_LEN-1,"%s limit %d", query, n);
+	return DBselect(query);
+#endif
+#ifdef	HAVE_ORACLE
+	snprintf(sql,MAX_STRING_LEN-1,"select * from (%s) where rownum<=%d", query, n);
+	return DBselect(query);
+#endif
+}
+
+/*
  * Get value for given row and field. Must be called after DBselect.
  */ 
 /*
@@ -520,9 +541,9 @@ static int	latest_alarm(int triggerid, int status)
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In latest_alarm()");
 
-	snprintf(sql,sizeof(sql)-1,"select value from alarms where triggerid=%d order by clock desc limit 1",triggerid);
+	snprintf(sql,sizeof(sql)-1,"select value from alarms where triggerid=%d order by clock desc",triggerid);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
-	result = DBselect(sql);
+	result = DBselectN(sql,1);
 	row = DBfetch(result);
 
 	if(!row || DBis_null(row[0])==SUCCEED)
