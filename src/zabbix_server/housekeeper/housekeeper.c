@@ -95,9 +95,7 @@ static int housekeeping_process_log()
 #else
 		snprintf(sql,sizeof(sql)-1,"delete from %s where %s=%d limit 500",housekeeper.tablename, housekeeper.field,housekeeper.value);
 #endif
-		DBexecute(sql);
-
-		if(( deleted = DBaffected_rows()) == 0)
+		if(( deleted = DBexecute(sql)) == 0)
 		{
 			snprintf(sql,sizeof(sql)-1,"delete from housekeeper where housekeeperid=%d",housekeeper.housekeeperid);
 			DBexecute(sql);
@@ -120,9 +118,8 @@ static int housekeeping_sessions(int now)
 	zabbix_log( LOG_LEVEL_DEBUG, "In housekeeping_sessions(%d)", now);
 
 	snprintf(sql,sizeof(sql)-1,"delete from sessions where lastaccess<%d",now-24*3600);
-	DBexecute(sql);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Deleted [%ld] records from table [sessions]", DBaffected_rows());
+	zabbix_log( LOG_LEVEL_DEBUG, "Deleted [%ld] records from table [sessions]", DBexecute(sql));
 
 	return SUCCEED;
 }
@@ -152,8 +149,7 @@ static int housekeeping_alerts(int now)
 		alert_history=atoi(row[0]);
 
 		snprintf(sql,sizeof(sql)-1,"delete from alerts where clock<%d",now-24*3600*alert_history);
-		DBexecute(sql);
-		zabbix_log( LOG_LEVEL_DEBUG, "Deleted [%ld] records from table [alerts]", DBaffected_rows());
+		zabbix_log( LOG_LEVEL_DEBUG, "Deleted [%ld] records from table [alerts]", DBexecute(sql));
 	}
 
 	DBfree_result(result);
@@ -196,11 +192,10 @@ static int housekeeping_alarms(int now)
 			DBexecute(sql);
 			
 			snprintf(sql,sizeof(sql)-1,"delete from alarms where alarmid=%d",alarmid);
-			DBexecute(sql);
+			zabbix_log( LOG_LEVEL_DEBUG, "Deleted [%ld] records from table [alarms]", DBexecute(sql));
 		}
 		DBfree_result(result2);
 
-		zabbix_log( LOG_LEVEL_DEBUG, "Deleted [%ld] records from table [alarms]", DBaffected_rows());
 	}
 	
 	DBfree_result(result);

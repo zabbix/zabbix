@@ -1,5 +1,6 @@
 Changes for 1.1beta11:
 
+ - eliminated function DBaffected_rows() (Alexei)
  - new function DBselectN() to select N records only. (Alexei)
  - fixed graph duplication (Eugene)
  - fixed oracle SQL request creating (Eugene)
