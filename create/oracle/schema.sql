@@ -1013,7 +1013,7 @@ CREATE TABLE images (
 	imageid		number(10)	NOT NULL,
 	imagetype	number(10)	DEFAULT '0' NOT NULL,
 	name		varchar2(64)	DEFAULT '0' NOT NULL,
-	image		varchar2(2048)	DEFAULT NULL,
+	image		BLOB,
 	CONSTRAINT 	images PRIMARY KEY (imageid)
 );
 

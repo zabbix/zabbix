@@ -238,13 +238,9 @@
 		else
 			$icon = $element["icon"];
 
-		$images = DBselect("select image from images where imagetype=1 and name=".zbx_dbstr($icon));
-		if(!$images)	return FALSE;
-
-		$image = DBfetch($images);
+		$image = get_image_by_name($icon);
 		if(!$image)	return FALSE;
-
-		return imagecreatefromstring($image["image"]);
+		return imagecreatefromstring($image['image']);
 	}
 
 	function	get_info_by_selementid($selementid, &$out_info, &$out_color)

@@ -1438,7 +1438,7 @@
 
 		if(isset($_REQUEST["imageid"]))
 		{
-			$result=DBselect("select imageid,imagetype,name,image from images".
+			$result=DBselect("select imageid,imagetype,name from images".
 				" where imageid=".$_REQUEST["imageid"]);
 
 			$row=DBfetch($result);
