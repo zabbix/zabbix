@@ -541,7 +541,7 @@
 		}
 
 COpt::profiling_start('prepare data');
-		$result = DBselect('select distinct h.hostid, h.host,i.itemid, i.value_type, i.lastvalue, i.units, i.description'.
+		$result = DBselect('select distinct h.hostid, h.host,i.itemid, i.key_, i.value_type, i.lastvalue, i.units, i.description'.
 			' from hosts h,items i '.$group_where.
 			' h.status='.HOST_STATUS_MONITORED.' and h.hostid=i.hostid and i.status='.ITEM_STATUS_ACTIVE.
 			' order by i.description');
@@ -568,7 +568,7 @@ COpt::profiling_start('prepare data');
 			if($access == 0) continue;
 
 			$hosts[$row['host']] = $row['host'];
-			$items[$row['description']][$row['host']] = array(
+			$items[item_description($row["description"],$row["key_"])][$row['host']] = array(
 				'itemid'	=> $row['itemid'],
 				'value_type'	=> $row['value_type'],
 				'lastvalue'	=> $row['lastvalue'],
