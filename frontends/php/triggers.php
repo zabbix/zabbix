@@ -205,9 +205,9 @@
 		while($row=DBfetch($result))
 		{
 	// Check if at least one host with read permission exists for this group
-			$result2=DBselect("select h.hostid,h.host from hosts h,hosts_groups hg,items i".
+			$result2=DBselect("select distinct h.hostid,h.host from hosts h,hosts_groups hg,items i".
 				" where hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid and i.hostid=h.hostid".
-				" and h.status<>".HOST_STATUS_DELETED." group by h.hostid,h.host order by h.host");
+				" and h.status<>".HOST_STATUS_DELETED." order by h.host");
 			while($row2=DBfetch($result2))
 			{
 				if(!check_right("Host","U",$row2["hostid"]))	continue;
@@ -220,9 +220,9 @@
 
 		if(isset($_REQUEST["groupid"]) && $_REQUEST["groupid"]>0)
 		{
-			$sql="select h.hostid,h.host from hosts h,hosts_groups hg,items i".
+			$sql="select distinct h.hostid,h.host from hosts h,hosts_groups hg,items i".
 				" where hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid and i.hostid=h.hostid".
-				" and h.status<>".HOST_STATUS_DELETED." group by h.hostid,h.host order by h.host";
+				" and h.status<>".HOST_STATUS_DELETED." order by h.host";
 		}
 		else
 		{

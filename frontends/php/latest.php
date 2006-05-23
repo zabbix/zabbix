@@ -102,10 +102,10 @@
 	while($row=DBfetch($result))
 	{
 // Check if at least one host with read permission exists for this group
-		$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg".
+		$result2=DBselect("select distinct h.hostid,h.host from hosts h,items i,hosts_groups hg".
 			" where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid".
 			" and i.status=".ITEM_STATUS_ACTIVE." and hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid".
-			" group by h.hostid,h.host order by h.host");
+			" order by h.host");
 		while($row2=DBfetch($result2))
 		{
 			if(!check_right("Host","R",$row2["hostid"]))
