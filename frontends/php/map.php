@@ -83,13 +83,10 @@
 	$x=imagesx($im); 
 	$y=imagesy($im);
   
-#	ImageFilledRectangle($im,0,0,$width,$height,$black);
+	ImageFilledRectangle($im,0,0,$width,$height,$white);
 	if($background!="")
 	{
-		$db_images = DBselect("select image from images".
-			" where imagetype=2 and name=".zbx_dbstr($background));
-
-		$db_image = DBfetch($db_images);
+		$db_image = get_image_by_name($background, 2);
 		if($db_image)
 		{
 			$back = ImageCreateFromString($db_image["image"]);
@@ -97,14 +94,12 @@
 		}
 		else
 		{
-			ImageFilledRectangle($im,0,0,$width,$height,$white);
 			$x=imagesx($im)/2-ImageFontWidth(4)*strlen($name)/2;
 			ImageString($im, 4,$x,1, $name , $darkred);
 		}
 	}
 	else
 	{
-		ImageFilledRectangle($im,0,0,$width,$height,$white);
 		$x=imagesx($im)/2-ImageFontWidth(4)*strlen($name)/2;
 		ImageString($im, 4,$x,1, $name , $colors["Dark Red"]);
 	}

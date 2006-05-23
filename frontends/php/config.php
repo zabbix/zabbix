@@ -432,7 +432,7 @@
 			$table=new CTableInfo(S_NO_IMAGES_DEFINED);
 			$table->setHeader(array(S_ID,S_NAME,S_TYPE,S_IMAGE));
 	
-			$result=DBselect("select imageid,imagetype,name,image from images order by name");
+			$result=DBselect("select imageid,imagetype,name from images order by name");
 			while($row=DBfetch($result))
 			{
 				if($row["imagetype"]==1)	$imagetype=S_ICON;
