@@ -1,5 +1,6 @@
 Changes for 1.1beta11:
 
+ - fixed PostgreSQL schema (Alexei)
  - fixed items grouping of Data overview screen (Eugene)
  - fixed image storing for oracle (Eugene)
  - eliminated function DBaffected_rows() (Alexei)
