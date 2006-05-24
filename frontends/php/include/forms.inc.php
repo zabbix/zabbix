@@ -1374,10 +1374,11 @@
 		$smtp_helo	= get_request("smtp_helo","localhost");
 		$smtp_email	= get_request("smtp_email","zabbix@localhost");
 		$exec_path	= get_request("exec_path","");
+		$gsm_modem	= get_request("gsm_modem","/dev/ttyS0");
 
 		if(isset($_REQUEST["mediatypeid"]) && !isset($_REQUEST["form_refresh"]))
 		{
-			$result=DBselect("select mediatypeid,type,description,smtp_server,smtp_helo,smtp_email,exec_path from media_type where mediatypeid=".$_REQUEST["mediatypeid"]);
+			$result=DBselect("select mediatypeid,type,description,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem from media_type where mediatypeid=".$_REQUEST["mediatypeid"]);
 			$row=DBfetch($result);
 			$mediatypeid=$row["mediatypeid"];
 			$type=@iif(isset($_REQUEST["type"]),$_REQUEST["type"],$row["type"]);
@@ -1386,6 +1387,7 @@
 			$smtp_helo=$row["smtp_helo"];
 			$smtp_email=$row["smtp_email"];
 			$exec_path=$row["exec_path"];
+			$gsm_modem=$row["gsm_modem"];
 		}
 
 		$frmMeadia = new CFormTable(S_MEDIA,"config.php");
@@ -1399,18 +1401,28 @@
 
 		$frmMeadia->AddRow(S_DESCRIPTION,new CTextBox("description",$description,30));
 		$cmbType = new CComboBox("type",$type,"submit()");
-		$cmbType->AddItem(0,S_EMAIL);
-		$cmbType->AddItem(1,S_SCRIPT);
+		$cmbType->AddItem(ALERT_TYPE_EMAIL,S_EMAIL);
+		$cmbType->AddItem(ALERT_TYPE_EXEC,S_SCRIPT);
+		$cmbType->AddItem(ALERT_TYPE_SMS,S_SMS);
 		$frmMeadia->AddRow(S_TYPE,$cmbType);
 
-		if($type==0)
+		if($type==ALERT_TYPE_EMAIL)
 		{
 			$frmMeadia->AddVar("exec_path",$exec_path);
+			$frmMeadia->AddVar("gsm_modem",$gsm_modem);
 			$frmMeadia->AddRow(S_SMTP_SERVER,new CTextBox("smtp_server",$smtp_server,30));
 			$frmMeadia->AddRow(S_SMTP_HELO,new CTextBox("smtp_helo",$smtp_helo,30));
 			$frmMeadia->AddRow(S_SMTP_EMAIL,new CTextBox("smtp_email",$smtp_email,30));
-		}elseif($type==1)
+		}elseif($type==ALERT_TYPE_SMS)
 		{
+			$frmMeadia->AddVar("exec_path",$exec_path);
+			$frmMeadia->AddVar("smtp_server",$smtp_server);
+			$frmMeadia->AddVar("smtp_helo",$smtp_helo);
+			$frmMeadia->AddVar("smtp_email",$smtp_email);
+			$frmMeadia->AddRow(S_GSM_MODEM,new CTextBox("gsm_modem",$gsm_modem,50));
+		}elseif($type==ALERT_TYPE_EXEC)
+		{
+			$frmMeadia->AddVar("gsm_modem",$gsm_modem);
 			$frmMeadia->AddVar("smtp_server",$smtp_server);
 			$frmMeadia->AddVar("smtp_helo",$smtp_helo);
 			$frmMeadia->AddVar("smtp_email",$smtp_email);
