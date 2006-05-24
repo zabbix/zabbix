@@ -381,7 +381,7 @@ CREATE TABLE items (
 -- Table structure for table 'media'
 --
 
-CREATE TABLE media 
+CREATE TABLE media (
 	mediaid		int(4) NOT NULL auto_increment,
 	userid		int(4) DEFAULT '0' NOT NULL,
 --	type		varchar(10) DEFAULT '' NOT NULL,

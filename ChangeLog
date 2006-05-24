@@ -1,5 +1,6 @@
 Changes for 1.1beta12:
 
+ - fixed typo in MySQL's schema.sql (Alexei)
  - fixed applying of actions having Trigger Value in condition (Alexei)
  - fixed evaluation of aggregate functions (Alexei)
 
