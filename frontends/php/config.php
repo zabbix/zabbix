@@ -61,7 +61,7 @@
 // media form
 		"mediatypeid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),
 						'{config}==1&&{form}=="update"'),
-		"type"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1"),
+		"type"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1,2"),
 						'({config}==1)&&(isset({save}))'),
 		"description"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
 						'({config}==1)&&(isset({save}))'),
@@ -73,6 +73,8 @@
 						'({config}==1)&&({type}==0)'),
 		"exec_path"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
 						'({config}==1)&&({type}==1)&&isset({save})'),
+		"gsm_modem"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
+						'({config}==1)&&({type}==2)&&isset({save})'),
 
 // image form
 		"imageid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),
@@ -132,7 +134,8 @@
 				$action = AUDIT_ACTION_UPDATE;
 				$result=update_mediatype($_REQUEST["mediatypeid"],
 					$_REQUEST["type"],$_REQUEST["description"],$_REQUEST["smtp_server"],
-					$_REQUEST["smtp_helo"],$_REQUEST["smtp_email"],$_REQUEST["exec_path"]);
+					$_REQUEST["smtp_helo"],$_REQUEST["smtp_email"],$_REQUEST["exec_path"],
+					$_REQUEST["gsm_modem"]);
 
 				show_messages($result, S_MEDIA_TYPE_UPDATED, S_MEDIA_TYPE_WAS_NOT_UPDATED);
 			}
@@ -142,7 +145,8 @@
 				$action = AUDIT_ACTION_ADD;
 				$result=add_mediatype(
 					$_REQUEST["type"],$_REQUEST["description"],$_REQUEST["smtp_server"],
-					$_REQUEST["smtp_helo"],$_REQUEST["smtp_email"],$_REQUEST["exec_path"]);
+					$_REQUEST["smtp_helo"],$_REQUEST["smtp_email"],$_REQUEST["exec_path"],
+					$_REQUEST["gsm_modem"]);
 
 				show_messages($result, S_ADDED_NEW_MEDIA_TYPE, S_NEW_MEDIA_TYPE_WAS_NOT_ADDED);
 			}
@@ -407,9 +411,10 @@
 				$description=new CLink($row["description"],"config.php?&form=update".
 					url_param("config")."&mediatypeid=".$row["mediatypeid"],'action');
 
-				if($row["type"]==0)		$type=S_EMAIL;
-				else if($row["type"]==1)	$type=S_SCRIPT;
-				else				$type=S_UNKNOWN;
+				if($row["type"]==ALERT_TYPE_EMAIL)	$type=S_EMAIL;
+				else if($row["type"]==ALERT_TYPE_EXEC)	$type=S_SCRIPT;
+				else if($row["type"]==ALERT_TYPE_SMS)	$type=S_SMS;
+				else					$type=S_UNKNOWN;
 
 				$table->addRow(array(
 //					$row["mediatypeid"],
