@@ -461,8 +461,8 @@
 	{
 		$db_graph = get_graph_by_graphid($graphid);
 		$new_graphid = add_graph($db_graph["name"],$db_graph["width"],$db_graph["height"],
-			$db_graph["yaxistype"],$db_graph["yaxismin"],$db_graph["yaxismax"],$graph["show_work_period"],
-			$graph["show_triggers"],$graphid);
+			$db_graph["yaxistype"],$db_graph["yaxismin"],$db_graph["yaxismax"],$db_graph["show_work_period"],
+			$db_graph["show_triggers"],$graphid);
 
 		if(!$new_graphid)
 			return $new_graphid;
