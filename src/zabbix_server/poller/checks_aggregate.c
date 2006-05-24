@@ -41,12 +41,12 @@ static	int	evaluate_one(double *result, int *num, char *grpfunc, char const *val
 	if(strcmp(grpfunc,"grpsum") == 0)
 	{
 		*result+=value;
-		num++;
+		*num+=1;
 	}
 	else if(strcmp(grpfunc,"grpavg") == 0)
 	{
 		*result+=value;
-		num++;
+		*num+=1;
 	}
 	else if(strcmp(grpfunc,"grpmin") == 0)
 	{
@@ -58,7 +58,7 @@ static	int	evaluate_one(double *result, int *num, char *grpfunc, char const *val
 		{
 			*result=value;
 		}
-		num++;
+		*num+=1;
 	}
 	else if(strcmp(grpfunc,"grpmax") == 0)
 	{
@@ -70,7 +70,7 @@ static	int	evaluate_one(double *result, int *num, char *grpfunc, char const *val
 		{
 			*result=value;
 		}
-		num++;
+		*num+=1;
 	}
 	else
 	{
