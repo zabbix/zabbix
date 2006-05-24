@@ -1,3 +1,7 @@
+Changes for 1.1beta12:
+
+ - fixed evaluation of aggregate functions (Alexei)
+
 Changes for 1.1beta11:
 
  - fixed PostgreSQL schema (Alexei)
