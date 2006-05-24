@@ -242,6 +242,7 @@ DB_MEDIATYPE
 	char	*smtp_helo;
 	char	*smtp_email;
 	char	*exec_path;
+	char	*gsm_modem;
 };
 
 DB_TRIGGER
