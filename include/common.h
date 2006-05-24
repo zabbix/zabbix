@@ -204,6 +204,7 @@
 /* Alert types */
 #define ALERT_TYPE_EMAIL	0
 #define ALERT_TYPE_EXEC		1
+#define ALERT_TYPE_SMS		2
 
 /* Alert statuses */
 #define ALERT_STATUS_NOT_SENT	0
