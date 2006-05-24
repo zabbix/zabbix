@@ -527,7 +527,7 @@ static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigge
 				ret = SUCCEED;
 			}
 		}
-		else if(condition->operator != CONDITION_OPERATOR_NOT_EQUAL)
+		else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
 		{
 			if(trigger->priority != atoi(condition->value))
 			{
