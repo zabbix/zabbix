@@ -492,6 +492,8 @@
 	"S_DELETE_SELECTED_ITEMS_Q"=>		"Delete selected items?",
 	"S_EMAIL"=>				"Email",
 	"S_SCRIPT"=>				"Script",
+	"S_SMS"=>				"SMS",
+	"S_GSM_MODEM"=>				"GSM modem",
 	"S_UNITS"=>				"Units",
 	"S_MULTIPLIER"=>			"Multiplier",
 	"S_UPDATE_INTERVAL_IN_SEC"=>		"Update interval (in sec)",
