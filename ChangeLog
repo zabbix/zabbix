@@ -1,5 +1,6 @@
 Changes for 1.1beta12:
 
+ - added support for direct sending of SMS via GSM modem (Alexei)
  - fixed syncing of graphs with templates (Alexei)
  - fixed typo in MySQL's schema.sql (Alexei)
  - fixed applying of actions having Trigger Value in condition (Alexei)

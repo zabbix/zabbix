@@ -407,6 +407,7 @@ CREATE TABLE media_type (
 	smtp_helo	varchar(255)	DEFAULT '' NOT NULL,
 	smtp_email	varchar(255)	DEFAULT '' NOT NULL,
 	exec_path	varchar(255)	DEFAULT '' NOT NULL,
+	gsm_modem	varchar(255)	DEFAULT '' NOT NULL,
 	PRIMARY KEY	(mediatypeid)
 ) type=InnoDB;
 
