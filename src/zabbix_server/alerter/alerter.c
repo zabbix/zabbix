@@ -108,7 +108,7 @@ static int execute_action(DB_ALERT *alert,DB_MEDIATYPE *mediatype, char *error, 
 	}
 	else if(mediatype->type==ALERT_TYPE_SMS)
 	{
-		res = send_sms(mediatype->gsm_modem,alert->sendto,alert->message, char *error, int max_error_len);
+		res = send_sms(mediatype->gsm_modem,alert->sendto,alert->message, error, max_error_len);
 	}
 	else if(mediatype->type==ALERT_TYPE_EXEC)
 	{
@@ -207,7 +207,7 @@ int main_alerter_loop()
 		now  = time(NULL);
 
 /*		snprintf(sql,sizeof(sql)-1,"select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,a.retries,mt.mediatypeid,mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path from alerts a,media_type mt where a.status=0 and a.retries<3 and a.mediatypeid=mt.mediatypeid order by a.clock"); */
-		snprintf(sql,sizeof(sql)-1,"select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,a.retries,mt.mediatypeid,mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path,a.delay from alerts a,media_type mt where a.status=%d and a.retries<3 and (a.repeats<a.maxrepeats or a.maxrepeats=0) and a.nextcheck<=%d and a.mediatypeid=mt.mediatypeid order by a.clock", ALERT_STATUS_NOT_SENT, now);
+		snprintf(sql,sizeof(sql)-1,"select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,a.retries,mt.mediatypeid,mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path,a.delay,mt.gsm_modem from alerts a,media_type mt where a.status=%d and a.retries<3 and (a.repeats<a.maxrepeats or a.maxrepeats=0) and a.nextcheck<=%d and a.mediatypeid=mt.mediatypeid order by a.clock", ALERT_STATUS_NOT_SENT, now);
 		result = DBselect(sql);
 
 		while((row=DBfetch(result)))
@@ -229,6 +229,8 @@ int main_alerter_loop()
 			mediatype.exec_path=row[13];
 
 			alert.delay=atoi(row[14]);
+
+			mediatype.gsm_modem=row[15];
 
 			phan.sa_handler = &signal_handler;
 			sigemptyset(&phan.sa_mask);

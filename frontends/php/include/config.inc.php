@@ -1406,7 +1406,7 @@ COpt::profiling_start("page");
 
 	# Update media type
 
-	function	update_mediatype($mediatypeid,$type,$description,$smtp_server,$smtp_helo,$smtp_email,$exec_path)
+	function	update_mediatype($mediatypeid,$type,$description,$smtp_server,$smtp_helo,$smtp_email,$exec_path,$gsm_modem)
 	{
 		$ret = 0;
 
@@ -1418,7 +1418,7 @@ COpt::profiling_start("page");
 		}
 		else
 		{
-			$sql="update media_type set type=$type,description=".zbx_dbstr($description).",smtp_server=".zbx_dbstr($smtp_server).",smtp_helo=".zbx_dbstr($smtp_helo).",smtp_email=".zbx_dbstr($smtp_email).",exec_path=".zbx_dbstr($exec_path)." where mediatypeid=$mediatypeid";
+			$sql="update media_type set type=$type,description=".zbx_dbstr($description).",smtp_server=".zbx_dbstr($smtp_server).",smtp_helo=".zbx_dbstr($smtp_helo).",smtp_email=".zbx_dbstr($smtp_email).",exec_path=".zbx_dbstr($exec_path).",gsm_modem=".zbx_dbstr($gsm_modem)." where mediatypeid=$mediatypeid";
 			$ret =	DBexecute($sql);
 		}
 		return $ret;
@@ -1426,7 +1426,7 @@ COpt::profiling_start("page");
 
 	# Add Media type
 
-	function	add_mediatype($type,$description,$smtp_server,$smtp_helo,$smtp_email,$exec_path)
+	function	add_mediatype($type,$description,$smtp_server,$smtp_helo,$smtp_email,$exec_path,$gsm_modem)
 	{
 		$ret = 0;
 
@@ -1443,7 +1443,7 @@ COpt::profiling_start("page");
 		}
 		else
 		{
-			$sql="insert into media_type (type,description,smtp_server,smtp_helo,smtp_email,exec_path) values ($type,".zbx_dbstr($description).",".zbx_dbstr($smtp_server).",".zbx_dbstr($smtp_helo).",".zbx_dbstr($smtp_email).",".zbx_dbstr($exec_path).")";
+			$sql="insert into media_type (type,description,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem) values ($type,".zbx_dbstr($description).",".zbx_dbstr($smtp_server).",".zbx_dbstr($smtp_helo).",".zbx_dbstr($smtp_email).",".zbx_dbstr($exec_path).",".zbx_dbstr($gsm_modem).")";
 			$ret = DBexecute($sql);
 		}
 		return $ret;
