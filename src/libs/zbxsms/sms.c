@@ -67,7 +67,6 @@ static int read_gsm(int fd, char *expect, char *error, int max_error_len)
 	bufptr = buffer;
 	while ((nbytes = read(fd, bufptr, buffer + sizeof(buffer) - bufptr - 1)) > 0)
 	{
-		printf("read %d bytes\n", nbytes);
 		bufptr += nbytes;
 		if (bufptr[-1] == '\n' || bufptr[-1] == '\r')
 			break;
