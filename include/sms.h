@@ -21,6 +21,6 @@
 #ifndef ZABBIX_SMS_H
 #define ZABBIX_SMS_H
 
-int	send_sms(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,char *mailsubject,char *mailbody, char *error, int max_error_len);
+int	send_sms(char *device,char *number,char *message, char *error, int max_error_len);
 
 #endif

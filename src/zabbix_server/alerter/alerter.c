@@ -50,6 +50,7 @@
 #include "log.h"
 #include "zlog.h"
 #include "email.h"
+#include "sms.h"
 
 #include "alerter.h"
 
@@ -104,6 +105,10 @@ static int execute_action(DB_ALERT *alert,DB_MEDIATYPE *mediatype, char *error, 
 	{
 		res = send_email(mediatype->smtp_server,mediatype->smtp_helo,mediatype->smtp_email,alert->sendto,alert->subject,
 			alert->message, error, max_error_len);
+	}
+	else if(mediatype->type==ALERT_TYPE_SMS)
+	{
+		res = send_sms(mediatype->gsm_modem,alert->sendto,alert->message, char *error, int max_error_len);
 	}
 	else if(mediatype->type==ALERT_TYPE_EXEC)
 	{

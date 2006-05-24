@@ -651,6 +651,7 @@ CREATE TABLE media_type (
 	smtp_helo	varchar2(255)	DEFAULT NULL,
 	smtp_email	varchar2(255)	DEFAULT NULL,
 	exec_path	varchar2(255)	DEFAULT NULL,
+	gsm_modem	varchar(255)	DEFAULT NULL,
 	CONSTRAINT 	media_type_pk PRIMARY KEY (mediatypeid)
 );
 
