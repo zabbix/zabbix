@@ -359,10 +359,10 @@ end;
 CREATE TABLE actions (
 	actionid	number(10),
 	userid		number(10)	DEFAULT '0' NOT NULL,
-	delay		number(10)	DEFAULT '0' NOT NULL,
+--	delay		number(10)	DEFAULT '0' NOT NULL,
 	subject		varchar2(255)	DEFAULT NULL,
 	message		varchar2(2048)	DEFAULT NULL,
-	nextcheck	number(10)	DEFAULT '0' NOT NULL,
+--	nextcheck	number(10)	DEFAULT '0' NOT NULL,
 	recipient	number(3)	DEFAULT '0' NOT NULL,
 	maxrepeats	number(10)	DEFAULT '0' NOT NULL,
 	repeatdelay	number(10)	DEFAULT '600' NOT NULL,

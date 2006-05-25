@@ -158,7 +158,7 @@ static	void	send_to_user_medias(DB_TRIGGER *trigger,DB_ACTION *action, int useri
 			continue;
 		}
 
-		DBadd_alert(action->actionid,trigger->triggerid, userid, media.mediatypeid,media.sendto,action->subject,action->message, action->maxrepeats, action->repeatdelay);
+		DBadd_alert(action->actionid, userid, trigger->triggerid, media.mediatypeid,media.sendto,action->subject,action->message, action->maxrepeats, action->repeatdelay);
 	}
 	DBfree_result(result);
 }
@@ -656,7 +656,7 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 
 	char sql[MAX_STRING_LEN];
 
-	int	now;
+/*	int	now;*/
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In apply_actions(triggerid:%d,alarmid:%d,trigger_value:%d)",trigger->triggerid, alarmid, trigger_value);
 
@@ -681,10 +681,13 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Applying actions");
 
-	now = time(NULL);
+/*	now = time(NULL);*/
 
 /*	snprintf(sql,sizeof(sql)-1,"select actionid,userid,delay,subject,message,scope,severity,recipient,good from actions where (scope=%d and triggerid=%d and good=%d and nextcheck<=%d) or (scope=%d and good=%d) or (scope=%d and good=%d)",ACTION_SCOPE_TRIGGER,trigger->triggerid,trigger_value,now,ACTION_SCOPE_HOST,trigger_value,ACTION_SCOPE_HOSTS,trigger_value);*/
-	snprintf(sql,sizeof(sql)-1,"select actionid,userid,delay,subject,message,recipient,maxrepeats,repeatdelay,scripts,actiontype from actions where nextcheck<=%d and status=%d", now, ACTION_STATUS_ACTIVE);
+/*	snprintf(sql,sizeof(sql)-1,"select actionid,userid,delay,subject,message,recipient,maxrepeats,repeatdelay,scripts,actiontype from actions where nextcheck<=%d and status=%d", now, ACTION_STATUS_ACTIVE);*/
+
+	/* No support of action delay anymore */
+	snprintf(sql,sizeof(sql)-1,"select actionid,userid,subject,message,recipient,maxrepeats,repeatdelay,scripts,actiontype from actions where status=%d", ACTION_STATUS_ACTIVE);
 	result = DBselect(sql);
 	zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]", sql);
 
@@ -694,27 +697,27 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 
 		if(check_action_conditions(trigger, alarmid, trigger_value, action.actionid) == SUCCEED)
 		{
+			zabbix_log( LOG_LEVEL_DEBUG, "Conditions match our trigger. Do apply actions.");
 			action.userid=atoi(row[1]);
-			action.delay=atoi(row[2]);
 			
-			strscpy(action.subject,row[3]);
-			strscpy(action.message,row[4]);
+			strscpy(action.subject,row[2]);
+			strscpy(action.message,row[3]);
 			substitute_macros(trigger, &action, action.message);
 			substitute_macros(trigger, &action, action.subject);
 
-			action.recipient=atoi(row[5]);
-			action.maxrepeats=atoi(row[6]);
-			action.repeatdelay=atoi(row[7]);
-			strscpy(action.scripts,row[8]);
-			action.actiontype=atoi(row[9]);
+			action.recipient=atoi(row[4]);
+			action.maxrepeats=atoi(row[5]);
+			action.repeatdelay=atoi(row[6]);
+			strscpy(action.scripts,row[7]);
+			action.actiontype=atoi(row[8]);
 
 			if(action.actiontype == ACTION_TYPE_MESSAGE)
 				send_to_user(trigger,&action);
 			else
 				run_commands(trigger,&action);
 
-			snprintf(sql,sizeof(sql)-1,"update actions set nextcheck=%d where actionid=%d",now+action.delay,action.actionid);
-			DBexecute(sql);
+/*			snprintf(sql,sizeof(sql)-1,"update actions set nextcheck=%d where actionid=%d",now+action.delay,action.actionid);
+			DBexecute(sql);*/
 		}
 		else
 		{
