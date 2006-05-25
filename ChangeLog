@@ -1,5 +1,7 @@
 Changes for 1.1beta12:
 
+ - dropped suport of delays between actions due to bad design (Alexei)
+ - fixed incorrect handling of actions (Alexei)
  - fixed bad performance of previous beta because of wrong DBselectN() (Alexei)
  - added support for direct sending of SMS via GSM modem (Alexei)
  - fixed syncing of graphs with templates (Alexei)

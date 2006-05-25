@@ -1071,7 +1071,6 @@
 		{
 			$actiontype	= $action["actiontype"];
 			$source		= $action["source"];
-			$delay		= $action["delay"];
 			$uid		= $action["userid"];
 			$subject	= $action["subject"];
 			$message	= $action["message"];
@@ -1112,7 +1111,6 @@
 			$source		= get_request("source",0);
 			$actiontype	= get_request("actiontype",ACTION_TYPE_MESSAGE);
 
-			$delay		= get_request("delay",30);
 			$subject	= get_request("subject","{TRIGGER.NAME}: {STATUS}");
 			$message	= get_request("message","{TRIGGER.NAME}: {STATUS}");
 			$scope		= get_request("scope",0);
@@ -1280,9 +1278,9 @@
 // end of new condition preparation
 		$frmAction->AddRow(S_CONDITION, $rowCondition);
 
-		$frmAction->AddRow(
+/*		$frmAction->AddRow(
 			$actiontype == ACTION_TYPE_MESSAGE ? S_DELAY_BETWEEN_MESSAGES_IN_SEC : S_DELAY_BETWEEN_EXECUTIONS_IN_SEC,
-			new CTextBox('delay',$delay,5));
+			new CTextBox('delay',$delay,5));*/
 
 		if($actiontype == ACTION_TYPE_MESSAGE)
 		{
