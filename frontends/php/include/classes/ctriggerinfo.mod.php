@@ -36,13 +36,15 @@
 			$this->style = $value;
 		}
 
-		function UpdateInfo()
+		function BodyToString()
 		{
 			$this->CleanItems();
 
 			$uncn = $info = $warn = $avg = $high = $dis = 0;
 
-			$db_priority = DBselect("select t.priority,count(*) as cnt from triggers t,hosts h,items i,functions f where t.value=1 and t.status=0 and f.itemid=i.itemid and h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and t.triggerid=f.triggerid and i.status=0 group by priority");
+			$db_priority = DBselect("select t.priority,count(*) as cnt from triggers t,hosts h,items i,functions f".
+				" where t.value=1 and t.status=0 and f.itemid=i.itemid and h.hostid=i.hostid".
+				" and h.status=".HOST_STATUS_MONITORED." and t.triggerid=f.triggerid and i.status=0 group by priority");
 
 			while($row=DBfetch($db_priority))
 			{
@@ -57,7 +59,10 @@
 				}
 			}
 
-			$db_ok_cnt = DBselect("select count(*) as cnt from triggers t,hosts h,items i,functions f where t.value=0 and t.status=0 and f.itemid=i.itemid and h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and t.triggerid=f.triggerid and i.status=0");
+			$db_ok_cnt = DBselect("select count(*) as cnt from triggers t,hosts h,items i,functions f".
+				" where t.value=0 and t.status=0 and f.itemid=i.itemid and h.hostid=i.hostid".
+				" and h.status=".HOST_STATUS_MONITORED." and t.triggerid=f.triggerid and i.status=0");
+
 			$ok_cnt = DBfetch($db_ok_cnt);
 
 			$header = new CCol(S_TRIGGERS_INFO,"header");
@@ -88,11 +93,7 @@
 				$this->AddRow($high);
 				$this->AddRow($dis);
 			}
-		}
-		function Show()
-		{
-			$this->UpdateInfo();
-			parent::Show();
+			return parent::BodyToString();
 		}
 	}
 ?>
