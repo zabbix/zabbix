@@ -275,15 +275,15 @@ DB_RESULT DBselectN(char *query, int n)
 	char sql[MAX_STRING_LEN];
 #ifdef	HAVE_MYSQL
 	snprintf(sql,MAX_STRING_LEN-1,"%s limit %d", query, n);
-	return DBselect(query);
+	return DBselect(sql);
 #endif
 #ifdef	HAVE_PGSQL
 	snprintf(sql,MAX_STRING_LEN-1,"%s limit %d", query, n);
-	return DBselect(query);
+	return DBselect(sql);
 #endif
 #ifdef	HAVE_ORACLE
 	snprintf(sql,MAX_STRING_LEN-1,"select * from (%s) where rownum<=%d", query, n);
-	return DBselect(query);
+	return DBselect(sql);
 #endif
 }
 
@@ -685,7 +685,8 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *re
 				((trigger->prevvalue == TRIGGER_VALUE_FALSE) && (trigger->value == TRIGGER_VALUE_UNKNOWN) && (new_value == TRIGGER_VALUE_TRUE)) ||
 				((trigger->prevvalue == TRIGGER_VALUE_TRUE) && (trigger->value == TRIGGER_VALUE_UNKNOWN) && (new_value == TRIGGER_VALUE_FALSE)))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG,"In update_trigger_value. Before apply_actions. Triggerid [%d]", trigger->triggerid);
+				if(12218 == trigger->triggerid)
+					zabbix_log(LOG_LEVEL_WARNING,"In update_trigger_value. Before apply_actions. Triggerid [%d] prev [%d] curr [%d] new [%d]", trigger->triggerid, trigger->prevvalue, trigger->value, new_value);
 				apply_actions(trigger,alarmid,new_value);
 				if(new_value == TRIGGER_VALUE_TRUE)
 				{
@@ -1370,7 +1371,7 @@ int	DBadd_alert(int actionid, int userid, int triggerid,  int mediatypeid, char 
 	char	subject_esc[MAX_STRING_LEN];
 	char	message_esc[MAX_STRING_LEN];
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In add_alert()");
+	zabbix_log(LOG_LEVEL_WARNING,"In add_alert(triggerid[%d])",triggerid);
 
 	now = time(NULL);
 /* Does not work on PostgreSQL */
