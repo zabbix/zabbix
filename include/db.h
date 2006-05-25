@@ -263,7 +263,7 @@ DB_ACTION
 	int	actionid;
 	int	actiontype;
 	int	userid;
-	int	delay;
+/*	int	delay;*/
 	int	lastcheck;
 	int	recipient;
 	char	subject[ACTION_SUBJECT_LEN_MAX];

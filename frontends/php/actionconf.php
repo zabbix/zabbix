@@ -47,7 +47,7 @@
 		"source"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0"),	'isset({save})'),
 		"recipient"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0,1"), 	'isset({save})'),
 		"userid"=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID, 		'isset({save})'),
-		"delay"=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),'isset({save})'),
+/*		"delay"=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),'isset({save})'),*/
 		"subject"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,	'{actiontype}==0&&isset({save})'),
 		"message"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,	'{actiontype}==0&&isset({save})'),
 		"scripts"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,	'{actiontype}==1&&isset({save})'),
@@ -108,7 +108,7 @@
 		{
 			$actionid=$_REQUEST["actionid"];
 			$result = update_action($actionid,
-				$_REQUEST['actiontype'],$_REQUEST['userid'],$_REQUEST["delay"],
+				$_REQUEST['actiontype'],$_REQUEST['userid'],
 				$_REQUEST["subject"], $_REQUEST["message"],$_REQUEST["recipient"],
 				$_REQUEST["maxrepeats"],$_REQUEST["repeatdelay"],$_REQUEST["status"],
 				$_REQUEST["scripts"]);
@@ -116,7 +116,7 @@
 			show_messages($result,S_ACTION_UPDATED,S_CANNOT_UPDATE_ACTION);
 		} else {
 			$actionid=add_action(
-				$_REQUEST['actiontype'],$_REQUEST['userid'],$_REQUEST["delay"], 
+				$_REQUEST['actiontype'],$_REQUEST['userid'], 
 				$_REQUEST["subject"],$_REQUEST["message"],$_REQUEST["recipient"],
 				$_REQUEST["maxrepeats"],$_REQUEST["repeatdelay"],$_REQUEST["status"],
 				$_REQUEST["scripts"]);
@@ -246,7 +246,6 @@
 			),
 			S_CONDITIONS,
 			$_REQUEST["actiontype"] == ACTION_TYPE_MESSAGE ? S_SEND_MESSAGE_TO : S_REMOTE_COMMAND,
-			S_DELAY,
 			$_REQUEST["actiontype"] == ACTION_TYPE_MESSAGE ? S_SUBJECT : NULL,
 			S_REPEATS,
 			S_STATUS));
@@ -310,7 +309,6 @@
 					),
 				$conditions,
 				$recipient,
-				htmlspecialchars($row["delay"]),
 				$subject,
 				$row["maxrepeats"] == 0 ? S_NO_REPEATS : $row["maxrepeats"],
 				$status

@@ -29,7 +29,7 @@
 #include "zlog.h"
 #include "common.h"
 
-int	DBadd_action(int triggerid, int userid, int delay, char *subject, char *message, int scope, int severity, int recipient, int usrgrpid)
+int	DBadd_action(int triggerid, int userid, char *subject, char *message, int scope, int severity, int recipient, int usrgrpid)
 {
 	char	sql[MAX_STRING_LEN];
 	int	actionid;
@@ -44,7 +44,7 @@ int	DBadd_action(int triggerid, int userid, int delay, char *subject, char *mess
 		userid = usrgrpid;
 	}
 
-	snprintf(sql, sizeof(sql)-1,"insert into actions (triggerid, userid, delay, subject, message, scope, severity, recipient) values (%d, %d, %d, '%s', '%s', %d, %d, %d)", triggerid, userid, delay, subject_esc, message_esc, scope, severity, recipient);
+	snprintf(sql, sizeof(sql)-1,"insert into actions (triggerid, userid, subject, message, scope, severity, recipient) values (%d, %d, '%s', '%s', %d, %d, %d)", triggerid, userid, subject_esc, message_esc, scope, severity, recipient);
 	if(FAIL == DBexecute(sql))
 	{
 		return FAIL;
@@ -69,7 +69,7 @@ int	DBget_action_by_actionid(int actionid,DB_ACTION *action)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In DBget_action_by_actionid(%d)", actionid);
 
-	snprintf(sql,sizeof(sql)-1,"select userid,delay,recipient,subject,message from actions where actionid=%d", actionid);
+	snprintf(sql,sizeof(sql)-1,"select userid,recipient,subject,message from actions where actionid=%d", actionid);
 	result=DBselect(sql);
 	row=DBfetch(result);
 
@@ -81,10 +81,9 @@ int	DBget_action_by_actionid(int actionid,DB_ACTION *action)
 	{
 		action->actionid=actionid;
 		action->userid=atoi(row[0]);
-		action->delay=atoi(row[1]);
-		action->recipient=atoi(row[2]);
-		strscpy(action->subject,row[3]);
-		strscpy(action->message,row[4]);
+		action->recipient=atoi(row[1]);
+		strscpy(action->subject,row[2]);
+		strscpy(action->message,row[3]);
 	}
 
 	DBfree_result(result);

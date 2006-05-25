@@ -207,10 +207,10 @@ CREATE INDEX auditlog_clock on auditlog (clock);
 CREATE TABLE actions (
   actionid		serial,
   userid		int4		DEFAULT '0' NOT NULL,
-  delay			int4		DEFAULT '0' NOT NULL,
+--  delay			int4		DEFAULT '0' NOT NULL,
   subject		varchar(255)	DEFAULT '' NOT NULL,
   message		text		DEFAULT '' NOT NULL,
-  nextcheck		int4		DEFAULT '0' NOT NULL,
+--  nextcheck		int4		DEFAULT '0' NOT NULL,
   recipient		int4		DEFAULT '0' NOT NULL,
   maxrepeats		int4		DEFAULT '0' NOT NULL,
   repeatdelay		int4		DEFAULT '600' NOT NULL,

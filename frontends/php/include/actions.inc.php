@@ -37,7 +37,7 @@
 
 	# Add Action
 
-	function	add_action($actiontype,$userid,$delay,$subject,$message,$recipient,$maxrepeats,$repeatdelay,$status,$scripts)
+	function	add_action($actiontype,$userid,$subject,$message,$recipient,$maxrepeats,$repeatdelay,$status,$scripts)
 	{
 //		if(!check_right_on_trigger("A",$triggerid))
 //		{
@@ -56,8 +56,8 @@
 			$recipient = 0;	
 			if(!check_commands($scripts))	return FALSE;
 		}
-		$sql="insert into actions (actiontype,userid,delay,nextcheck,subject,message,recipient,".
-			"maxrepeats,repeatdelay,status,scripts) values ($actiontype,$userid,$delay,0,".zbx_dbstr($subject).",".
+		$sql="insert into actions (actiontype,userid,subject,message,recipient,".
+			"maxrepeats,repeatdelay,status,scripts) values ($actiontype,$userid,".zbx_dbstr($subject).",".
 			zbx_dbstr($message).",$recipient,$maxrepeats,$repeatdelay,$status,".zbx_dbstr($scripts).")";
 		$result=DBexecute($sql);
 		return DBinsert_id($result,"actions","actionid");
@@ -65,7 +65,7 @@
 
 	# Update Action
 
-	function	update_action($actionid,$actiontype,$userid,$delay,$subject,$message,$recipient,$maxrepeats,$repeatdelay,$status,$scripts)
+	function	update_action($actionid,$actiontype,$userid,$subject,$message,$recipient,$maxrepeats,$repeatdelay,$status,$scripts)
 	{
 //		if(!check_right_on_trigger("U",$triggerid))
 //		{
@@ -84,7 +84,7 @@
 			if(!check_commands($scripts))	return FALSE;
 		}
 
-		$result=DBexecute("update actions set actiontype=$actiontype,userid=$userid,delay=$delay,nextcheck=0,subject=".zbx_dbstr($subject).",message=".zbx_dbstr($message).",recipient=$recipient,maxrepeats=$maxrepeats, repeatdelay=$repeatdelay,status=$status,scripts=".zbx_dbstr($scripts)." where actionid=$actionid");
+		$result=DBexecute("update actions set actiontype=$actiontype,userid=$userid,subject=".zbx_dbstr($subject).",message=".zbx_dbstr($message).",recipient=$recipient,maxrepeats=$maxrepeats, repeatdelay=$repeatdelay,status=$status,scripts=".zbx_dbstr($scripts)." where actionid=$actionid");
 		return $result;
 	}
 
@@ -169,7 +169,7 @@
 					$action["message"]);
 
 				add_action($action["actiontype"],$row2["triggerid"], $action["userid"], $action["good"], 
-					$action["delay"], $action["subject"], $message, $action["scope"],
+					$action["subject"], $message, $action["scope"],
 					$action["severity"], $action["recipient"], $action["maxrepeats"],
 					$action["repeatdelay"],$action["scripts"]);
 			}
@@ -262,7 +262,7 @@
 				{
 					$host=get_host_by_hostid($row["hostid"]);
 					$message=str_replace("{".$host_template["host"].":", "{".$host["host"].":", $action["message"]);
-					update_action($row3["actionid"], $action["actiontype"],$row2["triggerid"], $action["userid"], $action["good"], $action["delay"], $action["subject"], $message, $action["scope"], $action["severity"], $action["recipient"], $action["maxrepeats"],$action["repeatdelay"],$action["scripts"]);
+					update_action($row3["actionid"], $action["actiontype"],$row2["triggerid"], $action["userid"], $action["good"], $action["subject"], $message, $action["scope"], $action["severity"], $action["recipient"], $action["maxrepeats"],$action["repeatdelay"],$action["scripts"]);
 
 				}
 			}
