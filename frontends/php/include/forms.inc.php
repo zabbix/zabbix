@@ -421,6 +421,7 @@
 		$cmbValType->AddItem(ITEM_VALUE_TYPE_FLOAT, S_NUMERIC_FLOAT);
 		$cmbValType->AddItem(ITEM_VALUE_TYPE_STR, S_CHARACTER);
 		$cmbValType->AddItem(ITEM_VALUE_TYPE_LOG, S_LOG);
+		$cmbValType->AddItem(ITEM_VALUE_TYPE_TEXT, S_TEXT);
 		$frmItem->AddRow(S_TYPE_OF_INFORMATION,$cmbValType);
 
 		if( ($value_type==ITEM_VALUE_TYPE_FLOAT) || ($value_type==ITEM_VALUE_TYPE_UINT64))
