@@ -1,5 +1,8 @@
 Changes for 1.1beta12:
 
+ - fixed "Server info" screen item (Eugene)
+ - fixed "Host info" screen item (Eugene)
+ - fixed "Trigger info" screen item (Eugene)
  - dropped suport of delays between actions due to bad design (Alexei)
  - fixed incorrect handling of actions (Alexei)
  - fixed bad performance of previous beta because of wrong DBselectN() (Alexei)

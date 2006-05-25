@@ -26,7 +26,7 @@
 			parent::CTable(NULL,"server_info");
 		}
 
-		function UpdateInfo()
+		function BodyToString()
 		{
 			global $USER_DETAILS;
 			global $_SERVER;
@@ -68,11 +68,8 @@
 				)));
 			$this->AddRow(S_NUMBER_OF_ALARMS.": ".$status["alarms_count"]);
 			$this->AddRow(S_NUMBER_OF_ALERTS.": ".$status["alerts_count"]);
-		}
-		function Show()
-		{
-			$this->UpdateInfo();
-			parent::Show();
+
+			return parent::BodyToString();
 		}
 	}
 ?>
