@@ -442,9 +442,16 @@
 				{
 					if(!check_right("Host","R",$row2["hostid"]))	continue;
 					$cmbGroups->AddItem($row["groupid"],$row["name"]);
+					if($row["groupid"] == $_REQUEST["groupid"]) $correct_host = 1;
 					break;
 				}
 			}
+			if(!isset($correct_host))
+			{
+				$_REQUEST["groupid"] = 0;
+				$cmbGroups->SetValue(0);
+			}
+
 			$frmForm = new CForm("hosts.php");
 			$frmForm->AddVar("config",$_REQUEST["config"]);
 			$frmForm->AddItem(S_GROUP.SPACE);
