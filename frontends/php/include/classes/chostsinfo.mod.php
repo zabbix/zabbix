@@ -36,7 +36,7 @@
 			$this->style = $value;
 		}
 
-		function UpdateInfo()
+		function BodyToString()
 		{
 			$this->CleanItems();
 
@@ -72,11 +72,7 @@
 				$this->AddRow($notav);
 				$this->AddRow($uncn);
 			}
-		}
-		function Show()
-		{
-			$this->UpdateInfo();
-			parent::Show();
+			return parent::BodyToString();
 		}
 	}
 ?>
