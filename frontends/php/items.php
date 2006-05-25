@@ -56,7 +56,7 @@
 		"status"=>	array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,65535),'isset({save})'),
 		"type"=>	array(T_ZBX_INT, O_OPT,  NULL,  IN("0,1,2,3,4,5,6,7,8"),'isset({save})'),
 		"trends"=>	array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,65535),'isset({save})'),
-		"value_type"=>	array(T_ZBX_INT, O_OPT,  NULL,  IN("0,1,2,3"),'isset({save})'),
+		"value_type"=>	array(T_ZBX_INT, O_OPT,  NULL,  IN("0,1,2,3,4"),'isset({save})'),
 		"valuemapid"=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,'isset({save})'),
 
 		"snmp_community"=>array(T_ZBX_STR, O_OPT,  NULL,  NOT_EMPTY,'isset({save})&&'.IN("1,4","type")),

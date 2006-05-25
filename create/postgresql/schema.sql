@@ -724,6 +724,20 @@ CREATE TABLE history_log (
 CREATE INDEX history_log_i_c on history_str (itemid, clock);
 
 --
+-- Table structure for table 'history_text'
+--
+
+CREATE TABLE history_text (
+  itemid		int4	DEFAULT '0' NOT NULL,
+  clock			int4	DEFAULT '0' NOT NULL,
+  value			text	DEFAULT '' NOT NULL,
+  KEY itemidclock (itemid, clock)
+);
+
+CREATE INDEX history_text_i_c on history_text (itemid, clock);
+
+
+--
 -- Table structure for table 'autoreg'
 --
 

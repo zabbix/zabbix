@@ -506,6 +506,7 @@
 	"S_NUMERIC_FLOAT"=>			"Numeric (float)",
 	"S_CHARACTER"=>				"Character",
 	"S_LOG"=>				"Log",
+	"S_TEXT"=>				"Text",
 	"S_AS_IS"=>				"As is",
 	"S_DELTA_SPEED_PER_SECOND"=>		"Delta (speed per second)",
 	"S_DELTA_SIMPLE_CHANGE"=>		"Delta (simple change)",
