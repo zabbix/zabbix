@@ -329,6 +329,7 @@ int	DBadd_trend(int itemid, double value, int clock);
 int	DBadd_history(int itemid, double value, int clock);
 int	DBadd_history_log(int itemid, char *value, int clock, int timestamp, char *source, int severity);
 int	DBadd_history_str(int itemid, char *value, int clock);
+int	DBadd_history_text(int itemid, char *value, int clock);
 int	DBadd_history_uint(int itemid, zbx_uint64_t value, int clock);
 int	DBadd_service_alarm(int serviceid,int status,int clock);
 int	DBadd_alert(int actionid, int triggerid, int userid, int mediatypeid, char *sendto, char *subject, char *message, int maxrepeats, int repeatdelay);

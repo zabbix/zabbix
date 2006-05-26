@@ -64,6 +64,39 @@
         }
 	update_profile("web.menu.view.last",$page["file"]);
 ?>
+
+<?php
+	// Misc functions
+	function	format_lastvalue($db_item)
+	{
+		if(isset($db_item["lastvalue"]))
+		{
+			if($db_item["value_type"] == ITEM_VALUE_TYPE_FLOAT)
+			{
+				$lastvalue=convert_units($db_item["lastvalue"],$db_item["units"]);
+			}
+			else if($db_item["value_type"] == ITEM_VALUE_TYPE_UINT64)
+			{
+				$lastvalue=convert_units($db_item["lastvalue"],$db_item["units"]);
+				$lastvalue = replace_value_by_map($lastvalue, $db_item["valuemapid"]);
+			}
+			else if($db_item["value_type"] == ITEM_VALUE_TYPE_TEXT)
+			{
+//				$lastvalue=nbsp(htmlspecialchars(substr($db_item["lastvalue"],0,20)." ..."));
+				$lastvalue="...";
+			}
+			else
+			{
+				$lastvalue=nbsp(htmlspecialchars(substr($db_item["lastvalue"],0,20)." ..."));
+			}
+		}
+		else
+		{
+			$lastvalue=new CCol("-","center");
+		}
+		return $lastvalue;
+	}
+?>
 <?php
 
 	$_REQUEST["select"] = get_request("select","");
@@ -217,23 +250,8 @@
 			else
 				$lastclock="-";
 
-			if(isset($db_item["lastvalue"]))
-			{
-				if(($db_item["value_type"] == ITEM_VALUE_TYPE_FLOAT) ||
-					($db_item["value_type"] == ITEM_VALUE_TYPE_UINT64))
-				{
-					$lastvalue=convert_units($db_item["lastvalue"],$db_item["units"]);
-				}
-				else
-				{
-					$lastvalue=nbsp(htmlspecialchars(substr($db_item["lastvalue"],0,20)." ..."));
-				}
-				$lastvalue = replace_value_by_map($lastvalue, $db_item["valuemapid"]);
-			}
-			else
-			{
-				$lastvalue=new CCol("-","center");
-			}
+			$lastvalue=format_lastvalue($db_item);
+
 			if( isset($db_item["lastvalue"]) && isset($db_item["prevvalue"]) &&
 				($db_item["value_type"] == 0) && ($db_item["lastvalue"]-$db_item["prevvalue"] != 0) )
 			{
@@ -323,23 +341,8 @@
 		else
 			$lastclock="-";
 
-		if(isset($db_item["lastvalue"]))
-		{
-			if(($db_item["value_type"] == ITEM_VALUE_TYPE_FLOAT) ||
-				($db_item["value_type"] == ITEM_VALUE_TYPE_UINT64))
-			{
-				$lastvalue=convert_units($db_item["lastvalue"],$db_item["units"]);
-			}
-			else
-			{
-				$lastvalue=nbsp(htmlspecialchars(substr($db_item["lastvalue"],0,20)." ..."));
-			}
-			$lastvalue = replace_value_by_map($lastvalue, $db_item["valuemapid"]);
-		}
-		else
-		{
-			$lastvalue=new CCol("-","center");
-		}
+		$lastvalue=format_lastvalue($db_item);
+
 		if( isset($db_item["lastvalue"]) && isset($db_item["prevvalue"]) &&
 			($db_item["value_type"] == 0) && ($db_item["lastvalue"]-$db_item["prevvalue"] != 0) )
 		{

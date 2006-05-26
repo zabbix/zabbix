@@ -1138,6 +1138,21 @@ int	DBadd_history_str(int itemid, char *value, int clock)
 	return SUCCEED;
 }
 
+int	DBadd_history_text(int itemid, char *value, int clock)
+{
+	char	sql[MAX_STRING_LEN];
+	char	value_esc[MAX_STRING_LEN];
+
+	zabbix_log(LOG_LEVEL_DEBUG,"In add_history_str()");
+
+	DBescape_string(value,value_esc,MAX_STRING_LEN);
+	snprintf(sql,sizeof(sql)-1,"insert into history_text (clock,itemid,value) values (%d,%d,'%s')",clock,itemid,value_esc);
+	DBexecute(sql);
+
+	return SUCCEED;
+}
+
+
 int	DBadd_history_log(int itemid, char *value, int clock, int timestamp,char *source, int severity)
 {
 	char	sql[MAX_STRING_LEN];

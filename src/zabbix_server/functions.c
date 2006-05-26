@@ -536,6 +536,8 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 		zabbix_log( LOG_LEVEL_DEBUG, "In add_history(%d,STRING:%s)", item->itemid, value->str);
 	if(value->type & AR_DOUBLE)
 		zabbix_log( LOG_LEVEL_DEBUG, "In add_history(%d,DOUBLE:" ZBX_FS_DBL ")", item->itemid, value->dbl);
+	if(value->type & AR_TEXT)
+		zabbix_log( LOG_LEVEL_WARNING, "In add_history(%d,STRING:[%s])", item->itemid, value->text);
 
 	if(item->history>0)
 	{
@@ -628,6 +630,11 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 				DBadd_history_log(item->itemid,value->str,now,item->timestamp,item->eventlog_source,item->eventlog_severity);
 			snprintf(sql,sizeof(sql)-1,"update items set lastlogsize=%d where itemid=%d",item->lastlogsize,item->itemid);
 			DBexecute(sql);
+		}
+		else if(item->value_type==ITEM_VALUE_TYPE_TEXT)
+		{
+			if(value->type & AR_TEXT)
+				DBadd_history_text(item->itemid,value->text,now);
 		}
 		else
 		{
