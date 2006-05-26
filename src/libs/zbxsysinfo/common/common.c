@@ -233,6 +233,11 @@ void	free_result(AGENT_RESULT *result)
 	{
 		free(result->str);
 	}
+
+	if(result->type & AR_TEXT)
+	{
+		free(result->text);
+	}
 	
 	if(result->type & AR_MESSAGE)
 	{
@@ -256,6 +261,7 @@ void	init_result(AGENT_RESULT *result)
 	result->ui64 = 0;
 	result->dbl = 0;	
 	result->str = NULL;
+	result->text = NULL;
 	result->msg = NULL;
 
 	init_result_list(&(result->list));
@@ -1121,7 +1127,7 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	FILE	*f;
 	char	c[MAX_STRING_LEN];
 	char	command[MAX_STRING_LEN];
-	int	i;
+	int	i,len;
 
         assert(result);
 
@@ -1142,7 +1148,9 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		}
 	}
 
-	if(NULL == fgets(c,MAX_STRING_LEN,f))
+	len = fread(c, 1, MAX_STRING_LEN-1, f);
+
+	if(0 != ferror(f))
 	{
 		switch (errno)
 		{
@@ -1155,6 +1163,10 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 				return SYSINFO_RET_FAIL;
 		}
 	}
+
+	c[len]=0;
+
+	zabbix_log(LOG_LEVEL_WARNING, "Run remote command [%s] Result [%d] [%s]", command, strlen(c), c);
 
 	if(pclose(f) != 0)
 	{

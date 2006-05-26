@@ -453,6 +453,7 @@
 			{
 				case ITEM_VALUE_TYPE_FLOAT:	$h_table = "history";		break;
 				case ITEM_VALUE_TYPE_UINT64:	$h_table = "history_uint";	break;
+				case ITEM_VALUE_TYPE_TEXT:	$h_table = "history_text";	break;
 				default:			$h_table = "history_str";
 			}
 
