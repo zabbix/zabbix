@@ -1,5 +1,6 @@
 Changes for 1.1beta12:
 
+ - added support "proc.num[]" for AIX 4.x (Eugene)
  - added support of value type Text (Alexei) 
  - fixed "Server info" screen item (Eugene)
  - fixed "Host info" screen item (Eugene)

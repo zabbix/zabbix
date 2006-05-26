@@ -236,4 +236,9 @@
 #	include <sys/mount.h>
 #endif
 
+#ifdef HAVE_PROCINFO_H
+#	undef T_NULL /* to solve definition conflict */
+#	include <procinfo.h>
+#endif
+
 #endif
