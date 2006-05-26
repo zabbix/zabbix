@@ -537,7 +537,7 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 	if(value->type & AR_DOUBLE)
 		zabbix_log( LOG_LEVEL_DEBUG, "In add_history(%d,DOUBLE:" ZBX_FS_DBL ")", item->itemid, value->dbl);
 	if(value->type & AR_TEXT)
-		zabbix_log( LOG_LEVEL_WARNING, "In add_history(%d,STRING:[%s])", item->itemid, value->text);
+		zabbix_log( LOG_LEVEL_DEBUG, "In add_history(%d,STRING:[%s])", item->itemid, value->text);
 
 	if(item->history>0)
 	{
