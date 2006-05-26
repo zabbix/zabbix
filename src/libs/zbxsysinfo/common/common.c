@@ -1166,7 +1166,7 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 	c[len]=0;
 
-	zabbix_log(LOG_LEVEL_WARNING, "Run remote command [%s] Result [%d] [%s]", command, strlen(c), c);
+	zabbix_log(LOG_LEVEL_DEBUG, "Run remote command [%s] Result [%d] [%s]", command, strlen(c), c);
 
 	if(pclose(f) != 0)
 	{
