@@ -1070,9 +1070,19 @@ COpt::profiling_start("page");
 	function&	get_screen_plaintext($itemid,$elements)
 	{
 		$item=get_item_by_itemid($itemid);
-		if($item["value_type"]==0)
+		if($item["value_type"]==ITEM_VALUE_TYPE_FLOAT)
 		{
 			$sql="select clock,value from history where itemid=$itemid".
+				" order by clock desc";
+		}
+		else if($item["value_type"]==ITEM_VALUE_TYPE_UINT64)
+		{
+			$sql="select clock,value from history_uint where itemid=$itemid".
+				" order by clock desc";
+		}
+		else if($item["value_type"]==ITEM_VALUE_TYPE_TEXT)
+		{
+			$sql="select clock,value from history_text where itemid=$itemid".
 				" order by clock desc";
 		}
 		else
@@ -1086,7 +1096,19 @@ COpt::profiling_start("page");
 		$table->SetHeader(array(S_TIMESTAMP,item_description($item["description"],$item["key_"])));
 		while($row=DBfetch($result))
 		{
-			$table->AddRow(array(date(S_DATE_FORMAT_YMDHMS,$row["clock"]),	$row["value"]));
+			if($item["value_type"]==ITEM_VALUE_TYPE_TEXT)
+			{
+				$value = nbsp(htmlspecialchars($row["value"]));
+			}
+			else if($item["value_type"]==ITEM_VALUE_TYPE_STRING)
+			{
+				$value = nbsp(htmlspecialchars($row["value"]));
+			}
+			else
+			{
+				$value = $row["value"];
+			}
+			$table->AddRow(array(date(S_DATE_FORMAT_YMDHMS,$row["clock"]),	$value));
 		}
 		return $table;
 	}

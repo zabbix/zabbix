@@ -316,6 +316,7 @@ AGENT_RESULT {
 	zbx_uint64_t	ui64;
 	double		dbl;
 	char		*str;
+	char		*text;
 	char		*msg;
 	ZBX_LIST	list;
 };
@@ -326,6 +327,7 @@ AGENT_RESULT {
 #define AR_STRING	4
 #define AR_MESSAGE	8
 #define AR_LIST		16
+#define AR_TEXT		32
 
 
 #define SET_DBL_RESULT(res, val) \
@@ -344,6 +346,12 @@ AGENT_RESULT {
 	{ \
 	(res)->type |= AR_STRING; \
 	(res)->str = (char*)(val); \
+	} 
+
+#define SET_TEXT_RESULT(res, val) \
+	{ \
+	(res)->type |= AR_TEXT; \
+	(res)->text = (char*)(val); \
 	} 
 
 #define SET_MSG_RESULT(res, val) \
@@ -365,6 +373,11 @@ AGENT_RESULT {
 #define UNSET_STR_RESULT(res) \
 	{ \
 	(res)->type &= ~AR_STRING; \
+	}
+
+#define UNSET_TEXT_RESULT(res) \
+	{ \
+	(res)->type &= ~AR_TEXT; \
 	}
 
 #define UNSET_MSG_RESULT(res) \
