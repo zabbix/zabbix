@@ -27,16 +27,37 @@
 #define DO_MIN 2
 #define DO_AVG 3
 				    
+
+#ifndef HAVE_SYS_PROCFS_H
+	extern int getprocs(
+		struct procsinfo *ProcessBuffer,
+		int ProcessSize,
+		struct fdsinfo *FileBuffer,
+		int FileSize,
+		pid_t *IndexPointer,
+		int Count
+		);
+#endif /* ndef HAVE_SYS_PROCFS_H */
+
 int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 { /* usage: <function name>[ <process name>, <user name>, <mode>, <command> ] */
 	
+#ifdef HAVE_SYS_PROCFS_H
     DIR		*dir;
     int		proc;
 
+    struct psinfo	psinfo;
+#else
+	struct procsinfo	ProcessBuffer;
+	pid_t			IndexPointer;
+
+	AGENT_RESULT	proc_args;
+	char		get_args_cmd[MAX_STRING_LEN];
+#endif /* HAVE_SYS_PROCFS_H */
+    
     struct  dirent	*entries;
     struct  stat	buf;
     struct passwd	*usrinfo = NULL;
-    struct psinfo	psinfo;
     
     char	filename[MAX_STRING_LEN];
 
@@ -118,6 +139,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		proccomm[0] = '\0';
 	}
 
+#ifdef HAVE_SYS_PROCFS_H /* AIX 5.x */
 	dir=opendir("/proc");
 	if(NULL == dir)
 	{
@@ -181,6 +203,62 @@ lbl_skip_procces:
 	}
 
 	closedir(dir);
+#else
+        while(getprocs(&ProcessBuffer, sizeof(struct procsinfo), NULL, sizeof(struct fdsinfo), &IndexPointer, 1) > 0)
+        {
+			/* Self process information. It leads to incorrect results for proc_cnt[zabbix_agentd] */
+			if(ProcessBuffer.pi_pid == curr_pid)
+				continue;
+			
+			if(procname[0] != 0)
+				if(strcmp(procname,ProcessBuffer.pi_comm) != 0)
+					continue;
+			
+			if(usrinfo != NULL)
+				if(usrinfo->pw_uid != ProcessBuffer.pi_uid)
+					continue;
+			
+			if(proccomm[0] != '\0')
+			{
+				init_result(&proc_args);
+				snprintf(get_args_cmd, MAX_STRING_LEN-1, "ps -p %i -oargs=", ProcessBuffer.pi_pid);
+				if(EXECUTE_STR(cmd, get_args_cmd, flags, &proc_args) != SYSINFO_RET_OK)
+				{
+					free_result(&proc_args);
+					continue;
+				}
+				if(zbx_regexp_match(proc_args.str,proccomm,NULL) == NULL)
+				{
+					free_result(&proc_args);
+					continue;
+				}
+				free_result(&proc_args);
+			}
+			
+			proccount++;
+			
+			if(memsize < 0) /* First inicialization */
+			{
+				memsize = (double) (ProcessBuffer.pi_size * pgsize);
+			}
+			else
+			{
+				if(do_task == DO_MAX)
+				{
+					memsize = MAX(memsize, (double) (ProcessBuffer.pi_size * pgsize));
+				}
+				else if(do_task == DO_MIN)
+				{
+					memsize = MIN(memsize, (double) (ProcessBuffer.pi_size * pgsize));
+				}
+				else /* SUM */
+				{
+					memsize +=  (double) (ProcessBuffer.pi_size * pgsize);
+				}
+			}
+        }
+
+#endif /* HAVE_SYS_PROCFS_H */
 
 	if(memsize < 0)
 	{
@@ -203,13 +281,22 @@ lbl_skip_procces:
 int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 { /* usage: <function name>[ <process name>, <user name>, <process state>, <command> ] */
 	
-    DIR		*dir;
-    int		proc;
+#ifdef HAVE_SYS_PROCFS_H /* AIX 5.x */
+	DIR		*dir;
+	int		proc;
+	
+	struct psinfo	psinfo;
+#else
+	struct procsinfo	ProcessBuffer;
+	pid_t			IndexPointer;
+
+	AGENT_RESULT	proc_args;
+	char		get_args_cmd[MAX_STRING_LEN];
+#endif /* HAVE_SYS_PROCFS_H */
 
     struct  dirent	*entries;
     struct  stat	buf;
     struct passwd	*usrinfo = NULL;
-    struct psinfo	psinfo;
     
     char	filename[MAX_STRING_LEN];
 
@@ -265,16 +352,26 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
     
         if(strcmp(procstat,"run") == 0)
         {
+#ifdef HAVE_SYS_PROCFS_H /* AIX 5.x */
 		procstat[0] = PR_SNAME_TSRUN;		procstat[1] = '\0';
+#else
+		procstat[0] = SRUN;
+#endif
         }
         else if(strcmp(procstat,"sleep") == 0)
         {
+#ifdef HAVE_SYS_PROCFS_H /* AIX 5.x */
 		procstat[0] = PR_SNAME_TSSLEEP;		procstat[1] = '\0';
+#else
+		procstat[0] = SSLEEP;
+#endif
         }
+#ifdef HAVE_SYS_PROCFS_H /* AIX 5.x */
         else if(strcmp(procstat,"zomb") == 0)
         {
 		procstat[0] = PR_SNAME_TSZOMB;		procstat[1] = '\0';
         }
+#endif
         else if(strcmp(procstat,"all") == 0)
         {
 		procstat[0] = '\0';
@@ -289,6 +386,7 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 		proccomm[0] = '\0';
 	}
 
+#ifdef HAVE_SYS_PROCFS_H /* AIX 5.x */
 	dir=opendir("/proc");
 	if(NULL == dir)
 	{
@@ -336,7 +434,47 @@ lbl_skip_procces:
 	}
 
 	closedir(dir);
+#else
+        while(getprocs(&ProcessBuffer, sizeof(struct procsinfo), NULL, sizeof(struct fdsinfo), &IndexPointer, 1) > 0)
+        {
+			/* Self process information. It leads to incorrect results for proc_cnt[zabbix_agentd] */
+			if(ProcessBuffer.pi_pid == curr_pid)
+				continue;
+			
+			if(procname[0] != 0)
+				if(strcmp(procname,ProcessBuffer.pi_comm) != 0)
+					continue;
+			
+			if(usrinfo != NULL)
+				if(usrinfo->pw_uid != ProcessBuffer.pi_uid)
+					continue;
+			
+			if(procstat[0] != '\0')
+				if(ProcessBuffer.pi_state != procstat[0])
+					continue;
 
+			if(proccomm[0] != '\0')
+			{
+				init_result(&proc_args);
+				snprintf(get_args_cmd, MAX_STRING_LEN-1, "ps -p %i -oargs=", ProcessBuffer.pi_pid);
+				if(EXECUTE_STR(cmd, get_args_cmd, flags, &proc_args) != SYSINFO_RET_OK)
+				{
+					free_result(&proc_args);
+					continue;
+				}
+				if(zbx_regexp_match(proc_args.str,proccomm,NULL) == NULL)
+				{
+					free_result(&proc_args);
+					continue;
+				}
+				free_result(&proc_args);
+			}
+			
+			proccount++;
+        }
+
+#endif /* HAVE_SYS_PROCFS_H */
+	
 	SET_UI64_RESULT(result, proccount);
 
 	return SYSINFO_RET_OK;
