@@ -612,6 +612,9 @@ int	main(int argc, char **argv)
 	setproctitle("main process");
 #endif
 
+	collect_statistics();
+
+/*
 #ifdef HAVE_PROC_NET_DEV
 	collect_statistics();
 #else
@@ -620,6 +623,7 @@ int	main(int argc, char **argv)
 		pause();
 	}
 #endif
+*/
 
 	return SUCCEED;
 }

@@ -443,6 +443,8 @@ void	add_values_diskdevices(int now,int major,int diskno,float read_io_ops,float
 
 void	collect_stats_diskdevices(FILE *outfile)
 {
+#ifdef HAVE_PROC_STAT
+
 	FILE	*file;
 
 	char	*s,*s2;
@@ -506,4 +508,6 @@ void	collect_stats_diskdevices(FILE *outfile)
 	fclose(file);
 
 	report_stats_diskdevices(outfile, now);
+
+#endif /* HAVE_PROC_STAT */
 }
