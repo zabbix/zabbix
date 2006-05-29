@@ -176,299 +176,52 @@ CPU_FNCLIST
 	return SYSINFO_RET_FAIL;
 }
 
-/* AIX CPU info */
-#ifdef HAVE_KNLIST_H
-static int getloadavg_kmem(double loadavg[], int nelem)
-{
-	struct nlist nl;
-	int kmem, i;
-	long avenrun[3];
-
-	nl.n_name = "avenrun";
-	nl.n_value = 0;
-
-	if(knlist(&nl, 1, sizeof(nl)))
-	{
-		return FAIL;
-	}
-	if((kmem = open("/dev/kmem", 0, 0)) <= 0)
-	{
-		return FAIL;
-	}
-
-	if(pread(kmem, avenrun, sizeof(avenrun), nl.n_value) <
-				sizeof(avenrun))
-	{
-		return FAIL;
-	}
-
-	for(i=0;i<nelem;i++)
-	{
-		loadavg[i] = (double) avenrun[i] / 65535;
-	}
-	return SUCCEED;
-}
-#endif
-
 int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef HAVE_GETLOADAVG
-	double	load[3];
-
-	assert(result);
-
-        init_result(result);
-		
-	if(getloadavg(load, 3))
-	{
-		SET_DBL_RESULT(result, load[0]);
-		return SYSINFO_RET_OK;
-	}
-	else
-	{
-		return SYSINFO_RET_FAIL;	
-	}
-#else
-#ifdef	HAVE_SYS_PSTAT_H
 	struct	pst_dynamic dyn;
 
 	assert(result);
 
         init_result(result);
 
-	if (pstat_getdynamic(&dyn, sizeof(dyn), 1, 0) == -1)
-	{
-		return SYSINFO_RET_FAIL;
-	}
-	else
+	if (pstat_getdynamic(&dyn, sizeof(dyn), 1, 0) != -1)
 	{
 		SET_DBL_RESULT(result, dyn.psd_avg_1_min);
 		return SYSINFO_RET_OK;
 	}
-#else
-#ifdef HAVE_PROC_LOADAVG
-	return	getPROC("/proc/loadavg",1,1, flags, result);
-#else
-#ifdef HAVE_KSTAT_H
-	static kstat_ctl_t *kc = NULL;
-	kstat_t *ks;
-	kstat_named_t *kn;
-
-	assert(result);
-
-        init_result(result);
-	
-	if (!kc && !(kc = kstat_open()))
-	{
-		return SYSINFO_RET_FAIL;
-	}
-	if (!(ks = kstat_lookup(kc, "unix", 0, "system_misc")) ||
-		kstat_read(kc, ks, 0) == -1 ||
-		!(kn = kstat_data_lookup(ks,"avenrun_1min")))
-	{
-		return SYSINFO_RET_FAIL;
-	}
-	SET_DBL_RESULT(result, ((double)kn->value.ul)/256.0);
-	return SYSINFO_RET_OK;
-#else
-#ifdef HAVE_KNLIST_H
-	double loadavg[3];
-
-	assert(result);
-
-        init_result(result);
-		
-	if(getloadavg_kmem(loadavg,3) == FAIL)
-	{
-		return SYSINFO_RET_FAIL;
-	}
-
-	SET_DBL_RESULT(result, loadavg[0]);
-	return SYSINFO_RET_OK;
-#else
-	assert(result);
-
-        init_result(result);
-	return	SYSINFO_RET_FAIL;
-#endif
-#endif
-#endif
-#endif
-#endif
+	return SYSINFO_RET_FAIL;
 }
 
 int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef HAVE_GETLOADAVG
-	double	load[3];
-
-	assert(result);
-
-        init_result(result);
-		
-	if(getloadavg(load, 3))
-	{
-		SET_DBL_RESULT(result, load[1]);
-		return SYSINFO_RET_OK;
-	}
-	else
-	{
-		return SYSINFO_RET_FAIL;	
-	}
-#else
-#ifdef	HAVE_SYS_PSTAT_H
 	struct	pst_dynamic dyn;
 
 	assert(result);
 
         init_result(result);
 	
-	if (pstat_getdynamic(&dyn, sizeof(dyn), 1, 0) == -1)
-	{
-		return SYSINFO_RET_FAIL;
-	}
-	else
+	if (pstat_getdynamic(&dyn, sizeof(dyn), 1, 0) != -1)
 	{
 		SET_DBL_RESULT(result, dyn.psd_avg_5_min);
 		return SYSINFO_RET_OK;
 	}
-#else
-#ifdef	HAVE_PROC_LOADAVG
-	return	getPROC("/proc/loadavg",1,2, flags, result);
-#else
-#ifdef HAVE_KSTAT_H
-	static kstat_ctl_t *kc = NULL;
-	kstat_t *ks;
-	kstat_named_t *kn;
-
-	assert(result);
-
-        init_result(result);
-		
-	if (!kc && !(kc = kstat_open()))
-	{
-		return SYSINFO_RET_FAIL;
-	}
-	if (!(ks = kstat_lookup(kc, "unix", 0, "system_misc")) ||
-		kstat_read(kc, ks, 0) == -1 ||
-		!(kn = kstat_data_lookup(ks,"avenrun_5min")))
-	{
-		return SYSINFO_RET_FAIL;
-	}
-	SET_DBL_RESULT(result, ((double)kn->value.ul)/256.0);
-	return SYSINFO_RET_OK;
-#else
-#ifdef HAVE_KNLIST_H
-	double loadavg[3];
-
-	assert(result);
-
-        init_result(result);
-
-	if(getloadavg_kmem(loadavg,3) == FAIL)
-	{
-		return STSINFO_RET_FAIL;
-	}
-
-	SET_DBL_RESULT(result, loadavg[1]);
-	return SYSINFO_RET_OK;
-#else
-	assert(result);
-
-        init_result(result);
-	return	SYSINFO_RET_FAIL;
-#endif
-#endif
-#endif
-#endif
-#endif
+	return SYSINFO_RET_FAIL;
 }
 
 int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef HAVE_GETLOADAVG
-	double	load[3];
-
-	assert(result);
-
-        init_result(result);
-
-	if(getloadavg(load, 3))
-	{
-		SET_DBL_RESULT(result, load[2]);	
-		return SYSINFO_RET_OK;
-	}
-	else
-	{
-		return SYSINFO_RET_FAIL;	
-	}
-#else
-#ifdef	HAVE_SYS_PSTAT_H
 	struct	pst_dynamic dyn;
 
 	assert(result);
 
         init_result(result);
 		
-	if (pstat_getdynamic(&dyn, sizeof(dyn), 1, 0) == -1)
-	{
-		return SYSINFO_RET_FAIL;
-	}
-	else
+	if (pstat_getdynamic(&dyn, sizeof(dyn), 1, 0) != -1)
 	{
 		SET_DBL_RESULT(result, dyn.psd_avg_15_min);
 		return SYSINFO_RET_OK;
 	}
-#else
-#ifdef	HAVE_PROC_LOADAVG
-	return	getPROC("/proc/loadavg",1,3, flags, result);
-#else
-#ifdef HAVE_KSTAT_H
-	static kstat_ctl_t *kc = NULL;
-	kstat_t *ks;
-	kstat_named_t *kn;
-
-	assert(result);
-
-        init_result(result);
-		
-	if (!kc && !(kc = kstat_open()))
-	{
-		return SYSINFO_RET_FAIL;
-	}
-	if (!(ks = kstat_lookup(kc, "unix", 0, "system_misc")) ||
-		kstat_read(kc, ks, 0) == -1 ||
-		!(kn = kstat_data_lookup(ks,"avenrun_15min")))
-	{
-		return SYSINFO_RET_FAIL;
-	}
-	SET_DBL_RESULT(result, ((double)kn->value.ul)/256.0);
-	return SYSINFO_RET_OK;
-#else
-#ifdef HAVE_KNLIST_H
-	double loadavg[3];
-
-	assert(result);
-
-        init_result(result);
-	
-	if(getloadavg_kmem(loadavg,3) == FAIL)
-	{
-		return STSINFO_RET_FAIL;
-	}
-
-	SET_DBL_RESULT(result, loadavg[2]);
-	return SYSINFO_RET_OK;
-#else
-	assert(result);
-
-        init_result(result);
-	return	SYSINFO_RET_FAIL;
-#endif
-#endif
-#endif
-#endif
-#endif
+	return SYSINFO_RET_FAIL;
 }
 
 int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)

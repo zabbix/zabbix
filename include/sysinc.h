@@ -137,6 +137,10 @@
 #	include <sys/pstat.h>
 #endif
 
+#ifdef HAVE_SYS_DK_H
+#	include <sys/dk.h>
+#endif
+
 #ifdef HAVE_RESOLV_H
 #	include <resolv.h>
 #endif

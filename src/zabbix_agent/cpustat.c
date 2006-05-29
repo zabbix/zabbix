@@ -284,45 +284,66 @@ void	add_values_cpustat(int now,float cpu_user,float cpu_system,float cpu_nice,f
 
 void	collect_stats_cpustat(FILE *outfile)
 {
-	FILE	*file;
-
-	char	*s;
-	char	line[MAX_STRING_LEN];
-	int	i;
-	int	now;
+	/* Must be static */
+	static	int initialised = 0;
+	int	now = 0;
 	float	cpu_user, cpu_nice, cpu_system, cpu_idle;
 
-	/* Must be static */
-	static	int initialised=0;
+#if defined(HAVE_PROC_STAT)
+	
+	FILE	*file;
+	char	line[MAX_STRING_LEN];
+	
+#elif defined(HAVE_SYS_PSTAT_H) /* HAVE_PROC_STAT */
+	
+	struct pst_dynamic stats;
+	
+#else /* HAVE_SYS_PSTAT_H */
 
-	if( 0 == initialised)
+	return;
+	
+#endif
+
+	if(!initialised)
 	{
 		init_stats_cpustat();
-		initialised=1;
+		initialised = 1;
 	}
 
-	now=time(NULL);
+	now = time(NULL);
 
-	file=fopen("/proc/stat","r");
+#if defined(HAVE_PROC_STAT)
+	
+	file = fopen("/proc/stat","r");
 	if(NULL == file)
 	{
 		fprintf(stderr, "Cannot open [%s] [%s]\n","/proc/stat", strerror(errno));
 		return;
 	}
-	i=0;
+	cpu_user = cpu_nice = cpu_system = cpu_idle = -1;
 	while(fgets(line,1024,file) != NULL)
 	{
-		if( (s=strstr(line,"cpu ")) == NULL)
-			continue;
+		if(strstr(line,"cpu ") == NULL) continue;
 
-		s=line;
-
-		sscanf(s,"cpu %f %f %f %f",&cpu_user, &cpu_nice, &cpu_system, &cpu_idle);
-		add_values_cpustat(now,cpu_user, cpu_system, cpu_nice, cpu_idle);
+		sscanf(line, "cpu %f %f %f %f", &cpu_user, &cpu_nice, &cpu_system, &cpu_idle);
 		break;
 	}
-
 	fclose(file);
 
+	if(cpu_user < 0) 
+		return;
+	
+#elif defined(HAVE_SYS_PSTAT_H) /* HAVE_PROC_STAT */
+
+	pstat_getdynamic(&stats, sizeof( struct pst_dynamic ), 1, 0 );
+	cpu_user 	= (float)stats.psd_cpu_time[CP_USER];
+	cpu_nice 	= (float)stats.psd_cpu_time[CP_SYS];
+	cpu_system 	= (float)stats.psd_cpu_time[CP_NICE];
+	cpu_idle 	= (float)stats.psd_cpu_time[CP_IDLE];
+	
+#endif /* HAVE_SYS_PSTAT_H */
+
+	add_values_cpustat(now,cpu_user, cpu_system, cpu_nice, cpu_idle);
 	report_stats_cpustat(outfile, now);
+	
 }
