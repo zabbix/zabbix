@@ -201,6 +201,8 @@ int	main(int argc, char **argv)
 		snprintf(value, MAX_STRING_LEN-1, ZBX_FS_UI64, result.ui64);
 	else if(result.type & AR_STRING)
 		snprintf(value, MAX_STRING_LEN-1, "%s", result.str);
+	else if(result.type & AR_TEXT)
+		snprintf(value, MAX_STRING_LEN-1, "%s", result.text);
 	else if(result.type & AR_MESSAGE)
 		snprintf(value, MAX_STRING_LEN-1, "%s", result.msg);
 	free_result(&result);

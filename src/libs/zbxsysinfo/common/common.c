@@ -330,6 +330,10 @@ void	test_parameter(char* key)
 	{
 		printf(" [s|%s]", result.str);
 	}
+	if(result.type & AR_TEXT)
+	{
+		printf(" [t|%s]", result.text);
+	}
 	if(result.type & AR_MESSAGE)
 	{
 		printf(" [m|%s]", result.msg);
@@ -362,6 +366,10 @@ void	test_parameters(void)
 		if(result.type & AR_STRING)
 		{
 			printf(" [s|%s]", result.str);
+		}
+		if(result.type & AR_TEXT)
+		{
+			printf(" [t|%s]", result.text);
 		}
 		if(result.type & AR_MESSAGE)
 		{
@@ -1195,7 +1203,7 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		}
 	}
 	
-	SET_STR_RESULT(result, strdup(c));
+	SET_TEXT_RESULT(result, strdup(c));
 	
 	return	SYSINFO_RET_OK;
 }
@@ -1260,8 +1268,10 @@ int	EXECUTE(const char *cmd, const char *command, unsigned flags, AGENT_RESULT *
 int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	command[MAX_STRING_LEN];
+#define MAX_FLAG_LEN 10
+	char	flag[MAX_FLAG_LEN];
 	pid_t	pid;
-
+	
         assert(result);
 
 	init_result(result);
@@ -1272,7 +1282,7 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		return  SYSINFO_RET_FAIL;
 	}
 	
-        if(num_param(param) > 1)
+        if(num_param(param) > 2)
         {
                 return SYSINFO_RET_FAIL;
         }
@@ -1283,6 +1293,25 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
         }
 
 	if(command[0] == '\0')
+	{
+		return SYSINFO_RET_FAIL;
+	}
+	
+	if(get_param(param, 2, flag, MAX_FLAG_LEN) != 0)
+        {
+                flag[0] = '\0';
+        }
+
+	if(flag[0] == '\0')
+	{
+		snprintf(flag,MAX_FLAG_LEN,"wait");
+	}
+
+	if(strcmp(flag,"wait") == 0)
+	{
+		return EXECUTE_STR(cmd,command,flags,result);
+	}
+	else if(strcmp(flag,"nowait") != 0)
 	{
 		return SYSINFO_RET_FAIL;
 	}
@@ -1311,7 +1340,7 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 			/* In normal case the program will never reach this point */
 			exit(0);
 		default:
-			waitpid(pid, NULL, WNOHANG); /* NO WAIT for thread 2 closing */
+			waitpid(pid, NULL, WNOHANG); /* NO WAIT can be used for thread 2 closing */
 			exit(0); /* close thread 1 and transmit thread 2 to system (solve zombie state) */
 			break;
 		}

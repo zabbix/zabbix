@@ -250,7 +250,7 @@ static void run_remote_command(char* host_name, char* command)
 		item.useip=atoi(row[2]);
 		item.port=atoi(row[3]);
 		
-		snprintf(item.key,ITEM_KEY_LEN_MAX-1,"system.run[%s]",command);
+		snprintf(item.key,ITEM_KEY_LEN_MAX-1,"system.run[%s,nowait]",command);
 		
 		alarm(CONFIG_TIMEOUT);
 		
