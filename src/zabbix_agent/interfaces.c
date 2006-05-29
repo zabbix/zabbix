@@ -320,6 +320,8 @@ void	add_values_interfaces(int now,char *interface,float value_sent,float value_
 
 void	collect_stats_interfaces(FILE *outfile)
 {
+#ifdef HAVE_PROC_NET_DEV
+	
 	FILE	*file;
 
 	char	*s;
@@ -389,4 +391,6 @@ void	collect_stats_interfaces(FILE *outfile)
 	fclose(file);
 
 	report_stats_interfaces(outfile, now);
+
+#endif /* HAVE_PROC_NET_DEV */
 }

@@ -45,7 +45,7 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   sys/time.h kstat.h sys/syscall.h sys/sysmacros.h sys/procfs.h \
   stdint.h mach/host_info.h mach/mach_host.h knlist.h pwd.h sys/proc.h \
   sys/var.h resolv.h arpa/nameser.h assert.h sys/dkstat.h sys/disk.h \
-  nlist.h net/if.h kvm.h linux/kernel.h ldap.h getopt.h procinfo.h)
+  nlist.h net/if.h kvm.h linux/kernel.h ldap.h getopt.h procinfo.h sys/dk.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -81,6 +81,15 @@ AC_MSG_CHECKING(for /proc filesystem)
 if test -d /proc; then
 	AC_MSG_RESULT(yes)
 	AC_DEFINE(HAVE_PROC,1,[Define to 1 if '/proc' file system should be used.])
+else
+	AC_MSG_RESULT(no)
+fi
+
+dnl Check for /proc filesystem
+AC_MSG_CHECKING(for file /proc/stat)
+if test -r /proc/stat; then
+	AC_MSG_RESULT(yes)
+	AC_DEFINE(HAVE_PROC_STAT,1,[Define to 1 if file '/proc/stat' should be used.])
 else
 	AC_MSG_RESULT(no)
 fi
@@ -937,6 +946,7 @@ openbsd*)
 dnl	AC_MSG_ERROR(${host_os} not supported)
 ;;
 esac
+	AC_DEFINE_UNQUOTED([ARCH], "${ARCH}", [Define to os name for code  managing])
 
 dnl AM_CONDITIONAL(CONFIG_HOST_LINUX, test "x$ARCH" = "xlinux")
 dnl AC_SUBST(CONFIG_HOST_LINUX)
