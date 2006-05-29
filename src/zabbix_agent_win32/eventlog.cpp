@@ -30,7 +30,7 @@ int process_eventlog(
 	WORD	category;
 	int		ret = 1;
 
-LOG_DEBUG_INFO("s","In process_eventlog()");
+LOG_FUNC_CALL("In process_eventlog()");
 INIT_CHECK_MEMORY(main);
 
     if (!MyOpenEventLog(source,&hAppLog,&LastID,&FirstID))
@@ -59,7 +59,7 @@ INIT_CHECK_MEMORY(main);
     }
 
 CHECK_MEMORY(main, "process_eventlog","end");
-LOG_DEBUG_INFO("s","End of process_eventlog()");
+LOG_FUNC_CALL("End of process_eventlog()");
 
 	return ret;
 }
@@ -73,7 +73,7 @@ DllExport   long    MyOpenEventLog(
 {
     HANDLE  hAppLog;		/* handle to the application log */
 
-LOG_DEBUG_INFO("s","In MyOpenEventLog()");
+LOG_FUNC_CALL("In MyOpenEventLog()");
 INIT_CHECK_MEMORY(main);
 
     *pEventHandle = 0;
@@ -89,7 +89,7 @@ INIT_CHECK_MEMORY(main);
     *pEventHandle = hAppLog;
 
 CHECK_MEMORY(main, "MyOpenEventLog", "end");
-LOG_DEBUG_INFO("s","End of MyOpenEventLog()");
+LOG_FUNC_CALL("End of MyOpenEventLog()");
     return(0);
 
 }
@@ -99,13 +99,13 @@ DllExport   long    MyCloseEventLog(
 	HANDLE hAppLog
 	)
 {
-LOG_DEBUG_INFO("s","In MyCloseEventLog()");
+LOG_FUNC_CALL("In MyCloseEventLog()");
 INIT_CHECK_MEMORY(main);
 
     if (hAppLog)  CloseEventLog(hAppLog);
 
 CHECK_MEMORY(main, "MyCloseEventLog", "end");
-LOG_DEBUG_INFO("s","End of MyCloseEventLog()");
+LOG_FUNC_CALL("End of MyCloseEventLog()");
 	return(0);
 }
 
@@ -114,7 +114,7 @@ DllExport   long    MyClearEventLog(
 	HANDLE hAppLog
 	)
 {
-LOG_DEBUG_INFO("s","In MyClearEventLog()");
+LOG_FUNC_CALL("In MyClearEventLog()");
 INIT_CHECK_MEMORY(main);
 
     if (!(ClearEventLog(hAppLog,0)))
@@ -124,7 +124,7 @@ LOG_DEBUG_INFO("s","MyClearEventLog: error exit");
 	}
 
 CHECK_MEMORY(main, "MyClearEventLog", "end");
-LOG_DEBUG_INFO("s","End of MyClearEventLog()");
+LOG_FUNC_CALL("End of MyClearEventLog()");
     return(0);
 
 }
@@ -157,7 +157,7 @@ DllExport   long    MyGetAEventLog(
     LPTSTR          msgBuf = NULL;                       // hold text of the error message that we
     long            err = 0;
 
-LOG_DEBUG_INFO("s","In MyGetAEventLog()");
+LOG_FUNC_CALL("In MyGetAEventLog()");
 INIT_CHECK_MEMORY(main);
 
     if (!hAppLog)        return(0);
@@ -273,7 +273,7 @@ INIT_CHECK_MEMORY(main);
 	}
 
 CHECK_MEMORY(main, "MyGetAEventLog", "end");
-LOG_DEBUG_INFO("s","End of MyGetAEventLog()");
+LOG_FUNC_CALL("End of MyGetAEventLog()");
     return 0;
 
 } 

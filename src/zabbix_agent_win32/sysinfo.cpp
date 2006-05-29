@@ -945,7 +945,7 @@ static LONG H_SystemUname(char *cmd,char *arg,char **value)
    SYSTEM_INFO sysInfo;
    OSVERSIONINFO versionInfo;
 
-LOG_DEBUG_INFO("s","In H_SystemUname()");
+LOG_FUNC_CALL("In H_SystemUname()");
 INIT_CHECK_MEMORY(main);
 
    dwSize=MAX_COMPUTERNAME_LENGTH+1;
@@ -1009,7 +1009,7 @@ INIT_CHECK_MEMORY(main);
    *value=strdup(buffer);
 
 CHECK_MEMORY(main, "H_SystemUname","end");
-LOG_DEBUG_INFO("s","End of H_SystemUname()");
+LOG_FUNC_CALL("End of H_SystemUname()");
 
    return SYSINFO_RC_SUCCESS;
 }
@@ -1111,7 +1111,7 @@ void ProcessCommand(char *received_cmd,char *result)
 assert(received_cmd);
 assert(result);
 
-LOG_DEBUG_INFO("s","In ProcessCommand()");
+LOG_FUNC_CALL("In ProcessCommand()");
 INIT_CHECK_MEMORY(main);
 
 	for(i=0; received_cmd[i]!='\0'; i++)
@@ -1206,7 +1206,7 @@ finish_cmd_processing:;
    }
 
 CHECK_MEMORY(main, "ProcessCommand","end");
-LOG_DEBUG_INFO("s","End of ProcessCommand()");
+LOG_FUNC_CALL("End of ProcessCommand()");
 }
 
 char *test_cmd = NULL;
@@ -1216,7 +1216,7 @@ int TestCommand()
 	char result[MAX_STRING_LEN];
 	int i = 0;
 
-LOG_DEBUG_INFO("s","In TestCommand()");
+LOG_FUNC_CALL("In TestCommand()");
 	result[0] = 0;
 	ProcessCommand(test_cmd, result);
 
@@ -1230,6 +1230,6 @@ LOG_DEBUG_INFO("s","In TestCommand()");
 	}
 
 	printf("%-35s [%s]\n",test_cmd, result);
-LOG_DEBUG_INFO("s","End of TestCommand()");
+LOG_FUNC_CALL("End of TestCommand()");
 	return 0;
 }
