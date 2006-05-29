@@ -63,7 +63,7 @@ void Communicate(SOCKET sock)
 
 	int rc = 0;
 
-LOG_DEBUG_INFO("s","In Communicate()");
+LOG_FUNC_CALL("In Communicate()");
 INIT_CHECK_MEMORY(main);
 
 	// Wait for command from server
@@ -105,7 +105,7 @@ send_result:
 	send(sock,rq.result,strlen(rq.result),0);
 
 CHECK_MEMORY(main, "Communicate", "end");
-LOG_DEBUG_INFO("s","End of Communicate()");
+LOG_FUNC_CALL("End of Communicate()");
 }
 
 //
