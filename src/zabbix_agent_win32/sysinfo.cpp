@@ -28,7 +28,7 @@
 //
 
 LONG H_ProcInfo(char *cmd,char *arg,double *value);
-LONG H_RunCommand(char *cmd,char *arg,double *value);
+LONG H_RunCommand(char *cmd,char *arg,char **value);
 LONG H_Execute(char *cmd,char *arg,char **value);
 LONG H_CheckTcpPort(char *cmd,char *arg,double *value);
 
@@ -1023,7 +1023,7 @@ static AGENT_COMMAND commands[]=
 {  /* name							handler_float		handler_string		arg */
 	{ "__exec{*}",					NULL,				H_Execute,			NULL },
 	{ "__usercnt{*}",				H_UserCounter,		NULL,				NULL },
-	{ "system.run[*]",				H_RunCommand,		NULL,				NULL },
+	{ "system.run[*]",				NULL,				H_RunCommand,		NULL },
 
 	{ "agent.stat[avg_collector_time]",		H_NumericPtr,		NULL,				(char *)&statAvgCollectorTime },
 	{ "agent.stat[max_collector_time]",		H_NumericPtr,		NULL,				(char *)&statMaxCollectorTime },
