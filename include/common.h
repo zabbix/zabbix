@@ -33,8 +33,17 @@
 #		define LOG_DEBUG_INFO(type, msg) \
 			WriteLog(MSG_DEBUG_INFO,EVENTLOG_ERROR_TYPE, "d"type , GetCurrentThreadId(), msg)
 //#		define ENABLE_CHECK_MEMOTY
+//#		define ENABLE_FUNC_CALL
 #	else
 #		define LOG_DEBUG_INFO(a, b) ((void)0)
+#	endif
+
+
+#	if defined(ENABLE_FUNC_CALL)
+#		define LOG_FUNC_CALL(msg) \
+			WriteLog(MSG_DEBUG_INFO,EVENTLOG_ERROR_TYPE, "ds" , GetCurrentThreadId(), msg)
+#	else
+#		define LOG_FUNC_CALL(a) ((void)0)
 #	endif
 
 #	if defined(ENABLE_CHECK_MEMOTY)

@@ -39,7 +39,7 @@ int   process_log(char *filename,int *lastlogsize, char *value)
 {
 	FILE	*f;
 
-LOG_DEBUG_INFO("s","In process_log()");
+LOG_FUNC_CALL("In process_log()");
 INIT_CHECK_MEMORY(main);
 
 	f=fopen(filename,"r");
@@ -77,6 +77,6 @@ CHECK_MEMORY(main, "process_log", "fgets");
 	*lastlogsize+=strlen(value);
 
 CHECK_MEMORY(main, "process_log", "end");
-LOG_DEBUG_INFO("s","End of process_log()");
+LOG_FUNC_CALL("End of process_log()");
 	return 0;
 }
