@@ -8,9 +8,6 @@
 #include <sys/types.h>
 #include <regex.h>
 
-#define MAX_FILE_LEN	1024*1024
-
-
 char	*zbx_regexp_match(const char *string, const char *pattern, int *len)
 {
 	int	status;
@@ -44,3 +41,16 @@ char	*zbx_regexp_match(const char *string, const char *pattern, int *len)
 
 	return	c;
 }
+
+/*#define ZABBIX_TEST*/
+
+#ifdef ZABBIX_TEST
+int main()
+{
+	int len=2;
+	char s[1024];
+
+	printf("[%s]\n", zbx_regexp_match("ABCDEFGH","^F",&len));
+	printf("[%d]\n", len);
+}
+#endif
