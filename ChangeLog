@@ -1,7 +1,9 @@
 Changes for 1.1beta12:
 
+ - support of web.page.regexp[] (Alexei)
+ - support of web.page.perf[] (Alexei)
+ - support of web.page.get[] (Alexei)
  - added whitespaces stripping (Eugene)
- - support of web.getpage[] (Alexei)
  - improved "system.run[]" key, added <wait>|<nowait> mode (Eugene)
  - added support of "system.cpu.util[]" key for HPUX (Eugene)
  - added support of "proc.num[]" key for AIX 4.x (Eugene)
