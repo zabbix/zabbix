@@ -1,5 +1,6 @@
 Changes for 1.1beta12:
 
+ - support of web.getpage[] (Alexei)
  - improved "system.run[]" key, added <wait>|<nowait> mode (Eugene)
  - added support of "system.cpu.util[]" key for HPUX (Eugene)
  - added support of "proc.num[]" key for AIX 4.x (Eugene)
