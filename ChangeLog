@@ -1,5 +1,6 @@
 Changes for 1.1beta12:
 
+ - fixed SQL requests escaping for oracle server (Eugene)
  - support of web.page.regexp[] (Alexei)
  - support of web.page.perf[] (Alexei)
  - support of web.page.get[] (Alexei)
