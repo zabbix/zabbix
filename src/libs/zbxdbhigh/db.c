@@ -1477,9 +1477,15 @@ void    DBescape_string(char *from, char *to, int maxlen)
 	maxlen--;
 	for(i=0, ptr=0; from && from[i] && ptr < maxlen; i++)
 	{
+#ifdef	HAVE_ORACLE
+		if( (from[i] == '\''))
+		{
+			to[ptr++] = '\'';
+#else /* HAVE_ORACLE */
 		if( (from[i] == '\'') || (from[i] == '\\'))
 		{
 			to[ptr++] = '\\';
+#endif
 			if(ptr >= maxlen)       break;
 		}
 		to[ptr++] = from[i];
