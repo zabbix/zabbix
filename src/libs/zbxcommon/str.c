@@ -203,10 +203,12 @@ void del_zeroes(char *s)
  * Parameters:                                                                *
  * 	param  - parameter list                                               *
  *      num    - requested parameter index                                    *
- *      buf    - pointer og output buffer                                     *
+ *      buf    - pointer of output buffer                                     *
  *      maxlem - size of output buffer                                        *
  *                                                                            *
- * Return value: 1 - on error                                                 *
+ * Return value:                                                              *
+ *      1 - requested parameter missed                                        *
+ *      0 - requested parameter founded (value - 'buf' can be empty string)   *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
