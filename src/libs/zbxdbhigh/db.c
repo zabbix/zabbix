@@ -1140,14 +1140,23 @@ int	DBadd_history_str(int itemid, char *value, int clock)
 
 int	DBadd_history_text(int itemid, char *value, int clock)
 {
-	char	sql[MAX_STRING_LEN];
-	char	value_esc[MAX_STRING_LEN];
+	char	*sql;
+	char	*value_esc;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_history_str()");
 
+	value_esc=malloc(strlen(value)+1024);
+	sql=malloc(strlen(value)+1024+100);
+
+	if(value_esc == NULL)	return FAIL;
+	if(sql == NULL)		{ free(value_esc); return FAIL; }
+
 	DBescape_string(value,value_esc,MAX_STRING_LEN);
-	snprintf(sql,sizeof(sql)-1,"insert into history_text (clock,itemid,value) values (%d,%d,'%s')",clock,itemid,value_esc);
+	snprintf(sql,strlen(value)+1024+100-1,"insert into history_text (clock,itemid,value) values (%d,%d,'%s')",clock,itemid,value_esc);
 	DBexecute(sql);
+
+	free(value_esc);
+	free(sql);
 
 	return SUCCEED;
 }

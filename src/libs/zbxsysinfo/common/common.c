@@ -40,7 +40,9 @@ ZBX_METRIC	parameters_common[]=
 	{"vfs.file.regexp",	CF_USEUPARAM,	VFS_FILE_REGEXP,	0,	"/etc/passwd,root"},
 	{"vfs.file.regmatch",	CF_USEUPARAM,	VFS_FILE_REGMATCH, 	0,	"/etc/passwd,root"},
 	{"system.run",		CF_USEUPARAM,	RUN_COMMAND,	 	0,	"echo test"},
-	{"web.getpage",		CF_USEUPARAM,	WEB_GETPAGE,	 	0,	"www.zabbix.com,,80"},
+	{"web.page.get",	CF_USEUPARAM,	WEB_PAGE_GET,	 	0,	"www.zabbix.com,,80"},
+	{"web.page.perf",	CF_USEUPARAM,	WEB_PAGE_PERF,	 	0,	"www.zabbix.com,,80"},
+	{"web.page.regexp",	CF_USEUPARAM,	WEB_PAGE_REGEXP,	 	0,	"www.zabbix.com,,80"},
 	{0}
 	};
 
