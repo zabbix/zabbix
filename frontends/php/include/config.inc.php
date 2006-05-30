@@ -658,14 +658,15 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 			$function=$arr[3];
 			$parameter=$arr[4];
 
-//			echo $host,"<br>";
-//			echo $key,"<br>";
-//			echo $function,"<br>";
-//			echo $parameter,"<br>";
+//SDI($host);
+//SDI($key);
+//SDI($function);
+//SDI($parameter);
 
-			$sql="select count(*) as cnt from hosts h,items i where h.host=".zbx_dbstr($host)." and i.key_=".zbx_dbstr($key)." and h.hostid=i.hostid";
-			$result=DBselect($sql);
-			$row=DBfetch($result);
+			$sql="select count(*) as cnt from hosts h,items i where h.host=".zbx_dbstr($host).
+				" and i.key_=".zbx_dbstr($key)." and h.hostid=i.hostid";
+//SDI($sql);
+			$row=DBfetch(DBselect($sql));
 			if($row["cnt"]!=1)
 			{
 				error("No such host ($host) or monitored parameter ($key)");
