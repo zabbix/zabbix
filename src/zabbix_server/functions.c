@@ -672,6 +672,11 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, int now)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In update_item()");
 
+	sql[0] 		= '\0';
+	value_str[0]	= '\0';
+	value_esc[0]	= '\0';
+	value_double	= 0;
+	
 	if(value->type & AR_UINT64)
 	{
 		snprintf(value_str,MAX_STRING_LEN-1,ZBX_FS_UI64, value->ui64);
@@ -683,7 +688,13 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, int now)
 		value_double = value->dbl;
 	}
 	if(value->type & AR_STRING)
+	{
 		strscpy(value_str, value->str);
+	}
+	if(value->type & AR_TEXT)
+	{
+		strscpy(value_str, value->text);
+	}
 
 	if(item->delta == ITEM_STORE_AS_IS)
 	{
