@@ -126,7 +126,7 @@ int	WEB_PAGE_GET(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	else
 	{
 		free(buffer);
-		SET_TEXT_RESULT(result, strdup(" "));
+		SET_TEXT_RESULT(result, strdup("EOF"));
 	}
 
 	return ret;
@@ -261,11 +261,11 @@ int	WEB_PAGE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 			strncpy(back,found, l);
 			SET_STR_RESULT(result, strdup(back));
 		}
-		else	SET_STR_RESULT(result, strdup(" "));
+		else	SET_STR_RESULT(result, strdup("EOF"));
 	}
 	else
 	{
-		SET_STR_RESULT(result, strdup(" "));
+		SET_STR_RESULT(result, strdup("EOF"));
 	}
 	free(buffer);
 
