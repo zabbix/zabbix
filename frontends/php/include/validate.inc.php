@@ -201,6 +201,21 @@
 		return ZBX_VALID_OK;
 	}
 
+	function	check_trim(&$var)
+	{
+		if(is_string($var)) 
+		{
+			$var = trim($var);
+		}
+		elseif(is_array($var))
+		{
+			foreach($var as $key => $val)
+			{
+				check_trim($var[$key]);
+			}
+		}
+	}
+
 	function	check_field(&$fields, &$field, $checks)
 	{
 		list($type,$opt,$flags,$validation,$exception)=$checks;
@@ -253,6 +268,8 @@
 			if(!isset($_REQUEST[$field]))
 				return ZBX_VALID_OK;
 		}
+
+		check_trim($_REQUEST[$field]);
 
 		$err = check_type($field, $flags, $_REQUEST[$field], $type);
 		if($err != ZBX_VALID_OK)
