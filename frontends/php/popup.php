@@ -220,7 +220,7 @@
 			S_STATUS));
 
 
-		$sql = "select distinct t.*".
+		$sql = "select distinct h.host,t.*".
 			" from triggers t,hosts h,items i,functions f".
 			" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid";
 
@@ -374,4 +374,5 @@ function add_variable(formname,value)
 		$table->Show();
 
 	}
+	show_messages();
 ?>
