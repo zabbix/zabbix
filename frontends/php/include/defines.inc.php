@@ -219,6 +219,11 @@
 	define("PROFILE_TYPE_INT",	2);
 	define("PROFILE_TYPE_STR",	3);
 
+	define("CALC_FNC_MIN", 1);
+	define("CALC_FNC_AVG", 2);
+	define("CALC_FNC_MAX", 4);
+	define("CALC_FNC_ALL", 7);
+
 /* Support for PHP5. PHP5 does not have $HTTP_..._VARS */
 	if (!function_exists('version_compare'))
 	{

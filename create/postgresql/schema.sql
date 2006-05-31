@@ -512,6 +512,9 @@ CREATE TABLE graphs_items (
   sortorder		int4		DEFAULT '0' NOT NULL,
   color			varchar(32)	DEFAULT 'Dark Green' NOT NULL,
   yaxisside		int2		DEFAULT '1' NOT NULL,
+  calc_fnc		int2		DEFAULT '2' NOT NULL,
+  show_history		int2		DEFAULT '0' NOT NULL,
+  history_len		int4		DEFAULT '5' NOT NULL,
   PRIMARY KEY (gitemid)
 --  FOREIGN KEY (graphid) REFERENCES graphs,
 --  FOREIGN KEY (itemid) REFERENCES items
