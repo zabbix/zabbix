@@ -1,5 +1,6 @@
 Changes for 1.1beta12:
 
+ - added support of serial GSM modems for SMS (Alexei)
  - fixed SQL requests escaping for oracle server (Eugene)
  - support of web.page.regexp[] (Alexei)
  - support of web.page.perf[] (Alexei)
