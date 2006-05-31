@@ -45,10 +45,11 @@
 		var $m_minY;
 		var $m_maxY;
 
+		var $data = array();
+
 		// items[num].data.min[max|avg]
 		var $items;
 		// $idnum[$num] is itemid
-		var $itemids;
 		var $min;
 		var $max;
 		var $avg;
@@ -92,32 +93,38 @@
 // I should rename No Alpha to Alpha at some point to get rid of some confusion
 			if(function_exists("ImageColorExactAlpha")&&function_exists("ImageCreateTrueColor")&&@imagecreatetruecolor(1,1))
 			{
-				$this->colors["Red"]=		ImageColorExactAlpha($this->im,255,0,0,50); 
-				$this->colors["Dark Red"]=	ImageColorExactAlpha($this->im,150,0,0,50); 
-				$this->colors["Green"]=		ImageColorExactAlpha($this->im,0,255,0,50); 
-				$this->colors["Dark Green"]=	ImageColorExactAlpha($this->im,0,150,0,50); 
-				$this->colors["Blue"]=		ImageColorExactAlpha($this->im,0,0,255,50); 
-				$this->colors["Dark Blue"]=	ImageColorExactAlpha($this->im,0,0,150,50); 
-				$this->colors["Yellow"]=	ImageColorExactAlpha($this->im,255,255,0,50); 
-				$this->colors["Dark Yellow"]=	ImageColorExactAlpha($this->im,150,150,0,50); 
-				$this->colors["Cyan"]=		ImageColorExactAlpha($this->im,0,255,255,50); 
-				$this->colors["Black"]=		ImageColorExactAlpha($this->im,0,0,0,50); 
-				$this->colors["Gray"]=		ImageColorExactAlpha($this->im,150,150,150,50);
+				$this->colors["Red"]		= ImageColorExactAlpha($this->im,255,0,0,50); 
+				$this->colors["Dark Red"]	= ImageColorExactAlpha($this->im,150,0,0,50); 
+				$this->colors["Green"]		= ImageColorExactAlpha($this->im,0,255,0,50); 
+				$this->colors["Dark Green"]	= ImageColorExactAlpha($this->im,0,150,0,50); 
+				$this->colors["Blue"]		= ImageColorExactAlpha($this->im,0,0,255,50); 
+				$this->colors["Dark Blue"]	= ImageColorExactAlpha($this->im,0,0,150,50); 
+				$this->colors["Yellow"]		= ImageColorExactAlpha($this->im,255,255,0,50); 
+				$this->colors["Dark Yellow"]	= ImageColorExactAlpha($this->im,150,150,0,50); 
+				$this->colors["Cyan"]		= ImageColorExactAlpha($this->im,0,255,255,50); 
+				$this->colors["Black"]		= ImageColorExactAlpha($this->im,0,0,0,50); 
+				$this->colors["Gray"]		= ImageColorExactAlpha($this->im,150,150,150,50);
+				$this->colors["History"]	= ImageColorExactAlpha($this->im,255,255,220,50);
+				$this->colors["HistoryMax"]	= ImageColorExactAlpha($this->im,255,200,200,50);
+				$this->colors["HistoryMin"]	= ImageColorExactAlpha($this->im,150,255,100,50);
 
 			}
 			else
 			{
-				$this->colors["Red"]=ImageColorAllocate($this->im,255,0,0); 
-				$this->colors["Dark Red"]=ImageColorAllocate($this->im,150,0,0); 
-				$this->colors["Green"]=ImageColorAllocate($this->im,0,255,0); 
-				$this->colors["Dark Green"]=ImageColorAllocate($this->im,0,150,0); 
-				$this->colors["Blue"]=ImageColorAllocate($this->im,0,0,255); 
-				$this->colors["Dark Blue"]=ImageColorAllocate($this->im,0,0,150); 
-				$this->colors["Yellow"]=ImageColorAllocate($this->im,255,255,0); 
-				$this->colors["Dark Yellow"]=ImageColorAllocate($this->im,150,150,0); 
-				$this->colors["Cyan"]=ImageColorAllocate($this->im,0,255,255); 
-				$this->colors["Black"]=ImageColorAllocate($this->im,0,0,0); 
-				$this->colors["Gray"]=ImageColorAllocate($this->im,150,150,150); 
+				$this->colors["Red"]		= ImageColorAllocate($this->im,255,0,0); 
+				$this->colors["Dark Red"]	= ImageColorAllocate($this->im,150,0,0); 
+				$this->colors["Green"]		= ImageColorAllocate($this->im,0,255,0); 
+				$this->colors["Dark Green"]	= ImageColorAllocate($this->im,0,150,0); 
+				$this->colors["Blue"]		= ImageColorAllocate($this->im,0,0,255); 
+				$this->colors["Dark Blue"]	= ImageColorAllocate($this->im,0,0,150); 
+				$this->colors["Yellow"]		= ImageColorAllocate($this->im,255,255,0); 
+				$this->colors["Dark Yellow"]	= ImageColorAllocate($this->im,150,150,0); 
+				$this->colors["Cyan"]		= ImageColorAllocate($this->im,0,255,255); 
+				$this->colors["Black"]		= ImageColorAllocate($this->im,0,0,0); 
+				$this->colors["Gray"]		= ImageColorAllocate($this->im,150,150,150); 
+				$this->colors["History"]	= ImageColorAllocate($this->im,150,150,50);
+				$this->colors["HistoryMax"]	= ImageColorAllocate($this->im,150,50,50);
+				$this->colors["HistoryMin"]	= ImageColorAllocate($this->im,50,150,50);
 			
 			}
 			$this->colors["White"]=			ImageColorAllocate($this->im,255,255,255);
@@ -154,15 +161,6 @@
 			$this->m_showWorkPeriod = 1;
 			$this->m_showTriggers = 1;
 
-			$this->count=array();
-			$this->min=array();
-			$this->max=array();
-			$this->avg=array();
-			$this->clock=array();
-
-			$this->itemids=array();
-
-
 /*			if($this->period<=3600)
 			{
 				$this->date_format="H:i";
@@ -184,31 +182,23 @@
 			$this->m_showTriggers = $value == 1 ? 1 : 0;;
 		}
 	
-		function addItem($itemid, $axis)
+		function addItem($itemid, $axis, $calc_fnc = CALC_FNC_AVG, $color=null, $drawtype=null)
 		{
-			$this->items[$this->num]=get_item_by_itemid($itemid);
+			$this->items[$this->num] = get_item_by_itemid($itemid);
 			$this->items[$this->num]["description"]=item_description($this->items[$this->num]["description"],$this->items[$this->num]["key_"]);
 			$host=get_host_by_hostid($this->items[$this->num]["hostid"]);
-			$this->items[$this->num]["host"]=$host["host"];
-			$this->itemids[$this->items[$this->num]["itemid"]]=$this->num;
-			$this->items[$this->num]["color"]="Dark Green";
-			$this->items[$this->num]["drawtype"]=GRAPH_DRAW_TYPE_LINE;
-			$this->items[$this->num]["axisside"]=$axis;
+
+			$this->items[$this->num]["host"] = $host["host"];
+			$this->items[$this->num]["color"] = is_null($color) ? "Dark Green" : $color;
+			$this->items[$this->num]["drawtype"] = is_null($drawtype) ? GRAPH_DRAW_TYPE_LINE : $drawtype;
+			$this->items[$this->num]["axisside"] = $axis;
+			$this->items[$this->num]["calc_fnc"] = $calc_fnc;
+
 			if($axis==GRAPH_YAXIS_SIDE_LEFT)
 				$this->yaxisleft=1;
 			if($axis==GRAPH_YAXIS_SIDE_RIGHT)
 				$this->yaxisright=1;
 			$this->num++;
-		}
-
-		function SetColor($itemid,$color)
-		{
-			$this->items[$this->itemids[$itemid]]["color"]=$color;
-		}
-
-		function setDrawtype($itemid,$drawtype)
-		{
-			$this->items[$this->itemids[$itemid]]["drawtype"]=$drawtype;
 		}
 
 		function setPeriod($period)
@@ -269,9 +259,18 @@
 			{
 				if(isset($this->count[$num][$i])&&($this->count[$num][$i]>0))
 				{
-					return $this->avg[$num][$i];
+					$data = &$this->data[$this->items[$num]["itemid"]];
+					switch($this->items[$num]["calc_fnc"])
+					{
+						case CALC_FNC_MIN:	return	$data->min[$i];
+						case CALC_FNC_MAX:	return	$data->max[$i];
+						case CALC_FNC_ALL:	/* use avg */
+						case CALC_FNC_AVG:
+						default:		return	$data->avg[$i];
+					}
 				}
 			}
+			return 0;
 		}
 
 		function drawSmallRectangle()
@@ -520,7 +519,7 @@
 			$max_desc_len=0;
 			for($i=0;$i<$this->num;$i++)
 			{
-				if(strlen($this->items[$i]["host"])>$max_host_len)	$max_host_len=strlen($this->items[$i]["host"]);
+				if(strlen($this->items[$i]["host"])>$max_host_len)		$max_host_len=strlen($this->items[$i]["host"]);
 				if(strlen($this->items[$i]["description"])>$max_desc_len)	$max_desc_len=strlen($this->items[$i]["description"]);
 			}
 
@@ -529,13 +528,24 @@
 				ImageFilledRectangle($this->im,$this->shiftXleft,$this->sizeY+$this->shiftY+62+12*$i,$this->shiftXleft+5,$this->sizeY+$this->shiftY+5+62+12*$i,$this->colors[$this->items[$i]["color"]]);
 				ImageRectangle($this->im,$this->shiftXleft,$this->sizeY+$this->shiftY+62+12*$i,$this->shiftXleft+5,$this->sizeY+$this->shiftY+5+62+12*$i,$this->colors["Black No Alpha"]);
 
-				if(isset($this->min[$i]))
+				switch($this->items[$i]["calc_fnc"])
 				{
-					$str=sprintf("%s: %s [min:%s max:%s last:%s]",
+					case CALC_FNC_MIN:	$fnc_name = "min";	break;
+					case CALC_FNC_MAX:	$fnc_name = "max";	break;
+					case CALC_FNC_ALL:	/* use avg */
+					case CALC_FNC_AVG:
+					default:		$fnc_name = "avg";
+				}
+
+				$data = &$this->data[$this->items[$i]["itemid"]];
+				if(isset($data->min))
+				{
+					$str=sprintf("%s: %s (%s) [min:%s max:%s last:%s]",
 						str_pad($this->items[$i]["host"],$max_host_len," "),
 						str_pad($this->items[$i]["description"],$max_desc_len," "),
-						convert_units(min($this->min[$i]),$this->items[$i]["units"]),
-						convert_units(max($this->max[$i]),$this->items[$i]["units"]),
+						$fnc_name,
+						convert_units(min($data->min),$this->items[$i]["units"]),
+						convert_units(max($data->max),$this->items[$i]["units"]),
 						convert_units($this->getLastValue($i),$this->items[$i]["units"]));
 				}
 				else
@@ -581,8 +591,51 @@
 			}
 		}
 
-		function drawElement($item,$x1,$y1,$x2,$y2)
+		function drawElement($item, $from, $to, $minX, $maxX, $minY, $maxY)
 		{
+			$data = &$this->data[$this->items[$item]["itemid"]];
+
+			$x1 = ($this->sizeX * ($from - $minX)/($maxX-$minX)) + $this->shiftXleft;
+			$x2 = ($this->sizeX * ($to - $minX)/($maxX-$minX)) + $this->shiftXleft-1;
+
+			$y1min = $this->sizeY - ($this->sizeY*($data->min[$from]-$minY)/($maxY-$minY)) + $this->shiftY;
+			$y2min = $this->sizeY - ($this->sizeY*($data->min[$to]-$minY)/($maxY-$minY)) + $this->shiftY;
+
+			$y1max = $this->sizeY - ($this->sizeY*($data->max[$from]-$minY)/($maxY-$minY)) + $this->shiftY;
+			$y2max = $this->sizeY - ($this->sizeY*($data->max[$to]-$minY)/($maxY-$minY)) + $this->shiftY;
+
+			switch($this->items[$item]["calc_fnc"])
+			{
+				case CALC_FNC_MAX:
+					$y1 = $y1max;
+					$y2 = $y2max;
+					break;
+				case CALC_FNC_MIN:
+					$y1 = $y1min;
+					$y2 = $y2min;
+					break;
+				case CALC_FNC_ALL:
+					$a[0] = $x1;		$a[1] = $y1max;
+					$a[2] = $x1;		$a[3] = $y1min;
+					$a[4] = $x2;		$a[5] = $y2min;
+					$a[6] = $x2;		$a[7] = $y2max;
+
+					ImageFilledPolygon($this->im,$a,4,$this->colors["History"]);
+					ImageLine($this->im,$x1,$y1max,$x2,$y2max,$this->colors["HistoryMax"]);
+					ImageLine($this->im,$x1,$y1min,$x2,$y2min,$this->colors["HistoryMin"]);
+
+					/* don't use break, avg must be drawed in this statement */
+					// break;
+				case CALC_FNC_AVG:
+					/* don't use break, avg must be drawed in this statement */
+					// break;
+				default:
+					$y1 = $this->sizeY - ($this->sizeY*($data->avg[$from]-$minY)/($maxY-$minY)) + $this->shiftY;
+					$y2 = $this->sizeY - ($this->sizeY*($data->avg[$to]-$minY)/($maxY-$minY)) + $this->shiftY;
+
+			}
+
+
 			if($this->items[$item]["drawtype"] == GRAPH_DRAW_TYPE_LINE)
 			{
 				ImageLine($this->im,$x1,$y1,$x2,$y2,$this->colors[$this->items[$item]["color"]]);
@@ -594,14 +647,10 @@
 			}
 			else if($this->items[$item]["drawtype"] == GRAPH_DRAW_TYPE_FILL)
 			{
-				$a[0]=$x1;
-				$a[1]=$y1;
-				$a[2]=$x1;
-				$a[3]=$this->shiftY+$this->sizeY;
-				$a[4]=$x2;
-				$a[5]=$this->shiftY+$this->sizeY;
-				$a[6]=$x2;
-				$a[7]=$y2;
+				$a[0] = $x1;		$a[1] = $y1;
+				$a[2] = $x1;		$a[3] = $this->shiftY+$this->sizeY;
+				$a[4] = $x2;		$a[5] = $this->shiftY+$this->sizeY;
+				$a[6] = $x2;		$a[7] = $y2;
 
 				ImageFilledPolygon($this->im,$a,4,$this->colors[$this->items[$item]["color"]]);
 			}
@@ -611,7 +660,6 @@
 				ImageFilledRectangle($this->im,$x2-1,$y2-1,$x2+1,$y2+1,$this->colors[$this->items[$item]["color"]]);
 			}
 		}
-
 // Calculation of maximum Y axis
 		function calculateMinY($side)
 		{
@@ -626,17 +674,30 @@
 				unset($minY);
 				for($i=0;$i<$this->num;$i++)
 				{
-					if($this->items[$i]["axisside"] != $side)	continue;
-					if(!isset($minY)&&(isset($this->min[$i])))
+					if($this->items[$i]["axisside"] != $side)
+						continue;
+
+					$data = &$this->data[$this->items[$i]["itemid"]];
+
+					switch($this->items[$i]["calc_fnc"])
 					{
-						if(count($this->max[$i])>0)
+						case CALC_FNC_ALL:	/* use min */
+						case CALC_FNC_MIN:	$val = &$data->min;	break;
+						case CALC_FNC_MAX:	$val = &$data->max;	break;
+						case CALC_FNC_AVG:
+						default:		$val = &$data->avg;
+					}
+
+					if(!isset($minY))
+					{
+						if(isset($val) && count($val) > 0)
 						{
-							$minY=min($this->avg[$i]);
+							$minY = min($val);
 						}
 					}
 					else
 					{
-						$minY=@iif($minY>min($this->avg[$i]),min($this->avg[$i]),$minY);
+						$minY = min($minY, min($val));
 					}
 				}
 	
@@ -673,20 +734,34 @@
 			}
 			else
 			{
+
 				unset($maxY);
 				for($i=0;$i<$this->num;$i++)
 				{
-					if($this->items[$i]["axisside"] != $side)	continue;
-					if(!isset($maxY)&&(isset($this->max[$i])))
+					if($this->items[$i]["axisside"] != $side)
+						continue;
+
+					$data = &$this->data[$this->items[$i]["itemid"]];
+
+					switch($this->items[$i]["calc_fnc"])
 					{
-						if(count($this->max[$i])>0)
+						case CALC_FNC_ALL:	/* use max */
+						case CALC_FNC_MAX:	$val = &$data->max;	break;
+						case CALC_FNC_MIN:	$val = &$data->min;	break;
+						case CALC_FNC_AVG:
+						default:		$val = &$data->avg;
+					}
+
+					if(!isset($maxY))
+					{
+						if(isset($val) && count($val) > 0)
 						{
-							$maxY=max($this->avg[$i]);
+							$maxY = max($val);
 						}
 					}
 					else
 					{
-						$maxY=@iif($maxY<max($this->avg[$i]),max($this->avg[$i]),$maxY);
+						$maxY = max($maxY, max($val));
 					}
 				}
 	
@@ -758,11 +833,11 @@
 				while($row=DBfetch($result))
 				{
 					$i=$row["i"];
-					$this->count[$this->itemids[$row["itemid"]]][$i]=$row["count"];
-					$this->min[$this->itemids[$row["itemid"]]][$i]=$row["min"];
-					$this->max[$this->itemids[$row["itemid"]]][$i]=$row["max"];
-					$this->avg[$this->itemids[$row["itemid"]]][$i]=$row["avg"];
-					$this->clock[$this->itemids[$row["itemid"]]][$i]=$row["clock"];
+					$this->data[$row["itemid"]]->count[$i]	= $row["count"];
+					$this->data[$row["itemid"]]->min[$i]	= $row["min"];
+					$this->data[$row["itemid"]]->max[$i]	= $row["max"];
+					$this->data[$row["itemid"]]->avg[$i]	= $row["avg"];
+					$this->data[$row["itemid"]]->clock[$i]	= $row["clock"];
 				}
 			}
 		}
@@ -819,8 +894,8 @@
 
 //			$this->im = imagecreate($this->sizeX+$this->shiftX+61,$this->sizeY+2*$this->shiftY+40);
 
-//			Header( "Content-type:  text/html"); 
-//*
+			Header( "Content-type:  text/html"); 
+/*
 			Header( "Content-type:  image/png"); 
 			Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
 /**/
@@ -872,41 +947,36 @@
 			{
 				$minY = $this->m_minY[$this->items[$item]["axisside"]];
 				$maxY = $this->m_maxY[$this->items[$item]["axisside"]];
+				$data = &$this->data[$this->items[$item]["itemid"]];
 
 				// For each X
-				for($i=0;$i<900;$i++)
+				for($i = $minX; $i < $maxX; $i++)
 				{
-					if(isset($this->count[$item][$i])&&($this->count[$item][$i]>0))
+					if(isset($data->count[$i])&&($data->count[$i]>0))
 					{
 						for($j=$i-1;$j>=0;$j--)
 						{
-							if(isset($this->count[$item][$j])&&($this->count[$item][$j]>0))
+							if(isset($data->count[$j])&&($data->count[$j]>0))
 							{
-								$x1=$this->sizeX*($i-$minX)/($maxX-$minX);
-								$y1=$this->sizeY*($this->avg[$item][$i]-$minY)/($maxY-$minY);
-								$y1=$this->sizeY-$y1;
-
-								$x2=$this->sizeX*($j-$minX)/($maxX-$minX);
-								$y2=$this->sizeY*($this->avg[$item][$j]-$minY)/($maxY-$minY);
-								$y2=$this->sizeY-$y2;
-
 								// Do not draw anything if difference between two points is more than 4*(item refresh period)
 //								if($this->clock[$item][$i]-$this->clock[$item][$j]<4*$this->items[$item]["delay"])
 //								echo 8*($this->to_time-$this->from_time)/900,"<br>";
 //								echo $this->clock[$item][$i]-$this->clock[$item][$j],"<br>";
-								$diff=$this->clock[$item][$i]-$this->clock[$item][$j];
-								$cell=($this->to_time-$this->from_time)/900;
-								$delay=$this->items[$item]["delay"];
-								if($cell>$delay)
+								$diff	= $data->clock[$i] - $data->clock[$j];
+								$cell	= ($this->to_time - $this->from_time)/900;
+								$delay	= $this->items[$item]["delay"];
+
+								if($cell > $delay)
 								{
-									if($diff<16*$cell)
-										$this->drawElement($item, $x1+$this->shiftXleft,$y1+$this->shiftY,$x2+$this->shiftXleft+1,$y2+$this->shiftY);
+									if($diff >= 16*$cell) break;
 								}
 								else
 								{
-									if($diff<4*$delay)
-										$this->drawElement($item, $x1+$this->shiftXleft,$y1+$this->shiftY,$x2+$this->shiftXleft+1,$y2+$this->shiftY);
+									if($diff >= 4*$delay) break;
 								}
+				
+								$this->drawElement($item, $i, $j, $maxX, $minX, $minY, $maxY);
+
 								break;
 							}
 						}

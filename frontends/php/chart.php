@@ -43,7 +43,7 @@
 	{
 		$graph->setBorder(0);
 	}
-	$graph->addItem($_REQUEST["itemid"], GRAPH_YAXIS_SIDE_RIGHT);
+	$graph->addItem($_REQUEST["itemid"], GRAPH_YAXIS_SIDE_RIGHT, CALC_FNC_ALL);
 
 	$graph->Draw();
 ?>

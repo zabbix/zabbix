@@ -44,8 +44,9 @@
 		}
 		function SetAccessKey($value='B')
 		{
-			if(!isset($this->options['title']))
-				$this->SetTitle($this->options['value'].' [Alt+$value]');
+			if(isset($value))
+				if(!isset($this->options['title']))
+					$this->SetTitle($this->options['value'].' [Alt+'.$value.']');
 
 			return $this->options['accessKey'] = $value;
 		}

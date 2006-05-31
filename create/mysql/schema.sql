@@ -61,6 +61,9 @@ CREATE TABLE graphs_items (
   sortorder		int(4)		DEFAULT '0' NOT NULL,
   color			varchar(32)	DEFAULT 'Dark Green' NOT NULL,
   yaxisside		int(1)		DEFAULT '1' NOT NULL,
+  calc_fnc		int(1)		DEFAULT '2' NOT NULL,
+  show_history		int(1)		DEFAULT '0' NOT NULL,
+  history_len		int(4)		DEFAULT '5' NOT NULL,
   PRIMARY KEY (gitemid)
 ) type=InnoDB;
 
