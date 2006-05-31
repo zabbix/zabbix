@@ -1,3 +1,7 @@
+Changes for 1.1:
+
+ - fixed popup of trigger selection (Eugene)
+
 Changes for 1.1beta12:
 
  - added support of serial GSM modems for SMS (Alexei)
