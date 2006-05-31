@@ -302,6 +302,14 @@
 	"S_SORT_ORDER_1_100"=>			"Sort order (0->100)",
 	"S_YAXIS_SIDE"=>			"Y axis side",
 	"S_LEFT"=>				"Left",
+	"S_FUNCTION"=>				"Function",
+	"S_MIN_SMALL"=>				"min",
+	"S_AVG_SMALL"=>				"avg",
+	"S_MAX_SMALL"=>				"max",
+	"S_SHOW_HISTORY"=>			"Show history",
+	"S_LAST_DAYS"=>				"Last days",
+	"S_LAST_WEEKS"=>			"Last weeks",
+	"S_LAST_MONTHS"=>			"Last months",
 
 //	graphs.php
 	"S_CONFIGURATION_OF_GRAPHS"=>		"Configuration of graphs",

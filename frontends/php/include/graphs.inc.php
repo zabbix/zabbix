@@ -201,11 +201,11 @@
 		return 0;
 	}
 
-	function	add_item_to_graph($graphid,$itemid,$color,$drawtype,$sortorder,$yaxisside)
+	function	add_item_to_graph($graphid,$itemid,$color,$drawtype,$sortorder,$yaxisside,$calc_fnc,$show_history,$history_len)
 	{
 		$result = DBexecute("insert into graphs_items".
-			" (graphid,itemid,color,drawtype,sortorder,yaxisside)".
-			" values ($graphid,$itemid,".zbx_dbstr($color).",$drawtype,$sortorder,$yaxisside)");
+			" (graphid,itemid,color,drawtype,sortorder,yaxisside,calc_fnc,show_history,history_len)".
+			" values ($graphid,$itemid,".zbx_dbstr($color).",$drawtype,$sortorder,$yaxisside,$calc_fnc,$show_history,$history_len)");
 
 		$gitemid = DBinsert_id($result,"graphs_items","gitemid");
 
@@ -245,7 +245,7 @@
 					}
 				// recursion
 					$result = add_item_to_graph($new_graphid,$db_item["itemid"],
-						$color,$drawtype,$sortorder,$yaxisside);
+						$color,$drawtype,$sortorder,$yaxisside,$calc_fnc,$show_history,$history_len);
 
 					if(!$result)
 						break;
@@ -270,7 +270,7 @@
 					}
 				// recursion
 					$result = add_item_to_graph($child["graphid"],$db_item["itemid"],
-						$color,$drawtype,$sortorder,$yaxisside);
+						$color,$drawtype,$sortorder,$yaxisside,$calc_fnc,$show_history,$history_len);
 					if(!$result)
 						break;
 				}
@@ -290,7 +290,7 @@
 		return $gitemid;
 	}
 	
-	function	update_graph_item($gitemid,$itemid,$color,$drawtype,$sortorder,$yaxisside)
+	function	update_graph_item($gitemid,$itemid,$color,$drawtype,$sortorder,$yaxisside,$calc_fnc,$show_history,$history_len)
 	{
 		$gitem = get_graphitem_by_gitemid($gitemid);
 
@@ -316,14 +316,16 @@
 
 			// recursion
 				$result = update_graph_item($chd_gitem["gitemid"],$db_item["itemid"],
-					$color,$drawtype,$sortorder,$yaxisside);
+					$color,$drawtype,$sortorder,$yaxisside,$calc_fnc,$show_history,$history_len);
 				if(!$result)
 					return $reslut;
 				break;
 			}
 		}
 		$result = DBexecute("update graphs_items set itemid=$itemid,color=".zbx_dbstr($color).",".
-			"drawtype=$drawtype,sortorder=$sortorder,yaxisside=$yaxisside where gitemid=$gitemid");
+			"drawtype=$drawtype,sortorder=$sortorder,yaxisside=$yaxisside,calc_fnc=$calc_fnc".
+			",show_history=".$show_history.",history_len=".$history_len.
+			" where gitemid=$gitemid");
 		if($result)
 		{
 			$host = get_host_by_itemid($item["itemid"]);
@@ -492,7 +494,8 @@
 
 				$result = add_item_to_graph($dist_graphid,$host_itemid,$src_graphitem["color"],
 					$src_graphitem["drawtype"],$src_graphitem["sortorder"],
-					$src_graphitem["yaxisside"]);
+					$src_graphitem["yaxisside"],$src_graphitem["calc_fnc"],
+					$src_graphitem["show_history"],$src_graphitem["history_len"]);
 				if(!$result)
 					return $result;
 				break;
