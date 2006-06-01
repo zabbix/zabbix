@@ -116,8 +116,8 @@ CREATE TABLE graphs_items (
 	color		varchar2(32)	DEFAULT 'Dark Green' NOT NULL,
 	yaxisside	number(3)		DEFAULT '1' NOT NULL,
 	calc_fnc	number(3)		DEFAULT '2' NOT NULL,
-	show_history	number(3)		DEFAULT '0' NOT NULL,
-	history_len	number(10)		DEFAULT '5' NOT NULL,
+	type		number(3)		DEFAULT '0' NOT NULL,
+	periods_cnt	number(10)		DEFAULT '5' NOT NULL,
 	CONSTRAINT	graphs_items_pk	PRIMARY KEY (gitemid)
 );
 

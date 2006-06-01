@@ -306,10 +306,10 @@
 	"S_MIN_SMALL"=>				"min",
 	"S_AVG_SMALL"=>				"avg",
 	"S_MAX_SMALL"=>				"max",
-	"S_SHOW_HISTORY"=>			"Show history",
-	"S_LAST_DAYS"=>				"Last days",
-	"S_LAST_WEEKS"=>			"Last weeks",
-	"S_LAST_MONTHS"=>			"Last months",
+	"S_DRAW_STYLE"=>			"Draw style",
+	"S_SIMPLE"=>				"Simple",
+	"S_AGGREGATED"=>			"Aggregated",
+	"S_AGGREGATED_PERIODS_COUNT"=>			"Aggregated periods count",
 
 //	graphs.php
 	"S_CONFIGURATION_OF_GRAPHS"=>		"Configuration of graphs",
