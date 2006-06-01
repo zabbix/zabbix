@@ -1,5 +1,6 @@
 Changes for 1.1:
 
+ - developed aggrgated graphs (Eugene)
  - improved graphs, added selector of data calculation function (Eugene)
  - fixed popup of trigger selection (Eugene)
 

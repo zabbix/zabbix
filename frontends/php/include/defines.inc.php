@@ -224,6 +224,10 @@
 	define("CALC_FNC_MAX", 4);
 	define("CALC_FNC_ALL", 7);
 
+	
+	define("GRAPH_ITEM_SIMPLE" , 	0);
+	define("GRAPH_ITEM_AGGREGATED",	1);
+
 /* Support for PHP5. PHP5 does not have $HTTP_..._VARS */
 	if (!function_exists('version_compare'))
 	{

@@ -822,7 +822,7 @@
 
 		if(isset($_REQUEST["gitemid"]))
 		{
-			$result=DBselect("select itemid,color,drawtype,sortorder,yaxisside,calc_fnc,show_history,history_len from graphs_items".
+			$result=DBselect("select itemid,color,drawtype,sortorder,yaxisside,calc_fnc,type,periods_cnt from graphs_items".
 				" where gitemid=".$_REQUEST["gitemid"]);
 			$row=DBfetch($result);
 
@@ -836,8 +836,8 @@
 			$sortorder	= $row["sortorder"];
 			$yaxisside	= $row["yaxisside"];
 			$calc_fnc	= $row["calc_fnc"];
-			$show_history	= $row["show_history"];
-			$history_len	= $row["history_len"];
+			$type		= $row["type"];
+			$periods_cnt	= $row["periods_cnt"];
 		}
 		else
 		{
@@ -847,8 +847,8 @@
 			$sortorder	= get_request("sortorder",	0);
 			$yaxisside	= get_request("yaxisside",	1);
 			$calc_fnc	= get_request("calc_fnc",	2);
-			$show_history	= get_request("show_history",	0);
-			$history_len	= get_request("history_len",	5);
+			$type	= get_request("type",	0);
+			$periods_cnt	= get_request("periods_cnt",	5);
 		}
 
 
@@ -870,55 +870,58 @@
 		}
 		$frmGItem->AddRow(S_PARAMETER, $cmbItems);
 
-		$cmbFnc = new CComboBox("calc_fnc",$calc_fnc);
-		$cmbFnc->AddItem(CALC_FNC_ALL, S_ALL_SMALL);
-		$cmbFnc->AddItem(CALC_FNC_MIN, S_MIN_SMALL);
-		$cmbFnc->AddItem(CALC_FNC_AVG, S_AVG_SMALL);
-		$cmbFnc->AddItem(CALC_FNC_MAX, S_MAX_SMALL);
-		$frmGItem->AddRow(S_FUNCTION, $cmbFnc);
-
-		$cmbType = new CComboBox("drawtype",$drawtype);
-		$cmbType->AddItem(0,get_drawtype_description(0));
-		$cmbType->AddItem(1,get_drawtype_description(1));
-		$cmbType->AddItem(2,get_drawtype_description(2));
-		$cmbType->AddItem(3,get_drawtype_description(3));
+		$cmbType = new CComboBox("type",$type,"submit()");
+		$cmbType->AddItem(GRAPH_ITEM_SIMPLE, S_SIMPLE);
+		$cmbType->AddItem(GRAPH_ITEM_AGGREGATED, S_AGGREGATED);
 		$frmGItem->AddRow(S_TYPE, $cmbType);
+
+		if($type == GRAPH_ITEM_AGGREGATED)
+		{
+			$frmGItem->AddRow(S_AGGREGATED_PERIODS_COUNT,	new CTextBox("periods_cnt",$periods_cnt,15)); 
+
+			$frmGItem->AddVar("calc_fnc",$calc_fnc);
+			$frmGItem->AddVar("drawtype",$drawtype);
+			$frmGItem->AddVar("color",$color);
+		}
+		else
+		{
+			$frmGItem->AddVar("periods_cnt",$periods_cnt);
+
+			$cmbFnc = new CComboBox("calc_fnc",$calc_fnc);
+			$cmbFnc->AddItem(CALC_FNC_ALL, S_ALL_SMALL);
+			$cmbFnc->AddItem(CALC_FNC_MIN, S_MIN_SMALL);
+			$cmbFnc->AddItem(CALC_FNC_AVG, S_AVG_SMALL);
+			$cmbFnc->AddItem(CALC_FNC_MAX, S_MAX_SMALL);
+			$frmGItem->AddRow(S_FUNCTION, $cmbFnc);
+
+			$cmbType = new CComboBox("drawtype",$drawtype);
+			$cmbType->AddItem(0,get_drawtype_description(0));
+			$cmbType->AddItem(1,get_drawtype_description(1));
+			$cmbType->AddItem(2,get_drawtype_description(2));
+			$cmbType->AddItem(3,get_drawtype_description(3));
+			$frmGItem->AddRow(S_DRAW_STYLE, $cmbType);
+
+			$cmbColor = new CComboBox("color",$color);
+			$cmbColor->AddItem("Black",		S_BLACK);
+			$cmbColor->AddItem("Blue",		S_BLUE);
+			$cmbColor->AddItem("Cyan",		S_CYAN);
+			$cmbColor->AddItem("Dark Blue",		S_DARK_BLUE);
+			$cmbColor->AddItem("Dark Green",	S_DARK_GREEN);
+			$cmbColor->AddItem("Dark Red",		S_DARK_RED);
+			$cmbColor->AddItem("Dark Yellow",	S_DARK_YELLOW);
+			$cmbColor->AddItem("Green",		S_GREEN);
+			$cmbColor->AddItem("Red",		S_RED);
+			$cmbColor->AddItem("White",		S_WHITE);
+			$cmbColor->AddItem("Yellow",		S_YELLOW);
+			$frmGItem->AddRow(S_COLOR, $cmbColor);
+		}
 
 		$cmbYax = new CComboBox("yaxisside",$yaxisside);
 		$cmbYax->AddItem(GRAPH_YAXIS_SIDE_RIGHT, S_RIGHT);
 		$cmbYax->AddItem(GRAPH_YAXIS_SIDE_LEFT,	S_LEFT);
 		$frmGItem->AddRow(S_YAXIS_SIDE, $cmbYax);
 
-		$cmbColor = new CComboBox("color",$color);
-		$cmbColor->AddItem("Black",		S_BLACK);
-		$cmbColor->AddItem("Blue",		S_BLUE);
-		$cmbColor->AddItem("Cyan",		S_CYAN);
-		$cmbColor->AddItem("Dark Blue",		S_DARK_BLUE);
-		$cmbColor->AddItem("Dark Green",	S_DARK_GREEN);
-		$cmbColor->AddItem("Dark Red",		S_DARK_RED);
-		$cmbColor->AddItem("Dark Yellow",	S_DARK_YELLOW);
-		$cmbColor->AddItem("Green",		S_GREEN);
-		$cmbColor->AddItem("Red",		S_RED);
-		$cmbColor->AddItem("White",		S_WHITE);
-		$cmbColor->AddItem("Yellow",		S_YELLOW);
-		$frmGItem->AddRow(S_COLOR, $cmbColor);
-
 		$frmGItem->AddRow(S_SORT_ORDER_1_100, new CTextBox("sortorder",$sortorder,3));
-
-		$cmbHist = new CComboBox("show_history",$show_history,"submit()");
-		$cmbHist->AddItem(0,S_NO);
-		$cmbHist->AddItem(1,S_DAILY);
-		$cmbHist->AddItem(2,S_WEEKLY);
-		$cmbHist->AddItem(3,S_MONTHLY);
-		$frmGItem->AddRow(S_SHOW_HISTORY, $cmbHist);
-
-		switch($show_history)
-		{
-			case 1: $frmGItem->AddRow(S_LAST_DAYS, 		new CTextBox("history_len",$history_len, 15)); break;
-			case 2: $frmGItem->AddRow(S_LAST_WEEKS,		new CTextBox("history_len",$history_len, 15)); break;
-			case 3: $frmGItem->AddRow(S_LAST_MONTHS,	new CTextBox("history_len",$history_len,15)); break;
-			default: $frmGItem->AddVar("history_len",$history_len);
-		}
 
 		$frmGItem->AddItemToBottomRow(new CButton("save",S_SAVE));
 		$frmGItem->AddItemToBottomRow(SPACE);

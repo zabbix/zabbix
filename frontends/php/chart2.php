@@ -77,11 +77,19 @@
 	$graph->setYAxisMin($row["yaxismin"]);
 	$graph->setYAxisMax($row["yaxismax"]);
 
-	$result=DBselect("select gi.itemid,i.description,gi.color,h.host,gi.drawtype,gi.yaxisside,gi.calc_fnc from graphs_items gi,items i,hosts h where gi.itemid=i.itemid and gi.graphid=".$_REQUEST["graphid"]." and i.hostid=h.hostid order by gi.sortorder");
+	$result=DBselect("select gi.*,i.description,h.host,gi.drawtype from graphs_items gi,items i,hosts h where gi.itemid=i.itemid and gi.graphid=".$_REQUEST["graphid"]." and i.hostid=h.hostid order by gi.sortorder");
 
 	while($row=DBfetch($result))
 	{
-		$graph->addItem($row["itemid"], $row["yaxisside"], $row["calc_fnc"], $row["color"], $row["drawtype"]);
+		$graph->addItem(
+			$row["itemid"],
+			$row["yaxisside"],
+			$row["calc_fnc"],
+			$row["color"],
+			$row["drawtype"],
+			$row["type"],
+			$row["periods_cnt"]
+			);
 	}
 	$graph->Draw();
 ?>
