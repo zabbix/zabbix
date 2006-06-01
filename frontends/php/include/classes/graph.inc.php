@@ -525,22 +525,28 @@
 
 			for($i=0;$i<$this->num;$i++)
 			{
-				ImageFilledRectangle($this->im,$this->shiftXleft,$this->sizeY+$this->shiftY+62+12*$i,$this->shiftXleft+5,$this->sizeY+$this->shiftY+5+62+12*$i,$this->colors[$this->items[$i]["color"]]);
-				ImageRectangle($this->im,$this->shiftXleft,$this->sizeY+$this->shiftY+62+12*$i,$this->shiftXleft+5,$this->sizeY+$this->shiftY+5+62+12*$i,$this->colors["Black No Alpha"]);
-
-				switch($this->items[$i]["calc_fnc"])
+				if($this->items[$i]["type"] == GRAPH_ITEM_AGGREGATED)
 				{
-					case CALC_FNC_MIN:	$fnc_name = "min";	break;
-					case CALC_FNC_MAX:	$fnc_name = "max";	break;
-					case CALC_FNC_ALL:	/* use avg */
-					case CALC_FNC_AVG:
-					default:		$fnc_name = "avg";
+					$fnc_name = "agr(".$this->items[$i]["periods_cnt"].")";
+					$color = $this->colors["HistoryMinMax"];
+				}
+				else
+				{
+					$color = $this->colors[$this->items[$i]["color"]];
+					switch($this->items[$i]["calc_fnc"])
+					{
+						case CALC_FNC_MIN:	$fnc_name = "min";	break;
+						case CALC_FNC_MAX:	$fnc_name = "max";	break;
+						case CALC_FNC_ALL:	$fnc_name = "all";	break;
+						case CALC_FNC_AVG:
+						default:		$fnc_name = "avg";
+					}
 				}
 
 				$data = &$this->data[$this->items[$i]["itemid"]][$this->items[$i]["type"]];
 				if(isset($data->min))
 				{
-					$str=sprintf("%s: %s (%s) [min:%s max:%s last:%s]",
+					$str=sprintf("%s: %s [%s] [min:%s max:%s last:%s]",
 						str_pad($this->items[$i]["host"],$max_host_len," "),
 						str_pad($this->items[$i]["description"],$max_desc_len," "),
 						$fnc_name,
@@ -555,6 +561,9 @@
 						str_pad($this->items[$i]["description"],$max_desc_len," "));
 				}
 	
+				ImageFilledRectangle($this->im,$this->shiftXleft,$this->sizeY+$this->shiftY+62+12*$i,$this->shiftXleft+5,$this->sizeY+$this->shiftY+5+62+12*$i,$color);
+				ImageRectangle($this->im,$this->shiftXleft,$this->sizeY+$this->shiftY+62+12*$i,$this->shiftXleft+5,$this->sizeY+$this->shiftY+5+62+12*$i,$this->colors["Black No Alpha"]);
+
 				ImageString($this->im, 2,
 					$this->shiftXleft+9,
 					$this->sizeY+$this->shiftY+(62-5)+12*$i,
@@ -678,27 +687,38 @@
 					if($this->items[$i]["axisside"] != $side)
 						continue;
 
-					$data = &$this->data[$this->items[$i]["itemid"]][$this->items[$i]["type"]];
-
-					switch($this->items[$i]["calc_fnc"])
+					foreach(array(GRAPH_ITEM_SIMPLE, GRAPH_ITEM_AGGREGATED) as $type)
 					{
-						case CALC_FNC_ALL:	/* use min */
-						case CALC_FNC_MIN:	$val = &$data->min;	break;
-						case CALC_FNC_MAX:	$val = &$data->max;	break;
-						case CALC_FNC_AVG:
-						default:		$val = &$data->avg;
-					}
+						if(!isset($this->items[$i][$type]))
+							continue;
 
-					if(!isset($minY))
-					{
-						if(isset($val) && count($val) > 0)
+						$data = &$this->data[$this->items[$i]["itemid"]][$type];
+
+						if($type == GRAPH_ITEM_AGGREGATED)
+							$calc_fnc = CALC_FNC_ALL;
+						else
+							$calc_fnc = $this->items[$i]["calc_fnc"];
+
+						switch($calc_fnc)
 						{
-							$minY = min($val);
+							case CALC_FNC_ALL:	/* use min */
+							case CALC_FNC_MIN:	$val = &$data->min;	break;
+							case CALC_FNC_MAX:	$val = &$data->max;	break;
+							case CALC_FNC_AVG:
+							default:		$val = &$data->avg;
 						}
-					}
-					else
-					{
-						$minY = min($minY, min($val));
+
+						if(!isset($minY))
+						{
+							if(isset($val) && count($val) > 0)
+							{
+								$minY = min($val);
+							}
+						}
+						else
+						{
+							$minY = min($minY, min($val));
+						}
 					}
 				}
 	
@@ -742,27 +762,38 @@
 					if($this->items[$i]["axisside"] != $side)
 						continue;
 
-					$data = &$this->data[$this->items[$i]["itemid"]][$this->items[$i]["type"]];
-
-					switch($this->items[$i]["calc_fnc"])
+					foreach(array(GRAPH_ITEM_SIMPLE, GRAPH_ITEM_AGGREGATED) as $type)
 					{
-						case CALC_FNC_ALL:	/* use max */
-						case CALC_FNC_MAX:	$val = &$data->max;	break;
-						case CALC_FNC_MIN:	$val = &$data->min;	break;
-						case CALC_FNC_AVG:
-						default:		$val = &$data->avg;
-					}
+						if(!isset($this->items[$i][$type]))
+							continue;
 
-					if(!isset($maxY))
-					{
-						if(isset($val) && count($val) > 0)
+						$data = &$this->data[$this->items[$i]["itemid"]][$type];
+
+						if($type == GRAPH_ITEM_AGGREGATED)
+							$calc_fnc = CALC_FNC_ALL;
+						else
+							$calc_fnc = $this->items[$i]["calc_fnc"];
+
+						switch($calc_fnc)
 						{
-							$maxY = max($val);
+							case CALC_FNC_ALL:	/* use max */
+							case CALC_FNC_MAX:	$val = &$data->max;	break;
+							case CALC_FNC_MIN:	$val = &$data->min;	break;
+							case CALC_FNC_AVG:
+							default:		$val = &$data->avg;
 						}
-					}
-					else
-					{
-						$maxY = max($maxY, max($val));
+
+						if(!isset($maxY))
+						{
+							if(isset($val) && count($val) > 0)
+							{
+								$maxY = max($val);
+							}
+						}
+						else
+						{
+							$maxY = max($maxY, max($val));
+						}
 					}
 				}
 	
