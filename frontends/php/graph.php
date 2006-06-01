@@ -40,8 +40,8 @@
 		"sortorder"=>	array(T_ZBX_INT, O_OPT,  NULL,	BETWEEN(0,65535),	'isset({save})'),
 		"yaxisside"=>	array(T_ZBX_INT, O_OPT,  NULL,	IN("0,1"),		'isset({save})'),
 		"calc_fnc"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("1,2,4,7"),		'isset({save})'),
-		"show_history"=>array(T_ZBX_INT, O_OPT,	 NULL,	IN("0,1,2,3"),		'isset({save})'),
-		"history_len"=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,360),		'isset({save})'),
+		"type"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0,1"),		'isset({save})'),
+		"periods_cnt"=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,360),		'isset({save})'),
 
 		"register"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -73,7 +73,7 @@
 		{
 			$result=update_graph_item($_REQUEST["gitemid"],$_REQUEST["itemid"],
 				$_REQUEST["color"],$_REQUEST["drawtype"],$_REQUEST["sortorder"],
-				$_REQUEST["yaxisside"],$_REQUEST["calc_fnc"],$_REQUEST["show_history"],$_REQUEST["history_len"]);
+				$_REQUEST["yaxisside"],$_REQUEST["calc_fnc"],$_REQUEST["type"],$_REQUEST["periods_cnt"]);
 
 			$gitemid = $_REQUEST["gitemid"];
 			$audit= AUDIT_ACTION_UPDATE;
@@ -85,7 +85,7 @@
 		{
 			$gitemid=add_item_to_graph($_REQUEST["graphid"],$_REQUEST["itemid"],
 				$_REQUEST["color"],$_REQUEST["drawtype"],$_REQUEST["sortorder"],
-				$_REQUEST["yaxisside"],$_REQUEST["calc_fnc"],$_REQUEST["show_history"],$_REQUEST["history_len"]);
+				$_REQUEST["yaxisside"],$_REQUEST["calc_fnc"],$_REQUEST["type"],$_REQUEST["periods_cnt"]);
 
 			$result = $gitemid;
 			$audit = AUDIT_ACTION_ADD;
@@ -163,21 +163,38 @@
 		show_table_header(S_DISPLAYED_PARAMETERS_BIG,$form);
 
 		$table = new CTableInfo("...");
-		$table->SetHeader(array(S_SORT_ORDER,S_HOST,S_PARAMETER,S_FUNCTION,S_TYPE,S_COLOR,S_ACTIONS));
+		$table->SetHeader(array(S_SORT_ORDER,S_HOST,S_PARAMETER,S_FUNCTION,S_TYPE,S_DRAW_STYLE,S_COLOR,S_ACTIONS));
 
 		$result=DBselect("select i.itemid,h.host,i.description,gi.*,i.key_".
 			" from hosts h,graphs_items gi,items i where i.itemid=gi.itemid".
 			" and gi.graphid=".$_REQUEST["graphid"]." and h.hostid=i.hostid order by gi.sortorder");
 		while($row=DBfetch($result))
 		{
-			switch($row["calc_fnc"])
+
+			if($row["type"] == GRAPH_ITEM_AGGREGATED)
 			{
-			case CALC_FNC_ALL:	$fnc_name = S_ALL_SMALL;	break;
-			case CALC_FNC_MIN:	$fnc_name = S_MIN_SMALL;	break;
-			case CALC_FNC_MAX:	$fnc_name = S_MAX_SMALL;	break;
-			case CALC_FNC_AVG:
-			default:
-				$fnc_name = S_AVG_SMALL;	break;
+				$type = S_AGGREGATED." (".$row["periods_cnt"].")";
+
+				$drawtype = "-";
+				$fnc_name = "-";
+				$color = "-";
+			}
+			else
+			{
+				$type = S_SIMPLE;
+
+				$drawtype = get_drawtype_description($row["drawtype"]);
+				$color = $row["color"];
+
+				switch($row["calc_fnc"])
+				{
+				case CALC_FNC_ALL:	$fnc_name = S_ALL_SMALL;	break;
+				case CALC_FNC_MIN:	$fnc_name = S_MIN_SMALL;	break;
+				case CALC_FNC_MAX:	$fnc_name = S_MAX_SMALL;	break;
+				case CALC_FNC_AVG:
+				default:
+					$fnc_name = S_AVG_SMALL;	break;
+				}
 			}
 			$table->AddRow(array(
 					$row["sortorder"],
@@ -186,8 +203,9 @@
 						"chart.php?itemid=".$row["itemid"]."&period=3600&from=0"),
 						"action"),
 					$fnc_name,
-					get_drawtype_description($row["drawtype"]),
-					$row["color"],
+					$type,
+					$drawtype,
+					$color,
 					array(
 						new CLink(S_CHANGE,"graph.php?graphid=".$_REQUEST["graphid"].
 							"&gitemid=".$row["gitemid"]."&form=update#form","action"),

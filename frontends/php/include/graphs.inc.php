@@ -201,11 +201,11 @@
 		return 0;
 	}
 
-	function	add_item_to_graph($graphid,$itemid,$color,$drawtype,$sortorder,$yaxisside,$calc_fnc,$show_history,$history_len)
+	function	add_item_to_graph($graphid,$itemid,$color,$drawtype,$sortorder,$yaxisside,$calc_fnc,$type,$periods_cnt)
 	{
 		$result = DBexecute("insert into graphs_items".
-			" (graphid,itemid,color,drawtype,sortorder,yaxisside,calc_fnc,show_history,history_len)".
-			" values ($graphid,$itemid,".zbx_dbstr($color).",$drawtype,$sortorder,$yaxisside,$calc_fnc,$show_history,$history_len)");
+			" (graphid,itemid,color,drawtype,sortorder,yaxisside,calc_fnc,type,periods_cnt)".
+			" values ($graphid,$itemid,".zbx_dbstr($color).",$drawtype,$sortorder,$yaxisside,$calc_fnc,$type,$periods_cnt)");
 
 		$gitemid = DBinsert_id($result,"graphs_items","gitemid");
 
@@ -245,7 +245,7 @@
 					}
 				// recursion
 					$result = add_item_to_graph($new_graphid,$db_item["itemid"],
-						$color,$drawtype,$sortorder,$yaxisside,$calc_fnc,$show_history,$history_len);
+						$color,$drawtype,$sortorder,$yaxisside,$calc_fnc,$type,$periods_cnt);
 
 					if(!$result)
 						break;
@@ -270,7 +270,7 @@
 					}
 				// recursion
 					$result = add_item_to_graph($child["graphid"],$db_item["itemid"],
-						$color,$drawtype,$sortorder,$yaxisside,$calc_fnc,$show_history,$history_len);
+						$color,$drawtype,$sortorder,$yaxisside,$calc_fnc,$type,$periods_cnt);
 					if(!$result)
 						break;
 				}
@@ -290,7 +290,7 @@
 		return $gitemid;
 	}
 	
-	function	update_graph_item($gitemid,$itemid,$color,$drawtype,$sortorder,$yaxisside,$calc_fnc,$show_history,$history_len)
+	function	update_graph_item($gitemid,$itemid,$color,$drawtype,$sortorder,$yaxisside,$calc_fnc,$type,$periods_cnt)
 	{
 		$gitem = get_graphitem_by_gitemid($gitemid);
 
@@ -316,7 +316,7 @@
 
 			// recursion
 				$result = update_graph_item($chd_gitem["gitemid"],$db_item["itemid"],
-					$color,$drawtype,$sortorder,$yaxisside,$calc_fnc,$show_history,$history_len);
+					$color,$drawtype,$sortorder,$yaxisside,$calc_fnc,$type,$periods_cnt);
 				if(!$result)
 					return $reslut;
 				break;
@@ -324,7 +324,7 @@
 		}
 		$result = DBexecute("update graphs_items set itemid=$itemid,color=".zbx_dbstr($color).",".
 			"drawtype=$drawtype,sortorder=$sortorder,yaxisside=$yaxisside,calc_fnc=$calc_fnc".
-			",show_history=".$show_history.",history_len=".$history_len.
+			",type=".$type.",periods_cnt=".$periods_cnt.
 			" where gitemid=$gitemid");
 		if($result)
 		{
@@ -495,7 +495,7 @@
 				$result = add_item_to_graph($dist_graphid,$host_itemid,$src_graphitem["color"],
 					$src_graphitem["drawtype"],$src_graphitem["sortorder"],
 					$src_graphitem["yaxisside"],$src_graphitem["calc_fnc"],
-					$src_graphitem["show_history"],$src_graphitem["history_len"]);
+					$src_graphitem["type"],$src_graphitem["periods_cnt"]);
 				if(!$result)
 					return $result;
 				break;
@@ -509,7 +509,6 @@
 	function	navigation_bar_calc()
 	{
 //		$workingperiod = 3600;
-
 		if(!isset($_REQUEST["period"]))	$_REQUEST["period"]=3600;
 		if(!isset($_REQUEST["from"]))	$_REQUEST["from"]=0;
 
