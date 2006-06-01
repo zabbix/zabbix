@@ -689,7 +689,7 @@
 
 					foreach(array(GRAPH_ITEM_SIMPLE, GRAPH_ITEM_AGGREGATED) as $type)
 					{
-						if(!isset($this->items[$i][$type]))
+						if(!isset($this->data[$this->items[$i]["itemid"]][$type]))
 							continue;
 
 						$data = &$this->data[$this->items[$i]["itemid"]][$type];
@@ -764,7 +764,7 @@
 
 					foreach(array(GRAPH_ITEM_SIMPLE, GRAPH_ITEM_AGGREGATED) as $type)
 					{
-						if(!isset($this->items[$i][$type]))
+						if(!isset($this->data[$this->items[$i]["itemid"]][$type]))
 							continue;
 
 						$data = &$this->data[$this->items[$i]["itemid"]][$type];
