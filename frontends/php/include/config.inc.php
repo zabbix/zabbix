@@ -852,7 +852,7 @@ COpt::profiling_start("page");
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=<?php echo S_HTML_CHARSET; ?>">
-<meta name="Author" content="Alexei Vladishev, Eugene Grigorjev">
+<meta name="Author" content="ZABBIX SIA (Alexei Vladishev, Eugene Grigorjev)">
 <link rel="stylesheet" href="css.css">
 <?php
 //	if($USER_DETAILS['alias']=='guest')
