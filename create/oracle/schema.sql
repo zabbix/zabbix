@@ -35,7 +35,7 @@ CREATE TABLE config (
 CREATE TABLE history (
   itemid		number(10)	DEFAULT '0' NOT NULL,
   clock			number(10)	DEFAULT '0' NOT NULL,
-  value			number(16,4)	DEFAULT '0.0000' NOT NULL
+  value			number(20,4)	DEFAULT '0.0000' NOT NULL
 );
 
 CREATE INDEX history_itemidclock on history (itemid, clock);
@@ -146,8 +146,8 @@ CREATE TABLE graphs (
 	width		number(10)		DEFAULT '0' NOT NULL,
 	height		number(10)		DEFAULT '0' NOT NULL,
 	yaxistype	number(3)		DEFAULT '0' NOT NULL,
-	yaxismin	number(16,4)	DEFAULT '0' NOT NULL,
-	yaxismax	number(16,4)	DEFAULT '0' NOT NULL,
+	yaxismin	number(20,4)	DEFAULT '0' NOT NULL,
+	yaxismax	number(20,4)	DEFAULT '0' NOT NULL,
 	templateid	number(10)		DEFAULT '0' NOT NULL,
 	show_work_period	number(3)		DEFAULT '1' NOT NULL,
 	show_triggers	number(3)		DEFAULT '1' NOT NULL,
@@ -576,7 +576,7 @@ CREATE TABLE items (
 	units		varchar2(10)	DEFAULT NULL,
 	multiplier	number(10)	DEFAULT '0' NOT NULL,
 	delta		number(3)  DEFAULT '0' NOT NULL,
-	prevorgvalue	number(16,4)  DEFAULT NULL,
+	prevorgvalue	number(20,4)  DEFAULT NULL,
 	snmpv3_securityname	varchar2(64) DEFAULT NULL,
 	snmpv3_securitylevel	number(3) DEFAULT '0' NOT NULL,
 	snmpv3_authpassphrase	varchar2(64) DEFAULT NULL,
@@ -1003,9 +1003,9 @@ CREATE TABLE trends (
 	itemid		number(10)	DEFAULT '0' NOT NULL,
 	clock		number(10)	DEFAULT '0' NOT NULL,
 	num		number(5)	DEFAULT '0' NOT NULL,
-	value_min	number(16,4)	DEFAULT '0.0000' NOT NULL,
-	value_avg	number(16,4)	DEFAULT '0.0000' NOT NULL,
-	value_max	number(16,4)	DEFAULT '0.0000' NOT NULL,
+	value_min	number(20,4)	DEFAULT '0.0000' NOT NULL,
+	value_avg	number(20,4)	DEFAULT '0.0000' NOT NULL,
+	value_max	number(20,4)	DEFAULT '0.0000' NOT NULL,
 	CONSTRAINT 	trends_pk	 PRIMARY KEY (itemid, clock)
 );
 
