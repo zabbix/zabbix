@@ -1107,7 +1107,19 @@ COpt::profiling_start("page");
 			}
 			else
 			{
-				$value = $row["value"];
+				if($DB_TYPE == "ORACLE" && $item["value_type"]==ITEM_VALUE_TYPE_TEXT)
+				{
+					if(isset($row["value"]))
+					{
+						$value = $row["value"]->load();
+					}
+					else
+					{
+						$value = "";
+					}
+				} else {
+					$value = $row["value"];
+				}
 			}
 			$table->AddRow(array(date(S_DATE_FORMAT_YMDHMS,$row["clock"]),	$value));
 		}
@@ -1128,6 +1140,9 @@ COpt::profiling_start("page");
 		{
 			if($DB_TYPE == "ORACLE")
 			{
+				if(!isset($row['image']))
+					return 0;
+
 				$row['image'] = $row['image']->load();
 			}
 
@@ -1149,6 +1164,9 @@ COpt::profiling_start("page");
 		{
 			if($DB_TYPE == "ORACLE")
 			{
+				if(!isset($row['image']))
+					return 0;
+
 				$row['image'] = $row['image']->load();
 			}
 			return	$row;

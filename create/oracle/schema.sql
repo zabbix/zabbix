@@ -1110,7 +1110,7 @@ end;
 CREATE TABLE history_text (
   itemid                number(10)    DEFAULT '0' NOT NULL,
   clock                 number(10)    DEFAULT '0' NOT NULL,
-  value                 BLOB
+  value                 CLOB
 );
 
 CREATE INDEX history_text_itemidclock on history_text (itemid,clock);

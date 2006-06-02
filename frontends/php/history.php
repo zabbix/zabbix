@@ -345,7 +345,6 @@
 					S_LOCAL_TIME,S_SOURCE,S_SEVERITY,S_VALUE),"header");
 
 				$table->ShowStart(); // to solve memory leak we call 'Show' method by steps
-				$table->ShowBody();	// to solve memory leak we call 'Show' method by steps
 			}
 			else
 			{
@@ -464,11 +463,9 @@
 			if(!isset($_REQUEST["plaintext"]))
 			{
 				$table = new CTableInfo();
-				$table->ShowStart(); // to solve memory leak we call 'Show' method by steps
-
 				$table->SetHeader(array(S_TIMESTAMP, S_VALUE));
 
-				$table->ShowBody();	// to show Header
+				$table->ShowStart(); // to solve memory leak we call 'Show' method by steps
 			}
 			else
 			{
@@ -478,6 +475,15 @@
 COpt::profiling_start("history");
 			while($row=DBfetch($result))
 			{
+				
+				if($DB_TYPE == "ORACLE" && $item_type == ITEM_VALUE_TYPE_TEXT)
+				{
+					if(isset($row["value"]))
+						$row["value"] = $row["value"]->load();
+					else
+						$row["value"] = "";
+				}
+
 				$value = replace_value_by_map($row["value"], $row["valuemapid"]);
 
 				$new_row = array(date("Y.M.d H:i:s",$row["clock"]));
