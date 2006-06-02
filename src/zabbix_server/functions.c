@@ -700,9 +700,9 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, int now)
 	{
 /*		if((item->prevvalue_null == 1) || (strcmp(value_str,item->lastvalue_str) != 0) || (strcmp(item->prevvalue_str,item->lastvalue_str) != 0) )*/
 /* Fixed crash when lastvalue == NULL */
-		if((item->prevvalue_null == 1) || (item->lastvalue_null == 1) ||
+		if((value->type & AR_TEXT) == 0 && ((item->prevvalue_null == 1) || (item->lastvalue_null == 1) ||
 			(strcmp(value_str,item->lastvalue_str) != 0) ||
-			(strcmp(item->prevvalue_str,item->lastvalue_str) != 0))
+			(strcmp(item->prevvalue_str,item->lastvalue_str) != 0)))
 		{
 			DBescape_string(value_str,value_esc,MAX_STRING_LEN);
 /*			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='%s',lastclock=%d where itemid=%d",now+item->delay,value_esc,now,item->itemid);*/
