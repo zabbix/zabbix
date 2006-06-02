@@ -1162,7 +1162,7 @@ int	DBadd_history_text(int itemid, char *value, int clock)
 	}
 
 	DBescape_string(value, value_esc, value_esc_max_len-1);
-	value_esc_max_len = strlen(value_esc)+1;
+	value_esc_max_len = strlen(value_esc);
 
 	/* alloate the lob descriptor */
 	if(sqlo_alloc_lob_desc(oracle, &loblp) < 0)
