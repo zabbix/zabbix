@@ -238,7 +238,8 @@ int main_alerter_loop()
 			sigaction(SIGALRM, &phan, NULL);
 
 			/* Hardcoded value */
-			alarm(10);
+			/* SMS requires 12.5s for sending */
+			alarm(20);
 			res=execute_action(&alert,&mediatype,error,sizeof(error));
 			alarm(0);
 
