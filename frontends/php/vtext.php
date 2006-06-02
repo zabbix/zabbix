@@ -32,9 +32,7 @@
 	$width = ImageFontWidth($font) * strlen($text);
 	$height = ImageFontHeight($font);
 
-//	Header( "Content-type:  text/html"); 
-	Header( "Content-type:  image/png"); 
-	Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
+	set_image_header();
 
 	$im = imagecreate($height,$width); 
   
