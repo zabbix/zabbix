@@ -202,7 +202,6 @@
 		$_REQUEST["hostid"] ==0 ? S_HOST : NULL,
 		S_DESCRIPTION,S_LAST_CHECK,S_LAST_VALUE,S_CHANGE,S_HISTORY));
 	$table->ShowStart();
-	$table->ShowBody();
 
 	if($_REQUEST["select"] != "")
 		$compare_description = " and i.description like ".zbx_dbstr("%".$_REQUEST["select"]."%");
