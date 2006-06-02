@@ -39,10 +39,7 @@
 	$background	= $map["background"];
 	$label_type	= $map["label_type"];
 
-	Header( "Content-type:  text/html"); 
-//	if(MAP_OUTPUT_FORMAT == "JPG")	Header( "Content-type:  image/jpeg"); 
-//	else				Header( "Content-type:  image/png"); 
-	Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
+	set_image_header();
 
 	check_authorisation();
 
