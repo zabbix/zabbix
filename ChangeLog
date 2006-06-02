@@ -1,5 +1,6 @@
 Changes for 1.1:
 
+ - fixed syntax in snmptrap.sh (Alexei)
  - fixed EventLog for Win32 ZABBIX agent, thanks to "bcheese" (Eugene)
  - developed aggrgated graphs (Eugene)
  - improved graphs, added selector of data calculation function (Eugene)
