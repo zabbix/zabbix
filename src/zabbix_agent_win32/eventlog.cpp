@@ -246,11 +246,14 @@ INIT_CHECK_MEMORY(main);
 					MAX_MSG_LENGTH,                     /* maximum size of the message buffer */
 					aInsertStrs);                       /* array of insert strings for the message */
 
-				strcpy(pMessage,msgBuf);                        // copy message
-				err = 0;
+				if(msgBuf)
+				{
+					strcpy(pMessage,msgBuf);                    // copy message
+					err = 0;
 
-				/* Free the buffer that FormatMessage allocated for us. */
-				if(msgBuf) LocalFree((HLOCAL) msgBuf);
+					/* Free the buffer that FormatMessage allocated for us. */
+					LocalFree((HLOCAL) msgBuf);
+				}
 				FreeLibrary(hLib);
 			}
 		}
