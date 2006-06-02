@@ -26,12 +26,11 @@
 //	$DB_TYPE	="POSTGRESQL";
 	$DB_TYPE	="MYSQL";
 	$DB_SERVER	="localhost";
-	$DB_DATABASE	="osmiy";
+	$DB_DATABASE	="zabbix";
 	$DB_USER	="root";
 	$DB_PASSWORD	="";
 // END OF DATABASE CONFIGURATION
 
-//	$USER_DETAILS	="";
 	global $USER_DETAILS;
 
 	if($DB_TYPE == "MYSQL")

@@ -894,7 +894,7 @@ COpt::profiling_start("page");
 					)
 				),
 		"cm"=>array(
-				"label"=>S_CONFIGURATION_MANAGEMENT,
+				"label"=>S_INVENTORY,
 				"pages"=>array("hostprofiles.php"),
 				"level2"=>array(
 					array("label"=>S_HOSTS,"url"=>"hostprofiles.php")

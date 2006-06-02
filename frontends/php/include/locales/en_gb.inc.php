@@ -993,7 +993,7 @@
 	"S_HELP"=>				"Help",
 	"S_PROFILE"=>				"Profile",
 	"S_MONITORING"=>			"Monitoring",
-	"S_CONFIGURATION_MANAGEMENT"=>		"Configuration management",
+	"S_INVENTORY"=>				"Inventory",
 	"S_QUEUE"=>				"Queue",
 	"S_EVENTS"=>				"Events",
 	"S_MAPS"=>				"Maps",
