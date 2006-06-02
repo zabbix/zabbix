@@ -463,7 +463,9 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-/*#define USE_TEST_FUNCTION 1 */
+/*
+#define USE_TEST_FUNCTION 1 
+/**/
 
 #ifdef USE_TEST_FUNCTION
 
@@ -471,6 +473,9 @@ void    run_commands(DB_TRIGGER *trigger,DB_ACTION *action);
 
 void test()
 {
+	printf("-= Test Started =-\n");
+
+	printf("-= Test completed =-\n");
 }
 #endif
 
@@ -580,10 +585,6 @@ int main(int argc, char **argv)
 		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,CONFIG_LOG_FILE);
 	}
 
-	if( FAIL == create_pid_file(CONFIG_PID_FILE))
-	{
-		exit(FAIL);
-	}
 	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_server. ZABBIX %s.", ZABBIX_VERSION);
 	DBconnect();
 	test();

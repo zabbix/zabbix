@@ -1140,25 +1140,125 @@ int	DBadd_history_str(int itemid, char *value, int clock)
 
 int	DBadd_history_text(int itemid, char *value, int clock)
 {
-	char	*sql;
+#ifdef HAVE_ORACLE
+	char	sql[MAX_STRING_LEN];
 	char	*value_esc;
+	int	value_esc_max_len = 0;
+	int	ret = FAIL;
+
+	sqlo_lob_desc_t		loblp;		/* the lob locator */
+	sqlo_stmt_handle_t	sth;
+
+	sqlo_autocommit_off(oracle);
+
+	zabbix_log(LOG_LEVEL_DEBUG,"In add_history_text()");
+
+	value_esc_max_len = strlen(value)+1024;
+	value_esc = malloc(value_esc_max_len);
+	if(value_esc == NULL)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG,"Can't allocate required memory");
+		goto lbl_exit;
+	}
+
+	DBescape_string(value, value_esc, value_esc_max_len-1);
+	value_esc_max_len = strlen(value_esc)+1;
+
+	/* alloate the lob descriptor */
+	if(sqlo_alloc_lob_desc(oracle, &loblp) < 0)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG,"CLOB allocating failed:%s", sqlo_geterror(oracle));
+		goto lbl_exit;
+	}
+
+	snprintf(sql, sizeof(sql)-1, "insert into history_text (clock,itemid,value)"
+		" values (%d,%d, EMPTY_CLOB()) returning value into :1", clock, itemid);
+
+	zabbix_log(LOG_LEVEL_DEBUG,"Query:%s", sql);
+
+	/* parse the statement */
+	sth = sqlo_prepare(oracle, sql);
+	if(sth < 0)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG,"Query prepearing failed:%s", sqlo_geterror(oracle));
+		goto lbl_exit;
+	}
+
+	/* bind input variables. Note: we bind the lob descriptor here */
+	if(SQLO_SUCCESS != sqlo_bind_by_pos(sth, 1, SQLOT_CLOB, &loblp, 0, NULL, 0))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG,"CLOB binding failed:%s", sqlo_geterror(oracle));
+		goto lbl_exit_loblp;
+	}
+
+	/* execute the statement */
+	if(sqlo_execute(sth, 1) != SQLO_SUCCESS)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG,"Query failed:%s", sqlo_geterror(oracle));
+		goto lbl_exit_loblp;
+	}
+
+	/* write the lob */
+	ret = sqlo_lob_write_buffer(oracle, loblp, value_esc_max_len, value_esc, value_esc_max_len, SQLO_ONE_PIECE);
+	if(ret < 0)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG,"CLOB writing failed:%s", sqlo_geterror(oracle) );
+		goto lbl_exit_loblp;
+	}
+
+	/* commiting */
+	if(sqlo_commit(oracle) < 0)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG,"Commiting failed:%s", sqlo_geterror(oracle) );
+	}
+
+	ret = SUCCEED;
+
+lbl_exit_loblp:
+	sqlo_free_lob_desc(oracle, &loblp);
+
+lbl_exit:
+	if(sth >= 0)	sqlo_close(sth);
+	if(value_esc)	free(value_esc);
+
+	sqlo_autocommit_on(oracle);
+
+	return ret;
+
+#else /* HAVE_ORACLE */
+
+	char    *sql;
+	char    *value_esc;
+	int	value_esc_max_len = 0;
+	int	sql_max_len = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_history_str()");
 
-	value_esc=malloc(strlen(value)+1024);
-	sql=malloc(strlen(value)+1024+100);
+	value_esc_max_len = strlen(value)+1024;
+	value_esc = malloc(value_esc_max_len);
+	if(value_esc == NULL)
+	{
+		return FAIL;
+	}
 
-	if(value_esc == NULL)	return FAIL;
-	if(sql == NULL)		{ free(value_esc); return FAIL; }
+	sql_max_len = value_esc_max_len+100;
+	sql = malloc(sql_max_len);
+	if(sql == NULL)
+	{
+		free(value_esc);
+		return FAIL;
+	}
 
-	DBescape_string(value,value_esc,MAX_STRING_LEN);
-	snprintf(sql,strlen(value)+1024+100-1,"insert into history_text (clock,itemid,value) values (%d,%d,'%s')",clock,itemid,value_esc);
+	DBescape_string(value,value_esc,value_esc_max_len);
+	snprintf(sql,sql_max_len, "insert into history_text (clock,itemid,value) values (%d,%d,'%s')",clock,itemid,value_esc);
 	DBexecute(sql);
 
 	free(value_esc);
 	free(sql);
 
 	return SUCCEED;
+
+#endif
 }
 
 
