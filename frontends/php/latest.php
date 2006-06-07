@@ -37,8 +37,8 @@
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"applications"=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,	NULL),
-		"applicationid"=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,	NULL),
+		"applications"=>	array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(-2,4294967295),	NULL),
+		"applicationid"=>	array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(-2,4294967295),	NULL),
 		"close"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("1"),	NULL),
 		"open"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("1"),	NULL),
 		"groupbyapp"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("1"),	NULL),
@@ -108,18 +108,34 @@
 
 	if(isset($_REQUEST["open"]) && isset($_REQUEST["applicationid"]))
 	{
-		if(!in_array($_REQUEST["applicationid"],$_REQUEST["applications"]))
+		if($_REQUEST["applicationid"] == -1)
+		{
+			$_REQUEST["applications"] = array();
+			$show_all_apps = 1;
+		}
+		elseif(!in_array($_REQUEST["applicationid"],$_REQUEST["applications"]))
 		{
 			array_push($_REQUEST["applications"],$_REQUEST["applicationid"]);
 		}
 		
 	} elseif(isset($_REQUEST["close"]) && isset($_REQUEST["applicationid"]))
 	{
-		if(($i=array_search($_REQUEST["applicationid"], $_REQUEST["applications"])) !== FALSE)
+		if($_REQUEST["applicationid"] == -1)
+		{
+			$_REQUEST["applications"] = array();
+		}
+		elseif(($i=array_search($_REQUEST["applicationid"], $_REQUEST["applications"])) !== FALSE)
 		{
 			unset($_REQUEST["applications"][$i]);
 		}
 	}
+
+	/* limit opened application count */
+	while(count($_REQUEST["applications"]) > 25)
+	{
+		array_shift($_REQUEST["applications"]);
+	}
+
 
 	update_profile("web.latest.applications",$_REQUEST["applications"],PROFILE_TYPE_ARRAY);
 ?>
@@ -197,10 +213,22 @@
 ?>
 
 <?php
+	if(isset($show_all_apps))
+		$link = new CLink(new CImg("images/general/opened.gif"),
+			"latest.php?close=1&applicationid=-1".
+			url_param("groupid").url_param("hostid").url_param("applications").
+			url_param("select"));
+	else
+		$link = new CLink(new CImg("images/general/closed.gif"),
+			"latest.php?open=1&applicationid=-1".
+			url_param("groupid").url_param("hostid").url_param("applications").
+			url_param("select"));
+
 	$table=new CTableInfo();
 	$table->SetHeader(array(
 		$_REQUEST["hostid"] ==0 ? S_HOST : NULL,
-		S_DESCRIPTION,S_LAST_CHECK,S_LAST_VALUE,S_CHANGE,S_HISTORY));
+		($link->ToString()).SPACE.S_DESCRIPTION,
+		S_LAST_CHECK,S_LAST_VALUE,S_CHANGE,S_HISTORY));
 	$table->ShowStart();
 
 	if($_REQUEST["select"] != "")
@@ -242,7 +270,7 @@
 			}
 
 			++$item_cnt;
-			if(!in_array($db_app["applicationid"],$_REQUEST["applications"])) continue;
+			if(!in_array($db_app["applicationid"],$_REQUEST["applications"]) && !isset($show_all_apps)) continue;
 
 			if(isset($db_item["lastclock"]))
 				$lastclock=date(S_DATE_FORMAT_YMDHMS,$db_item["lastclock"]);
@@ -289,7 +317,7 @@
 		}
 		if($item_cnt > 0)
 		{
-			if(in_array($db_app["applicationid"],$_REQUEST["applications"]))
+			if(in_array($db_app["applicationid"],$_REQUEST["applications"]) || isset($show_all_apps))
 				$link = new CLink(new CImg("images/general/opened.gif"),
 					"latest.php?close=1&applicationid=".$db_app["applicationid"].
 					url_param("groupid").url_param("hostid").url_param("applications").
@@ -332,7 +360,7 @@
 		}
 
 		++$item_cnt;
-		if(!in_array(0,$_REQUEST["applications"]) && $any_app_exist) continue;
+		if(!in_array(0,$_REQUEST["applications"]) && $any_app_exist && !isset($show_all_apps)) continue;
 
 
 		if(isset($db_item["lastclock"]))
@@ -383,7 +411,7 @@
 	{
 		if($any_app_exist)
 		{
-			if(in_array(0,$_REQUEST["applications"]))
+			if(in_array(0,$_REQUEST["applications"]) || isset($show_all_apps))
 				$link = new CLink(new CImg("images/general/opened.gif"),
 					"latest.php?close=1&applicationid=0".
 					url_param("groupid").url_param("hostid").url_param("applications").
