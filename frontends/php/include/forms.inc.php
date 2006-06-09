@@ -597,7 +597,7 @@
 	function	insert_trigger_form()
 	{
 		$frmTrig = new CFormTable(S_TRIGGER,"triggers.php");
-		$frmTrig->SetHelp("web.triggers.trigger.php");
+		$frmTrig->SetHelp("config_triggers.php");
 
 		if(isset($_REQUEST["hostid"]))
 		{
