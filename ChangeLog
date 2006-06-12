@@ -1,3 +1,7 @@
+Changes for 1.1patch1:
+
+ - fixed value mapping for screens (Eugene)
+
 Changes for 1.1:
 
  - timeout for sending emails and SMS was increased to 20 seconds (Alexei)
