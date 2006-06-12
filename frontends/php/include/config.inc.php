@@ -2636,7 +2636,7 @@ COpt::profiling_stop("script");
 		$row = DBfetch($result);
 		if($row)
 		{
-			return $row["newvalue"].SPACE."($value)";
+			return $row["newvalue"]." "."($value)";
 		}
 		return $value;
 	}

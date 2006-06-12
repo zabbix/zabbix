@@ -1,5 +1,6 @@
 Changes for 1.1patch1:
 
+ - fixed value mapping for latest data (Eugene)
  - fixed value mapping for screens (Eugene)
 
 Changes for 1.1:

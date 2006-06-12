@@ -78,17 +78,20 @@
 			else if($db_item["value_type"] == ITEM_VALUE_TYPE_UINT64)
 			{
 				$lastvalue=convert_units($db_item["lastvalue"],$db_item["units"]);
-				$lastvalue = replace_value_by_map($lastvalue, $db_item["valuemapid"]);
 			}
 			else if($db_item["value_type"] == ITEM_VALUE_TYPE_TEXT)
 			{
-//				$lastvalue=nbsp(htmlspecialchars(substr($db_item["lastvalue"],0,20)." ..."));
 				$lastvalue="...";
 			}
 			else
 			{
-				$lastvalue=nbsp(htmlspecialchars(substr($db_item["lastvalue"],0,20)." ..."));
+				$lastvalue=nbsp(htmlspecialchars(substr($db_item["lastvalue"],0,20)));
+				if(strlen($db_item["lastvalue"]) > 20)
+					$lastvalue .= " ...";
 			}
+			if($db_item["valuemapid"] > 0);
+				$lastvalue = replace_value_by_map($lastvalue, $db_item["valuemapid"]);
+
 		}
 		else
 		{
