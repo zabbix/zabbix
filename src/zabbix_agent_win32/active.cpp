@@ -696,9 +696,9 @@ LOG_FUNC_CALL("In refresh_metrics()");
 	while(get_active_checks(server, port, error, max_error_len) != SUCCEED)
 	{
 LOG_DEBUG_INFO("s","Getting list of active checks failed. Will retry after 60 seconds");
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("poller [sleeping for %d seconds]", 60*1000);
-#endif
+
+		zbx_setproctitle("poller [sleeping for %d seconds]", 60*1000);
+
 		Sleep(60*1000);
 	}
 LOG_DEBUG_INFO("s","Out of refresh_metrics()");

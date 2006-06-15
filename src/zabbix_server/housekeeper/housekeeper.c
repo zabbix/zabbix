@@ -211,9 +211,8 @@ int main_housekeeper_loop()
 		for(;;)
 		{
 /* Do nothing */
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-			setproctitle("do nothing");
-#endif
+			zbx_setproctitle("do nothing");
+
 			sleep(3600);
 		}
 	}
@@ -221,62 +220,47 @@ int main_housekeeper_loop()
 	for(;;)
 	{
 		now = time(NULL);
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("connecting to the database");
-#endif
+
+		zbx_setproctitle("connecting to the database");
+
 		DBconnect();
 
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-/*		setproctitle("housekeeper [removing deleted hosts]");*/
-#endif
+
+/*		zbx_setproctitle("housekeeper [removing deleted hosts]");*/
+
 /*		housekeeping_hosts();*/
 
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-/*		setproctitle("housekeeper [removing deleted items]");*/
-#endif
+/*		zbx_setproctitle("housekeeper [removing deleted items]");*/
 
 /*		housekeeping_items();*/
 
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-/*		setproctitle("housekeeper [removing old history]");*/
-#endif
+/*		zbx_setproctitle("housekeeper [removing old history]");*/
 
 /*		housekeeping_history_and_trends(now);*/
 
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("housekeeper [removing old history]");
-#endif
+		zbx_setproctitle("housekeeper [removing old history]");
 
 		housekeeping_process_log(now);
 
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("housekeeper [removing old alarms]");
-#endif
+		zbx_setproctitle("housekeeper [removing old alarms]");
 
 		housekeeping_alarms(now);
 
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("housekeeper [removing old alerts]");
-#endif
+		zbx_setproctitle("housekeeper [removing old alerts]");
 
 		housekeeping_alerts(now);
 
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("housekeeper [removing old sessions]");
-#endif
+		zbx_setproctitle("housekeeper [removing old sessions]");
 
 		housekeeping_sessions(now);
 
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("housekeeper [vacuuming database]");
-#endif
+		zbx_setproctitle("housekeeper [vacuuming database]");
+
 		DBvacuum();
 
 		zabbix_log( LOG_LEVEL_DEBUG, "Sleeping for %d hours", CONFIG_HOUSEKEEPING_FREQUENCY);
 
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("housekeeper [sleeping for %d hour(s)]", CONFIG_HOUSEKEEPING_FREQUENCY);
-#endif
+		zbx_setproctitle("housekeeper [sleeping for %d hour(s)]", CONFIG_HOUSEKEEPING_FREQUENCY);
 
 		DBclose();
 		sleep(3660*CONFIG_HOUSEKEEPING_FREQUENCY);

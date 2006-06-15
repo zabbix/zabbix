@@ -399,9 +399,7 @@ void main_pinger_loop()
 	{
 		for(;;)
 		{
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-			setproctitle("connecting to the database");
-#endif
+			zbx_setproctitle("connecting to the database");
 
 			DBconnect();
 	
@@ -411,9 +409,7 @@ void main_pinger_loop()
 	
 			if( SUCCEED == ret)
 			{
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-				setproctitle("pinging hosts");
-#endif
+				zbx_setproctitle("pinging hosts");
 
 				ret = do_ping();
 			}
@@ -423,9 +419,8 @@ void main_pinger_loop()
 
 			DBclose();
 
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-			setproctitle("pinger [sleeping for %d seconds]", CONFIG_PINGER_FREQUENCY);
-#endif
+			zbx_setproctitle("pinger [sleeping for %d seconds]", CONFIG_PINGER_FREQUENCY);
+
 			sleep(CONFIG_PINGER_FREQUENCY);
 		}
 	}

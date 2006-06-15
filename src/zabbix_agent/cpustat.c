@@ -17,7 +17,7 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#include "config.h"
+#include "common.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -47,7 +47,6 @@
 
 #include <dirent.h>
 
-#include "common.h"
 #include "sysinfo.h"
 #include "security.h"
 #include "zabbix_agent.h"

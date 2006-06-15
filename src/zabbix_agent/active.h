@@ -37,4 +37,4 @@ METRIC
 
 pid_t   child_active_make(int i,char *server, int port);
 
-#endif
+#endif /* ZABBIX_ACTIVE_H */

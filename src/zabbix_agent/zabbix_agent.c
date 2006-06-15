@@ -17,8 +17,6 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#include "config.h"
-
 #include "common.h"
 #include "cfg.h"
 #include "log.h"
@@ -121,6 +119,7 @@ int	main(int argc, char **argv)
 	int             ch;
 	int		task = ZBX_TASK_START;
 	char		*TEST_METRIC = NULL;
+
 	AGENT_RESULT	result;
 
 	memset(&result, 0, sizeof(AGENT_RESULT));
@@ -157,28 +156,27 @@ int	main(int argc, char **argv)
 			break;
 	}
 
-/* Must be before init_config() */
-	init_metrics();
+	init_metrics(); // Must be before init_config()
 	init_config();
 
-/* Do not create debug files */
+	/* Do not create debug files */
 	zabbix_open_log(LOG_TYPE_SYSLOG,LOG_LEVEL_EMPTY,NULL);
 
-        switch(task)
-        {
-                case ZBX_TASK_PRINT_SUPPORTED:
-                        test_parameters();
-                        exit(-1);
-                        break;
-                case ZBX_TASK_TEST_METRIC:
-                        test_parameter(TEST_METRIC);
-                        exit(-1);
-                        break;
-                case ZBX_TASK_SHOW_USAGE:
-                        usage();
-                        exit(-1);
-                        break;
-        }
+	switch(task)
+	{
+		case ZBX_TASK_PRINT_SUPPORTED:
+			test_parameters();
+			exit(-1);
+			break;
+		case ZBX_TASK_TEST_METRIC:
+			test_parameter(TEST_METRIC);
+			exit(-1);
+			break;
+		case ZBX_TASK_SHOW_USAGE:
+			usage();
+			exit(-1);
+			break;
+	}
 
 	signal( SIGINT,  signal_handler );
 	signal( SIGQUIT, signal_handler );

@@ -22,29 +22,29 @@
 
 #include "sysinc.h"
 
+#include "zbxtypes.h"
+
 #if defined(WIN32)
 #	pragma warning (disable: 4100)
 
-#	define zbx_uint64_t __int64
-#	define ZBX_FS_UI64 "%llu"
-
 //#undef _DEBUG
+
 #	ifdef _DEBUG
 #		define LOG_DEBUG_INFO(type, msg) \
 			WriteLog(MSG_DEBUG_INFO,EVENTLOG_ERROR_TYPE, "d"type , GetCurrentThreadId(), msg)
 //#		define ENABLE_CHECK_MEMOTY
 //#		define ENABLE_FUNC_CALL
-#	else
+#	else /* _DEBUG */
 #		define LOG_DEBUG_INFO(a, b) ((void)0)
-#	endif
+#	endif /* _DEBUG */
 
 
 #	if defined(ENABLE_FUNC_CALL)
 #		define LOG_FUNC_CALL(msg) \
 			WriteLog(MSG_DEBUG_INFO,EVENTLOG_ERROR_TYPE, "ds" , GetCurrentThreadId(), msg)
-#	else
+#	else /* ENABLE_FUNC_CALL */
 #		define LOG_FUNC_CALL(a) ((void)0)
-#	endif
+#	endif /* ENABLE_FUNC_CALL */
 
 #	if defined(ENABLE_CHECK_MEMOTY)
 #		include "crtdbg.h"
@@ -91,18 +91,13 @@
 					(long) a ## diffMemState.lCounts[_MAX_BLOCKS]); \
 				 LOG_DEBUG_INFO("s", a ## DumpMessage); \
 			}
-#	else
+#	else /* ENABLE_CHECK_MEMOTY */
 #		define INIT_CHECK_MEMORY(a) ((void)0)
 #		define CHECK_MEMORY(a, fncname, msg) ((void)0)
-#	endif
-#else
-#	define zbx_uint64_t uint64_t
-#	if __WORDSIZE == 64
-#		define ZBX_FS_UI64 "%lu"
-#	else
-#		define ZBX_FS_UI64 "%llu"
-#	endif
-#endif
+#	endif /* ENABLE_CHECK_MEMOTY */
+
+#endif /* WIN32 */
+
 
 #ifndef HAVE_GETOPT_LONG
 	struct option {
@@ -112,7 +107,7 @@
 		int val;
 	};
 #	define  getopt_long(argc, argv, optstring, longopts, longindex) getopt(argc, argv, optstring)
-#endif
+#endif /* ndef HAVE_GETOPT_LONG */
 
 #define ZBX_UNUSED(a) ((void)0)(a)
 
@@ -428,6 +423,8 @@ void	delete_reol(char *c);
 int	get_param(const char *param, int num, char *buf, int maxlen);
 int	num_param(const char *param);
 int	calculate_item_nextcheck(int delay, int now);
+void	zbx_setproctitle(const char *fmt, ...);
+double	zbx_getseconds(void);
 
 int	set_result_type(AGENT_RESULT *result, int value_type, char *c);
 
@@ -451,5 +448,6 @@ char    *zbx_regexp_match(const char *string, const char *pattern, int *len);
 int	cmp_double(double a,double b);
 
 int       SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+
 
 #endif

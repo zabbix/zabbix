@@ -17,7 +17,7 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#include "config.h"
+#include "common.h"
 
 #include <netdb.h>
 
@@ -50,7 +50,6 @@
 /* Required for getpwuid */
 #include <pwd.h>
 
-#include "common.h"
 #include "sysinfo.h"
 #include "security.h"
 #include "zabbix_agent.h"

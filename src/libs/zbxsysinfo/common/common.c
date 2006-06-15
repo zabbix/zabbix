@@ -17,10 +17,6 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#include "config.h"
-
-#include <sys/wait.h>
-
 #include "common.h"
 #include "sysinfo.h"
 
@@ -406,7 +402,7 @@ int	replace_param(const char *cmd, const char *param, char *out, int outlen)
 	{
 		pr[0] = '\0';
 		strncat(out, pl, outlen);
-		outlen -= MIN(strlen(pl), outlen);
+		outlen -= MIN((int)strlen(pl), (int)outlen);
 		pr[0] = '$';
 		
 		if (pr[1] >= '0' && pr[1] <= '9')
@@ -423,7 +419,7 @@ int	replace_param(const char *cmd, const char *param, char *out, int outlen)
 			}
 			
 			strncat(out, buf, outlen);
-			outlen -= MIN(strlen(buf), outlen);
+			outlen -= MIN((int)strlen(buf), (int)outlen);
 					
 			pl = pr + 2;
 			continue;
@@ -433,7 +429,7 @@ int	replace_param(const char *cmd, const char *param, char *out, int outlen)
 		outlen -= 1;
 	}
 	strncat(out, pl, outlen);
-	outlen -= MIN(strlen(pl), outlen);
+	outlen -= MIN((int)strlen(pl), (int)outlen);
 	
 	return ret;
 }
@@ -567,8 +563,9 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 
 int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	int	fd;
-	int	i,nr;
+	FILE	*file = NULL;
+	int	i;
+	size_t	nr;
 	struct stat	buf_stat;
 
         md5_state_t state;
@@ -605,20 +602,20 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		return	SYSINFO_RET_FAIL;
 	}
 
-	fd=open(filename,O_RDONLY);
-	if(fd == -1)
+	file = fopen(filename,"r");
+	if(file == NULL)
 	{
 		return	SYSINFO_RET_FAIL;
 	}
 
         md5_init(&state);
-	while ((nr = read(fd, buf, sizeof(buf))) > 0)
+	while ((nr = fread(buf, (size_t)sizeof(buf), 1, file)) > 0)
 	{
-        	md5_append(&state,(const md5_byte_t *)buf,nr);
+        	md5_append(&state,(const md5_byte_t *)buf, nr);
 	}
         md5_finish(&state,(md5_byte_t *)hash);
 
-	close(fd);
+	fclose(file);
 
 /* Convert MD5 hash to text form */
 	for(i=0;i<MD5_DIGEST_SIZE;i++)
@@ -699,12 +696,14 @@ int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 {
 	register u_char *p;
 	register int nr;
+
 /*	AV Crashed under 64 platforms. Must be 32 bit! */
 /*	register u_long crc, len;*/
 	register uint32_t crc, len;
+
 	u_char buf[16 * 1024];
 	u_long cval, clen;
-	int	fd;
+	FILE	*f;
 	char	filename[MAX_STRING_LEN];
 
 	assert(result);
@@ -721,8 +720,8 @@ int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
                 return SYSINFO_RET_FAIL;
         }	
 		
-	fd=open(filename,O_RDONLY);
-	if(fd == -1)
+	f = fopen(filename,"r");
+	if(NULL == f)
 	{
 		return	SYSINFO_RET_FAIL;
 	}
@@ -730,14 +729,14 @@ int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 #define	COMPUTE(var, ch)	(var) = (var) << 8 ^ crctab[(var) >> 24 ^ (ch)]
 
 	crc = len = 0;
-	while ((nr = read(fd, buf, sizeof(buf))) > 0)
+	while ((nr = fread(buf, sizeof(buf), 1, f)) > 0)
 	{
 		for( len += nr, p = buf; nr--; ++p)
 		{
 			COMPUTE(crc, *p);
 		}
 	}
-	close(fd);
+	fclose(f);
 	
 	if (nr < 0)
 	{
@@ -789,7 +788,7 @@ int	get_stat(const char *key, unsigned flags, AGENT_RESULT *result)
 
         init_result(result);	
 
-	f=fopen("/tmp/zabbix_agentd.tmp","r");
+	f = fopen("/tmp/zabbix_agentd.tmp","r");
 	if(f==NULL)
 	{
 		return SYSINFO_RET_FAIL;
@@ -807,7 +806,9 @@ int	get_stat(const char *key, unsigned flags, AGENT_RESULT *result)
 		}
 
 	}
+
 	fclose(f);
+
 	return SYSINFO_RET_FAIL;
 }
 
@@ -896,7 +897,7 @@ int	TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 		return	SYSINFO_RET_FAIL;
 	}
 
-	while (NULL!=fgets(c,MAX_STRING_LEN,f))
+	while (NULL != fgets(c,MAX_STRING_LEN,f))
 	{
 		if(NULL != strstr(c,pattern))
 		{
@@ -928,7 +929,7 @@ int	getPROC(char *file, int lineno, int fieldno, unsigned flags, AGENT_RESULT *r
 
         init_result(result);	
 		
-	f=fopen(file,"r");
+	f = fopen(file,"r");
 	if(NULL == f)
 	{
 		return	SYSINFO_RET_FAIL;
@@ -938,7 +939,7 @@ int	getPROC(char *file, int lineno, int fieldno, unsigned flags, AGENT_RESULT *r
 		fgets(c,MAX_STRING_LEN,f);
 	}
 	t=(char *)strtok(c," ");
-	for(i=2;i<=fieldno;i++)
+	for(i=2; i<=fieldno; i++)
 	{
 		t=(char *)strtok(NULL," ");
 	}
@@ -1064,7 +1065,7 @@ int	PROCCOUNT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 
 		if(stat(filename,&buf)==0)
 		{
-			f=fopen(filename,"r");
+			f = fopen(filename,"r");
 			if(f==NULL)
 			{
 				continue;
@@ -1135,6 +1136,8 @@ int     OLD_VERSION(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
+#ifdef TODO /* TODO !!! */
+	
 	FILE	*f;
 	char	c[MAX_STRING_LEN];
 	char	command[MAX_STRING_LEN];
@@ -1159,7 +1162,7 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		}
 	}
 
-	len = fread(c, 1, MAX_STRING_LEN-1, f);
+	len = fread(c, MAX_STRING_LEN-1, 1, f);
 
 	if(0 != ferror(f))
 	{
@@ -1207,12 +1210,15 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	}
 	
 	SET_TEXT_RESULT(result, strdup(c));
-	
+
+#endif /* TODO */
+
 	return	SYSINFO_RET_OK;
 }
 
 int	EXECUTE(const char *cmd, const char *command, unsigned flags, AGENT_RESULT *result)
 {
+#ifdef TODO /* TODO !!! */
 	FILE	*f;
 	char	c[MAX_STRING_LEN];
 	double	value = 0;
@@ -1265,11 +1271,14 @@ int	EXECUTE(const char *cmd, const char *command, unsigned flags, AGENT_RESULT *
 	sscanf(c, "%lf", &value);
 	SET_DBL_RESULT(result, value);
 
+#endif /* TODO */
+
 	return	SYSINFO_RET_OK;
 }
 
 int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
+#ifdef TODO /* TODO !!! */
 	char	command[MAX_STRING_LEN];
 #define MAX_FLAG_LEN 10
 	char	flag[MAX_FLAG_LEN];
@@ -1370,11 +1379,13 @@ zabbix_log(LOG_LEVEL_WARNING, "RUN_COMMAND runed as NOWAIT",flag);
 	}
 
 	SET_UI64_RESULT(result, 1);
+#endif /* TODO */
 	
 	return	SYSINFO_RET_OK;
 }
 int	forward_request(char *proxy, char *command, int port, unsigned flags, AGENT_RESULT *result)
 {
+#ifdef TODO /* TODO !!! */
 	char	*haddr;
 	char	c[1024];
 	
@@ -1435,7 +1446,7 @@ int	forward_request(char *proxy, char *command, int port, unsigned flags, AGENT_
 	close(s);
 	
 	SET_STR_RESULT(result, strdup(c));
-
+#endif /* TODO */
 	return	SYSINFO_RET_OK;
 }
 
@@ -1446,6 +1457,8 @@ int	forward_request(char *proxy, char *command, int port, unsigned flags, AGENT_
  * */
 int	tcp_expect(char	*hostname, short port, char *request,char *expect,char *sendtoclose, int *value_int)
 {
+#ifdef TODO /* TODO !!! */
+
 	char	*haddr;
 	char	c[1024];
 	
@@ -1508,13 +1521,13 @@ int	tcp_expect(char	*hostname, short port, char *request,char *expect,char *send
 		*value_int = 1;
 		return SYSINFO_RET_OK;
 	}
-	else
-	{
-		send(s,sendtoclose,strlen(sendtoclose),0);
-		close(s);
-		*value_int = 0;
-		return SYSINFO_RET_OK;
-	}
+	send(s,sendtoclose,strlen(sendtoclose),0);
+	close(s);
+	*value_int = 0;
+
+#endif /* TODO */
+
+	return SYSINFO_RET_OK;
 }
 
 #ifdef HAVE_LDAP
@@ -1585,6 +1598,7 @@ int    check_ldap(char *hostname, short port, int *value_int)
  * */
 int	check_ssh(char	*hostname, short port, int *value_int)
 {
+#ifdef TODO /* TODO !!! */
 	char	*haddr;
 	char	c[MAX_STRING_LEN];
 	char	out[MAX_STRING_LEN];
@@ -1652,6 +1666,9 @@ int	check_ssh(char	*hostname, short port, int *value_int)
 	send(s,"0\n",2,0);
 	close(s);
 	*value_int = 0;
+
+#endif /* TODO */
+
 	return	SYSINFO_RET_OK;
 }
 
@@ -1659,6 +1676,8 @@ int	check_ssh(char	*hostname, short port, int *value_int)
 /* check_service[ssh,127.0.0.1,ssh] */
 int	CHECK_SERVICE_PERF(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
+#ifdef TODO /* TODO !!! */
+
 	int	port=0;
 	char	service[MAX_STRING_LEN];
 	char	ip[MAX_STRING_LEN];
@@ -1781,6 +1800,8 @@ int	CHECK_SERVICE_PERF(const char *cmd, const char *param, unsigned flags, AGENT
 	
 	SET_DBL_RESULT(result, 0.0);
 
+#endif /* TODO */
+
 	return SYSINFO_RET_OK;
 }
 
@@ -1788,7 +1809,7 @@ int	CHECK_SERVICE_PERF(const char *cmd, const char *param, unsigned flags, AGENT
 /* check_service[ssh,127.0.0.1,ssh] */
 int	CHECK_SERVICE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	int	port=0;
+	short	port=0;
 	char	service[MAX_STRING_LEN];
 	char	ip[MAX_STRING_LEN];
 	char	str_port[MAX_STRING_LEN];
@@ -1904,7 +1925,7 @@ int	CHECK_SERVICE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 
 int	CHECK_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	int	port=0;
+	short	port=0;
 	int	value_int;
 	int	ret;
 	char	ip[MAX_STRING_LEN];
@@ -1954,6 +1975,7 @@ int	CHECK_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 
 int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
+#ifdef TODO /* TODO !!! */
 	int	res;
 	char	ip[MAX_STRING_LEN];
 	char	zone[MAX_STRING_LEN];
@@ -2025,6 +2047,8 @@ int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	res=res_query(zone,ns_c_in,ns_t_soa,(unsigned char *)respbuf,sizeof(respbuf));
 #endif
 	SET_UI64_RESULT(result, res != -1 ? 1 : 0);
+
+#endif /* TODO */
 
 	return SYSINFO_RET_OK;
 }

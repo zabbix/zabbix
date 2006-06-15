@@ -223,15 +223,14 @@ void	child_trapper_main(int i,int listenfd, int addrlen)
 	for(;;)
 	{
 		clilen = addrlen;
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("waiting for connection");
-#endif
+
+		zbx_setproctitle("waiting for connection");
+
 		zabbix_log( LOG_LEVEL_DEBUG, "Before accept()");
 		connfd=accept(listenfd,&cliaddr, &clilen);
 		zabbix_log( LOG_LEVEL_DEBUG, "After accept()");
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("processing data");
-#endif
+
+		zbx_setproctitle("processing data");
 
 		process_trapper_child(connfd);
 

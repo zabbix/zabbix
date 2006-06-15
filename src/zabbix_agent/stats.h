@@ -20,10 +20,13 @@
 #ifndef ZABBIX_STATS_H
 #define ZABBIX_STATS_H
 
-#include "interfaces.h"
-#include "diskdevices.h"
-#include "cpustat.h"
+#include "threads.h"
 
-void	collect_statistics();
+extern long int stats_request;
+extern long int stats_request_failed;
+extern long int stats_request_accepted;
+extern long int stats_request_rejected;
+
+ZBX_THREAD_ENTRY(CollectorThread, pSemColectorStarted);
 
 #endif

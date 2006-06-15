@@ -1522,9 +1522,9 @@ void	DBvacuum(void)
 	char	sql[MAX_STRING_LEN];
 	char	*table;
 	int	i;
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-	setproctitle("housekeeper [vacuum DB]");
-#endif
+
+	zbx_setproctitle("housekeeper [vacuum DB]");
+
 	i=0;
 	while (NULL != (table = table_for_housekeeping[i++]))
 	{

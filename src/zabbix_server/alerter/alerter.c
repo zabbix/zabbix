@@ -198,9 +198,8 @@ int main_alerter_loop()
 
 	for(;;)
 	{
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("connecting to the database");
-#endif
+
+		zbx_setproctitle("connecting to the database");
 
 		DBconnect();
 
@@ -264,9 +263,8 @@ int main_alerter_loop()
 		DBfree_result(result);
 
 		DBclose();
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("sender [sleeping for %d seconds]", CONFIG_SENDER_FREQUENCY);
-#endif
+
+		zbx_setproctitle("sender [sleeping for %d seconds]", CONFIG_SENDER_FREQUENCY);
 
 		sleep(CONFIG_SENDER_FREQUENCY);
 	}

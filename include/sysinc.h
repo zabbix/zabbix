@@ -20,12 +20,26 @@
 #ifndef ZABBIX_SYSINC_H
 #define ZABBIX_SYSINC_H
 
-#if !defined(WIN32)
-#	include "config.h"
-#endif
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#ifdef HAVE_WINDOWS_H
+#	include <windows.h>
+#endif
+
+#ifdef HAVE_PROCESS_H
+#	include <process.h>
+#endif
+
+#ifdef HAVE_WINSOCK2_H
+#	include <winsock2.h>
+#endif
+
+#ifdef HAVE_CONIO_H
+#	include <conio.h>
+#endif
 
 #ifdef HAVE_ASSERT_H
 #	include <assert.h>
@@ -33,6 +47,10 @@
 
 #ifdef HAVE_ERRNO_H
 #	include <errno.h>
+#endif
+
+#ifdef HAVE_STDARG_H
+#	include <stdarg.h>
 #endif
 
 #ifdef HAVE_CTYPE_H
@@ -99,6 +117,10 @@
 #	include <netdb.h>
 #endif
 
+#ifdef SYS_WAIT_H
+#	include <sys/wait.h>
+#endif
+
 #ifdef HAVE_NETINET_IN_H
 #	include <netinet/in.h>
 #endif
@@ -135,6 +157,10 @@
 
 #ifdef HAVE_SYS_PSTAT_H
 #	include <sys/pstat.h>
+#endif
+
+#ifdef SEMAPHORE_H
+#	include <semaphore.h>
 #endif
 
 #ifdef HAVE_SYS_DK_H
@@ -197,6 +223,10 @@
 #	include <sys/vmmeter.h>
 #endif
 
+#ifdef HAVE_SYS_RESOURCE_H
+#	include <sys/resource.h>
+#endif
+
 #ifdef HAVE_NLIST_H
 #	include <nlist.h>
 #endif
@@ -226,6 +256,14 @@
 #		define _GNU_SOURCE
 #		include <getopt.h>
 #	endif
+#endif
+
+#ifdef HAVE_MATH_H
+#	include <math.h>
+#endif
+
+#ifdef HAVE_REGEX_H
+#	include <regex.h>
 #endif
 
 #ifdef HAVE_VM_VM_PARAM_H

@@ -379,9 +379,8 @@ void main_poller_loop()
 
 	for(;;)
 	{
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("poller [getting values]");
-#endif
+		zbx_setproctitle("poller [getting values]");
+
 		now=time(NULL);
 		get_values();
 
@@ -410,10 +409,10 @@ void main_poller_loop()
 			}
 			zabbix_log( LOG_LEVEL_DEBUG, "Sleeping for %d seconds",
 					sleeptime );
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-			setproctitle("poller [sleeping for %d seconds]", 
+
+			zbx_setproctitle("poller [sleeping for %d seconds]", 
 					sleeptime);
-#endif
+
 			sleep( sleeptime );
 		}
 		else

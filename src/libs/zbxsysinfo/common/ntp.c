@@ -17,12 +17,9 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#include <unistd.h>
-
-#include "config.h"
-
 #include "common.h"
 #include "sysinfo.h"
+#include "zbxsock.h"
 
 #define JAN_1970   2208988800.0        /* 1970 - 1900 in seconds */
 #define NTP_SCALE  4294967296.0        /* 2^32, of course! */
@@ -58,7 +55,10 @@ typedef struct NTP_DATA {
     double dispersion, reference, originate, receive, transmit, current;
 } ntp_data;
 
-double current_time (double offset) {
+double current_time (double offset)
+{
+
+#ifdef TODO
 
 /* Get the current UTC time in seconds since the Epoch plus an offset (usually
 the time from the beginning of the century to the Epoch!) */
@@ -66,11 +66,19 @@ the time from the beginning of the century to the Epoch!) */
     struct timeval current;
 
     errno = 0;
+
+#error "Replace <gettimeofday> function"
     if (gettimeofday(&current,NULL))
     {
 	    /* No processing of error condition here */
     }
-    return offset+current.tv_sec+1.0e-6*current.tv_usec;
+    return offset+current.tv_sec+1.0e-6*current.tv_usec;\
+
+#else
+
+	    return 0.;
+
+#endif /* TODO */
 }
 
 void make_packet (ntp_data *data)
@@ -222,13 +230,16 @@ systems do not set the return value from (s)printf. */
 
 int	check_ntp(char *host, int port, int *value_int)
 {
-	int	s;
+
+#ifdef TODO
+
+	ZBX_SOCKET	s;
+	ZBX_SOCKADDR	servaddr_in;
+
 	int	len;
 	unsigned char	c[MAX_STRING_LEN];
 
 	struct hostent *hp;
-
-	struct sockaddr_in servaddr_in;
 
 	char	text[50];
 
@@ -262,6 +273,7 @@ int	check_ntp(char *host, int port, int *value_int)
  
 	if( connect(s,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
 	{
+		/* useless code
 		switch (errno)
 		{
 			case EINTR:
@@ -270,16 +282,18 @@ int	check_ntp(char *host, int port, int *value_int)
 				break;
 			default:
 				break;
-		} 
+		}
+		*/
 /*		fprintf(stderr, "Cannot connect [%s]", strerror(errno));*/
-		close(s);
-		return	SYSINFO_RET_OK;
+		goto lbl_error;
 	}
 
 	pack_ntp(packet,NTP_PACKET_MIN,&data);
 
+#error "TIDO replace <write> function"
 	if( write(s,&packet,NTP_PACKET_MIN) == -1 )
 	{
+		/* useless code
 		switch (errno)
 		{
 			case EINTR:
@@ -287,16 +301,19 @@ int	check_ntp(char *host, int port, int *value_int)
 			default:
 				break;
 		} 
+		*/
 /*		fprintf(stderr, "Cannot write [%s]", strerror(errno));*/
-		close(s);
-		return	SYSINFO_RET_OK;
+		goto lbl_error;
 	} 
 
 	memset(c,0,MAX_STRING_LEN);
-	len=read(s,c,MAX_STRING_LEN);
+
+#error "TIDO replace <read> function"
+	len = read(s,c,MAX_STRING_LEN);
 
 	if(len == -1)
 	{
+		/* useless code
 		switch (errno)
 		{
 			case 	EINTR:
@@ -306,11 +323,11 @@ int	check_ntp(char *host, int port, int *value_int)
 			default:
 					break;
 		} 
+		*/
 /*		fprintf(stderr, "Cannot read0 [%d]", errno);*/
-		close(s);
-		return	SYSINFO_RET_OK;
+		goto lbl_error;
 	}
-	close(s);
+	zbx_sock_close(s);
 
 	unpack_ntp(&data,c,len);
 
@@ -331,5 +348,11 @@ int	check_ntp(char *host, int port, int *value_int)
         *value_int = format_time(text,75,0,0,0.0,-1.0);
 
 	return SYSINFO_RET_OK;
+
+lbl_error:
+	zbx_sock_close(s);
+
+#endif /* TODO */
+	return	SYSINFO_RET_OK;
 }
 

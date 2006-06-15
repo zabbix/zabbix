@@ -18,19 +18,8 @@
 **/
 
 
-#include <stdio.h>
-#include <string.h>
-#include <stdarg.h>
-#include <syslog.h>
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-
-#include <time.h>
-
-#include "log.h"
 #include "common.h"
+#include "log.h"
 
 static	char log_filename[MAX_STRING_LEN];
 
@@ -39,6 +28,8 @@ static	int log_level;
 
 int zabbix_open_log(int type,int level, const char *filename)
 {
+#ifdef TODO
+
 	FILE *log_file = NULL;
 /* Just return if we do not want to write debug */
 	log_level = level;
@@ -72,6 +63,9 @@ int zabbix_open_log(int type,int level, const char *filename)
 		fprintf(stderr, "Not supported loggin type [%d]\n", type);
 		return	FAIL;
 	}
+
+#endif /* TODO */
+
 	return	SUCCEED;
 }
 
@@ -100,12 +94,14 @@ void zabbix_log(int level, const char *fmt, ...)
 
 	if(log_type == LOG_TYPE_SYSLOG)
 	{
+#ifdef TODO
 		va_start(ap,fmt);
 		vsprintf(str,fmt,ap);
 		strncat(str,"\n",MAX_STRING_LEN);
 		str[MAX_STRING_LEN-1]=0;
 		syslog(LOG_DEBUG,str);
 		va_end(ap);
+#endif /* TODO */
 	}
 	else if(log_type == LOG_TYPE_FILE)
 	{

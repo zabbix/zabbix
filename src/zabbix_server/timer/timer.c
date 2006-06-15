@@ -77,9 +77,7 @@ void main_timer_loop()
 
 	for(;;)
 	{
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("updating nodata() functions");
-#endif
+		zbx_setproctitle("updating nodata() functions");
 
 		DBconnect();
 
@@ -111,9 +109,8 @@ void main_timer_loop()
 		DBfree_result(result);
 		DBclose();
 
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("sleeping for 30 sec");
-#endif
+		zbx_setproctitle("sleeping for 30 sec");
+
 		sleep(30);
 	}
 }

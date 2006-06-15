@@ -17,7 +17,7 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#include "config.h"
+#include "common.h"
 
 #include <netdb.h>
 
@@ -50,7 +50,6 @@
 /* Required for getpwuid */
 #include <pwd.h>
 
-#include "common.h"
 #include "sysinfo.h"
 
 #include "pid.h"
@@ -512,9 +511,9 @@ void	refresh_metrics(char *server, int port, char *error, int max_error_len)
 	while(get_active_checks(server, port, error, sizeof(error)) != SUCCEED)
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Getting list of active checks failed. Will retry after 60 seconds");
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("poller [sleeping for %d seconds]", 60);
-#endif
+
+		zbx_setproctitle("poller [sleeping for %d seconds]", 60);
+
 		sleep(60);
 	}
 }
@@ -527,9 +526,7 @@ void    child_active_main(int i,char *server, int port)
 
 	zabbix_log( LOG_LEVEL_WARNING, "zabbix_agentd %ld started",(long)getpid());
 
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-	setproctitle("getting list of active checks");
-#endif
+	zbx_setproctitle("getting list of active checks");
 
 	init_list();
 
@@ -538,9 +535,9 @@ void    child_active_main(int i,char *server, int port)
 
 	for(;;)
 	{
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("processing active checks");
-#endif
+
+		zbx_setproctitle("processing active checks");
+
 		if(process_active_checks(server, port) == FAIL)
 		{
 			sleep(60);
@@ -567,10 +564,10 @@ void    child_active_main(int i,char *server, int port)
 			}
 			zabbix_log( LOG_LEVEL_DEBUG, "Sleeping for %d seconds",
 					sleeptime );
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-			setproctitle("poller [sleeping for %d seconds]", 
+
+			zbx_setproctitle("poller [sleeping for %d seconds]", 
 					sleeptime);
-#endif
+
 			sleep( sleeptime );
 		}
 		else
@@ -586,18 +583,3 @@ void    child_active_main(int i,char *server, int port)
 	}
 }
 
-pid_t	child_active_make(int i,char *server, int port)
-{
-	pid_t	pid;
-
-	if((pid = fork()) >0)
-	{
-			return (pid);
-	}
-
-	/* never returns */
-	child_active_main(i, server, port);
-
-	/* avoid compilator warning */
-	return 0;
-}
