@@ -17,28 +17,36 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#ifndef ZABBIX_LOG_H
-#define ZABBIX_LOG_H
+#ifndef ZABBIX_PERFMON_H
+#define ZABBIX_PERFMON_H
 
-#define LOG_LEVEL_EMPTY		0
-#define LOG_LEVEL_CRIT		1
-#define LOG_LEVEL_ERR		2
-#define LOG_LEVEL_WARNING	3
-#define LOG_LEVEL_DEBUG		4
+//
+// Performance Counter Indexes
+//
 
-#define LOG_TYPE_UNDEFINED	0
-#define LOG_TYPE_SYSLOG		1
-#define LOG_TYPE_FILE		2
+#define PCI_SYSTEM			(2)
+#define PCI_PROCESSOR			(238)
+#define PCI_PROCESSOR_TIME		(6)
+#define PCI_PROCESSOR_QUEUE_LENGTH	(44)
+#define PCI_SYSTEM_UP_TIME		(674)
 
-/* Type - 0 (syslog), 1 - file */
-int zabbix_open_log(int type,int level, const char *filename);
-void zabbix_log(int level, const char *fmt, ...);
-void zabbix_set_log_level(int level);
+//
+// Performance Countername structure
+//
 
-#if defined(WIN32)
+#define MAX_PERFCOUNTER_NAME_LEN      (108)	/* old naming <MAX_COUNTER_NAME> */
 
-char *GetSystemErrorText(DWORD error);
+struct perfcounter
+{
+	struct perfcounter *next;
+	DWORD pdhIndex;
+	char name[MAX_PERFCOUNTER_NAME_LEN];
+};
 
-#endif /* WIN32 */
+typedef struct perfcounter PERFCOUNTER;
 
-#endif
+extern PERFCOUNTER *PerfCounterList;
+
+char *GetCounterName(DWORD index);
+
+#endif /* ZABBIX_PERFMON_H */

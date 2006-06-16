@@ -25,6 +25,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifdef HAVE_ASSERT_H
+#	include <assert.h>
+#endif
+
+#ifdef HAVE_ERRNO_H
+#	include <errno.h>
+#endif
+
 #ifdef HAVE_WINDOWS_H
 #	include <windows.h>
 #endif
@@ -41,12 +49,12 @@
 #	include <conio.h>
 #endif
 
-#ifdef HAVE_ASSERT_H
-#	include <assert.h>
+#ifdef HAVE_PDH_H
+#	include <pdh.h>
 #endif
 
-#ifdef HAVE_ERRNO_H
-#	include <errno.h>
+#ifdef HAVE_PSAPI_H
+#	include <psapi.h>
 #endif
 
 #ifdef HAVE_STDARG_H

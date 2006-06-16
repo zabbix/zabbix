@@ -18,6 +18,13 @@
 /* Define to 1 if you have the <process.h> header file. */
 #define HAVE_PROCESS_H 1
 
+/* Define to 1 if you have the <pdh.h> header file. */
+#define HAVE_PDH_H 1
+
+/* Define to 1 if you have the <psapi.h> header file. */
+#define HAVE_PSAPI_H 1
+
+/* Define to 1 if you have the <arpa/inet.h> header file. */
 //#define HAVE_ARPA_INET_H 1
 
 /* Define to 1 if you have the <arpa/nameser.h> header file. */

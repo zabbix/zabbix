@@ -20,6 +20,9 @@
 #ifndef ZABBIX_SERVICE_H
 #define ZABBIX_SERVICE_H
 
+#define ZABBIX_EVENT_SOURCE   "Zabbix Win32 Agent"
+#define ZABBIX_SERVICE_NAME   "ZabbixAgentdW32"
+
 extern HANDLE eventShutdown;
 
 void init_service(void);
@@ -28,5 +31,6 @@ int ZabbixCreateService(char *execName);
 int ZabbixRemoveService(void);
 int ZabbixStartService(void);
 int ZabbixStopService(void);
+
 
 #endif /* ZABBIX_SERVICE_H */

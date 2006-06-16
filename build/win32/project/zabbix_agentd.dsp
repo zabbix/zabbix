@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /I "../include/" /I "../../../include/" /D "NDEBUG" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
+# ADD CPP /nologo /MT /W3 /GX /O2 /I "../include/" /I "../../../include/" /I "../../../zabbix_agent" /D "NDEBUG" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
 # ADD BASE RSC /l 0x419 /d "NDEBUG"
 # ADD RSC /l 0x409 /fo"Release/zabbixw32.res" /d "NDEBUG"
 BSC32=bscmake.exe
@@ -67,7 +67,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "../include/" /I "../../../include/" /D "_DEBUG" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /FR /YX /FD /GZ /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "../include/" /I "../../../include/" /I "../../../zabbix_agent" /D "_DEBUG" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /FR /YX /FD /GZ /c
 # ADD BASE RSC /l 0x419 /d "_DEBUG"
 # ADD RSC /l 0x409 /fo"Debug/zabbixw32.res" /d "_DEBUG"
 BSC32=bscmake.exe
@@ -92,7 +92,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "../include/" /I "../../../include/" /D "_DEBUG" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /FR /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W4 /Gm /GX /ZI /Od /I "../include/" /I "../../../include/" /D "_DEBUG" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "TODO" /FR /YX /FD /GZ /c
+# ADD CPP /nologo /MTd /W4 /Gm /GX /ZI /Od /I "../include/" /I "../../../include/" /I "../../../zabbix_agent" /D "_DEBUG" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "TODO" /FR /YX /FD /GZ /c
 # ADD BASE RSC /l 0x409 /fo"Debug/zabbixw32.res" /d "_DEBUG"
 # ADD RSC /l 0x409 /fo"Debug/zabbixw32.res" /d "_DEBUG"
 BSC32=bscmake.exe
@@ -220,7 +220,13 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\win32\win32.c
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=..\..\..\src\libs\zbxwin32\perfmon.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\src\libs\zbxwin32\service.c
+# ADD CPP /I "../../../src/zabbix_agent"
+# SUBTRACT CPP /I "../../../zabbix_agent"
 # End Source File
 # End Group
 # Begin Group "zbxnix"
@@ -260,6 +266,14 @@ SOURCE=..\..\..\src\libs\zbxnix\pid.c
 SOURCE=..\..\..\src\libs\zbxsys\threads.c
 # End Source File
 # End Group
+# Begin Group "zbxplugin"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxplugin\zbxplugin.c
+# End Source File
+# End Group
 # End Group
 # Begin Source File
 
@@ -268,6 +282,14 @@ SOURCE=..\..\..\src\zabbix_agent\active.c
 # Begin Source File
 
 SOURCE=..\..\..\src\zabbix_agent\active.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\zabbix_agent\alias.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\zabbix_agent\alias.h
 # End Source File
 # Begin Source File
 
@@ -387,6 +409,10 @@ SOURCE=..\..\..\include\md5.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\include\perfmon.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\include\pid.h
 # End Source File
 # Begin Source File
@@ -408,6 +434,10 @@ SOURCE=..\..\..\include\sysinfo.h
 # Begin Source File
 
 SOURCE=..\..\..\include\threads.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\zbxplugin.h
 # End Source File
 # Begin Source File
 

@@ -144,3 +144,33 @@ void zabbix_log(int level, const char *fmt, ...)
         return;
 }
 
+#if defined(WIN32)
+
+//
+// Get system error string by call to FormatMessage
+//
+
+char *GetSystemErrorText(DWORD error)
+{
+	char *msgBuf;
+	static char staticBuffer[1024];
+
+	if (FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+		FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+		NULL,error,
+		MAKELANGID(LANG_NEUTRAL,SUBLANG_DEFAULT), // Default language
+		(LPSTR)&msgBuf,0,NULL)>0)
+	{
+		msgBuf[strcspn(msgBuf,"\r\n")]=0;
+		strncpy(staticBuffer,msgBuf,1023);
+		LocalFree(msgBuf);
+	}
+	else
+	{
+		sprintf(staticBuffer,"3. MSG 0x%08X - Unable to find message text [0x%X]", error , GetLastError());
+	}
+
+	return staticBuffer;
+}
+
+#endif /* WIN32 */

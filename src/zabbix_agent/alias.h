@@ -17,28 +17,23 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#ifndef ZABBIX_LOG_H
-#define ZABBIX_LOG_H
+#ifndef ZABBIX_ALIAS_H
+#define ZABBIX_ALIAS_H
 
-#define LOG_LEVEL_EMPTY		0
-#define LOG_LEVEL_CRIT		1
-#define LOG_LEVEL_ERR		2
-#define LOG_LEVEL_WARNING	3
-#define LOG_LEVEL_DEBUG		4
+#define MAX_ALIAS_NAME        120
 
-#define LOG_TYPE_UNDEFINED	0
-#define LOG_TYPE_SYSLOG		1
-#define LOG_TYPE_FILE		2
+struct zbx_alias
+{
+   struct zbx_alias *next;
+   char name[MAX_ALIAS_NAME];
+   char *value;
+};
 
-/* Type - 0 (syslog), 1 - file */
-int zabbix_open_log(int type,int level, const char *filename);
-void zabbix_log(int level, const char *fmt, ...);
-void zabbix_set_log_level(int level);
+typedef struct zbx_alias ALIAS;
 
-#if defined(WIN32)
+BOOL AddAlias(char *name,char *value);
+void	FreeAliasList(void);
+void ExpandAlias(char *orig,char *expanded);
 
-char *GetSystemErrorText(DWORD error);
 
-#endif /* WIN32 */
-
-#endif
+#endif /* ZABBIX_ALIAS_H */

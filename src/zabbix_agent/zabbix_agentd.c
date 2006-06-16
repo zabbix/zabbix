@@ -167,7 +167,7 @@ static ZBX_SOCKET connect_to_server(void)
 	return sock;
 }
 
-void MAIN_ZABBIX_EVENT_LOOP(void)
+void MAIN_ZABBIX_ENTRY(void)
 {
 	ZBX_THREAD_HANDLE		*threads;
 	ZBX_THREAD_ACTIVECHK_ARGS	activechk_args;

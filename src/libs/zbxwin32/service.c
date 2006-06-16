@@ -21,9 +21,15 @@
 **/
 
 #include "common.h"
-#include "cfg.h"
+#include "service.h"
 
-#define ZABBIX_SERVICE_NAME   "ZabbixAgentdW32"
+#include "alias.h"
+#include "perfmon.c"
+#include "cfg.h"
+#include "log.h"
+
+static int ZabbixRemoveEventSource(void);
+static int ZabbixInstallEventSource(char *path);
 
 //
 // Static data
@@ -33,6 +39,12 @@ static	SERVICE_STATUS		serviceStatus;
 static	SERVICE_STATUS_HANDLE	serviceHandle;
 
 static	HANDLE eventShutdown;
+
+//DWORD (__stdcall *imp_GetGuiResources)(HANDLE,DWORD);				// use GetGuiResources
+//BOOL (__stdcall *imp_GetProcessIoCounters)(HANDLE,PIO_COUNTERS);		// use GetProcessIoCounters
+//BOOL (__stdcall *imp_GetPerformanceInfo)(PPERFORMANCE_INFORMATION,DWORD);	// use GetPerformanceInfo
+//BOOL (__stdcall *imp_GlobalMemoryStatusEx)(LPMEMORYSTATUSEX);			// use GlobalMemoryStatusEx
+
 
 //
 // Shutdown routine
@@ -80,6 +92,72 @@ static VOID WINAPI ServiceCtrlHandler(DWORD ctrlCode)
 	SetServiceStatus(serviceHandle, &serviceStatus);
 }
 
+//
+// Get proc address and write log file
+//
+
+static FARPROC GetProcAddressAndLog(HMODULE hModule,LPCSTR procName)
+{
+	FARPROC ptr;
+
+	ptr=GetProcAddress(hModule,procName);
+	if ((ptr==NULL)&&(dwFlags & AF_LOG_UNRESOLVED_SYMBOLS))
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Unable to resolve symbol \"%s\"", procName);
+	}
+	return ptr;
+}
+
+//
+// Import symbols
+//
+
+static void ImportSymbols(void)
+{
+	/* 
+	// Unneeded code, i think what this code can be removed
+	// libraries already loaded, and prototype is used from "windows.h"
+	// (Eugene)
+
+	HMODULE hModule;
+	char ModuleName[0x32];
+
+	sprintf(ModuleName,"USER32.DLL");
+	hModule = GetModuleHandle(ModuleName);
+	if (NULL == hModule)
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Unable to get handle to \"%s\"", ModuleName);
+	}
+	else
+	{
+		imp_GetGuiResources=(DWORD (__stdcall *)(HANDLE,DWORD))GetProcAddressAndLog(hModule,"GetGuiResources");
+	}
+
+	sprintf(ModuleName,"KERNEL32.DLL");
+	hModule = GetModuleHandle(ModuleName);
+	if (NULL == hModule)
+	{
+		WriteLog(MSG_NO_DLL,EVENTLOG_WARNING_TYPE,"s",ModuleName);
+	}
+	else
+	{
+		imp_GetProcessIoCounters=(BOOL (__stdcall *)(HANDLE,PIO_COUNTERS))GetProcAddressAndLog(hModule,"GetProcessIoCounters");
+		imp_GlobalMemoryStatusEx=(BOOL (__stdcall *)(LPMEMORYSTATUSEX))GetProcAddressAndLog(hModule,"GlobalMemoryStatusEx");
+	}
+
+	sprintf(ModuleName,PSAPI.DLL");
+	hModule=GetModuleHandle(ModuleName);
+	if (NULL == hModule)
+	{
+		WriteLog(MSG_NO_DLL,EVENTLOG_WARNING_TYPE,"s",ModuleName);
+	}
+	else
+	{
+		imp_GetPerformanceInfo=(BOOL (__stdcall *)(PPERFORMANCE_INFORMATION,DWORD))GetProcAddressAndLog(hModule,"GetPerformanceInfo");
+	}
+	*/
+}
+
 
 //
 // The entry point for a ZABBIX service.
@@ -87,7 +165,8 @@ static VOID WINAPI ServiceCtrlHandler(DWORD ctrlCode)
 
 static VOID WINAPI ServiceEntry(DWORD argc,LPTSTR *argv)
 {
-	SERVICE_STATUS status;
+	WSADATA sockInfo;
+	char counterPath[MAX_COUNTER_PATH * 2 + 50];
 
 	serviceHandle = RegisterServiceCtrlHandler(ZABBIX_SERVICE_NAME, ServiceCtrlHandler);
 
@@ -102,15 +181,13 @@ static VOID WINAPI ServiceEntry(DWORD argc,LPTSTR *argv)
 
 	SetServiceStatus(serviceHandle, &serviceStatus);
 
-	WSAData sockInfo;
-	int i;
-	char counterPath[MAX_COUNTER_PATH * 2 + 50];
-
 	// Initialize Windows Sockets API
 	WSAStartup(0x0002,&sockInfo);
 
 	// Dynamically import functions that may not be presented in all Windows versions
 	ImportSymbols();
+
+#ifdef TODO
 
 	// Load subagents
 	if (subagentNameList!=NULL)
@@ -120,6 +197,7 @@ static VOID WINAPI ServiceEntry(DWORD argc,LPTSTR *argv)
 
 		FreeSubagentNameList();
 	}
+#endif /* TODO */
 
 	// Create synchronization stuff
 	eventShutdown		= CreateEvent(NULL,TRUE,FALSE,NULL);
@@ -133,7 +211,7 @@ static VOID WINAPI ServiceEntry(DWORD argc,LPTSTR *argv)
 	serviceStatus.dwWaitHint	= 0;
 	SetServiceStatus(serviceHandle, &serviceStatus);
 
-	MAIN_ZABBIX_EVENT_LOOP();
+	MAIN_ZABBIX_ENTRY();
 }
 
 
@@ -144,8 +222,8 @@ static VOID WINAPI ServiceEntry(DWORD argc,LPTSTR *argv)
 void init_service(void)
 {
 	static SERVICE_TABLE_ENTRY serviceTable[] = {
-			{ ZABBIX_SERVICE_NAME, ServiceEntry },
-			{ NULL,NULL } 
+		{ ZABBIX_SERVICE_NAME, ServiceEntry },
+		{ NULL,NULL } 
 		};
 
 	eventShutdown = CreateEvent(NULL, TRUE, FALSE, NULL);
@@ -153,8 +231,8 @@ void init_service(void)
 	if (!StartServiceCtrlDispatcher(serviceTable))
 	{
 		printf(
-			"StartServiceCtrlDispatcher() failed: %s\n",
-			GetSystemErrorText(GetLastError())
+		"StartServiceCtrlDispatcher() failed: %s\n",
+		GetSystemErrorText(GetLastError())
 		);
 	}
 
@@ -168,44 +246,46 @@ void init_service(void)
 
 int ZabbixCreateService(char *execName)
 {
-   SC_HANDLE mgr,service;
-   char cmdLine[MAX_PATH*2];
-   int ret = 0;
+	SC_HANDLE mgr,service;
+	char cmdLine[MAX_PATH*2];
+	int ret = 0;
 
-INIT_CHECK_MEMORY(main);
+	INIT_CHECK_MEMORY(main);
 
-   mgr=OpenSCManager(NULL,NULL,GENERIC_WRITE);
-   if (mgr==NULL)
-   {
-      printf("ERROR: Cannot connect to Service Manager (%s)\n",GetSystemErrorText(GetLastError()));
-      return 1;
-   }
+	mgr=OpenSCManager(NULL,NULL,GENERIC_WRITE);
+	if (mgr==NULL)
+	{
+		printf("ERROR: Cannot connect to Service Manager (%s)\n",GetSystemErrorText(GetLastError()));
+		return 1;
+	}
 
-   sprintf(cmdLine,"\"%s\" --config \"%s\"",execName,confFile);
-   service=CreateService(mgr,ZABBIX_SERVICE_NAME,"Zabbix Win32 Agent",GENERIC_READ,SERVICE_WIN32_OWN_PROCESS,
-                         SERVICE_AUTO_START,SERVICE_ERROR_NORMAL,cmdLine,NULL,NULL,NULL,NULL,NULL);
-   if (service==NULL)
-   {
-      DWORD code=GetLastError();
+	sprintf(cmdLine,"\"%s\" --config \"%s\"", execName, CONFIG_FILE);
+	service=CreateService(mgr,ZABBIX_SERVICE_NAME,"Zabbix Win32 Agent",GENERIC_READ,SERVICE_WIN32_OWN_PROCESS,
+	SERVICE_AUTO_START,SERVICE_ERROR_NORMAL,cmdLine,NULL,NULL,NULL,NULL,NULL);
+	if (service==NULL)
+		{
+		DWORD code=GetLastError();
 
-      if (code==ERROR_SERVICE_EXISTS)
-         printf("ERROR: Service named '" ZABBIX_SERVICE_NAME "' already exist\n");
-      else
-         printf("ERROR: Cannot create service (%s)\n",GetSystemErrorText(code));
-	  ret = 1;
-   }
-   else
-   {
-      printf("Zabbix Win32 Agent service created successfully\n");
-      CloseServiceHandle(service);
-   }
+		if (code==ERROR_SERVICE_EXISTS)
+		printf("ERROR: Service named '" ZABBIX_SERVICE_NAME "' already exist\n");
+		else
+		printf("ERROR: Cannot create service (%s)\n",GetSystemErrorText(code));
+		ret = 1;
+	}
+	else
+	{
+		printf("Zabbix Win32 Agent service created successfully\n");
+		CloseServiceHandle(service);
+	}
 
-   CloseServiceHandle(mgr);
+	CloseServiceHandle(mgr);
 
-   if(ret == 0)
-	   ret = ZabbixInstallEventSource(execName);
+	if(ret == 0)
+	{
+		ret = ZabbixInstallEventSource(execName);
+	}
 
-CHECK_MEMORY(main,"ZabbixCreateService","end");
+	CHECK_MEMORY(main,"ZabbixCreateService","end");
 	return ret;
 }
 
@@ -357,15 +437,14 @@ CHECK_MEMORY(main,"ZabbixStopService","end");
 //
 // Install event source
 //
-
-int ZabbixInstallEventSource(char *path)
+static int ZabbixInstallEventSource(char *path)
 {
    HKEY hKey;
    DWORD dwTypes=EVENTLOG_ERROR_TYPE | EVENTLOG_WARNING_TYPE | EVENTLOG_INFORMATION_TYPE;
 
 INIT_CHECK_MEMORY(main);
 
-   if (ERROR_SUCCESS!=RegCreateKeyEx(HKEY_LOCAL_MACHINE,
+   if (ERROR_SUCCESS != RegCreateKeyEx(HKEY_LOCAL_MACHINE,
          "System\\CurrentControlSet\\Services\\EventLog\\System\\" ZABBIX_EVENT_SOURCE,
          0,NULL,REG_OPTION_NON_VOLATILE,KEY_SET_VALUE,NULL,&hKey,NULL))
    {
@@ -389,7 +468,7 @@ CHECK_MEMORY(main,"ZabbixInstallEventSource","end");
 // Remove event source
 //
 
-int ZabbixRemoveEventSource(void)
+static int ZabbixRemoveEventSource(void)
 {
 
 INIT_CHECK_MEMORY(main);

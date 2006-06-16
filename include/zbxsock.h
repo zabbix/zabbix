@@ -29,6 +29,15 @@
 #	define SOCKET_ERROR (-1)
 #endif /* SOCKET_ERROR */
 
+#if !defined (EINTR)
+#	define EINTR WSAETIMEDOUT
+#endif /* EINTR */
+
+#if !defined(EHOSTUNREACH)
+#	define EHOSTUNREACH WSAEHOSTUNREACH
+#endif /* EHOSTUNREACH */
+
+
 #if defined(SOCKET)
 
 	typedef SOCKET ZBX_SOCKET;

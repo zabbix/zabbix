@@ -25,16 +25,21 @@ extern int	CONFIG_REFRESH_ACTIVE_CHECKS;
 
 #define MAX_LINES_PER_SECOND	10
 
-#define METRIC struct metric_type
-METRIC
+typedef struct zbx_metric
 {
 	char	*key;
 	int	refresh;
 	int	nextcheck;
 	int	status;
 	int	lastlogsize;
-};
+} METRIC;
 
-pid_t   child_active_make(int i,char *server, int port);
+typedef struct active_ckeck_args
+{
+	char		*host;
+	unsigned short	port;
+} ZBX_THREAD_ACTIVECHK_ARGS;
+
+ZBX_THREAD_ENTRY(ActiveChecksThread, args);
 
 #endif /* ZABBIX_ACTIVE_H */
