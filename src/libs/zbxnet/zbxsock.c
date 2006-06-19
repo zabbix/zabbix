@@ -20,6 +20,25 @@
 #include "common.h"
 #include "zbxsock.h"
 
+#include "log.h"
+
+#if !defined(WIN32)
+
+static void	sock_signal_handler(int sig)
+{
+	switch(sig)
+	{
+	case SIGALRM:
+		signal(SIGALRM , sock_signal_handler);
+		zabbix_log( LOG_LEVEL_WARNING, "Timeout while answering request");
+		break;
+	default:
+		zabbix_log( LOG_LEVEL_WARNING, "Sock handler: Got signal [%d]. Ignoring ...", sig);
+	}
+}
+
+#endif /* not WIN32 */
+
 int zbx_sock_read(ZBX_SOCKET sock, void *buf, int buflen, int timeout)
 {
 #if defined (WIN32)
@@ -55,7 +74,7 @@ int zbx_sock_read(ZBX_SOCKET sock, void *buf, int buflen, int timeout)
         static struct  	sigaction phan;
 	int nread = 0;
 	
-	phan.sa_handler = child_signal_handler; /* set up sig handler using sigaction() */
+	phan.sa_handler = sock_signal_handler; /* set up sig handler using sigaction() */
 	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = 0;
 
@@ -63,7 +82,7 @@ int zbx_sock_read(ZBX_SOCKET sock, void *buf, int buflen, int timeout)
 
 	alarm(timeout);
 
-	if( (nread = read(sockfd, buf, MAX_STRING_LEN)) == SOCKET_ERROR)
+	if( (nread = read(sock, buf, MAX_STRING_LEN)) == SOCKET_ERROR)
 	{
 		if(errno == EINTR)
 		{

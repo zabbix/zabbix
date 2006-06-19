@@ -23,6 +23,7 @@
 #include "security.h"
 #include "zabbix_agent.h"
 
+#include "cfg.h"
 #include "pid.h"
 #include "log.h"
 #include "zbxconf.h"
@@ -33,6 +34,7 @@
 #include "active.h"
 #include "listener.h"
 #include "service.h"
+#include "daemon.h"
 
 #define	LISTENQ 1024
 
@@ -190,8 +192,12 @@ void MAIN_ZABBIX_ENTRY(void)
 	threads = calloc(CONFIG_AGENTD_FORKS, sizeof(ZBX_THREAD_HANDLE));
 
 	/* start collector */
-	SemColectorStarted = zbx_semaphore_create();
-
+	if(zbx_semaphore_create(&SemColectorStarted) == SOCKET_ERROR)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Can not create semaphore for Collection thread.");
+		exit(1);
+	}
+	
 	threads[i] = zbx_thread_start(CollectorThread, &SemColectorStarted);
 
 	zbx_semaphore_wait(&SemColectorStarted);

@@ -65,7 +65,7 @@ ZBX_THREAD_HANDLE zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), void *args
 
 		/* The ZBX_TREAD_EXIT must be called from the handler */
 		/* And in normal case the program will never reach this point. */
-		ZBX_TREAD_EXIT(0);
+		zbx_tread_exit(0);
 		/* Program will never reach this point. */
 	} 
 	else if(thread < 0)
@@ -125,7 +125,7 @@ int zbx_thread_wait(ZBX_THREAD_HANDLE thread)
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value: Returns a handle to the newly created "semaphore",           *
+ * Return value: If the function succeeds, the return ZBX_SEM_OK,             *
  *               ZBX_SEM_ERROR on an error                                    *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
@@ -134,33 +134,27 @@ int zbx_thread_wait(ZBX_THREAD_HANDLE thread)
  *                                                                            *
  ******************************************************************************/
 
-ZBX_SEM_HANDLE zbx_semaphore_create(void)
+int zbx_semaphore_create(ZBX_SEM_HANDLE *semaphore)
 {
-	ZBX_SEM_HANDLE semaphore = 0;
 #if defined(WIN32)	
 
-	semaphore = CreateSemaphore(
-		NULL,        // no security attributes
-		0,           // initial count
-		1,   // maximum count
-		NULL);
+	*semaphore = CreateSemaphore(NULL, 0, 1, NULL);
 
-	if(semaphore == 0)  
-		semaphore = ZBX_SEM_ERROR;
+	if(*semaphore == 0)
+	{
+		return ZBX_SEM_ERROR;
+	}
 
 #else /* not WIN32 */
 
-	semaphore = sem_init(
-		sem,   // handle to the event semaphore
-		0,     // not shared
-		0);    // initially set to non signaled state
-
-	if(semaphore < 0)
-		semaphore = ZBX_SEM_ERROR;
+	if(sem_init(semaphore, 0, 0) < 0)
+	{
+		return ZBX_SEM_ERROR;
+	}
 
 #endif /* WIN32 */
 
-	return semaphore;
+	return ZBX_SEM_OK;
 }
 
 /******************************************************************************
@@ -261,3 +255,4 @@ int zbx_semaphore_unloc(ZBX_SEM_HANDLE *semaphore)
 
 	return (1);
 }
+

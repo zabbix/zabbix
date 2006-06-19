@@ -270,6 +270,10 @@
 #	include <math.h>
 #endif
 
+#ifdef HAVE_SEMAPHORE_H
+#	include <semaphore.h>
+#endif
+
 #ifdef HAVE_REGEX_H
 #	include <regex.h>
 #endif

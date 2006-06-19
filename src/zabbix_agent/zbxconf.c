@@ -27,8 +27,6 @@
 #include "sysinfo.h"
 
 
-DWORD dwFlags = AF_USE_EVENT_LOG;
-
 #ifdef WIN32
 
 static char	DEFAULT_CONFIG_FILE[] = "C:\\zabbix_agentd.conf";
@@ -44,16 +42,11 @@ static char	DEFAULT_PID_FILE[]	= "/tmp/zabbix_agentd.pid";
 
 char	*CONFIG_HOSTS_ALLOWED		= NULL;
 char	*CONFIG_HOSTNAME		= NULL;
-char	*CONFIG_FILE			= NULL;
-char	*CONFIG_PID_FILE		= NULL;
-char	*CONFIG_LOG_FILE		= NULL;
 char	*CONFIG_STAT_FILE		= NULL;
 char	*CONFIG_STAT_FILE_TMP		= NULL;
-int	CONFIG_AGENTD_FORKS		= AGENTD_FORKS;
 /* int	CONFIG_NOTIMEWAIT		= 0; */
 int	CONFIG_DISABLE_ACTIVE		= 0;
 int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
-int	CONFIG_TIMEOUT			= AGENT_TIMEOUT;
 unsigned short	CONFIG_LISTEN_PORT	= 10050;
 unsigned short	CONFIG_SERVER_PORT	= 10051;
 int	CONFIG_REFRESH_ACTIVE_CHECKS	= 120;
@@ -90,14 +83,17 @@ void    load_config(void)
 		{"StartAgents",		&CONFIG_AGENTD_FORKS,		0,TYPE_INT,	PARM_OPT,	1,16},
 		{"RefreshActiveChecks",	&CONFIG_REFRESH_ACTIVE_CHECKS,	0,TYPE_INT,	PARM_OPT,60,3600},
 		{"EnableRemoteCommands",&CONFIG_ENABLE_REMOTE_COMMANDS,	0,TYPE_INT,	PARM_OPT,0,1},
-//		{"AllowRootPermission",	&CONFIG_ALLOW_ROOT_PERMISSION,	0,TYPE_INT,	PARM_OPT,0,1},
+		{"AllowRootPermission",	&CONFIG_ALLOW_ROOT_PERMISSION,	0,TYPE_INT,	PARM_OPT,0,1},
 		
 //		{"PerfCounter",		&CONFIG_PERF_COUNTER,		0,	TYPE_STRING,PARM_OPT,0,0},
 //		{"CollectorTimeout",	&CONFIG_COLLECTOR_TIMEOUT,	0,	TYPE_STRING,PARM_OPT,0,0},
 		{"LogUnresolvedSymbols",&CONFIG_LOG_UNRES_SYMB,			0,	TYPE_STRING,PARM_OPT,0,1},
 
 		{"Alias",		0,	&AddAlias,	TYPE_STRING,PARM_OPT,0,0},
+		
+#if defined(ZABBIX_DAEMON)
 		{"Plugin",		0,	&add_plugin,	TYPE_STRING,PARM_OPT,0,0},
+#endif /* ZABBIX_DAEMON */
 		
 		{0}
 	};

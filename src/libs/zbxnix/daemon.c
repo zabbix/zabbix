@@ -20,6 +20,8 @@
 #include "common.h"
 
 #include "threads.h"
+#include "pid.h"
+#include "log.h"
 #include "cfg.h"
 
 static	pid_t	*pids=NULL;
@@ -47,7 +49,7 @@ static void	uninit(void)
 	}
 }
 
-static void	child_signal_handler(int sig)
+void	child_signal_handler(int sig)
 {
 	switch(sig)
 	{
@@ -90,10 +92,10 @@ void    init_daemon(void)
 {
 	int     i;
 	pid_t   pid;
-	struct passwd   *pwd;
+	struct passwd	*pwd;
+	struct sigaction	phan;
 
 	/* running as root ?*/
-	if
 	if((0 == CONFIG_ALLOW_ROOT_PERMISSION) && (0 == getuid() || 0 == getgid()))
 	{
 		pwd = getpwnam("zabbix");

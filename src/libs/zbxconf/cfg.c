@@ -22,6 +22,13 @@
 #include "log.h"
 
 
+int	CONFIG_AGENTD_FORKS		= AGENTD_FORKS;
+char	*CONFIG_FILE			= NULL;
+char	*CONFIG_PID_FILE		= NULL;
+char	*CONFIG_LOG_FILE		= NULL;
+char	CONFIG_ALLOW_ROOT_PERMISSION	= 0;
+int	CONFIG_TIMEOUT			= AGENT_TIMEOUT;
+
 /******************************************************************************
  *                                                                            *
  * Function: parse_cfg_file                                                   *

@@ -21,6 +21,8 @@
 #ifndef ZABBIX_DAEMON_H
 #define ZABBIX_DAEMON_H
 
-void    init_daemon(void);
+void    child_signal_handler(int sig);
+
+void	init_daemon(void);
 
 #endif /* ZABBIX_DAEMON_H */

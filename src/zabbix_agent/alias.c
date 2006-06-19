@@ -29,13 +29,13 @@ static ALIAS *aliasList=NULL;
 
 //
 // Add alias to the list
-// Returns TRUE on success or FALSE if alias with that name already exist
+// Returns 1 on success or 0 if alias with that name already exist
 //
 
-BOOL AddAlias(char *name,char *value)
+int AddAlias(char *name,char *value)
 {
 	ALIAS *alias;
-	BOOL ret = FALSE;
+	int ret = 0;
 
 	for(alias=aliasList; ; alias=alias->next)
 	{
@@ -52,7 +52,7 @@ BOOL AddAlias(char *name,char *value)
 				alias->next=aliasList;
 				aliasList=alias;
 
-				ret = TRUE;
+				ret = 1;
 			}
 			break;
 		}
@@ -73,7 +73,7 @@ BOOL AddAlias(char *name,char *value)
 			alias->next = aliasList;
 			aliasList = alias;
 
-			ret = TRUE;
+			ret = 1;
 			break;
 		}
 	}

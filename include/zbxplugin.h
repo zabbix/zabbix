@@ -20,11 +20,17 @@
 #ifndef ZABBIX_ZBXPLUGIN_H
 #define ZABBIX_ZBXPLUGIN_H
 
-#ifdef _WIN32
+#ifdef WIN32
+
 #	define __zabbix_api __cdecl
-#else
+typedef HMODULE ZBX_MODULE;
+
+#else /* not WIN32 */
+
 #	define __zabbix_api
-#endif
+typedef void* ZBX_MODULE;
+
+#endif /* WIN32 */
 
 #define MAX_CMDNAME	256
 
@@ -39,7 +45,7 @@ struct zbx_plugin_list
 {
 	struct zbx_plugin_list	*next;	// Pointer to next element in a chain
 
-	HMODULE		hModule;	// DLL module handle
+	ZBX_MODULE	hModule;	// DLL module handle
 	int		runned;
 	int	(__zabbix_api * init)(char *,ZBX_PLUGIN_ARGS **);
 	void	(__zabbix_api * shutdown)(void);
@@ -50,6 +56,6 @@ typedef struct zbx_plugin_list ZBX_PLUGIN_LIST;
 
 extern ZBX_PLUGIN_LIST	*PluginsList;
 
-BOOL add_plugin(char *args);
+int add_plugin(char *args);
 
 #endif /* ZABBIX_ZBXPLUGIN_H */

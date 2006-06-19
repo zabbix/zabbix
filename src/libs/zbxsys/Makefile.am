@@ -1,3 +1,3 @@
 SUBDIRS=
 lib_LIBRARIES=libzbxsys.a
-libzbxsms_a_SOURCES=threads.c
+libzbxsys_a_SOURCES=threads.c

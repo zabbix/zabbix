@@ -20,11 +20,13 @@
 #ifndef ZABBIX_THREADS_H
 #define ZABBIX_THREADS_H
 
+#include "common.h"
+
 /* ====== THREADS ====== */
 
 #if defined(WIN32)
 
-	#define ZBX_THREAD_ERROR 0
+	#define ZBX_THREAD_ERROR (0)
 
 	#define ZBX_THREAD_HANDLE HANDLE
 
@@ -42,7 +44,7 @@
 
 #else /* not WIN32 */
 
-	#define ZBX_THREAD_ERROR -1
+	#define ZBX_THREAD_ERROR (-1)
 
 	#define ZBX_THREAD_HANDLE pid_t
 
@@ -70,16 +72,18 @@ int zbx_thread_wait(ZBX_THREAD_HANDLE thread);
 #if defined(WIN32)
 
 	#define ZBX_SEM_HANDLE HANDLE
-	#define ZBX_SEM_ERROR 0
+	#define ZBX_SEM_ERROR (0)
+	#define ZBX_SEM_OK (1)
 
 #else /* not WIN32 */
 
 	#define ZBX_SEM_HANDLE sem_t
-	#define ZBX_SEM_ERROR -1
+	#define ZBX_SEM_ERROR (-1)
+	#define ZBX_SEM_OK (1)
 
 #endif /* WIN32 */
 
-ZBX_SEM_HANDLE zbx_semaphore_create(void);
+int zbx_semaphore_create(ZBX_SEM_HANDLE *semaphore);
 int zbx_semaphore_wait(ZBX_SEM_HANDLE *semaphore);
 int zbx_semaphore_destr(ZBX_SEM_HANDLE *semaphore);
 int zbx_semaphore_unloc(ZBX_SEM_HANDLE *semaphore);

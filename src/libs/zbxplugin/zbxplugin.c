@@ -23,10 +23,10 @@
 ZBX_PLUGIN_LIST	*PluginsList = NULL;
 
 
-BOOL add_plugin(char *args)
+int add_plugin(char *args)
 {
 #ifdef TODO
 #	error ADD REALIZATION!!!
 #endif
-   return TRUE;
+   return 0;
 }

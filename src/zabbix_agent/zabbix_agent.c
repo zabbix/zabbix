@@ -18,11 +18,14 @@
 **/
 
 #include "common.h"
+#include "zabbix_agent.h"
+
 #include "cfg.h"
 #include "log.h"
 #include "sysinfo.h"
 #include "security.h"
-#include "zabbix_agent.h"
+#include "zbxconf.h"
+#include "zbxgetopt.h"
 
 char *progname = NULL;
 char title_message[] = "ZABBIX Agent";
@@ -49,7 +52,7 @@ char *help_message[] = {
 };
 #endif
 
-struct option longopts[] =
+struct zbx_option longopts[] =
 {
 	{"config",	1,	0,	'c'},
 	{"help",	0,	0,	'h'},
@@ -59,16 +62,14 @@ struct option longopts[] =
 	{0,0,0,0}
 };
 
-char	*CONFIG_FILE			= NULL;
 static	char	*CONFIG_HOSTS_ALLOWED	= NULL;
-static	int	CONFIG_TIMEOUT		= AGENT_TIMEOUT;
-int		CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
 
-void	signal_handler( int sig )
+#ifdef TODO
+void	child_signal_handler( int sig )
 {
 	if( SIGALRM == sig )
 	{
-		signal( SIGALRM, signal_handler );
+		signal( SIGALRM, child_signal_handler );
 	}
  
 	if( SIGQUIT == sig || SIGINT == sig || SIGTERM == sig )
@@ -112,6 +113,8 @@ void    init_config(void)
 	parse_cfg_file(CONFIG_FILE,cfg);
 }
 
+#endif /* TODO */
+	  
 int	main(int argc, char **argv)
 {
 	char		s[MAX_STRING_LEN];
@@ -127,10 +130,10 @@ int	main(int argc, char **argv)
 	progname = argv[0];
 
 /* Parse the command-line. */
-	while ((ch = getopt_long(argc, argv, "c:hvpt:", longopts, NULL)) != EOF)
+	while ((ch = zbx_getopt_long(argc, argv, "c:hvpt:", longopts, NULL)) != EOF)
 		switch ((char) ch) {
 		case 'c':
-			CONFIG_FILE = optarg;
+			CONFIG_FILE = zbx_optarg;
 			break;
 		case 'h':
 			help();
@@ -148,7 +151,7 @@ int	main(int argc, char **argv)
 			if(task == ZBX_TASK_START)
 			{
 				task = ZBX_TASK_TEST_METRIC;
-				TEST_METRIC = optarg;
+				TEST_METRIC = zbx_optarg;
 			}
 			break;
 		default:
@@ -157,7 +160,8 @@ int	main(int argc, char **argv)
 	}
 
 	init_metrics(); // Must be before init_config()
-	init_config();
+
+	load_config();
 
 	/* Do not create debug files */
 	zabbix_open_log(LOG_TYPE_SYSLOG,LOG_LEVEL_EMPTY,NULL);
@@ -178,10 +182,14 @@ int	main(int argc, char **argv)
 			break;
 	}
 
-	signal( SIGINT,  signal_handler );
-	signal( SIGQUIT, signal_handler );
-	signal( SIGTERM, signal_handler );
-	signal( SIGALRM, signal_handler );
+#ifdef TODO
+	
+	signal( SIGINT,  child_signal_handler);
+	signal( SIGQUIT, child_signal_handler );
+	signal( SIGTERM, child_signal_handler );
+	signal( SIGALRM, child_signal_handler );
+
+#endif /* TODO */
 
 	alarm(CONFIG_TIMEOUT);
 

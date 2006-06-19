@@ -21,6 +21,7 @@
 #include "listener.h"
 
 #include "zbxsock.h"
+#include "cfg.h"
 #include "zbxconf.h"
 #include "stats.h"
 #include "sysinfo.h"
