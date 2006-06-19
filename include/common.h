@@ -98,6 +98,9 @@
 
 #endif /* WIN32 */
 
+#ifndef WIN32
+#	define USE_PID_FILE 1
+#endif /* not WON32 */
 
 #ifndef HAVE_GETOPT_LONG
 	struct option {

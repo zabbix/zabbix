@@ -32,11 +32,12 @@ extern int	CONFIG_AGENTD_FORKS;
 extern int	CONFIG_DISABLE_ACTIVE;
 extern int	CONFIG_ENABLE_REMOTE_COMMANDS;
 extern int	CONFIG_TIMEOUT;
-extern int	CONFIG_LISTEN_PORT;
-extern int	CONFIG_SERVER_PORT;
+extern unsigned short	CONFIG_LISTEN_PORT;
+extern unsigned short	CONFIG_SERVER_PORT;
 extern int	CONFIG_REFRESH_ACTIVE_CHECKS;
 extern char	*CONFIG_LISTEN_IP;
 extern int	CONFIG_LOG_LEVEL;
+extern char	CONFIG_LOG_UNRES_SYMB;
 
 void    load_config(void);
 void    load_user_parameters(void);

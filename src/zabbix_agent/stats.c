@@ -19,7 +19,8 @@
 
 #include "common.h"
 
-#include "cfg.h"
+#include "zbxconf.h"
+#include "log.h"
 #include "stats.h"
 
 /* Number of processed requests */
@@ -39,16 +40,18 @@ ZBX_THREAD_ENTRY(CollectorThread, pSemColectorStarted)
 		file=fopen(CONFIG_STAT_FILE_TMP,"w");
 		if(NULL == file)
 		{
-//TODO			zabbix_log( LOG_LEVEL_CRIT, "Cannot open file [%s] [%s]\n","/tmp/zabbix_agentd.tmp2", strerror(errno));
+			zabbix_log( LOG_LEVEL_CRIT, "Cannot open file [%s] [%s]\n","/tmp/zabbix_agentd.tmp2", strerror(errno));
 			zbx_tread_exit(1);
 		}
 		else
 		{
 			/* Here is list of functions to call periodically */
-/*TODO			collect_stats_interfaces(file);
+#ifdef TODO
+			collect_stats_interfaces(file);
 			collect_stats_diskdevices(file);
 			collect_stats_cpustat(file);
-*/
+#endif /* TODO */
+
 			fclose(file);
 			rename(CONFIG_STAT_FILE_TMP, CONFIG_STAT_FILE);
 		}

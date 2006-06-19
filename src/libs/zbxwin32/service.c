@@ -24,8 +24,8 @@
 #include "service.h"
 
 #include "alias.h"
-#include "perfmon.c"
-#include "cfg.h"
+#include "perfmon.h"
+#include "zbxconf.h"
 #include "log.h"
 
 static int ZabbixRemoveEventSource(void);
@@ -100,8 +100,8 @@ static FARPROC GetProcAddressAndLog(HMODULE hModule,LPCSTR procName)
 {
 	FARPROC ptr;
 
-	ptr=GetProcAddress(hModule,procName);
-	if ((ptr==NULL)&&(dwFlags & AF_LOG_UNRESOLVED_SYMBOLS))
+	ptr = GetProcAddress(hModule,procName);
+	if ((NULL == ptr) && CONFIG_LOG_UNRES_SYMB)
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Unable to resolve symbol \"%s\"", procName);
 	}

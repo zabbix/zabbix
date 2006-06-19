@@ -18,11 +18,29 @@
 **/
 
 #include "common.h"
-#include "cfg.h"
 #include "zbxconf.h"
+
+#include "cfg.h"
+#include "log.h"
+#include "alias.h"
+#include "zbxplugin.h"
+#include "sysinfo.h"
 
 
 DWORD dwFlags = AF_USE_EVENT_LOG;
+
+#ifdef WIN32
+
+static char	DEFAULT_CONFIG_FILE[] = "C:\\zabbix_agentd.conf";
+static char	*DEFAULT_PID_FILE	= NULL;
+
+#else /* not WIN32 */
+
+static char	DEFAULT_CONFIG_FILE[]	= "/etc/zabbix/zabbix_agentd.conf";
+static char	DEFAULT_PID_FILE[]	= "/tmp/zabbix_agentd.pid";
+
+#endif /* WIN32 */
+
 
 char	*CONFIG_HOSTS_ALLOWED		= NULL;
 char	*CONFIG_HOSTNAME		= NULL;
@@ -36,11 +54,13 @@ int	CONFIG_AGENTD_FORKS		= AGENTD_FORKS;
 int	CONFIG_DISABLE_ACTIVE		= 0;
 int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
 int	CONFIG_TIMEOUT			= AGENT_TIMEOUT;
-int	CONFIG_LISTEN_PORT		= 10050;
-int	CONFIG_SERVER_PORT		= 10051;
+unsigned short	CONFIG_LISTEN_PORT	= 10050;
+unsigned short	CONFIG_SERVER_PORT	= 10051;
 int	CONFIG_REFRESH_ACTIVE_CHECKS	= 120;
 char	*CONFIG_LISTEN_IP		= NULL;
 int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
+char	CONFIG_LOG_UNRES_SYMB		= 0;
+
 
 void    load_config(void)
 {
@@ -50,7 +70,11 @@ void    load_config(void)
 */
 		{"Server",		&CONFIG_HOSTS_ALLOWED,	0,TYPE_STRING,	PARM_MAND,	0,0},
 		{"Hostname",		&CONFIG_HOSTNAME,	0,TYPE_STRING,	PARM_OPT,	0,0},
+
+#ifdef USE_PID_FILE
 		{"PidFile",		&CONFIG_PID_FILE,	0,TYPE_STRING,	PARM_OPT,	0,0},
+#endif /* USE_PID_FILE */
+
 		{"LogFile",		&CONFIG_LOG_FILE,	0,TYPE_STRING,	PARM_OPT,	0,0},
 /*		{"StatFile",		&CONFIG_STAT_FILE,	0,TYPE_STRING,	PARM_OPT,	0,0},*/
 		{"DisableActive",	&CONFIG_DISABLE_ACTIVE,	0,TYPE_INT,	PARM_OPT,	0,1},
@@ -66,15 +90,14 @@ void    load_config(void)
 		{"StartAgents",		&CONFIG_AGENTD_FORKS,		0,TYPE_INT,	PARM_OPT,	1,16},
 		{"RefreshActiveChecks",	&CONFIG_REFRESH_ACTIVE_CHECKS,	0,TYPE_INT,	PARM_OPT,60,3600},
 		{"EnableRemoteCommands",&CONFIG_ENABLE_REMOTE_COMMANDS,	0,TYPE_INT,	PARM_OPT,0,1},
-		{"AllowRootPermission",	&CONFIG_ALLOW_ROOT_PERMISSION,	0,TYPE_INT,	PARM_OPT,0,1},
+//		{"AllowRootPermission",	&CONFIG_ALLOW_ROOT_PERMISSION,	0,TYPE_INT,	PARM_OPT,0,1},
 		
-		{"PerfCounter",		&CONFIG_PERF_COUNTER,		0,	TYPE_STRING,PARM_OPT,0,0},
-		{"CollectorTimeout",	&CONFIG_COLLECTOR_TIMEOUT,	0,	TYPE_STRING,PARM_OPT,0,0},
-		{"LogUnresolvedSymbols",&CONFIG_LOG_US,			0,	TYPE_STRING,PARM_OPT,0,0},
+//		{"PerfCounter",		&CONFIG_PERF_COUNTER,		0,	TYPE_STRING,PARM_OPT,0,0},
+//		{"CollectorTimeout",	&CONFIG_COLLECTOR_TIMEOUT,	0,	TYPE_STRING,PARM_OPT,0,0},
+		{"LogUnresolvedSymbols",&CONFIG_LOG_UNRES_SYMB,			0,	TYPE_STRING,PARM_OPT,0,1},
 
-		{"Alias",		0,	&add_alias,	TYPE_STRING,PARM_OPT,0,0},
-		{"SubAgent",		0,	&add_subagent,	TYPE_STRING,PARM_OPT,0,0},
-		{"StartAgents",		0,	&start_agents,	TYPE_STRING,PARM_OPT,0,0},
+		{"Alias",		0,	&AddAlias,	TYPE_STRING,PARM_OPT,0,0},
+		{"Plugin",		0,	&add_plugin,	TYPE_STRING,PARM_OPT,0,0},
 		
 		{0}
 	};
@@ -85,15 +108,17 @@ void    load_config(void)
 	
 	if(CONFIG_FILE == NULL)
 	{
-		CONFIG_FILE = strdup("/etc/zabbix/zabbix_agentd.conf");
+		CONFIG_FILE = DEFAULT_CONFIG_FILE;
 	}
 
 	parse_cfg_file(CONFIG_FILE,cfg);
 
+#ifdef USE_PID_FILE
 	if(CONFIG_PID_FILE == NULL)
 	{
-		CONFIG_PID_FILE=strdup("/tmp/zabbix_agentd.pid");
+		CONFIG_PID_FILE = DEFAULT_PID_FILE;
 	}
+#endif /* USE_PID_FILE */
 
 	if(CONFIG_HOSTNAME == NULL)
 	{

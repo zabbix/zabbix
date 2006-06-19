@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /I "../include/" /I "../../../include/" /I "../../../zabbix_agent" /D "NDEBUG" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
+# ADD CPP /nologo /MT /W3 /GX /O2 /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "NDEBUG" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
 # ADD BASE RSC /l 0x419 /d "NDEBUG"
 # ADD RSC /l 0x409 /fo"Release/zabbixw32.res" /d "NDEBUG"
 BSC32=bscmake.exe
@@ -67,7 +67,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "../include/" /I "../../../include/" /I "../../../zabbix_agent" /D "_DEBUG" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /FR /YX /FD /GZ /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /FR /YX /FD /GZ /c
 # ADD BASE RSC /l 0x419 /d "_DEBUG"
 # ADD RSC /l 0x409 /fo"Debug/zabbixw32.res" /d "_DEBUG"
 BSC32=bscmake.exe
@@ -92,7 +92,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "../include/" /I "../../../include/" /D "_DEBUG" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /FR /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W4 /Gm /GX /ZI /Od /I "../include/" /I "../../../include/" /I "../../../zabbix_agent" /D "_DEBUG" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "TODO" /FR /YX /FD /GZ /c
+# ADD CPP /nologo /MTd /W4 /Gm /GX /ZI /Od /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "TODO" /FR /YX /FD /GZ /c
 # ADD BASE RSC /l 0x409 /fo"Debug/zabbixw32.res" /d "_DEBUG"
 # ADD RSC /l 0x409 /fo"Debug/zabbixw32.res" /d "_DEBUG"
 BSC32=bscmake.exe
@@ -141,6 +141,10 @@ SOURCE=..\..\..\src\libs\zbxcommon\str.c
 # Begin Source File
 
 SOURCE=..\..\..\src\libs\zbxcommon\xml.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxcommon\zbxgetopt.c
 # End Source File
 # End Group
 # Begin Group "zbxlog"
@@ -211,6 +215,50 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\common\system.c
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=..\..\..\src\libs\zbxsysinfo\win32\cpu.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\win32\diskio.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\win32\diskspace.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\win32\inodes.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\win32\kernel.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\win32\memory.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\win32\net.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\win32\proc.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\win32\sensors.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\win32\swap.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\win32\uptime.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\src\libs\zbxsysinfo\win32\win32.c
 # End Source File
 # End Group
@@ -226,7 +274,6 @@ SOURCE=..\..\..\src\libs\zbxwin32\perfmon.c
 
 SOURCE=..\..\..\src\libs\zbxwin32\service.c
 # ADD CPP /I "../../../src/zabbix_agent"
-# SUBTRACT CPP /I "../../../zabbix_agent"
 # End Source File
 # End Group
 # Begin Group "zbxnix"
@@ -341,26 +388,6 @@ SOURCE=..\..\..\src\zabbix_agent\stats.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\src\zabbix_agent\zabbix_agent.c
-
-!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ENDIF 
-
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\..\src\zabbix_agent\zabbix_agentd.c
 # End Source File
 # Begin Source File
@@ -434,6 +461,10 @@ SOURCE=..\..\..\include\sysinfo.h
 # Begin Source File
 
 SOURCE=..\..\..\include\threads.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\zbxgetopt.h
 # End Source File
 # Begin Source File
 

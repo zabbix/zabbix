@@ -26,9 +26,13 @@
 #include "pid.h"
 #include "log.h"
 #include "zbxconf.h"
+#include "zbxgetopt.h"
+#include "zbxsock.h"
 
 #include "stats.h"
 #include "active.h"
+#include "listener.h"
+#include "service.h"
 
 #define	LISTENQ 1024
 
@@ -62,7 +66,7 @@ char usage_message[] = "[-vhp] [-c <file>] [-t <metric>]";
 
 #endif /* HAVE_GETOPT_LONG */
 
-struct option longopts[] =
+struct zbx_option longopts[] =
 {
 	{"config",	1,	0,	'c'},
 	{"help",	0,	0,	'h'},
@@ -80,10 +84,10 @@ static int parse_commandline(int argc, char **argv)
 	char	ch	= '\0';
 
 	/* Parse the command-line. */
-	while ((ch = getopt_long(argc, argv, "c:hvpt:", longopts, NULL)) != EOF)
+	while ((ch = zbx_getopt_long(argc, argv, "c:hvpt:", longopts, NULL)) != EOF)
 		switch ((char) ch) {
 		case 'c':
-			CONFIG_FILE = optarg;
+			CONFIG_FILE = zbx_optarg;
 			break;
 		case 'h':
 			help();
@@ -101,7 +105,7 @@ static int parse_commandline(int argc, char **argv)
 			if(task == ZBX_TASK_START) 
 			{
 				task = ZBX_TASK_TEST_METRIC;
-				TEST_METRIC = optarg;
+				TEST_METRIC = zbx_optarg;
 			}
 			break;
 		default:
@@ -124,29 +128,28 @@ void	init_log(void)
 static ZBX_SOCKET connect_to_server(void)
 {
 	ZBX_SOCKET sock;
-	zbx_sockaddr serv_addr;
+	ZBX_SOCKADDR serv_addr;
 
 	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
 	{
 		zabbix_log( LOG_LEVEL_CRIT, "Unable to create socket");
 //		WriteLog(MSG_SOCKET_ERROR,EVENTLOG_ERROR_TYPE,"e",WSAGetLastError());
-		LOG_DEBUG_INFO("s", "End of ListenerThread() Error: 1");
 		exit(1);
 	}
 
 	// Create socket
 	// Fill in local address structure
-	memset(&serv_addr, 0, sizeof(zbx_sockaddr));
+	memset(&serv_addr, 0, sizeof(ZBX_SOCKADDR));
 
 	serv_addr.sin_family		= AF_INET;
 	serv_addr.sin_addr.s_addr	= CONFIG_LISTEN_IP ? inet_addr(CONFIG_LISTEN_IP) : htonl(INADDR_ANY);
 	serv_addr.sin_port		= htons(CONFIG_LISTEN_PORT);
 
 	// Bind socket
-	if (bind(sock,&serv_addr,sizeof(zbx_sockaddr)) == SOCKET_ERROR)
+	if (bind(sock,(struct sockaddr *)&serv_addr,sizeof(ZBX_SOCKADDR)) == SOCKET_ERROR)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Cannot bind to port %d. Error [%s]. Another zabbix_agentd already running ?",
-				port, strerror(errno));
+		zabbix_log(LOG_LEVEL_CRIT, "Cannot bind to port %u. Error [%s]. Another zabbix_agentd already running ?",
+				serv_addr.sin_port, strerror(errno));
 //		WriteLog(MSG_BIND_ERROR,EVENTLOG_ERROR_TYPE,"e",WSAGetLastError());
 		exit(1);
 	}
@@ -171,6 +174,7 @@ void MAIN_ZABBIX_ENTRY(void)
 {
 	ZBX_THREAD_HANDLE		*threads;
 	ZBX_THREAD_ACTIVECHK_ARGS	activechk_args;
+	ZBX_SEM_HANDLE			SemColectorStarted;
 
 	int	i = 0;
 
@@ -213,20 +217,22 @@ void MAIN_ZABBIX_ENTRY(void)
 	for(i = 0; i < CONFIG_AGENTD_FORKS; i++)
 	{
 		if(zbx_thread_wait(threads[i]))
-			WriteLog(MSG_INFORMATION,EVENTLOG_INFORMATION_TYPE,"ds", tid[i], ": Listen thread is Terminated.");
+		{
+			zabbix_log( LOG_LEVEL_DEBUG, "%d: Listen thread is Terminated", threads[i]);
+//			WriteLog(MSG_INFORMATION,EVENTLOG_INFORMATION_TYPE,"ds", , ": Listen thread is Terminated.");
+		}
 	}
 }
 
 int	main(int argc, char **argv)
 {
-	ZBX_SEM_HANDLE SemColectorStarted;
 	int	task = ZBX_TASK_START;
 
 	progname = argv[0];
 
 	task = parse_commandline(argc, argv);
 
-	init_metrics(); // Must be before init_config() !!!
+	init_metrics(); // Must be before load_config().  load_config - use metrics!!!
 
 	load_config();
 

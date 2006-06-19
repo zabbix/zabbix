@@ -19,6 +19,8 @@
 
 #include "common.h"
 
+#ifdef TODO
+
 #include <netdb.h>
 
 #include <stdlib.h>
@@ -510,3 +512,5 @@ void	collect_stats_diskdevices(FILE *outfile)
 
 #endif /* HAVE_PROC_STAT */
 }
+
+#endif /* TODO */

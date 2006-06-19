@@ -21,7 +21,7 @@
 #include "sysinfo.h"
 #include "log.h"
 #include "zbxsock.h"
-#include "cfg.h"
+#include "zbxconf.h"
 
 static int	get_http_page(char *hostname, char *param, unsigned short port, char *buffer, int max_buf_len)
 {

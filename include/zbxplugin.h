@@ -50,4 +50,6 @@ typedef struct zbx_plugin_list ZBX_PLUGIN_LIST;
 
 extern ZBX_PLUGIN_LIST	*PluginsList;
 
+BOOL add_plugin(char *args);
+
 #endif /* ZABBIX_ZBXPLUGIN_H */

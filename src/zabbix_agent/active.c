@@ -21,12 +21,14 @@
 #include "active.h"
 
 #include "log.h"
+#include "sysinfo.h"
+#include "logfiles.h"
 #include "zbxsock.h"
 #include "threads.h"
 
 METRIC	*metrics = NULL;
 
-void	init_list()
+static void	init_metrics()
 {
 	zabbix_log( LOG_LEVEL_DEBUG, "In init_list()");
 
@@ -41,7 +43,7 @@ void	init_list()
 	}
 }
 
-void	disable_all_metrics()
+static void	disable_all_metrics()
 {
 	int i;
 
@@ -54,7 +56,20 @@ void	disable_all_metrics()
 	}
 }
 
-int	get_min_nextcheck()
+
+static void	free_metrics(void)
+{
+	int i;
+	for(i=0;;i++)
+	{
+		if(metrics[i].key == NULL)	break;
+		free(metrics[i].key);
+		metrics[i].status = ITEM_STATUS_NOTSUPPORTED;
+	}
+	free(metrics);
+}
+
+static int	get_min_nextcheck()
 {
 	int i;
 	int min=-1;
@@ -79,7 +94,7 @@ int	get_min_nextcheck()
 	return min;
 }
 
-void	add_check(char *key, int refresh, int lastlogsize)
+static void	add_check(char *key, int refresh, int lastlogsize)
 {
 	int i;
 
@@ -134,7 +149,7 @@ void	add_check(char *key, int refresh, int lastlogsize)
  *                                                                            *
  ******************************************************************************/
 
-int	parse_list_of_checks(char *str)
+static int	parse_list_of_checks(char *str)
 {
 	char 
 		*p, 
@@ -176,7 +191,7 @@ int	parse_list_of_checks(char *str)
 	return SUCCEED;
 }
 
-int	get_active_checks(char *server, unsigned short port, char *error, int max_error_len)
+static int	get_active_checks(char *server, unsigned short port, char *error, int max_error_len)
 {
 
 	ZBX_SOCKET	s;
@@ -308,7 +323,7 @@ int	get_active_checks(char *server, unsigned short port, char *error, int max_er
 	return SUCCEED;
 }
 
-int	send_value(char *server,unsigned short port,char *host, char *key,char *value, char *lastlogsize)
+static int	send_value(char *server,unsigned short port,char *host, char *key,char *value, char *lastlogsize)
 {
 	ZBX_SOCKET	s;
 	char	tosend[MAX_STRING_LEN];
@@ -401,7 +416,7 @@ int	send_value(char *server,unsigned short port,char *host, char *key,char *valu
 	return SUCCEED;
 }
 
-int	process_active_checks(char *server, unsigned short port)
+static int	process_active_checks(char *server, unsigned short port)
 {
 	char	value[MAX_STRING_LEN];
 	char	lastlogsize[MAX_STRING_LEN];
@@ -490,7 +505,7 @@ int	process_active_checks(char *server, unsigned short port)
 	return ret;
 }
 
-void	refresh_metrics(char *server, unsigned short port, char *error, int max_error_len)
+static void	refresh_metrics(char *server, unsigned short port, char *error, int max_error_len)
 {
 	zabbix_log( LOG_LEVEL_DEBUG, "In refresh_metrics()");
 
@@ -516,7 +531,7 @@ ZBX_THREAD_ENTRY(ActiveChecksThread, args)
 
 	zbx_setproctitle("getting list of active checks");
 
-	init_list();
+	init_metrics();
 
 	refresh_metrics(activechk_args->host, activechk_args->port, error, sizeof(error));
 	nextrefresh = time(NULL) + CONFIG_REFRESH_ACTIVE_CHECKS;
@@ -566,7 +581,7 @@ ZBX_THREAD_ENTRY(ActiveChecksThread, args)
 		}
 	}
 
-	FreeMetrics();
+	free_metrics();
 
 	zbx_tread_exit(0);
 

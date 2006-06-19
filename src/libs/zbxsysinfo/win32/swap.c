@@ -17,16 +17,48 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
+#include "config.h"
+
 #include "common.h"
-#include "zbxplugin.h"
+#include "sysinfo.h"
 
-ZBX_PLUGIN_LIST	*PluginsList = NULL;
+#include "md5.h"
 
 
-BOOL add_plugin(char *args)
+int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+
+#ifdef TODO
+#error Realize function!!!
+#endif /* todo */
+
+	return SYSINFO_RET_FAIL;
+}
+
+int     OLD_SWAP(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef TODO
-#	error ADD REALIZATION!!!
-#endif
-   return TRUE;
+#error Realize function!!!
+#endif /* todo */
+
+	return SYSINFO_RET_FAIL;
 }
+
+int	SYSTEM_SWAP_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+#ifdef TODO
+#error Realize function!!!
+#endif /* todo */
+
+	return SYSINFO_RET_FAIL;
+}
+
+int	SYSTEM_SWAP_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+#ifdef TODO
+#error Realize function!!!
+#endif /* todo */
+
+	return SYSINFO_RET_FAIL;
+}
+

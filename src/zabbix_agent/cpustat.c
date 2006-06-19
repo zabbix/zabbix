@@ -19,6 +19,8 @@
 
 #include "common.h"
 
+#ifdef TODO
+
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -346,3 +348,5 @@ void	collect_stats_cpustat(FILE *outfile)
 	report_stats_cpustat(outfile, now);
 	
 }
+
+#endif /* TODO */

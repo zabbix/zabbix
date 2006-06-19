@@ -26,25 +26,6 @@
 #define	PARM_OPT	0
 #define	PARM_MAND	1
 
-extern char	*CONFIG_HOSTS_ALLOWED;
-extern char	*CONFIG_HOSTNAME;
-extern char	*CONFIG_FILE;
-extern char	*CONFIG_PID_FILE;
-extern char	*CONFIG_LOG_FILE;
-extern char	*CONFIG_STAT_FILE;
-extern char	*CONFIG_STAT_FILE_TMP;
-extern int	CONFIG_AGENTD_FORKS;
-/* extern int	CONFIG_NOTIMEWAIT; */
-extern int	CONFIG_DISABLE_ACTIVE;
-extern int	CONFIG_ENABLE_REMOTE_COMMANDS;
-extern int	CONFIG_TIMEOUT;
-extern int	CONFIG_LISTEN_PORT;
-extern int	CONFIG_SERVER_PORT;
-extern int	CONFIG_REFRESH_ACTIVE_CHECKS;
-extern char	*CONFIG_LISTEN_IP;
-extern int	CONFIG_LOG_LEVEL;
-
-
 //
 // Application flags
 //

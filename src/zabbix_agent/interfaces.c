@@ -19,6 +19,8 @@
 
 #include "common.h"
 
+#ifdef TODO
+
 #include <netdb.h>
 
 #include <stdlib.h>
@@ -393,3 +395,5 @@ void	collect_stats_interfaces(FILE *outfile)
 
 #endif /* HAVE_PROC_NET_DEV */
 }
+
+#endif /* TODO */
