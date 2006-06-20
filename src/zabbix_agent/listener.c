@@ -101,7 +101,7 @@ ZBX_THREAD_ENTRY(ListenerThread, pSock)
 
 		accept_sock = SOCKET_ERROR;
 		nlen = sizeof(ZBX_SOCKADDR);
-		if (accept_sock = accept(sock, (struct sockaddr *)&serv_addr, &nlen) == SOCKET_ERROR)
+		if ((accept_sock = accept(sock, (struct sockaddr *)&serv_addr, &nlen)) == SOCKET_ERROR)
 		{
 #if defined (WIN32)
 			int error = WSAGetLastError();
@@ -131,7 +131,14 @@ ZBX_THREAD_ENTRY(ListenerThread, pSock)
 		zbx_setproctitle("processing request");
 
 		//Win32 - IsValidServerAddr
-		if( check_security(serv_addr.sin_addr.S_un.S_addr, CONFIG_HOSTS_ALLOWED, 0) == SUCCEED)
+		if(check_security(
+#if defined(WIN32)
+			serv_addr.sin_addr.S_un.S_addr, 
+#else /* not WIN32 */
+			serv_addr.sin_addr.s_addr,
+#endif /* WIN32 */
+			CONFIG_HOSTS_ALLOWED, 
+			0) == SUCCEED)
 		{
 			stats_request_accepted++;
 			process_listener(sock);

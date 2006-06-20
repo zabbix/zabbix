@@ -29,15 +29,15 @@ extern int	CONFIG_ENABLE_REMOTE_COMMANDS;
 #define	SYSINFO_RET_FAIL	1
 #define	SYSINFO_RET_TIMEOUT	2
 
-#define ZBX_METRIC struct zbx_metric_type
-ZBX_METRIC
+typedef struct zbx_metric_type
 {
 	char		*key;
 	unsigned	flags;
 	int		(*function)();
 	char		*main_param;
 	char		*test_param;
-};
+} ZBX_METRIC;
+
 
 /* flags for command */
 #define CF_USEUPARAM	1	/* use user param */

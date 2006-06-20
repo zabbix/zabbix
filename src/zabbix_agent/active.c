@@ -26,15 +26,15 @@
 #include "zbxsock.h"
 #include "threads.h"
 
-METRIC	*metrics = NULL;
+ZBX_ACTIVE_METRIC	*metrics = NULL;
 
-static void	init_metrics()
+static void	init_active_metrics()
 {
-	zabbix_log( LOG_LEVEL_DEBUG, "In init_list()");
+	zabbix_log( LOG_LEVEL_DEBUG, "In init_active_metrics()");
 
 	if(metrics==NULL)
 	{
-		metrics=malloc(sizeof(METRIC));
+		metrics=malloc(sizeof(ZBX_ACTIVE_METRIC));
 		metrics[0].key=NULL;
 	}
 	else
@@ -110,7 +110,7 @@ static void	add_check(char *key, int refresh, int lastlogsize)
 			metrics[i].status=ITEM_STATUS_ACTIVE;
 			metrics[i].lastlogsize=lastlogsize;
 
-			metrics=realloc(metrics,(i+2)*sizeof(METRIC));
+			metrics=realloc(metrics,(i+2)*sizeof(ZBX_ACTIVE_METRIC));
 			metrics[i+1].key=NULL;
 			break;
 		}
@@ -531,7 +531,7 @@ ZBX_THREAD_ENTRY(ActiveChecksThread, args)
 
 	zbx_setproctitle("getting list of active checks");
 
-	init_metrics();
+	init_active_metrics();
 
 	refresh_metrics(activechk_args->host, activechk_args->port, error, sizeof(error));
 	nextrefresh = time(NULL) + CONFIG_REFRESH_ACTIVE_CHECKS;

@@ -20,19 +20,21 @@
 #ifndef ZABBIX_ACTIVE_H
 #define ZABBIX_ACTIVE_H
 
+#include "threads.h"
+
 extern char	*CONFIG_HOSTNAME;
 extern int	CONFIG_REFRESH_ACTIVE_CHECKS;
 
 #define MAX_LINES_PER_SECOND	10
 
-typedef struct zbx_metric
+typedef struct zbx_active_metric_type
 {
 	char	*key;
 	int	refresh;
 	int	nextcheck;
 	int	status;
 	int	lastlogsize;
-} METRIC;
+} ZBX_ACTIVE_METRIC;
 
 typedef struct active_ckeck_args
 {
