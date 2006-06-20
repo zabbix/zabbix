@@ -255,7 +255,7 @@ int	check_ntp(char *host, int port, int *value_int)
 
 	if(hp==NULL)
 	{
-/*		fprintf(stderr, "gethostbyname(%s) failed [%s]", host, hstrerror(h_errno));*/
+/*		zbx_error("gethostbyname(%s) failed [%s]", host, hstrerror(h_errno));*/
 		return	SYSINFO_RET_OK;
 	}
 
@@ -267,7 +267,7 @@ int	check_ntp(char *host, int port, int *value_int)
 
 	if(s == -1)
 	{
-/*		fprintf(stderr, "Cannot create socket [%s]", strerror(errno));*/
+/*		zbx_error(stderr, "Cannot create socket [%s]", strerror(errno));*/
 		return	SYSINFO_RET_OK;
 	}
  
@@ -284,7 +284,7 @@ int	check_ntp(char *host, int port, int *value_int)
 				break;
 		}
 		*/
-/*		fprintf(stderr, "Cannot connect [%s]", strerror(errno));*/
+/*		zbx_error("Cannot connect [%s]", strerror(errno));*/
 		goto lbl_error;
 	}
 
@@ -302,7 +302,7 @@ int	check_ntp(char *host, int port, int *value_int)
 				break;
 		} 
 		*/
-/*		fprintf(stderr, "Cannot write [%s]", strerror(errno));*/
+/*		zbx_error("Cannot write [%s]", strerror(errno));*/
 		goto lbl_error;
 	} 
 
@@ -324,7 +324,7 @@ int	check_ntp(char *host, int port, int *value_int)
 					break;
 		} 
 		*/
-/*		fprintf(stderr, "Cannot read0 [%d]", errno);*/
+/*		zbx_error("Cannot read0 [%d]", errno);*/
 		goto lbl_error;
 	}
 	zbx_sock_close(s);

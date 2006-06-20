@@ -101,20 +101,20 @@ void    init_daemon(void)
 		pwd = getpwnam("zabbix");
 		if (NULL == pwd)
 		{
-			fprintf(stderr,"User zabbix does not exist.\n");
-			fprintf(stderr, "Cannot run as root !\n");
+			zbx_error("User zabbix does not exist.");
+			zbx_error("Cannot run as root !");
 			exit(FAIL);
 		}
 		if( (setgid(pwd->pw_gid) ==-1) || (setuid(pwd->pw_uid) == -1) )
 		{
-			fprintf(stderr,"Cannot setgid or setuid to zabbix [%s]\n", strerror(errno));
+			zbx_error("Cannot setgid or setuid to zabbix [%s].", strerror(errno));
 			exit(FAIL);
 		}
 
 #ifdef HAVE_FUNCTION_SETEUID
 		if( (setegid(pwd->pw_gid) ==-1) || (seteuid(pwd->pw_uid) == -1) )
 		{
-			fprintf(stderr,"Cannot setegid or seteuid to zabbix [%s]\n", strerror(errno));
+			zbx_error("Cannot setegid or seteuid to zabbix [%s].", strerror(errno));
 			exit(FAIL);
 		}
 #endif /* HAVE_FUNCTION_SETEUID */
@@ -151,7 +151,7 @@ void    init_daemon(void)
 #ifdef HAVE_SYS_RESOURCE_SETPRIORITY
 	if(setpriority(PRIO_PROCESS,0,5)!=0)
 	{
-		fprintf(stderr, "Unable to set process priority to 5. Leaving default.\n");
+		zbx_error("Unable to set process priority to 5. Leaving default.");
 	}
 #endif /* HAVE_SYS_RESOURCE_SETPRIORITY */
 

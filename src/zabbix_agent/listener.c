@@ -44,8 +44,7 @@ static void	process_listener(ZBX_SOCKET sock)
 
 	if(ret == SOCKET_ERROR)
 	{
-//		WriteLog(MSG_RECV_ERROR,EVENTLOG_ERROR_TYPE,"s",strerror(errno));
-		zabbix_log( LOG_LEVEL_DEBUG, "read() failed.");
+		zabbix_log(LOG_LEVEL_DEBUG, "Error receiving data from socket: %s", strerror(errno));
 	}
 	else if(ret == 0)
 	{
@@ -78,7 +77,7 @@ static void	process_listener(ZBX_SOCKET sock)
 	}
 }
 
-ZBX_THREAD_ENTRY(ListenerThread, pSock)
+ZBX_THREAD_ENTRY(listener_thread, pSock)
 {
 	int local_request_failed = 0;
 
@@ -101,12 +100,12 @@ ZBX_THREAD_ENTRY(ListenerThread, pSock)
 
 		accept_sock = SOCKET_ERROR;
 		nlen = sizeof(ZBX_SOCKADDR);
-		if ((accept_sock = accept(sock, (struct sockaddr *)&serv_addr, &nlen)) == SOCKET_ERROR)
+		if(SOCKET_ERROR == (accept_sock = accept(sock, (struct sockaddr *)&serv_addr, &nlen)))
 		{
 #if defined (WIN32)
 			int error = WSAGetLastError();
 
-			if (error!=WSAEINTR)
+			if (error != WSAEINTR)
 			{
 				//WriteLog(MSG_ACCEPT_ERROR,EVENTLOG_ERROR_TYPE,"e",error);
 				zabbix_log( LOG_LEVEL_WARNING, "Accept error");

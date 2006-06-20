@@ -318,7 +318,7 @@ void	collect_stats_cpustat(FILE *outfile)
 	file = fopen("/proc/stat","r");
 	if(NULL == file)
 	{
-		fprintf(stderr, "Cannot open [%s] [%s]\n","/proc/stat", strerror(errno));
+		zbx_error("Cannot open [%s] [%s]\n","/proc/stat", strerror(errno));
 		return;
 	}
 	cpu_user = cpu_nice = cpu_system = cpu_idle = -1;

@@ -17,16 +17,26 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#ifndef ZABBIX_STATS_H
-#define ZABBIX_STATS_H
+#ifndef ZABBIX_MUTEXS_H
+#define ZABBIX_MUTEXS_H
 
-#include "threads.h"
+#if defined(WIN32)
 
-extern long int stats_request;
-extern long int stats_request_failed;
-extern long int stats_request_accepted;
-extern long int stats_request_rejected;
+	#define ZBX_MUTEX HANDLE
+	#define ZBX_MUTEX_ERROR (0)
+	#define ZBX_MUTEX_OK (1)
 
-ZBX_THREAD_ENTRY(collector_thread, pSemColectorStarted);
+#else /* not WIN32 */
 
-#endif
+	#define ZBX_MUTEX sem_t
+	#define ZBX_MUTEX_ERROR (-1)
+	#define ZBX_MUTEX_OK (1)
+
+#endif /* WIN32 */
+
+int zbx_mutex_create(ZBX_MUTEX	*mutex);
+int zbx_mutex_lock(ZBX_MUTEX	*mutex);
+int zbx_mutex_unlock(ZBX_MUTEX	*mutex);
+int zbx_mutex_destroy(ZBX_MUTEX	*mutex);
+
+#endif /* ZABBIX_MUTEXS_H */

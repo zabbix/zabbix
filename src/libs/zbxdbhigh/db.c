@@ -168,8 +168,8 @@ int	DBexecute(char *query)
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", sqlo_geterror(oracle) );
-		fprintf(stderr, "Query::%s\n",query);
-		fprintf(stderr, "Query failed:%s\n", sqlo_geterror(oracle) );
+		zbx_error("Query::%s.",query);
+		zbx_error("Query failed:%s.", sqlo_geterror(oracle) );
 		ret = FAIL;
 	}
 	return ret;
@@ -207,7 +207,7 @@ DB_ROW	DBfetch(DB_RESULT result)
 	}
 	else
 	{
-		fprintf(stderr, "Fetch failed:%s\n", sqlo_geterror(oracle) );
+		zbx_error("Fetch failed:%s", sqlo_geterror(oracle) );
 		exit(FAIL);
 	}
 #endif

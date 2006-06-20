@@ -105,7 +105,7 @@ void help()
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! beter use system functions like 'strchr' !!!                  *
+ * Comments: !!! beter use system functions like 'strchr' !!!                 *
  *                                                                            *
  ******************************************************************************/
 int	find_char(char *str,char c)
@@ -117,6 +117,31 @@ int	find_char(char *str,char c)
 	return	FAIL;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_error                                                        *
+ *                                                                            *
+ * Purpose: Print error text to the stderr                                    *
+ *                                                                            *
+ * Parameters: fmt - format of mesage                                         *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ ******************************************************************************/
+void zbx_error(const char *fmt, ...)
+{
+	va_list args;
+    
+	va_start(args, fmt);
+
+	fprintf(stderr, "%s: ",progname);
+	vfprintf(stderr, fmt, args);
+	fprintf(stderr, "\n");
+
+	va_end(args);
+}
 
 /* Has to be rewritten to avoi malloc */
 char *string_replace(char *str, const char *sub_str1, const char *sub_str2)

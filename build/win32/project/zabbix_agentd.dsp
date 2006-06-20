@@ -273,7 +273,6 @@ SOURCE=..\..\..\src\libs\zbxwin32\perfmon.c
 # Begin Source File
 
 SOURCE=..\..\..\src\libs\zbxwin32\service.c
-# ADD CPP /I "../../../src/zabbix_agent"
 # End Source File
 # End Group
 # Begin Group "zbxnix"
@@ -308,6 +307,10 @@ SOURCE=..\..\..\src\libs\zbxnix\pid.c
 # Begin Group "zbxsys"
 
 # PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsys\mutexs.c
+# End Source File
 # Begin Source File
 
 SOURCE=..\..\..\src\libs\zbxsys\threads.c
@@ -433,6 +436,10 @@ SOURCE=..\..\..\include\log.h
 # Begin Source File
 
 SOURCE=..\..\..\include\md5.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\mutexs.h
 # End Source File
 # Begin Source File
 

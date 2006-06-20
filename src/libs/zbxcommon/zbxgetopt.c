@@ -412,8 +412,8 @@ static int _getopt_internal (int argc, char **argv, const char *optstring,
       if (needexact && !exact)
         {
           if (zbx_opterr)
-            fprintf (stderr, "%s: unrecognized zbx_option `%s'\n",
-                     argv[0], argv[zbx_optind]);
+                fprintf (stderr, "%s: unrecognized zbx_option `%s'", argv[0], argv[zbx_optind]);
+
           nextchar += strlen (nextchar);
           zbx_optind++;
           return BAD_OPTION;
@@ -421,8 +421,8 @@ static int _getopt_internal (int argc, char **argv, const char *optstring,
       if (ambig && !exact)
         {
           if (zbx_opterr)
-            fprintf (stderr, "%s: zbx_option `%s' is ambiguous\n",
-                     argv[0], argv[zbx_optind]);
+                fprintf (stderr, "%s: zbx_option `%s' is ambiguous", argv[0], argv[zbx_optind]);
+
           nextchar += strlen (nextchar);
           zbx_optind++;
           return BAD_OPTION;

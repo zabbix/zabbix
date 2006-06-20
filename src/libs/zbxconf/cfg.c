@@ -42,7 +42,7 @@ int	CONFIG_TIMEOUT			= AGENT_TIMEOUT;
  *               FAIL - error processing config file                          *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
- * Optimized: Eugene Grigorjev                                                *
+ *         Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -61,34 +61,43 @@ int	parse_cfg_file(char *cfg_file,struct cfg_line *cfg)
 	file = fopen(cfg_file,"r");
 	if(NULL == file)
 	{
-		fprintf(stderr, "Cannot open config file [%s] [%s]\n",cfg_file,strerror(errno));
+		zbx_error("Cannot open config file [%s] [%s].",cfg_file,strerror(errno));
 		return	FAIL;
 	}
 
-	lineno = 0;
-	while(fgets(line,MAX_STRING_LEN,file) != NULL)
+	
+	for(lineno = 1; fgets(line,MAX_STRING_LEN,file) != NULL; lineno++)
 	{
-		lineno++;
-
 		if(line[0]=='#')	continue;
 		if(strlen(line) < 3)	continue;
 
 		parameter	= line;
-		value		= strstr(line,"=");
 
+		value		= strstr(line,"=");
 		if(NULL == value)
 		{
-			fprintf(stderr, "Error in line [%s] Line %d\n", line, lineno);
+			zbx_error("Error in line [%d] \"%s\"", lineno, line);
 			return	FAIL;
 		}
 
 		*value = '\0';
 		value++;
 
+		for(i = 0; value[i] != '\0'; i++)
+		{
+			if(value[i] == '\n')
+			{
+				value[i] = '\0';
+				break;
+			}
+		}
+
 		for(i = 0; cfg[i].parameter != 0; i++)
 		{
 			if(strcmp(cfg[i].parameter, parameter))
 				continue;
+
+			zbx_error("'%s' = '%s'",parameter, value);
 
 			if(cfg[i].function != 0)
 			{
@@ -137,10 +146,10 @@ int	parse_cfg_file(char *cfg_file,struct cfg_line *cfg)
 	return	SUCCEED;
 
 lbl_missing_mandatory:
-	fprintf(stderr, "Missing mandatory parameter [%s]\n", cfg[i].parameter);
+	zbx_error("Missing mandatory parameter [%s].", cfg[i].parameter);
 	return	FAIL;
 
 lbl_incorrect_config:
-	fprintf(stderr, "Wrong value of [%s] in line %d.\n", cfg[i].parameter, lineno);
+	zbx_error("Wrong value of [%s] in line %d.", cfg[i].parameter, lineno);
 	return	FAIL;
 }

@@ -23,7 +23,7 @@
 #include "sysinfo.h"
 
 /*
-#define FDI(f, m) fprintf(stderr, "DEBUG INFO: " f "\n" , m) // show debug info to stderr
+#define FDI(f, m) zbx_error("DEBUG INFO: " f "\n" , m) // show debug info to stderr
 #define SDI(m) FDI("%s", m) // string info
 #define IDI(i) FDI("%i", i) // integer info
 */

@@ -103,12 +103,12 @@ static void    signal_handler( int sig )
 	if( SIGALRM == sig )
 	{
 		signal( SIGALRM, signal_handler );
-		fprintf(stderr,"Timeout while executing operation.\n");
+		zbx_error("Timeout while executing operation.");
 	}
  
 	if( SIGQUIT == sig || SIGINT == sig || SIGTERM == sig )
 	{
-/*		fprintf(stderr,"\nGot QUIT or INT or TERM signal. Exiting..." ); */
+/*		zbx_error("\nGot QUIT or INT or TERM signal. Exiting..." ); */
 	}
 	exit( FAIL );
 }
@@ -149,7 +149,7 @@ static int	get_value(char *server,int port,char *key,char *value)
 
 	if(hp==NULL)
 	{
-		fprintf(stderr, "Error: %s\n", strerror(errno));
+		zbx_error("Error on gethostbyname. [%s]", strerror(errno));
 		return	FAIL;
 	}
 

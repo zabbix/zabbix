@@ -19,9 +19,10 @@
 
 #include "common.h"
 
-#include "zbxconf.h"
 #include "log.h"
 #include "stats.h"
+#include "mutexs.h"
+#include "zbxconf.h"
 
 /* Number of processed requests */
 long int stats_request=0;
@@ -29,11 +30,11 @@ long int stats_request_failed = 0;
 long int stats_request_accepted = 0;
 long int stats_request_rejected = 0;
 
-ZBX_THREAD_ENTRY(CollectorThread, pSemColectorStarted)
+ZBX_THREAD_ENTRY(collector_thread, p_colector_started)
 {
 	FILE	*file;
 
-	zbx_semaphore_unloc((ZBX_SEM_HANDLE *)pSemColectorStarted);
+	zbx_mutex_unlock((ZBX_MUTEX *)p_colector_started);
 
 	for(;;)
 	{

@@ -84,14 +84,7 @@ int zbx_sock_read(ZBX_SOCKET sock, void *buf, int buflen, int timeout)
 
 	if( (nread = read(sock, buf, MAX_STRING_LEN)) == SOCKET_ERROR)
 	{
-		if(errno == EINTR)
-		{
-			return (0); /* time out */
-		}
-		else
-		{
-			return (SOCKET_ERROR);
-		}
+		return (SOCKET_ERROR);
 	}
 	alarm(0);
 

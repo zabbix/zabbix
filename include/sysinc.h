@@ -167,8 +167,8 @@
 #	include <sys/pstat.h>
 #endif
 
-#ifdef SEMAPHORE_H
-#	include <semaphore.h>
+#ifdef HAVE_PTHREAD_H
+#	include <pthread.h>
 #endif
 
 #ifdef HAVE_SYS_DK_H

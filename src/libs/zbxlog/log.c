@@ -21,52 +21,112 @@
 #include "common.h"
 #include "log.h"
 
+#include "mutexs.h"
+
 static	char log_filename[MAX_STRING_LEN];
 
 static	int log_type = LOG_TYPE_UNDEFINED;
-static	int log_level;
+static	int log_level = LOG_LEVEL_ERR;
 
-int zabbix_open_log(int type,int level, const char *filename)
+ZBX_MUTEX log_file_access;
+
+#if defined(WIN32)
+
+static HANDLE system_log_handle = INVALID_HANDLE_VALUE;
+
+#endif
+
+int zabbix_open_log(int type, int level, const char *filename)
 {
-#ifdef TODO
-
 	FILE *log_file = NULL;
-/* Just return if we do not want to write debug */
+
 	log_level = level;
 
-	if(level == LOG_LEVEL_EMPTY)
+	if(LOG_LEVEL_EMPTY == level)
 	{
 		return	SUCCEED;
 	}
 
-	if(type == LOG_TYPE_SYSLOG)
+	if(LOG_TYPE_FILE == type && NULL == filename)
 	{
-        	openlog("zabbix_suckerd",LOG_PID,LOG_USER);
-        	setlogmask(LOG_UPTO(LOG_WARNING));
-		log_type = LOG_TYPE_SYSLOG;
+		type = LOG_TYPE_SYSLOG;
 	}
-	else if(type == LOG_TYPE_FILE)
+
+	if(LOG_TYPE_SYSLOG == type)
 	{
+		log_type = LOG_TYPE_SYSLOG;
+
+#if defined(WIN32)
+
+		system_log_handle = RegisterEventSource(NULL, ZABBIX_EVENT_SOURCE);
+
+#else /* not WIN32 */
+
+        	openlog("zabbix_suckerd", LOG_PID, LOG_USER);
+        	setlogmask(LOG_UPTO(LOG_WARNING));
+
+#endif /* WIN32 */
+	}
+
+	else if(LOG_TYPE_FILE == type)
+	{
+		if(strlen(filename) >= MAX_STRING_LEN)
+		{
+			zbx_error("To large path for logfile.");
+			return	FAIL;
+		}
+
+		if(ZBX_MUTEX_ERROR == zbx_mutex_create(&log_file_access))
+		{
+			zbx_error("Unable to create mutex for log file");
+			return	FAIL;
+		}
+		
 		log_file = fopen(filename,"a+");
 		if(log_file == NULL)
 		{
-			fprintf(stderr, "Unable to open log file [%s] [%s]\n", filename, strerror(errno));
+			zbx_error("Unable to open log file [%s] [%s]\n", filename, strerror(errno));
 			return	FAIL;
 		}
+
 		log_type = LOG_TYPE_FILE;
 		strscpy(log_filename,filename);
 		fclose(log_file);
 	}
 	else
 	{
-/* Not supported logging type */
-		fprintf(stderr, "Not supported loggin type [%d]\n", type);
+		/* Not supported logging type */
+		zbx_error("Not supported loggin type [%d]\n", type);
 		return	FAIL;
 	}
 
-#endif /* TODO */
-
 	return	SUCCEED;
+}
+
+void zabbix_close_log(void)
+{
+	if(LOG_TYPE_SYSLOG == log_type)
+	{
+#if defined(WIN32)
+
+		if(system_log_handle) 
+			DeregisterEventSource(system_log_handle);
+
+#else /* not WIN32 */
+
+		closelog();
+
+#endif /* WIN32 */
+	}
+	else if(log_type == LOG_TYPE_FILE)
+	{
+		if(log_file_access) 
+			zbx_mutex_destroy(&log_file_access);
+	}
+	else
+	{
+		/* Not supported loggin type */
+	}
 }
 
 void zabbix_set_log_level(int level)
@@ -76,101 +136,150 @@ void zabbix_set_log_level(int level)
 
 void zabbix_log(int level, const char *fmt, ...)
 {
-	FILE *log_file = NULL;
+	FILE	*log_file = NULL;
 
-	char	str[MAX_STRING_LEN];
-	char	str2[MAX_STRING_LEN];
+	char	message[MAX_STRING_LEN];
+
 	time_t	t;
 	struct	tm	*tm;
-	va_list ap;
+	va_list args;
 
-	struct stat	buf;
+	struct	stat	buf;
+
 	char	filename_old[MAX_STRING_LEN];
+
+#if defined(WIN32)
+
+	WORD	wType;
+	char	*strings[2] = {message, NULL};
 	
-	if( (level>log_level) || (level == LOG_LEVEL_EMPTY))
+#endif /* WIN32 */
+
+	if( (level > log_level) || (LOG_LEVEL_EMPTY == level))
 	{
 		return;
 	}
 
-	if(log_type == LOG_TYPE_SYSLOG)
+	va_start(args, fmt);
+	vsnprintf(message, MAX_STRING_LEN-2, fmt, args);
+	va_end(args);
+	strncat(message,"\n\0",MAX_STRING_LEN);
+
+	if(LOG_TYPE_SYSLOG == log_type)
 	{
-#ifdef TODO
-		va_start(ap,fmt);
-		vsprintf(str,fmt,ap);
-		strncat(str,"\n",MAX_STRING_LEN);
-		str[MAX_STRING_LEN-1]=0;
+#if defined(WIN32)
+		switch(level)
+		{
+			case LOG_LEVEL_CRIT:
+			case LOG_LEVEL_ERR:
+				wType = EVENTLOG_ERROR_TYPE;
+				break;
+			case LOG_LEVEL_WARNING:	
+				wType = EVENTLOG_WARNING_TYPE;
+				break;
+			default:
+				wType = EVENTLOG_INFORMATION_TYPE;
+				break;
+		}
+
+		ReportEvent(system_log_handle, wType, 0, 0, NULL, 1, 0, strings, NULL);
+
+#else /* not WIN32 */
+
 		syslog(LOG_DEBUG,str);
-		va_end(ap);
-#endif /* TODO */
+		
+#endif /* WIN32 */
 	}
 	else if(log_type == LOG_TYPE_FILE)
 	{
-		t=time(NULL);
-		tm=localtime(&t);
-		snprintf(str2,sizeof(str2)-1,"%.6d:%.4d%.2d%.2d:%.2d%.2d%.2d ",(int)getpid(),tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday,tm->tm_hour,tm->tm_min,tm->tm_sec);
-
-		va_start(ap,fmt);
-		vsnprintf(str,MAX_STRING_LEN,fmt,ap);
-		va_end(ap);
+		zbx_mutex_lock(&log_file_access);
 
 		log_file = fopen(log_filename,"a+");
-		if(log_file == NULL)
+		if(NULL != log_file)
 		{
-			return;
-		}
-		fprintf(log_file,"%s",str2);
-		fprintf(log_file,"%s",str);
-		fprintf(log_file,"\n");
-		fclose(log_file);
+
+			t = time(NULL);
+			tm = localtime(&t);
+
+			fprintf(log_file,"%.6d:%.4d%.2d%.2d:%.2d%.2d%.2d ",(int)getpid(),tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday,tm->tm_hour,tm->tm_min,tm->tm_sec);
+
+			va_start(args,fmt);
+
+			vfprintf(log_file,fmt, args);
+
+			va_end(args);
+
+			fprintf(log_file,"\n");
+			fclose(log_file);
 
 
-		if(stat(log_filename,&buf) == 0)
-		{
-			if(buf.st_size > MAX_LOG_FILE_LEN)
+			if(stat(log_filename,&buf) == 0)
 			{
-				strscpy(filename_old,log_filename);
-				strncat(filename_old,".old",MAX_STRING_LEN);
-				if(rename(log_filename,filename_old) != 0)
+				if(buf.st_size > MAX_LOG_FILE_LEN)
 				{
-/*					exit(1);*/
+					strscpy(filename_old,log_filename);
+					strncat(filename_old,".old",MAX_STRING_LEN);
+					if(rename(log_filename,filename_old) != 0)
+					{
+						zbx_error("Can't rename log file [%s] [%s]\n", log_filename, strerror(errno));
+					}
 				}
 			}
 		}
+
+		zbx_mutex_unlock(&log_file_access);
 	}
 	else
 	{
-		/* Log is not opened */
+		switch(level)
+		{
+			case LOG_LEVEL_CRIT:
+				zbx_error("ERROR: %s", message);
+				break;
+			case LOG_LEVEL_ERR:
+				zbx_error("Error: %s", message);
+				break;
+			case LOG_LEVEL_WARNING:	
+				zbx_error("Warning: %s", message);
+				break;
+			case LOG_LEVEL_DEBUG:	
+				zbx_error("DEBUG: %s", message);
+				break;
+			default:
+				zbx_error("%s", message);
+				break;
+		}
 	}	
         return;
 }
-
-#if defined(WIN32)
 
 //
 // Get system error string by call to FormatMessage
 //
 
-char *GetSystemErrorText(DWORD error)
+char *system_strerror(unsigned long error)
 {
-	char *msgBuf;
-	static char staticBuffer[1024];
+	static char buffer[1024];
 
-	if (FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | 
-		FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-		NULL,error,
-		MAKELANGID(LANG_NEUTRAL,SUBLANG_DEFAULT), // Default language
-		(LPSTR)&msgBuf,0,NULL)>0)
-	{
-		msgBuf[strcspn(msgBuf,"\r\n")]=0;
-		strncpy(staticBuffer,msgBuf,1023);
-		LocalFree(msgBuf);
-	}
-	else
-	{
-		sprintf(staticBuffer,"3. MSG 0x%08X - Unable to find message text [0x%X]", error , GetLastError());
-	}
+	buffer[0] = '\0';
 
-	return staticBuffer;
-}
+#if defined(WIN32)
+
+	if (FormatMessage(
+	      FORMAT_MESSAGE_FROM_SYSTEM |
+	      FORMAT_MESSAGE_FROM_HMODULE | 
+	      FORMAT_MESSAGE_IGNORE_INSERTS,
+	      NULL,
+	      error,
+	      0,
+	      buffer,
+	      1024,
+	      NULL) == 0)
+	{
+		snprintf(buffer, 1024, "3. MSG 0x%08X - Unable to find message text [0x%X]", error , GetLastError());
+	}
 
 #endif /* WIN32 */
+
+	return buffer;
+}

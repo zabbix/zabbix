@@ -20,7 +20,6 @@
 #ifndef ZABBIX_SERVICE_H
 #define ZABBIX_SERVICE_H
 
-#define ZABBIX_EVENT_SOURCE   "Zabbix Win32 Agent"
 #define ZABBIX_SERVICE_NAME   "ZabbixAgentdW32"
 
 #ifdef TODO

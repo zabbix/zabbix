@@ -42,6 +42,6 @@ typedef struct active_ckeck_args
 	unsigned short	port;
 } ZBX_THREAD_ACTIVECHK_ARGS;
 
-ZBX_THREAD_ENTRY(ActiveChecksThread, args);
+ZBX_THREAD_ENTRY(active_checks_thread, args);
 
 #endif /* ZABBIX_ACTIVE_H */

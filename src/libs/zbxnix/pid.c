@@ -28,13 +28,12 @@ int	create_pid_file(const char *pidfile)
 	f = fopen(pidfile, "r");
 	if(f != NULL)
 	{
-		fprintf(stderr, "File [%s] exists. Is this process already running ?\n",
-			pidfile);
+		zbx_error("File [%s] exists. Is this process already running ?", pidfile);
 		zabbix_log( LOG_LEVEL_CRIT, "File [%s] exists. Is this process already running ?",
 			pidfile);
 		if(fclose(f) != 0)
 		{
-			fprintf(stderr, "Cannot close file [%s] [%s]", pidfile, strerror(errno));
+			zbx_error("Cannot close file [%s] [%s]", pidfile, strerror(errno));
 			zabbix_log( LOG_LEVEL_WARNING, "Cannot close file [%s] [%s]",
 				pidfile, strerror(errno));
 		}
@@ -46,7 +45,7 @@ int	create_pid_file(const char *pidfile)
 
 	if( f == NULL)
 	{
-		fprintf(stderr, "Cannot create PID file [%s] [%s]\n",
+		zbx_error("Cannot create PID file [%s] [%s]",
 			pidfile, strerror(errno));
 		zabbix_log( LOG_LEVEL_CRIT, "Cannot create PID file [%s] [%s]",
 			pidfile, strerror(errno));
@@ -57,7 +56,7 @@ int	create_pid_file(const char *pidfile)
 	fprintf(f,"%d",(int)getpid());
 	if(fclose(f) != 0)
 	{
-		fprintf(stderr, "Cannot close file [%s] [%s]", pidfile, strerror(errno));
+		zbx_error("Cannot close file [%s] [%s]", pidfile, strerror(errno));
 		zabbix_log( LOG_LEVEL_WARNING, "Cannot close file [%s] [%s]",
 			pidfile, strerror(errno));
 	}

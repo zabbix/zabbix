@@ -30,12 +30,16 @@
 #endif /* SOCKET_ERROR */
 
 #if !defined (EINTR)
-#	define EINTR WSAETIMEDOUT
+#	define EINTR		WSAETIMEDOUT
 #endif /* EINTR */
 
 #if !defined(EHOSTUNREACH)
-#	define EHOSTUNREACH WSAEHOSTUNREACH
+#	define EHOSTUNREACH	WSAEHOSTUNREACH
 #endif /* EHOSTUNREACH */
+
+#if !defined(ECONNRESET)
+#	define ECONNRESET	WSAECONNRESET
+#endif /* ECONNRESET */
 
 
 #if defined(SOCKET)

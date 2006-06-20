@@ -67,13 +67,17 @@ double	zbx_getseconds(void)
 void	zbx_setproctitle(const char *fmt, ...)
 {
 #ifdef HAVE_FUNCTION_SETPROCTITLE
+
+	char	title[MAX_STRING_LEN];
+
 	va_list args;
 
 	va_start(args, fmt);
-
-	setproctitle(fmt, args);
-
+	vsnprintf(title, MAX_STRING_LEN-1, fmt, args);
 	va_end(args);
+
+	setproctitle(title);
+
 #endif /* HAVE_FUNCTION_SETPROCTITLE */
 }
 

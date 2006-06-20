@@ -23,10 +23,11 @@
 #include "common.h"
 #include "service.h"
 
-#include "alias.h"
-#include "perfmon.h"
-#include "zbxconf.h"
+#include "cfg.h"
 #include "log.h"
+#include "alias.h"
+#include "zbxconf.h"
+#include "perfmon.h"
 
 static int ZabbixRemoveEventSource(void);
 static int ZabbixInstallEventSource(char *path);
@@ -199,9 +200,6 @@ static VOID WINAPI ServiceEntry(DWORD argc,LPTSTR *argv)
 	}
 #endif /* TODO */
 
-	// Create synchronization stuff
-	eventShutdown		= CreateEvent(NULL,TRUE,FALSE,NULL);
-
 	// Internal command aliases
 	sprintf(counterPath,"perf_counter[\\%s\\%s]",GetCounterName(PCI_SYSTEM),GetCounterName(PCI_SYSTEM_UP_TIME));
 	AddAlias("system.uptime",counterPath);
@@ -222,18 +220,49 @@ static VOID WINAPI ServiceEntry(DWORD argc,LPTSTR *argv)
 void init_service(void)
 {
 	static SERVICE_TABLE_ENTRY serviceTable[] = {
-		{ ZABBIX_SERVICE_NAME, ServiceEntry },
+		{ ZABBIX_SERVICE_NAME, (LPSERVICE_MAIN_FUNCTION)ServiceEntry },
 		{ NULL,NULL } 
 		};
 
-	eventShutdown = CreateEvent(NULL, TRUE, FALSE, NULL);
+#if defined(WIN32)	
+	WSADATA sockInfo;
+
+	// Initialize Windows Sockets API
+	switch(WSAStartup(0x0002,&sockInfo))
+	{
+	case WSASYSNOTREADY:
+		zbx_error("Underlying network subsystem is not ready for network communication.");
+		return;
+	case WSAVERNOTSUPPORTED:
+		zbx_error("The version of Windows Sockets support requested is not provided.");
+		return;
+	case WSAEINPROGRESS:
+		zbx_error("A blocking Windows Sockets 1.1 operation is in progress.");
+		return;
+	case WSAEPROCLIM:
+		zbx_error("Limit on the number of tasks supported by the Windows Sockets implementation has been reached.");
+		return;
+	case WSAEFAULT:
+		zbx_error("The lpWSAData is not a valid pointer.");
+		return;
+	}
+#endif
+
+	// Create synchronization stuff
+	eventShutdown		= CreateEvent(NULL,TRUE,FALSE,NULL);
 
 	if (!StartServiceCtrlDispatcher(serviceTable))
 	{
-		printf(
-		"StartServiceCtrlDispatcher() failed: %s\n",
-		GetSystemErrorText(GetLastError())
-		);
+		if(ERROR_FAILED_SERVICE_CONTROLLER_CONNECT == GetLastError())
+		{
+			zbx_error("!!!ATTENTION!!! ZABBIX Agent runned as a console application. !!!ATTENTION!!!");
+			MAIN_ZABBIX_ENTRY();
+		}
+		else
+		{
+			zbx_error("StartServiceCtrlDispatcher() failed: %s", system_strerror(GetLastError()));
+		}
+
 	}
 
 	CloseHandle(eventShutdown);
@@ -255,7 +284,7 @@ int ZabbixCreateService(char *execName)
 	mgr=OpenSCManager(NULL,NULL,GENERIC_WRITE);
 	if (mgr==NULL)
 	{
-		printf("ERROR: Cannot connect to Service Manager (%s)\n",GetSystemErrorText(GetLastError()));
+		printf("ERROR: Cannot connect to Service Manager (%s)\n",system_strerror(GetLastError()));
 		return 1;
 	}
 
@@ -266,10 +295,10 @@ int ZabbixCreateService(char *execName)
 		{
 		DWORD code=GetLastError();
 
-		if (code==ERROR_SERVICE_EXISTS)
+		if (ERROR_SERVICE_EXISTS == code)
 		printf("ERROR: Service named '" ZABBIX_SERVICE_NAME "' already exist\n");
 		else
-		printf("ERROR: Cannot create service (%s)\n",GetSystemErrorText(code));
+		printf("ERROR: Cannot create service (%s)\n",system_strerror(code));
 		ret = 1;
 	}
 	else
@@ -304,7 +333,7 @@ INIT_CHECK_MEMORY(main);
    mgr=OpenSCManager(NULL,NULL,GENERIC_WRITE);
    if (mgr==NULL)
    {
-      printf("ERROR: Cannot connect to Service Manager (%s)\n",GetSystemErrorText(GetLastError()));
+      printf("ERROR: Cannot connect to Service Manager (%s)\n",system_strerror(GetLastError()));
 CHECK_MEMORY(main,"ZabbixCreateService","OpenSCManager");
       return 1;
    }
@@ -313,7 +342,7 @@ CHECK_MEMORY(main,"ZabbixCreateService","OpenSCManager");
    if (service==NULL)
    {
       printf("ERROR: Cannot open service named '" ZABBIX_SERVICE_NAME "' (%s)\n",
-             GetSystemErrorText(GetLastError()));
+             system_strerror(GetLastError()));
 	  ret = 1;
    }
    else
@@ -323,7 +352,7 @@ CHECK_MEMORY(main,"ZabbixCreateService","OpenSCManager");
       else
 	  {
          printf("ERROR: Cannot remove service named '" ZABBIX_SERVICE_NAME "' (%s)\n",
-                GetSystemErrorText(GetLastError()));
+                system_strerror(GetLastError()));
 		 ret = 1;
 	  }
 
@@ -354,7 +383,7 @@ INIT_CHECK_MEMORY(main);
    mgr=OpenSCManager(NULL,NULL,GENERIC_WRITE);
    if (mgr==NULL)
    {
-      printf("ERROR: Cannot connect to Service Manager (%s)\n",GetSystemErrorText(GetLastError()));
+      printf("ERROR: Cannot connect to Service Manager (%s)\n",system_strerror(GetLastError()));
 CHECK_MEMORY(main,"ZabbixStartService","OpenSCManager");
       return 1;
    }
@@ -363,7 +392,7 @@ CHECK_MEMORY(main,"ZabbixStartService","OpenSCManager");
    if (service==NULL)
    {
       printf("ERROR: Cannot open service named '" ZABBIX_SERVICE_NAME "' (%s)\n",
-             GetSystemErrorText(GetLastError()));
+             system_strerror(GetLastError()));
 	  ret=1;
    }
    else
@@ -373,7 +402,7 @@ CHECK_MEMORY(main,"ZabbixStartService","OpenSCManager");
       else
 	  {
          printf("ERROR: Cannot start service named '" ZABBIX_SERVICE_NAME "' (%s)\n",
-                GetSystemErrorText(GetLastError()));
+                system_strerror(GetLastError()));
 		 ret = 1;
 	  }
 
@@ -400,7 +429,7 @@ INIT_CHECK_MEMORY(main);
    mgr=OpenSCManager(NULL,NULL,GENERIC_WRITE);
    if (mgr==NULL)
    {
-      printf("ERROR: Cannot connect to Service Manager (%s)\n",GetSystemErrorText(GetLastError()));
+      printf("ERROR: Cannot connect to Service Manager (%s)\n",system_strerror(GetLastError()));
 CHECK_MEMORY(main,"ZabbixStopService","OpenSCManager");
       return 1;
    }
@@ -409,7 +438,7 @@ CHECK_MEMORY(main,"ZabbixStopService","OpenSCManager");
    if (service==NULL)
    {
       printf("ERROR: Cannot open service named '" ZABBIX_SERVICE_NAME "' (%s)\n",
-             GetSystemErrorText(GetLastError()));
+             system_strerror(GetLastError()));
 	  ret = 1;
    }
    else
@@ -421,7 +450,7 @@ CHECK_MEMORY(main,"ZabbixStopService","OpenSCManager");
       else
 	  {
          printf("ERROR: Cannot stop service named '" ZABBIX_SERVICE_NAME "' (%s)\n",
-                GetSystemErrorText(GetLastError()));
+                system_strerror(GetLastError()));
 		 ret = 1;
 	  }
 
@@ -448,7 +477,7 @@ INIT_CHECK_MEMORY(main);
          "System\\CurrentControlSet\\Services\\EventLog\\System\\" ZABBIX_EVENT_SOURCE,
          0,NULL,REG_OPTION_NON_VOLATILE,KEY_SET_VALUE,NULL,&hKey,NULL))
    {
-      printf("Unable to create registry key: %s\n",GetSystemErrorText(GetLastError()));
+      printf("Unable to create registry key: %s\n",system_strerror(GetLastError()));
 CHECK_MEMORY(main,"ZabbixInstallEventSource","RegCreateKeyEx");
       return 1;
    }
@@ -481,7 +510,7 @@ INIT_CHECK_MEMORY(main);
    else
    {
       printf("Unable to uninstall event source \"" ZABBIX_EVENT_SOURCE "\": %s\n",
-             GetSystemErrorText(GetLastError()));
+             system_strerror(GetLastError()));
 	  return 1;
    }
 CHECK_MEMORY(main,"ZabbixRemoveEventSource","end");

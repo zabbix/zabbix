@@ -29,6 +29,7 @@
 #include "zbxconf.h"
 #include "zbxgetopt.h"
 #include "zbxsock.h"
+#include "mutexs.h"
 
 #include "stats.h"
 #include "active.h"
@@ -118,15 +119,6 @@ static int parse_commandline(int argc, char **argv)
 	return task;
 }
 
-void	init_log(void)
-{
-	if(CONFIG_LOG_FILE == NULL)
-		zabbix_open_log(LOG_TYPE_SYSLOG,CONFIG_LOG_LEVEL,NULL);
-	else
-		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,CONFIG_LOG_FILE);
-
-}
-
 static ZBX_SOCKET connect_to_server(void)
 {
 	ZBX_SOCKET sock;
@@ -150,8 +142,15 @@ static ZBX_SOCKET connect_to_server(void)
 	// Bind socket
 	if (bind(sock,(struct sockaddr *)&serv_addr,sizeof(ZBX_SOCKADDR)) == SOCKET_ERROR)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Cannot bind to port %u. Error [%s]. Another zabbix_agentd already running ?",
-				serv_addr.sin_port, strerror(errno));
+		zabbix_log(LOG_LEVEL_CRIT, "Cannot bind to port %u for server %s. Error [%s]. Another zabbix_agentd already running ?",
+				CONFIG_LISTEN_PORT, CONFIG_LISTEN_IP,
+#if defined (WIN32)
+				system_strerror(WSAGetLastError())
+#else /* not WIN32 */
+				strerror(errno)
+#endif /* WIN32 */
+				);
+
 //		WriteLog(MSG_BIND_ERROR,EVENTLOG_ERROR_TYPE,"e",WSAGetLastError());
 		exit(1);
 	}
@@ -176,15 +175,15 @@ void MAIN_ZABBIX_ENTRY(void)
 {
 	ZBX_THREAD_HANDLE		*threads;
 	ZBX_THREAD_ACTIVECHK_ARGS	activechk_args;
-	ZBX_SEM_HANDLE			SemColectorStarted;
+	ZBX_MUTEX		colector_started;
 
 	int	i = 0;
 
 	ZBX_SOCKET	sock;
 
-	init_log();	
+	zabbix_open_log(LOG_TYPE_UNDEFINED /* LOG_TYPE_FILE */, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
 
-	zabbix_log( LOG_LEVEL_WARNING, "zabbix_agentd started. ZABBIX %s.", ZABBIX_VERSION);
+	zabbix_log(LOG_LEVEL_INFORMATION, "zabbix_agentd started. ZABBIX %s.", ZABBIX_VERSION);
 
 	sock = connect_to_server();
 
@@ -192,21 +191,25 @@ void MAIN_ZABBIX_ENTRY(void)
 	threads = calloc(CONFIG_AGENTD_FORKS, sizeof(ZBX_THREAD_HANDLE));
 
 	/* start collector */
-	if(zbx_semaphore_create(&SemColectorStarted) == SOCKET_ERROR)
+	if(ZBX_MUTEX_ERROR == zbx_mutex_create(&colector_started))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Can not create semaphore for Collection thread.");
+		zabbix_log(LOG_LEVEL_CRIT, "Can not create mutex for Collection thread.");
 		exit(1);
 	}
-	
-	threads[i] = zbx_thread_start(CollectorThread, &SemColectorStarted);
+	zbx_mutex_lock(&colector_started);
 
-	zbx_semaphore_wait(&SemColectorStarted);
-	zbx_semaphore_destr(&SemColectorStarted);
+	threads[i] = zbx_thread_start(collector_thread, &colector_started);
+	
+	/* wait until collector_thread unlock the mutex */
+	zbx_mutex_lock(&colector_started);
+	zbx_mutex_unlock(&colector_started);
+	zbx_mutex_destroy(&colector_started);
 
 	/* start listeners */
 	for(; i < CONFIG_AGENTD_FORKS-1; i++)
 	{
-		threads[i] = zbx_thread_start(ListenerThread, &sock);
+		DebugBreak();
+		threads[i] = zbx_thread_start(listener_thread, &sock);
 	}
 
 	/* start active chack */
@@ -215,7 +218,7 @@ void MAIN_ZABBIX_ENTRY(void)
 		activechk_args.host = CONFIG_HOSTS_ALLOWED;
 		activechk_args.port = CONFIG_SERVER_PORT;
 
-		threads[i] = zbx_thread_start(ActiveChecksThread, &activechk_args);
+		threads[i] = zbx_thread_start(active_checks_thread, &activechk_args);
 	}
 
 
@@ -230,11 +233,23 @@ void MAIN_ZABBIX_ENTRY(void)
 	}
 }
 
+static char* get_file_name(char *path)
+{
+	char	*p;
+	char	*filename;
+
+	for(filename = p = path; p && *p; p++)
+		if(*p == '\\' || *p == '/')
+			filename = p+1;
+
+	return filename;
+}
+
 int	main(int argc, char **argv)
 {
 	int	task = ZBX_TASK_START;
 
-	progname = argv[0];
+	progname = get_file_name(argv[0]);
 
 	task = parse_commandline(argc, argv);
 
@@ -243,7 +258,7 @@ int	main(int argc, char **argv)
 	load_config();
 
 	load_user_parameters();
-	
+
 	switch(task)
 	{
 		case ZBX_TASK_PRINT_SUPPORTED:
@@ -267,6 +282,8 @@ int	main(int argc, char **argv)
 #endif /* WIN32 */
 
 	//WriteLog(MSG_AGENT_SHUTDOWN, EVENTLOG_INFORMATION_TYPE,NULL);
+
+	zabbix_close_log();
 
 	return SUCCEED;
 }

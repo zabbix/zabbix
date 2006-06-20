@@ -55,7 +55,7 @@ char *GetCounterName(DWORD index)
 		dwSize = MAX_COMPUTERNAME_LENGTH+1;
 		if(GetComputerName((char *) &hostname + 2, &dwSize)==0)
 		{
-			zabbix_log(LOG_LEVEL_ERR, "GetComputerName failed: %s", GetSystemErrorText(GetLastError()));
+			zabbix_log(LOG_LEVEL_ERR, "GetComputerName failed: %s", system_strerror(GetLastError()));
 		}
 
 		dwSize = MAX_PERFCOUNTER_NAME_LEN;
@@ -65,7 +65,7 @@ char *GetCounterName(DWORD index)
 		} 
 		else 
 		{
-			zabbix_log(LOG_LEVEL_ERR, "PdhLookupPerfNameByIndex failed: %s", GetSystemErrorText(GetLastError()));
+			zabbix_log(LOG_LEVEL_ERR, "PdhLookupPerfNameByIndex failed: %s", system_strerror(GetLastError()));
 			free(counterName);
 			return "UnknownPerformanceCounter";
 		}

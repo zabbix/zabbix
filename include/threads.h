@@ -22,8 +22,6 @@
 
 #include "common.h"
 
-/* ====== THREADS ====== */
-
 #if defined(WIN32)
 
 	#define ZBX_THREAD_ERROR (0)
@@ -64,28 +62,6 @@
 
 ZBX_THREAD_HANDLE zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), void *args);
 int zbx_thread_wait(ZBX_THREAD_HANDLE thread);
-/* zbx_tread_exit(status) // as define */
-
-
-/* ====== SEMAPHORES ====== */
-
-#if defined(WIN32)
-
-	#define ZBX_SEM_HANDLE HANDLE
-	#define ZBX_SEM_ERROR (0)
-	#define ZBX_SEM_OK (1)
-
-#else /* not WIN32 */
-
-	#define ZBX_SEM_HANDLE sem_t
-	#define ZBX_SEM_ERROR (-1)
-	#define ZBX_SEM_OK (1)
-
-#endif /* WIN32 */
-
-int zbx_semaphore_create(ZBX_SEM_HANDLE *semaphore);
-int zbx_semaphore_wait(ZBX_SEM_HANDLE *semaphore);
-int zbx_semaphore_destr(ZBX_SEM_HANDLE *semaphore);
-int zbx_semaphore_unloc(ZBX_SEM_HANDLE *semaphore);
+/* zbx_tread_exit(status) // declared as define !!! */
 
 #endif /* ZABBIX_THREADS_H */

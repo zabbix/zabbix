@@ -25,6 +25,10 @@
 #include "zbxtypes.h"
 
 #if defined(WIN32)
+
+#	define ZABBIX_EVENT_SOURCE   "Zabbix Win32 Agent"
+
+
 #	pragma warning (disable: 4100)
 
 //#undef _DEBUG
@@ -428,6 +432,7 @@ int	num_param(const char *param);
 int	calculate_item_nextcheck(int delay, int now);
 void	zbx_setproctitle(const char *fmt, ...);
 double	zbx_getseconds(void);
+void zbx_error(const char *fmt, ...);
 
 int	set_result_type(AGENT_RESULT *result, int value_type, char *c);
 
