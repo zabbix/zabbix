@@ -1,5 +1,6 @@
 Changes for 1.1patch1:
 
+ - fixed notification report for Oracle (Eugene)
  - fixed large history of alarms displaying (Eugene)
  - fixed value mapping for latest data (Eugene)
  - fixed value mapping for screens (Eugene)
