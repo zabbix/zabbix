@@ -120,10 +120,6 @@ LINK32=link.exe
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\..\..\src\libs\zbxcommon\base64.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\..\src\libs\zbxcommon\comms.c
 # End Source File
 # Begin Source File
@@ -158,6 +154,10 @@ SOURCE=..\..\..\src\libs\zbxlog\log.c
 # Begin Group "zbxcrypto"
 
 # PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxcrypto\base64.c
+# End Source File
 # Begin Source File
 
 SOURCE=..\..\..\src\libs\zbxcrypto\md5.c
