@@ -53,7 +53,7 @@ int	create_pid_file(const char *pidfile)
 		return FAIL;
 	}
 
-	fprintf(f,"%d",(int)getpid());
+	fprintf(f,"%d",zbx_get_thread_id);
 	if(fclose(f) != 0)
 	{
 		zbx_error("Cannot close file [%s] [%s]", pidfile, strerror(errno));

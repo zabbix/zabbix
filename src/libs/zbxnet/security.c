@@ -67,45 +67,43 @@ int	check_security(ZBX_SOCKET sock, char *ip_list, int allow_if_empty)
 
         zabbix_log( LOG_LEVEL_DEBUG, "In check_security()");
 
-	if( (1 == allow_if_empty) && (strlen(ip_list)==0) )
+	if( (1 == allow_if_empty) && (0 == strlen(ip_list)) )
 	{
 		return SUCCEED;
 	}
 
 	nlen = sizeof(ZBX_SOCKADDR);
-	if(getpeername(sock,  (struct sockaddr*)&name, &nlen) == 0)
+	if( 0 != getpeername(sock,  (struct sockaddr*)&name, &nlen))
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Connection rejected. Getpeername failed [%s].",strerror(errno));
+		return FAIL;
+	}
+	else
 	{
 		strcpy(sname, inet_ntoa(name.sin_addr));
-
-		zabbix_log( LOG_LEVEL_DEBUG, "Connection from [%s]. Allowed servers [%s] ",sname, ip_list);
 
 		strscpy(tmp,ip_list);
 
         	host = (char *)strtok(tmp,",");
 
-		while(host != NULL)
+		while( NULL != host )
 		{
 			/* Allow IP addresses or DNS names for authorization */
-			if((hp = gethostbyname(host)) == 0)
+			if( 0 == (hp = gethostbyname(host)))
 			{
-				zabbix_log( LOG_LEVEL_WARNING, "Error gethostbyname, can not resolve [%s]",host);
+				zabbix_log( LOG_LEVEL_WARNING, "Error on gethostbyname, can not resolve [%s]",host);
 			}
 			else
 			{
 				sip = inet_ntoa(*((struct in_addr *)hp->h_addr));
-				if(strcmp(sname, sip) == 0)
+				if( 0 == strcmp(sname, sip))
 				{
+					zabbix_log( LOG_LEVEL_DEBUG, "Connection from [%s] accepted. Allowed servers [%s] ",sname, ip_list);
 					return	SUCCEED;
 				}
 			}
-                	host=(char *)strtok(NULL,",");
+                	host = (char *)strtok(NULL,",");
 		}
-	}
-	else
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "Error getpeername [%s]",strerror(errno));
-		zabbix_log( LOG_LEVEL_WARNING, "Connection rejected");
-		return FAIL;
 	}
 	zabbix_log( LOG_LEVEL_WARNING, "Connection from [%s] rejected. Allowed server is [%s] ",sname, ip_list);
 	return	FAIL;

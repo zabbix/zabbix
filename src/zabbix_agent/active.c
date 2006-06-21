@@ -48,7 +48,7 @@ static void	disable_all_metrics()
 {
 	int i;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In delete_all_metrics()");
+ 	zabbix_log( LOG_LEVEL_DEBUG, "In disable_all_metrics()");
 
 	if(NULL == active_metrics) 
 	{
@@ -171,10 +171,11 @@ static void	add_check(char *key, int refresh, int lastlogsize)
 static int	parse_list_of_checks(char *str)
 {
 	char 
-		*p, 
-		*key, 
-		*refresh, 
-		*lastlogsize;
+		*p = NULL, 
+		*pstrend = NULL, 
+		*key = NULL, 
+		*refresh = NULL, 
+		*lastlogsize = NULL;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In parse_list_of_checks('%s')", str);
 
@@ -182,32 +183,43 @@ static int	parse_list_of_checks(char *str)
 
 	while(str)
 	{
-		p = strchr((str = p),'\n');
-		if(p) p[0] = '\0'; /* prepare line */
+		pstrend = strchr(str,'\n');
+		if(pstrend) *pstrend = '\0'; /* prepare line */
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Parsed [%s]", p);
+		zabbix_log(LOG_LEVEL_DEBUG, "Parsed [%s]", str);
+
 		if(strcmp(str, "ZBX_EOF") == 0)	break;
+		if(pstrend == NULL) break;
 
-		if(p) p[0] = '\n'; /* restore string */
-
-		/* Key */
-		p = strchr(str,':');
-		if(p) { p[0] = '\0'; p++; } else return FAIL;
-		key = str;
-		zabbix_log( LOG_LEVEL_DEBUG, "Key [%s]", key);
-
-		/* Refresh */
-		p = strchr((str = p),':');
-		if(p) { p[0] = '\0'; p++; } else return FAIL;
-		refresh = str;
-		zabbix_log( LOG_LEVEL_DEBUG, "Refresh [%s]", refresh);
+		/* parse string from end of line */
 
 		/* Lastlogsize */
-		p = strchr((str = p),'\n');
-		if(p) { p[0] = '\0'; p++; }
-		lastlogsize = str;
-		zabbix_log( LOG_LEVEL_DEBUG, "Lastlogsize [%s]", lastlogsize);
-		str = p;		
+		for(p = str + strlen(str); p != str; p--)
+		{
+			if(*p == ':')
+			{
+				*p = '\0';
+
+				lastlogsize = p+1;
+				break;
+			}
+		}
+
+		/* Refresh */
+		for(; p != str; p--)
+		{
+			if(*p == ':')
+			{
+				*p = '\0';
+
+				refresh = p+1;
+				break;
+			}
+		}
+
+		key = str;
+
+		str = pstrend+1;
 		
 		add_check(key, atoi(refresh), atoi(lastlogsize));
 	}
@@ -229,7 +241,7 @@ static int	get_active_checks(char *server, unsigned short port, char *error, int
 	int	amount_read;
 
 
-	zabbix_log( LOG_LEVEL_DEBUG, "get_active_checks: host[%s] port[%u]", server, port);
+	zabbix_log( LOG_LEVEL_DEBUG, "get_active_checks('%s',%u)", server, port);
 
 	servaddr_in.sin_family = AF_INET;
 	hp = gethostbyname(server);
@@ -251,7 +263,7 @@ static int	get_active_checks(char *server, unsigned short port, char *error, int
 
 	if(INVALID_SOCKET == (s = socket(AF_INET,SOCK_STREAM,0)))
 	{
-		snprintf(error, max_error_len-1, "Cannot create socket [%s]", strerror(errno));
+		snprintf(error, max_error_len-1, "Cannot create socket [%s]", strerror_from_system(errno));
 		zabbix_log(LOG_LEVEL_WARNING, error);
 		return	FAIL;
 	}
@@ -345,7 +357,7 @@ static int	send_value(char *server,unsigned short port,char *host, char *key,cha
 
 	struct hostent *hp;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In send_value('%s'.%u,'%s','%s','%s')", server, port, host, key, lastlogsize);
+	zabbix_log( LOG_LEVEL_DEBUG, "In send_value('%s',%u,'%s','%s','%s')", server, port, host, key, lastlogsize);
 
 	servaddr_in.sin_family=AF_INET;
 	hp = gethostbyname(server);
@@ -397,7 +409,8 @@ static int	send_value(char *server,unsigned short port,char *host, char *key,cha
 		return	FAIL;
 	}
 
-	/* !!! POSSIBLE MUST BE CHECK FOR '\n' AT THE AND !!! */
+	/* !!! REMOVE '\n' AT THE AND (always must be present) !!! */
+	buf[len-1] = '\0';
 
 	if(strcmp(buf,"OK") == 0)
 	{
@@ -481,6 +494,8 @@ static int	process_active_checks(char *server, unsigned short port)
                                  snprintf(value, MAX_STRING_LEN-1, "%s", result.msg);
 			free_result(&result);
 
+			zabbix_log( LOG_LEVEL_DEBUG, "For key [%s] received value [%s]", active_metrics[i].key, value);
+
 			if(send_value(server,port,CONFIG_HOSTNAME,active_metrics[i].key,value,lastlogsize) == FAIL)
 			{
 				ret = FAIL;
@@ -521,7 +536,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	int	sleeptime, nextcheck;
 	int	nextrefresh;
 
-	zabbix_log( LOG_LEVEL_WARNING, "zabbix_agentd %ld started",(long)getpid());
+	zabbix_log( LOG_LEVEL_INFORMATION, "zabbix_agentd active check started [%s:%u]", activechk_args->host, activechk_args->port);
 
 	zbx_setproctitle("getting list of active checks");
 
@@ -576,6 +591,8 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	}
 
 	free_metrics();
+
+	zabbix_log( LOG_LEVEL_INFORMATION, "zabbix_agentd active check stopped");
 
 	zbx_tread_exit(0);
 

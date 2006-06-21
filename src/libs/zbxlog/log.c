@@ -22,6 +22,7 @@
 #include "log.h"
 
 #include "mutexs.h"
+#include "threads.h"
 
 static	char log_filename[MAX_STRING_LEN];
 
@@ -163,7 +164,7 @@ void zabbix_log(int level, const char *fmt, ...)
 	va_start(args, fmt);
 	vsnprintf(message, MAX_STRING_LEN-2, fmt, args);
 	va_end(args);
-	strncat(message,"\n\0",MAX_STRING_LEN);
+	strncat(message,"\0",MAX_STRING_LEN);
 
 	if(LOG_TYPE_SYSLOG == log_type)
 	{
@@ -201,9 +202,10 @@ void zabbix_log(int level, const char *fmt, ...)
 			t = time(NULL);
 			tm = localtime(&t);
 
-			fprintf(log_file,"%.6d:%.4d%.2d%.2d:%.2d%.2d%.2d ",(int)getpid(),tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday,tm->tm_hour,tm->tm_min,tm->tm_sec);
+			fprintf(log_file,"%.6ul:%.4d%.2d%.2d:%.2d%.2d%.2d ",zbx_get_thread_id(),tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday,tm->tm_hour,tm->tm_min,tm->tm_sec);
 
 			va_start(args,fmt);
+
 
 			vfprintf(log_file,fmt, args);
 
@@ -257,29 +259,68 @@ void zabbix_log(int level, const char *fmt, ...)
 // Get system error string by call to FormatMessage
 //
 
-char *system_strerror(unsigned long error)
+char *strerror_from_system(unsigned long error)
 {
-	static char buffer[1024];
-
-	buffer[0] = '\0';
-
 #if defined(WIN32)
 
-	if (FormatMessage(
-	      FORMAT_MESSAGE_FROM_SYSTEM |
-	      FORMAT_MESSAGE_FROM_HMODULE | 
-	      FORMAT_MESSAGE_IGNORE_INSERTS,
-	      NULL,
-	      error,
-	      0,
-	      buffer,
-	      1024,
-	      NULL) == 0)
+	static char buffer[1024];
+
+	memset(buffer, 0, 1024);
+
+	if(FormatMessage(
+		FORMAT_MESSAGE_FROM_SYSTEM, 
+		NULL, 
+		error,
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), 
+		buffer, 
+		1023, 
+		NULL) == 0)
 	{
 		snprintf(buffer, 1024, "3. MSG 0x%08X - Unable to find message text [0x%X]", error , GetLastError());
 	}
 
+	return buffer;
+
+#else /* not WIN32 */
+
+	return strerror(errno)
+
 #endif /* WIN32 */
 
+}
+
+//
+// Get system error string by call to FormatMessage
+//
+
+char *strerror_from_module(unsigned long error, const char *module)
+{
+#if defined(WIN32)
+
+	static char buffer[1024];
+
+	assert(module);
+
+	memset(buffer, 0, 1024);
+
+	if (FormatMessage(
+		FORMAT_MESSAGE_FROM_HMODULE,
+		GetModuleHandle(module),
+		error,
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
+		buffer,
+		1024,
+		NULL) == 0)
+	{
+		snprintf(buffer, 1024, "3. MSG 0x%08X - Unable to find message text [0x%X]", error , GetLastError());
+	}
+
 	return buffer;
+
+#else /* not WIN32 */
+
+	return strerror(errno)
+
+#endif /* WIN32 */
+
 }

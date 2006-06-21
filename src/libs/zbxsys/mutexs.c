@@ -20,6 +20,7 @@
 #include "common.h"
 
 #include "mutexs.h"
+#include "log.h"
 
 /******************************************************************************
  *                                                                            *
@@ -42,10 +43,9 @@ int zbx_mutex_create(ZBX_MUTEX *mutex)
 {
 #if defined(WIN32)	
 
-	*mutex = CreateMutex(NULL, 0, NULL);
-
-	if(*mutex == 0)
+	if(NULL == ((*mutex) = CreateMutex(NULL, FALSE, NULL)))
 	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Error on mutex creating. [%s]", strerror_from_system(GetLastError()));
 		return ZBX_MUTEX_ERROR;
 	}
 
@@ -53,6 +53,7 @@ int zbx_mutex_create(ZBX_MUTEX *mutex)
 
 	if(pthread_mutex_init(mutexm, NULL) < 0)
 	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Error on mutex creating.");
 		return ZBX_MUTEX_ERROR;
 	}
 
@@ -82,12 +83,18 @@ int zbx_mutex_lock(ZBX_MUTEX *mutex)
 #if defined(WIN32)	
 
 	if(WaitForSingleObject(*mutex, INFINITE) != WAIT_OBJECT_0)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Error on mutex locking. [%s]", strerror_from_system(GetLastError()));
 		return ZBX_MUTEX_ERROR;
+	}
 
 #else /* not WIN32 */
 
 	if(pthread_mutex_lock(mutex) < 0)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Error on mutex locking.");
 		return ZBX_MUTEX_ERROR;
+	}
 
 #endif /* WIN32 */
 
@@ -115,12 +122,18 @@ int zbx_mutex_unlock(ZBX_MUTEX *mutex)
 #if defined(WIN32)	
 
 	if(ReleaseMutex(*mutex) == 0)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Error on mutex UNlocking. [%s]", strerror_from_system(GetLastError()));
 		return ZBX_MUTEX_ERROR;
+	}
 
 #else /* not WIN32 */
 
 	if(pthread_mutex_unlock(mutex) < 0)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Error on mutex UNlocking.");
 		return ZBX_MUTEX_ERROR;
+	}
 
 #endif /* WIN32 */
 
@@ -148,12 +161,18 @@ int zbx_mutex_destroy(ZBX_MUTEX *mutex)
 #if defined(WIN32)	
 
 	if(CloseHandle(*mutex) == 0)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Error on mutex destroying. [%s]", strerror_from_system(GetLastError()));
 		return ZBX_MUTEX_ERROR;
+	}
 
 #else /* not WIN32 */
 
 	if(pthread_mutex_destroy(mutex) < 0)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Error on mutex destroying.");
 		return ZBX_MUTEX_ERROR;
+	}
 
 #endif /* WIN32 */
 

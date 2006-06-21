@@ -126,8 +126,7 @@ static ZBX_SOCKET connect_to_server(void)
 
 	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
 	{
-		zabbix_log( LOG_LEVEL_CRIT, "Unable to create socket");
-//		WriteLog(MSG_SOCKET_ERROR,EVENTLOG_ERROR_TYPE,"e",WSAGetLastError());
+		zabbix_log( LOG_LEVEL_CRIT, "Unable to create socket. [%s]", strerror_from_system(WSAGetLastError()));
 		exit(1);
 	}
 
@@ -137,34 +136,20 @@ static ZBX_SOCKET connect_to_server(void)
 
 	serv_addr.sin_family		= AF_INET;
 	serv_addr.sin_addr.s_addr	= CONFIG_LISTEN_IP ? inet_addr(CONFIG_LISTEN_IP) : htonl(INADDR_ANY);
-	serv_addr.sin_port		= htons(CONFIG_LISTEN_PORT);
+	serv_addr.sin_port		= htons((unsigned short)CONFIG_LISTEN_PORT);
 
 	// Bind socket
 	if (bind(sock,(struct sockaddr *)&serv_addr,sizeof(ZBX_SOCKADDR)) == SOCKET_ERROR)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Cannot bind to port %u for server %s. Error [%s]. Another zabbix_agentd already running ?",
-				CONFIG_LISTEN_PORT, CONFIG_LISTEN_IP,
-#if defined (WIN32)
-				system_strerror(WSAGetLastError())
-#else /* not WIN32 */
-				strerror(errno)
-#endif /* WIN32 */
-				);
+				CONFIG_LISTEN_PORT, CONFIG_LISTEN_IP, strerror_from_system(WSAGetLastError()));
 
-//		WriteLog(MSG_BIND_ERROR,EVENTLOG_ERROR_TYPE,"e",WSAGetLastError());
 		exit(1);
 	}
 
-	if(listen(sock, 
-#if defined(WIN32)
-		LISTENQ
-#else /* WIN32 */
-		SOMAXCONN
-#endif
-		) == SOCKET_ERROR)
+	if(listen(sock, SOMAXCONN) == SOCKET_ERROR)
 	{
-		zabbix_log( LOG_LEVEL_CRIT, "Listen failed");
-//		WriteLog(MSG_LISTEN_ERROR,EVENTLOG_ERROR_TYPE,"e",WSAGetLastError());
+		zabbix_log( LOG_LEVEL_CRIT, "Listen failed. [%s]", strerror_from_system(WSAGetLastError()));
 		exit(1);
 	}
 
@@ -175,13 +160,12 @@ void MAIN_ZABBIX_ENTRY(void)
 {
 	ZBX_THREAD_HANDLE		*threads;
 	ZBX_THREAD_ACTIVECHK_ARGS	activechk_args;
-	ZBX_MUTEX		colector_started;
 
 	int	i = 0;
 
 	ZBX_SOCKET	sock;
 
-	zabbix_open_log(LOG_TYPE_UNDEFINED /* LOG_TYPE_FILE */, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
+	zabbix_open_log(LOG_TYPE_UNDEFINED /* LOG_TYPE_FILE !!! TMP OFF !!!*/, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "zabbix_agentd started. ZABBIX %s.", ZABBIX_VERSION);
 
@@ -190,33 +174,19 @@ void MAIN_ZABBIX_ENTRY(void)
 	/* --- START THREADS ---*/
 	threads = calloc(CONFIG_AGENTD_FORKS, sizeof(ZBX_THREAD_HANDLE));
 
-	/* start collector */
-	if(ZBX_MUTEX_ERROR == zbx_mutex_create(&colector_started))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "Can not create mutex for Collection thread.");
-		exit(1);
-	}
-	zbx_mutex_lock(&colector_started);
-
-	threads[i] = zbx_thread_start(collector_thread, &colector_started);
-	
-	/* wait until collector_thread unlock the mutex */
-	zbx_mutex_lock(&colector_started);
-	zbx_mutex_unlock(&colector_started);
-	zbx_mutex_destroy(&colector_started);
+	threads[i] = zbx_thread_start(collector_thread, NULL);
 
 	/* start listeners */
 	for(; i < CONFIG_AGENTD_FORKS-1; i++)
 	{
-		DebugBreak();
 		threads[i] = zbx_thread_start(listener_thread, &sock);
 	}
 
 	/* start active chack */
-	if(CONFIG_DISABLE_ACTIVE==0)
+	if(0 == CONFIG_DISABLE_ACTIVE)
 	{
 		activechk_args.host = CONFIG_HOSTS_ALLOWED;
-		activechk_args.port = CONFIG_SERVER_PORT;
+		activechk_args.port = (unsigned short)CONFIG_SERVER_PORT;
 
 		threads[i] = zbx_thread_start(active_checks_thread, &activechk_args);
 	}
@@ -227,8 +197,7 @@ void MAIN_ZABBIX_ENTRY(void)
 	{
 		if(zbx_thread_wait(threads[i]))
 		{
-			zabbix_log( LOG_LEVEL_DEBUG, "%d: Listen thread is Terminated", threads[i]);
-//			WriteLog(MSG_INFORMATION,EVENTLOG_INFORMATION_TYPE,"ds", , ": Listen thread is Terminated.");
+			zabbix_log( LOG_LEVEL_DEBUG, "%08X: Thread is Terminated", threads[i]);
 		}
 	}
 }

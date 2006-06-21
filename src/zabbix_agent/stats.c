@@ -30,11 +30,11 @@ long int stats_request_failed = 0;
 long int stats_request_accepted = 0;
 long int stats_request_rejected = 0;
 
-ZBX_THREAD_ENTRY(collector_thread, p_colector_started)
+ZBX_THREAD_ENTRY(collector_thread, args)
 {
 	FILE	*file;
 
-	zbx_mutex_unlock((ZBX_MUTEX *)p_colector_started);
+	zabbix_log( LOG_LEVEL_INFORMATION, "zabbix_agentd collector started");
 
 	for(;;)
 	{
@@ -58,5 +58,8 @@ ZBX_THREAD_ENTRY(collector_thread, p_colector_started)
 		}
 		zbx_sleep(1);
 	}
+
+	zabbix_log( LOG_LEVEL_INFORMATION, "zabbix_agentd collector stopped");
+
 	zbx_tread_exit(0);
 }

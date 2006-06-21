@@ -37,6 +37,7 @@ void zabbix_log(int level, const char *fmt, ...);
 void zabbix_close_log(void);
 void zabbix_set_log_level(int level);
 
-char *system_strerror(unsigned long error);
+char *strerror_from_system(unsigned long error);
+char *strerror_from_module(unsigned long error, const char *module);
 
 #endif

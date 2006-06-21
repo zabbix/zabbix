@@ -41,6 +41,9 @@
 #	define ECONNRESET	WSAECONNRESET
 #endif /* ECONNRESET */
 
+#if !defined(SOMAXCONN)
+#	define SOMAXCONN	LISTENQ
+#endif /* SOMAXCONN */
 
 #if defined(SOCKET)
 

@@ -136,11 +136,13 @@ void zbx_error(const char *fmt, ...)
     
 	va_start(args, fmt);
 
-	fprintf(stderr, "%s: ",progname);
+	fprintf(stderr, "%s [%li]: ",progname, zbx_get_thread_id());
 	vfprintf(stderr, fmt, args);
 	fprintf(stderr, "\n");
 
 	va_end(args);
+
+	fflush(stderr);
 }
 
 /* Has to be rewritten to avoi malloc */

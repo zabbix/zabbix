@@ -27,8 +27,8 @@ extern char	*CONFIG_STAT_FILE_TMP;
 /* extern int	CONFIG_NOTIMEWAIT;		*/
 extern int	CONFIG_DISABLE_ACTIVE;
 extern int	CONFIG_ENABLE_REMOTE_COMMANDS;
-extern unsigned short	CONFIG_LISTEN_PORT;
-extern unsigned short	CONFIG_SERVER_PORT;
+extern int	CONFIG_LISTEN_PORT;
+extern int	CONFIG_SERVER_PORT;
 extern int	CONFIG_REFRESH_ACTIVE_CHECKS;
 extern char	*CONFIG_LISTEN_IP;
 extern int	CONFIG_LOG_LEVEL;
