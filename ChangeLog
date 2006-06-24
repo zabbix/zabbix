@@ -1,5 +1,6 @@
 Changes for 1.3:
 
+ - ZABBIX agent to bind even if TIME_WAIT sockets exist (Alexei)
  - ZABBIX server to bind even if TIME_WAIT sockets exist (Alexei)
 
 Changes for 1.1:
