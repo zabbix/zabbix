@@ -408,12 +408,22 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
 {
 	int	sockfd;
 	struct	sockaddr_in      serv_addr;
+	int	on;
 /*	struct linger ling;*/
 
 	if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 	{
 		zabbix_log( LOG_LEVEL_CRIT, "Cannot create socket");
 		exit(1);
+	}
+
+	/* Enable address reuse */
+	/* This is to immediately use the address even if it is in TIME_WAIT state */
+	/* http://www-128.ibm.com/developerworks/linux/library/l-sockpit/index.html */
+	on = 1;
+	if( -1 == setsockopt( sockfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on) ))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot setsockopt SO_REUSEADDR [%s]", strerror(errno));
 	}
 
 /*	if(CONFIG_NOTIMEWAIT == 1)
