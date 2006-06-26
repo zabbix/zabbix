@@ -51,7 +51,7 @@ int zbx_mutex_create(ZBX_MUTEX *mutex)
 
 #else /* not WIN32 */
 
-	if(pthread_mutex_init(mutexm, NULL) < 0)
+	if(pthread_mutex_init(mutex, NULL) < 0)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Error on mutex creating.");
 		return ZBX_MUTEX_ERROR;

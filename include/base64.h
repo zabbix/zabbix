@@ -17,26 +17,10 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#ifndef ZABBIX_MUTEXS_H
-#define ZABBIX_MUTEXS_H
+#ifndef ZABBIX_BASE64_H
+#define ZABBIX_BASE64_H
 
-#if defined(WIN32)
+void	str_base64_encode(char *p_str, char *p_b64str, int in_size);
+void	str_base64_decode(char *p_b64str, char *p_str, int *p_out_size);
 
-	#define ZBX_MUTEX HANDLE
-	#define ZBX_MUTEX_ERROR (0)
-	#define ZBX_MUTEX_OK (1)
-
-#else /* not WIN32 */
-
-	#define ZBX_MUTEX pthread_mutex_t 
-	#define ZBX_MUTEX_ERROR (-1)
-	#define ZBX_MUTEX_OK (1)
-
-#endif /* WIN32 */
-
-int zbx_mutex_create(ZBX_MUTEX	*mutex);
-int zbx_mutex_lock(ZBX_MUTEX	*mutex);
-int zbx_mutex_unlock(ZBX_MUTEX	*mutex);
-int zbx_mutex_destroy(ZBX_MUTEX	*mutex);
-
-#endif /* ZABBIX_MUTEXS_H */
+#endif /* ZABBIX_BASE64_H */

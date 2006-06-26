@@ -432,7 +432,7 @@ int	num_param(const char *param);
 int	calculate_item_nextcheck(int delay, int now);
 void	zbx_setproctitle(const char *fmt, ...);
 double	zbx_getseconds(void);
-void zbx_error(const char *fmt, ...);
+void	zbx_error(const char *fmt, ...);
 
 int	set_result_type(AGENT_RESULT *result, int value_type, char *c);
 
@@ -444,10 +444,6 @@ int	comms_parse_response(char *xml,char *host,char *key, char *data, char *lastl
 		               char *source, char *severity, int maxlen);
 
 int 	parse_command(const char *command, char *cmd, int cmd_max_len, char *param, int param_max_len);
-
-/* Base64 functions */
-void	str_base64_encode(char *p_str, char *p_b64str, int in_size);
-void	str_base64_decode(char *p_b64str, char *p_str, int *p_out_size);
 
 /* Regular expressions */
 char    *zbx_regexp_match(const char *string, const char *pattern, int *len);

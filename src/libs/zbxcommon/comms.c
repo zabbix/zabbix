@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "log.h"
+#include "base64.h"
 
 int	comms_create_request(char *host, char *key, char *data, char *lastlogsize, char *request,int maxlen)
 {

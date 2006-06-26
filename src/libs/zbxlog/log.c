@@ -121,8 +121,7 @@ void zabbix_close_log(void)
 	}
 	else if(log_type == LOG_TYPE_FILE)
 	{
-		if(log_file_access) 
-			zbx_mutex_destroy(&log_file_access);
+		zbx_mutex_destroy(&log_file_access);
 	}
 	else
 	{
@@ -187,7 +186,7 @@ void zabbix_log(int level, const char *fmt, ...)
 
 #else /* not WIN32 */
 
-		syslog(LOG_DEBUG,str);
+		syslog(LOG_DEBUG,message);
 		
 #endif /* WIN32 */
 	}
@@ -202,7 +201,17 @@ void zabbix_log(int level, const char *fmt, ...)
 			t = time(NULL);
 			tm = localtime(&t);
 
-			fprintf(log_file,"%.6ul:%.4d%.2d%.2d:%.2d%.2d%.2d ",zbx_get_thread_id(),tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday,tm->tm_hour,tm->tm_min,tm->tm_sec);
+			fprintf(
+				log_file,
+				"%10lu:%.4d%.2d%.2d:%.2d%.2d%.2d ",
+				(unsigned long)zbx_get_thread_id(),
+				tm->tm_year+1900,
+				tm->tm_mon+1,
+				tm->tm_mday,
+				tm->tm_hour,
+				tm->tm_min,
+				tm->tm_sec
+				);
 
 			va_start(args,fmt);
 
@@ -283,10 +292,9 @@ char *strerror_from_system(unsigned long error)
 
 #else /* not WIN32 */
 
-	return strerror(errno)
+	return strerror(errno);
 
 #endif /* WIN32 */
-
 }
 
 //
@@ -319,7 +327,7 @@ char *strerror_from_module(unsigned long error, const char *module)
 
 #else /* not WIN32 */
 
-	return strerror(errno)
+	return strerror(errno);
 
 #endif /* WIN32 */
 

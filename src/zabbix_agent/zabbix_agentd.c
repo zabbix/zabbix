@@ -123,10 +123,16 @@ static ZBX_SOCKET connect_to_server(void)
 {
 	ZBX_SOCKET sock;
 	ZBX_SOCKADDR serv_addr;
+	int error;
 
 	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
 	{
-		zabbix_log( LOG_LEVEL_CRIT, "Unable to create socket. [%s]", strerror_from_system(WSAGetLastError()));
+#if defined(WIN32)
+	error = WSAGetLastError();	
+#else /* not WIN32 */
+	error = errno;
+#endif /* WIN32 */
+		zabbix_log( LOG_LEVEL_CRIT, "Unable to create socket. [%s]", strerror_from_system(error));
 		exit(1);
 	}
 
@@ -141,15 +147,25 @@ static ZBX_SOCKET connect_to_server(void)
 	// Bind socket
 	if (bind(sock,(struct sockaddr *)&serv_addr,sizeof(ZBX_SOCKADDR)) == SOCKET_ERROR)
 	{
+#if defined(WIN32)
+	error = WSAGetLastError();	
+#else /* not WIN32 */
+	error = errno;
+#endif /* WIN32 */
 		zabbix_log(LOG_LEVEL_CRIT, "Cannot bind to port %u for server %s. Error [%s]. Another zabbix_agentd already running ?",
-				CONFIG_LISTEN_PORT, CONFIG_LISTEN_IP, strerror_from_system(WSAGetLastError()));
+				CONFIG_LISTEN_PORT, CONFIG_LISTEN_IP, strerror_from_system(error));
 
 		exit(1);
 	}
 
 	if(listen(sock, SOMAXCONN) == SOCKET_ERROR)
 	{
-		zabbix_log( LOG_LEVEL_CRIT, "Listen failed. [%s]", strerror_from_system(WSAGetLastError()));
+#if defined(WIN32)
+	error = WSAGetLastError();	
+#else /* not WIN32 */
+	error = errno;
+#endif /* WIN32 */
+		zabbix_log( LOG_LEVEL_CRIT, "Listen failed. [%s]", strerror_from_system(error));
 		exit(1);
 	}
 

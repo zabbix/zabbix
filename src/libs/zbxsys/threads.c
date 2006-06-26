@@ -20,8 +20,6 @@
 #include "common.h"
 #include "threads.h"
 
-#include "log.h"
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_thread_start                                                 *
@@ -50,7 +48,7 @@ ZBX_THREAD_HANDLE zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), void *args
 
 	if(0 == (thread = (ZBX_THREAD_HANDLE)_beginthreadex(NULL,0,handler,args,0,&thrdaddr))) /* NOTE: _beginthreadex returns 0 on failure, rather than –1 */
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Error on thread creation. [%s]", strerror_from_system(GetLastError()));
+		zbx_error("Error on thread creation. [%s]", strerror_from_system(GetLastError()));
 		thread = (ZBX_THREAD_HANDLE)(ZBX_THREAD_ERROR);
 	}
 
@@ -69,7 +67,7 @@ ZBX_THREAD_HANDLE zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), void *args
 	} 
 	else if(thread < 0)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Error on thread creation.");
+		zbx_error("Error on thread creation.");
 		thread = (ZBX_THREAD_HANDLE)(ZBX_THREAD_ERROR);
 	}
 
@@ -100,13 +98,13 @@ int zbx_thread_wait(ZBX_THREAD_HANDLE thread)
 
 	if(WaitForSingleObject(thread, INFINITE) != WAIT_OBJECT_0)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Error on thread waiting. [%s]", strerror_from_system(GetLastError()));
+		zbx_error("Error on thread waiting. [%s]", strerror_from_system(GetLastError()));
 		return (0);
 	}
 
 	if(CloseHandle(thread) == 0)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Error on thread closing. [%s]", strerror_from_system(GetLastError()));
+		zbx_error("Error on thread closing. [%s]", strerror_from_system(GetLastError()));
 		return (0);
 	}
 
@@ -114,7 +112,7 @@ int zbx_thread_wait(ZBX_THREAD_HANDLE thread)
 
 	if(waitpid(thread, (int *)0, 0) <= 0)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Error on thread waiting.");
+		zbx_error("Error on thread waiting.");
 		return (0);
 	}
 
@@ -135,3 +133,4 @@ long int zbx_get_thread_id(void)
 
 #endif /* WIN32 */
 }
+

@@ -33,6 +33,7 @@ long int stats_request_rejected = 0;
 ZBX_THREAD_ENTRY(collector_thread, args)
 {
 	FILE	*file;
+	int	err_cnt = 0;
 
 	zabbix_log( LOG_LEVEL_INFORMATION, "zabbix_agentd collector started");
 
@@ -41,11 +42,17 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 		file=fopen(CONFIG_STAT_FILE_TMP,"w");
 		if(NULL == file)
 		{
-			zabbix_log( LOG_LEVEL_CRIT, "Cannot open file [%s] [%s]\n","/tmp/zabbix_agentd.tmp2", strerror(errno));
-			zbx_tread_exit(1);
+			zabbix_log( LOG_LEVEL_CRIT, "Cannot open file [%s] [%s]", CONFIG_STAT_FILE_TMP, strerror(errno));
+			zbx_sleep(20);
+			if(err_cnt++ > 20)
+			{
+				zabbix_log( LOG_LEVEL_CRIT, "Too many attemptions to open file [%s] [%s]", CONFIG_STAT_FILE_TMP, strerror(errno));
+				zbx_tread_exit(1);
+			}
 		}
 		else
 		{
+			err_cnt = 0;
 			/* Here is list of functions to call periodically */
 #ifdef TODO
 			collect_stats_interfaces(file);

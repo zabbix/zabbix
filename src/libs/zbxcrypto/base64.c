@@ -18,14 +18,13 @@
 **/
 
 #include "common.h"
+#include "base64.h"
 
 #define MAX_B64_SIZE 16*1024
 
 static char base64_set [] =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-void str_base64_encode(char *p_str, char *p_b64str, int in_size);
-void str_base64_decode(char *p_b64str, char *p_str, int *p_out_size);
 static char char_base64_encode(unsigned char uc);
 static unsigned char char_base64_decode(char c);
 static int is_base64 (char c);
