@@ -7,6 +7,7 @@
 #	Eugene Grigorjev
 #
 
+win2nix="no"
 premake="no"
 copy="no"
 tgz="no"
@@ -23,6 +24,7 @@ def="--enable-agent --enable-server --with-mysql --with-ldap --with-net-snmp"
 for cmd
 do
   case "$cmd" in
+    win2nix ) win2nix="yes";;
     copy )    copy="yes"; noparam=1;;
     cpy )     copy="yes"; noparam=1;;
     pre ) premake="yes"; noparam=1;;
@@ -60,6 +62,11 @@ then
         echo "  $0 cat                       - cat last REPORT"
         echo "  $0                           - show this help"
         exit 1;
+fi
+
+if [ "$win2nix" = "yes" ]
+then
+  find . -name "*.[hc]" -exec vi "+%s/\r$//" "+wq" {} ';' -print;
 fi
 
 if [ "$copy" = "yes" ] || [ $premake = "yes" ] || 

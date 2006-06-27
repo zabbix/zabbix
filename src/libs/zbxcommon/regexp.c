@@ -24,7 +24,7 @@
 #endif /* WIN32 */
 
 char	*zbx_regexp_match(const char *string, const char *pattern, int *len)
-{
+{ 
 	char	*c = NULL;
 
 	int	status;
@@ -57,3 +57,4 @@ char	*zbx_regexp_match(const char *string, const char *pattern, int *len)
 
 	return	c;
 }
+
