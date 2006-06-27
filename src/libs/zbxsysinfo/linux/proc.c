@@ -134,7 +134,11 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	while((entries=readdir(dir))!=NULL)
 	{
-		if(f) fclose(f);
+		if(f)
+		{
+			fclose(f);
+			f = NULL;
+		}
 
 		proc_ok = 0;
 		usr_ok = 0;
