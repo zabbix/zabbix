@@ -1,5 +1,6 @@
 Changes for 1.1patch1:
 
+ - changed type of lastlogsize to long in structure METRIC (Alexei)
  - ZABBIX agent to bind even if TIME_WAIT sockets exist (Alexei)
  - ZABBIX server to bind even if TIME_WAIT sockets exist (Alexei)
  - fixed notification report for Oracle (Eugene)
