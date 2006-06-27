@@ -257,16 +257,3 @@ int	WEB_PAGE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	return ret;
 }
-
-/*#define ZABBIX_TEST*/
-
-#ifdef ZABBIX_TEST
-int main()
-{
-	char buffer[100*1024];
-
-	get_http_page("www.zabbix.com", "", 80, buffer, 100*1024);
-
-	printf("Back [%d] [%s]\n", strlen(buffer), buffer);
-}
-#endif

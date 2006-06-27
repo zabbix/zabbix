@@ -230,6 +230,39 @@ static char* get_file_name(char *path)
 	return filename;
 }
 
+#ifdef ZABBIX_TEST
+
+int main()
+{
+#if 0
+	char buffer[100*1024];
+
+	get_http_page("www.zabbix.com", "", 80, buffer, 100*1024);
+
+	printf("Back [%d] [%s]\n", strlen(buffer), buffer);
+	
+#elif 1
+
+	char s[] = "ABCDEFGH";
+	char p[] = "D(.){0,}E";
+	int len=2;
+
+	printf("String: \t %s\n", s);
+	printf("Pattern:\t %s\n", p);
+	printf("Result: \t [%s] [%d]\n", zbx_regexp_match(s, p, &len), len);
+/*
+#elif 1 // 0 - off; 1 - on;
+
+  Place your test code HERE!!!
+
+*/
+
+#endif
+
+}
+
+#else /* not ZABBIX_TEST */
+
 int	main(int argc, char **argv)
 {
 	int	task = ZBX_TASK_START;
@@ -272,3 +305,5 @@ int	main(int argc, char **argv)
 
 	return SUCCEED;
 }
+
+#endif /* ZABBIX_TEST */
