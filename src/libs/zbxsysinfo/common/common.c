@@ -20,6 +20,7 @@
 #include "common.h"
 #include "sysinfo.h"
 
+#include "alias.h"
 #include "md5.h"
 #include "log.h"
 
@@ -141,7 +142,7 @@ void	init_metrics()
 {
 	int 	i;
 
-	commands=malloc(sizeof(ZBX_METRIC));
+	commands = malloc(sizeof(ZBX_METRIC));
 	commands[0].key=NULL;
 
 	for(i=0;parameters_common[i].key!=0;i++)
@@ -452,11 +453,12 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 		
 
         assert(result);
-        init_result(result);	
+        init_result(result);
 	
-	strncpy(usr_command, in_command, MAX_STRING_LEN);
+	alias_expand(in_command, usr_command, MAX_STRING_LEN);
+	
 	usr_command_len = strlen(usr_command);
-	
+
 	for( p=usr_command+usr_command_len-1; p>usr_command && ( *p=='\r' || *p =='\n' || *p == ' ' ); --p );
 
 	if( (p[1]=='\r') || (p[1]=='\n') || (p[1]==' '))
@@ -479,9 +481,9 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 		}
 	}
 
+	param[0] = '\0';	
 	if(function != 0)
 	{
-		param[0] = '\0';	
 		
 		if(commands[i].flags & CF_USEUPARAM)
 		{
@@ -505,7 +507,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 		}
 		else
 		{
-			snprintf(param, MAX_STRING_LEN, "%s", usr_param);
+			zbx_snprintf(param, MAX_STRING_LEN, "%s", usr_param);
 		}
 
 		if(err != FAIL)
@@ -816,7 +818,7 @@ int	NET_IF_IBYTES1(const char *cmd, const char *param, unsigned flags, AGENT_RES
 {
 	char	key[MAX_STRING_LEN];
 
-	snprintf(key,sizeof(key)-1,"netloadin1[%s]",param);
+	zbx_snprintf(key,sizeof(key),"netloadin1[%s]",param);
 
 	return	get_stat(key, flags, result);
 }
@@ -825,7 +827,7 @@ int	NET_IF_IBYTES5(const char *cmd, const char *param, unsigned flags, AGENT_RES
 {
 	char	key[MAX_STRING_LEN];
 
-	snprintf(key,sizeof(key)-1,"netloadin5[%s]",param);
+	zbx_snprintf(key,sizeof(key),"netloadin5[%s]",param);
 
 	return	get_stat(key, flags, result);
 }
@@ -834,7 +836,7 @@ int	NET_IF_IBYTES15(const char *cmd, const char *param, unsigned flags, AGENT_RE
 {
 	char	key[MAX_STRING_LEN];
 
-	snprintf(key,sizeof(key)-1,"netloadin15[%s]",param);
+	zbx_snprintf(key,sizeof(key),"netloadin15[%s]",param);
 
 	return	get_stat(key, flags, result);
 }
@@ -843,7 +845,7 @@ int	NET_IF_OBYTES1(const char *cmd, const char *param, unsigned flags, AGENT_RES
 {
 	char	key[MAX_STRING_LEN];
 
-	snprintf(key,sizeof(key)-1,"netloadout1[%s]",param);
+	zbx_snprintf(key,sizeof(key),"netloadout1[%s]",param);
 
 	return	get_stat(key, flags, result);
 }
@@ -852,7 +854,7 @@ int	NET_IF_OBYTES5(const char *cmd, const char *param, unsigned flags, AGENT_RES
 {
 	char	key[MAX_STRING_LEN];
 
-	snprintf(key,sizeof(key)-1,"netloadout5[%s]",param);
+	zbx_snprintf(key,sizeof(key),"netloadout5[%s]",param);
 
 	return	get_stat(key, flags, result);
 }
@@ -861,7 +863,7 @@ int	NET_IF_OBYTES15(const char *cmd, const char *param, unsigned flags, AGENT_RE
 {
 	char	key[MAX_STRING_LEN];
 
-	snprintf(key,sizeof(key)-1,"netloadout15[%s]",param);
+	zbx_snprintf(key,sizeof(key),"netloadout15[%s]",param);
 
 	return	get_stat(key, flags, result);
 }
@@ -1136,10 +1138,22 @@ int     OLD_VERSION(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef TODO /* TODO !!! */
-	
+
+#if defined(WIN32)
+
+	STARTUPINFO si = {0};
+	PROCESS_INFORMATION pi = {0};
+	SECURITY_ATTRIBUTES sa;
+	HANDLE hOutput;
+	char szTempPath[MAX_PATH],szTempFile[MAX_PATH];
+
+#else /* not WIN32 */
+
 	FILE	*f;
-	char	c[MAX_STRING_LEN];
+
+#endif /* WIN32 */
+
+	char	cmd_result[MAX_STRING_LEN];
 	char	command[MAX_STRING_LEN];
 	int	i,len;
 
@@ -1147,10 +1161,61 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
         init_result(result);
 	
-	strncpy(command, param, MAX_STRING_LEN);
+	strsncpy(command, param, MAX_STRING_LEN);
 	
-	f=popen(command,"r");
-	if(f==0)
+#if defined(WIN32)
+
+	// Create temporary file to hold process output
+	GetTempPath( MAX_PATH-1,	szTempPath);
+	GetTempFileName( szTempPath, "zbx", 0, szTempFile);
+
+	sa.nLength		= sizeof(SECURITY_ATTRIBUTES);
+	sa.lpSecurityDescriptor	= NULL;
+	sa.bInheritHandle	= TRUE;
+
+	if(INVALID_HANDLE_VALUE == (hOutput = CreateFile(
+		szTempFile,
+		GENERIC_READ | GENERIC_WRITE,
+		0,
+		&sa,
+		CREATE_ALWAYS,
+		FILE_ATTRIBUTE_TEMPORARY,
+		NULL)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Unable to create temporary file: '%s' [%s]", szTempFile, strerror_from_system(GetLastError()));
+		return SYSINFO_RET_FAIL;
+	}
+
+	// Fill in process startup info structure
+	memset(&si,0,sizeof(STARTUPINFO));
+	si.cb=sizeof(STARTUPINFO);
+	si.dwFlags=STARTF_USESTDHANDLES;
+	si.hStdInput=GetStdHandle(STD_INPUT_HANDLE);
+	si.hStdOutput=hOutput;
+	si.hStdError=GetStdHandle(STD_ERROR_HANDLE);
+
+	// Create new process
+	if (!CreateProcess(NULL,command,NULL,NULL,TRUE,0,NULL,NULL,&si,&pi))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Unable to create process: '%s' [%s]", command, strerror_from_system(GetLastError()));
+		return SYSINFO_RET_FAIL;
+	}
+
+	// Wait for process termination and close all handles
+	WaitForSingleObject(pi.hProcess,INFINITE);
+	CloseHandle(pi.hThread);
+	CloseHandle(pi.hProcess);
+
+	// Rewind temporary file for reading
+	SetFilePointer(hOutput,0,NULL,FILE_BEGIN);
+
+	// Read process output
+	ReadFile(hOutput, cmd_result, MAX_STRING_LEN-1, &len, NULL);
+	cmd_result[len]=0;		
+
+#else /* not WIN32 */
+
+	if(0 == (f = popen(command,"r"))
 	{
 		switch (errno)
 		{
@@ -1162,7 +1227,7 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		}
 	}
 
-	len = fread(c, MAX_STRING_LEN-1, 1, f);
+	len = fread(cmd_result, MAX_STRING_LEN-1, 1, f);
 
 	if(0 != ferror(f))
 	{
@@ -1178,9 +1243,9 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		}
 	}
 
-	c[len]=0;
+	cmd_result[len]=0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Run remote command [%s] Result [%d] [%s]", command, strlen(c), c);
+	zabbix_log(LOG_LEVEL_DEBUG, "Run remote command [%s] Result [%d] [%s]", command, strlen(cmd_result), cmd_result);
 
 	if(pclose(f) != 0)
 	{
@@ -1194,26 +1259,27 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		}
 	}
 
+#endif /* WIN32 */
+
 	/* We got EOL only */
-	if(c[0] == '\n')
+	if(cmd_result[0] == '\n')
 	{
 		return SYSINFO_RET_FAIL;
 	}
 	
-	for(i=strlen(c); i>0; i--)
+	for(i=strlen(cmd_result); i>0; i--)
 	{
-		if(c[i] == '\n')
+		if(cmd_result[i] == '\n')
 		{
-			c[i] = '\0';
+			cmd_result[i] = '\0';
 			break;
 		}
 	}
 	
-	SET_TEXT_RESULT(result, strdup(c));
-
-#endif /* TODO */
+	SET_TEXT_RESULT(result, strdup(cmd_result));
 
 	return	SYSINFO_RET_OK;
+
 }
 
 int	EXECUTE(const char *cmd, const char *command, unsigned flags, AGENT_RESULT *result)
@@ -1278,18 +1344,25 @@ int	EXECUTE(const char *cmd, const char *command, unsigned flags, AGENT_RESULT *
 
 int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef TODO /* TODO !!! */
-	char	command[MAX_STRING_LEN];
 #define MAX_FLAG_LEN 10
+
+	char	command[MAX_STRING_LEN];
 	char	flag[MAX_FLAG_LEN];
+
+#if defined (WIN32)
+	STARTUPINFO    si;
+	PROCESS_INFORMATION  pi;
+
+	char	full_command[MAX_STRING_LEN];
+#else /* not WIN32 */
 	pid_t	pid;
+#endif
+
 	
         assert(result);
 
 	init_result(result);
 	
-
-zabbix_log(LOG_LEVEL_WARNING, "RUN_COMMAND cmd = '%s'",cmd);
 
 	if(CONFIG_ENABLE_REMOTE_COMMANDS != 1)
 	{
@@ -1311,6 +1384,8 @@ zabbix_log(LOG_LEVEL_WARNING, "RUN_COMMAND cmd = '%s'",cmd);
 	{
 		return SYSINFO_RET_FAIL;
 	}
+
+	zabbix_log(LOG_LEVEL_WARNING, "Run command '%s'",command);
 	
 	if(get_param(param, 2, flag, MAX_FLAG_LEN) != 0)
         {
@@ -1319,13 +1394,11 @@ zabbix_log(LOG_LEVEL_WARNING, "RUN_COMMAND cmd = '%s'",cmd);
 
 	if(flag[0] == '\0')
 	{
-		snprintf(flag,MAX_FLAG_LEN,"wait");
+		zbx_snprintf(flag,MAX_FLAG_LEN,"wait");
 	}
 
-zabbix_log(LOG_LEVEL_WARNING, "RUN_COMMAND flag = '%s'",flag);
 	if(strcmp(flag,"wait") == 0)
 	{
-zabbix_log(LOG_LEVEL_WARNING, "RUN_COMMAND runed as WAIT",flag);
 		return EXECUTE_STR(cmd,command,flags,result);
 	}
 	else if(strcmp(flag,"nowait") != 0)
@@ -1333,9 +1406,33 @@ zabbix_log(LOG_LEVEL_WARNING, "RUN_COMMAND runed as WAIT",flag);
 		return SYSINFO_RET_FAIL;
 	}
 	
-	zabbix_log(LOG_LEVEL_DEBUG, "Run remote command '%s'", command);
-	
-zabbix_log(LOG_LEVEL_WARNING, "RUN_COMMAND runed as NOWAIT",flag);
+#if defined(WIN32)
+
+	zbx_snprintf(full_command,MAX_STRING_LEN, "cmd /C \"%s\"", command);
+
+zbx_error(full_command);
+
+	GetStartupInfo(&si);
+
+	zabbix_log(LOG_LEVEL_WARNING, "Execute command '%s'",full_command);
+
+	if(!CreateProcess(
+		NULL,	// No module name (use command line)
+		full_command,// Name of app to launch
+		NULL,	// Default process security attributes
+		NULL,	// Default thread security attributes
+		FALSE,	// Don't inherit handles from the parent
+		0,	// Normal priority
+		NULL,	// Use the same environment as the parent
+		NULL,	// Launch in the current directory
+		&si,	// Startup Information
+		&pi))	// Process information stored upon return
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+
+#else /* not WIN32 */
 	
 	pid = fork(); /* run new thread 1 */
 	switch(pid)
@@ -1352,7 +1449,7 @@ zabbix_log(LOG_LEVEL_WARNING, "RUN_COMMAND runed as NOWAIT",flag);
 			return SYSINFO_RET_FAIL;
 		case 0:
 			/* 
-			 * DON'T REMVE SLEEP
+			 * DON'T REMOVE SLEEP
 			 * sleep needed to return server result as "1"
 			 * then we can run "execl"
 			 * otherwise command print result into socket with STDOUT id
@@ -1378,8 +1475,9 @@ zabbix_log(LOG_LEVEL_WARNING, "RUN_COMMAND runed as NOWAIT",flag);
 		break;
 	}
 
+#endif /* WIN32 */
+
 	SET_UI64_RESULT(result, 1);
-#endif /* TODO */
 	
 	return	SYSINFO_RET_OK;
 }
@@ -1653,7 +1751,7 @@ int	check_ssh(char	*hostname, short port, int *value_int)
 
 /*		printf("[%s] [%s]\n",ssh_proto, ssh_server);*/
 
-		snprintf(out,sizeof(out)-1,"SSH-%s-%s\r\n", ssh_proto, "zabbix_agent");
+		zbx_snprintf(out,sizeof(out),"SSH-%s-%s\r\n", ssh_proto, "zabbix_agent");
 		send(s,out,strlen(out),0);
 
 /*		printf("[%s]\n",out);*/

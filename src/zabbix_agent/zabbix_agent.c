@@ -202,15 +202,15 @@ int	main(int argc, char **argv)
 	
 	process(s, 0, &result);
 	if(result.type & AR_DOUBLE)
-		snprintf(value, MAX_STRING_LEN-1, "%f", result.dbl);
+		zbx_snprintf(value, MAX_STRING_LEN, "%f", result.dbl);
 	else if(result.type & AR_UINT64)
-		snprintf(value, MAX_STRING_LEN-1, ZBX_FS_UI64, result.ui64);
+		zbx_snprintf(value, MAX_STRING_LEN, ZBX_FS_UI64, result.ui64);
 	else if(result.type & AR_STRING)
-		snprintf(value, MAX_STRING_LEN-1, "%s", result.str);
+		zbx_snprintf(value, MAX_STRING_LEN, "%s", result.str);
 	else if(result.type & AR_TEXT)
-		snprintf(value, MAX_STRING_LEN-1, "%s", result.text);
+		zbx_snprintf(value, MAX_STRING_LEN, "%s", result.text);
 	else if(result.type & AR_MESSAGE)
-		snprintf(value, MAX_STRING_LEN-1, "%s", result.msg);
+		zbx_snprintf(value, MAX_STRING_LEN, "%s", result.msg);
 	free_result(&result);
   
 	printf("%s\n",value);

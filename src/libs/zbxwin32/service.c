@@ -188,21 +188,9 @@ static VOID WINAPI ServiceEntry(DWORD argc,LPTSTR *argv)
 	// Dynamically import functions that may not be presented in all Windows versions
 	ImportSymbols();
 
-#ifdef TODO
-
-	// Load subagents
-	if (subagentNameList!=NULL)
-	{
-		for(i=0; subagentNameList[i].name!=NULL; i++)
-		LoadSubAgent(subagentNameList[i].name,subagentNameList[i].cmdLine);
-
-		FreeSubagentNameList();
-	}
-#endif /* TODO */
-
 	// Internal command aliases
 	sprintf(counterPath,"perf_counter[\\%s\\%s]",GetCounterName(PCI_SYSTEM),GetCounterName(PCI_SYSTEM_UP_TIME));
-	AddAlias("system.uptime",counterPath);
+	add_alias("system.uptime",counterPath);
 
 	// Now service is running
 	serviceStatus.dwCurrentState	= SERVICE_RUNNING;
@@ -219,6 +207,7 @@ static VOID WINAPI ServiceEntry(DWORD argc,LPTSTR *argv)
 
 void init_service(void)
 {
+	int c = 0;
 	static SERVICE_TABLE_ENTRY serviceTable[] = {
 		{ ZABBIX_SERVICE_NAME, (LPSERVICE_MAIN_FUNCTION)ServiceEntry },
 		{ NULL,NULL } 
@@ -255,7 +244,7 @@ void init_service(void)
 	{
 		if(ERROR_FAILED_SERVICE_CONTROLLER_CONNECT == GetLastError())
 		{
-			zbx_error("!!!ATTENTION!!! ZABBIX Agent runned as a console application. !!!ATTENTION!!!");
+			zbx_error("\n\n\t!!!ATTENTION!!! ZABBIX Agent runned as a console application. !!!ATTENTION!!!\n");
 			MAIN_ZABBIX_ENTRY();
 		}
 		else

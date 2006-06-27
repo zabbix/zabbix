@@ -398,16 +398,16 @@ LOG_FUNC_CALL("In get_active_checks()");
 			{
 				case 	WSAETIMEDOUT:
 						zabbix_log( LOG_LEVEL_WARNING, "Timeout while receiving data from [%s:%d]",server,port);
-						snprintf(error,max_error_len-1,"Timeout while receiving data from [%s:%d]",server,port);
+						zbx_snprintf(error,max_error_len,"Timeout while receiving data from [%s:%d]",server,port);
 						break;
 				case	ECONNRESET:
 						zabbix_log( LOG_LEVEL_WARNING, "Connection reset by peer.");
-						snprintf(error,max_error_len-1,"Connection reset by peer.");
+						zbx_snprintf(error,max_error_len,"Connection reset by peer.");
 						close(s);
 						return	NETWORK_ERROR;
 				default:
 						zabbix_log( LOG_LEVEL_WARNING, "Error while receiving data from [%s:%d] [%s]",server,port,strerror(errno));
-						snprintf(error,max_error_len-1,"Error while receiving data from [%s:%d] [%s]",server,port,strerror(errno));
+						zbx_snprintf(error,max_error_len,"Error while receiving data from [%s:%d] [%s]",server,port,strerror(errno));
 			} 
 			close(s);
 			return	FAIL;

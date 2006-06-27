@@ -382,16 +382,16 @@ void	trend(void)
 
 	int		i,j;
 
-	snprintf(sql,sizeof(sql)-1,"select itemid from items");
+	zbx_snprintf(sql,sizeof(sql),"select itemid from items");
 	result2 = DBselect(sql);
 	for(i=0;i<DBnum_rows(result2);i++)
 	{
-		snprintf(sql,sizeof(sql)-1,"select clock-clock%%3600, count(*),min(value),avg(value),max(value) from history where itemid=%d group by 1",atoi(DBget_field(result2,i,0)));
+		zbx_snprintf(sql,sizeof(sql),"select clock-clock%%3600, count(*),min(value),avg(value),max(value) from history where itemid=%d group by 1",atoi(DBget_field(result2,i,0)));
 		result = DBselect(sql);
 	
 		for(j=0;j<DBnum_rows(result);j++)
 		{
-			snprintf(sql,sizeof(sql)-1,"insert into trends (itemid, clock, num, value_min, value_avg, value_max) values (%d,%d,%d,%f,%f,%f)",atoi(DBget_field(result2,i,0)), atoi(DBget_field(result,j,0)),atoi(DBget_field(result,j,1)),atof(DBget_field(result,j,2)),atof(DBget_field(result,j,3)),atof(DBget_field(result,j,4)));
+			zbx_snprintf(sql,sizeof(sql),"insert into trends (itemid, clock, num, value_min, value_avg, value_max) values (%d,%d,%d,%f,%f,%f)",atoi(DBget_field(result2,i,0)), atoi(DBget_field(result,j,0)),atoi(DBget_field(result,j,1)),atof(DBget_field(result,j,2)),atof(DBget_field(result,j,3)),atof(DBget_field(result,j,4)));
 			DBexecute(sql);
 		}
 		DBfree_result(result);
@@ -616,7 +616,7 @@ int main(int argc, char **argv)
 
 	DBconnect();
 
-	snprintf(sql,sizeof(sql)-1,"select refresh_unsupported from config");
+	zbx_snprintf(sql,sizeof(sql),"select refresh_unsupported from config");
 	result = DBselect(sql);
 	row = DBfetch(result);
 

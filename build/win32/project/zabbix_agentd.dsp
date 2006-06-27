@@ -4,7 +4,7 @@
 
 # TARGTYPE "Win32 (x86) Console Application" 0x0103
 
-CFG=zabbix_agentd - Win32 TODO
+CFG=zabbix_agentd - Win32 Test
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
@@ -13,13 +13,14 @@ CFG=zabbix_agentd - Win32 TODO
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "zabbix_agentd.mak" CFG="zabbix_agentd - Win32 TODO"
+!MESSAGE NMAKE /f "zabbix_agentd.mak" CFG="zabbix_agentd - Win32 Test"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
 !MESSAGE "zabbix_agentd - Win32 Release" (based on "Win32 (x86) Console Application")
 !MESSAGE "zabbix_agentd - Win32 Debug" (based on "Win32 (x86) Console Application")
 !MESSAGE "zabbix_agentd - Win32 TODO" (based on "Win32 (x86) Console Application")
+!MESSAGE "zabbix_agentd - Win32 Test" (based on "Win32 (x86) Console Application")
 !MESSAGE 
 
 # Begin Project
@@ -92,7 +93,32 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "../include/" /I "../../../include/" /D "_DEBUG" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /FR /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W4 /Gm /GX /ZI /Od /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "TODO" /FR /YX /FD /GZ /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "TODO" /FR /YX /FD /GZ /c
+# ADD BASE RSC /l 0x409 /fo"Debug/zabbixw32.res" /d "_DEBUG"
+# ADD RSC /l 0x409 /fo"Debug/zabbixw32.res" /d "_DEBUG"
+BSC32=bscmake.exe
+# ADD BASE BSC32 /nologo
+# ADD BSC32 /nologo
+LINK32=link.exe
+# ADD BASE LINK32 ws2_32.lib pdh.lib psapi.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
+# ADD LINK32 ws2_32.lib pdh.lib psapi.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+# PROP BASE Use_MFC 0
+# PROP BASE Use_Debug_Libraries 1
+# PROP BASE Output_Dir "zabbix_agentd___Win32_Test"
+# PROP BASE Intermediate_Dir "zabbix_agentd___Win32_Test"
+# PROP BASE Ignore_Export_Lib 0
+# PROP BASE Target_Dir ""
+# PROP Use_MFC 0
+# PROP Use_Debug_Libraries 1
+# PROP Output_Dir "Test"
+# PROP Intermediate_Dir "Test"
+# PROP Ignore_Export_Lib 0
+# PROP Target_Dir ""
+# ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /FR /YX /FD /GZ /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "ZABBIX_TEST" /FR /YX /FD /GZ /c
 # ADD BASE RSC /l 0x409 /fo"Debug/zabbixw32.res" /d "_DEBUG"
 # ADD RSC /l 0x409 /fo"Debug/zabbixw32.res" /d "_DEBUG"
 BSC32=bscmake.exe
@@ -109,6 +135,7 @@ LINK32=link.exe
 # Name "zabbix_agentd - Win32 Release"
 # Name "zabbix_agentd - Win32 Debug"
 # Name "zabbix_agentd - Win32 TODO"
+# Name "zabbix_agentd - Win32 Test"
 # Begin Group "src"
 
 # PROP Default_Filter ""
@@ -121,6 +148,10 @@ LINK32=link.exe
 # Begin Source File
 
 SOURCE=..\..\..\src\libs\zbxcommon\comms.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxcommon\gnuregex.c
 # End Source File
 # Begin Source File
 
@@ -295,13 +326,37 @@ SOURCE=..\..\..\src\libs\zbxnix\daemon.c
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+# PROP BASE Exclude_From_Build 1
+# PROP Exclude_From_Build 1
+
 !ENDIF 
 
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\..\src\libs\zbxnix\pid.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
 # PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+# PROP BASE Exclude_From_Build 1
+# PROP Exclude_From_Build 1
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "zbxsys"
@@ -428,6 +483,10 @@ SOURCE=..\..\..\include\db.h
 # Begin Source File
 
 SOURCE=..\..\..\include\email.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\gnuregex.h
 # End Source File
 # Begin Source File
 

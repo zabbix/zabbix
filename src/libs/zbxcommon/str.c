@@ -146,6 +146,34 @@ void zbx_error(const char *fmt, ...)
 	fflush(stderr);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_snprintf                                                     *
+ *                                                                            *
+ * Purpose: Sequrity version of snprintf function.                            *
+ *          Add zero character at the end of string.                          *
+ *                                                                            *
+ * Parameters: str - distination buffer poiner                                *
+ *             count - size of distination buffer                             *
+ *             fmt - format                                                   *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ ******************************************************************************/
+void zbx_snprintf(char* str, size_t count, const char *fmt, ...)
+{
+	va_list args;
+    
+	va_start(args, fmt);
+
+	vsnprintf(str, count, fmt, args);
+	str[count-1] = '\0';
+
+	va_end(args);
+}
+
 /* Has to be rewritten to avoi malloc */
 char *string_replace(char *str, const char *sub_str1, const char *sub_str2)
 {

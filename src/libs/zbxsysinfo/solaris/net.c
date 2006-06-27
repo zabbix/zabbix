@@ -379,7 +379,7 @@ int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RES
     
     memset(command, '\0', sizeof(command));
 
-    snprintf(command, sizeof(command)-1, "netstat -an | grep '*.%s' | wc -l", param);
+    zbx_snprintf(command, sizeof(command), "netstat -an | grep '*.%s' | wc -l", param);
    
     return EXECUTE(NULL, command, flags, result);
 }

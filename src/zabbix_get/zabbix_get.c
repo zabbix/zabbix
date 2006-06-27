@@ -175,7 +175,7 @@ static int	get_value(char *server,int port,char *key,char *value)
 		return	FAIL;
 	}
 
-	snprintf(tosend,sizeof(tosend)-1,"%s\n",key);
+	zbx_snprintf(tosend,sizeof(tosend),"%s\n",key);
 
 	if(write(s,tosend,strlen(tosend)) == -1)
 /*	if( sendto(s,tosend,strlen(tosend),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )*/

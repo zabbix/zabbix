@@ -306,7 +306,8 @@
 #endif
 				    
 /* Secure string copy */
-#define strscpy(x,y) { strncpy(x,y,sizeof(x)); x[sizeof(x)-1]=0; }
+#define strsncpy(x,y,size) strncpy(x,y,size); x[size-1]='\0'
+#define strscpy(x,y) strsncpy(x,y,sizeof(x))
 
 /* list structure as item of agent return vaile */					 
 #define ZBX_LIST_ITEM struct zbx_list_item_s
@@ -433,6 +434,7 @@ int	calculate_item_nextcheck(int delay, int now);
 void	zbx_setproctitle(const char *fmt, ...);
 double	zbx_getseconds(void);
 void	zbx_error(const char *fmt, ...);
+void	zbx_snprintf(char* str, size_t count, const char *fmt, ...);
 
 int	set_result_type(AGENT_RESULT *result, int value_type, char *c);
 

@@ -143,11 +143,11 @@ int	process_trap(int sockfd,char *s, int max_len)
 		ret=process_data(sockfd,server,key,value_string,lastlogsize,timestamp,source,severity);
 		if( SUCCEED == ret)
 		{
-			snprintf(result,sizeof(result)-1,"OK\n");
+			zbx_snprintf(result,sizeof(result),"OK\n");
 		}
 		else
 		{
-			snprintf(result,sizeof(result)-1,"NOT OK\n");
+			zbx_snprintf(result,sizeof(result),"NOT OK\n");
 		}
 		zabbix_log( LOG_LEVEL_DEBUG, "Sending back [%s]", result);
 		zabbix_log( LOG_LEVEL_DEBUG, "Length [%d]", strlen(result));

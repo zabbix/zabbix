@@ -1546,7 +1546,7 @@ static int TCP_LISTEN(const char *cmd, const char *parameter,double  *value, con
   
   memset(command, '\0', sizeof command);
 
-  snprintf(command, sizeof command-1, "netstat -an | grep '*.%s' | wc -l", parameter);
+  zbx_snprintf(command, sizeof(command), "netstat -an | grep '*.%s' | wc -l", parameter);
    
   return EXECUTE(NULL, command, value, msg, mlen_max);
 }

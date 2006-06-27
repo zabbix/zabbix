@@ -79,7 +79,7 @@ static int evaluate_LOGSOURCE(char *value, DB_ITEM *item, char *parameter)
 
 	now=time(NULL);
 
-	snprintf(sql,sizeof(sql)-1,"select source from history_log where itemid=%d order by clock desc",item->itemid);
+	zbx_snprintf(sql,sizeof(sql),"select source from history_log where itemid=%d order by clock desc",item->itemid);
 
 	result = DBselectN(sql,1);
 	row = DBfetch(result);
@@ -138,7 +138,7 @@ static int evaluate_LOGSEVERITY(char *value, DB_ITEM *item, char *parameter)
 
 	now=time(NULL);
 
-	snprintf(sql,sizeof(sql)-1,"select severity from history_log where itemid=%d order by clock desc",item->itemid);
+	zbx_snprintf(sql,sizeof(sql),"select severity from history_log where itemid=%d order by clock desc",item->itemid);
 
 	result = DBselectN(sql,1);
 	row = DBfetch(result);
@@ -198,7 +198,7 @@ static int evaluate_COUNT(char *value, DB_ITEM *item, int parameter)
 	{
 		strscpy(table,"history");
 	}
-	snprintf(sql,sizeof(sql)-1,"select count(value) from %s where clock>%d and itemid=%d",table,now-parameter,item->itemid);
+	zbx_snprintf(sql,sizeof(sql),"select count(value) from %s where clock>%d and itemid=%d",table,now-parameter,item->itemid);
 
 	result = DBselect(sql);
 	row = DBfetch(result);
@@ -263,7 +263,7 @@ static int evaluate_SUM(char *value, DB_ITEM *item, int parameter, int flag)
 		{
 			strscpy(table,"history");
 		}
-		snprintf(sql,sizeof(sql)-1,"select sum(value) from %s where clock>%d and itemid=%d",table, now-parameter,item->itemid);
+		zbx_snprintf(sql,sizeof(sql),"select sum(value) from %s where clock>%d and itemid=%d",table, now-parameter,item->itemid);
 
 		result = DBselect(sql);
 		row = DBfetch(result);
@@ -287,7 +287,7 @@ static int evaluate_SUM(char *value, DB_ITEM *item, int parameter, int flag)
 		{
 			strscpy(table,"history");
 		}
-		snprintf(sql,sizeof(sql)-1,"select value from %s where itemid=%d order by clock desc",table,item->itemid);
+		zbx_snprintf(sql,sizeof(sql),"select value from %s where itemid=%d order by clock desc",table,item->itemid);
 		result = DBselectN(sql, parameter);
 		row = DBfetch(result);
 		if(!row || DBis_null(row[0])==SUCCEED)
@@ -305,12 +305,12 @@ static int evaluate_SUM(char *value, DB_ITEM *item, int parameter, int flag)
 #else
 					sum_uint64+=atol(row[0]);
 #endif
-				snprintf(value,MAX_STRING_LEN-1,ZBX_FS_UI64, sum_uint64);
+				zbx_snprintf(value,MAX_STRING_LEN,ZBX_FS_UI64, sum_uint64);
 			}
 			else
 			{
 				while((row=DBfetch(result))) sum+=atof(row[0]);
-				snprintf(value,MAX_STRING_LEN-1,"%f", sum);
+				zbx_snprintf(value,MAX_STRING_LEN,"%f", sum);
 			}
 		}
 	}
@@ -362,7 +362,7 @@ static int evaluate_AVG(char *value,DB_ITEM	*item,int parameter,int flag)
 
 	if(flag == ZBX_FLAG_SEC)
 	{
-		snprintf(sql,sizeof(sql)-1,"select avg(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
+		zbx_snprintf(sql,sizeof(sql),"select avg(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
 
 		result = DBselect(sql);
 		row = DBfetch(result);
@@ -380,7 +380,7 @@ static int evaluate_AVG(char *value,DB_ITEM	*item,int parameter,int flag)
 	}
 	else if(flag == ZBX_FLAG_VALUES)
 	{
-		snprintf(sql,sizeof(sql)-1,"select value from history where itemid=%d order by clock desc",item->itemid);
+		zbx_snprintf(sql,sizeof(sql),"select value from history where itemid=%d order by clock desc",item->itemid);
 		result = DBselectN(sql, parameter);
 		rows=0;
 		while((row=DBfetch(result)))
@@ -395,7 +395,7 @@ static int evaluate_AVG(char *value,DB_ITEM	*item,int parameter,int flag)
 		}
 		else
 		{
-			snprintf(value,MAX_STRING_LEN-1,"%f", sum/(double)rows);
+			zbx_snprintf(value,MAX_STRING_LEN,"%f", sum/(double)rows);
 		}
 	}
 	else
@@ -460,7 +460,7 @@ static int evaluate_MIN(char *value,DB_ITEM	*item,int parameter, int flag)
 		{
 			strscpy(table,"history");
 		}
-		snprintf(sql,sizeof(sql)-1,"select min(value) from %s where clock>%d and itemid=%d",table, now-parameter,item->itemid);
+		zbx_snprintf(sql,sizeof(sql),"select min(value) from %s where clock>%d and itemid=%d",table, now-parameter,item->itemid);
 		result = DBselect(sql);
 		row = DBfetch(result);
 		if(!row || DBis_null(row[0])==SUCCEED)
@@ -484,7 +484,7 @@ static int evaluate_MIN(char *value,DB_ITEM	*item,int parameter, int flag)
 		{
 			strscpy(table,"history");
 		}
-		snprintf(sql,sizeof(sql)-1,"select value from %s where itemid=%d order by clock desc",table,item->itemid);
+		zbx_snprintf(sql,sizeof(sql),"select value from %s where itemid=%d order by clock desc",table,item->itemid);
 		result = DBselectN(sql,parameter);
 
 		rows=0;
@@ -518,11 +518,11 @@ static int evaluate_MIN(char *value,DB_ITEM	*item,int parameter, int flag)
 		{
 			if(item->value_type == ITEM_VALUE_TYPE_UINT64)
 			{
-				snprintf(value,MAX_STRING_LEN-1,ZBX_FS_UI64, min_uint64);
+				zbx_snprintf(value,MAX_STRING_LEN,ZBX_FS_UI64, min_uint64);
 			}
 			else
 			{
-				snprintf(value,MAX_STRING_LEN-1,"%f", min);
+				zbx_snprintf(value,MAX_STRING_LEN,"%f", min);
 			}
 		}
 	}
@@ -589,7 +589,7 @@ static int evaluate_MAX(char *value,DB_ITEM *item,int parameter,int flag)
 		{
 			strscpy(table,"history");
 		}
-		snprintf(sql,sizeof(sql)-1,"select max(value) from %s where clock>%d and itemid=%d",table,now-parameter,item->itemid);
+		zbx_snprintf(sql,sizeof(sql),"select max(value) from %s where clock>%d and itemid=%d",table,now-parameter,item->itemid);
 
 zabbix_log(LOG_LEVEL_DEBUG, "DBselect" );
 		result = DBselect(sql);
@@ -620,7 +620,7 @@ zabbix_log(LOG_LEVEL_DEBUG, "del_zeroes" );
 		{
 			strscpy(table,"history");
 		}
-		snprintf(sql,sizeof(sql)-1,"select value from %s where itemid=%d order by clock desc",table,item->itemid);
+		zbx_snprintf(sql,sizeof(sql),"select value from %s where itemid=%d order by clock desc",table,item->itemid);
 		result = DBselectN(sql,parameter);
 		rows=0;
 		while((row=DBfetch(result)))
@@ -652,11 +652,11 @@ zabbix_log(LOG_LEVEL_DEBUG, "del_zeroes" );
 		{
 			if(item->value_type == ITEM_VALUE_TYPE_UINT64)
 			{
-				snprintf(value,MAX_STRING_LEN-1,ZBX_FS_UI64, max_uint64);
+				zbx_snprintf(value,MAX_STRING_LEN,ZBX_FS_UI64, max_uint64);
 			}
 			else
 			{
-				snprintf(value,MAX_STRING_LEN-1,"%f", max);
+				zbx_snprintf(value,MAX_STRING_LEN,"%f", max);
 			}
 		}
 	}
@@ -713,7 +713,7 @@ static int evaluate_DELTA(char *value,DB_ITEM *item,int parameter, int flag)
 
 	if(flag == ZBX_FLAG_SEC)
 	{
-		snprintf(sql,sizeof(sql)-1,"select max(value)-min(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
+		zbx_snprintf(sql,sizeof(sql),"select max(value)-min(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
 
 		result = DBselect(sql);
 		row = DBfetch(result);
@@ -730,7 +730,7 @@ static int evaluate_DELTA(char *value,DB_ITEM *item,int parameter, int flag)
 	}
 	else if(flag == ZBX_FLAG_VALUES)
 	{
-		snprintf(sql,sizeof(sql)-1,"select value from history where itemid=%d order by clock desc",item->itemid);
+		zbx_snprintf(sql,sizeof(sql),"select value from history where itemid=%d order by clock desc",item->itemid);
 		result = DBselectN(sql,parameter);
 		rows=0;
 		while((row=DBfetch(result)))
@@ -754,7 +754,7 @@ static int evaluate_DELTA(char *value,DB_ITEM *item,int parameter, int flag)
 		}
 		else
 		{
-			snprintf(value,MAX_STRING_LEN-1,"%f", max-min);
+			zbx_snprintf(value,MAX_STRING_LEN,"%f", max-min);
 		}
 	}
 	else
@@ -850,7 +850,7 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 			if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) || (item->value_type==ITEM_VALUE_TYPE_UINT64))
 			{
 				zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 1");
-				snprintf(value,MAX_STRING_LEN-1,"%f",item->lastvalue);
+				zbx_snprintf(value,MAX_STRING_LEN,"%f",item->lastvalue);
 				del_zeroes(value);
 				zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 2 value [%s]", value);
 			}
@@ -873,7 +873,7 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 		{
 			if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) || (item->value_type==ITEM_VALUE_TYPE_UINT64))
 			{
-				snprintf(value,MAX_STRING_LEN-1,"%f",item->prevvalue);
+				zbx_snprintf(value,MAX_STRING_LEN,"%f",item->prevvalue);
 				del_zeroes(value);
 			}
 			else
@@ -929,7 +929,7 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 	{
 		now=time(NULL);
                 tm=localtime(&now);
-                snprintf(value,MAX_STRING_LEN-1,"%.4d%.2d%.2d",tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday);
+                zbx_snprintf(value,MAX_STRING_LEN,"%.4d%.2d%.2d",tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday);
 	}
 	else if(strcmp(function,"dayofweek")==0)
 	{
@@ -938,13 +938,13 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 		/* The number of days since Sunday, in the range 0 to 6. */
 		day=tm->tm_wday;
 		if(0 == day)	day=7;
-                snprintf(value,MAX_STRING_LEN-1,"%d", day);
+                zbx_snprintf(value,MAX_STRING_LEN,"%d", day);
 	}
 	else if(strcmp(function,"time")==0)
 	{
 		now=time(NULL);
                 tm=localtime(&now);
-                snprintf(value,MAX_STRING_LEN-1,"%.2d%.2d%.2d",tm->tm_hour,tm->tm_min,tm->tm_sec);
+                zbx_snprintf(value,MAX_STRING_LEN,"%.2d%.2d%.2d",tm->tm_hour,tm->tm_min,tm->tm_sec);
 	}
 	else if(strcmp(function,"abschange")==0)
 	{
@@ -956,7 +956,7 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 		{
 			if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) || (item->value_type==ITEM_VALUE_TYPE_UINT64))
 			{
-				snprintf(value,MAX_STRING_LEN-1,"%f",(float)abs(item->lastvalue-item->prevvalue));
+				zbx_snprintf(value,MAX_STRING_LEN,"%f",(float)abs(item->lastvalue-item->prevvalue));
 				del_zeroes(value);
 			}
 			else
@@ -982,7 +982,7 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 		{
 			if(item->value_type==ITEM_VALUE_TYPE_FLOAT)
 			{
-				snprintf(value,MAX_STRING_LEN-1,"%f",item->lastvalue-item->prevvalue);
+				zbx_snprintf(value,MAX_STRING_LEN,"%f",item->lastvalue-item->prevvalue);
 				del_zeroes(value);
 			}
 			else
@@ -1071,7 +1071,7 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 	else if(strcmp(function,"now")==0)
 	{
 		now=time(NULL);
-                snprintf(value,MAX_STRING_LEN-1,"%d",(int)now);
+                zbx_snprintf(value,MAX_STRING_LEN,"%d",(int)now);
 	}
 	else if(strcmp(function,"fuzzytime")==0)
 	{
@@ -1186,11 +1186,11 @@ int	add_value_suffix(char *value, DB_ITEM *item)
 /*		if(cmp_double((double)round(value_float), value_float) == 0) */
 	if(cmp_double((int)(value_float+0.5), value_float) == 0)
 	{
-		snprintf(value, MAX_STRING_LEN-1, "%.0f %s%s", value_float, suffix, item->units);
+		zbx_snprintf(value, MAX_STRING_LEN, "%.0f %s%s", value_float, suffix, item->units);
 	}
 	else
 	{
-		snprintf(value, MAX_STRING_LEN-1, "%.2f %s%s", value_float, suffix, item->units);
+		zbx_snprintf(value, MAX_STRING_LEN, "%.2f %s%s", value_float, suffix, item->units);
 	}
 	
 	zabbix_log(LOG_LEVEL_DEBUG, "Value [%s] [%f] Suffix [%s] Units [%s]",value,value_float,suffix,item->units);
@@ -1227,7 +1227,7 @@ int	replace_value_by_map(char *value, int valuemapid)
 	
 	if(valuemapid == 0)	return FAIL;
 	
-	snprintf(sql,sizeof(sql)-1,"select newvalue from mappings where valuemapid=%d and value='%s'",
+	zbx_snprintf(sql,sizeof(sql),"select newvalue from mappings where valuemapid=%d and value='%s'",
 			valuemapid, value);
 	result = DBselect(sql);
 	row = DBfetch(result);
@@ -1241,7 +1241,7 @@ int	replace_value_by_map(char *value, int valuemapid)
 	or_value = sql;	/* sql variarbvle used as tmp - original value */
 	strncpy(sql,value,MAX_STRING_LEN);
 	
-	snprintf(value, MAX_STRING_LEN-1, "%s (%s)", new_value, or_value);
+	zbx_snprintf(value, MAX_STRING_LEN, "%s (%s)", new_value, or_value);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Value: $s", value);
 	return SUCCEED;
@@ -1277,7 +1277,7 @@ int evaluate_FUNCTION2(char *value,char *host,char *key,char *function,char *par
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate_FUNCTION2()" );
 
-	snprintf(sql,sizeof(sql)-1,"select %s where h.host='%s' and h.hostid=i.hostid and i.key_='%s'", ZBX_SQL_ITEM_SELECT, host, key );
+	zbx_snprintf(sql,sizeof(sql),"select %s where h.host='%s' and h.hostid=i.hostid and i.key_='%s'", ZBX_SQL_ITEM_SELECT, host, key );
 	result = DBselect(sql);
 
 	row = DBfetch(result);

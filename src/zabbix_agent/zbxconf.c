@@ -88,7 +88,7 @@ void    load_config(void)
 //		{"CollectorTimeout",	&CONFIG_COLLECTOR_TIMEOUT,	0,	TYPE_STRING,PARM_OPT,0,0},
 		{"LogUnresolvedSymbols",&CONFIG_LOG_UNRES_SYMB,			0,	TYPE_STRING,PARM_OPT,0,1},
 
-		{"Alias",		0,	&AddAlias,	TYPE_STRING,PARM_OPT,0,0},
+		{"Alias",		0,	&add_alias_from_config,	TYPE_STRING,PARM_OPT,0,0},
 		
 #if defined(ZABBIX_DAEMON)
 		{"Plugin",		0,	&add_plugin,	TYPE_STRING,PARM_OPT,0,0},
@@ -141,18 +141,18 @@ void    load_config(void)
 
 
 
-static int     add_parameter(char *value)
+static int     add_parameter(char *key)
 {
-	char    *value2;
+	char    *command;
 
-	value2 = strstr(value,",");
-	if(NULL == value2)
+	command = strstr(key,",");
+	if(NULL == command)
 	{
 		return  FAIL;
 	}
-	value2[0]=0;
-	value2++;
-	add_user_parameter(value, value2);
+	command[0]=0;
+	command++;
+	add_user_parameter(key, command);
 	return  SUCCEED;
 }
 

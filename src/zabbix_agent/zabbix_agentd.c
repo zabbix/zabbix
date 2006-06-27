@@ -36,11 +36,18 @@
 #include "listener.h"
 #include "service.h"
 #include "daemon.h"
+#include "alias.h"
 
 #define	LISTENQ 1024
 
 char *progname = NULL;
-char title_message[] = "ZABBIX Agent (daemon)";
+char title_message[] = "ZABBIX Agent "
+#if defined(WIN32)
+	"(service)";
+#else /* not WIN32 */
+	"(daemon)";
+#endif
+
 char usage_message[] = "[-vhp] [-c <file>] [-t <metric>]";
 
 #ifndef HAVE_GETOPT_LONG
@@ -108,7 +115,7 @@ static int parse_commandline(int argc, char **argv)
 			if(task == ZBX_TASK_START) 
 			{
 				task = ZBX_TASK_TEST_METRIC;
-				TEST_METRIC = zbx_optarg;
+				TEST_METRIC = strdup(zbx_optarg);
 			}
 			break;
 		default:
@@ -218,7 +225,7 @@ void MAIN_ZABBIX_ENTRY(void)
 	}
 }
 
-static char* get_file_name(char *path)
+static char* get_programm_name(char *path)
 {
 	char	*p;
 	char	*filename;
@@ -267,7 +274,7 @@ int	main(int argc, char **argv)
 {
 	int	task = ZBX_TASK_START;
 
-	progname = get_file_name(argv[0]);
+	progname = get_programm_name(argv[0]);
 
 	task = parse_commandline(argc, argv);
 
@@ -302,6 +309,7 @@ int	main(int argc, char **argv)
 	//WriteLog(MSG_AGENT_SHUTDOWN, EVENTLOG_INFORMATION_TYPE,NULL);
 
 	zabbix_close_log();
+	alias_list_free();
 
 	return SUCCEED;
 }

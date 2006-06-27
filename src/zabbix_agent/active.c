@@ -249,9 +249,9 @@ static int	get_active_checks(char *server, unsigned short port, char *error, int
 	if(hp==NULL)
 	{
 #ifdef	HAVE_HSTRERROR		
-		snprintf(error, max_error_len-1,"gethostbyname() failed [%s]", (char*)hstrerror((int)h_errno));
+		zbx_snprintf(error, max_error_len,"gethostbyname() failed [%s]", (char*)hstrerror((int)h_errno));
 #else
-		snprintf(error, max_error_len-1,"gethostbyname() failed [%d]", h_errno);
+		zbx_snprintf(error, max_error_len,"gethostbyname() failed [%d]", h_errno);
 #endif
 		zabbix_log( LOG_LEVEL_WARNING, error);
 		return	NETWORK_ERROR;
@@ -263,7 +263,7 @@ static int	get_active_checks(char *server, unsigned short port, char *error, int
 
 	if(INVALID_SOCKET == (s = socket(AF_INET,SOCK_STREAM,0)))
 	{
-		snprintf(error, max_error_len-1, "Cannot create socket [%s]", strerror_from_system(errno));
+		zbx_snprintf(error, max_error_len, "Cannot create socket [%s]", strerror_from_system(errno));
 		zabbix_log(LOG_LEVEL_WARNING, error);
 		return	FAIL;
 	}
@@ -273,13 +273,13 @@ static int	get_active_checks(char *server, unsigned short port, char *error, int
 		switch (errno)
 		{
 			case EINTR:
-				snprintf(error,max_error_len-1,"Timeout while connecting to [%s:%u]",server,port);
+				zbx_snprintf(error,max_error_len,"Timeout while connecting to [%s:%u]",server,port);
 				break;
 			case EHOSTUNREACH:
-				snprintf(error,max_error_len-1,"No route to host [%s:%u]",server,port);
+				zbx_snprintf(error,max_error_len,"No route to host [%s:%u]",server,port);
 				break;
 			default:
-				snprintf(error,max_error_len-1,"Cannot connect to [%s:%u] [%s]",server,port,strerror(errno));
+				zbx_snprintf(error,max_error_len,"Cannot connect to [%s:%u] [%s]",server,port,strerror(errno));
 				break;
 		} 
 		zabbix_log(LOG_LEVEL_WARNING, error);
@@ -287,7 +287,7 @@ static int	get_active_checks(char *server, unsigned short port, char *error, int
 		return	NETWORK_ERROR;
 	}
 
-	snprintf(buf, MAX_BUF_LEN-1, "%s\n%s\n","ZBX_GET_ACTIVE_CHECKS", CONFIG_HOSTNAME);
+	zbx_snprintf(buf, MAX_BUF_LEN, "%s\n%s\n","ZBX_GET_ACTIVE_CHECKS", CONFIG_HOSTNAME);
 	zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", buf);
 
 	if(SOCKET_ERROR == zbx_sock_write(s, buf, strlen(buf)))
@@ -295,10 +295,10 @@ static int	get_active_checks(char *server, unsigned short port, char *error, int
 		switch (errno)
 		{
 			case EINTR:
-				snprintf(error,max_error_len-1,"Timeout while sending data to [%s:%u]",server,port);
+				zbx_snprintf(error,max_error_len,"Timeout while sending data to [%s:%u]",server,port);
 				break;
 			default:
-				snprintf(error,max_error_len-1,"Error while sending data to [%s:%u] [%s]",server,port,strerror(errno));
+				zbx_snprintf(error,max_error_len,"Error while sending data to [%s:%u] [%s]",server,port,strerror(errno));
 				break;
 		} 
 		zabbix_log(LOG_LEVEL_WARNING, error);
@@ -321,13 +321,13 @@ static int	get_active_checks(char *server, unsigned short port, char *error, int
 			switch (errno)
 			{
 				case 	EINTR:
-						snprintf(error,max_error_len-1,"Timeout while receiving data from [%s:%u]",server,port);
+						zbx_snprintf(error,max_error_len,"Timeout while receiving data from [%s:%u]",server,port);
 						break;
 				case	ECONNRESET:
-						snprintf(error,max_error_len-1,"Connection reset by peer.");
+						zbx_snprintf(error,max_error_len,"Connection reset by peer.");
 						break;
 				default:
-						snprintf(error,max_error_len-1,"Error while receiving data from [%s:%u] [%s]",server,port,strerror(errno));
+						zbx_snprintf(error,max_error_len,"Error while receiving data from [%s:%u] [%s]",server,port,strerror(errno));
 						break;
 			} 
 			zabbix_log( LOG_LEVEL_WARNING, error);
@@ -459,7 +459,7 @@ static int	process_active_checks(char *server, unsigned short port)
 			count = 0;
 			while(process_log(filename,&active_metrics[i].lastlogsize,value) == 0)
 			{
-				snprintf(lastlogsize, MAX_STRING_LEN-1,"%d",active_metrics[i].lastlogsize);
+				zbx_snprintf(lastlogsize, MAX_STRING_LEN,"%d",active_metrics[i].lastlogsize);
 
 				if(send_value(server,port,CONFIG_HOSTNAME,active_metrics[i].key,value,lastlogsize) == FAIL)
 				{
@@ -483,15 +483,15 @@ static int	process_active_checks(char *server, unsigned short port)
 			
 			process(active_metrics[i].key, 0, &result);
 			if(result.type & AR_DOUBLE)
-				 snprintf(value, MAX_STRING_LEN-1, ZBX_FS_DBL, result.dbl);
+				 zbx_snprintf(value, MAX_STRING_LEN, ZBX_FS_DBL, result.dbl);
 			else if(result.type & AR_UINT64)
-                                 snprintf(value, MAX_STRING_LEN-1, ZBX_FS_UI64, result.ui64);
+                                 zbx_snprintf(value, MAX_STRING_LEN, ZBX_FS_UI64, result.ui64);
 			else if(result.type & AR_STRING)
-                                 snprintf(value, MAX_STRING_LEN-1, "%s", result.str);
+                                 zbx_snprintf(value, MAX_STRING_LEN, "%s", result.str);
 			else if(result.type & AR_TEXT)
-                                 snprintf(value, MAX_STRING_LEN-1, "%s", result.text);
+                                 zbx_snprintf(value, MAX_STRING_LEN, "%s", result.text);
 			else if(result.type & AR_MESSAGE)
-                                 snprintf(value, MAX_STRING_LEN-1, "%s", result.msg);
+                                 zbx_snprintf(value, MAX_STRING_LEN, "%s", result.msg);
 			free_result(&result);
 
 			zabbix_log( LOG_LEVEL_DEBUG, "For key [%s] received value [%s]", active_metrics[i].key, value);

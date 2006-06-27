@@ -31,19 +31,33 @@ static ALIAS *aliasList=NULL;
 // Add alias to the list
 // Returns 1 on success or 0 if alias with that name already exist
 //
+int	add_alias_from_config(char *line)
+{
+	char 	*name = NULL,
+		*value = NULL;
 
-int AddAlias(char *name,char *value)
+	name = line;
+	value = strchr(line,':');
+	if(NULL == value)
+		return FAIL;
+
+	*value = '\0';
+	value++;
+
+	return add_alias(name, value);
+}
+
+int	add_alias(const char *name, const char *value)
 {
 	ALIAS *alias;
-	int ret = 0;
 
-	for(alias=aliasList; ; alias=alias->next)
+	for(alias = aliasList; ; alias=alias->next)
 	{
 		/* Add new parameters */
 		if(alias == NULL)
 		{
-			alias=(ALIAS *)malloc(sizeof(ALIAS));
-			if (alias!=NULL)
+			alias = (ALIAS *)malloc(sizeof(ALIAS));
+			if (NULL != alias)
 			{
 				memset(alias,0,sizeof(ALIAS));
 				strncpy(alias->name, name, MAX_ALIAS_NAME-1);
@@ -52,7 +66,7 @@ int AddAlias(char *name,char *value)
 				alias->next=aliasList;
 				aliasList=alias;
 
-				ret = 1;
+				return SUCCEED;
 			}
 			break;
 		}
@@ -73,14 +87,13 @@ int AddAlias(char *name,char *value)
 			alias->next = aliasList;
 			aliasList = alias;
 
-			ret = 1;
-			break;
+			return SUCCEED;
 		}
 	}
-	return ret;
+	return FAIL;
 }
 
-void	FreeAliasList(void)
+void	alias_list_free(void)
 {
 	ALIAS	*curr;
 	ALIAS	*next;
@@ -99,22 +112,17 @@ void	FreeAliasList(void)
 // Checks parameter and expands it if aliased
 //
 
-void ExpandAlias(char *orig,char *expanded)
+void	alias_expand(const char *orig, char *expanded, int exp_buf_len)
 {
-   ALIAS *alias;
-   int ret = 1;
+	ALIAS *alias;
 
-   for(alias=aliasList;alias!=NULL;alias=alias->next)
-      if (!strcmp(alias->name,orig))
-      {
-         strcpy(expanded,alias->value);
-		 ret = 0;
-         break;
-      }
-
-	if(ret == 1)
+	for(alias = aliasList; alias!=NULL; alias = alias->next)
 	{
-		strcpy(expanded,orig);
+		if (!strcmp(alias->name,orig))
+		{
+			strsncpy(expanded, alias->value, exp_buf_len);
+			return;
+		}
 	}
-
+	strsncpy(expanded, orig, exp_buf_len);
 }

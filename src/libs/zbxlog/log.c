@@ -285,7 +285,7 @@ char *strerror_from_system(unsigned long error)
 		1023, 
 		NULL) == 0)
 	{
-		snprintf(buffer, 1024, "3. MSG 0x%08X - Unable to find message text [0x%X]", error , GetLastError());
+		zbx_snprintf(buffer, 1024, "3. MSG 0x%08X - Unable to find message text [0x%X]", error , GetLastError());
 	}
 
 	return buffer;
@@ -320,7 +320,7 @@ char *strerror_from_module(unsigned long error, const char *module)
 		1024,
 		NULL) == 0)
 	{
-		snprintf(buffer, 1024, "3. MSG 0x%08X - Unable to find message text [0x%X]", error , GetLastError());
+		zbx_snprintf(buffer, 1024, "3. MSG 0x%08X - Unable to find message text [0x%X]", error , GetLastError());
 	}
 
 	return buffer;

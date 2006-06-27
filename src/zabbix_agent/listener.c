@@ -59,11 +59,11 @@ static void	process_listener(ZBX_SOCKET sock)
 
 	process(command, 0, &result);
 
-        if(result.type & AR_DOUBLE)		snprintf(value, MAX_STRING_LEN-1, "%f", result.dbl);
-        else if(result.type & AR_UINT64)	snprintf(value, MAX_STRING_LEN-1, ZBX_FS_UI64, result.ui64);
-        else if(result.type & AR_STRING)	snprintf(value, MAX_STRING_LEN-1, "%s", result.str);
-        else if(result.type & AR_TEXT)		snprintf(value, MAX_STRING_LEN-1, "%s", result.text);
-        else if(result.type & AR_MESSAGE)	snprintf(value, MAX_STRING_LEN-1, "%s", result.msg);
+        if(result.type & AR_DOUBLE)		zbx_snprintf(value, MAX_STRING_LEN, "%f", result.dbl);
+        else if(result.type & AR_UINT64)	zbx_snprintf(value, MAX_STRING_LEN, ZBX_FS_UI64, result.ui64);
+        else if(result.type & AR_STRING)	zbx_snprintf(value, MAX_STRING_LEN, "%s", result.str);
+        else if(result.type & AR_TEXT)		zbx_snprintf(value, MAX_STRING_LEN, "%s", result.text);
+        else if(result.type & AR_MESSAGE)	zbx_snprintf(value, MAX_STRING_LEN, "%s", result.msg);
 
         free_result(&result);
 
@@ -127,6 +127,8 @@ ZBX_THREAD_ENTRY(listener_thread, pSock)
 		local_request_failed = 0;     /* Reset consecutive errors counter */
 		
 		zbx_setproctitle("processing request");
+
+		zabbix_log(LOG_LEVEL_DEBUG, "Processing request.");
 
 		if(SUCCEED == check_security(accept_sock, CONFIG_HOSTS_ALLOWED, 0))
 		{

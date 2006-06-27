@@ -40,7 +40,7 @@ int   process_log(char *filename,int *lastlogsize, char *value)
 	else
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Cannot open [%s] [%s]", filename, strerror(errno));
-		snprintf(value,MAX_STRING_LEN-1,"%s","ZBX_NOTSUPPORTED\n");
+		zbx_snprintf(value,MAX_STRING_LEN,"%s","ZBX_NOTSUPPORTED\n");
 		return 1;
 	}
 
@@ -48,14 +48,14 @@ int   process_log(char *filename,int *lastlogsize, char *value)
 	if(NULL == f)
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Cannot open [%s] [%s]", filename, strerror(errno));
-		snprintf(value,MAX_STRING_LEN-1,"%s","ZBX_NOTSUPPORTED\n");
+		zbx_snprintf(value,MAX_STRING_LEN,"%s","ZBX_NOTSUPPORTED\n");
 		return 1;
 	}
 
 	if(-1 == fseek(f,*lastlogsize,SEEK_SET))
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Cannot set postition to [%d] for [%s] [%s]", *lastlogsize, filename, strerror(errno));
-		snprintf(value,MAX_STRING_LEN-1,"%s","ZBX_NOTSUPPORTED\n");
+		zbx_snprintf(value,MAX_STRING_LEN,"%s","ZBX_NOTSUPPORTED\n");
 		fclose(f);
 		return 1;
 	}
