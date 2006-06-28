@@ -204,6 +204,12 @@ void    daemon_init(void)
 
 	}
 
+	/* Init log files */
+	if(CONFIG_LOG_FILE == NULL)
+		zabbix_open_log(LOG_TYPE_SYSLOG,CONFIG_LOG_LEVEL,NULL);
+	else
+		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,CONFIG_LOG_FILE);
+
 	if( (pid = fork()) != 0 )
 	{
 		exit( 0 );
@@ -552,11 +558,12 @@ int	main(int argc, char **argv)
 /* Must be before init_config() */
 	init_metrics();
 	init_config();
-	
-	if(CONFIG_LOG_FILE == NULL)
+
+/*	Moved to daemon_init(), otherwise log files can be created as root */
+/*	if(CONFIG_LOG_FILE == NULL)
 		zabbix_open_log(LOG_TYPE_SYSLOG,CONFIG_LOG_LEVEL,NULL);
 	else
-		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,CONFIG_LOG_FILE);
+		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,CONFIG_LOG_FILE);*/
 	
 	load_user_parameters();
 	
