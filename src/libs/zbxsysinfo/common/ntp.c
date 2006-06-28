@@ -58,7 +58,7 @@ typedef struct NTP_DATA {
 double current_time (double offset)
 {
 
-#ifdef TODO
+#if !defined(WIN32) || (defined(WIN32) && defined(TODO))
 
 /* Get the current UTC time in seconds since the Epoch plus an offset (usually
 the time from the beginning of the century to the Epoch!) */
@@ -66,8 +66,10 @@ the time from the beginning of the century to the Epoch!) */
     struct timeval current;
 
     errno = 0;
-
-#error "Replace <gettimeofday> function"
+#ifdef WIN32
+#	error "Replace <gettimeofday> function"
+#endif /* WIN32 */
+    
     if (gettimeofday(&current,NULL))
     {
 	    /* No processing of error condition here */
@@ -231,7 +233,7 @@ systems do not set the return value from (s)printf. */
 int	check_ntp(char *host, int port, int *value_int)
 {
 
-#ifdef TODO
+#if !defined(WIN32) || (defined(WIN32) && defined(TODO))
 
 	ZBX_SOCKET	s;
 	ZBX_SOCKADDR	servaddr_in;
@@ -290,7 +292,9 @@ int	check_ntp(char *host, int port, int *value_int)
 
 	pack_ntp(packet,NTP_PACKET_MIN,&data);
 
-#error "TIDO replace <write> function"
+#ifdef WIN32
+#	error "TIDO replace <write> function"
+#endif /* WIN32 */
 	if( write(s,&packet,NTP_PACKET_MIN) == -1 )
 	{
 		/* useless code
@@ -308,7 +312,10 @@ int	check_ntp(char *host, int port, int *value_int)
 
 	memset(c,0,MAX_STRING_LEN);
 
-#error "TIDO replace <read> function"
+#ifdef WIN32
+#	error "TIDO replace <read> function"
+#endif /* WIN32 */
+	
 	len = read(s,c,MAX_STRING_LEN);
 
 	if(len == -1)

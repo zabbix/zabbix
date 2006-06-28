@@ -29,7 +29,7 @@ static	char log_filename[MAX_STRING_LEN];
 static	int log_type = LOG_TYPE_UNDEFINED;
 static	int log_level = LOG_LEVEL_ERR;
 
-ZBX_MUTEX log_file_access;
+static ZBX_MUTEX log_file_access;
 
 #if defined(WIN32)
 
@@ -92,11 +92,18 @@ int zabbix_open_log(int type, int level, const char *filename)
 
 		log_type = LOG_TYPE_FILE;
 		strscpy(log_filename,filename);
-		fclose(log_file);
+		zbx_fclose(log_file);
 	}
 	else
 	{
 		/* Not supported logging type */
+
+		if(ZBX_MUTEX_ERROR == zbx_mutex_create(&log_file_access))
+		{
+			zbx_error("Unable to create mutex for log file");
+			return	FAIL;
+		}
+
 		zbx_error("Not supported loggin type [%d]\n", type);
 		return	FAIL;
 	}
@@ -126,6 +133,7 @@ void zabbix_close_log(void)
 	else
 	{
 		/* Not supported loggin type */
+		zbx_mutex_destroy(&log_file_access);
 	}
 }
 
@@ -193,17 +201,17 @@ void zabbix_log(int level, const char *fmt, ...)
 	else if(log_type == LOG_TYPE_FILE)
 	{
 		zbx_mutex_lock(&log_file_access);
-
+		
 		log_file = fopen(log_filename,"a+");
+
 		if(NULL != log_file)
 		{
 
 			t = time(NULL);
 			tm = localtime(&t);
 
-			fprintf(
-				log_file,
-				"%10lu:%.4d%.2d%.2d:%.2d%.2d%.2d ",
+			fprintf(log_file,
+				"%lu:%.4d%.2d%.2d:%.2d%.2d%.2d ",
 				(unsigned long)zbx_get_thread_id(),
 				tm->tm_year+1900,
 				tm->tm_mon+1,
@@ -221,7 +229,7 @@ void zabbix_log(int level, const char *fmt, ...)
 			va_end(args);
 
 			fprintf(log_file,"\n");
-			fclose(log_file);
+			zbx_fclose(log_file);
 
 
 			if(stat(log_filename,&buf) == 0)
@@ -242,6 +250,8 @@ void zabbix_log(int level, const char *fmt, ...)
 	}
 	else
 	{
+		zbx_mutex_lock(&log_file_access);
+		
 		switch(level)
 		{
 			case LOG_LEVEL_CRIT:
@@ -260,6 +270,8 @@ void zabbix_log(int level, const char *fmt, ...)
 				zbx_error("%s", message);
 				break;
 		}
+		
+		zbx_mutex_unlock(&log_file_access);
 	}	
         return;
 }

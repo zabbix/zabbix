@@ -24,6 +24,10 @@
 #include "mutexs.h"
 #include "zbxconf.h"
 
+#include "interfaces.h"
+#include "diskdevices.h"
+#include "cpustat.h"
+
 /* Number of processed requests */
 long int stats_request=0;
 long int stats_request_failed = 0;
@@ -34,19 +38,31 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 {
 	FILE	*file;
 	int	err_cnt = 0;
+	char	*CONFIG_STAT_FILE_TMP = NULL;
+	int	len = 0;
 
+	assert(CONFIG_STAT_FILE);
+	
 	zabbix_log( LOG_LEVEL_INFORMATION, "zabbix_agentd collector started");
 
+	len = strlen(CONFIG_STAT_FILE)+4;
+	
+	CONFIG_STAT_FILE_TMP = alloca(strlen(CONFIG_STAT_FILE)+4);
+	
+	zbx_snprintf(CONFIG_STAT_FILE_TMP, len, "%s.new", CONFIG_STAT_FILE);
+	
 	for(;;)
 	{
-		file=fopen(CONFIG_STAT_FILE_TMP,"w");
+		file = fopen(CONFIG_STAT_FILE_TMP,"w");
 		if(NULL == file)
 		{
-			zabbix_log( LOG_LEVEL_CRIT, "Cannot open file [%s] [%s]", CONFIG_STAT_FILE_TMP, strerror(errno));
+			zabbix_log( LOG_LEVEL_CRIT, "Can not create statistic file [%s] [%s]", 
+					CONFIG_STAT_FILE_TMP, strerror(errno));
 			zbx_sleep(20);
 			if(err_cnt++ > 20)
 			{
-				zabbix_log( LOG_LEVEL_CRIT, "Too many attemptions to open file [%s] [%s]", CONFIG_STAT_FILE_TMP, strerror(errno));
+				zabbix_log( LOG_LEVEL_CRIT, "Too many attemptions to create statistic file [%s] [%s]", 
+						CONFIG_STAT_FILE_TMP, strerror(errno));
 				zbx_tread_exit(1);
 			}
 		}
@@ -54,11 +70,13 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 		{
 			err_cnt = 0;
 			/* Here is list of functions to call periodically */
-#ifdef TODO
+#if !defined(WIN32) || (defined(TODO) && defined(WIN32))
+			
 			collect_stats_interfaces(file);
 			collect_stats_diskdevices(file);
 			collect_stats_cpustat(file);
-#endif /* TODO */
+			
+#endif /* TODO for WIN32 */
 
 			fclose(file);
 			rename(CONFIG_STAT_FILE_TMP, CONFIG_STAT_FILE);

@@ -306,8 +306,11 @@
 #endif
 				    
 /* Secure string copy */
-#define strsncpy(x,y,size) strncpy(x,y,size); x[size-1]='\0'
+#define strsncpy(x,y,size) { strncpy(x,y,size); x[size-1]='\0'; }
 #define strscpy(x,y) strsncpy(x,y,sizeof(x))
+
+#define zbx_free(ptr) { if(ptr){ free(ptr); ptr = NULL; } }
+#define zbx_fclose(f) { if(f){ fclose(f); f = NULL; } }
 
 /* list structure as item of agent return vaile */					 
 #define ZBX_LIST_ITEM struct zbx_list_item_s
@@ -412,7 +415,6 @@ void	version();
 #define ZBX_TASK_PRINT_SUPPORTED 3
 #define ZBX_TASK_TEST_METRIC     4
 #define ZBX_TASK_SHOW_USAGE      5
-
 
 void   	init_result(AGENT_RESULT *result);
 int    	copy_result(AGENT_RESULT *src, AGENT_RESULT *dist);

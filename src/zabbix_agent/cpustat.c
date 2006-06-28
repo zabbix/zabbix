@@ -19,7 +19,7 @@
 
 #include "common.h"
 
-#ifdef TODO
+#if !defined(WIN32) || (defined(TODO) && defined(WIN32))
 
 #include <stdlib.h>
 #include <stdio.h>

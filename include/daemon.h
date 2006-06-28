@@ -21,8 +21,14 @@
 #ifndef ZABBIX_DAEMON_H
 #define ZABBIX_DAEMON_H
 
+#include "threads.h"
+
+extern ZBX_THREAD_HANDLE	*threads;
+
 void    child_signal_handler(int sig);
 
 void	init_daemon(void);
+
+void	init_parent_process(void);
 
 #endif /* ZABBIX_DAEMON_H */

@@ -18,14 +18,14 @@
 **/
 
 #include "common.h"
+#include "daemon.h"
 
 #include "threads.h"
 #include "pid.h"
 #include "log.h"
 #include "cfg.h"
 
-static	pid_t	*pids=NULL;
-int		parent=0;
+static int	parent=0;
 
 static void	uninit(void)
 {
@@ -33,11 +33,13 @@ static void	uninit(void)
 
 	if(parent == 1)
 	{
-		if(pids != NULL)
+		if(threads != NULL)
 		{
 			for(i = 0; i<CONFIG_AGENTD_FORKS; i++)
 			{
-				kill(pids[i],SIGTERM);
+				if(threads[i]) {
+					kill(threads[i],SIGTERM);
+				}
 			}
 		}
 
@@ -163,7 +165,7 @@ void    init_daemon(void)
 		exit(FAIL);
 	}
 
-	phan.sa_handler = parent_signal_handler;
+	phan.sa_handler = child_signal_handler;
 	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = 0;
 
@@ -172,11 +174,22 @@ void    init_daemon(void)
 	sigaction(SIGTERM,	&phan, NULL);
 	sigaction(SIGPIPE,	&phan, NULL);
 
-	/* For parent only. To avoid problems with EXECUTE */
-	sigaction(SIGCHLD,	&phan, NULL);
-
-
 	zbx_setproctitle("main process");
 
 	MAIN_ZABBIX_ENTRY();
 }
+
+void	init_parent_process(void)
+{
+	struct sigaction	phan;
+	
+	parent = 1; /* signalize signal_handler what this process isi a PARENT process */
+	
+	phan.sa_handler = parent_signal_handler;
+	sigemptyset(&phan.sa_mask);
+	phan.sa_flags = 0;
+
+	/* For parent only. To avoid problems with EXECUTE */
+	sigaction(SIGCHLD,	&phan, NULL);
+}
+

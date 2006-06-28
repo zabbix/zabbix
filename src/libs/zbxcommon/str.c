@@ -140,10 +140,10 @@ void zbx_error(const char *fmt, ...)
 	fprintf(stderr, "%s [%li]: ",progname, zbx_get_thread_id());
 	vfprintf(stderr, fmt, args);
 	fprintf(stderr, "\n");
+	fflush(stderr);
 
 	va_end(args);
 
-	fflush(stderr);
 }
 
 /******************************************************************************

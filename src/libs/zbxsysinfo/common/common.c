@@ -1399,6 +1399,7 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 	if(strcmp(flag,"wait") == 0)
 	{
+zabbix_log(LOG_LEVEL_WARNING, "Run wait command '%s'",command); // TMP!!!
 		return EXECUTE_STR(cmd,command,flags,result);
 	}
 	else if(strcmp(flag,"nowait") != 0)
@@ -1434,6 +1435,8 @@ zbx_error(full_command);
 
 #else /* not WIN32 */
 	
+zabbix_log(LOG_LEVEL_WARNING, "Run nowait command '%s'",command); // TMP!!!
+
 	pid = fork(); /* run new thread 1 */
 	switch(pid)
 	{
@@ -1457,26 +1460,31 @@ zbx_error(full_command);
 			sleep(3); 
 			/**/
 			
+zabbix_log(LOG_LEVEL_WARNING, "Run command via execl '%s'",command); // TMP!!!
 			/* replace thread 2 by the execution of command */
 			if(execl("/bin/sh", "sh", "-c", command, (char *)0))
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "execl failed for '%s'",command);
-				exit(1);
+				zabbix_log(LOG_LEVEL_WARNING, "execl failed for command '%s'",command);
 			}
+zabbix_log(LOG_LEVEL_WARNING, "Exit from thread 2"); // TMP!!!
 			/* In normal case the program will never reach this point */
 			exit(0);
 		default:
+zabbix_log(LOG_LEVEL_WARNING, "NOWait thread 2"); // TMP!!!
 			waitpid(pid, NULL, WNOHANG); /* NO WAIT can be used for thread 2 closing */
+zabbix_log(LOG_LEVEL_WARNING, "Exit from thread 1"); // TMP!!!
 			exit(0); /* close thread 1 and transmit thread 2 to system (solve zombie state) */
 			break;
 		}
 	default:
+zabbix_log(LOG_LEVEL_WARNING, "Wait thread 1"); // TMP!!!
 		waitpid(pid, NULL, 0); /* wait thread 1 closing */
 		break;
 	}
 
 #endif /* WIN32 */
 
+zabbix_log(LOG_LEVEL_WARNING, "END run command '%s' - OK",command); // TMP!!!
 	SET_UI64_RESULT(result, 1);
 	
 	return	SYSINFO_RET_OK;

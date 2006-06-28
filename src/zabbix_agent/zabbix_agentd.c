@@ -34,11 +34,18 @@
 #include "stats.h"
 #include "active.h"
 #include "listener.h"
-#include "service.h"
-#include "daemon.h"
+
+#if defined(WIN32)
+#	include "service.h"
+#else /* not WIN32 */
+#	include "daemon.h"
+#endif /* WIN32 */
+
 #include "alias.h"
 
 #define	LISTENQ 1024
+
+ZBX_THREAD_HANDLE		*threads = NULL;
 
 char *progname = NULL;
 char title_message[] = "ZABBIX Agent "
@@ -181,14 +188,13 @@ static ZBX_SOCKET connect_to_server(void)
 
 void MAIN_ZABBIX_ENTRY(void)
 {
-	ZBX_THREAD_HANDLE		*threads;
 	ZBX_THREAD_ACTIVECHK_ARGS	activechk_args;
 
 	int	i = 0;
 
 	ZBX_SOCKET	sock;
 
-	zabbix_open_log(LOG_TYPE_UNDEFINED /* LOG_TYPE_FILE !!! TMP OFF !!!*/, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
+	zabbix_open_log(LOG_TYPE_FILE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "zabbix_agentd started. ZABBIX %s.", ZABBIX_VERSION);
 
@@ -197,10 +203,10 @@ void MAIN_ZABBIX_ENTRY(void)
 	/* --- START THREADS ---*/
 	threads = calloc(CONFIG_AGENTD_FORKS, sizeof(ZBX_THREAD_HANDLE));
 
-	threads[i] = zbx_thread_start(collector_thread, NULL);
+	threads[i=0] = zbx_thread_start(collector_thread, NULL);
 
 	/* start listeners */
-	for(; i < CONFIG_AGENTD_FORKS-1; i++)
+	for(i++; i < CONFIG_AGENTD_FORKS-1; i++)
 	{
 		threads[i] = zbx_thread_start(listener_thread, &sock);
 	}
@@ -214,6 +220,9 @@ void MAIN_ZABBIX_ENTRY(void)
 		threads[i] = zbx_thread_start(active_checks_thread, &activechk_args);
 	}
 
+#if !defined(WIN32)
+	init_parent_process();
+#endif
 
 	/* wait for exit */
 	for(i = 0; i < CONFIG_AGENTD_FORKS; i++)
@@ -223,6 +232,8 @@ void MAIN_ZABBIX_ENTRY(void)
 			zabbix_log( LOG_LEVEL_DEBUG, "%08X: Thread is Terminated", threads[i]);
 		}
 	}
+
+	zbx_free(threads);
 }
 
 static char* get_programm_name(char *path)

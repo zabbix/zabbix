@@ -29,13 +29,15 @@
 
 #ifdef WIN32
 
-static char	DEFAULT_CONFIG_FILE[] = "C:\\zabbix_agentd.conf";
+static char	DEFAULT_CONFIG_FILE[]	= "C:\\zabbix_agentd.conf";
 static char	*DEFAULT_PID_FILE	= NULL;
+static char	DEFAULT_STAT_FILE[]	= "C:\\zabbix_agentd.stt";
 
 #else /* not WIN32 */
 
 static char	DEFAULT_CONFIG_FILE[]	= "/etc/zabbix/zabbix_agentd.conf";
 static char	DEFAULT_PID_FILE[]	= "/tmp/zabbix_agentd.pid";
+static char	DEFAULT_STAT_FILE[]	= "/tmp/zabbix_agentd.stt";
 
 #endif /* WIN32 */
 
@@ -43,7 +45,6 @@ static char	DEFAULT_PID_FILE[]	= "/tmp/zabbix_agentd.pid";
 char	*CONFIG_HOSTS_ALLOWED		= NULL;
 char	*CONFIG_HOSTNAME		= NULL;
 char	*CONFIG_STAT_FILE		= NULL;
-char	*CONFIG_STAT_FILE_TMP		= NULL;
 /* int	CONFIG_NOTIMEWAIT		= 0; */
 int	CONFIG_DISABLE_ACTIVE		= 0;
 int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
@@ -69,7 +70,7 @@ void    load_config(void)
 #endif /* USE_PID_FILE */
 
 		{"LogFile",		&CONFIG_LOG_FILE,	0,TYPE_STRING,	PARM_OPT,	0,0},
-/*		{"StatFile",		&CONFIG_STAT_FILE,	0,TYPE_STRING,	PARM_OPT,	0,0},*/
+		{"StatFile",		&CONFIG_STAT_FILE,	0,TYPE_STRING,	PARM_OPT,	0,0},
 		{"DisableActive",	&CONFIG_DISABLE_ACTIVE,	0,TYPE_INT,	PARM_OPT,	0,1},
 		{"Timeout",		&CONFIG_TIMEOUT,	0,TYPE_INT,	PARM_OPT,	1,30},
 /*		{"NoTimeWait",		&CONFIG_NOTIMEWAIT,	0,TYPE_INT,	PARM_OPT,	0,1},*/
@@ -114,6 +115,11 @@ void    load_config(void)
 		CONFIG_PID_FILE = DEFAULT_PID_FILE;
 	}
 #endif /* USE_PID_FILE */
+	
+	if(CONFIG_STAT_FILE == NULL)
+	{
+		CONFIG_STAT_FILE = DEFAULT_STAT_FILE;
+	}
 
 	if(CONFIG_HOSTNAME == NULL)
 	{

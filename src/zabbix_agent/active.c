@@ -249,9 +249,9 @@ static int	get_active_checks(char *server, unsigned short port, char *error, int
 	if(hp==NULL)
 	{
 #ifdef	HAVE_HSTRERROR		
-		zbx_snprintf(error, max_error_len,"gethostbyname() failed [%s]", (char*)hstrerror((int)h_errno));
+		zbx_snprintf(error, max_error_len,"gethostbyname() failed for server '%s' [%s]", server, (char*)hstrerror((int)h_errno));
 #else
-		zbx_snprintf(error, max_error_len,"gethostbyname() failed [%d]", h_errno);
+		zbx_snprintf(error, max_error_len,"gethostbyname() failed for server '%s' [%d]", server, h_errno);
 #endif
 		zabbix_log( LOG_LEVEL_WARNING, error);
 		return	NETWORK_ERROR;
@@ -364,7 +364,11 @@ static int	send_value(char *server,unsigned short port,char *host, char *key,cha
 
 	if(hp==NULL)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "gethostbyname failed [%s]",server);
+#ifdef	HAVE_HSTRERROR		
+		zabbix_log( LOG_LEVEL_WARNING, "gethostbyname() failed for server '%s' [%d]", server, (char*)hstrerror((int)h_errno));
+#else
+		zabbix_log( LOG_LEVEL_WARNING, "gethostbyname() failed for server '%s' [%d]", server, h_errno);
+#endif
 		return	FAIL;
 	}
 
@@ -518,7 +522,7 @@ static void	refresh_metrics(char *server, unsigned short port, char *error, int 
 {
 	zabbix_log( LOG_LEVEL_DEBUG, "In refresh_metrics('%s',%u)",server, port);
 
-	while(get_active_checks(server, port, error, sizeof(error)) != SUCCEED)
+	while(get_active_checks(server, port, error, max_error_len) != SUCCEED)
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Getting list of active checks failed. Will retry after 60 seconds");
 
@@ -530,19 +534,28 @@ static void	refresh_metrics(char *server, unsigned short port, char *error, int 
 
 ZBX_THREAD_ENTRY(active_checks_thread, args)
 {
-	ZBX_THREAD_ACTIVECHK_ARGS *activechk_args = (ZBX_THREAD_ACTIVECHK_ARGS *)args;
+	ZBX_THREAD_ACTIVECHK_ARGS activechk_args;
 
 	char	error[MAX_STRING_LEN];
 	int	sleeptime, nextcheck;
 	int	nextrefresh;
+	char	*p = NULL;
 
-	zabbix_log( LOG_LEVEL_INFORMATION, "zabbix_agentd active check started [%s:%u]", activechk_args->host, activechk_args->port);
+	activechk_args.host = strdup(((ZBX_THREAD_ACTIVECHK_ARGS *)args)->host);
+	activechk_args.port = ((ZBX_THREAD_ACTIVECHK_ARGS *)args)->port;
+
+	assert(activechk_args.host);
+	
+	p = strchr(activechk_args.host,',');
+	if(p) *p = '\0';
+
+	zabbix_log( LOG_LEVEL_INFORMATION, "zabbix_agentd active check started [%s:%u]", activechk_args.host, activechk_args.port);
 
 	zbx_setproctitle("getting list of active checks");
 
 	init_active_metrics();
 
-	refresh_metrics(activechk_args->host, activechk_args->port, error, sizeof(error));
+	refresh_metrics(activechk_args.host, activechk_args.port, error, MAX_STRING_LEN);
 	nextrefresh = time(NULL) + CONFIG_REFRESH_ACTIVE_CHECKS;
 
 	for(;;)
@@ -550,7 +563,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 		zbx_setproctitle("processing active checks");
 
-		if(process_active_checks(activechk_args->host, activechk_args->port) == FAIL)
+		if(process_active_checks(activechk_args.host, activechk_args.port) == FAIL)
 		{
 			zbx_sleep(60);
 			continue;
@@ -585,11 +598,12 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 		if(time(NULL) >= nextrefresh)
 		{
-			refresh_metrics(activechk_args->host, activechk_args->port, error, sizeof(error));
+			refresh_metrics(activechk_args.host, activechk_args.port, error, MAX_STRING_LEN);
 			nextrefresh=time(NULL) + CONFIG_REFRESH_ACTIVE_CHECKS;
 		}
 	}
 
+	free(activechk_args.host);
 	free_metrics();
 
 	zabbix_log( LOG_LEVEL_INFORMATION, "zabbix_agentd active check stopped");

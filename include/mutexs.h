@@ -28,7 +28,7 @@
 
 #else /* not WIN32 */
 
-	#define ZBX_MUTEX pthread_mutex_t 
+	#define ZBX_MUTEX pthread_mutex_t
 	#define ZBX_MUTEX_ERROR (-1)
 	#define ZBX_MUTEX_OK (1)
 

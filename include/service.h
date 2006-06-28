@@ -20,6 +20,10 @@
 #ifndef ZABBIX_SERVICE_H
 #define ZABBIX_SERVICE_H
 
+#include "threads.h"
+
+extern ZBX_THREAD_HANDLE	*threads;
+
 #define ZABBIX_SERVICE_NAME   "ZabbixAgentdW32"
 
 #ifdef TODO
