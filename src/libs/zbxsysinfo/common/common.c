@@ -1215,7 +1215,7 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 #else /* not WIN32 */
 
-	if(0 == (f = popen(command,"r"))
+	if(0 == (f = popen(command,"r")))
 	{
 		switch (errno)
 		{
