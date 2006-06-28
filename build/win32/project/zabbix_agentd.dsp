@@ -147,6 +147,10 @@ LINK32=link.exe
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=..\..\..\src\libs\zbxcommon\alias.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\src\libs\zbxcommon\comms.c
 # End Source File
 # Begin Source File
@@ -390,14 +394,6 @@ SOURCE=..\..\..\src\zabbix_agent\active.h
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\src\zabbix_agent\alias.c
-# End Source File
-# Begin Source File
-
-SOURCE=..\..\..\src\zabbix_agent\alias.h
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\..\src\zabbix_agent\cpustat.c
 # End Source File
 # Begin Source File
@@ -460,6 +456,10 @@ SOURCE=..\..\..\src\zabbix_agent\zbxconf.h
 # Begin Group "inlcude"
 
 # PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\..\include\alias.h
+# End Source File
 # Begin Source File
 
 SOURCE=..\..\..\include\cfg.h
