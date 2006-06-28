@@ -1,5 +1,6 @@
 Changes for 1.1patch1:
 
+ - fixed permissions of log files when starting as 'root' (Alexei)
  - fixed agent crash while evaluating proc.mem[] (Alexei)
  - changed type of lastlogsize to long in structure METRIC (Alexei)
  - ZABBIX agent to bind even if TIME_WAIT sockets exist (Alexei)
