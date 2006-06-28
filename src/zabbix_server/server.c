@@ -277,6 +277,15 @@ void	daemon_init(void)
 
 	}
 
+	if(CONFIG_LOG_FILE == NULL)
+	{
+		zabbix_open_log(LOG_TYPE_SYSLOG,CONFIG_LOG_LEVEL,NULL);
+	}
+	else
+	{
+		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,CONFIG_LOG_FILE);
+	}
+
 	if( (pid = fork()) != 0 )
 	{
 		exit( 0 );
@@ -612,14 +621,15 @@ int main(int argc, char **argv)
 	sigaction(SIGTERM, &phan, NULL);
 	sigaction(SIGPIPE, &phan, NULL);
 
-	if(CONFIG_LOG_FILE == NULL)
+/* Moved to daemon_init() */
+/*	if(CONFIG_LOG_FILE == NULL)
 	{
 		zabbix_open_log(LOG_TYPE_SYSLOG,CONFIG_LOG_LEVEL,NULL);
 	}
 	else
 	{
 		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,CONFIG_LOG_FILE);
-	}
+	}*/
 
 	if( FAIL == create_pid_file(CONFIG_PID_FILE))
 	{
