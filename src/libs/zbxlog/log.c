@@ -77,7 +77,7 @@ int zabbix_open_log(int type, int level, const char *filename)
 			return	FAIL;
 		}
 
-		if(ZBX_MUTEX_ERROR == zbx_mutex_create(&log_file_access))
+		if(ZBX_MUTEX_ERROR == zbx_mutex_create(&log_file_access, "/tmp/zbxlmtx"))
 		{
 			zbx_error("Unable to create mutex for log file");
 			return	FAIL;
@@ -86,7 +86,7 @@ int zabbix_open_log(int type, int level, const char *filename)
 		log_file = fopen(filename,"a+");
 		if(log_file == NULL)
 		{
-			zbx_error("Unable to open log file [%s] [%s]\n", filename, strerror(errno));
+			zbx_error("Unable to open log file [%s] [%s]", filename, strerror(errno));
 			return	FAIL;
 		}
 
@@ -98,13 +98,13 @@ int zabbix_open_log(int type, int level, const char *filename)
 	{
 		/* Not supported logging type */
 
-		if(ZBX_MUTEX_ERROR == zbx_mutex_create(&log_file_access))
+		if(ZBX_MUTEX_ERROR == zbx_mutex_create(&log_file_access, "/tmp/zbxlmtx"))
 		{
 			zbx_error("Unable to create mutex for log file");
 			return	FAIL;
 		}
 
-		zbx_error("Not supported loggin type [%d]\n", type);
+		zbx_error("Not supported loggin type [%d]", type);
 		return	FAIL;
 	}
 
@@ -238,9 +238,10 @@ void zabbix_log(int level, const char *fmt, ...)
 				{
 					strscpy(filename_old,log_filename);
 					strncat(filename_old,".old",MAX_STRING_LEN);
+					remove(filename_old);
 					if(rename(log_filename,filename_old) != 0)
 					{
-						zbx_error("Can't rename log file [%s] [%s]\n", log_filename, strerror(errno));
+						zbx_error("Can't rename log file [%s] to [%s] [%s]", log_filename, filename_old, strerror(errno));
 					}
 				}
 			}

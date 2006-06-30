@@ -21,12 +21,32 @@
 #define ZABBIX_STATS_H
 
 #include "threads.h"
+#include "cpustat.h"
+#include "interfaces.h"
+#include "diskdevices.h"
 
-extern long int stats_request;
-extern long int stats_request_failed;
-extern long int stats_request_accepted;
-extern long int stats_request_rejected;
+typedef struct s_request_stat_data
+{
+	long all;
+	long failed;
+	long accepted;
+	long rejected;
+} ZBX_REQUESTS_DATA;
+
+typedef struct s_collector_data
+{
+	ZBX_REQUESTS_DATA	requests;
+	ZBX_CPUS_STAT_DATA	cpus;
+	ZBX_INTERFACES_DATA	interfaces;
+	ZBX_DISKDEVICES_DATA	diskdevices;
+} ZBX_COLLECTOR_DATA;
+ 
+extern ZBX_COLLECTOR_DATA *collector;
+
 
 ZBX_THREAD_ENTRY(collector_thread, pSemColectorStarted);
+
+void	init_collector_data(void);
+void	free_collector_data(void);
 
 #endif

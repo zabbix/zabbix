@@ -194,11 +194,19 @@ void MAIN_ZABBIX_ENTRY(void)
 
 	ZBX_SOCKET	sock;
 
-	zabbix_open_log(LOG_TYPE_FILE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
+	zabbix_open_log(
+#if 0
+		LOG_TYPE_FILE
+#else 
+		LOG_TYPE_UNDEFINED
+#endif
+		, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "zabbix_agentd started. ZABBIX %s.", ZABBIX_VERSION);
 
 	sock = connect_to_server();
+
+	init_collector_data();
 
 	/* --- START THREADS ---*/
 	threads = calloc(CONFIG_AGENTD_FORKS, sizeof(ZBX_THREAD_HANDLE));
@@ -232,6 +240,8 @@ void MAIN_ZABBIX_ENTRY(void)
 			zabbix_log( LOG_LEVEL_DEBUG, "%08X: Thread is Terminated", threads[i]);
 		}
 	}
+
+	free_collector_data();
 
 	zbx_free(threads);
 }

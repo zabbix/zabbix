@@ -22,7 +22,6 @@
 
 extern char	*CONFIG_HOSTS_ALLOWED;
 extern char	*CONFIG_HOSTNAME;
-extern char	*CONFIG_STAT_FILE;
 /* extern int	CONFIG_NOTIMEWAIT;		*/
 extern int	CONFIG_DISABLE_ACTIVE;
 extern int	CONFIG_ENABLE_REMOTE_COMMANDS;

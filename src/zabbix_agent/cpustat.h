@@ -20,6 +20,26 @@
 #ifndef ZABBIX_CPUSTAT_H
 #define ZABBIX_CPUSTAT_H
 
+typedef struct s_single_cpu_stat_data
+{
+	char    *device;
+	int	major;
+	int	diskno;
+	int	clock[60*15];
+	float	cpu_user[60*15];
+	float	cpu_system[60*15];
+	float	cpu_nice[60*15];
+	float	cpu_idle[60*15];
+} ZBX_SINGLE_CPU_STAT_DATA;
+
+typedef struct s_cpus_stat_data
+{
+	ZBX_SINGLE_CPU_STAT_DATA cpu;
+} ZBX_CPUS_STAT_DATA;
+
+void	collect_stats_cpustat(ZBX_CPUS_STAT_DATA *pcpus);
+
+/*
 #define CPUSTAT struct cpustat_type
 CPUSTAT
 {
@@ -34,5 +54,5 @@ CPUSTAT
 };
 
 void	collect_stats_cpustat(FILE *outfile);
-
+*/
 #endif

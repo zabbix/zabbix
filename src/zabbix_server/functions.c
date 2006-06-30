@@ -93,15 +93,15 @@ void	update_functions(DB_ITEM *item)
 		function.itemid=atoi(row[2]);
 		lastvalue=row[3];
 
-		zabbix_log( LOG_LEVEL_DEBUG, "ItemId:%d Evaluating %s(%d)\n",function.itemid,function.function,function.parameter);
+		zabbix_log( LOG_LEVEL_DEBUG, "ItemId:%d Evaluating %s(%d)",function.itemid,function.function,function.parameter);
 
 		ret = evaluate_FUNCTION(value,item,function.function,function.parameter);
 		if( FAIL == ret)	
 		{
-			zabbix_log( LOG_LEVEL_DEBUG, "Evaluation failed for function:%s\n",function.function);
+			zabbix_log( LOG_LEVEL_DEBUG, "Evaluation failed for function:%s",function.function);
 			continue;
 		}
-		zabbix_log( LOG_LEVEL_DEBUG, "Result of evaluate_FUNCTION [%s]\n",value);
+		zabbix_log( LOG_LEVEL_DEBUG, "Result of evaluate_FUNCTION [%s]",value);
 		if (ret == SUCCEED)
 		{
 			/* Update only if lastvalue differs from new one */

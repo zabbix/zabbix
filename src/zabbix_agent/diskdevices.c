@@ -18,6 +18,33 @@
 **/
 
 #include "common.h"
+#include "diskdevices.h"
+
+
+void	collect_stats_diskdevices(ZBX_DISKDEVICES_DATA *pdiskdevices)
+{
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #if !defined(WIN32) || (defined(TODO) && defined(WIN32))
 

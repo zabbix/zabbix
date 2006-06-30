@@ -95,8 +95,8 @@ ZBX_THREAD_ENTRY(listener_thread, pSock)
 	// Wait for connection requests
 	for(;;)
 	{
-		stats_request++;
-		zbx_setproctitle("waiting for connection. Requests [%d]", stats_request);
+		collector->requests.all++;
+		zbx_setproctitle("waiting for connection. Requests [%d]", collector->requests.all);
 
 		accept_sock = SOCKET_ERROR;
 		nlen = sizeof(ZBX_SOCKADDR);
@@ -114,7 +114,8 @@ ZBX_THREAD_ENTRY(listener_thread, pSock)
 			}
 
 			local_request_failed++;
-			stats_request_failed++;
+
+			collector->requests.failed++;
 			if (local_request_failed > 1000)
 			{
 				zabbix_log( LOG_LEVEL_WARNING, "Too many consecutive errors on accept() call.");
@@ -132,12 +133,12 @@ ZBX_THREAD_ENTRY(listener_thread, pSock)
 
 		if(SUCCEED == check_security(accept_sock, CONFIG_HOSTS_ALLOWED, 0))
 		{
-			stats_request_accepted++;
+			collector->requests.accepted++;
 			process_listener(accept_sock);
 		}
 		else 
 		{
-			stats_request_rejected++;
+			collector->requests.rejected++;
 		}
 
 		shutdown(accept_sock,2);

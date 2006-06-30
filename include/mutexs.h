@@ -20,6 +20,8 @@
 #ifndef ZABBIX_MUTEXS_H
 #define ZABBIX_MUTEXS_H
 
+#define ZBX_SHARED_MUTEX 1
+
 #if defined(WIN32)
 
 	#define ZBX_MUTEX HANDLE
@@ -28,13 +30,22 @@
 
 #else /* not WIN32 */
 
+#if defined(ZBX_SHARED_MUTEX)
+
+	#define ZBX_MUTEX int
+
+#else /* not ZBX_SHARED_MUTEX */
+
 	#define ZBX_MUTEX pthread_mutex_t
+
+#endif /* ZBX_SHARED_MUTEX */
+
 	#define ZBX_MUTEX_ERROR (-1)
 	#define ZBX_MUTEX_OK (1)
 
 #endif /* WIN32 */
 
-int zbx_mutex_create(ZBX_MUTEX	*mutex);
+int zbx_mutex_create(ZBX_MUTEX	*mutex, char *name);
 int zbx_mutex_lock(ZBX_MUTEX	*mutex);
 int zbx_mutex_unlock(ZBX_MUTEX	*mutex);
 int zbx_mutex_destroy(ZBX_MUTEX	*mutex);

@@ -96,7 +96,7 @@ void    DBconnect(void)
 /* check to see that the backend connection was successfully made */
 	if (PQstatus(conn) != CONNECTION_OK)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Connection to database '%s' failed.\n", CONFIG_DBNAME);
+		zabbix_log(LOG_LEVEL_ERR, "Connection to database '%s' failed.", CONFIG_DBNAME);
 		exit(FAIL);
 	}
 #endif
@@ -113,7 +113,7 @@ void    DBconnect(void)
 	if (SQLO_SUCCESS != sqlo_connect(&oracle, connect))
 	{
 		printf("Cannot login with %s\n", connect);
-		zabbix_log(LOG_LEVEL_ERR, "Cannot login with %s\n", connect);
+		zabbix_log(LOG_LEVEL_ERR, "Cannot login with %s", connect);
 		exit(FAIL);
 	}
 	sqlo_autocommit_on(oracle);

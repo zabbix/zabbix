@@ -43,7 +43,7 @@ static int write_gsm(int fd, char *str, char *error, int max_error_len)
 
 	len = strlen(str);
 
-	zabbix_log(LOG_LEVEL_WARNING, "Write [%s]\n", str);
+	zabbix_log(LOG_LEVEL_WARNING, "Write [%s]", str);
 
 	if (write(fd, str, len) < len)
 	{
@@ -76,9 +76,9 @@ static int read_gsm(int fd, char *expect, char *error, int max_error_len)
 /*	printf("Read buffer [%s]\n", buffer);
 	for(i=0;i<strlen(buffer);i++)
 		printf("[%x]\n",buffer[i]);*/
-	zabbix_log(LOG_LEVEL_WARNING, "Read buffer [%s]\n", buffer);
+	zabbix_log(LOG_LEVEL_WARNING, "Read buffer [%s]", buffer);
 	for(i=0;i<strlen(buffer);i++)
-		zabbix_log(LOG_LEVEL_WARNING, "[%x]\n", buffer[i]);
+		zabbix_log(LOG_LEVEL_WARNING, "[%x]", buffer[i]);
 	if (strstr(buffer, expect) == NULL)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Read something unexpected from GSM modem");

@@ -27,60 +27,135 @@
 #include "interfaces.h"
 #include "diskdevices.h"
 #include "cpustat.h"
+#include "log.h"
 
-/* Number of processed requests */
-long int stats_request=0;
-long int stats_request_failed = 0;
-long int stats_request_accepted = 0;
-long int stats_request_rejected = 0;
+ZBX_COLLECTOR_DATA *collector = NULL;
 
+/******************************************************************************
+ *                                                                            *
+ * Function: init_collector_data                                              *
+ *                                                                            *
+ * Purpose: Allocate memory for collector                                     *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: Linux version allocate memory as shared.                         *
+ *                                                                            *
+ ******************************************************************************/
+void	init_collector_data(void)
+{
+#if defined (WIN32)
+
+	collector = calloc(1, sizeof(ZBX_COLLECTOR_DATA));
+
+	if(NULL == collector)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Can't allocate memory for collector.");
+		exit(1);
+
+	}
+
+#else /* not WIN32 */
+
+	key_t	shm_key;
+	int	shm_id;
+
+	shm_key = ftok("/tmp/zbxshm", (int)'z');
+
+	shm_id = shmget(shm_key, sizeof(ZBX_COLLECTOR_DATA), 0);
+
+	if (-1 == shm_id)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Can't allocate shared memory for collector. [%s]",strerror(errno));
+		exit(1);
+	}
+
+	collector = shmat(shm_id, 0, 0);
+
+	if (-1 == collector)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Can't attache shared memory for collector. [%s]",strerror(errno));
+		exit(1);
+	}
+
+#endif /* WIN32 */
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: free_collector_data                                              *
+ *                                                                            *
+ * Purpose: Free memory aloccated for collector                               *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: Linux version allocate memory as shared.                         *
+ *                                                                            *
+ ******************************************************************************/
+void	free_collector_data(void)
+{
+	if(NULL == collector) return;
+
+#if defined (WIN32)
+
+	free(collector);
+
+#else /* not WIN32 */
+
+	key_t	shm_key;
+	int	shm_id;
+
+	shm_key = ftok("/tmp/zbxshm", 'S');
+
+	shm_id = shmget(shm_key, sizeof(ZBX_COLLECTOR_DATA), 0);
+
+	if (-1 == shm_id)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Can't allocate shared memory for collector. [%s]",strerror(errno));
+		exit(1);
+	}
+
+	shmctl(shm_id, IPC_RMID, 0);
+
+#endif /* WIN32 */
+
+	collector = NULL;
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Function: collector_thread                                                 *
+ *                                                                            *
+ * Purpose: Collect system information                                        *
+ *                                                                            *
+ * Parameters:  args - skipped                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
 ZBX_THREAD_ENTRY(collector_thread, args)
 {
-	FILE	*file;
-	int	err_cnt = 0;
-	char	*CONFIG_STAT_FILE_TMP = NULL;
-	int	len = 0;
-
-	assert(CONFIG_STAT_FILE);
-	
 	zabbix_log( LOG_LEVEL_INFORMATION, "zabbix_agentd collector started");
 
-	len = strlen(CONFIG_STAT_FILE)+4;
-	
-	CONFIG_STAT_FILE_TMP = alloca(strlen(CONFIG_STAT_FILE)+4);
-	
-	zbx_snprintf(CONFIG_STAT_FILE_TMP, len, "%s.new", CONFIG_STAT_FILE);
-	
 	for(;;)
 	{
-		file = fopen(CONFIG_STAT_FILE_TMP,"w");
-		if(NULL == file)
-		{
-			zabbix_log( LOG_LEVEL_CRIT, "Can not create statistic file [%s] [%s]", 
-					CONFIG_STAT_FILE_TMP, strerror(errno));
-			zbx_sleep(20);
-			if(err_cnt++ > 20)
-			{
-				zabbix_log( LOG_LEVEL_CRIT, "Too many attemptions to create statistic file [%s] [%s]", 
-						CONFIG_STAT_FILE_TMP, strerror(errno));
-				zbx_tread_exit(1);
-			}
-		}
-		else
-		{
-			err_cnt = 0;
-			/* Here is list of functions to call periodically */
-#if !defined(WIN32) || (defined(TODO) && defined(WIN32))
-			
-			collect_stats_interfaces(file);
-			collect_stats_diskdevices(file);
-			collect_stats_cpustat(file);
-			
-#endif /* TODO for WIN32 */
+		collect_stats_interfaces(&(collector->interfaces));
+		collect_stats_diskdevices(&(collector->diskdevices));
+		collect_stats_cpustat(&(collector->cpus));
 
-			fclose(file);
-			rename(CONFIG_STAT_FILE_TMP, CONFIG_STAT_FILE);
-		}
 		zbx_sleep(1);
 	}
 

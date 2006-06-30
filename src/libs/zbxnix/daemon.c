@@ -48,6 +48,7 @@ static void	uninit(void)
 			zabbix_log( LOG_LEVEL_WARNING, "Cannot remove PID file [%s]",
 				CONFIG_PID_FILE);
 		}
+		// TODO call free_collector_data() !!!
 	}
 }
 

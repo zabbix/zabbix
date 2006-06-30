@@ -18,6 +18,31 @@
 **/
 
 #include "common.h"
+#include "interfaces.h"
+
+
+void	collect_stats_interfaces(ZBX_INTERFACES_DATA *pinterfaces)
+{
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #if !defined(WIN32) || (defined(TODO) && defined(WIN32))
 
