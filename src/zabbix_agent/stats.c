@@ -18,9 +18,16 @@
 **/
 
 #include "common.h"
+#include "stats.h"
+
+#ifndef WIN32
+#warning REMOVE sustem includes fron here!
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#endif
 
 #include "log.h"
-#include "stats.h"
 #include "mutexs.h"
 #include "zbxconf.h"
 
@@ -66,7 +73,7 @@ void	init_collector_data(void)
 
 	shm_key = ftok("/tmp/zbxshm", (int)'z');
 
-	shm_id = shmget(shm_key, sizeof(ZBX_COLLECTOR_DATA), 0);
+	shm_id = shmget(shm_key, sizeof(ZBX_COLLECTOR_DATA), IPC_CREAT | 0666);
 
 	if (-1 == shm_id)
 	{
@@ -113,13 +120,13 @@ void	free_collector_data(void)
 	key_t	shm_key;
 	int	shm_id;
 
-	shm_key = ftok("/tmp/zbxshm", 'S');
+	shm_key = ftok("/tmp/zbxshm", 'z');
 
 	shm_id = shmget(shm_key, sizeof(ZBX_COLLECTOR_DATA), 0);
 
 	if (-1 == shm_id)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Can't allocate shared memory for collector. [%s]",strerror(errno));
+		zabbix_log(LOG_LEVEL_ERR, "Can't find shared memory for collector. [%s]",strerror(errno));
 		exit(1);
 	}
 

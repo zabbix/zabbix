@@ -46,7 +46,7 @@ void	collect_stats_diskdevices(ZBX_DISKDEVICES_DATA *pdiskdevices)
 
 
 
-#if !defined(WIN32) || (defined(TODO) && defined(WIN32))
+#if 0 && (!defined(WIN32) || (defined(TODO) && defined(WIN32)))
 
 #include <netdb.h>
 

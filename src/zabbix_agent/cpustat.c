@@ -38,7 +38,7 @@ void	collect_stats_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 
 
 
-#if !defined(WIN32) || (defined(TODO) && defined(WIN32))
+#if 0 && (!defined(WIN32) || (defined(TODO) && defined(WIN32)))
 
 #include <stdlib.h>
 #include <stdio.h>

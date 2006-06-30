@@ -44,7 +44,7 @@ void	collect_stats_interfaces(ZBX_INTERFACES_DATA *pinterfaces)
 
 
 
-#if !defined(WIN32) || (defined(TODO) && defined(WIN32))
+#if 0 && (!defined(WIN32) || (defined(TODO) && defined(WIN32)))
 
 #include <netdb.h>
 
