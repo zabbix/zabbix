@@ -34,8 +34,8 @@ PERFCOUNTER *PerfCounterList = NULL;
 char *GetCounterName(DWORD index)
 {
 	PERFCOUNTER	*counterName;
-	DWORD	dwSize;
-	char hostname[MAX_COMPUTERNAME_LENGTH+3];
+	DWORD		dwSize;
+	char		hostname[MAX_COMPUTERNAME_LENGTH+3];
 
 	counterName=PerfCounterList;
 	while(counterName!=NULL)

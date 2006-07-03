@@ -116,7 +116,7 @@ int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
 /* internal system functions */
-int	EXECUTE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	EXECUTE_INT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
 int	WEB_PAGE_GET(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);

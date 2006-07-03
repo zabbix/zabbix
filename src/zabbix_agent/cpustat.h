@@ -20,39 +20,79 @@
 #ifndef ZABBIX_CPUSTAT_H
 #define ZABBIX_CPUSTAT_H
 
-typedef struct s_single_cpu_stat_data
-{
-	char    *device;
-	int	major;
-	int	diskno;
-	int	clock[60*15];
-	float	cpu_user[60*15];
-	float	cpu_system[60*15];
-	float	cpu_nice[60*15];
-	float	cpu_idle[60*15];
-} ZBX_SINGLE_CPU_STAT_DATA;
+#if defined (WIN32)
 
-typedef struct s_cpus_stat_data
-{
-	ZBX_SINGLE_CPU_STAT_DATA cpu;
-} ZBX_CPUS_STAT_DATA;
+	#define MAX_CPU	16
+	#define MAX_CPU_HISTORY 900 /* 15 min in seconds */
 
-void	collect_stats_cpustat(ZBX_CPUS_STAT_DATA *pcpus);
+	typedef struct s_single_cpu_stat_data
+	{
+		PDH_HCOUNTER	usage_couter;
+		PDH_RAW_COUNTER	usage;
+		PDH_RAW_COUNTER	usage_old;
 
-/*
-#define CPUSTAT struct cpustat_type
-CPUSTAT
-{
-	char    *device;
-	int	major;
-	int	diskno;
-	int	clock[60*15];
-	float	cpu_user[60*15];
-	float	cpu_system[60*15];
-	float	cpu_nice[60*15];
-	float	cpu_idle[60*15];
-};
+		double util1;
+		double util5;
+		double util15;
 
-void	collect_stats_cpustat(FILE *outfile);
-*/
+		LONG	h_usage[MAX_CPU_HISTORY]; /* usage history */
+		int	h_usage_index;
+	} ZBX_SINGLE_CPU_STAT_DATA;
+
+	typedef struct s_cpus_stat_data
+	{
+		ZBX_SINGLE_CPU_STAT_DATA cpu[MAX_CPU];
+		int	count;
+
+		double	load1;
+		double	load5;
+		double	load15;
+
+		LONG	h_queue[MAX_CPU_HISTORY]; /* queue history */
+		int	h_queue_index;
+
+		HQUERY		pdh_query;
+		PDH_RAW_COUNTER	queue;
+		PDH_HCOUNTER	queue_counter;
+
+	} ZBX_CPUS_STAT_DATA;
+
+#else /* not WIN32 */
+
+	#define MAX_CPU_HISTORY 900 /* 15 min in seconds */
+
+	typedef struct s_cpus_stat_data
+	{
+		int	clock[MAX_CPU_HISTORY];
+		float	user[MAX_CPU_HISTORY];
+		float	system[MAX_CPU_HISTORY];
+		float	nice[MAX_CPU_HISTORY];
+		float	idle[MAX_CPU_HISTORY];
+
+		float	idle1;
+		float	idle5;
+		float	idle15;
+		float	user1;
+		float	user5;
+		float	user15;
+		float	system;
+		float	system1;
+		float	system5;
+		float	system15;
+		float	nice1;
+		float	nice5;
+		float	nice15;
+		float	all1;
+		float	all5;
+		float	all15;
+
+	} ZBX_CPUS_STAT_DATA;
+
+#endif /* WIN32 */
+
+
+int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus);
+void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus);
+void	close_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus);
+
 #endif

@@ -30,20 +30,22 @@ ZBX_METRIC	parameters_specific[]=
 	{"kernel.maxfiles",	0,	KERNEL_MAXFILES,	0,	0},
 	{"kernel.maxproc",	0,	KERNEL_MAXPROC, 	0,	0},
 
-	{"vfs.file.cksum",	CF_USEUPARAM,	VFS_FILE_CKSUM,		0,	"/etc/services"},
-	{"vfs.file.md5sum",	CF_USEUPARAM,	VFS_FILE_MD5SUM,	0,	"/etc/services"},
+	{"vfs.file.exists",	CF_USEUPARAM,	VFS_FILE_EXISTS,	0,	"c:\\windows\\win.ini"},
+	{"vfs.file.time",       CF_USEUPARAM,   VFS_FILE_TIME,          0,      "c:\\windows\\win.ini,modify"},
+	{"vfs.file.size",	CF_USEUPARAM,	VFS_FILE_SIZE, 		0,	"c:\\windows\\win.ini"},
+	{"vfs.file.regexp",	CF_USEUPARAM,	VFS_FILE_REGEXP,	0,	"c:\\windows\\win.ini,fonts"},
+	{"vfs.file.regmatch",	CF_USEUPARAM,	VFS_FILE_REGMATCH, 	0,	"c:\\windows\\win.ini,fonts"},
+	{"vfs.file.cksum",	CF_USEUPARAM,	VFS_FILE_CKSUM,		0,	"c:\\windows\\win.ini"},
+	{"vfs.file.md5sum",	CF_USEUPARAM,	VFS_FILE_MD5SUM,	0,	"c:\\windows\\win.ini"},
 
-/************************************
- *          NEW FUNCTIONS           *
- ************************************/
+	{"vfs.fs.size",		CF_USEUPARAM,	VFS_FS_SIZE,	0,	"c:,free"},
+	{"vfs.fs.inode",	CF_USEUPARAM,	VFS_FS_INODE,	0,	"c:,free"},
 
-	{"system.cpu.switches", 0,              SYSTEM_CPU_SWITCHES,    0,      0},
-	{"system.cpu.intr",     0,              SYSTEM_CPU_INTR,        0,      0},
+	{"vfs.dev.read",	CF_USEUPARAM,	VFS_DEV_READ,	0,	"hda,ops,avg1"},
+	{"vfs.dev.write",	CF_USEUPARAM,	VFS_DEV_WRITE,	0,	"hda,ops,avg1"},
 
 	{"net.tcp.dns",		CF_USEUPARAM,	CHECK_DNS,		0,	"127.0.0.1,localhost"},
-
 	{"net.tcp.listen",      CF_USEUPARAM,   NET_TCP_LISTEN, 0,      "80"},	
-
 	{"net.tcp.port",	CF_USEUPARAM,	CHECK_PORT,		0,	",80"},
 	{"net.tcp.service",	CF_USEUPARAM,	CHECK_SERVICE, 		0,	"ssh,127.0.0.1,22"},
 	{"net.tcp.service.perf",CF_USEUPARAM,	CHECK_SERVICE_PERF, 	0,	"ssh,127.0.0.1,22"},
@@ -53,19 +55,14 @@ ZBX_METRIC	parameters_specific[]=
 	{"net.if.total",	CF_USEUPARAM,	NET_IF_TOTAL,	0,	"lo,bytes"},
         {"net.if.collisions",   CF_USEUPARAM,   NET_IF_COLLISIONS,      0,      "lo"},
 
-	{"vfs.fs.size",		CF_USEUPARAM,	VFS_FS_SIZE,	0,	"/,free"},
-	{"vfs.fs.inode",	CF_USEUPARAM,	VFS_FS_INODE,	0,	"/,free"},
-
-	{"vfs.dev.read",	CF_USEUPARAM,	VFS_DEV_READ,	0,	"hda,ops,avg1"},
-	{"vfs.dev.write",	CF_USEUPARAM,	VFS_DEV_WRITE,	0,	"hda,ops,avg1"},
-
 	{"vm.memory.size",	CF_USEUPARAM,	VM_MEMORY_SIZE,	0,	"free"},
 
-	{"proc.num",		CF_USEUPARAM,	PROC_NUM,	0,	"inetd,,"},
-	{"proc.mem",		CF_USEUPARAM,	PROC_MEMORY,	0,	"inetd,,"},
+	{"proc.num",		CF_USEUPARAM,	PROC_NUM,	0,	"svchost.exe,"},
+	{"proc.mem",		CF_USEUPARAM,	PROC_MEMORY,	0,	"svchost.exe,,"},
 
-	{"system.cpu.util",	CF_USEUPARAM,	SYSTEM_CPU_UTIL,	0,	"all,user,avg1"},
-
+	{"system.cpu.switches", 0,              SYSTEM_CPU_SWITCHES,    0,      0},
+	{"system.cpu.intr",     0,              SYSTEM_CPU_INTR,        0,      0},
+	{"system.cpu.util",	CF_USEUPARAM,	SYSTEM_CPU_UTIL,	0,	"all,system,avg1"},
 	{"system.cpu.load",	CF_USEUPARAM,	SYSTEM_CPU_LOAD,	0,	"all,avg1"},
 
 	{"system.swap.size",	CF_USEUPARAM,	SYSTEM_SWAP_SIZE,	0,	"all,free"},

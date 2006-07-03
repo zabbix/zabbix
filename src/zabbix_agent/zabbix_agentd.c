@@ -137,16 +137,10 @@ static ZBX_SOCKET connect_to_server(void)
 {
 	ZBX_SOCKET sock;
 	ZBX_SOCKADDR serv_addr;
-	int error;
 
 	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
 	{
-#if defined(WIN32)
-	error = WSAGetLastError();	
-#else /* not WIN32 */
-	error = errno;
-#endif /* WIN32 */
-		zabbix_log( LOG_LEVEL_CRIT, "Unable to create socket. [%s]", strerror_from_system(error));
+		zabbix_log( LOG_LEVEL_CRIT, "Unable to create socket. [%s]", strerror_from_system(zbx_sock_last_error()));
 		exit(1);
 	}
 
@@ -161,25 +155,15 @@ static ZBX_SOCKET connect_to_server(void)
 	// Bind socket
 	if (bind(sock,(struct sockaddr *)&serv_addr,sizeof(ZBX_SOCKADDR)) == SOCKET_ERROR)
 	{
-#if defined(WIN32)
-	error = WSAGetLastError();	
-#else /* not WIN32 */
-	error = errno;
-#endif /* WIN32 */
 		zabbix_log(LOG_LEVEL_CRIT, "Cannot bind to port %u for server %s. Error [%s]. Another zabbix_agentd already running ?",
-				CONFIG_LISTEN_PORT, CONFIG_LISTEN_IP, strerror_from_system(error));
+				CONFIG_LISTEN_PORT, CONFIG_LISTEN_IP, strerror_from_system(zbx_sock_last_error()));
 
 		exit(1);
 	}
 
 	if(listen(sock, SOMAXCONN) == SOCKET_ERROR)
 	{
-#if defined(WIN32)
-	error = WSAGetLastError();	
-#else /* not WIN32 */
-	error = errno;
-#endif /* WIN32 */
-		zabbix_log( LOG_LEVEL_CRIT, "Listen failed. [%s]", strerror_from_system(error));
+		zabbix_log( LOG_LEVEL_CRIT, "Listen failed. [%s]", strerror_from_system(zbx_sock_last_error()));
 		exit(1);
 	}
 
@@ -327,12 +311,36 @@ int	main(int argc, char **argv)
 	init_daemon();
 #endif /* WIN32 */
 
-	//WriteLog(MSG_AGENT_SHUTDOWN, EVENTLOG_INFORMATION_TYPE,NULL);
-
-	zabbix_close_log();
-	alias_list_free();
+	on_exit();
 
 	return SUCCEED;
+}
+
+void	on_exit()
+{
+#if !defined(WIN32)
+	if(threads != NULL)
+	{
+		for(i = 0; i<CONFIG_AGENTD_FORKS; i++)
+		{
+			if(threads[i]) {
+				kill(threads[i],SIGTERM);
+			}
+		}
+	}
+
+	if(unlink(CONFIG_PID_FILE) != 0)
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Cannot remove PID file [%s]",
+			CONFIG_PID_FILE);
+	}
+
+#endif /* not WIN32 */
+
+	zabbix_log(LOG_LEVEL_INFORMATION,"ZABBIX Agent stopped");
+	zabbix_close_log();
+	free_collector_data();
+	alias_list_free();
 }
 
 #endif /* ZABBIX_TEST */

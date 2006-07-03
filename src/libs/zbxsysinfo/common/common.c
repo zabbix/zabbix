@@ -31,11 +31,6 @@ ZBX_METRIC	parameters_common[]=
 /*      KEY                     FLAG    FUNCTION        ADD_PARAM       TEST_PARAM */
 	{
 	{"system.localtime",	0,		SYSTEM_LOCALTIME,	0,	0},
-	{"vfs.file.exists",	CF_USEUPARAM,	VFS_FILE_EXISTS,	0,	"/etc/passwd"},
-	{"vfs.file.time",       CF_USEUPARAM,   VFS_FILE_TIME,          0,      "/etc/passwd,modify"},
-	{"vfs.file.size",	CF_USEUPARAM,	VFS_FILE_SIZE, 		0,	"/etc/passwd"},
-	{"vfs.file.regexp",	CF_USEUPARAM,	VFS_FILE_REGEXP,	0,	"/etc/passwd,root"},
-	{"vfs.file.regmatch",	CF_USEUPARAM,	VFS_FILE_REGMATCH, 	0,	"/etc/passwd,root"},
 	{"system.run",		CF_USEUPARAM,	RUN_COMMAND,	 	0,	"echo test"},
 	{"web.page.get",	CF_USEUPARAM,	WEB_PAGE_GET,	 	0,	"www.zabbix.com,,80"},
 	{"web.page.perf",	CF_USEUPARAM,	WEB_PAGE_PERF,	 	0,	"www.zabbix.com,,80"},
@@ -229,27 +224,19 @@ int 	copy_result(AGENT_RESULT *src, AGENT_RESULT *dist)
 void	free_result(AGENT_RESULT *result)
 {
 
-	if(result->type & AR_STRING)
-	{
-		free(result->str);
-	}
-
-	if(result->type & AR_TEXT)
-	{
-		free(result->text);
-	}
-	
-	if(result->type & AR_MESSAGE)
-	{
-		free(result->msg);
-	}
+	UNSET_DBL_RESULT(result);
+	UNSET_UI64_RESULT(result);
+	UNSET_STR_RESULT(result);
+	UNSET_TEXT_RESULT(result);
+	UNSET_MSG_RESULT(result);
 
 	if(result->type & AR_LIST)
 	{
 		free_result_list(&(result->list));
+
+		result->type &= ~AR_LIST;
 	}
 
-	init_result(result);
 }
 
 void	init_result(AGENT_RESULT *result)
@@ -1162,7 +1149,8 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
         init_result(result);
 	
 	strsncpy(command, param, MAX_STRING_LEN);
-	
+	memset(cmd_result, 0, MAX_STRING_LEN);
+
 #if defined(WIN32)
 
 	// Create temporary file to hold process output
@@ -1188,11 +1176,11 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 	// Fill in process startup info structure
 	memset(&si,0,sizeof(STARTUPINFO));
-	si.cb=sizeof(STARTUPINFO);
-	si.dwFlags=STARTF_USESTDHANDLES;
-	si.hStdInput=GetStdHandle(STD_INPUT_HANDLE);
-	si.hStdOutput=hOutput;
-	si.hStdError=GetStdHandle(STD_ERROR_HANDLE);
+	si.cb		= sizeof(STARTUPINFO);
+	si.dwFlags	= STARTF_USESTDHANDLES;
+	si.hStdInput	= GetStdHandle(STD_INPUT_HANDLE);
+	si.hStdOutput	= hOutput;
+	si.hStdError	= GetStdHandle(STD_ERROR_HANDLE);
 
 	// Create new process
 	if (!CreateProcess(NULL,command,NULL,NULL,TRUE,0,NULL,NULL,&si,&pi))
@@ -1211,7 +1199,8 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 	// Read process output
 	ReadFile(hOutput, cmd_result, MAX_STRING_LEN-1, &len, NULL);
-	cmd_result[len]=0;		
+
+	cmd_result[len] = '\0';
 
 #else /* not WIN32 */
 
@@ -1220,7 +1209,6 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		switch (errno)
 		{
 			case	EINTR:
-/* (char *) to avoid compiler warning */
 				return SYSINFO_RET_TIMEOUT;
 			default:
 				return SYSINFO_RET_FAIL;
@@ -1235,7 +1223,6 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		{
 			case	EINTR:
 				pclose(f);
-/* (char *) to avoid compiler warning */
 				return SYSINFO_RET_TIMEOUT;
 			default:
 				pclose(f);
@@ -1243,7 +1230,7 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		}
 	}
 
-	cmd_result[len]=0;
+	cmd_result[len] = '\0';
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Run remote command [%s] Result [%d] [%s]", command, strlen(cmd_result), cmd_result);
 
@@ -1266,80 +1253,39 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	{
 		return SYSINFO_RET_FAIL;
 	}
-	
-	for(i=strlen(cmd_result); i>0; i--)
+
+	for(i=1; i < len; i++)
 	{
-		if(cmd_result[i] == '\n')
+		if(cmd_result[i] == '\n' || cmd_result[i] == '\r')
 		{
 			cmd_result[i] = '\0';
 			break;
 		}
 	}
-	
+
 	SET_TEXT_RESULT(result, strdup(cmd_result));
 
 	return	SYSINFO_RET_OK;
 
 }
 
-int	EXECUTE(const char *cmd, const char *command, unsigned flags, AGENT_RESULT *result)
+int	EXECUTE_INT(const char *cmd, const char *command, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef TODO /* TODO !!! */
-	FILE	*f;
-	char	c[MAX_STRING_LEN];
-	double	value = 0;
+	int	ret	= SYSINFO_RET_FAIL;
+	double	value	= 0;
 
-        assert(result);
+	ret = EXECUTE_STR(cmd,command,flags,result);
 
-	init_result(result);
-		
-	f=popen( command,"r");
-	if(f==0)
+	if(SYSINFO_RET_OK == ret)
 	{
-		switch (errno)
-		{
-			case	EINTR:
-				return SYSINFO_RET_TIMEOUT;
-			default:
-				return SYSINFO_RET_FAIL;
-		}
+		sscanf(result->text, "%lf", &value);
+
+		UNSET_TEXT_RESULT(result);
+
+		SET_DBL_RESULT(result, value);
 	}
 
-	if(NULL == fgets(c,MAX_STRING_LEN,f))
-	{
-		pclose(f);
-		switch (errno)
-		{
-			case	EINTR:
-				return SYSINFO_RET_TIMEOUT;
-			default:
-				return SYSINFO_RET_FAIL;
-		}
-	}
-
-	if(pclose(f) != 0)
-	{
-		switch (errno)
-		{
-			case	EINTR:
-				return SYSINFO_RET_TIMEOUT;
-			default:
-				return SYSINFO_RET_FAIL;
-		}
-	}
-
-	/* We got EOL only */
-	if(c[0] == '\n')
-	{
-		return SYSINFO_RET_FAIL;
-	}
-
-	sscanf(c, "%lf", &value);
-	SET_DBL_RESULT(result, value);
-
-#endif /* TODO */
-
-	return	SYSINFO_RET_OK;
+	return ret;
 }
 
 int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -1631,9 +1577,10 @@ int	tcp_expect(char	*hostname, short port, char *request,char *expect,char *send
 	close(s);
 	*value_int = 0;
 
+	return SYSINFO_RET_OK;
 #endif /* TODO */
 
-	return SYSINFO_RET_OK;
+	return SYSINFO_RET_FAIL;
 }
 
 #ifdef HAVE_LDAP
@@ -1773,9 +1720,11 @@ int	check_ssh(char	*hostname, short port, int *value_int)
 	close(s);
 	*value_int = 0;
 
+	return	SYSINFO_RET_OK;
+
 #endif /* TODO */
 
-	return	SYSINFO_RET_OK;
+	return	SYSINFO_RET_FAIL;
 }
 
 /* Example check_service[ssh], check_service[smtp,29],check_service[ssh,127.0.0.1,22]*/
@@ -1906,9 +1855,11 @@ int	CHECK_SERVICE_PERF(const char *cmd, const char *param, unsigned flags, AGENT
 	
 	SET_DBL_RESULT(result, 0.0);
 
+	return SYSINFO_RET_OK;
+
 #endif /* TODO */
 
-	return SYSINFO_RET_OK;
+	return SYSINFO_RET_FAIL;
 }
 
 /* Example check_service[ssh], check_service[smtp,29],check_service[ssh,127.0.0.1,22]*/
@@ -1921,7 +1872,7 @@ int	CHECK_SERVICE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	char	str_port[MAX_STRING_LEN];
 
 	int	ret;
-	int	value_int;
+	int	value_int = 0;
 
         assert(result);
 
@@ -2024,7 +1975,10 @@ int	CHECK_SERVICE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 		return SYSINFO_RET_FAIL;
 	}
 
-	SET_UI64_RESULT(result, value_int);
+	if(SYSINFO_RET_OK == ret)
+	{
+		SET_UI64_RESULT(result, value_int);
+	}
 
 	return ret;
 }
@@ -2154,9 +2108,11 @@ int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 #endif
 	SET_UI64_RESULT(result, res != -1 ? 1 : 0);
 
+	return SYSINFO_RET_OK;
+
 #endif /* TODO */
 
-	return SYSINFO_RET_OK;
+	return SYSINFO_RET_FAIL;
 }
 
 int     SYSTEM_UNUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -2165,25 +2121,7 @@ int     SYSTEM_UNUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
         init_result(result);
 
-        return EXECUTE(cmd, "who|wc -l", flags, result);
-}
-
-int     SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-        assert(result);
-
-        init_result(result);
-
-        return EXECUTE_STR(cmd, "uname -a", flags, result);
-}
-
-int     SYSTEM_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-        assert(result);
-
-        init_result(result);
-
-        return EXECUTE_STR(cmd, "hostname", flags, result);
+        return EXECUTE_INT(cmd, "who|wc -l", flags, result);
 }
 
 int     OLD_SYSTEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -2211,7 +2149,7 @@ int     OLD_SYSTEM(const char *cmd, const char *param, unsigned flags, AGENT_RES
         }
         else if(strcmp(key,"procrunning") == 0)
         {
-                ret = EXECUTE(cmd, "cat /proc/loadavg|cut -f1 -d'/'|cut -f4 -d' '", flags, result);
+                ret = EXECUTE_INT(cmd, "cat /proc/loadavg|cut -f1 -d'/'|cut -f4 -d' '", flags, result);
         }
         else if(strcmp(key,"uptime") == 0)
         {

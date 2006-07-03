@@ -290,6 +290,10 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\win32\swap.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\src\libs\zbxsysinfo\win32\system_w32.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\src\libs\zbxsysinfo\win32\uptime.c
 # End Source File
 # Begin Source File

@@ -29,22 +29,22 @@ int     OLD_CPU(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 static int	SYSTEM_CPU_IDLE1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	return EXECUTE(cmd, "iostat | tail -n 1 | awk '{printf(\"%s\",$(NF))}'", flags, result);
+	return EXECUTE_INT(cmd, "iostat | tail -n 1 | awk '{printf(\"%s\",$(NF))}'", flags, result);
 }
 
 static int	SYSTEM_CPU_SYS1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	return EXECUTE(cmd, "iostat | tail -n 1 | awk '{printf(\"%s\",$(NF-1))}'", flags, result);
+	return EXECUTE_INT(cmd, "iostat | tail -n 1 | awk '{printf(\"%s\",$(NF-1))}'", flags, result);
 }
 
 static int	SYSTEM_CPU_NICE1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	return EXECUTE(cmd, "iostat | tail -n 1 | awk '{printf(\"%s\",$(NF-2))}'", flags, result);
+	return EXECUTE_INT(cmd, "iostat | tail -n 1 | awk '{printf(\"%s\",$(NF-2))}'", flags, result);
 }
 
 static int	SYSTEM_CPU_USER1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	return EXECUTE(cmd, "iostat | tail -n 1 | awk '{printf(\"%s\",$(NF-3))}'", flags, result);
+	return EXECUTE_INT(cmd, "iostat | tail -n 1 | awk '{printf(\"%s\",$(NF-3))}'", flags, result);
 }
 
 int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -131,17 +131,17 @@ CPU_FNCLIST
 
 int	SYSTEM_CPU_LOAD1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	return EXECUTE(cmd, "uptime | awk '{printf(\"%s\", $(NF))}' | sed 's/[ ,]//g'", flags, result);
+	return EXECUTE_INT(cmd, "uptime | awk '{printf(\"%s\", $(NF))}' | sed 's/[ ,]//g'", flags, result);
 }
 
 int	SYSTEM_CPU_LOAD5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	return EXECUTE(cmd, "uptime | awk '{printf(\"%s\", $(NF-1))}' | sed 's/[ ,]//g'", flags, result);
+	return EXECUTE_INT(cmd, "uptime | awk '{printf(\"%s\", $(NF-1))}' | sed 's/[ ,]//g'", flags, result);
 }
 
 int	SYSTEM_CPU_LOAD15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	return EXECUTE(cmd, "uptime | awk '{printf(\"%s\", $(NF-2))}' | sed 's/[ ,]//g'", flags, result);
+	return EXECUTE_INT(cmd, "uptime | awk '{printf(\"%s\", $(NF-2))}' | sed 's/[ ,]//g'", flags, result);
 }
 
 int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)

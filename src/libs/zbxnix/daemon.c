@@ -20,7 +20,6 @@
 #include "common.h"
 #include "daemon.h"
 
-#include "threads.h"
 #include "pid.h"
 #include "log.h"
 #include "cfg.h"
@@ -33,22 +32,7 @@ static void	uninit(void)
 
 	if(parent == 1)
 	{
-		if(threads != NULL)
-		{
-			for(i = 0; i<CONFIG_AGENTD_FORKS; i++)
-			{
-				if(threads[i]) {
-					kill(threads[i],SIGTERM);
-				}
-			}
-		}
-
-		if( unlink(CONFIG_PID_FILE) != 0)
-		{
-			zabbix_log( LOG_LEVEL_WARNING, "Cannot remove PID file [%s]",
-				CONFIG_PID_FILE);
-		}
-		// TODO call free_collector_data() !!!
+		on_exit();
 	}
 }
 
@@ -190,7 +174,7 @@ void	init_parent_process(void)
 	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = 0;
 
-	/* For parent only. To avoid problems with EXECUTE */
+	/* For parent only. To avoid problems with EXECUTE_INT */
 	sigaction(SIGCHLD,	&phan, NULL);
 }
 

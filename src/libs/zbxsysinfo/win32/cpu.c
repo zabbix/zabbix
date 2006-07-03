@@ -33,9 +33,7 @@ int     OLD_CPU(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 
-#ifdef TODO
-
-	char cpuname[20];
+	char cpuname[MAX_STRING_LEN];
 	char type[MAX_STRING_LEN];
 	char mode[MAX_STRING_LEN];
 
@@ -80,6 +78,12 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		/* default parameter */
 		sprintf(mode, "avg1");
 	}
+	
+	if(NULL == collector)
+	{
+		SET_MSG_RESULT(result, strdup("Collector is not started!"));
+		return SYSINFO_RET_OK;
+	}
 
 	if(strcmp(cpuname,"all") == 0)
 	{
@@ -88,7 +92,7 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	else
 	{
 		cpu_num = atoi(cpuname)+1;
-		if ((cpu_num < 1)||(cpu_num > MAX_CPU))
+		if ((cpu_num < 1) || (cpu_num > collector->cpus.count))
 			return SYSINFO_RET_FAIL;
 	}
 
@@ -99,15 +103,15 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	if(strcmp(mode,"avg1") == 0)
 	{
-		SET_DBL_RESULT(result, collector->cpu.util[cpu_num]);
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].util1);
 	}
 	else	if(strcmp(mode,"avg5") == 0)
 	{
-		SET_DBL_RESULT(result, collector->cpu.util5[cpu_num]);
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].util5);
 	}
 	else	if(strcmp(mode,"avg15") == 0)
 	{
-		SET_DBL_RESULT(result, collector->cpu.util15[cpu_num]);
+		SET_DBL_RESULT(result, collector->cpus.cpu[cpu_num].util15);
 	}
 	else
 	{
@@ -115,23 +119,14 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	}
 
 	return SYSINFO_RET_OK;
-
-#endif /* TODO */
-
-	return SYSINFO_RET_FAIL;
 }
 
 
 
 int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef TODO
-
-	char 
-		cpuname[10],
+	char	cpuname[10],
 		mode[10];
-
-	int cpu_num;
 
 	if(num_param(param) > 2)
 	{
@@ -160,28 +155,28 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		sprintf(mode, "avg1");
 	}
 
-	if(strcmp(cpuname,"all") == 0)
+	if(strcmp(cpuname,"all") != 0)
 	{
-		cpu_num = 0;
+		return SYSINFO_RET_FAIL;
 	}
-	else
+
+	if(NULL == collector)
 	{
-		cpu_num = atoi(cpuname)+1;
-		if ((cpu_num < 1) || (cpu_num > MAX_CPU))
-			return SYSINFO_RET_FAIL;
+		SET_MSG_RESULT(result, strdup("Collector is not started!"));
+		return SYSINFO_RET_OK;
 	}
 
 	if(strcmp(mode,"avg1") == 0)
 	{
-		SET_DBL_RESULT(result, collector->cpu.load);
+		SET_DBL_RESULT(result, collector->cpus.load1);
 	}
 	else	if(strcmp(mode,"avg5") == 0)
 	{
-		SET_DBL_RESULT(result, collector->cpu.load5);
+		SET_DBL_RESULT(result, collector->cpus.load5);
 	}
 	else	if(strcmp(mode,"avg15") == 0)
 	{
-		SET_DBL_RESULT(result, collector->cpu.load15);
+		SET_DBL_RESULT(result, collector->cpus.load15);
 	}
 	else
 	{
@@ -190,9 +185,6 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	return SYSINFO_RET_OK;
 
-#endif /* TODO */
-
-	return SYSINFO_RET_FAIL;
 }
 
 int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)

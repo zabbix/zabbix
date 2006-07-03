@@ -112,8 +112,8 @@ int	WEB_PAGE_GET(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 		strscpy(port_str, "80");
 	}
 
-	buffer=malloc(ZABBIX_MAX_WEBPAGE_SIZE);
-	if(get_http_page(hostname, path, (unsigned short)atoi(port_str), buffer, ZABBIX_MAX_WEBPAGE_SIZE) == SYSINFO_RET_OK)
+	buffer = calloc(1, ZABBIX_MAX_WEBPAGE_SIZE);
+	if(SYSINFO_RET_OK == get_http_page(hostname, path, (unsigned short)atoi(port_str), buffer, ZABBIX_MAX_WEBPAGE_SIZE))
 	{
 		SET_TEXT_RESULT(result, buffer);
 	}
@@ -168,7 +168,7 @@ int	WEB_PAGE_PERF(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 
 	start_time = zbx_getseconds();
 
-	buffer=malloc(ZABBIX_MAX_WEBPAGE_SIZE);
+	buffer = calloc(1, ZABBIX_MAX_WEBPAGE_SIZE);
 	if(get_http_page(hostname, path, (unsigned short)atoi(port_str), buffer, ZABBIX_MAX_WEBPAGE_SIZE) == SYSINFO_RET_OK)
 	{
 		SET_DBL_RESULT(result, zbx_getseconds() - start_time);
@@ -238,7 +238,7 @@ int	WEB_PAGE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
                 return SYSINFO_RET_FAIL;
 	}
 
-	buffer=malloc(ZABBIX_MAX_WEBPAGE_SIZE);
+	buffer = calloc(1, ZABBIX_MAX_WEBPAGE_SIZE);
 	if(get_http_page(hostname, path, (unsigned short)atoi(port_str), buffer, ZABBIX_MAX_WEBPAGE_SIZE) == SYSINFO_RET_OK)
 	{
 		found = zbx_regexp_match(buffer,regexp,&l);

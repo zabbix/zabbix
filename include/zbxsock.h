@@ -62,8 +62,10 @@ int zbx_sock_write(ZBX_SOCKET sock, void *buf, int buflen);
 
 #if defined (WIN32)
 #	define	zbx_sock_close(sock)	closesocket(sock)
+#	define  zbx_sock_last_error()	WSAGetLastError()
 #else /* not WIN32 */
 #	define	zbx_sock_close(sock)	close(sock)
+#	define  zbx_sock_last_error()	errno
 #endif /* WIN32 */
 
 

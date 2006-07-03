@@ -73,7 +73,7 @@ static void	process_listener(ZBX_SOCKET sock)
 
 	if(ret == SOCKET_ERROR)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Error writing to socket [%s]", strerror(errno));
+		zabbix_log(LOG_LEVEL_WARNING, "Error writing to socket [%s]", strerror(errno));
 	}
 }
 
@@ -84,7 +84,6 @@ ZBX_THREAD_ENTRY(listener_thread, pSock)
 	ZBX_SOCKET	sock, accept_sock;
 	ZBX_SOCKADDR	serv_addr;
 	int nlen = 0;
-	int error;
 
 	assert(pSock);
 
@@ -102,15 +101,9 @@ ZBX_THREAD_ENTRY(listener_thread, pSock)
 		nlen = sizeof(ZBX_SOCKADDR);
 		if(SOCKET_ERROR == (accept_sock = accept(sock, (struct sockaddr *)&serv_addr, &nlen)))
 		{
-#if defined (WIN32)
-			error = WSAGetLastError();
-#else /* not WIN32 */
-			error = errno;
-#endif /* WIN32 */
-
-			if (error != EINTR)
+			if (EINTR != zbx_sock_last_error())
 			{
-				zabbix_log( LOG_LEVEL_WARNING, "Unable to accept incoming connection: [%s]", strerror_from_system(error));
+				zabbix_log( LOG_LEVEL_WARNING, "Unable to accept incoming connection: [%s]", strerror_from_system(zbx_sock_last_error()));
 			}
 
 			local_request_failed++;

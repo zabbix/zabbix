@@ -20,8 +20,6 @@
 #ifndef ZABBIX_MUTEXS_H
 #define ZABBIX_MUTEXS_H
 
-#define ZBX_SHARED_MUTEX 1
-
 #if defined(WIN32)
 
 	#define ZBX_MUTEX HANDLE
@@ -29,6 +27,8 @@
 	#define ZBX_MUTEX_OK (1)
 
 #else /* not WIN32 */
+
+#define ZBX_SHARED_MUTEX 1
 
 #if defined(ZBX_SHARED_MUTEX)
 

@@ -381,7 +381,7 @@ int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RES
 
     zbx_snprintf(command, sizeof(command), "netstat -an | grep '*.%s' | wc -l", param);
    
-    return EXECUTE(NULL, command, flags, result);
+    return EXECUTE_INT(NULL, command, flags, result);
 }
 
 int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)

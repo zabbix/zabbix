@@ -345,6 +345,8 @@ AGENT_RESULT {
 #define AR_TEXT		32
 
 
+/* SET RESULT */
+
 #define SET_DBL_RESULT(res, val) \
 	{ \
 	(res)->type |= AR_DOUBLE; \
@@ -375,30 +377,47 @@ AGENT_RESULT {
 	(res)->msg = (char*)(val); \
 	}
 
-#define UNSET_DBL_RESULT(res) \
-	{ \
-	(res)->type &= ~AR_DOUBLE; \
+/* UNSER RESULT */
+
+#define UNSET_DBL_RESULT(res)           \
+	{                               \
+	(res)->type &= ~AR_DOUBLE;      \
+	(res)->dbl = (double)(0);        \
 	}
 
-#define UNSET_UI64_RESULT(res) \
-	{ \
-	(res)->type &= ~AR_UINT64; \
+#define UNSET_UI64_RESULT(res)             \
+	{                                  \
+	(res)->type &= ~AR_UINT64;         \
+	(res)->ui64 = (zbx_uint64_t)(0); \
 	}
 
-#define UNSET_STR_RESULT(res) \
-	{ \
-	(res)->type &= ~AR_STRING; \
+#define UNSET_STR_RESULT(res)                      \
+	{                                          \
+		if((res)->type & AR_STRING){       \
+			free((res)->str);          \
+			(res)->str = NULL;         \
+			(res)->type &= ~AR_STRING; \
+		}                                  \
 	}
 
-#define UNSET_TEXT_RESULT(res) \
-	{ \
-	(res)->type &= ~AR_TEXT; \
+#define UNSET_TEXT_RESULT(res)                   \
+	{                                        \
+		if((res)->type & AR_TEXT){       \
+			free((res)->text);       \
+			(res)->text = NULL;      \
+			(res)->type &= ~AR_TEXT; \
+		}                                \
 	}
 
-#define UNSET_MSG_RESULT(res) \
-	{ \
-	(res)->type &= ~AR_MESSAGE; \
+#define UNSET_MSG_RESULT(res)                       \
+	{                                           \
+		if((res)->type & AR_MESSAGE){       \
+			free((res)->msg);           \
+			(res)->msg = NULL;          \
+			(res)->type &= ~AR_MESSAGE; \
+		}                                   \
 	}
+
 
 extern char *progname;
 extern char title_message[];
@@ -454,6 +473,8 @@ char    *zbx_regexp_match(const char *string, const char *pattern, int *len);
 
 /* Misc functions */
 int	cmp_double(double a,double b);
+
+void	on_exit();
 
 int       SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
