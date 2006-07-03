@@ -311,14 +311,16 @@ int	main(int argc, char **argv)
 	init_daemon();
 #endif /* WIN32 */
 
-	on_exit();
+	zbx_on_exit();
 
 	return SUCCEED;
 }
 
-void	on_exit()
+void	zbx_on_exit()
 {
 #if !defined(WIN32)
+	int i = 0;
+
 	if(threads != NULL)
 	{
 		for(i = 0; i<CONFIG_AGENTD_FORKS; i++)

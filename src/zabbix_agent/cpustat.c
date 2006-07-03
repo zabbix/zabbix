@@ -311,35 +311,35 @@ static int	get_cpustat(int *now,float *cpu_user,float *cpu_system,float *cpu_nic
 	{
 		if(strstr(line,"cpu ") == NULL) continue;
 
-		sscanf(line, "cpu %f %f %f %f", &cpu_user, &cpu_nice, &cpu_system, &cpu_idle);
+		sscanf(line, "cpu %f %f %f %f", cpu_user, cpu_nice, cpu_system, cpu_idle);
 		break;
 	}
 	fclose(file);
 
-	if(cpu_user < 0) 
+	if(*cpu_user < 0) 
 		return 1;
 	
 #elif defined(HAVE_SYS_PSTAT_H) /* HAVE_PROC_STAT */
 
 	pstat_getdynamic(&stats, sizeof( struct pst_dynamic ), 1, 0 );
-	cpu_user 	= (float)stats.psd_cpu_time[CP_USER];
-	cpu_nice 	= (float)stats.psd_cpu_time[CP_SYS];
-	cpu_system 	= (float)stats.psd_cpu_time[CP_NICE];
-	cpu_idle 	= (float)stats.psd_cpu_time[CP_IDLE];
+	*cpu_user 	= (float)stats.psd_cpu_time[CP_USER];
+	*cpu_nice 	= (float)stats.psd_cpu_time[CP_SYS];
+	*cpu_system 	= (float)stats.psd_cpu_time[CP_NICE];
+	*cpu_idle 	= (float)stats.psd_cpu_time[CP_IDLE];
 	
 #endif /* HAVE_SYS_PSTAT_H */
 	return 0;
 }
 
 
-#define CALC_CPU_LOAD(now_val, tim_val, now_all_val, tim_all_val)                         \
-	if((now_val - tim_val) > 0) && (now_all_val - tim_all_val) > 0)                   \
-	{                                                                                 \
-		tim_val = 100 * (float)((now_val - tim_val)/(now_all_val - tim_all_val)); \
-	}                                                                                 \
-	else                                                                              \
-	{                                                                                 \
-		tim_val = 0;                                                              \
+#define CALC_CPU_LOAD(now_val, tim_val, now_all_val, tim_all_val)                             \
+	if((now_val) - (tim_val) > 0 && (now_all_val) - (tim_all_val) > 0)                    \
+	{                                                                                     \
+		tim_val = 100 * (float)((now_val) - (tim_val)/(now_all_val) - (tim_all_val)); \
+	}                                                                                     \
+	else                                                                                  \
+	{                                                                                     \
+		tim_val = 0;                                                                  \
 	}
 
 static void	apply_cpustat(
@@ -363,10 +363,10 @@ static void	apply_cpustat(
 		{
 			pcpus->clock[i]	= now;
 
-			pcpus->idle	= pcpus->user[i]	= cpu_user;
-			pcpus->user	= pcpus->system[i]	= cpu_system;
-			pcpus->nice	= pcpus->nice[i]	= cpu_nice;
-			pcpus->system	= pcpus->idle[i]	= cpu_idle;
+			pcpus->user	= pcpus->h_user[i]	= cpu_user;
+			pcpus->system	= pcpus->h_system[i]	= cpu_system;
+			pcpus->nice	= pcpus->h_nice[i]	= cpu_nice;
+			pcpus->idle	= pcpus->h_idle[i]	= cpu_idle;
 
 			pcpus->all	= cpu_idle + cpu_user + cpu_nice + cpu_system;
 			break;
@@ -381,39 +381,39 @@ static void	apply_cpustat(
 
 		if(pcpus->clock[i] == now)
 		{
-			pcpus->idle	= pcpus->cpu_idle[i];
-			pcpus->user	= pcpus->cpu_user[i];
-			pcpus->nice	= pcpus->cpu_nice[i];
-			pcpus->system	= pcpus->cpu_system[i];
-			pcpus->all	= cpu_idle + cpu_user + cpu_nice + cpu_system;
+			pcpus->idle	= pcpus->h_idle[i];
+			pcpus->user	= pcpus->h_user[i];
+			pcpus->nice	= pcpus->h_nice[i];
+			pcpus->system	= pcpus->h_system[i];
+			pcpus->all	= pcpus->idle + pcpus->user + pcpus->nice + pcpus->system;
 		}
 
 		if((pcpus->clock[i] >= (now - 60)) && (time1 > pcpus->clock[i]))
 		{
 			time1		= pcpus->clock[i];
-			pcpus->idle1	= pcpus->cpu_idle[i];
-			pcpus->user1	= pcpus->cpu_user[i];
-			pcpus->nice1	= pcpus->cpu_nice[i];
-			pcpus->system1	= pcpus->cpu_system[i];
-			pcpus->all1	= cpu_idle1 + cpu_user1 + cpu_nice1 + cpu_system1;
+			pcpus->idle1	= pcpus->h_idle[i];
+			pcpus->user1	= pcpus->h_user[i];
+			pcpus->nice1	= pcpus->h_nice[i];
+			pcpus->system1	= pcpus->h_system[i];
+			pcpus->all1	= pcpus->idle1 + pcpus->user1 + pcpus->nice1 + pcpus->system1;
 		}
 		if((pcpus->clock[i] >= (now - (5*60))) && (time5 > pcpus->clock[i]))
 		{
 			time5		= pcpus->clock[i];
-			pcpus->idle5	= pcpus->cpu_idle[i];
-			pcpus->user5	= pcpus->cpu_user[i];
-			pcpus->nice5	= pcpus->cpu_nice[i];
-			pcpus->system5	= pcpus->cpu_system[i];
-			pcpus->all5	= cpu_idle5 + cpu_user5 + cpu_nice5 + cpu_system5;
+			pcpus->idle5	= pcpus->h_idle[i];
+			pcpus->user5	= pcpus->h_user[i];
+			pcpus->nice5	= pcpus->h_nice[i];
+			pcpus->system5	= pcpus->h_system[i];
+			pcpus->all5	= pcpus->idle5 + pcpus->user5 + pcpus->nice5 + pcpus->system5;
 		}
 		if((pcpus->clock[i] >= (now - (15*60))) && (time15 > pcpus->clock[i]))
 		{
 			time15		= pcpus->clock[i];
-			pcpus->idle15	= pcpus->cpu_idle[i];
-			pcpus->user15	= pcpus->cpu_user[i];
-			pcpus->nice15	= pcpus->cpu_nice[i];
-			pcpus->system15	= pcpus->cpu_system[i];
-			pcpus->all15	= cpu_idle15 + cpu_user15 + cpu_nice15 + cpu_system15;
+			pcpus->idle15	= pcpus->h_idle[i];
+			pcpus->user15	= pcpus->h_user[i];
+			pcpus->nice15	= pcpus->h_nice[i];
+			pcpus->system15	= pcpus->h_system[i];
+			pcpus->all15	= pcpus->idle15 + pcpus->user15 + pcpus->nice15 + pcpus->system15;
 		}
 	}
 

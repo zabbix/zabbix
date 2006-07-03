@@ -474,7 +474,7 @@ char    *zbx_regexp_match(const char *string, const char *pattern, int *len);
 /* Misc functions */
 int	cmp_double(double a,double b);
 
-void	on_exit();
+void	zbx_on_exit();
 
 int       SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 

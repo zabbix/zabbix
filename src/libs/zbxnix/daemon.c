@@ -28,11 +28,9 @@ static int	parent=0;
 
 static void	uninit(void)
 {
-	int i;
-
 	if(parent == 1)
 	{
-		on_exit();
+		zbx_on_exit();
 	}
 }
 

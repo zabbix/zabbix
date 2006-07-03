@@ -64,14 +64,16 @@
 	typedef struct s_cpus_stat_data
 	{
 		int	clock[MAX_CPU_HISTORY];
-		float	user[MAX_CPU_HISTORY];
-		float	system[MAX_CPU_HISTORY];
-		float	nice[MAX_CPU_HISTORY];
-		float	idle[MAX_CPU_HISTORY];
+		float	h_user[MAX_CPU_HISTORY];
+		float	h_system[MAX_CPU_HISTORY];
+		float	h_nice[MAX_CPU_HISTORY];
+		float	h_idle[MAX_CPU_HISTORY];
 
+		float	idle;
 		float	idle1;
 		float	idle5;
 		float	idle15;
+		float	user;
 		float	user1;
 		float	user5;
 		float	user15;
@@ -79,9 +81,11 @@
 		float	system1;
 		float	system5;
 		float	system15;
+		float	nice;
 		float	nice1;
 		float	nice5;
 		float	nice15;
+		float	all;
 		float	all1;
 		float	all5;
 		float	all15;
