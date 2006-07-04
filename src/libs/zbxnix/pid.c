@@ -18,6 +18,8 @@
 **/
 
 #include "common.h"
+#include "pid.h"
+
 #include "log.h"
 #include "threads.h"
 
@@ -25,41 +27,37 @@ int	create_pid_file(const char *pidfile)
 {
 	FILE	*f;
 
-/* Check if PID file already exists */
-	f = fopen(pidfile, "r");
-	if(f != NULL)
+	/* check if pid file already exists */
+	if( NULL != (f = fopen(pidfile, "r")) )
 	{
 		zbx_error("File [%s] exists. Is this process already running ?", pidfile);
-		zabbix_log( LOG_LEVEL_CRIT, "File [%s] exists. Is this process already running ?",
-			pidfile);
+		zabbix_log( LOG_LEVEL_CRIT, "File [%s] exists. Is this process already running ?", pidfile);
 		if(fclose(f) != 0)
 		{
 			zbx_error("Cannot close file [%s] [%s]", pidfile, strerror(errno));
-			zabbix_log( LOG_LEVEL_WARNING, "Cannot close file [%s] [%s]",
-				pidfile, strerror(errno));
+			zabbix_log( LOG_LEVEL_WARNING, "Cannot close file [%s] [%s]", pidfile, strerror(errno));
 		}
 
 		return FAIL;
 	}
 
-	f = fopen(pidfile, "w");
-
-	if( f == NULL)
+	/* open pid file */
+	if( NULL == (f = fopen(pidfile, "w")))
 	{
-		zbx_error("Cannot create PID file [%s] [%s]",
-			pidfile, strerror(errno));
-		zabbix_log( LOG_LEVEL_CRIT, "Cannot create PID file [%s] [%s]",
-			pidfile, strerror(errno));
+		zbx_error("Cannot create PID file [%s] [%s]", pidfile, strerror(errno));
+		zabbix_log( LOG_LEVEL_CRIT, "Cannot create PID file [%s] [%s]", pidfile, strerror(errno));
 
 		return FAIL;
 	}
 
-	fprintf(f,"%li",zbx_get_thread_id());
+	/* frite pid to file */
+	fprintf(f, "%li", zbx_get_thread_id());
+
+	/* close pid file */
 	if(fclose(f) != 0)
 	{
 		zbx_error("Cannot close file [%s] [%s]", pidfile, strerror(errno));
-		zabbix_log( LOG_LEVEL_WARNING, "Cannot close file [%s] [%s]",
-			pidfile, strerror(errno));
+		zabbix_log( LOG_LEVEL_WARNING, "Cannot close file [%s] [%s]", pidfile, strerror(errno));
 	}
 
 	return SUCCEED;

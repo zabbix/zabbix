@@ -24,7 +24,7 @@
 #include "log.h"
 #include "cfg.h"
 
-static int	parent=0;
+static int	parent = 0;
 
 static void	uninit(void)
 {
@@ -106,19 +106,19 @@ void    init_daemon(void)
 
 	}
 
-	if( (pid = fork()) != 0 )	/* ???? Why and Why "!= 0" possiable " < 0" ???? - by Eugene */
-	{				/* ???? Why and Why "!= 0" possiable " < 0" ???? - by Eugene */
-		exit( 0 );		/* ???? Why and Why "!= 0" possiable " < 0" ???? - by Eugene */
-	}				/* ???? Why and Why "!= 0" possiable " < 0" ???? - by Eugene */
+	if( (pid = fork()) != 0 )	/* ???? Why and Why "!= 0" possiable " < 0" ???? - by Eugene !!!*/
+	{				/* ???? Why and Why "!= 0" possiable " < 0" ???? - by Eugene !!!*/
+		exit( 0 );		/* ???? Why and Why "!= 0" possiable " < 0" ???? - by Eugene !!!*/
+	}				/* ???? Why and Why "!= 0" possiable " < 0" ???? - by Eugene !!!*/
 
 	setsid();
 	
 	signal( SIGHUP, SIG_IGN );
 
-	if( (pid = fork()) !=0 )	/* ???? Why and Why "!= 0" possiable " < 0" ???? - by Eugene */
-	{				/* ???? Why and Why "!= 0" possiable " < 0" ???? - by Eugene */
-		exit( 0 );		/* ???? Why and Why "!= 0" possiable " < 0" ???? - by Eugene */
-	}				/* ???? Why and Why "!= 0" possiable " < 0" ???? - by Eugene */
+	if( (pid = fork()) !=0 )	/* ???? Why and Why "!= 0" possiable " < 0" ???? - by Eugene !!!*/
+	{				/* ???? Why and Why "!= 0" possiable " < 0" ???? - by Eugene !!!*/
+		exit( 0 );		/* ???? Why and Why "!= 0" possiable " < 0" ???? - by Eugene !!!*/
+	}				/* ???? Why and Why "!= 0" possiable " < 0" ???? - by Eugene !!!*/
 
 	chdir("/");
 	umask(022);
@@ -134,19 +134,25 @@ void    init_daemon(void)
 
 
 #ifdef HAVE_SYS_RESOURCE_SETPRIORITY
+
 	if(setpriority(PRIO_PROCESS,0,5)!=0)
 	{
 		zbx_error("Unable to set process priority to 5. Leaving default.");
 	}
+
 #endif /* HAVE_SYS_RESOURCE_SETPRIORITY */
 
 
 //------------------------------------------------
 
+#ifdef USE_PID_FILE
+
 	if( FAIL == create_pid_file(CONFIG_PID_FILE))
 	{
 		exit(FAIL);
 	}
+
+#endif /* USE_PID_FILE */
 
 	phan.sa_handler = child_signal_handler;
 	sigemptyset(&phan.sa_mask);

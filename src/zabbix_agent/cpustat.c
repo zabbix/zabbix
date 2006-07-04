@@ -23,24 +23,49 @@
 #include "log.h"
 
 #ifdef WIN32
-#	include "perfmon.h"
+
+	#include "perfmon.h"
+
 #else /* not WIN32 */
-static int	get_cpustat(
-	int *now,
-	float *cpu_user,
-	float *cpu_system,
-	float *cpu_nice,
-	float *cpu_idle
-	);
-static void	apply_cpustat(
-	ZBX_CPUS_STAT_DATA *pcpus,
-	int now, 
-	float cpu_user, 
-	float cpu_system,
-	float cpu_nice,
-	float cpu_idle
-	);
+
+	static int	get_cpustat(
+		int *now,
+		float *cpu_user,
+		float *cpu_system,
+		float *cpu_nice,
+		float *cpu_idle
+		);
+
+	static void	apply_cpustat(
+		ZBX_CPUS_STAT_DATA *pcpus,
+		int now, 
+		float cpu_user, 
+		float cpu_system,
+		float cpu_nice,
+		float cpu_idle
+		);
+
 #endif /* WIN32 */
+
+
+/******************************************************************************
+ *                                                                            *
+ * Function: init_cpu_collector                                               *
+ *                                                                            *
+ * Purpose: Initialize statistic structure and prepare state                  *
+ *          for data calculation                                              *
+ *                                                                            *
+ * Parameters:  pcpus - pointer to the structure                              *
+ *                      of ZBX_CPUS_STAT_DATA type                            *
+ *                                                                            *
+ * Return value: If the function succeeds, the return 0,                      *
+ *               great than 0 on an error                                     *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
 
 int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 {
@@ -75,7 +100,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 		return 2;
 	}
 
-	for(i=1 /* 0 - all cpus */; i <= pcpus->count /* "<=" instead of  "+ 1" */; i++)
+	for(i=1 /* 0 - is Total cpus */; i <= pcpus->count /* "<=" instead of  "+ 1" */; i++)
 	{
 		zbx_snprintf(counter_path, MAX_COUNTER_PATH,"\\%s(%d)\\%s", GetCounterName(PCI_PROCESSOR), i-1, GetCounterName(PCI_PROCESSOR_TIME));
 
@@ -119,6 +144,23 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 
 	return 0;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: close_cpu_collector                                              *
+ *                                                                            *
+ * Purpose: Cleare state of data calculation                                  *
+ *                                                                            *
+ * Parameters:  pcpus - pointer to the structure                              *
+ *                      of ZBX_CPUS_STAT_DATA type                            *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
 
 void	close_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 {
@@ -279,24 +321,24 @@ void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 
 static int	get_cpustat(int *now,float *cpu_user,float *cpu_system,float *cpu_nice,float *cpu_idle)
 {
-#if defined(HAVE_PROC_STAT)
+    #if defined(HAVE_PROC_STAT)
 	
 	FILE	*file;
 	char	line[MAX_STRING_LEN];
 	
-#elif defined(HAVE_SYS_PSTAT_H) /* not HAVE_PROC_STAT */
+    #elif defined(HAVE_SYS_PSTAT_H) /* not HAVE_PROC_STAT */
 	
 	struct pst_dynamic stats;
 	
-#else /* not HAVE_SYS_PSTAT_H */
+    #else /* not HAVE_SYS_PSTAT_H */
 
 	return 1;
 	
-#endif /* HAVE_PROC_STAT */
+    #endif /* HAVE_PROC_STAT */
 
 	*now = time(NULL);
 
-#if defined(HAVE_PROC_STAT)
+    #if defined(HAVE_PROC_STAT)
 	
 	file = fopen("/proc/stat","r");
 	if(NULL == file)
@@ -319,7 +361,7 @@ static int	get_cpustat(int *now,float *cpu_user,float *cpu_system,float *cpu_nic
 	if(*cpu_user < 0) 
 		return 1;
 	
-#elif defined(HAVE_SYS_PSTAT_H) /* HAVE_PROC_STAT */
+    #elif defined(HAVE_SYS_PSTAT_H) /* HAVE_PROC_STAT */
 
 	pstat_getdynamic(&stats, sizeof( struct pst_dynamic ), 1, 0 );
 	*cpu_user 	= (float)stats.psd_cpu_time[CP_USER];
@@ -327,7 +369,7 @@ static int	get_cpustat(int *now,float *cpu_user,float *cpu_system,float *cpu_nic
 	*cpu_system 	= (float)stats.psd_cpu_time[CP_NICE];
 	*cpu_idle 	= (float)stats.psd_cpu_time[CP_IDLE];
 	
-#endif /* HAVE_SYS_PSTAT_H */
+    #endif /* HAVE_SYS_PSTAT_H */
 	return 0;
 }
 

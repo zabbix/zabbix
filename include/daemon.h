@@ -23,6 +23,8 @@
 
 #include "threads.h"
 
+#define	MAXFD	64
+
 void    child_signal_handler(int sig);
 
 void	init_daemon(void);

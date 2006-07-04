@@ -56,31 +56,27 @@ char title_message[] = "ZABBIX Agent "
 
 char usage_message[] = "[-vhp] [-c <file>] [-t <metric>]";
 
-#ifndef HAVE_GETOPT_LONG
+char *help_message[] = {
+	"Options:",
+	"  -c --config <file>  Specify configuration file",
+	"  -h --help           give this help",
+	"  -v --version        display version number",
+	"  -p --print          print supported metrics and exit",
+	"  -t --test <metric>  test specified metric and exit",
 
-	char *help_message[] = {
-		"Options:",
-		"  -c <file>    Specify configuration file",
-		"  -h           give this help",
-		"  -v           display version number",
-		"  -p           print supported metrics and exit",
-		"  -t <metric>  test specified metric and exit",
-		0 /* end of text */
-	};
+#if defined (WIN32)
 
-#else /* not HAVE_GETOPT_LONG */
+	" ",
+	"  -i --install        install ZABIX agent as service",
+	"  -u --uninstall      uninstall ZABIX agent from service",
+	
+	"  -s --start          start ZABIX agent service",
+	"  -x --stop           stop ZABIX agent service",
 
-	char *help_message[] = {
-		"Options:",
-		"  -c --config <file>  Specify configuration file",
-		"  -h --help           give this help",
-		"  -v --version        display version number",
-		"  -p --print          print supported metrics and exit",
-		"  -t --test <metric>  test specified metric and exit",
-		0 /* end of text */
-	};
+#endif /* WIN32 */
 
-#endif /* HAVE_GETOPT_LONG */
+	0 /* end of text */
+};
 
 struct zbx_option longopts[] =
 {
@@ -89,6 +85,17 @@ struct zbx_option longopts[] =
 	{"version",	0,	0,	'v'},
 	{"print",	0,	0,	'p'},
 	{"test",	1,	0,	't'},
+
+#if defined (WIN32)
+
+	{"install",	0,	0,	'i'},
+	{"uninstall",	0,	0,	'u'},
+
+	{"start",	0,	0,	's'},
+	{"stop",	0,	0,	'x'},
+
+#endif /* WIN32 */
+
 	{0,0,0,0}
 };
 
@@ -105,7 +112,7 @@ static int parse_commandline(int argc, char **argv)
 	while ((ch = zbx_getopt_long(argc, argv, "c:hvpt:", longopts, NULL)) != EOF)
 		switch ((char) ch) {
 		case 'c':
-			CONFIG_FILE = zbx_optarg;
+			CONFIG_FILE = strdup(zbx_optarg);
 			break;
 		case 'h':
 			help();
@@ -126,6 +133,23 @@ static int parse_commandline(int argc, char **argv)
 				TEST_METRIC = strdup(zbx_optarg);
 			}
 			break;
+
+#if defined (WIN32)
+		case 'i':
+			task = ZBX_TASK_INSTALL_SERVICE;
+			break;
+		case 'u':
+			task = ZBX_TASK_UNINSTALL_SERVICE;
+			break;
+		case 's':
+			task = ZBX_TASK_START_SERVICE;
+			break;
+		case 'x':
+			task = ZBX_TASK_STOP_SERVICE;
+			break;
+
+#endif /* WIN32 */
+
 		default:
 			task = ZBX_TASK_SHOW_USAGE;
 			break;
@@ -228,7 +252,7 @@ void MAIN_ZABBIX_ENTRY(void)
 	{
 		if(zbx_thread_wait(threads[i]))
 		{
-			zabbix_log( LOG_LEVEL_INFORMATION, "%d: thread is terminated", threads[i]);
+			zabbix_log( LOG_LEVEL_INFORMATION, "%li: thread is terminated", threads[i]);
 			exit(1); /* close agent if any thread is closed */
 		}
 	}
@@ -306,6 +330,22 @@ int	main(int argc, char **argv)
 
 	switch(task)
 	{
+
+#if defined (WIN32)
+		case ZBX_TASK_INSTALL_SERVICE:
+			exit(ZabbixCreateService(argv[0]));
+			break;
+		case ZBX_TASK_UNINSTALL_SERVICE:
+			exit(ZabbixRemoveService());
+			break;
+		case ZBX_TASK_START_SERVICE:
+			exit(ZabbixStartService());
+			break;
+		case ZBX_TASK_STOP_SERVICE:
+			exit(ZabbixStopService());
+			break;
+#endif /* WIN32 */
+
 		case ZBX_TASK_PRINT_SUPPORTED:
 			test_parameters();
 			exit(SUCCEED);

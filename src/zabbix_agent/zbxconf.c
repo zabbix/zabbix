@@ -132,8 +132,6 @@ void    load_config(void)
 	}
 }
 
-
-
 static int     add_parameter(char *key)
 {
 	char    *command;

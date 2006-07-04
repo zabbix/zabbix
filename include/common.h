@@ -26,85 +26,15 @@
 
 #if defined(WIN32)
 
-#	define ZABBIX_EVENT_SOURCE   "Zabbix Win32 Agent"
-
-
+#	define ZABBIX_EVENT_SOURCE   "ZABBIX Win32 Agent"
 #	pragma warning (disable: 4100)
 
-//#undef _DEBUG
+#else /* not WIN32 */
 
-#	ifdef _DEBUG
-#		define LOG_DEBUG_INFO(type, msg) \
-			WriteLog(MSG_DEBUG_INFO,EVENTLOG_ERROR_TYPE, "d"type , GetCurrentThreadId(), msg)
-//#		define ENABLE_CHECK_MEMOTY
-//#		define ENABLE_FUNC_CALL
-#	else /* _DEBUG */
-#		define LOG_DEBUG_INFO(a, b) ((void)0)
-#	endif /* _DEBUG */
-
-
-#	if defined(ENABLE_FUNC_CALL)
-#		define LOG_FUNC_CALL(msg) \
-			WriteLog(MSG_DEBUG_INFO,EVENTLOG_ERROR_TYPE, "ds" , GetCurrentThreadId(), msg)
-#	else /* ENABLE_FUNC_CALL */
-#		define LOG_FUNC_CALL(a) ((void)0)
-#	endif /* ENABLE_FUNC_CALL */
-
-#	if defined(ENABLE_CHECK_MEMOTY)
-#		include "crtdbg.h"
-
-#		define REINIT_CHECK_MEMORY(a) \
-			_CrtMemCheckpoint(& ## a ## oldMemState)
-
-#		define INIT_CHECK_MEMORY(a) \
-			char a ## DumpMessage[0xFFFF]; \
-			_CrtMemState  a ## oldMemState, a ## newMemState, a ## diffMemState; \
-			REINIT_CHECK_MEMORY(a)
-
-#		define CHECK_MEMORY(a, fncname, msg) \
-			_CrtMemCheckpoint(& ## a ## newMemState); \
-			if(_CrtMemDifference(& ## a ## diffMemState, & ## a ## oldMemState, & ## a ## newMemState)) \
-			{ \
-				sprintf(a ## DumpMessage, \
-					"%s\n" \
-					"free:  %10li bytes in %10li blocks\n" \
-					"normal:%10li bytes in %10li blocks\n" \
-					"CRT:   %10li bytes in %10li blocks\n" \
-					"ignore:%10li bytes in %10li blocks\n" \
-					"client:%10li bytes in %10li blocks\n" \
-					"max:   %10li bytes in %10li blocks", \
-					 \
-					fncname ": (" #a ") Memory changed! (" msg ")\n", \
-					 \
-					(long) a ## diffMemState.lSizes[_FREE_BLOCK], \
-					(long) a ## diffMemState.lCounts[_FREE_BLOCK], \
-					 \
-					(long) a ## diffMemState.lSizes[_NORMAL_BLOCK], \
-					(long) a ## diffMemState.lCounts[_NORMAL_BLOCK], \
-					 \
-					(long) a ## diffMemState.lSizes[_CRT_BLOCK], \
-					(long) a ## diffMemState.lCounts[_CRT_BLOCK], \
-					 \
-					(long) a ## diffMemState.lSizes[_IGNORE_BLOCK], \
-					(long) a ## diffMemState.lCounts[_IGNORE_BLOCK], \
-					 \
-					(long) a ## diffMemState.lSizes[_CLIENT_BLOCK], \
-					(long) a ## diffMemState.lCounts[_CLIENT_BLOCK], \
-					 \
-					(long) a ## diffMemState.lSizes[_MAX_BLOCKS], \
-					(long) a ## diffMemState.lCounts[_MAX_BLOCKS]); \
-				 LOG_DEBUG_INFO("s", a ## DumpMessage); \
-			}
-#	else /* ENABLE_CHECK_MEMOTY */
-#		define INIT_CHECK_MEMORY(a) ((void)0)
-#		define CHECK_MEMORY(a, fncname, msg) ((void)0)
-#	endif /* ENABLE_CHECK_MEMOTY */
+#	define USE_PID_FILE 1
 
 #endif /* WIN32 */
 
-#ifndef WIN32
-#	define USE_PID_FILE 1
-#endif /* not WON32 */
 
 #ifndef HAVE_GETOPT_LONG
 	struct option {
@@ -131,8 +61,6 @@
 #define	NETWORK_ERROR	(-3)
 #define	TIMEOUT_ERROR	(-4)
 #define	AGENT_ERROR	(-5)
-
-#define	MAXFD	64
 
 /* show debug info to stderr */
 #define FDI(f, m) fprintf(stderr, "DEBUG INFO: " f "\n" , m)
@@ -428,12 +356,16 @@ void	help();
 void	usage();
 void	version();
 
-#define ZBX_TASK_START           0
-#define ZBX_TASK_SHOW_HELP       1
-#define ZBX_TASK_SHOW_VERSION    2
-#define ZBX_TASK_PRINT_SUPPORTED 3
-#define ZBX_TASK_TEST_METRIC     4
-#define ZBX_TASK_SHOW_USAGE      5
+#define ZBX_TASK_START			0
+#define ZBX_TASK_SHOW_HELP		1
+#define ZBX_TASK_SHOW_VERSION		2
+#define ZBX_TASK_PRINT_SUPPORTED	3
+#define ZBX_TASK_TEST_METRIC		4
+#define ZBX_TASK_SHOW_USAGE		5
+#define ZBX_TASK_INSTALL_SERVICE	6
+#define ZBX_TASK_UNINSTALL_SERVICE	7
+#define ZBX_TASK_START_SERVICE		8
+#define ZBX_TASK_STOP_SERVICE		9
 
 void   	init_result(AGENT_RESULT *result);
 int    	copy_result(AGENT_RESULT *src, AGENT_RESULT *dist);

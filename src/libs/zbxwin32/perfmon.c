@@ -37,7 +37,7 @@ char *GetCounterName(DWORD index)
 	DWORD		dwSize;
 	char		hostname[MAX_COMPUTERNAME_LENGTH+3];
 
-	counterName=PerfCounterList;
+	counterName = PerfCounterList;
 	while(counterName!=NULL)
 	{
 		if (counterName->pdhIndex == index)
