@@ -83,7 +83,7 @@ void	init_collector_data(void)
 
 	collector = shmat(shm_id, 0, 0);
 
-	if (-1 == collector)
+	if ((void*)(-1) == collector)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Can't attache shared memory for collector. [%s]",strerror(errno));
 		exit(1);

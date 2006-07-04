@@ -45,9 +45,8 @@
 
 #define	LISTENQ 1024
 
-ZBX_THREAD_HANDLE		*threads = NULL;
-
 char *progname = NULL;
+
 char title_message[] = "ZABBIX Agent "
 #if defined(WIN32)
 	"(service)";
@@ -94,6 +93,8 @@ struct zbx_option longopts[] =
 };
 
 static char	*TEST_METRIC = NULL;
+
+static ZBX_THREAD_HANDLE	*threads = NULL;
 
 static int parse_commandline(int argc, char **argv)
 {
@@ -179,9 +180,9 @@ void MAIN_ZABBIX_ENTRY(void)
 	ZBX_SOCKET	sock;
 
 	zabbix_open_log(
-#if 0
+#if 0 /* !!! normal case must be 1 !!! */
 		LOG_TYPE_FILE
-#else 
+#else /* !!! for debug only print log to stderr !!! */ 
 		LOG_TYPE_UNDEFINED
 #endif
 		, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
@@ -211,9 +212,15 @@ void MAIN_ZABBIX_ENTRY(void)
 
 		threads[i] = zbx_thread_start(active_checks_thread, &activechk_args);
 	}
+	else
+	{	/* if disabled active thread run listener thread */
+		threads[i] = zbx_thread_start(listener_thread, &sock);
+	}
 
 #if !defined(WIN32)
+	
 	init_parent_process();
+
 #endif
 
 	/* wait for exit */
@@ -221,13 +228,52 @@ void MAIN_ZABBIX_ENTRY(void)
 	{
 		if(zbx_thread_wait(threads[i]))
 		{
-			zabbix_log( LOG_LEVEL_DEBUG, "%08X: Thread is Terminated", threads[i]);
+			zabbix_log( LOG_LEVEL_INFORMATION, "%d: thread is terminated", threads[i]);
+			exit(1); /* close agent if any thread is closed */
 		}
 	}
 
 	free_collector_data();
 
 	zbx_free(threads);
+}
+
+void	zbx_on_exit()
+{
+#if !defined(WIN32)
+	
+	int i = 0;
+
+	if(threads != NULL)
+	{
+		for(i = 0; i<CONFIG_AGENTD_FORKS; i++)
+		{
+			if(threads[i]) {
+				kill(threads[i],SIGTERM);
+				threads[i] = (ZBX_THREAD_HANDLE)NULL;
+			}
+		}
+	}
+	
+#endif /* not WIN32 */
+
+#ifdef USE_PID_FILE
+	
+	if(unlink(CONFIG_PID_FILE) != 0)
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Cannot remove PID file [%s]",
+			CONFIG_PID_FILE);
+	}
+
+#endif /* USE_PID_FILE */
+
+	free_collector_data();
+	alias_list_free();
+
+	zbx_sleep(2); /* wait for all threads closing */
+	
+	zabbix_log(LOG_LEVEL_INFORMATION, "ZABBIX Agent stopped");
+	zabbix_close_log();
 }
 
 static char* get_programm_name(char *path)
@@ -242,38 +288,7 @@ static char* get_programm_name(char *path)
 	return filename;
 }
 
-#ifdef ZABBIX_TEST
-
-int main()
-{
-#if 0
-	char buffer[100*1024];
-
-	get_http_page("www.zabbix.com", "", 80, buffer, 100*1024);
-
-	printf("Back [%d] [%s]\n", strlen(buffer), buffer);
-	
-#elif 1
-
-	char s[] = "ABCDEFGH";
-	char p[] = "D(.){0,}E";
-	int len=2;
-
-	printf("String: \t %s\n", s);
-	printf("Pattern:\t %s\n", p);
-	printf("Result: \t [%s] [%d]\n", zbx_regexp_match(s, p, &len), len);
-/*
-#elif 1 // 0 - off; 1 - on;
-
-  Place your test code HERE!!!
-
-*/
-
-#endif
-
-}
-
-#else /* not ZABBIX_TEST */
+#ifndef ZABBIX_TEST
 
 int	main(int argc, char **argv)
 {
@@ -306,9 +321,13 @@ int	main(int argc, char **argv)
 	}
 
 #if defined(WIN32)
+	
 	init_service();
+	
 #else /* not WIN32 */
+	
 	init_daemon();
+	
 #endif /* WIN32 */
 
 	zbx_on_exit();
@@ -316,33 +335,36 @@ int	main(int argc, char **argv)
 	return SUCCEED;
 }
 
-void	zbx_on_exit()
+#else /* ZABBIX_TEST */
+
+int main()
 {
-#if !defined(WIN32)
-	int i = 0;
+#if 0
+	char buffer[100*1024];
 
-	if(threads != NULL)
-	{
-		for(i = 0; i<CONFIG_AGENTD_FORKS; i++)
-		{
-			if(threads[i]) {
-				kill(threads[i],SIGTERM);
-			}
-		}
-	}
+	get_http_page("www.zabbix.com", "", 80, buffer, 100*1024);
 
-	if(unlink(CONFIG_PID_FILE) != 0)
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "Cannot remove PID file [%s]",
-			CONFIG_PID_FILE);
-	}
+	printf("Back [%d] [%s]\n", strlen(buffer), buffer);
+	
+#elif 1
 
-#endif /* not WIN32 */
+	char s[] = "ABCDEFGH";
+	char p[] = "D(.){0,}E";
+	int len=2;
 
-	zabbix_log(LOG_LEVEL_INFORMATION,"ZABBIX Agent stopped");
-	zabbix_close_log();
-	free_collector_data();
-	alias_list_free();
+	printf("String: \t %s\n", s);
+	printf("Pattern:\t %s\n", p);
+	printf("Result: \t [%s] [%d]\n", zbx_regexp_match(s, p, &len), len);
+/*
+#elif 1 // 0 - off; 1 - on;
+
+  Place your test code HERE!!!
+
+*/
+
+#endif /* 0 */
+
 }
 
-#endif /* ZABBIX_TEST */
+#endif /* not ZABBIX_TEST */
+

@@ -24,25 +24,25 @@ def="--enable-agent --enable-server --with-mysql --with-ldap --with-net-snmp"
 for cmd
 do
   case "$cmd" in
-    win2nix ) win2nix="yes";;
-    copy )    copy="yes"; noparam=1;;
-    cpy )     copy="yes"; noparam=1;;
-    pre ) premake="yes"; noparam=1;;
-    premake ) premake="yes"; noparam=1;;
-    conf )      configure="yes"; noparam=1;;
-    config )    configure="yes"; noparam=1;;
-    configure ) configure="yes"; noparam=1;;
-    make )    domake="yes"; noparam=1;;
-    test )    dotest="yes"; noparam=1;;
-    tar )     tgz="yes"; noparam=1;;
-    nocat )   docat="no"; noparam=1;;
-    cat )   docat="yes"; noparam=1;;
-    def ) config_param="$config_param $def";;
-    --enable-* ) config_param="$config_param $cmd";; 
-    --with-* ) config_param="$config_param $cmd";;
-    --prefix=* ) config_param="$config_param $cmd";;
-    help ) help="yes";;
-    h ) help="yes";;
+    win2nix )	win2nix="yes";		noparam=1;;
+    copy )	copy="yes";		noparam=1;;
+    cpy )	copy="yes";		noparam=1;;
+    pre )	premake="yes";		noparam=1;;
+    premake )	premake="yes";		noparam=1;;
+    conf )	configure="yes";	noparam=1;;
+    config )	configure="yes";	noparam=1;;
+    configure )	configure="yes";	noparam=1;;
+    make )	domake="yes";		noparam=1;;
+    test )	dotest="yes";		noparam=1;;
+    tar )	tgz="yes";		noparam=1;;
+    nocat )	docat="no";		noparam=1;;
+    cat )	docat="yes";		noparam=1;;
+    def )		config_param="$config_param $def";;
+    --enable-* )	config_param="$config_param $cmd";; 
+    --with-* )		config_param="$config_param $cmd";;
+    --prefix=* )	config_param="$config_param $cmd";;
+    help )	help="yes";;
+    h )		help="yes";;
     * ) 
         echo "$0: ERROR: uncnown parameter \"$cmd\""; 
 	help="yes";
@@ -52,9 +52,10 @@ if [ "$help" = "yes" ] || [ $noparam = 0 ]
 then
         echo
         echo "Usage:"
-        echo "  $0 [copy|cpy] [premake|pre] [configure|config|conf] [def] [make] [test] [tar] [cat] [nocat] [--enable-*] [--with-*]"
+        echo "  $0 [win2nix] [copy|cpy] [premake|pre] [configure|config|conf] [def] [make] [test] [tar] [cat] [nocat] [--enable-*] [--with-*]"
         echo
 	echo "  def = $def"
+        echo "  win2nix - convers win EOL [\\r\\n] to nix EOL [\\r]" 
         echo
         echo "Examples:"
         echo "  $0 conf def make test        - compyle, test, and sow report"
@@ -62,11 +63,6 @@ then
         echo "  $0 cat                       - cat last REPORT"
         echo "  $0                           - show this help"
         exit 1;
-fi
-
-if [ "$win2nix" = "yes" ]
-then
-  find . -name "*.[hc]" -exec vi "+%s/\r$//" "+wq" {} ';' -print;
 fi
 
 if [ "$copy" = "yes" ] || [ $premake = "yes" ] || 
@@ -79,6 +75,13 @@ fi
 if [ "$cleanwarnings" = "yes" ] 
 then
   rm -f WARNINGS
+fi
+
+if [ "$win2nix" = "yes" ]
+then
+  echo "Replacing..."
+  echo "Replacing..." >> WARNINGS
+  find ./ -name "*.[hc]" -exec vi "+%s/\\r$//" "+wq" "-es" {} ';' -print 2>> WARNINGS
 fi
 
 if [ "$premake" = "yes" ] 

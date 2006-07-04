@@ -1215,7 +1215,7 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		}
 	}
 
-	len = fread(cmd_result, MAX_STRING_LEN-1, 1, f);
+	len = fread(cmd_result, 1, MAX_STRING_LEN-1, f);
 
 	if(0 != ferror(f))
 	{
@@ -1239,7 +1239,6 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		switch (errno)
 		{
 			case	EINTR:
-/* (char *) to avoid compiler warning */
 				return SYSINFO_RET_TIMEOUT;
 			default:
 				return SYSINFO_RET_FAIL;
@@ -1254,13 +1253,9 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		return SYSINFO_RET_FAIL;
 	}
 
-	for(i=1; i < len; i++)
+	for(i = len-1; i >= 0 && (cmd_result[i] == '\n' || cmd_result[i] == '\r' || cmd_result[i] == '\0'); i++)
 	{
-		if(cmd_result[i] == '\n' || cmd_result[i] == '\r')
-		{
-			cmd_result[i] = '\0';
-			break;
-		}
+		cmd_result[i] = '\0';
 	}
 
 	SET_TEXT_RESULT(result, strdup(cmd_result));
@@ -1346,6 +1341,7 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	if(strcmp(flag,"wait") == 0)
 	{
 zabbix_log(LOG_LEVEL_WARNING, "Run wait command '%s'",command); // TMP!!!
+zbx_error("Run wait command '%s'",command); // TMP!!!
 		return EXECUTE_STR(cmd,command,flags,result);
 	}
 	else if(strcmp(flag,"nowait") != 0)

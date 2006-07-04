@@ -23,8 +23,6 @@
 
 #include "threads.h"
 
-extern ZBX_THREAD_HANDLE	*threads;
-
 void    child_signal_handler(int sig);
 
 void	init_daemon(void);

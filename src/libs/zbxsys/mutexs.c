@@ -36,8 +36,6 @@
 	#include <sys/sem.h>
 #endif /* ZBX_SHARED_MUTEX */
 
-#include "log.h"
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_mutex_create                                                 *
@@ -61,7 +59,7 @@ int zbx_mutex_create(ZBX_MUTEX *mutex, char *name)
 
 	if(NULL == ((*mutex) = CreateMutex(NULL, FALSE, NULL)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Error on mutex creating. [%s]", strerror_from_system(GetLastError()));
+		zbx_error("Error on mutex creating. [%s]", strerror_from_system(GetLastError()));
 		return ZBX_MUTEX_ERROR;
 	}
 
@@ -77,7 +75,7 @@ int zbx_mutex_create(ZBX_MUTEX *mutex, char *name)
 
 	if ((sem_id = semget(sem_key, 1, IPC_CREAT | 0666)) == -1)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Semaphore set does not exist!");
+		zbx_error("Semaphore set does not exist!");
 		return ZBX_MUTEX_ERROR;
 	}
 
@@ -90,7 +88,7 @@ int zbx_mutex_create(ZBX_MUTEX *mutex, char *name)
 
  	if(pthread_mutex_init(mutex, NULL) < 0)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Error on mutex creating.");
+		zbx_error("Error on mutex creating.");
 		return ZBX_MUTEX_ERROR;
 	}
 
@@ -119,11 +117,14 @@ int zbx_mutex_create(ZBX_MUTEX *mutex, char *name)
 
 int zbx_mutex_lock(ZBX_MUTEX *mutex)
 {
+
+	if(!*mutex) return ZBX_MUTEX_OK;
+	
 #if defined(WIN32)	
 
 	if(WaitForSingleObject(*mutex, INFINITE) != WAIT_OBJECT_0)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Error on mutex locking. [%s]", strerror_from_system(GetLastError()));
+		zbx_error("Error on mutex locking. [%s]", strerror_from_system(GetLastError()));
 		return ZBX_MUTEX_ERROR;
 	}
 
@@ -131,11 +132,11 @@ int zbx_mutex_lock(ZBX_MUTEX *mutex)
 
 #if defined(ZBX_SHARED_MUTEX)
 
-	struct sembuf sem_lock = { 0, -1, 0};
+	struct sembuf sem_lock = { 0, -1, 0 };
 
-	if ((semop(*mutex, &sem_lock, 1)) == -1)
+	if (-1 == (semop(*mutex, &sem_lock, 1)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Lock failed");
+		zbx_error("Lock failed [%s]", strerror(errno));
 		return ZBX_MUTEX_ERROR;
 	}
 	
@@ -143,7 +144,7 @@ int zbx_mutex_lock(ZBX_MUTEX *mutex)
 
 	if(pthread_mutex_lock(mutex) < 0)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Error on mutex locking.");
+		zbx_error("Error on mutex locking.");
 		return ZBX_MUTEX_ERROR;
 	}
 
@@ -172,11 +173,14 @@ int zbx_mutex_lock(ZBX_MUTEX *mutex)
 
 int zbx_mutex_unlock(ZBX_MUTEX *mutex)
 {
+
+	if(!*mutex) return ZBX_MUTEX_OK;
+	
 #if defined(WIN32)	
 
 	if(ReleaseMutex(*mutex) == 0)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Error on mutex UNlocking. [%s]", strerror_from_system(GetLastError()));
+		zbx_error("Error on mutex UNlocking. [%s]", strerror_from_system(GetLastError()));
 		return ZBX_MUTEX_ERROR;
 	}
 
@@ -184,11 +188,11 @@ int zbx_mutex_unlock(ZBX_MUTEX *mutex)
 
 #if defined(ZBX_SHARED_MUTEX)
 
-	struct sembuf sem_lock = { 0, 1, 0};
+	struct sembuf sem_unlock = { 0, 1, 0};
 
-	if ((semop(*mutex, &sem_lock, 1)) == -1)
+	if ((semop(*mutex, &sem_unlock, 1)) == -1)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Unlock failed");
+		zbx_error("Unlock failed [%s]", strerror(errno));
 		return ZBX_MUTEX_ERROR;
 	}
 	
@@ -196,7 +200,7 @@ int zbx_mutex_unlock(ZBX_MUTEX *mutex)
 
 	if(pthread_mutex_unlock(mutex) < 0)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Error on mutex UNlocking.");
+		zbx_error("Error on mutex UNlocking.");
 		return ZBX_MUTEX_ERROR;
 	}
 
@@ -225,11 +229,13 @@ int zbx_mutex_unlock(ZBX_MUTEX *mutex)
 
 int zbx_mutex_destroy(ZBX_MUTEX *mutex)
 {
+	if(!*mutex) return ZBX_MUTEX_OK;
+	
 #if defined(WIN32)	
 
 	if(CloseHandle(*mutex) == 0)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Error on mutex destroying. [%s]", strerror_from_system(GetLastError()));
+		zbx_error("Error on mutex destroying. [%s]", strerror_from_system(GetLastError()));
 		return ZBX_MUTEX_ERROR;
 	}
 
@@ -243,13 +249,15 @@ int zbx_mutex_destroy(ZBX_MUTEX *mutex)
 
 	if(pthread_mutex_destroy(mutex) < 0)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Error on mutex destroying.");
+		zbx_error("Error on mutex destroying.");
 		return ZBX_MUTEX_ERROR;
 	}
 
 #endif /* ZBX_SHARED_MUTEX */
 
 #endif /* WIN32 */
+	
+	*mutex = (ZBX_MUTEX)NULL;
 
 	return ZBX_MUTEX_OK;
 }
