@@ -33,6 +33,8 @@ static ZBX_MUTEX log_file_access;
 
 #if defined(WIN32)
 
+#include "messages.h"
+
 static HANDLE system_log_handle = INVALID_HANDLE_VALUE;
 
 #endif
@@ -40,6 +42,9 @@ static HANDLE system_log_handle = INVALID_HANDLE_VALUE;
 int zabbix_open_log(int type, int level, const char *filename)
 {
 	FILE *log_file = NULL;
+
+	zbx_error("Log file is '%s'",filename);
+
 
 	log_level = level;
 
@@ -190,7 +195,7 @@ void zabbix_log(int level, const char *fmt, ...)
 				break;
 		}
 
-		ReportEvent(system_log_handle, wType, 0, 0, NULL, 1, 0, strings, NULL);
+		ReportEvent(system_log_handle, wType, 0, MSG_ZABBIX_MESSAGE, NULL, 1, 0, strings, NULL);
 
 #else /* not WIN32 */
 
@@ -280,14 +285,15 @@ void zabbix_log(int level, const char *fmt, ...)
 //
 // Get system error string by call to FormatMessage
 //
+#define ZBX_MESSAGE_BUF_SIZE	1024
 
 char *strerror_from_system(unsigned long error)
 {
 #if defined(WIN32)
 
-	static char buffer[1024];
+	static char buffer[ZBX_MESSAGE_BUF_SIZE];  /* !!! Attention static !!! not thread safely - Win32*/
 
-	memset(buffer, 0, 1024);
+	memset(buffer, 0, ZBX_MESSAGE_BUF_SIZE);
 
 	if(FormatMessage(
 		FORMAT_MESSAGE_FROM_SYSTEM, 
@@ -298,7 +304,7 @@ char *strerror_from_system(unsigned long error)
 		1023, 
 		NULL) == 0)
 	{
-		zbx_snprintf(buffer, 1024, "3. MSG 0x%08X - Unable to find message text [0x%X]", error , GetLastError());
+		zbx_snprintf(buffer, ZBX_MESSAGE_BUF_SIZE, "3. MSG 0x%08X - Unable to find message text [0x%X]", error , GetLastError());
 	}
 
 	return buffer;
@@ -318,11 +324,11 @@ char *strerror_from_module(unsigned long error, const char *module)
 {
 #if defined(WIN32)
 
-	static char buffer[1024];
+	static char buffer[ZBX_MESSAGE_BUF_SIZE]; /* !!! Attention static !!! not thread safely - Win32*/
 
 	assert(module);
 
-	memset(buffer, 0, 1024);
+	memset(buffer, 0, ZBX_MESSAGE_BUF_SIZE);
 
 	if (FormatMessage(
 		FORMAT_MESSAGE_FROM_HMODULE,
@@ -333,7 +339,7 @@ char *strerror_from_module(unsigned long error, const char *module)
 		1024,
 		NULL) == 0)
 	{
-		zbx_snprintf(buffer, 1024, "3. MSG 0x%08X - Unable to find message text [0x%X]", error , GetLastError());
+		zbx_snprintf(buffer, ZBX_MESSAGE_BUF_SIZE, "3. MSG 0x%08X - Unable to find message text [0x%X]", error , GetLastError());
 	}
 
 	return buffer;

@@ -26,6 +26,7 @@
 #include "logfiles.h"
 #include "zbxsock.h"
 #include "threads.h"
+#include "service.h"
 
 static ZBX_ACTIVE_METRIC *active_metrics = NULL;
 
@@ -558,7 +559,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	refresh_metrics(activechk_args.host, activechk_args.port, error, MAX_STRING_LEN);
 	nextrefresh = time(NULL) + CONFIG_REFRESH_ACTIVE_CHECKS;
 
-	for(;;)
+	while(ZBX_IS_RUNNING)
 	{
 
 		zbx_setproctitle("processing active checks");
@@ -590,6 +591,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 			zbx_setproctitle("poller [sleeping for %d seconds]", sleeptime);
 
 			zbx_sleep( sleeptime );
+			continue;
 		}
 		else
 		{
@@ -607,6 +609,8 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	free_metrics();
 
 	zabbix_log( LOG_LEVEL_INFORMATION, "zabbix_agentd active check stopped");
+
+	ZBX_DO_EXIT();
 
 	zbx_tread_exit(0);
 

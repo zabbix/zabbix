@@ -54,10 +54,16 @@ char title_message[] = "ZABBIX Agent "
 	"(daemon)";
 #endif
 
-char usage_message[] = "[-vhp] [-c <file>] [-t <metric>]";
+char usage_message[] = 
+	"[-vhp]"
+	#if defined(WIN32)
+	" [-iusx]"
+	#endif /* WIN32 */
+	" [-c <file>] [-t <metric>]";
 
 char *help_message[] = {
 	"Options:",
+	"",
 	"  -c --config <file>  Specify configuration file",
 	"  -h --help           give this help",
 	"  -v --version        display version number",
@@ -66,7 +72,9 @@ char *help_message[] = {
 
 #if defined (WIN32)
 
-	" ",
+	"",
+	"Functions:",
+	"",
 	"  -i --install        install ZABIX agent as service",
 	"  -u --uninstall      uninstall ZABIX agent from service",
 	
@@ -169,8 +177,7 @@ static ZBX_SOCKET connect_to_server(void)
 		exit(1);
 	}
 
-	// Create socket
-	// Fill in local address structure
+	// Create socket	// Fill in local address structure
 	memset(&serv_addr, 0, sizeof(ZBX_SOCKADDR));
 
 	serv_addr.sin_family		= AF_INET;
@@ -204,9 +211,11 @@ void MAIN_ZABBIX_ENTRY(void)
 	ZBX_SOCKET	sock;
 
 	zabbix_open_log(
-#if 0 /* !!! normal case must be 1 !!! */
+#if 0	/* !!! normal case must be 1 !!! */
 		LOG_TYPE_FILE
-#else /* !!! for debug only print log to stderr !!! */ 
+#elif 1	/* !!! normal case must be 0 !!! */
+		LOG_TYPE_SYSLOG
+#else	/* !!! for debug only print log to stderr !!! */ 
 		LOG_TYPE_UNDEFINED
 #endif
 		, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
@@ -247,19 +256,21 @@ void MAIN_ZABBIX_ENTRY(void)
 
 #endif
 
-	/* wait for exit */
+	/* wait for all threads exiting */
 	for(i = 0; i < CONFIG_AGENTD_FORKS; i++)
 	{
 		if(zbx_thread_wait(threads[i]))
 		{
-			zabbix_log( LOG_LEVEL_INFORMATION, "%li: thread is terminated", threads[i]);
-			exit(1); /* close agent if any thread is closed */
+			zabbix_log( LOG_LEVEL_DEBUG, "%li: thread is terminated", threads[i]);
+			ZBX_DO_EXIT();
 		}
 	}
 
 	free_collector_data();
 
 	zbx_free(threads);
+
+	zbx_on_exit();
 }
 
 void	zbx_on_exit()
@@ -298,6 +309,8 @@ void	zbx_on_exit()
 	
 	zabbix_log(LOG_LEVEL_INFORMATION, "ZABBIX Agent stopped");
 	zabbix_close_log();
+
+	exit(SUCCEED);
 }
 
 static char* get_programm_name(char *path)
@@ -324,7 +337,7 @@ int	main(int argc, char **argv)
 
 	init_metrics(); // Must be before load_config().  load_config - use metrics!!!
 
-	load_config();
+	load_config(task == 0);
 
 	load_user_parameters();
 
@@ -369,8 +382,6 @@ int	main(int argc, char **argv)
 	init_daemon();
 	
 #endif /* WIN32 */
-
-	zbx_on_exit();
 
 	return SUCCEED;
 }

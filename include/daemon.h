@@ -31,4 +31,7 @@ void	init_daemon(void);
 
 void	init_parent_process(void);
 
+#define ZBX_IS_RUNNING (1)
+#define ZBX_DO_EXIT()
+
 #endif /* ZABBIX_DAEMON_H */

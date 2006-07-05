@@ -54,7 +54,7 @@ int	CONFIG_LOG_LEVEL		= LOG_LEVEL_INFORMATION;
 char	CONFIG_LOG_UNRES_SYMB		= 0;
 
 
-void    load_config(void)
+void    load_config(int exit_on_error)
 {
 	struct cfg_line cfg[]=
 	{
@@ -104,7 +104,7 @@ void    load_config(void)
 		CONFIG_FILE = DEFAULT_CONFIG_FILE;
 	}
 
-	parse_cfg_file(CONFIG_FILE,cfg);
+	parse_cfg_file(CONFIG_FILE, cfg);
 
 #ifdef USE_PID_FILE
 	if(CONFIG_PID_FILE == NULL)
@@ -119,7 +119,7 @@ void    load_config(void)
 		{
 	        	if(result.type & AR_STRING)
 			{
-				CONFIG_HOSTNAME=strdup(result.str);
+				CONFIG_HOSTNAME = strdup(result.str);
 			}
 		}
 	        free_result(&result);
@@ -127,7 +127,10 @@ void    load_config(void)
 		if(CONFIG_HOSTNAME == NULL)
 		{
 			zabbix_log( LOG_LEVEL_CRIT, "Hostname is not defined");
-			exit(1);
+			if(exit_on_error) 
+			{
+				exit(1);
+			}
 		}
 	}
 }

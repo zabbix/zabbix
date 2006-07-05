@@ -39,17 +39,7 @@ static int ZabbixInstallEventSource(char *path);
 static	SERVICE_STATUS		serviceStatus;
 static	SERVICE_STATUS_HANDLE	serviceHandle;
 
-static	HANDLE eventShutdown;
-
-//
-// Shutdown routine
-//
-
-static void Shutdown(void)
-{
-	SetEvent(eventShutdown);
-	Sleep(2000);      // Allow other threads to terminate
-}
+int application_is_runned = ZBX_APP_RUNNED;
 
 //
 // ZABBIX service control handler
@@ -57,6 +47,8 @@ static void Shutdown(void)
 
 static VOID WINAPI ServiceCtrlHandler(DWORD ctrlCode)
 {
+	int do_exit = 0;
+
 	serviceStatus.dwServiceType		= SERVICE_WIN32_OWN_PROCESS;
 	serviceStatus.dwCurrentState		= SERVICE_RUNNING;
 	serviceStatus.dwControlsAccepted	= SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_SHUTDOWN;
@@ -73,7 +65,10 @@ static VOID WINAPI ServiceCtrlHandler(DWORD ctrlCode)
 			serviceStatus.dwWaitHint	= 4000;
 			SetServiceStatus(serviceHandle,&serviceStatus);
 
-			Shutdown();
+			ZBX_DO_EXIT();
+
+			/* Allow other threads to terminate */
+			zbx_sleep(1);
 
 			serviceStatus.dwCurrentState	= SERVICE_STOPPED;
 			serviceStatus.dwWaitHint	= 0;
@@ -85,7 +80,6 @@ static VOID WINAPI ServiceCtrlHandler(DWORD ctrlCode)
 	}
 
 	SetServiceStatus(serviceHandle, &serviceStatus);
-
 }
 
 //
@@ -161,7 +155,7 @@ void init_service(void)
 	}
 
 	// Create synchronization stuff
-	eventShutdown = CreateEvent(NULL,TRUE,FALSE,NULL);
+//	eventShutdown = CreateEvent(NULL,TRUE,FALSE,NULL);
 
 	if (!StartServiceCtrlDispatcher(serviceTable))
 	{
@@ -177,7 +171,7 @@ void init_service(void)
 
 	}
 
-	CloseHandle(eventShutdown);
+//	CloseHandle(eventShutdown);
 }
 
 

@@ -35,6 +35,7 @@
 #include "diskdevices.h"
 #include "cpustat.h"
 #include "log.h"
+#include "service.h"
 
 ZBX_COLLECTOR_DATA *collector = NULL;
 
@@ -162,7 +163,7 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 
 	init_cpu_collector(&(collector->cpus));
 
-	for(;;)
+	while(ZBX_IS_RUNNING)
 	{
 		collect_cpustat(&(collector->cpus));
 
@@ -175,6 +176,8 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 	close_cpu_collector(&(collector->cpus));
 
 	zabbix_log( LOG_LEVEL_INFORMATION, "zabbix_agentd collector stopped");
+
+	ZBX_DO_EXIT();
 
 	zbx_tread_exit(0);
 }

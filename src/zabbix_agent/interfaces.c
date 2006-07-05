@@ -135,7 +135,7 @@ void	init_stats_interfaces()
 	file=fopen("/proc/net/dev","r");
 	if(NULL == file)
 	{
-		zbx_error("Cannot open config file [%s] [%s].","/proc/net/dev", strerror(errno));
+		zbx_error("Cannot open statistic file [%s] [%s].","/proc/net/dev", strerror(errno));
 		return;
 	}
 	i=0;
@@ -372,7 +372,7 @@ void	collect_stats_interfaces(FILE *outfile)
 	file=fopen("/proc/net/dev","r");
 	if(NULL == file)
 	{
-		zbx_error("Cannot open config file [%s] [%s].","/proc/net/dev", strerror(errno));
+		zbx_error("Cannot open statistic file [%s] [%s].","/proc/net/dev", strerror(errno));
 		return;
 	}
 

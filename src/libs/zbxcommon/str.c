@@ -88,7 +88,9 @@ void help()
 	char **p = help_message;
 	
 	app_title();
+	printf("\n");
 	usage();
+	printf("\n");
 	while (*p) printf("%s\n", *p++);
 }
 

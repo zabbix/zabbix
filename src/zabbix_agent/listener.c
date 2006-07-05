@@ -27,6 +27,7 @@
 #include "sysinfo.h"
 #include "log.h"
 #include "zbxsecurity.h"
+#include "service.h"
 
 static void	process_listener(ZBX_SOCKET sock)
 {
@@ -91,8 +92,7 @@ ZBX_THREAD_ENTRY(listener_thread, pSock)
 
 	sock = *((ZBX_SOCKET *)pSock);
 
-	// Wait for connection requests
-	for(;;)
+	while(ZBX_IS_RUNNING)
 	{
 		collector->requests.all++;
 		zbx_setproctitle("waiting for connection. Requests [%d]", collector->requests.all);
@@ -101,6 +101,8 @@ ZBX_THREAD_ENTRY(listener_thread, pSock)
 		nlen = sizeof(ZBX_SOCKADDR);
 		if(SOCKET_ERROR == (accept_sock = accept(sock, (struct sockaddr *)&serv_addr, &nlen)))
 		{
+			if(!ZBX_IS_RUNNING) break;
+
 			if (EINTR != zbx_sock_last_error())
 			{
 				zabbix_log( LOG_LEVEL_WARNING, "Unable to accept incoming connection: [%s]", strerror_from_system(zbx_sock_last_error()));
@@ -117,6 +119,7 @@ ZBX_THREAD_ENTRY(listener_thread, pSock)
 			zbx_sleep(1);
 			continue;
 		}
+		if(!ZBX_IS_RUNNING) break;
 
 		local_request_failed = 0;     /* Reset consecutive errors counter */
 		
@@ -140,6 +143,8 @@ ZBX_THREAD_ENTRY(listener_thread, pSock)
 	}
 
 	zabbix_log( LOG_LEVEL_INFORMATION, "zabbix_agentd listener stopped");
+
+	ZBX_DO_EXIT();
 
 	zbx_tread_exit(0);
 }

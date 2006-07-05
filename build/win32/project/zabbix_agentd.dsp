@@ -466,6 +466,10 @@ SOURCE=..\..\..\include\alias.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\include\base64.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\include\cfg.h
 # End Source File
 # Begin Source File
@@ -560,6 +564,161 @@ SOURCE=..\..\..\include\zlog.h
 # Begin Group "Resource Files"
 
 # PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
+# Begin Source File
+
+SOURCE=..\..\..\src\zabbix_agent\messages.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\zabbix_agent\messages.mc
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+# Begin Custom Build - Message Compiling...
+ProjDir=.
+InputPath=..\..\..\src\zabbix_agent\messages.mc
+InputName=messages
+
+BuildCmds= \
+	mc -s -U -h  $(ProjDir)\..\..\..\src\zabbix_agent\ -r $(ProjDir)\..\..\..\src\zabbix_agent\ $(ProjDir)\..\..\..\src\zabbix_agent\$(InputName) \
+	del $(ProjDir)\..\..\..\src\zabbix_agent\$(InputName).rc \
+	
+
+"$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+   $(BuildCmds)
+
+"Msg00001.bin" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+   $(BuildCmds)
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# Begin Custom Build - Message Compiling...
+ProjDir=.
+InputPath=..\..\..\src\zabbix_agent\messages.mc
+InputName=messages
+
+BuildCmds= \
+	mc -s -U -h  $(ProjDir)\..\..\..\src\zabbix_agent\ -r $(ProjDir)\..\..\..\src\zabbix_agent\ $(ProjDir)\..\..\..\src\zabbix_agent\$(InputName) \
+	del $(ProjDir)\..\..\..\src\zabbix_agent\$(InputName).rc \
+	
+
+"$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+   $(BuildCmds)
+
+"Msg00001.bin" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+   $(BuildCmds)
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+# Begin Custom Build - Message Compiling...
+ProjDir=.
+InputPath=..\..\..\src\zabbix_agent\messages.mc
+InputName=messages
+
+BuildCmds= \
+	mc -s -U -h  $(ProjDir)\..\..\..\src\zabbix_agent\ -r $(ProjDir)\..\..\..\src\zabbix_agent\ $(ProjDir)\..\..\..\src\zabbix_agent\$(InputName) \
+	del $(ProjDir)\..\..\..\src\zabbix_agent\$(InputName).rc \
+	
+
+"$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+   $(BuildCmds)
+
+"Msg00001.bin" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+   $(BuildCmds)
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+# Begin Custom Build - Message Compiling...
+ProjDir=.
+InputPath=..\..\..\src\zabbix_agent\messages.mc
+InputName=messages
+
+BuildCmds= \
+	mc -s -U -h  $(ProjDir)\..\..\..\src\zabbix_agent\ -r $(ProjDir)\..\..\..\src\zabbix_agent\ $(ProjDir)\..\..\..\src\zabbix_agent\$(InputName) \
+	del $(ProjDir)\..\..\..\src\zabbix_agent\$(InputName).rc \
+	
+
+"$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+   $(BuildCmds)
+
+"Msg00001.bin" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+   $(BuildCmds)
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\zabbix_agent\resource.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\zabbix_agent\resources.rc
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Resource Compiling...
+IntDir=.\Release
+ProjDir=.
+InputPath=..\..\..\src\zabbix_agent\resources.rc
+InputName=resources
+
+"$(IntDir)\$(InputName).res" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	rc /l 0x409 /fo"$(INTDIR)\$(InputName).res" /i $(ProjDir)\..\..\..\src\zabbix_agent\ $(ProjDir)\..\..\..\src\zabbix_agent\$(InputName).rc
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Ignore_Default_Tool 1
+USERDEP__RESOU="Msg00001.bin"	
+# Begin Custom Build - Resource Compiling...
+IntDir=.\Debug
+ProjDir=.
+InputPath=..\..\..\src\zabbix_agent\resources.rc
+InputName=resources
+
+"$(IntDir)\$(InputName).res" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	rc /l 0x409 /fo"$(INTDIR)\$(InputName).res" /i $(ProjDir)\..\..\..\src\zabbix_agent\ $(ProjDir)\..\..\..\src\zabbix_agent\$(InputName).rc
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Resource Compiling...
+IntDir=.\TODO
+ProjDir=.
+InputPath=..\..\..\src\zabbix_agent\resources.rc
+InputName=resources
+
+"$(IntDir)\$(InputName).res" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	rc /l 0x409 /fo"$(INTDIR)\$(InputName).res" /i $(ProjDir)\..\..\..\src\zabbix_agent\ $(ProjDir)\..\..\..\src\zabbix_agent\$(InputName).rc
+
+# End Custom Build
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+# PROP Ignore_Default_Tool 1
+# Begin Custom Build - Resource Compiling...
+IntDir=.\Test
+ProjDir=.
+InputPath=..\..\..\src\zabbix_agent\resources.rc
+InputName=resources
+
+"$(IntDir)\$(InputName).res" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
+	rc /l 0x409 /fo"$(INTDIR)\$(InputName).res" /i $(ProjDir)\..\..\..\src\zabbix_agent\ $(ProjDir)\..\..\..\src\zabbix_agent\$(InputName).rc
+
+# End Custom Build
+
+!ENDIF 
+
+# End Source File
 # End Group
 # End Target
 # End Project

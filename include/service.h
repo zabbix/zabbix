@@ -20,15 +20,15 @@
 #ifndef ZABBIX_SERVICE_H
 #define ZABBIX_SERVICE_H
 
+#if !defined(WIN32)
+#	error "This module allowed only for Windows OS"
+#endif
+
 #include "threads.h"
 
 extern ZBX_THREAD_HANDLE	*threads;
 
 #define ZABBIX_SERVICE_NAME   "ZabbixAgentdW32"
-
-#ifdef TODO
-extern HANDLE eventShutdown;
-#endif /* TODO */
 
 void init_service(void);
 
@@ -37,5 +37,12 @@ int ZabbixRemoveService(void);
 int ZabbixStartService(void);
 int ZabbixStopService(void);
 
+extern int application_is_runned;
+
+#define ZBX_APP_STOPPED 1
+#define ZBX_APP_RUNNED 1
+
+#define ZBX_IS_RUNNING (ZBX_APP_RUNNED == application_is_runned)
+#define ZBX_DO_EXIT() (application_is_runned = ZBX_APP_STOPPED)
 
 #endif /* ZABBIX_SERVICE_H */
