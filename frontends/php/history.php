@@ -486,6 +486,8 @@ COpt::profiling_start("history");
 
 				if($row["valuemapid"] > 0)
 					$value = replace_value_by_map($row["value"], $row["valuemapid"]);
+				else
+					$value = $row["value"]; 
 
 				$new_row = array(date("Y.M.d H:i:s",$row["clock"]));
 				if(in_array($item_type,array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64)))
