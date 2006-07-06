@@ -225,7 +225,8 @@ void    daemon_init(void)
 	}
 
 	chdir("/");
-	umask(022);
+/*	umask(022);*/
+	umask(002);
 
 	for(i=0;i<MAXFD;i++)
 	{
