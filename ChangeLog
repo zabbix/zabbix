@@ -1,5 +1,6 @@
 Changes for 1.1.1:
 
+ - disabled excessive debug printing for system.run (Alexei)
  - umask(022) changed to umask(002) (Alexei)
  - added additional symbols for trigger expressions (slash, space) (Alexei)
  - fixed permissions of log files when starting as 'root' (Alexei)
