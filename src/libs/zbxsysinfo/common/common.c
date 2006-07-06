@@ -1957,7 +1957,11 @@ int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	int	res;
 	char	ip[MAX_STRING_LEN];
 	char	zone[MAX_STRING_LEN];
+#ifdef	PACKETSZ
 	char	respbuf[PACKETSZ];
+#else
+	char	respbuf[NS_PACKETSZ];
+#endif
 	struct	in_addr in;
 
 	extern struct __res_state _res;
