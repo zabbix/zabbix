@@ -166,12 +166,18 @@ void zbx_error(const char *fmt, ...)
  ******************************************************************************/
 void zbx_snprintf(char* str, size_t count, const char *fmt, ...)
 {
-	va_list args;
+	va_list	args;
+	int	writen_len = 0;
     
+	assert(str);
+
 	va_start(args, fmt);
 
-	vsnprintf(str, count, fmt, args);
-	str[count-1] = '\0';
+	writen_len = vsnprintf(str, count, fmt, args);
+	writen_len = MIN(writen_len - 1, ((int)count) - 1);
+	writen_len = MAX(writen_len, 0);
+
+	str[writen_len] = '\0';
 
 	va_end(args);
 }
@@ -187,6 +193,8 @@ char *string_replace(char *str, const char *sub_str1, const char *sub_str2)
         signed long len;
         signed long diff;
         unsigned long count = 0;
+
+	assert(str);
 
         if ( (p=strstr(str, sub_str1)) == NULL )
                 return str;

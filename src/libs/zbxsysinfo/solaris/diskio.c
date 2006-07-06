@@ -358,19 +358,19 @@ DEV_FNCLIST
                 return SYSINFO_RET_FAIL;
         }
 
-        if(get_param(param, 1, devname, MAX_STRING_LEN) != 0)
+        if(get_param(param, 1, devname, sizeof(mode)) != 0)
         {
                 return SYSINFO_RET_FAIL;
         }
 	
-	if(get_param(param, 2, mode, MAX_STRING_LEN) != 0)
+	if(get_param(param, 2, mode, sizeof(mofe)) != 0)
         {
                 mode[0] = '\0';
         }
         if(mode[0] == '\0')
 	{
 		/* default parameter */
-		sprintf(mode, "bytes");
+		zbx_snprintf(mode, sizeof(mode), "bytes");
 	}
 	
 	for(i=0; fl[i].mode!=0; i++)
@@ -414,19 +414,19 @@ DEV_FNCLIST
                 return SYSINFO_RET_FAIL;
         }
 
-        if(get_param(param, 1, devname, MAX_STRING_LEN) != 0)
+        if(get_param(param, 1, devname, sizeof(devname)) != 0)
         {
                 return SYSINFO_RET_FAIL;
         }
 	
-	if(get_param(param, 2, mode, MAX_STRING_LEN) != 0)
+	if(get_param(param, 2, mode, sizeof(mode)) != 0)
         {
                 mode[0] = '\0';
         }
         if(mode[0] == '\0')
 	{
 		/* default parameter */
-		sprintf(mode, "bytes");
+		zbx_snprintf(mode, sizeof(mode), "bytes");
 	}
 	for(i=0; fl[i].mode!=0; i++)
 	{

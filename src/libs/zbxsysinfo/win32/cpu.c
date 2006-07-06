@@ -44,31 +44,31 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		return SYSINFO_RET_FAIL;
 	}
 
-	if(get_param(param, 1, cpuname, MAX_STRING_LEN) != 0)
+	if(get_param(param, 1, cpuname, sizeof(cpuname)) != 0)
 	{
 		cpuname[0] = '\0';
 	}
 	if(cpuname[0] == '\0')
 	{
 		/* default parameter */
-		sprintf(cpuname, "all");
+		zbx_snprintf(cpuname, sizeof(cpuname), "all");
 	}
 
-	if(get_param(param, 2, type, MAX_STRING_LEN) != 0)
+	if(get_param(param, 2, type, sizeof(type)) != 0)
 	{
 		type[0] = '\0';
 	}
 	if(type[0] == '\0')
 	{
 		/* default parameter */
-		sprintf(type, "system");
+		zbx_snprintf(type, sizeof(type), "system");
 	}
-	if(strncmp(type, "system", MAX_STRING_LEN))
+	if(strncmp(type, "system", sizeof(type)))
 	{	/* only 'system' parameter supported */
 		return SYSINFO_RET_FAIL;
 	}
 
-	if(get_param(param, 3, mode, MAX_STRING_LEN) != 0)
+	if(get_param(param, 3, mode, sizeof(mode)) != 0)
 	{
 		mode[0] = '\0';
 	}
@@ -76,7 +76,7 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	if(mode[0] == '\0')
 	{
 		/* default parameter */
-		sprintf(mode, "avg1");
+		zbx_snprintf(mode, sizeof(mode), "avg1");
 	}
 	
 	if(NULL == collector)
@@ -133,18 +133,18 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		return SYSINFO_RET_FAIL;
 	}
 
-	if(get_param(param, 1, cpuname, 10) != 0)
+	if(get_param(param, 1, cpuname, sizeof(cpuname)) != 0)
 	{
 		cpuname[0] = '\0';
 	}
 	if(cpuname[0] == '\0')
 	{
 		/* default parameter */
-		sprintf(cpuname, "all");
+		zbx_snprintf(cpuname, sizeof(cpuname), "all");
 	}
 
 
-	if(get_param(param, 2, mode, 10) != 0)
+	if(get_param(param, 2, mode, sizeof(mode)) != 0)
 	{
 		mode[0] = '\0';
 	}
@@ -152,7 +152,7 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	if(mode[0] == '\0')
 	{
 		/* default parameter */
-		sprintf(mode, "avg1");
+		zbx_snprintf(mode, sizeof(mode), "avg1");
 	}
 
 	if(strcmp(cpuname,"all") != 0)

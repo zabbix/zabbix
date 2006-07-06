@@ -175,8 +175,10 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	}
 			
 	memset(c,0,MAX_STRING_LEN);
-/*	sprintf(c,"MAIL FROM: %s\r\n",smtp_email);*/
+
+	/* zbx_snprintf(c,sizeof(c),"MAIL FROM: %s\r\n",smtp_email); */
 	zbx_snprintf(c,sizeof(c),"MAIL FROM: <%s>\r\n",smtp_email);
+
 /*	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); */
 	e=write(s,c,strlen(c)); 
 	zabbix_log( LOG_LEVEL_DEBUG, "SENDING MAIL9");
@@ -286,7 +288,7 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	time(&email_time);
 	local_time = localtime(&email_time);
 	strftime( str_time, MAX_STRING_LEN, "%a, %d %b %Y %H:%M:%S %z", local_time );
-/*	sprintf(c,"Subject: %s\r\n%s",mailsubject, mailbody);*/
+/*	zbx_snprintf(c,sizeof(c),"Subject: %s\r\n%s",mailsubject, mailbody);*/
 /*	zbx_snprintf(c,sizeof(c),"From:<%s>\r\nTo:<%s>\r\nSubject: %s\r\n\r\n%s",smtp_email,mailto,mailsubject, mailbody);*/
 	zbx_snprintf(c,sizeof(c),"From:<%s>\r\nTo:<%s>\r\nDate: %s\r\nSubject: %s\r\n\r\n%s",smtp_email,mailto,str_time,mailsubject, mailbody);
 /*	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); */

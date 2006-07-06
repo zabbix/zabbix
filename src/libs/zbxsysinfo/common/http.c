@@ -58,7 +58,7 @@ static int	get_http_page(char *hostname, char *param, unsigned short port, char 
 	{
 		if (connect(s, (struct sockaddr *) &addr, addrlen) != SOCKET_ERROR)
 		{
-			zbx_snprintf(c, MAX_STRING_LEN, "GET /%s HTTP/1.1\nHost: %s\nConnection: close\n\n", param, hostname);
+			zbx_snprintf(c, sizeof(c), "GET /%s HTTP/1.1\nHost: %s\nConnection: close\n\n", param, hostname);
 
 			zbx_sock_write(s, c, strlen(c));
 

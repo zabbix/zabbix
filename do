@@ -67,7 +67,8 @@ fi
 
 if [ "$copy" = "yes" ] || [ $premake = "yes" ] || 
   [ $configure = "yes" ] || [ $domake = "yes" ] || 
-  [ $dotest = "yes" ] || [ $tgz = "yes" ]
+  [ $dotest = "yes" ] || [ $tgz = "yes" ] ||
+  [ "$win2nix" = "yes" ]
 then
   cleanwarnings="yes"
 fi

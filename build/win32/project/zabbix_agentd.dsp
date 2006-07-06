@@ -308,6 +308,19 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\win32\win32.c
 # Begin Source File
 
 SOURCE=..\..\..\src\libs\zbxwin32\perfmon.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# ADD CPP /W4
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 

@@ -35,7 +35,7 @@ char *GetCounterName(DWORD index)
 {
 	PERFCOUNTER	*counterName;
 	DWORD		dwSize;
-	char		hostname[MAX_COMPUTERNAME_LENGTH+3];
+	char		hostname[MAX_COMPUTERNAME_LENGTH];
 
 	counterName = PerfCounterList;
 	while(counterName!=NULL)
@@ -51,15 +51,15 @@ char *GetCounterName(DWORD index)
 		counterName->pdhIndex = index;
 		counterName->next = PerfCounterList;
 
-		sprintf(hostname, "\\\\");
-		dwSize = MAX_COMPUTERNAME_LENGTH+1;
-		if(GetComputerName((char *) &hostname + 2, &dwSize)==0)
+		hostname[0] = hostname[1] = '\\';
+		dwSize = sizeof(hostname) - 2;
+		if(GetComputerName(hostname + 2, &dwSize)==0)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "GetComputerName failed: %s", strerror_from_system(GetLastError()));
 		}
 
-		dwSize = MAX_PERFCOUNTER_NAME_LEN;
-		if(PdhLookupPerfNameByIndex((char *)&hostname, index, (char *)&counterName->name, &dwSize) == ERROR_SUCCESS)
+		dwSize = sizeof(counterName->name);
+		if(PdhLookupPerfNameByIndex(hostname, index, counterName->name, &dwSize) == ERROR_SUCCESS)
 		{
 			PerfCounterList = counterName;
 		} 

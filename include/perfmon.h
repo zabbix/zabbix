@@ -40,7 +40,9 @@ struct perfcounter
 {
 	struct perfcounter *next;
 	DWORD pdhIndex;
-	char name[MAX_PERFCOUNTER_NAME_LEN];
+	char name[MAX_PERFCOUNTER_NAME_LEN];	/* must be caracter array! if you want to rewrite */
+						/* to dinacal memory allocation CHECK for usage   */
+						/* of sizeof function                             */
 };
 
 typedef struct perfcounter PERFCOUNTER;

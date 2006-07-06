@@ -164,7 +164,7 @@ void	update_services_rec(int serviceid)
 			(SERVICE_ALGORITHM_MIN == algorithm))
 		{
 			/* Why it was so complex ?
-			sprintf(sql,"select status from services s,services_links l where l.serviceupid=%d and s.serviceid=l.servicedownid",serviceupid);
+			zbx_snprintf(sql, sizeof(sql), "select status from services s,services_links l where l.serviceupid=%d and s.serviceid=l.servicedownid",serviceupid);
 			result2=DBselect(sql);
 			for(j=0;j<DBnum_rows(result2);j++)
 			{
@@ -285,7 +285,7 @@ void	update_triggers(int itemid)
 	zabbix_log( LOG_LEVEL_DEBUG, "In update_triggers [%d]", itemid);
 
 /* Does not work for PostgreSQL */
-/*		sprintf(sql,"select t.triggerid,t.expression,t.status,t.dep_level,t.priority,t.value from triggers t,functions f,items i where i.status<>3 and i.itemid=f.itemid and t.status=%d and f.triggerid=t.triggerid and f.itemid=%d group by t.triggerid,t.expression,t.dep_level",TRIGGER_STATUS_ENABLED,server_num);*/
+/*		zbx_snprintf(sql, sizeof(sql), "select t.triggerid,t.expression,t.status,t.dep_level,t.priority,t.value from triggers t,functions f,items i where i.status<>3 and i.itemid=f.itemid and t.status=%d and f.triggerid=t.triggerid and f.itemid=%d group by t.triggerid,t.expression,t.dep_level",TRIGGER_STATUS_ENABLED,server_num);*/
 /* Is it correct SQL? */
 	zbx_snprintf(sql,sizeof(sql),"select distinct t.triggerid,t.expression,t.status,t.dep_level,t.priority,t.value,t.description from triggers t,functions f,items i where i.status<>%d and i.itemid=f.itemid and t.status=%d and f.triggerid=t.triggerid and f.itemid=%d",ITEM_STATUS_NOTSUPPORTED, TRIGGER_STATUS_ENABLED, itemid);
 
@@ -679,12 +679,12 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, int now)
 	
 	if(value->type & AR_UINT64)
 	{
-		zbx_snprintf(value_str,MAX_STRING_LEN,ZBX_FS_UI64, value->ui64);
+		zbx_snprintf(value_str, sizeof(value_str),ZBX_FS_UI64, value->ui64);
 		value_double = (double)value->ui64;
 	}
 	if(value->type & AR_DOUBLE)
 	{
-		zbx_snprintf(value_str,MAX_STRING_LEN,"%f", value->dbl);
+		zbx_snprintf(value_str,sizeof(value_str),"%f", value->dbl);
 		value_double = value->dbl;
 	}
 	if(value->type & AR_STRING)

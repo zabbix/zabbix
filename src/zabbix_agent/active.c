@@ -288,7 +288,7 @@ static int	get_active_checks(char *server, unsigned short port, char *error, int
 		return	NETWORK_ERROR;
 	}
 
-	zbx_snprintf(buf, MAX_BUF_LEN, "%s\n%s\n","ZBX_GET_ACTIVE_CHECKS", CONFIG_HOSTNAME);
+	zbx_snprintf(buf, sizeof(buf), "%s\n%s\n","ZBX_GET_ACTIVE_CHECKS", CONFIG_HOSTNAME);
 	zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", buf);
 
 	if(SOCKET_ERROR == zbx_sock_write(s, buf, strlen(buf)))
@@ -488,15 +488,15 @@ static int	process_active_checks(char *server, unsigned short port)
 			
 			process(active_metrics[i].key, 0, &result);
 			if(result.type & AR_DOUBLE)
-				 zbx_snprintf(value, MAX_STRING_LEN, ZBX_FS_DBL, result.dbl);
+				 zbx_snprintf(value, sizeof(value), ZBX_FS_DBL, result.dbl);
 			else if(result.type & AR_UINT64)
-                                 zbx_snprintf(value, MAX_STRING_LEN, ZBX_FS_UI64, result.ui64);
+                                 zbx_snprintf(value, sizeof(value), ZBX_FS_UI64, result.ui64);
 			else if(result.type & AR_STRING)
-                                 zbx_snprintf(value, MAX_STRING_LEN, "%s", result.str);
+                                 zbx_snprintf(value, sizeof(value), "%s", result.str);
 			else if(result.type & AR_TEXT)
-                                 zbx_snprintf(value, MAX_STRING_LEN, "%s", result.text);
+                                 zbx_snprintf(value, sizeof(value), "%s", result.text);
 			else if(result.type & AR_MESSAGE)
-                                 zbx_snprintf(value, MAX_STRING_LEN, "%s", result.msg);
+                                 zbx_snprintf(value, sizeof(value), "%s", result.msg);
 			free_result(&result);
 
 			zabbix_log( LOG_LEVEL_DEBUG, "For key [%s] received value [%s]", active_metrics[i].key, value);

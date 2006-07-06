@@ -108,7 +108,7 @@ static VOID WINAPI ServiceEntry(DWORD argc,LPTSTR *argv)
 	WSAStartup(0x0002,&sockInfo);
 
 	// Internal command aliases
-	sprintf(counterPath,"perf_counter[\\%s\\%s]",GetCounterName(PCI_SYSTEM),GetCounterName(PCI_SYSTEM_UP_TIME));
+	zbx_snprintf(counterPath, sizeof(counterPath), "perf_counter[\\%s\\%s]",GetCounterName(PCI_SYSTEM),GetCounterName(PCI_SYSTEM_UP_TIME));
 	add_alias("system.uptime",counterPath);
 
 	// Now service is running
@@ -200,12 +200,12 @@ int ZabbixCreateService(char *path)
 
 	if(NULL == CONFIG_FILE)
 	{
-		zbx_snprintf(cmdLine, MAX_CMD_LEN, "\"%s\"", execName);
+		zbx_snprintf(cmdLine, sizeof(cmdLine), "\"%s\"", execName);
 	}
 	else
 	{
 		_fullpath(configFile, CONFIG_FILE, MAX_PATH);
-		zbx_snprintf(cmdLine, MAX_CMD_LEN, "\"%s\" --config \"%s\"", execName, configFile);
+		zbx_snprintf(cmdLine, sizeof(cmdLine), "\"%s\" --config \"%s\"", execName, configFile);
 	}
 
 	service = CreateService(mgr,

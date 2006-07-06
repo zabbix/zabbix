@@ -29,8 +29,8 @@ int xml_get_data(char *xml,char *tag, char *data, int maxlen)
 	char tag_close[MAX_STRING_LEN];
 	int len;
 
-	zbx_snprintf(tag_open, MAX_STRING_LEN,"<%s>",tag);
-	zbx_snprintf(tag_close, MAX_STRING_LEN,"</%s>",tag);
+	zbx_snprintf(tag_open, sizeof(tag_open),"<%s>",tag);
+	zbx_snprintf(tag_close, sizeof(tag_close),"</%s>",tag);
 
 	if(NULL==(start=strstr(xml,tag_open)))
 	{

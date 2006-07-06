@@ -166,19 +166,19 @@ DEV_FNCLIST
                 return SYSINFO_RET_FAIL;
         }
 
-        if(get_param(param, 1, devname, MAX_STRING_LEN) != 0)
+        if(get_param(param, 1, devname, sizeof(devname)) != 0)
         {
                 return SYSINFO_RET_FAIL;
         }
 	
-	if(get_param(param, 2, type, MAX_STRING_LEN) != 0)
+	if(get_param(param, 2, type, sizeof(type)) != 0)
         {
                 type[0] = '\0';
         }
         if(type[0] == '\0')
 	{
 		/* default parameter */
-		sprintf(type, "bps");
+		zbx_snprintf(type, sizeof(type), "bps");
 	}
 	
 	if(get_param(param, 3, mode, MAX_STRING_LEN) != 0)
@@ -189,7 +189,7 @@ DEV_FNCLIST
         if(mode[0] == '\0')
 	{
 		/* default parameter */
-		sprintf(mode, "avg1");
+		zbx_snprintf(mode, sizeof(mode), "avg1");
 	}
 	
 	for(i=0; fl[i].type!=0; i++)
@@ -242,22 +242,22 @@ DEV_FNCLIST
                 return SYSINFO_RET_FAIL;
         }
 
-        if(get_param(param, 1, devname, MAX_STRING_LEN) != 0)
+        if(get_param(param, 1, devname, sizeof(devname)) != 0)
         {
                 return SYSINFO_RET_FAIL;
         }
 	
-	if(get_param(param, 2, type, MAX_STRING_LEN) != 0)
+	if(get_param(param, 2, type, sizeof(type)) != 0)
         {
                 type[0] = '\0';
         }
         if(type[0] == '\0')
 	{
 		/* default parameter */
-		sprintf(type, "bps");
+		zbx_snprintf(type, sizeof(type), "bps");
 	}
 	
-	if(get_param(param, 3, mode, MAX_STRING_LEN) != 0)
+	if(get_param(param, 3, mode, sizeof(mode)) != 0)
         {
                 mode[0] = '\0';
         }
@@ -265,7 +265,7 @@ DEV_FNCLIST
         if(mode[0] == '\0')
 	{
 		/* default parameter */
-		sprintf(mode, "avg1");
+		zbx_snprintf(mode, sizeof(mode), "avg1");
 	}
 	
 	for(i=0; fl[i].type!=0; i++)

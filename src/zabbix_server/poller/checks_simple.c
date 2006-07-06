@@ -76,7 +76,7 @@ int	get_value_simple(DB_ITEM *item, AGENT_RESULT *result)
 		}
 		else
 		{
-			zbx_snprintf(error,MAX_STRING_LEN,"You must use IP address in Host %s definition", item->host);
+			zbx_snprintf(error,sizeof(error),"You must use IP address in Host %s definition", item->host);
 			zabbix_log( LOG_LEVEL_WARNING, error);
 			result->str=strdup(error);
 			return NOTSUPPORTED;
@@ -110,7 +110,7 @@ int	get_value_simple(DB_ITEM *item, AGENT_RESULT *result)
 			}
 			else
 			{
-				zbx_snprintf(error,MAX_STRING_LEN,"Port number must be numeric in [%s]", item->key);
+				zbx_snprintf(error,sizeof(error),"Port number must be numeric in [%s]", item->key);
 				zabbix_log( LOG_LEVEL_WARNING, error);
 				result->str=strdup(error);
 				ret = NOTSUPPORTED;
@@ -118,7 +118,7 @@ int	get_value_simple(DB_ITEM *item, AGENT_RESULT *result)
 		}
 		else
 		{
-			zbx_snprintf(error,MAX_STRING_LEN,"Too many parameters in [%s]", item->key);
+			zbx_snprintf(error,sizeof(error),"Too many parameters in [%s]", item->key);
 			zabbix_log( LOG_LEVEL_WARNING, error);
 			result->str=strdup(error);
 			ret = NOTSUPPORTED;
@@ -189,7 +189,7 @@ int	get_value_simple(DB_ITEM *item, AGENT_RESULT *result)
 
 	if(process(c, 0, result) == NOTSUPPORTED)
 	{
-		zbx_snprintf(error,MAX_STRING_LEN,"Simple check [%s] is not supported", c);
+		zbx_snprintf(error,sizeof(error),"Simple check [%s] is not supported", c);
 		zabbix_log( LOG_LEVEL_WARNING, error);
 		result->str=strdup(error);
 		ret = NOTSUPPORTED;

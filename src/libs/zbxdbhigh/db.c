@@ -109,7 +109,7 @@ void    DBconnect(void)
 		exit(FAIL);
 	}
 			        /* login */
-	zbx_snprintf(connect, MAX_STRING_LEN,"%s/%s@%s", CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME);
+	zbx_snprintf(connect, sizeof(connect),"%s/%s@%s", CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME);
 	if (SQLO_SUCCESS != sqlo_connect(&oracle, connect))
 	{
 		printf("Cannot login with %s\n", connect);
@@ -274,15 +274,15 @@ DB_RESULT DBselectN(char *query, int n)
 {
 	char sql[MAX_STRING_LEN];
 #ifdef	HAVE_MYSQL
-	zbx_snprintf(sql,MAX_STRING_LEN,"%s limit %d", query, n);
+	zbx_snprintf(sql,sizeof(sql),"%s limit %d", query, n);
 	return DBselect(sql);
 #endif
 #ifdef	HAVE_PGSQL
-	zbx_snprintf(sql,MAX_STRING_LEN,"%s limit %d", query, n);
+	zbx_snprintf(sql,sizeof(sql),"%s limit %d", query, n);
 	return DBselect(sql);
 #endif
 #ifdef	HAVE_ORACLE
-	zbx_snprintf(sql,MAX_STRING_LEN,"select * from (%s) where rownum<=%d", query, n);
+	zbx_snprintf(sql,sizeof(sql),"select * from (%s) where rownum<=%d", query, n);
 	return DBselect(sql);
 #endif
 }

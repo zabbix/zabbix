@@ -141,7 +141,7 @@ int	send_sms(char *device,char *number,char *message, char *error, int max_error
 	/* Send phone number */
 	if(ret == SUCCEED)
 	{
-		zbx_snprintf(str, MAX_STRING_LEN,"AT+CMGS=\"%s\"\r", number);
+		zbx_snprintf(str, sizeof(str),"AT+CMGS=\"%s\"\r", number);
 		ret = write_gsm(f,str, error, max_error_len);
 	}
 	if(ret == SUCCEED)
@@ -150,7 +150,7 @@ int	send_sms(char *device,char *number,char *message, char *error, int max_error
 	/* Send message */
 	if(ret == SUCCEED)
 	{
-		zbx_snprintf(str, MAX_STRING_LEN,"%s\x01a", message);
+		zbx_snprintf(str, sizeof(str),"%s\x01a", message);
 		ret = write_gsm(f, str, error, max_error_len);
 	}
 	if(ret == SUCCEED)

@@ -60,11 +60,11 @@ static void	process_listener(ZBX_SOCKET sock)
 
 	process(command, 0, &result);
 
-        if(result.type & AR_DOUBLE)		zbx_snprintf(value, MAX_STRING_LEN, "%f", result.dbl);
-        else if(result.type & AR_UINT64)	zbx_snprintf(value, MAX_STRING_LEN, ZBX_FS_UI64, result.ui64);
-        else if(result.type & AR_STRING)	zbx_snprintf(value, MAX_STRING_LEN, "%s", result.str);
-        else if(result.type & AR_TEXT)		zbx_snprintf(value, MAX_STRING_LEN, "%s", result.text);
-        else if(result.type & AR_MESSAGE)	zbx_snprintf(value, MAX_STRING_LEN, "%s", result.msg);
+        if(result.type & AR_DOUBLE)		zbx_snprintf(value, sizeof(value), "%f", result.dbl);
+        else if(result.type & AR_UINT64)	zbx_snprintf(value, sizeof(value), ZBX_FS_UI64, result.ui64);
+        else if(result.type & AR_STRING)	zbx_snprintf(value, sizeof(value), "%s", result.str);
+        else if(result.type & AR_TEXT)		zbx_snprintf(value, sizeof(value), "%s", result.text);
+        else if(result.type & AR_MESSAGE)	zbx_snprintf(value, sizeof(value), "%s", result.msg);
 
         free_result(&result);
 

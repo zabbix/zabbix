@@ -178,7 +178,7 @@ DEV_FNCLIST
         if(type[0] == '\0')
 	{
 		/* default parameter */
-		sprintf(type, "bps");
+		zbx_snprintf(type, sizeof(type), "bps");
 	}
 	
 	if(get_param(param, 3, mode, MAX_STRING_LEN) != 0)
@@ -189,7 +189,7 @@ DEV_FNCLIST
         if(mode[0] == '\0')
 	{
 		/* default parameter */
-		sprintf(mode, "avg1");
+		zbx_snprintf(mode, sizeof(mode), "avg1");
 	}
 	
 	for(i=0; fl[i].type!=0; i++)
@@ -254,7 +254,7 @@ DEV_FNCLIST
         if(type[0] == '\0')
 	{
 		/* default parameter */
-		sprintf(type, "bps");
+		zbx_snprintf(type, sizeof(type), "bps");
 	}
 	
 	if(get_param(param, 3, mode, MAX_STRING_LEN) != 0)
@@ -265,7 +265,7 @@ DEV_FNCLIST
         if(mode[0] == '\0')
 	{
 		/* default parameter */
-		sprintf(mode, "avg1");
+		zbx_snprintf(mode, sizeof(mode), "avg1");
 	}
 	
 	for(i=0; fl[i].type!=0; i++)

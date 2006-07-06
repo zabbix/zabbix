@@ -89,7 +89,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 		return 1;
 	}
 
-	zbx_snprintf(counter_path, MAX_COUNTER_PATH, "\\%s(_Total)\\%s",GetCounterName(PCI_PROCESSOR),GetCounterName(PCI_PROCESSOR_TIME));
+	zbx_snprintf(counter_path, sizeof(counter_path), "\\%s(_Total)\\%s",GetCounterName(PCI_PROCESSOR),GetCounterName(PCI_PROCESSOR_TIME));
 
 	if (ERROR_SUCCESS != (status = PdhAddCounter(
 		pcpus->pdh_query, 
@@ -102,7 +102,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 
 	for(i=1 /* 0 - is Total cpus */; i <= pcpus->count /* "<=" instead of  "+ 1" */; i++)
 	{
-		zbx_snprintf(counter_path, MAX_COUNTER_PATH,"\\%s(%d)\\%s", GetCounterName(PCI_PROCESSOR), i-1, GetCounterName(PCI_PROCESSOR_TIME));
+		zbx_snprintf(counter_path, sizeof(counter_path),"\\%s(%d)\\%s", GetCounterName(PCI_PROCESSOR), i-1, GetCounterName(PCI_PROCESSOR_TIME));
 
 		if (ERROR_SUCCESS != (status = PdhAddCounter(
 			pcpus->pdh_query, 
@@ -126,7 +126,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	}
 
 
-	zbx_snprintf(counter_path, MAX_COUNTER_PATH, "\\%s\\%s", GetCounterName(PCI_SYSTEM), GetCounterName(PCI_PROCESSOR_QUEUE_LENGTH));
+	zbx_snprintf(counter_path, sizeof(counter_path), "\\%s\\%s", GetCounterName(PCI_SYSTEM), GetCounterName(PCI_PROCESSOR_QUEUE_LENGTH));
 
 	// Prepare for CPU execution queue usage collection
 	if (ERROR_SUCCESS != (status = PdhAddCounter(pcpus->pdh_query, counter_path, 0, &pcpus->queue_counter)))

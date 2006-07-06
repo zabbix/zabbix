@@ -340,7 +340,7 @@ int	check_ntp(char *host, int port, int *value_int)
 
 /*	display_data(&data); */
 
-        sprintf(text,"%d",0);
+        zbx_snprintf(text, sizeof(text), "%d",0);
 
 /*        format_time(text,75,offset,error,0.0,-1.0);*/
 

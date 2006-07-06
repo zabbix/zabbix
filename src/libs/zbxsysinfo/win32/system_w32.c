@@ -56,14 +56,22 @@ int     SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_R
 	switch(versionInfo.dwPlatformId)
 	{
 		case VER_PLATFORM_WIN32_WINDOWS:
-			sprintf(osVersion,"Windows %s-%s",versionInfo.dwMinorVersion==0 ? "95" :
-			(versionInfo.dwMinorVersion==10 ? "98" :
-			(versionInfo.dwMinorVersion==90 ? "Me" : "Unknown")),versionInfo.szCSDVersion);
+			zbx_snprintf(
+				osVersion, 
+				sizeof(osVersion), 
+				"Windows %s-%s",
+				versionInfo.dwMinorVersion==0 ? "95" :
+					(versionInfo.dwMinorVersion==10 ? "98" :
+					(versionInfo.dwMinorVersion==90 ? "Me" : "Unknown")),
+				versionInfo.szCSDVersion);
 			break;
 		case VER_PLATFORM_WIN32_NT:
 			if (versionInfo.dwMajorVersion!=5)
 			{
-				sprintf(osVersion,"Windows NT %d.%d %s",
+				zbx_snprintf(
+					osVersion,
+					sizeof(osVersion),
+					"Windows NT %d.%d %s",
 					versionInfo.dwMajorVersion,
 					versionInfo.dwMinorVersion,
 					versionInfo.szCSDVersion
@@ -71,15 +79,18 @@ int     SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_R
 			}
 			else      // Windows 2000, Windows XP or Windows Server 2003
 			{
-				sprintf(osVersion,"Windows %s%s%s",
+				zbx_snprintf(
+					osVersion,
+					sizeof(osVersion),
+					"Windows %s%s%s",
 					(versionInfo.dwMinorVersion == 0) ? "2000" :
-					((versionInfo.dwMinorVersion == 1) ? "XP" : "Server 2003"),
+						((versionInfo.dwMinorVersion == 1) ? "XP" : "Server 2003"),
 					versionInfo.szCSDVersion[0]==0 ? "" : " ",
 					versionInfo.szCSDVersion);
 			}
 			break;
 		default:
-			strcpy(osVersion,"Windows [Unknown Version]");
+			zbx_snprintf(osVersion, sizeof(osVersion), "Windows [Unknown Version]");
 			break;
 	}
 
@@ -112,7 +123,10 @@ int     SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_R
 			break;
 	}
 
-	zbx_snprintf(buffer, MAX_STRING_LEN, "Windows %s %d.%d.%d %s %s",
+	zbx_snprintf(
+		buffer, 
+		sizeof(buffer), 
+		"Windows %s %d.%d.%d %s %s",
 		computerName,
 		versionInfo.dwMajorVersion,
 		versionInfo.dwMinorVersion,

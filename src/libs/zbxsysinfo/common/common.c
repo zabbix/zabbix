@@ -494,7 +494,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 		}
 		else
 		{
-			zbx_snprintf(param, MAX_STRING_LEN, "%s", usr_param);
+			zbx_snprintf(param, sizeof(param), "%s", usr_param);
 		}
 
 		if(err != FAIL)
@@ -608,7 +608,9 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 /* Convert MD5 hash to text form */
 	for(i=0;i<MD5_DIGEST_SIZE;i++)
-		sprintf((char *)&hashText[i<<1],"%02x",hash[i]);
+	{
+		zbx_snprintf((char *)&hashText[i<<1], 2,"%02x",hash[i]);
+	}
 
 	SET_STR_RESULT(result, strdup((char*)hashText));
 
@@ -1316,7 +1318,7 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
                 return SYSINFO_RET_FAIL;
         }
         
-	if(get_param(param, 1, command, MAX_STRING_LEN) != 0)
+	if(get_param(param, 1, command, sizeof(command)) != 0)
         {
                 return SYSINFO_RET_FAIL;
         }
@@ -1328,14 +1330,14 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 	zabbix_log(LOG_LEVEL_WARNING, "Run command '%s'",command);
 	
-	if(get_param(param, 2, flag, MAX_FLAG_LEN) != 0)
+	if(get_param(param, 2, flag, sizeof(flag)) != 0)
         {
                 flag[0] = '\0';
         }
 
 	if(flag[0] == '\0')
 	{
-		zbx_snprintf(flag,MAX_FLAG_LEN,"wait");
+		zbx_snprintf(flag,sizeof(flag),"wait");
 	}
 
 	if(strcmp(flag,"wait") == 0)
@@ -1351,7 +1353,7 @@ zbx_error("Run wait command '%s'",command); // TMP!!!
 	
 #if defined(WIN32)
 
-	zbx_snprintf(full_command,MAX_STRING_LEN, "cmd /C \"%s\"", command);
+	zbx_snprintf(full_command, sizeof(full_command), "cmd /C \"%s\"", command);
 
 zbx_error(full_command);
 
