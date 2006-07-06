@@ -22,13 +22,13 @@
 
 // DATABASE CONFIGURATION
 
-//	$DB_TYPE	="ORACLE";
+	$DB_TYPE	="ORACLE";
 //	$DB_TYPE	="POSTGRESQL";
-	$DB_TYPE	="MYSQL";
+//	$DB_TYPE	="MYSQL";
 	$DB_SERVER	="localhost";
-	$DB_DATABASE	="osmiy";
-	$DB_USER	="root";
-	$DB_PASSWORD	="";
+//	$DB_DATABASE	="osmiy";
+	$DB_USER	="scott";
+	$DB_PASSWORD	="tiger";
 // END OF DATABASE CONFIGURATION
 
 	global $USER_DETAILS;
@@ -182,7 +182,7 @@ COpt::savesqlrequest($query);
 		if($DB_TYPE == "ORACLE")
 		{
 //			echo "DBfetch<br>";
-			if(!ocifetchinto($cursor,$row,OCI_ASSOC+OCI_RETURN_NULLS))
+			if(!ocifetchinto($cursor, $row, OCI_ASSOC+OCI_NUM+OCI_RETURN_NULLS))
 			{
 				return FALSE;
 			}

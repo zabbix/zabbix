@@ -1,3 +1,18 @@
+Changes for 1.1.1:
+
+ - disabled excessive debug printing for system.run (Alexei)
+ - umask(022) changed to umask(002) (Alexei)
+ - added additional symbols for trigger expressions (slash, space) (Alexei)
+ - fixed permissions of log files when starting as 'root' (Alexei)
+ - fixed agent crash while evaluating proc.mem[] (Alexei)
+ - changed type of lastlogsize to long in structure METRIC (Alexei)
+ - ZABBIX agent to bind even if TIME_WAIT sockets exist (Alexei)
+ - ZABBIX server to bind even if TIME_WAIT sockets exist (Alexei)
+ - fixed notification report for Oracle (Eugene)
+ - fixed large history of alarms displaying (Eugene)
+ - fixed value mapping for latest data (Eugene)
+ - fixed value mapping for screens (Eugene)
+
 Changes for 1.1:
 
  - timeout for sending emails and SMS was increased to 20 seconds (Alexei)

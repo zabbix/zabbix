@@ -450,7 +450,7 @@ int	process_active_checks(char *server, int port)
 			{
 /*				snprintf(shortname, MAX_STRING_LEN-1,"%s:%s",CONFIG_HOSTNAME,metrics[i].key);
 				zabbix_log( LOG_LEVEL_DEBUG, "%s",shortname); */
-				snprintf(lastlogsize, MAX_STRING_LEN-1,"%d",metrics[i].lastlogsize);
+				snprintf(lastlogsize, MAX_STRING_LEN-1,"%ld",metrics[i].lastlogsize);
 
 				if(send_value(server,port,CONFIG_HOSTNAME,metrics[i].key,value,lastlogsize) == FAIL)
 				{

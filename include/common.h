@@ -118,8 +118,8 @@
 
 #define	ZBX_FS_DBL	"%f"
 
-#define	ZABBIX_REVDATE	"2 Juna 2006"
-#define	ZABBIX_VERSION	"1.1"
+#define	ZABBIX_REVDATE	"1 July 2006"
+#define	ZABBIX_VERSION	"1.1.1"
 
 #define MAX_LOG_FILE_LEN (1024*1024)
 
