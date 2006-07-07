@@ -106,6 +106,7 @@ char	*CONFIG_HOSTS_ALLOWED		= NULL;
 char	*CONFIG_HOSTNAME		= NULL;
 char	*CONFIG_FILE			= NULL;
 char	*CONFIG_PID_FILE		= NULL;
+char	*CONFIG_STAT_FILE		= NULL;
 char	*CONFIG_LOG_FILE		= NULL;
 int	CONFIG_AGENTD_FORKS		= AGENTD_FORKS;
 /*int	CONFIG_NOTIMEWAIT		= 0;*/
@@ -132,6 +133,12 @@ void	uninit(void)
 			{
 				kill(pids[i],SIGTERM);
 			}
+		}
+
+		if( unlink(CONFIG_STAT_FILE) != 0)
+		{
+			zabbix_log( LOG_LEVEL_WARNING, "Cannot remove STAT file [%s]",
+				CONFIG_STAT_FILE);
 		}
 
 		if( unlink(CONFIG_PID_FILE) != 0)
@@ -272,7 +279,7 @@ void    init_config(void)
 		{"Hostname",&CONFIG_HOSTNAME,0,TYPE_STRING,PARM_OPT,0,0},
 		{"PidFile",&CONFIG_PID_FILE,0,TYPE_STRING,PARM_OPT,0,0},
 		{"LogFile",&CONFIG_LOG_FILE,0,TYPE_STRING,PARM_OPT,0,0},
-/*		{"StatFile",&CONFIG_STAT_FILE,0,TYPE_STRING,PARM_OPT,0,0},*/
+		{"StatFile",&CONFIG_STAT_FILE,0,TYPE_STRING,PARM_OPT,0,0},
 		{"DisableActive",&CONFIG_DISABLE_ACTIVE,0,TYPE_INT,PARM_OPT,0,1},
 		{"EnableRemoteCommands",&CONFIG_ENABLE_REMOTE_COMMANDS,0,TYPE_INT,PARM_OPT,0,1},
 		{"Timeout",&CONFIG_TIMEOUT,0,TYPE_INT,PARM_OPT,1,30},
@@ -319,10 +326,10 @@ void    init_config(void)
 		}
 	}
 
-/*	if(CONFIG_STAT_FILE == NULL)
+	if(CONFIG_STAT_FILE == NULL)
 	{
 		CONFIG_STAT_FILE=strdup("/tmp/zabbix_agentd.tmp");
-	}*/
+	}
 }
 
 void    load_user_parameters(void)
@@ -633,6 +640,8 @@ int	main(int argc, char **argv)
 #endif
 
 	collect_statistics();
+
+	uninit();
 
 /*
 #ifdef HAVE_PROC_NET_DEV
