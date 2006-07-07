@@ -9,7 +9,7 @@ int	comms_create_request(char *host, char *key, char *data, char *lastlogsize, c
 	int ret = SUCCEED;
 	char host_b64[MAX_STRING_LEN];
 	char key_b64[MAX_STRING_LEN];
-	char data_b64[MAX_STRING_LEN];
+	char data_b64[ZBX_MAX_B64_LEN];
 	char lastlogsize_b64[MAX_STRING_LEN];
 
 	memset(host_b64,0,sizeof(host_b64));
@@ -47,7 +47,7 @@ int	comms_parse_response(char *xml,char *host,char *key, char *data, char *lastl
 	char data_b64[MAX_STRING_LEN];
 	char lastlogsize_b64[MAX_STRING_LEN];
 	char timestamp_b64[MAX_STRING_LEN];
-	char source_b64[MAX_STRING_LEN];
+	char source_b64[ZBX_MAX_B64_LEN];
 	char severity_b64[MAX_STRING_LEN];
 
 	memset(host_b64,0,sizeof(host_b64));
