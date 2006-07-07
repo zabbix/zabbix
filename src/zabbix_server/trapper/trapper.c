@@ -164,9 +164,12 @@ int	process_trap(int sockfd,char *s, int max_len)
 
 void	process_trapper_child(int sockfd)
 {
-	ssize_t	nread;
-	char	line[MAX_STRING_LEN];
+	ssize_t	nbytes;
+	char	buffer[MAX_BUF_LEN];
 	static struct  sigaction phan;
+	char	*bufptr;
+
+	zabbix_log( LOG_LEVEL_DEBUG, "In process_trapper_child");
 
 	phan.sa_handler = &signal_handler;
 	sigemptyset(&phan.sa_mask);
@@ -175,32 +178,40 @@ void	process_trapper_child(int sockfd)
 
 	alarm(CONFIG_TIMEOUT);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Before read()");
-	if( (nread = read(sockfd, line, MAX_STRING_LEN)) < 0)
+	zabbix_log( LOG_LEVEL_DEBUG, "Before read(%d)", MAX_BUF_LEN);
+/*	if( (nbytes = read(sockfd, line, MAX_BUF_LEN)) < 0)*/
+	memset(buffer,0,MAX_BUF_LEN);
+	bufptr = buffer;
+	while ((nbytes = read(sockfd, bufptr, buffer + sizeof(buffer) - bufptr - 1)) != -1 && nbytes != 0)
+	{
+		zabbix_log( LOG_LEVEL_DEBUG, "Read %d bytes", nbytes);
+		if(nbytes < buffer + sizeof(buffer) - bufptr - 1)
+		{
+			bufptr += nbytes;
+			break;
+		}
+		bufptr += nbytes;
+	}
+
+	if(nbytes < 0)
 	{
 		if(errno == EINTR)
 		{
-			zabbix_log( LOG_LEVEL_DEBUG, "Read timeout");
+			zabbix_log( LOG_LEVEL_WARNING, "Read timeout");
 		}
 		else
 		{
-			zabbix_log( LOG_LEVEL_DEBUG, "read() failed");
+			zabbix_log( LOG_LEVEL_WARNING, "read() failed");
 		}
-		zabbix_log( LOG_LEVEL_DEBUG, "After read() 1");
 		alarm(0);
 		return;
 	}
 
-	zabbix_log( LOG_LEVEL_DEBUG, "After read() 2 [%d]",nread);
+	zabbix_log( LOG_LEVEL_DEBUG, "After read() 3 [%d]",nbytes);
 
-	if(nread>0)
-	{
-		line[nread-1]=0;
-	}
+	zabbix_log( LOG_LEVEL_DEBUG, "Got data:%s", buffer);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Got line:%s", line);
-
-	process_trap(sockfd,line, MAX_STRING_LEN);
+	process_trap(sockfd,buffer, MAX_BUF_LEN);
 
 	alarm(0);
 }
