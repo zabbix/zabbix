@@ -591,8 +591,7 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		return	SYSINFO_RET_FAIL;
 	}
 
-	file = fopen(filename,"r");
-	if(file == NULL)
+	if(NULL == (file = fopen(filename,"r")))
 	{
 		return	SYSINFO_RET_FAIL;
 	}
@@ -604,7 +603,7 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	}
         md5_finish(&state,(md5_byte_t *)hash);
 
-	fclose(file);
+	zbx_fclose(file);
 
 /* Convert MD5 hash to text form */
 	for(i=0;i<MD5_DIGEST_SIZE;i++)
@@ -711,8 +710,7 @@ int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
                 return SYSINFO_RET_FAIL;
         }	
 		
-	f = fopen(filename,"r");
-	if(NULL == f)
+	if(NULL == (f = fopen(filename,"r")))
 	{
 		return	SYSINFO_RET_FAIL;
 	}
@@ -727,7 +725,7 @@ int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 			COMPUTE(crc, *p);
 		}
 	}
-	fclose(f);
+	zbx_fclose(f);
 	
 	if (nr < 0)
 	{
@@ -770,37 +768,38 @@ crc_buf2(p, clen, cval)
 
 int	get_stat(const char *key, unsigned flags, AGENT_RESULT *result)
 {
-	FILE	*f;
+	FILE	*f = NULL;
 	char	line[MAX_STRING_LEN];
 	char	name1[MAX_STRING_LEN];
 	char	name2[MAX_STRING_LEN];
+	int	ret = SYSINFO_RET_FAIL;
 
         assert(result);
 
         init_result(result);	
 
-	f = fopen("/tmp/zabbix_agentd.tmp","r");
-	if(f==NULL)
+	if(NULL == (f = fopen("/tmp/zabbix_agentd.tmp","r")))
 	{
 		return SYSINFO_RET_FAIL;
 	}
+
 	while(fgets(line,MAX_STRING_LEN,f))
 	{
 		if(sscanf(line,"%s %s\n",name1,name2)==2)
 		{
 			if(strcmp(name1,key) == 0)
 			{
-				fclose(f);
 				SET_UI64_RESULT(result, atoi(name2));
-				return SYSINFO_RET_OK;
+				ret = SYSINFO_RET_OK;
+				break;
 			}
 		}
 
 	}
 
-	fclose(f);
+	zbx_fclose(f);
 
-	return SYSINFO_RET_FAIL;
+	return ret;
 }
 
 int	NET_IF_IBYTES1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -860,10 +859,11 @@ int	NET_IF_OBYTES15(const char *cmd, const char *param, unsigned flags, AGENT_RE
 int	TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef HAVE_PROC
-	FILE	*f;
+	FILE	*f = NULL;
 	char	c[MAX_STRING_LEN];
 	char	porthex[MAX_STRING_LEN];
 	char	pattern[MAX_STRING_LEN];
+	int	ret = SYSINFO_RET_FAIL;
 
         assert(result);
 
@@ -882,8 +882,7 @@ int	TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 	strscpy(pattern,porthex);
 	strncat(pattern," 00000000:0000 0A", MAX_STRING_LEN);
 
-	f=fopen("/proc/net/tcp","r");
-	if(NULL == f)
+	if(NULL == (f = fopen("/proc/net/tcp","r")))
 	{
 		return	SYSINFO_RET_FAIL;
 	}
@@ -892,16 +891,16 @@ int	TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 	{
 		if(NULL != strstr(c,pattern))
 		{
-			fclose(f);
 			SET_UI64_RESULT(result, 1);
-			return SYSINFO_RET_OK;
+			ret = SYSINFO_RET_OK;
+			break;
 		}
 	}
-	fclose(f);
+	zbx_fclose(f);
 
 	SET_UI64_RESULT(result, 0);
 	
-	return SYSINFO_RET_OK;
+	return ret;
 #else
 	return	SYSINFO_RET_FAIL;
 #endif
@@ -920,21 +919,23 @@ int	getPROC(char *file, int lineno, int fieldno, unsigned flags, AGENT_RESULT *r
 
         init_result(result);	
 		
-	f = fopen(file,"r");
-	if(NULL == f)
+	if(NULL == (f = fopen(file,"r")))
 	{
 		return	SYSINFO_RET_FAIL;
 	}
-	for(i=1;i<=lineno;i++)
+
+	for(i=1; i<=lineno; i++)
 	{	
 		fgets(c,MAX_STRING_LEN,f);
 	}
+
 	t=(char *)strtok(c," ");
 	for(i=2; i<=fieldno; i++)
 	{
 		t=(char *)strtok(NULL," ");
 	}
-	fclose(f);
+
+	zbx_fclose(f);
 
 	sscanf(t, "%lf", &value);
 	SET_DBL_RESULT(result, value);
@@ -1056,17 +1057,18 @@ int	PROCCOUNT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 
 		if(stat(filename,&buf)==0)
 		{
-			f = fopen(filename,"r");
-			if(f==NULL)
+			if(NULL == (f = fopen(filename,"r")))
 			{
 				continue;
 			}
+
 			/* This check can be skipped. No need to read anything from this file. */
 			if(NULL != fgets(line,MAX_STRING_LEN,f))
 			{
 				proccount++;
 			}
-			fclose(f);
+
+			zbx_fclose(f);
 		}
 	}
 	closedir(dir);
@@ -1343,7 +1345,6 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	if(strcmp(flag,"wait") == 0)
 	{
 zabbix_log(LOG_LEVEL_WARNING, "Run wait command '%s'",command); // TMP!!!
-zbx_error("Run wait command '%s'",command); // TMP!!!
 		return EXECUTE_STR(cmd,command,flags,result);
 	}
 	else if(strcmp(flag,"nowait") != 0)
@@ -1354,8 +1355,6 @@ zbx_error("Run wait command '%s'",command); // TMP!!!
 #if defined(WIN32)
 
 	zbx_snprintf(full_command, sizeof(full_command), "cmd /C \"%s\"", command);
-
-zbx_error(full_command);
 
 	GetStartupInfo(&si);
 
@@ -1385,7 +1384,7 @@ zabbix_log(LOG_LEVEL_WARNING, "Run nowait command '%s'",command); // TMP!!!
 	switch(pid)
 	{
 	case -1:
-		zabbix_log(LOG_LEVEL_WARNING, "fork failed for '%s'",command);
+		zabbix_log(LOG_LEVEL_WARNING, "fork failed for command '%s'",command);
 		return SYSINFO_RET_FAIL;
 	case 0:
 		pid = fork(); /* run new tread 2 to replace by command */
@@ -1404,31 +1403,25 @@ zabbix_log(LOG_LEVEL_WARNING, "Run nowait command '%s'",command); // TMP!!!
 			sleep(3); 
 			/**/
 			
-zabbix_log(LOG_LEVEL_WARNING, "Run command via execl '%s'",command); // TMP!!!
 			/* replace thread 2 by the execution of command */
 			if(execl("/bin/sh", "sh", "-c", command, (char *)0))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "execl failed for command '%s'",command);
 			}
-zabbix_log(LOG_LEVEL_WARNING, "Exit from thread 2"); // TMP!!!
 			/* In normal case the program will never reach this point */
 			exit(0);
 		default:
-zabbix_log(LOG_LEVEL_WARNING, "NOWait thread 2"); // TMP!!!
 			waitpid(pid, NULL, WNOHANG); /* NO WAIT can be used for thread 2 closing */
-zabbix_log(LOG_LEVEL_WARNING, "Exit from thread 1"); // TMP!!!
 			exit(0); /* close thread 1 and transmit thread 2 to system (solve zombie state) */
 			break;
 		}
 	default:
-zabbix_log(LOG_LEVEL_WARNING, "Wait thread 1"); // TMP!!!
 		waitpid(pid, NULL, 0); /* wait thread 1 closing */
 		break;
 	}
 
 #endif /* WIN32 */
 
-zabbix_log(LOG_LEVEL_WARNING, "END run command '%s' - OK",command); // TMP!!!
 	SET_UI64_RESULT(result, 1);
 	
 	return	SYSINFO_RET_OK;
@@ -1496,8 +1489,10 @@ int	forward_request(char *proxy, char *command, int port, unsigned flags, AGENT_
 	close(s);
 	
 	SET_STR_RESULT(result, strdup(c));
-#endif /* TODO */
 	return	SYSINFO_RET_OK;
+#endif /* TODO */
+
+	return SYSINFO_RET_FAIL;
 }
 
 

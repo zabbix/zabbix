@@ -47,8 +47,7 @@ static int get_net_stat(const char *if_name, struct net_stat_s *result)
 
 	assert(result);
 
-	f=fopen("/proc/net/dev","r");
-	if(f)
+	if(NULL != (f = fopen("/proc/net/dev","r") ))
 	{
 		
 		while(fgets(line,MAX_STRING_LEN,f) != NULL)
@@ -85,7 +84,7 @@ static int get_net_stat(const char *if_name, struct net_stat_s *result)
 				}
 			}
 		}
-		fclose(f);
+		zbx_fclose(f);
 	}
 
 	if(ret != SYSINFO_RET_OK)

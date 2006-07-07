@@ -412,7 +412,7 @@ static int _getopt_internal (int argc, char **argv, const char *optstring,
       if (needexact && !exact)
         {
           if (zbx_opterr)
-                fprintf (stderr, "%s: unrecognized zbx_option `%s'", argv[0], argv[zbx_optind]);
+                zbx_error("unrecognized zbx_option `%s'", argv[zbx_optind]);
 
           nextchar += strlen (nextchar);
           zbx_optind++;
@@ -421,7 +421,7 @@ static int _getopt_internal (int argc, char **argv, const char *optstring,
       if (ambig && !exact)
         {
           if (zbx_opterr)
-                fprintf (stderr, "%s: zbx_option `%s' is ambiguous", argv[0], argv[zbx_optind]);
+                zbx_error("zbx_option `%s' is ambiguous", argv[zbx_optind]);
 
           nextchar += strlen (nextchar);
           zbx_optind++;
@@ -447,14 +447,10 @@ static int _getopt_internal (int argc, char **argv, const char *optstring,
                     {
                       if (argv[zbx_optind - 1][1] == '-')
                         /* --zbx_option */
-                        fprintf (stderr,
-                                 "%s: zbx_option `--%s' doesn't allow an argument\n",
-                                 argv[0], pfound->name);
+                        zbx_error("zbx_option `--%s' doesn't allow an argument",pfound->name);
                       else
                         /* +zbx_option or -zbx_option */
-                        fprintf (stderr,
-                             "%s: zbx_option `%c%s' doesn't allow an argument\n",
-                             argv[0], argv[zbx_optind - 1][0], pfound->name);
+                        zbx_error("zbx_option `%c%s' doesn't allow an argument", argv[zbx_optind - 1][0], pfound->name);
                     }
                   nextchar += strlen (nextchar);
                   return BAD_OPTION;
@@ -471,9 +467,8 @@ static int _getopt_internal (int argc, char **argv, const char *optstring,
               else
                 {
                   if (zbx_opterr)
-                    fprintf (stderr, "%s: zbx_option `--%s%s' requires an argument\n",
-                             argv[0], pfound->name,
-                             (pfound->has_arg & 0x20) ? "=" : "");
+                    zbx_error("zbx_option `--%s%s' requires an argument",
+                             pfound->name, (pfound->has_arg & 0x20) ? "=" : "");
                   nextchar += strlen (nextchar);
                   return optstring[0] == ':' ? ':' : BAD_OPTION;
                 }
@@ -502,12 +497,10 @@ static int _getopt_internal (int argc, char **argv, const char *optstring,
             {
               if (argv[zbx_optind][1] == '-')
                 /* --zbx_option */
-                fprintf (stderr, "%s: unrecognized zbx_option `--%s'\n",
-                         argv[0], nextchar);
+                zbx_error("unrecognized zbx_option `--%s'", nextchar);
               else
                 /* +zbx_option or -zbx_option */
-                fprintf (stderr, "%s: unrecognized zbx_option `%c%s'\n",
-                         argv[0], argv[zbx_optind][0], nextchar);
+                zbx_error("unrecognized zbx_option `%c%s'", argv[zbx_optind][0], nextchar);
             }
           nextchar = empty_string;
           zbx_optind++;
@@ -532,13 +525,12 @@ static int _getopt_internal (int argc, char **argv, const char *optstring,
           {
 #if 0
             if (c < 040 || c >= 0177)
-              fprintf (stderr, "%s: unrecognized zbx_option, character code 0%o\n",
-                       argv[0], c);
+              zbx_error("unrecognized zbx_option, character code 0%o", c);
             else
-              fprintf (stderr, "%s: unrecognized zbx_option `-%c'\n", argv[0], c);
+              zbx_error("unrecognized zbx_option `-%c'", c);
 #else
             /* 1003.2 specifies the format of this message.  */
-            fprintf (stderr, "%s: illegal zbx_option -- %c\n", argv[0], c);
+            zbx_error("illegal zbx_option -- %c", c);
 #endif
           }
         zbx_optopt = c;
@@ -573,12 +565,10 @@ static int _getopt_internal (int argc, char **argv, const char *optstring,
                 if (zbx_opterr)
                   {
 #if 0
-                    fprintf (stderr, "%s: zbx_option `-%c' requires an argument\n",
-                             argv[0], c);
+                    zbx_error("zbx_option `-%c' requires an argument", c);
 #else
                     /* 1003.2 specifies the format of this message.  */
-                    fprintf (stderr, "%s: zbx_option requires an argument -- %c\n",
-                             argv[0], c);
+                    zbx_error("zbx_option requires an argument -- %c", c);
 #endif
                   }
                 zbx_optopt = c;

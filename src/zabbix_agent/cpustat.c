@@ -340,8 +340,7 @@ static int	get_cpustat(int *now,float *cpu_user,float *cpu_system,float *cpu_nic
 
     #if defined(HAVE_PROC_STAT)
 	
-	file = fopen("/proc/stat","r");
-	if(NULL == file)
+	if(NULL == (file = fopen("/proc/stat","r") ))
 	{
 		zbx_error("Cannot open [%s] [%s]\n","/proc/stat", strerror(errno));
 		return 1;
@@ -356,7 +355,7 @@ static int	get_cpustat(int *now,float *cpu_user,float *cpu_system,float *cpu_nic
 		sscanf(line, "cpu %f %f %f %f", cpu_user, cpu_nice, cpu_system, cpu_idle);
 		break;
 	}
-	fclose(file);
+	zbx_fclose(file);
 
 	if(*cpu_user < 0) 
 		return 1;

@@ -269,7 +269,7 @@ int	check_ntp(char *host, int port, int *value_int)
 
 	if(s == -1)
 	{
-/*		zbx_error(stderr, "Cannot create socket [%s]", strerror(errno));*/
+/*		zbx_error("Cannot create socket [%s]", strerror(errno));*/
 		return	SYSINFO_RET_OK;
 	}
  

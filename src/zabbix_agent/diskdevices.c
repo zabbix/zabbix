@@ -152,8 +152,7 @@ void	init_stats_diskdevices()
 		}
 	}
 
-	file=fopen("/proc/stat","r");
-	if(NULL == file)
+	if(NULL == (file = fopen("/proc/stat","r") ))
 	{
 		zbx_error("Cannot open [%s] [%s].","/proc/stat", strerror(errno));
 		return;
@@ -194,7 +193,7 @@ void	init_stats_diskdevices()
 		}
 	}
 
-	fclose(file);
+	zbx_fclose(file);
 }
 
 /*
@@ -215,8 +214,7 @@ void	init_stats_diskdevices()
 		}
 	}
 
-	file=fopen("/proc/stat","r");
-	if(NULL == file)
+	if(NULL == (file = fopen("/proc/stat","r") ))
 	{
 		zbx_error("Cannot open [%s] [%m].","/proc/stat");
 		return;
@@ -241,7 +239,7 @@ void	init_stats_diskdevices()
 		i++;
 	}
 
-	fclose(file);
+	zbx_fclose(file);
 }
 */
 
@@ -498,8 +496,7 @@ void	collect_stats_diskdevices(FILE *outfile)
 
 	now=time(NULL);
 
-	file=fopen("/proc/stat","r");
-	if(NULL == file)
+	if( NULL == (file = fopen("/proc/stat","r") ))
 	{
 		zbx_error("Cannot open [%s] [%s].","/proc/stat", strerror(errno));
 		return;
@@ -533,7 +530,7 @@ void	collect_stats_diskdevices(FILE *outfile)
 		}
 	}
 
-	fclose(file);
+	zbx_fclose(file);
 
 	report_stats_diskdevices(outfile, now);
 

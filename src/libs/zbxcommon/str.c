@@ -133,19 +133,31 @@ int	find_char(char *str,char c)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
+//#define ZBX_STDERR_FILE "zbx_errors.log"
+
 void zbx_error(const char *fmt, ...)
 {
 	va_list args;
+	FILE *f = NULL;
+
+#if defined(ZBX_STDERR_FILE)
+	f = fopen(ZBX_STDERR_FILE,"a+");
+#else
+	f = stderr;
+#endif /* ZBX_STDERR_FILE */
     
 	va_start(args, fmt);
 
-	fprintf(stderr, "%s [%li]: ",progname, zbx_get_thread_id());
-	vfprintf(stderr, fmt, args);
-	fprintf(stderr, "\n");
-	fflush(stderr);
+	fprintf(f, "%s [%li]: ",progname, zbx_get_thread_id());
+	vfprintf(f, fmt, args);
+	fprintf(f, "\n");
+	fflush(f);
 
 	va_end(args);
 
+#if defined(ZBX_STDERR_FILE)
+	zbx_fclose(f);
+#endif /* ZBX_STDERR_FILE */
 }
 
 /******************************************************************************
@@ -174,7 +186,7 @@ void zbx_snprintf(char* str, size_t count, const char *fmt, ...)
 	va_start(args, fmt);
 
 	writen_len = vsnprintf(str, count, fmt, args);
-	writen_len = MIN(writen_len - 1, ((int)count) - 1);
+	writen_len = MIN(writen_len, ((int)count) - 1);
 	writen_len = MAX(writen_len, 0);
 
 	str[writen_len] = '\0';

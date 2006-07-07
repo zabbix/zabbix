@@ -26,7 +26,6 @@
 
 #if defined(WIN32)
 
-#	define ZABBIX_EVENT_SOURCE   "ZABBIX Win32 Agent"
 #	pragma warning (disable: 4100)
 
 #else /* not WIN32 */
@@ -61,12 +60,6 @@
 #define	NETWORK_ERROR	(-3)
 #define	TIMEOUT_ERROR	(-4)
 #define	AGENT_ERROR	(-5)
-
-/* show debug info to stderr */
-#define FDI(f, m) fprintf(stderr, "DEBUG INFO: " f "\n" , m)
-#define SDI(m) FDI("%s", m)
-#define IDI(i) FDI("%i", i)
-
 
 /*
 #define ZBX_POLLER

@@ -75,9 +75,11 @@ int zbx_mutex_create(ZBX_MUTEX *mutex, char *name)
 	int	sem_id;
 	union semun semopts;
 
+	CONFIG_FILE + name;
+
 	sem_key = ftok(name, 'z');
 
-	if ((sem_id = semget(sem_key, 1, IPC_CREAT | 0666)) == -1)
+	if ((sem_id = semget(sem_key, 1, IPC_CREAT | 0666 /* 0022 */)) == -1)
 	{
 		zbx_error("Semaphore set does not exist!");
 		return ZBX_MUTEX_ERROR;

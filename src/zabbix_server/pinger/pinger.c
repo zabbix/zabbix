@@ -229,9 +229,7 @@ static int create_host_file(void)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In create_host_file()");
 
-	f = fopen("/tmp/zabbix_server.pinger", "w");
-
-	if( f == NULL)
+	if(NULL == (f = fopen("/tmp/zabbix_server.pinger", "w") ))
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Cannot open file [%s] [%s]", "/tmp/zabbix_server.pinger", strerror(errno));
 		zabbix_syslog("Cannot open file [%s] [%s]", "/tmp/zabbix_server.pinger", strerror(errno));
@@ -268,7 +266,7 @@ static int create_host_file(void)
 	}
 	DBfree_result(result);
 
-	fclose(f);
+	zbx_fclose(f);
 
 	return SUCCEED;
 }

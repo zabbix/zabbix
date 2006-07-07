@@ -25,7 +25,7 @@
 static int	VM_MEMORY_CACHED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef HAVE_PROC
-        FILE    *f;
+        FILE    *f = NULL;
         char    *t;
         char    c[MAX_STRING_LEN];
         zbx_uint64_t    res = 0;
@@ -34,12 +34,12 @@ static int	VM_MEMORY_CACHED(const char *cmd, const char *param, unsigned flags, 
 
         init_result(result);
 
-        f=fopen("/proc/meminfo","r");
-        if(NULL == f)
+        if(NULL == (f = fopen("/proc/meminfo","r")))
         {
                 return  SYSINFO_RET_FAIL;
         }
-        while(NULL!=fgets(c,MAX_STRING_LEN,f))
+
+        while(NULL != fgets(c,MAX_STRING_LEN,f))
         {
                 if(strncmp(c,"Cached:",7) == 0)
                 {
@@ -56,7 +56,8 @@ static int	VM_MEMORY_CACHED(const char *cmd, const char *param, unsigned flags, 
                         break;
                 }
         }
-        fclose(f);
+
+        zbx_fclose(f);
 
         SET_UI64_RESULT(result, res);
         return SYSINFO_RET_OK;

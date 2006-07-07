@@ -47,18 +47,21 @@
 
 char *progname = NULL;
 
-char title_message[] = "ZABBIX Agent "
+char title_message[] = "ZABBIX Agent"
+
 #if defined(WIN32)
-	"(service)";
-#else /* not WIN32 */
-	"(daemon)";
+	#if defined(ZABBIX_DAEMON)
+		" (service)";
+	#else /* not WIN32 */
+		" (daemon)";
+	#endif
 #endif
 
 char usage_message[] = 
 	"[-vhp]"
-	#if defined(WIN32)
+#if defined(WIN32)
 	" [-iusx]"
-	#endif /* WIN32 */
+#endif /* WIN32 */
 	" [-c <file>] [-t <metric>]";
 
 char *help_message[] = {
@@ -86,7 +89,9 @@ char *help_message[] = {
 	0 /* end of text */
 };
 
-struct zbx_option longopts[] =
+/* COMMAND LINE OPTIONS - Start */
+
+static struct zbx_option longopts[] =
 {
 	{"config",	1,	0,	'c'},
 	{"help",	0,	0,	'h'},
@@ -107,6 +112,15 @@ struct zbx_option longopts[] =
 	{0,0,0,0}
 };
 
+static char	shortopts[] = 
+	"c:hvpt:"
+#if defined (WIN32)
+	"iusx"
+#endif /* WIN32 */
+	;
+
+/* COMMAND LINE OPTIONS - End*/
+
 static char	*TEST_METRIC = NULL;
 
 static ZBX_THREAD_HANDLE	*threads = NULL;
@@ -116,8 +130,9 @@ static int parse_commandline(int argc, char **argv)
 	int	task	= ZBX_TASK_START;
 	char	ch	= '\0';
 
+
 	/* Parse the command-line. */
-	while ((ch = zbx_getopt_long(argc, argv, "c:hvpt:", longopts, NULL)) != EOF)
+	while ((ch = zbx_getopt_long(argc, argv, shortopts, longopts, NULL)) != EOF)
 		switch ((char) ch) {
 		case 'c':
 			CONFIG_FILE = strdup(zbx_optarg);
@@ -211,14 +226,17 @@ void MAIN_ZABBIX_ENTRY(void)
 	ZBX_SOCKET	sock;
 
 	zabbix_open_log(
-#if 0	/* !!! normal case must be 1 !!! */
+#if 1	/* !!! normal case must be 1 !!! */
 		LOG_TYPE_FILE
-#elif 1	/* !!! normal case must be 0 !!! */
+#elif 0	/* !!! normal case must be 0 !!! */
 		LOG_TYPE_SYSLOG
-#else	/* !!! for debug only print log to stderr !!! */ 
+#else	/* !!! for debug only, print log with zbx_error !!! */ 
 		LOG_TYPE_UNDEFINED
 #endif
-		, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
+		,
+		CONFIG_LOG_LEVEL,
+		CONFIG_LOG_FILE
+		);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "zabbix_agentd started. ZABBIX %s.", ZABBIX_VERSION);
 
@@ -227,12 +245,13 @@ void MAIN_ZABBIX_ENTRY(void)
 	init_collector_data();
 
 	/* --- START THREADS ---*/
+
 	threads = calloc(CONFIG_AGENTD_FORKS, sizeof(ZBX_THREAD_HANDLE));
 
 	threads[i=0] = zbx_thread_start(collector_thread, NULL);
 
 	/* start listeners */
-	for(i++; i < CONFIG_AGENTD_FORKS-1; i++)
+	for(i++; i < CONFIG_AGENTD_FORKS - ((0 == CONFIG_DISABLE_ACTIVE) ? 1 : 0); i++)
 	{
 		threads[i] = zbx_thread_start(listener_thread, &sock);
 	}
@@ -244,10 +263,6 @@ void MAIN_ZABBIX_ENTRY(void)
 		activechk_args.port = (unsigned short)CONFIG_SERVER_PORT;
 
 		threads[i] = zbx_thread_start(active_checks_thread, &activechk_args);
-	}
-	else
-	{	/* if disabled active thread run listener thread */
-		threads[i] = zbx_thread_start(listener_thread, &sock);
 	}
 
 #if !defined(WIN32)

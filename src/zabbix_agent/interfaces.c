@@ -132,8 +132,7 @@ void	init_stats_interfaces()
 		}
 	}
 
-	file=fopen("/proc/net/dev","r");
-	if(NULL == file)
+	if( NULL == (file = fopen("/proc/net/dev","r") ))
 	{
 		zbx_error("Cannot open statistic file [%s] [%s].","/proc/net/dev", strerror(errno));
 		return;
@@ -158,7 +157,7 @@ void	init_stats_interfaces()
 		i++;
 	}
 
-	fclose(file);
+	zbx_fclose(file);
 }
 
 void	report_stats_interfaces(FILE *file, int now)
@@ -369,8 +368,7 @@ void	collect_stats_interfaces(FILE *outfile)
 
 	now=time(NULL);
 
-	file=fopen("/proc/net/dev","r");
-	if(NULL == file)
+	if(NULL == (file = fopen("/proc/net/dev","r") ))
 	{
 		zbx_error("Cannot open statistic file [%s] [%s].","/proc/net/dev", strerror(errno));
 		return;
@@ -414,7 +412,7 @@ void	collect_stats_interfaces(FILE *outfile)
 		}
 		i++;
 	}
-	fclose(file);
+	zbx_fclose(file);
 
 	report_stats_interfaces(outfile, now);
 

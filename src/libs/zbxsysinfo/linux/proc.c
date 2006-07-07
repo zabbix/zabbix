@@ -134,7 +134,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	while((entries=readdir(dir))!=NULL)
 	{
-		if(f) fclose(f);
+		zbx_fclose(f);
 
 		proc_ok = 0;
 		usr_ok = 0;
@@ -152,8 +152,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 		if(stat(filename,&buf)==0)
 		{
-			f=fopen(filename,"r");
-			if(f==NULL)
+			if(NULL == ( f = fopen(filename,"r") ))
 			{
 				continue;
 			}
@@ -216,10 +215,11 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 				strncat(filename,entries->d_name,MAX_STRING_LEN);
 				strncat(filename,"/cmdline",MAX_STRING_LEN);
 				
-				if(stat(filename,&buf)!=0)	continue;
+				if(stat(filename,&buf)!=0)
+					continue;
 				
-				f2=fopen(filename,"r");
-				if(f2==NULL)			continue;
+				if(NULL == (f2 = fopen(filename,"r") ))
+					continue;
 				
 				if(fgets(line, MAX_STRING_LEN, f2) != NULL)
 				{
@@ -227,7 +227,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 						comm_ok = 1;
 				}
 
-				fclose(f2);
+				zbx_fclose(f2);
 			} else {
 				comm_ok = 1;
 			}
@@ -292,7 +292,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 			}
 		}
 	}
-	if(f) fclose(f);
+	zbx_fclose(f);
 	closedir(dir);
 
 	if(first == 0)
@@ -433,8 +433,7 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 			continue;
 		}
 
-                f=fopen(filename,"r");
-                if(f==NULL)
+                if(NULL == (f = fopen(filename,"r") ))
                 {
 			continue;
                 }
@@ -456,7 +455,7 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
                 
                     if(proc_ok == 0) 
                     {
-                        fclose(f);
+                        zbx_fclose(f);
                         continue;
                     }
                 }
@@ -520,7 +519,7 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
                 {
                     usr_ok = 1;
                 }
-                fclose(f);
+                zbx_fclose(f);
 		
 		comm_ok = 0;
 		if(proccomm[0] != '\0')
@@ -529,16 +528,17 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 			strncat(filename,entries->d_name,MAX_STRING_LEN);
 			strncat(filename,"/cmdline",MAX_STRING_LEN);
 			
-			if(stat(filename,&buf)!=0)	continue;
+			if(stat(filename,&buf)!=0)
+				continue;
 			
-			f=fopen(filename,"r");
-			if(f==NULL)			continue;
+			if(NULL == (f = fopen(filename,"r") ))
+				continue;
 			
 			if(fgets(line, MAX_STRING_LEN, f) != NULL)
 				if(zbx_regexp_match(line,proccomm,NULL) != NULL)
 					comm_ok = 1;
 
-			fclose(f);
+			zbx_fclose(f);
 		} else {
 			comm_ok = 1;
 		}

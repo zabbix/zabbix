@@ -559,8 +559,7 @@ int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGEN
 
         init_result(result);
 
-	f=fopen("/proc/stat","r");
-	if(f)
+	if(NULL != ( f = fopen("/proc/stat","r") ))
 	{
 		while(fgets(line,MAX_STRING_LEN,f) != NULL)
 		{
@@ -574,7 +573,7 @@ int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGEN
 				break;
 			}
 		}
-		fclose(f);
+		zbx_fclose(f);
 	}
 
 	return ret;

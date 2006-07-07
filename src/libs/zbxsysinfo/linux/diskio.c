@@ -97,8 +97,7 @@ static int get_disk_stat(const char *interface, struct disk_stat_s *result)
 
 	assert(result);
 
-	f=fopen(INFO_FILE_NAME,"r");
-	if(f)
+	if(NULL != (f = fopen(INFO_FILE_NAME,"r") ))
 	{
 		while(fgets(line,MAX_STRING_LEN,f) != NULL)
 		{
@@ -110,7 +109,7 @@ static int get_disk_stat(const char *interface, struct disk_stat_s *result)
 				break;
 			}
 		}
-		fclose(f);
+		zbx_fclose(f);
 	}
 
 	if(ret != SYSINFO_RET_OK)

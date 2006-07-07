@@ -20,6 +20,10 @@
 #ifndef ZABBIX_PERFMON_H
 #define ZABBIX_PERFMON_H
 
+#if !defined(WIN32)
+#	error "This module allowed only for Windows OS"
+#endif
+
 //
 // Performance Counter Indexes
 //

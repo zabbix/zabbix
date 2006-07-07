@@ -29,6 +29,7 @@
 extern ZBX_THREAD_HANDLE	*threads;
 
 #define ZABBIX_SERVICE_NAME   "ZabbixAgentdW32"
+#define ZABBIX_EVENT_SOURCE   "ZABBIX Win32 Agent"
 
 void init_service(void);
 
@@ -37,12 +38,18 @@ int ZabbixRemoveService(void);
 int ZabbixStartService(void);
 int ZabbixStopService(void);
 
+
+/* APPLICATION running status                    */
+/* requred for closing application from service  */
 extern int application_is_runned;
 
 #define ZBX_APP_STOPPED 1
 #define ZBX_APP_RUNNED 1
 
+/* ask for running application of closing status */
 #define ZBX_IS_RUNNING (ZBX_APP_RUNNED == application_is_runned)
+
+/* ask for application closing status            */
 #define ZBX_DO_EXIT() (application_is_runned = ZBX_APP_STOPPED)
 
 #endif /* ZABBIX_SERVICE_H */

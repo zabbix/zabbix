@@ -21,6 +21,11 @@
 #ifndef ZABBIX_DAEMON_H
 #define ZABBIX_DAEMON_H
 
+#if defined(WIN32)
+#	error "This module allowed only for Linux OS"
+#endif
+
+
 #include "threads.h"
 
 #define	MAXFD	64
@@ -31,7 +36,10 @@ void	init_daemon(void);
 
 void	init_parent_process(void);
 
+/* ask for application closing status - NOT needed for linux forks */
 #define ZBX_IS_RUNNING (1)
+
+/* tall all threads what application must be closed  - NOT needed for linux forks */
 #define ZBX_DO_EXIT()
 
 #endif /* ZABBIX_DAEMON_H */

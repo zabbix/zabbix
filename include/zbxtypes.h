@@ -31,6 +31,8 @@
 #	define snprintf		_snprintf
 #	define vsnprintf	_vsnprintf
 
+#	define alloca		_alloca
+
 #ifndef uint32_t
 #	define uint32_t	__int32
 #endif /* uint32_t */

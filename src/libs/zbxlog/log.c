@@ -34,6 +34,7 @@ static ZBX_MUTEX log_file_access;
 #if defined(WIN32)
 
 #include "messages.h"
+#include "service.h"
 
 static HANDLE system_log_handle = INVALID_HANDLE_VALUE;
 
@@ -82,14 +83,13 @@ int zabbix_open_log(int type, int level, const char *filename)
 			return	FAIL;
 		}
 
-		if(ZBX_MUTEX_ERROR == zbx_mutex_create(&log_file_access, "/tmp/zbxlmtx"))
+		if(ZBX_MUTEX_ERROR == zbx_mutex_create(&log_file_access, "log"))
 		{
 			zbx_error("Unable to create mutex for log file");
 			return	FAIL;
 		}
 		
-		log_file = fopen(filename,"a+");
-		if(log_file == NULL)
+		if(NULL == (log_file = fopen(filename,"a+")))
 		{
 			zbx_error("Unable to open log file [%s] [%s]", filename, strerror(errno));
 			return	FAIL;

@@ -60,8 +60,7 @@ int	parse_cfg_file(char *cfg_file,struct cfg_line *cfg)
 
 	int	i,var;
 
-	file = fopen(cfg_file,"r");
-	if(NULL == file)
+	if(NULL == (file = fopen(cfg_file,"r")))
 	{
 		zbx_error("Cannot open config file [%s] [%s].",cfg_file,strerror(errno));
 		return	FAIL;
