@@ -1,6 +1,6 @@
 Changes for 1.1.1:
 
- - fixed B24 en-decoding of large data (Alexei)
+ - fixed B64 en-decoding of large data (Alexei)
  - fixed problem with undefined PACKETSZ under Mac OS/X (Alexei)
  - disabled excessive debug printing for system.run (Alexei)
  - umask(022) changed to umask(002) (Alexei)
