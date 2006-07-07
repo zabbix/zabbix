@@ -64,28 +64,37 @@
 	{0}
 };*/
 
+extern char    *CONFIG_STAT_FILE;
+
 void	collect_statistics()
 {
 	FILE	*file;
 
+	char	tmpname[MAX_STRING_LEN];
+
 	for(;;)
 	{
-		file=fopen("/tmp/zabbix_agentd.tmp2","w");
+		memset(tmpname, 0, MAX_STRING_LEN);
+		strscpy(tmpname, CONFIG_STAT_FILE);
+		strncat(tmpname, "2", MAX_STRING_LEN);
+		file=fopen(tmpname,"w");
 		if(NULL == file)
 		{
-			zabbix_log( LOG_LEVEL_CRIT, "Cannot open file [%s] [%s]\n","/tmp/zabbix_agentd.tmp2", strerror(errno));
-			exit(1);
+			zabbix_log( LOG_LEVEL_CRIT, "Cannot open file [%s] [%s]",tmpname, strerror(errno));
+			return;
 		}
-		else
-		{
-			/* Here is list of functions to call periodically */
-			collect_stats_interfaces(file);
-			collect_stats_diskdevices(file);
-			collect_stats_cpustat(file);
+		/* Here is list of functions to call periodically */
+		collect_stats_interfaces(file);
+		collect_stats_diskdevices(file);
+		collect_stats_cpustat(file);
 
-			fclose(file);
-			rename("/tmp/zabbix_agentd.tmp2","/tmp/zabbix_agentd.tmp");
+		fclose(file);
+		if(-1 == rename(tmpname,CONFIG_STAT_FILE))
+		{
+			zabbix_log( LOG_LEVEL_CRIT, "Cannot rename file [%s] to [%s] [%s]",tmpname,CONFIG_STAT_FILE,strerror(errno));
+			return;
 		}
+
 		sleep(1);
 	}
 }
