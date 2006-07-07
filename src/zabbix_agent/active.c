@@ -331,14 +331,14 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 int	send_value(char *server,int port,char *host, char *key,char *value, char *lastlogsize)
 {
 	int	i,s;
-	char	tosend[MAX_STRING_LEN];
+	char	tosend[MAX_BUF_LEN];
 	char	result[MAX_STRING_LEN];
 	struct hostent *hp;
 
 	struct sockaddr_in myaddr_in;
 	struct sockaddr_in servaddr_in;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In send_value([%s])",lastlogsize);
+	zabbix_log( LOG_LEVEL_DEBUG, "In send_value([%s])",value);
 
 	servaddr_in.sin_family=AF_INET;
 	hp=gethostbyname(server);
@@ -379,7 +379,7 @@ int	send_value(char *server,int port,char *host, char *key,char *value, char *la
 
 	comms_create_request(host, key, value, lastlogsize, tosend, sizeof(tosend)-1);
 /*	snprintf(tosend,sizeof(tosend)-1,"%s:%s\n",shortname,value); */
-	zabbix_log( LOG_LEVEL_DEBUG, "XML before sonding [%s]",tosend);
+	zabbix_log( LOG_LEVEL_DEBUG, "XML before sending [%s]",tosend);
 
 	if( sendto(s,tosend,strlen(tosend),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
 	{

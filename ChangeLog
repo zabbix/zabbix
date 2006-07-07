@@ -1,5 +1,6 @@
 Changes for 1.1.1:
 
+ - fixed processing of web.page.get and long data sent by agent (Alexei)
  - fixed B64 en-decoding of large data (Alexei)
  - fixed problem with undefined PACKETSZ under Mac OS/X (Alexei)
  - disabled excessive debug printing for system.run (Alexei)
