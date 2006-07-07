@@ -410,6 +410,8 @@ void	version();
 #define ZBX_TASK_TEST_METRIC     4
 #define ZBX_TASK_SHOW_USAGE      5
 
+/* MAX Length of base64 data */
+#define ZBX_MAX_B64_LEN 16*1024
 
 void   	init_result(AGENT_RESULT *result);
 int    	copy_result(AGENT_RESULT *src, AGENT_RESULT *dist);
