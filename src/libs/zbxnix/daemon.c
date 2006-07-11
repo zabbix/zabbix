@@ -106,19 +106,19 @@ void    init_daemon(void)
 
 	}
 
-	if( (pid = fork()) != 0 )	/* ???? Why and Why "!= 0" possiable " < 0" ???? - by Eugene !!!*/
-	{				/* ???? Why and Why "!= 0" possiable " < 0" ???? - by Eugene !!!*/
-		exit( 0 );		/* ???? Why and Why "!= 0" possiable " < 0" ???? - by Eugene !!!*/
-	}				/* ???? Why and Why "!= 0" possiable " < 0" ???? - by Eugene !!!*/
+	if( (pid = fork()) != 0 )	
+	{				
+		exit( 0 );		
+	}				
 
 	setsid();
 	
 	signal( SIGHUP, SIG_IGN );
 
-	if( (pid = fork()) !=0 )	/* ???? Why and Why "!= 0" possiable " < 0" ???? - by Eugene !!!*/
-	{				/* ???? Why and Why "!= 0" possiable " < 0" ???? - by Eugene !!!*/
-		exit( 0 );		/* ???? Why and Why "!= 0" possiable " < 0" ???? - by Eugene !!!*/
-	}				/* ???? Why and Why "!= 0" possiable " < 0" ???? - by Eugene !!!*/
+	if( (pid = fork()) !=0 )	
+	{				
+		exit( 0 );		
+	}				
 
 	chdir("/");
 	umask(022);
@@ -126,12 +126,12 @@ void    init_daemon(void)
 	for(i=0; i<MAXFD; i++)
 	{
 		/* Do not close stderr */
-		if(i != fileno(stderr)) close(i);
+		if(i == fileno(stderr)) continue; //TODO!!! redirection;
+		/* Do not close stdout */
+		if(i == fileno(stdout)) continue; //TODO!!! redirestion;
+
+		close(i);
 	}
-
-/*	openlog("zabbix_agentd",LOG_LEVEL_PID,LOG_USER);
-	setlogmask(LOG_UPTO(LOG_WARNING));*/
-
 
 #ifdef HAVE_SYS_RESOURCE_SETPRIORITY
 
@@ -145,14 +145,10 @@ void    init_daemon(void)
 
 //------------------------------------------------
 
-#ifdef USE_PID_FILE
-
-	if( FAIL == create_pid_file(CONFIG_PID_FILE))
+	if( FAIL == create_pid_file(APP_PID_FILE))
 	{
 		exit(FAIL);
 	}
-
-#endif /* USE_PID_FILE */
 
 	phan.sa_handler = child_signal_handler;
 	sigemptyset(&phan.sa_mask);
@@ -166,6 +162,11 @@ void    init_daemon(void)
 	zbx_setproctitle("main process");
 
 	MAIN_ZABBIX_ENTRY();
+}
+
+void	uninit_daemon(void)
+{	
+	drop_pid_file(APP_PID_FILE);
 }
 
 void	init_parent_process(void)

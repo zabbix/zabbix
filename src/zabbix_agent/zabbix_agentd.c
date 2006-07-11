@@ -24,38 +24,45 @@
 #include "zabbix_agent.h"
 
 #include "cfg.h"
-#include "pid.h"
 #include "log.h"
 #include "zbxconf.h"
 #include "zbxgetopt.h"
 #include "zbxsock.h"
 #include "mutexs.h"
+#include "alias.h"
 
 #include "stats.h"
 #include "active.h"
 #include "listener.h"
 
-#if defined(WIN32)
+#if defined(ZABBIX_SERVICE)
+
 #	include "service.h"
-#else /* not WIN32 */
+
+#elif defined(ZABBIX_DAEMON) /* ZABBIX_SERVICE */
+
 #	include "daemon.h"
-#endif /* WIN32 */
 
-#include "alias.h"
+#endif /* ZABBIX_DAEMON */
 
-#define	LISTENQ 1024
 
 char *progname = NULL;
 
-char title_message[] = "ZABBIX Agent"
 
-#if defined(WIN32)
-	#if defined(ZABBIX_DAEMON)
-		" (service)";
-	#else /* not WIN32 */
-		" (daemon)";
-	#endif
-#endif
+/* application TITLE */
+
+char title_message[] = "ZABBIX Agent"
+#if defined(ZABBIX_SERVICE)
+		" (service)"
+#elif defined(ZABBIX_DAEMON) /* ZABBIX_SERVICE */
+		" (daemon)"
+#endif /* ZABBIX_DAEMON */
+	;
+/* end of application TITLE */
+
+
+
+/* application USAGE message */
 
 char usage_message[] = 
 	"[-vhp]"
@@ -63,6 +70,12 @@ char usage_message[] =
 	" [-iusx]"
 #endif /* WIN32 */
 	" [-c <file>] [-t <metric>]";
+
+/*end of application USAGE message */
+
+
+
+/* application HELP message */
 
 char *help_message[] = {
 	"Options:",
@@ -89,7 +102,13 @@ char *help_message[] = {
 	0 /* end of text */
 };
 
-/* COMMAND LINE OPTIONS - Start */
+/* end of application HELP message */
+
+
+
+/* COMMAND LINE OPTIONS */
+
+/* long options */
 
 static struct zbx_option longopts[] =
 {
@@ -112,6 +131,8 @@ static struct zbx_option longopts[] =
 	{0,0,0,0}
 };
 
+/* short options */
+
 static char	shortopts[] = 
 	"c:hvpt:"
 #if defined (WIN32)
@@ -119,7 +140,9 @@ static char	shortopts[] =
 #endif /* WIN32 */
 	;
 
-/* COMMAND LINE OPTIONS - End*/
+/* end of COMMAND LINE OPTIONS*/
+
+
 
 static char	*TEST_METRIC = NULL;
 
@@ -246,12 +269,12 @@ void MAIN_ZABBIX_ENTRY(void)
 
 	/* --- START THREADS ---*/
 
-	threads = calloc(CONFIG_AGENTD_FORKS, sizeof(ZBX_THREAD_HANDLE));
+	threads = calloc(CONFIG_ZABBIX_FORKS, sizeof(ZBX_THREAD_HANDLE));
 
 	threads[i=0] = zbx_thread_start(collector_thread, NULL);
 
 	/* start listeners */
-	for(i++; i < CONFIG_AGENTD_FORKS - ((0 == CONFIG_DISABLE_ACTIVE) ? 1 : 0); i++)
+	for(i++; i < CONFIG_ZABBIX_FORKS - ((0 == CONFIG_DISABLE_ACTIVE) ? 1 : 0); i++)
 	{
 		threads[i] = zbx_thread_start(listener_thread, &sock);
 	}
@@ -266,13 +289,13 @@ void MAIN_ZABBIX_ENTRY(void)
 	}
 
 #if !defined(WIN32)
-	
+	/* Must be called after all child processes loading. */
 	init_parent_process();
 
 #endif
 
 	/* wait for all threads exiting */
-	for(i = 0; i < CONFIG_AGENTD_FORKS; i++)
+	for(i = 0; i < CONFIG_ZABBIX_FORKS; i++)
 	{
 		if(zbx_thread_wait(threads[i]))
 		{
@@ -296,7 +319,7 @@ void	zbx_on_exit()
 
 	if(threads != NULL)
 	{
-		for(i = 0; i<CONFIG_AGENTD_FORKS; i++)
+		for(i = 0; i<CONFIG_ZABBIX_FORKS ; i++)
 		{
 			if(threads[i]) {
 				kill(threads[i],SIGTERM);
@@ -308,12 +331,8 @@ void	zbx_on_exit()
 #endif /* not WIN32 */
 
 #ifdef USE_PID_FILE
-	
-	if(unlink(CONFIG_PID_FILE) != 0)
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "Cannot remove PID file [%s]",
-			CONFIG_PID_FILE);
-	}
+
+	uninit_daemon();
 
 #endif /* USE_PID_FILE */
 

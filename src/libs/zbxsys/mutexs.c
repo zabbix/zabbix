@@ -20,9 +20,9 @@
 #include "common.h"
 #include "mutexs.h"
 
-#if defined(ZBX_SHARED_MUTEX)
+#if !defined(WIN32)
 
-	#if !defined(semun)
+#	if !defined(semun)
 		union semun
 		{
 			int val;			/* <= value for SETVAL */
@@ -30,13 +30,11 @@
 			unsigned short int *array;	/* <= array for GETALL & SETALL */
 			struct seminfo *__buf;		/* <= buffer for IPC_INFO */
 		};
-	#endif /* semun */
+#	endif /* semun */
 
-	#include <sys/types.h>
-	#include <sys/ipc.h>
-	#include <sys/sem.h>
+#	include "cfg.h"
 
-#endif /* ZBX_SHARED_MUTEX */
+#endif /* not WIN32 */
 
 #include "log.h"
 
@@ -69,37 +67,27 @@ int zbx_mutex_create(ZBX_MUTEX *mutex, char *name)
 
 #else /* not WIN32 */
 
-#if defined(ZBX_SHARED_MUTEX)
-
 	key_t	sem_key;
 	int	sem_id;
 	union semun semopts;
+	char	path_name[MAX_STRING_LEN];
 
-	CONFIG_FILE + name;
+	zbx_snprintf(path_name, MAX_STRING_LEN, "%s.%s", CONFIG_FILE , name);
 
-	sem_key = ftok(name, 'z');
+	sem_key = ftok(path_name, 'z');
 
-	if ((sem_id = semget(sem_key, 1, IPC_CREAT | 0666 /* 0022 */)) == -1)
+	if ((sem_id = semget(sem_key, 1, IPC_CREAT | 0022)) == -1)
 	{
 		zbx_error("Semaphore set does not exist!");
 		return ZBX_MUTEX_ERROR;
 	}
 
+	/* set default semaphore value */
 	semopts.val = 1;
 	semctl(sem_id, 0, SETVAL, semopts);
 
 	*mutex = sem_id;
 	
-#else /* not ZBX_SHARED_MUTEX */
-
- 	if(pthread_mutex_init(mutex, NULL) < 0)
-	{
-		zbx_error("Error on mutex creating.");
-		return ZBX_MUTEX_ERROR;
-	}
-
-#endif /* ZBX_SHARED_MUTEX */
-
 #endif /* WIN32 */
 
 	return ZBX_MUTEX_OK;
@@ -136,8 +124,6 @@ int zbx_mutex_lock(ZBX_MUTEX *mutex)
 
 #else /* not WIN32 */
 
-#if defined(ZBX_SHARED_MUTEX)
-
 	struct sembuf sem_lock = { 0, -1, 0 };
 
 	if (-1 == (semop(*mutex, &sem_lock, 1)))
@@ -146,16 +132,6 @@ int zbx_mutex_lock(ZBX_MUTEX *mutex)
 		return ZBX_MUTEX_ERROR;
 	}
 	
-#else /* not ZBX_SHARED_MUTEX */
-
-	if(pthread_mutex_lock(mutex) < 0)
-	{
-		zbx_error("Error on mutex locking.");
-		return ZBX_MUTEX_ERROR;
-	}
-
-#endif /* ZBX_SHARED_MUTEX */
-
 #endif /* WIN32 */
 
 	return ZBX_MUTEX_OK;
@@ -192,8 +168,6 @@ int zbx_mutex_unlock(ZBX_MUTEX *mutex)
 
 #else /* not WIN32 */
 
-#if defined(ZBX_SHARED_MUTEX)
-
 	struct sembuf sem_unlock = { 0, 1, 0};
 
 	if ((semop(*mutex, &sem_unlock, 1)) == -1)
@@ -202,16 +176,6 @@ int zbx_mutex_unlock(ZBX_MUTEX *mutex)
 		return ZBX_MUTEX_ERROR;
 	}
 	
-#else /* not ZBX_SHARED_MUTEX */
-
-	if(pthread_mutex_unlock(mutex) < 0)
-	{
-		zbx_error("Error on mutex UNlocking.");
-		return ZBX_MUTEX_ERROR;
-	}
-
-#endif /* ZBX_SHARED_MUTEX */
-
 #endif /* WIN32 */
 
 	return ZBX_MUTEX_OK;
@@ -247,19 +211,7 @@ int zbx_mutex_destroy(ZBX_MUTEX *mutex)
 
 #else /* not WIN32 */
 	
-#if defined(ZBX_SHARED_MUTEX)
-
 	semctl(*mutex, 0, IPC_RMID, 0);
-	
-#else /* not ZBX_SHARED_MUTEX */
-
-	if(pthread_mutex_destroy(mutex) < 0)
-	{
-		zbx_error("Error on mutex destroying.");
-		return ZBX_MUTEX_ERROR;
-	}
-
-#endif /* ZBX_SHARED_MUTEX */
 
 #endif /* WIN32 */
 	

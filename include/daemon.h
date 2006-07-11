@@ -33,6 +33,7 @@
 void    child_signal_handler(int sig);
 
 void	init_daemon(void);
+void	uninit_daemon(void);
 
 void	init_parent_process(void);
 

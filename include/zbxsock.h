@@ -42,7 +42,7 @@
 #endif /* ECONNRESET */
 
 #if !defined(SOMAXCONN)
-#	define SOMAXCONN	LISTENQ
+#	define SOMAXCONN	1024
 #endif /* SOMAXCONN */
 
 #if defined(SOCKET)

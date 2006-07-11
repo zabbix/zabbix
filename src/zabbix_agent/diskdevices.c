@@ -23,30 +23,15 @@
 
 void	collect_stats_diskdevices(ZBX_DISKDEVICES_DATA *pdiskdevices)
 {
-
+#if defined(TODO)
+#error "Realize function"
+#endif
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #if 0 && (!defined(WIN32) || (defined(TODO) && defined(WIN32)))
+
+//TODO!!! Make same as cpustat.c
 
 #include <netdb.h>
 

@@ -24,6 +24,11 @@
 #	error "This module allowed only for Linux OS"
 #endif
 
-int create_pid_file(const char *pidfile);
+#if !defined(USE_PID_FILE)
+#	error "To use this module use USE_PID_FILE definision before including."
+#endif
+
+int	create_pid_file(const char *pidfile);
+void	drop_pid_file(const char *pidfile);
 
 #endif

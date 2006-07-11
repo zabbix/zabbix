@@ -34,9 +34,13 @@
 #define AF_USE_EVENT_LOG            0x0002
 #define AF_LOG_UNRESOLVED_SYMBOLS   0x0004
 
-extern int	CONFIG_AGENTD_FORKS;
+extern int	CONFIG_ZABBIX_FORKS;
 extern char	*CONFIG_FILE;
-extern char	*CONFIG_PID_FILE;
+
+#ifdef USE_PID_FILE
+	extern char		*CONFIG_PID_FILE;
+#endif /* USE_PID_FILE */
+
 extern char	*CONFIG_LOG_FILE;
 extern char	CONFIG_ALLOW_ROOT_PERMISSION;
 extern int	CONFIG_TIMEOUT;

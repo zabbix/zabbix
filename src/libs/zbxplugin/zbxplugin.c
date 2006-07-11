@@ -18,6 +18,7 @@
 **/
 
 #include "common.h"
+
 #include "zbxplugin.h"
 
 ZBX_PLUGIN_LIST	*PluginsList = NULL;

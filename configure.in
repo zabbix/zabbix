@@ -47,7 +47,7 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   sys/var.h resolv.h arpa/nameser.h assert.h sys/dkstat.h sys/disk.h \
   nlist.h net/if.h kvm.h linux/kernel.h ldap.h getopt.h procinfo.h sys/dk.h \
   sys/resource.h pthread.h windows.h process.h conio.h sys/wait.h regex.h \
-  stdarg.h winsock2.h pdh.h psapi.h semaphore.h)
+  stdarg.h winsock2.h pdh.h psapi.h sys/sem.h sys/ipc.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST

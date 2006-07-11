@@ -36,8 +36,7 @@ static void	init_active_metrics()
 
 	if(NULL == active_metrics)
 	{
-		active_metrics = malloc(sizeof(ZBX_ACTIVE_METRIC));
-		memset(active_metrics, 0, sizeof(ZBX_ACTIVE_METRIC));
+		active_metrics = calloc(sizeof(ZBX_ACTIVE_METRIC), 1);
 	}
 	else
 	{

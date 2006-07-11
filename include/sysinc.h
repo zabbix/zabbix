@@ -266,12 +266,16 @@
 #	endif
 #endif
 
-#ifdef HAVE_MATH_H
-#	include <math.h>
+#ifdef HAVE_SYS_IPC_H
+#	include <sys/ipc.h>
 #endif
 
-#ifdef HAVE_SEMAPHORE_H
-#	include <semaphore.h>
+#ifdef HAVE_SYS_SEM_H
+#	include <sys/sem.h>
+#endif
+
+#ifdef HAVE_MATH_H
+#	include <math.h>
 #endif
 
 #ifdef HAVE_REGEX_H

@@ -44,7 +44,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "NDEBUG" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /FR /YX /FD /c
+# ADD CPP /nologo /MT /W3 /GX /O2 /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "NDEBUG" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "ZABBIX_SERVICE" /FR /YX /FD /c
 # ADD BASE RSC /l 0x419 /d "NDEBUG"
 # ADD RSC /l 0x409 /fo"Release/zabbixw32.res" /d "NDEBUG"
 BSC32=bscmake.exe
@@ -68,7 +68,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /FR /YX /FD /GZ /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "ZABBIX_SERVICE" /FR /YX /FD /GZ /c
 # ADD BASE RSC /l 0x419 /d "_DEBUG"
 # ADD RSC /l 0x409 /fo"Debug/zabbixw32.res" /d "_DEBUG"
 BSC32=bscmake.exe
@@ -93,7 +93,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "../include/" /I "../../../include/" /D "_DEBUG" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /FR /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "TODO" /FR /YX /FD /GZ /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "TODO" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "ZABBIX_SERVICE" /FR /YX /FD /GZ /c
 # ADD BASE RSC /l 0x409 /fo"Debug/zabbixw32.res" /d "_DEBUG"
 # ADD RSC /l 0x409 /fo"Debug/zabbixw32.res" /d "_DEBUG"
 BSC32=bscmake.exe
@@ -118,7 +118,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /FR /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "ZABBIX_TEST" /FR /YX /FD /GZ /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "ZABBIX_TEST" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "ZABBIX_SERVICE" /FR /YX /FD /GZ /c
 # ADD BASE RSC /l 0x409 /fo"Debug/zabbixw32.res" /d "_DEBUG"
 # ADD RSC /l 0x409 /fo"Debug/zabbixw32.res" /d "_DEBUG"
 BSC32=bscmake.exe
@@ -139,7 +139,7 @@ LINK32=link.exe
 # Begin Group "src"
 
 # PROP Default_Filter ""
-# Begin Group "lib"
+# Begin Group "libs"
 
 # PROP Default_Filter ""
 # Begin Group "zbxcommon"
@@ -221,28 +221,2135 @@ SOURCE=..\..\..\src\libs\zbxconf\cfg.c
 # Begin Group "zbxsysinfo"
 
 # PROP Default_Filter ""
-# Begin Group "common"
+# Begin Group "aix"
 
 # PROP Default_Filter ""
 # Begin Source File
 
-SOURCE=..\..\..\src\libs\zbxsysinfo\common\common.c
+SOURCE=..\..\..\src\libs\zbxsysinfo\aix\aix.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\src\libs\zbxsysinfo\common\file.c
+SOURCE=..\..\..\src\libs\zbxsysinfo\aix\AIX_new.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\src\libs\zbxsysinfo\common\http.c
+SOURCE=..\..\..\src\libs\zbxsysinfo\aix\cpu.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\src\libs\zbxsysinfo\common\ntp.c
+SOURCE=..\..\..\src\libs\zbxsysinfo\aix\diskio.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\src\libs\zbxsysinfo\common\system.c
+SOURCE=..\..\..\src\libs\zbxsysinfo\aix\diskspace.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\aix\inodes.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\aix\kernel.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\aix\memory.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\aix\net.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\aix\proc.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\aix\sensors.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\aix\swap.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\aix\uptime.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# End Group
+# Begin Group "freebsd"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\freebsd\cpu.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\freebsd\diskio.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\freebsd\diskspace.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\freebsd\freebsd.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\freebsd\inodes.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\freebsd\kernel.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\freebsd\memory.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\freebsd\net.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\freebsd\proc.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\freebsd\sensors.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\freebsd\swap.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\freebsd\uptime.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# End Group
+# Begin Group "hpux"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\hpux\cpu.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\hpux\diskio.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\hpux\diskspace.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\hpux\hpux.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\hpux\inodes.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\hpux\kernel.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\hpux\memory.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\hpux\net.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\hpux\proc.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\hpux\sensors.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\hpux\swap.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\hpux\uptime.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# End Group
+# Begin Group "linux"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\linux\cpu.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\linux\diskio.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\linux\diskspace.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\linux\inodes.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\linux\kernel.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\linux\linux.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\linux\memory.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\linux\net.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\linux\proc.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\linux\sensors.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\linux\swap.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\linux\uptime.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# End Group
+# Begin Group "netbsd"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\netbsd\cpu.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\netbsd\diskio.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\netbsd\diskspace.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\netbsd\inodes.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\netbsd\kernel.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\netbsd\memory.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\netbsd\net.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\netbsd\netbsd.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\netbsd\proc.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\netbsd\sensors.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\netbsd\swap.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\netbsd\uptime.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# End Group
+# Begin Group "openbsd"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\openbsd\cpu.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\openbsd\diskio.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\openbsd\diskspace.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\openbsd\inodes.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\openbsd\kernel.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\openbsd\memory.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\openbsd\net.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\openbsd\openbsd.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\openbsd\OpenBSD3.7.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\openbsd\proc.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\openbsd\sensors.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\openbsd\swap.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\openbsd\uptime.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# End Group
+# Begin Group "osf"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\osf\cpu.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\osf\diskio.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\osf\diskspace.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\osf\inodes.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\osf\kernel.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\osf\memory.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\osf\net.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\osf\osf.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\osf\proc.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\osf\sensors.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\osf\swap.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\osf\uptime.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# End Group
+# Begin Group "osx"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\osx\cpu.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\osx\diskio.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\osx\diskspace.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\osx\inodes.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\osx\kernel.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\osx\memory.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\osx\net.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\osx\osx.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\osx\proc.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\osx\sensors.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\osx\swap.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\osx\uptime.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# End Group
+# Begin Group "solaris"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\solaris\cpu.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\solaris\diskio.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\solaris\diskspace.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\solaris\inodes.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\solaris\kernel.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\solaris\memory.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\solaris\net.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\solaris\proc.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\solaris\sensors.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\solaris\solaris.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\solaris\SunOS5.9.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\solaris\swap.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\solaris\uptime.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# End Group
+# Begin Group "unknown"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\unknown\cpu.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\unknown\diskio.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\unknown\diskspace.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\unknown\inodes.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\unknown\kernel.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\unknown\memory.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\unknown\net.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\unknown\proc.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\unknown\sensors.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\unknown\swap.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\unknown\unknown.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\unknown\uptime.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Exclude_From_Build 1
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+!ENDIF 
+
 # End Source File
 # End Group
 # Begin Group "win32"
@@ -299,6 +2406,30 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\win32\uptime.c
 # Begin Source File
 
 SOURCE=..\..\..\src\libs\zbxsysinfo\win32\win32.c
+# End Source File
+# End Group
+# Begin Group "common"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\common\common.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\common\file.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\common\http.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\common\ntp.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\common\system.c
 # End Source File
 # End Group
 # End Group
@@ -731,6 +2862,58 @@ InputName=resources
 
 !ENDIF 
 
+# End Source File
+# End Group
+# Begin Group "Package Files"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\..\configure.in
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\do
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\go
+# End Source File
+# End Group
+# Begin Group "Documentation"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\..\AUTHORS
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\ChangeLog
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\COPYING
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\FAQ
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\INSTALL
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\NEWS
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\README
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\TODO
 # End Source File
 # End Group
 # End Target

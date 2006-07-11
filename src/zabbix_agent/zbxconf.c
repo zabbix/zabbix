@@ -23,27 +23,26 @@
 #include "cfg.h"
 #include "log.h"
 #include "alias.h"
-#include "zbxplugin.h"
 #include "sysinfo.h"
 
+#if defined(WITH_PLUGINS)
+#	include "zbxplugin.h"
+#endif /* WITH_PLUGINS */
 
 #ifdef WIN32
-
-static char	DEFAULT_CONFIG_FILE[]	= "C:\\zabbix_agentd.conf";
-static char	*DEFAULT_PID_FILE	= NULL;
-
+	static char	DEFAULT_CONFIG_FILE[]	= "C:\\zabbix_agentd.conf";
 #else /* not WIN32 */
-
-static char	DEFAULT_CONFIG_FILE[]	= "/etc/zabbix/zabbix_agentd.conf";
-static char	DEFAULT_PID_FILE[]	= "/tmp/zabbix_agentd.pid";
-
+	static char	DEFAULT_CONFIG_FILE[]	= "/etc/zabbix/zabbix_agentd.conf";
 #endif /* WIN32 */
 
+#ifdef USE_PID_FILE
+	static char	DEFAULT_PID_FILE[]	= "/tmp/zabbix_agentd.pid";
+#endif /* USE_PID_FILE */
 
 char	*CONFIG_HOSTS_ALLOWED		= NULL;
 char	*CONFIG_HOSTNAME		= NULL;
 
-/* int	CONFIG_NOTIMEWAIT		= 0; */
+
 int	CONFIG_DISABLE_ACTIVE		= 0;
 int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
 int	CONFIG_LISTEN_PORT	= 10050;
@@ -70,25 +69,24 @@ void    load_config(int exit_on_error)
 		{"LogFile",		&CONFIG_LOG_FILE,	0,TYPE_STRING,	PARM_OPT,	0,0},
 		{"DisableActive",	&CONFIG_DISABLE_ACTIVE,	0,TYPE_INT,	PARM_OPT,	0,1},
 		{"Timeout",		&CONFIG_TIMEOUT,	0,TYPE_INT,	PARM_OPT,	1,30},
-/*		{"NoTimeWait",		&CONFIG_NOTIMEWAIT,	0,TYPE_INT,	PARM_OPT,	0,1},*/
 		{"ListenPort",		&CONFIG_LISTEN_PORT,	0,TYPE_INT,	PARM_OPT,	1024,32767},
 		{"ServerPort",		&CONFIG_SERVER_PORT,	0,TYPE_INT,	PARM_OPT,	1024,32767},
 		{"ListenIP",		&CONFIG_LISTEN_IP,	0,TYPE_STRING,	PARM_OPT,	0,0},
 
 		{"DebugLevel",		&CONFIG_LOG_LEVEL,	0,TYPE_INT,	PARM_OPT,	0,5},
 
-		{"StartAgents",		&CONFIG_AGENTD_FORKS,		0,TYPE_INT,	PARM_OPT,	1,16},
+		{"StartAgents",		&CONFIG_ZABBIX_FORKS,		0,TYPE_INT,	PARM_OPT,	1,16},
 		{"RefreshActiveChecks",	&CONFIG_REFRESH_ACTIVE_CHECKS,	0,TYPE_INT,	PARM_OPT,60,3600},
 		{"EnableRemoteCommands",&CONFIG_ENABLE_REMOTE_COMMANDS,	0,TYPE_INT,	PARM_OPT,0,1},
 		{"AllowRootPermission",	&CONFIG_ALLOW_ROOT_PERMISSION,	0,TYPE_INT,	PARM_OPT,0,1},
 		
 //		{"PerfCounter",		&CONFIG_PERF_COUNTER,		0,	TYPE_STRING,PARM_OPT,0,0},
-//		{"CollectorTimeout",	&CONFIG_COLLECTOR_TIMEOUT,	0,	TYPE_STRING,PARM_OPT,0,0},
-		{"LogUnresolvedSymbols",&CONFIG_LOG_UNRES_SYMB,			0,	TYPE_STRING,PARM_OPT,0,1},
+
+		{"LogUnresolvedSymbols",&CONFIG_LOG_UNRES_SYMB,		0,	TYPE_STRING,PARM_OPT,0,1},
 
 		{"Alias",		0,	&add_alias_from_config,	TYPE_STRING,PARM_OPT,0,0},
 		
-#if defined(ZABBIX_DAEMON)
+#if defined(WITH_PLUGINS)
 		{"Plugin",		0,	&add_plugin,	TYPE_STRING,PARM_OPT,0,0},
 #endif /* ZABBIX_DAEMON */
 		

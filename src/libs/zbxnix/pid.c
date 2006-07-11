@@ -55,3 +55,11 @@ int	create_pid_file(const char *pidfile)
 
 	return SUCCEED;
 }
+
+void	drop_pid_file(const char *pidfile)
+{
+	if(unlink(pidfile) != 0)
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Cannot remove PID file [%s]", pidfile);
+	}
+}

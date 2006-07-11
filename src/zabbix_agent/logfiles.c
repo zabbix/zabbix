@@ -27,6 +27,10 @@ int   process_log(char *filename,int *lastlogsize, char *value)
 	FILE	*f;
 	struct stat	buf;
 
+	assert(filename);
+	assert(lastlogsize);
+	assert(value);
+
 	zabbix_log( LOG_LEVEL_DEBUG, "In process log (%s,%d)", filename, *lastlogsize);
 
 	/* Handling of file shrinking */

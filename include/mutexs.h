@@ -22,26 +22,17 @@
 
 #if defined(WIN32)
 
-	#define ZBX_MUTEX HANDLE
-	#define ZBX_MUTEX_ERROR (0)
-	#define ZBX_MUTEX_OK (1)
+	#define ZBX_MUTEX		HANDLE
+	#define ZBX_MUTEX_ERROR		(0)
+	#define ZBX_MUTEX_OK		(1)
 
 #else /* not WIN32 */
 
-#define ZBX_SHARED_MUTEX 1
 
-#if defined(ZBX_SHARED_MUTEX)
+	#define ZBX_MUTEX		int
 
-	#define ZBX_MUTEX int
-
-#else /* not ZBX_SHARED_MUTEX */
-
-	#define ZBX_MUTEX pthread_mutex_t
-
-#endif /* ZBX_SHARED_MUTEX */
-
-	#define ZBX_MUTEX_ERROR (-1)
-	#define ZBX_MUTEX_OK (1)
+	#define ZBX_MUTEX_ERROR		(-1)
+	#define ZBX_MUTEX_OK		(1)
 
 #endif /* WIN32 */
 
