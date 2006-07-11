@@ -407,7 +407,7 @@ int	main(int argc, char **argv)
 
 #if defined(WIN32)
 	
-	init_service();
+	service_start();
 	
 #else /* not WIN32 */
 	

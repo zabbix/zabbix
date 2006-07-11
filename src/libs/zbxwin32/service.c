@@ -124,7 +124,7 @@ static VOID WINAPI ServiceEntry(DWORD argc,LPTSTR *argv)
 // Initialize service
 //
 
-void init_service(void)
+void service_start(void)
 {
 	int c = 0;
 	static SERVICE_TABLE_ENTRY serviceTable[] = {

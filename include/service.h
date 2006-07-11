@@ -31,7 +31,7 @@ extern ZBX_THREAD_HANDLE	*threads;
 #define ZABBIX_SERVICE_NAME   "ZabbixAgentdW32"
 #define ZABBIX_EVENT_SOURCE   "ZABBIX Win32 Agent"
 
-void init_service(void);
+void service_start(void);
 
 int ZabbixCreateService(char *execName);
 int ZabbixRemoveService(void);
