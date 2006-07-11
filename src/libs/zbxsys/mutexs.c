@@ -51,7 +51,7 @@
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments:                                                                  *
+ * Comments: LINUX version can create ONLY ONE mutex!!!!!!!                   *
  *                                                                            *
  ******************************************************************************/
 
@@ -70,15 +70,20 @@ int zbx_mutex_create(ZBX_MUTEX *mutex, char *name)
 	key_t	sem_key;
 	int	sem_id;
 	union semun semopts;
-	char	path_name[MAX_STRING_LEN];
 
-	zbx_snprintf(path_name, MAX_STRING_LEN, "%s.%s", CONFIG_FILE , name);
-
-	sem_key = ftok(path_name, 'z');
-
-	if ((sem_id = semget(sem_key, 1, IPC_CREAT | 0022)) == -1)
+	if( -1 == (sem_key = ftok(CONFIG_FILE, (int)'z') ))
 	{
-		zbx_error("Semaphore set does not exist!");
+		zbx_error("Can not create IPC key for path '%s', try to create for path '.' [%s]", CONFIG_FILE, strerror(errno));
+		if( -1 == (sem_key = ftok(".", (int)'z') ))
+		{
+			zbx_error("Can not create IPC key for path '.' [%s]", strerror(errno));
+			return ZBX_MUTEX_ERROR;
+		}
+	}			
+
+	if ( -1 == (sem_id = semget(sem_key, 1, IPC_CREAT | /* 0022 */ 0666)) )
+	{
+		zbx_error("Can not create Semaphore [%s]", strerror(errno));
 		return ZBX_MUTEX_ERROR;
 	}
 

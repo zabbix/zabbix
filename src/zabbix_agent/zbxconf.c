@@ -25,7 +25,13 @@
 #include "alias.h"
 #include "sysinfo.h"
 
+#if defined(ZABBIX_DAEMON)
+/* use pid file configureation */
+#	include "daemon.h"
+#endif /* ZABBIX_DAEMON */
+
 #if defined(WITH_PLUGINS)
+/* use ZABBIX plugins configurations */
 #	include "zbxplugin.h"
 #endif /* WITH_PLUGINS */
 
@@ -63,7 +69,7 @@ void    load_config(int exit_on_error)
 		{"Hostname",		&CONFIG_HOSTNAME,	0,TYPE_STRING,	PARM_OPT,	0,0},
 
 #ifdef USE_PID_FILE
-		{"PidFile",		&CONFIG_PID_FILE,	0,TYPE_STRING,	PARM_OPT,	0,0},
+		{"PidFile",		&APP_PID_FILE,		0,TYPE_STRING,	PARM_OPT,	0,0},
 #endif /* USE_PID_FILE */
 
 		{"LogFile",		&CONFIG_LOG_FILE,	0,TYPE_STRING,	PARM_OPT,	0,0},
@@ -105,9 +111,9 @@ void    load_config(int exit_on_error)
 	parse_cfg_file(CONFIG_FILE, cfg);
 
 #ifdef USE_PID_FILE
-	if(CONFIG_PID_FILE == NULL)
+	if(APP_PID_FILE == NULL)
 	{
-		CONFIG_PID_FILE = DEFAULT_PID_FILE;
+		APP_PID_FILE = DEFAULT_PID_FILE;
 	}
 #endif /* USE_PID_FILE */
 	

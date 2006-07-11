@@ -27,7 +27,12 @@
 #include "sysinfo.h"
 #include "log.h"
 #include "zbxsecurity.h"
-#include "service.h"
+
+#if defined(ZABBIX_SERVICE)
+#	include "service.h"
+#elif defined(ZABBIX_DAEMON) /* ZABBIX_SERVICE */
+#	include "daemon.h"
+#endif /* ZABBIX_DAEMON */
 
 static void	process_listener(ZBX_SOCKET sock)
 {

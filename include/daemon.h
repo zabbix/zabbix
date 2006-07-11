@@ -25,6 +25,9 @@
 #	error "This module allowed only for Linux OS"
 #endif
 
+#define USE_PID_FILE (1)
+
+extern char	*APP_PID_FILE;
 
 #include "threads.h"
 
@@ -32,10 +35,10 @@
 
 void    child_signal_handler(int sig);
 
-void	init_daemon(void);
-void	uninit_daemon(void);
+int	daemon_start(int allow_root);
+void	daemon_stop(void);
 
-void	init_parent_process(void);
+void	init_main_process(void);
 
 /* ask for application closing status - NOT needed for linux forks */
 #define ZBX_IS_RUNNING (1)

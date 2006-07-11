@@ -22,17 +22,12 @@
 
 #include "pid.h"
 #include "log.h"
-#include "cfg.h"
+
+char	*APP_PID_FILE	= NULL;
 
 static int	parent = 0;
 
-static void	uninit(void)
-{
-	if(parent == 1)
-	{
-		zbx_on_exit();
-	}
-}
+#define uninit() { if(parent == 1) zbx_on_exit(); }
 
 void	child_signal_handler(int sig)
 {
@@ -72,16 +67,31 @@ static void	parent_signal_handler(int sig)
 }
 
 
+/******************************************************************************
+ *                                                                            *
+ * Function: daemon_start                                                     *
+ *                                                                            *
+ * Purpose: init process as daemon                                            *
+ *                                                                            *
+ * Parameters: allow_root - allow root permision for application              *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: it doesn't allow running under 'root' if allow_root is zerro     *
+ *                                                                            *
+ ******************************************************************************/
 
-void    init_daemon(void)
+int	daemon_start(int allow_root)
 {
-	int     i;
-	pid_t   pid;
-	struct passwd	*pwd;
+	int     		i;
+	pid_t   		pid;
+	struct passwd		*pwd;
 	struct sigaction	phan;
 
 	/* running as root ?*/
-	if((0 == CONFIG_ALLOW_ROOT_PERMISSION) && (0 == getuid() || 0 == getgid()))
+	if((0 == allow_root) && (0 == getuid() || 0 == getgid()))
 	{
 		pwd = getpwnam("zabbix");
 		if (NULL == pwd)
@@ -142,7 +152,6 @@ void    init_daemon(void)
 
 #endif /* HAVE_SYS_RESOURCE_SETPRIORITY */
 
-
 //------------------------------------------------
 
 	if( FAIL == create_pid_file(APP_PID_FILE))
@@ -161,15 +170,15 @@ void    init_daemon(void)
 
 	zbx_setproctitle("main process");
 
-	MAIN_ZABBIX_ENTRY();
+	return MAIN_ZABBIX_ENTRY();
 }
 
-void	uninit_daemon(void)
+void	daemon_stop(void)
 {	
 	drop_pid_file(APP_PID_FILE);
 }
 
-void	init_parent_process(void)
+void	init_main_process(void)
 {
 	struct sigaction	phan;
 	

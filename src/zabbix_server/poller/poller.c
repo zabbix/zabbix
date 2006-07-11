@@ -53,7 +53,11 @@
 #include "checks_simple.h"
 #include "checks_snmp.h"
 
+#include "daemon.h"
+
 AGENT_RESULT    result;
+
+static int my_server_num = 0;
 
 int	get_value(DB_ITEM *item, AGENT_RESULT *result)
 {
@@ -61,7 +65,7 @@ int	get_value(DB_ITEM *item, AGENT_RESULT *result)
 
 	struct	sigaction phan;
 
-	phan.sa_handler = &signal_handler;
+	phan.sa_handler = &child_signal_handler;
 	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = 0;
 	sigaction(SIGALRM, &phan, NULL);
@@ -117,7 +121,7 @@ static int get_minnextcheck(int now)
 /* Host status	0 == MONITORED
 		1 == NOT MONITORED
 		2 == UNREACHABLE */
-	if(server_num == 4)
+	if(my_server_num == 4)
 	{
 		zbx_snprintf(sql,sizeof(sql),"select count(*),min(nextcheck) from items i,hosts h where i.nextcheck<=%d and i.status in (%d) and i.type not in (%d,%d) and h.status=%d and h.disable_until<=%d and h.errors_from!=0 and h.hostid=i.hostid and i.key_ not in ('%s','%s','%s','%s') order by i.nextcheck", now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, HOST_STATUS_MONITORED, now, SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY,SERVER_ZABBIXLOG_KEY);
 	}
@@ -125,11 +129,11 @@ static int get_minnextcheck(int now)
 	{
 		if(CONFIG_REFRESH_UNSUPPORTED != 0)
 		{
-			zbx_snprintf(sql,sizeof(sql),"select count(*),min(nextcheck) from items i,hosts h where h.status=%d and h.disable_until<%d and h.errors_from=0 and h.hostid=i.hostid and i.status in (%d,%d) and i.type not in (%d,%d) and mod(i.itemid,%d)=%d and i.key_ not in ('%s','%s','%s','%s')", HOST_STATUS_MONITORED, now, ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED, ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, CONFIG_POLLER_FORKS-5,server_num-5,SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY,SERVER_ZABBIXLOG_KEY);
+			zbx_snprintf(sql,sizeof(sql),"select count(*),min(nextcheck) from items i,hosts h where h.status=%d and h.disable_until<%d and h.errors_from=0 and h.hostid=i.hostid and i.status in (%d,%d) and i.type not in (%d,%d) and mod(i.itemid,%d)=%d and i.key_ not in ('%s','%s','%s','%s')", HOST_STATUS_MONITORED, now, ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED, ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, CONFIG_POLLER_FORKS-5,my_server_num-5,SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY,SERVER_ZABBIXLOG_KEY);
 		}
 		else
 		{
-			zbx_snprintf(sql,sizeof(sql),"select count(*),min(nextcheck) from items i,hosts h where h.status=%d and h.disable_until<%d and h.errors_from=0 and h.hostid=i.hostid and i.status in (%d,%d) and i.type not in (%d) and mod(i.itemid,%d)=%d and i.key_ not in ('%s','%s','%s','%s')", HOST_STATUS_MONITORED, now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, CONFIG_POLLER_FORKS-5,server_num-5,SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY,SERVER_ZABBIXLOG_KEY);
+			zbx_snprintf(sql,sizeof(sql),"select count(*),min(nextcheck) from items i,hosts h where h.status=%d and h.disable_until<%d and h.errors_from=0 and h.hostid=i.hostid and i.status in (%d,%d) and i.type not in (%d) and mod(i.itemid,%d)=%d and i.key_ not in ('%s','%s','%s','%s')", HOST_STATUS_MONITORED, now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, CONFIG_POLLER_FORKS-5,my_server_num-5,SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY,SERVER_ZABBIXLOG_KEY);
 		}
 	}
 
@@ -231,7 +235,7 @@ int get_values(void)
 	now = time(NULL);
 
 	/* Poller for unreachable hosts */
-	if(server_num == 4)
+	if(my_server_num == 4)
 	{
 		zbx_snprintf(sql,sizeof(sql),"select %s where i.nextcheck<=%d and i.status in (%d) and i.type not in (%d,%d) and h.status=%d and h.disable_until<=%d and h.errors_from!=0 and h.hostid=i.hostid and i.key_ not in ('%s','%s','%s','%s') order by i.nextcheck", ZBX_SQL_ITEM_SELECT, now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, HOST_STATUS_MONITORED, now, SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY,SERVER_ZABBIXLOG_KEY);
 	}
@@ -239,11 +243,11 @@ int get_values(void)
 	{
 		if(CONFIG_REFRESH_UNSUPPORTED != 0)
 		{
-			zbx_snprintf(sql,sizeof(sql),"select %s where i.nextcheck<=%d and i.status in (%d,%d) and i.type not in (%d,%d) and h.status=%d and h.disable_until<=%d and h.errors_from=0 and h.hostid=i.hostid and mod(i.itemid,%d)=%d and i.key_ not in ('%s','%s','%s','%s') order by i.nextcheck", ZBX_SQL_ITEM_SELECT, now, ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED, ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, HOST_STATUS_MONITORED, now, CONFIG_POLLER_FORKS-5,server_num-5,SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY,SERVER_ZABBIXLOG_KEY);
+			zbx_snprintf(sql,sizeof(sql),"select %s where i.nextcheck<=%d and i.status in (%d,%d) and i.type not in (%d,%d) and h.status=%d and h.disable_until<=%d and h.errors_from=0 and h.hostid=i.hostid and mod(i.itemid,%d)=%d and i.key_ not in ('%s','%s','%s','%s') order by i.nextcheck", ZBX_SQL_ITEM_SELECT, now, ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED, ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, HOST_STATUS_MONITORED, now, CONFIG_POLLER_FORKS-5,my_server_num-5,SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY,SERVER_ZABBIXLOG_KEY);
 		}
 		else
 		{
-			zbx_snprintf(sql,sizeof(sql),"select %s where i.nextcheck<=%d and i.status in (%d) and i.type not in (%d,%d) and h.status=%d and h.disable_until<=%d and h.errors_from=0 and h.hostid=i.hostid and mod(i.itemid,%d)=%d and i.key_ not in ('%s','%s','%s','%s') order by i.nextcheck", ZBX_SQL_ITEM_SELECT, now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, HOST_STATUS_MONITORED, now, CONFIG_POLLER_FORKS-5,server_num-5,SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY,SERVER_ZABBIXLOG_KEY);
+			zbx_snprintf(sql,sizeof(sql),"select %s where i.nextcheck<=%d and i.status in (%d) and i.type not in (%d,%d) and h.status=%d and h.disable_until<=%d and h.errors_from=0 and h.hostid=i.hostid and mod(i.itemid,%d)=%d and i.key_ not in ('%s','%s','%s','%s') order by i.nextcheck", ZBX_SQL_ITEM_SELECT, now, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, HOST_STATUS_MONITORED, now, CONFIG_POLLER_FORKS-5,my_server_num-5,SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY,SERVER_ZABBIXLOG_KEY);
 		}
 	}
 	result = DBselect(sql);
@@ -370,10 +374,12 @@ int get_values(void)
 	return SUCCEED;
 }
 
-void main_poller_loop()
+void main_poller_loop(int _server_num)
 {
 	int	now;
 	int	nextcheck,sleeptime;
+
+	my_server_num = _server_num;
 
 	DBconnect();
 

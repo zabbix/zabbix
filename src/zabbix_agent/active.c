@@ -26,7 +26,12 @@
 #include "logfiles.h"
 #include "zbxsock.h"
 #include "threads.h"
-#include "service.h"
+
+#if defined(ZABBIX_SERVICE)
+#	include "service.h"
+#elif defined(ZABBIX_DAEMON) /* ZABBIX_SERVICE */
+#	include "daemon.h"
+#endif /* ZABBIX_DAEMON */
 
 static ZBX_ACTIVE_METRIC *active_metrics = NULL;
 

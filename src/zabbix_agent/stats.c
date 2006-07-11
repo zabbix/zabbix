@@ -35,7 +35,13 @@
 #include "diskdevices.h"
 #include "cpustat.h"
 #include "log.h"
-#include "service.h"
+#include "cfg.h"
+
+#if defined(ZABBIX_SERVICE)
+#	include "service.h"
+#elif defined(ZABBIX_DAEMON) /* ZABBIX_SERVICE */
+#	include "daemon.h"
+#endif /* ZABBIX_DAEMON */
 
 ZBX_COLLECTOR_DATA *collector = NULL;
 
@@ -73,7 +79,16 @@ void	init_collector_data(void)
 	key_t	shm_key;
 	int	shm_id;
 
-	shm_key = ftok("/tmp/zbxshm", (int)'z');
+//	shm_key = ftok("/tmp/zbxshm", (int)'z');
+        if( -1 == (shm_key = ftok(CONFIG_FILE, (int)'z') ))
+        {
+                zbx_error("Can not create IPC key for path '%s', try to create for path '.' [%s]", CONFIG_FILE, strerror(errno));
+                if( -1 == (shm_key = ftok(".", (int)'z') ))
+                {
+                        zbx_error("Can not create IPC key for path '.' [%s]", strerror(errno));
+                        return ZBX_MUTEX_ERROR;
+                }
+        }
 
 	shm_id = shmget(shm_key, sizeof(ZBX_COLLECTOR_DATA), IPC_CREAT | 0666);
 

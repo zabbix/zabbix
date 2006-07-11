@@ -214,7 +214,6 @@ int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_
 	int	len;
 	char	*c;
 
-	int	ret = SYSINFO_RET_OK;
 	char	*buf = NULL;
 
         assert(result);

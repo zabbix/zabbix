@@ -52,6 +52,8 @@
 #include "autoregister.h"
 #include "trapper.h"
 
+#include "daemon.h"
+
 extern int    send_list_of_active_checks(int sockfd, char *host);
 
 int	process_trap(int sockfd,char *s, int max_len)
@@ -168,7 +170,7 @@ void	process_trapper_child(int sockfd)
 	char	line[MAX_STRING_LEN];
 	static struct  sigaction phan;
 
-	phan.sa_handler = &signal_handler;
+	phan.sa_handler = &child_signal_handler;
 	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = 0;
 	sigaction(SIGALRM, &phan, NULL);
@@ -246,10 +248,6 @@ pid_t	child_trapper_make(int i,int listenfd, int addrlen)
 	if((pid = fork()) >0)
 	{
 		return (pid);
-	}
-	else
-	{
-		server_num=i;
 	}
 
 	/* never returns */

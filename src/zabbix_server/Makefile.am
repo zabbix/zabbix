@@ -3,6 +3,7 @@ INCLUDES=-I@top_srcdir@/include @MYSQL_INCLUDE@ @ORACLE_INCLUDE@ @SNMP_INCLUDE@
 
 bin_PROGRAMS = zabbix_server
 zabbix_server_SOURCES = evalfunc.c expression.c actions.c zlog.c functions.c server.c
+zabbix_server_CPPFLAGS = -DZABBIX_DAEMON
 zabbix_server_LDADD = ../libs/zbxsysinfo/libzbxsysinfo.a ../libs/zbxsysinfo/@ARCH@/libzbxsysinfo2.a \
 ../libs/zbxlog/libzbxlog.a ../libs/zbxnix/libzbxnix.a ../libs/zbxsys/libzbxsys.a ../libs/zbxconf/libzbxconf.a \
 ../libs/zbxnet/libzbxnet.a pinger/libzbxpinger.a poller/libzbxpoller.a housekeeper/libzbxhousekeeper.a \

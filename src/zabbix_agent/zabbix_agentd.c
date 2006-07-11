@@ -36,13 +36,9 @@
 #include "listener.h"
 
 #if defined(ZABBIX_SERVICE)
-
 #	include "service.h"
-
 #elif defined(ZABBIX_DAEMON) /* ZABBIX_SERVICE */
-
 #	include "daemon.h"
-
 #endif /* ZABBIX_DAEMON */
 
 
@@ -240,7 +236,7 @@ static ZBX_SOCKET connect_to_server(void)
 	return sock;
 }
 
-void MAIN_ZABBIX_ENTRY(void)
+int MAIN_ZABBIX_ENTRY(void)
 {
 	ZBX_THREAD_ACTIVECHK_ARGS	activechk_args;
 
@@ -290,7 +286,7 @@ void MAIN_ZABBIX_ENTRY(void)
 
 #if !defined(WIN32)
 	/* Must be called after all child processes loading. */
-	init_parent_process();
+	init_main_process();
 
 #endif
 
@@ -309,6 +305,8 @@ void MAIN_ZABBIX_ENTRY(void)
 	zbx_free(threads);
 
 	zbx_on_exit();
+
+	return SUCCEED;
 }
 
 void	zbx_on_exit()
@@ -332,7 +330,7 @@ void	zbx_on_exit()
 
 #ifdef USE_PID_FILE
 
-	uninit_daemon();
+	daemon_stop();
 
 #endif /* USE_PID_FILE */
 
@@ -413,7 +411,7 @@ int	main(int argc, char **argv)
 	
 #else /* not WIN32 */
 	
-	init_daemon();
+	daemon_start(CONFIG_ALLOW_ROOT_PERMISSION);
 	
 #endif /* WIN32 */
 

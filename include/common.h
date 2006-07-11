@@ -28,10 +28,6 @@
 
 #	pragma warning (disable: 4100)
 
-#else /* not WIN32 */
-
-#	define USE_PID_FILE 1
-
 #endif /* WIN32 */
 
 
@@ -403,6 +399,6 @@ void	zbx_on_exit();
 
 int       SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
-void MAIN_ZABBIX_ENTRY(void);
+int MAIN_ZABBIX_ENTRY(void);
 
 #endif

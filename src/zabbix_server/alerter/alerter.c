@@ -53,26 +53,7 @@
 #include "sms.h"
 
 #include "alerter.h"
-
-/******************************************************************************
- *                                                                            *
- * Function: signal_handler                                                   *
- *                                                                            *
- * Purpose: dummy signal handler                                              *
- *                                                                            *
- * Parameters: sign - signal id                                               *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-static void signal_handler2( int sig )
-{
-	zabbix_log( LOG_LEVEL_DEBUG, "Got signal [%d]", sig);
-}
+#include "daemon.h"
 
 /******************************************************************************
  *                                                                            *
@@ -93,8 +74,7 @@ static void signal_handler2( int sig )
  ******************************************************************************/
 static int execute_action(DB_ALERT *alert,DB_MEDIATYPE *mediatype, char *error, int max_error_len)
 {
-	int res=FAIL;
-	struct	sigaction phan;
+	int 	res=FAIL;
 	int	pid;
 
 	char	full_path[MAX_STRING_LEN];
@@ -114,14 +94,6 @@ static int execute_action(DB_ALERT *alert,DB_MEDIATYPE *mediatype, char *error, 
 	{
 /*		if(-1 == execl(CONFIG_ALERT_SCRIPTS_PATH,mediatype->exec_path,alert->sendto,alert->subject,alert->message))*/
 		zabbix_log( LOG_LEVEL_DEBUG, "Before execl([%s],[%s])",CONFIG_ALERT_SCRIPTS_PATH,mediatype->exec_path);
-
-		phan.sa_handler = &signal_handler2;
-		phan.sa_handler = SIG_IGN;
-/*		signal( SIGCHLD, SIG_IGN );*/
-
-		sigemptyset(&phan.sa_mask);
-		phan.sa_flags = 0;
-		sigaction(SIGCHLD, &phan, NULL);
 
 /*		if(-1 == execl("/home/zabbix/bin/lmt.sh","lmt.sh",alert->sendto,alert->subject,alert->message,(char *)0))*/
 
@@ -231,7 +203,7 @@ int main_alerter_loop()
 
 			mediatype.gsm_modem=row[15];
 
-			phan.sa_handler = &signal_handler;
+			phan.sa_handler = child_signal_handler;
 			sigemptyset(&phan.sa_mask);
 			phan.sa_flags = 0;
 			sigaction(SIGALRM, &phan, NULL);

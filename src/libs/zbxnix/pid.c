@@ -25,7 +25,7 @@
 
 int	create_pid_file(const char *pidfile)
 {
-	FILE	*f == NULL;
+	FILE	*f = NULL;
 
 	/* check if pid file already exists */
 	if( NULL != (f = fopen(pidfile, "r")) )

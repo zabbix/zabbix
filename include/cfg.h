@@ -37,10 +37,6 @@
 extern int	CONFIG_ZABBIX_FORKS;
 extern char	*CONFIG_FILE;
 
-#ifdef USE_PID_FILE
-	extern char		*CONFIG_PID_FILE;
-#endif /* USE_PID_FILE */
-
 extern char	*CONFIG_LOG_FILE;
 extern char	CONFIG_ALLOW_ROOT_PERMISSION;
 extern int	CONFIG_TIMEOUT;
