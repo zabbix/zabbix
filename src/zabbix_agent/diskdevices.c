@@ -17,7 +17,21 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#include "config.h"
+#include "common.h"
+#include "diskdevices.h"
+
+
+void	collect_stats_diskdevices(ZBX_DISKDEVICES_DATA *pdiskdevices)
+{
+#if defined(TODO)
+#error "Realize function"
+#endif
+}
+
+
+#if 0 && (!defined(WIN32) || (defined(TODO) && defined(WIN32)))
+
+//TODO!!! Make same as cpustat.c
 
 #include <netdb.h>
 
@@ -57,7 +71,6 @@
 
 #include <dirent.h>
 
-#include "common.h"
 #include "sysinfo.h"
 #include "security.h"
 #include "zabbix_agent.h"
@@ -124,10 +137,9 @@ void	init_stats_diskdevices()
 		}
 	}
 
-	file=fopen("/proc/stat","r");
-	if(NULL == file)
+	if(NULL == (file = fopen("/proc/stat","r") ))
 	{
-		fprintf(stderr, "Cannot open [%s] [%s]\n","/proc/stat", strerror(errno));
+		zbx_error("Cannot open [%s] [%s].","/proc/stat", strerror(errno));
 		return;
 	}
 	i=0;
@@ -166,7 +178,7 @@ void	init_stats_diskdevices()
 		}
 	}
 
-	fclose(file);
+	zbx_fclose(file);
 }
 
 /*
@@ -187,10 +199,9 @@ void	init_stats_diskdevices()
 		}
 	}
 
-	file=fopen("/proc/stat","r");
-	if(NULL == file)
+	if(NULL == (file = fopen("/proc/stat","r") ))
 	{
-		fprintf(stderr, "Cannot open [%s] [%m]\n","/proc/stat");
+		zbx_error("Cannot open [%s] [%m].","/proc/stat");
 		return;
 	}
 	i=0;
@@ -213,7 +224,7 @@ void	init_stats_diskdevices()
 		i++;
 	}
 
-	fclose(file);
+	zbx_fclose(file);
 }
 */
 
@@ -470,10 +481,9 @@ void	collect_stats_diskdevices(FILE *outfile)
 
 	now=time(NULL);
 
-	file=fopen("/proc/stat","r");
-	if(NULL == file)
+	if( NULL == (file = fopen("/proc/stat","r") ))
 	{
-		fprintf(stderr, "Cannot open [%s] [%s]\n","/proc/stat", strerror(errno));
+		zbx_error("Cannot open [%s] [%s].","/proc/stat", strerror(errno));
 		return;
 	}
 	i=0;
@@ -505,9 +515,11 @@ void	collect_stats_diskdevices(FILE *outfile)
 		}
 	}
 
-	fclose(file);
+	zbx_fclose(file);
 
 	report_stats_diskdevices(outfile, now);
 
 #endif /* HAVE_PROC_STAT */
 }
+
+#endif /* TODO */

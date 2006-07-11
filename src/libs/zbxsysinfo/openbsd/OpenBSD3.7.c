@@ -1819,7 +1819,7 @@ ZBX_METRIC agent_commands[]=
         {"system[hostname]"     ,0,             EXECUTE_STR, "hostname"},
         {"system[uname]"        ,0,             EXECUTE_STR, "uname -a"},
         {"system[uptime]"       ,UPTIME,        0, 0},
-        {"system[users]"        ,EXECUTE,       0,"who|wc -l"},
+        {"system[users]"        ,EXECUTE_INT,       0,"who|wc -l"},
 
         {"ping"                 ,PING,          0, 0},
         {"tcp_count"            ,TCP_SOCKETS,   0, 0},

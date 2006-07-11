@@ -20,6 +20,25 @@
 #ifndef ZABBIX_INTERFACES_H
 #define ZABBIX_INTERFACES_H
 
+
+#define	MAX_INTERFACE	(16)
+
+typedef struct s_single_interface_data
+{
+	char    *name;
+	int	clock[60*15];
+	float	sent[60*15];
+	float	received[60*15];
+} ZBX_SINGLE_INTERFACE_DATA;
+
+typedef struct s_interfaces_data
+{
+	ZBX_SINGLE_INTERFACE_DATA intfs[MAX_INTERFACE];
+} ZBX_INTERFACES_DATA;
+
+void	collect_stats_interfaces(ZBX_INTERFACES_DATA *pinterfaces);
+
+/*
 #define	MAX_INTERFACE	16
 
 #define INTERFACE struct interface_type
@@ -32,5 +51,5 @@ INTERFACE
 };
 
 void	collect_stats_interfaces(FILE *outfile);
-
+*/
 #endif

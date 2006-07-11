@@ -37,7 +37,7 @@ dnl Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   syslog.h time.h errno.h sys/types.h sys/stat.h netinet/in.h \
-  sys/socket.h dirent.h ctype.h \
+  math.h sys/socket.h dirent.h ctype.h \
   mtent.h fcntl.h sys/param.h sys/mount.h arpa/inet.h \
   sys/vfs.h sys/pstat.h sys/sysinfo.h sys/statvfs.h \
   sys/socket.h sys/loadavg.h netinet/in.h arpa/inet.h \
@@ -45,7 +45,9 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   sys/time.h kstat.h sys/syscall.h sys/sysmacros.h sys/procfs.h \
   stdint.h mach/host_info.h mach/mach_host.h knlist.h pwd.h sys/proc.h \
   sys/var.h resolv.h arpa/nameser.h assert.h sys/dkstat.h sys/disk.h \
-  nlist.h net/if.h kvm.h linux/kernel.h ldap.h getopt.h procinfo.h sys/dk.h)
+  nlist.h net/if.h kvm.h linux/kernel.h ldap.h getopt.h procinfo.h sys/dk.h \
+  sys/resource.h pthread.h windows.h process.h conio.h sys/wait.h regex.h \
+  stdarg.h winsock2.h pdh.h psapi.h sys/sem.h sys/ipc.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -969,7 +971,7 @@ dnl AC_SUBST(CONFIG_HOST_UNKNOWN)
 AC_SUBST(ARCH)
 
 AC_OUTPUT(Makefile src/Makefile src/libs/Makefile src/libs/zbxlog/Makefile src/libs/zbxcrypto/Makefile  \
-	src/libs/zbxpid/Makefile src/libs/zbxnet/Makefile src/libs/zbxconf/Makefile src/zabbix_sender/Makefile \
+	src/libs/zbxnet/Makefile src/libs/zbxconf/Makefile src/zabbix_sender/Makefile \
 	src/libs/zbxdbhigh/Makefile src/libs/zbxemail/Makefile src/libs/zbxsysinfo/Makefile src/libs/zbxsms/Makefile \
 	src/zabbix_server/pinger/Makefile src/zabbix_agent/Makefile \
 	src/zabbix_server/housekeeper/Makefile src/zabbix_server/alerter/Makefile src/zabbix_server/Makefile \
@@ -977,7 +979,8 @@ AC_OUTPUT(Makefile src/Makefile src/libs/Makefile src/libs/zbxlog/Makefile src/l
 	src/zabbix_get/Makefile src/libs/zbxcommon/Makefile src/libs/zbxsysinfo/linux/Makefile \
 	src/libs/zbxsysinfo/aix/Makefile src/libs/zbxsysinfo/freebsd/Makefile src/libs/zbxsysinfo/hpux/Makefile \
 	src/libs/zbxsysinfo/openbsd/Makefile src/libs/zbxsysinfo/osx/Makefile src/libs/zbxsysinfo/solaris/Makefile \
-	src/libs/zbxsysinfo/osf/Makefile src/libs/zbxsysinfo/netbsd/Makefile src/libs/zbxsysinfo/unknown/Makefile)
+	src/libs/zbxsysinfo/osf/Makefile src/libs/zbxsysinfo/netbsd/Makefile src/libs/zbxsysinfo/unknown/Makefile \
+	src/libs/zbxnix/Makefile src/libs/zbxplugin/Makefile src/libs/zbxsys/Makefile)
 
 echo "
 

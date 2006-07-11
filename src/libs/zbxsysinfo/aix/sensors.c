@@ -53,13 +53,12 @@ static int	get_sensor(const char *name, unsigned flags, AGENT_RESULT *result)
 
 		if(stat(filename,&buf)==0)
 		{
-			f=fopen(filename,"r");
-			if(f==NULL)
+			if(NULL == (f = fopen(filename,"r")))
 			{
 				continue;
 			}
-			fgets(line,MAX_STRING_LEN,f);
-			fclose(f);
+			fgets(line, MAX_STRING_LEN, f);
+			zbx_fclose(f);
 
 			if(sscanf(line,"%lf\t%lf\t%lf\n",&d1, &d2, &d3) == 3)
 			{

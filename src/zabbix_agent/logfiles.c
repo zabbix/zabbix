@@ -17,16 +17,6 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#include "config.h"
-
-#include <errno.h>
-#include <stdio.h>
-#include <string.h>
-
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-
 #include "common.h"
 
 #include "log.h"
@@ -36,6 +26,10 @@ int   process_log(char *filename,int *lastlogsize, char *value)
 {
 	FILE	*f;
 	struct stat	buf;
+
+	assert(filename);
+	assert(lastlogsize);
+	assert(value);
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process log (%s,%d)", filename, *lastlogsize);
 
@@ -50,33 +44,32 @@ int   process_log(char *filename,int *lastlogsize, char *value)
 	else
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Cannot open [%s] [%s]", filename, strerror(errno));
-		snprintf(value,MAX_STRING_LEN-1,"%s","ZBX_NOTSUPPORTED\n");
+		zbx_snprintf(value, sizeof(value),"%s","ZBX_NOTSUPPORTED\n");
 		return 1;
 	}
 
-	f=fopen(filename,"r");
-	if(NULL == f)
+	if(NULL == (f = fopen(filename,"r") ))
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Cannot open [%s] [%s]", filename, strerror(errno));
-		snprintf(value,MAX_STRING_LEN-1,"%s","ZBX_NOTSUPPORTED\n");
+		zbx_snprintf(value,sizeof(value),"%s","ZBX_NOTSUPPORTED\n");
 		return 1;
 	}
 
 	if(-1 == fseek(f,*lastlogsize,SEEK_SET))
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Cannot set postition to [%d] for [%s] [%s]", *lastlogsize, filename, strerror(errno));
-		snprintf(value,MAX_STRING_LEN-1,"%s","ZBX_NOTSUPPORTED\n");
-		fclose(f);
+		zbx_snprintf(value,sizeof(value),"%s","ZBX_NOTSUPPORTED\n");
+		zbx_fclose(f);
 		return 1;
 	}
 
 	if(NULL == fgets(value, MAX_STRING_LEN-1, f))
 	{
 		/* EOF */
-		fclose(f);
+		zbx_fclose(f);
 		return 1;
 	}
-	fclose(f);
+	zbx_fclose(f);
 
 	*lastlogsize+=strlen(value);
 

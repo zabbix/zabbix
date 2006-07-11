@@ -110,12 +110,12 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
 	DBescape_string(hostgroup,hostgroup_esc,MAX_STRING_LEN);
 /* Get list of affected item IDs */
 	strscpy(items,"0");
-	snprintf(sql,sizeof(sql)-1,"select itemid from items,hosts_groups,hosts,groups where hosts_groups.groupid=groups.groupid and items.hostid=hosts.hostid and hosts_groups.hostid=hosts.hostid and groups.name='%s' and items.key_='%s' and items.status=%d and hosts.status=%d",hostgroup_esc, itemkey_esc, ITEM_STATUS_ACTIVE, HOST_STATUS_MONITORED);
+	zbx_snprintf(sql,sizeof(sql),"select itemid from items,hosts_groups,hosts,groups where hosts_groups.groupid=groups.groupid and items.hostid=hosts.hostid and hosts_groups.hostid=hosts.hostid and groups.name='%s' and items.key_='%s' and items.status=%d and hosts.status=%d",hostgroup_esc, itemkey_esc, ITEM_STATUS_ACTIVE, HOST_STATUS_MONITORED);
 	result = DBselect(sql);
 
 	while((row=DBfetch(result)))
 	{
-		snprintf(items2,sizeof(items2)-1,"%s,%s",items, row[0]);
+		zbx_snprintf(items2,sizeof(items2),"%s,%s",items, row[0]);
 /*		zabbix_log( LOG_LEVEL_WARNING, "ItemIDs items2[%s])",items2);*/
 		strscpy(items,items2);
 /*		zabbix_log( LOG_LEVEL_WARNING, "ItemIDs items[%s])",items2);*/
@@ -124,11 +124,11 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
 
 	if(strcmp(itemfunc,"last") == 0)
 	{
-		snprintf(sql,sizeof(sql)-1,"select itemid,value_type,lastvalue from items where lastvalue is not NULL and items.itemid in (%s)",items);
-		snprintf(sql2,sizeof(sql2)-1,"select itemid,value_type,lastvalue from items where 0=1");
+		zbx_snprintf(sql,sizeof(sql),"select itemid,value_type,lastvalue from items where lastvalue is not NULL and items.itemid in (%s)",items);
+		zbx_snprintf(sql2,sizeof(sql2),"select itemid,value_type,lastvalue from items where 0=1");
 	}
 		/* The SQL works very very slow on MySQL 4.0. That's why it has been split into two. */
-/*		snprintf(sql,sizeof(sql)-1,"select items.itemid,items.value_type,min(history.value) from items,hosts_groups,hosts,groups,history where history.itemid=items.itemid and hosts_groups.groupid=groups.groupid and items.hostid=hosts.hostid and hosts_groups.hostid=hosts.hostid and groups.name='%s' and items.key_='%s' and history.clock>%d group by 1,2",hostgroup_esc, itemkey_esc, now - atoi(param));*/
+/*		zbx_snprintf(sql,sizeof(sql),"select items.itemid,items.value_type,min(history.value) from items,hosts_groups,hosts,groups,history where history.itemid=items.itemid and hosts_groups.groupid=groups.groupid and items.hostid=hosts.hostid and hosts_groups.hostid=hosts.hostid and groups.name='%s' and items.key_='%s' and history.clock>%d group by 1,2",hostgroup_esc, itemkey_esc, now - atoi(param));*/
 	else if( (strcmp(itemfunc,"min") == 0) ||
 		(strcmp(itemfunc,"max") == 0) ||
 		(strcmp(itemfunc,"avg") == 0) ||
@@ -136,8 +136,8 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
 		(strcmp(itemfunc,"sum") == 0)
 	)
 	{
-		snprintf(sql,sizeof(sql)-1,"select h.itemid,i.value_type,%s(h.value) from items i,history h where h.itemid=i.itemid and h.itemid in (%s) and h.clock>%d group by 1,2",itemfunc, items, now - atoi(param));
-		snprintf(sql2,sizeof(sql)-1,"select h.itemid,i.value_type,%s(h.value) from items i,history_uint h where h.itemid=i.itemid and h.itemid in (%s) and h.clock>%d group by 1,2",itemfunc, items, now - atoi(param));
+		zbx_snprintf(sql,sizeof(sql),"select h.itemid,i.value_type,%s(h.value) from items i,history h where h.itemid=i.itemid and h.itemid in (%s) and h.clock>%d group by 1,2",itemfunc, items, now - atoi(param));
+		zbx_snprintf(sql2,sizeof(sql),"select h.itemid,i.value_type,%s(h.value) from items i,history_uint h where h.itemid=i.itemid and h.itemid in (%s) and h.clock>%d group by 1,2",itemfunc, items, now - atoi(param));
 	}
 	else
 	{

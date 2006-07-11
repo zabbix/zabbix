@@ -18,19 +18,20 @@
 **/
 
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
+//#include <sys/types.h>
+//#include <sys/socket.h>
+//#include <netinet/in.h>
+//#include <arpa/inet.h>
+//#include <netdb.h>
 
-#include <string.h>
+//#include <string.h>
 
-#include <errno.h>
+//#include <errno.h>
 
 /* config.h is required for socklen_t (undefined under Solaris) */
 #include "config.h"
 #include "common.h"
+#include "zbxsock.h"
 #include "log.h"
 
 /******************************************************************************
@@ -51,57 +52,58 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	check_security(int sockfd, char *ip_list, int allow_if_empty)
+
+int	check_security(ZBX_SOCKET sock, char *ip_list, int allow_if_empty)
 {
-	struct	sockaddr_in name;
-	int	i;
-	char	*sip, *host;
+	ZBX_SOCKADDR name;
+	int	nlen;
+
 	struct  hostent *hp;
 
-	char	tmp[MAX_STRING_LEN], sname[MAX_STRING_LEN];
+	char	tmp[MAX_STRING_LEN], 
+		sname[MAX_STRING_LEN],
+		*sip, 
+		*host;
 
         zabbix_log( LOG_LEVEL_DEBUG, "In check_security()");
 
-	if( (1 == allow_if_empty) && (strlen(ip_list)==0) )
+	if( (1 == allow_if_empty) && (0 == strlen(ip_list)) )
 	{
 		return SUCCEED;
 	}
 
-	i=sizeof(name);
-
-	if(getpeername(sockfd,  (struct sockaddr *)&name, (socklen_t *)&i) == 0)
+	nlen = sizeof(ZBX_SOCKADDR);
+	if( 0 != getpeername(sock,  (struct sockaddr*)&name, &nlen))
 	{
-		i=sizeof(struct sockaddr_in);
-
-		strcpy(sname,inet_ntoa(name.sin_addr));
-
-		zabbix_log( LOG_LEVEL_DEBUG, "Connection from [%s]. Allowed servers [%s] ",sname, ip_list);
-
-		strscpy(tmp,ip_list);
-        	host=(char *)strtok(tmp,",");
-		while(host!=NULL)
-		{
-			/* Allow IP addresses or DNS names for authorization */
-			if((hp=gethostbyname(host)) == 0)
-			{
-				zabbix_log( LOG_LEVEL_WARNING, "Error gethostbyname, can not resolve [%s]",host);
-			}
-			else
-			{
-				sip=inet_ntoa(*((struct in_addr *)hp->h_addr));
-				if(strcmp(sname, sip)==0)
-				{
-					return	SUCCEED;
-				}
-			}
-                	host=(char *)strtok(NULL,",");
-		}
+		zabbix_log( LOG_LEVEL_WARNING, "Connection rejected. Getpeername failed [%s].",strerror(errno));
+		return FAIL;
 	}
 	else
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Error getpeername [%s]",strerror(errno));
-		zabbix_log( LOG_LEVEL_WARNING, "Connection rejected");
-		return FAIL;
+		strcpy(sname, inet_ntoa(name.sin_addr));
+
+		strscpy(tmp,ip_list);
+
+        	host = (char *)strtok(tmp,",");
+
+		while( NULL != host )
+		{
+			/* Allow IP addresses or DNS names for authorization */
+			if( 0 == (hp = gethostbyname(host)))
+			{
+				zabbix_log( LOG_LEVEL_WARNING, "Error on gethostbyname, can not resolve [%s]",host);
+			}
+			else
+			{
+				sip = inet_ntoa(*((struct in_addr *)hp->h_addr));
+				if( 0 == strcmp(sname, sip))
+				{
+					zabbix_log( LOG_LEVEL_DEBUG, "Connection from [%s] accepted. Allowed servers [%s] ",sname, ip_list);
+					return	SUCCEED;
+				}
+			}
+                	host = (char *)strtok(NULL,",");
+		}
 	}
 	zabbix_log( LOG_LEVEL_WARNING, "Connection from [%s] rejected. Allowed server is [%s] ",sname, ip_list);
 	return	FAIL;

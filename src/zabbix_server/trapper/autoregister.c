@@ -57,7 +57,7 @@ int	autoregister(char *server)
 		return FAIL;
 	}
 
-	snprintf(sql,sizeof(sql)-1,"select id,pattern,hostid from autoreg order by priority");
+	zbx_snprintf(sql,sizeof(sql),"select id,pattern,hostid from autoreg order by priority");
 
 	result = DBselect(sql);
 

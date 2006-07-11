@@ -138,7 +138,7 @@ void	wait_connect()
 			if ((poll_cli[i].revents&POLLOUT)==POLLOUT)
 			{
 				printf("[%d] remote socket ready for writing\n",i);
-				snprintf(c, 1024 - 1, "%s\n", "system.uptime\n");
+				zbx_snprintf(c, sizeof(c), "%s\n", "system.uptime\n");
 				if( write(poll_cli[i].fd,c,strlen(c)) == -1 )
 				{
 					perror("write");

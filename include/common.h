@@ -22,87 +22,14 @@
 
 #include "sysinc.h"
 
+#include "zbxtypes.h"
+
 #if defined(WIN32)
+
 #	pragma warning (disable: 4100)
 
-#	define zbx_uint64_t __int64
-#	define ZBX_FS_UI64 "%llu"
+#endif /* WIN32 */
 
-//#undef _DEBUG
-#	ifdef _DEBUG
-#		define LOG_DEBUG_INFO(type, msg) \
-			WriteLog(MSG_DEBUG_INFO,EVENTLOG_ERROR_TYPE, "d"type , GetCurrentThreadId(), msg)
-//#		define ENABLE_CHECK_MEMOTY
-//#		define ENABLE_FUNC_CALL
-#	else
-#		define LOG_DEBUG_INFO(a, b) ((void)0)
-#	endif
-
-
-#	if defined(ENABLE_FUNC_CALL)
-#		define LOG_FUNC_CALL(msg) \
-			WriteLog(MSG_DEBUG_INFO,EVENTLOG_ERROR_TYPE, "ds" , GetCurrentThreadId(), msg)
-#	else
-#		define LOG_FUNC_CALL(a) ((void)0)
-#	endif
-
-#	if defined(ENABLE_CHECK_MEMOTY)
-#		include "crtdbg.h"
-
-#		define REINIT_CHECK_MEMORY(a) \
-			_CrtMemCheckpoint(& ## a ## oldMemState)
-
-#		define INIT_CHECK_MEMORY(a) \
-			char a ## DumpMessage[0xFFFF]; \
-			_CrtMemState  a ## oldMemState, a ## newMemState, a ## diffMemState; \
-			REINIT_CHECK_MEMORY(a)
-
-#		define CHECK_MEMORY(a, fncname, msg) \
-			_CrtMemCheckpoint(& ## a ## newMemState); \
-			if(_CrtMemDifference(& ## a ## diffMemState, & ## a ## oldMemState, & ## a ## newMemState)) \
-			{ \
-				sprintf(a ## DumpMessage, \
-					"%s\n" \
-					"free:  %10li bytes in %10li blocks\n" \
-					"normal:%10li bytes in %10li blocks\n" \
-					"CRT:   %10li bytes in %10li blocks\n" \
-					"ignore:%10li bytes in %10li blocks\n" \
-					"client:%10li bytes in %10li blocks\n" \
-					"max:   %10li bytes in %10li blocks", \
-					 \
-					fncname ": (" #a ") Memory changed! (" msg ")\n", \
-					 \
-					(long) a ## diffMemState.lSizes[_FREE_BLOCK], \
-					(long) a ## diffMemState.lCounts[_FREE_BLOCK], \
-					 \
-					(long) a ## diffMemState.lSizes[_NORMAL_BLOCK], \
-					(long) a ## diffMemState.lCounts[_NORMAL_BLOCK], \
-					 \
-					(long) a ## diffMemState.lSizes[_CRT_BLOCK], \
-					(long) a ## diffMemState.lCounts[_CRT_BLOCK], \
-					 \
-					(long) a ## diffMemState.lSizes[_IGNORE_BLOCK], \
-					(long) a ## diffMemState.lCounts[_IGNORE_BLOCK], \
-					 \
-					(long) a ## diffMemState.lSizes[_CLIENT_BLOCK], \
-					(long) a ## diffMemState.lCounts[_CLIENT_BLOCK], \
-					 \
-					(long) a ## diffMemState.lSizes[_MAX_BLOCKS], \
-					(long) a ## diffMemState.lCounts[_MAX_BLOCKS]); \
-				 LOG_DEBUG_INFO("s", a ## DumpMessage); \
-			}
-#	else
-#		define INIT_CHECK_MEMORY(a) ((void)0)
-#		define CHECK_MEMORY(a, fncname, msg) ((void)0)
-#	endif
-#else
-#	define zbx_uint64_t uint64_t
-#	if __WORDSIZE == 64
-#		define ZBX_FS_UI64 "%lu"
-#	else
-#		define ZBX_FS_UI64 "%llu"
-#	endif
-#endif
 
 #ifndef HAVE_GETOPT_LONG
 	struct option {
@@ -112,14 +39,14 @@
 		int val;
 	};
 #	define  getopt_long(argc, argv, optstring, longopts, longindex) getopt(argc, argv, optstring)
-#endif
+#endif /* ndef HAVE_GETOPT_LONG */
 
 #define ZBX_UNUSED(a) ((void)0)(a)
 
 #define	ZBX_FS_DBL	"%f"
 
-#define	ZABBIX_REVDATE	"2 Juna 2006"
-#define	ZABBIX_VERSION	"1.1"
+#define	ZABBIX_REVDATE	"11 July 2006"
+#define	ZABBIX_VERSION	"1.2.1"
 
 #define MAX_LOG_FILE_LEN (1024*1024)
 
@@ -129,14 +56,6 @@
 #define	NETWORK_ERROR	(-3)
 #define	TIMEOUT_ERROR	(-4)
 #define	AGENT_ERROR	(-5)
-
-#define	MAXFD	64
-
-/* show debug info to stderr */
-#define FDI(f, m) fprintf(stderr, "DEBUG INFO: " f "\n" , m)
-#define SDI(m) FDI("%s", m)
-#define IDI(i) FDI("%i", i)
-
 
 /*
 #define ZBX_POLLER
@@ -277,7 +196,7 @@
 #define SERVICE_ALGORITHM_MAX	1
 #define SERVICE_ALGORITHM_MIN	2
 
-#define	AGENTD_FORKS	5
+#define	ZABBIX_FORKS	5
 
 #define	TRAPPERD_FORKS	5
 #define	POLLER_FORKS	11
@@ -304,7 +223,11 @@
 #endif
 				    
 /* Secure string copy */
-#define strscpy(x,y) { strncpy(x,y,sizeof(x)); x[sizeof(x)-1]=0; }
+#define strsncpy(x,y,size) { strncpy(x,y,size); x[size-1]='\0'; }
+#define strscpy(x,y) strsncpy(x,y,sizeof(x))
+
+#define zbx_free(ptr) { if(ptr){ free(ptr); ptr = NULL; } }
+#define zbx_fclose(f) { if(f){ fclose(f); f = NULL; } }
 
 /* list structure as item of agent return vaile */					 
 #define ZBX_LIST_ITEM struct zbx_list_item_s
@@ -339,6 +262,8 @@ AGENT_RESULT {
 #define AR_TEXT		32
 
 
+/* SET RESULT */
+
 #define SET_DBL_RESULT(res, val) \
 	{ \
 	(res)->type |= AR_DOUBLE; \
@@ -369,30 +294,47 @@ AGENT_RESULT {
 	(res)->msg = (char*)(val); \
 	}
 
-#define UNSET_DBL_RESULT(res) \
-	{ \
-	(res)->type &= ~AR_DOUBLE; \
+/* UNSER RESULT */
+
+#define UNSET_DBL_RESULT(res)           \
+	{                               \
+	(res)->type &= ~AR_DOUBLE;      \
+	(res)->dbl = (double)(0);        \
 	}
 
-#define UNSET_UI64_RESULT(res) \
-	{ \
-	(res)->type &= ~AR_UINT64; \
+#define UNSET_UI64_RESULT(res)             \
+	{                                  \
+	(res)->type &= ~AR_UINT64;         \
+	(res)->ui64 = (zbx_uint64_t)(0); \
 	}
 
-#define UNSET_STR_RESULT(res) \
-	{ \
-	(res)->type &= ~AR_STRING; \
+#define UNSET_STR_RESULT(res)                      \
+	{                                          \
+		if((res)->type & AR_STRING){       \
+			free((res)->str);          \
+			(res)->str = NULL;         \
+			(res)->type &= ~AR_STRING; \
+		}                                  \
 	}
 
-#define UNSET_TEXT_RESULT(res) \
-	{ \
-	(res)->type &= ~AR_TEXT; \
+#define UNSET_TEXT_RESULT(res)                   \
+	{                                        \
+		if((res)->type & AR_TEXT){       \
+			free((res)->text);       \
+			(res)->text = NULL;      \
+			(res)->type &= ~AR_TEXT; \
+		}                                \
 	}
 
-#define UNSET_MSG_RESULT(res) \
-	{ \
-	(res)->type &= ~AR_MESSAGE; \
+#define UNSET_MSG_RESULT(res)                       \
+	{                                           \
+		if((res)->type & AR_MESSAGE){       \
+			free((res)->msg);           \
+			(res)->msg = NULL;          \
+			(res)->type &= ~AR_MESSAGE; \
+		}                                   \
 	}
+
 
 extern char *progname;
 extern char title_message[];
@@ -403,13 +345,16 @@ void	help();
 void	usage();
 void	version();
 
-#define ZBX_TASK_START           0
-#define ZBX_TASK_SHOW_HELP       1
-#define ZBX_TASK_SHOW_VERSION    2
-#define ZBX_TASK_PRINT_SUPPORTED 3
-#define ZBX_TASK_TEST_METRIC     4
-#define ZBX_TASK_SHOW_USAGE      5
-
+#define ZBX_TASK_START			0
+#define ZBX_TASK_SHOW_HELP		1
+#define ZBX_TASK_SHOW_VERSION		2
+#define ZBX_TASK_PRINT_SUPPORTED	3
+#define ZBX_TASK_TEST_METRIC		4
+#define ZBX_TASK_SHOW_USAGE		5
+#define ZBX_TASK_INSTALL_SERVICE	6
+#define ZBX_TASK_UNINSTALL_SERVICE	7
+#define ZBX_TASK_START_SERVICE		8
+#define ZBX_TASK_STOP_SERVICE		9
 
 void   	init_result(AGENT_RESULT *result);
 int    	copy_result(AGENT_RESULT *src, AGENT_RESULT *dist);
@@ -428,6 +373,10 @@ void	delete_reol(char *c);
 int	get_param(const char *param, int num, char *buf, int maxlen);
 int	num_param(const char *param);
 int	calculate_item_nextcheck(int delay, int now);
+void	zbx_setproctitle(const char *fmt, ...);
+double	zbx_getseconds(void);
+void	zbx_error(const char *fmt, ...);
+void	zbx_snprintf(char* str, size_t count, const char *fmt, ...);
 
 int	set_result_type(AGENT_RESULT *result, int value_type, char *c);
 
@@ -440,16 +389,16 @@ int	comms_parse_response(char *xml,char *host,char *key, char *data, char *lastl
 
 int 	parse_command(const char *command, char *cmd, int cmd_max_len, char *param, int param_max_len);
 
-/* Base64 functions */
-void	str_base64_encode(char *p_str, char *p_b64str, int in_size);
-void	str_base64_decode(char *p_b64str, char *p_str, int *p_out_size);
-
 /* Regular expressions */
 char    *zbx_regexp_match(const char *string, const char *pattern, int *len);
 
 /* Misc functions */
 int	cmp_double(double a,double b);
 
+void	zbx_on_exit();
+
 int       SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+
+int MAIN_ZABBIX_ENTRY(void);
 
 #endif

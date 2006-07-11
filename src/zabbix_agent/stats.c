@@ -17,75 +17,182 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#include "config.h"
-
-#include <netdb.h>
-
-#include <stdlib.h>
-#include <stdio.h>
-
-#include <unistd.h>
-#include <signal.h>
-
-#include <errno.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-
-#include <time.h>
-
-/* No warning for bzero */
-#include <string.h>
-#include <strings.h>
-
-/* For config file operations */
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-
-/* For setpriority */
-#include <sys/time.h>
-#include <sys/resource.h>
-
-/* Required for getpwuid */
-#include <pwd.h>
-
 #include "common.h"
-#include "sysinfo.h"
-#include "security.h"
-#include "zabbix_agent.h"
-
-#include "log.h"
-#include "cfg.h"
 #include "stats.h"
 
-/*INTERFACE interfaces[MAX_INTERFACE]=
-{
-	{0}
-};*/
+#ifndef WIN32
+#warning REMOVE sustem includes fron here!
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#endif
 
-void	collect_statistics()
-{
-	FILE	*file;
+#include "log.h"
+#include "mutexs.h"
+#include "zbxconf.h"
 
-	for(;;)
+#include "interfaces.h"
+#include "diskdevices.h"
+#include "cpustat.h"
+#include "log.h"
+#include "cfg.h"
+
+#if defined(ZABBIX_SERVICE)
+#	include "service.h"
+#elif defined(ZABBIX_DAEMON) /* ZABBIX_SERVICE */
+#	include "daemon.h"
+#endif /* ZABBIX_DAEMON */
+
+ZBX_COLLECTOR_DATA *collector = NULL;
+
+/******************************************************************************
+ *                                                                            *
+ * Function: init_collector_data                                              *
+ *                                                                            *
+ * Purpose: Allocate memory for collector                                     *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: Linux version allocate memory as shared.                         *
+ *                                                                            *
+ ******************************************************************************/
+
+void	init_collector_data(void)
+{
+#if defined (WIN32)
+
+	collector = calloc(1, sizeof(ZBX_COLLECTOR_DATA));
+
+	if(NULL == collector)
 	{
-		file=fopen("/tmp/zabbix_agentd.tmp2","w");
-		if(NULL == file)
-		{
-			zabbix_log( LOG_LEVEL_CRIT, "Cannot open file [%s] [%s]\n","/tmp/zabbix_agentd.tmp2", strerror(errno));
-			exit(1);
-		}
-		else
-		{
-			/* Here is list of functions to call periodically */
-			collect_stats_interfaces(file);
-			collect_stats_diskdevices(file);
-			collect_stats_cpustat(file);
+		zabbix_log(LOG_LEVEL_CRIT, "Can't allocate memory for collector.");
+		exit(1);
 
-			fclose(file);
-			rename("/tmp/zabbix_agentd.tmp2","/tmp/zabbix_agentd.tmp");
-		}
-		sleep(1);
 	}
+
+#else /* not WIN32 */
+
+	key_t	shm_key;
+	int	shm_id;
+
+//	shm_key = ftok("/tmp/zbxshm", (int)'z');
+        if( -1 == (shm_key = ftok(CONFIG_FILE, (int)'z') ))
+        {
+                zbx_error("Can not create IPC key for path '%s', try to create for path '.' [%s]", CONFIG_FILE, strerror(errno));
+                if( -1 == (shm_key = ftok(".", (int)'z') ))
+                {
+                        zbx_error("Can not create IPC key for path '.' [%s]", strerror(errno));
+                        return ZBX_MUTEX_ERROR;
+                }
+        }
+
+	shm_id = shmget(shm_key, sizeof(ZBX_COLLECTOR_DATA), IPC_CREAT | 0666);
+
+	if (-1 == shm_id)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Can't allocate shared memory for collector. [%s]",strerror(errno));
+		exit(1);
+	}
+
+	collector = shmat(shm_id, 0, 0);
+
+	if ((void*)(-1) == collector)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Can't attache shared memory for collector. [%s]",strerror(errno));
+		exit(1);
+	}
+
+#endif /* WIN32 */
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: free_collector_data                                              *
+ *                                                                            *
+ * Purpose: Free memory aloccated for collector                               *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: Linux version allocate memory as shared.                         *
+ *                                                                            *
+ ******************************************************************************/
+
+void	free_collector_data(void)
+{
+	if(NULL == collector) return;
+
+#if defined (WIN32)
+
+	free(collector);
+
+#else /* not WIN32 */
+
+	key_t	shm_key;
+	int	shm_id;
+
+	shm_key = ftok("/tmp/zbxshm", 'z');
+
+	shm_id = shmget(shm_key, sizeof(ZBX_COLLECTOR_DATA), 0);
+
+	if (-1 == shm_id)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Can't find shared memory for collector. [%s]",strerror(errno));
+		exit(1);
+	}
+
+	shmctl(shm_id, IPC_RMID, 0);
+
+#endif /* WIN32 */
+
+	collector = NULL;
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Function: collector_thread                                                 *
+ *                                                                            *
+ * Purpose: Collect system information                                        *
+ *                                                                            *
+ * Parameters:  args - skipped                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+
+ZBX_THREAD_ENTRY(collector_thread, args)
+{
+	zabbix_log( LOG_LEVEL_INFORMATION, "zabbix_agentd collector started");
+
+	init_cpu_collector(&(collector->cpus));
+
+	while(ZBX_IS_RUNNING)
+	{
+		collect_cpustat(&(collector->cpus));
+
+		collect_stats_interfaces(&(collector->interfaces));
+		collect_stats_diskdevices(&(collector->diskdevices));
+
+		zbx_sleep(1);
+	}
+
+	close_cpu_collector(&(collector->cpus));
+
+	zabbix_log( LOG_LEVEL_INFORMATION, "zabbix_agentd collector stopped");
+
+	ZBX_DO_EXIT();
+
+	zbx_tread_exit(0);
 }

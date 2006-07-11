@@ -97,8 +97,7 @@ static int get_disk_stat(const char *interface, struct disk_stat_s *result)
 
 	assert(result);
 
-	f=fopen(INFO_FILE_NAME,"r");
-	if(f)
+	if(NULL != (f = fopen(INFO_FILE_NAME,"r") ))
 	{
 		while(fgets(line,MAX_STRING_LEN,f) != NULL)
 		{
@@ -110,7 +109,7 @@ static int get_disk_stat(const char *interface, struct disk_stat_s *result)
 				break;
 			}
 		}
-		fclose(f);
+		zbx_fclose(f);
 	}
 
 	if(ret != SYSINFO_RET_OK)
@@ -137,12 +136,12 @@ int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
                 return SYSINFO_RET_FAIL;
         }
 
-        if(get_param(param, 1, devname, MAX_STRING_LEN) != 0)
+        if(get_param(param, 1, devname, sizeof(devname)) != 0)
         {
                 return SYSINFO_RET_FAIL;
         }
 	
-	if(get_param(param, 2, mode, MAX_STRING_LEN) != 0)
+	if(get_param(param, 2, mode, sizeof(mode)) != 0)
         {
                 mode[0] = '\0';
         }
@@ -150,7 +149,7 @@ int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
         if(mode[0] == '\0')
 	{
 		/* default parameter */
-		sprintf(mode, "sectors");
+		zbx_snprintf(mode, sizeof(mode), "sectors");
 	}
 	
 	ret = get_disk_stat(devname, &ds);
@@ -192,12 +191,12 @@ int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
                 return SYSINFO_RET_FAIL;
         }
 
-        if(get_param(param, 1, devname, MAX_STRING_LEN) != 0)
+        if(get_param(param, 1, devname, sizeof(devname)) != 0)
         {
                 return SYSINFO_RET_FAIL;
         }
 	
-	if(get_param(param, 2, mode, MAX_STRING_LEN) != 0)
+	if(get_param(param, 2, mode, sizeof(mode)) != 0)
         {
                 mode[0] = '\0';
         }
@@ -205,7 +204,7 @@ int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
         if(mode[0] == '\0')
 	{
 		/* default parameter */
-		sprintf(mode, "sectors");
+		zbx_snprintf(mode, sizeof(mode), "sectors");
 	}
 	
 	ret = get_disk_stat(devname, &ds);

@@ -26,7 +26,7 @@ static int	DISKREADOPS1(const char *cmd, const char *param, unsigned flags, AGEN
 {
 	char	key[MAX_STRING_LEN];
 
-	snprintf(key,sizeof(key)-1,"disk_read_ops1[%s]",param);
+	zbx_snprintf(key,sizeof(key),"disk_read_ops1[%s]",param);
 
 	return	get_stat(key, flags, result);
 }
@@ -35,7 +35,7 @@ static int	DISKREADOPS5(const char *cmd, const char *param, unsigned flags, AGEN
 {
 	char	key[MAX_STRING_LEN];
 
-	snprintf(key,sizeof(key)-1,"disk_read_ops5[%s]",param);
+	zbx_snprintf(key,sizeof(key),"disk_read_ops5[%s]",param);
 
 	return	get_stat(key, flags, result);
 }
@@ -44,7 +44,7 @@ static int	DISKREADOPS15(const char *cmd, const char *param, unsigned flags, AGE
 {
 	char	key[MAX_STRING_LEN];
 
-	snprintf(key,sizeof(key)-1,"disk_read_ops15[%s]",param);
+	zbx_snprintf(key,sizeof(key),"disk_read_ops15[%s]",param);
 
 	return	get_stat(key, flags, result);
 }
@@ -53,7 +53,7 @@ static int	DISKREADBLKS1(const char *cmd, const char *param, unsigned flags, AGE
 {
 	char	key[MAX_STRING_LEN];
 
-	snprintf(key,sizeof(key)-1,"disk_read_blks1[%s]",param);
+	zbx_snprintf(key,sizeof(key),"disk_read_blks1[%s]",param);
 
 	return	get_stat(key, flags, result);
 }
@@ -62,7 +62,7 @@ static int	DISKREADBLKS5(const char *cmd, const char *param, unsigned flags, AGE
 {
 	char	key[MAX_STRING_LEN];
 
-	snprintf(key,sizeof(key)-1,"disk_read_blks5[%s]",param);
+	zbx_snprintf(key,sizeof(key),"disk_read_blks5[%s]",param);
 
 	return	get_stat(key, flags, result);
 }
@@ -71,7 +71,7 @@ static int	DISKREADBLKS15(const char *cmd, const char *param, unsigned flags, AG
 {
 	char	key[MAX_STRING_LEN];
 
-	snprintf(key,sizeof(key)-1,"disk_read_blks15[%s]",param);
+	zbx_snprintf(key,sizeof(key),"disk_read_blks15[%s]",param);
 
 	return	get_stat(key, flags, result);
 }
@@ -80,7 +80,7 @@ static int	DISKWRITEOPS1(const char *cmd, const char *param, unsigned flags, AGE
 {
 	char	key[MAX_STRING_LEN];
 
-	snprintf(key,sizeof(key)-1,"disk_write_ops1[%s]",param);
+	zbx_snprintf(key,sizeof(key),"disk_write_ops1[%s]",param);
 
 	return	get_stat(key, flags, result);
 }
@@ -89,7 +89,7 @@ static int	DISKWRITEOPS5(const char *cmd, const char *param, unsigned flags, AGE
 {
 	char	key[MAX_STRING_LEN];
 
-	snprintf(key,sizeof(key)-1,"disk_write_ops5[%s]",param);
+	zbx_snprintf(key,sizeof(key),"disk_write_ops5[%s]",param);
 
 	return	get_stat(key, flags, result);
 }
@@ -98,7 +98,7 @@ static int	DISKWRITEOPS15(const char *cmd, const char *param, unsigned flags, AG
 {
 	char	key[MAX_STRING_LEN];
 
-	snprintf(key,sizeof(key)-1,"disk_write_ops15[%s]",param);
+	zbx_snprintf(key,sizeof(key),"disk_write_ops15[%s]",param);
 
 	return	get_stat(key, flags, result);
 }
@@ -107,7 +107,7 @@ static int	DISKWRITEBLKS1(const char *cmd, const char *param, unsigned flags, AG
 {
 	char	key[MAX_STRING_LEN];
 
-	snprintf(key,sizeof(key)-1,"disk_write_blks1[%s]",param);
+	zbx_snprintf(key,sizeof(key),"disk_write_blks1[%s]",param);
 
 	return	get_stat(key, flags, result);
 }
@@ -116,7 +116,7 @@ static int	DISKWRITEBLKS5(const char *cmd, const char *param, unsigned flags, AG
 {
 	char	key[MAX_STRING_LEN];
 
-	snprintf(key,sizeof(key)-1,"disk_write_blks5[%s]",param);
+	zbx_snprintf(key,sizeof(key),"disk_write_blks5[%s]",param);
 
 	return	get_stat(key, flags, result);
 }
@@ -125,7 +125,7 @@ static int	DISKWRITEBLKS15(const char *cmd, const char *param, unsigned flags, A
 {
 	char	key[MAX_STRING_LEN];
 
-	snprintf(key,sizeof(key)-1,"disk_write_blks15[%s]",param);
+	zbx_snprintf(key,sizeof(key),"disk_write_blks15[%s]",param);
 
 	return	get_stat(key, flags, result);
 }
@@ -166,19 +166,19 @@ DEV_FNCLIST
                 return SYSINFO_RET_FAIL;
         }
 
-        if(get_param(param, 1, devname, MAX_STRING_LEN) != 0)
+        if(get_param(param, 1, devname, sizeof(devname)) != 0)
         {
                 return SYSINFO_RET_FAIL;
         }
 	
-	if(get_param(param, 2, type, MAX_STRING_LEN) != 0)
+	if(get_param(param, 2, type, sizeof(type)) != 0)
         {
                 type[0] = '\0';
         }
         if(type[0] == '\0')
 	{
 		/* default parameter */
-		sprintf(type, "bps");
+		zbx_snprintf(type, sizeof(type), "bps");
 	}
 	
 	if(get_param(param, 3, mode, MAX_STRING_LEN) != 0)
@@ -189,7 +189,7 @@ DEV_FNCLIST
         if(mode[0] == '\0')
 	{
 		/* default parameter */
-		sprintf(mode, "avg1");
+		zbx_snprintf(mode, sizeof(mode), "avg1");
 	}
 	
 	for(i=0; fl[i].type!=0; i++)
@@ -242,22 +242,22 @@ DEV_FNCLIST
                 return SYSINFO_RET_FAIL;
         }
 
-        if(get_param(param, 1, devname, MAX_STRING_LEN) != 0)
+        if(get_param(param, 1, devname, sizeof(devname)) != 0)
         {
                 return SYSINFO_RET_FAIL;
         }
 	
-	if(get_param(param, 2, type, MAX_STRING_LEN) != 0)
+	if(get_param(param, 2, type, sizeof(type)) != 0)
         {
                 type[0] = '\0';
         }
         if(type[0] == '\0')
 	{
 		/* default parameter */
-		sprintf(type, "bps");
+		zbx_snprintf(type, sizeof(type) "bps");
 	}
 	
-	if(get_param(param, 3, mode, MAX_STRING_LEN) != 0)
+	if(get_param(param, 3, mode, sizeof(mode)) != 0)
         {
                 mode[0] = '\0';
         }
@@ -265,7 +265,7 @@ DEV_FNCLIST
         if(mode[0] == '\0')
 	{
 		/* default parameter */
-		sprintf(mode, "avg1");
+		zbx_snprintf(mode, sizeof(mode), "avg1");
 	}
 	
 	for(i=0; fl[i].type!=0; i++)

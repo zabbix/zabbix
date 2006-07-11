@@ -128,31 +128,31 @@ CPU_FNCLIST
                 return SYSINFO_RET_FAIL;
         }
 
-        if(get_param(param, 1, cpuname, MAX_STRING_LEN) != 0)
+        if(get_param(param, 1, cpuname, sizeof(type)) != 0)
         {
                 return SYSINFO_RET_FAIL;
         }
 	if(cpuname[0] == '\0')
 	{
 		/* default parameter */
-		sprintf(cpuname, "all");
+		zbx_snprintf(cpuname, sizeof(cpuname), "all");
 	}
 	if(strncmp(cpuname, "all", MAX_STRING_LEN))
 	{
 		return SYSINFO_RET_FAIL;
 	}
 	
-	if(get_param(param, 2, type, MAX_STRING_LEN) != 0)
+	if(get_param(param, 2, type, sizeof(type)) != 0)
         {
                 type[0] = '\0';
         }
         if(type[0] == '\0')
 	{
 		/* default parameter */
-		sprintf(type, "user");
+		zbx_snprintf(type, sizeof(type) "user");
 	}
 	
-	if(get_param(param, 3, mode, MAX_STRING_LEN) != 0)
+	if(get_param(param, 3, mode, sizeof(mode)) != 0)
         {
                 mode[0] = '\0';
         }
@@ -160,7 +160,7 @@ CPU_FNCLIST
         if(mode[0] == '\0')
 	{
 		/* default parameter */
-		sprintf(mode, "avg1");
+		zbx_snprintf(mode, sizeof(mode), "avg1");
 	}
 	
 	for(i=0; fl[i].type!=0; i++)
@@ -502,28 +502,28 @@ CPU_FNCLIST
                 return SYSINFO_RET_FAIL;
         }
 
-        if(get_param(param, 1, cpuname, MAX_STRING_LEN) != 0)
+        if(get_param(param, 1, cpuname, sizeof(mode)) != 0)
         {
                 return SYSINFO_RET_FAIL;
         }
 	if(cpuname[0] == '\0')
 	{
 		/* default parameter */
-		sprintf(cpuname, "all");
+		zbx_snprintf(cpuname, sizeof(cpuname), "all");
 	}
 	if(strncmp(cpuname, "all", MAX_STRING_LEN))
 	{
 		return SYSINFO_RET_FAIL;
 	}
 	
-	if(get_param(param, 2, mode, MAX_STRING_LEN) != 0)
+	if(get_param(param, 2, mode, sizeof(mode)) != 0)
         {
                 mode[0] = '\0';
         }
         if(mode[0] == '\0')
 	{
 		/* default parameter */
-		sprintf(mode, "avg1");
+		zbx_snprintf(mode, sizeof(mode), "avg1");
 	}
 	for(i=0; fl[i].mode!=0; i++)
 	{

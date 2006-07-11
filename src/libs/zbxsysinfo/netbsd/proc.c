@@ -143,8 +143,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
     
         if(stat(filename,&buf)==0)
         {
-            f=fopen(filename,"r");
-            if(f==NULL)
+            if( NULL == (f = fopen(filename,"r") ))
             {
                 continue;
             }
@@ -165,7 +164,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
             
                 if(proc_ok == 0) 
                 {
-                    fclose(f);
+                    zbx_fclose(f);
                     continue;
                 }
             }
@@ -260,7 +259,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
             }
             
                     
-            fclose(f);
+            zbx_fclose(f);
         }
     }
     closedir(dir);
@@ -400,8 +399,7 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
             if(stat(filename,&buf)==0)
             {
-                f=fopen(filename,"r");
-                if(f==NULL)
+                if(NULL == (f = fopen(filename,"r") ))
                 {
                     continue;
                 }
@@ -422,7 +420,7 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
                 
                     if(proc_ok == 0) 
                     {
-                        fclose(f);
+                        zbx_fclose(f);
                         continue;
                     }
                 }
@@ -490,7 +488,7 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
                     proccount++;
                 }
                 
-                fclose(f);
+                zbx_fclose(f);
             }
     }
     closedir(dir);

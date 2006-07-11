@@ -17,13 +17,10 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#include "config.h"
-
-#include <sys/wait.h>
-
 #include "common.h"
 #include "sysinfo.h"
 
+#include "alias.h"
 #include "md5.h"
 #include "log.h"
 
@@ -34,11 +31,6 @@ ZBX_METRIC	parameters_common[]=
 /*      KEY                     FLAG    FUNCTION        ADD_PARAM       TEST_PARAM */
 	{
 	{"system.localtime",	0,		SYSTEM_LOCALTIME,	0,	0},
-	{"vfs.file.exists",	CF_USEUPARAM,	VFS_FILE_EXISTS,	0,	"/etc/passwd"},
-	{"vfs.file.time",       CF_USEUPARAM,   VFS_FILE_TIME,          0,      "/etc/passwd,modify"},
-	{"vfs.file.size",	CF_USEUPARAM,	VFS_FILE_SIZE, 		0,	"/etc/passwd"},
-	{"vfs.file.regexp",	CF_USEUPARAM,	VFS_FILE_REGEXP,	0,	"/etc/passwd,root"},
-	{"vfs.file.regmatch",	CF_USEUPARAM,	VFS_FILE_REGMATCH, 	0,	"/etc/passwd,root"},
 	{"system.run",		CF_USEUPARAM,	RUN_COMMAND,	 	0,	"echo test"},
 	{"web.page.get",	CF_USEUPARAM,	WEB_PAGE_GET,	 	0,	"www.zabbix.com,,80"},
 	{"web.page.perf",	CF_USEUPARAM,	WEB_PAGE_PERF,	 	0,	"www.zabbix.com,,80"},
@@ -145,7 +137,7 @@ void	init_metrics()
 {
 	int 	i;
 
-	commands=malloc(sizeof(ZBX_METRIC));
+	commands = malloc(sizeof(ZBX_METRIC));
 	commands[0].key=NULL;
 
 	for(i=0;parameters_common[i].key!=0;i++)
@@ -232,27 +224,19 @@ int 	copy_result(AGENT_RESULT *src, AGENT_RESULT *dist)
 void	free_result(AGENT_RESULT *result)
 {
 
-	if(result->type & AR_STRING)
-	{
-		free(result->str);
-	}
-
-	if(result->type & AR_TEXT)
-	{
-		free(result->text);
-	}
-	
-	if(result->type & AR_MESSAGE)
-	{
-		free(result->msg);
-	}
+	UNSET_DBL_RESULT(result);
+	UNSET_UI64_RESULT(result);
+	UNSET_STR_RESULT(result);
+	UNSET_TEXT_RESULT(result);
+	UNSET_MSG_RESULT(result);
 
 	if(result->type & AR_LIST)
 	{
 		free_result_list(&(result->list));
+
+		result->type &= ~AR_LIST;
 	}
 
-	init_result(result);
 }
 
 void	init_result(AGENT_RESULT *result)
@@ -406,7 +390,7 @@ int	replace_param(const char *cmd, const char *param, char *out, int outlen)
 	{
 		pr[0] = '\0';
 		strncat(out, pl, outlen);
-		outlen -= MIN(strlen(pl), outlen);
+		outlen -= MIN((int)strlen(pl), (int)outlen);
 		pr[0] = '$';
 		
 		if (pr[1] >= '0' && pr[1] <= '9')
@@ -423,7 +407,7 @@ int	replace_param(const char *cmd, const char *param, char *out, int outlen)
 			}
 			
 			strncat(out, buf, outlen);
-			outlen -= MIN(strlen(buf), outlen);
+			outlen -= MIN((int)strlen(buf), (int)outlen);
 					
 			pl = pr + 2;
 			continue;
@@ -433,7 +417,7 @@ int	replace_param(const char *cmd, const char *param, char *out, int outlen)
 		outlen -= 1;
 	}
 	strncat(out, pl, outlen);
-	outlen -= MIN(strlen(pl), outlen);
+	outlen -= MIN((int)strlen(pl), (int)outlen);
 	
 	return ret;
 }
@@ -456,11 +440,12 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 		
 
         assert(result);
-        init_result(result);	
+        init_result(result);
 	
-	strncpy(usr_command, in_command, MAX_STRING_LEN);
+	alias_expand(in_command, usr_command, MAX_STRING_LEN);
+	
 	usr_command_len = strlen(usr_command);
-	
+
 	for( p=usr_command+usr_command_len-1; p>usr_command && ( *p=='\r' || *p =='\n' || *p == ' ' ); --p );
 
 	if( (p[1]=='\r') || (p[1]=='\n') || (p[1]==' '))
@@ -483,9 +468,9 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 		}
 	}
 
+	param[0] = '\0';	
 	if(function != 0)
 	{
-		param[0] = '\0';	
 		
 		if(commands[i].flags & CF_USEUPARAM)
 		{
@@ -509,7 +494,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 		}
 		else
 		{
-			snprintf(param, MAX_STRING_LEN, "%s", usr_param);
+			zbx_snprintf(param, sizeof(param), "%s", usr_param);
 		}
 
 		if(err != FAIL)
@@ -567,8 +552,9 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 
 int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	int	fd;
-	int	i,nr;
+	FILE	*file = NULL;
+	int	i;
+	size_t	nr;
 	struct stat	buf_stat;
 
         md5_state_t state;
@@ -605,24 +591,25 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		return	SYSINFO_RET_FAIL;
 	}
 
-	fd=open(filename,O_RDONLY);
-	if(fd == -1)
+	if(NULL == (file = fopen(filename,"r")))
 	{
 		return	SYSINFO_RET_FAIL;
 	}
 
         md5_init(&state);
-	while ((nr = read(fd, buf, sizeof(buf))) > 0)
+	while ((nr = fread(buf, (size_t)sizeof(buf), 1, file)) > 0)
 	{
-        	md5_append(&state,(const md5_byte_t *)buf,nr);
+        	md5_append(&state,(const md5_byte_t *)buf, nr);
 	}
         md5_finish(&state,(md5_byte_t *)hash);
 
-	close(fd);
+	zbx_fclose(file);
 
 /* Convert MD5 hash to text form */
 	for(i=0;i<MD5_DIGEST_SIZE;i++)
-		sprintf((char *)&hashText[i<<1],"%02x",hash[i]);
+	{
+		zbx_snprintf((char *)&hashText[i<<1], 2,"%02x",hash[i]);
+	}
 
 	SET_STR_RESULT(result, strdup((char*)hashText));
 
@@ -699,12 +686,14 @@ int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 {
 	register u_char *p;
 	register int nr;
+
 /*	AV Crashed under 64 platforms. Must be 32 bit! */
 /*	register u_long crc, len;*/
 	register uint32_t crc, len;
+
 	u_char buf[16 * 1024];
 	u_long cval, clen;
-	int	fd;
+	FILE	*f;
 	char	filename[MAX_STRING_LEN];
 
 	assert(result);
@@ -721,8 +710,7 @@ int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
                 return SYSINFO_RET_FAIL;
         }	
 		
-	fd=open(filename,O_RDONLY);
-	if(fd == -1)
+	if(NULL == (f = fopen(filename,"r")))
 	{
 		return	SYSINFO_RET_FAIL;
 	}
@@ -730,14 +718,14 @@ int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 #define	COMPUTE(var, ch)	(var) = (var) << 8 ^ crctab[(var) >> 24 ^ (ch)]
 
 	crc = len = 0;
-	while ((nr = read(fd, buf, sizeof(buf))) > 0)
+	while ((nr = fread(buf, sizeof(buf), 1, f)) > 0)
 	{
 		for( len += nr, p = buf; nr--; ++p)
 		{
 			COMPUTE(crc, *p);
 		}
 	}
-	close(fd);
+	zbx_fclose(f);
 	
 	if (nr < 0)
 	{
@@ -780,42 +768,45 @@ crc_buf2(p, clen, cval)
 
 int	get_stat(const char *key, unsigned flags, AGENT_RESULT *result)
 {
-	FILE	*f;
+	FILE	*f = NULL;
 	char	line[MAX_STRING_LEN];
 	char	name1[MAX_STRING_LEN];
 	char	name2[MAX_STRING_LEN];
+	int	ret = SYSINFO_RET_FAIL;
 
         assert(result);
 
         init_result(result);	
 
-	f=fopen("/tmp/zabbix_agentd.tmp","r");
-	if(f==NULL)
+	if(NULL == (f = fopen("/tmp/zabbix_agentd.tmp","r")))
 	{
 		return SYSINFO_RET_FAIL;
 	}
+
 	while(fgets(line,MAX_STRING_LEN,f))
 	{
 		if(sscanf(line,"%s %s\n",name1,name2)==2)
 		{
 			if(strcmp(name1,key) == 0)
 			{
-				fclose(f);
 				SET_UI64_RESULT(result, atoi(name2));
-				return SYSINFO_RET_OK;
+				ret = SYSINFO_RET_OK;
+				break;
 			}
 		}
 
 	}
-	fclose(f);
-	return SYSINFO_RET_FAIL;
+
+	zbx_fclose(f);
+
+	return ret;
 }
 
 int	NET_IF_IBYTES1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	key[MAX_STRING_LEN];
 
-	snprintf(key,sizeof(key)-1,"netloadin1[%s]",param);
+	zbx_snprintf(key,sizeof(key),"netloadin1[%s]",param);
 
 	return	get_stat(key, flags, result);
 }
@@ -824,7 +815,7 @@ int	NET_IF_IBYTES5(const char *cmd, const char *param, unsigned flags, AGENT_RES
 {
 	char	key[MAX_STRING_LEN];
 
-	snprintf(key,sizeof(key)-1,"netloadin5[%s]",param);
+	zbx_snprintf(key,sizeof(key),"netloadin5[%s]",param);
 
 	return	get_stat(key, flags, result);
 }
@@ -833,7 +824,7 @@ int	NET_IF_IBYTES15(const char *cmd, const char *param, unsigned flags, AGENT_RE
 {
 	char	key[MAX_STRING_LEN];
 
-	snprintf(key,sizeof(key)-1,"netloadin15[%s]",param);
+	zbx_snprintf(key,sizeof(key),"netloadin15[%s]",param);
 
 	return	get_stat(key, flags, result);
 }
@@ -842,7 +833,7 @@ int	NET_IF_OBYTES1(const char *cmd, const char *param, unsigned flags, AGENT_RES
 {
 	char	key[MAX_STRING_LEN];
 
-	snprintf(key,sizeof(key)-1,"netloadout1[%s]",param);
+	zbx_snprintf(key,sizeof(key),"netloadout1[%s]",param);
 
 	return	get_stat(key, flags, result);
 }
@@ -851,7 +842,7 @@ int	NET_IF_OBYTES5(const char *cmd, const char *param, unsigned flags, AGENT_RES
 {
 	char	key[MAX_STRING_LEN];
 
-	snprintf(key,sizeof(key)-1,"netloadout5[%s]",param);
+	zbx_snprintf(key,sizeof(key),"netloadout5[%s]",param);
 
 	return	get_stat(key, flags, result);
 }
@@ -860,7 +851,7 @@ int	NET_IF_OBYTES15(const char *cmd, const char *param, unsigned flags, AGENT_RE
 {
 	char	key[MAX_STRING_LEN];
 
-	snprintf(key,sizeof(key)-1,"netloadout15[%s]",param);
+	zbx_snprintf(key,sizeof(key),"netloadout15[%s]",param);
 
 	return	get_stat(key, flags, result);
 }
@@ -868,10 +859,11 @@ int	NET_IF_OBYTES15(const char *cmd, const char *param, unsigned flags, AGENT_RE
 int	TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef HAVE_PROC
-	FILE	*f;
+	FILE	*f = NULL;
 	char	c[MAX_STRING_LEN];
 	char	porthex[MAX_STRING_LEN];
 	char	pattern[MAX_STRING_LEN];
+	int	ret = SYSINFO_RET_FAIL;
 
         assert(result);
 
@@ -890,26 +882,25 @@ int	TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 	strscpy(pattern,porthex);
 	strncat(pattern," 00000000:0000 0A", MAX_STRING_LEN);
 
-	f=fopen("/proc/net/tcp","r");
-	if(NULL == f)
+	if(NULL == (f = fopen("/proc/net/tcp","r")))
 	{
 		return	SYSINFO_RET_FAIL;
 	}
 
-	while (NULL!=fgets(c,MAX_STRING_LEN,f))
+	while (NULL != fgets(c,MAX_STRING_LEN,f))
 	{
 		if(NULL != strstr(c,pattern))
 		{
-			fclose(f);
 			SET_UI64_RESULT(result, 1);
-			return SYSINFO_RET_OK;
+			ret = SYSINFO_RET_OK;
+			break;
 		}
 	}
-	fclose(f);
+	zbx_fclose(f);
 
 	SET_UI64_RESULT(result, 0);
 	
-	return SYSINFO_RET_OK;
+	return ret;
 #else
 	return	SYSINFO_RET_FAIL;
 #endif
@@ -928,21 +919,23 @@ int	getPROC(char *file, int lineno, int fieldno, unsigned flags, AGENT_RESULT *r
 
         init_result(result);	
 		
-	f=fopen(file,"r");
-	if(NULL == f)
+	if(NULL == (f = fopen(file,"r")))
 	{
 		return	SYSINFO_RET_FAIL;
 	}
-	for(i=1;i<=lineno;i++)
+
+	for(i=1; i<=lineno; i++)
 	{	
 		fgets(c,MAX_STRING_LEN,f);
 	}
+
 	t=(char *)strtok(c," ");
-	for(i=2;i<=fieldno;i++)
+	for(i=2; i<=fieldno; i++)
 	{
 		t=(char *)strtok(NULL," ");
 	}
-	fclose(f);
+
+	zbx_fclose(f);
 
 	sscanf(t, "%lf", &value);
 	SET_DBL_RESULT(result, value);
@@ -1064,17 +1057,18 @@ int	PROCCOUNT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 
 		if(stat(filename,&buf)==0)
 		{
-			f=fopen(filename,"r");
-			if(f==NULL)
+			if(NULL == (f = fopen(filename,"r")))
 			{
 				continue;
 			}
+
 			/* This check can be skipped. No need to read anything from this file. */
 			if(NULL != fgets(line,MAX_STRING_LEN,f))
 			{
 				proccount++;
 			}
-			fclose(f);
+
+			zbx_fclose(f);
 		}
 	}
 	closedir(dir);
@@ -1135,8 +1129,22 @@ int     OLD_VERSION(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
+
+#if defined(WIN32)
+
+	STARTUPINFO si = {0};
+	PROCESS_INFORMATION pi = {0};
+	SECURITY_ATTRIBUTES sa;
+	HANDLE hOutput;
+	char szTempPath[MAX_PATH],szTempFile[MAX_PATH];
+
+#else /* not WIN32 */
+
 	FILE	*f;
-	char	c[MAX_STRING_LEN];
+
+#endif /* WIN32 */
+
+	char	cmd_result[MAX_STRING_LEN];
 	char	command[MAX_STRING_LEN];
 	int	i,len;
 
@@ -1144,22 +1152,74 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
         init_result(result);
 	
-	strncpy(command, param, MAX_STRING_LEN);
-	
-	f=popen(command,"r");
-	if(f==0)
+	strsncpy(command, param, MAX_STRING_LEN);
+	memset(cmd_result, 0, MAX_STRING_LEN);
+
+#if defined(WIN32)
+
+	// Create temporary file to hold process output
+	GetTempPath( MAX_PATH-1,	szTempPath);
+	GetTempFileName( szTempPath, "zbx", 0, szTempFile);
+
+	sa.nLength		= sizeof(SECURITY_ATTRIBUTES);
+	sa.lpSecurityDescriptor	= NULL;
+	sa.bInheritHandle	= TRUE;
+
+	if(INVALID_HANDLE_VALUE == (hOutput = CreateFile(
+		szTempFile,
+		GENERIC_READ | GENERIC_WRITE,
+		0,
+		&sa,
+		CREATE_ALWAYS,
+		FILE_ATTRIBUTE_TEMPORARY,
+		NULL)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Unable to create temporary file: '%s' [%s]", szTempFile, strerror_from_system(GetLastError()));
+		return SYSINFO_RET_FAIL;
+	}
+
+	// Fill in process startup info structure
+	memset(&si,0,sizeof(STARTUPINFO));
+	si.cb		= sizeof(STARTUPINFO);
+	si.dwFlags	= STARTF_USESTDHANDLES;
+	si.hStdInput	= GetStdHandle(STD_INPUT_HANDLE);
+	si.hStdOutput	= hOutput;
+	si.hStdError	= GetStdHandle(STD_ERROR_HANDLE);
+
+	// Create new process
+	if (!CreateProcess(NULL,command,NULL,NULL,TRUE,0,NULL,NULL,&si,&pi))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Unable to create process: '%s' [%s]", command, strerror_from_system(GetLastError()));
+		return SYSINFO_RET_FAIL;
+	}
+
+	// Wait for process termination and close all handles
+	WaitForSingleObject(pi.hProcess,INFINITE);
+	CloseHandle(pi.hThread);
+	CloseHandle(pi.hProcess);
+
+	// Rewind temporary file for reading
+	SetFilePointer(hOutput,0,NULL,FILE_BEGIN);
+
+	// Read process output
+	ReadFile(hOutput, cmd_result, MAX_STRING_LEN-1, &len, NULL);
+
+	cmd_result[len] = '\0';
+
+#else /* not WIN32 */
+
+	if(0 == (f = popen(command,"r")))
 	{
 		switch (errno)
 		{
 			case	EINTR:
-/* (char *) to avoid compiler warning */
 				return SYSINFO_RET_TIMEOUT;
 			default:
 				return SYSINFO_RET_FAIL;
 		}
 	}
 
-	len = fread(c, 1, MAX_STRING_LEN-1, f);
+	len = fread(cmd_result, 1, MAX_STRING_LEN-1, f);
 
 	if(0 != ferror(f))
 	{
@@ -1167,7 +1227,6 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		{
 			case	EINTR:
 				pclose(f);
-/* (char *) to avoid compiler warning */
 				return SYSINFO_RET_TIMEOUT;
 			default:
 				pclose(f);
@@ -1175,112 +1234,80 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		}
 	}
 
-	c[len]=0;
+	cmd_result[len] = '\0';
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Run remote command [%s] Result [%d] [%s]", command, strlen(c), c);
+	zabbix_log(LOG_LEVEL_DEBUG, "Run remote command [%s] Result [%d] [%s]", command, strlen(cmd_result), cmd_result);
 
 	if(pclose(f) != 0)
 	{
 		switch (errno)
 		{
 			case	EINTR:
-/* (char *) to avoid compiler warning */
 				return SYSINFO_RET_TIMEOUT;
 			default:
 				return SYSINFO_RET_FAIL;
 		}
 	}
 
+#endif /* WIN32 */
+
 	/* We got EOL only */
-	if(c[0] == '\n')
+	if(cmd_result[0] == '\n')
 	{
 		return SYSINFO_RET_FAIL;
 	}
-	
-	for(i=strlen(c); i>0; i--)
+
+	for(i = len-1; i >= 0 && (cmd_result[i] == '\n' || cmd_result[i] == '\r' || cmd_result[i] == '\0'); i++)
 	{
-		if(c[i] == '\n')
-		{
-			c[i] = '\0';
-			break;
-		}
+		cmd_result[i] = '\0';
 	}
-	
-	SET_TEXT_RESULT(result, strdup(c));
-	
+
+	SET_TEXT_RESULT(result, strdup(cmd_result));
+
 	return	SYSINFO_RET_OK;
+
 }
 
-int	EXECUTE(const char *cmd, const char *command, unsigned flags, AGENT_RESULT *result)
+int	EXECUTE_INT(const char *cmd, const char *command, unsigned flags, AGENT_RESULT *result)
 {
-	FILE	*f;
-	char	c[MAX_STRING_LEN];
-	double	value = 0;
+	int	ret	= SYSINFO_RET_FAIL;
+	double	value	= 0;
 
-        assert(result);
+	ret = EXECUTE_STR(cmd,command,flags,result);
 
-	init_result(result);
-		
-	f=popen( command,"r");
-	if(f==0)
+	if(SYSINFO_RET_OK == ret)
 	{
-		switch (errno)
-		{
-			case	EINTR:
-				return SYSINFO_RET_TIMEOUT;
-			default:
-				return SYSINFO_RET_FAIL;
-		}
+		sscanf(result->text, "%lf", &value);
+
+		UNSET_TEXT_RESULT(result);
+
+		SET_DBL_RESULT(result, value);
 	}
 
-	if(NULL == fgets(c,MAX_STRING_LEN,f))
-	{
-		pclose(f);
-		switch (errno)
-		{
-			case	EINTR:
-				return SYSINFO_RET_TIMEOUT;
-			default:
-				return SYSINFO_RET_FAIL;
-		}
-	}
-
-	if(pclose(f) != 0)
-	{
-		switch (errno)
-		{
-			case	EINTR:
-				return SYSINFO_RET_TIMEOUT;
-			default:
-				return SYSINFO_RET_FAIL;
-		}
-	}
-
-	/* We got EOL only */
-	if(c[0] == '\n')
-	{
-		return SYSINFO_RET_FAIL;
-	}
-
-	sscanf(c, "%lf", &value);
-	SET_DBL_RESULT(result, value);
-
-	return	SYSINFO_RET_OK;
+	return ret;
 }
 
 int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	char	command[MAX_STRING_LEN];
 #define MAX_FLAG_LEN 10
+
+	char	command[MAX_STRING_LEN];
 	char	flag[MAX_FLAG_LEN];
+
+#if defined (WIN32)
+	STARTUPINFO    si;
+	PROCESS_INFORMATION  pi;
+
+	char	full_command[MAX_STRING_LEN];
+#else /* not WIN32 */
 	pid_t	pid;
+#endif
+
 	
         assert(result);
 
 	init_result(result);
 	
-
-zabbix_log(LOG_LEVEL_WARNING, "RUN_COMMAND cmd = '%s'",cmd);
 
 	if(CONFIG_ENABLE_REMOTE_COMMANDS != 1)
 	{
@@ -1293,7 +1320,7 @@ zabbix_log(LOG_LEVEL_WARNING, "RUN_COMMAND cmd = '%s'",cmd);
                 return SYSINFO_RET_FAIL;
         }
         
-	if(get_param(param, 1, command, MAX_STRING_LEN) != 0)
+	if(get_param(param, 1, command, sizeof(command)) != 0)
         {
                 return SYSINFO_RET_FAIL;
         }
@@ -1302,21 +1329,22 @@ zabbix_log(LOG_LEVEL_WARNING, "RUN_COMMAND cmd = '%s'",cmd);
 	{
 		return SYSINFO_RET_FAIL;
 	}
+
+	zabbix_log(LOG_LEVEL_WARNING, "Run command '%s'",command);
 	
-	if(get_param(param, 2, flag, MAX_FLAG_LEN) != 0)
+	if(get_param(param, 2, flag, sizeof(flag)) != 0)
         {
                 flag[0] = '\0';
         }
 
 	if(flag[0] == '\0')
 	{
-		snprintf(flag,MAX_FLAG_LEN,"wait");
+		zbx_snprintf(flag,sizeof(flag),"wait");
 	}
 
-zabbix_log(LOG_LEVEL_WARNING, "RUN_COMMAND flag = '%s'",flag);
 	if(strcmp(flag,"wait") == 0)
 	{
-zabbix_log(LOG_LEVEL_WARNING, "RUN_COMMAND runed as WAIT",flag);
+zabbix_log(LOG_LEVEL_WARNING, "Run wait command '%s'",command); // TMP!!!
 		return EXECUTE_STR(cmd,command,flags,result);
 	}
 	else if(strcmp(flag,"nowait") != 0)
@@ -1324,15 +1352,39 @@ zabbix_log(LOG_LEVEL_WARNING, "RUN_COMMAND runed as WAIT",flag);
 		return SYSINFO_RET_FAIL;
 	}
 	
-	zabbix_log(LOG_LEVEL_DEBUG, "Run remote command '%s'", command);
+#if defined(WIN32)
+
+	zbx_snprintf(full_command, sizeof(full_command), "cmd /C \"%s\"", command);
+
+	GetStartupInfo(&si);
+
+	zabbix_log(LOG_LEVEL_WARNING, "Execute command '%s'",full_command);
+
+	if(!CreateProcess(
+		NULL,	// No module name (use command line)
+		full_command,// Name of app to launch
+		NULL,	// Default process security attributes
+		NULL,	// Default thread security attributes
+		FALSE,	// Don't inherit handles from the parent
+		0,	// Normal priority
+		NULL,	// Use the same environment as the parent
+		NULL,	// Launch in the current directory
+		&si,	// Startup Information
+		&pi))	// Process information stored upon return
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+
+#else /* not WIN32 */
 	
-zabbix_log(LOG_LEVEL_WARNING, "RUN_COMMAND runed as NOWAIT",flag);
-	
+zabbix_log(LOG_LEVEL_WARNING, "Run nowait command '%s'",command); // TMP!!!
+
 	pid = fork(); /* run new thread 1 */
 	switch(pid)
 	{
 	case -1:
-		zabbix_log(LOG_LEVEL_WARNING, "fork failed for '%s'",command);
+		zabbix_log(LOG_LEVEL_WARNING, "fork failed for command '%s'",command);
 		return SYSINFO_RET_FAIL;
 	case 0:
 		pid = fork(); /* run new tread 2 to replace by command */
@@ -1343,7 +1395,7 @@ zabbix_log(LOG_LEVEL_WARNING, "RUN_COMMAND runed as NOWAIT",flag);
 			return SYSINFO_RET_FAIL;
 		case 0:
 			/* 
-			 * DON'T REMVE SLEEP
+			 * DON'T REMOVE SLEEP
 			 * sleep needed to return server result as "1"
 			 * then we can run "execl"
 			 * otherwise command print result into socket with STDOUT id
@@ -1354,8 +1406,7 @@ zabbix_log(LOG_LEVEL_WARNING, "RUN_COMMAND runed as NOWAIT",flag);
 			/* replace thread 2 by the execution of command */
 			if(execl("/bin/sh", "sh", "-c", command, (char *)0))
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "execl failed for '%s'",command);
-				exit(1);
+				zabbix_log(LOG_LEVEL_WARNING, "execl failed for command '%s'",command);
 			}
 			/* In normal case the program will never reach this point */
 			exit(0);
@@ -1369,12 +1420,15 @@ zabbix_log(LOG_LEVEL_WARNING, "RUN_COMMAND runed as NOWAIT",flag);
 		break;
 	}
 
+#endif /* WIN32 */
+
 	SET_UI64_RESULT(result, 1);
 	
 	return	SYSINFO_RET_OK;
 }
 int	forward_request(char *proxy, char *command, int port, unsigned flags, AGENT_RESULT *result)
 {
+#ifdef TODO /* TODO !!! */
 	char	*haddr;
 	char	c[1024];
 	
@@ -1435,8 +1489,10 @@ int	forward_request(char *proxy, char *command, int port, unsigned flags, AGENT_
 	close(s);
 	
 	SET_STR_RESULT(result, strdup(c));
-
 	return	SYSINFO_RET_OK;
+#endif /* TODO */
+
+	return SYSINFO_RET_FAIL;
 }
 
 
@@ -1446,6 +1502,8 @@ int	forward_request(char *proxy, char *command, int port, unsigned flags, AGENT_
  * */
 int	tcp_expect(char	*hostname, short port, char *request,char *expect,char *sendtoclose, int *value_int)
 {
+#ifdef TODO /* TODO !!! */
+
 	char	*haddr;
 	char	c[1024];
 	
@@ -1508,13 +1566,14 @@ int	tcp_expect(char	*hostname, short port, char *request,char *expect,char *send
 		*value_int = 1;
 		return SYSINFO_RET_OK;
 	}
-	else
-	{
-		send(s,sendtoclose,strlen(sendtoclose),0);
-		close(s);
-		*value_int = 0;
-		return SYSINFO_RET_OK;
-	}
+	send(s,sendtoclose,strlen(sendtoclose),0);
+	close(s);
+	*value_int = 0;
+
+	return SYSINFO_RET_OK;
+#endif /* TODO */
+
+	return SYSINFO_RET_FAIL;
 }
 
 #ifdef HAVE_LDAP
@@ -1585,6 +1644,7 @@ int    check_ldap(char *hostname, short port, int *value_int)
  * */
 int	check_ssh(char	*hostname, short port, int *value_int)
 {
+#ifdef TODO /* TODO !!! */
 	char	*haddr;
 	char	c[MAX_STRING_LEN];
 	char	out[MAX_STRING_LEN];
@@ -1639,7 +1699,7 @@ int	check_ssh(char	*hostname, short port, int *value_int)
 
 /*		printf("[%s] [%s]\n",ssh_proto, ssh_server);*/
 
-		snprintf(out,sizeof(out)-1,"SSH-%s-%s\r\n", ssh_proto, "zabbix_agent");
+		zbx_snprintf(out,sizeof(out),"SSH-%s-%s\r\n", ssh_proto, "zabbix_agent");
 		send(s,out,strlen(out),0);
 
 /*		printf("[%s]\n",out);*/
@@ -1652,13 +1712,20 @@ int	check_ssh(char	*hostname, short port, int *value_int)
 	send(s,"0\n",2,0);
 	close(s);
 	*value_int = 0;
+
 	return	SYSINFO_RET_OK;
+
+#endif /* TODO */
+
+	return	SYSINFO_RET_FAIL;
 }
 
 /* Example check_service[ssh], check_service[smtp,29],check_service[ssh,127.0.0.1,22]*/
 /* check_service[ssh,127.0.0.1,ssh] */
 int	CHECK_SERVICE_PERF(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
+#ifdef TODO /* TODO !!! */
+
 	int	port=0;
 	char	service[MAX_STRING_LEN];
 	char	ip[MAX_STRING_LEN];
@@ -1782,19 +1849,23 @@ int	CHECK_SERVICE_PERF(const char *cmd, const char *param, unsigned flags, AGENT
 	SET_DBL_RESULT(result, 0.0);
 
 	return SYSINFO_RET_OK;
+
+#endif /* TODO */
+
+	return SYSINFO_RET_FAIL;
 }
 
 /* Example check_service[ssh], check_service[smtp,29],check_service[ssh,127.0.0.1,22]*/
 /* check_service[ssh,127.0.0.1,ssh] */
 int	CHECK_SERVICE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	int	port=0;
+	short	port=0;
 	char	service[MAX_STRING_LEN];
 	char	ip[MAX_STRING_LEN];
 	char	str_port[MAX_STRING_LEN];
 
 	int	ret;
-	int	value_int;
+	int	value_int = 0;
 
         assert(result);
 
@@ -1897,14 +1968,17 @@ int	CHECK_SERVICE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 		return SYSINFO_RET_FAIL;
 	}
 
-	SET_UI64_RESULT(result, value_int);
+	if(SYSINFO_RET_OK == ret)
+	{
+		SET_UI64_RESULT(result, value_int);
+	}
 
 	return ret;
 }
 
 int	CHECK_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	int	port=0;
+	short	port=0;
 	int	value_int;
 	int	ret;
 	char	ip[MAX_STRING_LEN];
@@ -1954,6 +2028,7 @@ int	CHECK_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 
 int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
+#ifdef TODO /* TODO !!! */
 	int	res;
 	char	ip[MAX_STRING_LEN];
 	char	zone[MAX_STRING_LEN];
@@ -2027,6 +2102,10 @@ int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	SET_UI64_RESULT(result, res != -1 ? 1 : 0);
 
 	return SYSINFO_RET_OK;
+
+#endif /* TODO */
+
+	return SYSINFO_RET_FAIL;
 }
 
 int     SYSTEM_UNUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -2035,25 +2114,7 @@ int     SYSTEM_UNUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
         init_result(result);
 
-        return EXECUTE(cmd, "who|wc -l", flags, result);
-}
-
-int     SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-        assert(result);
-
-        init_result(result);
-
-        return EXECUTE_STR(cmd, "uname -a", flags, result);
-}
-
-int     SYSTEM_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-        assert(result);
-
-        init_result(result);
-
-        return EXECUTE_STR(cmd, "hostname", flags, result);
+        return EXECUTE_INT(cmd, "who|wc -l", flags, result);
 }
 
 int     OLD_SYSTEM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -2081,7 +2142,7 @@ int     OLD_SYSTEM(const char *cmd, const char *param, unsigned flags, AGENT_RES
         }
         else if(strcmp(key,"procrunning") == 0)
         {
-                ret = EXECUTE(cmd, "cat /proc/loadavg|cut -f1 -d'/'|cut -f4 -d' '", flags, result);
+                ret = EXECUTE_INT(cmd, "cat /proc/loadavg|cut -f1 -d'/'|cut -f4 -d' '", flags, result);
         }
         else if(strcmp(key,"uptime") == 0)
         {

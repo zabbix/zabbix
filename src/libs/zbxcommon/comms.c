@@ -1,8 +1,25 @@
-#include <string.h>
-#include <stdio.h>
+/* 
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+**/
 
 #include "common.h"
 #include "log.h"
+#include "base64.h"
 
 int	comms_create_request(char *host, char *key, char *data, char *lastlogsize, char *request,int maxlen)
 {
@@ -27,11 +44,11 @@ int	comms_create_request(char *host, char *key, char *data, char *lastlogsize, c
 
 	if(lastlogsize[0]==0)
 	{
-		snprintf(request,maxlen,"<req><host>%s</host><key>%s</key><data>%s</data></req>",host_b64,key_b64,data_b64);
+		zbx_snprintf(request,maxlen,"<req><host>%s</host><key>%s</key><data>%s</data></req>",host_b64,key_b64,data_b64);
 	}
 	else
 	{
-		snprintf(request,maxlen,"<req><host>%s</host><key>%s</key><data>%s</data><lastlogsize>%s</lastlogsize></req>",host_b64,key_b64,data_b64,lastlogsize_b64);
+		zbx_snprintf(request,maxlen,"<req><host>%s</host><key>%s</key><data>%s</data><lastlogsize>%s</lastlogsize></req>",host_b64,key_b64,data_b64,lastlogsize_b64);
 	}
 
 	return ret;
