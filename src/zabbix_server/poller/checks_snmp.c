@@ -85,8 +85,10 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 	#ifdef NEW_APPROACH
 		snprintf(temp,sizeof(temp)-1,"%s:%d", item->ip, item->snmp_port);
 		session.peername = temp;
+		session.remote_port = item->snmp_port;
 	#else
 		session.peername = item->ip;
+		session.remote_port = item->snmp_port;
 	#endif
 	}
 	else
@@ -94,8 +96,10 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 	#ifdef NEW_APPROACH
 		snprintf(temp, sizeof(temp)-1, "%s:%d", item->host, item->snmp_port);
 		session.peername = temp;
+		session.remote_port = item->snmp_port;
 	#else
 		session.peername = item->host;
+		session.remote_port = item->snmp_port;
 	#endif
 	}
 
@@ -211,7 +215,9 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMP() 0.2");
 
 	pdu = snmp_pdu_create(SNMP_MSG_GET);
-	read_objid(item->snmp_oid, anOID, &anOID_len);
+/* Changed to snmp_parse_oid */
+/* read_objid(item->snmp_oid, anOID, &anOID_len);*/
+	snmp_parse_oid(item->snmp_oid, anOID, &anOID_len);
 
 #if OTHER_METHODS
 	get_node("sysDescr.0", anOID, &anOID_len);
