@@ -1,5 +1,6 @@
 Changes for 1.1.1:
 
+ - fixed database data to get rid of zero multiplier for disk spaces (Alexei)
  - misc fixes for WEB frontend (Alexei)
  - fixed srv_status.php: Cannot use object of type CLink ... (Alexei)
  - added removal of stat file on agent shutdown (Alexei)
