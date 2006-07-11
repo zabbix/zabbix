@@ -1,5 +1,6 @@
 Changes for 1.1.1:
 
+ - fixed srv_status.php: Cannot use object of type CLink ... (Alexei)
  - added removal of stat file on agent shutdown (Alexei)
  - added new parameter StatFile to ZABBIX config file (Alexei)
  - fixed processing of web.page.get and long data sent by agent (Alexei)
