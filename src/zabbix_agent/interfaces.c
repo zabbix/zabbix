@@ -17,7 +17,21 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#include "config.h"
+#include "common.h"
+#include "interfaces.h"
+
+
+void	collect_stats_interfaces(ZBX_INTERFACES_DATA *pinterfaces)
+{
+#if defined(TODO)
+#error "Realize function"
+#endif
+}
+
+
+#if 0 && (!defined(WIN32) || (defined(TODO) && defined(WIN32)))
+
+//TODO!!! Make same as cpustat.c
 
 #include <netdb.h>
 
@@ -50,7 +64,6 @@
 /* Required for getpwuid */
 #include <pwd.h>
 
-#include "common.h"
 #include "sysinfo.h"
 #include "security.h"
 #include "zabbix_agent.h"
@@ -106,10 +119,9 @@ void	init_stats_interfaces()
 		}
 	}
 
-	file=fopen("/proc/net/dev","r");
-	if(NULL == file)
+	if( NULL == (file = fopen("/proc/net/dev","r") ))
 	{
-		fprintf(stderr, "Cannot open config file [%s] [%s]\n","/proc/net/dev", strerror(errno));
+		zbx_error("Cannot open statistic file [%s] [%s].","/proc/net/dev", strerror(errno));
 		return;
 	}
 	i=0;
@@ -132,7 +144,7 @@ void	init_stats_interfaces()
 		i++;
 	}
 
-	fclose(file);
+	zbx_fclose(file);
 }
 
 void	report_stats_interfaces(FILE *file, int now)
@@ -343,10 +355,9 @@ void	collect_stats_interfaces(FILE *outfile)
 
 	now=time(NULL);
 
-	file=fopen("/proc/net/dev","r");
-	if(NULL == file)
+	if(NULL == (file = fopen("/proc/net/dev","r") ))
 	{
-		fprintf(stderr, "Cannot open config file [%s] [%s]\n","/proc/net/dev", strerror(errno));
+		zbx_error("Cannot open statistic file [%s] [%s].","/proc/net/dev", strerror(errno));
 		return;
 	}
 
@@ -388,9 +399,12 @@ void	collect_stats_interfaces(FILE *outfile)
 		}
 		i++;
 	}
-	fclose(file);
+	zbx_fclose(file);
 
 	report_stats_interfaces(outfile, now);
 
 #endif /* HAVE_PROC_NET_DEV */
 }
+
+#endif /* TODO */
+

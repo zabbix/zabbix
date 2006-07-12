@@ -138,15 +138,14 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
     /* Better approach: check if /proc/x/ is symbolic link */
         if(strncmp(entries->d_name,"self",MAX_STRING_LEN) == 0)
         {
-            continue;
+            continue; /* readdir */
         }
     
         if(stat(filename,&buf)==0)
         {
-            f=fopen(filename,"r");
-            if(f==NULL)
+            if(NULL == (f = fopen(filename,"r")))
             {
-                continue;
+                continue; /* readdir */
             }
     
             if(procname[0] != 0)
@@ -165,8 +164,8 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
             
                 if(proc_ok == 0) 
                 {
-                    fclose(f);
-                    continue;
+                    zbx_fclose(f);
+                    continue; /* readdir */
                 }
             }
             else
@@ -181,12 +180,12 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
                 
                     if(sscanf(line, "%s\t%lli\n", name1, &llvalue) != 2)
                     {
-                        continue;
+                        continue; /* fgets */
                     }
                     
                     if(strcmp(name1,"Uid:") != 0)
                     {
-                        continue;
+                        continue; /* fgets */
                     }
                     
                     if(usrinfo->pw_uid == (uid_t)(llvalue))
@@ -208,12 +207,12 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
                 
                     if(sscanf(line, "%s\t%lli %s\n", name1, &llvalue, name2) != 3)
                     {
-                        continue;
+                        continue; /* fgets */
                     }
                     
                     if(strcmp(name1,"VmSize:") != 0)
                     {
-                        continue;
+                        continue; /* fgets */
                     }
                     
                     proccount++;
@@ -259,8 +258,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
                 }
             }
             
-                    
-            fclose(f);
+            zbx_fclose(f);
         }
     }
     closedir(dir);
@@ -391,7 +389,7 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 /* Better approach: check if /proc/x/ is symbolic link */
             if(strncmp(entries->d_name,"self",MAX_STRING_LEN) == 0)
             {
-                continue;
+                continue; /* readdir */
             }
 
             strscpy(filename,"/proc/");	
@@ -400,10 +398,9 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
             if(stat(filename,&buf)==0)
             {
-                f=fopen(filename,"r");
-                if(f==NULL)
+                if( NULL == (f = fopen(filename,"r")))
                 {
-                    continue;
+                    continue; /* readdir */
                 }
     
                 if(procname[0] != 0)
@@ -422,8 +419,8 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
                 
                     if(proc_ok == 0) 
                     {
-                        fclose(f);
-                        continue;
+                        zbx_fclose(f);
+                        continue; /* readdir */
                     }
                 }
                 else
@@ -438,12 +435,12 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
                     
                         if(sscanf(line, "%s\t%s\n", name1, name2) != 2)
                         {
-                            continue;
+                            continue; /* fgets */
                         }
                         
                         if(strcmp(name1,"State:") != 0)
                         {
-                            continue;
+                            continue; /* fgets */
                         }
                         
                         if(strcmp(name2, procstat))
@@ -465,12 +462,12 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
                     
                         if(sscanf(line, "%s\t%li\n", name1, &lvalue) != 2)
                         {
-                            continue;
+                            continue; /* fgets */
                         }
                         
                         if(strcmp(name1,"Uid:") != 0)
                         {
-                            continue;
+                            continue; /* fgets */
                         }
                         
                         if(usrinfo->pw_uid == (uid_t)(lvalue))
@@ -490,7 +487,7 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
                     proccount++;
                 }
                 
-                fclose(f);
+                zbx_fclose(f);
             }
     }
     closedir(dir);

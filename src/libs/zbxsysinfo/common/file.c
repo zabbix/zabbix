@@ -135,6 +135,8 @@ int	VFS_FILE_EXISTS(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	return SYSINFO_RET_OK;
 }
 
+/* #include<malloc.h> */
+
 int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	char	filename[MAX_STRING_LEN];
@@ -144,7 +146,6 @@ int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	char	tmp[MAX_STRING_LEN];
 	char	*c;
 
-	int	ret = SYSINFO_RET_OK;
 	char	*buf = NULL;
 
         assert(result);
@@ -155,72 +156,54 @@ int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	if(get_param(param, 1, filename, MAX_STRING_LEN) != 0)
 	{
-		ret = SYSINFO_RET_FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 
 	if(get_param(param, 2, regexp, MAX_STRING_LEN) != 0)
 	{
-		ret = SYSINFO_RET_FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 
 
-	if(ret == SYSINFO_RET_OK)
+	if(NULL == (f = fopen(filename,"r")))
 	{
-		f=fopen(filename,"r");
-		if(f==NULL)
-		{
-			ret = SYSINFO_RET_FAIL;
-		}
+		return SYSINFO_RET_FAIL;
 	}
-	if(ret == SYSINFO_RET_OK)
+
+	if(NULL == (buf = (char*)calloc((size_t)MAX_FILE_LEN, 1)))
 	{
-		buf = (char*)malloc((size_t)MAX_FILE_LEN);
-		if(buf == NULL)
-		{
-			ret = SYSINFO_RET_FAIL;
-		}
-		else
-		{
-			memset(buf,0,(size_t)MAX_FILE_LEN);
-		}
+		goto lbl_fail;
 	}
 
-	if(ret == SYSINFO_RET_OK)
+	if(0 == fread(buf, 1, MAX_FILE_LEN-1, f))
 	{
-		if(0 == fread(buf, 1, MAX_FILE_LEN-1, f))
-		{
-			ret = SYSINFO_RET_FAIL;
-		}
+		goto lbl_fail;
 	}
+ 	zbx_fclose(f);
 
+	c = zbx_regexp_match(buf, regexp, &len);
 
-	if(f != NULL)
+	if(c == NULL)
 	{
-		fclose(f);
+		tmp[0]=0;
 	}
-
-	if(ret == SYSINFO_RET_OK)
+	else
 	{
-		c=zbx_regexp_match(buf, regexp, &len);
-
-		if(c == NULL)
-		{
-			tmp[0]=0;
-		}
-		else
-		{
-			strncpy(tmp,c,len);
-		}
-
-		SET_STR_RESULT(result, strdup(tmp));
+		strncpy(tmp,c,len);
 	}
 
-	if(buf != NULL)
-	{
-		free(buf);
-	}
+	SET_STR_RESULT(result, strdup(tmp));
 
-	return	ret;
+	zbx_free(buf);
+
+	return	SYSINFO_RET_OK;
+
+lbl_fail:
+
+	zbx_free(buf);
+	zbx_fclose(f);
+
+	return	SYSINFO_RET_FAIL;
 }
 
 int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -231,7 +214,6 @@ int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_
 	int	len;
 	char	*c;
 
-	int	ret = SYSINFO_RET_OK;
 	char	*buf = NULL;
 
         assert(result);
@@ -240,68 +222,51 @@ int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_
 
 	if(get_param(param, 1, filename, MAX_STRING_LEN) != 0)
 	{
-		ret = SYSINFO_RET_FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 
 	if(get_param(param, 2, regexp, MAX_STRING_LEN) != 0)
 	{
-		ret = SYSINFO_RET_FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 
 
-	if(ret == SYSINFO_RET_OK)
+	if(NULL == (f = fopen(filename,"r")))
 	{
-		f=fopen(filename,"r");
-		if(f==NULL)
-		{
-			ret = SYSINFO_RET_FAIL;
-		}
+		return SYSINFO_RET_FAIL;
 	}
-	if(ret == SYSINFO_RET_OK)
+
+	if(NULL == (buf = (char*)calloc((size_t)MAX_FILE_LEN, 1)))
 	{
-		buf = (char*)malloc((size_t)MAX_FILE_LEN);
-		if(buf == NULL)
-		{
-			ret = SYSINFO_RET_FAIL;
-		}
-		else
-		{
-			memset(buf,0,(size_t)MAX_FILE_LEN);
-		}
+		goto lbl_fail;
 	}
 
-	if(ret == SYSINFO_RET_OK)
+	if(0 == fread(buf, 1, MAX_FILE_LEN-1, f))
 	{
-		if(0 == fread(buf, 1, MAX_FILE_LEN-1, f))
-		{
-			ret = SYSINFO_RET_FAIL;
-		}
+		goto lbl_fail;
 	}
 
+	zbx_fclose(f);
 
-	if(f != NULL)
+	c = zbx_regexp_match(buf, regexp, &len);
+
+	if(c == NULL)
 	{
-		fclose(f);
+		SET_UI64_RESULT(result, 0);
 	}
-
-	if(ret == SYSINFO_RET_OK)
+	else
 	{
-		c=zbx_regexp_match(buf, regexp, &len);
-
-		if(c == NULL)
-		{
-			SET_UI64_RESULT(result, 0);
-		}
-		else
-		{
-			SET_UI64_RESULT(result, 1);
-		}
+		SET_UI64_RESULT(result, 1);
 	}
 
-	if(buf != NULL)
-	{
-		free(buf);
-	}
+	zbx_free(buf);
 
-	return	ret;
+	return	SYSINFO_RET_OK;
+
+lbl_fail:
+
+	zbx_free(buf);
+	zbx_fclose(f);
+
+	return	SYSINFO_RET_FAIL;
 }

@@ -26,6 +26,21 @@
 #define	PARM_OPT	0
 #define	PARM_MAND	1
 
+//
+// Application flags
+//
+
+#define AF_STANDALONE               0x0001
+#define AF_USE_EVENT_LOG            0x0002
+#define AF_LOG_UNRESOLVED_SYMBOLS   0x0004
+
+extern int	CONFIG_ZABBIX_FORKS;
+extern char	*CONFIG_FILE;
+
+extern char	*CONFIG_LOG_FILE;
+extern char	CONFIG_ALLOW_ROOT_PERMISSION;
+extern int	CONFIG_TIMEOUT;
+
 struct cfg_line
 {
 	char	*parameter;

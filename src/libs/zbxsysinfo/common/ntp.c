@@ -17,12 +17,9 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#include <unistd.h>
-
-#include "config.h"
-
 #include "common.h"
 #include "sysinfo.h"
+#include "zbxsock.h"
 
 #define JAN_1970   2208988800.0        /* 1970 - 1900 in seconds */
 #define NTP_SCALE  4294967296.0        /* 2^32, of course! */
@@ -58,7 +55,10 @@ typedef struct NTP_DATA {
     double dispersion, reference, originate, receive, transmit, current;
 } ntp_data;
 
-double current_time (double offset) {
+double current_time (double offset)
+{
+
+#if !defined(WIN32) || (defined(WIN32) && defined(TODO))
 
 /* Get the current UTC time in seconds since the Epoch plus an offset (usually
 the time from the beginning of the century to the Epoch!) */
@@ -66,11 +66,21 @@ the time from the beginning of the century to the Epoch!) */
     struct timeval current;
 
     errno = 0;
+#ifdef WIN32
+#	error "Replace <gettimeofday> function"
+#endif /* WIN32 */
+    
     if (gettimeofday(&current,NULL))
     {
 	    /* No processing of error condition here */
     }
-    return offset+current.tv_sec+1.0e-6*current.tv_usec;
+    return offset+current.tv_sec+1.0e-6*current.tv_usec;\
+
+#else
+
+	    return 0.;
+
+#endif /* TODO */
 }
 
 void make_packet (ntp_data *data)
@@ -222,13 +232,16 @@ systems do not set the return value from (s)printf. */
 
 int	check_ntp(char *host, int port, int *value_int)
 {
-	int	s;
+
+#if !defined(WIN32) || (defined(WIN32) && defined(TODO))
+
+	ZBX_SOCKET	s;
+	ZBX_SOCKADDR	servaddr_in;
+
 	int	len;
 	unsigned char	c[MAX_STRING_LEN];
 
 	struct hostent *hp;
-
-	struct sockaddr_in servaddr_in;
 
 	char	text[50];
 
@@ -244,7 +257,7 @@ int	check_ntp(char *host, int port, int *value_int)
 
 	if(hp==NULL)
 	{
-/*		fprintf(stderr, "gethostbyname(%s) failed [%s]", host, hstrerror(h_errno));*/
+/*		zbx_error("gethostbyname(%s) failed [%s]", host, hstrerror(h_errno));*/
 		return	SYSINFO_RET_OK;
 	}
 
@@ -256,12 +269,13 @@ int	check_ntp(char *host, int port, int *value_int)
 
 	if(s == -1)
 	{
-/*		fprintf(stderr, "Cannot create socket [%s]", strerror(errno));*/
+/*		zbx_error("Cannot create socket [%s]", strerror(errno));*/
 		return	SYSINFO_RET_OK;
 	}
  
 	if( connect(s,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
 	{
+		/* useless code
 		switch (errno)
 		{
 			case EINTR:
@@ -270,16 +284,20 @@ int	check_ntp(char *host, int port, int *value_int)
 				break;
 			default:
 				break;
-		} 
-/*		fprintf(stderr, "Cannot connect [%s]", strerror(errno));*/
-		close(s);
-		return	SYSINFO_RET_OK;
+		}
+		*/
+/*		zbx_error("Cannot connect [%s]", strerror(errno));*/
+		goto lbl_error;
 	}
 
 	pack_ntp(packet,NTP_PACKET_MIN,&data);
 
+#ifdef WIN32
+#	error "TIDO replace <write> function"
+#endif /* WIN32 */
 	if( write(s,&packet,NTP_PACKET_MIN) == -1 )
 	{
+		/* useless code
 		switch (errno)
 		{
 			case EINTR:
@@ -287,16 +305,22 @@ int	check_ntp(char *host, int port, int *value_int)
 			default:
 				break;
 		} 
-/*		fprintf(stderr, "Cannot write [%s]", strerror(errno));*/
-		close(s);
-		return	SYSINFO_RET_OK;
+		*/
+/*		zbx_error("Cannot write [%s]", strerror(errno));*/
+		goto lbl_error;
 	} 
 
 	memset(c,0,MAX_STRING_LEN);
-	len=read(s,c,MAX_STRING_LEN);
+
+#ifdef WIN32
+#	error "TIDO replace <read> function"
+#endif /* WIN32 */
+	
+	len = read(s,c,MAX_STRING_LEN);
 
 	if(len == -1)
 	{
+		/* useless code
 		switch (errno)
 		{
 			case 	EINTR:
@@ -306,17 +330,17 @@ int	check_ntp(char *host, int port, int *value_int)
 			default:
 					break;
 		} 
-/*		fprintf(stderr, "Cannot read0 [%d]", errno);*/
-		close(s);
-		return	SYSINFO_RET_OK;
+		*/
+/*		zbx_error("Cannot read0 [%d]", errno);*/
+		goto lbl_error;
 	}
-	close(s);
+	zbx_sock_close(s);
 
 	unpack_ntp(&data,c,len);
 
 /*	display_data(&data); */
 
-        sprintf(text,"%d",0);
+        zbx_snprintf(text, sizeof(text), "%d",0);
 
 /*        format_time(text,75,offset,error,0.0,-1.0);*/
 
@@ -331,5 +355,11 @@ int	check_ntp(char *host, int port, int *value_int)
         *value_int = format_time(text,75,0,0,0.0,-1.0);
 
 	return SYSINFO_RET_OK;
+
+lbl_error:
+	zbx_sock_close(s);
+
+#endif /* TODO */
+	return	SYSINFO_RET_OK;
 }
 

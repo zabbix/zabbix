@@ -17,20 +17,25 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#include "config.h"
-
 #include "common.h"
 #include "sysinfo.h"
-#include "log.h"
 
-static int	get_http_page(char *hostname, char *param, int port, char *buffer, int max_buf_len)
+#include "log.h"
+#include "zbxsock.h"
+#include "cfg.h"
+
+static int	get_http_page(char *hostname, char *param, unsigned short port, char *buffer, int max_buf_len)
 {
 	char	*haddr;
 	char	c[MAX_STRING_LEN];
 	
-	int	s;
-	struct	sockaddr_in addr;
-	int	addrlen, n, total;
+	ZBX_SOCKET	s;
+	ZBX_SOCKADDR	addr;
+	int	
+		addrlen, 
+		n, 
+		total, 
+		ret = SYSINFO_RET_FAIL;
 
 	struct hostent *host;
 
@@ -46,35 +51,27 @@ static int	get_http_page(char *hostname, char *param, int port, char *buffer, in
 	memset(&addr, 0, addrlen);
 	addr.sin_port = htons(port);
 	addr.sin_family = AF_INET;
-	bcopy(haddr, (void *) &addr.sin_addr.s_addr, 4);
 
-	s = socket(AF_INET, SOCK_STREAM, 0);
-	if (s == -1)
+	memcpy(haddr, (void *) &addr.sin_addr.s_addr, 4);
+
+	if((s = socket(AF_INET, SOCK_STREAM, 0)) != SOCKET_ERROR)
 	{
-		close(s);
-		return SYSINFO_RET_FAIL;
+		if (connect(s, (struct sockaddr *) &addr, addrlen) != SOCKET_ERROR)
+		{
+			zbx_snprintf(c, sizeof(c), "GET /%s HTTP/1.1\nHost: %s\nConnection: close\n\n", param, hostname);
+
+			zbx_sock_write(s, c, strlen(c));
+
+			memset(buffer, 0, max_buf_len);
+
+			for(total=0; (n = zbx_sock_read(s, buffer+total, max_buf_len-1-total, CONFIG_TIMEOUT)) > 0; total+=n);
+
+			ret = SYSINFO_RET_OK;
+		}
 	}
 
-	if (connect(s, (struct sockaddr *) &addr, addrlen) == -1)
-	{
-		close(s);
-		return SYSINFO_RET_FAIL;
-	}
-
-	snprintf(c,MAX_STRING_LEN-1,"GET /%s HTTP/1.1\nHost: %s\nConnection: close\n\n", param, hostname);
-
-	write(s,c,strlen(c));
-
-	memset(buffer, 0, max_buf_len);
-
-	total=0;
-	while((n=read(s, buffer+total, max_buf_len-1-total))>0)
-	{
-		total+=n;
-	}
-
-	close(s);
-	return SYSINFO_RET_OK;
+	zbx_sock_close(s);
+	return ret;
 }
 
 int	WEB_PAGE_GET(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -86,9 +83,6 @@ int	WEB_PAGE_GET(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
 	char	*buffer;
 
-	int	ret;
-
-
         assert(result);
 
         init_result(result);
@@ -118,8 +112,8 @@ int	WEB_PAGE_GET(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 		strscpy(port_str, "80");
 	}
 
-	buffer=malloc(ZABBIX_MAX_WEBPAGE_SIZE);
-	if(get_http_page(hostname, path, atoi(port_str), buffer, ZABBIX_MAX_WEBPAGE_SIZE) == SYSINFO_RET_OK)
+	buffer = calloc(1, ZABBIX_MAX_WEBPAGE_SIZE);
+	if(SYSINFO_RET_OK == get_http_page(hostname, path, (unsigned short)atoi(port_str), buffer, ZABBIX_MAX_WEBPAGE_SIZE))
 	{
 		SET_TEXT_RESULT(result, buffer);
 	}
@@ -129,7 +123,7 @@ int	WEB_PAGE_GET(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 		SET_TEXT_RESULT(result, strdup("EOF"));
 	}
 
-	return ret;
+	return SYSINFO_RET_OK;
 }
 
 int	WEB_PAGE_PERF(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -141,19 +135,12 @@ int	WEB_PAGE_PERF(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 
 	char	*buffer;
 
-	int	ret = SYSINFO_RET_OK;
-
-	struct timeval t1,t2;
-	struct timezone tz1,tz2;
-
-	long	exec_time;
+	double	start_time;
 
         assert(result);
 
         init_result(result);
 
-	gettimeofday(&t1,&tz1);
-	
         if(num_param(param) > 3)
         {
                 return SYSINFO_RET_FAIL;
@@ -179,13 +166,12 @@ int	WEB_PAGE_PERF(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 		strscpy(port_str, "80");
 	}
 
-	buffer=malloc(ZABBIX_MAX_WEBPAGE_SIZE);
-	if(get_http_page(hostname, path, atoi(port_str), buffer, ZABBIX_MAX_WEBPAGE_SIZE) == SYSINFO_RET_OK)
-	{
-		gettimeofday(&t2,&tz2);
-   		exec_time=(t2.tv_sec - t1.tv_sec) * 1000000 + (t2.tv_usec - t1.tv_usec);
+	start_time = zbx_getseconds();
 
-		SET_DBL_RESULT(result, exec_time / 1000000.0);
+	buffer = calloc(1, ZABBIX_MAX_WEBPAGE_SIZE);
+	if(get_http_page(hostname, path, (unsigned short)atoi(port_str), buffer, ZABBIX_MAX_WEBPAGE_SIZE) == SYSINFO_RET_OK)
+	{
+		SET_DBL_RESULT(result, zbx_getseconds() - start_time);
 	}
 	else
 	{
@@ -193,7 +179,7 @@ int	WEB_PAGE_PERF(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	}
 	free(buffer);
 
-	return ret;
+	return SYSINFO_RET_OK;
 }
 
 int	WEB_PAGE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -252,8 +238,8 @@ int	WEB_PAGE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
                 return SYSINFO_RET_FAIL;
 	}
 
-	buffer=malloc(ZABBIX_MAX_WEBPAGE_SIZE);
-	if(get_http_page(hostname, path, atoi(port_str), buffer, ZABBIX_MAX_WEBPAGE_SIZE) == SYSINFO_RET_OK)
+	buffer = calloc(1, ZABBIX_MAX_WEBPAGE_SIZE);
+	if(get_http_page(hostname, path, (unsigned short)atoi(port_str), buffer, ZABBIX_MAX_WEBPAGE_SIZE) == SYSINFO_RET_OK)
 	{
 		found = zbx_regexp_match(buffer,regexp,&l);
 		if(found!=NULL)
@@ -271,16 +257,3 @@ int	WEB_PAGE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	return ret;
 }
-
-/*#define ZABBIX_TEST*/
-
-#ifdef ZABBIX_TEST
-int main()
-{
-	char buffer[100*1024];
-
-	get_http_page("www.zabbix.com", "", 80, buffer, 100*1024);
-
-	printf("Back [%d] [%s]\n", strlen(buffer), buffer);
-}
-#endif

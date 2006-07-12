@@ -20,13 +20,14 @@
 #ifndef ZABBIX_ACTIVE_H
 #define ZABBIX_ACTIVE_H
 
+#include "threads.h"
+
 extern char	*CONFIG_HOSTNAME;
 extern int	CONFIG_REFRESH_ACTIVE_CHECKS;
 
 #define MAX_LINES_PER_SECOND	10
 
-#define METRIC struct metric_type
-METRIC
+typedef struct zbx_active_metric_type
 {
 	char	*key;
 	int	refresh;
@@ -35,8 +36,14 @@ METRIC
 /* Must be long for fseek() */
 /*	int	lastlogsize;*/
 	long	lastlogsize;
-};
+} ZBX_ACTIVE_METRIC;
 
-pid_t   child_active_make(int i,char *server, int port);
+typedef struct active_ckeck_args
+{
+	char		*host;
+	unsigned short	port;
+} ZBX_THREAD_ACTIVECHK_ARGS;
 
-#endif
+ZBX_THREAD_ENTRY(active_checks_thread, args);
+
+#endif /* ZABBIX_ACTIVE_H */

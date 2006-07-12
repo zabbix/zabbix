@@ -35,8 +35,7 @@ int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
         init_result(result);	
 
-	f=fopen("/proc/sys/fs/file-max","r");
-	if(f)
+	if(NULL != ( f = fopen("/proc/sys/fs/file-max","r") ))
 	{
 		if(fgets(line,MAX_STRING_LEN,f) != NULL);
 		{
@@ -46,7 +45,7 @@ int	KERNEL_MAXFILES(const char *cmd, const char *param, unsigned flags, AGENT_RE
 				ret = SYSINFO_RET_OK;
 			}
 		}
-		fclose(f);
+		zbx_fclose(f);
 	}
 
 	return ret;

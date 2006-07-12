@@ -17,333 +17,462 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#include "config.h"
-
-#include <stdlib.h>
-#include <stdio.h>
-
-#include <unistd.h>
-#include <signal.h>
-
-#include <errno.h>
-
-#include <time.h>
-
-/* No warning for bzero */
-#include <string.h>
-#include <strings.h>
-
-/* For config file operations */
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-
-/* For setpriority */
-#include <sys/time.h>
-#include <sys/resource.h>
-
-/* Required for getpwuid */
-#include <pwd.h>
-
-#include <dirent.h>
-
 #include "common.h"
-#include "sysinfo.h"
-#include "security.h"
-#include "zabbix_agent.h"
-
-#include "log.h"
-#include "cfg.h"
 #include "cpustat.h"
 
-CPUSTAT cpustat;
+#include "log.h"
 
-void	init_stats_cpustat()
+#ifdef WIN32
+
+	#include "perfmon.h"
+
+#else /* not WIN32 */
+
+	static int	get_cpustat(
+		int *now,
+		float *cpu_user,
+		float *cpu_system,
+		float *cpu_nice,
+		float *cpu_idle
+		);
+
+	static void	apply_cpustat(
+		ZBX_CPUS_STAT_DATA *pcpus,
+		int now, 
+		float cpu_user, 
+		float cpu_system,
+		float cpu_nice,
+		float cpu_idle
+		);
+
+#endif /* WIN32 */
+
+
+/******************************************************************************
+ *                                                                            *
+ * Function: init_cpu_collector                                               *
+ *                                                                            *
+ * Purpose: Initialize statistic structure and prepare state                  *
+ *          for data calculation                                              *
+ *                                                                            *
+ * Parameters:  pcpus - pointer to the structure                              *
+ *                      of ZBX_CPUS_STAT_DATA type                            *
+ *                                                                            *
+ * Return value: If the function succeeds, the return 0,                      *
+ *               great than 0 on an error                                     *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+
+int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 {
+#ifdef WIN32
+
+	SYSTEM_INFO	sysInfo;
+	PDH_STATUS	status;
 	int	i;
 
-	for(i=0;i<60*15;i++)
+	char counter_path[MAX_COUNTER_PATH];
+
+	GetSystemInfo(&sysInfo);
+
+	pcpus->count = sysInfo.dwNumberOfProcessors;
+
+	memset(pcpus, 0, sizeof(ZBX_CPUS_STAT_DATA));
+
+	if (PdhOpenQuery(NULL,0,&pcpus->pdh_query)!=ERROR_SUCCESS)
 	{
-		cpustat.clock[i]=0;
+		zabbix_log( LOG_LEVEL_ERR, "Call to PdhOpenQuery() failed: %s", strerror_from_system(GetLastError()));
+		return 1;
 	}
+
+	zbx_snprintf(counter_path, sizeof(counter_path), "\\%s(_Total)\\%s",GetCounterName(PCI_PROCESSOR),GetCounterName(PCI_PROCESSOR_TIME));
+
+	if (ERROR_SUCCESS != (status = PdhAddCounter(
+		pcpus->pdh_query, 
+		counter_path, 0, 
+		&pcpus->cpu[0].usage_couter)))
+	{
+		zabbix_log( LOG_LEVEL_ERR, "Unable to add performance counter \"%s\" to query: %s", strerror_from_module(status,"PDH.DLL"));
+		return 2;
+	}
+
+	for(i=1 /* 0 - is Total cpus */; i <= pcpus->count /* "<=" instead of  "+ 1" */; i++)
+	{
+		zbx_snprintf(counter_path, sizeof(counter_path),"\\%s(%d)\\%s", GetCounterName(PCI_PROCESSOR), i-1, GetCounterName(PCI_PROCESSOR_TIME));
+
+		if (ERROR_SUCCESS != (status = PdhAddCounter(
+			pcpus->pdh_query, 
+			counter_path,0,
+			&pcpus->cpu[i].usage_couter)))
+		{
+			zabbix_log( LOG_LEVEL_ERR, "Unable to add performance counter \"%s\" to query: %s", strerror_from_module(status,"PDH.DLL"));
+			return 2;
+		}
+	}
+
+	if (ERROR_SUCCESS != (status = PdhCollectQueryData(pcpus->pdh_query)))
+	{
+		zabbix_log( LOG_LEVEL_ERR, "Call to PdhCollectQueryData() failed: %s", strerror_from_module(status,"PDH.DLL"));
+		return 3;
+	}
+
+	for(i = 1; i <= pcpus->count; i++)
+	{
+		PdhGetRawCounterValue(pcpus->cpu[i].usage_couter, NULL, &pcpus->cpu[i].usage_old);
+	}
+
+
+	zbx_snprintf(counter_path, sizeof(counter_path), "\\%s\\%s", GetCounterName(PCI_SYSTEM), GetCounterName(PCI_PROCESSOR_QUEUE_LENGTH));
+
+	// Prepare for CPU execution queue usage collection
+	if (ERROR_SUCCESS != (status = PdhAddCounter(pcpus->pdh_query, counter_path, 0, &pcpus->queue_counter)))
+	{
+		zabbix_log( LOG_LEVEL_ERR, "Unable to add performance counter \"%s\" to query: %s", strerror_from_module(status,"PDH.DLL"));
+		return 2;
+	}
+
+#else /* not WIN32 */
+
+	memset(pcpus, 0, sizeof(ZBX_CPUS_STAT_DATA));
+
+
+#endif /* WIN32 */
+
+	return 0;
 }
 
-void	report_stats_cpustat(FILE *file, int now)
+/******************************************************************************
+ *                                                                            *
+ * Function: close_cpu_collector                                              *
+ *                                                                            *
+ * Purpose: Cleare state of data calculation                                  *
+ *                                                                            *
+ * Parameters:  pcpus - pointer to the structure                              *
+ *                      of ZBX_CPUS_STAT_DATA type                            *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+
+void	close_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 {
-	int	time=0,
-		time1=0,
-		time5=0,
-		time15=0;
-	float
-		cpu_idle=0,
-		cpu_idle1=0,
-		cpu_idle5=0,
-		cpu_idle15=0,
-		cpu_user=0,
-		cpu_user1=0,
-		cpu_user5=0,
-		cpu_user15=0,
-		cpu_system=0,
-		cpu_system1=0,
-		cpu_system5=0,
-		cpu_system15=0,
-		cpu_nice=0,
-		cpu_nice1=0,
-		cpu_nice5=0,
-		cpu_nice15=0,
-		cpu_sum=0,
-		cpu_sum1=0,
-		cpu_sum5=0,
-		cpu_sum15=0;
+#ifdef WIN32
 
-	int	i;
-
-	time=now+1;
-	time1=now+1;
-	time5=now+1;
-	time15=now+1;
-	for(i=0;i<60*15;i++)
-	{
-		if(cpustat.clock[i]==0)
-		{
-			continue;
-		}
-		if(cpustat.clock[i]==now)
-		{
-			continue;
-		}
-		if((cpustat.clock[i] >= now-60) && (time1 > cpustat.clock[i]))
-		{
-			time1=cpustat.clock[i];
-		}
-		if((cpustat.clock[i] >= now-5*60) && (time5 > cpustat.clock[i]))
-		{
-			time5=cpustat.clock[i];
-		}
-		if((cpustat.clock[i] >= now-15*60) && (time15 > cpustat.clock[i]))
-		{
-			time15=cpustat.clock[i];
-		}
-	}
-	for(i=0;i<60*15;i++)
-	{
-		if(cpustat.clock[i]==now)
-		{
-			cpu_idle=cpustat.cpu_idle[i];
-			cpu_user=cpustat.cpu_user[i];
-			cpu_nice=cpustat.cpu_nice[i];
-			cpu_system=cpustat.cpu_system[i];
-			cpu_sum=cpu_idle+cpu_user+cpu_nice+cpu_system;
-		}
-		if(cpustat.clock[i]==time1)
-		{
-			cpu_idle1=cpustat.cpu_idle[i];
-			cpu_user1=cpustat.cpu_user[i];
-			cpu_nice1=cpustat.cpu_nice[i];
-			cpu_system1=cpustat.cpu_system[i];
-			cpu_sum1=cpu_idle1+cpu_user1+cpu_nice1+cpu_system1;
-		}
-		if(cpustat.clock[i]==time5)
-		{
-			cpu_idle5=cpustat.cpu_idle[i];
-			cpu_user5=cpustat.cpu_user[i];
-			cpu_nice5=cpustat.cpu_nice[i];
-			cpu_system5=cpustat.cpu_system[i];
-			cpu_sum5=cpu_idle5+cpu_user5+cpu_nice5+cpu_system5;
-		}
-		if(cpustat.clock[i]==time15)
-		{
-			cpu_idle15=cpustat.cpu_idle[i];
-			cpu_user15=cpustat.cpu_user[i];
-			cpu_nice15=cpustat.cpu_nice[i];
-			cpu_system15=cpustat.cpu_system[i];
-			cpu_sum15=cpu_idle15+cpu_user15+cpu_nice15+cpu_system15;
-		}
-	}
-	if((cpu_idle!=0)&&(cpu_idle1!=0))
-	{
-		fprintf(file,"cpu[idle1] %f\n", 100*(float)((cpu_idle-cpu_idle1)/(cpu_sum-cpu_sum1)));
-	}
-	else
-	{
-		fprintf(file,"cpu[idle1] 0\n");
-	}
-	if((cpu_idle!=0)&&(cpu_idle5!=0))
-	{
-		fprintf(file,"cpu[idle5] %f\n",100*(float)((cpu_idle-cpu_idle5)/(cpu_sum-cpu_sum5)));
-	}
-	else
-	{
-		fprintf(file,"cpu[idle5] 0\n");
-	}
-	if((cpu_idle!=0)&&(cpu_idle15!=0))
-	{
-		fprintf(file,"cpu[idle15] %f\n", 100*(float)((cpu_idle-cpu_idle15)/((cpu_sum-cpu_sum15))));
-	}
-	else
-	{
-		fprintf(file,"cpu[idle15] 0\n");
-	}
-
-	if((cpu_user!=0)&&(cpu_user1!=0))
-	{
-		fprintf(file,"cpu[user1] %f\n", 100*(float)((cpu_user-cpu_user1)/((cpu_sum-cpu_sum1))));
-	}
-	else
-	{
-		fprintf(file,"cpu[user1] 0\n");
-	}
-	if((cpu_user!=0)&&(cpu_user5!=0))
-	{
-		fprintf(file,"cpu[user5] %f\n", 100*(float)((cpu_user-cpu_user5)/((cpu_sum-cpu_sum5))));
-	}
-	else
-	{
-		fprintf(file,"cpu[user5] 0\n");
-	}
-	if((cpu_user!=0)&&(cpu_user15!=0))
-	{
-		fprintf(file,"cpu[user15] %f\n", 100*(float)((cpu_user-cpu_user15)/((cpu_sum-cpu_sum15))));
-	}
-	else
-	{
-		fprintf(file,"cpu[user15] 0\n");
-	}
-
-	if((cpu_nice!=0)&&(cpu_nice1!=0))
-	{
-		fprintf(file,"cpu[nice1] %f\n", 100*(float)((cpu_nice-cpu_nice1)/((cpu_sum-cpu_sum1))));
-	}
-	else
-	{
-		fprintf(file,"cpu[nice1] 0\n");
-	}
-	if((cpu_nice!=0)&&(cpu_nice5!=0))
-	{
-		fprintf(file,"cpu[nice5] %f\n", 100*(float)((cpu_nice-cpu_nice5)/((cpu_sum-cpu_sum5))));
-	}
-	else
-	{
-		fprintf(file,"cpu[nice5] 0\n");
-	}
-	if((cpu_nice!=0)&&(cpu_nice15!=0))
-	{
-		fprintf(file,"cpu[nice15] %f\n", 100*(float)((cpu_nice-cpu_nice15)/((cpu_sum-cpu_sum15))));
-	}
-	else
-	{
-		fprintf(file,"cpu[nice15] 0\n");
-	}
-
-	if((cpu_system!=0)&&(cpu_system1!=0))
-	{
-		fprintf(file,"cpu[system1] %f\n", 100*(float)((cpu_system-cpu_system1)/((cpu_sum-cpu_sum1))));
-	}
-	else
-	{
-		fprintf(file,"cpu[system1] 0\n");
-	}
-	if((cpu_system!=0)&&(cpu_system5!=0))
-	{
-		fprintf(file,"cpu[system5] %f\n", 100*(float)((cpu_system-cpu_system5)/((cpu_sum-cpu_sum5))));
-	}
-	else
-	{
-		fprintf(file,"cpu[system5] 0\n");
-	}
-	if((cpu_system!=0)&&(cpu_system15!=0))
-	{
-		fprintf(file,"cpu[system15] %f\n", 100*(float)((cpu_system-cpu_system15)/((cpu_sum-cpu_sum15))));
-	}
-	else
-	{
-		fprintf(file,"cpu[system15] 0\n");
-	}
-}
-
-
-void	add_values_cpustat(int now,float cpu_user,float cpu_system,float cpu_nice,float cpu_idle)
-{
 	int i;
 
-/*	printf("Add_values [%s] [%f] [%f]\n",interface,value_sent,value_received);*/
-
-	for(i=0;i<15*60;i++)
+	if(pcpus->queue_counter)
 	{
-		if(cpustat.clock[i]<now-15*60)
+		PdhRemoveCounter(pcpus->queue_counter);
+		pcpus->queue_counter = NULL;
+	}
+
+	for(i=0; i < MAX_CPU; i++)
+	{
+		if(pcpus->cpu[i].usage_couter)
 		{
-			cpustat.clock[i]=now;
-			cpustat.cpu_user[i]=cpu_user;;
-			cpustat.cpu_system[i]=cpu_system;
-			cpustat.cpu_nice[i]=cpu_nice;
-			cpustat.cpu_idle[i]=cpu_idle;
-			break;
+			PdhRemoveCounter(pcpus->cpu[i].usage_couter);
+			pcpus->cpu[i].usage_couter = NULL;
 		}
 	}
+	
+	if(pcpus->pdh_query)
+	{
+		PdhCloseQuery(pcpus->pdh_query);
+		pcpus->pdh_query = NULL;
+	}
+
+#endif /* WIN32 */
+
 }
 
-void	collect_stats_cpustat(FILE *outfile)
+void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 {
-	/* Must be static */
-	static	int initialised = 0;
+#ifdef WIN32
+
+	PDH_FMT_COUNTERVALUE 
+		value;
+	PDH_STATUS	
+		status;
+	LONG	sum;
+	int	i,
+		j,
+		n;
+
+	if(!pcpus->queue_counter) return;
+
+	if ((status = PdhCollectQueryData(pcpus->pdh_query)) != ERROR_SUCCESS)
+	{
+		zabbix_log( LOG_LEVEL_ERR, "Call to PdhCollectQueryData() failed: %s", strerror_from_module(status,"PDH.DLL"));
+		return;
+	}
+
+	// Process CPU utilization data
+	for(i=0; i <= pcpus->count; i++)
+	{
+		if(!pcpus->cpu[i].usage_couter)
+			continue;
+
+		PdhGetRawCounterValue(
+			pcpus->cpu[i].usage_couter, 
+			NULL, 
+			&pcpus->cpu[i].usage);
+
+		PdhCalculateCounterFromRawValue(
+			pcpus->cpu[i].usage_couter,
+			PDH_FMT_LONG,
+			&pcpus->cpu[i].usage,
+			&pcpus->cpu[i].usage_old, 
+			&value);
+
+		pcpus->cpu[i].h_usage[pcpus->cpu[i].h_usage_index] = value.longValue;
+		pcpus->cpu[i].usage_old = pcpus->cpu[i].usage;
+
+		// Calculate average cpu usage
+		for(n = pcpus->cpu[i].h_usage_index, j = 0, sum = 0; j < MAX_CPU_HISTORY; j++, n--)
+		{
+			if(n < 0) n = MAX_CPU_HISTORY - 1;
+
+			sum += pcpus->cpu[i].h_usage[n];
+
+			if(j == 60) /* cpu usage for last minute */
+			{
+				pcpus->cpu[i].util1 = ((double)sum)/(double)j;
+			}
+			else if(j == 300) /* cpu usage for last five minutes */
+			{
+				pcpus->cpu[i].util5 = ((double)sum)/(double)j;
+			}
+		}
+
+		/* cpu usage for last fifteen minutes */
+		pcpus->cpu[i].util15 = ((double)sum)/(double)MAX_CPU_HISTORY;
+		
+		pcpus->cpu[i].h_usage_index++;
+		if (pcpus->cpu[i].h_usage_index == MAX_CPU_HISTORY)
+			pcpus->cpu[i].h_usage_index = 0;
+	}
+
+
+	if(pcpus->queue_counter)
+	{
+		// Process CPU queue length data
+		PdhGetRawCounterValue(
+			pcpus->queue_counter,
+			NULL,
+			&pcpus->queue);
+
+		PdhCalculateCounterFromRawValue(
+			pcpus->queue_counter,
+			PDH_FMT_LONG,
+			&pcpus->queue,
+			NULL,
+			&value);
+
+		pcpus->h_queue[pcpus->h_queue_index] = value.longValue;
+
+		// Calculate average cpu usage
+		for(n = pcpus->h_queue_index, j = 0, sum = 0; j < MAX_CPU_HISTORY; j++, n--)
+		{
+			if(n < 0) n = MAX_CPU_HISTORY - 1;
+
+			sum += pcpus->h_queue[n];
+
+			if(j == 60) /* processor(s) load for last minute */
+			{
+				pcpus->load1 = ((double)sum)/(double)j;
+			}
+			else if(j == 300) /* processor(s) load for last five minutes */
+			{
+				pcpus->load5 = ((double)sum)/(double)j;
+			}
+		}
+
+		/* cpu usage for last fifteen minutes */
+		pcpus->load15 = ((double)sum)/(double)MAX_CPU_HISTORY;
+
+		pcpus->h_queue_index++;
+
+		if (pcpus->h_queue_index == MAX_CPU_HISTORY)
+			pcpus->h_queue_index = 0;
+	}
+#else /* not WIN32 */
+
 	int	now = 0;
 	float	cpu_user, cpu_nice, cpu_system, cpu_idle;
 
-#if defined(HAVE_PROC_STAT)
+
+	if(0 != get_cpustat(&now, &cpu_user, &cpu_system, &cpu_nice, &cpu_idle))
+		return;
+
+	apply_cpustat(pcpus, now, cpu_user, cpu_system, cpu_nice, cpu_idle);
+
+#endif /* WIN32 */
+}
+
+#if !defined(WIN32)
+
+static int	get_cpustat(int *now,float *cpu_user,float *cpu_system,float *cpu_nice,float *cpu_idle)
+{
+    #if defined(HAVE_PROC_STAT)
 	
 	FILE	*file;
 	char	line[MAX_STRING_LEN];
 	
-#elif defined(HAVE_SYS_PSTAT_H) /* HAVE_PROC_STAT */
+    #elif defined(HAVE_SYS_PSTAT_H) /* not HAVE_PROC_STAT */
 	
 	struct pst_dynamic stats;
 	
-#else /* HAVE_SYS_PSTAT_H */
+    #else /* not HAVE_SYS_PSTAT_H */
 
-	return;
+	return 1;
 	
-#endif
+    #endif /* HAVE_PROC_STAT */
 
-	if(!initialised)
+	*now = time(NULL);
+
+    #if defined(HAVE_PROC_STAT)
+	
+	if(NULL == (file = fopen("/proc/stat","r") ))
 	{
-		init_stats_cpustat();
-		initialised = 1;
+		zbx_error("Cannot open [%s] [%s]\n","/proc/stat", strerror(errno));
+		return 1;
 	}
 
-	now = time(NULL);
+	*cpu_user = *cpu_nice = *cpu_system = *cpu_idle = -1;
 
-#if defined(HAVE_PROC_STAT)
-	
-	file = fopen("/proc/stat","r");
-	if(NULL == file)
-	{
-		fprintf(stderr, "Cannot open [%s] [%s]\n","/proc/stat", strerror(errno));
-		return;
-	}
-	cpu_user = cpu_nice = cpu_system = cpu_idle = -1;
 	while(fgets(line,1024,file) != NULL)
 	{
 		if(strstr(line,"cpu ") == NULL) continue;
 
-		sscanf(line, "cpu %f %f %f %f", &cpu_user, &cpu_nice, &cpu_system, &cpu_idle);
+		sscanf(line, "cpu %f %f %f %f", cpu_user, cpu_nice, cpu_system, cpu_idle);
 		break;
 	}
-	fclose(file);
+	zbx_fclose(file);
 
-	if(cpu_user < 0) 
-		return;
+	if(*cpu_user < 0) 
+		return 1;
 	
-#elif defined(HAVE_SYS_PSTAT_H) /* HAVE_PROC_STAT */
+    #elif defined(HAVE_SYS_PSTAT_H) /* HAVE_PROC_STAT */
 
 	pstat_getdynamic(&stats, sizeof( struct pst_dynamic ), 1, 0 );
-	cpu_user 	= (float)stats.psd_cpu_time[CP_USER];
-	cpu_nice 	= (float)stats.psd_cpu_time[CP_SYS];
-	cpu_system 	= (float)stats.psd_cpu_time[CP_NICE];
-	cpu_idle 	= (float)stats.psd_cpu_time[CP_IDLE];
+	*cpu_user 	= (float)stats.psd_cpu_time[CP_USER];
+	*cpu_nice 	= (float)stats.psd_cpu_time[CP_SYS];
+	*cpu_system 	= (float)stats.psd_cpu_time[CP_NICE];
+	*cpu_idle 	= (float)stats.psd_cpu_time[CP_IDLE];
 	
-#endif /* HAVE_SYS_PSTAT_H */
-
-	add_values_cpustat(now,cpu_user, cpu_system, cpu_nice, cpu_idle);
-	report_stats_cpustat(outfile, now);
-	
+    #endif /* HAVE_SYS_PSTAT_H */
+	return 0;
 }
+
+
+#define CALC_CPU_LOAD(now_val, tim_val, now_all_val, tim_all_val)                             \
+	if((now_val) - (tim_val) > 0 && (now_all_val) - (tim_all_val) > 0)                    \
+	{                                                                                     \
+		tim_val = 100 * (float)((now_val) - (tim_val)/(now_all_val) - (tim_all_val)); \
+	}                                                                                     \
+	else                                                                                  \
+	{                                                                                     \
+		tim_val = 0;                                                                  \
+	}
+
+static void	apply_cpustat(
+	ZBX_CPUS_STAT_DATA *pcpus,
+	int now, 
+	float cpu_user, 
+	float cpu_system,
+	float cpu_nice,
+	float cpu_idle
+	)
+{
+	int	i	= 0,
+		time	= 0,
+		time1	= 0,
+		time5	= 0,
+		time15	= 0;
+
+	for(i=0; i < MAX_CPU_HISTORY; i++)
+	{
+		if(pcpus->clock[i] < now - MAX_CPU_HISTORY)
+		{
+			pcpus->clock[i]	= now;
+
+			pcpus->user	= pcpus->h_user[i]	= cpu_user;
+			pcpus->system	= pcpus->h_system[i]	= cpu_system;
+			pcpus->nice	= pcpus->h_nice[i]	= cpu_nice;
+			pcpus->idle	= pcpus->h_idle[i]	= cpu_idle;
+
+			pcpus->all	= cpu_idle + cpu_user + cpu_nice + cpu_system;
+			break;
+		}
+	}
+
+	time = time1 = time5 = time15 = now+1;
+
+	for(i=0; i < MAX_CPU_HISTORY; i++)
+	{
+		if(0 == pcpus->clock[i])	continue;
+
+		if(pcpus->clock[i] == now)
+		{
+			pcpus->idle	= pcpus->h_idle[i];
+			pcpus->user	= pcpus->h_user[i];
+			pcpus->nice	= pcpus->h_nice[i];
+			pcpus->system	= pcpus->h_system[i];
+			pcpus->all	= pcpus->idle + pcpus->user + pcpus->nice + pcpus->system;
+		}
+
+		if((pcpus->clock[i] >= (now - 60)) && (time1 > pcpus->clock[i]))
+		{
+			time1		= pcpus->clock[i];
+			pcpus->idle1	= pcpus->h_idle[i];
+			pcpus->user1	= pcpus->h_user[i];
+			pcpus->nice1	= pcpus->h_nice[i];
+			pcpus->system1	= pcpus->h_system[i];
+			pcpus->all1	= pcpus->idle1 + pcpus->user1 + pcpus->nice1 + pcpus->system1;
+		}
+		if((pcpus->clock[i] >= (now - (5*60))) && (time5 > pcpus->clock[i]))
+		{
+			time5		= pcpus->clock[i];
+			pcpus->idle5	= pcpus->h_idle[i];
+			pcpus->user5	= pcpus->h_user[i];
+			pcpus->nice5	= pcpus->h_nice[i];
+			pcpus->system5	= pcpus->h_system[i];
+			pcpus->all5	= pcpus->idle5 + pcpus->user5 + pcpus->nice5 + pcpus->system5;
+		}
+		if((pcpus->clock[i] >= (now - (15*60))) && (time15 > pcpus->clock[i]))
+		{
+			time15		= pcpus->clock[i];
+			pcpus->idle15	= pcpus->h_idle[i];
+			pcpus->user15	= pcpus->h_user[i];
+			pcpus->nice15	= pcpus->h_nice[i];
+			pcpus->system15	= pcpus->h_system[i];
+			pcpus->all15	= pcpus->idle15 + pcpus->user15 + pcpus->nice15 + pcpus->system15;
+		}
+	}
+
+	CALC_CPU_LOAD(pcpus->idle, pcpus->idle1,	pcpus->all, pcpus->all1);
+	CALC_CPU_LOAD(pcpus->idle, pcpus->idle5,	pcpus->all, pcpus->all5);
+	CALC_CPU_LOAD(pcpus->idle, pcpus->idle15,	pcpus->all, pcpus->all15);
+
+	CALC_CPU_LOAD(pcpus->user, pcpus->user1,	pcpus->all, pcpus->all1);
+	CALC_CPU_LOAD(pcpus->user, pcpus->user5,	pcpus->all, pcpus->all5);
+	CALC_CPU_LOAD(pcpus->user, pcpus->user15,	pcpus->all, pcpus->all15);
+
+	CALC_CPU_LOAD(pcpus->nice, pcpus->nice1,	pcpus->all, pcpus->all1);
+	CALC_CPU_LOAD(pcpus->nice, pcpus->nice5,	pcpus->all, pcpus->all5);
+	CALC_CPU_LOAD(pcpus->nice, pcpus->nice15,	pcpus->all, pcpus->all15);
+
+	CALC_CPU_LOAD(pcpus->system, pcpus->system1,	pcpus->all, pcpus->all1);
+	CALC_CPU_LOAD(pcpus->system, pcpus->system5,	pcpus->all, pcpus->all5);
+	CALC_CPU_LOAD(pcpus->system, pcpus->system15,	pcpus->all, pcpus->all15);
+}
+
+#endif /* not WIN32 */

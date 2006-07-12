@@ -88,7 +88,7 @@ static int get_ifdata(const char *device, struct ifnet *result)
 static int      NET_IF_IN_BYTES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct ifnet value;
-	char    interface[MAX_STRING_LEN];
+	char    if_name[MAX_STRING_LEN];
 	int     ret = SYSINFO_RET_FAIL;
 
 	assert(result);
@@ -100,12 +100,12 @@ static int      NET_IF_IN_BYTES(const char *cmd, const char *param, unsigned fla
 		return SYSINFO_RET_FAIL;
 	}
 
-	if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+	if(get_param(param, 1, if_name, MAX_STRING_LEN) != 0)
 	{
 		return SYSINFO_RET_FAIL;
 	}
 
-	ret = get_ifdata(interface, &value);
+	ret = get_ifdata(if_name, &value);
 	
 	if(ret == SYSINFO_RET_OK)
 	{
@@ -119,7 +119,7 @@ static int      NET_IF_IN_BYTES(const char *cmd, const char *param, unsigned fla
 static int      NET_IF_IN_PACKETS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct ifnet value;
-	char    interface[MAX_STRING_LEN];
+	char    if_name[MAX_STRING_LEN];
 	int     ret = SYSINFO_RET_FAIL;
 
 	assert(result);
@@ -131,12 +131,12 @@ static int      NET_IF_IN_PACKETS(const char *cmd, const char *param, unsigned f
 		return SYSINFO_RET_FAIL;
 	}
 
-	if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+	if(get_param(param, 1, if_name, MAX_STRING_LEN) != 0)
 	{
 		return SYSINFO_RET_FAIL;
 	}
 
-	ret = get_ifdata(interface, &value);
+	ret = get_ifdata(if_name, &value);
 	
 	if(ret == SYSINFO_RET_OK)
 	{
@@ -150,7 +150,7 @@ static int      NET_IF_IN_PACKETS(const char *cmd, const char *param, unsigned f
 static int      NET_IF_IN_ERRORS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct ifnet value;
-	char    interface[MAX_STRING_LEN];
+	char    if_name[MAX_STRING_LEN];
 	int     ret = SYSINFO_RET_FAIL;
 
 	assert(result);
@@ -162,12 +162,12 @@ static int      NET_IF_IN_ERRORS(const char *cmd, const char *param, unsigned fl
 		return SYSINFO_RET_FAIL;
 	}
 
-	if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+	if(get_param(param, 1, if_name, MAX_STRING_LEN) != 0)
 	{
 		return SYSINFO_RET_FAIL;
 	}
 
-	ret = get_ifdata(interface, &value);
+	ret = get_ifdata(if_name, &value);
 	
 	if(ret == SYSINFO_RET_OK)
 	{
@@ -195,7 +195,7 @@ NET_FNCLIST
                 {0,         0}
         };
 
-        char interface[MAX_STRING_LEN];
+        char if_name[MAX_STRING_LEN];
         char mode[MAX_STRING_LEN];
         int i;
 
@@ -208,26 +208,26 @@ NET_FNCLIST
                 return SYSINFO_RET_FAIL;
         }
 
-        if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+        if(get_param(param, 1, if_name, sizeof(if_name)) != 0)
         {
                 return SYSINFO_RET_FAIL;
         }
 
-        if(get_param(param, 2, mode, MAX_STRING_LEN) != 0)
+        if(get_param(param, 2, mode, sizeof(mode)) != 0)
         {
                 mode[0] = '\0';
         }
         if(mode[0] == '\0')
         {
                 /* default parameter */
-                sprintf(mode, "bytes");
+                zbx_snprintf(mode, sizeof(mode), "bytes");
         }
 
         for(i=0; fl[i].mode!=0; i++)
         {
                 if(strncmp(mode, fl[i].mode, MAX_STRING_LEN)==0)
                 {
-                        return (fl[i].function)(cmd, interface, flags, result);
+                        return (fl[i].function)(cmd, if_name, flags, result);
                 }
         }
 
@@ -237,7 +237,7 @@ NET_FNCLIST
 static int      NET_IF_OUT_BYTES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct ifnet value;
-	char    interface[MAX_STRING_LEN];
+	char    if_name[MAX_STRING_LEN];
 	int     ret = SYSINFO_RET_FAIL;
 
 	assert(result);
@@ -249,12 +249,12 @@ static int      NET_IF_OUT_BYTES(const char *cmd, const char *param, unsigned fl
 		return SYSINFO_RET_FAIL;
 	}
 
-	if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+	if(get_param(param, 1, if_name, MAX_STRING_LEN) != 0)
 	{
 		return SYSINFO_RET_FAIL;
 	}
 
-	ret = get_ifdata(interface, &value);
+	ret = get_ifdata(if_name, &value);
 	
 	if(ret == SYSINFO_RET_OK)
 	{
@@ -268,7 +268,7 @@ static int      NET_IF_OUT_BYTES(const char *cmd, const char *param, unsigned fl
 static int      NET_IF_OUT_PACKETS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct ifnet value;
-	char    interface[MAX_STRING_LEN];
+	char    if_name[MAX_STRING_LEN];
 	int     ret = SYSINFO_RET_FAIL;
 
 	assert(result);
@@ -280,12 +280,12 @@ static int      NET_IF_OUT_PACKETS(const char *cmd, const char *param, unsigned 
 		return SYSINFO_RET_FAIL;
 	}
 
-	if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+	if(get_param(param, 1, if_name, MAX_STRING_LEN) != 0)
 	{
 		return SYSINFO_RET_FAIL;
 	}
 
-	ret = get_ifdata(interface, &value);
+	ret = get_ifdata(if_name, &value);
 	
 	if(ret == SYSINFO_RET_OK)
 	{
@@ -299,7 +299,7 @@ static int      NET_IF_OUT_PACKETS(const char *cmd, const char *param, unsigned 
 static int      NET_IF_OUT_ERRORS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct ifnet value;
-	char    interface[MAX_STRING_LEN];
+	char    if_name[MAX_STRING_LEN];
 	int     ret = SYSINFO_RET_FAIL;
 
 	assert(result);
@@ -311,12 +311,12 @@ static int      NET_IF_OUT_ERRORS(const char *cmd, const char *param, unsigned f
 		return SYSINFO_RET_FAIL;
 	}
 
-	if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+	if(get_param(param, 1, if_name, MAX_STRING_LEN) != 0)
 	{
 		return SYSINFO_RET_FAIL;
 	}
 
-	ret = get_ifdata(interface, &value);
+	ret = get_ifdata(if_name, &value);
 	
 	if(ret == SYSINFO_RET_OK)
 	{
@@ -344,7 +344,7 @@ NET_FNCLIST
                 {0,         0}
         };
 
-        char interface[MAX_STRING_LEN];
+        char if_name[MAX_STRING_LEN];
         char mode[MAX_STRING_LEN];
         int i;
 
@@ -357,26 +357,26 @@ NET_FNCLIST
                 return SYSINFO_RET_FAIL;
         }
 
-        if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+        if(get_param(param, 1, if_name, sizeof(if_name)) != 0)
         {
                 return SYSINFO_RET_FAIL;
         }
 
-        if(get_param(param, 2, mode, MAX_STRING_LEN) != 0)
+        if(get_param(param, 2, mode, sizeof(mode)) != 0)
         {
                 mode[0] = '\0';
         }
         if(mode[0] == '\0')
         {
                 /* default parameter */
-                sprintf(mode, "bytes");
+                zbx_snprintf(mode, sizeof(mode), "bytes");
         }
 
         for(i=0; fl[i].mode!=0; i++)
         {
                 if(strncmp(mode, fl[i].mode, MAX_STRING_LEN)==0)
                 {
-                        return (fl[i].function)(cmd, interface, flags, result);
+                        return (fl[i].function)(cmd, if_name, flags, result);
                 }
         }
 
@@ -386,7 +386,7 @@ NET_FNCLIST
 static int      NET_IF_TOTAL_BYTES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct ifnet value;
-	char    interface[MAX_STRING_LEN];
+	char    if_name[MAX_STRING_LEN];
 	int     ret = SYSINFO_RET_FAIL;
 
 	assert(result);
@@ -398,12 +398,12 @@ static int      NET_IF_TOTAL_BYTES(const char *cmd, const char *param, unsigned 
 		return SYSINFO_RET_FAIL;
 	}
 
-	if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+	if(get_param(param, 1, if_name, MAX_STRING_LEN) != 0)
 	{
 		return SYSINFO_RET_FAIL;
 	}
 
-	ret = get_ifdata(interface, &value);
+	ret = get_ifdata(if_name, &value);
 	
 	if(ret == SYSINFO_RET_OK)
 	{
@@ -417,7 +417,7 @@ static int      NET_IF_TOTAL_BYTES(const char *cmd, const char *param, unsigned 
 static int      NET_IF_TOTAL_PACKETS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct ifnet value;
-	char    interface[MAX_STRING_LEN];
+	char    if_name[MAX_STRING_LEN];
 	int     ret = SYSINFO_RET_FAIL;
 
 	assert(result);
@@ -429,12 +429,12 @@ static int      NET_IF_TOTAL_PACKETS(const char *cmd, const char *param, unsigne
 		return SYSINFO_RET_FAIL;
 	}
 
-	if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+	if(get_param(param, 1, if_name, MAX_STRING_LEN) != 0)
 	{
 		return SYSINFO_RET_FAIL;
 	}
 
-	ret = get_ifdata(interface, &value);
+	ret = get_ifdata(if_name, &value);
 	
 	if(ret == SYSINFO_RET_OK)
 	{
@@ -448,7 +448,7 @@ static int      NET_IF_TOTAL_PACKETS(const char *cmd, const char *param, unsigne
 static int      NET_IF_TOTAL_ERRORS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct ifnet value;
-	char    interface[MAX_STRING_LEN];
+	char    if_name[MAX_STRING_LEN];
 	int     ret = SYSINFO_RET_FAIL;
 
 	assert(result);
@@ -460,12 +460,12 @@ static int      NET_IF_TOTAL_ERRORS(const char *cmd, const char *param, unsigned
 		return SYSINFO_RET_FAIL;
 	}
 
-	if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+	if(get_param(param, 1, if_name, MAX_STRING_LEN) != 0)
 	{
 		return SYSINFO_RET_FAIL;
 	}
 
-	ret = get_ifdata(interface, &value);
+	ret = get_ifdata(if_name, &value);
 	
 	if(ret == SYSINFO_RET_OK)
 	{
@@ -493,7 +493,7 @@ NET_FNCLIST
                 {0,         0}
         };
 
-        char interface[MAX_STRING_LEN];
+        char if_name[MAX_STRING_LEN];
         char mode[MAX_STRING_LEN];
         int i;
 
@@ -506,26 +506,26 @@ NET_FNCLIST
                 return SYSINFO_RET_FAIL;
         }
 
-        if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+        if(get_param(param, 1, if_name, sizeof(if_name)) != 0)
         {
                 return SYSINFO_RET_FAIL;
         }
 
-        if(get_param(param, 2, mode, MAX_STRING_LEN) != 0)
+        if(get_param(param, 2, mode, sizeof(mode)) != 0)
         {
                 mode[0] = '\0';
         }
         if(mode[0] == '\0')
         {
                 /* default parameter */
-                sprintf(mode, "bytes");
+                zbx_snprintf(mode, sizeof(mode), "bytes");
         }
 
         for(i=0; fl[i].mode!=0; i++)
         {
                 if(strncmp(mode, fl[i].mode, MAX_STRING_LEN)==0)
                 {
-                        return (fl[i].function)(cmd, interface, flags, result);
+                        return (fl[i].function)(cmd, if_name, flags, result);
                 }
         }
 
@@ -544,7 +544,7 @@ int     NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT
 int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	struct ifnet value;
-	char    interface[MAX_STRING_LEN];
+	char    if_name[MAX_STRING_LEN];
 	int     ret = SYSINFO_RET_FAIL;
 
 	assert(result);
@@ -556,12 +556,12 @@ int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AG
 		return SYSINFO_RET_FAIL;
 	}
 
-	if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+	if(get_param(param, 1, if_name, MAX_STRING_LEN) != 0)
 	{
 		return SYSINFO_RET_FAIL;
 	}
 
-	ret = get_ifdata(interface, &value);
+	ret = get_ifdata(if_name, &value);
 	
 	if(ret == SYSINFO_RET_OK)
 	{
