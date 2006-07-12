@@ -20,17 +20,15 @@
 #include "common.h"
 #include "alias.h"
 
-//
-// Static data
-//
+/* Static data */
 
 static ALIAS *aliasList=NULL;
 
 
-//
-// Add alias to the list
-// Returns 1 on success or 0 if alias with that name already exist
-//
+/*
+ * Add alias to the list
+ * Returns 1 on success or 0 if alias with that name already exist
+*/
 int	add_alias_from_config(char *line)
 {
 	char 	*name = NULL,
@@ -108,9 +106,9 @@ void	alias_list_free(void)
 	}
 }
 
-//
-// Checks parameter and expands it if aliased
-//
+/*
+ * Checks parameter and expands it if aliased
+ */
 
 void	alias_expand(const char *orig, char *expanded, int exp_buf_len)
 {

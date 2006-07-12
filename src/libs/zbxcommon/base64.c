@@ -1,6 +1,6 @@
-#include <string.h>
+#include "common.h"
 
-#define ZBX_MAX_B64_LEN 16*1024
+#define MAX_B64_LEN ZBX_MAX_B64_LEN
 
 static char base64_set [] =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -189,7 +189,7 @@ void str_base64_decode(char *p_b64str, char *p_str, int *p_out_size)
 	int	in_size;
 	char from1='A',from2='A',from3='A',from4='A';
 	unsigned char to1=0,to2=0,to3=0,to4=0;
-	char	str_clean[ZBX_MAX_B64_LEN];/* str_clean is the string 
+	char	str_clean[MAX_B64_LEN];/* str_clean is the string 
 					* after removing the non-base64 
 					* characters
 					*/
@@ -286,8 +286,8 @@ int main()
 			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
 			"0000000000000000000000000000000000000000000000000000000000000000"
 			"11111111111111111111111111111111111111111111111111111111111111";
-	char b64[ZBX_MAX_B64_LEN];
-	char b64_rev[ZBX_MAX_B64_LEN];
+	char b64[MAX_B64_LEN];
+	char b64_rev[MAX_B64_LEN];
 	int i;
 
 	memset(b64,0,sizeof(b64));

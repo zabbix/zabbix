@@ -182,7 +182,7 @@ void	process_trapper_child(int sockfd)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Before read(%d)", MAX_BUF_LEN);
 /*	if( (nbytes = read(sockfd, line, MAX_BUF_LEN)) < 0)*/
-	memset(buffer,0,MAX_BUF_LEN);
+	memset(buffer,0,sizeof(buffer));
 	bufptr = buffer;
 	while ((nbytes = read(sockfd, bufptr, buffer + sizeof(buffer) - bufptr - 1)) != -1 && nbytes != 0)
 	{
@@ -213,7 +213,7 @@ void	process_trapper_child(int sockfd)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Got data:%s", buffer);
 
-	process_trap(sockfd,buffer, MAX_BUF_LEN);
+	process_trap(sockfd,buffer, sizeof(buffer));
 
 	alarm(0);
 }

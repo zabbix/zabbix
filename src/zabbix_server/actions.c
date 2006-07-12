@@ -401,7 +401,7 @@ static int get_next_command(char** command_list, char** alias, int* is_group, ch
 		{
 			run_remote_command(alias, command);
 		}
-//		DBadd_alert(action->actionid,trigger->triggerid, userid, media.mediatypeid,media.sendto,action->subject,action->scripts, action->maxrepeats, action->repeatdelay); // TODO !!! Add alert for remote commands !!!
+/*		DBadd_alert(action->actionid,trigger->triggerid, userid, media.mediatypeid,media.sendto,action->subject,action->scripts, action->maxrepeats, action->repeatdelay); */ /* TODO !!! Add alert for remote commands !!! */
 	}
 	zabbix_log( LOG_LEVEL_DEBUG, "Run remote commands END");
 }

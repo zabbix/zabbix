@@ -151,7 +151,7 @@ void zabbix_log(int level, const char *fmt, ...)
 {
 	FILE	*log_file = NULL;
 
-	char	message[MAX_STRING_LEN];
+	char	message[MAX_BUF_LEN];
 
 	time_t	t;
 	struct	tm	*tm;
@@ -173,37 +173,7 @@ void zabbix_log(int level, const char *fmt, ...)
 		return;
 	}
 
-	va_start(args, fmt);
-	vsnprintf(message, MAX_STRING_LEN-2, fmt, args);
-	va_end(args);
-	strncat(message,"\0",MAX_STRING_LEN);
-
-	if(LOG_TYPE_SYSLOG == log_type)
-	{
-#if defined(WIN32)
-		switch(level)
-		{
-			case LOG_LEVEL_CRIT:
-			case LOG_LEVEL_ERR:
-				wType = EVENTLOG_ERROR_TYPE;
-				break;
-			case LOG_LEVEL_WARNING:	
-				wType = EVENTLOG_WARNING_TYPE;
-				break;
-			default:
-				wType = EVENTLOG_INFORMATION_TYPE;
-				break;
-		}
-
-		ReportEvent(system_log_handle, wType, 0, MSG_ZABBIX_MESSAGE, NULL, 1, 0, strings, NULL);
-
-#else /* not WIN32 */
-
-		syslog(LOG_DEBUG,message);
-		
-#endif /* WIN32 */
-	}
-	else if(log_type == LOG_TYPE_FILE)
+	if(LOG_TYPE_FILE == log_type)
 	{
 		zbx_mutex_lock(&log_file_access);
 		
@@ -251,6 +221,39 @@ void zabbix_log(int level, const char *fmt, ...)
 		}
 
 		zbx_mutex_unlock(&log_file_access);
+
+		return;
+	}
+	
+	va_start(args, fmt);
+	vsnprintf(message, sizeof(message)-2, fmt, args);
+	va_end(args);
+	strncat(message,"\0",sizeof(message));
+
+	if(LOG_TYPE_SYSLOG == log_type)
+	{
+#if defined(WIN32)
+		switch(level)
+		{
+			case LOG_LEVEL_CRIT:
+			case LOG_LEVEL_ERR:
+				wType = EVENTLOG_ERROR_TYPE;
+				break;
+			case LOG_LEVEL_WARNING:	
+				wType = EVENTLOG_WARNING_TYPE;
+				break;
+			default:
+				wType = EVENTLOG_INFORMATION_TYPE;
+				break;
+		}
+
+		ReportEvent(system_log_handle, wType, 0, MSG_ZABBIX_MESSAGE, NULL, 1, 0, strings, NULL);
+
+#else /* not WIN32 */
+
+		syslog(LOG_DEBUG,message);
+		
+#endif /* WIN32 */
 	}
 	else
 	{
@@ -277,12 +280,11 @@ void zabbix_log(int level, const char *fmt, ...)
 		
 		zbx_mutex_unlock(&log_file_access);
 	}	
-        return;
 }
 
-//
-// Get system error string by call to FormatMessage
-//
+/*
+ * Get system error string by call to FormatMessage
+ */
 #define ZBX_MESSAGE_BUF_SIZE	1024
 
 char *strerror_from_system(unsigned long error)
@@ -314,9 +316,9 @@ char *strerror_from_system(unsigned long error)
 #endif /* WIN32 */
 }
 
-//
-// Get system error string by call to FormatMessage
-//
+/*
+ * Get system error string by call to FormatMessage
+ */
 
 char *strerror_from_module(unsigned long error, const char *module)
 {
@@ -332,7 +334,7 @@ char *strerror_from_module(unsigned long error, const char *module)
 		FORMAT_MESSAGE_FROM_HMODULE,
 		GetModuleHandle(module),
 		error,
-		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), /* Default language */
 		buffer,
 		1024,
 		NULL) == 0)

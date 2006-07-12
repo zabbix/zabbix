@@ -97,7 +97,7 @@ int	parse_cfg_file(char *cfg_file,struct cfg_line *cfg)
 			if(strcmp(cfg[i].parameter, parameter))
 				continue;
 
-			zbx_error("Accepted configuration parameter: '%s' = '%s'",parameter, value);
+			/* zbx_error("Accepted configuration parameter: '%s' = '%s'",parameter, value); */
 
 			if(cfg[i].function != 0)
 			{

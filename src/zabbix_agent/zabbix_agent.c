@@ -159,7 +159,7 @@ int	main(int argc, char **argv)
 			break;
 	}
 
-	init_metrics(); // Must be before init_config()
+	init_metrics(); /* Must be before init_config() */
 
 	load_config(1);
 

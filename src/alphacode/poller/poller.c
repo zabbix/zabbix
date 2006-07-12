@@ -35,7 +35,7 @@ ZBXPOOL
 	char    ip[128];
 	int     port;
 	int	socket;
-	int	status; // 0 - not connected, 1 - connected, 2 - wrote data
+	int	status; /* 0 - not connected, 1 - connected, 2 - wrote data */
 };
 
 ZBXPOOL	pool[NUM];
@@ -67,13 +67,14 @@ void	wait_connect()
 
 	for(;;)
 	{
-//		printf("To process [%d]\n", NUM-READ);
-//		printf("-----------------------\n");
-//		for(j=0;j<NUM-READ;j++)
-//		{
-//			printf("[%d] fd [%d] revents [%X]\n",j,poll_cli[j].fd,poll_cli[j].revents);
-//		}
-//		printf("-----------------------\n");
+/*		printf("To process [%d]\n", NUM-READ);
+		printf("-----------------------\n");
+		for(j=0;j<NUM-READ;j++)
+		{
+			printf("[%d] fd [%d] revents [%X]\n",j,poll_cli[j].fd,poll_cli[j].revents);
+		}
+		printf("-----------------------\n");
+*/
 		if(NUM-READ<=0) break;
 		retval = poll(poll_cli,NUM-READ,-1);
 
@@ -90,7 +91,7 @@ void	wait_connect()
 
 		for(i=0;i<NUM-READ;i++)
 		{
-//			printf("[%d] remote socket [%X]\n",i,poll_cli[i].revents);
+/*			printf("[%d] remote socket [%X]\n",i,poll_cli[i].revents); */
 			if ((poll_cli[i].revents&POLLHUP)==POLLHUP)
 			{
 				printf("[%d] remote socket has closed\n",i);
@@ -100,13 +101,14 @@ void	wait_connect()
 			{
 				memmove(&poll_cli[i], &poll_cli[i+1],(NUM-READ-i-1)*sizeof(struct pollfd));
 				READ++;
-//				for(j=i;j<NUM-READ;j++)
-//				{
-//					memmove(&poll_cli[j], &poll_cli[j+1],sizeof(struct pollfd));
-//					poll_cli[j].fd=poll_cli[j+1].fd;
-//					poll_cli[j].events=poll_cli[j+1].events;
-//					poll_cli[j].revents=poll_cli[j+1].revents;
-//				}
+/*				for(j=i;j<NUM-READ;j++)
+				{
+					memmove(&poll_cli[j], &poll_cli[j+1],sizeof(struct pollfd));
+					poll_cli[j].fd=poll_cli[j+1].fd;
+					poll_cli[j].events=poll_cli[j+1].events;
+					poll_cli[j].revents=poll_cli[j+1].revents;
+				}
+*/
 				break;
 			} 
 			if ((poll_cli[i].revents&POLLERR)==POLLERR)

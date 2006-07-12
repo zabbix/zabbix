@@ -112,11 +112,11 @@ static int	get_min_nextcheck()
 	return min;
 }
 
-static void	add_check(char *key, int refresh, int lastlogsize)
+static void	add_check(char *key, int refresh, long lastlogsize)
 {
 	int i;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In add_check('%s', %i, %i)", key, refresh, lastlogsize);
+	zabbix_log( LOG_LEVEL_DEBUG, "In add_check('%s', %i, %li)", key, refresh, lastlogsize);
 
 	for(i=0; NULL != active_metrics[i].key; i++)
 	{
@@ -315,11 +315,11 @@ static int	get_active_checks(char *server, unsigned short port, char *error, int
 	zabbix_log(LOG_LEVEL_DEBUG, "Before read");
 
 	amount_read = 0;
-	memset(buf, 0, MAX_BUF_LEN);
+	memset(buf, 0, sizeof(buf));
 
 	do
 	{
-		len = zbx_sock_read(s, buf + amount_read, (MAX_BUF_LEN-1) - amount_read, CONFIG_TIMEOUT);
+		len = zbx_sock_read(s, buf + amount_read, (sizeof(buf)-1) - amount_read, CONFIG_TIMEOUT);
 
 		if(SOCKET_ERROR == len)
 		{
@@ -357,7 +357,7 @@ static int	send_value(char *server,unsigned short port,char *host, char *key,cha
 	ZBX_SOCKADDR myaddr_in;
 	ZBX_SOCKADDR servaddr_in;
 
-	char	buf[MAX_STRING_LEN];
+	char	buf[MAX_BUF_LEN];
 	int	len;
 
 	struct hostent *hp;
@@ -409,9 +409,9 @@ static int	send_value(char *server,unsigned short port,char *host, char *key,cha
 		return	FAIL;
 	} 
 
-	memset(buf, 0, MAX_STRING_LEN);
+	memset(buf, 0, sizeof(buf));
 
-	if(SOCKET_ERROR == (len = zbx_sock_read(s, buf, MAX_STRING_LEN-1, CONFIG_TIMEOUT)))
+	if(SOCKET_ERROR == (len = zbx_sock_read(s, buf, sizeof(buf)-1, CONFIG_TIMEOUT)))
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Error in recvfrom() [%s:%u] [%s]",server, port, strerror(errno));
 		zbx_sock_close(s);
@@ -468,7 +468,7 @@ static int	process_active_checks(char *server, unsigned short port)
 			count = 0;
 			while(process_log(filename,&active_metrics[i].lastlogsize,value) == 0)
 			{
-				zbx_snprintf(lastlogsize, sizeof(lastlogsize), "%d", active_metrics[i].lastlogsize);
+				zbx_snprintf(lastlogsize, sizeof(lastlogsize), "%li", active_metrics[i].lastlogsize);
 
 				if(send_value(server,port,CONFIG_HOSTNAME,active_metrics[i].key,value,lastlogsize) == FAIL)
 				{

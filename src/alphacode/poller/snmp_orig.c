@@ -210,7 +210,7 @@ void synchronous (void)
 
     snmp_sess_init(&ss);			/* initialize session */
     ss.version = SNMP_VERSION_1;
-//    ss.version = SNMP_VERSION_2c;
+/*    ss.version = SNMP_VERSION_2c; */
     ss.peername = strdup(hp->name);
     ss.community = strdup(hp->community);
     ss.community_len = strlen(ss.community);
@@ -289,7 +289,7 @@ void asynchronous(void)
     struct snmp_session sess;
     snmp_sess_init(&sess);			/* initialize session */
     sess.version = SNMP_VERSION_1;
-//    sess.version = SNMP_VERSION_2c;
+/*    sess.version = SNMP_VERSION_2c; */
     sess.peername = strdup(hp->name);
     sess.community = strdup(hp->community);
     sess.community_len = strlen(sess.community);
