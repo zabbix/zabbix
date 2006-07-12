@@ -34,6 +34,7 @@ static ZBX_MUTEX log_file_access;
 #if defined(WIN32)
 
 #include "messages.h"
+
 #include "service.h"
 
 static HANDLE system_log_handle = INVALID_HANDLE_VALUE;
@@ -293,7 +294,7 @@ char *strerror_from_system(unsigned long error)
 
 	static char buffer[ZBX_MESSAGE_BUF_SIZE];  /* !!! Attention static !!! not thread safely - Win32*/
 
-	memset(buffer, 0, ZBX_MESSAGE_BUF_SIZE);
+	memset(buffer, 0, sizeof(buffer));
 
 	if(FormatMessage(
 		FORMAT_MESSAGE_FROM_SYSTEM, 
@@ -301,7 +302,7 @@ char *strerror_from_system(unsigned long error)
 		error,
 		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), 
 		buffer, 
-		1023, 
+		sizeof(buffer), 
 		NULL) == 0)
 	{
 		zbx_snprintf(buffer, sizeof(buffer), "3. MSG 0x%08X - Unable to find message text [0x%X]", error , GetLastError());
@@ -325,24 +326,24 @@ char *strerror_from_module(unsigned long error, const char *module)
 #if defined(WIN32)
 
 	static char buffer[ZBX_MESSAGE_BUF_SIZE]; /* !!! Attention static !!! not thread safely - Win32*/
+	char *strings[2];
 
-	assert(module);
-
-	memset(buffer, 0, ZBX_MESSAGE_BUF_SIZE);
+	memset(strings,0,sizeof(char *)*2);
+	memset(buffer, 0, sizeof(buffer));
 
 	if (FormatMessage(
-		FORMAT_MESSAGE_FROM_HMODULE,
-		GetModuleHandle(module),
+		FORMAT_MESSAGE_FROM_HMODULE | FORMAT_MESSAGE_ARGUMENT_ARRAY,
+		module ? GetModuleHandle(module) : NULL,
 		error,
 		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), /* Default language */
-		buffer,
-		1024,
-		NULL) == 0)
+		(LPTSTR)buffer,
+		sizeof(buffer),
+		strings) == 0)
 	{
-		zbx_snprintf(buffer, sizeof(buffer), "3. MSG 0x%08X - Unable to find message text [0x%X]", error , GetLastError());
+		zbx_snprintf(buffer, sizeof(buffer), "3. MSG 0x%08X - Unable to find message text [%s]", error , strerror_from_system(GetLastError()));
 	}
 
-	return buffer;
+	return (char *)buffer;
 
 #else /* not WIN32 */
 

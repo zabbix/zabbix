@@ -204,7 +204,7 @@ static ZBX_SOCKET connect_to_server(void)
 {
 	ZBX_SOCKET sock;
 	ZBX_SOCKADDR serv_addr;
-	int	on;
+	char	on;
 
 	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
 	{
@@ -432,16 +432,20 @@ int	main(int argc, char **argv)
 
 #else /* ZABBIX_TEST */
 
+#include "messages.h"
+
 int main()
 {
-#if 0
+#if 1
+	zbx_error("%s",strerror_from_module(MSG_ZABBIX_MESSAGE, NULL));
+#elif 0
 	char buffer[100*1024];
 
 	get_http_page("www.zabbix.com", "", 80, buffer, 100*1024);
 
 	printf("Back [%d] [%s]\n", strlen(buffer), buffer);
 	
-#elif 1
+#elif 0
 
 	char s[] = "ABCDEFGH";
 	char p[] = "D(.){0,}E";
