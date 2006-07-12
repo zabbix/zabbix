@@ -1157,7 +1157,7 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 #if defined(WIN32)
 
-	// Create temporary file to hold process output
+	/* Create temporary file to hold process output */
 	GetTempPath( MAX_PATH-1,	szTempPath);
 	GetTempFileName( szTempPath, "zbx", 0, szTempFile);
 
@@ -1178,7 +1178,7 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		return SYSINFO_RET_FAIL;
 	}
 
-	// Fill in process startup info structure
+	/* Fill in process startup info structure */
 	memset(&si,0,sizeof(STARTUPINFO));
 	si.cb		= sizeof(STARTUPINFO);
 	si.dwFlags	= STARTF_USESTDHANDLES;
@@ -1186,22 +1186,22 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	si.hStdOutput	= hOutput;
 	si.hStdError	= GetStdHandle(STD_ERROR_HANDLE);
 
-	// Create new process
+	/* Create new process */
 	if (!CreateProcess(NULL,command,NULL,NULL,TRUE,0,NULL,NULL,&si,&pi))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Unable to create process: '%s' [%s]", command, strerror_from_system(GetLastError()));
 		return SYSINFO_RET_FAIL;
 	}
 
-	// Wait for process termination and close all handles
+	/* Wait for process termination and close all handles */
 	WaitForSingleObject(pi.hProcess,INFINITE);
 	CloseHandle(pi.hThread);
 	CloseHandle(pi.hProcess);
 
-	// Rewind temporary file for reading
+	/* Rewind temporary file for reading */
 	SetFilePointer(hOutput,0,NULL,FILE_BEGIN);
 
-	// Read process output
+	/* Read process output */
 	ReadFile(hOutput, cmd_result, MAX_STRING_LEN-1, &len, NULL);
 
 	cmd_result[len] = '\0';
@@ -1330,7 +1330,7 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		return SYSINFO_RET_FAIL;
 	}
 
-	zabbix_log(LOG_LEVEL_WARNING, "Run command '%s'",command);
+	zabbix_log(LOG_LEVEL_DEBUG, "Run command '%s'",command);
 	
 	if(get_param(param, 2, flag, sizeof(flag)) != 0)
         {
@@ -1360,19 +1360,19 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 	GetStartupInfo(&si);
 
-	zabbix_log(LOG_LEVEL_WARNING, "Execute command '%s'",full_command);
+	zabbix_log(LOG_LEVEL_DEBUG, "Execute command '%s'",full_command);
 
 	if(!CreateProcess(
-		NULL,	// No module name (use command line)
-		full_command,// Name of app to launch
-		NULL,	// Default process security attributes
-		NULL,	// Default thread security attributes
-		FALSE,	// Don't inherit handles from the parent
-		0,	// Normal priority
-		NULL,	// Use the same environment as the parent
-		NULL,	// Launch in the current directory
-		&si,	// Startup Information
-		&pi))	// Process information stored upon return
+		NULL,	/* No module name (use command line) */
+		full_command,/* Name of app to launch */
+		NULL,	/* Default process security attributes */
+		NULL,	/* Default thread security attributes */
+		FALSE,	/* Don't inherit handles from the parent */
+		0,	/* Normal priority */
+		NULL,	/* Use the same environment as the parent */
+		NULL,	/* Launch in the current directory */
+		&si,	/* Startup Information */
+		&pi))	/* Process information stored upon return */
 	{
 		return SYSINFO_RET_FAIL;
 	}

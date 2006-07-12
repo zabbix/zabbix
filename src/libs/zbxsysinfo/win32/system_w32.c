@@ -77,7 +77,7 @@ int     SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_R
 					versionInfo.szCSDVersion
 					);
 			}
-			else      // Windows 2000, Windows XP or Windows Server 2003
+			else      /* Windows 2000, Windows XP or Windows Server 2003 */
 			{
 				zbx_snprintf(
 					osVersion,

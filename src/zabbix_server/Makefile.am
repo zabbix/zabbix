@@ -10,4 +10,4 @@ zabbix_server_LDADD = ../libs/zbxsysinfo/libzbxsysinfo.a ../libs/zbxsysinfo/@ARC
 alerter/libzbxalerter.a timer/libzbxtimer.a trapper/libzbxtrapper.a ../libs/zbxemail/libzbxemail.a  \
 ../libs/zbxsms/libzbxsms.a ../libs/zbxdbhigh/libzbxdbhigh.a ../libs/zbxcommon/libzbxcommon.a \
 ../libs/zbxcrypto/libzbxcrypto.a @MYSQL_LIBS@ @PGSQL_LIBS@ @ORACLE_LIBS@ @LDAP_LIBS@ @SNMP_LIBS@
-zabbix_server_LDFLAGS=@MYSQL_LFLAGS@ @PGSQL_LFLAGS@ @ORACLE_LFLAGS@ @LDAP_LFLAGS@ @SNMP_LFLAGS@ -DZABBIX_DEAMON
+zabbix_server_LDFLAGS=@MYSQL_LFLAGS@ @PGSQL_LFLAGS@ @ORACLE_LFLAGS@ @LDAP_LFLAGS@ @SNMP_LFLAGS@

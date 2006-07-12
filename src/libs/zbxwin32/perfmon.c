@@ -27,9 +27,9 @@
 
 PERFCOUNTER *PerfCounterList = NULL;
 
-//
-// Get performance counter name by index
-//
+/*
+ * Get performance counter name by index
+ */
 
 char *GetCounterName(DWORD index)
 {

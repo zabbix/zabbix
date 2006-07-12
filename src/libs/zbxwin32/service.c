@@ -32,18 +32,18 @@
 static int ZabbixRemoveEventSource(void);
 static int ZabbixInstallEventSource(char *path);
 
-//
-// Static data
-//
+/*
+ * Static data
+ */
 
 static	SERVICE_STATUS		serviceStatus;
 static	SERVICE_STATUS_HANDLE	serviceHandle;
 
 int application_is_runned = ZBX_APP_RUNNED;
 
-//
-// ZABBIX service control handler
-//
+/*
+ * ZABBIX service control handler
+ */
 
 static VOID WINAPI ServiceCtrlHandler(DWORD ctrlCode)
 {
@@ -82,9 +82,9 @@ static VOID WINAPI ServiceCtrlHandler(DWORD ctrlCode)
 	SetServiceStatus(serviceHandle, &serviceStatus);
 }
 
-//
-// The entry point for a ZABBIX service.
-//
+/*
+ * The entry point for a ZABBIX service.
+ */
 
 static VOID WINAPI ServiceEntry(DWORD argc,LPTSTR *argv)
 {
@@ -93,7 +93,7 @@ static VOID WINAPI ServiceEntry(DWORD argc,LPTSTR *argv)
 
 	serviceHandle = RegisterServiceCtrlHandler(ZABBIX_SERVICE_NAME, ServiceCtrlHandler);
 
-	// Now we start service initialization
+	/* Now we start service initialization */
 	serviceStatus.dwServiceType		= SERVICE_WIN32_OWN_PROCESS;
 	serviceStatus.dwCurrentState		= SERVICE_START_PENDING;
 	serviceStatus.dwControlsAccepted	= SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_SHUTDOWN;
@@ -104,14 +104,14 @@ static VOID WINAPI ServiceEntry(DWORD argc,LPTSTR *argv)
 
 	SetServiceStatus(serviceHandle, &serviceStatus);
 
-	// Initialize Windows Sockets API
+	/* Initialize Windows Sockets API */
 	WSAStartup(0x0002,&sockInfo);
 
-	// Internal command aliases
+	/* Internal command aliases */
 	zbx_snprintf(counterPath, sizeof(counterPath), "perf_counter[\\%s\\%s]",GetCounterName(PCI_SYSTEM),GetCounterName(PCI_SYSTEM_UP_TIME));
 	add_alias("system.uptime",counterPath);
 
-	// Now service is running
+	/* Now service is running */
 	serviceStatus.dwCurrentState	= SERVICE_RUNNING;
 	serviceStatus.dwWaitHint	= 0;
 	SetServiceStatus(serviceHandle, &serviceStatus);
@@ -120,9 +120,9 @@ static VOID WINAPI ServiceEntry(DWORD argc,LPTSTR *argv)
 }
 
 
-//
-// Initialize service
-//
+/*
+ * Initialize service
+ */
 
 void service_start(void)
 {
@@ -134,7 +134,7 @@ void service_start(void)
 
 	WSADATA sockInfo;
 
-	// Initialize Windows Sockets API
+	/* Initialize Windows Sockets APIa */
 	switch(WSAStartup(0x0002,&sockInfo))
 	{
 		case WSASYSNOTREADY:
@@ -154,8 +154,8 @@ void service_start(void)
 			return;
 	}
 
-	// Create synchronization stuff
-//	eventShutdown = CreateEvent(NULL,TRUE,FALSE,NULL);
+	/* Create synchronization stuff */
+/*	eventShutdown = CreateEvent(NULL,TRUE,FALSE,NULL); */
 
 	if (!StartServiceCtrlDispatcher(serviceTable))
 	{
@@ -171,13 +171,13 @@ void service_start(void)
 
 	}
 
-//	CloseHandle(eventShutdown);
+/*	CloseHandle(eventShutdown); */
 }
 
 
-//
-// Create service
-//
+/*
+ * Create service
+ */
 
 int ZabbixCreateService(char *path)
 {
@@ -248,9 +248,9 @@ int ZabbixCreateService(char *path)
 }
 
 
-//
-// Remove service
-//
+/*
+ * Remove service
+ */
 
 int ZabbixRemoveService(void)
 {
@@ -296,9 +296,9 @@ int ZabbixRemoveService(void)
 }
 
 
-//
-// Start service
-//
+/*
+ * Start service
+ */
 
 int ZabbixStartService(void)
 {
@@ -340,9 +340,9 @@ int ZabbixStartService(void)
 }
 
 
-//
-// Stop service
-//
+/*
+ * Stop service
+ */
 
 int ZabbixStopService(void)
 {
@@ -384,9 +384,9 @@ int ZabbixStopService(void)
 }
 
 
-//
-// Install event source
-//
+/*
+ * Install event source
+ */
 static int ZabbixInstallEventSource(char *path)
 {
    HKEY		hKey;
@@ -419,9 +419,9 @@ static int ZabbixInstallEventSource(char *path)
 }
 
 
-//
-// Remove event source
-//
+/*
+ * Remove event source
+ */
 
 static int ZabbixRemoveEventSource(void)
 {
