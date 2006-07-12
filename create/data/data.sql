@@ -121,27 +121,27 @@ insert into help_items values(0,'agent.version','Version of zabbix_agent(d) runn
 insert into help_items values(0,'kernel.maxfiles','Maximum number of opened file supported by OS.');
 insert into help_items values(0,'kernel.maxproc','Maximum number of processes supported by OS.');
 insert into help_items values(0,'net.if.collisions[if]','Out-of-window collision. Collisions count.');
-insert into help_items values(0,'net.if.in[if &lt;,mode&gt;]','Network interfice input statistic. Integer value. If mode is missing &lt;b&gt;bytes&lt;/b&gt; is used.');
-insert into help_items values(0,'net.if.out[if &lt;,mode&gt;]','Network interfice output statistic. Integer value. If mode is missing &lt;b&gt;bytes&lt;/b&gt; is used.');
+insert into help_items values(0,'net.if.in[if &lt;,mode&gt;]','Network interfice input statistic. Integer value. If mode is missing bytes is used.');
+insert into help_items values(0,'net.if.out[if &lt;,mode&gt;]','Network interfice output statistic. Integer value. If mode is missing bytes is used.');
 insert into help_items values(0,'net.tcp.dns[ip, zone]','Checks if DNS service is up. 0 - DNS is down, 1 - DNS is up.');
 insert into help_items values(0,'net.tcp.listen[port]','Checks if this port is in LISTEN state. 0 - it is not, 1 - it is in LISTEN state.');
 insert into help_items values(0,'net.tcp.port[&lt;ip&gt;, port]','Check, if it is possible to make TCP connection to the port number. 0 - cannot connect, 1 - can connect. IP address is optional. If ip is missing, 127.0.0.1 is used. Example: net.tcp.port[,80]');
 insert into help_items values(0,'net.tcp.service[service &lt;,ip&gt; &lt;,port&gt;]','Check if service server is running and accepting connections. 0 - service is down, 1 - service is running. If ip is missing 127.0.0.1 is used. If port number is missing, default service port is used. Example: net.tcp.service[ftp,,45].');
-insert into help_items values(0,'net.tcp.service.perf[service &lt;,ip&gt; &lt;,port&gt;]','Check performance of service server. 0 - service server is down, &lt;sec&gt; - number of seconds spent on connection to the service server. If ip is missing 127.0.0.1 is used.  If port number is missing, default service port is used.');
-insert into help_items values(0,'proc.mem[&lt;name&gt; &lt;,user&gt; &lt;,mode&gt;]','Memory used of process with name name running under user &lt;b&gt;user&lt;/b&gt;. Memory used by processes. Process name, user and mode is optional. If name or user is missing all processes will be calculated. If &lt;b&gt;mode&lt;/b&gt; is missing &lt;b&gt;sum&lt;/b&gt; is used.  Examples: proc.mem[,root]');
-insert into help_items values(0,'proc.num[&lt;name&gt; &lt;,user&gt; &lt;,state&gt;]','Number of processes with name &lt;b&gt;name&lt;/b&gt; running under user &lt;b&gt;user&lt;/b&gt; having state &lt;b&gt;state&lt;/b&gt;.	Process name, user and state are optional. Example: proc.num[,root]');
+insert into help_items values(0,'net.tcp.service.perf[service &lt;,ip&gt; &lt;,port&gt;]','Check performance of service server. 0 - service server is down, sec - number of seconds spent on connection to the service server. If ip is missing 127.0.0.1 is used.  If port number is missing, default service port is used.');
+insert into help_items values(0,'proc.mem[&lt;name&gt; &lt;,user&gt; &lt;,mode&gt;]','Memory used of process with name name running under user user. Memory used by processes. Process name, user and mode is optional. If name or user is missing all processes will be calculated. If mode is missing sum is used.  Examples: proc.mem[,root]');
+insert into help_items values(0,'proc.num[&lt;name&gt; &lt;,user&gt; &lt;,state&gt;]','Number of processes with name name running under user user having state state. Process name, user and state are optional. Example: proc.num[,root]');
 insert into help_items values(0,'system.cpu.intr','Device interrupts.');
-insert into help_items values(0,'system.cpu.load[&lt;cpu&gt; &lt;,mode&gt;]','CPU(s) load. Processor load. The cpu and mode are optional. If cpu is missing &lt;b&gt;all&lt;/b&gt; is used.  If mode is missing &lt;b&gt;avg1&lt;/b&gt; is used. Note that this is not percentage.');
+insert into help_items values(0,'system.cpu.load[&lt;cpu&gt; &lt;,mode&gt;]','CPU(s) load. Processor load. The cpu and mode are optional. If cpu is missing all is used. If mode is missing avg1 is used. Note that this is not percentage.');
 insert into help_items values(0,'system.cpu.switches','Context switches.');
-insert into help_items values(0,'system.cpu.util[&lt;cpu&gt; &lt;,type&gt; &lt;,mode&gt;]','CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing &lt;b&gt;all&lt;/b&gt; is used.  If type is missing &lt;b&gt;user&lt;/b&gt; is used. If mode is missing &lt;b&gt;avg1&lt;/b&gt; is used.&lt;/b&gt;');
+insert into help_items values(0,'system.cpu.util[&lt;cpu&gt; &lt;,type&gt; &lt;,mode&gt;]','CPU(s) utilisation. Processor load in percents. The cpu, type and mode are optional. If cpu is missing all is used.  If type is missing user is used. If mode is missing avg1 is used.');
 insert into help_items values(0,'system.hostname','Return host name. String value. Example of returned value: www.zabbix.com');
 insert into help_items values(0,'system.localtime','System local time. Time in seconds.');
-insert into help_items values(0,'system.swap.in[&lt;swap&gt; &lt;,type&gt;]','Swap in. If type is &lt;b&gt;count&lt;b&gt; - swapins is returned. If type is &lt;b&gt;pages&lt;/b&gt; - pages swapped in is returned.	If swap is missing &lt;b&gt;all&lt;/b&gt; is used.');
-insert into help_items values(0,'system.swap.out[&lt;swap&gt; &lt;,type&gt;]','Swap out. If type is &lt;b&gt;count&lt;/b&gt; - swapouts is returned. If type is &lt;b&gt;pages&lt;/b&gt; - pages swapped in is returned.  If swap is missing &lt;b&gt;all&lt;/b&gt; is used.');
-insert into help_items values(0,'system.swap.size[&lt;swap&gt; &lt;,mode&gt;]','Swap space.	Number of bytes. If swap is missing &lt;b&gt;all&lt;/b&gt; is used. If mode is missing &lt;b&gt;free&lt;/b&gt; is used.');
+insert into help_items values(0,'system.swap.in[&lt;swap&gt; &lt;,type&gt;]','Swap in. If type is count - swapins is returned. If type is pages - pages swapped in is returned.	If swap is missing all is used.');
+insert into help_items values(0,'system.swap.out[&lt;swap&gt; &lt;,type&gt;]','Swap out. If type is count - swapouts is returned. If type is pages - pages swapped in is returned.  If swap is missing all is used.');
+insert into help_items values(0,'system.swap.size[&lt;swap&gt; &lt;,mode&gt;]','Swap space. Number of bytes. If swap is missing all is used. If mode is missing free is used.');
 insert into help_items values(0,'system.uname','Returns detailed host information. String value');
 insert into help_items values(0,'system.uptime','System uptime in seconds.');
-insert into help_items values(0,'system.users.num','Number of users connected. Command &lt;b&gt;who&lt;/b&gt; is used on agent side.');
+insert into help_items values(0,'system.users.num','Number of users connected. Command who is used on agent side.');
 insert into help_items values(0,'vfs.dev.read[device &lt;,type&gt; &lt;,mode&gt;]','Device read statistics.');
 insert into help_items values(0,'vfs.dev.write[device &lt;,type&gt; &lt;,mode&gt;]','Device write statistics.');
 insert into help_items values(0,'vfs.file.cksum[file]','Calculate check sum of a given file. Check sum of the file calculate by standard algorithm used by UNIX utility cksum.	Example: vfs.file.cksum[/etc/passwd]');
@@ -150,10 +150,10 @@ insert into help_items values(0,'vfs.file.md5sum[file]','Calculate MD5 check sum
 insert into help_items values(0,'vfs.file.regexp[file, user]','');
 insert into help_items values(0,'vfs.file.regmatch[file, user]','');
 insert into help_items values(0,'vfs.file.size[file]','Size of a given file. Size in bytes. File must have read permissions for user zabbix. Example: vfs.file.size[/var/log/syslog]');
-insert into help_items values(0,'vfs.file.time[file&lt;, mode&gt;]','File time information. Number of seconds.	The mode is optional. If mode is missing &lt;b&gt;modify&lt;/b&gt; is used.');
-insert into help_items values(0,'vfs.fs.inode[fs &lt;,mode&gt;]','Number of inodes for a given volume. If mode is missing &lt;b&gt;total&lt;/b&gt; is used.');
-insert into help_items values(0,'vfs.fs.size[fs &lt;,mode&gt;]','Calculate disk space for a given volume. Disk space in KB. If mode is missing &lt;b&gt;total&lt;/b&gt; is used.  In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free].');
-insert into help_items values(0,'vm.memory.size[&lt;mode&gt;]','Amount of memory size in bytes. If mode is missing &lt;b&gt;total&lt;/b&gt; is used.');
+insert into help_items values(0,'vfs.file.time[file&lt;, mode&gt;]','File time information. Number of seconds.	The mode is optional. If mode is missing modify is used.');
+insert into help_items values(0,'vfs.fs.inode[fs &lt;,mode&gt;]','Number of inodes for a given volume. If mode is missing total is used.');
+insert into help_items values(0,'vfs.fs.size[fs &lt;,mode&gt;]','Calculate disk space for a given volume. Disk space in KB. If mode is missing total is used.  In case of mounted volume, unused disk space for local file system is returned. Example: vfs.fs.size[/tmp,free].');
+insert into help_items values(0,'vm.memory.size[&lt;mode&gt;]','Amount of memory size in bytes. If mode is missing total is used.');
 
 --
 -- Dumping data for table `items`
