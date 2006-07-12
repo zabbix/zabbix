@@ -1546,9 +1546,9 @@ static int TCP_LISTEN(const char *cmd, const char *parameter,double  *value, con
   
   memset(command, '\0', sizeof command);
 
-  snprintf(command, sizeof command-1, "netstat -an | grep '*.%s' | wc -l", parameter);
+  zbx_snprintf(command, sizeof(command), "netstat -an | grep '*.%s' | wc -l", parameter);
    
-  return EXECUTE(NULL, command, value, msg, mlen_max);
+  return EXECUTE_INT(NULL, command, value, msg, mlen_max);
 }
 */
 
@@ -1742,10 +1742,10 @@ ZBX_METRIC agent_commands[]=
         {"system[hostname]"     ,0,             EXECUTE_STR, "hostname"},
         {"system[uname]"        ,0,             EXECUTE_STR, "uname -a"},
         {"system[uptime]"       ,UPTIME,        0, 0},
-        {"system[users]"        ,EXECUTE,       0,"who|wc -l"},
+        {"system[users]"        ,EXECUTE_INT,       0,"who|wc -l"},
 
         {"ping"                 ,PING,          0, 0},
-        {"tcp_count"            ,EXECUTE,       0, "netstat -s -P tcp | grep tcpCurrEstab | cut -f2 | tr -s ' ' | cut -d' ' -f3"},
+        {"tcp_count"            ,EXECUTE_INT,       0, "netstat -s -P tcp | grep tcpCurrEstab | cut -f2 | tr -s ' ' | cut -d' ' -f3"},
 
         {"tcp_listen[*]"        ,TCP_LISTEN,    0, "22"},
 

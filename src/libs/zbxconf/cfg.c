@@ -17,13 +17,18 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "common.h"
 #include "cfg.h"
+#include "log.h"
+
+
+int	CONFIG_ZABBIX_FORKS		= ZABBIX_FORKS;
+char	*CONFIG_FILE			= NULL;
+
+
+char	*CONFIG_LOG_FILE		= NULL;
+char	CONFIG_ALLOW_ROOT_PERMISSION	= 0;
+int	CONFIG_TIMEOUT			= AGENT_TIMEOUT;
 
 /******************************************************************************
  *                                                                            *
@@ -38,6 +43,7 @@
  *               FAIL - error processing config file                          *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
+ *         Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -45,116 +51,105 @@
 int	parse_cfg_file(char *cfg_file,struct cfg_line *cfg)
 {
 	FILE	*file;
-	char	line[MAX_STRING_LEN];
-	char	parameter[MAX_STRING_LEN];
-	char	*value;
 	int	lineno;
+
+	char	line[MAX_STRING_LEN];
+	char	*parameter;
+	char	*value;
+
 	int	i,var;
-	char	**c;
-	int	(*func)();
 
-
-
-	file=fopen(cfg_file,"r");
-	if(NULL == file)
+	if(NULL == (file = fopen(cfg_file,"r")))
 	{
-		fprintf(stderr, "Cannot open config file [%s] [%s]\n",cfg_file,strerror(errno));
+		zbx_error("Cannot open config file [%s] [%s].",cfg_file,strerror(errno));
 		return	FAIL;
 	}
 
-	lineno=0;
-	while(fgets(line,MAX_STRING_LEN,file) != NULL)
+	
+	for(lineno = 1; fgets(line,MAX_STRING_LEN,file) != NULL; lineno++)
 	{
-		lineno++;
-
 		if(line[0]=='#')	continue;
-		if(strlen(line)==1)	continue;
+		if(strlen(line) < 3)	continue;
 
-		strscpy(parameter,line);
+		parameter	= line;
 
-		value=strstr(line,"=");
-
+		value		= strstr(line,"=");
 		if(NULL == value)
 		{
-			fprintf(stderr, "Error in line [%s] Line %d\n", line, lineno);
+			zbx_error("Error in line [%d] \"%s\"", lineno, line);
 			return	FAIL;
 		}
+
+		*value = '\0';
 		value++;
-		value[strlen(value)-1]=0;
 
-		parameter[value-line-1]=0;
-
-		i=0;
-		while(cfg[i].parameter != 0)
+		for(i = 0; value[i] != '\0'; i++)
 		{
-			if(strcmp(cfg[i].parameter, parameter) == 0)
+			if(value[i] == '\n')
 			{
-				if(cfg[i].function != 0)
-				{
-					func=cfg[i].function;
-					if(func(value)!=SUCCEED)
-					{
-						fprintf(stderr, "Wrong value of [%s] in line %d.\n", cfg[i].parameter, lineno);
-						return	FAIL;
-					}
-				}
-				else
-				{
-				if(cfg[i].type == TYPE_INT)
-				{
-					var=atoi(value);
-					if( (cfg[i].min!=0) || (cfg[i].max!=0))
-					{
-						if( (var<cfg[i].min) || (var>cfg[i].max) )
-						{
-							fprintf(stderr, "Wrong value of [%s] in line %d. Should be between %d and %d.\n", cfg[i].parameter, lineno, cfg[i].min, cfg[i].max);
-							return	FAIL;
-						}
-						
-					}
-					*((int*)cfg[i].variable)=var;
-				}
-				else
-				{
-/* Can this be done without "c" ? */ 
-					c=(char **)cfg[i].variable;
-					*c=(char *)strdup(value);
-/*					*((char*)cfg[i].variable)=strdup(value);*/
-				}
-				}
+				value[i] = '\0';
+				break;
 			}
-			i++;
+		}
+
+		for(i = 0; cfg[i].parameter != 0; i++)
+		{
+			if(strcmp(cfg[i].parameter, parameter))
+				continue;
+
+			zbx_error("Accepted configuration parameter: '%s' = '%s'",parameter, value);
+
+			if(cfg[i].function != 0)
+			{
+				if(cfg[i].function(value) != SUCCEED)
+					goto lbl_incorrect_config;
+			}
+			else if(TYPE_INT == cfg[i].type)
+			{
+				var = atoi(value);
+
+				if(cfg[i].min) 
+					if(var < cfg[i].min)
+						goto lbl_incorrect_config;
+
+				if(cfg[i].max) 
+					if(var > cfg[i].max)
+						goto lbl_incorrect_config;
+
+				*((int*)cfg[i].variable) = var;
+			}
+			else
+			{
+				*((char **)cfg[i].variable) = strdup(value);
+			}
 		}
 	}
 
-/* Check for mandatory parameters */
-	i=0;
-	while(cfg[i].parameter != 0)
+	/* Check for mandatory parameters */
+	for(i = 0; cfg[i].parameter != 0; i++)
 	{
-		if(cfg[i].mandatory ==1)
+		if(!cfg[i].mandatory)
+			continue;
+
+		if(TYPE_INT == cfg[i].type)
 		{
-			if(cfg[i].type == TYPE_INT)
-			{
-/*				pointer=(int *)cfg[i].variable;
-				if(*pointer==0)*/
-				if(*((int*)cfg[i].variable) == 0)
-				{
-					fprintf(stderr,"Missing mandatory parameter [%s]\n", cfg[i].parameter);
-					return	FAIL;
-				}
-			}
-			if(cfg[i].type == TYPE_STRING)
-			{
-				c=(char **)cfg[i].variable;
-				if(*c==NULL)
-				{
-					fprintf(stderr, "Missing mandatory parameter [%s]\n", cfg[i].parameter);
-					return	FAIL;
-				}
-			}
+			if(*((int*)cfg[i].variable) == 0)
+				goto lbl_missing_mandatory;
 		}
-		i++;
+		else if(TYPE_STRING == cfg[i].type)
+		{
+			if((*(char **)cfg[i].variable) == NULL)
+				goto lbl_missing_mandatory;
+		}
 	}
 
 	return	SUCCEED;
+
+lbl_missing_mandatory:
+	zbx_error("Missing mandatory parameter [%s].", cfg[i].parameter);
+	return	FAIL;
+
+lbl_incorrect_config:
+	zbx_error("Wrong value of [%s] in line %d.", cfg[i].parameter, lineno);
+	return	FAIL;
 }

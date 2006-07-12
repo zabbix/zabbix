@@ -81,8 +81,8 @@ void	update_functions(DB_ITEM *item)
 	zabbix_log( LOG_LEVEL_DEBUG, "In update_functions(%d)",item->itemid);
 
 /* Oracle does'n support this */
-/*	snprintf(sql,sizeof(sql)-1,"select function,parameter,itemid,lastvalue from functions where itemid=%d group by function,parameter,itemid order by function,parameter,itemid",item->itemid);*/
-	snprintf(sql,sizeof(sql)-1,"select distinct function,parameter,itemid,lastvalue from functions where itemid=%d",item->itemid);
+/*	zbx_snprintf(sql,sizeof(sql),"select function,parameter,itemid,lastvalue from functions where itemid=%d group by function,parameter,itemid order by function,parameter,itemid",item->itemid);*/
+	zbx_snprintf(sql,sizeof(sql),"select distinct function,parameter,itemid,lastvalue from functions where itemid=%d",item->itemid);
 
 	result = DBselect(sql);
 
@@ -93,22 +93,22 @@ void	update_functions(DB_ITEM *item)
 		function.itemid=atoi(row[2]);
 		lastvalue=row[3];
 
-		zabbix_log( LOG_LEVEL_DEBUG, "ItemId:%d Evaluating %s(%d)\n",function.itemid,function.function,function.parameter);
+		zabbix_log( LOG_LEVEL_DEBUG, "ItemId:%d Evaluating %s(%d)",function.itemid,function.function,function.parameter);
 
 		ret = evaluate_FUNCTION(value,item,function.function,function.parameter);
 		if( FAIL == ret)	
 		{
-			zabbix_log( LOG_LEVEL_DEBUG, "Evaluation failed for function:%s\n",function.function);
+			zabbix_log( LOG_LEVEL_DEBUG, "Evaluation failed for function:%s",function.function);
 			continue;
 		}
-		zabbix_log( LOG_LEVEL_DEBUG, "Result of evaluate_FUNCTION [%s]\n",value);
+		zabbix_log( LOG_LEVEL_DEBUG, "Result of evaluate_FUNCTION [%s]",value);
 		if (ret == SUCCEED)
 		{
 			/* Update only if lastvalue differs from new one */
 			if( (lastvalue == NULL) || (strcmp(lastvalue,value) != 0))
 			{
 				DBescape_string(value,value_esc,MAX_STRING_LEN);
-				snprintf(sql,sizeof(sql)-1,"update functions set lastvalue='%s' where itemid=%d and function='%s' and parameter='%s'", value_esc, function.itemid, function.function, function.parameter );
+				zbx_snprintf(sql,sizeof(sql),"update functions set lastvalue='%s' where itemid=%d and function='%s' and parameter='%s'", value_esc, function.itemid, function.function, function.parameter );
 				DBexecute(sql);
 			}
 			else
@@ -148,7 +148,7 @@ void	update_services_rec(int serviceid)
 	DB_ROW	row;
 	DB_ROW	row2;
 
-	snprintf(sql,sizeof(sql)-1,"select l.serviceupid,s.algorithm from services_links l,services s where s.serviceid=l.serviceupid and l.servicedownid=%d",serviceid);
+	zbx_snprintf(sql,sizeof(sql),"select l.serviceupid,s.algorithm from services_links l,services s where s.serviceid=l.serviceupid and l.servicedownid=%d",serviceid);
 	result=DBselect(sql);
 	status=0;
 	while((row=DBfetch(result)))
@@ -164,7 +164,7 @@ void	update_services_rec(int serviceid)
 			(SERVICE_ALGORITHM_MIN == algorithm))
 		{
 			/* Why it was so complex ?
-			sprintf(sql,"select status from services s,services_links l where l.serviceupid=%d and s.serviceid=l.servicedownid",serviceupid);
+			zbx_snprintf(sql, sizeof(sql), "select status from services s,services_links l where l.serviceupid=%d and s.serviceid=l.servicedownid",serviceupid);
 			result2=DBselect(sql);
 			for(j=0;j<DBnum_rows(result2);j++)
 			{
@@ -177,12 +177,12 @@ void	update_services_rec(int serviceid)
 
 			if(SERVICE_ALGORITHM_MAX == algorithm)
 			{
-				snprintf(sql,sizeof(sql)-1,"select count(*),max(status) from services s,services_links l where l.serviceupid=%d and s.serviceid=l.servicedownid",serviceupid);
+				zbx_snprintf(sql,sizeof(sql),"select count(*),max(status) from services s,services_links l where l.serviceupid=%d and s.serviceid=l.servicedownid",serviceupid);
 			}
 			/* MIN otherwise */
 			else
 			{
-				snprintf(sql,sizeof(sql)-1,"select count(*),min(status) from services s,services_links l where l.serviceupid=%d and s.serviceid=l.servicedownid",serviceupid);
+				zbx_snprintf(sql,sizeof(sql),"select count(*),min(status) from services s,services_links l where l.serviceupid=%d and s.serviceid=l.servicedownid",serviceupid);
 			}
 			result2=DBselect(sql);
 			row2=DBfetch(result2);
@@ -197,7 +197,7 @@ void	update_services_rec(int serviceid)
 
 			now=time(NULL);
 			DBadd_service_alarm(atoi(row[0]),status,now);
-			snprintf(sql,sizeof(sql)-1,"update services set status=%d where serviceid=%d",status,atoi(row[0]));
+			zbx_snprintf(sql,sizeof(sql),"update services set status=%d where serviceid=%d",status,atoi(row[0]));
 			DBexecute(sql);
 		}
 		else
@@ -208,7 +208,7 @@ void	update_services_rec(int serviceid)
 	}
 	DBfree_result(result);
 
-	snprintf(sql,sizeof(sql)-1,"select serviceupid from services_links where servicedownid=%d",serviceid);
+	zbx_snprintf(sql,sizeof(sql),"select serviceupid from services_links where servicedownid=%d",serviceid);
 	result=DBselect(sql);
 
 	while((row=DBfetch(result)))
@@ -241,10 +241,10 @@ void	update_services(int triggerid, int status)
 
 	DB_RESULT result;
 
-	snprintf(sql,sizeof(sql)-1,"update services set status=%d where triggerid=%d",status,triggerid);
+	zbx_snprintf(sql,sizeof(sql),"update services set status=%d where triggerid=%d",status,triggerid);
 	DBexecute(sql);
 
-	snprintf(sql,sizeof(sql)-1,"select serviceid from services where triggerid=%d", triggerid);
+	zbx_snprintf(sql,sizeof(sql),"select serviceid from services where triggerid=%d", triggerid);
 	result = DBselect(sql);
 
 	while((row=DBfetch(result)))
@@ -285,9 +285,9 @@ void	update_triggers(int itemid)
 	zabbix_log( LOG_LEVEL_DEBUG, "In update_triggers [%d]", itemid);
 
 /* Does not work for PostgreSQL */
-/*		sprintf(sql,"select t.triggerid,t.expression,t.status,t.dep_level,t.priority,t.value from triggers t,functions f,items i where i.status<>3 and i.itemid=f.itemid and t.status=%d and f.triggerid=t.triggerid and f.itemid=%d group by t.triggerid,t.expression,t.dep_level",TRIGGER_STATUS_ENABLED,server_num);*/
+/*		zbx_snprintf(sql, sizeof(sql), "select t.triggerid,t.expression,t.status,t.dep_level,t.priority,t.value from triggers t,functions f,items i where i.status<>3 and i.itemid=f.itemid and t.status=%d and f.triggerid=t.triggerid and f.itemid=%d group by t.triggerid,t.expression,t.dep_level",TRIGGER_STATUS_ENABLED,server_num);*/
 /* Is it correct SQL? */
-	snprintf(sql,sizeof(sql)-1,"select distinct t.triggerid,t.expression,t.status,t.dep_level,t.priority,t.value,t.description from triggers t,functions f,items i where i.status<>%d and i.itemid=f.itemid and t.status=%d and f.triggerid=t.triggerid and f.itemid=%d",ITEM_STATUS_NOTSUPPORTED, TRIGGER_STATUS_ENABLED, itemid);
+	zbx_snprintf(sql,sizeof(sql),"select distinct t.triggerid,t.expression,t.status,t.dep_level,t.priority,t.value,t.description from triggers t,functions f,items i where i.status<>%d and i.itemid=f.itemid and t.status=%d and f.triggerid=t.triggerid and f.itemid=%d",ITEM_STATUS_NOTSUPPORTED, TRIGGER_STATUS_ENABLED, itemid);
 
 	result = DBselect(sql);
 
@@ -424,12 +424,12 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 
 	init_result(&agent);
 
-/*	snprintf(sql,sizeof(sql)-1,"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts,i.delta,i.units,i.multiplier,i.formula,i.logtimefmt from items i,hosts h where h.status=%d and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type in (%d,%d)", HOST_STATUS_MONITORED, server, key, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE);*/
+/*	zbx_snprintf(sql,sizeof(sql),"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts,i.delta,i.units,i.multiplier,i.formula,i.logtimefmt from items i,hosts h where h.status=%d and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type in (%d,%d)", HOST_STATUS_MONITORED, server, key, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE);*/
 
 	DBescape_string(server, server_esc, MAX_STRING_LEN);
 	DBescape_string(key, key_esc, MAX_STRING_LEN);
 
-	snprintf(sql,sizeof(sql)-1,"select %s where h.status=%d and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type in (%d,%d)", ZBX_SQL_ITEM_SELECT, HOST_STATUS_MONITORED, server_esc, key_esc, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE);
+	zbx_snprintf(sql,sizeof(sql),"select %s where h.status=%d and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type in (%d,%d)", ZBX_SQL_ITEM_SELECT, HOST_STATUS_MONITORED, server_esc, key_esc, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE);
 
 	result = DBselect(sql);
 
@@ -628,7 +628,7 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 		{
 			if(value->type & AR_STRING)
 				DBadd_history_log(item->itemid,value->str,now,item->timestamp,item->eventlog_source,item->eventlog_severity);
-			snprintf(sql,sizeof(sql)-1,"update items set lastlogsize=%d where itemid=%d",item->lastlogsize,item->itemid);
+			zbx_snprintf(sql,sizeof(sql),"update items set lastlogsize=%d where itemid=%d",item->lastlogsize,item->itemid);
 			DBexecute(sql);
 		}
 		else if(item->value_type==ITEM_VALUE_TYPE_TEXT)
@@ -679,12 +679,12 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, int now)
 	
 	if(value->type & AR_UINT64)
 	{
-		snprintf(value_str,MAX_STRING_LEN-1,ZBX_FS_UI64, value->ui64);
+		zbx_snprintf(value_str, sizeof(value_str),ZBX_FS_UI64, value->ui64);
 		value_double = (double)value->ui64;
 	}
 	if(value->type & AR_DOUBLE)
 	{
-		snprintf(value_str,MAX_STRING_LEN-1,"%f", value->dbl);
+		zbx_snprintf(value_str,sizeof(value_str),"%f", value->dbl);
 		value_double = value->dbl;
 	}
 	if(value->type & AR_STRING)
@@ -705,8 +705,8 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, int now)
 			(strcmp(item->prevvalue_str,item->lastvalue_str) != 0)))
 		{
 			DBescape_string(value_str,value_esc,MAX_STRING_LEN);
-/*			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='%s',lastclock=%d where itemid=%d",now+item->delay,value_esc,now,item->itemid);*/
-			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='%s',lastclock=%d where itemid=%d",calculate_item_nextcheck(item->delay,now),value_esc,(int)now,item->itemid);
+/*			zbx_snprintf(sql,sizeof(sql),"update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='%s',lastclock=%d where itemid=%d",now+item->delay,value_esc,now,item->itemid);*/
+			zbx_snprintf(sql,sizeof(sql),"update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='%s',lastclock=%d where itemid=%d",calculate_item_nextcheck(item->delay,now),value_esc,(int)now,item->itemid);
 			item->prevvalue=item->lastvalue;
 			item->lastvalue=value_double;
 			item->prevvalue_str=item->lastvalue_str;
@@ -717,8 +717,8 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, int now)
 		}
 		else
 		{
-/*			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,lastclock=%d where itemid=%d",now+item->delay,now,item->itemid);*/
-			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,lastclock=%d where itemid=%d",calculate_item_nextcheck(item->delay,now),(int)now,item->itemid);
+/*			zbx_snprintf(sql,sizeof(sql),"update items set nextcheck=%d,lastclock=%d where itemid=%d",now+item->delay,now,item->itemid);*/
+			zbx_snprintf(sql,sizeof(sql),"update items set nextcheck=%d,lastclock=%d where itemid=%d",calculate_item_nextcheck(item->delay,now),(int)now,item->itemid);
 		}
 	}
 	/* Logic for delta as speed of change */
@@ -726,13 +726,13 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, int now)
 	{
 		if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value_double) )
 		{
-/*			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue=%f,lastvalue='%f',lastclock=%d where itemid=%d",now+item->delay,value_double,(value_double - item->prevorgvalue)/(now-item->lastclock),now,item->itemid);*/
-			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue=%f,lastvalue='%f',lastclock=%d where itemid=%d",calculate_item_nextcheck(item->delay,now),value_double,(value_double - item->prevorgvalue)/(now-item->lastclock),(int)now,item->itemid);
+/*			zbx_snprintf(sql,sizeof(sql),"update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue=%f,lastvalue='%f',lastclock=%d where itemid=%d",now+item->delay,value_double,(value_double - item->prevorgvalue)/(now-item->lastclock),now,item->itemid);*/
+			zbx_snprintf(sql,sizeof(sql),"update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue=%f,lastvalue='%f',lastclock=%d where itemid=%d",calculate_item_nextcheck(item->delay,now),value_double,(value_double - item->prevorgvalue)/(now-item->lastclock),(int)now,item->itemid);
 		}
 		else
 		{
-/*			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevorgvalue=%f,lastclock=%d where itemid=%d",now+item->delay,value_double,now,item->itemid);*/
-			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevorgvalue=%f,lastclock=%d where itemid=%d",calculate_item_nextcheck(item->delay,now),value_double,(int)now,item->itemid);
+/*			zbx_snprintf(sql,sizeof(sql),"update items set nextcheck=%d,prevorgvalue=%f,lastclock=%d where itemid=%d",now+item->delay,value_double,now,item->itemid);*/
+			zbx_snprintf(sql,sizeof(sql),"update items set nextcheck=%d,prevorgvalue=%f,lastclock=%d where itemid=%d",calculate_item_nextcheck(item->delay,now),value_double,(int)now,item->itemid);
 		}
 
 		item->prevvalue=item->lastvalue;
@@ -748,11 +748,11 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, int now)
 	{
 		if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value_double) )
 		{
-			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue=%f,lastvalue='%f',lastclock=%d where itemid=%d",calculate_item_nextcheck(item->delay,now),value_double,(value_double - item->prevorgvalue),(int)now,item->itemid);
+			zbx_snprintf(sql,sizeof(sql),"update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue=%f,lastvalue='%f',lastclock=%d where itemid=%d",calculate_item_nextcheck(item->delay,now),value_double,(value_double - item->prevorgvalue),(int)now,item->itemid);
 		}
 		else
 		{
-			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevorgvalue=%f,lastclock=%d where itemid=%d",calculate_item_nextcheck(item->delay,now),value_double,(int)now,item->itemid);
+			zbx_snprintf(sql,sizeof(sql),"update items set nextcheck=%d,prevorgvalue=%f,lastclock=%d where itemid=%d",calculate_item_nextcheck(item->delay,now),value_double,(int)now,item->itemid);
 		}
 
 		item->prevvalue=item->lastvalue;
@@ -771,7 +771,7 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, int now)
 		zabbix_log( LOG_LEVEL_WARNING, "Parameter [%s] became supported by agent on host [%s]", item->key, item->host );
 		zabbix_syslog("Parameter [%s] became supported by agent on host [%s]", item->key, item->host );
 		item->status = ITEM_STATUS_ACTIVE;
-		snprintf(sql,sizeof(sql)-1,"update items set status=%d where itemid=%d", ITEM_STATUS_ACTIVE, item->itemid);
+		zbx_snprintf(sql,sizeof(sql),"update items set status=%d where itemid=%d", ITEM_STATUS_ACTIVE, item->itemid);
 		DBexecute(sql);
 	}
 

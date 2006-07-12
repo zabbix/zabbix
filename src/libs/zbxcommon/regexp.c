@@ -1,17 +1,33 @@
-#include "config.h"
+/* 
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+**/
 
-#include <stdio.h>
-#include <stdio.h>
-#include <errno.h>
-#include <stdlib.h>
+#include "common.h"
 
-#include <sys/types.h>
-#include <regex.h>
+#if defined(WIN32)
+#	include "gnuregex.h"
+#endif /* WIN32 */
 
 char	*zbx_regexp_match(const char *string, const char *pattern, int *len)
-{
+{ 
+	char	*c = NULL;
+
 	int	status;
-	char	*c;
 
 	regex_t	re;
 	regmatch_t match;
@@ -42,15 +58,3 @@ char	*zbx_regexp_match(const char *string, const char *pattern, int *len)
 	return	c;
 }
 
-/*#define ZABBIX_TEST*/
-
-#ifdef ZABBIX_TEST
-int main()
-{
-	int len=2;
-	char s[1024];
-
-	printf("[%s]\n", zbx_regexp_match("ABCDEFGH","^F",&len));
-	printf("[%d]\n", len);
-}
-#endif

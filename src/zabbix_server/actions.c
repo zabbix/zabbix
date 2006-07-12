@@ -135,7 +135,7 @@ static	void	send_to_user_medias(DB_TRIGGER *trigger,DB_ACTION *action, int useri
 	DB_RESULT result;
 	DB_ROW	row;
 
-	snprintf(sql,sizeof(sql)-1,"select mediatypeid,sendto,active,severity,period from media where active=%d and userid=%d",MEDIA_STATUS_ACTIVE,userid);
+	zbx_snprintf(sql,sizeof(sql),"select mediatypeid,sendto,active,severity,period from media where active=%d and userid=%d",MEDIA_STATUS_ACTIVE,userid);
 	result = DBselect(sql);
 
 	while((row=DBfetch(result)))
@@ -191,7 +191,7 @@ static	void	send_to_user(DB_TRIGGER *trigger,DB_ACTION *action)
 	}
 	else if(action->recipient == RECIPIENT_TYPE_GROUP)
 	{
-		snprintf(sql,sizeof(sql)-1,"select u.userid from users u, users_groups ug where ug.usrgrpid=%d and ug.userid=u.userid", action->userid);
+		zbx_snprintf(sql,sizeof(sql),"select u.userid from users u, users_groups ug where ug.usrgrpid=%d and ug.userid=u.userid", action->userid);
 		result = DBselect(sql);
 		while((row=DBfetch(result)))
 		{
@@ -240,7 +240,7 @@ static void run_remote_command(char* host_name, char* command)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "run_remote_command START [hostname: '%s', command: '%s']", host_name, command);
 
-	snprintf(sql,sizeof(sql)-1,"select distinct host,ip,useip,port from hosts where host='%s'", host_name);
+	zbx_snprintf(sql,sizeof(sql),"select distinct host,ip,useip,port from hosts where host='%s'", host_name);
 	result = DBselect(sql);
 	row = DBfetch(result);
 	if(row)
@@ -250,7 +250,7 @@ static void run_remote_command(char* host_name, char* command)
 		item.useip=atoi(row[2]);
 		item.port=atoi(row[3]);
 		
-		snprintf(item.key,ITEM_KEY_LEN_MAX-1,"system.run[%s,nowait]",command);
+		zbx_snprintf(item.key,ITEM_KEY_LEN_MAX,"system.run[%s,nowait]",command);
 		
 		alarm(CONFIG_TIMEOUT);
 		
@@ -388,7 +388,7 @@ static int get_next_command(char** command_list, char** alias, int* is_group, ch
 		if(alias == '\0' || command == '\0') continue;
 		if(is_group)
 		{
-			snprintf(sql,sizeof(sql)-1,"select distinct h.host from hosts_groups hg,hosts h, groups g where hg.hostid=h.hostid and hg.groupid=g.groupid and g.name='%s'", alias);
+			zbx_snprintf(sql,sizeof(sql),"select distinct h.host from hosts_groups hg,hosts h, groups g where hg.hostid=h.hostid and hg.groupid=g.groupid and g.name='%s'", alias);
 	                result = DBselect(sql);
 			while((row=DBfetch(result)))
 			{
@@ -418,7 +418,7 @@ static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigge
 
 	if(condition->conditiontype == CONDITION_TYPE_HOST_GROUP)
 	{
-		snprintf(sql,sizeof(sql)-1,"select distinct hg.groupid from hosts_groups hg,hosts h, items i, functions f, triggers t where hg.hostid=h.hostid and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=%d", trigger->triggerid);
+		zbx_snprintf(sql,sizeof(sql),"select distinct hg.groupid from hosts_groups hg,hosts h, items i, functions f, triggers t where hg.hostid=h.hostid and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=%d", trigger->triggerid);
 		result = DBselect(sql);
 		while((row=DBfetch(result)))
 		{
@@ -448,7 +448,7 @@ static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigge
 	}
 	else if(condition->conditiontype == CONDITION_TYPE_HOST)
 	{
-		snprintf(sql,sizeof(sql)-1,"select distinct h.hostid from hosts h, items i, functions f, triggers t where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=%d", trigger->triggerid);
+		zbx_snprintf(sql,sizeof(sql),"select distinct h.hostid from hosts h, items i, functions f, triggers t where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=%d", trigger->triggerid);
 		result = DBselect(sql);
 		while((row=DBfetch(result)))
 		{
@@ -605,7 +605,7 @@ static int	check_action_conditions(DB_TRIGGER *trigger,int alarmid,int new_trigg
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In check_action_conditions [actionid:%d]", actionid);
 
-	snprintf(sql,sizeof(sql)-1,"select conditionid,actionid,conditiontype,operator,value from conditions where actionid=%d order by conditiontype", actionid);
+	zbx_snprintf(sql,sizeof(sql),"select conditionid,actionid,conditiontype,operator,value from conditions where actionid=%d order by conditiontype", actionid);
 	result = DBselect(sql);
 
 	while((row=DBfetch(result)))
@@ -664,7 +664,7 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 	{
 		zabbix_log( LOG_LEVEL_DEBUG, "Check dependencies");
 
-		snprintf(sql,sizeof(sql)-1,"select count(*) from trigger_depends d,triggers t where d.triggerid_down=%d and d.triggerid_up=t.triggerid and t.value=%d",trigger->triggerid, TRIGGER_VALUE_TRUE);
+		zbx_snprintf(sql,sizeof(sql),"select count(*) from trigger_depends d,triggers t where d.triggerid_down=%d and d.triggerid_up=t.triggerid and t.value=%d",trigger->triggerid, TRIGGER_VALUE_TRUE);
 		result = DBselect(sql);
 		row=DBfetch(result);
 		if(row && DBis_null(row[0]) != SUCCEED)
@@ -683,11 +683,11 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 
 /*	now = time(NULL);*/
 
-/*	snprintf(sql,sizeof(sql)-1,"select actionid,userid,delay,subject,message,scope,severity,recipient,good from actions where (scope=%d and triggerid=%d and good=%d and nextcheck<=%d) or (scope=%d and good=%d) or (scope=%d and good=%d)",ACTION_SCOPE_TRIGGER,trigger->triggerid,trigger_value,now,ACTION_SCOPE_HOST,trigger_value,ACTION_SCOPE_HOSTS,trigger_value);*/
-/*	snprintf(sql,sizeof(sql)-1,"select actionid,userid,delay,subject,message,recipient,maxrepeats,repeatdelay,scripts,actiontype from actions where nextcheck<=%d and status=%d", now, ACTION_STATUS_ACTIVE);*/
+/*	zbx_snprintf(sql,sizeof(sql),"select actionid,userid,delay,subject,message,scope,severity,recipient,good from actions where (scope=%d and triggerid=%d and good=%d and nextcheck<=%d) or (scope=%d and good=%d) or (scope=%d and good=%d)",ACTION_SCOPE_TRIGGER,trigger->triggerid,trigger_value,now,ACTION_SCOPE_HOST,trigger_value,ACTION_SCOPE_HOSTS,trigger_value);*/
+/*	zbx_snprintf(sql,sizeof(sql),"select actionid,userid,delay,subject,message,recipient,maxrepeats,repeatdelay,scripts,actiontype from actions where nextcheck<=%d and status=%d", now, ACTION_STATUS_ACTIVE);*/
 
 	/* No support of action delay anymore */
-	snprintf(sql,sizeof(sql)-1,"select actionid,userid,subject,message,recipient,maxrepeats,repeatdelay,scripts,actiontype from actions where status=%d", ACTION_STATUS_ACTIVE);
+	zbx_snprintf(sql,sizeof(sql),"select actionid,userid,subject,message,recipient,maxrepeats,repeatdelay,scripts,actiontype from actions where status=%d", ACTION_STATUS_ACTIVE);
 	result = DBselect(sql);
 	zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]", sql);
 
@@ -716,7 +716,7 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 			else
 				run_commands(trigger,&action);
 
-/*			snprintf(sql,sizeof(sql)-1,"update actions set nextcheck=%d where actionid=%d",now+action.delay,action.actionid);
+/*			zbx_snprintf(sql,sizeof(sql),"update actions set nextcheck=%d where actionid=%d",now+action.delay,action.actionid);
 			DBexecute(sql);*/
 		}
 		else

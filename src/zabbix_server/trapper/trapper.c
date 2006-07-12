@@ -52,6 +52,8 @@
 #include "autoregister.h"
 #include "trapper.h"
 
+#include "daemon.h"
+
 extern int    send_list_of_active_checks(int sockfd, char *host);
 
 int	process_trap(int sockfd,char *s, int max_len)
@@ -143,11 +145,11 @@ int	process_trap(int sockfd,char *s, int max_len)
 		ret=process_data(sockfd,server,key,value_string,lastlogsize,timestamp,source,severity);
 		if( SUCCEED == ret)
 		{
-			snprintf(result,sizeof(result)-1,"OK\n");
+			zbx_snprintf(result,sizeof(result),"OK\n");
 		}
 		else
 		{
-			snprintf(result,sizeof(result)-1,"NOT OK\n");
+			zbx_snprintf(result,sizeof(result),"NOT OK\n");
 		}
 		zabbix_log( LOG_LEVEL_DEBUG, "Sending back [%s]", result);
 		zabbix_log( LOG_LEVEL_DEBUG, "Length [%d]", strlen(result));
@@ -171,7 +173,7 @@ void	process_trapper_child(int sockfd)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_trapper_child");
 
-	phan.sa_handler = &signal_handler;
+	phan.sa_handler = &child_signal_handler;
 	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = 0;
 	sigaction(SIGALRM, &phan, NULL);
@@ -234,15 +236,14 @@ void	child_trapper_main(int i,int listenfd, int addrlen)
 	for(;;)
 	{
 		clilen = addrlen;
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("waiting for connection");
-#endif
+
+		zbx_setproctitle("waiting for connection");
+
 		zabbix_log( LOG_LEVEL_DEBUG, "Before accept()");
 		connfd=accept(listenfd,&cliaddr, &clilen);
 		zabbix_log( LOG_LEVEL_DEBUG, "After accept()");
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("processing data");
-#endif
+
+		zbx_setproctitle("processing data");
 
 		process_trapper_child(connfd);
 
@@ -258,10 +259,6 @@ pid_t	child_trapper_make(int i,int listenfd, int addrlen)
 	if((pid = fork()) >0)
 	{
 		return (pid);
-	}
-	else
-	{
-		server_num=i;
 	}
 
 	/* never returns */

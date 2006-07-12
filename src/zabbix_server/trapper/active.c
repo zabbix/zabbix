@@ -69,12 +69,12 @@ int	send_list_of_active_checks(int sockfd, char *host)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In send_list_of_active_checks()");
 
-	snprintf(sql,sizeof(sql)-1,"select i.key_,i.delay,i.lastlogsize from items i,hosts h where i.hostid=h.hostid and h.status=%d and i.status=%d and i.type=%d and h.host='%s'", HOST_STATUS_MONITORED, ITEM_STATUS_ACTIVE, ITEM_TYPE_ZABBIX_ACTIVE, host);
+	zbx_snprintf(sql,sizeof(sql),"select i.key_,i.delay,i.lastlogsize from items i,hosts h where i.hostid=h.hostid and h.status=%d and i.status=%d and i.type=%d and h.host='%s'", HOST_STATUS_MONITORED, ITEM_STATUS_ACTIVE, ITEM_TYPE_ZABBIX_ACTIVE, host);
 
 	result = DBselect(sql);
 	while((row=DBfetch(result)))
 	{
-		snprintf(s,sizeof(s)-1,"%s:%s:%s\n",row[0],row[1],row[2]);
+		zbx_snprintf(s,sizeof(s),"%s:%s:%s\n",row[0],row[1],row[2]);
 		zabbix_log( LOG_LEVEL_DEBUG, "Sending [%s]", s);
 		if( write(sockfd,s,strlen(s)) == -1 )
 		{
@@ -92,7 +92,7 @@ int	send_list_of_active_checks(int sockfd, char *host)
 	}
 	DBfree_result(result);
 
-	snprintf(s,sizeof(s)-1,"%s\n","ZBX_EOF");
+	zbx_snprintf(s,sizeof(s),"%s\n","ZBX_EOF");
 	zabbix_log( LOG_LEVEL_DEBUG, "Sending [%s]", s);
 	if( write(sockfd,s,strlen(s)) == -1 )
 	{

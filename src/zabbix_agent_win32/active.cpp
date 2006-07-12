@@ -398,16 +398,16 @@ LOG_FUNC_CALL("In get_active_checks()");
 			{
 				case 	WSAETIMEDOUT:
 						zabbix_log( LOG_LEVEL_WARNING, "Timeout while receiving data from [%s:%d]",server,port);
-						snprintf(error,max_error_len-1,"Timeout while receiving data from [%s:%d]",server,port);
+						zbx_snprintf(error,max_error_len,"Timeout while receiving data from [%s:%d]",server,port);
 						break;
 				case	ECONNRESET:
 						zabbix_log( LOG_LEVEL_WARNING, "Connection reset by peer.");
-						snprintf(error,max_error_len-1,"Connection reset by peer.");
+						zbx_snprintf(error,max_error_len,"Connection reset by peer.");
 						close(s);
 						return	NETWORK_ERROR;
 				default:
 						zabbix_log( LOG_LEVEL_WARNING, "Error while receiving data from [%s:%d] [%s]",server,port,strerror(errno));
-						snprintf(error,max_error_len-1,"Error while receiving data from [%s:%d] [%s]",server,port,strerror(errno));
+						zbx_snprintf(error,max_error_len,"Error while receiving data from [%s:%d] [%s]",server,port,strerror(errno));
 			} 
 			close(s);
 			return	FAIL;
@@ -696,9 +696,9 @@ LOG_FUNC_CALL("In refresh_metrics()");
 	while(get_active_checks(server, port, error, max_error_len) != SUCCEED)
 	{
 LOG_DEBUG_INFO("s","Getting list of active checks failed. Will retry after 60 seconds");
-#ifdef HAVE_FUNCTION_SETPROCTITLE
-		setproctitle("poller [sleeping for %d seconds]", 60*1000);
-#endif
+
+		zbx_setproctitle("poller [sleeping for %d seconds]", 60*1000);
+
 		Sleep(60*1000);
 	}
 LOG_DEBUG_INFO("s","Out of refresh_metrics()");

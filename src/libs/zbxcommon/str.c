@@ -1,9 +1,24 @@
-#include "common.h"
+/* 
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+**/
 
-#include <string.h>
-#include <stdlib.h>
-
 #include "common.h"
+#include "threads.h"
 
 /******************************************************************************
  *                                                                            *
@@ -73,7 +88,9 @@ void help()
 	char **p = help_message;
 	
 	app_title();
+	printf("\n");
 	usage();
+	printf("\n");
 	while (*p) printf("%s\n", *p++);
 }
 
@@ -91,7 +108,7 @@ void help()
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments: !!! beter use system functions like 'strchr' !!!                  *
+ * Comments: !!! beter use system functions like 'strchr' !!!                 *
  *                                                                            *
  ******************************************************************************/
 int	find_char(char *str,char c)
@@ -103,6 +120,79 @@ int	find_char(char *str,char c)
 	return	FAIL;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_error                                                        *
+ *                                                                            *
+ * Purpose: Print error text to the stderr                                    *
+ *                                                                            *
+ * Parameters: fmt - format of mesage                                         *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ ******************************************************************************/
+//#define ZBX_STDERR_FILE "zbx_errors.log"
+
+void zbx_error(const char *fmt, ...)
+{
+	va_list args;
+	FILE *f = NULL;
+
+#if defined(ZBX_STDERR_FILE)
+	f = fopen(ZBX_STDERR_FILE,"a+");
+#else
+	f = stderr;
+#endif /* ZBX_STDERR_FILE */
+    
+	va_start(args, fmt);
+
+	fprintf(f, "%s [%li]: ",progname, zbx_get_thread_id());
+	vfprintf(f, fmt, args);
+	fprintf(f, "\n");
+	fflush(f);
+
+	va_end(args);
+
+#if defined(ZBX_STDERR_FILE)
+	zbx_fclose(f);
+#endif /* ZBX_STDERR_FILE */
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_snprintf                                                     *
+ *                                                                            *
+ * Purpose: Sequrity version of snprintf function.                            *
+ *          Add zero character at the end of string.                          *
+ *                                                                            *
+ * Parameters: str - distination buffer poiner                                *
+ *             count - size of distination buffer                             *
+ *             fmt - format                                                   *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ ******************************************************************************/
+void zbx_snprintf(char* str, size_t count, const char *fmt, ...)
+{
+	va_list	args;
+	int	writen_len = 0;
+    
+	assert(str);
+
+	va_start(args, fmt);
+
+	writen_len = vsnprintf(str, count, fmt, args);
+	writen_len = MIN(writen_len, ((int)count) - 1);
+	writen_len = MAX(writen_len, 0);
+
+	str[writen_len] = '\0';
+
+	va_end(args);
+}
 
 /* Has to be rewritten to avoi malloc */
 char *string_replace(char *str, const char *sub_str1, const char *sub_str2)
@@ -115,6 +205,8 @@ char *string_replace(char *str, const char *sub_str1, const char *sub_str2)
         signed long len;
         signed long diff;
         unsigned long count = 0;
+
+	assert(str);
 
         if ( (p=strstr(str, sub_str1)) == NULL )
                 return str;

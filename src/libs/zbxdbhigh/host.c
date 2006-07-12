@@ -34,7 +34,7 @@ int	DBadd_host(char *server, int port, int status, int useip, char *ip, int disa
 	char	sql[MAX_STRING_LEN];
 	int	hostid;
 
-	snprintf(sql, sizeof(sql)-1,"insert into hosts (host,port,status,useip,ip,disable_until,available) values ('%s',%d,%d,%d,'%s',%d,%d)", server, port, status, useip, ip, disable_until, available);
+	zbx_snprintf(sql, sizeof(sql),"insert into hosts (host,port,status,useip,ip,disable_until,available) values ('%s',%d,%d,%d,'%s',%d,%d)", server, port, status, useip, ip, disable_until, available);
 	if(FAIL == DBexecute(sql))
 	{
 		return FAIL;
@@ -57,7 +57,7 @@ int	DBhost_exists(char *server)
 	char	sql[MAX_STRING_LEN];
 	int	ret = SUCCEED;
 
-	snprintf(sql,sizeof(sql)-1,"select hostid from hosts where host='%s'", server);
+	zbx_snprintf(sql,sizeof(sql),"select hostid from hosts where host='%s'", server);
 	result = DBselect(sql);
 	row = DBfetch(result);
 
@@ -78,7 +78,7 @@ int	DBadd_templates_to_host(int hostid,int host_templateid)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In DBadd_templates_to_host(%d,%d)", hostid, host_templateid);
 
-	snprintf(sql,sizeof(sql)-1,"select templateid,items,triggers,graphs from hosts_templates where hostid=%d", host_templateid);
+	zbx_snprintf(sql,sizeof(sql),"select templateid,items,triggers,graphs from hosts_templates where hostid=%d", host_templateid);
 	result = DBselect(sql);
 
 	while((row=DBfetch(result)))
@@ -98,7 +98,7 @@ int	DBadd_template_linkage(int hostid,int templateid,int items,int triggers,int 
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In DBadd_template_linkage(%d)", hostid);
 
-	snprintf(sql,sizeof(sql)-1,"insert into hosts_templates (hostid,templateid,items,triggers,graphs) values (%d,%d,%d,%d,%d)",hostid, templateid, items, triggers, graphs);
+	zbx_snprintf(sql,sizeof(sql),"insert into hosts_templates (hostid,templateid,items,triggers,graphs) values (%d,%d,%d,%d,%d)",hostid, templateid, items, triggers, graphs);
 
 	return DBexecute(sql);
 }
@@ -111,7 +111,7 @@ int	DBsync_host_with_templates(int hostid)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In DBsync_host_with_templates(%d)", hostid);
 
-	snprintf(sql,sizeof(sql)-1,"select templateid,items,triggers,graphs from hosts_templates where hostid=%d", hostid);
+	zbx_snprintf(sql,sizeof(sql),"select templateid,items,triggers,graphs from hosts_templates where hostid=%d", hostid);
 	result = DBselect(sql);
 
 	while((row=DBfetch(result)))
@@ -134,7 +134,7 @@ int	DBsync_host_with_template(int hostid,int templateid,int items,int triggers,i
 	zabbix_log( LOG_LEVEL_DEBUG, "In DBsync_host_with_template(%d,%d)", hostid, templateid);
 
 	/* Sync items */
-	snprintf(sql,sizeof(sql)-1,"select itemid from items where hostid=%d", templateid);
+	zbx_snprintf(sql,sizeof(sql),"select itemid from items where hostid=%d", templateid);
 	result = DBselect(sql);
 
 	while((row=DBfetch(result)))
@@ -144,7 +144,7 @@ int	DBsync_host_with_template(int hostid,int templateid,int items,int triggers,i
 	DBfree_result(result);
 
 	/* Sync triggers */
-	snprintf(sql,sizeof(sql)-1,"select distinct t.triggerid from hosts h, items i,triggers t,functions f where h.hostid=%d and h.hostid=i.hostid and t.triggerid=f.triggerid and i.itemid=f.itemid", templateid);
+	zbx_snprintf(sql,sizeof(sql),"select distinct t.triggerid from hosts h, items i,triggers t,functions f where h.hostid=%d and h.hostid=i.hostid and t.triggerid=f.triggerid and i.itemid=f.itemid", templateid);
 	result = DBselect(sql);
 	while((row=DBfetch(result)))
 	{
@@ -153,7 +153,7 @@ int	DBsync_host_with_template(int hostid,int templateid,int items,int triggers,i
 	DBfree_result(result);
 
 	/* Sync graphs */
-	snprintf(sql,sizeof(sql)-1,"select distinct gi.gitemid from graphs g,graphs_items gi,items i where i.itemid=gi.itemid and i.hostid=%d and g.graphid=gi.graphid", templateid);
+	zbx_snprintf(sql,sizeof(sql),"select distinct gi.gitemid from graphs g,graphs_items gi,items i where i.itemid=gi.itemid and i.hostid=%d and g.graphid=gi.graphid", templateid);
 	result = DBselect(sql);
 	while((row=DBfetch(result)))
 	{
@@ -173,7 +173,7 @@ int	DBget_host_by_hostid(int hostid,DB_HOST *host)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In DBget_host_by_hostid(%d)", hostid);
 
-	snprintf(sql,sizeof(sql)-1,"select hostid,host,useip,ip,port,status,disable_until,errors_from,error,available from hosts where hostid=%d", hostid);
+	zbx_snprintf(sql,sizeof(sql),"select hostid,host,useip,ip,port,status,disable_until,errors_from,error,available from hosts where hostid=%d", hostid);
 	result=DBselect(sql);
 
 	row=DBfetch(result);

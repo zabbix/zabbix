@@ -29,15 +29,15 @@ extern int	CONFIG_ENABLE_REMOTE_COMMANDS;
 #define	SYSINFO_RET_FAIL	1
 #define	SYSINFO_RET_TIMEOUT	2
 
-#define ZBX_METRIC struct zbx_metric_type
-ZBX_METRIC
+typedef struct zbx_metric_type
 {
 	char		*key;
 	unsigned	flags;
 	int		(*function)();
 	char		*main_param;
 	char		*test_param;
-};
+} ZBX_METRIC;
+
 
 /* flags for command */
 #define CF_USEUPARAM	1	/* use user param */
@@ -116,7 +116,7 @@ int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
 /* internal system functions */
-int	EXECUTE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	EXECUTE_INT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
 int	WEB_PAGE_GET(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);

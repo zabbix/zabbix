@@ -37,7 +37,7 @@ int	DBadd_graph(char *name, int width, int height, int yaxistype, double yaxismi
 
 	DBescape_string(name,name_esc,GRAPH_NAME_LEN_MAX);
 
-	snprintf(sql, sizeof(sql)-1,"insert into graphs (name,width,height,yaxistype,yaxismin,yaxismax) values ('%s',%d,%d,%d,%f,%f)", name_esc, width, height, yaxistype, yaxismin, yaxismax);
+	zbx_snprintf(sql, sizeof(sql),"insert into graphs (name,width,height,yaxistype,yaxismin,yaxismax) values ('%s',%d,%d,%d,%f,%f)", name_esc, width, height, yaxistype, yaxismin, yaxismax);
 	if(FAIL == DBexecute(sql))
 	{
 		return FAIL;
@@ -61,7 +61,7 @@ int	DBadd_item_to_graph(int graphid,int itemid, char *color,int drawtype, int so
 
 	DBescape_string(color,color_esc,GRAPH_ITEM_COLOR_LEN_MAX);
 
-	snprintf(sql, sizeof(sql)-1,"insert into graphs_items (graphid,itemid,drawtype,sortorder,color) values (%d,%d,%d,%d,'%s')", graphid, itemid, drawtype, sortorder, color_esc);
+	zbx_snprintf(sql, sizeof(sql),"insert into graphs_items (graphid,itemid,drawtype,sortorder,color) values (%d,%d,%d,%d,'%s')", graphid, itemid, drawtype, sortorder, color_esc);
 	if(FAIL == DBexecute(sql))
 	{
 		return FAIL;
@@ -86,7 +86,7 @@ int	DBget_graph_item_by_gitemid(int gitemid, DB_GRAPH_ITEM *graph_item)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In DBget_graph_item_by_gitemid(%d)", gitemid);
 
-	snprintf(sql,sizeof(sql)-1,"select gitemid, graphid, itemid, drawtype, sortorder, color from graphs_items where gitemid=%d", gitemid);
+	zbx_snprintf(sql,sizeof(sql),"select gitemid, graphid, itemid, drawtype, sortorder, color from graphs_items where gitemid=%d", gitemid);
 	result=DBselect(sql);
 	row=DBfetch(result);
 
@@ -118,7 +118,7 @@ int	DBget_graph_by_graphid(int graphid, DB_GRAPH *graph)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In DBget_graph_by_graphid(%d)", graphid);
 
-	snprintf(sql,sizeof(sql)-1,"select graphid,name,width,height,yaxistype,yaxismin,yaxismax from graphs where graphid=%d", graphid);
+	zbx_snprintf(sql,sizeof(sql),"select graphid,name,width,height,yaxistype,yaxismin,yaxismax from graphs where graphid=%d", graphid);
 	result=DBselect(sql);
 	row=DBfetch(result);
 
@@ -177,11 +177,11 @@ int	DBadd_graph_item_to_linked_hosts(int gitemid,int hostid)
 
 	if(hostid==0)
 	{
-		snprintf(sql,sizeof(sql)-1,"select hostid,templateid,graphs from hosts_templates where templateid=%d", item.hostid);
+		zbx_snprintf(sql,sizeof(sql),"select hostid,templateid,graphs from hosts_templates where templateid=%d", item.hostid);
 	}
 	else
 	{
-		snprintf(sql,sizeof(sql)-1,"select hostid,templateid,graphs from hosts_templates where hostid=%d and templateid=%d", hostid, item.hostid);
+		zbx_snprintf(sql,sizeof(sql),"select hostid,templateid,graphs from hosts_templates where hostid=%d and templateid=%d", hostid, item.hostid);
 	}
 
 	zabbix_log( LOG_LEVEL_DEBUG, "\tSQL [%s]", sql);
@@ -191,7 +191,7 @@ int	DBadd_graph_item_to_linked_hosts(int gitemid,int hostid)
 	{
 		if( (atoi(row[2])&1) == 0)	continue;
 
-		snprintf(sql,sizeof(sql)-1,"select i.itemid from items i where i.key_='%s' and i.hostid=%d", item.key, atoi(row[0]));
+		zbx_snprintf(sql,sizeof(sql),"select i.itemid from items i where i.key_='%s' and i.hostid=%d", item.key, atoi(row[0]));
 		zabbix_log( LOG_LEVEL_DEBUG, "\t\tSQL [%s]", sql);
 
 		result2=DBselect(sql);
@@ -210,7 +210,7 @@ int	DBadd_graph_item_to_linked_hosts(int gitemid,int hostid)
 
 		if(DBget_host_by_hostid(atoi(row[0]), &host) == FAIL)	continue;
 
-		snprintf(sql,sizeof(sql)-1,"select distinct g.graphid from graphs g,graphs_items gi,items i where i.itemid=gi.itemid and i.hostid=%d and g.graphid=gi.graphid and g.name='%s'", atoi(row[0]), name_esc);
+		zbx_snprintf(sql,sizeof(sql),"select distinct g.graphid from graphs g,graphs_items gi,items i where i.itemid=gi.itemid and i.hostid=%d and g.graphid=gi.graphid and g.name='%s'", atoi(row[0]), name_esc);
 		result2=DBselect(sql);
 
 		rows=0;
