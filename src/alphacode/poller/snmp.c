@@ -121,7 +121,7 @@ void load_oids(void)
 	struct host *h;
 	struct oid *o;
 
-	sprintf(sql,"select h.ip,i.snmp_community,i.snmp_oid from hosts h,items i where i.hostid=h.hostid and i.type=1 and i.status=0 and h.status=0 and h.useip=1");
+	zbx_snprintf(sql, sizeof(sql), "select h.ip,i.snmp_community,i.snmp_oid from hosts h,items i where i.hostid=h.hostid and i.type=1 and i.status=0 and h.status=0 and h.useip=1");
 
 	result=DBselect(sql);
 

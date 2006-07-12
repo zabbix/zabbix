@@ -34,7 +34,7 @@ struct net_stat_s {
 	unsigned long colls;
 };
 
-static int get_net_stat(const char *interface, struct net_stat_s *result)
+static int get_net_stat(const char *if_name, struct net_stat_s *result)
 {
 	int ret = SYSINFO_RET_FAIL;
 	char line[MAX_STRING_LEN];
@@ -47,8 +47,7 @@ static int get_net_stat(const char *interface, struct net_stat_s *result)
 
 	assert(result);
 
-	f=fopen("/proc/net/dev","r");
-	if(f)
+	if(NULL != (f = fopen("/proc/net/dev","r") ))
 	{
 		
 		while(fgets(line,MAX_STRING_LEN,f) != NULL)
@@ -78,14 +77,14 @@ static int get_net_stat(const char *interface, struct net_stat_s *result)
 			        &(tmp)	 		/* compressed */
 				) == 17)
 			{
-				if(strncmp(name, interface, MAX_STRING_LEN) == 0)
+				if(strncmp(name, if_name, MAX_STRING_LEN) == 0)
 				{
 					ret = SYSINFO_RET_OK;
 					break;
 				}
 			}
 		}
-		fclose(f);
+		zbx_fclose(f);
 	}
 
 	if(ret != SYSINFO_RET_OK)
@@ -100,7 +99,7 @@ int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 {
 	struct net_stat_s	ns;
 	
-	char	interface[MAX_STRING_LEN];
+	char	if_name[MAX_STRING_LEN];
 	char	mode[MAX_STRING_LEN];
 	
 	int ret = SYSINFO_RET_FAIL;
@@ -114,22 +113,22 @@ int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
                 return SYSINFO_RET_FAIL;
         }
 
-        if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+        if(get_param(param, 1, if_name, sizeof(if_name)) != 0)
         {
                 return SYSINFO_RET_FAIL;
         }
 	
-	if(get_param(param, 2, mode, MAX_STRING_LEN) != 0)
+	if(get_param(param, 2, mode, sizeof(mode)) != 0)
         {
                 mode[0] = '\0';
         }
         if(mode[0] == '\0')
 	{
 		/* default parameter */
-		sprintf(mode, "bytes");
+		zbx_snprintf(mode, sizeof(mode), "bytes");
 	}
 
-	ret = get_net_stat(interface, &ns);
+	ret = get_net_stat(if_name, &ns);
 	
 
 	if(ret == SYSINFO_RET_OK)
@@ -163,7 +162,7 @@ int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 {
 	struct net_stat_s	ns;
 	
-	char	interface[MAX_STRING_LEN];
+	char	if_name[MAX_STRING_LEN];
 	char	mode[MAX_STRING_LEN];
 	
 	int ret = SYSINFO_RET_FAIL;
@@ -177,22 +176,22 @@ int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
                 return SYSINFO_RET_FAIL;
         }
 
-        if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+        if(get_param(param, 1, if_name, sizeof(if_name)) != 0)
         {
                 return SYSINFO_RET_FAIL;
         }
 	
-	if(get_param(param, 2, mode, MAX_STRING_LEN) != 0)
+	if(get_param(param, 2, mode, sizeof(mode)) != 0)
         {
                 mode[0] = '\0';
         }
         if(mode[0] == '\0')
 	{
 		/* default parameter */
-		sprintf(mode, "bytes");
+		zbx_snprintf(mode, sizeof(mode), "bytes");
 	}
 
-	ret = get_net_stat(interface, &ns);
+	ret = get_net_stat(if_name, &ns);
 	
 
 	if(ret == SYSINFO_RET_OK)
@@ -226,7 +225,7 @@ int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 {
 	struct net_stat_s	ns;
 	
-	char	interface[MAX_STRING_LEN];
+	char	if_name[MAX_STRING_LEN];
 	char	mode[MAX_STRING_LEN];
 	
 	int ret = SYSINFO_RET_FAIL;
@@ -240,22 +239,22 @@ int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
                 return SYSINFO_RET_FAIL;
         }
 
-        if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+        if(get_param(param, 1, if_name, sizeof(if_name)) != 0)
         {
                 return SYSINFO_RET_FAIL;
         }
 	
-	if(get_param(param, 2, mode, MAX_STRING_LEN) != 0)
+	if(get_param(param, 2, mode, sizeof(mode)) != 0)
         {
                 mode[0] = '\0';
         }
         if(mode[0] == '\0')
 	{
 		/* default parameter */
-		sprintf(mode, "bytes");
+		zbx_snprintf(mode, sizeof(mode), "bytes");
 	}
 
-	ret = get_net_stat(interface, &ns);
+	ret = get_net_stat(if_name, &ns);
 	
 
 	if(ret == SYSINFO_RET_OK)
@@ -298,7 +297,7 @@ int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AG
 {
 	struct net_stat_s	ns;
 	
-	char	interface[MAX_STRING_LEN];
+	char	if_name[MAX_STRING_LEN];
 	
 	int ret = SYSINFO_RET_FAIL;
         
@@ -311,13 +310,13 @@ int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AG
                 return SYSINFO_RET_FAIL;
         }
 
-        if(get_param(param, 1, interface, MAX_STRING_LEN) != 0)
+        if(get_param(param, 1, if_name, MAX_STRING_LEN) != 0)
         {
                 return SYSINFO_RET_FAIL;
         }
 	
 
-	ret = get_net_stat(interface, &ns);
+	ret = get_net_stat(if_name, &ns);
 	
 
 	if(ret == SYSINFO_RET_OK)

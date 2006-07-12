@@ -34,8 +34,7 @@ static int	VM_MEMORY_CACHED(const char *cmd, const char *param, unsigned flags, 
 
         init_result(result);
 
-        f=fopen("/proc/meminfo","r");
-        if(NULL == f)
+        if( NULL == (f = fopen("/proc/meminfo","r") ))
         {
                 return  SYSINFO_RET_FAIL;
         }
@@ -56,7 +55,7 @@ static int	VM_MEMORY_CACHED(const char *cmd, const char *param, unsigned flags, 
                         break;
                 }
         }
-        fclose(f);
+        zbx_fclose(f);
 
         SET_UI64_RESULT(result, res);
         return SYSINFO_RET_OK;
@@ -395,7 +394,7 @@ MEM_FNCLIST
         if(mode[0] == '\0')
 	{
 		/* default parameter */
-		sprintf(mode, "total");
+		zbx_snprintf(mode, sizeof(mode), "total");
 	}
 	
 	for(i=0; fl[i].mode!=0; i++)

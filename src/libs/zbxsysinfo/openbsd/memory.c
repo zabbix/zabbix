@@ -97,7 +97,7 @@ MEM_FNCLIST
         }
 	else
 	{
-		if(get_param(param, 1, mode, MAX_STRING_LEN) != 0)
+		if(get_param(param, 1, mode, sizeof(mode)) != 0)
 		{
 			mode[0] = '\0';
 		}
@@ -105,7 +105,7 @@ MEM_FNCLIST
 		if(mode[0] == '\0')
 		{
 			/* default parameter */
-			sprintf(mode, "total");
+			zbx_snprintf(mode, sizeof(mode) "total");
 		}
 
 		for(i=0; fl[i].mode!=0; i++)
