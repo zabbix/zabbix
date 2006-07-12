@@ -31,7 +31,7 @@ int   process_log(char *filename,long *lastlogsize, char *value)
 	assert(lastlogsize);
 	assert(value);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In process log (%s,%d)", filename, *lastlogsize);
+	zabbix_log( LOG_LEVEL_DEBUG, "In process log (%s,%li)", filename, *lastlogsize);
 
 	/* Handling of file shrinking */
 	if(stat(filename,&buf) == 0)
@@ -57,7 +57,7 @@ int   process_log(char *filename,long *lastlogsize, char *value)
 
 	if(-1 == fseek(f,*lastlogsize,SEEK_SET))
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Cannot set postition to [%d] for [%s] [%s]", *lastlogsize, filename, strerror(errno));
+		zabbix_log( LOG_LEVEL_WARNING, "Cannot set postition to [%li] for [%s] [%s]", *lastlogsize, filename, strerror(errno));
 		zbx_snprintf(value,sizeof(value),"%s","ZBX_NOTSUPPORTED\n");
 		zbx_fclose(f);
 		return 1;

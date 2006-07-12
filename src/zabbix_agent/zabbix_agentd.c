@@ -204,21 +204,31 @@ static ZBX_SOCKET connect_to_server(void)
 {
 	ZBX_SOCKET sock;
 	ZBX_SOCKADDR serv_addr;
+	int	on;
 
 	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
 	{
 		zabbix_log( LOG_LEVEL_CRIT, "Unable to create socket. [%s]", strerror_from_system(zbx_sock_last_error()));
 		exit(1);
 	}
+	
+	/* Enable address reuse */
+	/* This is to immediately use the address even if it is in TIME_WAIT state */
+	/* http://www-128.ibm.com/developerworks/linux/library/l-sockpit/index.html */
+	on = 1;
+	if( -1 == setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on) ))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot setsockopt SO_REUSEADDR [%s]", strerror(errno));
+	}
 
-	// Create socket	// Fill in local address structure
+	/* Create socket	Fill in local address structure */
 	memset(&serv_addr, 0, sizeof(ZBX_SOCKADDR));
 
 	serv_addr.sin_family		= AF_INET;
 	serv_addr.sin_addr.s_addr	= CONFIG_LISTEN_IP ? inet_addr(CONFIG_LISTEN_IP) : htonl(INADDR_ANY);
 	serv_addr.sin_port		= htons((unsigned short)CONFIG_LISTEN_PORT);
 
-	// Bind socket
+	/* Bind socket */
 	if (bind(sock,(struct sockaddr *)&serv_addr,sizeof(ZBX_SOCKADDR)) == SOCKET_ERROR)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Cannot bind to port %u for server %s. Error [%s]. Another zabbix_agentd already running ?",
@@ -369,7 +379,7 @@ int	main(int argc, char **argv)
 
 	task = parse_commandline(argc, argv);
 
-	init_metrics(); // Must be before load_config().  load_config - use metrics!!!
+	init_metrics(); /* Must be before load_config().  load_config - use metrics!!! */
 
 	load_config(task == 0);
 
@@ -441,7 +451,7 @@ int main()
 	printf("Pattern:\t %s\n", p);
 	printf("Result: \t [%s] [%d]\n", zbx_regexp_match(s, p, &len), len);
 /*
-#elif 1 // 0 - off; 1 - on;
+#elif 1 /* 0 - off; 1 - on; */
 
   Place your test code HERE!!!
 

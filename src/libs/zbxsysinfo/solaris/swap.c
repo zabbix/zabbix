@@ -243,22 +243,22 @@ int	get_swap_io(double *swapin, double *pgswapin, double *swapout, double *pgswa
 		cpu = (cpu_stat_t*) k->ks_data;
 		if(swapin)
 		{
-		   /* uint_t   swapin;	    	// swapins */
+		   /* uint_t   swapin;	    	*/ /* swapins */
 		   (*swapin) += (double) cpu->cpu_vminfo.swapin;
 		}
 		if(pgswapin)
 		{
-		   /* uint_t   pgswapin;	// pages swapped in */
+		   /* uint_t   pgswapin;	*/ /* pages swapped in */
 		  (*pgswapin) += (double) cpu->cpu_vminfo.pgswapin;
 		}
 		if(swapout)
 		{
-		   /* uint_t   swapout;	    	// swapout */
+		   /* uint_t   swapout;	    	*/ /* swapout */
 		   (*swapout) += (double) cpu->cpu_vminfo.swapout;
 		}
 		if(pgswapout)
 		{
-		   /* uint_t   pgswapout;	// pages swapped out */
+		   /* uint_t   pgswapout;	*/ /* pages swapped out */
 		  (*pgswapout) += (double) cpu->cpu_vminfo.pgswapout;
 		}
 		cpu_count += 1;

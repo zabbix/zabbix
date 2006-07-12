@@ -128,7 +128,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 
 	zbx_snprintf(counter_path, sizeof(counter_path), "\\%s\\%s", GetCounterName(PCI_SYSTEM), GetCounterName(PCI_PROCESSOR_QUEUE_LENGTH));
 
-	// Prepare for CPU execution queue usage collection
+	/* Prepare for CPU execution queue usage collection */
 	if (ERROR_SUCCESS != (status = PdhAddCounter(pcpus->pdh_query, counter_path, 0, &pcpus->queue_counter)))
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Unable to add performance counter \"%s\" to query: %s", strerror_from_module(status,"PDH.DLL"));
@@ -214,7 +214,7 @@ void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 		return;
 	}
 
-	// Process CPU utilization data
+	/* Process CPU utilization data */
 	for(i=0; i <= pcpus->count; i++)
 	{
 		if(!pcpus->cpu[i].usage_couter)
@@ -235,7 +235,7 @@ void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 		pcpus->cpu[i].h_usage[pcpus->cpu[i].h_usage_index] = value.longValue;
 		pcpus->cpu[i].usage_old = pcpus->cpu[i].usage;
 
-		// Calculate average cpu usage
+		/* Calculate average cpu usage */
 		for(n = pcpus->cpu[i].h_usage_index, j = 0, sum = 0; j < MAX_CPU_HISTORY; j++, n--)
 		{
 			if(n < 0) n = MAX_CPU_HISTORY - 1;
@@ -263,7 +263,7 @@ void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 
 	if(pcpus->queue_counter)
 	{
-		// Process CPU queue length data
+		/* Process CPU queue length data */
 		PdhGetRawCounterValue(
 			pcpus->queue_counter,
 			NULL,
@@ -278,7 +278,7 @@ void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 
 		pcpus->h_queue[pcpus->h_queue_index] = value.longValue;
 
-		// Calculate average cpu usage
+		/* Calculate average cpu usage */
 		for(n = pcpus->h_queue_index, j = 0, sum = 0; j < MAX_CPU_HISTORY; j++, n--)
 		{
 			if(n < 0) n = MAX_CPU_HISTORY - 1;

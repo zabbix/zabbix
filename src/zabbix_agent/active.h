@@ -34,7 +34,6 @@ typedef struct zbx_active_metric_type
 	int	nextcheck;
 	int	status;
 /* Must be long for fseek() */
-/*	int	lastlogsize;*/
 	long	lastlogsize;
 } ZBX_ACTIVE_METRIC;
 

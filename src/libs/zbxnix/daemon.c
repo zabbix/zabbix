@@ -131,7 +131,7 @@ int	daemon_start(int allow_root)
 	}				
 
 	chdir("/");
-	umask(002 /* 022 */);
+	umask(0002);
 
 	for(i=0; i<MAXFD; i++)
 	{
