@@ -1,5 +1,6 @@
 Changes for 1.1.1:
 
+ - fixed selection popup if return string contains single quote (Alexei)
  - fixed incorrect character in item key selector (Alexei)
  - fixed processing of SNMP having non-standard port (Alexei)
  - fixed database data to get rid of zero multiplier for disk spaces (Alexei)
