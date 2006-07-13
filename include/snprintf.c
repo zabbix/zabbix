@@ -655,11 +655,11 @@ static void fmtfp (char *buffer, size_t *currlen, size_t maxlen,
 		}
 	}
 
-#if 0
+#if OFF
 	if (flags & DP_F_UP) caps = 1; /* Should characters be upper case? */
 #endif
 
-#if 0
+#if OFF
 	 if (max == 0) ufvalue += 0.5; /* if max = 0 we must round */
 #endif
 

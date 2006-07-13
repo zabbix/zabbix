@@ -176,7 +176,7 @@ void zbx_error(const char *fmt, ...)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-void zbx_snprintf(char* str, size_t count, const char *fmt, ...)
+int zbx_snprintf(char* str, size_t count, const char *fmt, ...)
 {
 	va_list	args;
 	int	writen_len = 0;
@@ -192,6 +192,8 @@ void zbx_snprintf(char* str, size_t count, const char *fmt, ...)
 	str[writen_len] = '\0';
 
 	va_end(args);
+
+	return writen_len;
 }
 
 /* Has to be rewritten to avoi malloc */

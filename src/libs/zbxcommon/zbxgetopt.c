@@ -269,7 +269,7 @@ static int _getopt_internal (int argc, char **argv, const char *optstring,
           ordering = REQUIRE_ORDER;
           ++optstring;
         }
-#if 0
+#if OFF
       else if (getenv ("POSIXLY_CORRECT") != NULL)
         ordering = REQUIRE_ORDER;
 #endif
@@ -372,7 +372,7 @@ static int _getopt_internal (int argc, char **argv, const char *optstring,
       int indfound = 0;
       int needexact = 0;
 
-#if 1
+#if ON
       /* allow `--zbx_option#value' because you cannout assign a '='
          to an environment variable under DOS command.com */
       while (*s && *s != '=' && * s != '#')
@@ -458,7 +458,7 @@ static int _getopt_internal (int argc, char **argv, const char *optstring,
             }
           else if ((pfound->has_arg & 0xf) == 1)
             {
-#if 0
+#if OFF
               if (zbx_optind < argc)
 #else
               if (zbx_optind < argc && (pfound->has_arg & 0x20) == 0)
@@ -523,7 +523,7 @@ static int _getopt_internal (int argc, char **argv, const char *optstring,
       {
         if (zbx_opterr)
           {
-#if 0
+#if OFF
             if (c < 040 || c >= 0177)
               zbx_error("unrecognized zbx_option, character code 0%o", c);
             else
@@ -564,7 +564,7 @@ static int _getopt_internal (int argc, char **argv, const char *optstring,
               {
                 if (zbx_opterr)
                   {
-#if 0
+#if OFF
                     zbx_error("zbx_option `-%c' requires an argument", c);
 #else
                     /* 1003.2 specifies the format of this message.  */
