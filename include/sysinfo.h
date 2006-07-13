@@ -54,7 +54,7 @@ void    add_user_parameter(char *key,char *command);
 void	test_parameters(void);
 void	test_parameter(char* key);
 
-int     check_ntp(char *host, int port, int *value_int);
+int     check_ntp(char *host, unsigned short port, int *value_int);
 
 int     get_stat(const char *key, unsigned flags, AGENT_RESULT *result);
 
