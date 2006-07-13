@@ -178,7 +178,6 @@ static int evaluate_COUNT(char *value, DB_ITEM *item, int parameter)
 	DB_RESULT	result;
 	DB_ROW	row;
 
-	char		sql[MAX_STRING_LEN];
 	char		table[MAX_STRING_LEN];
 	int		now;
 	int		res = SUCCEED;
@@ -198,9 +197,8 @@ static int evaluate_COUNT(char *value, DB_ITEM *item, int parameter)
 	{
 		strscpy(table,"history");
 	}
-	zbx_snprintf(sql,sizeof(sql),"select count(value) from %s where clock>%d and itemid=%d",table,now-parameter,item->itemid);
+	result = DBselect("select count(value) from %s where clock>%d and itemid=%d",table,now-parameter,item->itemid);
 
-	result = DBselect(sql);
 	row = DBfetch(result);
 
 	if(!row || DBis_null(row[0])==SUCCEED)
@@ -263,9 +261,8 @@ static int evaluate_SUM(char *value, DB_ITEM *item, int parameter, int flag)
 		{
 			strscpy(table,"history");
 		}
-		zbx_snprintf(sql,sizeof(sql),"select sum(value) from %s where clock>%d and itemid=%d",table, now-parameter,item->itemid);
+		result = DBselect("select sum(value) from %s where clock>%d and itemid=%d",table, now-parameter,item->itemid);
 
-		result = DBselect(sql);
 		row = DBfetch(result);
 		if(!row || DBis_null(row[0])==SUCCEED)
 		{
@@ -362,9 +359,8 @@ static int evaluate_AVG(char *value,DB_ITEM	*item,int parameter,int flag)
 
 	if(flag == ZBX_FLAG_SEC)
 	{
-		zbx_snprintf(sql,sizeof(sql),"select avg(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
+		result = DBselect("select avg(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
 
-		result = DBselect(sql);
 		row = DBfetch(result);
 		
 		if(!row || DBis_null(row[0])==SUCCEED)
@@ -460,8 +456,7 @@ static int evaluate_MIN(char *value,DB_ITEM	*item,int parameter, int flag)
 		{
 			strscpy(table,"history");
 		}
-		zbx_snprintf(sql,sizeof(sql),"select min(value) from %s where clock>%d and itemid=%d",table, now-parameter,item->itemid);
-		result = DBselect(sql);
+		result = DBselect("select min(value) from %s where clock>%d and itemid=%d",table, now-parameter,item->itemid);
 		row = DBfetch(result);
 		if(!row || DBis_null(row[0])==SUCCEED)
 		{
@@ -589,13 +584,9 @@ static int evaluate_MAX(char *value,DB_ITEM *item,int parameter,int flag)
 		{
 			strscpy(table,"history");
 		}
-		zbx_snprintf(sql,sizeof(sql),"select max(value) from %s where clock>%d and itemid=%d",table,now-parameter,item->itemid);
+		result = DBselect("select max(value) from %s where clock>%d and itemid=%d",table,now-parameter,item->itemid);
 
-zabbix_log(LOG_LEVEL_DEBUG, "DBselect" );
-		result = DBselect(sql);
-zabbix_log(LOG_LEVEL_DEBUG, "DBfetch" );
 		row = DBfetch(result);
-zabbix_log(LOG_LEVEL_DEBUG, "After DBfetch" );
 
 		if(!row || DBis_null(row[0])==SUCCEED)
 		{
@@ -604,9 +595,7 @@ zabbix_log(LOG_LEVEL_DEBUG, "After DBfetch" );
 		}
 		else
 		{
-zabbix_log(LOG_LEVEL_DEBUG, "strcpy '0x%4x'",row[0]);
 			strcpy(value,row[0]);
-zabbix_log(LOG_LEVEL_DEBUG, "del_zeroes" );
 			del_zeroes(value);
 		}
 	}
@@ -713,9 +702,8 @@ static int evaluate_DELTA(char *value,DB_ITEM *item,int parameter, int flag)
 
 	if(flag == ZBX_FLAG_SEC)
 	{
-		zbx_snprintf(sql,sizeof(sql),"select max(value)-min(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
+		result = DBselect("select max(value)-min(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
 
-		result = DBselect(sql);
 		row = DBfetch(result);
 		if(!row || DBis_null(row[0])==SUCCEED)
 		{
@@ -1227,9 +1215,8 @@ int	replace_value_by_map(char *value, int valuemapid)
 	
 	if(valuemapid == 0)	return FAIL;
 	
-	zbx_snprintf(sql,sizeof(sql),"select newvalue from mappings where valuemapid=%d and value='%s'",
+	result = DBselect("select newvalue from mappings where valuemapid=%d and value='%s'",
 			valuemapid, value);
-	result = DBselect(sql);
 	row = DBfetch(result);
 
 	if(!row || DBis_null(row[0])==SUCCEED)		return FAIL;
@@ -1272,21 +1259,19 @@ int evaluate_FUNCTION2(char *value,char *host,char *key,char *function,char *par
 	DB_RESULT result;
 	DB_ROW	row;
 
-        char	sql[MAX_STRING_LEN];
 	int	res;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate_FUNCTION2()" );
 
-	zbx_snprintf(sql,sizeof(sql),"select %s where h.host='%s' and h.hostid=i.hostid and i.key_='%s'", ZBX_SQL_ITEM_SELECT, host, key );
-	result = DBselect(sql);
+	result = DBselect("select %s where h.host='%s' and h.hostid=i.hostid and i.key_='%s'", ZBX_SQL_ITEM_SELECT, host, key );
 
 	row = DBfetch(result);
 
 	if(!row)
 	{
         	DBfree_result(result);
-		zabbix_log(LOG_LEVEL_WARNING, "Query [%s] returned empty result", sql );
-		zabbix_syslog("Query [%s] returned empty result", sql );
+		zabbix_log(LOG_LEVEL_WARNING, "Query returned empty result");
+		zabbix_syslog("Query returned empty result");
 		return FAIL;
 	}
 

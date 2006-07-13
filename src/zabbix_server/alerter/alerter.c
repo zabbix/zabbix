@@ -155,7 +155,6 @@ static int execute_action(DB_ALERT *alert,DB_MEDIATYPE *mediatype, char *error, 
  ******************************************************************************/
 int main_alerter_loop()
 {
-	char	sql[MAX_STRING_LEN];
 	char	error[MAX_STRING_LEN];
 	char	error_esc[MAX_STRING_LEN];
 
@@ -178,8 +177,7 @@ int main_alerter_loop()
 		now  = time(NULL);
 
 /*		zbx_snprintf(sql,sizeof(sql),"select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,a.retries,mt.mediatypeid,mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path from alerts a,media_type mt where a.status=0 and a.retries<3 and a.mediatypeid=mt.mediatypeid order by a.clock"); */
-		zbx_snprintf(sql,sizeof(sql),"select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,a.retries,mt.mediatypeid,mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path,a.delay,mt.gsm_modem from alerts a,media_type mt where a.status=%d and a.retries<3 and (a.repeats<a.maxrepeats or a.maxrepeats=0) and a.nextcheck<=%d and a.mediatypeid=mt.mediatypeid order by a.clock", ALERT_STATUS_NOT_SENT, now);
-		result = DBselect(sql);
+		result = DBselect("select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,a.retries,mt.mediatypeid,mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path,a.delay,mt.gsm_modem from alerts a,media_type mt where a.status=%d and a.retries<3 and (a.repeats<a.maxrepeats or a.maxrepeats=0) and a.nextcheck<=%d and a.mediatypeid=mt.mediatypeid order by a.clock", ALERT_STATUS_NOT_SENT, now);
 
 		while((row=DBfetch(result)))
 		{
@@ -217,18 +215,15 @@ int main_alerter_loop()
 			if(res==SUCCEED)
 			{
 				zabbix_log( LOG_LEVEL_DEBUG, "Alert ID [%d] was sent successfully", alert.alertid);
-				zbx_snprintf(sql,sizeof(sql),"update alerts set repeats=repeats+1, nextcheck=%d where alertid=%d", now+alert.delay, alert.alertid);
-				DBexecute(sql);
-				zbx_snprintf(sql,sizeof(sql),"update alerts set status=%d where alertid=%d and repeats>=maxrepeats and status=%d and retries<3", ALERT_STATUS_SENT, alert.alertid, ALERT_STATUS_NOT_SENT);
-				DBexecute(sql);
+				DBexecute("update alerts set repeats=repeats+1, nextcheck=%d where alertid=%d", now+alert.delay, alert.alertid);
+				DBexecute("update alerts set status=%d where alertid=%d and repeats>=maxrepeats and status=%d and retries<3", ALERT_STATUS_SENT, alert.alertid, ALERT_STATUS_NOT_SENT);
 			}
 			else
 			{
 				zabbix_log( LOG_LEVEL_DEBUG, "Error sending alert ID [%d]", alert.alertid);
 				zabbix_syslog("Error sending alert ID [%d]", alert.alertid);
 				DBescape_string(error,error_esc,MAX_STRING_LEN);
-				zbx_snprintf(sql,sizeof(sql),"update alerts set retries=retries+1,error='%s' where alertid=%d", error_esc, alert.alertid);
-				DBexecute(sql);
+				DBexecute("update alerts set retries=retries+1,error='%s' where alertid=%d", error_esc, alert.alertid);
 			}
 
 		}
