@@ -24,6 +24,9 @@
 
 #include "zbxtypes.h"
 
+#define ON	1
+#define OFF	0
+
 #if defined(WIN32)
 
 #	pragma warning (disable: 4100)
@@ -379,7 +382,7 @@ int	calculate_item_nextcheck(int delay, int now);
 void	zbx_setproctitle(const char *fmt, ...);
 double	zbx_getseconds(void);
 void	zbx_error(const char *fmt, ...);
-void	zbx_snprintf(char* str, size_t count, const char *fmt, ...);
+int	zbx_snprintf(char* str, size_t count, const char *fmt, ...);
 
 int	set_result_type(AGENT_RESULT *result, int value_type, char *c);
 

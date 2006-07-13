@@ -11,7 +11,7 @@ MessageIdTypedef=DWORD
 MessageId=1
 SymbolicName=MSG_ZABBIX_MESSAGE
 Language=English
-%1
+%1 %2
 .
 
 ;#endif

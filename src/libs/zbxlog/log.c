@@ -45,8 +45,6 @@ int zabbix_open_log(int type, int level, const char *filename)
 {
 	FILE *log_file = NULL;
 
-	zbx_error("Log file is '%s'",filename);
-
 
 	log_level = level;
 
@@ -62,6 +60,7 @@ int zabbix_open_log(int type, int level, const char *filename)
 
 	if(LOG_TYPE_SYSLOG == type)
 	{
+zbx_error("Loging to SYSLOG",filename);
 		log_type = LOG_TYPE_SYSLOG;
 
 #if defined(WIN32)
@@ -78,6 +77,8 @@ int zabbix_open_log(int type, int level, const char *filename)
 
 	else if(LOG_TYPE_FILE == type)
 	{
+zbx_error("Loging to file '%s'",filename);
+
 		if(strlen(filename) >= MAX_STRING_LEN)
 		{
 			zbx_error("To large path for logfile.");
@@ -102,6 +103,7 @@ int zabbix_open_log(int type, int level, const char *filename)
 	}
 	else
 	{
+zbx_error("Loging to STDERR",filename);
 		/* Not supported logging type */
 
 		if(ZBX_MUTEX_ERROR == zbx_mutex_create(&log_file_access, "/tmp/zbxlmtx"))
@@ -154,18 +156,18 @@ void zabbix_log(int level, const char *fmt, ...)
 
 	char	message[MAX_BUF_LEN];
 
-	time_t	t;
+	time_t		t;
 	struct	tm	*tm;
-	va_list args;
+	va_list		args;
 
 	struct	stat	buf;
 
 	char	filename_old[MAX_STRING_LEN];
-
 #if defined(WIN32)
 
 	WORD	wType;
-	char	*strings[2] = {message, NULL};
+	char	thread_id[20];
+	char	*(strings[]) = {thread_id, message, NULL};
 	
 #endif /* WIN32 */
 
@@ -226,14 +228,20 @@ void zabbix_log(int level, const char *fmt, ...)
 		return;
 	}
 	
+	memset(message, 0, sizeof(message));
 	va_start(args, fmt);
-	vsnprintf(message, sizeof(message)-2, fmt, args);
+	vsnprintf(message, sizeof(message)-1, fmt, args);
 	va_end(args);
-	strncat(message,"\0",sizeof(message));
 
 	if(LOG_TYPE_SYSLOG == log_type)
 	{
 #if defined(WIN32)
+		t = time(NULL);
+		tm = localtime(&t);
+
+		memset(thread_id, 0, sizeof(thread_id));
+		zbx_snprintf(thread_id, sizeof(thread_id),"[%lu]: ",(unsigned long)zbx_get_thread_id());
+
 		switch(level)
 		{
 			case LOG_LEVEL_CRIT:
@@ -247,8 +255,16 @@ void zabbix_log(int level, const char *fmt, ...)
 				wType = EVENTLOG_INFORMATION_TYPE;
 				break;
 		}
-
-		ReportEvent(system_log_handle, wType, 0, MSG_ZABBIX_MESSAGE, NULL, 1, 0, strings, NULL);
+		ReportEvent(
+			system_log_handle, 
+			wType, 
+			0, 
+			MSG_ZABBIX_MESSAGE, 
+			NULL, 
+			sizeof(*strings)-1, 
+			0, 
+			strings, 
+			NULL);
 
 #else /* not WIN32 */
 

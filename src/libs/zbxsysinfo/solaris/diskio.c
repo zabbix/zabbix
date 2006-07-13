@@ -23,7 +23,7 @@
 #include "sysinfo.h"
 
 
-#if 0
+#if OFF
 /*
  * hidden
  */
@@ -77,7 +77,7 @@ typedef struct disk_data
 } DISK_DATA;
 #endif
 
-#if 0
+#if OFF
 /*
  * hidden
  */
@@ -116,7 +116,7 @@ static DISK_DATA *get_disk_data_record(const char *device)
 }
 #endif
 
-#if 0
+#if OFF
 /*
  * hidden
  */
@@ -155,7 +155,7 @@ static int get_disk_kstat_record(const char *name,
 }
 #endif 
 
-#if 0
+#if OFF
 /*
  * hidden
  */
@@ -195,7 +195,7 @@ int	DISKSVC(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *re
 }
 #endif
 
-#if 0
+#if OFF
 /*
  * hidden
  */
