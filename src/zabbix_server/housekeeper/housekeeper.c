@@ -68,7 +68,6 @@
  ******************************************************************************/
 static int housekeeping_process_log()
 {
-	char		sql[MAX_STRING_LEN];
 	DB_HOUSEKEEPER	housekeeper;
 
 	DB_RESULT	result;
@@ -80,8 +79,7 @@ static int housekeeping_process_log()
 	zabbix_log( LOG_LEVEL_DEBUG, "In housekeeping_process_log()");
 
 	/* order by tablename to effectively use DB cache */
-	zbx_snprintf(sql,sizeof(sql),"select housekeeperid, tablename, field, value from housekeeper order by tablename");
-	result = DBselect(sql);
+	result = DBselect("select housekeeperid, tablename, field, value from housekeeper order by tablename");
 
 	while((row=DBfetch(result)))
 	{
@@ -91,14 +89,13 @@ static int housekeeping_process_log()
 		housekeeper.value=atoi(row[3]);
 
 #ifdef HAVE_ORACLE
-		zbx_snprintf(sql,sizeof(sql),"delete from %s where %s=%d and rownum<500",housekeeper.tablename, housekeeper.field,housekeeper.value);
+		deleted = DBexecute("delete from %s where %s=%d and rownum<500",housekeeper.tablename, housekeeper.field,housekeeper.value);
 #else
-		zbx_snprintf(sql,sizeof(sql),"delete from %s where %s=%d limit 500",housekeeper.tablename, housekeeper.field,housekeeper.value);
+		deleted = DBexecute("delete from %s where %s=%d limit 500",housekeeper.tablename, housekeeper.field,housekeeper.value);
 #endif
-		if(( deleted = DBexecute(sql)) == 0)
+		if(deleted == 0)
 		{
-			zbx_snprintf(sql,sizeof(sql),"delete from housekeeper where housekeeperid=%d",housekeeper.housekeeperid);
-			DBexecute(sql);
+			DBexecute("delete from housekeeper where housekeeperid=%d",housekeeper.housekeeperid);
 		}
 		else
 		{
@@ -113,29 +110,28 @@ static int housekeeping_process_log()
 
 static int housekeeping_sessions(int now)
 {
-	char	sql[MAX_STRING_LEN];
+	int deleted;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In housekeeping_sessions(%d)", now);
 
-	zbx_snprintf(sql,sizeof(sql),"delete from sessions where lastaccess<%d",now-24*3600);
+	deleted = DBexecute("delete from sessions where lastaccess<%d",now-24*3600);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Deleted [%ld] records from table [sessions]", DBexecute(sql));
+	zabbix_log( LOG_LEVEL_DEBUG, "Deleted [%ld] records from table [sessions]", deleted);
 
 	return SUCCEED;
 }
 
 static int housekeeping_alerts(int now)
 {
-	char		sql[MAX_STRING_LEN];
 	int		alert_history;
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		res = SUCCEED;
+	int		deleted;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In housekeeping_alerts(%d)", now);
 
-	zbx_snprintf(sql,sizeof(sql),"select alert_history from config");
-	result = DBselect(sql);
+	result = DBselect("select alert_history from config");
 
 	row=DBfetch(result);
 
@@ -148,8 +144,8 @@ static int housekeeping_alerts(int now)
 	{
 		alert_history=atoi(row[0]);
 
-		zbx_snprintf(sql,sizeof(sql),"delete from alerts where clock<%d",now-24*3600*alert_history);
-		zabbix_log( LOG_LEVEL_DEBUG, "Deleted [%ld] records from table [alerts]", DBexecute(sql));
+		deleted = DBexecute("delete from alerts where clock<%d",now-24*3600*alert_history);
+		zabbix_log( LOG_LEVEL_DEBUG, "Deleted [%ld] records from table [alerts]", deleted);
 	}
 
 	DBfree_result(result);
@@ -158,7 +154,6 @@ static int housekeeping_alerts(int now)
 
 static int housekeeping_alarms(int now)
 {
-	char		sql[MAX_STRING_LEN];
 	int		alarm_history;
 	DB_RESULT	result;
 	DB_RESULT	result2;
@@ -169,8 +164,8 @@ static int housekeeping_alarms(int now)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In housekeeping_alarms(%d)", now);
 
-	zbx_snprintf(sql,sizeof(sql),"select alarm_history from config");
-	result = DBselect(sql);
+	result = DBselect("select alarm_history from config");
+
 	row1=DBfetch(result);
 	
 	if(!row1 || DBis_null(row1[0])==SUCCEED)
@@ -182,17 +177,14 @@ static int housekeeping_alarms(int now)
 	{
 		alarm_history=atoi(row1[0]);
 
-		zbx_snprintf(sql,sizeof(sql),"select alarmid from alarms where clock<%d", now-24*3600*alarm_history);
-		result2 = DBselect(sql);
+		result2 = DBselect("select alarmid from alarms where clock<%d", now-24*3600*alarm_history);
 		while((row2=DBfetch(result2)))
 		{
 			alarmid=atoi(row2[0]);
 			
-			zbx_snprintf(sql,sizeof(sql),"delete from acknowledges where alarmid=%d",alarmid);
-			DBexecute(sql);
+			DBexecute("delete from acknowledges where alarmid=%d",alarmid);
 			
-			zbx_snprintf(sql,sizeof(sql),"delete from alarms where alarmid=%d",alarmid);
-			zabbix_log( LOG_LEVEL_DEBUG, "Deleted [%ld] records from table [alarms]", DBexecute(sql));
+			DBexecute("delete from alarms where alarmid=%d",alarmid);
 		}
 		DBfree_result(result2);
 

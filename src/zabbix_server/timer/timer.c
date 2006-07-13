@@ -63,7 +63,6 @@ extern void	update_functions(DB_ITEM *item);
  ******************************************************************************/
 void main_timer_loop()
 {
-	char	sql[MAX_STRING_LEN];
 	int	now;
 
 /*	int	itemid,functionid;
@@ -90,9 +89,7 @@ void main_timer_loop()
 #endif
 	*/
 
-		zbx_snprintf(sql,sizeof(sql),"select distinct %s, functions f where h.hostid=i.hostid and h.status=%d and i.status=%d and f.function in ('nodata','date','dayofweek','time','now') and i.itemid=f.itemid", ZBX_SQL_ITEM_SELECT, HOST_STATUS_MONITORED, ITEM_STATUS_ACTIVE);
-
-		result = DBselect(sql);
+		result = DBselect("select distinct %s, functions f where h.hostid=i.hostid and h.status=%d and i.status=%d and f.function in ('nodata','date','dayofweek','time','now') and i.itemid=f.itemid", ZBX_SQL_ITEM_SELECT, HOST_STATUS_MONITORED, ITEM_STATUS_ACTIVE);
 
 		while((row=DBfetch(result)))
 		{

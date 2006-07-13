@@ -562,7 +562,6 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data
 {
 	int	found = SUCCEED;
 	char	*s;
-	char	sql[MAX_STRING_LEN];
 	char	str[MAX_STRING_LEN];
 	char	tmp[MAX_STRING_LEN];
 
@@ -589,8 +588,7 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data
 		else if( (s = strstr(str,"{HOSTNAME}")) != NULL )
 		{
 /*			zbx_snprintf(sql,sizeof(sql),"select distinct t.description,h.host from triggers t, functions f,items i, hosts h where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid", trigger->triggerid);*/
-			zbx_snprintf(sql,sizeof(sql),"select distinct h.host from triggers t, functions f,items i, hosts h where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid", trigger->triggerid);
-			result = DBselect(sql);
+			result = DBselect("select distinct h.host from triggers t, functions f,items i, hosts h where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid", trigger->triggerid);
 			row=DBfetch(result);
 
 			if(!row || DBis_null(row[0])==SUCCEED)
@@ -614,8 +612,7 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data
 		}
 		else if( (s = strstr(str,"{TRIGGER.KEY}")) != NULL )
 		{
-			zbx_snprintf(sql,sizeof(sql),"select distinct i.key_ from triggers t, functions f,items i, hosts h where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid order by i.key_", trigger->triggerid);
-			result = DBselect(sql);
+			result = DBselect("select distinct i.key_ from triggers t, functions f,items i, hosts h where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid order by i.key_", trigger->triggerid);
 			row=DBfetch(result);
 
 			if(!row || DBis_null(row[0])==SUCCEED)
@@ -639,8 +636,7 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data
 		}
 		else if( (s = strstr(str,"{IPADDRESS}")) != NULL )
 		{
-			zbx_snprintf(sql,sizeof(sql),"select distinct h.ip from triggers t, functions f,items i, hosts h where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and h.useip=1", trigger->triggerid);
-			result = DBselect(sql);
+			result = DBselect("select distinct h.ip from triggers t, functions f,items i, hosts h where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and h.useip=1", trigger->triggerid);
 			row = DBfetch(result);
 
 			if(!row || DBis_null(row[0])==SUCCEED)

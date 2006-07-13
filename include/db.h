@@ -121,6 +121,8 @@ extern	int	CONFIG_DBPORT;
 
 #define ZBX_SQL_ITEM_SELECT	"i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.errors_from,i.snmp_port,i.delta,i.prevorgvalue,i.lastclock,i.units,i.multiplier,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula,h.available,i.status,i.trapper_hosts,i.logtimefmt,i.valuemapid from hosts h, items i"
 
+#define ZBX_MAX_SQL_LEN			4096
+
 DB_HOST
 {
 	int     hostid;
@@ -311,10 +313,12 @@ void    DBconnect(void);
 void    DBclose(void);
 void    DBvacuum(void);
 
-int	DBexecute( char *query );
+/*int	DBexecute( char *query );*/
+int DBexecute(const char *fmt, ...);
 /*long	DBaffected_rows();*/
 
-DB_RESULT	DBselect(char *query);
+/*DB_RESULT	DBselect(char *query);*/
+DB_RESULT DBselect(const char *fmt, ...);
 DB_RESULT	DBselectN(char *query, int n);
 DB_ROW	DBfetch(DB_RESULT result);
 /*char	*DBget_field(DB_RESULT result, int rownum, int fieldnum);*/
