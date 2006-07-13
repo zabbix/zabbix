@@ -909,6 +909,10 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\win32\net.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\src\libs\zbxsysinfo\win32\pdhmon.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\src\libs\zbxsysinfo\win32\proc.c
 # End Source File
 # Begin Source File

@@ -236,7 +236,7 @@ static int	get_active_checks(char *server, unsigned short port, char *error, int
 {
 
 	ZBX_SOCKET	s;
-	ZBX_SOCKADDR servaddr_in;
+	ZBX_SOCKADDR	servaddr_in;
 
 	struct hostent *hp;
 
@@ -248,21 +248,22 @@ static int	get_active_checks(char *server, unsigned short port, char *error, int
 
 	zabbix_log( LOG_LEVEL_DEBUG, "get_active_checks('%s',%u)", server, port);
 
-	servaddr_in.sin_family = AF_INET;
 	if(NULL == (hp = gethostbyname(server)) )
 	{
 #ifdef	HAVE_HSTRERROR		
 		zbx_snprintf(error, max_error_len,"gethostbyname() failed for server '%s' [%s]", server, (char*)hstrerror((int)h_errno));
 #else
-		zbx_snprintf(error, max_error_len,"gethostbyname() failed for server '%s' [%d]", server, h_errno);
+		zbx_snprintf(error, max_error_len,"gethostbyname() failed for server '%s' [%s]", server, strerror_from_system(h_errno));
 #endif
 		zabbix_log( LOG_LEVEL_WARNING, error);
 		return	NETWORK_ERROR;
 	}
 
-	servaddr_in.sin_addr.s_addr = ((struct in_addr *)(hp->h_addr))->s_addr;
+	memset(&servaddr_in, 0, sizeof(ZBX_SOCKADDR));
 
-	servaddr_in.sin_port = htons(port);
+	servaddr_in.sin_family		= AF_INET;
+	servaddr_in.sin_addr.s_addr	= ((struct in_addr *)(hp->h_addr))->s_addr;
+	servaddr_in.sin_port		= htons(port);
 
 	if(INVALID_SOCKET == (s = socket(AF_INET,SOCK_STREAM,0)))
 	{
@@ -282,7 +283,7 @@ static int	get_active_checks(char *server, unsigned short port, char *error, int
 				zbx_snprintf(error,max_error_len,"No route to host [%s:%u]",server,port);
 				break;
 			default:
-				zbx_snprintf(error,max_error_len,"Cannot connect to [%s:%u] [%s]",server,port,strerror(errno));
+				zbx_snprintf(error,max_error_len,"Cannot connect to [%s:%u] [%s]",server,port,strerror_from_system(errno));
 				break;
 		} 
 		zabbix_log(LOG_LEVEL_WARNING, error);
@@ -301,7 +302,7 @@ static int	get_active_checks(char *server, unsigned short port, char *error, int
 				zbx_snprintf(error,max_error_len,"Timeout while sending data to [%s:%u]",server,port);
 				break;
 			default:
-				zbx_snprintf(error,max_error_len,"Error while sending data to [%s:%u] [%s]",server,port,strerror(errno));
+				zbx_snprintf(error,max_error_len,"Error while sending data to [%s:%u] [%s]",server,port,strerror_from_system(errno));
 				break;
 		} 
 		zabbix_log(LOG_LEVEL_WARNING, error);
@@ -330,7 +331,7 @@ static int	get_active_checks(char *server, unsigned short port, char *error, int
 							zbx_snprintf(error,max_error_len,"Connection reset by peer.");
 							break;
 					default:
-							zbx_snprintf(error,max_error_len,"Error while receiving data from [%s:%u] [%s]",server,port,strerror(errno));
+							zbx_snprintf(error,max_error_len,"Error while receiving data from [%s:%u] [%s]",server,port,strerror_from_system(errno));
 							break;
 				} 
 				zabbix_log( LOG_LEVEL_WARNING, error);
@@ -365,12 +366,13 @@ static int	send_value(char *server,unsigned short port,char *host, char *key,cha
 	if( NULL == (hp = gethostbyname(server)) )
 	{
 #ifdef	HAVE_HSTRERROR		
-		zabbix_log( LOG_LEVEL_WARNING, "gethostbyname() failed for server '%s' [%d]", server, (char*)hstrerror((int)h_errno));
+		zabbix_log( LOG_LEVEL_WARNING, "gethostbyname() failed for server '%s' [%s]", server, (char*)hstrerror((int)h_errno));
 #else
-		zabbix_log( LOG_LEVEL_WARNING, "gethostbyname() failed for server '%s' [%d]", server, h_errno);
+		zabbix_log( LOG_LEVEL_WARNING, "gethostbyname() failed for server '%s' [%s]", server, strerror_from_system(h_errno));
 #endif
 		return	FAIL;
 	}
+	memset(&servaddr_in, 0, sizeof(ZBX_SOCKADDR));
 
 	servaddr_in.sin_family		= AF_INET;
 	servaddr_in.sin_addr.s_addr	= ((struct in_addr *)(hp->h_addr))->s_addr;
@@ -378,17 +380,17 @@ static int	send_value(char *server,unsigned short port,char *host, char *key,cha
 
 	if(INVALID_SOCKET == (s = socket(AF_INET,SOCK_STREAM,0)))
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Error in socket() [%s:%u] [%s]",server, port, strerror(errno));
+		zabbix_log( LOG_LEVEL_WARNING, "Error in socket() [%s:%u] [%s]",server, port, strerror_from_system(errno));
 		return	FAIL;
 	}
 	 
-	myaddr_in.sin_family = AF_INET;
-	myaddr_in.sin_port=0;
-	myaddr_in.sin_addr.s_addr=INADDR_ANY;
+	myaddr_in.sin_family		= AF_INET;
+	myaddr_in.sin_addr.s_addr	= INADDR_ANY;
+	myaddr_in.sin_port		= 0;
 
 	if(SOCKET_ERROR == connect(s,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)))
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Error in connect() [%s:%u] [%s]",server, port, strerror(errno));
+		zabbix_log( LOG_LEVEL_WARNING, "Error in connect() [%s:%u] [%s]",server, port, strerror_from_system(errno));
 		zbx_sock_close(s);
 		return	FAIL;
 	}
@@ -399,7 +401,7 @@ static int	send_value(char *server,unsigned short port,char *host, char *key,cha
 
 	if(SOCKET_ERROR == zbx_sock_write(s, buf, strlen(buf)))
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Error during sending [%s:%u] [%s]",server, port, strerror(errno));
+		zabbix_log( LOG_LEVEL_WARNING, "Error during sending [%s:%u] [%s]",server, port, strerror_from_system(errno));
 		zbx_sock_close(s);
 		return	FAIL;
 	} 
@@ -408,7 +410,7 @@ static int	send_value(char *server,unsigned short port,char *host, char *key,cha
 
 	if(SOCKET_ERROR == (len = zbx_sock_read(s, buf, sizeof(buf)-1, CONFIG_TIMEOUT)))
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Error in recvfrom() [%s:%u] [%s]",server, port, strerror(errno));
+		zabbix_log( LOG_LEVEL_WARNING, "Error in recvfrom() [%s:%u] [%s]",server, port, strerror_from_system(errno));
 		zbx_sock_close(s);
 		return	FAIL;
 	}
