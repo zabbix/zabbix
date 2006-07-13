@@ -89,7 +89,6 @@ static VOID WINAPI ServiceCtrlHandler(DWORD ctrlCode)
 static VOID WINAPI ServiceEntry(DWORD argc,LPTSTR *argv)
 {
 	WSADATA sockInfo;
-	char counterPath[MAX_COUNTER_PATH * 2 + 50];
 
 	serviceHandle = RegisterServiceCtrlHandler(ZABBIX_SERVICE_NAME, ServiceCtrlHandler);
 
@@ -106,10 +105,6 @@ static VOID WINAPI ServiceEntry(DWORD argc,LPTSTR *argv)
 
 	/* Initialize Windows Sockets API */
 	WSAStartup(0x0002,&sockInfo);
-
-	/* Internal command aliases */
-	zbx_snprintf(counterPath, sizeof(counterPath), "perf_counter[\\%s\\%s]",GetCounterName(PCI_SYSTEM),GetCounterName(PCI_SYSTEM_UP_TIME));
-	add_alias("system.uptime",counterPath);
 
 	/* Now service is running */
 	serviceStatus.dwCurrentState	= SERVICE_RUNNING;

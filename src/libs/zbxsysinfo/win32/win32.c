@@ -75,5 +75,7 @@ ZBX_METRIC	parameters_specific[]=
 	{"system.uptime",	0,	SYSTEM_UPTIME,		0,	0},
 	{"system.users.num",	0,	SYSTEM_UNUM, 		0,	0},
 
+	{"perf_counter",	CF_USEUPARAM,	PERF_MONITOR,	0,	"\\Processor(_Total)\\% Processor Time"},
+
 	{0}
 	};

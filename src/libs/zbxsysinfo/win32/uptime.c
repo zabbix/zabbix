@@ -18,15 +18,16 @@
 **/
 
 #include "config.h"
+#include "perfmon.h"
 
 #include "common.h"
 #include "sysinfo.h"
 
 int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef TODO
-#error Realize function!!!
-#endif /* todo */
+	char counter_path[MAX_COUNTER_PATH];
 
-	return SYSINFO_RET_FAIL;
+	zbx_snprintf(counter_path, sizeof(counter_path), "\\%s\\%s",GetCounterName(PCI_SYSTEM),GetCounterName(PCI_SYSTEM_UP_TIME));
+
+	return PERF_MONITOR(cmd, counter_path, flags, result);
 }

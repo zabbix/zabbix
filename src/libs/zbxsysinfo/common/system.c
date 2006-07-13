@@ -43,6 +43,10 @@ int     SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_R
 
         init_result(result);
 
+#ifdef TODO
+#error Realize function!!!
+#endif /* todo */
+
         return EXECUTE_STR(cmd, "uname -a", flags, result);
 }
 
@@ -51,6 +55,10 @@ int     SYSTEM_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGEN
         assert(result);
 
         init_result(result);
+
+#ifdef TODO
+#error Realize function!!!
+#endif /* todo */
 
         return EXECUTE_STR(cmd, "hostname", flags, result);
 }
