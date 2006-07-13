@@ -437,8 +437,21 @@ int	main(int argc, char **argv)
 int main()
 {
 #if ON
-	zbx_error("%s",strerror_from_module(MSG_ZABBIX_MESSAGE, NULL));
+	int res, val;
+	WSADATA sockInfo;
+
+	WSAStartup(0x0002,&sockInfo);
+
+	res = check_ntp("142.3.100.15",123,&val);
+
+	zbx_error("check_ntp result '%i' value '%i'", res, val);
+
 #elif OFF
+
+	zbx_error("%s",strerror_from_module(MSG_ZABBIX_MESSAGE, NULL));
+
+#elif OFF
+	
 	char buffer[100*1024];
 
 	get_http_page("www.zabbix.com", "", 80, buffer, 100*1024);

@@ -1859,7 +1859,7 @@ int	CHECK_SERVICE_PERF(const char *cmd, const char *param, unsigned flags, AGENT
 /* check_service[ssh,127.0.0.1,ssh] */
 int	CHECK_SERVICE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	short	port=0;
+	unsigned short	port=0;
 	char	service[MAX_STRING_LEN];
 	char	ip[MAX_STRING_LEN];
 	char	str_port[MAX_STRING_LEN];

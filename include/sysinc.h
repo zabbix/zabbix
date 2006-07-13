@@ -298,6 +298,10 @@
 #	include <sys/mount.h>
 #endif
 
+#ifdef HAVE_SYS_TIMEB_H
+#	include <sys/timeb.h>
+#endif
+
 #ifdef HAVE_PROCINFO_H
 #	undef T_NULL /* to solve definition conflict */
 #	include <procinfo.h>
