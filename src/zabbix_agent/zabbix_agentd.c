@@ -255,9 +255,9 @@ int MAIN_ZABBIX_ENTRY(void)
 	ZBX_SOCKET	sock;
 
 	zabbix_open_log(
-#if 1	/* !!! normal case must be 1 !!! */
+#if ON	/* !!! normal case must be ON !!! */
 		LOG_TYPE_FILE
-#elif 0	/* !!! normal case must be 0 !!! */
+#elif OFF	/* !!! normal case must be OFF !!! */
 		LOG_TYPE_SYSLOG
 #else	/* !!! for debug only, print log with zbx_error !!! */ 
 		LOG_TYPE_UNDEFINED
@@ -436,16 +436,16 @@ int	main(int argc, char **argv)
 
 int main()
 {
-#if 1
+#if ON
 	zbx_error("%s",strerror_from_module(MSG_ZABBIX_MESSAGE, NULL));
-#elif 0
+#elif OFF
 	char buffer[100*1024];
 
 	get_http_page("www.zabbix.com", "", 80, buffer, 100*1024);
 
 	printf("Back [%d] [%s]\n", strlen(buffer), buffer);
 	
-#elif 0
+#elif OFF
 
 	char s[] = "ABCDEFGH";
 	char p[] = "D(.){0,}E";
@@ -455,7 +455,7 @@ int main()
 	printf("Pattern:\t %s\n", p);
 	printf("Result: \t [%s] [%d]\n", zbx_regexp_match(s, p, &len), len);
 /*
-#elif 1 /* 0 - off; 1 - on; */
+#elif OFF or ON
 
   Place your test code HERE!!!
 

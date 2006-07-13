@@ -29,7 +29,7 @@ void	collect_stats_diskdevices(ZBX_DISKDEVICES_DATA *pdiskdevices)
 }
 
 
-#if 0 && (!defined(WIN32) || (defined(TODO) && defined(WIN32)))
+#if OFF && (!defined(WIN32) || (defined(TODO) && defined(WIN32)))
 
 //TODO!!! Make same as cpustat.c
 

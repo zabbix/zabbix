@@ -29,7 +29,7 @@ void	collect_stats_interfaces(ZBX_INTERFACES_DATA *pinterfaces)
 }
 
 
-#if 0 && (!defined(WIN32) || (defined(TODO) && defined(WIN32)))
+#if OFF && (!defined(WIN32) || (defined(TODO) && defined(WIN32)))
 
 //TODO!!! Make same as cpustat.c
 
