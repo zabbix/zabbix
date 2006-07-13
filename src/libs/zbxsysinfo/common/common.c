@@ -23,6 +23,8 @@
 #include "alias.h"
 #include "md5.h"
 #include "log.h"
+#include "zbxsock.h"
+#include "cfg.h"
 
 ZBX_METRIC *commands=NULL;
 extern ZBX_METRIC parameters_specific[];
@@ -1152,7 +1154,6 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
         init_result(result);
 	
-	strsncpy(command, param, MAX_STRING_LEN);
 	memset(cmd_result, 0, MAX_STRING_LEN);
 
 #if defined(WIN32)
@@ -1186,6 +1187,8 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	si.hStdOutput	= hOutput;
 	si.hStdError	= GetStdHandle(STD_ERROR_HANDLE);
 
+	zbx_snprintf(command, sizeof(command), "cmd /C \"%s\"", param);
+
 	/* Create new process */
 	if (!CreateProcess(NULL,command,NULL,NULL,TRUE,0,NULL,NULL,&si,&pi))
 	{
@@ -1207,6 +1210,7 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	cmd_result[len] = '\0';
 
 #else /* not WIN32 */
+	strsncpy(command, param, sizeof(command));
 
 	if(0 == (f = popen(command,"r")))
 	{
@@ -1426,73 +1430,84 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	
 	return	SYSINFO_RET_OK;
 }
-int	forward_request(char *proxy, char *command, int port, unsigned flags, AGENT_RESULT *result)
-{
-#ifdef TODO /* TODO !!! */
-	char	*haddr;
-	char	c[1024];
-	
-	int	s;
-	struct	sockaddr_in addr;
-	int	addrlen;
 
-	struct hostent *host;
+
+/***************************************/
+/***** !!! NOT USED FUNCTION !!! *******/
+/***************************************/
+
+static int	forward_request(char *proxy, char *command, int port, unsigned flags, AGENT_RESULT *result)
+{
+	ZBX_SOCKET	s;
+	ZBX_SOCKADDR	servaddr_in;
+
+	struct hostent *hp;
+
+	char	buf[MAX_BUF_LEN];
+	
+	int	len;
 
 	assert(result);
 
 	init_result(result);
 		
-	host = gethostbyname(proxy);
-	if(host == NULL)
+	if(NULL == (hp = gethostbyname(proxy)) )
 	{
+#ifdef	HAVE_HSTRERROR		
+		zabbix_log( LOG_LEVEL_DEBUG,"gethostbyname() failed for proxy '%s' [%s]", proxy, (char*)hstrerror((int)h_errno));
+#else
+		zabbix_log( LOG_LEVEL_DEBUG,"gethostbyname() failed for proxy '%s' [%s]", proxy, strerror_from_system(h_errno));
+#endif
 		SET_MSG_RESULT(result, strdup("ZBX_NETWORK_ERROR"));
 		return SYSINFO_RET_FAIL;
 	}
 
-	haddr=host->h_addr;
+	memset(&servaddr_in, 0, sizeof(ZBX_SOCKADDR));
 
-	addrlen = sizeof(addr);
-	memset(&addr, 0, addrlen);
-	addr.sin_port = htons(port);
-	addr.sin_family = AF_INET;
-	bcopy(haddr, (void *) &addr.sin_addr.s_addr, 4);
+	servaddr_in.sin_family		= AF_INET;
+	servaddr_in.sin_addr.s_addr	= ((struct in_addr *)(hp->h_addr))->s_addr;
+	servaddr_in.sin_port		= htons(port);
 
-	s = socket(AF_INET, SOCK_STREAM, 0);
-	if (s == -1)
+	if(INVALID_SOCKET == (s = socket(AF_INET,SOCK_STREAM,0)))
 	{
-		close(s);
+		zabbix_log( LOG_LEVEL_DEBUG, "Error in socket() [%s:%u] [%s]",proxy, port, strerror_from_system(errno));
 		SET_MSG_RESULT(result, strdup("ZBX_NOTSUPPORTED"));
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (connect(s, (struct sockaddr *) &addr, addrlen) == -1)
+
+	if(SOCKET_ERROR == connect(s,(struct sockaddr *)&servaddr_in,sizeof(ZBX_SOCKADDR)))
 	{
-		close(s);
+		zabbix_log( LOG_LEVEL_WARNING, "Error in connect() [%s:%u] [%s]",proxy, port, strerror_from_system(errno));
+		zbx_sock_close(s);
 		SET_MSG_RESULT(result, strdup("ZBX_NETWORK_ERROR"));
 		return SYSINFO_RET_FAIL;
 	}
 
-	if(write(s,command,strlen(command)) == -1)
+
+	if(SOCKET_ERROR == zbx_sock_write(s, command, strlen(command)))
 	{
-		close(s);
+		zabbix_log( LOG_LEVEL_DEBUG, "Error during sending [%s:%u] [%s]",proxy, port, strerror_from_system(errno));
+		zbx_sock_close(s);
 		SET_MSG_RESULT(result, strdup("ZBX_NETWORK_ERROR"));
 		return SYSINFO_RET_FAIL;
-	}
+	} 
 
-	memset(&c, 0, 1024);
-	if(read(s, c, 1024) == -1)
+	memset(buf, 0, sizeof(buf));
+
+	if(SOCKET_ERROR == (len = zbx_sock_read(s, buf, sizeof(buf)-1, CONFIG_TIMEOUT)))
 	{
-		close(s);
+		zabbix_log( LOG_LEVEL_DEBUG, "Error in reading() [%s:%u] [%s]",proxy, port, strerror_from_system(errno));
+		zbx_sock_close(s);
 		SET_MSG_RESULT(result, strdup("ZBX_ERROR"));
 		return SYSINFO_RET_FAIL;
 	}
-	close(s);
-	
-	SET_STR_RESULT(result, strdup(c));
-	return	SYSINFO_RET_OK;
-#endif /* TODO */
 
-	return SYSINFO_RET_FAIL;
+	zbx_sock_close(s);
+	
+	SET_STR_RESULT(result, strdup(buf));
+
+	return	SYSINFO_RET_OK;
 }
 
 
@@ -2117,6 +2132,10 @@ int     SYSTEM_UNUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
         assert(result);
 
         init_result(result);
+
+#ifdef TODO
+#error Realize function!!!
+#endif /* todo */
 
         return EXECUTE_INT(cmd, "who|wc -l", flags, result);
 }
