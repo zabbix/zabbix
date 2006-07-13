@@ -44,7 +44,6 @@ int	autoregister(char *server)
 	DB_ROW		row;
 
 	int	ret=SUCCEED;
-	char	sql[MAX_STRING_LEN];
 	char	*pattern;
 	int	len;
 	int	hostid;
@@ -57,9 +56,7 @@ int	autoregister(char *server)
 		return FAIL;
 	}
 
-	zbx_snprintf(sql,sizeof(sql),"select id,pattern,hostid from autoreg order by priority");
-
-	result = DBselect(sql);
+	result = DBselect("select id,pattern,hostid from autoreg order by priority");
 
 	while((row=DBfetch(result)))
 	{

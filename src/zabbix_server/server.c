@@ -212,12 +212,10 @@ void	trend(void)
 
 	int		i,j;
 
-	zbx_snprintf(sql,sizeof(sql),"select itemid from items");
-	result2 = DBselect(sql);
+	result2 = DBselect("select itemid from items");
 	for(i=0;i<DBnum_rows(result2);i++)
 	{
-		zbx_snprintf(sql,sizeof(sql),"select clock-clock%%3600, count(*),min(value),avg(value),max(value) from history where itemid=%d group by 1",atoi(DBget_field(result2,i,0)));
-		result = DBselect(sql);
+		result = DBselect("select clock-clock%%3600, count(*),min(value),avg(value),max(value) from history where itemid=%d group by 1",atoi(DBget_field(result2,i,0)));
 	
 		for(j=0;j<DBnum_rows(result);j++)
 		{
@@ -346,7 +344,6 @@ int main(int argc, char **argv)
 	init_config();
 
 	DBconnect();
-//	result = DBselect("select * from history where itemid=20272");
 	result = DBselect("select NULL from history where itemid=20272222");
 	row=DBfetch(result);
 	if(!row) printf("OK");
@@ -362,7 +359,6 @@ int main(int argc, char **argv)
 #ifdef HAVE_ZZZ
 /* */
 	DBconnect();
-/*	DBexecute("update history set value=value-10 where itemid=20272");*/
 	result = DBselect("select itemid,key_,description from items");
 	while ( SQLO_SUCCESS == sqlo_fetch(result, 1))
 	{

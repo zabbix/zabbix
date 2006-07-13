@@ -457,8 +457,7 @@ int main()
 /*
 #elif OFF or ON
 
-  Place your test code HERE!!!
-
+Place your test code HERE!!!
 */
 
 #endif /* 0 */

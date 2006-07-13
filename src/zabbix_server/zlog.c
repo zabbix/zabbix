@@ -52,7 +52,6 @@
 void zabbix_syslog(const char *fmt, ...)
 { 
 	va_list		ap;
-	char		sql[MAX_STRING_LEN];
 	char		value_str[MAX_STRING_LEN];
 
 	DB_ITEM		item;
@@ -63,8 +62,7 @@ void zabbix_syslog(const char *fmt, ...)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In zabbix_log()");
 
-	zbx_snprintf(sql,sizeof(sql),"select %s where h.hostid=i.hostid and i.key_='%s' and i.value_type=%d", ZBX_SQL_ITEM_SELECT, SERVER_ZABBIXLOG_KEY, ITEM_VALUE_TYPE_STR);
-	result = DBselect(sql);
+	result = DBselect("select %s where h.hostid=i.hostid and i.key_='%s' and i.value_type=%d", ZBX_SQL_ITEM_SELECT, SERVER_ZABBIXLOG_KEY, ITEM_VALUE_TYPE_STR);
 
 	while((row=DBfetch(result)))
 	{

@@ -38,7 +38,6 @@ int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid)
 	DB_ROW		row;
 	DB_ROW		row2;
 	DB_ROW		row3;
-	char	sql[MAX_STRING_LEN];
 	char	old[MAX_STRING_LEN];
 	char	new[MAX_STRING_LEN];
 	int	functionid, triggerid_new;
@@ -50,8 +49,7 @@ int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In DBadd_trigger_to_linked_hosts(%d,%d)",triggerid, hostid);
 
-	zbx_snprintf(sql,sizeof(sql),"select description, priority,status,comments,url,value,expression from triggers where triggerid=%d", triggerid);
-	result2=DBselect(sql);
+	result2 = DBselect("select description, priority,status,comments,url,value,expression from triggers where triggerid=%d", triggerid);
 	row2=DBfetch(result2);
 
 	if(!row2)
@@ -72,10 +70,9 @@ int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid)
 
 	DBfree_result(result2);
 
-	zbx_snprintf(sql,sizeof(sql),"select distinct h.hostid from hosts h,functions f, items i where i.itemid=f.itemid and h.hostid=i.hostid and f.triggerid=%d", triggerid);
-	result=DBselect(sql);
+	result2 = DBselect("select distinct h.hostid from hosts h,functions f, items i where i.itemid=f.itemid and h.hostid=i.hostid and f.triggerid=%d", triggerid);
 
-	row=DBfetch(result);
+	row=DBfetch(result2);
 
 	if(!row)
 	{
@@ -84,16 +81,14 @@ int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid)
 
 	if(hostid==0)
 	{
-		zbx_snprintf(sql,sizeof(sql),"select hostid,templateid,triggers from hosts_templates where templateid=%d", atoi(row[0]));
+		result = DBselect("select hostid,templateid,triggers from hosts_templates where templateid=%d", atoi(row[0]));
 	}
 	/* Link to one host only */
 	else
 	{
-		zbx_snprintf(sql,sizeof(sql),"select hostid,templateid,triggers from hosts_templates where hostid=%d and templateid=%d", hostid, atoi(row[0]));
+		result = DBselect("select hostid,templateid,triggers from hosts_templates where hostid=%d and templateid=%d", hostid, atoi(row[0]));
 	}
-	DBfree_result(result);
-
-	result=DBselect(sql);
+	DBfree_result(result2);
 
 	/* Loop: linked hosts */
 	while((row=DBfetch(result)))
@@ -107,38 +102,30 @@ int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid)
 		DBescape_string(trigger.comments,comments_esc,TRIGGER_COMMENTS_LEN_MAX);
 		DBescape_string(trigger.url,url_esc,TRIGGER_URL_LEN_MAX);
 
-		zbx_snprintf(sql,sizeof(sql),"insert into triggers  (description,priority,status,comments,url,value,expression) values ('%s',%d,%d,'%s','%s',2,'%s')",description_esc, trigger.priority, trigger.status, comments_esc, url_esc, expression_old);
-		zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]",sql);
+		DBexecute("insert into triggers  (description,priority,status,comments,url,value,expression) values ('%s',%d,%d,'%s','%s',2,'%s')",description_esc, trigger.priority, trigger.status, comments_esc, url_esc, expression_old);
 
-		DBexecute(sql);
 		triggerid_new=DBinsert_id();
 
-		zbx_snprintf(sql,sizeof(sql),"select i.key_,f.parameter,f.function,f.functionid from functions f,items i where i.itemid=f.itemid and f.triggerid=%d", triggerid);
-		result2=DBselect(sql);
+		result2 = DBselect("select i.key_,f.parameter,f.function,f.functionid from functions f,items i where i.itemid=f.itemid and f.triggerid=%d", triggerid);
 		/* Loop: functions */
 		while((row2=DBfetch(result2)))
 		{
-			zbx_snprintf(sql,sizeof(sql),"select itemid from items where key_='%s' and hostid=%d", row2[0], atoi(row[0]));
-			result3=DBselect(sql);
+			result3 = DBselect("select itemid from items where key_='%s' and hostid=%d", row2[0], atoi(row[0]));
 			row3=DBfetch(result3);
 			if(!row3)
 			{
 				DBfree_result(result3);
 
-				zbx_snprintf(sql,sizeof(sql),"delete from triggers where triggerid=%d", triggerid_new);
-				DBexecute(sql);
-				zbx_snprintf(sql,sizeof(sql),"delete from functions where triggerid=%d", triggerid_new);
-				DBexecute(sql);
+				DBexecute("delete from triggers where triggerid=%d", triggerid_new);
+				DBexecute("delete from functions where triggerid=%d", triggerid_new);
 				break;
 			}
 
-			zbx_snprintf(sql,sizeof(sql),"insert into functions (itemid,triggerid,function,parameter) values (%d,%d,'%s','%s')", atoi(row3[0]), triggerid_new, row2[2], row2[1]);
+			DBexecute("insert into functions (itemid,triggerid,function,parameter) values (%d,%d,'%s','%s')", atoi(row3[0]), triggerid_new, row2[2], row2[1]);
 
-			DBexecute(sql);
 			functionid=DBinsert_id();
 
-			zbx_snprintf(sql,sizeof(sql),"update triggers set expression='%s' where triggerid=%d", expression_old, triggerid_new );
-			DBexecute(sql);
+			DBexecute("update triggers set expression='%s' where triggerid=%d", expression_old, triggerid_new );
 
 			zbx_snprintf(old, sizeof(old),"{%d}", atoi(row2[3]));
 			zbx_snprintf(new, sizeof(new),"{%d}", functionid);
@@ -148,10 +135,8 @@ int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid)
 
 			strscpy(expression_old, expression);
 
-			zbx_snprintf(sql,sizeof(sql),"update triggers set expression='%s' where triggerid=%d", expression, triggerid_new );
+			DBexecute("update triggers set expression='%s' where triggerid=%d", expression, triggerid_new );
 			free(expression);
-
-			DBexecute(sql);
 
 			DBfree_result(result3);
 		}
@@ -183,13 +168,11 @@ int	DBget_trigger_by_triggerid(int triggerid,DB_TRIGGER *trigger)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	char	sql[MAX_STRING_LEN];
 	int	ret = SUCCEED;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In DBget_trigger_by_triggerid(%d)", triggerid);
 
-	zbx_snprintf(sql,sizeof(sql),"select triggerid, expression,description,url,comments,status,value,priority from triggers where triggerid=%d", triggerid);
-	result=DBselect(sql);
+	result = DBselect("select triggerid, expression,description,url,comments,status,value,priority from triggers where triggerid=%d", triggerid);
 	row=DBfetch(result);
 
 	if(!row)
