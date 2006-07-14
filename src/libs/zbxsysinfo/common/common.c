@@ -557,6 +557,8 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 
 int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
+#error Incorrect calculation of MD5 sum!!!
+
 	FILE	*file = NULL;
 	int	i;
 	size_t	nr;
@@ -566,7 +568,7 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	u_char	buf[16 * 1024];
 
 	unsigned char	hashText[MD5_DIGEST_SIZE*2+1];
-	unsigned char	hash[MD5_DIGEST_SIZE];
+	md5_byte_t	hash[MD5_DIGEST_SIZE];
 
 	char filename[MAX_STRING_LEN];
 	
@@ -606,19 +608,20 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	{
         	md5_append(&state,(const md5_byte_t *)buf, nr);
 	}
-        md5_finish(&state,(md5_byte_t *)hash);
+        md5_finish(&state, hash);
 
 	zbx_fclose(file);
 
 /* Convert MD5 hash to text form */
 	for(i=0;i<MD5_DIGEST_SIZE;i++)
 	{
-		zbx_snprintf((char *)&hashText[i<<1], 2,"%02x",hash[i]);
+		zbx_snprintf(&hashText[i<<1], sizeof(hashText) - (i<<1), "%02x",hash[i]);
 	}
-
+	
 	SET_STR_RESULT(result, strdup((char*)hashText));
 
 	return SYSINFO_RET_OK;
+
 }
 
 /* Code for cksum is based on code from cksum.c */
@@ -1435,10 +1438,7 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 }
 
 
-/***************************************/
-/***** !!! NOT USED FUNCTION !!! *******/
-/***************************************/
-
+/*
 static int	forward_request(char *proxy, char *command, int port, unsigned flags, AGENT_RESULT *result)
 {
 	ZBX_SOCKET	s;
@@ -1512,7 +1512,7 @@ static int	forward_request(char *proxy, char *command, int port, unsigned flags,
 
 	return	SYSINFO_RET_OK;
 }
-
+*/
 
 /* 
  * 0 - NOT OK
@@ -2078,7 +2078,29 @@ int	CHECK_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 
 int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef TODO /* TODO !!! */
+#ifdef TODO
+
+#if !defined(PACKETSZ)
+#	define PACKETSZ 512
+#endif /* PACKETSZ */
+
+#if !defined(C_IN) 
+#	define C_IN 	ns_c_in
+#endif /* C_IN */
+
+#if !defined(ns_c_in) 
+#	define ns_c_in 	1
+#endif /* ns_c_in */
+
+#if !defined(T_SOA)
+#	define T_SOA	ns_t_soa
+#endif /* T_SOA */
+
+#if !defined(ns_t_soa)
+#	define ns_t_soa	6
+#endif /* ns_t_soa */
+
+
 	int	res;
 	char	ip[MAX_STRING_LEN];
 	char	zone[MAX_STRING_LEN];
@@ -2089,7 +2111,6 @@ int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 #endif
 	struct	in_addr in;
 
-	extern struct __res_state _res;
 	/* extern char *h_errlist[]; */
 
         assert(result);
@@ -2130,35 +2151,13 @@ int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 
 	res_init();
 
-/*
-	_res.nsaddr.sin_addr=in;
-	_res.nscount=1;
-	_res.options= (RES_INIT|RES_AAONLY) & ~RES_RECURSE;
-	_res.retrans=5;
-	_res.retry=1;
-*/
+	res = res_query(zone, C_IN, T_SOA, (unsigned char *)respbuf, sizeof(respbuf));
 
-	h_errno=0;
-
-	_res.nsaddr_list[0].sin_addr = in;
-	_res.nsaddr_list[0].sin_family = AF_INET;
-/*	_res.nsaddr_list[0].sin_port = htons(NS_DEFAULTPORT);*/
-
-	_res.nsaddr_list[0].sin_port = htons(53);
-	_res.nscount = 1; 
-	_res.retrans=5;
-
-#ifdef	C_IN
-	res=res_query(zone,C_IN,T_SOA,(unsigned char *)respbuf,sizeof(respbuf));
-#else
-	res=res_query(zone,ns_c_in,ns_t_soa,(unsigned char *)respbuf,sizeof(respbuf));
-#endif
 	SET_UI64_RESULT(result, res != -1 ? 1 : 0);
 
 	return SYSINFO_RET_OK;
 
 #endif /* TODO */
-
 	return SYSINFO_RET_FAIL;
 }
 
@@ -2169,7 +2168,7 @@ int     SYSTEM_UNUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
         init_result(result);
 
 #ifdef TODO
-#error Realize function!!!
+#error Realize function SYSTEM_UNUM!!!
 #endif /* todo */
 
         return EXECUTE_INT(cmd, "who|wc -l", flags, result);

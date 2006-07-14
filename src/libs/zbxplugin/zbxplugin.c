@@ -27,7 +27,7 @@ ZBX_PLUGIN_LIST	*PluginsList = NULL;
 int add_plugin(char *args)
 {
 #ifdef TODO
-#	error ADD REALIZATION!!!
+#	error Realize plugin functionality!!!
 #endif
    return 0;
 }

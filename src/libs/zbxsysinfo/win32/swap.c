@@ -29,7 +29,7 @@ int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_R
 {
 
 #ifdef TODO
-#error Realize function!!!
+#error Realize function KERNEL_MAXFILES!!!
 #endif /* todo */
 
 	return SYSINFO_RET_FAIL;
@@ -38,7 +38,7 @@ int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_R
 int     OLD_SWAP(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef TODO
-#error Realize function!!!
+#error Realize function OLD_SWAP!!!
 #endif /* todo */
 
 	return SYSINFO_RET_FAIL;
@@ -47,7 +47,7 @@ int     OLD_SWAP(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 int	SYSTEM_SWAP_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef TODO
-#error Realize function!!!
+#error Realize function SYSTEM_SWAP_IN!!!
 #endif /* todo */
 
 	return SYSINFO_RET_FAIL;
@@ -56,7 +56,7 @@ int	SYSTEM_SWAP_IN(const char *cmd, const char *param, unsigned flags, AGENT_RES
 int	SYSTEM_SWAP_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef TODO
-#error Realize function!!!
+#error Realize function SYSTEM_SWAP_OUT!!!
 #endif /* todo */
 
 	return SYSINFO_RET_FAIL;

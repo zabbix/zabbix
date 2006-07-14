@@ -71,7 +71,7 @@ lbl_err:
 int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 { /* usage: <function name>[ <process name>, <user name>, <mode>, <command> ] */
 	#ifdef TODO
-	#	error Realize function!!!
+	#	error Realize function KERNEL_MAXFILES!!!
 	#endif /* todo */
 
 	return SYSINFO_RET_FAIL;

@@ -26,7 +26,7 @@
 int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef TODO
-#error Realize function!!!
+#error Realize function KERNEL_MAXFILES!!!
 #endif /* todo */
 
 	return SYSINFO_RET_FAIL;
@@ -35,7 +35,7 @@ int	NET_IF_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef TODO
-#error Realize function!!!
+#error Realize function NET_IF_OUT!!!
 #endif /* todo */
 
 	return SYSINFO_RET_FAIL;
@@ -44,7 +44,7 @@ int	NET_IF_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef TODO
-#error Realize function!!!
+#error Realize function NET_IF_TOTAL!!!
 #endif /* todo */
 
 	return SYSINFO_RET_FAIL;
@@ -53,7 +53,7 @@ int	NET_IF_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 int     NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef TODO
-#error Realize function!!!
+#error Realize function NET_TCP_LISTEN!!!
 #endif /* todo */
 
 	return SYSINFO_RET_FAIL;
@@ -62,7 +62,7 @@ int     NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT
 int     NET_IF_COLLISIONS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef TODO
-#error Realize function!!!
+#error Realize function NET_IF_COLLISIONS!!!
 #endif /* todo */
 
 	return SYSINFO_RET_FAIL;

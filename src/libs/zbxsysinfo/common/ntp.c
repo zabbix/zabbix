@@ -164,6 +164,7 @@ endian problems.  Note that it ignores fields irrelevant to SNTP. */
     data->transmit = d / NTP_SCALE;
 }
 
+/*
 static void display_data (ntp_data *data) {
 
     printf("sta = %d ver = %d mod = %d str = %d pol = %d dis = %.6f ref = %.6f\n",
@@ -172,6 +173,7 @@ static void display_data (ntp_data *data) {
     printf("ori = %.6f rec = %.6f\n",data->originate, data->receive);
     printf("tra = %.6f cur = %.6f\n",data->transmit, data->current);
 }
+*/
 
 #if OFF
 
@@ -301,9 +303,7 @@ int	check_ntp(char *host, unsigned short port, int *value_int)
 
 	make_packet(&data);
 
-#if OFF
-	display_data(&data);
-#endif /* OFF */
+/*	display_data(&data); */
 
 	pack_ntp(packet, sizeof(packet), &data);
 
@@ -344,9 +344,7 @@ int	check_ntp(char *host, unsigned short port, int *value_int)
 
 	zbx_sock_close(s);
 
-#if OFF
-	display_data(&data);
-#endif /* OFF */
+/*	display_data(&data); */
 
 /*        format_time(text,sizeof(text),offset,error,0.0,-1.0);*/
 

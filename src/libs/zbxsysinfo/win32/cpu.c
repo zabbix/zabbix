@@ -190,7 +190,7 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef TODO
-#error Realize function!!!
+#error Realize function SYSTEM_CPU_SWITCHES!!!
 #endif /* todo */
 
 	return SYSINFO_RET_FAIL;
@@ -200,7 +200,7 @@ int     SYSTEM_CPU_SWITCHES(const char *cmd, const char *param, unsigned flags, 
 int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef TODO
-#error Realize function!!!
+#error Realize function SYSTEM_CPU_INTR!!!
 #endif /* todo */
 
 	return SYSINFO_RET_FAIL;

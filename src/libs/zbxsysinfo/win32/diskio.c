@@ -26,7 +26,7 @@
 int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef TODO
-#error Realize function!!!
+#error Realize function VFS_DEV_WRITE!!!
 #endif /* todo */
 
 	return SYSINFO_RET_FAIL;
@@ -35,7 +35,7 @@ int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef TODO
-#error Realize function!!!
+#error Realize function VFS_DEV_READ!!!
 #endif /* todo */
 
 	return SYSINFO_RET_FAIL;
@@ -44,7 +44,7 @@ int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 static int	DISK_IO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef TODO
-#error Realize function!!!
+#error Realize function DISK_IO!!!
 #endif /* todo */
 
 	return SYSINFO_RET_FAIL;
@@ -53,7 +53,7 @@ static int	DISK_IO(const char *cmd, const char *param, unsigned flags, AGENT_RES
 static int	DISK_RIO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef TODO
-#error Realize function!!!
+#error Realize function DISK_RIO!!!
 #endif /* todo */
 
 	return SYSINFO_RET_FAIL;
@@ -62,7 +62,7 @@ static int	DISK_RIO(const char *cmd, const char *param, unsigned flags, AGENT_RE
 static int	DISK_WIO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef TODO
-#error Realize function!!!
+#error Realize function DISK_WIO!!!
 #endif /* todo */
 
 	return SYSINFO_RET_FAIL;
@@ -71,7 +71,7 @@ static int	DISK_WIO(const char *cmd, const char *param, unsigned flags, AGENT_RE
 static int	DISK_RBLK(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef TODO
-#error Realize function!!!
+#error Realize function DISK_RBLK!!!
 #endif /* todo */
 
 	return SYSINFO_RET_FAIL;
@@ -80,7 +80,7 @@ static int	DISK_RBLK(const char *cmd, const char *param, unsigned flags, AGENT_R
 static int	DISK_WBLK(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef TODO
-#error Realize function!!!
+#error Realize function DISK_WBLK!!!
 #endif /* todo */
 
 	return SYSINFO_RET_FAIL;

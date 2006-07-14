@@ -27,7 +27,7 @@ int	VFS_FS_INODE(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 {
 
 #ifdef TODO
-#error Realize function!!!
+#error Realize function VFS_FS_INODE!!!
 #endif /* todo */
 
 	return SYSINFO_RET_FAIL;
