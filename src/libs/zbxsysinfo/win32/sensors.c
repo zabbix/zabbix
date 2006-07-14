@@ -28,7 +28,7 @@
 int     OLD_SENSOR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #ifdef TODO
-#error Realize function!!!
+#error Realize function KERNEL_MAXFILES!!!
 #endif /* todo */
 
 	return SYSINFO_RET_FAIL;

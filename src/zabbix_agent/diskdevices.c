@@ -24,7 +24,7 @@
 void	collect_stats_diskdevices(ZBX_DISKDEVICES_DATA *pdiskdevices)
 {
 #if defined(TODO)
-#error "Realize function"
+#error "Realize function collect_stats_diskdevices IF needed"
 #endif
 }
 

@@ -24,7 +24,7 @@
 void	collect_stats_interfaces(ZBX_INTERFACES_DATA *pinterfaces)
 {
 #if defined(TODO)
-#error "Realize function"
+#error "Realize function collect_stats_interfaces IF needed"
 #endif
 }
 

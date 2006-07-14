@@ -273,6 +273,12 @@
 /* Define to 1 if you have the <sys/pstat.h> header file. */
 /* #undef HAVE_SYS_PSTAT_H */
 
+/* Define to 1 if function 'GetPerformanceInfo' exist. */
+#define HAVE_GETPERFORMANCEINFO 1
+
+/* Define to 1 if function 'GlobalMemoryStatusEx' exist. */
+#define HAVE_GLOBALMEMORYSTATUSEX 1
+
 /* Define to 1 if function 'setpriority' exist. */
 //#define HAVE_SYS_RESOURCE_SETPRIORITY 1
 

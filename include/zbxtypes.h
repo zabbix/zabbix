@@ -23,7 +23,7 @@
 #if defined(WIN32)
 
 #	define zbx_uint64_t __int64
-#	define ZBX_FS_UI64 "%llu"
+#	define ZBX_FS_UI64 "%I64u"
 
 #	define zbx_pid_t	int
 
