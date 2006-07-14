@@ -23,7 +23,6 @@
 #include "log.h"
 #include "cfg.h"
 
-#define JAN_1970   2208988800.0        /* 1970 - 1900 in seconds */
 #define NTP_SCALE  4294967296.0        /* 2^32, of course! */
 
 #define NTP_PACKET_MIN       48        /* Without authentication */
@@ -71,33 +70,6 @@ typedef struct ntp_data_s {
 
 } ntp_data;
 
-static double current_time (double offset)
-{
-
-/* Get the current UTC time in seconds since the Epoch plus an offset (usually
-the time from the beginning of the century to the Epoch!) */
-
-#if defined(WIN32)
-
-	struct _timeb current;
-
-	_ftime(&current);
-
-	return (offset + ((double)current.time) + 1.0e-6 * ((double)current.millitm));
-
-#else /* not WIN32 */
-
-	struct timeval current;
-
-	gettimeofday(&current,NULL);
-
-	return (offset + ((double)current.tv_sec) + 1.0e-6 * ((double)current.tv_usec));
-
-#endif /* WIN32 */
-
-    return 0.;
-}
-
 static void make_packet (ntp_data *data)
 {
 	data->status	= NTP_LI_FUDGE<<6;
@@ -109,7 +81,7 @@ static void make_packet (ntp_data *data)
 	data->polling	= NTP_POLLING;
 	data->precision	= NTP_PRECISION;
 	data->receive	= data->originate = 0.0;
-	data->current	= data->transmit = current_time(JAN_1970);
+	data->current	= data->transmit = zbx_current_time();
 }
 
 static void pack_ntp (unsigned char *packet, int length, ntp_data *data)
@@ -167,7 +139,7 @@ endian problems.  Note that it ignores fields irrelevant to SNTP. */
 
     assert(length >= (NTP_TRANSMIT + 8));
 
-    data->current	= current_time(JAN_1970);    /* Best to come first */
+    data->current	= zbx_current_time();    /* Best to come first */
     data->status	= (packet[0] >> 6);
     data->version	= (packet[0] >> 3) & 0x07;
     data->mode		= packet[0] & 0x07;
@@ -249,7 +221,7 @@ those printed by the verbose options. */
 /* Work out and format the current local time.  Note that some semi-ANSI
 systems do not set the return value from (s)printf. */
 
-    now = convert_time(current_time(offset),&milli);
+    now = convert_time(zbx_time() + offset,&milli);
     errno = 0;
 
     if ((gmt = localtime(&now)) == NULL)
@@ -391,7 +363,7 @@ int	check_ntp(char *host, unsigned short port, int *value_int)
 #if OFF
 	*value_int = time(NULL);						/* local time */
 #else
-	*value_int = (data.receive > 0) ? (int)(data.receive - JAN_1970) : 0;	/* server time */
+	*value_int = (data.receive > 0) ? (int)(data.receive - ZBX_JAN_1970_IN_SEC) : 0;	/* server time */
 #endif
 
 	return SYSINFO_RET_OK;

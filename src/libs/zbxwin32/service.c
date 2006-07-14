@@ -27,6 +27,7 @@
 #include "log.h"
 #include "alias.h"
 #include "zbxconf.h"
+#include "zbxsock.h"
 #include "perfmon.h"
 
 static int ZabbixRemoveEventSource(void);
@@ -88,8 +89,6 @@ static VOID WINAPI ServiceCtrlHandler(DWORD ctrlCode)
 
 static VOID WINAPI ServiceEntry(DWORD argc,LPTSTR *argv)
 {
-	WSADATA sockInfo;
-
 	serviceHandle = RegisterServiceCtrlHandler(ZABBIX_SERVICE_NAME, ServiceCtrlHandler);
 
 	/* Now we start service initialization */
@@ -103,8 +102,8 @@ static VOID WINAPI ServiceEntry(DWORD argc,LPTSTR *argv)
 
 	SetServiceStatus(serviceHandle, &serviceStatus);
 
-	/* Initialize Windows Sockets API */
-	WSAStartup(0x0002,&sockInfo);
+	if(FAIL == zbx_sock_init())
+		return;
 
 	/* Now service is running */
 	serviceStatus.dwCurrentState	= SERVICE_RUNNING;
@@ -126,28 +125,6 @@ void service_start(void)
 		{ ZABBIX_SERVICE_NAME, (LPSERVICE_MAIN_FUNCTION)ServiceEntry },
 		{ NULL,NULL } 
 		};
-
-	WSADATA sockInfo;
-
-	/* Initialize Windows Sockets APIa */
-	switch(WSAStartup(0x0002,&sockInfo))
-	{
-		case WSASYSNOTREADY:
-			zbx_error("Underlying network subsystem is not ready for network communication.");
-			return;
-		case WSAVERNOTSUPPORTED:
-			zbx_error("The version of Windows Sockets support requested is not provided.");
-			return;
-		case WSAEINPROGRESS:
-			zbx_error("A blocking Windows Sockets 1.1 operation is in progress.");
-			return;
-		case WSAEPROCLIM:
-			zbx_error("Limit on the number of tasks supported by the Windows Sockets implementation has been reached.");
-			return;
-		case WSAEFAULT:
-			zbx_error("The lpWSAData is not a valid pointer.");
-			return;
-	}
 
 	/* Create synchronization stuff */
 /*	eventShutdown = CreateEvent(NULL,TRUE,FALSE,NULL); */

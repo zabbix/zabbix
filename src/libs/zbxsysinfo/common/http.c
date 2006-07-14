@@ -166,12 +166,12 @@ int	WEB_PAGE_PERF(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 		strscpy(port_str, "80");
 	}
 
-	start_time = zbx_getseconds();
+	start_time = zbx_time();
 
 	buffer = calloc(1, ZABBIX_MAX_WEBPAGE_SIZE);
 	if(get_http_page(hostname, path, (unsigned short)atoi(port_str), buffer, ZABBIX_MAX_WEBPAGE_SIZE) == SYSINFO_RET_OK)
 	{
-		SET_DBL_RESULT(result, zbx_getseconds() - start_time);
+		SET_DBL_RESULT(result, zbx_time() - start_time);
 	}
 	else
 	{
