@@ -95,6 +95,7 @@ if [ "$win2nix" = "yes" ]
 then
   echo "Replacing..."
   echo "Replacing..." >> WARNINGS
+  find ./ -name "configure.in" -exec vi "+%s/\\r$//" "+wq" "-es" {} ';' -print 2>> WARNINGS
   find ./ -name "*.[hc]" -exec vi "+%s/\\r$//" "+wq" "-es" {} ';' -print 2>> WARNINGS
 fi
 

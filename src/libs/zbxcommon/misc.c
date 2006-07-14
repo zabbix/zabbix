@@ -21,34 +21,60 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_getseconds                                                   *
+ * Function: zbx_time                                                         *
  *                                                                            *
- * Purpose: Retrieves the number of seconds that have elapsed since the       *
- *          system was started.                                               *
+ * Purpose: Gets the current time.                                            *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value: Number of seconds                                            *
+ * Return value: Time in seconds                                              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ *  Comments: Time in seconds since midnight (00:00:00),                      *
+ *            January 1, 1970, coordinated universal time (UTC).              *
+ *                                                                            *
+ ******************************************************************************/
+double	zbx_time(void)
+{
+
+#if defined(WIN32)
+
+	struct _timeb current;
+
+	_ftime(&current);
+
+	return (((double)current.time) + 1.0e-6 * ((double)current.millitm));
+
+#else /* not WIN32 */
+
+	struct timeval current;
+
+	gettimeofday(&current,NULL);
+
+	return (((double)current.tv_sec) + 1.0e-6 * ((double)current.tv_usec));
+
+#endif /* WIN32 */
+
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_current_time                                                 *
+ *                                                                            *
+ * Purpose: Gets the current time include UTC offset                          *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: Time in seconds                                              *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-double	zbx_getseconds(void)
+
+double zbx_current_time (void)
 {
-#ifdef WIN32
-
-	return ((double)GetTickCount()) / ((double)1000);
-
-#else /* not WIN32 */
-#	if !defined (CLOCKS_PER_SEC) || (CLOCKS_PER_SEC == 0)
-#		define CLOCKS_PER_SEC 100000
-#	endif /* CLOCKS_PER_SEC */
-
-	return ((double)clock())/((double)CLOCKS_PER_SEC);
-
-#endif /* WIN32 */
-
-	return -1;
+	return (zbx_time() + ZBX_JAN_1970_IN_SEC);
 }
 
 /******************************************************************************

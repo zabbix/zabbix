@@ -109,6 +109,17 @@
 	#include <ldap.h>
 #endif
 
+#ifdef HAVE_WINLDAP_H
+#	undef SEC_I_INCOMPLETE_CREDENTIALS
+#	undef SEC_E_INCOMPLETE_CREDENTIALS
+#	undef SEC_I_RENEGOTIATE
+#	include <Winldap.h>
+#endif
+
+#ifdef HAVE_WINBER_H
+#	include <Winber.h>
+#endif
+
 #ifdef HAVE_MACH_HOST_INFO_H
 #	include <mach/host_info.h>
 #endif

@@ -22,6 +22,35 @@
 
 #include "log.h"
 
+#if defined(WIN32)
+int	zbx_sock_init(void)
+{
+	WSADATA sockInfo;
+
+	/* Initialize Windows Sockets APIa */
+	switch(WSAStartup(0x0002,&sockInfo))
+	{
+		case WSASYSNOTREADY:
+			zabbix_log( LOG_LEVEL_CRIT, "Underlying network subsystem is not ready for network communication.");
+			return FAIL;
+		case WSAVERNOTSUPPORTED:
+			zabbix_log( LOG_LEVEL_CRIT, "The version of Windows Sockets support requested is not provided.");
+			return FAIL;
+		case WSAEINPROGRESS:
+			zabbix_log( LOG_LEVEL_CRIT, "A blocking Windows Sockets 1.1 operation is in progress.");
+			return FAIL;
+		case WSAEPROCLIM:
+			zabbix_log( LOG_LEVEL_CRIT, "Limit on the number of tasks supported by the Windows Sockets implementation has been reached.");
+			return FAIL;
+		case WSAEFAULT:
+			zabbix_log( LOG_LEVEL_CRIT, "The lpWSAData is not a valid pointer.");
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+#endif /* WIN 32 */
+
 #if !defined(WIN32)
 
 static void	sock_signal_handler(int sig)

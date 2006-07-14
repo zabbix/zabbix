@@ -1,5 +1,8 @@
 Changes for 1.3:
 
+ - added support of LDAP services monitoring for Win32 (Eugene)
+ - added support of "net.tcp.service.perf" for Win32 (Eugene)
+ - added support of "net.tcp.service" for Win32 (Eugene)
  - fixed NTP protocol monitoring (Eugene)
  - new more efficient definition of function DBexecute() (Alexei)
  - new more efficient definition of function DBselect() (Alexei)
