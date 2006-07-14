@@ -20,6 +20,42 @@
 #include "common.h"
 #include "sysinfo.h"
 
+#ifdef TODO
+#error Check supported functionality!!!
+/*
+SKIP	{ "__exec{*}",					NULL,				H_Execute,			NULL },
+SKIP	{ "__usercnt{*}",				H_UserCounter,		NULL,				NULL },
+OK	{ "system.run[*]",				NULL,				H_RunCommand,		NULL },
+	{ "agent.stat[avg_collector_time]",		H_NumericPtr,		NULL,				(char *)&statAvgCollectorTime },
+	{ "agent.stat[max_collector_time]",		H_NumericPtr,		NULL,				(char *)&statMaxCollectorTime },
+	{ "agent.stat[accepted_requests]",		H_NumericPtr,		NULL,				(char *)&statAcceptedRequests },
+	{ "agent.stat[rejected_requests]",		H_NumericPtr,		NULL,				(char *)&statRejectedRequests },
+	{ "agent.stat[timed_out_requests]",		H_NumericPtr,		NULL,				(char *)&statTimedOutRequests },
+	{ "agent.stat[accept_errors]",			H_NumericPtr,		NULL,				(char *)&statAcceptErrors },
+	{ "agent.stat[processed_requests]",		H_NumericPtr,		NULL,				(char *)&statProcessedRequests },
+	{ "agent.stat[failed_requests]",		H_NumericPtr,		NULL,				(char *)&statFailedRequests },
+	{ "agent.stat[unsupported_requests]",	H_NumericPtr,		NULL,				(char *)&statUnsupportedRequests },
+	{ "proc_info[*]",				H_ProcInfo,			NULL,				NULL }, // TODO 'new realization and naming'
+OK	{ "perf_counter[*]",			H_PerfCounter,		NULL,				NULL }, // TODO 'new naming'
+	{ "service_state[*]",			H_ServiceState,		NULL,				NULL }, // TODO 'new naming'
+
+OK	{ "net.tcp.port[*]",			H_CheckTcpPort,		NULL,				NULL },
+OK	{ "system.cpu.util[*]",			H_CpuUtil,			NULL,				NULL},
+OK	{ "system.cpu.load[*]",			H_CpuLoad,			NULL,				NULL},
+OK	{ "vfs.fs.size[*]",				H_DiskInfo,			NULL,				NULL },
+OK	{ "vfs.file.size[*]",			H_FileSize,			NULL,				NULL },
+OK	{ "vfs.file.cksum[*]",			H_CRC32,			NULL,				NULL },
+	{ "vfs.file.md5sum[*]",			NULL,				H_MD5Hash,			NULL },
+	{ "system.swap.size[*]",		H_SwapSize,			NULL,				NULL },
+OK	{ "vm.memory.size[*]",			H_MemorySize,		NULL,				NULL },
+OK	{ "agent.ping",					H_NumericConstant,	NULL,				(char *)1 },
+OK	{ "proc.num[*]",				H_ProcNum,			NULL,				NULL },
+OK	{ "system.uname",				NULL,				H_SystemUname,		NULL },
+OK	{ "system.hostname",			NULL,				H_HostName,			NULL },
+OK	{ "agent.version",				NULL,				H_StringConstant,	AGENT_VERSION },
+*/
+#endif /* TODO */
+
 ZBX_METRIC	parameters_specific[]=
 /* 	KEY			FLAG	FUNCTION 	ADD_PARAM	TEST_PARAM */
 	{

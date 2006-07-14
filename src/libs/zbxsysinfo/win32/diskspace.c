@@ -25,10 +25,55 @@
 
 int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef TODO
-#error Realize function!!!
-#endif /* todo */
+	
+	char
+		path[MAX_PATH],
+		mode[20];
 
-	return SYSINFO_RET_FAIL;
+	ULARGE_INTEGER freeBytes,totalBytes;
+
+	if(num_param(param) > 2)
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	if(get_param(param, 1, path, MAX_PATH) != 0)
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	if(get_param(param, 2, mode, 20) != 0)
+	{
+		mode[0] = '\0';
+	}
+	if(mode[0] == '\0')
+	{
+		/* default parameter */
+		sprintf(mode, "total");
+	}
+
+	if (!GetDiskFreeSpaceEx(path, &freeBytes, &totalBytes, NULL))
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (strcmp(mode,"free") == 0)
+	{
+		SET_UI64_RESULT(result, freeBytes.QuadPart);
+	}
+	else if (strcmp(mode,"used") == 0)
+	{
+		SET_UI64_RESULT(result, totalBytes.QuadPart - freeBytes.QuadPart);
+	}
+	else if (strcmp(mode,"total") == 0)
+	{
+		SET_UI64_RESULT(result, totalBytes.QuadPart);
+	}
+	else
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	return SYSINFO_RET_OK;
 }
 

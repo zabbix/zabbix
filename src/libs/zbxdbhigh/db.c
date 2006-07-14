@@ -448,9 +448,11 @@ int	DBinsert_id()
 	zabbix_log(LOG_LEVEL_DEBUG, "In DBinsert_id()" );
 	return mysql_insert_id(&mysql);
 #endif
+
 #ifdef	HAVE_PGSQL
-#error	SUPPORT OF POSTGRESQL NOT IMPLEMENTED YET
+#	error	SUPPORT OF POSTGRESQL NOT IMPLEMENTED YET
 #endif
+
 #ifdef	HAVE_ORACLE
 	return FAIL;
 #endif
