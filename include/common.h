@@ -380,7 +380,11 @@ int	get_param(const char *param, int num, char *buf, int maxlen);
 int	num_param(const char *param);
 int	calculate_item_nextcheck(int delay, int now);
 void	zbx_setproctitle(const char *fmt, ...);
-double	zbx_getseconds(void);
+
+#define ZBX_JAN_1970_IN_SEC   2208988800.0        /* 1970 - 1900 in seconds */
+double	zbx_time(void);
+double	zbx_current_time (void);
+
 void	zbx_error(const char *fmt, ...);
 int	zbx_snprintf(char* str, size_t count, const char *fmt, ...);
 

@@ -27,6 +27,12 @@
 /* Define to 1 if you have the <sys/timeb.h> header file. */
 #define HAVE_SYS_TIMEB_H 1
 
+/* Define to 1 if you have the <Winldap.h> header file. */
+#define HAVE_WINLDAP_H
+
+/* Define to 1 if you have the <Winber.h> header file. */
+#define HAVE_WINBER_H
+
 /* Define to 1 if you have the <arpa/inet.h> header file. */
 //#define HAVE_ARPA_INET_H 1
 

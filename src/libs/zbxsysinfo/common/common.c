@@ -339,6 +339,9 @@ void	test_parameters(void)
 	int	i;
 	AGENT_RESULT	result;
 
+#if defined(WIN32)
+#endif
+
 	memset(&result, 0, sizeof(AGENT_RESULT));
 	
 	for(i=0; 0 != commands[i].key; i++)
@@ -1515,139 +1518,165 @@ static int	forward_request(char *proxy, char *command, int port, unsigned flags,
  * 0 - NOT OK
  * 1 - OK
  * */
-int	tcp_expect(char	*hostname, short port, char *request,char *expect,char *sendtoclose, int *value_int)
+static int	tcp_expect(const char	*hostname, short port, const char *request, const char *expect, const char *sendtoclose, int *value_int)
 {
-#ifdef TODO /* TODO !!! */
+	ZBX_SOCKET	s;
+	ZBX_SOCKADDR	servaddr_in;
 
-	char	*haddr;
-	char	c[1024];
+	struct hostent *hp;
+
+	char	buf[MAX_BUF_LEN];
 	
-	int	s;
-	struct	sockaddr_in addr;
-	int	addrlen;
+	int	len;
 
+	assert(hostname);
+	assert(value_int);
 
-	struct hostent *host;
-
-	host = gethostbyname(hostname);
-	if(host == NULL)
-	{
-		*value_int = 0;
-		return SYSINFO_RET_OK;
-	}
-
-	haddr=host->h_addr;
-
-
-	addrlen = sizeof(addr);
-	memset(&addr, 0, addrlen);
-	addr.sin_port = htons(port);
-	addr.sin_family = AF_INET;
-	bcopy(haddr, (void *) &addr.sin_addr.s_addr, 4);
-
-	s = socket(AF_INET, SOCK_STREAM, 0);
-	if (s == -1)
-	{
-		close(s);
-		*value_int = 0;
-		return SYSINFO_RET_OK;
-	}
-
-	if (connect(s, (struct sockaddr *) &addr, addrlen) == -1)
-	{
-		close(s);
-		*value_int = 0;
-		return SYSINFO_RET_OK;
-	}
-
-	if( request != NULL)
-	{
-		send(s,request,strlen(request),0);
-	}
-
-	if( expect == NULL)
-	{
-		close(s);
-		*value_int = 1;
-		return SYSINFO_RET_OK;
-	}
-
-	memset(&c, 0, 1024);
-	recv(s, c, 1024, 0);
-	if ( strncmp(c, expect, strlen(expect)) == 0 )
-	{
-		send(s,sendtoclose,strlen(sendtoclose),0);
-		close(s);
-		*value_int = 1;
-		return SYSINFO_RET_OK;
-	}
-	send(s,sendtoclose,strlen(sendtoclose),0);
-	close(s);
 	*value_int = 0;
 
-	return SYSINFO_RET_OK;
-#endif /* TODO */
+	if(NULL == (hp = gethostbyname(hostname)) )
+	{
+		zabbix_log(
+			LOG_LEVEL_DEBUG,
+			"gethostbyname() failed for host '%s' [%s]", 
+			hostname, 
+#ifdef	HAVE_HSTRERROR		
+			(char*)hstrerror((int)h_errno)
+#else
+			strerror_from_system(h_errno)
+#endif
+			);
 
-	return SYSINFO_RET_FAIL;
+		return SYSINFO_RET_OK;
+	}
+
+	memset(&servaddr_in, 0, sizeof(ZBX_SOCKADDR));
+
+	servaddr_in.sin_family		= AF_INET;
+	servaddr_in.sin_addr.s_addr	= ((struct in_addr *)(hp->h_addr))->s_addr;
+	servaddr_in.sin_port		= htons(port);
+
+	if(INVALID_SOCKET == (s = socket(AF_INET,SOCK_STREAM,0)))
+	{
+		zabbix_log( LOG_LEVEL_DEBUG, "Error in socket() [%s:%u] [%s]", hostname, port, strerror_from_system(errno));
+		return SYSINFO_RET_OK;
+	}
+
+	if(SOCKET_ERROR == connect(s,(struct sockaddr *)&servaddr_in,sizeof(ZBX_SOCKADDR)))
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Error in connect() [%s:%u] [%s]",hostname, port, strerror_from_system(errno));
+		zbx_sock_close(s);
+		return SYSINFO_RET_OK;
+	}
+
+	if(NULL != request)
+	{
+		if(SOCKET_ERROR == zbx_sock_write(s, (void *)request, strlen(request)))
+		{
+			zabbix_log( LOG_LEVEL_DEBUG, "Error during sending [%s:%u] [%s]",hostname, port, strerror_from_system(errno));
+			zbx_sock_close(s);
+			return SYSINFO_RET_OK;
+		}
+	}
+
+	if( NULL == expect)
+	{
+		zbx_sock_close(s);
+		*value_int = 1;
+		return SYSINFO_RET_OK;
+	}
+
+	memset(buf, 0, sizeof(buf));
+
+	if(SOCKET_ERROR == (len = zbx_sock_read(s, buf, sizeof(buf)-1, CONFIG_TIMEOUT)))
+	{
+		zabbix_log( LOG_LEVEL_DEBUG, "Error in reading() [%s:%u] [%s]",hostname, port, strerror_from_system(errno));
+		zbx_sock_close(s);
+		return SYSINFO_RET_OK;
+	}
+
+	buf[sizeof(buf)-1] = '\0';
+
+	if( strcmp(buf, expect) == 0 )
+	{
+		*value_int = 1;
+	}
+	else
+	{
+		*value_int = 0;
+	}
+
+	if(NULL != sendtoclose)
+	{
+		if(SOCKET_ERROR == zbx_sock_write(s, (void *)sendtoclose, strlen(sendtoclose)))
+		{
+			zabbix_log( LOG_LEVEL_DEBUG, "Error during close string sending [%s:%u] [%s]",hostname, port, strerror_from_system(errno));
+		}
+	}
+
+	zbx_sock_close(s);
+
+	return SYSINFO_RET_OK;
 }
 
 #ifdef HAVE_LDAP
-int    check_ldap(char *hostname, short port, int *value_int)
+
+static int    check_ldap(char *hostname, short port, int *value_int)
 {
-	int rc;
-	LDAP *ldap;
-	LDAPMessage *res;
-	LDAPMessage *msg;
+	LDAP		*ldap	= NULL;
+	LDAPMessage	*res	= NULL;
+	LDAPMessage	*msg	= NULL;
+	BerElement	*ber	= NULL;
 
-	char *base = "";
-	int scope = LDAP_SCOPE_BASE;
-	char *filter="(objectClass=*)";
-	int attrsonly=0;
-	char *attrs[2];
+	char	*attrs[2] = { "namingContexts", NULL };
 
-	attrs[0] = "namingContexts";
-	attrs[1] = NULL;
+	char	*attr	 = NULL;
+	char	**valRes = NULL;
 
-	BerElement *ber;
-	char *attr=NULL;
-	char **valRes=NULL;
+	int	ldapErr = 0;
 
         assert(value_int);
 
-	ldap = ldap_init(hostname, port);
-	if ( !ldap )
+	*value_int = 0;
+
+	if(NULL == (ldap = ldap_init(hostname, port)) )
 	{
-		*value_int = 0;
+		zabbix_log( LOG_LEVEL_DEBUG, "LDAP - initialization failed [%s:%u]",hostname, port);
 		return	SYSINFO_RET_OK;
 	}
 
-	rc = ldap_search_s(ldap, base, scope, filter, attrs, attrsonly, &res);
-	if( rc != 0 )
+	if( LDAP_SUCCESS != (ldapErr = ldap_search_s(
+		ldap, 
+		"", 
+		LDAP_SCOPE_BASE, 
+		"(objectClass=*)", 
+		attrs, 
+		0, 
+		&res)) )
 	{
-		*value_int = 0;
-		return	SYSINFO_RET_OK;
+		zabbix_log( LOG_LEVEL_DEBUG, "LDAP - serching failed [%s] [%s]",hostname, ldap_err2string(ldapErr));
+		goto lbl_ret;
 	}
 
-	msg = ldap_first_entry(ldap, res);
-	if( !msg )
+	if(NULL == (msg = ldap_first_entry(ldap, res)) )
 	{
-		*value_int = 0;
-		return	SYSINFO_RET_OK;
+		zabbix_log( LOG_LEVEL_DEBUG, " LDAP - empty sort result. [%s] [%s]", hostname, ldap_err2string(ldapErr));
+		goto lbl_ret;
 	}
        
-	attr = ldap_first_attribute (ldap, msg, &ber);
-	valRes = ldap_get_values( ldap, msg, attr );
+	attr	= ldap_first_attribute (ldap, msg, &ber);
 
-	ldap_value_free(valRes);
-	ldap_memfree(attr);
-	if (ber != NULL) {
-		ber_free(ber, 0);
-	}
-	ldap_msgfree(res);
-	ldap_unbind(ldap);
-       
+	valRes	= ldap_get_values( ldap, msg, attr );
+
 	*value_int = 1;
-	
+
+lbl_ret:
+	if(valRes)	ldap_value_free(valRes);
+	if(attr)	ldap_memfree(attr);
+	if(ber) 	ber_free(ber, 0);
+	if(res)		ldap_msgfree(res);
+	if(res)		ldap_unbind(ldap);
+       
 	return	SYSINFO_RET_OK;
 }
 #endif
@@ -1657,108 +1686,116 @@ int    check_ldap(char *hostname, short port, int *value_int)
  *  0- NOT OK
  *  1 - OK
  * */
-int	check_ssh(char	*hostname, short port, int *value_int)
+static int	check_ssh(const char	*hostname, short port, int *value_int)
 {
-#ifdef TODO /* TODO !!! */
-	char	*haddr;
-	char	c[MAX_STRING_LEN];
-	char	out[MAX_STRING_LEN];
-	char	*ssh_proto=NULL;
-	char	*ssh_server=NULL;
+
+	ZBX_SOCKET	s;
+	ZBX_SOCKADDR	servaddr_in;
+
+	struct hostent *hp;
+
+	char	buf[MAX_BUF_LEN];
+	char	buf2[MAX_BUF_LEN];
+	char	*ssh_server, 
+		*ssh_proto;
 	
-	int	s;
-	struct	sockaddr_in addr;
-	int	addrlen;
+	int	len;
 
-	struct hostent *host;
+	assert(hostname);
+	assert(value_int);
 
-        assert(value_int);
-
-	host = gethostbyname(hostname);
-	if(host == NULL)
-	{
-		*value_int = 0;
-		return	SYSINFO_RET_OK;
-	}
-
-	haddr=host->h_addr;
-
-	addrlen = sizeof(addr);
-	memset(&addr, 0, addrlen);
-	addr.sin_port = htons(port);
-	addr.sin_family = AF_INET;
-	bcopy(haddr, (void *) &addr.sin_addr.s_addr, 4);
-
-	s = socket(AF_INET, SOCK_STREAM, 0);
-	if (s == -1)
-	{
-		close(s);
-		*value_int = 0;
-		return	SYSINFO_RET_OK;
-	}
-
-	if (connect(s, (struct sockaddr *) &addr, addrlen) == -1)
-	{
-		close(s);
-		*value_int = 0;
-		return	SYSINFO_RET_OK;
-	}
-
-	memset(&c, 0, 1024);
-	recv(s, c, 1024, 0);
-	if ( strncmp(c, "SSH", 3) == 0 )
-	{
-		ssh_proto = c + 4;
-		ssh_server = ssh_proto + strspn (ssh_proto, "0123456789-. ");
-		ssh_proto[strspn (ssh_proto, "0123456789-. ")] = 0;
-
-/*		printf("[%s] [%s]\n",ssh_proto, ssh_server);*/
-
-		zbx_snprintf(out,sizeof(out),"SSH-%s-%s\r\n", ssh_proto, "zabbix_agent");
-		send(s,out,strlen(out),0);
-
-/*		printf("[%s]\n",out);*/
-
-		close(s);
-		*value_int = 1;
-		return	SYSINFO_RET_OK;
-	}
-
-	send(s,"0\n",2,0);
-	close(s);
 	*value_int = 0;
 
+	if(NULL == (hp = gethostbyname(hostname)) )
+	{
+		zabbix_log(
+			LOG_LEVEL_DEBUG,
+			"gethostbyname() failed for host '%s' [%s]", 
+			hostname, 
+#ifdef	HAVE_HSTRERROR		
+			(char*)hstrerror((int)h_errno)
+#else
+			strerror_from_system(h_errno)
+#endif
+			);
+
+		return SYSINFO_RET_OK;
+	}
+
+	memset(&servaddr_in, 0, sizeof(ZBX_SOCKADDR));
+
+	servaddr_in.sin_family		= AF_INET;
+	servaddr_in.sin_addr.s_addr	= ((struct in_addr *)(hp->h_addr))->s_addr;
+	servaddr_in.sin_port		= htons(port);
+
+	if(INVALID_SOCKET == (s = socket(AF_INET,SOCK_STREAM,0)))
+	{
+		zabbix_log( LOG_LEVEL_DEBUG, "Error in socket() [%s:%u] [%s]", hostname, port, strerror_from_system(errno));
+		return SYSINFO_RET_OK;
+	}
+
+	if(SOCKET_ERROR == connect(s,(struct sockaddr *)&servaddr_in,sizeof(ZBX_SOCKADDR)))
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Error in connect() [%s:%u] [%s]",hostname, port, strerror_from_system(errno));
+		zbx_sock_close(s);
+		return SYSINFO_RET_OK;
+	}
+
+	memset(buf, 0, sizeof(buf));
+
+	if(SOCKET_ERROR == (len = zbx_sock_read(s, buf, sizeof(buf)-1, CONFIG_TIMEOUT)))
+	{
+		zabbix_log( LOG_LEVEL_DEBUG, "Error in reading() [%s:%u] [%s]",hostname, port, strerror_from_system(errno));
+		zbx_sock_close(s);
+		return SYSINFO_RET_OK;
+	}
+
+	buf[sizeof(buf)-1] = '\0';
+
+	if ( strncmp(buf, "SSH", 3) == 0 )
+	{
+		ssh_server = ssh_proto = buf + 4;
+		ssh_server += strspn (ssh_proto, "0123456789-. ") ;
+		ssh_server[-1] = '\0';
+
+		zbx_snprintf(buf2,sizeof(buf2),"SSH-%s-%s\n", ssh_proto, "zabbix_agent");
+		*value_int = 1;
+	}
+	else
+	{
+		zbx_snprintf(buf2,sizeof(buf2),"0\n");
+		*value_int = 0;
+	}
+
+	if(SOCKET_ERROR == zbx_sock_write(s, buf2, strlen(buf2)))
+	{
+		zabbix_log( LOG_LEVEL_DEBUG, "Error during sending [%s:%u] [%s]",hostname, port, strerror_from_system(errno));
+	}
+
+	zbx_sock_close(s);
+
 	return	SYSINFO_RET_OK;
-
-#endif /* TODO */
-
-	return	SYSINFO_RET_FAIL;
 }
 
 /* Example check_service[ssh], check_service[smtp,29],check_service[ssh,127.0.0.1,22]*/
 /* check_service[ssh,127.0.0.1,ssh] */
 int	CHECK_SERVICE_PERF(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef TODO /* TODO !!! */
-
-	int	port=0;
+	unsigned short	port=0;
 	char	service[MAX_STRING_LEN];
 	char	ip[MAX_STRING_LEN];
 	char	str_port[MAX_STRING_LEN];
 
-	struct timeval t1,t2;
-	struct timezone tz1,tz2;
+	double	start_time = 0;
 
-	int	ret;
+	int	ret	= SYSINFO_RET_OK;
 	int	value_int;
-
-	long	exec_time;
 
         assert(result);
 
 	init_result(result);
 
-	gettimeofday(&t1,&tz1);
+	start_time = zbx_time();
 
         if(num_param(param) > 3)
         {
@@ -1852,22 +1889,20 @@ int	CHECK_SERVICE_PERF(const char *cmd, const char *param, unsigned flags, AGENT
 		return SYSINFO_RET_FAIL;
 	}
 
-	if(value_int)
+	if(SYSINFO_RET_OK == ret)
 	{
-		gettimeofday(&t2,&tz2);
-   		exec_time=(t2.tv_sec - t1.tv_sec) * 1000000 + (t2.tv_usec - t1.tv_usec);
-
-		SET_DBL_RESULT(result, exec_time / 1000000.0);
-		return SYSINFO_RET_OK;
+		if(value_int)
+		{
+			SET_DBL_RESULT(result, zbx_time() - start_time);
+		}
+		else
+		{
+			SET_DBL_RESULT(result, 0.0);
+		}
 	}
 	
-	SET_DBL_RESULT(result, 0.0);
 
-	return SYSINFO_RET_OK;
-
-#endif /* TODO */
-
-	return SYSINFO_RET_FAIL;
+	return ret;
 }
 
 /* Example check_service[ssh], check_service[smtp,29],check_service[ssh,127.0.0.1,22]*/

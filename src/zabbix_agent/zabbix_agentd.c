@@ -385,6 +385,9 @@ int	main(int argc, char **argv)
 
 	load_user_parameters();
 
+	if(FAIL == zbx_sock_init())
+		exit(FAIL);
+
 	switch(task)
 	{
 
@@ -427,7 +430,7 @@ int	main(int argc, char **argv)
 	
 #endif /* WIN32 */
 
-	return SUCCEED;
+	exit(SUCCEED);
 }
 
 #else /* ZABBIX_TEST */
@@ -438,9 +441,12 @@ int main()
 {
 #if ON
 	int res, val;
-	WSADATA sockInfo;
 
-	WSAStartup(0x0002,&sockInfo);
+	if(FAIL == zbx_sock_init())
+	{
+		return 1;
+	}
+
 
 	res = check_ntp("142.3.100.15",123,&val);
 
@@ -475,6 +481,7 @@ Place your test code HERE!!!
 
 #endif /* 0 */
 
+	return 0;
 }
 
 #endif /* not ZABBIX_TEST */
