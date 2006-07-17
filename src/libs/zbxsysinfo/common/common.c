@@ -2086,17 +2086,9 @@ int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 #	define C_IN 	ns_c_in
 #endif /* C_IN */
 
-#if !defined(ns_c_in) 
-#	define ns_c_in 	1
-#endif /* ns_c_in */
-
 #if !defined(T_SOA)
 #	define T_SOA	ns_t_soa
 #endif /* T_SOA */
-
-#if !defined(ns_t_soa)
-#	define ns_t_soa	6
-#endif /* ns_t_soa */
 
 
 	int	res;

@@ -22,18 +22,14 @@
 #include "common.h"
 #include "sysinfo.h"
 
+#include "symbols.h"
+
 int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-
-#if defined(HAVE_GETPERFORMANCEINFO)
 	PERFORMANCE_INFORMATION pfi;
-#endif /* HAVE_GETPERFORMANCEINFO */
+	MEMORYSTATUSEX		ms_ex;
+	MEMORYSTATUS		ms;
 
-#if defined(HAVE_GLOBALMEMORYSTATUSEX)
-	MEMORYSTATUSEX ms;
-#else /* HAVE_GLOBALMEMORYSTATUSEX */
-	MEMORYSTATUS ms;
-#endif
 	char	mode[10];
 
 	if(num_param(param) > 1)
@@ -51,57 +47,55 @@ int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT
 		zbx_snprintf(mode, sizeof(mode), "total");
 	}
 
-#if defined(HAVE_GETPERFORMANCEINFO)
-
 	if (strcmp(mode,"cached") == 0)
 	{
+		if(NULL == zbx_GetPerformanceInfo)
+			return SYSINFO_RET_FAIL;
 
-		GetPerformanceInfo(&pfi,sizeof(PERFORMANCE_INFORMATION));
+		zbx_GetPerformanceInfo(&pfi,sizeof(PERFORMANCE_INFORMATION));
 
 		SET_UI64_RESULT(result, (zbx_uint64_t)pfi.SystemCache * (zbx_uint64_t)pfi.PageSize);
 
 		return SYSINFO_RET_OK;
 	}
 
-#endif /* HAVE_GETPERFORMANCEINFO */
-
-#if defined(HAVE_GLOBALMEMORYSTATUSEX)
-
-	ms.dwLength = sizeof(MEMORYSTATUSEX);
-
-	GlobalMemoryStatusEx(&ms);
-
-	if (strcmp(mode, "total") == 0)
+	if(NULL != zbx_GlobalMemoryStatusEx)
 	{
-		SET_UI64_RESULT(result, ms.ullTotalPhys);
-		return SYSINFO_RET_OK;
-	}
-	else if (strcmp(mode, "free") == 0)
-	{
-		SET_UI64_RESULT(result, ms.ullAvailPhys);
-		return SYSINFO_RET_OK;
+		ms_ex.dwLength = sizeof(MEMORYSTATUSEX);
+
+		zbx_GlobalMemoryStatusEx(&ms_ex);
+
+		if (strcmp(mode, "total") == 0)
+		{
+			SET_UI64_RESULT(result, ms_ex.ullTotalPhys);
+			return SYSINFO_RET_OK;
+		}
+		else if (strcmp(mode, "free") == 0)
+		{
+			SET_UI64_RESULT(result, ms_ex.ullAvailPhys);
+			return SYSINFO_RET_OK;
+		}
+		else
+		{
+			return SYSINFO_RET_FAIL;
+		}
 	}
 	else
 	{
-		return SYSINFO_RET_FAIL;
+
+		GlobalMemoryStatus(&ms);
+
+		if (strcmp(mode,"total") == 0)
+		{
+			SET_UI64_RESULT(result, ms.dwTotalPhys);
+			return SYSINFO_RET_OK;
+		}
+		else if (strcmp(mode,"free") == 0)
+		{
+			SET_UI64_RESULT(result, ms.dwAvailPhys);
+			return SYSINFO_RET_OK;
+		}
 	}
-
-#else /* not HAVE_GLOBALMEMORYSTATUSEX */
-
-	GlobalMemoryStatus(&ms);
-
-	if (strcmp(mode,"total") == 0)
-	{
-		SET_UI64_RESULT(result, ms.dwTotalPhys);
-		return SYSINFO_RET_OK;
-	}
-	else if (strcmp(mode,"free") == 0)
-	{
-		SET_UI64_RESULT(result, ms.dwAvailPhys);
-		return SYSINFO_RET_OK;
-	}
-
-#endif /* HAVE_GLOBALMEMORYSTATUSEX */
 
 	return SYSINFO_RET_FAIL;
 

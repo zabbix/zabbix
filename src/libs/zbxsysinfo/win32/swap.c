@@ -21,17 +21,15 @@
 
 #include "common.h"
 #include "sysinfo.h"
+#include "symbols.h"
 
 #include "md5.h"
 
 
 int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#if defined(HAVE_GLOBALMEMORYSTATUSEX)
-	MEMORYSTATUSEX ms;
-#else /* HAVE_GLOBALMEMORYSTATUSEX */
-	MEMORYSTATUS ms;
-#endif
+	MEMORYSTATUSEX	ms_ex;
+	MEMORYSTATUS	ms;
 
 	char swapdev[10];
 	char mode[10];
@@ -65,43 +63,42 @@ int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_R
 		zbx_snprintf(mode, sizeof(mode), "total");
 	}
 
-#if defined(HAVE_GLOBALMEMORYSTATUSEX)
-
-	ms.dwLength = sizeof(MEMORYSTATUSEX);
-
-	GlobalMemoryStatusEx(&ms);
-
-	if (strcmp(mode, "total") == 0)
+	if(NULL != zbx_GlobalMemoryStatusEx)
 	{
-		SET_UI64_RESULT(result, ms.ullTotalPageFile);
-		return SYSINFO_RET_OK;
-	}
-	else if (strcmp(mode, "free") == 0)
-	{
-		SET_UI64_RESULT(result, ms.ullAvailPageFile);
-		return SYSINFO_RET_OK;
+		ms_ex.dwLength = sizeof(MEMORYSTATUSEX);
+
+		zbx_GlobalMemoryStatusEx(&ms_ex);
+
+		if (strcmp(mode, "total") == 0)
+		{
+			SET_UI64_RESULT(result, ms_ex.ullTotalPageFile);
+			return SYSINFO_RET_OK;
+		}
+		else if (strcmp(mode, "free") == 0)
+		{
+			SET_UI64_RESULT(result, ms_ex.ullAvailPageFile);
+			return SYSINFO_RET_OK;
+		}
+		else
+		{
+			return SYSINFO_RET_FAIL;
+		}
 	}
 	else
 	{
-		return SYSINFO_RET_FAIL;
+		GlobalMemoryStatus(&ms);
+
+		if (strcmp(mode,"total") == 0)
+		{
+			SET_UI64_RESULT(result, ms.dwTotalPageFile);
+			return SYSINFO_RET_OK;
+		}
+		else if (strcmp(mode,"free") == 0)
+		{
+			SET_UI64_RESULT(result, ms.dwAvailPageFile);
+			return SYSINFO_RET_OK;
+		}
 	}
-
-#else /* not HAVE_GLOBALMEMORYSTATUSEX */
-
-	GlobalMemoryStatus(&ms);
-
-	if (strcmp(mode,"total") == 0)
-	{
-		SET_UI64_RESULT(result, ms.dwTotalPageFile);
-		return SYSINFO_RET_OK;
-	}
-	else if (strcmp(mode,"free") == 0)
-	{
-		SET_UI64_RESULT(result, ms.dwAvailPageFile);
-		return SYSINFO_RET_OK;
-	}
-
-#endif /* HAVE_GLOBALMEMORYSTATUSEX */
 
 	return SYSINFO_RET_OK;
 }

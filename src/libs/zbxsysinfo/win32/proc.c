@@ -22,6 +22,8 @@
 #include "common.h"
 #include "sysinfo.h"
 
+#include "symbols.h"
+
 #define MAX_PROCESSES         4096
 #define MAX_MODULES           512
 
@@ -207,42 +209,59 @@ static double GetProcessAttribute(HANDLE hProcess,int attr,int type,int count,do
       case 3:        /* ktime */
       case 4:        /* utime */
          GetProcessTimes(hProcess,&ftCreate,&ftExit,&ftKernel,&ftUser);
-         value=ConvertProcessTime(attr==3 ? &ftKernel : &ftUser);
+         value = ConvertProcessTime(attr==3 ? &ftKernel : &ftUser);
          break;
+
       case 5:        /* gdiobj */
-
-#if defined(HAVE_GETGUIRESOURCES)
       case 6:        /* userobj */
-         value=(double)GetGuiResources(hProcess,attr==5 ? 0 : 1);
-         break;
-#endif /* HAVE_GETGUIRESOURCES */
+         if(NULL == zbx_GetGuiResources)
+	     return SYSINFO_RET_FAIL;
 
-#if defined(HAVE_GETPROCESSIOCOUNTERS)
+         value = (double)zbx_GetGuiResources(hProcess,attr==5 ? 0 : 1);
+         break;
+
       case 7:        /* io_read_b */
-         GetProcessIoCounters(hProcess,&ioCounters);
+         if(NULL == zbx_GetProcessIoCounters)
+	     return SYSINFO_RET_FAIL;
+
+         zbx_GetProcessIoCounters(hProcess,&ioCounters);
          value=(double)((__int64)ioCounters.ReadTransferCount);
          break;
       case 8:        /* io_read_op */
+         if(NULL == zbx_GetProcessIoCounters)
+	     return SYSINFO_RET_FAIL;
+
          GetProcessIoCounters(hProcess,&ioCounters);
          value=(double)((__int64)ioCounters.ReadOperationCount);
          break;
       case 9:        /* io_write_b */
+         if(NULL == zbx_GetProcessIoCounters)
+	     return SYSINFO_RET_FAIL;
+
          GetProcessIoCounters(hProcess,&ioCounters);
          value=(double)((__int64)ioCounters.WriteTransferCount);
          break;
       case 10:       /* io_write_op */
+         if(NULL == zbx_GetProcessIoCounters)
+	     return SYSINFO_RET_FAIL;
+
          GetProcessIoCounters(hProcess,&ioCounters);
          value=(double)((__int64)ioCounters.WriteOperationCount);
          break;
       case 11:       /* io_other_b */
+         if(NULL == zbx_GetProcessIoCounters)
+	     return SYSINFO_RET_FAIL;
+
          GetProcessIoCounters(hProcess,&ioCounters);
          value=(double)((__int64)ioCounters.OtherTransferCount);
          break;
       case 12:       /* io_other_op */
+         if(NULL == zbx_GetProcessIoCounters)
+	     return SYSINFO_RET_FAIL;
+
          GetProcessIoCounters(hProcess,&ioCounters);
          value=(double)((__int64)ioCounters.OtherOperationCount);
          break;
-#endif /* HAVE_GETPROCESSIOCOUNTERS */
 
       default:       /* Unknown attribute */
          return SYSINFO_RET_FAIL;

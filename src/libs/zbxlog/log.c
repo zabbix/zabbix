@@ -106,7 +106,7 @@ zbx_error("Loging to file '%s'",filename);
 zbx_error("Loging to STDERR",filename);
 		/* Not supported logging type */
 
-		if(ZBX_MUTEX_ERROR == zbx_mutex_create(&log_file_access, "/tmp/zbxlmtx"))
+		if(ZBX_MUTEX_ERROR == zbx_mutex_create(&log_file_access, "log"))
 		{
 			zbx_error("Unable to create mutex for log file");
 			return	FAIL;
