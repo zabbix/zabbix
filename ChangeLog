@@ -1,5 +1,6 @@
 Changes for 1.3:
 
+ - fixed "web.page.*" functions (Eugene)
  - added startup script for Fedora Core 5. Thanks to Mark Moses. (Alexei)
  - fixed md5sum calculation (Eugene)
  - added support of LDAP services monitoring for Win32 (Eugene)
