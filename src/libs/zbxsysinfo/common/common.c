@@ -557,8 +557,6 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 
 int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-// !!! #error Incorrect calculation of MD5 sum !!!
-
 	FILE	*file = NULL;
 	int	i;
 	size_t	nr;
