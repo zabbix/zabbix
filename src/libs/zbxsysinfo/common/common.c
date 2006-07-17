@@ -36,7 +36,7 @@ ZBX_METRIC	parameters_common[]=
 	{"system.run",		CF_USEUPARAM,	RUN_COMMAND,	 	0,	"echo test"},
 	{"web.page.get",	CF_USEUPARAM,	WEB_PAGE_GET,	 	0,	"www.zabbix.com,,80"},
 	{"web.page.perf",	CF_USEUPARAM,	WEB_PAGE_PERF,	 	0,	"www.zabbix.com,,80"},
-	{"web.page.regexp",	CF_USEUPARAM,	WEB_PAGE_REGEXP,	0,	"www.zabbix.com,,80"},
+	{"web.page.regexp",	CF_USEUPARAM,	WEB_PAGE_REGEXP,	0,	"www.zabbix.com,,80,OK"},
 	{0}
 	};
 

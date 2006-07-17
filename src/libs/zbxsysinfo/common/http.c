@@ -26,49 +26,67 @@
 
 static int	get_http_page(char *hostname, char *param, unsigned short port, char *buffer, int max_buf_len)
 {
-	char	*haddr;
-	char	c[MAX_STRING_LEN];
+	char	request[MAX_STRING_LEN];
 	
 	ZBX_SOCKET	s;
-	ZBX_SOCKADDR	addr;
+	ZBX_SOCKADDR	servaddr_in;
 	int	
-		addrlen, 
 		n, 
 		total, 
 		ret = SYSINFO_RET_FAIL;
 
-	struct hostent *host;
+	struct hostent *hp;
 
-	host = gethostbyname(hostname);
-	if(host == NULL)
+	if(NULL == (hp = gethostbyname(hostname)) )
 	{
-		return SYSINFO_RET_OK;
+		zabbix_log(
+			LOG_LEVEL_DEBUG,
+			"get_http_page - gethostbyname() failed for host '%s' [%s]", 
+			hostname, 
+#ifdef	HAVE_HSTRERROR		
+			(char*)hstrerror((int)h_errno)
+#else
+			strerror_from_system(h_errno)
+#endif
+			);
+
+		return SYSINFO_RET_FAIL;
 	}
 
-	haddr=host->h_addr;
+	memset(&servaddr_in, 0, sizeof(ZBX_SOCKADDR));
 
-	addrlen = sizeof(addr);
-	memset(&addr, 0, addrlen);
-	addr.sin_port = htons(port);
-	addr.sin_family = AF_INET;
+	servaddr_in.sin_family		= AF_INET;
+	servaddr_in.sin_addr.s_addr	= ((struct in_addr *)(hp->h_addr))->s_addr;
+	servaddr_in.sin_port		= htons(port);
 
-	memcpy(haddr, (void *) &addr.sin_addr.s_addr, 4);
 
-	if((s = socket(AF_INET, SOCK_STREAM, 0)) != SOCKET_ERROR)
+	if(INVALID_SOCKET == (s = socket(AF_INET,SOCK_STREAM,0)))
 	{
-		if (connect(s, (struct sockaddr *) &addr, addrlen) != SOCKET_ERROR)
-		{
-			zbx_snprintf(c, sizeof(c), "GET /%s HTTP/1.1\nHost: %s\nConnection: close\n\n", param, hostname);
-
-			zbx_sock_write(s, c, strlen(c));
-
-			memset(buffer, 0, max_buf_len);
-
-			for(total=0; (n = zbx_sock_read(s, buffer+total, max_buf_len-1-total, CONFIG_TIMEOUT)) > 0; total+=n);
-
-			ret = SYSINFO_RET_OK;
-		}
+		zabbix_log( LOG_LEVEL_DEBUG, "get_http_page - Error in socket() [%s:%u] [%s]", hostname, port, strerror_from_system(errno));
+		return SYSINFO_RET_FAIL;
 	}
+
+	if(SOCKET_ERROR == connect(s,(struct sockaddr *)&servaddr_in,sizeof(ZBX_SOCKADDR)))
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "get_http_page - Error in connect() [%s:%u] [%s]",hostname, port, strerror_from_system(errno));
+		zbx_sock_close(s);
+		return SYSINFO_RET_FAIL;
+	}
+
+	zbx_snprintf(request, sizeof(request), "GET /%s HTTP/1.1\nHost: %s\nConnection: close\n\n", param, hostname);
+
+	if(SOCKET_ERROR == zbx_sock_write(s, (void *)request, strlen(request)))
+	{
+		zabbix_log( LOG_LEVEL_DEBUG, "get_http_page - Error during sending [%s:%u] [%s]",hostname, port, strerror_from_system(errno));
+		zbx_sock_close(s);
+		return SYSINFO_RET_FAIL;
+	}
+
+	memset(buffer, 0, max_buf_len);
+
+	for(total=0; (n = zbx_sock_read(s, buffer+total, max_buf_len-1-total, CONFIG_TIMEOUT)) > 0; total+=n);
+
+	ret = SYSINFO_RET_OK;
 
 	zbx_sock_close(s);
 	return ret;
@@ -235,19 +253,24 @@ int	WEB_PAGE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	if(get_param(param, 5, len_str, MAX_STRING_LEN) != 0)
 	{
-                return SYSINFO_RET_FAIL;
+		len_str[0] = '\0';
+                /* return SYSINFO_RET_FAIL;  */ /* TODO develope !!! */
 	}
 
 	buffer = calloc(1, ZABBIX_MAX_WEBPAGE_SIZE);
-	if(get_http_page(hostname, path, (unsigned short)atoi(port_str), buffer, ZABBIX_MAX_WEBPAGE_SIZE) == SYSINFO_RET_OK)
+	if(SYSINFO_RET_OK == get_http_page(hostname, path, (unsigned short)atoi(port_str), buffer, ZABBIX_MAX_WEBPAGE_SIZE))
 	{
 		found = zbx_regexp_match(buffer,regexp,&l);
-		if(found!=NULL)
+		if(NULL != found)
 		{
 			strncpy(back,found, l);
+			back[l] = '\0';
 			SET_STR_RESULT(result, strdup(back));
 		}
-		else	SET_STR_RESULT(result, strdup("EOF"));
+		else	
+		{
+			SET_STR_RESULT(result, strdup("EOF"));
+		}
 	}
 	else
 	{
