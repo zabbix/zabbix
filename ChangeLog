@@ -1,5 +1,6 @@
 Changes for 1.3:
 
+ - fixed md5sum calculation (Eugene)
  - added support of LDAP services monitoring for Win32 (Eugene)
  - added support of "net.tcp.service.perf" for Win32 (Eugene)
  - added support of "net.tcp.service" for Win32 (Eugene)
