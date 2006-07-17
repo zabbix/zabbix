@@ -59,6 +59,7 @@ int zbx_mutex_create(ZBX_MUTEX *mutex, char *name)
 {
 #if defined(WIN32)	
 
+	/* ignore "name" */
 	if(NULL == ((*mutex) = CreateMutex(NULL, FALSE, NULL)))
 	{
 		zbx_error("Error on mutex creating. [%s]", strerror_from_system(GetLastError()));
@@ -71,6 +72,7 @@ int zbx_mutex_create(ZBX_MUTEX *mutex, char *name)
 	int	sem_id;
 	union semun semopts;
 
+	/* !!! ignore "name" !!! */
 	if( -1 == (sem_key = ftok(CONFIG_FILE, (int)'z') ))
 	{
 		zbx_error("Can not create IPC key for path '%s', try to create for path '.' [%s]", CONFIG_FILE, strerror(errno));

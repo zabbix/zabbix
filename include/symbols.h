@@ -17,35 +17,22 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
+#ifndef ZABBIX_SYMBOLS_H
+#define ZABBIX_SYMBOLS_H
 
-#ifndef ZABBIX_DAEMON_H
-#define ZABBIX_DAEMON_H
+#if defined (WIN32)
 
-#if defined(WIN32)
-#	error "This module allowed only for Linux OS"
-#endif
+DWORD	(__stdcall *zbx_GetGuiResources)(HANDLE,DWORD);
+BOOL	(__stdcall *zbx_GetProcessIoCounters)(HANDLE,PIO_COUNTERS);
+BOOL	(__stdcall *zbx_GetPerformanceInfo)(PPERFORMANCE_INFORMATION,DWORD);
+BOOL	(__stdcall *zbx_GlobalMemoryStatusEx)(LPMEMORYSTATUSEX);
 
-#define USE_PID_FILE (1)
+void import_symbols(void);
 
-extern char	*APP_PID_FILE;
+#else /* not WIN32 */
 
-#include "threads.h"
+#	define import_symbols()
 
-#define	MAXFD	64
+#endif /* WIN32 */
 
-void    child_signal_handler(int sig);
-
-int	daemon_start(int allow_root);
-void	daemon_stop(void);
-
-void	init_main_process(void);
-
-/* ask for application closing status - NOT needed for linux forks */
-#define ZBX_IS_RUNNING (1)
-
-/* tall all threads what application must be closed  - NOT needed for linux forks */
-#define ZBX_DO_EXIT()
-
-#define START_MAIN_ZABBIX_ENTRY(a)	daemon_start(a)
-
-#endif /* ZABBIX_DAEMON_H */
+#endif /* ZABBIX_SYMBOLS_H */

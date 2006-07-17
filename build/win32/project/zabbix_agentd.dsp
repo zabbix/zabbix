@@ -1052,6 +1052,10 @@ SOURCE=..\..\..\src\libs\zbxsys\mutexs.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\src\libs\zbxsys\symbols.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\src\libs\zbxsys\threads.c
 # End Source File
 # End Group
@@ -1199,6 +1203,10 @@ SOURCE=..\..\..\include\service.h
 # Begin Source File
 
 SOURCE=..\..\..\include\sms.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\include\symbols.h
 # End Source File
 # Begin Source File
 
