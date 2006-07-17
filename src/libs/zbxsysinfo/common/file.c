@@ -179,6 +179,8 @@ int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	{
 		goto lbl_fail;
 	}
+	buf[MAX_FILE_LEN-1] = 0;
+
  	zbx_fclose(f);
 
 	c = zbx_regexp_match(buf, regexp, &len);
@@ -245,6 +247,7 @@ int	VFS_FILE_REGMATCH(const char *cmd, const char *param, unsigned flags, AGENT_
 	{
 		goto lbl_fail;
 	}
+	buf[MAX_FILE_LEN-1] = 0;
 
 	zbx_fclose(f);
 

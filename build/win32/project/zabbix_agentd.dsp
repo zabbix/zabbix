@@ -921,6 +921,10 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\win32\sensors.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\src\libs\zbxsysinfo\win32\services.c
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\src\libs\zbxsysinfo\win32\swap.c
 # End Source File
 # Begin Source File

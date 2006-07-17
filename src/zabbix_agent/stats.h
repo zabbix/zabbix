@@ -25,17 +25,8 @@
 #include "interfaces.h"
 #include "diskdevices.h"
 
-typedef struct s_request_stat_data
-{
-	long all;
-	long failed;
-	long accepted;
-	long rejected;
-} ZBX_REQUESTS_DATA;
-
 typedef struct s_collector_data
 {
-	ZBX_REQUESTS_DATA	requests;
 	ZBX_CPUS_STAT_DATA	cpus;
 	ZBX_INTERFACES_DATA	interfaces;
 	ZBX_DISKDEVICES_DATA	diskdevices;

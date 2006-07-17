@@ -557,7 +557,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 
 int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#error Incorrect calculation of MD5 sum!!!
+// !!! #error Incorrect calculation of MD5 sum !!!
 
 	FILE	*file = NULL;
 	int	i;
@@ -598,13 +598,13 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		return	SYSINFO_RET_FAIL;
 	}
 
-	if(NULL == (file = fopen(filename,"r")))
+	if(NULL == (file = fopen(filename,"rb")))
 	{
 		return	SYSINFO_RET_FAIL;
 	}
 
         md5_init(&state);
-	while ((nr = fread(buf, (size_t)sizeof(buf), 1, file)) > 0)
+	while ((nr = fread(buf, 1, (size_t)sizeof(buf), file)) > 0)
 	{
         	md5_append(&state,(const md5_byte_t *)buf, nr);
 	}
@@ -718,7 +718,7 @@ int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
                 return SYSINFO_RET_FAIL;
         }	
 		
-	if(NULL == (f = fopen(filename,"r")))
+	if(NULL == (f = fopen(filename,"rb")))
 	{
 		return	SYSINFO_RET_FAIL;
 	}
@@ -726,7 +726,7 @@ int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 #define	COMPUTE(var, ch)	(var) = (var) << 8 ^ crctab[(var) >> 24 ^ (ch)]
 
 	crc = len = 0;
-	while ((nr = fread(buf, sizeof(buf), 1, f)) > 0)
+	while ((nr = fread(buf, 1, sizeof(buf), f)) > 0)
 	{
 		for( len += nr, p = buf; nr--; ++p)
 		{
@@ -1229,7 +1229,7 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		}
 	}
 
-	len = fread(cmd_result, 1, MAX_STRING_LEN-1, f);
+	len = fread(cmd_result, 1, sizeof(cmd_result)-1, f);
 
 	if(0 != ferror(f))
 	{
