@@ -35,6 +35,8 @@
 #include "active.h"
 #include "listener.h"
 
+#include "symbols.h"
+
 #if defined(ZABBIX_SERVICE)
 #	include "service.h"
 #elif defined(ZABBIX_DAEMON) /* ZABBIX_SERVICE */
@@ -63,7 +65,7 @@ char title_message[] = "ZABBIX Agent"
 char usage_message[] = 
 	"[-vhp]"
 #if defined(WIN32)
-	" [-iusx]"
+	" [-idsx]"
 #endif /* WIN32 */
 	" [-c <file>] [-t <metric>]";
 
@@ -118,7 +120,7 @@ static struct zbx_option longopts[] =
 #if defined (WIN32)
 
 	{"install",	0,	0,	'i'},
-	{"uninstall",	0,	0,	'u'},
+	{"uninstall",	0,	0,	'd'},
 
 	{"start",	0,	0,	's'},
 	{"stop",	0,	0,	'x'},
@@ -133,7 +135,7 @@ static struct zbx_option longopts[] =
 static char	shortopts[] = 
 	"c:hvpt:"
 #if defined (WIN32)
-	"iusx"
+	"idsx"
 #endif /* WIN32 */
 	;
 
@@ -181,7 +183,7 @@ static int parse_commandline(int argc, char **argv)
 		case 'i':
 			task = ZBX_TASK_INSTALL_SERVICE;
 			break;
-		case 'u':
+		case 'd':
 			task = ZBX_TASK_UNINSTALL_SERVICE;
 			break;
 		case 's':
@@ -295,11 +297,8 @@ int MAIN_ZABBIX_ENTRY(void)
 		threads[i] = zbx_thread_start(active_checks_thread, &activechk_args);
 	}
 
-#if !defined(WIN32)
 	/* Must be called after all child processes loading. */
 	init_main_process();
-
-#endif
 
 	/* wait for all threads exiting */
 	for(i = 0; i < CONFIG_ZABBIX_FORKS; i++)
@@ -380,6 +379,8 @@ int	main(int argc, char **argv)
 
 	task = parse_commandline(argc, argv);
 
+	import_symbols();
+
 	init_metrics(); /* Must be before load_config().  load_config - use metrics!!! */
 
 	load_config(task == 0);
@@ -421,15 +422,7 @@ int	main(int argc, char **argv)
 			break;
 	}
 
-#if defined(WIN32)
-	
-	service_start();
-	
-#else /* not WIN32 */
-	
-	daemon_start(CONFIG_ALLOW_ROOT_PERMISSION);
-	
-#endif /* WIN32 */
+	START_MAIN_ZABBIX_ENTRY(CONFIG_ALLOW_ROOT_PERMISSION);
 
 	exit(SUCCEED);
 }

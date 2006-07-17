@@ -273,18 +273,6 @@
 /* Define to 1 if you have the <sys/pstat.h> header file. */
 /* #undef HAVE_SYS_PSTAT_H */
 
-/* Define to 1 if function 'GetPerformanceInfo' exist. Supported on 2000,2003,XP,Vista,Longhorn*/
-#define HAVE_GETPERFORMANCEINFO 1
-
-/* Define to 1 if function 'GlobalMemoryStatusEx' exist. Supported on 2000,2003,XP,Vista,Longhorn*/
-#define HAVE_GLOBALMEMORYSTATUSEX 1
-
-/* Define to 1 if function 'GetGuiResources' exist. Supported on 2000,2003,XP,Vista,Longhorn*/
-#define HAVE_GETGUIRESOURCES 1
-
-/* Define to 1 if function 'GetProcessIoCounters' exist. Supported on 2000,2003,XP,Vista,Longhorn*/
-#define HAVE_GETPROCESSIOCOUNTERS 1
-
 /* Define to 1 if function 'setpriority' exist. */
 //#define HAVE_SYS_RESOURCE_SETPRIORITY 1
 

@@ -38,6 +38,7 @@ int ZabbixRemoveService(void);
 int ZabbixStartService(void);
 int ZabbixStopService(void);
 
+#define init_main_process()
 
 /* APPLICATION running status                    */
 /* requred for closing application from service  */
@@ -51,5 +52,7 @@ extern int application_is_runned;
 
 /* ask for application closing status            */
 #define ZBX_DO_EXIT() (application_is_runned = ZBX_APP_STOPPED)
+
+#define START_MAIN_ZABBIX_ENTRY(a)	service_start()
 
 #endif /* ZABBIX_SERVICE_H */
