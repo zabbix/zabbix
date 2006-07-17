@@ -27,12 +27,83 @@
 
 int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
+#if defined(HAVE_GLOBALMEMORYSTATUSEX)
+	MEMORYSTATUSEX ms;
+#else /* HAVE_GLOBALMEMORYSTATUSEX */
+	MEMORYSTATUS ms;
+#endif
 
-#ifdef TODO
-#error Realize function KERNEL_MAXFILES!!!
-#endif /* todo */
+	char swapdev[10];
+	char mode[10];
 
-	return SYSINFO_RET_FAIL;
+	if(num_param(param) > 2)
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	if(get_param(param, 1, swapdev, sizeof(swapdev)) != 0)
+	{
+		swapdev[0] = '\0';
+	}
+	if(swapdev[0] == '\0')
+	{
+		/* default parameter */
+		zbx_snprintf(swapdev, sizeof(swapdev), "all");
+	}
+	if(strncmp(swapdev, "all", sizeof(swapdev)))
+	{  /* only 'all' parameter supported */
+		return SYSINFO_RET_FAIL;
+	}
+
+	if(get_param(param, 2, mode, sizeof(mode)) != 0)
+	{
+		mode[0] = '\0';
+	}
+	if(mode[0] == '\0')
+	{
+		/* default parameter */
+		zbx_snprintf(mode, sizeof(mode), "total");
+	}
+
+#if defined(HAVE_GLOBALMEMORYSTATUSEX)
+
+	ms.dwLength = sizeof(MEMORYSTATUSEX);
+
+	GlobalMemoryStatusEx(&ms);
+
+	if (strcmp(mode, "total") == 0)
+	{
+		SET_UI64_RESULT(result, ms.ullTotalPageFile);
+		return SYSINFO_RET_OK;
+	}
+	else if (strcmp(mode, "free") == 0)
+	{
+		SET_UI64_RESULT(result, ms.ullAvailPageFile);
+		return SYSINFO_RET_OK;
+	}
+	else
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+#else /* not HAVE_GLOBALMEMORYSTATUSEX */
+
+	GlobalMemoryStatus(&ms);
+
+	if (strcmp(mode,"total") == 0)
+	{
+		SET_UI64_RESULT(result, ms.dwTotalPageFile);
+		return SYSINFO_RET_OK;
+	}
+	else if (strcmp(mode,"free") == 0)
+	{
+		SET_UI64_RESULT(result, ms.dwAvailPageFile);
+		return SYSINFO_RET_OK;
+	}
+
+#endif /* HAVE_GLOBALMEMORYSTATUSEX */
+
+	return SYSINFO_RET_OK;
 }
 
 int     OLD_SWAP(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)

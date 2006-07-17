@@ -48,7 +48,7 @@ int     VM_MEMORY_SIZE(const char *cmd, const char *param, unsigned flags, AGENT
 	if(mode[0] == '\0')
 	{
 		/* default parameter */
-		sprintf(mode, "total");
+		zbx_snprintf(mode, sizeof(mode), "total");
 	}
 
 #if defined(HAVE_GETPERFORMANCEINFO)

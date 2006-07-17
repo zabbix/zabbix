@@ -125,6 +125,8 @@ int	WEB_PAGE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 #if defined(WIN32)
 int	PERF_MONITOR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	SERVICE_STATE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int	PROC_INFO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 #endif
 
 #endif

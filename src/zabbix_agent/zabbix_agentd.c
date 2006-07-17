@@ -81,6 +81,7 @@ char *help_message[] = {
 	"  -v --version        display version number",
 	"  -p --print          print supported metrics and exit",
 	"  -t --test <metric>  test specified metric and exit",
+/*	"  -u --usage <metric> test specified metric and exit",	*/ /* !!! TODO - print metric usage !!! */
 
 #if defined (WIN32)
 
@@ -88,7 +89,7 @@ char *help_message[] = {
 	"Functions:",
 	"",
 	"  -i --install        install ZABIX agent as service",
-	"  -u --uninstall      uninstall ZABIX agent from service",
+	"  -d --uninstall      uninstall ZABIX agent from service",
 	
 	"  -s --start          start ZABIX agent service",
 	"  -x --stop           stop ZABIX agent service",

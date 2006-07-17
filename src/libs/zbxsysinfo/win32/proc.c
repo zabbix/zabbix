@@ -22,7 +22,8 @@
 #include "common.h"
 #include "sysinfo.h"
 
-
+#define MAX_PROCESSES         4096
+#define MAX_MODULES           512
 
 static int GetProcessUsername(HANDLE hProcess, char *userName, int userNameLen) {
 	HANDLE		tok = 0;
@@ -77,8 +78,6 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	return SYSINFO_RET_FAIL;
 }
 
-#define MAX_PROCESSES         4096
-
 int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 { /* usage: <function name>[ <process name>, <user name>] */
 	HANDLE	hProcess;
@@ -105,12 +104,12 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 		return SYSINFO_RET_FAIL;
 	}
 
-	if(get_param(param, 1, procName, MAX_PATH) != 0)
+	if(get_param(param, 1, procName, sizeof(procName)) != 0)
 	{
 		return SYSINFO_RET_FAIL;
 	}
 
-	if(get_param(param, 2, userName, MAX_PATH) != 0)
+	if(get_param(param, 2, userName, sizeof(userName)) != 0)
 	{
 		userName[0] = '\0';
 	}
@@ -160,4 +159,277 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	SET_UI64_RESULT(result, proccount);
 
 	return SYSINFO_RET_OK;
+}
+
+
+
+/************ PROC INFO ****************/
+
+/*
+ * Convert process time from FILETIME structure (100-nanosecond units) to double (milliseconds)
+ */
+
+static double ConvertProcessTime(FILETIME *lpft)
+{
+   __int64 i;
+
+   memcpy(&i,lpft,sizeof(__int64));
+   i/=10000;      /* Convert 100-nanosecond units to milliseconds */
+   return (double)i;
+}
+
+/*
+ * Get specific process attribute
+ */
+
+static double GetProcessAttribute(HANDLE hProcess,int attr,int type,int count,double *lastValue)
+{
+   double value;  
+   PROCESS_MEMORY_COUNTERS mc;
+   IO_COUNTERS ioCounters;
+   FILETIME ftCreate,ftExit,ftKernel,ftUser;
+
+   /* Get value for current process instance */
+   switch(attr)
+   {
+      case 0:        /* vmsize */
+         GetProcessMemoryInfo(hProcess,&mc,sizeof(PROCESS_MEMORY_COUNTERS));
+         value=(double)mc.PagefileUsage/1024;   /* Convert to Kbytes */
+         break;
+      case 1:        /* wkset */
+         GetProcessMemoryInfo(hProcess,&mc,sizeof(PROCESS_MEMORY_COUNTERS));
+         value=(double)mc.WorkingSetSize/1024;   /* Convert to Kbytes */
+         break;
+      case 2:        /* pf */
+         GetProcessMemoryInfo(hProcess,&mc,sizeof(PROCESS_MEMORY_COUNTERS));
+         value=(double)mc.PageFaultCount;
+         break;
+      case 3:        /* ktime */
+      case 4:        /* utime */
+         GetProcessTimes(hProcess,&ftCreate,&ftExit,&ftKernel,&ftUser);
+         value=ConvertProcessTime(attr==3 ? &ftKernel : &ftUser);
+         break;
+      case 5:        /* gdiobj */
+
+#if defined(HAVE_GETGUIRESOURCES)
+      case 6:        /* userobj */
+         value=(double)GetGuiResources(hProcess,attr==5 ? 0 : 1);
+         break;
+#endif /* HAVE_GETGUIRESOURCES */
+
+#if defined(HAVE_GETPROCESSIOCOUNTERS)
+      case 7:        /* io_read_b */
+         GetProcessIoCounters(hProcess,&ioCounters);
+         value=(double)((__int64)ioCounters.ReadTransferCount);
+         break;
+      case 8:        /* io_read_op */
+         GetProcessIoCounters(hProcess,&ioCounters);
+         value=(double)((__int64)ioCounters.ReadOperationCount);
+         break;
+      case 9:        /* io_write_b */
+         GetProcessIoCounters(hProcess,&ioCounters);
+         value=(double)((__int64)ioCounters.WriteTransferCount);
+         break;
+      case 10:       /* io_write_op */
+         GetProcessIoCounters(hProcess,&ioCounters);
+         value=(double)((__int64)ioCounters.WriteOperationCount);
+         break;
+      case 11:       /* io_other_b */
+         GetProcessIoCounters(hProcess,&ioCounters);
+         value=(double)((__int64)ioCounters.OtherTransferCount);
+         break;
+      case 12:       /* io_other_op */
+         GetProcessIoCounters(hProcess,&ioCounters);
+         value=(double)((__int64)ioCounters.OtherOperationCount);
+         break;
+#endif /* HAVE_GETPROCESSIOCOUNTERS */
+
+      default:       /* Unknown attribute */
+         return SYSINFO_RET_FAIL;
+   }
+
+   /* Recalculate final value according to selected type */
+   if (count==1)     /* First instance */
+   {
+      *lastValue = value;
+   }
+
+   switch(type)
+   {
+      case 0:     /* min */
+         *lastValue = min((*lastValue),value);
+	 break;
+      case 1:     /* max */
+         *lastValue = max((*lastValue),value);
+	 break;
+      case 2:     /* avg */
+         *lastValue = ((*lastValue) * (count-1) + value) / count;
+	 break;
+      case 3:     /* sum */
+         *lastValue = (*lastValue) + value;
+	 break;
+      default:
+         return SYSINFO_RET_FAIL;
+   }
+
+   return SYSINFO_RET_OK;
+}
+
+
+/*
+ * Get process-specific information
+ * Parameter has the following syntax:
+ *    proc_info[<process>,<attribute>,<type>]
+ * where
+ *    <process>   - process name (same as in proc_cnt[] parameter)
+ *    <attribute> - requested process attribute (see documentation for list of valid attributes)
+ *    <type>      - representation type (meaningful when more than one process with the same
+ *                  name exists). Valid values are:
+ *         min - minimal value among all processes named <process>
+ *         max - maximal value among all processes named <process>
+ *         avg - average value for all processes named <process>
+ *         sum - sum of values for all processes named <process>
+ */
+
+
+int	    PROC_INFO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	DWORD	*procList, dwSize;
+	HMODULE *modList;
+
+	char
+		proc_name[MAX_PATH],
+		attr[MAX_PATH],
+		type[MAX_PATH];
+
+	const char *attrList[]=
+	{
+		"vmsize",
+		"wkset",
+		"pf",
+		"ktime",
+		"utime",
+		"gdiobj",
+		"userobj",
+		"io_read_b",
+		"io_read_op",
+		"io_write_b",
+		"io_write_op",
+		"io_other_b",
+		"io_other_op",
+		NULL
+	};
+
+	const char *typeList[]={ "min","max","avg","sum" };
+
+	double	value;
+	int	
+		i,
+		proc_cnt,
+		counter,
+		attr_id,
+		type_id,
+		ret = SYSINFO_RET_OK;
+
+	if(num_param(param) > 3)
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	if(get_param(param, 1, proc_name, sizeof(proc_name)) != 0)
+	{
+		proc_name[0] = '\0';
+	}
+
+	if(proc_name[0] == '\0')
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	if(get_param(param, 2, attr, sizeof(attr)) != 0)
+	{
+		attr[0] = '\0';
+	}
+
+	if(attr[0] == '\0')
+	{
+		/* default parameter */
+		zbx_snprintf(attr, sizeof(attr), attrList[0]);
+	}
+
+	if(get_param(param, 3, type, sizeof(type)) != 0)
+	{
+		type[0] = '\0';
+	}
+
+	if(type[0] == '\0')
+	{
+		/* default parameter */
+		zbx_snprintf(type, sizeof(type), typeList[2]);
+	}
+
+	/* Get attribute code from string */
+	for(attr_id = 0; NULL != attrList[attr_id] && strcmp(attrList[attr_id], attr); attr_id++);
+
+	if (attrList[attr_id]==NULL)
+	{
+		return SYSINFO_RET_FAIL;     /* Unsupported attribute */
+	}
+
+	/* Get type code from string */
+	for(type_id = 0; NULL != typeList[type_id] && strcmp(typeList[type_id], type); type_id++);
+
+	if (typeList[type_id]==NULL)
+	{
+		return SYSINFO_RET_FAIL;     /* Unsupported type */
+	}
+
+	procList = (DWORD *)malloc(MAX_PROCESSES*sizeof(DWORD));
+	modList = (HMODULE *)malloc(MAX_MODULES*sizeof(HMODULE));
+
+	EnumProcesses(procList, sizeof(DWORD)*MAX_PROCESSES, &dwSize);
+
+	proc_cnt = dwSize / sizeof(DWORD);
+
+	for(i=0, counter=0, value=0; i < proc_cnt; i++)
+	{
+		HANDLE hProcess;
+
+		if (NULL != (hProcess = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,FALSE, procList[i])) )
+		{
+			if (EnumProcessModules(hProcess, modList, sizeof(HMODULE)*MAX_MODULES, &dwSize))
+			{
+				if (dwSize >= sizeof(HMODULE))     /* At least one module exist */
+				{
+					char baseName[MAX_PATH];
+
+					GetModuleBaseName(hProcess,modList[0],baseName,sizeof(baseName));
+					if (stricmp(baseName, proc_name) == 0)
+					{
+						if(SYSINFO_RET_OK != GetProcessAttribute(
+							hProcess, 
+							attr_id, 
+							type_id, 
+							++counter, /* Number of processes with specific name */
+							&value))
+						{
+							ret = SYSINFO_RET_FAIL;
+							break;
+						}
+					}
+				}
+			}
+			CloseHandle(hProcess);
+		}
+	}
+
+	free(procList);
+	free(modList);
+
+	if(SYSINFO_RET_OK == ret)
+	{
+		SET_DBL_RESULT(result, value);
+	}
+
+	return ret;
 }
