@@ -1,5 +1,6 @@
 Changes for 1.1.1:
 
+ - added startup script for Fedora Core 5. Thanks to Mark Moses. (Alexei)
  - fixed selection popup if return string contains single quote (Alexei)
  - fixed incorrect character in item key selector (Alexei)
  - fixed processing of SNMP having non-standard port (Alexei)
