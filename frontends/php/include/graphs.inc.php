@@ -439,32 +439,58 @@
 		return $result;
 	}
 
-	function	delete_template_graphs_by_hostid($hostid)
+	function	delete_template_graphs($hostid, $templateid = null, $unlink_mode = false)
 	{
 		$db_graphs = get_graphs_by_hostid($hostid);
 		while($db_graph = DBfetch($db_graphs))
 		{
-			if($db_graph["templateid"] == 0)	continue;
-			delete_graph($db_graph["graphid"]);
+			if($db_graph["templateid"] == 0)
+				continue;
+
+			if($templateid != null)
+			{
+				$tmp_graph = get_graph_by_graphid($db_graph["templateid"]);
+				if($tmp_graph["hostid"] != $templateid)
+					continue;
+			}
+
+			if($unlink_mode)
+			{
+				if(DBexecute("update graphs set templateid=0 where graphid=".$db_graph["graphid"]))
+				{
+					info("Graph '".$db_graph["name"]."' unlinked");
+				}	
+			}
+			else
+			{
+				delete_graph($db_graph["graphid"]);
+			}
 		}
 	}
 	
-	function	sync_graphs_with_templates($hostid)
+	function	copy_template_graphs($hostid, $templateid = null, $copy_mode = false)
 	{
-		$host = get_host_by_hostid($hostid);	
-		$db_graphs = get_graphs_by_hostid($host["templateid"]);
+		if($templateid == null)
+		{
+			$host = get_host_by_hostid($hostid);	
+			$templateid = $host["templateid"];
+		}
+
+		$db_graphs = get_graphs_by_hostid($templateid);
+
 		while($db_graph = DBfetch($db_graphs))
 		{
-			copy_graph_to_host($db_graph["graphid"], $hostid);
+			copy_graph_to_host($db_graph["graphid"], $hostid, $copy_mode);
 		}
 	}
 
-	function	copy_graph_to_host($graphid, $hostid)
+	function	copy_graph_to_host($graphid, $hostid, $copy_mode = false)
 	{
 		$db_graph = get_graph_by_graphid($graphid);
-		$new_graphid = add_graph($db_graph["name"],$db_graph["width"],$db_graph["height"],
-			$db_graph["yaxistype"],$db_graph["yaxismin"],$db_graph["yaxismax"],$db_graph["show_work_period"],
-			$db_graph["show_triggers"],$graphid);
+		$new_graphid = add_graph($db_graph["name"],$db_graph["width"],$db_graph["height"],$db_graph["yaxistype"],
+			$db_graph["yaxismin"],$db_graph["yaxismax"],$db_graph["show_work_period"],$db_graph["show_triggers"], 
+			$copy_mode ? 0 : $graphid
+			);
 
 		if(!$new_graphid)
 			return $new_graphid;

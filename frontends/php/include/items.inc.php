@@ -343,17 +343,36 @@
 		return $result;
 	}
 
-	function	delete_template_items_by_hostid($hostid)
+	function	delete_template_items($hostid, $templateid = null, $unlink_mode = false)
 	{
 		$db_items = get_items_by_hostid($hostid);
 		while($db_item = DBfetch($db_items))
 		{
-			if($db_item["templateid"] == 0)	continue;
-			delete_item($db_item["itemid"]);
+			if($db_item["templateid"] == 0)
+				continue;
+
+			if($templateid != null)
+			{
+				$db_tmp_item = get_item_by_itemid($db_item["templateid"]);
+				if($db_tmp_item["hostid"] != $templateid)
+					continue;
+			}
+
+			if($unlink_mode)
+			{
+				if(DBexecute("update items set templateid=0 where itemid=".$db_item["itemid"]))
+                                {
+                                        info("Item '".$db_item["key_"]."' unlinked");
+                                }
+			}
+			else
+			{
+				delete_item($db_item["itemid"]);
+			}
 		}
 	}
 
-	function	sync_items_with_template($hostid)
+	function	copy_template_items($hostid, $templateid = null, $copy_mode = false)
 	{
 		$host = get_host_by_hostid($hostid);
 
@@ -395,7 +414,7 @@
 				$db_tmp_item["logtimefmt"],
 				$db_tmp_item["valuemapid"],
 				$applications,
-				$db_tmp_item["itemid"]);
+				$copy_mode ? 0 : $db_tmp_item["itemid"]);
 		}
 	}
 

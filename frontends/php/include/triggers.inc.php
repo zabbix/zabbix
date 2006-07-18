@@ -33,7 +33,7 @@
 	function        get_realhosts_by_triggerid($triggerid)
 	{
 		$trigger = get_trigger_by_triggerid($triggerid);
-		if($trigger["templateid"] <> 0)
+		if($trigger["templateid"] > 0)
 			return get_realhosts_by_triggerid($trigger["templateid"]);
 
 		return get_hosts_by_triggerid($triggerid);
@@ -348,7 +348,7 @@
 		return $triggerid;
 	}
 
-	function	copy_trigger_to_host($triggerid, $hostid)
+	function	copy_trigger_to_host($triggerid, $hostid, $copy_mode = false)
 	{
 		$trigger = get_trigger_by_triggerid($triggerid);
 
@@ -373,14 +373,15 @@
 				$trigger["comments"],
 				$trigger["url"],
 				$deps,
-				$triggerid);
+				$copy_mode ? 0 : $triggerid);
 		}
 
 		$result = DBexecute("insert into triggers".
 			" (description,priority,status,comments,url,value,expression,templateid)".
-			" values (".zbx_dbstr($trigger["description"]).",".$trigger["priority"].","
-			.$trigger["status"].",".zbx_dbstr($trigger["comments"]).",".
-			zbx_dbstr($trigger["url"]).",2,'{???:???}', $triggerid)");
+			" values (".zbx_dbstr($trigger["description"]).",".$trigger["priority"].",".
+			$trigger["status"].",".zbx_dbstr($trigger["comments"]).",".
+			zbx_dbstr($trigger["url"]).",2,'{???:???}',".
+			($copy_mode ? 0 : $triggerid).")");
 
 		if(!$result)
 			return $result;
@@ -430,10 +431,11 @@
 
 		info("Added trigger '".$trigger["description"]."' to host '".$host["host"]."'");
 
+// Copy triggers to the child hosts
 		$child_hosts = get_hosts_by_templateid($hostid);
 		while($child_host = DBfetch($child_hosts))
 		{// recursion
-			$result = copy_trigger_to_host($triggerid, $child_host["hostid"]);
+			$result = copy_trigger_to_host($newtriggerid, $child_host["hostid"]);
 			if(!$result){
 				return result;
 			}
@@ -1011,25 +1013,49 @@
 		return strcmp($expr1,$trig2["expression"]);
 	}
 
-	function	delete_template_triggers_by_hostid($hostid)
+	function	delete_template_triggers($hostid, $templateid = null, $unlink_mode = false)
 	{
 		$triggers = get_triggers_by_hostid($hostid);
 		while($trigger = DBfetch($triggers))
 		{
 			if($trigger["templateid"]==0)	continue;
-			delete_trigger($trigger["triggerid"]);
+
+			if($templateid != null)
+                        {
+                                $db_tmp_hosts = get_hostis_by_triggerid($trigger["templateid"]);
+				$tmp_host = DBfetch($db_tmp_hosts);
+                                if($tmp_host["hostid"] != $templateid)
+                                        continue;
+                        }
+
+                        if($unlink_mode)
+                        {
+                                if(DBexecute("update triggers set templateid=0 where triggerid=".$trigger["triggerid"]))
+                                {
+                                        info("Trigger '".$trigger["description"]."' unlinked");
+                                }
+                        }
+                        else
+                        {
+				delete_trigger($trigger["triggerid"]);
+			}
 		}
 
 		return TRUE;
 	}
 	
-	function	sync_triggers_with_template($hostid)
+	function	copy_template_triggers($hostid, $templateid = null, $copy_mode = false)
 	{
-		$host = get_host_by_hostid($hostid);	
-		$triggers = get_triggers_by_hostid($host["templateid"]);
+		if(null == $templateid)
+		{
+			$host = get_host_by_hostid($hostid);	
+			$templateid = $host["templateid"];
+		}
+
+		$triggers = get_triggers_by_hostid($templateid);
 		while($trigger = DBfetch($triggers))
 		{
-			copy_trigger_to_host($trigger["triggerid"], $hostid);
+			copy_trigger_to_host($trigger["triggerid"], $hostid, $copy_mode);
 		}
 	}
 

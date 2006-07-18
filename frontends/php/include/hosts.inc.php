@@ -233,23 +233,33 @@
 		return	$result;
 	}
 
-# Sync host with linked template
-	function	sync_host_with_templates($hostid)
+	function	unlink_template($hostid, $templateid = null, $unlink_mode = true)
 	{
-		$host = get_host_by_hostid($hostid);
-		delete_template_graphs_by_hostid($hostid);
-		delete_template_triggers_by_hostid($hostid);
-		delete_template_items_by_hostid($hostid);
-		
-		if($host["templateid"] > 0)
-		{
-// start host syncing
-			sync_applications_with_template($hostid);
-			sync_items_with_template($hostid);
-			sync_triggers_with_template($hostid);
-			sync_graphs_with_templates($hostid);
-// end host syncing
-		}
+		delete_template_elements($hostid, $templateid = null, $unlink_mode);
+		DBexecute("update hosts set templateid=0 where hostid=".$hostid);
+	}
+
+	function	delete_template_elements($hostid, $templateid = null, $unlink_mode = false)
+	{
+		delete_template_graphs($hostid, $templateid, $unlink_mode);
+		delete_template_triggers($hostid, $templateid, $unlink_mode);
+		delete_template_items($hostid, $templateid, $unlink_mode);
+		delete_template_applications($hostid, $templateid, $unlink_mode);
+	}	
+
+	function	copy_template_elements($hostid, $templateid = null, $copy_mode = false)
+	{
+		copy_template_applications($hostid, $templateid, $copy_mode);
+		copy_template_items($hostid, $templateid, $copy_mode);
+		copy_template_triggers($hostid, $templateid, $copy_mode);
+		copy_template_graphs($hostid, $templateid, $copy_mode);
+	}
+
+# Sync host with linked template
+	function	sync_host_with_templates($hostid, $templateid = null)
+	{
+		delete_template_elements($hostid, $templateid);		
+		copy_template_elements($hostid, $templateid);
 	}
 
 	function	delete_groups_by_hostid($hostid)
@@ -273,11 +283,18 @@
 
 	# Delete Host
 
-	function	delete_host($hostid)
+	function	delete_host($hostid, $unlink_mode = false)
 	{
 		global $DB_TYPE;
 
 		$ret = FALSE;
+
+	// unlink child hosts
+		$db_childs = get_hosts_by_templateid($hostid);
+		while($db_child = DBfetch($db_childs))
+		{
+			unlink_template($db_child["hostid"], NULL, $unlink_mode);
+		}
 
 	// delete items -> triggers -> graphs
 		$db_items = get_items_by_hostid($hostid);
@@ -291,14 +308,6 @@
 		
 	// delete host from group
 		DBexecute("delete from hosts_groups where hostid=$hostid");
-
-	// unlink child hosts
-		$db_childs = get_hosts_by_templateid($hostid);
-		while($db_child = DBfetch($db_childs))
-		{
-			DBexecute("update hosts set templateid=0 where hostid=".$db_child["hostid"]);
-			sync_host_with_templates($hostid);
-		}
 
 	// delete host profile
 		delete_host_profile($hostid);
@@ -718,20 +727,47 @@
 		return DBselect("select * from applications where hostid=$hostid");
 	}
 
-	function	sync_applications_with_template($hostid)
+	function        delete_template_applications($hostid, $templateid = null, $unlink_mode = false)
 	{
-		$host = get_host_by_hostid($hostid);
+		$db_apps = get_applications_by_hostid($hostid);
+		while($db_app = DBfetch($db_apps))
+		{
+			if($db_app["templateid"] == 0)
+				continue;
 
-//SDI("sync host: ".$host['host']);
+			if($templateid != null && $templateid != $db_app["templateid"])
+				continue;
+			
+			if($unlink_mode)
+			{
+				if(DBexecute("update applications set templateid=0 where applicationid=".$db_app["applicationid"]))
+				{
+					info("Application '".$db_app["name"]."' unlinked");
+				}
+			}
+			else
+			{
+				delete_application($db_app["applicationid"]);
+			}
+		}
+	}
 
-		$db_tmp_applications = get_applications_by_hostid($host["templateid"]);
+	function	copy_template_applications($hostid, $templateid = null, $copy_mode = false)
+	{
+		if(null == $templateid)
+		{
+			$host = get_host_by_hostid($hostid);
+			$templateid = $host["templateid"];
+		}
+
+		$db_tmp_applications = get_applications_by_hostid($templateid);
 
 		while($db_tmp_app = DBfetch($db_tmp_applications))
 		{
 			add_application(
 				$db_tmp_app["name"],
 				$hostid,
-				$db_tmp_app["applicationid"]);
+				$copy_mode ? 0 : $db_tmp_app["applicationid"]);
 		}
 	}
 ?>

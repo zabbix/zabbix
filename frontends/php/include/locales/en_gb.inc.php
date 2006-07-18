@@ -456,6 +456,8 @@
 	"S_TEMPLATES"=>				"Templates",
 	"S_TEMPLATES_BIG"=>			"TEMPLATES",
 	"S_HOSTS"=>				"Hosts",
+	"S_UNLINK"=>				"Unlink",
+	"S_UNLINK_AND_CLEAR"=>			"Unlink and clear",
 
 //	items.php
 	"S_NO_ITEMS_DEFINED"=>			"No items defined",
