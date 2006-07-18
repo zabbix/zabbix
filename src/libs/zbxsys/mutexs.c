@@ -119,10 +119,11 @@ int zbx_mutex_create(ZBX_MUTEX *mutex, char *name)
 int zbx_mutex_lock(ZBX_MUTEX *mutex)
 {
 
-	if(!*mutex) return ZBX_MUTEX_OK;
 	
 #if defined(WIN32)	
 
+	if(!*mutex) return ZBX_MUTEX_OK;
+	
 	if(WaitForSingleObject(*mutex, INFINITE) != WAIT_OBJECT_0)
 	{
 		zbx_error("Error on mutex locking. [%s]", strerror_from_system(GetLastError()));
@@ -133,6 +134,8 @@ int zbx_mutex_lock(ZBX_MUTEX *mutex)
 
 	struct sembuf sem_lock = { 0, -1, 0 };
 
+	if(!*mutex) return ZBX_MUTEX_OK;
+	
 	if (-1 == (semop(*mutex, &sem_lock, 1)))
 	{
 		zbx_error("Lock failed [%s]", strerror(errno));
@@ -163,9 +166,10 @@ int zbx_mutex_lock(ZBX_MUTEX *mutex)
 int zbx_mutex_unlock(ZBX_MUTEX *mutex)
 {
 
-	if(!*mutex) return ZBX_MUTEX_OK;
 	
 #if defined(WIN32)	
+
+	if(!*mutex) return ZBX_MUTEX_OK;
 
 	if(ReleaseMutex(*mutex) == 0)
 	{
@@ -176,6 +180,8 @@ int zbx_mutex_unlock(ZBX_MUTEX *mutex)
 #else /* not WIN32 */
 
 	struct sembuf sem_unlock = { 0, 1, 0};
+
+	if(!*mutex) return ZBX_MUTEX_OK;
 
 	if ((semop(*mutex, &sem_unlock, 1)) == -1)
 	{
@@ -206,9 +212,10 @@ int zbx_mutex_unlock(ZBX_MUTEX *mutex)
 
 int zbx_mutex_destroy(ZBX_MUTEX *mutex)
 {
-	if(!*mutex) return ZBX_MUTEX_OK;
 	
 #if defined(WIN32)	
+
+	if(!*mutex) return ZBX_MUTEX_OK;
 
 	if(CloseHandle(*mutex) == 0)
 	{
@@ -218,6 +225,8 @@ int zbx_mutex_destroy(ZBX_MUTEX *mutex)
 
 #else /* not WIN32 */
 	
+	if(!*mutex) return ZBX_MUTEX_OK;
+
 	semctl(*mutex, 0, IPC_RMID, 0);
 
 #endif /* WIN32 */

@@ -234,7 +234,7 @@ static void exchange (char **argv)
    If LONG_ONLY is nonzero, '-' as well as '--' can introduce
    long-named options.  */
 
-static int _getopt_internal (int argc, char **argv, const char *optstring,
+static int zbx_getopt_internal (int argc, char **argv, const char *optstring,
                  const struct zbx_option *longopts, int *longind,
                  int long_only)
 {
@@ -590,7 +590,7 @@ static int _getopt_internal (int argc, char **argv, const char *optstring,
 
 int zbx_getopt(int argc, char **argv, const char *optstring)
 {
-  return _getopt_internal (argc, argv, optstring,
+  return zbx_getopt_internal (argc, argv, optstring,
                            (const struct zbx_option *) 0,
                            (int *) 0,
                            0);
@@ -599,7 +599,7 @@ int zbx_getopt(int argc, char **argv, const char *optstring)
 int zbx_getopt_long(int argc, char **argv, const char *options,
                     const struct zbx_option *long_options, int *opt_index)
 {
-  return _getopt_internal (argc, argv, options, long_options, opt_index, 0);
+  return zbx_getopt_internal (argc, argv, options, long_options, opt_index, 0);
 }
 
 
