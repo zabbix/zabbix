@@ -122,9 +122,10 @@ void	init_collector_data(void)
 
 void	free_collector_data(void)
 {
-	if(NULL == collector) return;
 
 #if defined (WIN32)
+
+	if(NULL == collector) return;
 
 	free(collector);
 
@@ -133,6 +134,8 @@ void	free_collector_data(void)
 	key_t	shm_key;
 	int	shm_id;
 
+	if(NULL == collector) return;
+	
 	ZBX_GET_SHM_KEY(shm_key);
 
 	shm_id = shmget(shm_key, sizeof(ZBX_COLLECTOR_DATA), 0);
