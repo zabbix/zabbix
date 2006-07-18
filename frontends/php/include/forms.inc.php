@@ -2019,10 +2019,12 @@
 		$location	= get_request("location","");
 		$notes		= get_request("notes","");
 
-		$templateid= get_request("templateid",0);
+		$templateid	= get_request("templateid",0);
 
 		$frm_title	= $show_only_tmp ? S_TEMPLATE : S_HOST;
-		if(isset($_REQUEST["hostid"])){
+
+		if(isset($_REQUEST["hostid"]))
+		{
 			$db_host=get_host_by_hostid($_REQUEST["hostid"]);
 			$frm_title	.= SPACE."\"".$db_host["host"]."\"";
 		}
@@ -2066,6 +2068,12 @@
 				$notes		= $db_profile["notes"];
 			}
 		}
+		$real_templateid = 0;
+		if(isset($db_host) && $db_host["templateid"] > 0)
+		{
+			$real_templateid = $templateid = $db_host["templateid"];
+		}
+
 		if($show_only_tmp){
 			$useip = "no";
 		}
@@ -2138,6 +2146,16 @@
 		}
 
 		$cmbHosts = new CComboBox("templateid",$templateid);
+		$btnUnlink = null;
+		$btnUnlinkAndClear = null;
+		if($real_templateid > 0)
+		{
+			$cmbHosts->SetEnabled(false);
+			$frmHost->AddVar("templateid",$templateid);
+			$btnUnlink = new CButton("unlink",S_UNLINK);
+			$btnUnlinkAndClear = new CButton("unlink_and_clear",S_UNLINK_AND_CLEAR);
+		}
+
 		$cmbHosts->AddItem(0,"...");
 		$hosts=DBselect("select host,hostid from hosts where status in (".HOST_STATUS_TEMPLATE.")".
 			" order by host");
@@ -2145,7 +2163,7 @@
 		{
 			$cmbHosts->AddItem($host["hostid"],$host["host"]);
 		}
-		$frmHost->AddRow(S_LINK_WITH_TEMPLATE,$cmbHosts);
+		$frmHost->AddRow(S_LINK_WITH_TEMPLATE, array($cmbHosts,SPACE, $btnUnlink, $btnUnlinkAndClear));
 	
 		if($show_only_tmp)
 		{
@@ -2197,6 +2215,19 @@
 					url_param("groupid")
 				)
 			);
+
+			if($show_only_tmp)
+			{
+				$frmHost->AddItemToBottomRow(SPACE);
+				$frmHost->AddItemToBottomRow(
+					new CButtonQMessage('delete_and_clear',
+						'Delete and clear',
+                                        	S_DELETE_SELECTED_HOSTS_Q,
+						url_param("form").url_param("config").url_param("hostid").
+						url_param("groupid")
+					)
+				);
+			}
 		}
 		$frmHost->AddItemToBottomRow(SPACE);
 		$frmHost->AddItemToBottomRow(new CButtonCancel(url_param("config").url_param("groupid")));

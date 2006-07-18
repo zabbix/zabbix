@@ -70,13 +70,22 @@
 		}
 	}
 
-	class CButtonDelete extends CButton
+	class CButtonDelete extends CButtonQMessage
+	{
+		function CButtonDelete($msg=NULL, $vars=NULL){
+			parent::CButtonQMessage("delete",S_DELETE,$msg,$vars);
+		}
+	}
+
+	class CButtonQMessage extends CButton
 	{
 		var $vars;
 		var $msg;
+		var $name;
 
-		function CButtonDelete($msg=NULL, $vars=NULL){
-			parent::CButton("delete",S_DELETE);
+		function CButtonQMessage($name, $caption, $msg=NULL, $vars=NULL){
+			$this->name = $name;
+			parent::CButton($name,$caption);
 			$this->SetMessage($msg);
 			$this->SetVars($vars);
 		}
@@ -104,7 +113,7 @@
 			global $page;
 
 			$confirmation = "Confirm('".$this->msg."')";
-			$redirect = "Redirect('".$page["file"]."?delete=1".$this->vars."')";
+			$redirect = "Redirect('".$page["file"]."?".$this->name."=1".$this->vars."')";
 			
 			return parent::SetAction("if(".$confirmation.") return ".$redirect."; else return false;");
 		}
