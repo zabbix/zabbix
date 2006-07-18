@@ -70,7 +70,7 @@ ZBX_METRIC	parameters_specific[]=
 
 	{"system.swap.size",	CF_USEUPARAM,	SYSTEM_SWAP_SIZE,	0,	"all,free"},
 	{"system.swap.in",      CF_USEUPARAM,   SYSTEM_SWAP_IN,         0,      "all"},
-	{"system.swap.out",     CF_USEUPARAM,   SYSTEM_SWAP_OUT,        0,      "all,count"},	
+	{"system.swap.out",     CF_USEUPARAM,   SYSTEM_SWAP_OUT,        0,      "all"},	
 
 	{"system.hostname",	0,	SYSTEM_HOSTNAME,	0,	0},
 
