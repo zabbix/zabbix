@@ -580,6 +580,82 @@
 		$frmItem->Show();
 	}
 
+	function	insert_copy_elements_to_forms($elements_array_name)
+	{
+		
+		$copy_type = get_request("copy_type", 0);
+		$copy_mode = get_request("copy_mode", 0);
+		$filter_groupid = get_request("filter_groupid", 0);
+		$group_itemid = get_request($elements_array_name, array());
+		$copy_targetid = get_request("copy_targetid", array());
+
+		if(!is_array($group_itemid) || (is_array($group_itemid) && count($group_itemid) < 1))
+		{
+			error("Incorrect list of items.");
+			return;
+		}
+
+		$frmCopy = new CFormTable(count($group_itemid).' '.S_X_ELEMENTS_COPY_TO_DOT_DOT_DOT,NULL,'post',NULL,'form_copy_to');
+		$frmCopy->SetHelp('web.items.copyto.php');
+		$frmCopy->AddVar($elements_array_name, $group_itemid);
+
+		$cmbCopyType = new CComboBox('copy_type',$copy_type,'submit()');
+		$cmbCopyType->AddItem(0,S_HOSTS);
+		$cmbCopyType->AddItem(1,S_HOST_GROUPS);
+		$frmCopy->AddRow(S_TARGET_TYPE, $cmbCopyType);
+
+		$target_sql = 'select distinct g.groupid target_id, g.name target_name'.
+			' from groups g, hosts_groups hg'.
+			' where hg.groupid=g.groupid';
+
+		if(0 == $copy_type)
+		{
+			$cmbGroup = new CComboBox('filter_groupid',$filter_groupid,'submit()');
+			$cmbGroup->AddItem(0,S_ALL_SMALL);
+			$groups = DBselect($target_sql);
+			while($group = DBfetch($groups))
+			{
+				$cmbGroup->AddItem($group["target_id"],$group["target_name"]);
+			}
+			$frmCopy->AddRow('Group', $cmbGroup);
+
+			$target_sql = 'select h.hostid target_id, h.host target_name from hosts h';
+			if($filter_groupid > 0)
+			{
+				$target_sql .= ', hosts_groups hg where hg.hostid=h.hostid and hg.groupid='.$filter_groupid;
+			}
+		}
+
+		$db_targets = DBselect($target_sql.' order by target_name');
+		$target_list = array();
+		while($target = DBfetch($db_targets))
+		{
+			array_push($target_list,array(
+				new CCheckBox('copy_targetid[]',
+					in_array($target['target_id'], $copy_targetid), 
+					NULL, 
+					$target['target_id']),
+				SPACE,
+				$target['target_name'],
+				BR
+				));
+		}
+
+		$frmCopy->AddRow(S_TARGET, $target_list);
+
+		$cmbCopyMode = new CComboBox('copy_mode',$copy_mode);
+		$cmbCopyMode->AddItem(0, S_UPDATE_EXISTING_NON_LINKED_ITEMS);
+		$cmbCopyMode->AddItem(1, S_SKIP_EXISTING_ITEMS);
+		$cmbCopyMode->SetEnabled(false);
+		$frmCopy->AddRow(S_MODE, $cmbCopyMode);
+
+		$frmCopy->AddItemToBottomRow(new CButton("copy",S_COPY));
+		$frmCopy->AddItemToBottomRow(array(SPACE,
+			new CButtonCancel(url_param("groupid").url_param("hostid").url_param("config"))));
+
+		$frmCopy->Show();
+	}
+
 
 	function	insert_login_form()
 	{

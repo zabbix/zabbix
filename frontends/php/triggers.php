@@ -47,6 +47,9 @@
 
 		"triggerid"=>	array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,'{form}=="update"'),
 
+		"copy_type"	=>array(T_ZBX_INT, O_OPT,	 P_SYS,	IN("0,1"),'isset({copy})'),
+		"copy_mode"	=>array(T_ZBX_INT, O_OPT,	 P_SYS,	IN("0"),NULL),
+
 		"description"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,'isset({save})'),
 		"expression"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,'isset({save})'),
 		"priority"=>	array(T_ZBX_INT, O_OPT,  NULL,  IN("0,1,2,3,4,5"),'isset({save})'),
@@ -59,6 +62,8 @@
 		"rem_dependence"=>	array(T_ZBX_INT, O_OPT,  NULL,	DB_ID, NULL),
 
 		"g_triggerid"=>	array(T_ZBX_INT, O_OPT,  NULL,	DB_ID, NULL),
+		"copy_targetid"=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID, NULL),
+		"filter_groupid"=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, 'isset({copy})&&{copy_type}==0'),
 
 /* actions */
 		"add_dependence"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -66,11 +71,13 @@
 		"group_enable"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"group_disable"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"group_delete"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"copy"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 /* other */
 		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		"form_copy_to"=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
 	);
 
@@ -125,6 +132,45 @@
 			unset($_REQUEST["form"]);
 			unset($_REQUEST["triggerid"]);
 		}
+	}
+	elseif(isset($_REQUEST["copy"])&&isset($_REQUEST["g_triggerid"])&&isset($_REQUEST["form_copy_to"]))
+	{
+		if(isset($_REQUEST['copy_targetid']) && $_REQUEST['copy_targetid'] > 0 && isset($_REQUEST['copy_type']))
+		{
+			if(0 == $_REQUEST['copy_type'])
+			{ /* hosts */
+				$hosts_ids = $_REQUEST['copy_targetid'];
+			}
+			else
+			{ /* groups */
+				$hosts_ids = array();
+				$group_ids = "";
+				foreach($_REQUEST['copy_targetid'] as $group_id)
+				{
+					$group_ids .= $group_id.',';
+				}
+				$group_ids = trim($group_ids,',');
+
+				$db_hosts = DBselect('select distinct h.hostid from hosts h, hosts_groups hg'.
+					' where h.hostid=hg.hostid and hg.groupid in ('.$group_ids.')');
+				while($db_host = DBfetch($db_hosts))
+				{
+					array_push($hosts_ids, $db_host['hostid']);
+				}
+			}
+
+			foreach($_REQUEST["g_triggerid"] as $trigger_id)
+				foreach($hosts_ids as $host_id)
+				{
+					copy_trigger_to_host($trigger_id, $host_id, true);
+				}
+			unset($_REQUEST["form_copy_to"]);
+		}
+		else
+		{
+			error('No target selection.');
+		}
+		show_messages();
 	}
 /* DEPENDENCE ACTIONS */
 	elseif(isset($_REQUEST["add_dependence"])&&isset($_REQUEST["new_dependence"]))
@@ -193,7 +239,11 @@
 	show_header2(S_CONFIGURATION_OF_TRIGGERS_BIG, $form);
 	echo BR;
 
-	if(!isset($_REQUEST["form"]))
+	if(isset($_REQUEST["form_copy_to"]) && isset($_REQUEST["g_triggerid"]))
+	{
+		insert_copy_elements_to_forms("g_triggerid");
+	}
+	else if(!isset($_REQUEST["form"]))
 	{
 /* filter panel */
 		$form = new CForm();
@@ -396,6 +446,8 @@
 		array_push($footerButtons, SPACE);
 		array_push($footerButtons, new CButton('group_delete','Delete selected',
 			"return Confirm('".S_DELETE_SELECTED_TRIGGERS_Q."');"));
+		array_push($footerButtons, SPACE);
+		array_push($footerButtons, new CButton('form_copy_to','Copy selected to ...'));
 		$table->SetFooter(new CCol($footerButtons));
 
 		$form->AddItem($table);

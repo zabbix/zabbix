@@ -56,16 +56,9 @@
 			}
 			return $this->AddOption("enctype",$value);
 		}
+
 		function AddVar($name, $value)
 		{
-			if(is_array($value))
-			{
-				foreach($value as $item)
-				{
-					$this->AddItem(new CVar($name."[]", $item));
-				}
-				return 1;
-			}
 			return $this->AddItem(new CVar($name, $value));
 		}
 	}
