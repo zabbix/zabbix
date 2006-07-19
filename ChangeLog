@@ -1,7 +1,8 @@
 Changes for 1.1.1:
 
- - added support of "ayatem.swap.out" key for Linux with kernel 2.4 (Eugene)
- - added support of "ayatem.swap.in" key for Linux with kernel 2.4 (Eugene)
+ - changed version to 1.1.1 (Alexei)
+ - added support of "system.swap.out" key for Linux with kernel 2.4 (Eugene)
+ - added support of "system.swap.in" key for Linux with kernel 2.4 (Eugene)
  - added startup script for Fedora Core 5. Thanks to Mark Moses. (Alexei)
  - fixed selection popup if return string contains single quote (Alexei)
  - fixed incorrect character in item key selector (Alexei)
