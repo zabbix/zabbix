@@ -39,7 +39,7 @@
 	);
 	check_fields($fields);
 ?>
-<?
+<?php
 	if(isset($_REQUEST["save"]))
 	{
 		$result = add_acknowledge_coment(
