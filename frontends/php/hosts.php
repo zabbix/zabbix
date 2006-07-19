@@ -113,10 +113,10 @@
 	if(($_REQUEST["config"]==0 || $_REQUEST["config"]==3) && (isset($_REQUEST["unlink"]) || isset($_REQUEST["unlink_and_clear"]))
 		 && isset($_REQUEST["hostid"]))
 	{
-		$unlink_mode = true;
+		$unlink_mode = false;
 		if(isset($_REQUEST["unlink"]))
 		{
-			$unlink_mode = false;
+			$unlink_mode = true;
 		}
 
 		unlink_template($_REQUEST["hostid"], NULL /* future usage -> $_REQUEST["templateid"]*/, $unlink_mode);
