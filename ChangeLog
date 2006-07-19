@@ -1,5 +1,7 @@
 Changes for 1.3:
 
+ - developed "Copty to" functionality for trigger groups (Eugene)
+ - developed "Copty to" functionality for item groups  (Eugene)
  - developed template unlinking feature (Eugene) 
  - added support of "system.swap.out" key for Linux with kernel 2.4 (Eugene)
  - added support of "system.swap.in" key for Linux with kernel 2.4 (Eugene)

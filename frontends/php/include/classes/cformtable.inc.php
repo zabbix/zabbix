@@ -30,9 +30,19 @@
 		var $center_items = array();
 		var $bottom_items = array();
 /* public */
-		function CFormTable($title=NULL, $action=NULL, $method='get', $enctype=NULL)
+		function CFormTable($title=null, $action=null, $method=null, $enctype=null, $form_variable=null)
 		{
 			global  $_REQUEST;
+
+			if( null == $method )
+			{
+				$method = 'get';
+			}
+
+			if( null == $form_variable )
+			{
+				$form_variable = 'form';
+			}
 
 			parent::CForm($action,$method,$enctype);
 			$this->SetTitle($title);
@@ -43,8 +53,8 @@
 //			$frm_link->SetName("formtable");
 			$this->AddItemToTopRow($frm_link);
 			
-			$this->AddVar("form",get_request("form",1));
-			$this->AddVar("form_refresh",get_request("form_refresh",0)+1);
+			$this->AddVar($form_variable, get_request($form_variable, 1));
+			$this->AddVar('form_refresh',get_request('form_refresh',0)+1);
 
 			$this->bottom_items = new CCol(NULL,'form_row_last');
 		        $this->bottom_items->SetColSpan(2);
