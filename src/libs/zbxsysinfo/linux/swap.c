@@ -100,7 +100,7 @@ SWP_FNCLIST
                 return SYSINFO_RET_FAIL;
         }
 
-        if(get_param(param, 1, swapdev, MAX_STRING_LEN) != 0)
+        if(get_param(param, 1, swapdev, sizeof(swapdev)) != 0)
         {
                 return SYSINFO_RET_FAIL;
         }
@@ -116,7 +116,7 @@ SWP_FNCLIST
 		return SYSINFO_RET_FAIL;
 	}
 	
-	if(get_param(param, 2, mode, MAX_STRING_LEN) != 0)
+	if(get_param(param, 2, mode, sizeof(mode)) != 0)
         {
                 mode[0] = '\0';
         }
@@ -173,15 +173,144 @@ int     OLD_SWAP(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
         return ret;
 }
 
+static int 	get_swap_io(zbx_uint64_t *swapin, zbx_uint64_t *swapout)
+{
+	FILE	*f = NULL;
+	char	line[MAX_STRING_LEN];
+	char	name[20];
+	zbx_uint64_t
+		value1,
+		value2;
+
+	if(NULL != (f = fopen("/proc/stat","r")) )
+	{
+		while(fgets(line, sizeof(line), f))
+		{
+			if(sscanf(line, "%10s\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\n", name, &value1, &value2) != 3)
+				continue;
+			
+			if(strcmp(name, "swap"))
+				continue;
+			
+			if(swapin)	*swapin  = value1;
+			if(swapout)	*swapout = value2;
+			
+			return SYSINFO_RET_OK;
+		};
+		fclose(f);
+	}
+	return SYSINFO_RET_FAIL;
+}
+
 int	SYSTEM_SWAP_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-    /* in this moment this function for this platform unsupported */
-    return	SYSINFO_RET_FAIL;
+	int		ret = SYSINFO_RET_FAIL;
+	char    	swapdev[10];
+	char    	mode[20];
+	zbx_uint64_t	value = 0;
+
+	assert(result);
+
+	init_result(result);
+
+	if(num_param(param) > 2)
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	if(get_param(param, 1, swapdev, sizeof(swapdev)) != 0)
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	if(swapdev[0] == '\0')
+	{
+		/* default parameter */
+		sprintf(swapdev, "all");
+	}
+
+	if(strcmp(swapdev, "all"))
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	if(get_param(param, 2, mode, sizeof(mode)) != 0)
+	{
+		mode[0] = '\0';
+	}
+
+	if(mode[0] == '\0')
+	{
+		/* default parameter */
+		sprintf(mode, "pages");
+	}
+
+	if(strcmp(mode,"pages") != 0)
+	{
+		return SYSINFO_RET_FAIL;
+	}
+	
+	if( SYSINFO_RET_OK == (ret = get_swap_io(&value, NULL)) )
+	{
+		SET_UI64_RESULT(result, value);
+	}
+
+	return ret;
 }
 
 int	SYSTEM_SWAP_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-    /* in this moment this function for this platform unsupported */
-    return	SYSINFO_RET_FAIL;
+	int		ret = SYSINFO_RET_FAIL;
+	char    	swapdev[10];
+	char    	mode[20];
+	zbx_uint64_t	value = 0;
+
+	assert(result);
+
+	init_result(result);
+
+	if(num_param(param) > 2)
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	if(get_param(param, 1, swapdev, sizeof(swapdev)) != 0)
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	if(swapdev[0] == '\0')
+	{
+		/* default parameter */
+		sprintf(swapdev, "all");
+	}
+
+	if(strcmp(swapdev, "all"))
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	if(get_param(param, 2, mode, sizeof(mode)) != 0)
+	{
+		mode[0] = '\0';
+	}
+
+	if(mode[0] == '\0')
+	{
+		/* default parameter */
+		sprintf(mode, "pages");
+	}
+
+	if(strcmp(mode,"pages") != 0)
+	{
+		return SYSINFO_RET_FAIL;
+	}
+	
+	if( SYSINFO_RET_OK == (ret = get_swap_io(NULL, &value)) )
+	{
+		SET_UI64_RESULT(result, value);
+	}
+
+	return ret;
 }
 

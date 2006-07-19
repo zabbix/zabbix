@@ -1,6 +1,6 @@
 #include <string.h>
 
-#define MAX_B64_SIZE 16*1024
+#define ZBX_MAX_B64_LEN 16*1024
 
 static char base64_set [] =
   "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -189,7 +189,7 @@ void str_base64_decode(char *p_b64str, char *p_str, int *p_out_size)
 	int	in_size;
 	char from1='A',from2='A',from3='A',from4='A';
 	unsigned char to1=0,to2=0,to3=0,to4=0;
-	char	str_clean[MAX_B64_SIZE];/* str_clean is the string 
+	char	str_clean[ZBX_MAX_B64_LEN];/* str_clean is the string 
 					* after removing the non-base64 
 					* characters
 					*/
@@ -254,3 +254,59 @@ void str_base64_decode(char *p_b64str, char *p_str, int *p_out_size)
 	
 	return;
 }
+
+/*#define ZABBIX_TEST*/
+
+#ifdef ZABBIX_TEST
+int main()
+{
+	int len=2;
+  	char s[]=	"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+			"0000000000000000000000000000000000000000000000000000000000000000"
+			"11111111111111111111111111111111111111111111111111111111111111";
+	char b64[ZBX_MAX_B64_LEN];
+	char b64_rev[ZBX_MAX_B64_LEN];
+	int i;
+
+	memset(b64,0,sizeof(b64));
+
+	str_base64_encode(s, b64, strlen(s));
+	printf("%d: [%s]\n", strlen(s), s);
+	printf("%d: [%s]\n\n", strlen(b64), b64);
+	str_base64_decode(b64, b64_rev, &i);
+	printf("%d: [%s]\n", strlen(s), s);
+	printf("%d: [%s]\n", strlen(b64), b64);
+	printf("%d: [%s]\n", strlen(b64_rev), b64_rev);
+
+	if(strcmp(s,b64_rev) == 0)
+	{
+		printf("Test passed OK\n");
+	}
+	else
+	{
+		printf("Test NOT passed\n");
+	}
+}
+#endif

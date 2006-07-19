@@ -84,8 +84,8 @@ void zabbix_log(int level, const char *fmt, ...)
 {
 	FILE *log_file = NULL;
 
-	char	str[MAX_STRING_LEN];
-	char	str2[MAX_STRING_LEN];
+	char	str[MAX_BUF_LEN];
+	char	str2[MAX_BUF_LEN];
 	time_t	t;
 	struct	tm	*tm;
 	va_list ap;
@@ -102,8 +102,8 @@ void zabbix_log(int level, const char *fmt, ...)
 	{
 		va_start(ap,fmt);
 		vsprintf(str,fmt,ap);
-		strncat(str,"\n",MAX_STRING_LEN);
-		str[MAX_STRING_LEN-1]=0;
+		strncat(str,"\n",MAX_BUF_LEN);
+		str[MAX_BUF_LEN-1]=0;
 		syslog(LOG_DEBUG,str);
 		va_end(ap);
 	}
@@ -114,7 +114,7 @@ void zabbix_log(int level, const char *fmt, ...)
 		snprintf(str2,sizeof(str2)-1,"%.6d:%.4d%.2d%.2d:%.2d%.2d%.2d ",(int)getpid(),tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday,tm->tm_hour,tm->tm_min,tm->tm_sec);
 
 		va_start(ap,fmt);
-		vsnprintf(str,MAX_STRING_LEN,fmt,ap);
+		vsnprintf(str,MAX_BUF_LEN,fmt,ap);
 		va_end(ap);
 
 		log_file = fopen(log_filename,"a+");

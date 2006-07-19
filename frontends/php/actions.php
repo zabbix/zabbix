@@ -78,7 +78,7 @@
 	show_header2(S_HISTORY_OF_ACTIONS_BIG,$form);
 ?>
 
-<?
+<?php
         if(!isset($_REQUEST["start"]))
         {
                 $_REQUEST["start"]=0;
