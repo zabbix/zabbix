@@ -1278,6 +1278,9 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
         assert(result);
 
 	init_result(result);
+	
+
+zabbix_log(LOG_LEVEL_WARNING, "RUN_COMMAND cmd = '%s'",cmd);
 
 	if(CONFIG_ENABLE_REMOTE_COMMANDS != 1)
 	{
@@ -1310,8 +1313,10 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		snprintf(flag,MAX_FLAG_LEN,"wait");
 	}
 
+	zabbix_log(LOG_LEVEL_DEBUG, "RUN_COMMAND flag = '%s'",flag);
 	if(strcmp(flag,"wait") == 0)
 	{
+	zabbix_log(LOG_LEVEL_DEBUG, "RUN_COMMAND is running as WAIT",flag);
 		return EXECUTE_STR(cmd,command,flags,result);
 	}
 	else if(strcmp(flag,"nowait") != 0)
@@ -1320,6 +1325,8 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	}
 	
 	zabbix_log(LOG_LEVEL_DEBUG, "Run remote command '%s'", command);
+	
+	zabbix_log(LOG_LEVEL_DEBUG, "RUN_COMMAND to be started as NOWAIT",flag);
 	
 	pid = fork(); /* run new thread 1 */
 	switch(pid)
@@ -1334,7 +1341,17 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		case -1:
 			zabbix_log(LOG_LEVEL_WARNING, "fork2 failed for '%s'",command);
 			return SYSINFO_RET_FAIL;
-		case 0: /* replace thread 2 */
+		case 0:
+			/* 
+			 * DON'T REMVE SLEEP
+			 * sleep needed to return server result as "1"
+			 * then we can run "execl"
+			 * otherwise command print result into socket with STDOUT id
+			 */
+			sleep(3); 
+			/**/
+			
+			/* replace thread 2 by the execution of command */
 			if(execl("/bin/sh", "sh", "-c", command, (char *)0))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "execl failed for '%s'",command);
@@ -1940,7 +1957,11 @@ int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	int	res;
 	char	ip[MAX_STRING_LEN];
 	char	zone[MAX_STRING_LEN];
+#ifdef	PACKETSZ
 	char	respbuf[PACKETSZ];
+#else
+	char	respbuf[NS_PACKETSZ];
+#endif
 	struct	in_addr in;
 
 	extern struct __res_state _res;

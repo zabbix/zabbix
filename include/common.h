@@ -22,6 +22,9 @@
 
 #include "sysinc.h"
 
+#define	ZABBIX_REVDATE	"19 July 2006"
+#define	ZABBIX_VERSION	"1.1.1"
+
 #if defined(WIN32)
 #	pragma warning (disable: 4100)
 
@@ -118,8 +121,6 @@
 
 #define	ZBX_FS_DBL	"%f"
 
-#define	ZABBIX_REVDATE	"2 Juna 2006"
-#define	ZABBIX_VERSION	"1.1"
 
 #define MAX_LOG_FILE_LEN (1024*1024)
 
@@ -410,6 +411,8 @@ void	version();
 #define ZBX_TASK_TEST_METRIC     4
 #define ZBX_TASK_SHOW_USAGE      5
 
+/* MAX Length of base64 data */
+#define ZBX_MAX_B64_LEN 16*1024
 
 void   	init_result(AGENT_RESULT *result);
 int    	copy_result(AGENT_RESULT *src, AGENT_RESULT *dist);

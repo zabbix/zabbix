@@ -59,7 +59,7 @@
 	if(isset($_REQUEST["serviceid"]))
 	{
 		$service=get_service_by_serviceid($_REQUEST["serviceid"]);
-		$service=new CLink($service["name"],"srv_status.php?serviceid=".$service["serviceid"],"action");
+		$srvc=new CLink($service["name"],"srv_status.php?serviceid=".$service["serviceid"],"action");
 
 		$status=get_service_status_description($service["status"]);
 
@@ -95,7 +95,7 @@
 		}
 		$actions=new CLink(S_SHOW,"srv_status.php?serviceid=".$service["serviceid"]."&showgraph=1","action");
 		$table->addRow(array(
-			$service,
+			$srvc,
 			$status,
 			$reason,
 			$sla,
