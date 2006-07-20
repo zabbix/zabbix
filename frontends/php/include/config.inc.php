@@ -2340,6 +2340,7 @@ COpt::profiling_stop("script");
 		{
 			if(frmForm.elements[i].type != 'checkbox') continue;
 			if(frmForm.elements[i].name == chkMain) continue;
+			if(frmForm.elements[i].disabled == true) continue;
 			frmForm.elements[i].checked = value;
 		}
 	}

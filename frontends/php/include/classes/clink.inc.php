@@ -44,7 +44,7 @@
 		}
 		function SetUrl($value)
 		{
-			$this->options['href'] = $value;
+			parent::AddOption('href', $value);
 		}
 		function SetTarget($value=NULL)
 		{

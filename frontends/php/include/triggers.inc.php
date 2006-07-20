@@ -464,7 +464,10 @@
 			if($expression[$i] == '}')
 			{
 				$state='';
-				$sql="select h.host,i.key_,f.function,f.parameter,i.itemid from items i,functions f,hosts h where functionid=$functionid and i.itemid=f.itemid and h.hostid=i.hostid";
+				$sql='select h.host,i.key_,f.function,f.parameter,i.itemid'.
+					' from items i,functions f,hosts h'.
+					' where functionid='.$functionid.' and i.itemid=f.itemid and h.hostid=i.hostid';
+
 				$res1=DBselect($sql);
 				$row1=DBfetch($res1);
 				if($html == 0)
@@ -473,15 +476,17 @@
 				}
 				else
 				{
+					$Link = new CLink($row1["host"].":".$row1["key_"]);
 					$item=get_item_by_itemid($row1["itemid"]);
 					if($item["value_type"] ==0) 
 					{
-						$exp=$exp."{<A HREF=\"history.php?action=showgraph&itemid=".$row1["itemid"]."\">".$row1["host"].":".$row1["key_"]."</A>.<B>".$row1["function"]."(</B>".$row1["parameter"]."<B>)</B>}";
+						$Link->SetUrl('history.php?action=showgraph&itemid='.$row1['itemid']);
 					}
 					else
 					{
-						$exp=$exp."{<A HREF=\"history.php?action=showvalues&period=3600&itemid=".$row1["itemid"]."\">".$row1["host"].":".$row1["key_"]."</A>.<B>".$row1["function"]."(</B>".$row1["parameter"]."<B>)</B>}";
+						$Link->SetUrl('history.php?action=showvalues&period=3600&itemid='.$row1['itemid']);
 					}
+					$exp .= $Link->ToString().'.'.bold($row1["function"].'(').$row1["parameter"].bold(')');
 				}
 				continue;
 			}
