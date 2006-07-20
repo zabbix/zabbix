@@ -539,6 +539,27 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 	if(value->type & AR_TEXT)
 		zabbix_log( LOG_LEVEL_DEBUG, "In add_history(%d,TEXT:[%s])", item->itemid, value->text);
 
+	if(item->store_equal == ZBX_ITEM_IGNORE_EQUAL)
+	{
+		if(value->type & AR_STRING)
+		{
+			if( item->prevvalue_null == 0 && strcmp(item->prevvalue_str, value->str) == 0)
+			{
+				zabbix_log( LOG_LEVEL_DEBUG, "Ignoring equal value for [%s]", item->key);
+				return ret;
+			}
+		}
+		/* Does not work currently because prevvalue is not updated for text */
+		else if(value->type & AR_TEXT)
+		{
+			if( item->prevvalue_null == 0 && strcmp(item->prevvalue_str, value->text) == 0)
+			{
+				zabbix_log( LOG_LEVEL_DEBUG, "Ignoring equal value for [%s]", item->key);
+				return ret;
+			}
+		}
+	}
+
 	if(item->history>0)
 	{
 		if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) || (item->value_type==ITEM_VALUE_TYPE_UINT64))

@@ -581,12 +581,13 @@ CREATE TABLE items (
 	snmpv3_securitylevel	number(3) DEFAULT '0' NOT NULL,
 	snmpv3_authpassphrase	varchar2(64) DEFAULT NULL,
 	snmpv3_privpassphrase	varchar2(64) DEFAULT NULL,
-	formula		varchar2(255) DEFAULT '0' NOT NULL,
-	error		varchar2(128) DEFAULT NULL,
-	lastlogsize	number(10) DEFAULT '0' NOT NULL,
-	logtimefmt	varchar2(64) DEFAULT NULL,
-	templateid	number(10) DEFAULT '0' NOT NULL,
-	valuemapid	number(10) DEFAULT '0' NOT NULL,
+	formula		varchar2(255)	DEFAULT '0' NOT NULL,
+	error		varchar2(128)	DEFAULT NULL,
+	lastlogsize	number(10)	DEFAULT '0' NOT NULL,
+	logtimefmt	varchar2(64)	DEFAULT NULL,
+	templateid	number(10)	DEFAULT '0' NOT NULL,
+	valuemapid	number(10)	DEFAULT '0' NOT NULL,
+	store_equal	number(3)	DEFAULT '0' NOT NULL,
   	CONSTRAINT 	items_pk PRIMARY KEY (itemid)
 );
 

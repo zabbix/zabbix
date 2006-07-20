@@ -278,6 +278,10 @@
 #define SERVICE_ALGORITHM_MAX	1
 #define SERVICE_ALGORITHM_MIN	2
 
+/* Ignore equal values */
+#define ZBX_ITEM_STORE_EQUAL	0
+#define ZBX_ITEM_IGNORE_EQUAL	1
+
 #define	AGENTD_FORKS	5
 
 #define	TRAPPERD_FORKS	5

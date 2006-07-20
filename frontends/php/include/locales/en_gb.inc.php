@@ -534,6 +534,9 @@
 	"S_LOG_TIME_FORMAT"=>			"Log time format",
 	"S_CREATE_ITEM"=>			"Create Item",
 	"S_ADD_ITEM"=>				"Add Item",
+	"S_STORE_ALL_VALUES"=>			"Store all values",
+	"S_IGNORE_EQUAL_VALUES"=>		"Ignore equal values",
+	"S_STORE_VALUES"=>			"Store values",
 
 //	events.php
 	"S_LATEST_EVENTS"=>			"Latest events",

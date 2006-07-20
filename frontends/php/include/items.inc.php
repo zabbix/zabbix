@@ -21,13 +21,13 @@
 <?php
 	# Update Item definition for selected group
 
-	function	update_item_in_group($groupid,$itemid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid,$applications)
+	function	update_item_in_group($groupid,$itemid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid,$applications,$store_equal)
 	{
 		$sql="select i.itemid,i.hostid from hosts_groups hg,items i where hg.groupid=$groupid and i.key_=".zbx_dbstr($key)." and hg.hostid=i.hostid";
 		$result=DBexecute($sql);
 		while($row=DBfetch($result))
 		{
-			update_item($row["itemid"],$description,$key,$row["hostid"],$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid,$applications);
+			update_item($row["itemid"],$description,$key,$row["hostid"],$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid,$applications,$store_equal);
 		}
 		return 1;
 	}
@@ -60,13 +60,13 @@
 
 	# Add Item definition to selected group
 
-	function	add_item_to_group($groupid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid,$applications)
+	function	add_item_to_group($groupid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid,$applications,$store_equal)
 	{
 		$sql="select hostid from hosts_groups where groupid=$groupid";
 		$result=DBexecute($sql);
 		while($row=DBfetch($result))
 		{
-			add_item($description,$key,$row["hostid"],$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid,$applications);
+			add_item($description,$key,$row["hostid"],$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid,$applications,$store_equal);
 		}
 		return 1;
 	}
@@ -77,7 +77,7 @@
 		$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,
 		$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,
 		$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,
-		$valuemapid,$applications,$templateid=0)
+		$valuemapid,$applications,$store_equal,$templateid=0)
 	{
 		$host=get_host_by_hostid($hostid);
 
@@ -162,6 +162,7 @@
 				$snmpv3_authpassphrase, $snmpv3_privpassphrase, $formula,
 				$trends, $logtimefmt, $valuemapid, 
 				get_same_applications_for_host($applications, $db_item["hostid"]),
+				$store_equal,
 				$templateid);
 
 			return $result;
@@ -178,7 +179,7 @@
 			zbx_dbstr($trapper_hosts).",$snmp_port,".zbx_dbstr($units).",$multiplier,$delta,".
 			zbx_dbstr($snmpv3_securityname).",$snmpv3_securitylevel,".
 			zbx_dbstr($snmpv3_authpassphrase).",".zbx_dbstr($snmpv3_privpassphrase).",".
-			zbx_dbstr($formula).",$trends,".zbx_dbstr($logtimefmt).",$valuemapid,$templateid)");
+			zbx_dbstr($formula).",$trends,".zbx_dbstr($logtimefmt).",$valuemapid,$store_equal,$templateid)");
 
 
 		if(!$result)
@@ -206,6 +207,7 @@
 				$snmpv3_authpassphrase, $snmpv3_privpassphrase, $formula,
 				$trends, $logtimefmt, $valuemapid,				
 				get_same_applications_for_host($applications, $db_host["hostid"]),
+				$store_equal,
 				$itemid);
 			if(!$result)
 				break;
@@ -244,7 +246,7 @@
 	function	update_item($itemid,$description,$key,$hostid,$delay,$history,$status,$type,
 		$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,
 		$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,
-		$formula,$trends,$logtimefmt,$valuemapid,$applications,$templateid=0)
+		$formula,$trends,$logtimefmt,$valuemapid,$applications,$store_equal,$templateid=0)
 	{
 		$host = get_host_by_hostid($hostid);
 
@@ -297,6 +299,7 @@
 				$snmpv3_authpassphrase, $snmpv3_privpassphrase, $formula,
 				$trends, $logtimefmt, $valuemapid,
 				get_same_applications_for_host($applications, $db_tmp_item["hostid"]),
+				$store_equal,
 				$itemid);
 
 
@@ -334,7 +337,7 @@
 			"snmpv3_authpassphrase=".zbx_dbstr($snmpv3_authpassphrase).",".
 			"snmpv3_privpassphrase=".zbx_dbstr($snmpv3_privpassphrase).",".
 			"formula=".zbx_dbstr($formula).",trends=$trends,logtimefmt=".zbx_dbstr($logtimefmt).",".
-			"valuemapid=$valuemapid,templateid=$templateid where itemid=$itemid");
+			"valuemapid=$valuemapid,templateid=$templateid,store_equal=$store_equal where itemid=$itemid");
 		if($result)
 		{
 			info("Item '".$host["host"].":$key' updated");
@@ -395,6 +398,7 @@
 				$db_tmp_item["logtimefmt"],
 				$db_tmp_item["valuemapid"],
 				$applications,
+				$store_equal,
 				$db_tmp_item["itemid"]);
 		}
 	}

@@ -73,6 +73,8 @@
 		"multiplier"=>	array(T_ZBX_INT, O_OPT,  NULL,  IN("0,1"),'isset({save})&&'.IN("0,3","type")),
 		"delta"=>	array(T_ZBX_INT, O_OPT,  NULL,  IN("0,1,2"),'isset({save})&&'.IN("0,3","type")),
 
+		"store_equal"=>	array(T_ZBX_INT, O_OPT,  NULL,  IN("0,1"),'isset({save})&&'.IN("0,3","type")),
+
 		"formula"=>	array(T_ZBX_DBL, O_OPT,  NULL,  NULL,'isset({save})&&{multiplier}==1'),
 		"logtimefmt"=>	array(T_ZBX_STR, O_OPT,  NULL,  NULL,'isset({save})&&{value_type}==2'),
                  
@@ -123,7 +125,8 @@
 				$_REQUEST["multiplier"],$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],
 				$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],
 				$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],
-				$_REQUEST["logtimefmt"],$_REQUEST["valuemapid"],$applications);
+				$_REQUEST["logtimefmt"],$_REQUEST["valuemapid"],$applications,
+				$_REQUEST["store_equal"]);
 
 			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 		}
@@ -137,7 +140,8 @@
 				$_REQUEST["multiplier"],$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],
 				$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],
 				$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],
-				$_REQUEST["logtimefmt"],$_REQUEST["valuemapid"],$applications);
+				$_REQUEST["logtimefmt"],$_REQUEST["valuemapid"],$applications,
+				$_REQUEST["store_equal"]);
 
 			$result = $itemid;
 			show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
@@ -175,7 +179,7 @@
 					$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],
 					$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],
 					$_REQUEST["trends"],$_REQUEST["logtimefmt"],$_REQUEST["valuemapid"],
-					$applications);
+					$applications,$_REQUEST["store_equal"]);
 				show_messages($itemid, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 				if($itemid){
 					unset($_REQUEST["form"]);
@@ -196,7 +200,7 @@
 					$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],
 					$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],
 					$_REQUEST["trends"],$_REQUEST["logtimefmt"],$_REQUEST["valuemapid"],
-					$applications);
+					$applications,$_REQUEST["store_equal"]);
 				show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 				if($result){
 					unset($_REQUEST["form"]);

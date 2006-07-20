@@ -284,6 +284,8 @@
 		$formula	= get_request("formula"		,"1");
 		$logtimefmt	= get_request("logtimefmt"	,"");
 
+		$store_equal	= get_request("store_equal"	,0);
+
 		$add_groupid	= get_request("add_groupid"	,get_request("groupid",0));
 
 
@@ -330,6 +332,8 @@
 
 			$formula	= $row["formula"];
 			$logtimefmt	= $row["logtimefmt"];
+
+			$store_equal	= $row["store_equal"];
 
 			$db_applications = get_applications_by_itemid($_REQUEST["itemid"]);
 			while($db_app = DBfetch($db_applications))
@@ -510,6 +514,14 @@
 		else
 		{
 			$frmItem->AddVar("valuemapid",0);
+		}
+
+		if(($value_type==ITEM_VALUE_TYPE_TEXT) || ($value_type == ITEM_VALUE_TYPE_STR))
+		{
+			$cmbStoreEqual = new CComboBox("store_equal",$store_equal);
+			$cmbStoreEqual->AddItem(0,S_STORE_ALL_VALUES);
+			$cmbStoreEqual->AddItem(1,S_IGNORE_EQUAL_VALUES);
+			$frmItem->AddRow(S_STORE_VALUES,$cmbStoreEqual);
 		}
 
 		if($type==2)

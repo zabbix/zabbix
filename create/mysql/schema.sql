@@ -373,6 +373,8 @@ CREATE TABLE items (
 	templateid	int(4) DEFAULT '0' NOT NULL,
 	valuemapid	int(4) DEFAULT '0' NOT NULL,
 
+	store_equal	int(1) DEFAULT '0' NOT NULL,
+
 	PRIMARY KEY	(itemid),
 	UNIQUE		shortname (hostid,key_),
 --	KEY		(hostid),

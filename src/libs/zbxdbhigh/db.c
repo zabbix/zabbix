@@ -1676,4 +1676,5 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 	item->trapper_hosts=row[32];
 	item->logtimefmt=row[33];
 	item->valuemapid=atoi(row[34]);
+	item->store_equal=atoi(row[35]);
 }
