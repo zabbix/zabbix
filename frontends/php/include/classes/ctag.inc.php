@@ -84,7 +84,9 @@
 		{
 			$res = $this->tag_start.'<'.$this->tagname;
 			foreach($this->options as $key => $value)
+			{
 				$res .= ' '.$key.'="'.$value.'"';
+			}
 			$res .= ($this->paired=='yes') ? '>' : '/>';
 			return $res;
 		}

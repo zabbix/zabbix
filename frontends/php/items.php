@@ -300,7 +300,7 @@
 			{
 				$item = get_item_by_itemid($id);
 				if($item["templateid"]<>0)	continue;
-				$result2=delete_item($id);
+				delete_item($id);
 			}
 			show_messages(TRUE, S_ITEMS_DELETED, S_CANNOT_DELETE_ITEMS);
 		}
@@ -309,7 +309,7 @@
 			$group_itemid = $_REQUEST["group_itemid"];
 			foreach($group_itemid as $id)
 			{
-				$result2=activate_item($id);
+				activate_item($id);
 			}
 			show_messages(TRUE, S_ITEMS_ACTIVATED, S_CANNOT_ACTIVATE_ITEMS);
 		}
@@ -318,7 +318,7 @@
 			$group_itemid = $_REQUEST["group_itemid"];
 			foreach($group_itemid as $id)
 			{
-				$result2=disable_item($id);
+				disable_item($id);
 			}
 			show_messages(TRUE, S_ITEMS_DISABLED, S_CANNOT_DISABLE_ITEMS);
 		}
@@ -515,11 +515,10 @@
 				$applications .= $db_app["name"].", ";
 			}
 
+			$chkBox = new CCheckBox("group_itemid[]",NULL,NULL,$db_item["itemid"]);
+			if($db_item["templateid"] > 0) $chkBox->SetEnabled(false);
 			$table->AddRow(array(
-				array(
-					new CCheckBox("group_itemid[]",NULL,NULL,$db_item["itemid"]),
-					$db_item["itemid"]
-				),
+				array($chkBox, $db_item["itemid"]),
 				$description,
 				$db_item["key_"],
 				$db_item["delay"],
@@ -544,6 +543,7 @@
 		array_push($footerButtons, SPACE);
 		array_push($footerButtons, new CButton('group_task','Delete selected',
 			"return Confirm('".S_DELETE_SELECTED_ITEMS_Q."');"));
+		array_push($footerButtons, SPACE);
 		array_push($footerButtons, new CButton('form_copy_to','Copy selected to ...'));
 		$table->SetFooter(new CCol($footerButtons));
 

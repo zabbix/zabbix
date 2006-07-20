@@ -342,14 +342,14 @@
 				continue;
 			}
 
-			$description = array(
-				new CCheckBox(
-					"g_triggerid[]",	/* name */
-					NULL,			/* checked */
-					NULL,			/* action */
-					$row["triggerid"]),	/* value */
-				SPACE
-				);
+			$chkBox =  new CCheckBox(
+                                        "g_triggerid[]",        /* name */
+                                        NULL,                   /* checked */
+                                        NULL,                   /* action */
+                                        $row["triggerid"]);     /* value */
+
+			if($row["templateid"] > 0) $chkBox->SetEnabled(false);
+			$description = array($chkBox,SPACE);
 
 			if($row["templateid"] == 0)
 			{

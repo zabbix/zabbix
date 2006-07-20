@@ -1001,7 +1001,7 @@
 
 		$frmGItem->AddItemToBottomRow(new CButton("save",S_SAVE));
 		$frmGItem->AddItemToBottomRow(SPACE);
-		if(isset($itemid))
+		if(isset($_REQUEST["gitemid"]))
 		{
 			$frmGItem->AddItemToBottomRow(new CButtonDelete("Delete graph element?",
 				url_param("gitemid").url_param("graphid")));

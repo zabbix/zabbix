@@ -51,7 +51,7 @@
 		{
 			$this->var_container = array();
 
-			if(null == $value) return;
+			if(is_null($value)) return;
 
 			if(is_array($value))
 			{

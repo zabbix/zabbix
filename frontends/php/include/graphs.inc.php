@@ -498,7 +498,7 @@
 		$result = copy_graphitems_for_host($graphid, $new_graphid, $hostid);
 		if(!$result)
 		{
-			delete_graph($graphid);
+			delete_graph($new_graphid);
 		}
 		return $result;
 	}
