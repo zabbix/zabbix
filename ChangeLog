@@ -1,5 +1,6 @@
 Changes for 1.3:
 
+ - developed group functionality for graphs (Eugene)
  - developed "Copty to" functionality for trigger groups (Eugene)
  - developed "Copty to" functionality for item groups  (Eugene)
  - developed template unlinking feature (Eugene) 
