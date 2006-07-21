@@ -2670,7 +2670,7 @@ COpt::profiling_stop("script");
 
 	function	set_image_header()
 	{
-		// Header( "Content-type:  text/html"); 
+		//Header( "Content-type:  text/html"); 
 
 		if(MAP_OUTPUT_FORMAT == "JPG")	Header( "Content-type:  image/jpeg"); 
 		else				Header( "Content-type:  image/png"); 

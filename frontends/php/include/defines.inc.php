@@ -228,6 +228,8 @@
 	define("GRAPH_ITEM_SIMPLE" , 	0);
 	define("GRAPH_ITEM_AGGREGATED",	1);
 
+	define("GRAPH_TYPE_NORMAL",	0);
+	define("GRAPH_TYPE_STACKED",	1);
 /* Support for PHP5. PHP5 does not have $HTTP_..._VARS */
 	if (!function_exists('version_compare'))
 	{
