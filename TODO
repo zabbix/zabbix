@@ -1,5 +1,6 @@
 1.3:
 
+ - parameter to disable log rotation
  - fix order for displaying log files order by clock desc,id desc
  - fix wrong ownership and possibly pid number for agent and server
  - use of aggregates in triggers
