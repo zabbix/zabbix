@@ -523,6 +523,10 @@
 			$cmbStoreEqual->AddItem(1,S_IGNORE_EQUAL_VALUES);
 			$frmItem->AddRow(S_STORE_VALUES,$cmbStoreEqual);
 		}
+		else
+		{
+			$frmItem->AddVar("store_equal",$store_equal);
+		}
 
 		if($type==2)
 		{
