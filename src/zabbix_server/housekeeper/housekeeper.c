@@ -194,9 +194,93 @@ static int housekeeping_alarms(int now)
 	return res;
 }
 
+
+/******************************************************************************
+ *                                                                            *
+ * Function: housekeeping_history_and_trends                                  *
+ *                                                                            *
+ * Purpose: remove outdated information from history and trends               *
+ *                                                                            *
+ * Parameters: now - current timestamp                                        *
+ *                                                                            *
+ * Return value: SUCCEED - information removed succesfully                    *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int housekeeping_history_and_trends(int now)
+{
+	char		sql[MAX_STRING_LEN];
+	DB_ITEM		item;
+
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	int		deleted = 0;
+
+	zabbix_log( LOG_LEVEL_DEBUG, "In housekeeping_history_and_trends(%d)", now);
+
+	snprintf(sql,sizeof(sql)-1,"select itemid,history,delay,trends from items");
+	result = DBselect(sql);
+
+	while((row=DBfetch(result)))
+	{
+		item.itemid=atoi(row[0]);
+		item.history=atoi(row[1]);
+		item.delay=atoi(row[2]);
+		item.trends=atoi(row[3]);
+
+		if(item.delay==0)
+		{
+			item.delay=1;
+		}
+
+#ifdef HAVE_MYSQL
+		snprintf(sql,sizeof(sql)-1,"delete from history where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
+#else
+		snprintf(sql,sizeof(sql)-1,"delete from history where itemid=%d and clock<%d",item.itemid,now-24*3600*item.history);
+#endif
+		deleted += DBexecute(sql);
+
+#ifdef HAVE_MYSQL
+		snprintf(sql,sizeof(sql)-1,"delete from history_uint where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
+#else
+		snprintf(sql,sizeof(sql)-1,"delete from history_uint where itemid=%d and clock<%d",item.itemid,now-24*3600*item.history);
+#endif
+		deleted += DBexecute(sql);
+
+#ifdef HAVE_MYSQL
+		snprintf(sql,sizeof(sql)-1,"delete from history_str where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
+#else
+		snprintf(sql,sizeof(sql)-1,"delete from history_str where itemid=%d and clock<%d",item.itemid,now-24*3600*item.history);
+#endif
+		deleted += DBexecute(sql);
+
+#ifdef HAVE_MYSQL
+		snprintf(sql,sizeof(sql)-1,"delete from history_log where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
+#else
+		snprintf(sql,sizeof(sql)-1,"delete from history_log where itemid=%d and clock<%d",item.itemid,now-24*3600*item.history);
+#endif
+		deleted += DBexecute(sql);
+
+#ifdef HAVE_MYSQL
+		snprintf(sql,sizeof(sql)-1,"delete from trends where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.trends,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
+#else
+		snprintf(sql,sizeof(sql)-1,"delete from trends where itemid=%d and clock<%d",item.itemid,now-24*3600*item.trends);
+#endif
+		deleted += DBexecute(sql);
+	}
+	DBfree_result(result);
+	return deleted;
+}
+
 int main_housekeeper_loop()
 {
 	int	now;
+	int	d;
 
 	if(CONFIG_DISABLE_HOUSEKEEPING == 1)
 	{
@@ -211,6 +295,7 @@ int main_housekeeper_loop()
 
 	for(;;)
 	{
+		zabbix_log( LOG_LEVEL_WARNING, "Executing housekeeper");
 		now = time(NULL);
 
 		zbx_setproctitle("connecting to the database");
@@ -228,7 +313,8 @@ int main_housekeeper_loop()
 
 /*		zbx_setproctitle("housekeeper [removing old history]");*/
 
-/*		housekeeping_history_and_trends(now);*/
+		d = housekeeping_history_and_trends(now);
+		zabbix_log( LOG_LEVEL_WARNING, "Deleted %d records from history and trends", d);
 
 		zbx_setproctitle("housekeeper [removing old history]");
 
@@ -255,6 +341,7 @@ int main_housekeeper_loop()
 		zbx_setproctitle("housekeeper [sleeping for %d hour(s)]", CONFIG_HOUSEKEEPING_FREQUENCY);
 
 		DBclose();
+		zabbix_log( LOG_LEVEL_WARNING, "Next housekeeper run is after %dh", CONFIG_HOUSEKEEPING_FREQUENCY);
 		sleep(3660*CONFIG_HOUSEKEEPING_FREQUENCY);
 	}
 }
