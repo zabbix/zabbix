@@ -213,7 +213,6 @@ static int housekeeping_alarms(int now)
  ******************************************************************************/
 static int housekeeping_history_and_trends(int now)
 {
-	char		sql[MAX_STRING_LEN];
 	DB_ITEM		item;
 
 	DB_RESULT	result;
@@ -223,8 +222,7 @@ static int housekeeping_history_and_trends(int now)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In housekeeping_history_and_trends(%d)", now);
 
-	snprintf(sql,sizeof(sql)-1,"select itemid,history,delay,trends from items");
-	result = DBselect(sql);
+	result = DBselect("select itemid,history,delay,trends from items");
 
 	while((row=DBfetch(result)))
 	{
@@ -239,39 +237,34 @@ static int housekeeping_history_and_trends(int now)
 		}
 
 #ifdef HAVE_MYSQL
-		snprintf(sql,sizeof(sql)-1,"delete from history where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
+		deleted += DBexecute("delete from history where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
 #else
-		snprintf(sql,sizeof(sql)-1,"delete from history where itemid=%d and clock<%d",item.itemid,now-24*3600*item.history);
+		deleted += DBexecute("delete from history where itemid=%d and clock<%d",item.itemid,now-24*3600*item.history);
 #endif
-		deleted += DBexecute(sql);
 
 #ifdef HAVE_MYSQL
-		snprintf(sql,sizeof(sql)-1,"delete from history_uint where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
+		deleted += DBexecute("delete from history_uint where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
 #else
-		snprintf(sql,sizeof(sql)-1,"delete from history_uint where itemid=%d and clock<%d",item.itemid,now-24*3600*item.history);
+		deleted += DBexecute("delete from history_uint where itemid=%d and clock<%d",item.itemid,now-24*3600*item.history);
 #endif
-		deleted += DBexecute(sql);
 
 #ifdef HAVE_MYSQL
-		snprintf(sql,sizeof(sql)-1,"delete from history_str where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
+		deleted += DBexecute("delete from history_str where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
 #else
-		snprintf(sql,sizeof(sql)-1,"delete from history_str where itemid=%d and clock<%d",item.itemid,now-24*3600*item.history);
+		deleted += DBexecute("delete from history_str where itemid=%d and clock<%d",item.itemid,now-24*3600*item.history);
 #endif
-		deleted += DBexecute(sql);
 
 #ifdef HAVE_MYSQL
-		snprintf(sql,sizeof(sql)-1,"delete from history_log where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
+		deleted += DBexecute("delete from history_log where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
 #else
-		snprintf(sql,sizeof(sql)-1,"delete from history_log where itemid=%d and clock<%d",item.itemid,now-24*3600*item.history);
+		deleted += DBexecute("delete from history_log where itemid=%d and clock<%d",item.itemid,now-24*3600*item.history);
 #endif
-		deleted += DBexecute(sql);
 
 #ifdef HAVE_MYSQL
-		snprintf(sql,sizeof(sql)-1,"delete from trends where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.trends,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
+		deleted += DBexecute("delete from trends where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.trends,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
 #else
-		snprintf(sql,sizeof(sql)-1,"delete from trends where itemid=%d and clock<%d",item.itemid,now-24*3600*item.trends);
+		deleted += DBexecute("delete from trends where itemid=%d and clock<%d",item.itemid,now-24*3600*item.trends);
 #endif
-		deleted += DBexecute(sql);
 	}
 	DBfree_result(result);
 	return deleted;
