@@ -1,5 +1,6 @@
 Changes for 1.1.2:
 
+ - fixed housekeeper, removal of historical and trend data (Alexei)
  - fixed caption of IT Services Availability Report (Alexei)
 
 Changes for 1.1.1:
