@@ -681,6 +681,7 @@
 	"S_FALSE"=>				"False",
 
 //	report3.php
+	"S_IT_SERVICES_AVAILABILITY_REPORT"=>	"IT services availability report",
 	"S_IT_SERVICES_AVAILABILITY_REPORT_BIG"=>	"IT SERVICES AVAILABILITY REPORT",
 	"S_FROM"=>				"From",
 	"S_TILL"=>				"Till",
