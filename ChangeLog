@@ -1,5 +1,6 @@
 Changes for 1.1.1-le:
 
+ - fixed more problems related to items form (Alexei)
  - fixed some problems related to items form (Alexei)
  - support of ignoring equal values to save history (Alexei)
 

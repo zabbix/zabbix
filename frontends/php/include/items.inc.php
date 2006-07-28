@@ -173,7 +173,7 @@
 			" (description,key_,hostid,delay,history,nextcheck,status,type,".
 			"snmp_community,snmp_oid,value_type,trapper_hosts,snmp_port,units,multiplier,".
 			"delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,".
-			"snmpv3_privpassphrase,formula,trends,logtimefmt,valuemapid,templateid)".
+			"snmpv3_privpassphrase,formula,trends,logtimefmt,valuemapid,store_equal,templateid)".
 			" values (".zbx_dbstr($description).",".zbx_dbstr($key).",$hostid,$delay,$history,0,
 			$status,$type,".zbx_dbstr($snmp_community).",".zbx_dbstr($snmp_oid).",$value_type,".
 			zbx_dbstr($trapper_hosts).",$snmp_port,".zbx_dbstr($units).",$multiplier,$delta,".
