@@ -37,6 +37,7 @@
 		"width"=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
 		"height"=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
 		"yaxistype"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0,1"),		'isset({save})'),
+		"graphtype"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0,1"),		'isset({save})'),
 		"yaxismin"=>	array(T_ZBX_DBL, O_OPT,	 NULL,	BETWEEN(-65535,65535),	'isset({save})'),
 		"yaxismax"=>	array(T_ZBX_DBL, O_OPT,	 NULL,	BETWEEN(-65535,65535),	'isset({save})'),
 		"yaxismax"=>	array(T_ZBX_DBL, O_OPT,	 NULL,	BETWEEN(-65535,65535),	'isset({save})'),
@@ -81,7 +82,7 @@
 			$result=update_graph($_REQUEST["graphid"],
 				$_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],
 				$_REQUEST["yaxistype"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"],
-				$showworkperiod,$showtriggers);
+				$showworkperiod,$showtriggers,$_REQUEST["graphtype"]);
 
 			if($result)
 			{
@@ -95,7 +96,7 @@
 		{
 			$result=add_graph($_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],
 				$_REQUEST["yaxistype"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"],
-				$showworkperiod,$showtriggers);
+				$showworkperiod,$showtriggers,$_REQUEST["graphtype"]);
 			if($result)
 			{
 				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH,
@@ -198,7 +199,7 @@
 /* TABLE */
 		$table = new CTableInfo(S_NO_GRAPHS_DEFINED);
 		$table->setHeader(array(S_ID,
-			$_REQUEST["hostid"] != 0 ? NULL : S_HOSTS, S_NAME,S_WIDTH,S_HEIGHT,S_GRAPH));
+			$_REQUEST["hostid"] != 0 ? NULL : S_HOSTS, S_NAME,S_WIDTH,S_HEIGHT,S_GRAPH_TYPE,S_GRAPH));
 
 		if($_REQUEST["hostid"] > 0)
 		{
@@ -260,12 +261,19 @@
 				$edit = SPACE;
 			}
 
+			if($row["graphtype"] == GRAPH_TYPE_STACKED)
+				$graphtype = S_STACKED;
+			else
+				$graphtype = S_NORMAL;
+		
+
 			$table->AddRow(array(
 				$row["graphid"],
 				$host_list,
 				$name,
 				$row["width"],
 				$row["height"],
+				$graphtype,
 				$edit
 				));
 		}

@@ -308,6 +308,9 @@
 	"S_MAX_SMALL"=>				"max",
 	"S_DRAW_STYLE"=>			"Draw style",
 	"S_SIMPLE"=>				"Simple",
+	"S_GRAPH_TYPE"=>			"Graph type",
+	"S_STACKED"=>				"Stacked",
+	"S_NORMAL"=>				"Normal",
 	"S_AGGREGATED"=>			"Aggregated",
 	"S_AGGREGATED_PERIODS_COUNT"=>			"Aggregated periods count",
 

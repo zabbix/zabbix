@@ -22,6 +22,7 @@
 // TODO !!! Correcr the help links !!! TODO
 
 	include_once 	"include/defines.inc.php";
+	include_once 	"include/classes/graph.inc.php";
 	include_once 	"include/db.inc.php";
 
 	function	insert_new_message_form()
@@ -748,6 +749,7 @@
 			$yaxismax	=$row["yaxismax"];
 			$showworkperiod = $row["show_work_period"];
 			$showtriggers	= $row["show_triggers"];
+			$graphtype	= $row["graphtype"];
 		} else {
 			$name		=get_request("name"	,"");
 			$width		=get_request("width"	,900);
@@ -757,11 +759,18 @@
 			$yaxismax	=get_request("yaxismax"	,100.00);
 			$showworkperiod = get_request("showworkperiod",1);
 			$showtriggers	= get_request("showtriggers",1);
+			$graphtype	= get_request("graphtype",GRAPH_TYPE_NORMAL);
 		}
 	
 		$frmGraph->AddRow(S_NAME,new CTextBox("name",$name,32));
 		$frmGraph->AddRow(S_WIDTH,new CTextBox("width",$width,5));
 		$frmGraph->AddRow(S_HEIGHT,new CTextBox("height",$height,5));
+
+		$cmbGType = new CComboBox("graphtype",$graphtype);
+		$cmbGType->AddItem(GRAPH_TYPE_NORMAL,S_NORMAL);
+		$cmbGType->AddItem(GRAPH_TYPE_STACKED,S_STACKED);
+		$frmGraph->AddRow(S_GRAPH_TYPE,$cmbGType);
+
 		$frmGraph->AddRow(S_SHOW_WORKING_TIME,new CCheckBox("showworkperiod",$showworkperiod,NULL,1));
 		$frmGraph->AddRow(S_SHOW_TRIGGERS,new CCheckBox("showtriggers",$showtriggers,NULL,1));
 
@@ -801,6 +810,7 @@
 		$frmGItem->SetHelp("web.graph.item.php");
 		
 
+		$db_graph = get_graph_by_graphid($_REQUEST["graphid"]);
 		$db_hosts = get_hosts_by_graphid($_REQUEST["graphid"]);
 		$db_host = DBfetch($db_hosts);
 		if(!$db_host)
@@ -870,10 +880,18 @@
 		}
 		$frmGItem->AddRow(S_PARAMETER, $cmbItems);
 
-		$cmbType = new CComboBox("type",$type,"submit()");
-		$cmbType->AddItem(GRAPH_ITEM_SIMPLE, S_SIMPLE);
-		$cmbType->AddItem(GRAPH_ITEM_AGGREGATED, S_AGGREGATED);
-		$frmGItem->AddRow(S_TYPE, $cmbType);
+		if($db_graph["graphtype"] == GRAPH_TYPE_NORMAL)
+		{
+			$cmbType = new CComboBox("type",$type,"submit()");
+			$cmbType->AddItem(GRAPH_ITEM_SIMPLE, S_SIMPLE);
+			$cmbType->AddItem(GRAPH_ITEM_AGGREGATED, S_AGGREGATED);
+			$frmGItem->AddRow(S_TYPE, $cmbType);
+		}
+		else
+		{
+			$frmGItem->AddVar("type",GRAPH_ITEM_SIMPLE);
+		}
+		
 
 		if($type == GRAPH_ITEM_AGGREGATED)
 		{
@@ -887,19 +905,30 @@
 		{
 			$frmGItem->AddVar("periods_cnt",$periods_cnt);
 
-			$cmbFnc = new CComboBox("calc_fnc",$calc_fnc);
-			$cmbFnc->AddItem(CALC_FNC_ALL, S_ALL_SMALL);
+			$cmbFnc = new CComboBox("calc_fnc",$calc_fnc,'submit();');
+
+			if($db_graph["graphtype"] == GRAPH_TYPE_NORMAL)
+				$cmbFnc->AddItem(CALC_FNC_ALL, S_ALL_SMALL);
+
 			$cmbFnc->AddItem(CALC_FNC_MIN, S_MIN_SMALL);
 			$cmbFnc->AddItem(CALC_FNC_AVG, S_AVG_SMALL);
 			$cmbFnc->AddItem(CALC_FNC_MAX, S_MAX_SMALL);
 			$frmGItem->AddRow(S_FUNCTION, $cmbFnc);
 
-			$cmbType = new CComboBox("drawtype",$drawtype);
-			$cmbType->AddItem(0,get_drawtype_description(0));
-			$cmbType->AddItem(1,get_drawtype_description(1));
-			$cmbType->AddItem(2,get_drawtype_description(2));
-			$cmbType->AddItem(3,get_drawtype_description(3));
-			$frmGItem->AddRow(S_DRAW_STYLE, $cmbType);
+			if($db_graph["graphtype"] == GRAPH_TYPE_NORMAL)
+			{
+				$cmbType = new CComboBox("drawtype",$drawtype);
+				$cmbType->AddItem(0,get_drawtype_description(0));
+				if($calc_fnc != CALC_FNC_ALL)
+					$cmbType->AddItem(1,get_drawtype_description(1));
+				$cmbType->AddItem(2,get_drawtype_description(2));
+				$cmbType->AddItem(3,get_drawtype_description(3));
+				$frmGItem->AddRow(S_DRAW_STYLE, $cmbType);
+			}
+			else
+			{
+				$frmGItem->AddVar("drawtype", 1);
+			}
 
 			$cmbColor = new CComboBox("color",$color);
 			$cmbColor->AddItem("Black",		S_BLACK);
