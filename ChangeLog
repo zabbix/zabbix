@@ -1,5 +1,7 @@
 Changes for 1.1.2:
 
+ - better pattern of distribution of item next checks to improve overall
+ performance (Alexei)
  - fixed housekeeper, removal of historical and trend data (Alexei)
  - fixed caption of IT Services Availability Report (Alexei)
 
