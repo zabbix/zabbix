@@ -285,7 +285,9 @@ int get_values(void)
 		{
 			if(item.status == ITEM_STATUS_NOTSUPPORTED)
 			{
-				snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d, lastclock=%d where itemid=%d",calculate_item_nextcheck(CONFIG_REFRESH_UNSUPPORTED,now), now, item.itemid);
+				/* It is not correct */
+/*				snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d, lastclock=%d where itemid=%d",calculate_item_nextcheck(item.itemid, CONFIG_REFRESH_UNSUPPORTED,now), now, item.itemid);*/
+				snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d, lastclock=%d where itemid=%d",CONFIG_REFRESH_UNSUPPORTED+now, now, item.itemid);
 				DBexecute(sql);
 			}
 			else
