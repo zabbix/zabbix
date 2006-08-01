@@ -1,3 +1,12 @@
+Changes for 1.1.2:
+
+ - fixed graphs drawing (Eugene)
+ - fixed graph min value calculation (Eugene)
+ - better pattern of distribution of item next checks to improve overall
+ performance (Alexei)
+ - fixed housekeeper, removal of historical and trend data (Alexei)
+ - fixed caption of IT Services Availability Report (Alexei)
+
 Changes for 1.1.1:
 
  - changed version to 1.1.1 (Alexei)
