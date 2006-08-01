@@ -2340,6 +2340,7 @@ COpt::profiling_stop("script");
 		{
 			if(frmForm.elements[i].type != 'checkbox') continue;
 			if(frmForm.elements[i].name == chkMain) continue;
+			if(frmForm.elements[i].disabled == true) continue;
 			frmForm.elements[i].checked = value;
 		}
 	}
@@ -2418,6 +2419,7 @@ COpt::profiling_stop("script");
 			ImageSetStyle($image, $style);
 			ImageLine($image,$x1,$y1,$x2,$y2,IMG_COLOR_STYLED);
 		}
+
 	}
 	else
 	{
@@ -2425,6 +2427,14 @@ COpt::profiling_stop("script");
 		{
 			ImageDashedLine($image,$x1,$y1,$x2,$y2,$color);
 		}
+	}
+
+	function DashedRectangle($image,$x1,$y1,$x2,$y2,$color)
+	{
+		DashedLine($image, $x1,$y1,$x1,$y2,$color);
+		DashedLine($image, $x1,$y2,$x2,$y2,$color);
+		DashedLine($image, $x2,$y2,$x2,$y1,$color);
+		DashedLine($image, $x2,$y1,$x1,$y1,$color);
 	}
 
 
@@ -2669,7 +2679,7 @@ COpt::profiling_stop("script");
 
 	function	set_image_header()
 	{
-		// Header( "Content-type:  text/html"); 
+		//Header( "Content-type:  text/html"); 
 
 		if(MAP_OUTPUT_FORMAT == "JPG")	Header( "Content-type:  image/jpeg"); 
 		else				Header( "Content-type:  image/png"); 
