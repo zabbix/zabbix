@@ -83,18 +83,6 @@
 	define("HOST_AVAILABLE_TRUE",		1);
 	define("HOST_AVAILABLE_FALSE",		2);
 
-	define("GRAPH_DRAW_TYPE_LINE",0);
-	define("GRAPH_DRAW_TYPE_FILL",1);
-	define("GRAPH_DRAW_TYPE_BOLDLINE",2);
-	define("GRAPH_DRAW_TYPE_DOT",3);
-	define("GRAPH_DRAW_TYPE_DASHEDLINE",4);
-
-	define("GRAPH_YAXIS_TYPE_CALCULATED",0);
-	define("GRAPH_YAXIS_TYPE_FIXED",1);
-
-	define("GRAPH_YAXIS_SIDE_LEFT",0);
-	define("GRAPH_YAXIS_SIDE_RIGHT",1);
-
 	define("MAP_LABEL_TYPE_LABEL",0);
 	define("MAP_LABEL_TYPE_IP",1);
 	define("MAP_LABEL_TYPE_NAME",2);
@@ -225,11 +213,6 @@
 	define("CALC_FNC_ALL", 7);
 
 	
-	define("GRAPH_ITEM_SIMPLE" , 	0);
-	define("GRAPH_ITEM_AGGREGATED",	1);
-
-	define("GRAPH_TYPE_NORMAL",	0);
-	define("GRAPH_TYPE_STACKED",	1);
 /* Support for PHP5. PHP5 does not have $HTTP_..._VARS */
 	if (!function_exists('version_compare'))
 	{

@@ -19,6 +19,25 @@
 **/
 ?>
 <?php
+
+	define("GRAPH_DRAW_TYPE_LINE",0);
+	define("GRAPH_DRAW_TYPE_FILL",1);
+	define("GRAPH_DRAW_TYPE_BOLDLINE",2);
+	define("GRAPH_DRAW_TYPE_DOT",3);
+	define("GRAPH_DRAW_TYPE_DASHEDLINE",4);
+
+	define("GRAPH_YAXIS_TYPE_CALCULATED",0);
+	define("GRAPH_YAXIS_TYPE_FIXED",1);
+
+	define("GRAPH_YAXIS_SIDE_LEFT",0);
+	define("GRAPH_YAXIS_SIDE_RIGHT",1);
+
+	define("GRAPH_ITEM_SIMPLE" , 	0);
+	define("GRAPH_ITEM_AGGREGATED",	1);
+
+	define("GRAPH_TYPE_NORMAL",	0);
+	define("GRAPH_TYPE_STACKED",	1);
+
 	class	Graph
 	{
 		var $period;
@@ -145,7 +164,7 @@
 			}
 		}
 
-		function Graph($type = GRAPH_TYPE_STACKED /* TMP!!! */ /* mist be GRAPH_TYPE_NORMAL */)
+		function Graph($type = GRAPH_TYPE_NORMAL)
 		{
 			$this->period=3600;
 			$this->from=0;
@@ -239,18 +258,21 @@
 			$this->from=$from;
 		}
 
-		function setWidth($width)
+		function setWidth($value = NULL)
 		{
 // Avoid sizeX==0, to prevent division by zero later
-			if($width>0)
-			{
-				$this->sizeX=$width-20;
-			}
+			if($value <= 0) $value = NULL;
+			if(is_null($value)) $value = 900;
+
+			$this->sizeX = $value;
 		}
 
-		function setHeight($height)
+		function setHeight($value = NULL)
 		{
-			$this->sizeY=$height;
+			if($value <= 0) $value = NULL;
+			if(is_null($value)) $value = 900;
+
+			$this->sizeYi = $value;
 		}
 
 		function setBorder($border)
@@ -280,10 +302,13 @@
 
 		function drawSmallRectangle()
 		{
-			DashedLine($this->im,$this->shiftXleft+1,$this->shiftY,$this->shiftXleft+1,$this->sizeY+$this->shiftY,$this->colors["Black No Alpha"]);
-			DashedLine($this->im,$this->shiftXleft+1,$this->shiftY,$this->sizeX+$this->shiftXleft,$this->shiftY,$this->colors["Black No Alpha"]);
-			DashedLine($this->im,$this->sizeX+$this->shiftXleft,$this->shiftY,$this->sizeX+$this->shiftXleft,$this->sizeY+$this->shiftY,$this->colors["Black No Alpha"]);
-			DashedLine($this->im,$this->shiftXleft+1,$this->shiftY+$this->sizeY,$this->sizeX+$this->shiftXleft,$this->sizeY+$this->shiftY,$this->colors["Black No Alpha"]);
+			DashedRectangle($this->im,
+				$this->shiftXleft-1,
+				$this->shiftY-1,
+				$this->sizeX+$this->shiftXleft-1,
+				$this->sizeY+$this->shiftY+1,
+				$this->colors["Black No Alpha"]
+				);
 		}
 
 		function drawRectangle()
@@ -627,13 +652,13 @@
 /**/
 			$min_from	= $data->min[$from]	+ $shift_min_from;
 			$min_to		= $data->min[$to]	+ $shift_min_to;
+
 			$max_from	= $data->max[$from]	+ $shift_max_from;
 			$max_to		= $data->max[$to]	+ $shift_max_to;
+
 			$avg_from	= $data->avg[$from]	+ $shift_avg_from;
 			$avg_to		= $data->avg[$to]	+ $shift_avg_to;
 
-//			$x1 = ($this->sizeX * ($from - $minX)/($maxX-$minX)) + $this->shiftXleft;
-//			$x2 = ($this->sizeX * ($to - $minX)/($maxX-$minX)) + $this->shiftXleft + 1;
 			$x1 = $from + $this->shiftXleft - 1;
 			$x2 = $to + $this->shiftXleft;
 
@@ -886,6 +911,7 @@
 
 			$p = $this->to_time - $this->from_time;
 			$z = $p - $this->from_time % $p;
+			$x = $this->sizeX - 1;
 
 			for($i=0; $i < $this->num; $i++)
 			{
@@ -904,13 +930,29 @@
 				if($this->period <= 24*3600)
 				{
 					array_push($sql_arr,
-						"select itemid,round(900*(mod(clock+$z,$p))/($p),0) as i,count(*) as count,avg(value) as avg,min(value) as min,max(value) as max,max(clock) as clock from history where itemid=".$this->items[$i]["itemid"]." and clock>=".$from_time." and clock<=".$to_time." group by itemid,round(900*(mod(clock+$z,$p))/($p),0)",
-						"select itemid,round(900*(mod(clock+$z,$p))/($p),0) as i,count(*) as count,avg(value) as avg,min(value) as min,max(value) as max,max(clock) as clock from history_uint where itemid=".$this->items[$i]["itemid"]." and clock>=".$from_time." and clock<=".$to_time." group by itemid,round(900*(mod(clock+$z,$p))/($p),0)");
+						'select itemid,round('.$x.'*(mod(clock+'.$z.','.$p.'))/('.$p.'),0) as i,'.
+						' count(*) as count,avg(value) as avg,min(value) as min,'.
+						' max(value) as max,max(clock) as clock'.
+						' from history where itemid='.$this->items[$i]['itemid'].' and clock>='.$from_time.
+						' and clock<='.$to_time.' group by itemid, i' //' round('.$x.'*(mod(clock+'.$z.','.$p.'))/('.$p.'),0)',
+						,
+
+						'select itemid,round('.$x.'*(mod(clock+'.$z.','.$p.'))/('.$p.'),0) as i,'.
+						' count(*) as count,avg(value) as avg,min(value) as min,'.
+						' max(value) as max,max(clock) as clock'.
+						' from history_uint where itemid='.$this->items[$i]['itemid'].' and clock>='.$from_time.
+						' and clock<='.$to_time.' group by itemid, i' //' round('.$x.'*(mod(clock+'.$z.','.$p.'))/('.$p.'),0)'
+						);
 				}
 				else
 				{
 					array_push($sql_arr,
-						"select itemid,round(900*(mod(clock+$z,$p))/($p),0) as i,sum(num) as count,avg(value_avg) as avg,min(value_min) as min,max(value_max) as max,max(clock) as clock from trends where itemid=".$this->items[$i]["itemid"]." and clock>=".$from_time." and clock<=".$to_time." group by itemid,round(900*(mod(clock+$z,$p))/($p),0)");
+						'select itemid,round('.$x.'*(mod(clock+'.$z.','.$p.'))/('.$p.'),0) as i,'.
+						' sum(num) as count,avg(value_avg) as avg,min(value_min) as min,'.
+						' max(value_max) as max,max(clock) as clock'.
+						' from trends where itemid='.$this->items[$i]['itemid'].' and clock>='.$from_time.
+						' and clock<='.$to_time.' group by itemid, i' //' round('.$x.'*(mod(clock+'.$z.','.$p.'))/('.$p.'),0)'
+						);
 				}
 
 				$curr_data = &$this->data[$this->items[$i]["itemid"]][$type];
@@ -931,16 +973,22 @@
 						$curr_data->max[$idx]	= $row["max"];
 						$curr_data->avg[$idx]	= $row["avg"];
 						$curr_data->clock[$idx]	= $row["clock"];
+						$curr_data->shift_min[$idx] = 0;
+						$curr_data->shift_max[$idx] = 0;
+						$curr_data->shift_avg[$idx] = 0;
 					}
 				}
 
 				/* calculate missed points */
 				$first_idx = 0;
-				for($ci = 0, $cj=0; $ci < 900; $ci++)
+				for($ci = 0, $cj=0; $ci < $this->sizeX; $ci++)
 				{
 					if(!isset($curr_data->count[$ci]) || $curr_data->count[$ci] == 0)
 					{
 						$curr_data->count[$ci] = 0;
+						$curr_data->shift_min[$ci] = 0;
+						$curr_data->shift_max[$ci] = 0;
+						$curr_data->shift_avg[$ci] = 0;
 						$cj++;
 					}
 					else if($cj > 0)
@@ -949,48 +997,49 @@
 
 						$first_idx = $ci - $dx;
 
-						if($first_idx < 0)	$first_idx = $ci;
+						if($first_idx < 0)	$first_idx = $ci; // if no data from start of graph get current data as first data
 
 						for(;$cj > 0; $cj--)
 						{
 							foreach(array('clock','min','max','avg') as $var_name)
 							{
 								$var = &$curr_data->$var_name;
+
 								if($first_idx == $ci && $var_name == 'clock')
 								{
-									$var[$ci - $cj] = 0;
+									$var[$ci - $cj] = $var[$first_idx] - ($p / $this->sizeX * $cj);
 									continue;
 								}
-								$dy = $var[$first_idx] - $var[$ci];
+
+								$dy = $var[$ci] - $var[$first_idx];
 								$var[$ci - $cj] = $var[$first_idx] + ($cj * $dy) / $dx;
 							}
 						}
 					}
 				}
-				if($cj > 0 && $cj != $ci)
+				if($cj > 0 && $ci > $cj)
 				{
-					$ci--;
-					$dx = ++$cj;
+					$dx = $cj + 1;
 
 					$first_idx = $ci - $dx;
-
-					if($first_idx < 0)	$first_idx = $ci;
-					$ci = $first_idx;
 
 					for(;$cj > 0; $cj--)
 					{
 						foreach(array('clock','min','max','avg') as $var_name)
 						{
 							$var = &$curr_data->$var_name;
-							$dy = $var[$first_idx] - $var[$ci];
-							$var[$first_idx + $cj] = $var[$first_idx] + ($cj * $dy) / $dx;
+
+							if($var_name == 'clock')
+							{
+								$var[$first_idx + $cj] = $var[$first_idx] + ($p / $this->sizeX * $cj);
+								continue;
+							}
+							$var[$first_idx + $cj] = $var[$first_idx];
 						}
 					}
 				}
 				/* end of missed points calculation */
-				$curr_data->shift_min = NULL;
-				$curr_data->shift_max = NULL;
-				$curr_data->shift_avg = NULL;
+
 			}
 
 			/* calculte shift for stacked graphs */
@@ -999,18 +1048,23 @@
 				for($i=$this->num-2; $i >= 0; $i--)
 				{
 					$curr_data = &$this->data[$this->items[$i]["itemid"]][$this->items[$i]["type"]];
-					$prev_data = &$this->data[$this->items[$i+1]["itemid"]][$this->items[$i+1]["type"]];
-
-					for($ci = 0; $ci < 900; $ci++)
+					for($j = $i+1; $j < $this->num; $j++)
 					{
-						foreach(array('min','max','avg') as $var_name)
+						if($this->items[$j]["axisside"] != $this->items[$i]["axisside"]) continue;
+
+						$prev_data = &$this->data[$this->items[$i+1]["itemid"]][$this->items[$i+1]["type"]];
+
+						for($ci = 0; $ci < $this->sizeX; $ci++)
 						{
-							$shift_var_name	= 'shift_'.$var_name;
-							$curr_shift	= &$curr_data->$shift_var_name;
-							$curr_var	= &$curr_data->$var_name;
-							$prev_shift	= &$prev_data->$shift_var_name;
-							$prev_var	= &$prev_data->$var_name;
-							$curr_shift[$ci] = $prev_var[$ci] + $prev_shift[$ci];
+							foreach(array('min','max','avg') as $var_name)
+							{
+								$shift_var_name	= 'shift_'.$var_name;
+								$curr_shift	= &$curr_data->$shift_var_name;
+								$curr_var	= &$curr_data->$var_name;
+								$prev_shift	= &$prev_data->$shift_var_name;
+								$prev_var	= &$prev_data->$var_name;
+								$curr_shift[$ci] = $prev_var[$ci] + $prev_shift[$ci];
+							}
 						}
 					}
 				}
@@ -1109,11 +1163,10 @@
 			$this->drawWorkPeriod();
 			$this->drawGrid();
 
-			$minX = 0;
-			$maxX = 900;
+			$maxX = $this->sizeX;
 
 			// For each metric
-			for($item=0;$item<$this->num;$item++)
+			for($item = $this->num-1; $item >=0; $item--)
 			{
 				$minY = $this->m_minY[$this->items[$item]["axisside"]];
 				$maxY = $this->m_maxY[$this->items[$item]["axisside"]];
@@ -1144,24 +1197,29 @@
 				}
 
 				// For each X
-				for($i = $minX+1, $j = $minX; $i < $maxX; $i++) // new point
+				for($i = 1, $j = 0; $i < $maxX; $i++) // new point
 				{
-					if(!isset($data->count[$i]) || (isset($data->count[$i]) && $data->count[$i] == 0)) continue;
+					if($data->count[$i] == 0) continue;
 
 					$diff	= $data->clock[$i] - $data->clock[$j];
-					$cell	= ($this->to_time - $this->from_time)/900;
+					$cell	= ($this->to_time - $this->from_time)/$this->sizeX;
 					$delay	= $this->items[$item]["delay"];
 
-					if($cell > $delay)	$max_diff = 16*$cell;
-					else			$max_diff = 4*$delay;
+					if($cell > $delay)
+						$draw = $diff < 16*$cell;
+					else		
+						$draw = $diff < 4*$delay;
 
-					if($diff < $max_diff)
+					if($draw == false && $this->items[$item]["type"] == GRAPH_ITEM_AGGREGATED)
+						$draw = $i - $j < 5;
+
+					if($draw)
 					{
 
 						$this->drawElement(
 							$data,
 							$i, $j,
-							$minX, $maxX, 
+							0, $this->sizeX, 
 							$minY, $maxY,
 							$drawtype,
 							$max_color,
