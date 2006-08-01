@@ -2419,6 +2419,7 @@ COpt::profiling_stop("script");
 			ImageSetStyle($image, $style);
 			ImageLine($image,$x1,$y1,$x2,$y2,IMG_COLOR_STYLED);
 		}
+
 	}
 	else
 	{
@@ -2426,6 +2427,14 @@ COpt::profiling_stop("script");
 		{
 			ImageDashedLine($image,$x1,$y1,$x2,$y2,$color);
 		}
+	}
+
+	function DashedRectangle($image,$x1,$y1,$x2,$y2,$color)
+	{
+		DashedLine($image, $x1,$y1,$x1,$y2,$color);
+		DashedLine($image, $x1,$y2,$x2,$y2,$color);
+		DashedLine($image, $x2,$y2,$x2,$y1,$color);
+		DashedLine($image, $x2,$y1,$x1,$y1,$color);
 	}
 
 

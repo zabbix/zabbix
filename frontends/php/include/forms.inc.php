@@ -22,6 +22,7 @@
 // TODO !!! Correcr the help links !!! TODO
 
 	include_once 	"include/defines.inc.php";
+	include_once 	"include/classes/graph.inc.php";
 	include_once 	"include/db.inc.php";
 
 	function	insert_new_message_form()
@@ -963,7 +964,7 @@
 		{
 			$frmGItem->AddVar("periods_cnt",$periods_cnt);
 
-			$cmbFnc = new CComboBox("calc_fnc",$calc_fnc);
+			$cmbFnc = new CComboBox("calc_fnc",$calc_fnc,'submit();');
 			$cmbFnc->AddItem(CALC_FNC_ALL, S_ALL_SMALL);
 			$cmbFnc->AddItem(CALC_FNC_MIN, S_MIN_SMALL);
 			$cmbFnc->AddItem(CALC_FNC_AVG, S_AVG_SMALL);
@@ -972,7 +973,10 @@
 
 			$cmbType = new CComboBox("drawtype",$drawtype);
 			$cmbType->AddItem(0,get_drawtype_description(0));
-			$cmbType->AddItem(1,get_drawtype_description(1));
+
+			if($calc_fnc != CALC_FNC_ALL)
+				$cmbType->AddItem(1,get_drawtype_description(1));
+
 			$cmbType->AddItem(2,get_drawtype_description(2));
 			$cmbType->AddItem(3,get_drawtype_description(3));
 			$frmGItem->AddRow(S_DRAW_STYLE, $cmbType);
