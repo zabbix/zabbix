@@ -378,7 +378,7 @@ void	rtrim_spaces(char *c);
 void	delete_reol(char *c);
 int	get_param(const char *param, int num, char *buf, int maxlen);
 int	num_param(const char *param);
-int	calculate_item_nextcheck(int delay, int now);
+int	calculate_item_nextcheck(int itemid, int delay, int now);
 void	zbx_setproctitle(const char *fmt, ...);
 
 #define ZBX_JAN_1970_IN_SEC   2208988800.0        /* 1970 - 1900 in seconds */
