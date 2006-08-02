@@ -1,5 +1,6 @@
 Changes for 1.1.2:
 
+ - added alternative startup scripts for Fedora Linux (Alexei)
  - fixed graphs drawing (Eugene)
  - fixed graph min value calculation (Eugene)
  - better pattern of distribution of item next checks to improve overall
