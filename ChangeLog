@@ -1,5 +1,6 @@
 Changes for 1.1.1-lk:
 
+ - improved sound notification of trigger status changing (Eugene)
  - developed aggrigated graphs (Eugene)
  - fixed graphs drawing (Eugene)
  - fixed graph min value calculation (Eugene)

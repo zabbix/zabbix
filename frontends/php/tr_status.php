@@ -26,7 +26,7 @@
 <?php
 
 	$tr_hash=calc_trigger_hash();
-	setcookie("triggers_hash",$tr_hash,time()+1800);
+//	setcookie("triggers_hash",$tr_hash,time()+1800); //TMP !!! May be unneded
 
 	if(!isset($_COOKIE["triggers_hash"]))
 	{
@@ -53,24 +53,39 @@
 	$new=explode(",",$tr_hash);
 	$old=explode(",",$triggers_hash);
 
-//	Number of trigger decreased
-//	echo $new[0]," ",$old[0];
-	if(($old[1]!=$new[1])&&($new[0]<$old[0]))
+	if( $old[1] != $new[1] )
 	{
-		$audio="warning_off.wav";
+		if( $new[0] < $old[0] )	// Number of trigger decreased
+			$status = "off";
+		else			// Number of trigger increased
+			$status = "on";
+
+		$files_apdx = array(
+			5 => 'disaster',
+			4 => 'high',
+			3 => 'average',
+			2 => 'warning',
+			1 => 'information',
+			0 => 'not_classified');
+
+		$prior_dif = $new[0]-$old[0];
+
+		krsort($files_apdx);
+		foreach($files_apdx as $priority => $apdx)
+		{
+			if(round($prior_dif / pow(100, $priority)) != 0)
+			{
+				$audio = 'audio/trigger_'.$status.'_'.$apdx.'.wav';
+				break;
+			}
+		}
+
+		if(!isset($audio) || !file_exists($audio))
+			$audio = 'audio/trigger_'.$status.'.wav';
 	}
-//	Number of trigger increased
 	if(($old[1]!=$new[1])&&($new[0]>=$old[0]))
 	{
 // DISASTER
-		if(($new[0]-$old[0])/pow(10,5)>=1)
-		{
-			$audio="disaster_on.wav";
-		}
-		else
-		{
-			$audio="warning_on.wav";
-		}
 	}
 
 //	echo "$tr_hash<br>$triggers_hash<br>".$old[1]."<br>".$new[1];
@@ -112,10 +127,10 @@
 	update_profile("web.menu.view.last",$page["file"]);
 ?>
 <?php
+
 	if(isset($audio))
 	{
-//		echo "AUDIO [$audio] [".$old[1].":".$new[1]."] [$triggers_hash] [$tr_hash]";
-		echo "<BGSOUND src=\"audio/$audio\" loop=0>";
+		play_sound($audio);
 	}
 ?>                                                                                                             
 
