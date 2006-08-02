@@ -19,9 +19,12 @@ create/data/images/UPS.png svneol=native#unset
 create/data/images/UPS_small.png svneol=native#unset
 create/data/images/Workstation.png svneol=native#unset
 create/data/images/Workstation_small.png svneol=native#unset
-frontends/php/audio/disaster_on.wav svneol=native#unset
-frontends/php/audio/warning_off.wav svneol=native#unset
-frontends/php/audio/warning_on.wav svneol=native#unset
+frontends/php/audio/trigger_off.wav -text
+frontends/php/audio/trigger_on.wav -text
+frontends/php/audio/trigger_on_average.wav -text
+frontends/php/audio/trigger_on_disaster.wav -text
+frontends/php/audio/trigger_on_high.wav -text
+frontends/php/audio/trigger_on_warning.wav -text
 frontends/php/images/flash/zbxclock.swf svneol=native#unset
 frontends/php/images/general/closed.gif svneol=native#unset
 frontends/php/images/general/help.gif svneol=native#unset

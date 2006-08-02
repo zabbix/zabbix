@@ -152,7 +152,6 @@ static int parse_commandline(int argc, char **argv)
 	int	task	= ZBX_TASK_START;
 	char	ch	= '\0';
 
-
 	/* Parse the command-line. */
 	while ((ch = zbx_getopt_long(argc, argv, shortopts, longopts, NULL)) != EOF)
 		switch ((char) ch) {
@@ -408,7 +407,6 @@ int	main(int argc, char **argv)
 			exit(ZabbixStopService());
 			break;
 #endif /* WIN32 */
-
 		case ZBX_TASK_PRINT_SUPPORTED:
 			test_parameters();
 			exit(SUCCEED);

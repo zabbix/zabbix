@@ -194,7 +194,6 @@ static int housekeeping_alarms(int now)
 	return res;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: housekeeping_history_and_trends                                  *

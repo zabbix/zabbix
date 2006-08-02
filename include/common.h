@@ -27,6 +27,9 @@
 #define ON	1
 #define OFF	0
 
+#define	ZABBIX_REVDATE	"2 August 2006"
+#define	ZABBIX_VERSION	"1.3"
+
 #if defined(WIN32)
 
 #	pragma warning (disable: 4100)
@@ -47,9 +50,6 @@
 #define ZBX_UNUSED(a) ((void)0)(a)
 
 #define	ZBX_FS_DBL	"%f"
-
-#define	ZABBIX_REVDATE	"12 July 2006"
-#define	ZABBIX_VERSION	"1.2.1"
 
 #define MAX_LOG_FILE_LEN (1024*1024)
 

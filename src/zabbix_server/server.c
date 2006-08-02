@@ -432,14 +432,15 @@ int MAIN_ZABBIX_ENTRY(void)
 	
 	int		server_num = 0;
 
-	if(CONFIG_LOG_FILE == NULL)
+/* Moved to daemon_init() */
+/*	if(CONFIG_LOG_FILE == NULL)
 	{
 		zabbix_open_log(LOG_TYPE_SYSLOG,CONFIG_LOG_LEVEL,NULL);
 	}
 	else
 	{
 		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,CONFIG_LOG_FILE);
-	}
+	}*/
 
 	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_server. ZABBIX %s.", ZABBIX_VERSION);
 
