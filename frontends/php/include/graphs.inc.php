@@ -97,7 +97,7 @@
 
 	# Add Graph
 
-	function	add_graph($name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$templateid=0)
+	function	add_graph($name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype=GRAPH_TYPE_NORMAL,$templateid=0)
 	{
 		if(!check_right("Graph","A",0))
 		{
@@ -106,9 +106,9 @@
 		}
 
 		$result=DBexecute("insert into graphs".
-			" (name,width,height,yaxistype,yaxismin,yaxismax,templateid,show_work_period,show_triggers)".
+			" (name,width,height,yaxistype,yaxismin,yaxismax,templateid,show_work_period,show_triggers,graphtype,templateid)".
 			" values (".zbx_dbstr($name).",$width,$height,$yaxistype,$yaxismin,".
-			" $yaxismax,$templateid,$showworkperiod,$showtriggers)");
+			" $yaxismax,$templateid,$showworkperiod,$showtriggers,$graphtype,$templateid)");
 		$graphid =  DBinsert_id($result,"graphs","graphid");
 		if($graphid)
 		{
@@ -119,7 +119,7 @@
 
 	# Update Graph
 
-	function	update_graph($graphid,$name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$templateid=0)
+	function	update_graph($graphid,$name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype=GRAPH_TYPE_NORMAL,$templateid=0)
 	{
 		if(!check_right("Graph","U",0))
 		{
@@ -133,17 +133,22 @@
 		while($graph = DBfetch($graphs))
 		{
 			$result = update_graph($graph["graphid"],$name,$width,
-				$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphid);
+				$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype,$graphid);
 			if(!$result)
 				return $result;
 		}
 
 		$result = DBexecute("update graphs set name=".zbx_dbstr($name).",width=$width,height=$height,".
 			"yaxistype=$yaxistype,yaxismin=$yaxismin,yaxismax=$yaxismax,templateid=$templateid,".
-			"show_work_period=$showworkperiod,show_triggers=$showtriggers ".
+			"show_work_period=$showworkperiod,show_triggers=$showtriggers,graphtype=$graphtype ".
 			"where graphid=$graphid");
 		if($result)
 		{
+			if($g_graph['graphtype'] != $graphtype && $graphtype == GRAPH_TYPE_STACKED)
+			{
+				$result = DBexecute("update graphs_items set calc_fnc=".CALC_FNC_AVG.",drawtype=1,type=".GRAPH_ITEM_SIMPLE);
+			}
+
 			info("Graph '".$g_graph["name"]."' updated");
 		}
 		return $result;
@@ -227,7 +232,7 @@
 				{
 					$new_graphid = add_graph($graph["name"],$graph["width"],$graph["height"],
 						$graph["yaxistype"],$graph["yaxismin"],$graph["yaxismax"],$graph["show_work_period"],
-						$graph["show_triggers"],$graph["graphid"]);
+						$graph["show_triggers"],$graph["graphtype"],$graph["graphid"]);
 
 					if(!$new_graphid)
 					{
@@ -489,7 +494,7 @@
 		$db_graph = get_graph_by_graphid($graphid);
 		$new_graphid = add_graph($db_graph["name"],$db_graph["width"],$db_graph["height"],$db_graph["yaxistype"],
 			$db_graph["yaxismin"],$db_graph["yaxismax"],$db_graph["show_work_period"],$db_graph["show_triggers"], 
-			$copy_mode ? 0 : $graphid
+			$db_graph["graphtype"],$copy_mode ? 0 : $graphid
 			);
 
 		if(!$new_graphid)
