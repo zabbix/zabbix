@@ -345,23 +345,47 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 		return $cnt; 
 	}
 
+	function	play_sound($filename)
+	{
+		echo '
+<SCRIPT TYPE="text/javascript">
+<!-- 
+var snd_tag = \'<BGSOUND SRC="'.$filename.'" LOOP=0/>\';
+
+if (navigator.appName != "Microsoft Internet Explorer")
+    snd_tag = \'<EMBED SRC="'.$filename.'" AUTOSTART=TRUE WIDTH=0 HEIGHT=0 LOOP=0><P/>\';
+
+document.writeln(snd_tag);
+// -->
+</SCRIPT>
+<NOSCRIPT>
+	<BGSOUND SRC="'.$filename.'"/>
+</NOSCRIPT>';
+	}
+
 //	The hash has form <md5sum of triggerid>,<sum of priorities>
 	function	calc_trigger_hash()
 	{
-		$priorities=0;
-		for($i=0;$i<=5;$i++)
-		{
-	        	$result=DBselect("select count(*) as cnt from triggers t,hosts h,items i,functions f  where t.value=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.status=0 and t.priority=$i");
-			$row=DBfetch($result);
-			$priorities+=pow(100,$i)*$row["cnt"];
-		}
+
+		$priority = array(0=>0, 1=>0, 2=>0, 3=>0, 4=>0, 5=>0);
 		$triggerids="";
-	       	$result=DBselect("select t.triggerid from triggers t,hosts h,items i,functions f  where t.value=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.status=0");
+
+	       	$result=DBselect('select t.triggerid,t.priority from triggers t,hosts h,items i,functions f'.
+			'  where t.value=1 and f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and i.status=0');
+
 		while($row=DBfetch($result))
 		{
+			$ack = get_last_alarm_by_triggerid($row["triggerid"]);
+			if($ack["acknowledged"] == 1) continue;
+
 			$triggerids="$triggerids,".$row["triggerid"];
+			$priority[$row["priority"]]++;
 		}
+
 		$md5sum=md5($triggerids);
+
+		$priorities=0;
+		for($i=0;$i<=5;$i++)	$priorities += pow(100,$i)*$priority[$i];
 
 		return	"$priorities,$md5sum";
 	}

@@ -280,7 +280,7 @@
 	"S_COMPARE"=>				"Compare",
 
 //	Footer
-	"S_ZABBIX_VER"=>			"ZABBIX 1.1.1",
+	"S_ZABBIX_VER"=>			"ZABBIX 1.3",
 	"S_COPYRIGHT_BY"=>			"Copyright 2001-2006 by ",
 	"S_CONNECTED_AS"=>			"Connected as",
 	"S_SIA_ZABBIX"=>			"SIA Zabbix",
@@ -308,6 +308,9 @@
 	"S_MAX_SMALL"=>				"max",
 	"S_DRAW_STYLE"=>			"Draw style",
 	"S_SIMPLE"=>				"Simple",
+	"S_GRAPH_TYPE"=>			"Graph type",
+	"S_STACKED"=>				"Stacked",
+	"S_NORMAL"=>				"Normal",
 	"S_AGGREGATED"=>			"Aggregated",
 	"S_AGGREGATED_PERIODS_COUNT"=>			"Aggregated periods count",
 
