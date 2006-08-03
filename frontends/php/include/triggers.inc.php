@@ -755,7 +755,7 @@
 		
 		$db_actions = DBselect("select distinct c.actionid from conditions c, triggers t".
 			" where c.conditiontype=".CONDITION_TYPE_TRIGGER.
-			" and c.value=t.triggerid");
+			" and c.value=t.triggerid and t.triggerid=".$triggerid);
 		while($db_action = DBfetch($db_actions))
 		{
 			DBexecute("update actions set status=".ACTION_STATUS_DISABLED.
