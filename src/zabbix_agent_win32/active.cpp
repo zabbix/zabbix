@@ -192,7 +192,7 @@ int strnrchr(char *str, int num, char delim)
 LOG_FUNC_CALL("In strnrchr()");
 INIT_CHECK_MEMORY(main);
 
-	for(i=strlen(str)-1;i>=0;i--)
+	for(i=(int)strlen(str)-1;i>=0;i--)
 	{
 		if(str[i]==delim) n++;
 		if(n==num) break;
@@ -328,7 +328,7 @@ LOG_FUNC_CALL("In get_active_checks()");
 	sprintf(c,"%s\n%s\n","ZBX_GET_ACTIVE_CHECKS",confHostname);
 //	zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", c);
 
-	if( sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
+	if( sendto(s,c,(int)strlen(c),0,(struct sockaddr *)&servaddr_in,(int)sizeof(struct sockaddr_in)) == -1 )
 //	if( write(s,c,strlen(c)) == -1 )
 	{
 		switch (errno)
@@ -431,14 +431,14 @@ LOG_FUNC_CALL("End of get_active_checks()");
 int	send_value(char *server,int port,char *host, char *key,char *value,char *lastlogsize,
 			   char *timestamp, char *source, char *severity)
 {
-	int	i,s;
+	SOCKET	s;
 	char	tosend[4*MAX_STRING_LEN];
 	char	result[1024];
 	char	tmp[1024];
 	struct hostent *hp;
 	struct sockaddr_in myaddr_in;
 	struct sockaddr_in servaddr_in;
-	int		ret = SUCCEED;
+	int	i, ret = SUCCEED;
 
 LOG_FUNC_CALL("In send_value()");
 INIT_CHECK_MEMORY(main);
@@ -508,7 +508,7 @@ INIT_CHECK_MEMORY(main);
 
 //	LOG_DEBUG_INFO("s",tosend);
 
-	if( sendto(s,tosend,strlen(tosend),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
+	if( sendto(s,tosend,(int)strlen(tosend),0,(struct sockaddr *)&servaddr_in,(int)sizeof(struct sockaddr_in)) == -1 )
 	{
 //		zabbix_log( LOG_LEVEL_WARNING, "Error in sendto() [%s:%d] [%s]",server, port, strerror(errno));
 sprintf(tmp,"Error in sendto()");
@@ -581,7 +581,7 @@ int	process_active_checks(char *server, int port)
 LOG_FUNC_CALL("In process_active_checks()");
 INIT_CHECK_MEMORY(main);
 
-	now=time(NULL);
+	now = (int)time(NULL);
 	for(i=0;;i++)
 	{
 		if(metrics[i].key == NULL)			break;
@@ -683,7 +683,7 @@ LOG_DEBUG_INFO("s","Active check is not supported. Disabled");
 			}
 		}
 
-		metrics[i].nextcheck=time(NULL)+metrics[i].refresh;
+		metrics[i].nextcheck = (int)time(NULL)+metrics[i].refresh;
 	}
 CHECK_MEMORY(main, "process_active_checks", "end");
 LOG_FUNC_CALL("End of process_active_checks()");
@@ -716,7 +716,7 @@ INIT_CHECK_MEMORY(main);
 	InitMetrics();
 
 	refresh_metrics(confServer, confServerPort, error, MAX_STRING_LEN);
-	nextrefresh=time(NULL)+300;
+	nextrefresh = (int)time(NULL) + 300;
 
 	for(;;)	
 	{
@@ -729,14 +729,14 @@ LOG_DEBUG_INFO("s","ActiveChecksThread - sleep 60000 (!!!)");
 		}
 
 		nextcheck = get_min_nextcheck();
-		if(nextcheck == FAIL)
+		if(nextcheck == FAIL)       
 		{
 			sleeptime=60;
 LOG_DEBUG_INFO("s","ActiveChecksThread - sleep 60 (1)");
 		}
 		else
 		{
-			sleeptime = nextcheck-time(NULL);
+			sleeptime = nextcheck - (int)time(NULL);
 			if(sleeptime<0)
 			{
 				sleeptime=0;
@@ -761,7 +761,7 @@ LOG_DEBUG_INFO("s","ActiveChecksThread - sleep 60 (2)");
 		if(time(NULL)>=nextrefresh)
 		{
 			refresh_metrics(confServer, confServerPort, error, sizeof(error));
-			nextrefresh=time(NULL)+300;
+			nextrefresh = (int)time(NULL) + 300;
 		}
 	}
 /**/

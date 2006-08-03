@@ -1,5 +1,6 @@
 Changes for 1.1.2:
 
+ - added Zabbix agent for Win64 platforms. (Eugene)
  - added alternative startup scripts for Fedora Linux (Alexei)
  - fixed graphs drawing (Eugene)
  - fixed graph min value calculation (Eugene)
