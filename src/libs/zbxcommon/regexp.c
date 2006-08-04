@@ -19,9 +19,9 @@
 
 #include "common.h"
 
-#if defined(WIN32)
+#if defined(_WINDOWS)
 #	include "gnuregex.h"
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 
 char	*zbx_regexp_match(const char *string, const char *pattern, int *len)
 { 

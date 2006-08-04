@@ -20,7 +20,7 @@
 #ifndef ZABBIX_TYPES_H
 #define ZABBIX_TYPES_H
 
-#if defined(WIN32)
+#if defined(_WINDOWS)
 
 #	define zbx_uint64_t __int64
 #	define ZBX_FS_UI64 "%I64u"
@@ -37,7 +37,7 @@
 #	define uint32_t	__int32
 #endif /* uint32_t */
 
-#else /* WIN32 */
+#else /* _WINDOWS */
 
 #	define zbx_uint64_t uint64_t
 #	if __WORDSIZE == 64
@@ -48,7 +48,7 @@
 
 #	define zbx_pid_t	pid_t
 
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 
 #ifndef S_ISREG
 #	define S_ISREG(x) (((x) & S_IFMT) == S_IFREG)

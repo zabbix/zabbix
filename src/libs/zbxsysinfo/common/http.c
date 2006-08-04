@@ -75,7 +75,7 @@ static int	get_http_page(char *hostname, char *param, unsigned short port, char 
 
 	zbx_snprintf(request, sizeof(request), "GET /%s HTTP/1.1\nHost: %s\nConnection: close\n\n", param, hostname);
 
-	if(SOCKET_ERROR == zbx_sock_write(s, (void *)request, strlen(request)))
+	if(SOCKET_ERROR == zbx_sock_write(s, (void *)request, (int)strlen(request)))
 	{
 		zabbix_log( LOG_LEVEL_DEBUG, "get_http_page - Error during sending [%s:%u] [%s]",hostname, port, strerror_from_system(errno));
 		zbx_sock_close(s);

@@ -44,7 +44,7 @@ ZBX_THREAD_HANDLE zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), void *args
 {
 	ZBX_THREAD_HANDLE thread = 0;
 
-#if defined(WIN32)
+#if defined(_WINDOWS)
 
 	unsigned thrdaddr;
 
@@ -54,7 +54,7 @@ ZBX_THREAD_HANDLE zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), void *args
 		thread = (ZBX_THREAD_HANDLE)(ZBX_THREAD_ERROR);
 	}
 
-#else /* not WIN32 */
+#else /* not _WINDOWS */
 
 	thread = fork();
 
@@ -73,7 +73,7 @@ ZBX_THREAD_HANDLE zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), void *args
 		thread = (ZBX_THREAD_HANDLE)(ZBX_THREAD_ERROR);
 	}
 
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 
 	return (ZBX_THREAD_HANDLE)(thread);
 }
@@ -96,7 +96,7 @@ ZBX_THREAD_HANDLE zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), void *args
 
 int zbx_thread_wait(ZBX_THREAD_HANDLE thread)
 {
-#if defined(WIN32)	
+#if defined(_WINDOWS)	
 
 	if(WaitForSingleObject(thread, INFINITE) != WAIT_OBJECT_0)
 	{
@@ -110,7 +110,7 @@ int zbx_thread_wait(ZBX_THREAD_HANDLE thread)
 		return (0);
 	}
 
-#else /* not WIN32 */
+#else /* not _WINDOWS */
 
 	if(waitpid(thread, (int *)0, 0) <= 0)
 	{
@@ -118,21 +118,21 @@ int zbx_thread_wait(ZBX_THREAD_HANDLE thread)
 		return (0);
 	}
 
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 
 	return (1);
 }
 
 long int zbx_get_thread_id(void)
 {
-#if defined(WIN32)	
+#if defined(_WINDOWS)	
 
 	return (long int) GetCurrentThreadId();
 
-#else /* not WIN32 */
+#else /* not _WINDOWS */
 
 	return (long int) getpid();
 
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 }
 

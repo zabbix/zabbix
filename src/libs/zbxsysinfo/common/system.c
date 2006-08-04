@@ -35,7 +35,7 @@ int	SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_R
 	return ret;
 }
 
-#if !defined(WIN32)
+#if !defined(_WINDOWS)
 
 int     SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
@@ -55,4 +55,4 @@ int     SYSTEM_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGEN
         return EXECUTE_STR(cmd, "hostname", flags, result);
 }
 
-#endif /* not WIN32 */
+#endif /* not _WINDOWS */

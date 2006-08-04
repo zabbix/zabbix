@@ -27,15 +27,13 @@
 #define ON	1
 #define OFF	0
 
-#define	ZABBIX_REVDATE	"2 August 2006"
-#define	ZABBIX_VERSION	"1.3"
+#define	APPLICATION_NAME	"ZABBIX Agent"
+#define	ZABBIX_REVDATE		"2 August 2006"
+#define	ZABBIX_VERSION		"1.3"
 
-#if defined(WIN32)
-
-#	pragma warning (disable: 4100)
-
-#endif /* WIN32 */
-
+#if defined(_WINDOWS)
+/*#	pragma warning (disable: 4100)*/
+#endif /* _WINDOWS */
 
 #ifndef HAVE_GETOPT_LONG
 	struct option {

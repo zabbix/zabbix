@@ -115,7 +115,7 @@ int	find_char(char *str,char c)
 {
 	char *p;
 	for(p = str; *p; p++) 
-		if(*p == c) return (p - str);
+		if(*p == c) return (int)(p - str);
 
 	return	FAIL;
 }
@@ -204,8 +204,8 @@ char *string_replace(char *str, const char *sub_str1, const char *sub_str2)
         const char *q;
         const char *r;
         char *t;
-        signed long len;
-        signed long diff;
+        long len;
+        long diff;
         unsigned long count = 0;
 
 	assert(str);
@@ -214,13 +214,13 @@ char *string_replace(char *str, const char *sub_str1, const char *sub_str2)
                 return str;
         ++count;
 
-        len = strlen(sub_str1);
+        len = (long)strlen(sub_str1);
 
         /* count the number of occurances of sub_str1 */
         for ( p+=len; (p=strstr(p, sub_str1)) != NULL; p+=len )
                 ++count;
 
-        diff = strlen(sub_str2) - len;
+        diff = (long)strlen(sub_str2) - len;
 
         /* allocate new memory */
         if ( (new_str=(char *)malloc((size_t)(strlen(str) + count*diff)*sizeof(char)))
@@ -268,7 +268,7 @@ void del_zeroes(char *s)
 
 	if(strchr(s,'.')!=NULL)
 	{
-		for(i=strlen(s)-1;;i--)
+		for(i = (int)strlen(s)-1;;i--)
 		{
 			if(s[i]=='0')
 			{
@@ -429,7 +429,7 @@ void	rtrim_spaces(char *c)
 {
 	int i,len;
 
-	len=strlen(c);
+	len = (int)strlen(c);
 	for(i=len-1;i>=0;i--)
 	{
 		if( c[i] == ' ')

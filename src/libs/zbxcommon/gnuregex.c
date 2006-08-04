@@ -19,6 +19,17 @@
    along with this program; if not, write to the Free Software
    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
+#if defined(_WIN64) && defined(_MSC_VER)
+/* NOTE: 
+
+   to compile this file for Windows AMD64 platform please 
+   disable any optimisation of this file.
+
+   otherwise, on any calling of _alloca function, you can get fatal error
+   C1001: INTERNAL COMPILER ERROR */
+#	pragma optimize( "", off )
+#endif
+
 /* AIX requires this to be the first thing in the file. */
 #if defined (_AIX) && !defined (REGEX_MALLOC)
   #pragma alloca
@@ -178,12 +189,13 @@ init_syntax_once ()
 
 /* Emacs already defines alloca, sometimes.  */
 	#ifndef alloca
+
 /* Make alloca work the best possible way.  */
 		#ifdef __GNUC__
 			#define alloca __builtin_alloca
 		#elif HAVE_ALLOCA_H
 			#include <alloca.h>
-		#elif WIN32
+		#elif _WINDOWS
 			#define alloca _alloca
 		#elif !defined(_AIX) /* Already did AIX, up at the top.  */
 			char *alloca ();
@@ -1585,10 +1597,10 @@ regex_compile (pattern, size, syntax, bufp)
                  group.  They are all relative offsets, so that if the
                  whole pattern moves because of realloc, they will still
                  be valid.  */
-              COMPILE_STACK_TOP.begalt_offset = begalt - bufp->buffer;
+              COMPILE_STACK_TOP.begalt_offset = (pattern_offset_t)(begalt - bufp->buffer);
               COMPILE_STACK_TOP.fixup_alt_jump 
-                = fixup_alt_jump ? fixup_alt_jump - bufp->buffer + 1 : 0;
-              COMPILE_STACK_TOP.laststart_offset = b - bufp->buffer;
+                = (pattern_offset_t)(fixup_alt_jump ? fixup_alt_jump - bufp->buffer + 1 : 0);
+              COMPILE_STACK_TOP.laststart_offset = (pattern_offset_t)(b - bufp->buffer);
               COMPILE_STACK_TOP.regnum = regnum;
 
               /* We will eventually replace the 0 with the number of
@@ -1597,7 +1609,7 @@ regex_compile (pattern, size, syntax, bufp)
                  represent in the compiled pattern.  */
               if (regnum <= MAX_REGNUM)
                 {
-                  COMPILE_STACK_TOP.inner_group_offset = b - bufp->buffer + 2;
+                  COMPILE_STACK_TOP.inner_group_offset = (pattern_offset_t)(b - bufp->buffer + 2);
                   BUF_PUSH_3 (start_memory, regnum, 0);
                 }
                 
@@ -2035,7 +2047,7 @@ regex_compile (pattern, size, syntax, bufp)
   free (compile_stack.stack);
 
   /* We have succeeded; set the length of the buffer.  */
-  bufp->used = b - bufp->buffer;
+  bufp->used = (unsigned long)(b - bufp->buffer);
 
 #ifdef DEBUG
   if (debug)
@@ -2824,7 +2836,7 @@ re_set_registers (bufp, regs, num_regs, starts, ends)
     {
       bufp->regs_allocated = REGS_UNALLOCATED;
       regs->num_regs = 0;
-      regs->start = regs->end = (regoff_t) 0;
+      regs->start = regs->end = (regoff_t*) 0;
     }
 }
 
@@ -3198,7 +3210,7 @@ re_match_2 (bufp, string1, size1, string2, size2, pos, regs, stop)
   /* We fill all the registers internally, independent of what we
      return, for use in backreferences.  The number here includes
      an element for register zero.  */
-  unsigned num_regs = bufp->re_nsub + 1;
+  unsigned num_regs = (unsigned)bufp->re_nsub + 1;
   
   /* The currently active registers.  */
   unsigned lowest_active_reg = NO_LOWEST_ACTIVE_REG;
@@ -3464,7 +3476,7 @@ re_match_2 (bufp, string1, size1, string2, size2, pos, regs, stop)
               if (regs->num_regs > 0)
                 {
                   regs->start[0] = pos;
-                  regs->end[0] = (MATCHING_IN_FIRST_STRING ? d - string1
+                  regs->end[0] = (regoff_t)(MATCHING_IN_FIRST_STRING ? d - string1
 			          : d - string2 + size1);
                 }
               
@@ -3476,8 +3488,8 @@ re_match_2 (bufp, string1, size1, string2, size2, pos, regs, stop)
                     regs->start[mcnt] = regs->end[mcnt] = -1;
                   else
                     {
-		      regs->start[mcnt] = POINTER_TO_OFFSET (regstart[mcnt]);
-                      regs->end[mcnt] = POINTER_TO_OFFSET (regend[mcnt]);
+		      regs->start[mcnt] = (regoff_t)POINTER_TO_OFFSET (regstart[mcnt]);
+                      regs->end[mcnt] = (regoff_t)POINTER_TO_OFFSET (regend[mcnt]);
                     }
 		}
               
@@ -3496,9 +3508,9 @@ re_match_2 (bufp, string1, size1, string2, size2, pos, regs, stop)
                         nfailure_points_pushed - nfailure_points_popped);
           DEBUG_PRINT2 ("%u registers pushed.\n", num_regs_pushed);
 
-          mcnt = d - pos - (MATCHING_IN_FIRST_STRING 
+          mcnt = (int)(d - pos - (MATCHING_IN_FIRST_STRING 
 			    ? string1 
-			    : string2 - size1);
+			    : string2 - size1));
 
           DEBUG_PRINT2 ("Returning %d from re_match_2.\n", mcnt);
 
@@ -3755,7 +3767,7 @@ re_match_2 (bufp, string1, size1, string2, size2, pos, regs, stop)
                           regstart[r] = old_regstart[r];
 
                           /* xx why this test?  */
-                          if ((int) old_regend[r] >= (int) regstart[r])
+                          if (old_regend[r] >= regstart[r])
                             regend[r] = old_regend[r];
                         }     
                     }
@@ -3815,12 +3827,12 @@ re_match_2 (bufp, string1, size1, string2, size2, pos, regs, stop)
 		PREFETCH ();
 
 		/* How many characters left in this segment to match.  */
-		mcnt = dend - d;
+		mcnt = (int)(dend - d);
                 
 		/* Want how many consecutive characters we can match in
                    one shot, so, if necessary, adjust the count.  */
                 if (mcnt > dend2 - d2)
-		  mcnt = dend2 - d2;
+		  mcnt = (int)(dend2 - d2);
                   
 		/* Compare that many; failure if mismatch, else move
                    past them.  */
@@ -4681,7 +4693,7 @@ int
 re_exec (s)
     const char *s;
 {
-  const int len = strlen (s);
+  const int len = (int)strlen (s);
   return
     0 <= re_search (&re_comp_buf, s, len, 0, len, (struct re_registers *) 0);
 }
@@ -4811,7 +4823,7 @@ regexec (preg, string, nmatch, pmatch, eflags)
   int ret;
   struct re_registers regs;
   regex_t private_preg;
-  int len = strlen (string);
+  int len = (int)strlen (string);
   boolean want_reg_info = !preg->no_sub && nmatch > 0;
 
   private_preg = *preg;
@@ -4826,7 +4838,7 @@ regexec (preg, string, nmatch, pmatch, eflags)
   
   if (want_reg_info)
     {
-      regs.num_regs = nmatch;
+      regs.num_regs = (unsigned)nmatch;
       regs.start = TALLOC (nmatch, regoff_t);
       regs.end = TALLOC (nmatch, regoff_t);
       if (regs.start == NULL || regs.end == NULL)
@@ -4931,6 +4943,12 @@ regfree (preg)
 }
 
 #endif /* not emacs  */
+
+#if defined(_WIN64) && defined(_MSC_VER)
+/*	restore optimization options */
+#	pragma optimize( "", on )
+#endif
+
 
 /*
 Local variables:

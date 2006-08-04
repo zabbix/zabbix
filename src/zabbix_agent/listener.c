@@ -59,7 +59,7 @@ static void	process_listener(ZBX_SOCKET sock)
 		return;
 	}
 
-	/*command[ret-2] = '\0'; *//* remove '\r\n' sumbols from recived command (WIN32) !!!TODO!!! correct win32 agent !!!TODO!!! */
+	/*command[ret-2] = '\0'; *//* remove '\r\n' sumbols from recived command (_WINDOWS) !!!TODO!!! correct win32 agent !!!TODO!!! */
 	command[ret-1] = '\0'; /* remove '\n' sumbols from recived command (LINUX) !!!TODO!!! */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Requested [%s]", command);
@@ -76,7 +76,7 @@ static void	process_listener(ZBX_SOCKET sock)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Sending back [%s]", value);
 
-	ret = zbx_sock_write(sock, value, strlen(value));
+	ret = zbx_sock_write(sock, value, (int)strlen(value));
 
 	if(ret == SOCKET_ERROR)
 	{

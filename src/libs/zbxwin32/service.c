@@ -1,6 +1,6 @@
 /* 
-** ZabbixW32 - Win32 agent for Zabbix
-** Copyright (C) 2002 Victor Kirhenshtein
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -15,9 +15,6 @@
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-**
-** $module: service.cpp
-**
 **/
 
 #include "common.h"
@@ -205,7 +202,7 @@ int ZabbixCreateService(char *path)
 	}
 	else
 	{
-		zbx_error("Zabbix Win32 Agent service created successfully.");
+		zbx_error(ZABBIX_SERVICE_NAME " service created successfully.");
 		CloseServiceHandle(service);
 	}
 
@@ -246,7 +243,7 @@ int ZabbixRemoveService(void)
 	{
 		if (DeleteService(service))
 		{
-			zbx_error(ZABBIX_EVENT_SOURCE "service deleted successfully");
+			zbx_error(ZABBIX_EVENT_SOURCE " service deleted successfully");
 		}
 		else
 		{
@@ -296,7 +293,7 @@ int ZabbixStartService(void)
 	{
 		if (StartService(service,0,NULL))
 		{
-			zbx_error("Zabbix Win32 Agent service started successfully.");
+			zbx_error(ZABBIX_SERVICE_NAME " service started successfully.");
 		}
 		else
 		{
@@ -340,7 +337,7 @@ int ZabbixStopService(void)
 
 		if (ControlService(service,SERVICE_CONTROL_STOP,&status))
 		{
-			zbx_error("Zabbix Win32 Agent service stopped successfully.");
+			zbx_error(ZABBIX_SERVICE_NAME " service stopped successfully.");
 		}
 		else
 		{
@@ -382,7 +379,7 @@ static int ZabbixInstallEventSource(char *path)
 	}
 
 	RegSetValueEx(hKey,"TypesSupported",0,REG_DWORD,(BYTE *)&dwTypes,sizeof(DWORD));
-	RegSetValueEx(hKey,"EventMessageFile",0,REG_EXPAND_SZ,(BYTE *)execName,strlen(execName)+1);
+	RegSetValueEx(hKey,"EventMessageFile",0,REG_EXPAND_SZ,(BYTE *)execName,(DWORD)strlen(execName)+1);
 
 	RegCloseKey(hKey);
 	zbx_error("Event source \"" ZABBIX_EVENT_SOURCE "\" installed successfully.");

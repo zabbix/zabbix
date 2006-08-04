@@ -22,7 +22,7 @@
 
 #include "common.h"
 
-#if defined(WIN32)
+#if defined(_WINDOWS)
 
 	#define ZBX_THREAD_ERROR (0)
 
@@ -40,7 +40,7 @@
 
 	#define zbx_sleep(sec) Sleep(((DWORD)(sec))*((DWORD)1000))
 
-#else /* not WIN32 */
+#else /* not _WINDOWS */
 
 	#define ZBX_THREAD_ERROR (-1)
 
@@ -58,7 +58,7 @@
 
 	#define zbx_sleep(sec) sleep((sec))
 
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 
 ZBX_THREAD_HANDLE zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), void *args);
 int zbx_thread_wait(ZBX_THREAD_HANDLE thread);

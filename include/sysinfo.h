@@ -123,10 +123,10 @@ int	WEB_PAGE_GET(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 int	WEB_PAGE_PERF(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	WEB_PAGE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
-#if defined(WIN32)
+#if defined(_WINDOWS)
 int	PERF_MONITOR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	SERVICE_STATE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	PROC_INFO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
-#endif
+#endif /* _WINDOWS */
 
 #endif
