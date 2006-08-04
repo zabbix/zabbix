@@ -20,9 +20,9 @@
 #ifndef ZABBIX_PID_H
 #define ZABBIX_PID_H
 
-#if defined(WIN32)
+#if defined(_WINDOWS)
 #	error "This module allowed only for Linux OS"
-#endif
+#endif /* _WINDOWS */
 
 int	create_pid_file(const char *pidfile);
 void	drop_pid_file(const char *pidfile);

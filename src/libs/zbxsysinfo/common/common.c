@@ -339,7 +339,7 @@ void	test_parameters(void)
 	int	i;
 	AGENT_RESULT	result;
 
-#if defined(WIN32)
+#if defined(_WINDOWS)
 #endif
 
 	memset(&result, 0, sizeof(AGENT_RESULT));
@@ -449,7 +449,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	
 	alias_expand(in_command, usr_command, MAX_STRING_LEN);
 	
-	usr_command_len = strlen(usr_command);
+	usr_command_len = (int)strlen(usr_command);
 
 	for( p=usr_command+usr_command_len-1; p>usr_command && ( *p=='\r' || *p =='\n' || *p == ' ' ); --p );
 
@@ -523,9 +523,9 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 		if(commands[i].flags & CF_USEUPARAM)
 		{
 			printf("[%s]", param);
-			i = strlen(param)+2;
+			i = (int)strlen(param)+2;
 		} else	i = 0;
-		i += strlen(usr_cmd);
+		i += (int)strlen(usr_cmd);
 		
 #define COLUMN_2_X 45 /* max of spaces count */
 		i = i > COLUMN_2_X ? 1 : (COLUMN_2_X - i);
@@ -604,7 +604,7 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
         md5_init(&state);
 	while ((nr = fread(buf, 1, (size_t)sizeof(buf), file)) > 0)
 	{
-        	md5_append(&state,(const md5_byte_t *)buf, nr);
+        	md5_append(&state,(const md5_byte_t *)buf, (int)nr);
 	}
         md5_finish(&state, hash);
 
@@ -724,7 +724,7 @@ int	VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RES
 #define	COMPUTE(var, ch)	(var) = (var) << 8 ^ crctab[(var) >> 24 ^ (ch)]
 
 	crc = len = 0;
-	while ((nr = fread(buf, 1, sizeof(buf), f)) > 0)
+	while ((nr = (int)fread(buf, 1, sizeof(buf), f)) > 0)
 	{
 		for( len += nr, p = buf; nr--; ++p)
 		{
@@ -1136,7 +1136,7 @@ int     OLD_VERSION(const char *cmd, const char *param, unsigned flags, AGENT_RE
 int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 
-#if defined(WIN32)
+#if defined(_WINDOWS)
 
 	STARTUPINFO si = {0};
 	PROCESS_INFORMATION pi = {0};
@@ -1144,11 +1144,11 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	HANDLE hOutput;
 	char szTempPath[MAX_PATH],szTempFile[MAX_PATH];
 
-#else /* not WIN32 */
+#else /* not _WINDOWS */
 
 	FILE	*f;
 
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 
 	char	cmd_result[MAX_STRING_LEN];
 	char	command[MAX_STRING_LEN];
@@ -1160,7 +1160,7 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	
 	memset(cmd_result, 0, MAX_STRING_LEN);
 
-#if defined(WIN32)
+#if defined(_WINDOWS)
 
 	/* Create temporary file to hold process output */
 	GetTempPath( MAX_PATH-1,	szTempPath);
@@ -1213,7 +1213,7 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 	cmd_result[len] = '\0';
 
-#else /* not WIN32 */
+#else /* not _WINDOWS */
 	strsncpy(command, param, sizeof(command));
 
 	if(0 == (f = popen(command,"r")))
@@ -1257,7 +1257,7 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		}
 	}
 
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 
 	/* We got EOL only */
 	if(cmd_result[0] == '\n')
@@ -1302,12 +1302,12 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	char	command[MAX_STRING_LEN];
 	char	flag[MAX_FLAG_LEN];
 
-#if defined (WIN32)
+#if defined (_WINDOWS)
 	STARTUPINFO    si;
 	PROCESS_INFORMATION  pi;
 
 	char	full_command[MAX_STRING_LEN];
-#else /* not WIN32 */
+#else /* not _WINDOWS */
 	pid_t	pid;
 #endif
 
@@ -1362,7 +1362,7 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	
 	zabbix_log(LOG_LEVEL_DEBUG, "Run nowait command '%s'",command);
 	
-#if defined(WIN32)
+#if defined(_WINDOWS)
 
 	zbx_snprintf(full_command, sizeof(full_command), "cmd /C \"%s\"", command);
 
@@ -1386,7 +1386,7 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	}
 
 
-#else /* not WIN32 */
+#else /* not _WINDOWS */
 
 	pid = fork(); /* run new thread 1 */
 	switch(pid)
@@ -1428,7 +1428,7 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		break;
 	}
 
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 
 	SET_UI64_RESULT(result, 1);
 	
@@ -1569,7 +1569,7 @@ static int	tcp_expect(const char	*hostname, short port, const char *request, con
 
 	if(NULL != request)
 	{
-		if(SOCKET_ERROR == zbx_sock_write(s, (void *)request, strlen(request)))
+		if(SOCKET_ERROR == zbx_sock_write(s, (void *)request, (int)strlen(request)))
 		{
 			zabbix_log( LOG_LEVEL_DEBUG, "Error during sending [%s:%u] [%s]",hostname, port, strerror_from_system(errno));
 			zbx_sock_close(s);
@@ -1606,7 +1606,7 @@ static int	tcp_expect(const char	*hostname, short port, const char *request, con
 
 	if(NULL != sendtoclose)
 	{
-		if(SOCKET_ERROR == zbx_sock_write(s, (void *)sendtoclose, strlen(sendtoclose)))
+		if(SOCKET_ERROR == zbx_sock_write(s, (void *)sendtoclose, (int)strlen(sendtoclose)))
 		{
 			zabbix_log( LOG_LEVEL_DEBUG, "Error during close string sending [%s:%u] [%s]",hostname, port, strerror_from_system(errno));
 		}
@@ -1765,7 +1765,7 @@ static int	check_ssh(const char	*hostname, short port, int *value_int)
 		*value_int = 0;
 	}
 
-	if(SOCKET_ERROR == zbx_sock_write(s, buf2, strlen(buf2)))
+	if(SOCKET_ERROR == zbx_sock_write(s, buf2, (int)strlen(buf2)))
 	{
 		zabbix_log( LOG_LEVEL_DEBUG, "Error during sending [%s:%u] [%s]",hostname, port, strerror_from_system(errno));
 	}

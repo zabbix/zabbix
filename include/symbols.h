@@ -20,7 +20,7 @@
 #ifndef ZABBIX_SYMBOLS_H
 #define ZABBIX_SYMBOLS_H
 
-#if defined (WIN32)
+#if defined (_WINDOWS)
 
 DWORD	(__stdcall *zbx_GetGuiResources)(HANDLE,DWORD);
 BOOL	(__stdcall *zbx_GetProcessIoCounters)(HANDLE,PIO_COUNTERS);
@@ -29,10 +29,10 @@ BOOL	(__stdcall *zbx_GlobalMemoryStatusEx)(LPMEMORYSTATUSEX);
 
 void import_symbols(void);
 
-#else /* not WIN32 */
+#else /* not _WINDOWS */
 
 #	define import_symbols()
 
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 
 #endif /* ZABBIX_SYMBOLS_H */

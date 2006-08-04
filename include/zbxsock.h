@@ -60,15 +60,15 @@ typedef struct sockaddr_in ZBX_SOCKADDR;
 int	zbx_sock_read(ZBX_SOCKET sock, void *buf, int buflen, int timeout);
 int	zbx_sock_write(ZBX_SOCKET sock, void *buf, int buflen);
 
-#if defined (WIN32)
+#if defined (_WINDOWS)
 	int	zbx_sock_init(void);
 #	define	zbx_sock_close(sock)	closesocket(sock)
 #	define  zbx_sock_last_error()	WSAGetLastError()
-#else /* not WIN32 */
+#else /* not _WINDOWS */
 #	define	zbx_sock_init()	SUCCEED
 #	define	zbx_sock_close(sock)	close(sock)
 #	define  zbx_sock_last_error()	errno
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 
 
 #endif /* ZABBIX_ZBXSOCK_H */

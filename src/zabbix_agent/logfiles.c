@@ -71,7 +71,7 @@ int   process_log(char *filename,long *lastlogsize, char *value)
 	}
 	zbx_fclose(f);
 
-	*lastlogsize+=strlen(value);
+	*lastlogsize += (long)strlen(value);
 
 	return 0;
 }

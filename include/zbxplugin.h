@@ -20,17 +20,17 @@
 #ifndef ZABBIX_ZBXPLUGIN_H
 #define ZABBIX_ZBXPLUGIN_H
 
-#ifdef WIN32
+#ifdef _WINDOWS
 
 #	define __zabbix_api __cdecl
 typedef HMODULE ZBX_MODULE;
 
-#else /* not WIN32 */
+#else /* not _WINDOWS */
 
 #	define __zabbix_api
 typedef void* ZBX_MODULE;
 
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 
 #define MAX_CMDNAME	256
 

@@ -20,16 +20,16 @@
 #ifndef ZABBIX_SERVICE_H
 #define ZABBIX_SERVICE_H
 
-#if !defined(WIN32)
+#if !defined(_WINDOWS)
 #	error "This module allowed only for Windows OS"
-#endif
+#endif /* _WINDOWS */
 
 #include "threads.h"
 
 extern ZBX_THREAD_HANDLE	*threads;
 
-#define ZABBIX_SERVICE_NAME   "ZabbixAgentdW32"
-#define ZABBIX_EVENT_SOURCE   "ZABBIX Win32 Agent"
+#define ZABBIX_SERVICE_NAME   APPLICATION_NAME
+#define ZABBIX_EVENT_SOURCE   APPLICATION_NAME
 
 void service_start(void);
 

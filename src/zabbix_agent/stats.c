@@ -67,7 +67,7 @@ ZBX_COLLECTOR_DATA *collector = NULL;
 
 void	init_collector_data(void)
 {
-#if defined (WIN32)
+#if defined (_WINDOWS)
 
 	collector = calloc(1, sizeof(ZBX_COLLECTOR_DATA));
 
@@ -78,7 +78,7 @@ void	init_collector_data(void)
 
 	}
 
-#else /* not WIN32 */
+#else /* not _WINDOWS */
 
 	key_t	shm_key;
 	int	shm_id;
@@ -101,7 +101,7 @@ void	init_collector_data(void)
 		exit(1);
 	}
 
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 }
 
 /******************************************************************************
@@ -123,13 +123,13 @@ void	init_collector_data(void)
 void	free_collector_data(void)
 {
 
-#if defined (WIN32)
+#if defined (_WINDOWS)
 
 	if(NULL == collector) return;
 
 	free(collector);
 
-#else /* not WIN32 */
+#else /* not _WINDOWS */
 
 	key_t	shm_key;
 	int	shm_id;
@@ -148,7 +148,7 @@ void	free_collector_data(void)
 
 	shmctl(shm_id, IPC_RMID, 0);
 
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 
 	collector = NULL;
 }

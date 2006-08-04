@@ -38,7 +38,7 @@
 double	zbx_time(void)
 {
 
-#if defined(WIN32)
+#if defined(_WINDOWS)
 
 	struct _timeb current;
 
@@ -46,7 +46,7 @@ double	zbx_time(void)
 
 	return (((double)current.time) + 1.0e-6 * ((double)current.millitm));
 
-#else /* not WIN32 */
+#else /* not _WINDOWS */
 
 	struct timeval current;
 
@@ -54,7 +54,7 @@ double	zbx_time(void)
 
 	return (((double)current.tv_sec) + 1.0e-6 * ((double)current.tv_usec));
 
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 
 }
 

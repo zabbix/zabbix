@@ -294,7 +294,7 @@ static int	get_active_checks(char *server, unsigned short port, char *error, int
 	zbx_snprintf(buf, sizeof(buf), "%s\n%s\n","ZBX_GET_ACTIVE_CHECKS", CONFIG_HOSTNAME);
 	zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", buf);
 
-	if(SOCKET_ERROR == zbx_sock_write(s, buf, strlen(buf)))
+	if(SOCKET_ERROR == zbx_sock_write(s, buf, (int)strlen(buf)))
 	{
 		switch (errno)
 		{
@@ -399,7 +399,7 @@ static int	send_value(char *server,unsigned short port,char *host, char *key,cha
 
 	zabbix_log(LOG_LEVEL_DEBUG, "XML before sending [%s]",buf);
 
-	if(SOCKET_ERROR == zbx_sock_write(s, buf, strlen(buf)))
+	if(SOCKET_ERROR == zbx_sock_write(s, buf, (int)strlen(buf)))
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Error during sending [%s:%u] [%s]",server, port, strerror_from_system(errno));
 		zbx_sock_close(s);
@@ -448,7 +448,7 @@ static int	process_active_checks(char *server, unsigned short port)
 
 	init_result(&result);
 
-	now = time(NULL);
+	now = (int)time(NULL);
 
 	for(i=0; NULL != active_metrics[i].key; i++)
 	{
@@ -515,7 +515,7 @@ static int	process_active_checks(char *server, unsigned short port)
 			}
 		}
 
-		active_metrics[i].nextcheck = time(NULL)+active_metrics[i].refresh;
+		active_metrics[i].nextcheck = (int)time(NULL)+active_metrics[i].refresh;
 	}
 	return ret;
 }
@@ -558,7 +558,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	init_active_metrics();
 
 	refresh_metrics(activechk_args.host, activechk_args.port, error, MAX_STRING_LEN);
-	nextrefresh = time(NULL) + CONFIG_REFRESH_ACTIVE_CHECKS;
+	nextrefresh = (int)time(NULL) + CONFIG_REFRESH_ACTIVE_CHECKS;
 
 	while(ZBX_IS_RUNNING)
 	{
@@ -578,7 +578,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 		}
 		else
 		{
-			sleeptime = nextcheck - time(NULL);
+			sleeptime = nextcheck - (int)time(NULL);
 
 			sleeptime = MAX(sleeptime, 0);
 		}
@@ -602,7 +602,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 		if(time(NULL) >= nextrefresh)
 		{
 			refresh_metrics(activechk_args.host, activechk_args.port, error, MAX_STRING_LEN);
-			nextrefresh=time(NULL) + CONFIG_REFRESH_ACTIVE_CHECKS;
+			nextrefresh = (int)time(NULL) + CONFIG_REFRESH_ACTIVE_CHECKS;
 		}
 	}
 
