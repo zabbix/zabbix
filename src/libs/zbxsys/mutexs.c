@@ -20,7 +20,7 @@
 #include "common.h"
 #include "mutexs.h"
 
-#if !defined(WIN32)
+#if !defined(_WINDOWS)
 
 #	if !defined(semun)
 		union semun
@@ -34,7 +34,7 @@
 
 #	include "cfg.h"
 
-#endif /* not WIN32 */
+#endif /* not _WINDOWS */
 
 #include "log.h"
 
@@ -57,7 +57,7 @@
 
 int zbx_mutex_create(ZBX_MUTEX *mutex, char *name)
 {
-#if defined(WIN32)	
+#if defined(_WINDOWS)	
 
 	/* ignore "name" */
 	if(NULL == ((*mutex) = CreateMutex(NULL, FALSE, NULL)))
@@ -66,7 +66,7 @@ int zbx_mutex_create(ZBX_MUTEX *mutex, char *name)
 		return ZBX_MUTEX_ERROR;
 	}
 
-#else /* not WIN32 */
+#else /* not _WINDOWS */
 
 	key_t	sem_key;
 	int	sem_id;
@@ -95,7 +95,7 @@ int zbx_mutex_create(ZBX_MUTEX *mutex, char *name)
 
 	*mutex = sem_id;
 	
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 
 	return ZBX_MUTEX_OK;
 }
@@ -120,7 +120,7 @@ int zbx_mutex_lock(ZBX_MUTEX *mutex)
 {
 
 	
-#if defined(WIN32)	
+#if defined(_WINDOWS)	
 
 	if(!*mutex) return ZBX_MUTEX_OK;
 	
@@ -130,7 +130,7 @@ int zbx_mutex_lock(ZBX_MUTEX *mutex)
 		return ZBX_MUTEX_ERROR;
 	}
 
-#else /* not WIN32 */
+#else /* not _WINDOWS */
 
 	struct sembuf sem_lock = { 0, -1, 0 };
 
@@ -142,7 +142,7 @@ int zbx_mutex_lock(ZBX_MUTEX *mutex)
 		return ZBX_MUTEX_ERROR;
 	}
 	
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 
 	return ZBX_MUTEX_OK;
 }
@@ -167,7 +167,7 @@ int zbx_mutex_unlock(ZBX_MUTEX *mutex)
 {
 
 	
-#if defined(WIN32)	
+#if defined(_WINDOWS)	
 
 	if(!*mutex) return ZBX_MUTEX_OK;
 
@@ -177,7 +177,7 @@ int zbx_mutex_unlock(ZBX_MUTEX *mutex)
 		return ZBX_MUTEX_ERROR;
 	}
 
-#else /* not WIN32 */
+#else /* not _WINDOWS */
 
 	struct sembuf sem_unlock = { 0, 1, 0};
 
@@ -189,7 +189,7 @@ int zbx_mutex_unlock(ZBX_MUTEX *mutex)
 		return ZBX_MUTEX_ERROR;
 	}
 	
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 
 	return ZBX_MUTEX_OK;
 }
@@ -213,7 +213,7 @@ int zbx_mutex_unlock(ZBX_MUTEX *mutex)
 int zbx_mutex_destroy(ZBX_MUTEX *mutex)
 {
 	
-#if defined(WIN32)	
+#if defined(_WINDOWS)	
 
 	if(!*mutex) return ZBX_MUTEX_OK;
 
@@ -223,13 +223,13 @@ int zbx_mutex_destroy(ZBX_MUTEX *mutex)
 		return ZBX_MUTEX_ERROR;
 	}
 
-#else /* not WIN32 */
+#else /* not _WINDOWS */
 	
 	if(!*mutex) return ZBX_MUTEX_OK;
 
 	semctl(*mutex, 0, IPC_RMID, 0);
 
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 	
 	*mutex = (ZBX_MUTEX)NULL;
 

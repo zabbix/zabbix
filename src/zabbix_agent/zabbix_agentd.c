@@ -49,24 +49,28 @@ char *progname = NULL;
 
 /* application TITLE */
 
-char title_message[] = "ZABBIX Agent"
-#if defined(ZABBIX_SERVICE)
-		" (service)"
-#elif defined(ZABBIX_DAEMON) /* ZABBIX_SERVICE */
-		" (daemon)"
-#endif /* ZABBIX_DAEMON */
+char title_message[] = APPLICATION_NAME
+#if defined(_WIN64)		
+				" Win64"
+#elif defined(WIN32)		
+				" Win32"
+#endif /* WIN32 */
+#if defined(ZABBIX_SERVICE)	
+				" (service)"
+#elif defined(ZABBIX_DAEMON)	
+				" (daemon)"
+#endif /* ZABBIX_SERVICE */
 	;
 /* end of application TITLE */
-
 
 
 /* application USAGE message */
 
 char usage_message[] = 
 	"[-vhp]"
-#if defined(WIN32)
+#if defined(_WINDOWS)
 	" [-idsx]"
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 	" [-c <file>] [-t <metric>]";
 
 /*end of application USAGE message */
@@ -85,7 +89,7 @@ char *help_message[] = {
 	"  -t --test <metric>  test specified metric and exit",
 /*	"  -u --usage <metric> test specified metric and exit",	*/ /* !!! TODO - print metric usage !!! */
 
-#if defined (WIN32)
+#if defined (_WINDOWS)
 
 	"",
 	"Functions:",
@@ -96,7 +100,7 @@ char *help_message[] = {
 	"  -s --start          start ZABIX agent service",
 	"  -x --stop           stop ZABIX agent service",
 
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 
 	0 /* end of text */
 };
@@ -117,7 +121,7 @@ static struct zbx_option longopts[] =
 	{"print",	0,	0,	'p'},
 	{"test",	1,	0,	't'},
 
-#if defined (WIN32)
+#if defined (_WINDOWS)
 
 	{"install",	0,	0,	'i'},
 	{"uninstall",	0,	0,	'd'},
@@ -125,7 +129,7 @@ static struct zbx_option longopts[] =
 	{"start",	0,	0,	's'},
 	{"stop",	0,	0,	'x'},
 
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 
 	{0,0,0,0}
 };
@@ -134,9 +138,9 @@ static struct zbx_option longopts[] =
 
 static char	shortopts[] = 
 	"c:hvpt:"
-#if defined (WIN32)
+#if defined (_WINDOWS)
 	"idsx"
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 	;
 
 /* end of COMMAND LINE OPTIONS*/
@@ -178,7 +182,7 @@ static int parse_commandline(int argc, char **argv)
 			}
 			break;
 
-#if defined (WIN32)
+#if defined (_WINDOWS)
 		case 'i':
 			task = ZBX_TASK_INSTALL_SERVICE;
 			break;
@@ -192,7 +196,7 @@ static int parse_commandline(int argc, char **argv)
 			task = ZBX_TASK_STOP_SERVICE;
 			break;
 
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 
 		default:
 			task = ZBX_TASK_SHOW_USAGE;
@@ -321,7 +325,7 @@ int MAIN_ZABBIX_ENTRY(void)
 void	zbx_on_exit()
 {
 
-#if !defined(WIN32)
+#if !defined(_WINDOWS)
 	
 	int i = 0;
 
@@ -336,7 +340,7 @@ void	zbx_on_exit()
 		}
 	}
 	
-#endif /* not WIN32 */
+#endif /* not _WINDOWS */
 	
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called.");
 
@@ -393,7 +397,7 @@ int	main(int argc, char **argv)
 	switch(task)
 	{
 
-#if defined (WIN32)
+#if defined (_WINDOWS)
 		case ZBX_TASK_INSTALL_SERVICE:
 			exit(ZabbixCreateService(argv[0]));
 			break;
@@ -406,7 +410,7 @@ int	main(int argc, char **argv)
 		case ZBX_TASK_STOP_SERVICE:
 			exit(ZabbixStopService());
 			break;
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 		case ZBX_TASK_PRINT_SUPPORTED:
 			test_parameters();
 			exit(SUCCEED);

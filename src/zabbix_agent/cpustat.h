@@ -20,7 +20,7 @@
 #ifndef ZABBIX_CPUSTAT_H
 #define ZABBIX_CPUSTAT_H
 
-#if defined (WIN32)
+#if defined (_WINDOWS)
 
 	#define MAX_CPU	16
 	#define MAX_CPU_HISTORY 900 /* 15 min in seconds */
@@ -57,7 +57,7 @@
 
 	} ZBX_CPUS_STAT_DATA;
 
-#else /* not WIN32 */
+#else /* not _WINDOWS */
 
 	#define MAX_CPU_HISTORY 900 /* 15 min in seconds */
 
@@ -92,7 +92,7 @@
 
 	} ZBX_CPUS_STAT_DATA;
 
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 
 
 int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus);

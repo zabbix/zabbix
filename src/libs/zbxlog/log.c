@@ -31,7 +31,7 @@ static	int log_level = LOG_LEVEL_DEBUG;
 
 static ZBX_MUTEX log_file_access;
 
-#if defined(WIN32)
+#if defined(_WINDOWS)
 
 #include "messages.h"
 
@@ -63,16 +63,16 @@ int zabbix_open_log(int type, int level, const char *filename)
 zbx_error("Loging to SYSLOG",filename);
 		log_type = LOG_TYPE_SYSLOG;
 
-#if defined(WIN32)
+#if defined(_WINDOWS)
 
 		system_log_handle = RegisterEventSource(NULL, ZABBIX_EVENT_SOURCE);
 
-#else /* not WIN32 */
+#else /* not _WINDOWS */
 
         	openlog("zabbix_suckerd", LOG_PID, LOG_USER);
         	setlogmask(LOG_UPTO(LOG_WARNING));
 
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 	}
 
 	else if(LOG_TYPE_FILE == type)
@@ -123,16 +123,16 @@ void zabbix_close_log(void)
 {
 	if(LOG_TYPE_SYSLOG == log_type)
 	{
-#if defined(WIN32)
+#if defined(_WINDOWS)
 
 		if(system_log_handle) 
 			DeregisterEventSource(system_log_handle);
 
-#else /* not WIN32 */
+#else /* not _WINDOWS */
 
 		closelog();
 
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 	}
 	else if(log_type == LOG_TYPE_FILE)
 	{
@@ -163,13 +163,13 @@ void zabbix_log(int level, const char *fmt, ...)
 	struct	stat	buf;
 
 	char	filename_old[MAX_STRING_LEN];
-#if defined(WIN32)
+#if defined(_WINDOWS)
 
 	WORD	wType;
 	char	thread_id[20];
 	char	*(strings[]) = {thread_id, message, NULL};
 	
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 
 	if( (level > log_level) || (LOG_LEVEL_EMPTY == level))
 	{
@@ -235,7 +235,7 @@ void zabbix_log(int level, const char *fmt, ...)
 
 	if(LOG_TYPE_SYSLOG == log_type)
 	{
-#if defined(WIN32)
+#if defined(_WINDOWS)
 		t = time(NULL);
 		tm = localtime(&t);
 
@@ -266,11 +266,11 @@ void zabbix_log(int level, const char *fmt, ...)
 			strings, 
 			NULL);
 
-#else /* not WIN32 */
+#else /* not _WINDOWS */
 
 		syslog(LOG_DEBUG,message);
 		
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 	}
 	else
 	{
@@ -306,7 +306,7 @@ void zabbix_log(int level, const char *fmt, ...)
 
 char *strerror_from_system(unsigned long error)
 {
-#if defined(WIN32)
+#if defined(_WINDOWS)
 
 	static char buffer[ZBX_MESSAGE_BUF_SIZE];  /* !!! Attention static !!! not thread safely - Win32*/
 
@@ -326,11 +326,11 @@ char *strerror_from_system(unsigned long error)
 
 	return buffer;
 
-#else /* not WIN32 */
+#else /* not _WINDOWS */
 
 	return strerror(errno);
 
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 }
 
 /*
@@ -339,7 +339,7 @@ char *strerror_from_system(unsigned long error)
 
 char *strerror_from_module(unsigned long error, const char *module)
 {
-#if defined(WIN32)
+#if defined(_WINDOWS)
 
 	static char buffer[ZBX_MESSAGE_BUF_SIZE]; /* !!! Attention static !!! not thread safely - Win32*/
 	char *strings[2];
@@ -361,10 +361,10 @@ char *strerror_from_module(unsigned long error, const char *module)
 
 	return (char *)buffer;
 
-#else /* not WIN32 */
+#else /* not _WINDOWS */
 
 	return strerror(errno);
 
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 
 }

@@ -1,5 +1,6 @@
 Changes for 1.3:
 
+ - added ZABBIX agent for Win64 platforms. (Eugene)
  - fixed incorrect disabling of actions while deleting a trigger (Alexei)
  - improved sound notification of trigger status changing (Eugene)
  - added alternative startup scripts for Fedora Linux (Alexei)

@@ -52,7 +52,7 @@ int xml_get_data(char *xml,char *tag, char *data, int maxlen)
 
 	if(ret == SUCCEED)
 	{
-		len=end-(start+strlen(tag_open));
+		len = (int)(end - start - strlen(tag_open));
 
 		if(len>maxlen)	len=maxlen;
 

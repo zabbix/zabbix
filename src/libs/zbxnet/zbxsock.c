@@ -22,7 +22,7 @@
 
 #include "log.h"
 
-#if defined(WIN32)
+#if defined(_WINDOWS)
 int	zbx_sock_init(void)
 {
 	WSADATA sockInfo;
@@ -51,7 +51,7 @@ int	zbx_sock_init(void)
 }
 #endif /* WIN 32 */
 
-#if !defined(WIN32)
+#if !defined(_WINDOWS)
 
 static void	sock_signal_handler(int sig)
 {
@@ -66,11 +66,11 @@ static void	sock_signal_handler(int sig)
 	}
 }
 
-#endif /* not WIN32 */
+#endif /* not _WINDOWS */
 
 int zbx_sock_read(ZBX_SOCKET sock, void *buf, int buflen, int timeout)
 {
-#if defined (WIN32)
+#if defined (_WINDOWS)
 
 	TIMEVAL		time = {0,0};
 	FD_SET		rdfs;
@@ -98,7 +98,7 @@ int zbx_sock_read(ZBX_SOCKET sock, void *buf, int buflen, int timeout)
 	return (int)recv(sock, buf, buflen, 0);
 
 
-#else /* not WIN32 */
+#else /* not _WINDOWS */
 
         static struct  	sigaction phan;
 	int nread = 0;
@@ -119,7 +119,7 @@ int zbx_sock_read(ZBX_SOCKET sock, void *buf, int buflen, int timeout)
 
 	return nread;
 
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 
 	/* normal case the program will never reach this point. */
 	return SOCKET_ERROR;
@@ -127,14 +127,14 @@ int zbx_sock_read(ZBX_SOCKET sock, void *buf, int buflen, int timeout)
 
 int zbx_sock_write(ZBX_SOCKET sock, void *buf, int buflen)
 {
-#if defined (WIN32)
+#if defined (_WINDOWS)
 
 	return send(sock, buf, buflen,0);
 
-#else /* not WIN32 */
+#else /* not _WINDOWS */
 
 	return write(sock, buf, buflen);
 
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 
 }

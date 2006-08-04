@@ -562,7 +562,7 @@ void	zbx_on_exit()
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called.");
 	
-#if !defined(WIN32)
+#if !defined(_WINDOWS)
 	
 	int i = 0;
 
@@ -577,7 +577,7 @@ void	zbx_on_exit()
 		}
 	}
 	
-#endif /* not WIN32 */
+#endif /* not _WINDOWS */
 
 #ifdef USE_PID_FILE
 

@@ -22,11 +22,11 @@
 
 #include "log.h"
 
-#ifdef WIN32
+#ifdef _WINDOWS
 
 	#include "perfmon.h"
 
-#else /* not WIN32 */
+#else /* not _WINDOWS */
 
 	static int	get_cpustat(
 		int *now,
@@ -45,7 +45,7 @@
 		float cpu_idle
 		);
 
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 
 
 /******************************************************************************
@@ -69,7 +69,7 @@
 
 int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 {
-#ifdef WIN32
+#ifdef _WINDOWS
 
 	SYSTEM_INFO	sysInfo;
 	PDH_STATUS	status;
@@ -135,12 +135,12 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 		return 2;
 	}
 
-#else /* not WIN32 */
+#else /* not _WINDOWS */
 
 	memset(pcpus, 0, sizeof(ZBX_CPUS_STAT_DATA));
 
 
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 
 	return 0;
 }
@@ -164,7 +164,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 
 void	close_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 {
-#ifdef WIN32
+#ifdef _WINDOWS
 
 	int i;
 
@@ -189,13 +189,13 @@ void	close_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 		pcpus->pdh_query = NULL;
 	}
 
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 
 }
 
 void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 {
-#ifdef WIN32
+#ifdef _WINDOWS
 
 	PDH_FMT_COUNTERVALUE 
 		value;
@@ -303,7 +303,7 @@ void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 		if (pcpus->h_queue_index == MAX_CPU_HISTORY)
 			pcpus->h_queue_index = 0;
 	}
-#else /* not WIN32 */
+#else /* not _WINDOWS */
 
 	int	now = 0;
 	float	cpu_user, cpu_nice, cpu_system, cpu_idle;
@@ -314,10 +314,10 @@ void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 
 	apply_cpustat(pcpus, now, cpu_user, cpu_system, cpu_nice, cpu_idle);
 
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 }
 
-#if !defined(WIN32)
+#if !defined(_WINDOWS)
 
 static int	get_cpustat(int *now,float *cpu_user,float *cpu_system,float *cpu_nice,float *cpu_idle)
 {
@@ -475,4 +475,4 @@ static void	apply_cpustat(
 	CALC_CPU_LOAD(pcpus->system, pcpus->system15,	pcpus->all, pcpus->all15);
 }
 
-#endif /* not WIN32 */
+#endif /* not _WINDOWS */

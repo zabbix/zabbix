@@ -4,8 +4,6 @@
 /* Define to os name for code managing */
 #define ARCH "windows"
 
-//#define WIN32_LEAN_AND_MEAN
-
 /* Define to 1 if you have the <windows.h> header file. */
 #define HAVE_WINDOWS_H 1
 

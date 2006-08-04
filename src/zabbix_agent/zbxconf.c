@@ -35,11 +35,11 @@
 #	include "zbxplugin.h"
 #endif /* WITH_PLUGINS */
 
-#ifdef WIN32
+#ifdef _WINDOWS
 	static char	DEFAULT_CONFIG_FILE[]	= "C:\\zabbix_agentd.conf";
-#else /* not WIN32 */
+#else /* not _WINDOWS */
 	static char	DEFAULT_CONFIG_FILE[]	= "/etc/zabbix/zabbix_agentd.conf";
-#endif /* WIN32 */
+#endif /* _WINDOWS */
 
 #ifdef USE_PID_FILE
 	static char	DEFAULT_PID_FILE[]	= "/tmp/zabbix_agentd.pid";
