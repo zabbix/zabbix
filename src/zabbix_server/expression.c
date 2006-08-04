@@ -585,6 +585,13 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data
 			strncat(data, trigger->description, MAX_STRING_LEN);
 			strncat(data, s+strlen("{TRIGGER.NAME}"), MAX_STRING_LEN);
 		}
+		else if( (s = strstr(str,"{TRIGGER.COMMENT}")) != NULL )
+		{
+			s[0]=0;
+			strcpy(data, str);
+			strncat(data, trigger->comments, MAX_STRING_LEN);
+			strncat(data, s+strlen("{TRIGGER.COMMENT}"), MAX_STRING_LEN);
+		}
 		else if( (s = strstr(str,"{HOSTNAME}")) != NULL )
 		{
 /*			zbx_snprintf(sql,sizeof(sql),"select distinct t.description,h.host from triggers t, functions f,items i, hosts h where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid", trigger->triggerid);*/
