@@ -206,11 +206,11 @@ static int parse_commandline(int argc, char **argv)
 	return task;
 }
 
-static ZBX_SOCKET connect_to_server(void)
+static ZBX_SOCKET tcp_listen(void)
 {
 	ZBX_SOCKET sock;
 	ZBX_SOCKADDR serv_addr;
-	char	on;
+	int	on;
 
 	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
 	{
@@ -222,7 +222,7 @@ static ZBX_SOCKET connect_to_server(void)
 	/* This is to immediately use the address even if it is in TIME_WAIT state */
 	/* http://www-128.ibm.com/developerworks/linux/library/l-sockpit/index.html */
 	on = 1;
-	if( -1 == setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on) ))
+	if( -1 == setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (void *)&on, sizeof(on) ))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot setsockopt SO_REUSEADDR [%s]", strerror(errno));
 	}
@@ -275,7 +275,7 @@ int MAIN_ZABBIX_ENTRY(void)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "zabbix_agentd started. ZABBIX %s.", ZABBIX_VERSION);
 
-	sock = connect_to_server();
+	sock = tcp_listen();
 
 	init_collector_data();
 
