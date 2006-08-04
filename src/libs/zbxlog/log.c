@@ -171,7 +171,7 @@ void zabbix_log(int level, const char *fmt, ...)
 	
 #endif /* _WINDOWS */
 
-	if( (level > log_level) || (LOG_LEVEL_EMPTY == level))
+	if( (level != LOG_LEVEL_INFORMATION) && ((level > log_level) || (LOG_LEVEL_EMPTY == level)) )
 	{
 		return;
 	}
