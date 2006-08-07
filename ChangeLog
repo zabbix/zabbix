@@ -1,5 +1,6 @@
 Changes for 1.1.2:
 
+ - added spec file for ZABBIX agent. Thanks to Alexey Zilber. (Alexei)
  - fixed count of problems displayin for submaps (Eugene)
  - fixed incorrect disabling of actions while deleting a trigger (Alexei)
  - added Zabbix agent for Win64 platforms. (Eugene)
