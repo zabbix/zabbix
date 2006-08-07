@@ -1,5 +1,6 @@
 Changes for 1.1.2:
 
+ - fixed count of problems displayin for submaps (Eugene)
  - fixed incorrect disabling of actions while deleting a trigger (Alexei)
  - added Zabbix agent for Win64 platforms. (Eugene)
  - added alternative startup scripts for Fedora Linux (Alexei)
