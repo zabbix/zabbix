@@ -1,5 +1,6 @@
 Changes for 1.3:
 
+ - fixed count of problems displayin for submaps (Eugene)
  - added support of macro {TRIGGER.COMMENT} (Alexei)
  - added ZABBIX agent for Win64 platforms. (Eugene)
  - fixed incorrect disabling of actions while deleting a trigger (Alexei)
