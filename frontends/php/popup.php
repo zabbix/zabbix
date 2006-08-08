@@ -257,6 +257,8 @@
 //				" window.opener.document.forms['".$dstfrm."'].".$dstfld2.".value='".$exp_desc."';".
 				" window.close();");
 
+			$description = array($description);
+
 			//add dependences
 			$result1=DBselect("select t.triggerid,t.description from triggers t,trigger_depends d".
 				" where t.triggerid=d.triggerid_up and d.triggerid_down=".$row["triggerid"]);
