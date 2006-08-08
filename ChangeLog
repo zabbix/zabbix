@@ -1,5 +1,6 @@
 Changes for 1.1.1-le:
 
+ - fixed warning in trigger selection popup (Alexei)
  - fixed count of problems displayin for submaps (Eugene)
  - fixed graphs drawing (Eugene)
  - fixed graph min value calculation (Eugene)
