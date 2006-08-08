@@ -32,12 +32,12 @@
 #include "log.h"
 #include "logfiles.h"
 
-int   process_log(char *filename,int *lastlogsize, char *value)
+int   process_log(char *filename,long *lastlogsize, char *value)
 {
 	FILE	*f;
 	struct stat	buf;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In process log (%s,%d)", filename, *lastlogsize);
+	zabbix_log( LOG_LEVEL_DEBUG, "In process log (%s,%ld)", filename, *lastlogsize);
 
 	/* Handling of file shrinking */
 	if(stat(filename,&buf) == 0)
@@ -64,7 +64,7 @@ int   process_log(char *filename,int *lastlogsize, char *value)
 
 	if(-1 == fseek(f,*lastlogsize,SEEK_SET))
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Cannot set postition to [%d] for [%s] [%s]", *lastlogsize, filename, strerror(errno));
+		zabbix_log( LOG_LEVEL_WARNING, "Cannot set postition to [%ld] for [%s] [%s]", *lastlogsize, filename, strerror(errno));
 		snprintf(value,MAX_STRING_LEN-1,"%s","ZBX_NOTSUPPORTED\n");
 		fclose(f);
 		return 1;

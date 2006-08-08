@@ -61,7 +61,7 @@ void Communicate(SOCKET sock)
 	FD_SET		rdfs;
 	REQUEST		rq;
 
-	int rc = 0;
+	int	rc = 0;
 
 LOG_FUNC_CALL("In Communicate()");
 INIT_CHECK_MEMORY(main);
@@ -72,7 +72,7 @@ INIT_CHECK_MEMORY(main);
 
 	timeout.tv_sec	= COMMAND_TIMEOUT;
 	timeout.tv_usec	= 0;
-	rc = select(sock+1, &rdfs, (fd_set *)NULL, (fd_set *)NULL, &timeout);
+	rc = select((int)sock+1, &rdfs, (fd_set *)NULL, (fd_set *)NULL, &timeout);
 	if (rc == SOCKET_ERROR)
 	{
 		WriteLog(MSG_SELECT_ERROR,EVENTLOG_ERROR_TYPE,"e",WSAGetLastError());
@@ -102,7 +102,7 @@ end_session:
 	sprintf(rq.result,"ERROR\n");
 
 send_result:
-	send(sock,rq.result,strlen(rq.result),0);
+	send(sock,rq.result,(int)strlen(rq.result),0);
 
 CHECK_MEMORY(main, "Communicate", "end");
 LOG_FUNC_CALL("End of Communicate()");

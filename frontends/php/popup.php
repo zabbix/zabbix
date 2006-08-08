@@ -58,6 +58,12 @@
 	}
 ?>
 <?php
+	function get_window_opener($frame, $field, $value)
+	{
+		return "window.opener.document.forms['".addslashes($frame)."'].".addslashes($field).".value='".addslashes($value)."';";
+	}
+?>
+<?php
 	$frmTitle = new CForm();
 	$frmTitle->AddVar("dstfrm",	$dstfrm);
 	$frmTitle->AddVar("dstfld1",	$dstfld1);
@@ -129,8 +135,11 @@
 
 	if(in_array($srctbl,array("triggers","hosts")))
 	{
-		$btnEmpty = new CButton("empty",S_EMPTY,"window.opener.document.forms['".$dstfrm."'].".$dstfld1.".value='0';".
-			" window.opener.document.forms['".$dstfrm."'].".$dstfld2.".value='';".
+		$btnEmpty = new CButton("empty",S_EMPTY,
+//			"window.opener.document.forms['".$dstfrm."'].".$dstfld1.".value='0';".
+//			" window.opener.document.forms['".$dstfrm."'].".$dstfld2.".value='';".
+			get_window_opener($dstfrm, $dstfld1, 0).
+			get_window_opener($dstfrm, $dstfld2, '').
 			" window.close();");
 
 		$frmTitle->AddItem(array(SPACE,$btnEmpty));
@@ -155,8 +164,10 @@
 			if(!check_right("Host","R",$host["hostid"]))	continue;
 			$name = new CLink($host["host"],"#","action");
 			$name->SetAction(
-				"window.opener.document.forms['".$dstfrm."'].".$dstfld1.".value='".$host[$srcfld1]."';".
-				" window.opener.document.forms['".$dstfrm."'].".$dstfld2.".value='".$host[$srcfld2]."';".
+//				"window.opener.document.forms['".$dstfrm."'].".$dstfld1.".value='".$host[$srcfld1]."';".
+//				" window.opener.document.forms['".$dstfrm."'].".$dstfld2.".value='".$host[$srcfld2]."';".
+				get_window_opener($dstfrm, $dstfld1, $host[$srcfld1]).
+				get_window_opener($dstfrm, $dstfld2, $host[$srcfld2]).
 				" window.close();");
 
 			if($host["status"] == HOST_STATUS_MONITORED)	
@@ -199,8 +210,8 @@
 		{
 			$name = new CLink($row["key_"],"#","action");
 			$name->SetAction(
-				"window.opener.document.forms['".$dstfrm."'].".$dstfld1.".value='".$row[$srcfld1]."';".
-//				" window.opener.document.forms['".$dstfrm."'].".$dstfld2.".value='".$row[$srcfld2]."';".
+//				"window.opener.document.forms['".$dstfrm."'].".$dstfld1.".value='".$row[$srcfld1]."';".
+				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
 				" window.close();");
 
 			$table->addRow(array(
@@ -240,9 +251,13 @@
 			$exp_desc = expand_trigger_description($row["triggerid"]);
 			$description = new CLink($exp_desc,"#","action");
 			$description->SetAction(
-				"window.opener.document.forms['".$dstfrm."'].".$dstfld1.".value='".$row[$srcfld1]."';".
-				" window.opener.document.forms['".$dstfrm."'].".$dstfld2.".value='".$exp_desc."';".
+				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
+				get_window_opener($dstfrm, $dstfld2, $exp_desc).
+//				"window.opener.document.forms['".$dstfrm."'].".$dstfld1.".value='".$row[$srcfld1]."';".
+//				" window.opener.document.forms['".$dstfrm."'].".$dstfld2.".value='".$exp_desc."';".
 				" window.close();");
+
+			$description = array($description);
 
 			//add dependences
 			$result1=DBselect("select t.triggerid,t.description from triggers t,trigger_depends d".

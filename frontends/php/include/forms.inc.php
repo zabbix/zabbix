@@ -597,7 +597,7 @@
 	function	insert_trigger_form()
 	{
 		$frmTrig = new CFormTable(S_TRIGGER,"triggers.php");
-		$frmTrig->SetHelp("web.triggers.trigger.php");
+		$frmTrig->SetHelp("config_triggers.php");
 
 		if(isset($_REQUEST["hostid"]))
 		{
@@ -1368,8 +1368,8 @@
 
 		if($repeat>0)
 		{
-			$frmAction->AddRow(S_NUMBER_OF_REPEATS, new CTextBox('maxrepeats',$maxrepeats,2));
-			$frmAction->AddRow(S_DELAY_BETWEEN_REPEATS, new CTextBox('repeatdelay',$repeatdelay,2));
+			$frmAction->AddRow(S_NUMBER_OF_REPEATS, new CTextBox('maxrepeats',$maxrepeats,5));
+			$frmAction->AddRow(S_DELAY_BETWEEN_REPEATS, new CTextBox('repeatdelay',$repeatdelay,5));
 		} else {
 			$frmAction->AddVar("maxrepeats",$maxrepeats);
 			$frmAction->AddVar("repeatdelay",$repeatdelay);

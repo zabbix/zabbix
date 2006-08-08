@@ -148,7 +148,7 @@ INIT_CHECK_MEMORY(main);
    }
 
    sprintf(cmdLine,"\"%s\" --config \"%s\"",execName,confFile);
-   service=CreateService(mgr,ZABBIX_SERVICE_NAME,"Zabbix Win32 Agent",GENERIC_READ,SERVICE_WIN32_OWN_PROCESS,
+   service=CreateService(mgr,ZABBIX_SERVICE_NAME,"Zabbix Win" PLATFORM " Agent",GENERIC_READ,SERVICE_WIN32_OWN_PROCESS,
                          SERVICE_AUTO_START,SERVICE_ERROR_NORMAL,cmdLine,NULL,NULL,NULL,NULL,NULL);
    if (service==NULL)
    {
@@ -162,7 +162,7 @@ INIT_CHECK_MEMORY(main);
    }
    else
    {
-      printf("Zabbix Win32 Agent service created successfully\n");
+      printf("Zabbix Win" PLATFORM " Agent service created successfully\n");
       CloseServiceHandle(service);
    }
 
@@ -205,7 +205,7 @@ CHECK_MEMORY(main,"ZabbixCreateService","OpenSCManager");
    else
    {
       if (DeleteService(service))
-         printf("Zabbix Win32 Agent service deleted successfully\n");
+         printf("Zabbix Win" PLATFORM " Agent service deleted successfully\n");
       else
 	  {
          printf("ERROR: Cannot remove service named '" ZABBIX_SERVICE_NAME "' (%s)\n",
@@ -255,7 +255,7 @@ CHECK_MEMORY(main,"ZabbixStartService","OpenSCManager");
    else
    {
       if (StartService(service,0,NULL))
-         printf("Zabbix Win32 Agent service started successfully\n");
+         printf("Zabbix Win" PLATFORM " Agent service started successfully\n");
       else
 	  {
          printf("ERROR: Cannot start service named '" ZABBIX_SERVICE_NAME "' (%s)\n",
@@ -303,7 +303,7 @@ CHECK_MEMORY(main,"ZabbixStopService","OpenSCManager");
       SERVICE_STATUS status;
 
       if (ControlService(service,SERVICE_CONTROL_STOP,&status))
-         printf("Zabbix Win32 Agent service stopped successfully\n");
+         printf("Zabbix Win" PLATFORM " Agent service stopped successfully\n");
       else
 	  {
          printf("ERROR: Cannot stop service named '" ZABBIX_SERVICE_NAME "' (%s)\n",
@@ -341,7 +341,7 @@ CHECK_MEMORY(main,"ZabbixInstallEventSource","RegCreateKeyEx");
    }
 
    RegSetValueEx(hKey,"TypesSupported",0,REG_DWORD,(BYTE *)&dwTypes,sizeof(DWORD));
-   RegSetValueEx(hKey,"EventMessageFile",0,REG_EXPAND_SZ,(BYTE *)path,strlen(path)+1);
+   RegSetValueEx(hKey,"EventMessageFile",0,REG_EXPAND_SZ,(BYTE *)path, (DWORD)strlen(path)+1);
 
    RegCloseKey(hKey);
    printf("Event source \"" ZABBIX_EVENT_SOURCE "\" installed successfully\n");

@@ -651,7 +651,8 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 // Before str()
 // 		if (eregi('^\{([0-9a-zA-Z[.-.]\_\.]+)\:([]\[0-9a-zA-Z\_\/\.\,]+)\.((diff)|(min)|(max)|(last)|(prev))\(([0-9\.]+)\)\}$', $expression, $arr)) 
 //		if (eregi('^\{([0-9a-zA-Z[.-.]\_\.]+)\:([]\[0-9a-zA-Z\_\/\.\,]+)\.((diff)|(min)|(max)|(last)|(prev)|(str))\(([0-9a-zA-Z\.\_\/\,]+)\)\}$', $expression, $arr)) 
- 		if (eregi('^\{([0-9a-zA-Z\_\.-]+)\:([]\[0-9a-zA-Z\_\/\.\,\:\(\) -]+)\.([a-z]{3,11})\(([#0-9a-zA-Z\_\/\.\,]+)\)\}$', $expression, $arr)) 
+// 		if (eregi('^\{([0-9a-zA-Z\_\.-]+)\:([]\[0-9a-zA-Z\_\*\/\.\,\:\(\) -]+)\.([a-z]{3,11})\(([#0-9a-zA-Z\_\/\.\,]+)\)\}$', $expression, $arr)) 
+		if (eregi('^\{([0-9a-zA-Z\_\.-]+)\:([]\[0-9a-zA-Z\_\*\/\.\,\:\(\) -]+)\.([a-z]{3,11})\(([#0-9a-zA-Z\_\/\.\,[:space:]]+)\)\}$', $expression, $arr))
 		{
 			$host=$arr[1];
 			$key=$arr[2];
@@ -1070,57 +1071,53 @@ COpt::profiling_start("page");
 	# Show screen cell containing plain text values
 	function&	get_screen_plaintext($itemid,$elements)
 	{
+		global $DB_TYPE;
+
 		$item=get_item_by_itemid($itemid);
-		if($item["value_type"]==ITEM_VALUE_TYPE_FLOAT)
+		switch($item["value_type"])
 		{
-			$sql="select clock,value from history where itemid=$itemid".
-				" order by clock desc";
+			case ITEM_VALUE_TYPE_FLOAT:	$history_table = "history";		break;
+			case ITEM_VALUE_TYPE_UINT64:	$history_table = "history_uint";	break;
+			case ITEM_VALUE_TYPE_TEXT:	$history_table = "history_text";	break;
+			default:			$history_table = "history_str";		break;
 		}
-		else if($item["value_type"]==ITEM_VALUE_TYPE_UINT64)
-		{
-			$sql="select clock,value from history_uint where itemid=$itemid".
-				" order by clock desc";
-		}
-		else if($item["value_type"]==ITEM_VALUE_TYPE_TEXT)
-		{
-			$sql="select clock,value from history_text where itemid=$itemid".
-				" order by clock desc";
-		}
-		else
-		{
-			$sql="select clock,value from history_str where itemid=$itemid".
-				" order by clock desc";
-		}
+
+		$sql="select h.clock,h.value,i.valuemapid from ".$history_table." h, items i where".
+			" h.itemid=i.itemid and i.itemid=$itemid order by clock desc";
+
                 $result=DBselect($sql,$elements);
 
 		$table = new CTableInfo();
 		$table->SetHeader(array(S_TIMESTAMP,item_description($item["description"],$item["key_"])));
 		while($row=DBfetch($result))
 		{
-			if($item["value_type"]==ITEM_VALUE_TYPE_TEXT)
+			switch($item["value_type"])
 			{
-				$value = nbsp(htmlspecialchars($row["value"]));
-			}
-			else if($item["value_type"]==ITEM_VALUE_TYPE_STRING)
-			{
-				$value = nbsp(htmlspecialchars($row["value"]));
-			}
-			else
-			{
-				if($DB_TYPE == "ORACLE" && $item["value_type"]==ITEM_VALUE_TYPE_TEXT)
-				{
-					if(isset($row["value"]))
+				case ITEM_VALUE_TYPE_TEXT:	
+					if($DB_TYPE == "ORACLE")
 					{
-						$value = $row["value"]->load();
+						if(isset($row["value"]))
+						{
+							$row["value"] = $row["value"]->load();
+						}
+						else
+						{
+							$row["value"] = "";
+						}
 					}
-					else
-					{
-						$value = "";
-					}
-				} else {
+					/* do not use break */
+				case ITEM_VALUE_TYPE_STR:	
+					$value = nbsp(htmlspecialchars($row["value"]));
+					break;
+				
+				default:
 					$value = $row["value"];
-				}
+					break;
 			}
+
+			if($row["valuemapid"] > 0)
+				$value = replace_value_by_map($value, $row["valuemapid"]);
+
 			$table->AddRow(array(date(S_DATE_FORMAT_YMDHMS,$row["clock"]),	$value));
 		}
 		return $table;
@@ -2343,6 +2340,7 @@ COpt::profiling_stop("script");
 		{
 			if(frmForm.elements[i].type != 'checkbox') continue;
 			if(frmForm.elements[i].name == chkMain) continue;
+			if(frmForm.elements[i].disabled == true) continue;
 			frmForm.elements[i].checked = value;
 		}
 	}
@@ -2421,6 +2419,7 @@ COpt::profiling_stop("script");
 			ImageSetStyle($image, $style);
 			ImageLine($image,$x1,$y1,$x2,$y2,IMG_COLOR_STYLED);
 		}
+
 	}
 	else
 	{
@@ -2428,6 +2427,14 @@ COpt::profiling_stop("script");
 		{
 			ImageDashedLine($image,$x1,$y1,$x2,$y2,$color);
 		}
+	}
+
+	function DashedRectangle($image,$x1,$y1,$x2,$y2,$color)
+	{
+		DashedLine($image, $x1,$y1,$x1,$y2,$color);
+		DashedLine($image, $x1,$y2,$x2,$y2,$color);
+		DashedLine($image, $x2,$y2,$x2,$y1,$color);
+		DashedLine($image, $x2,$y1,$x1,$y1,$color);
 	}
 
 
@@ -2640,7 +2647,7 @@ COpt::profiling_stop("script");
 		$row = DBfetch($result);
 		if($row)
 		{
-			return $row["newvalue"].SPACE."($value)";
+			return $row["newvalue"]." "."($value)";
 		}
 		return $value;
 	}
@@ -2672,7 +2679,7 @@ COpt::profiling_stop("script");
 
 	function	set_image_header()
 	{
-		// Header( "Content-type:  text/html"); 
+		//Header( "Content-type:  text/html"); 
 
 		if(MAP_OUTPUT_FORMAT == "JPG")	Header( "Content-type:  image/jpeg"); 
 		else				Header( "Content-type:  image/png"); 
