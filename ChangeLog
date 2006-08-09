@@ -1,5 +1,7 @@
 Changes for 1.1.1-lk:
 
+ - fixed errors while adding a host to IT service (Alexei)
+ - fixed warning in classes.inc.php while displaying graphs (Alexei)
  - fixed warning in trigger selection popup (Alexei)
  - fixed count of problems displayin for submaps (Eugene)
  - improved sound notification of trigger status changing (Eugene)
