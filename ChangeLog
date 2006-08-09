@@ -1,5 +1,6 @@
 Changes for 1.1.2:
 
+ - fixed warning in classes.inc.php while displaying graphs (Alexei)
  - fixed warning in trigger selection popup (Alexei)
  - added spec file for ZABBIX agent. Thanks to Alexey Zilber. (Alexei)
  - fixed count of problems displayin for submaps (Eugene)

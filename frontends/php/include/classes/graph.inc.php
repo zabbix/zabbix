@@ -268,7 +268,7 @@
 		function getLastValue($num)
 		{
 			$data = &$this->data[$this->items[$num]["itemid"]][$this->items[$num]["type"]];
-			for($i=899;$i>=0;$i--)
+			if(isset($data)) for($i=$this->sizeX-1;$i>=0;$i--)
 			{
 				if(isset($data->count[$i]) && ($data->count[$i] > 0))
 				{
@@ -559,7 +559,7 @@
 				}
 
 				$data = &$this->data[$this->items[$i]["itemid"]][$this->items[$i]["type"]];
-				if(isset($data->min))
+				if(isset($data)&&isset($data->min))
 				{
 					$str=sprintf("%s: %s [%s] [min:%s max:%s last:%s]",
 						str_pad($this->items[$i]["host"],$max_host_len," "),
@@ -743,6 +743,8 @@
 
 						$data = &$this->data[$this->items[$i]["itemid"]][$type];
 
+						if(!isset($data))	continue;
+
 						if($type == GRAPH_ITEM_AGGREGATED)
 							$calc_fnc = CALC_FNC_ALL;
 						else
@@ -823,6 +825,8 @@
 							continue;
 
 						$data = &$this->data[$this->items[$i]["itemid"]][$type];
+
+						if(!isset($data))	continue;
 
 						if($type == GRAPH_ITEM_AGGREGATED)
 							$calc_fnc = CALC_FNC_ALL;
@@ -1033,11 +1037,16 @@
 				for($i=$this->num-2; $i >= 0; $i--)
 				{
 					$curr_data = &$this->data[$this->items[$i]["itemid"]][$this->items[$i]["type"]];
+
+					if(!isset($curr_data))	continue;
+
 					for($j = $i+1; $j < $this->num; $j++)
 					{
 						if($this->items[$j]["axisside"] != $this->items[$i]["axisside"]) continue;
 
 						$prev_data = &$this->data[$this->items[$i+1]["itemid"]][$this->items[$i+1]["type"]];
+
+						if(!isset($prev_data))	continue;
 
 						for($ci = 0; $ci < $this->sizeX; $ci++)
 						{
@@ -1157,6 +1166,8 @@
 				$maxY = $this->m_maxY[$this->items[$item]["axisside"]];
 
 				$data = &$this->data[$this->items[$item]["itemid"]][$this->items[$item]["type"]];
+
+				if(!isset($data))	continue;
 
 				if($this->items[$item]["type"] == GRAPH_ITEM_AGGREGATED)
 				{
