@@ -24,7 +24,7 @@
 		if(is_null($triggerid)) $triggerid = 'NULL';
 
 		$sql="insert into services (name,status,triggerid,algorithm,showsla,goodsla,sortorder)".
-			" values (".zbx_dbstr($name).",0,$triggerid,$algorithm,$showsla,$goodsla,$sortorder)";
+			" values (".zbx_dbstr($name).",0,$triggerid,".zbx_dbstr($algorithm).",$showsla,".zbx_dbstr($goodsla).",$sortorder)";
 		$result=DBexecute($sql);
 		if(!$result)
 		{
