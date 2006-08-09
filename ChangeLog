@@ -1,5 +1,6 @@
 Changes for 1.1.2:
 
+ - fixed errors while adding a host to IT service (Alexei)
  - fixed warning in classes.inc.php while displaying graphs (Alexei)
  - fixed warning in trigger selection popup (Alexei)
  - added spec file for ZABBIX agent. Thanks to Alexey Zilber. (Alexei)
