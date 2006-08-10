@@ -1,5 +1,6 @@
 Changes for 1.1.2:
 
+ - fixed windows agent crashing with processing of 'system.cpu.util' key (Eugene)
  - fixed errors while adding a host to IT service (Alexei)
  - fixed warning in classes.inc.php while displaying graphs (Alexei)
  - fixed warning in trigger selection popup (Alexei)
