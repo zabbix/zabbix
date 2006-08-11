@@ -372,6 +372,7 @@ CREATE TABLE items (
 	logtimefmt	varchar(64) DEFAULT '' NOT NULL,
 	templateid	int(4) DEFAULT '0' NOT NULL,
 	valuemapid	int(4) DEFAULT '0' NOT NULL,
+	params		text	DEFAULT '' NOT NULL,
 
 	PRIMARY KEY	(itemid),
 	UNIQUE		shortname (hostid,key_),

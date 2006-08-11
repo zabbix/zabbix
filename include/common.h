@@ -160,6 +160,7 @@
 #define ITEM_TYPE_SNMPv3	6
 #define ITEM_TYPE_ZABBIX_ACTIVE	7
 #define ITEM_TYPE_AGGREGATE	8
+#define ITEM_TYPE_DB_MONITOR	9
 
 /* Item value types */
 #define ITEM_VALUE_TYPE_FLOAT	0

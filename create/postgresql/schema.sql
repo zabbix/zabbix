@@ -80,6 +80,7 @@ CREATE TABLE items (
   logtimefmt		varchar(64)	DEFAULT '' NOT NULL,
   templateid		int4		DEFAULT '0' NOT NULL,
   valuemapid		int4		 DEFAULT '0' NOT NULL,
+  params                varchar(255)    DEFAULT '' NOT NULL,
   PRIMARY KEY (itemid)
 --  FOREIGN KEY (hostid) REFERENCES hosts
 );

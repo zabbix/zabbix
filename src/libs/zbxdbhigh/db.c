@@ -1190,7 +1190,7 @@ int	DBadd_history_text(int itemid, char *value, int clock)
 		zabbix_log(LOG_LEVEL_DEBUG,"CLOB binding failed:%s", sqlo_geterror(oracle));
 		goto lbl_exit_loblp;
 	}
-
+d
 	/* execute the statement */
 	if(sqlo_execute(sth, 1) != SQLO_SUCCESS)
 	{
@@ -1653,7 +1653,7 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 		item->prevorgvalue_null=0;
 		item->prevorgvalue=atof(s);
 	}
-	s=row[22];
+	s = row[22];
 	if(DBis_null(s)==SUCCEED)
 	{
 		item->lastclock=0;
@@ -1666,14 +1666,17 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 	item->units=row[23];
 	item->multiplier=atoi(row[24]);
 
-	item->snmpv3_securityname = row[25];
-	item->snmpv3_securitylevel = atoi(row[26]);
-	item->snmpv3_authpassphrase = row[27];
-	item->snmpv3_privpassphrase = row[28];
-	item->formula = row[29];
-	item->host_available=atoi(row[30]);
-	item->status=atoi(row[31]);
-	item->trapper_hosts=row[32];
-	item->logtimefmt=row[33];
-	item->valuemapid=atoi(row[34]);
+	item->snmpv3_securityname	= row[25];
+	item->snmpv3_securitylevel	= atoi(row[26]);
+	item->snmpv3_authpassphrase	= row[27];
+	item->snmpv3_privpassphrase	= row[28];
+	
+	item->formula 		= row[29];
+	item->host_available	= atoi(row[30]);
+	item->status		= atoi(row[31]);
+	item->trapper_hosts	= row[32];
+	item->logtimefmt	= row[33];
+	item->valuemapid	= atoi(row[34]);
+
+	item->params		= row[35];		/* !!! WHAT about CLOB??? */
 }

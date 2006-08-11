@@ -52,6 +52,7 @@
 #include "checks_internal.h"
 #include "checks_simple.h"
 #include "checks_snmp.h"
+#include "checks_db.h"
 
 AGENT_RESULT    result;
 
@@ -89,6 +90,10 @@ int	get_value(DB_ITEM *item, AGENT_RESULT *result)
 	else if(item->type == ITEM_TYPE_INTERNAL)
 	{
 		res=get_value_internal(item, result);
+	}
+	else if(item->type == ITEM_TYPE_DB_MONITOR)
+	{
+		res=get_value_db(item, result);
 	}
 	else if(item->type == ITEM_TYPE_AGGREGATE)
 	{
@@ -253,7 +258,7 @@ int get_values(void)
 		DBget_item_from_db(&item,row);
 
 		init_result(&agent);
-		zabbix_log( LOG_LEVEL_DEBUG, "GOT VALUE TYPE [0x%X]", agent.type);
+		zabbix_log( LOG_LEVEL_DEBUG, "(%i) GOT KEY [%d:%s] VALUE TYPE [0x%X]", server_num, item.hostid, item.key, item.value_type);
 		res = get_value(&item, &agent);
 		
 		if(res == SUCCEED )

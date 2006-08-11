@@ -248,7 +248,7 @@
 	{
 		global  $_REQUEST;
 
-		$frmItem = new CFormTable(S_ITEM,"items.php");
+		$frmItem = new CFormTable(S_ITEM,"items.php","post");
 		$frmItem->SetHelp("web.items.item.php");
 
 		$frmItem->AddVar("config",get_request("config",0));
@@ -271,6 +271,10 @@
 		$trapper_hosts	= get_request("trapper_hosts"	,"");
 		$units		= get_request("units"		,'');
 		$valuemapid	= get_request("valuemapid"	,0);
+		$params		= get_request("params"		,"database=<database name>\n".
+								 "user=<database username>\n".
+								 "pass=<password>\n".
+								 "sql=<query>");
 		$multiplier	= get_request("multiplier"	,0);
 		$delta		= get_request("delta"		,0);
 		$trends		= get_request("trends"		,365);
@@ -285,6 +289,8 @@
 		$logtimefmt	= get_request("logtimefmt"	,"");
 
 		$add_groupid	= get_request("add_groupid"	,get_request("groupid",0));
+
+		if("" == $key && $type == ITEM_TYPE_DB_MONITOR) $key = "db.odbc.select[<unique short description>]";
 
 
 		if(is_null($host)){
@@ -318,6 +324,7 @@
 			$trapper_hosts	= $row["trapper_hosts"];
 			$units		= $row["units"];
 			$valuemapid	= $row["valuemapid"];
+			$params		= $row["params"];
 			$multiplier	= $row["multiplier"];
 			$hostid		= $row["hostid"];
 			$delta		= $row["delta"];
@@ -347,7 +354,7 @@
 			$frmItem->SetTitle(S_ITEM." '$host:$description'");
 		}
 
-		$frmItem->AddRow(S_DESCRIPTION, new CTextBox("description",$description,40));
+		$frmItem->AddRow(S_DESCRIPTION, new CTextBox("description",$description,60));
 
 
 		$cmbType = new CComboBox("type",$type,"submit()");
@@ -359,7 +366,7 @@
 		$cmbType->AddItem(ITEM_TYPE_SNMPV3,S_SNMPV3_AGENT);
 		$cmbType->AddItem(ITEM_TYPE_TRAPPER,S_ZABBIX_TRAPPER);
 		$cmbType->AddItem(ITEM_TYPE_INTERNAL,S_ZABBIX_INTERNAL);
-		$cmbType->AddItem(ITEM_TYPE_AGGREGATE,S_ZABBIX_AGGREGATE);
+		$cmbType->AddItem(ITEM_TYPE_DB_MONITOR,S_ZABBIX_DATABASE_MONITOR);
 		$frmItem->AddRow(S_TYPE, $cmbType);
 
 
@@ -371,17 +378,17 @@
 			$frmItem->AddVar("snmpv3_privpassphrase",$snmpv3_privpassphrase);
 
 			$frmItem->AddRow(S_SNMP_COMMUNITY, new CTextBox("snmp_community",$snmp_community,16));
-			$frmItem->AddRow(S_SNMP_OID, new CTextBox("snmp_oid",$snmp_oid,40));
+			$frmItem->AddRow(S_SNMP_OID, new CTextBox("snmp_oid",$snmp_oid,60));
 			$frmItem->AddRow(S_SNMP_PORT, new CTextBox("snmp_port",$snmp_port,5));
 		}
 		else if($type==ITEM_TYPE_SNMPV3)
 		{
 			$frmItem->AddVar("snmp_community",$snmp_community);
 
-			$frmItem->AddRow(S_SNMP_OID, new CTextBox("snmp_oid",$snmp_oid,40));
+			$frmItem->AddRow(S_SNMP_OID, new CTextBox("snmp_oid",$snmp_oid,60));
 
 			$frmItem->AddRow(S_SNMPV3_SECURITY_NAME,
-				new CTextBox("snmpv3_securityname",$snmpv3_securityname,64));
+				new CTextBox("snmpv3_securityname",$snmpv3_securityname,60));
 
 			$cmbSecLevel = new CComboBox("snmpv3_securitylevel",$snmpv3_securitylevel);
 			$cmbSecLevel->AddItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,"NoAuthPriv");
@@ -390,10 +397,10 @@
 			$frmItem->AddRow(S_SNMPV3_SECURITY_LEVEL, $cmbSecLevel);
 
 			$frmItem->AddRow(S_SNMPV3_AUTH_PASSPHRASE,
-				new CTextBox("snmpv3_authpassphrase",$snmpv3_authpassphrase,64));
+				new CTextBox("snmpv3_authpassphrase",$snmpv3_authpassphrase,60));
 
 			$frmItem->AddRow(S_SNMPV3_PRIV_PASSPHRASE,
-				new CTextBox("snmpv3_privpassphrase",$snmpv3_privpassphrase,64));
+				new CTextBox("snmpv3_privpassphrase",$snmpv3_privpassphrase,60));
 
 			$frmItem->AddRow(S_SNMP_PORT, new CTextBox("snmp_port",$snmp_port,5));
 		}
@@ -414,7 +421,16 @@
 			"'width=650,height=450,resizable=1,scrollbars=1');");
 		$btnSelect->SetAccessKey('T');
 
-		$frmItem->AddRow(S_KEY, array(new CTextBox("key",$key,40), $btnSelect));
+		$frmItem->AddRow(S_KEY, array(new CTextBox("key",$key,60), $btnSelect));
+
+		if($type==ITEM_TYPE_DB_MONITOR)
+		{
+			$frmItem->AddRow(S_PARAMS, new CTextArea("params",$params,60,4));
+		}
+		else
+		{
+			$frmItem->AddVar("params",$params);
+		}
 
 		$cmbValType = new CComboBox("value_type",$value_type,"submit()");
 		$cmbValType->AddItem(ITEM_VALUE_TYPE_UINT64, S_NUMERIC_UINT64);
@@ -426,7 +442,7 @@
 
 		if( ($value_type==ITEM_VALUE_TYPE_FLOAT) || ($value_type==ITEM_VALUE_TYPE_UINT64))
 		{
-			$frmItem->AddRow(S_UNITS, new CTextBox("units",$units,40));
+			$frmItem->AddRow(S_UNITS, new CTextBox("units",$units,60));
 
 			$cmbMultipler = new CComboBox("multiplier",$multiplier,"submit()");
 			$cmbMultipler->AddItem(0,S_DO_NOT_USE);
@@ -441,7 +457,7 @@
 
 		if($multiplier == 1)
 		{
-			$frmItem->AddRow(S_CUSTOM_MULTIPLIER, new CTextBox("formula",$formula,40));
+			$frmItem->AddRow(S_CUSTOM_MULTIPLIER, new CTextBox("formula",$formula,60));
 		}
 		else
 		{
@@ -514,7 +530,7 @@
 
 		if($type==2)
 		{
-			$frmItem->AddRow(S_ALLOWED_HOSTS, new CTextBox("trapper_hosts",$trapper_hosts,40));
+			$frmItem->AddRow(S_ALLOWED_HOSTS, new CTextBox("trapper_hosts",$trapper_hosts,60));
 		}
 		else
 		{

@@ -587,6 +587,7 @@ CREATE TABLE items (
 	logtimefmt	varchar2(64) DEFAULT NULL,
 	templateid	number(10) DEFAULT '0' NOT NULL,
 	valuemapid	number(10) DEFAULT '0' NOT NULL,
+	params		varchar2(2048)	DEFAULT NULL,
   	CONSTRAINT 	items_pk PRIMARY KEY (itemid)
 );
 

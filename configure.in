@@ -486,6 +486,7 @@ esac],
 AM_CONDITIONAL(AGENT, test x$agent = xyes)
     
 have_db="no"
+have_odbc="no"
 
 if test "$server" = "yes"; then
 	AC_MSG_CHECKING(for Oracle support)
@@ -674,10 +675,92 @@ if test "$server" = "yes"; then
 	AC_MSG_CHECKING(for ZABBIX server database selection)
 	if test "$have_db" = "no"; then
 		AC_MSG_RESULT(error)
-		AC_MSG_ERROR(No database selected for ZABBIX server. Use --with-mysql or --with-pgsql.)
+		AC_MSG_ERROR(No database selected for ZABBIX server. Use --with-mysql or --with-pgsql or --with-oracle.)
 	else
-		AC_MSG_RESULT(ok)
+		AC_MSG_RESULT($have_db)
 	fi
+
+
+	AC_MSG_CHECKING(for iODBC support)
+	AC_ARG_ENABLE(iodbc,
+	AC_HELP_STRING([--enable-iodbc=DIR], [build odbc driver against iODBC in DIR]),
+	[
+		if test "$enableval"; then
+			if test "$enableval" = "yes"; then
+				if test -f /usr/include/sql.h; then
+					withval="/usr"
+				else
+					withval="/usr/local"
+				fi
+			else
+				if echo "$enableval" | grep -v '^/'; then
+					withval="$PWD/$enableval"
+				fi
+			fi
+
+			ODBC_INCLUDE="-I$enableval/include"
+			ODBC_LDFLAGS="$LDFLAGS -L$enableval/lib"
+			ODBC_LIBS="-liodbc"
+
+			AC_DEFINE(HAVE_ODBC,1,[Define to 1 if ODBC Driver Manager should be enabled.])
+			AC_DEFINE(HAVE_IODBC,1,[Define to 1 if iODBC Driver Manager should be used.])
+			AC_MSG_RESULT(yes)
+			have_odbc="iODBC"
+		else
+			AC_MSG_RESULT(no)
+		fi
+	],[
+	  AC_MSG_RESULT(no)
+	])
+
+	AC_MSG_CHECKING(for unixODBC support)
+	AC_ARG_ENABLE(unixodbc,
+	AC_HELP_STRING([--with-unixodbc=DIR], [build odbc driver against unixODBC in DIR]),
+	[
+		if test "$enableval"; then
+			if test "$have_odbc" != "no"; then
+			  AC_MSG_RESULT(error)
+			  AC_MSG_ERROR("You can use only one ODBC Driver Manager.");
+			fi
+
+			if test "$enableval" = "yes"; then
+				if test -f /usr/include/sql.h; then
+					wwithval"/usr"
+				else
+					withval="/usr/local"
+				fi
+			else
+				if echo "$enableval" | grep -v '^/'; then
+					withval="$PWD/$enableval"
+				fi
+			fi
+
+			if test -f "$enableval/bin/odbc_config"; then
+				ODBC_CONFIG="$enableval/bin/odbc_config"
+				ODBC_INCLUDE="-I`$ODBC_CONFIG --include-prefix`"
+				ODBC_LDFLAGS="$LDFLAGS -L`$ODBC_CONFIG --lib-prefix`"
+			else
+				ODBC_INCLUDE="-I$enableval/include"
+				ODBC_LDFLAGS="$LDFLAGS -L$enableval/lib"
+			fi
+			ODBC_LIBS="-lodbc"
+			AC_DEFINE(HAVE_ODBC,1,[Define to 1 if ODBC Driver Manager should be enabled.])
+			AC_DEFINE(HAVE_UNIXODBC,1,[Define to 1 if unixIODBC Driver Manager should be used.])
+			AC_MSG_RESULT(yes)
+
+			have_odbc="unixODBC"
+		else
+			AC_MSG_RESULT(no)
+		fi
+	],[
+	  AC_MSG_RESULT(no)
+	])
+
+	AM_CONDITIONAL(WITH_ODBC, test x$have_odbc != xno)
+
+	AC_SUBST(ODBC_INCLUDE)
+	AC_SUBST(ODBC_LDFLAGS)
+	AC_SUBST(ODBC_LIBS)
 fi
 
 AC_MSG_CHECKING(for NET-SNMP support)
@@ -729,9 +812,6 @@ dnl   			SNMP_LIBDIR=$withval/lib/net-snmp
 		fi
    	fi
 
-dnl    AC_CHECK_LIB(crypto, main,  SNMP_LFLAGS="-lcrypto $SNMP_LFLAGS")
-    AC_CHECK_LIB(crypto, main,  SNMP_LIBS="$SNMP_LIBS -lcrypto")
-
     SNMP_INCLUDE=-I$SNMP_INCDIR
     SNMP_LFLAGS="-L$SNMP_LIBDIR $SNMP_LFLAGS"
     SNMP_LIBS="-lnetsnmp $SNMP_LIBS"
@@ -739,6 +819,9 @@ dnl    AC_CHECK_LIB(crypto, main,  SNMP_LFLAGS="-lcrypto $SNMP_LFLAGS")
     AC_DEFINE(HAVE_NETSNMP,1,[Define to 1 if NETSNMP should be enabled.])
     AC_DEFINE(HAVE_SNMP,1,[Define to 1 if SNMP should be enabled.])
     AC_MSG_RESULT(yes)
+
+dnl    AC_CHECK_LIB(crypto, main,  SNMP_LFLAGS="-lcrypto $SNMP_LFLAGS")
+    AC_CHECK_LIB(crypto, main,  SNMP_LIBS="$SNMP_LIBS -lcrypto")
 
   else
   	AC_MSG_RESULT(no)
@@ -990,10 +1073,11 @@ Configuration:
   Linker flags:     ${LIBS}
   Compilation arch: ${ARCH}
 
-  Enable server:    ${server}
-  With database:    ${have_db}
+  Enable server:         ${server}
+  With database:         ${have_db}
+  Enable DB monitor via: ${have_odbc}
 
-  Enable agent:     ${agent}"
+  Enable agent:          ${agent}"
 
 echo
 echo "***********************************************************"

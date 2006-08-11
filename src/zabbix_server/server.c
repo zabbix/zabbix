@@ -483,21 +483,55 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-/*
-#define USE_TEST_FUNCTION 1 
-*/
 
-#ifdef USE_TEST_FUNCTION
+#ifdef TEST
+#include "zodbc.h"
 
 void    run_commands(DB_TRIGGER *trigger,DB_ACTION *action);
 
 void test()
 {
+	DB_ITEM		item;
+	AGENT_RESULT	result;
+
+	
 	printf("-= Test Started =-\n");
+
+	item.itemid = 17318;
+	item.type = ITEM_TYPE_DB_MONITOR;
+	
+	get_value(&item, &result);
+	
+	printf("'%15s'", item.key);
+	if(result.type & AR_DOUBLE)
+	{
+		printf(" [d|" ZBX_FS_DBL "]", result.dbl);
+	}
+	if(result.type & AR_UINT64)
+	{
+		printf(" [u|" ZBX_FS_UI64 "]", result.ui64);
+	}
+	if(result.type & AR_STRING)
+	{
+		printf(" [s|%s]", result.str);
+	}
+	if(result.type & AR_TEXT)
+	{
+		printf(" [t|%s]", result.text);
+	}
+	if(result.type & AR_MESSAGE)
+	{
+		printf(" [m|%s]", result.msg);
+	}
+
+	free_result(&result);
+
+	printf("\n");
+
 
 	printf("-= Test completed =-\n");
 }
-#endif
+#endif /* TEST */
 
 /******************************************************************************
  *                                                                            *
@@ -595,7 +629,7 @@ int main(int argc, char **argv)
 
 	init_config();
 
-#ifdef USE_TEST_FUNCTION
+#ifdef TEST
 	if(CONFIG_LOG_FILE == NULL)
 	{
 		zabbix_open_log(LOG_TYPE_SYSLOG,CONFIG_LOG_LEVEL,NULL);
@@ -610,7 +644,7 @@ int main(int argc, char **argv)
 	test();
 	DBclose();
 	return 0;
-#endif
+#endif /* TEST */
 	
 	daemon_init();
 
