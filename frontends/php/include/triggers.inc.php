@@ -26,6 +26,7 @@
 		else if($severity == 2)	return S_WARNING;
 		else if($severity == 3)	return S_AVERAGE;
 		else if($severity == 4)	return S_HIGH;
+		else if($severity == 5)	return S_DISASTER;
 
 		return "Unknown";
 	}
@@ -755,7 +756,7 @@
 		
 		$db_actions = DBselect("select distinct c.actionid from conditions c, triggers t".
 			" where c.conditiontype=".CONDITION_TYPE_TRIGGER.
-			" and c.value=t.triggerid");
+			" and c.value=t.triggerid and t.triggerid=".$triggerid);
 		while($db_action = DBfetch($db_actions))
 		{
 			DBexecute("update actions set status=".ACTION_STATUS_DISABLED.

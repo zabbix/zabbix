@@ -194,7 +194,7 @@ void str_base64_decode(char *p_b64str, char *p_str, int *p_out_size)
 					* characters
 					*/
 		
-	in_size = strlen(p_b64str);
+	in_size = (int)strlen(p_b64str);
 	memset(str_clean, 0, sizeof(str_clean));
 	*p_out_size = 0;
 	
@@ -208,7 +208,7 @@ void str_base64_decode(char *p_b64str, char *p_str, int *p_out_size)
 	}
 	
 	/* Re-define in_size after clean-up */
-	in_size = strlen(str_clean);
+	in_size = (int)strlen(str_clean);
 	
 	if ( 0 == in_size )
 	{

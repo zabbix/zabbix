@@ -22,13 +22,13 @@ INIT_CHECK_MEMORY(main);
 	memset(source_b64,0,sizeof(source_b64));
 	memset(severity_b64,0,sizeof(severity_b64));
 
-	str_base64_encode(host, host_b64, strlen(host));
-	str_base64_encode(key, key_b64, strlen(key));
-	str_base64_encode(data, data_b64, strlen(data));
-	str_base64_encode(lastlogsize, lastlogsize_b64, strlen(lastlogsize));
-	str_base64_encode(timestamp, timestamp_b64, strlen(timestamp));
-	str_base64_encode(source, source_b64, strlen(source));
-	str_base64_encode(severity, severity_b64, strlen(severity));
+	str_base64_encode(host, host_b64, (int)strlen(host));
+	str_base64_encode(key, key_b64, (int)strlen(key));
+	str_base64_encode(data, data_b64, (int)strlen(data));
+	str_base64_encode(lastlogsize, lastlogsize_b64, (int)strlen(lastlogsize));
+	str_base64_encode(timestamp, timestamp_b64, (int)strlen(timestamp));
+	str_base64_encode(source, source_b64, (int)strlen(source));
+	str_base64_encode(severity, severity_b64, (int)strlen(severity));
 
 	if(lastlogsize[0]==0)
 	{

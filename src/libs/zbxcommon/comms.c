@@ -9,9 +9,10 @@ int	comms_create_request(char *host, char *key, char *data, char *lastlogsize, c
 	int ret = SUCCEED;
 	char host_b64[MAX_STRING_LEN];
 	char key_b64[MAX_STRING_LEN];
-	char data_b64[MAX_STRING_LEN];
+	char data_b64[ZBX_MAX_B64_LEN];
 	char lastlogsize_b64[MAX_STRING_LEN];
 
+	memset(request,0,maxlen);
 	memset(host_b64,0,sizeof(host_b64));
 	memset(key_b64,0,sizeof(key_b64));
 	memset(data_b64,0,sizeof(data_b64));
@@ -25,6 +26,8 @@ int	comms_create_request(char *host, char *key, char *data, char *lastlogsize, c
 		str_base64_encode(lastlogsize, lastlogsize_b64, strlen(lastlogsize));
 	}
 
+/*	fprintf(stderr, "Data Base64 [%s]\n", data_b64);*/
+
 	if(lastlogsize[0]==0)
 	{
 		snprintf(request,maxlen,"<req><host>%s</host><key>%s</key><data>%s</data></req>",host_b64,key_b64,data_b64);
@@ -33,6 +36,7 @@ int	comms_create_request(char *host, char *key, char *data, char *lastlogsize, c
 	{
 		snprintf(request,maxlen,"<req><host>%s</host><key>%s</key><data>%s</data><lastlogsize>%s</lastlogsize></req>",host_b64,key_b64,data_b64,lastlogsize_b64);
 	}
+/*	fprintf(stderr, "Max [%d] Result [%s][%d]\n", maxlen , request, strlen(request));*/
 
 	return ret;
 }
@@ -47,7 +51,7 @@ int	comms_parse_response(char *xml,char *host,char *key, char *data, char *lastl
 	char data_b64[MAX_STRING_LEN];
 	char lastlogsize_b64[MAX_STRING_LEN];
 	char timestamp_b64[MAX_STRING_LEN];
-	char source_b64[MAX_STRING_LEN];
+	char source_b64[ZBX_MAX_B64_LEN];
 	char severity_b64[MAX_STRING_LEN];
 
 	memset(host_b64,0,sizeof(host_b64));

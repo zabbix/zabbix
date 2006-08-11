@@ -263,7 +263,7 @@ void Main(void)
    {
       int ch;
 
-      printf("\n*** Zabbix Win32 agent operational. Press ESC to terminate. ***\n");
+      printf("\n*** Zabbix Win" PLATFORM " agent operational. Press ESC to terminate. ***\n");
       for(;;)
       {
          ch=getch();
@@ -315,7 +315,7 @@ INIT_CHECK_MEMORY(main);
    {
       if (!Initialize())
       {
-         printf("Zabbix Win32 agent initialization failed\n");
+         printf("Zabbix Win" PLATFORM " agent initialization failed\n");
 	     ret = 1;
 		 goto lbl_End;
       }

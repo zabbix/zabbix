@@ -20,11 +20,13 @@
  *           New one: preserve period, if delay==5, nextcheck = 0,5,10,15,... *
  *                                                                            *
  ******************************************************************************/
-int	calculate_item_nextcheck(int delay, int now)
+int	calculate_item_nextcheck(int itemid, int delay, int now)
 {
 	int i;
 
-	i=delay*(int)(now/delay);
+/*	Old algorithm */
+/*	i=delay*(int)(now/delay);*/
+	i=delay*(int)(now/delay)+(itemid % delay);
 
 	while(i<=now)	i+=delay;
 

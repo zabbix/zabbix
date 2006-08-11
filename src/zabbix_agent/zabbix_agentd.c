@@ -106,6 +106,7 @@ char	*CONFIG_HOSTS_ALLOWED		= NULL;
 char	*CONFIG_HOSTNAME		= NULL;
 char	*CONFIG_FILE			= NULL;
 char	*CONFIG_PID_FILE		= NULL;
+char	*CONFIG_STAT_FILE		= NULL;
 char	*CONFIG_LOG_FILE		= NULL;
 int	CONFIG_AGENTD_FORKS		= AGENTD_FORKS;
 /*int	CONFIG_NOTIMEWAIT		= 0;*/
@@ -132,6 +133,12 @@ void	uninit(void)
 			{
 				kill(pids[i],SIGTERM);
 			}
+		}
+
+		if( unlink(CONFIG_STAT_FILE) != 0)
+		{
+			zabbix_log( LOG_LEVEL_WARNING, "Cannot remove STAT file [%s]",
+				CONFIG_STAT_FILE);
 		}
 
 		if( unlink(CONFIG_PID_FILE) != 0)
@@ -204,6 +211,12 @@ void    daemon_init(void)
 
 	}
 
+	/* Init log files */
+	if(CONFIG_LOG_FILE == NULL)
+		zabbix_open_log(LOG_TYPE_SYSLOG,CONFIG_LOG_LEVEL,NULL);
+	else
+		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,CONFIG_LOG_FILE);
+
 	if( (pid = fork()) != 0 )
 	{
 		exit( 0 );
@@ -219,7 +232,8 @@ void    daemon_init(void)
 	}
 
 	chdir("/");
-	umask(022);
+/*	umask(022);*/
+	umask(002);
 
 	for(i=0;i<MAXFD;i++)
 	{
@@ -265,7 +279,7 @@ void    init_config(void)
 		{"Hostname",&CONFIG_HOSTNAME,0,TYPE_STRING,PARM_OPT,0,0},
 		{"PidFile",&CONFIG_PID_FILE,0,TYPE_STRING,PARM_OPT,0,0},
 		{"LogFile",&CONFIG_LOG_FILE,0,TYPE_STRING,PARM_OPT,0,0},
-/*		{"StatFile",&CONFIG_STAT_FILE,0,TYPE_STRING,PARM_OPT,0,0},*/
+		{"StatFile",&CONFIG_STAT_FILE,0,TYPE_STRING,PARM_OPT,0,0},
 		{"DisableActive",&CONFIG_DISABLE_ACTIVE,0,TYPE_INT,PARM_OPT,0,1},
 		{"EnableRemoteCommands",&CONFIG_ENABLE_REMOTE_COMMANDS,0,TYPE_INT,PARM_OPT,0,1},
 		{"Timeout",&CONFIG_TIMEOUT,0,TYPE_INT,PARM_OPT,1,30},
@@ -312,10 +326,10 @@ void    init_config(void)
 		}
 	}
 
-/*	if(CONFIG_STAT_FILE == NULL)
+	if(CONFIG_STAT_FILE == NULL)
 	{
 		CONFIG_STAT_FILE=strdup("/tmp/zabbix_agentd.tmp");
-	}*/
+	}
 }
 
 void    load_user_parameters(void)
@@ -400,6 +414,7 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
 {
 	int			sockfd;
 	struct sockaddr_in	serv_addr;
+	int			on;
 
 /*	struct linger ling;*/
 
@@ -407,6 +422,15 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
 	{
 		zabbix_log( LOG_LEVEL_CRIT, "Unable to create socket");
 		exit(1);
+	}
+
+	/* Enable address reuse */
+	/* This is to immediately use the address even if it is in TIME_WAIT state */
+	/* http://www-128.ibm.com/developerworks/linux/library/l-sockpit/index.html */
+	on = 1;
+	if( -1 == setsockopt( sockfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on) ))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot setsockopt SO_REUSEADDR [%s]", strerror(errno));
 	}
 
 	/*
@@ -542,11 +566,12 @@ int	main(int argc, char **argv)
 /* Must be before init_config() */
 	init_metrics();
 	init_config();
-	
-	if(CONFIG_LOG_FILE == NULL)
+
+/*	Moved to daemon_init(), otherwise log files can be created as root */
+/*	if(CONFIG_LOG_FILE == NULL)
 		zabbix_open_log(LOG_TYPE_SYSLOG,CONFIG_LOG_LEVEL,NULL);
 	else
-		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,CONFIG_LOG_FILE);
+		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,CONFIG_LOG_FILE);*/
 	
 	load_user_parameters();
 	
@@ -615,6 +640,8 @@ int	main(int argc, char **argv)
 #endif
 
 	collect_statistics();
+
+	uninit();
 
 /*
 #ifdef HAVE_PROC_NET_DEV

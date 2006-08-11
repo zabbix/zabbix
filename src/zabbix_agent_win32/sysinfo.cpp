@@ -121,7 +121,7 @@ static LONG H_CpuUtil(char *cmd,char *arg,double *value)
             return SYSINFO_RC_NOTSUPPORTED;
     }
 
-    if(get_param(param, 1, cpuname, MAX_STRING_LEN) != 0)
+    if(get_param(param, 1, cpuname, sizeof(cpuname)) != 0)
     {
             cpuname[0] = '\0';
     }
