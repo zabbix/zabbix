@@ -1,5 +1,6 @@
 Changes for 1.1.1-le:
 
+ - fixed Unknown when selcting trigger severity Disaster in action form (Alexei)
  - fixed errors while adding a host to IT service (Alexei)
  - fixed warning in classes.inc.php while displaying graphs (Alexei)
  - fixed warning in trigger selection popup (Alexei)
