@@ -1,5 +1,6 @@
 Changes for 1.1.1-al:
 
+ - fixed history cleaning (Eugene)
  - developed database monitoring via ODBC (Eugene)
  - fixed Unknown when selcting trigger severity Disaster in action form (Alexei)
  - fixed windows agent crashing with processing of 'system.cpu.util' key (Eugene)
