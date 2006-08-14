@@ -1,1 +1,1 @@
-alter table media_type add	params                varchar(255)    DEFAULT '' NOT NULL;
+alter table items add	params                varchar(255)    DEFAULT '' NOT NULL;

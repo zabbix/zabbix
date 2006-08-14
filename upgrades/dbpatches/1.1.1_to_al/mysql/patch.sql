@@ -1,1 +1,1 @@
-alter table media_type add	params		text	DEFAULT '' NOT NULL;
+alter table items add	params		text	DEFAULT '' NOT NULL;
