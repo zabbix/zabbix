@@ -33,13 +33,13 @@ static void Help(void)
           "Where possible commands are:\n"
           "   check-config    : Check configuration file and exit\n"
           "   standalone      : Run in standalone mode\n"
-          "   start           : Start Zabbix Win32 Agent service\n"
-          "   stop            : Stop Zabbix Win32 Agent service\n"
-          "   install         : Install Zabbix Win32 Agent as service\n"
-          "   remove          : Remove previously installed Zabbix Win32 Agent service\n"
-          "   install-events  : Install Zabbix Win32 Agent as event source for Event Log\n"
+          "   start           : Start Zabbix Win" PLATFORM " Agent service\n"
+          "   stop            : Stop Zabbix Win" PLATFORM " Agent service\n"
+          "   install         : Install Zabbix Win" PLATFORM " Agent as service\n"
+          "   remove          : Remove previously installed Zabbix Win" PLATFORM " Agent service\n"
+          "   install-events  : Install Zabbix Win" PLATFORM " Agent as event source for Event Log\n"
           "                     This is done automatically when service is being installed\n"
-          "   remove-events   : Remove Zabbix Win32 Agent event source\n"
+          "   remove-events   : Remove Zabbix Win" PLATFORM " Agent event source\n"
           "                     This is done automatically when service is being removed\n"
           "   help            : Display help information\n"
           "   version         : Display version information\n"
@@ -75,7 +75,7 @@ INIT_CHECK_MEMORY(main);
       }
       else if (!strcmp(argv[i],"version"))    // Display version and exit
       {
-         printf("Zabbix Win32 Agent Version " AGENT_VERSION " Build of " __DATE__ "\n");
+         printf("Zabbix Win" PLATFORM " Agent Version " AGENT_VERSION " Build of " __DATE__ "\n");
 		 exit(0);
 		 goto lbl_end;
       }
@@ -296,7 +296,7 @@ INIT_CHECK_MEMORY(main);
    for(i=0;(str[i]!=0)&&((str[i]==' ')||(str[i]=='\t'));i++);
    if (i>0)
       memmove(str,&str[i],strlen(&str[i])+1);
-   for(i=strlen(str)-1;(i>=0)&&((str[i]==' ')||(str[i]=='\t'));i--);
+   for(i = (int)strlen(str)-1; (i>=0)&&((str[i]==' ')||(str[i]=='\t')); i--);
    str[i+1]=0;
 
 CHECK_MEMORY(main,"StrStrip","end");

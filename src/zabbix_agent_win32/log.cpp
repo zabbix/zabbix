@@ -59,11 +59,11 @@ static void WriteLogToFile(char *message)
 
 	// Prevent simultaneous write to log file
 
-	WriteFile(hLog,buffer,strlen(buffer),&size,NULL);
+	WriteFile(hLog,buffer,(DWORD)strlen(buffer),&size,NULL);
 	if (IsStandalone())
 		printf("%s",buffer);
 
-	WriteFile(hLog,message,strlen(message),&size,NULL);
+	WriteFile(hLog,message,(DWORD)strlen(message),&size,NULL);
 
 	FlushFileBuffers(hLog);
 

@@ -74,7 +74,7 @@ CHECK_MEMORY(main, "process_log", "fgets");
 	}
 	fclose(f);
 
-	*lastlogsize+=strlen(value);
+	*lastlogsize += (int)strlen(value);
 
 CHECK_MEMORY(main, "process_log", "end");
 LOG_FUNC_CALL("End of process_log()");

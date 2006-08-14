@@ -1,3 +1,53 @@
+Changes for 1.1.2:
+
+ - fixed history cleaning (Eugene)
+ - fixed Unknown when selcting trigger severity Disaster in action form (Alexei)
+ - fixed windows agent crashing with processing of 'system.cpu.util' key (Eugene)
+ - fixed errors while adding a host to IT service (Alexei)
+ - fixed warning in classes.inc.php while displaying graphs (Alexei)
+ - fixed warning in trigger selection popup (Alexei)
+ - added spec file for ZABBIX agent. Thanks to Alexey Zilber. (Alexei)
+ - fixed count of problems displayin for submaps (Eugene)
+ - fixed incorrect disabling of actions while deleting a trigger (Alexei)
+ - added Zabbix agent for Win64 platforms. (Eugene)
+ - added alternative startup scripts for Fedora Linux (Alexei)
+ - fixed graphs drawing (Eugene)
+ - fixed graph min value calculation (Eugene)
+ - better pattern of distribution of item next checks to improve overall
+ performance (Alexei)
+ - fixed housekeeper, removal of historical and trend data (Alexei)
+ - fixed caption of IT Services Availability Report (Alexei)
+
+Changes for 1.1.1:
+
+ - changed version to 1.1.1 (Alexei)
+ - added support of "system.swap.out" key for Linux with kernel 2.4 (Eugene)
+ - added support of "system.swap.in" key for Linux with kernel 2.4 (Eugene)
+ - added startup script for Fedora Core 5. Thanks to Mark Moses. (Alexei)
+ - fixed selection popup if return string contains single quote (Alexei)
+ - fixed incorrect character in item key selector (Alexei)
+ - fixed processing of SNMP having non-standard port (Alexei)
+ - fixed database data to get rid of zero multiplier for disk spaces (Alexei)
+ - misc fixes for WEB frontend (Alexei)
+ - fixed srv_status.php: Cannot use object of type CLink ... (Alexei)
+ - added removal of stat file on agent shutdown (Alexei)
+ - added new parameter StatFile to ZABBIX config file (Alexei)
+ - fixed processing of web.page.get and long data sent by agent (Alexei)
+ - fixed B64 en-decoding of large data (Alexei)
+ - fixed problem with undefined PACKETSZ under Mac OS/X (Alexei)
+ - disabled excessive debug printing for system.run (Alexei)
+ - umask(022) changed to umask(002) (Alexei)
+ - added additional symbols for trigger expressions (slash, space) (Alexei)
+ - fixed permissions of log files when starting as 'root' (Alexei)
+ - fixed agent crash while evaluating proc.mem[] (Alexei)
+ - changed type of lastlogsize to long in structure METRIC (Alexei)
+ - ZABBIX agent to bind even if TIME_WAIT sockets exist (Alexei)
+ - ZABBIX server to bind even if TIME_WAIT sockets exist (Alexei)
+ - fixed notification report for Oracle (Eugene)
+ - fixed large history of alarms displaying (Eugene)
+ - fixed value mapping for latest data (Eugene)
+ - fixed value mapping for screens (Eugene)
+
 Changes for 1.1:
 
  - timeout for sending emails and SMS was increased to 20 seconds (Alexei)

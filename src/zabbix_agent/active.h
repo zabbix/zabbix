@@ -32,7 +32,9 @@ METRIC
 	int	refresh;
 	int	nextcheck;
 	int	status;
-	int	lastlogsize;
+/* Must be long for fseek() */
+/*	int	lastlogsize;*/
+	long	lastlogsize;
 };
 
 pid_t   child_active_make(int i,char *server, int port);

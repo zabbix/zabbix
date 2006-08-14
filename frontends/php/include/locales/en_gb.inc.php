@@ -280,7 +280,7 @@
 	"S_COMPARE"=>				"Compare",
 
 //	Footer
-	"S_ZABBIX_VER"=>			"ZABBIX 1.1",
+	"S_ZABBIX_VER"=>			"ZABBIX 1.1.1",
 	"S_COPYRIGHT_BY"=>			"Copyright 2001-2006 by ",
 	"S_CONNECTED_AS"=>			"Connected as",
 	"S_SIA_ZABBIX"=>			"SIA Zabbix",
@@ -681,6 +681,7 @@
 	"S_FALSE"=>				"False",
 
 //	report3.php
+	"S_IT_SERVICES_AVAILABILITY_REPORT"=>	"IT services availability report",
 	"S_IT_SERVICES_AVAILABILITY_REPORT_BIG"=>	"IT SERVICES AVAILABILITY REPORT",
 	"S_FROM"=>				"From",
 	"S_TILL"=>				"Till",
