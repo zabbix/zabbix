@@ -152,7 +152,7 @@
 		$result = delete_history_by_itemid($_REQUEST["itemid"]);
 		if($result)
 		{
-			DBexecute("update items set nextcheck=null,lastvalue=null,".
+			DBexecute("update items set nextcheck=0,lastvalue=null,".
 				"lastclock=null,prevvalue=null where itemid=".$_REQUEST["itemid"]);
 		}
 		show_messages($result, S_HISTORY_CLEANED, S_CANNOT_CLEAN_HISTORY);
@@ -282,7 +282,7 @@
 			foreach($group_itemid as $id)
 			{
 				delete_history_by_itemid($id);
-				DBexecute("update items set nextcheck=null,lastvalue=null,".
+				DBexecute("update items set nextcheck=0,lastvalue=null,".
 					"lastclock=null,prevvalue=null where itemid=$id");
 			}
 			show_messages(TRUE, S_HISTORY_CLEANED, S_CANNOT_CLEAN_HISTORY);

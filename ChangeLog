@@ -1,5 +1,6 @@
 Changes for 1.1.2:
 
+ - fixed history cleaning (Eugene)
  - fixed Unknown when selcting trigger severity Disaster in action form (Alexei)
  - fixed windows agent crashing with processing of 'system.cpu.util' key (Eugene)
  - fixed errors while adding a host to IT service (Alexei)
