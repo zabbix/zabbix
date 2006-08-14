@@ -398,7 +398,7 @@
 				$db_tmp_item["logtimefmt"],
 				$db_tmp_item["valuemapid"],
 				$applications,
-				$store_equal,
+				$db_tmp_item["store_equal"],
 				$db_tmp_item["itemid"]);
 		}
 	}
