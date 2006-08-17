@@ -82,6 +82,21 @@ void zabbix_set_log_level(int level)
 
 void zabbix_log(int level, const char *fmt, ...)
 {
+#ifdef TEST
+	time_t	t;
+	struct	tm	*tm;
+	va_list ap;
+	
+		t=time(NULL);
+		tm=localtime(&t);
+		printf("%.6d:%.4d%.2d%.2d:%.2d%.2d%.2d ",(int)getpid(),tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday,tm->tm_hour,tm->tm_min,tm->tm_sec);
+		va_start(ap,fmt);
+		vprintf(fmt,ap);
+		va_end(ap);
+
+		printf("\n");
+#else /* TEST */
+	
 	FILE *log_file = NULL;
 
 	char	str[MAX_BUF_LEN];
@@ -92,7 +107,7 @@ void zabbix_log(int level, const char *fmt, ...)
 
 	struct stat	buf;
 	char	filename_old[MAX_STRING_LEN];
-	
+
 	if( (level>log_level) || (level == LOG_LEVEL_EMPTY))
 	{
 		return;
@@ -146,5 +161,8 @@ void zabbix_log(int level, const char *fmt, ...)
 		/* Log is not opened */
 	}	
         return;
+	
+#endif /* TEST */
+
 }
 

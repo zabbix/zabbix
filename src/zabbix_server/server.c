@@ -483,21 +483,23 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-/*
-#define USE_TEST_FUNCTION 1 
-*/
 
-#ifdef USE_TEST_FUNCTION
+#ifdef TEST
 
 void    run_commands(DB_TRIGGER *trigger,DB_ACTION *action);
 
 void test()
 {
+	time_t now = time(NULL);
+	char delay_flex[] = "10/1-3,07:00-20:00;15/1-7,20:01-22:00;5/4-4,11:00-11:40";
+
 	printf("-= Test Started =-\n");
 
+	printf("Next check: %d (%d)\n", calculate_item_nextcheck(1000, 20, delay_flex,now),now);
+	
 	printf("-= Test completed =-\n");
 }
-#endif
+#endif /* TEST */
 
 /******************************************************************************
  *                                                                            *
@@ -595,7 +597,7 @@ int main(int argc, char **argv)
 
 	init_config();
 
-#ifdef USE_TEST_FUNCTION
+#ifdef TEST
 	if(CONFIG_LOG_FILE == NULL)
 	{
 		zabbix_open_log(LOG_TYPE_SYSLOG,CONFIG_LOG_LEVEL,NULL);
@@ -610,7 +612,7 @@ int main(int argc, char **argv)
 	test();
 	DBclose();
 	return 0;
-#endif
+#endif /* TEST */
 	
 	daemon_init();
 
