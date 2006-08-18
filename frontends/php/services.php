@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
+	include_once "include/config.inc.php";
 
 	$page["title"] = "S_IT_SERVICES";
 	$page["file"] = "services.php";
@@ -75,20 +75,24 @@
 	}
 	elseif(isset($_REQUEST["save_service"]))
 	{
+		$service_times = get_request('service_times',array());
+
 		$showsla = isset($_REQUEST["showsla"]) ? 1 : 0;
 		$triggerid = isset($_REQUEST["linktrigger"]) ? $_REQUEST["triggerid"] : NULL;
 		if(isset($_REQUEST["serviceid"]))
 		{
 			$result = update_service($_REQUEST["serviceid"],
 				$_REQUEST["name"],$triggerid,$_REQUEST["algorithm"],
-				$showsla,$_REQUEST["goodsla"],$_REQUEST["sortorder"]);
+				$showsla,$_REQUEST["goodsla"],$_REQUEST["sortorder"],
+				$service_times);
 			show_messages($result, S_SERVICE_UPDATED, S_CANNOT_UPDATE_SERVICE);
 		}
 		else
 		{
 			$result = add_service(
 				$_REQUEST["name"],$triggerid,$_REQUEST["algorithm"],
-				$showsla,$_REQUEST["goodsla"],$_REQUEST["sortorder"]);
+				$showsla,$_REQUEST["goodsla"],$_REQUEST["sortorder"],
+				$service_times);
 			show_messages($result, S_SERVICE_ADDED, S_CANNOT_ADD_SERVICE);
 		}	
 	}
@@ -111,6 +115,38 @@
 	{
 		$result=add_host_to_services($_REQUEST["serverid"],$_REQUEST["serviceid"]);
 		show_messages($result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
+	}
+	elseif(isset($_REQUEST["add_service_time"]) && isset($_REQUEST["new_service_time"]))
+	{
+		$_REQUEST['service_times'] = get_request('service_times',array());
+
+		$new_service_time['type'] = $_REQUEST["new_service_time"]['type'];
+
+		if($_REQUEST["new_service_time"]['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME)
+		{
+			$new_service_time['from'] = strtotime($_REQUEST["new_service_time"]['from']);
+			$new_service_time['to'] = strtotime($_REQUEST["new_service_time"]['to']);
+			$new_service_time['note'] = $_REQUEST["new_service_time"]['note'];
+		}
+		else
+		{
+			$new_service_time['from'] = strtotime(
+				$_REQUEST["new_service_time"]['from_week'].' '.$_REQUEST["new_service_time"]['from']
+				);
+			$new_service_time['to'] = strtotime(
+				$_REQUEST["new_service_time"]['to_week'].' '.$_REQUEST["new_service_time"]['to']
+				);
+			$new_service_time['note'] = $_REQUEST["new_service_time"]['note'];
+		}
+		if(!in_array($_REQUEST['service_times'], $new_service_time))
+			array_push($_REQUEST['service_times'],$new_service_time);
+	}
+	elseif(isset($_REQUEST["del_service_times"]) && isset($_REQUEST["rem_service_times"]))
+	{
+		$_REQUEST["service_times"] = get_request("service_times",array());
+		foreach($_REQUEST["rem_service_times"] as $val){
+			unset($_REQUEST["service_times"][$val]);
+		}
 	}
 ?>
 
@@ -252,6 +288,9 @@
 	$frmService->SetHelp("web.services.service.php");
 	$frmService->AddVar("parentid",$_REQUEST["parentid"]);
 	
+	$service_times = get_request('service_times',array());
+	$new_service_time = get_request('new_service_time',array('type' => SERVICE_TIME_TYPE_UPTIME));
+
 	if(isset($_REQUEST["serviceid"]))
 	{
 		$frmService->AddVar("serviceid",$_REQUEST["serviceid"]);
@@ -271,6 +310,19 @@
 		$triggerid	=$service["triggerid"];
 		$linktrigger	= isset($triggerid) ? 'yes' : 'no';
 		if(!isset($triggerid)) $triggerid = 0;
+
+		$result = DBselect('select * from services_times where serviceid='.$_REQUEST['serviceid']);
+		while($db_stime = DBfetch($result))
+		{
+			$stime = array(
+				'type'=>	$db_stime['type'],
+				'from'=>	$db_stime['ts_from'],
+				'to'=>		$db_stime['ts_to'],
+				'note'=>	$db_stime['note']
+				);
+			if(in_array($stime, $service_times))	continue;
+			array_push($service_times, $stime);
+		}
 	}
 	else
 	{
@@ -301,6 +353,95 @@
 		$frmService->AddRow(S_ACCEPTABLE_SLA_IN_PERCENT,new CTextBox("goodsla",$goodsla,6));
 	else
 		$frmService->AddVar("goodsla",$goodsla);
+
+	$stime_el = array();
+	$i = 0;
+	foreach($service_times as $val)
+	{
+		switch($val['type'])
+		{
+			case SERVICE_TIME_TYPE_UPTIME:
+				$type = new CSpan(S_UPTIME,'enabled');
+				$from = date('l H:i', $val['from']);
+				$to = date('l H:i', $val['to']);
+				break;
+			case SERVICE_TIME_TYPE_DOWNTIME:
+				$type = new CSpan(S_DOWNTIME,'disabled');
+				$from = date('l H:i', $val['from']);
+				$to = date('l H:i', $val['to']);
+				break;
+			case SERVICE_TIME_TYPE_ONETIME_DOWNTIME:
+				$type = new CSpan(S_ONE_TIME_DOWNTIME,'disabled');
+				$from = date('d M Y H:i', $val['from']);
+				$to = date('d M Y H:i', $val['to']);
+				break;
+		}
+		array_push($stime_el, array(new CCheckBox("rem_service_times[]", 'no', NULL,$i), 
+			$type,':'.SPACE, $from, SPACE.'-'.SPACE, $to,
+			(!empty($val['note']) ? BR.'['.htmlspecialchars($val['note']).']' : '' ),BR));
+
+		$frmService->AddVar('service_times['.$i.'][type]',	$val['type']);
+		$frmService->AddVar('service_times['.$i.'][from]',	$val['from']);
+		$frmService->AddVar('service_times['.$i.'][to]',	$val['to']);
+		$frmService->AddVar('service_times['.$i.'][note]',	$val['note']);
+		
+		$i++;
+	}
+
+	if(count($stime_el)==0)
+		array_push($stime_el, S_NO_TIMES_DEFINED);
+	else
+		array_push($stime_el, new CButton('del_service_times','delete selected'));
+
+	$frmService->AddRow(S_SERVICE_TIMES, $stime_el);
+
+	$cmbTimeType = new CComboBox("new_service_time[type]",$new_service_time['type'],'submit()');
+	$cmbTimeType->AddItem(SERVICE_TIME_TYPE_UPTIME, S_UPTIME);
+	$cmbTimeType->AddItem(SERVICE_TIME_TYPE_DOWNTIME, S_DOWNTIME);
+	$cmbTimeType->AddItem(SERVICE_TIME_TYPE_ONETIME_DOWNTIME, S_ONE_TIME_DOWNTIME);
+
+	$time_param = new CTable();
+	if($new_service_time['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME)
+	{
+		$time_param->AddRow(array(S_NOTE, new CTextBox('new_service_time[note]','<short description>',40)));
+		$time_param->AddRow(array(S_FROM, new CTextBox('new_service_time[from]','d M Y H:i',20)));
+		$time_param->AddRow(array(S_TILL, new CTextBox('new_service_time[to]','d M Y H:i',20)));
+	}
+	else
+	{
+		$cmbWeekFrom = new CComboBox('new_service_time[from_week]',0);
+		$cmbWeekTo = new CComboBox('new_service_time[to_week]',0);
+		foreach(array(
+			/*0=>S_SUNDAY,
+			1=>S_MONDAY,
+			2=>S_TUESDAY,
+			3=>S_WEDNESDAY,
+			4=>S_THURSDAY,
+			5=>S_FRIDAY,
+			6=>S_SATURDAY*/
+			S_SUNDAY  =>S_SUNDAY,
+			S_MONDAY  =>S_MONDAY,
+			S_TUESDAY =>S_TUESDAY,
+			S_WEDNESDAY=>S_WEDNESDAY,
+			S_THURSDAY=>S_THURSDAY,
+			S_FRIDAY  =>S_FRIDAY,
+			S_SATURDAY =>S_SATURDAY
+			) as $day_num => $day_str)
+		{
+			$cmbWeekFrom->AddItem($day_num, $day_str);
+			$cmbWeekTo->AddItem($day_num, $day_str);
+		}
+
+		$time_param->AddRow(array(S_FROM, $cmbWeekFrom, new CTextBox('new_service_time[from]','H:i',9)));
+		$time_param->AddRow(array(S_TILL, $cmbWeekTo, new CTextBox('new_service_time[to]','H:i',9)));
+		$frmService->AddVar('new_service_time[note]','');
+	}
+
+	$frmService->AddRow(S_NEW_SERVICE_TIME, array(
+			$cmbTimeType, BR, 
+			$time_param, BR,
+			new CButton('add_service_time','add')
+		));
 
 	$frmService->AddRow(S_LINK_TO_TRIGGER_Q, new CCheckBox("linktrigger",$linktrigger,"submit();"));
 

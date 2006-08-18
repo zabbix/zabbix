@@ -35,6 +35,16 @@
 ?>
 
 <?php
+
+	if(isset($_REQUEST["test"]))
+	{
+		if(DBexecute('insert into service_alarms (serviceid,clock,value) values (55,'.strtotime('-4 month').',0)'))
+			SDI('OK');
+		else
+			SDI('NO');
+		
+	}
+
 	if(!isset($_REQUEST["serviceid"]))
 	{
 		show_table_header("<font color=\"AA0000\">Undefined serviceid !</font>");

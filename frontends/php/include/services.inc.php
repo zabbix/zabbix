@@ -19,8 +19,11 @@
 **/
 ?>
 <?php
-	function	add_service($name,$triggerid,$algorithm,$showsla,$goodsla,$sortorder)
+	function	add_service($name,$triggerid,$algorithm,$showsla,$goodsla,$sortorder,$service_times=array())
 	{
+
+var_dump($service_times);
+
 		if(is_null($triggerid)) $triggerid = 'NULL';
 
 		$sql="insert into services (name,status,triggerid,algorithm,showsla,goodsla,sortorder)".
@@ -30,15 +33,36 @@
 		{
 			return FALSE;
 		}
-		return DBinsert_id($result,"services","serviceid");
+		$new_service_id = DBinsert_id($result,"services","serviceid");
+
+		foreach($service_times as $val)
+		{
+			$result = DBexecute('insert into services_times (serviceid, type, ts_from, ts_to, note)'.
+				' values ('.$new_service_id.','.$val['type'].','.$val['from'].','.$val['to'].','.zbx_dbstr($val['note']).')');
+
+			if(!$result)
+			{
+				delete_service($new_service_id);
+				return FALSE;
+			}
+		}
+		return $new_service_id;
 	}
 
-	function	update_service($serviceid,$name,$triggerid,$algorithm,$showsla,$goodsla,$sortorder)
+	function	update_service($serviceid,$name,$triggerid,$algorithm,$showsla,$goodsla,$sortorder,$service_times=array())
 	{
 		if(is_null($triggerid)) $triggerid = 'NULL';
 
-		$sql="update services set name=".zbx_dbstr($name).",triggerid=$triggerid,status=0,algorithm=$algorithm,showsla=$showsla,goodsla=$goodsla,sortorder=$sortorder where serviceid=$serviceid";
-		return	DBexecute($sql);
+		$result = DBexecute("update services set name=".zbx_dbstr($name).",triggerid=$triggerid,status=0,algorithm=$algorithm,showsla=$showsla,goodsla=$goodsla,sortorder=$sortorder where serviceid=$serviceid");
+
+		DBexecute('delete from services_times where serviceid='.$serviceid);
+		foreach($service_times as $val)
+		{
+			DBexecute('insert into services_times (serviceid, type, ts_from, ts_to, note)'.
+				' values ('.$serviceid.','.$val['type'].','.$val['from'].','.$val['to'].','.zbx_dbstr($val['note']).')');
+		}
+
+		return $result;
 	}
 
 	function	add_host_to_services($hostid,$serviceid)
@@ -203,40 +227,21 @@
 
 	function	calculate_service_availability($serviceid,$period_start,$period_end)
 	{
-	       	$sql="select count(*),min(clock),max(clock) from service_alarms where serviceid=$serviceid and clock>=$period_start and clock<=$period_end";
+//	       	$sql="select count(*),min(clock),max(clock) from service_alarms where serviceid=$serviceid and clock>=$period_start and clock<=$period_end";
 		
-		$sql="select clock,value from service_alarms where serviceid=$serviceid and clock>=$period_start and clock<=$period_end";
+		$sql="select clock,value from service_alarms where serviceid=$serviceid and clock>=$period_start and clock<=$period_end order by clock";
 		$result=DBselect($sql);
 
 // -1,0,1
+#state=0,1 (OK), >1 PROBLEMS (trigger severity)
 		$state=get_last_service_value($serviceid,$period_start);
 		$problem_time=0;
 		$ok_time=0;
 		$time=$period_start;
-		while($row=DBfetch($result))
-		{
-			$clock=$row["clock"];
-			$value=$row["value"];
+		
 
-			$diff=$clock-$time;
-
-			$time=$clock;
-#state=0,1 (OK), >1 PROBLEMS 
-
-			if($state<=1)
-			{
-				$ok_time+=$diff;
-				$state=$value;
-			}
-			else
-			{
-				$problem_time+=$diff;
-				$state=$value;
-			}
-		}
-//		echo $problem_time,"-",$ok_time,"<br>";
-
-		if(!DBfetch($result))
+		$row = DBfetch($result);
+		if(!$row)
 		{
 			if(get_last_service_value($serviceid,$period_start)<=1)
 			{
@@ -247,8 +252,29 @@
 				$problem_time=$period_end-$period_start;
 			}
 		}
-		else
+		else 
 		{
+			do{
+				$clock=$row["clock"];
+				$value=$row["value"];
+
+				$diff=$clock-$time;
+
+				$time=$clock;
+
+				if($state<=1)
+				{
+					$ok_time+=$diff;
+					$state=$value;
+				}
+				else
+				{
+					$problem_time+=$diff;
+					$state=$value;
+				}
+			}
+			while($row=DBfetch($result));
+
 			if($state<=1)
 			{
 				$ok_time=$ok_time+$period_end-$time;
@@ -258,8 +284,6 @@
 				$problem_time=$problem_time+$period_end-$time;
 			}
 		}
-
-//		echo $problem_time,"-",$ok_time,"<br>";
 
 		$total_time=$problem_time+$ok_time;
 		if($total_time==0)
