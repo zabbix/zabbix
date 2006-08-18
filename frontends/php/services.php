@@ -138,6 +138,9 @@
 				);
 			$new_service_time['note'] = $_REQUEST["new_service_time"]['note'];
 		}
+
+		while($new_service_time['to'] <= $new_service_time['from']) $new_service_time['to'] += 7*24*3600;
+
 		if(!in_array($_REQUEST['service_times'], $new_service_time))
 			array_push($_REQUEST['service_times'],$new_service_time);
 	}
@@ -409,23 +412,16 @@
 	}
 	else
 	{
-		$cmbWeekFrom = new CComboBox('new_service_time[from_week]',0);
-		$cmbWeekTo = new CComboBox('new_service_time[to_week]',0);
+		$cmbWeekFrom = new CComboBox('new_service_time[from_week]','Sunday');
+		$cmbWeekTo = new CComboBox('new_service_time[to_week]','Sunday');
 		foreach(array(
-			/*0=>S_SUNDAY,
-			1=>S_MONDAY,
-			2=>S_TUESDAY,
-			3=>S_WEDNESDAY,
-			4=>S_THURSDAY,
-			5=>S_FRIDAY,
-			6=>S_SATURDAY*/
-			S_SUNDAY  =>S_SUNDAY,
-			S_MONDAY  =>S_MONDAY,
-			S_TUESDAY =>S_TUESDAY,
-			S_WEDNESDAY=>S_WEDNESDAY,
-			S_THURSDAY=>S_THURSDAY,
-			S_FRIDAY  =>S_FRIDAY,
-			S_SATURDAY =>S_SATURDAY
+			'Sunday'  =>S_SUNDAY,
+			'Monday'  =>S_MONDAY,
+			'Tuesday' =>S_TUESDAY,
+			'Wednesday'=>S_WEDNESDAY,
+			'Thursday'=>S_THURSDAY,
+			'Friday'  =>S_FRIDAY,
+			'Saturday' =>S_SATURDAY
 			) as $day_num => $day_str)
 		{
 			$cmbWeekFrom->AddItem($day_num, $day_str);
