@@ -232,7 +232,7 @@ var_dump($service_times);
 		)
 	{
 			/* calculate period from '-1 week' to know period name for  $period_start */
-			for($curr = ($period_start - (7*24*36000)); $curr<=$period_end; $curr += 24*3600)
+			for($curr = ($period_start - (7*24*36000)); $curr<=$period_end; $curr += 6*3600)
 			{
 				$curr_date = getdate($curr);
 				$from_date = getdate($ts_from);
@@ -380,6 +380,8 @@ SDI('dt = '.$dt);/**/
 		$prev_alarm = $data[$period_start]['alarm'];
 		$prev_time  = $period_start;
 
+//print_r($data[$period_start]); print(BR);
+
 		if(isset($data[$period_start]['ut_s'])) $ut_cnt += $data[$period_start]['ut_s'];
 		if(isset($data[$period_start]['ut_e'])) $ut_cnt -= $data[$period_start]['ut_e'];
 		if(isset($data[$period_start]['dt_s'])) $dt_cnt += $data[$period_start]['dt_s'];
@@ -410,7 +412,8 @@ SDI('dt = '.$dt);/**/
 			{
 				$sla_time[$period_type]['ok_time'] 	+= $ts - $prev_time;
 			}
-
+//SDI($dt_cnt.'/'.$ut_cnt.' - '.$prev_alarm);
+//print_r($val); print(BR);
 			if(isset($val['ut_s'])) $ut_cnt += $val['ut_s'];
 			if(isset($val['ut_e'])) $ut_cnt -= $val['ut_e'];
 			if(isset($val['dt_s'])) $dt_cnt += $val['dt_s'];
@@ -426,7 +429,7 @@ SDI(
 'dt: '.$sla_time['dt']['ok_time'].'/'.$sla_time['dt']['problem_time'].' '.
 'ut: '.$sla_time['ut']['ok_time'].'/'.$sla_time['ut']['problem_time']
 );
-*/
+/**/
 
 		$sla_time['problem_time']	= &$sla_time['ut']['problem_time'];
 		$sla_time['ok_time']		= &$sla_time['ut']['ok_time'];
