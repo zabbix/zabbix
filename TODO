@@ -1,5 +1,6 @@
 1.3:
 
+ - add value mapping for messages
  - fix ZABBIX crash if % us used in message body/subject
  - parameter to disable log rotation
  - fix order for displaying log files order by clock desc,id desc
