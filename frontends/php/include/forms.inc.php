@@ -110,6 +110,7 @@
 
 		$cmbLang = new CcomboBox('lang',$lang);
 		$cmbLang->AddItem("en_gb",S_ENGLISH_GB);
+		$cmbLang->AddItem("pt_br",S_BRAZILIAN_PT);
 		$cmbLang->AddItem("cn_zh",S_CHINESE_CN);
 		$cmbLang->AddItem("fr_fr",S_FRENCH_FR);
 		$cmbLang->AddItem("de_de",S_GERMAN_DE);

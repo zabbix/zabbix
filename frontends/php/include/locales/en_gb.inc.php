@@ -951,6 +951,7 @@
 	"S_USER_PROFILE"=>			"User profile",
 	"S_LANGUAGE"=>				"Language",
 	"S_ENGLISH_GB"=>			"English (GB)",
+	"S_BRAZILIAN_PT"=>			"Brazilian (PT)",
 	"S_FRENCH_FR"=>				"French (FR)",
 	"S_GERMAN_DE"=>				"German (DE)",
 	"S_ITALIAN_IT"=>			"Italian (IT)",
