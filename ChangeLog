@@ -1,5 +1,6 @@
 Changes for 1.1.1-lk:
 
+ - developed template unlinking feature (Eugene) 
  - developed SLA calculation periods (Eugene)
  - developed flexible update intervals for items (Eugene)
  - fixed history cleaning (Eugene)
