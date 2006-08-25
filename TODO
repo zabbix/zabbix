@@ -1,5 +1,6 @@
 1.3:
 
+ - introduce new value (3 - timeout) for simple checks
  - add value mapping for messages
  - fix ZABBIX crash if % us used in message body/subject
  - parameter to disable log rotation
