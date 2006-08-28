@@ -167,7 +167,7 @@
 
 		$result=DBselect("select i.itemid,h.host,i.description,gi.*,i.key_".
 			" from hosts h,graphs_items gi,items i where i.itemid=gi.itemid".
-			" and gi.graphid=".$_REQUEST["graphid"]." and h.hostid=i.hostid order by gi.sortorder");
+			" and gi.graphid=".$_REQUEST["graphid"]." and h.hostid=i.hostid order by gi.sortorder desc");
 		while($row=DBfetch($result))
 		{
 

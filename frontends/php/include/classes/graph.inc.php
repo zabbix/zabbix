@@ -1034,17 +1034,17 @@
 			/* calculte shift for stacked graphs */
 			if($this->type == GRAPH_TYPE_STACKED /* stacked graph */)
 			{
-				for($i=$this->num-2; $i >= 0; $i--)
+				for($i=1; $i<$this->num; $i++)
 				{
 					$curr_data = &$this->data[$this->items[$i]["itemid"]][$this->items[$i]["type"]];
 
 					if(!isset($curr_data))	continue;
 
-					for($j = $i+1; $j < $this->num; $j++)
+					for($j = $i-1; $j >= 0; $j--)
 					{
 						if($this->items[$j]["axisside"] != $this->items[$i]["axisside"]) continue;
 
-						$prev_data = &$this->data[$this->items[$i+1]["itemid"]][$this->items[$i+1]["type"]];
+						$prev_data = &$this->data[$this->items[$j]["itemid"]][$this->items[$j]["type"]];
 
 						if(!isset($prev_data))	continue;
 
@@ -1060,6 +1060,7 @@
 								$curr_shift[$ci] = $prev_var[$ci] + $prev_shift[$ci];
 							}
 						}
+						break;
 					}
 				}
 			}
@@ -1160,7 +1161,7 @@
 			$maxX = $this->sizeX;
 
 			// For each metric
-			for($item = $this->num-1; $item >=0; $item--)
+			for($item = 0; $item < $this->num; $item++)
 			{
 				$minY = $this->m_minY[$this->items[$item]["axisside"]];
 				$maxY = $this->m_maxY[$this->items[$item]["axisside"]];
@@ -1197,7 +1198,7 @@
 				{
 					if($data->count[$i] == 0) continue;
 
-					$diff	= $data->clock[$i] - $data->clock[$j];
+					$diff	= abs($data->clock[$i] - $data->clock[$j]);
 					$cell	= ($this->to_time - $this->from_time)/$this->sizeX;
 					$delay	= $this->items[$item]["delay"];
 
