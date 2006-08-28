@@ -767,7 +767,7 @@
 	"S_VERTICAL_ALIGN"=>			"Vertical align",
 	"S_TOP"=>				"Top",
 	"S_MIDDLE"=>				"Middle",
-	"S_BOTTOM"=>				"Buttom",
+	"S_BOTTOM"=>				"Bottom",
 
 //	screens.php
 	"S_CUSTOM_SCREENS"=>			"Custom screens",
