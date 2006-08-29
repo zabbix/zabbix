@@ -842,6 +842,9 @@ COpt::profiling_start("page");
 
 		if($noauth==0)
 		{
+			global $TRANSLATION;
+			if(!isset($TRANSLATION) || !is_array($TRANSLATION))	$TRANSLATION = array();
+
 			check_authorisation();
 			include_once "include/locales/".$USER_DETAILS["lang"].".inc.php";
 			process_locales();
