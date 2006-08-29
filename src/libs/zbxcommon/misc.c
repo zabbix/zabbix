@@ -141,8 +141,11 @@ int	is_double(char *c)
 {
 	int i;
 	int dot=-1;
+	int len;
 
-	for(i=0;c[i]!=0;i++)
+	for(i=0; c[i]==' ' && c[i]!=0;i++); /* trim left spaces */
+
+	for(len=0; c[i]!=0; i++, len++)
 	{
 		if((c[i]>='0')&&(c[i]<='9'))
 		{
@@ -152,15 +155,23 @@ int	is_double(char *c)
 		if((c[i]=='.')&&(dot==-1))
 		{
 			dot=i;
+			continue;
+		}
 
-			if((dot!=0)&&(dot!=(int)strlen(c)-1))
-			{
-				continue;
-			}
+		if(c[i]==' ') /* check right spaces */
+		{
+			for( ; c[i]==' ' && c[i]!=0;i++); /* trim right spaces */
+			
+			if(c[i]==0) break; /* SUCCEED */
 		}
 
 		return FAIL;
 	}
+	
+	if(len <= 0) return FAIL;
+
+	if(len == 1 && dot!=-1) return FAIL;
+
 	return SUCCEED;
 }
 
@@ -182,17 +193,29 @@ int	is_double(char *c)
  ******************************************************************************/
 int	is_uint(char *c)
 {
-	int i;
+	int	i;
+	int	len;
 
-	for(i=0;c[i]!=0;i++)
+	for(i=0; c[i]==' ' && c[i]!=0;i++); /* trim left spaces */
+	
+	for(len=0; c[i]!=0; i++,len++)
 	{
 		if((c[i]>='0')&&(c[i]<='9'))
 		{
 			continue;
 		}
+		
+		if(c[i]==' ') /* check right spaces */
+		{
+			for( ; c[i]==' ' && c[i]!=0;i++); /* trim right spaces */
+			
+			if(c[i]==0) break; /* SUCCEED */
+		}
 		return FAIL;
 	}
 
+	if(len <= 0) return FAIL;
+	
 	return SUCCEED;
 }
 
