@@ -1,5 +1,6 @@
 Changes for 1.1.2:
 
+ - added action email action variable '{SEVERITY}' (Eugene)
  - added Brazilian Portuguese translation. Thanks to Marcelo Honorio. (Alexei)
  - fixed history cleaning (Eugene)
  - fixed Unknown when selcting trigger severity Disaster in action form (Alexei)
