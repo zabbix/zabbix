@@ -555,7 +555,7 @@ int	evaluate(int *result,char *exp, char *error, int maxerrlen)
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: {DATE},{TIME},{HOSTNAME},{IPADDRESS},{STATUS},                   *
- *           {TRIGGER.DESCRIPTION}, {TRIGGER.KEY}                             *
+ *           {TRIGGER.DESCRIPTION}, {TRIGGER.KEY}, {SEVERITY}                 *
  *                                                                            *
  ******************************************************************************/
 void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data)
@@ -700,6 +700,22 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data
 			strcpy(data, str);
 			strncat(data, tmp, MAX_STRING_LEN);
 			strncat(data, s+strlen("{STATUS}"), MAX_STRING_LEN);
+		}
+		else if( (s = strstr(str,"{SEVERITY}")) != NULL )
+		{
+			s[0]=0;
+			strcpy(data, str);
+
+			if(trigger->priority == 0)	strncat(data, "Not classified",	MAX_STRING_LEN);
+                        else if(trigger->priority == 1)	strncat(data, "Information",	MAX_STRING_LEN);
+                        else if(trigger->priority == 2)	strncat(data, "Warning",	MAX_STRING_LEN);
+                        else if(trigger->priority == 3)	strncat(data, "Average",	MAX_STRING_LEN);
+                        else if(trigger->priority == 4)	strncat(data, "High",		MAX_STRING_LEN);
+                        else if(trigger->priority == 5)	strncat(data, "Disaster",	MAX_STRING_LEN);
+                        else				strncat(data, "Uncnown",	MAX_STRING_LEN);
+
+			strncat(data, tmp, MAX_STRING_LEN);
+			strncat(data, s+strlen("{SEVERITY}"), MAX_STRING_LEN);
 		}
 		else
 		{
