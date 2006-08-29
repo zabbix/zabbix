@@ -257,7 +257,7 @@
 			if($value <= 0) $value = NULL;
 			if(is_null($value)) $value = 900;
 
-			$this->sizeYi = $value;
+			$this->sizeY = $value;
 		}
 
 		function setBorder($border)
