@@ -1,5 +1,6 @@
 Changes for 1.1.2:
 
+ - fixed problem with ASN_IPADDRESS SNMP values (Eugene)
  - added action email action variable '{SEVERITY}' (Eugene)
  - added Brazilian Portuguese translation. Thanks to Marcelo Honorio. (Alexei)
  - fixed history cleaning (Eugene)
