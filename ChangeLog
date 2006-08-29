@@ -1,5 +1,6 @@
 Changes for 1.1.2:
 
+ - disabled exit code handling of UserParameter scripts (Eugene)
  - improved UserParameter substitution (Eugene)
  - improved definition of integer and float point types (Eugene)
  - fixed problem with ASN_IPADDRESS SNMP values (Eugene)

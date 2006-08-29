@@ -1190,7 +1190,7 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Run remote command [%s] Result [%d] [%s]", command, strlen(c), c);
 
-	if(pclose(f) != 0)
+	if(pclose(f) == -1)
 	{
 		switch (errno)
 		{
@@ -1203,7 +1203,7 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	}
 
 	/* We got EOL only */
-	if(c[0] == '\n')
+	if(c[0] == '\n' || c[0] == '\0')
 	{
 		return SYSINFO_RET_FAIL;
 	}
