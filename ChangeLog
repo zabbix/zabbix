@@ -3,7 +3,7 @@ Changes for 1.1.1-al:
  - fixed 'Height' field in the graph configuration under Screens (Eugene)
  - improved definition of integer and float point types (Eugene)
  - fixed problem with ASN_IPADDRESS SNMP values (Eugene)
- - added action email action variable '{SEVERITY}' (Eugene)
+ - added action email action variable '{TRIGGER.SEVERITY}' (Eugene)
  - added Brazilian Portuguese translation. Thanks to Marcelo Honorio. (Alexei)
  - fixed history cleaning (Eugene)
  - developed database monitoring via ODBC (Eugene)
