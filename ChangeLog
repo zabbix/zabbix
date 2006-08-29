@@ -1,5 +1,6 @@
 Changes for 1.1.2:
 
+ - improved UserParameter substitution (Eugene)
  - improved definition of integer and float point types (Eugene)
  - fixed problem with ASN_IPADDRESS SNMP values (Eugene)
  - added action email action variable '{TRIGGER.SEVERITY}' (Eugene)
