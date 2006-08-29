@@ -373,6 +373,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 					p = malloc(16);
 					if(p)
 					{
+						ip = vars->val.string;
 						zbx_snprintf(p,16,"%d.%d.%d.%d",ip[0],ip[1],ip[2],ip[3]);
 
 						SET_STR_RESULT(value, p);
