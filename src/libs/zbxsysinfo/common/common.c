@@ -404,7 +404,7 @@ int	replace_param(const char *cmd, const char *param, char *out, int outlen)
 
 			if(pr[1] == '0')
 			{
-				strncpy(buf, cmd, MAX_STRING_LEN);
+				strncpy(buf, command, MAX_STRING_LEN);
 			}
 			else
 			{
@@ -416,7 +416,11 @@ int	replace_param(const char *cmd, const char *param, char *out, int outlen)
 					
 			pl = pr + 2;
 			continue;
+		} else if(pr[1] == '$')
+		{
+			pr++; /* remove second '$' symbol */
 		}
+		
 		pl = pr + 1;
 		strncat(out, "$", outlen);
 		outlen -= 1;
@@ -491,11 +495,18 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 		
 		if(commands[i].main_param)
 		{
-			err = replace_param(
-				commands[i].main_param,
-				usr_param,
-				param,
-				MAX_STRING_LEN);
+			if(commands[i].flags & CF_USEUPARAM)
+			{
+				err = replace_param(
+					commands[i].main_param,
+					usr_param,
+					param,
+					MAX_STRING_LEN);
+			}
+			else
+			{
+				snprintf(param, MAX_STRING_LEN, "%s", commands[i].main_param);
+			}
 		}
 		else
 		{
@@ -1246,7 +1257,7 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Run remote command [%s] Result [%d] [%s]", command, strlen(cmd_result), cmd_result);
 
-	if(pclose(f) != 0)
+	if(pclose(f) == -1)
 	{
 		switch (errno)
 		{
@@ -1260,7 +1271,7 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 #endif /* _WINDOWS */
 
 	/* We got EOL only */
-	if(cmd_result[0] == '\n')
+	if(cmd_result[0] == '\n' || cmd_result[0] == '\0')
 	{
 		return SYSINFO_RET_FAIL;
 	}
