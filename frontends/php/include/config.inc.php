@@ -281,10 +281,15 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 			$u="M";
 			$value=$value/(1024*1024);
 		}
-		else
+		else if($abs<1024*1024*1024*1024)
 		{
 			$u="G";
 			$value=$value/(1024*1024*1024);
+		}
+		else
+		{
+			$u="T";
+			$value=$value/(1024*1024*1024*1024);
 		}
 
 		if(round($value)==$value)
