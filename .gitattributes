@@ -1,4 +1,6 @@
 * text=auto !eol
+build/win32/project/zabbix_agentd.dsp -text
+build/win32/project/zabbix_agentd.dsw -text
 create/data/images/Hub.png -text svneol=unset#unset
 create/data/images/Hub_small.png -text svneol=unset#unset
 create/data/images/Network.png -text svneol=unset#unset
