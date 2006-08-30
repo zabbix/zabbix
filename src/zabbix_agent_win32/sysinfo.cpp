@@ -578,6 +578,10 @@ static LONG H_DiskInfo(char *cmd,char *arg,double *value)
 		*value = (double)((__int64)totalBytes.QuadPart-(__int64)freeBytes.QuadPart);
 	else if (strcmp(mode,"total") == 0)
 		*value = (double)((__int64)totalBytes.QuadPart);
+	else if (strcmp(mode,"pfree") == 0)
+		*value = (double)(__int64)freeBytes.QuadPart * 100. / (double)(__int64)totalBytes.QuadPart;
+	else if (strcmp(mode,"pused") == 0)
+		*value = (double)((__int64)totalBytes.QuadPart-(__int64)freeBytes.QuadPart) * 100. / (double)(__int64)totalBytes.QuadPart;
 	else
 		return SYSINFO_RC_NOTSUPPORTED;
 
