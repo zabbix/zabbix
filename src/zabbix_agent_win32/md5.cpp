@@ -21,7 +21,7 @@
   ghost@aladdin.com
 
  */
-/* $Id$ */
+/* $Id: md5.cpp 1905 2005-07-26 10:31:51Z hugetoad $ */
 /*
   Independent implementation of MD5 (RFC 1321).
 
