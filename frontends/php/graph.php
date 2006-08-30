@@ -199,8 +199,8 @@
 			$table->AddRow(array(
 					$row["sortorder"],
 					$row["host"],
-					NEW CLink(item_description($row["description"],$row["key_"],
-						"chart.php?itemid=".$row["itemid"]."&period=3600&from=0"),
+					NEW CLink(item_description($row["description"],$row["key_"]),
+						"chart.php?itemid=".$row["itemid"]."&period=3600&from=0",
 						"action"),
 					$fnc_name,
 					$type,
