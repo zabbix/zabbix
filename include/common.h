@@ -202,6 +202,7 @@
 #define	CONDITION_OPERATOR_NOT_LIKE	3
 #define	CONDITION_OPERATOR_IN		4
 #define	CONDITION_OPERATOR_MORE_EQUAL	5
+#define	CONDITION_OPERATOR_LESS_EQUAL	6
 
 /* Special item key used for storing server status */
 #define SERVER_STATUS_KEY	"status"

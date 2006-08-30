@@ -1,5 +1,6 @@
 Changes for 1.1.2:
 
+ - added '<=' comporator for trigger severity of action conditions (Eugene)
  - fixed problem with escape characters in triggers (Eugene)
  - fixed 'system.cpu.util[*]' for Tru64 (Eugene)
  - disabled exit code handling of UserParameter scripts (Eugene)
