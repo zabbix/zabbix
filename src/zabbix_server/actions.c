@@ -541,6 +541,13 @@ static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigge
 				ret = SUCCEED;
 			}
 		}
+		else if(condition->operator == CONDITION_OPERATOR_LESS_EQUAL)
+		{
+			if(trigger->priority <= atoi(condition->value))
+			{
+				ret = SUCCEED;
+			}
+		}
 		else
 		{
 			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [%d]", condition->operator, condition->conditionid);

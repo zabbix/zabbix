@@ -309,6 +309,10 @@
 		{
 			$op=">=";
 		}
+		else if($operator == CONDITION_OPERATOR_LESS_EQUAL)
+		{
+			$op="<=";
+		}
 
 		$desc=S_UNKNOWN;
 		if($conditiontype==CONDITION_TYPE_GROUP)
