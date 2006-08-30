@@ -69,6 +69,14 @@ int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	{
 		SET_UI64_RESULT(result, totalBytes.QuadPart);
 	}
+	else if (strcmp(mode,"pfree") == 0)
+	{
+		SET_UI64_RESULT(result, (double)(__int64)freeBytes.QuadPart * 100. / (double)(__int64)totalBytes.QuadPart);
+	}
+	else if (strcmp(mode,"pused") == 0)
+	{
+		SET_UI64_RESULT(result, (double)((__int64)totalBytes.QuadPart-(__int64)freeBytes.QuadPart) * 100. / (double)(__int64)totalBytes.QuadPart);
+	}
 	else
 	{
 		return SYSINFO_RET_FAIL;
