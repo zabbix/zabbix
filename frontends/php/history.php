@@ -333,7 +333,7 @@
 			$sql = "select hst.host,i.itemid,i.key_,i.description,h.clock,h.value,i.valuemapid,h.timestamp,h.source,h.severity".
 				" from history_log h, items i, hosts hst".
 				" where hst.hostid=i.hostid and h.itemid=i.itemid".$sql_filter." and i.itemid in (".$itemid_lst.")".$cond_clock.
-				" order by clock desc";
+				" order by h.clock desc, h.id desc";
 
 			$result=DBselect($sql,$limit);
 
