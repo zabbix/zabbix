@@ -30,7 +30,7 @@ int	calculate_item_nextcheck(int itemid, int delay, char *delay_flex, time_t now
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In calculate_item_nextcheck [%d, %d, %s, %d]",itemid,delay,delay_flex,now);
 
-	if(delay_flex)
+	if(delay_flex && *delay_flex)
 	{
 		do
 		{
