@@ -26,6 +26,8 @@
 #define	ZABBIX_VERSION	"1.1.1"
 
 #if defined(WIN32)
+#	include <time.h>
+
 #	pragma warning (disable: 4100)
 
 #	define zbx_uint64_t __int64
