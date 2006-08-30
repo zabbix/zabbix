@@ -1339,6 +1339,8 @@
 			$cmbCondOp->AddItem(CONDITION_OPERATOR_IN,		'in');
 		if(in_array($new_condition_type,array(CONDITION_TYPE_TRIGGER_SEVERITY)))
 			$cmbCondOp->AddItem(CONDITION_OPERATOR_MORE_EQUAL,	'>=');
+		if(in_array($new_condition_type,array(CONDITION_TYPE_TRIGGER_SEVERITY)))
+			$cmbCondOp->AddItem(CONDITION_OPERATOR_LESS_EQUAL,	'<=');
 
 		array_push($rowCondition,$cmbCondOp);
 
