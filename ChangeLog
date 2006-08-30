@@ -1,5 +1,6 @@
 Changes for 1.1.1-al:
 
+ - fixed 'system.cpu.util[*]' for Tru64 (Eugene)
  - disabled exit code handling of UserParameter scripts (Eugene)
  - improved UserParameter substitution (Eugene)
  - fixed 'Height' field in the graph configuration under Screens (Eugene)
