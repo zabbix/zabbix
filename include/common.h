@@ -436,6 +436,7 @@ int	calculate_item_nextcheck(int itemid, int delay, int now);
 int	set_result_type(AGENT_RESULT *result, int value_type, char *c);
 
 int	replace_param(const char *cmd, const char *param, char *out, int outlen);
+void	signal_handler( int sig );
 
 int	xml_get_data(char *xml,char *tag, char *data, int maxlen);
 int	comms_create_request(char *host, char *key, char *data, char *lastlogsize, char *request,int maxlen);
