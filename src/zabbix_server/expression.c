@@ -545,76 +545,103 @@ int	evaluate(int *result,char *exp, char *error, int maxerrlen)
  *                                                                            *
  * Purpose: substitute simple macros in data string with real values          *
  *                                                                            *
- * Parameters: data - data string                                             *
- *             trigger - trigger structure                                    *
+ * Parameters: trigger - trigger structure                                    *
  *             action - action structure                                      *
+ *             data - data string                                             *
+ *             dala_max_len - max length of data string,include '\0'          *
  *                                                                            *
- * Return value:  SUCCEED - substituted succesfully, data - updated data      *
- *                FAIL - otherwise                                            *
+ * Return value:                                                              *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: {DATE},{TIME},{HOSTNAME},{IPADDRESS},{STATUS},                   *
- *           {TRIGGER.DESCRIPTION}, {TRIGGER.KEY}, {TRIGGER.SEVERITY}         *
+ *           {TRIGGER.NAME}, {TRIGGER.KEY}, {TRIGGER.SEVERITY}                *
  *                                                                            *
  ******************************************************************************/
-void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data)
+/* definition of macros variables */
+#define MVAR_DATE			"{DATE}"
+#define MVAR_TIME			"{TIME}"
+#define MVAR_HOST_NAME			"{HOSTNAME}"
+#define MVAR_IPADDRESS			"{IPADDRESS}"
+#define MVAR_TRIGGER_NAME		"{TRIGGER.NAME}"
+#define MVAR_TRIGGER_KEY		"{TRIGGER.KEY}"
+#define MVAR_TRIGGER_STATUS		"{TRIGGER.STATUS}"
+#define MVAR_TRIGGER_STATUS_OLD		"{STATUS}"
+#define MVAR_TRIGGER_SEVERITY		"{TRIGGER.SEVERITY}"
+
+#define STR_UNKNOWN_VARIAVLE		"*UNKNOWN*"
+static  void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data, int dala_max_len)
 {
-	int	found = SUCCEED;
-	char	*s;
 	char	sql[MAX_STRING_LEN];
-	char	str[MAX_STRING_LEN];
-	char	tmp[MAX_STRING_LEN];
+
+	char
+		*pl = NULL,
+		*pr = NULL,
+		str_out[MAX_STRING_LEN],
+		replace_to[MAX_STRING_LEN];
+	int	
+		outlen,
+		var_len;
 
 	time_t  now;
 	struct  tm      *tm;
 
-	DB_RESULT result;
+	DB_RESULT	result;
 	DB_ROW		row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_simple_macros [%s]",data);
 
-	while (found == SUCCEED)
+	*str_out = '\0';
+	outlen = sizeof(str_out) - 1;
+	pl = data;
+	while((pr = strchr(pl, '{')) && outlen > 0)
 	{
-		strscpy(str, data);
+		pr[0] = '\0';
+		strncat(str_out, pl, outlen);
+		outlen -= MIN(strlen(pl), outlen);
+		pr[0] = '{';
 
+		snprintf(replace_to, sizeof(replace_to), "{");
+		var_len = 1;
 
-		if( (s = strstr(str,"{TRIGGER.NAME}")) != NULL )
+		if(strncmp(pr, MVAR_TRIGGER_NAME, strlen(MVAR_TRIGGER_NAME)) == 0)
 		{
-			s[0]=0;
-			strcpy(data, str);
-			strncat(data, trigger->description, MAX_STRING_LEN);
-			strncat(data, s+strlen("{TRIGGER.NAME}"), MAX_STRING_LEN);
+			var_len = strlen(MVAR_TRIGGER_NAME);
+
+			snprintf(replace_to, sizeof(replace_to), "%s", trigger->description);
 		}
-		else if( (s = strstr(str,"{HOSTNAME}")) != NULL )
+		else if(strncmp(pr, MVAR_HOST_NAME, strlen(MVAR_HOST_NAME)) == 0)
 		{
-/*			snprintf(sql,sizeof(sql)-1,"select distinct t.description,h.host from triggers t, functions f,items i, hosts h where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid", trigger->triggerid);*/
-			snprintf(sql,sizeof(sql)-1,"select distinct h.host from triggers t, functions f,items i, hosts h where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid", trigger->triggerid);
+			var_len = strlen(MVAR_HOST_NAME);
+
+			snprintf(sql,sizeof(sql)-1,"select distinct h.host from triggers t, functions f,items i, hosts h"
+				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid", 
+				trigger->triggerid);
+
 			result = DBselect(sql);
-			row=DBfetch(result);
+			row = DBfetch(result);
 
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
 				zabbix_log( LOG_LEVEL_ERR, "No hostname in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
 				zabbix_syslog("No hostname in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
-				strscpy(tmp, "*UNKNOWN*");
-				DBfree_result(result);
+
+				snprintf(replace_to, sizeof(replace_to), "%s", STR_UNKNOWN_VARIAVLE);
 			}
 			else
 			{
-				strscpy(tmp,row[0]);
-
-				DBfree_result(result);
+				snprintf(replace_to, sizeof(replace_to), "%s", row[0]);
 			}
-
-			s[0]=0;
-			strcpy(data, str);
-			strncat(data, tmp, MAX_STRING_LEN);
-			strncat(data, s+strlen("{HOSTNAME}"), MAX_STRING_LEN);
+			DBfree_result(result);
 		}
-		else if( (s = strstr(str,"{TRIGGER.KEY}")) != NULL )
+		else if(strncmp(pr, MVAR_TRIGGER_KEY, strlen(MVAR_TRIGGER_KEY)) == 0)
 		{
-			snprintf(sql,sizeof(sql)-1,"select distinct i.key_ from triggers t, functions f,items i, hosts h where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid order by i.key_", trigger->triggerid);
+			var_len = strlen(MVAR_TRIGGER_KEY);
+
+			snprintf(sql,sizeof(sql)-1,"select distinct i.key_ from triggers t, functions f,items i, hosts h"
+				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid"
+				" order by i.key_", trigger->triggerid);
+
 			result = DBselect(sql);
 			row=DBfetch(result);
 
@@ -622,106 +649,98 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data
 			{
 				zabbix_log( LOG_LEVEL_ERR, "No TRIGGER.KEY in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
 				zabbix_syslog("No TRIGGER.KEY in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
-				strscpy(tmp, "");
-				DBfree_result(result);
+				/* remove variable */
+				*replace_to = '\0';
 			}
 			else
 			{
-				strscpy(tmp,row[0]);
-
-				DBfree_result(result);
+				snprintf(replace_to, sizeof(replace_to), "%s", row[0]);
 			}
 
-			s[0]=0;
-			strcpy(data, str);
-			strncat(data, tmp, MAX_STRING_LEN);
-			strncat(data, s+strlen("{TRIGGER.KEY}"), MAX_STRING_LEN);
+			DBfree_result(result);
 		}
-		else if( (s = strstr(str,"{IPADDRESS}")) != NULL )
+		if(strncmp(pr, MVAR_IPADDRESS, strlen(MVAR_IPADDRESS)) == 0)
 		{
-			snprintf(sql,sizeof(sql)-1,"select distinct h.ip from triggers t, functions f,items i, hosts h where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and h.useip=1", trigger->triggerid);
+			var_len = strlen(MVAR_IPADDRESS);
+
+			snprintf(sql,sizeof(sql)-1,"select distinct h.ip from triggers t, functions f,items i, hosts h"
+				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and h.useip=1",
+				trigger->triggerid);
+
 			result = DBselect(sql);
 			row = DBfetch(result);
 
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
-				zabbix_log( LOG_LEVEL_ERR, "No IP address in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
-				zabbix_syslog("No IP address in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
-				strscpy(tmp, "*UNKNOWN IP*");
-				DBfree_result(result);
+				zabbix_log( LOG_LEVEL_ERR, "No hostname in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+				zabbix_syslog("No hostname in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+
+				snprintf(replace_to, sizeof(replace_to), "%s", STR_UNKNOWN_VARIAVLE);
 			}
 			else
 			{
-				strscpy(tmp,row[0]);
-
-				DBfree_result(result);
+				snprintf(replace_to, sizeof(replace_to), "%s", row[0]);
 			}
-
-			s[0]=0;
-			strcpy(data, str);
-			strncat(data, tmp, MAX_STRING_LEN);
-			strncat(data, s+strlen("{IPADDRESS}"), MAX_STRING_LEN);
+			DBfree_result(result);
 		}
-		else if( (s = strstr(str,"{DATE}")) != NULL )
+		else if(strncmp(pr, MVAR_DATE, strlen(MVAR_DATE)) == 0)
 		{
-			now=time(NULL);
-			tm=localtime(&now);
-			snprintf(tmp,sizeof(tmp)-1,"%.4d.%.2d.%.2d",tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday);
+			var_len = strlen(MVAR_TIME);
 
-			s[0]=0;
-			strcpy(data, str);
-			strncat(data, tmp, MAX_STRING_LEN);
-			strncat(data, s+strlen("{DATE}"), MAX_STRING_LEN);
+			now	= time(NULL);
+			tm	= localtime(&now);
+			snprintf(replace_to, sizeof(replace_to)-1, "%.4d.%.2d.%.2d", tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday);
 		}
-		else if( (s = strstr(str,"{TIME}")) != NULL )
+		else if(strncmp(pr, MVAR_TIME, strlen(MVAR_TIME)) == 0)
 		{
-			now=time(NULL);
-			tm=localtime(&now);
-			snprintf(tmp,sizeof(tmp)-1,"%.2d:%.2d:%.2d",tm->tm_hour,tm->tm_min,tm->tm_sec);
+			var_len = strlen(MVAR_TIME);
 
-			s[0]=0;
-			strcpy(data, str);
-			strncat(data, tmp, MAX_STRING_LEN);
-			strncat(data, s+strlen("{TIME}"), MAX_STRING_LEN);
+			now	= time(NULL);
+			tm	= localtime(&now);
+			snprintf(replace_to, sizeof(replace_to), "%.2d:%.2d:%.2d",tm->tm_hour,tm->tm_min,tm->tm_sec);
+
 		}
-		else if( (s = strstr(str,"{STATUS}")) != NULL )
+		else if(strncmp(pr, MVAR_TRIGGER_STATUS, strlen(MVAR_TRIGGER_STATUS)) == 0)
 		{
-			/* This is old value */
+			/* NOTE: if you make changes for this bloc, don't forgot MVAR_TRIGGER_STATUS_OLD block */
+			var_len = strlen(MVAR_TRIGGER_STATUS);
+
 			if(trigger->value == TRIGGER_VALUE_TRUE)
-			{
-				snprintf(tmp,sizeof(tmp)-1,"OFF");
-			}
+				snprintf(replace_to, sizeof(replace_to), "OFF");
 			else
-			{
-				snprintf(tmp,sizeof(tmp)-1,"ON");
-			}
-
-			s[0]=0;
-			strcpy(data, str);
-			strncat(data, tmp, MAX_STRING_LEN);
-			strncat(data, s+strlen("{STATUS}"), MAX_STRING_LEN);
+				snprintf(replace_to, sizeof(replace_to), "ON");
 		}
-		else if( (s = strstr(str,"{TRIGGER.SEVERITY}")) != NULL )
+		else if(strncmp(pr, MVAR_TRIGGER_STATUS_OLD, strlen(MVAR_TRIGGER_STATUS_OLD)) == 0)
 		{
-			s[0]=0;
-			strcpy(data, str);
+			/* NOTE: if you make changes for this bloc, don't forgot MVAR_TRIGGER_STATUS block */
+			var_len = strlen(MVAR_TRIGGER_STATUS_OLD);
 
-			if(trigger->priority == 0)	strncat(data, "Not classified",	MAX_STRING_LEN);
-                        else if(trigger->priority == 1)	strncat(data, "Information",	MAX_STRING_LEN);
-                        else if(trigger->priority == 2)	strncat(data, "Warning",	MAX_STRING_LEN);
-                        else if(trigger->priority == 3)	strncat(data, "Average",	MAX_STRING_LEN);
-                        else if(trigger->priority == 4)	strncat(data, "High",		MAX_STRING_LEN);
-                        else if(trigger->priority == 5)	strncat(data, "Disaster",	MAX_STRING_LEN);
-                        else				strncat(data, "Unknown",	MAX_STRING_LEN);
-
-			strncat(data, tmp, MAX_STRING_LEN);
-			strncat(data, s+strlen("{TRIGGER.SEVERITY}"), MAX_STRING_LEN);
+			if(trigger->value == TRIGGER_VALUE_TRUE)
+				snprintf(replace_to, sizeof(replace_to), "OFF");
+			else
+				snprintf(replace_to, sizeof(replace_to), "ON");
 		}
-		else
+		else if(strncmp(pr, MVAR_TRIGGER_SEVERITY, strlen(MVAR_TRIGGER_SEVERITY)) == 0)
 		{
-			found = FAIL;
+			var_len = strlen(MVAR_TRIGGER_SEVERITY);
+
+			if(trigger->priority == 0)	snprintf(replace_to, sizeof(replace_to), "Not classified");
+                        else if(trigger->priority == 1)	snprintf(replace_to, sizeof(replace_to), "Information");
+                        else if(trigger->priority == 2)	snprintf(replace_to, sizeof(replace_to), "Warning");
+                        else if(trigger->priority == 3)	snprintf(replace_to, sizeof(replace_to), "Average");
+                        else if(trigger->priority == 4)	snprintf(replace_to, sizeof(replace_to), "High");
+                        else if(trigger->priority == 5)	snprintf(replace_to, sizeof(replace_to), "Disaster");
+                        else				snprintf(replace_to, sizeof(replace_to), "Unknown");
 		}
+
+		strncat(str_out, replace_to, outlen);
+		outlen -= MIN(strlen(replace_to), outlen);
+		pl = pr + var_len;
 	}
+	strncat(str_out, pl, outlen);
+	outlen -= MIN(strlen(pl), outlen);
+
+	snprintf(data, dala_max_len, "%s", str_out);
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Result expression [%s]", data );
 }
@@ -732,139 +751,113 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data
  *                                                                            *
  * Purpose: substitute macros in data string with real values                 *
  *                                                                            *
- * Parameters: data - data string                                             *
- *             trigger - trigger structure                                    *
+ * Parameters: trigger - trigger structure                                    *
  *             action - action structure                                      *
+ *             dala_max_len - max length of data string,include '\0'          *
+ *             data - data string                                             *
  *                                                                            *
- * Return value:  SUCCEED - substituted succesfully, data - updated data      *
- *                FAIL - otherwise                                            *
+ * Return value:                                                              *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: example: "{127.0.0.1:system[procload].last(0)}" to "1.34"        *
  *                                                                            *
- * Make this function more secure. Get rid of snprintf. Utilise substr()      *
- *                                                                            *
  ******************************************************************************/
-int	substitute_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data)
+void	substitute_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data, int dala_max_len)
 {
-	char	res[MAX_STRING_LEN];
-	char	macro[MAX_STRING_LEN];
-	char	host[MAX_STRING_LEN];
-	char	key[MAX_STRING_LEN];
-	char	function[MAX_STRING_LEN];
-	char	parameter[MAX_STRING_LEN];
-	static	char	value[MAX_STRING_LEN];
-	int	i;
-	int	r,l;
-	int	r1,l1;
+	char	
+		str_out[MAX_STRING_LEN],
+		replace_to[MAX_STRING_LEN],
+		*pl = NULL,
+		*pr = NULL,
+		*pms = NULL,
+		*pme = NULL,
+		*p = NULL;
+	char
+		host[MAX_STRING_LEN],
+		key[MAX_STRING_LEN],
+		function[MAX_STRING_LEN],
+		parameter[MAX_STRING_LEN];
+
+	int
+		outlen,
+		var_len;
+
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_macros([%s])",data);
 
-	substitute_simple_macros(trigger, action, data);
+	substitute_simple_macros(trigger, action, data, dala_max_len);
 
-	while( find_char(data,'{') != FAIL )
+	*str_out = '\0';
+	outlen = sizeof(str_out) - 1;
+	pl = data;
+	while((pr = strchr(pl, '{')) && outlen > 0)
 	{
-		l=find_char(data,'{');
-		r=find_char(data,'}');
+		if((pme = strchr(pr, '}')) == NULL)
+			break;
 
-		if( r == FAIL )
+		pme[0] = '\0';
+	
+		pr = strrchr(pr, '{'); /* find '{' near '}' */	
+
+		/* copy left side */
+		pr[0] = '\0';
+		strncat(str_out, pl, outlen);
+		outlen -= MIN(strlen(pl), outlen);
+		pr[0] = '{';
+
+
+		/* copy original name of variable */
+		snprintf(replace_to, sizeof(replace_to), "%s}", pr);	/* in format used '}' */
+									/* cose in 'pr' string symbol '}' is changed to '\0' by 'pme'*/
+		var_len = strlen(replace_to);
+		
+		pms = pr + 1;
+	
+		if(NULL != (p = strchr(pms, ':')))
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Cannot find right bracket. Expression:[%s]", data );
-			zabbix_syslog("Cannot find right bracket. Expression:[%s]", data );
-			return	FAIL;
+			*p = '\0';
+			snprintf(host, sizeof(host), "%s", pms);
+			*p = ':';
+			pms = p + 1;
+			if(NULL != (p = strrchr(pms, '.')))
+			{
+				*p = '\0';
+				snprintf(key, sizeof(key), "%s", pms);
+				*p = '.';
+				pms = p + 1;
+				if(NULL != (p = strchr(pms, '(')))
+				{
+					*p = '\0';
+					snprintf(function, sizeof(function), "%s", pms);
+					*p = '(';
+					pms = p + 1;
+					if(NULL != (p = strchr(pms, ')')))
+					{
+						*p = '\0';
+						snprintf(parameter, sizeof(parameter), "%s", pms);
+						*p = ')';
+						pms = p + 1;
+						
+						if(evaluate_FUNCTION2(replace_to,host,key,function,parameter) != SUCCEED)
+							snprintf(replace_to, sizeof(replace_to), "%s", STR_UNKNOWN_VARIAVLE);
+					}
+				}
+			}
+			
 		}
+		pme[0] = '}';
 
-		if( r < l )
-		{
-			zabbix_log( LOG_LEVEL_WARNING, "Right bracket is before left one. Expression:[%s]", data );
-			zabbix_syslog("Right bracket is before left one. Expression:[%s]", data );
-			return	FAIL;
-		}
-
-		for(i=l+1;i<r;i++)
-		{
-			macro[i-l-1]=data[i];
-		} 
-		macro[r-l-1]=0;
-
-		zabbix_log( LOG_LEVEL_DEBUG, "Macro:%s", macro );
-
-		/* macro=="host:key.function(parameter)" */
-
-		r1=find_char(macro,':');
-
-		for(i=0;i<r1;i++)
-		{
-			host[i]=macro[i];
-		} 
-		host[r1]=0;
-
-		zabbix_log( LOG_LEVEL_DEBUG, "Host:%s", host );
-
-		r1=r1+1;
-/* Doesn't work if the key contains '.' */
-/*		l1=find_char(macro+r1,'.');*/
-
-		l1=FAIL;
-		for(i=0;(macro+r1)[i]!=0;i++)
-		{
-			if((macro+r1)[i]=='.') l1=i;
-		}
-
-		for(i=r1;i<l1+r1;i++)
-		{
-			key[i-r1]=macro[i];
-		} 
-		key[l1]=0;
-
-		zabbix_log( LOG_LEVEL_DEBUG, "Key:%s", key );
-
-		l1=l1+r1+1;
-		r1=find_char(macro+l1,'(');
-
-		for(i=l1;i<l1+r1;i++)
-		{
-			function[i-l1]=macro[i];
-		} 
-		function[r1]=0;
-
-		zabbix_log( LOG_LEVEL_DEBUG, "Function:%s", function );
-
-		l1=l1+r1+1;
-		r1=find_char(macro+l1,')');
-
-		for(i=l1;i<l1+r1;i++)
-		{
-			parameter[i-l1]=macro[i];
-		} 
-		parameter[r1]=0;
-
-		zabbix_log( LOG_LEVEL_DEBUG, "Parameter:%s", parameter );
-
-		i=evaluate_FUNCTION2(value,host,key,function,parameter);
-		zabbix_log( LOG_LEVEL_DEBUG, "Value3 [%s]", value );
-
-
-		zabbix_log( LOG_LEVEL_DEBUG, "Value4 [%s]", data );
-		data[l]='%';
-		data[l+1]='s';
-
-		zabbix_log( LOG_LEVEL_DEBUG, "Value41 [%s]", data+l+2 );
-		zabbix_log( LOG_LEVEL_DEBUG, "Value42 [%s]", data+r+1 );
-		strcpy(data+l+2,data+r+1);
-
-		zabbix_log( LOG_LEVEL_DEBUG, "Value5 [%s]", data );
-
-		snprintf(res,sizeof(res)-1,data,value);
-		strcpy(data,res);
-/*		delete_spaces(data); */
-		zabbix_log( LOG_LEVEL_DEBUG, "Expression4:[%s]", data );
+		strncat(str_out, replace_to, outlen);
+		outlen -= MIN(strlen(replace_to), outlen);
+		pl = pr + var_len;
 	}
+	strncat(str_out, pl, outlen);
+	outlen -= MIN(strlen(pl), outlen);
+
+	snprintf(data, dala_max_len, "%s", str_out);
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Result expression:%s", data );
-
-	return SUCCEED;
 }
 
 /******************************************************************************
