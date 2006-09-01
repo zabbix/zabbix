@@ -1,5 +1,6 @@
 Changes for 1.1.2:
 
+ - improved macro variables substitution in message body/subject (Eugene)
  - added new value for 'net.tcp.service*[]', 2 - timeout (Eugene)
  - fixed order of displaying log files (Eugene)
  - added support of 'pfree' and 'pused' for 'vfs.fs.size' of windows (Eugene)

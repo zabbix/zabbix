@@ -709,8 +709,8 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 			
 			strscpy(action.subject,row[2]);
 			strscpy(action.message,row[3]);
-			substitute_macros(trigger, &action, action.message);
-			substitute_macros(trigger, &action, action.subject);
+			substitute_macros(trigger, &action, action.message, sizeof(action.message));
+			substitute_macros(trigger, &action, action.subject, sizeof(action.subject));
 
 			action.recipient=atoi(row[4]);
 			action.maxrepeats=atoi(row[5]);

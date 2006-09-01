@@ -266,8 +266,8 @@ DB_ACTION
 /*	int	delay;*/
 	int	lastcheck;
 	int	recipient;
-	char	subject[ACTION_SUBJECT_LEN_MAX];
-	char	message[MAX_STRING_LEN];
+	char	subject[ACTION_SUBJECT_LEN_MAX];	/* don't use pointer, cose sizeof is used */
+	char	message[MAX_STRING_LEN];		/* don't use pointer, cose sizeof is used */
 	int	maxrepeats;
 	int	repeatdelay;
 	char	scripts[MAX_STRING_LEN];
