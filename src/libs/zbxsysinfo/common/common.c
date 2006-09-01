@@ -318,9 +318,21 @@ int parse_command( /* return value: 0 - error; 1 - command without parameters; 2
 void	test_parameter(char* key)
 {
 	AGENT_RESULT	result;
+	static struct   sigaction phan;
 
 	memset(&result, 0, sizeof(AGENT_RESULT));
+	
+	phan.sa_handler = signal_handler;
+	sigemptyset(&phan.sa_mask);
+	phan.sa_flags = 0;
+	sigaction(SIGALRM, &phan, NULL);
+	
+	alarm(AGENT_TIMEOUT);
+	
 	process(key, PROCESS_TEST, &result);
+
+	alarm(0);
+
 	if(result.type & AR_DOUBLE)
 	{
 		printf(" [d|" ZBX_FS_DBL "]", result.dbl);
@@ -352,12 +364,23 @@ void	test_parameters(void)
 {
 	int	i;
 	AGENT_RESULT	result;
+	static struct   sigaction phan;
 
 	memset(&result, 0, sizeof(AGENT_RESULT));
 	
+	phan.sa_handler = signal_handler;
+	sigemptyset(&phan.sa_mask);
+	phan.sa_flags = 0;
+	sigaction(SIGALRM, &phan, NULL);
+
 	for(i=0; 0 != commands[i].key; i++)
 	{
+		alarm(AGENT_TIMEOUT);
+		
 		process(commands[i].key, PROCESS_TEST | PROCESS_USE_TEST_PARAM, &result);
+
+		alarm(0);
+
 		if(result.type & AR_DOUBLE)
 		{
 			printf(" [d|" ZBX_FS_DBL "]", result.dbl);
@@ -1450,10 +1473,10 @@ int	forward_request(char *proxy, char *command, int port, unsigned flags, AGENT_
 	return	SYSINFO_RET_OK;
 }
 
-
 /* 
- * 0 - NOT OK
- * 1 - OK
+ *  0- NOT OK
+ *  1 - OK
+ *  2 - TIMEOUT
  * */
 int	tcp_expect(char	*hostname, short port, char *request,char *expect,char *sendtoclose, int *value_int)
 {
@@ -1493,14 +1516,21 @@ int	tcp_expect(char	*hostname, short port, char *request,char *expect,char *send
 
 	if (connect(s, (struct sockaddr *) &addr, addrlen) == -1)
 	{
+		if(errno == EINTR)	*value_int = 2;
+		else			*value_int = 0;
 		close(s);
-		*value_int = 0;
 		return SYSINFO_RET_OK;
 	}
 
 	if( request != NULL)
 	{
-		send(s,request,strlen(request),0);
+		if(send(s,request,strlen(request),0) == -1 && errno == EINTR)
+		{
+			send(s,sendtoclose,strlen(sendtoclose),0);
+			close(s);
+			*value_int = 2;
+			return SYSINFO_RET_OK;
+		}
 	}
 
 	if( expect == NULL)
@@ -1511,7 +1541,15 @@ int	tcp_expect(char	*hostname, short port, char *request,char *expect,char *send
 	}
 
 	memset(&c, 0, 1024);
-	recv(s, c, 1024, 0);
+
+	if(recv(s, c, 1024, 0) == -1 && errno == EINTR)
+	{
+		send(s,sendtoclose,strlen(sendtoclose),0);
+		close(s);
+		*value_int = 2;
+		return SYSINFO_RET_OK;
+	}
+	
 	if ( strncmp(c, expect, strlen(expect)) == 0 )
 	{
 		send(s,sendtoclose,strlen(sendtoclose),0);
@@ -1519,16 +1557,19 @@ int	tcp_expect(char	*hostname, short port, char *request,char *expect,char *send
 		*value_int = 1;
 		return SYSINFO_RET_OK;
 	}
-	else
-	{
-		send(s,sendtoclose,strlen(sendtoclose),0);
-		close(s);
-		*value_int = 0;
-		return SYSINFO_RET_OK;
-	}
+
+	send(s,sendtoclose,strlen(sendtoclose),0);
+	close(s);
+	*value_int = 0;
+	return SYSINFO_RET_OK;
 }
 
 #ifdef HAVE_LDAP
+/* 
+ *  0- NOT OK
+ *  1 - OK
+ *  2 - TIMEOUT
+ * */
 int    check_ldap(char *hostname, short port, int *value_int)
 {
 	int rc;
@@ -1548,43 +1589,68 @@ int    check_ldap(char *hostname, short port, int *value_int)
 	BerElement *ber;
 	char *attr=NULL;
 	char **valRes=NULL;
+	int	err = 0;
 
         assert(value_int);
 
-	ldap = ldap_init(hostname, port);
-	if ( !ldap )
-	{
-		*value_int = 0;
-		return	SYSINFO_RET_OK;
-	}
-
-	rc = ldap_search_s(ldap, base, scope, filter, attrs, attrsonly, &res);
-	if( rc != 0 )
-	{
-		*value_int = 0;
-		return	SYSINFO_RET_OK;
-	}
-
-	msg = ldap_first_entry(ldap, res);
-	if( !msg )
-	{
-		*value_int = 0;
-		return	SYSINFO_RET_OK;
-	}
-       
-	attr = ldap_first_attribute (ldap, msg, &ber);
-	valRes = ldap_get_values( ldap, msg, attr );
-
-	ldap_value_free(valRes);
-	ldap_memfree(attr);
-	if (ber != NULL) {
-		ber_free(ber, 0);
-	}
-	ldap_msgfree(res);
-	ldap_unbind(ldap);
-       
-	*value_int = 1;
+	*value_int = 0;
 	
+	ldap = ldap_init(hostname, port);
+	if ( ldap )
+	{
+		rc = ldap_search_s(ldap, base, scope, filter, attrs, attrsonly, &res);
+		if( rc == 0 )
+		{
+			msg = ldap_first_entry(ldap, res);
+			if( msg )
+			{
+				attr = ldap_first_attribute (ldap, msg, &ber);
+				if( attr )
+				{
+					valRes = ldap_get_values( ldap, msg, attr );
+
+					if( valRes )
+					{
+						ldap_value_free(valRes);
+						*value_int = 1;
+					}
+					else
+					{
+						ldap_get_option(ldap, LDAP_OPT_ERROR_NUMBER, &err);
+						if(err == LDAP_TIMEOUT)		*value_int = 2;
+					}
+
+					ldap_memfree(attr);
+					
+				}
+				else
+				{
+					ldap_get_option(ldap, LDAP_OPT_ERROR_NUMBER, &err);
+					if(err == LDAP_TIMEOUT)		*value_int = 2;
+				}
+
+				if ( ber ) ber_free(ber, 0);
+				
+			}
+			else
+			{
+				ldap_get_option(ldap, LDAP_OPT_ERROR_NUMBER, &err);
+				if(err == LDAP_TIMEOUT)		*value_int = 2;
+			}
+
+			ldap_msgfree(res);
+		}
+		else if(rc == LDAP_TIMEOUT || errno == EINTR)
+		{
+			*value_int = 2;
+		}
+		ldap_unbind(ldap);
+	}
+	else if( errno == EINTR)
+	{
+		*value_int = 2;
+	}
+       
 	return	SYSINFO_RET_OK;
 }
 #endif
@@ -1593,6 +1659,7 @@ int    check_ldap(char *hostname, short port, int *value_int)
 /* 
  *  0- NOT OK
  *  1 - OK
+ *  2 - TIMEOUT
  * */
 int	check_ssh(char	*hostname, short port, int *value_int)
 {
@@ -1635,13 +1702,21 @@ int	check_ssh(char	*hostname, short port, int *value_int)
 
 	if (connect(s, (struct sockaddr *) &addr, addrlen) == -1)
 	{
+		if(errno == EINTR)	*value_int = 2;
+		else			*value_int = 0;
 		close(s);
-		*value_int = 0;
 		return	SYSINFO_RET_OK;
 	}
 
 	memset(&c, 0, 1024);
-	recv(s, c, 1024, 0);
+	if(recv(s, c, 1024, 0) == -1 && errno == EINTR)
+	{
+		send(s,"0\n",2,0);
+		close(s);
+		*value_int = 2;
+		return  SYSINFO_RET_OK;
+	}
+	
 	if ( strncmp(c, "SSH", 3) == 0 )
 	{
 		ssh_proto = c + 4;
