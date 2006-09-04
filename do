@@ -135,9 +135,8 @@ fi
 if [ "$tgz" = "yes" ] 
 then
   echo "Zipping..."
-  cd ..
-  rm -f zabbix.tar.gz
-  tar cvzf zabbix.tar.gz zabbix
+  rm -f ../zabbix.tar.gz
+  tar cvzf ../zabbix.tar.gz .
 fi
 
 if [ "$docat" = "yes" ] 
