@@ -21,7 +21,7 @@
 -- Table structure for table 'hosts'
 --
 
-\connect zabbix
+--\connect zabbix
 
 CREATE TABLE hosts (
   hostid		serial,
@@ -46,42 +46,42 @@ CREATE UNIQUE INDEX hosts_host on hosts (host);
 --
 
 CREATE TABLE items (
-  itemid		serial,
-  type			int4		NOT NULL,
-  snmp_community	varchar(64)	DEFAULT ''	NOT NULL,
-  snmp_oid		varchar(255)	DEFAULT ''	NOT NULL,
-  snmp_port		int4		DEFAULT '161'	NOT NULL,
-  hostid		int4		NOT NULL,
-  description		varchar(255)	DEFAULT '' NOT NULL,
-  key_			varchar(64)	DEFAULT '' NOT NULL,
-  delay			int4		DEFAULT '0' NOT NULL,
-  history		int4		DEFAULT '90' NOT NULL,
-  trends		int4		DEFAULT '365' NOT NULL,
--- lastdelete is no longer required
---  lastdelete		int4		DEFAULT '0' NOT NULL,
-  nextcheck		int4		DEFAULT '0' NOT NULL,
-  lastvalue		varchar(255)	DEFAULT NULL,
-  lastclock		int4		DEFAULT NULL,
-  prevvalue		varchar(255)	DEFAULT NULL,
-  status		int4		DEFAULT '0' NOT NULL,
-  value_type		int4		DEFAULT '0' NOT NULL,
-  trapper_hosts		varchar(255)	DEFAULT '' NOT NULL,
-  units			varchar(10)	DEFAULT '' NOT NULL,
-  multiplier		int4		DEFAULT '0' NOT NULL,
-  delta			int4		DEFAULT '0' NOT NULL,
-  prevorgvalue		float8		DEFAULT NULL,
-  snmpv3_securityname	varchar(64)	DEFAULT '' NOT NULL,
-  snmpv3_securitylevel	int4		DEFAULT '0' NOT NULL,
-  snmpv3_authpassphrase	varchar(64)	DEFAULT '' NOT NULL,
-  snmpv3_privpassphrase	varchar(64)	DEFAULT '' NOT NULL,
-  formula		varchar(255)	DEFAULT '0' NOT NULL,
-  error			varchar(128)	DEFAULT '' NOT NULL,
-  lastlogsize		int4		DEFAULT '0' NOT NULL,
-  logtimefmt		varchar(64)	DEFAULT '' NOT NULL,
-  templateid		int4		DEFAULT '0' NOT NULL,
-  valuemapid		int4		 DEFAULT '0' NOT NULL,
-  PRIMARY KEY (itemid)
---  FOREIGN KEY (hostid) REFERENCES hosts
+	itemid		serial,
+	type			int4		NOT NULL,
+	snmp_community	varchar(64)	DEFAULT ''	NOT NULL,
+	snmp_oid		varchar(255)	DEFAULT ''	NOT NULL,
+	snmp_port		int4		DEFAULT '161'	NOT NULL,
+	hostid		int4		NOT NULL,
+	description		varchar(255)	DEFAULT '' NOT NULL,
+	key_			varchar(64)	DEFAULT '' NOT NULL,
+	delay			int4		DEFAULT '0' NOT NULL,
+	history		int4		DEFAULT '90' NOT NULL,
+	trends		int4		DEFAULT '365' NOT NULL,
+	-- lastdelete is no longer required
+	--  lastdelete		int4		DEFAULT '0' NOT NULL,
+	nextcheck		int4		DEFAULT '0' NOT NULL,
+	lastvalue		varchar(255)	DEFAULT NULL,
+	lastclock		int4		DEFAULT NULL,
+	prevvalue		varchar(255)	DEFAULT NULL,
+	status		int4		DEFAULT '0' NOT NULL,
+	value_type		int4		DEFAULT '0' NOT NULL,
+	trapper_hosts		varchar(255)	DEFAULT '' NOT NULL,
+	units			varchar(10)	DEFAULT '' NOT NULL,
+	multiplier		int4		DEFAULT '0' NOT NULL,
+	delta			int4		DEFAULT '0' NOT NULL,
+	prevorgvalue		float8		DEFAULT NULL,
+	snmpv3_securityname	varchar(64)	DEFAULT '' NOT NULL,
+	snmpv3_securitylevel	int4		DEFAULT '0' NOT NULL,
+	snmpv3_authpassphrase	varchar(64)	DEFAULT '' NOT NULL,
+	snmpv3_privpassphrase	varchar(64)	DEFAULT '' NOT NULL,
+	formula		varchar(255)	DEFAULT '0' NOT NULL,
+	error			varchar(128)	DEFAULT '' NOT NULL,
+	lastlogsize		int4		DEFAULT '0' NOT NULL,
+	logtimefmt		varchar(64)	DEFAULT '' NOT NULL,
+	templateid		int4		DEFAULT '0' NOT NULL,
+	valuemapid		int4		 DEFAULT '0' NOT NULL,
+	PRIMARY KEY (itemid)
+	--  FOREIGN KEY (hostid) REFERENCES hosts
 );
 
 CREATE UNIQUE INDEX items_hostid_key on items (hostid,key_);
@@ -100,7 +100,7 @@ CREATE TABLE config (
 --  password_required	int4		DEFAULT '0' NOT NULL,
   alert_history		int4		DEFAULT '0' NOT NULL,
   alarm_history		int4		DEFAULT '0' NOT NULL,
-  refresh_unsupported	int4		DEFAULT '0' NOT NULL
+  refresh_unsupported	int4		DEFAULT '0' NOT NULL,
   work_period		varchar(100)	DEFAULT '1-5,00:00-24:00' NOT NULL
 );
 
@@ -233,7 +233,7 @@ CREATE TABLE conditions (
   conditionid		serial,
   actionid		int4		DEFAULT '0' NOT NULL,
   conditiontype		int4		DEFAULT '0' NOT NULL,
-  operator		int1		DEFAULT '0' NOT NULL,
+  operator		int2		DEFAULT '0' NOT NULL,
   value			varchar(255)	DEFAULT '' NOT NULL,
   PRIMARY KEY (conditionid)
 --  FOREIGN KEY (actionid) REFERENCES actions
@@ -373,34 +373,6 @@ CREATE TABLE history_str (
 CREATE INDEX history_str_i_c on history_str (itemid, clock);
 
 --
--- Table structure for table 'items_template'
---
-
-CREATE TABLE items_template (
-  itemtemplateid	int4		NOT NULL,
-  description		varchar(255)	DEFAULT '' NOT NULL,
-  key_			varchar(64)	DEFAULT '' NOT NULL,
-  delay			int4		DEFAULT '0' NOT NULL,
-  value_type		int4		DEFAULT '0' NOT NULL,
-  PRIMARY KEY (itemtemplateid)
-);
-
-CREATE UNIQUE INDEX items_template_p_k on items_template (key_);
-
---
--- Table structure for table 'triggers_template'
---
-
-CREATE TABLE triggers_template (
-  triggertemplateid	int4		NOT NULL,
-  itemtemplateid	int4		NOT NULL,
-  description		varchar(255)	DEFAULT '' NOT NULL,
-  expression		varchar(255)	DEFAULT '' NOT NULL,
-  PRIMARY KEY (triggertemplateid),
-  FOREIGN KEY (itemtemplateid) REFERENCES items_template
-);
-
---
 -- Table structure for table 'media'
 --
 
@@ -454,7 +426,7 @@ CREATE TABLE sysmaps_elements (
   x			int4		DEFAULT '0' NOT NULL,
   y			int4		DEFAULT '0' NOT NULL,
   url			varchar(255)	DEFAULT '' NOT NULL,
-  PRIMARY KEY (shostid)
+  PRIMARY KEY (selementid)
 --  FOREIGN KEY (sysmapid) REFERENCES sysmaps,
 --  FOREIGN KEY (hostid) REFERENCES hosts
 );
@@ -467,7 +439,7 @@ CREATE TABLE sysmaps_links (
   linkid		serial,
   sysmapid		int4		DEFAULT '0' NOT NULL,
   selementid1		int4		DEFAULT '0' NOT NULL,
-  selementid2		int4		DEFAULT '0' NOT NULL
+  selementid2		int4		DEFAULT '0' NOT NULL,
 -- may be NULL 
   triggerid		int4,
   drawtype_off		int4		DEFAULT '0' NOT NULL,
@@ -555,7 +527,7 @@ CREATE UNIQUE INDEX services_links_upidownid on services_links (serviceupid, ser
 CREATE TABLE rights (
   rightid               serial,
   userid                int4		DEFAULT '0' NOT NULL,
-  name                  char(255)	DEFAULT '' NOT NULL,
+  name                  varchar(255)	DEFAULT '' NOT NULL,
   permission            char(1)		DEFAULT '' NOT NULL,
   id                    int4,
   PRIMARY KEY (rightid)
@@ -693,6 +665,20 @@ CREATE TABLE trends (
 );
 
 --
+-- Table structure for table 'images'
+--
+
+CREATE TABLE images (
+  imageid		serial,
+  imagetype		int4		DEFAULT '0' NOT NULL,
+  name			varchar(64)	DEFAULT '0' NOT NULL,
+  image			bytea,
+  PRIMARY KEY (imageid)
+);
+
+CREATE UNIQUE INDEX images_name_imagetype on images (name, imagetype);
+
+--
 -- Table structure for table 'hosts_templates'
 --
 
@@ -731,14 +717,34 @@ CREATE INDEX history_log_i_c on history_str (itemid, clock);
 --
 
 CREATE TABLE history_text (
+  id                    serial,
   itemid		int4	DEFAULT '0' NOT NULL,
   clock			int4	DEFAULT '0' NOT NULL,
   value			text	DEFAULT '' NOT NULL,
-  KEY itemidclock (itemid, clock)
+  PRIMARY KEY (id)
 );
 
-CREATE INDEX history_text_i_c on history_text (itemid, clock);
+CREATE UNIQUE INDEX history_text_itemid_clock on history_text (itemid, clock);
 
+--
+-- Table structure for table 'hosts_profiles'
+--
+
+CREATE TABLE hosts_profiles (
+  hostid		int4		DEFAULT '0' NOT NULL,
+  devicetype		varchar(64)	DEFAULT '' NOT NULL,
+  name			varchar(64)	DEFAULT '' NOT NULL,
+  os			varchar(64)	DEFAULT '' NOT NULL,
+  serialno		varchar(64)	DEFAULT '' NOT NULL,
+  tag			varchar(64)	DEFAULT '' NOT NULL,
+  macaddress		varchar(64)	DEFAULT '' NOT NULL,
+  hardware		text		DEFAULT '' NOT NULL,
+  software		text		DEFAULT '' NOT NULL,
+  contact		text		DEFAULT '' NOT NULL,
+  location		text		DEFAULT '' NOT NULL,
+  notes			text		DEFAULT '' NOT NULL,
+  PRIMARY KEY (hostid)
+);
 
 --
 -- Table structure for table 'autoreg'

@@ -140,26 +140,28 @@ int	DBexecute(char *query)
 	return (long)mysql_affected_rows(&mysql);
 #endif
 #ifdef	HAVE_PGSQL
+	int ret = SUCCEED;
 	PGresult	*result;
 
-	aabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s",query);
+	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s",query);
 	result = PQexec(conn,query);
 
 	if( result==NULL)
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", "Result is NULL" );
-		PQclear(result);
-		return FAIL;
-	}
-	if( PQresultStatus(result) != PGRES_COMMAND_OK)
+		ret = FAIL;
+	} else if( PQresultStatus(result) != PGRES_COMMAND_OK)
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", PQresStatus(PQresultStatus(result)) );
-		PQclear(result);
-		return FAIL;
+		ret = FAIL;
 	}
+	
+	ret = (int)PQoidValue(result); /* return object id, for insert id processing */
+	
 	PQclear(result);
+	return ret;
 #endif
 #ifdef	HAVE_ORACLE
 	int ret;
@@ -187,10 +189,75 @@ int	DBis_null(char *field)
 	return ret;
 }
 
+#ifdef  HAVE_PGSQL
+void	PG_DBfree_result(DB_RESULT result)
+{
+	int i = 0;
+
+	/* free old data */
+	if(result->values)
+	{
+		for(i = 0; i < result->fld_num; i++)
+		{
+			if(!result->values[i]) continue;
+			
+			free(result->values[i]);
+			result->values[i] = NULL;
+		}
+		result->fld_num = 0;
+		free(result->values);
+		result->values = NULL;
+	}
+
+	PQclear(result->pg_result);
+}
+#endif
+
 DB_ROW	DBfetch(DB_RESULT result)
 {
 #ifdef	HAVE_MYSQL
 	return mysql_fetch_row(result);
+#endif
+#ifdef	HAVE_PGSQL
+
+	int	i;
+
+	/* EOF */
+	if(!result)	return NULL;
+		
+	/* free old data */
+	if(result->values)
+	{
+		for(i = 0; i < result->fld_num; i++)
+		{
+			if(!result->values[i]) continue;
+			
+			free(result->values[i]);
+			result->values[i] = NULL;
+		}
+		result->fld_num = 0;
+		free(result->values);
+		result->values = NULL;
+	}
+	
+	/* EOF */
+	if(result->cursor == result->row_num) return NULL;
+
+	/* init result */	
+	result->fld_num = PQnfields(result->pg_result);
+
+	if(result->fld_num > 0)
+	{
+		result->values = malloc(sizeof(char*) * result->fld_num);
+		for(i = 0; i < result->fld_num; i++)
+		{
+			 result->values[i] = strdup(PQgetvalue(result->pg_result, result->cursor, i));
+		}
+	}
+
+	result->cursor++;
+
+	return result->values;	
 #endif
 #ifdef	HAVE_ORACLE
 	int res;
@@ -207,7 +274,7 @@ DB_ROW	DBfetch(DB_RESULT result)
 	}
 	else
 	{
-		fprintf(stderr, "Fetch failed:%s\n", sqlo_geterror(oracle) );
+		zabbix_log( LOG_LEVEL_ERR, "Fetch failed:%s\n", sqlo_geterror(oracle) );
 		exit(FAIL);
 	}
 #endif
@@ -233,23 +300,37 @@ DB_RESULT DBselect(char *query)
 	return	mysql_store_result(&mysql);
 #endif
 #ifdef	HAVE_PGSQL
-	PGresult	*result;
+	PGresult		*pg_result;
+	ZBX_PG_DB_RESULT	*result = NULL;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s",query);
-	result = PQexec(conn,query);
 
-	if( result==NULL)
+	pg_result = PQexec(conn,query);
+
+	if( pg_result==NULL)
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", "Result is NULL" );
+		PQclear(pg_result);
 		exit( FAIL );
 	}
-	if( PQresultStatus(result) != PGRES_TUPLES_OK)
+	else if( PQresultStatus(pg_result) != PGRES_TUPLES_OK)
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
-		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", PQresStatus(PQresultStatus(result)) );
+		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", PQresStatus(PQresultStatus(pg_result)) );
+		PQclear(pg_result);
 		exit( FAIL );
 	}
+	else
+	{
+		result = malloc(sizeof(ZBX_PG_DB_RESULT));
+		result->pg_result	= pg_result;
+		result->row_num		= PQntuples(pg_result);
+		result->fld_num		= 0;
+		result->cursor		= 0;
+		result->values		= NULL;
+	}
+	
 	return result;
 #endif
 #ifdef	HAVE_ORACLE
@@ -318,16 +399,32 @@ char	*DBget_field(DB_RESULT result, int rownum, int fieldnum)
 /*
  * Get value of autoincrement field for last insert or update statement
  */ 
-int	DBinsert_id()
+int	DBinsert_id(int exec_result, const char *table, const char *field)
 {
 #ifdef	HAVE_MYSQL
 	zabbix_log(LOG_LEVEL_DEBUG, "In DBinsert_id()" );
 	return mysql_insert_id(&mysql);
 #endif
 #ifdef	HAVE_PGSQL
-#error	SUPPORT OF POSTGRESQL NOT IMPLEMENTED YET
+	char		sql[MAX_STRING_LEN];
+	DB_RESULT	tmp_res;
+	int		id_res = FAIL;
+
+	if(exec_result < 0) return 0;
+	if(exec_result == FAIL) return 0;
+	if((Oid)exec_result == InvalidOid) return 0;
+	
+	snprintf(sql, sizeof(sql), "select %s from %s where oid=%i", field, table, exec_result);
+	tmp_res = DBselect(sql);
+	
+	id_res = atoi(PQgetvalue(tmp_res->pg_result, 0, 0));
+	
+	DBfree_result(tmp_res);
+	
+	return id_res;
 #endif
 #ifdef	HAVE_ORACLE
+#error TODO Oracle support!!!
 	return FAIL;
 #endif
 }
@@ -609,9 +706,8 @@ int	add_alarm(int triggerid,int status,int clock,int *alarmid)
 	}
 
 	snprintf(sql,sizeof(sql)-1,"insert into alarms(triggerid,clock,value) values(%d,%d,%d)", triggerid, clock, status);
-	DBexecute(sql);
 
-	*alarmid=DBinsert_id();
+	*alarmid = DBinsert_id(DBexecute(sql), "alarms", "alarmid");
 
 	/* Cancel currently active alerts */
 	if(status == TRIGGER_VALUE_FALSE || status == TRIGGER_VALUE_TRUE)
@@ -866,7 +962,7 @@ void DBdelete_sysmaps_hosts_by_hostid(int hostid)
 	DB_ROW		row;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBdelete_sysmaps_hosts(%d)", hostid);
-	snprintf(sql,sizeof(sql)-1,"select shostid from sysmaps_hosts where hostid=%d", hostid);
+	snprintf(sql,sizeof(sql)-1,"select shostid from sysmaps_elements where hostid=%d", hostid);
 	result = DBselect(sql);
 
 	while((row=DBfetch(result)))
@@ -876,7 +972,7 @@ void DBdelete_sysmaps_hosts_by_hostid(int hostid)
 	}
 	DBfree_result(result);
 
-	snprintf(sql,sizeof(sql)-1,"delete from sysmaps_hosts where hostid=%d", hostid);
+	snprintf(sql,sizeof(sql)-1,"delete from sysmaps_elements where hostid=%d", hostid);
 	DBexecute(sql);
 }
 
@@ -1512,11 +1608,10 @@ void	DBvacuum(void)
 {
 #ifdef	HAVE_PGSQL
 	char *table_for_housekeeping[]={"services", "services_links", "graphs_items", "graphs", "sysmaps_links",
-			"sysmaps_hosts", "sysmaps", "config", "groups", "hosts_groups", "alerts",
+			"sysmaps_elements", "sysmaps", "config", "groups", "hosts_groups", "alerts",
 			"actions", "alarms", "functions", "history", "history_str", "hosts", "trends",
 			"items", "media", "media_type", "triggers", "trigger_depends", "users",
 			"sessions", "rights", "service_alarms", "profiles", "screens", "screens_items",
-			"stats",
 			NULL};
 
 	char	sql[MAX_STRING_LEN];

@@ -400,7 +400,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 		{
 			error("Unable to select configuration");
 		}
-		return	$config;
+		return	$row;
 	}
 
 	function	show_infomsg()
@@ -1150,6 +1150,10 @@ COpt::profiling_start("page");
 
 				$row['image'] = $row['image']->load();
 			}
+			else if($DB_TYPE == "POSTGRESQL")
+			{
+				$row['image'] = pg_unescape_bytea($row['image']);
+			}
 
 			return	$row;
 		}
@@ -1173,6 +1177,11 @@ COpt::profiling_start("page");
 					return 0;
 
 				$row['image'] = $row['image']->load();
+			}
+			else if($DB_TYPE == "POSTGRESQL")
+			{
+				$row['image'] = pg_unescape_bytea($row['image']);
+//SDI($row['image']);
 			}
 			return	$row;
 		}
@@ -1234,6 +1243,14 @@ COpt::profiling_start("page");
 					OCIFreeStatement($stid);
 
 					return $stid;
+				}
+				else if($DB_TYPE == "POSTGRESQL")
+				{
+					$image = pg_escape_bytea($image);
+
+					$sql = "insert into images (name,imagetype,image)".
+						" values (".zbx_dbstr($name).",".$imagetype.",'".$image."')";
+					return	DBexecute($sql);
 				}
 				$sql = "insert into images (name,imagetype,image)".
 					" values (".zbx_dbstr($name).",".$imagetype.",".zbx_dbstr($image).")";
@@ -1307,6 +1324,13 @@ COpt::profiling_start("page");
 					$lobimage->free();
 
 					return $stid;
+				}
+				else if($DB_TYPE == "POSTGRESQL")
+				{
+					$image = pg_escape_bytea($image);
+					$sql="update images set name=".zbx_dbstr($name).",imagetype=".zbx_dbstr($imagetype).
+						",image='".$image."' where imageid=$imageid";
+					return	DBexecute($sql);
 				}
 
 				$sql="update images set name=".zbx_dbstr($name).",imagetype=".zbx_dbstr($imagetype).

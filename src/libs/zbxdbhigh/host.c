@@ -35,12 +35,8 @@ int	DBadd_host(char *server, int port, int status, int useip, char *ip, int disa
 	int	hostid;
 
 	snprintf(sql, sizeof(sql)-1,"insert into hosts (host,port,status,useip,ip,disable_until,available) values ('%s',%d,%d,%d,'%s',%d,%d)", server, port, status, useip, ip, disable_until, available);
-	if(FAIL == DBexecute(sql))
-	{
-		return FAIL;
-	}
 
-	hostid=DBinsert_id();
+	hostid = DBinsert_id(DBexecute(sql), "hosts", "hostid");
 
 	if(hostid==0)
 	{

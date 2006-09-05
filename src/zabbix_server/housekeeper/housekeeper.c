@@ -92,6 +92,12 @@ static int housekeeping_process_log()
 
 #ifdef HAVE_ORACLE
 		snprintf(sql,sizeof(sql)-1,"delete from %s where %s=%d and rownum<500",housekeeper.tablename, housekeeper.field,housekeeper.value);
+#elif defined(HAVE_PGSQL)
+		snprintf(sql,sizeof(sql)-1,"delete from %s where oid in (select oid from %s where %s=%d limit 500)",
+				housekeeper.tablename, 
+				housekeeper.tablename, 
+				housekeeper.field,
+				housekeeper.value);
 #else
 		snprintf(sql,sizeof(sql)-1,"delete from %s where %s=%d limit 500",housekeeper.tablename, housekeeper.field,housekeeper.value);
 #endif

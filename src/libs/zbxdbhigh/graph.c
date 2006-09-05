@@ -38,12 +38,8 @@ int	DBadd_graph(char *name, int width, int height, int yaxistype, double yaxismi
 	DBescape_string(name,name_esc,GRAPH_NAME_LEN_MAX);
 
 	snprintf(sql, sizeof(sql)-1,"insert into graphs (name,width,height,yaxistype,yaxismin,yaxismax) values ('%s',%d,%d,%d,%f,%f)", name_esc, width, height, yaxistype, yaxismin, yaxismax);
-	if(FAIL == DBexecute(sql))
-	{
-		return FAIL;
-	}
 
-	graphid=DBinsert_id();
+	graphid = DBinsert_id(DBexecute(sql), "graphs", "graphid");
 
 	if(graphid==0)
 	{
@@ -62,12 +58,8 @@ int	DBadd_item_to_graph(int graphid,int itemid, char *color,int drawtype, int so
 	DBescape_string(color,color_esc,GRAPH_ITEM_COLOR_LEN_MAX);
 
 	snprintf(sql, sizeof(sql)-1,"insert into graphs_items (graphid,itemid,drawtype,sortorder,color) values (%d,%d,%d,%d,'%s')", graphid, itemid, drawtype, sortorder, color_esc);
-	if(FAIL == DBexecute(sql))
-	{
-		return FAIL;
-	}
 
-	gitemid=DBinsert_id();
+	gitemid = DBinsert_id(DBexecute(sql), "graphs_items", "gitemid");
 
 	if(gitemid==0)
 	{

@@ -28,15 +28,19 @@
 #include "common.h"
 
 #ifdef HAVE_MYSQL
-	#include "mysql.h"
-	#include "errmsg.h"
-	#include "mysqld_error.h"
-#define	DB_HANDLE	MYSQL
-#endif
+#	include "mysql.h"
+#	include "errmsg.h"
+#	include "mysqld_error.h"
+#	define	DB_HANDLE	MYSQL
+#endif /* HAVE_MYSQL */
 
 #ifdef HAVE_ORACLE
-	#include "sqlora.h"
-#endif
+#	include "sqlora.h"
+#endif /* HAVE_ORACLE */
+
+#ifdef HAVE_PGSQL
+#	include <libpq-fe.h>
+#endif /* HAVE_PGSQL */
 
 extern	char	*CONFIG_DBHOST;
 extern	char	*CONFIG_DBNAME;
@@ -68,8 +72,21 @@ extern	int	CONFIG_DBPORT;
 #endif
 
 #ifdef HAVE_PGSQL
-	#define	DB_RESULT	PGresult *
-	#define	DBfree_result	PQclear
+	#define DB_ROW		char **
+	#define	DB_RESULT	ZBX_PG_DB_RESULT*
+	#define	DBfree_result	PG_DBfree_result
+
+	typedef struct zbx_pg_db_result_s
+	{
+		PGresult	*pg_result;
+		int		row_num;
+		int		fld_num;
+		int		cursor;
+		DB_ROW		values;
+	} ZBX_PG_DB_RESULT;
+
+void	PG_DBfree_result(DB_RESULT result);
+
 #endif
 
 #ifdef HAVE_ORACLE
@@ -319,7 +336,7 @@ DB_RESULT	DBselectN(char *query, int n);
 DB_ROW	DBfetch(DB_RESULT result);
 /*char	*DBget_field(DB_RESULT result, int rownum, int fieldnum);*/
 /*int	DBnum_rows(DB_RESULT result);*/
-int	DBinsert_id();
+int	DBinsert_id(int exec_result, const char *table, const char *field);
 int	DBis_null(char *field);
 
 int	DBget_function_result(double *result,char *functionid);

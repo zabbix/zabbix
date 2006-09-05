@@ -23,12 +23,12 @@
 // DATABASE CONFIGURATION
 
 //	$DB_TYPE	="ORACLE";
-//	$DB_TYPE	="POSTGRESQL";
-	$DB_TYPE	="MYSQL";
+	$DB_TYPE	="POSTGRESQL";
+//	$DB_TYPE	="MYSQL";
 	$DB_SERVER	="localhost";
 	$DB_DATABASE	="osmiy";
-	$DB_USER	="root";
-	$DB_PASSWORD	="";
+	$DB_USER	="eugene";
+	$DB_PASSWORD	="123";
 // END OF DATABASE CONFIGURATION
 
 	global $USER_DETAILS;
@@ -225,27 +225,6 @@ COpt::savesqlrequest($query);
 			$result=FALSE;
 		}
 	}
-
-/*	function	DBnum_rows($result)
-	{
-		global $DB_TYPE;
-	
-		if(!$result) return 0;
-
-		if($DB_TYPE == "MYSQL")
-		{
-			return mysql_num_rows($result);
-		}
-		if($DB_TYPE == "POSTGRESQL")
-		{
-			return pg_numrows($result);
-		}
-		if($DB_TYPE == "ORACLE")
-		{
-			$result=FALSE;
-		}
-		return 0;
-	}*/
 
 	function	DBinsert_id($result,$table,$field)
 	{

@@ -110,8 +110,7 @@ int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid)
 		snprintf(sql,sizeof(sql)-1,"insert into triggers  (description,priority,status,comments,url,value,expression) values ('%s',%d,%d,'%s','%s',2,'%s')",description_esc, trigger.priority, trigger.status, comments_esc, url_esc, expression_old);
 		zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]",sql);
 
-		DBexecute(sql);
-		triggerid_new=DBinsert_id();
+		triggerid_new = DBinsert_id(DBexecute(sql), "triggers", "triggerid");
 
 		snprintf(sql,sizeof(sql)-1,"select i.key_,f.parameter,f.function,f.functionid from functions f,items i where i.itemid=f.itemid and f.triggerid=%d", triggerid);
 		result2=DBselect(sql);
@@ -134,8 +133,7 @@ int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid)
 
 			snprintf(sql,sizeof(sql)-1,"insert into functions (itemid,triggerid,function,parameter) values (%d,%d,'%s','%s')", atoi(row3[0]), triggerid_new, row2[2], row2[1]);
 
-			DBexecute(sql);
-			functionid=DBinsert_id();
+			functionid = DBinsert_id(DBexecute(sql), "functions", "functionid");
 
 			snprintf(sql,sizeof(sql)-1,"update triggers set expression='%s' where triggerid=%d", expression_old, triggerid_new );
 			DBexecute(sql);

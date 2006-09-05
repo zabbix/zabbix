@@ -45,12 +45,8 @@ int	DBadd_action(int triggerid, int userid, char *subject, char *message, int sc
 	}
 
 	snprintf(sql, sizeof(sql)-1,"insert into actions (triggerid, userid, subject, message, scope, severity, recipient) values (%d, %d, '%s', '%s', %d, %d, %d)", triggerid, userid, subject_esc, message_esc, scope, severity, recipient);
-	if(FAIL == DBexecute(sql))
-	{
-		return FAIL;
-	}
 
-	actionid=DBinsert_id();
+	actionid = DBinsert_id(DBexecute(sql), "actions", "actionid");
 
 	if(actionid==0)
 	{

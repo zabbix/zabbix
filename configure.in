@@ -589,7 +589,7 @@ if test "$server" = "yes"; then
 			AC_MSG_ERROR(Invalid MySQL directory - unable to find mysql.h under $withval)
 			fi
 		fi
-		MYSQL_INCLUDE=-I$MYSQL_INCDIR
+		MYSQL_INCLUDE="-I$MYSQL_INCDIR"
 		MYSQL_LFLAGS="-L$MYSQL_LIBDIR"
 		MYSQL_LIBS="-lmysqlclient"
 
@@ -651,13 +651,13 @@ if test "$server" = "yes"; then
 			PGSQL_LIBDIR=$withval/lib
 			test -d $withval/lib/pgsql && PGSQL_LIBDIR=$withval/lib/pgsql
 		fi
-	    PGSQL_INCLUDE=-I$PGSQL_INCDIR
+	    PGSQL_INCLUDE="-I$PGSQL_INCDIR"
 	    PGSQL_LFLAGS="-L$PGSQL_LIBDIR"
 	    PGSQL_LIBS="-lpq"
 	dnl To avoid linking of crypt with the agent
 	dnl    AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt, LIBS="-lcrypt $LIBS"))
 	dnl    AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt,  PGSQL_LFLAGS="-lcrypt $PGSQL_LFLAGS"))
-	    AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt,  PGSQL_LIBS="-lcrypt"))
+	    AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt,  PGSQL_LIBS="-lcrypt $PGSQL_LIBS"))
 
 	    AC_DEFINE(HAVE_PGSQL,1,[Define to 1 if PostgreSQL should be enabled.])
 	    AC_MSG_RESULT(yes)
