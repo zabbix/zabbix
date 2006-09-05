@@ -403,6 +403,9 @@ int	DBinsert_id(int exec_result, const char *table, const char *field)
 {
 #ifdef	HAVE_MYSQL
 	zabbix_log(LOG_LEVEL_DEBUG, "In DBinsert_id()" );
+	
+	if(exec_result == FAIL) return 0;
+	
 	return mysql_insert_id(&mysql);
 #endif
 #ifdef	HAVE_PGSQL
@@ -410,6 +413,8 @@ int	DBinsert_id(int exec_result, const char *table, const char *field)
 	DB_RESULT	tmp_res;
 	int		id_res = FAIL;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In DBinsert_id()" );
+	
 	if(exec_result < 0) return 0;
 	if(exec_result == FAIL) return 0;
 	if((Oid)exec_result == InvalidOid) return 0;
@@ -424,8 +429,18 @@ int	DBinsert_id(int exec_result, const char *table, const char *field)
 	return id_res;
 #endif
 #ifdef	HAVE_ORACLE
-#error TODO Oracle support!!!
-	return FAIL;
+	DB_ROW	row;
+	char	sql[MAX_STRING_LEN];
+	
+	zabbix_log(LOG_LEVEL_DEBUG, "In DBinsert_id()" );
+
+	if(exec_result == FAIL) return 0;
+	
+	snprintf(sql, sizeof(sql), "select %s_%s.currval from dual", table, field);
+	row = DBfetch(DBselect(sql));
+
+	return atoi(row[0]);
+	
 #endif
 }
 

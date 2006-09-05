@@ -1,5 +1,6 @@
 Changes for 1.1.2:
 
+ - fixed autoregistration in oracle system (Eugene)
  - fixed support of PostgreSQL (Eugene)
  - improved macro variables substitution in message body/subject (Eugene)
  - added new value for 'net.tcp.service*[]', 2 - timeout (Eugene)
