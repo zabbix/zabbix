@@ -322,13 +322,44 @@ int	DBinsert_id()
 {
 #ifdef	HAVE_MYSQL
 	zabbix_log(LOG_LEVEL_DEBUG, "In DBinsert_id()" );
+	
+	if(exec_result == FAIL) return 0;
+	
 	return mysql_insert_id(&mysql);
 #endif
 #ifdef	HAVE_PGSQL
-#error	SUPPORT OF POSTGRESQL NOT IMPLEMENTED YET
+	char		sql[MAX_STRING_LEN];
+	DB_RESULT	tmp_res;
+	int		id_res = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In DBinsert_id()" );
+	
+	if(exec_result < 0) return 0;
+	if(exec_result == FAIL) return 0;
+	if((Oid)exec_result == InvalidOid) return 0;
+	
+	snprintf(sql, sizeof(sql), "select %s from %s where oid=%i", field, table, exec_result);
+	tmp_res = DBselect(sql);
+	
+	id_res = atoi(PQgetvalue(tmp_res->pg_result, 0, 0));
+	
+	DBfree_result(tmp_res);
+	
+	return id_res;
 #endif
 #ifdef	HAVE_ORACLE
-	return FAIL;
+	DB_ROW	row;
+	char	sql[MAX_STRING_LEN];
+	
+	zabbix_log(LOG_LEVEL_DEBUG, "In DBinsert_id()" );
+
+	if(exec_result == FAIL) return 0;
+	
+	snprintf(sql, sizeof(sql), "select %s_%s.currval from dual", table, field);
+	row = DBfetch(DBselect(sql));
+
+	return atoi(row[0]);
+	
 #endif
 }
 

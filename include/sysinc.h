@@ -221,6 +221,10 @@
 #	include <unistd.h>
 #endif
 
+#ifdef HAVE_LBER_H
+#	include <lber.h>
+#endif
+
 #ifdef HAVE_GETOPT_H
 #	ifdef HAVE_GETOPT_LONG
 #		define _GNU_SOURCE
