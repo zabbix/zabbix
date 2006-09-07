@@ -1,5 +1,8 @@
 Changes for 1.1.2:
 
+ - fixed limitation of return value for 'net.if.*' (Eugene)
+ - fixed limitation of return value for 'vfs.dev.*' (Eugene)
+ - fixed limitation of return value for 'system.cpu.intr' (Eugene)
  - fixed autoregistration in oracle system (Eugene)
  - fixed support of PostgreSQL (Eugene)
  - improved macro variables substitution in message body/subject (Eugene)

@@ -551,7 +551,7 @@ int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGEN
 	char line[MAX_STRING_LEN];
 
 	char name[MAX_STRING_LEN];
-	unsigned long value = 0;
+	zbx_uint64_t value = 0;
 	
 	FILE *f;
 
@@ -564,7 +564,7 @@ int     SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGEN
 	{
 		while(fgets(line,MAX_STRING_LEN,f) != NULL)
 		{
-			if(sscanf(line,"%s\t%lu\n", name, &value) != 2) 
+			if(sscanf(line,"%s\t" ZBX_FS_UI64 "\n", name, &value) != 2) 
 				continue;
 		
 			if(strncmp(name, "intr", MAX_STRING_LEN) == 0)

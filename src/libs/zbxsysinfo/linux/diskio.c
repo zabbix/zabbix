@@ -23,18 +23,18 @@
 #include "sysinfo.h"
 
 struct disk_stat_s {
-	unsigned long rio;
-	unsigned long rsect;
-	unsigned long wio;
-	unsigned long wsect;
+	zbx_uint64_t rio;
+	zbx_uint64_t rsect;
+	zbx_uint64_t wio;
+	zbx_uint64_t wsect;
 };
 
 #if defined(KERNEL_2_4)
 #	define INFO_FILE_NAME	"/proc/partitions"
-#	define PARSE(line)	if(sscanf(line,"%lu\t%lu\t%lu\t%s\t \
-					%lu\t%lu\t%lu\t%lu\t \
-					%lu\t%lu\t%lu\t%lu\t \
-					%lu\t%lu\t%lu\n", \
+#	define PARSE(line)	if(sscanf(line,ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t%s\t \
+					" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t \
+					" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t \
+					" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\n", \
 				&(tmp),			/* major  */ \
 				&(tmp),			/* minor  */ \
 				&(tmp),			/* #blocks */ \
@@ -53,10 +53,10 @@ struct disk_stat_s {
 				) != 15) continue
 #else
 #	define INFO_FILE_NAME	"/proc/diskstats"
-#	define PARSE(line)	if(sscanf(line,"%lu\t%lu\t%s\t \
-					%lu\t%lu\t%lu\t%lu\t \
-					%lu\t%lu\t%lu\t%lu\t \
-					%lu\t%lu\t%lu\n", \
+#	define PARSE(line)	if(sscanf(line,ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t%s\t \
+					" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t \
+					" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t \
+					" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\n", \
 				&(tmp),			/* major  */ \
 				&(tmp),			/* minor  */ \
 				name, 			/* name */ \
@@ -72,9 +72,9 @@ struct disk_stat_s {
 				&(tmp),			/* use */ \
 			        &(tmp)	 		/* aveq */ \
 				) != 14)  \
-					if(sscanf(line,"%lu\t%lu\t%s\t \
-						%lu\t%lu\t \
-						%lu\t%lu\n", \
+					if(sscanf(line,ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t%s\t \
+						" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t \
+						" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\n", \
 					&(tmp),			/* major  */ \
 					&(tmp),			/* minor  */ \
 					name, 			/* name */ \
@@ -91,7 +91,7 @@ static int get_disk_stat(const char *interface, struct disk_stat_s *result)
 	char line[MAX_STRING_LEN];
 
 	char name[MAX_STRING_LEN];
-	unsigned long tmp = 0; /* for PARSE */
+	zbx_uint64_t tmp = 0; /* for PARSE */
 	
 	FILE *f;
 

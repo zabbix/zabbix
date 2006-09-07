@@ -23,15 +23,15 @@
 #include "sysinfo.h"
 
 struct net_stat_s {
-	unsigned long ibytes;
-	unsigned long ipackets;
-	unsigned long ierr;
-	unsigned long idrop;
-	unsigned long obytes;
-	unsigned long opackets;
-	unsigned long oerr;
-	unsigned long odrop;
-	unsigned long colls;
+	zbx_uint64_t ibytes;
+	zbx_uint64_t ipackets;
+	zbx_uint64_t ierr;
+	zbx_uint64_t idrop;
+	zbx_uint64_t obytes;
+	zbx_uint64_t opackets;
+	zbx_uint64_t oerr;
+	zbx_uint64_t odrop;
+	zbx_uint64_t colls;
 };
 
 static int get_net_stat(const char *interface, struct net_stat_s *result)
@@ -40,7 +40,7 @@ static int get_net_stat(const char *interface, struct net_stat_s *result)
 	char line[MAX_STRING_LEN];
 
 	char name[MAX_STRING_LEN];
-	unsigned long tmp = 0;
+	zbx_uint64_t tmp = 0;
 	
 	FILE *f;
 	char	*p;
@@ -57,8 +57,10 @@ static int get_net_stat(const char *interface, struct net_stat_s *result)
 			p = strstr(line,":");
 			if(p) p[0]='\t';
 			
-			if(sscanf(line,"%s\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t \
-					    %lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\t%lu\n",
+			if(sscanf(line,"%s\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" 
+					ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t \
+					" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" 
+					ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\n",
 				name, 
 				&(result->ibytes), 	/* bytes */
 				&(result->ipackets),	/* packets */
