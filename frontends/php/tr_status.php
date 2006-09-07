@@ -360,8 +360,8 @@
 		echo "\n<TABLE BORDER=0 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=0>";
 		echo "<TR ALIGN=CENTER>";
 		table_td("<B>".S_NOT_CLASSIFIED.": $p0</B>","");
-		table_td("<B>".S_INFORMATION.": $p1</B>","");
-		table_td("<B>".S_WARNING.": $p2</B>","");
+		table_td("<B>".S_INFORMATION.": $p1</B>","BGCOLOR=#CCE5CC");
+		table_td("<B>".S_WARNING.": $p2</B>","BGCOLOR=#EFEFCC");
 		table_td("<B>".S_AVERAGE.": $p3</B>","BGCOLOR=#DDAAAA");
 		table_td("<B>".S_HIGH.": $p4</B>","BGCOLOR=#FF8888");
 		table_td("<B>".S_DISASTER.": $p5</B>","BGCOLOR=RED");
@@ -537,8 +537,16 @@
 
 		$priority_style=NULL;
 		if($row["priority"]==0)		$priority=S_NOT_CLASSIFIED;
-		elseif($row["priority"]==1)	$priority=S_INFORMATION;
-		elseif($row["priority"]==2)	$priority=S_WARNING;
+		elseif($row["priority"]==1)
+		{
+			$priority=S_INFORMATION;
+			$priority_style="information";
+		}
+		elseif($row["priority"]==2)
+		{
+			$priority=S_WARNING;
+			$priority_style="warning";
+		}
 		elseif($row["priority"]==3)
 		{
 			$priority=S_AVERAGE;

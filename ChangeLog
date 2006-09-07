@@ -1,5 +1,6 @@
 Changes for 1.1.2:
 
+ - added color selection for trigger severity 'warning' and 'information' (Eugene)
  - fixed limitation of return value for 'net.if.*' (Eugene)
  - fixed limitation of return value for 'vfs.dev.*' (Eugene)
  - fixed limitation of return value for 'system.cpu.intr' (Eugene)

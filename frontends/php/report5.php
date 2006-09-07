@@ -88,9 +88,17 @@
         while($row=DBfetch($result))
         {
                 $priority_style=NULL;
-                if($row["priority"]==0)         $priority=S_NOT_CLASSIFIED;
-                elseif($row["priority"]==1)     $priority=S_INFORMATION;
-                elseif($row["priority"]==2)     $priority=S_WARNING;
+                if($row["priority"]==0)       $priority=S_NOT_CLASSIFIED;
+                elseif($row["priority"]==1)     
+		{
+			$priority=S_INFORMATION;
+                        $priority_style="information";
+		}
+                elseif($row["priority"]==2)
+		{
+		     $priority=S_WARNING;
+                        $priority_style="warning";
+		}
                 elseif($row["priority"]==3)
                 {
                         $priority=S_AVERAGE;
