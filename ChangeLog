@@ -1,5 +1,11 @@
 Changes for 1.3:
 
+ - added color selection for trigger severity 'warning' and 'information' (Eugene)
+ - fixed limitation of return value for 'net.if.*' (Eugene)
+ - fixed limitation of return value for 'vfs.dev.*' (Eugene)
+ - fixed limitation of return value for 'system.cpu.intr' (Eugene)
+ - fixed autoregistration in oracle system (Eugene)
+ - fixed support of PostgreSQL (Eugene)
  - improved macro variables substitution in message body/subject (Eugene)
  - fixed order of displaying log files (Eugene)
  - added support of 'pfree' and 'pused' for 'vfs.fs.size' of windows (Eugene)

@@ -75,7 +75,7 @@
 	{
 		$time_dif=365*24*3600;
 	}
-        $result=DBselect("select h.host, t.triggerid, t.description, t.priority, count(a.alarmid)
+        $result=DBselect("select h.host, t.triggerid, t.description, t.priority, count(a.alarmid) as count
 	from hosts h, triggers t, functions f, items i, alarms a where 
 	h.hostid = i.hostid and
 	i.itemid = f.itemid and
@@ -88,9 +88,17 @@
         while($row=DBfetch($result))
         {
                 $priority_style=NULL;
-                if($row["priority"]==0)         $priority=S_NOT_CLASSIFIED;
-                elseif($row["priority"]==1)     $priority=S_INFORMATION;
-                elseif($row["priority"]==2)     $priority=S_WARNING;
+                if($row["priority"]==0)       $priority=S_NOT_CLASSIFIED;
+                elseif($row["priority"]==1)     
+		{
+			$priority=S_INFORMATION;
+                        $priority_style="information";
+		}
+                elseif($row["priority"]==2)
+		{
+		     $priority=S_WARNING;
+                        $priority_style="warning";
+		}
                 elseif($row["priority"]==3)
                 {
                         $priority=S_AVERAGE;
@@ -112,7 +120,7 @@
 			$row["host"],
 			expand_trigger_description($row["triggerid"]),
 			new CCol($priority,$priority_style),
-			$row["count(a.alarmid)"],
+			$row["count"],
 			));
 	}
 	$table->show();

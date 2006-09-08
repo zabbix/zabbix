@@ -1,5 +1,5 @@
 SUBDIRS = alerter housekeeper pinger poller timer trapper
-INCLUDES=-I@top_srcdir@/include @MYSQL_INCLUDE@ @ORACLE_INCLUDE@ @SNMP_INCLUDE@
+INCLUDES=-I@top_srcdir@/include @MYSQL_INCLUDE@ @ORACLE_INCLUDE@ @SNMP_INCLUDE@ @PGSQL_INCLUDE@
 
 bin_PROGRAMS = zabbix_server
 zabbix_server_SOURCES = evalfunc.c expression.c actions.c zlog.c functions.c server.c

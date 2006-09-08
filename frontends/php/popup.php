@@ -273,8 +273,8 @@
 			}
 	
 			if($row["priority"]==0)		$priority=S_NOT_CLASSIFIED;
-			elseif($row["priority"]==1)	$priority=S_INFORMATION;
-			elseif($row["priority"]==2)	$priority=S_WARNING;
+			elseif($row["priority"]==1)	$priority=new CCol(S_INFORMATION,"information");
+			elseif($row["priority"]==2)	$priority=new CCol(S_WARNING,"warning");
 			elseif($row["priority"]==3)	$priority=new CCol(S_AVERAGE,"average");
 			elseif($row["priority"]==4)	$priority=new CCol(S_HIGH,"high");
 			elseif($row["priority"]==5)	$priority=new CCol(S_DISASTER,"disaster");

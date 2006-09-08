@@ -226,27 +226,6 @@ COpt::savesqlrequest($query);
 		}
 	}
 
-/*	function	DBnum_rows($result)
-	{
-		global $DB_TYPE;
-	
-		if(!$result) return 0;
-
-		if($DB_TYPE == "MYSQL")
-		{
-			return mysql_num_rows($result);
-		}
-		if($DB_TYPE == "POSTGRESQL")
-		{
-			return pg_numrows($result);
-		}
-		if($DB_TYPE == "ORACLE")
-		{
-			$result=FALSE;
-		}
-		return 0;
-	}*/
-
 	function	DBinsert_id($result,$table,$field)
 	{
 		global	$DB,$DB_TYPE;
@@ -266,13 +245,16 @@ COpt::savesqlrequest($query);
 		}
 		if($DB_TYPE == "ORACLE")
 		{
-			$sql="select max($field) from $table";
+/*			$sql="select max($field) from $table";
 			$parse=DBexecute($sql);
 			while(OCIFetch($parse))
 			{
 				$colvalue = OCIResult($parse, 1);
 				return $colvalue;
 			}
+*/
+			$res = DBfetch(DBselect('select '.$table.'_'.$field.'.currval from dual'));
+			return $res[0];
 		}
 	}
 

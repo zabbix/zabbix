@@ -112,7 +112,11 @@ int	send_sms(char *device,char *number,char *message, char *error, int max_error
 	memset(&options, 0, sizeof(struct termios));
 
 	options.c_iflag     = IGNCR | INLCR | ICRNL;
+
+#ifdef ONOCR
 	options.c_oflag     = ONOCR;
+#endif /* ONOCR */
+	
 	options.c_cflag     = B38400 | CRTSCTS | CS8 | CLOCAL | CREAD;
 	options.c_lflag     &= ~(ICANON | ECHO | ECHOE | ISIG);
 	options.c_cc[VMIN]  = 0;
