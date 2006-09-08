@@ -142,7 +142,7 @@
 
 	if(isset($_REQUEST["save"])&&($_REQUEST["config"]==1))
 	{
-		$users=$_REQUEST["users"];
+		$users=get_request("users", array());;
 
 		if(isset($_REQUEST["usrgrpid"])){
 			$result=update_user_group($_REQUEST["usrgrpid"], $_REQUEST["gname"], $users);

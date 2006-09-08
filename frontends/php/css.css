@@ -347,6 +347,10 @@ table.tableinfo tr td.high		{	background-color: #FF8888;	}
 table.tableinfo tr:hover td.high	{	background-color: #FF8888;	}
 table.tableinfo tr td.average		{	background-color: #DDAAAA;	}
 table.tableinfo tr:hover td.average	{	background-color: #DDAAAA;	}
+table.tableinfo tr td.warning		{	background-color: #EFEFCC;	}
+table.tableinfo tr:hover td.warning	{	background-color: #E5E5CC;	}
+table.tableinfo tr td.information	{	background-color: #CCE2CC;	}
+table.tableinfo tr:hover td.information	{	background-color: #CCE2CC;	}
 table.tableinfo tr td.unknown_trigger	{	background-color: #BCBCBC;	}
 table.tableinfo tr:hover td.unknown_trigger{	background-color: #BCBCBC;	}
 table.tableinfo tr td.normal		{	background-color: #AADDAA;	}
@@ -550,7 +554,7 @@ table.triggers_info td {
 	background-color: #CCCCCC;
 }
 table.triggers_info td.trok {
-	background-color: #99F099;
+	background-color: #00FF33;
 }
 table.triggers_info td.dis {
 	background-color: #FF0000;
@@ -560,6 +564,12 @@ table.triggers_info td.high {
 }
 table.triggers_info td.avg {
 	background-color: #DDAAAA;
+}
+table.triggers_info tr td.warn	{
+	background-color: #EFEFCC;
+}
+table.triggers_info tr td.info	{
+	background-color: #CCE5CC;
 }
 
 /**************** HOSTS INFORMATION MODULE ****************/
@@ -686,6 +696,8 @@ A.action:active 	{	color:#3C3089;	text-decoration: underline;}
 .disaster	{	background-color: #FF0000;	}
 .high		{	background-color: #FF8888;	}
 .average	{	background-color: #DDAAAA;	}
+.warning	{	background-color: #EFEFCC;	}
+.information	{	background-color: #CCE5CC;	}
 .unknown_trigger{	background-color: #BCBCBC;	}
 .normal		{	background-color: #AADDAA;	}
 

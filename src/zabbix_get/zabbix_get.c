@@ -98,7 +98,7 @@ struct option longopts[] =
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void    signal_handler( int sig )
+void    signal_handler( int sig )
 {
 	if( SIGALRM == sig )
 	{

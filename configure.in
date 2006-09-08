@@ -48,7 +48,7 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   nlist.h net/if.h kvm.h linux/kernel.h ldap.h getopt.h procinfo.h sys/dk.h \
   sys/resource.h pthread.h windows.h process.h conio.h sys/wait.h regex.h \
   stdarg.h winsock2.h pdh.h psapi.h sys/sem.h sys/ipc.h sys/shm.h Winldap.h \
-  sys/timeb.h Winber.h)
+  sys/timeb.h Winber.h lber.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -66,7 +66,7 @@ AC_CHECK_LIB(kstat, main)
 AC_CHECK_LIB(nsl, main)
 AC_CHECK_LIB(resolv, main)
 AC_CHECK_LIB(kvm, main)
-dnl AC_CHECK_LIB(pthread, pthread_exit, LIBS="-pthread $LIBS")
+dnl AC_CHECK_LIB(pthread, main)
 
 dnl Check for socklen_t
 AC_MSG_CHECKING(for socklen_t)
@@ -463,10 +463,11 @@ AC_CHECK_FUNCS(atoll)
 AC_CHECK_FUNCS(getopt_long)
 
 dnl Check if we want to compile everything with static
-AC_ARG_ENABLE(static,[
-  --enable-static         Build statically linked binaries],
-			CFLAGS="-static $CFLAGS"
-			LIBS="")
+ AC_ARG_ENABLE(static,[
+   --enable-static         Build statically linked binaries],
+	CFLAGS="-static $CFLAGS";
+	enable_static=yes)
+dnl			LIBS="")
 
 AC_ARG_ENABLE(server,
 [  --enable-server         Turn on build of server],
@@ -591,7 +592,7 @@ if test "$server" = "yes"; then
 			AC_MSG_ERROR(Invalid MySQL directory - unable to find mysql.h under $withval)
 			fi
 		fi
-		MYSQL_INCLUDE=-I$MYSQL_INCDIR
+		MYSQL_INCLUDE="-I$MYSQL_INCDIR"
 		MYSQL_LFLAGS="-L$MYSQL_LIBDIR"
 		MYSQL_LIBS="-lmysqlclient"
 
@@ -653,13 +654,13 @@ if test "$server" = "yes"; then
 			PGSQL_LIBDIR=$withval/lib
 			test -d $withval/lib/pgsql && PGSQL_LIBDIR=$withval/lib/pgsql
 		fi
-	    PGSQL_INCLUDE=-I$PGSQL_INCDIR
+	    PGSQL_INCLUDE="-I$PGSQL_INCDIR"
 	    PGSQL_LFLAGS="-L$PGSQL_LIBDIR"
 	    PGSQL_LIBS="-lpq"
 	dnl To avoid linking of crypt with the agent
 	dnl    AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt, LIBS="-lcrypt $LIBS"))
 	dnl    AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt,  PGSQL_LFLAGS="-lcrypt $PGSQL_LFLAGS"))
-	    AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt,  PGSQL_LIBS="-lcrypt"))
+	    AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt,  PGSQL_LIBS="-lcrypt $PGSQL_LIBS"))
 
 	    AC_DEFINE(HAVE_PGSQL,1,[Define to 1 if PostgreSQL should be enabled.])
 	    AC_MSG_RESULT(yes)
@@ -857,12 +858,16 @@ If you want to check LDAP servers:
 	LDAP_LFLAGS="-L$LDAP_LIBDIR $LDAP_LFLAGS"
 	LDAP_LIBS="-lldap"
 
+		if test x$enable_static = xyes; then
+			LDAP_LIBS=" -llber -lgnutls -lpthread -lsasl2 $LDAP_LIBS"
+		fi
+
 	AC_DEFINE(HAVE_LDAP,1,[Define to 1 if LDAP should be enabled.])
 	AC_MSG_RESULT(yes)
 
-	else
-		AC_MSG_RESULT(no)
-	fi
+  else
+	AC_MSG_RESULT(no)
+  fi
 ],[
   AC_MSG_RESULT(no)
 ])
@@ -989,10 +994,12 @@ Configuration:
 
   Detected OS:      ${host_os}
   Install path:     ${prefix}
+  Compilation arch: ${ARCH}
+
   Compiler:         ${CC}
   Compiler flags:   ${CFLAGS}
-  Linker flags:     ${LIBS}
-  Compilation arch: ${ARCH}
+  Linker flags:     ${LDFLAGS}
+  Libraries:        ${LIBS}
 
   Enable server:    ${server}
   With database:    ${have_db}

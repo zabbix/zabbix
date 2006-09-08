@@ -33,15 +33,16 @@ int	DBadd_graph(char *name, int width, int height, int yaxistype, double yaxismi
 {
 	int	graphid;
 	char	name_esc[GRAPH_NAME_LEN_MAX];
+	int	exec_res;
 
 	DBescape_string(name,name_esc,GRAPH_NAME_LEN_MAX);
 
-	if(FAIL == DBexecute("insert into graphs (name,width,height,yaxistype,yaxismin,yaxismax) values ('%s',%d,%d,%d,%f,%f)", name_esc, width, height, yaxistype, yaxismin, yaxismax))
+	if(FAIL == (exec_res = DBexecute("insert into graphs (name,width,height,yaxistype,yaxismin,yaxismax) values ('%s',%d,%d,%d,%f,%f)", name_esc, width, height, yaxistype, yaxismin, yaxismax)))
 	{
 		return FAIL;
 	}
 
-	graphid=DBinsert_id();
+	graphid = DBinsert_id(exec_res, "graphs", "graphid");
 
 	if(graphid==0)
 	{
@@ -55,15 +56,16 @@ int	DBadd_item_to_graph(int graphid,int itemid, char *color,int drawtype, int so
 {
 	int	gitemid;
 	char	color_esc[GRAPH_ITEM_COLOR_LEN_MAX];
+	int	exec_res;
 
 	DBescape_string(color,color_esc,GRAPH_ITEM_COLOR_LEN_MAX);
 
-	if(FAIL == DBexecute("insert into graphs_items (graphid,itemid,drawtype,sortorder,color) values (%d,%d,%d,%d,'%s')", graphid, itemid, drawtype, sortorder, color_esc))
+	if(FAIL == (exec_res = DBexecute("insert into graphs_items (graphid,itemid,drawtype,sortorder,color) values (%d,%d,%d,%d,'%s')", graphid, itemid, drawtype, sortorder, color_esc)))
 	{
 		return FAIL;
 	}
 
-	gitemid=DBinsert_id();
+	gitemid = DBinsert_id(exec_res, "graphs_items", "gitemid");
 
 	if(gitemid==0)
 	{
