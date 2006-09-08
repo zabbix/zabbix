@@ -180,6 +180,7 @@ define("GROUP_RIGHT",		0);
 		if(is_null($access))	$access = $group_permission;
 		if(is_null($access))    $access = $default_permission;
 
+
 //SDI($right.": ".$access." >= ".$permission);
 		return (($access >= $permission) ? 1 : 0);
 	}

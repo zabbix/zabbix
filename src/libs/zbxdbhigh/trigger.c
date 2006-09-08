@@ -102,9 +102,12 @@ int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid)
 		DBescape_string(trigger.comments,comments_esc,TRIGGER_COMMENTS_LEN_MAX);
 		DBescape_string(trigger.url,url_esc,TRIGGER_URL_LEN_MAX);
 
-		DBexecute("insert into triggers  (description,priority,status,comments,url,value,expression) values ('%s',%d,%d,'%s','%s',2,'%s')",description_esc, trigger.priority, trigger.status, comments_esc, url_esc, expression_old);
-
-		triggerid_new=DBinsert_id();
+		triggerid_new = DBinsert_id(
+			DBexecute(
+				"insert into triggers  (description,priority,status,comments,url,value,expression) "
+				"values ('%s',%d,%d,'%s','%s',2,'%s')",description_esc, trigger.priority, 
+				trigger.status, comments_esc, url_esc, expression_old),
+			"triggers", "triggerid");
 
 		result2 = DBselect("select i.key_,f.parameter,f.function,f.functionid from functions f,items i where i.itemid=f.itemid and f.triggerid=%d", triggerid);
 		/* Loop: functions */
@@ -121,9 +124,12 @@ int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid)
 				break;
 			}
 
-			DBexecute("insert into functions (itemid,triggerid,function,parameter) values (%d,%d,'%s','%s')", atoi(row3[0]), triggerid_new, row2[2], row2[1]);
 
-			functionid=DBinsert_id();
+			functionid = DBinsert_id(
+				DBexecute(
+					"insert into functions (itemid,triggerid,function,parameter)"
+					" values (%d,%d,'%s','%s')", atoi(row3[0]), triggerid_new, row2[2], row2[1]),
+			       	"functions", "functionid");
 
 			DBexecute("update triggers set expression='%s' where triggerid=%d", expression_old, triggerid_new );
 

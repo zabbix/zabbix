@@ -32,13 +32,14 @@
 int	DBadd_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available)
 {
 	int	hostid;
+	int	exec_res;
 
-	if(FAIL == DBexecute("insert into hosts (host,port,status,useip,ip,disable_until,available) values ('%s',%d,%d,%d,'%s',%d,%d)", server, port, status, useip, ip, disable_until, available))
+	if(FAIL == (exec_res = DBexecute("insert into hosts (host,port,status,useip,ip,disable_until,available) values ('%s',%d,%d,%d,'%s',%d,%d)", server, port, status, useip, ip, disable_until, available)))
 	{
 		return FAIL;
 	}
 
-	hostid=DBinsert_id();
+	hostid = DBinsert_id(exec_res, "hosts", "hostid");
 
 	if(hostid==0)
 	{

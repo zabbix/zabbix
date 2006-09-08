@@ -70,8 +70,8 @@
 			$trigger = get_trigger_by_triggerid($row["triggerid"]);
 
 			if($trigger["priority"]==0)     $priority=S_NOT_CLASSIFIED;
-			elseif($trigger["priority"]==1) $priority=S_INFORMATION;
-			elseif($trigger["priority"]==2) $priority=S_WARNING;
+			elseif($trigger["priority"]==1) $priority=new CCol(S_INFORMATION, "information");
+			elseif($trigger["priority"]==2) $priority=new CCol(S_WARNING,"warning");
 			elseif($trigger["priority"]==3) $priority=new CCol(S_AVERAGE,"average");
 			elseif($trigger["priority"]==4) $priority=new CCol(S_HIGH,"high");
 			elseif($trigger["priority"]==5) $priority=new CCol(S_DISASTER,"disaster");

@@ -403,8 +403,8 @@
 				$severity = $row["severity"];
 
 				if($severity==0)         $severity = S_NOT_CLASSIFIED;
-				elseif($severity==1)     $severity = S_INFORMATION;
-				elseif($severity==2)     $severity = S_WARNING;
+				elseif($severity==1)     $severity = new CCol(S_INFORMATION,"information");
+				elseif($severity==2)     $severity = new CCol(S_WARNING,"warrning");
 				elseif($severity==3)     $severity = new CCol(S_AVERAGE,"average");
 				elseif($severity==4)     $severity = new CCol(S_HIGH,"high");
 				elseif($severity==5)     $severity = new CCol(S_DISASTER,"disaster");

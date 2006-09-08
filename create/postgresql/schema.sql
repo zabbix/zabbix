@@ -21,10 +21,12 @@
 -- Table structure for table 'hosts'
 --
 
-\connect zabbix
+--\connect zabbix
+
+CREATE SEQUENCE hosts_hostid_seq START 10100;
 
 CREATE TABLE hosts (
-  hostid		serial,
+  hostid		integer DEFAULT nextval('hosts_hostid_seq') NOT NULL,
   host			varchar(64)	DEFAULT '' 		NOT NULL,
   useip			int4		DEFAULT '0'		NOT NULL,
   ip			varchar(15)	DEFAULT '127.0.0.1'	NOT NULL,
@@ -45,43 +47,45 @@ CREATE UNIQUE INDEX hosts_host on hosts (host);
 -- Table structure for table 'items'
 --
 
+CREATE SEQUENCE items_itemid_seq START 18000;
+
 CREATE TABLE items (
-  itemid		serial,
-  type			int4		NOT NULL,
-  snmp_community	varchar(64)	DEFAULT ''	NOT NULL,
-  snmp_oid		varchar(255)	DEFAULT ''	NOT NULL,
-  snmp_port		int4		DEFAULT '161'	NOT NULL,
-  hostid		int4		NOT NULL,
-  description		varchar(255)	DEFAULT '' NOT NULL,
-  key_			varchar(64)	DEFAULT '' NOT NULL,
-  delay			int4		DEFAULT '0' NOT NULL,
-  history		int4		DEFAULT '90' NOT NULL,
-  trends		int4		DEFAULT '365' NOT NULL,
--- lastdelete is no longer required
---  lastdelete		int4		DEFAULT '0' NOT NULL,
-  nextcheck		int4		DEFAULT '0' NOT NULL,
-  lastvalue		varchar(255)	DEFAULT NULL,
-  lastclock		int4		DEFAULT NULL,
-  prevvalue		varchar(255)	DEFAULT NULL,
-  status		int4		DEFAULT '0' NOT NULL,
-  value_type		int4		DEFAULT '0' NOT NULL,
-  trapper_hosts		varchar(255)	DEFAULT '' NOT NULL,
-  units			varchar(10)	DEFAULT '' NOT NULL,
-  multiplier		int4		DEFAULT '0' NOT NULL,
-  delta			int4		DEFAULT '0' NOT NULL,
-  prevorgvalue		float8		DEFAULT NULL,
-  snmpv3_securityname	varchar(64)	DEFAULT '' NOT NULL,
-  snmpv3_securitylevel	int4		DEFAULT '0' NOT NULL,
-  snmpv3_authpassphrase	varchar(64)	DEFAULT '' NOT NULL,
-  snmpv3_privpassphrase	varchar(64)	DEFAULT '' NOT NULL,
-  formula		varchar(255)	DEFAULT '0' NOT NULL,
-  error			varchar(128)	DEFAULT '' NOT NULL,
-  lastlogsize		int4		DEFAULT '0' NOT NULL,
-  logtimefmt		varchar(64)	DEFAULT '' NOT NULL,
-  templateid		int4		DEFAULT '0' NOT NULL,
-  valuemapid		int4		 DEFAULT '0' NOT NULL,
-  PRIMARY KEY (itemid)
---  FOREIGN KEY (hostid) REFERENCES hosts
+	itemid		integer DEFAULT nextval('items_itemid_seq') NOT NULL,
+	type			int4		NOT NULL,
+	snmp_community	varchar(64)	DEFAULT ''	NOT NULL,
+	snmp_oid		varchar(255)	DEFAULT ''	NOT NULL,
+	snmp_port		int4		DEFAULT '161'	NOT NULL,
+	hostid		int4		NOT NULL,
+	description		varchar(255)	DEFAULT '' NOT NULL,
+	key_			varchar(64)	DEFAULT '' NOT NULL,
+	delay			int4		DEFAULT '0' NOT NULL,
+	history		int4		DEFAULT '90' NOT NULL,
+	trends		int4		DEFAULT '365' NOT NULL,
+	-- lastdelete is no longer required
+	--  lastdelete		int4		DEFAULT '0' NOT NULL,
+	nextcheck		int4		DEFAULT '0' NOT NULL,
+	lastvalue		varchar(255)	DEFAULT NULL,
+	lastclock		int4		DEFAULT NULL,
+	prevvalue		varchar(255)	DEFAULT NULL,
+	status		int4		DEFAULT '0' NOT NULL,
+	value_type		int4		DEFAULT '0' NOT NULL,
+	trapper_hosts		varchar(255)	DEFAULT '' NOT NULL,
+	units			varchar(10)	DEFAULT '' NOT NULL,
+	multiplier		int4		DEFAULT '0' NOT NULL,
+	delta			int4		DEFAULT '0' NOT NULL,
+	prevorgvalue		float8		DEFAULT NULL,
+	snmpv3_securityname	varchar(64)	DEFAULT '' NOT NULL,
+	snmpv3_securitylevel	int4		DEFAULT '0' NOT NULL,
+	snmpv3_authpassphrase	varchar(64)	DEFAULT '' NOT NULL,
+	snmpv3_privpassphrase	varchar(64)	DEFAULT '' NOT NULL,
+	formula		varchar(255)	DEFAULT '0' NOT NULL,
+	error			varchar(128)	DEFAULT '' NOT NULL,
+	lastlogsize		int4		DEFAULT '0' NOT NULL,
+	logtimefmt		varchar(64)	DEFAULT '' NOT NULL,
+	templateid		int4		DEFAULT '0' NOT NULL,
+	valuemapid		int4		 DEFAULT '0' NOT NULL,
+	PRIMARY KEY (itemid)
+	--  FOREIGN KEY (hostid) REFERENCES hosts
 );
 
 CREATE UNIQUE INDEX items_hostid_key on items (hostid,key_);
@@ -100,7 +104,7 @@ CREATE TABLE config (
 --  password_required	int4		DEFAULT '0' NOT NULL,
   alert_history		int4		DEFAULT '0' NOT NULL,
   alarm_history		int4		DEFAULT '0' NOT NULL,
-  refresh_unsupported	int4		DEFAULT '0' NOT NULL
+  refresh_unsupported	int4		DEFAULT '0' NOT NULL,
   work_period		varchar(100)	DEFAULT '1-5,00:00-24:00' NOT NULL
 );
 
@@ -108,8 +112,10 @@ CREATE TABLE config (
 -- Table structure for table 'groups'
 --
 
+CREATE SEQUENCE groups_groupid_seq START 3;
+
 CREATE TABLE groups (
-  groupid		serial,
+  groupid		integer DEFAULT nextval('groups_groupid_seq') NOT NULL,
   name			varchar(64)     DEFAULT '' NOT NULL,
   PRIMARY KEY (groupid)
 );
@@ -132,8 +138,9 @@ CREATE TABLE hosts_groups (
 -- Table structure for table 'triggers'
 --
 
+CREATE SEQUENCE triggers_triggerid_seq START 13000;
 CREATE TABLE triggers (
-  triggerid		serial,
+  triggerid		integer DEFAULT nextval('triggers_triggerid_seq') NOT NULL,
   expression		varchar(255)	DEFAULT '' NOT NULL,
   description		varchar(255)	DEFAULT '' NOT NULL,
   url			varchar(255)	DEFAULT '' NOT NULL,
@@ -167,9 +174,10 @@ CREATE INDEX trigger_depends_up   on trigger_depends (triggerid_up);
 --
 -- Table structure for table 'users'
 --
+CREATE SEQUENCE users_userid_seq START 3;
 
 CREATE TABLE users (
-  userid		serial,
+  userid		integer DEFAULT nextval('users_userid_seq') NOT NULL,
   alias			varchar(100)	DEFAULT '' NOT NULL,
   name			varchar(100)	DEFAULT '' NOT NULL,
   surname		varchar(100)	DEFAULT '' NOT NULL,
@@ -233,7 +241,7 @@ CREATE TABLE conditions (
   conditionid		serial,
   actionid		int4		DEFAULT '0' NOT NULL,
   conditiontype		int4		DEFAULT '0' NOT NULL,
-  operator		int1		DEFAULT '0' NOT NULL,
+  operator		int2		DEFAULT '0' NOT NULL,
   value			varchar(255)	DEFAULT '' NOT NULL,
   PRIMARY KEY (conditionid)
 --  FOREIGN KEY (actionid) REFERENCES actions
@@ -245,9 +253,10 @@ CREATE INDEX conditiond_actionid on conditions (actionid);
 --
 -- Table structure for table 'media_type'
 --
+CREATE SEQUENCE media_type_mediatypeid_seq START 3;
 
 CREATE TABLE media_type (
-  mediatypeid		serial,
+  mediatypeid		integer DEFAULT nextval('media_type_mediatypeid_seq') NOT NULL,
   type			int4		DEFAULT '0' NOT NULL,
   description		varchar(100)	DEFAULT '' NOT NULL,
   smtp_server		varchar(255)	DEFAULT '' NOT NULL,
@@ -315,8 +324,10 @@ CREATE INDEX alarms_clock on alarms (clock);
 -- Table structure for table 'functions'
 --
 
+CREATE SEQUENCE functions_functionid_seq START 11300;
+
 CREATE TABLE functions (
-  functionid		serial,
+  functionid		integer DEFAULT nextval('functions_functionid_seq') NOT NULL,
   itemid		int4		DEFAULT '0' NOT NULL,
   triggerid		int4		DEFAULT '0' NOT NULL,
   lastvalue		varchar(255),
@@ -373,34 +384,6 @@ CREATE TABLE history_str (
 CREATE INDEX history_str_i_c on history_str (itemid, clock);
 
 --
--- Table structure for table 'items_template'
---
-
-CREATE TABLE items_template (
-  itemtemplateid	int4		NOT NULL,
-  description		varchar(255)	DEFAULT '' NOT NULL,
-  key_			varchar(64)	DEFAULT '' NOT NULL,
-  delay			int4		DEFAULT '0' NOT NULL,
-  value_type		int4		DEFAULT '0' NOT NULL,
-  PRIMARY KEY (itemtemplateid)
-);
-
-CREATE UNIQUE INDEX items_template_p_k on items_template (key_);
-
---
--- Table structure for table 'triggers_template'
---
-
-CREATE TABLE triggers_template (
-  triggertemplateid	int4		NOT NULL,
-  itemtemplateid	int4		NOT NULL,
-  description		varchar(255)	DEFAULT '' NOT NULL,
-  expression		varchar(255)	DEFAULT '' NOT NULL,
-  PRIMARY KEY (triggertemplateid),
-  FOREIGN KEY (itemtemplateid) REFERENCES items_template
-);
-
---
 -- Table structure for table 'media'
 --
 
@@ -454,7 +437,7 @@ CREATE TABLE sysmaps_elements (
   x			int4		DEFAULT '0' NOT NULL,
   y			int4		DEFAULT '0' NOT NULL,
   url			varchar(255)	DEFAULT '' NOT NULL,
-  PRIMARY KEY (shostid)
+  PRIMARY KEY (selementid)
 --  FOREIGN KEY (sysmapid) REFERENCES sysmaps,
 --  FOREIGN KEY (hostid) REFERENCES hosts
 );
@@ -467,7 +450,7 @@ CREATE TABLE sysmaps_links (
   linkid		serial,
   sysmapid		int4		DEFAULT '0' NOT NULL,
   selementid1		int4		DEFAULT '0' NOT NULL,
-  selementid2		int4		DEFAULT '0' NOT NULL
+  selementid2		int4		DEFAULT '0' NOT NULL,
 -- may be NULL 
   triggerid		int4,
   drawtype_off		int4		DEFAULT '0' NOT NULL,
@@ -553,10 +536,12 @@ CREATE TABLE services_links (
 CREATE INDEX services_links_servicedownid on services_links (servicedownid);
 CREATE UNIQUE INDEX services_links_upidownid on services_links (serviceupid, servicedownid);
 
+CREATE SEQUENCE rights_rightid_seq START 4;
+
 CREATE TABLE rights (
-  rightid               serial,
+  rightid               integer DEFAULT nextval('rights_rightid_seq') NOT NULL,
   userid                int4		DEFAULT '0' NOT NULL,
-  name                  char(255)	DEFAULT '' NOT NULL,
+  name                  varchar(255)	DEFAULT '' NOT NULL,
   permission            char(1)		DEFAULT '' NOT NULL,
   id                    int4,
   PRIMARY KEY (rightid)
@@ -658,8 +643,10 @@ CREATE TABLE screens_items (
 -- Table structure for table 'usrgrp'
 --
 
+CREATE SEQUENCE usrgrp_usrgrpid_seq START 9;
+
 CREATE TABLE usrgrp (
-  usrgrpid		serial,
+  usrgrpid		integer DEFAULT nextval('usrgrp_usrgrpid_seq') NOT NULL,
   name			varchar(64)	DEFAULT '' NOT NULL,
   PRIMARY KEY (usrgrpid)
 );
@@ -692,6 +679,22 @@ CREATE TABLE trends (
   PRIMARY KEY (itemid,clock)
 --  FOREIGN KEY (itemid) REFERENCES items
 );
+
+--
+-- Table structure for table 'images'
+--
+
+CREATE SEQUENCE images_imageid_seq START 100;
+
+CREATE TABLE images (
+  imageid		integer DEFAULT nextval('images_imageid_seq') NOT NULL,
+  imagetype		int4		DEFAULT '0' NOT NULL,
+  name			varchar(64)	DEFAULT '0' NOT NULL,
+  image			bytea,
+  PRIMARY KEY (imageid)
+);
+
+CREATE UNIQUE INDEX images_name_imagetype on images (name, imagetype);
 
 --
 -- Table structure for table 'hosts_templates'
@@ -732,14 +735,34 @@ CREATE INDEX history_log_i_c on history_str (itemid, clock);
 --
 
 CREATE TABLE history_text (
+  id                    serial,
   itemid		int4	DEFAULT '0' NOT NULL,
   clock			int4	DEFAULT '0' NOT NULL,
   value			text	DEFAULT '' NOT NULL,
-  KEY itemidclock (itemid, clock)
+  PRIMARY KEY (id)
 );
 
-CREATE INDEX history_text_i_c on history_text (itemid, clock);
+CREATE UNIQUE INDEX history_text_itemid_clock on history_text (itemid, clock);
 
+--
+-- Table structure for table 'hosts_profiles'
+--
+
+CREATE TABLE hosts_profiles (
+  hostid		int4		DEFAULT '0' NOT NULL,
+  devicetype		varchar(64)	DEFAULT '' NOT NULL,
+  name			varchar(64)	DEFAULT '' NOT NULL,
+  os			varchar(64)	DEFAULT '' NOT NULL,
+  serialno		varchar(64)	DEFAULT '' NOT NULL,
+  tag			varchar(64)	DEFAULT '' NOT NULL,
+  macaddress		varchar(64)	DEFAULT '' NOT NULL,
+  hardware		text		DEFAULT '' NOT NULL,
+  software		text		DEFAULT '' NOT NULL,
+  contact		text		DEFAULT '' NOT NULL,
+  location		text		DEFAULT '' NOT NULL,
+  notes			text		DEFAULT '' NOT NULL,
+  PRIMARY KEY (hostid)
+);
 
 --
 -- Table structure for table 'autoreg'

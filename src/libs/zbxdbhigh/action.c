@@ -34,6 +34,7 @@ int	DBadd_action(int triggerid, int userid, char *subject, char *message, int sc
 	int	actionid;
 	char	subject_esc[ACTION_SUBJECT_LEN_MAX];
 	char	message_esc[MAX_STRING_LEN];
+	int 	exec_res;
 
 	DBescape_string(subject,subject_esc,ACTION_SUBJECT_LEN_MAX);
 	DBescape_string(message,message_esc,MAX_STRING_LEN);
@@ -43,12 +44,12 @@ int	DBadd_action(int triggerid, int userid, char *subject, char *message, int sc
 		userid = usrgrpid;
 	}
 
-	if(FAIL == DBexecute("insert into actions (triggerid, userid, subject, message, scope, severity, recipient) values (%d, %d, '%s', '%s', %d, %d, %d)", triggerid, userid, subject_esc, message_esc, scope, severity, recipient))
+	if(FAIL == (exec_res = DBexecute("insert into actions (triggerid, userid, subject, message, scope, severity, recipient) values (%d, %d, '%s', '%s', %d, %d, %d)", triggerid, userid, subject_esc, message_esc, scope, severity, recipient)))
 	{
 		return FAIL;
 	}
 
-	actionid=DBinsert_id();
+	actionid = DBinsert_id(exec_res, "actions", "actionid");
 
 	if(actionid==0)
 	{
