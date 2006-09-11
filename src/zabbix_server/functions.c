@@ -573,16 +573,16 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 				}
 				else if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) && (value->type & AR_UINT64))
 				{
-					if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= (double)value->ui64))
+					if((item->prevorgvalue_null == 0) && ((zbx_uint64_t)item->prevorgvalue <= value->ui64))
 					{
-						DBadd_history(item->itemid, ((double)value->ui64 - item->prevorgvalue)/(now-item->lastclock), now);
+						DBadd_history(item->itemid, (double)(value->ui64 - (zbx_uint64_t)item->prevorgvalue)/(now-item->lastclock), now);
 					}
 				}
 				else if((item->value_type==ITEM_VALUE_TYPE_UINT64) && (value->type & AR_UINT64))
 				{
-					if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value->ui64))
+					if((item->prevorgvalue_null == 0) && ((zbx_uint64_t)item->prevorgvalue <= value->ui64))
 					{
-						DBadd_history_uint(item->itemid, (zbx_uint64_t)(value->ui64 - item->prevorgvalue)/(now-item->lastclock), now);
+						DBadd_history_uint(item->itemid, (zbx_uint64_t)(value->ui64 - (zbx_uint64_t)item->prevorgvalue)/(now-item->lastclock), now);
 					}
 				}
 			}
@@ -599,16 +599,16 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 				}
 				else if((item->value_type==ITEM_VALUE_TYPE_FLOAT) && (value->type & AR_UINT64))
 				{
-					if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= (double)value->ui64) )
+					if((item->prevorgvalue_null == 0) && ((zbx_uint64_t)item->prevorgvalue <= value->ui64) )
 					{
-						DBadd_history(item->itemid, ((double)value->ui64 - item->prevorgvalue), now);
+						DBadd_history(item->itemid, (value->ui64 - (zbx_uint64_t)item->prevorgvalue), now);
 					}
 				}
 				else if((item->value_type==ITEM_VALUE_TYPE_UINT64) && (value->type & AR_UINT64))
 				{
-					if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value->ui64) )
+					if((item->prevorgvalue_null == 0) && ((zbx_uint64_t)item->prevorgvalue <= value->ui64) )
 					{
-						DBadd_history_uint(item->itemid, (value->ui64 - item->prevorgvalue), now);
+						DBadd_history_uint(item->itemid, (value->ui64 - (zbx_uint64_t)item->prevorgvalue), now);
 					}
 				}
 			}
@@ -823,7 +823,7 @@ void	process_new_value(DB_ITEM *item, AGENT_RESULT *value)
 		}
 		if( (item->value_type==ITEM_VALUE_TYPE_UINT64) && (value->type & AR_UINT64))
 		{
-			if(is_uint(item->formula))
+			if(is_uint(item->formula)==SUCCEED)
 			{
 #ifdef HAVE_ATOLL
 				SET_UI64_RESULT(value, value->ui64 * (zbx_uint64_t)atoll(item->formula));
