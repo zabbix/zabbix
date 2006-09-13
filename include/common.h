@@ -24,6 +24,9 @@
 
 #include "zbxtypes.h"
 
+#define snprintf	ERROR_DO_NOT_USE_SNPRINTF_FUNCTION_TRY_TO_USE_ZBX_SNPRINTF
+#define sprintf		ERROR_DO_NOT_USE_SPRINTF_FUNCTION_TRY_TO_USE_ZBX_SNPRINTF
+
 #define ON	1
 #define OFF	0
 

@@ -505,7 +505,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 			}
 			else
 			{
-				snprintf(param, MAX_STRING_LEN, "%s", commands[i].main_param);
+				zbx_snprintf(param, sizeof(param), "%s", commands[i].main_param);
 			}
 		}
 		else
