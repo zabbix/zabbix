@@ -649,6 +649,122 @@
 	$table->show();
 
 	show_table_header(S_TOTAL.":$col");
+
+
+################################################	
+#        NEW permission system                 #
+################################################	
+
+
+	function accessiable_host_id_list($requested_right='H')
+	{
+$CURRENT_USER_ID = 4;
+
+COpt::profiling_start("host_id_list");
+
+		$requested_right = permission2int($requested_right);
+
+		$result = array();
+
+		$hosts_rights = DBselect('select r.permission from rights r where r.userid='.$CURRENT_USER_ID.' AND r.name=\'User Type\'');
+		if($right = DBfetch($hosts_rights))
+		if(permission2int($right['permission']) >= $requested_right)
+		{
+			$arr_rights = array();
+
+			$group_rights = DBselect('select h.hostid, r.permission from hosts_groups hg, hosts h, rights r '.
+				'where r.userid='.$CURRENT_USER_ID.' AND hg.hostid=h.hostid AND r.name=\'Host Group\' AND r.id=hg.groupid');
+			while($right = DBfetch($group_rights))
+				$arr_rights[$right['hostid']] = isset($arr_rights[$right['hostid']]) ?
+					MIN($arr_rights[$right['hostid']], permission2int($right['permission']))  :
+					permission2int($right['permission']);
+
+			$hosts_rights = DBselect('select h.hostid, r.permission from hosts h, rights r '.
+				'where r.userid='.$CURRENT_USER_ID.' AND r.name=\'Host\' AND r.id=h.hostid');
+			while($right = DBfetch($hosts_rights)) $arr_rights[$right['hostid']] = permission2int($right['permission']);
+
+
+			foreach($arr_rights as $hostid => $right)
+			{
+				if($right >= $requested_right) array_push($result, $hostid);
+			}
+		}
+
+		if(count($result) == 0) array_push($result, -1);
+
+COpt::profiling_stop("host_id_list");
+
+		return $result;
+	}
+
+	function process_hosts($function, &$args, $select_params)
+	{
+		/*
+			$result=DBselect("select distinct t.triggerid,t.status,t.description,t.expression,t.priority,".
+			"t.lastchange,t.comments,t.url,t.value from triggers t,hosts h,items i,functions f".$groupname.
+			" where t.value=1 and t.status=0 and f.itemid=i.itemid and h.hostid=i.hostid and t.description".
+			" $select_cond and t.triggerid=f.triggerid and i.status=".ITEM_STATUS_ACTIVE.
+			" and h.status=".HOST_STATUS_MONITORED." $cond $groupcond $sort");
+		*/
+	
+		$select_data = array('h.*');
+		$select_from = array('hosts h');
+		$select_where = array('h.hostid in '.'('.implode(',',accessiable_host_id_list()).')'); /* Node selection */
+
+		if(isset($select_params['hostid'])) 
+			array_push($select_where, 'h.hostid='.$select_params['hostid']);
+
+		if(isset($select_params['groupid']))
+		{
+			array_push($select_from,'hosts_groups hg');
+			array_push($select_where,'h.hostid=hg.hostid AND hg.groupid='.$select_params['groupid']);
+		}
+
+		if(isset($select_params['status']))
+		{
+			array_push($select_where,'h.status='.$select_params['status']);
+		}
+
+		$db_hosts = DBselect(
+			'select '.implode(',',$select_data).' '.
+			'from '.implode(',',$select_from).' '.
+			(count($select_where) > 0 ? 'where '.implode(' AND ', $select_where) : ''));
+
+		for(
+			$ret = true;
+			$ret == true && $db_host_row = DBfetch($db_hosts);
+			$ret = $function($args, $db_host_row)
+		);
+	
+		return $ret;
+	}
+
+	function add_hot_to_table(&$args, $db_row)
+	{
+		if(!is_object($args)) return false;
+
+		$args->AddRow(array($db_row['hostid'], $db_row['host'], $db_row['ip']));
+
+		return true;
+	}
+
+	$host_table = new CTableInfo();
+	$host_table->SetHeader(array(S_ID, S_HOST, S_IP));
+
+	process_hosts('add_hot_to_table', $host_table, 
+		array(
+//			'groupid' => 3,
+//			'hostid' => 10024,
+//			'status' => HOST_STATUS_MONITORED
+		)
+	);
+
+	$host_table->Show();
+	
+
+
+################################################	
+
 ?>
 
 <?php

@@ -23,6 +23,7 @@
 #include <string.h>
 #include <math.h>
 
+#include "expression.h"
 #include "functions.h"
 #include "evalfunc.h"
 #include "common.h"
@@ -546,7 +547,7 @@ int	evaluate(int *result,char *exp, char *error, int maxerrlen)
  * Purpose: substitute simple macros in data string with real values          *
  *                                                                            *
  * Parameters: trigger - trigger structure                                    *
- *             action - action structure                                      *
+ *             action - action structure (NULL if uncnown)                    *
  *             data - data string                                             *
  *             dala_max_len - max length of data string,include '\0'          *
  *                                                                            *
@@ -571,7 +572,8 @@ int	evaluate(int *result,char *exp, char *error, int maxerrlen)
 #define MVAR_TRIGGER_SEVERITY		"{TRIGGER.SEVERITY}"
 
 #define STR_UNKNOWN_VARIAVLE		"*UNKNOWN*"
-static  void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data, int dala_max_len)
+
+void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data, int dala_max_len, int macro_type)
 {
 
 	char
@@ -604,19 +606,23 @@ static  void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, ch
 		zbx_snprintf(replace_to, sizeof(replace_to), "{");
 		var_len = 1;
 
-		if(strncmp(pr, MVAR_TRIGGER_NAME, strlen(MVAR_TRIGGER_NAME)) == 0)
+		if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
+			strncmp(pr, MVAR_TRIGGER_NAME, strlen(MVAR_TRIGGER_NAME)) == 0)
 		{
 			var_len = strlen(MVAR_TRIGGER_NAME);
 
 			zbx_snprintf(replace_to, sizeof(replace_to), "%s", trigger->description);
+			substitute_simple_macros(trigger, action, replace_to, sizeof(replace_to), MACRO_TYPE_TRIGGER_DESCRIPTION);
 		}
-		else if(strncmp(pr, MVAR_TRIGGER_COMMENT, strlen(MVAR_TRIGGER_COMMENT)) == 0)
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
+			strncmp(pr, MVAR_TRIGGER_COMMENT, strlen(MVAR_TRIGGER_COMMENT)) == 0)
 		{
 			var_len = strlen(MVAR_TRIGGER_COMMENT);
 
 			zbx_snprintf(replace_to, sizeof(replace_to), "%s", trigger->comments);
 		}
-		else if(strncmp(pr, MVAR_HOST_NAME, strlen(MVAR_HOST_NAME)) == 0)
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY | MACRO_TYPE_TRIGGER_DESCRIPTION) &&
+			strncmp(pr, MVAR_HOST_NAME, strlen(MVAR_HOST_NAME)) == 0)
 		{
 			var_len = strlen(MVAR_HOST_NAME);
 
@@ -639,7 +645,8 @@ static  void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, ch
 			}
 			DBfree_result(result);
 		}
-		else if(strncmp(pr, MVAR_TRIGGER_KEY, strlen(MVAR_TRIGGER_KEY)) == 0)
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
+			strncmp(pr, MVAR_TRIGGER_KEY, strlen(MVAR_TRIGGER_KEY)) == 0)
 		{
 			var_len = strlen(MVAR_TRIGGER_KEY);
 
@@ -663,7 +670,8 @@ static  void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, ch
 
 			DBfree_result(result);
 		}
-		if(strncmp(pr, MVAR_IPADDRESS, strlen(MVAR_IPADDRESS)) == 0)
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
+			strncmp(pr, MVAR_IPADDRESS, strlen(MVAR_IPADDRESS)) == 0)
 		{
 			var_len = strlen(MVAR_IPADDRESS);
 
@@ -686,7 +694,8 @@ static  void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, ch
 			}
 			DBfree_result(result);
 		}
-		else if(strncmp(pr, MVAR_DATE, strlen(MVAR_DATE)) == 0)
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
+			strncmp(pr, MVAR_DATE, strlen(MVAR_DATE)) == 0)
 		{
 			var_len = strlen(MVAR_TIME);
 
@@ -694,7 +703,8 @@ static  void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, ch
 			tm	= localtime(&now);
 			zbx_snprintf(replace_to, sizeof(replace_to)-1, "%.4d.%.2d.%.2d", tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday);
 		}
-		else if(strncmp(pr, MVAR_TIME, strlen(MVAR_TIME)) == 0)
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY)&&
+			strncmp(pr, MVAR_TIME, strlen(MVAR_TIME)) == 0)
 		{
 			var_len = strlen(MVAR_TIME);
 
@@ -703,7 +713,8 @@ static  void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, ch
 			zbx_snprintf(replace_to, sizeof(replace_to), "%.2d:%.2d:%.2d",tm->tm_hour,tm->tm_min,tm->tm_sec);
 
 		}
-		else if(strncmp(pr, MVAR_TRIGGER_STATUS, strlen(MVAR_TRIGGER_STATUS)) == 0)
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
+			strncmp(pr, MVAR_TRIGGER_STATUS, strlen(MVAR_TRIGGER_STATUS)) == 0)
 		{
 			/* NOTE: if you make changes for this bloc, don't forgot MVAR_TRIGGER_STATUS_OLD block */
 			var_len = strlen(MVAR_TRIGGER_STATUS);
@@ -713,7 +724,8 @@ static  void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, ch
 			else
 				zbx_snprintf(replace_to, sizeof(replace_to), "ON");
 		}
-		else if(strncmp(pr, MVAR_TRIGGER_STATUS_OLD, strlen(MVAR_TRIGGER_STATUS_OLD)) == 0)
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) && 
+			strncmp(pr, MVAR_TRIGGER_STATUS_OLD, strlen(MVAR_TRIGGER_STATUS_OLD)) == 0)
 		{
 			/* NOTE: if you make changes for this bloc, don't forgot MVAR_TRIGGER_STATUS block */
 			var_len = strlen(MVAR_TRIGGER_STATUS_OLD);
@@ -723,7 +735,8 @@ static  void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, ch
 			else
 				zbx_snprintf(replace_to, sizeof(replace_to), "ON");
 		}
-		else if(strncmp(pr, MVAR_TRIGGER_SEVERITY, strlen(MVAR_TRIGGER_SEVERITY)) == 0)
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) && 
+			strncmp(pr, MVAR_TRIGGER_SEVERITY, strlen(MVAR_TRIGGER_SEVERITY)) == 0)
 		{
 			var_len = strlen(MVAR_TRIGGER_SEVERITY);
 
@@ -789,7 +802,7 @@ void	substitute_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data, int d
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_macros([%s])",data);
 
-	substitute_simple_macros(trigger, action, data, dala_max_len);
+	substitute_simple_macros(trigger, action, data, dala_max_len, MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY);
 
 	*str_out = '\0';
 	outlen = sizeof(str_out) - 1;

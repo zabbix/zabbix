@@ -368,7 +368,7 @@ static int get_next_command(char** command_list, char** alias, int* is_group, ch
 	char *alias = NULL;
 	char *command = NULL;
 	int is_group = 0;
-	
+
 	assert(trigger);
 	assert(action);
 
@@ -402,6 +402,8 @@ static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigge
 	DB_RESULT result;
 	DB_ROW	row;
 
+	char tmp_str[MAX_STRING_LEN];
+	
 	int	ret = FAIL;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In check_action_condition [actionid:%d,conditionid:%d:cond.value:%s]", condition->actionid, condition->conditionid, condition->value);
@@ -487,16 +489,20 @@ static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigge
 	}
 	else if(condition->conditiontype == CONDITION_TYPE_TRIGGER_NAME)
 	{
+		zbx_snprintf(tmp_str, sizeof(tmp_str), "%s",trigger->description);
+		
+		substitute_simple_macros(trigger, NULL, tmp_str, sizeof(tmp_str), MACRO_TYPE_TRIGGER_DESCRIPTION);
+		
 		if(condition->operator == CONDITION_OPERATOR_LIKE)
 		{
-			if(strstr(trigger->description,condition->value) != NULL)
+			if(strstr(tmp_str, condition->value) != NULL)
 			{
 				ret = SUCCEED;
 			}
 		}
 		else if(condition->operator == CONDITION_OPERATOR_NOT_LIKE)
 		{
-			if(strstr(trigger->description,condition->value) == NULL)
+			if(strstr(tmp_str, condition->value) == NULL)
 			{
 				ret = SUCCEED;
 			}
