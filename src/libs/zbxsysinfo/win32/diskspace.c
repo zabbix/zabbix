@@ -42,14 +42,14 @@ int	VFS_FS_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		return SYSINFO_RET_FAIL;
 	}
 
-	if(get_param(param, 2, mode, 20) != 0)
+	if(get_param(param, 2, mode, sizeof(mode)) != 0)
 	{
 		mode[0] = '\0';
 	}
 	if(mode[0] == '\0')
 	{
 		/* default parameter */
-		sprintf(mode, "total");
+		zbx_snprintf(mode, sizeof(mode), "total");
 	}
 
 	if (!GetDiskFreeSpaceEx(path, &freeBytes, &totalBytes, NULL))
