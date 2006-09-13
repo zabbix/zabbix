@@ -75,6 +75,13 @@
 			$autologout	= $user["autologout"];
 			$lang		= $user["lang"];
 			$refresh	= $user["refresh"];
+			$user_groups	= array();
+
+			$db_user_groups = DBselect('select g.* from usrgrp g, users_groups ug where ug.usrgrpid=g.usrgrpid and ug.userid='.$userid);
+			while($db_group = DBfetch($db_user_groups))
+			{
+				$user_groups[$db_group['usrgrpid']] = $db_group['name'];
+			}
 		}
 		else
 		{
@@ -86,6 +93,7 @@
 			$autologout	= get_request("autologout","900");
 			$lang		= get_request("lang","en_gb");
 			$refresh	= get_request("refresh","30");
+			$user_groups	= get_request("user_groups",array());
 		}
 
 		$frmUser = new CFormTable($frm_title);
@@ -108,6 +116,11 @@
 
 		$frmUser->AddRow(S_PASSWORD,	new CPassBox("password1",$password,20));
 		$frmUser->AddRow(S_PASSWORD_ONCE_AGAIN,	new CPassBox("password2",$password,20));
+
+		foreach($user_groups as $groupid => $group_name)
+		{
+			$frmUser->AddRow(S_GROUPS,	$group_name);
+		}
 
 		$cmbLang = new CcomboBox('lang',$lang);
 		$cmbLang->AddItem("en_gb",S_ENGLISH_GB);
