@@ -499,16 +499,20 @@ static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigge
 	}
 	else if(condition->conditiontype == CONDITION_TYPE_TRIGGER_NAME)
 	{
+		sprintf(sql,"%s",trigger->description); /* NOTE: 'sql' variable used as temporally veriable */
+		
+		substitute_simple_macros(trigger, NULL, sql, sizeof(sql), MACRO_TYPE_TRIGGER_DESCRIPTION);
+		
 		if(condition->operator == CONDITION_OPERATOR_LIKE)
 		{
-			if(strstr(trigger->description,condition->value) != NULL)
+			if(strstr(sql, condition->value) != NULL)
 			{
 				ret = SUCCEED;
 			}
 		}
 		else if(condition->operator == CONDITION_OPERATOR_NOT_LIKE)
 		{
-			if(strstr(trigger->description,condition->value) == NULL)
+			if(strstr(sql, condition->value) == NULL)
 			{
 				ret = SUCCEED;
 			}

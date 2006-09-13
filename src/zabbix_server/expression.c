@@ -23,6 +23,7 @@
 #include <string.h>
 #include <math.h>
 
+#include "expression.h"
 #include "functions.h"
 #include "evalfunc.h"
 #include "common.h"
@@ -546,7 +547,7 @@ int	evaluate(int *result,char *exp, char *error, int maxerrlen)
  * Purpose: substitute simple macros in data string with real values          *
  *                                                                            *
  * Parameters: trigger - trigger structure                                    *
- *             action - action structure                                      *
+ *             action - action structure (NULL if uncnown)                    *
  *             data - data string                                             *
  *             dala_max_len - max length of data string,include '\0'          *
  *                                                                            *
@@ -571,11 +572,7 @@ int	evaluate(int *result,char *exp, char *error, int maxerrlen)
 
 #define STR_UNKNOWN_VARIAVLE		"*UNKNOWN*"
 
-#define MACRO_TYPE_TRIGGER_DESCRIPTION	1
-#define MACRO_TYPE_MESSAGE_SUBJECT	2
-#define MACRO_TYPE_MESSAGE_BODY		4
-
-static  void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data, int dala_max_len, int macro_type)
+void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data, int dala_max_len, int macro_type)
 {
 	char	sql[MAX_STRING_LEN];
 
