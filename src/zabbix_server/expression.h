@@ -26,9 +26,15 @@
 
 int	cmp_double(double a,double b);
 int	find_char(char *str,char c);
-int	substitute_functions(char *exp);
+int	evaluate_expression(int *result,char *expression, char *error, int maxerrlen);
 void	substitute_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data, int dala_max_len);
 int     evaluate_expression (int *result,char *expression,char *error,int maxerrlen);
 void	delete_reol(char *c);
 
+#define MACRO_TYPE_TRIGGER_DESCRIPTION	1
+#define MACRO_TYPE_MESSAGE_SUBJECT	2
+#define MACRO_TYPE_MESSAGE_BODY		4
+
+void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data, int dala_max_len, int macro_type);
+	
 #endif
