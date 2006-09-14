@@ -229,7 +229,7 @@
 		$element = DBfetch($elements);
 		if(!$element)	return FALSE;
 
-		if(get_info_by_selementid($element["selementid"],$info,$color) == 0)
+		if(get_info_by_selementid($element["selementid"],$info,$color) != 0)
 			$icon = $element["icon_on"];
 		else
 			$icon = $element["icon"];
