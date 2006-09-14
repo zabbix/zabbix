@@ -35,6 +35,33 @@
 ?>
 
 <?php
+
+	if(isset($_REQUEST["test"]))
+	{
+/*		if(DBexecute('insert into service_alarms (serviceid,clock,value) values (55,'.strtotime('-4 month').',0)'))
+			SDI('OK');
+		else
+			SDI('NO');
+*/
+		$tmp_arr = array(
+			array(10, "1"),
+			array(9,  "2"),
+			array(8,  "3"),
+			array(7,  "4"),
+			array(6,  "5"),
+			array(5,  "6"),
+			array(4,  "7"),
+			array(3,  "8"),
+			array(2,  "9"),
+			array(1,  "10"),
+			);
+		SDI("source");
+		print_r($tmp_arr);
+		SDI("sorted");
+		array_multisort($tmp_arr);
+		print_r($tmp_arr);
+	}
+
 	if(!isset($_REQUEST["serviceid"]))
 	{
 		show_table_header("<font color=\"AA0000\">Undefined serviceid !</font>");
@@ -81,7 +108,7 @@
 	$table = new CTableInfo();
 	if($_REQUEST["period"]=="yearly")
 	{
-		$table->setHeader(array(S_YEAR,S_OK,S_PROBLEMS,S_PERCENTAGE,S_SLA));
+		$table->setHeader(array(S_YEAR,S_OK,S_PROBLEMS,S_DOWNTIME,S_PERCENTAGE,S_SLA));
 		for($year=date("Y")-5;$year<=date("Y");$year++)
 		{
 			$start=mktime(0,0,0,1,1,$year);
@@ -96,6 +123,7 @@
 			$ok=new CSpan($f_time,"off");
 			$problems=new CSpan($t_time,"on");
 			$percentage=new CSpan($f,"off");
+			$downtime	= sprintf("%dd %dh %dm",$stat["downtime_time"]/(24*3600),($stat["downtime_time"]%(24*3600))/3600,($stat["downtime_time"]%(3600))/(60));
 
 			if($service["showsla"]==1)
 			{
@@ -116,6 +144,7 @@
 				$year,
 				$ok,
 				$problems,
+				$downtime,
 				$percentage,
 				$sla
 				));
@@ -123,7 +152,7 @@
 	}
 	else if($_REQUEST["period"]=="monthly")
 	{
-		$table->setHeader(array(S_MONTH,S_OK,S_PROBLEMS,S_PERCENTAGE,S_SLA));
+		$table->setHeader(array(S_MONTH,S_OK,S_PROBLEMS,S_DOWNTIME,S_PERCENTAGE,S_SLA));
 		for($month=1;$month<=12;$month++)
 		{
 			$start=mktime(0,0,0,$month,1,$_REQUEST["year"]);
@@ -141,6 +170,7 @@
 			$ok=new CSpan($f_time,"off");
 			$problems=new CSpan($t_time,"on");
 			$percentage=new CSpan($f,"off");
+			$downtime	= sprintf("%dd %dh %dm",$stat["downtime_time"]/(24*3600),($stat["downtime_time"]%(24*3600))/3600,($stat["downtime_time"]%(3600))/(60));
 
 			if($service["showsla"]==1)
 			{
@@ -161,6 +191,7 @@
 				date("M Y",$start),
 				$ok,
 				$problems,
+				$downtime,
 				$percentage,
 				$sla
 				));
@@ -168,7 +199,7 @@
 	}
 	else if($_REQUEST["period"]=="daily")
 	{
-		$table->setHeader(array(S_DAY,S_OK,S_PROBLEMS,S_PERCENTAGE,S_SLA));
+		$table->setHeader(array(S_DAY,S_OK,S_PROBLEMS,S_DOWNTIME,S_PERCENTAGE,S_SLA));
 		$s=mktime(0,0,0,1,1,$_REQUEST["year"]);
 		$e=mktime(0,0,0,1,1,$_REQUEST["year"]+1);
 		for($day=$s;$day<$e;$day+=24*3600)
@@ -188,6 +219,7 @@
 			$ok=new CSpan($f_time,"off");
 			$problems=new CSpan($t_time,"on");
 			$percentage=new CSpan($f,"off");
+			$downtime	= sprintf("%dd %dh %dm",$stat["downtime_time"]/(24*3600),($stat["downtime_time"]%(24*3600))/3600,($stat["downtime_time"]%(3600))/(60));
 
 			if($service["showsla"]==1)
 			{
@@ -208,6 +240,7 @@
 				date("d M Y",$start),
 				$ok,
 				$problems,
+				$downtime,
 				$percentage,
 				$sla
 				));
@@ -216,7 +249,7 @@
 	else
 	{
 	//--------Weekly-------------
-	$table->setHeader(array(S_FROM,S_TILL,S_OK,S_PROBLEMS,S_PERCENTAGE,S_SLA));
+	$table->setHeader(array(S_FROM,S_TILL,S_OK,S_PROBLEMS,S_DOWNTIME,S_PERCENTAGE,S_SLA));
 	$year=date("Y");
 	for($year=date("Y")-2;$year<=date("Y");$year++)
 	{
@@ -248,9 +281,10 @@
 			$f=sprintf("%2.2f%%",$stat["ok"]);
 			$f_time=sprintf("%dd %dh %dm",$stat["ok_time"]/(24*3600),($stat["ok_time"]%(24*3600))/3600,($stat["ok_time"]%(3600))/(60));
 
-			$ok=new CSpan($f_time,"off");
-			$problems=new CSpan($t_time,"on");
-			$percentage=new CSpan($f,"off");
+			$ok		= new CSpan($f_time,"off");
+			$problems	= new CSpan($t_time,"on");
+			$percentage	= new CSpan($f,"off");
+			$downtime	= sprintf("%dd %dh %dm",$stat["downtime_time"]/(24*3600),($stat["downtime_time"]%(24*3600))/3600,($stat["downtime_time"]%(3600))/(60));
 
 			if($service["showsla"]==1)
 			{
@@ -273,6 +307,7 @@
 				$till,
 				$ok,
 				$problems,
+				$downtime,
 				$percentage,
 				$sla
 				));

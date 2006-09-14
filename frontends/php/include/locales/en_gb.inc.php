@@ -828,6 +828,21 @@
 	"S_DELETE_SELECTED_LINKS"=>		"Delete selected links?",
 	"S_SERVICES_DELETED"=>			"Services deleted",
 	"S_CANNOT_DELETE_SERVICES"=>		"Cannot delete services",
+	"S_UPTIME"=>				"Uptime",
+	"S_DOWNTIME"=>				"Downtime",
+	"S_ONE_TIME_DOWNTIME"=>			"One-time downtime",
+	"S_NO_TIMES_DEFINED"=>			"No times defined",
+	"S_SERVICE_TIMES"=>			"Service times",
+	"S_NEW_SERVICE_TIME"=>			"New service time",
+	"S_NOTE"=>				"Note",
+
+	"S_SUNDAY"=>				"Sunday",
+	"S_MONDAY"=>				"Monday",
+	"S_TUESDAY"=>				"Tuesday",
+	"S_WEDNESDAY"=>				"Wednesday",
+	"S_THURSDAY"=>				"Thursday",
+	"S_FRIDAY"=>				"Friday",
+	"S_SATURDAY"=>				"Saturday",
 
 //	srv_status.php
 	"S_IT_SERVICES_BIG"=>			"IT SERVICES",

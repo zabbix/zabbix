@@ -292,6 +292,7 @@
 		$delta		= get_request("delta"		,0);
 		$trends		= get_request("trends"		,365);
 		$applications	= get_request("applications"	,array());
+		$delay_flex	= get_request("delay_flex"	,array());
 
 		$snmpv3_securityname	= get_request("snmpv3_securityname"	,"");
 		$snmpv3_securitylevel	= get_request("snmpv3_securitylevel"	,0);
@@ -339,6 +340,7 @@
 			$hostid		= $row["hostid"];
 			$delta		= $row["delta"];
 			$trends		= $row["trends"];
+			$db_delay_flex	= $row["delay_flex"];
 
 			$snmpv3_securityname	= $row["snmpv3_securityname"];
 			$snmpv3_securitylevel	= $row["snmpv3_securitylevel"];
@@ -354,8 +356,48 @@
 				if(in_array($db_app["applicationid"],$applications))	continue;
 				array_push($applications,$db_app["applicationid"]);
 			}
-			
+
+			if(isset($db_delay_flex))
+			{
+				$arr_of_dellays = explode(";",$db_delay_flex);
+				foreach($arr_of_dellays as $one_db_delay)
+				{
+					@list($one_delay,$one_time_period) = explode("/",$one_db_delay);
+					if(!isset($one_delay) || !isset($one_time_period)) continue;
+
+					array_push($delay_flex,array("delay"=>$one_delay,"period"=>$one_time_period));
+				}
+			}
 		}
+
+		$delay_flex_el = array();
+		$i = 0;
+		foreach($delay_flex as $val)
+		{
+			if(!isset($val["delay"]) && !isset($val["period"])) continue;
+
+			array_push($delay_flex_el,
+				array(
+					new CCheckBox("rem_delay_flex[]", 'no', NULL,$i),
+						$val["delay"],
+						" sec at ",
+						$val["period"]
+				),
+				BR);
+			$frmItem->AddVar("delay_flex[".$i."][delay]", $val['delay']);
+			$frmItem->AddVar("delay_flex[".$i."][period]", $val['period']);
+			$i++;
+			if($i >= 7) break; /* limit count of  intervals
+			                    * 7 intervals by 30 symbols = 210 characters
+			                    * db storage field is 256
+			                    */
+		}
+
+		if(count($delay_flex_el)==0)
+			array_push($delay_flex_el, "No flexible intervals");
+		else
+			array_push($delay_flex_el, new CButton('del_delay_flex','delete selected'));
+
 		if(count($applications)==0)  array_push($applications,0);
 
 		if(isset($_REQUEST["itemid"])) {
@@ -467,10 +509,20 @@
 		if($type != ITEM_TYPE_TRAPPER)
 		{
 			$frmItem->AddRow(S_UPDATE_INTERVAL_IN_SEC, new CTextBox("delay",$delay,5));
+			$frmItem->AddRow("Flexible intervals (sec)", $delay_flex_el);
+			$frmItem->AddRow("New flexible interval", 
+				array(
+					S_DELAY, SPACE,
+					new CTextBox("new_delay_flex[delay]","50",5), 
+					S_PERIOD, SPACE,
+					new CTextBox("new_delay_flex[period]","1-7,00:00-23:59",27), BR,
+					new CButton("add_delay_flex",S_ADD)
+				));
 		}
 		else
 		{
 			$frmItem->AddVar("delay",$delay);
+			$frmItem->AddVar("delay_flex[]","");
 		}
 
 		$frmItem->AddRow(S_KEEP_HISTORY_IN_DAYS, array(

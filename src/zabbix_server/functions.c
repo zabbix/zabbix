@@ -642,7 +642,7 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	update_item(DB_ITEM *item, AGENT_RESULT *value, int now)
+static int	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 {
 	char	value_esc[MAX_STRING_LEN];
 	char	value_str[MAX_STRING_LEN];
@@ -684,7 +684,7 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, int now)
 		{
 			DBescape_string(value_str,value_esc,MAX_STRING_LEN);
 /*			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='%s',lastclock=%d where itemid=%d",now+item->delay,value_esc,now,item->itemid);*/
-			DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='%s',lastclock=%d where itemid=%d",calculate_item_nextcheck(item->itemid, item->delay,now),value_esc,(int)now,item->itemid);
+			DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='%s',lastclock=%d where itemid=%d",calculate_item_nextcheck(item->itemid, item->delay, item->delay_flex, now),value_esc,(int)now,item->itemid);
 
 			item->prevvalue=item->lastvalue;
 			item->lastvalue=value_double;
@@ -697,7 +697,7 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, int now)
 		else
 		{
 /*			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,lastclock=%d where itemid=%d",now+item->delay,now,item->itemid);*/
-			DBexecute("update items set nextcheck=%d,lastclock=%d where itemid=%d",calculate_item_nextcheck(item->itemid, item->delay,now),(int)now,item->itemid);
+			DBexecute("update items set nextcheck=%d,lastclock=%d where itemid=%d",calculate_item_nextcheck(item->itemid, item->delay, item->delay_flex, now),(int)now,item->itemid);
 		}
 	}
 	/* Logic for delta as speed of change */
@@ -706,12 +706,12 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, int now)
 		if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value_double) )
 		{
 /*			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue=%f,lastvalue='%f',lastclock=%d where itemid=%d",now+item->delay,value_double,(value_double - item->prevorgvalue)/(now-item->lastclock),now,item->itemid);*/
-			DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue=%f,lastvalue='%f',lastclock=%d where itemid=%d",calculate_item_nextcheck(item->itemid, item->delay,now),value_double,(value_double - item->prevorgvalue)/(now-item->lastclock),(int)now,item->itemid);
+			DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue=%f,lastvalue='%f',lastclock=%d where itemid=%d",calculate_item_nextcheck(item->itemid, item->delay,item->delay_flex,now),value_double,(value_double - item->prevorgvalue)/(now-item->lastclock),(int)now,item->itemid);
 		}
 		else
 		{
 /*			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevorgvalue=%f,lastclock=%d where itemid=%d",now+item->delay,value_double,now,item->itemid);*/
-			DBexecute("update items set nextcheck=%d,prevorgvalue=%f,lastclock=%d where itemid=%d",calculate_item_nextcheck(item->itemid, item->delay,now),value_double,(int)now,item->itemid);
+			DBexecute("update items set nextcheck=%d,prevorgvalue=%f,lastclock=%d where itemid=%d",calculate_item_nextcheck(item->itemid, item->delay,item->delay_flex,now),value_double,(int)now,item->itemid);
 		}
 
 		item->prevvalue=item->lastvalue;
@@ -727,11 +727,11 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, int now)
 	{
 		if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value_double) )
 		{
-			DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue=%f,lastvalue='%f',lastclock=%d where itemid=%d",calculate_item_nextcheck(item->itemid, item->delay,now),value_double,(value_double - item->prevorgvalue),(int)now,item->itemid);
+			DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue=%f,lastvalue='%f',lastclock=%d where itemid=%d",calculate_item_nextcheck(item->itemid, item->delay,item->delay_flex,now),value_double,(value_double - item->prevorgvalue),(int)now,item->itemid);
 		}
 		else
 		{
-			DBexecute("update items set nextcheck=%d,prevorgvalue=%f,lastclock=%d where itemid=%d",calculate_item_nextcheck(item->itemid, item->delay,now),value_double,(int)now,item->itemid);
+			DBexecute("update items set nextcheck=%d,prevorgvalue=%f,lastclock=%d where itemid=%d",calculate_item_nextcheck(item->itemid, item->delay,item->delay_flex, now),value_double,(int)now,item->itemid);
 		}
 
 		item->prevvalue=item->lastvalue;

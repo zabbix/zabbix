@@ -84,6 +84,7 @@ CREATE TABLE items (
 	logtimefmt		varchar(64)	DEFAULT '' NOT NULL,
 	templateid		int4		DEFAULT '0' NOT NULL,
 	valuemapid		int4		 DEFAULT '0' NOT NULL,
+	delay_flex		varchar(255)	DEFAULT "" NOT NULL,
 	PRIMARY KEY (itemid)
 	--  FOREIGN KEY (hostid) REFERENCES hosts
 );
@@ -519,6 +520,22 @@ CREATE TABLE services (
   sortorder		int4		DEFAULT '0' NOT NULL,
   PRIMARY KEY (serviceid)
 );
+
+--
+-- Table structure for table 'services_times'
+--
+
+CREATE TABLE services_times (
+	timeid		serial,
+	serviceid	int4		DEFAULT '0' NOT NULL,
+	type		int2		DEFAULT '0' NOT NULL,
+	ts_from		int4		DEFAULT '0' NOT NULL,
+	ts_to		int4		DEFAULT '0' NOT NULL,
+	note		varchar(255)	DEFAULT '' NOT NULL,
+	PRIMARY KEY (timeid)
+) type=InnoDB;
+
+CREATE UNIQUE INDEX services_times_uniq on services_times (serviceid,type,ts_from,ts_to);
 
 --
 -- Table structure for table 'services_links'
