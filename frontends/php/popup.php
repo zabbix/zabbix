@@ -115,7 +115,7 @@
 			$sql .= ",hosts_groups hg where mod(h.hostid,100)=$ZBX_CURNODEID and h.hostid=hg.hostid and hg.groupid=$groupid";
 		else
 		{
-			$sql .= "where mod(h.hostid,100)=$ZBX_CURNODEID";
+			$sql .= " where mod(h.hostid,100)=$ZBX_CURNODEID";
 			$cmbHosts->AddItem(0,S_ALL_SMALL);
 		}
 
@@ -161,7 +161,7 @@
 		if(isset($groupid))
 			$sql .= ",hosts_groups hg where mod(h.hostid,100)=$ZBX_CURNODEID and h.hostid=hg.hostid and hg.groupid=$groupid";
 		else
-			$sql .= "where mod(h.hostid,100)=$ZBX_CURNODEID";
+			$sql .= " where mod(h.hostid,100)=$ZBX_CURNODEID";
 
 		$db_hosts = DBselect($sql);
 		while($host = DBfetch($db_hosts))
@@ -365,8 +365,9 @@ function add_variable(formname,value)
 		else
 		{
 			$sql = "select h.host,i.* from items i,hosts h".
-				" where i.value_type=".ITEM_VALUE_TYPE_LOG." and h.hostid=i.hostid order by i.description, i.key_".
+				" where i.value_type=".ITEM_VALUE_TYPE_LOG." and h.hostid=i.hostid".
 				" and mod(i.itemid,100)=".$ZBX_CURNODEID.
+				" order by i.description, i.key_";
 		}
 
 		$db_items = DBselect($sql);

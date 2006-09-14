@@ -55,6 +55,9 @@
 		"description"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,'isset({save})'),
 		"key"=>		array(T_ZBX_STR, O_OPT,  NULL,  NOT_EMPTY,'isset({save})'),
 		"delay"=>	array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,86400),'isset({save})&&{type}!=2'),
+		"new_delay_flex"=>	array(T_ZBX_STR, O_OPT,  NOT_EMPTY,  "",'isset({add_delay_flex})&&{type}!=2'),
+		"rem_delay_flex"=>	array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,86400),NULL),
+		"delay_flex"=>	array(T_ZBX_STR, O_OPT,  NULL,  "",NULL),
 		"history"=>	array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,65535),'isset({save})'),
 		"status"=>	array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,65535),'isset({save})'),
 		"type"=>	array(T_ZBX_INT, O_OPT,  NULL,  IN("0,1,2,3,4,5,6,7,8"),'isset({save})'),
@@ -85,6 +88,8 @@
 		"applications"=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID, NULL),
 
 		"del_history"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"add_delay_flex"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"del_delay_flex"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 
 		"register"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"group_task"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -108,7 +113,19 @@
 
 <?php
 	$result = 0;
-	if(isset($_REQUEST["delete"])&&isset($_REQUEST["itemid"]))
+	if(isset($_REQUEST['del_delay_flex']) && isset($_REQUEST['rem_delay_flex']))
+	{
+		$_REQUEST['delay_flex'] = get_request('delay_flex',array());
+		foreach($_REQUEST['rem_delay_flex'] as $val){
+			unset($_REQUEST['delay_flex'][$val]);
+		}
+	}
+	else if(isset($_REQUEST["add_delay_flex"])&&isset($_REQUEST["new_delay_flex"]))
+	{
+		$_REQUEST['delay_flex'] = get_request("delay_flex", array());
+		array_push($_REQUEST['delay_flex'],$_REQUEST["new_delay_flex"]);
+	}
+	else if(isset($_REQUEST["delete"])&&isset($_REQUEST["itemid"]))
 	{
 		$result = delete_item($_REQUEST["itemid"]);
 		show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
@@ -120,6 +137,12 @@
 	else if(isset($_REQUEST["save"]))
 	{
 		$applications = get_request("applications",array());
+		$delay_flex = get_request('delay_flex',array());
+		$db_delay_flex = "";
+		foreach($delay_flex as $val)
+			$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
+		$db_delay_flex = trim($db_delay_flex,";");
+
 		if(isset($_REQUEST["itemid"]))
 		{
 			$result=update_item($_REQUEST["itemid"],
@@ -130,7 +153,7 @@
 				$_REQUEST["multiplier"],$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],
 				$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],
 				$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],
-				$_REQUEST["logtimefmt"],$_REQUEST["valuemapid"],$applications);
+				$_REQUEST["logtimefmt"],$_REQUEST["valuemapid"],$db_delay_flex,$applications);
 
 			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 		}
@@ -144,7 +167,7 @@
 				$_REQUEST["multiplier"],$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],
 				$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],
 				$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],
-				$_REQUEST["logtimefmt"],$_REQUEST["valuemapid"],$applications);
+				$_REQUEST["logtimefmt"],$_REQUEST["valuemapid"],$db_delay_flex,$applications);
 
 			$result = $itemid;
 			show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
@@ -211,6 +234,11 @@
 			if($_REQUEST["action"]=="add to group")
 			{
 				$applications = get_request("applications",array());
+				$delay_flex = get_request('delay_flex',array());
+				$db_delay_flex = "";
+				foreach($delay_flex as $val)
+					$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
+				$db_delay_flex = trim($db_delay_flex,";");
 				$itemid=add_item_to_group(
 					$_REQUEST["add_groupid"],$_REQUEST["description"],$_REQUEST["key"],
 					$_REQUEST["hostid"],$_REQUEST["delay"],$_REQUEST["history"],
@@ -221,7 +249,7 @@
 					$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],
 					$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],
 					$_REQUEST["trends"],$_REQUEST["logtimefmt"],$_REQUEST["valuemapid"],
-					$applications);
+					$db_delay_flex, $applications);
 				show_messages($itemid, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 				if($itemid){
 					unset($_REQUEST["form"]);
@@ -232,6 +260,11 @@
 			if($_REQUEST["action"]=="update in group")
 			{
 				$applications = get_request("applications",array());
+				$delay_flex = get_request('delay_flex',array());
+				$db_delay_flex = "";
+				foreach($delay_flex as $val)
+					$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
+				$db_delay_flex = trim($db_delay_flex,";");
 				$result=update_item_in_group($_REQUEST["add_groupid"],
 					$_REQUEST["itemid"],$_REQUEST["description"],$_REQUEST["key"],
 					$_REQUEST["hostid"],$_REQUEST["delay"],$_REQUEST["history"],
@@ -242,7 +275,7 @@
 					$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],
 					$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],
 					$_REQUEST["trends"],$_REQUEST["logtimefmt"],$_REQUEST["valuemapid"],
-					$applications);
+					$db_delay_flex, $applications);
 				show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 				if($result){
 					unset($_REQUEST["form"]);
