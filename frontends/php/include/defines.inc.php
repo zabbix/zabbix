@@ -214,6 +214,10 @@
 	define("CALC_FNC_ALL", 7);
 
 	
+	define("SERVICE_TIME_TYPE_UPTIME", 0);
+	define("SERVICE_TIME_TYPE_DOWNTIME", 1);
+	define("SERVICE_TIME_TYPE_ONETIME_DOWNTIME", 2);
+
 /* Support for PHP5. PHP5 does not have $HTTP_..._VARS */
 	if (!function_exists('version_compare'))
 	{
