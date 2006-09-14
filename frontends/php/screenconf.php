@@ -80,7 +80,8 @@
 		$table = new CTableInfo(S_NO_SCREENS_DEFINED);
 		$table->setHeader(array(S_ID,S_NAME,S_DIMENSION_COLS_ROWS,S_SCREEN));
 
-		$result=DBselect("select screenid,name,hsize,vsize from screens order by name");
+		$result=DBselect("select screenid,name,hsize,vsize from screens where mod(screenid,100)=$ZBX_CURNODEID".
+				" order by name");
 		while($row=DBfetch($result))
 		{
 			if(!check_right("Screen","R",$row["screenid"]))		continue;

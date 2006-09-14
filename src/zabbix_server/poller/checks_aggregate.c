@@ -110,7 +110,7 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
 	DBescape_string(hostgroup,hostgroup_esc,MAX_STRING_LEN);
 /* Get list of affected item IDs */
 	strscpy(items,"0");
-	result = DBselect("select itemid from items,hosts_groups,hosts,groups where hosts_groups.groupid=groups.groupid and items.hostid=hosts.hostid and hosts_groups.hostid=hosts.hostid and groups.name='%s' and items.key_='%s' and items.status=%d and hosts.status=%d",hostgroup_esc, itemkey_esc, ITEM_STATUS_ACTIVE, HOST_STATUS_MONITORED);
+	result = DBselect("select itemid from items i,hosts_groups hg,hosts h,groups g where hosts_groups.groupid=groups.groupid and items.hostid=hosts.hostid and hosts_groups.hostid=hosts.hostid and groups.name='%s' and items.key_='%s' and items.status=%d and hosts.status=%d and" ZBX_COND_NODEID,hostgroup_esc, itemkey_esc, ITEM_STATUS_ACTIVE, HOST_STATUS_MONITORED, LOCAL_NODE("h.hostid"));
 
 	while((row=DBfetch(result)))
 	{

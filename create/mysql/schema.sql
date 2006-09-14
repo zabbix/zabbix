@@ -17,6 +17,55 @@
 -- Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 --
 
+--
+-- Table structure for table 'nodes'
+--
+
+CREATE TABLE nodes (
+  nodeid		int(4)		NOT NULL auto_increment,
+  name			varchar(64)	DEFAULT '' NOT NULL,
+  timezone		int(4)		DEFAULT '0' NOT NULL,
+  ip			varchar(15)	DEFAULT '' NOT NULL,
+  port			int(4)		DEFAULT '0' NOT NULL,
+  slave_history		int(4)		DEFAULT '0' NOT NULL,
+  slave_trends		int(4)		DEFAULT '0' NOT NULL,
+  nodetype		int(4)		DEFAULT '0' NOT NULL,
+  masterid		int(4)		DEFAULT '0' NOT NULL,
+  PRIMARY KEY (nodeid)
+) type=InnoDB;
+
+--
+-- Table structure for table 'node_cksum'
+--
+
+CREATE TABLE node_cksum (
+  cksumid		int(4)		NOT NULL auto_increment,
+  nodeid		int(4)		DEFAULT '0' NOT NULL,
+  tablename		varchar(64)	DEFAULT '' NOT NULL,
+  fieldname		varchar(64)	DEFAULT '' NOT NULL,
+  recordid		int(4)		DEFAULT '0' NOT NULL,
+  cksumtype		int(4)		DEFAULT '0' NOT NULL,
+  cksum			char(32)	DEFAULT '' NOT NULL,
+  PRIMARY KEY (cksumid),
+  KEY (nodeid,tablename,fieldname,recordid,cksumtype)
+) type=InnoDB;
+
+--
+-- Table structure for table 'node_configlog'
+--
+
+CREATE TABLE node_configlog (
+  conflogid		int(4)		NOT NULL auto_increment,
+  nodeid		int(4)		DEFAULT '0' NOT NULL,
+  tablename		varchar(64)	DEFAULT '' NOT NULL,
+  recordid		int(4)		DEFAULT '0' NOT NULL,
+  operation		int(4)		DEFAULT '0' NOT NULL,
+  sync_master		int(4)		DEFAULT '0' NOT NULL,
+  sync_slave		int(4)		DEFAULT '0' NOT NULL,
+  PRIMARY KEY (nodeid,conflogid),
+  KEY (conflogid),
+  KEY (nodeid,tablename)
+) type=InnoDB;
 
 --
 -- Table structure for table 'services'
@@ -145,6 +194,7 @@ CREATE TABLE sysmaps (
 --
 
 CREATE TABLE config (
+  configid		int(4)		NOT NULL auto_increment,
 --  smtp_server		varchar(255)	DEFAULT '' NOT NULL,
 --  smtp_helo		varchar(255)	DEFAULT '' NOT NULL,
 --  smtp_email		varchar(255)	DEFAULT '' NOT NULL,
@@ -152,7 +202,8 @@ CREATE TABLE config (
   alert_history		int(4)		DEFAULT '0' NOT NULL,
   alarm_history		int(4)		DEFAULT '0' NOT NULL,
   refresh_unsupported	int(4)		DEFAULT '0' NOT NULL,
-  work_period		varchar(100)	DEFAULT '1-5,00:00-24:00' NOT NULL
+  work_period		varchar(100)	DEFAULT '1-5,00:00-24:00' NOT NULL,
+  PRIMARY KEY (configid)
 ) type=InnoDB;
 
 --
@@ -163,7 +214,8 @@ CREATE TABLE groups (
   groupid		int(4)		NOT NULL auto_increment,
   name			varchar(64)	DEFAULT '' NOT NULL,
   PRIMARY KEY (groupid),
-  UNIQUE (name)
+--  UNIQUE (name)
+  KEY (name)
 ) type=InnoDB;
 
 --
@@ -171,9 +223,12 @@ CREATE TABLE groups (
 --
 
 CREATE TABLE hosts_groups (
+  hostgroupid		int(4)		NOT NULL auto_increment,
   hostid		int(4)		DEFAULT '0' NOT NULL,
   groupid		int(4)		DEFAULT '0' NOT NULL,
-  PRIMARY KEY (hostid,groupid)
+  PRIMARY KEY (hostgroupid),
+--  UNIQUE (hostid,groupid)
+  KEY (hostid,groupid)
 ) type=InnoDB;
 
 --
@@ -328,7 +383,8 @@ CREATE TABLE hosts (
 	errors_from	int(4)		DEFAULT '0' NOT NULL,
 	templateid	int(4)		DEFAULT '0' NOT NULL,
 	PRIMARY KEY	(hostid),
-	UNIQUE		(host),
+--	UNIQUE		(host),
+	KEY		(host),
 	KEY		(status)
 ) type=InnoDB;
 
@@ -442,9 +498,11 @@ CREATE TABLE triggers (
 --
 
 CREATE TABLE trigger_depends (
+	triggerdepid	int(4) NOT NULL auto_increment,
 	triggerid_down	int(4) DEFAULT '0' NOT NULL,
 	triggerid_up	int(4) DEFAULT '0' NOT NULL,
-	PRIMARY KEY	(triggerid_down, triggerid_up),
+	PRIMARY KEY	(triggerdepid),
+	UNIQUE KEY	(triggerid_down, triggerid_up),
 --	KEY		(triggerid_down),
 	KEY		(triggerid_up)
 ) type=InnoDB;
@@ -464,7 +522,8 @@ CREATE TABLE users (
   lang			varchar(5)	DEFAULT 'en_gb' NOT NULL,
   refresh		int(4)		DEFAULT '30' NOT NULL,
   PRIMARY KEY (userid),
-  UNIQUE (alias)
+--  UNIQUE (alias)
+  KEY (alias)
 ) type=InnoDB;
 
 --
@@ -641,7 +700,8 @@ CREATE TABLE usrgrp (
   usrgrpid		int(4)		NOT NULL auto_increment,
   name			varchar(64)	DEFAULT '' NOT NULL,
   PRIMARY KEY (usrgrpid),
-  UNIQUE (name)
+--  UNIQUE (name)
+  KEY (name)
 ) type=InnoDB;
 
 --
@@ -649,9 +709,12 @@ CREATE TABLE usrgrp (
 --
 
 CREATE TABLE users_groups (
+  id			int(4) NOT NULL auto_increment,
   usrgrpid		int(4)		DEFAULT '0' NOT NULL,
   userid		int(4)		DEFAULT '0' NOT NULL,
-  PRIMARY KEY (usrgrpid,userid)
+  PRIMARY KEY (id),
+--  UNIQUE (usrgrpid,userid)
+  KEY (usrgrpid,userid)
 ) type=InnoDB;
 
 --
@@ -828,9 +891,11 @@ CREATE TABLE applications (
 --
 
 CREATE TABLE items_applications (
+	itemappid		int(4)		NOT NULL auto_increment,
 	applicationid           int(4)          DEFAULT '0' NOT NULL,
 	itemid                  int(4)          DEFAULT '0' NOT NULL,
-	PRIMARY KEY (applicationid,itemid)
+	PRIMARY KEY (itemappid),
+	UNIQUE (applicationid,itemid)
 ) type=InnoDB;
 
 --

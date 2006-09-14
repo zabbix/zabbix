@@ -23,14 +23,16 @@
 	{
 		if(is_null($triggerid)) $triggerid = 'NULL';
 
-		$sql="insert into services (name,status,triggerid,algorithm,showsla,goodsla,sortorder)".
-			" values (".zbx_dbstr($name).",0,$triggerid,".zbx_dbstr($algorithm).",$showsla,".zbx_dbstr($goodsla).",$sortorder)";
+		$serviceid=get_dbid("services","serviceid");
+
+		$sql="insert into services (serviceid,name,status,triggerid,algorithm,showsla,goodsla,sortorder)".
+			" values ($serviceid,".zbx_dbstr($name).",0,$triggerid,".zbx_dbstr($algorithm).",$showsla,".zbx_dbstr($goodsla).",$sortorder)";
 		$result=DBexecute($sql);
 		if(!$result)
 		{
 			return FALSE;
 		}
-		return DBinsert_id($result,"services","serviceid");
+		return $serviceid;
 	}
 
 	function	update_service($serviceid,$name,$triggerid,$algorithm,$showsla,$goodsla,$sortorder)
@@ -156,8 +158,15 @@
 			return	false;
 		}
 
-		$sql="insert into services_links (servicedownid,serviceupid,soft) values ($servicedownid,$serviceupid,$softlink)";
-		return	dbexecute($sql);
+		$linkid=get_dbid("services_links","linkid");
+
+		$sql="insert into services_links (linkid,servicedownid,serviceupid,soft) values ($linkid,$servicedownid,$serviceupid,$softlink)";
+		$result=DBexecute($sql);
+
+		if(!$result)
+			return $result;
+
+		return $linkid;
 	}
 	function	update_service_link($linkid,$servicedownid,$serviceupid,$softlink)
 	{

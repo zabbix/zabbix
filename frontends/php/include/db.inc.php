@@ -26,12 +26,15 @@
 //	$DB_TYPE	="POSTGRESQL";
 	$DB_TYPE	="MYSQL";
 	$DB_SERVER	="localhost";
-	$DB_DATABASE	="osmiy";
+	$DB_DATABASE	="node4";
 	$DB_USER	="root";
 	$DB_PASSWORD	="";
 // END OF DATABASE CONFIGURATION
 
 	global $USER_DETAILS;
+
+	$ZBX_CURNODEID = 4; // Selected node
+	$ZBX_LOCALNODEID = 4; // Local node
 
 	if($DB_TYPE == "MYSQL")
 	{

@@ -27,7 +27,11 @@
 			error("incorrect parameters for 'add_host_to_group'");
 			return FALSE;
 		}
-		return DBexecute("insert into hosts_groups (hostid,groupid) values ($hostid,$groupid)");
+		$hostgroupid=get_dbid("hosts_groups","hostgroupid");
+		$result=DBexecute("insert into hosts_groups (hostgroupid,hostid,groupid) values ($hostgroupid,$hostid,$groupid)");
+		if(!$result)
+			return $result;
+		return $hostgroupid;
 	}
 
 	function	db_save_group($name,$groupid=NULL)
@@ -49,7 +53,13 @@
 			return FALSE;
 		}
 		if($groupid==NULL)
-			return DBexecute("insert into groups (name) values (".zbx_dbstr($name).")");
+		{
+			$groupid=get_dbid("groups","groupid");
+			if(!DBexecute("insert into groups (name) values (".zbx_dbstr($name).")"))
+				return FALSE;
+			return $groupid;
+
+		}
 		else
 			return DBexecute("update groups set name=".zbx_dbstr($name)." where groupid=$groupid");
 	}
@@ -162,10 +172,12 @@
 
 		if($hostid==NULL)
 		{
+			$hostid = get_dbid("hosts","hostid");
 			$result = DBexecute("insert into hosts".
-				" (host,port,status,useip,ip,disable_until,available,templateid)".
-				" values (".zbx_dbstr($host).",$port,$status,$useip,".zbx_dbstr($ip).",0,"
+				" (hostid,host,port,status,useip,ip,disable_until,available,templateid)".
+				" values ($hostid,".zbx_dbstr($host).",$port,$status,$useip,".zbx_dbstr($ip).",0,"
 				.HOST_AVAILABLE_UNKNOWN.",$templateid)");
+			if($result) $result = $hostid;
 		}
 		else
 		{
@@ -597,8 +609,9 @@
 		
 		if($applicationid==NULL)
 		{
-			if($result = DBexecute("insert into applications (name,hostid,templateid)".
-				" values (".zbx_dbstr($name).",$hostid,$templateid)"))
+			$applicationid_new = get_dbid("applications","applicationid");
+			if($result = DBexecute("insert into applications (applicationid,name,hostid,templateid)".
+				" values ($applicationid_new,".zbx_dbstr($name).",$hostid,$templateid)"))
 					info("Added new application ".$host["host"].":$name");
 		}
 		else
@@ -613,7 +626,7 @@
 
 		if($applicationid==NULL)
 		{
-			$applicationid = DBinsert_id($result,"applications","applicationid");
+			$applicationid = $applicationid_new;
 
 			$db_childs = get_hosts_by_templateid($hostid);
 			while($db_child = DBfetch($db_childs))

@@ -29,6 +29,8 @@ extern	char	*CONFIG_DBPASSWORD;
 extern	char	*CONFIG_DBSOCKET;
 extern	char	*CONFIG_FPING_LOCATION;
 
+extern	int	CONFIG_NODEID;
+
 extern	void	signal_handler( int sig );
 
 void main_pinger_loop();

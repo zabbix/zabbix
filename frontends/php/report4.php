@@ -60,7 +60,7 @@
 #       $h2=S_GROUP.SPACE;
         $h2=S_YEAR.SPACE;
         $h2=$h2."<select class=\"biginput\" name=\"year\" onChange=\"submit()\">";
-        $result=DBselect("select h.hostid,h.host from hosts h,items i where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid group by h.hostid,h.host order by h.host");
+        $result=DBselect("select h.hostid,h.host from hosts h,items i where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and mod(h.hostid,100)=$ZBX_CURNODEID group by h.hostid,h.host order by h.host");
 
         $year=date("Y");
         for($year=date("Y")-2;$year<=date("Y");$year++)
@@ -79,7 +79,7 @@
         $h2=$h2.SPACE.S_MEDIA_TYPE.SPACE;
         $h2=$h2."<select class=\"biginput\" name=\"media_type\" onChange=\"submit()\">";
  //     $h2=$h2.form_select("media_type","0",S_ALL_SMALL);
-        $result=DBselect("select * from media_type order by description");
+        $result=DBselect("select * from media_type where mod(mediatypeid,100)=$ZBX_CURNODEID order by description");
         $type_count=0;
         while($row=DBfetch($result))
              {
@@ -118,6 +118,7 @@
                 $header=array(new CCol(S_YEAR,"center"));
                 $uindex=1;
                 $result=DBselect("select * from users".
+                        " where mod(userid,100)=".$ZBX_CURNODEID.
                         " order by alias");
                 while($row=DBfetch($result))
                 {
@@ -184,7 +185,7 @@
                 {
                 $header=array(new CCol(SPACE.S_MONTH,"center"));
                 $uindex=1;
-                $result=DBselect("select * from users order by alias");
+                $result=DBselect("select * from users where mod(userid,100)=$ZBX_CURNODEID order by alias");
                 while($row=DBfetch($result))
                 {
                         $header=array_merge($header,array(new CImg("vtext.php?text=".$row["alias"])));
@@ -249,7 +250,7 @@
         {
                 $header=array(new CCol(SPACE.S_DAY,"center"));
                 $uindex=1;
-                $result=DBselect("select * from users order by alias");
+                $result=DBselect("select * from users where mod(userid,100)=$ZBX_CURNODEID order by alias");
                 while($row=DBfetch($result))
                 {
                         $header=array_merge($header,array(new CImg("vtext.php?text=".$row["alias"])));
@@ -321,7 +322,7 @@
                 $year=date("Y");
                 $header=array(new CCol(SPACE.S_FROM,"center"),new CCol(SPACE.S_TILL,"center"));
                 $uindex=1;
-                $result=DBselect("select * from users order by alias");
+                $result=DBselect("select * from users where mod(userid,100)=$ZBX_CURNODEID order by alias");
                 while($row=DBfetch($result))
                 {
                         $header=array_merge($header,array(new CImg("vtext.php?text=".$row["alias"])));

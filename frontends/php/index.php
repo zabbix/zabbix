@@ -52,7 +52,8 @@
 		$password = md5(get_request("password",""));
 
 		$result=DBselect("select u.userid,u.alias,u.name,u.surname,u.url,u.refresh from users u where".
-			" u.alias=".zbx_dbstr($name)." and u.passwd=".zbx_dbstr($password));
+			" u.alias=".zbx_dbstr($name)." and u.passwd=".zbx_dbstr($password).
+			" and mod(u.userid,100)=".$ZBX_CURNODEID);
 
 		$row=DBfetch($result);
 		if($row)

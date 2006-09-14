@@ -395,6 +395,23 @@ document.writeln(snd_tag);
 		return	"$priorities,$md5sum";
 	}
 
+	function	get_dbid($table,$field)
+	{
+		global	$ZBX_CURNODEID;
+
+		$sql="select max($field) as id from $table where mod($field,100)=$ZBX_CURNODEID";
+		$result=DBselect($sql);
+		$row=DBfetch($result);
+		if($row && !is_null($row["id"]))
+		{
+			return	$row["id"]+100;
+		}
+		else
+		{
+			return	100+$ZBX_CURNODEID;
+		}
+	}
+
 	function	get_function_by_functionid($functionid)
 	{
 		$sql="select * from functions where functionid=$functionid"; 
@@ -1234,8 +1251,10 @@ COpt::profiling_start("page");
 				{
 					$lobimage = OCINewDescriptor($DB, OCI_D_LOB);
 
-					$sql = "insert into images (name,imagetype,image)".
-						" values (".zbx_dbstr($name).",".$imagetype.",EMPTY_BLOB())".
+					$imageid=get_dbid("images","imageid");
+
+					$sql = "insert into images (imageid,name,imagetype,image)".
+						" values ($imageid,".zbx_dbstr($name).",".$imagetype.",EMPTY_BLOB())".
 						" return image into :image";
 					$stid = OCIParse($DB, $sql);
 					if(!$stid)
@@ -1537,8 +1556,10 @@ COpt::profiling_start("page");
 		}
 		else
 		{
-			$sql="insert into media_type (type,description,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem) values ($type,".zbx_dbstr($description).",".zbx_dbstr($smtp_server).",".zbx_dbstr($smtp_helo).",".zbx_dbstr($smtp_email).",".zbx_dbstr($exec_path).",".zbx_dbstr($gsm_modem).")";
+			$mediatypeid=get_dbid("media_type","mediatypeid");
+			$sql="insert into media_type (mediatypeid,type,description,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem) values ($mediatypeid,$type,".zbx_dbstr($description).",".zbx_dbstr($smtp_server).",".zbx_dbstr($smtp_helo).",".zbx_dbstr($smtp_email).",".zbx_dbstr($exec_path).",".zbx_dbstr($gsm_modem).")";
 			$ret = DBexecute($sql);
+			if($ret)	$ret = $mediatypeid;
 		}
 		return $ret;
 	}
@@ -1559,8 +1580,11 @@ COpt::profiling_start("page");
 		{
 			$s=$s|pow(2,(int)$severity[$i]);
 		}
-		$sql="insert into media (userid,mediatypeid,sendto,active,severity,period) values ($userid,".zbx_dbstr($mediatypeid).",".zbx_dbstr($sendto).",$active,$s,".zbx_dbstr($period).")";
-		return	DBexecute($sql);
+		$mediaid=get_dbid("media","mediaid");
+		$sql="insert into media (mediaid,userid,mediatypeid,sendto,active,severity,period) values ($mediaid,$userid,".zbx_dbstr($mediatypeid).",".zbx_dbstr($sendto).",$active,$s,".zbx_dbstr($period).")";
+		$ret = DBexecute($sql);
+		if($ret)	$ret = $mediaid;
+		return	$ret;
 	}
 
 	# Update Media definition
@@ -2656,13 +2680,13 @@ COpt::profiling_stop("script");
 	function	add_valuemap($name, $mappings)
 	{
 		if(!is_array($mappings))	return FALSE;
+
+		$valuemapid = get_dbid("valuemaps","valuemapid");
 		
-		$result = DBexecute("insert into valuemaps (name) values (".zbx_dbstr($name).")");
+		$result = DBexecute("insert into valuemaps (valuemapid,name) values ($valuemapid,".zbx_dbstr($name).")");
 		if(!$result)
 			return $result;
 
-		$valuemapid =  DBinsert_id($result,"valuemaps","valuemapid");
-		
 		$result = add_mapping_to_valuemap($valuemapid, $mappings);
 		if(!$result){
 			delete_valuemap($valuemapid);

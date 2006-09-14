@@ -60,6 +60,8 @@
 #include "poller/checks_snmp.h"
 #include "timer/timer.h"
 #include "trapper/trapper.h"
+#include "nodewatcher/nodewatcher.h"
+#include "nodesender/nodesender.h"
 
 #define       LISTENQ 1024
 
@@ -123,6 +125,8 @@ char	*CONFIG_DBSOCKET		= NULL;
 int	CONFIG_DBPORT			= 3306;
 int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
 
+int	CONFIG_NODEID			= 0;
+
 /* From table config */
 int	CONFIG_REFRESH_UNSUPPORTED	= 0;
 
@@ -146,7 +150,7 @@ void	init_config(void)
 	static struct cfg_line cfg[]=
 	{
 /*		 PARAMETER	,VAR	,FUNC,	TYPE(0i,1s),MANDATORY,MIN,MAX	*/
-		{"StartPollers",&CONFIG_POLLER_FORKS,0,TYPE_INT,PARM_OPT,6,255},
+		{"StartPollers",&CONFIG_POLLER_FORKS,0,TYPE_INT,PARM_OPT,8,255},
 		{"HousekeepingFrequency",&CONFIG_HOUSEKEEPING_FREQUENCY,0,TYPE_INT,PARM_OPT,1,24},
 		{"SenderFrequency",&CONFIG_SENDER_FREQUENCY,0,TYPE_INT,PARM_OPT,5,3600},
 		{"PingerFrequency",&CONFIG_PINGER_FREQUENCY,0,TYPE_INT,PARM_OPT,1,3600},
@@ -171,6 +175,7 @@ void	init_config(void)
 		{"DBPassword",&CONFIG_DBPASSWORD,0,TYPE_STRING,PARM_OPT,0,0},
 		{"DBSocket",&CONFIG_DBSOCKET,0,TYPE_STRING,PARM_OPT,0,0},
 		{"DBPort",&CONFIG_DBPORT,0,TYPE_INT,PARM_OPT,1024,65535},
+		{"NodeID",&CONFIG_NODEID,0,TYPE_INT,PARM_OPT,0,65535},
 		{0}
 	};
 
@@ -445,7 +450,8 @@ int MAIN_ZABBIX_ENTRY(void)
 
 	DBconnect();
 
-	result = DBselect("select refresh_unsupported from config");
+	zabbix_log( LOG_LEVEL_WARNING, "Cond1 " ZBX_COND_NODEID, LOCAL_NODE("configid"));
+	result = DBselect("select refresh_unsupported from config where " ZBX_COND_NODEID, LOCAL_NODE("configid"));
 	row = DBfetch(result);
 
 	if(row && DBis_null(row[0]) != SUCCEED)
@@ -453,6 +459,7 @@ int MAIN_ZABBIX_ENTRY(void)
 		CONFIG_REFRESH_UNSUPPORTED = atoi(row[0]);
 	}
 	DBfree_result(result);
+	zabbix_log( LOG_LEVEL_WARNING, "OK");
 
 /* Need to set trigger status to UNKNOWN since last run */
 /* DBconnect() already made in init_config() */
@@ -541,6 +548,18 @@ int MAIN_ZABBIX_ENTRY(void)
 #endif
 
 		main_poller_loop(server_num);
+	}
+	else if(server_num == 5)
+	{
+/* Periodic checker of node configuration changes */
+		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Node watcher]",server_num);
+		main_nodewatcher_loop();
+	}
+	else if(server_num == 6)
+	{
+/* Node communications */
+		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Node sender]",server_num);
+		main_nodesender_loop();
 	}
 	else
 	{

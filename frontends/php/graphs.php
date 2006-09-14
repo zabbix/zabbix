@@ -202,7 +202,7 @@
 		$form->AddItem(S_GROUP.SPACE);
 		$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit()");
 		$cmbGroup->AddItem(0,S_ALL_SMALL);
-		$result=DBselect("select groupid,name from groups order by name");
+		$result=DBselect("select groupid,name from groups where mod(groupid,100)=$ZBX_CURNODEID order by name");
 		while($row=DBfetch($result))
 		{
 	// Check if at least one host with read permission exists for this group
@@ -237,6 +237,7 @@
 		{
 			$sql="select h.hostid,h.host from hosts h,items i where h.hostid=i.hostid".
 				" and h.status=".HOST_STATUS_MONITORED." group by h.hostid,h.host".
+				" and mod(h.hostid,100)=".$ZBX_CURNODEID.
 				" order by h.host";
 		}
 
@@ -276,7 +277,7 @@
 		}
 		else
 		{
-			$result=DBselect("select * from graphs g order by g.name");
+			$result=DBselect("select * from graphs g where mod(graphid,100)=$ZBX_CURNODEID order by g.name");
 		}
 		while($row=DBfetch($result))
 		{

@@ -251,7 +251,7 @@
 		$_REQUEST["groupid"] = get_request("groupid",0);
 		$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit();");
 		$cmbGroup->AddItem(0,S_ALL_SMALL);
-		$result=DBselect("select groupid,name from groups order by name");
+		$result=DBselect("select groupid,name from groups where mod(groupid,100)=$ZBX_CURNODEID order by name");
 		while($row=DBfetch($result))
 		{
 	// Check if at least one host with read permission exists for this group
@@ -277,6 +277,7 @@
 		else
 		{
 			$sql="select h.hostid,h.host from hosts h,items i where i.hostid=h.hostid and h.status<>".HOST_STATUS_DELETED.
+				" and mod(h.hostid,100)=$ZBX_CURNODEID".
 				" group by h.hostid,h.host order by h.host";
 		}
 
@@ -327,7 +328,8 @@
 
 		$sql = "select distinct h.hostid,h.host,t.*".
 			" from triggers t,hosts h,items i,functions f".
-			" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid";
+			" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid".
+			" and mod(h.hostid,100)=$ZBX_CURNODEID";
 
 		if($_REQUEST["hostid"] > 0) 
 			$sql .= " and h.hostid=".$_REQUEST["hostid"];
@@ -456,7 +458,7 @@
 	else
 	{
 /* FORM */
-		$result=DBselect("select count(*) as cnt from hosts");
+		$result=DBselect("select count(*) as cnt from hosts where mod(hostid,100)=$ZBX_CURNODEID");
 		$row=DBfetch($result);
 		if($row["cnt"]>0)
 		{
