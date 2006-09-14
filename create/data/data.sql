@@ -21,7 +21,7 @@
 -- Dumping data for table `config`
 --
 
-INSERT INTO config VALUES (365,365,600,'1-5,00:00-24:00');
+INSERT INTO config VALUES (1,365,365,600,'1-5,00:00-24:00');
 
 --
 -- Dumping data for table `media_type`
@@ -76,11 +76,11 @@ INSERT INTO groups VALUES (1,'Templates');
 -- Dumping data for table `hosts_groups`
 --
 
-INSERT INTO hosts_groups VALUES (10001,1);
-INSERT INTO hosts_groups VALUES (10002,1);
-INSERT INTO hosts_groups VALUES (10003,1);
-INSERT INTO hosts_groups VALUES (10004,1);
-INSERT INTO hosts_groups VALUES (10007,1);
+INSERT INTO hosts_groups VALUES (1,10001,1);
+INSERT INTO hosts_groups VALUES (2,10002,1);
+INSERT INTO hosts_groups VALUES (3,10003,1);
+INSERT INTO hosts_groups VALUES (4,10004,1);
+INSERT INTO hosts_groups VALUES (5,10007,1);
 
 --
 -- Dumping data for table `help_items`

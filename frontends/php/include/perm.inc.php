@@ -32,6 +32,7 @@ define("GROUP_RIGHT",		0);
 		global	$USER_RIGHTS;
 		global	$_COOKIE;
 		global	$_REQUEST;
+		global	$ZBX_CURNODEID;
 
 		$USER_DETAILS = NULL;
 		$USER_RIGHTS = array();
@@ -41,7 +42,8 @@ define("GROUP_RIGHT",		0);
 			$sessionid = $_COOKIE["sessionid"];
 			$USER_DETAILS = DBfetch(DBselect("select u.*,s.* from sessions s,users u".
 				" where s.sessionid=".zbx_dbstr($sessionid)." and s.userid=u.userid".
-				" and ((s.lastaccess+u.autologout>".time().") or (u.autologout=0))"));
+				" and ((s.lastaccess+u.autologout>".time().") or (u.autologout=0))".
+				" and mod(u.userid,100) = ".$ZBX_CURNODEID));
 
 			if(!$USER_DETAILS)
 			{
@@ -57,7 +59,7 @@ define("GROUP_RIGHT",		0);
 				exit;
 			}
 		} else {
-			$USER_DETAILS = DBfetch(DBselect("select u.* from users u where u.alias='guest'"));
+			$USER_DETAILS = DBfetch(DBselect("select u.* from users u where u.alias='guest' and mod(u.userid,100)=$ZBX_CURNODEID"));
 		}
 
 		if($USER_DETAILS)

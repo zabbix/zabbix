@@ -87,7 +87,8 @@
 
 				//  Determine which template, if any this host is linked to
 				$sqlResult=DBselect("select distinct(hostid) from hosts where status=". HOST_STATUS_TEMPLATE .
-					" and host=".zbx_dbstr($tmpHostTemplate));
+					" and host=".zbx_dbstr($tmpHostTemplate).
+					" and mod(hostid,100)=".$ZBX_CURNODEID;
 				$row=DBfetch($sqlResult);
 				if($row)
 				{
@@ -103,7 +104,8 @@
 				foreach(explode(',',rtrim(rtrim($tmpHostGroups," "),"\n")) as $group_name)
 				{
 					add_host_group($group_name);
-					$groupid = DBfetch(DBselect("select groupid from groups where name=".zbx_dbstr($group_name)));
+					$groupid = DBfetch(DBselect("select groupid from groups where name=".zbx_dbstr($group_name).
+					" and mod(groupid,100)=".$ZBX_CURNODEID;
 					if(!$groupid) continue;
 					array_push($groups,$groupid["groupid"]);
 				}

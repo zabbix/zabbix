@@ -78,7 +78,7 @@
 		$groupid = get_request("groupid",get_profile("web.popup.groupid",0));
 		$cmbGroups = new CComboBox("groupid",$groupid,"submit()");
 		$cmbGroups->AddItem(0,S_ALL_SMALL);
-		$db_groups = DBselect("select groupid,name from groups order by name");
+		$db_groups = DBselect("select groupid,name from groups where mod(groupid,100)=$ZBX_CURNODEID order by name");
 		while($group = DBfetch($db_groups))
 		{ // Check if at least one host with read permission exists for this group
 			$db_hosts = DBselect("select distinct h.hostid,h.host from hosts h,items i,hosts_groups hg".
@@ -112,9 +112,12 @@
 		
 		$sql = "select h.hostid,h.host from hosts h";
 		if(isset($groupid))
-			$sql .= ",hosts_groups hg where h.hostid=hg.hostid and hg.groupid=$groupid";
+			$sql .= ",hosts_groups hg where mod(h.hostid,100)=$ZBX_CURNODEID and h.hostid=hg.hostid and hg.groupid=$groupid";
 		else
+		{
+			$sql .= "where mod(h.hostid,100)=$ZBX_CURNODEID";
 			$cmbHosts->AddItem(0,S_ALL_SMALL);
+		}
 
 		$first_hostid = 0;
 		$db_hosts = DBselect($sql);
@@ -156,7 +159,9 @@
 
 		$sql = "select * from hosts h";
 		if(isset($groupid))
-			$sql .= ",hosts_groups hg where h.hostid=hg.hostid and hg.groupid=$groupid";
+			$sql .= ",hosts_groups hg where mod(h.hostid,100)=$ZBX_CURNODEID and h.hostid=hg.hostid and hg.groupid=$groupid";
+		else
+			$sql .= "where mod(h.hostid,100)=$ZBX_CURNODEID";
 
 		$db_hosts = DBselect($sql);
 		while($host = DBfetch($db_hosts))
@@ -203,7 +208,7 @@
 		$table = new CTableInfo(S_NO_ITEMS);
 		$table->SetHeader(array(S_KEY,S_DESCRIPTION));
 
-		$sql = "select * from help_items where itemtype=$itemtype order by key_";
+		$sql = "select * from help_items where mod(itemtypeid,100)=$ZBX_CURNODEID and itemtype=$itemtype order by key_";
 
 		$result = DBselect($sql);
 		while($row = DBfetch($result))
@@ -234,6 +239,7 @@
 		$sql = "select distinct h.host,t.*".
 			" from triggers t,hosts h,items i,functions f".
 			" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid";
+			" and mod(h.hostid,100)=".$ZBX_CURNODEID;
 
 		if(isset($hostid)) 
 			$sql .= " and h.hostid=$hostid";
@@ -261,7 +267,8 @@
 
 			//add dependences
 			$result1=DBselect("select t.triggerid,t.description from triggers t,trigger_depends d".
-				" where t.triggerid=d.triggerid_up and d.triggerid_down=".$row["triggerid"]);
+				" where t.triggerid=d.triggerid_up and d.triggerid_down=".$row["triggerid"].
+				" and mod(t.triggerid,100)=".$ZBX_CURNODEID);
 			if($row1=DBfetch($result1))
 			{
 				array_push($description,BR.BR."<strong>".S_DEPENDS_ON."</strong>".SPACE.BR);
@@ -352,12 +359,14 @@ function add_variable(formname,value)
 		{
 			$sql = "select i.* from items i where $hostid=i.hostid".
 				" and i.value_type=".ITEM_VALUE_TYPE_LOG.
+				" and mod(i.itemid,100)=".$ZBX_CURNODEID.
 				" order by i.description, i.key_";
 		}
 		else
 		{
 			$sql = "select h.host,i.* from items i,hosts h".
-				" where i.value_type=".ITEM_VALUE_TYPE_LOG." and h.hostid=i.hostid order by i.description, i.key_";
+				" where i.value_type=".ITEM_VALUE_TYPE_LOG." and h.hostid=i.hostid order by i.description, i.key_".
+				" and mod(i.itemid,100)=".$ZBX_CURNODEID.
 		}
 
 		$db_items = DBselect($sql);

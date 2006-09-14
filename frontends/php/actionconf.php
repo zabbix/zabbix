@@ -179,7 +179,8 @@
 /* GROUP ACTIONS */
 	elseif(isset($_REQUEST["group_enable"])&&isset($_REQUEST["g_actionid"]))
 	{
-		$result=DBselect("select distinct actionid from actions");
+		$result=DBselect("select distinct actionid from actions".
+				" where mod(actionid,100)=".$ZBX_CURNODEID);
 		while($row=DBfetch($result))
 		{
 			if(!in_array($row["actionid"], $_REQUEST["g_actionid"]))	continue;
@@ -190,7 +191,8 @@
 	}
 	elseif(isset($_REQUEST["group_disable"])&&isset($_REQUEST["g_actionid"]))
 	{
-		$result=DBselect("select distinct actionid from actions");
+		$result=DBselect("select distinct actionid from actions".
+				" where mod(actionid,100)=".$ZBX_CURNODEID);
 		while($row=DBfetch($result))
 		{
 			if(!in_array($row["actionid"], $_REQUEST["g_actionid"]))	continue;
@@ -201,7 +203,8 @@
 	}
 	elseif(isset($_REQUEST["group_delete"])&&isset($_REQUEST["g_actionid"]))
 	{
-		$result=DBselect("select distinct actionid from actions");
+		$result=DBselect("select distinct actionid from actions".
+				" where mod(actionid,100)=".$ZBX_CURNODEID);
 		while($row=DBfetch($result))
 		{
 			if(!in_array($row["actionid"], $_REQUEST["g_actionid"])) continue;
@@ -250,7 +253,9 @@
 			S_REPEATS,
 			S_STATUS));
 
-		$result=DBselect("select * from actions where actiontype=".$_REQUEST["actiontype"]." order by actiontype, source");
+		$result=DBselect("select * from actions where actiontype=".$_REQUEST["actiontype"].
+			" and mod(actionid,100)=".$ZBX_CURNODEID.
+			" order by actiontype, source");
 		while($row=DBfetch($result))
 		{
 			$conditions="";

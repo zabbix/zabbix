@@ -25,7 +25,11 @@
 
 		$userid=$USER_DETAILS["userid"];
 		$clock=time();
-		$sql="insert into auditlog (userid,clock,action,resourcetype,details) values ($userid,$clock,$action,$resourcetype,".zbx_dbstr($details).")";
-		return DBexecute($sql);
+		$auditlogid = get_dbid("auditlog","auditlogid");
+		$sql="insert into auditlog (auditlogid,userid,clock,action,resourcetype,details) values ($auditlogid,$userid,$clock,$action,$resourcetype,".zbx_dbstr($details).")";
+		$result = DBexecute($sql);
+		if(!$result)
+			return $result;
+		return $auditlogid;
 	}
 ?>

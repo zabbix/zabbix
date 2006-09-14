@@ -150,7 +150,7 @@
 
 	$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit()");
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
-	$result=DBselect("select groupid,name from groups order by name");
+	$result=DBselect("select groupid,name from groups where mod(groupid,100)=$ZBX_CURNODEID order by name");
 	while($row=DBfetch($result))
 	{
 // Check if at least one host with read permission exists for this group
@@ -180,7 +180,9 @@
 	{
 		$cmbHosts->AddItem(0,S_ALL_SMALL);
 		$sql="select h.hostid,h.host from hosts h,items i where h.status=".HOST_STATUS_MONITORED.
-			" and i.status=".ITEM_STATUS_ACTIVE." and h.hostid=i.hostid group by h.hostid,h.host order by h.host";
+			" and i.status=".ITEM_STATUS_ACTIVE." and h.hostid=i.hostid".
+			" and mod(h.hostid,100)=".$ZBX_CURNODEID.
+			" group by h.hostid,h.host order by h.host";
 	}
 	$result=DBselect($sql);
 	$first_hostid = -1;
@@ -247,6 +249,7 @@
 	$any_app_exist = false;
 
 	$db_applications = DBselect("select h.host,h.hostid,a.* from applications a,hosts h where a.hostid=h.hostid".$compare_host.
+		" and mod(h.hostid,100)=".$ZBX_CURNODEID.
 		" order by a.name,a.applicationid,h.host");
 	while($db_app = DBfetch($db_applications))
 	{
@@ -256,6 +259,7 @@
 			" where h.hostid=i.hostid and ia.applicationid=".$db_app["applicationid"]." and i.itemid=ia.itemid".
 			" and h.status=".HOST_STATUS_MONITORED." and i.status=".ITEM_STATUS_ACTIVE.
 			$compare_description.$compare_host.
+			" and mod(h.hostid,100)=".$ZBX_CURNODEID.
 			" order by i.description";
 
 		$db_items = DBselect($sql);
@@ -346,6 +350,7 @@
 	$sql="select h.host,h.hostid,i.* from hosts h, items i LEFT JOIN items_applications ia ON ia.itemid=i.itemid".
 		" where ia.itemid is NULL and h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and i.status=".ITEM_STATUS_ACTIVE.
 		$compare_description.$compare_host.
+		" and mod(h.hostid,100)=".$ZBX_CURNODEID.
 		" order by i.description,h.host";
 	$db_items = DBselect($sql);
 

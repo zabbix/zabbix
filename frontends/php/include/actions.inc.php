@@ -56,11 +56,14 @@
 			$recipient = 0;	
 			if(!check_commands($scripts))	return FALSE;
 		}
-		$sql="insert into actions (actiontype,userid,subject,message,recipient,".
-			"maxrepeats,repeatdelay,status,scripts) values ($actiontype,$userid,".zbx_dbstr($subject).",".
+		$actionid=get_dbid("actions","actionid");
+		$sql="insert into actions (actionid,actiontype,userid,subject,message,recipient,".
+			"maxrepeats,repeatdelay,status,scripts) values ($actionid,$actiontype,$userid,".zbx_dbstr($subject).",".
 			zbx_dbstr($message).",$recipient,$maxrepeats,$repeatdelay,$status,".zbx_dbstr($scripts).")";
 		$result=DBexecute($sql);
-		return DBinsert_id($result,"actions","actionid");
+		if(!$result)
+			return $result;
+		return $actionid;
 	}
 
 	# Update Action
@@ -358,9 +361,13 @@
 
 	function	add_action_condition($actionid, $conditiontype, $operator, $value)
 	{
-		$sql="insert into conditions (actionid,conditiontype,operator,value) values ($actionid,$conditiontype,$operator,".zbx_dbstr($value).")";
+		$conditionid=get_dbid("conditions","conditionid");
+		$sql="insert into conditions (conditionid,actionid,conditiontype,operator,value)".
+			" values ($conditionid,$actionid,$conditiontype,$operator,".zbx_dbstr($value).")";
 		$result=DBexecute($sql);
-		return DBinsert_id($result,"conditions","conditionid");
+		if(!$result)
+			return $result;
+		return $conditionid;
 	}
 
 	function	update_action_status($actionid, $status)

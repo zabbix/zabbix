@@ -75,13 +75,15 @@
 	if(!isset($_REQUEST["start"]))
 	{
 		$sql="select u.alias,a.clock,a.action,a.resourcetype,a.details from auditlog a, users u".
-			" where u.userid=a.userid and a.auditid>$maxauditid-200 order by clock desc";
+			" where u.userid=a.userid and a.auditid>$maxauditid-200 order by clock desc".
+			" and mod(u.userid,100)=".$ZBX_CURNODEID;
 		$limit = 200;
 	}
 	else
 	{
 		$sql="select u.alias,a.clock,a.action,a.resourcetype,a.details from auditlog a, users u".
 			" where u.userid=a.userid and a.auditid>$maxauditid-".($_REQUEST["start"]+200).
+			" and mod(u.userid,100)=".$ZBX_CURNODEID.
 			" order by clock desc";
 		$limit = $_REQUEST["start"]+200;
 

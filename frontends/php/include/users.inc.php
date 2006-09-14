@@ -43,8 +43,10 @@
 		}
 		
 		$passwd=md5($passwd);
-		$sql="insert into users (name,surname,alias,passwd,url,autologout,lang,refresh) values (".zbx_dbstr($name).",".zbx_dbstr($surname).",".zbx_dbstr($alias).",".zbx_dbstr($passwd).",".zbx_dbstr($url).",$autologout,".zbx_dbstr($lang).",$refresh)";
-		return DBexecute($sql);
+		$userid = get_dbid("users","userid");
+		$sql="insert into users (userid,name,surname,alias,passwd,url,autologout,lang,refresh) values ($userid,".zbx_dbstr($name).",".zbx_dbstr($surname).",".zbx_dbstr($alias).",".zbx_dbstr($passwd).",".zbx_dbstr($url).",$autologout,".zbx_dbstr($lang).",$refresh)";
+		DBexecute($sql);
+		return $userid;
 	}
 
 	# Update User definition
@@ -160,15 +162,15 @@
 			return 0;
 		}
 
-		$sql="insert into usrgrp (name) values (".zbx_dbstr($name).")";
+		$usrgrpid=get_dbid("usrgrp","usrgrpid");
+
+		$sql="insert into usrgrp (usrgrpid,name) values ($usrgrpid,".zbx_dbstr($name).")";
 		$result=DBexecute($sql);
 		if(!$result)
 		{
 			return	$result;
 		}
 		
-		$usrgrpid=DBinsert_id($result,"usrgrp","usrgrpid");
-
 		update_user_groups($usrgrpid,$users);
 
 		return $result;

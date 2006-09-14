@@ -211,8 +211,9 @@
 			$table=new CTableInfo(S_NO_USERS_DEFINED);
 			$table->setHeader(array(S_ID,S_ALIAS,S_NAME,S_SURNAME,S_IS_ONLINE_Q,S_ACTIONS));
 		
-			$db_users=DBselect("select u.userid,u.alias,u.name,u.surname ".
-				"from users u order by u.alias");
+			$db_users=DBselect("select userid,alias,name,surname ".
+				" from users where mod(userid,100)=".$ZBX_CURNODEID.
+				" order by alias");
 			while($db_user=DBfetch($db_users))
 			{
 				if(!check_right("User","R",$db_user["userid"]))		continue;
@@ -306,7 +307,9 @@
 			$table = new CTableInfo(S_NO_USER_GROUPS_DEFINED);
 			$table->setHeader(array(S_ID,S_NAME,S_MEMBERS));
 		
-			$result=DBselect("select usrgrpid,name from usrgrp order by name");
+			$result=DBselect("select usrgrpid,name from usrgrp".
+					" where mod(usrgrpid,100)=".$ZBX_CURNODEID.
+					" order by name");
 			while($row=DBfetch($result))
 			{
 				if(!check_right("User group","R",$row["usrgrpid"]))	continue;

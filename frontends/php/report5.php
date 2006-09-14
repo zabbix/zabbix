@@ -82,6 +82,7 @@
 	t.triggerid=f.triggerid and
 	t.triggerid=a.triggerid and
 	a.clock>$time_now-$time_dif
+	mod(h.hostid,100)=$ZBX_CURNODEID
 	group by h.host,t.triggerid,t.description,t.priority
 	order by 5 desc,1,3", 100);
 

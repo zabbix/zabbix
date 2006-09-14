@@ -105,12 +105,13 @@
 			return 0;
 		}
 
+		$graphid=get_dbid("graphs","graphid");
+
 		$result=DBexecute("insert into graphs".
-			" (name,width,height,yaxistype,yaxismin,yaxismax,templateid,show_work_period,show_triggers,graphtype,templateid)".
-			" values (".zbx_dbstr($name).",$width,$height,$yaxistype,$yaxismin,".
+			" (graphid,name,width,height,yaxistype,yaxismin,yaxismax,templateid,show_work_period,show_triggers,graphtype,templateid)".
+			" values ($graphid,".zbx_dbstr($name).",$width,$height,$yaxistype,$yaxismin,".
 			" $yaxismax,$templateid,$showworkperiod,$showtriggers,$graphtype,$templateid)");
-		$graphid =  DBinsert_id($result,"graphs","graphid");
-		if($graphid)
+		if($result)
 		{
 			info("Graph '$name' added");
 		}
@@ -208,11 +209,10 @@
 
 	function	add_item_to_graph($graphid,$itemid,$color,$drawtype,$sortorder,$yaxisside,$calc_fnc,$type,$periods_cnt)
 	{
+		$gitemid=get_dbid("graphs_items","gitemid");
 		$result = DBexecute("insert into graphs_items".
-			" (graphid,itemid,color,drawtype,sortorder,yaxisside,calc_fnc,type,periods_cnt)".
-			" values ($graphid,$itemid,".zbx_dbstr($color).",$drawtype,$sortorder,$yaxisside,$calc_fnc,$type,$periods_cnt)");
-
-		$gitemid = DBinsert_id($result,"graphs_items","gitemid");
+			" (gitemid,graphid,itemid,color,drawtype,sortorder,yaxisside,calc_fnc,type,periods_cnt)".
+			" values ($gitemid,$graphid,$itemid,".zbx_dbstr($color).",$drawtype,$sortorder,$yaxisside,$calc_fnc,$type,$periods_cnt)");
 
 		$item = get_item_by_itemid($itemid);
 		$graph = get_graph_by_graphid($graphid);

@@ -202,7 +202,7 @@
 /* group operations */
 			$result = 0;
 			$hosts = get_request("hosts",array());
-			$db_hosts=DBselect("select hostid from hosts");
+			$db_hosts=DBselect("select hostid from hosts where mod(hostid,100)=".$ZBX_CURNODEID);
 			while($db_host=DBfetch($db_hosts))
 			{
 				$host=get_host_by_hostid($db_host["hostid"]);
@@ -226,7 +226,7 @@
 		$status = isset($_REQUEST["activate"]) ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
 		$hosts = get_request("hosts",array());
 
-		$db_hosts=DBselect("select hostid from hosts");
+		$db_hosts=DBselect("select hostid from hosts where mod(hostid,100)=".$ZBX_CURNODEID);
 		while($db_host=DBfetch($db_hosts))
 		{
 			if(!in_array($db_host["hostid"],$hosts)) continue;
@@ -296,7 +296,7 @@
 			$result = 0;
 			$groups = get_request("groups",array());
 
-			$db_groups=DBselect("select groupid, name from groups");
+			$db_groups=DBselect("select groupid, name from groups where mod(groupid,100)=".$ZBX_CURNODEID);
 			while($db_group=DBfetch($db_groups))
 			{
 				if(!in_array($db_group["groupid"],$groups)) continue;
@@ -319,7 +319,8 @@
 		$groups = get_request("groups",array());
 
 		$db_hosts=DBselect("select h.hostid, hg.groupid from hosts_groups hg, hosts h".
-			" where h.hostid=hg.hostid and h.status<>".HOST_STATUS_DELETED);
+			" where h.hostid=hg.hostid and h.status<>".HOST_STATUS_DELETED.
+			" and mod(h.hostid,100)=".$ZBX_CURNODEID);
 		while($db_host=DBfetch($db_hosts))
 		{
 			if(!in_array($db_host["groupid"],$groups)) continue;
@@ -375,7 +376,7 @@
 			$result = 0;
 			$applications = get_request("applications",array());
 
-			$db_applications = DBselect("select applicationid from applications");
+			$db_applications = DBselect("select applicationid from applications where mod(applicationid,100)=".$ZBX_CURNODEID);
 			while($db_app = DBfetch($db_applications))
 			{
 				if(!in_array($db_app["applicationid"],$applications))	continue;
@@ -451,7 +452,9 @@
 
 			$cmbGroups = new CComboBox("groupid",get_request("groupid",0),"submit()");
 			$cmbGroups->AddItem(0,S_ALL_SMALL);
-			$result=DBselect("select groupid,name from groups order by name");
+			$result=DBselect("select groupid,name from groups".
+					" where mod(groupid,100)=".$ZBX_CURNODEID.
+					" order by name");
 			while($row=DBfetch($result))
 			{
 // Check if at least one host with read permission exists for this group
@@ -506,7 +509,7 @@
 				$sql .= " hosts h,hosts_groups hg where";
 				$sql .= " hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid and";
 			} else  $sql .= " hosts h where";
-			$sql .=	" $status_filter order by h.host";
+			$sql .=	" $status_filter and mod(h.hostid,100)=$ZBX_CURNODEID order by h.host";
 
 			$result=DBselect($sql);
 		
@@ -636,7 +639,9 @@
 					S_NAME),
 				S_MEMBERS));
 
-			$db_groups=DBselect("select groupid,name from groups order by name");
+			$db_groups=DBselect("select groupid,name from groups".
+					" where mod(groupid,100)=".$ZBX_CURNODEID.
+					" order by name");
 			while($db_group=DBfetch($db_groups))
 			{
 				$db_hosts = DBselect("select distinct h.host, h.status".
@@ -695,6 +700,7 @@
 		$table->SetHeader(array(S_TEMPLATES,S_HOSTS));
 
 		$templates = DBSelect("select * from hosts where status=".HOST_STATUS_TEMPLATE.
+			" and mod(hostid,100)=".$ZBX_CURNODEID.
 			" order by host");
 		while($template = DBfetch($templates))
 		{
@@ -742,7 +748,9 @@
 			$_REQUEST["groupid"] = get_request("groupid",0);
 			$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit();");
 			$cmbGroup->AddItem(0,S_ALL_SMALL);
-			$result=DBselect("select groupid,name from groups order by name");
+			$result=DBselect("select groupid,name from groups".
+				" where mod(groupid,100)=".$ZBX_CURNODEID.
+				" order by name");
 			while($row=DBfetch($result))
 			{
 		// Check if at least one host with read permission exists for this group
@@ -768,6 +776,7 @@
 			else
 			{
 				$sql="select h.hostid,h.host from hosts h where h.status<>".HOST_STATUS_DELETED.
+					" and mod(h.hostid,100)=".$ZBX_CURNODEID.
 					" group by h.hostid,h.host order by h.host";
 			}
 

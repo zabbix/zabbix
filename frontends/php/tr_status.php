@@ -202,7 +202,7 @@
 	$h2=$h2."<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
 	$h2=$h2.form_select("groupid",0,S_ALL_SMALL);
 
-	$result=DBselect("select groupid,name from groups order by name");
+	$result=DBselect("select groupid,name from groups where mod(groupid,100)=$ZBX_CURNODEID order by name");
 	while($row=DBfetch($result))
 	{
 // Check if at least one host with read permission exists for this group
@@ -244,6 +244,7 @@
 	$sql="select h.hostid,h.host from hosts h,items i".$groupname.
 		" where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid $groupcond".
 		" and i.status=".ITEM_STATUS_ACTIVE." group by h.hostid,h.host order by h.host";
+		" and mod(h.hostid,100)=$ZBX_CURNODEID";
 
 	$result=DBselect($sql);
 	while($row=DBfetch($result))
@@ -350,6 +351,7 @@
 			$sql="select t.priority,count(*) as cnt from triggers t,hosts h,items i,functions f".$groupname.
 				" where t.value=1 and t.status=0 and f.itemid=i.itemid and h.hostid=i.hostid".
 				" and h.status=".HOST_STATUS_MONITORED." and i.status=".ITEM_STATUS_ACTIVE.
+				" and mod(h.hostid,100)=$ZBX_CURNODEID".
 				" and t.triggerid=f.triggerid and t.description $select_cond $cond $groupcond group by t.priority";
 		}
 		else
@@ -357,6 +359,7 @@
 			$sql="select t.priority,count(*) as cnt from triggers t,hosts h,items i,functions f".$groupname.
 				" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.status=0".
 				" and h.status=".HOST_STATUS_MONITORED." and i.status=".ITEM_STATUS_ACTIVE.
+				" and mod(h.hostid,100)=$ZBX_CURNODEID".
 				" and t.description $select_cond $cond $groupcond group by t.priority";
 		}
 		$result=DBselect($sql);
@@ -488,6 +491,7 @@
 			"t.lastchange,t.comments,t.url,t.value from triggers t,hosts h,items i,functions f".$groupname.
 			" where t.value=1 and t.status=0 and f.itemid=i.itemid and h.hostid=i.hostid and t.description".
 			" $select_cond and t.triggerid=f.triggerid and i.status=".ITEM_STATUS_ACTIVE.
+			" and mod(h.hostid,100)=$ZBX_CURNODEID".
 			" and h.status=".HOST_STATUS_MONITORED." $cond $groupcond $sort");
 	}
 	else
@@ -495,6 +499,7 @@
 		$result=DBselect("select distinct t.triggerid,t.status,t.description,t.expression,t.priority,".
 			"t.lastchange,t.comments,t.url,t.value from triggers t,hosts h,items i,functions f".$groupname.
 			" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.status=0".
+			" and mod(h.hostid,100)=$ZBX_CURNODEID".
 			" and t.description $select_cond and i.status=".ITEM_STATUS_ACTIVE." and h.status=".HOST_STATUS_MONITORED.
 			" $cond $groupcond $sort");
 	}
