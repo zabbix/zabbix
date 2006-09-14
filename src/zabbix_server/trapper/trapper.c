@@ -50,6 +50,7 @@
 #include "../expression.h"
 
 #include "autoregister.h"
+#include "nodesync.h"
 #include "trapper.h"
 
 #include "daemon.h"
@@ -100,8 +101,23 @@ int	process_trap(int sockfd,char *s, int max_len)
 /* Process information sent by zabbix_sender */
 	else
 	{
+		/* Node data exchange? */
+		if(strncmp(s,"Data",4) == 0)
+		{
+//			zabbix_log( LOG_LEVEL_WARNING, "Node data received [len:%d]", strlen(s));
+			if(node_sync(s) == SUCCEED)
+			{
+				zbx_snprintf(result,sizeof(result),"OK\n");
+				if( write(sockfd,result,strlen(result)) == -1)
+				{
+					zabbix_log( LOG_LEVEL_WARNING, "Error sending confirmation to node [%s]",strerror(errno));
+					zabbix_syslog("Trapper: error sending confirmation to node [%s]",strerror(errno));
+				}
+			}
+			return ret;
+		}
 		/* New XML protocol? */
-		if(s[0]=='<')
+		else if(s[0]=='<')
 		{
 			zabbix_log( LOG_LEVEL_DEBUG, "XML received [%s]", s);
 
@@ -167,33 +183,39 @@ int	process_trap(int sockfd,char *s, int max_len)
 void	process_trapper_child(int sockfd)
 {
 	ssize_t	nbytes;
-	char	buffer[MAX_BUF_LEN];
+	char	*buffer;
 	static struct  sigaction phan;
 	char	*bufptr;
 
+#define ZBX_MAX_PACKET_LEN	8*1024*1024
+
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_trapper_child");
+
+	
+	buffer=malloc(ZBX_MAX_PACKET_LEN);
 
 	phan.sa_handler = &child_signal_handler;
 	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = 0;
 	sigaction(SIGALRM, &phan, NULL);
 
-	alarm(CONFIG_TIMEOUT);
+//	alarm(CONFIG_TIMEOUT);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Before read(%d)", MAX_BUF_LEN);
+	zabbix_log( LOG_LEVEL_DEBUG, "Before read(%d)", ZBX_MAX_PACKET_LEN);
 /*	if( (nbytes = read(sockfd, line, MAX_BUF_LEN)) < 0)*/
-	memset(buffer,0,sizeof(buffer));
+	memset(buffer,0,ZBX_MAX_PACKET_LEN);
 	bufptr = buffer;
-	while ((nbytes = read(sockfd, bufptr, buffer + sizeof(buffer) - bufptr - 1)) != -1 && nbytes != 0)
+	while ((nbytes = read(sockfd, bufptr, buffer + ZBX_MAX_PACKET_LEN - bufptr - 1)) != -1 && nbytes != 0)
 	{
-		zabbix_log( LOG_LEVEL_DEBUG, "Read %d bytes", nbytes);
-		if(nbytes < buffer + sizeof(buffer) - bufptr - 1)
+//		zabbix_log( LOG_LEVEL_WARNING, "Read %d bytes", nbytes);
+		if(nbytes < buffer + ZBX_MAX_PACKET_LEN - bufptr - 1)
 		{
 			bufptr += nbytes;
 			break;
 		}
 		bufptr += nbytes;
 	}
+//	zabbix_log( LOG_LEVEL_WARNING, "Read total %d bytes", nbytes);
 
 	if(nbytes < 0)
 	{
@@ -206,6 +228,7 @@ void	process_trapper_child(int sockfd)
 			zabbix_log( LOG_LEVEL_WARNING, "read() failed");
 		}
 		alarm(0);
+		free(buffer);
 		return;
 	}
 
@@ -215,6 +238,7 @@ void	process_trapper_child(int sockfd)
 
 	process_trap(sockfd,buffer, sizeof(buffer));
 
+	free(buffer);
 	alarm(0);
 }
 

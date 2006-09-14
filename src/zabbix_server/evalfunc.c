@@ -1263,7 +1263,7 @@ int evaluate_FUNCTION2(char *value,char *host,char *key,char *function,char *par
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate_FUNCTION2()" );
 
-	result = DBselect("select %s where h.host='%s' and h.hostid=i.hostid and i.key_='%s'", ZBX_SQL_ITEM_SELECT, host, key );
+	result = DBselect("select %s where h.host='%s' and h.hostid=i.hostid and i.key_='%s'" ZBX_COND_NODEID, ZBX_SQL_ITEM_SELECT, host, key, LOCAL_NODE("h.hostid"));
 
 	row = DBfetch(result);
 

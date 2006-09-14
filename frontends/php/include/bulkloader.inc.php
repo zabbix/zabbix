@@ -34,11 +34,12 @@ include_once    "include/config.inc.php";
 		{
 			return $row["groupid"];
 		}
+		$groupid = get_dbid("groups","groupid");
 
-		$result=DBexecute("insert into groups (name) values (".zbx_dbstr($group).")");
+		$result=DBexecute("insert into groups (groupid,name) values ($groupid,".zbx_dbstr($group).")");
 		if($result)
 		{
-			return DBinsert_id($result,"groups","name");
+			return $groupid;
 		}
 		else
 		{
@@ -57,10 +58,11 @@ include_once    "include/config.inc.php";
 			return $row["usrgrpid"];
 		}
 
-		$result=DBexecute("insert into usrgrp (name) values ('$group')");
+		$usrgrpid=get_dbid("usrgrp","usrgrpid");
+		$result=DBexecute("insert into usrgrp (usrgrpid,name) values ($usrgrpid,'$group')");
 		if($result)
 		{
-			return DBinsert_id($result,"usrgrp","name");
+			return $usrgrpid;
 		}
 		else
 		{
@@ -76,10 +78,11 @@ include_once    "include/config.inc.php";
 		{
 			return 0;
 		}
-		$result=DBexecute("insert into users_groups (usrgrpid,userid) values ($groupid,$userid)");
+		$id=get_dbid("users_groups","id");
+		$result=DBexecute("insert into users_groups (id,usrgrpid,userid) values ($id,$groupid,$userid)");
 		if($result)
 		{
-			return 1;
+			return $id;
 		}
 		return 0;	
 	}

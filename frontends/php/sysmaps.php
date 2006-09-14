@@ -118,7 +118,7 @@
 		$table = new CTableInfo(S_NO_MAPS_DEFINED);
 		$table->setHeader(array(S_ID,S_NAME,S_WIDTH,S_HEIGHT,S_MAP));
 
-		$result=DBselect("select s.sysmapid,s.name,s.width,s.height from sysmaps s order by s.name");
+		$result=DBselect("select sysmapid,name,width,height from sysmaps where mod(sysmapid,100)=$ZBX_CURNODEID order by name");
 		while($row=DBfetch($result))
 		{
 		        if(!check_right("Network map","U",$row["sysmapid"]))

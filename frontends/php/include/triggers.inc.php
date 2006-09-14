@@ -295,16 +295,17 @@
 //		}
 		if(!is_null($expression)) if(validate_expression($expression))	return FALSE;
 
+		$triggerid=get_dbid("triggers","triggerid");
+
 		$result=DBexecute("insert into triggers".
-			"  (description,priority,status,comments,url,value,error,templateid)".
-			" values (".zbx_dbstr($description).",$priority,$status,".zbx_dbstr($comments).",".
+			"  (triggerid,description,priority,status,comments,url,value,error,templateid)".
+			" values ($triggerid,".zbx_dbstr($description).",$priority,$status,".zbx_dbstr($comments).",".
 			"".zbx_dbstr($url).",2,'Trigger just added. No status update so far.',$templateid)");
 		if(!$result)
 		{
 			return	$result;
 		}
  
-		$triggerid = DBinsert_id($result,"triggers","triggerid");
 		add_alarm($triggerid,TRIGGER_VALUE_UNKNOWN);
  
 		$expression = implode_exp($expression,$triggerid);
@@ -377,17 +378,17 @@
 				$copy_mode ? 0 : $triggerid);
 		}
 
+		$newtriggerid=dn_getid("triggers","triggerid");
+
 		$result = DBexecute("insert into triggers".
-			" (description,priority,status,comments,url,value,expression,templateid)".
-			" values (".zbx_dbstr($trigger["description"]).",".$trigger["priority"].",".
+			" (triggerid,description,priority,status,comments,url,value,expression,templateid)".
+			" values ($newtriggerid,".zbx_dbstr($trigger["description"]).",".$trigger["priority"].",".
 			$trigger["status"].",".zbx_dbstr($trigger["comments"]).",".
 			zbx_dbstr($trigger["url"]).",2,'{???:???}',".
 			($copy_mode ? 0 : $triggerid).")");
 
 		if(!$result)
 			return $result;
-
-		$newtriggerid = DBinsert_id($result,"triggers","triggerid");
 
 		$host = get_host_by_hostid($hostid);
 		$newexpression = $trigger["expression"];
@@ -408,10 +409,11 @@
 				return FALSE;
 			}
 
-			$result = DBexecute("insert into functions (itemid,triggerid,function,parameter)".
-				" values (".$host_item["itemid"].",$newtriggerid,".
+			$newfunctionid=get_dbid("functions","functionid");
+
+			$result = DBexecute("insert into functions (functionid,itemid,triggerid,function,parameter)".
+				" values ($newfunctionid,".$host_item["itemid"].",$newtriggerid,".
 				zbx_dbstr($function["function"]).",".zbx_dbstr($function["parameter"]).")");
-			$newfunctionid = DBinsert_id($result,"functions","functionid");
 
 			$newexpression = str_replace(
 				"{".$function["functionid"]."}",

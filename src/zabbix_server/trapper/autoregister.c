@@ -56,7 +56,7 @@ int	autoregister(char *server)
 		return FAIL;
 	}
 
-	result = DBselect("select id,pattern,hostid from autoreg order by priority");
+	result = DBselect("select id,pattern,hostid from autoreg where " ZBX_COND_NODEID " order by priority", LOCAL_NODE("id"));
 
 	while((row=DBfetch(result)))
 	{

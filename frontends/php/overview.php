@@ -77,7 +77,7 @@
 	$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit()");
 	
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
-	$result=DBselect("select groupid,name from groups order by name");
+	$result=DBselect("select groupid,name from groups where mod(groupid,100)=$ZBX_CURNODEID order by name");
 	while($row=DBfetch($result))
 	{
 		$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg where".

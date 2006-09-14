@@ -130,7 +130,7 @@
 		S_TRIGGER
 		));
 
-	$sql = "select serviceid,name,algorithm,triggerid from services order by sortorder,name";
+	$sql = "select serviceid,name,algorithm,triggerid from services where mod(serviceid,100)=$ZBX_CURNODEID order by sortorder,name";
 	if(isset($_REQUEST["serviceid"]))
 	{
 		$form->AddVar("serviceid",$_REQUEST["serviceid"]);
@@ -418,7 +418,7 @@
 		$frmDetails->AddVar("parentid",$_REQUEST["parentid"]);
 		
 		$cmbServers = new CComboBox("serverid");
-		$result=DBselect("select hostid,host from hosts order by host");
+		$result=DBselect("select hostid,host from hosts where mod(hostid,100)=$ZBX_CURNODEID order by host");
 		while($row=DBfetch($result))
 		{
 			$cmbServers->AddItem($row["hostid"],$row["host"]);
