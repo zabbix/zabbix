@@ -179,6 +179,7 @@
 	function	insert_usergroups_form($usrgrpid)
 	{
 		global  $_REQUEST;
+		global  $ZBX_CURNODEID;
 
 		$frm_title = S_USER_GROUP;
 		if(isset($usrgrpid))
@@ -216,7 +217,9 @@
 		$frmUserG->AddRow(S_GROUP_NAME,new CTextBox("gname",$name,30));
 
 		$form_row = array();
-		$db_users=DBselect("select distinct userid,alias from users order by alias");
+		$db_users=DBselect("select distinct userid,alias from users".
+				" where mod(userid,100)=".$ZBX_CURNODEID.
+				" order by alias");
 		while($db_user=DBfetch($db_users))
 		{
 			array_push($form_row,

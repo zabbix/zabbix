@@ -28,6 +28,8 @@ extern	char	*CONFIG_DBPASSWORD;
 extern	char	*CONFIG_DBSOCKET;
 extern	char	*CONFIG_ALERT_SCRIPTS_PATH;
 
+extern	int	CONFIG_NODEID;
+
 extern	void	signal_handler( int sig );
 
 int main_alerter_loop();

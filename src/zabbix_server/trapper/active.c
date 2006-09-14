@@ -68,7 +68,7 @@ int	send_list_of_active_checks(int sockfd, char *host)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In send_list_of_active_checks()");
 
-	result = DBselect("select i.key_,i.delay,i.lastlogsize from items i,hosts h where i.hostid=h.hostid and h.status=%d and i.status=%d and i.type=%d and h.host='%s'", HOST_STATUS_MONITORED, ITEM_STATUS_ACTIVE, ITEM_TYPE_ZABBIX_ACTIVE, host);
+	result = DBselect("select i.key_,i.delay,i.lastlogsize from items i,hosts h where i.hostid=h.hostid and h.status=%d and i.status=%d and i.type=%d and h.host='%s' and" ZBX_COND_NODEID, HOST_STATUS_MONITORED, ITEM_STATUS_ACTIVE, ITEM_TYPE_ZABBIX_ACTIVE, host, LOCAL_NODE("h.hostid"));
 
 	while((row=DBfetch(result)))
 	{

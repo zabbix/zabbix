@@ -92,20 +92,34 @@
 			return 0;
 		}
 
-		return	DBexecute("insert into sysmaps (name,width,height,background,label_type,label_location)".
-			" values (".zbx_dbstr($name).",$width,$height,".zbx_dbstr($background).",$label_type,
+		$sysmapid=get_dbid("sysmaps","sysmapid");
+
+		$result=DBexecute("insert into sysmaps (sysmapid,name,width,height,background,label_type,label_location)".
+			" values ($sysmapid,".zbx_dbstr($name).",$width,$height,".zbx_dbstr($background).",$label_type,
 			$label_location)");
+
+		if(!$result)
+			return $result;
+
+		return $sysmapid;
 	}
 
 	function	add_link($sysmapid,$selementid1,$selementid2,$triggerid,$drawtype_off,$color_off,$drawtype_on,$color_on)
 	{
 		if($triggerid == 0)	$triggerid = 'NULL';
 
-		return	DBexecute("insert into sysmaps_links".
-			" (sysmapid,selementid1,selementid2,triggerid,drawtype_off,".
+		$linkid=get_dbid("sysmaps_links","linkid");
+
+		$result=DBexecute("insert into sysmaps_links".
+			" (linkid,sysmapid,selementid1,selementid2,triggerid,drawtype_off,".
 			"color_off,drawtype_on,color_on)".
-			" values ($sysmapid,$selementid1,$selementid2,$triggerid,$drawtype_off,".
+			" values ($linkid,$sysmapid,$selementid1,$selementid2,$triggerid,$drawtype_off,".
 			zbx_dbstr($color_off).",$drawtype_on,".zbx_dbstr($color_on).")");
+
+		if(!$result)
+			return $result;
+
+		return $linkid;
 	}
 
 	function	update_link($linkid,$sysmapid,$selementid1,$selementid2,$triggerid,$drawtype_off,$color_off,$drawtype_on,$color_on)
@@ -153,11 +167,18 @@
 			return FALSE;
 		}
 
-		return	DBexecute("insert into sysmaps_elements".
+		$selementid = get_dbid("sysmaps_elements","selementid");
+
+		$result=DBexecute("insert into sysmaps_elements".
 			" (sysmapid,elementid,elementtype,label,x,y,icon,url,icon_on,label_location)".
 			" values ($sysmapid,$elementid,$elementtype,".zbx_dbstr($label).",
 			$x,$y,".zbx_dbstr($icon).",".zbx_dbstr($url).",".zbx_dbstr($icon_on).",".
 			"$label_location)");
+
+		if(!$result)
+			return $result;
+
+		return $selementid;
 	}
 
 	# Update Element from system map

@@ -24,6 +24,8 @@
 #include "common.h"
 #include "db.h"
 
+extern	int	CONFIG_NODEID;
+
 int	send_list_of_active_checks(int sockfd, char *host);
 
 #endif

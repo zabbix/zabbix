@@ -28,15 +28,17 @@
 			error("Insufficient permissions");
 			return 0;
 		}
+		$autoregid = get_dbid("autoreg","autoregid");
 
-		$sql="insert into autoreg (pattern,priority,hostid) values (".zbx_dbstr($pattern).",$priority,$hostid)";
+		$sql="insert into autoreg (autoregid,pattern,priority,hostid) values ($autoregid,".zbx_dbstr($pattern).",$priority,$hostid)";
 		$result=DBexecute($sql);
 		if($result)
 		{
 			$host=get_host_by_hostid($hostid);
 			info("Added new autoregistration rule for $pattern");
 		}
-		return DBinsert_id($result,"autoreg","id");
+		else	return $result;
+		return $autoregid;
 	}
 
 	# Update Autoregistration rule

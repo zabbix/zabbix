@@ -27,8 +27,14 @@
                         return 0;
                 }
 
-                $sql="insert into screens (name,hsize,vsize) values (".zbx_dbstr($name).",$hsize,$vsize)";
-                return  DBexecute($sql);
+		$screenid=get_dbid("screens","screenid");
+                $sql="insert into screens (screenid,name,hsize,vsize) values ($screenid,".zbx_dbstr($name).",$hsize,$vsize)";
+                $result=DBexecute($sql);
+
+		if(!$result)
+			return $result;
+
+		return $screenid;
         }
 
         function        update_screen($screenid,$name,$hsize,$vsize)
@@ -61,10 +67,16 @@
         {
                 $sql="delete from screens_items where screenid=$screenid and x=$x and y=$y";
                 DBexecute($sql);
+		$screenitemid=get_dbid("screens_items","screenitemid");
                 $sql="insert into screens_items (resourcetype,screenid,x,y,resourceid,width,height,colspan,rowspan,elements,valign,halign,style,url)".
 			" values ($resourcetype,$screenid,$x,$y,$resourceid,$width,$height,$colspan,$rowspan,$elements,$valign,$halign,$style,".
 			zbx_dbstr($url).")";
-                return  DBexecute($sql);
+                $result=DBexecute($sql);
+
+		if(!$result)
+			return $result;
+
+		return $screenitemid;
         }
 
         function update_screen_item($screenitemid,$resourcetype,$resourceid,$width,$height,$colspan,$rowspan,$elements,$valign,$halign,$style,$url)

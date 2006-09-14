@@ -78,7 +78,7 @@
 	$cmbScreens = new CComboBox("screenid",$_REQUEST["screenid"],"submit()");
 	$screen_correct = 0;
 	$first_screen = 0;
-	$result=DBselect("select screenid,name from screens order by name");
+	$result=DBselect("select screenid,name from screens where mod(screenid,100)=$ZBX_CURNODEID order by name");
 	while($row=DBfetch($result))
 	{
 		if(!check_right("Screen","R",$row["screenid"]))

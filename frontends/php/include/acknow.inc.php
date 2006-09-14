@@ -39,8 +39,15 @@
 		if(!$result)
 			return $result;
 
-		return DBexecute("insert into acknowledges (userid,alarmid,clock,message)".
-			" values ($userid,$alarmid,".time().",".zbx_dbstr($message).")");
+		$acknowledgeid = get_dbid("acknowledges","acknowledgeid");
+
+		$result =  DBexecute("insert into acknowledges (acknowledgeid,userid,alarmid,clock,message)".
+			" values ($acknowledgeid,$userid,$alarmid,".time().",".zbx_dbstr($message).")");
+
+		if(!$result)
+			return $result;
+
+		return $acknowledgeid;
 	}
 
 	function	set_alarm_acnowledged($alarmid)

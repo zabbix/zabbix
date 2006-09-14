@@ -29,6 +29,8 @@
 #include "db.h"
 #include "log.h"
 
+extern  int     CONFIG_NODEID;
+
 extern	int	get_value_aggregate(DB_ITEM *item, AGENT_RESULT *result);
 
 #endif

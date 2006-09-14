@@ -234,7 +234,8 @@ static void run_remote_command(char* host_name, char* command)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "run_remote_command START [hostname: '%s', command: '%s']", host_name, command);
 
-	result = DBselect("select distinct host,ip,useip,port from hosts where host='%s'", host_name);
+	result = DBselect("select distinct host,ip,useip,port from hosts where host='%s' and " ZBX_COND_NODEID,
+			host_name, LOCAL_NODE("hostid"));
 	row = DBfetch(result);
 	if(row)
 	{
@@ -380,7 +381,7 @@ static int get_next_command(char** command_list, char** alias, int* is_group, ch
 		if(alias == '\0' || command == '\0') continue;
 		if(is_group)
 		{
-			result = DBselect("select distinct h.host from hosts_groups hg,hosts h, groups g where hg.hostid=h.hostid and hg.groupid=g.groupid and g.name='%s'", alias);
+			result = DBselect("select distinct h.host from hosts_groups hg,hosts h, groups g where hg.hostid=h.hostid and hg.groupid=g.groupid and g.name='%s' and" ZBX_COND_NODEID, alias, LOCAL_NODE("h.hostid"));
 			while((row=DBfetch(result)))
 			{
 				run_remote_command(row[0], command);
@@ -670,7 +671,7 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 /*	zbx_snprintf(sql,sizeof(sql),"select actionid,userid,delay,subject,message,recipient,maxrepeats,repeatdelay,scripts,actiontype from actions where nextcheck<=%d and status=%d", now, ACTION_STATUS_ACTIVE);*/
 
 	/* No support of action delay anymore */
-	result = DBselect("select actionid,userid,subject,message,recipient,maxrepeats,repeatdelay,scripts,actiontype from actions where status=%d", ACTION_STATUS_ACTIVE);
+	result = DBselect("select actionid,userid,subject,message,recipient,maxrepeats,repeatdelay,scripts,actiontype from actions where status=%d and" ZBX_COND_NODEID, ACTION_STATUS_ACTIVE, LOCAL_NODE("actionid"));
 
 	while((row=DBfetch(result)))
 	{

@@ -168,12 +168,13 @@
 		}
 
 		// first add mother item
+		$itemid=get_dbid("items","itemid");
 		$result=DBexecute("insert into items".
-			" (description,key_,hostid,delay,history,nextcheck,status,type,".
+			" (itemid,description,key_,hostid,delay,history,nextcheck,status,type,".
 			"snmp_community,snmp_oid,value_type,trapper_hosts,snmp_port,units,multiplier,".
 			"delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,".
 			"snmpv3_privpassphrase,formula,trends,logtimefmt,valuemapid,templateid)".
-			" values (".zbx_dbstr($description).",".zbx_dbstr($key).",$hostid,$delay,$history,0,
+			" values ($itemid,".zbx_dbstr($description).",".zbx_dbstr($key).",$hostid,$delay,$history,0,
 			$status,$type,".zbx_dbstr($snmp_community).",".zbx_dbstr($snmp_oid).",$value_type,".
 			zbx_dbstr($trapper_hosts).",$snmp_port,".zbx_dbstr($units).",$multiplier,$delta,".
 			zbx_dbstr($snmpv3_securityname).",$snmpv3_securitylevel,".
@@ -184,11 +185,10 @@
 		if(!$result)
 			return $result;
 
-		$itemid =  DBinsert_id($result,"items","itemid");
-
 		foreach($applications as $appid)
 		{
-			DBexecute("insert into items_applications (itemid,applicationid) values(".$itemid.",".$appid.")");
+			$itemappid=get_dbid("items_applications","itemappid");
+			DBexecute("insert into items_applications (itemappid,itemid,applicationid) values($itemappid,".$itemid.",".$appid.")");
 		}
 
 		info("Added new item ".$host["host"].":$key");
@@ -321,7 +321,10 @@
 
 		$result = DBexecute("delete from items_applications where itemid=$itemid");
 		foreach($applications as $appid)
-			DBexecute("insert into items_applications (itemid,applicationid) values(".$itemid.",".$appid.")");
+		{
+			$itemappid=get_dbid("items_applications","itemappid");
+			DBexecute("insert into items_applications (itemappid,itemid,applicationid) values($itemappid,".$itemid.",".$appid.")");
+		}
 
 		$result=DBexecute(
 			"update items set description=".zbx_dbstr($description).",key_=".zbx_dbstr($key).",".

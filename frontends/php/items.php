@@ -347,7 +347,7 @@
 	show_header2(S_CONFIGURATION_OF_ITEMS_BIG, $form);
 	echo BR;
 
-	$db_hosts=DBselect("select hostid from hosts");
+	$db_hosts=DBselect("select hostid from hosts where mod(hostid,100)=$ZBX_CURNODEID");
 	if(isset($_REQUEST["form_copy_to"]) && isset($_REQUEST["group_itemid"]))
 	{
 		insert_copy_elements_to_forms("group_itemid");
@@ -363,7 +363,7 @@
 
 		$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit();");
 		$cmbGroup->AddItem(0,S_ALL_SMALL);
-		$result=DBselect("select groupid,name from groups order by name");
+		$result=DBselect("select groupid,name from groups where mod(groupid,100)=$ZBX_CURNODEID order by name");
 		while($row=DBfetch($result))
 		{
 	// Check if at least one host with read permission exists for this group
@@ -389,6 +389,7 @@
 		else
 		{
 			$sql="select h.hostid,h.host from hosts h where h.status<>".HOST_STATUS_DELETED.
+				" and mod(h.hostid,100)=".$ZBX_CURNODEID.
 				" group by h.hostid,h.host order by h.host";
 		}
 

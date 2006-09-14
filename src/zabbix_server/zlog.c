@@ -34,6 +34,8 @@
 #include "log.h"
 #include "zlog.h"
 
+extern        int     CONFIG_NODEID;
+
 /******************************************************************************
  *                                                                            *
  * Function: zabbix_syslog                                                    *
@@ -62,7 +64,7 @@ void zabbix_syslog(const char *fmt, ...)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In zabbix_log()");
 
-	result = DBselect("select %s where h.hostid=i.hostid and i.key_='%s' and i.value_type=%d", ZBX_SQL_ITEM_SELECT, SERVER_ZABBIXLOG_KEY, ITEM_VALUE_TYPE_STR);
+	result = DBselect("select %s where h.hostid=i.hostid and i.key_='%s' and i.value_type=%d and" ZBX_COND_NODEID, ZBX_SQL_ITEM_SELECT, SERVER_ZABBIXLOG_KEY, ITEM_VALUE_TYPE_STR, LOCAL_NODE("h.hostid"));
 
 	while((row=DBfetch(result)))
 	{

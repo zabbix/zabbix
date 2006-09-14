@@ -30,6 +30,7 @@
 #define ZBX_FLAG_SEC			0
 #define ZBX_FLAG_VALUES			1
 
+extern	int	CONFIG_NODEID;
 
 int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter);
 int	evaluate_FUNCTION2(char *value,char *host,char *key,char *function,char *parameter);

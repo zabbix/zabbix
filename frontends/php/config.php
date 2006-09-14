@@ -405,7 +405,9 @@
 			$table->setHeader(array(S_DESCRIPTION,S_TYPE));
 
 			$result=DBselect("select mt.mediatypeid,mt.type,mt.description,mt.smtp_server,".
-				"mt.smtp_helo,mt.smtp_email,mt.exec_path from media_type mt order by mt.type");
+				"mt.smtp_helo,mt.smtp_email,mt.exec_path from media_type mt".
+				" where mod(mt.mediatypeid,100)=".$ZBX_CURNODEID.
+				" order by mt.type");
 			while($row=DBfetch($result))
 			{
 				$description=new CLink($row["description"],"config.php?&form=update".
@@ -437,7 +439,9 @@
 			$table=new CTableInfo(S_NO_IMAGES_DEFINED);
 			$table->setHeader(array(S_ID,S_NAME,S_TYPE,S_IMAGE));
 	
-			$result=DBselect("select imageid,imagetype,name from images order by name");
+			$result=DBselect("select imageid,imagetype,name from images".
+					" where mod(imageid,100)=".$ZBX_CURNODEID.
+					" order by name");
 			while($row=DBfetch($result))
 			{
 				if($row["imagetype"]==1)	$imagetype=S_ICON;
@@ -472,7 +476,9 @@
 			$table=new CTableInfo(S_NO_AUTOREGISTRATION_RULES_DEFINED);
 			$table->setHeader(array(S_ID,S_PRIORITY,S_PATTERN,S_HOST));
 
-			$result=DBselect("select * from autoreg order by priority");
+			$result=DBselect("select * from autoreg".
+					" where mod(id,100)=".$ZBX_CURNODEID.
+					" order by priority");
 			while($row=DBfetch($result))
 			{
 				if($row["hostid"]==0)
@@ -514,7 +520,8 @@
 			{
 				$mappings_row = array();
 				$db_maps = DBselect("select * from mappings".
-					" where valuemapid=".$db_valuemap["valuemapid"]);
+					" where valuemapid=".$db_valuemap["valuemapid"].
+					" and mod(valuemapid,100)=".$ZBX_CURNODEID);
 				while($db_map = DBfetch($db_maps))
 				{
 					array_push($mappings_row, 

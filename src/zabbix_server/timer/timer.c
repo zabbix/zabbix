@@ -42,6 +42,7 @@
 #include "zlog.h"
 
 #include "common.h"
+#include "timer.h"
 
 extern void	update_triggers(int itemid);
 extern void	update_functions(DB_ITEM *item);
@@ -89,7 +90,7 @@ void main_timer_loop()
 #endif
 	*/
 
-		result = DBselect("select distinct %s, functions f where h.hostid=i.hostid and h.status=%d and i.status=%d and f.function in ('nodata','date','dayofweek','time','now') and i.itemid=f.itemid", ZBX_SQL_ITEM_SELECT, HOST_STATUS_MONITORED, ITEM_STATUS_ACTIVE);
+		result = DBselect("select distinct %s, functions f where h.hostid=i.hostid and h.status=%d and i.status=%d and f.function in ('nodata','date','dayofweek','time','now') and i.itemid=f.itemid and" ZBX_COND_NODEID, ZBX_SQL_ITEM_SELECT, HOST_STATUS_MONITORED, ITEM_STATUS_ACTIVE, LOCAL_NODE("h.hostid"));
 
 		while((row=DBfetch(result)))
 		{

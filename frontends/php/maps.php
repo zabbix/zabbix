@@ -45,7 +45,7 @@
 
 	if($_REQUEST["sysmapid"] <=0 )
 	{
-		$db_sysmaps = DBselect("select sysmapid,name from sysmaps order by name");
+		$db_sysmaps = DBselect("select sysmapid,name from sysmaps where mod(sysmapid,100)=$ZBX_CURNODEID order by name");
 		if($sysmap = DBfetch($db_sysmaps))
 		{
 			$_REQUEST["sysmapid"] = $sysmap["sysmapid"];
@@ -82,7 +82,7 @@
 		$form->AddVar("fullscreen",$_REQUEST["fullscreen"]);
 
 	$cmbMaps = new CComboBox("sysmapid",$_REQUEST["sysmapid"],"submit()");
-	$result=DBselect("select sysmapid,name from sysmaps order by name");
+	$result=DBselect("select sysmapid,name from sysmaps where mod(sysmapid,100)=$ZBX_CURNODEID order by name");
 	while($row=DBfetch($result))
 	{
 		if(!check_right("Network map","R",$row["sysmapid"]))		continue;

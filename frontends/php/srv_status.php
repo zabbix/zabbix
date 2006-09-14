@@ -52,7 +52,7 @@
 	}
 
 	$now=time();
-	$result=DBselect("select serviceid,name,triggerid,status,showsla,goodsla from services order by sortorder,name");
+	$result=DBselect("select serviceid,name,triggerid,status,showsla,goodsla from services where mod(serviceid,100)=$ZBX_CURNODEID order by sortorder,name");
 //	table_begin();
 	$table  = new CTableInfo();
 	$table->SetHeader(array(S_SERVICE,S_STATUS,S_REASON,S_SLA_LAST_7_DAYS,nbsp(S_PLANNED_CURRENT_SLA),S_GRAPH));
@@ -158,7 +158,7 @@
 		else
 		{
 			$reason="<ul>";
-			$sql="select s.triggerid,s.serviceid from services s, triggers t where s.status>0 and s.triggerid is not NULL and t.triggerid=s.triggerid order by s.status desc,t.description";
+			$sql="select s.triggerid,s.serviceid from services s, triggers t where s.status>0 and s.triggerid is not NULL and t.triggerid=s.triggerid where mod(s.serviceid,100)=$ZBX_CURNODEID order by s.status desc,t.description";
 			$result2=DBselect($sql);
 			while($row2=DBfetch($result2))
 			{
