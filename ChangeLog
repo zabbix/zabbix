@@ -1,5 +1,6 @@
 Changes for 1.1.3:
 
+ - added images for postgres (Eugene)
  - fixed reversed icons on maps (Eugene)
  - fixed trigger description substitution in action comporation (Eugene) 
  - fixed trigger description substitution in message subject and body (Eugene) 
