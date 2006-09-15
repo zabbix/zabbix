@@ -67,7 +67,6 @@
 <?php
 	$_REQUEST["type"] = get_request("type",get_profile("web.overview.type",0));
 
-	update_profile("web.menu.view.last",$page["file"]);
 	update_profile("web.overview.type",$_REQUEST["type"]);
 ?>
 

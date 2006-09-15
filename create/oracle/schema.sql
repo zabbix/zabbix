@@ -771,6 +771,7 @@ CREATE TABLE users (
 	autologout	number(10)	DEFAULT '900' NOT NULL,
 	lang		varchar2(5)	DEFAULT 'en_gb' NOT NULL,
 	refresh		number(10)	DEFAULT '30' NOT NULL,
+	type		number(2)	DEFAULT '1' NOT NULL, -- Type of user (0 - Uncnown; 1 - ZABBIX user; 2 - ZABBIX Admin; 3 - Supper Admin)
   	CONSTRAINT 	users_pk PRIMARY KEY (userid)
 );
 

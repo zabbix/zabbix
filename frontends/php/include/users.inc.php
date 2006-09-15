@@ -19,6 +19,19 @@
 **/
 ?>
 <?php
+
+	function	user_type2str($user_type_int)
+	{
+		$str_user_type[USER_TYPE_ZABBIX_USER]	= S_ZABBIX_USER;
+		$str_user_type[USER_TYPE_ZABBIX_ADMIN]	= S_ZABBIX_ADMIN;
+		$str_user_type[USER_TYPE_SUPPER_ADMIN]	= S_SUPPER_ADMIN;
+
+		if(isset($str_user_type[$user_type_int]))
+			return $str_user_type[$user_type_int];
+
+		return S_UNCNOWN;
+	}
+
 	# Add User definition
 
 	function	add_user($name,$surname,$alias,$passwd,$url,$autologout,$lang,$refresh)

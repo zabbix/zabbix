@@ -24,11 +24,6 @@
 	$page["file"] = "srv_status.php";
 	show_header($page["title"],1,0);
 ?>
-
-<?php
-	update_profile("web.menu.view.last",$page["file"]);
-?>
-
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(

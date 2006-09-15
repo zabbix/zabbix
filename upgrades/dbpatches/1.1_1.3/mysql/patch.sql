@@ -139,3 +139,11 @@ CREATE TABLE services_times (
 	UNIQUE (serviceid,type,ts_from,ts_to)
 ) type=InnoDB;
 
+----------------------------------------------------
+----------------------------------------------------
+--------------- NEW RIGHT SYSTEM -------------------
+----------------------------------------------------
+----------------------------------------------------
+
+alter table users add	type		int(2)	DEFAULT '1' NOT NULL; -- Type of user (0 - Uncnown; 1 - ZABBIX user; 2 - ZABBIX Admin; 3 - Supper Admin)
+

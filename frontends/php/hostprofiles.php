@@ -41,15 +41,9 @@
                 exit;
         }
 ?>
-
 <?php
 	validate_group_with_host("R", array("allow_all_hosts","monitored_hosts","with_items"));
 ?>
-
-<?php
-	update_profile("web.menu.cm.last",$page["file"]);
-?>
-
 <?php
 	$form = new CForm();
 

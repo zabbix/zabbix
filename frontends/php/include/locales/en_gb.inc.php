@@ -196,6 +196,7 @@
 	"S_MEDIA_TYPE_DELETED"=>		"Media type deleted",
 	"S_MEDIA_TYPE_WAS_NOT_DELETED"=>	"Media type was not deleted",
 	"S_CONFIGURATION"=>			"Configuration",
+	"S_ADMINISTRATION"=>			"Administration",
 	"S_DO_NOT_KEEP_ACTIONS_OLDER_THAN"=>	"Do not keep actions older than (in days)",
 	"S_DO_NOT_KEEP_EVENTS_OLDER_THAN"=>	"Do not keep events older than (in days)",
 	"S_MEDIA_TYPES_BIG"=>			"MEDIA TYPES",
@@ -911,6 +912,10 @@
 	"S_ACK"=>				"Ack",
 
 //	users.php
+	"S_ZABBIX_USER"=>			"ZABBIX User",
+	"S_ZABBIX_ADMIN"=>			"ZABBIX Admin",
+	"S_SUPPER_ADMIN"=>			"ZABBIX Supper Admin",
+	"S_USER_TYPE"=>				"User type",
 	"S_USERS"=>				"Users",
 	"S_USER_ADDED"=>			"User added",
 	"S_CANNOT_ADD_USER"=>			"Cannot add user",

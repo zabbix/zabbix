@@ -86,10 +86,6 @@
 	validate_group_with_host("U",array("allow_all_hosts","with_items"));
 ?>
 <?php
-	update_profile("web.menu.config.last",$page["file"]);
-?>
-
-<?php
 
 /* FORM ACTIONS */
 	if(isset($_REQUEST["save"]))

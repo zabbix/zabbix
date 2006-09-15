@@ -104,7 +104,6 @@
 		validate_group("U");
 
 	update_profile("web.hosts.config",$_REQUEST["config"]);
-	update_profile("web.menu.config.last",$page["file"]);
 ?>
 <?php
 

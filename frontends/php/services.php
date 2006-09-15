@@ -40,8 +40,6 @@
 	if($_REQUEST["serviceid"] == 0) unset($_REQUEST["serviceid"]);
 
 	$_REQUEST["parentid"] = get_request("parentid", 0);
-
-	update_profile("web.menu.config.last",$page["file"]);
 ?>
 
 <?php

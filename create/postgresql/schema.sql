@@ -178,16 +178,17 @@ CREATE INDEX trigger_depends_up   on trigger_depends (triggerid_up);
 CREATE SEQUENCE users_userid_seq START 3;
 
 CREATE TABLE users (
-  userid		integer DEFAULT nextval('users_userid_seq') NOT NULL,
-  alias			varchar(100)	DEFAULT '' NOT NULL,
-  name			varchar(100)	DEFAULT '' NOT NULL,
-  surname		varchar(100)	DEFAULT '' NOT NULL,
-  passwd		char(32)	DEFAULT '' NOT NULL,
-  url			varchar(255)	DEFAULT '' NOT NULL,
-  autologout		int4		DEFAULT '900' NOT NULL,
-  lang			varchar(5)	DEFAULT 'en_gb' NOT NULL,
-  refresh		int4		DEFAULT '30' NOT NULL,
-  PRIMARY KEY (userid)
+	userid		integer DEFAULT nextval('users_userid_seq') NOT NULL,
+	alias		varchar(100)	DEFAULT '' NOT NULL,
+	name		varchar(100)	DEFAULT '' NOT NULL,
+	surname		varchar(100)	DEFAULT '' NOT NULL,
+	passwd		char(32)	DEFAULT '' NOT NULL,
+	url		varchar(255)	DEFAULT '' NOT NULL,
+	autologout	int4		DEFAULT '900' NOT NULL,
+	lang		varchar(5)	DEFAULT 'en_gb' NOT NULL,
+	refresh		int4		DEFAULT '30' NOT NULL,
+	type		int2		DEFAULT '1' NOT NULL, -- Type of user (0 - Uncnown; 1 - ZABBIX user; 2 - ZABBIX Admin; 3 - Supper Admin)
+	PRIMARY KEY (userid)
 );
 
 CREATE UNIQUE INDEX users_alias on users (alias);

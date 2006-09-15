@@ -52,7 +52,6 @@
 	$_REQUEST["screenid"]=get_request("screenid",get_profile("web.screens.screenid",0));
 
 	update_profile("web.screens.screenid",$_REQUEST["screenid"]);
-	update_profile("web.menu.view.last",$page["file"]);
 ?>
 
 <?php

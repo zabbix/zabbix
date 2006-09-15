@@ -145,8 +145,7 @@
 			}
 			elseif(is_a($item,'crow'))
 			{
-				if(isset($rowClass))
-					$item->options['class'] = $rowClass;
+				$item->SetClass($rowClass);
 			}
 			else
 			{
@@ -154,9 +153,9 @@
 			}
 			if(!isset($item->options['class']))
 			{
-				$item->options['class'] = ($this->rownum % 2) ?
+				$item->SetClass(($this->rownum % 2) ?
                                                 $this->evenRowClass:
-                                                $this->oddRowClass;
+                                                $this->oddRowClass);
 			}/**/
 			return $item->ToString();
 		}
@@ -166,7 +165,7 @@
 
 			if(is_a($value,'crow'))
 			{
-				if(isset($class))	$value->SetClass($class);
+				if(!is_null($class))	$value->SetClass($class);
 			}else{
 				$value = new CRow($value,$class);
 			}

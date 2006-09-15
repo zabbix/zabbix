@@ -75,6 +75,7 @@
 			$autologout	= $user["autologout"];
 			$lang		= $user["lang"];
 			$refresh	= $user["refresh"];
+			$user_type	= $user["type"];
 			$user_groups	= array();
 
 			$db_user_groups = DBselect('select g.* from usrgrp g, users_groups ug where ug.usrgrpid=g.usrgrpid and ug.userid='.$userid);
@@ -93,6 +94,7 @@
 			$autologout	= get_request("autologout","900");
 			$lang		= get_request("lang","en_gb");
 			$refresh	= get_request("refresh","30");
+			$user_type	= get_request("user_type",USER_TYPE_ZABBIX_USER);;
 			$user_groups	= get_request("user_groups",array());
 		}
 
@@ -117,12 +119,18 @@
 		$frmUser->AddRow(S_PASSWORD,	new CPassBox("password1",$password,20));
 		$frmUser->AddRow(S_PASSWORD_ONCE_AGAIN,	new CPassBox("password2",$password,20));
 
+		$cmbUserType = new CComboBox('user_type', $user_type);
+		$cmbUserType->AddItem(USER_TYPE_ZABBIX_USER,	user_type2str(USER_TYPE_ZABBIX_USER));
+		$cmbUserType->AddItem(USER_TYPE_ZABBIX_ADMIN,	user_type2str(USER_TYPE_ZABBIX_ADMIN));
+		$cmbUserType->AddItem(USER_TYPE_SUPPER_ADMIN,	user_type2str(USER_TYPE_SUPPER_ADMIN));
+		$frmUser->AddRow(S_USER_TYPE, $cmbUserType);
+
 		foreach($user_groups as $groupid => $group_name)
 		{
 			$frmUser->AddRow(S_GROUPS,	$group_name);
 		}
 
-		$cmbLang = new CcomboBox('lang',$lang);
+		$cmbLang = new CComboBox('lang',$lang);
 		$cmbLang->AddItem("en_gb",S_ENGLISH_GB);
 		$cmbLang->AddItem("cn_zh",S_CHINESE_CN);
 		$cmbLang->AddItem("fr_fr",S_FRENCH_FR);
@@ -1595,14 +1603,13 @@
 			$gsm_modem=$row["gsm_modem"];
 		}
 
-		$frmMeadia = new CFormTable(S_MEDIA,"config.php");
+		$frmMeadia = new CFormTable(S_MEDIA);
 		$frmMeadia->SetHelp("web.config.medias.php");
 
 		if(isset($_REQUEST["mediatypeid"]))
 		{
 			$frmMeadia->AddVar("mediatypeid",$_REQUEST["mediatypeid"]);
 		}
-		$frmMeadia->AddVar("config",1);
 
 		$frmMeadia->AddRow(S_DESCRIPTION,new CTextBox("description",$description,30));
 		$cmbType = new CComboBox("type",$type,"submit()");
@@ -1640,10 +1647,10 @@
 		{
 			$frmMeadia->AddItemToBottomRow(SPACE);
 			$frmMeadia->AddItemToBottomRow(new CButtonDelete(S_DELETE_SELECTED_MEDIA,
-				url_param("form").url_param("config").url_param("mediatypeid")));
+				url_param("form").url_param("mediatypeid")));
 		}
 		$frmMeadia->AddItemToBottomRow(SPACE);
-		$frmMeadia->AddItemToBottomRow(new CButtonCancel(url_param("config")));
+		$frmMeadia->AddItemToBottomRow(new CButtonCancel());
 		$frmMeadia->Show();
 	}
 

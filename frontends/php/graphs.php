@@ -72,8 +72,6 @@
 		show_page_footer();
 		exit;
 	}
-
-	update_profile("web.menu.config.last",$page["file"]);
 ?>
 <?php
 	if(isset($_REQUEST["save"]))

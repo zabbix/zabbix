@@ -218,6 +218,10 @@
 	define("SERVICE_TIME_TYPE_DOWNTIME", 1);
 	define("SERVICE_TIME_TYPE_ONETIME_DOWNTIME", 2);
 
+	define("USER_TYPE_ZABBIX_USER",		1);
+	define("USER_TYPE_ZABBIX_ADMIN",	2);
+	define("USER_TYPE_SUPPER_ADMIN",	3);
+
 /* Support for PHP5. PHP5 does not have $HTTP_..._VARS */
 	if (!function_exists('version_compare'))
 	{

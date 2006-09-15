@@ -97,6 +97,14 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 	include_once("include/classes/cserverinfo.mod.php");
 	include_once("include/classes/cflashclock.mod.php");
 
+	function	access_deny()
+	{
+		$table = new CTable();
+		$table->SetAlign('center');
+		$table->AddRow("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
+		$table->Show();
+                show_page_footer();
+	}
 
 	function zbx_stripslashes($value){
 		if(is_array($value)){
@@ -905,215 +913,224 @@ COpt::profiling_start("page");
 <meta name="Author" content="ZABBIX SIA (Alexei Vladishev, Eugene Grigorjev)">
 <link rel="stylesheet" href="css.css">
 <?php
-//	if($USER_DETAILS['alias']=='guest')
-//	{
-//		$refresh=2*$refresh;
-//	}
-	if(defined($title))	$title=constant($title);
-	if($dorefresh && $USER_DETAILS["refresh"])
-	{
-		echo "	<meta http-equiv=\"refresh\" content=\"".$USER_DETAILS["refresh"]."\">\n";
-		echo "	<title>$title [refreshed every ".$USER_DETAILS["refresh"]." sec]</title>\n";
-	}
-	else
-	{
-		echo "	<title>$title</title>\n";
-	}
+	//	if($USER_DETAILS['alias']=='guest')
+	//	{
+	//		$refresh=2*$refresh;
+	//	}
+		if(defined($title))	$title=constant($title);
+		if($dorefresh && $USER_DETAILS["refresh"])
+		{
+			echo "	<meta http-equiv=\"refresh\" content=\"".$USER_DETAILS["refresh"]."\">\n";
+			echo "	<title>$title [refreshed every ".$USER_DETAILS["refresh"]." sec]</title>\n";
+		}
+		else
+		{
+			echo "	<title>$title</title>\n";
+		}
 
 ?>
 </head>
 <body>
 <?php
-	if($nomenu == 0)
-	{
-	$menu=array(
-		"view"=>array(
-				"label"=>S_MONITORING,
-				"pages"=>array("overview.php","latest.php","tr_status.php","queue.php","events.php","actions.php","maps.php","charts.php","screens.php","srv_status.php","alarms.php","history.php","tr_comments.php","report3.php","profile.php","acknow.php"),
-				"level2"=>array(
-					array("label"=>S_OVERVIEW,"url"=>"overview.php"),
-					array("label"=>S_LATEST_DATA,"url"=>"latest.php"),
-					array("label"=>S_TRIGGERS,"url"=>"tr_status.php"),
-					array("label"=>S_QUEUE,"url"=>"queue.php"),
-					array("label"=>S_EVENTS,"url"=>"events.php"),
-					array("label"=>S_ACTIONS,"url"=>"actions.php"),
-					array("label"=>S_MAPS,"url"=>"maps.php"),
-					array("label"=>S_GRAPHS,"url"=>"charts.php"),
-					array("label"=>S_SCREENS,"url"=>"screens.php"),
-					array("label"=>S_IT_SERVICES,"url"=>"srv_status.php")
-					)
-				),
-		"cm"=>array(
-				"label"=>S_INVENTORY,
-				"pages"=>array("hostprofiles.php"),
-				"level2"=>array(
-					array("label"=>S_HOSTS,"url"=>"hostprofiles.php")
-					)
-				),
-		"reports"=>array(
-				"label"=>S_REPORTS,
-				"pages"=>array("report1.php","report2.php","report4.php","report5.php"),
-				"level2"=>array(
-					array("label"=>S_STATUS_OF_ZABBIX,"url"=>"report1.php"),
-					array("label"=>S_AVAILABILITY_REPORT,"url"=>"report2.php"),
-					array("label"=>S_NOTIFICATIONS,"url"=>"report4.php"),
-					array("label"=>S_TRIGGERS_TOP_100,"url"=>"report5.php"),   
-					)
-				),
-		"configuration"=>array(
-				"label"=>S_CONFIGURATION,
-				"pages"=>array("config.php","users.php","audit.php","hosts.php","items.php","triggers.php","sysmaps.php","graphs.php","screenconf.php","services.php","sysmap.php","media.php","screenedit.php","graph.php","actionconf.php","bulkloader.php"),
-				"level2"=>array(
-					array("label"=>S_GENERAL,"url"=>"config.php"),
-					array("label"=>S_USERS,"url"=>"users.php"),
-					array("label"=>S_AUDIT,"url"=>"audit.php"),
-					array("label"=>S_HOSTS,"url"=>"hosts.php"),
-					array("label"=>S_ITEMS,"url"=>"items.php"),
-					array("label"=>S_TRIGGERS,"url"=>"triggers.php"),
-					array("label"=>S_ACTIONS,"url"=>"actionconf.php"),
-					array("label"=>S_MAPS,"url"=>"sysmaps.php"),
-					array("label"=>S_GRAPHS,"url"=>"graphs.php"),
-					array("label"=>S_SCREENS,"url"=>"screenconf.php"),
-					array("label"=>S_IT_SERVICES,"url"=>"services.php"),
-					array("label"=>S_MENU_BULKLOADER,"url"=>"bulkloader.php")
-					)
-				),
-		"login"=>array(
-				"label"=>S_LOGIN,
-				"pages"=>array("index.php"),
-				"level2"=>array(
-					array("label"=>S_LOGIN,"url"=>"index.php"),
-					)
-				),
-		);
-
-	$table = new CTable(NULL,"page_header");
-	$table->SetCellSpacing(0);
-	$table->SetCellPadding(5);
-
-	$help = new CLink(S_HELP, "http://www.zabbix.com/manual/v1.1/index.php", "small_font");
-	$help->SetTarget('_blank');
-	$col_r = array($help);
-	if($USER_DETAILS["alias"]!="guest") {
-		array_push($col_r, "|");		
-		array_push($col_r, new CLink(S_PROFILE, "profile.php", "small_font"));
-	}
-
-	$logo = new CLink(new CImg("images/general/zabbix.png","ZABBIX"),"http://www.zabbix.com");
-	$logo->SetTarget('_blank');
-	$table->AddRow(array(new CCol($logo, "page_header_l"), new CCol($col_r, "page_header_r")));
-
-	$table->Show();
-?>
-
-<table class="menu" cellspacing=0 cellpadding=5>
-<tr>
-<?php
-	$i=0;
-	foreach($menu as $label=>$sub)
-	{
-// Check permissions
-		if($label=="configuration")
+		if($nomenu == 0)
 		{
-			if(	!check_anyright("Configuration of Zabbix","U")
-				&&!check_anyright("User","U")
-				&&!check_anyright("Host","U")
-				&&!check_anyright("Item","U")
-				&&!check_anyright("Graph","U")
-				&&!check_anyright("Screen","U")
-				&&!check_anyright("Network map","U")
-				&&!check_anyright("Service","U")
-			)
-			{
-				continue;
-			}
-			if(	!check_anyright("Default permission","R")
-				&&!check_anyright("Host","R")
-			)
-			{
-				continue;
+			$menu=array(
+				"view"=>array(
+						"label"			=> S_MONITORING,
+						"default_page_id"	=> 0,
+						"pages"=>array(
+							array("url"=>"overview.php"	,"label"=>S_OVERVIEW	),
+							array("url"=>"latest.php"	,"label"=>S_LATEST_DATA	,
+								"sub_pages"=>array("history.php")
+								),
+							array("url"=>"tr_status.php"	,"label"=>S_TRIGGERS	,
+								"sub_pages"=>array("alarms.php","acknow.php","tr_comments.php")
+								),
+							array("url"=>"queue.php"	,"label"=>S_QUEUE	),
+							array("url"=>"events.php"	,"label"=>S_EVENTS	),
+							array("url"=>"actions.php"	,"label"=>S_ACTIONS	),
+							array("url"=>"maps.php"		,"label"=>S_MAPS	),
+							array("url"=>"charts.php"	,"label"=>S_GRAPHS	),
+							array("url"=>"screens.php"	,"label"=>S_SCREENS	),
+							array("url"=>"srv_status.php"	,"label"=>S_IT_SERVICES	,
+								"sub_pages"=>array("report3.php")
+								),
+							array("url"=>"profile.php")
+							)
+						),
+				"cm"=>array(
+						"label"			=> S_INVENTORY,
+						"default_page_id"	=> 0,
+						"pages"=>array(
+							array("url"=>"hostprofiles.php"	,"label"=>S_HOSTS	)
+							)
+						),
+				"reports"=>array(
+						"label"			=> S_REPORTS,
+						"default_page_id"	=> 0,
+						"pages"=>array(
+							array("url"=>"report1.php",	"label"=>S_STATUS_OF_ZABBIX	),
+							array("url"=>"report2.php",	"label"=>S_AVAILABILITY_REPORT	),
+							array("url"=>"report4.php",	"label"=>S_NOTIFICATIONS	),
+							array("url"=>"report5.php",	"label"=>S_TRIGGERS_TOP_100	)   
+							)
+						),
+				"config"=>array(
+						"label"			=> S_CONFIGURATION,
+						"default_page_id"	=> 0,
+						"pages"=>array(
+							array("url"=>"config.php"	,"label"=>S_GENERAL		),
+							array("url"=>"hosts.php"	,"label"=>S_HOSTS		),
+							array("url"=>"items.php"	,"label"=>S_ITEMS		),
+							array("url"=>"triggers.php"	,"label"=>S_TRIGGERS		),
+							array("url"=>"actionconf.php"	,"label"=>S_ACTIONS		),
+							array("url"=>"sysmaps.php"	,"label"=>S_MAPS		),
+							array("url"=>"graphs.php"	,"label"=>S_GRAPHS		,
+								"sub_pages"=>array("graph.php")
+								),
+							array("url"=>"screenconf.php"	,"label"=>S_SCREENS		,
+								"sub_pages"=>array("screenedit.php")
+								),
+							array("url"=>"services.php"	,"label"=>S_IT_SERVICES		),
+							array("url"=>"bulkloader.php"	,"label"=>S_MENU_BULKLOADER	)
+							)
+						),
+				"admin"=>array(
+						"label"			=> S_ADMINISTRATION,
+						"default_page_id"	=> 0,
+						"pages"=>array(
+							array("url"=>"media_types.php"	,"label"=>S_MEDIA_TYPES		),
+							array("url"=>"users.php"	,"label"=>S_USERS		),
+							array("url"=>"audit.php"	,"label"=>S_AUDIT		,
+								"sub_pages"=>array("media.php")
+								),
+							array("url"=>"admin.php")
+							)
+						),
+				"login"=>array(
+						"label"			=> S_LOGIN,
+						"default_page_id"	=> 0,
+						"pages"=>array(
+							array("url"=>"index.php"),
+							)
+						),
+				);
+
+			$table = new CTable(NULL,"page_header");
+			$table->SetCellSpacing(0);
+			$table->SetCellPadding(5);
+
+			$help = new CLink(S_HELP, "http://www.zabbix.com/manual/v1.1/index.php", "small_font");
+			$help->SetTarget('_blank');
+			$col_r = array($help);
+			if($USER_DETAILS["alias"]!="guest") {
+				array_push($col_r, "|");		
+				array_push($col_r, new CLink(S_PROFILE, "profile.php", "small_font"));
 			}
 
-		}
-// End of check permissions
-		$active=0;
-		foreach($sub["pages"] as $label2)
-		{
-			if($page["file"]==$label2)
-			{
-				$active=1;
-				$active_level1=$label;
-			}
-		}
-		if($i==0)	$url=get_profile("web.menu.view.last",0);
-		else if($i==1)	$url=get_profile("web.menu.cm.last",0);
-		else if($i==2)	$url=get_profile("web.menu.reports.last",0);
-		else if($i==3)	$url=get_profile("web.menu.config.last",0);
-		else if($i==4)	$url="0";
+			$logo = new CLink(new CImg("images/general/zabbix.png","ZABBIX"),"http://www.zabbix.com");
+			$logo->SetTarget('_blank');
+			$table->AddRow(array(new CCol($logo, "page_header_l"), new CCol($col_r, "page_header_r")));
 
-		if($url=="0")	$url=$sub["level2"][0]["url"];
-		if($active==1) 
-		{
+			$table->Show();
+
 			global $page;
-			$class = "horizontal_menu";
-			if(isset($page["menu.url"]))
-				$url = $page["menu.url"];
-			else
-				$url	= $page["file"];
-		}
-		else
-		{
-			$class = "horizontal_menu_n";
-		}
 
-		echo "<td class=\"$class\" height=24 colspan=9><b><a href=\"$url\" class=\"highlight\">".$sub["label"]."</a></b></td>\n";
-		$i++;
-	}
-?>
-</tr>
-</table>
+			$main_menu_row	= array();
+			$sub_menu_row	= array();
 
-<table class="menu" width="100%" cellspacing=0 cellpadding=5>
-<tr><td class="horizontal_menu" height=24 colspan=9><b>
-<?php
-	if(isset($active_level1))
-	foreach($menu[$active_level1]["level2"] as $label=>$sub)
-	{
-// Check permissions
-		if(($sub["url"]=="latest.php")&&!check_anyright("Host","R"))							continue;
-		if(($sub["url"]=="overview.php")&&!check_anyright("Host","R"))							continue;
-		if(($sub["url"]=="tr_status.php?onlytrue=true&noactions=true&compact=true")&&!check_anyright("Host","R"))	continue;
-		if(($sub["url"]=="queue.php")&&!check_anyright("Host","R"))							continue;
-		if(($sub["url"]=="events.php")&&!check_anyright("Default permission","R"))				continue;
-		if(($sub["url"]=="actions.php")&&!check_anyright("Default permission","R"))					continue;
-		if(($sub["url"]=="maps.php")&&!check_anyright("Network map","R"))						continue;
-		if(($sub["url"]=="charts.php")&&!check_anyright("Graph","R"))							continue;
-		if(($sub["url"]=="screens.php")&&!check_anyright("Screen","R"))							continue;
-		if(($sub["url"]=="srv_status.php")&&!check_anyright("Service","R"))						continue;
-		if(($sub["url"]=="report1.php")&&!check_anyright("Default permission","R"))					continue;
-		if(($sub["url"]=="report2.php")&&!check_anyright("Host","R"))							continue;
-		if(($sub["url"]=="config.php")&&!check_anyright("Configuration of Zabbix","U"))					continue;
-		if(($sub["url"]=="users.php")&&!check_anyright("User","U"))							continue;
-		if(($sub["url"]=="media.php")&&!check_anyright("User","U"))							continue;
-		if(($sub["url"]=="audit.php")&&!check_anyright("Audit","U"))							continue;
-		if(($sub["url"]=="hosts.php")&&!check_anyright("Host","U"))							continue;
-		if(($sub["url"]=="items.php")&&!check_anyright("Item","U"))							continue;
-		if(($sub["url"]=="triggers.php")&&!check_anyright("Host","U"))							continue;
-		if(($sub["url"]=="sysmaps.php")&&!check_anyright("Network map","U"))						continue;
-		if(($sub["url"]=="sysmap.php")&&!check_anyright("Network map","U"))						continue;
-		if(($sub["url"]=="graphs.php")&&!check_anyright("Graph","U"))							continue;
-		if(($sub["url"]=="graph.php")&&!check_anyright("Graph","U"))							continue;
-		if(($sub["url"]=="screenedit.php")&&!check_anyright("Screen","U"))						continue;
-		if(($sub["url"]=="screenconf.php")&&!check_anyright("Screen","U"))						continue;
-		if(($sub["url"]=="services.php")&&!check_anyright("Service","U"))						continue;
+			unset($denyed_page_requested);
 
-		echo "<a href=\"".$sub["url"]."\" class=\"highlight\">".$sub["label"]."</a><span class=\"divider\">".SPACE.SPACE."|".SPACE."</span>\n";
-	}
-?>
-</b></td></tr>
-</table>
-<br/>
-<?php
+			foreach($menu as $label=>$sub)
+			{
+		// Check permissions
+				unset($deny);
+				if($label=='admin'	&& !in_array($USER_DETAILS['type'], 
+					array(USER_TYPE_SUPPER_ADMIN)) )
+					$deny = true;
+				if($label=='config'	&& !in_array($USER_DETAILS['type'], 
+					array(USER_TYPE_SUPPER_ADMIN, USER_TYPE_ZABBIX_ADMIN)) )
+					$deny = true;
+				if($label=='view'	&& !in_array($USER_DETAILS['type'], 
+					array(USER_TYPE_SUPPER_ADMIN, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_ZABBIX_USER)) )
+					$deny = true;
+
+		// End of check permissions
+				$menu_url = null;
+				foreach($sub['pages'] as $sub_pages)
+				{
+					if($page['file'] == $sub_pages['url'])
+					{
+						$menu_url = $sub_pages['url'];
+						break;
+					}
+					else if(isset($sub_pages['sub_pages']))
+					{
+						if(in_array($page['file'], $sub_pages['sub_pages']))
+						{
+							$menu_url = $sub_pages['url'];
+							break;
+						}					
+					}
+				}
+
+
+				if(!is_null($menu_url)) /* active menu */
+				{
+					$class = "active";
+
+					update_profile('web.menu.'.$label.'.last', $menu_url);
+
+					if(isset($deny))
+					{
+						$denyed_page_requested = true;
+						continue;
+					}
+
+					foreach($sub['pages'] as $sub_pages)
+					{
+						if(!isset($sub_pages['label'])) continue;
+
+						array_push($sub_menu_row, 
+							new CLink($sub_pages['label'], $sub_pages['url'],'highlight'), 
+							new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider')
+							);
+					}
+				}
+				else
+				{
+					if(isset($deny)) continue;
+
+					$class = "horizontal_menu_n";
+
+					$menu_url = get_profile('web.menu.'.$label.'.last',false);
+
+					if(!$menu_url)
+						$menu_url = $sub['pages'][$sub['default_page_id']]["url"];
+				}
+
+				array_push($main_menu_row, new CCol(new CLink($sub['label'], $menu_url, "highlight"),$class));
+			}
+			
+			$table = new CTable(NULL,'menu');
+			$table->SetCellSpacing(0);
+			$table->SetCellPadding(5);
+			$table->AddRow($main_menu_row);
+			$table->Show();
+
+			$table = new CTable(NULL,'sub_menu');
+			$table->SetCellSpacing(0);
+			$table->SetCellPadding(5);
+			$table->AddRow(new CCol($sub_menu_row));
+			$table->Show();
+
+			echo BR;
+
+			if(isset($denyed_page_requested))
+			{
+				access_deny();
+				exit;
+			}
 		}
 	}
 

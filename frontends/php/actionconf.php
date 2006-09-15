@@ -92,7 +92,6 @@
 
 <?php
 	update_profile("web.actionconf.actiontype",$_REQUEST["actiontype"]);
-	update_profile("web.menu.config.last",$page["file"]);
 ?>
 
 <?php

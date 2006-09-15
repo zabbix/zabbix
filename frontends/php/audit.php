@@ -24,11 +24,6 @@
 	$page["file"] = "audit.php";
 	show_header($page["title"],1,0);
 ?>
-
-<?php
-	update_profile("web.menu.config.last",$page["file"]);
-?>
-
 <?php
 	if(isset($_REQUEST["start"])&&isset($_REQUEST["prev"]))
 	{

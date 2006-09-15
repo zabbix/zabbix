@@ -122,7 +122,9 @@
 		}
 		function SetClass($value)		
 		{
-			return $this->options['class'] = $value;
+			if(isset($value))
+				$this->options['class'] = $value;
+			return $value;
 		}
 		function DelOption($name)
 		{

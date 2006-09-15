@@ -37,16 +37,11 @@
                 exit;
         }
 ?>
-
-<?php
-	update_profile("web.menu.config.last",$page["file"]);
-?>
-
 <?php
 	$fields=array(
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 
-		"config"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1,3,4,5,6,7"),	NULL),
+		"config"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,3,4,5,6,7"),	NULL),
 
 // other form
 		"alert_history"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),
@@ -57,24 +52,6 @@
 						'in_array({config},array(0,5,7))&&({save}=="Save")'),
 		"work_period"=>		array(T_ZBX_STR, O_NO,	NULL,	NULL,
 						'in_array({config},array(0,5,7))&&({save}=="Save")'),
-
-// media form
-		"mediatypeid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),
-						'{config}==1&&{form}=="update"'),
-		"type"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1,2"),
-						'({config}==1)&&(isset({save}))'),
-		"description"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
-						'({config}==1)&&(isset({save}))'),
-		"smtp_server"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
-						'({config}==1)&&({type}==0)'),
-		"smtp_helo"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
-						'({config}==1)&&({type}==0)'),
-		"smtp_email"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
-						'({config}==1)&&({type}==0)'),
-		"exec_path"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
-						'({config}==1)&&({type}==1)&&isset({save})'),
-		"gsm_modem"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
-						'({config}==1)&&({type}==2)&&isset({save})'),
 
 // image form
 		"imageid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),
@@ -120,58 +97,7 @@
 	update_profile("web.config.config",$_REQUEST["config"]);
 
 	$result = 0;
-	if($_REQUEST["config"]==1)
-	{
-
-
-
-/* MEDIATYPE ACTIONS */
-		if(isset($_REQUEST["save"]))
-		{
-			if(isset($_REQUEST["mediatypeid"]))
-			{
-	/* UPDATE */
-				$action = AUDIT_ACTION_UPDATE;
-				$result=update_mediatype($_REQUEST["mediatypeid"],
-					$_REQUEST["type"],$_REQUEST["description"],$_REQUEST["smtp_server"],
-					$_REQUEST["smtp_helo"],$_REQUEST["smtp_email"],$_REQUEST["exec_path"],
-					$_REQUEST["gsm_modem"]);
-
-				show_messages($result, S_MEDIA_TYPE_UPDATED, S_MEDIA_TYPE_WAS_NOT_UPDATED);
-			}
-			else
-			{
-	/* ADD */
-				$action = AUDIT_ACTION_ADD;
-				$result=add_mediatype(
-					$_REQUEST["type"],$_REQUEST["description"],$_REQUEST["smtp_server"],
-					$_REQUEST["smtp_helo"],$_REQUEST["smtp_email"],$_REQUEST["exec_path"],
-					$_REQUEST["gsm_modem"]);
-
-				show_messages($result, S_ADDED_NEW_MEDIA_TYPE, S_NEW_MEDIA_TYPE_WAS_NOT_ADDED);
-			}
-			if($result)
-			{
-				add_audit($action,AUDIT_RESOURCE_MEDIA_TYPE,
-					"Media type [".$_REQUEST["description"]."]");
-
-				unset($_REQUEST["form"]);
-			}
-		} elseif(isset($_REQUEST["delete"])&&isset($_REQUEST["mediatypeid"])) {
-	/* DELETE */
-			$mediatype=get_mediatype_by_mediatypeid($_REQUEST["mediatypeid"]);
-			$result=delete_mediatype($_REQUEST["mediatypeid"]);
-			show_messages($result, S_MEDIA_TYPE_DELETED, S_MEDIA_TYPE_WAS_NOT_DELETED);
-			if($result)
-			{
-				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_MEDIA_TYPE,
-					"Media type [".$mediatype["description"]."]");
-
-				unset($_REQUEST["form"]);
-			}
-		}
-	}
-	elseif($_REQUEST["config"]==3)
+	if($_REQUEST["config"]==3)
 	{
 
 
@@ -347,7 +273,6 @@
 	$form = new CForm("config.php");
 	$cmbConfig = new CCombobox("config",$_REQUEST["config"],"submit()");
 	$cmbConfig->AddItem(0,S_HOUSEKEEPER);
-	$cmbConfig->AddItem(1,S_MEDIA_TYPES);
 //	$cmbConfig->AddItem(2,S_ESCALATION_RULES);
 	$cmbConfig->AddItem(3,S_IMAGES);
 	$cmbConfig->AddItem(4,S_AUTOREGISTRATION);
@@ -357,10 +282,6 @@
 	$form->AddItem($cmbConfig);
 	switch($_REQUEST["config"])
 	{
-	case 1:
-		$form->AddItem(SPACE."|".SPACE);
-		$form->AddItem(new CButton("form",S_CREATE_MEDIA_TYPE));
-		break;
 	case 3:
 		$form->AddItem(SPACE."|".SPACE);
 		$form->AddItem(new CButton("form",S_CREATE_IMAGE));
@@ -390,41 +311,6 @@
 	elseif($_REQUEST["config"]==7)
 	{
 		insert_work_period_form();
-	}
-	elseif($_REQUEST["config"]==1)
-	{
-		if(isset($_REQUEST["form"]))
-		{
-			insert_media_type_form();
-		}
-		else
-		{
-			show_table_header(S_MEDIA_TYPES_BIG);
-
-			$table=new CTableInfo(S_NO_MEDIA_TYPES_DEFINED);
-			$table->setHeader(array(S_DESCRIPTION,S_TYPE));
-
-			$result=DBselect("select mt.mediatypeid,mt.type,mt.description,mt.smtp_server,".
-				"mt.smtp_helo,mt.smtp_email,mt.exec_path from media_type mt".
-				" where mod(mt.mediatypeid,100)=".$ZBX_CURNODEID.
-				" order by mt.type");
-			while($row=DBfetch($result))
-			{
-				$description=new CLink($row["description"],"config.php?&form=update".
-					url_param("config")."&mediatypeid=".$row["mediatypeid"],'action');
-
-				if($row["type"]==ALERT_TYPE_EMAIL)	$type=S_EMAIL;
-				else if($row["type"]==ALERT_TYPE_EXEC)	$type=S_SCRIPT;
-				else if($row["type"]==ALERT_TYPE_SMS)	$type=S_SMS;
-				else					$type=S_UNKNOWN;
-
-				$table->addRow(array(
-//					$row["mediatypeid"],
-					$description,
-					$type));
-			}
-			$table->show();
-		}
 	}
 	elseif($_REQUEST["config"]==3)
 	{

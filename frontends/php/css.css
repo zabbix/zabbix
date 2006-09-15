@@ -451,30 +451,49 @@ table.map
 
 table.menu
 {
+	height: 24;
 	background-color: #FFFFFF;
 	color: #000000;
 	border: 0px solid #000000;
 }
 
-table.menu td.sub_menu
+table.menu tr
 {
-	color: #FFFFFF;
         font-family:verdana, arial, helvetica, sans-serif;
         font-size:10px;
-	background: #5C7099 url(images/gradients/table_head2.gif) repeat-x top left;
-	background-color: #6d88ad;
-	border-color: #000000;
-	border-width:0px;
-	border-top-style: solid;
-	border-left-style: solid;
-	border-right-style: solid;
-	border-bottom-style: solid;
-	vertical-align: middle;
+	background: #AAAAAA url(images/gradients/menu_not_active.gif) repeat-x top left;
 	padding-right: 5px;
 	padding-left: 5px;
 }
 
-table.menu td.horizontal_menu
+table.menu td
+{
+	border-color: #AAAAAA;
+	border-width:1px;
+	border-top-style: solid;
+	border-left-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+}
+table.menu td.active
+{
+	color: #FFFFFF;
+	background: #5C7099 url(images/gradients/table_head.gif) repeat-x top left;
+	border-width:0px;
+}
+
+/************* SUB MENU ************/
+
+table.sub_menu
+{
+	height: 24;
+	background-color: #FFFFFF;
+	color: #000000;
+	border: 0px solid #000000;
+	width: 100%;
+}
+
+table.sub_menu tr
 {
 	color: #FFFFFF;
         font-family:verdana, arial, helvetica, sans-serif;
@@ -486,18 +505,6 @@ table.menu td.horizontal_menu
 	border-left-style: solid;
 	border-right-style: solid;
 	border-bottom-style: solid;
-	padding-right: 5px;
-	padding-left: 5px;
-}
-
-table.menu td.horizontal_menu_n
-{
-	background: #AAAAAA url(images/gradients/menu_not_active.gif) repeat-x top left;
-	border-color: #AAAAAA;
-	border-width:1px;
-	border-top-style: solid;
-	border-left-style: solid;
-	border-right-style: solid;
 	padding-right: 5px;
 	padding-left: 5px;
 }

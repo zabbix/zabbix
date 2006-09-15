@@ -106,11 +106,6 @@
 
 	validate_group_with_host("U",array("always_select_first_host"));
 ?>
-
-<?php
-	update_profile("web.menu.config.last",$page["file"]);
-?>
-
 <?php
 	$result = 0;
 	if(isset($_REQUEST['del_delay_flex']) && isset($_REQUEST['rem_delay_flex']))

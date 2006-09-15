@@ -53,7 +53,6 @@
 	}
 
 	update_profile("web.maps.sysmapid",$_REQUEST["sysmapid"]);
-	update_profile("web.menu.view.last",$page["file"]);
 
 	if($_REQUEST["sysmapid"] > 0 && !check_right("Network map","R",$_REQUEST["sysmapid"]))
 	{

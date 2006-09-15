@@ -85,7 +85,6 @@
 	}
 
 	update_profile("web.charts.grapgid",$_REQUEST["graphid"]);
-	update_profile("web.menu.view.last",$page["file"]);
 ?>
 
 <?php

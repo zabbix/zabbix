@@ -60,8 +60,6 @@
 	$h2=$h2."</select>";
 
 	show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"queue.php\">", "</form>");
-
-	update_profile("web.menu.view.last",$page["file"]);
 ?>
 
 <?php

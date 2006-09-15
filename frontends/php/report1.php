@@ -24,11 +24,6 @@
 	$page["file"] = "report1.php";
 	show_header($page["title"],0,0);
 ?>
-
-<?php
-	update_profile("web.menu.reports.last",$page["file"]);
-?>
-
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(

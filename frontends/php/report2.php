@@ -44,11 +44,6 @@
 
 	check_fields($fields);
 ?>
-
-<?php
-	update_profile("web.menu.reports.last",$page["file"]);
-?>
-
 <?php
 	$h1=SPACE.S_AVAILABILITY_REPORT_BIG;
 

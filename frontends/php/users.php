@@ -40,10 +40,6 @@
 	update_profile("web.users.config",$_REQUEST["config"]);
 ?>
 <?php
-	update_profile("web.menu.config.last",$page["file"]);
-?>
-
-<?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		"config"=>	array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1"),	NULL),
@@ -55,6 +51,7 @@
 		"surname"=>	array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'{config}==0&&isset({save})'),
 		"password1"=>	array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'{config}==0&&isset({save})'),
 		"password2"=>	array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'{config}==0&&isset({save})'),
+		"user_type"=>	array(T_ZBX_INT, O_OPT,	NULL,	IN('1,2,3'),	'{config}==0&&isset({save})'),
 		"lang"=>	array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'{config}==0&&isset({save})'),
 		"autologout"=>	array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,3600),'{config}==0&&isset({save})'),
 		"url"=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'{config}==0&&isset({save})'),
@@ -103,7 +100,7 @@
 				$result=update_user($_REQUEST["userid"],
 					$_REQUEST["name"],$_REQUEST["surname"],$_REQUEST["alias"],
 					$_REQUEST["password1"],$_REQUEST["url"],$_REQUEST["autologout"],
-					$_REQUEST["lang"],$_REQUEST["refresh"]);
+					$_REQUEST["lang"],$_REQUEST["refresh"],$_REQUEST["user_type"]);
 
 				show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
 			} else {
@@ -111,7 +108,7 @@
 				$result=add_user(
 					$_REQUEST["name"],$_REQUEST["surname"],$_REQUEST["alias"],
 					$_REQUEST["password1"],$_REQUEST["url"],$_REQUEST["autologout"],
-					$_REQUEST["lang"],$_REQUEST["refresh"]);
+					$_REQUEST["lang"],$_REQUEST["refresh"],$_REQUEST["user_type"]);
 
 				show_messages($result, S_USER_ADDED, S_CANNOT_ADD_USER);
 			}
@@ -209,9 +206,9 @@
 		{
 			show_table_header(S_USERS_BIG);
 			$table=new CTableInfo(S_NO_USERS_DEFINED);
-			$table->setHeader(array(S_ID,S_ALIAS,S_NAME,S_SURNAME,S_IS_ONLINE_Q,S_ACTIONS));
+			$table->setHeader(array(S_ID,S_ALIAS,S_NAME,S_SURNAME,S_USER_TYPE,S_IS_ONLINE_Q,S_ACTIONS));
 		
-			$db_users=DBselect("select userid,alias,name,surname ".
+			$db_users=DBselect("select userid,alias,name,surname,type ".
 				" from users where mod(userid,100)=".$ZBX_CURNODEID.
 				" order by alias");
 			while($db_user=DBfetch($db_users))
@@ -249,6 +246,7 @@
 					$alias,
 					$db_user["name"],
 					$db_user["surname"],
+					user_type2str($db_user['type']),
 					$online,
 					$actions
 					));

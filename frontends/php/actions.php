@@ -57,11 +57,6 @@
 		}
 	}
 ?>
-
-<?php
-	update_profile("web.menu.view.last",$page["file"]);
-?>
-
 <?php
 	$form = new CForm();
 
