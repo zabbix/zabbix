@@ -34,37 +34,47 @@
 
 	# Add User definition
 
-	function	add_user($name,$surname,$alias,$passwd,$url,$autologout,$lang,$refresh)
+	function	add_user($name,$surname,$alias,$passwd,$url,$autologout,$lang,$refresh,$user_type,$user_groups)
 	{
-		if(!check_right("User","A",0))
+		global $USER_DETAILS;
+
+		if($USER_DETAILS['type'] != USER_TYPE_SUPPER_ADMIN)
 		{
 			error("Insufficient permissions");
 			return 0;
 		}
 
-		if($alias==""){
-			error("Incorrect Alias name");
+		if(DBfetch(DBexecute("select * from users where alias=".zbx_dbstr($alias))))
+		{
+			error('User "'.$alias.'" already exists');
 			return 0;
 		}
 
-		$sql="select * from users where alias=".zbx_dbstr($alias);
-		$result=DBexecute($sql);
-		if(DBfetch($result))
-		{
-			error("User '$alias' already exists");
-			return 0;
-		}
-		
-		$passwd=md5($passwd);
 		$userid = get_dbid("users","userid");
-		$sql="insert into users (userid,name,surname,alias,passwd,url,autologout,lang,refresh) values ($userid,".zbx_dbstr($name).",".zbx_dbstr($surname).",".zbx_dbstr($alias).",".zbx_dbstr($passwd).",".zbx_dbstr($url).",$autologout,".zbx_dbstr($lang).",$refresh)";
-		DBexecute($sql);
-		return $userid;
+
+		$result =  DBexecute('insert into users (userid,name,surname,alias,passwd,url,autologout,lang,refresh,type)'.
+			' values ('.$userid.','.zbx_dbstr($name).','.zbx_dbstr($surname).','.zbx_dbstr($alias).','.
+			zbx_dbstr(md5($passwd)).','.zbx_dbstr($url).','.$autologout.','.zbx_dbstr($lang).','.$refresh.','.$user_type.')');
+
+		if($result)
+		{
+			DBexecute('delete from users_groups where userid='.$userid);
+			foreach($user_groups as $groupid => $grou_pname)
+			{
+				$users_groups_id = get_dbid("users_groups","id");
+				$result = DBexecute('insert into users_groups (id,usrgrpid,userid)'.
+					'values('.$users_groups_id.','.$groupid.','.$userid.')');
+
+				if($result == false) break;
+			}
+		}
+
+		return $result;
 	}
 
 	# Update User definition
 
-	function	update_user($userid,$name,$surname,$alias,$passwd, $url,$autologout,$lang,$refresh)
+	function	update_user($userid,$name,$surname,$alias,$passwd, $url,$autologout,$lang,$refresh,$user_type,$user_groups)
 	{
 		if(!check_right("User","U",$userid))
 		{
@@ -72,30 +82,64 @@
 			return 0;
 		}
 
-		if($alias==""){
-			error("incorrect alias name");
-			return 0;
-		}
-
-		$sql="select * from users where alias=".zbx_dbstr($alias)." and userid<>$userid";
-		$result=DBexecute($sql);
-		if(DBfetch($result))
+		if(DBfetch(DBexecute("select * from users where alias=".zbx_dbstr($alias)." and userid<>$userid")))
 		{
 			error("User '$alias' already exists");
 			return 0;
 		}
-		
-		if($passwd=="")
+
+		$result = DBexecute("update users set name=".zbx_dbstr($name).",surname=".zbx_dbstr($surname).","."alias=".zbx_dbstr($alias).
+			(isset($passwd) ? (',passwd='.zbx_dbstr(md5($passwd))) : '').
+			",url=".zbx_dbstr($url).","."autologout=$autologout,lang=".zbx_dbstr($lang).",refresh=$refresh,".
+			"type=$user_type where userid=$userid");
+
+		if($result)
 		{
-			$sql="update users set name=".zbx_dbstr($name).",surname=".zbx_dbstr($surname).",alias=".zbx_dbstr($alias).",url=".zbx_dbstr($url).",autologout=$autologout,lang=".zbx_dbstr($lang).",refresh=$refresh where userid=$userid";
+			DBexecute('delete from users_groups where userid='.$userid);
+			foreach($user_groups as $groupid => $grou_pname)
+			{
+				$users_groups_id = get_dbid("users_groups","id");
+				$result = DBexecute('insert into users_groups (id,usrgrpid,userid)'.
+					'values('.$users_groups_id.','.$groupid.','.$userid.')');
+
+				if($result == false) break;
+			}
 		}
-		else
-		{
-			$passwd=md5($passwd);
-			$sql="update users set name=".zbx_dbstr($name).",surname=".zbx_dbstr($surname).",alias=".zbx_dbstr($alias).",passwd=".zbx_dbstr($passwd).",url=".zbx_dbstr($url).",autologout=$autologout,lang=".zbx_dbstr($lang).",refresh=$refresh where userid=$userid";
-		}
-		return DBexecute($sql);
+
+		return $result;
 	}
+
+	# Delete User definition
+
+	function	delete_user($userid)
+	{
+
+		if(DBfetch(DBselect('select * from users where userid='.$userid.' and alias=\'guest\'')))
+		{
+			error("Cannot delete user 'guest'");
+			return	false;
+		}
+
+		while($row=DBfetch(DBexecute('select actionid from actions where userid='.$userid)))
+		{
+			$result = delete_action($row["actionid"]);
+			if(!$result) return $result;
+		}
+
+		$result = DBexecute('delete from media where userid='.$userid);
+		if(!$result) return $result;
+
+		$result = DBexecute('delete from profiles where userid='.$userid);
+		if(!$result) return $result;
+
+		$result = DBexecute('delete from users_groups where userid='.$userid);
+		if(!$result) return $result;
+
+		$result = DBexecute('delete from users where userid='.$userid);
+
+		return $result;
+	}
+
 
 	# Update User Profile
 
@@ -109,16 +153,9 @@
 			return 0;
 		}
 
-		if($passwd=="")
-		{
-			$sql="update users set url=".zbx_dbstr($url).",autologout=$autologout,lang=".zbx_dbstr($lang).",refresh=$refresh where userid=$userid";
-		}
-		else
-		{
-			$passwd=md5($passwd);
-			$sql="update users set passwd=".zbx_dbstr($passwd).",url=".zbx_dbstr($url).",autologout=$autologout,lang=".zbx_dbstr($lang).",refresh=$refresh where userid=$userid";
-		}
-		return DBexecute($sql);
+		return DBexecute("update users set url=".zbx_dbstr($url).",autologout=$autologout,lang=".zbx_dbstr($lang).
+				(isset($passwd) ? (',passwd='.zbx_dbstr(md5($passwd))) : '').
+				",refresh=$refresh where userid=$userid");
 	}
 
 	# Add permission

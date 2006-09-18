@@ -26,22 +26,32 @@
 	$page["file"] = "profile.php";
 
 	show_header($page["title"],0,0);
-//	insert_confirm_javascript();
+	insert_confirm_javascript();
 ?>
 
 <?php
 	if($USER_DETAILS["alias"]=="guest")
 	{
-		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-		show_page_footer();
+		access_deny();
 		exit;
 	}
 ?>
 
 <?php
-	if(isset($_REQUEST["save"]))
+	if(isset($_REQUEST["cancel"]))
 	{
-		if($_REQUEST["password1"]==$_REQUEST["password2"])
+		Redirect('index.php');
+	}
+	elseif(isset($_REQUEST["save"]))
+	{
+		$_REQUEST["password1"] = get_request("password1", null);
+		$_REQUEST["password2"] = get_request("password2", null);
+
+		if(isset($_REQUEST["password1"]) && $_REQUEST["password1"] == "")
+		{
+			show_error_message(S_ONLY_FOR_GUEST_ALLOWED_EMPTY_PASSWORD);
+		}
+		elseif($_REQUEST["password1"]==$_REQUEST["password2"])
 		{
 			$result=update_user_profile($_REQUEST["userid"],$_REQUEST["password1"],$_REQUEST["url"],$_REQUEST["autologout"],$_REQUEST["lang"],$_REQUEST["refresh"]);
 			show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);

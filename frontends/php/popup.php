@@ -29,10 +29,11 @@
 	$srcfld1	= get_request("srcfld1", 0);	// source table field [can be different from fields of source table]
 	$srcfld2	= get_request("srcfld2", 0);	// second source table field [can be different from fields of source table]
 
-	if($srctbl == "hosts")		{ $page["title"] = "S_HOSTS_BIG";	$right_src = "Host"; }
-	if($srctbl == "triggers")	{ $page["title"] = "S_TRIGGERS_BIG";	$right_src = "Triggers"; }
-	if($srctbl == "logitems")	{ $page["title"] = "S_ITEMS_BIG";	$right_src = "Items"; }
-	if($srctbl == "help_items")	{ $page["title"] = "S_STANDARD_ITEMS_BIG";	$right_src = "Standard items"; }
+	if($srctbl == "hosts")		{ $page["title"] = "S_HOSTS_BIG";		$min_user_type = USER_TYPE_ZABBIX_ADMIN; }
+	if($srctbl == "triggers")	{ $page["title"] = "S_TRIGGERS_BIG";		$min_user_type = USER_TYPE_ZABBIX_ADMIN; }
+	if($srctbl == "logitems")	{ $page["title"] = "S_ITEMS_BIG";		$min_user_type = USER_TYPE_ZABBIX_USER; }
+	if($srctbl == "usrgrp")		{ $page["title"] = "S_GROUPS";			$min_user_type = USER_TYPE_SUPPER_ADMIN; }
+	if($srctbl == "help_items")	{ $page["title"] = "S_STANDARD_ITEMS_BIG";	$min_user_type = USER_TYPE_ZABBIX_USER; }
 
 	if(!isset($page["title"]))
 	{
@@ -50,11 +51,11 @@
 ?>
 
 <?php
-	if(!check_anyright($right_src,"R"))
+	global $USER_DETAILS;
+
+	if($min_user_type > $USER_DETAILS['type'])
 	{
-		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-		show_page_footer();
-		exit;
+		access_deny();
 	}
 ?>
 <?php
@@ -203,7 +204,25 @@
 		}
 		$table->show();
 	}
-	if($srctbl == "help_items")
+	elseif($srctbl == "usrgrp")
+	{
+		$table = new CTableInfo(S_NO_GROUPS);
+		$table->SetHeader(array(S_NAME));
+
+		$result = DBselect("select * from usrgrp where mod(usrgrpid,100)=$ZBX_CURNODEID order by name");
+		while($row = DBfetch($result))
+		{
+			$name = new CLink($row["name"],"#","action");
+			$name->SetAction(
+				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
+				get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
+				" window.close();");
+
+			$table->addRow($name);
+		}
+		$table->show();
+	}
+	elseif($srctbl == "help_items")
 	{
 		$table = new CTableInfo(S_NO_ITEMS);
 		$table->SetHeader(array(S_KEY,S_DESCRIPTION));

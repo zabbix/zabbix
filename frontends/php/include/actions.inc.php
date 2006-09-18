@@ -91,39 +91,17 @@
 		return $result;
 	}
 
-	# Delete Action by userid
-
-	function	delete_actions_by_userid( $userid )
-	{
-		$sql="select actionid from actions where userid=$userid";
-		$result=DBexecute($sql);
-		while($row=DBfetch($result))
-		{
-			delete_alert_by_actionid($row["actionid"]);
-		}
-
-		$sql="delete from actions where userid=$userid";
-		return	DBexecute($sql);
-	}
-
-	# Delete Conditions associated with actionid
-
-	function	delete_conditions_by_actionid($actionid)
-	{
-		$sql="delete from conditions where actionid=$actionid";
-		return	DBexecute($sql);
-	}
-
 	# Delete Action
 
 	function	delete_action( $actionid )
 	{
-		delete_conditions_by_actionid($actionid);
-		delete_alert_by_actionid($actionid);
+		$return = DBexecute('delete from conditions where actionid='.$actionid);
 
-		$sql="delete from actions where actionid=$actionid";
-		$result=DBexecute($sql);
+		if($return)
+			$result = DBexecute('delete from alerts where actionid='.$actionid);
 
+		if($return)
+			$result = DBexecute('delete from actions where actionid='.$actionid);
 
 		return $result;
 	}

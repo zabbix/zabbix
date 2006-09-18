@@ -70,7 +70,9 @@
 			$alias		= $user["alias"];
 			$name		= $user["name"];
 			$surname	= $user["surname"];
-			$password	= "";
+			$password	= NULL;
+			$password1	= NULL;
+			$password2	= NULL;
 			$url		= $user["url"];
 			$autologout	= $user["autologout"];
 			$lang		= $user["lang"];
@@ -83,29 +85,33 @@
 			{
 				$user_groups[$db_group['usrgrpid']] = $db_group['name'];
 			}
+
+			$new_group_id	= 0;
+			$new_group_name = '';
 		}
 		else
 		{
 			$alias		= get_request("alias","");
 			$name		= get_request("name","");
 			$surname	= get_request("surname","");
-			$password	= "";
+			$password	= null;
+			$password1 	= get_request("password1", null);
+			$password2 	= get_request("password2", null);
 			$url 		= get_request("url","");
 			$autologout	= get_request("autologout","900");
 			$lang		= get_request("lang","en_gb");
 			$refresh	= get_request("refresh","30");
 			$user_type	= get_request("user_type",USER_TYPE_ZABBIX_USER);;
 			$user_groups	= get_request("user_groups",array());
+			$change_password = get_request("change_password", null);
+			$new_group_id	= get_request('new_group_id', 0);
+			$new_group_name = get_request('new_group_name', '');
 		}
 
 		$frmUser = new CFormTable($frm_title);
+		$frmUser->SetName('user_form');
 		$frmUser->SetHelp("web.users.php");
 		$frmUser->AddVar("config",get_request("config",0));
-
-		if($profile==0) 
-			$frmUser->SetAction("users.php");
-		else
-			$frmUser->SetAction("profile.php");
 
 		if(isset($userid))	$frmUser->AddVar("userid",$userid);
 
@@ -116,18 +122,70 @@
 			$frmUser->AddRow(S_SURNAME,	new CTextBox("surname",$surname,20));
 		}
 
-		$frmUser->AddRow(S_PASSWORD,	new CPassBox("password1",$password,20));
-		$frmUser->AddRow(S_PASSWORD_ONCE_AGAIN,	new CPassBox("password2",$password,20));
-
-		$cmbUserType = new CComboBox('user_type', $user_type);
-		$cmbUserType->AddItem(USER_TYPE_ZABBIX_USER,	user_type2str(USER_TYPE_ZABBIX_USER));
-		$cmbUserType->AddItem(USER_TYPE_ZABBIX_ADMIN,	user_type2str(USER_TYPE_ZABBIX_ADMIN));
-		$cmbUserType->AddItem(USER_TYPE_SUPPER_ADMIN,	user_type2str(USER_TYPE_SUPPER_ADMIN));
-		$frmUser->AddRow(S_USER_TYPE, $cmbUserType);
-
-		foreach($user_groups as $groupid => $group_name)
+		if(!isset($userid) || isset($change_password))
 		{
-			$frmUser->AddRow(S_GROUPS,	$group_name);
+			$frmUser->AddRow(S_PASSWORD,	new CPassBox("password1",$password1,20));
+			$frmUser->AddRow(S_PASSWORD_ONCE_AGAIN,	new CPassBox("password2",$password2,20));
+			if(isset($change_password))
+				$frmUser->AddVar('change_password', $change_password);
+		}
+		else
+		{
+			$frmUser->AddRow(S_PASSWORD,	new CButton("change_password", S_CHANGE_PASSWORD));
+		}
+
+		if($profile==0)
+		{
+			global $USER_DETAILS;
+
+			$frmUser->AddVar('user_groups',$user_groups);
+
+			if(isset($userid) && ($USER_DETAILS['userid'] == $userid))
+			{
+				$frmUser->AddVar('user_type',$user_type);
+			}
+			else
+			{
+				$cmbUserType = new CComboBox('user_type', $user_type);
+				$cmbUserType->AddItem(USER_TYPE_ZABBIX_USER,	user_type2str(USER_TYPE_ZABBIX_USER));
+				$cmbUserType->AddItem(USER_TYPE_ZABBIX_ADMIN,	user_type2str(USER_TYPE_ZABBIX_ADMIN));
+				$cmbUserType->AddItem(USER_TYPE_SUPPER_ADMIN,	user_type2str(USER_TYPE_SUPPER_ADMIN));
+				$frmUser->AddRow(S_USER_TYPE, $cmbUserType);
+			}
+			
+			$lstGroups = new CListBox('user_groups_to_del[]');
+			$lstGroups->options['style'] = 'width: 270px';
+
+			foreach($user_groups as $groupid => $group_name)
+			{
+				$lstGroups->AddItem($groupid,	$group_name);
+			}
+			$frmUser->AddRow(S_GROUPS, 
+				array(
+					$lstGroups, 
+					BR, 
+					new CButton('btn1',S_ADD,
+						"return PopUp('popup_usrgrp.php?dstfrm=".$frmUser->GetName().
+						"&list_name=user_groups_to_del[]&var_name=user_groups','new_group',".
+						"'width=450,height=450,resizable=1,scrollbars=1');"),
+					SPACE,
+					new CButton('del_user_group',S_DELETE_SELECTED)
+				));
+
+/*
+			$frmUser->AddVar("new_group_id",$new_group_id);
+
+			$frmUser->AddRow(S_GROUP,array( 
+				new CTextBox("new_group_name",$new_group_name,32,'yes'),
+				new CButton('btn1',S_SELECT,
+        	                	"return PopUp('popup_usrgrp.php?dstfrm=".$frmUser->GetName().
+	        	                "&dstfld1=new_group_id&dstfld2=new_group_name&".
+					"srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name','new_group',".
+        	                	"'width=650,height=450,resizable=1,scrollbars=1');"),
+				BR,
+				new CButton('add_user_gropu', S_ADD)
+				));
+*/
 		}
 
 		$cmbLang = new CComboBox('lang',$lang);
@@ -148,7 +206,7 @@
 		$frmUser->AddRow(S_SCREEN_REFRESH,	new CTextBox("refresh",$refresh,5));
 
 		$frmUser->AddItemToBottomRow(new CButton('save',S_SAVE));
-		if(isset($userid))
+		if(isset($userid) && $profile == 0)
 		{
 			$frmUser->AddItemToBottomRow(SPACE);
 			$frmUser->AddItemToBottomRow(new CButtonDelete("Delete selected user?",

@@ -55,10 +55,10 @@
 
 			if(is_array($value))
 			{
-				foreach($value as $item)
+				foreach($value as $itemid => $item)
 				{
 					if( null == $item ) continue;
-					array_push($this->var_container, new CVarTag($this->var_name.'[]', $item));
+					array_push($this->var_container, new CVarTag($this->var_name.'['.$itemid.']', $item));
 				}
 				return;
 			}

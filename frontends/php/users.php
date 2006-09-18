@@ -49,9 +49,11 @@
 		"alias"=>	array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'{config}==0&&isset({save})'),
 		"name"=>	array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'{config}==0&&isset({save})'),
 		"surname"=>	array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'{config}==0&&isset({save})'),
-		"password1"=>	array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'{config}==0&&isset({save})'),
-		"password2"=>	array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'{config}==0&&isset({save})'),
+		"password1"=>	array(T_ZBX_STR, O_OPT,	NULL,	null,		'{config}==0&&isset({save})&&{form}!="update"'),
+		"password2"=>	array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'{config}==0&&isset({save})&&{form}!="update"'),
 		"user_type"=>	array(T_ZBX_INT, O_OPT,	NULL,	IN('1,2,3'),	'{config}==0&&isset({save})'),
+		"user_groups"=>	array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'{config}==0&&isset({save})'),
+		"user_groups_to_del"=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,	NULL),
 		"lang"=>	array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'{config}==0&&isset({save})'),
 		"autologout"=>	array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,3600),'{config}==0&&isset({save})'),
 		"url"=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'{config}==0&&isset({save})'),
@@ -77,11 +79,14 @@
 
 		"save"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"delete"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"del_user_group"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"change_password"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"cancel"=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 /* other */
 		"form"=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		"form_refresh"=>array(T_ZBX_STR, O_OPT, NULL,	NULL,	NULL)
 	);
+
 
 	check_fields($fields);
 ?>
@@ -89,7 +94,16 @@
 <?php
 	if(isset($_REQUEST["save"])&&($_REQUEST["config"]==0))
 	{
-		if($_REQUEST["password1"]!=$_REQUEST["password2"]){
+		$user_groups = get_request('user_groups', array());
+
+		$_REQUEST["password1"] = get_request("password1", null);
+		$_REQUEST["password2"] = get_request("password2", null);
+
+		if(isset($_REQUEST["password1"]) && $_REQUEST["password1"] == "" && $_REQUEST["alias"]!="guest")
+		{
+			show_error_message(S_ONLY_FOR_GUEST_ALLOWED_EMPTY_PASSWORD);
+		}
+		elseif($_REQUEST["password1"]!=$_REQUEST["password2"]){
 			if(isset($_REQUEST["userid"]))
 				show_error_message(S_CANNOT_UPDATE_USER_BOTH_PASSWORDS);
 			else
@@ -100,7 +114,8 @@
 				$result=update_user($_REQUEST["userid"],
 					$_REQUEST["name"],$_REQUEST["surname"],$_REQUEST["alias"],
 					$_REQUEST["password1"],$_REQUEST["url"],$_REQUEST["autologout"],
-					$_REQUEST["lang"],$_REQUEST["refresh"],$_REQUEST["user_type"]);
+					$_REQUEST["lang"],$_REQUEST["refresh"],$_REQUEST["user_type"],
+					$user_groups);
 
 				show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
 			} else {
@@ -108,7 +123,8 @@
 				$result=add_user(
 					$_REQUEST["name"],$_REQUEST["surname"],$_REQUEST["alias"],
 					$_REQUEST["password1"],$_REQUEST["url"],$_REQUEST["autologout"],
-					$_REQUEST["lang"],$_REQUEST["refresh"],$_REQUEST["user_type"]);
+					$_REQUEST["lang"],$_REQUEST["refresh"],$_REQUEST["user_type"],
+					$user_groups);
 
 				show_messages($result, S_USER_ADDED, S_CANNOT_ADD_USER);
 			}
@@ -121,8 +137,17 @@
 			}
 		}
 	}
-
-	if(isset($_REQUEST["delete"])&&($_REQUEST["config"]==0))
+	elseif(isset($_REQUEST["del_user_group"])&&($_REQUEST["config"]==0))
+	{
+		$user_groups_to_del = get_request('user_groups_to_del', array());
+		foreach($user_groups_to_del as $groupid)
+		{
+			if(isset($_REQUEST['user_groups'][$groupid]))
+				unset($_REQUEST['user_groups'][$groupid]);
+		}
+		
+	}
+	elseif(isset($_REQUEST["delete"])&&($_REQUEST["config"]==0))
 	{
 		$user=get_user_by_userid($_REQUEST["userid"]);
 		$result=delete_user($_REQUEST["userid"]);
@@ -137,7 +162,7 @@
 		}
 	}
 
-	if(isset($_REQUEST["save"])&&($_REQUEST["config"]==1))
+	elseif(isset($_REQUEST["save"])&&($_REQUEST["config"]==1))
 	{
 		$users=get_request("users", array());;
 
@@ -154,7 +179,7 @@
 		}
 	}
 
-	if(isset($_REQUEST["delete"])&&($_REQUEST["config"]==1))
+	elseif(isset($_REQUEST["delete"])&&($_REQUEST["config"]==1))
 	{
 		$result=delete_user_group($_REQUEST["usrgrpid"]);
 		show_messages($result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
@@ -164,7 +189,7 @@
 		}
 	}
 
-	if(isset($_REQUEST["register"]))
+	elseif(isset($_REQUEST["register"]))
 	{
 		if($_REQUEST["register"]=="delete permission")
 		{

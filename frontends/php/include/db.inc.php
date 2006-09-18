@@ -82,6 +82,27 @@
 			SELECT * FROM (SELECT ROWNUM as RN, * FROM tbl) WHERE RN BETWEEN 6 AND 15
 	*/
 
+	function	DBstart()
+	{
+		/* start transaction */
+		/* TODO */
+	}
+	
+	function	DBend($result)
+	{
+		/* end transaction */
+		/* TODO */
+
+		if($result)
+		{ // OK
+			/* commit TODO */
+		}
+		else
+		{ // FAIL
+			/* rollback  TODO */
+		}
+	}
+
 	function	DBselect($query, $limit='NO')
 	{
 		global $DB,$DB_TYPE;

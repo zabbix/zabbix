@@ -104,6 +104,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 		$table->AddRow("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
 		$table->Show();
                 show_page_footer();
+		exit;
 	}
 
 	function zbx_stripslashes($value){
@@ -934,6 +935,19 @@ COpt::profiling_start("page");
 <?php
 		if($nomenu == 0)
 		{
+			/*
+				first level:
+					'label' 		= main menu title.
+					'default_page_id	= default page url from 'pages' then opened menu.
+					'pages'			= collection of pages whitch displayed from this menu
+								this pages are saved a last visited submenu of main menu.
+
+				second level (pages):
+					'url'	= 	real url for this page
+					'label'	= 	submenu title, if missed menu skipped, but remmembed as last visited page.
+					'sub_pages'	= collection of pages for displaying but dont remember as last visited.
+					
+			*/
 			$menu=array(
 				"view"=>array(
 						"label"			=> S_MONITORING,
@@ -954,8 +968,7 @@ COpt::profiling_start("page");
 							array("url"=>"screens.php"	,"label"=>S_SCREENS	),
 							array("url"=>"srv_status.php"	,"label"=>S_IT_SERVICES	,
 								"sub_pages"=>array("report3.php")
-								),
-							array("url"=>"profile.php")
+								)
 							)
 						),
 				"cm"=>array(
@@ -999,19 +1012,21 @@ COpt::profiling_start("page");
 						"label"			=> S_ADMINISTRATION,
 						"default_page_id"	=> 0,
 						"pages"=>array(
+							array("url"=>"admin.php"	,"label"=>S_ADMINISTRATION	),
 							array("url"=>"media_types.php"	,"label"=>S_MEDIA_TYPES		),
 							array("url"=>"users.php"	,"label"=>S_USERS		),
 							array("url"=>"audit.php"	,"label"=>S_AUDIT		,
 								"sub_pages"=>array("media.php")
-								),
-							array("url"=>"admin.php")
+								)
 							)
 						),
 				"login"=>array(
 						"label"			=> S_LOGIN,
 						"default_page_id"	=> 0,
 						"pages"=>array(
-							array("url"=>"index.php"),
+							array("url"=>"index.php",
+								"sub_pages"=>array("profile.php")
+								)
 							)
 						),
 				);
@@ -1416,14 +1431,6 @@ COpt::profiling_start("page");
 		return	DBexecute($sql);
 	}
 
-	# Delete Alert by actionid
-
-	function	delete_alert_by_actionid( $actionid )
-	{
-		$sql="delete from alerts where actionid=$actionid";
-		return	DBexecute($sql);
-	}
-
 	function	delete_rights_by_userid($userid )
 	{
 		$sql="delete from rights where userid=$userid";
@@ -1632,20 +1639,6 @@ COpt::profiling_start("page");
 		return	DBexecute($sql);
 	}
 
-	# Delete Media definition by userid
-
-	function	delete_media_by_userid($userid)
-	{
-		$sql="delete from media where userid=$userid";
-		return	DBexecute($sql);
-	}
-
-	function	delete_profiles_by_userid($userid)
-	{
-		$sql="delete from profiles where userid=$userid";
-		return	DBexecute($sql);
-	}
-
 	# Update configuration
 
 //	function	update_config($smtp_server,$smtp_helo,$smtp_email,$alarm_history,$alert_history)
@@ -1691,33 +1684,6 @@ COpt::profiling_start("page");
 	function	delete_permission($rightid)
 	{
 		$sql="delete from rights where rightid=$rightid";
-		return DBexecute($sql);
-	}
-
-	# Delete User definition
-
-	function	delete_user($userid)
-	{
-		$sql="select * from users where userid=$userid and alias='guest'";
-		$result=DBselect($sql);
-		if(DBfetch($result))
-		{
-			error("Cannot delete user 'guest'");
-			return	0;
-		}
-
-
-		delete_media_by_userid($userid);
-		delete_actions_by_userid($userid);
-		delete_rights_by_userid($userid);
-		delete_profiles_by_userid($userid);
-
-	// delete user permisions
-		DBexecute('delete from rights where name=\'User\' and id='.$userid);
-
-		$sql="delete from users_groups where userid=$userid";
-		DBexecute($sql);
-		$sql="delete from users where userid=$userid";
 		return DBexecute($sql);
 	}
 
@@ -2445,6 +2411,18 @@ COpt::profiling_stop("script");
 </script>
 		";
 	}
+
+	function Redirect($url)
+	{
+echo "
+<script language=\"JavaScript\" type=\"text/javascript\">
+<!--
+	Redirect('$url');
+//-->
+</script>
+                ";
+	}
+
 	function insert_javascript_clock($form, $field)
 	{
 		echo "
