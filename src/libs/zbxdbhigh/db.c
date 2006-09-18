@@ -45,8 +45,9 @@
 	sqlo_db_handle_t oracle;
 #endif
 
-extern void    apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value);
-extern void    update_services(int triggerid, int status);
+extern void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value);
+extern void	update_services(int triggerid, int status);
+extern int	CONFIG_NODEID;
 
 void	DBclose(void)
 {
@@ -1799,4 +1800,37 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 	item->logtimefmt=row[33];
 	item->valuemapid=atoi(row[34]);
 	item->delay_flex=row[35];
+}
+
+/*
+ * Execute SQL statement. For select statements only.
+ * If fails, program terminates.
+ */ 
+zbx_uint64_t DBget_nextid(char *table, char *field)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	res;
+
+	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_nextid(%s,%s)", table, field);
+
+	result = DBselect("select max(%s) from %s where mod(%s,100)=%d", field, table, field, CONFIG_NODEID);
+
+	row=DBfetch(result);
+
+	if(row && (DBis_null(row[0])!=SUCCEED))
+	{
+	zabbix_log(LOG_LEVEL_DEBUG,"3 [%s]", row[0]);
+		sscanf(row[0],ZBX_FS_UI64,&res);
+
+		res=res+100;
+	}
+	else
+	{
+	zabbix_log(LOG_LEVEL_DEBUG,"4");
+		res=(zbx_uint64_t)(100+CONFIG_NODEID);
+	}
+	DBfree_result(result);
+
+	return res;
 }

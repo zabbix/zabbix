@@ -221,13 +221,17 @@ static int create_host_file(void)
 	DB_HOST	host;
 	DB_RESULT	result;
 	DB_ROW		row;
+	char	str[MAX_STRING_LEN];
+
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In create_host_file()");
 
-	if(NULL == (f = fopen("/tmp/zabbix_server.pinger", "w") ))
+	zbx_snprintf(str,sizeof(str),"/tmp/zabbix_server_%d.pinger",getpid());
+
+	if(NULL == (f = fopen(str, "w") ))
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Cannot open file [%s] [%s]", "/tmp/zabbix_server.pinger", strerror(errno));
-		zabbix_syslog("Cannot open file [%s] [%s]", "/tmp/zabbix_server.pinger", strerror(errno));
+		zabbix_log( LOG_LEVEL_ERR, "Cannot open file [%s] [%s]", str, strerror(errno));
+		zabbix_syslog("Cannot open file [%s] [%s]", str, strerror(errno));
 		return FAIL;
 	}
 
@@ -294,7 +298,7 @@ static int do_ping(void)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In do_ping()");
 
-	zbx_snprintf(str,sizeof(str),"cat /tmp/zabbix_server.pinger | %s -e 2>/dev/null",CONFIG_FPING_LOCATION);
+	zbx_snprintf(str,sizeof(str),"cat /tmp/zabbix_server_%d.pinger | %s -e 2>/dev/null",getpid(),CONFIG_FPING_LOCATION);
 	
 	f=popen(str,"r");
 	if(f==0)
@@ -379,6 +383,8 @@ void main_pinger_loop()
 {
 	int ret = SUCCEED;
 
+	char	str[MAX_STRING_LEN];
+
 	if(1 == CONFIG_DISABLE_PINGER)
 	{
 		for(;;)
@@ -404,7 +410,8 @@ void main_pinger_loop()
 
 				ret = do_ping();
 			}
-			unlink("/tmp/zabbix_server.pinger");
+			zbx_snprintf(str,sizeof(str),"/tmp/zabbix_server_%d.pinger",getpid());
+			unlink(str);
 	
 /*	zabbix_set_log_level(LOG_LEVEL_WARNING); */
 

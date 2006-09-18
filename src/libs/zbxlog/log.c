@@ -60,7 +60,6 @@ int zabbix_open_log(int type, int level, const char *filename)
 
 	if(LOG_TYPE_SYSLOG == type)
 	{
-zbx_error("Loging to SYSLOG",filename);
 		log_type = LOG_TYPE_SYSLOG;
 
 #if defined(_WINDOWS)
@@ -77,8 +76,6 @@ zbx_error("Loging to SYSLOG",filename);
 
 	else if(LOG_TYPE_FILE == type)
 	{
-zbx_error("Loging to file '%s'",filename);
-
 		if(strlen(filename) >= MAX_STRING_LEN)
 		{
 			zbx_error("To large path for logfile.");
@@ -103,7 +100,6 @@ zbx_error("Loging to file '%s'",filename);
 	}
 	else
 	{
-zbx_error("Loging to STDERR",filename);
 		/* Not supported logging type */
 
 		if(ZBX_MUTEX_ERROR == zbx_mutex_create(&log_file_access, "log"))

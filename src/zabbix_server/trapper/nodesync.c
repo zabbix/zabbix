@@ -155,12 +155,22 @@ static int	process_record(int nodeid, char *record)
 			}
 			else
 			{
-				DBescape_string(value, value_esc,MAX_STRING_LEN);
+				if(valuetype == ZBX_TYPE_INT || valuetype == ZBX_TYPE_UINT)
+				{
+					zbx_snprintf(tmp,sizeof(tmp),"%s=%s,", fieldname, value);
+					strncat(fields_update,tmp,sizeof(fields));
 
-				zbx_snprintf(tmp,sizeof(tmp),"%s='%s',", fieldname, value_esc);
-				strncat(fields_update,tmp,sizeof(fields));
+					zbx_snprintf(tmp,sizeof(tmp),"%s,", value);
+				}
+				else
+				{
+					DBescape_string(value, value_esc,MAX_STRING_LEN);
 
-				zbx_snprintf(tmp,sizeof(tmp),"'%s',", value_esc);
+					zbx_snprintf(tmp,sizeof(tmp),"%s='%s',", fieldname, value_esc);
+					strncat(fields_update,tmp,sizeof(fields));
+	
+					zbx_snprintf(tmp,sizeof(tmp),"'%s',", value_esc);
+				}
 			}
 
 			strncat(values,tmp,sizeof(values));
