@@ -490,7 +490,8 @@ static	ZBX_TABLE	tables[]={
 		{"imageid",		ZBX_TYPE_INT,	ZBX_SYNC},
 		{"imagetype",		ZBX_TYPE_INT,	ZBX_SYNC},
 		{"name",		ZBX_TYPE_CHAR,	ZBX_SYNC},
-		{"image",		ZBX_TYPE_BLOB,	ZBX_SYNC},
+/*		{"image",		ZBX_TYPE_BLOB,	ZBX_SYNC},*/
+		{"image",		ZBX_TYPE_BLOB,	ZBX_NOSYNC},
 		{0}
 		}
 	},

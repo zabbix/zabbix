@@ -20,7 +20,6 @@
 #ifndef ZABBIX_NODESENDER_H
 #define ZABBIX_NODESENDER_H
 
-
-int main_nodesender_loop();
+void main_nodesender();
 
 #endif

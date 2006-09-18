@@ -61,6 +61,42 @@ insert into config_tmp (select null,alert_history,alarm_history,refresh_unsuppor
 drop table config;
 alter table config_tmp rename config;
 
+-- Fix indexes of table groups
+CREATE TABLE groups_tmp (
+  groupid               int(4)          NOT NULL auto_increment,
+  name                  varchar(64)     DEFAULT '' NOT NULL,
+  PRIMARY KEY (groupid),
+  KEY (name)
+) type=InnoDB;
+
+insert into groups_tmp (select * from groups);
+drop table groups;
+alter table groups_tmp rename groups;
+
+ -- Fix indexes of table hosts
+CREATE TABLE hosts_tmp (
+        hostid          int(4)          NOT NULL auto_increment,
+        host            varchar(64)     DEFAULT '' NOT NULL,
+        useip           int(1)          DEFAULT '1' NOT NULL,
+        ip              varchar(15)     DEFAULT '127.0.0.1' NOT NULL,
+        port            int(4)          DEFAULT '0' NOT NULL,
+        status          int(4)          DEFAULT '0' NOT NULL,
+-- If status=UNREACHABLE, host will not be checked until this time
+        disable_until   int(4)          DEFAULT '0' NOT NULL,
+        error           varchar(128)    DEFAULT '' NOT NULL,
+        available       int(4)          DEFAULT '0' NOT NULL,
+        errors_from     int(4)          DEFAULT '0' NOT NULL,
+        templateid      int(4)          DEFAULT '0' NOT NULL,
+        PRIMARY KEY     (hostid),
+--      UNIQUE          (host),
+        KEY             (host),
+        KEY             (status)
+) type=InnoDB;
+
+insert into hosts_tmp (select * from hosts);
+drop table hosts;
+alter table hosts_tmp rename hosts;
+
 -- Add hostgroupid to table hosts_groups
 
 CREATE TABLE hosts_groups_tmp (
@@ -68,7 +104,7 @@ CREATE TABLE hosts_groups_tmp (
   hostid		int(4)		DEFAULT '0' NOT NULL,
   groupid		int(4)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (hostgroupid),
-  UNIQUE (hostid,groupid)
+  KEY (hostid,groupid)
 ) type=InnoDB;
 
 insert into hosts_groups_tmp (select null,hostid,groupid from hosts_groups);
@@ -82,7 +118,7 @@ CREATE TABLE items_applications_tmp (
 	applicationid		int(4)		DEFAULT '0' NOT NULL,
 	itemid			int(4)		DEFAULT '0' NOT NULL,
 	PRIMARY KEY (itemappid),
-	UNIQUE (applicationid,itemid)
+	KEY (applicationid,itemid)
 ) type=InnoDB;
 
 insert into items_applications_tmp (select null,applicationid,itemid from items_applications);
@@ -96,13 +132,33 @@ CREATE TABLE trigger_depends_tmp (
 	triggerid_down	int(4) DEFAULT '0' NOT NULL,
 	triggerid_up	int(4) DEFAULT '0' NOT NULL,
 	PRIMARY KEY	(triggerdepid),
-	UNIQUE		(triggerid_down, triggerid_up),
+	KEY		(triggerid_down, triggerid_up),
 	KEY		(triggerid_up)
 ) type=InnoDB;
 
 insert into trigger_depends_tmp (select null,triggerid_down,triggerid_up from trigger_depends);
 drop table trigger_depends;
 alter table trigger_depends_tmp rename trigger_depends;
+
+-- Fixed indexes of users
+CREATE TABLE users_tmp (
+  userid                int(4)          NOT NULL auto_increment,
+  alias                 varchar(100)    DEFAULT '' NOT NULL,
+  name                  varchar(100)    DEFAULT '' NOT NULL,
+  surname               varchar(100)    DEFAULT '' NOT NULL,
+  passwd                char(32)        DEFAULT '' NOT NULL,
+  url                   varchar(255)    DEFAULT '' NOT NULL,
+  autologout            int(4)          DEFAULT '900' NOT NULL,
+  lang                  varchar(5)      DEFAULT 'en_gb' NOT NULL,
+  refresh               int(4)          DEFAULT '30' NOT NULL,
+  PRIMARY KEY (userid),
+--  UNIQUE (alias)
+  KEY (alias)
+) type=InnoDB;
+
+insert into users_tmp (select * from users);
+drop table users;
+alter table users_tmp rename users;
 
 -- Add id to table users_groups
 
@@ -111,7 +167,7 @@ CREATE TABLE users_groups_tmp (
   usrgrpid		int(4)		DEFAULT '0' NOT NULL,
   userid		int(4)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (id),
-  UNIQUE (usrgrpid,userid)
+  KEY (usrgrpid,userid)
 ) type=InnoDB;
 
 insert into users_groups_tmp (select null,usrgrpid,userid from users_groups);
@@ -122,7 +178,7 @@ alter table users_groups_tmp rename users_groups;
 alter table sysmaps_elements modify label_location        int(1)          DEFAULT '0' NOT NULL;
 
 alter table graphs add graphtype	int(2) DEFAULT '0' NOT NULL;
-alter table items  add delay_flex       varchar(255) DEFAULT "" NOT NULL;
+alter table items  add delay_flex       varchar(255) DEFAULT '' NOT NULL;
 
 --
 -- Table structure for table 'services_times'

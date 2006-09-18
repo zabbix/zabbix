@@ -339,6 +339,7 @@ int DBexecute(const char *fmt, ...);
 DB_RESULT DBselect(const char *fmt, ...);
 DB_RESULT	DBselectN(char *query, int n);
 DB_ROW	DBfetch(DB_RESULT result);
+zbx_uint64_t DBget_nextid(char *table, char *field);
 /*char	*DBget_field(DB_RESULT result, int rownum, int fieldnum);*/
 /*int	DBnum_rows(DB_RESULT result);*/
 int	DBinsert_id(int exec_result, const char *table, const char *field);
