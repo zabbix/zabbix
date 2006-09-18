@@ -1,5 +1,7 @@
 Changes for 1.3:
 
+ - added automatic generation of database schemas (Alexei)
+ - pinger will use unique temporary file name (Alexei)
  - developed SLA calculation periods (Eugene)
  - developed flexible update intervals for items (Eugene)
  - fixed reversed icons on maps (Eugene)

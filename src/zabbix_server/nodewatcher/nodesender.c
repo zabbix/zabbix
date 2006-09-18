@@ -86,11 +86,15 @@ static int send_to_node(int dest_nodeid, int nodeid, char *xml)
 	int	ret = FAIL;
 	int	written;
 
+	char	header[5]="ZBXD\1";
+	zbx_uint64_t	len64;
+
 	DB_RESULT	result;
 	DB_ROW		row;
 
 //	zabbix_log( LOG_LEVEL_WARNING, "In send_to_node (%d,%d)", nodeid, strlen(xml));
 //	zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Sending data of node %d to node %d", CONFIG_NODEID, nodeid, dest_nodeid);
+//	zabbix_log( LOG_LEVEL_WARNING, "Data [%s]", xml);
 
 	result = DBselect("select ip, port from nodes where nodeid=%d", dest_nodeid);
 	row = DBfetch(result);
@@ -137,6 +141,26 @@ static int send_to_node(int dest_nodeid, int nodeid, char *xml)
 	}
 
 	written = 0;
+
+	/* Write header */
+	i=write(s, header, 5);
+	if(i == -1)
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Error writing to node [%d] [%s]", dest_nodeid, strerror(errno));
+		close(s);
+		return	FAIL;
+	}
+	len64 = (zbx_uint64_t)strlen(xml);
+
+	/* Write data length */
+//	zabbix_log( LOG_LEVEL_WARNING, "Sending data len [" ZBX_FS_UI64 "]", len64);
+	i=write(s, &len64, sizeof(len64));
+	if(i == -1)
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Error writing to node [%d] [%s]", dest_nodeid, strerror(errno));
+		close(s);
+		return	FAIL;
+	}
 
 	while(written<strlen(xml))
 	{
@@ -197,7 +221,7 @@ static int send_config_data(int nodeid, int dest_nodeid, int maxlogid, int node_
 	DB_ROW		row;
 	DB_ROW		row2;
 
-#define	ZBX_XML_MAX	161024*1024
+#define	ZBX_XML_MAX	16*1024*1024
 	char	*xml;
 	char	tmp[MAX_STRING_LEN];
 	char	fields[MAX_STRING_LEN];
@@ -239,6 +263,12 @@ static int send_config_data(int nodeid, int dest_nodeid, int maxlogid, int node_
 			/* for each field */
 			for(j=0;tables[i].fields[j].name!=0;j++)
 			{
+/*				if( (tables[i].fields[j].flags & ZBX_SYNC) ==0)
+				{
+					zabbix_log( LOG_LEVEL_WARNING, "Skip %s.%s fields[%s]", tables[i].table,tables[i].fields[j].name, fields);
+					continue;
+				}*/
+
 				strncat(fields,tables[i].fields[j].name,sizeof(fields));
 				strncat(fields,",",sizeof(fields));
 			}
@@ -257,6 +287,7 @@ static int send_config_data(int nodeid, int dest_nodeid, int maxlogid, int node_
 				/* for each field */
 				for(j=0;tables[i].fields[j].name!=0;j++)
 				{
+					if( (tables[i].fields[j].flags & ZBX_SYNC) ==0)	continue;
 //					snprintf(tmp,sizeof(tmp),"<Record table='%s' field='%s' op='%s' recid='%s'>%s<Record>\n",
 //						row[0], tables[i].fields[j].name, row[2], row[1], row2[j]);
 //					// Fieldname, type, value
@@ -283,7 +314,6 @@ static int send_config_data(int nodeid, int dest_nodeid, int maxlogid, int node_
 					strncat(xml,tmp,ZBX_XML_MAX);
 				}
 				strncat(xml,"\n",ZBX_XML_MAX);
-
 			}
 			else
 			{
@@ -440,7 +470,9 @@ static int send_to_master_and_slave(int nodeid)
 	}
 	if(atoi(row[1])-atoi(row[0])>200)
 	{
-		maxlogid = atoi(row[0])+200;
+// Limit number of config changes to send in one go
+//		maxlogid = atoi(row[0])+200;
+		maxlogid = atoi(row[1]);
 	}
 	else
 	{
@@ -536,7 +568,7 @@ static int process_node(int nodeid)
 
 /******************************************************************************
  *                                                                            *
- * Function: main_nodesender_loop                                             *
+ * Function: main_nodesender                                                  *
  *                                                                            *
  * Purpose: periodically sends config changes and history to related nodes    *
  *                                                                            *
@@ -549,41 +581,28 @@ static int process_node(int nodeid)
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-int main_nodesender_loop()
+void main_nodesender()
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 
-//	zabbix_log( LOG_LEVEL_WARNING, "In main_nodesender_loop()");
-	for(;;)
+	zabbix_log( LOG_LEVEL_DEBUG, "In main_nodesender()");
+
+	result = DBselect("select nodeid from nodes where nodetype=%d",NODE_TYPE_LOCAL);
+
+	row = DBfetch(result);
+
+	if(row)
 	{
-
-		zbx_setproctitle("connecting to the database");
-
-		DBconnect();
-
-		result = DBselect("select nodeid from nodes where nodetype=%d",NODE_TYPE_LOCAL);
-
-		row = DBfetch(result);
-
-		if(row)
+		if(CONFIG_NODEID != atoi(row[0]))
 		{
-			if(CONFIG_NODEID != atoi(row[0]))
-			{
-				zabbix_log( LOG_LEVEL_WARNING, "NodeID does not match configuration settings. Processing of the node is disabled.");
-			}
-			else
-			{
-				process_node(atoi(row[0]));
-			}
+			zabbix_log( LOG_LEVEL_WARNING, "NodeID does not match configuration settings. Processing of the node is disabled.");
 		}
-	
-		DBfree_result(result);
-
-		DBclose();
-
-		zbx_setproctitle("node sender [sleeping for %d seconds]", 30);
-
-		sleep(30);
+		else
+		{
+			process_node(atoi(row[0]));
+		}
 	}
+
+	DBfree_result(result);
 }

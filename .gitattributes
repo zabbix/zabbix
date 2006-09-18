@@ -1,7 +1,6 @@
 * text=auto !eol
 build/win32/project/zabbix_agentd.dsp -text
 build/win32/project/zabbix_agentd.dsw -text
-create/data/data_small.sql -text
 create/data/images/Hub.png -text svneol=unset#unset
 create/data/images/Hub_small.png -text svneol=unset#unset
 create/data/images/Network.png -text svneol=unset#unset
@@ -23,8 +22,13 @@ create/data/images/UPS_small.png -text svneol=unset#unset
 create/data/images/Workstation.png -text svneol=unset#unset
 create/data/images/Workstation_small.png -text svneol=unset#unset
 create/data/nodes.sql -text
+create/data/nodes_psql.sql -text
 create/data/recreate.sh -text
-create/mysql/schema.sql.new -text
+create/schema/generate_schemas.sh -text
+create/schema/mysql.fmt -text
+create/schema/oracle.fmt -text
+create/schema/postgresql.fmt -text
+create/schema/schema.sql -text
 frontends/php/audio/trigger_off.wav -text
 frontends/php/audio/trigger_on.wav -text
 frontends/php/audio/trigger_on_average.wav -text
@@ -75,11 +79,10 @@ frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
 include/dbsync.h -text
 src/zabbix_agent_win32/Debug/ZabbixW32.exe -text
 src/zabbix_agent_win32/Release/ZabbixW32.exe -text
-src/zabbix_server/nodesender/Makefile.am -text
-src/zabbix_server/nodesender/nodesender.c -text
-src/zabbix_server/nodesender/nodesender.h -text
 src/zabbix_server/nodewatcher/.deps/nodewatcher.Po -text
 src/zabbix_server/nodewatcher/Makefile.am -text
+src/zabbix_server/nodewatcher/nodesender.c -text
+src/zabbix_server/nodewatcher/nodesender.h -text
 src/zabbix_server/nodewatcher/nodewatcher.c -text
 src/zabbix_server/nodewatcher/nodewatcher.h -text
 src/zabbix_server/trapper/nodesync.c -text
@@ -104,6 +107,6 @@ upgrades/dbpatches/1.0_to_1.1alpha1/mysql/UPS.png -text svneol=unset#unset
 upgrades/dbpatches/1.0_to_1.1alpha1/mysql/UPS_small.png -text svneol=unset#unset
 upgrades/dbpatches/1.0_to_1.1alpha1/mysql/Workstation.png -text svneol=unset#unset
 upgrades/dbpatches/1.0_to_1.1alpha1/mysql/Workstation_small.png -text svneol=unset#unset
-upgrades/dbpatches/1.1_1.3/mysql/patch.sql -text
-upgrades/dbpatches/1.1_1.3/oracle/patch.sql -text
-upgrades/dbpatches/1.1_1.3/postgresql/patch.sql -text
+upgrades/dbpatches/1.3/mysql/patch.sql -text
+upgrades/dbpatches/1.3/oracle/patch.sql -text
+upgrades/dbpatches/1.3/postgresql/patch.sql -text

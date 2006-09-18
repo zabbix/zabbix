@@ -61,7 +61,6 @@
 #include "timer/timer.h"
 #include "trapper/trapper.h"
 #include "nodewatcher/nodewatcher.h"
-#include "nodesender/nodesender.h"
 
 #define       LISTENQ 1024
 
@@ -456,12 +455,11 @@ int MAIN_ZABBIX_ENTRY(void)
 	result = DBselect("select refresh_unsupported from config where " ZBX_COND_NODEID, LOCAL_NODE("configid"));
 	row = DBfetch(result);
 
-	if(row && DBis_null(row[0]) != SUCCEED)
+	if( (row != NULL) && DBis_null(row[0]) != SUCCEED)
 	{
 		CONFIG_REFRESH_UNSUPPORTED = atoi(row[0]);
 	}
 	DBfree_result(result);
-	zabbix_log( LOG_LEVEL_WARNING, "OK");
 
 /* Need to set trigger status to UNKNOWN since last run */
 /* DBconnect() already made in init_config() */
@@ -556,12 +554,6 @@ int MAIN_ZABBIX_ENTRY(void)
 /* Periodic checker of node configuration changes */
 		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Node watcher]",server_num);
 		main_nodewatcher_loop();
-	}
-	else if(server_num == 6)
-	{
-/* Node communications */
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Node sender]",server_num);
-		main_nodesender_loop();
 	}
 	else
 	{

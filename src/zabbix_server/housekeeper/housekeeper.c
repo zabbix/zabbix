@@ -91,7 +91,7 @@ static int housekeeping_process_log()
 #ifdef HAVE_ORACLE
 		deleted = DBexecute("delete from %s where %s=%d and rownum<500",housekeeper.tablename, housekeeper.field,housekeeper.value);
 #elif defined(HAVE_PGSQL)
-		snprintf(sql,sizeof(sql)-1,"delete from %s where oid in (select oid from %s where %s=%d limit 500)",
+		deleted = DBexecute("delete from %s where oid in (select oid from %s where %s=%d limit 500)",
 				housekeeper.tablename, 
 				housekeeper.tablename, 
 				housekeeper.field,
@@ -293,7 +293,7 @@ int main_housekeeper_loop()
 
 	for(;;)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Executing housekeeper");
+		zabbix_log( LOG_LEVEL_DEBUG, "Executing housekeeper");
 		now = time(NULL);
 
 		zbx_setproctitle("connecting to the database");
@@ -312,7 +312,7 @@ int main_housekeeper_loop()
 /*		zbx_setproctitle("housekeeper [removing old history]");*/
 
 		d = housekeeping_history_and_trends(now);
-		zabbix_log( LOG_LEVEL_WARNING, "Deleted %d records from history and trends", d);
+		zabbix_log( LOG_LEVEL_DEBUG, "Deleted %d records from history and trends", d);
 
 		zbx_setproctitle("housekeeper [removing old history]");
 
@@ -339,7 +339,7 @@ int main_housekeeper_loop()
 		zbx_setproctitle("housekeeper [sleeping for %d hour(s)]", CONFIG_HOUSEKEEPING_FREQUENCY);
 
 		DBclose();
-		zabbix_log( LOG_LEVEL_WARNING, "Next housekeeper run is after %dh", CONFIG_HOUSEKEEPING_FREQUENCY);
+		zabbix_log( LOG_LEVEL_DEBUG, "Next housekeeper run is after %dh", CONFIG_HOUSEKEEPING_FREQUENCY);
 		sleep(3660*CONFIG_HOUSEKEEPING_FREQUENCY);
 	}
 }

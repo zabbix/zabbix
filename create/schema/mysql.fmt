@@ -1,0 +1,10 @@
+{bigint}=>bigint
+{integer}=>integer
+{double}=>double
+{varchar}=>varchar
+{char}=>char
+{image_type}=>longblob
+{history_log_type}=>text
+{history_text_type}=>text
+{blob}=>blob
+{create_table_opt}=>type=InnoDB
