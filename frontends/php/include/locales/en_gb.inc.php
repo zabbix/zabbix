@@ -876,6 +876,8 @@
 	"S_EXPRESSION"=>			"Expression",
 	"S_DISABLED"=>				"Disabled",
 	"S_ENABLED"=>				"Enabled",
+	"S_DISABLE_SELECTED"=>			"Disable selected",
+	"S_ENABLE_SELECTED"=>			"Enable selected",
 	"S_ENABLE_SELECTED_TRIGGERS_Q"=>	"Enable selected triggers?",
 	"S_DISABLE_SELECTED_TRIGGERS_Q"=>	"Disable selected triggers?",
 	"S_DELETE_SELECTED_TRIGGERS_Q"=>	"Delete selected triggers?",

@@ -19,6 +19,16 @@
 **/
 ?>
 <?php
+	function	get_severity_style($severity)
+	{
+		if($severity == 1)	return "information";
+		elseif($severity == 2)	return "warning";
+		elseif($severity == 3)	return "average";
+		elseif($severity == 4)	return "high";
+		elseif($severity == 5)	return "disaster";
+		else			return "";
+	}
+
 	function	get_severity_description($severity)
 	{
 		if($severity == 0)	return S_NOT_CLASSIFIED;

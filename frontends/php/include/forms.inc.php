@@ -78,12 +78,29 @@
 			$lang		= $user["lang"];
 			$refresh	= $user["refresh"];
 			$user_type	= $user["type"];
-			$user_groups	= array();
 
-			$db_user_groups = DBselect('select g.* from usrgrp g, users_groups ug where ug.usrgrpid=g.usrgrpid and ug.userid='.$userid);
+			$user_groups	= array();
+			$medias		= array();
+
+			$db_user_groups = DBselect('select g.* from usrgrp g, users_groups ug'.
+				' where ug.usrgrpid=g.usrgrpid and ug.userid='.$userid);
+
 			while($db_group = DBfetch($db_user_groups))
 			{
 				$user_groups[$db_group['usrgrpid']] = $db_group['name'];
+			}
+
+			$db_medias = DBselect('select m.* from media m where m.userid='.$userid);
+			while($db_media = DBfetch($db_medias))
+			{
+				array_push($medias, 
+					array(	'mediatypeid' => $db_media['mediatypeid'],
+						'period' => $db_media['period'],
+						'sendto' => $db_media['sendto'],
+						'severity' => $db_media['severity'],
+						'active' => $db_media['active']
+					)
+				);
 			}
 
 			$new_group_id	= 0;
@@ -104,8 +121,26 @@
 			$user_type	= get_request("user_type",USER_TYPE_ZABBIX_USER);;
 			$user_groups	= get_request("user_groups",array());
 			$change_password = get_request("change_password", null);
+
+			$medias		= get_request("medias", array());
+
 			$new_group_id	= get_request('new_group_id', 0);
 			$new_group_name = get_request('new_group_name', '');
+		}
+
+		$media_types = array();
+		$media_type_ids = array();
+		foreach($medias as $one_media) $media_type_ids[$one_media['mediatypeid']] = 1;
+
+		if(count($media_type_ids) > 0)
+		{
+			$db_media_types = DBselect('select mt.mediatypeid,mt.description from media_type mt'.
+				' where mt.mediatypeid in ('.implode(',',array_keys($media_type_ids)).')');
+
+			while($db_media_type = DBfetch($db_media_types))
+			{
+				$media_types[$db_media_type['mediatypeid']] = $db_media_type['description'];
+			}	
 		}
 
 		$frmUser = new CFormTable($frm_title);
@@ -160,6 +195,7 @@
 			{
 				$lstGroups->AddItem($groupid,	$group_name);
 			}
+
 			$frmUser->AddRow(S_GROUPS, 
 				array(
 					$lstGroups, 
@@ -169,23 +205,39 @@
 						"&list_name=user_groups_to_del[]&var_name=user_groups','new_group',".
 						"'width=450,height=450,resizable=1,scrollbars=1');"),
 					SPACE,
-					new CButton('del_user_group',S_DELETE_SELECTED)
+					(count($user_groups) > 0) ? new CButton('del_user_group',S_DELETE_SELECTED) : NULL
 				));
 
-/*
-			$frmUser->AddVar("new_group_id",$new_group_id);
+			$frmUser->AddVar('medias', $medias);
 
-			$frmUser->AddRow(S_GROUP,array( 
-				new CTextBox("new_group_name",$new_group_name,32,'yes'),
-				new CButton('btn1',S_SELECT,
-        	                	"return PopUp('popup_usrgrp.php?dstfrm=".$frmUser->GetName().
-	        	                "&dstfld1=new_group_id&dstfld2=new_group_name&".
-					"srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name','new_group',".
-        	                	"'width=650,height=450,resizable=1,scrollbars=1');"),
-				BR,
-				new CButton('add_user_gropu', S_ADD)
+			$media_table = new CTable(S_NO_MEDIA_DEFINED);
+			foreach($medias as $id => $one_media)
+			{
+				if(!isset($one_media["active"]) || $one_media["active"]==0)
+				{
+					$status = new CLink(S_ENABLED,'#','enabled');
+					$status->options['onClick'] = "return create_var('".$frmUser->GetName()."','disable_media',".$id.", true);";
+				}
+				else
+				{
+					$status = new CLink(S_DISABLED,'#','disabled');
+					$status->options['onClick'] = "return create_var('".$frmUser->GetName()."','enable_media',".$id.", true);";
+				}
+
+				$media_table->AddRow(array(
+					new CCheckBox('selected_medias[]',NULL,NULL),
+					$media_types[$one_media['mediatypeid']],
+					$one_media['sendto'],
+					new CSpan($one_media['period'], 'nowrap'),
+					media_severity2str($one_media['severity']),
+					$status)
+				);
+			}
+			$frmUser->AddRow(S_MEDIA, array($media_table,
+				new CButton('add',S_ADD),
+				SPACE,
+				(count($medias) > 0) ? new CButton('del_media',S_DELETE_SELECTED) : NULL
 				));
-*/
 		}
 
 		$cmbLang = new CComboBox('lang',$lang);

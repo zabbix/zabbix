@@ -19,6 +19,30 @@
 **/
 ?>
 <?php
+
+	function	media_severity2str($severity)
+	{
+
+		insert_showhint_javascript();
+		$mapping = array(
+			0 => array('letter' => 'N', 'style' => (($severity & 1)  ? 'enabled' : NULL)),
+			1 => array('letter' => 'I', 'style' => (($severity & 2)  ? 'enabled' : NULL)),
+			2 => array('letter' => 'W', 'style' => (($severity & 4)  ? 'enabled' : NULL)),
+			3 => array('letter' => 'A', 'style' => (($severity & 8)  ? 'enabled' : NULL)),
+			4 => array('letter' => 'H', 'style' => (($severity & 16) ? 'enabled' : NULL)),
+			5 => array('letter' => 'D', 'style' => (($severity & 32) ? 'enabled' : NULL))
+		);
+
+		foreach($mapping as $id => $map)
+		{
+			$result[$id] = new CSpan($map['letter'], $map['style']);
+			$result[$id]->options['onMouseOver'] = 
+				"show_hint(this,'".get_severity_description($id)." (".(isset($map['style']) ? "on" : "off").")"."');";
+		}
+
+		return unpack_object($result);
+	}
+
 	function	get_media_by_mediaid($mediaid)
 	{
 		$sql="select * from media where mediaid=$mediaid"; 

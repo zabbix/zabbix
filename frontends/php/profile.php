@@ -56,7 +56,10 @@
 			$result=update_user_profile($_REQUEST["userid"],$_REQUEST["password1"],$_REQUEST["url"],$_REQUEST["autologout"],$_REQUEST["lang"],$_REQUEST["refresh"]);
 			show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
 			if($result)
-				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_USER,"User ID [".$_REQUEST["userid"]."]");
+				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_USER,
+					"User alias [".$USER_DETAILS["alias"].
+					"] name [".$USER_DETAILS["name"]."] surname [".
+					$USER_DETAILS["surname"]."] profile id [".$_REQUEST["userid"]."]");
 		}
 		else
 		{

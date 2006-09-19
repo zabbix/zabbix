@@ -53,17 +53,22 @@
 
 			if(is_null($value)) return;
 
+			$this->ParseValue($this->var_name, $value);
+		}
+
+		function ParseValue($name, $value)
+		{
 			if(is_array($value))
 			{
 				foreach($value as $itemid => $item)
 				{
 					if( null == $item ) continue;
-					array_push($this->var_container, new CVarTag($this->var_name.'['.$itemid.']', $item));
+					$this->ParseValue($name.'['.$itemid.']', $item);
 				}
 				return;
 			}
 
-			array_push($this->var_container, new CVarTag($this->var_name, $value));
+			array_push($this->var_container, new CVarTag($name, $value));
 		}
 
 		function ToString()

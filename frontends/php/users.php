@@ -54,6 +54,9 @@
 		"user_type"=>	array(T_ZBX_INT, O_OPT,	NULL,	IN('1,2,3'),	'{config}==0&&isset({save})'),
 		"user_groups"=>	array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'{config}==0&&isset({save})'),
 		"user_groups_to_del"=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,	NULL),
+		"medias"=>	array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'{config}==0&&isset({save})'),
+		"enable_media"=>array(T_ZBX_INT, O_OPT,	NULL,	null,		null),
+		"disable_media"=>array(T_ZBX_INT, O_OPT,NULL,	null,		null),
 		"lang"=>	array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'{config}==0&&isset({save})'),
 		"autologout"=>	array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,3600),'{config}==0&&isset({save})'),
 		"url"=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'{config}==0&&isset({save})'),
@@ -92,7 +95,21 @@
 ?>
 
 <?php
-	if(isset($_REQUEST["save"])&&($_REQUEST["config"]==0))
+	if(isset($_REQUEST["medias"]) && isset($_REQUEST["enable_media"]))
+	{
+		if(isset($_REQUEST["medias"][$_REQUEST["enable_media"]]))
+		{
+			$_REQUEST["medias"][$_REQUEST["enable_media"]]['active'] = 0;
+		}
+	}
+	elseif(isset($_REQUEST["medias"]) && isset($_REQUEST["disable_media"]))
+	{
+		if(isset($_REQUEST["medias"][$_REQUEST["disable_media"]]))
+		{
+			$_REQUEST["medias"][$_REQUEST["disable_media"]]['active'] = 1;
+		}
+	}
+	elseif(isset($_REQUEST["save"])&&($_REQUEST["config"]==0))
 	{
 		$user_groups = get_request('user_groups', array());
 
@@ -132,7 +149,7 @@
 				add_audit($action,AUDIT_RESOURCE_USER,
 					"User alias [".$_REQUEST["alias"].
 					"] name [".$_REQUEST["name"]."] surname [".
-					$_REQUEST["surname"]."]]");
+					$_REQUEST["surname"]."]");
 				unset($_REQUEST["form"]);
 			}
 		}

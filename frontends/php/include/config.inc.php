@@ -1060,13 +1060,15 @@ COpt::profiling_start("page");
 			{
 		// Check permissions
 				unset($deny);
-				if($label=='admin'	&& !in_array($USER_DETAILS['type'], 
+				if($label!='login' && !isset($USER_DETAILS['type']))
+					$deny = true;
+				elseif($label=='admin'	&& !in_array($USER_DETAILS['type'], 
 					array(USER_TYPE_SUPPER_ADMIN)) )
 					$deny = true;
-				if($label=='config'	&& !in_array($USER_DETAILS['type'], 
+				elseif($label=='config'	&& !in_array($USER_DETAILS['type'], 
 					array(USER_TYPE_SUPPER_ADMIN, USER_TYPE_ZABBIX_ADMIN)) )
 					$deny = true;
-				if($label=='view'	&& !in_array($USER_DETAILS['type'], 
+				elseif($label=='view'	&& !in_array($USER_DETAILS['type'], 
 					array(USER_TYPE_SUPPER_ADMIN, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_ZABBIX_USER)) )
 					$deny = true;
 
@@ -2372,11 +2374,127 @@ COpt::profiling_stop("script");
 		return "Unknown";
         }
 
+$SHOW_HINT_SCRIPT_ISERTTED = false; /* TODO rewrite with include */
+
+	function insert_showhint_javascript()
+	{
+		global $SHOW_HINT_SCRIPT_ISERTTED;
+
+		if($SHOW_HINT_SCRIPT_ISERTTED) return;
+		$SHOW_HINT_SCRIPT_ISERTTED = true;
+?>
+<script language="JavaScript" type="text/javascript">
+<!--
+
+function GetPos(obj)
+{
+	var left = obj.offsetLeft;
+	var top  = obj.offsetTop;;
+	while (obj = obj.offsetParent)
+	{
+		left	+= obj.offsetLeft
+		top	+= obj.offsetTop
+	}
+	return [left,top];
+}
+
+var hint_box = null;
+
+function hide_hint()
+{
+	if(!hint_box) return;
+
+	hint_box.style.visibility="hidden"
+	//hint_box.style.width	= "0px"
+	hint_box.style.left	= "-" + hint_box.style.width;
+}
+
+function show_hint(obj, hint_text)
+{
+	show_hint_ext(obj, hint_text, "", "");
+}
+
+function show_hint_ext(obj, hint_text, width, class)
+{
+	if(!hint_box) return;
+	
+	if(class != "")
+	{
+		hint_text = "<span class=" + class + ">" + hint_text + "</span>";
+	}
+
+	hint_box.innerHTML = hint_text;
+	hint_box.style.width = width;
+
+	var pos = GetPos(obj);
+
+	hint_box.x	= pos[0];
+	hint_box.y	= pos[1];
+
+	hint_box.style.left	= hint_box.x + obj.offsetWidth + 10 + "px";
+	hint_box.style.top	= hint_box.y + obj.offsetHeight + "px";
+
+	hint_box.style.visibility = "visible";
+	obj.onmouseout	= hide_hint;
+}
+
+function create_hint_box()
+{
+	if(hint_box) return;
+
+	hint_box = document.createElement("div");
+	hint_box.setAttribute("id", "hint_box");
+	document.body.appendChild(hint_box);
+
+	hide_hint();
+}
+
+if (window.addEventListener)
+{
+	window.addEventListener("load", create_hint_box, false);
+}
+else if (window.attachEvent)
+{
+	window.attachEvent("onload", create_hint_box);
+}
+else if (document.getElementById)
+{
+	window.onload	= create_hint_box;
+}
+//-->
+</script>
+<?php
+	}
+
 	function insert_confirm_javascript()
 	{
-		echo "
-<script language=\"JavaScript\" type=\"text/javascript\">
+?>
+<script language="JavaScript" type="text/javascript">
 <!--
+	function create_var(form_name, var_name, var_val, submit)
+	{
+		var frmForm = document.forms[form_name];
+
+		if(!frmForm) return false;
+//alert('ok');
+
+		var objVar = document.createElement('input');
+
+		if(!objVar) return false;
+//alert('ok');
+
+		objVar.setAttribute('type', 	'hidden');
+		objVar.setAttribute('name', 	var_name);
+		objVar.setAttribute('value', 	var_val);
+
+		frmForm.appendChild(objVar);
+//alert('ok');
+		if(submit)
+			frmForm.submit();
+
+		return false;
+	}
+
 	function Confirm(msg)
 	{
 		if(confirm(msg,'title'))
@@ -2409,7 +2527,7 @@ COpt::profiling_stop("script");
 	}
 //-->
 </script>
-		";
+<?php
 	}
 
 	function Redirect($url)

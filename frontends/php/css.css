@@ -785,3 +785,24 @@ ul
 .bold {
 	font-weight: bold;
 }
+
+.nowrap {
+	white-space: nowrap;
+	word-spacing: nowrap;
+}
+
+#hint_box{
+	top: 0;
+	z-index: 100;
+	position: absolute;
+	background-color: lightyellow;
+	padding: 2px;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	line-height:15px;
+	border: 1px solid black;
+	border-left: none;
+	border-top: none;
+	visibility: hidden;
+}
+
