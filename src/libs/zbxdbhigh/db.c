@@ -45,7 +45,7 @@
 	sqlo_db_handle_t oracle;
 #endif
 
-extern void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value);
+extern void	apply_actions(DB_TRIGGER *trigger,int eventid,int trigger_value);
 extern void	update_services(int triggerid, int status);
 extern int	CONFIG_NODEID;
 
@@ -694,7 +694,7 @@ int	DBget_prev_trigger_value(int triggerid)
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_prev_trigger_value[%d]", triggerid);
 
-	result = DBselect("select max(clock) from alarms where triggerid=%d",triggerid);
+	result = DBselect("select max(clock) from events where triggerid=%d",triggerid);
 
 	row=DBfetch(result);
 
@@ -707,7 +707,7 @@ int	DBget_prev_trigger_value(int triggerid)
 	clock=atoi(row[0]);
 	DBfree_result(result);
 
-	result=DBselect("select max(clock) from alarms where triggerid=%d and clock<%d",triggerid,clock);
+	result=DBselect("select max(clock) from events where triggerid=%d and clock<%d",triggerid,clock);
 	row=DBfetch(result);
 
 	if(!row || DBis_null(row[0])==SUCCEED)
@@ -722,7 +722,7 @@ status changes to TRUE for te first time */
 	clock=atoi(row[0]);
 	DBfree_result(result);
 
-	result = DBselect("select value from alarms where triggerid=%d and clock=%d",triggerid,clock);
+	result = DBselect("select value from events where triggerid=%d and clock=%d",triggerid,clock);
 	row=DBfetch(result);
 
 	if(!row || DBis_null(row[0])==SUCCEED)
@@ -737,9 +737,9 @@ status changes to TRUE for te first time */
 	return value;
 }
 
-/* SUCCEED if latest alarm with triggerid has this status */
+/* SUCCEED if latest event with triggerid has this status */
 /* Rewrite required to simplify logic ?*/
-static int	latest_alarm(int triggerid, int status)
+static int	latest_event(int triggerid, int status)
 {
 	char		sql[MAX_STRING_LEN];
 	DB_RESULT	result;
@@ -747,9 +747,9 @@ static int	latest_alarm(int triggerid, int status)
 	int 		ret = FAIL;
 
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In latest_alarm()");
+	zabbix_log(LOG_LEVEL_DEBUG,"In latest_event()");
 
-	zbx_snprintf(sql,sizeof(sql),"select value from alarms where triggerid=%d order by clock desc",triggerid);
+	zbx_snprintf(sql,sizeof(sql),"select value from events where triggerid=%d order by clock desc",triggerid);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	result = DBselectN(sql,1);
 	row = DBfetch(result);
@@ -812,32 +812,32 @@ int	latest_service_alarm(int serviceid, int status)
 	return ret;
 }
 
-/* Returns alarmid or 0 */
-int	add_alarm(int triggerid,int status,int clock,int *alarmid)
+/* Returns eventid or 0 */
+int	add_event(int triggerid,int status,int clock,int *eventid)
 {
-	*alarmid=0;
+	*eventid=0;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In add_alarm(%d,%d,%d)",triggerid, status, *alarmid);
+	zabbix_log(LOG_LEVEL_DEBUG,"In add_event(%d,%d,%d)",triggerid, status, *eventid);
 
-	/* Latest alarm has the same status? */
-	if(latest_alarm(triggerid,status) == SUCCEED)
+	/* Latest event has the same status? */
+	if(latest_event(triggerid,status) == SUCCEED)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG,"Alarm for triggerid [%d] status [%d] already exists",triggerid,status);
 		return FAIL;
 	}
 
 
-	*alarmid = DBinsert_id(
-		DBexecute("insert into alarms(triggerid,clock,value) values(%d,%d,%d)", triggerid, clock, status),
-		"alarms", "alarmid");
+	*eventid = DBinsert_id(
+		DBexecute("insert into events(triggerid,clock,value) values(%d,%d,%d)", triggerid, clock, status),
+		"events", "eventid");
 
 	/* Cancel currently active alerts */
 	if(status == TRIGGER_VALUE_FALSE || status == TRIGGER_VALUE_TRUE)
 	{
-		DBexecute("update alerts set retries=3,error='Trigger changed its status. WIll not send repeats.' where triggerid=%d and repeats>0 and status=%d", triggerid, ALERT_STATUS_NOT_SENT);
+		DBexecute("update events set retries=3,error='Trigger changed its status. WIll not send repeats.' where triggerid=%d and repeats>0 and status=%d", triggerid, ALERT_STATUS_NOT_SENT);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG,"End of add_alarm()");
+	zabbix_log(LOG_LEVEL_DEBUG,"End of add_event()");
 	
 	return SUCCEED;
 }
@@ -860,7 +860,7 @@ int	DBadd_service_alarm(int serviceid,int status,int clock)
 
 int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *reason)
 {
-	int	alarmid;
+	int	eventid;
 	int	ret = SUCCEED;
 
 	if(reason==NULL)
@@ -875,7 +875,7 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *re
 	if(trigger->value != new_value)
 	{
 		trigger->prevvalue=DBget_prev_trigger_value(trigger->triggerid);
-		if(add_alarm(trigger->triggerid,new_value,now,&alarmid) == SUCCEED)
+		if(add_event(trigger->triggerid,new_value,now,&eventid) == SUCCEED)
 		{
 			if(reason==NULL)
 			{
@@ -897,7 +897,7 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *re
 				((trigger->prevvalue == TRIGGER_VALUE_TRUE) && (trigger->value == TRIGGER_VALUE_UNKNOWN) && (new_value == TRIGGER_VALUE_FALSE)))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG,"In update_trigger_value. Before apply_actions. Triggerid [%d] prev [%d] curr [%d] new [%d]", trigger->triggerid, trigger->prevvalue, trigger->value, new_value);
-				apply_actions(trigger,alarmid,new_value);
+				apply_actions(trigger,eventid,new_value);
 				if(new_value == TRIGGER_VALUE_TRUE)
 				{
 					update_services(trigger->triggerid, trigger->priority);
@@ -993,7 +993,7 @@ void  DBdelete_trigger(int triggerid)
 {
 	DBexecute("delete from trigger_depends where triggerid_down=%d or triggerid_up=%d", triggerid, triggerid);
 	DBexecute("delete from functions where triggerid=%d", triggerid);
-	DBexecute("delete from alarms where triggerid=%d", triggerid);
+	DBexecute("delete from events where triggerid=%d", triggerid);
 /*	zbx_snprintf(sql,sizeof(sql),"delete from actions where triggerid=%d and scope=%d", triggerid, ACTION_SCOPE_TRIGGER);
 	DBexecute(sql);*/
 
@@ -1638,7 +1638,7 @@ void	DBvacuum(void)
 #ifdef	HAVE_PGSQL
 	char *table_for_housekeeping[]={"services", "services_links", "graphs_items", "graphs", "sysmaps_links",
 			"sysmaps_elements", "sysmaps", "config", "groups", "hosts_groups", "alerts",
-			"actions", "alarms", "functions", "history", "history_str", "hosts", "trends",
+			"actions", "events", "functions", "history", "history_str", "hosts", "trends",
 			"items", "media", "media_type", "triggers", "trigger_depends", "users",
 			"sessions", "rights", "service_alarms", "profiles", "screens", "screens_items",
 			NULL};
@@ -1723,7 +1723,8 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 {
 	char	*s;
 
-	item->itemid=atoi(row[0]);
+	ZBX_STR2UINT64(item->itemid, row[0]);
+//	item->itemid=atoi(row[0]);
 	strscpy(item->key,row[1]);
 	item->host=row[2];
 	item->port=atoi(row[3]);
@@ -1758,7 +1759,8 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 		item->prevvalue_str=s;
 		item->prevvalue=atof(s);
 	}
-	item->hostid=atoi(row[15]);
+//	item->hostid=atoi(row[15]);
+	ZBX_STR2UINT64(item->hostid, row[15]);
 	item->host_status=atoi(row[16]);
 	item->value_type=atoi(row[17]);
 
@@ -1811,26 +1813,32 @@ zbx_uint64_t DBget_nextid(char *table, char *field)
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	res;
+	zbx_uint64_t	min;
+	zbx_uint64_t	max;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_nextid(%s,%s)", table, field);
 
-	result = DBselect("select max(%s) from %s where mod(%s,100)=%d", field, table, field, CONFIG_NODEID);
+	min = (zbx_uint64_t)100000000000000*(zbx_uint64_t)CONFIG_NODEID;
+	max = (zbx_uint64_t)100000000000000*(zbx_uint64_t)(CONFIG_NODEID+1)-1;
+
+	result = DBselect("select max(%s) from %s where %s>=" ZBX_FS_UI64 " and %s<=" ZBX_FS_UI64, field, table, field, min, field, max);
+//	zabbix_log(LOG_LEVEL_WARNING, "select max(%s) from %s where %s>=" ZBX_FS_UI64 " and %s<=" ZBX_FS_UI64, field, table, field, min, field, max);
 
 	row=DBfetch(result);
 
 	if(row && (DBis_null(row[0])!=SUCCEED))
 	{
-	zabbix_log(LOG_LEVEL_DEBUG,"3 [%s]", row[0]);
 		sscanf(row[0],ZBX_FS_UI64,&res);
 
-		res=res+100;
+		res++;
 	}
 	else
 	{
-	zabbix_log(LOG_LEVEL_DEBUG,"4");
-		res=(zbx_uint64_t)(100+CONFIG_NODEID);
+//	zabbix_log(LOG_LEVEL_WARNING,"4");
+		res=(zbx_uint64_t)100000000000000*(zbx_uint64_t)CONFIG_NODEID+1;
 	}
 	DBfree_result(result);
+//	zabbix_log(LOG_LEVEL_WARNING, ZBX_FS_UI64, res);
 
 	return res;
 }

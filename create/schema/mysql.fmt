@@ -1,4 +1,4 @@
-{bigint}=>bigint
+{bigint}=>bigint unsigned
 {integer}=>integer
 {double}=>double
 {varchar}=>varchar
