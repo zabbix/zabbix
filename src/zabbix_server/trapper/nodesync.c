@@ -89,7 +89,7 @@ static int	process_record(int nodeid, char *record)
 {
 	char	tablename[MAX_STRING_LEN];
 	char	fieldname[MAX_STRING_LEN];
-	int	recid;
+	zbx_uint64_t	recid;
 	int	op;
 	int	valuetype;
 	char	value[MAX_STRING_LEN];
@@ -108,7 +108,7 @@ static int	process_record(int nodeid, char *record)
 
 	get_field(record,tablename,0);
 	get_field(record,tmp,1);
-	recid=atoi(tmp);
+	sscanf(tmp,ZBX_FS_UI64,&recid);
 	get_field(record,tmp,2);
 	op=atoi(tmp);
 
@@ -128,7 +128,7 @@ static int	process_record(int nodeid, char *record)
 	}
 	if(op==NODE_CONFIGLOG_OP_DELETE)
 	{
-		zbx_snprintf(tmp,sizeof(tmp),"delete from %s where %s=%d and nodeid=%d", tablename, key, recid, nodeid);
+		zbx_snprintf(tmp,sizeof(tmp),"delete from %s where %s=" ZBX_FS_UI64 " and nodeid=%d", tablename, key, recid, nodeid);
 		zabbix_log( LOG_LEVEL_WARNING, "SQL [%s]", sql);
 		return SUCCEED;
 	}
@@ -193,15 +193,15 @@ static int	process_record(int nodeid, char *record)
 	{
 //		zbx_snprintf(tmp,sizeof(tmp),"%s='%s',", fieldname, value);
 //		strncat(fields,tmp,sizeof(fields));
-		zbx_snprintf(sql,sizeof(sql),"update %s set %s where %s=%d", tablename, fields_update, key, recid);
+		zbx_snprintf(sql,sizeof(sql),"update %s set %s where %s=" ZBX_FS_UI64, tablename, fields_update, key, recid);
 	}
 	else if(op==NODE_CONFIGLOG_OP_ADD)
 	{
-		result = DBselect("select 0 from %s where %s=%d", tablename, key, recid);
+		result = DBselect("select 0 from %s where %s=" ZBX_FS_UI64, tablename, key, recid);
 		row = DBfetch(result);	
 		if(row)
 		{
-			zbx_snprintf(sql,sizeof(sql),"update %s set %s where %s=%d", tablename, fields_update, key, recid);
+			zbx_snprintf(sql,sizeof(sql),"update %s set %s where %s=" ZBX_FS_UI64, tablename, fields_update, key, recid);
 		}
 		else
 		{
