@@ -214,7 +214,7 @@ static int send_to_node(int dest_nodeid, int nodeid, char *xml)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int send_config_data(int nodeid, int dest_nodeid, int maxlogid, int node_type)
+static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, int node_type)
 {
 	DB_RESULT	result;
 	DB_RESULT	result2;
@@ -237,11 +237,11 @@ static int send_config_data(int nodeid, int dest_nodeid, int maxlogid, int node_
 	/* Begin work */
 	if(node_type == ZBX_NODE_MASTER)
 	{
-		result=DBselect("select tablename,recordid,operation from node_configlog where nodeid=%d and sync_master=0 and conflogid<=%d order by tablename,operation", nodeid, maxlogid);
+		result=DBselect("select tablename,recordid,operation from node_configlog where nodeid=" ZBX_FS_UI64  " and sync_master=0 and conflogid<=" ZBX_FS_UI64 " order by tablename,operation", nodeid, maxlogid);
 	}
 	else
 	{
-		result=DBselect("select tablename,recordid,operation from node_configlog where nodeid=%d and sync_slave=0 and conflogid<=%d order by tablename,operation", nodeid, maxlogid);
+		result=DBselect("select tablename,recordid,operation from node_configlog where nodeid=" ZBX_FS_UI64 " and sync_slave=0 and conflogid<=" ZBX_FS_UI64 " order by tablename,operation", nodeid, maxlogid);
 	}
 
 //	snprintf(tmp,sizeof(tmp),"<Data type='config'>\n<Node id='%d'>\n</Node>\n<Version>1.4</Version>\n<Records>\n", nodeid);
@@ -334,11 +334,11 @@ static int send_config_data(int nodeid, int dest_nodeid, int maxlogid, int node_
 	{
 		if(node_type == ZBX_NODE_MASTER)
 		{
-			DBexecute("update node_configlog set sync_master=1 where nodeid=%d and sync_master=0 and conflogid<=%d", nodeid, maxlogid);
+			DBexecute("update node_configlog set sync_master=1 where nodeid=%d and sync_master=0 and conflogid<=" ZBX_FS_UI64, nodeid, maxlogid);
 		}
 		else
 		{
-			DBexecute("update node_configlog set sync_slave=1 where nodeid=%d and sync_slave=0 and conflogid<=%d", nodeid, maxlogid);
+			DBexecute("update node_configlog set sync_slave=1 where nodeid=%d and sync_slave=0 and conflogid<=" ZBX_FS_UI64, nodeid, maxlogid);
 		}
 	}
 
@@ -453,12 +453,12 @@ static int send_to_master_and_slave(int nodeid)
 	DB_ROW		row;
 	int		master_nodeid, slave_nodeid;
 	int		master_result, slave_result;
-	int		maxlogid;
+	zbx_uint64_t	maxlogid;
 
 //	zabbix_log( LOG_LEVEL_WARNING, "In send_to_master_and_slave(local:%d,node:%d)",local_nodeid, nodeid);
 	/* Begin work */
 
-	result = DBselect("select min(conflogid),max(conflogid) from node_configlog where nodeid=%d", nodeid);
+	result = DBselect("select max(conflogid) from node_configlog where nodeid=%d", nodeid);
 
 	row = DBfetch(result);
 
@@ -468,16 +468,7 @@ static int send_to_master_and_slave(int nodeid)
 		DBfree_result(result);
 		return SUCCEED;
 	}
-	if(atoi(row[1])-atoi(row[0])>200)
-	{
-// Limit number of config changes to send in one go
-//		maxlogid = atoi(row[0])+200;
-		maxlogid = atoi(row[1]);
-	}
-	else
-	{
-		maxlogid = atoi(row[1]);
-	}
+	sscanf(row[0], ZBX_FS_UI64, &maxlogid);
 	DBfree_result(result);
 
 
@@ -503,7 +494,7 @@ static int send_to_master_and_slave(int nodeid)
 	{
 		if((master_result == SUCCEED) && (slave_result == SUCCEED))
 		{
-			DBexecute("delete from node_configlog where nodeid=%d and sync_slave=1 and sync_master=1 and conflogid<=%d", nodeid, maxlogid);
+			DBexecute("delete from node_configlog where nodeid=%d and sync_slave=1 and sync_master=1 and conflogid<=" ZBX_FS_UI64, nodeid, maxlogid);
 //			zabbix_log(LOG_LEVEL_WARNING,"delete from node_configlog where nodeid=%d and sync_slave=1 and sync_master=1 and conflogid<=%d", nodeid, maxlogid);
 		}
 	}
@@ -512,7 +503,7 @@ static int send_to_master_and_slave(int nodeid)
 	{
 		if(master_result == SUCCEED)
 		{
-			DBexecute("delete from node_configlog where nodeid=%d and sync_master=1 and conflogid<=%d", nodeid, maxlogid);
+			DBexecute("delete from node_configlog where nodeid=%d and sync_master=1 and conflogid<=" ZBX_FS_UI64, nodeid, maxlogid);
 //			zabbix_log(LOG_LEVEL_WARNING,"delete from node_configlog where nodeid=%d and sync_master=1 and conflogid<=%d", nodeid, maxlogid);
 		}
 	}
@@ -521,7 +512,7 @@ static int send_to_master_and_slave(int nodeid)
 	{
 		if(slave_result == SUCCEED)
 		{
-			DBexecute("delete from node_configlog where nodeid=%d and sync_slave=1 and conflogid<=%d", nodeid, maxlogid);
+			DBexecute("delete from node_configlog where nodeid=%d and sync_slave=1 and conflogid<=" ZBX_FS_UI64, nodeid, maxlogid);
 //			zabbix_log(LOG_LEVEL_WARNING,"delete from node_configlog where nodeid=%d and sync_slave=1 and conflogid<=%d", nodeid, maxlogid);
 		}
 	}

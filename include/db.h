@@ -142,7 +142,7 @@ void	PG_DBfree_result(DB_RESULT result);
 
 DB_HOST
 {
-	int     hostid;
+	zbx_uint64_t     hostid;
 	char    host[HOST_HOST_LEN_MAX];
 	int     useip;
 	char    ip[HOST_IP_LEN_MAX];
@@ -156,7 +156,7 @@ DB_HOST
 
 DB_GRAPH
 {
-	int	graphid;
+	zbx_uint64_t	graphid;
 	char	name[GRAPH_NAME_LEN_MAX];
 	int	width;
 	int	height;
@@ -167,9 +167,9 @@ DB_GRAPH
 
 DB_GRAPH_ITEM
 {
-	int	gitemid;
-	int	graphid;
-	int	itemid;
+	zbx_uint64_t	gitemid;
+	zbx_uint64_t	graphid;
+	zbx_uint64_t	itemid;
 	int	drawtype;
 	int	sortorder;
 	char	color[GRAPH_ITEM_COLOR_LEN_MAX];
@@ -177,8 +177,8 @@ DB_GRAPH_ITEM
 
 DB_ITEM
 {
-	int	itemid;
-	int	hostid;
+	zbx_uint64_t	itemid;
+	zbx_uint64_t	hostid;
 	int	type;
 	int	status;
 	char	*description;
@@ -232,9 +232,9 @@ DB_ITEM
  
 DB_FUNCTION
 {
-	int     functionid;
-	int     itemid;
-	int     triggerid;
+	zbx_uint64_t     functionid;
+	zbx_uint64_t     itemid;
+	zbx_uint64_t     triggerid;
 	double  lastvalue;
 	int	lastvalue_null;
 	char    *function;
@@ -244,9 +244,9 @@ DB_FUNCTION
 
 DB_MEDIA
 {
-	int	mediaid;
+	zbx_uint64_t	mediaid;
 /*	char	*type;*/
-	int	mediatypeid;
+	zbx_uint64_t	mediatypeid;
 	char	*sendto;
 	char	*period;
 	int	active;
@@ -255,7 +255,7 @@ DB_MEDIA
 
 DB_MEDIATYPE
 {
-	int	mediatypeid;
+	zbx_uint64_t	mediatypeid;
 	int	type;
 	char	*description;
 	char	*smtp_server;
@@ -267,7 +267,7 @@ DB_MEDIATYPE
 
 DB_TRIGGER
 {
-	int	triggerid;
+	zbx_uint64_t	triggerid;
 	char	expression[TRIGGER_EXPRESSION_LEN_MAX];
 	char	description[TRIGGER_DESCRIPTION_LEN_MAX];
 	char	url[TRIGGER_URL_LEN_MAX];
@@ -280,9 +280,9 @@ DB_TRIGGER
 
 DB_ACTION
 {
-	int	actionid;
+	zbx_uint64_t	actionid;
 	int	actiontype;
-	int	userid;
+	zbx_uint64_t	userid;
 /*	int	delay;*/
 	int	lastcheck;
 	int	recipient;
@@ -295,8 +295,8 @@ DB_ACTION
 
 DB_CONDITION
 {
-	int	conditionid;
-	int	actionid;
+	zbx_uint64_t	conditionid;
+	zbx_uint64_t	actionid;
 	int	conditiontype;
 	int	operator;
 	char	*value;
@@ -304,11 +304,11 @@ DB_CONDITION
 
 DB_ALERT
 {
-	int	alertid;
-	int 	actionid;
+	zbx_uint64_t	alertid;
+	zbx_uint64_t 	actionid;
 	int 	clock;
 /*	char	*type;*/
-	int	mediatypeid;
+	zbx_uint64_t	mediatypeid;
 	char	*sendto;
 	char	*subject;
 	char	*message;
@@ -319,10 +319,10 @@ DB_ALERT
 
 DB_HOUSEKEEPER
 {
-	int	housekeeperid;
+	zbx_uint64_t	housekeeperid;
 	char	*tablename;
 	char	*field;
-	int	value;
+	zbx_uint64_t	value;
 };
 
 

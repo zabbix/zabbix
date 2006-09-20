@@ -171,7 +171,7 @@ CREATE INDEX sysmaps_1 ON sysmaps (name);
 CREATE TABLE config (
 	configid		{bigint}		DEFAULT '0' NOT NULL,
 	alert_history		{integer}		DEFAULT '0' NOT NULL,
-	alarm_history		{integer}		DEFAULT '0' NOT NULL,
+	event_history		{integer}		DEFAULT '0' NOT NULL,
 	refresh_unsupported	{integer}		DEFAULT '0' NOT NULL,
 	work_period		{varchar}(100)	DEFAULT '1-5,00:00-24:00' NOT NULL,
 	PRIMARY KEY (configid)
@@ -248,17 +248,17 @@ CREATE TABLE conditions (
 
 CREATE INDEX conditions_1 ON conditions (actionid);
 
-CREATE TABLE alarms (
-	alarmid			{bigint}		DEFAULT '0' NOT NULL,
+CREATE TABLE events (
+	eventid			{bigint}		DEFAULT '0' NOT NULL,
 	triggerid		{bigint}		DEFAULT '0' NOT NULL,
 	clock			{integer}		DEFAULT '0' NOT NULL,
 	value			{integer}		DEFAULT '0' NOT NULL,
 	acknowledged		{integer}		DEFAULT '0' NOT NULL,
-	PRIMARY KEY (alarmid)
+	PRIMARY KEY (eventid)
 ) {create_table_opt};
 
-CREATE INDEX alarms_1 ON alarms (triggerid,clock);
-CREATE INDEX alarms_2 ON alarms (clock);
+CREATE INDEX events_1 ON events (triggerid,clock);
+CREATE INDEX events_2 ON events (clock);
 
 CREATE TABLE functions (
 	functionid		{bigint}		DEFAULT '0' NOT NULL,
@@ -634,14 +634,14 @@ CREATE TABLE housekeeper (
 CREATE TABLE acknowledges (
 	acknowledgeid		{bigint}		DEFAULT '0' NOT NULL,
 	userid			{bigint}		DEFAULT '0' NOT NULL,
-	alarmid			{bigint}		DEFAULT '0' NOT NULL,
+	eventid			{bigint}		DEFAULT '0' NOT NULL,
 	clock			{integer}		DEFAULT '0' NOT NULL,
 	message			{varchar}(255)	DEFAULT '' NOT NULL,
 	PRIMARY KEY (acknowledgeid)
 ) {create_table_opt};
 
 CREATE INDEX acknowledges_1 ON acknowledges (userid);
-CREATE INDEX acknowledges_2 ON acknowledges (alarmid);
+CREATE INDEX acknowledges_2 ON acknowledges (eventid);
 CREATE INDEX acknowledges_3 ON acknowledges (clock);
 
 CREATE TABLE applications (

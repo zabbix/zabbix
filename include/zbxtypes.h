@@ -54,4 +54,6 @@
 #	define S_ISREG(x) (((x) & S_IFMT) == S_IFREG)
 #endif
 
+#define ZBX_STR2UINT64(uint,string) scanf(string ,ZBX_FS_UI64 ,&uint);
+
 #endif

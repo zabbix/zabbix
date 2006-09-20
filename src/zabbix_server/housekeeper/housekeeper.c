@@ -158,19 +158,19 @@ static int housekeeping_alerts(int now)
 	return res;
 }
 
-static int housekeeping_alarms(int now)
+static int housekeeping_events(int now)
 {
-	int		alarm_history;
+	int		event_history;
 	DB_RESULT	result;
 	DB_RESULT	result2;
 	DB_ROW		row1;
 	DB_ROW		row2;
-	int 		alarmid;
+	int 		eventid;
 	int		res = SUCCEED;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In housekeeping_alarms(%d)", now);
+	zabbix_log( LOG_LEVEL_DEBUG, "In housekeeping_events(%d)", now);
 
-	result = DBselect("select alarm_history from config");
+	result = DBselect("select event_history from config");
 
 	row1=DBfetch(result);
 	
@@ -181,16 +181,16 @@ static int housekeeping_alarms(int now)
 	}
 	else
 	{
-		alarm_history=atoi(row1[0]);
+		event_history=atoi(row1[0]);
 
-		result2 = DBselect("select alarmid from alarms where clock<%d", now-24*3600*alarm_history);
+		result2 = DBselect("select eventid from events where clock<%d", now-24*3600*event_history);
 		while((row2=DBfetch(result2)))
 		{
-			alarmid=atoi(row2[0]);
+			eventid=atoi(row2[0]);
 			
-			DBexecute("delete from acknowledges where alarmid=%d",alarmid);
+			DBexecute("delete from acknowledges where eventid=%d",eventid);
 			
-			DBexecute("delete from alarms where alarmid=%d",alarmid);
+			DBexecute("delete from events where eventid=%d",eventid);
 		}
 		DBfree_result(result2);
 
@@ -318,9 +318,9 @@ int main_housekeeper_loop()
 
 		housekeeping_process_log(now);
 
-		zbx_setproctitle("housekeeper [removing old alarms]");
+		zbx_setproctitle("housekeeper [removing old events]");
 
-		housekeeping_alarms(now);
+		housekeeping_events(now);
 
 		zbx_setproctitle("housekeeper [removing old alerts]");
 

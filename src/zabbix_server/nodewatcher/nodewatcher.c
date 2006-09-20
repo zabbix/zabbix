@@ -82,6 +82,9 @@ static int calculate_checksums()
 	DB_RESULT	result2;
 	DB_ROW		row;
 	DB_ROW		row2;
+	int		nodeid;
+
+	int	now;
 
 //	zabbix_log( LOG_LEVEL_WARNING, "In calculate_checksums");
 	DBexecute("delete from node_cksum where cksumtype=%d", NODE_CKSUM_TYPE_NEW);
@@ -92,6 +95,9 @@ static int calculate_checksums()
 	result =DBselect(sql);
 	while((row=DBfetch(result)))
 	{
+		now  = time(NULL);
+		nodeid = atoi(row[0]);
+
 		zbx_snprintf(sql,sizeof(sql),"select 'table                  ','field                ',itemid, '012345678901234' from items where 1=0\n");
 
 		for(i=0;tables[i].table!=0;i++)
@@ -119,22 +125,31 @@ static int calculate_checksums()
 			if(fields[0]!=0)	fields[strlen(fields)-1] = 0;
 
 			// select table,recid,md5(fields) from table union all ...
-			zbx_snprintf(tmp,sizeof(tmp),"union all select '%s','%s',%s,md5(concat(%s)) from %s where mod(%s,100)=%s\n",
-					tables[i].table, tables[i].recid, tables[i].recid, fields, tables[i].table, tables[i].recid, row[0]);
+			zbx_snprintf(tmp,sizeof(tmp),"union all select '%s','%s',%s,md5(concat(%s)) from %s where %s>=" ZBX_FS_UI64 " and %s<=" ZBX_FS_UI64 "\n",
+					tables[i].table, tables[i].recid, tables[i].recid, fields, tables[i].table,
+					tables[i].recid, (zbx_uint64_t)100000000000000*(zbx_uint64_t)nodeid,
+					tables[i].recid, (zbx_uint64_t)100000000000000*(zbx_uint64_t)nodeid+99999999999999);
+//		zabbix_log( LOG_LEVEL_WARNING, "TMP [%s]", tmp);
 			strncat(sql,tmp,sizeof(sql));
 		}
 //		zabbix_log( LOG_LEVEL_WARNING, "SQL [%s]", sql);
 
 		result2 =DBselect(sql);
+
+		zabbix_log( LOG_LEVEL_WARNING, "Selected records in %d seconds", time(NULL)-now);
+		now = time(NULL);
+		i=0;
 		while((row2=DBfetch(result2)))
 		{
 //			zabbix_log( LOG_LEVEL_WARNING, "Cksum [%s]", row2[3]);
 			DBexecute("insert into node_cksum (cksumid,nodeid,tablename,fieldname,recordid,cksumtype,cksum)"\
-				"values (" ZBX_FS_UI64 ",%s,'%s','%s',%s,%d,'%s')",
+				"values (" ZBX_FS_UI64 ",%d,'%s','%s',%s,%d,'%s')",
 				DBget_nextid("node_cksum","cksumid"),
-				row[0],row2[0],row2[1],row2[2],NODE_CKSUM_TYPE_NEW,row2[3]);
+				nodeid,row2[0],row2[1],row2[2],NODE_CKSUM_TYPE_NEW,row2[3]);
+			i++;
 		}
 		DBfree_result(result2);
+		zabbix_log( LOG_LEVEL_WARNING, "Added %d records in %d seconds", i, time(NULL)-now);
 	}
 	DBfree_result(result);
 
@@ -264,6 +279,7 @@ int main_nodewatcher_loop()
 	{
 
 		zbx_setproctitle("connecting to the database");
+//		zabbix_log( LOG_LEVEL_WARNING, "Starting sync with nodes");
 
 		DBconnect();
 		calculate_checksums();
