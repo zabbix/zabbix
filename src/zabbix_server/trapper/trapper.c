@@ -51,6 +51,7 @@
 
 #include "autoregister.h"
 #include "nodesync.h"
+#include "nodeevents.h"
 #include "trapper.h"
 
 #include "daemon.h"
@@ -106,6 +107,21 @@ int	process_trap(int sockfd,char *s, int max_len)
 		{
 //			zabbix_log( LOG_LEVEL_WARNING, "Node data received [len:%d]", strlen(s));
 			if(node_sync(s) == SUCCEED)
+			{
+				zbx_snprintf(result,sizeof(result),"OK\n");
+				if( write(sockfd,result,strlen(result)) == -1)
+				{
+					zabbix_log( LOG_LEVEL_WARNING, "Error sending confirmation to node [%s]",strerror(errno));
+					zabbix_syslog("Trapper: error sending confirmation to node [%s]",strerror(errno));
+				}
+			}
+			return ret;
+		}
+		/* Slave node events? */
+		if(strncmp(s,"Events",6) == 0)
+		{
+			zabbix_log( LOG_LEVEL_WARNING, "Slave node events received [len:%d]", strlen(s));
+			if(node_events(s) == SUCCEED)
 			{
 				zbx_snprintf(result,sizeof(result),"OK\n");
 				if( write(sockfd,result,strlen(result)) == -1)
