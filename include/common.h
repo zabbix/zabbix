@@ -282,10 +282,9 @@ AGENT_RESULT {
 	ZBX_LIST	list;
 };
 
-id>=100000000000000*nodeid and id<=(100000000000000*nodeid1+99999999999999)
 #define ZBX_COND_NODEID " %s>=100000000000000*%d and %s<=(100000000000000*%d+99999999999999) "
-#define LOCAL_NODE(fieldid) "mod(" fieldid ",100)",CONFIG_NODEID
-#define ANY_NODE(fieldid,nodeid) "mod(" fieldid ",100)",CONFIG_NODEID
+#define LOCAL_NODE(fieldid) fieldid, CONFIG_NODEID, fieldid, CONFIG_NODEID
+#define ZBX_NODE(fieldid,nodeid) fieldid, nodeid, fieldid, nodeid
 
 /* agent result types */
 #define AR_UINT64	1

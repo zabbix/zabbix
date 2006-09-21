@@ -52,18 +52,19 @@ extern	int	CONFIG_DBPORT;
 #define DB_FULL_DELETE	0
 #define DB_PART_DELETE	1
 
-#define DB_HOST		struct host_type
-#define DB_ITEM		struct item_type
-#define DB_TRIGGER	struct trigger_type
 #define DB_ACTION	struct action_type
-#define DB_CONDITION	struct condition_type
 #define DB_ALERT	struct alert_type
+#define DB_CONDITION	struct condition_type
+#define DB_EVENT	struct event_type
 #define DB_FUNCTION	struct function_type
-#define DB_MEDIA	struct media_type
-#define DB_MEDIATYPE	struct mediatype_type
 #define DB_GRAPH	struct graph_type
 #define DB_GRAPH_ITEM	struct graph_item_type
+#define DB_HOST		struct host_type
 #define DB_HOUSEKEEPER	struct housekeeper_type
+#define DB_ITEM		struct item_type
+#define DB_MEDIA	struct media_type
+#define DB_MEDIATYPE	struct mediatype_type
+#define DB_TRIGGER	struct trigger_type
 
 #ifdef HAVE_MYSQL
 	#define	DB_RESULT	MYSQL_RES *
@@ -139,6 +140,15 @@ void	PG_DBfree_result(DB_RESULT result);
 #define ZBX_SQL_ITEM_SELECT	"i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.errors_from,i.snmp_port,i.delta,i.prevorgvalue,i.lastclock,i.units,i.multiplier,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula,h.available,i.status,i.trapper_hosts,i.logtimefmt,i.valuemapid,i.delay_flex from hosts h, items i"
 
 #define ZBX_MAX_SQL_LEN			16384
+
+DB_EVENT
+{
+	zbx_uint64_t	eventid;
+	zbx_uint64_t	triggerid;
+	int		clock;
+	int		value;
+	int		acknowledged;
+};
 
 DB_HOST
 {

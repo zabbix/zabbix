@@ -17,15 +17,9 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
+#ifndef ZABBIX_NODEWATCHER_EVENTS_H
+#define ZABBIX_NODEWATCHER_EVENTS_H
 
-#ifndef ZABBIX_ACTIONS_H
-#define ZABBIX_ACTIONS_H
-
-#include "common.h"
-#include "db.h"
-
-extern	int	CONFIG_NODEID;
-
-void    apply_actions(DB_TRIGGER *trigger, int trigger_value);
+void main_eventsender();
 
 #endif

@@ -18,14 +18,11 @@
 **/
 
 
-#ifndef ZABBIX_ACTIONS_H
-#define ZABBIX_ACTIONS_H
-
-#include "common.h"
-#include "db.h"
+#ifndef ZABBIX_NODEEVENTS_H
+#define ZABBIX_NODEEVENTS_H
 
 extern	int	CONFIG_NODEID;
 
-void    apply_actions(DB_TRIGGER *trigger, int trigger_value);
+int	node_events(char *data);
 
 #endif

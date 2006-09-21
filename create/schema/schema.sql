@@ -23,12 +23,13 @@
 
 CREATE TABLE nodes (
 	nodeid			{bigint}		DEFAULT '0' NOT NULL,
-	name			{varchar}(64)	DEFAULT '' NOT NULL,
+	name			{varchar}(64)		DEFAULT '' NOT NULL,
 	timezone		{integer}		DEFAULT '0' NOT NULL,
-	ip			{varchar}(15)	DEFAULT '' NOT NULL,
+	ip			{varchar}(15)		DEFAULT '' NOT NULL,
 	port			{integer}		DEFAULT '0' NOT NULL,
 	slave_history		{integer}		DEFAULT '0' NOT NULL,
 	slave_trends		{integer}		DEFAULT '0' NOT NULL,
+	event_lastid		{bigint}		DEFAULT '0' NOT NULL,
 	nodetype		{integer}		DEFAULT '0' NOT NULL,
 	masterid		{bigint}		DEFAULT '0' NOT NULL,
 	PRIMARY KEY (nodeid)
