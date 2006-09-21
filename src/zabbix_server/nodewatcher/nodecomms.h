@@ -17,15 +17,9 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
+#ifndef ZABBIX_NODECOMMS_H
+#define ZABBIX_NODECOMMS_H
 
-#ifndef ZABBIX_ACTIONS_H
-#define ZABBIX_ACTIONS_H
-
-#include "common.h"
-#include "db.h"
-
-extern	int	CONFIG_NODEID;
-
-void    apply_actions(DB_TRIGGER *trigger, int trigger_value);
+int send_to_node(int dest_nodeid, int nodeid, char *data);
 
 #endif

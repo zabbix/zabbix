@@ -299,7 +299,7 @@ static int get_next_command(char** command_list, char** alias, int* is_group, ch
  * Comments: commands devided with newline                                    *
  *                                                                            *
  ******************************************************************************/
-/*static*/	void	run_commands(DB_TRIGGER *trigger,DB_ACTION *action)
+static	void	run_commands(DB_TRIGGER *trigger,DB_ACTION *action)
 {
 	DB_RESULT result;
 	DB_ROW		row;
@@ -337,7 +337,7 @@ static int get_next_command(char** command_list, char** alias, int* is_group, ch
 	zabbix_log( LOG_LEVEL_DEBUG, "Run remote commands END");
 }
 
-static int	check_action_condition(DB_TRIGGER *trigger,int eventid,int new_trigger_value, DB_CONDITION *condition)
+static int	check_action_condition(DB_TRIGGER *trigger,int new_trigger_value, DB_CONDITION *condition)
 {
 	DB_RESULT result;
 	DB_ROW	row;
@@ -533,7 +533,7 @@ static int	check_action_condition(DB_TRIGGER *trigger,int eventid,int new_trigge
 	return ret;
 }
 
-static int	check_action_conditions(DB_TRIGGER *trigger,int eventid,int new_trigger_value, int actionid)
+static int	check_action_conditions(DB_TRIGGER *trigger,int new_trigger_value, int actionid)
 {
 	DB_RESULT result;
 	DB_ROW row;
@@ -558,7 +558,7 @@ static int	check_action_conditions(DB_TRIGGER *trigger,int eventid,int new_trigg
 		/* OR conditions */
 		if(old_type == condition.conditiontype)
 		{
-			if(check_action_condition(trigger, eventid, new_trigger_value, &condition) == SUCCEED)
+			if(check_action_condition(trigger, new_trigger_value, &condition) == SUCCEED)
 				ret = SUCCEED;
 		}
 		/* AND conditions */
@@ -566,7 +566,7 @@ static int	check_action_conditions(DB_TRIGGER *trigger,int eventid,int new_trigg
 		{
 			/* Break if PREVIOUS AND condition is FALSE */
 			if(ret == FAIL) break;
-			if(check_action_condition(trigger, eventid, new_trigger_value, &condition) == FAIL)
+			if(check_action_condition(trigger, new_trigger_value, &condition) == FAIL)
 				ret = FAIL;
 		}
 		
@@ -586,7 +586,7 @@ static int	check_action_conditions(DB_TRIGGER *trigger,int eventid,int new_trigg
 	return ret;
 }
 
-void	apply_actions(DB_TRIGGER *trigger,int eventid,int trigger_value)
+void	apply_actions(DB_TRIGGER *trigger,int trigger_value)
 {
 	DB_RESULT result;
 	DB_ROW row;
@@ -595,7 +595,7 @@ void	apply_actions(DB_TRIGGER *trigger,int eventid,int trigger_value)
 
 /*	int	now;*/
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In apply_actions(triggerid:%d,eventid:%d,trigger_value:%d)",trigger->triggerid, eventid, trigger_value);
+	zabbix_log( LOG_LEVEL_DEBUG, "In apply_actions(triggerid:%d,trigger_value:%d)",trigger->triggerid, trigger_value);
 
 	if(TRIGGER_VALUE_TRUE == trigger_value)
 	{
@@ -629,7 +629,7 @@ void	apply_actions(DB_TRIGGER *trigger,int eventid,int trigger_value)
 	{
 		action.actionid=atoi(row[0]);
 
-		if(check_action_conditions(trigger, eventid, trigger_value, action.actionid) == SUCCEED)
+		if(check_action_conditions(trigger, trigger_value, action.actionid) == SUCCEED)
 		{
 			zabbix_log( LOG_LEVEL_DEBUG, "Conditions match our trigger. Do apply actions.");
 			action.userid=atoi(row[1]);

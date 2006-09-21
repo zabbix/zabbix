@@ -289,6 +289,9 @@ int main_nodewatcher_loop()
 		/* Send configuration changes to required nodes */
 		main_nodesender();
 
+		/* Send new events to master node */
+		main_eventsender();
+
 		DBclose();
 
 		zbx_setproctitle("sender [sleeping for %d seconds]", 30);

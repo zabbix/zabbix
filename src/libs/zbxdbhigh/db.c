@@ -739,6 +739,7 @@ status changes to TRUE for te first time */
 
 /* SUCCEED if latest event with triggerid has this status */
 /* Rewrite required to simplify logic ?*/
+/*
 static int	latest_event(int triggerid, int status)
 {
 	char		sql[MAX_STRING_LEN];
@@ -770,6 +771,7 @@ static int	latest_event(int triggerid, int status)
 
 	return ret;
 }
+*/
 
 /* SUCCEED if latest service alarm has this status */
 /* Rewrite required to simplify logic ?*/
@@ -813,13 +815,13 @@ int	latest_service_alarm(int serviceid, int status)
 }
 
 /* Returns eventid or 0 */
+/*
 int	add_event(int triggerid,int status,int clock,int *eventid)
 {
 	*eventid=0;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_event(%d,%d,%d)",triggerid, status, *eventid);
 
-	/* Latest event has the same status? */
 	if(latest_event(triggerid,status) == SUCCEED)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG,"Alarm for triggerid [%d] status [%d] already exists",triggerid,status);
@@ -831,7 +833,6 @@ int	add_event(int triggerid,int status,int clock,int *eventid)
 		DBexecute("insert into events(triggerid,clock,value) values(%d,%d,%d)", triggerid, clock, status),
 		"events", "eventid");
 
-	/* Cancel currently active alerts */
 	if(status == TRIGGER_VALUE_FALSE || status == TRIGGER_VALUE_TRUE)
 	{
 		DBexecute("update events set retries=3,error='Trigger changed its status. WIll not send repeats.' where triggerid=%d and repeats>0 and status=%d", triggerid, ALERT_STATUS_NOT_SENT);
@@ -841,6 +842,7 @@ int	add_event(int triggerid,int status,int clock,int *eventid)
 	
 	return SUCCEED;
 }
+*/
 
 int	DBadd_service_alarm(int serviceid,int status,int clock)
 {
@@ -860,8 +862,8 @@ int	DBadd_service_alarm(int serviceid,int status,int clock)
 
 int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *reason)
 {
-	int	eventid;
 	int	ret = SUCCEED;
+	DB_EVENT	event;
 
 	if(reason==NULL)
 	{
@@ -875,7 +877,13 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *re
 	if(trigger->value != new_value)
 	{
 		trigger->prevvalue=DBget_prev_trigger_value(trigger->triggerid);
-		if(add_event(trigger->triggerid,new_value,now,&eventid) == SUCCEED)
+
+		event.eventid = 0;
+		event.triggerid = trigger->triggerid;
+		event.clock = now;
+		event.value = new_value;
+		event.acknowledged = 0;
+		if(process_event(event) == SUCCEED)
 		{
 			if(reason==NULL)
 			{
@@ -897,7 +905,7 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *re
 				((trigger->prevvalue == TRIGGER_VALUE_TRUE) && (trigger->value == TRIGGER_VALUE_UNKNOWN) && (new_value == TRIGGER_VALUE_FALSE)))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG,"In update_trigger_value. Before apply_actions. Triggerid [%d] prev [%d] curr [%d] new [%d]", trigger->triggerid, trigger->prevvalue, trigger->value, new_value);
-				apply_actions(trigger,eventid,new_value);
+				apply_actions(trigger,event.eventid,new_value);
 				if(new_value == TRIGGER_VALUE_TRUE)
 				{
 					update_services(trigger->triggerid, trigger->priority);
