@@ -70,9 +70,9 @@
 			$alias		= $user["alias"];
 			$name		= $user["name"];
 			$surname	= $user["surname"];
-			$password	= NULL;
-			$password1	= NULL;
-			$password2	= NULL;
+			$password	= null;
+			$password1	= null;
+			$password2	= null;
 			$url		= $user["url"];
 			$autologout	= $user["autologout"];
 			$lang		= $user["lang"];
@@ -80,7 +80,7 @@
 			$user_type	= $user["type"];
 
 			$user_groups	= array();
-			$medias		= array();
+			$user_medias		= array();
 
 			$db_user_groups = DBselect('select g.* from usrgrp g, users_groups ug'.
 				' where ug.usrgrpid=g.usrgrpid and ug.userid='.$userid);
@@ -93,7 +93,7 @@
 			$db_medias = DBselect('select m.* from media m where m.userid='.$userid);
 			while($db_media = DBfetch($db_medias))
 			{
-				array_push($medias, 
+				array_push($user_medias, 
 					array(	'mediatypeid' => $db_media['mediatypeid'],
 						'period' => $db_media['period'],
 						'sendto' => $db_media['sendto'],
@@ -122,7 +122,7 @@
 			$user_groups	= get_request("user_groups",array());
 			$change_password = get_request("change_password", null);
 
-			$medias		= get_request("medias", array());
+			$user_medias		= get_request("user_medias", array());
 
 			$new_group_id	= get_request('new_group_id', 0);
 			$new_group_name = get_request('new_group_name', '');
@@ -130,7 +130,7 @@
 
 		$media_types = array();
 		$media_type_ids = array();
-		foreach($medias as $one_media) $media_type_ids[$one_media['mediatypeid']] = 1;
+		foreach($user_medias as $one_media) $media_type_ids[$one_media['mediatypeid']] = 1;
 
 		if(count($media_type_ids) > 0)
 		{
@@ -200,32 +200,32 @@
 				array(
 					$lstGroups, 
 					BR, 
-					new CButton('btn1',S_ADD,
+					new CButton('add_group',S_ADD,
 						"return PopUp('popup_usrgrp.php?dstfrm=".$frmUser->GetName().
 						"&list_name=user_groups_to_del[]&var_name=user_groups','new_group',".
 						"'width=450,height=450,resizable=1,scrollbars=1');"),
 					SPACE,
-					(count($user_groups) > 0) ? new CButton('del_user_group',S_DELETE_SELECTED) : NULL
+					(count($user_groups) > 0) ? new CButton('del_user_group',S_DELETE_SELECTED) : null
 				));
 
-			$frmUser->AddVar('medias', $medias);
+			$frmUser->AddVar('user_medias', $user_medias);
 
 			$media_table = new CTable(S_NO_MEDIA_DEFINED);
-			foreach($medias as $id => $one_media)
+			foreach($user_medias as $id => $one_media)
 			{
 				if(!isset($one_media["active"]) || $one_media["active"]==0)
 				{
 					$status = new CLink(S_ENABLED,'#','enabled');
-					$status->options['onClick'] = "return create_var('".$frmUser->GetName()."','disable_media',".$id.", true);";
+					$status->OnClick("return create_var('".$frmUser->GetName()."','disable_media',".$id.", true);");
 				}
 				else
 				{
 					$status = new CLink(S_DISABLED,'#','disabled');
-					$status->options['onClick'] = "return create_var('".$frmUser->GetName()."','enable_media',".$id.", true);";
+					$status->OnClick("return create_var('".$frmUser->GetName()."','enable_media',".$id.", true);");
 				}
 
 				$media_table->AddRow(array(
-					new CCheckBox('selected_medias[]',NULL,NULL),
+					new CCheckBox('user_medias_to_del[]',null,null,$id),
 					$media_types[$one_media['mediatypeid']],
 					$one_media['sendto'],
 					new CSpan($one_media['period'], 'nowrap'),
@@ -234,9 +234,11 @@
 				);
 			}
 			$frmUser->AddRow(S_MEDIA, array($media_table,
-				new CButton('add',S_ADD),
+				new CButton('add_media',S_ADD,
+						'return PopUp("popup_media.php?dstfrm='.$frmUser->GetName().'","new_media",'.
+						'"width=550,height=400,resizable=1,scrollbars=1");'),
 				SPACE,
-				(count($medias) > 0) ? new CButton('del_media',S_DELETE_SELECTED) : NULL
+				(count($user_medias) > 0) ? new CButton('del_user_media',S_DELETE_SELECTED) : null
 				));
 		}
 
@@ -307,64 +309,132 @@
 	}
 
 	# Insert form for User Groups
-	function	insert_usergroups_form($usrgrpid)
+	function	insert_usergroups_form()
 	{
 		global  $_REQUEST;
 		global  $ZBX_CURNODEID;
 
 		$frm_title = S_USER_GROUP;
-		if(isset($usrgrpid))
+		if(isset($_REQUEST["usrgrpid"]))
 		{
-			$usrgrp=get_usergroup_by_groupid($usrgrpid);
-			$frm_title = S_USER_GROUP." \"".$usrgrp["name"]."\"";
+			$usrgrp		= get_group_by_usrgrpid($_REQUEST["usrgrpid"]);
+			$frm_title 	= S_USER_GROUP." \"".$usrgrp["name"]."\"";
 		}
 
-		$users = get_request("users",array());
-		if(isset($usrgrpid) && !isset($_REQUEST["form_refresh"]))
+		if(isset($_REQUEST["usrgrpid"]) && !isset($_REQUEST["form_refresh"]))
 		{
 			$name	= $usrgrp["name"];
+
+			$group_users = array();
 			$db_users=DBselect("select distinct u.userid,u.alias from users u,users_groups ug ".
-				"where u.userid=ug.userid and ug.usrgrpid=".$usrgrpid.
+				"where u.userid=ug.userid and ug.usrgrpid=".$_REQUEST["usrgrpid"].
 				" order by alias");
 
 			while($db_user=DBfetch($db_users))
+				$group_users[$db_user["userid"]] = $db_user['alias'];
+
+			$group_rights = array();			
+			$sqls = array(
+				'select r.*i,n.name as name from rights r, nodes n where r.groupid='.$_REQUEST["usrgrpid"].
+					' and r.type='.RESOURCE_TYPE_NODE.' and r.id=n.nodeid',
+				'select r.*i, CONCAT(n.name,":",g.name) as name from rights r, groups g, nodes n'.
+					' where r.groupid='.$_REQUEST["usrgrpid"].' and n.nodeid='.id2nodeid('g.groupid').
+					' and r.type='.RESOURCE_TYPE_GROUP.' and r.id=g.groupid',
+		
+				);
+			foreach($sqls as $sql)
 			{
-				if(in_array($db_user["userid"], $users)) continue;
-				array_push($users,$db_user["userid"]);
+				$db_rights = DBselect($sql);
+				while($db_right = DBfetch($db_rights))
+				{
+					$group_rights[$db_right['name']] = array(
+						'type'		=> $db_right['type'],
+						'permission'	=> $db_right['permission'],
+						'id'		=> $db_right['id']
+					);
+				}
 			}
 		}
 		else
 		{
-			$name	= get_request("gname","");
+			$name		= get_request("gname","");
+			$group_users	= get_request("group_users",array());
+			$group_rights	= get_request("group_rights",array());
 		}
+
+		ksort($group_rights);
 
 		$frmUserG = new CFormTable($frm_title,"users.php");
 		$frmUserG->SetHelp("web.users.groups.php");
-		$frmUserG->AddVar("config",get_request("config",2));
-		if(isset($usrgrpid))
-		{
-			$frmUserG->AddVar("usrgrpid",$usrgrpid);
-		}
-		$frmUserG->AddRow(S_GROUP_NAME,new CTextBox("gname",$name,30));
+		$frmUserG->AddVar("config",get_request("config",1));
 
-		$form_row = array();
-		$db_users=DBselect("select distinct userid,alias from users".
-				" where mod(userid,100)=".$ZBX_CURNODEID.
-				" order by alias");
-		while($db_user=DBfetch($db_users))
+		if(isset($_REQUEST["usrgrpid"]))
 		{
-			array_push($form_row,
-				array(
-					new CCheckBox("users[]",
-						in_array($db_user["userid"],$users) ? 'yes' : 'no',
-						NULL,			/* action */
-						$db_user["userid"]),	/* value */
-					$db_user["alias"]
-				),
-				BR);
+			$frmUserG->AddVar("usrgrpid",$_REQUEST["usrgrpid"]);
 		}
-		$frmUserG->AddRow(S_USERS,$form_row);
-	
+		$grName = new CTextBox("gname",$name,49);
+		$grName->options['style'] = 'width: 250px';
+		$frmUserG->AddRow(S_GROUP_NAME,$grName);
+
+		$frmUserG->AddVar('group_rights', $group_rights);
+
+		$frmUserG->AddVar('group_users', $group_users);
+
+		$lstUsers = new CListBox('group_users_to_del[]');
+		$lstUsers->options['style'] = 'width: 250px';
+
+		foreach($group_users as $userid => $alias)
+		{
+			$lstUsers->AddItem($userid,	$alias);
+		}
+
+		$frmUserG->AddRow(S_USERS, 
+			array(
+				$lstUsers, 
+				BR, 
+				new CButton('add_user',S_ADD,
+					"return PopUp('popup_users.php?dstfrm=".$frmUserG->GetName().
+					"&list_name=group_users_to_del[]&var_name=group_users','new_user',".
+					"'width=450,height=450,resizable=1,scrollbars=1');"),
+				(count($group_users) > 0) ? new CButton('del_group_user',S_DELETE_SELECTED) : null
+			));
+
+		$table_Rights = new CTable(S_NO_RIGHTS_DEFINED,'right_table');
+
+		$lstDeny  = new CListBox('right_to_del[deny][]',null,20);
+		$lstRead  = new CListBox('right_to_del[read_only][]',null,20);
+		$lstWrite = new CListBox('right_to_del[read_write][]',null,20);
+
+		foreach($group_rights as $name => $element_data)
+		{
+			if($element_data['permission'] == PERM_DENY)		$lstDeny->AddItem($name, $name);
+			elseif ($element_data['permission'] == PERM_READ_ONLY)	$lstRead->AddItem($name, $name);
+			elseif ($element_data['permission'] == PERM_READ_WRITE)	$lstWrite->AddItem($name, $name);
+			
+		}
+
+		$table_Rights->SetHeader(array(S_READ_ONLY, S_READ_WRITE, S_DENY),'header');
+		$table_Rights->AddRow(array($lstRead, $lstWrite, $lstDeny));
+		$table_Rights->AddRow(array(
+			array(	new CButton('add_read_only',S_ADD,
+					"return PopUp('popup_right.php?dstfrm=".$frmUserG->GetName().
+					"&permission=".PERM_READ_ONLY."','new_right',".
+					"'width=450,height=450,resizable=1,scrollbars=1');"),
+				new CButton('del_read_only',S_DELETE_SELECTED)),
+			array(new CButton('add_read_write',S_ADD,
+					"return PopUp('popup_right.php?dstfrm=".$frmUserG->GetName().
+					"&permission=".PERM_READ_WRITE."','new_right',".
+					"'width=450,height=450,resizable=1,scrollbars=1');"),
+				new CButton('del_read_write',S_DELETE_SELECTED)),
+			array(new CButton('add_deny',S_ADD,
+					"return PopUp('popup_right.php?dstfrm=".$frmUserG->GetName().
+					"&permission=".PERM_DENY."','new_right',".
+					"'width=450,height=450,resizable=1,scrollbars=1');"),
+				new CButton('del_deny',S_DELETE_SELECTED))
+			));
+
+		$frmUserG->AddRow(S_RIGHTS,$table_Rights);
+
 		$frmUserG->AddItemToBottomRow(new CButton("save",S_SAVE));
 		if(isset($_REQUEST["usrgrpid"]))
 		{
@@ -394,7 +464,7 @@
 
 		$description	= get_request("description"	,"");
 		$key		= get_request("key"		,"");
-		$host		= get_request("host",		NULL);
+		$host		= get_request("host",		null);
 		$delay		= get_request("delay"		,30);
 		$history	= get_request("history"		,90);
 		$status		= get_request("status"		,0);
@@ -496,7 +566,7 @@
 
 			array_push($delay_flex_el,
 				array(
-					new CCheckBox("rem_delay_flex[]", 'no', NULL,$i),
+					new CCheckBox("rem_delay_flex[]", 'no', null,$i),
 						$val["delay"],
 						" sec at ",
 						$val["period"]
@@ -645,7 +715,7 @@
 
 		$frmItem->AddRow(S_KEEP_HISTORY_IN_DAYS, array(
 			new CTextBox("history",$history,8),
-			(!isset($_REQUEST["itemid"])) ? NULL :
+			(!isset($_REQUEST["itemid"])) ? null :
 				new CButton("del_history",
 					"Clean history",
 					"return Confirm('History cleaning can take a long time. Continue?');")
@@ -782,7 +852,7 @@
 			return;
 		}
 
-		$frmCopy = new CFormTable(count($group_itemid).' '.S_X_ELEMENTS_COPY_TO_DOT_DOT_DOT,NULL,'post',NULL,'form_copy_to');
+		$frmCopy = new CFormTable(count($group_itemid).' '.S_X_ELEMENTS_COPY_TO_DOT_DOT_DOT,null,'post',null,'form_copy_to');
 		$frmCopy->SetHelp('web.items.copyto.php');
 		$frmCopy->AddVar($elements_array_name, $group_itemid);
 
@@ -820,7 +890,7 @@
 			array_push($target_list,array(
 				new CCheckBox('copy_targetid[]',
 					in_array($target['target_id'], $copy_targetid), 
-					NULL, 
+					null, 
 					$target['target_id']),
 				SPACE,
 				$target['target_name'],
@@ -912,7 +982,7 @@
 		foreach($dependences as $val){
 			array_push($dep_el,
 				array(
-					new CCheckBox("rem_dependence[]", 'no', NULL, strval($val)),
+					new CCheckBox("rem_dependence[]", 'no', null, strval($val)),
 					expand_trigger_description($val)
 				),
 				BR);
@@ -1033,8 +1103,8 @@
 		$cmbGType->AddItem(GRAPH_TYPE_STACKED,S_STACKED);
 		$frmGraph->AddRow(S_GRAPH_TYPE,$cmbGType);
 
-		$frmGraph->AddRow(S_SHOW_WORKING_TIME,new CCheckBox("showworkperiod",$showworkperiod,NULL,1));
-		$frmGraph->AddRow(S_SHOW_TRIGGERS,new CCheckBox("showtriggers",$showtriggers,NULL,1));
+		$frmGraph->AddRow(S_SHOW_WORKING_TIME,new CCheckBox("showworkperiod",$showworkperiod,null,1));
+		$frmGraph->AddRow(S_SHOW_TRIGGERS,new CCheckBox("showtriggers",$showtriggers,null,1));
 
 		$cmbYType = new CComboBox("yaxistype",$yaxistype,"submit()");
 		$cmbYType->AddItem(GRAPH_YAXIS_TYPE_CALCULATED,S_CALCULATED);
@@ -1332,7 +1402,7 @@
 		{
 			array_push($valuemap_el,
 				array(
-					new CCheckBox("rem_value[]", 'no', NULL, $i),
+					new CCheckBox("rem_value[]", 'no', null, $i),
 					$value["value"].SPACE.RARR.SPACE.$value["newvalue"]
 				),
 				BR);
@@ -1373,7 +1443,7 @@
 	{
 		global  $_REQUEST;
 
-		$uid=NULL;
+		$uid=null;
 
 		$frmAction = new CFormTable(S_ACTION,'actionconf.php');
 		$frmAction->SetHelp('web.actions.action.php');
@@ -1461,7 +1531,7 @@
 		{
 			array_push($cond_el, 
 				array(
-					new CCheckBox("rem_condition[]", 'no', NULL,$i),
+					new CCheckBox("rem_condition[]", 'no', null,$i),
 					get_condition_desc(
 						$val["type"],
 						$val["operator"],
@@ -1589,12 +1659,9 @@
 		else if($new_condition_type == CONDITION_TYPE_TRIGGER_SEVERITY)
 		{
 			$cmbCondVal = new CComboBox('new_condition_value');
-			$cmbCondVal->AddItem(0,S_NOT_CLASSIFIED);
-			$cmbCondVal->AddItem(1,S_INFORMATION);
-			$cmbCondVal->AddItem(2,S_WARNING);
-			$cmbCondVal->AddItem(3,S_AVERAGE);
-			$cmbCondVal->AddItem(4,S_HIGH);
-			$cmbCondVal->AddItem(5,S_DISASTER);
+			foreach(array(0,1,2,3,4,5) as $id)
+				$cmbCondVal->AddItem($id,get_severity_description($id));
+
 			array_push($rowCondition,$cmbCondVal);
 		}
 // add condition button
@@ -1805,7 +1872,7 @@
 		if($imageid > 0)
 		{
 			$frmImages->AddRow(S_IMAGE,new CLink(
-				new CImg("image.php?width=640&height=480&imageid=".$imageid,"no image",NULL),
+				new CImg("image.php?width=640&height=480&imageid=".$imageid,"no image",null),
 				"image.php?imageid=".$row["imageid"]));
 		}
 
@@ -2135,7 +2202,7 @@
 		if(isset($_REQUEST["screenitemid"]))
 		{
 			$form->AddItemToBottomRow(SPACE);
-			$form->AddItemToBottomRow(new CButtonDelete(NULL,
+			$form->AddItemToBottomRow(new CButtonDelete(null,
 				url_param("form").url_param("screenid").url_param("screenitemid")));
 		}
 		$form->AddItemToBottomRow(SPACE);
@@ -2146,44 +2213,48 @@
 	function	insert_media_form()
 	{
 		global $_REQUEST;
+		global $ZBX_CURNODEID;
 
-		$severity = get_request("severity",array());
+		$severity = get_request("severity",array(0,1,2,3,4,5));
 
-		if(isset($_REQUEST["mediaid"]) && !isset($_REQUEST["form_refresh"]))
-		{
-			$media=get_media_by_mediaid($_REQUEST["mediaid"]);
-
-			$sendto		= $media["sendto"];
-			$mediatypeid	= $media["mediatypeid"];
-			$active		= $media["active"];
-			$period		= $media["period"];
-
-			if($media["severity"] & 1)	array_push($severity,0);
-			if($media["severity"] & 2)	array_push($severity,1);
-			if($media["severity"] & 4)	array_push($severity,2);
-			if($media["severity"] & 8)	array_push($severity,3);
-			if($media["severity"] & 16)	array_push($severity,4);
-			if($media["severity"] & 32)	array_push($severity,5);
-		}
-		else
-		{
+//		if(isset($_REQUEST["mediaid"]) && !isset($_REQUEST["form_refresh"]))
+//		{
+//			$media=get_media_by_mediaid($_REQUEST["mediaid"]);
+//
+//			$sendto		= $media["sendto"];
+//			$mediatypeid	= $media["mediatypeid"];
+//			$active		= $media["active"];
+//			$period		= $media["period"];
+//
+//			if($media["severity"] & 1)	array_push($severity,0);
+//			if($media["severity"] & 2)	array_push($severity,1);
+//			if($media["severity"] & 4)	array_push($severity,2);
+//			if($media["severity"] & 8)	array_push($severity,3);
+//			if($media["severity"] & 16)	array_push($severity,4);
+//			if($media["severity"] & 32)	array_push($severity,5);
+//		}
+//		else
+//		{
 			$sendto		= get_request("sendto","");
 			$mediatypeid	= get_request("mediatypeid",0);
 			$active		= get_request("active",0);
 			$period		= get_request("period","1-7,00:00-23:59");
-		}
+//		}
 
-		$frmMedia = new CFormTable(S_NEW_MEDIA,"media.php");
-		$frmMedia->SetHelp("web.media.media.php");
+		$frmMedia = new CFormTable(S_NEW_MEDIA);
+		$frmMedia->SetHelp("web.media.php");
 
-		$frmMedia->AddVar("userid",$_REQUEST["userid"]);
-		if(isset($_REQUEST["mediaid"]))
-		{
-			$frmMedia->AddVar("mediaid",$_REQUEST["mediaid"]);
-		}
+		$frmMedia->AddVar("dstfrm",$_REQUEST["dstfrm"]);
+
+//		$frmMedia->AddVar("userid",$_REQUEST["userid"]);
+//		if(isset($_REQUEST["mediaid"]))
+//		{
+//			$frmMedia->AddVar("mediaid",$_REQUEST["mediaid"]);
+//		}
 
 		$cmbType = new CComboBox("mediatypeid",$mediatypeid);
-		$types=DBselect("select mediatypeid,description from media_type order by type");
+		$types=DBselect("select mediatypeid,description from media_type".
+				" where mod(mediatypeid,100)=".$ZBX_CURNODEID." order by type");
 		while($type=DBfetch($types))
 		{
 			$cmbType->AddItem($type["mediatypeid"],$type["description"]);
@@ -2193,14 +2264,6 @@
 		$frmMedia->AddRow(S_SEND_TO,new CTextBox("sendto",$sendto,20));	
 		$frmMedia->AddRow(S_WHEN_ACTIVE,new CTextBox("period",$period,48));	
 	
-
-		$label[0] = S_NOT_CLASSIFIED;
-		$label[1] = S_INFORMATION;
-		$label[2] = S_WARNING;
-		$label[3] = S_AVERAGE;
-		$label[4] = S_HIGH;
-		$label[5] = S_DISASTER;
-
 		$frm_row = array();
 		for($i=0; $i<=5; $i++){
 			array_push($frm_row, 
@@ -2208,9 +2271,9 @@
 					new CCheckBox(
 						"severity[]",
 						in_array($i,$severity)?'yes':'no', 
-						NULL,		/* action */
+						null,		/* action */
 						$i),		/* value */
-					$label[$i]
+					get_severity_description($i)
 				),
 				BR);
 		}
@@ -2221,15 +2284,15 @@
 		$cmbStat->AddItem(1,S_DISABLED);
 		$frmMedia->AddRow("Status",$cmbStat);
 	
-		$frmMedia->AddItemToBottomRow(new CButton("save", S_SAVE));
-		if(isset($_REQUEST["mediaid"]))
-		{
-			$frmMedia->AddItemToBottomRow(SPACE);
-			$frmMedia->AddItemToBottomRow(new CButtonDelete(S_DELETE_SELECTED_MEDIA_Q,
-				url_param("form").url_param("userid").url_param("mediaid")));
-		}
+		$frmMedia->AddItemToBottomRow(new CButton("add", S_ADD));
+//		if(isset($_REQUEST["mediaid"]))
+//		{
+//			$frmMedia->AddItemToBottomRow(SPACE);
+//			$frmMedia->AddItemToBottomRow(new CButtonDelete(S_DELETE_SELECTED_MEDIA_Q,
+//				url_param("form").url_param("userid").url_param("mediaid")));
+//		}
 		$frmMedia->AddItemToBottomRow(SPACE);
-		$frmMedia->AddItemToBottomRow(new CButtonCancel(url_param("userid")));
+		$frmMedia->AddItemToBottomRow(new CButton('cancel',S_CANCEL,'window.close();'));
 		$frmMedia->Show();
 	}
 
@@ -2387,7 +2450,7 @@
 				array(
 					new CCheckBox("groups[]",
 						in_array($db_group["groupid"],$groups) ? 'yes' : 'no', 
-						NULL,
+						null,
 						$db_group["groupid"]
 						),
 					$db_group["name"]

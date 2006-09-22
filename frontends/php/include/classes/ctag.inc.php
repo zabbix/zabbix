@@ -137,6 +137,31 @@
 				$ret =& $this->options[$name];
 			return $ret;
 		}
+
+		function SetHint($text, $width='', $class='')
+		{
+			if($width != '' || $class!= '')
+			{
+				$this->AddOption(
+					'onMouseOver',
+					"show_hint_ext(this,'".$text."','".$width."','".$class."');"
+				);
+			}
+			else
+			{
+				$this->AddOption(
+					'onMouseOver',
+					"show_hint(this,'".$text."');"
+				);
+			}
+
+		}
+
+		function OnClick($handle_code)
+		{
+			$this->AddOption('onClick', $handle_code);
+		}
+
 		function AddOption($name, $value)
 		{
 			$this->options[$name] = htmlspecialchars(strval($value)); 

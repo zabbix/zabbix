@@ -43,26 +43,23 @@
 		" order by clock desc",
 		$limit);
 
+	$str_resource[AUDIT_RESOURCE_USER] 		= S_USER;
+	$str_resource[AUDIT_RESOURCE_ZABBIX_CONFIG] 	= S_CONFIGURATION_OF_ZABBIX;
+	$str_resource[AUDIT_RESOURCE_MEDIA_TYPE] 	= S_MEDIA_TYPE;
+	$str_resource[AUDIT_RESOURCE_HOST] 		= S_HOST;
+	$str_resource[AUDIT_RESOURCE_ACTION] 		= S_ACTION;
+	$str_resource[AUDIT_RESOURCE_GRAPH] 		= S_GRAPH;
+	$str_resource[AUDIT_RESOURCE_GRAPH_ELEMENT]	= S_GRAPH_ELEMENT;
+	$str_resource[AUDIT_RESOURCE_USER_GROUP] 	= S_USER_GROUP;
+
 	$table = new CTableInfo();
 	$table->setHeader(array(S_TIME,S_USER,S_RESOURCE,S_ACTION,S_DETAILS));
 	for($i=0; $row=DBfetch($result); $i++)
 	{
 		if($i<$start)	continue;
 
-		if($row["resourcetype"]==AUDIT_RESOURCE_USER)
-			$resource=S_USER;
-		else if($row["resourcetype"]==AUDIT_RESOURCE_ZABBIX_CONFIG)
-			$resource=S_CONFIGURATION_OF_ZABBIX;
-		else if($row["resourcetype"]==AUDIT_RESOURCE_MEDIA_TYPE)
-			$resource=S_MEDIA_TYPE;
-		else if($row["resourcetype"]==AUDIT_RESOURCE_HOST)
-			$resource=S_HOST;
-		else if($row["resourcetype"]==AUDIT_RESOURCE_ACTION)
-			$resource=S_ACTION;
-		else if($row["resourcetype"]==AUDIT_RESOURCE_GRAPH)
-			$resource=S_GRAPH;
-		else if($row["resourcetype"]==AUDIT_RESOURCE_GRAPH_ELEMENT)
-			$resource=S_GRAPH_ELEMENT;
+		if(isset($str_resource[$row["resourcetype"]]))
+			$resource = $str_resource[$row["resourcetype"]];
 		else
 			$resource=S_UNKNOWN_RESOURCE;
 

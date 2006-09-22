@@ -20,6 +20,18 @@
 ?>
 <?php
 
+	function	media_type2str($type)
+	{
+		$str_type[ALERT_TYPE_EMAIL]	= S_EMAIL;
+		$str_type[ALERT_TYPE_EXEC]	= S_SCRIPT;
+		$str_type[ALERT_TYPE_SMS]	= S_SMS;
+		
+		if(isset($str_type[$type]))
+			return $str_type[$type];
+
+		return S_UNKNOWN;
+	}
+
 	function	media_severity2str($severity)
 	{
 
@@ -36,8 +48,7 @@
 		foreach($mapping as $id => $map)
 		{
 			$result[$id] = new CSpan($map['letter'], $map['style']);
-			$result[$id]->options['onMouseOver'] = 
-				"show_hint(this,'".get_severity_description($id)." (".(isset($map['style']) ? "on" : "off").")"."');";
+			$result[$id]->SetHint(get_severity_description($id)." (".(isset($map['style']) ? "on" : "off").")");
 		}
 
 		return unpack_object($result);

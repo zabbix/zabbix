@@ -914,11 +914,13 @@ COpt::profiling_start("page");
 <meta name="Author" content="ZABBIX SIA (Alexei Vladishev, Eugene Grigorjev)">
 <link rel="stylesheet" href="css.css">
 <?php
-	//	if($USER_DETAILS['alias']=='guest')
-	//	{
-	//		$refresh=2*$refresh;
-	//	}
 		if(defined($title))	$title=constant($title);
+
+		global $ZBX_CURNODEID;
+
+		if($curr_node_data = DBfetch(DBselect('select * from nodes where nodeid='.$ZBX_CURNODEID)))
+			$title .= ' ('.$curr_node_data['name'].')';
+
 		if($dorefresh && $USER_DETAILS["refresh"])
 		{
 			echo "	<meta http-equiv=\"refresh\" content=\"".$USER_DETAILS["refresh"]."\">\n";
@@ -935,7 +937,7 @@ COpt::profiling_start("page");
 <?php
 		if($nomenu == 0)
 		{
-			/*
+			/* NOTE
 				first level:
 					'label' 		= main menu title.
 					'default_page_id	= default page url from 'pages' then opened menu.
@@ -1016,7 +1018,8 @@ COpt::profiling_start("page");
 							array("url"=>"media_types.php"	,"label"=>S_MEDIA_TYPES		),
 							array("url"=>"users.php"	,"label"=>S_USERS		),
 							array("url"=>"audit.php"	,"label"=>S_AUDIT		,
-								"sub_pages"=>array("media.php")
+								"sub_pages"=>array("media.php","popup_media.php",
+									"popup_usrgrp.php","popup_right.php")
 								)
 							)
 						),
@@ -1888,29 +1891,32 @@ COpt::profiling_start("page");
 		echo "</center>";
 	}
 
-	function	show_page_footer()
+	function	show_page_footer($realy_show=true)
 	{
 		global $USER_DETAILS;
 
 		show_messages();
 
 		echo BR;
-		$table = new CTable(NULL,"page_footer");
-		$table->SetCellSpacing(0);
-		$table->SetCellPadding(1);
-		$table->AddRow(array(
-			new CCol(new CLink(
-				S_ZABBIX_VER.SPACE.S_COPYRIGHT_BY.SPACE.S_SIA_ZABBIX,
-				"http://www.zabbix.com", "highlight"),
-				"page_footer_l"),
-			new CCol(array(
-					new CSpan(SPACE.SPACE."|".SPACE.SPACE,"divider"),
-					S_CONNECTED_AS.SPACE.$USER_DETAILS["alias"]
-				),
-				"page_footer_r")
-			));
-		$table->Show();
 
+		if($realy_show)
+		{
+			$table = new CTable(NULL,"page_footer");
+			$table->SetCellSpacing(0);
+			$table->SetCellPadding(1);
+			$table->AddRow(array(
+				new CCol(new CLink(
+					S_ZABBIX_VER.SPACE.S_COPYRIGHT_BY.SPACE.S_SIA_ZABBIX,
+					"http://www.zabbix.com", "highlight"),
+					"page_footer_l"),
+				new CCol(array(
+						new CSpan(SPACE.SPACE."|".SPACE.SPACE,"divider"),
+						S_CONNECTED_AS.SPACE.$USER_DETAILS["alias"]
+					),
+					"page_footer_r")
+				));
+			$table->Show();
+		}
 COpt::profiling_stop("page");
 COpt::profiling_stop("script");
 
@@ -2476,19 +2482,16 @@ else if (document.getElementById)
 		var frmForm = document.forms[form_name];
 
 		if(!frmForm) return false;
-//alert('ok');
 
 		var objVar = document.createElement('input');
 
 		if(!objVar) return false;
-//alert('ok');
 
 		objVar.setAttribute('type', 	'hidden');
 		objVar.setAttribute('name', 	var_name);
 		objVar.setAttribute('value', 	var_val);
 
 		frmForm.appendChild(objVar);
-//alert('ok');
 		if(submit)
 			frmForm.submit();
 

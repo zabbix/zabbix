@@ -265,6 +265,8 @@
 	"S_CREATE_IMAGE"=>			"Create Image",
 	"S_CREATE_RULE"=>			"Create Rule",
 	"S_WORKING_TIME"=>			"Working time",
+	"S_NODE"=>				"Node",
+	"S_NODES"=>				"Nodes",
 
 //	Latest values
 	"S_LATEST_VALUES"=>			"Latest values",
@@ -410,7 +412,7 @@
 	"S_DELETED"=>				"Deleted",
 	"S_UNKNOWN"=>				"Unknown",
 	"S_GROUPS"=>				"Groups",
-	"S_NO_GROUPS"=>				"No groups",
+	"S_NO_GROUPS_DEFINED"=>			"No groups defined",
 	"S_NEW_GROUP"=>				"New group",
 	"S_USE_IP_ADDRESS"=>			"Use IP address",
 	"S_IP_ADDRESS"=>			"IP address",
@@ -741,6 +743,8 @@
 	"S_CONFIGURATION_OF_SCREEN_BIG"=>	"CONFIGURATION OF SCREEN",
 	"S_SCREEN_CELL_CONFIGURATION"=>		"Screen cell configuration",
 	"S_RESOURCE"=>				"Resource",
+	"S_RESOURCE_TYPE"=>			"Resource type",
+	"S_NO_RESOURCES_DEFINED"=>		"No resources defined",
 	"S_SIMPLE_GRAPH"=>			"Simple graph",
 	"S_GRAPH_NAME"=>			"Graph name",
 	"S_WIDTH"=>				"Width",
@@ -957,9 +961,12 @@
 	"S_NO_USERS_DEFINED"=>			"No users defined",
 	"S_PERMISSION"=>			"Permission",
 	"S_RIGHT"=>				"Right",
+	"S_RIGHTS"=>				"Rights",
+	"S_NO_RIGHTS_DEFINED"=>			"No rights defined",
 	"S_RESOURCE_NAME"=>			"Resource name",
 	"S_READ_ONLY"=>				"Read only",
 	"S_READ_WRITE"=>			"Read-write",
+	"S_DENY"=>				"Deny",
 	"S_HIDE"=>				"Hide",
 	"S_PASSWORD"=>				"Password",
 	"S_CHANGE_PASSWORD"=>			"Change password",
@@ -969,6 +976,7 @@
 	"S_SCREEN_REFRESH"=>                    "Refresh (in seconds)",
 	"S_CREATE_USER"=>			"Create User",
 	"S_CREATE_GROUP"=>			"Create Group",
+	"S_DELETE_SELECTED_USERS_Q"=>		"Delete selected users?",
 
 //	audit.php
 	"S_AUDIT_LOG"=>				"Audit log",

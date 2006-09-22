@@ -29,13 +29,11 @@ define("GROUP_RIGHT",		0);
 		global	$page;
 		global	$PHP_AUTH_USER,$PHP_AUTH_PW;
 		global	$USER_DETAILS;
-		global	$USER_RIGHTS;
 		global	$_COOKIE;
 		global	$_REQUEST;
 		global	$ZBX_CURNODEID;
 
 		$USER_DETAILS = NULL;
-		$USER_RIGHTS = array();
 
 		if(isset($_COOKIE["sessionid"]))
 		{
@@ -68,20 +66,6 @@ define("GROUP_RIGHT",		0);
 			{
 				setcookie("sessionid",$sessionid);
 				DBexecute("update sessions set lastaccess=".time()." where sessionid=".zbx_dbstr($sessionid));
-			}
-
-			$USER_RIGHTS = array();
-
-			$db_rights = DBselect("select * from rights where userid=".$USER_DETAILS["userid"]);
-			while($db_right = DBfetch($db_rights))
-			{
-				$usr_right = array(
-					"name"=>	$db_right["name"],
-					"id"=>		$db_right["id"],
-					"permission"=>	$db_right["permission"]
-					);
-
-				array_push($USER_RIGHTS,$usr_right);
 			}
 			return;
 		}
@@ -144,6 +128,8 @@ define("GROUP_RIGHT",		0);
 
 	function	check_right($right,$permission,$id = GROUP_RIGHT)
 	{
+		return true;
+
 		global $USER_RIGHTS;
 
 		$default_permission = permission2int("H");

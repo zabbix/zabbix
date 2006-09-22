@@ -10,11 +10,10 @@ for i in 1 2 3; do
 	echo "create database 1_3_rights$i"|mysql -uroot
 	cat ../mysql/schema.sql|mysql -uroot 1_3_rights$i
 	cat data.sql|sed -e "s/{10010}/{100100$i}/g"|mysql -uroot 1_3_rights$i
-#	cat data_small.sql|sed -e "s/{10010}/{100100$i}/g"|mysql -uroot 1_3_rights$i
 done
 cat nodes.sql|mysql -uroot
 
-for i in 1 2 3; do
+for i in 1 2 3; do #node ids
 	echo "update config set configid=100*configid+$i"|mysql -uroot 1_3_rights$i
 	echo "update media_type set mediatypeid=100*mediatypeid+$i"|mysql -uroot 1_3_rights$i
 	echo "update users set userid=100*userid+$i"|mysql -uroot 1_3_rights$i

@@ -276,7 +276,7 @@
 				}
 				else
 				{
-					$groupd=get_usergroup_by_groupid($row["userid"]);
+					$groupd=get_group_by_usrgrpid($row["userid"]);
 					$recipient=$groupd["name"];
 				}
 				$subject = htmlspecialchars($row["subject"]);

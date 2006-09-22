@@ -47,16 +47,17 @@
 	define("AUDIT_ACTION_LOGOUT",		4);
 
 	define("AUDIT_RESOURCE_USER",		0);
-	define("AUDIT_RESOURCE_ZABBIX",		1);
+//	define("AUDIT_RESOURCE_ZABBIX",		1);
 	define("AUDIT_RESOURCE_ZABBIX_CONFIG",	2);
 	define("AUDIT_RESOURCE_MEDIA_TYPE",	3);
 	define("AUDIT_RESOURCE_HOST",		4);
 	define("AUDIT_RESOURCE_ACTION",		5);
 	define("AUDIT_RESOURCE_GRAPH",		6);
 	define("AUDIT_RESOURCE_GRAPH_ELEMENT",	7);
-	define("AUDIT_RESOURCE_ESCALATION",	8);
-	define("AUDIT_RESOURCE_ESCALATION_RULE",9);
-	define("AUDIT_RESOURCE_AUTOREGISTRATION",10);
+//	define("AUDIT_RESOURCE_ESCALATION",	8);
+//	define("AUDIT_RESOURCE_ESCALATION_RULE",9);
+//	define("AUDIT_RESOURCE_AUTOREGISTRATION",10);
+	define("AUDIT_RESOURCE_USER_GROUP",	11);
 
 	define("CONDITION_TYPE_GROUP",		0);
 	define("CONDITION_TYPE_HOST",		1);
@@ -221,6 +222,13 @@
 	define("USER_TYPE_ZABBIX_USER",		1);
 	define("USER_TYPE_ZABBIX_ADMIN",	2);
 	define("USER_TYPE_SUPPER_ADMIN",	3);
+
+	define("PERM_READ_WRITE",	2);
+	define("PERM_READ_ONLY",	1);
+	define("PERM_DENY",		0);
+
+	define("RESOURCE_TYPE_NODE",		0);
+	define("RESOURCE_TYPE_GROUP",		1);
 
 /* Support for PHP5. PHP5 does not have $HTTP_..._VARS */
 	if (!function_exists('version_compare'))

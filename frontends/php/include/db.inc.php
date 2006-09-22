@@ -36,6 +36,11 @@
 	$ZBX_CURNODEID = 1; // Selected node
 	$ZBX_LOCALNODEID = 1; // Local node
 
+	function id2nodeid($id_name)
+	{
+		return 'mod('.$id_name.',100)';
+	}
+
 	if($DB_TYPE == "MYSQL")
 	{
 		$DB=mysql_pconnect($DB_SERVER,$DB_USER,$DB_PASSWORD);

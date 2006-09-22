@@ -27,7 +27,7 @@
 			parent::CTag('input','no');
 			$this->tag_body_start = '';
 			$this->options['type'] = 'submit';
-			$this->options['value'] = $caption;
+			$this->AddOption('value', $caption);
 //			$this->options["type"] = "button";
 			$this->options['class'] = 'button';
 			$this->SetName($name);
@@ -36,11 +36,11 @@
 		}
 		function SetAction($value='submit()', $event='onClick')
 		{
-			$this->options[$event] = $value;
+			$this->AddOption($event, $value);
 		}
 		function SetTitle($value='button title')
 		{
-			$this->options['title'] = $value;
+			$this->AddOption('title', $value);
 		}
 		function SetAccessKey($value='B')
 		{
@@ -48,7 +48,7 @@
 				if(!isset($this->options['title']))
 					$this->SetTitle($this->options['value'].' [Alt+'.$value.']');
 
-			return $this->options['accessKey'] = $value;
+			return $this->AddOption('accessKey', $value);
 		}
 	}
 

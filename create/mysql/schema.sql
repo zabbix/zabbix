@@ -447,7 +447,7 @@ CREATE TABLE items (
 	delay_flex      varchar(255) DEFAULT "" NOT NULL,
 
 	PRIMARY KEY	(itemid),
-	UNIQUE		shortname (hostid,key_),
+--	UNIQUE		shortname (hostid,key_),
 --	KEY		(hostid),
 	KEY		(nextcheck),
 	KEY		(status)
@@ -576,12 +576,12 @@ CREATE TABLE sessions (
 
 CREATE TABLE rights (
   rightid		int(4)		NOT NULL auto_increment,
-  userid		int(4)		DEFAULT '0' NOT NULL,
-  name			char(255)	DEFAULT '' NOT NULL,
-  permission		char(1)		DEFAULT '' NOT NULL,
+  groupid		int(4)		DEFAULT '0' NOT NULL,
+  type			int(2)		DEFAULT '0' NOT NULL,
+  permission		int(2)		DEFAULT '0' NOT NULL,
   id			int(4),
   PRIMARY KEY (rightid),
-  KEY (userid)
+  KEY (groupid)
 ) type=InnoDB;
 
 --

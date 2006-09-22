@@ -418,5 +418,5 @@ function add_variable(formname,value)
 		$table->Show();
 
 	}
-	show_messages();
+	show_page_footer(false);
 ?>

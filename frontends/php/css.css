@@ -427,6 +427,31 @@ table.ack_msgs tr.msg td{
 	border: 1px dotted black;
 }
 
+/**************** TABLE FOR RIGHT DISPLAYING *********/
+
+table.right_table{
+	width: 100%;
+	border-width: 0px;
+        margin: 0px;
+        padding: 0px;
+}
+
+table.right_table tr.header
+{
+	font-weight: bold;
+}
+
+table.right_table td
+{
+        margin: 0px;
+        padding: 0px;
+}
+
+table.right_table select
+{
+	width: 250px;
+}
+
 /**************** GRAPH ****************/
 
 table.graph
@@ -518,6 +543,7 @@ table.sub_menu tr
 	border-width: 1px;
 	border-color: gray;
 	background-color: white;
+	margin: 2px;
 }
 .biginput:focus	{	border-color: black;	}
 .biginput:hover	{	border-color: black;	}
@@ -530,6 +556,7 @@ table.sub_menu tr
 	border-width: 1px;
 	border-color: gray;
 	background: gray url(images/gradients/button.gif) repeat-x top left;
+	margin: 2px;
 /*	margin-right:5px; */
 }
 .button:hover	{	text-decoration: underline;	border-color: black;	}
@@ -790,6 +817,8 @@ ul
 	white-space: nowrap;
 	word-spacing: nowrap;
 }
+
+/**************** HINT BOX *****************/
 
 #hint_box{
 	top: 0;

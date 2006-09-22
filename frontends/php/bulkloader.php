@@ -127,8 +127,7 @@
 				{
 					foreach(explode(',',rtrim(rtrim($tmpUserGroups," "),"\n")) as $tmpGroup)
 					{
-						$tmpGroupID=add_user_group($tmpGroup);
-						update_user_groups($tmpGroupID,array($tmpUserID));
+						add_user_group($tmpGroup,array($tmpUserID));
 					}
 				}
 				break;

@@ -147,3 +147,14 @@ CREATE TABLE services_times (
 
 alter table users add	type		int(2)	DEFAULT '1' NOT NULL; -- Type of user (0 - Uncnown; 1 - ZABBIX user; 2 - ZABBIX Admin; 3 - Supper Admin)
 
+DROP TABLE rights;
+
+CREATE TABLE rights (
+  rightid		int(4)		NOT NULL auto_increment,
+  groupid		int(4)		DEFAULT '0' NOT NULL,
+  type			int(2)		DEFAULT '0' NOT NULL,
+  permission		int(2)		DEFAULT '0' NOT NULL,
+  id			int(4),
+  PRIMARY KEY (rightid),
+  KEY (groupid)
+) type=InnoDB;
