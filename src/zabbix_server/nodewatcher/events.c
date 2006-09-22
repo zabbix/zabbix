@@ -86,7 +86,7 @@ static int process_node(int nodeid, int master_nodeid, zbx_uint64_t event_lastid
 
 #define DATA_MAX	1024*1024
 
-	zabbix_log( LOG_LEVEL_WARNING, "In process_node(local:%d, event_lastid:" ZBX_FS_UI64 ")",nodeid, event_lastid);
+//	zabbix_log( LOG_LEVEL_WARNING, "In process_node(local:%d, event_lastid:" ZBX_FS_UI64 ")",nodeid, event_lastid);
 	/* Begin work */
 
 	data = malloc(DATA_MAX);
@@ -106,15 +106,15 @@ static int process_node(int nodeid, int master_nodeid, zbx_uint64_t event_lastid
 	}
 	if(found == 1)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Sending [%s]",data);
+//		zabbix_log( LOG_LEVEL_WARNING, "Sending [%s]",data);
 		if(send_to_node(master_nodeid, nodeid, data) == SUCCEED)
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Updating nodes.event_lastid");
+//			zabbix_log( LOG_LEVEL_WARNING, "Updating nodes.event_lastid");
 			DBexecute("update nodes set event_lastid=" ZBX_FS_UI64 " where nodeid=%d", eventid, nodeid);
 		}
 		else
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Not updating nodes.event_lastid");
+//			zabbix_log( LOG_LEVEL_WARNING, "Not updating nodes.event_lastid");
 		}
 	}
 	DBfree_result(result);
@@ -146,7 +146,7 @@ void main_eventsender()
 	int		nodeid;
 	int		master_nodeid;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In main_eventsender()");
+	zabbix_log( LOG_LEVEL_DEBUG, "In main_eventsender()");
 
 	master_nodeid = get_master_node(CONFIG_NODEID);
 

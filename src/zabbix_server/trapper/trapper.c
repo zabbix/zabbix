@@ -120,7 +120,7 @@ int	process_trap(int sockfd,char *s, int max_len)
 		/* Slave node events? */
 		if(strncmp(s,"Events",6) == 0)
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Slave node events received [len:%d]", strlen(s));
+//			zabbix_log( LOG_LEVEL_WARNING, "Slave node events received [len:%d]", strlen(s));
 			if(node_events(s) == SUCCEED)
 			{
 				zbx_snprintf(result,sizeof(result),"OK\n");

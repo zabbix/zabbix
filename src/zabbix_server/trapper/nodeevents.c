@@ -62,32 +62,24 @@
  ******************************************************************************/
 static int	process_record(int nodeid, char *record)
 {
-	zbx_uint64_t	eventid;
-	zbx_uint64_t	triggerid;
-	int	clock;
-	int	value;
-	int	acknowledged;
-	
 	char	tmp[MAX_STRING_LEN];
+
+	DB_EVENT	event;
 
 	zabbix_log( LOG_LEVEL_WARNING, "In process_record [%s]", record);
 
 	get_field(record,tmp,0);
-	sscanf(tmp,ZBX_FS_UI64,&eventid);
+	sscanf(tmp,ZBX_FS_UI64,&event.eventid);
 	get_field(record,tmp,1);
-	sscanf(tmp,ZBX_FS_UI64,&triggerid);
+	sscanf(tmp,ZBX_FS_UI64,&event.triggerid);
 	get_field(record,tmp,2);
-	clock=atoi(tmp);
+	event.clock=atoi(tmp);
 	get_field(record,tmp,3);
-	value=atoi(tmp);
+	event.value=atoi(tmp);
 	get_field(record,tmp,4);
-	acknowledged=atoi(tmp);
+	event.acknowledged=atoi(tmp);
 
-	DBexecute("insert into events (eventid, triggerid, clock, value, acknowledged)"
-		" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,%d)",
-		eventid, triggerid, clock, value, acknowledged);
-
-	return SUCCEED;
+	return process_event(&event);
 }
 /******************************************************************************
  *                                                                            *
@@ -113,7 +105,7 @@ int	node_events(char *data)
 	int	sender_nodeid=0;
 	char	tmp[MAX_STRING_LEN];
 
-	zabbix_log( LOG_LEVEL_WARNING, "In node_events(len:%d)", strlen(data));
+//	zabbix_log( LOG_LEVEL_WARNING, "In node_events(len:%d)", strlen(data));
 
        	s=(char *)strtok(data,"\n");
 	while(s!=NULL)

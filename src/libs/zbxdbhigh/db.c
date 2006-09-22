@@ -45,7 +45,7 @@
 	sqlo_db_handle_t oracle;
 #endif
 
-extern void	apply_actions(DB_TRIGGER *trigger,int eventid,int trigger_value);
+extern void	apply_actions(DB_TRIGGER *trigger,int trigger_value);
 extern void	update_services(int triggerid, int status);
 extern int	CONFIG_NODEID;
 
@@ -683,8 +683,57 @@ int     DBget_function_result(double *result,char *functionid)
         return res;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: get_latest_event_status                                          *
+ *                                                                            *
+ * Purpose: return status of latest event of the trigger                      *
+ *                                                                            *
+ * Parameters: triggerid - trigger ID, status - trigger status                *
+ *                                                                            *
+ * Return value: On SUCCESS, status - status of last event                    *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: Rewrite required to simplify logic ?                             *
+ *                                                                            *
+ ******************************************************************************/
+static void	get_latest_event_status(int triggerid, int *prev_status, int *latest_status)
+{
+	char		sql[MAX_STRING_LEN];
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	zabbix_log(LOG_LEVEL_DEBUG,"In latest_event()");
+
+	zbx_snprintf(sql,sizeof(sql),"select value from events where triggerid=%d order by clock desc",triggerid);
+	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
+	result = DBselectN(sql,2);
+	row = DBfetch(result);
+
+	if(!row || DBis_null(row[0])==SUCCEED)
+        {
+		zabbix_log(LOG_LEVEL_DEBUG, "Result for last is empty" );
+                *prev_status = TRIGGER_VALUE_UNKNOWN;
+		*latest_status = TRIGGER_VALUE_UNKNOWN;
+        }
+	else
+	{
+                *prev_status = TRIGGER_VALUE_FALSE;
+		*latest_status = atoi(row[0]);
+
+		row = DBfetch(result);
+		if(row && DBis_null(row[0]) != SUCCEED)
+		{
+			*prev_status = atoi(row[0]);
+		}
+
+	}
+	DBfree_result(result);
+}
+
 /* Returns previous trigger value. If not value found, return TRIGGER_VALUE_FALSE */
-int	DBget_prev_trigger_value(int triggerid)
+/*int	DBget_prev_trigger_value(int triggerid)
 {
 	int	clock;
 	int	value;
@@ -714,10 +763,7 @@ int	DBget_prev_trigger_value(int triggerid)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Result for MAX is empty" );
 		DBfree_result(result);
-/* Assume that initially Trigger value is False. Otherwise alarms will not be generated when
-status changes to TRUE for te first time */
 		return TRIGGER_VALUE_FALSE;
-/*		return TRIGGER_VALUE_UNKNOWN;*/
 	}
 	clock=atoi(row[0]);
 	DBfree_result(result);
@@ -735,7 +781,7 @@ status changes to TRUE for te first time */
 	DBfree_result(result);
 
 	return value;
-}
+}*/
 
 /* SUCCEED if latest event with triggerid has this status */
 /* Rewrite required to simplify logic ?*/
@@ -864,6 +910,8 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *re
 {
 	int	ret = SUCCEED;
 	DB_EVENT	event;
+	int		event_last_status;
+	int		event_prev_status;
 
 	if(reason==NULL)
 	{
@@ -874,16 +922,13 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *re
 		zabbix_log(LOG_LEVEL_DEBUG,"In update_trigger_value[%d,%d,%d,%s]", trigger->triggerid, new_value, now, reason);
 	}
 
+	/* New trigger value differs from current one */
 	if(trigger->value != new_value)
 	{
-		trigger->prevvalue=DBget_prev_trigger_value(trigger->triggerid);
+		get_latest_event_status(trigger->triggerid, &event_prev_status, &event_last_status);
 
-		event.eventid = 0;
-		event.triggerid = trigger->triggerid;
-		event.clock = now;
-		event.value = new_value;
-		event.acknowledged = 0;
-		if(process_event(event) == SUCCEED)
+		/* The lastest event has the same status, skip of so. */
+		if(event_last_status != new_value)
 		{
 			if(reason==NULL)
 			{
@@ -893,19 +938,30 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *re
 			{
 				DBexecute("update triggers set value=%d,lastchange=%d,error='%s' where triggerid=%d",new_value,now,reason, trigger->triggerid);
 			}
-/* It is not required and is wrong! */
-/*			if(TRIGGER_VALUE_UNKNOWN == new_value)
-			{
-				zbx_snprintf(sql,sizeof(sql),"update functions set lastvalue=NULL where triggerid=%d",trigger->triggerid);
-				DBexecute(sql);
-			}*/
 			if(	((trigger->value == TRIGGER_VALUE_TRUE) && (new_value == TRIGGER_VALUE_FALSE)) ||
 				((trigger->value == TRIGGER_VALUE_FALSE) && (new_value == TRIGGER_VALUE_TRUE)) ||
-				((trigger->prevvalue == TRIGGER_VALUE_FALSE) && (trigger->value == TRIGGER_VALUE_UNKNOWN) && (new_value == TRIGGER_VALUE_TRUE)) ||
-				((trigger->prevvalue == TRIGGER_VALUE_TRUE) && (trigger->value == TRIGGER_VALUE_UNKNOWN) && (new_value == TRIGGER_VALUE_FALSE)))
+				((event_prev_status == TRIGGER_VALUE_FALSE) && (trigger->value == TRIGGER_VALUE_UNKNOWN) && (new_value == TRIGGER_VALUE_TRUE)) ||
+				((event_prev_status == TRIGGER_VALUE_TRUE) && (trigger->value == TRIGGER_VALUE_UNKNOWN) && (new_value == TRIGGER_VALUE_FALSE)))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG,"In update_trigger_value. Before apply_actions. Triggerid [%d] prev [%d] curr [%d] new [%d]", trigger->triggerid, trigger->prevvalue, trigger->value, new_value);
-				apply_actions(trigger,event.eventid,new_value);
+				/* Preparing event for processing */
+				memset(&event,0,sizeof(DB_EVENT));
+				event.eventid = 0;
+				event.triggerid = trigger->triggerid;
+				event.clock = now;
+				event.value = new_value;
+				event.acknowledged = 0;
+
+				/* Processing event */
+				if(process_event(event) == SUCCEED)
+				{
+					zabbix_log(LOG_LEVEL_DEBUG,"Event processed OK");
+				}
+				else
+				{
+					zabbix_log(LOG_LEVEL_WARNING,"Event processed not OK");
+				}
+/*				zabbix_log(LOG_LEVEL_DEBUG,"In update_trigger_value. Before apply_actions. Triggerid [%d] prev [%d] curr [%d] new [%d]", trigger->triggerid, event_prev_status, trigger->value, new_value);
+				apply_actions(trigger,new_value);
 				if(new_value == TRIGGER_VALUE_TRUE)
 				{
 					update_services(trigger->triggerid, trigger->priority);
@@ -913,7 +969,7 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *re
 				else
 				{
 					update_services(trigger->triggerid, 0);
-				}
+				}*/
 			}
 		}
 		else
@@ -924,28 +980,6 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *re
 	}
 	return ret;
 }
-
-/*
-int	DBupdate_trigger_value(int triggerid,int value,int clock)
-{
-	char	sql[MAX_STRING_LEN];
-
-	zabbix_log(LOG_LEVEL_DEBUG,"In update_trigger_value[%d,%d,%d]", triggerid, value, clock);
-	add_alarm(triggerid,value,clock);
-
-	zbx_snprintf(sql,sizeof(sql),"update triggers set value=%d,lastchange=%d where triggerid=%d",value,clock,triggerid);
-	DBexecute(sql);
-
-	if(TRIGGER_VALUE_UNKNOWN == value)
-	{
-		zbx_snprintf(sql,sizeof(sql),"update functions set lastvalue=NULL where triggerid=%d",triggerid);
-		DBexecute(sql);
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG,"End of update_trigger_value()");
-	return SUCCEED;
-}
-*/
 
 void update_triggers_status_to_unknown(int hostid,int clock,char *reason)
 {

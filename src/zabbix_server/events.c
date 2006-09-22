@@ -43,49 +43,42 @@
 #include "log.h"
 #include "zlog.h"
 
+#include "actions.h"
 #include "events.h"
 
 /******************************************************************************
  *                                                                            *
- * Function: get_latest_event_status                                          *
+ * Function: add_trigger_info                                                 *
  *                                                                            *
- * Purpose: return status of latest event of the trigger                      *
+ * Purpose: add trigger info to event if required                             *
  *                                                                            *
- * Parameters: triggerid - trigger ID, status - trigger status                *
+ * Parameters: event - event data (event.triggerid)                           *
  *                                                                            *
- * Return value: On SUCCESS, status - status of last event                    *
+ * Return value:                                                              *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments: Rewrite required to simplify logic ?                             *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	get_latest_event_status(int triggerid, int *status)
+static void	add_trigger_info(DB_EVENT *event)
 {
-	char		sql[MAX_STRING_LEN];
 	DB_RESULT	result;
 	DB_ROW		row;
-	int 		ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In latest_event()");
+	if(event->triggerid == 0)	return;
 
-	zbx_snprintf(sql,sizeof(sql),"select value from events where triggerid=%d order by clock desc",triggerid);
-	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
-	result = DBselectN(sql,1);
+	result = DBselect("select description,priority,comments from triggers where triggerid=" ZBX_FS_UI64, event->triggerid);
 	row = DBfetch(result);
 
-	if(!row || DBis_null(row[0])==SUCCEED)
-        {
-                zabbix_log(LOG_LEVEL_DEBUG, "Result for last is empty" );
-        }
-	else
+	if(row)
 	{
-		*status = atoi(row[0]);
-		ret = SUCCEED;
+		strncpy(event->trigger_description, row[0], TRIGGER_DESCRIPTION_LEN_MAX);
+		event->trigger_priority = atoi(row[1]);
+		strncpy(event->trigger_comments, row[2], TRIGGER_COMMENTS_LEN_MAX);
 	}
-	DBfree_result(result);
 
-	return ret;
+	DBfree_result(result);
 }
 
 /******************************************************************************
@@ -105,19 +98,9 @@ static int	get_latest_event_status(int triggerid, int *status)
  ******************************************************************************/
 int	process_event(DB_EVENT *event)
 {
-	int	status;
-
 	zabbix_log(LOG_LEVEL_WARNING,"In process_event(" ZBX_FS_UI64 ")",event->eventid);
 
-	/* Latest event has the same status? */
-	if(event->eventid ==0 &&
-		get_latest_event_status(event->triggerid,&status) == SUCCEED &&
-		status == event->value)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG,"Alarm for triggerid [%d] status [%d] already exists",
-				event->triggerid,event->value);
-		return FAIL;
-	}
+	add_trigger_info(event);
 
 	if(event->eventid == 0)
 	{
@@ -136,6 +119,18 @@ int	process_event(DB_EVENT *event)
 	if(event->value == TRIGGER_VALUE_FALSE || event->value == TRIGGER_VALUE_TRUE)
 	{
 		DBexecute("update alerts set retries=3,error='Trigger changed its status. WIll not send repeats.' where triggerid=%d and repeats>0 and status=%d", event->triggerid, ALERT_STATUS_NOT_SENT);
+	}
+
+	apply_actions(event);
+
+	if(event->value == TRIGGER_VALUE_TRUE)
+	{
+//		update_services(trigger->triggerid, trigger->priority);
+		update_services(event->triggerid, event->trigger_priority);
+	}
+	else
+	{
+		update_services(event->triggerid, 0);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG,"End of add_event()");
