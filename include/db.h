@@ -148,6 +148,9 @@ DB_EVENT
 	int		clock;
 	int		value;
 	int		acknowledged;
+	char		trigger_description[TRIGGER_DESCRIPTION_LEN_MAX];
+	int		trigger_priority;
+	char		trigger_comments[TRIGGER_COMMENTS_LEN_MAX];
 };
 
 DB_HOST
@@ -284,7 +287,7 @@ DB_TRIGGER
 	char	comments[TRIGGER_COMMENTS_LEN_MAX];
 	int	status;
 	int	value;
-	int	prevvalue;
+//	int	prevvalue;
 	int	priority;
 };
 
