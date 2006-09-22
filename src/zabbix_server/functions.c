@@ -295,8 +295,6 @@ void	update_triggers(int itemid)
 			continue;
 		}
 
-		zabbix_log( LOG_LEVEL_DEBUG, "exp_value trigger.value trigger.prevvalue [%d] [%d] [%d]", exp_value, trigger.value, trigger.prevvalue);
-
 		now = time(NULL);
 		DBupdate_trigger_value(&trigger, exp_value, now, NULL);
 	}
