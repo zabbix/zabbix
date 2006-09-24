@@ -30,6 +30,7 @@ CREATE TABLE nodes (
 	slave_history		{integer}		DEFAULT '0' NOT NULL,
 	slave_trends		{integer}		DEFAULT '0' NOT NULL,
 	event_lastid		{bigint}		DEFAULT '0' NOT NULL,
+	history_lastid		{bigint}		DEFAULT '0' NOT NULL,
 	nodetype		{integer}		DEFAULT '0' NOT NULL,
 	masterid		{bigint}		DEFAULT '0' NOT NULL,
 	PRIMARY KEY (nodeid)
@@ -282,6 +283,17 @@ CREATE TABLE history (
 
 CREATE INDEX history_1 ON history (itemid, clock);
 
+CREATE TABLE history_sync (
+	id			{serial},
+	nodeid			{integer}			DEFAULT '0' NOT NULL,
+	itemid			{bigint}		DEFAULT '0' NOT NULL,
+	clock			{integer}		DEFAULT '0' NOT NULL,
+	value			{double}(16,4)		DEFAULT '0.0000' NOT NULL,
+	PRIMARY KEY (id)
+) {create_table_opt};
+
+CREATE INDEX history_sync_1 ON history_sync (nodeid, id);
+
 CREATE TABLE history_uint (
 	itemid			{bigint}		DEFAULT '0' NOT NULL,
 	clock			{integer}		DEFAULT '0' NOT NULL,
@@ -350,7 +362,7 @@ CREATE TABLE items (
 	lastlogsize		{integer}		DEFAULT '0' NOT NULL,
 	logtimefmt		{varchar}(64)	DEFAULT '' NOT NULL,
 	templateid		{integer}		DEFAULT '0' NOT NULL,
-	valuemapid		{integer}		DEFAULT '0' NOT NULL,
+	valuemapid		{bigint}		DEFAULT '0' NOT NULL,
 	delay_flex		{varchar}(255)	DEFAULT '' NOT NULL,
 
 	PRIMARY KEY	(itemid)

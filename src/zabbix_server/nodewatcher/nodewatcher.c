@@ -50,6 +50,8 @@
 #include "zlog.h"
 
 #include "dbsync.h"
+#include "events.h"
+#include "history.h"
 #include "nodewatcher.h"
 #include "nodesender.h"
 
@@ -136,7 +138,7 @@ static int calculate_checksums()
 
 		result2 =DBselect(sql);
 
-		zabbix_log( LOG_LEVEL_WARNING, "Selected records in %d seconds", time(NULL)-now);
+//		zabbix_log( LOG_LEVEL_WARNING, "Selected records in %d seconds", time(NULL)-now);
 		now = time(NULL);
 		i=0;
 		while((row2=DBfetch(result2)))
@@ -149,7 +151,7 @@ static int calculate_checksums()
 			i++;
 		}
 		DBfree_result(result2);
-		zabbix_log( LOG_LEVEL_WARNING, "Added %d records in %d seconds", i, time(NULL)-now);
+//		zabbix_log( LOG_LEVEL_WARNING, "Added %d records in %d seconds", i, time(NULL)-now);
 	}
 	DBfree_result(result);
 
@@ -291,6 +293,9 @@ int main_nodewatcher_loop()
 
 		/* Send new events to master node */
 		main_eventsender();
+
+		/* Send new history data to master node */
+		main_historysender();
 
 		DBclose();
 

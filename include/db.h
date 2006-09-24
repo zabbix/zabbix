@@ -239,7 +239,7 @@ DB_ITEM
 	char	*eventlog_source;
 
 	char	*logtimefmt;
-	int	valuemapid;
+	zbx_uint64_t	valuemapid;
 	char	*delay_flex;
 };
  
@@ -359,16 +359,16 @@ int	DBinsert_id(int exec_result, const char *table, const char *field);
 int	DBis_null(char *field);
 
 int	DBget_function_result(double *result,char *functionid);
-void	DBupdate_host_availability(int hostid,int available,int clock,char *error);
-int	DBupdate_item_status_to_notsupported(int itemid, char *error);
+void	DBupdate_host_availability(zbx_uint64_t hostid,int available,int clock,char *error);
+int	DBupdate_item_status_to_notsupported(zbx_uint64_t itemid, char *error);
 int	DBadd_trend(int itemid, double value, int clock);
-int	DBadd_history(int itemid, double value, int clock);
-int	DBadd_history_log(int itemid, char *value, int clock, int timestamp, char *source, int severity);
-int	DBadd_history_str(int itemid, char *value, int clock);
-int	DBadd_history_text(int itemid, char *value, int clock);
-int	DBadd_history_uint(int itemid, zbx_uint64_t value, int clock);
-int	DBadd_service_alarm(int serviceid,int status,int clock);
-int	DBadd_alert(int actionid, int triggerid, int userid, int mediatypeid, char *sendto, char *subject, char *message, int maxrepeats, int repeatdelay);
+int	DBadd_history(zbx_uint64_t itemid, double value, int clock);
+int	DBadd_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity);
+int	DBadd_history_str(zbx_uint64_t itemid, char *value, int clock);
+int	DBadd_history_text(zbx_uint64_t itemid, char *value, int clock);
+int	DBadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock);
+int	DBadd_service_alarm(zbx_uint64_t serviceid,int status,int clock);
+int	DBadd_alert(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t userid, zbx_uint64_t mediatypeid, char *sendto, char *subject, char *message, int maxrepeats, int repeatdelay);
 void	DBupdate_triggers_status_after_restart(void);
 int	DBget_prev_trigger_value(int triggerid);
 /*int	DBupdate_trigger_value(int triggerid,int value,int clock);*/
@@ -402,8 +402,8 @@ int	DBadd_action_to_linked_hosts(int actionid,int hostid);
 
 int	DBget_trigger_by_triggerid(int triggerid,DB_TRIGGER *trigger);
 int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid);
-void	DBdelete_triggers_by_itemid(int itemid);
-void	DBdelete_sysmaps_hosts_by_hostid(int hostid);
+void	DBdelete_triggers_by_itemid(zbx_uint64_t itemid);
+void	DBdelete_sysmaps_hosts_by_hostid(zbx_uint64_t hostid);
 
 int	DBadd_graph(char *name, int width, int height, int yaxistype, double yaxismin, double yaxismax);
 int	DBget_graph_item_by_gitemid(int gitemid, DB_GRAPH_ITEM *graph_item);
