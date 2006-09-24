@@ -1,5 +1,6 @@
 {bigint}=>bigint unsigned
 {integer}=>integer
+{serial}=>serial
 {double}=>double
 {varchar}=>varchar
 {char}=>char

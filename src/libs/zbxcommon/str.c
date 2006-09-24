@@ -497,3 +497,45 @@ void	lrtrim_spaces(char *c)
 	ltrim_spaces(c);
 	rtrim_spaces(c);
 }
+
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_get_field                                                    *
+ *                                                                            *
+ * Purpose: return Nth field of characted separated string                    *
+ *                                                                            *
+ * Parameters: c - string to trim spaces                                      *
+ *                                                                            *
+ * Return value: string without left and right spaces                         *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_get_field(char *line, char *result, int num, char separator)
+{
+	int delim=0;
+	int ptr=0;
+	int i;
+
+	int ret = FAIL;
+
+	for(i=0;line[i]!=0;i++)
+	{
+		if(line[i]==separator)
+		{
+			delim++;
+			continue;
+		}
+		if(delim==num)
+		{
+			result[ptr++]=line[i];
+			result[ptr]=0;
+			ret = SUCCEED;
+		}
+	}
+	return ret;
+}
+

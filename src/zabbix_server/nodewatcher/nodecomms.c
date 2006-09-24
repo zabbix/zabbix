@@ -49,7 +49,6 @@
 #include "log.h"
 #include "zlog.h"
 
-#include "dbsync.h"
 #include "nodecomms.h"
 
 /******************************************************************************

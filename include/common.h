@@ -435,8 +435,11 @@ char    *zbx_regexp_match(const char *string, const char *pattern, int *len);
 
 /* Misc functions */
 int	cmp_double(double a,double b);
+int     zbx_get_field(char *line, char *result, int num, char delim);
 
 void	zbx_on_exit();
+
+int	get_nodeid_by_id(zbx_uint64_t id);
 
 int       SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 

@@ -125,6 +125,7 @@ int	CONFIG_DBPORT			= 3306;
 int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
 
 int	CONFIG_NODEID			= 0;
+int	CONFIG_MASTER_NODEID		= -1;
 
 /* From table config */
 int	CONFIG_REFRESH_UNSUPPORTED	= 0;
@@ -451,13 +452,21 @@ int MAIN_ZABBIX_ENTRY(void)
 
 	DBconnect();
 
-	zabbix_log( LOG_LEVEL_WARNING, "Cond1 " ZBX_COND_NODEID, LOCAL_NODE("configid"));
 	result = DBselect("select refresh_unsupported from config where " ZBX_COND_NODEID, LOCAL_NODE("configid"));
 	row = DBfetch(result);
 
 	if( (row != NULL) && DBis_null(row[0]) != SUCCEED)
 	{
 		CONFIG_REFRESH_UNSUPPORTED = atoi(row[0]);
+	}
+	DBfree_result(result);
+
+	result = DBselect("select masterid from nodes where nodeid=%d", CONFIG_NODEID);
+	row = DBfetch(result);
+
+	if( (row != NULL) && DBis_null(row[0]) != SUCCEED)
+	{
+		CONFIG_MASTER_NODEID = atoi(row[0]);
 	}
 	DBfree_result(result);
 

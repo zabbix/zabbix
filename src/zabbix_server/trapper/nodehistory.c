@@ -26,8 +26,6 @@
 #include <netinet/in.h>
 #include <netdb.h>
 
-#include <signal.h>
-
 #include <string.h>
 
 #include <time.h>
@@ -43,99 +41,91 @@
 #include "log.h"
 #include "zlog.h"
 
-#include "actions.h"
-#include "events.h"
+#include "nodeevents.h"
+
+extern int     process_event(DB_EVENT *event);
 
 /******************************************************************************
  *                                                                            *
- * Function: add_trigger_info                                                 *
+ * Function: process_record                                                   *
  *                                                                            *
- * Purpose: add trigger info to event if required                             *
+ * Purpose: process record update                                             *
  *                                                                            *
- * Parameters: event - event data (event.triggerid)                           *
+ * Parameters:                                                                *
  *                                                                            *
- * Return value:                                                              *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occured                                     *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void	add_trigger_info(DB_EVENT *event)
+static int	process_record(int nodeid, char *record)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	char	tmp[MAX_STRING_LEN];
+	zbx_uint64_t	itemid;
+	int		timestamp;
+	double		value;
 
-	if(event->triggerid == 0)	return;
+	zabbix_log( LOG_LEVEL_DEBUG, "In process_record [%s]", record);
 
-	result = DBselect("select description,priority,comments from triggers where triggerid=" ZBX_FS_UI64,
-		event->triggerid);
-	row = DBfetch(result);
+	zbx_get_field(record,tmp,0,'|');
+	sscanf(tmp,ZBX_FS_UI64,&itemid);
+	zbx_get_field(record,tmp,1,'|');
+	timestamp=atoi(tmp);
+	zbx_get_field(record,tmp,2,'|');
+	value=atof(tmp);
 
-	if(row)
-	{
-		strncpy(event->trigger_description, row[0], TRIGGER_DESCRIPTION_LEN_MAX);
-		event->trigger_priority = atoi(row[1]);
-		strncpy(event->trigger_comments, row[2], TRIGGER_COMMENTS_LEN_MAX);
-	}
-
-	DBfree_result(result);
+	return DBadd_history(itemid, value, clock);
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: process_event                                                    *
+ * Function: node_events                                                      *
  *                                                                            *
- * Purpose: process new event                                                 *
+ * Purpose: process new events received from a salve node                     *
  *                                                                            *
- * Parameters: event - event data (event.eventid - new event)                 *
+ * Parameters:                                                                *
  *                                                                            *
- * Return value: SUCCESS - event added                                        *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occured                                     *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments: Cannot use action->userid as it may also be groupid              *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	process_event(DB_EVENT *event)
+int	node_history(char *data)
 {
-	zabbix_log(LOG_LEVEL_DEBUG,"In process_event(" ZBX_FS_UI64 ")",event->eventid);
+	char	*s;
+	int	firstline=1;
+	int	nodeid=0;
+	int	sender_nodeid=0;
+	char	tmp[MAX_STRING_LEN];
 
-	add_trigger_info(event);
+//	zabbix_log( LOG_LEVEL_WARNING, "In node_history(len:%d)", strlen(data));
 
-	if(event->eventid == 0)
+       	s=(char *)strtok(data,"\n");
+	while(s!=NULL)
 	{
-		event->eventid = DBinsert_id(
-			DBexecute("insert into events(triggerid,clock,value) values(" ZBX_FS_UI64 ",%d,%d)",
-				event->triggerid, event->clock, event->value),
-				"events", "eventid");
-	}
-	else
-	{
-		DBexecute("insert into events(eventid,triggerid,clock,value) values(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d)",
-			event->eventid,event->triggerid, event->clock, event->value);
-	}
+		if(firstline == 1)
+		{
+//			zabbix_log( LOG_LEVEL_WARNING, "First line [%s]", s);
+			zbx_get_field(s,tmp,1,'|');
+			sender_nodeid=atoi(tmp);
+			zbx_get_field(s,tmp,2,'|');
+			nodeid=atoi(tmp);
+			firstline=0;
+			zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Received history from node %d for node %d", CONFIG_NODEID, sender_nodeid, nodeid);
+		}
+		else
+		{
+//			zabbix_log( LOG_LEVEL_WARNING, "Got line [%s]", s);
+			process_record(nodeid, s);
+		}
 
-	/* Cancel currently active alerts */
-	if(event->value == TRIGGER_VALUE_FALSE || event->value == TRIGGER_VALUE_TRUE)
-	{
-		DBexecute("update alerts set retries=3,error='Trigger changed its status. WIll not send repeats.' where triggerid=" ZBX_FS_UI64 " and repeats>0 and status=%d",
-			event->triggerid, ALERT_STATUS_NOT_SENT);
+       		s=(char *)strtok(NULL,"\n");
 	}
-
-	apply_actions(event);
-
-	if(event->value == TRIGGER_VALUE_TRUE)
-	{
-//		update_services(trigger->triggerid, trigger->priority);
-		update_services(event->triggerid, event->trigger_priority);
-	}
-	else
-	{
-		update_services(event->triggerid, 0);
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG,"End of add_event()");
-	
 	return SUCCEED;
 }

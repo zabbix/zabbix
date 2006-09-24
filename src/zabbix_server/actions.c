@@ -68,7 +68,7 @@
  *                                                                            *
  ******************************************************************************/
 //static	void	send_to_user_medias(DB_TRIGGER *trigger,DB_ACTION *action, int userid)
-static	void	send_to_user_medias(DB_EVENT *event,DB_ACTION *action, int userid)
+static	void	send_to_user_medias(DB_EVENT *event,DB_ACTION *action, zbx_uint64_t userid)
 {
 	DB_MEDIA media;
 	DB_RESULT result;
@@ -78,7 +78,8 @@ static	void	send_to_user_medias(DB_EVENT *event,DB_ACTION *action, int userid)
 
 	while((row=DBfetch(result)))
 	{
-		media.mediatypeid=atoi(row[0]);
+		ZBX_STR2UINT64(media.mediatypeid, row[0]);
+//		media.mediatypeid=atoi(row[0]);
 		media.sendto=row[1];
 		media.active=atoi(row[2]);
 		media.severity=atoi(row[3]);
@@ -121,8 +122,9 @@ static	void	send_to_user_medias(DB_EVENT *event,DB_ACTION *action, int userid)
 //static	void	send_to_user(DB_TRIGGER *trigger,DB_ACTION *action)
 static	void	send_to_user(DB_EVENT *event, DB_ACTION *action)
 {
-	DB_RESULT result;
-	DB_ROW	row;
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	userid;
 
 	if(action->recipient == RECIPIENT_TYPE_USER)
 	{
@@ -131,18 +133,23 @@ static	void	send_to_user(DB_EVENT *event, DB_ACTION *action)
 	}
 	else if(action->recipient == RECIPIENT_TYPE_GROUP)
 	{
-		result = DBselect("select u.userid from users u, users_groups ug where ug.usrgrpid=%d and ug.userid=u.userid", action->userid);
+		result = DBselect("select u.userid from users u, users_groups ug where ug.usrgrpid=" ZBX_FS_UI64 " and ug.userid=u.userid",
+			action->userid);
 		while((row=DBfetch(result)))
 		{
 //			send_to_user_medias(trigger, action, atoi(row[0]));
-			send_to_user_medias(event, action, atoi(row[0]));
+			ZBX_STR2UINT64(userid, row[0]);
+			send_to_user_medias(event, action, userid);
+//			send_to_user_medias(event, action, atoi(row[0]));
 		}
 		DBfree_result(result);
 	}
 	else
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Unknown recipient type [%d] for actionid [%d]",action->recipient,action->actionid);
-		zabbix_syslog("Unknown recipient type [%d] for actionid [%d]",action->recipient,action->actionid);
+		zabbix_log( LOG_LEVEL_WARNING, "Unknown recipient type [%d] for actionid [" ZBX_FS_UI64 "]",
+			action->recipient,action->actionid);
+		zabbix_syslog("Unknown recipient type [%d] for actionid [" ZBX_FS_UI64 "]",
+			action->recipient,action->actionid);
 	}
 }
 
@@ -319,7 +326,8 @@ static	void	run_commands(DB_EVENT *event, DB_ACTION *action)
 	assert(action);
 
 	cmd_list = action->scripts;
-	zabbix_log( LOG_LEVEL_DEBUG, "Run remote commands START [actionid:%d]", action->actionid);
+	zabbix_log( LOG_LEVEL_DEBUG, "Run remote commands START [actionid:" ZBX_FS_UI64 "]",
+		action->actionid);
 	while(get_next_command(&cmd_list,&alias,&is_group,&command)!=1)
 	{
 		if(!alias || !command) continue;
@@ -348,22 +356,26 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 {
 	DB_RESULT result;
 	DB_ROW	row;
+	zbx_uint64_t	groupid;
+	zbx_uint64_t	hostid;
 
 	char tmp_str[MAX_STRING_LEN];
 	
 	int	ret = FAIL;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In check_action_condition [actionid:%d,conditionid:%d:cond.value:%s]", condition->actionid, condition->conditionid, condition->value);
+	zabbix_log( LOG_LEVEL_DEBUG, "In check_action_condition [actionid:" ZBX_FS_UI64 ",conditionid:" ZBX_FS_UI64 ",cond.value:%s]", condition->actionid, condition->conditionid, condition->value);
 
 	if(condition->conditiontype == CONDITION_TYPE_HOST_GROUP)
 	{
 //		result = DBselect("select distinct hg.groupid from hosts_groups hg,hosts h, items i, functions f, triggers t where hg.hostid=h.hostid and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=%d", trigger->triggerid);
-		result = DBselect("select distinct hg.groupid from hosts_groups hg,hosts h, items i, functions f, triggers t where hg.hostid=h.hostid and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=%d", event->triggerid);
+		result = DBselect("select distinct hg.groupid from hosts_groups hg,hosts h, items i, functions f, triggers t where hg.hostid=h.hostid and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=" ZBX_FS_UI64,
+			event->triggerid);
 		while((row=DBfetch(result)))
 		{
+			ZBX_STR2UINT64(groupid, row[0]);
 			if(condition->operator == CONDITION_OPERATOR_EQUAL)
 			{
-				if(atoi(condition->value) == atoi(row[0]))
+				if(atoi(condition->value) == groupid)
 				{
 					ret = SUCCEED;
 					break;
@@ -371,7 +383,7 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 			}
 			else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
 			{
-				if(atoi(condition->value) != atoi(row[0]))
+				if(atoi(condition->value) != groupid)
 				{
 					ret = SUCCEED;
 					break;
@@ -379,7 +391,7 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 			}
 			else
 			{
-				zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [%d]", condition->operator, condition->conditionid);
+				zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]", condition->operator, condition->conditionid);
 				break;
 			}
 		}
@@ -391,9 +403,10 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		result = DBselect("select distinct h.hostid from hosts h, items i, functions f, triggers t where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=%d", event->triggerid);
 		while((row=DBfetch(result)))
 		{
+			ZBX_STR2UINT64(hostid, row[0]);
 			if(condition->operator == CONDITION_OPERATOR_EQUAL)
 			{
-				if(atoi(condition->value) == atoi(row[0]))
+				if(atoi(condition->value) == hostid)
 				{
 					ret = SUCCEED;
 					break;
@@ -401,7 +414,7 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 			}
 			else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
 			{
-				if(atoi(condition->value) != atoi(row[0]))
+				if(atoi(condition->value) != hostid)
 				{
 					ret = SUCCEED;
 					break;
@@ -409,7 +422,7 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 			}
 			else
 			{
-				zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [%d]", condition->operator, condition->conditionid);
+				zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]", condition->operator, condition->conditionid);
 				break;
 			}
 		}
@@ -462,7 +475,8 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		}
 		else
 		{
-			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [%d]", condition->operator, condition->conditionid);
+			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+				condition->operator, condition->conditionid);
 		}
 	}
 	else if(condition->conditiontype == CONDITION_TYPE_TRIGGER_SEVERITY)
@@ -501,7 +515,8 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		}
 		else
 		{
-			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [%d]", condition->operator, condition->conditionid);
+			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+				condition->operator, condition->conditionid);
 		}
 	}
 	else if(condition->conditiontype == CONDITION_TYPE_TRIGGER_VALUE)
@@ -516,7 +531,8 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		}
 		else
 		{
-			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [%d]", condition->operator, condition->conditionid);
+			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+				condition->operator, condition->conditionid);
 		}
 	}
 	else if(condition->conditiontype == CONDITION_TYPE_TIME_PERIOD)
@@ -531,12 +547,14 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		}
 		else
 		{
-			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [%d]", condition->operator, condition->conditionid);
+			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+				condition->operator, condition->conditionid);
 		}
 	}
 	else
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Condition type [%d] is unknown for condition id [%d]", condition->conditiontype, condition->conditionid);
+		zabbix_log( LOG_LEVEL_ERR, "Condition type [%d] is unknown for condition id [" ZBX_FS_UI64 "]",
+			condition->conditiontype, condition->conditionid);
 	}
 
 	if(FAIL==ret)
@@ -552,7 +570,7 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 }
 
 //static int	check_action_conditions(DB_TRIGGER *trigger,int new_trigger_value, int actionid)
-static int	check_action_conditions(DB_EVENT *event, int actionid)
+static int	check_action_conditions(DB_EVENT *event, zbx_uint64_t actionid)
 {
 	DB_RESULT result;
 	DB_ROW row;
@@ -568,8 +586,10 @@ static int	check_action_conditions(DB_EVENT *event, int actionid)
 
 	while((row=DBfetch(result)))
 	{
-		condition.conditionid=atoi(row[0]);
-		condition.actionid=atoi(row[1]);
+		ZBX_STR2UINT64(condition.conditionid, row[0]);
+//		condition.conditionid=atoi(row[0]);
+		ZBX_STR2UINT64(condition.actionid, row[1]);
+//		condition.actionid=atoi(row[1]);
 		condition.conditiontype=atoi(row[2]);
 		condition.operator=atoi(row[3]);
 		condition.value=row[4];
@@ -648,13 +668,15 @@ void	apply_actions(DB_EVENT *event)
 
 	while((row=DBfetch(result)))
 	{
-		action.actionid=atoi(row[0]);
+		ZBX_STR2UINT64(action.actionid, row[0]);
+//		action.actionid=atoi(row[0]);
 
 //		if(check_action_conditions(trigger, trigger_value, action.actionid) == SUCCEED)
 		if(check_action_conditions(event, action.actionid) == SUCCEED)
 		{
 			zabbix_log( LOG_LEVEL_DEBUG, "Conditions match our trigger. Do apply actions.");
-			action.userid=atoi(row[1]);
+			ZBX_STR2UINT64(action.userid, row[1]);
+//			action.userid=atoi(row[1]);
 			
 			strscpy(action.subject,row[2]);
 			strscpy(action.message,row[3]);

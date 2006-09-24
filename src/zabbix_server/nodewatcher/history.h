@@ -17,16 +17,9 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
+#ifndef ZABBIX_NODEWATCHER_HISTORY_H
+#define ZABBIX_NODEWATCHER_HISTORY_H
 
-#ifndef ZABBIX_FUNCTIONS_H
-#define ZABBIX_FUNCTIONS_H
-
-#include "common.h"
-#include "db.h"
-
-void    update_triggers (zbx_uint64_t itemid);
-int	process_data(int sockfd,char *server,char *key, char *value,char *lastlogsize,char *timestamp,
-			char *source, char *severity);
-void	process_new_value(DB_ITEM *item, AGENT_RESULT *value);
+void main_historysender();
 
 #endif

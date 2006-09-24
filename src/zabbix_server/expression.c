@@ -631,7 +631,7 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 			var_len = strlen(MVAR_HOST_NAME);
 
 			result = DBselect("select distinct h.host from triggers t, functions f,items i, hosts h "
-				"where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid",
+				"where t.triggerid=" ZBX_FS_UI64 " and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid",
 //				trigger->triggerid);
 				event->triggerid);
 
@@ -640,9 +640,11 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
 	//			zabbix_log( LOG_LEVEL_ERR, "No hostname in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
-				zabbix_log( LOG_LEVEL_ERR, "No hostname in substitute_simple_macros. Triggerid [%d]", event->triggerid);
+				zabbix_log( LOG_LEVEL_ERR, "No hostname in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
+					event->triggerid);
 //				zabbix_syslog("No hostname in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
-				zabbix_syslog("No hostname in substitute_simple_macros. Triggerid [%d]", event->triggerid);
+				zabbix_syslog("No hostname in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
+					event->triggerid);
 
 				zbx_snprintf(replace_to, sizeof(replace_to), "%s", STR_UNKNOWN_VARIAVLE);
 			}
@@ -658,7 +660,7 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 			var_len = strlen(MVAR_TRIGGER_KEY);
 
 			result = DBselect("select distinct i.key_ from triggers t, functions f,items i, hosts h"
-				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid"
+				" where t.triggerid=" ZBX_FS_UI64 " and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid"
 //				" order by i.key_", trigger->triggerid);
 				" order by i.key_", event->triggerid);
 
@@ -667,9 +669,11 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
 //				zabbix_log( LOG_LEVEL_ERR, "No TRIGGER.KEY in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
-				zabbix_log( LOG_LEVEL_ERR, "No TRIGGER.KEY in substitute_simple_macros. Triggerid [%d]", event->triggerid);
+				zabbix_log( LOG_LEVEL_ERR, "No TRIGGER.KEY in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
+					event->triggerid);
 //				zabbix_syslog("No TRIGGER.KEY in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
-				zabbix_syslog("No TRIGGER.KEY in substitute_simple_macros. Triggerid [%d]", event->triggerid);
+				zabbix_syslog("No TRIGGER.KEY in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
+					event->triggerid);
 				/* remove variable */
 				*replace_to = '\0';
 			}
@@ -686,7 +690,7 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 			var_len = strlen(MVAR_IPADDRESS);
 
 			result = DBselect("select distinct h.ip from triggers t, functions f,items i, hosts h"
-				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and h.useip=1",
+				" where t.triggerid=" ZBX_FS_UI64 " and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and h.useip=1",
 //				trigger->triggerid);
 				event->triggerid);
 
@@ -695,9 +699,11 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
 //				zabbix_log( LOG_LEVEL_ERR, "No hostname in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
-				zabbix_log( LOG_LEVEL_ERR, "No hostname in substitute_simple_macros. Triggerid [%d]", event->triggerid);
+				zabbix_log( LOG_LEVEL_ERR, "No hostname in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
+					event->triggerid);
 //				zabbix_syslog("No hostname in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
-				zabbix_syslog("No hostname in substitute_simple_macros. Triggerid [%d]", event->triggerid);
+				zabbix_syslog("No hostname in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
+					event->triggerid);
 
 				zbx_snprintf(replace_to, sizeof(replace_to), "%s", STR_UNKNOWN_VARIAVLE);
 			}
