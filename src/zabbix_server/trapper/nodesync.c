@@ -44,31 +44,6 @@
 #include "dbsync.h"
 #include "nodesync.h"
 
-int	get_field(char *line, char *result, int num)
-{
-	int delim=0;
-	int ptr=0;
-	int i;
-
-	int ret = FAIL;
-
-	for(i=0;line[i]!=0;i++)
-	{
-		if(line[i]=='|')
-		{
-			delim++;
-			continue;
-		}
-		if(delim==num)
-		{
-			result[ptr++]=line[i];
-			result[ptr]=0;
-			ret = SUCCEED;
-		}
-	}
-	return ret;
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: process_record                                                   *
@@ -106,10 +81,10 @@ static int	process_record(int nodeid, char *record)
 
 //	zabbix_log( LOG_LEVEL_WARNING, "In process_record [%s]", record);
 
-	get_field(record,tablename,0);
-	get_field(record,tmp,1);
+	zbx_get_field(record,tablename,0,'|');
+	zbx_get_field(record,tmp,1,'|');
 	sscanf(tmp,ZBX_FS_UI64,&recid);
-	get_field(record,tmp,2);
+	zbx_get_field(record,tmp,2,'|');
 	op=atoi(tmp);
 
 	for(i=0;tables[i].table!=0;i++)
@@ -137,13 +112,13 @@ static int	process_record(int nodeid, char *record)
 	fields[0]=0;
 	fields_update[0]=0;
 	values[0]=0;
-	while(get_field(record,fieldname,i++)==SUCCEED)
+	while(zbx_get_field(record,fieldname,i++,'|')==SUCCEED)
 	{
 		tmp[0]=0;
-		get_field(record,tmp,i++);
+		zbx_get_field(record,tmp,i++,'|');
 		valuetype=atoi(tmp);
 		value[0]=0;
-		get_field(record,value,i++);
+		zbx_get_field(record,value,i++,'|');
 		if(op==NODE_CONFIGLOG_OP_UPDATE || op==NODE_CONFIGLOG_OP_ADD)
 		{
 			if(strcmp(value,"NULL")==0)
@@ -198,7 +173,7 @@ static int	process_record(int nodeid, char *record)
 	else if(op==NODE_CONFIGLOG_OP_ADD)
 	{
 		result = DBselect("select 0 from %s where %s=" ZBX_FS_UI64, tablename, key, recid);
-		row = DBfetch(result);	
+		row = DBfetch(result);
 		if(row)
 		{
 			zbx_snprintf(sql,sizeof(sql),"update %s set %s where %s=" ZBX_FS_UI64, tablename, fields_update, key, recid);
@@ -249,9 +224,9 @@ int	node_sync(char *data)
 		if(firstline == 1)
 		{
 //			zabbix_log( LOG_LEVEL_WARNING, "First line [%s]", s);
-			get_field(s,tmp,1);
+			zbx_get_field(s,tmp,1,'|');
 			sender_nodeid=atoi(tmp);
-			get_field(s,tmp,2);
+			zbx_get_field(s,tmp,2,'|');
 			nodeid=atoi(tmp);
 			firstline=0;
 			zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Received data from node %d for node %d", CONFIG_NODEID, sender_nodeid, nodeid);

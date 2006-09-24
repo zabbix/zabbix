@@ -50,18 +50,15 @@
 #include "zlog.h"
 
 #include "nodecomms.h"
-#include "events.h"
-
-#define	ZBX_NODE_MASTER	0
-#define	ZBX_NODE_SLAVE	1
+#include "history.h"
 
 extern	int	CONFIG_NODEID;
 
 /******************************************************************************
  *                                                                            *
- * Function: process_node                                                     *
+ * Function: process_node_history                                             *
  *                                                                            *
- * Purpose: select all related nodes and send config changes                  *
+ * Purpose: process new history data                                          *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -73,15 +70,17 @@ extern	int	CONFIG_NODEID;
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int process_node(int nodeid, int master_nodeid, zbx_uint64_t event_lastid)
+static int process_node_history(int nodeid, int master_nodeid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*data;
 	char		tmp[MAX_STRING_LEN];
+	char		sql[MAX_STRING_LEN];
 	int		found = 0;
 
-	zbx_uint64_t	eventid;
+	zbx_uint64_t	id;
+	zbx_uint64_t	itemid;
 
 #define DATA_MAX	1024*1024
 
@@ -91,16 +90,19 @@ static int process_node(int nodeid, int master_nodeid, zbx_uint64_t event_lastid
 	data = malloc(DATA_MAX);
 	memset(data,0,DATA_MAX);
 
-	zbx_snprintf(tmp,sizeof(tmp),"Events|%d|%d\n", CONFIG_NODEID, nodeid);
+	zbx_snprintf(tmp,sizeof(tmp),"History|%d|%d\n", CONFIG_NODEID, nodeid);
 	strncat(data,tmp,DATA_MAX);
 
-	result = DBselect("select eventid,triggerid,clock,value,acknowledged from events where eventid>" ZBX_FS_UI64 " and " ZBX_COND_NODEID " order by eventid", event_lastid, ZBX_NODE("eventid", nodeid));
+	zbx_snprintf(sql,sizeof(sql),"select id,itemid,clock,value from history_sync where nodeid=%d order by id", nodeid);
+
+	result = DBselectN(sql, 100000);
 	while((row=DBfetch(result)))
 	{
-		ZBX_STR2UINT64(eventid,row[0])
-//		zabbix_log( LOG_LEVEL_WARNING, "Processing eventid " ZBX_FS_UI64, eventid);
+		ZBX_STR2UINT64(id,row[0])
+		ZBX_STR2UINT64(itemid,row[1])
+//		zabbix_log( LOG_LEVEL_WARNING, "Processing itemid " ZBX_FS_UI64, itemid);
 		found = 1;
-		zbx_snprintf(tmp,sizeof(tmp),"%s|%s|%s|%s|%s\n", row[0],row[1],row[2],row[3],row[4]);
+		zbx_snprintf(tmp,sizeof(tmp),"%s|%s|%s\n", row[1],row[2],row[3]);
 		strncat(data,tmp,DATA_MAX);
 	}
 	if(found == 1)
@@ -108,18 +110,46 @@ static int process_node(int nodeid, int master_nodeid, zbx_uint64_t event_lastid
 //		zabbix_log( LOG_LEVEL_WARNING, "Sending [%s]",data);
 		if(send_to_node(master_nodeid, nodeid, data) == SUCCEED)
 		{
-//			zabbix_log( LOG_LEVEL_WARNING, "Updating nodes.event_lastid");
-			DBexecute("update nodes set event_lastid=" ZBX_FS_UI64 " where nodeid=%d", eventid, nodeid);
+//			zabbix_log( LOG_LEVEL_WARNING, "Updating nodes.history_lastid");
+			DBexecute("update nodes set history_lastid=" ZBX_FS_UI64 " where nodeid=%d", id, nodeid);
+			DBexecute("delete from history_sync where nodeid=%d and id<=" ZBX_FS_UI64, nodeid, id);
 		}
 		else
 		{
-//			zabbix_log( LOG_LEVEL_WARNING, "Not updating nodes.event_lastid");
+			zabbix_log( LOG_LEVEL_WARNING, "Not updating nodes.history_lastid");
 		}
 	}
 	DBfree_result(result);
 	free(data);
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: process_node                                                     *
+ *                                                                            *
+ * Purpose: process all history tables for this node                          *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: SUCCESS - processed succesfully                              * 
+ *               FAIL - an error occured                                      *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void process_node(int nodeid, int master_nodeid)
+{
+//	zabbix_log( LOG_LEVEL_WARNING, "In process_node(local:%d, master_nodeid:" ZBX_FS_UI64 ")",nodeid, master_nodeid);
+
+	process_node_history(nodeid, master_nodeid);
+/*	process_node_history_uint(nodeid, master_nodeid);
+	process_node_history_str(nodeid, master_nodeid);
+	process_node_history_log(nodeid, master_nodeid);
+	process_node_trends(nodeid, master_nodeid);*/
 }
 
 /******************************************************************************
@@ -137,7 +167,7 @@ static int process_node(int nodeid, int master_nodeid, zbx_uint64_t event_lastid
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-void main_eventsender()
+void main_historysender()
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -151,14 +181,14 @@ void main_eventsender()
 
 	if(master_nodeid == 0)		return;
 
-	result = DBselect("select nodeid,event_lastid from nodes");
+	result = DBselect("select nodeid from nodes");
 
 	while((row = DBfetch(result)))
 	{
 		nodeid=atoi(row[0]);
 		ZBX_STR2UINT64(lastid,row[1])
 
-		process_node(nodeid, master_nodeid, lastid);
+		process_node(nodeid, master_nodeid);
 	}
 
 	DBfree_result(result);

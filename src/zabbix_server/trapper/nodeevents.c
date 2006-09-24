@@ -41,8 +41,9 @@
 #include "log.h"
 #include "zlog.h"
 
-#include "dbsync.h"
 #include "nodeevents.h"
+
+extern int     process_event(DB_EVENT *event);
 
 /******************************************************************************
  *                                                                            *
@@ -66,17 +67,19 @@ static int	process_record(int nodeid, char *record)
 
 	DB_EVENT	event;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In process_record [%s]", record);
+	zabbix_log( LOG_LEVEL_DEBUG, "In process_record [%s]", record);
 
-	get_field(record,tmp,0);
+	memset(&event,0,sizeof(DB_EVENT));
+
+	zbx_get_field(record,tmp,0,'|');
 	sscanf(tmp,ZBX_FS_UI64,&event.eventid);
-	get_field(record,tmp,1);
+	zbx_get_field(record,tmp,1,'|');
 	sscanf(tmp,ZBX_FS_UI64,&event.triggerid);
-	get_field(record,tmp,2);
+	zbx_get_field(record,tmp,2,'|');
 	event.clock=atoi(tmp);
-	get_field(record,tmp,3);
+	zbx_get_field(record,tmp,3,'|');
 	event.value=atoi(tmp);
-	get_field(record,tmp,4);
+	zbx_get_field(record,tmp,4,'|');
 	event.acknowledged=atoi(tmp);
 
 	return process_event(&event);
@@ -113,16 +116,16 @@ int	node_events(char *data)
 		if(firstline == 1)
 		{
 //			zabbix_log( LOG_LEVEL_WARNING, "First line [%s]", s);
-			get_field(s,tmp,1);
+			zbx_get_field(s,tmp,1,'|');
 			sender_nodeid=atoi(tmp);
-			get_field(s,tmp,2);
+			zbx_get_field(s,tmp,2,'|');
 			nodeid=atoi(tmp);
 			firstline=0;
 			zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Received events from node %d for node %d", CONFIG_NODEID, sender_nodeid, nodeid);
 		}
 		else
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Got line [%s]", s);
+//			zabbix_log( LOG_LEVEL_WARNING, "Got line [%s]", s);
 			process_record(nodeid, s);
 		}
 

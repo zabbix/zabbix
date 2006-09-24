@@ -79,7 +79,8 @@ static int evaluate_LOGSOURCE(char *value, DB_ITEM *item, char *parameter)
 
 	now=time(NULL);
 
-	zbx_snprintf(sql,sizeof(sql),"select source from history_log where itemid=%d order by clock desc",item->itemid);
+	zbx_snprintf(sql,sizeof(sql),"select source from history_log where itemid=" ZBX_FS_UI64 " order by clock desc",
+		item->itemid);
 
 	result = DBselectN(sql,1);
 	row = DBfetch(result);
@@ -138,7 +139,8 @@ static int evaluate_LOGSEVERITY(char *value, DB_ITEM *item, char *parameter)
 
 	now=time(NULL);
 
-	zbx_snprintf(sql,sizeof(sql),"select severity from history_log where itemid=%d order by clock desc",item->itemid);
+	zbx_snprintf(sql,sizeof(sql),"select severity from history_log where itemid=" ZBX_FS_UI64 " order by clock desc",
+		item->itemid);
 
 	result = DBselectN(sql,1);
 	row = DBfetch(result);
@@ -197,7 +199,8 @@ static int evaluate_COUNT(char *value, DB_ITEM *item, int parameter)
 	{
 		strscpy(table,"history");
 	}
-	result = DBselect("select count(value) from %s where clock>%d and itemid=%d",table,now-parameter,item->itemid);
+	result = DBselect("select count(value) from %s where clock>%d and itemid=" ZBX_FS_UI64,
+		table,now-parameter,item->itemid);
 
 	row = DBfetch(result);
 
@@ -261,7 +264,8 @@ static int evaluate_SUM(char *value, DB_ITEM *item, int parameter, int flag)
 		{
 			strscpy(table,"history");
 		}
-		result = DBselect("select sum(value) from %s where clock>%d and itemid=%d",table, now-parameter,item->itemid);
+		result = DBselect("select sum(value) from %s where clock>%d and itemid=" ZBX_FS_UI64,
+			table, now-parameter,item->itemid);
 
 		row = DBfetch(result);
 		if(!row || DBis_null(row[0])==SUCCEED)
@@ -284,7 +288,8 @@ static int evaluate_SUM(char *value, DB_ITEM *item, int parameter, int flag)
 		{
 			strscpy(table,"history");
 		}
-		zbx_snprintf(sql,sizeof(sql),"select value from %s where itemid=%d order by clock desc",table,item->itemid);
+		zbx_snprintf(sql,sizeof(sql),"select value from %s where itemid=" ZBX_FS_UI64 " order by clock desc",
+			table,item->itemid);
 		result = DBselectN(sql, parameter);
 		row = DBfetch(result);
 		if(!row || DBis_null(row[0])==SUCCEED)
@@ -359,7 +364,8 @@ static int evaluate_AVG(char *value,DB_ITEM	*item,int parameter,int flag)
 
 	if(flag == ZBX_FLAG_SEC)
 	{
-		result = DBselect("select avg(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
+		result = DBselect("select avg(value) from history where clock>%d and itemid=" ZBX_FS_UI64,
+			now-parameter,item->itemid);
 
 		row = DBfetch(result);
 		
@@ -376,7 +382,8 @@ static int evaluate_AVG(char *value,DB_ITEM	*item,int parameter,int flag)
 	}
 	else if(flag == ZBX_FLAG_VALUES)
 	{
-		zbx_snprintf(sql,sizeof(sql),"select value from history where itemid=%d order by clock desc",item->itemid);
+		zbx_snprintf(sql,sizeof(sql),"select value from history where itemid=" ZBX_FS_UI64 " order by clock desc",
+			item->itemid);
 		result = DBselectN(sql, parameter);
 		rows=0;
 		while((row=DBfetch(result)))
@@ -456,7 +463,8 @@ static int evaluate_MIN(char *value,DB_ITEM	*item,int parameter, int flag)
 		{
 			strscpy(table,"history");
 		}
-		result = DBselect("select min(value) from %s where clock>%d and itemid=%d",table, now-parameter,item->itemid);
+		result = DBselect("select min(value) from %s where clock>%d and itemid=" ZBX_FS_UI64,
+			table, now-parameter,item->itemid);
 		row = DBfetch(result);
 		if(!row || DBis_null(row[0])==SUCCEED)
 		{
@@ -479,7 +487,8 @@ static int evaluate_MIN(char *value,DB_ITEM	*item,int parameter, int flag)
 		{
 			strscpy(table,"history");
 		}
-		zbx_snprintf(sql,sizeof(sql),"select value from %s where itemid=%d order by clock desc",table,item->itemid);
+		zbx_snprintf(sql,sizeof(sql),"select value from %s where itemid=" ZBX_FS_UI64 " order by clock desc",
+			table,item->itemid);
 		result = DBselectN(sql,parameter);
 
 		rows=0;
@@ -584,7 +593,8 @@ static int evaluate_MAX(char *value,DB_ITEM *item,int parameter,int flag)
 		{
 			strscpy(table,"history");
 		}
-		result = DBselect("select max(value) from %s where clock>%d and itemid=%d",table,now-parameter,item->itemid);
+		result = DBselect("select max(value) from %s where clock>%d and itemid=" ZBX_FS_UI64,
+			table,now-parameter,item->itemid);
 
 		row = DBfetch(result);
 
@@ -609,7 +619,8 @@ static int evaluate_MAX(char *value,DB_ITEM *item,int parameter,int flag)
 		{
 			strscpy(table,"history");
 		}
-		zbx_snprintf(sql,sizeof(sql),"select value from %s where itemid=%d order by clock desc",table,item->itemid);
+		zbx_snprintf(sql,sizeof(sql),"select value from %s where itemid=" ZBX_FS_UI64 " order by clock desc",
+			table,item->itemid);
 		result = DBselectN(sql,parameter);
 		rows=0;
 		while((row=DBfetch(result)))
@@ -702,7 +713,8 @@ static int evaluate_DELTA(char *value,DB_ITEM *item,int parameter, int flag)
 
 	if(flag == ZBX_FLAG_SEC)
 	{
-		result = DBselect("select max(value)-min(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
+		result = DBselect("select max(value)-min(value) from history where clock>%d and itemid=" ZBX_FS_UI64,
+			now-parameter,item->itemid);
 
 		row = DBfetch(result);
 		if(!row || DBis_null(row[0])==SUCCEED)
@@ -718,7 +730,8 @@ static int evaluate_DELTA(char *value,DB_ITEM *item,int parameter, int flag)
 	}
 	else if(flag == ZBX_FLAG_VALUES)
 	{
-		zbx_snprintf(sql,sizeof(sql),"select value from history where itemid=%d order by clock desc",item->itemid);
+		zbx_snprintf(sql,sizeof(sql),"select value from history where itemid=" ZBX_FS_UI64 " order by clock desc",
+			item->itemid);
 		result = DBselectN(sql,parameter);
 		rows=0;
 		while((row=DBfetch(result)))
@@ -1202,7 +1215,7 @@ int	add_value_suffix(char *value, DB_ITEM *item)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	replace_value_by_map(char *value, int valuemapid)
+int	replace_value_by_map(char *value, zbx_uint64_t valuemapid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -1215,7 +1228,7 @@ int	replace_value_by_map(char *value, int valuemapid)
 	
 	if(valuemapid == 0)	return FAIL;
 	
-	result = DBselect("select newvalue from mappings where valuemapid=%d and value='%s'",
+	result = DBselect("select newvalue from mappings where valuemapid=" ZBX_FS_UI64 " and value='%s'",
 			valuemapid, value);
 	row = DBfetch(result);
 
@@ -1277,7 +1290,7 @@ int evaluate_FUNCTION2(char *value,char *host,char *key,char *function,char *par
 
 	DBget_item_from_db(&item,row);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Itemid:%d", item.itemid );
+	zabbix_log(LOG_LEVEL_DEBUG, "Itemid:" ZBX_FS_UI64, item.itemid );
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Before evaluate_FUNCTION()" );
 
