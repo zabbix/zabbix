@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/actions.inc.php";
+
 	$page["title"] = "S_LATEST_ACTIONS";
 	$page["file"] = "actions.php";
 	show_header($page["title"],1,0);

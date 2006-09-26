@@ -19,8 +19,9 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
-	include "include/forms.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/triggers.inc.php";
+	require_once "include/forms.inc.php";
 
 	$dstfrm		= get_request("dstfrm",		0);	// destination form
 

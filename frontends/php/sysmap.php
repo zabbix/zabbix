@@ -19,10 +19,12 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
-	include "include/forms.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/forms.inc.php";
+
 	$page["title"] = "S_CONFIGURATION_OF_NETWORK_MAPS";
 	$page["file"] = "sysmap.php";
+
 	show_header($page["title"],0,0);
 	insert_confirm_javascript();
 ?>

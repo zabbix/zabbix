@@ -123,6 +123,9 @@ table.formtable td.form_row_l { /* left cell */
 	border-bottom-style: none;
 	border-color: #222255;
 	text-align: left;
+	white-space: nowrap;
+	word-spacing: nowrap;
+	width: 10;
 }
 table.formtable td.form_row_c { /* center cell */
 	border-right-style: solid;
@@ -130,6 +133,7 @@ table.formtable td.form_row_c { /* center cell */
 	border-top-style: none;
 	border-bottom-style: none;
 	border-color: #222255;
+	color: inherit;
 	text-align: center;
 }
 table.formtable td.form_row_r { /* right cell */
@@ -429,6 +433,16 @@ table.ack_msgs tr.msg td{
 
 /**************** TABLE FOR RIGHT DISPLAYING *********/
 
+.right_header {
+	font-weight: bold; 
+	text-align: center;
+	border-top-style: solid;
+	border-left-style: solid;
+	border-right-style: solid;
+	border-bottom-style: none;
+	border-color: #222255;
+}
+
 table.right_table{
 	width: 100%;
 	border-width: 0px;
@@ -436,21 +450,29 @@ table.right_table{
         padding: 0px;
 }
 
-table.right_table tr.header
+table.right_table tr.header td
 {
 	font-weight: bold;
+	text-align: left;
 }
 
 table.right_table td
 {
         margin: 0px;
         padding: 0px;
+	text-align: right;
+	white-space: nowrap;
+	word-spacing: nowrap;
 }
 
 table.right_table select
 {
-	width: 250px;
+	width: 200px;
 }
+
+table.right_table td.read_write	select.biginput	{ color: #008800; }
+table.right_table td.read_only	select.biginput	{ color: #CC8800; }
+table.right_table td.deny 	select.biginput	{ color: #CC0000; }
 
 /**************** GRAPH ****************/
 

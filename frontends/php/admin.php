@@ -19,8 +19,7 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
-	include "include/forms.inc.php";
+	require_once "include/config.inc.php";
 
         $page["title"] = "S_ADMINISTRATION";
         $page["file"] = "admin.php";

@@ -19,7 +19,6 @@
 **/
 ?>
 <?php
-
 	function	user_type2str($user_type_int)
 	{
 		$str_user_type[USER_TYPE_ZABBIX_USER]	= S_ZABBIX_USER;
@@ -28,18 +27,6 @@
 
 		if(isset($str_user_type[$user_type_int]))
 			return $str_user_type[$user_type_int];
-
-		return S_UNCNOWN;
-	}
-
-	function	permission2str($group_permission)
-	{
-		$str_perm[PERM_READ_WRITE]	= S_READ_WRITE;
-		$str_perm[PERM_READ_ONLY]	= S_READ_ONLY;
-		$str_perm[PERM_DENY]		= S_DENY;
-
-		if(isset($str_perm[$group_permission]))
-			return $str_perm[$group_permission];
 
 		return S_UNCNOWN;
 	}
@@ -207,7 +194,9 @@
 
 	function	add_user_group($name,$users=array(),$rights=array())
 	{
-		if(DBfetch(DBexecute("select * from usrgrp where name=".zbx_dbstr($name))))
+		global $ZBX_CURNODEID;
+
+		if(DBfetch(DBexecute("select * from usrgrp where name=".zbx_dbstr($name)." and ".DBid2nodeid('usrgrpid')."=".$ZBX_CURNODEID)))
 		{
 			error("Group '$name' already exists");
 			return 0;
@@ -240,7 +229,10 @@
 
 	function	update_user_group($usrgrpid,$name,$users=array(),$rights=array())
 	{
-		if(DBfetch(DBexecute("select * from usrgrp where name=".zbx_dbstr($name)." and usrgrpid<>$usrgrpid")))
+		global $ZBX_CURNODEID;
+
+		if(DBfetch(DBexecute("select * from usrgrp where name=".zbx_dbstr($name).
+			" and usrgrpid<>".$usrgrpid." and ".DBid2nodeid('usrgrpid')."=".$ZBX_CURNODEID)))
 		{
 			error("Group '$name' already exists");
 			return 0;

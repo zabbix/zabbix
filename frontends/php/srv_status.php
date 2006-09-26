@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/services.inc.php";
+
 	$page["title"] = "S_IT_SERVICES";
 	$page["file"] = "srv_status.php";
 	show_header($page["title"],1,0);

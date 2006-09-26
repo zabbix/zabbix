@@ -19,8 +19,11 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
-	include "include/forms.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/triggers.inc.php";
+	require_once "include/media.inc.php";
+	require_once "include/users.inc.php";
+	require_once "include/forms.inc.php";
 
 	$page["title"] = "S_USERS";
 	$page["file"] = "users.php";
@@ -36,6 +39,7 @@
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		"config"=>	array(T_ZBX_INT, O_OPT,	null,	IN("0,1"),	null),
+		"perm_details"=>array(T_ZBX_INT, O_OPT,	null,	IN("0,1"),	null),
 /* user */
 		"userid"=>	array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,'{config}==0&&{form}=="update"'),
 		"group_userid"=>array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		null),
@@ -368,7 +372,7 @@
 				S_NAME,S_SURNAME,S_USER_TYPE,S_GROUPS,S_IS_ONLINE_Q));
 		
 			$db_users=DBselect("select userid,alias,name,surname,type,autologout ".
-				" from users where ".id2nodeid('userid')."=".$ZBX_CURNODEID.
+				" from users where ".DBid2nodeid('userid')."=".$ZBX_CURNODEID.
 				" order by alias");
 			while($db_user=DBfetch($db_users))
 			{
@@ -429,7 +433,7 @@
 				S_MEMBERS));
 		
 			$result=DBselect("select usrgrpid,name from usrgrp".
-					" where ".id2nodeid('usrgrpid')."=".$ZBX_CURNODEID.
+					" where ".DBid2nodeid('usrgrpid')."=".$ZBX_CURNODEID.
 					" order by name");
 			while($row=DBfetch($result))
 			{

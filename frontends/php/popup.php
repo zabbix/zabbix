@@ -19,8 +19,11 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
-	include "include/forms.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/hosts.inc.php";
+	require_once "include/triggers.inc.php";
+	require_once "include/items.inc.php";
+	require_once "include/users.inc.php";
 
 	$dstfrm		= get_request("dstfrm",0);	// destination form
 	$dstfld1	= get_request("dstfld1", 0);	// output field on destination form

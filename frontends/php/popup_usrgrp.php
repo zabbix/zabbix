@@ -19,8 +19,8 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
-	include "include/forms.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/users.inc.php";
 
 	$dstfrm		= get_request("dstfrm",		0);	// destination form
 	$list_name	= get_request("list_name",	0);	// output field on destination form
@@ -73,7 +73,7 @@ function add_group(formname,group_id,name)
 	$table = new CTableInfo(S_NO_GROUPS_DEFINED);
 	$table->SetHeader(array(S_NAME));
 
-	$result = DBselect("select * from usrgrp where ".id2nodeid('usrgrpid')."=$ZBX_CURNODEID order by name");
+	$result = DBselect("select * from usrgrp where ".DBid2nodeid('usrgrpid')."=$ZBX_CURNODEID order by name");
 	while($row = DBfetch($result))
 	{
 		$name = new CLink($row["name"],"#","action");

@@ -19,7 +19,8 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
+	require_once "include/config.inc.php";
+
 	$page["title"] = "S_TRIGGERS_TOP_100";
 	$page["file"] = "report5.php";
 	show_header($page["title"],0,0);

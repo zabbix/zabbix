@@ -19,7 +19,8 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
+	require_once "include/config.inc.php";
+
 	$page["title"] = "S_AVAILABILITY_REPORT";
 	$page["file"] = "report2.php";
 	show_header($page["title"],0,0);

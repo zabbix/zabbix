@@ -743,7 +743,9 @@
 	"S_CONFIGURATION_OF_SCREEN_BIG"=>	"CONFIGURATION OF SCREEN",
 	"S_SCREEN_CELL_CONFIGURATION"=>		"Screen cell configuration",
 	"S_RESOURCE"=>				"Resource",
+	"S_RESOURCES"=>				"Resources",
 	"S_RESOURCE_TYPE"=>			"Resource type",
+	"S_RIGHTS_OF_RESOURCES"=>		"Rights of resources",
 	"S_NO_RESOURCES_DEFINED"=>		"No resources defined",
 	"S_SIMPLE_GRAPH"=>			"Simple graph",
 	"S_GRAPH_NAME"=>			"Graph name",
@@ -977,6 +979,7 @@
 	"S_CREATE_USER"=>			"Create User",
 	"S_CREATE_GROUP"=>			"Create Group",
 	"S_DELETE_SELECTED_USERS_Q"=>		"Delete selected users?",
+	"S_NO_ACCESSIBLE_RESOURCES"=>		"No accessibles resources",
 
 //	audit.php
 	"S_AUDIT_LOG"=>				"Audit log",

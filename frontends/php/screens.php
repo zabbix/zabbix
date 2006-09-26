@@ -19,7 +19,8 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/screens.inc.php";
 
 
 	$page["title"] = "S_CUSTOM_SCREENS";

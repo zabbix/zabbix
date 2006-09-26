@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/hosts.inc.php";
+	require_once "include/events.inc.php";
 	$page["title"] = "S_LATEST_EVENTS";
 	$page["file"] = "events.php";
 	show_header($page["title"],1,0);

@@ -19,11 +19,12 @@
 **/
 ?>
 <?php
+	require_once "include/config.inc.php";
+	require_once "include/items.inc.php";
+	require_once "include/graphs.inc.php";
+
 	$page["file"]="history.php";
 	$page["menu.url"]="latest.php";
-
-	include "include/config.inc.php";
-	include "include/forms.inc.php";
 
 /*** Prepare page header - start ***/
 	if(is_array($_REQUEST["itemid"]))

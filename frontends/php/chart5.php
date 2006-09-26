@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
+	require_once "include/config.inc.php";
 
 #	PARAMETERS:
 	

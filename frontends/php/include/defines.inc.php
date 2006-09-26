@@ -223,9 +223,19 @@
 	define("USER_TYPE_ZABBIX_ADMIN",	2);
 	define("USER_TYPE_SUPPER_ADMIN",	3);
 
-	define("PERM_READ_WRITE",	2);
-	define("PERM_READ_ONLY",	1);
+	define("PERM_MAX",		3);
+	define("PERM_READ_WRITE",	3);
+	define("PERM_READ_ONLY",	2);
+	define("PERM_READ_LIST",	1);
 	define("PERM_DENY",		0);
+
+	define("PERM_RES_STRING_LINE",	0); /* return string of nodes id - "1,2,3,4,5" */
+	define("PERM_RES_IDS_ARRAY",	1); /* return array of nodes id - array(1,2,3,4) */
+	define("PERM_RES_DATA_ARRAY",	2); 
+
+	define("PERM_MODE_GE",	0);
+	define("PERM_MODE_EQ",	1);
+	define("PERM_MODE_LE",	2);
 
 	define("RESOURCE_TYPE_NODE",		0);
 	define("RESOURCE_TYPE_GROUP",		1);

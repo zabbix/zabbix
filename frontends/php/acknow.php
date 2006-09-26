@@ -19,14 +19,12 @@
 **/
 ?>
 <?php
-	$page["title"]="S_ACKNOWLEDGES";
-	$page["file"]="acknow.php";
-	$page["menu.url"] = "tr_status.php";
+	require_once "include/config.inc.php";
+	require_once "include/acknow.inc.php";
+	require_once "include/forms.inc.php";
 
-	include "include/config.inc.php";
-	include "include/forms.inc.php";
-?>
-<?php
+	$page["title"]	= "S_ACKNOWLEDGES";
+	$page["file"]	= "acknow.php";
 	show_header($page["title"],0,0);
 ?>
 <?php

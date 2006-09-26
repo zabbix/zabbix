@@ -19,11 +19,12 @@
 **/
 ?>
 <?php
+	require_once "include/config.inc.php";
+	require_once "include/forms.inc.php";
+
 	$page["title"]="S_ZABBIX_BIG";
 	$page["file"]="index.php";
 
-	include "include/config.inc.php";
-	include "include/forms.inc.php";
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION

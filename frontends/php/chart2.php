@@ -19,8 +19,9 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
-	include "include/classes/graph.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/graphs.inc.php";
+	require_once "include/classes/graph.inc.php";
 
 	$result=DBselect("select * from graphs where graphid=".$_REQUEST["graphid"]);
 	$row=DBfetch($result);

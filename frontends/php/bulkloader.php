@@ -17,9 +17,10 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-	include "include/config.inc.php";
-	include "include/forms.inc.php";
-	include "include/bulkloader.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/forms.inc.php";
+	require_once "include/bulkloader.inc.php";
+
 	$page["file"] = "bulkloader.php";
 	$page["title"] = "S_BULKLOADER_MAIN";
 	$fileuploaded=0;
@@ -86,7 +87,7 @@
 				//  Determine which template, if any this host is linked to
 				$sqlResult=DBselect("select distinct(hostid) from hosts where status=". HOST_STATUS_TEMPLATE .
 					" and host=".zbx_dbstr($tmpHostTemplate).
-					" and mod(hostid,100)=".$ZBX_CURNODEID;
+					" and ".DBid2nodeid('hostid').'='.$ZBX_CURNODEID);
 				$row=DBfetch($sqlResult);
 				if($row)
 				{
@@ -103,7 +104,7 @@
 				{
 					add_host_group($group_name);
 					$groupid = DBfetch(DBselect("select groupid from groups where name=".zbx_dbstr($group_name).
-					" and mod(groupid,100)=".$ZBX_CURNODEID;
+						" and ".DBid2nodeid('groupid').'='.$ZBX_CURNODEID));
 					if(!$groupid) continue;
 					array_push($groups,$groupid["groupid"]);
 				}

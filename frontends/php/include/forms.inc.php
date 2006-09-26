@@ -128,6 +128,8 @@
 			$new_group_name = get_request('new_group_name', '');
 		}
 
+		$perm_details	= get_request('perm_details',0);
+
 		$media_types = array();
 		$media_type_ids = array();
 		foreach($user_medias as $one_media) $media_type_ids[$one_media['mediatypeid']] = 1;
@@ -226,8 +228,8 @@
 
 				$media_table->AddRow(array(
 					new CCheckBox('user_medias_to_del[]',null,null,$id),
-					$media_types[$one_media['mediatypeid']],
-					$one_media['sendto'],
+					new CSpan($media_types[$one_media['mediatypeid']], 'nowrap'),
+					new CSpan($one_media['sendto'], 'nowrap'),
 					new CSpan($one_media['period'], 'nowrap'),
 					media_severity2str($one_media['severity']),
 					$status)
@@ -258,6 +260,57 @@
 		$frmUser->AddRow(S_AUTO_LOGOUT_IN_SEC,	new CTextBox("autologout",$autologout,5));
 		$frmUser->AddRow(S_URL_AFTER_LOGIN,	new CTextBox("url",$url,50));
 		$frmUser->AddRow(S_SCREEN_REFRESH,	new CTextBox("refresh",$refresh,5));
+	
+		
+		if($profile==0)
+		{
+			$frmUser->AddVar('perm_details', $perm_details);
+
+			$link = new CLink($perm_details ? S_HIDE : S_SHOW ,'#','action');
+			$link->OnClick("return create_var('".$frmUser->GetName()."','perm_details',".($perm_details ? 0 : 1).", true);");
+			$resources_list = array(
+				S_RIGHTS_OF_RESOURCES,
+				SPACE.'(',$link,')'
+				);
+			$frmUser->AddSpanRow($resources_list,'right_header');
+
+			if($perm_details)
+			{
+				$group_ids = array_keys($user_groups);
+				if(count($group_ids) == 0) $group_ids = array(-1);
+				$db_rights = DBselect('select * from rights r where r.groupid in ('.implode(',',$group_ids).')');
+
+				$tmp_perm = array();
+				while($db_right = DBfetch($db_rights))
+				{
+					if(isset($tmp_perm[$db_right['type']][$db_right['id']]))
+					{
+						$tmp_perm[$db_right['type']][$db_right['id']] = 
+							min($tmp_perm[$db_right['type']][$db_right['id']],
+								$db_right['permission']);
+					}
+					else
+					{
+						$tmp_perm[$db_right['type']][$db_right['id']] = $db_right['permission'];
+					}
+				}
+
+				$user_rights = array();
+				foreach($tmp_perm as $type => $res)
+				{
+					foreach($res as $id => $perm)
+					{
+						array_push($user_rights, array(	
+							'type'		=> $type,
+							'id'		=> $id,
+							'permission'	=> $perm
+							));
+					}
+				}
+				
+				$frmUser->AddSpanRow(get_rights_of_elements_table($user_rights));
+			}
+		}
 
 		$frmUser->AddItemToBottomRow(new CButton('save',S_SAVE));
 		if(isset($userid) && $profile == 0)
@@ -269,43 +322,6 @@
 		$frmUser->AddItemToBottomRow(SPACE);
 		$frmUser->AddItemToBottomRow(new CButtonCancel(url_param("config")));
 		$frmUser->Show();
-	}
-
-	# Insert form for User permissions
-	function	insert_permissions_form()
-	{
-		global  $_REQUEST;
-
-		$frmPerm = new CFormTable("New permission","users.php");
-		$frmPerm->SetHelp("web.users.php");
-
-		$frmPerm->AddVar("userid",$_REQUEST["userid"]);
-		$frmPerm->AddVar("config",get_request("config",0));
-
-		$cmbRes = new CComboBox("right");
-		$cmbRes->AddItem("Configuration of Zabbix","Configuration of Zabbix");
-		$cmbRes->AddItem("Default permission","Default permission");
-		$cmbRes->AddItem("Graph","Graph");
-		$cmbRes->AddItem("Host","Host");
-		$cmbRes->AddItem("Screen","Screen");
-		$cmbRes->AddItem("Service","IT Service");
-		$cmbRes->AddItem("Item","Item");
-		$cmbRes->AddItem("Network map","Network map");
-		$cmbRes->AddItem("Trigger comment","Trigger comment");
-		$cmbRes->AddItem("User","User");
-		$cmbRes->AddItem("Application","Application");
-		$frmPerm->AddRow(S_RESOURCE,$cmbRes);
-
-		$cmbPerm = new CComboBox("permission");
-		$cmbPerm->AddItem("R","Read-only");
-		$cmbPerm->AddItem("U","Read-write");
-		$cmbPerm->AddItem("H","Hide");
-		$cmbPerm->AddItem("A","Add");
-		$frmPerm->AddRow(S_PERMISSION,$cmbPerm);
-
-		$frmPerm->AddRow("Resource ID (0 for all)",new CTextBox("id",0));
-		$frmPerm->AddItemToBottomRow(new CButton("register","add permission"));
-		$frmPerm->Show();
 	}
 
 	# Insert form for User Groups
@@ -338,7 +354,7 @@
 				'select r.*i,n.name as name from rights r, nodes n where r.groupid='.$_REQUEST["usrgrpid"].
 					' and r.type='.RESOURCE_TYPE_NODE.' and r.id=n.nodeid',
 				'select r.*i, CONCAT(n.name,":",g.name) as name from rights r, groups g, nodes n'.
-					' where r.groupid='.$_REQUEST["usrgrpid"].' and n.nodeid='.id2nodeid('g.groupid').
+					' where r.groupid='.$_REQUEST["usrgrpid"].' and n.nodeid='.DBid2nodeid('g.groupid').
 					' and r.type='.RESOURCE_TYPE_GROUP.' and r.id=g.groupid',
 		
 				);
@@ -361,6 +377,7 @@
 			$group_users	= get_request("group_users",array());
 			$group_rights	= get_request("group_rights",array());
 		}
+		$perm_details = get_request('perm_details', 0);
 
 		ksort($group_rights);
 
@@ -401,9 +418,9 @@
 
 		$table_Rights = new CTable(S_NO_RIGHTS_DEFINED,'right_table');
 
-		$lstDeny  = new CListBox('right_to_del[deny][]',null,20);
-		$lstRead  = new CListBox('right_to_del[read_only][]',null,20);
-		$lstWrite = new CListBox('right_to_del[read_write][]',null,20);
+		$lstWrite = new CListBox('right_to_del[read_write][]'	,null	,20);
+		$lstRead  = new CListBox('right_to_del[read_only][]'	,null	,20);
+		$lstDeny  = new CListBox('right_to_del[deny][]'		,null	,20);
 
 		foreach($group_rights as $name => $element_data)
 		{
@@ -413,19 +430,19 @@
 			
 		}
 
-		$table_Rights->SetHeader(array(S_READ_ONLY, S_READ_WRITE, S_DENY),'header');
-		$table_Rights->AddRow(array($lstRead, $lstWrite, $lstDeny));
+		$table_Rights->SetHeader(array(S_READ_WRITE, S_READ_ONLY, S_DENY),'header');
+		$table_Rights->AddRow(array(new CCol($lstWrite,'read_write'), new CCol($lstRead,'read_only'), new CCol($lstDeny,'deny')));
 		$table_Rights->AddRow(array(
-			array(	new CButton('add_read_only',S_ADD,
-					"return PopUp('popup_right.php?dstfrm=".$frmUserG->GetName().
-					"&permission=".PERM_READ_ONLY."','new_right',".
-					"'width=450,height=450,resizable=1,scrollbars=1');"),
-				new CButton('del_read_only',S_DELETE_SELECTED)),
 			array(new CButton('add_read_write',S_ADD,
 					"return PopUp('popup_right.php?dstfrm=".$frmUserG->GetName().
 					"&permission=".PERM_READ_WRITE."','new_right',".
 					"'width=450,height=450,resizable=1,scrollbars=1');"),
 				new CButton('del_read_write',S_DELETE_SELECTED)),
+			array(	new CButton('add_read_only',S_ADD,
+					"return PopUp('popup_right.php?dstfrm=".$frmUserG->GetName().
+					"&permission=".PERM_READ_ONLY."','new_right',".
+					"'width=450,height=450,resizable=1,scrollbars=1');"),
+				new CButton('del_read_only',S_DELETE_SELECTED)),
 			array(new CButton('add_deny',S_ADD,
 					"return PopUp('popup_right.php?dstfrm=".$frmUserG->GetName().
 					"&permission=".PERM_DENY."','new_right',".
@@ -434,6 +451,21 @@
 			));
 
 		$frmUserG->AddRow(S_RIGHTS,$table_Rights);
+
+		$frmUserG->AddVar('perm_details', $perm_details);
+
+		$link = new CLink($perm_details ? S_HIDE : S_SHOW ,'#','action');
+		$link->OnClick("return create_var('".$frmUserG->GetName()."','perm_details',".($perm_details ? 0 : 1).", true);");
+		$resources_list = array(
+			S_RIGHTS_OF_RESOURCES,
+			SPACE.'(',$link,')'
+			);
+		$frmUserG->AddSpanRow($resources_list,'right_header');
+
+		if($perm_details)
+		{
+			$frmUserG->AddSpanRow(get_rights_of_elements_table($group_rights));
+		}
 
 		$frmUserG->AddItemToBottomRow(new CButton("save",S_SAVE));
 		if(isset($_REQUEST["usrgrpid"]))
@@ -445,6 +477,77 @@
 		$frmUserG->AddItemToBottomRow(SPACE);
 		$frmUserG->AddItemToBottomRow(new CButtonCancel(url_param("config")));
 		$frmUserG->Show();
+	}
+
+	function	get_rights_of_elements_table($rights=array())
+	{
+		$table = new CTable('S_NO_ACCESSIBLE_RESOURCES', 'right_table');
+		$table->SetHeader(array(SPACE, S_READ_WRITE, S_READ_ONLY, S_DENY),'header');
+
+		$lst['node']['label']		= S_NODES;
+		$lst['node']['read_write']	= new CListBox('nodes_write'	,null	,6);
+		$lst['node']['read_only']	= new CListBox('nodes_read'	,null	,6);
+		$lst['node']['deny']		= new CListBox('nodes_deny'	,null	,6);
+
+		$nodes = get_accessible_nodes_by_rights($rights, PERM_DENY, PERM_MODE_GE, PERM_RES_DATA_ARRAY);
+
+		foreach($nodes as $node)
+		{
+			switch($node['permission'])
+			{
+				case PERM_READ_ONLY:	$list_name='read_only';		break;
+				case PERM_READ_WRITE:	$list_name='read_write';	break;
+				default:		$list_name='deny';		break;
+			}
+			$lst['node'][$list_name]->AddItem($node['nodeid'],$node['name']);
+		}
+
+		$lst['group']['label']		= S_HOST_GROUPS;
+		$lst['group']['read_write']	= new CListBox('groups_write'	,null	,10);
+		$lst['group']['read_only']	= new CListBox('groups_read'	,null	,10);
+		$lst['group']['deny']		= new CListBox('groups_deny'	,null	,10);
+
+		$groups = get_accessible_groups_by_rights($rights, PERM_DENY, PERM_MODE_GE, PERM_RES_DATA_ARRAY);
+
+		foreach($groups as $group)
+		{
+			switch($group['permission'])
+			{
+				case PERM_READ_ONLY:	$list_name='read_only';		break;
+				case PERM_READ_WRITE:	$list_name='read_write';	break;
+				default:		$list_name='deny';		break;
+			}
+			$lst['group'][$list_name]->AddItem($group['groupid'],$group['node_name'].':'.$group['name']);
+		}
+		
+		$lst['host']['label']		= S_HOSTS;
+		$lst['host']['read_write']	= new CListBox('hosts_write'	,null	,15);
+		$lst['host']['read_only']	= new CListBox('hosts_read'	,null	,15);
+		$lst['host']['deny']		= new CListBox('hosts_deny'	,null	,15);
+
+		$hosts = get_accessible_hosts_by_rights($rights, PERM_DENY, PERM_MODE_GE, PERM_RES_DATA_ARRAY);
+		foreach($hosts as $host)
+		{
+			switch($host['permission'])
+			{
+				case PERM_READ_ONLY:	$list_name='read_only';		break;
+				case PERM_READ_WRITE:	$list_name='read_write';	break;
+				default:		$list_name='deny';		break;
+			}
+			$lst['host'][$list_name]->AddItem($host['hostid'],$host['node_name'].':'.$host['host']);
+		}
+		
+		foreach($lst as $name => $lists)
+		{
+			$row = new CRow();
+			foreach($lists as $class => $list_obj)
+			{
+				$row->AddItem(new CCol($list_obj, $class));
+			}
+			$table->AddRow($row);
+		}
+
+		return $table;
 	}
 
 

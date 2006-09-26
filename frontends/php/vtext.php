@@ -19,12 +19,7 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
-
-#	PARAMETERS:
-	
-#	itemid
-#	type
+	require_once "include/config.inc.php";
 
 	$text = get_request("text","");;
 	$font = get_request("font",3);

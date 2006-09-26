@@ -19,8 +19,10 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
-	include "include/forms.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/screens.inc.php";
+	require_once "include/forms.inc.php";
+
 	$page["title"] = "S_CONFIGURATION_OF_SCREENS";
 	$page["file"] = "screenedit.php";
 	show_header($page["title"],0,0);

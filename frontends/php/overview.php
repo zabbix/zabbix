@@ -19,7 +19,11 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/hosts.inc.php";
+	require_once "include/triggers.inc.php";
+	require_once "include/items.inc.php";
+
 	$page["title"] = "S_OVERVIEW";
 	$page["file"] = "overview.php";
 	show_header($page["title"],1,0);

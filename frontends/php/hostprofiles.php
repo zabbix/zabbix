@@ -19,8 +19,9 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
-	include "include/forms.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/hosts.inc.php";
+
 	$page["title"] = "S_HOST_PROFILES";
 	$page["file"] = "hostprofiles.php";
 	show_header($page["title"],0,0);

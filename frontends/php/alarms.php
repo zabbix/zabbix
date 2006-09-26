@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/triggers.inc.php";
+
 	$page["title"] = "S_ALARMS";
 	$page["file"] = "alarms.php";
 	$page["menu.url"] = "tr_status.php";

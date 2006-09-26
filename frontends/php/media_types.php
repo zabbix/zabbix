@@ -19,8 +19,9 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
-	include "include/forms.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/media.inc.php";
+	require_once "include/forms.inc.php";
 
 	$page["title"] = "S_MEDIA_TYPES";
 	$page["file"] = "media_types.php";
@@ -130,7 +131,7 @@
 		$table->setHeader(array(S_DESCRIPTION,S_TYPE));
 
 		$result=DBselect("select mt.mediatypeid,mt.type,mt.description from media_type mt".
-			" where ".id2nodeid('mediatypeid')."=".$ZBX_CURNODEID.
+			" where ".DBid2nodeid('mediatypeid')."=".$ZBX_CURNODEID.
 			" order by mt.type");
 		while($row=DBfetch($result))
 		{

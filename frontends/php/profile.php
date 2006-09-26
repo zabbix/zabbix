@@ -19,8 +19,9 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
-	include "include/forms.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/users.inc.php";
+	require_once "include/forms.inc.php";
 
 	$page["title"] = "S_USER_PROFILE";
 	$page["file"] = "profile.php";
@@ -78,7 +79,7 @@
 ?>
 
 <?php
-	@insert_user_form($USER_DETAILS["userid"],1);
+	insert_user_form($USER_DETAILS["userid"],1);
 ?>
 
 <?php

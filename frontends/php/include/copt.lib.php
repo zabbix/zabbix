@@ -90,7 +90,7 @@
 	define("USE_TIME_PROF",1);
 	define("USE_MEM_PROF",1);
 	define("USE_SQLREQUEST_PROF",1);
-//	define("SHOW_SQLREQUEST_DETAILS",1);
+	//define("SHOW_SQLREQUEST_DETAILS",1);
 
 if(defined('USE_PROFILING'))
 {
@@ -112,6 +112,15 @@ if(defined('USE_TIME_PROF')) {
 }
 		}
 
+
+		/* public static */ function showmemoryusage($descr=null)
+		{
+if(defined('USE_MEM_PROF')) {
+			$memory_usage = COpt::getmemoryusage();
+			$memory_usage = $memory_usage.'b | '.($memory_usage>>10).'K | '.($memory_usage>>20).'M';
+			SDI('PHP memory usage ['.$descr.'] '.$memory_usage);
+}
+		}
 
 		/* protected static */ function getmemoryusage() {
 if(defined('USE_MEM_PROF')) {
@@ -209,6 +218,7 @@ else
 		/* public static */ function profiling_start($type=NULL) {}
 		/* public static */ function profiling_stop($type=NULL) {}
 		/* public static */ function savesqlrequest($sql) {}
+		/* public static */ function showmemoryusage($descr=null) {}
 	}
 }
 

@@ -19,7 +19,9 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/audit.inc.php";
+
 	$page["title"] = "S_AUDIT_LOG";
 	$page["file"] = "audit.php";
 	show_header($page["title"],1,0);

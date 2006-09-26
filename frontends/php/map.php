@@ -19,10 +19,20 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
-	include_once "include/locales/en_gb.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/maps.inc.php";
 
+/*
+	$page["title"] = "S_MAP";
+	$page["file"] = "map.php";
+
+	show_header($page["title"],0,1);
+*/
+// OR
+//*
+	require_once "include/locales/en_gb.inc.php";
 	process_locales();
+/**/
 
 #	PARAMETERS:
 

@@ -36,9 +36,13 @@
 	$ZBX_CURNODEID = 1; // Selected node
 	$ZBX_LOCALNODEID = 1; // Local node
 
-	function id2nodeid($id_name)
+	function DBid2nodeid($id_name)
 	{
 		return 'mod('.$id_name.',100)';
+	}
+	function id2nodeid($id_var)
+	{
+		return ($id_var % 100);
 	}
 
 	if($DB_TYPE == "MYSQL")

@@ -23,7 +23,8 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 
 ?>
 <?php
-	include_once("include/copt.lib.php");
+	require_once 	"include/html.inc.php";
+	require_once	"include/copt.lib.php";
 
 // GLOBALS
 	$USER_DETAILS	= array();
@@ -40,58 +41,42 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 		$_REQUEST= zbx_stripslashes($_REQUEST);
 	}
 
-	include_once 	"include/defines.inc.php";
-	include_once 	"include/db.inc.php";
-	include_once 	"include/html.inc.php";
-	include_once 	"include/locales.inc.php";
-	include_once 	"include/perm.inc.php";
-
-	include_once 	"include/audit.inc.php";
-	include_once 	"include/acknow.inc.php";
-	include_once 	"include/autoregistration.inc.php";
-	include_once 	"include/escalations.inc.php";
-	include_once 	"include/hosts.inc.php";
-	include_once 	"include/users.inc.php";
-	include_once 	"include/graphs.inc.php";
-	include_once 	"include/items.inc.php";
-	include_once 	"include/screens.inc.php";
-	include_once 	"include/triggers.inc.php";
-	include_once 	"include/actions.inc.php";
-        include_once    "include/events.inc.php";
-	include_once 	"include/profiles.inc.php";
-	include_once 	"include/services.inc.php";
-	include_once 	"include/maps.inc.php";
-	include_once 	"include/media.inc.php";
+	require_once 	"include/defines.inc.php";
+	require_once 	"include/db.inc.php";
+	require_once 	"include/locales.inc.php";
+	require_once 	"include/perm.inc.php";
+	require_once 	"include/audit.inc.php";
 
 // Include Validation
 
-	include_once 	"include/validate.inc.php";
+	require_once 	"include/validate.inc.php";
 
 // Include Classes
-	include_once("include/classes/ctag.inc.php");
-	include_once("include/classes/cvar.inc.php");
-	include_once("include/classes/cspan.inc.php");
-	include_once("include/classes/cimg.inc.php");
-	include_once("include/classes/clink.inc.php");
-	include_once("include/classes/chelp.inc.php");
-	include_once("include/classes/cbutton.inc.php");
-	include_once("include/classes/ccombobox.inc.php");
-	include_once("include/classes/ctable.inc.php");
-	include_once("include/classes/ctableinfo.inc.php");
-	include_once("include/classes/ctextarea.inc.php");
-	include_once("include/classes/ctextbox.inc.php");
-	include_once("include/classes/cpassbox.inc.php");
-	include_once("include/classes/cform.inc.php");
-	include_once("include/classes/cfile.inc.php");
-	include_once("include/classes/ccheckbox.inc.php");
-	include_once("include/classes/clistbox.inc.php");
-	include_once("include/classes/cform.inc.php");
-	include_once("include/classes/cformtable.inc.php");
-	include_once("include/classes/cmap.inc.php");
-	include_once("include/classes/cflash.inc.php");
-	include_once("include/classes/ciframe.inc.php");
+	require_once("include/classes/ctag.inc.php");
+	require_once("include/classes/cvar.inc.php");
+	require_once("include/classes/cspan.inc.php");
+	require_once("include/classes/cimg.inc.php");
+	require_once("include/classes/clink.inc.php");
+	require_once("include/classes/chelp.inc.php");
+	require_once("include/classes/cbutton.inc.php");
+	require_once("include/classes/ccombobox.inc.php");
+	require_once("include/classes/ctable.inc.php");
+	require_once("include/classes/ctableinfo.inc.php");
+	require_once("include/classes/ctextarea.inc.php");
+	require_once("include/classes/ctextbox.inc.php");
+	require_once("include/classes/cpassbox.inc.php");
+	require_once("include/classes/cform.inc.php");
+	require_once("include/classes/cfile.inc.php");
+	require_once("include/classes/ccheckbox.inc.php");
+	require_once("include/classes/clistbox.inc.php");
+	require_once("include/classes/cform.inc.php");
+	require_once("include/classes/cformtable.inc.php");
+	require_once("include/classes/cmap.inc.php");
+	require_once("include/classes/cflash.inc.php");
+	require_once("include/classes/ciframe.inc.php");
 
 // Include Tactical Overview modules
+
 	include_once("include/classes/chostsinfo.mod.php");
 	include_once("include/classes/ctriggerinfo.mod.php");
 	include_once("include/classes/cserverinfo.mod.php");

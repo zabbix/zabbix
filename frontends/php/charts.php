@@ -19,7 +19,10 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/hosts.inc.php";
+	require_once "include/graphs.inc.php";
+
 	$page["title"] = "S_CUSTOM_GRAPHS";
 	$page["file"] = "charts.php";
 
@@ -39,7 +42,6 @@
 	}
 
 ?>
-
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(

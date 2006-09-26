@@ -19,8 +19,10 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
-	include "include/classes/graph.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/hosts.inc.php";
+	require_once "include/items.inc.php";
+	require_once "include/classes/graph.inc.php";
 
 	$graph=new Graph();
 	if(isset($_REQUEST["period"]))

@@ -19,8 +19,7 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
-	include "include/forms.inc.php";
+	require_once "include/config.inc.php";
 
 	$page["title"] = "S_RESOURCE";
 	$page["file"] = "popup_right.php";
@@ -102,7 +101,7 @@ function add_right(formname,type,id,permission,name)
 	elseif($type == RESOURCE_TYPE_GROUP)
 	{
 		$db_resources = DBselect('select CONCAT(n.name,":",g.name) as name, g.groupid as id from groups g, nodes n '.
-			' where '.id2nodeid('g.groupid').'=n.nodeid order by n.name, g.name');
+			' where '.DBid2nodeid('g.groupid').'=n.nodeid order by n.name, g.name');
 		
 			
 	}
