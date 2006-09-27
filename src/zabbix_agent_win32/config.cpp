@@ -347,7 +347,7 @@ CHECK_MEMORY(main, "ReadConfig", "fopen==NULL");
          n=atoi(ptr);
          if ((n<1)||(n>65535))
          {
-            confListenPort=10000;
+            confListenPort=10050;
             errors++;
             if (IsStandalone())
                printf("Error in configuration file, line %d: invalid port number (%s)\n",sourceLine,ptr);

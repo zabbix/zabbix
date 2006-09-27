@@ -1,5 +1,6 @@
 Changes for 1.1.3:
 
+ - fixed assignment of default listen port for Win agent (Eugene)
  - changed return value for 'net.tcp.port[]' of Win agent (Eugene)
  - added images for postgres (Eugene)
  - fixed reversed icons on maps (Eugene)
