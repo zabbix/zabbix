@@ -21,6 +21,7 @@
 <?php
 	require_once "include/config.inc.php";
 	require_once "include/autoregistration.inc.php";
+	require_once "include/images.inc.php";
 	require_once "include/forms.inc.php";
 
 	$page["title"] = "S_CONFIGURATION_OF_ZABBIX";
@@ -28,15 +29,6 @@
 
 	show_header($page["title"],0,0);
 	insert_confirm_javascript();
-?>
-
-<?php
-        if(!check_anyright("Configuration of Zabbix","U"))
-        {
-                show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-                show_page_footer();
-                exit;
-        }
 ?>
 <?php
 	$fields=array(
@@ -115,14 +107,14 @@
 
 				$msg_ok = S_IMAGE_UPDATED;
 				$msg_fail = S_CANNOT_UPDATE_IMAGE;
-				$audit_action = "Image updated";
+				$audit_action = "Image [".$_REQUEST["name"]."] updated";
 			} else {
 	/* ADD */
 				$result=add_image($_REQUEST["name"],$_REQUEST["imagetype"],$file);
 
 				$msg_ok = S_IMAGE_ADDED;
 				$msg_fail = S_CANNOT_ADD_IMAGE;
-				$audit_action = "Image added";
+				$audit_action = "Image [".$_REQUEST["name"]."] added";
 			}
 			show_messages($result, $msg_ok, $msg_fail);
 			if($result)
@@ -132,11 +124,13 @@
 			}
 		} elseif(isset($_REQUEST["delete"])&&isset($_REQUEST["imageid"])) {
 	/* DELETE */
+			$image = get_image_by_imageid($_REQUEST["imageid"]);
+			
 			$result=delete_image($_REQUEST["imageid"]);
 			show_messages($result, S_IMAGE_DELETED, S_CANNOT_DELETE_IMAGE);
 			if($result)
 			{
-				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,"Image deleted");
+				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,"Image [".$image['name']."] deleted");
 				unset($_REQUEST["form"]);
 			}
 			unset($_REQUEST["imageid"]);

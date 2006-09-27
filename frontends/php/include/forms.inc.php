@@ -25,6 +25,11 @@
 	include_once 	"include/classes/graph.inc.php";
 	include_once 	"include/db.inc.php";
 
+	function	insert_node_form()
+	{
+		SDI('TODO'); /* TODO node form realization */
+	}
+	
 	function	insert_new_message_form()
 	{
 		global $USER_DETAILS;
@@ -2314,46 +2319,21 @@
 	}
 
 	function	insert_media_form()
-	{
+	{	/* NOTE: only NEW media is acessed */
+
 		global $_REQUEST;
 		global $ZBX_CURNODEID;
 
-		$severity = get_request("severity",array(0,1,2,3,4,5));
-
-//		if(isset($_REQUEST["mediaid"]) && !isset($_REQUEST["form_refresh"]))
-//		{
-//			$media=get_media_by_mediaid($_REQUEST["mediaid"]);
-//
-//			$sendto		= $media["sendto"];
-//			$mediatypeid	= $media["mediatypeid"];
-//			$active		= $media["active"];
-//			$period		= $media["period"];
-//
-//			if($media["severity"] & 1)	array_push($severity,0);
-//			if($media["severity"] & 2)	array_push($severity,1);
-//			if($media["severity"] & 4)	array_push($severity,2);
-//			if($media["severity"] & 8)	array_push($severity,3);
-//			if($media["severity"] & 16)	array_push($severity,4);
-//			if($media["severity"] & 32)	array_push($severity,5);
-//		}
-//		else
-//		{
-			$sendto		= get_request("sendto","");
-			$mediatypeid	= get_request("mediatypeid",0);
-			$active		= get_request("active",0);
-			$period		= get_request("period","1-7,00:00-23:59");
-//		}
+		$severity	= get_request("severity",array(0,1,2,3,4,5));
+		$sendto		= get_request("sendto","");
+		$mediatypeid	= get_request("mediatypeid",0);
+		$active		= get_request("active",0);
+		$period		= get_request("period","1-7,00:00-23:59");
 
 		$frmMedia = new CFormTable(S_NEW_MEDIA);
 		$frmMedia->SetHelp("web.media.php");
 
 		$frmMedia->AddVar("dstfrm",$_REQUEST["dstfrm"]);
-
-//		$frmMedia->AddVar("userid",$_REQUEST["userid"]);
-//		if(isset($_REQUEST["mediaid"]))
-//		{
-//			$frmMedia->AddVar("mediaid",$_REQUEST["mediaid"]);
-//		}
 
 		$cmbType = new CComboBox("mediatypeid",$mediatypeid);
 		$types=DBselect("select mediatypeid,description from media_type".
@@ -2388,12 +2368,6 @@
 		$frmMedia->AddRow("Status",$cmbStat);
 	
 		$frmMedia->AddItemToBottomRow(new CButton("add", S_ADD));
-//		if(isset($_REQUEST["mediaid"]))
-//		{
-//			$frmMedia->AddItemToBottomRow(SPACE);
-//			$frmMedia->AddItemToBottomRow(new CButtonDelete(S_DELETE_SELECTED_MEDIA_Q,
-//				url_param("form").url_param("userid").url_param("mediaid")));
-//		}
 		$frmMedia->AddItemToBottomRow(SPACE);
 		$frmMedia->AddItemToBottomRow(new CButton('cancel',S_CANCEL,'window.close();'));
 		$frmMedia->Show();
@@ -2887,7 +2861,7 @@
 			$name		= $row["name"];
 			$width		= $row["width"];
 			$height		= $row["height"];
-			$background	= $row["background"];
+			$backgroundid	= $row["backgroundid"];
 			$label_type	= $row["label_type"];
 			$label_location	= $row["label_location"];
 		}
@@ -2896,7 +2870,7 @@
 			$name		= get_request("name","");
 			$width		= get_request("width",800);
 			$height		= get_request("height",600);
-			$background	= get_request("background","");
+			$backgroundid	= get_request("backgroundid",0);
 			$label_type	= get_request("label_type",0);
 			$label_location	= get_request("label_location",0);
 		}
@@ -2912,11 +2886,13 @@
 		$frmMap->AddRow(S_WIDTH,new CTextBox("width",$width,5));
 		$frmMap->AddRow(S_HEIGHT,new CTextBox("height",$height,5));
 
-		$cmbImg = new CComboBox("background",$background);
-		$cmbImg->AddItem('',"No image...");
-		$result=DBselect("select name from images where imagetype=2 order by name");
+		$cmbImg = new CComboBox("backgroundid",$backgroundid);
+		$cmbImg->AddItem(0,"No image...");
+		$result=DBselect("select * from images where imagetype=2 order by name");
 		while($row=DBfetch($result))
-			$cmbImg->AddItem($row["name"],$row["name"]);
+		{
+			$cmbImg->AddItem($row["imageid"],$row["name"]);
+		}
 		$frmMap->AddRow(S_BACKGROUND_IMAGE,$cmbImg);
 
 		$cmbLabel = new CComboBox("label_type",$label_type);
@@ -2970,9 +2946,9 @@
 			$label		= $element["label"];
 			$x		= $element["x"];
 			$y		= $element["y"];
-			$icon		= $element["icon"];
 			$url		= $element["url"];
-			$icon_on	= $element["icon_on"];
+			$iconid_off	= $element["iconid_off"];
+			$iconid_on	= $element["iconid_on"];
 			$label_location	= $element["label_location"];
 			if(is_null($label_location)) $label_location = -1;
 		}
@@ -2983,9 +2959,9 @@
 			$label		= get_request("label",		"");
 			$x		= get_request("x",		0);
 			$y		= get_request("y",		0);
-			$icon		= get_request("icon",		"");
 			$url		= get_request("url",		"");
-			$icon_on	= get_request("icon_on",	"");
+			$iconid_off	= get_request("iconid_off",	0);
+			$iconid_on	= get_request("iconid_on",	0);
 			$label_location	= get_request("label_location",	"-1");
 		}
 
@@ -3065,17 +3041,16 @@
 			$frmEl->AddRow(S_TRIGGER, $cmbTriggers);
 		}
 
-		$cmbIcon = new CComboBox("icon",$icon);
-		$result=DBselect("select name from images where imagetype=1 order by name");
+		$cmbIconOff	= new CComboBox("iconid_off",$iconid_off);
+		$cmbIconOn	= new CComboBox("iconid_on",$iconid_on);
+		$result = DBselect("select * from images where imagetype=1 order by name");
 		while($row=DBfetch($result))
-			$cmbIcon->AddItem($row["name"],$row["name"]);
-		$frmEl->AddRow("Icon (OFF)",$cmbIcon);
-
-		$cmbIcon = new CComboBox("icon_on",$icon_on);
-		$result=DBselect("select name from images where imagetype=1 order by name");
-		while($row=DBfetch($result))
-			$cmbIcon->AddItem($row["name"],$row["name"]);
-		$frmEl->AddRow("Icon (ON)",$cmbIcon);
+		{
+			$cmbIconOff->AddItem($row["imageid"],$row["name"]);
+			$cmbIconOn->AddItem($row["imageid"],$row["name"]);
+		}
+		$frmEl->AddRow("Icon (OFF)",$cmbIconOff);
+		$frmEl->AddRow("Icon (ON)",$cmbIconOn);
 
 		$frmEl->AddRow("Coordinate X", new CTextBox("x", $x, 5));
 		$frmEl->AddRow("Coordinate Y", new CTextBox("y", $y, 5));

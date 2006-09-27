@@ -117,15 +117,15 @@ table.formtable td.form_row_last {
 	text-align: right;
 }
 table.formtable td.form_row_l { /* left cell */
-	border-left-style: solid;
-	border-top-style: none;
-	border-right-style: none;
-	border-bottom-style: none;
-	border-color: #222255;
-	text-align: left;
-	white-space: nowrap;
-	word-spacing: nowrap;
-	width: 10;
+	border-left-style:	solid;
+	border-top-style:	none;
+	border-right-style:	none;
+	border-bottom-style:	none;
+	border-color:	#222255;
+	text-align:	left;
+	white-space:	nowrap;
+	word-spacing:	nowrap;
+	width:		50%;
 }
 table.formtable td.form_row_c { /* center cell */
 	border-right-style: solid;

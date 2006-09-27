@@ -58,10 +58,10 @@
 		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
 	);
-?>
-
-<?php
+	
 	check_fields($fields);
+?>
+<?php
 
 /* MEDIATYPE ACTIONS */
 	$result = 0;
@@ -115,30 +115,46 @@
 
 	$form = new CForm();
 	$form->AddItem(new CButton("form",S_CREATE_MEDIA_TYPE));
-	show_header2(S_CONFIGURATION_OF_ZABBIX_BIG, $form);
-	echo BR;
+	show_header2(S_CONFIGURATION_OF_MEDIA_TYPES_BIG, $form);
 ?>
 <?php
 	if(isset($_REQUEST["form"]))
 	{
+		echo BR;
 		insert_media_type_form();
 	}
 	else
 	{
-		show_table_header(S_MEDIA_TYPES_BIG);
-
 		$table=new CTableInfo(S_NO_MEDIA_TYPES_DEFINED);
-		$table->setHeader(array(S_DESCRIPTION,S_TYPE));
+		$table->setHeader(array(S_DESCRIPTION,S_TYPE,S_DETAILS));
 
-		$result=DBselect("select mt.mediatypeid,mt.type,mt.description from media_type mt".
+		$result=DBselect("select mt.* from media_type mt".
 			" where ".DBid2nodeid('mediatypeid')."=".$ZBX_CURNODEID.
 			" order by mt.type");
 		while($row=DBfetch($result))
 		{
-
+			switch($row['type'])
+			{
+				case ALERT_TYPE_EMAIL:
+					$details =
+						S_SMTP_SERVER.": '".$row['smtp_server']."', ".
+						S_SMTP_HELO.": '".$row['smtp_helo']."', ". 
+						S_SMTP_EMAIL.": '".$row['smtp_email']."'";
+					break;
+				case ALERT_TYPE_EXEC:
+					$details = S_SCRIPT_NAME.": '".$row['exec_path']."'";
+					break;
+				case ALERT_TYPE_SMS:
+					$details = S_GSM_MODEM.": '".$row['gsm_modem']."'";
+					break;
+				default:
+					$details = '';
+			}
+			
 			$table->addRow(array(
 				new CLink($row["description"],"?&form=update&mediatypeid=".$row["mediatypeid"],'action'),
-				media_type2str($row['type'])));
+				media_type2str($row['type']),
+				$details));
 		}
 		$table->show();
 	}

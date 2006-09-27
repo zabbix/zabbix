@@ -367,8 +367,8 @@
 			show_messages($result, S_APPLICATION_DELETED, S_CANNOT_DELETE_APPLICATION);
 			if($result)
 			{
-// TODO				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_APPLICATION,
-// TODO				"Application [".$app["name"]."] from host [".$host["host"]."]");
+				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_APPLICATION,
+					"Application [".$app["name"]."] from host [".$host["host"]."]");
 
 				unset($_REQUEST["form"]);
 				unset($_REQUEST["applicationid"]);
@@ -385,8 +385,8 @@
 				if(!delete_application($db_app["applicationid"]))	continue;
 				$result = 1;
 
-// TODO				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_APPLICATION,
-// TODO				"Application [".$app["name"]."] from host [".$host["host"]."]");
+				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_APPLICATION,
+					"Application [".$app["name"]."] from host [".$host["host"]."]");
 			}
 			show_messages($result, S_APPLICATION_DELETED, NULL);
 		}

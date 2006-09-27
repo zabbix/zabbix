@@ -64,16 +64,15 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 	require_once("include/classes/ctableinfo.inc.php");
 	require_once("include/classes/ctextarea.inc.php");
 	require_once("include/classes/ctextbox.inc.php");
-	require_once("include/classes/cpassbox.inc.php");
 	require_once("include/classes/cform.inc.php");
 	require_once("include/classes/cfile.inc.php");
 	require_once("include/classes/ccheckbox.inc.php");
-	require_once("include/classes/clistbox.inc.php");
 	require_once("include/classes/cform.inc.php");
 	require_once("include/classes/cformtable.inc.php");
 	require_once("include/classes/cmap.inc.php");
 	require_once("include/classes/cflash.inc.php");
 	require_once("include/classes/ciframe.inc.php");
+	require_once("./include/classes/graph.inc.php");
 
 // Include Tactical Overview modules
 
@@ -984,7 +983,9 @@ COpt::profiling_start("page");
 							array("url"=>"items.php"	,"label"=>S_ITEMS		),
 							array("url"=>"triggers.php"	,"label"=>S_TRIGGERS		),
 							array("url"=>"actionconf.php"	,"label"=>S_ACTIONS		),
-							array("url"=>"sysmaps.php"	,"label"=>S_MAPS		),
+							array("url"=>"sysmaps.php"	,"label"=>S_MAPS		,
+								"sub_pages"=>array("sysmap.php")
+								),
 							array("url"=>"graphs.php"	,"label"=>S_GRAPHS		,
 								"sub_pages"=>array("graph.php")
 								),
@@ -1000,10 +1001,11 @@ COpt::profiling_start("page");
 						"default_page_id"	=> 0,
 						"pages"=>array(
 							array("url"=>"admin.php"	,"label"=>S_ADMINISTRATION	),
-							array("url"=>"media_types.php"	,"label"=>S_MEDIA_TYPES		),
+							array("url"=>"nodes.php"	,"label"=>S_NODES		),
 							array("url"=>"users.php"	,"label"=>S_USERS		),
+							array("url"=>"media_types.php"	,"label"=>S_MEDIA_TYPES		),
 							array("url"=>"audit.php"	,"label"=>S_AUDIT		,
-								"sub_pages"=>array("media.php","popup_media.php",
+								"sub_pages"=>array("popup_media.php",
 									"popup_usrgrp.php","popup_right.php")
 								)
 							)
@@ -1018,6 +1020,8 @@ COpt::profiling_start("page");
 							)
 						),
 				);
+
+COpt::compare_files_with_menu($menu);
 
 			$table = new CTable(NULL,"page_header");
 			$table->SetCellSpacing(0);
@@ -1078,7 +1082,6 @@ COpt::profiling_start("page");
 						}					
 					}
 				}
-
 
 				if(!is_null($menu_url)) /* active menu */
 				{
@@ -1192,233 +1195,6 @@ COpt::profiling_start("page");
 			$table->AddRow(array(date(S_DATE_FORMAT_YMDHMS,$row["clock"]),	$value));
 		}
 		return $table;
-	}
-
-	function	get_image_by_name($name,$imagetype=NULL)
-	{
-		global $DB_TYPE;
-
-		$sql="select image from images where name=".zbx_dbstr($name); 
-		if(isset($imagetype))
-			$sql .= "and imagetype=".$imagetype;
-
-		$result=DBselect($sql);
-		$row=DBfetch($result);
-		if($row)
-		{
-			if($DB_TYPE == "ORACLE")
-			{
-				if(!isset($row['image']))
-					return 0;
-
-				$row['image'] = $row['image']->load();
-			}
-			else if($DB_TYPE == "POSTGRESQL")
-			{
-				$row['image'] = pg_unescape_bytea($row['image']);
-			}
-
-			return	$row;
-		}
-		else
-		{
-			return 0;
-		}
-	}
-
-	function	get_image_by_imageid($imageid)
-	{
-		global $DB_TYPE;
-
-		$result=DBselect('select * from images where imageid='.$imageid);
-		$row=DBfetch($result);
-		if($row)
-		{
-			if($DB_TYPE == "ORACLE")
-			{
-				if(!isset($row['image']))
-					return 0;
-
-				$row['image'] = $row['image']->load();
-			}
-			else if($DB_TYPE == "POSTGRESQL")
-			{
-				$row['image'] = pg_unescape_bytea($row['image']);
-//SDI($row['image']);
-			}
-			return	$row;
-		}
-		else
-		{
-			return 0;
-		}
-	}
-
-	function	add_image($name,$imagetype,$file)
-	{
-		global $DB_TYPE;
-		global $DB;
-
-		if(!is_null($file))
-		{
-			if($file["error"] != 0 || $file["size"]==0)
-			{
-				error("Incorrect Image");
-				return FALSE;
-			}
-			if($file["size"]<1024*1024)
-			{
-				$image=fread(fopen($file["tmp_name"],"r"),filesize($file["tmp_name"]));
-				if($DB_TYPE == "ORACLE")
-				{
-					$lobimage = OCINewDescriptor($DB, OCI_D_LOB);
-
-					$imageid=get_dbid("images","imageid");
-
-					$sql = "insert into images (imageid,name,imagetype,image)".
-						" values ($imageid,".zbx_dbstr($name).",".$imagetype.",EMPTY_BLOB())".
-						" return image into :image";
-					$stid = OCIParse($DB, $sql);
-					if(!$stid)
-					{
-						$e = ocierror($stid);
-						error("Parse SQL error [".$e["message"]."] in [".$e["sqltext"]."]");
-						return false;
-					}
-
-					OCIBindByName($stid, ':image', $lobimage, -1, OCI_B_BLOB);
-
-					$result = OCIExecute($stid, OCI_DEFAULT);
-					if(!$result){
-						$e = ocierror($stid);
-						error("Execute SQL error [".$e["message"]."] in [".$e["sqltext"]."]");
-						return false;
-					}
-
-					if ($lobimage->save($image)) {
-						OCICommit($DB);
-					}
-					else {
-						OCIRollback($DB);
-						error("Couldn't save image!\n");
-						return false;
-					}
-
-					$lobimage->free();
-					OCIFreeStatement($stid);
-
-					return $stid;
-				}
-				else if($DB_TYPE == "POSTGRESQL")
-				{
-					$image = pg_escape_bytea($image);
-
-					$sql = "insert into images (name,imagetype,image)".
-						" values (".zbx_dbstr($name).",".$imagetype.",'".$image."')";
-					return	DBexecute($sql);
-				}
-				$sql = "insert into images (name,imagetype,image)".
-					" values (".zbx_dbstr($name).",".$imagetype.",".zbx_dbstr($image).")";
-				return	DBexecute($sql);
-			}
-			else
-			{
-				error("Image size must be less than 1Mb");
-				return false;
-			}
-		}
-		else
-		{
-			error("Select image to download");
-			return false;
-		}
-	}
-
-	function	update_image($imageid,$name,$imagetype,$file)
-	{
-		global $DB_TYPE;
-		global $DB;
-
-		if(!is_null($file))
-		{
-			if($file["error"] != 0 || $file["size"]==0)
-			{
-				error("Incorrect Image");
-				return FALSE;
-			}
-			if($file["size"]<1024*1024)
-			{
-				$image=fread(fopen($file["tmp_name"],"r"),filesize($file["tmp_name"]));
-
-				if($DB_TYPE == "ORACLE")
-				{
-
-					$result = DBexecute("update images set name=".zbx_dbstr($name).
-						",imagetype=".zbx_dbstr($imagetype).
-						" where imageid=$imageid");
-
-					if(!$result) return $result;
-
-					$stid = OCIParse($DB, "select image from images where imageid=".$imageid." for update");
-
-					$result = OCIExecute($stid, OCI_DEFAULT);
-					if(!$result){
-						$e = ocierror($stid);
-						error("Execute SQL error [".$e["message"]."] in [".$e["sqltext"]."]");
-						OCIRollback($DB);
-						return false;
-					}
-
-					$row = DBfetch($stid);
-
-					$lobimage = $row['image'];
-
-//					if (!($lobimage->erase()))
-//					{
-//						OCIRollback($DB);
-//						error("Failed to truncate LOB\n");
-//						return false;
-//					}
-
-					if (!$lobimage->save($image)) {
-						OCIRollback($DB);
-					} else {
-						OCICommit($DB);
-					}
-
-					$lobimage->free();
-
-					return $stid;
-				}
-				else if($DB_TYPE == "POSTGRESQL")
-				{
-					$image = pg_escape_bytea($image);
-					$sql="update images set name=".zbx_dbstr($name).",imagetype=".zbx_dbstr($imagetype).
-						",image='".$image."' where imageid=$imageid";
-					return	DBexecute($sql);
-				}
-
-				$sql="update images set name=".zbx_dbstr($name).",imagetype=".zbx_dbstr($imagetype).
-					",image=".zbx_dbstr($image)." where imageid=$imageid";
-				return	DBexecute($sql);
-			}
-			else
-			{
-				error("Image size must be less than 1Mb");
-				return FALSE;
-			}
-		}
-		else
-		{
-				$sql="update images set name=".zbx_dbstr($name).",imagetype=".zbx_dbstr($imagetype)." where imageid=$imageid";
-				return	DBexecute($sql);
-		}
-	}
-
-	function	delete_image($imageid)
-	{
-		$sql="delete from images where imageid=$imageid";
-		return	DBexecute($sql);
 	}
 
 	function	delete_rights_by_userid($userid )
@@ -2365,7 +2141,7 @@ COpt::profiling_stop("script");
 		return "Unknown";
         }
 
-$SHOW_HINT_SCRIPT_ISERTTED = false; /* TODO rewrite with include */
+$SHOW_HINT_SCRIPT_ISERTTED = false; /* TODO rewrite with JS include */
 
 	function insert_showhint_javascript()
 	{
@@ -2462,6 +2238,11 @@ else if (document.getElementById)
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--
+	function Redirect(url) {
+		window.location = url;
+		return false;
+	}	
+
 	function create_var(form_name, var_name, var_val, submit)
 	{
 		var frmForm = document.forms[form_name];
@@ -2490,11 +2271,6 @@ else if (document.getElementById)
 		else
 			return false;
 	}
-	function Redirect(url)
-	{
-		window.location = url;
-		return false;
-	}	
 	function PopUp(url,form_name,param)
 	{
 		window.open(url,form_name,param);
@@ -2520,13 +2296,13 @@ else if (document.getElementById)
 
 	function Redirect($url)
 	{
-echo "
-<script language=\"JavaScript\" type=\"text/javascript\">
+?>
+<script language="JavaScript" type="text/javascript">
 <!--
-	Redirect('$url');
+	window.location = '<?php echo $url ?>';
 //-->
 </script>
-                ";
+<?php
 	}
 
 	function insert_javascript_clock($form, $field)

@@ -20,6 +20,7 @@
 ?>
 <?php
 	require_once "include/config.inc.php";
+	require_once "include/maps.inc.php";
 	require_once "include/forms.inc.php";
 
 	$page["title"] = "S_CONFIGURATION_OF_NETWORK_MAPS";
@@ -27,15 +28,6 @@
 
 	show_header($page["title"],0,0);
 	insert_confirm_javascript();
-?>
-
-<?php
-	if(!check_right("Network map","U",$_REQUEST["sysmapid"]))
-	{
-		show_table_header("<font color=\"AA0000\">No permissions !</font>");
-		show_page_footer();
-		exit;
-	}
 ?>
 <?php
 
@@ -49,8 +41,8 @@
 		"label"=>	array(T_ZBX_STR, O_OPT,  NULL, NOT_EMPTY,	'isset({save})'),
 		"x"=>		array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,65535),'isset({save})'),
 		"y"=>           array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,65535),'isset({save})'),
-		"icon"=>	array(T_ZBX_STR, O_OPT,  NULL, NOT_EMPTY,	'isset({save})'),
-		"icon_on"=>	array(T_ZBX_STR, O_OPT,  NULL, NOT_EMPTY,	'isset({save})'),
+		"iconid_off"=>	array(T_ZBX_INT, O_OPT,  NULL, DB_ID,		'isset({save})'),
+		"iconid_on"=>	array(T_ZBX_INT, O_OPT,  NULL, DB_ID,		'isset({save})'),
 		"url"=>		array(T_ZBX_STR, O_OPT,  NULL, NULL,		'isset({save})'),
 		"label_location"=>array(T_ZBX_INT, O_OPT, NULL,	IN("-1,0,1,2,3"),'isset({save})'),
 
@@ -89,7 +81,7 @@
 			$result=update_sysmap_element($_REQUEST["selementid"],
 				$_REQUEST["sysmapid"],$_REQUEST["elementid"],$_REQUEST["elementtype"],
 				$_REQUEST["label"],$_REQUEST["x"],$_REQUEST["y"],
-				$_REQUEST["icon"],$_REQUEST["url"],$_REQUEST["icon_on"],
+				$_REQUEST["iconid_off"],$_REQUEST["url"],$_REQUEST["iconid_on"],
 				$_REQUEST["label_location"]);
 			show_messages($result,"Element updated","Cannot update element");
 		}
@@ -97,7 +89,7 @@
 		{ // add element
 			$result=add_element_to_sysmap($_REQUEST["sysmapid"],$_REQUEST["elementid"],
 				$_REQUEST["elementtype"],$_REQUEST["label"],$_REQUEST["x"],$_REQUEST["y"],
-				$_REQUEST["icon"],$_REQUEST["url"],$_REQUEST["icon_on"],
+				$_REQUEST["iconid_off"],$_REQUEST["url"],$_REQUEST["iconid_on"],
 				$_REQUEST["label_location"]);
 
 			show_messages($result,"Element added","Cannot add element");
@@ -201,8 +193,8 @@
 				nbsp($type),
 				$db_element["x"],
 				$db_element["y"],
-				nbsp($db_element["icon_on"]),
-				nbsp($db_element["icon"])
+				new CImg("image.php?height=24&imageid=".$db_element["iconid_on"],"no image",NULL),
+				new CImg("image.php?height=24&imageid=".$db_element["iconid_off"],"no image",NULL)
 				));
 		}
 		$table->show();

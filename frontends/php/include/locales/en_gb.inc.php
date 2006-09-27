@@ -199,7 +199,6 @@
 	"S_ADMINISTRATION"=>			"Administration",
 	"S_DO_NOT_KEEP_ACTIONS_OLDER_THAN"=>	"Do not keep actions older than (in days)",
 	"S_DO_NOT_KEEP_EVENTS_OLDER_THAN"=>	"Do not keep events older than (in days)",
-	"S_MEDIA_TYPES_BIG"=>			"MEDIA TYPES",
 	"S_NO_MEDIA_TYPES_DEFINED"=>		"No media types defined",
 	"S_SMTP_SERVER"=>			"SMTP server",
 	"S_SMTP_HELO"=>				"SMTP helo",
@@ -265,8 +264,13 @@
 	"S_CREATE_IMAGE"=>			"Create Image",
 	"S_CREATE_RULE"=>			"Create Rule",
 	"S_WORKING_TIME"=>			"Working time",
+	
+//	nodes.php
 	"S_NODE"=>				"Node",
 	"S_NODES"=>				"Nodes",
+	"S_NODES_BIG"=>				"NODES",
+	"S_NEW_NODE"=>				"New node",
+	"S_NO_NODES_DEFINED"=>			"No nodes defined",
 
 //	Latest values
 	"S_LATEST_VALUES"=>			"Latest values",
@@ -602,6 +606,7 @@
 	"S_NOTHING"=>				"Nothing",
 
 //	media.php
+	"S_CONFIGURATION_OF_MEDIA_TYPES_BIG"=>	"CONFIGURATION OF MEDIA TYPES",
 	"S_MEDIA"=>				"Media",
 	"S_MEDIA_BIG"=>				"MEDIA",
 	"S_MEDIA_ACTIVATED"=>			"Media activated",

@@ -46,7 +46,7 @@
 	$name		= $map["name"];
 	$width		= $map["width"];
 	$height		= $map["height"];
-	$background	= $map["background"];
+	$backgroundid	= $map["backgroundid"];
 	$label_type	= $map["label_type"];
 
 	set_image_header();
@@ -91,24 +91,16 @@
 	$y=imagesy($im);
   
 	ImageFilledRectangle($im,0,0,$width,$height,$white);
-	if($background!="")
+
+	if(($db_image = get_image_by_imageid($backgroundid, 2)))
 	{
-		$db_image = get_image_by_name($background, 2);
-		if($db_image)
-		{
-			$back = ImageCreateFromString($db_image["image"]);
-			ImageCopy($im,$back,0,0,0,0,imagesx($back),imagesy($back));
-		}
-		else
-		{
-			$x=imagesx($im)/2-ImageFontWidth(4)*strlen($name)/2;
-			ImageString($im, 4,$x,1, $name , $darkred);
-		}
+		$back = ImageCreateFromString($db_image["image"]);
+		ImageCopy($im,$back,0,0,0,0,imagesx($back),imagesy($back));
 	}
 	else
 	{
 		$x=imagesx($im)/2-ImageFontWidth(4)*strlen($name)/2;
-		ImageString($im, 4,$x,1, $name , $colors["Dark Red"]);
+		ImageString($im, 4,$x,1, $name , $darkred);
 	}
 
 //	$x=imagesx($im)/2-ImageFontWidth(4)*strlen($name)/2;
@@ -116,13 +108,6 @@
 
 	$str=date("m.d.Y H:i:s",time(NULL));
 	ImageString($im, 0,imagesx($im)-120,imagesy($im)-12,"$str", $gray);
-
-	if(!check_right("Network map","R",$_REQUEST["sysmapid"]))
-	{
-		ImageOut($im); 
-		ImageDestroy($im); 
-		exit();
-	}
 
 	if(!isset($_REQUEST["noedit"]))
 	{

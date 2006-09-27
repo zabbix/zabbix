@@ -36,6 +36,7 @@
 	function	add_user($name,$surname,$alias,$passwd,$url,$autologout,$lang,$refresh,$user_type,$user_groups,$user_medias)
 	{
 		global $USER_DETAILS;
+		global $ZBX_CURNODEID;
 
 		if($USER_DETAILS['type'] != USER_TYPE_SUPPER_ADMIN)
 		{
@@ -43,7 +44,7 @@
 			return 0;
 		}
 
-		if(DBfetch(DBexecute("select * from users where alias=".zbx_dbstr($alias))))
+		if(DBfetch(DBexecute("select * from users where alias=".zbx_dbstr($alias)." and ".DBid2nodeid('userid')."=".$ZBX_CURNODEID)))
 		{
 			error('User "'.$alias.'" already exists');
 			return 0;
@@ -89,7 +90,10 @@
 
 	function	update_user($userid,$name,$surname,$alias,$passwd, $url,$autologout,$lang,$refresh,$user_type,$user_groups,$user_medias)
 	{
-		if(DBfetch(DBexecute("select * from users where alias=".zbx_dbstr($alias)." and userid<>$userid")))
+		global $ZBX_CURNODEID;
+
+		if(DBfetch(DBexecute("select * from users where alias=".zbx_dbstr($alias).
+			" and userid<>$userid and ".DBid2nodeid('userid')."=".$ZBX_CURNODEID)))
 		{
 			error("User '$alias' already exists");
 			return 0;

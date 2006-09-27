@@ -24,7 +24,6 @@
 
 	$page["title"]="S_ZABBIX_BIG";
 	$page["file"]="index.php";
-
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -74,9 +73,7 @@
 
 			if($USER_DETAILS["url"] != '')
 			{
-				echo "<HTML><HEAD>";
-        			echo "<META HTTP-EQUIV=\"Refresh\" CONTENT=\"0; URL=".$USER_DETAILS["url"]."\">";
-				echo "</HEAD></HTML>";
+				Redirect($USER_DETAILS["url"]);
 				return;
 			}
 		}
@@ -92,8 +89,10 @@
 	}
 	else
 	{
+		$logoff = new CLink('here', '?reconnect=1');
+
 		echo "<div align=center>";
-		echo "Press <a href=\"index.php?reconnect=1\">here</a> to disconnect/reconnect";
+		echo "Press ".$logoff->ToString()." to disconnect/reconnect";
 		echo "</div>";
 	}	
 ?>

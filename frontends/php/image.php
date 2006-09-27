@@ -20,6 +20,7 @@
 ?>
 <?php
 	require_once "include/config.inc.php";
+	require_once "include/images.inc.php";
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION

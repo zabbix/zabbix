@@ -20,24 +20,6 @@
 ?>
 <?php
 
-/* TODO Remove !!!!!!!!!!!!!!!!!!! Start */
-
-define("ANY_ELEMENT_RIGHT",	-1);
-define("GROUP_RIGHT",		0);
-
-	function	check_right($right,$permission,$id = GROUP_RIGHT)
-	{
-		return true;
-	}
-
-	function	check_anyright($right,$permission)
-	{
-		return check_right($right,$permission, ANY_ELEMENT_RIGHT);
-	}
-
-/* TODO Remove !!!!!!!!!!!!!!!!!!! End */
-
-
 	function	permission2str($group_permission)
 	{
 		$str_perm[PERM_READ_WRITE]	= S_READ_WRITE;
@@ -256,6 +238,8 @@ define("GROUP_RIGHT",		0);
 
 	function	get_accessible_nodes_by_userid($userid,$perm,$perm_mode=null,$perm_res=null,$nodeid=null)
 	{
+		global $ZBX_LOCALNODEID;
+
 		if(is_null($perm_mode)) $perm_mode=PERM_MODE_GE;
 		if(is_null($perm_res))	$perm_res=PERM_RES_STRING_LINE;
 
@@ -286,13 +270,15 @@ define("GROUP_RIGHT",		0);
 		while($node_data = DBfetch($db_nodes))
 		{
 
-			/* deny if no rights defined */
-			if(is_null($node_data['permission'])) $node_data['permission'] = PERM_DENY;
+			/* deny if no rights defined (for local node read/write)*/
+			if(is_null($node_data['permission']))
+				$node_data['permission'] = 
+					($node_data['nodeid'] == $ZBX_LOCALNODEID) ? PERM_READ_WRITE : PERM_DENY;
 
 			if(eval('return ('.$node_data["permission"].' '.$perm_mode.' '.$perm.')? 0 : 1;'))
 				continue;
 
-			/* TODO special processing for PERM_READ_LIST*/
+			/* special processing for PERM_READ_LIST*/
 			if(PERM_DENY == $node_data['permission'] && PERM_READ_LIST == $perm)
 			{
 				$groups = get_accessible_groups_by_userid($userid,
@@ -325,7 +311,7 @@ define("GROUP_RIGHT",		0);
 		
 	*/
 
-/* TODO */	function	get_accessible_hosts_by_rights($rights,$perm,$perm_mode=null,$perm_res=null,$nodeid=null)
+	function	get_accessible_hosts_by_rights($rights,$perm,$perm_mode=null,$perm_res=null,$nodeid=null)
 	{
 		if(is_null($perm_res))		$perm_res	= PERM_RES_STRING_LINE;
 		if($perm == PERM_READ_LIST)	$perm		= PERM_READ_ONLY;
@@ -390,7 +376,12 @@ define("GROUP_RIGHT",		0);
 			}
 			else
 			{
-				$host_data['permission'] = PERM_DENY;
+				if(!isset($node_data[$host_data['nodeid']]))
+				{
+					$node_data = get_accessible_nodes_by_rights($rights,
+						PERM_DENY, PERM_MODE_GE, PERM_RES_DATA_ARRAY, $host_data['nodeid']);
+				}
+				$host_data['permission'] = $node_data[$host_data['nodeid']]['permission'];
 			}
 			
 			if(eval('return ('.$host_data["permission"].' '.$perm_mode.' '.$perm.')? 0 : 1;'))
@@ -478,8 +469,9 @@ define("GROUP_RIGHT",		0);
 	}
 
 	function	get_accessible_nodes_by_rights($rights,$perm,$perm_mode=null,$perm_res=null,$nodeid=null)
-
 	{
+		global $ZBX_LOCALNODEID;
+
 		if(is_null($perm_mode)) $perm_mode=PERM_MODE_GE;
 		if(is_null($perm_res))	$perm_res=PERM_RES_STRING_LINE;
 
@@ -514,11 +506,13 @@ define("GROUP_RIGHT",		0);
 		{
 			if(isset($node_perm[$node_data['nodeid']]))
 				$node_data['permission'] = $node_perm[$node_data['nodeid']];
+			elseif($node_data['nodeid'] == $ZBX_LOCALNODEID) /* for local node default permission is READ_WRITE */
+				$node_data['permission'] = PERM_READ_WRITE;
 
 			if(eval('return ('.$node_data["permission"].' '.$perm_mode.' '.$perm.')? 0 : 1;'))
 				continue;
 
-			/* TODO special processing for PERM_READ_LIST*/
+			/* special processing for PERM_READ_LIST*/
 			if(PERM_DENY == $node_data['permission'] && PERM_READ_LIST == $perm)
 			{
 				$groups = get_accessible_groups_by_rights($rights,

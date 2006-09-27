@@ -19,6 +19,10 @@
 **/
 ?>
 <?php
+	require_once "include/images.inc.php";
+	require_once "include/hosts.inc.php";
+	require_once "include/triggers.inc.php";
+
 	function	get_sysmap_by_sysmapid($sysmapid)
 	{
 		$sql="select * from sysmaps where sysmapid=$sysmapid"; 
@@ -61,41 +65,26 @@
 		$result = DBexecute("delete from sysmaps_elements where sysmapid=$sysmapid");
 		if(!$result)	return	$result;
 
-	// delete map permisions
-		DBexecute('delete from rights where name=\'Network map\' and id='.$sysmapid);
-
 		return DBexecute("delete from sysmaps where sysmapid=$sysmapid");
 	}
 
 	# Update System Map
 
-	function	update_sysmap($sysmapid,$name,$width,$height,$background,$label_type,$label_location)
+	function	update_sysmap($sysmapid,$name,$width,$height,$backgroundid,$label_type,$label_location)
 	{
-		if(!check_right("Network map","U",$sysmapid))
-		{
-			error("Insufficient permissions");
-			return 0;
-		}
-
 		return	DBexecute("update sysmaps set name=".zbx_dbstr($name).",width=$width,height=$height,".
-			"background=".zbx_dbstr($background).",label_type=$label_type,".
+			"backgroundid=".$backgroundid.",label_type=$label_type,".
 			"label_location=$label_location where sysmapid=$sysmapid");
 	}
 
 	# Add System Map
 
-	function	add_sysmap($name,$width,$height,$background,$label_type,$label_location)
+	function	add_sysmap($name,$width,$height,$backgroundid,$label_type,$label_location)
 	{
-		if(!check_right("Network map","A",0))
-		{
-			error("Insufficient permissions");
-			return 0;
-		}
-
 		$sysmapid=get_dbid("sysmaps","sysmapid");
 
-		$result=DBexecute("insert into sysmaps (sysmapid,name,width,height,background,label_type,label_location)".
-			" values ($sysmapid,".zbx_dbstr($name).",$width,$height,".zbx_dbstr($background).",$label_type,
+		$result=DBexecute("insert into sysmaps (sysmapid,name,width,height,backgroundid,label_type,label_location)".
+			" values ($sysmapid,".zbx_dbstr($name).",$width,$height,".$backgroundid.",$label_type,
 			$label_location)");
 
 		if(!$result)
@@ -158,7 +147,7 @@
 	# Add Element to system map
 
 	function add_element_to_sysmap($sysmapid,$elementid,$elementtype,
-						$label,$x,$y,$icon,$url,$icon_on,$label_location)
+						$label,$x,$y,$iconid_off,$url,$iconid_on,$label_location)
 	{
 		if($label_location<0) $label_location='null';
 		if(check_circle_elements_link($sysmapid,$elementid,$elementtype))
@@ -170,9 +159,9 @@
 		$selementid = get_dbid("sysmaps_elements","selementid");
 
 		$result=DBexecute("insert into sysmaps_elements".
-			" (sysmapid,elementid,elementtype,label,x,y,icon,url,icon_on,label_location)".
+			" (sysmapid,elementid,elementtype,label,x,y,iconid_off,url,iconid_on,label_location)".
 			" values ($sysmapid,$elementid,$elementtype,".zbx_dbstr($label).",
-			$x,$y,".zbx_dbstr($icon).",".zbx_dbstr($url).",".zbx_dbstr($icon_on).",".
+			$x,$y,$iconid_off,".zbx_dbstr($url).",$iconid_on,".
 			"$label_location)");
 
 		if(!$result)
@@ -184,7 +173,7 @@
 	# Update Element from system map
 
 	function	update_sysmap_element($selementid,$sysmapid,$elementid,$elementtype,
-						$label,$x,$y,$icon,$url,$icon_on,$label_location)
+						$label,$x,$y,$iconid_off,$url,$iconid_on,$label_location)
 	{
 		if($label_location<0) $label_location='null';
 		if(check_circle_elements_link($sysmapid,$elementid,$elementtype))
@@ -194,8 +183,8 @@
 		}
 
 		return	DBexecute("update sysmaps_elements set elementid=$elementid,elementtype=$elementtype,".
-			"label=".zbx_dbstr($label).",x=$x,y=$y,icon=".zbx_dbstr($icon).",url=".zbx_dbstr($url).
-			",icon_on=".zbx_dbstr($icon_on).",label_location=$label_location".
+			"label=".zbx_dbstr($label).",x=$x,y=$y,iconid_off=$iconid_off,url=".zbx_dbstr($url).
+			",iconid_on=$iconid_on,label_location=$label_location".
 			" where selementid=$selementid");
 	}
 
@@ -251,12 +240,13 @@
 		if(!$element)	return FALSE;
 
 		if(get_info_by_selementid($element["selementid"],$info,$color) != 0)
-			$icon = $element["icon_on"];
+			$iconid = $element["iconid_on"];
 		else
-			$icon = $element["icon"];
+			$iconid = $element["iconid_off"];
 
-		$image = get_image_by_name($icon);
+		$image = get_image_by_imageid($iconid);
 		if(!$image)	return FALSE;
+
 		return imagecreatefromstring($image['image']);
 	}
 

@@ -93,14 +93,12 @@
 
 	function	DBstart()
 	{
-		/* start transaction */
-		/* TODO */
+		/* TODO *//* start transaction */
 	}
 	
 	function	DBend($result)
 	{
-		/* end transaction */
-		/* TODO */
+		/* end transaction *//* TODO */
 
 		if($result)
 		{ // OK

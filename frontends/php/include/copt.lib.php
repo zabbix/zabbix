@@ -89,6 +89,8 @@
 	define("USE_PROFILING",1);
 	define("USE_TIME_PROF",1);
 	define("USE_MEM_PROF",1);
+//	define("USE_MENU_PROF",1);
+//	define("USE_MENU_DETAILS",1);
 	define("USE_SQLREQUEST_PROF",1);
 	//define("SHOW_SQLREQUEST_DETAILS",1);
 
@@ -195,7 +197,7 @@ if(defined('USE_SQLREQUEST_PROF'))
 	{
 			for($i = $sqlmark[$type]; $i < $requests_cnt; $i++)
 			{
-				echo "(".$type.") SQL request    : ".$sqlrequests[$i]."<br>\n";;
+				echo "(".$type.") SQL request    : ".$sqlrequests[$i]."<br>\n";
 			}
 	}
 }
@@ -205,6 +207,66 @@ if(defined('USE_SQLREQUEST_PROF'))
 		/* public static */ function set_memory_limit($limit='8M')
 		{
 			ini_set('memory_limit',$limit);
+		}
+
+		/* public static */ function compare_files_with_menu($menu=null)
+		{
+if(defined('USE_MENU_PROF'))
+{
+			$files_list = glob('*.php');
+
+			$result = array();
+			foreach($files_list as $file)
+			{
+				$list = array();
+				foreach($menu as $label=>$sub)
+				{
+					foreach($sub['pages'] as $sub_pages)
+					{
+						if(!isset($sub_pages["label"])) $sub_pages["label"]=$sub_pages['url'];
+						
+						$menu_path = $sub["label"].'->'.$sub_pages["label"];
+						
+						if($sub_pages['url'] == $file)
+						{
+							array_push($list, $menu_path);
+						}
+						if(!in_array($sub_pages['url'], $files_list))
+							$result['error'][$sub_pages['url']] = array($menu_path);
+
+						if(isset($sub_pages['sub_pages'])) foreach($sub_pages['sub_pages'] as $page)
+						{
+							$menu_path = $sub["label"].'->'.$sub_pages["label"].'->sub_pages';
+							
+							if(!in_array($page, $files_list))
+								$result['error'][$page] = array($menu_path);
+
+							if($page != $file) continue;
+							array_push($list, $menu_path);
+						}
+					}
+				}
+				if(count($list) != 1)	$level = 'worning';
+				else			$level = 'normal';
+				
+				$result[$level][$file] = $list;
+			}
+			foreach($result as $level => $files_list)
+			{
+if(defined('USE_MENU_DETAILS'))
+{
+				echo '</br>(menu check) ['.$level."]</br>\n";
+				foreach($files_list as $file => $menu_list)
+				{
+					echo "(menu check)".SPACE.SPACE.SPACE.SPACE.$file.' {'.implode(',',$menu_list)."}</br>\n";
+				}
+}
+else
+{
+				echo '</br>(menu check) ['.$level."] = ".count($files_list)."</br>\n";
+}
+			}
+}
 		}
 	}
 
@@ -219,6 +281,7 @@ else
 		/* public static */ function profiling_stop($type=NULL) {}
 		/* public static */ function savesqlrequest($sql) {}
 		/* public static */ function showmemoryusage($descr=null) {}
+		/* public static */ function compare_files_with_menu($menu=null) {}
 	}
 }
 
