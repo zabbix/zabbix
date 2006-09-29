@@ -19,6 +19,10 @@
 **/
 ?>
 <?php
+require_once "include/graphs.inc.php";
+require_once "include/profiles.inc.php";
+require_once "include/triggers.inc.php";
+require_once "include/items.inc.php";
 
 /* HOST GROUP functions */
 	function	add_host_to_group($hostid, $groupid)
@@ -100,12 +104,6 @@
 
 	function	add_host_group($name,$hosts=array())
 	{
-//		if(!check_right("Host","A",0))
-//		{
-//			error("Insufficient permissions");
-//			return FLASE;
-//		}
-
 		$result = db_save_group($name);
 		if(!$result)
 			return	$result;
@@ -119,13 +117,6 @@
 
 	function	update_host_group($groupid,$name,$hosts)
 	{
-//		if(!check_right("Host","U",0))
-//		{
-//			error("Insufficient permissions");
-//			return 0;
-//		}
-
-
 		$result = db_save_group($name,$groupid);
 		if(!$result)
 			return	$result;
@@ -198,12 +189,6 @@
 
 	function	add_host($host,$port,$status,$useip,$ip,$templateid,$newgroup,$groups)
 	{
-		if(!check_right("Host","A",0))
-		{
-			error("Insufficient permissions");
-			return FALSE;
-		}
-
 		$result = db_save_host($host,$port,$status,$useip,$ip,$templateid);
 		if(!$result)
 			return $result;
@@ -223,12 +208,6 @@
 
 	function	update_host($hostid,$host,$port,$status,$useip,$ip,$templateid,$newgroup,$groups)
 	{
-		if(!check_right("Host","U",$hostid))
-		{
-			error("Insufficient permissions");
-			return FALSE;
-		}
-
 		$old_host = get_host_by_hostid($hostid);
 
 		$result = db_save_host($host,$port,$status,$useip,$ip,$templateid,$hostid);
@@ -324,9 +303,6 @@
 	// delete host profile
 		delete_host_profile($hostid);
 
-	// delete host permisions
-		DBexecute('delete from rights where name=\'Host\' and id='.$hostid);
-
 	// delete host
 		return DBexecute("delete from hosts where hostid=$hostid");
 	}
@@ -387,12 +363,6 @@
 
 	function	update_host_status($hostid,$status)
 	{
-                if(!check_right("Host","U",0))
-                {
-                        error("Insufficient permissions");
-                        return 0;
-                }
-
 		$sql="select status,host from hosts where hostid=$hostid";
 		$result=DBselect($sql);
 		$row=DBfetch($result);
@@ -421,7 +391,7 @@
 		return get_template_path($tmp_host["hostid"]).$tmp_host["host"]."/";
 	}
 
-	function get_correct_group_and_host($a_groupid=NULL, $a_hostid=NULL, $right="U", $options = array())
+	function get_correct_group_and_host($a_groupid=NULL, $a_hostid=NULL, $perm=PERM_READ_WRITE, $options = array())
 	{
 		if(!is_array($options))
 		{
@@ -429,8 +399,10 @@
 			show_page_footer();
 			exit;
 		}
+
+		global $USER_DETAILS;
 		
-		$first_hostig_in_group = 0;
+		$first_hostid_in_group = 0;
 
 		$allow_all_hosts = (in_array("allow_all_hosts",$options)) ? 1 : 0;
 		$always_select_first_host = in_array("always_select_first_host",$options) ? 1 : 0;
@@ -448,6 +420,8 @@
 			$item_table = "";		$with_items = "";
 		}
 
+		$accessed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],$perm);
+
 		if(is_null($a_groupid))
 		{
 			$groupid = 0;
@@ -456,27 +430,14 @@
 		{
 			$groupid = $a_groupid;
 
-			if($groupid > 0) 
-				if(!DBfetch(DBselect("select hg.groupid from hosts_groups hg".
-					" where hg.groupid=".$groupid." group by hg.groupid")))
-						$groupid = 0;
-
 			if($groupid > 0)
 			{
-				// Check if at least one host with read permission exists for this group
-				$sql = "select distinct h.hostid,h.host from hosts h,hosts_groups hg".$item_table.
-					" where hg.groupid=".$groupid." and hg.hostid=h.hostid and".
-					" h.status<>".HOST_STATUS_DELETED.$with_host_status.$with_items.
-					" order by h.host";
-
-				$db_hosts = DBselect($sql);
-				while($db_host = DBfetch($db_hosts))
+				if(!DBfetch(DBselect("select distinct g.groupid from groups g, hosts_groups hg, hosts h".$item_table.
+					" where hg.groupid=g.groupid and h.hostid=hg.hostid and h.hostid in (".$accessed_hosts.") ".
+					$with_host_status.$with_items)))
 				{
-					if(!check_right("Host",$right,$db_host["hostid"]))	continue;
-					$first_hostig_in_group = $db_host["hostid"];
-					break;
+					$groupid = 0;
 				}
-				if($first_hostig_in_group == 0)	$groupid = 0;
 			}
 
 		}
@@ -489,61 +450,58 @@
 			$hostid = $a_hostid;
 			if(!($hostid == 0 && $allow_all_hosts == 1)) /* is not 'All' selected */
 			{
-				if($groupid == 0)
+				$group_table = "";
+				$witth_group = "";
+				if($groupid != 0)
 				{
-					$sql = "select distinct h.hostid,h.host from hosts h".$item_table.
-						" where h.status<>".HOST_STATUS_DELETED.$with_host_status.$with_items.
-						" order by h.host";
-
-					$db_hosts = DBselect($sql);
-					while($db_host = DBfetch($db_hosts))
-					{
-						if(!check_right("Host",$right,$db_host["hostid"]))	continue;
-						$first_hostig_in_group = $db_host["hostid"];
-						break;
-					}
-					if($first_hostig_in_group == 0)	$hostid = 0;
-				}
-
-				if($groupid > 0)
-				{ 
 					if(!DBfetch(DBselect("select hg.hostid from hosts_groups hg".
 						" where hg.groupid=".$groupid." and hg.hostid=".$hostid)))
-							$hostid = 0;
+					{
+						$hostid = 0;
+					}
+					$group_table = " ,hosts_groups hg ";
+					$witth_group = " and hg.hostid=h.hostid and hg.groupid=".$groupid;
 				}
 
-				if(!check_right("Host",$right,$hostid)) $hostid = 0;
+				if($db_host = DBfetch(DBselect("select distinct h.hostid,h.host from hosts h ".$item_table.$group_table.
+					" where h.hostid in (".$accessed_hosts.") "
+					.$with_host_status.$with_items.$witth_group.
+					" order by h.host")))
+				{
+					$first_hostid_in_group = $db_host["hostid"];
+				}
+
+				if($first_hostid_in_group == 0)	$hostid = 0; /* no hosts in selected grpore */
 
 				if($hostid > 0)
 				{
 					if(!DBfetch(DBselect("select distinct h.hostid from hosts h".$item_table.
-						" where h.status<>".HOST_STATUS_DELETED.$with_host_status.$with_items.
-						" and h.hostid=".$hostid)))
+						" where h.hostid=".$hostid.$with_host_status.$with_items.
+						" and h.hostid in (".$accessed_hosts.") ")))
+					{
 							$hostid = 0;
+					}
 				}
+
 				if(($hostid < 0) || ($hostid == 0 && $always_select_first_host == 1)) /* incorrect host */
 				{
-					$hostid = $first_hostig_in_group;
+					$hostid = $first_hostid_in_group;
 				}
 			}
 		}
 
-		$host_correct = ($hostid == $a_hostid) ? 1 : 0;
-		$group_correct = ($groupid == $a_groupid) ? 1 : 0;
-		$correct = ($group_correct && $host_correct) ? 1 : 0;
-
-		$result = array(
+		$group_correct	= ($groupid == $a_groupid) ? 1 : 0;
+		$host_correct	= ($hostid == $a_hostid) ? 1 : 0;
+		return array(
 			"groupid"	=> $groupid,
 			"group_correct"	=> $group_correct,
 			"hostid"	=> $hostid,
 			"host_correct"	=> $host_correct,
-			"correct"	=> $correct
+			"correct"	=> ($group_correct && $host_correct) ? 1 : 0
 			);
-
-		return $result;
 	}
 
-	function	validate_group_with_host($right, $options = array(),$group_var=NULL,$host_var=NULL)
+	function	validate_group_with_host($perm, $options = array(),$group_var=NULL,$host_var=NULL)
 	{
 		if(is_null($group_var)) $group_var = "web.latest.groupid";
 		if(is_null($host_var))	$host_var = "web.latest.hostid";
@@ -552,7 +510,7 @@
 		$_REQUEST["hostid"]     = get_request("hostid",get_profile($host_var,
 			(in_array("always_select_first_host",$options)) ? -1 : 0));
 
-		$result = get_correct_group_and_host($_REQUEST["groupid"],$_REQUEST["hostid"], $right, $options);
+		$result = get_correct_group_and_host($_REQUEST["groupid"],$_REQUEST["hostid"], $perm, $options);
 
 		$_REQUEST["groupid"]    = $result["groupid"];
 		$_REQUEST["hostid"]     = $result["hostid"];
@@ -561,13 +519,13 @@
 		update_profile($group_var,$_REQUEST["groupid"]);
 	}
 
-	function	validate_group($right, $options = array(),$group_var=NULL)
+	function	validate_group($perm, $options = array(),$group_var=NULL)
 	{
 		if(is_null($group_var)) $group_var = "web.latest.groupid";
 
 		$_REQUEST["groupid"]    = get_request("groupid",get_profile($group_var,0));
 
-		$result = get_correct_group_and_host($_REQUEST["groupid"],NULL,$right,$options);
+		$result = get_correct_group_and_host($_REQUEST["groupid"],NULL,$perm,$options);
 
 		$_REQUEST["groupid"]    = $result["groupid"];
 
@@ -681,9 +639,6 @@
 		$result = DBexecute("delete from applications where applicationid=$applicationid");
 		if($result)
 		{
-		// delete application permisions
-			DBexecute('delete from rights where name=\'Application\' and id='.$applicationid);
-
 			info("Application '".$host["host"].":".$app["name"]."' deleted");
 		}
 		return $result;

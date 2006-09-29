@@ -33,18 +33,6 @@
 
 	global $USER_DETAILS;
 
-	$ZBX_CURNODEID = 1; // Selected node
-	$ZBX_LOCALNODEID = 1; // Local node
-
-	function DBid2nodeid($id_name)
-	{
-		return 'mod('.$id_name.',100)';
-	}
-	function id2nodeid($id_var)
-	{
-		return ($id_var % 100);
-	}
-
 	if($DB_TYPE == "MYSQL")
 	{
 		$DB=mysql_pconnect($DB_SERVER,$DB_USER,$DB_PASSWORD);
@@ -299,4 +287,30 @@ if($DB_TYPE == "ORACLE") {
 		return "'".addslashes($var)."'";
 	}
 }
+
+	function DBid2nodeid($id_name)
+	{
+		return 'mod('.$id_name.',100)';
+	}
+
+	function id2nodeid($id_var)
+	{
+		return ($id_var % 100);
+	}
+
+	function	get_dbid($table,$field)
+	{
+		global	$ZBX_CURNODEID;
+
+		$result=DBselect("select max($field) as id from $table where ".DBid2nodeid($field)."=".$ZBX_CURNODEID);
+		$row=DBfetch($result);
+		if($row && !is_null($row["id"]))
+		{
+			return	$row["id"]+100;
+		}
+		else
+		{
+			return	100+$ZBX_CURNODEID;
+		}
+	}
 ?>

@@ -27,46 +27,26 @@
 	$page["file"] = "latest.php";
 	show_header($page["title"],1,0);
 ?>
-
-<?php
-        if(!check_anyright("Host","R"))
-        {
-                show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-                show_page_footer();
-                exit;
-        }
-?>
-
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"applications"=>	array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(-2,4294967295),	NULL),
-		"applicationid"=>	array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(-2,4294967295),	NULL),
+		"applications"=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,		NULL),
+		"applicationid"=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,		NULL),
 		"close"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("1"),	NULL),
 		"open"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("1"),	NULL),
 		"groupbyapp"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("1"),	NULL),
 
-		"groupid"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(0,65535),	NULL),
-		"hostid"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(0,65535),	NULL),
-		"select"=>		array(T_ZBX_STR, O_OPT, NULL,	NULL,	NULL),
+		"groupid"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
+		"hostid"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL),
+		"select"=>		array(T_ZBX_STR, O_OPT, NULL,	NULL,		NULL),
 
-		"show"=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,   NULL)
+		"show"=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,		NULL)
 	);
 
 	check_fields($fields);
 
-	validate_group_with_host("R",array("allow_all_hosts","always_select_first_host","monitored_hosts","with_monitored_items"));
+	validate_group_with_host(PERM_READ_LIST,array("allow_all_hosts","always_select_first_host","monitored_hosts","with_monitored_items"));
 ?>
-
-<?php
-        if($_REQUEST["hostid"] > 0 && !check_right("Host","R",$_REQUEST["hostid"]))
-        {
-                show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-                show_page_footer();
-                exit;
-        }
-?>
-
 <?php
 	// Misc functions
 	function	format_lastvalue($db_item)
@@ -144,66 +124,50 @@
 
 	update_profile("web.latest.applications",$_REQUEST["applications"],PROFILE_TYPE_ARRAY);
 ?>
-
 <?php
 	$r_form = new CForm();
 
 	$r_form->AddVar("select",$_REQUEST["select"]);
 
 	$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit()");
-	$cmbGroup->AddItem(0,S_ALL_SMALL);
-	$result=DBselect("select groupid,name from groups where mod(groupid,100)=$ZBX_CURNODEID order by name");
-	while($row=DBfetch($result))
-	{
-// Check if at least one host with read permission exists for this group
-		$result2=DBselect("select distinct h.hostid,h.host from hosts h,items i,hosts_groups hg".
-			" where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid".
-			" and i.status=".ITEM_STATUS_ACTIVE." and hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid".
-			" order by h.host");
-		while($row2=DBfetch($result2))
-		{
-			if(!check_right("Host","R",$row2["hostid"]))
-				continue;
-			$cmbGroup->AddItem($row["groupid"],$row["name"]);
-			break;
-		}
-	}
-	$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
-
 	$cmbHosts = new CComboBox("hostid",$_REQUEST["hostid"],"submit()");
 
+	$cmbGroup->AddItem(0,S_ALL_SMALL);
+	
+	$availiable_groups= get_accessible_groups_by_userid($USER_DETAILS['userid'],PERM_READ_LIST, null, null, $ZBX_CURNODEID);
+	$availiable_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_LIST, null, null, $ZBX_CURNODEID);
+
+	$result=DBselect("select distinct g.groupid,g.name from groups g, hosts_groups hg, hosts h, items i ".
+		" where g.groupid in (".$availiable_groups.") ".
+		" and hg.groupid=g.groupid and h.status=".HOST_STATUS_MONITORED.
+		" and h.hostid=i.hostid and hg.hostid=h.hostid and i.status=".ITEM_STATUS_ACTIVE.
+		" order by g.name");
+	while($row=DBfetch($result))
+	{
+		$cmbGroup->AddItem($row["groupid"],$row["name"]);
+	}
+	$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
+	
 	if($_REQUEST["groupid"] > 0)
 	{
 		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED.
 			" and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid".
-			" and i.status=".ITEM_STATUS_ACTIVE." group by h.hostid,h.host order by h.host";
+			" and i.status=".ITEM_STATUS_ACTIVE.
+			" group by h.hostid,h.host order by h.host";
 	}
 	else
 	{
 		$cmbHosts->AddItem(0,S_ALL_SMALL);
 		$sql="select h.hostid,h.host from hosts h,items i where h.status=".HOST_STATUS_MONITORED.
 			" and i.status=".ITEM_STATUS_ACTIVE." and h.hostid=i.hostid".
-			" and mod(h.hostid,100)=".$ZBX_CURNODEID.
+			" and h.hostid in (".$availiable_hosts.") ".
 			" group by h.hostid,h.host order by h.host";
 	}
 	$result=DBselect($sql);
-	$first_hostid = -1;
-	$correct_hostid = 'no';
 	while($row=DBfetch($result))
 	{
-		if(!check_right("Host","R",$row["hostid"]))
-			continue;
 		$cmbHosts->AddItem($row["hostid"],$row["host"]);
-
-		if($first_hostid == -1) $first_hostid = $row["hostid"];
-
-		if($_REQUEST["hostid"] > 0){
-			if($_REQUEST["hostid"] == $row["hostid"])
-				$correct_hostid = 'ok';
-		}
 	}
-	if($correct_hostid == 'no' && $_REQUEST["groupid"] > 0)
-		$_REQUEST["hostid"] = $first_hostid;
 
 	$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
 	show_header2(S_LATEST_DATA_BIG,$r_form);
@@ -213,12 +177,11 @@
 	$r_form->AddVar("hostid",$_REQUEST["hostid"]);
 	$r_form->AddVar("groupid",$_REQUEST["groupid"]);
 
-	$r_form->AddItem(array("Show items with description like ", new CTextBox("select",$_REQUEST["select"],20)));
+	$r_form->AddItem(array(S_SHOW_ITEMS_WITH_DESCRIPTION_LIKE, new CTextBox("select",$_REQUEST["select"],20)));
 	$r_form->AddItem(array(SPACE, new CButton("show",S_SHOW)));
 
 	show_header2(NULL, $r_form);
 ?>
-
 <?php
 	if(isset($show_all_apps))
 		$link = new CLink(new CImg("images/general/opened.gif"),
@@ -246,38 +209,24 @@
 	if($_REQUEST["hostid"] > 0)
 		$compare_host = " and h.hostid=".$_REQUEST["hostid"];
 	else
-		$compare_host = "";
+		$compare_host = " and h.hostid in (".$availiable_hosts.") ";
 
 	$any_app_exist = false;
 
-	$db_applications = DBselect("select h.host,h.hostid,a.* from applications a,hosts h where a.hostid=h.hostid".$compare_host.
-		" and mod(h.hostid,100)=".$ZBX_CURNODEID.
-		" order by a.name,a.applicationid,h.host");
+	$db_applications = DBselect("select distinct h.host,h.hostid,a.* from applications a,hosts h ".
+		" where a.hostid=h.hostid".$compare_host.' and h.hostid in ('.$availiable_hosts.')'.
+		" and h.status=".HOST_STATUS_MONITORED." order by a.name,a.applicationid,h.host");
 	while($db_app = DBfetch($db_applications))
 	{
-		if(!check_right("Application","R",$db_app["applicationid"]))	continue;
+		$db_items = DBselect("select distinct i.* from items i,items_applications ia".
+			" where ia.applicationid=".$db_app["applicationid"]." and i.itemid=ia.itemid".
+			" and i.status=".ITEM_STATUS_ACTIVE.$compare_description.
+			" order by i.description");
 
-		$sql = "select i.* from items i,hosts h,items_applications ia".
-			" where h.hostid=i.hostid and ia.applicationid=".$db_app["applicationid"]." and i.itemid=ia.itemid".
-			" and h.status=".HOST_STATUS_MONITORED." and i.status=".ITEM_STATUS_ACTIVE.
-			$compare_description.$compare_host.
-			" and mod(h.hostid,100)=".$ZBX_CURNODEID.
-			" order by i.description";
-
-		$db_items = DBselect($sql);
 		$app_rows = array();
 		$item_cnt = 0;
 		while($db_item = DBfetch($db_items))
 		{
-			if(!check_right("Item","R",$db_item["itemid"]))
-			{
-				continue;
-			}
-			if(!check_right("Host","R",$db_item["hostid"]))
-			{
-				continue;
-			}
-
 			++$item_cnt;
 			if(!in_array($db_app["applicationid"],$_REQUEST["applications"]) && !isset($show_all_apps)) continue;
 
@@ -294,13 +243,12 @@
 				if($db_item["lastvalue"]-$db_item["prevvalue"]<0)
 				{
 					$change=convert_units($db_item["lastvalue"]-$db_item["prevvalue"],$db_item["units"]);
-					$change=nbsp($change);
 				}
 				else
 				{
 					$change="+".convert_units($db_item["lastvalue"]-$db_item["prevvalue"],$db_item["units"]);
-					$change=nbsp($change);
 				}
+				$change=nbsp($change);
 			}
 			else
 			{
@@ -349,29 +297,16 @@
 				$table->ShowRow($row);
 		}
 	}
-	$sql="select h.host,h.hostid,i.* from hosts h, items i LEFT JOIN items_applications ia ON ia.itemid=i.itemid".
+	$db_items = DBselect("select h.host,h.hostid,i.* from hosts h, items i LEFT JOIN items_applications ia ON ia.itemid=i.itemid".
 		" where ia.itemid is NULL and h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and i.status=".ITEM_STATUS_ACTIVE.
-		$compare_description.$compare_host.
-		" and mod(h.hostid,100)=".$ZBX_CURNODEID.
-		" order by i.description,h.host";
-	$db_items = DBselect($sql);
+		$compare_description.$compare_host.' and h.hostid in ('.$availiable_hosts.") order by i.description,h.host");
 
 	$app_rows = array();
 	$item_cnt = 0;
 	while($db_item = DBfetch($db_items))
 	{
-		if(!check_right("Host","R",$db_item["hostid"]))
-		{
-			continue;
-		}
-		if(!check_right("Item","R",$db_item["itemid"]))
-		{
-			continue;
-		}
-
 		++$item_cnt;
 		if(!in_array(0,$_REQUEST["applications"]) && $any_app_exist && !isset($show_all_apps)) continue;
-
 
 		if(isset($db_item["lastclock"]))
 			$lastclock=date(S_DATE_FORMAT_YMDHMS,$db_item["lastclock"]);
@@ -444,7 +379,6 @@
 
 	$table->ShowEnd();
 ?>
-
 <?php
 	show_page_footer();
 ?>

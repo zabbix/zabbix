@@ -66,15 +66,7 @@
 
 	check_fields($fields);
 
-	validate_group_with_host("U",array("allow_all_hosts"));
-?>
-<?php
-	if(!check_anyright("Graph","U"))
-	{
-		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-		show_page_footer();
-		exit;
-	}
+	validate_group_with_host(PERM_READ_WRITE,array("allow_all_hosts"));
 ?>
 <?php
 	if(isset($_REQUEST["save"]))
@@ -213,7 +205,7 @@
 				" group by h.hostid,h.host order by h.host");
 			while($row2=DBfetch($result2))
 			{
-				if(!check_right("Host","R",$row2["hostid"]))
+//				if(!check_right("Host","R",$row2["hostid"])) /* TODO */
 					continue;
 				$cmbGroup->AddItem($row["groupid"],$row["name"]);
 				break;
@@ -247,7 +239,7 @@
 		$first_host = 0;
 		while($row=DBfetch($result))
 		{
-			if(!check_right("Host","R",$row["hostid"]))	continue;
+//			if(!check_right("Host","R",$row["hostid"]))	continue; /* TODO */
 			$cmbHosts->AddItem($row["hostid"],$row["host"]);
 			if($first_host == 0) $first_host = $row["hostid"];
 			if($_REQUEST["hostid"] == $row["hostid"]) $host_ok = 1;
@@ -282,7 +274,7 @@
 		}
 		while($row=DBfetch($result))
 		{
-			if(!check_right("Graph","U",$row["graphid"]))		continue;
+//			if(!check_right("Graph","U",$row["graphid"]))		continue; /* TODO */
 
 			if($_REQUEST["hostid"] != 0)
 			{

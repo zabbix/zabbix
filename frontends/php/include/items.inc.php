@@ -81,12 +81,6 @@
 	{
 		$host=get_host_by_hostid($hostid);
 
-		if(!check_right("Item","A",0))
-		{
-			error("Insufficient permissions to item '".$host["host"].":$key'");
-			return FALSE;
-		}
-
 		if(($i = array_search(0,$applications)) !== FALSE)
 			unset($applications[$i]);
 
@@ -225,12 +219,6 @@
 
 	function	update_item_status($itemid,$status)
 	{
-                if(!check_right("Item","U",0))
-		{
-                        error("Insufficient permissions");
-                        return 0;
-		}
-
 		if($status==ITEM_STATUS_ACTIVE)
 			$sql="update items set status=$status,error='' where itemid=$itemid";
 		else
@@ -248,12 +236,6 @@
 		$formula,$trends,$logtimefmt,$valuemapid,$delay_flex,$applications,$templateid=0)
 	{
 		$host = get_host_by_hostid($hostid);
-
-		if(!check_right("Item","U",$itemid))
-		{
-			error("Insufficient permissions to item '".$host["host"].":$key'");
-			return FALSE;
-		}
 
 		if(($i = array_search(0,$applications)) !== FALSE)
 			unset($applications[$i]);
@@ -543,9 +525,6 @@
 		$result = DBexecute("delete from items where itemid=$itemid");
 		if($result)
 		{
-		// delete item permisions
-			DBexecute('delete from rights where name=\'Item\' and id='.$itemid);
-
 			info("Item '".$host["host"].":".$item["key_"]."' deleted");
 		}
 		return $result;
@@ -610,23 +589,6 @@ COpt::profiling_start('prepare data');
 		unset($hosts);
 		while($row = DBfetch($result))
 		{
-			if(!check_right("Item","R",$row["itemid"])) continue;
-			if(!check_right('Host','R',$row['hostid'])) continue;
-
-			$access = 1;
-			$db_applications = get_applications_by_itemid($row["itemid"]);
-
-			while($db_app = DBfetch($db_applications))
-			{
-				if(check_right("Application","R",$db_app["applicationid"]))
-				{
-					$access = 1;
-					break;
-				}
-				$access = 0;
-			}
-			if($access == 0) continue;
-
 			$hosts[$row['host']] = $row['host'];
 			$items[item_description($row["description"],$row["key_"])][$row['host']] = array(
 				'itemid'	=> $row['itemid'],

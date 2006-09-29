@@ -106,28 +106,28 @@
 	if(is_array($_REQUEST["itemid"]))
 	{
 		$item_type = ITEM_VALUE_TYPE_LOG;
-		foreach($_REQUEST["itemid"] as $id => $itemid)
-		{
-			if(!check_right("Item","R",$itemid))
-				unset($_REQUEST["itemid"][$id]);
-		}
-		if(count($_REQUEST["itemid"])==0)
-		{
-			show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-			if(!isset($_REQUEST["plaintext"]))
-				show_page_footer();
-			exit;
-		}
+//		foreach($_REQUEST["itemid"] as $id => $itemid)
+//		{
+//			if(!check_right("Item","R",$itemid)) /* TODO */
+//				unset($_REQUEST["itemid"][$id]);
+//		}
+//		if(count($_REQUEST["itemid"])==0)
+//		{
+//			show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
+//			if(!isset($_REQUEST["plaintext"]))
+//				show_page_footer();
+//			exit;
+//		}
 	}
 	else
 	{
-		if(!check_right("Item","R",$_REQUEST["itemid"]))
-		{
-			show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-			if(!isset($_REQUEST["plaintext"]))
-				show_page_footer();
-			exit;
-		}
+//		if(!check_right("Item","R",$_REQUEST["itemid"])) /* TODO */
+//		{
+//			show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
+//			if(!isset($_REQUEST["plaintext"]))
+//				show_page_footer();
+//			exit;
+//		}
 		$item=get_item_by_itemid($_REQUEST["itemid"]);
 		$item_type = $item["value_type"];
 	}

@@ -31,6 +31,8 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 	$USER_RIGHTS	= array();
 	$ERROR_MSG	= array();
 	$INFO_MSG	= array();
+	
+	$ZBX_LOCALNODEID = 1; // Local node
 // END OF GLOBALS
 
 // if magic quotes on then get rid of them
@@ -46,6 +48,15 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 	require_once 	"include/locales.inc.php";
 	require_once 	"include/perm.inc.php";
 	require_once 	"include/audit.inc.php";
+
+
+	$ZBX_CURNODEID = get_cookie('nodeid', $ZBX_LOCALNODEID); // Selected node
+	if(isset($_REQUEST['switch_node']))
+	{
+		if(DBfetch(DBselect("select nodeid from nodes where nodeid=".$_REQUEST['switch_node'])))
+			$ZBX_CURNODEID = $_REQUEST['switch_node'];
+	}
+	setcookie("nodeid",$ZBX_CURNODEID);
 
 // Include Validation
 
@@ -297,68 +308,21 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 		return "$s $u$units";
 	}
 
-	function	get_template_permission_str($num)
-	{
-		$str=SPACE;
-		if(($num&1)==1)	$str=$str.S_ADD.SPACE;
-		if(($num&2)==2)	$str=$str.S_UPDATE.SPACE;
-		if(($num&4)==4)	$str=$str.S_DELETE.SPACE;
-		return $str;
-	}
-	
-	function	get_media_count_by_userid($userid)
-	{
-		$sql="select count(mediaid) as cnt from media where userid=$userid";
-		$result=DBselect($sql);
-		$row=DBfetch($result);
-		return $row["cnt"]; 
-	}
-	
-	function	get_action_count_by_triggerid($triggerid)
-	{
-		$cnt=0;
-
-		$sql="select count(actionid) as cnt from actions where triggerid=$triggerid and scope=0";
-		$result=DBselect($sql);
-		$row=DBfetch($result);
-
-		$cnt=$cnt+$row["cnt"];
-
-		$sql="select count(actionid) as cnt from actions where scope=2";
-		$result=DBselect($sql);
-		$row=DBfetch($result);
-
-		$cnt=$cnt+$row["cnt"];
-
-		$sql="select distinct h.hostid from hosts h,items i,triggers t,functions f where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=$triggerid";
-		$result=DBselect($sql);
-		while($row=DBfetch($result))
-		{
-			$sql="select count(*) as cnt from actions a,hosts h,items i,triggers t,functions f where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and a.triggerid=".$row["hostid"]." and a.scope=1";
-			$result2=DBselect($sql);
-			$row2=DBfetch($result2);
-			$cnt=$cnt+$row2["cnt"];
-		}
-
-		return $cnt; 
-	}
-
 	function	play_sound($filename)
 	{
-		echo '
+?>
 <SCRIPT TYPE="text/javascript">
 <!-- 
-var snd_tag = \'<BGSOUND SRC="'.$filename.'" LOOP=0/>\';
-
 if (navigator.appName != "Microsoft Internet Explorer")
-    snd_tag = \'<EMBED SRC="'.$filename.'" AUTOSTART=TRUE WIDTH=0 HEIGHT=0 LOOP=0><P/>\';
-
-document.writeln(snd_tag);
+	document.writeln('<EMBED SRC="<?php echo $filename; ?>" AUTOSTART=TRUE WIDTH=0 HEIGHT=0 LOOP=0><P/>');
+else
+	document.writeln('<BGSOUND SRC="<?php echo $filename; ?>" LOOP=0/>');
 // -->
 </SCRIPT>
 <NOSCRIPT>
-	<BGSOUND SRC="'.$filename.'"/>
-</NOSCRIPT>';
+	<BGSOUND SRC="<?php echo $filename; ?>"/>
+</NOSCRIPT>
+<?php
 	}
 
 //	The hash has form <md5sum of triggerid>,<sum of priorities>
@@ -386,39 +350,6 @@ document.writeln(snd_tag);
 		for($i=0;$i<=5;$i++)	$priorities += pow(100,$i)*$priority[$i];
 
 		return	"$priorities,$md5sum";
-	}
-
-	function	get_dbid($table,$field)
-	{
-		global	$ZBX_CURNODEID;
-
-		$sql="select max($field) as id from $table where mod($field,100)=$ZBX_CURNODEID";
-		$result=DBselect($sql);
-		$row=DBfetch($result);
-		if($row && !is_null($row["id"]))
-		{
-			return	$row["id"]+100;
-		}
-		else
-		{
-			return	100+$ZBX_CURNODEID;
-		}
-	}
-
-	function	get_function_by_functionid($functionid)
-	{
-		$sql="select * from functions where functionid=$functionid"; 
-		$result=DBselect($sql);
-		$row=DBfetch($result);
-		if($row)
-		{
-			return	$row;
-		}
-		else
-		{
-			error("No function with functionid=[$functionid]");
-		}
-		return	$item;
 	}
 
 	function	select_config()
@@ -765,106 +696,6 @@ document.writeln(snd_tag);
 		}
 		return 0;
 	}
-/*
-	function	validate_expression($expression)
-	{
-//		echo "Validating expression: $expression<br>";
-
-		$ok=0;
-// Replace all {server:key.function(param)} with 0
-		while($ok==0)
-		{
-//			echo "Expression:$expression<br>";
-			$arr="";
-			if (eregi('^((.)*)[ ]*(\{((.)*)\})[ ]*((.)*)$', $expression, $arr)) 
-			{
-//				for($i=0;$i<20;$i++)
-//				{
-//					if($arr[$i])
-//						echo "  $i: ",$arr[$i],"<br>";
-//				}
-				if(validate_simple_expression($arr[3])!=0)
-				{
-					return -1;
-				}
-				$expression=$arr[1]."0".$arr[6];
-	                }
-			else
-			{
-				$ok=1;
-			}
-		}
-//		echo "Result:$expression<br><hr>";
-
-		$ok=0;
-		while($ok==0)
-		{
-// 	Replace all <float> <sign> <float> <K|M|G> with 0
-//			echo "Expression:$expression<br>";
-			$arr="";
-			if (eregi('^((.)*)([0-9\.]+[A-Z]{0,1})[ ]*([\&\|\>\<\=\+\-\*\/\#]{1})[ ]*([0-9\.]+[A-Z]{0,1})((.)*)$', $expression, $arr)) 
-			{
-//				echo "OK<br>";
-//				for($i=0;$i<50;$i++)
-//				{
-//					if($arr[$i]!="")
-//						echo "  $i: ",$arr[$i],"<br>";
-//				}
-				if(validate_float($arr[3])!=0)
-				{
-					error("[".$arr[3]."] is not a float");
-					return -1;
-				}
-				if(validate_float($arr[5])!=0)
-				{
-					error("[".$arr[5]."] is not a float");
-					return -1;
-				}
-				$expression=$arr[1]."(0)".$arr[6];
-	                }
-			else
-			{
-				$ok=1;
-			}
-
-
-// 	Replace all (float) with 0
-//			echo "Expression2:[$expression]<br>";
-			$arr="";
-			if (eregi('^((.)*)(\(([ 0-9\.]+)\))((.)*)$', $expression, $arr)) 
-			{
-//				echo "OK<br>";
-//				for($i=0;$i<30;$i++)
-//				{
-//					if($arr[$i]!="")
-//						echo "  $i: ",$arr[$i],"<br>";
-//				}
-				if(validate_float($arr[4])!=0)
-				{
-					error("[".$arr[4]."] is not a float");
-					return -1;
-				}
-				$expression=$arr[1]."0".$arr[5];
-				$ok=0;
-	                }
-			else
-			{
-				$ok=1;
-			}
-
-
-
-		}
-//		echo "Result:$expression<br><hr>";
-
-		if($expression=="0")
-		{
-			return 0;
-		}
-
-		return 1;
-	}
-/**/
 
 	function	cr()
 	{
@@ -878,6 +709,9 @@ document.writeln(snd_tag);
 		global $page;
 		global $USER_DETAILS;
 COpt::profiling_start("page");
+
+		global $ZBX_CURNODEID;
+		global $ZBX_LOCALNODEID;
 
 		if($noauth==0)
 		{
@@ -899,8 +733,6 @@ COpt::profiling_start("page");
 <link rel="stylesheet" href="css.css">
 <?php
 		if(defined($title))	$title=constant($title);
-
-		global $ZBX_CURNODEID;
 
 		if($curr_node_data = DBfetch(DBselect('select * from nodes where nodeid='.$ZBX_CURNODEID)))
 			$title .= ' ('.$curr_node_data['name'].')';
@@ -1120,17 +952,37 @@ COpt::compare_files_with_menu($menu);
 				array_push($main_menu_row, new CCol(new CLink($sub['label'], $menu_url, "highlight"),$class));
 			}
 			
-			$table = new CTable(NULL,'menu');
-			$table->SetCellSpacing(0);
-			$table->SetCellPadding(5);
-			$table->AddRow($main_menu_row);
-			$table->Show();
+			$menu_table = new CTable(NULL,'menu');
+			$menu_table->SetCellSpacing(0);
+			$menu_table->SetCellPadding(5);
+			$menu_table->AddRow($main_menu_row);
 
-			$table = new CTable(NULL,'sub_menu');
+			$lst_nodes = new CComboBox('switch_node', $ZBX_CURNODEID);
+			$db_nodes = DBselect('select * from nodes where nodeid in ('.
+				get_accessible_nodes_by_userid($USER_DETAILS['userid'],PERM_READ_LIST).') ');
+			while($node_data = DBfetch($db_nodes))
+			{
+				$lst_nodes->AddItem($node_data['nodeid'],$node_data['name']);
+			}
+			$node_form = new CForm();
+			$node_form->AddItem('Current node ');
+			$node_form->AddItem($lst_nodes);
+			$node_form->AddItem(new CButton('submit',S_SWITCH));
+
+			$table = new CTable();
 			$table->SetCellSpacing(0);
-			$table->SetCellPadding(5);
-			$table->AddRow(new CCol($sub_menu_row));
+			$table->SetCellPadding(0);
+			$table->options['style'] = "width: 100%;";
+			
+			$table->AddRow(array($menu_table,$node_form));
 			$table->Show();
+			
+			$sub_menu_table = new CTable(NULL,'sub_menu');
+			$sub_menu_table->SetCellSpacing(0);
+			$sub_menu_table->SetCellPadding(5);
+			$sub_menu_table->AddRow(new CCol($sub_menu_row));
+		
+			$sub_menu_table->Show();
 
 			echo BR;
 
@@ -1197,12 +1049,6 @@ COpt::compare_files_with_menu($menu);
 		return $table;
 	}
 
-	function	delete_rights_by_userid($userid )
-	{
-		$sql="delete from rights where userid=$userid";
-		return	DBexecute($sql);
-	}
-
 	# Delete from History
 
 	function	delete_history_by_itemid($itemid, $use_housekeeper=0)
@@ -1264,193 +1110,19 @@ COpt::compare_files_with_menu($menu);
 		}
 	}
 
-	# Delete Media definition by mediatypeid
-
-	function	delete_media_by_mediatypeid($mediatypeid)
-	{
-		$sql="delete from media where mediatypeid=$mediatypeid";
-		return	DBexecute($sql);
-	}
-
-	# Delete alrtes by mediatypeid
-
-	function	delete_alerts_by_mediatypeid($mediatypeid)
-	{
-		$sql="delete from alerts where mediatypeid=$mediatypeid";
-		return	DBexecute($sql);
-	}
-
-	function	get_mediatype_by_mediatypeid($mediatypeid)
-	{
-		$sql="select * from media_type where mediatypeid=$mediatypeid";
-		$result=DBselect($sql);
-		$row=DBfetch($result);
-		if($row)
-		{
-			return	$row;
-		}
-		else
-		{
-			error("No media type with with mediatypeid=[$mediatypeid]");
-		}
-		return	$item;
-	}
-
-	# Delete media type
-
-	function	delete_mediatype($mediatypeid)
-	{
-
-		delete_media_by_mediatypeid($mediatypeid);
-		delete_alerts_by_mediatypeid($mediatypeid);
-		$sql="delete from media_type where mediatypeid=$mediatypeid";
-		return	DBexecute($sql);
-	}
-
-	# Update media type
-
-	function	update_mediatype($mediatypeid,$type,$description,$smtp_server,$smtp_helo,$smtp_email,$exec_path,$gsm_modem)
-	{
-		$ret = 0;
-
-		$sql="select * from media_type where description=".zbx_dbstr($description)." and mediatypeid!=$mediatypeid";
-		$result=DBexecute($sql);
-		if(DBfetch($result))
-		{
-			error("An action type with description '$description' already exists.");
-		}
-		else
-		{
-			$sql="update media_type set type=$type,description=".zbx_dbstr($description).",smtp_server=".zbx_dbstr($smtp_server).",smtp_helo=".zbx_dbstr($smtp_helo).",smtp_email=".zbx_dbstr($smtp_email).",exec_path=".zbx_dbstr($exec_path).",gsm_modem=".zbx_dbstr($gsm_modem)." where mediatypeid=$mediatypeid";
-			$ret =	DBexecute($sql);
-		}
-		return $ret;
-	}
-
-	# Add Media type
-
-	function	add_mediatype($type,$description,$smtp_server,$smtp_helo,$smtp_email,$exec_path,$gsm_modem)
-	{
-		$ret = 0;
-
-		if($description==""){
-			error(S_INCORRECT_DESCRIPTION);
-			return 0;
-		}
-
-		$sql="select * from media_type where description=".zbx_dbstr($description);
-		$result=DBexecute($sql);
-		if(DBfetch($result))
-		{
-			error("An action type with description '$description' already exists.");
-		}
-		else
-		{
-			$mediatypeid=get_dbid("media_type","mediatypeid");
-			$sql="insert into media_type (mediatypeid,type,description,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem) values ($mediatypeid,$type,".zbx_dbstr($description).",".zbx_dbstr($smtp_server).",".zbx_dbstr($smtp_helo).",".zbx_dbstr($smtp_email).",".zbx_dbstr($exec_path).",".zbx_dbstr($gsm_modem).")";
-			$ret = DBexecute($sql);
-			if($ret)	$ret = $mediatypeid;
-		}
-		return $ret;
-	}
-
-	# Add Media definition
-
-	function	add_media( $userid, $mediatypeid, $sendto, $severity, $active, $period)
-	{
-		if(validate_period($period) != 0)
-		{
-			error("Icorrect time period");
-			return NULL;
-		}
-
-		$c=count($severity);
-		$s=0;
-		for($i=0;$i<$c;$i++)
-		{
-			$s=$s|pow(2,(int)$severity[$i]);
-		}
-		$mediaid=get_dbid("media","mediaid");
-		$sql="insert into media (mediaid,userid,mediatypeid,sendto,active,severity,period) values ($mediaid,$userid,".zbx_dbstr($mediatypeid).",".zbx_dbstr($sendto).",$active,$s,".zbx_dbstr($period).")";
-		$ret = DBexecute($sql);
-		if($ret)	$ret = $mediaid;
-		return	$ret;
-	}
-
-	# Update Media definition
-
-	function	update_media($mediaid, $userid, $mediatypeid, $sendto, $severity, $active, $period)
-	{
-		if(validate_period($period) != 0)
-		{
-			error("Icorrect time period");
-			return NULL;
-		}
-
-		$c=count($severity);
-		$s=0;
-		for($i=0;$i<$c;$i++)
-		{
-			$s=$s|pow(2,(int)$severity[$i]);
-		}
-		$sql="update media set userid=$userid, mediatypeid=$mediatypeid, sendto=".zbx_dbstr($sendto).", active=$active,severity=$s,period=".zbx_dbstr($period)." where mediaid=$mediaid";
-		return	DBexecute($sql);
-	}
-
-	# Delete Media definition
-
-	function	delete_media($mediaid)
-	{
-		$sql="delete from media where mediaid=$mediaid";
-		return	DBexecute($sql);
-	}
-
 	# Update configuration
 
-//	function	update_config($smtp_server,$smtp_helo,$smtp_email,$alarm_history,$alert_history)
 	function	update_config($alarm_history,$alert_history,$refresh_unsupported,$work_period)
 	{
-		if(!check_right("Configuration of Zabbix","U",0))
-		{
-			error("Insufficient permissions");
-			return	0;
-		}
 		if(validate_period($work_period) != 0)
 		{
 			error("Icorrect work period");
 			return NULL;
 		}
 
-
-//		$sql="update config set smtp_server='$smtp_server',smtp_helo='$smtp_helo',smtp_email='$smtp_email',alarm_history=$alarm_history,alert_history=$alert_history";
-		$sql="update config set alarm_history=$alarm_history,alert_history=$alert_history,refresh_unsupported=$refresh_unsupported,".
-			"work_period=".zbx_dbstr($work_period);
-		return	DBexecute($sql);
-	}
-
-
-	# Activate Media
-
-	function	activate_media($mediaid)
-	{
-		$sql="update media set active=0 where mediaid=$mediaid";
-		return	DBexecute($sql);
-	}
-
-	# Disactivate Media
-
-	function	disactivate_media($mediaid)
-	{
-		$sql="update media set active=1 where mediaid=$mediaid";
-		return	DBexecute($sql);
-	}
-
-	# Delete User permission
-
-	function	delete_permission($rightid)
-	{
-		$sql="delete from rights where rightid=$rightid";
-		return DBexecute($sql);
+		return	DBexecute("update config set alarm_history=$alarm_history,alert_history=$alert_history,".
+			" refresh_unsupported=$refresh_unsupported,".
+			" work_period=".zbx_dbstr($work_period));
 	}
 
 	function	show_header2($col1, $col2=SPACE, $before="", $after="")
@@ -1467,156 +1139,6 @@ COpt::compare_files_with_menu($menu);
 		$table->SetCellPadding(1);
 		$table->AddRow(array(new CCol($col1,"header_l"), new CCol($col2,"header_r")));
 		$table->Show();
-	}
-
-	function	insert_time_navigator($itemid,$period,$from)
-	{
-		$descr=array("January","February","March","April","May","June",
-			"July","August","September","October","November","December");
-		$sql="select min(clock) as minn,max(clock) as maxx from history where itemid=$itemid";
-		$result=DBselect($sql);
-		$row=Dvfetch($result);
-
-		if(!row)
-		{
-			$min=time(NULL);
-			$max=time(NULL);
-		}
-		else
-		{
-			$min=$row["minn"];
-			$max=$row["maxx"];
-		}
-
-		$now=time()-3600*$from-$period;
-
-		$year_min=date("Y",$min);   
-		$year_max=date("Y",$max);
-
-		$year_now=date("Y",$now);
-		$month_now=date("m",$now);
-		$day_now=date("d",$now);
-		$hour_now=date("H",$now);
-
-		echo "<form method=\"put\" action=\"history.php\">";
-		echo "<input name=\"itemid\" type=\"hidden\" value=$itemid size=8>";
-		echo "<input name=\"action\" type=\"hidden\" value=\"showgraph\" size=8>";
-
-		echo "Year";
-		echo "<select name=\"year\">";
-	        for($i=$year_min;$i<=$year_max;$i++)
-	        {
-			if($i==$year_now)
-			{	
-	               		echo "<option value=\"$i\" selected>$i";
-			}
-			else
-			{
-	               		echo "<option value=\"$i\">$i";
-			}
-	        }
-		echo "</select>";
-
-		echo "Month";
-		echo "<select name=\"month\">";
-	        for($i=1;$i<=12;$i++)
-	        {
-			if($i==$month_now)
-			{	
-	               		echo "<option value=\"$i\" selected>".$descr[$i-1];
-			}
-			else
-			{
-	               		echo "<option value=\"$i\">".$descr[$i-1];
-			}
-	        }
-		echo "</select>";
-
-		echo "Day";
-		echo "<select name=\"day\">";
-	        for($i=1;$i<=31;$i++)
-	        {
-			if($i==$day_now)
-			{	
-	               		echo "<option value=\"$i\" selected>$i";
-			}
-			else
-			{
-	               		echo "<option value=\"$i\">$i";
-			}
-	        }
-		echo "</select>";
-
-		echo "Hour";
-		echo "<select name=\"hour\">";
-	        for($i=0;$i<=23;$i++)
-	        {
-			if($i==$hour_now)
-			{	
-	               		echo "<option value=\"$i\" selected>$i";
-			}
-			else
-			{
-	               		echo "<option value=\"$i\">$i";
-			}
-	        }
-		echo "</select>";
-
-		echo "Period:";
-		echo "<select name=\"period\">";
-		if($period==3600)
-		{
-			echo "<option value=\"3600\" selected>1 hour";
-		}
-		else
-		{
-			echo "<option value=\"3600\">1 hour";
-		}
-		if($period==10800)
-		{
-			echo "<option value=\"10800\" selected>3 hours";
-		}
-		else
-		{
-			echo "<option value=\"10800\">3 hours";
-		}
-		if($period==21600)
-		{
-			echo "<option value=\"21600\" selected>6 hours";
-		}
-		else
-		{
-			echo "<option value=\"21600\">6 hours";
-		}
-		if($period==86400)
-		{
-			echo "<option value=\"86400\" selected>24 hours";
-		}
-		else
-		{
-			echo "<option value=\"86400\">24 hours";
-		}
-		if($period==604800)
-		{
-			echo "<option value=\"604800\" selected>one week";
-		}
-		else
-		{
-			echo "<option value=\"604800\">one week";
-		}
-		if($period==2419200)
-		{
-			echo "<option value=\"2419200\" selected>one month";
-		}
-		else
-		{
-			echo "<option value=\"2419200\">one month";
-		}
-		echo "</select>";
-
-		echo "<input class=\"button\" type=\"submit\" name=\"action\" value=\"showgraph\">";
-
-		echo "</form>";
 	}
 
 	# Show History Graph
@@ -1672,7 +1194,8 @@ COpt::compare_files_with_menu($menu);
 					"page_footer_l"),
 				new CCol(array(
 						new CSpan(SPACE.SPACE."|".SPACE.SPACE,"divider"),
-						S_CONNECTED_AS.SPACE.$USER_DETAILS["alias"]
+						S_CONNECTED_AS.SPACE."'".$USER_DETAILS["alias"]."'".SPACE.
+						S_FROM_SMALL.SPACE."'".$USER_DETAILS["node"]['name']."'"
 					),
 					"page_footer_r")
 				));
@@ -2053,6 +1576,13 @@ COpt::profiling_stop("script");
 		return ($var == "" ? 0 : 1);
 	}
 
+	function	get_cookie($name, $default_value)
+	{
+		if(isset($_COOKIE[$name]))	return $_COOKIE[$name];
+		// else
+		return $default_value;
+	}
+	
 	function	get_profile($idx,$default_value,$type=PROFILE_TYPE_UNCNOWN)
 	{
 		global $USER_DETAILS;
@@ -2299,70 +1829,21 @@ else if (document.getElementById)
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--
-	window.location = '<?php echo $url ?>';
+	window.location = '<?php echo $url; ?>';
 //-->
 </script>
 <?php
 	}
 
-	function insert_javascript_clock($form, $field)
-	{
-		echo "
-<script language=\"JavaScript\" type=\"text/javascript\">
-<!--
-	function show_clock()
-	{
-		var thetime=new Date();
-
-		var nhours=thetime.getHours();
-		var nmins=thetime.getMinutes();
-		var nsecn=thetime.getSeconds();
-		var AorP=\" \";
-
-		var year = thetime.getFullYear();
-		var nmonth = thetime.getMonth()+1;
-		var ndate = thetime.getDate();
-		
-		if (nhours>=12)		AorP=\"PM\";
-		else			AorP=\"AM\";
-
-		if (nhours>=13)		nhours-=12;
-		if (nhours==0)		nhours=12;
-
-		if (nsecn<10)		nsecn=\"0\"+nsecn;
-		if (nmins<10)		nmins=\"0\"+nmins;
-		if (nmonth<10)		nmonth=\"0\"+nmonth;
-		if (ndate<10)		ndate=\"0\"+ndate;
-
-		document.forms['$form'].elements['$field'].value=ndate+\"-\"+nmonth+\"-\"+year+\" \"+nhours+\":\"+nmins+\":\"+nsecn+\" \"+AorP;
-
-		setTimeout('show_clock()',1000);
-	} 
-//-->
-</script>
-";
-	}
-
-	function	start_javascript_clock()
-	{
-		echo "
-<script language=\"JavaScript\" type=\"text/javascript\">
-<!--
-	show_clock();
-//-->
-</script>
-";
-	}
-
 	function	SetFocus($frm_name, $fld_name)
 	{
-		echo "
-<script language=\"JavaScript\" type=\"text/javascript\">
+?>
+<script language="JavaScript" type="text/javascript">
 <!--
-	document.forms['$frm_name'].elements['$fld_name'].focus();
+	document.forms['<?php echo $frm_name; ?>'].elements['<?php echo $fld_name; ?>'].focus();
 //-->
 </script>
-";
+<?php
 	}
 
 /* Use ImageSetStyle+ImageLIne instead of bugged ImageDashedLine */
@@ -2611,13 +2092,13 @@ else if (document.getElementById)
 
 	function	Alert($msg)
 	{
-		echo "
+?>
 <script language=\"JavaScript\" type=\"text/javascript\">
 <!--
-	alert('$msg');
+	alert('<? echo $msg; ?>');
 //-->
 </script>
-";
+<?php
 	}
 
 	function natksort(&$array) {

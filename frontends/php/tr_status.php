@@ -87,10 +87,6 @@
 		if(!isset($audio) || !file_exists($audio))
 			$audio = 'audio/trigger_'.$status.'.wav';
 	}
-	if(($old[1]!=$new[1])&&($new[0]>=$old[0]))
-	{
-// DISASTER
-	}
 
 //	echo "$tr_hash<br>$triggers_hash<br>".$old[1]."<br>".$new[1];
 ?>
@@ -113,21 +109,7 @@
 	}
 ?>
 <?php
-	validate_group_with_host("R",array("allow_all_hosts","monitored_hosts","with_monitored_items"),"web.tr_status.groupid","web.tr_status.hostid");
-?>
-<?php
-	if(!check_anyright("Host","R"))
-	{
-		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-		show_page_footer();
-		exit;
-	}
-	if($_REQUEST["hostid"] > 0 && !check_right("Host","R",$_REQUEST["hostid"]))
-	{
-		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-		show_page_footer();
-		exit;
-	}
+	validate_group_with_host(PERM_READ_ONLY,array("allow_all_hosts","monitored_hosts","with_monitored_items"),"web.tr_status.groupid","web.tr_status.hostid");
 ?>
 <?php
 
@@ -215,7 +197,7 @@
 		$cnt=0;
 		while($row2=DBfetch($result2))
 		{
-			if(!check_right("Host","R",$row2["hostid"]))
+//			if(!check_right("Host","R",$row2["hostid"])) /* TODO */
 			{
 				continue;
 			}
@@ -252,7 +234,7 @@
 	$result=DBselect($sql);
 	while($row=DBfetch($result))
 	{
-		if(!check_right("Host","R",$row["hostid"]))
+//		if(!check_right("Host","R",$row["hostid"])) /* TODO */
 		{
 			continue;
 		}
@@ -510,7 +492,7 @@
 	$col=0;
 	while($row=DBfetch($result))
 	{
-		if(!check_right_on_trigger("R",$row["triggerid"]))
+		if(!check_right_on_trigger(PERM_READ_ONLY,$row["triggerid"]))
 		{
 			continue;
 		}

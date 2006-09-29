@@ -89,6 +89,7 @@
 	define("USE_PROFILING",1);
 	define("USE_TIME_PROF",1);
 	define("USE_MEM_PROF",1);
+	define("USE_COUNTER_PROF",1);
 //	define("USE_MENU_PROF",1);
 //	define("USE_MENU_DETAILS",1);
 	define("USE_SQLREQUEST_PROF",1);
@@ -100,6 +101,7 @@ if(defined('USE_PROFILING'))
 	$memorystamp=array();
 	$sqlrequests=array();
 	$sqlmark = array();
+	$perf_counter = array();
 
 	class COpt
 	{
@@ -140,6 +142,23 @@ if(defined('USE_MEM_PROF')) {
 			return round($size, 6).$prefix;
 		}
 
+		/* public static */ function counter_up($type=NULL)
+		{
+if(defined('USE_COUNTER_PROF'))
+{
+			global $perf_counter;
+			global $starttime;
+
+			foreach(array_keys($starttime) as $keys)
+			{
+				if(!isset($perf_counter[$keys][$type]))
+					$perf_counter[$keys][$type]=1;
+				else
+					$perf_counter[$keys][$type]++;
+			}
+}
+		}
+		
 		/* public static */ function profiling_start($type=NULL)
 		{
 			global $starttime;
@@ -172,6 +191,7 @@ if(defined('USE_SQLREQUEST_PROF'))
 			global $memorystamp;
 			global $sqlrequests;
 			global $sqlmark;
+			global $perf_counter;
 
 			$endtime = COpt::getmicrotime();
 			$memory = COpt::getmemoryusage();
@@ -188,6 +208,17 @@ if(defined('USE_MEM_PROF'))
 			echo "(".$type.") Memory limit	 : ".ini_get('memory_limit')."<br>\n";
 			echo "(".$type.") Memory usage	 : ".COpt::mem2str($memorystamp[$type])." - ".COpt::mem2str($memory)."\n<br>\n";
 			echo "(".$type.") Memory leak	 : ".COpt::mem2str($memory - $memorystamp[$type])."\n<br>\n";
+}
+if(defined('USE_COUNTER_PROF'))
+{
+			if(isset($perf_counter[$type]))
+			{
+				ksort($perf_counter[$type]);
+				foreach($perf_counter[$type] as $name => $value)
+				{
+					echo "(".$type.") Counter '".$name."' : ".$value."</br>\n";
+				}
+			}
 }
 if(defined('USE_SQLREQUEST_PROF'))
 {

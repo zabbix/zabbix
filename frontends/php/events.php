@@ -39,7 +39,7 @@
 
 	check_fields($fields);
 
-	validate_group_with_host("R", array("allow_all_hosts","always_select_first_host","monitored_hosts","with_items"));
+	validate_group_with_host(PERM_READ_ONLY, array("allow_all_hosts","always_select_first_host","monitored_hosts","with_items"));
 ?>
 
 
@@ -77,7 +77,7 @@
 		$cnt=0;
 		while($row2=DBfetch($result2))
 		{
-			if(!check_right("Host","R",$row2["hostid"]))
+//			if(!check_right("Host","R",$row2["hostid"])) /* TODO */
 			{
 				continue;
 			}
@@ -108,7 +108,7 @@
 	$result=DBselect($sql);
 	while($row=DBfetch($result))
 	{
-		if(!check_right("Host","R",$row["hostid"]))
+//		if(!check_right("Host","R",$row["hostid"])) /* TODO */
 		{
 			continue;
 		}

@@ -68,7 +68,7 @@
 	$_REQUEST["period"] = get_request("period",get_profile("web.graph[".$_REQUEST["graphid"]."].period", 3600));
 	$effectiveperiod=navigation_bar_calc();
 
-	validate_group_with_host("R",array("allow_all_hosts","monitored_hosts","with_items"));
+	validate_group_with_host(PERM_READ_ONLY,array("allow_all_hosts","monitored_hosts","with_items"));
 
 	if($_REQUEST["graphid"] > 0 && $_REQUEST["hostid"] > 0)
 	{
@@ -117,7 +117,7 @@
 		$cnt=0;
 		while($row2=DBfetch($result2))
 		{
-			if(!check_right("Host","R",$row2["hostid"]))
+//			if(!check_right("Host","R",$row2["hostid"])) /* TODO */
 			{
 				continue;
 			}
@@ -147,7 +147,7 @@
 	$result=DBselect($sql);
 	while($row=DBfetch($result))
 	{
-		if(!check_right("Host","R",$row["hostid"]))
+//		if(!check_right("Host","R",$row["hostid"])) /* TODO */
 		{
 			continue;
 		}
@@ -188,7 +188,7 @@
 	$result=DBselect($sql);
 	while($row=DBfetch($result))
 	{
-		if(!check_right("Graph","R",$row["graphid"]))
+//		if(!check_right("Graph","R",$row["graphid"])) /* TODO */
 		{
 			continue;
 		}

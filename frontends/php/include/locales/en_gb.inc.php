@@ -554,6 +554,7 @@
 	"S_SKIP_EXISTING_ITEMS"=>		"Skip existing items",
 	"S_UPDATE_EXISTING_NON_LINKED_ITEMS"=>	"update existing non linked items",
 	"S_COPY"=>				"Copy",
+	"S_SHOW_ITEMS_WITH_DESCRIPTION_LIKE"=>	"Show items with description like",
 
 //	events.php
 	"S_LATEST_EVENTS"=>			"Latest events",
@@ -648,6 +649,7 @@
 	"S_MENU_HOSTS"=>			"HOSTS",
 	"S_MENU_ITEMS"=>			"ITEMS",
 	"S_MENU_AUDIT"=>			"AUDIT",
+	"S_SWITCH"=>				"Switch",
 
 //	overview.php
 	"S_SELECT_GROUP_DOT_DOT_DOT"=>		"Select group ...",
@@ -705,6 +707,7 @@
 	"S_IT_SERVICES_AVAILABILITY_REPORT"=>	"IT services availability report",
 	"S_IT_SERVICES_AVAILABILITY_REPORT_BIG"=>	"IT SERVICES AVAILABILITY REPORT",
 	"S_FROM"=>				"From",
+	"S_FROM_SMALL"=>			"from",
 	"S_TILL"=>				"Till",
 	"S_OK"=>				"Ok",
 	"S_PROBLEMS"=>				"Problems",

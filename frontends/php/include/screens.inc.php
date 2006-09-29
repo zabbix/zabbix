@@ -21,12 +21,6 @@
 <?php
         function        add_screen($name,$hsize,$vsize)
         {
-                if(!check_right("Screen","A",0))
-                {
-                        error("Insufficient permissions");
-                        return 0;
-                }
-
 		$screenid=get_dbid("screens","screenid");
                 $sql="insert into screens (screenid,name,hsize,vsize) values ($screenid,".zbx_dbstr($name).",$hsize,$vsize)";
                 $result=DBexecute($sql);
@@ -39,12 +33,6 @@
 
         function        update_screen($screenid,$name,$hsize,$vsize)
         {
-                if(!check_right("Screen","U",0))
-                {
-                        error("Insufficient permissions");
-                        return 0;
-                }
-
                 $sql="update screens set name=".zbx_dbstr($name).",hsize=$hsize,vsize=$vsize where screenid=$screenid";
                 return  DBexecute($sql);
         }
@@ -56,9 +44,6 @@
 
                 $result=DBexecute("delete from screens_items where resourceid=$screenid and resourcetype=".SCREEN_RESOURCE_SCREEN);
                 if(!$result)	return  $result;
-
-		// delete screen permisions
-		DBexecute('delete from rights where name=\'Screen\' and id='.$screenid);
 
                 return  DBexecute("delete from screens where screenid=$screenid");
         }

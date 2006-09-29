@@ -42,7 +42,7 @@
 		$skip=$start;
 		while(($row=DBfetch($result))&&($col<100))
 		{
-			if(!check_right_on_trigger("R",$row["triggerid"]))
+			if(!check_right_on_trigger(PERM_READ_ONLY,$row["triggerid"]))
 			{
 				continue;
 			}

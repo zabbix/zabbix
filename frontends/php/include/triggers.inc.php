@@ -19,6 +19,8 @@
 **/
 ?>
 <?php
+	require_once "maps.inc.php";
+
 	function	get_severity_style($severity)
 	{
 		if($severity == 1)	return "information";
@@ -298,11 +300,6 @@
 		$expression, $description, $priority, $status,
 		$comments, $url, $deps=array(), $templateid=0)
 	{
-//		if(!check_right("Trigger","A",0))
-//		{
-//			error("Insufficient permissions");
-//			return	0;
-//		}
 		if(!is_null($expression)) if(validate_expression($expression))	return FALSE;
 
 		$triggerid=get_dbid("triggers","triggerid");
@@ -388,7 +385,7 @@
 				$copy_mode ? 0 : $triggerid);
 		}
 
-		$newtriggerid=dn_getid("triggers","triggerid");
+		$newtriggerid=get_dbid("triggers","triggerid");
 
 		$result = DBexecute("insert into triggers".
 			" (triggerid,description,priority,status,comments,url,value,expression,templateid)".
@@ -627,12 +624,6 @@
 
 	function	update_trigger_comments($triggerid,$comments)
 	{
-		if(!check_right("Trigger comment","U",$triggerid))
-		{
-			error("Insufficient permissions");
-			return	0;
-		}
-
 		return	DBexecute("update triggers set comments=".zbx_dbstr($comments).
 			" where triggerid=$triggerid");
 	}
@@ -648,11 +639,6 @@
 			update_trigger_status($db_chd_trigger["triggerid"],$status);
 		}
 
-		if(!check_right_on_trigger("U",$triggerid))
-		{
-                        error("Insufficient permissions");
-                        return 0;
-		}
 		add_alarm($triggerid,TRIGGER_VALUE_UNKNOWN);
 		return	DBexecute("update triggers set status=$status where triggerid=$triggerid");
 	}
@@ -788,9 +774,6 @@
 
 		if($result)
 		{
-		// delete trigger permisions
-			DBexecute('delete from rights where name=\'Trigger comment\' and id='.$triggerid);
-
 			$msg = "Trigger '".$trigger["description"]."' deleted";
 			$trig_host = DBfetch($trig_hosts);
 			if($trig_host)
@@ -807,12 +790,6 @@
 	function	update_trigger($triggerid,$expression=NULL,$description=NULL,$priority=NULL,$status=NULL,
 		$comments=NULL,$url=NULL,$deps=array(),$templateid=0)
 	{
-		if(!check_right_on_trigger("U",$triggerid))
-		{
-                        error("Insufficient permissions");
-                        return 0;
-		}
-
 		$trigger	= get_trigger_by_triggerid($triggerid);
 		$trig_hosts	= get_hosts_by_triggerid($triggerid);
 		$trig_host	= DBfetch($trig_hosts);
@@ -899,14 +876,15 @@
 		return $result;
 	}
 
-	function	check_right_on_trigger($permission,$triggerid)
+	function	check_right_on_trigger($permission,$triggerid)	/* TODO */
 	{
+		/*
                 $result=DBselect("select distinct h.hostid from functions f,items i,hosts h".
 			" where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid");
 		while($row=DBfetch($result))
 			if(check_right("Host",$permission,$row["hostid"]))
 				return 1;
-
+		*/
 		return	0;
 	}
 
@@ -1096,7 +1074,6 @@
 		unset($hosts);
 		while($row = DBfetch($result))
 		{
-			if(!check_right('Host','R',$row['hostid'])) continue;
 			$hosts[$row['host']] = $row['host'];
 			$triggers[$row['description']][$row['host']] = array('value' => $row['value'], 'lastchange' => $row['lastchange']);
 		}
@@ -1133,4 +1110,20 @@
 		}
 		return $table;
 	}
+
+	function	get_function_by_functionid($functionid)
+	{
+		$result=DBselect("select * from functions where functionid=$functionid");
+		$row=DBfetch($result);
+		if($row)
+		{
+			return	$row;
+		}
+		else
+		{
+			error("No function with functionid=[$functionid]");
+		}
+		return	$item;
+	}
+
 ?>

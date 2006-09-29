@@ -560,6 +560,8 @@
 	function	insert_item_form()
 	{
 		global  $_REQUEST;
+		global  $USER_DETAILS;
+		global  $ZBX_CURNODEID;
 
 		$frmItem = new CFormTable(S_ITEM,"items.php");
 		$frmItem->SetHelp("web.items.item.php");
@@ -914,20 +916,12 @@
 
 	        $cmbGroups = new CComboBox("add_groupid",$add_groupid);		
 
-	        $groups=DBselect("select groupid,name from groups order by name");
+	        $groups=DBselect("select distinct groupid,name from groups ".
+			"where groupid in (".get_accessible_groups_by_userid($USER_DETAILS['userid'],PERM_READ_ONLY,null,null,$ZBX_CURNODEID).") ".
+			" order by name");
 	        while($group=DBfetch($groups))
 	        {
-// Check if at least one host with read permission exists for this group
-	                $hosts=DBselect("select h.hostid,h.host from hosts h,hosts_groups hg".
-				" where hg.groupid=".$group["groupid"]." and hg.hostid=h.hostid".
-				" and h.status<>".HOST_STATUS_DELETED." group by h.hostid,h.host".
-				" order by h.host");
-	                while($host=DBfetch($hosts))
-	                {
-	                        if(!check_right("Host","U",$host["hostid"])) continue;
-				$cmbGroups->AddItem($group["groupid"],$group["name"]);
-				break;
-	                }
+			$cmbGroups->AddItem($group["groupid"],$group["name"]);
 	        }
 		$frmItem->AddRow(S_GROUP,$cmbGroups);
 
@@ -2424,7 +2418,8 @@
 
 	function	insert_host_form($show_only_tmp=0)
 	{
-
+		global $ZBX_CURNODEID;
+		global $USER_DETAILS;
 		global $_REQUEST;
 
 		$groups= get_request("groups",array());
@@ -2472,7 +2467,10 @@
 
 			$templateid = $db_host["templateid"];
 // add groups
-			$db_groups=DBselect("select groupid from hosts_groups where hostid=".$_REQUEST["hostid"]);
+			$db_groups=DBselect("select distinct groupid from hosts_groups where hostid=".$_REQUEST["hostid"].
+				" and groupid in (".
+				get_accessible_groups_by_userid($USER_DETAILS['userid'],PERM_READ_LIST,null,null,$ZBX_CURNODEID).
+				") ");
 			while($db_group=DBfetch($db_groups)){
 				if(in_array($db_group["groupid"],$groups)) continue;
 				array_push($groups, $db_group["groupid"]);
@@ -2520,7 +2518,11 @@
 		$frmHost->AddRow(S_NAME,new CTextBox("host",$host,20));
 
 		$frm_row = array();
-		$db_groups=DBselect("select distinct groupid,name from groups order by name");
+		
+		$db_groups=DBselect("select distinct groupid,name from groups ".
+			" where groupid in (".
+			get_accessible_groups_by_userid($USER_DETAILS['userid'],PERM_READ_LIST,null,null,$ZBX_CURNODEID).
+			") order by name");
 		while($db_group=DBfetch($db_groups))
 		{
 			array_push($frm_row,

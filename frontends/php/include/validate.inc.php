@@ -300,6 +300,7 @@
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$system_fields=array(
 		"sessionid"=>		array(T_ZBX_STR, O_OPT,	 P_SYS,	HEX(),NULL),
+		"switch_node"=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,NULL),
 		"triggers_hash"=>	array(T_ZBX_STR, O_OPT,	 P_SYS,	NOT_EMPTY,NULL)
 	);
 

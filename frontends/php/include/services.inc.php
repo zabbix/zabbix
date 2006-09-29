@@ -103,8 +103,6 @@ var_dump($service_times);
 		{
 			return	$result;
 		}
-	// delete service permisions
-		DBexecute('delete from rights where name=\'Service\' and id='.$serviceid);
 
 		$sql="delete from services where serviceid=$serviceid";
 		return DBexecute($sql);

@@ -28,22 +28,7 @@
 ?>
 
 <?php
-        if(!check_anyright("Host","R"))
-        {
-                show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-                show_page_footer();
-                exit;
-        }
-	
-        if(isset($_REQUEST["hostid"])&&!check_right("Host","R",$_REQUEST["hostid"]))
-        {
-                show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-                show_page_footer();
-                exit;
-        }
-?>
-<?php
-	validate_group_with_host("R", array("allow_all_hosts","monitored_hosts","with_items"));
+	validate_group_with_host(PERM_READ_ONLY, array("allow_all_hosts","monitored_hosts","with_items"));
 ?>
 <?php
 	$form = new CForm();
@@ -62,7 +47,7 @@
 			" order by h.host");
 		while($row2=DBfetch($result2))
 		{
-			if(!check_right("Host","R",$row2["hostid"]))	continue;
+//			if(!check_right("Host","R",$row2["hostid"]))	continue; /* TODO */
 			$cmbGroup->AddItem($row["groupid"],$row["name"]);
 			break;
 		}
@@ -92,7 +77,7 @@
 	$result=DBselect($sql);
 	while($row=DBfetch($result))
 	{
-		if(!check_right("Host","R",$row["hostid"]))	continue;
+//		if(!check_right("Host","R",$row["hostid"]))	continue; /* TODO */
 		$cmbHost->AddItem($row["hostid"],$row["host"]);
 	}
 	$form->AddItem($cmbHost);
@@ -128,7 +113,7 @@
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
-        		if(!check_right("Host","R",$row["hostid"]))
+//        		if(!check_right("Host","R",$row["hostid"])) /* TODO */
 			{
 				continue;
 			}

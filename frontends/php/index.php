@@ -81,7 +81,6 @@
 
 	show_header($page["title"],0,0);
 ?>
-
 <?php
 	if(!isset($_COOKIE["sessionid"]))
 	{

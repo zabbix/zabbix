@@ -28,34 +28,16 @@
 	$page["file"] = "overview.php";
 	show_header($page["title"],1,0);
 ?>
-
 <?php
 	define("SHOW_TRIGGERS",0);
 	define("SHOW_DATA",1);
-?>
 
-
-<?php
-        if(!check_anyright("Host","R"))
-        {
-                show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-                show_page_footer();
-                exit;
-        }
 	if(isset($_REQUEST["select"])&&($_REQUEST["select"]!=""))
 	{
 		unset($_REQUEST["groupid"]);
 		unset($_REQUEST["hostid"]);
 	}
-	
-        if(isset($_REQUEST["hostid"])&&!check_right("Host","R",$_REQUEST["hostid"]))
-        {
-                show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-                show_page_footer();
-                exit;
-        }
 ?>
-
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
@@ -65,15 +47,13 @@
 
 	check_fields($fields);
 
-	validate_group("R",array("allow_all_hosts","monitored_hosts","with_monitored_items"));
+	validate_group(PERM_READ_ONLY,array("allow_all_hosts","monitored_hosts","with_monitored_items"));
 ?>
-
 <?php
 	$_REQUEST["type"] = get_request("type",get_profile("web.overview.type",0));
 
 	update_profile("web.overview.type",$_REQUEST["type"]);
 ?>
-
 <?php
 
 	$form = new CForm();
