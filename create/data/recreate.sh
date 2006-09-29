@@ -47,6 +47,10 @@ for i in 1 2 3 4 5 6 7; do
 	echo "update images set imageid=imageid+0000100000000000000*$i"|mysql -uroot 1_3_rights$i
 done
 
+for i in 2 3 4 5 6 7; do
+	mysqldump --add-drop-table=false --add-locks=FALSE --no-create-db=FALSE --create-options=FALSE --no-create-info=TRUE --ignore-table="1_3_rights$i.help_items" --ignore-table="1_3_rights$i.nodes" -uroot 1_3_rights$i | mysql -f -uroot 1_3_rights1
+done
+
 #echo Making MySQL server
 #cd ../..
 #./configure --enable-agent --enable-server --with-mysql --with-net-snmp --prefix=`pwd` 2>>WARNINGS >/dev/null
