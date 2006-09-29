@@ -142,6 +142,7 @@ CREATE TABLE services_times (
 ----------------------------------------------------
 ----------------------------------------------------
 --------------- NEW RIGHT SYSTEM -------------------
+-------------------- (Osmiy) -----------------------
 ----------------------------------------------------
 ----------------------------------------------------
 
@@ -158,3 +159,7 @@ CREATE TABLE rights (
   PRIMARY KEY (rightid),
   KEY (groupid)
 ) type=InnoDB;
+
+alter table sysmaps_elements	change icon		iconid_off	int(4)		DEFAULT '0' NOT NULL;
+alter table sysmaps_elements	change icon_on		iconid_on	int(4)		DEFAULT '0' NOT NULL;
+alter table sysmaps		change background	backgroundid	int(4)		DEFAULT '0' NOT NULL;

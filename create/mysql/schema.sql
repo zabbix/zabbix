@@ -178,8 +178,8 @@ CREATE TABLE sysmaps_elements (
   sysmapid		int(4)		DEFAULT '0' NOT NULL,
   elementid		int(4)		DEFAULT '0' NOT NULL,
   elementtype		int(4)		DEFAULT '0' NOT NULL,
-  icon			varchar(32)	DEFAULT 'Server' NOT NULL,
-  icon_on		varchar(32)	DEFAULT 'Server' NOT NULL,
+  iconid_off		int(4)		DEFAULT '0' NOT NULL;
+  iconid_on		int(4)		DEFAULT '0' NOT NULL;
   label			varchar(128)	DEFAULT '' NOT NULL,
   label_location	int(1)		DEFAULT NULL,
   x			int(4)		DEFAULT '0' NOT NULL,
@@ -197,7 +197,7 @@ CREATE TABLE sysmaps (
   name			varchar(128)	DEFAULT '' NOT NULL,
   width			int(4)		DEFAULT '0' NOT NULL,
   height		int(4)		DEFAULT '0' NOT NULL,
-  background		varchar(64)	DEFAULT '' NOT NULL,
+  backgroundid		int(4)		DEFAULT '0' NOT NULL,
   label_type		int(4)		DEFAULT '0' NOT NULL,
   label_location	int(1)		DEFAULT '0' NOT NULL,
   PRIMARY KEY (sysmapid),
