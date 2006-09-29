@@ -52,18 +52,19 @@ extern	int	CONFIG_DBPORT;
 #define DB_FULL_DELETE	0
 #define DB_PART_DELETE	1
 
-#define DB_HOST		struct host_type
-#define DB_ITEM		struct item_type
-#define DB_TRIGGER	struct trigger_type
 #define DB_ACTION	struct action_type
-#define DB_CONDITION	struct condition_type
 #define DB_ALERT	struct alert_type
+#define DB_CONDITION	struct condition_type
+#define DB_EVENT	struct event_type
 #define DB_FUNCTION	struct function_type
-#define DB_MEDIA	struct media_type
-#define DB_MEDIATYPE	struct mediatype_type
 #define DB_GRAPH	struct graph_type
 #define DB_GRAPH_ITEM	struct graph_item_type
+#define DB_HOST		struct host_type
 #define DB_HOUSEKEEPER	struct housekeeper_type
+#define DB_ITEM		struct item_type
+#define DB_MEDIA	struct media_type
+#define DB_MEDIATYPE	struct mediatype_type
+#define DB_TRIGGER	struct trigger_type
 
 #ifdef HAVE_MYSQL
 	#define	DB_RESULT	MYSQL_RES *
@@ -140,9 +141,21 @@ void	PG_DBfree_result(DB_RESULT result);
 
 #define ZBX_MAX_SQL_LEN			16384
 
+DB_EVENT
+{
+	zbx_uint64_t	eventid;
+	zbx_uint64_t	triggerid;
+	int		clock;
+	int		value;
+	int		acknowledged;
+	char		trigger_description[TRIGGER_DESCRIPTION_LEN_MAX];
+	int		trigger_priority;
+	char		trigger_comments[TRIGGER_COMMENTS_LEN_MAX];
+};
+
 DB_HOST
 {
-	int     hostid;
+	zbx_uint64_t     hostid;
 	char    host[HOST_HOST_LEN_MAX];
 	int     useip;
 	char    ip[HOST_IP_LEN_MAX];
@@ -156,7 +169,7 @@ DB_HOST
 
 DB_GRAPH
 {
-	int	graphid;
+	zbx_uint64_t	graphid;
 	char	name[GRAPH_NAME_LEN_MAX];
 	int	width;
 	int	height;
@@ -167,9 +180,9 @@ DB_GRAPH
 
 DB_GRAPH_ITEM
 {
-	int	gitemid;
-	int	graphid;
-	int	itemid;
+	zbx_uint64_t	gitemid;
+	zbx_uint64_t	graphid;
+	zbx_uint64_t	itemid;
 	int	drawtype;
 	int	sortorder;
 	char	color[GRAPH_ITEM_COLOR_LEN_MAX];
@@ -177,8 +190,8 @@ DB_GRAPH_ITEM
 
 DB_ITEM
 {
-	int	itemid;
-	int	hostid;
+	zbx_uint64_t	itemid;
+	zbx_uint64_t	hostid;
 	int	type;
 	int	status;
 	char	*description;
@@ -226,15 +239,15 @@ DB_ITEM
 	char	*eventlog_source;
 
 	char	*logtimefmt;
-	int	valuemapid;
+	zbx_uint64_t	valuemapid;
 	char	*delay_flex;
 };
  
 DB_FUNCTION
 {
-	int     functionid;
-	int     itemid;
-	int     triggerid;
+	zbx_uint64_t     functionid;
+	zbx_uint64_t     itemid;
+	zbx_uint64_t     triggerid;
 	double  lastvalue;
 	int	lastvalue_null;
 	char    *function;
@@ -244,9 +257,9 @@ DB_FUNCTION
 
 DB_MEDIA
 {
-	int	mediaid;
+	zbx_uint64_t	mediaid;
 /*	char	*type;*/
-	int	mediatypeid;
+	zbx_uint64_t	mediatypeid;
 	char	*sendto;
 	char	*period;
 	int	active;
@@ -255,7 +268,7 @@ DB_MEDIA
 
 DB_MEDIATYPE
 {
-	int	mediatypeid;
+	zbx_uint64_t	mediatypeid;
 	int	type;
 	char	*description;
 	char	*smtp_server;
@@ -267,22 +280,22 @@ DB_MEDIATYPE
 
 DB_TRIGGER
 {
-	int	triggerid;
+	zbx_uint64_t	triggerid;
 	char	expression[TRIGGER_EXPRESSION_LEN_MAX];
 	char	description[TRIGGER_DESCRIPTION_LEN_MAX];
 	char	url[TRIGGER_URL_LEN_MAX];
 	char	comments[TRIGGER_COMMENTS_LEN_MAX];
 	int	status;
 	int	value;
-	int	prevvalue;
+//	int	prevvalue;
 	int	priority;
 };
 
 DB_ACTION
 {
-	int	actionid;
+	zbx_uint64_t	actionid;
 	int	actiontype;
-	int	userid;
+	zbx_uint64_t	userid;
 /*	int	delay;*/
 	int	lastcheck;
 	int	recipient;
@@ -295,8 +308,8 @@ DB_ACTION
 
 DB_CONDITION
 {
-	int	conditionid;
-	int	actionid;
+	zbx_uint64_t	conditionid;
+	zbx_uint64_t	actionid;
 	int	conditiontype;
 	int	operator;
 	char	*value;
@@ -304,11 +317,11 @@ DB_CONDITION
 
 DB_ALERT
 {
-	int	alertid;
-	int 	actionid;
+	zbx_uint64_t	alertid;
+	zbx_uint64_t 	actionid;
 	int 	clock;
 /*	char	*type;*/
-	int	mediatypeid;
+	zbx_uint64_t	mediatypeid;
 	char	*sendto;
 	char	*subject;
 	char	*message;
@@ -319,10 +332,10 @@ DB_ALERT
 
 DB_HOUSEKEEPER
 {
-	int	housekeeperid;
+	zbx_uint64_t	housekeeperid;
 	char	*tablename;
 	char	*field;
-	int	value;
+	zbx_uint64_t	value;
 };
 
 
@@ -339,22 +352,23 @@ int DBexecute(const char *fmt, ...);
 DB_RESULT DBselect(const char *fmt, ...);
 DB_RESULT	DBselectN(char *query, int n);
 DB_ROW	DBfetch(DB_RESULT result);
+zbx_uint64_t DBget_nextid(char *table, char *field);
 /*char	*DBget_field(DB_RESULT result, int rownum, int fieldnum);*/
 /*int	DBnum_rows(DB_RESULT result);*/
 int	DBinsert_id(int exec_result, const char *table, const char *field);
 int	DBis_null(char *field);
 
 int	DBget_function_result(double *result,char *functionid);
-void	DBupdate_host_availability(int hostid,int available,int clock,char *error);
-int	DBupdate_item_status_to_notsupported(int itemid, char *error);
+void	DBupdate_host_availability(zbx_uint64_t hostid,int available,int clock,char *error);
+int	DBupdate_item_status_to_notsupported(zbx_uint64_t itemid, char *error);
 int	DBadd_trend(int itemid, double value, int clock);
-int	DBadd_history(int itemid, double value, int clock);
-int	DBadd_history_log(int itemid, char *value, int clock, int timestamp, char *source, int severity);
-int	DBadd_history_str(int itemid, char *value, int clock);
-int	DBadd_history_text(int itemid, char *value, int clock);
-int	DBadd_history_uint(int itemid, zbx_uint64_t value, int clock);
-int	DBadd_service_alarm(int serviceid,int status,int clock);
-int	DBadd_alert(int actionid, int triggerid, int userid, int mediatypeid, char *sendto, char *subject, char *message, int maxrepeats, int repeatdelay);
+int	DBadd_history(zbx_uint64_t itemid, double value, int clock);
+int	DBadd_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity);
+int	DBadd_history_str(zbx_uint64_t itemid, char *value, int clock);
+int	DBadd_history_text(zbx_uint64_t itemid, char *value, int clock);
+int	DBadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock);
+int	DBadd_service_alarm(zbx_uint64_t serviceid,int status,int clock);
+int	DBadd_alert(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t userid, zbx_uint64_t mediatypeid, char *sendto, char *subject, char *message, int maxrepeats, int repeatdelay);
 void	DBupdate_triggers_status_after_restart(void);
 int	DBget_prev_trigger_value(int triggerid);
 /*int	DBupdate_trigger_value(int triggerid,int value,int clock);*/
@@ -388,8 +402,8 @@ int	DBadd_action_to_linked_hosts(int actionid,int hostid);
 
 int	DBget_trigger_by_triggerid(int triggerid,DB_TRIGGER *trigger);
 int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid);
-void	DBdelete_triggers_by_itemid(int itemid);
-void	DBdelete_sysmaps_hosts_by_hostid(int hostid);
+void	DBdelete_triggers_by_itemid(zbx_uint64_t itemid);
+void	DBdelete_sysmaps_hosts_by_hostid(zbx_uint64_t hostid);
 
 int	DBadd_graph(char *name, int width, int height, int yaxistype, double yaxismin, double yaxismax);
 int	DBget_graph_item_by_gitemid(int gitemid, DB_GRAPH_ITEM *graph_item);

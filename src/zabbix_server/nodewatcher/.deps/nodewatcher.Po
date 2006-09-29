@@ -70,10 +70,12 @@ nodewatcher.o nodewatcher.o: nodewatcher.c ../../../include/config.h \
   /usr/include/bits/ioctl-types.h /usr/include/sys/ttydefaults.h \
   /usr/include/sys/timeb.h ../../../include/zbxtypes.h \
   ../../../include/cfg.h ../../../include/db.h /usr/include/mysql/mysql.h \
-  /usr/include/mysql/mysql_com.h /usr/include/mysql/mysql_version.h \
-  /usr/include/mysql/my_alloc.h /usr/include/mysql/errmsg.h \
-  /usr/include/mysql/mysqld_error.h ../../../include/log.h \
-  ../../../include/zlog.h ../../../include/dbsync.h nodewatcher.h
+  /usr/include/mysql/mysql_com.h /usr/include/mysql/mysql_time.h \
+  /usr/include/mysql/mysql_version.h /usr/include/mysql/typelib.h \
+  /usr/include/mysql/my_list.h /usr/include/mysql/my_alloc.h \
+  /usr/include/mysql/errmsg.h /usr/include/mysql/mysqld_error.h \
+  ../../../include/log.h ../../../include/zlog.h \
+  ../../../include/dbsync.h events.h history.h nodewatcher.h nodesender.h
 
 ../../../include/config.h:
 
@@ -379,7 +381,13 @@ nodewatcher.o nodewatcher.o: nodewatcher.c ../../../include/config.h \
 
 /usr/include/mysql/mysql_com.h:
 
+/usr/include/mysql/mysql_time.h:
+
 /usr/include/mysql/mysql_version.h:
+
+/usr/include/mysql/typelib.h:
+
+/usr/include/mysql/my_list.h:
 
 /usr/include/mysql/my_alloc.h:
 
@@ -393,4 +401,10 @@ nodewatcher.o nodewatcher.o: nodewatcher.c ../../../include/config.h \
 
 ../../../include/dbsync.h:
 
+events.h:
+
+history.h:
+
 nodewatcher.h:
+
+nodesender.h:

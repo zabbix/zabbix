@@ -26,6 +26,6 @@
 
 extern	int	CONFIG_NODEID;
 
-void    apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value);
+void    apply_actions(DB_EVENT *event);
 
 #endif

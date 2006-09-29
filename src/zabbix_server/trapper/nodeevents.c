@@ -41,8 +41,9 @@
 #include "log.h"
 #include "zlog.h"
 
-#include "dbsync.h"
-#include "nodesync.h"
+#include "nodeevents.h"
+
+extern int     process_event(DB_EVENT *event);
 
 /******************************************************************************
  *                                                                            *
@@ -62,141 +63,32 @@
  ******************************************************************************/
 static int	process_record(int nodeid, char *record)
 {
-	char	tablename[MAX_STRING_LEN];
-	char	fieldname[MAX_STRING_LEN];
-	zbx_uint64_t	recid;
-	int	op;
-	int	valuetype;
-	char	value[MAX_STRING_LEN];
-	char	value_esc[MAX_STRING_LEN];
 	char	tmp[MAX_STRING_LEN];
-	char	sql[MAX_STRING_LEN];
-	int	i;
-	char	*key=NULL;
-	char	fields[MAX_STRING_LEN];
-	char	fields_update[MAX_STRING_LEN];
-	char	values[MAX_STRING_LEN];
-	DB_RESULT	result;
-	DB_ROW		row;
 
-//	zabbix_log( LOG_LEVEL_WARNING, "In process_record [%s]", record);
+	DB_EVENT	event;
 
-	zbx_get_field(record,tablename,0,'|');
+	zabbix_log( LOG_LEVEL_DEBUG, "In process_record [%s]", record);
+
+	memset(&event,0,sizeof(DB_EVENT));
+
+	zbx_get_field(record,tmp,0,'|');
+	sscanf(tmp,ZBX_FS_UI64,&event.eventid);
 	zbx_get_field(record,tmp,1,'|');
-	sscanf(tmp,ZBX_FS_UI64,&recid);
+	sscanf(tmp,ZBX_FS_UI64,&event.triggerid);
 	zbx_get_field(record,tmp,2,'|');
-	op=atoi(tmp);
+	event.clock=atoi(tmp);
+	zbx_get_field(record,tmp,3,'|');
+	event.value=atoi(tmp);
+	zbx_get_field(record,tmp,4,'|');
+	event.acknowledged=atoi(tmp);
 
-	for(i=0;tables[i].table!=0;i++)
-	{
-		if(strcmp(tables[i].table, tablename)==0)
-		{
-			key=tables[i].recid;
-			break;
-		}
-	}
-
-	if(key == NULL)
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "Cannot find key field for table [%s]",tablename);
-		return FAIL;
-	}
-	if(op==NODE_CONFIGLOG_OP_DELETE)
-	{
-		zbx_snprintf(tmp,sizeof(tmp),"delete from %s where %s=" ZBX_FS_UI64 " and nodeid=%d", tablename, key, recid, nodeid);
-		zabbix_log( LOG_LEVEL_WARNING, "SQL [%s]", sql);
-		return SUCCEED;
-	}
-
-	i=3;
-	fields[0]=0;
-	fields_update[0]=0;
-	values[0]=0;
-	while(zbx_get_field(record,fieldname,i++,'|')==SUCCEED)
-	{
-		tmp[0]=0;
-		zbx_get_field(record,tmp,i++,'|');
-		valuetype=atoi(tmp);
-		value[0]=0;
-		zbx_get_field(record,value,i++,'|');
-		if(op==NODE_CONFIGLOG_OP_UPDATE || op==NODE_CONFIGLOG_OP_ADD)
-		{
-			if(strcmp(value,"NULL")==0)
-			{
-				zbx_snprintf(tmp,sizeof(tmp),"%s=NULL,", fieldname);
-				strncat(fields_update,tmp,sizeof(fields));
-
-				zbx_snprintf(tmp,sizeof(tmp),"NULL,", value);
-			}
-			else
-			{
-				if(valuetype == ZBX_TYPE_INT || valuetype == ZBX_TYPE_UINT)
-				{
-					zbx_snprintf(tmp,sizeof(tmp),"%s=%s,", fieldname, value);
-					strncat(fields_update,tmp,sizeof(fields));
-
-					zbx_snprintf(tmp,sizeof(tmp),"%s,", value);
-				}
-				else
-				{
-					DBescape_string(value, value_esc,MAX_STRING_LEN);
-
-					zbx_snprintf(tmp,sizeof(tmp),"%s='%s',", fieldname, value_esc);
-					strncat(fields_update,tmp,sizeof(fields));
-	
-					zbx_snprintf(tmp,sizeof(tmp),"'%s',", value_esc);
-				}
-			}
-
-			strncat(values,tmp,sizeof(values));
-//			zabbix_log( LOG_LEVEL_WARNING, "VALUES [%s]", values);
-			zbx_snprintf(tmp,sizeof(tmp),"%s,", fieldname);
-			strncat(fields,tmp,sizeof(fields));
-//			zabbix_log( LOG_LEVEL_WARNING, "FIELDS [%s]", fields);
-		}
-		else
-		{
-			zabbix_log( LOG_LEVEL_WARNING, "Unknown record operation [%d]",op);
-			return FAIL;
-		}
-	}
-	if(fields[0]!=0)	fields[strlen(fields)-1]=0;
-	if(fields_update[0]!=0)	fields_update[strlen(fields_update)-1]=0;
-	if(values[0]!=0)	values[strlen(values)-1]=0;
-
-	if(op==NODE_CONFIGLOG_OP_UPDATE)
-	{
-//		zbx_snprintf(tmp,sizeof(tmp),"%s='%s',", fieldname, value);
-//		strncat(fields,tmp,sizeof(fields));
-		zbx_snprintf(sql,sizeof(sql),"update %s set %s where %s=" ZBX_FS_UI64, tablename, fields_update, key, recid);
-	}
-	else if(op==NODE_CONFIGLOG_OP_ADD)
-	{
-		result = DBselect("select 0 from %s where %s=" ZBX_FS_UI64, tablename, key, recid);
-		row = DBfetch(result);
-		if(row)
-		{
-			zbx_snprintf(sql,sizeof(sql),"update %s set %s where %s=" ZBX_FS_UI64, tablename, fields_update, key, recid);
-		}
-		else
-		{
-			zbx_snprintf(sql,sizeof(sql),"insert into %s (%s) values(%s)", tablename, fields, values);
-		}
-		DBfree_result(result);
-	}
-//	zabbix_log( LOG_LEVEL_WARNING, "SQL [%s]", sql);
-	if(FAIL == DBexecute(sql))
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "Failed [%s]", record);
-	}
-
-	return SUCCEED;
+	return process_event(&event);
 }
 /******************************************************************************
  *                                                                            *
- * Function: node_sync                                                        *
+ * Function: node_events                                                      *
  *                                                                            *
- * Purpose: process configuration changes received from a node                *
+ * Purpose: process new events received from a salve node                     *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -208,7 +100,7 @@ static int	process_record(int nodeid, char *record)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	node_sync(char *data)
+int	node_events(char *data)
 {
 	char	*s;
 	int	firstline=1;
@@ -216,7 +108,7 @@ int	node_sync(char *data)
 	int	sender_nodeid=0;
 	char	tmp[MAX_STRING_LEN];
 
-//	zabbix_log( LOG_LEVEL_WARNING, "In node_sync(len:%d)", strlen(data));
+//	zabbix_log( LOG_LEVEL_WARNING, "In node_events(len:%d)", strlen(data));
 
        	s=(char *)strtok(data,"\n");
 	while(s!=NULL)
@@ -229,7 +121,7 @@ int	node_sync(char *data)
 			zbx_get_field(s,tmp,2,'|');
 			nodeid=atoi(tmp);
 			firstline=0;
-			zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Received data from node %d for node %d", CONFIG_NODEID, sender_nodeid, nodeid);
+			zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Received events from node %d for node %d", CONFIG_NODEID, sender_nodeid, nodeid);
 		}
 		else
 		{

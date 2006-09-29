@@ -18,11 +18,3 @@ CREATE TABLE services_times (
 
 CREATE UNIQUE INDEX services_times_uniq on services_times (serviceid,type,ts_from,ts_to);
 
-----------------------------------------------------
-----------------------------------------------------
---------------- NEW RIGHT SYSTEM -------------------
-----------------------------------------------------
-----------------------------------------------------
-
-alter table users add	type	int2	DEFAULT '1' NOT NULL; -- Type of user (0 - Uncnown; 1 - ZABBIX user; 2 - ZABBIX Admin; 3 - Supper Admin)
-

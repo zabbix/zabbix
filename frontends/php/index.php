@@ -51,35 +51,35 @@
 		$name = get_request("name","");
 		$password = md5(get_request("password",""));
 
-		$result=DBselect("select u.userid,u.alias,u.name,u.surname,u.url,u.refresh from users u where".
+		$row = DBfetch(DBselect("select u.userid,u.alias,u.name,u.surname,u.url,u.refresh from users u where".
 			" u.alias=".zbx_dbstr($name)." and u.passwd=".zbx_dbstr($password).
-			" and mod(u.userid,100)=".$ZBX_CURNODEID);
+			" and ".DBid2nodeid('u.userid')."=".$ZBX_LOCALNODEID));
 
-		$row=DBfetch($result);
 		if($row)
 		{
-			$USER_DETAILS["userid"]	= $row["userid"];
-			$USER_DETAILS["alias"]	= $row["alias"];
-			$USER_DETAILS["name"]	= $row["name"];
-			$USER_DETAILS["surname"]= $row["surname"];
-			$USER_DETAILS["url"]	= $row["url"];
-			$USER_DETAILS["refresh"]= $row["refresh"];
-			$sessionid=md5(time().$password.$name.rand(0,10000000));
+			$sessionid = md5(time().$password.$name.rand(0,10000000));
 			setcookie("sessionid",$sessionid,time()+3600);
-// Required !
-			$_COOKIE["sessionid"]	= $sessionid;
+			$_COOKIE["sessionid"]	= $sessionid;	/* Required ! */
+			
 			DBexecute("insert into sessions (sessionid,userid,lastaccess)".
-				" values (".zbx_dbstr($sessionid).",".$USER_DETAILS["userid"].",".time().")");
+				" values (".zbx_dbstr($sessionid).",".$row["userid"].",".time().")");
 
-			if($USER_DETAILS["url"] != '')
+			if($row["url"] != '')
 			{
-				Redirect($USER_DETAILS["url"]);
+				Redirect($row["url"]);
 				return;
 			}
+		}
+		else
+		{
+			$incorrect_password = true;
 		}
 	}
 
 	show_header($page["title"],0,0);
+	
+	if(isset($incorrect_password)) 
+		show_error_message("Login name or password is incorrect");
 ?>
 <?php
 	if(!isset($_COOKIE["sessionid"]))

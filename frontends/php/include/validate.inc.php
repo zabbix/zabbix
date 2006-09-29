@@ -49,7 +49,7 @@
 	}
 
 	define("NOT_EMPTY","({}!='')&&");
-	define("DB_ID","({}>=0&&{}<=4294967295)&&");
+	define("DB_ID","({}>=0&&{}<=10000000000000000000)&&");
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 

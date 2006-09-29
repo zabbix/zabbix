@@ -33,7 +33,7 @@
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 
 // media form
-		"nodeid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'{form}=="update"'),
+		"nodeid"=>		array(T_ZBX_INT, O_NO,	null,	DB_ID,		'{form}=="update"'),
 /* actions */
 		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),

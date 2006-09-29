@@ -290,27 +290,27 @@ if($DB_TYPE == "ORACLE") {
 
 	function DBid2nodeid($id_name)
 	{
-		return 'mod('.$id_name.',100)';
+		return '('.$id_name.' div 100000000000000)';
 	}
 
 	function id2nodeid($id_var)
 	{
-		return ($id_var % 100);
+		return (int)($id_var / 100000000000000);
 	}
 
 	function	get_dbid($table,$field)
 	{
 		global	$ZBX_CURNODEID;
 
-		$result=DBselect("select max($field) as id from $table where ".DBid2nodeid($field)."=".$ZBX_CURNODEID);
+		$result=DBselect("select max($field) as id from $table");
 		$row=DBfetch($result);
 		if($row && !is_null($row["id"]))
 		{
-			return	$row["id"]+100;
+			return	++$row["id"];
 		}
 		else
 		{
-			return	100+$ZBX_CURNODEID;
+			return $ZBX_CURNODEID*100000000000000+1;
 		}
 	}
 ?>

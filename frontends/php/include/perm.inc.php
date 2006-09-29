@@ -51,79 +51,72 @@
 		if(isset($_COOKIE["sessionid"]))
 		{
 			$sessionid = $_COOKIE["sessionid"];
-			$USER_DETAILS = DBfetch(DBselect("select u.*,s.* from sessions s,users u".
+			if(!($USER_DETAILS = DBfetch(DBselect("select u.*,s.* from sessions s,users u".
 				" where s.sessionid=".zbx_dbstr($sessionid)." and s.userid=u.userid".
 				" and ((s.lastaccess+u.autologout>".time().") or (u.autologout=0))".
-				" and ".DBid2nodeid('u.userid')." = ".$ZBX_LOCALNODEID));
-			
-			$USER_DETAILS['node'] = DBfetch(DBselect('select * from nodes where nodeid='.id2nodeid($USER_DETAILS['userid'])));
-			
-			if(empty($USER_DETAILS['node']))
+				" and ".DBid2nodeid('u.userid')." = ".$ZBX_LOCALNODEID))))
 			{
-				$USER_DETAILS['node']['name'] = S_UNCNOWN;
-				$USER_DETAILS['node']['nodeid'] = $ZBX_LOCALNODEID;
-			}
-
-			if(!$USER_DETAILS)
-			{
-				$USER_DETAILS = array("alias"=>"- unknown -","userid"=>0);
-
 				setcookie("sessionid",$sessionid,time()-3600);
+				DBexecute("delete from sessions where sessionid=".zbx_dbstr($sessionid));
 				unset($_COOKIE["sessionid"]);
 				unset($sessionid);
 
-				show_header("Login",0,0,1);
-				show_error_message("Session was ended, please relogin!");
-				show_page_footer();
-				exit;
+				$incorrect_session = true;
 			}
-		} else {
-			$USER_DETAILS = DBfetch(DBselect("select u.* from users u where u.alias='guest'".
-				" and ".DBid2nodeid('u.userid')."=$ZBX_LOCALNODEID"));
-			
-			$USER_DETAILS['node'] = DBfetch(DBselect('select * from nodes where nodeid='.id2nodeid($USER_DETAILS['userid'])));
-			
-			if(empty($USER_DETAILS['node']))
-			{
-				$USER_DETAILS['node']['name'] = S_UNCNOWN;
-				$USER_DETAILS['node']['nodeid'] = $ZBX_LOCALNODEID;
-			}
-			
-		}
-
-		if($USER_DETAILS)
-		{
-			if(isset($sessionid))
+			else
 			{
 				setcookie("sessionid",$sessionid);
 				DBexecute("update sessions set lastaccess=".time()." where sessionid=".zbx_dbstr($sessionid));
 			}
-			return;
+		}
+		
+		if(!$USER_DETAILS)
+		{
+			if(!($USER_DETAILS = DBfetch(DBselect("select u.* from users u where u.alias='guest'".
+				" and ".DBid2nodeid('u.userid')."=$ZBX_LOCALNODEID"))))
+			{
+				$missed_user_guest = true;
+			}
+		}
+
+		if($USER_DETAILS)
+		{
+			$USER_DETAILS['node'] = DBfetch(DBselect('select * from nodes where nodeid='.id2nodeid($USER_DETAILS['userid'])));
+			if(empty($USER_DETAILS['node']))
+			{
+				$USER_DETAILS['node']['name'] = '- uncnown -';
+				$USER_DETAILS['node']['nodeid'] = $ZBX_LOCALNODEID;
+			}
 		}
 		else
 		{
-			$USER_DETAILS = array("alias"=>"- unknown -","userid"=>0,"node"=>array("name"=>S_UNCNOWN,"nodeid"=>0));
+			$USER_DETAILS = array(
+				"alias"	=>"- unknown -",
+				"userid"=>0,
+				"lang"	=>"en_gb",
+				"type"	=>"0",
+				"node"	=>array(
+					"name"	=>'- uncnown -',
+					"nodeid"=>0));
 		}
-
-		/* Incorrect login */
-
-		if(isset($sessionid))
+		
+		if(isset($incorrect_session) || isset($missed_user_guest))
 		{
-			setcookie("sessionid",$sessionid,time()-3600);
-			unset($_COOKIE["sessionid"]);
-		}
-
-		if($page["file"]!="index.php")
-		{
-			echo "<meta http-equiv=\"refresh\" content=\"0; url=index.php\">";
+			if($missed_user_guest)		$message = "Database corrupted, missed user 'guest'";
+			else if($incorrect_session)	$message = "Session was ended, please relogin!";
+			
+			if($page["file"]!="index.php")
+			{
+				Redirect("index.php");
+				exit;
+			}
+			show_header("Login",0,0,1 /* recursion solving */);
+			show_error_message($message);
+			insert_login_form();
+			show_page_footer();
+			
 			exit;
 		}
-		show_header("Login",0,0,1);
-		show_error_message("Login name or password is incorrect");
-		insert_login_form();
-		show_page_footer();
-		
-		exit;
 	}
 
 /***********************************************

@@ -282,8 +282,9 @@ AGENT_RESULT {
 	ZBX_LIST	list;
 };
 
-#define ZBX_COND_NODEID " %s=%d "
-#define LOCAL_NODE(fieldid) "mod(" fieldid ",100)",CONFIG_NODEID
+#define ZBX_COND_NODEID " %s>=100000000000000*%d and %s<=(100000000000000*%d+99999999999999) "
+#define LOCAL_NODE(fieldid) fieldid, CONFIG_NODEID, fieldid, CONFIG_NODEID
+#define ZBX_NODE(fieldid,nodeid) fieldid, nodeid, fieldid, nodeid
 
 /* agent result types */
 #define AR_UINT64	1
@@ -434,8 +435,11 @@ char    *zbx_regexp_match(const char *string, const char *pattern, int *len);
 
 /* Misc functions */
 int	cmp_double(double a,double b);
+int     zbx_get_field(char *line, char *result, int num, char delim);
 
 void	zbx_on_exit();
+
+int	get_nodeid_by_id(zbx_uint64_t id);
 
 int       SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 

@@ -151,7 +151,7 @@ static	ZBX_TABLE	tables[]={
 		{
 		{"configid",		ZBX_TYPE_INT,	ZBX_SYNC},
 		{"alert_history",	ZBX_TYPE_INT,	ZBX_SYNC},
-		{"alarm_history",	ZBX_TYPE_INT,	ZBX_SYNC},
+		{"event_history",	ZBX_TYPE_INT,	ZBX_SYNC},
 		{"refresh_unsupported",	ZBX_TYPE_INT,	ZBX_SYNC},
 		{"work_period",		ZBX_TYPE_CHAR,	ZBX_SYNC},
 		{0}
@@ -219,9 +219,9 @@ static	ZBX_TABLE	tables[]={
 		{0}
 		}
 	},
-	{"alarms",	"alarmid",	ZBX_NOSYNC,
+	{"events",	"eventid",	ZBX_NOSYNC,
 		{
-		{"alarmid",		ZBX_TYPE_INT,	ZBX_SYNC},
+		{"eventid",		ZBX_TYPE_INT,	ZBX_SYNC},
 		{"triggerid",		ZBX_TYPE_INT,	ZBX_SYNC},
 		{"clock",		ZBX_TYPE_INT,	ZBX_SYNC},
 		{"value",		ZBX_TYPE_INT,	ZBX_SYNC},
@@ -490,7 +490,8 @@ static	ZBX_TABLE	tables[]={
 		{"imageid",		ZBX_TYPE_INT,	ZBX_SYNC},
 		{"imagetype",		ZBX_TYPE_INT,	ZBX_SYNC},
 		{"name",		ZBX_TYPE_CHAR,	ZBX_SYNC},
-		{"image",		ZBX_TYPE_BLOB,	ZBX_SYNC},
+/*		{"image",		ZBX_TYPE_BLOB,	ZBX_SYNC},*/
+		{"image",		ZBX_TYPE_BLOB,	ZBX_NOSYNC},
 		{0}
 		}
 	},
@@ -581,7 +582,7 @@ static	ZBX_TABLE	tables[]={
 		{
 		{"acknowledgeid",	ZBX_TYPE_INT,	ZBX_SYNC},
 		{"userid",		ZBX_TYPE_INT,	ZBX_SYNC},
-		{"alarmid",		ZBX_TYPE_INT,	ZBX_SYNC},
+		{"eventid",		ZBX_TYPE_INT,	ZBX_SYNC},
 		{"clock",		ZBX_TYPE_INT,	ZBX_SYNC},
 		{"message",		ZBX_TYPE_CHAR,	ZBX_SYNC},
 		{0}

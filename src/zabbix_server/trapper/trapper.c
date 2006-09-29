@@ -51,6 +51,8 @@
 
 #include "autoregister.h"
 #include "nodesync.h"
+#include "nodeevents.h"
+#include "nodehistory.h"
 #include "trapper.h"
 
 #include "daemon.h"
@@ -106,6 +108,36 @@ int	process_trap(int sockfd,char *s, int max_len)
 		{
 //			zabbix_log( LOG_LEVEL_WARNING, "Node data received [len:%d]", strlen(s));
 			if(node_sync(s) == SUCCEED)
+			{
+				zbx_snprintf(result,sizeof(result),"OK\n");
+				if( write(sockfd,result,strlen(result)) == -1)
+				{
+					zabbix_log( LOG_LEVEL_WARNING, "Error sending confirmation to node [%s]",strerror(errno));
+					zabbix_syslog("Trapper: error sending confirmation to node [%s]",strerror(errno));
+				}
+			}
+			return ret;
+		}
+		/* Slave node events? */
+		if(strncmp(s,"Events",6) == 0)
+		{
+//			zabbix_log( LOG_LEVEL_WARNING, "Slave node events received [len:%d]", strlen(s));
+			if(node_events(s) == SUCCEED)
+			{
+				zbx_snprintf(result,sizeof(result),"OK\n");
+				if( write(sockfd,result,strlen(result)) == -1)
+				{
+					zabbix_log( LOG_LEVEL_WARNING, "Error sending confirmation to node [%s]",strerror(errno));
+					zabbix_syslog("Trapper: error sending confirmation to node [%s]",strerror(errno));
+				}
+			}
+			return ret;
+		}
+		/* Slave node history ? */
+		if(strncmp(s,"History",7) == 0)
+		{
+//			zabbix_log( LOG_LEVEL_WARNING, "Slave node history received [len:%d]", strlen(s));
+			if(node_history(s) == SUCCEED)
 			{
 				zbx_snprintf(result,sizeof(result),"OK\n");
 				if( write(sockfd,result,strlen(result)) == -1)
@@ -186,10 +218,12 @@ void	process_trapper_child(int sockfd)
 	char	*buffer;
 	static struct  sigaction phan;
 	char	*bufptr;
+	zbx_uint64_t	expected_len;
+	zbx_uint64_t	read_len=0;
 
-#define ZBX_MAX_PACKET_LEN	8*1024*1024
+#define ZBX_MAX_PACKET_LEN	16*1024*1024
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In process_trapper_child");
+//	zabbix_log( LOG_LEVEL_WARNING, "In process_trapper_child");
 
 	
 	buffer=malloc(ZBX_MAX_PACKET_LEN);
@@ -201,19 +235,47 @@ void	process_trapper_child(int sockfd)
 
 //	alarm(CONFIG_TIMEOUT);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Before read(%d)", ZBX_MAX_PACKET_LEN);
+//	zabbix_log( LOG_LEVEL_WARNING, "Before read(%d)", ZBX_MAX_PACKET_LEN);
 /*	if( (nbytes = read(sockfd, line, MAX_BUF_LEN)) < 0)*/
 	memset(buffer,0,ZBX_MAX_PACKET_LEN);
 	bufptr = buffer;
-	while ((nbytes = read(sockfd, bufptr, buffer + ZBX_MAX_PACKET_LEN - bufptr - 1)) != -1 && nbytes != 0)
+
+	nbytes=read(sockfd, bufptr, 5);
+
+	if(nbytes==5 && strncmp(bufptr,"ZBXD",4)==0 && bufptr[4] == 1)
 	{
+//		zabbix_log( LOG_LEVEL_WARNING, "Got new protocol");
+		nbytes=read(sockfd, (zbx_uint64_t *)&expected_len, sizeof(expected_len));
 //		zabbix_log( LOG_LEVEL_WARNING, "Read %d bytes", nbytes);
-		if(nbytes < buffer + ZBX_MAX_PACKET_LEN - bufptr - 1)
+		if(nbytes==sizeof(expected_len))
 		{
-			bufptr += nbytes;
-			break;
+//			zabbix_log( LOG_LEVEL_WARNING, "Expected data len [" ZBX_FS_UI64 "]", expected_len);
 		}
+		while ((nbytes = read(sockfd, bufptr, 1024)) != -1 && nbytes != 0)
+		{
+//			zabbix_log( LOG_LEVEL_WARNING, "Read %d bytes", nbytes);
+			read_len+=nbytes;
+			if(read_len >= expected_len)
+			{
+				break;
+			}
+			bufptr += nbytes;
+		}
+//		zabbix_log( LOG_LEVEL_WARNING, "Read total %d bytes", read_len);
+	}
+	else
+	{
 		bufptr += nbytes;
+		zabbix_log( LOG_LEVEL_WARNING, "Old protocol");
+		while ((nbytes = read(sockfd, bufptr, buffer + ZBX_MAX_PACKET_LEN - bufptr - 1)) != -1 && nbytes != 0)
+		{
+			if(read_len < buffer + ZBX_MAX_PACKET_LEN - bufptr - 1)
+			{
+				bufptr += nbytes;
+				break;
+			}
+			bufptr += nbytes;
+		}
 	}
 //	zabbix_log( LOG_LEVEL_WARNING, "Read total %d bytes", nbytes);
 

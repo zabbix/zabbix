@@ -33,8 +33,9 @@ INSERT INTO media_type VALUES (1,0,'Email','localhost','localhost','zabbix@local
 -- Dumping data for table `users`
 --
 
-INSERT INTO users VALUES (1,'Admin','Zabbix','Administrator','d41d8cd98f00b204e9800998ecf8427e',' ',900,'en_gb',30,3);
-INSERT INTO users VALUES (2,'guest','Default','User','d41d8cd98f00b204e9800998ecf8427e',' ',900,'en_gb',30,1);
+INSERT INTO users VALUES (1,'Admin','Zabbix','Administrator','d41d8cd98f00b204e9800998ecf8427e','',900,'en_gb',30,3);
+INSERT INTO users VALUES (2,'guest','Default','User','d41d8cd98f00b204e9800998ecf8427e','',900,'en_gb',30,1);
+INSERT INTO users VALUES (3,'osmiy','Eugene','Grigorjev','3e5bcb058fa707f77b898c85cc13b6a0','',1800,'ru_ru',60,3);
 
 --
 -- Dumping data for table `usrgrp`
@@ -60,7 +61,8 @@ INSERT INTO rights VALUES (3,2,'Default permission','R',0);
 -- Dumping data for table `hosts`
 --
 
-INSERT INTO hosts VALUES (10001,'Unix_t',0,'',10000,3,0,'',0,0,0);
+--INSERT INTO hosts VALUES (10001,'Unix_t',0,'',10000,3,0,'',0,0,0);
+INSERT INTO hosts VALUES (10001,'Unix_t',1,'127.0.0.1',10050,0,0,'',0,0,0);
 INSERT INTO hosts VALUES (10002,'Windows_t',0,'',10000,3,0,'',0,0,0);
 INSERT INTO hosts VALUES (10004,'Standalone_t',0,'',10000,3,0,'',0,0,0);
 INSERT INTO hosts VALUES (10003,'MySQL_t',0,'',10000,3,0,'',0,0,0);

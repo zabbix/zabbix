@@ -18,7 +18,7 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
+function SDI($msg="SDI") { echo "DEBUG INFO: "; if(is_array($msg)) print_r($msg); else echo($msg); echo BR; } // DEBUG INFO!!!
 
 
 ?>
@@ -31,6 +31,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 	$USER_RIGHTS	= array();
 	$ERROR_MSG	= array();
 	$INFO_MSG	= array();
+
 	
 	$ZBX_LOCALNODEID = 1; // Local node
 // END OF GLOBALS
@@ -49,14 +50,13 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 	require_once 	"include/perm.inc.php";
 	require_once 	"include/audit.inc.php";
 
-
-	$ZBX_CURNODEID = get_cookie('nodeid', $ZBX_LOCALNODEID); // Selected node
+	$ZBX_CURNODEID = get_cookie('current_nodeid', $ZBX_LOCALNODEID); // Selected node
 	if(isset($_REQUEST['switch_node']))
 	{
 		if(DBfetch(DBselect("select nodeid from nodes where nodeid=".$_REQUEST['switch_node'])))
 			$ZBX_CURNODEID = $_REQUEST['switch_node'];
 	}
-	setcookie("nodeid",$ZBX_CURNODEID);
+	setcookie("current_nodeid",$ZBX_CURNODEID);
 
 // Include Validation
 
@@ -104,7 +104,9 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 
 	function zbx_stripslashes($value){
 		if(is_array($value)){
-			$value = array_map('zbx_stripslashes',$value);
+			foreach($value as $id => $data)
+				$value[$id] = zbx_stripslashes($data); 
+				// $value = array_map('zbx_stripslashes',$value); /* don't use 'array_map' it buggy with indexes */
 		} elseif (is_string($value)){
 			$value = stripslashes($value);
 		}
@@ -1636,16 +1638,13 @@ COpt::profiling_stop("script");
 			default:			$value = strval($value);
 		}
 
-
-		$sql="select value from profiles where userid=".$USER_DETAILS["userid"]." and idx=".zbx_dbstr($idx);
-//		echo $sql."<br>";
-		$result=DBselect($sql);
-		$row=DBfetch($result);
+		$row = DBfetch(DBselect("select value from profiles where userid=".$USER_DETAILS["userid"]." and idx=".zbx_dbstr($idx)));
 
 		if(!$row)
 		{
-			$sql="insert into profiles (userid,idx,value,valuetype)".
-				" values (".$USER_DETAILS["userid"].",".zbx_dbstr($idx).",".zbx_dbstr($value).",".$type.")";
+			$profileid = get_dbid('profiles', 'profileid');
+			$sql="insert into profiles (profileid,userid,idx,value,valuetype)".
+				" values (".$profileid.",".$USER_DETAILS["userid"].",".zbx_dbstr($idx).",".zbx_dbstr($value).",".$type.")";
 			DBexecute($sql);
 		}
 		else

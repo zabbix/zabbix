@@ -1,5 +1,10 @@
 Changes for 1.3:
 
+ - added processing of distributed events (Alexei)
+ - restructured code to add function process_event() (Alexei)
+ - table ALARMS renamed to EVENTS (Alexei)
+ - added automatic generation of database schemas (Alexei)
+ - pinger will use unique temporary file name (Alexei)
  - developed SLA calculation periods (Eugene)
  - developed flexible update intervals for items (Eugene)
  - fixed reversed icons on maps (Eugene)

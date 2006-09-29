@@ -43,6 +43,8 @@
 			error("Insufficient permissions");
 			return 0;
 		}
+SDI('pass: '.$passwd);
+SDI('groups: '.$user_groups);
 
 		if(DBfetch(DBexecute("select * from users where alias=".zbx_dbstr($alias)." and ".DBid2nodeid('userid')."=".$ZBX_CURNODEID)))
 		{
