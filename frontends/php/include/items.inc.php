@@ -79,6 +79,7 @@
 		$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,
 		$valuemapid,$delay_flex,$applications,$templateid=0)
 	{
+
 		$host=get_host_by_hostid($hostid);
 
 		if(($i = array_search(0,$applications)) !== FALSE)
@@ -175,7 +176,6 @@
 			zbx_dbstr($snmpv3_authpassphrase).",".zbx_dbstr($snmpv3_privpassphrase).",".
 			zbx_dbstr($formula).",$trends,".zbx_dbstr($logtimefmt).",$valuemapid,".
 			zbx_dbstr($delay_flex).",$templateid)");
-
 
 		if(!$result)
 			return $result;
@@ -568,8 +568,10 @@
 		return get_host_by_itemid($itemid);
 	}
 
-	function get_items_data_overview($groupid)
+	function get_items_data_overview($groupid, $nodeid)
 	{
+		global	$USER_DETAILS;
+
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 
 		if($groupid > 0)
@@ -580,10 +582,13 @@
 		}
 
 COpt::profiling_start('prepare data');
-		$result = DBselect('select distinct h.hostid, h.host,i.itemid, i.key_, i.value_type, i.lastvalue, i.units, i.description'.
-			' from hosts h,items i '.$group_where.
-			' h.status='.HOST_STATUS_MONITORED.' and h.hostid=i.hostid and i.status='.ITEM_STATUS_ACTIVE.
-			' order by i.description');
+		$result = DBselect('select distinct h.hostid, h.host,i.itemid, i.key_, i.value_type, i.lastvalue, i.units, '.
+			' i.description, t.priority, t.value as tr_value'.
+			' from hosts h,items i left join  functions f on f.itemid=i.itemid left join triggers t on t.triggerid=f.triggerid '.
+			$group_where.
+			' h.hostid in ('.get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_ONLY, null, null, $nodeid).') '.
+			' and h.status='.HOST_STATUS_MONITORED.' and h.hostid=i.hostid and i.status='.ITEM_STATUS_ACTIVE.
+			' order by i.description,i.itemid');
 
 		unset($items);
 		unset($hosts);
@@ -595,16 +600,20 @@ COpt::profiling_start('prepare data');
 				'value_type'	=> $row['value_type'],
 				'lastvalue'	=> $row['lastvalue'],
 				'units'		=> $row['units'],
-				'description'	=> $row['description']);
+				'description'	=> $row['description'],
+				'severity'	=> $row['priority'],
+				'tr_value'	=> $row['tr_value']
+				);
 		}
 		if(!isset($hosts))
 		{
 			return $table;
 		}
+
 		sort($hosts);
 COpt::profiling_stop('prepare data');
 COpt::profiling_start('prepare table');
-		$header=array(new CCol(S_TRIGGERS,'center'));
+		$header=array(new CCol(S_ITEMS,'center'));
 		foreach($hosts as $hostname)
 		{
 			$header=array_merge($header,array(new CImg('vtext.php?text='.$hostname)));
@@ -620,11 +629,9 @@ COpt::profiling_start('prepare table');
 				$value = '-';
 				if(isset($ithosts[$hostname]))
 				{
-					$db_item_triggers = DBselect('select t.triggerid from triggers t, items i, functions f where'.
-						' i.itemid='.$ithosts[$hostname]['itemid'].' and i.itemid=f.itemid'.
-						' and t.priority>1 and t.triggerid=f.triggerid and t.value='.TRIGGER_VALUE_TRUE);
-					if(DBfetch($db_item_triggers))	$style = "high";
-
+					if($ithosts[$hostname]['tr_value'] == TRIGGER_VALUE_TRUE)
+						$style = get_severity_style($ithosts[$hostname]['severity']);
+					
 					if($ithosts[$hostname]["value_type"] == 0)
 						$value = convert_units($ithosts[$hostname]["lastvalue"],$ithosts[$hostname]["units"]);
 					else

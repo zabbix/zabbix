@@ -75,7 +75,7 @@
 
 	check_fields($fields);
 
-	validate_group_with_host(PERM_READ_WRITE,array("allow_all_hosts","with_items"));
+	validate_group_with_host(PERM_READ_WRITE,array("allow_all_hosts","always_select_first_host","with_items"));
 ?>
 <?php
 
@@ -213,93 +213,63 @@
 			show_messages(TRUE, S_TRIGGERS_DELETED, S_CANNOT_DELETE_TRIGGERS);
 	}
 ?>
-
 <?php
-?>
+	$r_form = new CForm();
 
-<?php
+	$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit()");
+	$cmbHosts = new CComboBox("hostid",$_REQUEST["hostid"],"submit()");
 
-	$form = new CForm();
+	$cmbGroup->AddItem(0,S_ALL_SMALL);
+	
+	$availiable_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_LIST, null, null, $ZBX_CURNODEID);
 
-	$form->AddVar("hostid",$_REQUEST["hostid"]);
-	$form->AddItem(new CButton("form",S_CREATE_TRIGGER));
-
-	show_header2(S_CONFIGURATION_OF_TRIGGERS_BIG, $form);
-	echo BR;
-
-	if(isset($_REQUEST["form_copy_to"]) && isset($_REQUEST["g_triggerid"]))
+	$result=DBselect("select distinct g.groupid,g.name from groups g, hosts_groups hg, hosts h, items i ".
+		" where h.hostid in (".$availiable_hosts.") ".
+		" and hg.groupid=g.groupid ".
+		" and h.hostid=i.hostid and hg.hostid=h.hostid ".
+		" order by g.name");
+	while($row=DBfetch($result))
 	{
-		insert_copy_elements_to_forms("g_triggerid");
+		$cmbGroup->AddItem($row["groupid"],$row["name"]);
 	}
-	else if(!isset($_REQUEST["form"]))
+	$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
+	
+	if($_REQUEST["groupid"] > 0)
 	{
-/* filter panel */
-		$form = new CForm();
+		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where ".
+			" h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid".
+			" and h.hostid in (".$availiable_hosts.") ".
+			" group by h.hostid,h.host order by h.host";
+	}
+	else
+	{
+		$cmbHosts->AddItem(0,S_ALL_SMALL);
+		$sql="select h.hostid,h.host from hosts h,items i ".
+			" where h.hostid=i.hostid ".
+			" and h.hostid in (".$availiable_hosts.") ".
+			" group by h.hostid,h.host order by h.host";
+	}
+	$result=DBselect($sql);
+	while($row=DBfetch($result))
+	{
+		$cmbHosts->AddItem($row["hostid"],$row["host"]);
+	}
 
-		$_REQUEST["groupid"] = get_request("groupid",0);
-		$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit();");
-		$cmbGroup->AddItem(0,S_ALL_SMALL);
-		$result=DBselect("select groupid,name from groups where mod(groupid,100)=$ZBX_CURNODEID order by name");
-		while($row=DBfetch($result))
-		{
-	// Check if at least one host with read permission exists for this group
-			$result2=DBselect("select distinct h.hostid,h.host from hosts h,hosts_groups hg,items i".
-				" where hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid and i.hostid=h.hostid".
-				" and h.status<>".HOST_STATUS_DELETED." order by h.host");
-			while($row2=DBfetch($result2))
-			{
-//				if(!check_right("Host","U",$row2["hostid"]))	continue; /* TODO */
-				$cmbGroup->AddItem($row["groupid"],$row["name"]);
-				break;
-			}
-		}
-		$form->AddItem(S_GROUP.SPACE);
-		$form->AddItem($cmbGroup);
+	$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
 
-		if(isset($_REQUEST["groupid"]) && $_REQUEST["groupid"]>0)
-		{
-			$sql="select distinct h.hostid,h.host from hosts h,hosts_groups hg,items i".
-				" where hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid and i.hostid=h.hostid".
-				" and h.status<>".HOST_STATUS_DELETED." order by h.host";
-		}
-		else
-		{
-			$sql="select h.hostid,h.host from hosts h,items i where i.hostid=h.hostid and h.status<>".HOST_STATUS_DELETED.
-				" and mod(h.hostid,100)=$ZBX_CURNODEID".
-				" group by h.hostid,h.host order by h.host";
-		}
+	$r_form->AddItem(array(SPACE, new CButton("form", S_CREATE_TRIGGER)));
 
-		$result=DBselect($sql);
-
-		$_REQUEST["hostid"] = get_request("hostid",0);
-		$cmbHosts = new CComboBox("hostid",$_REQUEST["hostid"],"submit();");
-		if($_REQUEST["groupid"]==0) $cmbHosts->AddItem(0,S_ALL_SMALL);
-
-		$correct_hostid='no';
-		$first_hostid = -1;
-		while($row=DBfetch($result))
-		{
-//			if(!check_right("Host","U",$row["hostid"]))	continue; /* TODO */
-			$cmbHosts->AddItem($row["hostid"],$row["host"]);
-
-			if($_REQUEST["hostid"]!=0){
-				if($_REQUEST["hostid"]==$row["hostid"])
-					$correct_hostid = 'ok';
-			}
-			if($first_hostid <= 0)
-				$first_hostid = $row["hostid"];
-		}
-		if($correct_hostid!='ok')
-			if($_REQUEST["groupid"]==0)
-				$_REQUEST["hostid"] = 0;
-			else
-				$_REQUEST["hostid"] = $first_hostid;
-
-		$form->AddItem(SPACE.S_HOST.SPACE);
-		$form->AddItem($cmbHosts);
-
-		show_header2(S_TRIGGERS_BIG, $form);
-
+	show_header2(S_TRIGGERS_BIG, $r_form);
+?>
+<?php
+	if(isset($_REQUEST["form"]))
+	{
+/* FORM */
+		echo BR;
+		insert_trigger_form();
+	}
+	else
+	{
 /* TABLE */
 		$form = new CForm('triggers.php');
 		$form->SetName('triggers');
@@ -317,7 +287,7 @@
 		$sql = "select distinct h.hostid,h.host,t.*".
 			" from triggers t,hosts h,items i,functions f".
 			" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid".
-			" and mod(h.hostid,100)=$ZBX_CURNODEID";
+			" and ".DBid2nodeid("h.hostid")."=".$ZBX_CURNODEID;
 
 		if($_REQUEST["hostid"] > 0) 
 			$sql .= " and h.hostid=".$_REQUEST["hostid"];
@@ -327,11 +297,6 @@
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
-			if(check_right_on_trigger(PERM_READ_ONLY,$row["triggerid"]) == 0)
-			{
-				continue;
-			}
-
 			$chkBox =  new CCheckBox(
                                         "g_triggerid[]",        /* name */
                                         NULL,                   /* checked */
@@ -442,16 +407,6 @@
 
 		$form->AddItem($table);
 		$form->Show();
-	}
-	else
-	{
-/* FORM */
-		$result=DBselect("select count(*) as cnt from hosts where mod(hostid,100)=$ZBX_CURNODEID");
-		$row=DBfetch($result);
-		if($row["cnt"]>0)
-		{
-			insert_trigger_form();
-		} 
 	}
 ?>
 

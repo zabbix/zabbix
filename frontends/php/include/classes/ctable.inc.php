@@ -154,8 +154,8 @@
 			if(!isset($item->options['class']))
 			{
 				$item->SetClass(($this->rownum % 2) ?
-                                                $this->evenRowClass:
-                                                $this->oddRowClass);
+                                                $this->oddRowClass:
+                                                $this->evenRowClass);
 			}/**/
 			return $item->ToString();
 		}
@@ -180,13 +180,14 @@
 		}
 		function AddRow($item,$rowClass=NULL)
 		{
+			$item = $this->AddItem($this->PrepareRow($item,$rowClass));
 			++$this->rownum;
-			return $this->AddItem($this->PrepareRow($item,$rowClass));
+			return $item;
 		}
 		function ShowRow($item,$rowClass=NULL)
 		{
-			++$this->rownum;
 			echo $this->PrepareRow($item,$rowClass);
+			++$this->rownum;
 		}
 /* protected */
 		function GetNumRows()
@@ -205,7 +206,6 @@
 			$ret = "";
 			if($this->rownum == 0 && isset($this->message)) 
 			{
-				++$this->rownum;
 				$ret = $this->PrepareRow(new CCol($this->message,'message'));
 			}
 			$ret .= $this->footer;

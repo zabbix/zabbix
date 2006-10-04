@@ -49,7 +49,8 @@
 	}
 
 	$now=time();
-	$result=DBselect("select serviceid,name,triggerid,status,showsla,goodsla from services where mod(serviceid,100)=$ZBX_CURNODEID order by sortorder,name");
+	$result=DBselect("select serviceid,name,triggerid,status,showsla,goodsla from services ".
+		" where ".DBid2nodeid("serviceid")."=".$ZBX_CURNODEID." order by sortorder,name");
 //	table_begin();
 	$table  = new CTableInfo();
 	$table->SetHeader(array(S_SERVICE,S_STATUS,S_REASON,S_SLA_LAST_7_DAYS,nbsp(S_PLANNED_CURRENT_SLA),S_GRAPH));
@@ -110,7 +111,7 @@
 		{
 			continue;
 		}
-		if(isset($row["triggerid"])&&!check_right_on_trigger("R",$row["triggerid"]))
+		if(isset($row["triggerid"])&&!check_right_on_trigger(PERM_READ_ONLY,$row["triggerid"]))
 		{
 			continue;
 		}
@@ -118,7 +119,7 @@
 		if(isset($row["triggerid"]))
 		{
 			$description=nbsp(expand_trigger_description($row["triggerid"]));
-			$description="[<a href=\"alarms.php?triggerid=".$row["triggerid"]."\">".S_TRIGGER_BIG."</a>] $description";
+			$description="[<a href=\"events.php?triggerid=".$row["triggerid"]."\">".S_TRIGGER_BIG."</a>] $description";
 		}
 		else
 		{
@@ -155,14 +156,14 @@
 		else
 		{
 			$reason="<ul>";
-			$sql="select s.triggerid,s.serviceid from services s, triggers t where s.status>0 and s.triggerid is not NULL and t.triggerid=s.triggerid where mod(s.serviceid,100)=$ZBX_CURNODEID order by s.status desc,t.description";
+			$sql="select s.triggerid,s.serviceid from services s, triggers t where s.status>0 and s.triggerid is not NULL and t.triggerid=s.triggerid where ".DBid2nodeid("s.serviceid")."=".$ZBX_CURNODEID." order by s.status desc,t.description";
 			$result2=DBselect($sql);
 			while($row2=DBfetch($result2))
 			{
 				if(does_service_depend_on_the_service($row["serviceid"],$row2["serviceid"]))
 				{
 					$description=nbsp(expand_trigger_description($row2["triggerid"]));
-					$reason=$reason."<li class=\"itservices\"><a href=\"alarms.php?triggerid=".$row2["triggerid"]."\">$description</a></li>";
+					$reason=$reason."<li class=\"itservices\"><a href=\"events.php?triggerid=".$row2["triggerid"]."\">$description</a></li>";
 				}
 			}
 			$reason=$reason."</ul>";

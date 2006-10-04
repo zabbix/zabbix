@@ -21,6 +21,7 @@
 <?php
 	require_once "include/config.inc.php";
 	require_once "include/hosts.inc.php";
+	require_once "include/forms.inc.php";
 
 	$page["title"] = "S_HOST_PROFILES";
 	$page["file"] = "hostprofiles.php";
@@ -37,7 +38,7 @@
 	$cmbGroup = new CComboBox("groupid",get_request("groupid",0),"submit()");
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
 
-	$result=DBselect("select groupid,name from groups where mod(groupid,100)=$ZBX_CURNODEID order by name");
+	$result=DBselect("select groupid,name from groups where ".DBid2nodeid("groupid")."=".$ZBX_CURNODEID." order by name");
 	while($row=DBfetch($result))
 	{
 // Check if at least one host with read permission exists for this group
@@ -70,7 +71,7 @@
 		$cmbHost->AddItem(0,S_ALL_SMALL);
 		$sql="select h.hostid,h.host from hosts h,items i where h.status=".HOST_STATUS_MONITORED.
 			" and h.hostid=i.hostid".
-			" and mod(h.hostid,100)=".$ZBX_CURNODEID.
+			" and ".DBid2nodeid("h.hostid")."=".$ZBX_CURNODEID.
 			" group by h.hostid,h.host order by h.host";
 	}
 
@@ -107,7 +108,7 @@
 		{
 			$sql="select h.hostid,h.host,p.name,p.os,p.serialno,p.tag,p.macaddress".
 				" from hosts h,hosts_profiles p where h.hostid=p.hostid".
-				" and mod(h.hostid,100)=$ZBX_CURNODEID order by h.host";
+				" and ".DBid2nodeid("h.hostid")."=".$ZBX_CURNODEID." order by h.host";
 		}
 
 		$result=DBselect($sql);

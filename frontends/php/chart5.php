@@ -85,7 +85,7 @@
 	ImageFilledRectangle($im,0,0,$x,$y,$white);
 	ImageRectangle($im,0,0,$x-1,$y-1,$black);
 
-//	if(!check_right_on_trigger("R",$_REQUEST["triggerid"]))
+	if(!check_right_on_trigger(PERM_READ_ONLY,$_REQUEST["triggerid"]))
 //	{
 //		ImageOut($im); 
 //		ImageDestroy($im); 

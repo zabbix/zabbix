@@ -60,14 +60,6 @@
 	echo BR;
 ?>
 <?php
-	if(!check_right("Graph","R",$_REQUEST["graphid"]))
-	{
-		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-		show_page_footer();
-		exit;
-	}
-?>
-<?php
 
 	if(isset($_REQUEST["save"]))
 	{

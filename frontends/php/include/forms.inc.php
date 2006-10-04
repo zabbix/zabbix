@@ -1098,19 +1098,22 @@
 		$frmTrig->AddRow("The trigger depends on",$dep_el);
 	/* end dependences */
 
-	/* new dependence */
+		global $USER_DETAILS;
+	/* new dependence */ /* TODO Rewrite with popups */
 		$cmbDepID = new CComboBox("new_dependence");
-		if(isset($_REQUEST["triggerid"]))
-			$sql="select t.triggerid,t.description from triggers t".
-				" where t.triggerid!=".$_REQUEST["triggerid"]." order by t.description";
-		else
-			$sql="select t.triggerid,t.description from triggers t order by t.description";
+		$db_trigs=DBselect("select distinct t.triggerid,t.description,h.host,n.name as node_name ".
+			" from triggers t, functions f,items i,hosts h,nodes n ".
+			" where t.triggerid=f.triggerid and f.itemid=i.itemid and i.hostid in (".
+			get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_LIST).
+			") and h.hostid=i.hostid and n.nodeid=".DBid2nodeid('t.triggerid').
+			(isset($_REQUEST["triggerid"]) ? " and t.triggerid!=".$_REQUEST["triggerid"] : "" ).
+			" order by n.name,t.description,t.triggerid");
 
-		$db_trigs=DBselect($sql);
 		while($db_trig=DBfetch($db_trigs))
 		{
 			$cmbDepID->AddItem($db_trig["triggerid"],
-				expand_trigger_description($db_trig["triggerid"]));
+				$db_trig["node_name"].":".expand_trigger_description_by_data($db_trig));
+				//$db_trig["node_name"].":".$db_trig["description"]);
 		}
 		$frmTrig->AddRow("New dependency",array(
 			$cmbDepID,SPACE,
@@ -1118,12 +1121,10 @@
 	/* end new dwpendence */
 
 		$cmbPrior = new CComboBox("priority",$priority);
-		$cmbPrior->AddItem(0,"Not classified");
-		$cmbPrior->AddItem(1,"Information");
-		$cmbPrior->AddItem(2,"Warning");
-		$cmbPrior->AddItem(3,"Average");
-		$cmbPrior->AddItem(4,"High");
-		$cmbPrior->AddItem(5,"Disaster");
+		for($i = 0; $i <= 5; $i++)
+		{
+			$cmbPrior->AddItem($i,get_severity_description("Not classified"));
+		}
 		$frmTrig->AddRow(S_SEVERITY,$cmbPrior);
 
 		$frmTrig->AddRow(S_COMMENTS,new CTextArea("comments",$comments,70,7));
@@ -2210,7 +2211,7 @@
 						" and hg.hostid=h.hostid group by h.hostid,h.host order by h.host");
 					while($row2=DBfetch($result2))
 					{
-						if(!check_right("Host","R",$row2["hostid"]))    continue;
+//						if(!check_right("Host","R",$row2["hostid"]))    continue; /* TODO */
 						$cmbGroup->AddItem($row["groupid"],$row["name"]);
 						break;
 					}
@@ -2331,7 +2332,7 @@
 
 		$cmbType = new CComboBox("mediatypeid",$mediatypeid);
 		$types=DBselect("select mediatypeid,description from media_type".
-				" where mod(mediatypeid,100)=".$ZBX_CURNODEID." order by type");
+				" where ".DBid2nodeid("mediatypeid")."=".$ZBX_CURNODEID." order by type");
 		while($type=DBfetch($types))
 		{
 			$cmbType->AddItem($type["mediatypeid"],$type["description"]);
@@ -2379,7 +2380,7 @@
 		$frmHouseKeep->AddRow(S_DO_NOT_KEEP_ACTIONS_OLDER_THAN,
 			new CTextBox("alert_history",$config["alert_history"],8));
 		$frmHouseKeep->AddRow(S_DO_NOT_KEEP_EVENTS_OLDER_THAN,
-			new CTextBox("alarm_history",$config["alarm_history"],8));
+			new CTextBox("event_history",$config["event_history"],8));
 		$frmHouseKeep->AddItemToBottomRow(new CButton("save",S_SAVE));
 		$frmHouseKeep->Show();
 	}
@@ -2392,7 +2393,7 @@
 		$frmHouseKeep->SetHelp("web.config.workperiod.php");
 		$frmHouseKeep->AddVar("config",get_request("config",7));
 		$frmHouseKeep->AddVar("alert_history",$config["alert_history"]);
-		$frmHouseKeep->AddVar("alarm_history",$config["alarm_history"]);
+		$frmHouseKeep->AddVar("event_history",$config["event_history"]);
 		$frmHouseKeep->AddVar("refresh_unsupported",$config["refresh_unsupported"]);
 		$frmHouseKeep->AddRow(S_WORKING_TIME,
 			new CTextBox("work_period",$config["work_period"],35));
@@ -2408,7 +2409,7 @@
 		$frmHouseKeep->SetHelp("web.config.other.php");
 		$frmHouseKeep->AddVar("config",get_request("config",5));
 		$frmHouseKeep->AddVar("alert_history",$config["alert_history"]);
-		$frmHouseKeep->AddVar("alarm_history",$config["alarm_history"]);
+		$frmHouseKeep->AddVar("event_history",$config["event_history"]);
 		$frmHouseKeep->AddVar("work_period",$config["work_period"]);
 		$frmHouseKeep->AddRow(S_REFRESH_UNSUPPORTED_ITEMS,
 			new CTextBox("refresh_unsupported",$config["refresh_unsupported"],8));
@@ -2592,6 +2593,7 @@
 
 		$cmbHosts->AddItem(0,"...");
 		$hosts=DBselect("select host,hostid from hosts where status in (".HOST_STATUS_TEMPLATE.")".
+			" and hostid in (".get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_LIST,null,null,$ZBX_CURNODEID).") ".
 			" order by host");
 		while($host=DBfetch($hosts))
 		{

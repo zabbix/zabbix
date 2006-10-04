@@ -245,6 +245,7 @@ COpt::savesqlrequest($query);
 		}
 	}
 
+/*
 	function	DBinsert_id($result,$table,$field)
 	{
 		global	$DB,$DB_TYPE;
@@ -257,25 +258,17 @@ COpt::savesqlrequest($query);
 		if($DB_TYPE == "POSTGRESQL")
 		{
 			$oid=pg_getlastoid($result);
-//			echo "OID:$oid<br>";
 			$sql="select $field from $table where oid=$oid";
 			$result=DBselect($sql);
 			return get_field($result,0,0);
 		}
 		if($DB_TYPE == "ORACLE")
 		{
-/*			$sql="select max($field) from $table";
-			$parse=DBexecute($sql);
-			while(OCIFetch($parse))
-			{
-				$colvalue = OCIResult($parse, 1);
-				return $colvalue;
-			}
-*/
 			$res = DBfetch(DBselect('select '.$table.'_'.$field.'.currval from dual'));
 			return $res[0];
 		}
 	}
+*/
 
 /* string value prepearing */
 if($DB_TYPE == "ORACLE") {	
@@ -302,7 +295,7 @@ if($DB_TYPE == "ORACLE") {
 	{
 		global	$ZBX_CURNODEID;
 
-		$result=DBselect("select max($field) as id from $table");
+		$result=DBselect("select max($field) as id from $table where ".DBid2nodeid($field)." in (".$ZBX_CURNODEID.")");
 		$row=DBfetch($result);
 		if($row && !is_null($row["id"]))
 		{

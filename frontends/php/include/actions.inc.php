@@ -396,10 +396,6 @@
 		$skip=$start;
 		while(($row=DBfetch($result))&&($col<$num))
 		{
-			if(!check_anyright("Default permission","R"))
-			{
-				continue;
-			}
 			if($skip > 0) 
 			{
 				$skip--;

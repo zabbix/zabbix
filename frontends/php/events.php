@@ -26,7 +26,6 @@
 	$page["file"] = "events.php";
 	show_header($page["title"],1,0);
 ?>
-
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
@@ -41,8 +40,6 @@
 
 	validate_group_with_host(PERM_READ_ONLY, array("allow_all_hosts","always_select_first_host","monitored_hosts","with_items"));
 ?>
-
-
 <?php
 	if(isset($_REQUEST["start"])&&isset($_REQUEST["prev"]))
 	{
@@ -61,15 +58,13 @@
 		}
 	}
 ?>
-
-
 <?php
 	$h1=SPACE.S_HISTORY_OF_EVENTS_BIG;
 
 	$h2=S_GROUP.SPACE;
 	$h2=$h2."<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
 	$h2=$h2.form_select("groupid",0,S_ALL_SMALL);
-	$result=DBselect("select groupid,name from groups where mod(groupid,100)=$ZBX_CURNODEID order by name");
+	$result=DBselect("select groupid,name from groups where ".DBid2nodeid("groupid")."=".$ZBX_CURNODEID." order by name");
 	while($row=DBfetch($result))
 	{
 // Check if at least one host with read permission exists for this group
@@ -98,11 +93,14 @@
 
 	if($_REQUEST["groupid"] > 0)
 	{
-		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
+		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED.
+			" and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid ".
+			" group by h.hostid,h.host order by h.host";
 	}
 	else
 	{
-		$sql="select h.hostid,h.host from hosts h,items i where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and mod(h.hostid,100)=$ZBX_CURNODEID group by h.hostid,h.host order by h.host";
+		$sql="select h.hostid,h.host from hosts h,items i where h.status=".HOST_STATUS_MONITORED.
+			" and h.hostid=i.hostid and ".DBid2nodeid("h.hostid")."=".$ZBX_CURNODEID." group by h.hostid,h.host order by h.host";
 	}
 
 	$result=DBselect($sql);

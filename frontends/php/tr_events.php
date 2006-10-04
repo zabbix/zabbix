@@ -22,22 +22,18 @@
 	require_once "include/config.inc.php";
 	require_once "include/triggers.inc.php";
 
-	$page["title"] = "S_ALARMS";
-	$page["file"] = "alarms.php";
-	$page["menu.url"] = "tr_status.php";
+	$page["title"]		= "S_ALARMS";
+	$page["file"]		= "tr_events.php";
+	$page["menu.url"]	= "tr_status.php";
 
 	show_header($page["title"],0,0);
 ?>
-
 <?php
-	if(!check_right_on_trigger("R",$_REQUEST["triggerid"]))
-        {
-                show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-                show_page_footer();
-                exit;
-        }
+//	if(!check_right_on_trigger(PERM_READ_ONLY,$_REQUEST["triggerid"])) /* TODO */
+//	{
+//		access_deny();
+//	}
 ?>
-
 <?php
 	$_REQUEST["limit"] = get_request("limit","NO");
 	if(is_numeric($_REQUEST["limit"]))
@@ -61,9 +57,9 @@
 ?>
 
 <?php
-	$sql="select * from alarms where triggerid=".$_REQUEST["triggerid"].
-		" order by clock desc";
-	$result=DBselect($sql, $_REQUEST["limit"]);
+	$result=DBselect("select * from events where triggerid=".$_REQUEST["triggerid"].
+		" order by clock desc",
+		$_REQUEST["limit"]);
 
 	$table = new CTableInfo();
 	$table->SetHeader(array(S_TIME,S_STATUS,S_ACKNOWLEDGED,S_DURATION,S_SUM,"%"));
@@ -79,11 +75,7 @@
 		$clock=$row["clock"];
 		$leng=$lclock-$row["clock"];
 
-//		if($row["value"]==0)		{ echo "<TR BGCOLOR=#EEFFEE>"; }
-//		elseif($row["value"]==2)	{ echo "<TR BGCOLOR=#EEEEEE>"; }
-//		else				{ echo "<TR BGCOLOR=#FFDDDD>"; }
 
-//		table_td(date("Y.M.d H:i:s",$row["clock"]),"");
 		if($row["value"]==1)
 		{
 			$istrue=new CCol(S_TRUE_BIG,"on");
@@ -113,7 +105,6 @@
 		$proc=round($proc*100)/100;
 		$proc="$proc%";
  
-//		table_td("<B>$istrue</B>","");
 		if($leng>60*60*24)
 		{
 			$leng= round(($leng/(60*60*24))*10)/10;
@@ -154,21 +145,17 @@
 			$sum="$sum secs";
 		}
   
-//		table_td($leng,"");
-//		table_td($sum,"");
-//		table_td($proc,"");
-//		echo "</TR>";
 		$ack = "-";
 		if($row["value"] == 1 && $row["acknowledged"] == 1)
 		{
-			$db_acks = get_acknowledges_by_alarmid($row["alarmid"]);
+			$db_acks = get_acknowledges_by_eventid($row["eventid"]);
 			$rows=0;
 			while($a=DBfetch($db_acks))	$rows++;
 			$ack=array(
 				new CSpan(S_YES,"off"),
 				SPACE."(".$rows.SPACE,
 				new CLink(S_SHOW,
-					"acknow.php?alarmid=".$row["alarmid"],"action"),
+					"acknow.php?eventid=".$row["eventid"],"action"),
 				")"
 				);
 		}

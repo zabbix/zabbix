@@ -35,12 +35,6 @@
 	if(isset($_REQUEST["screenid"]))
 	{
 		echo BR;
-		if(!check_right("Screen","U",$_REQUEST["screenid"]))
-		{
-			show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-			show_page_footer();
-			exit;
-		}
 		if(isset($_REQUEST["save"]))
 		{
 			if(!isset($_REQUEST["elements"]))	$_REQUEST["elements"]=0;

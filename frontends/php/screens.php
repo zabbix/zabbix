@@ -20,6 +20,7 @@
 ?>
 <?php
 	require_once "include/config.inc.php";
+	require_once "include/graphs.inc.php";
 	require_once "include/screens.inc.php";
 
 
@@ -78,10 +79,10 @@
 	$cmbScreens = new CComboBox("screenid",$_REQUEST["screenid"],"submit()");
 	$screen_correct = 0;
 	$first_screen = 0;
-	$result=DBselect("select screenid,name from screens where mod(screenid,100)=$ZBX_CURNODEID order by name");
+	$result=DBselect("select screenid,name from screens where ".DBid2nodeid("screenid")."=".$ZBX_CURNODEID." order by name");
 	while($row=DBfetch($result))
 	{
-		if(!check_right("Screen","R",$row["screenid"]))
+//		if(!check_right("Screen","R",$row["screenid"])) /* TODO */
 			continue;
 		$cmbScreens->AddItem($row["screenid"],$row["name"]);
 		if($_REQUEST["screenid"] == $row["screenid"]) $screen_correct = 1;
@@ -97,7 +98,7 @@
 ?>
 
 <?php
-	if($_REQUEST["screenid"] > 0 && check_right("Screen","R",$_REQUEST["screenid"]))
+//	if($_REQUEST["screenid"] > 0 && check_right("Screen","R",$_REQUEST["screenid"])) /* TODO */
 	{
 		$effectiveperiod=navigation_bar_calc();
 		$table = get_screen($_REQUEST["screenid"], 0, $effectiveperiod);

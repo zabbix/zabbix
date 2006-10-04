@@ -322,43 +322,56 @@ table.tableinfo tr.odd_row:hover td 	{	background-color: #DDDDEE; }
 table.tableinfo tr.even_row td		{	background-color: #EEEEEE; }
 table.tableinfo tr.even_row:hover td 	{	background-color: #EEEEFE; }
 
-table.tableinfo tr td.high		{	background-color: #FF8888; 	}
-table.tableinfo tr:hover td.high	{	background-color: #FF8888;	}
-table.tableinfo tr td.high_blink1	{	background: #FF8888 url(images/gradients/blink1.gif) repeat top left;	}
-table.tableinfo tr:hover td.high_blink1	{	background: #FF8888 url(images/gradients/blink1.gif) repeat top left;	}
-table.tableinfo tr td.high_blink2	{	background: #FF8888 url(images/gradients/blink2.gif) repeat top left;	}
-table.tableinfo tr:hover td.high_blink2	{	background: #FF8888 url(images/gradients/blink2.gif) repeat top left;	}
-
-table.tableinfo tr td.unknown_trigger	{	background-color: #BCBCBC;	}
-table.tableinfo tr:hover td.unknown_trigger {	background-color: #BCBCBC;	}
-table.tableinfo tr td.unknown_trigger_blink1 {	background: #BCBCBC url(images/gradients/blink1.gif) repeat top left;	}
-table.tableinfo tr:hover td.unknown_trigger_blink1 {	background: #BCBCBC url(images/gradients/blink1.gif) repeat top left;	}
-table.tableinfo tr td.unknown_trigger_blink2 {	background: #BCBCBC url(images/gradients/blink2.gif) repeat top left;	}
-table.tableinfo tr:hover td.unknown_trigger_blink2 {	background: #BCBCBC url(images/gradients/blink2.gif) repeat top left;	}
-
-table.tableinfo tr td.normal		{	background-color: #AADDAA;	}
-table.tableinfo tr:hover td.normal	{	background-color: #AADDAA;	}
-table.tableinfo tr td.normal_blink1	{	background: #AADDAA url(images/gradients/blink1.gif) repeat top left;	}
-table.tableinfo tr:hover td.normal_blink1	{	background: #AADDAA url(images/gradients/blink1.gif) repeat top left;	}
-table.tableinfo tr td.normal_blink2	{	background: #AADDAA url(images/gradients/blink2.gif) repeat top left;	}
-table.tableinfo tr:hover td.normal_blink2	{	background: #AADDAA url(images/gradients/blink2.gif) repeat top left;	}
-
 table.tableinfo tr td.center		{vertical-align: middle; text-align: center; }
 
-table.tableinfo tr td.disaster		{	background-color: #FF0000;	}
-table.tableinfo tr:hover td.disaster	{	background-color: #FF0000;	}
+table.tableinfo tr td.disaster			{	background-color: #FF0000;	}
+table.tableinfo tr td.disaster_blink1		{	background: #FF0000 url(images/gradients/blink1.gif) repeat top left;	}
+table.tableinfo tr td.disaster_blink2 		{	background: #FF0000 url(images/gradients/blink2.gif) repeat top left;	}
+table.tableinfo tr:hover td.disaster		{	background-color: #FA0000;	}
+table.tableinfo tr:hover td.disaster_blink1	{	background: #FA0000 url(images/gradients/blink1.gif) repeat top left;	}
+table.tableinfo tr:hover td.disaster_blink2 	{	background: #FA0000 url(images/gradients/blink2.gif) repeat top left;	}
+
 table.tableinfo tr td.high		{	background-color: #FF8888;	}
-table.tableinfo tr:hover td.high	{	background-color: #FF8888;	}
-table.tableinfo tr td.average		{	background-color: #DDAAAA;	}
-table.tableinfo tr:hover td.average	{	background-color: #DDAAAA;	}
-table.tableinfo tr td.warning		{	background-color: #EFEFCC;	}
-table.tableinfo tr:hover td.warning	{	background-color: #E5E5CC;	}
-table.tableinfo tr td.information	{	background-color: #CCE2CC;	}
-table.tableinfo tr:hover td.information	{	background-color: #CCE2CC;	}
-table.tableinfo tr td.unknown_trigger	{	background-color: #BCBCBC;	}
-table.tableinfo tr:hover td.unknown_trigger{	background-color: #BCBCBC;	}
-table.tableinfo tr td.normal		{	background-color: #AADDAA;	}
-table.tableinfo tr:hover td.normal	{	background-color: #AADDAA;	}
+table.tableinfo tr td.high_blink1	{	background: #FF8888 url(images/gradients/blink1.gif) repeat top left;	}
+table.tableinfo tr td.high_blink2	{	background: #FF8888 url(images/gradients/blink2.gif) repeat top left;	}
+table.tableinfo tr:hover td.high	{	background-color: #FA8388;	}
+table.tableinfo tr:hover td.high_blink1	{	background: #FA8388 url(images/gradients/blink1.gif) repeat top left;	}
+table.tableinfo tr:hover td.high_blink2	{	background: #FA8388 url(images/gradients/blink2.gif) repeat top left;	}
+
+table.tableinfo tr td.average			{	background-color: #DDAAAA;	}
+table.tableinfo tr td.average_blink1		{	background: #DDAAAA url(images/gradients/blink1.gif) repeat top left;	}
+table.tableinfo tr td.average_blink2 		{	background: #DDAAAA url(images/gradients/blink2.gif) repeat top left;	}
+table.tableinfo tr:hover td.average		{	background-color: #D8A5AA;	}
+table.tableinfo tr:hover td.average_blink1	{	background: #D8A5AA url(images/gradients/blink1.gif) repeat top left;	}
+table.tableinfo tr:hover td.average_blink2 	{	background: #D8A5AA url(images/gradients/blink2.gif) repeat top left;	}
+
+table.tableinfo tr td.warning			{	background-color: #EFEFCC;	}
+table.tableinfo tr td.warning_blink1		{	background: #EFEFCC url(images/gradients/blink1.gif) repeat top left;	}
+table.tableinfo tr td.warning_blink2 		{	background: #EFEFCC url(images/gradients/blink2.gif) repeat top left;	}
+table.tableinfo tr:hover td.warning		{	background-color: #EAEACC;	}
+table.tableinfo tr:hover td.warning_blink1	{	background: #EAEACC url(images/gradients/blink1.gif) repeat top left;	}
+table.tableinfo tr:hover td.warning_blink2 	{	background: #EAEACC url(images/gradients/blink2.gif) repeat top left;	}
+
+table.tableinfo tr td.information		{	background-color: #CCE2CC;	}
+table.tableinfo tr td.information_blink1	{	background: #CCE2CC url(images/gradients/blink1.gif) repeat top left;	}
+table.tableinfo tr td.information_blink2 	{	background: #CCE2CC url(images/gradients/blink2.gif) repeat top left;	}
+table.tableinfo tr:hover td.information		{	background-color: #C7DDCC;	}
+table.tableinfo tr:hover td.information_blink1	{	background: #C7DDCC url(images/gradients/blink1.gif) repeat top left;	}
+table.tableinfo tr:hover td.information_blink2 	{	background: #C7DDCC url(images/gradients/blink2.gif) repeat top left;	}
+
+table.tableinfo tr td.unknown_trigger			{	background-color: #BCBCBC;	}
+table.tableinfo tr td.unknown_trigger_blink1		{	background: #BCBCBC url(images/gradients/blink1.gif) repeat top left;	}
+table.tableinfo tr td.unknown_trigger_blink2 		{	background: #BCBCBC url(images/gradients/blink2.gif) repeat top left;	}
+table.tableinfo tr:hover td.unknown_trigger		{	background-color: #BCBCBC;	}
+table.tableinfo tr:hover td.unknown_trigger_blink1	{	background: #BCBCBC url(images/gradients/blink1.gif) repeat top left;	}
+table.tableinfo tr:hover td.unknown_trigger_blink2	{	background: #BCBCBC url(images/gradients/blink2.gif) repeat top left;	}
+
+table.tableinfo tr td.normal			{	background-color: #AADDAA; }
+table.tableinfo tr td.normal_blink1		{	background: #AADDAA url(images/gradients/blink1.gif) repeat top left;	}
+table.tableinfo tr td.normal_blink2		{	background: #AADDAA url(images/gradients/blink2.gif) repeat top left;	}
+table.tableinfo tr:hover td.normal		{	background-color: #AADDAA;	}
+table.tableinfo tr:hover td.normal_blink1	{	background: #AADDAA url(images/gradients/blink1.gif) repeat top left;	}
+table.tableinfo tr:hover td.normal_blink2	{	background: #AADDAA url(images/gradients/blink2.gif) repeat top left;	}
 
 /****** HEADER *********/
 
@@ -393,6 +406,10 @@ table.header td.header_r
 	height: 24px;
 }
 
+table.header a
+{
+	color: #FFFFFF; !important
+}
 /**************** Aknowledges ****************/
 
 table.ack_msgs
@@ -613,27 +630,14 @@ table.triggers_info td.header {
 	background: #5C7099 url(images/gradients/table_head2.gif) repeat-x top left;
 	color: #FFFFFF;
 }
-table.triggers_info td {
-	background-color: #CCCCCC;
-}
-table.triggers_info td.trok {
-	background-color: #00FF33;
-}
-table.triggers_info td.dis {
-	background-color: #FF0000;
-}
-table.triggers_info td.high {
-	background-color: #FF8888;
-}
-table.triggers_info td.avg {
-	background-color: #DDAAAA;
-}
-table.triggers_info tr td.warn	{
-	background-color: #EFEFCC;
-}
-table.triggers_info tr td.info	{
-	background-color: #CCE5CC;
-}
+table.triggers_info td 				{	background-color: #CCCCCC;	}
+table.triggers_info tr td.disaster		{	background-color: #FF0000;	}
+table.triggers_info tr td.high			{	background-color: #FF8888;	}
+table.triggers_info tr td.average		{	background-color: #DDAAAA;	}
+table.triggers_info tr td.warning		{	background-color: #EFEFCC;	}
+table.triggers_info tr td.information		{	background-color: #CCE2CC;	}
+table.triggers_info tr td.unknown_trigger	{	background-color: #BCBCBC;	}
+table.triggers_info tr td.normal		{	background-color: #AADDAA; 	}
 
 /**************** HOSTS INFORMATION MODULE ****************/
 table.hosts_info {
@@ -760,7 +764,7 @@ A.action:active 	{	color:#3C3089;	text-decoration: underline;}
 .high		{	background-color: #FF8888;	}
 .average	{	background-color: #DDAAAA;	}
 .warning	{	background-color: #EFEFCC;	}
-.information	{	background-color: #CCE5CC;	}
+.information	{	background-color: #CCE2CC;	}
 .unknown_trigger{	background-color: #BCBCBC;	}
 .normal		{	background-color: #AADDAA;	}
 

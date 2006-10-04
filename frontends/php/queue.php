@@ -25,16 +25,6 @@
 	$page["file"] = "queue.php";
 	show_header($page["title"],1,0);
 ?>
- 
-<?php
-	if(!check_anyright("Host","R"))
-	{
-		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-		show_page_footer();
-		exit;	
-	}
-?>
-
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
@@ -78,7 +68,7 @@
 		$sec_rest=0;
 		while($row=DBfetch($result))
 		{
-			if(!check_right("Host","R",$row["hostid"]))
+//			if(!check_right("Host","R",$row["hostid"])) /* TODO */
 			{
 				continue;
 			}
@@ -111,7 +101,7 @@
 		$col=0;
 		while($row=DBfetch($result))
 		{
-			if(!check_right("Host","R",$row["hostid"]))
+//			if(!check_right("Host","R",$row["hostid"])) /* TODO */
 			{
 				continue;
 			}

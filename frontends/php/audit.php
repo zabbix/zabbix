@@ -41,7 +41,7 @@
 ?>
 <?php
 	$result = DBselect("select u.alias,a.clock,a.action,a.resourcetype,a.details from auditlog a, users u".
-		" where u.userid=a.userid and mod(u.userid,100)=".$ZBX_CURNODEID.
+		" where u.userid=a.userid and ".DBid2nodeid("u.userid")."=".$ZBX_CURNODEID.
 		" order by clock desc",
 		$limit);
 

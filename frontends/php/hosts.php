@@ -195,7 +195,7 @@
 /* group operations */
 			$result = 0;
 			$hosts = get_request("hosts",array());
-			$db_hosts=DBselect("select hostid from hosts where mod(hostid,100)=".$ZBX_CURNODEID);
+			$db_hosts=DBselect("select hostid from hosts where ".DBid2nodeid("hostid")."=".$ZBX_CURNODEID);
 			while($db_host=DBfetch($db_hosts))
 			{
 				$host=get_host_by_hostid($db_host["hostid"]);
@@ -219,7 +219,7 @@
 		$status = isset($_REQUEST["activate"]) ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
 		$hosts = get_request("hosts",array());
 
-		$db_hosts=DBselect("select hostid from hosts where mod(hostid,100)=".$ZBX_CURNODEID);
+		$db_hosts=DBselect("select hostid from hosts where ".DBid2nodeid("hostid")."=".$ZBX_CURNODEID);
 		while($db_host=DBfetch($db_hosts))
 		{
 			if(!in_array($db_host["hostid"],$hosts)) continue;
@@ -289,7 +289,7 @@
 			$result = 0;
 			$groups = get_request("groups",array());
 
-			$db_groups=DBselect("select groupid, name from groups where mod(groupid,100)=".$ZBX_CURNODEID);
+			$db_groups=DBselect("select groupid, name from groups where ".DBid2nodeid("groupid")."=".$ZBX_CURNODEID);
 			while($db_group=DBfetch($db_groups))
 			{
 				if(!in_array($db_group["groupid"],$groups)) continue;
@@ -313,7 +313,7 @@
 
 		$db_hosts=DBselect("select h.hostid, hg.groupid from hosts_groups hg, hosts h".
 			" where h.hostid=hg.hostid and h.status<>".HOST_STATUS_DELETED.
-			" and mod(h.hostid,100)=".$ZBX_CURNODEID);
+			" and ".DBid2nodeid("h.hostid")."=".$ZBX_CURNODEID);
 		while($db_host=DBfetch($db_hosts))
 		{
 			if(!in_array($db_host["groupid"],$groups)) continue;
@@ -369,7 +369,9 @@
 			$result = 0;
 			$applications = get_request("applications",array());
 
-			$db_applications = DBselect("select applicationid from applications where mod(applicationid,100)=".$ZBX_CURNODEID);
+			$db_applications = DBselect("select applicationid from applications ".
+				"where ".DBid2nodeid("applicationid")."=".$ZBX_CURNODEID);
+
 			while($db_app = DBfetch($db_applications))
 			{
 				if(!in_array($db_app["applicationid"],$applications))	continue;
@@ -605,7 +607,7 @@
 				S_MEMBERS));
 
 			$db_groups=DBselect("select groupid,name from groups".
-					" where mod(groupid,100)=".$ZBX_CURNODEID.
+					" where ".DBid2nodeid("groupid")."=".$ZBX_CURNODEID.
 					" order by name");
 			while($db_group=DBfetch($db_groups))
 			{
@@ -665,7 +667,7 @@
 		$table->SetHeader(array(S_TEMPLATES,S_HOSTS));
 
 		$templates = DBSelect("select * from hosts where status=".HOST_STATUS_TEMPLATE.
-			" and mod(hostid,100)=".$ZBX_CURNODEID.
+			" and ".DBid2nodeid("hostid")."=".$ZBX_CURNODEID.
 			" order by host");
 		while($template = DBfetch($templates))
 		{

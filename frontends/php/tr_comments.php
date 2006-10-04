@@ -27,16 +27,6 @@
 	$page["file"] = "tr_comments.php";
 	show_header($page["title"],0,0);
 ?>
-
-<?php
-	if(!check_right("Trigger comment","R",$_REQUEST["triggerid"]))
-	{
-		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-		show_page_footer();
-		exit;
-	}
-?>
-
 <?php
 	show_table_header(S_TRIGGER_COMMENTS_BIG);
 ?>

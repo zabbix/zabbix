@@ -53,10 +53,11 @@
                 $sql="delete from screens_items where screenid=$screenid and x=$x and y=$y";
                 DBexecute($sql);
 		$screenitemid=get_dbid("screens_items","screenitemid");
-                $sql="insert into screens_items (resourcetype,screenid,x,y,resourceid,width,height,colspan,rowspan,elements,valign,halign,style,url)".
-			" values ($resourcetype,$screenid,$x,$y,$resourceid,$width,$height,$colspan,$rowspan,$elements,$valign,$halign,$style,".
-			zbx_dbstr($url).")";
-                $result=DBexecute($sql);
+                $result=DBexecute("insert into screens_items (screenitemid,resourcetype,screenid,x,y,resourceid,width,height,".
+			" colspan,rowspan,elements,valign,halign,style,url) ".
+			" values ($screenitemid,$resourcetype,$screenid,$x,$y,$resourceid,".
+			" $width,$height,$colspan,$rowspan,$elements,$valign,$halign,$style,".
+			zbx_dbstr($url).")");
 
 		if(!$result)
 			return $result;
@@ -66,8 +67,9 @@
 
         function update_screen_item($screenitemid,$resourcetype,$resourceid,$width,$height,$colspan,$rowspan,$elements,$valign,$halign,$style,$url)
         {
-                $sql="update screens_items set resourcetype=$resourcetype,resourceid=$resourceid,width=$width,height=$height,colspan=$colspan,rowspan=$rowspan,elements=$elements,valign=$valign,halign=$halign,style=$style,url=".zbx_dbstr($url)." where screenitemid=$screenitemid";
-                return  DBexecute($sql);
+                return  DBexecute("update screens_items set resourcetype=$resourcetype,resourceid=$resourceid,".
+			"width=$width,height=$height,colspan=$colspan,rowspan=$rowspan,elements=$elements,valign=$valign,".
+			"halign=$halign,style=$style,url=".zbx_dbstr($url)." where screenitemid=$screenitemid");
         }
 
         function delete_screen_item($screenitemid)
@@ -275,12 +277,14 @@
 				}
 				elseif( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_TRIGGERS_OVERVIEW) )
 				{
-					$item = array(get_triggers_overview($resourceid));
+					global $ZBX_CURNODEID;
+					$item = array(get_triggers_overview($resourceid, $ZBX_CURNODEID));
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
 				elseif( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_DATA_OVERVIEW) )
 				{
-					$item = array(get_items_data_overview($resourceid));
+					global $ZBX_CURNODEID;
+					$item = array(get_items_data_overview($resourceid, $ZBX_CURNODEID));
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
 				elseif( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_URL) )

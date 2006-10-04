@@ -25,6 +25,8 @@
 	$page["title"] = "S_IT_SERVICES_AVAILABILITY_REPORT";
 	$page["file"] = "report3.php";
 	show_header($page["title"],0,0);
+
+/* TODO - rewrite page SERVICES_AVAILABILITY_REPORT */
 ?>
 
 <?php
@@ -86,7 +88,8 @@
 	$h2=S_YEAR.SPACE;
 	$h2=$h2."<input name=\"serviceid\" type=\"hidden\" value=".$_REQUEST["serviceid"].">";
 	$h2=$h2."<select class=\"biginput\" name=\"year\" onChange=\"submit()\">";
-	$result=DBselect("select h.hostid,h.host from hosts h,items i where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and mod(h.hostid,100)=$ZBX_CURNODEID group by h.hostid,h.host order by h.host");
+	$result=DBselect("select h.hostid,h.host from hosts h,items i where h.status=".HOST_STATUS_MONITORED.
+		" and h.hostid=i.hostid and ".DBid2nodeid("h.hostid")."=".$ZBX_CURNODEID." group by h.hostid,h.host order by h.host");
 
 	$year=date("Y");
 	for($year=date("Y")-2;$year<=date("Y");$year++)

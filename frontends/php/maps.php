@@ -46,7 +46,7 @@
 
 	if($_REQUEST["sysmapid"] <=0 )
 	{
-		$db_sysmaps = DBselect("select sysmapid,name from sysmaps where mod(sysmapid,100)=$ZBX_CURNODEID order by name");
+		$db_sysmaps = DBselect("select sysmapid,name from sysmaps where ".DBid2nodeid("sysmapid")."=".$ZBX_CURNODEID." order by name");
 		if($sysmap = DBfetch($db_sysmaps))
 		{
 			$_REQUEST["sysmapid"] = $sysmap["sysmapid"];
@@ -54,13 +54,6 @@
 	}
 
 	update_profile("web.maps.sysmapid",$_REQUEST["sysmapid"]);
-
-	if($_REQUEST["sysmapid"] > 0 && !check_right("Network map","R",$_REQUEST["sysmapid"]))
-	{
-		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-		show_page_footer();
-		exit;
-	}
 ?>
 
 
@@ -82,10 +75,10 @@
 		$form->AddVar("fullscreen",$_REQUEST["fullscreen"]);
 
 	$cmbMaps = new CComboBox("sysmapid",$_REQUEST["sysmapid"],"submit()");
-	$result=DBselect("select sysmapid,name from sysmaps where mod(sysmapid,100)=$ZBX_CURNODEID order by name");
+	$result=DBselect("select sysmapid,name from sysmaps where ".DBid2nodeid("sysmapid")."=".$ZBX_CURNODEID." order by name");
 	while($row=DBfetch($result))
 	{
-		if(!check_right("Network map","R",$row["sysmapid"]))		continue;
+//		if(!check_right("Network map","R",$row["sysmapid"]))		continue; /* TODO */
 		$cmbMaps->AddItem($row["sysmapid"],$row["name"]);
 	}
 	$form->AddItem($cmbMaps);

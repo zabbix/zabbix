@@ -119,7 +119,7 @@
 		{
 			list($type,$opt,$flags,$validation,$exception)=$checks;
 
-			if(($flags&P_NZERO)&&(isset($_REQUEST[$field]))&&($_REQUEST[$field]==0))
+			if(($flags&P_NZERO)&&(isset($_REQUEST[$field]))&&(is_numeric($_REQUEST[$field]))&&($_REQUEST[$field]==0))
 			{
 				unset_request($field);
 			}

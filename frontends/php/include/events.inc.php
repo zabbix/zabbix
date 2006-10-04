@@ -24,15 +24,15 @@
 	{
 		if($hostid > 0)
 		{
-			$sql="select distinct a.clock,a.value,a.triggerid from alarms a,functions f,items i where a.triggerid=f.triggerid and f.itemid=i.itemid and i.hostid=".$hostid." order by clock desc";
+			$sql="select distinct a.clock,a.value,a.triggerid from events a,functions f,items i where a.triggerid=f.triggerid and f.itemid=i.itemid and i.hostid=".$hostid." order by clock desc";
 		}
 		elseif($groupid > 0)
 		{
-			$sql="select distinct a.clock,a.value,a.triggerid from alarms a,functions f,items i where a.triggerid=f.triggerid and f.itemid=i.itemid and i.hostid=hg.hostid and hg.groupid=".$groupid." order by clock desc";
+			$sql="select distinct a.clock,a.value,a.triggerid from events a,functions f,items i where a.triggerid=f.triggerid and f.itemid=i.itemid and i.hostid=hg.hostid and hg.groupid=".$groupid." order by clock desc";
 		}
 		else
 		{
-			$sql="select distinct triggerid,clock,value from alarms order by clock desc";
+			$sql="select distinct triggerid,clock,value from events order by clock desc";
 		}
 		$result=DBselect($sql,10*($start+$num));
        
@@ -52,7 +52,7 @@
 				continue;
 			}
 			$description=expand_trigger_description($row["triggerid"]);
-			$description=new CLink($description,"alarms.php?triggerid=".$row["triggerid"],"action");
+			$description=new CLink($description,"events.php?triggerid=".$row["triggerid"],"action");
 
 			if($row["value"] == 0)
 			{

@@ -195,7 +195,7 @@
 		$form->AddItem(S_GROUP.SPACE);
 		$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit()");
 		$cmbGroup->AddItem(0,S_ALL_SMALL);
-		$result=DBselect("select groupid,name from groups where mod(groupid,100)=$ZBX_CURNODEID order by name");
+		$result=DBselect("select groupid,name from groups where ".DBid2nodeid("groupid")."=".$ZBX_CURNODEID." order by name");
 		while($row=DBfetch($result))
 		{
 	// Check if at least one host with read permission exists for this group
@@ -230,7 +230,7 @@
 		{
 			$sql="select h.hostid,h.host from hosts h,items i where h.hostid=i.hostid".
 				" and h.status=".HOST_STATUS_MONITORED." group by h.hostid,h.host".
-				" and mod(h.hostid,100)=".$ZBX_CURNODEID.
+				" and ".DBid2nodeid("h.hostid")."=".$ZBX_CURNODEID.
 				" order by h.host";
 		}
 
@@ -257,10 +257,11 @@
 
 		$table = new CTableInfo(S_NO_GRAPHS_DEFINED);
 		$table->setHeader(array(
+			$_REQUEST["hostid"] != 0 ? NULL : S_HOSTS,
 			array(	new CCheckBox("all_graphs",NULL,
 					"CheckAll('".$form->GetName()."','all_graphs');"),
-				S_ID),
-			$_REQUEST["hostid"] != 0 ? NULL : S_HOSTS, S_NAME,S_WIDTH,S_HEIGHT,S_GRAPH_TYPE,S_GRAPH));
+				S_NAME),
+			S_WIDTH,S_HEIGHT,S_GRAPH_TYPE,S_GRAPH));
 
 		if($_REQUEST["hostid"] > 0)
 		{
@@ -270,7 +271,7 @@
 		}
 		else
 		{
-			$result=DBselect("select * from graphs g where mod(graphid,100)=$ZBX_CURNODEID order by g.name");
+			$result=DBselect("select * from graphs g where ".DBid2nodeid("graphid")."=".$ZBX_CURNODEID." order by g.name");
 		}
 		while($row=DBfetch($result))
 		{
@@ -331,9 +332,8 @@
 				$graphtype = S_NORMAL;
 
 			$table->AddRow(array(
-				array($chkBox, $row["graphid"]),
 				$host_list,
-				$name,
+				array($chkBox, $name),
 				$row["width"],
 				$row["height"],
 				$graphtype,

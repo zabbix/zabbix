@@ -30,7 +30,7 @@
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"alarmid"=>		array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		NULL),
+		"eventid"=>		array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		NULL),
 		"message"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'isset({save})'),
 
 		"save"=>		array(T_ZBX_STR,O_OPT,	P_ACT|P_SYS, NULL,	NULL)
@@ -41,7 +41,7 @@
 	if(isset($_REQUEST["save"]))
 	{
 		$result = add_acknowledge_coment(
-			$_REQUEST["alarmid"],
+			$_REQUEST["eventid"],
 			$USER_DETAILS["userid"],
 			$_REQUEST["message"]);
 
@@ -50,10 +50,10 @@
 ?>
 <?php
 
-	$alarm = get_alarm_by_alarmid($_REQUEST["alarmid"]);
-	$trigger=get_trigger_by_triggerid($alarm["triggerid"]);
+	$event = get_event_by_eventid($_REQUEST["eventid"]);
+	$trigger=get_trigger_by_triggerid($event["triggerid"]);
 	$expression=explode_exp($trigger["expression"],1);
-	$description=expand_trigger_description($alarm["triggerid"]);
+	$description=expand_trigger_description($event["triggerid"]);
 
 	show_table_header(S_ALARM_ACKNOWLEDGES_BIG.":".$description.BR.$expression);
 
@@ -61,7 +61,7 @@
 	$table = new CTable(NULL,"ack_msgs");
 	$table->SetAlign("center");
 
-	$db_acks = get_acknowledges_by_alarmid($_REQUEST["alarmid"]);
+	$db_acks = get_acknowledges_by_eventid($_REQUEST["eventid"]);
 	while($db_ack = DBfetch($db_acks))
 	{
 		$db_user = get_user_by_userid($db_ack["userid"]);

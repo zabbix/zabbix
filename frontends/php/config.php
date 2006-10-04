@@ -39,7 +39,7 @@
 // other form
 		"alert_history"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),
 						'in_array({config},array(0,5,7))&&({save}=="Save")'),
-		"alarm_history"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),
+		"event_history"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),
 						'in_array({config},array(0,5,7))&&({save}=="Save")'),
 		"refresh_unsupported"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),
 						'in_array({config},array(0,5,7))&&({save}=="Save")'),
@@ -190,14 +190,14 @@
 
 
 /* OTHER ACTIONS */
-		$result=update_config($_REQUEST["alarm_history"],$_REQUEST["alert_history"],
+		$result=update_config($_REQUEST["event_history"],$_REQUEST["alert_history"],
 			$_REQUEST["refresh_unsupported"],$_REQUEST["work_period"]);
 
 		show_messages($result, S_CONFIGURATION_UPDATED, S_CONFIGURATION_WAS_NOT_UPDATED);
 		if($result)
 		{
 			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,
-				"Alarm history [".$_REQUEST["alarm_history"]."]".
+				"Alarm history [".$_REQUEST["event_history"]."]".
 				" alert history [".$_REQUEST["alert_history"]."]".
 				" refresh unsupported items [".$_REQUEST["refresh_unsupported"]."]");
 		}
@@ -318,10 +318,10 @@
 			show_table_header(S_IMAGES_BIG);
 
 			$table=new CTableInfo(S_NO_IMAGES_DEFINED);
-			$table->setHeader(array(S_ID,S_NAME,S_TYPE,S_IMAGE));
+			$table->setHeader(array(S_NAME,S_TYPE,S_IMAGE));
 	
 			$result=DBselect("select imageid,imagetype,name from images".
-					" where mod(imageid,100)=".$ZBX_CURNODEID.
+					" where ".DBid2nodeid("imageid")."=".$ZBX_CURNODEID.
 					" order by name");
 			while($row=DBfetch($result))
 			{
@@ -333,7 +333,6 @@
 					"&imageid=".$row["imageid"],'action');
 
 				$table->addRow(array(
-					$row["imageid"],
 					$name,
 					$imagetype,
 					$actions=new CLink(
@@ -355,10 +354,10 @@
 			show_table_header(S_AUTOREGISTRATION_RULES_BIG);
 
 			$table=new CTableInfo(S_NO_AUTOREGISTRATION_RULES_DEFINED);
-			$table->setHeader(array(S_ID,S_PRIORITY,S_PATTERN,S_HOST));
+			$table->setHeader(array(S_PRIORITY,S_PATTERN,S_HOST));
 
 			$result=DBselect("select * from autoreg".
-					" where mod(id,100)=".$ZBX_CURNODEID.
+					" where ".DBid2nodeid("id")."=".$ZBX_CURNODEID.
 					" order by priority");
 			while($row=DBfetch($result))
 			{
@@ -376,7 +375,6 @@
 					'action');
 
 				$table->addRow(array(
-					$row["id"],
 					$row["priority"],
 					$pattern,
 					$name));
@@ -402,7 +400,7 @@
 				$mappings_row = array();
 				$db_maps = DBselect("select * from mappings".
 					" where valuemapid=".$db_valuemap["valuemapid"].
-					" and mod(valuemapid,100)=".$ZBX_CURNODEID);
+					" and ".DBid2nodeid("valuemapid")."=".$ZBX_CURNODEID);
 				while($db_map = DBfetch($db_maps))
 				{
 					array_push($mappings_row, 

@@ -28,7 +28,8 @@
 		elseif($severity == 3)	return "average";
 		elseif($severity == 4)	return "high";
 		elseif($severity == 5)	return "disaster";
-		else			return "";
+
+		return "";
 	}
 
 	function	get_severity_description($severity)
@@ -313,7 +314,7 @@
 			return	$result;
 		}
  
-		add_alarm($triggerid,TRIGGER_VALUE_UNKNOWN);
+		add_event($triggerid,TRIGGER_VALUE_UNKNOWN);
  
 		$expression = implode_exp($expression,$triggerid);
 
@@ -474,29 +475,29 @@
 			if($expression[$i] == '}')
 			{
 				$state='';
-				$sql='select h.host,i.key_,f.function,f.parameter,i.itemid'.
+				if($function_data = DBfetch(DBselect('select h.host,i.key_,f.function,f.parameter,i.itemid,i.value_type'.
 					' from items i,functions f,hosts h'.
-					' where functionid='.$functionid.' and i.itemid=f.itemid and h.hostid=i.hostid';
-
-				$res1=DBselect($sql);
-				$row1=DBfetch($res1);
-				if($html == 0)
+					' where functionid='.$functionid.' and i.itemid=f.itemid and h.hostid=i.hostid')))
 				{
-					$exp=$exp."{".$row1["host"].":".$row1["key_"].".".$row1["function"]."(".$row1["parameter"].")}";
-				}
-				else
-				{
-					$Link = new CLink($row1["host"].":".$row1["key_"]);
-					$item=get_item_by_itemid($row1["itemid"]);
-					if($item["value_type"] ==0) 
+					if($html == 0)
 					{
-						$Link->SetUrl('history.php?action=showgraph&itemid='.$row1['itemid']);
+						$exp .= "{".$function_data["host"].":".$function_data["key_"].".".
+							$function_data["function"]."(".$function_data["parameter"].")}";
 					}
 					else
 					{
-						$Link->SetUrl('history.php?action=showvalues&period=3600&itemid='.$row1['itemid']);
+						$link = new CLink($function_data["host"].":".$function_data["key_"],
+							'history.php?action='.( $function_data["value_type"] ==0 ? 'showvalues' : 'showgraph').
+							'&itemid='.$function_data['itemid']);
+					
+						$exp .= $link->ToString().'.'.bold($row1["function"].'(').$row1["parameter"].bold(')');
 					}
-					$exp .= $Link->ToString().'.'.bold($row1["function"].'(').$row1["parameter"].bold(')');
+				}
+				else
+				{
+					if($html == 1)	$exp .= "<FONT COLOR=\"#AA0000\">";
+					$exp .= "*ERROR*";
+					if($html == 1)	$exp .= "</FONT>";
 				}
 				continue;
 			}
@@ -547,14 +548,14 @@
 
 				$itemid=$row["itemid"];
 	
-				$res=DBexecute("insert into functions (itemid,triggerid,function,parameter)".
-					" values ($itemid,$triggerid,".zbx_dbstr($function).",".
+				$functionid = get_dbid("functions","functionid");
+				$res=DBexecute("insert into functions (functionid,itemid,triggerid,function,parameter)".
+					" values ($functionid,$itemid,$triggerid,".zbx_dbstr($function).",".
 					zbx_dbstr($parameter).")");
 				if(!$res)
 				{
 					return	$res;
 				}
-				$functionid=DBinsert_id($res,"functions","functionid");
 
 				$exp=$exp.'{'.$functionid.'}';
 
@@ -639,35 +640,38 @@
 			update_trigger_status($db_chd_trigger["triggerid"],$status);
 		}
 
-		add_alarm($triggerid,TRIGGER_VALUE_UNKNOWN);
+		add_event($triggerid,TRIGGER_VALUE_UNKNOWN);
 		return	DBexecute("update triggers set status=$status where triggerid=$triggerid");
 	}
 
 	# "Processor load on {HOSTNAME} is 5" to "Processor load on www.sf.net is 5"
-	function	expand_trigger_description_simple($triggerid)
+	function	expand_trigger_description_by_data($row)
 	{
-		$result=DBselect("select distinct t.description,h.host".
-			" from triggers t,functions f,items i,hosts h".
-			" where t.triggerid=$triggerid and f.triggerid=t.triggerid".
-			" and f.itemid=i.itemid and i.hostid=h.hostid");
-
-
-		$row = DBfetch($result);
 		if($row)
 		{
+			if(is_null($row["host"])) $row["host"] = "{HOSTNAME}";
 			$description = str_replace("{HOSTNAME}", $row["host"],$row["description"]);
 		}
 		else
 		{
-			$result = DBselect("select description from triggers where triggerid=$triggerid");
-			$row = DBfetch($result);
-			$description = $row["description"];
+			$description = "*ERROR*";
 		}
-
 		return $description;
 	}
+	
+	function	expand_trigger_description_simple($triggerid)
+	{
+		return expand_trigger_description_by_data(
+			DBfetch(
+				DBselect("select distinct t.description,h.host".
+					" from triggers t left join functions f on t.triggerid=f.triggerid ".
+					" left join items i on f.itemid=i.itemid ".
+					" left join hosts h on i.hostid=h.hostid ".
+					" where t.triggerid=$triggerid")
+				)
+			);
+	}
 
-	# "Processor load on %s is 5" to "Processor load on www.sf.net is 5"
 	function	expand_trigger_description($triggerid)
 	{
 		$description=expand_trigger_description_simple($triggerid);
@@ -685,27 +689,27 @@
 		$now = time();
 		while($row=DBfetch($result))
 		{
-			if(!add_alarm($row["triggerid"],TRIGGER_VALUE_UNKNOWN,$now)) continue;
+			if(!add_event($row["triggerid"],TRIGGER_VALUE_UNKNOWN,$now)) continue;
 
 			DBexecute('update triggers set value='.TRIGGER_VALUE_UNKNOWN.' where triggerid='.$row["triggerid"]);
 		}
 	}
 
-	function add_alarm($triggerid, $value, $time=NULL)
+	function add_event($triggerid, $value, $time=NULL)
 	{
 		if(is_null($time)) $time = time();
 
-		$result = DBselect('select value from alarms where triggerid='.$triggerid.' order by clock desc',1);
+		$result = DBselect('select value from events where triggerid='.$triggerid.' order by clock desc',1);
 		$last_value = DBfetch($result);
 		if($last_value)
 		{
 			if($value == $last_value['value'])
 				return false;
 		}
-		$result = DBexecute('insert into alarms(triggerid,clock,value) values('.$triggerid.','.$time.','.$value.')');
+		$eventid = get_dbid("events","eventid");
+		$result = DBexecute('insert into events(eventid,triggerid,clock,value) values('.$eventid.','.$triggerid.','.$time.','.$value.')');
 		if($value == TRIGGER_VALUE_FALSE || $value == TRIGGER_VALUE_TRUE)
 		{
-			$alarm_id = DBinsert_id($result,'alarms','alarmid');
 			DBexesute('update alerts set retries=3,error=\'Trigger changed its status. WIll not send repeats.\''.
 				' where triggerid='.$triggerid.' and repeats>0 and status='.ALERT_STATUS_NOT_SENT);
 		}
@@ -746,7 +750,7 @@
 		$result=delete_function_by_triggerid($triggerid);
 		if(!$result)	return	$result;
 
-		$result=delete_alarms_by_triggerid($triggerid);
+		$result=delete_events_by_triggerid($triggerid);
 		if(!$result)	return	$result;
 
 		$result=delete_services_by_triggerid($triggerid);
@@ -841,7 +845,7 @@
 		}
 
 		$expression = implode_exp($expression,$triggerid);
-		add_alarm($triggerid,TRIGGER_VALUE_UNKNOWN);
+		add_event($triggerid,TRIGGER_VALUE_UNKNOWN);
 		reset_items_nextcheck($triggerid);
 
 		$sql="update triggers set";
@@ -949,9 +953,9 @@
 		return	DBexecute("delete from functions where triggerid=$triggerid");
 	}
 
-	function	delete_alarms_by_triggerid($triggerid)
+	function	delete_events_by_triggerid($triggerid)
 	{
-		return	DBexecute("delete from alarms where triggerid=$triggerid");
+		return	DBexecute("delete from events where triggerid=$triggerid");
 	}
 
 	function	delete_triggers_by_itemid($itemid)
@@ -1055,8 +1059,10 @@
 		}
 	}
 
-	function	get_triggers_overview($groupid)
+	function	get_triggers_overview($groupid, $nodeid)
 	{
+		global $USER_DETAILS;
+
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
 		if($groupid > 0)
 		{
@@ -1065,17 +1071,21 @@
 			$group_where = ' where';
 		}
 
-		$result=DBselect('select distinct t.description,t.value,t.lastchange,h.hostid,h.host'.
+		$result=DBselect('select distinct t.description,t.value,t.priority,t.lastchange,h.hostid,h.host'.
 			' from hosts h,items i,triggers t, functions f '.$group_where.
 			' h.status='.HOST_STATUS_MONITORED.' and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid'.
-			' and t.status='.TRIGGER_STATUS_ENABLED.
+			' and h.hostid in ('.get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_ONLY, null, null, $nodeid).') '.
+			' and t.status='.TRIGGER_STATUS_ENABLED.' and i.status='.ITEM_STATUS_ACTIVE.
 			' order by t.description');
 		unset($triggers);
 		unset($hosts);
 		while($row = DBfetch($result))
 		{
 			$hosts[$row['host']] = $row['host'];
-			$triggers[$row['description']][$row['host']] = array('value' => $row['value'], 'lastchange' => $row['lastchange']);
+			$triggers[$row['description']][$row['host']] = array(
+				'value'		=> $row['value'], 
+				'lastchange'	=> $row['lastchange'],
+				'priority'	=> $row['priority']);
 		}
 		if(!isset($hosts))
 		{
@@ -1097,9 +1107,16 @@
 				$style = NULL;
 				if(isset($trhosts[$hostname]))
 				{
-					if($trhosts[$hostname]['value'] == TRIGGER_VALUE_FALSE)		$style = 'normal';
-					elseif($trhosts[$hostname]['value'] == TRIGGER_VALUE_UNKNOWN)	$style = 'unknown_trigger';
-					else								$style = 'high';
+					switch($trhosts[$hostname]['value'])
+					{
+						case TRIGGER_VALUE_TRUE:
+							$style = get_severity_style($trhosts[$hostname]['priority']);
+							break;
+						case TRIGGER_VALUE_FALSE:
+							$style = 'normal';
+						default:
+							$style = 'unknown_trigger';
+					}
 
 					if((time(NULL)-$trhosts[$hostname]['lastchange'])<300)	 	$style .= '_blink1';
 					elseif((time(NULL)-$trhosts[$hostname]['lastchange'])<900) 	$style .= '_blink2';
@@ -1124,6 +1141,140 @@
 			error("No function with functionid=[$functionid]");
 		}
 		return	$item;
+	}
+
+	function	calculate_availability($triggerid,$period_start,$period_end)
+	{
+		if(($period_start==0)&&($period_end==0))
+		{
+	        	$sql="select count(*) as cnt,min(clock) as minn,max(clock) as maxx from events where triggerid=$triggerid";
+		}
+		else
+		{
+	        	$sql="select count(*) as cnt,min(clock) as minn,max(clock) as maxx from events where triggerid=$triggerid and clock>=$period_start and clock<=$period_end";
+		}
+
+		$row=DBfetch(DBselect($sql));
+		if($row["cnt"]>0)
+		{
+			$min=$row["minn"];
+			$max=$row["maxx"];
+		}
+		else
+		{
+			if(($period_start==0)&&($period_end==0))
+			{
+				$max=time();
+				$min=$max-24*3600;
+			}
+			else
+			{
+				$ret["true_time"]	= 0;
+				$ret["false_time"]	= 0;
+				$ret["unknown_time"]	= 0;
+				$ret["true"]		= 0;
+				$ret["false"]		= 0;
+				$ret["unknown"]		= 100;
+				return $ret;
+			}
+		}
+
+		$result=DBselect("select clock,value from events where triggerid=$triggerid and clock>=$min and clock<=$max");
+
+		$state		= -1;
+		$true_time	= 0;
+		$false_time	= 0;
+		$unknown_time	= 0;
+		$time		= $min;
+
+		if(($period_start==0)&&($period_end==0))
+		{
+			$max=time();
+		}
+		$rows=0;
+		while($row=DBfetch($result))
+		{
+			$clock=$row["clock"];
+			$value=$row["value"];
+
+			$diff=$clock-$time;
+
+			$time=$clock;
+
+			if($state==-1)
+			{
+				$state=$value;
+				if($state == 0)
+				{
+					$false_time+=$diff;
+				}
+				if($state == 1)
+				{
+					$true_time+=$diff;
+				}
+				if($state == 2)
+				{
+					$unknown_time+=$diff;
+				}
+			}
+			else if($state==0)
+			{
+				$false_time+=$diff;
+				$state=$value;
+			}
+			else if($state==1)
+			{
+				$true_time+=$diff;
+				$state=$value;
+			}
+			else if($state==2)
+			{
+				$unknown_time+=$diff;
+				$state=$value;
+			}
+			$rows++;
+		}
+
+		if($rows==0)
+		{
+			$trigger = get_trigger_by_triggerid($triggerid);
+			$state = $trigger['value'];
+		}
+		
+		if($state==0)
+		{
+			$false_time=$false_time+$max-$time;
+		}
+		elseif($state==1)
+		{
+			$true_time=$true_time+$max-$time;
+		}
+		elseif($state==3)
+		{
+			$unknown_time=$unknown_time+$max-$time;
+		}
+
+		$total_time=$true_time+$false_time+$unknown_time;
+
+		if($total_time==0)
+		{
+			$ret["true_time"]	= 0;
+			$ret["false_time"]	= 0;
+			$ret["unknown_time"]	= 0;
+			$ret["true"]		= 0;
+			$ret["false"]		= 0;
+			$ret["unknown"]		= 100;
+		}
+		else
+		{
+			$ret["true_time"]	= $true_time;
+			$ret["false_time"]	= $false_time;
+			$ret["unknown_time"]	= $unknown_time;
+			$ret["true"]		= (100*$true_time)/$total_time;
+			$ret["false"]		= (100*$false_time)/$total_time;
+			$ret["unknown"]		= (100*$unknown_time)/$total_time;
+		}
+		return $ret;
 	}
 
 ?>

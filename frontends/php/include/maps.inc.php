@@ -365,7 +365,7 @@
 			elseif($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_IMAGE)
 			{
 				if($url=="" && $db_element["elementid"]!=0)
-					$url="alarms.php?triggerid=".$db_element["elementid"];
+					$url="events.php?triggerid=".$db_element["elementid"];
 			}
 
 			if($url=="")	continue;

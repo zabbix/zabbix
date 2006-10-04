@@ -59,7 +59,7 @@ require_once "include/items.inc.php";
 		if($groupid==NULL)
 		{
 			$groupid=get_dbid("groups","groupid");
-			if(!DBexecute("insert into groups (name) values (".zbx_dbstr($name).")"))
+			if(!DBexecute("insert into groups (groupid,name) values (".$groupid.",".zbx_dbstr($name).")"))
 				return FALSE;
 			return $groupid;
 
@@ -73,12 +73,10 @@ require_once "include/items.inc.php";
 		if($newgroup == "" || $newgroup == NULL)
 			 return TRUE;
 
-		$result = db_save_group($newgroup);
-		if(!$result)
-			return	$result;
+		$groupid = db_save_group($newgroup);
+		if(!$groupid)
+			return	$groupid;
 		
-		$groupid = DBinsert_id($result,"groups","groupid");
-
 		return add_host_to_group($hostid, $groupid);
 	}
 
@@ -104,12 +102,10 @@ require_once "include/items.inc.php";
 
 	function	add_host_group($name,$hosts=array())
 	{
-		$result = db_save_group($name);
-		if(!$result)
-			return	$result;
+		$groupid = db_save_group($name);
+		if(!$groupid)
+			return	$groupid;
 		
-		$groupid = DBinsert_id($result,"groups","groupid");
-
 		update_host_groups_by_groupid($groupid,$hosts);
 
 		return $groupid;
@@ -161,6 +157,7 @@ require_once "include/items.inc.php";
 		if($useip=="on" || $useip=="yes" || $useip==1)		$useip=1;
 		else							$useip=0;
 
+
 		if($hostid==NULL)
 		{
 			$hostid = get_dbid("hosts","hostid");
@@ -189,11 +186,9 @@ require_once "include/items.inc.php";
 
 	function	add_host($host,$port,$status,$useip,$ip,$templateid,$newgroup,$groups)
 	{
-		$result = db_save_host($host,$port,$status,$useip,$ip,$templateid);
-		if(!$result)
-			return $result;
-	
-		$hostid = DBinsert_id($result,"hosts","hostid");
+		$hostid = db_save_host($host,$port,$status,$useip,$ip,$templateid);
+		if(!$hostid)
+			return $hostid;
 
 		update_host_groups($hostid,$groups);
 
@@ -452,6 +447,7 @@ require_once "include/items.inc.php";
 			{
 				$group_table = "";
 				$witth_group = "";
+
 				if($groupid != 0)
 				{
 					if(!DBfetch(DBselect("select hg.hostid from hosts_groups hg".
@@ -506,14 +502,30 @@ require_once "include/items.inc.php";
 		if(is_null($group_var)) $group_var = "web.latest.groupid";
 		if(is_null($host_var))	$host_var = "web.latest.hostid";
 
-		$_REQUEST["groupid"]    = get_request("groupid",get_profile($group_var,0));
-		$_REQUEST["hostid"]     = get_request("hostid",get_profile($host_var,
-			(in_array("always_select_first_host",$options)) ? -1 : 0));
+		$_REQUEST["groupid"]    = get_request("groupid", -1 );
+		$_REQUEST["hostid"]     = get_request("hostid", get_profile($host_var,0));
+		
+		if($_REQUEST["groupid"] == -1)
+		{
+			if($_REQUEST["hostid"] > 0)
+				$_REQUEST["groupid"] = 0;
+			else 
+				$_REQUEST["groupid"] = get_profile($group_var,0);
+		}
+		
+//		SDI("ig:".$_REQUEST["groupid"]);	
+//		SDI("ih:".$_REQUEST["hostid"]);	
+
+		if(in_array("always_select_first_host",$options) && $_REQUEST["hostid"] == 0 && $_REQUEST["groupid"] != 0)
+			$_REQUEST["hostid"] = -1;
 
 		$result = get_correct_group_and_host($_REQUEST["groupid"],$_REQUEST["hostid"], $perm, $options);
 
 		$_REQUEST["groupid"]    = $result["groupid"];
 		$_REQUEST["hostid"]     = $result["hostid"];
+
+//		SDI("og:".$_REQUEST["groupid"]);	
+//		SDI("oh:".$_REQUEST["hostid"]);	
 
 		update_profile($host_var,$_REQUEST["hostid"]);
 		update_profile($group_var,$_REQUEST["groupid"]);

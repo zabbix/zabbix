@@ -98,13 +98,13 @@
 	{
 		show_header2(S_MAPS_BIG);
 		$table = new CTableInfo(S_NO_MAPS_DEFINED);
-		$table->setHeader(array(S_ID,S_NAME,S_WIDTH,S_HEIGHT,S_MAP));
+		$table->setHeader(array(S_NAME,S_WIDTH,S_HEIGHT,S_MAP));
 
-		$result=DBselect("select sysmapid,name,width,height from sysmaps where mod(sysmapid,100)=$ZBX_CURNODEID order by name");
+		$result=DBselect("select sysmapid,name,width,height from sysmaps ".
+			" where ".DBid2nodeid("sysmapid")."=".$ZBX_CURNODEID." order by name");
 		while($row=DBfetch($result))
 		{
 			$table->addRow(array(
-				$row["sysmapid"],
 				new CLink($row["name"], "sysmaps.php?form=update".
 					"&sysmapid=".$row["sysmapid"]."#form",'action'),
 				$row["width"],

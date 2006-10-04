@@ -29,18 +29,8 @@
 	$page["file"]="actionconf.php";
 	show_header($page["title"],0,0);
 	insert_confirm_javascript();
-?>
-
-<?php
-        if(!check_anyright("Configuration of Zabbix","U"))
-        {
-                show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-                show_page_footer();
-                exit;
-        }
 
 	$_REQUEST["actiontype"] = get_request("actiontype",get_profile("web.actionconf.actiontype",0));
-
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -183,7 +173,7 @@
 	elseif(isset($_REQUEST["group_enable"])&&isset($_REQUEST["g_actionid"]))
 	{
 		$result=DBselect("select distinct actionid from actions".
-				" where mod(actionid,100)=".$ZBX_CURNODEID);
+				" where ".DBid2nodeid("actionid")."=".$ZBX_CURNODEID);
 		while($row=DBfetch($result))
 		{
 			if(!in_array($row["actionid"], $_REQUEST["g_actionid"]))	continue;
@@ -195,7 +185,7 @@
 	elseif(isset($_REQUEST["group_disable"])&&isset($_REQUEST["g_actionid"]))
 	{
 		$result=DBselect("select distinct actionid from actions".
-				" where mod(actionid,100)=".$ZBX_CURNODEID);
+				" where ".DBid2nodeid("actionid")."=".$ZBX_CURNODEID);
 		while($row=DBfetch($result))
 		{
 			if(!in_array($row["actionid"], $_REQUEST["g_actionid"]))	continue;
@@ -207,7 +197,7 @@
 	elseif(isset($_REQUEST["group_delete"])&&isset($_REQUEST["g_actionid"]))
 	{
 		$result=DBselect("select distinct actionid from actions".
-				" where mod(actionid,100)=".$ZBX_CURNODEID);
+				" where ".DBid2nodeid("actionid")."=".$ZBX_CURNODEID);
 		while($row=DBfetch($result))
 		{
 			if(!in_array($row["actionid"], $_REQUEST["g_actionid"])) continue;
@@ -257,7 +247,7 @@
 			S_STATUS));
 
 		$result=DBselect("select * from actions where actiontype=".$_REQUEST["actiontype"].
-			" and mod(actionid,100)=".$ZBX_CURNODEID.
+			" and ".DBid2nodeid("actionid")."=".$ZBX_CURNODEID.
 			" order by actiontype, source");
 		while($row=DBfetch($result))
 		{

@@ -28,17 +28,6 @@
 	show_header($page["title"],0,0);
 	insert_confirm_javascript();
 ?>
-
-<?php
-	if(!check_right("Screen","U",0))
-	{
-		show_table_header("<font color=\"AA0000\">No permissions !</font>");
-		show_page_footer();
-		exit;
-	}
-?>
-
-
 <?php
 	if(isset($_REQUEST["save"])){
 		if(isset($_REQUEST["screenid"]))
@@ -78,16 +67,15 @@
 		show_header2(S_SCREENS_BIG);
 
 		$table = new CTableInfo(S_NO_SCREENS_DEFINED);
-		$table->setHeader(array(S_ID,S_NAME,S_DIMENSION_COLS_ROWS,S_SCREEN));
+		$table->setHeader(array(S_NAME,S_DIMENSION_COLS_ROWS,S_SCREEN));
 
-		$result=DBselect("select screenid,name,hsize,vsize from screens where mod(screenid,100)=$ZBX_CURNODEID".
+		$result=DBselect("select screenid,name,hsize,vsize from screens where ".DBid2nodeid("screenid")."=".$ZBX_CURNODEID.
 				" order by name");
 		while($row=DBfetch($result))
 		{
-			if(!check_right("Screen","R",$row["screenid"]))		continue;
+//			if(!check_right("Screen","R",$row["screenid"]))		continue; /* TODO */
 
 			$table->addRow(array(
-				$row["screenid"],
 				new CLink($row["name"],"screenconf.php?form=update&screenid=".$row["screenid"],
 					'action'),
 				$row["hsize"]." x ".$row["vsize"],

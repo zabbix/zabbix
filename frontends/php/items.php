@@ -367,7 +367,7 @@
 	show_header2(S_CONFIGURATION_OF_ITEMS_BIG, $form);
 	echo BR;
 
-	$db_hosts=DBselect("select hostid from hosts where mod(hostid,100)=$ZBX_CURNODEID");
+	$db_hosts=DBselect("select hostid from hosts where ".DBid2nodeid("hostid")."=".$ZBX_CURNODEID);
 	if(isset($_REQUEST["form_copy_to"]) && isset($_REQUEST["group_itemid"]))
 	{
 		insert_copy_elements_to_forms("group_itemid");
@@ -446,8 +446,8 @@
 		$table->setHeader(array(
 			array(	new CCheckBox("all_items",NULL,
 					"CheckAll('".$form->GetName()."','all_items');"),
-				S_ID),
-			S_DESCRIPTION,S_KEY,nbsp(S_UPDATE_INTERVAL),
+				S_DESCRIPTION),
+			S_KEY,nbsp(S_UPDATE_INTERVAL),
 			S_HISTORY,S_TRENDS,S_TYPE,S_STATUS,
 			$show_applications == 1 ? S_APPLICATIONS : NULL,
 			S_ERROR));
@@ -529,8 +529,7 @@
 			$chkBox = new CCheckBox("group_itemid[]",NULL,NULL,$db_item["itemid"]);
 			if($db_item["templateid"] > 0) $chkBox->SetEnabled(false);
 			$table->AddRow(array(
-				array($chkBox, $db_item["itemid"]),
-				$description,
+				array($chkBox, $description),
 				$db_item["key_"],
 				$db_item["delay"],
 				$db_item["history"],

@@ -26,22 +26,12 @@
 
 	show_header($page["title"],0,0);
 	insert_confirm_javascript();
-?>
-
-<?php
-	if(!check_anyright("Service","U"))
-	{
-		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-		show_page_footer();
-		exit;
-	}
 
 	$_REQUEST["serviceid"] = get_request("serviceid",0);
 	if($_REQUEST["serviceid"] == 0) unset($_REQUEST["serviceid"]);
 
 	$_REQUEST["parentid"] = get_request("parentid", 0);
 ?>
-
 <?php
 
 	if(isset($_REQUEST["delete"]))
@@ -161,13 +151,13 @@
 	$table->SetHeader(array(
 		array(new CCheckBox("all_services",NULL,
 			"CheckAll('".$form->GetName()."','all_services');"),
-			S_ID),
-		S_SERVICE,
+			S_SERVICE),
 		S_STATUS_CALCULATION,
 		S_TRIGGER
 		));
 
-	$sql = "select serviceid,name,algorithm,triggerid from services where mod(serviceid,100)=$ZBX_CURNODEID order by sortorder,name";
+	$sql = "select serviceid,name,algorithm,triggerid from services where ".DBid2nodeid("serviceid")."=".$ZBX_CURNODEID.
+		" order by sortorder,name";
 	if(isset($_REQUEST["serviceid"]))
 	{
 		$form->AddVar("serviceid",$_REQUEST["serviceid"]);
@@ -185,9 +175,9 @@
 			$table->AddRow(array(
 				array(
 					new CCheckBox("group_serviceid[]",NULL,NULL,$_REQUEST["serviceid"]),
-					$_REQUEST["serviceid"]
+					new CLink(new CSpan($service["name"]." [$childs]","bold"),
+						"services.php?serviceid=".$_REQUEST["parentid"]."#form")
 				),
-				new CLink(new CSpan($service["name"]." [$childs]","bold"),"services.php?serviceid=".$_REQUEST["parentid"]."#form"),
 				algorithm2str($service["algorithm"]),
 				$trigger
 				));
@@ -553,7 +543,7 @@
 		$frmDetails->AddVar("parentid",$_REQUEST["parentid"]);
 		
 		$cmbServers = new CComboBox("serverid");
-		$result=DBselect("select hostid,host from hosts where mod(hostid,100)=$ZBX_CURNODEID order by host");
+		$result=DBselect("select hostid,host from hosts where ".DBid2nodeid("hostid")."=".$ZBX_CURNODEID." order by host");
 		while($row=DBfetch($result))
 		{
 			$cmbServers->AddItem($row["hostid"],$row["host"]);

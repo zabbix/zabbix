@@ -339,7 +339,7 @@ else
 
 		while($row=DBfetch($result))
 		{
-			$ack = get_last_alarm_by_triggerid($row["triggerid"]);
+			$ack = get_last_event_by_triggerid($row["triggerid"]);
 			if($ack["acknowledged"] == 1) continue;
 
 			$triggerids="$triggerids,".$row["triggerid"];
@@ -356,9 +356,7 @@ else
 
 	function	select_config()
 	{
-		$sql="select * from config";
-		$result=DBselect($sql);
-		$row=DBfetch($result);
+		$row=DBfetch(DBselect("select * from config"));
 		if($row)
 		{
 			return	$row;
@@ -778,7 +776,7 @@ COpt::profiling_start("page");
 								"sub_pages"=>array("history.php")
 								),
 							array("url"=>"tr_status.php"	,"label"=>S_TRIGGERS	,
-								"sub_pages"=>array("alarms.php","acknow.php","tr_comments.php")
+								"sub_pages"=>array("tr_events.php","acknow.php","tr_comments.php")
 								),
 							array("url"=>"queue.php"	,"label"=>S_QUEUE	),
 							array("url"=>"events.php"	,"label"=>S_EVENTS	),
@@ -804,7 +802,6 @@ COpt::profiling_start("page");
 						"pages"=>array(
 							array("url"=>"report1.php",	"label"=>S_STATUS_OF_ZABBIX	),
 							array("url"=>"report2.php",	"label"=>S_AVAILABILITY_REPORT	),
-							array("url"=>"report4.php",	"label"=>S_NOTIFICATIONS	),
 							array("url"=>"report5.php",	"label"=>S_TRIGGERS_TOP_100	)   
 							)
 						),
@@ -836,12 +833,13 @@ COpt::profiling_start("page");
 						"pages"=>array(
 							array("url"=>"admin.php"	,"label"=>S_ADMINISTRATION	),
 							array("url"=>"nodes.php"	,"label"=>S_NODES		),
-							array("url"=>"users.php"	,"label"=>S_USERS		),
-							array("url"=>"media_types.php"	,"label"=>S_MEDIA_TYPES		),
-							array("url"=>"audit.php"	,"label"=>S_AUDIT		,
+							array("url"=>"users.php"	,"label"=>S_USERS		,
 								"sub_pages"=>array("popup_media.php",
 									"popup_usrgrp.php","popup_right.php")
-								)
+								),
+							array("url"=>"media_types.php"	,"label"=>S_MEDIA_TYPES		),
+							array("url"=>"audit.php"	,"label"=>S_AUDIT		),
+							array("url"=>"report4.php"	,"label"=>S_NOTIFICATIONS	)
 							)
 						),
 				"login"=>array(
@@ -967,7 +965,7 @@ COpt::compare_files_with_menu($menu);
 				$lst_nodes->AddItem($node_data['nodeid'],$node_data['name']);
 			}
 			$node_form = new CForm();
-			$node_form->AddItem('Current node ');
+			$node_form->AddItem('Current node ['.$ZBX_CURNODEID.'] ');
 			$node_form->AddItem($lst_nodes);
 			$node_form->AddItem(new CButton('submit',S_SWITCH));
 
@@ -1091,12 +1089,12 @@ COpt::compare_files_with_menu($menu);
 		return	DBexecute("delete from trends where itemid=$itemid");
 	}
 
-	# Add alarm
+	# Add event
 
-	function	get_alarm_by_alarmid($alarmid)
+	function	get_event_by_eventid($eventid)
 	{
-		$db_alarms = DBselect("select * from alarms where alarmid=$alarmid");
-		return DBfetch($db_alarms);
+		$db_events = DBselect("select * from events where eventid=$eventid");
+		return DBfetch($db_events);
 	}
 
 	# Reset nextcheck for related items
@@ -1114,7 +1112,7 @@ COpt::compare_files_with_menu($menu);
 
 	# Update configuration
 
-	function	update_config($alarm_history,$alert_history,$refresh_unsupported,$work_period)
+	function	update_config($event_history,$alert_history,$refresh_unsupported,$work_period)
 	{
 		if(validate_period($work_period) != 0)
 		{
@@ -1122,7 +1120,7 @@ COpt::compare_files_with_menu($menu);
 			return NULL;
 		}
 
-		return	DBexecute("update config set alarm_history=$alarm_history,alert_history=$alert_history,".
+		return	DBexecute("update config set event_history=$event_history,alert_history=$alert_history,".
 			" refresh_unsupported=$refresh_unsupported,".
 			" work_period=".zbx_dbstr($work_period));
 	}
@@ -1254,9 +1252,9 @@ COpt::profiling_stop("script");
 			$row=DBfetch($result);
 			$status["trends_count"]=$row["cnt"];
 		}
-// alarms
-		$row=DBfetch(DBselect("select count(alarmid) as cnt from alarms"));
-		$status["alarms_count"]=$row["cnt"];
+// events
+		$row=DBfetch(DBselect("select count(eventid) as cnt from events"));
+		$status["events_count"]=$row["cnt"];
 // alerts
 		$row=DBfetch(DBselect("select count(alertid) as cnt from alerts"));
 		$status["alerts_count"]=$row["cnt"];
@@ -1320,150 +1318,6 @@ COpt::profiling_stop("script");
 		while(DBfetch($result))		$status["users_online"]++;
 
 		return $status;
-	}
-
-	// If $period_start=$period_end=0, then take maximum period
-	function	calculate_availability($triggerid,$period_start,$period_end)
-	{
-		if(($period_start==0)&&($period_end==0))
-		{
-	        	$sql="select count(*) as cnt,min(clock) as minn,max(clock) as maxx from alarms where triggerid=$triggerid";
-		}
-		else
-		{
-	        	$sql="select count(*) as cnt,min(clock) as minn,max(clock) as maxx from alarms where triggerid=$triggerid and clock>=$period_start and clock<=$period_end";
-		}
-//		echo $sql,"<br>";
-
-		
-	        $result=DBselect($sql);
-		$row=DBfetch($result);
-		if($row["cnt"]>0)
-		{
-			$min=$row["minn"];
-			$max=$row["maxx"];
-		}
-		else
-		{
-			if(($period_start==0)&&($period_end==0))
-			{
-				$max=time();
-				$min=$max-24*3600;
-			}
-			else
-			{
-				$ret["true_time"]=0;
-				$ret["false_time"]=0;
-				$ret["unknown_time"]=0;
-				$ret["true"]=0;
-				$ret["false"]=0;
-				$ret["unknown"]=100;
-				return $ret;
-			}
-		}
-
-		$sql="select clock,value from alarms where triggerid=$triggerid and clock>=$min and clock<=$max";
-//		echo " $sql<br>";
-		$result=DBselect($sql);
-
-//		echo $sql,"<br>";
-
-// -1,0,1
-		$state=-1;
-		$true_time=0;
-		$false_time=0;
-		$unknown_time=0;
-		$time=$min;
-		if(($period_start==0)&&($period_end==0))
-		{
-			$max=time();
-		}
-		$rows=0;
-		while($row=DBfetch($result))
-		{
-			$clock=$row["clock"];
-			$value=$row["value"];
-
-			$diff=$clock-$time;
-
-			$time=$clock;
-
-			if($state==-1)
-			{
-				$state=$value;
-				if($state == 0)
-				{
-					$false_time+=$diff;
-				}
-				if($state == 1)
-				{
-					$true_time+=$diff;
-				}
-				if($state == 2)
-				{
-					$unknown_time+=$diff;
-				}
-			}
-			else if($state==0)
-			{
-				$false_time+=$diff;
-				$state=$value;
-			}
-			else if($state==1)
-			{
-				$true_time+=$diff;
-				$state=$value;
-			}
-			else if($state==2)
-			{
-				$unknown_time+=$diff;
-				$state=$value;
-			}
-			$rows++;
-		}
-
-		if($rows==0)
-		{
-			$false_time=$max-$min;
-		}
-		else
-		{
-			if($state==0)
-			{
-				$false_time=$false_time+$max-$time;
-			}
-			elseif($state==1)
-			{
-				$true_time=$true_time+$max-$time;
-			}
-			elseif($state==3)
-			{
-				$unknown_time=$unknown_time+$max-$time;
-			}
-
-		}
-//		echo "$true_time $false_time $unknown_time";
-
-		$total_time=$true_time+$false_time+$unknown_time;
-		if($total_time==0)
-		{
-			$ret["true_time"]=0;
-			$ret["false_time"]=0;
-			$ret["unknown_time"]=0;
-			$ret["true"]=0;
-			$ret["false"]=0;
-			$ret["unknown"]=100;
-		}
-		else
-		{
-			$ret["true_time"]=$true_time;
-			$ret["false_time"]=$false_time;
-			$ret["unknown_time"]=$unknown_time;
-			$ret["true"]=(100*$true_time)/$total_time;
-			$ret["false"]=(100*$false_time)/$total_time;
-			$ret["unknown"]=(100*$unknown_time)/$total_time;
-		}
-		return $ret;
 	}
 
 	function	get_resource_name($permission,$id)
