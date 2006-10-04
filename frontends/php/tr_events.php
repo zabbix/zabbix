@@ -20,31 +20,21 @@
 ?>
 <?php
 	require_once "include/config.inc.php";
+	require_once "include/acknow.inc.php";
 	require_once "include/triggers.inc.php";
 
 	$page["title"]		= "S_ALARMS";
 	$page["file"]		= "tr_events.php";
-	$page["menu.url"]	= "tr_status.php";
 
 	show_header($page["title"],0,0);
 ?>
 <?php
-//	if(!check_right_on_trigger(PERM_READ_ONLY,$_REQUEST["triggerid"])) /* TODO */
-//	{
-//		access_deny();
-//	}
-?>
-<?php
 	$_REQUEST["limit"] = get_request("limit","NO");
-	if(is_numeric($_REQUEST["limit"]))
-		$_REQUEST["limit"] = 100;
 
-	$trigger=get_trigger_by_triggerid($_REQUEST["triggerid"]);
+	$trigger	= get_trigger_by_triggerid($_REQUEST["triggerid"]);
 
-	$expression=$trigger["expression"];
-
-	$expression=explode_exp($expression,1);
-	$description=expand_trigger_description($_REQUEST["triggerid"]);
+	$expression	= explode_exp($trigger["expression"],1);
+	$description	= expand_trigger_description($_REQUEST["triggerid"]);
 
 	$form = new CForm();
 	$form->AddVar("triggerid",$_REQUEST["triggerid"]);
@@ -53,7 +43,7 @@
 	$cmbLimit->AddItem("100",S_SHOW_ONLY_LAST_100);
 	$form->AddItem($cmbLimit);
 
-	show_header2(S_ALARMS_BIG.":$description<br>$expression", $form);
+	show_header2(S_ALARMS_BIG.":$description".BR."$expression", $form);
 ?>
 
 <?php
@@ -88,13 +78,7 @@
 			$falsesum=$falsesum+$leng;
 			$sum=$falsesum;
 		}
-		elseif($row["value"]==3)
-		{
-			$istrue=new CCol(S_DISABLED_BIG,"unknown");
-			$dissum=$dissum+$leng;
-			$sum=$dissum;
-		}
-		elseif($row["value"]==2)
+		else
 		{
 			$istrue=new CCol(S_UNKNOWN_BIG,"unknown");
 			$dissum=$dissum+$leng;

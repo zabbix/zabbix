@@ -83,11 +83,9 @@
 
 	check_fields($fields);
 ?>
-
 <?php
 	update_profile("web.actionconf.actiontype",$_REQUEST["actiontype"]);
 ?>
-
 <?php
 	if(isset($_REQUEST["save"]))
 	{

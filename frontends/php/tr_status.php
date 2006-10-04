@@ -342,8 +342,6 @@
 		else
 		{
 			$actions=array(
-				new CLink(S_HISTORY,"tr_events.php?triggerid=".$row["triggerid"],"action"),
-				SPACE.'-'.SPACE,
 				new CLink(S_CHANGE,"triggers.php?triggerid=".$row["triggerid"].
 					($_REQUEST["hostid"] > 0 ? "&hostid=".$_REQUEST["hostid"] : "" ).
 					"#form","action")
@@ -353,27 +351,29 @@
 		$ack = "-";
 		if($row["value"] == 1)
 		{
-			$event = get_last_event_by_triggerid($row["triggerid"]);
-			if($event["acknowledged"] == 1)
+			if($event = get_last_event_by_triggerid($row["triggerid"]))
 			{
-				$acks_cnt = DBfetch(DBselect("select vount(*) as cnt from acknowledges where eventid=".$event["eventid"]));
-				$ack=array(
-					new CSpan(S_YES,"off"),
-					SPACE."(".$acks_cnt['cnt'].SPACE,
-					new CLink(S_SHOW,
-						"acknow.php?eventid=".$event["eventid"],"action"),
-					")"
-					);
-			}
-			else
-			{
-				$ack=array(
-					new CSpan(S_NO,"on"),
-					SPACE."(",
-					new CLink(S_ACK,
-						"acknow.php?eventid=".$event["eventid"],"action"),
-					")"
-					);
+				if($event["acknowledged"] == 1)
+				{
+					$acks_cnt = DBfetch(DBselect("select count(*) as cnt from acknowledges where eventid=".$event["eventid"]));
+					$ack=array(
+						new CSpan(S_YES,"off"),
+						SPACE."(".$acks_cnt['cnt'].SPACE,
+						new CLink(S_SHOW,
+							"acknow.php?eventid=".$event["eventid"],"action"),
+						")"
+						);
+				}
+				else
+				{
+					$ack=array(
+						new CSpan(S_NO,"on"),
+						SPACE."(",
+						new CLink(S_ACK,
+							"acknow.php?eventid=".$event["eventid"],"action"),
+						")"
+						);
+				}
 			}
 		}
 

@@ -23,6 +23,7 @@
 
 	include_once 	"include/defines.inc.php";
 	include_once 	"include/classes/graph.inc.php";
+	include_once 	"include/users.inc.php";
 	include_once 	"include/db.inc.php";
 
 	function	insert_node_form()
@@ -35,7 +36,7 @@
 		global $USER_DETAILS;
 		global $_REQUEST;
 
-		$db_acks = get_acknowledges_by_alarmid($_REQUEST["alarmid"]);
+		$db_acks = get_acknowledges_by_eventid($_REQUEST["eventid"]);
 		if(!DBfetch($db_acks))
 		{
 			$title = S_ACKNOWLEDGE_ALARM_BY;
@@ -49,11 +50,12 @@
 
 		$frmMsg= new CFormTable($title." \"".$USER_DETAILS["alias"]."\"");
 		$frmMsg->SetHelp("manual.php");
-		$frmMsg->AddVar("alarmid",get_request("alarmid",0));
+		$frmMsg->AddVar("eventid",get_request("eventid",0));
 
 		$frmMsg->AddRow(S_MESSAGE, new CTextArea("message","",80,6));
 
 		$frmMsg->AddItemToBottomRow(new CButton("save",$btn_txt));
+		$frmMsg->AddItemToBottomRow(new CButton("cancel",S_CANCEL));
 
 		$frmMsg->Show();
 
@@ -1146,14 +1148,16 @@
 
 	function insert_trigger_comment_form($triggerid)
 	{
-		$trigger=get_trigger_by_triggerid($triggerid);
-		$comments=stripslashes($trigger["comments"]);
+		$trigger	= DBfetch(DBselect('select t.*, h.* from triggers t, functions f, items i, hosts h '.
+			' where t.triggerid='.$triggerid.' and f.triggerid=t.triggerid and f.itemid=i.itemid '.
+			' and i.hostid=h.hostid '));
 
-		$frmComent = new CFormTable(S_COMMENTS." for \"".expand_trigger_description_simple($triggerid)."\"");
+		$frmComent = new CFormTable(S_COMMENTS." for ".$trigger['host']." : \"".expand_trigger_description_by_data($trigger)."\"");
 		$frmComent->SetHelp("web.tr_comments.comments.php");
 		$frmComent->AddVar("triggerid",$triggerid);
-		$frmComent->AddRow(S_COMMENTS,new CTextArea("comments",$comments,100,25));
-		$frmComent->AddItemToBottomRow(new CButton("register","update"));
+		$frmComent->AddRow(S_COMMENTS,new CTextArea("comments",stripslashes($trigger["comments"]),100,25));
+		$frmComent->AddItemToBottomRow(new CButton("save",S_SAVE));
+		$frmComent->AddItemToBottomRow(new CButton("cancel",S_CANCEL));
 
 		$frmComent->Show();
 	}

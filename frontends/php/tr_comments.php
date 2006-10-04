@@ -28,22 +28,55 @@
 	show_header($page["title"],0,0);
 ?>
 <?php
-	show_table_header(S_TRIGGER_COMMENTS_BIG);
-?>
 
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"triggerid"=>	array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID, null),
+		"comments"=>	array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,'isset({save})'),
+
+/* actions */
+		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+/* other */
+/*
+		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		"form_copy_to"=>	array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	null,	null,	null)
+*/
+	);
+
+	check_fields($fields);
+?>
 <?php
-	if(isset($_REQUEST["register"]) && ($_REQUEST["register"]=="update"))
+	$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_LIST, PERM_MODE_LE);
+
+	if(! ($db_data = DBfetch(DBselect('select * from items i, functions f '.
+	                        ' where i.itemid=f.itemid and f.triggerid='.$_REQUEST["triggerid"].
+				" and i.hostid not in (".$denyed_hosts.")".
+				" and ".DBid2nodeid("f.triggerid")."=".$ZBX_CURNODEID
+				))))
 	{
-		$result=update_trigger_comments($_REQUEST["triggerid"],$_REQUEST["comments"]);
+		access_deny();
+	}
+	$trigger_hostid = $db_data['hostid'];
+	
+	if(isset($_REQUEST["save"]))
+	{
+		$result = update_trigger_comments($_REQUEST["triggerid"],$_REQUEST["comments"]);
 		show_messages($result, S_COMMENT_UPDATED, S_CANNOT_UPDATE_COMMENT);
 	}
+	else if(isset($_REQUEST["cancel"]))
+	{
+		Redirect('tr_status.php?hostid='.$trigger_hostid);
+		exit;
+		
+	}
 ?>
-
 <?php
+	show_table_header(S_TRIGGER_COMMENTS_BIG);
 	echo BR;
 	insert_trigger_comment_form($_REQUEST["triggerid"]);
 ?>
-
 <?php
 	show_page_footer();
 ?>

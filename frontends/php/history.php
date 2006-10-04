@@ -24,7 +24,6 @@
 	require_once "include/graphs.inc.php";
 
 	$page["file"]="history.php";
-	$page["menu.url"]="latest.php";
 
 /*** Prepare page header - start ***/
 	if(is_array($_REQUEST["itemid"]))

@@ -21,6 +21,7 @@
 <?php
 	require_once "include/config.inc.php";
 	require_once "include/acknow.inc.php";
+	require_once "include/triggers.inc.php";
 	require_once "include/forms.inc.php";
 
 	$page["title"]	= "S_ACKNOWLEDGES";
@@ -33,11 +34,25 @@
 		"eventid"=>		array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		NULL),
 		"message"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'isset({save})'),
 
-		"save"=>		array(T_ZBX_STR,O_OPT,	P_ACT|P_SYS, NULL,	NULL)
+	/* actions */
+		"save"=>		array(T_ZBX_STR,O_OPT,	P_ACT|P_SYS, NULL,	NULL),
+		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null)
 	);
 	check_fields($fields);
 ?>
 <?php
+	$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_LIST, PERM_MODE_LE);
+	
+	if(! ($db_data = DBfetch(DBselect('select * from items i, functions f, events e '.
+	                        ' where i.itemid=f.itemid and f.triggerid=e.triggerid and e.eventid='.$_REQUEST["eventid"].
+				" and i.hostid not in (".$denyed_hosts.")".
+				" and ".DBid2nodeid("e.eventid")."=".$ZBX_CURNODEID
+				))))
+	{
+		access_deny();
+	}
+	$trigger_hostid = $db_data['hostid'];
+
 	if(isset($_REQUEST["save"]))
 	{
 		$result = add_acknowledge_coment(
@@ -47,15 +62,20 @@
 
 		show_messages($result, S_COMMENT_ADDED, S_CANNOT_ADD_COMMENT);
 	}
+	else if(isset($_REQUEST["cancel"]))
+	{
+		Redirect('tr_status.php?hostid='.$trigger_hostid);
+		exit;
+	}
 ?>
 <?php
 
-	$event = get_event_by_eventid($_REQUEST["eventid"]);
-	$trigger=get_trigger_by_triggerid($event["triggerid"]);
-	$expression=explode_exp($trigger["expression"],1);
-	$description=expand_trigger_description($event["triggerid"]);
+	$event 		= get_event_by_eventid($_REQUEST["eventid"]);
+	$trigger	= get_trigger_by_triggerid($event["triggerid"]);
+	$expression	= explode_exp($trigger["expression"],1);
+	$description	= expand_trigger_description($event["triggerid"]);
 
-	show_table_header(S_ALARM_ACKNOWLEDGES_BIG.":".$description.BR.$expression);
+	show_table_header(S_ALARM_ACKNOWLEDGES_BIG." : \"".$description."\"".BR.$expression);
 
 	echo BR;
 	$table = new CTable(NULL,"ack_msgs");

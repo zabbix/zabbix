@@ -385,10 +385,11 @@
 
 	function get_history_of_actions($start,$num)
 	{
-		$sql="select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,".
-		"a.error from alerts a,media_type mt where mt.mediatypeid=a.mediatypeid order by a.clock".
-		" desc";
-		$result=DBselect($sql,10*$start+$num);
+		$result=DBselect(
+			"select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,".
+				"a.error from alerts a,media_type mt where mt.mediatypeid=a.mediatypeid order by a.clock".
+				" desc",
+			10*$start+$num);
 
 		$table = new CTableInfo(S_NO_ACTIONS_FOUND);
 		$table->setHeader(array(S_TIME, S_TYPE, S_STATUS, S_RECIPIENTS, S_SUBJECT, S_MESSAGE, S_ERROR));
@@ -423,13 +424,13 @@
 				$error=new CSpan($row["error"],"on");
 			}
 			$table->addRow(array(
-			$time,
-			$row["description"],
-			$status,
-			$sendto,
-			$subject,
-			$message,
-			$error));
+				$time,
+				$row["description"],
+				$status,
+				$sendto,
+				$subject,
+				$message,
+				$error));
 			$col++;
 		}
 
