@@ -26,7 +26,7 @@
 	$page["file"] = "actions.php";
 	show_header($page["title"],1,0);
 	
-	define("PAGE_SIZE", 11);
+	define("PAGE_SIZE", 100);
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -54,7 +54,6 @@
 	}
 
 	if($_REQUEST["start"] < 0) $_REQUEST["start"] = 0;
-	SDI($_REQUEST["start"]);
 ?>
 <?php
         $table = get_history_of_actions($_REQUEST["start"], PAGE_SIZE);
