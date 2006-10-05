@@ -24,13 +24,14 @@
 
 	$page["title"] = "S_IT_SERVICES_AVAILABILITY_REPORT";
 	$page["file"] = "report3.php";
-	show_header($page["title"],0,0);
+	
+include "include/page_header.php";
 
 /* TODO - rewrite page SERVICES_AVAILABILITY_REPORT */
 ?>
 
 <?php
-//	if(!check_right("Host","R",0))
+//	if(!check_right("Host","R",0)) /* TODO */
 //	{
 //		show_table_header("<font color=\"AA0000\">No permissions !</font>");
 //		show_page_footer();
@@ -322,5 +323,9 @@
 	}
 	$table->show();
 
-	show_page_footer();
+?>
+<?php
+
+include "include/page_footer.php";
+
 ?>

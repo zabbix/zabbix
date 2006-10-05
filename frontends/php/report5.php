@@ -22,9 +22,11 @@
 	require_once "include/config.inc.php";
 	require_once "include/triggers.inc.php";
 
-	$page["title"] = "S_TRIGGERS_TOP_100";
-	$page["file"] = "report5.php";
-	show_header($page["title"],0,0);
+	$page["title"]	= "S_TRIGGERS_TOP_100";
+	$page["file"]	= "report5.php";
+	
+include "include/page_header.php";
+
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -58,17 +60,19 @@
 		case "week":	$time_dif=7*24*3600;	break;
 		case "month":	$time_dif=10*24*3600;	break;
 		case "year":	$time_dif=365*24*3600;	break;
-	/* day */ default:	$time_dif=24*3600;	break;
+		case "day":
+		default:	$time_dif=24*3600;	break;
 	}
 
-	$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_LIST, PERM_MODE_LE, null, $ZBX_CURNODEID);
+	$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_LIST, PERM_MODE_LE);
 	
-        $result=DBselect("select h.host, t.triggerid, t.description, t.priority, count(a.eventid) as count ".
-		" from hosts h, triggers t, functions f, items i, events a where ".
+        $result=DBselect("select h.host, t.triggerid, t.description, t.priority, count(e.eventid) as count ".
+		" from hosts h, triggers t, functions f, items i, events e where ".
 		" h.hostid = i.hostid and i.itemid = f.itemid and t.triggerid=f.triggerid and ".
-		" t.triggerid=a.triggerid and a.clock>".(time()-$time_dif).
-		" and h.hostid not in (".$denyed_hosts.") ".
-		" group by h.host,t.triggerid,t.description,t.priority order by 5 desc,1,3", 100);
+		" t.triggerid=e.triggerid and e.clock>".(time()-$time_dif).
+		" and h.hostid not in (".$denyed_hosts.") and ".DBid2nodeid("e.triggerid")."=".$ZBX_CURNODEID.
+		" group by h.host,t.triggerid,t.description,t.priority ".
+		" order by count desc, h.host, t.description, t.triggerid", 100);
 
         while($row=DBfetch($result))
         {
@@ -80,6 +84,9 @@
 			));
 	}
 	$table->show();
+?>
+<?php
 
-	show_page_footer();
+include "include/page_footer.php";
+
 ?>

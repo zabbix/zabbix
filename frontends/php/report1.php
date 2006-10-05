@@ -22,7 +22,9 @@
 	require_once "include/config.inc.php";
 	$page["title"] = "S_STATUS_OF_ZABBIX";
 	$page["file"] = "report1.php";
-	show_header($page["title"],0,0);
+
+include "include/page_header.php";
+
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -63,5 +65,7 @@
 	$table->Show();
 ?>
 <?php
-	show_page_footer();
+
+include "include/page_footer.php";
+
 ?>

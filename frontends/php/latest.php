@@ -25,7 +25,11 @@
 
 	$page["title"] = "S_LATEST_VALUES";
 	$page["file"] = "latest.php";
-	show_header($page["title"],1,0);
+
+	define('ZBX_PAGE_DO_REFRESH', 1);
+	
+include "include/page_header.php";
+
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -45,7 +49,7 @@
 
 	check_fields($fields);
 
-	validate_group_with_host(PERM_READ_LIST,array("allow_all_hosts","always_select_first_host","monitored_hosts","with_monitored_items"));
+	validate_group_with_host(PERM_READ_ONLY,array("allow_all_hosts","always_select_first_host","monitored_hosts","with_monitored_items"));
 ?>
 <?php
 	// Misc functions
@@ -380,5 +384,7 @@
 	$table->ShowEnd();
 ?>
 <?php
-	show_page_footer();
+
+include "include/page_footer.php";
+
 ?>

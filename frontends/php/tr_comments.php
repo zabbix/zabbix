@@ -25,7 +25,9 @@
 
 	$page["title"] = "S_TRIGGER_COMMENTS";
 	$page["file"] = "tr_comments.php";
-	show_header($page["title"],0,0);
+
+include "include/page_header.php";
+
 ?>
 <?php
 
@@ -78,5 +80,7 @@
 	insert_trigger_comment_form($_REQUEST["triggerid"]);
 ?>
 <?php
-	show_page_footer();
+
+include "include/page_footer.php";
+
 ?>

@@ -23,7 +23,9 @@
 
         $page["title"] = "S_IT_NOTIFICATIONS";
         $page["file"] = "report4.php";
-        show_header($page["title"],0,0);
+
+include "include/page_header.php";
+
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -172,4 +174,8 @@
 	}
 	show_page_footer();
 ?>
+<?php
 
+include "include/page_footer.php";
+
+?>

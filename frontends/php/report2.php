@@ -22,9 +22,10 @@
 	require_once "include/config.inc.php";
 	require_once "include/hosts.inc.php";
 
-	$page["title"] = "S_AVAILABILITY_REPORT";
-	$page["file"] = "report2.php";
-	show_header($page["title"],0,0);
+	$page["title"]	= "S_AVAILABILITY_REPORT";
+	$page["file"]	= "report2.php";
+
+	include "include/page_header.php";
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -36,7 +37,7 @@
 
 	check_fields($fields);
 
-	validate_group_with_host(PERM_READ_LIST,array("allow_all_hosts","always_select_first_host","monitored_hosts","with_items"));
+	validate_group_with_host(PERM_READ_LIST,array("always_select_first_host","monitored_hosts","with_items"));
 ?>
 <?php
 	$r_form = new CForm();
@@ -83,14 +84,14 @@
 
 ?>
 <?php
-	$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_LIST, PERM_MODE_LE, null, $ZBX_CURNODEID);
+	$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_LIST, PERM_MODE_LE);
 	
 	if(isset($_REQUEST["triggerid"]))
 	{
 		if (!$row = DBfetch(DBselect("select distinct h.hostid,h.host,t.description from hosts h,items i,functions f,triggers t ".
 			" where t.triggerid=".$_REQUEST["triggerid"]." and t.triggerid=f.triggerid ".
 			" and f.itemid=i.itemid and i.hostid=h.hostid ".
-			" and h.hostid not in (".$denyed_hosts.") ".
+			" and h.hostid not in (".$denyed_hosts.") and ".DBid2nodeid("t.triggerid")."=".$ZBX_CURNODEID.
 			" order by h.host,t.description ")))
 			access_deny();
 		
@@ -114,7 +115,7 @@
 			" from triggers t,hosts h,items i,functions f ".
 			" where f.itemid=i.itemid and h.hostid=i.hostid and t.status=".TRIGGER_STATUS_ENABLED.
 			" and t.triggerid=f.triggerid and h.hostid=".$_REQUEST["hostid"]." and h.status=".HOST_STATUS_MONITORED.
-			" and h.hostid not in (".$denyed_hosts.") ".
+			" and h.hostid not in (".$denyed_hosts.") and ".DBid2nodeid("t.triggerid")."=".$ZBX_CURNODEID.
 			" and i.status=".ITEM_STATUS_ACTIVE.
 			" order by h.host, t.description");
 
@@ -143,5 +144,5 @@
 	}
 ?>
 <?php
-	show_page_footer();
+	include "include/page_footer.php";
 ?>

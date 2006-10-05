@@ -26,15 +26,37 @@
 	$page["title"]		= "S_ALARMS";
 	$page["file"]		= "tr_events.php";
 
-	show_header($page["title"],0,0);
+include "include/page_header.php";
+
+?>
+<?php
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"triggerid"=>		array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
+		"limit"=>		array(T_ZBX_STR, O_OPT,	null,	IN('"100","NO"'),	null),
+
+	/* actions */
+		"save"=>		array(T_ZBX_STR,O_OPT,	P_ACT|P_SYS, null,	null),
+		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null)
+	);
+	check_fields($fields);
+	
+	$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_LIST, PERM_MODE_LE);
+	
+	if(! ($trigger_data = DBfetch(DBselect('select h.host, t.* from hosts h, items i, functions f, triggers t '.
+	                        ' where i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid='.$_REQUEST["triggerid"].
+				" and i.hostid not in (".$denyed_hosts.") and h.hostid=i.hostid ".
+				" and ".DBid2nodeid("t.triggerid")."=".$ZBX_CURNODEID
+				))))
+	{
+		access_deny();
+	}
 ?>
 <?php
 	$_REQUEST["limit"] = get_request("limit","NO");
 
-	$trigger	= get_trigger_by_triggerid($_REQUEST["triggerid"]);
-
-	$expression	= explode_exp($trigger["expression"],1);
-	$description	= expand_trigger_description($_REQUEST["triggerid"]);
+	$expression	= explode_exp($trigger_data["expression"],1);
+	$description	= expand_trigger_description_by_data($trigger_data);
 
 	$form = new CForm();
 	$form->AddVar("triggerid",$_REQUEST["triggerid"]);
@@ -43,9 +65,8 @@
 	$cmbLimit->AddItem("100",S_SHOW_ONLY_LAST_100);
 	$form->AddItem($cmbLimit);
 
-	show_header2(S_ALARMS_BIG.":$description".BR."$expression", $form);
+	show_header2(S_ALARMS_BIG.": \"".$description."\"".BR."$expression", $form);
 ?>
-
 <?php
 	$result=DBselect("select * from events where triggerid=".$_REQUEST["triggerid"].
 		" order by clock desc",
@@ -157,5 +178,7 @@
 ?>
 
 <?php
-	show_page_footer();
+
+include "include/page_footer.php";
+
 ?>

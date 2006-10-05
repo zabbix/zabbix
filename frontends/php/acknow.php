@@ -26,7 +26,9 @@
 
 	$page["title"]	= "S_ACKNOWLEDGES";
 	$page["file"]	= "acknow.php";
-	show_header($page["title"],0,0);
+
+include "include/page_header.php";
+
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -95,11 +97,16 @@
 		$table->AddRow($msgCol,"msg");
 	}
 /**/
-	$table->Show();
-	echo BR;
+	if($table->GetNumRows() > 0)
+	{
+		$table->Show();
+		echo BR;
+	}
 	insert_new_message_form();
 ?>
 
 <?php
-	show_page_footer();
+
+include "include/page_footer.php";
+
 ?>

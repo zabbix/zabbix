@@ -26,7 +26,11 @@
 
 	$page["title"] = "S_OVERVIEW";
 	$page["file"] = "overview.php";
-	show_header($page["title"],1,0);
+
+	define('ZBX_PAGE_DO_REFRESH', 1);
+	
+include "include/page_header.php";
+
 ?>
 <?php
 	define("SHOW_TRIGGERS",0);
@@ -110,7 +114,8 @@ COpt::profiling_stop("get_triggers_overview");
 		unset($table);
 	}
 ?>
-
 <?php
-	show_page_footer();
+
+include "include/page_footer.php";
+
 ?>

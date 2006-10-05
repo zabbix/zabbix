@@ -26,6 +26,7 @@
 
 	$page["file"] = "tr_status.php";
 	$page["title"] = "S_STATUS_OF_TRIGGERS";
+
 ?>
 <?php
 	$tr_hash=calc_trigger_hash();
@@ -88,8 +89,31 @@
 
 ?>
 <?php
-	show_header($page["title"],1, isset($_REQUEST["fullscreen"]) ? 1 : 0);
+	define('ZBX_PAGE_DO_REFRESH', 1);
+
+	if(isset($_REQUEST["fullscreen"]))
+		define('ZBX_PAGE_NO_MENU', 1);
 	
+include "include/page_header.php";
+	
+?>
+<?php
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"groupid"=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null),
+		"hostid"=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null),
+		"sort"=>	array(T_ZBX_STR, O_OPT,  null,	IN('"priority","description","lastchange"'), null),
+		"noactions"=>	array(T_ZBX_STR, O_OPT,  null,	IN('"true","false"'), null),
+		"compact"=>	array(T_ZBX_STR, O_OPT,  null,	IN('"true","false"'), null),
+		"onlytrue"=>	array(T_ZBX_STR, O_OPT,  null,	IN('"true","false"'), null),
+		"select"=>	array(T_ZBX_STR, O_OPT,  null,	IN('"true","false"'), null),
+		"txt_select"=>	array(T_ZBX_STR, O_OPT,  null,	null, null),
+		"fullscreen"=>	array(T_ZBX_STR, O_OPT,  null,	null, null),
+		"btnSelect"=>	array(T_ZBX_STR, O_OPT,  null,  null, null)
+	);
+
+	check_fields($fields);
+
 	validate_group_with_host(PERM_READ_ONLY,array("allow_all_hosts","always_select_first_host","monitored_hosts","with_monitored_items"),
 		"web.tr_status.groupid","web.tr_status.hostid");
 ?>
@@ -171,32 +195,27 @@
 		$r_form);
 ?>
 <?php
-	$cond="";
-	if($_REQUEST["hostid"] > 0)	$cond=" and h.hostid=".$_REQUEST["hostid"]." ";
-
-	if($onlytrue=='true')		$cond .= " and t.value=1 ";
-
 	if(!isset($_REQUEST["fullscreen"]))
 	{
 		$left_col = array();
 		array_push($left_col, '[', new CLink($onlytrue != 'true' ? S_SHOW_ONLY_TRUE : S_SHOW_ALL_TRIGGERS,
 			"tr_status.php?onlytrue=".($onlytrue != 'true' ? 'true' : 'false').
-			"&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select&sort=$sort$cond"
+			"&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select&sort=$sort"
 			), ']'.SPACE);
 		
 		array_push($left_col, '[', new CLink($noactions != 'true' ? S_HIDE_ACTIONS : S_SHOW_ACTIONS,
 			"tr_status.php?noactions=".($noactions != 'true' ? 'true' : 'false').
-			"&onlytrue=$onlytrue&compact=$compact&select=$select&txt_select=$txt_select&sort=$sort$cond"
+			"&onlytrue=$onlytrue&compact=$compact&select=$select&txt_select=$txt_select&sort=$sort"
 			), ']'.SPACE);
 
 		array_push($left_col, '[', new CLink($compact != 'true' ? S_HIDE_DETAILS: S_SHOW_DETAILS,
 			"tr_status.php?compact=".($compact != 'true' ? 'true' : 'false').
-			"&onlytrue=$onlytrue&noactions=$noactions&select=$select&txt_select=$txt_select&sort=$sort$cond"
+			"&onlytrue=$onlytrue&noactions=$noactions&select=$select&txt_select=$txt_select&sort=$sort"
 			), ']'.SPACE);
 		
 		array_push($left_col, '[', new CLink($select != 'true' ? S_SELECT : S_HIDE_SELECT,
 			"tr_status.php?select=".($select != 'true' ? 'true' : 'false').
-			"&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&txt_select=$txt_select&sort=$sort$cond"
+			"&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&txt_select=$txt_select&sort=$sort"
 			), ']');
 			
 		if($select=='true')
@@ -282,13 +301,17 @@
 		$select_cond="like '%$txt_select%'";
 	}
 
+	$cond="";
+	if($_REQUEST["hostid"] > 0)	$cond=" and h.hostid=".$_REQUEST["hostid"]." ";
+
+	if($onlytrue=='true')		$cond .= " and t.value=1 ";
+
 	$result = DBselect("select distinct t.triggerid,t.status,t.description,t.expression,t.priority,".
 		" t.lastchange,t.comments,t.url,t.value from triggers t,hosts h,items i,functions f".
 		" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.status=".TRIGGER_STATUS_ENABLED.
 		" and t.description $select_cond and i.status=".ITEM_STATUS_ACTIVE.
 		" and ".DBid2nodeid("t.triggerid")."=".$ZBX_CURNODEID.
-		" and h.hostid not in (".get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_LIST, PERM_MODE_LE, 
-			null, $ZBX_CURNODEID).") ".
+		" and h.hostid not in (".get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_LIST, PERM_MODE_LE).") ". 
 		" and h.status=".HOST_STATUS_MONITORED." $cond $sort");
 
 	while($row=DBfetch($result))
@@ -394,5 +417,7 @@
 	show_table_header(S_TOTAL.": ".$table->GetNumRows());
 ?>
 <?php
-	show_page_footer();
+
+include "include/page_footer.php";
+
 ?>

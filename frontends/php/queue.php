@@ -20,10 +20,15 @@
 ?>
 <?php
 	require_once "include/config.inc.php";
+	require_once "include/items.inc.php";
 
 	$page["title"] = "S_QUEUE_BIG";
 	$page["file"] = "queue.php";
-	show_header($page["title"],1,0);
+	
+	define('ZBX_PAGE_DO_REFRESH', 1);
+
+include "include/page_header.php";
+
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -35,43 +40,37 @@
 ?>
 
 <?php
-	if(!isset($_REQUEST["show"]))
-	{
-		$_REQUEST["show"]=0;
-	}
+	$_REQUEST["show"] = get_request("show", 0);
 
-	$h1=S_QUEUE_OF_ITEMS_TO_BE_UPDATED_BIG;
+	$form = new CForm();
+	$cmbMode = new CComboBox("show", $_REQUEST["show"], "submit();");
+	$cmbMode->AddItem(0, S_OVERVIEW);
+	$cmbMode->AddItem(1,S_DETAILS);
+	$form->AddItem($cmbMode);
 
-#	$h2=S_GROUP.SPACE;
-	$h2="";
-	$h2=$h2."<select class=\"biginput\" name=\"show\" onChange=\"submit()\">";
-	$h2=$h2.form_select("show",0,S_OVERVIEW);
-	$h2=$h2.form_select("show",1,S_DETAILS);
-	$h2=$h2."</select>";
-
-	show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"queue.php\">", "</form>");
+	show_header2(S_QUEUE_OF_ITEMS_TO_BE_UPDATED_BIG, $form);
 ?>
 
 <?php
-	$now=time();
+	$now = time();
 
-	$result=DBselect("select i.itemid, i.nextcheck, i.description, h.host,h.hostid from items i,hosts h where i.status=0 and i.type not in (2) and ((h.status=".HOST_STATUS_MONITORED." and h.available!=".HOST_AVAILABLE_FALSE.") or (h.status=".HOST_STATUS_MONITORED." and h.available=".HOST_AVAILABLE_FALSE." and h.disable_until<=$now)) and i.hostid=h.hostid and i.nextcheck<$now and i.key_ not in ('status','icmpping','icmppingsec','zabbix[log]') order by i.nextcheck");
-	$table=new CTableInfo(S_THE_QUEUE_IS_EMPTY);
+	$result = DBselect("select i.itemid, i.nextcheck, i.description, i.key_, h.host,h.hostid ".
+		" from items i,hosts h ".
+		" where i.status=".ITEM_STATUS_ACTIVE." and i.type not in (".ITEM_TYPE_TRAPPER.") ".
+		" and ((h.status=".HOST_STATUS_MONITORED." and h.available != ".HOST_AVAILABLE_FALSE.") ".
+		" or (h.status=".HOST_STATUS_MONITORED." and h.available=".HOST_AVAILABLE_FALSE." and h.disable_until<=$now)) ".
+		" and i.hostid=h.hostid and i.nextcheck<$now and i.key_ not in ('status','icmpping','icmppingsec','zabbix[log]') ".
+		" and h.hostid in (".get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_ONLY,null,null,$ZBX_CURNODEID).")".
+		" order by i.nextcheck,h.host,i.description,i.key_");
+
+	$table = new CTableInfo(S_THE_QUEUE_IS_EMPTY);
 
 	if($_REQUEST["show"]==0)
 	{
-		$sec_5=0;
-		$sec_10=0;
-		$sec_30=0;
-		$sec_60=0;
-		$sec_300=0;
-		$sec_rest=0;
+		$sec_5 = $sec_10 = $sec_30 = $sec_60 = $sec_300 = $sec_rest = 0;
+
 		while($row=DBfetch($result))
 		{
-//			if(!check_right("Host","R",$row["hostid"])) /* TODO */
-			{
-				continue;
-			}
 			if($now-$row["nextcheck"]<=5)		$sec_5++;
 			elseif($now-$row["nextcheck"]<=10)	$sec_10++;
 			elseif($now-$row["nextcheck"]<=30)	$sec_30++;
@@ -80,43 +79,39 @@
 			else					$sec_rest++;
 
 		}
-		$col=0;
-		$table->setHeader(array(S_DELAY,S_COUNT));
-		$elements=array(S_5_SECONDS,$sec_5);
-		$table->addRow($elements);
-		$elements=array(S_10_SECONDS,$sec_10);
-		$table->addRow($elements);
-		$elements=array(S_30_SECONDS,$sec_30);
-		$table->addRow($elements);
-		$elements=array(S_1_MINUTE,$sec_60);
-		$table->addRow($elements);
-		$elements=array(S_5_MINUTES,$sec_300);
-		$table->addRow($elements);
-		$elements=array(S_MORE_THAN_5_MINUTES,$sec_rest);
-		$table->addRow($elements);
+		$table->SetHeader(array(S_DELAY,		S_COUNT));
+		$table->AddRow(array(S_5_SECONDS,		$sec_5));
+		$table->AddRow(array(S_10_SECONDS,		$sec_10));
+		$table->AddRow(array(S_30_SECONDS,		$sec_30));
+		$table->AddRow(array(S_1_MINUTE,		$sec_60));
+		$table->AddRow(array(S_5_MINUTES,		$sec_300));
+		$table->AddRow(array(S_MORE_THAN_5_MINUTES,	$sec_rest));
 	}
 	else
 	{
-		$table->setHeader(array(S_NEXT_CHECK,S_HOST,S_DESCRIPTION));
-		$col=0;
+		$table->SetHeader(array(S_NEXT_CHECK,S_HOST,S_DESCRIPTION));
 		while($row=DBfetch($result))
 		{
-//			if(!check_right("Host","R",$row["hostid"])) /* TODO */
-			{
-				continue;
-			}
-			$elements=array(date("m.d.Y H:i:s",$row["nextcheck"]),$row["host"],$row["description"]);
-			$col++;
-			$table->addRow($elements);
+			$table->AddRow(array(
+				date("m.d.Y H:i:s",
+				$row["nextcheck"]),
+				$row["host"],
+				item_description($row["description"],$row["key_"])
+				));
 		}
 	}
 
-	$table->show();
+	$table->Show();
 ?>
 <?php
-	show_table_header(S_TOTAL.":$col");
+	if($_REQUEST["show"]!=0)
+	{
+		show_table_header(S_TOTAL.": ".$table->GetNumRows());
+	}
 ?>
 
 <?php
-	show_page_footer();
+
+include "include/page_footer.php";
+
 ?>

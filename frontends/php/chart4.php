@@ -21,6 +21,22 @@
 <?php
 	require_once "include/config.inc.php";
 
+	$page["file"] = "chart4.php";
+	$page["title"] = "S_CHART";
+	$page["type"]	= PAGE_TYPE_IMAGE;
+        show_header();
+?>
+<?php
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"year"=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	NULL,		NULL),
+		"period"=>		array(T_ZBX_STR, O_OPT,	P_SYS|P_NZERO,	IN('"dayly","weekly","monthly","yearly"'),		NULL),
+		"media_type"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL)
+	);
+
+	check_fields($fields);
+?>
+<?php
 #	PARAMETERS:
 	
 #	itemid
@@ -28,81 +44,54 @@
 
 	$start_time=time(NULL);
 
-	if(!isset($_REQUEST["type"]))
+	$_REQUEST["type"] = get_request("type", "week");
+
+	switch($_REQUEST["type"])
 	{
-		$_REQUEST["type"]="week";
+		case "month":	$period=30*24*3600;	break;
+		case "year":	$period=365*24*3600;	break;
+		case "week":
+		default:
+				$period=7*24*3600;	break;
 	}
 
-	if($_REQUEST["type"] == "month")
-	{
-		$period=30*24*3600;
-	}
-	else if($_REQUEST["type"] == "week")
-	{
-		$period=7*24*3600;
-	}
-	else if($_REQUEST["type"] == "year")
-	{
-		$period=365*24*3600;
-	}
-	else
-	{
-		$period=7*24*3600;
-		$type="week";
-	}
+	$sizeX		= 900;
+	$sizeY		= 300;
 
-	$sizeX=900;
-	$sizeY=300;
-
-	$shiftX=12;
-	$shiftYup=17;
-	$shiftYdown=25+15*3;
-
-
-	set_image_header();
-
-	check_authorisation();
+	$shiftX		= 12;
+	$shiftYup	= 17;
+	$shiftYdown	= 25+15*3;
 
 	$im = imagecreate($sizeX+$shiftX+61,$sizeY+$shiftYup+$shiftYdown+10); 
-  
-	$red=ImageColorAllocate($im,255,0,0); 
-	$darkred=ImageColorAllocate($im,150,0,0); 
-	$green=ImageColorAllocate($im,0,255,0); 
-	$darkgreen=ImageColorAllocate($im,0,150,0); 
-	$blue=ImageColorAllocate($im,0,0,255); 
-	$darkblue=ImageColorAllocate($im,0,0,150); 
-	$yellow=ImageColorAllocate($im,255,255,0); 
-	$darkyellow=ImageColorAllocate($im,150,150,0); 
-	$cyan=ImageColorAllocate($im,0,255,255); 
-	$black=ImageColorAllocate($im,0,0,0); 
-	$gray=ImageColorAllocate($im,150,150,150); 
-	$white=ImageColorAllocate($im,255,255,255); 
-	$bg=ImageColorAllocate($im,6+6*16,7+7*16,8+8*16);
+	access_deny(PAGE_TYPE_IMAGE, $im);
+	
+	$red		= ImageColorAllocate($im,255,0,0); 
+	$darkred	= ImageColorAllocate($im,150,0,0); 
+	$green		= ImageColorAllocate($im,0,255,0); 
+	$darkgreen	= ImageColorAllocate($im,0,150,0); 
+	$bluei		= ImageColorAllocate($im,0,0,255); 
+	$darkblue	= ImageColorAllocate($im,0,0,150); 
+	$yellow		= ImageColorAllocate($im,255,255,0); 
+	$darkyellow	= ImageColorAllocate($im,150,150,0); 
+	$cyan		= ImageColorAllocate($im,0,255,255); 
+	$black		= ImageColorAllocate($im,0,0,0); 
+	$gray		= ImageColorAllocate($im,150,150,150); 
+	$white		= ImageColorAllocate($im,255,255,255); 
+	$bg		= ImageColorAllocate($im,6+6*16,7+7*16,8+8*16);
 
 	$x=imagesx($im); 
 	$y=imagesy($im);
   
-//	ImageFilledRectangle($im,0,0,$sizeX+$shiftX+61,$sizeY+$shiftYup+$shiftYdown+10,$white);
 	ImageFilledRectangle($im,0,0,$x,$y,$white);
 	ImageRectangle($im,0,0,$x-1,$y-1,$black);
 
 	if(!check_right_on_trigger(PERM_READ_ONLY,$_REQUEST["triggerid"]))
 	{
-//		show_table_header("<font color=\"AA0000\">No permissions !</font>");
-//		show_page_footer();
-		ImageOut($im); 
-		ImageDestroy($im); 
-		exit;
+		access_deny(PAGE_TYPE_IMAGE, $im);
 	}
 
 
-//	$trigger=get_trigger_by_triggerid($_REQUEST["triggerid"]);
-//	$str=$trigger["description"];
-
-//	if( strstr($str,"%s"))
-//	{
-		$str=expand_trigger_description($_REQUEST["triggerid"]);
-//	}
+	$str=expand_trigger_description($_REQUEST["triggerid"]);
 
 	$str=$str." (year ".date("Y").")";
 	$x=imagesx($im)/2-ImageFontWidth(4)*strlen($str)/2;
@@ -205,4 +194,7 @@
 
 	ImageOut($im); 
 	ImageDestroy($im); 
+?>
+<?php
+	show_page_footer();
 ?>

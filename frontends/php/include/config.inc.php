@@ -92,14 +92,41 @@ function SDI($msg="SDI") { echo "DEBUG INFO: "; if(is_array($msg)) print_r($msg)
 	include_once("include/classes/cserverinfo.mod.php");
 	include_once("include/classes/cflashclock.mod.php");
 
+define("PAGE_TYPE_HTML",	0);
+define("PAGE_TYPE_IMAGE",	1);
+
 	function	access_deny()
 	{
-		$table = new CTable();
-		$table->SetAlign('center');
-		$table->AddRow("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-		$table->Show();
-                show_page_footer();
-		exit;
+		global $page;
+
+		switch($page["type"])
+		{
+			case PAGE_TYPE_IMAGE:
+				$font = 4;
+				$w = ImageFontWidth($font)*strlen(S_NO_PERMISSIONS)+2;
+				$h = imagefontheight($font)+2;
+				$canvas = imagecreate($w, $h);
+				ImageFilledRectangle($canvas,0,0,$w,$h, ImageColorAllocate($canvas, 255, 255, 255));
+				ImageString(
+					$canvas,
+					$font,
+					1,
+					1,
+					S_NO_PERMISSIONS ,
+					ImageColorAllocate($canvas, 255, 0, 0)
+					);
+				ImageOut($canvas);
+				ImageDestroy($canvas);
+				break;			
+			case PAGE_TYPE_HTML:
+			default:
+				$table = new CTable();
+				$table->SetAlign('center');
+				$table->AddRow("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
+				$table->Show();
+				break;
+		}
+		include "include/page_footer.php";
 	}
 
 	function zbx_stripslashes($value){
@@ -704,7 +731,7 @@ else
 
 	# Header for HTML pages
 
-	function	show_header($title,$dorefresh=0,$nomenu=0,$noauth=0)
+	function	show_header($title="",$dorefresh=0,$nomenu=0,$noauth=0)
 	{
 		global $page;
 		global $USER_DETAILS;
@@ -712,6 +739,8 @@ COpt::profiling_start("page");
 
 		global $ZBX_CURNODEID;
 		global $ZBX_LOCALNODEID;
+
+		if(!isset($page["type"])) $page["type"] = PAGE_TYPE_HTML;
 
 		if($noauth==0)
 		{
@@ -724,6 +753,15 @@ COpt::profiling_start("page");
 		}
 		include_once "include/locales/en_gb.inc.php";
 		process_locales();
+
+		switch($page["type"])
+		{
+			case PAGE_TYPE_IMAGE:
+				set_image_header();
+				$nomenu = 1;
+				break;
+			case PAGE_TYPE_HTML:
+			default:
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
@@ -732,226 +770,229 @@ COpt::profiling_start("page");
 <meta name="Author" content="ZABBIX SIA (Alexei Vladishev, Eugene Grigorjev)">
 <link rel="stylesheet" href="css.css">
 <?php
-		if(defined($title))	$title=constant($title);
+			if(defined($title))	$title=constant($title);
 
-		if($curr_node_data = DBfetch(DBselect('select * from nodes where nodeid='.$ZBX_CURNODEID)))
-			$title .= ' ('.$curr_node_data['name'].')';
+			if($curr_node_data = DBfetch(DBselect('select * from nodes where nodeid='.$ZBX_CURNODEID)))
+				$title .= ' ('.$curr_node_data['name'].')';
 
-		if($dorefresh && $USER_DETAILS["refresh"])
-		{
-			echo "	<meta http-equiv=\"refresh\" content=\"".$USER_DETAILS["refresh"]."\">\n";
-			echo "	<title>$title [refreshed every ".$USER_DETAILS["refresh"]." sec]</title>\n";
-		}
-		else
-		{
-			echo "	<title>$title</title>\n";
-		}
+			if($dorefresh && $USER_DETAILS["refresh"])
+			{
+				echo "	<meta http-equiv=\"refresh\" content=\"".$USER_DETAILS["refresh"]."\">\n";
+				echo "	<title>$title [refreshed every ".$USER_DETAILS["refresh"]." sec]</title>\n";
+			}
+			else
+			{
+				echo "	<title>$title</title>\n";
+			}
 
 ?>
 </head>
 <body>
 <?php
-		if($nomenu == 0)
-		{
-			/* NOTE
-				first level:
-					'label' 		= main menu title.
-					'default_page_id	= default page url from 'pages' then opened menu.
-					'pages'			= collection of pages whitch displayed from this menu
-								this pages are saved a last visited submenu of main menu.
+			break; /* case PAGE_TYPE_HTML */
+		} /* switch($page["type"]) */
 
-				second level (pages):
-					'url'	= 	real url for this page
-					'label'	= 	submenu title, if missed menu skipped, but remmembed as last visited page.
-					'sub_pages'	= collection of pages for displaying but dont remember as last visited.
-					
-			*/
-			$menu=array(
-				"view"=>array(
-						"label"			=> S_MONITORING,
-						"default_page_id"	=> 0,
-						"pages"=>array(
-							array("url"=>"overview.php"	,"label"=>S_OVERVIEW	),
-							array("url"=>"latest.php"	,"label"=>S_LATEST_DATA	,
-								"sub_pages"=>array("history.php")
-								),
-							array("url"=>"tr_status.php"	,"label"=>S_TRIGGERS	,
-								"sub_pages"=>array("tr_events.php","acknow.php","tr_comments.php")
-								),
-							array("url"=>"queue.php"	,"label"=>S_QUEUE	),
-							array("url"=>"events.php"	,"label"=>S_EVENTS	),
-							array("url"=>"actions.php"	,"label"=>S_ACTIONS	),
-							array("url"=>"maps.php"		,"label"=>S_MAPS	),
-							array("url"=>"charts.php"	,"label"=>S_GRAPHS	),
-							array("url"=>"screens.php"	,"label"=>S_SCREENS	),
-							array("url"=>"srv_status.php"	,"label"=>S_IT_SERVICES	,
-								"sub_pages"=>array("report3.php")
-								)
+		/* NOTE
+			first level:
+				'label' 		= main menu title.
+				'default_page_id	= default page url from 'pages' then opened menu.
+				'pages'			= collection of pages whitch displayed from this menu
+							this pages are saved a last visited submenu of main menu.
+
+			second level (pages):
+				'url'	= 	real url for this page
+				'label'	= 	submenu title, if missed menu skipped, but remmembed as last visited page.
+				'sub_pages'	= collection of pages for displaying but dont remember as last visited.
+				
+		*/
+		$menu=array(
+			"view"=>array(
+					"label"			=> S_MONITORING,
+					"default_page_id"	=> 0,
+					"pages"=>array(
+						array("url"=>"overview.php"	,"label"=>S_OVERVIEW	),
+						array("url"=>"latest.php"	,"label"=>S_LATEST_DATA	,
+							"sub_pages"=>array("history.php")
+							),
+						array("url"=>"tr_status.php"	,"label"=>S_TRIGGERS	,
+							"sub_pages"=>array("tr_events.php","acknow.php","tr_comments.php")
+							),
+						array("url"=>"queue.php"	,"label"=>S_QUEUE	),
+						array("url"=>"events.php"	,"label"=>S_EVENTS	),
+						array("url"=>"actions.php"	,"label"=>S_ACTIONS	),
+						array("url"=>"maps.php"		,"label"=>S_MAPS	),
+						array("url"=>"charts.php"	,"label"=>S_GRAPHS	),
+						array("url"=>"screens.php"	,"label"=>S_SCREENS	),
+						array("url"=>"srv_status.php"	,"label"=>S_IT_SERVICES	,
+							"sub_pages"=>array("report3.php")
 							)
-						),
-				"cm"=>array(
-						"label"			=> S_INVENTORY,
-						"default_page_id"	=> 0,
-						"pages"=>array(
-							array("url"=>"hostprofiles.php"	,"label"=>S_HOSTS	)
+						)
+					),
+			"cm"=>array(
+					"label"			=> S_INVENTORY,
+					"default_page_id"	=> 0,
+					"pages"=>array(
+						array("url"=>"hostprofiles.php"	,"label"=>S_HOSTS	)
+						)
+					),
+			"reports"=>array(
+					"label"			=> S_REPORTS,
+					"default_page_id"	=> 0,
+					"pages"=>array(
+						array("url"=>"report1.php",	"label"=>S_STATUS_OF_ZABBIX	),
+						array("url"=>"report2.php",	"label"=>S_AVAILABILITY_REPORT	),
+						array("url"=>"report5.php",	"label"=>S_TRIGGERS_TOP_100	)   
+						)
+					),
+			"config"=>array(
+					"label"			=> S_CONFIGURATION,
+					"default_page_id"	=> 0,
+					"pages"=>array(
+						array("url"=>"config.php"	,"label"=>S_GENERAL		),
+						array("url"=>"hosts.php"	,"label"=>S_HOSTS		),
+						array("url"=>"items.php"	,"label"=>S_ITEMS		),
+						array("url"=>"triggers.php"	,"label"=>S_TRIGGERS		),
+						array("url"=>"actionconf.php"	,"label"=>S_ACTIONS		),
+						array("url"=>"sysmaps.php"	,"label"=>S_MAPS		,
+							"sub_pages"=>array("sysmap.php")
+							),
+						array("url"=>"graphs.php"	,"label"=>S_GRAPHS		,
+							"sub_pages"=>array("graph.php")
+							),
+						array("url"=>"screenconf.php"	,"label"=>S_SCREENS		,
+							"sub_pages"=>array("screenedit.php")
+							),
+						array("url"=>"services.php"	,"label"=>S_IT_SERVICES		),
+						array("url"=>"bulkloader.php"	,"label"=>S_MENU_BULKLOADER	)
+						)
+					),
+			"admin"=>array(
+					"label"			=> S_ADMINISTRATION,
+					"default_page_id"	=> 0,
+					"pages"=>array(
+						array("url"=>"admin.php"	,"label"=>S_ADMINISTRATION	),
+						array("url"=>"nodes.php"	,"label"=>S_NODES		),
+						array("url"=>"users.php"	,"label"=>S_USERS		,
+							"sub_pages"=>array("popup_media.php",
+								"popup_usrgrp.php","popup_right.php")
+							),
+						array("url"=>"media_types.php"	,"label"=>S_MEDIA_TYPES		),
+						array("url"=>"audit.php"	,"label"=>S_AUDIT		),
+						array("url"=>"report4.php"	,"label"=>S_NOTIFICATIONS	)
+						)
+					),
+			"login"=>array(
+					"label"			=> S_LOGIN,
+					"default_page_id"	=> 0,
+					"pages"=>array(
+						array("url"=>"index.php",
+							"sub_pages"=>array("profile.php")
 							)
-						),
-				"reports"=>array(
-						"label"			=> S_REPORTS,
-						"default_page_id"	=> 0,
-						"pages"=>array(
-							array("url"=>"report1.php",	"label"=>S_STATUS_OF_ZABBIX	),
-							array("url"=>"report2.php",	"label"=>S_AVAILABILITY_REPORT	),
-							array("url"=>"report5.php",	"label"=>S_TRIGGERS_TOP_100	)   
-							)
-						),
-				"config"=>array(
-						"label"			=> S_CONFIGURATION,
-						"default_page_id"	=> 0,
-						"pages"=>array(
-							array("url"=>"config.php"	,"label"=>S_GENERAL		),
-							array("url"=>"hosts.php"	,"label"=>S_HOSTS		),
-							array("url"=>"items.php"	,"label"=>S_ITEMS		),
-							array("url"=>"triggers.php"	,"label"=>S_TRIGGERS		),
-							array("url"=>"actionconf.php"	,"label"=>S_ACTIONS		),
-							array("url"=>"sysmaps.php"	,"label"=>S_MAPS		,
-								"sub_pages"=>array("sysmap.php")
-								),
-							array("url"=>"graphs.php"	,"label"=>S_GRAPHS		,
-								"sub_pages"=>array("graph.php")
-								),
-							array("url"=>"screenconf.php"	,"label"=>S_SCREENS		,
-								"sub_pages"=>array("screenedit.php")
-								),
-							array("url"=>"services.php"	,"label"=>S_IT_SERVICES		),
-							array("url"=>"bulkloader.php"	,"label"=>S_MENU_BULKLOADER	)
-							)
-						),
-				"admin"=>array(
-						"label"			=> S_ADMINISTRATION,
-						"default_page_id"	=> 0,
-						"pages"=>array(
-							array("url"=>"admin.php"	,"label"=>S_ADMINISTRATION	),
-							array("url"=>"nodes.php"	,"label"=>S_NODES		),
-							array("url"=>"users.php"	,"label"=>S_USERS		,
-								"sub_pages"=>array("popup_media.php",
-									"popup_usrgrp.php","popup_right.php")
-								),
-							array("url"=>"media_types.php"	,"label"=>S_MEDIA_TYPES		),
-							array("url"=>"audit.php"	,"label"=>S_AUDIT		),
-							array("url"=>"report4.php"	,"label"=>S_NOTIFICATIONS	)
-							)
-						),
-				"login"=>array(
-						"label"			=> S_LOGIN,
-						"default_page_id"	=> 0,
-						"pages"=>array(
-							array("url"=>"index.php",
-								"sub_pages"=>array("profile.php")
-								)
-							)
-						),
-				);
+						)
+					),
+			);
 
 COpt::compare_files_with_menu($menu);
 
-			$table = new CTable(NULL,"page_header");
-			$table->SetCellSpacing(0);
-			$table->SetCellPadding(5);
 
-			$help = new CLink(S_HELP, "http://www.zabbix.com/manual/v1.1/index.php", "small_font");
-			$help->SetTarget('_blank');
-			$col_r = array($help);
-			if($USER_DETAILS["alias"]!="guest") {
-				array_push($col_r, "|");		
-				array_push($col_r, new CLink(S_PROFILE, "profile.php", "small_font"));
-			}
+		$help = new CLink(S_HELP, "http://www.zabbix.com/manual/v1.1/index.php", "small_font");
+		$help->SetTarget('_blank');
+		$col_r = array($help);
+		if($USER_DETAILS["alias"]!="guest") {
+			array_push($col_r, "|", new CLink(S_PROFILE, "profile.php", "small_font"));
+		}
 
-			$logo = new CLink(new CImg("images/general/zabbix.png","ZABBIX"),"http://www.zabbix.com");
-			$logo->SetTarget('_blank');
-			$table->AddRow(array(new CCol($logo, "page_header_l"), new CCol($col_r, "page_header_r")));
+		$logo = new CLink(new CImg("images/general/zabbix.png","ZABBIX"),"http://www.zabbix.com");
+		$logo->SetTarget('_blank');
 
-			$table->Show();
+		global $page;
 
-			global $page;
+		$top_page_row	= array(new CCol($logo, "page_header_l"), new CCol($col_r, "page_header_r"));
+		$main_menu_row	= array();
+		$sub_menu_row	= array();
 
-			$main_menu_row	= array();
-			$sub_menu_row	= array();
+		unset($denyed_page_requested);
 
-			unset($denyed_page_requested);
+		foreach($menu as $label=>$sub)
+		{
+	// Check permissions
+			unset($deny);
+			if($label!='login' && !isset($USER_DETAILS['type']))
+				$deny = true;
+			elseif($label=='admin'	&& !in_array($USER_DETAILS['type'], 
+				array(USER_TYPE_SUPPER_ADMIN)) )
+				$deny = true;
+			elseif($label=='config'	&& !in_array($USER_DETAILS['type'], 
+				array(USER_TYPE_SUPPER_ADMIN, USER_TYPE_ZABBIX_ADMIN)) )
+				$deny = true;
+			elseif($label=='view'	&& !in_array($USER_DETAILS['type'], 
+				array(USER_TYPE_SUPPER_ADMIN, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_ZABBIX_USER)) )
+				$deny = true;
 
-			foreach($menu as $label=>$sub)
+	// End of check permissions
+			$menu_url = null;
+			foreach($sub['pages'] as $sub_pages)
 			{
-		// Check permissions
-				unset($deny);
-				if($label!='login' && !isset($USER_DETAILS['type']))
-					$deny = true;
-				elseif($label=='admin'	&& !in_array($USER_DETAILS['type'], 
-					array(USER_TYPE_SUPPER_ADMIN)) )
-					$deny = true;
-				elseif($label=='config'	&& !in_array($USER_DETAILS['type'], 
-					array(USER_TYPE_SUPPER_ADMIN, USER_TYPE_ZABBIX_ADMIN)) )
-					$deny = true;
-				elseif($label=='view'	&& !in_array($USER_DETAILS['type'], 
-					array(USER_TYPE_SUPPER_ADMIN, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_ZABBIX_USER)) )
-					$deny = true;
-
-		// End of check permissions
-				$menu_url = null;
-				foreach($sub['pages'] as $sub_pages)
+				if($page['file'] == $sub_pages['url'])
 				{
-					if($page['file'] == $sub_pages['url'])
+					$menu_url = $sub_pages['url'];
+					break;
+				}
+				else if(isset($sub_pages['sub_pages']))
+				{
+					if(in_array($page['file'], $sub_pages['sub_pages']))
 					{
 						$menu_url = $sub_pages['url'];
 						break;
-					}
-					else if(isset($sub_pages['sub_pages']))
-					{
-						if(in_array($page['file'], $sub_pages['sub_pages']))
-						{
-							$menu_url = $sub_pages['url'];
-							break;
-						}					
-					}
+					}					
 				}
-
-				if(!is_null($menu_url)) /* active menu */
-				{
-					$class = "active";
-
-					update_profile('web.menu.'.$label.'.last', $menu_url);
-
-					if(isset($deny))
-					{
-						$denyed_page_requested = true;
-						continue;
-					}
-
-					foreach($sub['pages'] as $sub_pages)
-					{
-						if(!isset($sub_pages['label'])) continue;
-
-						array_push($sub_menu_row, 
-							new CLink($sub_pages['label'], $sub_pages['url'],'highlight'), 
-							new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider')
-							);
-					}
-				}
-				else
-				{
-					if(isset($deny)) continue;
-
-					$class = "horizontal_menu_n";
-
-					$menu_url = get_profile('web.menu.'.$label.'.last',false);
-
-					if(!$menu_url)
-						$menu_url = $sub['pages'][$sub['default_page_id']]["url"];
-				}
-
-				array_push($main_menu_row, new CCol(new CLink($sub['label'], $menu_url, "highlight"),$class));
 			}
+
+			if(!is_null($menu_url)) /* active menu */
+			{
+				$class = "active";
+
+				update_profile('web.menu.'.$label.'.last', $menu_url);
+
+				if(isset($deny))
+				{
+					$denyed_page_requested = true;
+					continue;
+				}
+
+				foreach($sub['pages'] as $sub_pages)
+				{
+					if(!isset($sub_pages['label'])) continue;
+
+					array_push($sub_menu_row, 
+						new CLink($sub_pages['label'], $sub_pages['url'],'highlight'), 
+						new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider')
+						);
+				}
+			}
+			else
+			{
+				if(isset($deny)) continue;
+
+				$class = "horizontal_menu_n";
+
+				$menu_url = get_profile('web.menu.'.$label.'.last',false);
+
+				if(!$menu_url)
+					$menu_url = $sub['pages'][$sub['default_page_id']]["url"];
+			}
+
+			array_push($main_menu_row, new CCol(new CLink($sub['label'], $menu_url, "highlight"),$class));
+		}
 			
+		if($nomenu == 0)
+		{
+			$table = new CTable(NULL,"page_header");
+			$table->SetCellSpacing(0);
+			$table->SetCellPadding(5);
+			$table->AddRow($top_page_row);
+			$table->Show();
+
 			$menu_table = new CTable(NULL,'menu');
 			$menu_table->SetCellSpacing(0);
 			$menu_table->SetCellPadding(5);
@@ -985,12 +1026,12 @@ COpt::compare_files_with_menu($menu);
 			$sub_menu_table->Show();
 
 			echo BR;
-
-			if(isset($denyed_page_requested))
-			{
-				access_deny();
-				exit;
-			}
+		}
+		
+		if(isset($denyed_page_requested))
+		{
+			access_deny();
+			exit;
 		}
 	}
 
@@ -1177,35 +1218,39 @@ COpt::compare_files_with_menu($menu);
 	function	show_page_footer($realy_show=true)
 	{
 		global $USER_DETAILS;
+		global $page;
 
-		show_messages();
-
-		echo BR;
-
-		if($realy_show)
+		if($page['type'] == PAGE_TYPE_HTML)
 		{
-			$table = new CTable(NULL,"page_footer");
-			$table->SetCellSpacing(0);
-			$table->SetCellPadding(1);
-			$table->AddRow(array(
-				new CCol(new CLink(
-					S_ZABBIX_VER.SPACE.S_COPYRIGHT_BY.SPACE.S_SIA_ZABBIX,
-					"http://www.zabbix.com", "highlight"),
-					"page_footer_l"),
-				new CCol(array(
-						new CSpan(SPACE.SPACE."|".SPACE.SPACE,"divider"),
-						S_CONNECTED_AS.SPACE."'".$USER_DETAILS["alias"]."'".SPACE.
-						S_FROM_SMALL.SPACE."'".$USER_DETAILS["node"]['name']."'"
-					),
-					"page_footer_r")
-				));
-			$table->Show();
-		}
+			show_messages();
+
+			echo BR;
+
+			if($realy_show)
+			{
+				$table = new CTable(NULL,"page_footer");
+				$table->SetCellSpacing(0);
+				$table->SetCellPadding(1);
+				$table->AddRow(array(
+					new CCol(new CLink(
+						S_ZABBIX_VER.SPACE.S_COPYRIGHT_BY.SPACE.S_SIA_ZABBIX,
+						"http://www.zabbix.com", "highlight"),
+						"page_footer_l"),
+					new CCol(array(
+							new CSpan(SPACE.SPACE."|".SPACE.SPACE,"divider"),
+							S_CONNECTED_AS.SPACE."'".$USER_DETAILS["alias"]."'".SPACE.
+							S_FROM_SMALL.SPACE."'".$USER_DETAILS["node"]['name']."'"
+						),
+						"page_footer_r")
+					));
+				$table->Show();
+			}
 COpt::profiling_stop("page");
 COpt::profiling_stop("script");
 
-		echo "</body>\n";
-		echo "</html>\n";
+			echo "</body>\n";
+			echo "</html>\n";
+		}
 	}
 
 	function	get_status()

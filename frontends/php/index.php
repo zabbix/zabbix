@@ -22,8 +22,8 @@
 	require_once "include/config.inc.php";
 	require_once "include/forms.inc.php";
 
-	$page["title"]="S_ZABBIX_BIG";
-	$page["file"]="index.php";
+	$page["title"]	= "S_ZABBIX_BIG";
+	$page["file"]	= "index.php";
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -76,7 +76,7 @@
 		}
 	}
 
-	show_header($page["title"],0,0);
+include "include/page_header.php";
 	
 	if(isset($incorrect_password)) 
 		show_error_message("Login name or password is incorrect");
@@ -95,8 +95,8 @@
 		echo "</div>";
 	}	
 ?>
-
-
 <?php
-	show_page_footer();
+
+include "include/page_footer.php";
+
 ?>

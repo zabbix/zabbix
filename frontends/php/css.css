@@ -51,6 +51,7 @@ table.page_footer
 	border-bottom-style: solid;
 	padding-right: 5px;
 	padding-left: 5px;
+	margin-top: 15px;
 	width: 100%;
 }
 table.page_footer td.page_footer_l
@@ -555,6 +556,7 @@ table.sub_menu
 	color: #000000;
 	border: 0px solid #000000;
 	width: 100%;
+	margin-bottom: 15px;
 }
 
 table.sub_menu tr

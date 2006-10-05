@@ -534,14 +534,11 @@
 	{
 		$param="";
 
-//		echo $key." ".$num."<br>";
-
-//		$params=split('[\[\]\,]', $description);
-		$params=preg_split('/[\]\[,]/', $key);
+		$params = preg_split('/[\]\[,]/', $key);
 
 		if(isset($params[$num]))
 		{
-			$param=$params[$num];
+			$param = $params[$num];
 		}
 
 		return $param;
