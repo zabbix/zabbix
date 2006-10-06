@@ -24,7 +24,9 @@
 	$page["file"] = "bulkloader.php";
 	$page["title"] = "S_BULKLOADER_MAIN";
 	$fileuploaded=0;
-	show_header($page["title"],0,0);
+
+include "include/page_header.php";
+
 	insert_confirm_javascript();
 	
 	if(isset($_FILES['uploadfile']))
@@ -201,6 +203,7 @@
 		"</form>"
 		), 1);
 	table_end();
-	show_page_footer();
+
+include "include/page_footer.php";
 
 ?>

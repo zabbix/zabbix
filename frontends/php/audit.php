@@ -24,9 +24,22 @@
 
 	$page["title"] = "S_AUDIT_LOG";
 	$page["file"] = "audit.php";
-	show_header($page["title"],1,0);
+
+	define('ZBX_PAGE_DO_REFRESH', 1);
+
+include "include/page_header.php";
 
 	$PAGE_SIZE = 100;
+?>
+<?php
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"start"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(0,65535)."({}%".$PAGE_SIZE."==0)",	NULL),
+		"next"=>		array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
+		"prev"=>		array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL)
+	);
+
+	check_fields($fields);
 ?>
 <?php
 	$start	= get_request("start", 0);
@@ -87,5 +100,7 @@
 ?>
 
 <?php
-	show_page_footer();
+
+include "include/page_footer.php";
+
 ?>

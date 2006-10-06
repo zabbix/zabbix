@@ -185,6 +185,14 @@ table.log_history_table td.message {
 	text-align: center;
 }
 
+/************* CHART TABLE ***************/
+table.chart
+{
+	width: 100%;
+	background-color: #DDDDDD;
+	text-align: center;
+}
+
 /************* SCREEN TABLE ***************/
 table.screen_edit
 {

@@ -35,6 +35,7 @@
 	"S_COMMENT_ADDED"=>			"Comment added",
 	"S_CANNOT_ADD_COMMENT"=>		"Cannot add coment",
 	"S_ALARM_ACKNOWLEDGES_BIG"=>		"ALARM ACKNOWLEDGES",
+	"S_ACKNOWLEDGE_ADDED"=>			"Acknowledge added",
 
 //	actionconf.php
 	"S_CONFIGURATION_OF_ACTIONS"=>		"Configuration of actions",

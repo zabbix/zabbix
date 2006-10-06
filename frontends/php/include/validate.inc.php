@@ -332,7 +332,9 @@
 		{
 			unset_action_vars($fields);
 		}
-		show_infomsg();
+
+		show_messages();
+
 		return ($err==ZBX_VALID_OK ? 1 : 0);
 	}
 ?>

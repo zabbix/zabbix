@@ -19,6 +19,8 @@
 **/
 ?>
 <?php
+	require_once "include/items.inc.php";
+	require_once "include/hosts.inc.php";
 
 	define("GRAPH_DRAW_TYPE_LINE",0);
 	define("GRAPH_DRAW_TYPE_FILL",1);
@@ -524,18 +526,6 @@
 					$this->colors[$trigger['color']]);
 			}
 			
-		}
-
-		function checkPermissions()
-		{
-//			if(!check_right("Item","R",$this->items[0]["itemid"])) /* TODO */
-			{
-				$this->drawGrid();
-				ImageString($this->im, 2,$this->sizeX/2 -50,$this->sizeY+$this->shiftY+3, "NO PERMISSIONS" , $this->colors["Dark Red No Alpha"]);
-				ImageOut($this->im); 
-				ImageDestroy($this->im); 
-				exit;
-			}
 		}
 
 		function drawLogo()
@@ -1166,9 +1156,6 @@
 			{
 //				$this->noDataFound();
 			}
-
-			$this->checkPermissions();
-
 
 			$this->drawWorkPeriod();
 			$this->drawGrid();

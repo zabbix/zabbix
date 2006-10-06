@@ -22,76 +22,83 @@
 	require_once "include/config.inc.php";
 	require_once "include/graphs.inc.php";
 	require_once "include/classes/graph.inc.php";
+	
+	$page["file"]	= "chart2.php";
+	$page["title"]	= "S_CHART";
+	$page["type"]	= PAGE_TYPE_IMAGE;
 
-	$result=DBselect("select * from graphs where graphid=".$_REQUEST["graphid"]);
-	$row=DBfetch($result);
+include "include/page_header.php";
 
-	$graph=new Graph($row["graphtype"]);
-	if(isset($_REQUEST["period"]))
-	{
-		$graph->setPeriod($_REQUEST["period"]);
-	}
-	if(isset($_REQUEST["from"]))
-	{
-		$graph->setFrom($_REQUEST["from"]);
-	}
-	if(isset($_REQUEST["stime"]))
-	{
-		$graph->setSTime($_REQUEST["stime"]);
-	}
-	if(isset($_REQUEST["border"]))
-	{
-		$graph->setBorder(0);
-	}
+?>
+<?php
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"graphid"=>		array(T_ZBX_INT, O_MAND,	P_SYS,	DB_ID,		null),
+		"period"=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	BETWEEN(3600,12*31*24*3600),	null),
+		"from"=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	null,		null),
+		"stime"=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	null,		null),
+		"border"=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	IN('0,1'),	null),
+		"width"=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	'{}>0',		null),
+		"height"=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	'{}>0',		null),
+	);
 
-	$db_hosts = get_hosts_by_graphid($_REQUEST["graphid"]);
-	$name=$row["name"];
-
-	$db_host = DBfetch($db_hosts);
-	if($db_host)
+	check_fields($fields);
+?>
+<?php
+	if( !($db_data = DBfetch(DBselect("select g.*,h.host,h.hostid from graphs g, graphs_items gi, items i, hosts h ".
+		" where g.graphid=".$_REQUEST["graphid"].
+		" and g.graphid=gi.graphid and gi.itemid=i.itemid and i.hostid=h.hostid ".
+		" and h.hostid not in (".
+			get_accessible_hosts_by_userid($USER_DETAILS['userid'], PERM_READ_LIST, PERM_MODE_LE).
+		")"))))
 	{
-		$name = $db_host["host"].":".$name;
+		access_deny();
 	}
-	if(isset($_REQUEST["width"])&&$_REQUEST["width"]>0)
-	{
-		$width=$_REQUEST["width"];
-	}
-	else
-	{
-		$width=$row["width"];
-	}
-	if(isset($_REQUEST["height"])&&$_REQUEST["height"]>0)
-	{
-		$height=$_REQUEST["height"];
-	}
-	else
-	{
-		$height=$row["height"];
-	}
+	$graph = new Graph($db_data["graphtype"]);
 
-	$graph->ShowWorkPeriod($row["show_work_period"]);
-	$graph->ShowTriggers($row["show_triggers"]);
+	if(isset($_REQUEST["period"]))		$graph->SetPeriod($_REQUEST["period"]);
+	if(isset($_REQUEST["from"]))		$graph->SetFrom($_REQUEST["from"]);
+	if(isset($_REQUEST["stime"]))		$graph->SetSTime($_REQUEST["stime"]);
+	if(isset($_REQUEST["border"]))		$graph->SetBorder(0);
 
-	$graph->setWidth($width);
-	$graph->setHeight($height);
-	$graph->setHeader($name);
-	$graph->setYAxisType($row["yaxistype"]);
-	$graph->setYAxisMin($row["yaxismin"]);
-	$graph->setYAxisMax($row["yaxismax"]);
+	$width = get_request("width", 0);
 
-	$result=DBselect("select gi.*,i.description,h.host,gi.drawtype from graphs_items gi,items i,hosts h where gi.itemid=i.itemid and gi.graphid=".$_REQUEST["graphid"]." and i.hostid=h.hostid order by gi.sortorder");
+	if($width <= 0) $width = $db_data["width"];
 
-	while($row=DBfetch($result))
+	$height = get_request("height", 0);
+	if($height <= 0) $height = $db_data["height"];
+
+	$graph->ShowWorkPeriod($db_data["show_work_period"]);
+	$graph->ShowTriggers($db_data["show_triggers"]);
+
+	$graph->SetWidth($width);
+	$graph->SetHeight($height);
+	$graph->SetHeader($db_data["host"].":".$db_data['name']);
+	$graph->SetYAxisType($db_data["yaxistype"]);
+	$graph->SetYAxisMin($db_data["yaxismin"]);
+	$graph->SetYAxisMax($db_data["yaxismax"]);
+
+	$result = DBselect("select gi.*".
+		" from graphs_items gi ".
+		" where gi.graphid=".$db_data["graphid"].
+		" order by gi.sortorder, gi.itemid desc");
+
+	while($db_data=DBfetch($result))
 	{
-		$graph->addItem(
-			$row["itemid"],
-			$row["yaxisside"],
-			$row["calc_fnc"],
-			$row["color"],
-			$row["drawtype"],
-			$row["type"],
-			$row["periods_cnt"]
+		$graph->AddItem(
+			$db_data["itemid"],
+			$db_data["yaxisside"],
+			$db_data["calc_fnc"],
+			$db_data["color"],
+			$db_data["drawtype"],
+			$db_data["type"],
+			$db_data["periods_cnt"]
 			);
 	}
 	$graph->Draw();
+?>
+<?php
+
+include "include/page_footer.php";
+
 ?>

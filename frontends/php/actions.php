@@ -24,15 +24,18 @@
 
 	$page["title"] = "S_LATEST_ACTIONS";
 	$page["file"] = "actions.php";
-	show_header($page["title"],1,0);
+	
+	define('ZBX_PAGE_DO_REFRESH', 1);
+
+include "inlcude/page_header.php";
 	
 	define("PAGE_SIZE", 100);
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"groupid"=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	BETWEEN(0,65535),	NULL),
-		"hostid"=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	BETWEEN(0,65535),	NULL),
+		"groupid"=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,	NULL),
+		"hostid"=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,	NULL),
 		"start"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(0,65535)."({}%".PAGE_SIZE."==0)",	NULL),
 		"next"=>		array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
 		"prev"=>		array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL)
@@ -74,7 +77,8 @@
 	show_header2(S_HISTORY_OF_ACTIONS_BIG,$form);
 	$table->Show();
 ?>
-
 <?php
-	show_page_footer();
+
+include "inlcude/page_footer.php";
+
 ?>

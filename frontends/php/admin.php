@@ -24,8 +24,8 @@
         $page["title"] = "S_ADMINISTRATION";
         $page["file"] = "admin.php";
 
-	show_header($page["title"],0,0);
-	insert_confirm_javascript();
+include "include/page_header.php"
+
 ?>
 <?php
 	$table = new CTable();
@@ -39,5 +39,7 @@
 	$table->Show();
 ?>
 <?php
-	show_page_footer();
+
+include "include/page_footer.php"
+
 ?>

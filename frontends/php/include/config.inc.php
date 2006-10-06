@@ -97,35 +97,9 @@ define("PAGE_TYPE_IMAGE",	1);
 
 	function	access_deny()
 	{
-		global $page;
 
-		switch($page["type"])
-		{
-			case PAGE_TYPE_IMAGE:
-				$font = 4;
-				$w = ImageFontWidth($font)*strlen(S_NO_PERMISSIONS)+2;
-				$h = imagefontheight($font)+2;
-				$canvas = imagecreate($w, $h);
-				ImageFilledRectangle($canvas,0,0,$w,$h, ImageColorAllocate($canvas, 255, 255, 255));
-				ImageString(
-					$canvas,
-					$font,
-					1,
-					1,
-					S_NO_PERMISSIONS ,
-					ImageColorAllocate($canvas, 255, 0, 0)
-					);
-				ImageOut($canvas);
-				ImageDestroy($canvas);
-				break;			
-			case PAGE_TYPE_HTML:
-			default:
-				$table = new CTable();
-				$table->SetAlign('center');
-				$table->AddRow("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-				$table->Show();
-				break;
-		}
+		show_error_message(S_NO_PERMISSIONS);
+		
 		include "include/page_footer.php";
 	}
 
@@ -395,56 +369,124 @@ else
 		return	$row;
 	}
 
-	function	show_infomsg()
+	function	show_messages_in_image($canvas, $text, $color)
 	{
-		global	$INFO_MSG;
-		global	$ERROR_MSG;
-		if(is_array($INFO_MSG) && count($INFO_MSG)>0)
-		{
-			echo "<p align=center class=\"info\">";
-			while($val = array_shift($INFO_MSG))
-			{
-				echo $val.BR;
-			}
-			echo "</p>";
-		}
 	}
 
 	function	show_messages($bool=TRUE,$msg=NULL,$errmsg=NULL)
 	{
 		global	$ERROR_MSG;
+		global	$INFO_MSG;
+		global	$page;
 
-		if(!$bool)
+		if(!isset($page["type"])) $page["type"] = PAGE_TYPE_HTML;
+
+		$message = array();
+		$width = 0;
+		$height= 0;
+
+		if(!$bool && !is_null($errmsg))		$msg="ERROR: ".$errmsg;
+
+		if(!is_null($msg))
 		{
-			if(!is_null($errmsg))
-				$msg="ERROR:".$errmsg;
-
-			$color="#AA0000";
+			switch($page["type"])
+			{
+				case PAGE_TYPE_IMAGE:
+					array_push($message, array(
+						'text'	=> $msg,
+						'color'	=> (!$bool) ? array('R'=>255,'G'=>0,'B'=>0) : array('R'=>34,'G'=>51,'B'=>68),
+						'font'	=> 4));
+					$width = max($width, ImageFontWidth(4) * strlen($msg) + 1);
+					$height += imagefontheight(4) + 1;
+					break;			
+				case PAGE_TYPE_HTML:
+				default:
+					echo "<p align=center>";
+					echo "<font color='".((!$bool) ? "#AA0000" : "#223344")."'>";
+					echo "<b>[$msg]</b>";
+					echo "</font>";
+					echo "</p>";
+					break;
+			}
 		}
-		else
+
+		if(is_array($INFO_MSG) && count($INFO_MSG)>0)
 		{
-			$color="#223344";
+			switch($page["type"])
+			{
+				case PAGE_TYPE_IMAGE:
+					while($val = array_shift($INFO_MSG))
+					{
+						array_push($message, array(
+							'text'	=> $val,
+							'color'	=> array('R'=>155,'G'=>155,'B'=>55),
+							'font'	=> 2));
+						$width = max($width, ImageFontWidth(2) * strlen($val) + 1);
+						$height += imagefontheight(2) + 1;
+					}
+					break;			
+				case PAGE_TYPE_HTML:
+					echo "<p align=center class=\"info\">";
+					while($val = array_shift($INFO_MSG))
+					{
+						echo $val.BR;
+					}
+					echo "</p>";
+					break;
+			}
 		}
-
-		if(isset($msg))
-		{
-			echo "<p align=center>";
-			echo "<font color='$color'>";
-			echo "<b>[$msg]</b>";
-			echo "</font>";
-			echo "</p>";
-		}
-
-		show_infomsg();
 
 		if(is_array($ERROR_MSG) && count($ERROR_MSG)>0)
 		{
-			echo "<p align=center class=\"error\">";
-			while($val = array_shift($ERROR_MSG))
+			switch($page["type"])
 			{
-				echo $val.BR;
+				case PAGE_TYPE_IMAGE:
+					while($val = array_shift($ERROR_MSG))
+					{
+						array_push($message, array(
+							'text'	=> $val,
+							'color'	=> array('R'=>255,'G'=>55,'B'=>55),
+							'font'	=> 2));
+						$width = max($width, ImageFontWidth(2) * strlen($val) + 1);
+						$height += imagefontheight(2) + 1;
+					}
+					break;			
+				case PAGE_TYPE_HTML:
+					echo "<p align=center class=\"error\">";
+					while($val = array_shift($ERROR_MSG))
+					{
+						echo $val.BR;
+					}
+					echo "</p>";
+					break;
 			}
-			echo "</p>";
+		}
+
+		if($page["type"] == PAGE_TYPE_IMAGE && count($message) > 0)
+		{
+			$width += 2;
+			$height += 2;
+			$canvas = imagecreate($width, $height);
+			ImageFilledRectangle($canvas,0,0,$width,$height, ImageColorAllocate($canvas, 255, 255, 255));
+
+			foreach($message as $id => $msg)
+			{
+				$message[$id]['y'] = 1 + (isset($previd) ? $message[$previd]['y'] + $message[$previd]['h'] : 0 );
+				$message[$id]['h'] = imagefontheight($msg['font']);
+				
+				ImageString(
+					$canvas,
+					$msg['font'],
+					1,
+					$message[$id]['y'],
+					$msg['text'],
+					ImageColorAllocate($canvas, $msg['color']['R'], $msg['color']['G'], $msg['color']['B'])
+					);
+				
+				$previd = $id;
+			}
+			ImageOut($canvas);
+			ImageDestroy($canvas);
 		}
 	}
 

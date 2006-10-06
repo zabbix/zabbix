@@ -20,40 +20,36 @@
 ?>
 <?php
 	require_once "include/config.inc.php";
+	require_once "include/triggers.inc.php";
 
-	$page["file"] = "chart4.php";
-	$page["title"] = "S_CHART";
+	$page["file"]	= "chart4.php";
+	$page["title"]	= "S_CHART";
 	$page["type"]	= PAGE_TYPE_IMAGE;
-        show_header();
+
+include "include/page_header.php";
+
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"year"=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	NULL,		NULL),
-		"period"=>		array(T_ZBX_STR, O_OPT,	P_SYS|P_NZERO,	IN('"dayly","weekly","monthly","yearly"'),		NULL),
-		"media_type"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		NULL)
+		"triggerid"=>		array(T_ZBX_INT, O_MAND,P_SYS,	DB_ID,		NULL)
 	);
 
 	check_fields($fields);
 ?>
 <?php
-#	PARAMETERS:
-	
-#	itemid
-#	type
+	$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_LIST, PERM_MODE_LE);
 
-	$start_time=time(NULL);
-
-	$_REQUEST["type"] = get_request("type", "week");
-
-	switch($_REQUEST["type"])
+	if(! ($db_data = DBfetch(DBselect('select distinct  t.triggerid,t.description,h.host,h.hostid '.
+			' from hosts h, items i, functions f, triggers t'.
+			' where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid='.$_REQUEST["triggerid"].
+			' and i.hostid not in ('.$denyed_hosts.') '
+			))))
 	{
-		case "month":	$period=30*24*3600;	break;
-		case "year":	$period=365*24*3600;	break;
-		case "week":
-		default:
-				$period=7*24*3600;	break;
+		access_deny();
 	}
+
+	$start_time = time(NULL);
 
 	$sizeX		= 900;
 	$sizeY		= 300;
@@ -63,7 +59,6 @@
 	$shiftYdown	= 25+15*3;
 
 	$im = imagecreate($sizeX+$shiftX+61,$sizeY+$shiftYup+$shiftYdown+10); 
-	access_deny(PAGE_TYPE_IMAGE, $im);
 	
 	$red		= ImageColorAllocate($im,255,0,0); 
 	$darkred	= ImageColorAllocate($im,150,0,0); 
@@ -85,22 +80,13 @@
 	ImageFilledRectangle($im,0,0,$x,$y,$white);
 	ImageRectangle($im,0,0,$x-1,$y-1,$black);
 
-	if(!check_right_on_trigger(PERM_READ_ONLY,$_REQUEST["triggerid"]))
-	{
-		access_deny(PAGE_TYPE_IMAGE, $im);
-	}
+	$str = expand_trigger_description_by_data($db_data);
 
-
-	$str=expand_trigger_description($_REQUEST["triggerid"]);
-
-	$str=$str." (year ".date("Y").")";
-	$x=imagesx($im)/2-ImageFontWidth(4)*strlen($str)/2;
+	$str = $str." (year ".date("Y").")";
+	$x = imagesx($im)/2-ImageFontWidth(4)*strlen($str)/2;
 	ImageString($im, 4,$x,1, $str , $darkred);
 
 	$now = time(NULL);
-	$to_time=$now;
-	$from_time=$to_time-$period;
-	$from_time_now=$to_time-24*3600;
 
 	$count_now=array();
 	$true=array();
@@ -122,8 +108,6 @@
 		$false[$i]=$stat["false"];
 		$unknown[$i]=$stat["unknown"];
 		$count_now[$i]=1;
-
-//		echo $true[$i]." ".$false[$i]."<br>";
 	}
 
 	for($i=0;$i<=$sizeY;$i+=$sizeY/10)
@@ -196,5 +180,7 @@
 	ImageDestroy($im); 
 ?>
 <?php
-	show_page_footer();
+
+include "include/page_footer.php";
+
 ?>

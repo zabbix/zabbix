@@ -21,9 +21,6 @@
 <?php
 	function	add_service($name,$triggerid,$algorithm,$showsla,$goodsla,$sortorder,$service_times=array())
 	{
-
-var_dump($service_times);
-
 		if(is_null($triggerid)) $triggerid = 'NULL';
 
 		$serviceid=get_dbid("services","serviceid");
@@ -483,20 +480,18 @@ SDI(
 
 	function	get_num_of_service_childs($serviceid)
 	{
-		$sql="select count(*) as cnt from services_links where serviceupid=$serviceid";
-		$result=DBselect($sql);
-		$row=DBfetch($result);
+		$row = DBfetch(DBselect("select count(*) as cnt from services_links where serviceupid=$serviceid"));
 		return	$row["cnt"];
 	}
 
 	function	get_service_by_serviceid($serviceid)
 	{
-		$sql="select * from services where serviceid=$serviceid";
-		$result=DBselect($sql);
-		$res = DBfetch($result);
+		access_deny(); /* TODO - permission system */
+		
+		$res = DBfetch(DBselect("select * from services where serviceid=".$serviceid));
 		if(!$res)
 		{
-			error("No service with serviceid=[$serviceid]");
+			error("No service with serviceid=[".$serviceid."]");
 			return	FALSE;
 		}
 		return $res;

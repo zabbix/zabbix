@@ -30,6 +30,7 @@
 		$str_resource[AUDIT_RESOURCE_GRAPH_ELEMENT]	= S_GRAPH_ELEMENT;
 		$str_resource[AUDIT_RESOURCE_USER_GROUP] 	= S_USER_GROUP;
 		$str_resource[AUDIT_RESOURCE_APPLICATION] 	= S_APPLICATION;
+		$str_resource[AUDIT_RESOURCE_TRIGGER] 		= S_TRIGGER;
 
 		if(isset($str_resource[$resource_type]))
 			return $str_resource[$resource_type];

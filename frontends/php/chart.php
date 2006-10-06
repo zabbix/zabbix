@@ -20,33 +20,50 @@
 ?>
 <?php
 	require_once "include/config.inc.php";
-	require_once "include/hosts.inc.php";
-	require_once "include/items.inc.php";
 	require_once "include/classes/graph.inc.php";
+	
+	$page["file"]	= "chart.php";
+	$page["title"]	= "S_CHART";
+	$page["type"]	= PAGE_TYPE_IMAGE;
 
-	$graph=new Graph();
-	if(isset($_REQUEST["period"]))
+include "include/page_header.php";
+
+?>
+<?php
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"itemid"=>		array(T_ZBX_INT, O_MAND,P_SYS,	DB_ID,		null),
+		"period"=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(3600,365*24*3600),	null),
+		"from"=>		array(T_ZBX_INT, O_OPT,	null,	'{}>=0',	null),
+		"width"=>		array(T_ZBX_INT, O_OPT,	null,	'{}>0',		null),
+		"height"=>		array(T_ZBX_INT, O_OPT,	null,	'{}>0',		null),
+		"border"=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null)
+	);
+
+	check_fields($fields);
+?>
+<?php
+	if(! ($db_data = DBfetch(DBselect("select i.itemid from items i ".
+		" where i.hostid in (".get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_ONLY).") ".
+		" and i.itemid=".$_REQUEST["itemid"]))))
 	{
-		$graph->setPeriod($_REQUEST["period"]);
+		access_deny();
 	}
-	if(isset($_REQUEST["from"]))
-	{
-		$graph->setFrom($_REQUEST["from"]);
-	}
-	if(isset($_REQUEST["width"]))
-	{
-		$graph->setWidth($_REQUEST["width"]);
-	}
-	if(isset($_REQUEST["height"]))
-	{
-		$graph->setHeight($_REQUEST["height"]);
-	}
-	if(isset($_REQUEST["border"]))
-	{
-		$graph->setBorder(0);
-	}
-	$graph->addItem($_REQUEST["itemid"], GRAPH_YAXIS_SIDE_RIGHT, CALC_FNC_ALL);
+
+	$graph = new Graph();
+	
+	if(isset($_REQUEST["period"]))		$graph->SetPeriod($_REQUEST["period"]);
+	if(isset($_REQUEST["from"]))		$graph->SetFrom($_REQUEST["from"]);
+	if(isset($_REQUEST["width"]))		$graph->SetWidth($_REQUEST["width"]);
+	if(isset($_REQUEST["height"]))		$graph->SetHeight($_REQUEST["height"]);
+	if(isset($_REQUEST["border"]))		$graph->SetBorder(0);
+	
+	$graph->AddItem($_REQUEST["itemid"], GRAPH_YAXIS_SIDE_RIGHT, CALC_FNC_ALL);
 
 	$graph->Draw();
 ?>
+<?php
 
+include "include/page_footer.php";
+
+?>

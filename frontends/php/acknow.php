@@ -45,45 +45,48 @@ include "include/page_header.php";
 <?php
 	$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_LIST, PERM_MODE_LE);
 	
-	if(! ($db_data = DBfetch(DBselect('select * from items i, functions f, events e '.
-	                        ' where i.itemid=f.itemid and f.triggerid=e.triggerid and e.eventid='.$_REQUEST["eventid"].
-				" and i.hostid not in (".$denyed_hosts.")".
-				" and ".DBid2nodeid("e.eventid")."=".$ZBX_CURNODEID
-				))))
+	if(! ($db_data = DBfetch(DBselect('select distinct  e.*,t.triggerid,t.expression,t.description,h.host,h.hostid '.
+			' from hosts h, items i, functions f, events e, triggers t'.
+			' where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=e.triggerid and e.eventid='.$_REQUEST["eventid"].
+			' and i.hostid not in ('.$denyed_hosts.') and e.triggerid=t.triggerid'.
+			' and '.DBid2nodeid('e.eventid').'='.$ZBX_CURNODEID
+			))))
 	{
 		access_deny();
 	}
-	$trigger_hostid = $db_data['hostid'];
+	unset($denyed_hosts);
 
 	if(isset($_REQUEST["save"]))
 	{
 		$result = add_acknowledge_coment(
-			$_REQUEST["eventid"],
+			$db_data["eventid"],
 			$USER_DETAILS["userid"],
 			$_REQUEST["message"]);
 
 		show_messages($result, S_COMMENT_ADDED, S_CANNOT_ADD_COMMENT);
+		if($result)
+		{
+			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_TRIGGER, S_ACKNOWLEDGE_ADDED.
+				' ['.expand_trigger_description_by_data($db_data).']'.
+				' ['.$_REQUEST["message"].']');
+		}
 	}
 	else if(isset($_REQUEST["cancel"]))
 	{
-		Redirect('tr_status.php?hostid='.$trigger_hostid);
+		Redirect('tr_status.php?hostid='.$db_data['hostid']);
 		exit;
 	}
 ?>
 <?php
-
-	$event 		= get_event_by_eventid($_REQUEST["eventid"]);
-	$trigger	= get_trigger_by_triggerid($event["triggerid"]);
-	$expression	= explode_exp($trigger["expression"],1);
-	$description	= expand_trigger_description($event["triggerid"]);
-
-	show_table_header(S_ALARM_ACKNOWLEDGES_BIG." : \"".$description."\"".BR.$expression);
+	show_table_header(S_ALARM_ACKNOWLEDGES_BIG." : ".
+		"\"".expand_trigger_description_by_data($db_data)."\"".BR.
+		explode_exp($db_data["expression"],1));
 
 	echo BR;
 	$table = new CTable(NULL,"ack_msgs");
 	$table->SetAlign("center");
 
-	$db_acks = get_acknowledges_by_eventid($_REQUEST["eventid"]);
+	$db_acks = get_acknowledges_by_eventid($db_data["eventid"]);
 	while($db_ack = DBfetch($db_acks))
 	{
 		$db_user = get_user_by_userid($db_ack["userid"]);

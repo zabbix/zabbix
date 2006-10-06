@@ -18,6 +18,7 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 	global $USER_DETAILS;
+	global $page;
 
 	if($page['type'] == PAGE_TYPE_HTML)
 	{

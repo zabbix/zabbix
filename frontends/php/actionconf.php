@@ -25,9 +25,11 @@
 	require_once "include/triggers.inc.php";
 	require_once "include/forms.inc.php";
 
-	$page["title"]="S_CONFIGURATION_OF_ACTIONS";
-	$page["file"]="actionconf.php";
-	show_header($page["title"],0,0);
+	$page["title"]	= "S_CONFIGURATION_OF_ACTIONS";
+	$page["file"]	= "actionconf.php";
+
+include "include/page_header.php";
+	
 	insert_confirm_javascript();
 
 	$_REQUEST["actiontype"] = get_request("actiontype",get_profile("web.actionconf.actiontype",0));
@@ -171,38 +173,60 @@
 	elseif(isset($_REQUEST["group_enable"])&&isset($_REQUEST["g_actionid"]))
 	{
 		$result=DBselect("select distinct actionid from actions".
-				" where ".DBid2nodeid("actionid")."=".$ZBX_CURNODEID);
+				" where ".DBid2nodeid("actionid")."=".$ZBX_CURNODEID.
+				" and actionid in (".implode($_REQUEST["g_actionid"]).") "
+				);
+		
+		$actionids = array();
 		while($row=DBfetch($result))
 		{
-			if(!in_array($row["actionid"], $_REQUEST["g_actionid"]))	continue;
-			$res=update_action_status($row["actionid"],0);
+			$res = update_action_status($row["actionid"],0);
+			if($res)
+				array_push($row["actionid"], $actionids);
 		}
 		if(isset($res))
+		{
 			show_messages(true, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',',$actionids).'] enabled');
+		}
 	}
 	elseif(isset($_REQUEST["group_disable"])&&isset($_REQUEST["g_actionid"]))
 	{
 		$result=DBselect("select distinct actionid from actions".
-				" where ".DBid2nodeid("actionid")."=".$ZBX_CURNODEID);
+				" where ".DBid2nodeid("actionid")."=".$ZBX_CURNODEID.
+				" and actionid in (".implode($_REQUEST["g_actionid"]).") "
+				);
+		$actionids = array();
 		while($row=DBfetch($result))
 		{
-			if(!in_array($row["actionid"], $_REQUEST["g_actionid"]))	continue;
-			$res=update_action_status($row["actionid"],1);
+			$res = update_action_status($row["actionid"],1);
+			if($res) 
+				array_push($row["actionid"], $actionids);
 		}
 		if(isset($res))
+		{
 			show_messages(true, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',',$actionids).'] disabled');
+		}
 	}
 	elseif(isset($_REQUEST["group_delete"])&&isset($_REQUEST["g_actionid"]))
 	{
 		$result=DBselect("select distinct actionid from actions".
-				" where ".DBid2nodeid("actionid")."=".$ZBX_CURNODEID);
+				" where ".DBid2nodeid("actionid")."=".$ZBX_CURNODEID.
+				" and actionid in (".implode($_REQUEST["g_actionid"]).") "
+				);
+		$actionids = array();
 		while($row=DBfetch($result))
 		{
-			if(!in_array($row["actionid"], $_REQUEST["g_actionid"])) continue;
 			$del_res = delete_action($row["actionid"]);
+			if($del_res) 
+				array_push($row["actionid"], $actionids);
 		}
 		if(isset($del_res))
+		{
 			show_messages(TRUE, S_ACTIONS_DELETED, S_CANNOT_DELETE_ACTIONS);
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',',$actionids).'] deleted');
+		}
 	}
 ?>
 
@@ -254,8 +278,10 @@
 				" order by conditiontype");
 			while($condition=DBfetch($result2))
 			{
-				$conditions=$conditions.get_condition_desc($condition["conditiontype"],
-					$condition["operator"],$condition["value"]).BR;
+				$conditions .= get_condition_desc(
+							$condition["conditiontype"],
+							$condition["operator"],
+							$condition["value"]).BR;
 			}
 
 				
@@ -263,13 +289,13 @@
 			{			
 				if($row["recipient"] == RECIPIENT_TYPE_USER)
 				{
-					$user=get_user_by_userid($row["userid"]);
-					$recipient=$user["alias"];
+					$user		= get_user_by_userid($row["userid"]);
+					$recipient	= $user["alias"];
 				}
 				else
 				{
-					$groupd=get_group_by_usrgrpid($row["userid"]);
-					$recipient=$groupd["name"];
+					$groupd		= get_group_by_usrgrpid($row["userid"]);
+					$recipient	= $groupd["name"];
 				}
 				$subject = htmlspecialchars($row["subject"]);
 			}elseif($_REQUEST["actiontype"] == ACTION_TYPE_COMMAND)
@@ -324,6 +350,9 @@
 		$form->AddItem($tblActions);
 		$form->Show();
 	}
+?>
+<?php
 
-	show_page_footer();
+	include "include/page_footer.php";
+
 ?>
