@@ -22,7 +22,7 @@
 --
 
 CREATE TABLE nodes (
-	nodeid			{bigint}		DEFAULT '0' NOT NULL,
+	nodeid			{integer}		DEFAULT '0' NOT NULL,
 	name			{varchar}(64)		DEFAULT '' NOT NULL,
 	timezone		{integer}		DEFAULT '0' NOT NULL,
 	ip			{varchar}(15)		DEFAULT '' NOT NULL,
@@ -302,6 +302,17 @@ CREATE TABLE history_uint (
 
 CREATE INDEX history_uint_1 ON history_uint (itemid, clock);
 
+CREATE TABLE history_uint_sync (
+	id			{serial},
+	nodeid			{integer}			DEFAULT '0' NOT NULL,
+	itemid			{bigint}		DEFAULT '0' NOT NULL,
+	clock			{integer}		DEFAULT '0' NOT NULL,
+	value			{bigint}		DEFAULT '0' NOT NULL,
+	PRIMARY KEY (id)
+) {create_table_opt};
+
+CREATE INDEX history_uint_sync_1 ON history_uint_sync (nodeid, id);
+
 CREATE TABLE history_str (
 	itemid			{bigint}		DEFAULT '0' NOT NULL,
 	clock			{integer}		DEFAULT '0' NOT NULL,
@@ -309,6 +320,17 @@ CREATE TABLE history_str (
 ) {create_table_opt};
 
 CREATE INDEX history_str_1 ON history_str (itemid, clock);
+
+CREATE TABLE history_str_sync (
+	id			{serial},
+	nodeid			{integer}			DEFAULT '0' NOT NULL,
+	itemid			{bigint}		DEFAULT '0' NOT NULL,
+	clock			{integer}		DEFAULT '0' NOT NULL,
+	value			{varchar}(255)	DEFAULT '' NOT NULL,
+	PRIMARY KEY (id)
+) {create_table_opt};
+
+CREATE INDEX history_str_sync_1 ON history_str_sync (nodeid, id);
 
 CREATE TABLE hosts (
 	hostid			{bigint}			DEFAULT '0' NOT NULL,
