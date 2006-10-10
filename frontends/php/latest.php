@@ -174,7 +174,7 @@ include "include/page_header.php";
 	}
 
 	$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
-	show_header2(S_LATEST_DATA_BIG,$r_form);
+	show_table_header(S_LATEST_DATA_BIG,$r_form);
 
 	$r_form = new CForm();
 
@@ -184,7 +184,7 @@ include "include/page_header.php";
 	$r_form->AddItem(array(S_SHOW_ITEMS_WITH_DESCRIPTION_LIKE, new CTextBox("select",$_REQUEST["select"],20)));
 	$r_form->AddItem(array(SPACE, new CButton("show",S_SHOW)));
 
-	show_header2(NULL, $r_form);
+	show_table_header(NULL, $r_form);
 ?>
 <?php
 	if(isset($show_all_apps))

@@ -74,7 +74,7 @@ include "include/page_header.php";
 		$form->AddItem($cmbYear);
 	}
 	
-        show_header2(S_NOTIFICATIONS_BIG, $form);
+        show_table_header(S_NOTIFICATIONS_BIG, $form);
 ?>
 <?php
 	$_REQUEST["year"]	= $year;
@@ -172,7 +172,6 @@ include "include/page_header.php";
 		$table->AddRow(new CSpan(SPACE.SPACE.SPACE.SPACE.SPACE.SPACE."all".SPACE."(".implode('/', $media_types).")","off"));
 		$table->Show();
 	}
-	show_page_footer();
 ?>
 <?php
 

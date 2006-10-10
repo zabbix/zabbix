@@ -1875,16 +1875,18 @@
 
 		if(isset($_REQUEST["mediatypeid"]) && !isset($_REQUEST["form_refresh"]))
 		{
-			$result=DBselect("select mediatypeid,type,description,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem from media_type where mediatypeid=".$_REQUEST["mediatypeid"]);
-			$row=DBfetch($result);
-			$mediatypeid=$row["mediatypeid"];
-			$type=@iif(isset($_REQUEST["type"]),$_REQUEST["type"],$row["type"]);
-			$description=$row["description"];
-			$smtp_server=$row["smtp_server"];
-			$smtp_helo=$row["smtp_helo"];
-			$smtp_email=$row["smtp_email"];
-			$exec_path=$row["exec_path"];
-			$gsm_modem=$row["gsm_modem"];
+			$result = DBselect("select mediatypeid,type,description,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem ".
+				"from media_type where mediatypeid=".$_REQUEST["mediatypeid"]);
+
+			$row = DBfetch($result);
+			$mediatypeid	= $row["mediatypeid"];
+			$type		= get_request("type",$row["type"]);
+			$description	= $row["description"];
+			$smtp_server	= $row["smtp_server"];
+			$smtp_helo	= $row["smtp_helo"];
+			$smtp_email	= $row["smtp_email"];
+			$exec_path	= $row["exec_path"];
+			$gsm_modem	= $row["gsm_modem"];
 		}
 
 		$frmMeadia = new CFormTable(S_MEDIA);
@@ -2741,7 +2743,7 @@
 	# Insert host profile ReadOnly form
 	function	insert_host_profile_form()
 	{
-		$frmHostP = new CFormTable(S_HOST_PROFILE,"hosts.php");
+		$frmHostP = new CFormTable(S_HOST_PROFILE);
 		$frmHostP->SetHelp("web.host_profile.php");
 
 		$result=DBselect("select * from hosts_profiles where hostid=".$_REQUEST["hostid"]);
@@ -2778,6 +2780,7 @@
 		{
 			$frmHostP->AddSpanRow("Profile for this host is missing","form_row_c");
 		}
+		$frmHostP->AddItemToBottomRow(new CButtonCancel(url_param("groupid")));
 		$frmHostP->Show();
 	}
 

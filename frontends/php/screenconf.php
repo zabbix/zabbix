@@ -25,7 +25,9 @@
 
 	$page["title"] = "S_SCREENS";
 	$page["file"] = "screenconf.php";
-	show_header($page["title"],0,0);
+
+include "include/page_header.php";
+	
 	insert_confirm_javascript();
 ?>
 <?php
@@ -55,7 +57,7 @@
 <?php
 	$form = new CForm("screenconf.php");
 	$form->AddItem(new CButton("form",S_CREATE_SCREEN));
-	show_header2(S_CONFIGURATION_OF_SCREENS_BIG, $form);
+	show_table_header(S_CONFIGURATION_OF_SCREENS_BIG, $form);
 	echo BR;
 
 	if(isset($_REQUEST["form"]))
@@ -64,7 +66,7 @@
 	}
 	else
 	{
-		show_header2(S_SCREENS_BIG);
+		show_table_header(S_SCREENS_BIG);
 
 		$table = new CTableInfo(S_NO_SCREENS_DEFINED);
 		$table->setHeader(array(S_NAME,S_DIMENSION_COLS_ROWS,S_SCREEN));
@@ -87,5 +89,7 @@
 ?>
 
 <?php
-	show_page_footer();
+
+include "include/page_footer.php";
+
 ?>

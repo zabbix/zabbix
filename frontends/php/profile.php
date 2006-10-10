@@ -26,18 +26,37 @@
 	$page["title"] = "S_USER_PROFILE";
 	$page["file"] = "profile.php";
 
-	show_header($page["title"],0,0);
+include "include/page_header.php";
+
 	insert_confirm_javascript();
 ?>
-
 <?php
 	if($USER_DETAILS["alias"]=="guest")
 	{
 		access_deny();
-		exit;
 	}
 ?>
+<?php
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"password1"=>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})&&{form}!="update"&&isset({change_password})'),
+		"password2"=>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})&&{form}!="update"&&isset({change_password})'),
+		"lang"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})'),
+		"autologout"=>  array(T_ZBX_INT, O_OPT, null,   BETWEEN(0,3600),'isset({save})'),
+		"url"=>		array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
+		"refresh"=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,3600),'isset({save})'),
+		"change_password"=>	array(T_ZBX_STR, O_OPT,	null,	null,	null),
+/* actions */
+		"save"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"cancel"=>	array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+/* other */
+		"form"=>	array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		"form_refresh"=>array(T_ZBX_STR, O_OPT, null,	null,	null)
+	);
 
+
+	check_fields($fields);
+?>
 <?php
 	if(isset($_REQUEST["cancel"]))
 	{
@@ -54,34 +73,27 @@
 		}
 		elseif($_REQUEST["password1"]==$_REQUEST["password2"])
 		{
-			$result=update_user_profile($_REQUEST["userid"],$_REQUEST["password1"],$_REQUEST["url"],$_REQUEST["autologout"],$_REQUEST["lang"],$_REQUEST["refresh"]);
+			$result=update_user_profile($USER_DETAILS["userid"],$_REQUEST["password1"],$_REQUEST["url"],$_REQUEST["autologout"],$_REQUEST["lang"],$_REQUEST["refresh"]);
 			show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
 			if($result)
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_USER,
 					"User alias [".$USER_DETAILS["alias"].
 					"] name [".$USER_DETAILS["name"]."] surname [".
-					$USER_DETAILS["surname"]."] profile id [".$_REQUEST["userid"]."]");
+					$USER_DETAILS["surname"]."] profile id [".$USER_DETAILS["userid"]."]");
 		}
 		else
 		{
 			show_error_message(S_CANNOT_UPDATE_USER_BOTH_PASSWORDS);
 		}
 	}
-	if(isset($_REQUEST["save"]))
-	{
-		unset($_REQUEST["userid"]);
-	}
 ?>
-
 <?php
 	show_table_header(S_USER_PROFILE_BIG." : ".$USER_DETAILS["name"]." ".$USER_DETAILS["surname"]);
 	echo "<br>";
-?>
-
-<?php
 	insert_user_form($USER_DETAILS["userid"],1);
 ?>
-
 <?php
-	show_page_footer();
+
+include "include/page_footer.php";
+
 ?>

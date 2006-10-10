@@ -169,11 +169,11 @@ COpt::savesqlrequest($query);
 				error("Query: $query");
 			}
 		}
-		if($DB_TYPE == "POSTGRESQL")
+		else if($DB_TYPE == "POSTGRESQL")
 		{
 			$result=pg_exec($DB,$query);
 		}
-		if($DB_TYPE == "ORACLE")
+		else if($DB_TYPE == "ORACLE")
 		{
 
 			return DBselect($query);

@@ -59,9 +59,9 @@ include "include/page_header.php";
 				//    that are not in the DB, the bulk loader will create new groups with the names defined in this field.
 				
 				list($tmpHost,$tmpHostIP,$tmpHostPort,$tmpHostStat,$tmpHostTemplate,$tmpHostServer,$tmpHostGroups) = explode(",",$tmpField,7);
-				$hostName=@iif($tmpHost==NULL,'Unknown',$tnpHost);
-				$hostUseIP=@iif($tmpHostIP==NULL,'off','on');
-				$hostPort=@iif($tmpHostPort==NULL,10050,$tmpHostPort);
+				$hostName	= (null==$tmpHost)		? 'Unknown' 	: $tnpHost;
+				$hostUseIP	= (null==$tmpHostIP)		? 'off' 	: 'on';
+				$hostPort	= (null==$tmpHostPort)	? 10050 	: $tmpHostPort;
 
 				//  Determine what type of host this is
 				switch($tmpHostStat)
@@ -112,11 +112,11 @@ include "include/page_header.php";
 				break;
 			case "USER":
 				list($tmpName,$tmpSurname,$tmpAlias,$tmpPasswd,$tmpURL,$tmpAutologout,$tmpLang,$tmpRefresh,$tmpUserGroups) = explode(",",$tmpField,9);
-				$autologout=@iif($tmpAutologout==NULL,900,$tmpAutologout);
-				$lang=@iif($tmpLang==NULL,'en_gb',$tmpLang);
-				$refresh=@iif($tmpRefresh==NULL,30,$tmpRefresh);
-				$passwd=@iif($tmpPasswd==NULL,md5($tmpAlias),md5($tmpPasswd));
-				$result=@iif($tmpAlias==NULL,0,add_user($tmpName,$tmpSurname,$tmpAlias,$passwd,$tmpURL,$autologout,$lang,$refresh));
+				$autologout	= ($tmpAutologout==NULL) ? 900 : $tmpAutologout;
+				$lang		= ($tmpLang==NULL) ? 'en_gb' : $tmpLang;
+				$refresh	= ($tmpRefresh==NULL) ? 30 : $tmpRefresh;
+				$passwd		= ($tmpPasswd==NULL) ? md5($tmpAlias) : md5($tmpPasswd);
+				$result		= ($tmpAlias==NULL) ? 0 : add_user($tmpName,$tmpSurname,$tmpAlias,$passwd,$tmpURL,$autologout,$lang,$refresh));
 				show_messages($result, S_USER_ADDED .': '. $tmpAlias, S_CANNOT_ADD_USER .': '. $tmpAlias);
 				$row=DBfetch(DBselect("select distinct(userid) from users where alias='$tmpAlias'"));
 				$tmpUserID=$row["userid"];

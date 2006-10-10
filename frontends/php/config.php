@@ -27,7 +27,8 @@
 	$page["title"] = "S_CONFIGURATION_OF_ZABBIX";
 	$page["file"] = "config.php";
 
-	show_header($page["title"],0,0);
+include "include/page_header.php";
+
 	insert_confirm_javascript();
 ?>
 <?php
@@ -119,7 +120,7 @@
 			show_messages($result, $msg_ok, $msg_fail);
 			if($result)
 			{
-				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,$audit_action);
+				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_IMAGE,$audit_action);
 				unset($_REQUEST["form"]);
 			}
 		} elseif(isset($_REQUEST["delete"])&&isset($_REQUEST["imageid"])) {
@@ -130,7 +131,7 @@
 			show_messages($result, S_IMAGE_DELETED, S_CANNOT_DELETE_IMAGE);
 			if($result)
 			{
-				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,"Image [".$image['name']."] deleted");
+				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_IMAGE,"Image [".$image['name']."] deleted");
 				unset($_REQUEST["form"]);
 			}
 			unset($_REQUEST["imageid"]);
@@ -235,26 +236,40 @@
 			if(isset($_REQUEST["valuemapid"]))
 			{
 				$result = update_valuemap($_REQUEST["valuemapid"],$_REQUEST["mapname"], $mapping);
-				$msg_ok = S_VALUE_MAP_UPDATED;
-				$msg_fail = S_CANNNOT_UPDATE_VALUE_MAP;
+				$audit_action	= AUDIT_ACTION_UPDATE;
+				$msg_ok		= S_VALUE_MAP_UPDATED;
+				$msg_fail	= S_CANNNOT_UPDATE_VALUE_MAP;
+				$valuemapid	= $_REQUEST["valuemapid"];
 			}
 			else
 			{
 				$result = add_valuemap($_REQUEST["mapname"], $mapping);
-				$msg_ok = S_VALUE_MAP_ADDED;
-				$msg_fail = S_CANNNOT_ADD_VALUE_MAP;
+				$audit_action	= AUDIT_ACTION_ADD;
+				$msg_ok		= S_VALUE_MAP_ADDED;
+				$msg_fail	= S_CANNNOT_ADD_VALUE_MAP;
+				$valuemapid	= $result;
 			}
 			if($result)
 			{
+				add_audit($audit_action, AUDIT_RESOURCE_VALUE_MAP,
+					S_VALUE_MAP." [".$_REQUEST["mapname"]."] [".$valuemapid."]");
 				unset($_REQUEST["form"]);
 			}
 			show_messages($result,$msg_ok, $msg_fail);
 		}
 		elseif(isset($_REQUEST["delete"]) && isset($_REQUEST["valuemapid"]))
 		{
-			$result = delete_valuemap($_REQUEST["valuemapid"]);
+			$result = false;
+
+			if(($map_data = DBfetch(DBselect("select * from valuemaps where ".DBid2nodeid("valuemapid")."=".$ZBX_CURNODEID.
+				" and valuemapid=".$_REQUEST["valuemapid"]))))
+			{
+				$result = delete_valuemap($_REQUEST["valuemapid"]);
+			}
 			if($result)
 			{
+				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_VALUE_MAP,
+					S_VALUE_MAP." [".$map_data["name"]."] [".$map_data['valuemapid']."]");
 				unset($_REQUEST["form"]);
 			}
 			show_messages($result, S_VALUE_MAP_DELETED, S_CANNNOT_DELETE_VALUE_MAP);
@@ -290,7 +305,7 @@
 		$form->AddItem(new CButton("form",S_CREATE_VALUE_MAP));
 		break;
 	}
-	show_header2(S_CONFIGURATION_OF_ZABBIX_BIG, $form);
+	show_table_header(S_CONFIGURATION_OF_ZABBIX_BIG, $form);
 	echo BR;
 ?>
 
@@ -420,7 +435,8 @@
 		}
 	}
 ?>
-
 <?php
-	show_page_footer();
+
+include "include/page_footer.php";
+
 ?>

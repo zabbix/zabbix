@@ -189,7 +189,7 @@ include "include/page_header.php";
 	$r_form->AddVar("sort",$sort);
 	if(isset($_REQUEST['fullscreen'])) $r_form->AddVar("fullscreen",1);
 
-	show_header2(
+	show_table_header(
 		new CLink(SPACE.S_STATUS_OF_TRIGGERS_BIG.SPACE.date("[H:i:s]",time()),"tr_status.php?onlytrue=$onlytrue&noactions=$noactions".
 			"&compact=$compact&sort=$sort".(!isset($_REQUEST["fullscreen"]) ? '&fullscreen=1' : '')),
 		$r_form);
@@ -311,7 +311,7 @@ include "include/page_header.php";
 		" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.status=".TRIGGER_STATUS_ENABLED.
 		" and t.description $select_cond and i.status=".ITEM_STATUS_ACTIVE.
 		" and ".DBid2nodeid("t.triggerid")."=".$ZBX_CURNODEID.
-		" and h.hostid not in (".get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_LIST, PERM_MODE_LE).") ". 
+		" and h.hostid not in (".get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_ONLY, PERM_MODE_LT).") ". 
 		" and h.status=".HOST_STATUS_MONITORED." $cond $sort");
 
 	while($row=DBfetch($result))

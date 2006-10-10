@@ -304,10 +304,10 @@ require_once "include/items.inc.php";
 
 	function	delete_host_group($groupid)
 	{
-		$sql="delete from hosts_groups where groupid=$groupid";
-		DBexecute($sql);
-		$sql="delete from groups where groupid=$groupid";
-		return DBexecute($sql);
+		if(!DBexecute("delete from hosts_groups where groupid=$groupid"))
+			return FALSE;
+
+		return DBexecute("delete from groups where groupid=$groupid");
 	}
 
 	function	get_hostgroup_by_groupid($groupid)
@@ -390,9 +390,7 @@ require_once "include/items.inc.php";
 	{
 		if(!is_array($options))
 		{
-			error("Incorrest options for get_correct_group_and_host");
-			show_page_footer();
-			exit;
+			fatal_error("Incorrest options for get_correct_group_and_host");
 		}
 
 		global $USER_DETAILS;
@@ -429,7 +427,7 @@ require_once "include/items.inc.php";
 			{
 				if(!DBfetch(DBselect("select distinct g.groupid from groups g, hosts_groups hg, hosts h".$item_table.
 					" where hg.groupid=g.groupid and h.hostid=hg.hostid and h.hostid in (".$accessed_hosts.") ".
-					$with_host_status.$with_items)))
+					" and g.groupid=".$groupid.$with_host_status.$with_items)))
 				{
 					$groupid = 0;
 				}

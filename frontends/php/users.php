@@ -28,7 +28,8 @@
 	$page["title"] = "S_USERS";
 	$page["file"] = "users.php";
 
-	show_header($page["title"]);
+include "include/page_header.php";
+
 	insert_confirm_javascript();
 ?>
 <?php
@@ -47,8 +48,8 @@
 		"alias"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'{config}==0&&isset({save})'),
 		"name"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'{config}==0&&isset({save})'),
 		"surname"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'{config}==0&&isset({save})'),
-		"password1"=>	array(T_ZBX_STR, O_OPT,	null,	null,		'{config}==0&&isset({save})&&{form}!="update"'),
-		"password2"=>	array(T_ZBX_STR, O_OPT,	null,	null,		'{config}==0&&isset({save})&&{form}!="update"'),
+		"password1"=>	array(T_ZBX_STR, O_OPT,	null,	null,		'{config}==0&&isset({save})&&{form}!="update"&&isset({change_password})'),
+		"password2"=>	array(T_ZBX_STR, O_OPT,	null,	null,		'{config}==0&&isset({save})&&{form}!="update"&&isset({change_password})'),
 		"user_type"=>	array(T_ZBX_INT, O_OPT,	null,	IN('1,2,3'),	'{config}==0&&isset({save})'),
 		"user_groups"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'{config}==0&&isset({save})'),
 		"user_groups_to_del"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,	null),
@@ -347,7 +348,7 @@
 	$frmForm->AddItem($cmbConf);
 	$frmForm->AddItem(SPACE."|".SPACE);
 	$frmForm->AddItem($btnNew = new CButton("form",($_REQUEST["config"] == 0) ? S_CREATE_USER : S_CREATE_GROUP));
-	show_header2(S_CONFIGURATION_OF_USERS_AND_USER_GROUPS, $frmForm);
+	show_table_header(S_CONFIGURATION_OF_USERS_AND_USER_GROUPS, $frmForm);
 	echo BR; 
 ?>
 <?php
@@ -463,5 +464,7 @@
 	}
 ?>
 <?php
-	show_page_footer();
+
+include "include/page_footer.php"
+
 ?>

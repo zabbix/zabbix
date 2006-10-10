@@ -23,7 +23,10 @@
 
 	$page["title"] = "S_RESOURCE";
 	$page["file"] = "popup_right.php";
-	show_header($page["title"],0,1);
+
+	define('ZBX_PAGE_NO_MENU', 1);
+	
+include	"include/page_header.php";
 
 	insert_confirm_javascript();
 ?>
@@ -87,7 +90,7 @@ function add_right(formname,type,id,permission,name)
 	$frmTitle->AddItem(array(
 		S_RESOURCE_TYPE, SPACE,
 		$cmbResourceType));
-	show_header2(permission2str($permission),$frmTitle);
+	show_table_header(permission2str($permission),$frmTitle);
 
 	$table = new CTableInfo(S_NO_RESOURCES_DEFINED);
 	$table->SetHeader(array(S_NAME));
@@ -117,6 +120,9 @@ function add_right(formname,type,id,permission,name)
 	}
 
 	$table->Show();
-	
-	show_page_footer(false);
+?>
+<?php
+
+include	"include/page_footer.php";
+
 ?>

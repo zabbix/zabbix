@@ -22,36 +22,34 @@
 	require_once "include/config.inc.php";
 	require_once "include/maps.inc.php";
 
-/*
 	$page["title"] = "S_MAP";
 	$page["file"] = "map.php";
+	$page["type"] = PAGE_TYPE_IMAGE;
 
-	show_header($page["title"],0,1);
-*/
-// OR
-//*
-	require_once "include/locales/en_gb.inc.php";
-	process_locales();
-/**/
+include "include/page_header.php";
 
-#	PARAMETERS:
+?>
+<?php
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"sysmapid"=>	array(T_ZBX_INT, O_MAND,P_SYS,	DB_ID,		NULL),
+		"noedit"=>	array(T_ZBX_INT, O_OPT,	NULL,	IN('0,1'),	NULL),
+		"border"=>	array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1"),	NULL)
+	);
 
-#	sysmapid
-#	noedit
-
-	$grid=50;
-
-	$map	= get_sysmap_by_sysmapid($_REQUEST["sysmapid"]);
+	check_fields($fields);
+?>
+<?php
+	if(!($map	= get_sysmap_by_sysmapid($_REQUEST["sysmapid"],PERM_READ_ONLY))) /* TODO *//* permission system */
+	{
+		access_deny();
+	}
 
 	$name		= $map["name"];
 	$width		= $map["width"];
 	$height		= $map["height"];
 	$backgroundid	= $map["backgroundid"];
 	$label_type	= $map["label_type"];
-
-	set_image_header();
-
-	check_authorisation();
 
 	if(function_exists("imagecreatetruecolor")&&@imagecreatetruecolor(1,1))
 	{
@@ -103,14 +101,13 @@
 		ImageString($im, 4,$x,1, $name , $darkred);
 	}
 
-//	$x=imagesx($im)/2-ImageFontWidth(4)*strlen($name)/2;
-//	ImageString($im, 4,$x,1, $name , $colors["Dark Red"]);
-
 	$str=date("m.d.Y H:i:s",time(NULL));
 	ImageString($im, 0,imagesx($im)-120,imagesy($im)-12,"$str", $gray);
 
 	if(!isset($_REQUEST["noedit"]))
 	{
+		$grid = 50;
+
 		for($x=$grid;$x<$width;$x+=$grid)
 		{
 			MyDrawLine($im,$x,0,$x,$height,$black,GRAPH_DRAW_TYPE_DASHEDLINE);
@@ -277,9 +274,12 @@
 		ImageRectangle($im,0,0,$width-1,$height-1,$colors["Black"]);
 	}
 
-	
-	if(MAP_OUTPUT_FORMAT == "JPG")	ImageJPEG($im);
-	else				ImageOut($im); #default
+	ImageOut($im, MAP_OUTPUT_FORMAT);
 
 	ImageDestroy($im);
+?>
+<?php
+
+include "include/page_footer.php";
+
 ?>

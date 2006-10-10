@@ -25,7 +25,9 @@
 
 	$page["title"] = "S_NETWORK_MAPS";
 	$page["file"] = "sysmaps.php";
-	show_header($page["title"],0,0);
+
+include "include/page_header.php";
+
 	insert_confirm_javascript();
 ?>
 <?php
@@ -81,14 +83,12 @@
 		}
 	}
 ?>
-
 <?php
 	$form = new CForm();
 	$form->AddItem(new CButton("form",S_CREATE_MAP));
-	show_header2(S_CONFIGURATION_OF_NETWORK_MAPS, $form);
+	show_table_header(S_CONFIGURATION_OF_NETWORK_MAPS, $form);
 	echo BR;
 ?>
-
 <?php
 	if(isset($_REQUEST["form"]))
 	{
@@ -96,7 +96,7 @@
 	}
 	else
 	{
-		show_header2(S_MAPS_BIG);
+		show_table_header(S_MAPS_BIG);
 		$table = new CTableInfo(S_NO_MAPS_DEFINED);
 		$table->setHeader(array(S_NAME,S_WIDTH,S_HEIGHT,S_MAP));
 
@@ -115,7 +115,8 @@
 		$table->show();
 	}
 ?>
-
 <?php
-	show_page_footer();
+
+include "include/page_footer.php";
+
 ?>

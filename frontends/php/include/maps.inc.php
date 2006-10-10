@@ -25,9 +25,7 @@
 
 	function	get_sysmap_by_sysmapid($sysmapid)
 	{
-		$sql="select * from sysmaps where sysmapid=$sysmapid"; 
-		$result=DBselect($sql);
-		$row=DBfetch($result);
+		$row=DBfetch(DBselect("select * from sysmaps where sysmapid=$sysmapid"));
 		if($row)
 		{
 			return	$row;

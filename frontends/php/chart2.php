@@ -49,7 +49,7 @@ include "include/page_header.php";
 		" where g.graphid=".$_REQUEST["graphid"].
 		" and g.graphid=gi.graphid and gi.itemid=i.itemid and i.hostid=h.hostid ".
 		" and h.hostid not in (".
-			get_accessible_hosts_by_userid($USER_DETAILS['userid'], PERM_READ_LIST, PERM_MODE_LE).
+			get_accessible_hosts_by_userid($USER_DETAILS['userid'], PERM_READ_ONLY, PERM_MODE_LT).
 		")"))))
 	{
 		access_deny();

@@ -93,7 +93,7 @@ include "include/page_header.php";
 	$cmbType->AddItem(SHOW_DATA,	S_DATA);
 	$form->AddItem(array(S_TYPE.SPACE,$cmbType));
 
-	show_header2(S_OVERVIEW_BIG, $form);
+	show_table_header(S_OVERVIEW_BIG, $form);
 ?>
 
 <?php

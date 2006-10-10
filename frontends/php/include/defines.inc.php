@@ -36,8 +36,11 @@
 	define("P_NZERO",			32);
 
 //	MISC PARAMETERS
-	define("MAP_OUTPUT_FORMAT",		"DEFAULT");
-#	define("MAP_OUTPUT_FORMAT",		"JPG");
+	define("IMAGE_FORMAT_PNG",         	"PNG");
+	define("IMAGE_FORMAT_JPEG",         	"JPEG");
+	define("IMAGE_FORMAT_DEFAULT",         	IMAGE_FORMAT_PNG);
+	define("MAP_OUTPUT_FORMAT",		IMAGE_FORMAT_PNG);
+#	define("MAP_OUTPUT_FORMAT",		IMAGE_FORMAT_JPEG);
 //	END OF MISC PARAMETERS
 
 	define("AUDIT_ACTION_ADD",		0);
@@ -60,6 +63,10 @@
 	define("AUDIT_RESOURCE_USER_GROUP",	11);
 	define("AUDIT_RESOURCE_APPLICATION",	12);
 	define("AUDIT_RESOURCE_TRIGGER",	13);
+	define("AUDIT_RESOURCE_HOST_GROUP",	14);
+	define("AUDIT_RESOURCE_ITEM",		15);
+	define("AUDIT_RESOURCE_IMAGE",		16);
+	define("AUDIT_RESOURCE_VALUE_MAP",	17);
 
 	define("CONDITION_TYPE_GROUP",		0);
 	define("CONDITION_TYPE_HOST",		1);
@@ -235,9 +242,12 @@
 	define("PERM_RES_IDS_ARRAY",	1); /* return array of nodes id - array(1,2,3,4) */
 	define("PERM_RES_DATA_ARRAY",	2); 
 
+	define("PERM_MODE_NE",	5);
+	define("PERM_MODE_EQ",	4);
+	define("PERM_MODE_GT",	3);
+	define("PERM_MODE_LT",	2);
+	define("PERM_MODE_LE",	1);
 	define("PERM_MODE_GE",	0);
-	define("PERM_MODE_EQ",	1);
-	define("PERM_MODE_LE",	2);
 
 	define("RESOURCE_TYPE_NODE",		0);
 	define("RESOURCE_TYPE_GROUP",		1);

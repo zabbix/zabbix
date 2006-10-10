@@ -68,11 +68,10 @@ include "include/page_header.php";
 
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
 	
-	$availiable_groups= get_accessible_groups_by_userid($USER_DETAILS['userid'],PERM_READ_LIST, null, null, $ZBX_CURNODEID);
 	$availiable_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_LIST, null, null, $ZBX_CURNODEID);
 
 	$result=DBselect("select distinct g.groupid,g.name from groups g, hosts_groups hg, hosts h, items i ".
-		" where g.groupid in (".$availiable_groups.") ".
+		" where h.hostid in (".$availiable_hosts.") ".
 		" and hg.groupid=g.groupid and h.status=".HOST_STATUS_MONITORED.
 		" and h.hostid=i.hostid and hg.hostid=h.hostid ".
 		" order by g.name");
@@ -86,6 +85,7 @@ include "include/page_header.php";
 	{
 		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED.
 			" and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid".
+			" and h.hostid in (".$availiable_hosts.") ".
 			" group by h.hostid,h.host order by h.host";
 	}
 	else
@@ -116,7 +116,7 @@ include "include/page_header.php";
 		$btnNext->SetEnabled('no');
 	$r_form->AddItem($btnNext);
 	
-	show_header2(S_HISTORY_OF_EVENTS_BIG,$r_form);
+	show_table_header(S_HISTORY_OF_EVENTS_BIG,$r_form);
 
         $table->Show();
 ?>

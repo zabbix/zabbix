@@ -102,26 +102,35 @@
 		
 		if(isset($incorrect_session) || isset($missed_user_guest))
 		{
-			if($missed_user_guest)		$message = "Database corrupted, missed user 'guest'";
-			else if($incorrect_session)	$message = "Session was ended, please relogin!";
+			if(isset($incorrect_session))	$message = "Session was ended, please relogin!";
+			else if(isset($missed_user_guest))		$message = "Database corrupted, missed default user 'guest'";
 			
 			if($page["file"]!="index.php")
 			{
-				Redirect("index.php");
+				Redirect("index.php?message=".addslashes($message));
 				exit;
 			}
-			show_header("Login",0,0,1 /* recursion solving */);
-			show_error_message($message);
-			insert_login_form();
-			show_page_footer();
-			
-			exit;
+			if(!isset($_REQUEST['message'])) $_REQUEST['message'] = $message;
 		}
 	}
 
 /***********************************************
 	GET ACCESSIBLE RESOURCES BY USERID
 ************************************************/
+	function	perm_mode2comparator($perm_mode)
+	{
+		switch($perm_mode)
+		{
+			case PERM_MODE_NE:	$perm_mode = '!='; break;
+			case PERM_MODE_EQ:	$perm_mode = '=='; break;
+			case PERM_MODE_GT:	$perm_mode = '>'; break;
+			case PERM_MODE_LT:	$perm_mode = '<'; break;
+			case PERM_MODE_LE:	$perm_mode = '<='; break;
+			case PERM_MODE_GE:
+			default:		$perm_mode = '>='; break;
+		}
+		return $perm_mode;
+	}
 
 	function	get_accessible_hosts_by_userid($userid,$perm,$perm_mode=null,$perm_res=null,$nodeid=null)
 	{
@@ -131,12 +140,6 @@
 
 		$result = array();
 
-		switch($perm_mode)
-		{
-			case PERM_MODE_EQ:	$perm_mode = '=='; break;
-			case PERM_MODE_LE:	$perm_mode = '<='; break;
-			default:		$perm_mode = '>='; break;
-		}
 		switch($perm_res)
 		{
 			case PERM_RES_DATA_ARRAY:	$resdata = '$host_data'; break;
@@ -173,7 +176,7 @@ COpt::counter_up('perm');
 				$host_data['permission'] = $nodes[$host_data['nodeid']]['permission'];
 			}
 
-			if(eval('return ('.$host_data["permission"].' '.$perm_mode.' '.$perm.')? 0 : 1;'))
+			if(eval('return ('.$host_data["permission"].' '.perm_mode2comparator($perm_mode).' '.$perm.')? 0 : 1;'))
 				continue;
 
 			$result[$host_data['hostid']] = eval('return '.$resdata.';');
@@ -199,12 +202,6 @@ COpt::counter_up('perm');
 
 		$result = array();
 
-		switch($perm_mode)
-		{
-			case PERM_MODE_EQ:	$perm_mode = '=='; break;
-			case PERM_MODE_LE:	$perm_mode = '<='; break;
-			default:		$perm_mode = '>='; break;
-		}
 		switch($perm_res)
 		{
 			case PERM_RES_DATA_ARRAY:	$resdata = '$group_data'; break;
@@ -239,7 +236,7 @@ COpt::counter_up('perm');
 				$group_data['permission'] = $nodes[$group_data['nodeid']]['permission'];
 			}
 
-			if(eval('return ('.$group_data["permission"].' '.$perm_mode.' '.$perm.')? 0 : 1;'))
+			if(eval('return ('.$group_data["permission"].' '.perm_mode2comparator($perm_mode).' '.$perm.')? 0 : 1;'))
 				continue;
 
 			$result[$group_data['groupid']] = eval('return '.$resdata.';');
@@ -265,12 +262,6 @@ COpt::counter_up('perm');
 
 		$result= array();
 
-		switch($perm_mode)
-		{
-			case PERM_MODE_EQ:	$perm_mode = '=='; break;
-			case PERM_MODE_LE:	$perm_mode = '<='; break;
-			default:		$perm_mode = '>='; break;
-		}
 		switch($perm_res)
 		{
 			case PERM_RES_DATA_ARRAY:	$resdata = '$node_data'; break;
@@ -307,7 +298,7 @@ COpt::counter_up('perm');
 			}
 			else
 			{
-				if(eval('return ('.$node_data["permission"].' '.$perm_mode.' '.$perm.')? 0 : 1;'))
+				if(eval('return ('.$node_data["permission"].' '.perm_mode2comparator($perm_mode).' '.$perm.')? 0 : 1;'))
 					continue;
 			}
 
@@ -343,12 +334,6 @@ COpt::counter_up('perm');
 
 		$result = array();
 
-		switch($perm_mode)
-		{
-			case PERM_MODE_EQ:	$perm_mode = '=='; break;
-			case PERM_MODE_LE:	$perm_mode = '<='; break;
-			default:		$perm_mode = '>='; break;
-		}
 		switch($perm_res)
 		{
 			case PERM_RES_DATA_ARRAY:	$resdata = '$host_data'; break;
@@ -409,7 +394,7 @@ COpt::counter_up('perm');
 				$host_data['permission'] = $node_data[$host_data['nodeid']]['permission'];
 			}
 			
-			if(eval('return ('.$host_data["permission"].' '.$perm_mode.' '.$perm.')? 0 : 1;'))
+			if(eval('return ('.$host_data["permission"].' '.perm_mode2comparator($perm_mode).' '.$perm.')? 0 : 1;'))
 				continue;
 
 			$result[$host_data['hostid']] = eval('return '.$resdata.';');
@@ -433,12 +418,6 @@ COpt::counter_up('perm');
 
 		$result= array();
 
-		switch($perm_mode)
-		{
-			case PERM_MODE_EQ:	$perm_mode = '=='; break;
-			case PERM_MODE_LE:	$perm_mode = '<='; break;
-			default:		$perm_mode = '>='; break;
-		}
 		switch($perm_res)
 		{
 			case PERM_RES_DATA_ARRAY:	$resdata = '$group_data'; break;
@@ -476,7 +455,7 @@ COpt::counter_up('perm');
 				$group_data['permission'] = $node_data[$group_data['nodeid']]['permission'];
 			}
 					
-			if(eval('return ('.$group_data["permission"].' '.$perm_mode.' '.$perm.')? 0 : 1;'))
+			if(eval('return ('.$group_data["permission"].' '.perm_mode2comparator($perm_mode).' '.$perm.')? 0 : 1;'))
 				continue;
 
 			$result[$group_data["groupid"]] = eval('return '.$resdata.';');
@@ -502,12 +481,6 @@ COpt::counter_up('perm');
 
 		$result= array();
 
-		switch($perm_mode)
-		{
-			case PERM_MODE_EQ:	$perm_mode = '=='; break;
-			case PERM_MODE_LE:	$perm_mode = '<='; break;
-			default:		$perm_mode = '>='; break;
-		}
 		switch($perm_res)
 		{
 			case PERM_RES_DATA_ARRAY:	$resdata = '$node_data'; break;
@@ -543,7 +516,7 @@ COpt::counter_up('perm');
 			}
 			else
 			{
-				if(eval('return ('.$node_data["permission"].' '.$perm_mode.' '.$perm.')? 0 : 1;'))
+				if(eval('return ('.$node_data["permission"].' '.perm_mode2comparator($perm_mode).' '.$perm.')? 0 : 1;'))
 					continue;
 			}
 

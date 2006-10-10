@@ -48,7 +48,7 @@ include "include/page_header.php";
 	$cmbMode->AddItem(1,S_DETAILS);
 	$form->AddItem($cmbMode);
 
-	show_header2(S_QUEUE_OF_ITEMS_TO_BE_UPDATED_BIG, $form);
+	show_table_header(S_QUEUE_OF_ITEMS_TO_BE_UPDATED_BIG, $form);
 ?>
 
 <?php

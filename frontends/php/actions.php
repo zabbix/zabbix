@@ -74,7 +74,7 @@ include "inlcude/page_header.php";
 		$btnNext->SetEnabled('no');
 	$form->AddItem($btnNext);
 
-	show_header2(S_HISTORY_OF_ACTIONS_BIG,$form);
+	show_table_header(S_HISTORY_OF_ACTIONS_BIG,$form);
 	$table->Show();
 ?>
 <?php

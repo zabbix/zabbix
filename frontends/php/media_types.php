@@ -26,7 +26,8 @@
 	$page["title"] = "S_MEDIA_TYPES";
 	$page["file"] = "media_types.php";
 
-	show_header($page["title"],0,0);
+include "include/page_header.php";
+
 	insert_confirm_javascript();
 ?>
 <?php
@@ -115,7 +116,7 @@
 
 	$form = new CForm();
 	$form->AddItem(new CButton("form",S_CREATE_MEDIA_TYPE));
-	show_header2(S_CONFIGURATION_OF_MEDIA_TYPES_BIG, $form);
+	show_table_header(S_CONFIGURATION_OF_MEDIA_TYPES_BIG, $form);
 ?>
 <?php
 	if(isset($_REQUEST["form"]))
@@ -161,5 +162,7 @@
 ?>
 
 <?php
-	show_page_footer();
+
+include "include/page_footer.php";
+
 ?>

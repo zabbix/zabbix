@@ -25,34 +25,70 @@
 	require_once "include/items.inc.php";
 	require_once "include/users.inc.php";
 
-	$dstfrm		= get_request("dstfrm",0);	// destination form
-	$dstfld1	= get_request("dstfld1", 0);	// output field on destination form
-	$dstfld2	= get_request("dstfld2", 0);	// second output field on destination form
-	$srctbl		= get_request("srctbl", 0);	// source table name
-	$srcfld1	= get_request("srcfld1", 0);	// source table field [can be different from fields of source table]
-	$srcfld2	= get_request("srcfld2", 0);	// second source table field [can be different from fields of source table]
-
-	if($srctbl == "hosts")		{ $page["title"] = "S_HOSTS_BIG";		$min_user_type = USER_TYPE_ZABBIX_ADMIN; }
-	if($srctbl == "triggers")	{ $page["title"] = "S_TRIGGERS_BIG";		$min_user_type = USER_TYPE_ZABBIX_ADMIN; }
-	if($srctbl == "logitems")	{ $page["title"] = "S_ITEMS_BIG";		$min_user_type = USER_TYPE_ZABBIX_USER; }
-	if($srctbl == "usrgrp")		{ $page["title"] = "S_GROUPS";			$min_user_type = USER_TYPE_SUPPER_ADMIN; }
-	if($srctbl == "help_items")	{ $page["title"] = "S_STANDARD_ITEMS_BIG";	$min_user_type = USER_TYPE_ZABBIX_USER; }
-
-	if(!isset($page["title"]))
+	$dstfrm		= get_request("dstfrm",  '');	// destination form
+	$dstfld1	= get_request("dstfld1", '');	// output field on destination form
+	$dstfld2	= get_request("dstfld2", '');	// second output field on destination form
+	$srctbl		= get_request("srctbl",  '');	// source table name
+	$srcfld1	= get_request("srcfld1", '');	// source table field [can be different from fields of source table]
+	$srcfld2	= get_request("srcfld2", '');	// second source table field [can be different from fields of source table]
+	
+	switch($srctbl)
 	{
-		show_header("Error",0,1);
-		error("Incorrect URL");
-		show_messages();
-		exit;
+		case 'hosts':
+			$page["title"] = "S_HOSTS_BIG";
+			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
+			break;
+		case 'triggers':
+			$page["title"] = "S_TRIGGERS_BIG";
+			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
+			break;
+		case 'logitems':
+			$page["title"] = "S_ITEMS_BIG";
+			$min_user_type = USER_TYPE_ZABBIX_USER;
+			break;
+		case 'usrgrp':
+			$page["title"] = "S_GROUPS";
+			$min_user_type = USER_TYPE_SUPPER_ADMIN;
+			break;
+		case 'help_items':
+			$page["title"] = "S_STANDARD_ITEMS_BIG";
+			$min_user_type = USER_TYPE_ZABBIX_USER;
+			break;
+		default:
+			$page["title"] = "S_ERROR";
+			$error = true;
+			break;
 	}
 
 	$page["file"] = "popup.php";
-	show_header($page["title"],0,1);
+	
+	define('ZBX_PAGE_NO_MENU', 1);
+	
+include "include/page_header.php";
+
+	if(isset($error))
+	{
+		invalid_url();
+	}
+	
 	insert_confirm_javascript();
 
 	if(defined($page["title"]))     $page["title"] = constant($page["title"]);
 ?>
+<?php
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"dstfrm" =>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	NULL),
+		"dstfld1"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	NULL),
+		"dstfld2"=>	array(T_ZBX_STR, O_OPT,P_SYS,	NOT_EMPTY,	NULL),
+		"srctbl" =>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	NULL),
+		"srcfld1"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	NULL),
+		"srcfld2"=>	array(T_ZBX_STR, O_OPT,P_SYS,	NOT_EMPTY,	NULL)
+	);
 
+	check_fields($fields);
+
+?>
 <?php
 	global $USER_DETAILS;
 
@@ -144,8 +180,6 @@
 	if(in_array($srctbl,array("triggers","hosts")))
 	{
 		$btnEmpty = new CButton("empty",S_EMPTY,
-//			"window.opener.document.forms['".$dstfrm."'].".$dstfld1.".value='0';".
-//			" window.opener.document.forms['".$dstfrm."'].".$dstfld2.".value='';".
 			get_window_opener($dstfrm, $dstfld1, 0).
 			get_window_opener($dstfrm, $dstfld2, '').
 			" window.close();");
@@ -153,7 +187,7 @@
 		$frmTitle->AddItem(array(SPACE,$btnEmpty));
 	}
 
-	show_header2($page["title"], $frmTitle);
+	show_table_header($page["title"], $frmTitle);
 ?>
 
 <?php
@@ -175,8 +209,6 @@
 //			if(!check_right("Host","R",$host["hostid"]))	continue; /* TODO */
 			$name = new CLink($host["host"],"#","action");
 			$name->SetAction(
-//				"window.opener.document.forms['".$dstfrm."'].".$dstfld1.".value='".$host[$srcfld1]."';".
-//				" window.opener.document.forms['".$dstfrm."'].".$dstfld2.".value='".$host[$srcfld2]."';".
 				get_window_opener($dstfrm, $dstfld1, $host[$srcfld1]).
 				get_window_opener($dstfrm, $dstfld2, $host[$srcfld2]).
 				" window.close();");
@@ -239,7 +271,6 @@
 		{
 			$name = new CLink($row["key_"],"#","action");
 			$name->SetAction(
-//				"window.opener.document.forms['".$dstfrm."'].".$dstfld1.".value='".$row[$srcfld1]."';".
 				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
 				" window.close();");
 
@@ -283,8 +314,6 @@
 			$description->SetAction(
 				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
 				get_window_opener($dstfrm, $dstfld2, $exp_desc).
-//				"window.opener.document.forms['".$dstfrm."'].".$dstfld1.".value='".$row[$srcfld1]."';".
-//				" window.opener.document.forms['".$dstfrm."'].".$dstfld2.".value='".$exp_desc."';".
 				" window.close();");
 
 			$description = array($description);
@@ -423,5 +452,9 @@ function add_variable(formname,value)
 		$table->Show();
 
 	}
-	show_page_footer(false);
+?>
+<?php
+
+include "include/page_footer.php";
+
 ?>

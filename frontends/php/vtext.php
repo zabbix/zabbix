@@ -21,13 +21,28 @@
 <?php
 	require_once "include/config.inc.php";
 
+	$page['file'] = 'vtext.php';
+	$page['type'] = PAGE_TYPE_IMAGE;
+	
+include "include/page_header.php";
+
+?>
+<?php
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"text"=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,		null),
+		"font"=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(1,5),	null),
+	);
+
+	check_fields($fields);
+?>
+<?php
+
 	$text = get_request("text","");;
 	$font = get_request("font",3);
 	
 	$width = ImageFontWidth($font) * strlen($text);
 	$height = ImageFontHeight($font);
-
-	set_image_header();
 
 	$im = imagecreate($height,$width); 
   
@@ -39,4 +54,9 @@
 
 	ImageOut($im); 
 	ImageDestroy($im); 
+?>
+<?php
+
+include "include/page_footer.php";
+
 ?>

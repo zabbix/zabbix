@@ -304,6 +304,13 @@
 		"triggers_hash"=>	array(T_ZBX_STR, O_OPT,	 P_SYS,	NOT_EMPTY,NULL)
 	);
 
+	function	invalid_url()
+	{
+		unset_all();
+		show_error_message(S_INVALID_URL);
+		include "include/page_footer.php";
+	}
+	
 	function	check_fields(&$fields)
 	{
 
@@ -323,10 +330,7 @@
 		unset_if_zero($fields);
 		if($err&ZBX_VALID_ERROR)
 		{
-			unset_all();
-			show_messages(FALSE, "", "Invalid URL");
-			show_page_footer();
-			exit;
+			invalid_url();
 		}
 		if($err!=ZBX_VALID_OK)
 		{

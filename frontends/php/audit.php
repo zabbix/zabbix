@@ -94,7 +94,7 @@ include "include/page_header.php";
 		$btnNext
 		));
 
-	show_header2(S_AUDIT_LOG_BIG,$form);
+	show_table_header(S_AUDIT_LOG_BIG,$form);
 
 	$table->show();
 ?>

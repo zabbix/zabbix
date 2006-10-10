@@ -25,7 +25,8 @@
         $page["title"] = "S_NODES";
         $page["file"] = "nodes.php";
 
-	show_header($page["title"],0,0);
+include "include/page_header.php";
+
 	insert_confirm_javascript();
 ?>
 <?php
@@ -70,6 +71,9 @@
 		}
 		$table->show();
 	}
+?>
+<?php
 
-	show_page_footer();
+include "include/page_footer.php";
+
 ?>

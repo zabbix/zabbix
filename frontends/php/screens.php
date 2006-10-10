@@ -28,7 +28,15 @@
 	$page["file"] = "screens.php";
 
 	$_REQUEST["fullscreen"] = get_request("fullscreen", 0);
-	show_header($page["title"],1,$_REQUEST["fullscreen"] >= 1 ? 1 : 0);
+
+	if($_REQUEST["fullscreen"])
+	{
+		define('ZBX_PAGE_NO_MENU', 1);
+	}
+	define('ZBX_PAGE_DO_REFRESH', 1);
+	
+include "include/page_header.php";
+
 ?>
 
 <?php
@@ -94,7 +102,7 @@
 	}
 
 	$form->AddItem($cmbScreens);
-	show_header2($text,$form);
+	show_table_header($text,$form);
 ?>
 
 <?php
@@ -108,8 +116,7 @@
 	}
 ?>
 <?php
-	if($_REQUEST["fullscreen"]==0)
-	{
-		show_page_footer();
-	}
+
+include "include/page_footer.php";
+
 ?>

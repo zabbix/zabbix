@@ -22,18 +22,31 @@
 	require_once "include/config.inc.php";
 	require_once "include/users.inc.php";
 
-	$dstfrm		= get_request("dstfrm",		0);	// destination form
-	$list_name	= get_request("list_name",	0);	// output field on destination form
-	$var_name	= get_request("var_name",	0);	// second output field on destination form
-
 	$page["title"] = "S_GROUPS";
 	$page["file"] = "popup_usrgrp.php";
-	show_header($page["title"],0,1);
+
+	define('ZBX_PAGE_NO_MENU', 1);
+	
+include	"include/page_header.php";
 
 	insert_confirm_javascript();
 ?>
 <?php
-	show_header2(S_GROUPS);
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"dstfrm"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	NULL),
+		"list_name"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	NULL),
+		"var_name"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	NULL)
+	);
+
+	check_fields($fields);
+
+	$dstfrm		= get_request("dstfrm",		0);	// destination form
+	$list_name	= get_request("list_name",	0);	// output field on destination form
+	$var_name	= get_request("var_name",	0);	// second output field on destination form
+?>
+<?php
+	show_table_header(S_GROUPS);
 ?>
 
 <script language="JavaScript" type="text/javascript">
@@ -81,6 +94,9 @@ function add_group(formname,group_id,name)
 		$table->AddRow($name);
 	}
 	$table->Show();
+?>
+<?php
 
-	show_page_footer(false);
+include	"include/page_footer.php";
+
 ?>

@@ -41,7 +41,7 @@ include "include/page_header.php";
 	);
 	check_fields($fields);
 	
-	$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_LIST, PERM_MODE_LE);
+	$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_ONLY, PERM_MODE_LT);
 	
 	if(! ($trigger_data = DBfetch(DBselect('select h.host, t.* from hosts h, items i, functions f, triggers t '.
 	                        ' where i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid='.$_REQUEST["triggerid"].
@@ -65,7 +65,7 @@ include "include/page_header.php";
 	$cmbLimit->AddItem("100",S_SHOW_ONLY_LAST_100);
 	$form->AddItem($cmbLimit);
 
-	show_header2(S_ALARMS_BIG.": \"".$description."\"".BR."$expression", $form);
+	show_table_header(S_ALARMS_BIG.": \"".$description."\"".BR."$expression", $form);
 ?>
 <?php
 	$result=DBselect("select * from events where triggerid=".$_REQUEST["triggerid"].

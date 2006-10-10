@@ -24,7 +24,8 @@
 	$page["title"] = "S_IT_SERVICES";
 	$page["file"] = "services.php";
 
-	show_header($page["title"],0,0);
+include "include/page_header.php";
+
 	insert_confirm_javascript();
 
 	$_REQUEST["serviceid"] = get_request("serviceid",0);
@@ -557,5 +558,7 @@
 ?>
 
 <?php
-	show_page_footer();
+
+include "include/page_footer.php";
+
 ?>

@@ -480,8 +480,7 @@
 
 	function	get_item_by_itemid($itemid)
 	{
-		$result=DBselect("select * from items where itemid=$itemid"); 
-		$row=DBfetch($result);
+		$row = DBfetch(DBselect("select * from items where itemid=$itemid")); 
 		if($row)
 		{
 			return	$row;
@@ -662,5 +661,54 @@ COpt::profiling_stop('prepare table');
 	{
 		return DBselect("select distinct app.* from applications app, items_applications ia".
 			" where app.applicationid=ia.applicationid and ia.itemid=".$itemid);
+	}
+
+	# Delete from History
+
+	function	delete_history_by_itemid($itemid, $use_housekeeper=0)
+	{
+		SDI('TODO: Correct housekeeper scheduling!'); /* TODO */ /* think about housekeeper scheduling, must be housekeeperid - unneeded */
+		
+		$result = delete_trends_by_itemid($itemid,$use_housekeeper);
+		if(!$result)	return $result;
+
+		if($use_housekeeper)
+		{
+			$housekeeperid = get_dbid('housekeeper','housekeeperid');
+			DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)".
+				" values ($housekeeperid,'history_log','itemid',$itemid)");
+			$housekeeperid = get_dbid('housekeeper','housekeeperid');
+			DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)".
+				" values ($housekeeperid,'history_uint','itemid',$itemid)");
+			$housekeeperid = get_dbid('housekeeper','housekeeperid');
+			DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)".
+				" values ($housekeeperid,'history_str','itemid',$itemid)");
+			$housekeeperid = get_dbid('housekeeper','housekeeperid');
+			DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)".
+				" values ($housekeeperid,'history','itemid',$itemid)");
+			return TRUE;
+		}
+
+		DBexecute("delete from history_log where itemid=$itemid");
+		DBexecute("delete from history_uint where itemid=$itemid");
+		DBexecute("delete from history_str where itemid=$itemid");
+		DBexecute("delete from history where itemid=$itemid");
+		return TRUE;
+	}
+
+	# Delete from Trends
+
+	function	delete_trends_by_itemid($itemid, $use_housekeeper=0)
+	{
+		SDI('TODO: Correct housekeeper scheduling!'); /* TODO */ /* think about housekeeper scheduling, must be housekeeperid - unneeded */
+
+		if($use_housekeeper)
+		{
+			$housekeeperid = get_dbid('housekeeper','housekeeperid');
+			DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)".
+				" values ($housekeeperid, 'trends','itemid',$itemid)");
+			return TRUE;
+		}
+		return	DBexecute("delete from trends where itemid=$itemid");
 	}
 ?>

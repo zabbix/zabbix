@@ -25,7 +25,9 @@
 
 	$page["title"] = "S_CONFIGURATION_OF_SCREENS";
 	$page["file"] = "screenedit.php";
-	show_header($page["title"],0,0);
+
+include "include/page_header.php";
+	
 	insert_confirm_javascript();
 ?>
 
@@ -79,5 +81,7 @@
 ?>
 
 <?php
-	show_page_footer();
+
+include "include/page_footer.php";
+
 ?>

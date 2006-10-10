@@ -470,6 +470,8 @@
 	"S_HOSTS"=>				"Hosts",
 	"S_UNLINK"=>				"Unlink",
 	"S_UNLINK_AND_CLEAR"=>			"Unlink and clear",
+	"S_UNLINKED_SMALL"=>			"unlinked",
+	"S_CLEANED_SMALL"=>			"cleaned",
 
 //	items.php
 	"S_NO_ITEMS_DEFINED"=>			"No items defined",
@@ -901,6 +903,7 @@
 	"S_CANNOT_UPDATE_TRIGGER"=>		"Cannot update trigger",
 	"S_DEPENDS_ON"=>			"Depends on",
 	"S_URL"=>				"URL",
+	"S_INVALID_URL"=>			"Invalid URL",
 	"S_CREATE_TRIGGER"=>			"Create Trigger",
 
 //	tr_comments.php

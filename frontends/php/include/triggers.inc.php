@@ -490,7 +490,7 @@
 							'history.php?action='.( $function_data["value_type"] ==0 ? 'showvalues' : 'showgraph').
 							'&itemid='.$function_data['itemid']);
 					
-						$exp .= $link->ToString().'.'.bold($row1["function"].'(').$row1["parameter"].bold(')');
+						$exp .= $link->ToString().'.'.bold($function_data["function"].'(').$function_data["parameter"].bold(')');
 					}
 				}
 				else

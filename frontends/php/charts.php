@@ -27,6 +27,20 @@
 	$page["file"] = "charts.php";
 ?>
 <?php
+	if(isset($_REQUEST["fullscreen"]))
+	{
+		define('ZBX_PAGE_NO_MENU', 1);
+	}
+
+	if(isset($_REQUEST["graphid"]) && $_REQUEST["graphid"] > 0 && !isset($_REQUEST["period"]) && !isset($_REQUEST["stime"]))
+	{
+		define('ZBX_PAGE_DO_REFRESH', 1);
+	}
+	
+include "include/page_header.php";
+
+?>
+<?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		"groupid"=>		array(T_ZBX_INT, O_OPT,	 P_SYS,		DB_ID,NULL),
@@ -45,20 +59,6 @@
 	);
 
 	check_fields($fields);
-?>
-<?php
-	if(isset($_REQUEST["fullscreen"]))
-	{
-		define('ZBX_PAGE_NO_MENU', 1);
-	}
-
-	if(isset($_REQUEST["graphid"]) && $_REQUEST["graphid"] > 0 && !isset($_REQUEST["period"]) && !isset($_REQUEST["stime"]))
-	{
-		define('ZBX_PAGE_DO_REFRESH', 1);
-	}
-	
-include "include/page_header.php";
-
 ?>
 <?php
 	$_REQUEST["graphid"] = get_request("graphid", get_profile("web.charts.graphid", 0));
@@ -90,7 +90,7 @@ include "include/page_header.php";
 	$h1 = array(S_GRAPHS_BIG.SPACE."/".SPACE);
 	
 	$availiable_groups = get_accessible_groups_by_userid($USER_DETAILS['userid'],PERM_READ_LIST, null, null, $ZBX_CURNODEID);
-	$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_LIST, PERM_MODE_LE);
+	$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_ONLY, PERM_MODE_LT);
 
 	if($_REQUEST["graphid"] > 0)
 	{
@@ -195,7 +195,7 @@ include "include/page_header.php";
 	
 	$r_form->AddItem(array(SPACE.S_GRAPH.SPACE,$cmbGraph));
 	
-	show_header2($h1, $r_form);
+	show_table_header($h1, $r_form);
 ?>
 
 <?php

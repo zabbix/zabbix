@@ -50,7 +50,7 @@ include "include/page_header.php";
 	check_fields($fields);
 ?>
 <?php
-	$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_LIST, PERM_MODE_LE);
+	$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_ONLY, PERM_MODE_LT);
 
 	if(! ($db_data = DBfetch(DBselect('select * from items i, functions f '.
 	                        ' where i.itemid=f.itemid and f.triggerid='.$_REQUEST["triggerid"].
@@ -65,7 +65,15 @@ include "include/page_header.php";
 	if(isset($_REQUEST["save"]))
 	{
 		$result = update_trigger_comments($_REQUEST["triggerid"],$_REQUEST["comments"]);
+	
 		show_messages($result, S_COMMENT_UPDATED, S_CANNOT_UPDATE_COMMENT);
+
+		if($result)
+		{
+			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_TRIGGER,
+				S_TRIGGER." [".$_REQUEST["triggerid"]."] [".expand_trigger_description($_REQUEST["triggerid"])."] ".
+				S_COMMENTS." [".$_REQUEST["comments"]."]");
+		}
 	}
 	else if(isset($_REQUEST["cancel"]))
 	{

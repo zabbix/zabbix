@@ -24,7 +24,11 @@
 
 	$page["title"] = "S_IT_SERVICES";
 	$page["file"] = "srv_status.php";
-	show_header($page["title"],1,0);
+
+	define('ZBX_PAGE_DO_REFRESH', 1);
+
+include "include/page_header.php";
+
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -35,184 +39,184 @@
 
 	check_fields($fields);
 ?>
- 
 <?php
 	show_table_header(S_IT_SERVICES_BIG);
 
 	if(isset($_REQUEST["serviceid"])&&isset($_REQUEST["showgraph"]))
 	{
 		$table  = new CTableInfo();
-		$table->AddRow("<IMG SRC=\"chart5.php?serviceid=".$_REQUEST["serviceid"]."\" border=0>");
+		$table->AddRow(new CImg("chart5.php?serviceid=".$_REQUEST["serviceid"]));
 		$table->Show();
-		show_page_footer();
-		exit;
 	}
-
-	$now=time();
-	$result=DBselect("select serviceid,name,triggerid,status,showsla,goodsla from services ".
-		" where ".DBid2nodeid("serviceid")."=".$ZBX_CURNODEID." order by sortorder,name");
-//	table_begin();
-	$table  = new CTableInfo();
-	$table->SetHeader(array(S_SERVICE,S_STATUS,S_REASON,S_SLA_LAST_7_DAYS,nbsp(S_PLANNED_CURRENT_SLA),S_GRAPH));
-	if(isset($_REQUEST["serviceid"]))
+	else
 	{
-		$service=get_service_by_serviceid($_REQUEST["serviceid"]);
-		$srvc=new CLink($service["name"],"srv_status.php?serviceid=".$service["serviceid"],"action");
-
-		$status=get_service_status_description($service["status"]);
-
-		$reason=SPACE;
-		if($service["showsla"]==1)
-		{
-			$sla="<img src=\"chart_sla.php?serviceid=".$service["serviceid"]."\">";
-		}
-		else
-		{
-			$sla=new CSpan("-","center");
-		}
-		if($service["showsla"]==1)
-		{
-			$now=time(NULL);
-			$period_start=$now-7*24*3600;
-			$period_end=$now;
-			$stat=calculate_service_availability($service["serviceid"],$period_start,$period_end);
-
-			if($service["goodsla"]>$stat["ok"])
-			{
-				$color="AA0000";
-			}
-			else
-			{
-				$color="00AA00";
-			}
-			$sla2=sprintf("<font color=\"00AA00\">%.2f%%</font><b>/</b><font color=\"%s\">%.2f%%</font>",$service["goodsla"],$color,$stat["ok"]);
-		}
-		else
-		{
-			$sla2="-";
-		}
-		$actions=new CLink(S_SHOW,"srv_status.php?serviceid=".$service["serviceid"]."&showgraph=1","action");
-		$table->addRow(array(
-			$srvc,
-			$status,
-			$reason,
-			$sla,
-			$sla2,
-			$actions
-			));
-	}
-	while($row=DBfetch($result))
-	{
-		if(!isset($_REQUEST["serviceid"]) && service_has_parent($row["serviceid"]))
-		{
-			continue;
-		}
-		if(isset($_REQUEST["serviceid"]) && service_has_no_this_parent($_REQUEST["serviceid"],$row["serviceid"]))
-		{
-			continue;
-		}
-		if(isset($row["triggerid"])&&!check_right_on_trigger(PERM_READ_ONLY,$row["triggerid"]))
-		{
-			continue;
-		}
-		$childs=get_num_of_service_childs($row["serviceid"]);
-		if(isset($row["triggerid"]))
-		{
-			$description=nbsp(expand_trigger_description($row["triggerid"]));
-			$description="[<a href=\"events.php?triggerid=".$row["triggerid"]."\">".S_TRIGGER_BIG."</a>] $description";
-		}
-		else
-		{
-			$trigger_link="";
-			$description=$row["name"];
-		}
+		$now=time();
+		$result=DBselect("select serviceid,name,triggerid,status,showsla,goodsla from services ".
+			" where ".DBid2nodeid("serviceid")."=".$ZBX_CURNODEID." order by sortorder,name");
+	//	table_begin();
+		$table  = new CTableInfo();
+		$table->SetHeader(array(S_SERVICE,S_STATUS,S_REASON,S_SLA_LAST_7_DAYS,nbsp(S_PLANNED_CURRENT_SLA),S_GRAPH));
 		if(isset($_REQUEST["serviceid"]))
 		{
-			if($childs == 0)
+			$service=get_service_by_serviceid($_REQUEST["serviceid"]);
+			$srvc=new CLink($service["name"],"srv_status.php?serviceid=".$service["serviceid"],"action");
+
+			$status=get_service_status_description($service["status"]);
+
+			$reason=SPACE;
+			if($service["showsla"]==1)
 			{
-				$service="$description";
+				$sla=new CImg("chart_sla.php?serviceid=".$service["serviceid"]);
 			}
 			else
 			{
-				$service=new CLink($description,"srv_status.php?serviceid=".$row["serviceid"],"action");
+				$sla=new CSpan("-","center");
 			}
-		}
-		else
-		{
-			if($childs == 0)
+			if($service["showsla"]==1)
 			{
-				$service="$description";
-			}
-			else
-			{
-				$service=new CLink($description,"srv_status.php?serviceid=".$row["serviceid"],"action");
-			}
-		}
-		$status=get_service_status_description($row["status"]);
-		if($row["status"]==0)
-		{
-			$reason="-";
-		}
-		else
-		{
-			$reason="<ul>";
-			$sql="select s.triggerid,s.serviceid from services s, triggers t where s.status>0 and s.triggerid is not NULL and t.triggerid=s.triggerid where ".DBid2nodeid("s.serviceid")."=".$ZBX_CURNODEID." order by s.status desc,t.description";
-			$result2=DBselect($sql);
-			while($row2=DBfetch($result2))
-			{
-				if(does_service_depend_on_the_service($row["serviceid"],$row2["serviceid"]))
+				$now=time(NULL);
+				$period_start=$now-7*24*3600;
+				$period_end=$now;
+				$stat=calculate_service_availability($service["serviceid"],$period_start,$period_end);
+
+				if($service["goodsla"]>$stat["ok"])
 				{
-					$description=nbsp(expand_trigger_description($row2["triggerid"]));
-					$reason=$reason."<li class=\"itservices\"><a href=\"events.php?triggerid=".$row2["triggerid"]."\">$description</a></li>";
+					$color="AA0000";
+				}
+				else
+				{
+					$color="00AA00";
+				}
+				$sla2=sprintf("<font color=\"00AA00\">%.2f%%</font><b>/</b><font color=\"%s\">%.2f%%</font>",$service["goodsla"],$color,$stat["ok"]);
+			}
+			else
+			{
+				$sla2="-";
+			}
+			$actions=new CLink(S_SHOW,"srv_status.php?serviceid=".$service["serviceid"]."&showgraph=1","action");
+			$table->addRow(array(
+				$srvc,
+				$status,
+				$reason,
+				$sla,
+				$sla2,
+				$actions
+				));
+		}
+		while($row=DBfetch($result))
+		{
+			if(!isset($_REQUEST["serviceid"]) && service_has_parent($row["serviceid"]))
+			{
+				continue;
+			}
+			if(isset($_REQUEST["serviceid"]) && service_has_no_this_parent($_REQUEST["serviceid"],$row["serviceid"]))
+			{
+				continue;
+			}
+			if(isset($row["triggerid"])&&!check_right_on_trigger(PERM_READ_ONLY,$row["triggerid"]))
+			{
+				continue;
+			}
+			$childs=get_num_of_service_childs($row["serviceid"]);
+			if(isset($row["triggerid"]))
+			{
+				$description=nbsp(expand_trigger_description($row["triggerid"]));
+				$description="[<a href=\"events.php?triggerid=".$row["triggerid"]."\">".S_TRIGGER_BIG."</a>] $description";
+			}
+			else
+			{
+				$trigger_link="";
+				$description=$row["name"];
+			}
+			if(isset($_REQUEST["serviceid"]))
+			{
+				if($childs == 0)
+				{
+					$service="$description";
+				}
+				else
+				{
+					$service=new CLink($description,"srv_status.php?serviceid=".$row["serviceid"],"action");
 				}
 			}
-			$reason=$reason."</ul>";
-		}
-
-		if($row["showsla"]==1)
-		{
-			$sla="<a href=\"report3.php?serviceid=".$row["serviceid"]."&year=".date("Y")."\"><img src=\"chart_sla.php?serviceid=".$row["serviceid"]."\" border=0>";
-		}
-		else
-		{
-			$sla="-";
-		}
-
-		if($row["showsla"]==1)
-		{
-			$now=time(NULL);
-			$period_start=$now-7*24*3600;
-			$period_end=$now;
-			$stat=calculate_service_availability($row["serviceid"],$period_start,$period_end);
-
-			if($row["goodsla"]>$stat["ok"])
+			else
 			{
-				$color="AA0000";
+				if($childs == 0)
+				{
+					$service="$description";
+				}
+				else
+				{
+					$service=new CLink($description,"srv_status.php?serviceid=".$row["serviceid"],"action");
+				}
+			}
+			$status=get_service_status_description($row["status"]);
+			if($row["status"]==0)
+			{
+				$reason="-";
 			}
 			else
 			{
-				$color="00AA00";
+				$reason="<ul>";
+				$sql="select s.triggerid,s.serviceid from services s, triggers t where s.status>0 and s.triggerid is not NULL and t.triggerid=s.triggerid where ".DBid2nodeid("s.serviceid")."=".$ZBX_CURNODEID." order by s.status desc,t.description";
+				$result2=DBselect($sql);
+				while($row2=DBfetch($result2))
+				{
+					if(does_service_depend_on_the_service($row["serviceid"],$row2["serviceid"]))
+					{
+						$description=nbsp(expand_trigger_description($row2["triggerid"]));
+						$reason=$reason."<li class=\"itservices\"><a href=\"events.php?triggerid=".$row2["triggerid"]."\">$description</a></li>";
+					}
+				}
+				$reason=$reason."</ul>";
 			}
-			$sla2=sprintf("<font color=\"00AA00\">%.2f%%</font><b>/</b><font color=\"%s\">%.2f%%</font>",$row["goodsla"],$color,$stat["ok"]);
-		}
-		else
-		{
-			$sla2="-";
-		}
 
-		$actions=new CLink(S_SHOW,"srv_status.php?serviceid=".$row["serviceid"]."&showgraph=1","action");
-		$table->addRow(array(
-			$service,
-			$status,
-			$reason,
-			$sla,
-			$sla2,
-			$actions
-			));
+			if($row["showsla"]==1)
+			{
+				$sla="<a href=\"report3.php?serviceid=".$row["serviceid"]."&year=".date("Y")."\"><img src=\"chart_sla.php?serviceid=".$row["serviceid"]."\" border=0>";
+			}
+			else
+			{
+				$sla="-";
+			}
+
+			if($row["showsla"]==1)
+			{
+				$now=time(NULL);
+				$period_start=$now-7*24*3600;
+				$period_end=$now;
+				$stat=calculate_service_availability($row["serviceid"],$period_start,$period_end);
+
+				if($row["goodsla"]>$stat["ok"])
+				{
+					$color="AA0000";
+				}
+				else
+				{
+					$color="00AA00";
+				}
+				$sla2=sprintf("<font color=\"00AA00\">%.2f%%</font><b>/</b><font color=\"%s\">%.2f%%</font>",$row["goodsla"],$color,$stat["ok"]);
+			}
+			else
+			{
+				$sla2="-";
+			}
+
+			$actions=new CLink(S_SHOW,"srv_status.php?serviceid=".$row["serviceid"]."&showgraph=1","action");
+			$table->addRow(array(
+				$service,
+				$status,
+				$reason,
+				$sla,
+				$sla2,
+				$actions
+				));
+		}
+		$table->Show();
 	}
-	$table->Show();
 ?>
-
 <?php
-	show_page_footer();
+
+include "include/page_footer.php";
+
 ?>

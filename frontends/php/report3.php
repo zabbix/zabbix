@@ -33,9 +33,7 @@ include "include/page_header.php";
 <?php
 //	if(!check_right("Host","R",0)) /* TODO */
 //	{
-//		show_table_header("<font color=\"AA0000\">No permissions !</font>");
-//		show_page_footer();
-//		exit;
+//		access_deny();
 //	}
 ?>
 
@@ -69,9 +67,7 @@ include "include/page_header.php";
 
 	if(!isset($_REQUEST["serviceid"]))
 	{
-		show_table_header("<font color=\"AA0000\">Undefined serviceid !</font>");
-		show_page_footer();
-		exit;
+		fatal_error("Undefined serviceid");
 	}
 	$service=get_service_by_serviceid($_REQUEST["serviceid"]);
 ?>
@@ -107,9 +103,8 @@ include "include/page_header.php";
 	$h2=$h2.form_select("period","yearly",S_YEARLY);
 	$h2=$h2."</select>";
 
-	show_header2($h1, $h2, "<form name=\"selection\" method=\"get\" action=\"report3.php\">", "</form>");
+	show_table_header("<form name=\"selection\" method=\"get\" action=\"report3.php\">".$h1, $h2."</form>");
 ?>
-
 <?php
 	$table = new CTableInfo();
 	if($_REQUEST["period"]=="yearly")

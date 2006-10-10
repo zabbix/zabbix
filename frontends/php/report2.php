@@ -25,7 +25,8 @@
 	$page["title"]	= "S_AVAILABILITY_REPORT";
 	$page["file"]	= "report2.php";
 
-	include "include/page_header.php";
+include "include/page_header.php";
+
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -80,11 +81,11 @@
 	}
 
 	$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
-	show_header2(S_AVAILABILITY_REPORT_BIG, $r_form);
+	show_table_header(S_AVAILABILITY_REPORT_BIG, $r_form);
 
 ?>
 <?php
-	$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_LIST, PERM_MODE_LE);
+	$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_ONLY, PERM_MODE_LT);
 	
 	if(isset($_REQUEST["triggerid"]))
 	{
@@ -97,14 +98,9 @@
 		
 		show_table_header(array(new CLink($row["host"],"?hostid=".$row["hostid"])," : \"",expand_trigger_description_by_data($row),"\""));
 
-		echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-		echo "<TR BGCOLOR=#EEEEEE>";
-		echo "<TR BGCOLOR=#DDDDDD>";
-		echo "<TD ALIGN=CENTER>";
-		echo "<IMG SRC=\"chart4.php?triggerid=".$_REQUEST["triggerid"]."\" border=0>";
-		echo "</TD>";
-		echo "</TR>";
-		echo "</TABLE>";
+		$table = new CTableInfo(null,"graph");
+		$table->AddRow(new CImg("chart4.php?triggerid=".$_REQUEST["triggerid"]));
+		$table->Show();
 	}
 	else if(isset($_REQUEST["hostid"]))
 	{
@@ -144,5 +140,7 @@
 	}
 ?>
 <?php
+	
 	include "include/page_footer.php";
+
 ?>

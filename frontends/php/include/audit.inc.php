@@ -31,6 +31,10 @@
 		$str_resource[AUDIT_RESOURCE_USER_GROUP] 	= S_USER_GROUP;
 		$str_resource[AUDIT_RESOURCE_APPLICATION] 	= S_APPLICATION;
 		$str_resource[AUDIT_RESOURCE_TRIGGER] 		= S_TRIGGER;
+		$str_resource[AUDIT_RESOURCE_HOST_GROUP]	= S_HOST_GROUP;
+		$str_resource[AUDIT_RESOURCE_ITEM]		= S_ITEM;
+		$str_resource[AUDIT_RESOURCE_IMAGE]		= S_IMAGE;
+		$str_resource[AUDIT_RESOURCE_VALUE_MAP]		= S_VALUE_MAP;
 
 		if(isset($str_resource[$resource_type]))
 			return $str_resource[$resource_type];

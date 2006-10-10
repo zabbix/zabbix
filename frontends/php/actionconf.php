@@ -242,7 +242,7 @@ include "include/page_header.php";
 	$form->AddItem(SPACE."|".SPACE);
 	$form->AddItem(new CButton("form",S_CREATE_ACTION));
 
-	show_header2(S_CONFIGURATION_OF_ACTIONS_BIG, $form);
+	show_table_header(S_CONFIGURATION_OF_ACTIONS_BIG, $form);
 	echo BR;
 
 	if(isset($_REQUEST["form"]))
@@ -252,7 +252,7 @@ include "include/page_header.php";
 	}
 	else
 	{
-		show_header2(S_ACTIONS_BIG);
+		show_table_header(S_ACTIONS_BIG);
 /* table */
 		$form = new CForm();
 		$form->SetName('actions');

@@ -49,7 +49,7 @@ include "include/page_header.php";
 
 	$form->AddItem($cmbPeriod);
 
-	show_header2(S_TRIGGERS_TOP_100_BIG, $form);
+	show_table_header(S_TRIGGERS_TOP_100_BIG, $form);
 ?>
 <?php
 	$table = new CTableInfo();
@@ -64,7 +64,7 @@ include "include/page_header.php";
 		default:	$time_dif=24*3600;	break;
 	}
 
-	$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_LIST, PERM_MODE_LE);
+	$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_ONLY, PERM_MODE_LT);
 	
         $result=DBselect("select h.host, t.triggerid, t.description, t.priority, count(e.eventid) as count ".
 		" from hosts h, triggers t, functions f, items i, events e where ".

@@ -27,7 +27,10 @@
 
 	$page["title"] = "S_MEDIA";
 	$page["file"] = "popup_media.php";
-	show_header($page["title"],0,1);
+
+	define('ZBX_PAGE_NO_MENU', 1);
+	
+include	"include/page_header.php";
 
 	insert_confirm_javascript();
 ?>
@@ -88,10 +91,6 @@ function add_media(formname,mediatypeid,sendto,period,active,severity)
 <?php
 	if(isset($_REQUEST['add']))
 	{
-?>
-<script language="JavaScript" type="text/javascript">
-<!--
-<?php
 		if(validate_period($_REQUEST['period']) != 0)
 		{
 			error("Icorrect time period");
@@ -103,6 +102,10 @@ function add_media(formname,mediatypeid,sendto,period,active,severity)
 			foreach($_REQUEST['severity'] as $id)
 				$severity |= 1 << $id;
 
+?>
+<script language="JavaScript" type="text/javascript">
+<!--
+<?php
 			echo "add_media('".
 				$_REQUEST['dstfrm']."',".
 				$_REQUEST['mediatypeid'].",'".
@@ -110,11 +113,11 @@ function add_media(formname,mediatypeid,sendto,period,active,severity)
 				$_REQUEST['period']."',".
 				$_REQUEST['active'].",".
 				$severity.");\n";
-		}
 ?>
 -->
 </script>
 <?php
+		}
 	}
 ?>
 <?php
@@ -122,5 +125,9 @@ function add_media(formname,mediatypeid,sendto,period,active,severity)
 
 	insert_media_form();
 
-	show_page_footer(false);
+?>
+<?php
+
+include	"include/page_footer.php";
+
 ?>

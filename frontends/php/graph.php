@@ -26,7 +26,9 @@
 
 	$page["title"] = "S_CONFIGURATION_OF_GRAPH";
 	$page["file"] = "graph.php";
-	show_header($page["title"],0,0);
+
+include "include/page_header.php";
+
 	insert_confirm_javascript();
 ?>
 <?php
@@ -56,8 +58,8 @@
 	check_fields($fields);
 ?>
 <?php
-	show_table_header(S_CONFIGURATION_OF_GRAPH_BIG);
-	echo BR;
+	show_table_header(S_CONFIGURATION_OF_GRAPH_BIG, 
+		isset($_REQUEST['form']) ? null: new CButton("cancel",S_CANCEL,"return Redirect('graphs.php');"));
 ?>
 <?php
 
@@ -73,7 +75,7 @@
 			$audit= AUDIT_ACTION_UPDATE;
 			$msg_ok = S_ITEM_UPDATED;
 			$msg_fail =S_CANNOT_UPDATE_ITEM; 
-			$action = "Added";
+			$action = "Updated";
 		}
 		else
 		{
@@ -85,7 +87,7 @@
 			$audit = AUDIT_ACTION_ADD;
 			$msg_ok = S_ITEM_ADDED;
 			$msg_fail = S_CANNOT_ADD_ITEM; 
-			$action = "Updated";
+			$action = "Added";
 		}
 		if($result)
 		{
@@ -119,13 +121,20 @@
 	{
 		if($_REQUEST["register"]=="up")
 		{
+			$graphitem = get_graphitem_by_gitemid($gitemid);
 			$result = move_up_graph_item($_REQUEST["gitemid"]);
 			show_messages($result, S_SORT_ORDER_UPDATED, S_CANNOT_UPDATE_SORT_ORDER);
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_GRAPH_ELEMENT,
+				"Graph ID [".$graphitem["graphid"]."] Name [".$graph["name"]."]".
+				" [".$item["description"]."] moved up.");
 			unset($_REQUEST["gitemid"]);
 		}
 		if($_REQUEST["register"]=="down")
 		{
 			$result = move_down_graph_item($_REQUEST["gitemid"]);
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_GRAPH_ELEMENT,
+				"Graph ID [".$graphitem["graphid"]."] Name [".$graph["name"]."]".
+				" [".$item["description"]."] moved down.");
 			show_messages($result, S_SORT_ORDER_UPDATED, S_CANNOT_UPDATE_SORT_ORDER);
 			unset($_REQUEST["gitemid"]);
 		}
@@ -134,9 +143,16 @@
 <?php
 /****** GRAPH ******/
 
-	$db_graphs = DBselect("select name from graphs where graphid=".$_REQUEST["graphid"]);
-	$db_graph = DBfetch($db_graphs);
-	show_table_header($db_graph["name"]);//,new CButton("cancel",S_CANCEL,"return Redirect('graphs.php');"));
+	if(! ($db_graph = DBfetch(DBselect("select g.name from graphs g,graphs_items gi,items i ".
+			" where g.graphid=".$_REQUEST["graphid"].
+			" and gi.graphid=g.graphid and gi.itemid=i.itemid and i.hostid not in (".
+			get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_ONLY,PERM_MODE_LT).
+			")"))))
+	{
+		access_deny();
+	}
+	
+	show_table_header($db_graph["name"]);
 
 	$table = new CTable(NULL,"graph");
 	$table->AddRow(new CImg("chart2.php?graphid=".$_REQUEST["graphid"]."&period=3600&from=0"));
@@ -216,5 +232,7 @@
 	}
 ?>
 <?php
-	show_page_footer();
+
+include "include/page_footer.php";
+
 ?>
