@@ -217,6 +217,13 @@
 #define	ZBX_TYPE_TEXT	4
 #define	ZBX_TYPE_UINT	5
 
+/* Flags for node history exchange */
+#define	ZBX_TABLE_HISTORY	0
+#define	ZBX_TABLE_HISTORY_UINT	1
+#define	ZBX_TABLE_HISTORY_STR	2
+#define	ZBX_TABLE_HISTORY_LOG	3
+#define	ZBX_TABLE_HISTORY_TEXT	4
+
 /* Flags */
 #define	ZBX_SYNC	1
 #define	ZBX_NOSYNC	2
