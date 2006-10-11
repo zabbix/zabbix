@@ -99,6 +99,7 @@ include "include/page_header.php";
 					" and h.hostid=i.hostid and g.graphid=".$_REQUEST["graphid"].
 					" and i.itemid=gi.itemid and gi.graphid=g.graphid".
 					" and h.hostid not in (".$denyed_hosts.") ".
+					" and ".DBid2nodeid("g.graphid")."=".$ZBX_CURNODEID.
 					" order by h.host"
 				))))
 		{
@@ -165,7 +166,7 @@ include "include/page_header.php";
 		$sql = "select distinct g.graphid,g.name from graphs g,graphs_items gi,items i".
 			" where i.itemid=gi.itemid and g.graphid=gi.graphid and i.hostid=".$_REQUEST["hostid"].
 			" and ".DBid2nodeid("g.graphid")."=".$ZBX_CURNODEID.
-			" and h.hostid in (".$denyed_hosts.") ".
+			" and i.hostid in (".$denyed_hosts.") ".
 			" order by g.name";
 	}
 	elseif ($_REQUEST["groupid"] > 0)
@@ -197,7 +198,6 @@ include "include/page_header.php";
 	
 	show_table_header($h1, $r_form);
 ?>
-
 <?php
 	$table = new CTableInfo('...','chart');
 

@@ -42,7 +42,9 @@ include "include/page_header.php";
 		access_deny();
 	}
 
+	if(count($available_hosts) == 0) $available_hosts = array(-1);
 	$available_hosts = implode(',', $available_hosts);
+
 	if(isset($_REQUEST["groupid"]) && $_REQUEST["groupid"] > 0)
 	{
 		if(!in_array($_REQUEST["groupid"], get_accessible_groups_by_userid($USER_DETAILS['userid'],PERM_READ_WRITE,null,

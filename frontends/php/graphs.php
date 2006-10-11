@@ -255,17 +255,18 @@ include "include/page_header.php";
 		{
 			$result = DBselect("select distinct g.* from graphs g left join graphs_items gi on g.graphid=gi.graphid ".
 				" left join items i on gi.itemid=i.itemid ".
-				" and i.hostid=".$_REQUEST["hostid"].
+				" where i.hostid=".$_REQUEST["hostid"].
 				" and i.hostid not in (".$denyed_hosts.") ".
 				" and ".DBid2nodeid("g.graphid")."=".$ZBX_CURNODEID.
+				" and i.hostid is not NULL ".
 				" order by g.name");
 		}
 		else
 		{
 			$result = DBselect("select g.* from graphs g left join graphs_items gi on g.graphid=gi.graphid ".
 				" left join items i on gi.itemid=i.itemid ".
-				" and i.hostid not in (".$denyed_hosts.") ".
 				" where ".DBid2nodeid("g.graphid")."=".$ZBX_CURNODEID.
+				" and ( i.hostid not in (".$denyed_hosts.")  OR i.hostid is NULL )".
 				" order by g.name");
 		}
 		while($row=DBfetch($result))

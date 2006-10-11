@@ -209,16 +209,30 @@ COpt::compare_files_with_menu($ZBX_MENU);
 // Check permissions
 		unset($deny);
 		if($label!='login' && !isset($USER_DETAILS['type']))
+		{
 			$deny = true;
-		elseif($label=='admin'	&& !in_array($USER_DETAILS['type'], 
-			array(USER_TYPE_SUPPER_ADMIN)) )
+		}
+		elseif($label=='admin'	&& (!in_array($USER_DETAILS['type'], array(USER_TYPE_SUPPER_ADMIN)) ||
+			!in_array($ZBX_CURNODEID, get_accessible_nodes_by_userid(
+				$USER_DETAILS['userid'],PERM_READ_WRITE,null,
+				PERM_RES_IDS_ARRAY,$ZBX_CURNODEID))))
+		{
 			$deny = true;
-		elseif($label=='config'	&& !in_array($USER_DETAILS['type'], 
-			array(USER_TYPE_SUPPER_ADMIN, USER_TYPE_ZABBIX_ADMIN)) )
+		}
+		elseif($label=='config'	&& (
+			!in_array($USER_DETAILS['type'], array(USER_TYPE_SUPPER_ADMIN, USER_TYPE_ZABBIX_ADMIN)) ||
+			!in_array($ZBX_CURNODEID, get_accessible_nodes_by_userid(
+				$USER_DETAILS['userid'],PERM_READ_LIST,null,
+				PERM_RES_IDS_ARRAY,$ZBX_CURNODEID))))
+		{
 			$deny = true;
-		elseif($label=='view'	&& !in_array($USER_DETAILS['type'], 
-			array(USER_TYPE_SUPPER_ADMIN, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_ZABBIX_USER)) )
+		}
+		elseif(!in_array($ZBX_CURNODEID, get_accessible_nodes_by_userid(
+				$USER_DETAILS['userid'],PERM_READ_LIST,null,
+				PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+		{
 			$deny = true;
+		}
 
 // End of check permissions
 

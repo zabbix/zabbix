@@ -142,12 +142,15 @@ include "include/page_header.php";
 ?>
 <?php
 /****** GRAPH ******/
+	$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_WRITE,PERM_MODE_LT);
 
-	if(! ($db_graph = DBfetch(DBselect("select g.name from graphs g,graphs_items gi,items i ".
+	if(! ($db_graph = DBfetch(DBselect("select g.name from graphs g left join graphs_items gi on gi.graphid=g.graphid ".
+			" left join items i on gi.itemid=i.itemid".
 			" where g.graphid=".$_REQUEST["graphid"].
-			" and gi.graphid=g.graphid and gi.itemid=i.itemid and i.hostid not in (".
-			get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_ONLY,PERM_MODE_LT).
-			")"))))
+			" and ".DBid2nodeid("g.graphid")."=".$ZBX_CURNODEID.
+			" and ( i.hostid not in (".$denyed_hosts.") OR i.hostid is NULL )"
+			)
+		)))
 	{
 		access_deny();
 	}
@@ -175,9 +178,10 @@ include "include/page_header.php";
 		$table = new CTableInfo("...");
 		$table->SetHeader(array(S_SORT_ORDER,S_HOST,S_PARAMETER,S_FUNCTION,S_TYPE,S_DRAW_STYLE,S_COLOR,S_ACTIONS));
 
-		$result=DBselect("select i.itemid,h.host,i.description,gi.*,i.key_".
-			" from hosts h,graphs_items gi,items i where i.itemid=gi.itemid".
-			" and gi.graphid=".$_REQUEST["graphid"]." and h.hostid=i.hostid order by gi.sortorder desc, gi.itemid");
+		$result=DBselect("select i.itemid,h.host,i.description,gi.*,i.key_ ".
+			" from hosts h,graphs_items gi,items i where i.itemid=gi.itemid ".
+			" and gi.graphid=".$_REQUEST["graphid"]." and h.hostid=i.hostid ".
+			" order by gi.sortorder desc, i.description, i.itemid");
 		while($row=DBfetch($result))
 		{
 

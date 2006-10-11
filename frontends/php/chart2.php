@@ -45,15 +45,17 @@ include "include/page_header.php";
 	check_fields($fields);
 ?>
 <?php
-	if( !($db_data = DBfetch(DBselect("select g.*,h.host,h.hostid from graphs g, graphs_items gi, items i, hosts h ".
+	$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'], PERM_READ_ONLY, PERM_MODE_LT);
+	
+	if( !($db_data = DBfetch(DBselect("select g.*,h.host,h.hostid from graphs g left join graphs_items gi on g.graphid=gi.graphid ".
+		" left join items i on gi.itemid=i.itemid left join hosts h on i.hostid=h.hostid ".
 		" where g.graphid=".$_REQUEST["graphid"].
-		" and g.graphid=gi.graphid and gi.itemid=i.itemid and i.hostid=h.hostid ".
-		" and h.hostid not in (".
-			get_accessible_hosts_by_userid($USER_DETAILS['userid'], PERM_READ_ONLY, PERM_MODE_LT).
-		")"))))
+		/* " and ".DBid2nodeid("g.graphid")."=".$ZBX_CURNODEID. */ /* NOTE: the chart can display any accesiable graph! */
+		" and ( h.hostid not in (".$denyed_hosts.") OR h.hostid is NULL) "))))
 	{
 		access_deny();
 	}
+
 	$graph = new Graph($db_data["graphtype"]);
 
 	if(isset($_REQUEST["period"]))		$graph->SetPeriod($_REQUEST["period"]);
@@ -78,8 +80,7 @@ include "include/page_header.php";
 	$graph->SetYAxisMin($db_data["yaxismin"]);
 	$graph->SetYAxisMax($db_data["yaxismax"]);
 
-	$result = DBselect("select gi.*".
-		" from graphs_items gi ".
+	$result = DBselect("select gi.* from graphs_items gi ".
 		" where gi.graphid=".$db_data["graphid"].
 		" order by gi.sortorder, gi.itemid desc");
 
