@@ -27,7 +27,7 @@
 
 	define('ZBX_PAGE_NO_MENU', 1);
 	
-include	"include/page_header.php";
+include_once "include/page_header.php";
 
 	insert_confirm_javascript();
 ?>
@@ -97,6 +97,6 @@ function add_user(formname,user_id,alias)
 ?>
 <?php
 
-include	"include/page_footer.php";
+include_once "include/page_footer.php";
 
 ?>

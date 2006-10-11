@@ -23,7 +23,7 @@
 	$page["title"] = "S_STATUS_OF_ZABBIX";
 	$page["file"] = "report1.php";
 
-include "include/page_header.php";
+include_once "include/page_header.php";
 
 ?>
 <?php
@@ -66,6 +66,6 @@ include "include/page_header.php";
 ?>
 <?php
 
-include "include/page_footer.php";
+include_once "include/page_footer.php";
 
 ?>

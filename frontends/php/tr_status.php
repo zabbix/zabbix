@@ -94,7 +94,7 @@
 	if(isset($_REQUEST["fullscreen"]))
 		define('ZBX_PAGE_NO_MENU', 1);
 	
-include "include/page_header.php";
+include_once "include/page_header.php";
 	
 ?>
 <?php
@@ -418,6 +418,6 @@ include "include/page_header.php";
 ?>
 <?php
 
-include "include/page_footer.php";
+include_once "include/page_footer.php";
 
 ?>

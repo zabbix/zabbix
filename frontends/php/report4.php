@@ -24,7 +24,7 @@
         $page["title"] = "S_IT_NOTIFICATIONS";
         $page["file"] = "report4.php";
 
-include "include/page_header.php";
+include_once "include/page_header.php";
 
 ?>
 <?php
@@ -131,7 +131,15 @@ include "include/page_header.php";
 			$from	= 0;
 			$to	= 52;
 			array_unshift($header,new CCol(S_FROM,"center"),new CCol(S_TILL,"center"));
-			function get_time($w)	{	global $year;	return mktime(0,0,0,1, $w*7+1, $year);	}
+			function get_time($w)	{
+				global $year;	
+
+				$time	= mktime(0,0,0,1, 1, $year);
+				$wd	= date("w", $time);
+				$wd	= $wd == 0 ? 6 : $wd - 1;
+
+				return ($time + ($w*7 - $wd)*24*3600);
+			}
 			function format_time($t){	return date("d M Y H:i",$t);	}
 			function format_time2($t){	return format_time($t); };
 			break;
@@ -142,8 +150,11 @@ include "include/page_header.php";
 
 	for($t = $from; $t <= $to; $t++)
 	{       
-		$start	= get_time($t);
-		$end	= get_time($t+1);
+		if(($start = get_time($t)) > time())
+			break;
+		
+		if(($end = get_time($t+1)) > time())
+			$end = time();
 
 		$table_row = array(format_time($start),format_time2($end));
 		foreach($users as $userid => $alias)
@@ -175,6 +186,6 @@ include "include/page_header.php";
 ?>
 <?php
 
-include "include/page_footer.php";
+include_once "include/page_footer.php";
 
 ?>

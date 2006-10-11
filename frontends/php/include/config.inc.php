@@ -50,14 +50,6 @@ function SDI($msg="SDI") { echo "DEBUG INFO: "; if(is_array($msg)) print_r($msg)
 	require_once 	"include/perm.inc.php";
 	require_once 	"include/audit.inc.php";
 
-	$ZBX_CURNODEID = get_cookie('current_nodeid', $ZBX_LOCALNODEID); // Selected node
-	if(isset($_REQUEST['switch_node']))
-	{
-		if(DBfetch(DBselect("select nodeid from nodes where nodeid=".$_REQUEST['switch_node'])))
-			$ZBX_CURNODEID = $_REQUEST['switch_node'];
-	}
-	setcookie("current_nodeid",$ZBX_CURNODEID);
-
 // Include Validation
 
 	require_once 	"include/validate.inc.php";
@@ -92,15 +84,13 @@ function SDI($msg="SDI") { echo "DEBUG INFO: "; if(is_array($msg)) print_r($msg)
 	include_once("include/classes/cserverinfo.mod.php");
 	include_once("include/classes/cflashclock.mod.php");
 
-define("PAGE_TYPE_HTML",	0);
-define("PAGE_TYPE_IMAGE",	1);
-
 	function	access_deny()
 	{
+		include_once "include/page_header.php";
 
 		show_error_message(S_NO_PERMISSIONS);
 		
-		include "include/page_footer.php";
+		include_once "include/page_footer.php";
 	}
 
 	function zbx_stripslashes($value){
@@ -152,7 +142,7 @@ define("PAGE_TYPE_IMAGE",	1);
 	function fatal_error($msg)
 	{
 		error($msg);
-		include "include/page_footer.php";
+		include_once "include/page_footer.php";
 	}
 
 	function getmicrotime()

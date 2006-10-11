@@ -308,7 +308,7 @@
 	{
 		unset_all();
 		show_error_message(S_INVALID_URL);
-		include "include/page_footer.php";
+		include_once "include/page_footer.php";
 	}
 	
 	function	check_fields(&$fields)

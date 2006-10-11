@@ -25,7 +25,7 @@
 	$page["title"]	= "S_AVAILABILITY_REPORT";
 	$page["file"]	= "report2.php";
 
-include "include/page_header.php";
+include_once "include/page_header.php";
 
 ?>
 <?php
@@ -141,6 +141,6 @@ include "include/page_header.php";
 ?>
 <?php
 	
-	include "include/page_footer.php";
+	include_once "include/page_footer.php";
 
 ?>

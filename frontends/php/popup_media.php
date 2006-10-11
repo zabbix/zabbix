@@ -30,7 +30,7 @@
 
 	define('ZBX_PAGE_NO_MENU', 1);
 	
-include	"include/page_header.php";
+include_once "include/page_header.php";
 
 	insert_confirm_javascript();
 ?>
@@ -128,6 +128,6 @@ function add_media(formname,mediatypeid,sendto,period,active,severity)
 ?>
 <?php
 
-include	"include/page_footer.php";
+include_once "include/page_footer.php";
 
 ?>

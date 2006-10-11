@@ -64,7 +64,7 @@
 	
 	define('ZBX_PAGE_NO_MENU', 1);
 	
-include "include/page_header.php";
+include_once "include/page_header.php";
 
 	if(isset($error))
 	{
@@ -111,25 +111,31 @@ include "include/page_header.php";
 	$frmTitle->AddVar("srctbl",	$srctbl);
 	$frmTitle->AddVar("srcfld1",	$srcfld1);
 	$frmTitle->AddVar("srcfld2",	$srcfld2);
-	
+
+	$accessible_nodes = get_accessible_nodes_by_userid($USER_DETAILS['userid'],PERM_READ_LIST);
+	$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_ONLY,PERM_MODE_LT);
+	$accessible_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_ONLY);
 	
 	if(in_array($srctbl,array("hosts","triggers","logitems")))
 	{
+		$nodeid = get_request("nodeid", $ZBX_CURNODEID);
+		$cmbNode = new CComboBox("nodeid", $nodeid, "submit()");
+		$cmbNode->AddItem(0,S_ALL_SMALL);
+		
+		
+		
+
+		
 		$groupid = get_request("groupid",get_profile("web.popup.groupid",0));
 		$cmbGroups = new CComboBox("groupid",$groupid,"submit()");
 		$cmbGroups->AddItem(0,S_ALL_SMALL);
-		$db_groups = DBselect("select groupid,name from groups where ".DBid2nodeid("groupid")."=".$ZBX_CURNODEID." order by name");
+		$db_groups = DBselect("select distinct g.groupid,g.name from groups g, hosts_groups hg ".
+			" where ".DBid2nodeid("g.groupid")."=".$ZBX_CURNODEID.
+			" and g.groupid=hg.groupid and hg.hostid in (".$accessible_hosts.") ".
+			" order by name");
 		while($group = DBfetch($db_groups))
-		{ // Check if at least one host with read permission exists for this group
-			$db_hosts = DBselect("select distinct h.hostid,h.host from hosts h,items i,hosts_groups hg".
-				" where h.hostid=i.hostid and hg.groupid=".$group["groupid"]." and hg.hostid=h.hostid".
-				" and h.status not in (".HOST_STATUS_DELETED.") order by h.host");
-			while($host = DBfetch($db_hosts))
-			{
-//				if(!check_right("Host","R",$host["hostid"]))	continue; /* TODO */
-				$cmbGroups->AddItem($group["groupid"],$group["name"]);
-				break;
-			}
+		{
+			$cmbGroups->AddItem($group["groupid"],$group["name"]);
 		}
 		$frmTitle->AddItem(array(S_GROUP,SPACE,$cmbGroups));
 		update_profile("web.popup.groupid",$groupid);
@@ -150,26 +156,30 @@ include "include/page_header.php";
 		$hostid = get_request("hostid",get_profile("web.popup.hostid",0));
 		$cmbHosts = new CComboBox("hostid",$hostid,"submit()");
 		
-		$sql = "select h.hostid,h.host from hosts h";
+		$sql = "select distinct h.hostid,h.host from hosts h";
 		if(isset($groupid))
-			$sql .= ",hosts_groups hg where ".DBid2nodeid("h.hostid")."=".$ZBX_CURNODEID.
-				" and h.hostid=hg.hostid and hg.groupid=$groupid";
+		{
+			$sql .= ",hosts_groups hg where ".
+				" h.hostid=hg.hostid and hg.groupid=".$groupid." and ";
+		}
 		else
 		{
-			$sql .= " where ".DBid2nodeid("h.hostid")."=".$ZBX_CURNODEID;
+			$sql .= " where ";
 			$cmbHosts->AddItem(0,S_ALL_SMALL);
 		}
+
+		$sql .= DBid2nodeid("h.hostid")."=".$ZBX_CURNODEID.
+				" and h.hostid in (".$accessible_hosts.")";
 
 		$first_hostid = 0;
 		$db_hosts = DBselect($sql);
 		while($host = DBfetch($db_hosts))
 		{
-//			if(!check_right("Host","R",$host["hostid"]))	continue; /* TODO */
 			$cmbHosts->AddItem($host["hostid"],$host["host"]);
 			if($hostid == $host["hostid"]) $correct_host = 1;
 			if($first_hostid == 0)	$first_hostid = $host["hostid"];
 		}
-		if(!isset($correct_host) && isset($groupid)){
+		if(!isset($correct_host)){
 			$hostid = $first_hostid;
 		}
 		$frmTitle->AddItem(array(SPACE,S_HOST,SPACE,$cmbHosts));
@@ -455,6 +465,6 @@ function add_variable(formname,value)
 ?>
 <?php
 
-include "include/page_footer.php";
+include_once "include/page_footer.php";
 
 ?>

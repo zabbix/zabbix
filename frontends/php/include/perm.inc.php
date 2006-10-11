@@ -47,7 +47,7 @@
 		global	$ZBX_LOCALNODEID;
 
 		$USER_DETAILS = NULL;
-
+		
 		if(isset($_COOKIE["sessionid"]))
 		{
 			$sessionid = $_COOKIE["sessionid"];

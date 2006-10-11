@@ -26,7 +26,7 @@
 	$page["title"] = "S_USER_PROFILE";
 	$page["file"] = "profile.php";
 
-include "include/page_header.php";
+include_once "include/page_header.php";
 
 	insert_confirm_javascript();
 ?>
@@ -94,6 +94,6 @@ include "include/page_header.php";
 ?>
 <?php
 
-include "include/page_footer.php";
+include_once "include/page_footer.php";
 
 ?>

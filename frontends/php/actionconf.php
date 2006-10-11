@@ -28,7 +28,7 @@
 	$page["title"]	= "S_CONFIGURATION_OF_ACTIONS";
 	$page["file"]	= "actionconf.php";
 
-include "include/page_header.php";
+include_once "include/page_header.php";
 	
 	insert_confirm_javascript();
 
@@ -353,6 +353,6 @@ include "include/page_header.php";
 ?>
 <?php
 
-	include "include/page_footer.php";
+	include_once "include/page_footer.php";
 
 ?>

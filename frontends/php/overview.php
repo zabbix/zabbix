@@ -29,7 +29,7 @@
 
 	define('ZBX_PAGE_DO_REFRESH', 1);
 	
-include "include/page_header.php";
+include_once "include/page_header.php";
 
 ?>
 <?php
@@ -116,6 +116,6 @@ COpt::profiling_stop("get_triggers_overview");
 ?>
 <?php
 
-include "include/page_footer.php";
+include_once "include/page_footer.php";
 
 ?>

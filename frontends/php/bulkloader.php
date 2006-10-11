@@ -25,7 +25,7 @@
 	$page["title"] = "S_BULKLOADER_MAIN";
 	$fileuploaded=0;
 
-include "include/page_header.php";
+include_once "include/page_header.php";
 
 	insert_confirm_javascript();
 	
@@ -204,6 +204,6 @@ include "include/page_header.php";
 		), 1);
 	table_end();
 
-include "include/page_footer.php";
+include_once "include/page_footer.php";
 
 ?>

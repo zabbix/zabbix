@@ -21,24 +21,49 @@
 <?php
 	require_once("include/config.inc.php");
 
+	global $USER_DETAILS;
+	global $TRANSLATION;
+	global $ZBX_CURNODEID;
+	global $ZBX_LOCALNODEID;
+	global $page;
+
 COpt::profiling_start("page");
+	
+	unset($denyed_page_requested);
 
 	/* Header for HTML pages */
 
 	if(!isset($page["type"])) $page["type"] = PAGE_TYPE_HTML;
+	if(!isset($page["file"])) $page["file"] = basename($_SERVER['PHP_SELF']);
 
 	if(!defined('ZBX_PAGE_NO_AUTHERIZATION'))
 	{
 
-		global $TRANSLATION;
 		if(!isset($TRANSLATION) || !is_array($TRANSLATION))	$TRANSLATION = array();
 
 		check_authorisation();
+		
+
 		include_once "include/locales/".$USER_DETAILS["lang"].".inc.php";
 		process_locales();
 	}
 	include_once "include/locales/en_gb.inc.php";
 	process_locales();
+
+	$ZBX_CURNODEID = get_cookie('current_nodeid', $ZBX_LOCALNODEID); // Selected node
+	if(isset($_REQUEST['switch_node']))
+	{
+		if(DBfetch(DBselect("select nodeid from nodes where nodeid=".$_REQUEST['switch_node'])))
+			$ZBX_CURNODEID = $_REQUEST['switch_node'];
+	}
+	
+	if(count(get_accessible_nodes_by_userid($USER_DETAILS['userid'],PERM_READ_LIST,null,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)) <= 0)
+	{
+		$denyed_page_requested = true;
+		$ZBX_CURNODEID = $ZBX_LOCALNODEID;
+	}
+	
+	setcookie("current_nodeid",$ZBX_CURNODEID);
 
 	switch($page["type"])
 	{
@@ -201,8 +226,6 @@ COpt::compare_files_with_menu($ZBX_MENU);
 
 	$main_menu_row	= array();
 	$sub_menu_row	= array();
-
-	unset($denyed_page_requested);
 
 	foreach($ZBX_MENU as $label=>$sub)
 	{

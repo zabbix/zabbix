@@ -26,7 +26,7 @@
 	$page["title"]	= "S_CHART";
 	$page["type"]	= PAGE_TYPE_IMAGE;
 
-include "include/page_header.php";
+include_once "include/page_header.php";
 
 ?>
 <?php
@@ -38,11 +38,20 @@ include "include/page_header.php";
 	check_fields($fields);
 ?>
 <?php
-	/* TODO - permission system for services */
-	if( !($service = get_service_by_serviceid($_REQUEST["serviceid"])))
+	$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_ONLY,PERM_MODE_LT);
+	
+	if( !($service = DBfetch(DBselect("select s.* from services s left join triggers t on s.triggerid=t.triggerid ".
+		" left join functions f on t.triggerid=f.triggerid left join items i on f.itemid=i.itemid ".
+		" where (i.hostid is NULL or i.hostid not in (".$denyed_hosts.")) ".
+		/* " and ".DBid2nodeid("s.serviceid")."=".$ZBX_CURNODEID. */ /* NOTE: allow displaying all accessiables services */
+		" and s.serviceid=".$_REQUEST["serviceid"]
+		))))
 	{
 		access_deny();
 	}
+?>
+<?php
+	$start_time = time(NULL);
 
 	$sizeX=900;
 	$sizeY=300;
@@ -89,10 +98,15 @@ include "include/page_header.php";
 	$wday=date("w",$start);
 	if($wday==0) $wday=7;
 	$start=$start-($wday-1)*24*3600;
+
 	for($i=0;$i<52;$i++)
 	{
-		$period_start=$start+7*24*3600*$i;
-		$period_end=$start+7*24*3600*($i+1);
+		if(($period_start=$start+7*24*3600*$i) > time())
+			break;
+			
+		if(($period_end=$start+7*24*3600*($i+1)) > time())
+			$period_end = time();
+
 		$stat = calculate_service_availability($_REQUEST["serviceid"],$period_start,$period_end);
 		
 		$problem[$i]=$stat["problem"];
@@ -105,28 +119,26 @@ include "include/page_header.php";
 		DashedLine($im,$shiftX,$i+$shiftYup,$sizeX+$shiftX,$i+$shiftYup,$gray);
 	}
 
-	$j=0;
-	for($i=0;$i<=$sizeX;$i+=$sizeX/52)
+	for(
+		$i = 0, $period_start = $start;
+		$i <= $sizeX;
+		$i += $sizeX/52, $period_start += 7*24*3600
+		)
 	{
 		DashedLine($im,$i+$shiftX,$shiftYup,$i+$shiftX,$sizeY+$shiftYup,$gray);
-		$period_start=$start+7*24*3600*$j;
 		ImageStringUp($im, 1,$i+$shiftX-4, $sizeY+$shiftYup+32, date("d.M",$period_start) , $black);
-		$j++;
 	}
 
-	$maxY=100;
-	$tmp=max($problem);
-	if($tmp>$maxY)
-	{
-		$maxY=$tmp;
-	}
-	$minY=0;
+	$maxY = max(max($problem), 100);
+	$minY = 0;
 
-	$maxX=900;
-	$minX=0;
+	$maxX = 900;
+	$minX = 0;
 
 	for($i=1;$i<=52;$i++)
 	{
+		if(!isset($ok[$i-1])) continue;
+
 		$x2=(900/52)*$sizeX*($i-$minX-1)/($maxX-$minX);
 		$y2=$sizeY*($ok[$i-1]-$minY)/($maxY-$minY);
 		$y2=$sizeY-$y2;
@@ -161,6 +173,6 @@ include "include/page_header.php";
 ?>
 <?php
 
-include "include/page_footer.php";
+include_once "include/page_footer.php";
 
 ?>

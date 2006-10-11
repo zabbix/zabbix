@@ -26,7 +26,7 @@
 	$page["title"]		= "S_ALARMS";
 	$page["file"]		= "tr_events.php";
 
-include "include/page_header.php";
+include_once "include/page_header.php";
 
 ?>
 <?php
@@ -179,6 +179,6 @@ include "include/page_header.php";
 
 <?php
 
-include "include/page_footer.php";
+include_once "include/page_footer.php";
 
 ?>

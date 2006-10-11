@@ -77,7 +77,7 @@
 		}
 	}
 
-include "include/page_header.php";
+include_once "include/page_header.php";
 	
 	if(isset($_REQUEST['message'])) show_error_message($_REQUEST['message']);
 ?>
@@ -97,6 +97,6 @@ include "include/page_header.php";
 ?>
 <?php
 
-include "include/page_footer.php";
+include_once "include/page_footer.php";
 
 ?>

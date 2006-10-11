@@ -486,8 +486,6 @@ SDI(
 
 	function	get_service_by_serviceid($serviceid)
 	{
-		access_deny(); /* TODO - permission system */
-		
 		$res = DBfetch(DBselect("select * from services where serviceid=".$serviceid));
 		if(!$res)
 		{

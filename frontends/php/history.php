@@ -35,7 +35,7 @@
 		define('ZBX_PAGE_DO_REFRESH', 1);
 	}
 
-include "include/page_header.php";
+include_once "include/page_header.php";
 	
 	if(!isset($_REQUEST["plaintext"]))
 		insert_confirm_javascript();
@@ -519,6 +519,6 @@ COpt::profiling_stop("history");
 ?>
 <?php
 
-include "include/page_footer.php";
+include_once "include/page_footer.php";
 
 ?>

@@ -19,6 +19,9 @@
 **/
 ?>
 <?php
+	define("PAGE_TYPE_HTML",	0);
+	define("PAGE_TYPE_IMAGE",	1);
+
 	define("T_ZBX_STR",			0);
 	define("T_ZBX_INT",			1);
 	define("T_ZBX_DBL",			2);

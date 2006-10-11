@@ -25,7 +25,7 @@
 	$page["title"]	= "S_TRIGGERS_TOP_100";
 	$page["file"]	= "report5.php";
 	
-include "include/page_header.php";
+include_once "include/page_header.php";
 
 ?>
 <?php
@@ -87,6 +87,6 @@ include "include/page_header.php";
 ?>
 <?php
 
-include "include/page_footer.php";
+include_once "include/page_footer.php";
 
 ?>

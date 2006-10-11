@@ -24,7 +24,7 @@
 	$page['file'] = 'vtext.php';
 	$page['type'] = PAGE_TYPE_IMAGE;
 	
-include "include/page_header.php";
+include_once "include/page_header.php";
 
 ?>
 <?php
@@ -57,6 +57,6 @@ include "include/page_header.php";
 ?>
 <?php
 
-include "include/page_footer.php";
+include_once "include/page_footer.php";
 
 ?>
