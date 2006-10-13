@@ -163,7 +163,7 @@ int	evaluate_simple (double *result,char *exp,char *error,int maxerrlen)
 		second[j]=0;*/
 		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
 			zabbix_syslog(error);
 			return FAIL;
 		}
@@ -174,7 +174,7 @@ int	evaluate_simple (double *result,char *exp,char *error,int maxerrlen)
 		}
 		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
 			zabbix_syslog(error);
 			return FAIL;
 		}
@@ -198,13 +198,13 @@ int	evaluate_simple (double *result,char *exp,char *error,int maxerrlen)
 		zabbix_log(LOG_LEVEL_DEBUG, "[%s] [%s]",first,second );
 		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
 			zabbix_syslog(error);
 			return FAIL;
 		}
 		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
 			zabbix_syslog(error);
 			return FAIL;
 		}
@@ -228,13 +228,13 @@ int	evaluate_simple (double *result,char *exp,char *error,int maxerrlen)
 		strscpy( second, p);
 		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
 			zabbix_syslog(error);
 			return FAIL;
 		}
 		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
 			zabbix_syslog(error);
 			return FAIL;
 		}
@@ -259,13 +259,13 @@ int	evaluate_simple (double *result,char *exp,char *error,int maxerrlen)
 		zabbix_log(LOG_LEVEL_DEBUG, "[%s] [%s]",first,second );
 		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
 			zabbix_syslog(error);
 			return FAIL;
 		}
 		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
 			zabbix_syslog(error);
 			return FAIL;
 		}
@@ -290,13 +290,13 @@ int	evaluate_simple (double *result,char *exp,char *error,int maxerrlen)
 		strscpy( second, p);
 		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
 			zabbix_syslog(error);
 			return FAIL;
 		}
 		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
 			zabbix_syslog(error);
 			return FAIL;
 		}
@@ -313,20 +313,20 @@ int	evaluate_simple (double *result,char *exp,char *error,int maxerrlen)
 		strscpy( second, p);
 		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
 			zabbix_syslog(error);
 			return FAIL;
 		}
 		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
 			zabbix_syslog(error);
 			return FAIL;
 		}
 		if(cmp_double(value2,0) == 0)
 		{
 			snprintf(error,maxerrlen-1,"Division by zero. Cannot evaluate expression [%s/%s]", first,second);
-			zabbix_log(LOG_LEVEL_WARNING, error);
+			zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 			zabbix_syslog(error);
 			return FAIL;
 		}
@@ -346,13 +346,13 @@ int	evaluate_simple (double *result,char *exp,char *error,int maxerrlen)
 		strscpy( second, p);
 		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
 			zabbix_syslog(error);
 			return FAIL;
 		}
 		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
 			zabbix_syslog(error);
 			return FAIL;
 		}
@@ -369,13 +369,13 @@ int	evaluate_simple (double *result,char *exp,char *error,int maxerrlen)
 		strscpy( second, p);
 		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
 			zabbix_syslog(error);
 			return FAIL;
 		}
 		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
 			zabbix_syslog(error);
 			return FAIL;
 		}
@@ -392,13 +392,13 @@ int	evaluate_simple (double *result,char *exp,char *error,int maxerrlen)
 		strscpy( second, p);
 		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
 			zabbix_syslog(error);
 			return FAIL;
 		}
 		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
 			zabbix_syslog(error);
 			return FAIL;
 		}
@@ -422,13 +422,13 @@ int	evaluate_simple (double *result,char *exp,char *error,int maxerrlen)
 		strscpy( second, p);
 		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
 			zabbix_syslog(error);
 			return FAIL;
 		}
 		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, error);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
 			zabbix_syslog(error);
 			return FAIL;
 		}
@@ -445,7 +445,7 @@ int	evaluate_simple (double *result,char *exp,char *error,int maxerrlen)
 	else
 	{
 		snprintf(error,maxerrlen-1,"Format error or unsupported operator.  Exp: [%s]", exp);
-		zabbix_log(LOG_LEVEL_WARNING, error);
+		zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 		zabbix_syslog(error);
 		return FAIL;
 	}
@@ -494,7 +494,7 @@ int	evaluate(int *result,char *exp, char *error, int maxerrlen)
 		if( r == -1 )
 		{
 			snprintf(error, maxerrlen-1, "Cannot find left bracket [(]. Expression:[%s]", exp);
-			zabbix_log(LOG_LEVEL_WARNING, error);
+			zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 			zabbix_syslog(error);
 			return	FAIL;
 		}
@@ -507,7 +507,7 @@ int	evaluate(int *result,char *exp, char *error, int maxerrlen)
 		if( evaluate_simple( &value, simple, error, maxerrlen ) != SUCCEED )
 		{
 			/* Changed to LOG_LEVEL_DEBUG */
-			zabbix_log( LOG_LEVEL_DEBUG, error);
+			zabbix_log( LOG_LEVEL_DEBUG, "%s", error);
 			zabbix_syslog(error);
 			return	FAIL;
 		}
@@ -530,7 +530,7 @@ int	evaluate(int *result,char *exp, char *error, int maxerrlen)
 	}
 	if( evaluate_simple( &value, res, error, maxerrlen ) != SUCCEED )
 	{
-		zabbix_log(LOG_LEVEL_WARNING, error);
+		zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 		zabbix_syslog(error);
 		return	FAIL;
 	}
@@ -906,14 +906,14 @@ int	substitute_functions(char *exp, char *error, int maxerrlen)
 		if( r == FAIL )
 		{
 			snprintf(error,maxerrlen-1,"Cannot find right bracket. Expression:[%s]", exp);
-			zabbix_log( LOG_LEVEL_WARNING, error);
+			zabbix_log( LOG_LEVEL_WARNING, "%s", error);
 			zabbix_syslog(error);
 			return	FAIL;
 		}
 		if( r < l )
 		{
 			snprintf(error,maxerrlen-1, "Right bracket is before left one. Expression:[%s]", exp);
-			zabbix_log( LOG_LEVEL_WARNING, error);
+			zabbix_log( LOG_LEVEL_WARNING, "%s", error);
 			zabbix_syslog(error);
 			return	FAIL;
 		}
@@ -928,7 +928,7 @@ int	substitute_functions(char *exp, char *error, int maxerrlen)
 		{
 /* It may happen because of functions.lastvalue is NULL, so this is not warning  */
 			snprintf(error,maxerrlen-1, "Unable to get value for functionid [%s]", functionid);
-			zabbix_log( LOG_LEVEL_DEBUG, error);
+			zabbix_log( LOG_LEVEL_DEBUG, "%s", error);
 			zabbix_syslog(error);
 			return	FAIL;
 		}

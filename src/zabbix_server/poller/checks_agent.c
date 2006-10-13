@@ -70,11 +70,11 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 	{
 #ifdef	HAVE_HSTRERROR
 		snprintf(error,MAX_STRING_LEN-1,"gethostbyname() failed [%s]", hstrerror(h_errno));
-		zabbix_log(LOG_LEVEL_WARNING, error);
+		zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 		result->msg=strdup(error);
 #else
 		snprintf(error,MAX_STRING_LEN-1,"gethostbyname() failed [%d]", h_errno);
-		zabbix_log(LOG_LEVEL_WARNING, error);
+		zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 		result->msg=strdup(error);
 #endif
 		return	NETWORK_ERROR;
@@ -98,7 +98,7 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 	if(s == -1)
 	{
 		snprintf(error,MAX_STRING_LEN-1,"Cannot create socket [%s]", strerror(errno));
-		zabbix_log(LOG_LEVEL_WARNING, error);
+		zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 		result->msg=strdup(error);
 		return	FAIL;
 	}
@@ -109,17 +109,17 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 		{
 			case EINTR:
 				snprintf(error,MAX_STRING_LEN-1,"Timeout while connecting to [%s]",item->host);
-				zabbix_log(LOG_LEVEL_WARNING, error);
+				zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 				result->msg=strdup(error);
 				break;
 			case EHOSTUNREACH:
 				snprintf(error,MAX_STRING_LEN-1,"No route to host [%s]",item->host);
-				zabbix_log(LOG_LEVEL_WARNING, error);
+				zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 				result->msg=strdup(error);
 				break;
 			default:
 				snprintf(error,MAX_STRING_LEN-1,"Cannot connect to [%s] [%s]",item->host, strerror(errno));
-				zabbix_log(LOG_LEVEL_WARNING, error);
+				zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 				result->msg=strdup(error);
 		} 
 		close(s);
@@ -134,12 +134,12 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 		{
 			case EINTR:
 				snprintf(error,MAX_STRING_LEN-1,"Timeout while sending data to [%s]",item->host);
-				zabbix_log(LOG_LEVEL_WARNING, error);
+				zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 				result->msg=strdup(error);
 				break;
 			default:
 				snprintf(error,MAX_STRING_LEN-1,"Error while sending data to [%s] [%s]",item->host, strerror(errno));
-				zabbix_log(LOG_LEVEL_WARNING, error);
+				zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 				result->msg=strdup(error);
 		} 
 		close(s);
@@ -154,18 +154,18 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 		{
 			case 	EINTR:
 					snprintf(error,MAX_STRING_LEN-1,"Timeout while receiving data from [%s]",item->host);
-					zabbix_log(LOG_LEVEL_WARNING, error);
+					zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 					result->msg=strdup(error);
 					break;
 			case	ECONNRESET:
 					snprintf(error,MAX_STRING_LEN-1,"Connection reset by peer.");
-					zabbix_log(LOG_LEVEL_WARNING, error);
+					zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 					result->msg=strdup(error);
 					close(s);
 					return	NETWORK_ERROR;
 			default:
 				snprintf(error,MAX_STRING_LEN-1,"Error while receiving data from [%s] [%s]",item->host, strerror(errno));
-				zabbix_log(LOG_LEVEL_WARNING, error);
+				zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 				result->msg=strdup(error);
 		} 
 		close(s);
@@ -204,7 +204,7 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 	else if(c[0]==0)
 	{
 		snprintf(error,MAX_STRING_LEN-1,"Got empty string from [%s] IP [%s] Parameter [%s]", item->host, item->ip, item->key);
-		zabbix_log( LOG_LEVEL_WARNING, error);
+		zabbix_log( LOG_LEVEL_WARNING, "%s", error);
 		zabbix_log( LOG_LEVEL_WARNING, "Assuming that agent dropped connection because of access permissions");
 		result->msg=strdup(error);
 		return	NETWORK_ERROR;
@@ -213,7 +213,7 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 	if(set_result_type(result, item->value_type, c) == FAIL)
 	{
 		snprintf(error,MAX_STRING_LEN-1, "Type of received value [%s] is not sutable for [%s@%s] having type [%d]", c, item->key, item->host, item->value_type);
-		zabbix_log( LOG_LEVEL_WARNING, error);
+		zabbix_log( LOG_LEVEL_WARNING, "%s", error);
 		zabbix_log( LOG_LEVEL_WARNING, "Returning NOTSUPPORTED");
 		result->msg=strdup(error);
 		return NOTSUPPORTED;

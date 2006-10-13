@@ -1,5 +1,6 @@
 Changes for 1.1.3:
 
+ - changed all zabbix_log(lev, str) to zabbix_log(lev,"%s", str) (Alexei)
  - introduced secure strcat and strcpy: zbx_strlcat, zbx_strlcpy (Alexei)
  - better format for Queue report (Alexei) 
  - fixed perofmance problem in Status of Triggers (Alexei)
