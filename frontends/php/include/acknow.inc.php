@@ -22,8 +22,8 @@
 	function	get_last_alarm_by_triggerid($triggerid)
 	{
 		$db_alarms = DBselect("select * from alarms where triggerid=$triggerid".
-			" order by clock desc");
-		$row=DBfetch($db_alarms,1);
+			" order by clock desc",1);
+		$row=DBfetch($db_alarms);
 		if(!$row)	return FALSE;
 		return $row;
 	}

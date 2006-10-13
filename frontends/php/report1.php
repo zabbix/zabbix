@@ -52,8 +52,8 @@
 		$style = "on";
 
 	$table->AddRow(array(S_ZABBIX_SERVER_IS_RUNNING,new CSpan($status["zabbix_server"],$style)));
-	$table->AddRow(array(S_VALUES_STORED,$status["history_count"]));
-	$table->AddRow(array(S_TRENDS_STORED,$status["trends_count"]));
+//	$table->AddRow(array(S_VALUES_STORED,$status["history_count"]));
+//	$table->AddRow(array(S_TRENDS_STORED,$status["trends_count"]));
 	$table->AddRow(array(S_NUMBER_OF_HOSTS,array($status["hosts_count"]."(",
 		new CSpan($status["hosts_count_monitored"],"off"),"/",
 		new CSpan($status["hosts_count_not_monitored"],"on"),"/",
@@ -70,8 +70,8 @@
 		new CSpan($status["triggers_count_unknown"],"unknown"),"/",
 		new CSpan($status["triggers_count_off"],"off"),"]"
 		)));
-	$table->AddRow(array(S_NUMBER_OF_ALARMS,$status["alarms_count"]));
-	$table->AddRow(array(S_NUMBER_OF_ALERTS,$status["alerts_count"]));
+//	$table->AddRow(array(S_NUMBER_OF_ALARMS,$status["alarms_count"]));
+//	$table->AddRow(array(S_NUMBER_OF_ALERTS,$status["alerts_count"]));
 	$table->Show();
 ?>
 

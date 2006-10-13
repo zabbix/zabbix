@@ -1,5 +1,8 @@
 Changes for 1.1.3:
 
+ - better format for Queue report (Alexei) 
+ - fixed perofmance problem in Status of Triggers (Alexei)
+ - history stats removed from Status of ZABBIX report (Alexei)
  - fixed assignment of default listen port for Win agent (Eugene)
  - changed return value for 'net.tcp.port[]' of Win agent (Eugene)
  - added images for postgres (Eugene)

@@ -67,45 +67,56 @@
 <?php
 	$now=time();
 
-	$result=DBselect("select i.itemid, i.nextcheck, i.description, h.host,h.hostid from items i,hosts h where i.status=0 and i.type not in (2) and ((h.status=".HOST_STATUS_MONITORED." and h.available!=".HOST_AVAILABLE_FALSE.") or (h.status=".HOST_STATUS_MONITORED." and h.available=".HOST_AVAILABLE_FALSE." and h.disable_until<=$now)) and i.hostid=h.hostid and i.nextcheck<$now and i.key_ not in ('status','icmpping','icmppingsec','zabbix[log]') order by i.nextcheck");
+	$result=DBselect("select i.itemid, i.nextcheck, i.description, i.type, h.host,h.hostid from items i,hosts h where i.status=0 and i.type not in (2) and ((h.status=".HOST_STATUS_MONITORED." and h.available!=".HOST_AVAILABLE_FALSE.") or (h.status=".HOST_STATUS_MONITORED." and h.available=".HOST_AVAILABLE_FALSE." and h.disable_until<=$now)) and i.hostid=h.hostid and i.nextcheck<$now and i.key_ not in ('status','icmpping','icmppingsec','zabbix[log]') order by i.nextcheck");
 	$table=new CTableInfo(S_THE_QUEUE_IS_EMPTY);
 
 	if($_REQUEST["show"]==0)
 	{
-		$sec_5=0;
-		$sec_10=0;
-		$sec_30=0;
-		$sec_60=0;
-		$sec_300=0;
-		$sec_rest=0;
+		for($i=ITEM_TYPE_ZABBIX;$i<=ITEM_TYPE_AGGREGATE;$i++)
+		{
+			$sec_5[$i]=0;
+			$sec_10[$i]=0;
+			$sec_30[$i]=0;
+			$sec_60[$i]=0;
+			$sec_300[$i]=0;
+			$sec_rest[$i]=0;
+		}
+
 		while($row=DBfetch($result))
 		{
 			if(!check_right("Host","R",$row["hostid"]))
 			{
 				continue;
 			}
-			if($now-$row["nextcheck"]<=5)		$sec_5++;
-			elseif($now-$row["nextcheck"]<=10)	$sec_10++;
-			elseif($now-$row["nextcheck"]<=30)	$sec_30++;
-			elseif($now-$row["nextcheck"]<=60)	$sec_60++;
-			elseif($now-$row["nextcheck"]<=300)	$sec_300++;
-			else					$sec_rest++;
+			if($now-$row["nextcheck"]<=5)		$sec_5[$row["type"]]++;
+			elseif($now-$row["nextcheck"]<=10)	$sec_10[$row["type"]]++;
+			elseif($now-$row["nextcheck"]<=30)	$sec_30[$row["type"]]++;
+			elseif($now-$row["nextcheck"]<=60)	$sec_60[$row["type"]]++;
+			elseif($now-$row["nextcheck"]<=300)	$sec_300[$row["type"]]++;
+			else					$sec_rest[$row["type"]]++;
 
 		}
 		$col=0;
-		$table->setHeader(array(S_DELAY,S_COUNT));
-		$elements=array(S_5_SECONDS,$sec_5);
-		$table->addRow($elements);
-		$elements=array(S_10_SECONDS,$sec_10);
-		$table->addRow($elements);
-		$elements=array(S_30_SECONDS,$sec_30);
-		$table->addRow($elements);
-		$elements=array(S_1_MINUTE,$sec_60);
-		$table->addRow($elements);
-		$elements=array(S_5_MINUTES,$sec_300);
-		$table->addRow($elements);
-		$elements=array(S_MORE_THAN_5_MINUTES,$sec_rest);
-		$table->addRow($elements);
+		$table->setHeader(array(S_ITEMS,S_5_SECONDS,S_10_SECONDS,S_30_SECONDS,S_1_MINUTE,S_5_MINUTES,S_MORE_THAN_5_MINUTES));
+		$a=array(
+			S_ZABBIX_AGENT => ITEM_TYPE_ZABBIX,
+			S_ZABBIX_AGENT_ACTIVE => ITEM_TYPE_ZABBIX_ACTIVE,
+			S_SNMPV1_AGENT => ITEM_TYPE_SNMPV1,
+			S_SNMPV2_AGENT => ITEM_TYPE_SNMPV2C,
+			S_SNMPV3_AGENT => ITEM_TYPE_SNMPV3,
+			S_SIMPLE_CHECK => ITEM_TYPE_SIMPLE,
+			S_ZABBIX_INTERNAL => ITEM_TYPE_INTERNAL,
+			S_ZABBIX_AGGREGATE => ITEM_TYPE_AGGREGATE
+		);
+		foreach($a as $name => $type)
+		{
+			$elements=array($name,$sec_5[$type],$sec_10[$type],
+				new CCol($sec_30[$type],"warning"),
+				new CCol($sec_60[$type],"average"),
+				new CCol($sec_300[$type],"high"),
+				new CCol($sec_rest[$type],"disaster"));
+			$table->addRow($elements);
+		}
 	}
 	else
 	{

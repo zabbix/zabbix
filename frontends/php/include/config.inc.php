@@ -1900,6 +1900,7 @@ COpt::profiling_stop("script");
 		}
 
 // history & trends
+/*
 		if ($DB_TYPE == "MYSQL")
 		{
 			$row=DBfetch(DBselect("show table status like 'history'"));
@@ -1928,13 +1929,13 @@ COpt::profiling_stop("script");
 			$result=DBselect("select count(itemid) as cnt from trends");
 			$row=DBfetch($result);
 			$status["trends_count"]=$row["cnt"];
-		}
+		}*/
 // alarms
-		$row=DBfetch(DBselect("select count(alarmid) as cnt from alarms"));
-		$status["alarms_count"]=$row["cnt"];
+//		$row=DBfetch(DBselect("select count(alarmid) as cnt from alarms"));
+//		$status["alarms_count"]=$row["cnt"];
 // alerts
-		$row=DBfetch(DBselect("select count(alertid) as cnt from alerts"));
-		$status["alerts_count"]=$row["cnt"];
+//		$row=DBfetch(DBselect("select count(alertid) as cnt from alerts"));
+//		$status["alerts_count"]=$row["cnt"];
 // triggers
 		$sql = "select count(t.triggerid) as cnt from triggers t, functions f, items i, hosts h".
 			" where t.triggerid=f.triggerid and f.itemid=i.itemid and i.status=0 and i.hostid=h.hostid and h.status=".HOST_STATUS_MONITORED;
