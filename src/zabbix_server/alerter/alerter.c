@@ -133,8 +133,8 @@ static int execute_action(DB_ALERT *alert,DB_MEDIATYPE *mediatype, char *error, 
 		else
 		{
 			strscpy(full_path,CONFIG_ALERT_SCRIPTS_PATH);
-			strncat(full_path,"/",MAX_STRING_LEN);
-			strncat(full_path,mediatype->exec_path,MAX_STRING_LEN);
+			zbx_strlcat(full_path,"/",MAX_STRING_LEN);
+			zbx_strlcat(full_path,mediatype->exec_path,MAX_STRING_LEN);
 			zabbix_log( LOG_LEVEL_DEBUG, "Before executing [%s] [%m]", full_path);
 			if(-1 == execl(full_path,mediatype->exec_path,alert->sendto,alert->subject,alert->message,(char *)0))
 			{

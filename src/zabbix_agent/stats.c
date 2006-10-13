@@ -76,7 +76,7 @@ void	collect_statistics()
 	{
 		memset(tmpname, 0, MAX_STRING_LEN);
 		strscpy(tmpname, CONFIG_STAT_FILE);
-		strncat(tmpname, "2", MAX_STRING_LEN);
+		zbx_strlcat(tmpname, "2", MAX_STRING_LEN);
 		file=fopen(tmpname,"w");
 		if(NULL == file)
 		{

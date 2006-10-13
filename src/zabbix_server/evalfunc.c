@@ -1239,7 +1239,7 @@ int	replace_value_by_map(char *value, int valuemapid)
 
 	del_zeroes(new_value);
 	or_value = sql;	/* sql variarbvle used as tmp - original value */
-	strncpy(sql,value,MAX_STRING_LEN);
+	zbx_strlcpy(sql,value,MAX_STRING_LEN);
 	
 	snprintf(value, MAX_STRING_LEN-1, "%s (%s)", new_value, or_value);
 

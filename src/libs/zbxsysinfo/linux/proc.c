@@ -144,8 +144,8 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		usr_ok = 0;
 
 		strscpy(filename,"/proc/");	
-		strncat(filename,entries->d_name,MAX_STRING_LEN);
-		strncat(filename,"/status",MAX_STRING_LEN);
+		zbx_strlcat(filename,entries->d_name,MAX_STRING_LEN);
+		zbx_strlcat(filename,"/status",MAX_STRING_LEN);
 
 		/* Self is a symbolic link. It leads to incorrect results for proc_cnt[zabbix_agentd] */
 		/* Better approach: check if /proc/x/ is symbolic link */
@@ -217,8 +217,8 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 			if(proccomm[0] != '\0')
 			{
 				strscpy(filename,"/proc/");	
-				strncat(filename,entries->d_name,MAX_STRING_LEN);
-				strncat(filename,"/cmdline",MAX_STRING_LEN);
+				zbx_strlcat(filename,entries->d_name,MAX_STRING_LEN);
+				zbx_strlcat(filename,"/cmdline",MAX_STRING_LEN);
 				
 				if(stat(filename,&buf)!=0)	continue;
 				
@@ -429,8 +429,8 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 		}
 
 		strscpy(filename,"/proc/");	
-		strncat(filename,entries->d_name,MAX_STRING_LEN);
-		strncat(filename,"/status",MAX_STRING_LEN);
+		zbx_strlcat(filename,entries->d_name,MAX_STRING_LEN);
+		zbx_strlcat(filename,"/status",MAX_STRING_LEN);
 
 		if(stat(filename,&buf)!=0)
 		{
@@ -530,8 +530,8 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 		if(proccomm[0] != '\0')
 		{
 			strscpy(filename,"/proc/");	
-			strncat(filename,entries->d_name,MAX_STRING_LEN);
-			strncat(filename,"/cmdline",MAX_STRING_LEN);
+			zbx_strlcat(filename,entries->d_name,MAX_STRING_LEN);
+			zbx_strlcat(filename,"/cmdline",MAX_STRING_LEN);
 			
 			if(stat(filename,&buf)!=0)	continue;
 			

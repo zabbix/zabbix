@@ -40,7 +40,7 @@ int xml_get_data(char *xml,char *tag, char *data, int maxlen)
 
 		if(len>maxlen)	len=maxlen;
 
-		strncpy(data, start+strlen(tag_open),len);
+		zbx_strlcpy(data, start+strlen(tag_open),len);
 	}
 
 	return ret;

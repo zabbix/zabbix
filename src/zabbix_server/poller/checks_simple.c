@@ -46,7 +46,7 @@ int	get_value_simple(DB_ITEM *item, AGENT_RESULT *result)
 			snprintf(c,sizeof(c)-1,"net.tcp.service[%s]",item->key);
 		else
 		{
-			strncpy( param,l+1, r-l-1);
+			zbx_strlcpy( param,l+1, r-l-1);
 			param[r-l-1]=0;
 			if(item->useip==1)
 			{
@@ -68,7 +68,7 @@ int	get_value_simple(DB_ITEM *item, AGENT_RESULT *result)
 				snprintf(c,sizeof(c)-1,"%s",item->key);
 			else
 			{
-				strncpy( param,l+1, r-l-1);
+				zbx_strlcpy( param,l+1, r-l-1);
 				param[r-l-1]=0;
 /*				snprintf(c,sizeof(c)-1,"dns[%s,%s]",item->ip,param);*/
 				snprintf(c,sizeof(c)-1,"dns[%s]",param);

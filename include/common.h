@@ -22,8 +22,8 @@
 
 #include "sysinc.h"
 
-#define	ZABBIX_REVDATE	"19 July 2006"
-#define	ZABBIX_VERSION	"1.1.2"
+#define	ZABBIX_REVDATE	"30 October 2006"
+#define	ZABBIX_VERSION	"1.1.3"
 
 #if defined(WIN32)
 #	pragma warning (disable: 4100)
@@ -434,6 +434,8 @@ int	num_param(const char *param);
 int	calculate_item_nextcheck(int itemid, int delay, int now);
 
 int	set_result_type(AGENT_RESULT *result, int value_type, char *c);
+size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);
+size_t	zbx_strlcat(char *dst, const char *src, size_t siz);
 
 int	replace_param(const char *cmd, const char *param, char *out, int outlen);
 void	signal_handler( int sig );

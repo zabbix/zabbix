@@ -102,7 +102,7 @@ void zabbix_log(int level, const char *fmt, ...)
 	{
 		va_start(ap,fmt);
 		vsprintf(str,fmt,ap);
-		strncat(str,"\n",MAX_BUF_LEN);
+		zbx_strlcat(str,"\n",MAX_BUF_LEN);
 		str[MAX_BUF_LEN-1]=0;
 		syslog(LOG_DEBUG,str);
 		va_end(ap);
@@ -133,7 +133,7 @@ void zabbix_log(int level, const char *fmt, ...)
 			if(buf.st_size > MAX_LOG_FILE_LEN)
 			{
 				strscpy(filename_old,log_filename);
-				strncat(filename_old,".old",MAX_STRING_LEN);
+				zbx_strlcat(filename_old,".old",MAX_STRING_LEN);
 				if(rename(log_filename,filename_old) != 0)
 				{
 /*					exit(1);*/

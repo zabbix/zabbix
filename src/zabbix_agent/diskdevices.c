@@ -78,8 +78,8 @@ int	get_device_name(char *device,int mjr,int diskno)
 	dir=opendir("/dev");
 	while((entries=readdir(dir))!=NULL)
 	{
-		strncpy(filename,"/dev/",1024);	
-		strncat(filename,entries->d_name,1024);
+		zbx_strlcpy(filename,"/dev/",1024);	
+		zbx_strlcat(filename,entries->d_name,1024);
 
 		if(stat(filename,&buf)==0)
 		{
@@ -149,7 +149,7 @@ void	init_stats_diskdevices()
 				break;
 			s2++;
 	
-			strncpy(device,s,s2-s);
+			zbx_strlcpy(device,s,s2-s);
 			device[s2-s]=0;
 			sscanf(device,"(%d,%d):(%d,%d,%d,%d,%d)",&major,&diskno,&noinfo,&read_io_ops,&blks_read,&write_io_ops,&blks_write);
 /*			printf("Major:[%d] Minor:[%d] read_io_ops[%d]\n",major,diskno,read_io_ops);*/
@@ -168,54 +168,6 @@ void	init_stats_diskdevices()
 
 	fclose(file);
 }
-
-/*
-void	init_stats_diskdevices()
-{
-	FILE	*file;
-	char	*s;
-	char	line[MAX_STRING_LEN+1];
-	char	interface[MAX_STRING_LEN+1];
-	int	i,j,j1;
-
-	for(i=0;i<MAX_DISKDEVICES;i++)
-	{
-		diskdevices[i].device=0;
-		for(j=0;j<60*15;j++)
-		{
-			diskdevices[i].clock[j]=0;
-		}
-	}
-
-	file=fopen("/proc/stat","r");
-	if(NULL == file)
-	{
-		fprintf(stderr, "Cannot open [%s] [%m]\n","/proc/stat");
-		return;
-	}
-	i=0;
-	while(fgets(line,MAX_STRING_LEN,file) != NULL)
-	{
-		if( (s=strstr(line,":")) == NULL)
-			continue;
-		strncpy(interface,line,s-line);
-		interface[s-line]=0;
-		j1=0;
-		for(j=0;j<strlen(interface);j++)
-		{
-			if(interface[j]!=' ')
-			{
-				interface[j1++]=interface[j];
-			}
-		}
-		interface[j1]=0;
-		diskdevices[i].device=strdup(interface);
-		i++;
-	}
-
-	fclose(file);
-}
-*/
 
 void	report_stats_diskdevices(FILE *file, int now)
 {
@@ -495,7 +447,7 @@ void	collect_stats_diskdevices(FILE *outfile)
 				break;
 			s2++;
 	
-			strncpy(device,s,s2-s);
+			zbx_strlcpy(device,s,s2-s);
 			device[s2-s]=0;
 			sscanf(device,"(%d,%d):(%d,%d,%d,%d,%d)",&major,&diskno,&noinfo,&read_io_ops,&blks_read,&write_io_ops,&blks_write);
 /*			printf("Major:[%d] Minor:[%d] read_io_ops[%d]\n",major,diskno,read_io_ops);*/
