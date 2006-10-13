@@ -1,5 +1,5 @@
 <?php
-/*
+/* 
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -19,19 +19,48 @@
 **/
 ?>
 <?php
-	# Translate global array $TRANSLATION into constants
-	function	process_locales()
+	class CListItem extends CTag
 	{
-		global $TRANSLATION;
-		global $GLOBALS;
-		
-		if(isset($TRANSLATION) && is_array($TRANSLATION))
+/* public */
+		function CListItem($value)
 		{
-			foreach($TRANSLATION as $const=>$label)
+			parent::CTag('li','yes');
+
+			$this->AddItem($value);
+		}
+	}
+
+	class CList extends CTag
+	{
+/* public */
+		function CList($value=NULL,$class=NULL)
+		{
+			parent::CTag('ul','yes');
+			$this->tag_end = '';
+			$this->AddItem($value);
+			$this->SetClass($class);
+		}
+		function PrepareItem($value=NULL)
+		{
+			if(!is_null($value))
 			{
-				if(!defined($const)) define($const,$label);
+				$value = new CListItem($value);
+			}
+			return $value;
+		}
+		
+		function AddItem($value)
+		{
+			if(is_array($value))
+			{
+				foreach($value as $el)
+					parent::AddItem($this->PrepareItem($el));
+			}
+			else
+			{
+				parent::AddItem($this->PrepareItem($value));
 			}
 		}
-		unset($GLOBALS['TRANSLATION']);
 	}
+
 ?>

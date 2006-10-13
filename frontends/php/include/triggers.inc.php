@@ -921,8 +921,9 @@
 
 	function	insert_dependency($triggerid_down,$triggerid_up)
 	{
-		$result=DBexecute("insert into trigger_depends (triggerid_down,triggerid_up)".
-			" values ($triggerid_down,$triggerid_up)");
+		$triggerdepid = get_dbid("trigger_depends","triggerdepid");
+		$result=DBexecute("insert into trigger_depends (triggerdepid,triggerid_down,triggerid_up)".
+			" values ($triggerdepid,$triggerid_down,$triggerid_up)");
 		if(!$result)
 		{
 			return	$result;

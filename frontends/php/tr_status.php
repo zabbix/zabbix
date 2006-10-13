@@ -153,6 +153,7 @@ include_once "include/page_header.php";
 	while($row=DBfetch($result))
 	{
 		$cmbGroup->AddItem($row["groupid"],$row["name"]);
+		unset($row);
 	}
 	$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
 	
@@ -279,6 +280,7 @@ include_once "include/page_header.php";
 			$descr = $el['simple_label'];
 		}
 		array_push($header,$descr);
+		unset($el);
 	}
   
 	$table->SetHeader($header);
@@ -411,8 +413,9 @@ include_once "include/page_header.php";
 				new CCol($ack,"center"),
 				new CLink(($row["comments"] == "") ? S_ADD : S_SHOW,"tr_comments.php?triggerid=".$row["triggerid"],"action")
 				));
+		unset($row,$description, $actions);
 	}
-	$table->Show();
+	$table->Show(false);
 
 	show_table_header(S_TOTAL.": ".$table->GetNumRows());
 ?>

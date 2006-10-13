@@ -21,11 +21,11 @@
 <?php
 	function	get_last_event_by_triggerid($triggerid)
 	{
-		$db_events = DBselect("select * from events where triggerid=$triggerid".
-			" order by clock desc");
-		$row=DBfetch($db_events,1);
-		if(!$row)	return FALSE;
-		return $row;
+		$event_data = DBfetch(DBselect("select * from events where triggerid=$triggerid".
+			" order by clock desc", 1));
+		if(!$event_data)
+			return FALSE;
+		return $event_data;
 	}
 
 	function 	get_acknowledges_by_eventid($eventid)

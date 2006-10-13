@@ -491,7 +491,7 @@ include_once "include/page_header.php";
 			S_ERROR));
 
 		$db_items = DBselect("select i.* from hosts h,items i where h.hostid=i.hostid and".
-			" h.hostid=".$_REQUEST["hostid"]." order by i.description, i.key_");
+			" h.hostid=".$_REQUEST["hostid"]." order by i.templateid,i.description, i.key_");
 		while($db_item = DBfetch($db_items))
 		{
 			if($db_item["templateid"]==0)

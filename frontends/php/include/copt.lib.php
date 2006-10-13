@@ -85,23 +85,25 @@
 	** Author: 
 	**     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
 	**/
-	
+
 	define("USE_PROFILING",1);
+	define("USE_VAR_MON",1);
 	define("USE_TIME_PROF",1);
 	define("USE_MEM_PROF",1);
 	define("USE_COUNTER_PROF",1);
-//	define("USE_MENU_PROF",1);
-//	define("USE_MENU_DETAILS",1);
+	define("USE_MENU_PROF",1);
+	//define("USE_MENU_DETAILS",1);
 	define("USE_SQLREQUEST_PROF",1);
 	//define("SHOW_SQLREQUEST_DETAILS",1);
-
+	
 if(defined('USE_PROFILING'))
 {
 	$starttime=array();
 	$memorystamp=array();
-	$sqlrequests=array();
+	$sqlrequests = defined('SHOW_SQLREQUEST_DETAILS') ? array() : 0;
 	$sqlmark = array();
 	$perf_counter = array();
+	$var_list = array();
 
 	class COpt
 	{
@@ -165,14 +167,25 @@ if(defined('USE_COUNTER_PROF'))
 			global $memorystamp;
 			global $sqlmark;
 			global $sqlrequests;
+			global $var_list;
 
 			if(is_null($type)) $type='global';
 
 			$starttime[$type] = COpt::getmicrotime();
 			$memorystamp[$type] = COpt::getmemoryusage();
+if(defined('USE_VAR_MON'))
+{
+			
+			$var_list[$type] = isset($GLOBALS) ? array_keys($GLOBALS) : array();
+}
 if(defined('USE_SQLREQUEST_PROF'))
 {
+	if(defined('SHOW_SQLREQUEST_DETAILS')){
 			$sqlmark[$type] = count($sqlrequests);
+	}
+	else {
+			$sqlmark[$type] = $sqlrequests;
+	}
 }
 		}
 
@@ -181,7 +194,11 @@ if(defined('USE_SQLREQUEST_PROF'))
 if(defined('USE_SQLREQUEST_PROF'))
 {
 			global $sqlrequests;
+	if(defined('SHOW_SQLREQUEST_DETAILS')){
 			array_push($sqlrequests, $sql);
+	}else{
+			$sqlrequests++;
+	}
 }
 		}
 
@@ -192,6 +209,7 @@ if(defined('USE_SQLREQUEST_PROF'))
 			global $sqlrequests;
 			global $sqlmark;
 			global $perf_counter;
+			global $var_list;
 
 			$endtime = COpt::getmicrotime();
 			$memory = COpt::getmemoryusage();
@@ -209,6 +227,14 @@ if(defined('USE_MEM_PROF'))
 			echo "(".$type.") Memory usage	 : ".COpt::mem2str($memorystamp[$type])." - ".COpt::mem2str($memory)."\n<br/>\n";
 			echo "(".$type.") Memory leak	 : ".COpt::mem2str($memory - $memorystamp[$type])."\n<br/>\n";
 }
+if(defined('USE_VAR_MON'))
+{
+			$curr_var_list = isset($GLOBALS) ? array_keys($GLOBALS) : array();
+			$var_diff = array_diff($curr_var_list, $var_list[$type]);
+			echo "(".$type.") Undeleted vars : ".count($var_diff)." [";
+			print_r(implode(', ',$var_diff));
+			echo "] <br/>";
+}
 if(defined('USE_COUNTER_PROF'))
 {
 			if(isset($perf_counter[$type]))
@@ -222,14 +248,19 @@ if(defined('USE_COUNTER_PROF'))
 }
 if(defined('USE_SQLREQUEST_PROF'))
 {
-			$requests_cnt = count($sqlrequests);
-			echo "(".$type.") SQL requests count: ".($requests_cnt - $sqlmark[$type])."<br/>\n";
 	if(defined('SHOW_SQLREQUEST_DETAILS'))
 	{
+			$requests_cnt = count($sqlrequests);
+			echo "(".$type.") SQL requests count: ".($requests_cnt - $sqlmark[$type])."<br/>\n";
+
 			for($i = $sqlmark[$type]; $i < $requests_cnt; $i++)
 			{
 				echo "(".$type.") SQL request    : ".$sqlrequests[$i]."<br/>\n";
 			}
+	}
+	else
+	{
+			echo "(".$type.") SQL requests count: ".($sqlrequests - $sqlmark[$type])."<br/>\n";
 	}
 }
 		}

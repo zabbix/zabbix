@@ -22,7 +22,6 @@
 	require_once("include/config.inc.php");
 
 	global $USER_DETAILS;
-	global $TRANSLATION;
 	global $ZBX_CURNODEID;
 	global $ZBX_LOCALNODEID;
 	global $page;
@@ -38,11 +37,7 @@ COpt::profiling_start("page");
 
 	if(!defined('ZBX_PAGE_NO_AUTHERIZATION'))
 	{
-
-		if(!isset($TRANSLATION) || !is_array($TRANSLATION))	$TRANSLATION = array();
-
 		check_authorisation();
-		
 
 		include_once "include/locales/".$USER_DETAILS["lang"].".inc.php";
 		process_locales();
@@ -126,20 +121,26 @@ COpt::profiling_start("page");
 				"pages"=>array(
 					array("url"=>"overview.php"	,"label"=>S_OVERVIEW	),
 					array("url"=>"latest.php"	,"label"=>S_LATEST_DATA	,
-						"sub_pages"=>array("history.php")
+						"sub_pages"=>array("history.php","chart.php")
 						),
 					array("url"=>"tr_status.php"	,"label"=>S_TRIGGERS	,
-						"sub_pages"=>array("tr_events.php","acknow.php","tr_comments.php")
+						"sub_pages"=>array("tr_events.php","acknow.php","tr_comments.php",
+								"chart4.php")
 						),
 					array("url"=>"queue.php"	,"label"=>S_QUEUE	),
 					array("url"=>"events.php"	,"label"=>S_EVENTS	),
 					array("url"=>"actions.php"	,"label"=>S_ACTIONS	),
-					array("url"=>"maps.php"		,"label"=>S_MAPS	),
-					array("url"=>"charts.php"	,"label"=>S_GRAPHS	),
+					array("url"=>"maps.php"		,"label"=>S_MAPS	,
+						"sub_pages"=>array("map.php")
+						),
+					array("url"=>"charts.php"	,"label"=>S_GRAPHS	,
+						"sub_pages"=>array("chart2.php")
+						),
 					array("url"=>"screens.php"	,"label"=>S_SCREENS	),
 					array("url"=>"srv_status.php"	,"label"=>S_IT_SERVICES	,
-						"sub_pages"=>array("report3.php")
-						)
+						"sub_pages"=>array("report3.php","chart_sla.php","chart5.php")
+						),
+					array("url"=>"vtext.php"),
 					)
 				),
 		"cm"=>array(
@@ -179,7 +180,8 @@ COpt::profiling_start("page");
 						"sub_pages"=>array("screenedit.php")
 						),
 					array("url"=>"services.php"	,"label"=>S_IT_SERVICES		),
-					array("url"=>"bulkloader.php"	,"label"=>S_MENU_BULKLOADER	)
+					array("url"=>"bulkloader.php"	,"label"=>S_MENU_BULKLOADER	),
+					array("url"=>"popup.php")
 					)
 				),
 		"admin"=>array(
@@ -190,7 +192,7 @@ COpt::profiling_start("page");
 					array("url"=>"nodes.php"	,"label"=>S_NODES		),
 					array("url"=>"users.php"	,"label"=>S_USERS		,
 						"sub_pages"=>array("popup_media.php",
-							"popup_usrgrp.php","popup_right.php")
+							"popup_usrgrp.php","popup_right.php","popup_users.php")
 						),
 					array("url"=>"media_types.php"	,"label"=>S_MEDIA_TYPES		),
 					array("url"=>"audit.php"	,"label"=>S_AUDIT		),
@@ -205,10 +207,8 @@ COpt::profiling_start("page");
 						"sub_pages"=>array("profile.php")
 						)
 					)
-				),
+				)
 		);
-
-COpt::compare_files_with_menu($ZBX_MENU);
 
 
 	$help = new CLink(S_HELP, "http://www.zabbix.com/manual/v1.1/index.php", "small_font");
@@ -314,21 +314,22 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		array_push($main_menu_row, new CCol(new CLink($sub['label'], $menu_url, "highlight"),$class));
 		unset($menu_url, $class);
 	}
-		
+
 	if(!defined('ZBX_PAGE_NO_MENU'))
 	{
+
+COpt::compare_files_with_menu($ZBX_MENU);
+
 		$table = new CTable(NULL,"page_header");
 		$table->SetCellSpacing(0);
 		$table->SetCellPadding(5);
 		$table->AddRow($top_page_row);
 		$table->Show();
-		unset($table, $top_page_row);
 
 		$menu_table = new CTable(NULL,'menu');
 		$menu_table->SetCellSpacing(0);
 		$menu_table->SetCellPadding(5);
 		$menu_table->AddRow($main_menu_row);
-		unset($main_menu_row);
 
 		$lst_nodes = new CComboBox('switch_node', $ZBX_CURNODEID);
 		$db_nodes = DBselect('select * from nodes where nodeid in ('.
@@ -337,7 +338,6 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		{
 			$lst_nodes->AddItem($node_data['nodeid'],$node_data['name']);
 		}
-		unset($db_nodes, $node_data);
 
 		$node_form = new CForm();
 		$node_form->AddItem('Current node ['.$ZBX_CURNODEID.'] ');
@@ -352,7 +352,6 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		
 		$table->AddRow(array($menu_table,$node_form));
 		$table->Show();
-		unset($table, $menu_table, $node_form);
 		
 		$sub_menu_table = new CTable(NULL,'sub_menu');
 		$sub_menu_table->SetCellSpacing(0);
@@ -360,8 +359,15 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$sub_menu_table->AddRow(new CCol($sub_menu_row));
 	
 		$sub_menu_table->Show();
-		unset($sub_menu_table, $sub_menu_row);
 	}
+	unset($ZBX_MENU);
+		
+	destroy_objects();
+
+	unset($table, $top_page_row, $menu_table, $node_form);
+	unset($main_menu_row);
+	unset($db_nodes, $node_data);
+	unset($sub_menu_table, $sub_menu_row);
 	
 	if(isset($denyed_page_requested))
 	{

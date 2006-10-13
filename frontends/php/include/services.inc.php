@@ -21,7 +21,7 @@
 <?php
 	function	add_service($name,$triggerid,$algorithm,$showsla,$goodsla,$sortorder,$service_times=array())
 	{
-		if(is_null($triggerid)) $triggerid = 'NULL';
+		if(is_null($triggerid) || $triggerid==0) $triggerid = 'NULL';
 
 		$serviceid=get_dbid("services","serviceid");
 
@@ -48,7 +48,7 @@
 
 	function	update_service($serviceid,$name,$triggerid,$algorithm,$showsla,$goodsla,$sortorder,$service_times=array())
 	{
-		if(is_null($triggerid)) $triggerid = 'NULL';
+		if(is_null($triggerid) || $triggerid==0) $triggerid = 'NULL';
 
 		$result = DBexecute("update services set name=".zbx_dbstr($name).",triggerid=$triggerid,status=0,algorithm=$algorithm,showsla=$showsla,goodsla=$goodsla,sortorder=$sortorder where serviceid=$serviceid");
 
@@ -109,9 +109,7 @@
 	# Warning: recursive function
 	function	does_service_depend_on_the_service($serviceid,$serviceid2)
 	{
-#		echo "Serviceid:$serviceid Triggerid:$serviceid2<br>";
 		$service=get_service_by_serviceid($serviceid);
-#		echo "Service status:".$service["status"]."<br>";
 		if($service["status"]==0)
 		{
 			return	FALSE;
@@ -125,9 +123,7 @@
 			
 		}
 
-		$sql="select serviceupid from services_links where servicedownid=$serviceid2 and soft=0";
-#		echo $sql."<br>";
-		$result=DBselect($sql);
+		$result=DBselect("select serviceupid from services_links where servicedownid=$serviceid2 and soft=0");
 		while($row=DBfetch($result))
 		{
 			if(does_service_depend_on_the_service($serviceid,$row["serviceupid"]) == TRUE)
@@ -140,9 +136,7 @@
 
 	function	service_has_parent($serviceid)
 	{
-		$sql="select count(*) as cnt from services_links where servicedownid=$serviceid";
-		$result=DBselect($sql);
-		$row=DBfetch($result);
+		$row = DBfetch(DBselect("select count(*) as cnt from services_links where servicedownid=$serviceid"));
 		if($row["cnt"]>0)
 		{
 			return	TRUE;
@@ -152,9 +146,7 @@
 
 	function	service_has_no_this_parent($parentid,$serviceid)
 	{
-		$sql="select count(*) as cnt from services_links where serviceupid=$parentid and servicedownid=$serviceid";
-		$result=DBselect($sql);
-		$row=DBfetch($result);
+		$row = DBfetch(DBselect("select count(*) as cnt from services_links where serviceupid=$parentid and servicedownid=$serviceid"));
 		if($row["cnt"]>0)
 		{
 			return	FALSE;
@@ -480,7 +472,8 @@ SDI(
 
 	function	get_num_of_service_childs($serviceid)
 	{
-		$row = DBfetch(DBselect("select count(*) as cnt from services_links where serviceupid=$serviceid"));
+		$row = DBfetch(DBselect("select count(distinct servicedownid) as cnt from services_links ".
+					" where serviceupid=".$serviceid));
 		return	$row["cnt"];
 	}
 

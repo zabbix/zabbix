@@ -328,13 +328,16 @@
 
 		unset_not_in_list($fields);
 		unset_if_zero($fields);
-		if($err&ZBX_VALID_ERROR)
-		{
-			invalid_url();
-		}
 		if($err!=ZBX_VALID_OK)
 		{
 			unset_action_vars($fields);
+		}
+
+		$fields = null;
+		
+		if($err&ZBX_VALID_ERROR)
+		{
+			invalid_url();
 		}
 
 		show_messages();

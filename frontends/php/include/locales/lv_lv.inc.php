@@ -21,7 +21,7 @@
 <?php
 	global $TRANSLATION;
 
-	$lv_lv=array(
+	$TRANSLATION = array(
 
 	"S_DATE_FORMAT_YMDHMS"=>		"d M H:i:s",
 	"S_DATE_FORMAT_YMD"=>			"d M Y",
@@ -727,6 +727,4 @@
 	"S_HELP"=>				"Help",
 	"S_PROFILE"=>				"Profile",
 	);
-
-	$TRANSLATION=array_merge($TRANSLATION,$lv_lv);
 ?>

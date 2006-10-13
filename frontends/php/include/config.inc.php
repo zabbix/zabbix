@@ -62,6 +62,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: "; if(is_array($msg)) print_r($msg)
 	require_once("include/classes/clink.inc.php");
 	require_once("include/classes/chelp.inc.php");
 	require_once("include/classes/cbutton.inc.php");
+	require_once("include/classes/clist.inc.php");
 	require_once("include/classes/ccombobox.inc.php");
 	require_once("include/classes/ctable.inc.php");
 	require_once("include/classes/ctableinfo.inc.php");
@@ -75,7 +76,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: "; if(is_array($msg)) print_r($msg)
 	require_once("include/classes/cmap.inc.php");
 	require_once("include/classes/cflash.inc.php");
 	require_once("include/classes/ciframe.inc.php");
-	require_once("./include/classes/graph.inc.php");
+	require_once("include/classes/graph.inc.php");
 
 // Include Tactical Overview modules
 

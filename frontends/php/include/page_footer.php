@@ -43,6 +43,7 @@
 				));
 			$table->Show();
 		}
+
 COpt::profiling_stop("page");
 COpt::profiling_stop("script");
 

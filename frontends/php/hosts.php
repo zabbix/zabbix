@@ -138,7 +138,7 @@ include_once "include/page_header.php";
 
 		unlink_template($_REQUEST["hostid"], NULL /* future usage -> $_REQUEST["templateid"]*/, $unlink_mode);
 			
-		$host = get_host_by_hostid($db_host["hostid"]);
+		$host = get_host_by_hostid($_REQUEST["hostid"]);
 
 		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST,
 			"Host [".$host["host"]."] [".$host['hostid']."] ".($unlink_mode ? S_UNLINKED_SMALL : S_CLEANED_SMALL));
