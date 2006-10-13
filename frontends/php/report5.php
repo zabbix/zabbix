@@ -75,7 +75,8 @@
 	{
 		$time_dif=365*24*3600;
 	}
-        $result=DBselect("select h.host, t.triggerid, t.description, t.priority, count(a.alarmid) as count
+//	$result=DBselect("select h.host, t.triggerid, t.description, t.priority, count(a.alarmid) as alarmcount
+	$result=DBselect("select h.host, t.triggerid, t.description, t.priority, count(distinct a.alarmid) as alarmcount
 	from hosts h, triggers t, functions f, items i, alarms a where 
 	h.hostid = i.hostid and
 	i.itemid = f.itemid and
@@ -118,9 +119,11 @@
 		$severity=new CSpan($priority,$priority_style);
             	$table->addRow(array(
 			$row["host"],
-			expand_trigger_description($row["triggerid"]),
+			new CLink(expand_trigger_description($row["triggerid"]),
+				"alarms.php?limit=100&triggerid=".$row["triggerid"]),
 			new CCol($priority,$priority_style),
-			$row["count"],
+//			$row["count"],
+			$row["alarmcount"],
 			));
 	}
 	$table->show();

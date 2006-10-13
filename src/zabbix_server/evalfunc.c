@@ -1285,7 +1285,8 @@ int evaluate_FUNCTION2(char *value,char *host,char *key,char *function,char *par
 	if(!row)
 	{
         	DBfree_result(result);
-		zabbix_log(LOG_LEVEL_WARNING, "Query [%s] returned empty result", sql );
+		zabbix_log(LOG_LEVEL_WARNING, "Host [%s] Key [%s]", host, key);
+		zabbix_log(LOG_LEVEL_WARNING, "Query [%s] returned empty result", sql);
 		zabbix_syslog("Query [%s] returned empty result", sql );
 		return FAIL;
 	}
