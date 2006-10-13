@@ -101,10 +101,10 @@ void zabbix_log(int level, const char *fmt, ...)
 	if(log_type == LOG_TYPE_SYSLOG)
 	{
 		va_start(ap,fmt);
-		vsprintf(str,fmt,ap);
+/*		vsprintf(str,fmt,ap);*/
+		vsnprintf(str,sizeof(str)-2,fmt,ap);
 		zbx_strlcat(str,"\n",MAX_BUF_LEN);
-		str[MAX_BUF_LEN-1]=0;
-		syslog(LOG_DEBUG,str);
+		syslog(LOG_DEBUG,"%s",str);
 		va_end(ap);
 	}
 	else if(log_type == LOG_TYPE_FILE)

@@ -71,7 +71,8 @@ void zabbix_syslog(const char *fmt, ...)
 		DBget_item_from_db(&item,row);
 
 		va_start(ap,fmt);
-		vsprintf(value_str,fmt,ap);
+/*		vsprintf(value_str,fmt,ap);*/
+		vsnprintf(value_str,sizeof(value_str),fmt,ap);
 		value_str[MAX_STRING_LEN-1]=0;
 		va_end(ap);
 
