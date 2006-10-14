@@ -20,15 +20,23 @@
  *           New one: preserve period, if delay==5, nextcheck = 0,5,10,15,... *
  *                                                                            *
  ******************************************************************************/
-int	calculate_item_nextcheck(int itemid, int delay, int now)
+int	calculate_item_nextcheck(int itemid, int item_type, int delay, int now)
 {
 	int i;
 
 /*	Old algorithm */
 /*	i=delay*(int)(now/delay);*/
-	i=delay*(int)(now/delay)+(itemid % delay);
 
-	while(i<=now)	i+=delay;
+	/* Special processing of active items to see better view in queue */
+	if(item_type == ITEM_TYPE_ZABBIX_ACTIVE)
+	{
+		i = now+delay;
+	}
+	else
+	{
+		i=delay*(int)(now/delay)+(itemid % delay);
+		while(i<=now)	i+=delay;
+	}
 
 	return i;
 }

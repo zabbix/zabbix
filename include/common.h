@@ -431,7 +431,7 @@ void	rtrim_spaces(char *c);
 void	delete_reol(char *c);
 int	get_param(const char *param, int num, char *buf, int maxlen);
 int	num_param(const char *param);
-int	calculate_item_nextcheck(int itemid, int delay, int now);
+int	calculate_item_nextcheck(int itemid, int item_type, int delay, int now);
 
 int	set_result_type(AGENT_RESULT *result, int value_type, char *c);
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);
