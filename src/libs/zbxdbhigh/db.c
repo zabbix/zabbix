@@ -632,27 +632,34 @@ static int	latest_alarm(int triggerid, int status)
 	DB_RESULT	result;
 	DB_ROW		row;
 	int 		ret = FAIL;
-
+	int		alarmid_max=0;
+	int		value_max;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In latest_alarm()");
 
-	snprintf(sql,sizeof(sql)-1,"select value from alarms where triggerid=%d order by clock desc",triggerid);
+	/* There could be more than 1 record with the same clock. We are interested in one with max alarmid */
+	snprintf(sql,sizeof(sql)-1,"select alarmid,value,clock from alarms where triggerid=%d order by clock desc",triggerid);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
-	result = DBselectN(sql,1);
+	result = DBselectN(sql,20);
 	row = DBfetch(result);
 
-	if(!row || DBis_null(row[0])==SUCCEED)
-        {
-                zabbix_log(LOG_LEVEL_DEBUG, "Result for last is empty" );
-        }
-	else
+	while((row=DBfetch(result)))
 	{
-		if(atoi(row[0]) == status)
+		if(atoi(row[0])>=alarmid_max)
 		{
-			ret = SUCCEED;
+			alarmid_max=atoi(row[0]);
+			value_max=atoi(row[1]);
 		}
 	}
 
+	if(alarmid_max!=0 && value_max==status)
+	{
+		ret = SUCCEED;
+	}
+	else
+	{
+                zabbix_log(LOG_LEVEL_DEBUG, "No alarms");
+	}
 	DBfree_result(result);
 
 	return ret;
