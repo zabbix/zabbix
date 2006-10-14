@@ -94,6 +94,72 @@ static int	SYSTEM_SWAP_TOTAL(const char *cmd, const char *param, unsigned flags,
 	return ret;
 }
 
+static int	SYSTEM_SWAP_PFREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	AGENT_RESULT	result_tmp;
+        zbx_uint64_t  tot_val = 0;
+        zbx_uint64_t  free_val = 0;
+
+        assert(result);
+
+        init_result(result);
+        init_result(&result_tmp);
+
+	if(SYSTEM_SWAP_TOTAL(cmd, param, flags, &result_tmp) != SYSINFO_RET_OK)
+                return  SYSINFO_RET_FAIL;
+	tot_val = result_tmp.ui64;
+
+	/* Check fot division by zero */
+	if(tot_val == 0)
+	{
+		free_result(&result_tmp);
+                return  SYSINFO_RET_FAIL;
+	}
+
+	if(SYSTEM_SWAP_FREE(cmd, param, flags, &result_tmp) != SYSINFO_RET_OK)
+                return  SYSINFO_RET_FAIL;
+	free_val = result_tmp.ui64;
+
+	free_result(&result_tmp);
+
+	SET_DBL_RESULT(result, (100.0 * (double)free_val) / (double)tot_val);
+
+        return SYSINFO_RET_OK;
+}
+
+static int	SYSTEM_SWAP_PUSED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	AGENT_RESULT	result_tmp;
+        zbx_uint64_t  tot_val = 0;
+        zbx_uint64_t  free_val = 0;
+
+        assert(result);
+
+        init_result(result);
+        init_result(&result_tmp);
+
+	if(SYSTEM_SWAP_TOTAL(cmd, param, flags, &result_tmp) != SYSINFO_RET_OK)
+                return  SYSINFO_RET_FAIL;
+	tot_val = result_tmp.ui64;
+
+	/* Check fot division by zero */
+	if(tot_val == 0)
+	{
+		free_result(&result_tmp);
+                return  SYSINFO_RET_FAIL;
+	}
+
+	if(SYSTEM_SWAP_FREE(cmd, param, flags, &result_tmp) != SYSINFO_RET_OK)
+                return  SYSINFO_RET_FAIL;
+	free_val = result_tmp.ui64;
+
+	free_result(&result_tmp);
+
+	SET_DBL_RESULT(result, 100.0-(100.0 * (double)free_val) / (double)tot_val);
+
+        return SYSINFO_RET_OK;
+}
+
 int	SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 
@@ -108,6 +174,8 @@ SWP_FNCLIST
 	{
 		{"total",	SYSTEM_SWAP_TOTAL},
 		{"free",	SYSTEM_SWAP_FREE},
+		{"pfree",	SYSTEM_SWAP_PFREE},
+		{"pused",	SYSTEM_SWAP_PUSED},
 		{0,		0}
 	};
 
