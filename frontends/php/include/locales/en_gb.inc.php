@@ -958,6 +958,7 @@
 	"S_LATVIAN_LV"=>			"Latvian (LV)",
 	"S_RUSSIAN_RU"=>			"Russian (RU)",
 	"S_SPANISH_SP"=>			"Spanish (SP)",
+	"S_SWEDISH_SE"=>			"Swedish (SE)",
 	"S_JAPANESE_JP"=>			"Japanese (JP)",
 	"S_CHINESE_CN"=>			"Chinese (CN)",
 

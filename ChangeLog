@@ -1,5 +1,6 @@
 Changes for 1.1.3:
 
+ - added Swedish translation. Thanks to "yeager". (Alexei)
  - support of system.swap.size[,pfree] and system.swap.size[,pused] (Alexei)
  - better calculation of next check timestamp for active items (Alexei)
  - fixed situations when latest_alarm() may return wrong value (Alexei)
