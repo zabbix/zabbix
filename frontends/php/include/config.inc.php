@@ -1353,7 +1353,7 @@ else if (document.getElementById)
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--
-	document.forms['<?php echo $frm_name; ?>'].elements['<?php echo $fld_name; ?>'].focus();
+	document.forms["<?php echo $frm_name; ?>"].elements["<?php echo $fld_name; ?>"].focus();
 //-->
 </script>
 <?php

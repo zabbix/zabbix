@@ -20,9 +20,10 @@
 	global $USER_DETAILS;
 	global $page;
 
+	show_messages();
+		
 	if($page['type'] == PAGE_TYPE_HTML)
 	{
-		show_messages();
 
 		if(!defined('ZBX_PAGE_NO_MENU') && !defined('ZBX_PAGE_NO_FOOTER'))
 		{

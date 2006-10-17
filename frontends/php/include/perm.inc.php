@@ -132,7 +132,7 @@
 		return $perm_mode;
 	}
 
-	function	get_accessible_hosts_by_userid($userid,$perm,$perm_mode=null,$perm_res=null,$nodeid=null)
+	function	get_accessible_hosts_by_userid($userid,$perm,$perm_mode=null,$perm_res=null,$nodeid=null,$hostid=null)
 	{
 
 		if(is_null($perm_res))		$perm_res	= PERM_RES_STRING_LINE;
@@ -153,13 +153,17 @@ COpt::counter_up('perm');
 		else if(is_array($nodeid))	$where_nodeid = ' and n.nodeid in ('.implode(',', $nodeid).') ';
 		else 				$where_nodeid = ' and n.nodeid in ('.$nodeid.') ';
 	
+		if(is_null($hostid))		$where_hostid = '';
+		else if(is_array($hostid))	$where_hostid = ' and h.hostid in ('.implode(',', $hostid).') ';
+		else 				$where_hostid = ' and h.hostid in ('.$hostid.') ';
+	
 		$db_hosts = DBselect('select distinct n.nodeid,n.name as node_name,h.hostid,h.host, min(r.permission) as permission '.
 			' from nodes n, users_groups ug '.
 			' left join rights r on r.groupid=ug.usrgrpid and r.type='.RESOURCE_TYPE_GROUP.' and ug.userid='.$userid.
 			' right join groups g on r.id=g.groupid '.
 			' left join hosts_groups hg on g.groupid=hg.groupid '.
 			' right join hosts h on hg.hostid=h.hostid '.
-			' where '.DBid2nodeid('h.hostid').'=n.nodeid '.$where_nodeid.'group by h.hostid'.
+			' where '.DBid2nodeid('h.hostid').'=n.nodeid '.$where_nodeid.$where_hostid.' group by h.hostid'.
 			' order by n.name, g.name, h.host');
 
 

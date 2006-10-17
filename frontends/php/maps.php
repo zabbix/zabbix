@@ -47,21 +47,43 @@ include_once "include/page_header.php";
 <?php
 	$_REQUEST["sysmapid"] = get_request("sysmapid",get_profile("web.maps.sysmapid",0));
 
-	if($_REQUEST["sysmapid"] <=0 )
+	$all_maps = array();
+	
+	$result = DBselect("select sysmapid,name from sysmaps ".
+		" where ".DBid2nodeid("sysmapid")."=".$ZBX_CURNODEID.
+		" order by name");
+	while($row=DBfetch($result))
 	{
-		if($sysmap = DBfetch(DBselect("select sysmapid,name from sysmaps ".
-			" where ".DBid2nodeid("sysmapid")."=".$ZBX_CURNODEID.
-			" order by name")))
-		{
-			$_REQUEST["sysmapid"] = $sysmap["sysmapid"];
-		}
+		if(!sysmap_accessiable($row["sysmapid"],PERM_READ_ONLY))
+			continue;
+
+		if(!isset($all_maps[0]))
+			$all_maps[0] = $row['sysmapid'];
+
+		$all_maps[$row['sysmapid']] = $row['name'];
 	}
 
-	update_profile("web.maps.sysmapid",$_REQUEST["sysmapid"]);
+	if(isset($_REQUEST["sysmapid"]) && !isset($all_maps[$_REQUEST["sysmapid"]]))
+	{
+		if(count($all_maps))
+		{
+			$_REQUEST["sysmapid"] = $all_maps[0];
+		}
+		else
+		{
+			unset($_REQUEST["sysmapid"]);
+		}
+	}
+	unset($all_maps[0]);
+	
+	if(isset($_REQUEST["sysmapid"]))
+	{
+		update_profile("web.maps.sysmapid",$_REQUEST["sysmapid"]);
+	}
 ?>
 <?php
 	$text = array(S_NETWORK_MAPS_BIG);
-	if($_REQUEST["sysmapid"] > 0)
+	if(isset($_REQUEST["sysmapid"]))
 	{
 		$sysmap = get_sysmap_by_sysmapid($_REQUEST["sysmapid"]);
 
@@ -69,22 +91,18 @@ include_once "include/page_header.php";
 		if(!isset($_REQUEST["fullscreen"]))
 			$url .= "&fullscreen=1";
 
-		array_push($text, nbsp(" / "), new CLink($sysmap["name"],$url));
+		array_push($text, nbsp(" / "), new CLink($all_maps[$_REQUEST["sysmapid"]],$url));
 	}
 
 	$form = new CForm();
 	if(isset($_REQUEST["fullscreen"]))
 		$form->AddVar("fullscreen",$_REQUEST["fullscreen"]);
 
-	$cmbMaps = new CComboBox("sysmapid",$_REQUEST["sysmapid"],"submit()");
+	$cmbMaps = new CComboBox("sysmapid",get_request("sysmapid",0),"submit()");
 	
-	$result = DBselect("select sysmapid,name from sysmaps ".
-		" where ".DBid2nodeid("sysmapid")."=".$ZBX_CURNODEID.
-		" order by name");
-
-	while($row=DBfetch($result))
+	foreach($all_maps as $id => $name)
 	{
-		$cmbMaps->AddItem($row["sysmapid"], $row["name"]);
+		$cmbMaps->AddItem($id, $name);
 	}
 	if($cmbMaps->ItemsCount()>0)
 	{	
@@ -95,7 +113,7 @@ include_once "include/page_header.php";
 ?>
 <?php
 	$table = new CTable(S_NO_MAPS_DEFINED,"map");
-	if($_REQUEST["sysmapid"] > 0)
+	if(isset($_REQUEST["sysmapid"]))
 	{
 		$action_map = get_action_map_by_sysmapid($_REQUEST["sysmapid"]);
 		$table->AddRow($action_map);

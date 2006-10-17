@@ -85,22 +85,45 @@
 		}
 	}
 
-	function url_param($parameter)
+	function	prepare_url(&$var, $varname)
 	{
-		global $_REQUEST;
+		$result = "";
+
+		if(is_array($var))
+		{
+			foreach($var as $id => $par)
+				$result .= prepare_url($par,$varname."[".$id."]");
+		}
+		else
+		{
+			$result = "&".$varname."=".$var;
+		}
+		return $result;
+	}
+
+	function url_param($parameter,$request=true,$name=null)
+	{
 	
 		$result = "";
-		if(isset($_REQUEST[$parameter]))
+
+		if(!isset($name)) $name = $parameter;
+		
+		if($request)
 		{
-			if(is_array($_REQUEST[$parameter]))
-			{
-				foreach($_REQUEST[$parameter] as $par)
-					$result .= "&".$parameter."[]=".$par;
-			}
-			else
-			{
-				$result = "&".$parameter."=".$_REQUEST[$parameter];
-			}
+			global $_REQUEST;
+			
+			$var =& $_REQUEST[$parameter];
+		}
+		else
+		{
+			global $$parameter;
+			
+			$var =& $$parameter;
+		}
+		
+		if(isset($var))
+		{
+			$result = prepare_url($var,$name);
 		}
 		return $result;
 	}

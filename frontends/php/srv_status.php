@@ -34,7 +34,8 @@ include_once "include/page_header.php";
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		"serviceid"=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,			NULL),
-		"showgraph"=>		array(T_ZBX_INT, O_OPT,	P_SYS,		IN("1")."isset({serviceid})",NULL)
+		"showgraph"=>		array(T_ZBX_INT, O_OPT,	P_SYS,		IN("1")."isset({serviceid})",NULL),
+		"path"=>		array(T_ZBX_STR, O_OPT,	null,		null,			NULL)
 	);
 
 	check_fields($fields);
@@ -58,12 +59,43 @@ include_once "include/page_header.php";
 	unset($_REQUEST["serviceid"]);
 ?>
 <?php
-	show_table_header(S_IT_SERVICES_BIG);
+	$path = get_request('path', array());
+	if(isset($service))
+	{
+		$path[count($path)] = array('id'=>$service["serviceid"], 'name'=>$service["name"]);
+	}
+	array_unique($path);
+	
+	$menu_path = array();
+	$new_path = array();
+	foreach($path as $el)
+	{
+		if(count($new_path)==0) 
+		{
+			$back_name = S_ROOT_SMALL;
+			$back_id = 0;
+		}
+		else 
+		{
+			$back_name = $new_path[count($new_path)-1]['name'];
+			$back_id = $new_path[count($new_path)-1]['id'];
+		}
+
+		if(isset($service) && $back_id == $service['serviceid'])	break;
+
+		array_push($menu_path, unpack_object(new CLink($back_name, '?serviceid='.$back_id.url_param('new_path',false,'path'))));
+		array_push($new_path, $el);
+	}
+	$_REQUEST['path'] = $path = $new_path;
+
+	show_table_header(S_IT_SERVICES_BIG.": ".implode('/',$menu_path));
+
+	unset($menu_path, $new_path, $el);
 
 	if(isset($service)&&isset($_REQUEST["showgraph"]))
 	{
 		$table  = new CTable(null,'chart');
-		$table->AddRow(new CImg("chart5.php?serviceid=".$service["serviceid"]));
+		$table->AddRow(new CImg("chart5.php?serviceid=".$service["serviceid"].url_param('path')));
 		$table->Show();
 	}
 	else
@@ -85,15 +117,26 @@ include_once "include/page_header.php";
 
 		while($row=DBfetch($result))
 		{
-			if(isset($service) && $row['serviceid'] == $service['serviceid']) $row['name'] = new CSpan($row['name'],'bold');
+			$description = array();
+			
+			if(isset($service))
+			{
+				if($row['serviceid'] == $service['serviceid'])
+				{
+					$row['name'] = new CSpan($row['name'],'bold');
+				}
+				else
+				{
+					array_push($description, " - ");
+				}
+			}
 
 			$childs = get_num_of_service_childs($row["serviceid"]);
 
-			$description = array();
 
 			if($childs && !(isset($service) && $service["serviceid"] == $row["serviceid"]))
 			{
-				array_push($description, new CLink($row['name'],"?serviceid=".$row["serviceid"],'action'));
+				array_push($description, new CLink($row['name'],"?serviceid=".$row["serviceid"].url_param('path'),'action'));
 			}
 			else
 			{
@@ -166,7 +209,7 @@ include_once "include/page_header.php";
 				$reason,
 				$sla,
 				$sla2,
-				new CLink(S_SHOW,"srv_status.php?serviceid=".$row["serviceid"]."&showgraph=1","action")
+				new CLink(S_SHOW,"srv_status.php?serviceid=".$row["serviceid"]."&showgraph=1".url_param('path'),"action")
 				));
 		}
 		$table->Show();

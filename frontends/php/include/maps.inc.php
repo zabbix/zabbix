@@ -23,14 +23,55 @@
 	require_once "include/hosts.inc.php";
 	require_once "include/triggers.inc.php";
 
+	function	sysmap_accessiable($sysmapid,$perm)
+	{
+		global $USER_DETAILS;
+
+		$result = false;
+
+		if($db_result = DBselect("select * from sysmaps_elements where sysmapid=".$sysmapid.
+			" and ".DBid2nodeid('sysmapid')." in (".get_accessible_nodes_by_userid($USER_DETAILS['userid'],$perm).")"))
+		{
+			$result = true;
+			
+			$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],$perm, PERM_MODE_LT);
+						
+			while(($se_data = DBfetch($db_result)) && $result)
+			{
+				switch($se_data['elementtype'])
+				{
+					case SYSMAP_ELEMENT_TYPE_HOST:
+						if(in_array($se_data['elementid'],explode(',',$denyed_hosts)))
+						{
+							$result = false;
+						}
+						break;
+					case SYSMAP_ELEMENT_TYPE_MAP:
+						$result &= sysmap_accessiable($se_data['elementid'], $perm);
+						break;
+					case SYSMAP_ELEMENT_TYPE_IMAGE:
+						if(!DBfetch(DBselect("select distinct t.*".
+							" from triggers t,items i,functions f".
+							" where f.itemid=i.itemid and t.triggerid=f.triggerid".
+							" and i.hostid not in (".$denyed_hosts.") and t.triggerid=".$se_data['elementid'])))
+						{
+							$result = false;
+						}
+						break;
+				}
+			}
+		}
+		return $result;
+	}
+
 	function	get_sysmap_by_sysmapid($sysmapid)
 	{
-		$row=DBfetch(DBselect("select * from sysmaps where sysmapid=$sysmapid"));
+		$row = DBfetch(DBselect("select * from sysmaps where sysmapid=".$sysmapid));
 		if($row)
 		{
 			return	$row;
 		}
-		error("No system map with sysmapid=[$sysmapid]");
+		error("No system map with sysmapid=[".$sysmapid."]");
 		return false;
 	}
 
@@ -157,8 +198,8 @@
 		$selementid = get_dbid("sysmaps_elements","selementid");
 
 		$result=DBexecute("insert into sysmaps_elements".
-			" (sysmapid,elementid,elementtype,label,x,y,iconid_off,url,iconid_on,label_location)".
-			" values ($sysmapid,$elementid,$elementtype,".zbx_dbstr($label).",
+			" (selementid,sysmapid,elementid,elementtype,label,x,y,iconid_off,url,iconid_on,label_location)".
+			" values ($selementid,$sysmapid,$elementid,$elementtype,".zbx_dbstr($label).",
 			$x,$y,$iconid_off,".zbx_dbstr($url).",$iconid_on,".
 			"$label_location)");
 

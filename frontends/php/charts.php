@@ -140,7 +140,7 @@ include_once "include/page_header.php";
 		$sql = " select distinct h.hostid,h.host from hosts h,items i,hosts_groups hg, graphs_items gi ".
 			" where h.status=".HOST_STATUS_MONITORED.
 			" and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid ".
-			" and h.hostid in (".$denyed_hosts.") and i.itemid=gi.itemid".
+			" and h.hostid not in (".$denyed_hosts.") and i.itemid=gi.itemid".
 			" order by h.host";
 	}
 	else
@@ -148,7 +148,7 @@ include_once "include/page_header.php";
 		$cmbHosts->AddItem(0,S_ALL_SMALL);
 		$sql = "select distinct h.hostid,h.host from hosts h,items i, graphs_items gi where h.status=".HOST_STATUS_MONITORED.
 			" and i.status=".ITEM_STATUS_ACTIVE." and h.hostid=i.hostid".
-			" and h.hostid in (".$denyed_hosts.") and i.itemid=gi.itemid".
+			" and h.hostid not in (".$denyed_hosts.") and i.itemid=gi.itemid".
 			" order by h.host";
 	}
 	$result=DBselect($sql);
@@ -166,7 +166,7 @@ include_once "include/page_header.php";
 		$sql = "select distinct g.graphid,g.name from graphs g,graphs_items gi,items i".
 			" where i.itemid=gi.itemid and g.graphid=gi.graphid and i.hostid=".$_REQUEST["hostid"].
 			" and ".DBid2nodeid("g.graphid")."=".$ZBX_CURNODEID.
-			" and i.hostid in (".$denyed_hosts.") ".
+			" and i.hostid not in (".$denyed_hosts.") ".
 			" order by g.name";
 	}
 	elseif ($_REQUEST["groupid"] > 0)
@@ -175,7 +175,7 @@ include_once "include/page_header.php";
 			" where i.itemid=gi.itemid and g.graphid=gi.graphid and i.hostid=hg.hostid and hg.groupid=".$_REQUEST["groupid"].
 			" and i.hostid=h.hostid and h.status=".HOST_STATUS_MONITORED.
 			" and ".DBid2nodeid("g.graphid")."=".$ZBX_CURNODEID.
-			" and h.hostid in (".$denyed_hosts.") ".
+			" and h.hostid not in (".$denyed_hosts.") ".
 			" order by g.name";
 	}
 	else
@@ -184,7 +184,7 @@ include_once "include/page_header.php";
 			" where i.itemid=gi.itemid and g.graphid=gi.graphid ".
 			" and i.hostid=h.hostid and h.status=".HOST_STATUS_MONITORED.
 			" and ".DBid2nodeid("g.graphid")."=".$ZBX_CURNODEID.
-			" and h.hostid in (".$denyed_hosts.") ".
+			" and h.hostid not in (".$denyed_hosts.") ".
 			" order by g.name";
 	}
 

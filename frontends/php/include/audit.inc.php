@@ -35,6 +35,8 @@
 		$str_resource[AUDIT_RESOURCE_ITEM]		= S_ITEM;
 		$str_resource[AUDIT_RESOURCE_IMAGE]		= S_IMAGE;
 		$str_resource[AUDIT_RESOURCE_VALUE_MAP]		= S_VALUE_MAP;
+		$str_resource[AUDIT_RESOURCE_IT_SERVICE]	= S_IT_SERVICE;
+		$str_resource[AUDIT_RESOURCE_MAP]		= S_MAP;
 
 		if(isset($str_resource[$resource_type]))
 			return $str_resource[$resource_type];
@@ -42,6 +44,14 @@
 		return S_UNKNOWN_RESOURCE;
 	}
 
+	function add_audit_if($condition,$action,$resourcetype,$details)
+	{
+		if($condition) 
+			return add_audit($action,$resourcetype,$details);
+
+		return false;
+	}
+	
 	function add_audit($action,$resourcetype,$details)
 	{
 		global $USER_DETAILS;

@@ -40,9 +40,14 @@ include_once "include/page_header.php";
 	check_fields($fields);
 ?>
 <?php
-	if(!($map	= get_sysmap_by_sysmapid($_REQUEST["sysmapid"],PERM_READ_ONLY))) /* TODO *//* permission system */
+	if(!sysmap_accessiable($_REQUEST["sysmapid"],PERM_READ_ONLY))
 	{
 		access_deny();
+	}
+	
+	if(!($map = get_sysmap_by_sysmapid($_REQUEST["sysmapid"])))
+	{
+		include_once "include/page_footer.php";
 	}
 
 	$name		= $map["name"];

@@ -57,9 +57,11 @@
 		$frmMsg->AddItemToBottomRow(new CButton("save",$btn_txt));
 		$frmMsg->AddItemToBottomRow(new CButton("cancel",S_CANCEL));
 
-		$frmMsg->Show();
+		$frmMsg->Show(false);
 
 		SetFocus($frmMsg->GetName(),"message");
+
+		$frmMsg->Destroy();
 	}
 
 	# Insert form for User
@@ -1025,9 +1027,11 @@
 		$frmLogin->AddRow('Login name', new CTextBox('name'));
 		$frmLogin->AddRow('Password', new CPassBox('password'));
 		$frmLogin->AddItemToBottomRow(new CButton('enter','Enter'));
-		$frmLogin->Show();
+		$frmLogin->Show(false);
 
 		SetFocus($frmLogin->GetName(),"name");
+		
+		$frmLogin->Destroy();
 	}
 
 	# Insert form for Trigger

@@ -28,42 +28,37 @@
 include_once "include/page_header.php";
 
 	insert_confirm_javascript();
-
-	$parentid = get_request("parentid", 0);
 ?>
 <?php
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
+		"path"=>		array(T_ZBX_STR, O_OPT, null, null, null),
+
 		"serviceid"=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,NULL),
 		"group_serviceid"=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,NULL),
+		
 		"linkid"=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,NULL),
 		"group_linkid"=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,NULL),
+		
+		"name"=>		array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,	'isset({save})'),
+		"algorithm"=>		array(T_ZBX_INT, O_OPT,  NULL,	IN('0,1,2'),	'isset({save})'),
+		"showsla"=>		array(T_ZBX_INT, O_OPT,  NULL,  IN("0,1"),null),
+		"goodsla"=>		array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,100),		null),
+		"sortorder"=>		array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,65535),	null),
+		"service_times"=>	array(T_ZBX_STR, O_OPT,  null,  null,			null),
+		
+		"linktrigger"=>		array(T_ZBX_INT, O_OPT,  NULL,  IN("0,1"),null),
+		"triggerid"=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,	NULL),
 
-/* TODO!!!!!!!!!!!!!!!
+		"serviceupid"=>		array(T_ZBX_INT, O_OPT,  null,  DB_ID,		'isset({save_link})'),
+		"servicedownid"=>	array(T_ZBX_INT, O_OPT,  null,  DB_ID,		null),
+		"soft"=>		array(T_ZBX_INT, O_OPT,  NULL,  IN("0,1"),	null),
 
-		"hostid"=>	array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,'isset({save})'),
+		"serverid"=>		array(T_ZBX_INT, O_OPT,  null,  DB_ID,		'isset({add_server})'),
 
-		"triggerid"=>	array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,'{form}=="update"'),
-
-		"copy_type"	=>array(T_ZBX_INT, O_OPT,	 P_SYS,	IN("0,1"),'isset({copy})'),
-		"copy_mode"	=>array(T_ZBX_INT, O_OPT,	 P_SYS,	IN("0"),NULL),
-
-		"description"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,'isset({save})'),
-		"expression"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,'isset({save})'),
-		"priority"=>	array(T_ZBX_INT, O_OPT,  NULL,  IN("0,1,2,3,4,5"),'isset({save})'),
-		"comments"=>	array(T_ZBX_STR, O_OPT,  NULL,	NULL,'isset({save})'),
-		"url"=>		array(T_ZBX_STR, O_OPT,  NULL,	NULL,'isset({save})'),
-		"status"=>	array(T_ZBX_STR, O_OPT,  NULL,	NULL,NULL),
-
-		"dependences"=>		array(T_ZBX_INT, O_OPT,  NULL,	DB_ID, NULL),
-		"new_dependence"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,'isset({add_dependence})'),
-		"rem_dependence"=>	array(T_ZBX_INT, O_OPT,  NULL,	DB_ID, NULL),
-
-		"g_triggerid"=>	array(T_ZBX_INT, O_OPT,  NULL,	DB_ID, NULL),
-		"copy_targetid"=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID, NULL),
-		"filter_groupid"=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, 'isset({copy})&&{copy_type}==0'),
-		*/
+		"new_service_time"=>	array(T_ZBX_STR, O_OPT,  null,  null,			null),
+		"rem_service_times"=>	array(T_ZBX_STR, O_OPT,  null,  null,			null),
 
 /* actions */
 		"save_service"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -102,14 +97,36 @@ include_once "include/page_header.php";
 ?>
 <?php
 /* ACTIONS */
+	$_REQUEST["showsla"]	= get_request("showsla",0);
+	$_REQUEST["soft"]	= get_request("soft", 0);
 
 	if(isset($_REQUEST["delete"]))
 	{
 		if(isset($_REQUEST["group_serviceid"]))
 		{
-			foreach($_REQUEST["group_serviceid"] as $sid)
-				delete_service($sid);
-			show_messages(TRUE, S_SERVICE_DELETED, S_CANNOT_DELETE_SERVICE);
+			$group_serviceid = get_request('group_serviceid', array(-1));
+			
+			if(($db_group_services = DBselect("select s.* from services s left join triggers t on s.triggerid=t.triggerid ".
+				" left join functions f on t.triggerid=f.triggerid left join items i on f.itemid=i.itemid ".
+				" where (i.hostid is null or i.hostid not in (".$denyed_hosts.")) ".
+				" and ".DBid2nodeid("s.serviceid")."=".$ZBX_CURNODEID.
+				" and s.serviceid in (".implode(',',$group_serviceid).")"
+				)))
+			{
+				while($g_service_data = DBfetch($db_group_services))
+				{
+					$result = delete_service($g_service_data['serviceid']);
+
+					if(isset($service) && $g_service_data['serviceid'] == $service['serviceid'])
+					{
+						unset($service, $path);
+					}
+					
+					add_audit_if($result,AUDIT_ACTION_DELETE,AUDIT_RESOURCE_IT_SERVICE,
+						' Name ['.$g_service_data["name"].'] id ['.$g_service_data['serviceid'].']');
+				}
+				show_messages(TRUE, S_SERVICE_DELETED, S_CANNOT_DELETE_SERVICE);
+			}
 		}
 		elseif(isset($_REQUEST["group_linkid"]))
 		{
@@ -119,43 +136,48 @@ include_once "include/page_header.php";
 		}
 		elseif(isset($_REQUEST["linkid"]))
 		{
-			$result=delete_service_link($_REQUEST["linkid"]);
+			$result = delete_service_link($_REQUEST["linkid"]);
 			show_messages($result, S_LINK_DELETED, S_CANNOT_DELETE_LINK);
 			unset($_REQUEST["linkid"]);
 		}
 		elseif(isset($_REQUEST["serviceid"]))
 		{
-			$result=delete_service($service["serviceid"]);
+			$result = delete_service($service["serviceid"]);
 			show_messages($result, S_SERVICE_DELETED, S_CANNOT_DELETE_SERVICE);
-			unset($service["serviceid"]);
+			add_audit_if($result,AUDIT_ACTION_DELETE,AUDIT_RESOURCE_IT_SERVICE,
+				' Name ['.$service["name"].'] id ['.$service['serviceid'].']');
+			unset($service,$path);
 		}
 	}
 	elseif(isset($_REQUEST["save_service"]))
 	{
 		$service_times = get_request('service_times',array());
 
-		$showsla = isset($_REQUEST["showsla"]) ? 1 : 0;
 		$triggerid = isset($_REQUEST["linktrigger"]) ? $_REQUEST["triggerid"] : null;
 		if(isset($service["serviceid"]))
 		{
 			$result = update_service($service["serviceid"],
 				$_REQUEST["name"],$triggerid,$_REQUEST["algorithm"],
-				$showsla,$_REQUEST["goodsla"],$_REQUEST["sortorder"],
+				$_REQUEST["showsla"],$_REQUEST["goodsla"],$_REQUEST["sortorder"],
 				$service_times);
 			show_messages($result, S_SERVICE_UPDATED, S_CANNOT_UPDATE_SERVICE);
+			$serviceid = $service["serviceid"];
+			$audit_acrion = AUDIT_ACTION_UPDATE;
 		}
 		else
 		{
 			$result = add_service(
 				$_REQUEST["name"],$triggerid,$_REQUEST["algorithm"],
-				$showsla,$_REQUEST["goodsla"],$_REQUEST["sortorder"],
+				$_REQUEST["showsla"],$_REQUEST["goodsla"],$_REQUEST["sortorder"],
 				$service_times);
 			show_messages($result, S_SERVICE_ADDED, S_CANNOT_ADD_SERVICE);
+			$serviceid = $result;
+			$audit_acrion = AUDIT_ACTION_ADD;
 		}	
+		add_audit_if($result,$audit_acrion,AUDIT_RESOURCE_IT_SERVICE,' Name ['.$_REQUEST["name"].'] id ['.$serviceid.']');
 	}
 	elseif(isset($_REQUEST["save_link"]))
 	{
-		$_REQUEST["soft"] = isset($_REQUEST["soft"]) ? 1 : 0;
 		if(isset($_REQUEST["linkid"]))
 		{
 			$result = update_service_link($_REQUEST["linkid"],
@@ -170,7 +192,13 @@ include_once "include/page_header.php";
 	}
 	elseif(isset($_REQUEST["add_server"]))
 	{
-		$result = add_host_to_services($_REQUEST["serverid"],$service["serviceid"]);
+		if(!($host_data = DBfetch(DBselect('select h.* from hosts h where '.DBid2nodeid('h.hostid').'='.$ZBX_CURNODEID.
+			' and h.hostid not in ('.$denyed_hosts.') and h.hostid='.$_REQUEST["serverid"]))))
+		{
+			access_deny();
+		}
+		$result = add_host_to_services($_REQUEST["serverid"], $service["serviceid"]);
+		add_audit_if($result,AUDIT_ACTION_ADD,AUDIT_RESOURCE_IT_SERVICE,' Host ['.$host_data["host"].'] id ['.$_REQUEST["serverid"].']');
 		show_messages($result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
 	}
 	elseif(isset($_REQUEST["add_service_time"]) && isset($_REQUEST["new_service_time"]))
@@ -209,17 +237,51 @@ include_once "include/page_header.php";
 		}
 	}
 ?>
-
 <?php
 	if(isset($service))
 	{
 		$service = get_service_by_serviceid($service['serviceid']); // update date after ACTIONS */
 	}
+
+	$path = get_request('path', array());
+	if(isset($service))
+	{
+		$path[count($path)] = array('id'=>$service["serviceid"], 'name'=>$service["name"]);
+	}
+	array_unique($path);
 	
-	show_table_header(S_IT_SERVICES_BIG);
+	$menu_path = array();
+	$new_path = array();
+	foreach($path as $el)
+	{
+		if(count($new_path)==0) 
+		{
+			$back_name = S_ROOT_SMALL;
+			$back_id = 0;
+		}
+		else 
+		{
+			$back_name = $new_path[count($new_path)-1]['name'];
+			$back_id = $new_path[count($new_path)-1]['id'];
+		}
+
+		if(isset($service) && $back_id == $service['serviceid'])	break;
+
+		array_push($menu_path, unpack_object(new CLink($back_name, '?serviceid='.$back_id.url_param('new_path',false,'path'))));
+		array_push($new_path, $el);
+	}
+	$_REQUEST['path'] = $path = $new_path;
+
+	show_table_header(S_IT_SERVICES_BIG.": ".implode('/',$menu_path));
+
+	unset($menu_path, $new_path, $el);
 
 	$form = new CForm();
 	$form->SetName("services");
+	$form->AddVar("path", $path);
+
+	if(isset($service)) 
+		$form->AddVar("serviceid", $service['serviceid']);
 
 	$table = new CTableInfo();
 	$table->SetHeader(array(
@@ -244,15 +306,14 @@ include_once "include/page_header.php";
 	{
 		$prefix	 = null;
 		$trigger = "-";
-		$parent  = "";
 		
-		$db_service_data["name"] .= " [".get_num_of_service_childs($db_service_data["serviceid"])."]";
+		$description = $db_service_data["name"]." [".get_num_of_service_childs($db_service_data["serviceid"])."]";
 		
 		if(isset($service["serviceid"]))
 		{
 			if($service["serviceid"] == $db_service_data["serviceid"])
 			{
-				$db_service_data["name"] = new CSpan($db_service_data["name"], 'bold');
+				$description = new CSpan($description, 'bold');
 			}
 			else
 			{
@@ -261,8 +322,9 @@ include_once "include/page_header.php";
 		}
 		if(!(isset($service["serviceid"]) && $service["serviceid"] == $db_service_data["serviceid"]))
 		{
-			$db_service_data["name"] = new CLink($db_service_data["name"],
-					"services.php?serviceid=".$db_service_data["serviceid"]."#form",'action');
+			
+			$description = new CLink($description,"services.php?serviceid=".$db_service_data["serviceid"].
+					url_param('path')."#form",'action');
 		}
 
 		if(isset($db_service_data["triggerid"]))
@@ -273,14 +335,14 @@ include_once "include/page_header.php";
 		$table->AddRow(array(
 			array(new CCheckBox("group_serviceid[]",null,null,$db_service_data["serviceid"]),
 				$prefix,
-				$db_service_data["name"]
+				$description
 			),
 			algorithm2str($db_service_data["algorithm"]),
 			$trigger
 			));
 	}
 
-	$table->SetFooter(new CCol(new CButton("delete","Delete selected","return Confirm('".S_DELETE_SELECTED_SERVICES."');")));
+	$table->SetFooter(new CCol(new CButtonQMessage('delete',S_DELETE_SELECTED,S_DELETE_SELECTED_SERVICES,null,false)));
 	$form->AddItem($table);
 	$form->Show();
 ?>
@@ -294,7 +356,7 @@ include_once "include/page_header.php";
 		$form = new CForm();
 		$form->SetName("Links");
 		$form->AddVar("serviceid",$service["serviceid"]);
-		$form->AddVar("parentid",$parentid);
+		$form->AddVar("path",$path);
 
 		$table = new CTableInfo();
 		$table->SetHeader(array(
@@ -318,15 +380,15 @@ include_once "include/page_header.php";
 				array(
 					new CCheckBox("group_linkid[]",null,null,$row["linkid"]),
 					new CLink(S_LINK.SPACE.$i++,
-						"services.php?form=update&linkid=".$row["linkid"].url_param("serviceid"),
+						"services.php?form=update&linkid=".$row["linkid"].url_param("serviceid").url_param("path"),
 						"action"),
 				),
-				new CLink($row["serviceupname"],"services.php?serviceid=".$row["serviceupid"]),
-				new CLink($row["servicedownname"],"services.php?serviceid=".$row["servicedownid"]),
+				new CLink($row["serviceupname"],"services.php?serviceid=".$row["serviceupid"].url_param("path")),
+				new CLink($row["servicedownname"],"services.php?serviceid=".$row["servicedownid"].url_param("path")),
 				$row["soft"] == 0 ? S_HARD : S_SOFT
 				));
 		}
-		$table->SetFooter(new CCol(new CButton("delete","Delete selected","return Confirm('".S_DELETE_SELECTED_LINKS."');")));
+		$table->SetFooter(new CCol(new CButtonQMessage('delete',S_DELETE_SELECTED,S_DELETE_SELECTED_SERVICES,null,false)));
 		$form->AddItem($table);
 		$form->Show();
 	}
@@ -337,7 +399,7 @@ include_once "include/page_header.php";
 
 	$frmService = new CFormTable(S_SERVICE);
 	$frmService->SetHelp("web.services.service.php");
-	$frmService->AddVar("parentid",$parentid);
+	$frmService->AddVar("path",$path);
 	
 	$service_times = get_request('service_times',array());
 	$new_service_time = get_request('new_service_time',array('type' => SERVICE_TIME_TYPE_UPTIME));
@@ -357,7 +419,7 @@ include_once "include/page_header.php";
 		$goodsla	= $service["goodsla"];
 		$sortorder	= $service["sortorder"];
 		$triggerid	= $service["triggerid"];
-		$linktrigger	= isset($triggerid) ? 'yes' : 'no';
+		$linktrigger	= isset($triggerid) ? 1 : 0;
 		if(!isset($triggerid)) $triggerid = 0;
 
 		$result = DBselect('select * from services_times where serviceid='.$service['serviceid']);
@@ -381,10 +443,10 @@ include_once "include/page_header.php";
 		$sortorder	= get_request("sortorder",0);
 		$algorithm	= get_request("algorithm",0);
 		$triggerid	= get_request("triggerid",0);
-		$linktrigger	= isset($_REQUEST["linktrigger"]) ? 'yes' : 'no';
+		$linktrigger	= get_request("linktrigger",0);
 	}
 
-	if(isset($service["serviceid"]))
+	if(isset($service))
 	{
 		$frmService->AddVar("serviceid",$service["serviceid"]);
 	}
@@ -396,7 +458,7 @@ include_once "include/page_header.php";
 	$cmbAlg->AddItem(2,S_MIN_BIG);
 	$frmService->AddRow(S_STATUS_CALCULATION_ALGORITHM, $cmbAlg);
 
-	$frmService->AddRow(S_SHOW_SLA, new CCheckBox("showsla",$showsla,'submit();'));
+	$frmService->AddRow(S_SHOW_SLA, new CCheckBox("showsla",$showsla,'submit();',1));
 
 	if($showsla)
 		$frmService->AddRow(S_ACCEPTABLE_SLA_IN_PERCENT,new CTextBox("goodsla",$goodsla,6));
@@ -485,9 +547,9 @@ include_once "include/page_header.php";
 			new CButton('add_service_time','add')
 		));
 
-	$frmService->AddRow(S_LINK_TO_TRIGGER_Q, new CCheckBox("linktrigger",$linktrigger,"submit();"));
+	$frmService->AddRow(S_LINK_TO_TRIGGER_Q, new CCheckBox("linktrigger",$linktrigger,"submit();",1));
 
-	if($linktrigger == 'yes')
+	if($linktrigger == 1)
 	{
 		if($triggerid > 0)
 			$trigger = expand_trigger_description($triggerid);
@@ -514,11 +576,11 @@ include_once "include/page_header.php";
 		$frmService->AddItemToBottomRow(SPACE);
 		$frmService->AddItemToBottomRow(new CButtonDelete(
 			"Delete selected service?",
-			url_param("form").url_param("serviceid")
+			url_param("form").url_param("serviceid").url_param("path")
 			));
 	}
 	$frmService->AddItemToBottomRow(SPACE);
-	$frmService->AddItemToBottomRow(new CButtonCancel("&serviceid=".$parentid));
+	$frmService->AddItemToBottomRow(new CButtonCancel(url_param('serviceid').url_param('path')));
 	$frmService->Show();
 ?>
 
@@ -530,7 +592,7 @@ include_once "include/page_header.php";
 		$frmLink = new CFormTable(S_LINK_TO);
 		$frmLink->SetHelp("web.services.link.php");
 		$frmLink->AddVar("serviceid",$service["serviceid"]);
-		$frmLink->AddVar("parentid",$parentid);
+		$frmLink->AddVar("path",$path);
 	
 		if(isset($_REQUEST["linkid"]))
 		{
@@ -557,10 +619,18 @@ include_once "include/page_header.php";
 
 		$cmbServices = new CComboBox("servicedownid",$servicedownid);
 		$result=DBselect("select serviceid,triggerid,name from services where serviceid<>$serviceupid order by name");
+		
+		$result = DBselect("select s.* from services s left join triggers t on s.triggerid=t.triggerid ".
+			" left join functions f on t.triggerid=f.triggerid left join items i on f.itemid=i.itemid ".
+			" where (i.hostid is null or i.hostid not in (".$denyed_hosts.")) ".
+			" and ".DBid2nodeid("s.serviceid")."=".$ZBX_CURNODEID.
+			" and s.serviceid <> ".$serviceupid);
+		
 		while($row=Dbfetch($result))
 		{
 			if(DBfetch(DBselect("select linkid from services_links".
-				" where servicedownid<>$servicedownid and serviceupid=$serviceupid and servicedownid=".$row["serviceid"])))
+				" where (servicedownid<>$servicedownid and serviceupid=$serviceupid and servicedownid=".$row["serviceid"].") ".
+				" or (servicedownid=".$row["serviceid"]." and soft=0) ")))
 				continue;
 
 			$name = $row["name"];
@@ -572,7 +642,7 @@ include_once "include/page_header.php";
 
 		$frmLink->AddRow(S_SERVICE_2, $cmbServices);
 
-		$frmLink->AddRow(S_SOFT_LINK_Q, new CCheckBox("soft",$soft));
+		$frmLink->AddRow(S_SOFT_LINK_Q, new CCheckBox("soft",$soft,null,1));
 
 		$frmLink->AddItemToBottomRow(new CButton("save_link",S_SAVE));
 		if(isset($_REQUEST["linkid"]))
@@ -580,11 +650,11 @@ include_once "include/page_header.php";
 			$frmLink->AddItemToBottomRow(SPACE);
 			$frmLink->AddItemToBottomRow(new CButtonDelete(
 				"Delete selected services linkage?",
-				url_param("form").url_param("linkid").url_param("serviceid")
+				url_param("form").url_param("linkid").url_param("serviceid").url_param('path')
 				));
 		}
 		$frmLink->AddItemToBottomRow(SPACE);
-		$frmLink->AddItemToBottomRow(new CButtonCancel(url_param("serviceid")));
+		$frmLink->AddItemToBottomRow(new CButtonCancel(url_param("serviceid").url_param("path")));
 		$frmLink->Show();
 	}
 ?>
@@ -597,10 +667,12 @@ include_once "include/page_header.php";
 		$frmDetails = new CFormTable(S_ADD_SERVER_DETAILS);
 		$frmDetails->SetHelp("web.services.server.php");
 		$frmDetails->AddVar("serviceid",$service["serviceid"]);
-		$frmDetails->AddVar("parentid",$parentid);
+		$frmDetails->AddVar("path",$path);
 		
 		$cmbServers = new CComboBox("serverid");
-		$result=DBselect("select hostid,host from hosts where ".DBid2nodeid("hostid")."=".$ZBX_CURNODEID." order by host");
+		$result=DBselect("select hostid,host from hosts where ".DBid2nodeid("hostid")."=".$ZBX_CURNODEID.
+			" and hostid not in (".$denyed_hosts.") ".
+			" order by host");
 		while($row=DBfetch($result))
 		{
 			$cmbServers->AddItem($row["hostid"],$row["host"]);

@@ -19,9 +19,9 @@
 **/
 ?>
 <?php
-	function unset_request($key)
+	function unset_request($key,$requester='unknown')
 	{
-//		SDI("unset: $key");
+//		SDI("unset [".$requester."]: $key");
 		unset($_REQUEST[$key]);
 	}
 
@@ -108,7 +108,7 @@
 		{
 			if(!isset($fields[$key]))
 			{
-				unset_request($key);
+				unset_request($key,'unset_not_in_list');
 			}
 		}
 	}
@@ -121,7 +121,7 @@
 
 			if(($flags&P_NZERO)&&(isset($_REQUEST[$field]))&&(is_numeric($_REQUEST[$field]))&&($_REQUEST[$field]==0))
 			{
-				unset_request($field);
+				unset_request($field,'unset_if_zero');
 			}
 		}
 	}
@@ -135,7 +135,7 @@
 			
 			if(($flags&P_ACT)&&(isset($_REQUEST[$field])))
 			{
-				unset_request($field);
+				unset_request($field,'unset_action_vars');
 			}
 		}
 	}
@@ -144,7 +144,7 @@
 	{
 		foreach($_REQUEST as $key => $val)
 		{
-			unset_request($key);
+			unset_request($key,'unset_all');
 		}
 	}
 
@@ -250,7 +250,7 @@
 			if(!isset($_REQUEST[$field]))
 				return ZBX_VALID_OK;
 
-			unset_request($field);
+			unset_request($field,'O_NO');
 
 			if($flags&P_SYS)
 			{

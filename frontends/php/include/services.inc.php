@@ -62,13 +62,17 @@
 		return $result;
 	}
 
-	function	add_host_to_services($hostid,$serviceid)
+	function	add_host_to_services($hostid, $serviceid)
 	{
-		$sql="select distinct t.triggerid,t.description from triggers t,hosts h,items i,functions f where h.hostid=$hostid and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid";
-		$result=DBselect($sql);
+		global $ZBX_CURNODEID;
+
+		$result = DBselect('select distinct h.host,t.triggerid,t.description '.
+			' from triggers t,hosts h,items i,functions f where h.hostid='.$hostid.' and h.hostid=i.hostid '.
+			' and i.itemid=f.itemid and f.triggerid=t.triggerid '.
+			' and '.DBid2nodeid('t.triggerid').'='.$ZBX_CURNODEID);
 		while($row=DBfetch($result))
 		{
-			$serviceid2=add_service($row["description"],$row["triggerid"],"on",0,"off",99,0);
+			$serviceid2 = add_service(expand_trigger_description_by_data($row),$row["triggerid"],"on",0,"off",99);
 			add_service_link($serviceid2,$serviceid,0);
 		}
 		return	1;
@@ -76,9 +80,7 @@
 
 	function	is_service_hardlinked($serviceid)
 	{
-		$sql="select count(*) as cnt from services_links where servicedownid=$serviceid and soft=0";
-		$result=DBselect($sql);
-		$row=DBfetch($result);
+		$row = DBfetch(DBselect("select count(*) as cnt from services_links where servicedownid=".$serviceid." and soft=0"));
 		if($row["cnt"]>0)
 		{
 			return	TRUE;
@@ -158,6 +160,7 @@
 	{
 		if( ($softlink==0) && (is_service_hardlinked($servicedownid)==true) )
 		{
+			error("cannot link hardlinked service.");
 			return	false;
 		}
 

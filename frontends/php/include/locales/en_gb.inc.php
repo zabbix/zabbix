@@ -808,6 +808,8 @@
 	"S_SELECT_SCREEN_DOT_DOT_DOT"=>		"Select screen ...",
 
 //	services.php
+	"S_ROOT_SMALL"=>			"root",
+	"S_IT_SERVICE"=>			"IT service",
 	"S_IT_SERVICES"=>			"IT services",
 	"S_SERVICE_UPDATED"=>			"Service updated",
 	"S_CANNOT_UPDATE_SERVICE"=>		"Cannot update service",

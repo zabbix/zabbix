@@ -53,6 +53,14 @@ include_once "include/page_header.php";
 
 	);
 	check_fields($fields);
+	
+	if(isset($_REQUEST["sysmapid"]))
+	{
+		if(!sysmap_accessiable($_REQUEST["sysmapid"],PERM_READ_WRITE))
+			access_deny();
+	
+		$sysmap = DBfetch(DBselect("select * from sysmaps where sysmapid=".$_REQUEST["sysmapid"]));
+	}
 ?>
 <?php
 	if(isset($_REQUEST["save"]))
@@ -63,11 +71,13 @@ include_once "include/page_header.php";
 				$_REQUEST["height"],$_REQUEST["backgroundid"],$_REQUEST["label_type"],
 				$_REQUEST["label_location"]);
 
+			add_audit_if($result,AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP,'Name ['.$_REQUEST['name'].']');
 			show_messages($result,"Network map updated","Cannot update network map");
 		} else {
 			$result=add_sysmap($_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],
 				$_REQUEST["backgroundid"],$_REQUEST["label_type"],$_REQUEST["label_location"]);
 
+			add_audit_if($result,AUDIT_ACTION_ADD,AUDIT_RESOURCE_MAP,'Name ['.$_REQUEST['name'].']');
 			show_messages($result,"Network map added","Cannot add network map");
 		}
 		if($result){
@@ -76,7 +86,8 @@ include_once "include/page_header.php";
 	}
 	elseif(isset($_REQUEST["delete"])&&isset($_REQUEST["sysmapid"]))
 	{
-		$result=delete_sysmap($_REQUEST["sysmapid"]);
+		$result = delete_sysmap($_REQUEST["sysmapid"]);
+		add_audit_if($result,AUDIT_ACTION_DELETE,AUDIT_RESOURCE_MAP,'Name ['.$sysmap['name'].']');
 		show_messages($result,"Network map deleted","Cannot delete network map");
 		if($result){
 			unset($_REQUEST["form"]);
@@ -98,13 +109,15 @@ include_once "include/page_header.php";
 	{
 		show_table_header(S_MAPS_BIG);
 		$table = new CTableInfo(S_NO_MAPS_DEFINED);
-		$table->setHeader(array(S_NAME,S_WIDTH,S_HEIGHT,S_MAP));
+		$table->SetHeader(array(S_NAME,S_WIDTH,S_HEIGHT,S_MAP));
 
-		$result=DBselect("select sysmapid,name,width,height from sysmaps ".
+		$result = DBselect("select sysmapid,name,width,height from sysmaps ".
 			" where ".DBid2nodeid("sysmapid")."=".$ZBX_CURNODEID." order by name");
 		while($row=DBfetch($result))
 		{
-			$table->addRow(array(
+			if(!sysmap_accessiable($row["sysmapid"],PERM_READ_WRITE)) continue;
+
+			$table->AddRow(array(
 				new CLink($row["name"], "sysmaps.php?form=update".
 					"&sysmapid=".$row["sysmapid"]."#form",'action'),
 				$row["width"],
@@ -112,7 +125,7 @@ include_once "include/page_header.php";
 				new CLink(S_EDIT,"sysmap.php?sysmapid=".$row["sysmapid"])
 				));
 		}
-		$table->show();
+		$table->Show();
 	}
 ?>
 <?php

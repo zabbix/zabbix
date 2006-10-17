@@ -262,7 +262,7 @@ COpt::profiling_start("page");
 		unset($menu_url);
 		foreach($sub['pages'] as $sub_pages)
 		{
-			if($page['file'] == $sub_pages['url'])
+			if($page['file'] == $sub_pages['url'] && isset($sub_pages['label']))
 			{
 				$menu_url = $sub_pages['url'];
 				break;

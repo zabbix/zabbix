@@ -68,12 +68,12 @@ include_once "include/page_header.php";
 
 	check_fields($fields);
 ?>
-
 <?php
 	show_table_header("CONFIGURATION OF NETWORK MAP");
-	echo BR;
+	if(!sysmap_accessiable($_REQUEST["sysmapid"],PERM_READ_WRITE)) access_deny();
+	
+	$sysmap = DBfetch(DBselect("select * from sysmaps where sysmapid=".$_REQUEST["sysmapid"]));
 ?>
-
 <?php
 	if(isset($_REQUEST["save"]))
 	{
@@ -84,6 +84,8 @@ include_once "include/page_header.php";
 				$_REQUEST["label"],$_REQUEST["x"],$_REQUEST["y"],
 				$_REQUEST["iconid_off"],$_REQUEST["url"],$_REQUEST["iconid_on"],
 				$_REQUEST["label_location"]);
+			$selementid = $_REQUEST["selementid"];
+			
 			show_messages($result,"Element updated","Cannot update element");
 		}
 		else
@@ -92,9 +94,11 @@ include_once "include/page_header.php";
 				$_REQUEST["elementtype"],$_REQUEST["label"],$_REQUEST["x"],$_REQUEST["y"],
 				$_REQUEST["iconid_off"],$_REQUEST["url"],$_REQUEST["iconid_on"],
 				$_REQUEST["label_location"]);
+			$selementid = $result;
 
 			show_messages($result,"Element added","Cannot add element");
 		}
+		add_audit_if($result,AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP,'Name ['.$sysmap['name'].'] Element ['.$selementid.'] updated ');
 		if($result)	unset($_REQUEST["form"]);
 	}
 	if(isset($_REQUEST["save_link"]))
@@ -105,6 +109,7 @@ include_once "include/page_header.php";
 				$_REQUEST["sysmapid"],$_REQUEST["selementid1"],$_REQUEST["selementid2"],
 				$_REQUEST["triggerid"],	$_REQUEST["drawtype_off"],$_REQUEST["color_off"],
 				$_REQUEST["drawtype_on"],$_REQUEST["color_on"]);
+			$linkid = $_REQUEST["linkid"];
 
 			show_messages($result,"Link updated","Cannot update link");
 		}
@@ -113,9 +118,11 @@ include_once "include/page_header.php";
 			$result=add_link($_REQUEST["sysmapid"],$_REQUEST["selementid1"],$_REQUEST["selementid2"],
 				$_REQUEST["triggerid"],	$_REQUEST["drawtype_off"],$_REQUEST["color_off"],
 				$_REQUEST["drawtype_on"],$_REQUEST["color_on"]);
+			$linkid = $result;
 
 			show_messages($result,"Link added","Cannot add link");
 		}
+		add_audit_if($result,AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP,'Name ['.$sysmap['name'].'] Link ['.$linkid.'] updated ');
 		if($result)	unset($_REQUEST["form"]);
 	}
 	elseif(isset($_REQUEST["delete"]))
@@ -124,6 +131,9 @@ include_once "include/page_header.php";
 		{
 			$result=delete_link($_REQUEST["linkid"]);
 			show_messages($result,"Link deleted","Cannot delete link");
+			add_audit_if($result,AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP,
+				'Name ['.$sysmap['name'].'] Link ['.$_REQUEST["linkid"].'] deleted');
+
 			if($result)
 			{
 				unset($_REQUEST["linkid"]);
@@ -134,6 +144,9 @@ include_once "include/page_header.php";
 		{
 			$result=delete_sysmaps_element($_REQUEST["selementid"]);
 			show_messages($result,"Element deleted","Cannot delete element");
+			add_audit_if($result,AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP,
+				'Name ['.$sysmap['name'].'] Element ['.$_REQUEST["selementid"].'] deleteed ');
+
 			if($result)
 			{
 				unset($_REQUEST["selementid"]);
@@ -144,6 +157,7 @@ include_once "include/page_header.php";
 ?>
 
 <?php
+	echo BR;
 	if(isset($_REQUEST["form"]) && ($_REQUEST["form"]=="add_element" ||
 		($_REQUEST["form"]=="update" && isset($_REQUEST["selementid"]))))
 	{
@@ -154,8 +168,7 @@ include_once "include/page_header.php";
 	elseif(isset($_REQUEST["form"]) && ($_REQUEST["form"]=="add_link" || 
 		($_REQUEST["form"]=="update" && isset($_REQUEST["linkid"]))))
 	{
-		$result=DBselect("select count(*) as count from sysmaps_elements where sysmapid=".$_REQUEST["sysmapid"]);
-		$row=DBfetch($result);;
+		$row = DBfetch(DBselect("select count(*) as count from sysmaps_elements where sysmapid=".$_REQUEST["sysmapid"]));
 		if($row["count"]>1)
 		{
 			show_table_header("CONNECTORS");
@@ -173,7 +186,7 @@ include_once "include/page_header.php";
 			"return Redirect('".$page["file"]."?form=add_element".url_param("sysmapid")."');"));
 
 		$table = new CTableInfo();
-		$table->setHeader(array(S_LABEL,S_TYPE,S_X,S_Y,S_ICON_ON,S_ICON_OFF));
+		$table->SetHeader(array(S_LABEL,S_TYPE,S_X,S_Y,S_ICON_ON,S_ICON_OFF));
 
 		$db_elements = DBselect("select * from sysmaps_elements where sysmapid=".$_REQUEST["sysmapid"].
 			" order by label");
@@ -242,7 +255,7 @@ include_once "include/page_header.php";
 				$description
 				));
 		}
-		$table->show();
+		$table->Show();
 	}
 
 	echo BR;
@@ -260,10 +273,10 @@ include_once "include/page_header.php";
 			$tmp_img = get_png_by_selementid($db_element["selementid"]);
 			if(!$tmp_img) continue;
 
-			$x1_		= $db_element["x"];
-			$y1_		= $db_element["y"];
-			$x2_		= $db_element["x"] + imagesx($tmp_img);
-			$y2_		= $db_element["y"] + imagesy($tmp_img);
+			$x1_	= $db_element["x"];
+			$y1_	= $db_element["y"];
+			$x2_	= $db_element["x"] + imagesx($tmp_img);
+			$y2_	= $db_element["y"] + imagesy($tmp_img);
 
 			$linkMap->AddRectArea($x1_,$y1_,$x2_,$y2_,
 				"sysmap.php?form=update&sysmapid=".$_REQUEST["sysmapid"].

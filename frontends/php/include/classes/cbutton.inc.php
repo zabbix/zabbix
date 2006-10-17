@@ -82,12 +82,14 @@
 		var $vars;
 		var $msg;
 		var $name;
+		var $do_redirect;
 
-		function CButtonQMessage($name, $caption, $msg=NULL, $vars=NULL){
+		function CButtonQMessage($name, $caption, $msg=NULL, $vars=NULL, $do_redirect=true){
 			$this->name = $name;
 			parent::CButton($name,$caption);
 			$this->SetMessage($msg);
 			$this->SetVars($vars);
+			$this->do_redirect = $do_redirect;
 		}
 		function SetVars($value=NULL){
 			if(!is_string($value) && !is_null($value)){
@@ -113,7 +115,15 @@
 			global $page;
 
 			$confirmation = "Confirm('".$this->msg."')";
-			$redirect = "Redirect('".$page["file"]."?".$this->name."=1".$this->vars."')";
+			
+			if($this->do_redirect)
+			{
+				$redirect = "Redirect('".$page["file"]."?".$this->name."=1".$this->vars."')";
+			}
+			else
+			{
+				$redirect = 'true';
+			}
 			
 			return parent::SetAction("if(".$confirmation.") return ".$redirect."; else return false;");
 		}
