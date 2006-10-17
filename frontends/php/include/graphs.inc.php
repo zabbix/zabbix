@@ -216,8 +216,7 @@
 		if($gitemid && $host["status"]==HOST_STATUS_TEMPLATE)
 		{// add to child graphs
 			$item_num = DBfetch(DBselect(
-				'select count(*) as num from graphs_items where graphid='.$graphid.
-	                        ' order by itemid,drawtype,sortorder,color,yaxisside'
+				'select count(*) as num from graphs_items where graphid='.$graphid
 			));
 
 			if($item_num['num'] == 1)
