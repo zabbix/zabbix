@@ -200,7 +200,7 @@
 			$this->items[$this->num]["drawtype"] = is_null($drawtype) ? GRAPH_DRAW_TYPE_LINE : $drawtype;
 			$this->items[$this->num]["axisside"] = $axis;
 			$this->items[$this->num]["calc_fnc"] = $calc_fnc;
-			$this->items[$this->num]["type"] = is_null($type) ? GRAPH_ITEM_SIMPLE : $type;
+			$this->items[$this->num]["calc_type"] = is_null($type) ? GRAPH_ITEM_SIMPLE : $type;
 			$this->items[$this->num]["periods_cnt"] = is_null($periods_cnt) ? 0 : $periods_cnt;
 
 			if($axis==GRAPH_YAXIS_SIDE_LEFT)
@@ -267,7 +267,7 @@
 
 		function getLastValue($num)
 		{
-			$data = &$this->data[$this->items[$num]["itemid"]][$this->items[$num]["type"]];
+			$data = &$this->data[$this->items[$num]["itemid"]][$this->items[$num]["calc_type"]];
 			if(isset($data)) for($i=$this->sizeX-1;$i>=0;$i--)
 			{
 				if(isset($data->count[$i]) && ($data->count[$i] > 0))
@@ -540,7 +540,7 @@
 
 			for($i=0;$i<$this->num;$i++)
 			{
-				if($this->items[$i]["type"] == GRAPH_ITEM_AGGREGATED)
+				if($this->items[$i]["calc_type"] == GRAPH_ITEM_AGGREGATED)
 				{
 					$fnc_name = "agr(".$this->items[$i]["periods_cnt"].")";
 					$color = $this->colors["HistoryMinMax"];
@@ -558,7 +558,7 @@
 					}
 				}
 
-				$data = &$this->data[$this->items[$i]["itemid"]][$this->items[$i]["type"]];
+				$data = &$this->data[$this->items[$i]["itemid"]][$this->items[$i]["calc_type"]];
 				if(isset($data)&&isset($data->min))
 				{
 					$str=sprintf("%s: %s [%s] [min:%s max:%s last:%s]",
@@ -904,7 +904,7 @@
 
 			for($i=0; $i < $this->num; $i++)
 			{
-				$type = $this->items[$i]["type"];
+				$type = $this->items[$i]["calc_type"];
 
 				if($type == GRAPH_ITEM_AGGREGATED) {
 					/* skip current period */
@@ -1036,7 +1036,7 @@
 			{
 				for($i=1; $i<$this->num; $i++)
 				{
-					$curr_data = &$this->data[$this->items[$i]["itemid"]][$this->items[$i]["type"]];
+					$curr_data = &$this->data[$this->items[$i]["itemid"]][$this->items[$i]["calc_type"]];
 
 					if(!isset($curr_data))	continue;
 
@@ -1044,7 +1044,7 @@
 					{
 						if($this->items[$j]["axisside"] != $this->items[$i]["axisside"]) continue;
 
-						$prev_data = &$this->data[$this->items[$j]["itemid"]][$this->items[$j]["type"]];
+						$prev_data = &$this->data[$this->items[$j]["itemid"]][$this->items[$j]["calc_type"]];
 
 						if(!isset($prev_data))	continue;
 
@@ -1166,11 +1166,11 @@
 				$minY = $this->m_minY[$this->items[$item]["axisside"]];
 				$maxY = $this->m_maxY[$this->items[$item]["axisside"]];
 
-				$data = &$this->data[$this->items[$item]["itemid"]][$this->items[$item]["type"]];
+				$data = &$this->data[$this->items[$item]["itemid"]][$this->items[$item]["calc_type"]];
 
 				if(!isset($data))	continue;
 
-				if($this->items[$item]["type"] == GRAPH_ITEM_AGGREGATED)
+				if($this->items[$item]["calc_type"] == GRAPH_ITEM_AGGREGATED)
 				{
 					$drawtype	= GRAPH_DRAW_TYPE_LINE;
 
@@ -1207,8 +1207,11 @@
 					else		
 						$draw = $diff < 4*$delay;
 
-					if($draw == false && $this->items[$item]["type"] == GRAPH_ITEM_AGGREGATED)
+					if($draw == false && $this->items[$item]["calc_type"] == GRAPH_ITEM_AGGREGATED)
 						$draw = $i - $j < 5;
+
+					if($this->items[$item]["type"] == ITEM_TYPE_TRAPPER)
+						$draw = true;
 
 					if($draw)
 					{
