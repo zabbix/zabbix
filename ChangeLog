@@ -1,5 +1,6 @@
 Changes for 1.1.3:
 
+ - new algorithm for housekeeping same for all DB engines (Alexei)
  - fixed calculation of delta(#N) (Alexei)
  - always draw graphs for items having type "trapper" (Alexei)
  - added Swedish translation. Thanks to "yeager". (Alexei)

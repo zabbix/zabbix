@@ -211,6 +211,53 @@ static int housekeeping_alarms(int now)
 
 /******************************************************************************
  *                                                                            *
+ * Function: delete_history                                                   *
+ *                                                                            *
+ * Purpose: remove outdated information from historical table                 *
+ *                                                                            *
+ * Parameters: now - current timestamp                                        *
+ *                                                                            *
+ * Return value: number of rows deleted                                       *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int delete_history(char *table, int itemid, int keep_history, int now)
+{
+	char		sql[MAX_STRING_LEN];
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		min_clock;
+
+	zabbix_log( LOG_LEVEL_DEBUG, "In delete_history(%s,%d,%d,%d)", table, itemid, keep_history, now);
+
+	snprintf(sql,sizeof(sql)-1,"select min(clock) from %s where itemid=%d", table, itemid);
+	result = DBselect(sql);
+
+	row=DBfetch(result);
+
+	if(!row || DBis_null(row[0]) == SUCCEED)
+	{
+		DBfree_result(result);
+		return 0;
+	}
+
+	min_clock = atoi(row[0]);
+	DBfree_result(result);
+
+	snprintf(sql,sizeof(sql)-1,"delete from %s where itemid=%d and clock<%d",
+		table,
+		itemid,
+		MIN(now-24*3600*keep_history, min_clock+4*3600*CONFIG_HOUSEKEEPING_FREQUENCY)
+		);
+
+	return DBexecute(sql);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: housekeeping_history_and_trends                                  *
  *                                                                            *
  * Purpose: remove outdated information from history and trends               *
@@ -237,55 +284,21 @@ static int housekeeping_history_and_trends(int now)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In housekeeping_history_and_trends(%d)", now);
 
-	snprintf(sql,sizeof(sql)-1,"select itemid,history,delay,trends from items");
+	snprintf(sql,sizeof(sql)-1,"select itemid,history,trends from items");
 	result = DBselect(sql);
 
 	while((row=DBfetch(result)))
 	{
 		item.itemid=atoi(row[0]);
 		item.history=atoi(row[1]);
-		item.delay=atoi(row[2]);
-		item.trends=atoi(row[3]);
+		item.trends=atoi(row[2]);
 
-		if(item.delay==0)
-		{
-			item.delay=1;
-		}
-
-#ifdef HAVE_MYSQL
-		snprintf(sql,sizeof(sql)-1,"delete from history where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
-#else
-		snprintf(sql,sizeof(sql)-1,"delete from history where itemid=%d and clock<%d",item.itemid,now-24*3600*item.history);
-#endif
-		deleted += DBexecute(sql);
-
-#ifdef HAVE_MYSQL
-		snprintf(sql,sizeof(sql)-1,"delete from history_uint where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
-#else
-		snprintf(sql,sizeof(sql)-1,"delete from history_uint where itemid=%d and clock<%d",item.itemid,now-24*3600*item.history);
-#endif
-		deleted += DBexecute(sql);
-
-#ifdef HAVE_MYSQL
-		snprintf(sql,sizeof(sql)-1,"delete from history_str where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
-#else
-		snprintf(sql,sizeof(sql)-1,"delete from history_str where itemid=%d and clock<%d",item.itemid,now-24*3600*item.history);
-#endif
-		deleted += DBexecute(sql);
-
-#ifdef HAVE_MYSQL
-		snprintf(sql,sizeof(sql)-1,"delete from history_log where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.history,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
-#else
-		snprintf(sql,sizeof(sql)-1,"delete from history_log where itemid=%d and clock<%d",item.itemid,now-24*3600*item.history);
-#endif
-		deleted += DBexecute(sql);
-
-#ifdef HAVE_MYSQL
-		snprintf(sql,sizeof(sql)-1,"delete from trends where itemid=%d and clock<%d limit %d",item.itemid,now-24*3600*item.trends,2*CONFIG_HOUSEKEEPING_FREQUENCY*3600/item.delay);
-#else
-		snprintf(sql,sizeof(sql)-1,"delete from trends where itemid=%d and clock<%d",item.itemid,now-24*3600*item.trends);
-#endif
-		deleted += DBexecute(sql);
+		deleted += delete_history("history", item.itemid, item.history, now);
+		deleted += delete_history("history_uint", item.itemid, item.history, now);
+		deleted += delete_history("history_str", item.itemid, item.history, now);
+		deleted += delete_history("history_str", item.itemid, item.history, now);
+		deleted += delete_history("history_log", item.itemid, item.history, now);
+		deleted += delete_history("trends", item.itemid, item.trends, now);
 	}
 	DBfree_result(result);
 	return deleted;
