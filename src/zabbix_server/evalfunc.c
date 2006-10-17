@@ -746,6 +746,7 @@ static int evaluate_DELTA(char *value,DB_ITEM *item,int parameter, int flag)
 				if(f>max)	max=f;
 				if(f<min)	min=f;
 			}
+			rows++;
 		}
 		if(rows==0)
 		{
