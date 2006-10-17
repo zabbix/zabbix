@@ -1,5 +1,6 @@
 Changes for 1.1.3:
 
+ - better processing of units 's', support for units 'uptime' (Alexei)
  - fixed data.sql to set correct item type UIN64 where required (Alexei)
  - fixed data.sql to get rid of zero multipliers (Alexei)
  - fixed problem when adding a graph under PostgreSQL (Alexei)

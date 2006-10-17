@@ -140,7 +140,7 @@ insert into help_items values(0,'system.swap.in[&lt;swap&gt; &lt;,type&gt;]','Sw
 insert into help_items values(0,'system.swap.out[&lt;swap&gt; &lt;,type&gt;]','Swap out. If type is count - swapouts is returned. If type is pages - pages swapped in is returned.  If swap is missing all is used.');
 insert into help_items values(0,'system.swap.size[&lt;swap&gt; &lt;,mode&gt;]','Swap space. Number of bytes. If swap is missing all is used. If mode is missing free is used.');
 insert into help_items values(0,'system.uname','Returns detailed host information. String value');
-insert into help_items values(0,'system.uptime','System uptime in seconds.');
+insert into help_items values(0,'system.uptime','System uptime. Set units s or uptime.');
 insert into help_items values(0,'system.users.num','Number of users connected. Command who is used on agent side.');
 insert into help_items values(0,'vfs.dev.read[device &lt;,type&gt; &lt;,mode&gt;]','Device read statistics.');
 insert into help_items values(0,'vfs.dev.write[device &lt;,type&gt; &lt;,mode&gt;]','Device write statistics.');
@@ -183,7 +183,7 @@ INSERT INTO items VALUES (10021,0,'','',161,10001,'Free disk space on $1','vfs.f
 INSERT INTO items VALUES (10022,0,'','',161,10001,'Free number of inodes on $1','vfs.fs.inode[/home,free]',60,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10023,0,'','',161,10001,'Free disk space on $1','vfs.fs.size[/var,free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','1','',0,'',0,0);
 INSERT INTO items VALUES (10024,0,'','',161,10001,'Free disk space on $1','vfs.fs.size[/opt,free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','1','',0,'',0,0);
-INSERT INTO items VALUES (10025,0,'','',161,10001,'Host uptime (in sec)','system.uptime',300,7,365,0,NULL,NULL,NULL,0,3,'','s',0,0,NULL,'',0,'','','0','',0,'',0,0);
+INSERT INTO items VALUES (10025,0,'','',161,10001,'Host uptime','system.uptime',300,7,365,0,NULL,NULL,NULL,0,3,'','uptime',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10026,0,'','',161,10001,'Total memory','vm.memory.size[total]',1800,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10027,0,'','',161,10001,'Shared memory','vm.memory.size[shared]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10028,0,'','',161,10001,'Buffers memory','vm.memory.size[buffers]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',0,0);
@@ -267,7 +267,7 @@ INSERT INTO items VALUES (10103,0,'','',161,10002,'Free swap space','system.swap
 INSERT INTO items VALUES (10104,0,'','',161,10002,'Size of $1','vfs.file.size[c:\\msdos.sys]',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10106,0,'','',161,10002,'Checksum of $1','vfs.file.cksum[c:\\autoexec.bat]',600,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10109,0,'','',161,10002,'Ping to the server (TCP)','agent.ping',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,0);
-INSERT INTO items VALUES (10114,0,'','',161,10002,'Host uptime (in sec)','system.uptime',300,7,365,0,NULL,NULL,NULL,0,0,'','s',0,0,NULL,'',0,'','','0','',0,'',0,0);
+INSERT INTO items VALUES (10114,0,'','',161,10002,'Host uptime','system.uptime',300,7,365,0,NULL,NULL,NULL,0,0,'','uptime',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10115,0,'','',161,10002,'Total memory','vm.memory.size[total]',1800,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10119,0,'','',161,10002,'Total swap space','system.swap.size[,total]',1800,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10137,0,'','',161,10002,'Number of running processes apache','proc.num[httpd]',60,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,0);
@@ -279,7 +279,7 @@ INSERT INTO items VALUES (10359,0,'','',161,10002,'Total disk space on $1','vfs.
 INSERT INTO items VALUES (10357,0,'','',161,10002,'Checksum of $1','vfs.file.cksum[c:\\config.sys]',600,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10358,0,'','',161,10002,'Free disk space on $1','vfs.fs.size[d:,free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','1','',0,'',0,0);
 INSERT INTO items VALUES (10200,0,'','',161,10003,'MySQL is alive','mysql[ping]',60,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,0);
-INSERT INTO items VALUES (10201,0,'','',161,10003,'MySQL uptime','mysql[uptime]',60,7,365,0,NULL,NULL,NULL,0,3,'','s',0,0,NULL,'',0,'','','0','',0,'',0,0);
+INSERT INTO items VALUES (10201,0,'','',161,10003,'MySQL uptime','mysql[uptime]',60,7,365,0,NULL,NULL,NULL,0,3,'','uptime',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10202,0,'','',161,10003,'MySQL number of threads','mysql[threads]',60,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10203,0,'','',161,10003,'MySQL queries per second','mysql[qps]',60,7,365,0,NULL,NULL,NULL,0,0,'','qps',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10204,0,'','',161,10003,'MySQL number of slow queries','mysql[slowqueries]',60,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,0);
