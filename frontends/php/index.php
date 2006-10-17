@@ -81,7 +81,6 @@
 	}
 
 	show_header($page["title"],0,0);
-	echo convert_units(2343600,"uptime");
 ?>
 
 <?php

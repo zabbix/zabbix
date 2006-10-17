@@ -45,11 +45,13 @@
 		}
 		else
 			$_REQUEST["itemid"] = array_pop($_REQUEST["itemid"]);
+
+		$do_not_refresh=1;
 	}
 
 	if(!is_array($_REQUEST["itemid"]))
 	{
-		$result=DBselect("select h.host,i.hostid,i.description,i.key_".
+		$result=DBselect("select h.host,i.hostid,i.description,i.key_,i.value_type".
 			" from items i,hosts h where i.itemid=".$_REQUEST["itemid"]." and h.hostid=i.hostid");
 
 		$row=DBfetch($result);
@@ -58,9 +60,10 @@
 		$item_description = item_description($row["description"],$row["key_"]);
 
 		$main_header = $item_host.": ".$item_description;
+		$do_not_refresh = $row["value_type"] == ITEM_VALUE_TYPE_LOG?1:null;
 	}
 
-	if(isset($_REQUEST["plaintext"]))
+	if(isset($do_not_refresh) || isset($_REQUEST["plaintext"]))
 	{
 		$auto_update = 0;
 	}
@@ -433,7 +436,7 @@
 						$crow->SetClass($color_style);
 					}
 
-					$crow->Show();	// to solve memory leak we call 'Show' method for each element
+					$table->ShowRow($crow);	// to solve memory leak we call 'Show' method for each element
 				}
 				else
 				{
