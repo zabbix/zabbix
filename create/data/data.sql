@@ -257,7 +257,7 @@ INSERT INTO items VALUES (10418,0,'','',161,10001,'Temperature of mainboard','se
 INSERT INTO items VALUES (10419,0,'','',161,10001,'Temperature of CPU 1of2','sensor[temp2]',30,7,365,0,NULL,NULL,NULL,0,0,'','C',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10420,0,'','',161,10001,'Temperature of CPU 2of2','sensor[temp3]',30,7,365,0,NULL,NULL,NULL,0,0,'','C',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10090,0,'','',161,10002,'Free memory','vm.memory.size[free]',30,7,365,0,NULL,NULL,NULL,0,0,'','B',0,0,NULL,'',0,'','','0','',0,'',0,0);
-INSERT INTO items VALUES (10091,0,'','',161,10002,'Free disk space on $1','vfs.fs.size[c:,free]',30,7,365,0,NULL,NULL,NULL,0,0,'','B',1,0,NULL,'',0,'','','1','',0,'',0,0);
+INSERT INTO items VALUES (10091,0,'','',161,10002,'Free disk space on $1','vfs.fs.size[c:,free]',30,7,365,0,NULL,NULL,NULL,0,0,'','B',0,0,NULL,'',0,'','','1','',0,'',0,0);
 INSERT INTO items VALUES (10098,0,'','',161,10002,'Number of processes','proc.num[]',30,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10099,0,'','',161,10002,'Processor load','system.cpu.load[,avg1]',5,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10100,0,'','',161,10002,'Processor load5','system.cpu.load[,avg5]',10,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','0','',0,'',0,0);
@@ -274,10 +274,10 @@ INSERT INTO items VALUES (10137,0,'','',161,10002,'Number of running processes a
 INSERT INTO items VALUES (10147,0,'','',161,10002,'Host information','system.uname',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10148,0,'','',161,10002,'Version of zabbix_agent(d) running','agent.version',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10150,0,'','',161,10002,'Host status','status',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','0','',0,'',0,0);
-INSERT INTO items VALUES (10156,0,'','',161,10002,'Total disk space on $1','vfs.fs.size[c:,total]',3600,7,365,0,NULL,NULL,NULL,0,0,'','B',1,0,NULL,'',0,'','','0','',0,'',0,0);
-INSERT INTO items VALUES (10359,0,'','',161,10002,'Total disk space on $1','vfs.fs.size[d:,total]',3600,7,365,0,NULL,NULL,NULL,0,0,'','B',1,0,NULL,'',0,'','','0','',0,'',0,0);
+INSERT INTO items VALUES (10156,0,'','',161,10002,'Total disk space on $1','vfs.fs.size[c:,total]',3600,7,365,0,NULL,NULL,NULL,0,0,'','B',0,0,NULL,'',0,'','','0','',0,'',0,0);
+INSERT INTO items VALUES (10359,0,'','',161,10002,'Total disk space on $1','vfs.fs.size[d:,total]',3600,7,365,0,NULL,NULL,NULL,0,0,'','B',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10357,0,'','',161,10002,'Checksum of $1','vfs.file.cksum[c:\\config.sys]',600,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','0','',0,'',0,0);
-INSERT INTO items VALUES (10358,0,'','',161,10002,'Free disk space on $1','vfs.fs.size[d:,free]',30,7,365,0,NULL,NULL,NULL,0,0,'','B',1,0,NULL,'',0,'','','1','',0,'',0,0);
+INSERT INTO items VALUES (10358,0,'','',161,10002,'Free disk space on $1','vfs.fs.size[d:,free]',30,7,365,0,NULL,NULL,NULL,0,0,'','B',0,0,NULL,'',0,'','','1','',0,'',0,0);
 INSERT INTO items VALUES (10200,0,'','',161,10003,'MySQL is alive','mysql[ping]',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10201,0,'','',161,10003,'MySQL uptime','mysql[uptime]',60,7,365,0,NULL,NULL,NULL,0,0,'','s',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10202,0,'','',161,10003,'MySQL number of threads','mysql[threads]',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','0','',0,'',0,0);
