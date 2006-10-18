@@ -19,6 +19,54 @@
 **/
 ?>
 <?php
+	function	action_accessiable($actionid,$perm)
+	{
+		global $USER_DETAILS;
+
+		$result = false;
+
+		if(DBselect("select actionid from actions where actionid=".$actionid.
+			" and ".DBid2nodeid('actionid')." in (".get_accessible_nodes_by_userid($USER_DETAILS['userid'],$perm).")"))
+		{
+			$result = true;
+			
+			$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],$perm, PERM_MODE_LT);
+			$denyed_groups = get_accessible_groups_by_userid($USER_DETAILS['userid'],$perm, PERM_MODE_LT);
+			
+			$db_result = DBselect("select * from conditions where actionid=".$actionid);
+			while(($ac_data = DBfetch($db_result)) && $result)
+			{
+				if($ac_data['operator'] != 0) continue;
+
+				switch($ac_data['conditiontype'])
+				{
+					case CONDITION_TYPE_GROUP:
+						if(in_array($ac_data['value'],explode(',',$denyed_groups)))
+						{
+							$result = false;
+						}
+						break;
+					case CONDITION_TYPE_HOST:
+						if(in_array($ac_data['value'],explode(',',$denyed_hosts)))
+						{
+							$result = false;
+						}
+						break;
+					case CONDITION_TYPE_TRIGGER:
+						if(!DBfetch(DBselect("select distinct t.*".
+							" from triggers t,items i,functions f".
+							" where f.itemid=i.itemid and t.triggerid=f.triggerid".
+							" and i.hostid not in (".$denyed_hosts.") and t.triggerid=".$ac_data['value'])))
+						{
+							$result = false;
+						}
+						break;
+				}
+			}
+		}
+		return $result;
+	}
+
 	function	get_action_by_actionid($actionid)
 	{
 		$sql="select * from actions where actionid=$actionid"; 
@@ -385,14 +433,20 @@
 
 	function get_history_of_actions($start,$num)
 	{
-		$result=DBselect(
-			"select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,".
-				"a.error from alerts a,media_type mt where mt.mediatypeid=a.mediatypeid order by a.clock".
+		global $USER_DETAILS;
+		
+		$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'], PERM_READ_ONLY, PERM_MODE_LT);
+		
+		$result=DBselect("select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,".
+				"a.error from alerts a,media_type mt,functions f,items i ".
+				" where mt.mediatypeid=a.mediatypeid and a.triggerid=f.triggerid and f.itemid=i.itemid ".
+				" and i.hostid not in (".$denyed_hosts.")".
+				" order by a.clock".
 				" desc",
 			10*$start+$num);
 
 		$table = new CTableInfo(S_NO_ACTIONS_FOUND);
-		$table->setHeader(array(S_TIME, S_TYPE, S_STATUS, S_RECIPIENTS, S_SUBJECT, S_MESSAGE, S_ERROR));
+		$table->SetHeader(array(S_TIME, S_TYPE, S_STATUS, S_RECIPIENTS, S_SUBJECT, S_MESSAGE, S_ERROR));
 		$col=0;
 		$skip=$start;
 		while(($row=DBfetch($result))&&($col<$num))
@@ -423,7 +477,7 @@
 			{
 				$error=new CSpan($row["error"],"on");
 			}
-			$table->addRow(array(
+			$table->AddRow(array(
 				$time,
 				$row["description"],
 				$status,

@@ -116,7 +116,7 @@ include_once "include/page_header.php";
 				$lang		= ($tmpLang==NULL) ? 'en_gb' : $tmpLang;
 				$refresh	= ($tmpRefresh==NULL) ? 30 : $tmpRefresh;
 				$passwd		= ($tmpPasswd==NULL) ? md5($tmpAlias) : md5($tmpPasswd);
-				$result		= ($tmpAlias==NULL) ? 0 : add_user($tmpName,$tmpSurname,$tmpAlias,$passwd,$tmpURL,$autologout,$lang,$refresh));
+				$result		= ($tmpAlias==NULL) ? 0 : add_user($tmpName,$tmpSurname,$tmpAlias,$passwd,$tmpURL,$autologout,$lang,$refresh);
 				show_messages($result, S_USER_ADDED .': '. $tmpAlias, S_CANNOT_ADD_USER .': '. $tmpAlias);
 				$row=DBfetch(DBselect("select distinct(userid) from users where alias='$tmpAlias'"));
 				$tmpUserID=$row["userid"];

@@ -349,8 +349,11 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$table->SetCellSpacing(0);
 		$table->SetCellPadding(0);
 		$table->options['style'] = "width: 100%;";
+
+		$r_col = new CCol($node_form);
+		$r_col->options['style'] = "text-align: right;";
 		
-		$table->AddRow(array($menu_table,$node_form));
+		$table->AddRow(array($menu_table,$r_col));
 		$table->Show();
 		
 		$sub_menu_table = new CTable(NULL,'sub_menu');

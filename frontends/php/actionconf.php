@@ -84,6 +84,11 @@ include_once "include/page_header.php";
 	);
 
 	check_fields($fields);
+	
+	if(isset($_REQUEST['actionid']) && !action_accessiable($_REQUEST['actionid'], PERM_READ_WRITE))
+	{
+		access_deny();
+	}
 ?>
 <?php
 	update_profile("web.actionconf.actiontype",$_REQUEST["actiontype"]);
@@ -220,7 +225,7 @@ include_once "include/page_header.php";
 		{
 			$del_res = delete_action($row["actionid"]);
 			if($del_res) 
-				array_push($row["actionid"], $actionids);
+				array_push($actionids, $row["actionid"]);
 		}
 		if(isset($del_res))
 		{
@@ -273,6 +278,8 @@ include_once "include/page_header.php";
 			" order by actiontype, source");
 		while($row=DBfetch($result))
 		{
+			if(!action_accessiable($row['actionid'], PERM_READ_WRITE)) continue;
+
 			$conditions="";
 			$result2=DBselect("select * from conditions where actionid=".$row["actionid"].
 				" order by conditiontype");
