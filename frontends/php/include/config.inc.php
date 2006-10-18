@@ -1532,8 +1532,10 @@ else if (document.getElementById)
 
 		foreach($mappings as $map)
 		{
-			$result = DBexecute("insert into mappings (valuemapid, value, newvalue)".
-				" values (".$valuemapid.",".zbx_dbstr($map["value"]).",".
+			$mappingid = get_dbid("mappings","mappingid");
+
+			$result = DBexecute("insert into mappings (mappingid,valuemapid, value, newvalue)".
+				" values (".$mappingid.",".$valuemapid.",".zbx_dbstr($map["value"]).",".
 				zbx_dbstr($map["newvalue"]).")");
 
 			if(!$result)

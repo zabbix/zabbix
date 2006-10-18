@@ -409,13 +409,12 @@ include_once "include/page_header.php";
 			$table = new CTableInfo();
 			$table->SetHeader(array(S_NAME, S_VALUE_MAP));
 
-			$db_valuemaps = DBselect("select * from valuemaps");
+			$db_valuemaps = DBselect("select * from valuemaps where ".DBid2nodeid("valuemapid")."=".$ZBX_CURNODEID);
 			while($db_valuemap = DBfetch($db_valuemaps))
 			{
 				$mappings_row = array();
 				$db_maps = DBselect("select * from mappings".
-					" where valuemapid=".$db_valuemap["valuemapid"].
-					" and ".DBid2nodeid("valuemapid")."=".$ZBX_CURNODEID);
+					" where valuemapid=".$db_valuemap["valuemapid"]);
 				while($db_map = DBfetch($db_maps))
 				{
 					array_push($mappings_row, 

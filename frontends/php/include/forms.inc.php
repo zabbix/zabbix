@@ -778,11 +778,11 @@
 		$frmItem->AddRow(S_KEY, array(new CTextBox("key",$key,40), $btnSelect));
 
 		$cmbValType = new CComboBox("value_type",$value_type,"submit()");
-		$cmbValType->AddItem(ITEM_VALUE_TYPE_UINT64, S_NUMERIC_UINT64);
-		$cmbValType->AddItem(ITEM_VALUE_TYPE_FLOAT, S_NUMERIC_FLOAT);
-		$cmbValType->AddItem(ITEM_VALUE_TYPE_STR, S_CHARACTER);
-		$cmbValType->AddItem(ITEM_VALUE_TYPE_LOG, S_LOG);
-		$cmbValType->AddItem(ITEM_VALUE_TYPE_TEXT, S_TEXT);
+		$cmbValType->AddItem(ITEM_VALUE_TYPE_UINT64,	S_NUMERIC_UINT64);
+		$cmbValType->AddItem(ITEM_VALUE_TYPE_FLOAT,	S_NUMERIC_FLOAT);
+		$cmbValType->AddItem(ITEM_VALUE_TYPE_STR, 	S_CHARACTER);
+		$cmbValType->AddItem(ITEM_VALUE_TYPE_LOG, 	S_LOG);
+		$cmbValType->AddItem(ITEM_VALUE_TYPE_TEXT,	S_TEXT);
 		$frmItem->AddRow(S_TYPE_OF_INFORMATION,$cmbValType);
 
 		if( ($value_type==ITEM_VALUE_TYPE_FLOAT) || ($value_type==ITEM_VALUE_TYPE_UINT64))
@@ -869,7 +869,7 @@
 		{
 			$cmbMap = new CComboBox("valuemapid",$valuemapid);
 			$cmbMap->AddItem(0,S_AS_IS);
-			$db_valuemaps = DBselect("select * from valuemaps");
+			$db_valuemaps = DBselect("select * from valuemaps where ".DBid2nodeid("valuemapid")."=".$ZBX_CURNODEID);
 			while($db_valuemap = DBfetch($db_valuemaps))
 				$cmbMap->AddItem($db_valuemap["valuemapid"],$db_valuemap["name"]);
 
@@ -1105,31 +1105,29 @@
 	/* end dependences */
 
 		global $USER_DETAILS;
-	/* new dependence */ /* TODO Rewrite with popups */
-		$cmbDepID = new CComboBox("new_dependence");
-		$db_trigs=DBselect("select distinct t.triggerid,t.description,h.host,n.name as node_name ".
-			" from triggers t, functions f,items i,hosts h,nodes n ".
-			" where t.triggerid=f.triggerid and f.itemid=i.itemid and i.hostid in (".
-			get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_LIST).
-			") and h.hostid=i.hostid and n.nodeid=".DBid2nodeid('t.triggerid').
-			(isset($_REQUEST["triggerid"]) ? " and t.triggerid!=".$_REQUEST["triggerid"] : "" ).
-			" order by n.name,t.description,t.triggerid");
+	/* new dependence */
+		$frmTrig->AddVar('new_dependence','0');
 
-		while($db_trig=DBfetch($db_trigs))
-		{
-			$cmbDepID->AddItem($db_trig["triggerid"],
-				$db_trig["node_name"].":".expand_trigger_description_by_data($db_trig));
-				//$db_trig["node_name"].":".$db_trig["description"]);
-		}
-		$frmTrig->AddRow("New dependency",array(
-			$cmbDepID,SPACE,
-			new CButton("add_dependence","add")));
+		$txtCondVal = new CTextBox('trigger','',50);
+		$txtCondVal->SetReadonly('yes');
+
+		$btnSelect = new CButton('btn1',S_SELECT,
+				"return PopUp('popup.php?dstfrm=".$frmTrig->GetName().
+				"&dstfld1=new_dependence&dstfld2=trigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description','new_win',".
+				"'width=600,height=450,resizable=1,scrollbars=1');");
+		
+		$btnSelect->SetAccessKey('T');
+		$frmTrig->AddRow("New dependency",array($txtCondVal, 
+			$btnSelect, BR,
+			new CButton("add_dependence","add")
+			));
+			
 	/* end new dwpendence */
 
 		$cmbPrior = new CComboBox("priority",$priority);
 		for($i = 0; $i <= 5; $i++)
 		{
-			$cmbPrior->AddItem($i,get_severity_description("Not classified"));
+			$cmbPrior->AddItem($i,get_severity_description($i));
 		}
 		$frmTrig->AddRow(S_SEVERITY,$cmbPrior);
 
@@ -1254,22 +1252,19 @@
 		
 
 		$db_graph = get_graph_by_graphid($_REQUEST["graphid"]);
-		$db_hosts = get_hosts_by_graphid($_REQUEST["graphid"]);
-		$db_host = DBfetch($db_hosts);
-		if(!$db_host)
-		{
-			// empty graph, can contain any item
-			$host_condition = " and h.status in(".HOST_STATUS_MONITORED.",".HOST_STATUS_TEMPLATE.")";
-		}
-		else
+
+		$db_host = DBfetch(get_hosts_by_graphid($_REQUEST["graphid"]));
+		
+		$host_condition = "";
+		if($db_host)
 		{
 			if($db_host["status"]==HOST_STATUS_TEMPLATE)
 			{// graph for template must use only one host
-				$host_condition = " and h.hostid=".$db_host["hostid"];
+				$host_condition = "&only_hostid=".$db_host["hostid"];
 			}
 			else
 			{
-				$host_condition = " and h.status in(".HOST_STATUS_MONITORED.")";
+				$host_condition = "&monitored_hosts=1";
 			}
 		}
 
@@ -1311,17 +1306,26 @@
 			$frmGItem->AddVar("gitemid",$_REQUEST["gitemid"]);
 		}
 
-		$cmbItems = new CComboBox("itemid", $itemid);
-		$result=DBselect("select h.host,i.description,i.itemid,i.key_ from hosts h,items i".
-			" where h.hostid=i.hostid".
-			$host_condition.
-			" and i.status=".ITEM_STATUS_ACTIVE." order by h.host,i.description");
-		while($row=DBfetch($result))
+		$description = '';
+		if($itemid > 0)
 		{
-			$cmbItems->AddItem($row["itemid"],
-				$row["host"].":".SPACE.item_description($row["description"],$row["key_"]));
+			$description = DBfetch(DBselect("select * from items where itemid=".$itemid));
+			$description = $description['description'];
 		}
-		$frmGItem->AddRow(S_PARAMETER, $cmbItems);
+		
+		$frmGItem->AddVar('itemid',$itemid);
+
+		$txtCondVal = new CTextBox('description',$description,50);
+		$txtCondVal->SetReadonly('yes');
+
+		$btnSelect = new CButton('btn1',S_SELECT,
+				"return PopUp('popup.php?dstfrm=".$frmGItem->GetName().
+				"&dstfld1=itemid&dstfld2=description&".
+				"srctbl=items&srcfld1=itemid&srcfld2=description".$host_condition."','new_win',".
+				"'width=600,height=450,resizable=1,scrollbars=1');");
+		
+		$btnSelect->SetAccessKey('T');
+		$frmGItem->AddRow(S_PARAMETER ,array($txtCondVal,$btnSelect));
 
 		if($db_graph["graphtype"] == GRAPH_TYPE_NORMAL)
 		{
@@ -1553,6 +1557,7 @@
 	function	insert_action_form()
 	{
 		global  $_REQUEST;
+		global  $ZBX_CURNODEID;
 
 		$uid=null;
 
@@ -1715,13 +1720,18 @@
 // add condition value
 		if($new_condition_type == CONDITION_TYPE_GROUP)
 		{
-			$cmbCondVal = new CComboBox('new_condition_value');
-			$groups = DBselect("select groupid,name from groups order by name");
-			while($group = DBfetch($groups))
-			{
-				$cmbCondVal->AddItem($group["groupid"],$group["name"]);
-			}
-			array_push($rowCondition,$cmbCondVal);
+			$frmAction->AddVar('new_condition_value','0');
+
+			$txtCondVal = new CTextBox('group','',20);
+			$txtCondVal->SetReadonly('yes');
+
+			$btnSelect = new CButton('btn1',S_SELECT,
+				"return PopUp('popup.php?dstfrm=".$frmAction->GetName().
+				"&dstfld1=new_condition_value&dstfld2=group&srctbl=host_group&srcfld1=groupid&srcfld2=name','new_win',".
+				"'width=450,height=450,resizable=1,scrollbars=1');");
+			$btnSelect->SetAccessKey('T');
+
+			array_push($rowCondition, $txtCondVal, $btnSelect);
 		}
 		else if($new_condition_type == CONDITION_TYPE_HOST)
 		{
@@ -1797,8 +1807,9 @@
 				
 				$cmbGroups = new CComboBox('userid', $uid);
 		
-				$sql="select usrgrpid,name from usrgrp order by name";
-				$groups=DBselect($sql);
+				$groups = DBselect("select usrgrpid,name from usrgrp ".
+					" where ".Dbid2nodeid("usrgrpid")."=".$ZBX_CURNODEID.
+					" order by name");
 				while($group=DBfetch($groups))
 				{
 					$cmbGroups->AddItem($group['usrgrpid'],$group['name']);
@@ -1810,8 +1821,9 @@
 			{
 				$cmbUser = new CComboBox('userid', $uid);
 				
-				$sql="select userid,alias from users order by alias";
-				$users=DBselect($sql);
+				$users=DBselect("select userid,alias from users ".
+					" where ".Dbid2nodeid("userid")."=".$ZBX_CURNODEID.
+					" order by alias");
 				while($user=DBfetch($users))
 				{
 					$cmbUser->AddItem($user['userid'],$user['alias']);

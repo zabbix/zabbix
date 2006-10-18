@@ -512,41 +512,11 @@ include_once "include/page_header.php";
 					);
 			}
 
-			switch($db_item["type"]){
-			case 0:	$type = S_ZABBIX_AGENT;			break;
-			case 7:	$type = S_ZABBIX_AGENT_ACTIVE;		break;
-			case 1:	$type = S_SNMPV1_AGENT;			break;
-			case 2:	$type = S_ZABBIX_TRAPPER;		break;
-			case 3:	$type = S_SIMPLE_CHECK;			break;
-			case 4:	$type = S_SNMPV2_AGENT;			break;
-			case 6:	$type = S_SNMPV3_AGENT;			break;
-			case 5:	$type = S_ZABBIX_INTERNAL;		break;
-			case 8:	$type = S_ZABBIX_AGGREGATE;		break;
-			default:$type = S_UNKNOWN;			break;
-			}
-
-			switch($db_item["status"]){
-			case 0:	$status=new CCol(new CLink(S_ACTIVE, 
+			$status=new CCol(new CLink(item_status2str($db_item["status"]),
 					"items.php?group_itemid%5B%5D=".$db_item["itemid"].
 					"&hostid=".$_REQUEST["hostid"].
-					"&group_task=Disable+selected",
-					"off"),"off");
-				break;
-			case 1:	$status=new CCol(new CLink(S_DISABLED,
-					"items.php?group_itemid%5B%5D=".$db_item["itemid"].
-					"&hostid=".$_REQUEST["hostid"].
-					"&group_task=Activate+selected",
-					"on"),"on");
-				break;
-			case 3:	$status=new CCol(new CLink(S_NOT_SUPPORTED,
-					"items.php?group_itemid%5B%5D=".$db_item["itemid"].
-					"&hostid=".$_REQUEST["hostid"].
-					"&group_task=Activate+selected",
-					"action")
-					,"unknown");
-				break;
-			default:$status=S_UNKNOWN;
-			}
+					"&group_task=".($db_item["status"] ? "Activate+selected" : "Disable+selected"),
+					item_status2style($db_item["status"])));
 	
 			if($db_item["error"] == "")
 			{
@@ -572,7 +542,7 @@ include_once "include/page_header.php";
 				$db_item["delay"],
 				$db_item["history"],
 				$db_item["trends"],
-				$type,
+				item_type2str($db_item['type']),
 				$status,
 				$show_applications == 1 ? trim($applications,", ") : NULL,
 				$error

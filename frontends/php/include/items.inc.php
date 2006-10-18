@@ -19,6 +19,63 @@
 **/
 ?>
 <?php
+	function	item_type2str($type)
+	{
+		switch($type)
+		{
+			case 0:	$type = S_ZABBIX_AGENT;			break;
+			case 1:	$type = S_SNMPV1_AGENT;			break;
+			case 2:	$type = S_ZABBIX_TRAPPER;		break;
+			case 3:	$type = S_SIMPLE_CHECK;			break;
+			case 4:	$type = S_SNMPV2_AGENT;			break;
+			case 5:	$type = S_ZABBIX_INTERNAL;		break;
+			case 6:	$type = S_SNMPV3_AGENT;			break;
+			case 7:	$type = S_ZABBIX_AGENT_ACTIVE;		break;
+			case 8:	$type = S_ZABBIX_AGGREGATE;		break;
+			default:$type = S_UNKNOWN;			break;
+		}
+		return $type;
+	}
+
+	function	item_value_type2str($value_type)
+	{
+		switch($value_type)
+		{
+			case ITEM_VALUE_TYPE_UINT64:	$value_type = S_NUMERIC_UINT64;		break;
+			case ITEM_VALUE_TYPE_FLOAT:	$value_type = S_NUMERIC_FLOAT;		break;
+			case ITEM_VALUE_TYPE_STR:	$value_type = S_CHARACTER;		break;
+			case ITEM_VALUE_TYPE_LOG:	$value_type = S_LOG;			break;
+			case ITEM_VALUE_TYPE_TEXT:	$value_type = S_TEXT;			break;
+			default:$value_type = S_UNKNOWN;			break;
+		}
+		return $value_type;
+	}
+
+	function	item_status2str($status)
+	{
+		switch($status)
+		{
+			case 0:	$status = S_ACTIVE;		break;
+			case 1:	$status = S_DISABLED;		break;
+			case 3:	
+			default:
+				$status = S_UNKNOWN;		break;
+		}
+		return $status;
+	}
+	
+	function	item_status2style($status)
+	{
+		switch($status)
+		{
+			case 0:	$status = 'off';	break;
+			case 1:	$status = 'on';		break;
+			case 3:	
+			default:
+				$status = 'uncnown';	break;
+		}
+		return $status;
+	}
 	# Update Item definition for selected group
 
 	function	update_item_in_group($groupid,$itemid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid,$delay_flex,$applications)

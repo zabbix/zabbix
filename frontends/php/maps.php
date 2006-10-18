@@ -63,7 +63,7 @@ include_once "include/page_header.php";
 		$all_maps[$row['sysmapid']] = $row['name'];
 	}
 
-	if(isset($_REQUEST["sysmapid"]) && !isset($all_maps[$_REQUEST["sysmapid"]]))
+	if(isset($_REQUEST["sysmapid"]) && (!isset($all_maps[$_REQUEST["sysmapid"]]) || $_REQUEST["sysmapid"] == 0))
 	{
 		if(count($all_maps))
 		{

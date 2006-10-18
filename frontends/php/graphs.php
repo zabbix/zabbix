@@ -71,8 +71,8 @@ include_once "include/page_header.php";
 	validate_group_with_host(PERM_READ_WRITE,array("allow_all_hosts","always_select_first_host"));
 ?>
 <?php
-	$availiable_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_WRITE, null, null, $ZBX_CURNODEID);
-	$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_WRITE, PERM_MODE_LT);
+	$availiable_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_ONLY, null, null, $ZBX_CURNODEID);
+	$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_ONLY, PERM_MODE_LT);
 
 	if(isset($_REQUEST["save"]))
 	{
