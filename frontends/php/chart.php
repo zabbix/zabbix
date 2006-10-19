@@ -44,7 +44,7 @@ include_once "include/page_header.php";
 ?>
 <?php
 	if(! ($db_data = DBfetch(DBselect("select i.itemid from items i ".
-		" where i.hostid in (".get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_ONLY).") ".
+		" where i.hostid in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY).") ".
 		" and i.itemid=".$_REQUEST["itemid"]))))
 	{
 		access_deny();

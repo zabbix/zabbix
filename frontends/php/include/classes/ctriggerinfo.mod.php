@@ -65,7 +65,7 @@
 				" where t.status=".TRIGGER_STATUS_ENABLED." and f.itemid=i.itemid ".
 				" and h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and t.triggerid=f.triggerid ".
 				" and i.status=".ITEM_STATUS_ACTIVE.
-				' and h.hostid in ('.get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_ONLY,
+				' and h.hostid in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,
 					null, null, $this->nodeid).') '.
 				" group by priority");
 			while($row=DBfetch($db_priority))

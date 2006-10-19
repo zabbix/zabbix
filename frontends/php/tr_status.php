@@ -142,7 +142,7 @@ include_once "include/page_header.php";
 
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
 	
-	$availiable_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_LIST, null, null, $ZBX_CURNODEID);
+	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST, null, null, $ZBX_CURNODEID);
 
 	$result=DBselect("select distinct g.groupid,g.name from groups g, hosts_groups hg, hosts h, items i, functions f, triggers t ".
 		" where h.hostid in (".$availiable_hosts.") ".
@@ -313,7 +313,7 @@ include_once "include/page_header.php";
 		" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.status=".TRIGGER_STATUS_ENABLED.
 		" and t.description $select_cond and i.status=".ITEM_STATUS_ACTIVE.
 		" and ".DBid2nodeid("t.triggerid")."=".$ZBX_CURNODEID.
-		" and h.hostid not in (".get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_ONLY, PERM_MODE_LT).") ". 
+		" and h.hostid not in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT).") ". 
 		" and h.status=".HOST_STATUS_MONITORED." $cond $sort");
 
 	while($row=DBfetch($result))

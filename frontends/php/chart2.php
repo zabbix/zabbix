@@ -45,7 +45,7 @@ include_once "include/page_header.php";
 	check_fields($fields);
 ?>
 <?php
-	$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'], PERM_READ_ONLY, PERM_MODE_LT);
+	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_MODE_LT);
 	
 	if( !($db_data = DBfetch(DBselect("select g.*,h.host,h.hostid from graphs g left join graphs_items gi on g.graphid=gi.graphid ".
 		" left join items i on gi.itemid=i.itemid left join hosts h on i.hostid=h.hostid ".

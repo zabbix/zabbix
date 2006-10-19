@@ -104,6 +104,7 @@ include_once "include/page_header.php";
 
 		if(isset($_REQUEST["actionid"]))
 		{
+			// TODO check permission by new value.
 			$actionid=$_REQUEST["actionid"];
 			$result = update_action($actionid,
 				$_REQUEST['actiontype'],$_REQUEST['userid'],
@@ -113,6 +114,9 @@ include_once "include/page_header.php";
 
 			show_messages($result,S_ACTION_UPDATED,S_CANNOT_UPDATE_ACTION);
 		} else {
+			if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+				access_deny();
+
 			$actionid=add_action(
 				$_REQUEST['actiontype'],$_REQUEST['userid'], 
 				$_REQUEST["subject"],$_REQUEST["message"],$_REQUEST["recipient"],

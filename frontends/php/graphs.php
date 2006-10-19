@@ -71,8 +71,8 @@ include_once "include/page_header.php";
 	validate_group_with_host(PERM_READ_WRITE,array("allow_all_hosts","always_select_first_host"));
 ?>
 <?php
-	$availiable_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_ONLY, null, null, $ZBX_CURNODEID);
-	$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_ONLY, PERM_MODE_LT);
+	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, $ZBX_CURNODEID);
+	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
 
 	if(isset($_REQUEST["save"]))
 	{
@@ -85,6 +85,7 @@ include_once "include/page_header.php";
 
 		if(isset($_REQUEST["graphid"]))
 		{
+			// TODO check permission by new value.
 			$result=update_graph($_REQUEST["graphid"],
 				$_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],
 				$_REQUEST["yaxistype"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"],
@@ -100,6 +101,9 @@ include_once "include/page_header.php";
 		}
 		else
 		{
+			if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+				access_deny();
+
 			$result=add_graph($_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],
 				$_REQUEST["yaxistype"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"],
 				$showworkperiod,$showtriggers,$_REQUEST["graphtype"]);

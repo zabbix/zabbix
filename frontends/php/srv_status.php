@@ -41,7 +41,7 @@ include_once "include/page_header.php";
 	check_fields($fields);
 ?>
 <?php
-	$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_ONLY,PERM_MODE_LT);
+	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT);
 
 	if(isset($_REQUEST["serviceid"]) && $_REQUEST["serviceid"] > 0)
 	{

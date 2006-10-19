@@ -45,6 +45,13 @@ include_once "include/page_header.php";
 	);
 	
 	check_fields($fields);
+	
+	$accessible_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST);
+
+	if(isset($_REQUEST["nodeid"]) && !in_array($_REQUEST["nodeid"], explode(',',$accessible_nodes)))
+	{
+		access_deny();
+	}
 ?>
 <?php
 	if(isset($_REQUEST["form"]))
@@ -58,18 +65,19 @@ include_once "include/page_header.php";
 		show_table_header(S_NODES_BIG,$form);
 
 		$table=new CTableInfo(S_NO_NODES_DEFINED);
-		$table->setHeader(array(S_NAME));
+		$table->SetHeader(array(S_NAME));
 
-		$result=DBselect("select * from nodes n".
-			" order by n.name");
-		while($row=DBfetch($result))
+		$db_nodes = DBselect('select * from nodes where nodeid in ('.
+			get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST).') '.
+			' order by name ');
+		while($row=DBfetch($db_nodes))
 		{
 
 			$table->AddRow(array(
 				new CLink($row["name"],"?&form=update&nodeid=".$row["nodeid"],'action'),
 				));
 		}
-		$table->show();
+		$table->Show();
 	}
 ?>
 <?php

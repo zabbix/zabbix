@@ -44,7 +44,7 @@
 			" where ".DBid2nodeid("t.triggerid")."=".$nodeid.
 			" and e.triggerid=t.triggerid and t.triggerid=f.triggerid and f.itemid=i.itemid ".
 			" and i.hostid=h.hostid ".$sql_cond." and h.status=".HOST_STATUS_MONITORED.
-			" and h.hostid not in (".get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_WRITE, PERM_MODE_LT).") ".
+			" and h.hostid not in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE, PERM_MODE_LT).") ".
 			" order by e.clock desc,h.host,t.priority,t.description,t.triggerid ",
 			10*($start+$num)
 			);

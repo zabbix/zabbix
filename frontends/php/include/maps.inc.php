@@ -30,11 +30,11 @@
 		$result = false;
 
 		if($db_result = DBselect("select * from sysmaps_elements where sysmapid=".$sysmapid.
-			" and ".DBid2nodeid('sysmapid')." in (".get_accessible_nodes_by_userid($USER_DETAILS['userid'],$perm).")"))
+			" and ".DBid2nodeid('sysmapid')." in (".get_accessible_nodes_by_user($USER_DETAILS,$perm).")"))
 		{
 			$result = true;
 			
-			$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],$perm, PERM_MODE_LT);
+			$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
 						
 			while(($se_data = DBfetch($db_result)) && $result)
 			{
@@ -47,7 +47,7 @@
 						}
 						break;
 					case SYSMAP_ELEMENT_TYPE_MAP:
-						$result &= sysmap_accessiable($se_data['elementid'], $perm);
+						$result &= sysmap_accessiable($se_data['elementid'], PERM_READ_ONLY);
 						break;
 					case SYSMAP_ELEMENT_TYPE_IMAGE:
 						if(!DBfetch(DBselect("select distinct t.*".

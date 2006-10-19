@@ -68,7 +68,7 @@ include_once "include/page_header.php";
 
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
 	
-	$availiable_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_LIST, null, null, $ZBX_CURNODEID);
+	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST, null, null, $ZBX_CURNODEID);
 
 	$result=DBselect("select distinct g.groupid,g.name from groups g, hosts_groups hg, hosts h, items i ".
 		" where h.hostid in (".$availiable_hosts.") ".

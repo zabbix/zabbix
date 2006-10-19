@@ -59,15 +59,16 @@ include_once "include/page_header.php";
 ?>
 
 <?php
-	$_REQUEST["screenid"]=get_request("screenid",get_profile("web.screens.screenid",0));
+	$_REQUEST["screenid"] = get_request("screenid",get_profile("web.screens.screenid", null));
+	$_REQUEST["fullscreen"] = get_request("fullscreen", 0);
 
 	update_profile("web.screens.screenid",$_REQUEST["screenid"]);
 ?>
 
 <?php
 	$text = array(S_SCREENS_BIG);
-	if($_REQUEST["screenid"] > 0)
-		{
+	if(isset($_REQUEST["screenid"]))
+	{
 		$screen = get_screen_by_screenid($_REQUEST["screenid"]);
 		if($screen) {
 			$url = "screens.php?screenid=".$_REQUEST["screenid"];
@@ -76,8 +77,8 @@ include_once "include/page_header.php";
 		}
 		else
 		{
-			$_REQUEST["screenid"] = 0;
-			update_profile("web.screens.screenid",$_REQUEST["screenid"]);
+			unset($_REQUEST["screenid"]);
+			update_profile("web.screens.screenid",0);
 		}
 	}
 
@@ -85,30 +86,36 @@ include_once "include/page_header.php";
 	$form->AddVar("fullscreen",$_REQUEST["fullscreen"]);
 
 	$cmbScreens = new CComboBox("screenid",$_REQUEST["screenid"],"submit()");
-	$screen_correct = 0;
-	$first_screen = 0;
+	unset($screen_correct);
+	unset($first_screen);
 	$result=DBselect("select screenid,name from screens where ".DBid2nodeid("screenid")."=".$ZBX_CURNODEID." order by name");
 	while($row=DBfetch($result))
 	{
-//		if(!check_right("Screen","R",$row["screenid"])) /* TODO */
+		if(!screen_accessiable($row["screenid"], PERM_READ_ONLY))
 			continue;
+
 		$cmbScreens->AddItem($row["screenid"],$row["name"]);
 		if($_REQUEST["screenid"] == $row["screenid"]) $screen_correct = 1;
-		if($first_screen == 0) $first_screen = $row["screenid"];
+		if(!isset($first_screen)) $first_screen = $row["screenid"];
 	}
-	if($screen_correct == 0 && $first_screen != 0)
+	if(!isset($screen_correct) && isset($first_screen))
 	{
 		$_REQUEST["screenid"] = $first_screen;
 	}
 
+	if(isset($_REQUEST["screenid"]))
+	{
+		if(!screen_accessiable($_REQUEST["screenid"], PERM_READ_ONLY))
+			access_deny();
+	}
+			
 	$form->AddItem($cmbScreens);
 	show_table_header($text,$form);
 ?>
-
 <?php
-//	if($_REQUEST["screenid"] > 0 && check_right("Screen","R",$_REQUEST["screenid"])) /* TODO */
+	if(isset($_REQUEST["screenid"]))
 	{
-		$effectiveperiod=navigation_bar_calc();
+		$effectiveperiod = navigation_bar_calc();
 		$table = get_screen($_REQUEST["screenid"], 0, $effectiveperiod);
 		$table->Show();
 		

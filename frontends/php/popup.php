@@ -156,9 +156,9 @@ include_once "include/page_header.php";
 	}
 	else
 	{
-		$accessible_nodes = get_accessible_nodes_by_userid($USER_DETAILS['userid'],PERM_READ_LIST);
-		$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_ONLY,PERM_MODE_LT);
-		$accessible_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_ONLY);
+		$accessible_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST);
+		$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT);
+		$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 
 		if(in_array($srctbl,array("hosts","host_group","triggers","logitems","items")))
 		{

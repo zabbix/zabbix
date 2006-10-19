@@ -17,8 +17,77 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
+	
+	require_once "include/events.inc.php";
+	require_once "include/actions.inc.php";
 ?>
 <?php
+	function	screen_accessiable($screenid,$perm)
+	{
+		global $USER_DETAILS;
+
+		$result = false;
+
+		if(DBselect("select screenid from screens where screenid=".$screenid.
+			" and ".DBid2nodeid('screenid')." in (".get_accessible_nodes_by_user($USER_DETAILS,$perm).")"))
+		{
+			$result = true;
+			
+			$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
+			$denyed_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
+			
+			$db_result = DBselect("select * from screens_items where screenid=".$screenid);
+			while(($ac_data = DBfetch($db_result)) && $result)
+			{
+				switch($ac_data['resourcetype'])
+				{
+					case SCREEN_RESOURCE_GRAPH:
+						$itemid = array();
+
+						$db_gitems = DBselect("select distinct itemid from graphs_items ".
+							" where graphid=".$ac_data['resourceid']);
+						
+						while($gitem_data = DBfetch($db_gitems)) array_push($itemid, $gitem_data['itemid']);
+						
+						if(count($itemid) == 0) $itemid = array(-1);
+						// break; /* use same processing as items */
+					case SCREEN_RESOURCE_SIMPLE_GRAPH:
+						// break; /* use same processing as items */
+					case SCREEN_RESOURCE_PLAIN_TEXT:
+						if(!isset($itemid))
+							$itemid = array($ac_data['resourceid']);
+
+						if(DBfetch(DBselect("select itemid from items where itemid in (".implode(',',$itemid).") ".
+							" and hostid in (".$denyed_hosts.")")))
+						{
+							$result = false;
+						}	
+
+						unset($itemid);
+						break;
+					case SCREEN_RESOURCE_MAP:
+						$result &= sysmap_accessiable($ac_data['resourceid'], PERM_READ_ONLY);
+						break;
+					case SCREEN_RESOURCE_SCREEN:
+						$result &= screen_accessiable($ac_data['resourceid'],PERM_READ_ONLY);
+						break;
+					case SCREEN_RESOURCE_SERVER_INFO:
+					case SCREEN_RESOURCE_HOSTS_INFO:
+					case SCREEN_RESOURCE_TRIGGERS_INFO:
+					case SCREEN_RESOURCE_TRIGGERS_OVERVIEW:
+					case SCREEN_RESOURCE_DATA_OVERVIEW:
+					case SCREEN_RESOURCE_CLOCK:
+					case SCREEN_RESOURCE_URL:
+					case SCREEN_RESOURCE_ACTIONS:
+					case SCREEN_RESOURCE_EVENTS:
+						/* skip */
+						break;
+				}
+			}
+		}
+		return $result;
+	}
+
         function        add_screen($name,$hsize,$vsize)
         {
 		$screenid=get_dbid("screens","screenid");
@@ -80,8 +149,7 @@
 
 	function	get_screen_by_screenid($screenid)
 	{
-		$sql="select * from screens where screenid=$screenid"; 
-		$result=DBselect($sql);
+		$result = DBselect("select * from screens where screenid=$screenid");
 		$row=DBfetch($result);
 		if($row)
 		{
@@ -110,12 +178,15 @@
 	// editmode: 0 - view with actions, 1 - edit mode, 2 - view without any actions
 	function get_screen($screenid, $editmode, $effectiveperiod=NULL)
 	{
+		if(!screen_accessiable($screenid, $editmode ? PERM_READ_WRITE : PERM_READ_ONLY))
+			access_deny();
+		
 		if(is_null($effectiveperiod)) 
 			$effectiveperiod = 3600;
 
 		$result=DBselect("select name,hsize,vsize from screens where screenid=$screenid");
 		$row=DBfetch($result);
-		if(!$row) return new CSpan("Screen missing".BR);
+		if(!$row) return new CTableInfo(S_NO_SCREENS_DEFINED);
 
 		for($r=0;$r<$row["vsize"];$r++)
 		{

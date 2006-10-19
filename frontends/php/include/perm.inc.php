@@ -132,13 +132,16 @@
 		return $perm_mode;
 	}
 
-	function	get_accessible_hosts_by_userid($userid,$perm,$perm_mode=null,$perm_res=null,$nodeid=null,$hostid=null)
+	function	get_accessible_hosts_by_user(&$user_data,$perm,$perm_mode=null,$perm_res=null,$nodeid=null,$hostid=null)
 	{
-
 		if(is_null($perm_res))		$perm_res	= PERM_RES_STRING_LINE;
 		if($perm == PERM_READ_LIST)	$perm		= PERM_READ_ONLY;
 
 		$result = array();
+
+		$userid =& $user_data['userid'];
+
+		if(!isset($userid)) fatal_error('Incorrect user data in "get_accessible_hosts_by_user"');
 
 		switch($perm_res)
 		{
@@ -174,7 +177,7 @@ COpt::counter_up('perm');
 			{
 				if(!isset($nodes))
 				{
-					$nodes = get_accessible_nodes_by_userid($userid,
+					$nodes = get_accessible_nodes_by_user($user_data,
 						PERM_DENY,PERM_MODE_GE,PERM_RES_DATA_ARRAY);
 				}
 				$host_data['permission'] = $nodes[$host_data['nodeid']]['permission'];
@@ -197,7 +200,7 @@ COpt::counter_up('perm');
 		return $result;
 	}
 
-	function	get_accessible_groups_by_userid($userid,$perm,$perm_mode=null,$perm_res=null,$nodeid=null)
+	function	get_accessible_groups_by_user($user_data,$perm,$perm_mode=null,$perm_res=null,$nodeid=null)
 	{
 		global $ZBX_LOCALNODEID;
 
@@ -205,6 +208,9 @@ COpt::counter_up('perm');
 		if(is_null($perm_res))		$perm_res	= PERM_RES_STRING_LINE;
 
 		$result = array();
+
+		$userid =& $user_data['userid'];
+		if(!isset($userid)) fatal_error('Incorrect user data in "get_accessible_groups_by_user"');
 
 		switch($perm_res)
 		{
@@ -234,7 +240,7 @@ COpt::counter_up('perm');
 			{
 				if(!isset($nodes))
 				{
-					$nodes = get_accessible_nodes_by_userid($userid,
+					$nodes = get_accessible_nodes_by_user($user_data,
 						PERM_DENY,PERM_MODE_GE,PERM_RES_DATA_ARRAY);
 				}
 				$group_data['permission'] = $nodes[$group_data['nodeid']]['permission'];
@@ -257,12 +263,16 @@ COpt::counter_up('perm');
 		return $result;
 	}
 
-	function	get_accessible_nodes_by_userid($userid,$perm,$perm_mode=null,$perm_res=null,$nodeid=null)
+	function	get_accessible_nodes_by_user(&$user_data,$perm,$perm_mode=null,$perm_res=null,$nodeid=null)
 	{
 		global $ZBX_LOCALNODEID;
 
 		if(is_null($perm_mode)) $perm_mode=PERM_MODE_GE;
 		if(is_null($perm_res))	$perm_res=PERM_RES_STRING_LINE;
+
+		$userid		=& $user_data['userid'];
+		$user_type	=& $user_data['type'];
+		if(!isset($userid)) fatal_error('Incorrect user data in "get_accessible_nodes_by_user"');
 
 		$result= array();
 
@@ -290,13 +300,18 @@ COpt::counter_up('perm');
 
 			/* deny if no rights defined (for local node read/write)*/
 			if(is_null($node_data['permission']))
-				$node_data['permission'] = 
-					($node_data['nodeid'] == $ZBX_LOCALNODEID) ? PERM_READ_WRITE : PERM_DENY;
+			{
+				if($user_type == USER_TYPE_SUPPER_ADMIN)
+					$node_data['permission'] = PERM_READ_WRITE;
+				else
+					$node_data['permission'] = 
+						($node_data['nodeid'] == $ZBX_LOCALNODEID) ? PERM_READ_WRITE : PERM_DENY;
+			}
 
 			/* special processing for PERM_READ_LIST*/
 			if(PERM_DENY == $node_data['permission'] && PERM_READ_LIST == $perm)
 			{
-				$groups = get_accessible_groups_by_userid($userid,
+				$groups = get_accessible_groups_by_user($user_data,
 					$perm, PERM_MODE_GE,PERM_RES_DATA_ARRAY,$node_data['nodeid']);
 				if(count($groups) == 0)  continue;
 			}
@@ -331,7 +346,7 @@ COpt::counter_up('perm');
 		
 	*/
 
-	function	get_accessible_hosts_by_rights($rights,$perm,$perm_mode=null,$perm_res=null,$nodeid=null)
+	function	get_accessible_hosts_by_rights(&$rights,$user_type,$perm,$perm_mode=null,$perm_res=null,$nodeid=null)
 	{
 		if(is_null($perm_res))		$perm_res	= PERM_RES_STRING_LINE;
 		if($perm == PERM_READ_LIST)	$perm		= PERM_READ_ONLY;
@@ -392,7 +407,7 @@ COpt::counter_up('perm');
 			{
 				if(!isset($node_data[$host_data['nodeid']]))
 				{
-					$node_data = get_accessible_nodes_by_rights($rights,
+					$node_data = get_accessible_nodes_by_rights($rights,$user_type,
 						PERM_DENY, PERM_MODE_GE, PERM_RES_DATA_ARRAY, $host_data['nodeid']);
 				}
 				$host_data['permission'] = $node_data[$host_data['nodeid']]['permission'];
@@ -415,7 +430,7 @@ COpt::counter_up('perm');
 
 		return $result;
 	}
-	function	get_accessible_groups_by_rights($rights,$perm,$perm_mode=null,$perm_res=null,$nodeid=null)
+	function	get_accessible_groups_by_rights(&$rights,$user_type,$perm,$perm_mode=null,$perm_res=null,$nodeid=null)
 	{
 		if(is_null($perm_mode)) $perm_mode=PERM_MODE_GE;
 		if(is_null($perm_res))	$perm_res=PERM_RES_STRING_LINE;
@@ -453,7 +468,7 @@ COpt::counter_up('perm');
 			{
 				if(!isset($node_data[$group_data['nodeid']]))
 				{
-					$node_data = get_accessible_nodes_by_rights($rights,
+					$node_data = get_accessible_nodes_by_rights($rights,$user_type,
 						PERM_DENY, PERM_MODE_GE, PERM_RES_DATA_ARRAY, $group_data['nodeid']);
 				}
 				$group_data['permission'] = $node_data[$group_data['nodeid']]['permission'];
@@ -476,7 +491,7 @@ COpt::counter_up('perm');
 		return $result;
 	}
 
-	function	get_accessible_nodes_by_rights($rights,$perm,$perm_mode=null,$perm_res=null,$nodeid=null)
+	function	get_accessible_nodes_by_rights(&$rights,$user_type,$perm,$perm_mode=null,$perm_res=null,$nodeid=null)
 	{
 		global $ZBX_LOCALNODEID;
 
@@ -484,6 +499,8 @@ COpt::counter_up('perm');
 		if(is_null($perm_res))	$perm_res=PERM_RES_STRING_LINE;
 
 		$result= array();
+
+		if(is_null($user_type)) $user_type = USER_TYPE_ZABBIX_USER;
 
 		switch($perm_res)
 		{
@@ -508,13 +525,15 @@ COpt::counter_up('perm');
 		{
 			if(isset($node_perm[$node_data['nodeid']]))
 				$node_data['permission'] = $node_perm[$node_data['nodeid']];
-			elseif($node_data['nodeid'] == $ZBX_LOCALNODEID) /* for local node default permission is READ_WRITE */
-				$node_data['permission'] = PERM_READ_WRITE;
+			elseif($node_data['nodeid'] == $ZBX_LOCALNODEID || $user_type == USER_TYPE_SUPPER_ADMIN)
+			/* for local node or superuser default permission is READ_WRITE */
+					$node_data['permission'] = PERM_READ_WRITE;
+
 
 			/* special processing for PERM_READ_LIST*/
 			if(PERM_DENY == $node_data['permission'] && PERM_READ_LIST == $perm)
 			{
-				$groups = get_accessible_groups_by_rights($rights,
+				$groups = get_accessible_groups_by_rights($rights,$user_type,
 					$perm, PERM_MODE_GE, PERM_RES_DATA_ARRAY, $node_data['nodeid']);
 				if(count($groups) == 0)  continue;
 			}

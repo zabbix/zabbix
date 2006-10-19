@@ -111,6 +111,11 @@ include_once "include/page_header.php";
 				$audit_action = "Image [".$_REQUEST["name"]."] updated";
 			} else {
 	/* ADD */
+				if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,
+						PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+				{
+					access_deny();
+				}
 				$result=add_image($_REQUEST["name"],$_REQUEST["imagetype"],$file);
 
 				$msg_ok = S_IMAGE_ADDED;
@@ -156,6 +161,11 @@ include_once "include/page_header.php";
 				$audit_action = AUDIT_ACTION_UPDATE;
 			} else {
 	/* ADD */
+				if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,
+						PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+				{
+					access_deny();
+				}
 				$result=add_autoregistration(
 					$_REQUEST["pattern"],$_REQUEST["priority"],$_REQUEST["hostid"]);
 
@@ -188,7 +198,8 @@ include_once "include/page_header.php";
 	elseif(isset($_REQUEST["save"])&&in_array($_REQUEST["config"],array(0,5,7)))
 	{
 
-
+		if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+			access_deny();
 
 /* OTHER ACTIONS */
 		$result=update_config($_REQUEST["event_history"],$_REQUEST["alert_history"],
@@ -243,6 +254,11 @@ include_once "include/page_header.php";
 			}
 			else
 			{
+				if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,
+					PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+				{
+					access_deny();
+				}
 				$result = add_valuemap($_REQUEST["mapname"], $mapping);
 				$audit_action	= AUDIT_ACTION_ADD;
 				$msg_ok		= S_VALUE_MAP_ADDED;

@@ -60,7 +60,7 @@ include_once "include/page_header.php";
 		" and ((h.status=".HOST_STATUS_MONITORED." and h.available != ".HOST_AVAILABLE_FALSE.") ".
 		" or (h.status=".HOST_STATUS_MONITORED." and h.available=".HOST_AVAILABLE_FALSE." and h.disable_until<=$now)) ".
 		" and i.hostid=h.hostid and i.nextcheck<$now and i.key_ not in ('status','icmpping','icmppingsec','zabbix[log]') ".
-		" and h.hostid in (".get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_ONLY,null,null,$ZBX_CURNODEID).")".
+		" and h.hostid in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,$ZBX_CURNODEID).")".
 		" order by i.nextcheck,h.host,i.description,i.key_");
 
 	$table = new CTableInfo(S_THE_QUEUE_IS_EMPTY);

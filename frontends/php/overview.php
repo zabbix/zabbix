@@ -75,7 +75,7 @@ include_once "include/page_header.php";
 	
 	$result=DBselect("select distinct g.groupid,g.name from groups g, hosts_groups hg, hosts h, items i".$from.
 		" where g.groupid in (".
-			get_accessible_groups_by_userid($USER_DETAILS['userid'],PERM_READ_LIST, null, null, $ZBX_CURNODEID).
+			get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST, null, null, $ZBX_CURNODEID).
 		") ".
 		" and hg.groupid=g.groupid and h.status=".HOST_STATUS_MONITORED.
 		" and h.hostid=i.hostid and hg.hostid=h.hostid and i.status=".ITEM_STATUS_ACTIVE.

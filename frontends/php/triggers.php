@@ -89,8 +89,9 @@ include_once "include/page_header.php";
 
 		$deps = get_request("dependences",array());
 
-		if(isset($_REQUEST["triggerid"])){
-
+		if(isset($_REQUEST["triggerid"]))
+		{
+			// TODO check permission by new value.
 			$result=update_trigger($_REQUEST["triggerid"],
 				$_REQUEST["expression"],$_REQUEST["description"],
 				$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"],
@@ -101,6 +102,9 @@ include_once "include/page_header.php";
 
 			show_messages($result, S_TRIGGER_UPDATED, S_CANNOT_UPDATE_TRIGGER);
 		} else {
+			if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+				access_deny();
+
 			$triggerid=add_trigger($_REQUEST["expression"],$_REQUEST["description"],
 				$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"],
 				$deps);
@@ -267,7 +271,7 @@ include_once "include/page_header.php";
 
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
 	
-	$availiable_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_WRITE, null, null, $ZBX_CURNODEID);
+	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE, null, null, $ZBX_CURNODEID);
 
 	$result=DBselect("select distinct g.groupid,g.name from groups g, hosts_groups hg, hosts h, items i ".
 		" where h.hostid in (".$availiable_hosts.") ".
@@ -317,7 +321,7 @@ include_once "include/page_header.php";
 	else
 	{
 /* TABLE */
-		$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_WRITE, PERM_MODE_LT);
+		$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE, PERM_MODE_LT);
 		
 		$form = new CForm('triggers.php');
 		$form->SetName('triggers');

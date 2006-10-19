@@ -639,7 +639,7 @@ COpt::profiling_start('prepare data');
 			' i.description, t.priority, t.value as tr_value'.
 			' from hosts h,items i left join  functions f on f.itemid=i.itemid left join triggers t on t.triggerid=f.triggerid '.
 			$group_where.
-			' h.hostid in ('.get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_ONLY, null, null, $nodeid).') '.
+			' h.hostid in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, $nodeid).') '.
 			' and h.status='.HOST_STATUS_MONITORED.' and h.hostid=i.hostid and i.status='.ITEM_STATUS_ACTIVE.
 			' order by i.description,i.itemid');
 

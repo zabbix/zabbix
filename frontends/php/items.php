@@ -97,9 +97,18 @@ include_once "include/page_header.php";
 
 	check_fields($fields);
 
-	validate_group_with_host(PERM_READ_WRITE,array("always_select_first_host"));
+	$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,$ZBX_CURNODEID);
+
+	if(isset($_REQUEST['hostid']) && !in_array($_REQUEST['hostid'], explode(',',$accessible_hosts)))
+	{
+		unset($_REQUEST['hostid']);
+	}
+		
+	validate_group_with_host(PERM_READ_WRITE,array("always_select_first_host","only_current_node"));
 ?>
 <?php
+SDI($_REQUEST['hostid']);
+
 	$result = 0;
 	if(isset($_REQUEST['del_delay_flex']) && isset($_REQUEST['rem_delay_flex']))
 	{
@@ -422,8 +431,6 @@ include_once "include/page_header.php";
 		$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit();");
 		$cmbGroup->AddItem(0,S_ALL_SMALL);
 
-		$accessible_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_WRITE,null,null,$ZBX_CURNODEID);
-		
 		$result=DBselect("select distinct g.groupid,g.name from groups g,hosts_groups hg".
 			" where g.groupid=hg.groupid and hg.hostid in (".$accessible_hosts.") ".
 			" order by name");
@@ -437,8 +444,9 @@ include_once "include/page_header.php";
 		if(isset($_REQUEST["groupid"]) && $_REQUEST["groupid"]>0)
 		{
 			$sql="select distinct h.hostid,h.host from hosts h,hosts_groups hg".
-				" where hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid and".
-				" h.status<>".HOST_STATUS_DELETED." group by h.hostid,h.host order by h.host";
+				" where hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid ".
+				" and h.hostid in (".$accessible_hosts.") ".
+				" and h.status<>".HOST_STATUS_DELETED." group by h.hostid,h.host order by h.host";
 		}
 		else
 		{

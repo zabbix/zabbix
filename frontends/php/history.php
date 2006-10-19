@@ -101,9 +101,9 @@ include_once "include/page_header.php";
 			$_REQUEST["itemid"] = array_pop($_REQUEST["itemid"]);
 	}
 
-	$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_ONLY,PERM_MODE_LT);
+	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT);
 
-	$availiable_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_ONLY,null,null,$ZBX_CURNODEID);
+	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,$ZBX_CURNODEID);
 	
 	if(($item_data = DBfetch(DBselect("select h.host,i.hostid,i.description,i.key_ from items i,hosts h ".
 		" where i.itemid in (".(is_array($_REQUEST["itemid"]) ? implode(',', $_REQUEST["itemid"]) : $_REQUEST["itemid"]).") ".

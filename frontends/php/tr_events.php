@@ -41,7 +41,7 @@ include_once "include/page_header.php";
 	);
 	check_fields($fields);
 	
-	$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_ONLY, PERM_MODE_LT);
+	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
 	
 	if(! ($trigger_data = DBfetch(DBselect('select h.host, t.* from hosts h, items i, functions f, triggers t '.
 	                        ' where i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid='.$_REQUEST["triggerid"].

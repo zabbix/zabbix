@@ -114,8 +114,13 @@ include_once "include/page_header.php";
 
 
 	check_fields($fields);
-?>
 
+	if(isset($_REQUEST["usrgrpid"]) and 
+		DBfetch(DBselect('select id from users_groups where userid='.$USER_DETAILS['userid'].' and usrgrpid='.$_REQUEST["usrgrpid"])))
+	{
+			access_deny();
+	}
+?>
 <?php
 	if($_REQUEST["config"]==0)
 	{
@@ -440,11 +445,12 @@ include_once "include/page_header.php";
 			{
 				$users = array();
 
-				$db_users=DBselect("select distinct u.alias from users u,users_groups ug ".
+				$db_users=DBselect("select distinct u.alias,u.userid from users u,users_groups ug ".
 					"where u.userid=ug.userid and ug.usrgrpid=".$row["usrgrpid"].
 					" order by alias");
 
-				while($db_user=DBfetch($db_users))	array_push($users, $db_user["alias"]);
+				while($db_user=DBfetch($db_users))	$users[$db_user['userid']] = $db_user["alias"];
+				if(isset($users[$USER_DETAILS['userid']])) continue;
 
 				$table->addRow(array(
 					array(

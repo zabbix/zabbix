@@ -142,7 +142,7 @@ include_once "include/page_header.php";
 ?>
 <?php
 /****** GRAPH ******/
-	$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_ONLY,PERM_MODE_LT);
+	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT);
 
 	if(! ($db_graph = DBfetch(DBselect("select g.name from graphs g left join graphs_items gi on gi.graphid=g.graphid ".
 			" left join items i on gi.itemid=i.itemid".

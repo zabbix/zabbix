@@ -89,8 +89,8 @@ include_once "include/page_header.php";
 <?php
 	$h1 = array(S_GRAPHS_BIG.SPACE."/".SPACE);
 	
-	$availiable_groups = get_accessible_groups_by_userid($USER_DETAILS['userid'],PERM_READ_LIST, null, null, $ZBX_CURNODEID);
-	$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_ONLY, PERM_MODE_LT);
+	$availiable_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST, null, null, $ZBX_CURNODEID);
+	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
 
 	if($_REQUEST["graphid"] > 0)
 	{

@@ -30,12 +30,50 @@ include_once "include/page_header.php";
 	
 	insert_confirm_javascript();
 ?>
+<?php
 
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"screenid"=>	array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
+		
+		"screenitemid"=>array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,			'{form}=="update"'),
+		"resourcetype"=>	array(T_ZBX_INT, O_OPT,  null,  
+					BETWEEN(SCREEN_RESOURCE_GRAPH,SCREEN_RESOURCE_EVENTS),	'isset({save})'),
+		"resourceid"=>	array(T_ZBX_INT, O_OPT,  null,  DB_ID,			'isset({save})'),
+		"width"=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	null),
+		"height"=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	null),
+		"colspan"=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,100),		null),
+		"rowspan"=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,100),		null),
+		"elements"=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,65535),	null),
+		"valign"=>	array(T_ZBX_INT, O_OPT,  null,  
+					BETWEEN(VALIGN_MIDDLE,VALIGN_BOTTOM),		null),
+		"halign"=>	array(T_ZBX_INT, O_OPT,  null,  
+					BETWEEN(HALIGN_CENTER,HALIGN_RIGHT),		null),
+		"style"=>	array(T_ZBX_INT, O_OPT,  null,  
+					BETWEEN(STYLE_HORISONTAL,STYLE_VERTICAL),	'isset({save})'),
+		"url"=>		array(T_ZBX_STR, O_OPT,  null,  null,			'isset({save})'),
+		"x"=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,100),		'isset({save})&&{form}!="update"'),
+		"y"=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,100),		'isset({save})&&{form}!="update"'),
+
+		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	null,	null,	null)
+	);
+
+	check_fields($fields);
+?>
 <?php
 	show_table_header(S_CONFIGURATION_OF_SCREEN_BIG);
 
 	if(isset($_REQUEST["screenid"]))
 	{
+		if(!screen_accessiable($_REQUEST["screenid"], PERM_READ_WRITE))
+			access_deny();
+
+		$screen = get_screen_by_screenid($_REQUEST["screenid"]);
+
 		echo BR;
 		if(isset($_REQUEST["save"]))
 		{
@@ -63,6 +101,9 @@ include_once "include/page_header.php";
 				show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 			}
 			if($result){
+				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_SCREEN," Name [".$screen['name']."] cell changed ".
+					(isset($_REQUEST["screenitemid"]) ? "[".$_REQUEST["screenitemid"]."]" : 
+						"[".$_REQUEST["x"].",".$_REQUEST["y"]."]"));
 				unset($_REQUEST["form"]);
 			}
 		} elseif(isset($_REQUEST["delete"])) {

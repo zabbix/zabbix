@@ -70,6 +70,9 @@
 		$frm_title = S_USER;
 		if(isset($userid))
 		{
+			global $USER_DETAILS;
+			if($userid == $USER_DETAILS['userid']) $profile = 1;
+
 			$user=get_user_by_userid($userid);
 			$frm_title = S_USER." \"".$user["alias"]."\"";
 		}
@@ -192,7 +195,7 @@
 			}
 			else
 			{
-				$cmbUserType = new CComboBox('user_type', $user_type);
+				$cmbUserType = new CComboBox('user_type', $user_type, $perm_details ? 'submit();' : null);
 				$cmbUserType->AddItem(USER_TYPE_ZABBIX_USER,	user_type2str(USER_TYPE_ZABBIX_USER));
 				$cmbUserType->AddItem(USER_TYPE_ZABBIX_ADMIN,	user_type2str(USER_TYPE_ZABBIX_ADMIN));
 				$cmbUserType->AddItem(USER_TYPE_SUPPER_ADMIN,	user_type2str(USER_TYPE_SUPPER_ADMIN));
@@ -317,7 +320,7 @@
 					}
 				}
 				
-				$frmUser->AddSpanRow(get_rights_of_elements_table($user_rights));
+				$frmUser->AddSpanRow(get_rights_of_elements_table($user_rights, $user_type));
 			}
 		}
 
@@ -488,7 +491,7 @@
 		$frmUserG->Show();
 	}
 
-	function	get_rights_of_elements_table($rights=array())
+	function	get_rights_of_elements_table($rights=array(),$user_type=USER_TYPE_ZABBIX_USER)
 	{
 		$table = new CTable('S_NO_ACCESSIBLE_RESOURCES', 'right_table');
 		$table->SetHeader(array(SPACE, S_READ_WRITE, S_READ_ONLY, S_DENY),'header');
@@ -498,7 +501,7 @@
 		$lst['node']['read_only']	= new CListBox('nodes_read'	,null	,6);
 		$lst['node']['deny']		= new CListBox('nodes_deny'	,null	,6);
 
-		$nodes = get_accessible_nodes_by_rights($rights, PERM_DENY, PERM_MODE_GE, PERM_RES_DATA_ARRAY);
+		$nodes = get_accessible_nodes_by_rights($rights, $user_type, PERM_DENY, PERM_MODE_GE, PERM_RES_DATA_ARRAY);
 
 		foreach($nodes as $node)
 		{
@@ -516,7 +519,7 @@
 		$lst['group']['read_only']	= new CListBox('groups_read'	,null	,10);
 		$lst['group']['deny']		= new CListBox('groups_deny'	,null	,10);
 
-		$groups = get_accessible_groups_by_rights($rights, PERM_DENY, PERM_MODE_GE, PERM_RES_DATA_ARRAY);
+		$groups = get_accessible_groups_by_rights($rights, $user_type, PERM_DENY, PERM_MODE_GE, PERM_RES_DATA_ARRAY);
 
 		foreach($groups as $group)
 		{
@@ -534,7 +537,7 @@
 		$lst['host']['read_only']	= new CListBox('hosts_read'	,null	,15);
 		$lst['host']['deny']		= new CListBox('hosts_deny'	,null	,15);
 
-		$hosts = get_accessible_hosts_by_rights($rights, PERM_DENY, PERM_MODE_GE, PERM_RES_DATA_ARRAY);
+		$hosts = get_accessible_hosts_by_rights($rights, $user_type, PERM_DENY, PERM_MODE_GE, PERM_RES_DATA_ARRAY);
 		foreach($hosts as $host)
 		{
 			switch($host['permission'])
@@ -921,7 +924,7 @@
 	        $cmbGroups = new CComboBox("add_groupid",$add_groupid);		
 
 	        $groups=DBselect("select distinct groupid,name from groups ".
-			"where groupid in (".get_accessible_groups_by_userid($USER_DETAILS['userid'],PERM_READ_ONLY,null,null,$ZBX_CURNODEID).") ".
+			"where groupid in (".get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,$ZBX_CURNODEID).") ".
 			" order by name");
 	        while($group=DBfetch($groups))
 	        {
@@ -2063,6 +2066,7 @@
 	function&	get_screen_item_form()
 	{
 		global $_REQUEST;
+		global $USER_DETAILS;
 
 		$form = new CFormTable(S_SCREEN_CELL_CONFIGURATION,"screenedit.php#form");
 		$form->SetHelp("web.screenedit.cell.php");
@@ -2131,16 +2135,20 @@
 		if($resourcetype == SCREEN_RESOURCE_GRAPH)
 		{
 	// User-defined graph
-			$result=DBselect("select graphid,name from graphs order by name");
+			$result = DBselect("select distinct g.graphid,g.name,n.name as node_name ".
+				" from graphs g, nodes n, graphs_items gi, items i, hosts h ".
+				" where n.nodeid=".DBid2nodeid("g.graphid")." and g.graphid=gi.graphid ".
+				" and gi.itemid=i.itemid and h.hostid=i.hostid".
+				" and i.hostid not in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT).")".
+				" order by node_name,host,name,graphid");
 
 			$cmbGraphs = new CComboBox("resourceid",$resourceid);
 			while($row=DBfetch($result))
 			{
-				$db_hosts = get_hosts_by_graphid($row["graphid"]);
-				$db_host = DBfetch($db_hosts);
+				$db_host = DBfetch(get_hosts_by_graphid($row["graphid"]));
 				if($db_host)
 				{
-					$name = $db_host["host"].":".$row["name"];
+					$name = "(".$row["node_name"].") ".$db_host["host"].":".$row["name"];
 				}
 				else
 				{
@@ -2154,17 +2162,18 @@
 		elseif($resourcetype == SCREEN_RESOURCE_SIMPLE_GRAPH)
 		{
 	// Simple graph
-			$result=DBselect("select h.host,i.description,i.itemid,i.key_".
-				" from hosts h,items i where h.hostid=i.hostid".
+			$result=DBselect("select n.name as node_name,h.host,i.description,i.itemid,i.key_".
+				" from hosts h,items i,nodes n where h.hostid=i.hostid and n.nodeid=".DBid2nodeid("i.itemid").
 				" and h.status=".HOST_STATUS_MONITORED." and i.status=".ITEM_STATUS_ACTIVE.
-				" order by h.host,i.description");
+				" and i.hostid not in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT).")".
+				" order by node_name,h.host,i.description");
 
 
 			$cmbItems = new CCombobox("resourceid",$resourceid);
 			while($row=DBfetch($result))
 			{
 				$description_=item_description($row["description"],$row["key_"]);
-				$cmbItems->AddItem($row["itemid"],$row["host"].": ".$description_);
+				$cmbItems->AddItem($row["itemid"],"(".$row["node_name"].") ".$row["host"].": ".$description_);
 
 			}
 			$form->AddRow(S_PARAMETER,$cmbItems);
@@ -2172,12 +2181,15 @@
 		elseif($resourcetype == SCREEN_RESOURCE_MAP)
 		{
 	// Map
-			$result=DBselect("select sysmapid,name from sysmaps order by name");
+			$result=DBselect("select n.name as node_name, s.sysmapid,s.name from sysmaps s, nodes n".
+				" where n.nodeid=".DBid2nodeid("s.sysmapid").
+				" order by name ");
 
 			$cmbMaps = new CComboBox("resourceid",$resourceid);
 			while($row=DBfetch($result))
 			{
-				$cmbMaps->AddItem($row["sysmapid"],$row["name"]);
+				if(!sysmap_accessiable($row["sysmapid"],PERM_READ_ONLY)) continue;
+				$cmbMaps->AddItem($row["sysmapid"],"(".$row["node_name"].") ".$row["name"]);
 			}
 
 			$form->AddRow(S_MAP,$cmbMaps);
@@ -2185,16 +2197,17 @@
 		elseif($resourcetype == SCREEN_RESOURCE_PLAIN_TEXT)
 		{
 	// Plain text
-			$result=DBselect("select h.host,i.description,i.itemid,i.key_".
-				" from hosts h,items i where h.hostid=i.hostid".
+			$result=DBselect("select n.name as node_name,h.host,i.description,i.itemid,i.key_".
+				" from hosts h,items i,nodes n where h.hostid=i.hostid and n.nodeid=".DBid2nodeid("i.itemid").
 				" and h.status=".HOST_STATUS_MONITORED." and i.status=".ITEM_STATUS_ACTIVE.
-				" order by h.host,i.description");
+				" and i.hostid not in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT).")".
+				" order by node_name,h.host,i.description");
 
 			$cmbHosts = new CComboBox("resourceid",$resourceid);
 			while($row=DBfetch($result))
 			{
 				$description_=item_description($row["description"],$row["key_"]);
-				$cmbHosts->AddItem($row["itemid"],$row["host"].": ".$description_);
+				$cmbHosts->AddItem($row["itemid"],"(".$row["node_name"].") ".$row["host"].": ".$description_);
 
 			}
 
@@ -2219,25 +2232,14 @@
 			$cmbGroup = new CComboBox("resourceid",$resourceid);
 
 			$cmbGroup->AddItem(0,S_ALL_SMALL);
-			$result=DBselect("select groupid,name from groups order by name");
+			$result=DBselect("select distinct n.name as node_name,g.groupid,g.name from groups g,nodes n,hosts_groups hg,hosts h ".
+				" where g.groupid in (".get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY).")".
+				" and n.nodeid=".DBid2nodeid("g.groupid")." and g.groupid=hg.groupid and hg.hostid=h.hostid ".
+				" and h.status=".HOST_STATUS_MONITORED.
+				" order by node_name,g.name");
 			while($row=DBfetch($result))
 			{
-				$cmbGroup = new CComboBox("resourceid",$resourceid);
-
-				$cmbGroup->AddItem(0,S_ALL_SMALL);
-				$result=DBselect("select groupid,name from groups order by name");
-				while($row=DBfetch($result))
-				{
-					$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg where".
-						" h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$row["groupid"].
-						" and hg.hostid=h.hostid group by h.hostid,h.host order by h.host");
-					while($row2=DBfetch($result2))
-					{
-//						if(!check_right("Host","R",$row2["hostid"]))    continue; /* TODO */
-						$cmbGroup->AddItem($row["groupid"],$row["name"]);
-						break;
-					}
-				}
+				$cmbGroup->AddItem($row["groupid"],"(".$row["node_name"].") ".$row["name"]);
 			}
 			$form->AddRow(S_GROUP,$cmbGroup);
 
@@ -2245,12 +2247,15 @@
 		elseif($resourcetype == SCREEN_RESOURCE_SCREEN)
 		{
 			$cmbScreens = new CComboBox("resourceid",$resourceid);
-			$result=DBselect("select screenid,name from screens");
+			$result=DBselect("select distinct n.name as node_name,s.screenid,s.name from screens s,nodes n ".
+				" where n.nodeid=".DBid2nodeid("s.screenid").
+				" order by node_name,s.name");
 			while($row=DBfetch($result))
 			{
+				if(!screen_accessiable($row["screenid"], PERM_READ_ONLY)) continue;
 				if(check_screen_recursion($_REQUEST["screenid"],$row["screenid"]))
 					continue;
-				$cmbScreens->AddItem($row["screenid"],$row["name"]);
+				$cmbScreens->AddItem($row["screenid"],"(".$row["node_name"].") ".$row["name"]);
 
 			}
 
@@ -2492,7 +2497,7 @@
 // add groups
 			$db_groups=DBselect("select distinct groupid from hosts_groups where hostid=".$_REQUEST["hostid"].
 				" and groupid in (".
-				get_accessible_groups_by_userid($USER_DETAILS['userid'],PERM_READ_LIST,null,null,$ZBX_CURNODEID).
+				get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST,null,null,$ZBX_CURNODEID).
 				") ");
 			while($db_group=DBfetch($db_groups)){
 				if(in_array($db_group["groupid"],$groups)) continue;
@@ -2544,7 +2549,7 @@
 		
 		$db_groups=DBselect("select distinct groupid,name from groups ".
 			" where groupid in (".
-			get_accessible_groups_by_userid($USER_DETAILS['userid'],PERM_READ_LIST,null,null,$ZBX_CURNODEID).
+			get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST,null,null,$ZBX_CURNODEID).
 			") order by name");
 		while($db_group=DBfetch($db_groups))
 		{
@@ -2615,7 +2620,7 @@
 
 		$cmbHosts->AddItem(0,"...");
 		$hosts=DBselect("select host,hostid from hosts where status in (".HOST_STATUS_TEMPLATE.")".
-			" and hostid in (".get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_LIST,null,null,$ZBX_CURNODEID).") ".
+			" and hostid in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST,null,null,$ZBX_CURNODEID).") ".
 			" order by host");
 		while($host=DBfetch($hosts))
 		{
@@ -2874,6 +2879,7 @@
 	function insert_map_form()
 	{
 		global $_REQUEST;
+		global $ZBX_CURNODEID;
 
 		$frm_title = "New system map";
 
@@ -2915,7 +2921,7 @@
 
 		$cmbImg = new CComboBox("backgroundid",$backgroundid);
 		$cmbImg->AddItem(0,"No image...");
-		$result=DBselect("select * from images where imagetype=2 order by name");
+		$result=DBselect("select * from images where imagetype=2 and ".DBid2nodeid("imageid")."=".$ZBX_CURNODEID." order by name");
 		while($row=DBfetch($result))
 		{
 			$cmbImg->AddItem($row["imageid"],$row["name"]);
@@ -2954,6 +2960,9 @@
 
 	function insert_map_element_form()
 	{
+		global $ZBX_CURNODEID;
+		global $USER_DETAILS;
+
 		$frmEl = new CFormTable("New map element","sysmap.php");
 		$frmEl->SetHelp("web.sysmap.host.php");
 		$frmEl->AddVar("sysmapid",$_REQUEST["sysmapid"]);
@@ -2994,8 +3003,13 @@
 
 		$cmbType = new CComboBox("elementtype",$elementtype,"submit()");
 
-		$db_hosts = DBselect("select hostid from hosts");
-		if(DBfetch($db_hosts))
+		$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT);
+		
+		$db_hosts = DBselect("select distinct n.name as node_name,h.hostid,h.host from hosts h,nodes n ".
+			" where h.hostid not in(".$denyed_hosts.")".
+			" and n.nodeid=".DBid2nodeid("h.hostid").
+			" order by node_name,h.host");
+		if($db_hosts)
 			$cmbType->AddItem(SYSMAP_ELEMENT_TYPE_HOST,	S_HOST);
 
 		$db_maps = DBselect("select sysmapid from sysmaps where sysmapid!=".$_REQUEST["sysmapid"]);
@@ -3019,10 +3033,11 @@
 		if($elementtype==SYSMAP_ELEMENT_TYPE_HOST) 
 		{
 			$host = "";
-			$host_info = 0;
 
-			$db_hosts = DBselect("select host from hosts where hostid=$elementid");
-			$host_info = DBfetch($db_hosts);
+			$host_info = DBfetch(DBselect("select distinct n.name as node_name,h.hostid,h.host from hosts h,nodes n ".
+				" where h.hostid not in(".$denyed_hosts.") and  hostid=".$elementid.
+				" and n.nodeid=".DBid2nodeid("h.hostid").
+				" order by node_name,h.host"));
 			if($host_info)
 				$host = $host_info["host"];
 			else
@@ -3030,10 +3045,8 @@
 
 			if($elementid==0)
 			{
-				$db_hosts = DBselect("select hostid,host from hosts",1);
-				$db_host = DBfetch($db_hosts);
-				$host = $db_host["host"];
-				$elementid = $db_host["hostid"];
+				$host = "";
+				$elementid = 0;
 			}
 
 			$frmEl->AddVar("elementid",$elementid);
@@ -3047,10 +3060,13 @@
 		elseif($elementtype==SYSMAP_ELEMENT_TYPE_MAP)
 		{
 			$cmbMaps = new CComboBox("elementid",$elementid);
-			$db_maps = DBselect("select sysmapid,name from sysmaps");
+			$db_maps = DBselect("select distinct n.name as node_name,s.sysmapid,s.name from sysmaps s,nodes n ".
+					" where ".DBid2nodeid("s.sysmapid")."=n.nodeid".
+					" order by node_name,s.name");
 			while($db_map = DBfetch($db_maps))
 			{
-				$cmbMaps->AddItem($db_map["sysmapid"],$db_map["name"]);
+				if(!sysmap_accessiable($db_map["sysmapid"],PERM_READ_ONLY)) continue;
+				$cmbMaps->AddItem($db_map["sysmapid"],"(".$db_map['node_name'].") ".$db_map["name"]);
 			}
 			$frmEl->AddRow(S_MAP, $cmbMaps);
 		}
@@ -3058,19 +3074,25 @@
 		{
 			$cmbTriggers= new CComboBox("elementid",$elementid);
 			$cmbTriggers->AddItem(0,"-");
-			$db_triggers = DBselect("select triggerid from triggers");
+			$db_triggers = DBselect("select distinct n.name as node_name,h.hostid,h.host,t.*".
+				" from triggers t,hosts h,items i,functions f,nodes n ".
+				" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid".
+				" and h.hostid not in (".$denyed_hosts.")".
+				" and ".DBid2nodeid("h.hostid")."=n.nodeid".
+				" order by node_name,h.host,t.description");
+			
 			while($db_trigger = DBfetch($db_triggers))
 			{
 				$cmbTriggers->AddItem(
 					$db_trigger["triggerid"],
-					expand_trigger_description($db_trigger["triggerid"]));
+					"(".$db_trigger['node_name'].") ".expand_trigger_description($db_trigger["triggerid"]));
 			}
 			$frmEl->AddRow(S_TRIGGER, $cmbTriggers);
 		}
 
 		$cmbIconOff	= new CComboBox("iconid_off",$iconid_off);
 		$cmbIconOn	= new CComboBox("iconid_on",$iconid_on);
-		$result = DBselect("select * from images where imagetype=1 order by name");
+		$result = DBselect("select * from images where imagetype=1 and ".DBid2nodeid("imageid")."=".$ZBX_CURNODEID." order by name");
 		while($row=DBfetch($result))
 		{
 			$cmbIconOff->AddItem($row["imageid"],$row["name"]);

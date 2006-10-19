@@ -67,6 +67,7 @@ include_once "include/page_header.php";
 	{
 		if(isset($_REQUEST["sysmapid"]))
 		{
+			// TODO check permission by new value.
 			$result=update_sysmap($_REQUEST["sysmapid"],$_REQUEST["name"],$_REQUEST["width"],
 				$_REQUEST["height"],$_REQUEST["backgroundid"],$_REQUEST["label_type"],
 				$_REQUEST["label_location"]);
@@ -74,6 +75,9 @@ include_once "include/page_header.php";
 			add_audit_if($result,AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP,'Name ['.$_REQUEST['name'].']');
 			show_messages($result,"Network map updated","Cannot update network map");
 		} else {
+			if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+				access_deny();
+
 			$result=add_sysmap($_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],
 				$_REQUEST["backgroundid"],$_REQUEST["label_type"],$_REQUEST["label_location"]);
 

@@ -26,12 +26,12 @@
 		$result = false;
 
 		if(DBselect("select actionid from actions where actionid=".$actionid.
-			" and ".DBid2nodeid('actionid')." in (".get_accessible_nodes_by_userid($USER_DETAILS['userid'],$perm).")"))
+			" and ".DBid2nodeid('actionid')." in (".get_accessible_nodes_by_user($USER_DETAILS,$perm).")"))
 		{
 			$result = true;
 			
-			$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],$perm, PERM_MODE_LT);
-			$denyed_groups = get_accessible_groups_by_userid($USER_DETAILS['userid'],$perm, PERM_MODE_LT);
+			$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
+			$denyed_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
 			
 			$db_result = DBselect("select * from conditions where actionid=".$actionid);
 			while(($ac_data = DBfetch($db_result)) && $result)
@@ -435,7 +435,7 @@
 	{
 		global $USER_DETAILS;
 		
-		$denyed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'], PERM_READ_ONLY, PERM_MODE_LT);
+		$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_MODE_LT);
 		
 		$result=DBselect("select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,".
 				"a.error from alerts a,media_type mt,functions f,items i ".

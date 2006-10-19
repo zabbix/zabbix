@@ -86,7 +86,7 @@
 	**     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
 	**/
 
-	define("USE_PROFILING",1);
+//	define("USE_PROFILING",1);
 	define("USE_VAR_MON",1);
 	define("USE_TIME_PROF",1);
 	define("USE_MEM_PROF",1);
@@ -344,6 +344,7 @@ else
 		/* public static */ function savesqlrequest($sql) {}
 		/* public static */ function showmemoryusage($descr=null) {}
 		/* public static */ function compare_files_with_menu($menu=null) {}
+		/* public static */ function counter_up($type=NULL) {}
 	}
 }
 

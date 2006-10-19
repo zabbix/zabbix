@@ -394,11 +394,13 @@ require_once "include/items.inc.php";
 		}
 
 		global $USER_DETAILS;
+		global $ZBX_CURNODEID;
 		
 		$first_hostid_in_group = 0;
 
 		$allow_all_hosts = (in_array("allow_all_hosts",$options)) ? 1 : 0;
 		$always_select_first_host = in_array("always_select_first_host",$options) ? 1 : 0;
+		$only_current_node = in_array("only_current_node",$options) ? 1 : 0;
 
 		if(in_array("monitored_hosts",$options))
 			$with_host_status = " and h.status=".HOST_STATUS_MONITORED;
@@ -413,7 +415,9 @@ require_once "include/items.inc.php";
 			$item_table = "";		$with_items = "";
 		}
 
-		$accessed_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],$perm);
+		$with_node = "";
+
+		$accessed_hosts = get_accessible_hosts_by_user($USER_DETAILS,$perm);
 
 		if(is_null($a_groupid))
 		{
@@ -425,9 +429,11 @@ require_once "include/items.inc.php";
 
 			if($groupid > 0)
 			{
+				if($only_current_node) $with_node = " and ".DBid2nodeid('g.groupid')."=".$ZBX_CURNODEID." ";
+				
 				if(!DBfetch(DBselect("select distinct g.groupid from groups g, hosts_groups hg, hosts h".$item_table.
 					" where hg.groupid=g.groupid and h.hostid=hg.hostid and h.hostid in (".$accessed_hosts.") ".
-					" and g.groupid=".$groupid.$with_host_status.$with_items)))
+					" and g.groupid=".$groupid.$with_host_status.$with_items.$with_node)))
 				{
 					$groupid = 0;
 				}
@@ -448,8 +454,10 @@ require_once "include/items.inc.php";
 
 				if($groupid != 0)
 				{
+					if($only_current_node) $with_node = " and ".DBid2nodeid('hg.hostid')."=".$ZBX_CURNODEID." ";
+					
 					if(!DBfetch(DBselect("select hg.hostid from hosts_groups hg".
-						" where hg.groupid=".$groupid." and hg.hostid=".$hostid)))
+						" where hg.groupid=".$groupid." and hg.hostid=".$hostid.$with_node)))
 					{
 						$hostid = 0;
 					}
@@ -457,9 +465,11 @@ require_once "include/items.inc.php";
 					$witth_group = " and hg.hostid=h.hostid and hg.groupid=".$groupid;
 				}
 
+				if($only_current_node) $with_node = " and ".DBid2nodeid('h.hostid')."=".$ZBX_CURNODEID." ";
+				
 				if($db_host = DBfetch(DBselect("select distinct h.hostid,h.host from hosts h ".$item_table.$group_table.
 					" where h.hostid in (".$accessed_hosts.") "
-					.$with_host_status.$with_items.$witth_group.
+					.$with_host_status.$with_items.$witth_group.$with_node.
 					" order by h.host")))
 				{
 					$first_hostid_in_group = $db_host["hostid"];
@@ -469,8 +479,10 @@ require_once "include/items.inc.php";
 
 				if($hostid > 0)
 				{
+					if($only_current_node) $with_node = " and ".DBid2nodeid('h.hostid')."=".$ZBX_CURNODEID." ";
+					
 					if(!DBfetch(DBselect("select distinct h.hostid from hosts h".$item_table.
-						" where h.hostid=".$hostid.$with_host_status.$with_items.
+						" where h.hostid=".$hostid.$with_host_status.$with_items.$with_node.
 						" and h.hostid in (".$accessed_hosts.") ")))
 					{
 							$hostid = 0;

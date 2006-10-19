@@ -32,7 +32,7 @@ include_once "include/page_header.php";
 	
 	$_REQUEST["config"] = get_request("config",get_profile("web.hosts.config",0));
 	
-	$available_hosts = get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_WRITE,null,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID);
 	if(isset($_REQUEST["hostid"]) && $_REQUEST["hostid"] > 0 && !in_array($_REQUEST["hostid"], $available_hosts)) 
 	{
 		access_deny();
@@ -47,7 +47,7 @@ include_once "include/page_header.php";
 
 	if(isset($_REQUEST["groupid"]) && $_REQUEST["groupid"] > 0)
 	{
-		if(!in_array($_REQUEST["groupid"], get_accessible_groups_by_userid($USER_DETAILS['userid'],PERM_READ_WRITE,null,
+		if(!in_array($_REQUEST["groupid"], get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,null,
 			PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
 		{
 			access_deny();
@@ -151,6 +151,19 @@ include_once "include/page_header.php";
 		$useip = get_request("useip","no");
 
 		$groups=get_request("groups",array());
+		
+		if(count($groups) > 0)
+		{
+			if(count(array_intersect($groups,
+				get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY))) > 0)
+					access_deny();
+		}
+		else
+		{
+			if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+				access_deny();
+
+		}
 
 		if(isset($_REQUEST["hostid"]))
 		{
@@ -291,6 +304,9 @@ include_once "include/page_header.php";
 			$msg_fail	= S_CANNOT_UPDATE_GROUP;
 			$groupid = $_REQUEST["groupid"];
 		} else {
+			if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+				access_deny();
+
 			$groupid = add_host_group($_REQUEST["gname"], $hosts);
 			$action 	= AUDIT_ACTION_ADD;
 			$msg_ok		= S_GROUP_ADDED;
@@ -433,6 +449,8 @@ include_once "include/page_header.php";
 		}
 		unset($_REQUEST["delete"]);
 	}
+	
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,$ZBX_CURNODEID); /* update available_hosts after ACTIONS */
 ?>
 <?php
 	$frmForm = new CForm();
@@ -649,7 +667,7 @@ include_once "include/page_header.php";
 					S_NAME),
 				S_MEMBERS));
 
-			$available_groups = get_accessible_groups_by_userid($USER_DETAILS['userid'],PERM_READ_WRITE,null,null,$ZBX_CURNODEID);
+			$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,$ZBX_CURNODEID);
 
 			$db_groups=DBselect("select groupid,name from groups".
 					" where groupid in (".$available_groups.")".

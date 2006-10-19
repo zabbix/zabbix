@@ -1075,7 +1075,7 @@
 		$result=DBselect('select distinct t.description,t.value,t.priority,t.lastchange,h.hostid,h.host'.
 			' from hosts h,items i,triggers t, functions f '.$group_where.
 			' h.status='.HOST_STATUS_MONITORED.' and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid'.
-			' and h.hostid in ('.get_accessible_hosts_by_userid($USER_DETAILS['userid'],PERM_READ_ONLY, null, null, $nodeid).') '.
+			' and h.hostid in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, $nodeid).') '.
 			' and t.status='.TRIGGER_STATUS_ENABLED.' and i.status='.ITEM_STATUS_ACTIVE.
 			' order by t.description');
 		unset($triggers);

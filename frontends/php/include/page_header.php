@@ -52,7 +52,7 @@ COpt::profiling_start("page");
 			$ZBX_CURNODEID = $_REQUEST['switch_node'];
 	}
 	
-	if(count(get_accessible_nodes_by_userid($USER_DETAILS['userid'],PERM_READ_LIST,null,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)) <= 0)
+	if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST,null,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)) <= 0)
 	{
 		$denyed_page_requested = true;
 		$ZBX_CURNODEID = $ZBX_LOCALNODEID;
@@ -236,22 +236,22 @@ COpt::profiling_start("page");
 			$deny = true;
 		}
 		elseif($label=='admin'	&& (!in_array($USER_DETAILS['type'], array(USER_TYPE_SUPPER_ADMIN)) ||
-			!in_array($ZBX_CURNODEID, get_accessible_nodes_by_userid(
-				$USER_DETAILS['userid'],PERM_READ_WRITE,null,
+			!in_array($ZBX_CURNODEID, get_accessible_nodes_by_user(
+				$USER_DETAILS,PERM_READ_WRITE,null,
 				PERM_RES_IDS_ARRAY,$ZBX_CURNODEID))))
 		{
 			$deny = true;
 		}
 		elseif($label=='config'	&& (
 			!in_array($USER_DETAILS['type'], array(USER_TYPE_SUPPER_ADMIN, USER_TYPE_ZABBIX_ADMIN)) ||
-			!in_array($ZBX_CURNODEID, get_accessible_nodes_by_userid(
-				$USER_DETAILS['userid'],PERM_READ_LIST,null,
+			!in_array($ZBX_CURNODEID, get_accessible_nodes_by_user(
+				$USER_DETAILS,PERM_READ_LIST,null,
 				PERM_RES_IDS_ARRAY,$ZBX_CURNODEID))))
 		{
 			$deny = true;
 		}
-		elseif(!in_array($ZBX_CURNODEID, get_accessible_nodes_by_userid(
-				$USER_DETAILS['userid'],PERM_READ_LIST,null,
+		elseif(!in_array($ZBX_CURNODEID, get_accessible_nodes_by_user(
+				$USER_DETAILS,PERM_READ_LIST,null,
 				PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
 		{
 			$deny = true;
@@ -333,7 +333,8 @@ COpt::compare_files_with_menu($ZBX_MENU);
 
 		$lst_nodes = new CComboBox('switch_node', $ZBX_CURNODEID);
 		$db_nodes = DBselect('select * from nodes where nodeid in ('.
-			get_accessible_nodes_by_userid($USER_DETAILS['userid'],PERM_READ_LIST).') ');
+			get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST).') '.
+			' order by name ');
 		while($node_data = DBfetch($db_nodes))
 		{
 			$lst_nodes->AddItem($node_data['nodeid'],$node_data['name']);
