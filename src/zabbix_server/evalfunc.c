@@ -801,6 +801,7 @@ static int evaluate_NODATA(char *value,DB_ITEM	*item,int parameter)
 	}
 	else
 	{
+		/* There is no data for this period */
 		strcpy(value,"1");
 	}
 

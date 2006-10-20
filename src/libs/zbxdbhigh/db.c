@@ -641,7 +641,6 @@ static int	latest_alarm(int triggerid, int status)
 	snprintf(sql,sizeof(sql)-1,"select alarmid,value,clock from alarms where triggerid=%d order by clock desc",triggerid);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	result = DBselectN(sql,20);
-	row = DBfetch(result);
 
 	while((row=DBfetch(result)))
 	{
@@ -661,6 +660,7 @@ static int	latest_alarm(int triggerid, int status)
                 zabbix_log(LOG_LEVEL_DEBUG, "No alarms");
 	}
 	DBfree_result(result);
+	zabbix_log(LOG_LEVEL_DEBUG,"Value of latest alarm is [%d] max alarmid [%d]", value_max, alarmid_max);
 
 	return ret;
 }
