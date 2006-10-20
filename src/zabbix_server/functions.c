@@ -676,6 +676,9 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, int now)
 	value_str[0]	= '\0';
 	value_esc[0]	= '\0';
 	value_double	= 0;
+
+	/* Required for nodata() */
+	item->lastclock = now;
 	
 	if(value->type & AR_UINT64)
 	{

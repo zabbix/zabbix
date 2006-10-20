@@ -1,5 +1,6 @@
 Changes for 1.1.3:
 
+ - fixed calculation of nodata() (Alexei)
  - do not refresh view of log files (Alexei)
  - better processing of units 's', support for units 'uptime' (Alexei)
  - fixed data.sql to set correct item type UIN64 where required (Alexei)
