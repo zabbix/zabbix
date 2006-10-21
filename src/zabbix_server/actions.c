@@ -501,7 +501,7 @@ static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigge
 	{
 		sprintf(sql,"%s",trigger->description); /* NOTE: 'sql' variable used as temporally veriable */
 		
-		substitute_simple_macros(trigger, NULL, sql, sizeof(sql), MACRO_TYPE_TRIGGER_DESCRIPTION);
+		substitute_simple_macros(0, trigger, NULL, sql, sizeof(sql), MACRO_TYPE_TRIGGER_DESCRIPTION);
 		
 		if(condition->operator == CONDITION_OPERATOR_LIKE)
 		{
@@ -713,8 +713,8 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 			
 			strscpy(action.subject,row[2]);
 			strscpy(action.message,row[3]);
-			substitute_macros(trigger, &action, action.message, sizeof(action.message));
-			substitute_macros(trigger, &action, action.subject, sizeof(action.subject));
+			substitute_macros(alarmid, trigger, &action, action.message, sizeof(action.message));
+			substitute_macros(alarmid, trigger, &action, action.subject, sizeof(action.subject));
 
 			action.recipient=atoi(row[4]);
 			action.maxrepeats=atoi(row[5]);

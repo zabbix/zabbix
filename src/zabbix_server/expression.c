@@ -571,10 +571,11 @@ int	evaluate(int *result,char *exp, char *error, int maxerrlen)
 #define MVAR_TRIGGER_STATUS_OLD		"{STATUS}"
 #define MVAR_TRIGGER_SEVERITY		"{TRIGGER.SEVERITY}"
 #define MVAR_TRIGGER_ID			"{TRIGGER.ID}"
+#define MVAR_EVENT_ID			"{EVENT.ID}"
 
 #define STR_UNKNOWN_VARIAVLE		"*UNKNOWN*"
 
-void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data, int dala_max_len, int macro_type)
+void	substitute_simple_macros(int alarmid, DB_TRIGGER *trigger, DB_ACTION *action, char *data, int dala_max_len, int macro_type)
 {
 	char	sql[MAX_STRING_LEN];
 
@@ -614,7 +615,7 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data
 			var_len = strlen(MVAR_TRIGGER_NAME);
 
 			snprintf(replace_to, sizeof(replace_to), "%s", trigger->description);
-			substitute_simple_macros(trigger, action, replace_to, sizeof(replace_to), MACRO_TYPE_TRIGGER_DESCRIPTION);
+			substitute_simple_macros(alarmid, trigger, action, replace_to, sizeof(replace_to), MACRO_TYPE_TRIGGER_DESCRIPTION);
 		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY | MACRO_TYPE_TRIGGER_DESCRIPTION) &&
 			strncmp(pr, MVAR_HOST_NAME, strlen(MVAR_HOST_NAME)) == 0)
@@ -742,6 +743,14 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data
 			snprintf(replace_to, sizeof(replace_to), "%d", trigger->triggerid);
 		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) && 
+			strncmp(pr, MVAR_EVENT_ID, strlen(MVAR_EVENT_ID)) == 0)
+		{
+			/* NOTE: if you make changes for this bloc, don't forgot MVAR_TRIGGER_STATUS block */
+			var_len = strlen(MVAR_EVENT_ID);
+
+			snprintf(replace_to, sizeof(replace_to), "%d", alarmid);
+		}
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) && 
 			strncmp(pr, MVAR_TRIGGER_SEVERITY, strlen(MVAR_TRIGGER_SEVERITY)) == 0)
 		{
 			var_len = strlen(MVAR_TRIGGER_SEVERITY);
@@ -785,7 +794,7 @@ void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data
  * Comments: example: "{127.0.0.1:system[procload].last(0)}" to "1.34"        *
  *                                                                            *
  ******************************************************************************/
-void	substitute_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data, int dala_max_len)
+void	substitute_macros(int alarmid, DB_TRIGGER *trigger, DB_ACTION *action, char *data, int dala_max_len)
 {
 	char	
 		str_out[MAX_STRING_LEN],
@@ -808,7 +817,7 @@ void	substitute_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data, int d
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_macros([%s])",data);
 
-	substitute_simple_macros(trigger, action, data, dala_max_len, MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY);
+	substitute_simple_macros(alarmid, trigger, action, data, dala_max_len, MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY);
 
 	*str_out = '\0';
 	outlen = sizeof(str_out) - 1;
