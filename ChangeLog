@@ -1,5 +1,9 @@
 Changes for 1.1.3:
-
+ 
+ - support of environment variables for aleert scripts:
+   ZABBIX_ALERT_ID,ZABBIX_ACTION_ID,ZABBIX_ALERT_TIME,ZABBIX_ALERT_MEDIATYPEID,
+   ZABBIX_ALERT_STATUS,ZABBIX_ALERT_RETRIES,ZABBIX_ALERT_DELAY (Alexei)
+ - added support of macro {TRIGGER.ID}
  - fixed calculation of nodata() (Alexei)
  - do not refresh view of log files (Alexei)
  - better processing of units 's', support for units 'uptime' (Alexei)
