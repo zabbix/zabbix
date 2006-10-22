@@ -1,5 +1,6 @@
 Changes for 1.1.3:
 
+ - fixed occasional LIBSQLORA8-30002: Memory allocation error. (Alexei)
  - added support of macro {EVENT.ID} (Alexei)
  - support of environment variables for aleert scripts:
    ZABBIX_ALERT_ID,ZABBIX_ACTION_ID,ZABBIX_ALERT_TIME,ZABBIX_ALERT_MEDIATYPEID,
