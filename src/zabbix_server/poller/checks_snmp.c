@@ -41,7 +41,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 	int status;
 
 	unsigned char *ip;
-	char 	*p;
+	char 	*p,*c;
 	double dbl;
 
 	char error[MAX_STRING_LEN];
@@ -286,6 +286,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 #endif
 			)
 			{
+				zabbix_log( LOG_LEVEL_DEBUG, "ASN_INTEGER");
 				SET_UI64_RESULT(value, (zbx_uint64_t)*vars->val.integer);
 /*				*result=(long)*vars->val.integer;
 				snprintf(result_str,MAX_STRING_LEN-1,"%ld",(long)*vars->val.integer);*/
@@ -293,6 +294,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 #ifdef OPAQUE_SPECIAL_TYPES
 			else if(vars->type == ASN_FLOAT)
 			{
+				zabbix_log( LOG_LEVEL_DEBUG, "ASN_FLOAT");
 /*				*result=(double)*vars->val.floatVal;
 				snprintf(result_str,MAX_STRING_LEN-1,"%f",(double)*vars->val.floatVal);*/
 				
@@ -300,6 +302,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 			}
 			else if(vars->type == ASN_DOUBLE)
 			{
+				zabbix_log( LOG_LEVEL_DEBUG, "ASN_DOUBLE");
 /*				*result=(double)*vars->val.doubleVal;
 				snprintf(result_str,MAX_STRING_LEN-1,"%lf",(double)*vars->val.doubleVal);*/
 				SET_DBL_RESULT(value, *vars->val.doubleVal);
@@ -307,6 +310,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 #endif
 			else if(vars->type == ASN_OCTET_STR)
 			{
+				zabbix_log( LOG_LEVEL_DEBUG, "ASN_OCTET_STR");
 /*				memcpy(result_str,vars->val.string,vars->val_len);
 				result_str[vars->val_len] = '\0';*/
 				if(item->value_type == ITEM_VALUE_TYPE_FLOAT)
@@ -337,13 +341,27 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 				}
 				else
 				{
-					p = malloc(vars->val_len+1);
+					zabbix_log( LOG_LEVEL_DEBUG, "ASN_OCTET_STR [%s]", vars->val.string);
+					zabbix_log( LOG_LEVEL_DEBUG, "ASN_OCTET_STR [%d]", vars->val_len);
+
+					p = malloc(1024);
 					if(p)
 					{
-						memcpy(p, vars->val.string, vars->val_len);
-						p[vars->val_len] = '\0';
+						memset(p,0,1024);
+						snprint_value(p, 1023, vars->name, vars->name_length, vars);
+						/* Skip STRING: and STRING_HEX: */
+						c=strchr(p,':');
+						if(c==NULL)
+						{
+							SET_STR_RESULT(value, strdup(p));
+						}
+						else
+						{
+							SET_STR_RESULT(value, strdup(c+1));
+						}
 
-						SET_STR_RESULT(value, p);
+						zabbix_log( LOG_LEVEL_DEBUG, "ASN_OCTET_STR [%s]", p);
+						free(p);
 					}
 					else
 					{
@@ -351,10 +369,27 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 						zabbix_log( LOG_LEVEL_ERR, "%s", error);
 						SET_MSG_RESULT(value, strdup(error));
 					}
+					
+/*					p = malloc(vars->val_len+1);
+					if(p)
+					{
+						memcpy(p, vars->val.string, vars->val_len);
+						p[vars->val_len] = '\0';
+
+						SET_STR_RESULT(value, p);
+						zabbix_log( LOG_LEVEL_DEBUG, "ASN_OCTET_STR [%s]", p);
+					}
+					else
+					{
+						snprintf(error,MAX_STRING_LEN-1,"Cannot allocate required memory");
+						zabbix_log( LOG_LEVEL_ERR, "%s", error);
+						SET_MSG_RESULT(value, strdup(error));
+					}*/
 				}
 			}
 			else if(vars->type == ASN_IPADDRESS)
 			{
+				zabbix_log( LOG_LEVEL_DEBUG, "ASN_IPADDRESS");
 /*				ip = vars->val.string;
 				snprintf(result_str,MAX_STRING_LEN-1,"%d.%d.%d.%d",ip[0],ip[1],ip[2],ip[3]);*/
 /*				if(item->type == 0)
