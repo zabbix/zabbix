@@ -1,5 +1,6 @@
 Changes for 1.1.3:
 
+ - fixed system.swap.in[] and system.swap.out[] under Linux 2.4 (Alexei)
  - fixed occasional LIBSQLORA8-30002: Memory allocation error. (Alexei)
  - added support of macro {EVENT.ID} (Alexei)
  - support of environment variables for aleert scripts:
