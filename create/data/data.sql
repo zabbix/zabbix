@@ -160,9 +160,9 @@ insert into help_items values(0,'vm.memory.size[&lt;mode&gt;]','Amount of memory
 --
 
 INSERT INTO items VALUES (10001,0,'','',161,10001,'Free memory','vm.memory.size[free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',0,0);
-INSERT INTO items VALUES (10002,0,'','',161,10001,'Free disk space on $1','vfs.fs.size[/,free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','1','',0,'',0,0);
-INSERT INTO items VALUES (10003,0,'','',161,10001,'Free disk space on $1','vfs.fs.size[/tmp,free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','1','',0,'',0,0);
-INSERT INTO items VALUES (10004,0,'','',161,10001,'Free disk space on $1','vfs.fs.size[/usr,free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','1','',0,'',0,0);
+INSERT INTO items VALUES (10002,0,'','',161,10001,'Free disk space on $1','vfs.fs.size[/,free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',1,0,NULL,'',0,'','','1024','',0,'',0,0);
+INSERT INTO items VALUES (10003,0,'','',161,10001,'Free disk space on $1','vfs.fs.size[/tmp,free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',1,0,NULL,'',0,'','','1024','',0,'',0,0);
+INSERT INTO items VALUES (10004,0,'','',161,10001,'Free disk space on $1','vfs.fs.size[/usr,free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',1,0,NULL,'',0,'','','1024','',0,'',0,0);
 INSERT INTO items VALUES (10005,0,'','',161,10001,'Free number of inodes on $1','vfs.fs.inode[/,free]',60,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10006,0,'','',161,10001,'Free number of inodes on $1','vfs.fs.inode[/opt,free]',60,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10007,0,'','',161,10001,'Free number of inodes on $1','vfs.fs.inode[/tmp,free]',60,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,0);
@@ -179,10 +179,10 @@ INSERT INTO items VALUES (10017,0,'','',161,10001,'Checksum of $1','vfs.file.cks
 INSERT INTO items VALUES (10018,0,'','',161,10001,'Checksum of $1','vfs.file.cksum[/vmlinuz]',600,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10019,0,'','',161,10001,'Checksum of $1','vfs.file.cksum[/etc/passwd]',600,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10020,0,'','',161,10001,'Ping to the server (TCP)','agent.ping',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,0);
-INSERT INTO items VALUES (10021,0,'','',161,10001,'Free disk space on $1','vfs.fs.size[/home,free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','1','',0,'',0,0);
+INSERT INTO items VALUES (10021,0,'','',161,10001,'Free disk space on $1','vfs.fs.size[/home,free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',1,0,NULL,'',0,'','','1024','',0,'',0,0);
 INSERT INTO items VALUES (10022,0,'','',161,10001,'Free number of inodes on $1','vfs.fs.inode[/home,free]',60,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,0);
-INSERT INTO items VALUES (10023,0,'','',161,10001,'Free disk space on $1','vfs.fs.size[/var,free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','1','',0,'',0,0);
-INSERT INTO items VALUES (10024,0,'','',161,10001,'Free disk space on $1','vfs.fs.size[/opt,free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','1','',0,'',0,0);
+INSERT INTO items VALUES (10023,0,'','',161,10001,'Free disk space on $1','vfs.fs.size[/var,free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',1,0,NULL,'',0,'','','1024','',0,'',0,0);
+INSERT INTO items VALUES (10024,0,'','',161,10001,'Free disk space on $1','vfs.fs.size[/opt,free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',1,0,NULL,'',0,'','','1024','',0,'',0,0);
 INSERT INTO items VALUES (10025,0,'','',161,10001,'Host uptime','system.uptime',300,7,365,0,NULL,NULL,NULL,0,3,'','uptime',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10026,0,'','',161,10001,'Total memory','vm.memory.size[total]',1800,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10027,0,'','',161,10001,'Shared memory','vm.memory.size[shared]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',0,0);
@@ -224,11 +224,11 @@ INSERT INTO items VALUES (10063,0,'','',161,10001,'Total number of inodes on $1'
 INSERT INTO items VALUES (10064,0,'','',161,10001,'Total number of inodes on $1','vfs.fs.inode[/tmp,total]',3600,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10065,0,'','',161,10001,'Total number of inodes on $1','vfs.fs.inode[/usr,total]',3600,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10066,0,'','',161,10001,'Total number of inodes on $1','vfs.fs.inode[/home,total]',3600,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,0);
-INSERT INTO items VALUES (10067,0,'','',161,10001,'Total disk space on $1','vfs.fs.size[/,total]',3600,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',0,0);
-INSERT INTO items VALUES (10068,0,'','',161,10001,'Total disk space on $1','vfs.fs.size[/opt,total]',3600,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',0,0);
-INSERT INTO items VALUES (10069,0,'','',161,10001,'Total disk space on $1','vfs.fs.size[/tmp,total]',3600,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',0,0);
-INSERT INTO items VALUES (10070,0,'','',161,10001,'Total disk space on $1','vfs.fs.size[/usr,total]',3600,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',0,0);
-INSERT INTO items VALUES (10071,0,'','',161,10001,'Total disk space on $1','vfs.fs.size[/home,total]',3600,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',0,0);
+INSERT INTO items VALUES (10067,0,'','',161,10001,'Total disk space on $1','vfs.fs.size[/,total]',3600,7,365,0,NULL,NULL,NULL,0,3,'','B',1,0,NULL,'',0,'','','1024','',0,'',0,0);
+INSERT INTO items VALUES (10068,0,'','',161,10001,'Total disk space on $1','vfs.fs.size[/opt,total]',3600,7,365,0,NULL,NULL,NULL,0,3,'','B',1,0,NULL,'',0,'','','1024','',0,'',0,0);
+INSERT INTO items VALUES (10069,0,'','',161,10001,'Total disk space on $1','vfs.fs.size[/tmp,total]',3600,7,365,0,NULL,NULL,NULL,0,3,'','B',1,0,NULL,'',0,'','','1024','',0,'',0,0);
+INSERT INTO items VALUES (10070,0,'','',161,10001,'Total disk space on $1','vfs.fs.size[/usr,total]',3600,7,365,0,NULL,NULL,NULL,0,3,'','B',1,0,NULL,'',0,'','','1024','',0,'',0,0);
+INSERT INTO items VALUES (10071,0,'','',161,10001,'Total disk space on $1','vfs.fs.size[/home,total]',3600,7,365,0,NULL,NULL,NULL,0,3,'','B',1,0,NULL,'',0,'','','1024','',0,'',0,0);
 INSERT INTO items VALUES (10072,0,'','',161,10001,'Input statistic on interface lo','net.if.in[lo]',5,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10075,0,'','',161,10001,'Input statistic on interface eth0','net.if.in[eth0]',5,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10078,0,'','',161,10001,'Input statistic on interface eth1','net.if.in[eth1]',5,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','0','',0,'',0,0);
@@ -247,12 +247,12 @@ INSERT INTO items VALUES (10408,0,'','',161,10001,'Number of read bytes on disk 
 INSERT INTO items VALUES (10409,0,'','',161,10001,'Number of write bytes on disk hdb (1min)','vfs.dev.write[hdb,,avg1]',5,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10410,0,'','',161,10001,'Number of write bytes on disk hdb (5min)','vfs.dev.write[hdb,,avg5]',10,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10411,0,'','',161,10001,'Number of write bytes on disk hdb (15min)','vfs.dev.write[hdb,,avg15]',20,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','0','',0,'',0,0);
-INSERT INTO items VALUES (10412,0,'','',161,10001,'Used disk space on $1','vfs.fs.size[/,used]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',0,0);
-INSERT INTO items VALUES (10413,0,'','',161,10001,'Used disk space on $1','vfs.fs.size[/opt,used]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',0,0);
-INSERT INTO items VALUES (10414,0,'','',161,10001,'Used disk space on $1','vfs.fs.size[/var,used]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',0,0);
-INSERT INTO items VALUES (10415,0,'','',161,10001,'Used disk space on $1','vfs.fs.size[/tmp,used]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',0,0);
-INSERT INTO items VALUES (10416,0,'','',161,10001,'Used disk space on $1','vfs.fs.size[/usr,used]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',0,0);
-INSERT INTO items VALUES (10417,0,'','',161,10001,'Used disk space on $1','vfs.fs.size[/home,used]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',0,0);
+INSERT INTO items VALUES (10412,0,'','',161,10001,'Used disk space on $1','vfs.fs.size[/,used]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',1,0,NULL,'',0,'','','1024','',0,'',0,0);
+INSERT INTO items VALUES (10413,0,'','',161,10001,'Used disk space on $1','vfs.fs.size[/opt,used]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',1,0,NULL,'',0,'','','1024','',0,'',0,0);
+INSERT INTO items VALUES (10414,0,'','',161,10001,'Used disk space on $1','vfs.fs.size[/var,used]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',1,0,NULL,'',0,'','','1024','',0,'',0,0);
+INSERT INTO items VALUES (10415,0,'','',161,10001,'Used disk space on $1','vfs.fs.size[/tmp,used]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',1,0,NULL,'',0,'','','1024','',0,'',0,0);
+INSERT INTO items VALUES (10416,0,'','',161,10001,'Used disk space on $1','vfs.fs.size[/usr,used]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',1,0,NULL,'',0,'','','1024','',0,'',0,0);
+INSERT INTO items VALUES (10417,0,'','',161,10001,'Used disk space on $1','vfs.fs.size[/home,used]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',1,0,NULL,'',0,'','','1024','',0,'',0,0);
 INSERT INTO items VALUES (10418,0,'','',161,10001,'Temperature of mainboard','sensor[temp1]',30,7,365,0,NULL,NULL,NULL,0,0,'','C',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10419,0,'','',161,10001,'Temperature of CPU 1of2','sensor[temp2]',30,7,365,0,NULL,NULL,NULL,0,0,'','C',0,0,NULL,'',0,'','','0','',0,'',0,0);
 INSERT INTO items VALUES (10420,0,'','',161,10001,'Temperature of CPU 2of2','sensor[temp3]',30,7,365,0,NULL,NULL,NULL,0,0,'','C',0,0,NULL,'',0,'','','0','',0,'',0,0);
