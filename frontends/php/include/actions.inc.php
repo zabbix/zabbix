@@ -19,6 +19,54 @@
 **/
 ?>
 <?php
+	function	action_accessiable($actionid,$perm)
+	{
+		global $USER_DETAILS;
+
+		$result = false;
+
+		if(DBselect("select actionid from actions where actionid=".$actionid.
+			" and ".DBid2nodeid('actionid')." in (".get_accessible_nodes_by_user($USER_DETAILS,$perm).")"))
+		{
+			$result = true;
+			
+			$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
+			$denyed_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
+			
+			$db_result = DBselect("select * from conditions where actionid=".$actionid);
+			while(($ac_data = DBfetch($db_result)) && $result)
+			{
+				if($ac_data['operator'] != 0) continue;
+
+				switch($ac_data['conditiontype'])
+				{
+					case CONDITION_TYPE_GROUP:
+						if(in_array($ac_data['value'],explode(',',$denyed_groups)))
+						{
+							$result = false;
+						}
+						break;
+					case CONDITION_TYPE_HOST:
+						if(in_array($ac_data['value'],explode(',',$denyed_hosts)))
+						{
+							$result = false;
+						}
+						break;
+					case CONDITION_TYPE_TRIGGER:
+						if(!DBfetch(DBselect("select distinct t.*".
+							" from triggers t,items i,functions f".
+							" where f.itemid=i.itemid and t.triggerid=f.triggerid".
+							" and i.hostid not in (".$denyed_hosts.") and t.triggerid=".$ac_data['value'])))
+						{
+							$result = false;
+						}
+						break;
+				}
+			}
+		}
+		return $result;
+	}
+
 	function	get_action_by_actionid($actionid)
 	{
 		$sql="select * from actions where actionid=$actionid"; 
@@ -91,39 +139,17 @@
 		return $result;
 	}
 
-	# Delete Action by userid
-
-	function	delete_actions_by_userid( $userid )
-	{
-		$sql="select actionid from actions where userid=$userid";
-		$result=DBexecute($sql);
-		while($row=DBfetch($result))
-		{
-			delete_alert_by_actionid($row["actionid"]);
-		}
-
-		$sql="delete from actions where userid=$userid";
-		return	DBexecute($sql);
-	}
-
-	# Delete Conditions associated with actionid
-
-	function	delete_conditions_by_actionid($actionid)
-	{
-		$sql="delete from conditions where actionid=$actionid";
-		return	DBexecute($sql);
-	}
-
 	# Delete Action
 
 	function	delete_action( $actionid )
 	{
-		delete_conditions_by_actionid($actionid);
-		delete_alert_by_actionid($actionid);
+		$return = DBexecute('delete from conditions where actionid='.$actionid);
 
-		$sql="delete from actions where actionid=$actionid";
-		$result=DBexecute($sql);
+		if($return)
+			$result = DBexecute('delete from alerts where actionid='.$actionid);
 
+		if($return)
+			$result = DBexecute('delete from actions where actionid='.$actionid);
 
 		return $result;
 	}
@@ -407,21 +433,24 @@
 
 	function get_history_of_actions($start,$num)
 	{
-		$sql="select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,".
-		"a.error from alerts a,media_type mt where mt.mediatypeid=a.mediatypeid order by a.clock".
-		" desc";
-		$result=DBselect($sql,10*$start+$num);
+		global $USER_DETAILS;
+		
+		$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_MODE_LT);
+		
+		$result=DBselect("select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,".
+				"a.error from alerts a,media_type mt,functions f,items i ".
+				" where mt.mediatypeid=a.mediatypeid and a.triggerid=f.triggerid and f.itemid=i.itemid ".
+				" and i.hostid not in (".$denyed_hosts.")".
+				" order by a.clock".
+				" desc",
+			10*$start+$num);
 
 		$table = new CTableInfo(S_NO_ACTIONS_FOUND);
-		$table->setHeader(array(S_TIME, S_TYPE, S_STATUS, S_RECIPIENTS, S_SUBJECT, S_MESSAGE, S_ERROR));
+		$table->SetHeader(array(S_TIME, S_TYPE, S_STATUS, S_RECIPIENTS, S_SUBJECT, S_MESSAGE, S_ERROR));
 		$col=0;
 		$skip=$start;
 		while(($row=DBfetch($result))&&($col<$num))
 		{
-			if(!check_anyright("Default permission","R"))
-			{
-				continue;
-			}
 			if($skip > 0) 
 			{
 				$skip--;
@@ -448,14 +477,14 @@
 			{
 				$error=new CSpan($row["error"],"on");
 			}
-			$table->addRow(array(
-			$time,
-			$row["description"],
-			$status,
-			$sendto,
-			$subject,
-			$message,
-			$error));
+			$table->AddRow(array(
+				$time,
+				$row["description"],
+				$status,
+				$sendto,
+				$subject,
+				$message,
+				$error));
 			$col++;
 		}
 

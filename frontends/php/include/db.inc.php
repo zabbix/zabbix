@@ -26,15 +26,12 @@
 //	$DB_TYPE	="POSTGRESQL";
 	$DB_TYPE	="MYSQL";
 	$DB_SERVER	="localhost";
-	$DB_DATABASE	="node4";
+	$DB_DATABASE	="1_3_rights1";
 	$DB_USER	="root";
 	$DB_PASSWORD	="";
 // END OF DATABASE CONFIGURATION
 
 	global $USER_DETAILS;
-
-	$ZBX_CURNODEID = 4; // Selected node
-	$ZBX_LOCALNODEID = 4; // Local node
 
 	if($DB_TYPE == "MYSQL")
 	{
@@ -81,6 +78,25 @@
 			SELECT a FROM tbe WHERE ROWNUM < 15 // ONLY < 15
 			SELECT * FROM (SELECT ROWNUM as RN, * FROM tbl) WHERE RN BETWEEN 6 AND 15
 	*/
+
+	function	DBstart()
+	{
+		/* TODO *//* start transaction */
+	}
+	
+	function	DBend($result)
+	{
+		/* end transaction *//* TODO */
+
+		if($result)
+		{ // OK
+			/* commit TODO */
+		}
+		else
+		{ // FAIL
+			/* rollback  TODO */
+		}
+	}
 
 	function	DBselect($query, $limit='NO')
 	{
@@ -153,11 +169,11 @@ COpt::savesqlrequest($query);
 				error("Query: $query");
 			}
 		}
-		if($DB_TYPE == "POSTGRESQL")
+		else if($DB_TYPE == "POSTGRESQL")
 		{
 			$result=pg_exec($DB,$query);
 		}
-		if($DB_TYPE == "ORACLE")
+		else if($DB_TYPE == "ORACLE")
 		{
 
 			return DBselect($query);
@@ -229,6 +245,7 @@ COpt::savesqlrequest($query);
 		}
 	}
 
+/*
 	function	DBinsert_id($result,$table,$field)
 	{
 		global	$DB,$DB_TYPE;
@@ -241,25 +258,17 @@ COpt::savesqlrequest($query);
 		if($DB_TYPE == "POSTGRESQL")
 		{
 			$oid=pg_getlastoid($result);
-//			echo "OID:$oid<br>";
 			$sql="select $field from $table where oid=$oid";
 			$result=DBselect($sql);
 			return get_field($result,0,0);
 		}
 		if($DB_TYPE == "ORACLE")
 		{
-/*			$sql="select max($field) from $table";
-			$parse=DBexecute($sql);
-			while(OCIFetch($parse))
-			{
-				$colvalue = OCIResult($parse, 1);
-				return $colvalue;
-			}
-*/
 			$res = DBfetch(DBselect('select '.$table.'_'.$field.'.currval from dual'));
 			return $res[0];
 		}
 	}
+*/
 
 /* string value prepearing */
 if($DB_TYPE == "ORACLE") {	
@@ -271,4 +280,30 @@ if($DB_TYPE == "ORACLE") {
 		return "'".addslashes($var)."'";
 	}
 }
+
+	function DBid2nodeid($id_name)
+	{
+		return '('.$id_name.' div 100000000000000)';
+	}
+
+	function id2nodeid($id_var)
+	{
+		return (int)($id_var / 100000000000000);
+	}
+
+	function	get_dbid($table,$field)
+	{
+		global	$ZBX_CURNODEID;
+
+		$result=DBselect("select max($field) as id from $table where ".DBid2nodeid($field)." in (".$ZBX_CURNODEID.")");
+		$row=DBfetch($result);
+		if($row && !is_null($row["id"]))
+		{
+			return	++$row["id"];
+		}
+		else
+		{
+			return $ZBX_CURNODEID*100000000000000+1;
+		}
+	}
 ?>

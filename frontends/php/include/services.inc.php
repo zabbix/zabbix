@@ -21,10 +21,7 @@
 <?php
 	function	add_service($name,$triggerid,$algorithm,$showsla,$goodsla,$sortorder,$service_times=array())
 	{
-
-var_dump($service_times);
-
-		if(is_null($triggerid)) $triggerid = 'NULL';
+		if(is_null($triggerid) || $triggerid==0) $triggerid = 'NULL';
 
 		$serviceid=get_dbid("services","serviceid");
 
@@ -51,7 +48,7 @@ var_dump($service_times);
 
 	function	update_service($serviceid,$name,$triggerid,$algorithm,$showsla,$goodsla,$sortorder,$service_times=array())
 	{
-		if(is_null($triggerid)) $triggerid = 'NULL';
+		if(is_null($triggerid) || $triggerid==0) $triggerid = 'NULL';
 
 		$result = DBexecute("update services set name=".zbx_dbstr($name).",triggerid=$triggerid,status=0,algorithm=$algorithm,showsla=$showsla,goodsla=$goodsla,sortorder=$sortorder where serviceid=$serviceid");
 
@@ -65,13 +62,17 @@ var_dump($service_times);
 		return $result;
 	}
 
-	function	add_host_to_services($hostid,$serviceid)
+	function	add_host_to_services($hostid, $serviceid)
 	{
-		$sql="select distinct t.triggerid,t.description from triggers t,hosts h,items i,functions f where h.hostid=$hostid and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid";
-		$result=DBselect($sql);
+		global $ZBX_CURNODEID;
+
+		$result = DBselect('select distinct h.host,t.triggerid,t.description '.
+			' from triggers t,hosts h,items i,functions f where h.hostid='.$hostid.' and h.hostid=i.hostid '.
+			' and i.itemid=f.itemid and f.triggerid=t.triggerid '.
+			' and '.DBid2nodeid('t.triggerid').'='.$ZBX_CURNODEID);
 		while($row=DBfetch($result))
 		{
-			$serviceid2=add_service($row["description"],$row["triggerid"],"on",0,"off",99,0);
+			$serviceid2 = add_service(expand_trigger_description_by_data($row),$row["triggerid"],"on",0,"off",99);
 			add_service_link($serviceid2,$serviceid,0);
 		}
 		return	1;
@@ -79,9 +80,7 @@ var_dump($service_times);
 
 	function	is_service_hardlinked($serviceid)
 	{
-		$sql="select count(*) as cnt from services_links where servicedownid=$serviceid and soft=0";
-		$result=DBselect($sql);
-		$row=DBfetch($result);
+		$row = DBfetch(DBselect("select count(*) as cnt from services_links where servicedownid=".$serviceid." and soft=0"));
 		if($row["cnt"]>0)
 		{
 			return	TRUE;
@@ -103,8 +102,6 @@ var_dump($service_times);
 		{
 			return	$result;
 		}
-	// delete service permisions
-		DBexecute('delete from rights where name=\'Service\' and id='.$serviceid);
 
 		$sql="delete from services where serviceid=$serviceid";
 		return DBexecute($sql);
@@ -114,9 +111,7 @@ var_dump($service_times);
 	# Warning: recursive function
 	function	does_service_depend_on_the_service($serviceid,$serviceid2)
 	{
-#		echo "Serviceid:$serviceid Triggerid:$serviceid2<br>";
 		$service=get_service_by_serviceid($serviceid);
-#		echo "Service status:".$service["status"]."<br>";
 		if($service["status"]==0)
 		{
 			return	FALSE;
@@ -130,9 +125,7 @@ var_dump($service_times);
 			
 		}
 
-		$sql="select serviceupid from services_links where servicedownid=$serviceid2 and soft=0";
-#		echo $sql."<br>";
-		$result=DBselect($sql);
+		$result=DBselect("select serviceupid from services_links where servicedownid=$serviceid2 and soft=0");
 		while($row=DBfetch($result))
 		{
 			if(does_service_depend_on_the_service($serviceid,$row["serviceupid"]) == TRUE)
@@ -145,9 +138,7 @@ var_dump($service_times);
 
 	function	service_has_parent($serviceid)
 	{
-		$sql="select count(*) as cnt from services_links where servicedownid=$serviceid";
-		$result=DBselect($sql);
-		$row=DBfetch($result);
+		$row = DBfetch(DBselect("select count(*) as cnt from services_links where servicedownid=$serviceid"));
 		if($row["cnt"]>0)
 		{
 			return	TRUE;
@@ -157,9 +148,7 @@ var_dump($service_times);
 
 	function	service_has_no_this_parent($parentid,$serviceid)
 	{
-		$sql="select count(*) as cnt from services_links where serviceupid=$parentid and servicedownid=$serviceid";
-		$result=DBselect($sql);
-		$row=DBfetch($result);
+		$row = DBfetch(DBselect("select count(*) as cnt from services_links where serviceupid=$parentid and servicedownid=$serviceid"));
 		if($row["cnt"]>0)
 		{
 			return	FALSE;
@@ -171,6 +160,7 @@ var_dump($service_times);
 	{
 		if( ($softlink==0) && (is_service_hardlinked($servicedownid)==true) )
 		{
+			error("cannot link hardlinked service.");
 			return	false;
 		}
 
@@ -485,20 +475,17 @@ SDI(
 
 	function	get_num_of_service_childs($serviceid)
 	{
-		$sql="select count(*) as cnt from services_links where serviceupid=$serviceid";
-		$result=DBselect($sql);
-		$row=DBfetch($result);
+		$row = DBfetch(DBselect("select count(distinct servicedownid) as cnt from services_links ".
+					" where serviceupid=".$serviceid));
 		return	$row["cnt"];
 	}
 
 	function	get_service_by_serviceid($serviceid)
 	{
-		$sql="select * from services where serviceid=$serviceid";
-		$result=DBselect($sql);
-		$res = DBfetch($result);
+		$res = DBfetch(DBselect("select * from services where serviceid=".$serviceid));
 		if(!$res)
 		{
-			error("No service with serviceid=[$serviceid]");
+			error("No service with serviceid=[".$serviceid."]");
 			return	FALSE;
 		}
 		return $res;

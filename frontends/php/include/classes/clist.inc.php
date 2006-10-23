@@ -19,9 +19,48 @@
 **/
 ?>
 <?php
+	class CListItem extends CTag
+	{
+/* public */
+		function CListItem($value)
+		{
+			parent::CTag('li','yes');
 
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// TODO REMOVE THIS FILE FROM CVS
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			$this->AddItem($value);
+		}
+	}
+
+	class CList extends CTag
+	{
+/* public */
+		function CList($value=NULL,$class=NULL)
+		{
+			parent::CTag('ul','yes');
+			$this->tag_end = '';
+			$this->AddItem($value);
+			$this->SetClass($class);
+		}
+		function PrepareItem($value=NULL)
+		{
+			if(!is_null($value))
+			{
+				$value = new CListItem($value);
+			}
+			return $value;
+		}
+		
+		function AddItem($value)
+		{
+			if(is_array($value))
+			{
+				foreach($value as $el)
+					parent::AddItem($this->PrepareItem($el));
+			}
+			else
+			{
+				parent::AddItem($this->PrepareItem($value));
+			}
+		}
+	}
 
 ?>

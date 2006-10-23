@@ -19,6 +19,63 @@
 **/
 ?>
 <?php
+	function	item_type2str($type)
+	{
+		switch($type)
+		{
+			case 0:	$type = S_ZABBIX_AGENT;			break;
+			case 1:	$type = S_SNMPV1_AGENT;			break;
+			case 2:	$type = S_ZABBIX_TRAPPER;		break;
+			case 3:	$type = S_SIMPLE_CHECK;			break;
+			case 4:	$type = S_SNMPV2_AGENT;			break;
+			case 5:	$type = S_ZABBIX_INTERNAL;		break;
+			case 6:	$type = S_SNMPV3_AGENT;			break;
+			case 7:	$type = S_ZABBIX_AGENT_ACTIVE;		break;
+			case 8:	$type = S_ZABBIX_AGGREGATE;		break;
+			default:$type = S_UNKNOWN;			break;
+		}
+		return $type;
+	}
+
+	function	item_value_type2str($value_type)
+	{
+		switch($value_type)
+		{
+			case ITEM_VALUE_TYPE_UINT64:	$value_type = S_NUMERIC_UINT64;		break;
+			case ITEM_VALUE_TYPE_FLOAT:	$value_type = S_NUMERIC_FLOAT;		break;
+			case ITEM_VALUE_TYPE_STR:	$value_type = S_CHARACTER;		break;
+			case ITEM_VALUE_TYPE_LOG:	$value_type = S_LOG;			break;
+			case ITEM_VALUE_TYPE_TEXT:	$value_type = S_TEXT;			break;
+			default:$value_type = S_UNKNOWN;			break;
+		}
+		return $value_type;
+	}
+
+	function	item_status2str($status)
+	{
+		switch($status)
+		{
+			case 0:	$status = S_ACTIVE;		break;
+			case 1:	$status = S_DISABLED;		break;
+			case 3:	
+			default:
+				$status = S_UNKNOWN;		break;
+		}
+		return $status;
+	}
+	
+	function	item_status2style($status)
+	{
+		switch($status)
+		{
+			case 0:	$status = 'off';	break;
+			case 1:	$status = 'on';		break;
+			case 3:	
+			default:
+				$status = 'uncnown';	break;
+		}
+		return $status;
+	}
 	# Update Item definition for selected group
 
 	function	update_item_in_group($groupid,$itemid,$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,$valuemapid,$delay_flex,$applications)
@@ -79,13 +136,8 @@
 		$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,$formula,$trends,$logtimefmt,
 		$valuemapid,$delay_flex,$applications,$templateid=0)
 	{
-		$host=get_host_by_hostid($hostid);
 
-		if(!check_right("Item","A",0))
-		{
-			error("Insufficient permissions to item '".$host["host"].":$key'");
-			return FALSE;
-		}
+		$host=get_host_by_hostid($hostid);
 
 		if(($i = array_search(0,$applications)) !== FALSE)
 			unset($applications[$i]);
@@ -182,7 +234,6 @@
 			zbx_dbstr($formula).",$trends,".zbx_dbstr($logtimefmt).",$valuemapid,".
 			zbx_dbstr($delay_flex).",$templateid)");
 
-
 		if(!$result)
 			return $result;
 
@@ -225,12 +276,6 @@
 
 	function	update_item_status($itemid,$status)
 	{
-                if(!check_right("Item","U",0))
-		{
-                        error("Insufficient permissions");
-                        return 0;
-		}
-
 		if($status==ITEM_STATUS_ACTIVE)
 			$sql="update items set status=$status,error='' where itemid=$itemid";
 		else
@@ -248,12 +293,6 @@
 		$formula,$trends,$logtimefmt,$valuemapid,$delay_flex,$applications,$templateid=0)
 	{
 		$host = get_host_by_hostid($hostid);
-
-		if(!check_right("Item","U",$itemid))
-		{
-			error("Insufficient permissions to item '".$host["host"].":$key'");
-			return FALSE;
-		}
 
 		if(($i = array_search(0,$applications)) !== FALSE)
 			unset($applications[$i]);
@@ -498,8 +537,7 @@
 
 	function	get_item_by_itemid($itemid)
 	{
-		$result=DBselect("select * from items where itemid=$itemid"); 
-		$row=DBfetch($result);
+		$row = DBfetch(DBselect("select * from items where itemid=$itemid")); 
 		if($row)
 		{
 			return	$row;
@@ -543,9 +581,6 @@
 		$result = DBexecute("delete from items where itemid=$itemid");
 		if($result)
 		{
-		// delete item permisions
-			DBexecute('delete from rights where name=\'Item\' and id='.$itemid);
-
 			info("Item '".$host["host"].":".$item["key_"]."' deleted");
 		}
 		return $result;
@@ -555,14 +590,11 @@
 	{
 		$param="";
 
-//		echo $key." ".$num."<br>";
-
-//		$params=split('[\[\]\,]', $description);
-		$params=preg_split('/[\]\[,]/', $key);
+		$params = preg_split('/[\]\[,]/', $key);
 
 		if(isset($params[$num]))
 		{
-			$param=$params[$num];
+			$param = $params[$num];
 		}
 
 		return $param;
@@ -589,8 +621,10 @@
 		return get_host_by_itemid($itemid);
 	}
 
-	function get_items_data_overview($groupid)
+	function get_items_data_overview($groupid, $nodeid)
 	{
+		global	$USER_DETAILS;
+
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 
 		if($groupid > 0)
@@ -601,48 +635,38 @@
 		}
 
 COpt::profiling_start('prepare data');
-		$result = DBselect('select distinct h.hostid, h.host,i.itemid, i.key_, i.value_type, i.lastvalue, i.units, i.description'.
-			' from hosts h,items i '.$group_where.
-			' h.status='.HOST_STATUS_MONITORED.' and h.hostid=i.hostid and i.status='.ITEM_STATUS_ACTIVE.
-			' order by i.description');
+		$result = DBselect('select distinct h.hostid, h.host,i.itemid, i.key_, i.value_type, i.lastvalue, i.units, '.
+			' i.description, t.priority, t.value as tr_value'.
+			' from hosts h,items i left join  functions f on f.itemid=i.itemid left join triggers t on t.triggerid=f.triggerid '.
+			$group_where.
+			' h.hostid in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, $nodeid).') '.
+			' and h.status='.HOST_STATUS_MONITORED.' and h.hostid=i.hostid and i.status='.ITEM_STATUS_ACTIVE.
+			' order by i.description,i.itemid');
 
 		unset($items);
 		unset($hosts);
 		while($row = DBfetch($result))
 		{
-			if(!check_right("Item","R",$row["itemid"])) continue;
-			if(!check_right('Host','R',$row['hostid'])) continue;
-
-			$access = 1;
-			$db_applications = get_applications_by_itemid($row["itemid"]);
-
-			while($db_app = DBfetch($db_applications))
-			{
-				if(check_right("Application","R",$db_app["applicationid"]))
-				{
-					$access = 1;
-					break;
-				}
-				$access = 0;
-			}
-			if($access == 0) continue;
-
 			$hosts[$row['host']] = $row['host'];
 			$items[item_description($row["description"],$row["key_"])][$row['host']] = array(
 				'itemid'	=> $row['itemid'],
 				'value_type'	=> $row['value_type'],
 				'lastvalue'	=> $row['lastvalue'],
 				'units'		=> $row['units'],
-				'description'	=> $row['description']);
+				'description'	=> $row['description'],
+				'severity'	=> $row['priority'],
+				'tr_value'	=> $row['tr_value']
+				);
 		}
 		if(!isset($hosts))
 		{
 			return $table;
 		}
+
 		sort($hosts);
 COpt::profiling_stop('prepare data');
 COpt::profiling_start('prepare table');
-		$header=array(new CCol(S_TRIGGERS,'center'));
+		$header=array(new CCol(S_ITEMS,'center'));
 		foreach($hosts as $hostname)
 		{
 			$header=array_merge($header,array(new CImg('vtext.php?text='.$hostname)));
@@ -658,11 +682,9 @@ COpt::profiling_start('prepare table');
 				$value = '-';
 				if(isset($ithosts[$hostname]))
 				{
-					$db_item_triggers = DBselect('select t.triggerid from triggers t, items i, functions f where'.
-						' i.itemid='.$ithosts[$hostname]['itemid'].' and i.itemid=f.itemid'.
-						' and t.priority>1 and t.triggerid=f.triggerid and t.value='.TRIGGER_VALUE_TRUE);
-					if(DBfetch($db_item_triggers))	$style = "high";
-
+					if($ithosts[$hostname]['tr_value'] == TRIGGER_VALUE_TRUE)
+						$style = get_severity_style($ithosts[$hostname]['severity']);
+					
 					if($ithosts[$hostname]["value_type"] == 0)
 						$value = convert_units($ithosts[$hostname]["lastvalue"],$ithosts[$hostname]["units"]);
 					else
@@ -696,5 +718,54 @@ COpt::profiling_stop('prepare table');
 	{
 		return DBselect("select distinct app.* from applications app, items_applications ia".
 			" where app.applicationid=ia.applicationid and ia.itemid=".$itemid);
+	}
+
+	# Delete from History
+
+	function	delete_history_by_itemid($itemid, $use_housekeeper=0)
+	{
+		SDI('TODO: Correct housekeeper scheduling!'); /* TODO */ /* think about housekeeper scheduling, must be housekeeperid - unneeded */
+		
+		$result = delete_trends_by_itemid($itemid,$use_housekeeper);
+		if(!$result)	return $result;
+
+		if($use_housekeeper)
+		{
+			$housekeeperid = get_dbid('housekeeper','housekeeperid');
+			DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)".
+				" values ($housekeeperid,'history_log','itemid',$itemid)");
+			$housekeeperid = get_dbid('housekeeper','housekeeperid');
+			DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)".
+				" values ($housekeeperid,'history_uint','itemid',$itemid)");
+			$housekeeperid = get_dbid('housekeeper','housekeeperid');
+			DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)".
+				" values ($housekeeperid,'history_str','itemid',$itemid)");
+			$housekeeperid = get_dbid('housekeeper','housekeeperid');
+			DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)".
+				" values ($housekeeperid,'history','itemid',$itemid)");
+			return TRUE;
+		}
+
+		DBexecute("delete from history_log where itemid=$itemid");
+		DBexecute("delete from history_uint where itemid=$itemid");
+		DBexecute("delete from history_str where itemid=$itemid");
+		DBexecute("delete from history where itemid=$itemid");
+		return TRUE;
+	}
+
+	# Delete from Trends
+
+	function	delete_trends_by_itemid($itemid, $use_housekeeper=0)
+	{
+		SDI('TODO: Correct housekeeper scheduling!'); /* TODO */ /* think about housekeeper scheduling, must be housekeeperid - unneeded */
+
+		if($use_housekeeper)
+		{
+			$housekeeperid = get_dbid('housekeeper','housekeeperid');
+			DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)".
+				" values ($housekeeperid, 'trends','itemid',$itemid)");
+			return TRUE;
+		}
+		return	DBexecute("delete from trends where itemid=$itemid");
 	}
 ?>

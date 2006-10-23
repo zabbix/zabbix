@@ -19,42 +19,98 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
-	include "include/forms.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/hosts.inc.php";
+	require_once "include/triggers.inc.php";
+	require_once "include/items.inc.php";
+	require_once "include/users.inc.php";
 
-	$dstfrm		= get_request("dstfrm",0);	// destination form
-	$dstfld1	= get_request("dstfld1", 0);	// output field on destination form
-	$dstfld2	= get_request("dstfld2", 0);	// second output field on destination form
-	$srctbl		= get_request("srctbl", 0);	// source table name
-	$srcfld1	= get_request("srcfld1", 0);	// source table field [can be different from fields of source table]
-	$srcfld2	= get_request("srcfld2", 0);	// second source table field [can be different from fields of source table]
+	$srctbl		= get_request("srctbl",  '');	// source table name
 
-	if($srctbl == "hosts")		{ $page["title"] = "S_HOSTS_BIG";	$right_src = "Host"; }
-	if($srctbl == "triggers")	{ $page["title"] = "S_TRIGGERS_BIG";	$right_src = "Triggers"; }
-	if($srctbl == "logitems")	{ $page["title"] = "S_ITEMS_BIG";	$right_src = "Items"; }
-	if($srctbl == "help_items")	{ $page["title"] = "S_STANDARD_ITEMS_BIG";	$right_src = "Standard items"; }
-
-	if(!isset($page["title"]))
+	switch($srctbl)
 	{
-		show_header("Error",0,1);
-		error("Incorrect URL");
-		show_messages();
-		exit;
+		case 'hosts':
+			$page["title"] = "S_HOSTS_BIG";
+			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
+			break;
+		case 'host_group':
+			$page["title"] = "S_HOST_GROUPS_BIG";
+			$min_user_type = USER_TYPE_ZABBIX_USER;
+			break;
+		case 'triggers':
+			$page["title"] = "S_TRIGGERS_BIG";
+			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
+			break;
+		case 'logitems':
+			$page["title"] = "S_ITEMS_BIG";
+			$min_user_type = USER_TYPE_ZABBIX_USER;
+			break;
+		case 'usrgrp':
+			$page["title"] = "S_GROUPS";
+			$min_user_type = USER_TYPE_SUPPER_ADMIN;
+			break;
+		case 'items':
+			$page["title"] = "S_ITEMS_BIG";
+			$min_user_type = USER_TYPE_ZABBIX_USER;
+			break;
+		case 'help_items':
+			$page["title"] = "S_STANDARD_ITEMS_BIG";
+			$min_user_type = USER_TYPE_ZABBIX_USER;
+			break;
+		default:
+			$page["title"] = "S_ERROR";
+			$error = true;
+			break;
 	}
 
 	$page["file"] = "popup.php";
-	show_header($page["title"],0,1);
+	
+	define('ZBX_PAGE_NO_MENU', 1);
+	
+include_once "include/page_header.php";
+
+	if(isset($error))
+	{
+		invalid_url();
+	}
+	
 	insert_confirm_javascript();
 
 	if(defined($page["title"]))     $page["title"] = constant($page["title"]);
 ?>
-
 <?php
-	if(!check_anyright($right_src,"R"))
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"dstfrm" =>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	NULL),
+		"dstfld1"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	NULL),
+		"dstfld2"=>	array(T_ZBX_STR, O_OPT,P_SYS,	NOT_EMPTY,	NULL),
+		"srctbl" =>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	NULL),
+		"srcfld1"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	NULL),
+		"srcfld2"=>	array(T_ZBX_STR, O_OPT,P_SYS,	NOT_EMPTY,	NULL),
+		"nodeid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		NULL),
+		"groupid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		NULL),
+		"hostid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		NULL),
+		"only_hostid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		NULL),
+		"monitored_hosts"=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	NULL)
+	);
+
+	check_fields($fields);
+
+	$dstfrm		= get_request("dstfrm",  '');	// destination form
+	$dstfld1	= get_request("dstfld1", '');	// output field on destination form
+	$dstfld2	= get_request("dstfld2", '');	// second output field on destination form
+	$srcfld1	= get_request("srcfld1", '');	// source table field [can be different from fields of source table]
+	$srcfld2	= get_request("srcfld2", '');	// second source table field [can be different from fields of source table]
+	
+	$monitored_hosts = get_request("monitored_hosts", '');
+	$only_hostid	 = get_request("only_hostid", null);
+?>
+<?php
+	global $USER_DETAILS;
+
+	if($min_user_type > $USER_DETAILS['type'])
 	{
-		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-		show_page_footer();
-		exit;
+		access_deny();
 	}
 ?>
 <?php
@@ -71,106 +127,154 @@
 	$frmTitle->AddVar("srctbl",	$srctbl);
 	$frmTitle->AddVar("srcfld1",	$srcfld1);
 	$frmTitle->AddVar("srcfld2",	$srcfld2);
-	
-	
-	if(in_array($srctbl,array("hosts","triggers","logitems")))
+
+	if(isset($only_hostid))
 	{
-		$groupid = get_request("groupid",get_profile("web.popup.groupid",0));
-		$cmbGroups = new CComboBox("groupid",$groupid,"submit()");
-		$cmbGroups->AddItem(0,S_ALL_SMALL);
-		$db_groups = DBselect("select groupid,name from groups where mod(groupid,100)=$ZBX_CURNODEID order by name");
-		while($group = DBfetch($db_groups))
-		{ // Check if at least one host with read permission exists for this group
-			$db_hosts = DBselect("select distinct h.hostid,h.host from hosts h,items i,hosts_groups hg".
-				" where h.hostid=i.hostid and hg.groupid=".$group["groupid"]." and hg.hostid=h.hostid".
-				" and h.status not in (".HOST_STATUS_DELETED.") order by h.host");
+		$_REQUEST['hostid'] = $only_hostid;
+		$frmTitle->AddVar("only_hostid",$only_hostid);
+		unset($_REQUEST["groupid"],$_REQUEST["nodeid"]);
+	}
+	
+	$validation_param = array("allow_all_hosts");
+
+	if($monitored_hosts)
+		array_push($validation_param, "monitored_hosts");
+		
+	if(in_array($srctbl,array("triggers","logitems","items")))
+	{
+		array_push($validation_param, "always_select_first_host");
+		validate_group_with_host(PERM_READ_LIST,$validation_param);
+	}
+	elseif(in_array($srctbl,array("hosts")))
+	{
+		validate_group(PERM_READ_LIST,$validation_param);
+	}
+
+	if(isset($only_hostid))
+	{
+		if(!isset($_REQUEST["hostid"]) || $_REQUEST["hostid"]!=$only_hostid) access_deny();
+	}
+	else
+	{
+		$accessible_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST);
+		$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT);
+		$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+
+		if(in_array($srctbl,array("hosts","host_group","triggers","logitems","items")))
+		{
+			$nodeid = get_request("nodeid", $ZBX_CURNODEID);
+			$cmbNode = new CComboBox("nodeid", $nodeid, "submit()");
+			$db_nodes = DBselect("select * from nodes where nodeid in (".$accessible_nodes.")");
+			while($node_data = DBfetch($db_nodes))
+			{
+				$cmbNode->AddItem($node_data['nodeid'], $node_data['name']);
+				if($nodeid == $node_data['nodeid']) $ok = true;
+			}
+			$frmTitle->AddItem(array(SPACE,S_NODE,SPACE,$cmbNode));
+			if(!isset($ok)) $nodeid = $ZBX_CURNODEID;
+			unset($ok);
+		}	
+		if(in_array($srctbl,array("hosts","triggers","logitems","items")))
+		{
+			$groupid = get_request("groupid",get_profile("web.popup.groupid",0));
+			
+			$cmbGroups = new CComboBox("groupid",$groupid,"submit()");
+			$cmbGroups->AddItem(0,S_ALL_SMALL);
+			$db_groups = DBselect("select distinct g.groupid,g.name from groups g, hosts_groups hg, hosts h ".
+				" where ".DBid2nodeid("g.groupid")."=".$nodeid.
+				" and g.groupid=hg.groupid and hg.hostid in (".$accessible_hosts.") ".
+				" and hg.hostid = h.hostid ".
+				($monitored_hosts ? " and h.status=".HOST_STATUS_MONITORED : "").
+				" order by name");
+			while($group = DBfetch($db_groups))
+			{
+				$cmbGroups->AddItem($group["groupid"],$group["name"]);
+				if($groupid == $group["groupid"]) $ok = true;
+			}
+			$frmTitle->AddItem(array(S_GROUP,SPACE,$cmbGroups));
+			update_profile("web.popup.groupid",$groupid);
+			if(!isset($ok) || $groupid == 0) unset($groupid);
+			unset($ok);
+		}
+		if(in_array($srctbl,array("help_items")))
+		{
+			$itemtype = get_request("itemtype",get_profile("web.popup.itemtype",0));
+			$cmbTypes = new CComboBox("itemtype",$itemtype,"submit()");
+			$cmbTypes->AddItem(ITEM_TYPE_ZABBIX,S_ZABBIX_AGENT);
+			$cmbTypes->AddItem(ITEM_TYPE_SIMPLE,S_SIMPLE_CHECK);
+			$cmbTypes->AddItem(ITEM_TYPE_INTERNAL,S_ZABBIX_INTERNAL);
+			$cmbTypes->AddItem(ITEM_TYPE_AGGREGATE,S_ZABBIX_AGGREGATE);
+			$frmTitle->AddItem(array(S_TYPE,SPACE,$cmbTypes));
+		}
+		if(in_array($srctbl,array("triggers","logitems","items")))
+		{
+			$hostid = get_request("hostid",get_profile("web.popup.hostid",0));
+			$cmbHosts = new CComboBox("hostid",$hostid,"submit()");
+			
+			$sql = "select distinct h.hostid,h.host from hosts h";
+			if(isset($groupid))
+			{
+				$sql .= ",hosts_groups hg where ".
+					" h.hostid=hg.hostid and hg.groupid=".$groupid." and ";
+			}
+			else
+			{
+				$sql .= " where ";
+				$cmbHosts->AddItem(0,S_ALL_SMALL);
+			}
+
+			$sql .= DBid2nodeid("h.hostid")."=".$nodeid.
+				" and h.hostid in (".$accessible_hosts.")".
+				($monitored_hosts ? " and h.status=".HOST_STATUS_MONITORED : "");
+
+			$db_hosts = DBselect($sql);
 			while($host = DBfetch($db_hosts))
 			{
-				if(!check_right("Host","R",$host["hostid"]))	continue;
-				$cmbGroups->AddItem($group["groupid"],$group["name"]);
-				break;
+				$cmbHosts->AddItem($host["hostid"],$host["host"]);
+				if($hostid == $host["hostid"]) $ok = true;
 			}
+			$frmTitle->AddItem(array(SPACE,S_HOST,SPACE,$cmbHosts));
+			update_profile("web.popup.hostid",$hostid);
+			if(!isset($ok) || $hostid == 0) unset($hostid);
+			unset($ok);
 		}
-		$frmTitle->AddItem(array(S_GROUP,SPACE,$cmbGroups));
-		update_profile("web.popup.groupid",$groupid);
-		if($groupid == 0) unset($groupid);
-	}
-	if(in_array($srctbl,array("help_items")))
-	{
-		$itemtype = get_request("itemtype",get_profile("web.popup.itemtype",0));
-		$cmbTypes = new CComboBox("itemtype",$itemtype,"submit()");
-		$cmbTypes->AddItem(ITEM_TYPE_ZABBIX,S_ZABBIX_AGENT);
-		$cmbTypes->AddItem(ITEM_TYPE_SIMPLE,S_SIMPLE_CHECK);
-		$cmbTypes->AddItem(ITEM_TYPE_INTERNAL,S_ZABBIX_INTERNAL);
-		$cmbTypes->AddItem(ITEM_TYPE_AGGREGATE,S_ZABBIX_AGGREGATE);
-		$frmTitle->AddItem(array(S_TYPE,SPACE,$cmbTypes));
-	}
-	if(in_array($srctbl,array("triggers","logitems")))
-	{
-		$hostid = get_request("hostid",get_profile("web.popup.hostid",0));
-		$cmbHosts = new CComboBox("hostid",$hostid,"submit()");
-		
-		$sql = "select h.hostid,h.host from hosts h";
-		if(isset($groupid))
-			$sql .= ",hosts_groups hg where mod(h.hostid,100)=$ZBX_CURNODEID and h.hostid=hg.hostid and hg.groupid=$groupid";
-		else
+
+		if(in_array($srctbl,array("triggers","hosts")))
 		{
-			$sql .= " where mod(h.hostid,100)=$ZBX_CURNODEID";
-			$cmbHosts->AddItem(0,S_ALL_SMALL);
-		}
+			$btnEmpty = new CButton("empty",S_EMPTY,
+				get_window_opener($dstfrm, $dstfld1, 0).
+				get_window_opener($dstfrm, $dstfld2, '').
+				" window.close();");
 
-		$first_hostid = 0;
-		$db_hosts = DBselect($sql);
-		while($host = DBfetch($db_hosts))
-		{
-			if(!check_right("Host","R",$host["hostid"]))	continue;
-			$cmbHosts->AddItem($host["hostid"],$host["host"]);
-			if($hostid == $host["hostid"]) $correct_host = 1;
-			if($first_hostid == 0)	$first_hostid = $host["hostid"];
+			$frmTitle->AddItem(array(SPACE,$btnEmpty));
 		}
-		if(!isset($correct_host) && isset($groupid)){
-			$hostid = $first_hostid;
-		}
-		$frmTitle->AddItem(array(SPACE,S_HOST,SPACE,$cmbHosts));
-		update_profile("web.popup.hostid",$hostid);
-		if($hostid == 0) unset($hostid);
 	}
-
-	if(in_array($srctbl,array("triggers","hosts")))
-	{
-		$btnEmpty = new CButton("empty",S_EMPTY,
-//			"window.opener.document.forms['".$dstfrm."'].".$dstfld1.".value='0';".
-//			" window.opener.document.forms['".$dstfrm."'].".$dstfld2.".value='';".
-			get_window_opener($dstfrm, $dstfld1, 0).
-			get_window_opener($dstfrm, $dstfld2, '').
-			" window.close();");
-
-		$frmTitle->AddItem(array(SPACE,$btnEmpty));
-	}
-
-	show_header2($page["title"], $frmTitle);
+	show_table_header($page["title"], $frmTitle);
 ?>
-
 <?php
 	if($srctbl == "hosts")
 	{
 		$table = new CTableInfo(S_NO_HOSTS_DEFINED);
 		$table->SetHeader(array(S_HOST,S_IP,S_PORT,S_STATUS,S_AVAILABILITY));
 
-		$sql = "select * from hosts h";
+		$sql = "select distinct h.* from hosts h";
 		if(isset($groupid))
-			$sql .= ",hosts_groups hg where mod(h.hostid,100)=$ZBX_CURNODEID and h.hostid=hg.hostid and hg.groupid=$groupid";
+			$sql .= ",hosts_groups hg where hg.groupid=".$groupid.
+				" and h.hostid=hg.hostid and ";
 		else
-			$sql .= " where mod(h.hostid,100)=$ZBX_CURNODEID";
+			$sql .= " where ";
+
+		$sql .= DBid2nodeid("h.hostid")."=".$nodeid.
+				" and h.hostid in (".$accessible_hosts.") ".
+				($monitored_hosts ? " and h.status=".HOST_STATUS_MONITORED : "").
+				" order by h.host,h.hostid";
+
 
 		$db_hosts = DBselect($sql);
 		while($host = DBfetch($db_hosts))
 		{
-			if(!check_right("Host","R",$host["hostid"]))	continue;
 			$name = new CLink($host["host"],"#","action");
 			$name->SetAction(
-//				"window.opener.document.forms['".$dstfrm."'].".$dstfld1.".value='".$host[$srcfld1]."';".
-//				" window.opener.document.forms['".$dstfrm."'].".$dstfld2.".value='".$host[$srcfld2]."';".
 				get_window_opener($dstfrm, $dstfld1, $host[$srcfld1]).
 				get_window_opener($dstfrm, $dstfld2, $host[$srcfld2]).
 				" window.close();");
@@ -193,99 +297,129 @@
 			else if($host["available"] == HOST_AVAILABLE_UNKNOWN)
 				$available=new CSpan(S_UNKNOWN,"unknown");
 
-			$table->addRow(array(
+			$table->AddRow(array(
 				$name,
 				$host["useip"]==1 ? $host["ip"] : "-",
 				$host["port"],
 				$status,
 				$available
 				));
+
+			unset($host);
 		}
-		$table->show();
+		$table->Show();
 	}
-	if($srctbl == "help_items")
+	elseif(in_array($srctbl,array("host_group")))
+	{
+		$table = new CTableInfo(S_NO_GROUPS_DEFINED);
+		$table->SetHeader(array(S_NAME));
+
+		$db_groups = DBselect("select distinct g.groupid,g.name from groups g, hosts_groups hg ".
+			" where ".DBid2nodeid("g.groupid")."=".$nodeid.
+			" and g.groupid=hg.groupid and hg.hostid in (".$accessible_hosts.") ".
+			" order by name");
+		while($row = DBfetch($db_groups))
+		{
+			$name = new CLink($row["name"],"#","action");
+			$name->SetAction(
+				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
+				get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
+				" window.close();");
+
+			$table->AddRow($name);
+		}
+		$table->Show();
+	}
+	elseif($srctbl == "usrgrp")
+	{
+		$table = new CTableInfo(S_NO_GROUPS_DEFINED);
+		$table->SetHeader(array(S_NAME));
+
+		$result = DBselect("select * from usrgrp where ".DBid2nodeid("usrgrpid")."=".$ZBX_CURNODEID." order by name");
+		while($row = DBfetch($result))
+		{
+			$name = new CLink($row["name"],"#","action");
+			$name->SetAction(
+				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
+				get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
+				" window.close();");
+
+			$table->AddRow($name);
+		}
+		$table->Show();
+	}
+	elseif($srctbl == "help_items")
 	{
 		$table = new CTableInfo(S_NO_ITEMS);
 		$table->SetHeader(array(S_KEY,S_DESCRIPTION));
 
-		$sql = "select * from help_items where mod(itemtypeid,100)=$ZBX_CURNODEID and itemtype=$itemtype order by key_";
+		$result = DBselect("select * from help_items where itemtype=".$itemtype." order by key_");
 
-		$result = DBselect($sql);
 		while($row = DBfetch($result))
 		{
 			$name = new CLink($row["key_"],"#","action");
 			$name->SetAction(
-//				"window.opener.document.forms['".$dstfrm."'].".$dstfld1.".value='".$row[$srcfld1]."';".
 				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
 				" window.close();");
 
-			$table->addRow(array(
+			$table->AddRow(array(
 				$name,
 				$row["description"]
 				));
 		}
-		$table->show();
+		$table->Show();
 	}
 	elseif($srctbl == "triggers")
 	{
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
-		$table->setHeader(array(
+		$table->SetHeader(array(
 			S_NAME,
-//			S_EXPRESSION,
 			S_SEVERITY,
 			S_STATUS));
 
 
-		$sql = "select distinct h.host,t.*".
-			" from triggers t,hosts h,items i,functions f".
-			" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid";
-			" and mod(h.hostid,100)=".$ZBX_CURNODEID;
+		$sql = "select h.host,t.*,count(d.triggerid_up) as dep_count ".
+			" from hosts h,items i,functions f, triggers t left join trigger_depends d on d.triggerid_down=t.triggerid ".
+			" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid".
+			" and ".DBid2nodeid("t.triggerid")."=".$nodeid.
+			" and h.hostid not in (".$denyed_hosts.")".
+			($monitored_hosts ? " and h.status=".HOST_STATUS_MONITORED : "");
 
 		if(isset($hostid)) 
 			$sql .= " and h.hostid=$hostid";
 
-		$sql .= " order by h.host,t.description";
+		$sql .= " group by h.host, t.triggerid".
+			" order by h.host,t.description";
 
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
-			if(check_right_on_trigger("R",$row["triggerid"]) == 0)
-			{
-				continue;
-			}
-
-			$exp_desc = expand_trigger_description($row["triggerid"]);
+			$exp_desc = expand_trigger_description_by_data($row);
 			$description = new CLink($exp_desc,"#","action");
 			$description->SetAction(
 				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
 				get_window_opener($dstfrm, $dstfld2, $exp_desc).
-//				"window.opener.document.forms['".$dstfrm."'].".$dstfld1.".value='".$row[$srcfld1]."';".
-//				" window.opener.document.forms['".$dstfrm."'].".$dstfld2.".value='".$exp_desc."';".
 				" window.close();");
 
-			$description = array($description);
-
-			//add dependences
-			$result1=DBselect("select t.triggerid,t.description from triggers t,trigger_depends d".
-				" where t.triggerid=d.triggerid_up and d.triggerid_down=".$row["triggerid"].
-				" and mod(t.triggerid,100)=".$ZBX_CURNODEID);
-			if($row1=DBfetch($result1))
+			if($row['dep_count'] > 0)
 			{
-				array_push($description,BR.BR."<strong>".S_DEPENDS_ON."</strong>".SPACE.BR);
-				do
+				$description = array($description);
+				
+				$result1=DBselect("select h.host,t.triggerid,t.description ".
+					" from triggers t,trigger_depends d,functions f,items i,hosts h ".
+					" where t.triggerid=d.triggerid_up and d.triggerid_down=".$row["triggerid"].
+					" and ".DBid2nodeid("t.triggerid")."=".$nodeid.
+					" and t.triggerid=f.triggerid and f.itemid=i.itemid and i.hostid=h.hostid");
+				if($row1=DBfetch($result1))
 				{
-					array_push($description,expand_trigger_description($row1["triggerid"]).BR);
-				} while( $row1=DBfetch($result1));
-				array_push($description,BR);
+					array_push($description,BR.BR."<strong>".S_DEPENDS_ON."</strong>".SPACE.BR);
+					do
+					{
+						array_push($description,expand_trigger_description_by_data($row1).BR);
+					} while( $row1=DBfetch($result1));
+					array_push($description,BR);
+				}
 			}
-	
-			if($row["priority"]==0)		$priority=S_NOT_CLASSIFIED;
-			elseif($row["priority"]==1)	$priority=new CCol(S_INFORMATION,"information");
-			elseif($row["priority"]==2)	$priority=new CCol(S_WARNING,"warning");
-			elseif($row["priority"]==3)	$priority=new CCol(S_AVERAGE,"average");
-			elseif($row["priority"]==4)	$priority=new CCol(S_HIGH,"high");
-			elseif($row["priority"]==5)	$priority=new CCol(S_DISASTER,"disaster");
-			else				$priority=$row["priority"];
 
 			if($row["status"] == TRIGGER_STATUS_DISABLED)
 			{
@@ -304,14 +438,16 @@
 
 			if($row["error"]=="")		$row["error"]=SPACE;
 
-			$table->addRow(array(
+			$table->AddRow(array(
 				$description,
-//				explode_exp($row["expression"],0),
-				$priority,
+				new CCol(get_severity_description($row['priority']),get_severity_style($row['priority'])),
 				$status,
 			));
+
+			unset($description);
+			unset($status);
 		}
-		$table->show();
+		$table->Show();
 	}
 	elseif($srctbl == "logitems")
 	{
@@ -339,8 +475,6 @@ function add_variable(formname,value)
         var element = form.elements['itemid'];
         if(element)     element.name = 'itemid[]';
 
-//        alert('add_variable - ok');
-
         form.submit();
 	window.close();
         return true;
@@ -351,41 +485,29 @@ function add_variable(formname,value)
 <?php
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 
-		$table->setHeader(array(
+		$table->SetHeader(array(
 			!isset($hostid) ? S_HOST : NULL,
 			S_DESCRIPTION,S_KEY,nbsp(S_UPDATE_INTERVAL),
 			S_STATUS));
-		if(isset($hostid))
-		{
-			$sql = "select i.* from items i where $hostid=i.hostid".
-				" and i.value_type=".ITEM_VALUE_TYPE_LOG.
-				" and mod(i.itemid,100)=".$ZBX_CURNODEID.
-				" order by i.description, i.key_";
-		}
-		else
-		{
-			$sql = "select h.host,i.* from items i,hosts h".
-				" where i.value_type=".ITEM_VALUE_TYPE_LOG." and h.hostid=i.hostid".
-				" and mod(i.itemid,100)=".$ZBX_CURNODEID.
-				" order by i.description, i.key_";
-		}
 
-		$db_items = DBselect($sql);
+		$db_items = DBselect("select distinct h.host,i.* from items i,hosts h".
+			" where i.value_type=".ITEM_VALUE_TYPE_LOG." and h.hostid=i.hostid".
+			" and ".DBid2nodeid("i.itemid")."=".$nodeid.
+			(isset($hostid) ? " and ".$hostid."=i.hostid " : "").
+			" and i.hostid in (".$accessible_hosts.")".
+			($monitored_hosts ? " and h.status=".HOST_STATUS_MONITORED : "").
+			" order by h.host,i.description, i.key_, i.itemid");
+
 		while($db_item = DBfetch($db_items))
 		{
-			if(!check_right("Item","R",$db_item["itemid"]))
-			{
-				continue;
-			}
-
 			$description = new CLink(item_description($db_item["description"],$db_item["key_"]),"#","action");
 			$description->SetAction("return add_variable('".$dstfrm."',".$db_item["itemid"].");");
 
 			switch($db_item["status"]){
-			case 0: $status=new CCol(S_ACTIVE,"enabled");		break;
-			case 1: $status=new CCol(S_DISABLED,"disabled");	break;
-			case 3: $status=new CCol(S_NOT_SUPPORTED,"unknown");	break;
-			default:$status=S_UNKNOWN;
+				case 0: $status=new CCol(S_ACTIVE,"enabled");		break;
+				case 1: $status=new CCol(S_DISABLED,"disabled");	break;
+				case 3: $status=new CCol(S_NOT_SUPPORTED,"unknown");	break;
+				default:$status=S_UNKNOWN;
 			}
 
 			$table->AddRow(array(
@@ -396,8 +518,55 @@ function add_variable(formname,value)
 				$status
 				));
 		}
-		$table->Show();
+		unset($db_items, $db_item);
 
+		$table->Show();
 	}
-	show_messages();
+	elseif($srctbl == "items")
+	{
+		$table = new CTableInfo(S_NO_GROUPS_DEFINED);
+		$table->SetHeader(array(
+			(isset($hostid) ? null : S_HOST),
+			S_DESCRIPTION,
+			S_TYPE,
+			S_TYPE_OF_INFORMATION,
+			S_STATUS
+			));
+
+		$sql = "select distinct h.host,i.* from hosts h,items i ".
+			" where h.hostid=i.hostid and ".DBid2nodeid("i.itemid")."=".$nodeid.
+			" and h.hostid not in (".$denyed_hosts.")".
+			($monitored_hosts ? " and h.status=".HOST_STATUS_MONITORED : "");
+
+		if(isset($hostid)) 
+			$sql .= " and h.hostid=$hostid";
+
+		$sql .= " order by h.host";
+			
+		$result = DBselect($sql);
+		while($row = DBfetch($result))
+		{
+			$row["description"] = item_description($row["description"],$row["key_"]);
+			
+			$description = new CLink($row["description"],"#","action");
+			$description->SetAction(
+				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
+				get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
+				" window.close();");
+
+			$table->AddRow(array(
+				(isset($hostid) ? null : $row['host']),
+				$description,
+				item_type2str($row['type']),
+				item_value_type2str($row['value_type']),
+				new CSpan(item_status2str($row['status']),item_status2style($row['status']))
+				));
+		}
+		$table->Show();
+	}
+?>
+<?php
+
+include_once "include/page_footer.php";
+
 ?>

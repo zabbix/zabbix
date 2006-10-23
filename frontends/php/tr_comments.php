@@ -19,40 +19,76 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
-	include "include/forms.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/triggers.inc.php";
+	require_once "include/forms.inc.php";
 
 	$page["title"] = "S_TRIGGER_COMMENTS";
 	$page["file"] = "tr_comments.php";
-	show_header($page["title"],0,0);
-?>
 
+include_once "include/page_header.php";
+
+?>
 <?php
-	if(!check_right("Trigger comment","R",$_REQUEST["triggerid"]))
+
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"triggerid"=>	array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID, null),
+		"comments"=>	array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,'isset({save})'),
+
+/* actions */
+		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+/* other */
+/*
+		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		"form_copy_to"=>	array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	null,	null,	null)
+*/
+	);
+
+	check_fields($fields);
+?>
+<?php
+	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
+
+	if(! ($db_data = DBfetch(DBselect('select * from items i, functions f '.
+	                        ' where i.itemid=f.itemid and f.triggerid='.$_REQUEST["triggerid"].
+				" and i.hostid not in (".$denyed_hosts.")".
+				" and ".DBid2nodeid("f.triggerid")."=".$ZBX_CURNODEID
+				))))
 	{
-		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-		show_page_footer();
+		access_deny();
+	}
+	$trigger_hostid = $db_data['hostid'];
+	
+	if(isset($_REQUEST["save"]))
+	{
+		$result = update_trigger_comments($_REQUEST["triggerid"],$_REQUEST["comments"]);
+	
+		show_messages($result, S_COMMENT_UPDATED, S_CANNOT_UPDATE_COMMENT);
+
+		if($result)
+		{
+			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_TRIGGER,
+				S_TRIGGER." [".$_REQUEST["triggerid"]."] [".expand_trigger_description($_REQUEST["triggerid"])."] ".
+				S_COMMENTS." [".$_REQUEST["comments"]."]");
+		}
+	}
+	else if(isset($_REQUEST["cancel"]))
+	{
+		Redirect('tr_status.php?hostid='.$trigger_hostid);
 		exit;
+		
 	}
 ?>
-
 <?php
 	show_table_header(S_TRIGGER_COMMENTS_BIG);
-?>
-
-<?php
-	if(isset($_REQUEST["register"]) && ($_REQUEST["register"]=="update"))
-	{
-		$result=update_trigger_comments($_REQUEST["triggerid"],$_REQUEST["comments"]);
-		show_messages($result, S_COMMENT_UPDATED, S_CANNOT_UPDATE_COMMENT);
-	}
-?>
-
-<?php
 	echo BR;
 	insert_trigger_comment_form($_REQUEST["triggerid"]);
 ?>
-
 <?php
-	show_page_footer();
+
+include_once "include/page_footer.php";
+
 ?>

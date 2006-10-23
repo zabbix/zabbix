@@ -29,6 +29,7 @@ create/schema/mysql.fmt -text
 create/schema/oracle.fmt -text
 create/schema/postgresql.fmt -text
 create/schema/schema.sql -text
+frontends/php/admin.php -text
 frontends/php/audio/trigger_off.wav -text
 frontends/php/audio/trigger_on.wav -text
 frontends/php/audio/trigger_on_average.wav -text
@@ -76,6 +77,16 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
+frontends/php/include/classes/clist.inc.php -text
+frontends/php/include/images.inc.php -text
+frontends/php/include/page_footer.php -text
+frontends/php/include/page_header.php -text
+frontends/php/media_types.php -text
+frontends/php/nodes.php -text
+frontends/php/popup_media.php -text
+frontends/php/popup_right.php -text
+frontends/php/popup_users.php -text
+frontends/php/popup_usrgrp.php -text
 include/dbsync.h -text
 src/zabbix_agent_win32/Debug/ZabbixW32.exe -text
 src/zabbix_agent_win32/Release/ZabbixW32.exe -text

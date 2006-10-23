@@ -19,92 +19,88 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/hosts.inc.php";
+	require_once "include/triggers.inc.php";
+	require_once "include/items.inc.php";
+
 	$page["title"] = "S_OVERVIEW";
 	$page["file"] = "overview.php";
-	show_header($page["title"],1,0);
-?>
 
+	define('ZBX_PAGE_DO_REFRESH', 1);
+	
+include_once "include/page_header.php";
+
+?>
 <?php
 	define("SHOW_TRIGGERS",0);
 	define("SHOW_DATA",1);
-?>
 
-
-<?php
-        if(!check_anyright("Host","R"))
-        {
-                show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-                show_page_footer();
-                exit;
-        }
 	if(isset($_REQUEST["select"])&&($_REQUEST["select"]!=""))
 	{
 		unset($_REQUEST["groupid"]);
 		unset($_REQUEST["hostid"]);
 	}
-	
-        if(isset($_REQUEST["hostid"])&&!check_right("Host","R",$_REQUEST["hostid"]))
-        {
-                show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-                show_page_footer();
-                exit;
-        }
 ?>
-
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"groupid"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(0,65535),	NULL),
+		"groupid"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
 		"type"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1"),		NULL)
 	);
 
 	check_fields($fields);
 
-	validate_group("R",array("allow_all_hosts","monitored_hosts","with_monitored_items"));
+	validate_group(PERM_READ_ONLY,array("allow_all_hosts","monitored_hosts","with_monitored_items"));
 ?>
-
 <?php
-	$_REQUEST["type"] = get_request("type",get_profile("web.overview.type",0));
+	$_REQUEST["type"] = get_request("type",get_profile("web.overview.type",SHOW_TRIGGERS));
 
-	update_profile("web.menu.view.last",$page["file"]);
 	update_profile("web.overview.type",$_REQUEST["type"]);
 ?>
-
 <?php
-
 	$form = new CForm();
 	$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit()");
-	
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
-	$result=DBselect("select groupid,name from groups where mod(groupid,100)=$ZBX_CURNODEID order by name");
+	
+	if($_REQUEST["type"] == SHOW_TRIGGERS)
+	{
+		$from = ", functions f, triggers t";
+		$where = " and i.itemid=f.itemid and f.triggerid=t.triggerid and t.status=".TRIGGER_STATUS_ENABLED;
+	}
+	else
+	{
+		$where = $from = '';
+	}
+	
+	$result=DBselect("select distinct g.groupid,g.name from groups g, hosts_groups hg, hosts h, items i".$from.
+		" where g.groupid in (".
+			get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST, null, null, $ZBX_CURNODEID).
+		") ".
+		" and hg.groupid=g.groupid and h.status=".HOST_STATUS_MONITORED.
+		" and h.hostid=i.hostid and hg.hostid=h.hostid and i.status=".ITEM_STATUS_ACTIVE.
+		$where.
+		" order by g.name");
 	while($row=DBfetch($result))
 	{
-		$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg where".
-			" h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$row["groupid"].
-			" and i.status=".ITEM_STATUS_ACTIVE." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host");
-		while($row2=DBfetch($result2))
-		{
-			if(!check_right("Host","R",$row2["hostid"]))	continue;
-			$cmbGroup->AddItem($row["groupid"],$row["name"]);
-			break;
-		}
+		$cmbGroup->AddItem($row["groupid"],$row["name"]);
 	}
+	
 	$form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
 
 	$cmbType = new CComboBox("type",$_REQUEST["type"],"submit()");
-	$cmbType->AddItem(0,S_TRIGGERS);
-	$cmbType->AddItem(1,S_DATA);
+	$cmbType->AddItem(SHOW_TRIGGERS,S_TRIGGERS);
+	$cmbType->AddItem(SHOW_DATA,	S_DATA);
 	$form->AddItem(array(S_TYPE.SPACE,$cmbType));
 
-	show_header2(S_OVERVIEW_BIG, $form);
+	show_table_header(S_OVERVIEW_BIG, $form);
 ?>
 
 <?php
 	if($_REQUEST["type"]==SHOW_DATA)
 	{
 COpt::profiling_start("get_items_data_overview");
-		$table = get_items_data_overview($_REQUEST["groupid"]);
+		$table = get_items_data_overview($_REQUEST["groupid"],$ZBX_CURNODEID);
 COpt::profiling_stop("get_items_data_overview");
 		$table->Show();
 		unset($table);
@@ -112,13 +108,14 @@ COpt::profiling_stop("get_items_data_overview");
 	elseif($_REQUEST["type"]==SHOW_TRIGGERS)
 	{
 COpt::profiling_start("get_triggers_overview");
-		$table = get_triggers_overview($_REQUEST["groupid"]);
+		$table = get_triggers_overview($_REQUEST["groupid"], $ZBX_CURNODEID);
 COpt::profiling_stop("get_triggers_overview");
 		$table->Show();
 		unset($table);
 	}
 ?>
-
 <?php
-	show_page_footer();
+
+include_once "include/page_footer.php";
+
 ?>

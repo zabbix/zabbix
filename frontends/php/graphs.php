@@ -19,11 +19,16 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
-	include "include/forms.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/hosts.inc.php";
+	require_once "include/graphs.inc.php";
+	require_once "include/forms.inc.php";
+
 	$page["title"] = "S_CONFIGURATION_OF_GRAPHS";
 	$page["file"] = "graphs.php";
-	show_header($page["title"],0,0);
+
+include_once "include/page_header.php";
+
 	insert_confirm_javascript();
 ?>
 <?php
@@ -63,19 +68,12 @@
 
 	check_fields($fields);
 
-	validate_group_with_host("U",array("allow_all_hosts"));
+	validate_group_with_host(PERM_READ_WRITE,array("allow_all_hosts","always_select_first_host"));
 ?>
 <?php
-	if(!check_anyright("Graph","U"))
-	{
-		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-		show_page_footer();
-		exit;
-	}
+	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, $ZBX_CURNODEID);
+	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
 
-	update_profile("web.menu.config.last",$page["file"]);
-?>
-<?php
 	if(isset($_REQUEST["save"]))
 	{
 		$showworkperiod = 0;
@@ -87,6 +85,7 @@
 
 		if(isset($_REQUEST["graphid"]))
 		{
+			// TODO check permission by new value.
 			$result=update_graph($_REQUEST["graphid"],
 				$_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],
 				$_REQUEST["yaxistype"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"],
@@ -102,6 +101,9 @@
 		}
 		else
 		{
+			if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+				access_deny();
+
 			$result=add_graph($_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],
 				$_REQUEST["yaxistype"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"],
 				$showworkperiod,$showtriggers,$_REQUEST["graphtype"]);
@@ -134,7 +136,11 @@
 		{
 			$graph=get_graph_by_graphid($id);
 			if($graph["templateid"]<>0)	continue;
-			$result=delete_graph($id);
+			if(delete_graph($id))
+			{
+				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GRAPH,
+					"Graph [".$graph["name"]."]");
+			}
 		}
 		show_messages(TRUE, S_ITEMS_DELETED, S_CANNOT_DELETE_ITEMS);
 	}
@@ -149,15 +155,10 @@
 			else
 			{ /* groups */
 				$hosts_ids = array();
-				$group_ids = "";
-				foreach($_REQUEST['copy_targetid'] as $group_id)
-				{
-					$group_ids .= $group_id.',';
-				}
-				$group_ids = trim($group_ids,',');
-
 				$db_hosts = DBselect('select distinct h.hostid from hosts h, hosts_groups hg'.
-					' where h.hostid=hg.hostid and hg.groupid in ('.$group_ids.')');
+					' where h.hostid=hg.hostid and hg.groupid in ('.implode(',',$_REQUEST['copy_targetid']).')'.
+					' and h.hostid in ('.$availiable_hosts.")"
+					);
 				while($db_host = DBfetch($db_hosts))
 				{
 					array_push($hosts_ids, $db_host['hostid']);
@@ -198,64 +199,48 @@
 			unset($_REQUEST["graphid"]);
 		}
 
-		$form = new CForm();
-		$form->AddItem(S_GROUP.SPACE);
+		$r_form = new CForm();
+
 		$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit()");
+		$cmbHosts = new CComboBox("hostid",$_REQUEST["hostid"],"submit()");
+
 		$cmbGroup->AddItem(0,S_ALL_SMALL);
-		$result=DBselect("select groupid,name from groups where mod(groupid,100)=$ZBX_CURNODEID order by name");
+
+		$result=DBselect("select distinct g.groupid,g.name from groups g, hosts_groups hg, hosts h, items i ".
+			" where h.hostid in (".$availiable_hosts.") ".
+			" and hg.groupid=g.groupid ".
+			" and h.hostid=i.hostid and hg.hostid=h.hostid ".
+			" order by g.name");
 		while($row=DBfetch($result))
 		{
-	// Check if at least one host with read permission exists for this group
-			$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg".
-				" where h.hostid=i.hostid and hg.groupid=".$row["groupid"].
-				" and hg.hostid=h.hostid and h.status=".HOST_STATUS_MONITORED.
-				" group by h.hostid,h.host order by h.host");
-			while($row2=DBfetch($result2))
-			{
-				if(!check_right("Host","R",$row2["hostid"]))
-					continue;
-				$cmbGroup->AddItem($row["groupid"],$row["name"]);
-				break;
-			}
+			$cmbGroup->AddItem($row["groupid"],$row["name"]);
 		}
-		$form->AddItem($cmbGroup);
-
-		$form->AddItem(SPACE.S_HOST.SPACE);
-			
-		$cmbHosts = new CComboBox("hostid", $_REQUEST["hostid"], "submit()");
-		if($_REQUEST["groupid"]==0)
-			$cmbHosts->AddItem(0,S_ALL_SMALL);
-
+		$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
+		
 		if($_REQUEST["groupid"] > 0)
 		{
-			$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg".
-				" where h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"].
-				" and hg.hostid=h.hostid"." and h.status=".HOST_STATUS_MONITORED.
+			$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where ".
+				" h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid".
+				" and h.hostid in (".$availiable_hosts.") ".
 				" group by h.hostid,h.host order by h.host";
 		}
 		else
 		{
-			$sql="select h.hostid,h.host from hosts h,items i where h.hostid=i.hostid".
-				" and h.status=".HOST_STATUS_MONITORED." group by h.hostid,h.host".
-				" and mod(h.hostid,100)=".$ZBX_CURNODEID.
-				" order by h.host";
+			$cmbHosts->AddItem(0,S_ALL_SMALL);
+			$sql="select h.hostid,h.host from hosts h,items i where ".
+				" h.hostid=i.hostid".
+				" and h.hostid in (".$availiable_hosts.") ".
+				" group by h.hostid,h.host order by h.host";
 		}
-
 		$result=DBselect($sql);
-		$host_ok = 0;
-		$first_host = 0;
 		while($row=DBfetch($result))
 		{
-			if(!check_right("Host","R",$row["hostid"]))	continue;
 			$cmbHosts->AddItem($row["hostid"],$row["host"]);
-			if($first_host == 0) $first_host = $row["hostid"];
-			if($_REQUEST["hostid"] == $row["hostid"]) $host_ok = 1;
 		}
-		$form->AddItem($cmbHosts);
-		if(!$host_ok && $_REQUEST["hostid"]!=0)
-			$_REQUEST["hostid"] = $first_host;
 
-		show_header2(S_GRAPHS_BIG, $form);
+		$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
+		
+		show_table_header(S_GRAPHS_BIG, $r_form);
 
 /* TABLE */
 		$form = new CForm();
@@ -264,38 +249,45 @@
 
 		$table = new CTableInfo(S_NO_GRAPHS_DEFINED);
 		$table->setHeader(array(
+			$_REQUEST["hostid"] != 0 ? NULL : S_HOSTS,
 			array(	new CCheckBox("all_graphs",NULL,
 					"CheckAll('".$form->GetName()."','all_graphs');"),
-				S_ID),
-			$_REQUEST["hostid"] != 0 ? NULL : S_HOSTS, S_NAME,S_WIDTH,S_HEIGHT,S_GRAPH_TYPE,S_GRAPH));
+				S_NAME),
+			S_WIDTH,S_HEIGHT,S_GRAPH_TYPE,S_GRAPH));
 
 		if($_REQUEST["hostid"] > 0)
 		{
-			$result=DBselect("select distinct g.* from graphs g,items i".
-				",graphs_items gi where gi.itemid=i.itemid and g.graphid=gi.graphid".
-				" and i.hostid=".$_REQUEST["hostid"]." order by g.name");
+			$result = DBselect("select distinct g.* from graphs g left join graphs_items gi on g.graphid=gi.graphid ".
+				" left join items i on gi.itemid=i.itemid ".
+				" where i.hostid=".$_REQUEST["hostid"].
+				" and i.hostid not in (".$denyed_hosts.") ".
+				" and ".DBid2nodeid("g.graphid")."=".$ZBX_CURNODEID.
+				" and i.hostid is not NULL ".
+				" order by g.name");
 		}
 		else
 		{
-			$result=DBselect("select * from graphs g where mod(graphid,100)=$ZBX_CURNODEID order by g.name");
+			$result = DBselect("select g.* from graphs g left join graphs_items gi on g.graphid=gi.graphid ".
+				" left join items i on gi.itemid=i.itemid ".
+				" where ".DBid2nodeid("g.graphid")."=".$ZBX_CURNODEID.
+				" and ( i.hostid not in (".$denyed_hosts.")  OR i.hostid is NULL )".
+				" order by g.name");
 		}
 		while($row=DBfetch($result))
 		{
-			if(!check_right("Graph","U",$row["graphid"]))		continue;
-
 			if($_REQUEST["hostid"] != 0)
 			{
 				$host_list = NULL;
 			}
 			else
 			{
-				$host_list = "";
+				$host_list = array();
 				$db_hosts = get_hosts_by_graphid($row["graphid"]);
 				while($db_host = DBfetch($db_hosts))
 				{
-					$host_list .= $db_host["host"].",";
+					array_push($host_list, $db_host["host"]);
 				}
-				$host_list = trim($host_list,',');
+				$host_list = implode(',',$host_list);
 			}
 	
 			if($row["templateid"]==0)
@@ -338,9 +330,8 @@
 				$graphtype = S_NORMAL;
 
 			$table->AddRow(array(
-				array($chkBox, $row["graphid"]),
 				$host_list,
-				$name,
+				array($chkBox, $name),
 				$row["width"],
 				$row["height"],
 				$graphtype,
@@ -361,5 +352,7 @@
 
 ?>
 <?php
-	show_page_footer();
+
+include_once "include/page_footer.php";
+
 ?>

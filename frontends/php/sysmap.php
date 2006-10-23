@@ -19,21 +19,16 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
-	include "include/forms.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/maps.inc.php";
+	require_once "include/forms.inc.php";
+
 	$page["title"] = "S_CONFIGURATION_OF_NETWORK_MAPS";
 	$page["file"] = "sysmap.php";
-	show_header($page["title"],0,0);
-	insert_confirm_javascript();
-?>
 
-<?php
-	if(!check_right("Network map","U",$_REQUEST["sysmapid"]))
-	{
-		show_table_header("<font color=\"AA0000\">No permissions !</font>");
-		show_page_footer();
-		exit;
-	}
+include_once "include/page_header.php";
+
+	insert_confirm_javascript();
 ?>
 <?php
 
@@ -47,8 +42,8 @@
 		"label"=>	array(T_ZBX_STR, O_OPT,  NULL, NOT_EMPTY,	'isset({save})'),
 		"x"=>		array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,65535),'isset({save})'),
 		"y"=>           array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,65535),'isset({save})'),
-		"icon"=>	array(T_ZBX_STR, O_OPT,  NULL, NOT_EMPTY,	'isset({save})'),
-		"icon_on"=>	array(T_ZBX_STR, O_OPT,  NULL, NOT_EMPTY,	'isset({save})'),
+		"iconid_off"=>	array(T_ZBX_INT, O_OPT,  NULL, DB_ID,		'isset({save})'),
+		"iconid_on"=>	array(T_ZBX_INT, O_OPT,  NULL, DB_ID,		'isset({save})'),
 		"url"=>		array(T_ZBX_STR, O_OPT,  NULL, NULL,		'isset({save})'),
 		"label_location"=>array(T_ZBX_INT, O_OPT, NULL,	IN("-1,0,1,2,3"),'isset({save})'),
 
@@ -73,12 +68,12 @@
 
 	check_fields($fields);
 ?>
-
 <?php
 	show_table_header("CONFIGURATION OF NETWORK MAP");
-	echo BR;
+	if(!sysmap_accessiable($_REQUEST["sysmapid"],PERM_READ_WRITE)) access_deny();
+	
+	$sysmap = DBfetch(DBselect("select * from sysmaps where sysmapid=".$_REQUEST["sysmapid"]));
 ?>
-
 <?php
 	if(isset($_REQUEST["save"]))
 	{
@@ -87,19 +82,23 @@
 			$result=update_sysmap_element($_REQUEST["selementid"],
 				$_REQUEST["sysmapid"],$_REQUEST["elementid"],$_REQUEST["elementtype"],
 				$_REQUEST["label"],$_REQUEST["x"],$_REQUEST["y"],
-				$_REQUEST["icon"],$_REQUEST["url"],$_REQUEST["icon_on"],
+				$_REQUEST["iconid_off"],$_REQUEST["url"],$_REQUEST["iconid_on"],
 				$_REQUEST["label_location"]);
+			$selementid = $_REQUEST["selementid"];
+			
 			show_messages($result,"Element updated","Cannot update element");
 		}
 		else
 		{ // add element
 			$result=add_element_to_sysmap($_REQUEST["sysmapid"],$_REQUEST["elementid"],
 				$_REQUEST["elementtype"],$_REQUEST["label"],$_REQUEST["x"],$_REQUEST["y"],
-				$_REQUEST["icon"],$_REQUEST["url"],$_REQUEST["icon_on"],
+				$_REQUEST["iconid_off"],$_REQUEST["url"],$_REQUEST["iconid_on"],
 				$_REQUEST["label_location"]);
+			$selementid = $result;
 
 			show_messages($result,"Element added","Cannot add element");
 		}
+		add_audit_if($result,AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP,'Name ['.$sysmap['name'].'] Element ['.$selementid.'] updated ');
 		if($result)	unset($_REQUEST["form"]);
 	}
 	if(isset($_REQUEST["save_link"]))
@@ -110,6 +109,7 @@
 				$_REQUEST["sysmapid"],$_REQUEST["selementid1"],$_REQUEST["selementid2"],
 				$_REQUEST["triggerid"],	$_REQUEST["drawtype_off"],$_REQUEST["color_off"],
 				$_REQUEST["drawtype_on"],$_REQUEST["color_on"]);
+			$linkid = $_REQUEST["linkid"];
 
 			show_messages($result,"Link updated","Cannot update link");
 		}
@@ -118,9 +118,11 @@
 			$result=add_link($_REQUEST["sysmapid"],$_REQUEST["selementid1"],$_REQUEST["selementid2"],
 				$_REQUEST["triggerid"],	$_REQUEST["drawtype_off"],$_REQUEST["color_off"],
 				$_REQUEST["drawtype_on"],$_REQUEST["color_on"]);
+			$linkid = $result;
 
 			show_messages($result,"Link added","Cannot add link");
 		}
+		add_audit_if($result,AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP,'Name ['.$sysmap['name'].'] Link ['.$linkid.'] updated ');
 		if($result)	unset($_REQUEST["form"]);
 	}
 	elseif(isset($_REQUEST["delete"]))
@@ -129,6 +131,9 @@
 		{
 			$result=delete_link($_REQUEST["linkid"]);
 			show_messages($result,"Link deleted","Cannot delete link");
+			add_audit_if($result,AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP,
+				'Name ['.$sysmap['name'].'] Link ['.$_REQUEST["linkid"].'] deleted');
+
 			if($result)
 			{
 				unset($_REQUEST["linkid"]);
@@ -139,6 +144,9 @@
 		{
 			$result=delete_sysmaps_element($_REQUEST["selementid"]);
 			show_messages($result,"Element deleted","Cannot delete element");
+			add_audit_if($result,AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP,
+				'Name ['.$sysmap['name'].'] Element ['.$_REQUEST["selementid"].'] deleteed ');
+
 			if($result)
 			{
 				unset($_REQUEST["selementid"]);
@@ -149,6 +157,7 @@
 ?>
 
 <?php
+	echo BR;
 	if(isset($_REQUEST["form"]) && ($_REQUEST["form"]=="add_element" ||
 		($_REQUEST["form"]=="update" && isset($_REQUEST["selementid"]))))
 	{
@@ -159,8 +168,7 @@
 	elseif(isset($_REQUEST["form"]) && ($_REQUEST["form"]=="add_link" || 
 		($_REQUEST["form"]=="update" && isset($_REQUEST["linkid"]))))
 	{
-		$result=DBselect("select count(*) as count from sysmaps_elements where sysmapid=".$_REQUEST["sysmapid"]);
-		$row=DBfetch($result);;
+		$row = DBfetch(DBselect("select count(*) as count from sysmaps_elements where sysmapid=".$_REQUEST["sysmapid"]));
 		if($row["count"]>1)
 		{
 			show_table_header("CONNECTORS");
@@ -178,7 +186,7 @@
 			"return Redirect('".$page["file"]."?form=add_element".url_param("sysmapid")."');"));
 
 		$table = new CTableInfo();
-		$table->setHeader(array(S_LABEL,S_TYPE,S_X,S_Y,S_ICON_ON,S_ICON_OFF));
+		$table->SetHeader(array(S_LABEL,S_TYPE,S_X,S_Y,S_ICON_ON,S_ICON_OFF));
 
 		$db_elements = DBselect("select * from sysmaps_elements where sysmapid=".$_REQUEST["sysmapid"].
 			" order by label");
@@ -199,8 +207,8 @@
 				nbsp($type),
 				$db_element["x"],
 				$db_element["y"],
-				nbsp($db_element["icon_on"]),
-				nbsp($db_element["icon"])
+				new CImg("image.php?height=24&imageid=".$db_element["iconid_on"],"no image",NULL),
+				new CImg("image.php?height=24&imageid=".$db_element["iconid_off"],"no image",NULL)
 				));
 		}
 		$table->show();
@@ -247,7 +255,7 @@
 				$description
 				));
 		}
-		$table->show();
+		$table->Show();
 	}
 
 	echo BR;
@@ -265,10 +273,10 @@
 			$tmp_img = get_png_by_selementid($db_element["selementid"]);
 			if(!$tmp_img) continue;
 
-			$x1_		= $db_element["x"];
-			$y1_		= $db_element["y"];
-			$x2_		= $db_element["x"] + imagesx($tmp_img);
-			$y2_		= $db_element["y"] + imagesy($tmp_img);
+			$x1_	= $db_element["x"];
+			$y1_	= $db_element["y"];
+			$x2_	= $db_element["x"] + imagesx($tmp_img);
+			$y2_	= $db_element["y"] + imagesy($tmp_img);
 
 			$linkMap->AddRectArea($x1_,$y1_,$x2_,$y2_,
 				"sysmap.php?form=update&sysmapid=".$_REQUEST["sysmapid"].
@@ -284,5 +292,7 @@
 	$table->Show();
 ?>
 <?php
-	show_page_footer();
+	
+include_once "include/page_footer.php";
+
 ?>

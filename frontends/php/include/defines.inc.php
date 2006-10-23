@@ -19,6 +19,9 @@
 **/
 ?>
 <?php
+	define("PAGE_TYPE_HTML",	0);
+	define("PAGE_TYPE_IMAGE",	1);
+
 	define("T_ZBX_STR",			0);
 	define("T_ZBX_INT",			1);
 	define("T_ZBX_DBL",			2);
@@ -36,8 +39,13 @@
 	define("P_NZERO",			32);
 
 //	MISC PARAMETERS
-	define("MAP_OUTPUT_FORMAT",		"DEFAULT");
-#	define("MAP_OUTPUT_FORMAT",		"JPG");
+	define("IMAGE_FORMAT_PNG",         	"PNG");
+	define("IMAGE_FORMAT_JPEG",         	"JPEG");
+	define("IMAGE_FORMAT_TEXT",         	"JPEG");
+//	define("IMAGE_FORMAT_DEFAULT",         	IMAGE_FORMAT_TEXT);
+	define("IMAGE_FORMAT_DEFAULT",         	IMAGE_FORMAT_PNG);
+	define("MAP_OUTPUT_FORMAT",		IMAGE_FORMAT_PNG);
+//	define("MAP_OUTPUT_FORMAT",		IMAGE_FORMAT_JPEG);
 //	END OF MISC PARAMETERS
 
 	define("AUDIT_ACTION_ADD",		0);
@@ -47,16 +55,26 @@
 	define("AUDIT_ACTION_LOGOUT",		4);
 
 	define("AUDIT_RESOURCE_USER",		0);
-	define("AUDIT_RESOURCE_ZABBIX",		1);
+//	define("AUDIT_RESOURCE_ZABBIX",		1);
 	define("AUDIT_RESOURCE_ZABBIX_CONFIG",	2);
 	define("AUDIT_RESOURCE_MEDIA_TYPE",	3);
 	define("AUDIT_RESOURCE_HOST",		4);
 	define("AUDIT_RESOURCE_ACTION",		5);
 	define("AUDIT_RESOURCE_GRAPH",		6);
 	define("AUDIT_RESOURCE_GRAPH_ELEMENT",	7);
-	define("AUDIT_RESOURCE_ESCALATION",	8);
-	define("AUDIT_RESOURCE_ESCALATION_RULE",9);
-	define("AUDIT_RESOURCE_AUTOREGISTRATION",10);
+//	define("AUDIT_RESOURCE_ESCALATION",	8);
+//	define("AUDIT_RESOURCE_ESCALATION_RULE",9);
+//	define("AUDIT_RESOURCE_AUTOREGISTRATION",10);
+	define("AUDIT_RESOURCE_USER_GROUP",	11);
+	define("AUDIT_RESOURCE_APPLICATION",	12);
+	define("AUDIT_RESOURCE_TRIGGER",	13);
+	define("AUDIT_RESOURCE_HOST_GROUP",	14);
+	define("AUDIT_RESOURCE_ITEM",		15);
+	define("AUDIT_RESOURCE_IMAGE",		16);
+	define("AUDIT_RESOURCE_VALUE_MAP",	17);
+	define("AUDIT_RESOURCE_IT_SERVICE",	18);
+	define("AUDIT_RESOURCE_MAP",		19);
+	define("AUDIT_RESOURCE_SCREEN",		20);
 
 	define("CONDITION_TYPE_GROUP",		0);
 	define("CONDITION_TYPE_HOST",		1);
@@ -217,6 +235,30 @@
 	define("SERVICE_TIME_TYPE_UPTIME", 0);
 	define("SERVICE_TIME_TYPE_DOWNTIME", 1);
 	define("SERVICE_TIME_TYPE_ONETIME_DOWNTIME", 2);
+
+	define("USER_TYPE_ZABBIX_USER",		1);
+	define("USER_TYPE_ZABBIX_ADMIN",	2);
+	define("USER_TYPE_SUPPER_ADMIN",	3);
+
+	define("PERM_MAX",		3);
+	define("PERM_READ_WRITE",	3);
+	define("PERM_READ_ONLY",	2);
+	define("PERM_READ_LIST",	1);
+	define("PERM_DENY",		0);
+
+	define("PERM_RES_STRING_LINE",	0); /* return string of nodes id - "1,2,3,4,5" */
+	define("PERM_RES_IDS_ARRAY",	1); /* return array of nodes id - array(1,2,3,4) */
+	define("PERM_RES_DATA_ARRAY",	2); 
+
+	define("PERM_MODE_NE",	5);
+	define("PERM_MODE_EQ",	4);
+	define("PERM_MODE_GT",	3);
+	define("PERM_MODE_LT",	2);
+	define("PERM_MODE_LE",	1);
+	define("PERM_MODE_GE",	0);
+
+	define("RESOURCE_TYPE_NODE",		0);
+	define("RESOURCE_TYPE_GROUP",		1);
 
 /* Support for PHP5. PHP5 does not have $HTTP_..._VARS */
 	if (!function_exists('version_compare'))

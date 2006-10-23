@@ -19,17 +19,52 @@
 **/
 ?>
 <?php
+	function	audit_resource2str($resource_type)
+	{
+		$str_resource[AUDIT_RESOURCE_USER] 		= S_USER;
+		$str_resource[AUDIT_RESOURCE_ZABBIX_CONFIG] 	= S_CONFIGURATION_OF_ZABBIX;
+		$str_resource[AUDIT_RESOURCE_MEDIA_TYPE] 	= S_MEDIA_TYPE;
+		$str_resource[AUDIT_RESOURCE_HOST] 		= S_HOST;
+		$str_resource[AUDIT_RESOURCE_ACTION] 		= S_ACTION;
+		$str_resource[AUDIT_RESOURCE_GRAPH] 		= S_GRAPH;
+		$str_resource[AUDIT_RESOURCE_GRAPH_ELEMENT]	= S_GRAPH_ELEMENT;
+		$str_resource[AUDIT_RESOURCE_USER_GROUP] 	= S_USER_GROUP;
+		$str_resource[AUDIT_RESOURCE_APPLICATION] 	= S_APPLICATION;
+		$str_resource[AUDIT_RESOURCE_TRIGGER] 		= S_TRIGGER;
+		$str_resource[AUDIT_RESOURCE_HOST_GROUP]	= S_HOST_GROUP;
+		$str_resource[AUDIT_RESOURCE_ITEM]		= S_ITEM;
+		$str_resource[AUDIT_RESOURCE_IMAGE]		= S_IMAGE;
+		$str_resource[AUDIT_RESOURCE_VALUE_MAP]		= S_VALUE_MAP;
+		$str_resource[AUDIT_RESOURCE_IT_SERVICE]	= S_IT_SERVICE;
+		$str_resource[AUDIT_RESOURCE_MAP]		= S_MAP;
+		$str_resource[AUDIT_RESOURCE_SCREEN]		= S_SCREEN;
+
+		if(isset($str_resource[$resource_type]))
+			return $str_resource[$resource_type];
+
+		return S_UNKNOWN_RESOURCE;
+	}
+
+	function add_audit_if($condition,$action,$resourcetype,$details)
+	{
+		if($condition) 
+			return add_audit($action,$resourcetype,$details);
+
+		return false;
+	}
+	
 	function add_audit($action,$resourcetype,$details)
 	{
 		global $USER_DETAILS;
 
-		$userid=$USER_DETAILS["userid"];
-		$clock=time();
-		$auditlogid = get_dbid("auditlog","auditlogid");
-		$sql="insert into auditlog (auditlogid,userid,clock,action,resourcetype,details) values ($auditlogid,$userid,$clock,$action,$resourcetype,".zbx_dbstr($details).")";
-		$result = DBexecute($sql);
-		if(!$result)
-			return $result;
-		return $auditlogid;
+		$auditid	= get_dbid("auditlog","auditid");
+
+		if(($result = DBexecute("insert into auditlog (auditid,userid,clock,action,resourcetype,details) ".
+			" values ($auditid,".$USER_DETAILS["userid"].",".time().",$action,$resourcetype,".zbx_dbstr($details).")")))
+		{
+			$result = $auditid;
+		}
+
+		return $result;
 	}
 ?>

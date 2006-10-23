@@ -19,14 +19,17 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/hosts.inc.php";
+	require_once "include/acknow.inc.php";
+	require_once "include/triggers.inc.php";
+
 	$page["file"] = "tr_status.php";
 	$page["title"] = "S_STATUS_OF_TRIGGERS";
+
 ?>
 <?php
-
 	$tr_hash=calc_trigger_hash();
-//	setcookie("triggers_hash",$tr_hash,time()+1800); //TMP !!! May be unneded
 
 	if(!isset($_COOKIE["triggers_hash"]))
 	{
@@ -83,48 +86,36 @@
 		if(!isset($audio) || !file_exists($audio))
 			$audio = 'audio/trigger_'.$status.'.wav';
 	}
-	if(($old[1]!=$new[1])&&($new[0]>=$old[0]))
-	{
-// DISASTER
-	}
 
-//	echo "$tr_hash<br>$triggers_hash<br>".$old[1]."<br>".$new[1];
 ?>
 <?php
-	if(!isset($_REQUEST["onlytrue"]))
-	{
-		$_REQUEST["onlytrue"]="true";
-	}
-	if(!isset($_REQUEST["noactions"]))
-	{
-		$_REQUEST["noactions"]="true";
-	}
+	define('ZBX_PAGE_DO_REFRESH', 1);
+
 	if(isset($_REQUEST["fullscreen"]))
-	{
-		show_header($page["title"],1,1);
-	}
-	else
-	{
-		show_header($page["title"],1,0);
-	}
+		define('ZBX_PAGE_NO_MENU', 1);
+	
+include_once "include/page_header.php";
+	
 ?>
 <?php
-	validate_group_with_host("R",array("allow_all_hosts","monitored_hosts","with_monitored_items"),"web.tr_status.groupid","web.tr_status.hostid");
-?>
-<?php
-	if(!check_anyright("Host","R"))
-	{
-		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-		show_page_footer();
-		exit;
-	}
-	if($_REQUEST["hostid"] > 0 && !check_right("Host","R",$_REQUEST["hostid"]))
-	{
-		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-		show_page_footer();
-		exit;
-	}
-	update_profile("web.menu.view.last",$page["file"]);
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"groupid"=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null),
+		"hostid"=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null),
+		"sort"=>	array(T_ZBX_STR, O_OPT,  null,	IN('"priority","description","lastchange"'), null),
+		"noactions"=>	array(T_ZBX_STR, O_OPT,  null,	IN('"true","false"'), null),
+		"compact"=>	array(T_ZBX_STR, O_OPT,  null,	IN('"true","false"'), null),
+		"onlytrue"=>	array(T_ZBX_STR, O_OPT,  null,	IN('"true","false"'), null),
+		"select"=>	array(T_ZBX_STR, O_OPT,  null,	IN('"true","false"'), null),
+		"txt_select"=>	array(T_ZBX_STR, O_OPT,  null,	null, null),
+		"fullscreen"=>	array(T_ZBX_STR, O_OPT,  null,	null, null),
+		"btnSelect"=>	array(T_ZBX_STR, O_OPT,  null,  null, null)
+	);
+
+	check_fields($fields);
+
+	validate_group_with_host(PERM_READ_ONLY,array("allow_all_hosts","always_select_first_host","monitored_hosts","with_monitored_items"),
+		"web.tr_status.groupid","web.tr_status.hostid");
 ?>
 <?php
 
@@ -133,53 +124,174 @@
 		play_sound($audio);
 	}
 ?>                                                                                                             
-
 <?php
- 
-	if(!isset($_REQUEST["sort"]))
-	{
-		$sort='priority';
-	}
-	else
-	{
-		$sort=$_REQUEST["sort"];
-	}
-	$onlytrue=$_REQUEST["onlytrue"];
-	if(isset($_REQUEST["noactions"])&&($_REQUEST["noactions"]!='true'))
-	{
-		$noactions='false';
-	}
-	else
-	{
-		$noactions='true';
-	}
-	if(isset($_REQUEST["compact"])&&($_REQUEST["compact"]!='true'))
-	{
-		$compact='false';
-	}
-	else
-	{
-		$compact='true';
-	}
+	$sort		= get_request('sort',		'priority');
+	$noactions	= get_request('noactions',	'true');
+	$compact	= get_request('compact',	'true');
+	$onlytrue	= get_request('onlytrue',	'true');
+	$select		= get_request('select',		'false');
+	$txt_select	= get_request('txt_select',	"");
+	if($select == 'false') $txt_select = '';
+
 ?>
-
 <?php
-	if(!isset($_REQUEST["select"]))
+	$r_form = new CForm();
+
+	$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit()");
+	$cmbHosts = new CComboBox("hostid",$_REQUEST["hostid"],"submit()");
+
+	$cmbGroup->AddItem(0,S_ALL_SMALL);
+	
+	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST, null, null, $ZBX_CURNODEID);
+
+	$result=DBselect("select distinct g.groupid,g.name from groups g, hosts_groups hg, hosts h, items i, functions f, triggers t ".
+		" where h.hostid in (".$availiable_hosts.") ".
+		" and hg.groupid=g.groupid and h.status=".HOST_STATUS_MONITORED.
+		" and h.hostid=i.hostid and hg.hostid=h.hostid and i.status=".ITEM_STATUS_ACTIVE.
+		" and i.itemid=f.itemid and t.triggerid=f.triggerid and t.status=".TRIGGER_STATUS_ENABLED.
+		" order by g.name");
+	while($row=DBfetch($result))
 	{
-		$select="";
+		$cmbGroup->AddItem($row["groupid"],$row["name"]);
+		unset($row);
+	}
+	$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
+	
+	if($_REQUEST["groupid"] > 0)
+	{
+		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg, functions f, triggers t where h.status=".HOST_STATUS_MONITORED.
+			" and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid".
+			" and i.status=".ITEM_STATUS_ACTIVE.
+			" and i.itemid=f.itemid and t.triggerid=f.triggerid and t.status=".TRIGGER_STATUS_ENABLED.
+			" and h.hostid in (".$availiable_hosts.") ".
+			" group by h.hostid,h.host order by h.host";
 	}
 	else
 	{
-		$select=$_REQUEST["select"];
+		$cmbHosts->AddItem(0,S_ALL_SMALL);
+		$sql="select h.hostid,h.host from hosts h,items i, functions f, triggers t where h.status=".HOST_STATUS_MONITORED.
+			" and i.status=".ITEM_STATUS_ACTIVE." and h.hostid=i.hostid".
+			" and i.itemid=f.itemid and t.triggerid=f.triggerid and t.status=".TRIGGER_STATUS_ENABLED.
+			" and h.hostid in (".$availiable_hosts.") ".
+			" group by h.hostid,h.host order by h.host";
+	}
+	$result=DBselect($sql);
+	while($row=DBfetch($result))
+	{
+		$cmbHosts->AddItem($row["hostid"],$row["host"]);
 	}
 
-	if(!isset($_REQUEST["txt_select"]))
+	$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
+	$r_form->AddVar("compact",$compact);
+	$r_form->AddVar("onlytrue",$onlytrue);
+	$r_form->AddVar("noactions",$noactions);
+	$r_form->AddVar("select",$select);
+	$r_form->AddVar("txt_select",$txt_select);
+	$r_form->AddVar("sort",$sort);
+	if(isset($_REQUEST['fullscreen'])) $r_form->AddVar("fullscreen",1);
+
+	show_table_header(
+		new CLink(SPACE.S_STATUS_OF_TRIGGERS_BIG.SPACE.date("[H:i:s]",time()),"tr_status.php?onlytrue=$onlytrue&noactions=$noactions".
+			"&compact=$compact&sort=$sort".(!isset($_REQUEST["fullscreen"]) ? '&fullscreen=1' : '')),
+		$r_form);
+?>
+<?php
+	if(!isset($_REQUEST["fullscreen"]))
 	{
-		$txt_select="";
+		$left_col = array();
+		array_push($left_col, '[', new CLink($onlytrue != 'true' ? S_SHOW_ONLY_TRUE : S_SHOW_ALL_TRIGGERS,
+			"tr_status.php?onlytrue=".($onlytrue != 'true' ? 'true' : 'false').
+			"&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select&sort=$sort"
+			), ']'.SPACE);
+		
+		array_push($left_col, '[', new CLink($noactions != 'true' ? S_HIDE_ACTIONS : S_SHOW_ACTIONS,
+			"tr_status.php?noactions=".($noactions != 'true' ? 'true' : 'false').
+			"&onlytrue=$onlytrue&compact=$compact&select=$select&txt_select=$txt_select&sort=$sort"
+			), ']'.SPACE);
+
+		array_push($left_col, '[', new CLink($compact != 'true' ? S_HIDE_DETAILS: S_SHOW_DETAILS,
+			"tr_status.php?compact=".($compact != 'true' ? 'true' : 'false').
+			"&onlytrue=$onlytrue&noactions=$noactions&select=$select&txt_select=$txt_select&sort=$sort"
+			), ']'.SPACE);
+		
+		array_push($left_col, '[', new CLink($select != 'true' ? S_SELECT : S_HIDE_SELECT,
+			"tr_status.php?select=".($select != 'true' ? 'true' : 'false').
+			"&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&txt_select=$txt_select&sort=$sort"
+			), ']');
+			
+		if($select=='true')
+		{
+			$form = new CForm();
+			$form->AddItem(new CTextBox("txt_select",$txt_select,15));
+			$form->AddItem(new CButton("btnSelect", "Select"));
+			$form->AddItem(new CButton("btnSelect", "Inverse select"));
+			$form->AddVar("compact",$compact);
+			$form->AddVar("onlytrue",$onlytrue);
+			$form->AddVar("noactions",$noactions);
+			$form->AddVar("select",$select);
+			array_push($left_col,BR,$form);
+		}
+		show_table_header($left_col);
+	}
+
+  	if(isset($_REQUEST["fullscreen"]))
+	{
+		$triggerInfo = new CTriggersInfo();
+		$triggerInfo->HideHeader();
+		$triggerInfo->Show();
+	}
+
+	if(isset($_REQUEST["fullscreen"]))
+	{
+		$fullscreen="&fullscreen=1";
 	}
 	else
 	{
-		$txt_select=$_REQUEST["txt_select"];
+		$fullscreen="";
+	}
+	
+	$table  = new CTableInfo();
+	$header=array();
+
+	$headers_array = array(
+		array('select_label'=>S_NAME_BIG	, 'simple_label'=>S_NAME,		'sort'=>'description'),
+		array('simple_label'=>S_STATUS),
+		array('select_label'=>S_SEVERITY_BIG	, 'simple_label'=>S_SEVERITY,		'sort'=>'priority'),
+		array('select_label'=>S_LAST_CHANGE_BIG	, 'simple_label'=>S_LAST_CHANGE,	'sort'=>'lastchange'),
+		array('simple_label'=>($noactions!='true') ? S_ACTIONS : NULL),
+		array('simple_label'=>S_ACKNOWLEDGED),
+		array('simple_label'=>S_COMMENTS)
+		);
+
+	$select_vars = (isset($sort) && $sort=="description") ? "&select=$select&txt_select=$txt_select" : "";
+	foreach($headers_array as $el)
+	{
+		if(isset($el['sort']) && $sort == $el['sort'])
+		{
+			$descr = $el['select_label'];
+		}
+		else if(isset($el['sort']))
+		{
+			$descr = new CLink($el['simple_label'],"tr_status.php?sort=".$el['sort'].
+				"&onlytrue=$onlytrue&noactions=$noactions&compact=$compact$select_vars$fullscreen");
+		}
+		else
+		{
+			$descr = $el['simple_label'];
+		}
+		array_push($header,$descr);
+		unset($el);
+	}
+  
+	$table->SetHeader($header);
+	unset($header);
+
+	switch ($sort)
+	{
+		case "description":	$sort="order by t.description";				break;
+		case "priority":	$sort="order by t.priority desc, t.description";	break;
+		case "lastchange":	$sort="order by t.lastchange desc, t.priority";		break;
+		default:		$sort="order by t.priority desc, t.description";
 	}
 
 	if(isset($_REQUEST["btnSelect"])&&($_REQUEST["btnSelect"]=="Inverse select"))
@@ -190,335 +302,28 @@
 	{
 		$select_cond="like '%$txt_select%'";
 	}
-?>
 
-<?php
-	$h1=SPACE.S_STATUS_OF_TRIGGERS_BIG;
+	$cond="";
+	if($_REQUEST["hostid"] > 0)	$cond=" and h.hostid=".$_REQUEST["hostid"]." ";
 
-	$h2="";
-	$h2=$h2."<input name=\"onlytrue\" type=\"hidden\" value=\"".$_REQUEST["onlytrue"]."\">";
-	$h2=$h2."<input name=\"noactions\" type=\"hidden\" value=\"".$_REQUEST["noactions"]."\">";
-	$h2=$h2.S_GROUP.SPACE;
-	$h2=$h2."<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
-	$h2=$h2.form_select("groupid",0,S_ALL_SMALL);
+	if($onlytrue=='true')		$cond .= " and t.value=1 ";
 
-	$result=DBselect("select groupid,name from groups where mod(groupid,100)=$ZBX_CURNODEID order by name");
+	$result = DBselect("select distinct t.triggerid,t.status,t.description,t.expression,t.priority,".
+		" t.lastchange,t.comments,t.url,t.value from triggers t,hosts h,items i,functions f".
+		" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.status=".TRIGGER_STATUS_ENABLED.
+		" and t.description $select_cond and i.status=".ITEM_STATUS_ACTIVE.
+		" and ".DBid2nodeid("t.triggerid")."=".$ZBX_CURNODEID.
+		" and h.hostid not in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT).") ". 
+		" and h.status=".HOST_STATUS_MONITORED." $cond $sort");
+
 	while($row=DBfetch($result))
 	{
-// Check if at least one host with read permission exists for this group
-		$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg".
-			" where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$row["groupid"].
-			" and i.status=".ITEM_STATUS_ACTIVE." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host");
-		$cnt=0;
-		while($row2=DBfetch($result2))
-		{
-			if(!check_right("Host","R",$row2["hostid"]))
-			{
-				continue;
-			}
-			$cnt=1; break;
-		}
-		if($cnt!=0)
-		{
-			$h2=$h2.form_select("groupid",$row["groupid"],$row["name"]);
-		}
-	}
-	$h2=$h2."</select>";
-
-	$h2=$h2.SPACE.S_HOST.SPACE;
-	$h2=$h2."<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
-
-	if($_REQUEST["groupid"]==0)
-		$h2=$h2.form_select("hostid",0,S_ALL_SMALL);
-
-	if($_REQUEST["groupid"] > 0)
-	{
-		$groupcond=" and hg.hostid=h.hostid and hg.groupid=".$_REQUEST["groupid"]." ";
-		$groupname=",hosts_groups hg";
-	}
-	else
-	{
-		$groupcond="";
-		$groupname="";
-	}
-	$sql="select h.hostid,h.host from hosts h,items i".$groupname.
-		" where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid $groupcond".
-		" and i.status=".ITEM_STATUS_ACTIVE." group by h.hostid,h.host order by h.host";
-		" and mod(h.hostid,100)=$ZBX_CURNODEID";
-
-	$result=DBselect($sql);
-	while($row=DBfetch($result))
-	{
-		if(!check_right("Host","R",$row["hostid"]))
-		{
-			continue;
-		}
-		$h2=$h2.form_select("hostid",$row["hostid"],$row["host"]);
-	}
-	$h2=$h2."</select>";
-
-	$h2=$h2.nbsp("  ");
-
-	if(isset($_REQUEST["select"])&&($_REQUEST["select"]==""))
-	{
-		unset($_REQUEST["select"]);
-	}
-	if(isset($_REQUEST["select"]))
-	{
-  		$h2=$h2."<input class=\"biginput\" type=\"text\" name=\"select\" value=\"".$_REQUEST["select"]."\">";
-	}
-	else
-	{
- 		$h2=$h2."<input class=\"biginput\" type=\"text\" name=\"select\" value=\"\">";
-	}
-	$h2=$h2.nbsp(" ");
-  	$h2=$h2."<input class=\"button\" type=\"submit\" name=\"do\" value=\"select\">";
-	show_header2($h1, $h2, "<form name=\"form2\" method=\"get\" action=\"tr_status.php\">", "</form>");
-?>
-
-<?php
-	if(!isset($_REQUEST["fullscreen"]))
-	{
-		$h1="";
-		if($_REQUEST["hostid"] > 0)
-		{
-			$cond="&hostid=".$_REQUEST["hostid"];
-		}
-		else
-		{
-			$cond="";
-		}
-
-		if($onlytrue!='true')
-		{
-			$h1=$h1."[<A HREF=\"tr_status.php?onlytrue=true&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select&sort=$sort$cond\">".S_SHOW_ONLY_TRUE."</a>] ";
-		}
-		else
-		{
-			$h1=$h1."[<A HREF=\"tr_status.php?onlytrue=false&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select&sort=$sort$cond\">".S_SHOW_ALL_TRIGGERS."</A>] ";
-		}
-		if($noactions!='true')
-		{
-			$h1=$h1."[<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=true&compact=$compact&select=$select&txt_select=$txt_select&sort=$sort$cond\">".S_HIDE_ACTIONS."</A>] ";
-		}
-		else
-		{
-			$h1=$h1."[<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=false&compact=$compact&select=$select&txt_select=$txt_select&sort=$sort$cond\">".S_SHOW_ACTIONS."</A>] ";
-		}
-		if($compact!='true')
-		{
-			$h1=$h1."[<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=true&select=$select&txt_select=$txt_select&sort=$sort$cond\">".S_HIDE_DETAILS."</A>] ";
-		}
-		else
-		{
-			$h1=$h1."[<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=false&select=$select&txt_select=$txt_select&sort=$sort$cond\">".S_SHOW_DETAILS."</A>] ";
-		}
-		
-		if($select!='true')
-		{
-			$h1=$h1."[<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=true&txt_select=$txt_select&sort=$sort$cond\">".S_SELECT."</A>] ";
-		}
-		else
-		{
-			$h1=$h1."[<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=false&sort=$sort$cond\">".S_HIDE_SELECT."</A>] "; 
-			$h1=$h1."<form name=\"form1\" method=\"get\" action=\"tr_status.php?select=true\">
-  			<input class=\"biginput\" type=\"text\" name=\"txt_select\" value=\"$txt_select\">
-  			<input class=\"button\" type=\"submit\" name=\"btnSelect\" value=\"Select\">
-  			<input class=\"button\" type=\"submit\" name=\"btnSelect\" value=\"Inverse select\">
-			<INPUT NAME=\"compact\" TYPE=\"HIDDEN\" value=\"$compact\">
-			<INPUT NAME=\"onlytrue\" TYPE=\"HIDDEN\" value=\"$onlytrue\">
-			<INPUT NAME=\"noactions\" TYPE=\"HIDDEN\" value=\"$noactions\">			
-		        <INPUT NAME=\"select\" TYPE=\"HIDDEN\" value=\"$select\">
-			</form>";
-		}
-		show_table_header($h1);
-//		echo "<br>";
-	}
-
- 	$time=date("[H:i:s]",time());
-  	if(isset($_REQUEST["fullscreen"]))
-	{
-		show_table_header("<A HREF=\"tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&sort=$sort\">".S_TRIGGERS_BIG." $time</A>");
-
-		$cond="";
-		if($_REQUEST["hostid"] > 0)
-		{
-			$cond=" and h.hostid=".$_REQUEST["hostid"]." ";
-		}
-
-		if($onlytrue=='true')
-		{
-			$sql="select t.priority,count(*) as cnt from triggers t,hosts h,items i,functions f".$groupname.
-				" where t.value=1 and t.status=0 and f.itemid=i.itemid and h.hostid=i.hostid".
-				" and h.status=".HOST_STATUS_MONITORED." and i.status=".ITEM_STATUS_ACTIVE.
-				" and mod(h.hostid,100)=$ZBX_CURNODEID".
-				" and t.triggerid=f.triggerid and t.description $select_cond $cond $groupcond group by t.priority";
-		}
-		else
-		{
-			$sql="select t.priority,count(*) as cnt from triggers t,hosts h,items i,functions f".$groupname.
-				" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.status=0".
-				" and h.status=".HOST_STATUS_MONITORED." and i.status=".ITEM_STATUS_ACTIVE.
-				" and mod(h.hostid,100)=$ZBX_CURNODEID".
-				" and t.description $select_cond $cond $groupcond group by t.priority";
-		}
-		$result=DBselect($sql);
-		$p0=$p1=$p2=$p3=$p4=$p5=0;
-		while($row=DBfetch($result))
-		{
-			$priority=$row["priority"];
-			$count=$row["cnt"];
-			if($priority==0) $p0=$count;
-			if($priority==1) $p1=$count;
-			if($priority==2) $p2=$count;
-			if($priority==3) $p3=$count;
-			if($priority==4) $p4=$count;
-			if($priority==5) $p5=$count;
-		}
-		echo "\n<TABLE BORDER=0 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=0>";
-		echo "<TR ALIGN=CENTER>";
-		table_td("<B>".S_NOT_CLASSIFIED.": $p0</B>","");
-		table_td("<B>".S_INFORMATION.": $p1</B>","BGCOLOR=#CCE5CC");
-		table_td("<B>".S_WARNING.": $p2</B>","BGCOLOR=#EFEFCC");
-		table_td("<B>".S_AVERAGE.": $p3</B>","BGCOLOR=#DDAAAA");
-		table_td("<B>".S_HIGH.": $p4</B>","BGCOLOR=#FF8888");
-		table_td("<B>".S_DISASTER.": $p5</B>","BGCOLOR=RED");
-		echo "</TR>";
-		echo "</TABLE>";
-	}
-	else
-	{
-		show_table_header(new CLink(S_TRIGGERS_BIG." $time","tr_status.php?onlytrue=$onlytrue&noactions=$noactions&compact=$compact&fullscreen=1&sort=$sort"));
-	}
-
-	$table  = new CTableInfo();
-	$header=array();
-  
-	echo "<TR ALIGN=CENTER BGCOLOR=\"#CCCCCC\">";
-	if(isset($_REQUEST["fullscreen"]))
-	{
-		$fullscreen="&fullscreen=1";
-	}
-	else
-	{
-		$fullscreen="";
-	}
-	if(isset($sort) && $sort=="description")
-	{
-		$description=S_NAME_BIG;
-	}
-	else
-	{
-		if($select=="TRUE")
-			$description="<A HREF=\"tr_status.php?sort=description&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select$fullscreen$cond\">".S_NAME;
-		else
-			$description="<A HREF=\"tr_status.php?sort=description&onlytrue=$onlytrue&noactions=$noactions&compact=$compact$fullscreen$cond\">".S_NAME."</a>";
-	}
-	if($compact!='true') {$description=$description."<BR><FONT SIZE=-1>".S_EXPRESSION."</FONT></B>";}
-	$header=array_merge($header,array($description));
-	$header=array_merge($header,array(S_STATUS));
-
-	if(!isset($sort)||(isset($sort) && $sort=="priority"))
-	{
-		$header=array_merge($header,array(S_SEVERITY_BIG));
-	}
-	else
-	{
-		if($select=="TRUE")
-			$header=array_merge($header,array("<A HREF=\"tr_status.php?sort=priority&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select$fullscreen$cond\">".S_SEVERITY."</a>"));
-		else
-			$header=array_merge($header,array("<A HREF=\"tr_status.php?sort=priority&onlytrue=$onlytrue&noactions=$noactions&compact=$compact$fullscreen$cond\">".S_SEVERITY."</a>"));
-	}
-
-	if(isset($sort) && $sort=="lastchange")
-	{
-		$header=array_merge($header,array(nbsp(S_LAST_CHANGE_BIG)));
-	}
-	else
-	{
-		if($select=="TRUE")
-		{
-			$header=array_merge($header,array("<A HREF=\"tr_status.php?sort=lastchange&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select$fullscreen$cond\">".nbsp(S_LAST_CHANGE)."</a>"));
-		}
-		else
-		{
-			$header=array_merge($header,array("<A HREF=\"tr_status.php?sort=lastchange&onlytrue=$onlytrue&noactions=$noactions&compact=$compact$fullscreen$cond\">".nbsp(S_LAST_CHANGE)."</a>"));
-		}
-	}
-	echo "</TD>";
-   
-	if($noactions!='true')
-	{
-		$header=array_merge($header,array(S_ACTIONS));
-	}
-	array_push($header,S_ACKNOWLEDGED);
-	array_push($header,S_COMMENTS);
-	$table->setHeader($header);
-	unset($header);
-
-	if($_REQUEST["hostid"] > 0)
-	{
-		$cond=" and h.hostid=".$_REQUEST["hostid"]." ";
-	}
-	else
-	{
-		$cond="";
-	}
-
-	if(!isset($sort))
-	{
-		$sort="priority";
-	}
-
-	switch ($sort)
-	{
-		case "description":
-			$sort="order by t.description";
-			break;
-		case "priority":
-			$sort="order by t.priority desc, t.description";
-			break;
-		case "lastchange":
-			$sort="order by t.lastchange desc, t.priority";
-			break;
-		default:
-			$sort="order by t.priority desc, t.description";
-	}
-
-	if($onlytrue=='true')
-	{
-		$result=DBselect("select distinct t.triggerid,t.status,t.description,t.expression,t.priority,".
-			"t.lastchange,t.comments,t.url,t.value from triggers t,hosts h,items i,functions f".$groupname.
-			" where t.value=1 and t.status=0 and f.itemid=i.itemid and h.hostid=i.hostid and t.description".
-			" $select_cond and t.triggerid=f.triggerid and i.status=".ITEM_STATUS_ACTIVE.
-			" and mod(h.hostid,100)=$ZBX_CURNODEID".
-			" and h.status=".HOST_STATUS_MONITORED." $cond $groupcond $sort");
-	}
-	else
-	{
-		$result=DBselect("select distinct t.triggerid,t.status,t.description,t.expression,t.priority,".
-			"t.lastchange,t.comments,t.url,t.value from triggers t,hosts h,items i,functions f".$groupname.
-			" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.status=0".
-			" and mod(h.hostid,100)=$ZBX_CURNODEID".
-			" and t.description $select_cond and i.status=".ITEM_STATUS_ACTIVE." and h.status=".HOST_STATUS_MONITORED.
-			" $cond $groupcond $sort");
-	}
-
-	$col=0;
-	while($row=DBfetch($result))
-	{
-		if(!check_right_on_trigger("R",$row["triggerid"]))
-		{
-			continue;
-		}
-
 // Check for dependencies
 
-		$sql="select count(*) as cnt from trigger_depends d, triggers t where d.triggerid_down=".$row["triggerid"]." and d.triggerid_up=t.triggerid and t.value=1";
-		$result2=DBselect($sql);
-		$row2=DBfetch($result2);
+		$deps = DBfetch(DBselect("select count(*) as cnt from trigger_depends d, triggers t ".
+			" where d.triggerid_down=".$row["triggerid"]." and d.triggerid_up=t.triggerid and t.value=1"));
 
-		if($row2["cnt"]>0)
+		if($deps["cnt"]>0)
 		{
 			continue;
 		}
@@ -526,252 +331,96 @@
 		$elements=array();
 
 
-		$description=expand_trigger_description($row["triggerid"]);
+		$description = expand_trigger_description($row["triggerid"]);
 
 		if($row["url"] != "")
 		{
-			$description="<a href='".$row["url"]."'>$description</a>";
+			$description = new CLink($description, $row["url"]);
 		}
 
-		if($compact!='true')
+		if($compact != 'true')
 		{
-			$description=$description."<BR><FONT COLOR=\"#000000\" SIZE=-2>".explode_exp($row["expression"],1)."</FONT>";
+			$description = array(
+				$description, BR, 
+				"<FONT COLOR=\"#000000\" SIZE=-2>", 
+				explode_exp($row["expression"],1), 
+				"</FONT>");
 		}
 
-		if( (time(NULL)-$row["lastchange"])<300)
-		{
-			$blink1="<blink>";
-			$blink2="</blink>";
-		}
+		if((time(NULL)-$row["lastchange"])<300)
+			$blink = array(1=>"<blink>",	2=>"</blink>");
 		else
-		{
-			$blink1="";
-			$blink2="";
-		}
+			$blink = array(1=>"", 		2=>"");
+		
 		if($row["value"]==0)
-				$value=new CSpan("$blink1".S_FALSE_BIG."$blink2","off");
+			$value = array( 'text' => $blink[1].S_FALSE_BIG.$blink[2],	'style'=> "off" );
 		else if($row["value"]==2)
-				$value=new CSpan("$blink1".S_UNKNOWN_BIG."$blink2","unknown");
+			$value = array( 'text' => $blink[1].S_UNKNOWN_BIG.$blink[2],	'style'=> "unknown" );
 		else
-				$value=new CSpan(S_TRUE_BIG,"on");
+			$value = array( 'text' => S_TRUE_BIG,				'style'=> "on" );
 
-		$priority_style=NULL;
-		if($row["priority"]==0)		$priority=S_NOT_CLASSIFIED;
-		elseif($row["priority"]==1)
-		{
-			$priority=S_INFORMATION;
-			$priority_style="information";
-		}
-		elseif($row["priority"]==2)
-		{
-			$priority=S_WARNING;
-			$priority_style="warning";
-		}
-		elseif($row["priority"]==3)
-		{
-			$priority=S_AVERAGE;
-			$priority_style="average";
-		}
-		elseif($row["priority"]==4)
-		{
-			$priority=S_HIGH;
-			$priority_style="high";
-		}
-		elseif($row["priority"]==5)
-		{
-			$priority=S_DISASTER;
-			$priority_style="disaster";
-		}
-		else				$priority=$row["priority"];
 
-		$lastchange=new CLink(date(S_DATE_FORMAT_YMDHMS,$row["lastchange"]),"alarms.php?triggerid=".$row["triggerid"],"action");
-
-		$actions=NULL;
-		if($noactions!='true')
+		if($noactions=='true')
 		{
-//			$actions="<A HREF=\"actions.php?triggerid=".$row["triggerid"]."\">".S_SHOW_ACTIONS."</A> - ";
-			$actions=array(new CLink(S_HISTORY,"alarms.php?triggerid=".$row["triggerid"],"action"));
-			array_push($actions, " - ");
-			if($_REQUEST["hostid"] > 0)
-			{
-				array_push($actions, new CLink(S_CHANGE,"triggers.php?hostid=".$_REQUEST["hostid"]."&triggerid=".$row["triggerid"]."#form","action"));
-			}
-			else
-			{
-				array_push($actions, new CLink(S_CHANGE,"triggers.php?triggerid=".$row["triggerid"]."#form","action"));
-			}
-		}
-		$comments=NULL;
-		if($row["comments"] != "")
-		{
-			$comments=new CLink(S_SHOW,"tr_comments.php?triggerid=".$row["triggerid"],"action");
+			$actions=NULL;
 		}
 		else
 		{
-			$comments=new CLink(S_ADD,"tr_comments.php?triggerid=".$row["triggerid"],"action");
+			$actions=array(
+				new CLink(S_CHANGE,"triggers.php?triggerid=".$row["triggerid"].
+					($_REQUEST["hostid"] > 0 ? "&hostid=".$_REQUEST["hostid"] : "" ).
+					"#form","action")
+				);
 		}
 
 		$ack = "-";
 		if($row["value"] == 1)
 		{
-			$alarm = get_last_alarm_by_triggerid($row["triggerid"]);
-			if($alarm["acknowledged"] == 1)
+			if($event = get_last_event_by_triggerid($row["triggerid"]))
 			{
-				$db_acks = get_acknowledges_by_alarmid($alarm["alarmid"]);
-				$rows=0;
-				while(DBfetch($db_acks))	$rows++;
-				$ack=array(
-					new CSpan(S_YES,"off"),
-					SPACE."(".$rows.SPACE,
-					new CLink(S_SHOW,
-						"acknow.php?alarmid=".$alarm["alarmid"],"action"),
-					")"
-					);
-			}
-			else
-			{
-				$ack=array(
-					new CSpan(S_NO,"on"),
-					SPACE."(",
-					new CLink(S_ACK,
-						"acknow.php?alarmid=".$alarm["alarmid"],"action"),
-					")"
-					);
+				if($event["acknowledged"] == 1)
+				{
+					$acks_cnt = DBfetch(DBselect("select count(*) as cnt from acknowledges where eventid=".$event["eventid"]));
+					$ack=array(
+						new CSpan(S_YES,"off"),
+						SPACE."(".$acks_cnt['cnt'].SPACE,
+						new CLink(S_SHOW,
+							"acknow.php?eventid=".$event["eventid"],"action"),
+						")"
+						);
+				}
+				else
+				{
+					$ack=array(
+						new CSpan(S_NO,"on"),
+						SPACE."(",
+						new CLink(S_ACK,
+							"acknow.php?eventid=".$event["eventid"],"action"),
+						")"
+						);
+				}
 			}
 		}
 
 		$table->AddRow(array(
 				$description,
-				$value,
-				new CCol($priority,$priority_style),
-				$lastchange,
+				new CSpan($value['text'], $value['style']),
+				new CCol(
+					get_severity_description($row["priority"]),
+					get_severity_style($row["priority"])),
+				new CLink(date(S_DATE_FORMAT_YMDHMS,$row["lastchange"]),"tr_events.php?triggerid=".$row["triggerid"],"action"),
 				$actions,
 				new CCol($ack,"center"),
-				$comments
+				new CLink(($row["comments"] == "") ? S_ADD : S_SHOW,"tr_comments.php?triggerid=".$row["triggerid"],"action")
 				));
-		$col++;
+		unset($row,$description, $actions);
 	}
-	$table->show();
+	$table->Show(false);
 
-	show_table_header(S_TOTAL.":$col");
-
-
-################################################	
-#        NEW permission system                 #
-################################################	
-
-
-	function accessiable_host_id_list($requested_right='H')
-	{
-$CURRENT_USER_ID = 4;
-
-COpt::profiling_start("host_id_list");
-
-		$requested_right = permission2int($requested_right);
-
-		$result = array();
-
-		$hosts_rights = DBselect('select r.permission from rights r where r.userid='.$CURRENT_USER_ID.' AND r.name=\'User Type\'');
-		if($right = DBfetch($hosts_rights))
-		if(permission2int($right['permission']) >= $requested_right)
-		{
-			$arr_rights = array();
-
-			$group_rights = DBselect('select h.hostid, r.permission from hosts_groups hg, hosts h, rights r '.
-				'where r.userid='.$CURRENT_USER_ID.' AND hg.hostid=h.hostid AND r.name=\'Host Group\' AND r.id=hg.groupid');
-			while($right = DBfetch($group_rights))
-				$arr_rights[$right['hostid']] = isset($arr_rights[$right['hostid']]) ?
-					MIN($arr_rights[$right['hostid']], permission2int($right['permission']))  :
-					permission2int($right['permission']);
-
-			$hosts_rights = DBselect('select h.hostid, r.permission from hosts h, rights r '.
-				'where r.userid='.$CURRENT_USER_ID.' AND r.name=\'Host\' AND r.id=h.hostid');
-			while($right = DBfetch($hosts_rights)) $arr_rights[$right['hostid']] = permission2int($right['permission']);
-
-
-			foreach($arr_rights as $hostid => $right)
-			{
-				if($right >= $requested_right) array_push($result, $hostid);
-			}
-		}
-
-		if(count($result) == 0) array_push($result, -1);
-
-COpt::profiling_stop("host_id_list");
-
-		return $result;
-	}
-
-	function process_hosts($function, &$args, $select_params)
-	{
-		/*
-			$result=DBselect("select distinct t.triggerid,t.status,t.description,t.expression,t.priority,".
-			"t.lastchange,t.comments,t.url,t.value from triggers t,hosts h,items i,functions f".$groupname.
-			" where t.value=1 and t.status=0 and f.itemid=i.itemid and h.hostid=i.hostid and t.description".
-			" $select_cond and t.triggerid=f.triggerid and i.status=".ITEM_STATUS_ACTIVE.
-			" and h.status=".HOST_STATUS_MONITORED." $cond $groupcond $sort");
-		*/
-	
-		$select_data = array('h.*');
-		$select_from = array('hosts h');
-		$select_where = array('h.hostid in '.'('.implode(',',accessiable_host_id_list()).')'); /* Node selection */
-
-		if(isset($select_params['hostid'])) 
-			array_push($select_where, 'h.hostid='.$select_params['hostid']);
-
-		if(isset($select_params['groupid']))
-		{
-			array_push($select_from,'hosts_groups hg');
-			array_push($select_where,'h.hostid=hg.hostid AND hg.groupid='.$select_params['groupid']);
-		}
-
-		if(isset($select_params['status']))
-		{
-			array_push($select_where,'h.status='.$select_params['status']);
-		}
-
-		$db_hosts = DBselect(
-			'select '.implode(',',$select_data).' '.
-			'from '.implode(',',$select_from).' '.
-			(count($select_where) > 0 ? 'where '.implode(' AND ', $select_where) : ''));
-
-		for(
-			$ret = true;
-			$ret == true && $db_host_row = DBfetch($db_hosts);
-			$ret = $function($args, $db_host_row)
-		);
-	
-		return $ret;
-	}
-
-	function add_hot_to_table(&$args, $db_row)
-	{
-		if(!is_object($args)) return false;
-
-		$args->AddRow(array($db_row['hostid'], $db_row['host'], $db_row['ip']));
-
-		return true;
-	}
-
-	$host_table = new CTableInfo();
-	$host_table->SetHeader(array(S_ID, S_HOST, S_IP));
-
-	process_hosts('add_hot_to_table', $host_table, 
-		array(
-//			'groupid' => 3,
-//			'hostid' => 10024,
-//			'status' => HOST_STATUS_MONITORED
-		)
-	);
-
-	$host_table->Show();
-	
-
-
-################################################	
-
+	show_table_header(S_TOTAL.": ".$table->GetNumRows());
 ?>
-
 <?php
-	show_page_footer();
+
+include_once "include/page_footer.php";
+
 ?>
