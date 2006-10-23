@@ -22,7 +22,7 @@
 
 #include "sysinc.h"
 
-#define	ZABBIX_REVDATE	"30 October 2006"
+#define	ZABBIX_REVDATE	"23 October 2006"
 #define	ZABBIX_VERSION	"1.1.3"
 
 #if defined(WIN32)
