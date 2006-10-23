@@ -23,14 +23,20 @@
 
 	include_once 	"include/defines.inc.php";
 	include_once 	"include/classes/graph.inc.php";
+	include_once 	"include/users.inc.php";
 	include_once 	"include/db.inc.php";
 
+	function	insert_node_form()
+	{
+		SDI('TODO'); /* TODO node form realization */
+	}
+	
 	function	insert_new_message_form()
 	{
 		global $USER_DETAILS;
 		global $_REQUEST;
 
-		$db_acks = get_acknowledges_by_alarmid($_REQUEST["alarmid"]);
+		$db_acks = get_acknowledges_by_eventid($_REQUEST["eventid"]);
 		if(!DBfetch($db_acks))
 		{
 			$title = S_ACKNOWLEDGE_ALARM_BY;
@@ -44,15 +50,18 @@
 
 		$frmMsg= new CFormTable($title." \"".$USER_DETAILS["alias"]."\"");
 		$frmMsg->SetHelp("manual.php");
-		$frmMsg->AddVar("alarmid",get_request("alarmid",0));
+		$frmMsg->AddVar("eventid",get_request("eventid",0));
 
 		$frmMsg->AddRow(S_MESSAGE, new CTextArea("message","",80,6));
 
 		$frmMsg->AddItemToBottomRow(new CButton("save",$btn_txt));
+		$frmMsg->AddItemToBottomRow(new CButton("cancel",S_CANCEL));
 
-		$frmMsg->Show();
+		$frmMsg->Show(false);
 
 		SetFocus($frmMsg->GetName(),"message");
+
+		$frmMsg->Destroy();
 	}
 
 	# Insert form for User
@@ -61,6 +70,9 @@
 		$frm_title = S_USER;
 		if(isset($userid))
 		{
+			global $USER_DETAILS;
+			if($userid == $USER_DETAILS['userid']) $profile = 1;
+
 			$user=get_user_by_userid($userid);
 			$frm_title = S_USER." \"".$user["alias"]."\"";
 		}
@@ -70,40 +82,85 @@
 			$alias		= $user["alias"];
 			$name		= $user["name"];
 			$surname	= $user["surname"];
-			$password	= "";
+			$password	= null;
+			$password1	= null;
+			$password2	= null;
 			$url		= $user["url"];
 			$autologout	= $user["autologout"];
 			$lang		= $user["lang"];
 			$refresh	= $user["refresh"];
-			$user_groups	= array();
+			$user_type	= $user["type"];
 
-			$db_user_groups = DBselect('select g.* from usrgrp g, users_groups ug where ug.usrgrpid=g.usrgrpid and ug.userid='.$userid);
+			$user_groups	= array();
+			$user_medias		= array();
+
+			$db_user_groups = DBselect('select g.* from usrgrp g, users_groups ug'.
+				' where ug.usrgrpid=g.usrgrpid and ug.userid='.$userid);
+
 			while($db_group = DBfetch($db_user_groups))
 			{
 				$user_groups[$db_group['usrgrpid']] = $db_group['name'];
 			}
+
+			$db_medias = DBselect('select m.* from media m where m.userid='.$userid);
+			while($db_media = DBfetch($db_medias))
+			{
+				array_push($user_medias, 
+					array(	'mediatypeid' => $db_media['mediatypeid'],
+						'period' => $db_media['period'],
+						'sendto' => $db_media['sendto'],
+						'severity' => $db_media['severity'],
+						'active' => $db_media['active']
+					)
+				);
+			}
+
+			$new_group_id	= 0;
+			$new_group_name = '';
 		}
 		else
 		{
 			$alias		= get_request("alias","");
 			$name		= get_request("name","");
 			$surname	= get_request("surname","");
-			$password	= "";
+			$password	= null;
+			$password1 	= get_request("password1", null);
+			$password2 	= get_request("password2", null);
 			$url 		= get_request("url","");
 			$autologout	= get_request("autologout","900");
 			$lang		= get_request("lang","en_gb");
 			$refresh	= get_request("refresh","30");
+			$user_type	= get_request("user_type",USER_TYPE_ZABBIX_USER);;
 			$user_groups	= get_request("user_groups",array());
+			$change_password = get_request("change_password", null);
+
+			$user_medias		= get_request("user_medias", array());
+
+			$new_group_id	= get_request('new_group_id', 0);
+			$new_group_name = get_request('new_group_name', '');
+		}
+
+		$perm_details	= get_request('perm_details',0);
+
+		$media_types = array();
+		$media_type_ids = array();
+		foreach($user_medias as $one_media) $media_type_ids[$one_media['mediatypeid']] = 1;
+
+		if(count($media_type_ids) > 0)
+		{
+			$db_media_types = DBselect('select mt.mediatypeid,mt.description from media_type mt'.
+				' where mt.mediatypeid in ('.implode(',',array_keys($media_type_ids)).')');
+
+			while($db_media_type = DBfetch($db_media_types))
+			{
+				$media_types[$db_media_type['mediatypeid']] = $db_media_type['description'];
+			}	
 		}
 
 		$frmUser = new CFormTable($frm_title);
+		$frmUser->SetName('user_form');
 		$frmUser->SetHelp("web.users.php");
 		$frmUser->AddVar("config",get_request("config",0));
-
-		if($profile==0) 
-			$frmUser->SetAction("users.php");
-		else
-			$frmUser->SetAction("profile.php");
 
 		if(isset($userid))	$frmUser->AddVar("userid",$userid);
 
@@ -114,15 +171,92 @@
 			$frmUser->AddRow(S_SURNAME,	new CTextBox("surname",$surname,20));
 		}
 
-		$frmUser->AddRow(S_PASSWORD,	new CPassBox("password1",$password,20));
-		$frmUser->AddRow(S_PASSWORD_ONCE_AGAIN,	new CPassBox("password2",$password,20));
-
-		foreach($user_groups as $groupid => $group_name)
+		if(!isset($userid) || isset($change_password))
 		{
-			$frmUser->AddRow(S_GROUPS,	$group_name);
+			$frmUser->AddRow(S_PASSWORD,	new CPassBox("password1",$password1,20));
+			$frmUser->AddRow(S_PASSWORD_ONCE_AGAIN,	new CPassBox("password2",$password2,20));
+			if(isset($change_password))
+				$frmUser->AddVar('change_password', $change_password);
+		}
+		else
+		{
+			$frmUser->AddRow(S_PASSWORD,	new CButton("change_password", S_CHANGE_PASSWORD));
 		}
 
-		$cmbLang = new CcomboBox('lang',$lang);
+		if($profile==0)
+		{
+			global $USER_DETAILS;
+
+			$frmUser->AddVar('user_groups',$user_groups);
+
+			if(isset($userid) && ($USER_DETAILS['userid'] == $userid))
+			{
+				$frmUser->AddVar('user_type',$user_type);
+			}
+			else
+			{
+				$cmbUserType = new CComboBox('user_type', $user_type, $perm_details ? 'submit();' : null);
+				$cmbUserType->AddItem(USER_TYPE_ZABBIX_USER,	user_type2str(USER_TYPE_ZABBIX_USER));
+				$cmbUserType->AddItem(USER_TYPE_ZABBIX_ADMIN,	user_type2str(USER_TYPE_ZABBIX_ADMIN));
+				$cmbUserType->AddItem(USER_TYPE_SUPPER_ADMIN,	user_type2str(USER_TYPE_SUPPER_ADMIN));
+				$frmUser->AddRow(S_USER_TYPE, $cmbUserType);
+			}
+			
+			$lstGroups = new CListBox('user_groups_to_del[]');
+			$lstGroups->options['style'] = 'width: 270px';
+
+			foreach($user_groups as $groupid => $group_name)
+			{
+				$lstGroups->AddItem($groupid,	$group_name);
+			}
+
+			$frmUser->AddRow(S_GROUPS, 
+				array(
+					$lstGroups, 
+					BR, 
+					new CButton('add_group',S_ADD,
+						"return PopUp('popup_usrgrp.php?dstfrm=".$frmUser->GetName().
+						"&list_name=user_groups_to_del[]&var_name=user_groups','new_group',".
+						"'width=450,height=450,resizable=1,scrollbars=1');"),
+					SPACE,
+					(count($user_groups) > 0) ? new CButton('del_user_group',S_DELETE_SELECTED) : null
+				));
+
+			$frmUser->AddVar('user_medias', $user_medias);
+
+			$media_table = new CTable(S_NO_MEDIA_DEFINED);
+			foreach($user_medias as $id => $one_media)
+			{
+				if(!isset($one_media["active"]) || $one_media["active"]==0)
+				{
+					$status = new CLink(S_ENABLED,'#','enabled');
+					$status->OnClick("return create_var('".$frmUser->GetName()."','disable_media',".$id.", true);");
+				}
+				else
+				{
+					$status = new CLink(S_DISABLED,'#','disabled');
+					$status->OnClick("return create_var('".$frmUser->GetName()."','enable_media',".$id.", true);");
+				}
+
+				$media_table->AddRow(array(
+					new CCheckBox('user_medias_to_del[]',null,null,$id),
+					new CSpan($media_types[$one_media['mediatypeid']], 'nowrap'),
+					new CSpan($one_media['sendto'], 'nowrap'),
+					new CSpan($one_media['period'], 'nowrap'),
+					media_severity2str($one_media['severity']),
+					$status)
+				);
+			}
+			$frmUser->AddRow(S_MEDIA, array($media_table,
+				new CButton('add_media',S_ADD,
+						'return PopUp("popup_media.php?dstfrm='.$frmUser->GetName().'","new_media",'.
+						'"width=550,height=400,resizable=1,scrollbars=1");'),
+				SPACE,
+				(count($user_medias) > 0) ? new CButton('del_user_media',S_DELETE_SELECTED) : null
+				));
+		}
+
+		$cmbLang = new CComboBox('lang',$lang);
 		$cmbLang->AddItem("en_gb",S_ENGLISH_GB);
 		$cmbLang->AddItem("cn_zh",S_CHINESE_CN);
 		$cmbLang->AddItem("fr_fr",S_FRENCH_FR);
@@ -138,9 +272,60 @@
 		$frmUser->AddRow(S_AUTO_LOGOUT_IN_SEC,	new CTextBox("autologout",$autologout,5));
 		$frmUser->AddRow(S_URL_AFTER_LOGIN,	new CTextBox("url",$url,50));
 		$frmUser->AddRow(S_SCREEN_REFRESH,	new CTextBox("refresh",$refresh,5));
+	
+		
+		if($profile==0)
+		{
+			$frmUser->AddVar('perm_details', $perm_details);
+
+			$link = new CLink($perm_details ? S_HIDE : S_SHOW ,'#','action');
+			$link->OnClick("return create_var('".$frmUser->GetName()."','perm_details',".($perm_details ? 0 : 1).", true);");
+			$resources_list = array(
+				S_RIGHTS_OF_RESOURCES,
+				SPACE.'(',$link,')'
+				);
+			$frmUser->AddSpanRow($resources_list,'right_header');
+
+			if($perm_details)
+			{
+				$group_ids = array_keys($user_groups);
+				if(count($group_ids) == 0) $group_ids = array(-1);
+				$db_rights = DBselect('select * from rights r where r.groupid in ('.implode(',',$group_ids).')');
+
+				$tmp_perm = array();
+				while($db_right = DBfetch($db_rights))
+				{
+					if(isset($tmp_perm[$db_right['type']][$db_right['id']]))
+					{
+						$tmp_perm[$db_right['type']][$db_right['id']] = 
+							min($tmp_perm[$db_right['type']][$db_right['id']],
+								$db_right['permission']);
+					}
+					else
+					{
+						$tmp_perm[$db_right['type']][$db_right['id']] = $db_right['permission'];
+					}
+				}
+
+				$user_rights = array();
+				foreach($tmp_perm as $type => $res)
+				{
+					foreach($res as $id => $perm)
+					{
+						array_push($user_rights, array(	
+							'type'		=> $type,
+							'id'		=> $id,
+							'permission'	=> $perm
+							));
+					}
+				}
+				
+				$frmUser->AddSpanRow(get_rights_of_elements_table($user_rights, $user_type));
+			}
+		}
 
 		$frmUser->AddItemToBottomRow(new CButton('save',S_SAVE));
-		if(isset($userid))
+		if(isset($userid) && $profile == 0)
 		{
 			$frmUser->AddItemToBottomRow(SPACE);
 			$frmUser->AddItemToBottomRow(new CButtonDelete("Delete selected user?",
@@ -151,102 +336,149 @@
 		$frmUser->Show();
 	}
 
-	# Insert form for User permissions
-	function	insert_permissions_form()
-	{
-		global  $_REQUEST;
-
-		$frmPerm = new CFormTable("New permission","users.php");
-		$frmPerm->SetHelp("web.users.php");
-
-		$frmPerm->AddVar("userid",$_REQUEST["userid"]);
-		$frmPerm->AddVar("config",get_request("config",0));
-
-		$cmbRes = new CComboBox("right");
-		$cmbRes->AddItem("Configuration of Zabbix","Configuration of Zabbix");
-		$cmbRes->AddItem("Default permission","Default permission");
-		$cmbRes->AddItem("Graph","Graph");
-		$cmbRes->AddItem("Host","Host");
-		$cmbRes->AddItem("Screen","Screen");
-		$cmbRes->AddItem("Service","IT Service");
-		$cmbRes->AddItem("Item","Item");
-		$cmbRes->AddItem("Network map","Network map");
-		$cmbRes->AddItem("Trigger comment","Trigger comment");
-		$cmbRes->AddItem("User","User");
-		$cmbRes->AddItem("Application","Application");
-		$frmPerm->AddRow(S_RESOURCE,$cmbRes);
-
-		$cmbPerm = new CComboBox("permission");
-		$cmbPerm->AddItem("R","Read-only");
-		$cmbPerm->AddItem("U","Read-write");
-		$cmbPerm->AddItem("H","Hide");
-		$cmbPerm->AddItem("A","Add");
-		$frmPerm->AddRow(S_PERMISSION,$cmbPerm);
-
-		$frmPerm->AddRow("Resource ID (0 for all)",new CTextBox("id",0));
-		$frmPerm->AddItemToBottomRow(new CButton("register","add permission"));
-		$frmPerm->Show();
-	}
-
 	# Insert form for User Groups
-	function	insert_usergroups_form($usrgrpid)
+	function	insert_usergroups_form()
 	{
 		global  $_REQUEST;
 		global  $ZBX_CURNODEID;
 
 		$frm_title = S_USER_GROUP;
-		if(isset($usrgrpid))
+		if(isset($_REQUEST["usrgrpid"]))
 		{
-			$usrgrp=get_usergroup_by_groupid($usrgrpid);
-			$frm_title = S_USER_GROUP." \"".$usrgrp["name"]."\"";
+			$usrgrp		= get_group_by_usrgrpid($_REQUEST["usrgrpid"]);
+			$frm_title 	= S_USER_GROUP." \"".$usrgrp["name"]."\"";
 		}
 
-		$users = get_request("users",array());
-		if(isset($usrgrpid) && !isset($_REQUEST["form_refresh"]))
+		if(isset($_REQUEST["usrgrpid"]) && !isset($_REQUEST["form_refresh"]))
 		{
 			$name	= $usrgrp["name"];
+
+			$group_users = array();
 			$db_users=DBselect("select distinct u.userid,u.alias from users u,users_groups ug ".
-				"where u.userid=ug.userid and ug.usrgrpid=".$usrgrpid.
+				"where u.userid=ug.userid and ug.usrgrpid=".$_REQUEST["usrgrpid"].
 				" order by alias");
 
 			while($db_user=DBfetch($db_users))
+				$group_users[$db_user["userid"]] = $db_user['alias'];
+
+			$group_rights = array();			
+			$sqls = array(
+				'select r.*i,n.name as name from rights r, nodes n where r.groupid='.$_REQUEST["usrgrpid"].
+					' and r.type='.RESOURCE_TYPE_NODE.' and r.id=n.nodeid',
+				'select r.*i, CONCAT(n.name,":",g.name) as name from rights r, groups g, nodes n'.
+					' where r.groupid='.$_REQUEST["usrgrpid"].' and n.nodeid='.DBid2nodeid('g.groupid').
+					' and r.type='.RESOURCE_TYPE_GROUP.' and r.id=g.groupid',
+		
+				);
+			foreach($sqls as $sql)
 			{
-				if(in_array($db_user["userid"], $users)) continue;
-				array_push($users,$db_user["userid"]);
+				$db_rights = DBselect($sql);
+				while($db_right = DBfetch($db_rights))
+				{
+					$group_rights[$db_right['name']] = array(
+						'type'		=> $db_right['type'],
+						'permission'	=> $db_right['permission'],
+						'id'		=> $db_right['id']
+					);
+				}
 			}
 		}
 		else
 		{
-			$name	= get_request("gname","");
+			$name		= get_request("gname","");
+			$group_users	= get_request("group_users",array());
+			$group_rights	= get_request("group_rights",array());
 		}
+		$perm_details = get_request('perm_details', 0);
+
+		ksort($group_rights);
 
 		$frmUserG = new CFormTable($frm_title,"users.php");
 		$frmUserG->SetHelp("web.users.groups.php");
-		$frmUserG->AddVar("config",get_request("config",2));
-		if(isset($usrgrpid))
-		{
-			$frmUserG->AddVar("usrgrpid",$usrgrpid);
-		}
-		$frmUserG->AddRow(S_GROUP_NAME,new CTextBox("gname",$name,30));
+		$frmUserG->AddVar("config",get_request("config",1));
 
-		$form_row = array();
-		$db_users=DBselect("select distinct userid,alias from users".
-				" where mod(userid,100)=".$ZBX_CURNODEID.
-				" order by alias");
-		while($db_user=DBfetch($db_users))
+		if(isset($_REQUEST["usrgrpid"]))
 		{
-			array_push($form_row,
-				array(
-					new CCheckBox("users[]",
-						in_array($db_user["userid"],$users) ? 'yes' : 'no',
-						NULL,			/* action */
-						$db_user["userid"]),	/* value */
-					$db_user["alias"]
-				),
-				BR);
+			$frmUserG->AddVar("usrgrpid",$_REQUEST["usrgrpid"]);
 		}
-		$frmUserG->AddRow(S_USERS,$form_row);
-	
+		$grName = new CTextBox("gname",$name,49);
+		$grName->options['style'] = 'width: 250px';
+		$frmUserG->AddRow(S_GROUP_NAME,$grName);
+
+		$frmUserG->AddVar('group_rights', $group_rights);
+
+		$frmUserG->AddVar('group_users', $group_users);
+
+		$lstUsers = new CListBox('group_users_to_del[]');
+		$lstUsers->options['style'] = 'width: 250px';
+
+		foreach($group_users as $userid => $alias)
+		{
+			$lstUsers->AddItem($userid,	$alias);
+		}
+
+		$frmUserG->AddRow(S_USERS, 
+			array(
+				$lstUsers, 
+				BR, 
+				new CButton('add_user',S_ADD,
+					"return PopUp('popup_users.php?dstfrm=".$frmUserG->GetName().
+					"&list_name=group_users_to_del[]&var_name=group_users','new_user',".
+					"'width=450,height=450,resizable=1,scrollbars=1');"),
+				(count($group_users) > 0) ? new CButton('del_group_user',S_DELETE_SELECTED) : null
+			));
+
+		$table_Rights = new CTable(S_NO_RIGHTS_DEFINED,'right_table');
+
+		$lstWrite = new CListBox('right_to_del[read_write][]'	,null	,20);
+		$lstRead  = new CListBox('right_to_del[read_only][]'	,null	,20);
+		$lstDeny  = new CListBox('right_to_del[deny][]'		,null	,20);
+
+		foreach($group_rights as $name => $element_data)
+		{
+			if($element_data['permission'] == PERM_DENY)		$lstDeny->AddItem($name, $name);
+			elseif ($element_data['permission'] == PERM_READ_ONLY)	$lstRead->AddItem($name, $name);
+			elseif ($element_data['permission'] == PERM_READ_WRITE)	$lstWrite->AddItem($name, $name);
+			
+		}
+
+		$table_Rights->SetHeader(array(S_READ_WRITE, S_READ_ONLY, S_DENY),'header');
+		$table_Rights->AddRow(array(new CCol($lstWrite,'read_write'), new CCol($lstRead,'read_only'), new CCol($lstDeny,'deny')));
+		$table_Rights->AddRow(array(
+			array(new CButton('add_read_write',S_ADD,
+					"return PopUp('popup_right.php?dstfrm=".$frmUserG->GetName().
+					"&permission=".PERM_READ_WRITE."','new_right',".
+					"'width=450,height=450,resizable=1,scrollbars=1');"),
+				new CButton('del_read_write',S_DELETE_SELECTED)),
+			array(	new CButton('add_read_only',S_ADD,
+					"return PopUp('popup_right.php?dstfrm=".$frmUserG->GetName().
+					"&permission=".PERM_READ_ONLY."','new_right',".
+					"'width=450,height=450,resizable=1,scrollbars=1');"),
+				new CButton('del_read_only',S_DELETE_SELECTED)),
+			array(new CButton('add_deny',S_ADD,
+					"return PopUp('popup_right.php?dstfrm=".$frmUserG->GetName().
+					"&permission=".PERM_DENY."','new_right',".
+					"'width=450,height=450,resizable=1,scrollbars=1');"),
+				new CButton('del_deny',S_DELETE_SELECTED))
+			));
+
+		$frmUserG->AddRow(S_RIGHTS,$table_Rights);
+
+		$frmUserG->AddVar('perm_details', $perm_details);
+
+		$link = new CLink($perm_details ? S_HIDE : S_SHOW ,'#','action');
+		$link->OnClick("return create_var('".$frmUserG->GetName()."','perm_details',".($perm_details ? 0 : 1).", true);");
+		$resources_list = array(
+			S_RIGHTS_OF_RESOURCES,
+			SPACE.'(',$link,')'
+			);
+		$frmUserG->AddSpanRow($resources_list,'right_header');
+
+		if($perm_details)
+		{
+			$frmUserG->AddSpanRow(get_rights_of_elements_table($group_rights));
+		}
+
 		$frmUserG->AddItemToBottomRow(new CButton("save",S_SAVE));
 		if(isset($_REQUEST["usrgrpid"]))
 		{
@@ -259,11 +491,84 @@
 		$frmUserG->Show();
 	}
 
+	function	get_rights_of_elements_table($rights=array(),$user_type=USER_TYPE_ZABBIX_USER)
+	{
+		$table = new CTable('S_NO_ACCESSIBLE_RESOURCES', 'right_table');
+		$table->SetHeader(array(SPACE, S_READ_WRITE, S_READ_ONLY, S_DENY),'header');
+
+		$lst['node']['label']		= S_NODES;
+		$lst['node']['read_write']	= new CListBox('nodes_write'	,null	,6);
+		$lst['node']['read_only']	= new CListBox('nodes_read'	,null	,6);
+		$lst['node']['deny']		= new CListBox('nodes_deny'	,null	,6);
+
+		$nodes = get_accessible_nodes_by_rights($rights, $user_type, PERM_DENY, PERM_MODE_GE, PERM_RES_DATA_ARRAY);
+
+		foreach($nodes as $node)
+		{
+			switch($node['permission'])
+			{
+				case PERM_READ_ONLY:	$list_name='read_only';		break;
+				case PERM_READ_WRITE:	$list_name='read_write';	break;
+				default:		$list_name='deny';		break;
+			}
+			$lst['node'][$list_name]->AddItem($node['nodeid'],$node['name']);
+		}
+
+		$lst['group']['label']		= S_HOST_GROUPS;
+		$lst['group']['read_write']	= new CListBox('groups_write'	,null	,10);
+		$lst['group']['read_only']	= new CListBox('groups_read'	,null	,10);
+		$lst['group']['deny']		= new CListBox('groups_deny'	,null	,10);
+
+		$groups = get_accessible_groups_by_rights($rights, $user_type, PERM_DENY, PERM_MODE_GE, PERM_RES_DATA_ARRAY);
+
+		foreach($groups as $group)
+		{
+			switch($group['permission'])
+			{
+				case PERM_READ_ONLY:	$list_name='read_only';		break;
+				case PERM_READ_WRITE:	$list_name='read_write';	break;
+				default:		$list_name='deny';		break;
+			}
+			$lst['group'][$list_name]->AddItem($group['groupid'],$group['node_name'].':'.$group['name']);
+		}
+		
+		$lst['host']['label']		= S_HOSTS;
+		$lst['host']['read_write']	= new CListBox('hosts_write'	,null	,15);
+		$lst['host']['read_only']	= new CListBox('hosts_read'	,null	,15);
+		$lst['host']['deny']		= new CListBox('hosts_deny'	,null	,15);
+
+		$hosts = get_accessible_hosts_by_rights($rights, $user_type, PERM_DENY, PERM_MODE_GE, PERM_RES_DATA_ARRAY);
+		foreach($hosts as $host)
+		{
+			switch($host['permission'])
+			{
+				case PERM_READ_ONLY:	$list_name='read_only';		break;
+				case PERM_READ_WRITE:	$list_name='read_write';	break;
+				default:		$list_name='deny';		break;
+			}
+			$lst['host'][$list_name]->AddItem($host['hostid'],$host['node_name'].':'.$host['host']);
+		}
+		
+		foreach($lst as $name => $lists)
+		{
+			$row = new CRow();
+			foreach($lists as $class => $list_obj)
+			{
+				$row->AddItem(new CCol($list_obj, $class));
+			}
+			$table->AddRow($row);
+		}
+
+		return $table;
+	}
+
 
 	# Insert form for Item information
 	function	insert_item_form()
 	{
 		global  $_REQUEST;
+		global  $USER_DETAILS;
+		global  $ZBX_CURNODEID;
 
 		$frmItem = new CFormTable(S_ITEM,"items.php");
 		$frmItem->SetHelp("web.items.item.php");
@@ -276,7 +581,7 @@
 
 		$description	= get_request("description"	,"");
 		$key		= get_request("key"		,"");
-		$host		= get_request("host",		NULL);
+		$host		= get_request("host",		null);
 		$delay		= get_request("delay"		,30);
 		$history	= get_request("history"		,90);
 		$status		= get_request("status"		,0);
@@ -378,7 +683,7 @@
 
 			array_push($delay_flex_el,
 				array(
-					new CCheckBox("rem_delay_flex[]", 'no', NULL,$i),
+					new CCheckBox("rem_delay_flex[]", 'no', null,$i),
 						$val["delay"],
 						" sec at ",
 						$val["period"]
@@ -476,11 +781,11 @@
 		$frmItem->AddRow(S_KEY, array(new CTextBox("key",$key,40), $btnSelect));
 
 		$cmbValType = new CComboBox("value_type",$value_type,"submit()");
-		$cmbValType->AddItem(ITEM_VALUE_TYPE_UINT64, S_NUMERIC_UINT64);
-		$cmbValType->AddItem(ITEM_VALUE_TYPE_FLOAT, S_NUMERIC_FLOAT);
-		$cmbValType->AddItem(ITEM_VALUE_TYPE_STR, S_CHARACTER);
-		$cmbValType->AddItem(ITEM_VALUE_TYPE_LOG, S_LOG);
-		$cmbValType->AddItem(ITEM_VALUE_TYPE_TEXT, S_TEXT);
+		$cmbValType->AddItem(ITEM_VALUE_TYPE_UINT64,	S_NUMERIC_UINT64);
+		$cmbValType->AddItem(ITEM_VALUE_TYPE_FLOAT,	S_NUMERIC_FLOAT);
+		$cmbValType->AddItem(ITEM_VALUE_TYPE_STR, 	S_CHARACTER);
+		$cmbValType->AddItem(ITEM_VALUE_TYPE_LOG, 	S_LOG);
+		$cmbValType->AddItem(ITEM_VALUE_TYPE_TEXT,	S_TEXT);
 		$frmItem->AddRow(S_TYPE_OF_INFORMATION,$cmbValType);
 
 		if( ($value_type==ITEM_VALUE_TYPE_FLOAT) || ($value_type==ITEM_VALUE_TYPE_UINT64))
@@ -527,7 +832,7 @@
 
 		$frmItem->AddRow(S_KEEP_HISTORY_IN_DAYS, array(
 			new CTextBox("history",$history,8),
-			(!isset($_REQUEST["itemid"])) ? NULL :
+			(!isset($_REQUEST["itemid"])) ? null :
 				new CButton("del_history",
 					"Clean history",
 					"return Confirm('History cleaning can take a long time. Continue?');")
@@ -567,7 +872,7 @@
 		{
 			$cmbMap = new CComboBox("valuemapid",$valuemapid);
 			$cmbMap->AddItem(0,S_AS_IS);
-			$db_valuemaps = DBselect("select * from valuemaps");
+			$db_valuemaps = DBselect("select * from valuemaps where ".DBid2nodeid("valuemapid")."=".$ZBX_CURNODEID);
 			while($db_valuemap = DBfetch($db_valuemaps))
 				$cmbMap->AddItem($db_valuemap["valuemapid"],$db_valuemap["name"]);
 
@@ -618,20 +923,12 @@
 
 	        $cmbGroups = new CComboBox("add_groupid",$add_groupid);		
 
-	        $groups=DBselect("select groupid,name from groups order by name");
+	        $groups=DBselect("select distinct groupid,name from groups ".
+			"where groupid in (".get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,$ZBX_CURNODEID).") ".
+			" order by name");
 	        while($group=DBfetch($groups))
 	        {
-// Check if at least one host with read permission exists for this group
-	                $hosts=DBselect("select h.hostid,h.host from hosts h,hosts_groups hg".
-				" where hg.groupid=".$group["groupid"]." and hg.hostid=h.hostid".
-				" and h.status<>".HOST_STATUS_DELETED." group by h.hostid,h.host".
-				" order by h.host");
-	                while($host=DBfetch($hosts))
-	                {
-	                        if(!check_right("Host","U",$host["hostid"])) continue;
-				$cmbGroups->AddItem($group["groupid"],$group["name"]);
-				break;
-	                }
+			$cmbGroups->AddItem($group["groupid"],$group["name"]);
 	        }
 		$frmItem->AddRow(S_GROUP,$cmbGroups);
 
@@ -664,7 +961,7 @@
 			return;
 		}
 
-		$frmCopy = new CFormTable(count($group_itemid).' '.S_X_ELEMENTS_COPY_TO_DOT_DOT_DOT,NULL,'post',NULL,'form_copy_to');
+		$frmCopy = new CFormTable(count($group_itemid).' '.S_X_ELEMENTS_COPY_TO_DOT_DOT_DOT,null,'post',null,'form_copy_to');
 		$frmCopy->SetHelp('web.items.copyto.php');
 		$frmCopy->AddVar($elements_array_name, $group_itemid);
 
@@ -702,7 +999,7 @@
 			array_push($target_list,array(
 				new CCheckBox('copy_targetid[]',
 					in_array($target['target_id'], $copy_targetid), 
-					NULL, 
+					null, 
 					$target['target_id']),
 				SPACE,
 				$target['target_name'],
@@ -733,9 +1030,11 @@
 		$frmLogin->AddRow('Login name', new CTextBox('name'));
 		$frmLogin->AddRow('Password', new CPassBox('password'));
 		$frmLogin->AddItemToBottomRow(new CButton('enter','Enter'));
-		$frmLogin->Show();
+		$frmLogin->Show(false);
 
 		SetFocus($frmLogin->GetName(),"name");
+		
+		$frmLogin->Destroy();
 	}
 
 	# Insert form for Trigger
@@ -794,7 +1093,7 @@
 		foreach($dependences as $val){
 			array_push($dep_el,
 				array(
-					new CCheckBox("rem_dependence[]", 'no', NULL, strval($val)),
+					new CCheckBox("rem_dependence[]", 'no', null, strval($val)),
 					expand_trigger_description($val)
 				),
 				BR);
@@ -808,32 +1107,31 @@
 		$frmTrig->AddRow("The trigger depends on",$dep_el);
 	/* end dependences */
 
+		global $USER_DETAILS;
 	/* new dependence */
-		$cmbDepID = new CComboBox("new_dependence");
-		if(isset($_REQUEST["triggerid"]))
-			$sql="select t.triggerid,t.description from triggers t".
-				" where t.triggerid!=".$_REQUEST["triggerid"]." order by t.description";
-		else
-			$sql="select t.triggerid,t.description from triggers t order by t.description";
+		$frmTrig->AddVar('new_dependence','0');
 
-		$db_trigs=DBselect($sql);
-		while($db_trig=DBfetch($db_trigs))
-		{
-			$cmbDepID->AddItem($db_trig["triggerid"],
-				expand_trigger_description($db_trig["triggerid"]));
-		}
-		$frmTrig->AddRow("New dependency",array(
-			$cmbDepID,SPACE,
-			new CButton("add_dependence","add")));
+		$txtCondVal = new CTextBox('trigger','',50);
+		$txtCondVal->SetReadonly('yes');
+
+		$btnSelect = new CButton('btn1',S_SELECT,
+				"return PopUp('popup.php?dstfrm=".$frmTrig->GetName().
+				"&dstfld1=new_dependence&dstfld2=trigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description','new_win',".
+				"'width=600,height=450,resizable=1,scrollbars=1');");
+		
+		$btnSelect->SetAccessKey('T');
+		$frmTrig->AddRow("New dependency",array($txtCondVal, 
+			$btnSelect, BR,
+			new CButton("add_dependence","add")
+			));
+			
 	/* end new dwpendence */
 
 		$cmbPrior = new CComboBox("priority",$priority);
-		$cmbPrior->AddItem(0,"Not classified");
-		$cmbPrior->AddItem(1,"Information");
-		$cmbPrior->AddItem(2,"Warning");
-		$cmbPrior->AddItem(3,"Average");
-		$cmbPrior->AddItem(4,"High");
-		$cmbPrior->AddItem(5,"Disaster");
+		for($i = 0; $i <= 5; $i++)
+		{
+			$cmbPrior->AddItem($i,get_severity_description($i));
+		}
 		$frmTrig->AddRow(S_SEVERITY,$cmbPrior);
 
 		$frmTrig->AddRow(S_COMMENTS,new CTextArea("comments",$comments,70,7));
@@ -855,14 +1153,16 @@
 
 	function insert_trigger_comment_form($triggerid)
 	{
-		$trigger=get_trigger_by_triggerid($triggerid);
-		$comments=stripslashes($trigger["comments"]);
+		$trigger	= DBfetch(DBselect('select t.*, h.* from triggers t, functions f, items i, hosts h '.
+			' where t.triggerid='.$triggerid.' and f.triggerid=t.triggerid and f.itemid=i.itemid '.
+			' and i.hostid=h.hostid '));
 
-		$frmComent = new CFormTable(S_COMMENTS." for \"".expand_trigger_description_simple($triggerid)."\"");
+		$frmComent = new CFormTable(S_COMMENTS." for ".$trigger['host']." : \"".expand_trigger_description_by_data($trigger)."\"");
 		$frmComent->SetHelp("web.tr_comments.comments.php");
 		$frmComent->AddVar("triggerid",$triggerid);
-		$frmComent->AddRow(S_COMMENTS,new CTextArea("comments",$comments,100,25));
-		$frmComent->AddItemToBottomRow(new CButton("register","update"));
+		$frmComent->AddRow(S_COMMENTS,new CTextArea("comments",stripslashes($trigger["comments"]),100,25));
+		$frmComent->AddItemToBottomRow(new CButton("save",S_SAVE));
+		$frmComent->AddItemToBottomRow(new CButton("cancel",S_CANCEL));
 
 		$frmComent->Show();
 	}
@@ -915,8 +1215,8 @@
 		$cmbGType->AddItem(GRAPH_TYPE_STACKED,S_STACKED);
 		$frmGraph->AddRow(S_GRAPH_TYPE,$cmbGType);
 
-		$frmGraph->AddRow(S_SHOW_WORKING_TIME,new CCheckBox("showworkperiod",$showworkperiod,NULL,1));
-		$frmGraph->AddRow(S_SHOW_TRIGGERS,new CCheckBox("showtriggers",$showtriggers,NULL,1));
+		$frmGraph->AddRow(S_SHOW_WORKING_TIME,new CCheckBox("showworkperiod",$showworkperiod,null,1));
+		$frmGraph->AddRow(S_SHOW_TRIGGERS,new CCheckBox("showtriggers",$showtriggers,null,1));
 
 		$cmbYType = new CComboBox("yaxistype",$yaxistype,"submit()");
 		$cmbYType->AddItem(GRAPH_YAXIS_TYPE_CALCULATED,S_CALCULATED);
@@ -955,22 +1255,19 @@
 		
 
 		$db_graph = get_graph_by_graphid($_REQUEST["graphid"]);
-		$db_hosts = get_hosts_by_graphid($_REQUEST["graphid"]);
-		$db_host = DBfetch($db_hosts);
-		if(!$db_host)
-		{
-			// empty graph, can contain any item
-			$host_condition = " and h.status in(".HOST_STATUS_MONITORED.",".HOST_STATUS_TEMPLATE.")";
-		}
-		else
+
+		$db_host = DBfetch(get_hosts_by_graphid($_REQUEST["graphid"]));
+		
+		$host_condition = "";
+		if($db_host)
 		{
 			if($db_host["status"]==HOST_STATUS_TEMPLATE)
 			{// graph for template must use only one host
-				$host_condition = " and h.hostid=".$db_host["hostid"];
+				$host_condition = "&only_hostid=".$db_host["hostid"];
 			}
 			else
 			{
-				$host_condition = " and h.status in(".HOST_STATUS_MONITORED.")";
+				$host_condition = "&monitored_hosts=1";
 			}
 		}
 
@@ -1012,17 +1309,26 @@
 			$frmGItem->AddVar("gitemid",$_REQUEST["gitemid"]);
 		}
 
-		$cmbItems = new CComboBox("itemid", $itemid);
-		$result=DBselect("select h.host,i.description,i.itemid,i.key_ from hosts h,items i".
-			" where h.hostid=i.hostid".
-			$host_condition.
-			" and i.status=".ITEM_STATUS_ACTIVE." order by h.host,i.description");
-		while($row=DBfetch($result))
+		$description = '';
+		if($itemid > 0)
 		{
-			$cmbItems->AddItem($row["itemid"],
-				$row["host"].":".SPACE.item_description($row["description"],$row["key_"]));
+			$description = DBfetch(DBselect("select * from items where itemid=".$itemid));
+			$description = $description['description'];
 		}
-		$frmGItem->AddRow(S_PARAMETER, $cmbItems);
+		
+		$frmGItem->AddVar('itemid',$itemid);
+
+		$txtCondVal = new CTextBox('description',$description,50);
+		$txtCondVal->SetReadonly('yes');
+
+		$btnSelect = new CButton('btn1',S_SELECT,
+				"return PopUp('popup.php?dstfrm=".$frmGItem->GetName().
+				"&dstfld1=itemid&dstfld2=description&".
+				"srctbl=items&srcfld1=itemid&srcfld2=description".$host_condition."','new_win',".
+				"'width=600,height=450,resizable=1,scrollbars=1');");
+		
+		$btnSelect->SetAccessKey('T');
+		$frmGItem->AddRow(S_PARAMETER ,array($txtCondVal,$btnSelect));
 
 		if($db_graph["graphtype"] == GRAPH_TYPE_NORMAL)
 		{
@@ -1214,7 +1520,7 @@
 		{
 			array_push($valuemap_el,
 				array(
-					new CCheckBox("rem_value[]", 'no', NULL, $i),
+					new CCheckBox("rem_value[]", 'no', null, $i),
 					$value["value"].SPACE.RARR.SPACE.$value["newvalue"]
 				),
 				BR);
@@ -1254,8 +1560,9 @@
 	function	insert_action_form()
 	{
 		global  $_REQUEST;
+		global  $ZBX_CURNODEID;
 
-		$uid=NULL;
+		$uid=null;
 
 		$frmAction = new CFormTable(S_ACTION,'actionconf.php');
 		$frmAction->SetHelp('web.actions.action.php');
@@ -1343,7 +1650,7 @@
 		{
 			array_push($cond_el, 
 				array(
-					new CCheckBox("rem_condition[]", 'no', NULL,$i),
+					new CCheckBox("rem_condition[]", 'no', null,$i),
 					get_condition_desc(
 						$val["type"],
 						$val["operator"],
@@ -1416,13 +1723,18 @@
 // add condition value
 		if($new_condition_type == CONDITION_TYPE_GROUP)
 		{
-			$cmbCondVal = new CComboBox('new_condition_value');
-			$groups = DBselect("select groupid,name from groups order by name");
-			while($group = DBfetch($groups))
-			{
-				$cmbCondVal->AddItem($group["groupid"],$group["name"]);
-			}
-			array_push($rowCondition,$cmbCondVal);
+			$frmAction->AddVar('new_condition_value','0');
+
+			$txtCondVal = new CTextBox('group','',20);
+			$txtCondVal->SetReadonly('yes');
+
+			$btnSelect = new CButton('btn1',S_SELECT,
+				"return PopUp('popup.php?dstfrm=".$frmAction->GetName().
+				"&dstfld1=new_condition_value&dstfld2=group&srctbl=host_group&srcfld1=groupid&srcfld2=name','new_win',".
+				"'width=450,height=450,resizable=1,scrollbars=1');");
+			$btnSelect->SetAccessKey('T');
+
+			array_push($rowCondition, $txtCondVal, $btnSelect);
 		}
 		else if($new_condition_type == CONDITION_TYPE_HOST)
 		{
@@ -1471,12 +1783,9 @@
 		else if($new_condition_type == CONDITION_TYPE_TRIGGER_SEVERITY)
 		{
 			$cmbCondVal = new CComboBox('new_condition_value');
-			$cmbCondVal->AddItem(0,S_NOT_CLASSIFIED);
-			$cmbCondVal->AddItem(1,S_INFORMATION);
-			$cmbCondVal->AddItem(2,S_WARNING);
-			$cmbCondVal->AddItem(3,S_AVERAGE);
-			$cmbCondVal->AddItem(4,S_HIGH);
-			$cmbCondVal->AddItem(5,S_DISASTER);
+			foreach(array(0,1,2,3,4,5) as $id)
+				$cmbCondVal->AddItem($id,get_severity_description($id));
+
 			array_push($rowCondition,$cmbCondVal);
 		}
 // add condition button
@@ -1501,8 +1810,9 @@
 				
 				$cmbGroups = new CComboBox('userid', $uid);
 		
-				$sql="select usrgrpid,name from usrgrp order by name";
-				$groups=DBselect($sql);
+				$groups = DBselect("select usrgrpid,name from usrgrp ".
+					" where ".Dbid2nodeid("usrgrpid")."=".$ZBX_CURNODEID.
+					" order by name");
 				while($group=DBfetch($groups))
 				{
 					$cmbGroups->AddItem($group['usrgrpid'],$group['name']);
@@ -1514,8 +1824,9 @@
 			{
 				$cmbUser = new CComboBox('userid', $uid);
 				
-				$sql="select userid,alias from users order by alias";
-				$users=DBselect($sql);
+				$users=DBselect("select userid,alias from users ".
+					" where ".Dbid2nodeid("userid")."=".$ZBX_CURNODEID.
+					" order by alias");
 				while($user=DBfetch($users))
 				{
 					$cmbUser->AddItem($user['userid'],$user['alias']);
@@ -1583,26 +1894,27 @@
 
 		if(isset($_REQUEST["mediatypeid"]) && !isset($_REQUEST["form_refresh"]))
 		{
-			$result=DBselect("select mediatypeid,type,description,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem from media_type where mediatypeid=".$_REQUEST["mediatypeid"]);
-			$row=DBfetch($result);
-			$mediatypeid=$row["mediatypeid"];
-			$type=@iif(isset($_REQUEST["type"]),$_REQUEST["type"],$row["type"]);
-			$description=$row["description"];
-			$smtp_server=$row["smtp_server"];
-			$smtp_helo=$row["smtp_helo"];
-			$smtp_email=$row["smtp_email"];
-			$exec_path=$row["exec_path"];
-			$gsm_modem=$row["gsm_modem"];
+			$result = DBselect("select mediatypeid,type,description,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem ".
+				"from media_type where mediatypeid=".$_REQUEST["mediatypeid"]);
+
+			$row = DBfetch($result);
+			$mediatypeid	= $row["mediatypeid"];
+			$type		= get_request("type",$row["type"]);
+			$description	= $row["description"];
+			$smtp_server	= $row["smtp_server"];
+			$smtp_helo	= $row["smtp_helo"];
+			$smtp_email	= $row["smtp_email"];
+			$exec_path	= $row["exec_path"];
+			$gsm_modem	= $row["gsm_modem"];
 		}
 
-		$frmMeadia = new CFormTable(S_MEDIA,"config.php");
+		$frmMeadia = new CFormTable(S_MEDIA);
 		$frmMeadia->SetHelp("web.config.medias.php");
 
 		if(isset($_REQUEST["mediatypeid"]))
 		{
 			$frmMeadia->AddVar("mediatypeid",$_REQUEST["mediatypeid"]);
 		}
-		$frmMeadia->AddVar("config",1);
 
 		$frmMeadia->AddRow(S_DESCRIPTION,new CTextBox("description",$description,30));
 		$cmbType = new CComboBox("type",$type,"submit()");
@@ -1640,10 +1952,10 @@
 		{
 			$frmMeadia->AddItemToBottomRow(SPACE);
 			$frmMeadia->AddItemToBottomRow(new CButtonDelete(S_DELETE_SELECTED_MEDIA,
-				url_param("form").url_param("config").url_param("mediatypeid")));
+				url_param("form").url_param("mediatypeid")));
 		}
 		$frmMeadia->AddItemToBottomRow(SPACE);
-		$frmMeadia->AddItemToBottomRow(new CButtonCancel(url_param("config")));
+		$frmMeadia->AddItemToBottomRow(new CButtonCancel());
 		$frmMeadia->Show();
 	}
 
@@ -1688,7 +2000,7 @@
 		if($imageid > 0)
 		{
 			$frmImages->AddRow(S_IMAGE,new CLink(
-				new CImg("image.php?width=640&height=480&imageid=".$imageid,"no image",NULL),
+				new CImg("image.php?width=640&height=480&imageid=".$imageid,"no image",null),
 				"image.php?imageid=".$row["imageid"]));
 		}
 
@@ -1754,6 +2066,7 @@
 	function&	get_screen_item_form()
 	{
 		global $_REQUEST;
+		global $USER_DETAILS;
 
 		$form = new CFormTable(S_SCREEN_CELL_CONFIGURATION,"screenedit.php#form");
 		$form->SetHelp("web.screenedit.cell.php");
@@ -1822,16 +2135,20 @@
 		if($resourcetype == SCREEN_RESOURCE_GRAPH)
 		{
 	// User-defined graph
-			$result=DBselect("select graphid,name from graphs order by name");
+			$result = DBselect("select distinct g.graphid,g.name,n.name as node_name ".
+				" from graphs g, nodes n, graphs_items gi, items i, hosts h ".
+				" where n.nodeid=".DBid2nodeid("g.graphid")." and g.graphid=gi.graphid ".
+				" and gi.itemid=i.itemid and h.hostid=i.hostid".
+				" and i.hostid not in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT).")".
+				" order by node_name,host,name,graphid");
 
 			$cmbGraphs = new CComboBox("resourceid",$resourceid);
 			while($row=DBfetch($result))
 			{
-				$db_hosts = get_hosts_by_graphid($row["graphid"]);
-				$db_host = DBfetch($db_hosts);
+				$db_host = DBfetch(get_hosts_by_graphid($row["graphid"]));
 				if($db_host)
 				{
-					$name = $db_host["host"].":".$row["name"];
+					$name = "(".$row["node_name"].") ".$db_host["host"].":".$row["name"];
 				}
 				else
 				{
@@ -1845,17 +2162,18 @@
 		elseif($resourcetype == SCREEN_RESOURCE_SIMPLE_GRAPH)
 		{
 	// Simple graph
-			$result=DBselect("select h.host,i.description,i.itemid,i.key_".
-				" from hosts h,items i where h.hostid=i.hostid".
+			$result=DBselect("select n.name as node_name,h.host,i.description,i.itemid,i.key_".
+				" from hosts h,items i,nodes n where h.hostid=i.hostid and n.nodeid=".DBid2nodeid("i.itemid").
 				" and h.status=".HOST_STATUS_MONITORED." and i.status=".ITEM_STATUS_ACTIVE.
-				" order by h.host,i.description");
+				" and i.hostid not in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT).")".
+				" order by node_name,h.host,i.description");
 
 
 			$cmbItems = new CCombobox("resourceid",$resourceid);
 			while($row=DBfetch($result))
 			{
 				$description_=item_description($row["description"],$row["key_"]);
-				$cmbItems->AddItem($row["itemid"],$row["host"].": ".$description_);
+				$cmbItems->AddItem($row["itemid"],"(".$row["node_name"].") ".$row["host"].": ".$description_);
 
 			}
 			$form->AddRow(S_PARAMETER,$cmbItems);
@@ -1863,12 +2181,15 @@
 		elseif($resourcetype == SCREEN_RESOURCE_MAP)
 		{
 	// Map
-			$result=DBselect("select sysmapid,name from sysmaps order by name");
+			$result=DBselect("select n.name as node_name, s.sysmapid,s.name from sysmaps s, nodes n".
+				" where n.nodeid=".DBid2nodeid("s.sysmapid").
+				" order by name ");
 
 			$cmbMaps = new CComboBox("resourceid",$resourceid);
 			while($row=DBfetch($result))
 			{
-				$cmbMaps->AddItem($row["sysmapid"],$row["name"]);
+				if(!sysmap_accessiable($row["sysmapid"],PERM_READ_ONLY)) continue;
+				$cmbMaps->AddItem($row["sysmapid"],"(".$row["node_name"].") ".$row["name"]);
 			}
 
 			$form->AddRow(S_MAP,$cmbMaps);
@@ -1876,16 +2197,17 @@
 		elseif($resourcetype == SCREEN_RESOURCE_PLAIN_TEXT)
 		{
 	// Plain text
-			$result=DBselect("select h.host,i.description,i.itemid,i.key_".
-				" from hosts h,items i where h.hostid=i.hostid".
+			$result=DBselect("select n.name as node_name,h.host,i.description,i.itemid,i.key_".
+				" from hosts h,items i,nodes n where h.hostid=i.hostid and n.nodeid=".DBid2nodeid("i.itemid").
 				" and h.status=".HOST_STATUS_MONITORED." and i.status=".ITEM_STATUS_ACTIVE.
-				" order by h.host,i.description");
+				" and i.hostid not in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT).")".
+				" order by node_name,h.host,i.description");
 
 			$cmbHosts = new CComboBox("resourceid",$resourceid);
 			while($row=DBfetch($result))
 			{
 				$description_=item_description($row["description"],$row["key_"]);
-				$cmbHosts->AddItem($row["itemid"],$row["host"].": ".$description_);
+				$cmbHosts->AddItem($row["itemid"],"(".$row["node_name"].") ".$row["host"].": ".$description_);
 
 			}
 
@@ -1910,25 +2232,14 @@
 			$cmbGroup = new CComboBox("resourceid",$resourceid);
 
 			$cmbGroup->AddItem(0,S_ALL_SMALL);
-			$result=DBselect("select groupid,name from groups order by name");
+			$result=DBselect("select distinct n.name as node_name,g.groupid,g.name from groups g,nodes n,hosts_groups hg,hosts h ".
+				" where g.groupid in (".get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY).")".
+				" and n.nodeid=".DBid2nodeid("g.groupid")." and g.groupid=hg.groupid and hg.hostid=h.hostid ".
+				" and h.status=".HOST_STATUS_MONITORED.
+				" order by node_name,g.name");
 			while($row=DBfetch($result))
 			{
-				$cmbGroup = new CComboBox("resourceid",$resourceid);
-
-				$cmbGroup->AddItem(0,S_ALL_SMALL);
-				$result=DBselect("select groupid,name from groups order by name");
-				while($row=DBfetch($result))
-				{
-					$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg where".
-						" h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$row["groupid"].
-						" and hg.hostid=h.hostid group by h.hostid,h.host order by h.host");
-					while($row2=DBfetch($result2))
-					{
-						if(!check_right("Host","R",$row2["hostid"]))    continue;
-						$cmbGroup->AddItem($row["groupid"],$row["name"]);
-						break;
-					}
-				}
+				$cmbGroup->AddItem($row["groupid"],"(".$row["node_name"].") ".$row["name"]);
 			}
 			$form->AddRow(S_GROUP,$cmbGroup);
 
@@ -1936,12 +2247,15 @@
 		elseif($resourcetype == SCREEN_RESOURCE_SCREEN)
 		{
 			$cmbScreens = new CComboBox("resourceid",$resourceid);
-			$result=DBselect("select screenid,name from screens");
+			$result=DBselect("select distinct n.name as node_name,s.screenid,s.name from screens s,nodes n ".
+				" where n.nodeid=".DBid2nodeid("s.screenid").
+				" order by node_name,s.name");
 			while($row=DBfetch($result))
 			{
+				if(!screen_accessiable($row["screenid"], PERM_READ_ONLY)) continue;
 				if(check_screen_recursion($_REQUEST["screenid"],$row["screenid"]))
 					continue;
-				$cmbScreens->AddItem($row["screenid"],$row["name"]);
+				$cmbScreens->AddItem($row["screenid"],"(".$row["node_name"].") ".$row["name"]);
 
 			}
 
@@ -2018,7 +2332,7 @@
 		if(isset($_REQUEST["screenitemid"]))
 		{
 			$form->AddItemToBottomRow(SPACE);
-			$form->AddItemToBottomRow(new CButtonDelete(NULL,
+			$form->AddItemToBottomRow(new CButtonDelete(null,
 				url_param("form").url_param("screenid").url_param("screenitemid")));
 		}
 		$form->AddItemToBottomRow(SPACE);
@@ -2027,46 +2341,25 @@
 	}
 
 	function	insert_media_form()
-	{
+	{	/* NOTE: only NEW media is acessed */
+
 		global $_REQUEST;
+		global $ZBX_CURNODEID;
 
-		$severity = get_request("severity",array());
+		$severity	= get_request("severity",array(0,1,2,3,4,5));
+		$sendto		= get_request("sendto","");
+		$mediatypeid	= get_request("mediatypeid",0);
+		$active		= get_request("active",0);
+		$period		= get_request("period","1-7,00:00-23:59");
 
-		if(isset($_REQUEST["mediaid"]) && !isset($_REQUEST["form_refresh"]))
-		{
-			$media=get_media_by_mediaid($_REQUEST["mediaid"]);
+		$frmMedia = new CFormTable(S_NEW_MEDIA);
+		$frmMedia->SetHelp("web.media.php");
 
-			$sendto		= $media["sendto"];
-			$mediatypeid	= $media["mediatypeid"];
-			$active		= $media["active"];
-			$period		= $media["period"];
-
-			if($media["severity"] & 1)	array_push($severity,0);
-			if($media["severity"] & 2)	array_push($severity,1);
-			if($media["severity"] & 4)	array_push($severity,2);
-			if($media["severity"] & 8)	array_push($severity,3);
-			if($media["severity"] & 16)	array_push($severity,4);
-			if($media["severity"] & 32)	array_push($severity,5);
-		}
-		else
-		{
-			$sendto		= get_request("sendto","");
-			$mediatypeid	= get_request("mediatypeid",0);
-			$active		= get_request("active",0);
-			$period		= get_request("period","1-7,00:00-23:59");
-		}
-
-		$frmMedia = new CFormTable(S_NEW_MEDIA,"media.php");
-		$frmMedia->SetHelp("web.media.media.php");
-
-		$frmMedia->AddVar("userid",$_REQUEST["userid"]);
-		if(isset($_REQUEST["mediaid"]))
-		{
-			$frmMedia->AddVar("mediaid",$_REQUEST["mediaid"]);
-		}
+		$frmMedia->AddVar("dstfrm",$_REQUEST["dstfrm"]);
 
 		$cmbType = new CComboBox("mediatypeid",$mediatypeid);
-		$types=DBselect("select mediatypeid,description from media_type order by type");
+		$types=DBselect("select mediatypeid,description from media_type".
+				" where ".DBid2nodeid("mediatypeid")."=".$ZBX_CURNODEID." order by type");
 		while($type=DBfetch($types))
 		{
 			$cmbType->AddItem($type["mediatypeid"],$type["description"]);
@@ -2076,14 +2369,6 @@
 		$frmMedia->AddRow(S_SEND_TO,new CTextBox("sendto",$sendto,20));	
 		$frmMedia->AddRow(S_WHEN_ACTIVE,new CTextBox("period",$period,48));	
 	
-
-		$label[0] = S_NOT_CLASSIFIED;
-		$label[1] = S_INFORMATION;
-		$label[2] = S_WARNING;
-		$label[3] = S_AVERAGE;
-		$label[4] = S_HIGH;
-		$label[5] = S_DISASTER;
-
 		$frm_row = array();
 		for($i=0; $i<=5; $i++){
 			array_push($frm_row, 
@@ -2091,9 +2376,9 @@
 					new CCheckBox(
 						"severity[]",
 						in_array($i,$severity)?'yes':'no', 
-						NULL,		/* action */
+						null,		/* action */
 						$i),		/* value */
-					$label[$i]
+					get_severity_description($i)
 				),
 				BR);
 		}
@@ -2104,15 +2389,9 @@
 		$cmbStat->AddItem(1,S_DISABLED);
 		$frmMedia->AddRow("Status",$cmbStat);
 	
-		$frmMedia->AddItemToBottomRow(new CButton("save", S_SAVE));
-		if(isset($_REQUEST["mediaid"]))
-		{
-			$frmMedia->AddItemToBottomRow(SPACE);
-			$frmMedia->AddItemToBottomRow(new CButtonDelete(S_DELETE_SELECTED_MEDIA_Q,
-				url_param("form").url_param("userid").url_param("mediaid")));
-		}
+		$frmMedia->AddItemToBottomRow(new CButton("add", S_ADD));
 		$frmMedia->AddItemToBottomRow(SPACE);
-		$frmMedia->AddItemToBottomRow(new CButtonCancel(url_param("userid")));
+		$frmMedia->AddItemToBottomRow(new CButton('cancel',S_CANCEL,'window.close();'));
 		$frmMedia->Show();
 	}
 
@@ -2128,7 +2407,7 @@
 		$frmHouseKeep->AddRow(S_DO_NOT_KEEP_ACTIONS_OLDER_THAN,
 			new CTextBox("alert_history",$config["alert_history"],8));
 		$frmHouseKeep->AddRow(S_DO_NOT_KEEP_EVENTS_OLDER_THAN,
-			new CTextBox("alarm_history",$config["alarm_history"],8));
+			new CTextBox("event_history",$config["event_history"],8));
 		$frmHouseKeep->AddItemToBottomRow(new CButton("save",S_SAVE));
 		$frmHouseKeep->Show();
 	}
@@ -2141,7 +2420,7 @@
 		$frmHouseKeep->SetHelp("web.config.workperiod.php");
 		$frmHouseKeep->AddVar("config",get_request("config",7));
 		$frmHouseKeep->AddVar("alert_history",$config["alert_history"]);
-		$frmHouseKeep->AddVar("alarm_history",$config["alarm_history"]);
+		$frmHouseKeep->AddVar("event_history",$config["event_history"]);
 		$frmHouseKeep->AddVar("refresh_unsupported",$config["refresh_unsupported"]);
 		$frmHouseKeep->AddRow(S_WORKING_TIME,
 			new CTextBox("work_period",$config["work_period"],35));
@@ -2157,7 +2436,7 @@
 		$frmHouseKeep->SetHelp("web.config.other.php");
 		$frmHouseKeep->AddVar("config",get_request("config",5));
 		$frmHouseKeep->AddVar("alert_history",$config["alert_history"]);
-		$frmHouseKeep->AddVar("alarm_history",$config["alarm_history"]);
+		$frmHouseKeep->AddVar("event_history",$config["event_history"]);
 		$frmHouseKeep->AddVar("work_period",$config["work_period"]);
 		$frmHouseKeep->AddRow(S_REFRESH_UNSUPPORTED_ITEMS,
 			new CTextBox("refresh_unsupported",$config["refresh_unsupported"],8));
@@ -2167,7 +2446,8 @@
 
 	function	insert_host_form($show_only_tmp=0)
 	{
-
+		global $ZBX_CURNODEID;
+		global $USER_DETAILS;
 		global $_REQUEST;
 
 		$groups= get_request("groups",array());
@@ -2215,7 +2495,10 @@
 
 			$templateid = $db_host["templateid"];
 // add groups
-			$db_groups=DBselect("select groupid from hosts_groups where hostid=".$_REQUEST["hostid"]);
+			$db_groups=DBselect("select distinct groupid from hosts_groups where hostid=".$_REQUEST["hostid"].
+				" and groupid in (".
+				get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST,null,null,$ZBX_CURNODEID).
+				") ");
 			while($db_group=DBfetch($db_groups)){
 				if(in_array($db_group["groupid"],$groups)) continue;
 				array_push($groups, $db_group["groupid"]);
@@ -2263,14 +2546,18 @@
 		$frmHost->AddRow(S_NAME,new CTextBox("host",$host,20));
 
 		$frm_row = array();
-		$db_groups=DBselect("select distinct groupid,name from groups order by name");
+		
+		$db_groups=DBselect("select distinct groupid,name from groups ".
+			" where groupid in (".
+			get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST,null,null,$ZBX_CURNODEID).
+			") order by name");
 		while($db_group=DBfetch($db_groups))
 		{
 			array_push($frm_row,
 				array(
 					new CCheckBox("groups[]",
 						in_array($db_group["groupid"],$groups) ? 'yes' : 'no', 
-						NULL,
+						null,
 						$db_group["groupid"]
 						),
 					$db_group["name"]
@@ -2333,6 +2620,7 @@
 
 		$cmbHosts->AddItem(0,"...");
 		$hosts=DBselect("select host,hostid from hosts where status in (".HOST_STATUS_TEMPLATE.")".
+			" and hostid in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST,null,null,$ZBX_CURNODEID).") ".
 			" order by host");
 		while($host=DBfetch($hosts))
 		{
@@ -2476,7 +2764,7 @@
 	# Insert host profile ReadOnly form
 	function	insert_host_profile_form()
 	{
-		$frmHostP = new CFormTable(S_HOST_PROFILE,"hosts.php");
+		$frmHostP = new CFormTable(S_HOST_PROFILE);
 		$frmHostP->SetHelp("web.host_profile.php");
 
 		$result=DBselect("select * from hosts_profiles where hostid=".$_REQUEST["hostid"]);
@@ -2513,6 +2801,7 @@
 		{
 			$frmHostP->AddSpanRow("Profile for this host is missing","form_row_c");
 		}
+		$frmHostP->AddItemToBottomRow(new CButtonCancel(url_param("groupid")));
 		$frmHostP->Show();
 	}
 
@@ -2590,6 +2879,7 @@
 	function insert_map_form()
 	{
 		global $_REQUEST;
+		global $ZBX_CURNODEID;
 
 		$frm_title = "New system map";
 
@@ -2604,7 +2894,7 @@
 			$name		= $row["name"];
 			$width		= $row["width"];
 			$height		= $row["height"];
-			$background	= $row["background"];
+			$backgroundid	= $row["backgroundid"];
 			$label_type	= $row["label_type"];
 			$label_location	= $row["label_location"];
 		}
@@ -2613,7 +2903,7 @@
 			$name		= get_request("name","");
 			$width		= get_request("width",800);
 			$height		= get_request("height",600);
-			$background	= get_request("background","");
+			$backgroundid	= get_request("backgroundid",0);
 			$label_type	= get_request("label_type",0);
 			$label_location	= get_request("label_location",0);
 		}
@@ -2629,11 +2919,13 @@
 		$frmMap->AddRow(S_WIDTH,new CTextBox("width",$width,5));
 		$frmMap->AddRow(S_HEIGHT,new CTextBox("height",$height,5));
 
-		$cmbImg = new CComboBox("background",$background);
-		$cmbImg->AddItem('',"No image...");
-		$result=DBselect("select name from images where imagetype=2 order by name");
+		$cmbImg = new CComboBox("backgroundid",$backgroundid);
+		$cmbImg->AddItem(0,"No image...");
+		$result=DBselect("select * from images where imagetype=2 and ".DBid2nodeid("imageid")."=".$ZBX_CURNODEID." order by name");
 		while($row=DBfetch($result))
-			$cmbImg->AddItem($row["name"],$row["name"]);
+		{
+			$cmbImg->AddItem($row["imageid"],$row["name"]);
+		}
 		$frmMap->AddRow(S_BACKGROUND_IMAGE,$cmbImg);
 
 		$cmbLabel = new CComboBox("label_type",$label_type);
@@ -2668,6 +2960,9 @@
 
 	function insert_map_element_form()
 	{
+		global $ZBX_CURNODEID;
+		global $USER_DETAILS;
+
 		$frmEl = new CFormTable("New map element","sysmap.php");
 		$frmEl->SetHelp("web.sysmap.host.php");
 		$frmEl->AddVar("sysmapid",$_REQUEST["sysmapid"]);
@@ -2687,9 +2982,9 @@
 			$label		= $element["label"];
 			$x		= $element["x"];
 			$y		= $element["y"];
-			$icon		= $element["icon"];
 			$url		= $element["url"];
-			$icon_on	= $element["icon_on"];
+			$iconid_off	= $element["iconid_off"];
+			$iconid_on	= $element["iconid_on"];
 			$label_location	= $element["label_location"];
 			if(is_null($label_location)) $label_location = -1;
 		}
@@ -2700,16 +2995,21 @@
 			$label		= get_request("label",		"");
 			$x		= get_request("x",		0);
 			$y		= get_request("y",		0);
-			$icon		= get_request("icon",		"");
 			$url		= get_request("url",		"");
-			$icon_on	= get_request("icon_on",	"");
+			$iconid_off	= get_request("iconid_off",	0);
+			$iconid_on	= get_request("iconid_on",	0);
 			$label_location	= get_request("label_location",	"-1");
 		}
 
 		$cmbType = new CComboBox("elementtype",$elementtype,"submit()");
 
-		$db_hosts = DBselect("select hostid from hosts");
-		if(DBfetch($db_hosts))
+		$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT);
+		
+		$db_hosts = DBselect("select distinct n.name as node_name,h.hostid,h.host from hosts h,nodes n ".
+			" where h.hostid not in(".$denyed_hosts.")".
+			" and n.nodeid=".DBid2nodeid("h.hostid").
+			" order by node_name,h.host");
+		if($db_hosts)
 			$cmbType->AddItem(SYSMAP_ELEMENT_TYPE_HOST,	S_HOST);
 
 		$db_maps = DBselect("select sysmapid from sysmaps where sysmapid!=".$_REQUEST["sysmapid"]);
@@ -2733,10 +3033,11 @@
 		if($elementtype==SYSMAP_ELEMENT_TYPE_HOST) 
 		{
 			$host = "";
-			$host_info = 0;
 
-			$db_hosts = DBselect("select host from hosts where hostid=$elementid");
-			$host_info = DBfetch($db_hosts);
+			$host_info = DBfetch(DBselect("select distinct n.name as node_name,h.hostid,h.host from hosts h,nodes n ".
+				" where h.hostid not in(".$denyed_hosts.") and  hostid=".$elementid.
+				" and n.nodeid=".DBid2nodeid("h.hostid").
+				" order by node_name,h.host"));
 			if($host_info)
 				$host = $host_info["host"];
 			else
@@ -2744,10 +3045,8 @@
 
 			if($elementid==0)
 			{
-				$db_hosts = DBselect("select hostid,host from hosts",1);
-				$db_host = DBfetch($db_hosts);
-				$host = $db_host["host"];
-				$elementid = $db_host["hostid"];
+				$host = "";
+				$elementid = 0;
 			}
 
 			$frmEl->AddVar("elementid",$elementid);
@@ -2761,10 +3060,13 @@
 		elseif($elementtype==SYSMAP_ELEMENT_TYPE_MAP)
 		{
 			$cmbMaps = new CComboBox("elementid",$elementid);
-			$db_maps = DBselect("select sysmapid,name from sysmaps");
+			$db_maps = DBselect("select distinct n.name as node_name,s.sysmapid,s.name from sysmaps s,nodes n ".
+					" where ".DBid2nodeid("s.sysmapid")."=n.nodeid".
+					" order by node_name,s.name");
 			while($db_map = DBfetch($db_maps))
 			{
-				$cmbMaps->AddItem($db_map["sysmapid"],$db_map["name"]);
+				if(!sysmap_accessiable($db_map["sysmapid"],PERM_READ_ONLY)) continue;
+				$cmbMaps->AddItem($db_map["sysmapid"],"(".$db_map['node_name'].") ".$db_map["name"]);
 			}
 			$frmEl->AddRow(S_MAP, $cmbMaps);
 		}
@@ -2772,27 +3074,32 @@
 		{
 			$cmbTriggers= new CComboBox("elementid",$elementid);
 			$cmbTriggers->AddItem(0,"-");
-			$db_triggers = DBselect("select triggerid from triggers");
+			$db_triggers = DBselect("select distinct n.name as node_name,h.hostid,h.host,t.*".
+				" from triggers t,hosts h,items i,functions f,nodes n ".
+				" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid".
+				" and h.hostid not in (".$denyed_hosts.")".
+				" and ".DBid2nodeid("h.hostid")."=n.nodeid".
+				" order by node_name,h.host,t.description");
+			
 			while($db_trigger = DBfetch($db_triggers))
 			{
 				$cmbTriggers->AddItem(
 					$db_trigger["triggerid"],
-					expand_trigger_description($db_trigger["triggerid"]));
+					"(".$db_trigger['node_name'].") ".expand_trigger_description($db_trigger["triggerid"]));
 			}
 			$frmEl->AddRow(S_TRIGGER, $cmbTriggers);
 		}
 
-		$cmbIcon = new CComboBox("icon",$icon);
-		$result=DBselect("select name from images where imagetype=1 order by name");
+		$cmbIconOff	= new CComboBox("iconid_off",$iconid_off);
+		$cmbIconOn	= new CComboBox("iconid_on",$iconid_on);
+		$result = DBselect("select * from images where imagetype=1 and ".DBid2nodeid("imageid")."=".$ZBX_CURNODEID." order by name");
 		while($row=DBfetch($result))
-			$cmbIcon->AddItem($row["name"],$row["name"]);
-		$frmEl->AddRow("Icon (OFF)",$cmbIcon);
-
-		$cmbIcon = new CComboBox("icon_on",$icon_on);
-		$result=DBselect("select name from images where imagetype=1 order by name");
-		while($row=DBfetch($result))
-			$cmbIcon->AddItem($row["name"],$row["name"]);
-		$frmEl->AddRow("Icon (ON)",$cmbIcon);
+		{
+			$cmbIconOff->AddItem($row["imageid"],$row["name"]);
+			$cmbIconOn->AddItem($row["imageid"],$row["name"]);
+		}
+		$frmEl->AddRow("Icon (OFF)",$cmbIconOff);
+		$frmEl->AddRow("Icon (ON)",$cmbIconOn);
 
 		$frmEl->AddRow("Coordinate X", new CTextBox("x", $x, 5));
 		$frmEl->AddRow("Coordinate Y", new CTextBox("y", $y, 5));

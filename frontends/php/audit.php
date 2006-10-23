@@ -19,102 +19,50 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/audit.inc.php";
+
 	$page["title"] = "S_AUDIT_LOG";
 	$page["file"] = "audit.php";
-	show_header($page["title"],1,0);
+
+	define('ZBX_PAGE_DO_REFRESH', 1);
+
+include_once "include/page_header.php";
+
+	$PAGE_SIZE = 100;
 ?>
-
 <?php
-	update_profile("web.menu.config.last",$page["file"]);
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"start"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(0,65535)."({}%".$PAGE_SIZE."==0)",	NULL),
+		"next"=>		array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
+		"prev"=>		array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL)
+	);
+
+	check_fields($fields);
 ?>
-
 <?php
-	if(isset($_REQUEST["start"])&&isset($_REQUEST["prev"]))
-	{
-		$_REQUEST["start"]-=100;
-		if($_REQUEST["start"]<=0)
-			unset($_REQUEST["start"]);
-	}
-	if(isset($_REQUEST["next"]))
-	{
-		if(isset($_REQUEST["start"]))
-		{
-			$_REQUEST["start"]+=100;
-		}
-		else
-		{
-			$_REQUEST["start"]=100;
-		}
-	}
+	$start	= get_request("start", 0);
+	$prev	= get_request("prev", null);
+	$next	= get_request("next", null);
+
+
+	if($start > 0 && isset($prev))	$start -= $PAGE_SIZE;
+	if(isset($next))		$start += $PAGE_SIZE;
+
+	$limit = $start+$PAGE_SIZE;
 ?>
-
 <?php
-	$form = new CForm();
-
-	$btnPrev = new CButton("prev","<< Prev 100");
-	if(isset($_REQUEST["start"]))   {
-		$form->AddVar("start",$_REQUEST["start"]);
-	} else {
-		$btnPrev->SetEnabled('no');
-	}
-	$form->AddItem($btnPrev);
-
-	$form->AddItem(new CButton("next","Next 100 >>"));
-
-	show_header2(S_AUDIT_LOG_BIG,$form);
-
-?>
-
-<?php
-	$sql="select max(auditid) as max from auditlog";
-	$result=DBselect($sql);
-	$row=DBfetch($result);
-	$maxauditid=@iif($row,$row["max"],0);
-
-	if(!isset($_REQUEST["start"]))
-	{
-		$sql="select u.alias,a.clock,a.action,a.resourcetype,a.details from auditlog a, users u".
-			" where u.userid=a.userid and a.auditid>$maxauditid-200 order by clock desc".
-			" and mod(u.userid,100)=".$ZBX_CURNODEID;
-		$limit = 200;
-	}
-	else
-	{
-		$sql="select u.alias,a.clock,a.action,a.resourcetype,a.details from auditlog a, users u".
-			" where u.userid=a.userid and a.auditid>$maxauditid-".($_REQUEST["start"]+200).
-			" and mod(u.userid,100)=".$ZBX_CURNODEID.
-			" order by clock desc";
-		$limit = $_REQUEST["start"]+200;
-
-	}
-	$result=DBselect($sql,$limit);
+	$result = DBselect("select u.alias,a.clock,a.action,a.resourcetype,a.details from auditlog a, users u".
+		" where u.userid=a.userid and ".DBid2nodeid("u.userid")."=".$ZBX_CURNODEID.
+		" order by clock desc",
+		$limit);
 
 	$table = new CTableInfo();
 	$table->setHeader(array(S_TIME,S_USER,S_RESOURCE,S_ACTION,S_DETAILS));
-	$i=0;
-	while($row=DBfetch($result))
+	for($i=0; $row=DBfetch($result); $i++)
 	{
-		$i++;
-		if(isset($_REQUEST["start"])&&($i<$_REQUEST["start"]))	continue;
-		if($i>100)	break;
-
-		if($row["resourcetype"]==AUDIT_RESOURCE_USER)
-			$resource=S_USER;
-		else if($row["resourcetype"]==AUDIT_RESOURCE_ZABBIX_CONFIG)
-			$resource=S_CONFIGURATION_OF_ZABBIX;
-		else if($row["resourcetype"]==AUDIT_RESOURCE_MEDIA_TYPE)
-			$resource=S_MEDIA_TYPE;
-		else if($row["resourcetype"]==AUDIT_RESOURCE_HOST)
-			$resource=S_HOST;
-		else if($row["resourcetype"]==AUDIT_RESOURCE_ACTION)
-			$resource=S_ACTION;
-		else if($row["resourcetype"]==AUDIT_RESOURCE_GRAPH)
-			$resource=S_GRAPH;
-		else if($row["resourcetype"]==AUDIT_RESOURCE_GRAPH_ELEMENT)
-			$resource=S_GRAPH_ELEMENT;
-		else
-			$resource=S_UNKNOWN_RESOURCE;
+		if($i<$start)	continue;
 
 		if($row["action"]==AUDIT_ACTION_ADD)			$action = S_ADDED;
 		else if($row["action"]==AUDIT_ACTION_UPDATE)		$action = S_UPDATED;
@@ -124,14 +72,35 @@
 		$table->addRow(array(
 			date("Y.M.d H:i:s",$row["clock"]),
 			$row["alias"],
-			$resource,
+			audit_resource2str($row["resourcetype"]),
 			$action,
 			$row["details"]
 		));
 	}
+
+	$form = new CForm();
+	$form->AddVar("start",$start);
+
+	$btnPrev = new CButton("prev","<< Prev ".$PAGE_SIZE);
+	if($start <= 0)
+		$btnPrev->SetEnabled('no');
+
+	$btnNext = new CButton("next","Next ".$PAGE_SIZE." >>");
+	if($i < $limit)
+		$btnNext->SetEnabled('no');
+
+	$form->AddItem(array(
+		$btnPrev,
+		$btnNext
+		));
+
+	show_table_header(S_AUDIT_LOG_BIG,$form);
+
 	$table->show();
 ?>
 
 <?php
-	show_page_footer();
+
+include_once "include/page_footer.php";
+
 ?>

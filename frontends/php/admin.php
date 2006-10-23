@@ -19,7 +19,27 @@
 **/
 ?>
 <?php
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// TODO REMOVE THIS FILE FROM CVS !!!
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	require_once "include/config.inc.php";
+
+        $page["title"] = "S_ADMINISTRATION";
+        $page["file"] = "admin.php";
+
+include_once "include/page_header.php"
+
+?>
+<?php
+	$table = new CTable();
+	$table->SetAlign('center');
+	$table->AddRow(new CSpan(S_ADMINISTRATION.' page', 'on'));
+	$table->AddRow(new CSpan(S_ADMINISTRATION.' page', 'off'));
+	$table->AddRow(new CSpan(S_ADMINISTRATION.' page', 'on'));
+	$table->AddRow(new CSpan(S_ADMINISTRATION.' page', 'off'));
+	$table->AddRow(new CSpan(S_ADMINISTRATION.' page', 'on'));
+	$table->AddRow(new CSpan(S_ADMINISTRATION.' page', 'off'));
+	$table->Show();
+?>
+<?php
+
+include_once "include/page_footer.php"
+
 ?>

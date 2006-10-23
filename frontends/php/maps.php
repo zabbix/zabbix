@@ -19,16 +19,21 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
+	require_once "include/config.inc.php";
+
 	$page["title"] = "S_NETWORK_MAPS";
 	$page["file"] = "maps.php";
 
-	$_REQUEST["fullscreen"] = get_request("fullscreen", 0);
+	if(isset($_REQUEST["fullscreen"]))
+	{
+		define('ZBX_PAGE_NO_MENU', 1);
+	}
 
-	show_header($page["title"],1, $_REQUEST["fullscreen"] > 0 ? 1 : 0);
+	define('ZBX_PAGE_DO_REFRESH', 1);
+	
+include_once "include/page_header.php";
 
 ?>
-
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
@@ -39,63 +44,76 @@
 	check_fields($fields);
 
 ?>
-
 <?php
 	$_REQUEST["sysmapid"] = get_request("sysmapid",get_profile("web.maps.sysmapid",0));
 
-	if($_REQUEST["sysmapid"] <=0 )
+	$all_maps = array();
+	
+	$result = DBselect("select sysmapid,name from sysmaps ".
+		" where ".DBid2nodeid("sysmapid")."=".$ZBX_CURNODEID.
+		" order by name");
+	while($row=DBfetch($result))
 	{
-		$db_sysmaps = DBselect("select sysmapid,name from sysmaps where mod(sysmapid,100)=$ZBX_CURNODEID order by name");
-		if($sysmap = DBfetch($db_sysmaps))
+		if(!sysmap_accessiable($row["sysmapid"],PERM_READ_ONLY))
+			continue;
+
+		if(!isset($all_maps[0]))
+			$all_maps[0] = $row['sysmapid'];
+
+		$all_maps[$row['sysmapid']] = $row['name'];
+	}
+
+	if(isset($_REQUEST["sysmapid"]) && (!isset($all_maps[$_REQUEST["sysmapid"]]) || $_REQUEST["sysmapid"] == 0))
+	{
+		if(count($all_maps))
 		{
-			$_REQUEST["sysmapid"] = $sysmap["sysmapid"];
+			$_REQUEST["sysmapid"] = $all_maps[0];
+		}
+		else
+		{
+			unset($_REQUEST["sysmapid"]);
 		}
 	}
-
-	update_profile("web.maps.sysmapid",$_REQUEST["sysmapid"]);
-	update_profile("web.menu.view.last",$page["file"]);
-
-	if($_REQUEST["sysmapid"] > 0 && !check_right("Network map","R",$_REQUEST["sysmapid"]))
+	unset($all_maps[0]);
+	
+	if(isset($_REQUEST["sysmapid"]))
 	{
-		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-		show_page_footer();
-		exit;
+		update_profile("web.maps.sysmapid",$_REQUEST["sysmapid"]);
 	}
 ?>
-
-
 <?php
 	$text = array(S_NETWORK_MAPS_BIG);
-	if($_REQUEST["sysmapid"] > 0)
+	if(isset($_REQUEST["sysmapid"]))
 	{
 		$sysmap = get_sysmap_by_sysmapid($_REQUEST["sysmapid"]);
 
 		$url = "maps.php?sysmapid=".$_REQUEST["sysmapid"];
-		if($_REQUEST["fullscreen"]==0)
+		if(!isset($_REQUEST["fullscreen"]))
 			$url .= "&fullscreen=1";
 
-		array_push($text, nbsp(" / "), new CLink($sysmap["name"],$url));
+		array_push($text, nbsp(" / "), new CLink($all_maps[$_REQUEST["sysmapid"]],$url));
 	}
 
 	$form = new CForm();
-	if($_REQUEST["fullscreen"]>=1)
+	if(isset($_REQUEST["fullscreen"]))
 		$form->AddVar("fullscreen",$_REQUEST["fullscreen"]);
 
-	$cmbMaps = new CComboBox("sysmapid",$_REQUEST["sysmapid"],"submit()");
-	$result=DBselect("select sysmapid,name from sysmaps where mod(sysmapid,100)=$ZBX_CURNODEID order by name");
-	while($row=DBfetch($result))
+	$cmbMaps = new CComboBox("sysmapid",get_request("sysmapid",0),"submit()");
+	
+	foreach($all_maps as $id => $name)
 	{
-		if(!check_right("Network map","R",$row["sysmapid"]))		continue;
-		$cmbMaps->AddItem($row["sysmapid"],$row["name"]);
+		$cmbMaps->AddItem($id, $name);
 	}
-	$form->AddItem($cmbMaps);
+	if($cmbMaps->ItemsCount()>0)
+	{	
+		$form->AddItem($cmbMaps);
+	}
 
-	show_header2($text,$form);
+	show_table_header($text,$form);
 ?>
-
 <?php
-	$table = new CTable(NULL,"map");
-	if($_REQUEST["sysmapid"] > 0)
+	$table = new CTable(S_NO_MAPS_DEFINED,"map");
+	if(isset($_REQUEST["sysmapid"]))
 	{
 		$action_map = get_action_map_by_sysmapid($_REQUEST["sysmapid"]);
 		$table->AddRow($action_map);
@@ -103,10 +121,11 @@
 		$imgMap = new CImg("map.php?noedit=1&sysmapid=".$_REQUEST["sysmapid"]);
 		$imgMap->SetMap($action_map->GetName());
 		$table->AddRow($imgMap);
-
 	}
 	$table->Show();
 ?>
 <?php
-	show_page_footer();
+
+include_once "include/page_footer.php";
+
 ?>

@@ -19,16 +19,59 @@
 **/
 ?>
 <?php
+	require_once "include/images.inc.php";
+	require_once "include/hosts.inc.php";
+	require_once "include/triggers.inc.php";
+
+	function	sysmap_accessiable($sysmapid,$perm)
+	{
+		global $USER_DETAILS;
+
+		$result = false;
+
+		if($db_result = DBselect("select * from sysmaps_elements where sysmapid=".$sysmapid.
+			" and ".DBid2nodeid('sysmapid')." in (".get_accessible_nodes_by_user($USER_DETAILS,$perm).")"))
+		{
+			$result = true;
+			
+			$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
+						
+			while(($se_data = DBfetch($db_result)) && $result)
+			{
+				switch($se_data['elementtype'])
+				{
+					case SYSMAP_ELEMENT_TYPE_HOST:
+						if(in_array($se_data['elementid'],explode(',',$denyed_hosts)))
+						{
+							$result = false;
+						}
+						break;
+					case SYSMAP_ELEMENT_TYPE_MAP:
+						$result &= sysmap_accessiable($se_data['elementid'], PERM_READ_ONLY);
+						break;
+					case SYSMAP_ELEMENT_TYPE_IMAGE:
+						if(!DBfetch(DBselect("select distinct t.*".
+							" from triggers t,items i,functions f".
+							" where f.itemid=i.itemid and t.triggerid=f.triggerid".
+							" and i.hostid not in (".$denyed_hosts.") and t.triggerid=".$se_data['elementid'])))
+						{
+							$result = false;
+						}
+						break;
+				}
+			}
+		}
+		return $result;
+	}
+
 	function	get_sysmap_by_sysmapid($sysmapid)
 	{
-		$sql="select * from sysmaps where sysmapid=$sysmapid"; 
-		$result=DBselect($sql);
-		$row=DBfetch($result);
+		$row = DBfetch(DBselect("select * from sysmaps where sysmapid=".$sysmapid));
 		if($row)
 		{
 			return	$row;
 		}
-		error("No system map with sysmapid=[$sysmapid]");
+		error("No system map with sysmapid=[".$sysmapid."]");
 		return false;
 	}
 
@@ -61,41 +104,26 @@
 		$result = DBexecute("delete from sysmaps_elements where sysmapid=$sysmapid");
 		if(!$result)	return	$result;
 
-	// delete map permisions
-		DBexecute('delete from rights where name=\'Network map\' and id='.$sysmapid);
-
 		return DBexecute("delete from sysmaps where sysmapid=$sysmapid");
 	}
 
 	# Update System Map
 
-	function	update_sysmap($sysmapid,$name,$width,$height,$background,$label_type,$label_location)
+	function	update_sysmap($sysmapid,$name,$width,$height,$backgroundid,$label_type,$label_location)
 	{
-		if(!check_right("Network map","U",$sysmapid))
-		{
-			error("Insufficient permissions");
-			return 0;
-		}
-
 		return	DBexecute("update sysmaps set name=".zbx_dbstr($name).",width=$width,height=$height,".
-			"background=".zbx_dbstr($background).",label_type=$label_type,".
+			"backgroundid=".$backgroundid.",label_type=$label_type,".
 			"label_location=$label_location where sysmapid=$sysmapid");
 	}
 
 	# Add System Map
 
-	function	add_sysmap($name,$width,$height,$background,$label_type,$label_location)
+	function	add_sysmap($name,$width,$height,$backgroundid,$label_type,$label_location)
 	{
-		if(!check_right("Network map","A",0))
-		{
-			error("Insufficient permissions");
-			return 0;
-		}
-
 		$sysmapid=get_dbid("sysmaps","sysmapid");
 
-		$result=DBexecute("insert into sysmaps (sysmapid,name,width,height,background,label_type,label_location)".
-			" values ($sysmapid,".zbx_dbstr($name).",$width,$height,".zbx_dbstr($background).",$label_type,
+		$result=DBexecute("insert into sysmaps (sysmapid,name,width,height,backgroundid,label_type,label_location)".
+			" values ($sysmapid,".zbx_dbstr($name).",$width,$height,".$backgroundid.",$label_type,
 			$label_location)");
 
 		if(!$result)
@@ -158,7 +186,7 @@
 	# Add Element to system map
 
 	function add_element_to_sysmap($sysmapid,$elementid,$elementtype,
-						$label,$x,$y,$icon,$url,$icon_on,$label_location)
+						$label,$x,$y,$iconid_off,$url,$iconid_on,$label_location)
 	{
 		if($label_location<0) $label_location='null';
 		if(check_circle_elements_link($sysmapid,$elementid,$elementtype))
@@ -170,9 +198,9 @@
 		$selementid = get_dbid("sysmaps_elements","selementid");
 
 		$result=DBexecute("insert into sysmaps_elements".
-			" (sysmapid,elementid,elementtype,label,x,y,icon,url,icon_on,label_location)".
-			" values ($sysmapid,$elementid,$elementtype,".zbx_dbstr($label).",
-			$x,$y,".zbx_dbstr($icon).",".zbx_dbstr($url).",".zbx_dbstr($icon_on).",".
+			" (selementid,sysmapid,elementid,elementtype,label,x,y,iconid_off,url,iconid_on,label_location)".
+			" values ($selementid,$sysmapid,$elementid,$elementtype,".zbx_dbstr($label).",
+			$x,$y,$iconid_off,".zbx_dbstr($url).",$iconid_on,".
 			"$label_location)");
 
 		if(!$result)
@@ -184,7 +212,7 @@
 	# Update Element from system map
 
 	function	update_sysmap_element($selementid,$sysmapid,$elementid,$elementtype,
-						$label,$x,$y,$icon,$url,$icon_on,$label_location)
+						$label,$x,$y,$iconid_off,$url,$iconid_on,$label_location)
 	{
 		if($label_location<0) $label_location='null';
 		if(check_circle_elements_link($sysmapid,$elementid,$elementtype))
@@ -194,8 +222,8 @@
 		}
 
 		return	DBexecute("update sysmaps_elements set elementid=$elementid,elementtype=$elementtype,".
-			"label=".zbx_dbstr($label).",x=$x,y=$y,icon=".zbx_dbstr($icon).",url=".zbx_dbstr($url).
-			",icon_on=".zbx_dbstr($icon_on).",label_location=$label_location".
+			"label=".zbx_dbstr($label).",x=$x,y=$y,iconid_off=$iconid_off,url=".zbx_dbstr($url).
+			",iconid_on=$iconid_on,label_location=$label_location".
 			" where selementid=$selementid");
 	}
 
@@ -251,12 +279,13 @@
 		if(!$element)	return FALSE;
 
 		if(get_info_by_selementid($element["selementid"],$info,$color) != 0)
-			$icon = $element["icon_on"];
+			$iconid = $element["iconid_on"];
 		else
-			$icon = $element["icon"];
+			$iconid = $element["iconid_off"];
 
-		$image = get_image_by_name($icon);
+		$image = get_image_by_imageid($iconid);
 		if(!$image)	return FALSE;
+
 		return imagecreatefromstring($image['image']);
 	}
 
@@ -375,7 +404,7 @@
 			elseif($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_IMAGE)
 			{
 				if($url=="" && $db_element["elementid"]!=0)
-					$url="alarms.php?triggerid=".$db_element["elementid"];
+					$url="events.php?triggerid=".$db_element["elementid"];
 			}
 
 			if($url=="")	continue;

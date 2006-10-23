@@ -19,52 +19,64 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/services.inc.php";
 
-#	PARAMETERS:
+	$page["file"]	= "chart_sla.php";
+	$page["title"]	= "S_CHART";
+	$page["type"]	= PAGE_TYPE_IMAGE;
+
+include_once "include/page_header.php";
+
+?>
+<?php
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"serviceid"=>		array(T_ZBX_INT, O_MAND,P_SYS,	DB_ID,		null)
+	);
+
+	check_fields($fields);
+?>
+<?php
+	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT);
 	
-#	itemid
-#	period
-#	from
-
+	if( !($service = DBfetch(DBselect("select s.* from services s left join triggers t on s.triggerid=t.triggerid ".
+		" left join functions f on t.triggerid=f.triggerid left join items i on f.itemid=i.itemid ".
+		" where (i.hostid is NULL or i.hostid not in (".$denyed_hosts.")) ".
+		/* " and ".DBid2nodeid("s.serviceid")."=".$ZBX_CURNODEID. */ /* NOTE: allow displaying all accessiables services */
+		" and s.serviceid=".$_REQUEST["serviceid"]
+		))))
+	{
+		access_deny();
+	}
+?>
+<?php
 	$sizeX=200;
 	$sizeY=15;
 
-	set_image_header();
-
-	check_authorisation();
-
 	$im = imagecreate($sizeX,$sizeY); 
   
-	$red=ImageColorAllocate($im,255,0,0); 
-	$darkred=ImageColorAllocate($im,150,0,0); 
-	$green=ImageColorAllocate($im,0,255,0); 
-	$darkgreen=ImageColorAllocate($im,0,150,0); 
-	$blue=ImageColorAllocate($im,0,0,255); 
-	$yellow=ImageColorAllocate($im,255,255,0); 
-	$cyan=ImageColorAllocate($im,0,255,255); 
-	$black=ImageColorAllocate($im,0,0,0); 
-	$gray=ImageColorAllocate($im,150,150,150); 
-	$white=ImageColorAllocate($im,255,255,255); 
+	$red		= ImageColorAllocate($im,255,0,0); 
+	$darkred	= ImageColorAllocate($im,150,0,0); 
+	$green		= ImageColorAllocate($im,0,255,0); 
+	$darkgreen	= ImageColorAllocate($im,0,150,0); 
+	$blue		= ImageColorAllocate($im,0,0,255); 
+	$yellow		= ImageColorAllocate($im,255,255,0); 
+	$cyan		= ImageColorAllocate($im,0,255,255); 
+	$black		= ImageColorAllocate($im,0,0,0); 
+	$gray		= ImageColorAllocate($im,150,150,150); 
+	$white		= ImageColorAllocate($im,255,255,255); 
 
 	ImageFilledRectangle($im,0,0,$sizeX,$sizeY,ImageColorAllocate($im,120,200,120));
 
 	$now=time(NULL);
 	$period_start=$now-7*24*3600;
 	$period_end=$now;
-	$service=get_service_by_serviceid($_REQUEST["serviceid"]);
 	$stat=calculate_service_availability($_REQUEST["serviceid"],$period_start,$period_end);
 		
 	$problem=$stat["problem"];
 	$ok=$stat["ok"];
 
-//	echo $problem," ",$ok;
-
-// for test
-//	$problem=81;
-//	$service["goodsla"]=81;
-
-//	$p=min(100-$problem,20);
 	$p=min($problem,20);
 	$g=max($service["goodsla"]-80,0);
 
@@ -79,4 +91,9 @@
 	ImageString($im, 2,$sizeX-45,1, $s , $white);
 	ImageOut($im); 
 	ImageDestroy($im); 
+?>
+<?php
+
+include_once "include/page_footer.php";
+
 ?>

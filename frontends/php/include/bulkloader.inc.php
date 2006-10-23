@@ -17,7 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-include_once    "include/config.inc.php";
+require_once "include/config.inc.php";
 
 /*
 **  This include file contains all of the non-standard functions required

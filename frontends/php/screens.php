@@ -19,14 +19,24 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/graphs.inc.php";
+	require_once "include/screens.inc.php";
 
 
 	$page["title"] = "S_CUSTOM_SCREENS";
 	$page["file"] = "screens.php";
 
 	$_REQUEST["fullscreen"] = get_request("fullscreen", 0);
-	show_header($page["title"],1,$_REQUEST["fullscreen"] >= 1 ? 1 : 0);
+
+	if($_REQUEST["fullscreen"])
+	{
+		define('ZBX_PAGE_NO_MENU', 1);
+	}
+	define('ZBX_PAGE_DO_REFRESH', 1);
+	
+include_once "include/page_header.php";
+
 ?>
 
 <?php
@@ -49,16 +59,16 @@
 ?>
 
 <?php
-	$_REQUEST["screenid"]=get_request("screenid",get_profile("web.screens.screenid",0));
+	$_REQUEST["screenid"] = get_request("screenid",get_profile("web.screens.screenid", null));
+	$_REQUEST["fullscreen"] = get_request("fullscreen", 0);
 
 	update_profile("web.screens.screenid",$_REQUEST["screenid"]);
-	update_profile("web.menu.view.last",$page["file"]);
 ?>
 
 <?php
 	$text = array(S_SCREENS_BIG);
-	if($_REQUEST["screenid"] > 0)
-		{
+	if(isset($_REQUEST["screenid"]))
+	{
 		$screen = get_screen_by_screenid($_REQUEST["screenid"]);
 		if($screen) {
 			$url = "screens.php?screenid=".$_REQUEST["screenid"];
@@ -67,8 +77,8 @@
 		}
 		else
 		{
-			$_REQUEST["screenid"] = 0;
-			update_profile("web.screens.screenid",$_REQUEST["screenid"]);
+			unset($_REQUEST["screenid"]);
+			update_profile("web.screens.screenid",0);
 		}
 	}
 
@@ -76,30 +86,36 @@
 	$form->AddVar("fullscreen",$_REQUEST["fullscreen"]);
 
 	$cmbScreens = new CComboBox("screenid",$_REQUEST["screenid"],"submit()");
-	$screen_correct = 0;
-	$first_screen = 0;
-	$result=DBselect("select screenid,name from screens where mod(screenid,100)=$ZBX_CURNODEID order by name");
+	unset($screen_correct);
+	unset($first_screen);
+	$result=DBselect("select screenid,name from screens where ".DBid2nodeid("screenid")."=".$ZBX_CURNODEID." order by name");
 	while($row=DBfetch($result))
 	{
-		if(!check_right("Screen","R",$row["screenid"]))
+		if(!screen_accessiable($row["screenid"], PERM_READ_ONLY))
 			continue;
+
 		$cmbScreens->AddItem($row["screenid"],$row["name"]);
 		if($_REQUEST["screenid"] == $row["screenid"]) $screen_correct = 1;
-		if($first_screen == 0) $first_screen = $row["screenid"];
+		if(!isset($first_screen)) $first_screen = $row["screenid"];
 	}
-	if($screen_correct == 0 && $first_screen != 0)
+	if(!isset($screen_correct) && isset($first_screen))
 	{
 		$_REQUEST["screenid"] = $first_screen;
 	}
 
-	$form->AddItem($cmbScreens);
-	show_header2($text,$form);
-?>
-
-<?php
-	if($_REQUEST["screenid"] > 0 && check_right("Screen","R",$_REQUEST["screenid"]))
+	if(isset($_REQUEST["screenid"]))
 	{
-		$effectiveperiod=navigation_bar_calc();
+		if(!screen_accessiable($_REQUEST["screenid"], PERM_READ_ONLY))
+			access_deny();
+	}
+			
+	$form->AddItem($cmbScreens);
+	show_table_header($text,$form);
+?>
+<?php
+	if(isset($_REQUEST["screenid"]))
+	{
+		$effectiveperiod = navigation_bar_calc();
 		$table = get_screen($_REQUEST["screenid"], 0, $effectiveperiod);
 		$table->Show();
 		
@@ -107,8 +123,7 @@
 	}
 ?>
 <?php
-	if($_REQUEST["fullscreen"]==0)
-	{
-		show_page_footer();
-	}
+
+include_once "include/page_footer.php";
+
 ?>

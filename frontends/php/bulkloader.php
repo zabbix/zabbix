@@ -17,23 +17,18 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-	include "include/config.inc.php";
-	include "include/forms.inc.php";
-	include "include/bulkloader.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/forms.inc.php";
+	require_once "include/bulkloader.inc.php";
+
 	$page["file"] = "bulkloader.php";
 	$page["title"] = "S_BULKLOADER_MAIN";
 	$fileuploaded=0;
-	show_header($page["title"],0,0);
-	if(!check_anyright("Default permission","U"))
-	{
-		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-		show_page_footer();
-		exit;
-	}
+
+include_once "include/page_header.php";
+
 	insert_confirm_javascript();
 	
-	update_profile("web.menu.config.last",$page["file"]);
-
 	if(isset($_FILES['uploadfile']))
 	{
 		$fileName     = $_FILES['uploadfile']['name'];
@@ -64,9 +59,9 @@
 				//    that are not in the DB, the bulk loader will create new groups with the names defined in this field.
 				
 				list($tmpHost,$tmpHostIP,$tmpHostPort,$tmpHostStat,$tmpHostTemplate,$tmpHostServer,$tmpHostGroups) = explode(",",$tmpField,7);
-				$hostName=@iif($tmpHost==NULL,'Unknown',$tnpHost);
-				$hostUseIP=@iif($tmpHostIP==NULL,'off','on');
-				$hostPort=@iif($tmpHostPort==NULL,10050,$tmpHostPort);
+				$hostName	= (null==$tmpHost)		? 'Unknown' 	: $tnpHost;
+				$hostUseIP	= (null==$tmpHostIP)		? 'off' 	: 'on';
+				$hostPort	= (null==$tmpHostPort)	? 10050 	: $tmpHostPort;
 
 				//  Determine what type of host this is
 				switch($tmpHostStat)
@@ -88,7 +83,7 @@
 				//  Determine which template, if any this host is linked to
 				$sqlResult=DBselect("select distinct(hostid) from hosts where status=". HOST_STATUS_TEMPLATE .
 					" and host=".zbx_dbstr($tmpHostTemplate).
-					" and mod(hostid,100)=".$ZBX_CURNODEID;
+					" and ".DBid2nodeid('hostid').'='.$ZBX_CURNODEID);
 				$row=DBfetch($sqlResult);
 				if($row)
 				{
@@ -105,7 +100,7 @@
 				{
 					add_host_group($group_name);
 					$groupid = DBfetch(DBselect("select groupid from groups where name=".zbx_dbstr($group_name).
-					" and mod(groupid,100)=".$ZBX_CURNODEID;
+						" and ".DBid2nodeid('groupid').'='.$ZBX_CURNODEID));
 					if(!$groupid) continue;
 					array_push($groups,$groupid["groupid"]);
 				}
@@ -117,11 +112,11 @@
 				break;
 			case "USER":
 				list($tmpName,$tmpSurname,$tmpAlias,$tmpPasswd,$tmpURL,$tmpAutologout,$tmpLang,$tmpRefresh,$tmpUserGroups) = explode(",",$tmpField,9);
-				$autologout=@iif($tmpAutologout==NULL,900,$tmpAutologout);
-				$lang=@iif($tmpLang==NULL,'en_gb',$tmpLang);
-				$refresh=@iif($tmpRefresh==NULL,30,$tmpRefresh);
-				$passwd=@iif($tmpPasswd==NULL,md5($tmpAlias),md5($tmpPasswd));
-				$result=@iif($tmpAlias==NULL,0,add_user($tmpName,$tmpSurname,$tmpAlias,$passwd,$tmpURL,$autologout,$lang,$refresh));
+				$autologout	= ($tmpAutologout==NULL) ? 900 : $tmpAutologout;
+				$lang		= ($tmpLang==NULL) ? 'en_gb' : $tmpLang;
+				$refresh	= ($tmpRefresh==NULL) ? 30 : $tmpRefresh;
+				$passwd		= ($tmpPasswd==NULL) ? md5($tmpAlias) : md5($tmpPasswd);
+				$result		= ($tmpAlias==NULL) ? 0 : add_user($tmpName,$tmpSurname,$tmpAlias,$passwd,$tmpURL,$autologout,$lang,$refresh);
 				show_messages($result, S_USER_ADDED .': '. $tmpAlias, S_CANNOT_ADD_USER .': '. $tmpAlias);
 				$row=DBfetch(DBselect("select distinct(userid) from users where alias='$tmpAlias'"));
 				$tmpUserID=$row["userid"];
@@ -129,8 +124,7 @@
 				{
 					foreach(explode(',',rtrim(rtrim($tmpUserGroups," "),"\n")) as $tmpGroup)
 					{
-						$tmpGroupID=add_user_group($tmpGroup);
-						update_user_groups($tmpGroupID,array($tmpUserID));
+						add_user_group($tmpGroup,array($tmpUserID));
 					}
 				}
 				break;
@@ -209,6 +203,7 @@
 		"</form>"
 		), 1);
 	table_end();
-	show_page_footer();
+
+include_once "include/page_footer.php";
 
 ?>

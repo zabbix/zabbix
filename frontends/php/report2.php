@@ -19,21 +19,15 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
-	$page["title"] = "S_AVAILABILITY_REPORT";
-	$page["file"] = "report2.php";
-	show_header($page["title"],0,0);
-?>
+	require_once "include/config.inc.php";
+	require_once "include/hosts.inc.php";
 
-<?php
-	if(!check_anyright("Host","R"))
-	{
-		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-		show_page_footer();
-		exit;
-	}
-?>
+	$page["title"]	= "S_AVAILABILITY_REPORT";
+	$page["file"]	= "report2.php";
 
+include_once "include/page_header.php";
+
+?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
@@ -43,98 +37,99 @@
 	);
 
 	check_fields($fields);
+
+	validate_group_with_host(PERM_READ_LIST,array("always_select_first_host","monitored_hosts","with_items"));
 ?>
-
 <?php
-	update_profile("web.menu.reports.last",$page["file"]);
-?>
+	$r_form = new CForm();
 
-<?php
-	$h1=SPACE.S_AVAILABILITY_REPORT_BIG;
+	$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit()");
+	$cmbHosts = new CComboBox("hostid",$_REQUEST["hostid"],"submit()");
 
-	$h2=S_GROUP.SPACE;
-	$h2=$h2."<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
-	$h2=$h2.form_select("groupid",0,S_ALL_SMALL);
-	$result=DBselect("select groupid,name from groups where mod(groupid,100)=$ZBX_CURNODEID order by name");
+	$cmbGroup->AddItem(0,S_ALL_SMALL);
+	
+	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, $ZBX_CURNODEID);
+
+	$result=DBselect("select distinct g.groupid,g.name from groups g, hosts_groups hg, hosts h, items i ".
+		" where h.hostid in (".$availiable_hosts.") ".
+		" and hg.groupid=g.groupid and h.status=".HOST_STATUS_MONITORED.
+		" and h.hostid=i.hostid and hg.hostid=h.hostid and i.status=".ITEM_STATUS_ACTIVE.
+		" order by g.name");
 	while($row=DBfetch($result))
 	{
-// Check if at least one host with read permission exists for this group
-		$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host");
-		$cnt=0;
-		while($row2=DBfetch($result2))
-		{
-			if(!check_right("Host","R",$row2["hostid"]))
-			{
-				continue;
-			}
-			$cnt=1; break;
-		}
-		if($cnt!=0)
-		{
-			$h2=$h2.form_select("groupid",$row["groupid"],$row["name"]);
-		}
+		$cmbGroup->AddItem($row["groupid"],$row["name"]);
 	}
-	$h2=$h2."</select>";
-
-	$h2=$h2.SPACE.S_HOST.SPACE;
-	$h2=$h2."<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
-	$h2=$h2.form_select("hostid",0,S_SELECT_HOST_DOT_DOT_DOT);
-
-	if(isset($_REQUEST["groupid"]))
+	$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
+	
+	if($_REQUEST["groupid"] > 0)
 	{
-		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
+		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED.
+			" and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid".
+			" and h.hostid in (".$availiable_hosts.") ".
+			" group by h.hostid,h.host order by h.host";
 	}
 	else
 	{
-		$sql="select h.hostid,h.host from hosts h,items i where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and mod(h.hostid,100)=$ZBX_CURNODEID group by h.hostid,h.host order by h.host";
+		$sql="select h.hostid,h.host from hosts h,items i where h.status=".HOST_STATUS_MONITORED.
+			" and h.hostid=i.hostid and h.hostid in (".$availiable_hosts.") ".
+			" group by h.hostid,h.host order by h.host";
 	}
-
 	$result=DBselect($sql);
 	while($row=DBfetch($result))
 	{
-		if(!check_right("Host","R",$row["hostid"]))
-		{
-			continue;
-		}
-		$h2=$h2.form_select("hostid",$row["hostid"],$row["host"]);
+		$cmbHosts->AddItem($row["hostid"],$row["host"]);
 	}
-	$h2=$h2."</select>";
 
-	show_header2($h1, $h2, "<form name=\"form2\" method=\"get\" action=\"report2.php\">", "</form>");
+	$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
+	show_table_header(S_AVAILABILITY_REPORT_BIG, $r_form);
+
 ?>
-
 <?php
-	if(isset($_REQUEST["hostid"])&&!isset($_REQUEST["triggerid"]))
+	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
+	
+	if(isset($_REQUEST["triggerid"]))
 	{
-		echo "<br>";
-		$result=DBselect("select host from hosts where hostid=".$_REQUEST["hostid"]);
-		$row=DBfetch($result);
+		if (!$row = DBfetch(DBselect("select distinct h.hostid,h.host,t.description from hosts h,items i,functions f,triggers t ".
+			" where t.triggerid=".$_REQUEST["triggerid"]." and t.triggerid=f.triggerid ".
+			" and f.itemid=i.itemid and i.hostid=h.hostid ".
+			" and h.hostid not in (".$denyed_hosts.") and ".DBid2nodeid("t.triggerid")."=".$ZBX_CURNODEID.
+			" order by h.host,t.description ")))
+			access_deny();
+		
+		show_table_header(array(new CLink($row["host"],"?hostid=".$row["hostid"])," : \"",expand_trigger_description_by_data($row),"\""));
+
+		$table = new CTableInfo(null,"graph");
+		$table->AddRow(new CImg("chart4.php?triggerid=".$_REQUEST["triggerid"]));
+		$table->Show();
+	}
+	else if(isset($_REQUEST["hostid"]))
+	{
+		$row	= DBfetch(DBselect("select host from hosts where hostid=".$_REQUEST["hostid"]));
 		show_table_header($row["host"]);
 
-		$result=DBselect("select distinct h.hostid,h.host,t.triggerid,t.expression,t.description,t.value from triggers t,hosts h,items i,functions f where f.itemid=i.itemid and h.hostid=i.hostid and t.status=0 and t.triggerid=f.triggerid and h.hostid=".$_REQUEST["hostid"]." and h.status=".HOST_STATUS_MONITORED." and i.status=0 order by h.host, t.description");
+		$result = DBselect("select distinct h.hostid,h.host,t.triggerid,t.expression,t.description,t.value ".
+			" from triggers t,hosts h,items i,functions f ".
+			" where f.itemid=i.itemid and h.hostid=i.hostid and t.status=".TRIGGER_STATUS_ENABLED.
+			" and t.triggerid=f.triggerid and h.hostid=".$_REQUEST["hostid"]." and h.status=".HOST_STATUS_MONITORED.
+			" and h.hostid not in (".$denyed_hosts.") and ".DBid2nodeid("t.triggerid")."=".$ZBX_CURNODEID.
+			" and i.status=".ITEM_STATUS_ACTIVE.
+			" order by h.host, t.description");
 
 		$table = new CTableInfo();
 		$table->setHeader(array(S_NAME,S_TRUE,S_FALSE,S_UNKNOWN,S_GRAPH));
 		while($row=DBfetch($result))
 		{
-			if(!check_right_on_trigger("R",$row["triggerid"])) 
-			{
-				continue;
-			}
-			$lasthost=$row["host"];
+			$availability = calculate_availability($row["triggerid"],0,0);
 
-			$description=expand_trigger_description($row["triggerid"]);
-			$description=new CLink($description,"alarms.php?triggerid=".$row["triggerid"],"action");
-	
-			$availability=calculate_availability($row["triggerid"],0,0);
-
-			$true=new CSpan(sprintf("%.4f%%",$availability["true"]), "on");
-			$false=new CSpan(sprintf("%.4f%%",$availability["false"]), "off");
-			$unknown=new CSpan(sprintf("%.4f%%",$availability["unknown"]), "unknown");
-			$actions=new CLink(S_SHOW,"report2.php?hostid=".$_REQUEST["hostid"]."&triggerid=".$row["triggerid"],"action");
+			$true	= new CSpan(sprintf("%.4f%%",$availability["true"]), "on");
+			$false	= new CSpan(sprintf("%.4f%%",$availability["false"]), "off");
+			$unknown= new CSpan(sprintf("%.4f%%",$availability["unknown"]), "unknown");
+			$actions= new CLink(S_SHOW,"report2.php?hostid=".$_REQUEST["hostid"]."&triggerid=".$row["triggerid"],"action");
 
 			$table->addRow(array(
-				$description,
+				new CLink(
+					expand_trigger_description_by_data($row),
+					"events.php?triggerid=".$row["triggerid"],"action"),
 				$true,
 				$false,
 				$unknown,
@@ -144,22 +139,8 @@
 		$table->show();
 	}
 ?>
-
 <?php
-	if(isset($_REQUEST["triggerid"]))
-	{
-		echo "<TABLE BORDER=0 COLS=4 align=center WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-		echo "<TR BGCOLOR=#EEEEEE>";
-		echo "<TR BGCOLOR=#DDDDDD>";
-		echo "<TD ALIGN=CENTER>";
-		echo "<IMG SRC=\"chart4.php?triggerid=".$_REQUEST["triggerid"]."\" border=0>";
-		echo "</TD>";
-		echo "</TR>";
-		echo "</TABLE>";
-	}
-?>
+	
+	include_once "include/page_footer.php";
 
-
-<?php
-	show_page_footer();
 ?>

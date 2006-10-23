@@ -99,18 +99,12 @@
 
 	function	add_graph($name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype=GRAPH_TYPE_NORMAL,$templateid=0)
 	{
-		if(!check_right("Graph","A",0))
-		{
-			error("Insufficient permissions");
-			return 0;
-		}
-
-		$graphid=get_dbid("graphs","graphid");
+		$graphid = get_dbid("graphs","graphid");
 
 		$result=DBexecute("insert into graphs".
-			" (graphid,name,width,height,yaxistype,yaxismin,yaxismax,templateid,show_work_period,show_triggers,graphtype,templateid)".
+			" (graphid,name,width,height,yaxistype,yaxismin,yaxismax,templateid,show_work_period,show_triggers,graphtype)".
 			" values ($graphid,".zbx_dbstr($name).",$width,$height,$yaxistype,$yaxismin,".
-			" $yaxismax,$templateid,$showworkperiod,$showtriggers,$graphtype,$templateid)");
+			" $yaxismax,$templateid,$showworkperiod,$showtriggers,$graphtype)");
 		if($result)
 		{
 			info("Graph '$name' added");
@@ -122,12 +116,6 @@
 
 	function	update_graph($graphid,$name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype=GRAPH_TYPE_NORMAL,$templateid=0)
 	{
-		if(!check_right("Graph","U",0))
-		{
-			error("Insufficient permissions");
-			return 0;
-		}
-
 		$g_graph = get_graph_by_graphid($graphid);
 
 		$graphs = get_graphs_by_templateid($graphid);
@@ -159,12 +147,6 @@
 
 	function	delete_graph($graphid)
 	{
-		if(!check_right("Graph","U",0))
-		{
-			error("Insufficient permissions");
-			return 0;
-		}
-
 		$graph = get_graph_by_graphid($graphid);
 
 		$chd_graphs = get_graphs_by_templateid($graphid);
@@ -184,10 +166,6 @@
 		if($result)
 		{	
 			info("Graph '".$graph["name"]."' deleted");
-
-			// delete graph permisions
-			DBexecute('delete from rights where name=\'Graph\' and id='.$graphid);
-
 		}
 		return $result;
 	}
@@ -652,7 +630,7 @@
 			if(isset($_REQUEST[$item]))
 				$form->AddVar($item,$_REQUEST[$item]);
 
-		show_header2(
+		show_table_header(
 			S_NAVIGATE,
 			$form);
 

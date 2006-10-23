@@ -19,27 +19,27 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/hosts.inc.php";
+	require_once "include/graphs.inc.php";
+
 	$page["title"] = "S_CUSTOM_GRAPHS";
 	$page["file"] = "charts.php";
-
-	$nomenu=0;
+?>
+<?php
 	if(isset($_REQUEST["fullscreen"]))
 	{
-		$nomenu=1;
+		define('ZBX_PAGE_NO_MENU', 1);
 	}
 
 	if(isset($_REQUEST["graphid"]) && $_REQUEST["graphid"] > 0 && !isset($_REQUEST["period"]) && !isset($_REQUEST["stime"]))
 	{
-		show_header($page["title"],1,$nomenu);
+		define('ZBX_PAGE_DO_REFRESH', 1);
 	}
-	else
-	{
-		show_header($page["title"],0,$nomenu);
-	}
+	
+include_once "include/page_header.php";
 
 ?>
-
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
@@ -59,14 +59,15 @@
 	);
 
 	check_fields($fields);
-
-	$_REQUEST["graphid"] = get_request("graphid", get_profile("web.charts.grapgid", 0));
+?>
+<?php
+	$_REQUEST["graphid"] = get_request("graphid", get_profile("web.charts.graphid", 0));
 	$_REQUEST["keep"] = get_request("keep", 1); // possible excessed REQUEST variable !!!
 
 	$_REQUEST["period"] = get_request("period",get_profile("web.graph[".$_REQUEST["graphid"]."].period", 3600));
 	$effectiveperiod=navigation_bar_calc();
 
-	validate_group_with_host("R",array("allow_all_hosts","monitored_hosts","with_items"));
+	validate_group_with_host(PERM_READ_ONLY,array("allow_all_hosts","monitored_hosts","with_items"));
 
 	if($_REQUEST["graphid"] > 0 && $_REQUEST["hostid"] > 0)
 	{
@@ -77,102 +78,104 @@
 			$_REQUEST["graphid"] = 0;
 	}
 ?>
-
 <?php
 	if($_REQUEST["graphid"] > 0 && $_REQUEST["period"] >= 3600)
 	{
 		update_profile("web.graph[".$_REQUEST["graphid"]."].period",$_REQUEST["period"]);
 	}
 
-	update_profile("web.charts.grapgid",$_REQUEST["graphid"]);
-	update_profile("web.menu.view.last",$page["file"]);
+	update_profile("web.charts.graphid",$_REQUEST["graphid"]);
 ?>
-
 <?php
+	$h1 = array(S_GRAPHS_BIG.SPACE."/".SPACE);
+	
+	$availiable_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST, null, null, $ZBX_CURNODEID);
+	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
+
 	if($_REQUEST["graphid"] > 0)
 	{
-		$result=DBselect("select name from graphs where graphid=".$_REQUEST["graphid"]);
-		$row=DBfetch($result);
-		$graph=$row["name"];
-		$h1=iif(isset($_REQUEST["fullscreen"]),
-			"<a href=\"charts.php?graphid=".$_REQUEST["graphid"]."\">".$graph."</a>",
-			"<a href=\"charts.php?graphid=".$_REQUEST["graphid"]."&fullscreen=1\">".$graph."</a>");
+		if(! ($row = DBfetch(DBselect(" select distinct g.name from hosts h, items i, graphs_items gi, graphs g ".
+					" where h.status=".HOST_STATUS_MONITORED.
+					" and h.hostid=i.hostid and g.graphid=".$_REQUEST["graphid"].
+					" and i.itemid=gi.itemid and gi.graphid=g.graphid".
+					" and h.hostid not in (".$denyed_hosts.") ".
+					" and ".DBid2nodeid("g.graphid")."=".$ZBX_CURNODEID.
+					" order by h.host"
+				))))
+		{
+			update_profile("web.charts.graphid",0);
+			access_deny();
+		}
+		array_push($h1, new CLink($row["name"], "?graphid=".$_REQUEST["graphid"].(isset($_REQUEST["fullscreen"]) ? "&fullscreen=1" : "")));
 	}
 	else
 	{
-		$h1=S_SELECT_GRAPH_TO_DISPLAY;
+		array_push($h1, S_SELECT_GRAPH_TO_DISPLAY);
 	}
 
-	$h1=S_GRAPHS_BIG.nbsp(" / ").$h1;
+	$r_form = new CForm();
 
-	$h2=S_GROUP.SPACE;
-	$h2=$h2."<select class=\"biginput\" name=\"groupid\" onChange=\"submit()\">";
-	$h2=$h2.form_select("groupid",0,S_ALL_SMALL);
-	$result=DBselect("select groupid,name from groups where mod(groupid,100)=$ZBX_CURNODEID order by name");
+	if(isset($_REQUEST['fullscreen']))
+		$r_form->AddVar('fullscreen', 1);
+
+	$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit()");
+	$cmbHosts = new CComboBox("hostid",$_REQUEST["hostid"],"submit()");
+	$cmbGraph = new CComboBox("graphid",$_REQUEST["graphid"],"submit()");
+
+	$cmbGroup->AddItem(0,S_ALL_SMALL);
+	
+	$result=DBselect("select distinct g.groupid,g.name from groups g, hosts_groups hg, hosts h, items i, graphs_items gi ".
+		" where g.groupid in (".$availiable_groups.") ".
+		" and hg.groupid=g.groupid and h.status=".HOST_STATUS_MONITORED.
+		" and h.hostid=i.hostid and hg.hostid=h.hostid and i.itemid=gi.itemid ".
+		" order by g.name");
 	while($row=DBfetch($result))
 	{
-// Check if at least one host with read permission exists for this group
-		$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host");
-		$cnt=0;
-		while($row2=DBfetch($result2))
-		{
-			if(!check_right("Host","R",$row2["hostid"]))
-			{
-				continue;
-			}
-			$cnt=1; break;
-		}
-		if($cnt!=0)
-		{
-			$h2=$h2.form_select("groupid",$row["groupid"],$row["name"]);
-		}
+		$cmbGroup->AddItem($row["groupid"],$row["name"]);
 	}
-	$h2=$h2."</select>";
-
-	$h2=$h2.SPACE.S_HOST.SPACE;
-	$h2=$h2."<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
-
+	$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
+	
 	if($_REQUEST["groupid"] > 0)
 	{
-		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host order by h.host";
+		$sql = " select distinct h.hostid,h.host from hosts h,items i,hosts_groups hg, graphs_items gi ".
+			" where h.status=".HOST_STATUS_MONITORED.
+			" and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid ".
+			" and h.hostid not in (".$denyed_hosts.") and i.itemid=gi.itemid".
+			" order by h.host";
 	}
 	else
 	{
-		$h2=$h2.form_select("hostid",0,S_ALL_SMALL);
-
-		$sql="select h.hostid,h.host from hosts h,items i where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and mod(h.hostid,100)=$ZBX_CURNODEID group by h.hostid,h.host order by h.host";
+		$cmbHosts->AddItem(0,S_ALL_SMALL);
+		$sql = "select distinct h.hostid,h.host from hosts h,items i, graphs_items gi where h.status=".HOST_STATUS_MONITORED.
+			" and i.status=".ITEM_STATUS_ACTIVE." and h.hostid=i.hostid".
+			" and h.hostid not in (".$denyed_hosts.") and i.itemid=gi.itemid".
+			" order by h.host";
 	}
-
 	$result=DBselect($sql);
 	while($row=DBfetch($result))
 	{
-		if(!check_right("Host","R",$row["hostid"]))
-		{
-			continue;
-		}
-		$h2=$h2.form_select("hostid",$row["hostid"],$row["host"]);
-	}
-	$h2=$h2."</select>";
-
-	if(isset($_REQUEST["fullscreen"]))
-	{
-		$h2="<input name=\"fullscreen\" type=\"hidden\" value=".$_REQUEST["fullscreen"].">";
+		$cmbHosts->AddItem($row["hostid"],$row["host"]);
 	}
 
-	$h2=$h2.SPACE.S_GRAPH.SPACE;
-	$h2=$h2."<select class=\"biginput\" name=\"graphid\" onChange=\"submit()\">";
-	$h2=$h2.form_select("graphid",0,S_SELECT_GRAPH_DOT_DOT_DOT);
+	$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
+
+	$cmbGraph->AddItem(0,S_SELECT_GRAPH_DOT_DOT_DOT);
 
 	if($_REQUEST["hostid"] > 0)
 	{
 		$sql = "select distinct g.graphid,g.name from graphs g,graphs_items gi,items i".
-			" where i.itemid=gi.itemid and g.graphid=gi.graphid and i.hostid=".$_REQUEST["hostid"]." order by g.name";
+			" where i.itemid=gi.itemid and g.graphid=gi.graphid and i.hostid=".$_REQUEST["hostid"].
+			" and ".DBid2nodeid("g.graphid")."=".$ZBX_CURNODEID.
+			" and i.hostid not in (".$denyed_hosts.") ".
+			" order by g.name";
 	}
 	elseif ($_REQUEST["groupid"] > 0)
 	{
 		$sql = "select distinct g.graphid,g.name from graphs g,graphs_items gi,items i,hosts_groups hg,hosts h".
 			" where i.itemid=gi.itemid and g.graphid=gi.graphid and i.hostid=hg.hostid and hg.groupid=".$_REQUEST["groupid"].
 			" and i.hostid=h.hostid and h.status=".HOST_STATUS_MONITORED.
+			" and ".DBid2nodeid("g.graphid")."=".$ZBX_CURNODEID.
+			" and h.hostid not in (".$denyed_hosts.") ".
 			" order by g.name";
 	}
 	else
@@ -180,49 +183,44 @@
 		$sql = "select distinct g.graphid,g.name from graphs g,graphs_items gi,items i,hosts h".
 			" where i.itemid=gi.itemid and g.graphid=gi.graphid ".
 			" and i.hostid=h.hostid and h.status=".HOST_STATUS_MONITORED.
-			" and mod(h.hostid,100)=".$ZBX_CURNODEID.
+			" and ".DBid2nodeid("g.graphid")."=".$ZBX_CURNODEID.
+			" and h.hostid not in (".$denyed_hosts.") ".
 			" order by g.name";
 	}
 
-	$result=DBselect($sql);
+	$result = DBselect($sql);
 	while($row=DBfetch($result))
 	{
-		if(!check_right("Graph","R",$row["graphid"]))
-		{
-			continue;
-		}
-		$h2=$h2.form_select("graphid",$row["graphid"],$row["name"]);
+		$cmbGraph->AddItem($row["graphid"],$row["name"]);
 	}
-	$h2=$h2."</select>";
-
-	show_header2($h1,$h2,"<form name=\"form2\" method=\"get\" action=\"charts.php\">","</form>");
+	
+	$r_form->AddItem(array(SPACE.S_GRAPH.SPACE,$cmbGraph));
+	
+	show_table_header($h1, $r_form);
 ?>
-
 <?php
-	echo "<TABLE BORDER=0 align=center COLS=4 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-	echo "<TR BGCOLOR=#DDDDDD>";
-	echo "<TD ALIGN=CENTER>";
+	$table = new CTableInfo('...','chart');
+
 	if($_REQUEST["graphid"] > 0)
 	{
-		echo "<script language=\"JavaScript\">";
-		echo "document.write(\"<IMG SRC='chart2.php?graphid=".$_REQUEST["graphid"].url_param("stime")."&period=".$effectiveperiod."&from=".$_REQUEST["from"]."&width=\"+(document.width-108)+\"'>\")";
-		echo "</script>";
+		$row = 	"\n<script language=\"JavaScript\">\n".
+			"if(window.innerWidth) width=window.innerWidth; else width=document.body.clientWidth;\n".
+			"document.write(\"<IMG SRC='chart2.php?graphid=".$_REQUEST["graphid"].url_param("stime").url_param("from").
+			"&period=".$effectiveperiod."&width=\"+(width-108)+\"'>\")\n".
+			"</script>";
+		
+		$table->AddRow($row);
 	}
-	else
-	{
-		echo "...";
-	}
-	echo "</TD>";
-	echo "</TR>";
-	echo "</TABLE>";
+	$table->Show();
 
-	if($_REQUEST["graphid"] > 0/*&&(!isset($_REQUEST["fullscreen"]))*/)
+	if($_REQUEST["graphid"] > 0)
 	{
 		navigation_bar("charts.php");
 	}
 	
 ?>
-
 <?php
-	show_page_footer();
+
+include_once "include/page_footer.php";
+
 ?>

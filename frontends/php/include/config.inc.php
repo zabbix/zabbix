@@ -18,18 +18,22 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
+function SDI($msg="SDI") { echo "DEBUG INFO: "; if(is_array($msg)) print_r($msg); else echo($msg); echo BR; } // DEBUG INFO!!!
 
 
 ?>
 <?php
-	include_once("include/copt.lib.php");
+	require_once 	"include/html.inc.php";
+	require_once	"include/copt.lib.php";
 
 // GLOBALS
 	$USER_DETAILS	= array();
 	$USER_RIGHTS	= array();
 	$ERROR_MSG	= array();
 	$INFO_MSG	= array();
+
+	
+	$ZBX_LOCALNODEID = 1; // Local node
 // END OF GLOBALS
 
 // if magic quotes on then get rid of them
@@ -40,67 +44,61 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 		$_REQUEST= zbx_stripslashes($_REQUEST);
 	}
 
-	include_once 	"include/defines.inc.php";
-	include_once 	"include/db.inc.php";
-	include_once 	"include/html.inc.php";
-	include_once 	"include/locales.inc.php";
-	include_once 	"include/perm.inc.php";
-
-	include_once 	"include/audit.inc.php";
-	include_once 	"include/acknow.inc.php";
-	include_once 	"include/autoregistration.inc.php";
-	include_once 	"include/escalations.inc.php";
-	include_once 	"include/hosts.inc.php";
-	include_once 	"include/users.inc.php";
-	include_once 	"include/graphs.inc.php";
-	include_once 	"include/items.inc.php";
-	include_once 	"include/screens.inc.php";
-	include_once 	"include/triggers.inc.php";
-	include_once 	"include/actions.inc.php";
-        include_once    "include/events.inc.php";
-	include_once 	"include/profiles.inc.php";
-	include_once 	"include/services.inc.php";
-	include_once 	"include/maps.inc.php";
-	include_once 	"include/media.inc.php";
+	require_once 	"include/defines.inc.php";
+	require_once 	"include/db.inc.php";
+	require_once 	"include/locales.inc.php";
+	require_once 	"include/perm.inc.php";
+	require_once 	"include/audit.inc.php";
 
 // Include Validation
 
-	include_once 	"include/validate.inc.php";
+	require_once 	"include/validate.inc.php";
 
 // Include Classes
-	include_once("include/classes/ctag.inc.php");
-	include_once("include/classes/cvar.inc.php");
-	include_once("include/classes/cspan.inc.php");
-	include_once("include/classes/cimg.inc.php");
-	include_once("include/classes/clink.inc.php");
-	include_once("include/classes/chelp.inc.php");
-	include_once("include/classes/cbutton.inc.php");
-	include_once("include/classes/ccombobox.inc.php");
-	include_once("include/classes/ctable.inc.php");
-	include_once("include/classes/ctableinfo.inc.php");
-	include_once("include/classes/ctextarea.inc.php");
-	include_once("include/classes/ctextbox.inc.php");
-	include_once("include/classes/cpassbox.inc.php");
-	include_once("include/classes/cform.inc.php");
-	include_once("include/classes/cfile.inc.php");
-	include_once("include/classes/ccheckbox.inc.php");
-	include_once("include/classes/clistbox.inc.php");
-	include_once("include/classes/cform.inc.php");
-	include_once("include/classes/cformtable.inc.php");
-	include_once("include/classes/cmap.inc.php");
-	include_once("include/classes/cflash.inc.php");
-	include_once("include/classes/ciframe.inc.php");
+	require_once("include/classes/ctag.inc.php");
+	require_once("include/classes/cvar.inc.php");
+	require_once("include/classes/cspan.inc.php");
+	require_once("include/classes/cimg.inc.php");
+	require_once("include/classes/clink.inc.php");
+	require_once("include/classes/chelp.inc.php");
+	require_once("include/classes/cbutton.inc.php");
+	require_once("include/classes/clist.inc.php");
+	require_once("include/classes/ccombobox.inc.php");
+	require_once("include/classes/ctable.inc.php");
+	require_once("include/classes/ctableinfo.inc.php");
+	require_once("include/classes/ctextarea.inc.php");
+	require_once("include/classes/ctextbox.inc.php");
+	require_once("include/classes/cform.inc.php");
+	require_once("include/classes/cfile.inc.php");
+	require_once("include/classes/ccheckbox.inc.php");
+	require_once("include/classes/cform.inc.php");
+	require_once("include/classes/cformtable.inc.php");
+	require_once("include/classes/cmap.inc.php");
+	require_once("include/classes/cflash.inc.php");
+	require_once("include/classes/ciframe.inc.php");
+	require_once("include/classes/graph.inc.php");
 
 // Include Tactical Overview modules
+
 	include_once("include/classes/chostsinfo.mod.php");
 	include_once("include/classes/ctriggerinfo.mod.php");
 	include_once("include/classes/cserverinfo.mod.php");
 	include_once("include/classes/cflashclock.mod.php");
 
+	function	access_deny()
+	{
+		include_once "include/page_header.php";
+
+		show_error_message(S_NO_PERMISSIONS);
+		
+		include_once "include/page_footer.php";
+	}
 
 	function zbx_stripslashes($value){
 		if(is_array($value)){
-			$value = array_map('zbx_stripslashes',$value);
+			foreach($value as $id => $data)
+				$value[$id] = zbx_stripslashes($data); 
+				// $value = array_map('zbx_stripslashes',$value); /* don't use 'array_map' it buggy with indexes */
 		} elseif (is_string($value)){
 			$value = stripslashes($value);
 		}
@@ -142,28 +140,17 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 		}
 	}
 
+	function fatal_error($msg)
+	{
+		error($msg);
+		include_once "include/page_footer.php";
+	}
+
 	function getmicrotime()
 	{
 		list($usec, $sec) = explode(" ",microtime()); 
 		return ((float)$usec + (float)$sec); 
 	} 
-
-	function	iif($bool,$a,$b)
-	{
-		if($bool)
-		{
-			return $a;
-		}
-		else
-		{
-			return $b;
-		}
-	}
-
-	function	iif_echo($bool,$a,$b)
-	{
-		echo iif($bool,$a,$b);
-	}
 
 	function	convert_units($value,$units)
 	{
@@ -304,68 +291,21 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 		return "$s $u$units";
 	}
 
-	function	get_template_permission_str($num)
-	{
-		$str=SPACE;
-		if(($num&1)==1)	$str=$str.S_ADD.SPACE;
-		if(($num&2)==2)	$str=$str.S_UPDATE.SPACE;
-		if(($num&4)==4)	$str=$str.S_DELETE.SPACE;
-		return $str;
-	}
-	
-	function	get_media_count_by_userid($userid)
-	{
-		$sql="select count(mediaid) as cnt from media where userid=$userid";
-		$result=DBselect($sql);
-		$row=DBfetch($result);
-		return $row["cnt"]; 
-	}
-	
-	function	get_action_count_by_triggerid($triggerid)
-	{
-		$cnt=0;
-
-		$sql="select count(actionid) as cnt from actions where triggerid=$triggerid and scope=0";
-		$result=DBselect($sql);
-		$row=DBfetch($result);
-
-		$cnt=$cnt+$row["cnt"];
-
-		$sql="select count(actionid) as cnt from actions where scope=2";
-		$result=DBselect($sql);
-		$row=DBfetch($result);
-
-		$cnt=$cnt+$row["cnt"];
-
-		$sql="select distinct h.hostid from hosts h,items i,triggers t,functions f where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=$triggerid";
-		$result=DBselect($sql);
-		while($row=DBfetch($result))
-		{
-			$sql="select count(*) as cnt from actions a,hosts h,items i,triggers t,functions f where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and a.triggerid=".$row["hostid"]." and a.scope=1";
-			$result2=DBselect($sql);
-			$row2=DBfetch($result2);
-			$cnt=$cnt+$row2["cnt"];
-		}
-
-		return $cnt; 
-	}
-
 	function	play_sound($filename)
 	{
-		echo '
+?>
 <SCRIPT TYPE="text/javascript">
 <!-- 
-var snd_tag = \'<BGSOUND SRC="'.$filename.'" LOOP=0/>\';
-
 if (navigator.appName != "Microsoft Internet Explorer")
-    snd_tag = \'<EMBED SRC="'.$filename.'" AUTOSTART=TRUE WIDTH=0 HEIGHT=0 LOOP=0><P/>\';
-
-document.writeln(snd_tag);
+	document.writeln('<EMBED SRC="<?php echo $filename; ?>" AUTOSTART=TRUE WIDTH=0 HEIGHT=0 LOOP=0><P/>');
+else
+	document.writeln('<BGSOUND SRC="<?php echo $filename; ?>" LOOP=0/>');
 // -->
 </SCRIPT>
 <NOSCRIPT>
-	<BGSOUND SRC="'.$filename.'"/>
-</NOSCRIPT>';
+	<BGSOUND SRC="<?php echo $filename; ?>"/>
+</NOSCRIPT>
+<?php
 	}
 
 //	The hash has form <md5sum of triggerid>,<sum of priorities>
@@ -380,7 +320,7 @@ document.writeln(snd_tag);
 
 		while($row=DBfetch($result))
 		{
-			$ack = get_last_alarm_by_triggerid($row["triggerid"]);
+			$ack = get_last_event_by_triggerid($row["triggerid"]);
 			if($ack["acknowledged"] == 1) continue;
 
 			$triggerids="$triggerids,".$row["triggerid"];
@@ -395,44 +335,9 @@ document.writeln(snd_tag);
 		return	"$priorities,$md5sum";
 	}
 
-	function	get_dbid($table,$field)
-	{
-		global	$ZBX_CURNODEID;
-
-		$sql="select max($field) as id from $table where mod($field,100)=$ZBX_CURNODEID";
-		$result=DBselect($sql);
-		$row=DBfetch($result);
-		if($row && !is_null($row["id"]))
-		{
-			return	$row["id"]+100;
-		}
-		else
-		{
-			return	100+$ZBX_CURNODEID;
-		}
-	}
-
-	function	get_function_by_functionid($functionid)
-	{
-		$sql="select * from functions where functionid=$functionid"; 
-		$result=DBselect($sql);
-		$row=DBfetch($result);
-		if($row)
-		{
-			return	$row;
-		}
-		else
-		{
-			error("No function with functionid=[$functionid]");
-		}
-		return	$item;
-	}
-
 	function	select_config()
 	{
-		$sql="select * from config";
-		$result=DBselect($sql);
-		$row=DBfetch($result);
+		$row=DBfetch(DBselect("select * from config"));
 		if($row)
 		{
 			return	$row;
@@ -444,56 +349,121 @@ document.writeln(snd_tag);
 		return	$row;
 	}
 
-	function	show_infomsg()
+	function	show_messages($bool=TRUE,$okmsg=NULL,$errmsg=NULL)
 	{
+		global	$ERROR_MSG;
 		global	$INFO_MSG;
-		global	$ERROR_MSG;
-		if(is_array($INFO_MSG) && count($INFO_MSG)>0)
-		{
-			echo "<p align=center class=\"info\">";
-			while($val = array_shift($INFO_MSG))
-			{
-				echo $val.BR;
-			}
-			echo "</p>";
-		}
-	}
+		global	$page;
 
-	function	show_messages($bool=TRUE,$msg=NULL,$errmsg=NULL)
-	{
-		global	$ERROR_MSG;
+		if(!isset($page["type"])) $page["type"] = PAGE_TYPE_HTML;
 
-		if(!$bool)
-		{
-			if(!is_null($errmsg))
-				$msg="ERROR:".$errmsg;
+		$message = array();
+		$width = 0;
+		$height= 0;
 
-			$color="#AA0000";
-		}
-		else
-		{
-			$color="#223344";
-		}
+		if(!$bool && !is_null($errmsg))		$msg="ERROR: ".$errmsg;
+		else if($bool && !is_null($okmsg))	$msg=$okmsg;
 
 		if(isset($msg))
 		{
-			echo "<p align=center>";
-			echo "<font color='$color'>";
-			echo "<b>[$msg]</b>";
-			echo "</font>";
-			echo "</p>";
+			switch($page["type"])
+			{
+				case PAGE_TYPE_IMAGE:
+					array_push($message, array(
+						'text'	=> $msg,
+						'color'	=> (!$bool) ? array('R'=>255,'G'=>0,'B'=>0) : array('R'=>34,'G'=>51,'B'=>68),
+						'font'	=> 4));
+					$width = max($width, ImageFontWidth(4) * strlen($msg) + 1);
+					$height += imagefontheight(4) + 1;
+					break;			
+				case PAGE_TYPE_HTML:
+				default:
+					echo "<p align=center>";
+					echo "<font color='".((!$bool) ? "#AA0000" : "#223344")."'>";
+					echo "<b>[".htmlspecialchars($msg)."]</b>";
+					echo "</font>";
+					echo "</p>";
+					break;
+			}
 		}
 
-		show_infomsg();
+		if(is_array($INFO_MSG) && count($INFO_MSG)>0)
+		{
+			switch($page["type"])
+			{
+				case PAGE_TYPE_IMAGE:
+					while($val = array_shift($INFO_MSG))
+					{
+						array_push($message, array(
+							'text'	=> $val,
+							'color'	=> array('R'=>155,'G'=>155,'B'=>55),
+							'font'	=> 2));
+						$width = max($width, ImageFontWidth(2) * strlen($val) + 1);
+						$height += imagefontheight(2) + 1;
+					}
+					break;			
+				case PAGE_TYPE_HTML:
+					echo "<p align=center class=\"info\">";
+					while($val = array_shift($INFO_MSG))
+					{
+						echo htmlspecialchars($val).BR;
+					}
+					echo "</p>";
+					break;
+			}
+		}
 
 		if(is_array($ERROR_MSG) && count($ERROR_MSG)>0)
 		{
-			echo "<p align=center class=\"error\">";
-			while($val = array_shift($ERROR_MSG))
+			switch($page["type"])
 			{
-				echo $val.BR;
+				case PAGE_TYPE_IMAGE:
+					while($val = array_shift($ERROR_MSG))
+					{
+						array_push($message, array(
+							'text'	=> $val,
+							'color'	=> array('R'=>255,'G'=>55,'B'=>55),
+							'font'	=> 2));
+						$width = max($width, ImageFontWidth(2) * strlen($val) + 1);
+						$height += imagefontheight(2) + 1;
+					}
+					break;			
+				case PAGE_TYPE_HTML:
+					echo "<p align=center class=\"error\">";
+					while($val = array_shift($ERROR_MSG))
+					{
+						echo htmlspecialchars($val).BR;
+					}
+					echo "</p>";
+					break;
 			}
-			echo "</p>";
+		}
+
+		if($page["type"] == PAGE_TYPE_IMAGE && count($message) > 0)
+		{
+			$width += 2;
+			$height += 2;
+			$canvas = imagecreate($width, $height);
+			ImageFilledRectangle($canvas,0,0,$width,$height, ImageColorAllocate($canvas, 255, 255, 255));
+
+			foreach($message as $id => $msg)
+			{
+				$message[$id]['y'] = 1 + (isset($previd) ? $message[$previd]['y'] + $message[$previd]['h'] : 0 );
+				$message[$id]['h'] = imagefontheight($msg['font']);
+				
+				ImageString(
+					$canvas,
+					$msg['font'],
+					1,
+					$message[$id]['y'],
+					$msg['text'],
+					ImageColorAllocate($canvas, $msg['color']['R'], $msg['color']['G'], $msg['color']['B'])
+					);
+				
+				$previd = $id;
+			}
+			ImageOut($canvas);
+			ImageDestroy($canvas);
 		}
 	}
 
@@ -631,14 +601,6 @@ document.writeln(snd_tag);
 
 	function	validate_period(&$str)
 	{
-/* // simple check
-		$per_expr = '[1-7]-[1-7],[0-9]{1,2}:[0-9]{1,2}-[0-9]{1,2}:[0-9]{1,2}';
-		$regexp = '^'.$per_expr.'(;'.$per_expr.')*[;]?$';
-		if(!ereg($regexp, $str, $arr))
-			return -1;
-
-		return 0;
-*/
 		$str = trim($str,';');
 		$out = "";
 		$periods = split(';',$str);
@@ -772,350 +734,6 @@ document.writeln(snd_tag);
 		}
 		return 0;
 	}
-/*
-	function	validate_expression($expression)
-	{
-//		echo "Validating expression: $expression<br>";
-
-		$ok=0;
-// Replace all {server:key.function(param)} with 0
-		while($ok==0)
-		{
-//			echo "Expression:$expression<br>";
-			$arr="";
-			if (eregi('^((.)*)[ ]*(\{((.)*)\})[ ]*((.)*)$', $expression, $arr)) 
-			{
-//				for($i=0;$i<20;$i++)
-//				{
-//					if($arr[$i])
-//						echo "  $i: ",$arr[$i],"<br>";
-//				}
-				if(validate_simple_expression($arr[3])!=0)
-				{
-					return -1;
-				}
-				$expression=$arr[1]."0".$arr[6];
-	                }
-			else
-			{
-				$ok=1;
-			}
-		}
-//		echo "Result:$expression<br><hr>";
-
-		$ok=0;
-		while($ok==0)
-		{
-// 	Replace all <float> <sign> <float> <K|M|G> with 0
-//			echo "Expression:$expression<br>";
-			$arr="";
-			if (eregi('^((.)*)([0-9\.]+[A-Z]{0,1})[ ]*([\&\|\>\<\=\+\-\*\/\#]{1})[ ]*([0-9\.]+[A-Z]{0,1})((.)*)$', $expression, $arr)) 
-			{
-//				echo "OK<br>";
-//				for($i=0;$i<50;$i++)
-//				{
-//					if($arr[$i]!="")
-//						echo "  $i: ",$arr[$i],"<br>";
-//				}
-				if(validate_float($arr[3])!=0)
-				{
-					error("[".$arr[3]."] is not a float");
-					return -1;
-				}
-				if(validate_float($arr[5])!=0)
-				{
-					error("[".$arr[5]."] is not a float");
-					return -1;
-				}
-				$expression=$arr[1]."(0)".$arr[6];
-	                }
-			else
-			{
-				$ok=1;
-			}
-
-
-// 	Replace all (float) with 0
-//			echo "Expression2:[$expression]<br>";
-			$arr="";
-			if (eregi('^((.)*)(\(([ 0-9\.]+)\))((.)*)$', $expression, $arr)) 
-			{
-//				echo "OK<br>";
-//				for($i=0;$i<30;$i++)
-//				{
-//					if($arr[$i]!="")
-//						echo "  $i: ",$arr[$i],"<br>";
-//				}
-				if(validate_float($arr[4])!=0)
-				{
-					error("[".$arr[4]."] is not a float");
-					return -1;
-				}
-				$expression=$arr[1]."0".$arr[5];
-				$ok=0;
-	                }
-			else
-			{
-				$ok=1;
-			}
-
-
-
-		}
-//		echo "Result:$expression<br><hr>";
-
-		if($expression=="0")
-		{
-			return 0;
-		}
-
-		return 1;
-	}
-/**/
-
-	function	cr()
-	{
-		echo "\n";
-	}
-
-	# Header for HTML pages
-
-	function	show_header($title,$dorefresh=0,$nomenu=0,$noauth=0)
-	{
-		global $page;
-		global $USER_DETAILS;
-COpt::profiling_start("page");
-
-		if($noauth==0)
-		{
-			global $TRANSLATION;
-			if(!isset($TRANSLATION) || !is_array($TRANSLATION))	$TRANSLATION = array();
-
-			check_authorisation();
-			include_once "include/locales/".$USER_DETAILS["lang"].".inc.php";
-			process_locales();
-		}
-		include_once "include/locales/en_gb.inc.php";
-		process_locales();
-?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=<?php echo S_HTML_CHARSET; ?>">
-<meta name="Author" content="ZABBIX SIA (Alexei Vladishev, Eugene Grigorjev)">
-<link rel="stylesheet" href="css.css">
-<?php
-//	if($USER_DETAILS['alias']=='guest')
-//	{
-//		$refresh=2*$refresh;
-//	}
-	if(defined($title))	$title=constant($title);
-	if($dorefresh && $USER_DETAILS["refresh"])
-	{
-		echo "	<meta http-equiv=\"refresh\" content=\"".$USER_DETAILS["refresh"]."\">\n";
-		echo "	<title>$title [refreshed every ".$USER_DETAILS["refresh"]." sec]</title>\n";
-	}
-	else
-	{
-		echo "	<title>$title</title>\n";
-	}
-
-?>
-</head>
-<body>
-<?php
-	if($nomenu == 0)
-	{
-	$menu=array(
-		"view"=>array(
-				"label"=>S_MONITORING,
-				"pages"=>array("overview.php","latest.php","tr_status.php","queue.php","events.php","actions.php","maps.php","charts.php","screens.php","srv_status.php","alarms.php","history.php","tr_comments.php","report3.php","profile.php","acknow.php"),
-				"level2"=>array(
-					array("label"=>S_OVERVIEW,"url"=>"overview.php"),
-					array("label"=>S_LATEST_DATA,"url"=>"latest.php"),
-					array("label"=>S_TRIGGERS,"url"=>"tr_status.php"),
-					array("label"=>S_QUEUE,"url"=>"queue.php"),
-					array("label"=>S_EVENTS,"url"=>"events.php"),
-					array("label"=>S_ACTIONS,"url"=>"actions.php"),
-					array("label"=>S_MAPS,"url"=>"maps.php"),
-					array("label"=>S_GRAPHS,"url"=>"charts.php"),
-					array("label"=>S_SCREENS,"url"=>"screens.php"),
-					array("label"=>S_IT_SERVICES,"url"=>"srv_status.php")
-					)
-				),
-		"cm"=>array(
-				"label"=>S_INVENTORY,
-				"pages"=>array("hostprofiles.php"),
-				"level2"=>array(
-					array("label"=>S_HOSTS,"url"=>"hostprofiles.php")
-					)
-				),
-		"reports"=>array(
-				"label"=>S_REPORTS,
-				"pages"=>array("report1.php","report2.php","report4.php","report5.php"),
-				"level2"=>array(
-					array("label"=>S_STATUS_OF_ZABBIX,"url"=>"report1.php"),
-					array("label"=>S_AVAILABILITY_REPORT,"url"=>"report2.php"),
-					array("label"=>S_NOTIFICATIONS,"url"=>"report4.php"),
-					array("label"=>S_TRIGGERS_TOP_100,"url"=>"report5.php"),   
-					)
-				),
-		"configuration"=>array(
-				"label"=>S_CONFIGURATION,
-				"pages"=>array("config.php","users.php","audit.php","hosts.php","items.php","triggers.php","sysmaps.php","graphs.php","screenconf.php","services.php","sysmap.php","media.php","screenedit.php","graph.php","actionconf.php","bulkloader.php"),
-				"level2"=>array(
-					array("label"=>S_GENERAL,"url"=>"config.php"),
-					array("label"=>S_USERS,"url"=>"users.php"),
-					array("label"=>S_AUDIT,"url"=>"audit.php"),
-					array("label"=>S_HOSTS,"url"=>"hosts.php"),
-					array("label"=>S_ITEMS,"url"=>"items.php"),
-					array("label"=>S_TRIGGERS,"url"=>"triggers.php"),
-					array("label"=>S_ACTIONS,"url"=>"actionconf.php"),
-					array("label"=>S_MAPS,"url"=>"sysmaps.php"),
-					array("label"=>S_GRAPHS,"url"=>"graphs.php"),
-					array("label"=>S_SCREENS,"url"=>"screenconf.php"),
-					array("label"=>S_IT_SERVICES,"url"=>"services.php"),
-					array("label"=>S_MENU_BULKLOADER,"url"=>"bulkloader.php")
-					)
-				),
-		"login"=>array(
-				"label"=>S_LOGIN,
-				"pages"=>array("index.php"),
-				"level2"=>array(
-					array("label"=>S_LOGIN,"url"=>"index.php"),
-					)
-				),
-		);
-
-	$table = new CTable(NULL,"page_header");
-	$table->SetCellSpacing(0);
-	$table->SetCellPadding(5);
-
-	$help = new CLink(S_HELP, "http://www.zabbix.com/manual/v1.1/index.php", "small_font");
-	$help->SetTarget('_blank');
-	$col_r = array($help);
-	if($USER_DETAILS["alias"]!="guest") {
-		array_push($col_r, "|");		
-		array_push($col_r, new CLink(S_PROFILE, "profile.php", "small_font"));
-	}
-
-	$logo = new CLink(new CImg("images/general/zabbix.png","ZABBIX"),"http://www.zabbix.com");
-	$logo->SetTarget('_blank');
-	$table->AddRow(array(new CCol($logo, "page_header_l"), new CCol($col_r, "page_header_r")));
-
-	$table->Show();
-?>
-
-<table class="menu" cellspacing=0 cellpadding=5>
-<tr>
-<?php
-	$i=0;
-	foreach($menu as $label=>$sub)
-	{
-// Check permissions
-		if($label=="configuration")
-		{
-			if(	!check_anyright("Configuration of Zabbix","U")
-				&&!check_anyright("User","U")
-				&&!check_anyright("Host","U")
-				&&!check_anyright("Item","U")
-				&&!check_anyright("Graph","U")
-				&&!check_anyright("Screen","U")
-				&&!check_anyright("Network map","U")
-				&&!check_anyright("Service","U")
-			)
-			{
-				continue;
-			}
-			if(	!check_anyright("Default permission","R")
-				&&!check_anyright("Host","R")
-			)
-			{
-				continue;
-			}
-
-		}
-// End of check permissions
-		$active=0;
-		foreach($sub["pages"] as $label2)
-		{
-			if($page["file"]==$label2)
-			{
-				$active=1;
-				$active_level1=$label;
-			}
-		}
-		if($i==0)	$url=get_profile("web.menu.view.last",0);
-		else if($i==1)	$url=get_profile("web.menu.cm.last",0);
-		else if($i==2)	$url=get_profile("web.menu.reports.last",0);
-		else if($i==3)	$url=get_profile("web.menu.config.last",0);
-		else if($i==4)	$url="0";
-
-		if($url=="0")	$url=$sub["level2"][0]["url"];
-		if($active==1) 
-		{
-			global $page;
-			$class = "horizontal_menu";
-			if(isset($page["menu.url"]))
-				$url = $page["menu.url"];
-			else
-				$url	= $page["file"];
-		}
-		else
-		{
-			$class = "horizontal_menu_n";
-		}
-
-		echo "<td class=\"$class\" height=24 colspan=9><b><a href=\"$url\" class=\"highlight\">".$sub["label"]."</a></b></td>\n";
-		$i++;
-	}
-?>
-</tr>
-</table>
-
-<table class="menu" width="100%" cellspacing=0 cellpadding=5>
-<tr><td class="horizontal_menu" height=24 colspan=9><b>
-<?php
-	if(isset($active_level1))
-	foreach($menu[$active_level1]["level2"] as $label=>$sub)
-	{
-// Check permissions
-		if(($sub["url"]=="latest.php")&&!check_anyright("Host","R"))							continue;
-		if(($sub["url"]=="overview.php")&&!check_anyright("Host","R"))							continue;
-		if(($sub["url"]=="tr_status.php?onlytrue=true&noactions=true&compact=true")&&!check_anyright("Host","R"))	continue;
-		if(($sub["url"]=="queue.php")&&!check_anyright("Host","R"))							continue;
-		if(($sub["url"]=="events.php")&&!check_anyright("Default permission","R"))				continue;
-		if(($sub["url"]=="actions.php")&&!check_anyright("Default permission","R"))					continue;
-		if(($sub["url"]=="maps.php")&&!check_anyright("Network map","R"))						continue;
-		if(($sub["url"]=="charts.php")&&!check_anyright("Graph","R"))							continue;
-		if(($sub["url"]=="screens.php")&&!check_anyright("Screen","R"))							continue;
-		if(($sub["url"]=="srv_status.php")&&!check_anyright("Service","R"))						continue;
-		if(($sub["url"]=="report1.php")&&!check_anyright("Default permission","R"))					continue;
-		if(($sub["url"]=="report2.php")&&!check_anyright("Host","R"))							continue;
-		if(($sub["url"]=="config.php")&&!check_anyright("Configuration of Zabbix","U"))					continue;
-		if(($sub["url"]=="users.php")&&!check_anyright("User","U"))							continue;
-		if(($sub["url"]=="media.php")&&!check_anyright("User","U"))							continue;
-		if(($sub["url"]=="audit.php")&&!check_anyright("Audit","U"))							continue;
-		if(($sub["url"]=="hosts.php")&&!check_anyright("Host","U"))							continue;
-		if(($sub["url"]=="items.php")&&!check_anyright("Item","U"))							continue;
-		if(($sub["url"]=="triggers.php")&&!check_anyright("Host","U"))							continue;
-		if(($sub["url"]=="sysmaps.php")&&!check_anyright("Network map","U"))						continue;
-		if(($sub["url"]=="sysmap.php")&&!check_anyright("Network map","U"))						continue;
-		if(($sub["url"]=="graphs.php")&&!check_anyright("Graph","U"))							continue;
-		if(($sub["url"]=="graph.php")&&!check_anyright("Graph","U"))							continue;
-		if(($sub["url"]=="screenedit.php")&&!check_anyright("Screen","U"))						continue;
-		if(($sub["url"]=="screenconf.php")&&!check_anyright("Screen","U"))						continue;
-		if(($sub["url"]=="services.php")&&!check_anyright("Service","U"))						continue;
-
-		echo "<a href=\"".$sub["url"]."\" class=\"highlight\">".$sub["label"]."</a><span class=\"divider\">".SPACE.SPACE."|".SPACE."</span>\n";
-	}
-?>
-</b></td></tr>
-</table>
-<br/>
-<?php
-		}
-	}
 
 	# Show screen cell containing plain text values
 	function&	get_screen_plaintext($itemid,$elements)
@@ -1172,293 +790,12 @@ COpt::profiling_start("page");
 		return $table;
 	}
 
-	function	get_image_by_name($name,$imagetype=NULL)
+	# Add event
+
+	function	get_event_by_eventid($eventid)
 	{
-		global $DB_TYPE;
-
-		$sql="select image from images where name=".zbx_dbstr($name); 
-		if(isset($imagetype))
-			$sql .= "and imagetype=".$imagetype;
-
-		$result=DBselect($sql);
-		$row=DBfetch($result);
-		if($row)
-		{
-			if($DB_TYPE == "ORACLE")
-			{
-				if(!isset($row['image']))
-					return 0;
-
-				$row['image'] = $row['image']->load();
-			}
-			else if($DB_TYPE == "POSTGRESQL")
-			{
-				$row['image'] = pg_unescape_bytea($row['image']);
-			}
-
-			return	$row;
-		}
-		else
-		{
-			return 0;
-		}
-	}
-
-	function	get_image_by_imageid($imageid)
-	{
-		global $DB_TYPE;
-
-		$result=DBselect('select * from images where imageid='.$imageid);
-		$row=DBfetch($result);
-		if($row)
-		{
-			if($DB_TYPE == "ORACLE")
-			{
-				if(!isset($row['image']))
-					return 0;
-
-				$row['image'] = $row['image']->load();
-			}
-			else if($DB_TYPE == "POSTGRESQL")
-			{
-				$row['image'] = pg_unescape_bytea($row['image']);
-//SDI($row['image']);
-			}
-			return	$row;
-		}
-		else
-		{
-			return 0;
-		}
-	}
-
-	function	add_image($name,$imagetype,$file)
-	{
-		global $DB_TYPE;
-		global $DB;
-
-		if(!is_null($file))
-		{
-			if($file["error"] != 0 || $file["size"]==0)
-			{
-				error("Incorrect Image");
-				return FALSE;
-			}
-			if($file["size"]<1024*1024)
-			{
-				$image=fread(fopen($file["tmp_name"],"r"),filesize($file["tmp_name"]));
-				if($DB_TYPE == "ORACLE")
-				{
-					$lobimage = OCINewDescriptor($DB, OCI_D_LOB);
-
-					$imageid=get_dbid("images","imageid");
-
-					$sql = "insert into images (imageid,name,imagetype,image)".
-						" values ($imageid,".zbx_dbstr($name).",".$imagetype.",EMPTY_BLOB())".
-						" return image into :image";
-					$stid = OCIParse($DB, $sql);
-					if(!$stid)
-					{
-						$e = ocierror($stid);
-						error("Parse SQL error [".$e["message"]."] in [".$e["sqltext"]."]");
-						return false;
-					}
-
-					OCIBindByName($stid, ':image', $lobimage, -1, OCI_B_BLOB);
-
-					$result = OCIExecute($stid, OCI_DEFAULT);
-					if(!$result){
-						$e = ocierror($stid);
-						error("Execute SQL error [".$e["message"]."] in [".$e["sqltext"]."]");
-						return false;
-					}
-
-					if ($lobimage->save($image)) {
-						OCICommit($DB);
-					}
-					else {
-						OCIRollback($DB);
-						error("Couldn't save image!\n");
-						return false;
-					}
-
-					$lobimage->free();
-					OCIFreeStatement($stid);
-
-					return $stid;
-				}
-				else if($DB_TYPE == "POSTGRESQL")
-				{
-					$image = pg_escape_bytea($image);
-
-					$sql = "insert into images (name,imagetype,image)".
-						" values (".zbx_dbstr($name).",".$imagetype.",'".$image."')";
-					return	DBexecute($sql);
-				}
-				$sql = "insert into images (name,imagetype,image)".
-					" values (".zbx_dbstr($name).",".$imagetype.",".zbx_dbstr($image).")";
-				return	DBexecute($sql);
-			}
-			else
-			{
-				error("Image size must be less than 1Mb");
-				return false;
-			}
-		}
-		else
-		{
-			error("Select image to download");
-			return false;
-		}
-	}
-
-	function	update_image($imageid,$name,$imagetype,$file)
-	{
-		global $DB_TYPE;
-		global $DB;
-
-		if(!is_null($file))
-		{
-			if($file["error"] != 0 || $file["size"]==0)
-			{
-				error("Incorrect Image");
-				return FALSE;
-			}
-			if($file["size"]<1024*1024)
-			{
-				$image=fread(fopen($file["tmp_name"],"r"),filesize($file["tmp_name"]));
-
-				if($DB_TYPE == "ORACLE")
-				{
-
-					$result = DBexecute("update images set name=".zbx_dbstr($name).
-						",imagetype=".zbx_dbstr($imagetype).
-						" where imageid=$imageid");
-
-					if(!$result) return $result;
-
-					$stid = OCIParse($DB, "select image from images where imageid=".$imageid." for update");
-
-					$result = OCIExecute($stid, OCI_DEFAULT);
-					if(!$result){
-						$e = ocierror($stid);
-						error("Execute SQL error [".$e["message"]."] in [".$e["sqltext"]."]");
-						OCIRollback($DB);
-						return false;
-					}
-
-					$row = DBfetch($stid);
-
-					$lobimage = $row['image'];
-
-//					if (!($lobimage->erase()))
-//					{
-//						OCIRollback($DB);
-//						error("Failed to truncate LOB\n");
-//						return false;
-//					}
-
-					if (!$lobimage->save($image)) {
-						OCIRollback($DB);
-					} else {
-						OCICommit($DB);
-					}
-
-					$lobimage->free();
-
-					return $stid;
-				}
-				else if($DB_TYPE == "POSTGRESQL")
-				{
-					$image = pg_escape_bytea($image);
-					$sql="update images set name=".zbx_dbstr($name).",imagetype=".zbx_dbstr($imagetype).
-						",image='".$image."' where imageid=$imageid";
-					return	DBexecute($sql);
-				}
-
-				$sql="update images set name=".zbx_dbstr($name).",imagetype=".zbx_dbstr($imagetype).
-					",image=".zbx_dbstr($image)." where imageid=$imageid";
-				return	DBexecute($sql);
-			}
-			else
-			{
-				error("Image size must be less than 1Mb");
-				return FALSE;
-			}
-		}
-		else
-		{
-				$sql="update images set name=".zbx_dbstr($name).",imagetype=".zbx_dbstr($imagetype)." where imageid=$imageid";
-				return	DBexecute($sql);
-		}
-	}
-
-	function	delete_image($imageid)
-	{
-		$sql="delete from images where imageid=$imageid";
-		return	DBexecute($sql);
-	}
-
-	# Delete Alert by actionid
-
-	function	delete_alert_by_actionid( $actionid )
-	{
-		$sql="delete from alerts where actionid=$actionid";
-		return	DBexecute($sql);
-	}
-
-	function	delete_rights_by_userid($userid )
-	{
-		$sql="delete from rights where userid=$userid";
-		return	DBexecute($sql);
-	}
-
-	# Delete from History
-
-	function	delete_history_by_itemid($itemid, $use_housekeeper=0)
-	{
-		$result = delete_trends_by_itemid($itemid,$use_housekeeper);
-		if(!$result)	return $result;
-
-		if($use_housekeeper)
-		{
-			DBexecute("insert into housekeeper (tablename,field,value)".
-				" values ('history_log','itemid',$itemid)");
-			DBexecute("insert into housekeeper (tablename,field,value)".
-				" values ('history_uint','itemid',$itemid)");
-			DBexecute("insert into housekeeper (tablename,field,value)".
-				" values ('history_str','itemid',$itemid)");
-			DBexecute("insert into housekeeper (tablename,field,value)".
-				" values ('history','itemid',$itemid)");
-			return TRUE;
-		}
-
-		DBexecute("delete from history_log where itemid=$itemid");
-		DBexecute("delete from history_uint where itemid=$itemid");
-		DBexecute("delete from history_str where itemid=$itemid");
-		DBexecute("delete from history where itemid=$itemid");
-		return TRUE;
-	}
-
-	# Delete from Trends
-
-	function	delete_trends_by_itemid($itemid, $use_housekeeper=0)
-	{
-		if($use_housekeeper)
-		{
-			DBexecute("insert into housekeeper (tablename,field,value)".
-				" values ('trends','itemid',$itemid)");
-			return TRUE;
-		}
-		return	DBexecute("delete from trends where itemid=$itemid");
-	}
-
-	# Add alarm
-
-	function	get_alarm_by_alarmid($alarmid)
-	{
-		$db_alarms = DBselect("select * from alarms where alarmid=$alarmid");
-		return DBfetch($db_alarms);
+		$db_events = DBselect("select * from events where eventid=$eventid");
+		return DBfetch($db_events);
 	}
 
 	# Reset nextcheck for related items
@@ -1474,241 +811,19 @@ COpt::profiling_start("page");
 		}
 	}
 
-	# Delete Media definition by mediatypeid
-
-	function	delete_media_by_mediatypeid($mediatypeid)
-	{
-		$sql="delete from media where mediatypeid=$mediatypeid";
-		return	DBexecute($sql);
-	}
-
-	# Delete alrtes by mediatypeid
-
-	function	delete_alerts_by_mediatypeid($mediatypeid)
-	{
-		$sql="delete from alerts where mediatypeid=$mediatypeid";
-		return	DBexecute($sql);
-	}
-
-	function	get_mediatype_by_mediatypeid($mediatypeid)
-	{
-		$sql="select * from media_type where mediatypeid=$mediatypeid";
-		$result=DBselect($sql);
-		$row=DBfetch($result);
-		if($row)
-		{
-			return	$row;
-		}
-		else
-		{
-			error("No media type with with mediatypeid=[$mediatypeid]");
-		}
-		return	$item;
-	}
-
-	# Delete media type
-
-	function	delete_mediatype($mediatypeid)
-	{
-
-		delete_media_by_mediatypeid($mediatypeid);
-		delete_alerts_by_mediatypeid($mediatypeid);
-		$sql="delete from media_type where mediatypeid=$mediatypeid";
-		return	DBexecute($sql);
-	}
-
-	# Update media type
-
-	function	update_mediatype($mediatypeid,$type,$description,$smtp_server,$smtp_helo,$smtp_email,$exec_path,$gsm_modem)
-	{
-		$ret = 0;
-
-		$sql="select * from media_type where description=".zbx_dbstr($description)." and mediatypeid!=$mediatypeid";
-		$result=DBexecute($sql);
-		if(DBfetch($result))
-		{
-			error("An action type with description '$description' already exists.");
-		}
-		else
-		{
-			$sql="update media_type set type=$type,description=".zbx_dbstr($description).",smtp_server=".zbx_dbstr($smtp_server).",smtp_helo=".zbx_dbstr($smtp_helo).",smtp_email=".zbx_dbstr($smtp_email).",exec_path=".zbx_dbstr($exec_path).",gsm_modem=".zbx_dbstr($gsm_modem)." where mediatypeid=$mediatypeid";
-			$ret =	DBexecute($sql);
-		}
-		return $ret;
-	}
-
-	# Add Media type
-
-	function	add_mediatype($type,$description,$smtp_server,$smtp_helo,$smtp_email,$exec_path,$gsm_modem)
-	{
-		$ret = 0;
-
-		if($description==""){
-			error(S_INCORRECT_DESCRIPTION);
-			return 0;
-		}
-
-		$sql="select * from media_type where description=".zbx_dbstr($description);
-		$result=DBexecute($sql);
-		if(DBfetch($result))
-		{
-			error("An action type with description '$description' already exists.");
-		}
-		else
-		{
-			$mediatypeid=get_dbid("media_type","mediatypeid");
-			$sql="insert into media_type (mediatypeid,type,description,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem) values ($mediatypeid,$type,".zbx_dbstr($description).",".zbx_dbstr($smtp_server).",".zbx_dbstr($smtp_helo).",".zbx_dbstr($smtp_email).",".zbx_dbstr($exec_path).",".zbx_dbstr($gsm_modem).")";
-			$ret = DBexecute($sql);
-			if($ret)	$ret = $mediatypeid;
-		}
-		return $ret;
-	}
-
-	# Add Media definition
-
-	function	add_media( $userid, $mediatypeid, $sendto, $severity, $active, $period)
-	{
-		if(validate_period($period) != 0)
-		{
-			error("Icorrect time period");
-			return NULL;
-		}
-
-		$c=count($severity);
-		$s=0;
-		for($i=0;$i<$c;$i++)
-		{
-			$s=$s|pow(2,(int)$severity[$i]);
-		}
-		$mediaid=get_dbid("media","mediaid");
-		$sql="insert into media (mediaid,userid,mediatypeid,sendto,active,severity,period) values ($mediaid,$userid,".zbx_dbstr($mediatypeid).",".zbx_dbstr($sendto).",$active,$s,".zbx_dbstr($period).")";
-		$ret = DBexecute($sql);
-		if($ret)	$ret = $mediaid;
-		return	$ret;
-	}
-
-	# Update Media definition
-
-	function	update_media($mediaid, $userid, $mediatypeid, $sendto, $severity, $active, $period)
-	{
-		if(validate_period($period) != 0)
-		{
-			error("Icorrect time period");
-			return NULL;
-		}
-
-		$c=count($severity);
-		$s=0;
-		for($i=0;$i<$c;$i++)
-		{
-			$s=$s|pow(2,(int)$severity[$i]);
-		}
-		$sql="update media set userid=$userid, mediatypeid=$mediatypeid, sendto=".zbx_dbstr($sendto).", active=$active,severity=$s,period=".zbx_dbstr($period)." where mediaid=$mediaid";
-		return	DBexecute($sql);
-	}
-
-	# Delete Media definition
-
-	function	delete_media($mediaid)
-	{
-		$sql="delete from media where mediaid=$mediaid";
-		return	DBexecute($sql);
-	}
-
-	# Delete Media definition by userid
-
-	function	delete_media_by_userid($userid)
-	{
-		$sql="delete from media where userid=$userid";
-		return	DBexecute($sql);
-	}
-
-	function	delete_profiles_by_userid($userid)
-	{
-		$sql="delete from profiles where userid=$userid";
-		return	DBexecute($sql);
-	}
-
 	# Update configuration
 
-//	function	update_config($smtp_server,$smtp_helo,$smtp_email,$alarm_history,$alert_history)
-	function	update_config($alarm_history,$alert_history,$refresh_unsupported,$work_period)
+	function	update_config($event_history,$alert_history,$refresh_unsupported,$work_period)
 	{
-		if(!check_right("Configuration of Zabbix","U",0))
-		{
-			error("Insufficient permissions");
-			return	0;
-		}
 		if(validate_period($work_period) != 0)
 		{
 			error("Icorrect work period");
 			return NULL;
 		}
 
-
-//		$sql="update config set smtp_server='$smtp_server',smtp_helo='$smtp_helo',smtp_email='$smtp_email',alarm_history=$alarm_history,alert_history=$alert_history";
-		$sql="update config set alarm_history=$alarm_history,alert_history=$alert_history,refresh_unsupported=$refresh_unsupported,".
-			"work_period=".zbx_dbstr($work_period);
-		return	DBexecute($sql);
-	}
-
-
-	# Activate Media
-
-	function	activate_media($mediaid)
-	{
-		$sql="update media set active=0 where mediaid=$mediaid";
-		return	DBexecute($sql);
-	}
-
-	# Disactivate Media
-
-	function	disactivate_media($mediaid)
-	{
-		$sql="update media set active=1 where mediaid=$mediaid";
-		return	DBexecute($sql);
-	}
-
-	# Delete User permission
-
-	function	delete_permission($rightid)
-	{
-		$sql="delete from rights where rightid=$rightid";
-		return DBexecute($sql);
-	}
-
-	# Delete User definition
-
-	function	delete_user($userid)
-	{
-		$sql="select * from users where userid=$userid and alias='guest'";
-		$result=DBselect($sql);
-		if(DBfetch($result))
-		{
-			error("Cannot delete user 'guest'");
-			return	0;
-		}
-
-
-		delete_media_by_userid($userid);
-		delete_actions_by_userid($userid);
-		delete_rights_by_userid($userid);
-		delete_profiles_by_userid($userid);
-
-	// delete user permisions
-		DBexecute('delete from rights where name=\'User\' and id='.$userid);
-
-		$sql="delete from users_groups where userid=$userid";
-		DBexecute($sql);
-		$sql="delete from users where userid=$userid";
-		return DBexecute($sql);
-	}
-
-	function	show_header2($col1, $col2=SPACE, $before="", $after="")
-	{
-		echo $before; 
-		show_table_header($col1, $col2);
-		echo $after;
+		return	DBexecute("update config set event_history=$event_history,alert_history=$alert_history,".
+			" refresh_unsupported=$refresh_unsupported,".
+			" work_period=".zbx_dbstr($work_period));
 	}
 
 	function	show_table_header($col1, $col2=SPACE)
@@ -1718,156 +833,6 @@ COpt::profiling_start("page");
 		$table->SetCellPadding(1);
 		$table->AddRow(array(new CCol($col1,"header_l"), new CCol($col2,"header_r")));
 		$table->Show();
-	}
-
-	function	insert_time_navigator($itemid,$period,$from)
-	{
-		$descr=array("January","February","March","April","May","June",
-			"July","August","September","October","November","December");
-		$sql="select min(clock) as minn,max(clock) as maxx from history where itemid=$itemid";
-		$result=DBselect($sql);
-		$row=Dvfetch($result);
-
-		if(!row)
-		{
-			$min=time(NULL);
-			$max=time(NULL);
-		}
-		else
-		{
-			$min=$row["minn"];
-			$max=$row["maxx"];
-		}
-
-		$now=time()-3600*$from-$period;
-
-		$year_min=date("Y",$min);   
-		$year_max=date("Y",$max);
-
-		$year_now=date("Y",$now);
-		$month_now=date("m",$now);
-		$day_now=date("d",$now);
-		$hour_now=date("H",$now);
-
-		echo "<form method=\"put\" action=\"history.php\">";
-		echo "<input name=\"itemid\" type=\"hidden\" value=$itemid size=8>";
-		echo "<input name=\"action\" type=\"hidden\" value=\"showgraph\" size=8>";
-
-		echo "Year";
-		echo "<select name=\"year\">";
-	        for($i=$year_min;$i<=$year_max;$i++)
-	        {
-			if($i==$year_now)
-			{	
-	               		echo "<option value=\"$i\" selected>$i";
-			}
-			else
-			{
-	               		echo "<option value=\"$i\">$i";
-			}
-	        }
-		echo "</select>";
-
-		echo "Month";
-		echo "<select name=\"month\">";
-	        for($i=1;$i<=12;$i++)
-	        {
-			if($i==$month_now)
-			{	
-	               		echo "<option value=\"$i\" selected>".$descr[$i-1];
-			}
-			else
-			{
-	               		echo "<option value=\"$i\">".$descr[$i-1];
-			}
-	        }
-		echo "</select>";
-
-		echo "Day";
-		echo "<select name=\"day\">";
-	        for($i=1;$i<=31;$i++)
-	        {
-			if($i==$day_now)
-			{	
-	               		echo "<option value=\"$i\" selected>$i";
-			}
-			else
-			{
-	               		echo "<option value=\"$i\">$i";
-			}
-	        }
-		echo "</select>";
-
-		echo "Hour";
-		echo "<select name=\"hour\">";
-	        for($i=0;$i<=23;$i++)
-	        {
-			if($i==$hour_now)
-			{	
-	               		echo "<option value=\"$i\" selected>$i";
-			}
-			else
-			{
-	               		echo "<option value=\"$i\">$i";
-			}
-	        }
-		echo "</select>";
-
-		echo "Period:";
-		echo "<select name=\"period\">";
-		if($period==3600)
-		{
-			echo "<option value=\"3600\" selected>1 hour";
-		}
-		else
-		{
-			echo "<option value=\"3600\">1 hour";
-		}
-		if($period==10800)
-		{
-			echo "<option value=\"10800\" selected>3 hours";
-		}
-		else
-		{
-			echo "<option value=\"10800\">3 hours";
-		}
-		if($period==21600)
-		{
-			echo "<option value=\"21600\" selected>6 hours";
-		}
-		else
-		{
-			echo "<option value=\"21600\">6 hours";
-		}
-		if($period==86400)
-		{
-			echo "<option value=\"86400\" selected>24 hours";
-		}
-		else
-		{
-			echo "<option value=\"86400\">24 hours";
-		}
-		if($period==604800)
-		{
-			echo "<option value=\"604800\" selected>one week";
-		}
-		else
-		{
-			echo "<option value=\"604800\">one week";
-		}
-		if($period==2419200)
-		{
-			echo "<option value=\"2419200\" selected>one month";
-		}
-		else
-		{
-			echo "<option value=\"2419200\">one month";
-		}
-		echo "</select>";
-
-		echo "<input class=\"button\" type=\"submit\" name=\"action\" value=\"showgraph\">";
-
-		echo "</form>";
 	}
 
 	# Show History Graph
@@ -1901,36 +866,6 @@ COpt::profiling_start("page");
 		echo "</TR>";
 		echo "</TABLE>";
 		echo "</center>";
-	}
-
-	function	show_page_footer()
-	{
-		global $USER_DETAILS;
-
-		show_messages();
-
-		echo BR;
-		$table = new CTable(NULL,"page_footer");
-		$table->SetCellSpacing(0);
-		$table->SetCellPadding(1);
-		$table->AddRow(array(
-			new CCol(new CLink(
-				S_ZABBIX_VER.SPACE.S_COPYRIGHT_BY.SPACE.S_SIA_ZABBIX,
-				"http://www.zabbix.com", "highlight"),
-				"page_footer_l"),
-			new CCol(array(
-					new CSpan(SPACE.SPACE."|".SPACE.SPACE,"divider"),
-					S_CONNECTED_AS.SPACE.$USER_DETAILS["alias"]
-				),
-				"page_footer_r")
-			));
-		$table->Show();
-
-COpt::profiling_stop("page");
-COpt::profiling_stop("script");
-
-		echo "</body>\n";
-		echo "</html>\n";
 	}
 
 	function	get_status()
@@ -1977,9 +912,9 @@ COpt::profiling_stop("script");
 			$row=DBfetch($result);
 			$status["trends_count"]=$row["cnt"];
 		}
-// alarms
-		$row=DBfetch(DBselect("select count(alarmid) as cnt from alarms"));
-		$status["alarms_count"]=$row["cnt"];
+// events
+		$row=DBfetch(DBselect("select count(eventid) as cnt from events"));
+		$status["events_count"]=$row["cnt"];
 // alerts
 		$row=DBfetch(DBselect("select count(alertid) as cnt from alerts"));
 		$status["alerts_count"]=$row["cnt"];
@@ -2043,150 +978,6 @@ COpt::profiling_stop("script");
 		while(DBfetch($result))		$status["users_online"]++;
 
 		return $status;
-	}
-
-	// If $period_start=$period_end=0, then take maximum period
-	function	calculate_availability($triggerid,$period_start,$period_end)
-	{
-		if(($period_start==0)&&($period_end==0))
-		{
-	        	$sql="select count(*) as cnt,min(clock) as minn,max(clock) as maxx from alarms where triggerid=$triggerid";
-		}
-		else
-		{
-	        	$sql="select count(*) as cnt,min(clock) as minn,max(clock) as maxx from alarms where triggerid=$triggerid and clock>=$period_start and clock<=$period_end";
-		}
-//		echo $sql,"<br>";
-
-		
-	        $result=DBselect($sql);
-		$row=DBfetch($result);
-		if($row["cnt"]>0)
-		{
-			$min=$row["minn"];
-			$max=$row["maxx"];
-		}
-		else
-		{
-			if(($period_start==0)&&($period_end==0))
-			{
-				$max=time();
-				$min=$max-24*3600;
-			}
-			else
-			{
-				$ret["true_time"]=0;
-				$ret["false_time"]=0;
-				$ret["unknown_time"]=0;
-				$ret["true"]=0;
-				$ret["false"]=0;
-				$ret["unknown"]=100;
-				return $ret;
-			}
-		}
-
-		$sql="select clock,value from alarms where triggerid=$triggerid and clock>=$min and clock<=$max";
-//		echo " $sql<br>";
-		$result=DBselect($sql);
-
-//		echo $sql,"<br>";
-
-// -1,0,1
-		$state=-1;
-		$true_time=0;
-		$false_time=0;
-		$unknown_time=0;
-		$time=$min;
-		if(($period_start==0)&&($period_end==0))
-		{
-			$max=time();
-		}
-		$rows=0;
-		while($row=DBfetch($result))
-		{
-			$clock=$row["clock"];
-			$value=$row["value"];
-
-			$diff=$clock-$time;
-
-			$time=$clock;
-
-			if($state==-1)
-			{
-				$state=$value;
-				if($state == 0)
-				{
-					$false_time+=$diff;
-				}
-				if($state == 1)
-				{
-					$true_time+=$diff;
-				}
-				if($state == 2)
-				{
-					$unknown_time+=$diff;
-				}
-			}
-			else if($state==0)
-			{
-				$false_time+=$diff;
-				$state=$value;
-			}
-			else if($state==1)
-			{
-				$true_time+=$diff;
-				$state=$value;
-			}
-			else if($state==2)
-			{
-				$unknown_time+=$diff;
-				$state=$value;
-			}
-			$rows++;
-		}
-
-		if($rows==0)
-		{
-			$false_time=$max-$min;
-		}
-		else
-		{
-			if($state==0)
-			{
-				$false_time=$false_time+$max-$time;
-			}
-			elseif($state==1)
-			{
-				$true_time=$true_time+$max-$time;
-			}
-			elseif($state==3)
-			{
-				$unknown_time=$unknown_time+$max-$time;
-			}
-
-		}
-//		echo "$true_time $false_time $unknown_time";
-
-		$total_time=$true_time+$false_time+$unknown_time;
-		if($total_time==0)
-		{
-			$ret["true_time"]=0;
-			$ret["false_time"]=0;
-			$ret["unknown_time"]=0;
-			$ret["true"]=0;
-			$ret["false"]=0;
-			$ret["unknown"]=100;
-		}
-		else
-		{
-			$ret["true_time"]=$true_time;
-			$ret["false_time"]=$false_time;
-			$ret["unknown_time"]=$unknown_time;
-			$ret["true"]=(100*$true_time)/$total_time;
-			$ret["false"]=(100*$false_time)/$total_time;
-			$ret["unknown"]=(100*$unknown_time)/$total_time;
-		}
-		return $ret;
 	}
 
 	function	get_resource_name($permission,$id)
@@ -2301,6 +1092,13 @@ COpt::profiling_stop("script");
 		return ($var == "" ? 0 : 1);
 	}
 
+	function	get_cookie($name, $default_value)
+	{
+		if(isset($_COOKIE[$name]))	return $_COOKIE[$name];
+		// else
+		return $default_value;
+	}
+	
 	function	get_profile($idx,$default_value,$type=PROFILE_TYPE_UNCNOWN)
 	{
 		global $USER_DETAILS;
@@ -2354,16 +1152,13 @@ COpt::profiling_stop("script");
 			default:			$value = strval($value);
 		}
 
-
-		$sql="select value from profiles where userid=".$USER_DETAILS["userid"]." and idx=".zbx_dbstr($idx);
-//		echo $sql."<br>";
-		$result=DBselect($sql);
-		$row=DBfetch($result);
+		$row = DBfetch(DBselect("select value from profiles where userid=".$USER_DETAILS["userid"]." and idx=".zbx_dbstr($idx)));
 
 		if(!$row)
 		{
-			$sql="insert into profiles (userid,idx,value,valuetype)".
-				" values (".$USER_DETAILS["userid"].",".zbx_dbstr($idx).",".zbx_dbstr($value).",".$type.")";
+			$profileid = get_dbid('profiles', 'profileid');
+			$sql="insert into profiles (profileid,userid,idx,value,valuetype)".
+				" values (".$profileid.",".$USER_DETAILS["userid"].",".zbx_dbstr($idx).",".zbx_dbstr($value).",".$type.")";
 			DBexecute($sql);
 		}
 		else
@@ -2389,11 +1184,129 @@ COpt::profiling_stop("script");
 		return "Unknown";
         }
 
+$SHOW_HINT_SCRIPT_ISERTTED = false; /* TODO rewrite with JS include */
+
+	function insert_showhint_javascript()
+	{
+		global $SHOW_HINT_SCRIPT_ISERTTED;
+
+		if($SHOW_HINT_SCRIPT_ISERTTED) return;
+		$SHOW_HINT_SCRIPT_ISERTTED = true;
+?>
+<script language="JavaScript" type="text/javascript">
+<!--
+
+function GetPos(obj)
+{
+	var left = obj.offsetLeft;
+	var top  = obj.offsetTop;;
+	while (obj = obj.offsetParent)
+	{
+		left	+= obj.offsetLeft
+		top	+= obj.offsetTop
+	}
+	return [left,top];
+}
+
+var hint_box = null;
+
+function hide_hint()
+{
+	if(!hint_box) return;
+
+	hint_box.style.visibility="hidden"
+	//hint_box.style.width	= "0px"
+	hint_box.style.left	= "-" + hint_box.style.width;
+}
+
+function show_hint(obj, hint_text)
+{
+	show_hint_ext(obj, hint_text, "", "");
+}
+
+function show_hint_ext(obj, hint_text, width, class)
+{
+	if(!hint_box) return;
+	
+	if(class != "")
+	{
+		hint_text = "<span class=" + class + ">" + hint_text + "</span>";
+	}
+
+	hint_box.innerHTML = hint_text;
+	hint_box.style.width = width;
+
+	var pos = GetPos(obj);
+
+	hint_box.x	= pos[0];
+	hint_box.y	= pos[1];
+
+	hint_box.style.left	= hint_box.x + obj.offsetWidth + 10 + "px";
+	hint_box.style.top	= hint_box.y + obj.offsetHeight + "px";
+
+	hint_box.style.visibility = "visible";
+	obj.onmouseout	= hide_hint;
+}
+
+function create_hint_box()
+{
+	if(hint_box) return;
+
+	hint_box = document.createElement("div");
+	hint_box.setAttribute("id", "hint_box");
+	document.body.appendChild(hint_box);
+
+	hide_hint();
+}
+
+if (window.addEventListener)
+{
+	window.addEventListener("load", create_hint_box, false);
+}
+else if (window.attachEvent)
+{
+	window.attachEvent("onload", create_hint_box);
+}
+else if (document.getElementById)
+{
+	window.onload	= create_hint_box;
+}
+//-->
+</script>
+<?php
+	}
+
 	function insert_confirm_javascript()
 	{
-		echo "
-<script language=\"JavaScript\" type=\"text/javascript\">
+?>
+<script language="JavaScript" type="text/javascript">
 <!--
+	function Redirect(url) {
+		window.location = url;
+		return false;
+	}	
+
+	function create_var(form_name, var_name, var_val, submit)
+	{
+		var frmForm = document.forms[form_name];
+
+		if(!frmForm) return false;
+
+		var objVar = document.createElement('input');
+
+		if(!objVar) return false;
+
+		objVar.setAttribute('type', 	'hidden');
+		objVar.setAttribute('name', 	var_name);
+		objVar.setAttribute('value', 	var_val);
+
+		frmForm.appendChild(objVar);
+		if(submit)
+			frmForm.submit();
+
+		return false;
+	}
+
 	function Confirm(msg)
 	{
 		if(confirm(msg,'title'))
@@ -2401,11 +1314,6 @@ COpt::profiling_stop("script");
 		else
 			return false;
 	}
-	function Redirect(url)
-	{
-		window.location = url;
-		return false;
-	}	
 	function PopUp(url,form_name,param)
 	{
 		window.open(url,form_name,param);
@@ -2426,66 +1334,29 @@ COpt::profiling_stop("script");
 	}
 //-->
 </script>
-		";
-	}
-	function insert_javascript_clock($form, $field)
-	{
-		echo "
-<script language=\"JavaScript\" type=\"text/javascript\">
-<!--
-	function show_clock()
-	{
-		var thetime=new Date();
-
-		var nhours=thetime.getHours();
-		var nmins=thetime.getMinutes();
-		var nsecn=thetime.getSeconds();
-		var AorP=\" \";
-
-		var year = thetime.getFullYear();
-		var nmonth = thetime.getMonth()+1;
-		var ndate = thetime.getDate();
-		
-		if (nhours>=12)		AorP=\"PM\";
-		else			AorP=\"AM\";
-
-		if (nhours>=13)		nhours-=12;
-		if (nhours==0)		nhours=12;
-
-		if (nsecn<10)		nsecn=\"0\"+nsecn;
-		if (nmins<10)		nmins=\"0\"+nmins;
-		if (nmonth<10)		nmonth=\"0\"+nmonth;
-		if (ndate<10)		ndate=\"0\"+ndate;
-
-		document.forms['$form'].elements['$field'].value=ndate+\"-\"+nmonth+\"-\"+year+\" \"+nhours+\":\"+nmins+\":\"+nsecn+\" \"+AorP;
-
-		setTimeout('show_clock()',1000);
-	} 
-//-->
-</script>
-";
+<?php
 	}
 
-	function	start_javascript_clock()
+	function Redirect($url)
 	{
-		echo "
-<script language=\"JavaScript\" type=\"text/javascript\">
+?>
+<script language="JavaScript" type="text/javascript">
 <!--
-	show_clock();
+	window.location = '<?php echo $url; ?>';
 //-->
 </script>
-";
+<?php
 	}
 
 	function	SetFocus($frm_name, $fld_name)
 	{
-		echo "
-<script language=\"JavaScript\" type=\"text/javascript\">
+?>
+<script language="JavaScript" type="text/javascript">
 <!--
-	document.forms['$frm_name'].elements['$fld_name'].focus();
+	document.forms["<?php echo $frm_name; ?>"].elements["<?php echo $fld_name; ?>"].focus();
 //-->
 </script>
-";
+<?php
 	}
 
 /* Use ImageSetStyle+ImageLIne instead of bugged ImageDashedLine */
@@ -2655,20 +1526,16 @@ COpt::profiling_stop("script");
 	echo "</TABLE>";
 	}
 
-	function ImageOut($image)
-	{
-//		ImageJPEG($image);
-		ImagePNG($image);
-	}
-
 	function	add_mapping_to_valuemap($valuemapid, $mappings)
 	{
 		DBexecute("delete from mappings where valuemapid=$valuemapid");
 
 		foreach($mappings as $map)
 		{
-			$result = DBexecute("insert into mappings (valuemapid, value, newvalue)".
-				" values (".$valuemapid.",".zbx_dbstr($map["value"]).",".
+			$mappingid = get_dbid("mappings","mappingid");
+
+			$result = DBexecute("insert into mappings (mappingid,valuemapid, value, newvalue)".
+				" values (".$mappingid.",".$valuemapid.",".zbx_dbstr($map["value"]).",".
 				zbx_dbstr($map["newvalue"]).")");
 
 			if(!$result)
@@ -2690,6 +1557,10 @@ COpt::profiling_stop("script");
 		$result = add_mapping_to_valuemap($valuemapid, $mappings);
 		if(!$result){
 			delete_valuemap($valuemapid);
+		}
+		else
+		{
+			$result = $valuemapid;
 		}
 		return $result;
 	}
@@ -2734,13 +1605,13 @@ COpt::profiling_stop("script");
 
 	function	Alert($msg)
 	{
-		echo "
+?>
 <script language=\"JavaScript\" type=\"text/javascript\">
 <!--
-	alert('$msg');
+	alert('<? echo $msg; ?>');
 //-->
 </script>
-";
+<?php
 	}
 
 	function natksort(&$array) {
@@ -2757,12 +1628,19 @@ COpt::profiling_stop("script");
 		return true;
 	}
 
-	function	set_image_header()
+	function	set_image_header($format=IMAGE_FORMAT_DEFAULT)
 	{
-		//Header( "Content-type:  text/html"); 
-
-		if(MAP_OUTPUT_FORMAT == "JPG")	Header( "Content-type:  image/jpeg"); 
-		else				Header( "Content-type:  image/png"); 
+		if(IMAGE_FORMAT_JPEG == $format)	Header( "Content-type:  image/jpeg"); 
+		if(IMAGE_FORMAT_TEXT == $format)	Header( "Content-type:  text/html"); 
+		else					Header( "Content-type:  image/png"); 
 		Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
+	}
+	
+	function ImageOut($image,$format=IMAGE_FORMAT_DEFAULT)
+	{
+		if(IMAGE_FORMAT_JPEG == $format)
+			ImageJPEG($image);
+		else
+			ImagePNG($image);
 	}
 ?>

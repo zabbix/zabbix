@@ -19,34 +19,44 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
-	$page["title"] = "S_ALARMS";
-	$page["file"] = "alarms.php";
-	$page["menu.url"] = "tr_status.php";
+	require_once "include/config.inc.php";
+	require_once "include/acknow.inc.php";
+	require_once "include/triggers.inc.php";
 
-	show_header($page["title"],0,0);
+	$page["title"]		= "S_ALARMS";
+	$page["file"]		= "tr_events.php";
+
+include_once "include/page_header.php";
+
 ?>
-
 <?php
-	if(!check_right_on_trigger("R",$_REQUEST["triggerid"]))
-        {
-                show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-                show_page_footer();
-                exit;
-        }
-?>
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"triggerid"=>		array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
+		"limit"=>		array(T_ZBX_STR, O_OPT,	null,	IN('"100","NO"'),	null),
 
+	/* actions */
+		"save"=>		array(T_ZBX_STR,O_OPT,	P_ACT|P_SYS, null,	null),
+		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null)
+	);
+	check_fields($fields);
+	
+	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
+	
+	if(! ($trigger_data = DBfetch(DBselect('select h.host, t.* from hosts h, items i, functions f, triggers t '.
+	                        ' where i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid='.$_REQUEST["triggerid"].
+				" and i.hostid not in (".$denyed_hosts.") and h.hostid=i.hostid ".
+				" and ".DBid2nodeid("t.triggerid")."=".$ZBX_CURNODEID
+				))))
+	{
+		access_deny();
+	}
+?>
 <?php
 	$_REQUEST["limit"] = get_request("limit","NO");
-	if(is_numeric($_REQUEST["limit"]))
-		$_REQUEST["limit"] = 100;
 
-	$trigger=get_trigger_by_triggerid($_REQUEST["triggerid"]);
-
-	$expression=$trigger["expression"];
-
-	$expression=explode_exp($expression,1);
-	$description=expand_trigger_description($_REQUEST["triggerid"]);
+	$expression	= explode_exp($trigger_data["expression"],1);
+	$description	= expand_trigger_description_by_data($trigger_data);
 
 	$form = new CForm();
 	$form->AddVar("triggerid",$_REQUEST["triggerid"]);
@@ -55,13 +65,12 @@
 	$cmbLimit->AddItem("100",S_SHOW_ONLY_LAST_100);
 	$form->AddItem($cmbLimit);
 
-	show_header2(S_ALARMS_BIG.":$description<br>$expression", $form);
+	show_table_header(S_ALARMS_BIG.": \"".$description."\"".BR."$expression", $form);
 ?>
-
 <?php
-	$sql="select * from alarms where triggerid=".$_REQUEST["triggerid"].
-		" order by clock desc";
-	$result=DBselect($sql, $_REQUEST["limit"]);
+	$result=DBselect("select * from events where triggerid=".$_REQUEST["triggerid"].
+		" order by clock desc",
+		$_REQUEST["limit"]);
 
 	$table = new CTableInfo();
 	$table->SetHeader(array(S_TIME,S_STATUS,S_ACKNOWLEDGED,S_DURATION,S_SUM,"%"));
@@ -77,11 +86,7 @@
 		$clock=$row["clock"];
 		$leng=$lclock-$row["clock"];
 
-//		if($row["value"]==0)		{ echo "<TR BGCOLOR=#EEFFEE>"; }
-//		elseif($row["value"]==2)	{ echo "<TR BGCOLOR=#EEEEEE>"; }
-//		else				{ echo "<TR BGCOLOR=#FFDDDD>"; }
 
-//		table_td(date("Y.M.d H:i:s",$row["clock"]),"");
 		if($row["value"]==1)
 		{
 			$istrue=new CCol(S_TRUE_BIG,"on");
@@ -94,13 +99,7 @@
 			$falsesum=$falsesum+$leng;
 			$sum=$falsesum;
 		}
-		elseif($row["value"]==3)
-		{
-			$istrue=new CCol(S_DISABLED_BIG,"unknown");
-			$dissum=$dissum+$leng;
-			$sum=$dissum;
-		}
-		elseif($row["value"]==2)
+		else
 		{
 			$istrue=new CCol(S_UNKNOWN_BIG,"unknown");
 			$dissum=$dissum+$leng;
@@ -111,7 +110,6 @@
 		$proc=round($proc*100)/100;
 		$proc="$proc%";
  
-//		table_td("<B>$istrue</B>","");
 		if($leng>60*60*24)
 		{
 			$leng= round(($leng/(60*60*24))*10)/10;
@@ -152,21 +150,17 @@
 			$sum="$sum secs";
 		}
   
-//		table_td($leng,"");
-//		table_td($sum,"");
-//		table_td($proc,"");
-//		echo "</TR>";
 		$ack = "-";
 		if($row["value"] == 1 && $row["acknowledged"] == 1)
 		{
-			$db_acks = get_acknowledges_by_alarmid($row["alarmid"]);
+			$db_acks = get_acknowledges_by_eventid($row["eventid"]);
 			$rows=0;
 			while($a=DBfetch($db_acks))	$rows++;
 			$ack=array(
 				new CSpan(S_YES,"off"),
 				SPACE."(".$rows.SPACE,
 				new CLink(S_SHOW,
-					"acknow.php?alarmid=".$row["alarmid"],"action"),
+					"acknow.php?eventid=".$row["eventid"],"action"),
 				")"
 				);
 		}
@@ -184,5 +178,7 @@
 ?>
 
 <?php
-	show_page_footer();
+
+include_once "include/page_footer.php";
+
 ?>

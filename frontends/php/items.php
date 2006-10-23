@@ -19,25 +19,18 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
-	include "include/forms.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/hosts.inc.php";
+	require_once "include/items.inc.php";
+	require_once "include/forms.inc.php";
 
         $page["title"] = "S_CONFIGURATION_OF_ITEMS";
         $page["file"] = "items.php";
 
-	show_header($page["title"],0,0);
+include_once "include/page_header.php";
+
 	insert_confirm_javascript();
 ?>
-
-<?php
-        if(!check_anyright("Item","U"))
-        {
-                show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-                show_page_footer();
-                exit;
-        }
-?>
-
 <?php
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -104,14 +97,18 @@
 
 	check_fields($fields);
 
-	validate_group_with_host("U",array("always_select_first_host"));
-?>
+	$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,$ZBX_CURNODEID);
 
-<?php
-	update_profile("web.menu.config.last",$page["file"]);
+	if(isset($_REQUEST['hostid']) && !in_array($_REQUEST['hostid'], explode(',',$accessible_hosts)))
+	{
+		unset($_REQUEST['hostid']);
+	}
+		
+	validate_group_with_host(PERM_READ_WRITE,array("always_select_first_host","only_current_node"));
 ?>
-
 <?php
+SDI($_REQUEST['hostid']);
+
 	$result = 0;
 	if(isset($_REQUEST['del_delay_flex']) && isset($_REQUEST['rem_delay_flex']))
 	{
@@ -127,12 +124,20 @@
 	}
 	else if(isset($_REQUEST["delete"])&&isset($_REQUEST["itemid"]))
 	{
-		$result = delete_item($_REQUEST["itemid"]);
+		$result = false;
+		if($item = get_item_by_itemid($_REQUEST["itemid"]))
+		{
+			$result = delete_item($_REQUEST["itemid"]);
+		}
 		show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
 		if($result){
-			unset($_REQUEST["itemid"]);
-			unset($_REQUEST["form"]);
+			$host = get_host_by_hostid($item["hostid"]);
+
+			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM,
+				S_ITEM." [".$item["key_"]."] [".$_REQUEST["itemid"]."] ".S_HOST." [".$host['host']."]");
 		}
+		unset($_REQUEST["itemid"]);
+		unset($_REQUEST["form"]);
 	}
 	else if(isset($_REQUEST["save"]))
 	{
@@ -155,6 +160,9 @@
 				$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],
 				$_REQUEST["logtimefmt"],$_REQUEST["valuemapid"],$db_delay_flex,$applications);
 
+			$itemid = $_REQUEST["itemid"];
+			$action = AUDIT_ACTION_UPDATE;
+			
 			show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 		}
 		else
@@ -170,20 +178,36 @@
 				$_REQUEST["logtimefmt"],$_REQUEST["valuemapid"],$db_delay_flex,$applications);
 
 			$result = $itemid;
+			$action = AUDIT_ACTION_ADD;
 			show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 		}
 		if($result){	
+			$host = get_host_by_hostid($_REQUEST["hostid"]);
+
+			add_audit($action, AUDIT_RESOURCE_ITEM,
+				S_ITEM." [".$_REQUEST["key"]."] [".$itemid."] ".S_HOST." [".$host['host']."]");
+
 			unset($_REQUEST["itemid"]);
 			unset($_REQUEST["form"]);
 		}
 	}
 	elseif(isset($_REQUEST["del_history"])&&isset($_REQUEST["itemid"]))
 	{
-		$result = delete_history_by_itemid($_REQUEST["itemid"]);
+		$result = false;
+		if($item = get_item_by_itemid($_REQUEST["itemid"]))
+		{
+			$result = delete_history_by_itemid($_REQUEST["itemid"]);
+		}
+		
 		if($result)
 		{
 			DBexecute("update items set nextcheck=0,lastvalue=null,".
 				"lastclock=null,prevvalue=null where itemid=".$_REQUEST["itemid"]);
+			
+			$host = get_host_by_hostid($_REQUEST["hostid"]);
+
+			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
+				S_ITEM." [".$item["key_"]."] [".$_REQUEST["itemid"]."] ".S_HOST." [".$host['host']."] ".S_HISTORY_CLEANED);
 		}
 		show_messages($result, S_HISTORY_CLEANED, S_CANNOT_CLEAN_HISTORY);
 		
@@ -292,83 +316,93 @@
 				}
 			}
 		}
-/*
-		else if($_REQUEST["register"]=="add to all hosts")
-		{
-			$result=DBselect("select hostid,host from hosts order by host");
-			$hosts_ok="";
-			$hosts_notok="";
-			while($row=DBfetch($result))
-			{
-				$result2=add_item(
-					$_REQUEST["description"],$_REQUEST["key"],$row["hostid"],
-					$_REQUEST["delay"],$_REQUEST["history"],$_REQUEST["status"],
-					$_REQUEST["type"],$_REQUEST["snmp_community"],$_REQUEST["snmp_oid"],
-					$_REQUEST["value_type"],$_REQUEST["trapper_hosts"],$_REQUEST["snmp_port"],
-					$_REQUEST["units"],$_REQUEST["multiplier"],$_REQUEST["delta"],
-					$_REQUEST["snmpv3_securityname"],$_REQUEST["snmpv3_securitylevel"],
-					$_REQUEST["snmpv3_authpassphrase"],$_REQUEST["snmpv3_privpassphrase"],
-					$_REQUEST["formula"],$_REQUEST["trends"],$_REQUEST["logtimefmt"]);
-				if($result2)
-				{
-					$hosts_ok=$hosts_ok." ".$row["host"];
-				}
-				else
-				{
-					$hosts_notok=$hosts_notok." ".$row["host"];
-				}
-			}
-			show_messages(TRUE,"Items added]<br>[Success for '$hosts_ok']<br>".
-				"[Failed for '$hosts_notok'","Cannot add item");
-			unset($_REQUEST["itemid"]);
-		}
-*/
 	}
 	elseif(isset($_REQUEST["group_task"])&&isset($_REQUEST["group_itemid"]))
 	{
 		if($_REQUEST["group_task"]=="Delete selected")
 		{
+			$result = false;
+
 			$group_itemid = $_REQUEST["group_itemid"];
 			foreach($group_itemid as $id)
 			{
-				$item = get_item_by_itemid($id);
+				if(!($item = get_item_by_itemid($id)))	continue;
 				if($item["templateid"]<>0)	continue;
-				delete_item($id);
+				if(delete_item($id))
+				{
+					$result = true;
+					
+					$host = get_host_by_hostid($item["hostid"]);
+
+					add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_ITEM,
+						S_ITEM." [".$item["key_"]."] [".$id."] ".S_HOST." [".$host['host']."]");
+				}
 			}
-			show_messages(TRUE, S_ITEMS_DELETED, S_CANNOT_DELETE_ITEMS);
+			show_messages($result, S_ITEMS_DELETED, null);
 		}
 		else if($_REQUEST["group_task"]=="Activate selected")
 		{
+			$result = false;
+			
 			$group_itemid = $_REQUEST["group_itemid"];
 			foreach($group_itemid as $id)
 			{
-				activate_item($id);
+				if(!($item = get_item_by_itemid($id)))	continue;
+				
+				if(activate_item($id))
+				{
+					$result = true;
+					$host = get_host_by_hostid($item["hostid"]);
+					add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
+						S_ITEM." [".$item["key_"]."] [".$id."] ".S_HOST." [".$host['host']."] ".S_ITEMS_ACTIVATED);
+				}
 			}
-			show_messages(TRUE, S_ITEMS_ACTIVATED, S_CANNOT_ACTIVATE_ITEMS);
+			show_messages($result, S_ITEMS_ACTIVATED, null);
 		}
 		elseif($_REQUEST["group_task"]=="Disable selected")
 		{
+			$result = false;
+			
 			$group_itemid = $_REQUEST["group_itemid"];
 			foreach($group_itemid as $id)
 			{
-				disable_item($id);
+				if(!($item = get_item_by_itemid($id)))	continue;
+
+				if(disable_item($id))
+				{
+					$result = true;				
+				
+					$host = get_host_by_hostid($item["hostid"]);
+					add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
+						S_ITEM." [".$item["key_"]."] [".$id."] ".S_HOST." [".$host['host']."] ".S_ITEMS_DISABLED);
+				}
 			}
-			show_messages(TRUE, S_ITEMS_DISABLED, S_CANNOT_DISABLE_ITEMS);
+			show_messages($result, S_ITEMS_DISABLED, null);
 		}
 		elseif($_REQUEST["group_task"]=='Clean history selected items')
 		{
+			$result = false;
+			
 			$group_itemid = $_REQUEST["group_itemid"];
 			foreach($group_itemid as $id)
 			{
-				delete_history_by_itemid($id);
-				DBexecute("update items set nextcheck=0,lastvalue=null,".
-					"lastclock=null,prevvalue=null where itemid=$id");
+				if(!($item = get_item_by_itemid($id)))	continue;
+
+				if(delete_history_by_itemid($id))
+				{
+					$result = true;
+					DBexecute("update items set nextcheck=0,lastvalue=null,".
+						"lastclock=null,prevvalue=null where itemid=$id");
+					
+					$host = get_host_by_hostid($item["hostid"]);
+					add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,
+						S_ITEM." [".$item["key_"]."] [".$id."] ".S_HOST." [".$host['host']."] ".S_HISTORY_CLEANED);
+				}
 			}
-			show_messages(TRUE, S_HISTORY_CLEANED, S_CANNOT_CLEAN_HISTORY);
+			show_messages($result, S_HISTORY_CLEANED, $result);
 		}
 	}
 ?>
-
 <?php
 
 	$form = new CForm();
@@ -377,10 +411,10 @@
 
 	$form->AddItem(new CButton("form",S_CREATE_ITEM));
 
-	show_header2(S_CONFIGURATION_OF_ITEMS_BIG, $form);
+	show_table_header(S_CONFIGURATION_OF_ITEMS_BIG, $form);
 	echo BR;
 
-	$db_hosts=DBselect("select hostid from hosts where mod(hostid,100)=$ZBX_CURNODEID");
+	$db_hosts=DBselect("select hostid from hosts where ".DBid2nodeid("hostid")."=".$ZBX_CURNODEID);
 	if(isset($_REQUEST["form_copy_to"]) && isset($_REQUEST["group_itemid"]))
 	{
 		insert_copy_elements_to_forms("group_itemid");
@@ -396,33 +430,28 @@
 
 		$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit();");
 		$cmbGroup->AddItem(0,S_ALL_SMALL);
-		$result=DBselect("select groupid,name from groups where mod(groupid,100)=$ZBX_CURNODEID order by name");
+
+		$result=DBselect("select distinct g.groupid,g.name from groups g,hosts_groups hg".
+			" where g.groupid=hg.groupid and hg.hostid in (".$accessible_hosts.") ".
+			" order by name");
 		while($row=DBfetch($result))
 		{
-	// Check if at least one host with read permission exists for this group
-			$result2=DBselect("select h.hostid,h.host from hosts h,hosts_groups hg".
-				" where hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid and".
-				" h.status<>".HOST_STATUS_DELETED." group by h.hostid,h.host order by h.host");
-			while($row2=DBfetch($result2))
-			{
-				if(!check_right("Host","U",$row2["hostid"]))	continue;
-				$cmbGroup->AddItem($row["groupid"],$row["name"]);
-				break;
-			}
+			$cmbGroup->AddItem($row["groupid"],$row["name"]);
 		}
 		$form->AddItem(S_GROUP.SPACE);
 		$form->AddItem($cmbGroup);
 
 		if(isset($_REQUEST["groupid"]) && $_REQUEST["groupid"]>0)
 		{
-			$sql="select h.hostid,h.host from hosts h,hosts_groups hg".
-				" where hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid and".
-				" h.status<>".HOST_STATUS_DELETED." group by h.hostid,h.host order by h.host";
+			$sql="select distinct h.hostid,h.host from hosts h,hosts_groups hg".
+				" where hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid ".
+				" and h.hostid in (".$accessible_hosts.") ".
+				" and h.status<>".HOST_STATUS_DELETED." group by h.hostid,h.host order by h.host";
 		}
 		else
 		{
-			$sql="select h.hostid,h.host from hosts h where h.status<>".HOST_STATUS_DELETED.
-				" and mod(h.hostid,100)=".$ZBX_CURNODEID.
+			$sql="select distinct h.hostid,h.host from hosts h where h.status<>".HOST_STATUS_DELETED.
+				" and h.hostid in (".$accessible_hosts.") ".
 				" group by h.hostid,h.host order by h.host";
 		}
 
@@ -431,11 +460,10 @@
 		$_REQUEST["hostid"] = get_request("hostid",0);
 		$cmbHosts = new CComboBox("hostid",$_REQUEST["hostid"],"submit();");
 
-		$correct_hostid='no';
+		unset($correct_hostid);
 		$first_hostid = -1;
 		while($row=DBfetch($result))
 		{
-			if(!check_right("Host","U",$row["hostid"]))	continue;
 			$cmbHosts->AddItem($row["hostid"],$row["host"]);
 
 			if($_REQUEST["hostid"]!=0){
@@ -445,13 +473,13 @@
 			if($first_hostid <= 0)
 				$first_hostid = $row["hostid"];
 		}
-		if($correct_hostid!='ok')
+		if(!isset($correct_hostid))
 			$_REQUEST["hostid"] = $first_hostid;
 
 		$form->AddItem(SPACE.S_HOST.SPACE);
 		$form->AddItem($cmbHosts);
 		
-		show_header2(S_ITEMS_BIG, $form);
+		show_table_header(S_ITEMS_BIG, $form);
 
 // TABLE
 		$form = new CForm();
@@ -464,21 +492,16 @@
 		$table->setHeader(array(
 			array(	new CCheckBox("all_items",NULL,
 					"CheckAll('".$form->GetName()."','all_items');"),
-				S_ID),
-			S_DESCRIPTION,S_KEY,nbsp(S_UPDATE_INTERVAL),
+				S_DESCRIPTION),
+			S_KEY,nbsp(S_UPDATE_INTERVAL),
 			S_HISTORY,S_TRENDS,S_TYPE,S_STATUS,
 			$show_applications == 1 ? S_APPLICATIONS : NULL,
 			S_ERROR));
 
 		$db_items = DBselect("select i.* from hosts h,items i where h.hostid=i.hostid and".
-			" h.hostid=".$_REQUEST["hostid"]." order by i.description, i.key_");
+			" h.hostid=".$_REQUEST["hostid"]." order by i.templateid,i.description, i.key_");
 		while($db_item = DBfetch($db_items))
 		{
-			if(!check_right("Item","U",$db_item["itemid"]))
-			{
-				continue;
-			}
-
 			if($db_item["templateid"]==0)
 			{
 				$description = new CLink(
@@ -497,41 +520,11 @@
 					);
 			}
 
-			switch($db_item["type"]){
-			case 0:	$type = S_ZABBIX_AGENT;			break;
-			case 7:	$type = S_ZABBIX_AGENT_ACTIVE;		break;
-			case 1:	$type = S_SNMPV1_AGENT;			break;
-			case 2:	$type = S_ZABBIX_TRAPPER;		break;
-			case 3:	$type = S_SIMPLE_CHECK;			break;
-			case 4:	$type = S_SNMPV2_AGENT;			break;
-			case 6:	$type = S_SNMPV3_AGENT;			break;
-			case 5:	$type = S_ZABBIX_INTERNAL;		break;
-			case 8:	$type = S_ZABBIX_AGGREGATE;		break;
-			default:$type = S_UNKNOWN;			break;
-			}
-
-			switch($db_item["status"]){
-			case 0:	$status=new CCol(new CLink(S_ACTIVE, 
+			$status=new CCol(new CLink(item_status2str($db_item["status"]),
 					"items.php?group_itemid%5B%5D=".$db_item["itemid"].
 					"&hostid=".$_REQUEST["hostid"].
-					"&group_task=Disable+selected",
-					"off"),"off");
-				break;
-			case 1:	$status=new CCol(new CLink(S_DISABLED,
-					"items.php?group_itemid%5B%5D=".$db_item["itemid"].
-					"&hostid=".$_REQUEST["hostid"].
-					"&group_task=Activate+selected",
-					"on"),"on");
-				break;
-			case 3:	$status=new CCol(new CLink(S_NOT_SUPPORTED,
-					"items.php?group_itemid%5B%5D=".$db_item["itemid"].
-					"&hostid=".$_REQUEST["hostid"].
-					"&group_task=Activate+selected",
-					"action")
-					,"unknown");
-				break;
-			default:$status=S_UNKNOWN;
-			}
+					"&group_task=".($db_item["status"] ? "Activate+selected" : "Disable+selected"),
+					item_status2style($db_item["status"])));
 	
 			if($db_item["error"] == "")
 			{
@@ -552,13 +545,12 @@
 			$chkBox = new CCheckBox("group_itemid[]",NULL,NULL,$db_item["itemid"]);
 			if($db_item["templateid"] > 0) $chkBox->SetEnabled(false);
 			$table->AddRow(array(
-				array($chkBox, $db_item["itemid"]),
-				$description,
+				array($chkBox, $description),
 				$db_item["key_"],
 				$db_item["delay"],
 				$db_item["history"],
 				$db_item["trends"],
-				$type,
+				item_type2str($db_item['type']),
 				$status,
 				$show_applications == 1 ? trim($applications,", ") : NULL,
 				$error
@@ -587,5 +579,7 @@
 	}
 ?>
 <?php
-	show_page_footer();
+
+include_once "include/page_footer.php"
+
 ?>

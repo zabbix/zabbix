@@ -23,11 +23,15 @@
 	function	process_locales()
 	{
 		global $TRANSLATION;
-
-		foreach($TRANSLATION as $const=>$label)
+		global $GLOBALS;
+		
+		if(isset($TRANSLATION) && is_array($TRANSLATION))
 		{
-			if(!defined($const)) define($const,$label);
-//			echo $const," ",$label,"<br>";
+			foreach($TRANSLATION as $const=>$label)
+			{
+				if(!defined($const)) define($const,$label);
+			}
 		}
+		unset($GLOBALS['TRANSLATION']);
 	}
 ?>
