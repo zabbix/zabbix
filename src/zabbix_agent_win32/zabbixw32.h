@@ -43,7 +43,7 @@
 #else
 #define DEBUG_SUFFIX
 #endif
-#define AGENT_VERSION         "1.1.1" DEBUG_SUFFIX
+#define AGENT_VERSION         ZABBIX_VERSION DEBUG_SUFFIX
 
 #ifdef _WIN64
 #define PLATFORM "64"
