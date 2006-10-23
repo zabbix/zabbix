@@ -19,94 +19,53 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
-	include "include/forms.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/hosts.inc.php";
+	require_once "include/forms.inc.php";
+
 	$page["title"] = "S_HOST_PROFILES";
 	$page["file"] = "hostprofiles.php";
-	show_header($page["title"],0,0);
-?>
-
-<?php
-        if(!check_anyright("Host","R"))
-        {
-                show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-                show_page_footer();
-                exit;
-        }
 	
-        if(isset($_REQUEST["hostid"])&&!check_right("Host","R",$_REQUEST["hostid"]))
-        {
-                show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
-                show_page_footer();
-                exit;
-        }
+include_once "include/page_header.php";
+
+	insert_confirm_javascript();
 ?>
-
 <?php
-	validate_group_with_host("R", array("allow_all_hosts","monitored_hosts","with_items"));
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"groupid"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
+		"hostid"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL)
+	);
+
+	check_fields($fields);
+
+	validate_group(PERM_READ_ONLY, array("allow_all_hosts","always_select_first_host","monitored_hosts","with_items"));
 ?>
-
 <?php
-	update_profile("web.menu.cm.last",$page["file"]);
-?>
+	$r_form = new CForm();
 
-<?php
-	$form = new CForm();
+	$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit()");
 
-	$form->AddItem(S_GROUP.SPACE);
-	$cmbGroup = new CComboBox("groupid",get_request("groupid",0),"submit()");
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
-
-	$result=DBselect("select groupid,name from groups where mod(groupid,100)=$ZBX_CURNODEID order by name");
-	while($row=DBfetch($result))
-	{
-// Check if at least one host with read permission exists for this group
-		$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg".
-			" where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and".
-			" hg.groupid=".$row["groupid"]." and hg.hostid=h.hostid group by h.hostid,h.host".
-			" order by h.host");
-		while($row2=DBfetch($result2))
-		{
-			if(!check_right("Host","R",$row2["hostid"]))	continue;
-			$cmbGroup->AddItem($row["groupid"],$row["name"]);
-			break;
-		}
-	}
-	$form->AddItem($cmbGroup);
-
-	$form->AddItem(SPACE.S_HOST.SPACE);
-
-	$cmbHost = new CComboBox("hostid",get_request("hostid",0),"submit()");
-
-	if($_REQUEST["groupid"] > 0)
-	{
-		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg".
-			" where h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and".
-			" hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid".
-			" group by h.hostid,h.host order by h.host";
-	}
-	else
-	{
-		$cmbHost->AddItem(0,S_ALL_SMALL);
-		$sql="select h.hostid,h.host from hosts h,items i where h.status=".HOST_STATUS_MONITORED.
-			" and h.hostid=i.hostid".
-			" and mod(h.hostid,100)=".$ZBX_CURNODEID.
-			" group by h.hostid,h.host order by h.host";
-	}
-
-	$result=DBselect($sql);
-	while($row=DBfetch($result))
-	{
-		if(!check_right("Host","R",$row["hostid"]))	continue;
-		$cmbHost->AddItem($row["hostid"],$row["host"]);
-	}
-	$form->AddItem($cmbHost);
 	
-	show_header2(S_HOST_PROFILES_BIG, $form);
+	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST, null, null, $ZBX_CURNODEID);
+
+	$result=DBselect("select distinct g.groupid,g.name from groups g, hosts_groups hg, hosts h, items i ".
+		" where h.hostid in (".$availiable_hosts.") ".
+		" and hg.groupid=g.groupid and h.status=".HOST_STATUS_MONITORED.
+		" and h.hostid=i.hostid and hg.hostid=h.hostid ".
+		" order by g.name");
+	while($row=DBfetch($result))
+	{
+		$cmbGroup->AddItem($row["groupid"],$row["name"]);
+	}
+	$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
+	
+	show_table_header(S_HOST_PROFILES_BIG, $r_form);
 ?>
 
 <?php
-	if($_REQUEST["hostid"] > 0)
+	if(isset($_REQUEST["hostid"]))
 	{
 		echo BR;
 		insert_host_profile_form();
@@ -121,25 +80,22 @@
 			$sql="select h.hostid,h.host,p.name,p.os,p.serialno,p.tag,p.macaddress".
 				" from hosts h,hosts_profiles p,hosts_groups hg where h.hostid=p.hostid".
 				" and h.hostid=hg.hostid and hg.groupid=".$_REQUEST["groupid"].
+				" and h.hostid in (".$availiable_hosts.") ".
 				" order by h.host";
 		}
 		else
 		{
 			$sql="select h.hostid,h.host,p.name,p.os,p.serialno,p.tag,p.macaddress".
 				" from hosts h,hosts_profiles p where h.hostid=p.hostid".
-				" and mod(h.hostid,100)=$ZBX_CURNODEID order by h.host";
+				" and h.hostid in (".$availiable_hosts.") ".
+				" order by h.host";
 		}
 
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
-        		if(!check_right("Host","R",$row["hostid"]))
-			{
-				continue;
-			}
-
 			$table->AddRow(array(
-				$row["host"],
+				new CLink($row["host"],"?hostid=".$row["hostid"].url_param("groupid"),"action"),
 				$row["name"],
 				$row["os"],
 				$row["serialno"],
@@ -150,7 +106,8 @@
 		$table->show();
 	}
 ?>
-
 <?php
-	show_page_footer();
+
+include_once "include/page_footer.php";
+
 ?>

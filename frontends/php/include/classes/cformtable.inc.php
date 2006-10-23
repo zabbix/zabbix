@@ -56,7 +56,7 @@
 			$this->AddVar($form_variable, get_request($form_variable, 1));
 			$this->AddVar('form_refresh',get_request('form_refresh',0)+1);
 
-			$this->bottom_items = new CCol(NULL,'form_row_last');
+			$this->bottom_items = new CCol(SPACE,'form_row_last');
 		        $this->bottom_items->SetColSpan(2);
 		}
 		function SetAction($value)
@@ -127,6 +127,9 @@
 			if(is_string($item1))
 				$item1=nbsp($item1);
 
+			if(is_null($item1)) $item1 = SPACE;
+			if(is_null($item2)) $item2 = SPACE;
+
 			$row = new CRow(array(
 					new CCol($item1,'form_row_l'),
 					new CCol($item2,'form_row_r')
@@ -137,9 +140,15 @@
 		}
 		function AddSpanRow($value, $class=NULL)
 		{
+			if(is_string($value))
+				$item1=nbsp($value);
+
+			if(is_null($value)) $value = SPACE;
+			if(is_null($class)) $class = 'form_row_c';
+
 			$col = new CCol($value,$class);
 		        $col->SetColSpan(2);
-			array_push($this->center_items,new CRow($col,$class));
+			array_push($this->center_items,new CRow($col));
 		}
 		function AddItemToBottomRow($value)
 		{

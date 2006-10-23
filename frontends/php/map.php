@@ -19,29 +19,42 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
-	include_once "include/locales/en_gb.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/maps.inc.php";
 
-	process_locales();
+	$page["title"] = "S_MAP";
+	$page["file"] = "map.php";
+	$page["type"] = PAGE_TYPE_IMAGE;
 
-#	PARAMETERS:
+include_once "include/page_header.php";
 
-#	sysmapid
-#	noedit
+?>
+<?php
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"sysmapid"=>	array(T_ZBX_INT, O_MAND,P_SYS,	DB_ID,		NULL),
+		"noedit"=>	array(T_ZBX_INT, O_OPT,	NULL,	IN('0,1'),	NULL),
+		"border"=>	array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1"),	NULL)
+	);
 
-	$grid=50;
-
-	$map	= get_sysmap_by_sysmapid($_REQUEST["sysmapid"]);
+	check_fields($fields);
+?>
+<?php
+	if(!sysmap_accessiable($_REQUEST["sysmapid"],PERM_READ_ONLY))
+	{
+		access_deny();
+	}
+	
+	if(!($map = get_sysmap_by_sysmapid($_REQUEST["sysmapid"])))
+	{
+		include_once "include/page_footer.php";
+	}
 
 	$name		= $map["name"];
 	$width		= $map["width"];
 	$height		= $map["height"];
-	$background	= $map["background"];
+	$backgroundid	= $map["backgroundid"];
 	$label_type	= $map["label_type"];
-
-	set_image_header();
-
-	check_authorisation();
 
 	if(function_exists("imagecreatetruecolor")&&@imagecreatetruecolor(1,1))
 	{
@@ -81,41 +94,25 @@
 	$y=imagesy($im);
   
 	ImageFilledRectangle($im,0,0,$width,$height,$white);
-	if($background!="")
+
+	if(($db_image = get_image_by_imageid($backgroundid, 2)))
 	{
-		$db_image = get_image_by_name($background, 2);
-		if($db_image)
-		{
-			$back = ImageCreateFromString($db_image["image"]);
-			ImageCopy($im,$back,0,0,0,0,imagesx($back),imagesy($back));
-		}
-		else
-		{
-			$x=imagesx($im)/2-ImageFontWidth(4)*strlen($name)/2;
-			ImageString($im, 4,$x,1, $name , $darkred);
-		}
+		$back = ImageCreateFromString($db_image["image"]);
+		ImageCopy($im,$back,0,0,0,0,imagesx($back),imagesy($back));
 	}
 	else
 	{
 		$x=imagesx($im)/2-ImageFontWidth(4)*strlen($name)/2;
-		ImageString($im, 4,$x,1, $name , $colors["Dark Red"]);
+		ImageString($im, 4,$x,1, $name , $darkred);
 	}
-
-//	$x=imagesx($im)/2-ImageFontWidth(4)*strlen($name)/2;
-//	ImageString($im, 4,$x,1, $name , $colors["Dark Red"]);
 
 	$str=date("m.d.Y H:i:s",time(NULL));
 	ImageString($im, 0,imagesx($im)-120,imagesy($im)-12,"$str", $gray);
 
-	if(!check_right("Network map","R",$_REQUEST["sysmapid"]))
-	{
-		ImageOut($im); 
-		ImageDestroy($im); 
-		exit();
-	}
-
 	if(!isset($_REQUEST["noedit"]))
 	{
+		$grid = 50;
+
 		for($x=$grid;$x<$width;$x+=$grid)
 		{
 			MyDrawLine($im,$x,0,$x,$height,$black,GRAPH_DRAW_TYPE_DASHEDLINE);
@@ -282,9 +279,12 @@
 		ImageRectangle($im,0,0,$width-1,$height-1,$colors["Black"]);
 	}
 
-	
-	if(MAP_OUTPUT_FORMAT == "JPG")	ImageJPEG($im);
-	else				ImageOut($im); #default
+	ImageOut($im, MAP_OUTPUT_FORMAT);
 
 	ImageDestroy($im);
+?>
+<?php
+
+include_once "include/page_footer.php";
+
 ?>

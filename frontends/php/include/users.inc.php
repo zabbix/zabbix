@@ -19,69 +19,121 @@
 **/
 ?>
 <?php
+	function	user_type2str($user_type_int)
+	{
+		$str_user_type[USER_TYPE_ZABBIX_USER]	= S_ZABBIX_USER;
+		$str_user_type[USER_TYPE_ZABBIX_ADMIN]	= S_ZABBIX_ADMIN;
+		$str_user_type[USER_TYPE_SUPPER_ADMIN]	= S_SUPPER_ADMIN;
+
+		if(isset($str_user_type[$user_type_int]))
+			return $str_user_type[$user_type_int];
+
+		return S_UNCNOWN;
+	}
+
 	# Add User definition
 
-	function	add_user($name,$surname,$alias,$passwd,$url,$autologout,$lang,$refresh)
+	function	add_user($name,$surname,$alias,$passwd,$url,$autologout,$lang,$refresh,$user_type,$user_groups,$user_medias)
 	{
-		if(!check_right("User","A",0))
+		global $USER_DETAILS;
+		global $ZBX_CURNODEID;
+
+		if($USER_DETAILS['type'] != USER_TYPE_SUPPER_ADMIN)
 		{
 			error("Insufficient permissions");
 			return 0;
 		}
+SDI('pass: '.$passwd);
+SDI('groups: '.$user_groups);
 
-		if($alias==""){
-			error("Incorrect Alias name");
-			return 0;
-		}
-
-		$sql="select * from users where alias=".zbx_dbstr($alias);
-		$result=DBexecute($sql);
-		if(DBfetch($result))
+		if(DBfetch(DBexecute("select * from users where alias=".zbx_dbstr($alias)." and ".DBid2nodeid('userid')."=".$ZBX_CURNODEID)))
 		{
-			error("User '$alias' already exists");
+			error('User "'.$alias.'" already exists');
 			return 0;
 		}
-		
-		$passwd=md5($passwd);
+
 		$userid = get_dbid("users","userid");
-		$sql="insert into users (userid,name,surname,alias,passwd,url,autologout,lang,refresh) values ($userid,".zbx_dbstr($name).",".zbx_dbstr($surname).",".zbx_dbstr($alias).",".zbx_dbstr($passwd).",".zbx_dbstr($url).",$autologout,".zbx_dbstr($lang).",$refresh)";
-		DBexecute($sql);
-		return $userid;
+
+		$result =  DBexecute('insert into users (userid,name,surname,alias,passwd,url,autologout,lang,refresh,type)'.
+			' values ('.$userid.','.zbx_dbstr($name).','.zbx_dbstr($surname).','.zbx_dbstr($alias).','.
+			zbx_dbstr(md5($passwd)).','.zbx_dbstr($url).','.$autologout.','.zbx_dbstr($lang).','.$refresh.','.$user_type.')');
+
+		if($result)
+		{
+			DBexecute('delete from users_groups where userid='.$userid);
+			foreach($user_groups as $groupid => $grou_pname)
+			{
+				$users_groups_id = get_dbid("users_groups","id");
+				$result = DBexecute('insert into users_groups (id,usrgrpid,userid)'.
+					'values('.$users_groups_id.','.$groupid.','.$userid.')');
+
+				if($result == false) break;
+			}
+			if($result)
+			{
+				DBexecute('delete from media where userid='.$userid);
+				foreach($user_medias as $mediaid => $media_data)
+				{
+					$mediaid = get_dbid("media","mediaid");
+					$result = DBexecute('insert into media (mediaid,userid,mediatypeid,sendto,active,severity,period)'.
+						' values ('.$mediaid.','.$userid.','.$media_data['mediatypeid'].','.
+						zbx_dbstr($media_data['sendto']).','.$media_data['active'].','.$media_data['severity'].','.
+						zbx_dbstr($media_data['period']).')');
+
+					if($result == false) break;
+				}
+			}
+		}
+
+		return $result;
 	}
 
 	# Update User definition
 
-	function	update_user($userid,$name,$surname,$alias,$passwd, $url,$autologout,$lang,$refresh)
+	function	update_user($userid,$name,$surname,$alias,$passwd, $url,$autologout,$lang,$refresh,$user_type,$user_groups,$user_medias)
 	{
-		if(!check_right("User","U",$userid))
-		{
-			error("Insufficient permissions");
-			return 0;
-		}
+		global $ZBX_CURNODEID;
 
-		if($alias==""){
-			error("incorrect alias name");
-			return 0;
-		}
-
-		$sql="select * from users where alias=".zbx_dbstr($alias)." and userid<>$userid";
-		$result=DBexecute($sql);
-		if(DBfetch($result))
+		if(DBfetch(DBexecute("select * from users where alias=".zbx_dbstr($alias).
+			" and userid<>$userid and ".DBid2nodeid('userid')."=".$ZBX_CURNODEID)))
 		{
 			error("User '$alias' already exists");
 			return 0;
 		}
-		
-		if($passwd=="")
+
+		$result = DBexecute("update users set name=".zbx_dbstr($name).",surname=".zbx_dbstr($surname).","."alias=".zbx_dbstr($alias).
+			(isset($passwd) ? (',passwd='.zbx_dbstr(md5($passwd))) : '').
+			",url=".zbx_dbstr($url).","."autologout=$autologout,lang=".zbx_dbstr($lang).",refresh=$refresh,".
+			"type=$user_type where userid=$userid");
+
+		if($result)
 		{
-			$sql="update users set name=".zbx_dbstr($name).",surname=".zbx_dbstr($surname).",alias=".zbx_dbstr($alias).",url=".zbx_dbstr($url).",autologout=$autologout,lang=".zbx_dbstr($lang).",refresh=$refresh where userid=$userid";
+			DBexecute('delete from users_groups where userid='.$userid);
+			foreach($user_groups as $groupid => $grou_pname)
+			{
+				$users_groups_id = get_dbid("users_groups","id");
+				$result = DBexecute('insert into users_groups (id,usrgrpid,userid)'.
+					'values('.$users_groups_id.','.$groupid.','.$userid.')');
+
+				if($result == false) break;
+			}
+			if($result)
+			{
+				DBexecute('delete from media where userid='.$userid);
+				foreach($user_medias as $mediaid => $media_data)
+				{
+					$mediaid = get_dbid("media","mediaid");
+					$result = DBexecute('insert into media (mediaid,userid,mediatypeid,sendto,active,severity,period)'.
+						' values ('.$mediaid.','.$userid.','.$media_data['mediatypeid'].','.
+						zbx_dbstr($media_data['sendto']).','.$media_data['active'].','.$media_data['severity'].','.
+						zbx_dbstr($media_data['period']).')');
+
+					if($result == false) break;
+				}
+			}
 		}
-		else
-		{
-			$passwd=md5($passwd);
-			$sql="update users set name=".zbx_dbstr($name).",surname=".zbx_dbstr($surname).",alias=".zbx_dbstr($alias).",passwd=".zbx_dbstr($passwd).",url=".zbx_dbstr($url).",autologout=$autologout,lang=".zbx_dbstr($lang).",refresh=$refresh where userid=$userid";
-		}
-		return DBexecute($sql);
+
+		return $result;
 	}
 
 	# Update User Profile
@@ -92,71 +144,65 @@
 
 		if($userid!=$USER_DETAILS["userid"])
 		{
-			error("Insufficient permissions");
-			return 0;
+			access_deny();
 		}
 
-		if($passwd=="")
-		{
-			$sql="update users set url=".zbx_dbstr($url).",autologout=$autologout,lang=".zbx_dbstr($lang).",refresh=$refresh where userid=$userid";
-		}
-		else
-		{
-			$passwd=md5($passwd);
-			$sql="update users set passwd=".zbx_dbstr($passwd).",url=".zbx_dbstr($url).",autologout=$autologout,lang=".zbx_dbstr($lang).",refresh=$refresh where userid=$userid";
-		}
-		return DBexecute($sql);
+		return DBexecute("update users set url=".zbx_dbstr($url).",autologout=$autologout,lang=".zbx_dbstr($lang).
+				(isset($passwd) ? (',passwd='.zbx_dbstr(md5($passwd))) : '').
+				",refresh=$refresh where userid=$userid");
 	}
 
-	# Add permission
+	# Delete User definition
 
-	function	add_permission($userid,$right,$permission,$id)
+	function	delete_user($userid)
 	{
-		$sql="insert into rights (userid,name,permission,id) values ($userid,".zbx_dbstr($right).",".zbx_dbstr($permission).",$id)";
-		return DBexecute($sql);
+
+		if(DBfetch(DBselect('select * from users where userid='.$userid.' and alias=\'guest\'')))
+		{
+			error("Cannot delete user 'guest'");
+			return	false;
+		}
+
+		while($row=DBfetch(DBexecute('select actionid from actions where userid='.$userid)))
+		{
+			$result = delete_action($row["actionid"]);
+			if(!$result) return $result;
+		}
+
+		$result = DBexecute('delete from media where userid='.$userid);
+		if(!$result) return $result;
+
+		$result = DBexecute('delete from profiles where userid='.$userid);
+		if(!$result) return $result;
+
+		$result = DBexecute('delete from users_groups where userid='.$userid);
+		if(!$result) return $result;
+
+		$result = DBexecute('delete from users where userid='.$userid);
+
+		return $result;
 	}
 
-	function	get_usergroup_by_groupid($groupid)
-	{
-		$result=DBselect("select * from usrgrp where usrgrpid=".$groupid);
-		$row=DBfetch($result);
-		if($row)
-		{
-			return $row;
-		}
-		error("No user groups with usrgrpid=[$groupid]");
-		return  FALSE;
-	}
 
 	function	get_user_by_userid($userid)
 	{
-		$sql="select * from users where userid=$userid"; 
-		$result=DBselect($sql);
-		$row=DBfetch($result);
-		if($row)
+		if($row = DBfetch(DBselect("select * from users where userid=$userid")))
 		{
 			return	$row;
 		}
-		error("No user with itemid=[$userid]");
+		error("No user with id [$userid]");
 		return	false;
 	}
 
-	function	add_user_group($name,$users=array())
-	{
-		if(!check_right("Host","A",0))
-		{
-			error("Insufficient permissions");
-			return 0;
-		}
-		
-		if($name==""){
-			error("Incorrect group name");
-			return 0;
-		}
+/**************************
+	USER GROUPS
+**************************/
 
-		$sql="select * from usrgrp where name=".zbx_dbstr($name);
-		$result=DBexecute($sql);
-		if(DBfetch($result))
+	function	add_user_group($name,$users=array(),$rights=array())
+	{
+		global $ZBX_CURNODEID;
+
+		if(DBfetch(DBexecute("select * from usrgrp where name=".zbx_dbstr($name)." and ".DBid2nodeid('usrgrpid')."=".$ZBX_CURNODEID)))
 		{
 			error("Group '$name' already exists");
 			return 0;
@@ -164,70 +210,85 @@
 
 		$usrgrpid=get_dbid("usrgrp","usrgrpid");
 
-		$sql="insert into usrgrp (usrgrpid,name) values ($usrgrpid,".zbx_dbstr($name).")";
-		$result=DBexecute($sql);
-		if(!$result)
-		{
-			return	$result;
-		}
+		$result=DBexecute("insert into usrgrp (usrgrpid,name) values ($usrgrpid,".zbx_dbstr($name).")");
+		if(!$result)	return	$result;
 		
-		update_user_groups($usrgrpid,$users);
+		$result=DBexecute("delete from users_groups where usrgrpid=".$usrgrpid);
+		foreach($users as $userid => $name)
+		{
+			$id = get_dbid('users_groups','id');
+			$result=DBexecute('insert into users_groups (id,usrgrpid,userid) values ('.$id.','.$usrgrpid.','.$userid.')');
+			if(!$result)	return	$result;
+		}
+
+		$result=DBexecute("delete from rights where groupid=".$usrgrpid);
+		foreach($rights as $right)
+		{
+			$id = get_dbid('rights','rightid');
+			$result=DBexecute('insert into rights (rightid,groupid,type,permission,id)'.
+				' values ('.$id.','.$usrgrpid.','.$right['type'].','.$right['permission'].','.$right['id'].')');
+			if(!$result)	return	$result;
+		}
 
 		return $result;
 	}
 
-	function	update_user_group($usrgrpid,$name,$users=array())
+	function	update_user_group($usrgrpid,$name,$users=array(),$rights=array())
 	{
-		if(!check_right("Host","U",0))
-		{
-			error("Insufficient permissions");
-			return 0;
-		}
-		
-		if($name==""){
-			error("Incorrect group name");
-			return 0;
-		}
+		global $ZBX_CURNODEID;
 
-		$sql="select * from usrgrp where name=".zbx_dbstr($name)." and usrgrpid<>$usrgrpid";
-		$result=DBexecute($sql);
-		if(DBfetch($result))
+		if(DBfetch(DBexecute("select * from usrgrp where name=".zbx_dbstr($name).
+			" and usrgrpid<>".$usrgrpid." and ".DBid2nodeid('usrgrpid')."=".$ZBX_CURNODEID)))
 		{
 			error("Group '$name' already exists");
 			return 0;
 		}
 
-		$sql="update usrgrp set name=".zbx_dbstr($name)." where usrgrpid=$usrgrpid";
-		$result=DBexecute($sql);
+		$result=DBexecute("update usrgrp set name=".zbx_dbstr($name)." where usrgrpid=$usrgrpid");
 		if(!$result)
 		{
 			return	$result;
 		}
 		
-		update_user_groups($usrgrpid,$users);
+		$result=DBexecute("delete from users_groups where usrgrpid=".$usrgrpid);
+		foreach($users as $userid => $name)
+		{
+			$id = get_dbid('users_groups','id');
+			$result=DBexecute('insert into users_groups (id,usrgrpid,userid) values ('.$id.','.$usrgrpid.','.$userid.')');
+			if(!$result)	return	$result;
+		}
+
+		$result=DBexecute("delete from rights where groupid=".$usrgrpid);
+		foreach($rights as $right)
+		{
+			$id = get_dbid('rights','rightid');
+			$result=DBexecute('insert into rights (rightid,groupid,type,permission,id)'.
+				' values ('.$id.','.$usrgrpid.','.$right['type'].','.$right['permission'].','.$right['id'].')');
+			if(!$result)	return	$result;
+		}
 
 		return $result;
 	}
 
 	function	delete_user_group($usrgrpid)
 	{
-		$sql="delete from users_groups where usrgrpid=$usrgrpid";
-		DBexecute($sql);
-		$sql="delete from usrgrp where usrgrpid=$usrgrpid";
-		return DBexecute($sql);
+		$result = DBexecute("delete from rights where groupid=$usrgrpid");
+		if(!$result)	return	$result;
+
+		$result = DBexecute("delete from users_groups where usrgrpid=$usrgrpid");
+		if(!$result)	return	$result;
+
+		$result = DBexecute("delete from usrgrp where usrgrpid=$usrgrpid");
+		return	$result;
 	}
 
-	function	update_user_groups($usrgrpid,$users=array())
+	function	get_group_by_usrgrpid($usrgrpid)
 	{
-		$count=count($users);
-
-		$sql="delete from users_groups where usrgrpid=$usrgrpid";
-		DBexecute($sql);
-
-		for($i=0;$i<$count;$i++)
+		if($row = DBfetch(DBselect("select * from usrgrp where usrgrpid=".$usrgrpid)))
 		{
-			$sql="insert into users_groups (usrgrpid,userid) values ($usrgrpid,".$users[$i].")";
-			DBexecute($sql);
+			return $row;
 		}
+		error("No user groups with id [$usrgrpid]");
+		return  FALSE;
 	}
 ?>

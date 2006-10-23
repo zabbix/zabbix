@@ -51,6 +51,7 @@ table.page_footer
 	border-bottom-style: solid;
 	padding-right: 5px;
 	padding-left: 5px;
+	margin-top: 15px;
 	width: 100%;
 }
 table.page_footer td.page_footer_l
@@ -117,12 +118,15 @@ table.formtable td.form_row_last {
 	text-align: right;
 }
 table.formtable td.form_row_l { /* left cell */
-	border-left-style: solid;
-	border-top-style: none;
-	border-right-style: none;
-	border-bottom-style: none;
-	border-color: #222255;
-	text-align: left;
+	border-left-style:	solid;
+	border-top-style:	none;
+	border-right-style:	none;
+	border-bottom-style:	none;
+	border-color:	#222255;
+	text-align:	left;
+	white-space:	nowrap;
+	word-spacing:	nowrap;
+	width:		50%;
 }
 table.formtable td.form_row_c { /* center cell */
 	border-right-style: solid;
@@ -130,6 +134,7 @@ table.formtable td.form_row_c { /* center cell */
 	border-top-style: none;
 	border-bottom-style: none;
 	border-color: #222255;
+	color: inherit;
 	text-align: center;
 }
 table.formtable td.form_row_r { /* right cell */
@@ -177,6 +182,14 @@ table.log_history_table tr.header td {
 	background-color:#CCCCCC;
 }
 table.log_history_table td.message {
+	text-align: center;
+}
+
+/************* CHART TABLE ***************/
+table.chart
+{
+	width: 100%;
+	background-color: #DDDDDD;
 	text-align: center;
 }
 
@@ -318,43 +331,56 @@ table.tableinfo tr.odd_row:hover td 	{	background-color: #DDDDEE; }
 table.tableinfo tr.even_row td		{	background-color: #EEEEEE; }
 table.tableinfo tr.even_row:hover td 	{	background-color: #EEEEFE; }
 
-table.tableinfo tr td.high		{	background-color: #FF8888; 	}
-table.tableinfo tr:hover td.high	{	background-color: #FF8888;	}
-table.tableinfo tr td.high_blink1	{	background: #FF8888 url(images/gradients/blink1.gif) repeat top left;	}
-table.tableinfo tr:hover td.high_blink1	{	background: #FF8888 url(images/gradients/blink1.gif) repeat top left;	}
-table.tableinfo tr td.high_blink2	{	background: #FF8888 url(images/gradients/blink2.gif) repeat top left;	}
-table.tableinfo tr:hover td.high_blink2	{	background: #FF8888 url(images/gradients/blink2.gif) repeat top left;	}
-
-table.tableinfo tr td.unknown_trigger	{	background-color: #BCBCBC;	}
-table.tableinfo tr:hover td.unknown_trigger {	background-color: #BCBCBC;	}
-table.tableinfo tr td.unknown_trigger_blink1 {	background: #BCBCBC url(images/gradients/blink1.gif) repeat top left;	}
-table.tableinfo tr:hover td.unknown_trigger_blink1 {	background: #BCBCBC url(images/gradients/blink1.gif) repeat top left;	}
-table.tableinfo tr td.unknown_trigger_blink2 {	background: #BCBCBC url(images/gradients/blink2.gif) repeat top left;	}
-table.tableinfo tr:hover td.unknown_trigger_blink2 {	background: #BCBCBC url(images/gradients/blink2.gif) repeat top left;	}
-
-table.tableinfo tr td.normal		{	background-color: #AADDAA;	}
-table.tableinfo tr:hover td.normal	{	background-color: #AADDAA;	}
-table.tableinfo tr td.normal_blink1	{	background: #AADDAA url(images/gradients/blink1.gif) repeat top left;	}
-table.tableinfo tr:hover td.normal_blink1	{	background: #AADDAA url(images/gradients/blink1.gif) repeat top left;	}
-table.tableinfo tr td.normal_blink2	{	background: #AADDAA url(images/gradients/blink2.gif) repeat top left;	}
-table.tableinfo tr:hover td.normal_blink2	{	background: #AADDAA url(images/gradients/blink2.gif) repeat top left;	}
-
 table.tableinfo tr td.center		{vertical-align: middle; text-align: center; }
 
-table.tableinfo tr td.disaster		{	background-color: #FF0000;	}
-table.tableinfo tr:hover td.disaster	{	background-color: #FF0000;	}
+table.tableinfo tr td.disaster			{	background-color: #FF0000;	}
+table.tableinfo tr td.disaster_blink1		{	background: #FF0000 url(images/gradients/blink1.gif) repeat top left;	}
+table.tableinfo tr td.disaster_blink2 		{	background: #FF0000 url(images/gradients/blink2.gif) repeat top left;	}
+table.tableinfo tr:hover td.disaster		{	background-color: #FA0000;	}
+table.tableinfo tr:hover td.disaster_blink1	{	background: #FA0000 url(images/gradients/blink1.gif) repeat top left;	}
+table.tableinfo tr:hover td.disaster_blink2 	{	background: #FA0000 url(images/gradients/blink2.gif) repeat top left;	}
+
 table.tableinfo tr td.high		{	background-color: #FF8888;	}
-table.tableinfo tr:hover td.high	{	background-color: #FF8888;	}
-table.tableinfo tr td.average		{	background-color: #DDAAAA;	}
-table.tableinfo tr:hover td.average	{	background-color: #DDAAAA;	}
-table.tableinfo tr td.warning		{	background-color: #EFEFCC;	}
-table.tableinfo tr:hover td.warning	{	background-color: #E5E5CC;	}
-table.tableinfo tr td.information	{	background-color: #CCE2CC;	}
-table.tableinfo tr:hover td.information	{	background-color: #CCE2CC;	}
-table.tableinfo tr td.unknown_trigger	{	background-color: #BCBCBC;	}
-table.tableinfo tr:hover td.unknown_trigger{	background-color: #BCBCBC;	}
-table.tableinfo tr td.normal		{	background-color: #AADDAA;	}
-table.tableinfo tr:hover td.normal	{	background-color: #AADDAA;	}
+table.tableinfo tr td.high_blink1	{	background: #FF8888 url(images/gradients/blink1.gif) repeat top left;	}
+table.tableinfo tr td.high_blink2	{	background: #FF8888 url(images/gradients/blink2.gif) repeat top left;	}
+table.tableinfo tr:hover td.high	{	background-color: #FA8388;	}
+table.tableinfo tr:hover td.high_blink1	{	background: #FA8388 url(images/gradients/blink1.gif) repeat top left;	}
+table.tableinfo tr:hover td.high_blink2	{	background: #FA8388 url(images/gradients/blink2.gif) repeat top left;	}
+
+table.tableinfo tr td.average			{	background-color: #DDAAAA;	}
+table.tableinfo tr td.average_blink1		{	background: #DDAAAA url(images/gradients/blink1.gif) repeat top left;	}
+table.tableinfo tr td.average_blink2 		{	background: #DDAAAA url(images/gradients/blink2.gif) repeat top left;	}
+table.tableinfo tr:hover td.average		{	background-color: #D8A5AA;	}
+table.tableinfo tr:hover td.average_blink1	{	background: #D8A5AA url(images/gradients/blink1.gif) repeat top left;	}
+table.tableinfo tr:hover td.average_blink2 	{	background: #D8A5AA url(images/gradients/blink2.gif) repeat top left;	}
+
+table.tableinfo tr td.warning			{	background-color: #EFEFCC;	}
+table.tableinfo tr td.warning_blink1		{	background: #EFEFCC url(images/gradients/blink1.gif) repeat top left;	}
+table.tableinfo tr td.warning_blink2 		{	background: #EFEFCC url(images/gradients/blink2.gif) repeat top left;	}
+table.tableinfo tr:hover td.warning		{	background-color: #EAEACC;	}
+table.tableinfo tr:hover td.warning_blink1	{	background: #EAEACC url(images/gradients/blink1.gif) repeat top left;	}
+table.tableinfo tr:hover td.warning_blink2 	{	background: #EAEACC url(images/gradients/blink2.gif) repeat top left;	}
+
+table.tableinfo tr td.information		{	background-color: #CCE2CC;	}
+table.tableinfo tr td.information_blink1	{	background: #CCE2CC url(images/gradients/blink1.gif) repeat top left;	}
+table.tableinfo tr td.information_blink2 	{	background: #CCE2CC url(images/gradients/blink2.gif) repeat top left;	}
+table.tableinfo tr:hover td.information		{	background-color: #C7DDCC;	}
+table.tableinfo tr:hover td.information_blink1	{	background: #C7DDCC url(images/gradients/blink1.gif) repeat top left;	}
+table.tableinfo tr:hover td.information_blink2 	{	background: #C7DDCC url(images/gradients/blink2.gif) repeat top left;	}
+
+table.tableinfo tr td.unknown_trigger			{	background-color: #BCBCBC;	}
+table.tableinfo tr td.unknown_trigger_blink1		{	background: #BCBCBC url(images/gradients/blink1.gif) repeat top left;	}
+table.tableinfo tr td.unknown_trigger_blink2 		{	background: #BCBCBC url(images/gradients/blink2.gif) repeat top left;	}
+table.tableinfo tr:hover td.unknown_trigger		{	background-color: #BCBCBC;	}
+table.tableinfo tr:hover td.unknown_trigger_blink1	{	background: #BCBCBC url(images/gradients/blink1.gif) repeat top left;	}
+table.tableinfo tr:hover td.unknown_trigger_blink2	{	background: #BCBCBC url(images/gradients/blink2.gif) repeat top left;	}
+
+table.tableinfo tr td.normal			{	background-color: #AADDAA; }
+table.tableinfo tr td.normal_blink1		{	background: #AADDAA url(images/gradients/blink1.gif) repeat top left;	}
+table.tableinfo tr td.normal_blink2		{	background: #AADDAA url(images/gradients/blink2.gif) repeat top left;	}
+table.tableinfo tr:hover td.normal		{	background-color: #AADDAA;	}
+table.tableinfo tr:hover td.normal_blink1	{	background: #AADDAA url(images/gradients/blink1.gif) repeat top left;	}
+table.tableinfo tr:hover td.normal_blink2	{	background: #AADDAA url(images/gradients/blink2.gif) repeat top left;	}
 
 /****** HEADER *********/
 
@@ -389,6 +415,10 @@ table.header td.header_r
 	height: 24px;
 }
 
+table.header a
+{
+	color: #FFFFFF; !important
+}
 /**************** Aknowledges ****************/
 
 table.ack_msgs
@@ -427,6 +457,49 @@ table.ack_msgs tr.msg td{
 	border: 1px dotted black;
 }
 
+/**************** TABLE FOR RIGHT DISPLAYING *********/
+
+.right_header {
+	font-weight: bold; 
+	text-align: center;
+	border-top-style: solid;
+	border-left-style: solid;
+	border-right-style: solid;
+	border-bottom-style: none;
+	border-color: #222255;
+}
+
+table.right_table{
+	width: 100%;
+	border-width: 0px;
+        margin: 0px;
+        padding: 0px;
+}
+
+table.right_table tr.header td
+{
+	font-weight: bold;
+	text-align: left;
+}
+
+table.right_table td
+{
+        margin: 0px;
+        padding: 0px;
+	text-align: right;
+	white-space: nowrap;
+	word-spacing: nowrap;
+}
+
+table.right_table select
+{
+	width: 200px;
+}
+
+table.right_table td.read_write	select.biginput	{ color: #008800; }
+table.right_table td.read_only	select.biginput	{ color: #CC8800; }
+table.right_table td.deny 	select.biginput	{ color: #CC0000; }
+
 /**************** GRAPH ****************/
 
 table.graph
@@ -451,30 +524,50 @@ table.map
 
 table.menu
 {
+	height: 24;
 	background-color: #FFFFFF;
 	color: #000000;
 	border: 0px solid #000000;
 }
 
-table.menu td.sub_menu
+table.menu tr
 {
-	color: #FFFFFF;
         font-family:verdana, arial, helvetica, sans-serif;
         font-size:10px;
-	background: #5C7099 url(images/gradients/table_head2.gif) repeat-x top left;
-	background-color: #6d88ad;
-	border-color: #000000;
-	border-width:0px;
-	border-top-style: solid;
-	border-left-style: solid;
-	border-right-style: solid;
-	border-bottom-style: solid;
-	vertical-align: middle;
+	background: #AAAAAA url(images/gradients/menu_not_active.gif) repeat-x top left;
 	padding-right: 5px;
 	padding-left: 5px;
 }
 
-table.menu td.horizontal_menu
+table.menu td
+{
+	border-color: #AAAAAA;
+	border-width:1px;
+	border-top-style: solid;
+	border-left-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+}
+table.menu td.active
+{
+	color: #FFFFFF;
+	background: #5C7099 url(images/gradients/table_head.gif) repeat-x top left;
+	border-width:0px;
+}
+
+/************* SUB MENU ************/
+
+table.sub_menu
+{
+	height: 24;
+	background-color: #FFFFFF;
+	color: #000000;
+	border: 0px solid #000000;
+	width: 100%;
+	margin-bottom: 15px;
+}
+
+table.sub_menu tr
 {
 	color: #FFFFFF;
         font-family:verdana, arial, helvetica, sans-serif;
@@ -490,17 +583,12 @@ table.menu td.horizontal_menu
 	padding-left: 5px;
 }
 
-table.menu td.horizontal_menu_n
+table.sub_menu tr td
 {
-	background: #AAAAAA url(images/gradients/menu_not_active.gif) repeat-x top left;
-	border-color: #AAAAAA;
-	border-width:1px;
-	border-top-style: solid;
-	border-left-style: solid;
-	border-right-style: solid;
-	padding-right: 5px;
-	padding-left: 5px;
+	padding-top: 0px;
+	padding-bottom: 0px;
 }
+
 
 /**************** FORM ELEMENTS ****************/
 .biginput
@@ -511,6 +599,7 @@ table.menu td.horizontal_menu_n
 	border-width: 1px;
 	border-color: gray;
 	background-color: white;
+	margin: 2px;
 }
 .biginput:focus	{	border-color: black;	}
 .biginput:hover	{	border-color: black;	}
@@ -523,6 +612,7 @@ table.menu td.horizontal_menu_n
 	border-width: 1px;
 	border-color: gray;
 	background: gray url(images/gradients/button.gif) repeat-x top left;
+	margin: 2px;
 /*	margin-right:5px; */
 }
 .button:hover	{	text-decoration: underline;	border-color: black;	}
@@ -550,27 +640,14 @@ table.triggers_info td.header {
 	background: #5C7099 url(images/gradients/table_head2.gif) repeat-x top left;
 	color: #FFFFFF;
 }
-table.triggers_info td {
-	background-color: #CCCCCC;
-}
-table.triggers_info td.trok {
-	background-color: #00FF33;
-}
-table.triggers_info td.dis {
-	background-color: #FF0000;
-}
-table.triggers_info td.high {
-	background-color: #FF8888;
-}
-table.triggers_info td.avg {
-	background-color: #DDAAAA;
-}
-table.triggers_info tr td.warn	{
-	background-color: #EFEFCC;
-}
-table.triggers_info tr td.info	{
-	background-color: #CCE5CC;
-}
+table.triggers_info td 				{	background-color: #CCCCCC;	}
+table.triggers_info tr td.disaster		{	background-color: #FF0000;	}
+table.triggers_info tr td.high			{	background-color: #FF8888;	}
+table.triggers_info tr td.average		{	background-color: #DDAAAA;	}
+table.triggers_info tr td.warning		{	background-color: #EFEFCC;	}
+table.triggers_info tr td.information		{	background-color: #CCE2CC;	}
+table.triggers_info tr td.unknown_trigger	{	background-color: #BCBCBC;	}
+table.triggers_info tr td.normal		{	background-color: #AADDAA; 	}
 
 /**************** HOSTS INFORMATION MODULE ****************/
 table.hosts_info {
@@ -697,7 +774,7 @@ A.action:active 	{	color:#3C3089;	text-decoration: underline;}
 .high		{	background-color: #FF8888;	}
 .average	{	background-color: #DDAAAA;	}
 .warning	{	background-color: #EFEFCC;	}
-.information	{	background-color: #CCE5CC;	}
+.information	{	background-color: #CCE2CC;	}
 .unknown_trigger{	background-color: #BCBCBC;	}
 .normal		{	background-color: #AADDAA;	}
 
@@ -778,3 +855,26 @@ ul
 .bold {
 	font-weight: bold;
 }
+
+.nowrap {
+	white-space: nowrap;
+	word-spacing: nowrap;
+}
+
+/**************** HINT BOX *****************/
+
+#hint_box{
+	top: 0;
+	z-index: 100;
+	position: absolute;
+	background-color: lightyellow;
+	padding: 2px;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+	line-height:15px;
+	border: 1px solid black;
+	border-left: none;
+	border-top: none;
+	visibility: hidden;
+}
+

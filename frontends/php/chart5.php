@@ -19,37 +19,39 @@
 **/
 ?>
 <?php
-	include "include/config.inc.php";
+	require_once "include/config.inc.php";
+	require_once "include/services.inc.php";
 
-#	PARAMETERS:
+	$page["file"]	= "chart5.php";
+	$page["title"]	= "S_CHART";
+	$page["type"]	= PAGE_TYPE_IMAGE;
+
+include_once "include/page_header.php";
+
+?>
+<?php
+//		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+	$fields=array(
+		"serviceid"=>		array(T_ZBX_INT, O_MAND,P_SYS,	DB_ID,		NULL)
+	);
+
+	check_fields($fields);
+?>
+<?php
+	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT);
 	
-#	itemid
-#	type
-
-	$start_time=time(NULL);
-
-	if(!isset($_REQUEST["type"]))
+	if( !($service = DBfetch(DBselect("select s.* from services s left join triggers t on s.triggerid=t.triggerid ".
+		" left join functions f on t.triggerid=f.triggerid left join items i on f.itemid=i.itemid ".
+		" where (i.hostid is NULL or i.hostid not in (".$denyed_hosts.")) ".
+		/* " and ".DBid2nodeid("s.serviceid")."=".$ZBX_CURNODEID. */ /* NOTE: allow displaying all accessiables services */
+		" and s.serviceid=".$_REQUEST["serviceid"]
+		))))
 	{
-		$_REQUEST["type"]="week";
+		access_deny();
 	}
-
-	if($_REQUEST["type"] == "month")
-	{
-		$period=30*24*3600;
-	}
-	else if($_REQUEST["type"] == "week")
-	{
-		$period=7*24*3600;
-	}
-	else if($_REQUEST["type"] == "year")
-	{
-		$period=365*24*3600;
-	}
-	else
-	{
-		$period=7*24*3600;
-		$type="week";
-	}
+?>
+<?php
+	$start_time = time(NULL);
 
 	$sizeX=900;
 	$sizeY=300;
@@ -57,10 +59,6 @@
 	$shiftX=12;
 	$shiftYup=17;
 	$shiftYdown=25+15*3;
-
-	set_image_header();
-
-	check_authorisation();
 
 	$im = imagecreate($sizeX+$shiftX+61,$sizeY+$shiftYup+$shiftYdown+10); 
   
@@ -81,19 +79,8 @@
 	$x=imagesx($im); 
 	$y=imagesy($im);
   
-//	ImageFilledRectangle($im,0,0,$sizeX+$shiftX+61,$sizeY+$shiftYup+$shiftYdown+10,$white);
 	ImageFilledRectangle($im,0,0,$x,$y,$white);
 	ImageRectangle($im,0,0,$x-1,$y-1,$black);
-
-//	if(!check_right_on_trigger("R",$_REQUEST["triggerid"]))
-//	{
-//		ImageOut($im); 
-//		ImageDestroy($im); 
-//		exit;
-//	}
-
-
-	$service=get_service_by_serviceid($_REQUEST["serviceid"]);
 
 	$str=$service["name"]." (year ".date("Y").")";
 	$x=imagesx($im)/2-ImageFontWidth(4)*strlen($str)/2;
@@ -101,8 +88,6 @@
 
 	$now = time(NULL);
 	$to_time=$now;
-	$from_time=$to_time-$period;
-	$from_time_now=$to_time-24*3600;
 
 	$count_now=array();
 	$problem=array();
@@ -113,11 +98,16 @@
 	$wday=date("w",$start);
 	if($wday==0) $wday=7;
 	$start=$start-($wday-1)*24*3600;
+
 	for($i=0;$i<52;$i++)
 	{
-		$period_start=$start+7*24*3600*$i;
-		$period_end=$start+7*24*3600*($i+1);
-		$stat=calculate_service_availability($_REQUEST["serviceid"],$period_start,$period_end);
+		if(($period_start=$start+7*24*3600*$i) > time())
+			break;
+			
+		if(($period_end=$start+7*24*3600*($i+1)) > time())
+			$period_end = time();
+
+		$stat = calculate_service_availability($_REQUEST["serviceid"],$period_start,$period_end);
 		
 		$problem[$i]=$stat["problem"];
 		$ok[$i]=$stat["ok"];
@@ -129,75 +119,35 @@
 		DashedLine($im,$shiftX,$i+$shiftYup,$sizeX+$shiftX,$i+$shiftYup,$gray);
 	}
 
-	$j=0;
-	for($i=0;$i<=$sizeX;$i+=$sizeX/52)
+	for(
+		$i = 0, $period_start = $start;
+		$i <= $sizeX;
+		$i += $sizeX/52, $period_start += 7*24*3600
+		)
 	{
 		DashedLine($im,$i+$shiftX,$shiftYup,$i+$shiftX,$sizeY+$shiftYup,$gray);
-		$period_start=$start+7*24*3600*$j;
 		ImageStringUp($im, 1,$i+$shiftX-4, $sizeY+$shiftYup+32, date("d.M",$period_start) , $black);
-		$j++;
 	}
 
-	$maxY=100;
-	$tmp=max($problem);
-	if($tmp>$maxY)
-	{
-		$maxY=$tmp;
-	}
-	$minY=0;
+	$maxY = max(max($problem), 100);
+	$minY = 0;
 
-	$maxX=900;
-	$minX=0;
+	$maxX = 900;
+	$minX = 0;
 
 	for($i=1;$i<=52;$i++)
 	{
-//		$x1=(900/52)*$sizeX*($i-$minX)/($maxX-$minX);
-//		$y1=$sizeY*($problem[$i]-$minY)/($maxY-$minY);
-//		$x2=(900/52)*$sizeX*($i-$minX-1)/($maxX-$minX);
-//		$y2=$sizeY*($problem[$i-1]-$minY)/($maxY-$minY);
-//		$y1=$sizeY-$y1;
-//		$y2=$sizeY-$y2;
+		if(!isset($ok[$i-1])) continue;
 
-//		ImageLine($im,$x1+$shiftX,$y1+$shiftYup,$x2+$shiftX,$y2+$shiftYup,$darkred);
-
-//		ImageRectangle($im,$x1+$shiftX-1,$y1+$shiftYup-1,$x1+$shiftX+1,$y1+$shiftYup+1,$darkred);
-//		ImageRectangle($im,$x2+$shiftX-1,$y2+$shiftYup-1,$x2+$shiftX+1,$y2+$shiftYup+1,$darkred);
-
-
-//		$x1=(900/52)*$sizeX*($i-$minX)/($maxX-$minX);
-//		$y1=$sizeY*($ok[$i]-$minY)/($maxY-$minY);
 		$x2=(900/52)*$sizeX*($i-$minX-1)/($maxX-$minX);
 		$y2=$sizeY*($ok[$i-1]-$minY)/($maxY-$minY);
-//		$y1=$sizeY-$y1;
 		$y2=$sizeY-$y2;
-
-//		ImageLine($im,$x1+$shiftX,$y1+$shiftYup,$x2+$shiftX,$y2+$shiftYup,$darkgreen);
-
-//		ImageRectangle($im,$x1+$shiftX-1,$y1+$shiftYup-1,$x1+$shiftX+1,$y1+$shiftYup+1,$darkgreen);
-//		ImageRectangle($im,$x2+$shiftX-1,$y2+$shiftYup-1,$x2+$shiftX+1,$y2+$shiftYup+1,$darkgreen);
 
 		ImageFilledRectangle($im,$x2+$shiftX,$y2+$shiftYup,$x2+$shiftX+8,$sizeY+$shiftYup,ImageColorAllocate($im,120,200,120));
 		ImageRectangle($im,$x2+$shiftX,$y2+$shiftYup,$x2+$shiftX+8,$sizeY+$shiftYup,$black);
 // Doesn't work for some reason
 		ImageFilledRectangle($im,$x2+$shiftX,$shiftYup,$x2+$shiftX+8,$y2+$shiftYup,ImageColorAllocate($im,200,120,120));
 		ImageRectangle($im,$x2+$shiftX,$shiftYup,$x2+$shiftX+8,$y2+$shiftYup,$black);
-//		ImageRectangle($im,$x2+$shiftX,$sizeY+$shiftYup,$x2+$shiftX+8,$shiftYup,$black);
-
-
-/*
-		$x1=(900/52)*$sizeX*($i-$minX)/($maxX-$minX);
-		$y1=$sizeY*($unknown[$i]-$minY)/($maxY-$minY);
-		$x2=(900/52)*$sizeX*($i-$minX-1)/($maxX-$minX);
-		$y2=$sizeY*($unknown[$i-1]-$minY)/($maxY-$minY);
-		$y1=$sizeY-$y1;
-		$y2=$sizeY-$y2;
-
-		ImageLine($im,$x1+$shiftX,$y1+$shiftYup,$x2+$shiftX,$y2+$shiftYup,$darkyellow);
-
-		ImageRectangle($im,$x1+$shiftX-1,$y1+$shiftYup-1,$x1+$shiftX+1,$y1+$shiftYup+1,$darkyellow);
-		ImageRectangle($im,$x2+$shiftX-1,$y2+$shiftYup-1,$x2+$shiftX+1,$y2+$shiftYup+1,$darkyellow);*/
-
-#			ImageStringUp($im, 1, $x1+10, $sizeY+$shiftYup+15, $i , $red);
 	}
 
 	for($i=0;$i<=$sizeY;$i+=$sizeY/10)
@@ -213,10 +163,6 @@
 	ImageRectangle($im,$shiftX,$sizeY+$shiftYup+39+15*1,$shiftX+5,$sizeY+$shiftYup+15+9+35*1,$black);
 	ImageString($im, 2,$shiftX+9,$sizeY+$shiftYup+15*1+35, "PROBLEMS (%)", $black);
 
-//	ImageFilledRectangle($im,$shiftX,$sizeY+$shiftYup+39+15*2,$shiftX+5,$sizeY+$shiftYup+35+9+15*2,$darkyellow);
-//	ImageRectangle($im,$shiftX,$sizeY+$shiftYup+39+15*2,$shiftX+5,$sizeY+$shiftYup+35+9+15*2,$black);
-//	ImageString($im, 2,$shiftX+9,$sizeY+$shiftYup+15*2+35, "UNKNOWN (%)", $black);
-
 	ImageStringUp($im,0,imagesx($im)-10,imagesy($im)-50, "http://www.zabbix.com", $gray);
 
 	$end_time=time(NULL);
@@ -224,4 +170,9 @@
 
 	ImageOut($im); 
 	ImageDestroy($im); 
+?>
+<?php
+
+include_once "include/page_footer.php";
+
 ?>

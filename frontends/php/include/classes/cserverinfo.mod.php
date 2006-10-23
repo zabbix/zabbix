@@ -66,7 +66,7 @@
 				new CSpan($status["triggers_count_unknown"],"unknown"),"/",
 				new CSpan($status["triggers_count_off"],"off"),"]"
 				)));
-			$this->AddRow(S_NUMBER_OF_ALARMS.": ".$status["alarms_count"]);
+			$this->AddRow(S_NUMBER_OF_ALARMS.": ".$status["events_count"]);
 			$this->AddRow(S_NUMBER_OF_ALERTS.": ".$status["alerts_count"]);
 
 			return parent::BodyToString();

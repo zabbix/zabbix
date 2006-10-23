@@ -147,8 +147,8 @@ CREATE TABLE sysmaps_elements (
 	sysmapid		{bigint}		DEFAULT '0' NOT NULL,
 	elementid		{bigint}		DEFAULT '0' NOT NULL,
 	elementtype		{integer}		DEFAULT '0' NOT NULL,
-	icon			{varchar}(32)	DEFAULT 'Server' NOT NULL,
-	icon_on			{varchar}(32)	DEFAULT 'Server' NOT NULL,
+	iconid_off		{bigint}		DEFAULT '0' NOT NULL,
+	iconid_on		{bigint}		DEFAULT '0' NOT NULL,
 	label			{varchar}(128)	DEFAULT '' NOT NULL,
 	label_location		{integer}		DEFAULT NULL,
 	x			{integer}		DEFAULT '0' NOT NULL,
@@ -162,7 +162,7 @@ CREATE TABLE sysmaps (
 	name			{varchar}(128)	DEFAULT '' NOT NULL,
 	width			{integer}		DEFAULT '0' NOT NULL,
 	height			{integer}		DEFAULT '0' NOT NULL,
-	background		{varchar}(64)	DEFAULT '' NOT NULL,
+	backgroundid		{bigint}		DEFAULT '0' NOT NULL,
 	label_type		{integer}		DEFAULT '0' NOT NULL,
 	label_location		{integer}		DEFAULT '0' NOT NULL,
 	PRIMARY KEY (sysmapid)
@@ -285,7 +285,7 @@ CREATE INDEX history_1 ON history (itemid, clock);
 
 CREATE TABLE history_sync (
 	id			{serial},
-	nodeid			{integer}			DEFAULT '0' NOT NULL,
+	nodeid			{bigint}			DEFAULT '0' NOT NULL,
 	itemid			{bigint}		DEFAULT '0' NOT NULL,
 	clock			{integer}		DEFAULT '0' NOT NULL,
 	value			{double}(16,4)		DEFAULT '0.0000' NOT NULL,
@@ -383,7 +383,7 @@ CREATE TABLE items (
 
 	lastlogsize		{integer}		DEFAULT '0' NOT NULL,
 	logtimefmt		{varchar}(64)	DEFAULT '' NOT NULL,
-	templateid		{integer}		DEFAULT '0' NOT NULL,
+	templateid		{bigint}		DEFAULT '0' NOT NULL,
 	valuemapid		{bigint}		DEFAULT '0' NOT NULL,
 	delay_flex		{varchar}(255)	DEFAULT '' NOT NULL,
 
@@ -459,6 +459,7 @@ CREATE TABLE users (
 	autologout		{integer}		DEFAULT '900' NOT NULL,
 	lang			{varchar}(5)	DEFAULT 'en_gb' NOT NULL,
 	refresh			{integer}		DEFAULT '30' NOT NULL,
+	type			{integer}		DEFAULT '0' NOT NULL,
 	PRIMARY KEY (userid)
 ) {create_table_opt};
 
@@ -486,14 +487,14 @@ CREATE TABLE sessions (
 
 CREATE TABLE rights (
 	rightid			{bigint}		DEFAULT '0' NOT NULL,
-	userid			{bigint}		DEFAULT '0' NOT NULL,
-	name			{char}(255)	DEFAULT '' NOT NULL,
-	permission		{char}(1)		DEFAULT '' NOT NULL,
+	groupid			{bigint}		DEFAULT '0' NOT NULL,
+	type			{integer}		DEFAULT '0' NOT NULL,
+	permission		{integer}		DEFAULT '0' NOT NULL,
 	id			{bigint},
 	PRIMARY KEY (rightid)
 ) {create_table_opt};
 
-CREATE INDEX rights_1 ON rights (userid);
+CREATE INDEX rights_1 ON rights (groupid);
 
 CREATE TABLE service_alarms (
 	servicealarmid		{bigint}		DEFAULT '0' NOT NULL,
