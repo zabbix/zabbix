@@ -285,7 +285,7 @@ CREATE INDEX history_1 ON history (itemid, clock);
 
 CREATE TABLE history_sync (
 	id			{serial},
-	nodeid			{integer}			DEFAULT '0' NOT NULL,
+	nodeid			{bigint}			DEFAULT '0' NOT NULL,
 	itemid			{bigint}		DEFAULT '0' NOT NULL,
 	clock			{integer}		DEFAULT '0' NOT NULL,
 	value			{double}(16,4)		DEFAULT '0.0000' NOT NULL,
@@ -361,7 +361,7 @@ CREATE TABLE items (
 
 	lastlogsize		{integer}		DEFAULT '0' NOT NULL,
 	logtimefmt		{varchar}(64)	DEFAULT '' NOT NULL,
-	templateid		{integer}		DEFAULT '0' NOT NULL,
+	templateid		{bigint}		DEFAULT '0' NOT NULL,
 	valuemapid		{bigint}		DEFAULT '0' NOT NULL,
 	delay_flex		{varchar}(255)	DEFAULT '' NOT NULL,
 
