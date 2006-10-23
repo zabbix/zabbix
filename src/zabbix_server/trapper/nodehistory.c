@@ -64,20 +64,51 @@ extern int     process_event(DB_EVENT *event);
 static int	process_record(int nodeid, char *record)
 {
 	char	tmp[MAX_STRING_LEN];
+	int		table;
 	zbx_uint64_t	itemid;
 	int		timestamp;
 	double		value;
+	zbx_uint64_t	value_uint;
+	int		res = FAIL;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_record [%s]", record);
 
 	zbx_get_field(record,tmp,0,'|');
-	sscanf(tmp,ZBX_FS_UI64,&itemid);
-	zbx_get_field(record,tmp,1,'|');
-	timestamp=atoi(tmp);
-	zbx_get_field(record,tmp,2,'|');
-	value=atof(tmp);
+	table=atoi(tmp);
+	if(table == ZBX_TABLE_HISTORY)
+	{
+		zbx_get_field(record,tmp,1,'|');
+		sscanf(tmp,ZBX_FS_UI64,&itemid);
+		zbx_get_field(record,tmp,2,'|');
+		timestamp=atoi(tmp);
+		zbx_get_field(record,tmp,3,'|');
+		value=atof(tmp);
 
-	return DBadd_history(itemid, value, clock);
+		res =  DBadd_history(itemid, value, timestamp);
+	}
+	else if(table == ZBX_TABLE_HISTORY_UINT)
+	{
+		zbx_get_field(record,tmp,1,'|');
+		sscanf(tmp,ZBX_FS_UI64,&itemid);
+		zbx_get_field(record,tmp,2,'|');
+		timestamp=atoi(tmp);
+		zbx_get_field(record,tmp,3,'|');
+		sscanf(tmp,ZBX_FS_UI64,&value_uint);
+
+		res =  DBadd_history_uint(itemid, value_uint, timestamp);
+	}
+	else if(table == ZBX_TABLE_HISTORY_STR)
+	{
+		zbx_get_field(record,tmp,1,'|');
+		sscanf(tmp,ZBX_FS_UI64,&itemid);
+		zbx_get_field(record,tmp,2,'|');
+		timestamp=atoi(tmp);
+		zbx_get_field(record,tmp,3,'|');
+
+		res =  DBadd_history_str(itemid, tmp, timestamp);
+	}
+
+	return res;
 }
 
 /******************************************************************************
