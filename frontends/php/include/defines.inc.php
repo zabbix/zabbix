@@ -75,6 +75,7 @@
 	define("AUDIT_RESOURCE_IT_SERVICE",	18);
 	define("AUDIT_RESOURCE_MAP",		19);
 	define("AUDIT_RESOURCE_SCREEN",		20);
+	define("AUDIT_RESOURCE_NODE",		21);
 
 	define("CONDITION_TYPE_GROUP",		0);
 	define("CONDITION_TYPE_HOST",		1);

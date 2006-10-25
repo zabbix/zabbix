@@ -38,6 +38,7 @@
 		$str_resource[AUDIT_RESOURCE_IT_SERVICE]	= S_IT_SERVICE;
 		$str_resource[AUDIT_RESOURCE_MAP]		= S_MAP;
 		$str_resource[AUDIT_RESOURCE_SCREEN]		= S_SCREEN;
+		$str_resource[AUDIT_RESOURCE_NODE]		= S_NODE;
 
 		if(isset($str_resource[$resource_type]))
 			return $str_resource[$resource_type];
