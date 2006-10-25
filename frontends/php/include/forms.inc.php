@@ -2784,7 +2784,7 @@
 	function	insert_hostgroups_form()
 	{
 		global  $_REQUEST;
-		global $USER_DETAILS;
+		global	$USER_DETAILS;
 
 		$hosts = get_request("hosts",array());
 		$frm_title = S_HOST_GROUP;

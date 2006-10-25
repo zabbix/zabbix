@@ -198,7 +198,7 @@ COpt::profiling_start("page");
 				"default_page_id"	=> 0,
 				"pages"=>array(
 					array("url"=>"admin.php"	,"label"=>S_ADMINISTRATION	),
-					ZBX_DISTRIBUTED ? array("url"=>"nodes.php"	,"label"=>S_NODE) : null ,
+					ZBX_DISTRIBUTED ? array("url"=>"nodes.php"	,"label"=>S_NODES) : null ,
 					array("url"=>"users.php"	,"label"=>S_USERS		,
 						"sub_pages"=>array("popup_media.php",
 							"popup_usrgrp.php","popup_right.php","popup_users.php")
