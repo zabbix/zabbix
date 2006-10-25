@@ -17,6 +17,10 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
+?>
+<?php
+	require_once("include/config.inc.php");
+
 	global $USER_DETAILS;
 	global $page;
 
@@ -37,8 +41,8 @@
 					"page_footer_l"),
 				new CCol(array(
 						new CSpan(SPACE.SPACE."|".SPACE.SPACE,"divider"),
-						S_CONNECTED_AS.SPACE."'".$USER_DETAILS["alias"]."'".SPACE.
-						S_FROM_SMALL.SPACE."'".$USER_DETAILS["node"]['name']."'"
+						S_CONNECTED_AS.SPACE."'".$USER_DETAILS["alias"]."'".
+						(ZBX_DISTRIBUTED ? SPACE.S_FROM_SMALL.SPACE."'".$USER_DETAILS["node"]['name']."'" : '')
 					),
 					"page_footer_r")
 				));

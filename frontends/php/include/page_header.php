@@ -35,6 +35,7 @@ COpt::profiling_start("page");
 	if(!isset($page["type"])) $page["type"] = PAGE_TYPE_HTML;
 	if(!isset($page["file"])) $page["file"] = basename($_SERVER['PHP_SELF']);
 
+	/* Authorize user */
 	if(!defined('ZBX_PAGE_NO_AUTHERIZATION'))
 	{
 		check_authorisation();
@@ -45,21 +46,29 @@ COpt::profiling_start("page");
 	include_once "include/locales/en_gb.inc.php";
 	process_locales();
 
-	$ZBX_CURNODEID = get_cookie('current_nodeid', $ZBX_LOCALNODEID); // Selected node
-	if(isset($_REQUEST['switch_node']))
+	/* Init CURRENT NODE ID */
+	if(ZBX_DISTRIBUTED)
 	{
-		if(DBfetch(DBselect("select nodeid from nodes where nodeid=".$_REQUEST['switch_node'])))
-			$ZBX_CURNODEID = $_REQUEST['switch_node'];
+		$ZBX_CURNODEID = get_cookie('current_nodeid', $ZBX_LOCALNODEID); // Selected node
+		if(isset($_REQUEST['switch_node']))
+		{
+			if(DBfetch(DBselect("select nodeid from nodes where nodeid=".$_REQUEST['switch_node'])))
+				$ZBX_CURNODEID = $_REQUEST['switch_node'];
+		}
+		
+		if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST,null,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)) <= 0)
+		{
+			$denyed_page_requested = true;
+			$ZBX_CURNODEID = $ZBX_LOCALNODEID;
+		}
+		
+		setcookie("current_nodeid",$ZBX_CURNODEID);
 	}
-	
-	if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST,null,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)) <= 0)
+	else
 	{
-		$denyed_page_requested = true;
 		$ZBX_CURNODEID = $ZBX_LOCALNODEID;
 	}
 	
-	setcookie("current_nodeid",$ZBX_CURNODEID);
-
 	switch($page["type"])
 	{
 		case PAGE_TYPE_IMAGE:
@@ -189,7 +198,7 @@ COpt::profiling_start("page");
 				"default_page_id"	=> 0,
 				"pages"=>array(
 					array("url"=>"admin.php"	,"label"=>S_ADMINISTRATION	),
-					array("url"=>"nodes.php"	,"label"=>S_NODES		),
+					ZBX_DISTRIBUTED ? array("url"=>"nodes.php"	,"label"=>S_NODE) : null ,
 					array("url"=>"users.php"	,"label"=>S_USERS		,
 						"sub_pages"=>array("popup_media.php",
 							"popup_usrgrp.php","popup_right.php","popup_users.php")
@@ -262,16 +271,25 @@ COpt::profiling_start("page");
 		unset($menu_url);
 		foreach($sub['pages'] as $sub_pages)
 		{
-			if($page['file'] == $sub_pages['url'] && isset($sub_pages['label']))
+				
+			if($page['file'] == $sub_pages['url'])
 			{
-				$menu_url = $sub_pages['url'];
+				if(isset($sub_pages['label']))
+				{
+					$menu_url = $sub_pages['url'];
+				}
+				$page_exist = true;
 				break;
 			}
 			else if(isset($sub_pages['sub_pages']))
 			{
 				if(in_array($page['file'], $sub_pages['sub_pages']))
 				{
-					$menu_url = $sub_pages['url'];
+					if(isset($sub_pages['label']))
+					{
+						$menu_url = $sub_pages['url'];
+					}
+					$page_exist = true;
 					break;
 				}					
 			}
@@ -279,6 +297,7 @@ COpt::profiling_start("page");
 
 		if(isset($menu_url)) /* active menu */
 		{
+
 			$class = "active";
 
 			update_profile('web.menu.'.$label.'.last', $menu_url);
@@ -331,21 +350,28 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$menu_table->SetCellPadding(5);
 		$menu_table->AddRow($main_menu_row);
 
-		$lst_nodes = new CComboBox('switch_node', $ZBX_CURNODEID);
-		$db_nodes = DBselect('select * from nodes where nodeid in ('.
-			get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST).') '.
-			' order by name ');
-		while($node_data = DBfetch($db_nodes))
+		if(ZBX_DISTRIBUTED)
 		{
-			$lst_nodes->AddItem($node_data['nodeid'],$node_data['name']);
+			$lst_nodes = new CComboBox('switch_node', $ZBX_CURNODEID);
+			$db_nodes = DBselect('select * from nodes where nodeid in ('.
+				get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST).') '.
+				' order by name ');
+			while($node_data = DBfetch($db_nodes))
+			{
+				$lst_nodes->AddItem($node_data['nodeid'],$node_data['name']);
+			}
+
+			$node_form = new CForm();
+			$node_form->AddItem('Current node ['.$ZBX_CURNODEID.'] ');
+			$node_form->AddItem($lst_nodes);
+			unset($lst_nodes);
+			$node_form->AddItem(new CButton('submit',S_SWITCH));
 		}
-
-		$node_form = new CForm();
-		$node_form->AddItem('Current node ['.$ZBX_CURNODEID.'] ');
-		$node_form->AddItem($lst_nodes);
-		unset($lst_nodes);
-		$node_form->AddItem(new CButton('submit',S_SWITCH));
-
+		else
+		{
+			$node_form = null;
+		}
+		
 		$table = new CTable();
 		$table->SetCellSpacing(0);
 		$table->SetCellPadding(0);
@@ -372,8 +398,8 @@ COpt::compare_files_with_menu($ZBX_MENU);
 	unset($main_menu_row);
 	unset($db_nodes, $node_data);
 	unset($sub_menu_table, $sub_menu_row);
-	
-	if(isset($denyed_page_requested))
+
+	if((!isset($page_exist) || isset($denyed_page_requested)) && !isset($_REQUEST['message']))
 	{
 		access_deny();
 	}

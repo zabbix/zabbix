@@ -92,6 +92,8 @@ include_once "include/page_header.php";
 		$users[$user_data['userid']] = $user_data['alias'];
 	}
 
+	$media_types = array();
+
 	$db_media_types = DBselect("select * from media_type where ".DBid2nodeid("mediatypeid")."=".$ZBX_CURNODEID.
 		($media_type > 0 ? " and mediatypeid=".$media_type : "" ).
 		" order by description,mediatypeid");
