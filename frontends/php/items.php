@@ -107,8 +107,6 @@ include_once "include/page_header.php";
 	validate_group_with_host(PERM_READ_WRITE,array("always_select_first_host","only_current_node"));
 ?>
 <?php
-SDI($_REQUEST['hostid']);
-
 	$result = 0;
 	if(isset($_REQUEST['del_delay_flex']) && isset($_REQUEST['rem_delay_flex']))
 	{

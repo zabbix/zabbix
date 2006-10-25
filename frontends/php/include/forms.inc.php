@@ -21,14 +21,85 @@
 <?php
 // TODO !!! Correcr the help links !!! TODO
 
-	include_once 	"include/defines.inc.php";
-	include_once 	"include/classes/graph.inc.php";
-	include_once 	"include/users.inc.php";
-	include_once 	"include/db.inc.php";
+	require_once 	"include/defines.inc.php";
+	require_once 	"include/classes/graph.inc.php";
+	require_once 	"include/users.inc.php";
+	require_once 	"include/db.inc.php";
 
 	function	insert_node_form()
 	{
-		SDI('TODO'); /* TODO node form realization */
+		global $ZBX_CURNODEID;
+		
+		$frm_title = S_NODE;
+			
+		if(isset($_REQUEST['nodeid']))
+		{
+			$node_data = get_node_by_nodeid($_REQUEST['nodeid']);
+
+			$nodetype	= $node_data['nodetype'];
+			$masterid	= $node_data['masterid'];
+
+			$frm_title = S_NODE." \"".$node_data["name"]."\"";
+		}
+		
+		$frmNode= new CFormTable($frm_title);
+		$frmNode->SetHelp("node.php");
+
+		if(isset($_REQUEST['nodeid']))
+		{
+			$frmNode->AddVar('nodeid', $_REQUEST['nodeid']);
+		}
+		
+		if(isset($_REQUEST['nodeid']) && (!isset($_REQUEST["form_refresh"]) || isset($_REQUEST["register"])))
+		{
+			$name		= $node_data['name'];
+			$timezone	= $node_data['timezone'];
+			$ip		= $node_data['ip'];
+			$port		= $node_data['port'];
+			$slave_history	= $node_data['slave_history'];
+			$slave_trends	= $node_data['slave_trends'];
+		}
+		else
+		{
+			$name 		= get_request('name','');
+			$timezone 	= get_request('timezone', 0);
+			$ip		= get_request('ip','127.0.0.1');
+			$port		= get_request('port',10051);
+			$slave_history	= get_request('slave_history',90);
+			$slave_trends	= get_request('slave_trends',365);
+			if(!isset($nodetype)) $nodetype	= get_request('nodetype',0);
+			if(!isset($masterid)) $masterid	= get_request('masterid', $ZBX_CURNODEID);
+		}
+
+		$master_node = DBfetch(DBselect('select name from nodes where nodeid='.$masterid));
+
+		$frmNode->AddRow(S_NAME, new CTextBox('name', $name, 40));
+
+		$frmNode->AddRow(S_MASTER_NODE, new CTextBox('master_name',	$master_node['name'], 40, 'yes'));
+		$frmNode->AddRow(S_TYPE, 	new CTextBox('node_type',	$nodetype ? S_LOCAL : S_REMOTE , null, 'yes'));
+	
+		$cmbTimeZone = new CComboBox('timezone', $timezone);
+		for($i = -12; $i <= 13; $i++)
+		{
+			$cmbTimeZone->AddItem($i, "GMT".sprintf("%+03d:00", $i));
+		}
+		$frmNode->AddRow(S_TIME_ZONE, $cmbTimeZone);
+		$frmNode->AddRow(S_IP, new CTextBox('ip', $ip, 17));
+		$frmNode->AddRow(S_PORT, new CTextBox('port', $port,5));
+		$frmNode->AddRow(S_DO_NOT_KEEP_HISTORY_OLDER_THAN, new CTextBox('slave_history', $slave_history,6));
+		$frmNode->AddRow(S_DO_NOT_KEEP_TRENDS_OLDER_THAN, new CTextBox('slave_trends', $slave_trends,6));
+
+		
+		$frmNode->AddItemToBottomRow(new CButton('save',S_SAVE));
+		if(isset($_REQUEST['nodeid']) && !DBfetch(DBselect('select * from nodes where masterid='.$_REQUEST['nodeid'])))
+		{
+			$frmNode->AddItemToBottomRow(SPACE);
+			$frmNode->AddItemToBottomRow(new CButtonDelete("Delete selected node?",
+				url_param("form").url_param("nodeid")));
+		}
+		$frmNode->AddItemToBottomRow(SPACE);
+		$frmNode->AddItemToBottomRow(new CButtonCancel(url_param("config")));
+		$frmNode->Show();
 	}
 	
 	function	insert_new_message_form()
