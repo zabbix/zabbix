@@ -162,15 +162,18 @@ include_once "include/page_header.php";
 
 		if(in_array($srctbl,array("hosts","host_group","triggers","logitems","items")))
 		{
-			$nodeid = get_request("nodeid", $ZBX_CURNODEID);
-			$cmbNode = new CComboBox("nodeid", $nodeid, "submit()");
-			$db_nodes = DBselect("select * from nodes where nodeid in (".$accessible_nodes.")");
-			while($node_data = DBfetch($db_nodes))
+			if(ZBX_DISTRIBUTED)
 			{
-				$cmbNode->AddItem($node_data['nodeid'], $node_data['name']);
-				if($nodeid == $node_data['nodeid']) $ok = true;
+				$nodeid = get_request("nodeid", $ZBX_CURNODEID);
+				$cmbNode = new CComboBox("nodeid", $nodeid, "submit()");
+				$db_nodes = DBselect("select * from nodes where nodeid in (".$accessible_nodes.")");
+				while($node_data = DBfetch($db_nodes))
+				{
+					$cmbNode->AddItem($node_data['nodeid'], $node_data['name']);
+					if($nodeid == $node_data['nodeid']) $ok = true;
+				}
+				$frmTitle->AddItem(array(SPACE,S_NODE,SPACE,$cmbNode));
 			}
-			$frmTitle->AddItem(array(SPACE,S_NODE,SPACE,$cmbNode));
 			if(!isset($ok)) $nodeid = $ZBX_CURNODEID;
 			unset($ok);
 		}	

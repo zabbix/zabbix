@@ -31,9 +31,6 @@ function SDI($msg="SDI") { echo "DEBUG INFO: "; if(is_array($msg)) print_r($msg)
 	$USER_RIGHTS	= array();
 	$ERROR_MSG	= array();
 	$INFO_MSG	= array();
-
-	
-	$ZBX_LOCALNODEID = 1; // Local node
 // END OF GLOBALS
 
 // if magic quotes on then get rid of them
@@ -84,6 +81,19 @@ function SDI($msg="SDI") { echo "DEBUG INFO: "; if(is_array($msg)) print_r($msg)
 	include_once("include/classes/ctriggerinfo.mod.php");
 	include_once("include/classes/cserverinfo.mod.php");
 	include_once("include/classes/cflashclock.mod.php");
+
+	/* Init LOCAL NODE ID */
+	if($local_node_data = DBfetch(DBselect('select nodeid from nodes where nodetype=1 order by nodeid')))
+	{
+		$ZBX_LOCALNODEID = $local_node_data['nodeid'];
+		define('ZBX_DISTRIBUTED', true);
+	}
+	else
+	{
+		$ZBX_LOCALNODEID = 0;
+		define('ZBX_DISTRIBUTED', false);
+	}
+	unset($local_node_data);
 
 	function	access_deny()
 	{

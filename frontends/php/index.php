@@ -24,6 +24,7 @@
 
 	$page["title"]	= "S_ZABBIX_BIG";
 	$page["file"]	= "index.php";
+
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
