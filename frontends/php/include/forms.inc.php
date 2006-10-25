@@ -85,9 +85,10 @@
 		}
 		$frmNode->AddRow(S_TIME_ZONE, $cmbTimeZone);
 		$frmNode->AddRow(S_IP, new CTextBox('ip', $ip, 17));
-		$frmNode->AddRow(S_PORT, new CTextBox('port', $port,5));
-		$frmNode->AddRow(S_DO_NOT_KEEP_HISTORY_OLDER_THAN, new CTextBox('slave_history', $slave_history,6));
-		$frmNode->AddRow(S_DO_NOT_KEEP_TRENDS_OLDER_THAN, new CTextBox('slave_trends', $slave_trends,6));
+//TEST		$frmNode->AddRow(S_IP.'(test)', new CIpBox('ip', $ip));
+		$frmNode->AddRow(S_PORT, new CNumericBox('port', $port,5));
+		$frmNode->AddRow(S_DO_NOT_KEEP_HISTORY_OLDER_THAN, new CNumericBox('slave_history', $slave_history,6));
+		$frmNode->AddRow(S_DO_NOT_KEEP_TRENDS_OLDER_THAN, new CNumericBox('slave_trends', $slave_trends,6));
 
 		
 		$frmNode->AddItemToBottomRow(new CButton('save',S_SAVE));
