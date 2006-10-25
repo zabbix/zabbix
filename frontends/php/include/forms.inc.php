@@ -564,25 +564,31 @@
 
 	function	get_rights_of_elements_table($rights=array(),$user_type=USER_TYPE_ZABBIX_USER)
 	{
+		global $ZBX_LOCALNODEID;
+
 		$table = new CTable('S_NO_ACCESSIBLE_RESOURCES', 'right_table');
 		$table->SetHeader(array(SPACE, S_READ_WRITE, S_READ_ONLY, S_DENY),'header');
 
-		$lst['node']['label']		= S_NODES;
-		$lst['node']['read_write']	= new CListBox('nodes_write'	,null	,6);
-		$lst['node']['read_only']	= new CListBox('nodes_read'	,null	,6);
-		$lst['node']['deny']		= new CListBox('nodes_deny'	,null	,6);
-
-		$nodes = get_accessible_nodes_by_rights($rights, $user_type, PERM_DENY, PERM_MODE_GE, PERM_RES_DATA_ARRAY);
-
-		foreach($nodes as $node)
+		if(ZBX_DISTRIBUTED)
 		{
-			switch($node['permission'])
+			$lst['node']['label']		= S_NODES;
+			$lst['node']['read_write']	= new CListBox('nodes_write'	,null	,6);
+			$lst['node']['read_only']	= new CListBox('nodes_read'	,null	,6);
+			$lst['node']['deny']		= new CListBox('nodes_deny'	,null	,6);
+
+			$nodes = get_accessible_nodes_by_rights($rights, $user_type, PERM_DENY, PERM_MODE_GE, PERM_RES_DATA_ARRAY);
+
+			foreach($nodes as $node)
 			{
-				case PERM_READ_ONLY:	$list_name='read_only';		break;
-				case PERM_READ_WRITE:	$list_name='read_write';	break;
-				default:		$list_name='deny';		break;
+				switch($node['permission'])
+				{
+					case PERM_READ_ONLY:	$list_name='read_only';		break;
+					case PERM_READ_WRITE:	$list_name='read_write';	break;
+					default:		$list_name='deny';		break;
+				}
+				$lst['node'][$list_name]->AddItem($node['nodeid'],$node['name']);
 			}
-			$lst['node'][$list_name]->AddItem($node['nodeid'],$node['name']);
+			unset($nodes);
 		}
 
 		$lst['group']['label']		= S_HOST_GROUPS;
@@ -590,7 +596,8 @@
 		$lst['group']['read_only']	= new CListBox('groups_read'	,null	,10);
 		$lst['group']['deny']		= new CListBox('groups_deny'	,null	,10);
 
-		$groups = get_accessible_groups_by_rights($rights, $user_type, PERM_DENY, PERM_MODE_GE, PERM_RES_DATA_ARRAY);
+		$groups = get_accessible_groups_by_rights($rights, $user_type, PERM_DENY, PERM_MODE_GE, PERM_RES_DATA_ARRAY, 
+			ZBX_DISTRIBUTED ? null : $ZBX_LOCALNODEID);
 
 		foreach($groups as $group)
 		{
@@ -602,13 +609,16 @@
 			}
 			$lst['group'][$list_name]->AddItem($group['groupid'],$group['node_name'].':'.$group['name']);
 		}
+		unset($groups);
 		
 		$lst['host']['label']		= S_HOSTS;
 		$lst['host']['read_write']	= new CListBox('hosts_write'	,null	,15);
 		$lst['host']['read_only']	= new CListBox('hosts_read'	,null	,15);
 		$lst['host']['deny']		= new CListBox('hosts_deny'	,null	,15);
 
-		$hosts = get_accessible_hosts_by_rights($rights, $user_type, PERM_DENY, PERM_MODE_GE, PERM_RES_DATA_ARRAY);
+		$hosts = get_accessible_hosts_by_rights($rights, $user_type, PERM_DENY, PERM_MODE_GE, PERM_RES_DATA_ARRAY,
+			ZBX_DISTRIBUTED ? null : $ZBX_LOCALNODEID);
+
 		foreach($hosts as $host)
 		{
 			switch($host['permission'])
@@ -619,6 +629,7 @@
 			}
 			$lst['host'][$list_name]->AddItem($host['hostid'],$host['node_name'].':'.$host['host']);
 		}
+		unset($hosts);
 		
 		foreach($lst as $name => $lists)
 		{
@@ -629,6 +640,7 @@
 			}
 			$table->AddRow($row);
 		}
+		unset($lst);
 
 		return $table;
 	}
@@ -2772,6 +2784,7 @@
 	function	insert_hostgroups_form()
 	{
 		global  $_REQUEST;
+		global $USER_DETAILS;
 
 		$hosts = get_request("hosts",array());
 		$frm_title = S_HOST_GROUP;
@@ -2810,7 +2823,9 @@
 
 		$cmbHosts = new CListBox("hosts[]",$hosts,10);
 		$db_hosts=DBselect("select distinct hostid,host from hosts".
-			" where status<>".HOST_STATUS_DELETED." order by host");
+			" where status<>".HOST_STATUS_DELETED.
+			" and hostid not in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT).")".
+			" order by host");
 		while($db_host=DBfetch($db_hosts))
 		{
 			$cmbHosts->AddItem($db_host["hostid"],$db_host["host"]);

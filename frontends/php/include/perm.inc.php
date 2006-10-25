@@ -152,26 +152,31 @@
 COpt::counter_up('perm_host['.$userid.','.$perm.','.$perm_mode.','.$perm_res.','.$nodeid.']');
 COpt::counter_up('perm');
 
-		if(is_null($nodeid))		$where_nodeid = '';
-		else if(is_array($nodeid))	$where_nodeid = ' and n.nodeid in ('.implode(',', $nodeid).') ';
-		else 				$where_nodeid = ' and n.nodeid in ('.$nodeid.') ';
+		$where = array();
+
+		if(is_array($nodeid))	array_push($where, DBid2nodeid('h.hostid').' in ('.implode(',', $nodeid).') ');
+		elseif(isset($nodeid))	array_push($where, DBid2nodeid('h.hostid').' in ('.$nodeid.') ');
 	
-		if(is_null($hostid))		$where_hostid = '';
-		else if(is_array($hostid))	$where_hostid = ' and h.hostid in ('.implode(',', $hostid).') ';
-		else 				$where_hostid = ' and h.hostid in ('.$hostid.') ';
+		if(is_array($hostid))	array_push($where, ' h.hostid in ('.implode(',', $hostid).') ');
+		elseif(isset($hostid))	array_push($where, ' h.hostid in ('.$hostid.') ');
+
+		if(count($where)) 	$where = ' where '.implode(' and ',$where);
+		else			$where = '';
 	
 		$db_hosts = DBselect('select distinct n.nodeid,n.name as node_name,h.hostid,h.host, min(r.permission) as permission '.
-			' from nodes n, users_groups ug '.
+			' from users_groups ug '.
 			' left join rights r on r.groupid=ug.usrgrpid and r.type='.RESOURCE_TYPE_GROUP.' and ug.userid='.$userid.
 			' right join groups g on r.id=g.groupid '.
 			' left join hosts_groups hg on g.groupid=hg.groupid '.
 			' right join hosts h on hg.hostid=h.hostid '.
-			' where '.DBid2nodeid('h.hostid').'=n.nodeid '.$where_nodeid.$where_hostid.' group by h.hostid'.
-			' order by n.name, g.name, h.host');
-
+			' left join nodes n on '.DBid2nodeid('h.hostid').'=n.nodeid '.
+			$where.' group by h.hostid'.
+			' order by n.name,n.nodeid, g.name, h.host');
 
 		while($host_data = DBfetch($db_hosts))
 		{
+			if(is_null($host_data['nodeid'])) $host_data['nodeid'] = id2nodeid($host_data['hostid']);
+
 			/* if no rights defined used node rights */
 			if(is_null($host_data['permission']))
 			{
@@ -180,7 +185,10 @@ COpt::counter_up('perm');
 					$nodes = get_accessible_nodes_by_user($user_data,
 						PERM_DENY,PERM_MODE_GE,PERM_RES_DATA_ARRAY);
 				}
-				$host_data['permission'] = $nodes[$host_data['nodeid']]['permission'];
+				if(!isset($nodes[$host_data['nodeid']]))
+					$host_data['permission'] = PERM_DENY;
+				else
+					$host_data['permission'] = $nodes[$host_data['nodeid']]['permission'];
 			}
 
 			if(eval('return ('.$host_data["permission"].' '.perm_mode2comparator($perm_mode).' '.$perm.')? 0 : 1;'))
@@ -221,20 +229,27 @@ COpt::counter_up('perm');
 COpt::counter_up('perm_group['.$userid.','.$perm.','.$perm_mode.','.$perm_res.','.$nodeid.']');
 COpt::counter_up('perm');
 
-		if(is_null($nodeid))		$where_nodeid = '';
-		else if(is_array($nodeid))	$where_nodeid = ' and n.nodeid in ('.implode(',', $nodeid).') ';
-		else 				$where_nodeid = ' and n.nodeid in ('.$nodeid.') ';
+		$where = array();
 
+		if(is_array($nodeid))	array_push($where, DBid2nodeid('hg.groupid').' in ('.implode(',', $nodeid).') ');
+		elseif(isset($nodeid))	array_push($where, DBid2nodeid('hg.groupid').' in ('.$nodeid.') ');
+	
+		if(count($where)) 	$where = ' where '.implode(' and ',$where);
+		else			$where = '';
+	
 		/* if no rights defined used node rights */
 		$db_groups = DBselect('select n.nodeid,n.name as node_name,hg.groupid,hg.name, min(r.permission) as permission '.
-			' from  nodes n, users_groups g '.
+			' from  users_groups g '.
 			' left join rights r on r.groupid=g.usrgrpid and r.type='.RESOURCE_TYPE_GROUP.' and g.userid='.$userid.
 			' right join groups hg on r.id=hg.groupid '.
-			' where '.DBid2nodeid('hg.groupid').'=n.nodeid '.$where_nodeid.
-			' group by hg.groupid, hg.name, g.userid order by n.name, hg.name');
+			' left join nodes n on '.DBid2nodeid('hg.groupid').'=n.nodeid '.
+			$where.' group by hg.groupid, hg.name, g.userid '.
+			' order by n.name, hg.name');
 
 		while($group_data = DBfetch($db_groups))
 		{
+			if(is_null($group_data['nodeid'])) $group_data['nodeid'] = id2nodeid($group_data['groupid']);
+
 			/* deny if no rights defined */
 			if(is_null($group_data['permission']))
 			{
@@ -243,7 +258,10 @@ COpt::counter_up('perm');
 					$nodes = get_accessible_nodes_by_user($user_data,
 						PERM_DENY,PERM_MODE_GE,PERM_RES_DATA_ARRAY);
 				}
-				$group_data['permission'] = $nodes[$group_data['nodeid']]['permission'];
+				if(!isset($nodes[$group_data['nodeid']]))
+					$group_data['permission'] = PERM_DENY;
+				else
+					$group_data['permission'] = $nodes[$group_data['nodeid']]['permission'];
 			}
 
 			if(eval('return ('.$group_data["permission"].' '.perm_mode2comparator($perm_mode).' '.$perm.')? 0 : 1;'))
@@ -295,8 +313,28 @@ COpt::counter_up('perm');
 			' right join nodes n on r.id=n.nodeid'.$where_nodeid.
 			' group by n.nodeid');
 
-		while($node_data = DBfetch($db_nodes))
+		while(($node_data = DBfetch($db_nodes)) || (!isset($do_break) && !ZBX_DISTRIBUTED))
 		{
+			if(!ZBX_DISTRIBUTED)
+			{
+				if(!$node_data)
+				{
+					$node_data = array(
+						'nodeid'	=> $ZBX_LOCALNODEID,
+						'name'		=> 'local',
+						'permission'	=> PERM_READ_WRITE
+						);
+
+					$do_break = true;
+
+					if(is_array($nodeid) && !in_array($node_data['nodeid'],$nodeid))	continue;
+					else if(isset($nodeid) and $node_data['nodeid'] != $nodeid)		continue;
+				}
+				else
+				{
+					$node_data['permission'] = PERM_DENY;
+				}
+			}
 
 			/* deny if no rights defined (for local node read/write)*/
 			if(is_null($node_data['permission']))
@@ -359,13 +397,18 @@ COpt::counter_up('perm');
 			default:			$resdata = '$host_data["hostid"]'; break;
 		}
 
-		if(is_null($nodeid))		$where_nodeid = '';
-		else if(is_array($nodeid))	$where_nodeid = ' and n.nodeid in ('.implode(',', $nodeid).') ';
-		else 				$where_nodeid = ' and n.nodeid in ('.$nodeid.') ';
+		$where = array();
+
+		if(is_array($nodeid))	array_push($where, DBid2nodeid('h.hostid').' in ('.implode(',', $nodeid).') ');
+		elseif(isset($nodeid))	array_push($where, DBid2nodeid('h.hostid').' in ('.$nodeid.') ');
+	
+		if(count($where)) 	$where = ' where '.implode(' and ',$where);
+		else			$where = '';
 
 		$db_hosts = DBselect('select n.nodeid,n.name as node_name,hg.groupid,h.hostid,h.host '.
-			' from nodes n, hosts h left join hosts_groups hg on hg.hostid=h.hostid '.
-			' where n.nodeid='.DBid2nodeid('h.hostid').$where_nodeid.' order by n.name,h.host');
+			' from hosts h left join hosts_groups hg on hg.hostid=h.hostid '.
+			' left join nodes n on n.nodeid='.DBid2nodeid('h.hostid').
+			$where.' order by n.name,h.host');
 
 		$res_perm = array();
 		foreach($rights as $right)
@@ -405,12 +448,17 @@ COpt::counter_up('perm');
 			}
 			else
 			{
+				if(is_null($host_data['nodeid'])) $host_data['nodeid'] = id2nodeid($host_data['groupid']);
+				
 				if(!isset($node_data[$host_data['nodeid']]))
 				{
 					$node_data = get_accessible_nodes_by_rights($rights,$user_type,
 						PERM_DENY, PERM_MODE_GE, PERM_RES_DATA_ARRAY, $host_data['nodeid']);
 				}
-				$host_data['permission'] = $node_data[$host_data['nodeid']]['permission'];
+				if(isset($node_data[$host_data['nodeid']]))
+					$host_data['permission'] = $node_data[$host_data['nodeid']]['permission'];
+				else
+					$host_data['permission'] = PERM_DENY;
 			}
 			
 			if(eval('return ('.$host_data["permission"].' '.perm_mode2comparator($perm_mode).' '.$perm.')? 0 : 1;'))
@@ -443,9 +491,13 @@ COpt::counter_up('perm');
 			default:			$resdata = '$group_data["groupid"]'; break;
 		}
 
-		if(is_null($nodeid))		$where_nodeid = '';
-		else if(is_array($nodeid))	$where_nodeid = ' and n.nodeid in ('.implode(',', $nodeid).') ';
-		else 				$where_nodeid = ' and n.nodeid in ('.$nodeid.') ';
+		$where = array();
+
+		if(is_array($nodeid))	array_push($where, DBid2nodeid('g.groupid').' in ('.implode(',', $nodeid).') ');
+		elseif(isset($nodeid))	array_push($where, DBid2nodeid('g.groupid').' in ('.$nodeid.') ');
+	
+		if(count($where)) 	$where = ' where '.implode(' and ',$where);
+		else			$where = '';
 
 		$group_perm = array();
 		foreach($rights as $right)
@@ -454,9 +506,9 @@ COpt::counter_up('perm');
 			$group_perm[$right['id']] = $right['permission'];
 		}
 
-		$db_groups = DBselect('select n.nodeid,n.name as node_name, g.groupid,g.name, '.PERM_DENY.' as permission from groups g, nodes n '.
-				' where '.DBid2nodeid('g.groupid').'=n.nodeid '.$where_nodeid.
-				' order by n.name, g.name');
+		$db_groups = DBselect('select n.nodeid,n.name as node_name, g.groupid,g.name, '.PERM_DENY.' as permission from groups g '.
+				' left join nodes n on '.DBid2nodeid('g.groupid').'=n.nodeid '.
+				$where.' order by n.name, g.name');
 
 		while($group_data = DBfetch($db_groups))
 		{
@@ -466,12 +518,17 @@ COpt::counter_up('perm');
 			}
 			else
 			{
+				if(is_null($group_data['nodeid'])) $group_data['nodeid'] = id2nodeid($group_data['groupid']);
+				
 				if(!isset($node_data[$group_data['nodeid']]))
 				{
 					$node_data = get_accessible_nodes_by_rights($rights,$user_type,
 						PERM_DENY, PERM_MODE_GE, PERM_RES_DATA_ARRAY, $group_data['nodeid']);
 				}
-				$group_data['permission'] = $node_data[$group_data['nodeid']]['permission'];
+				if(isset($node_data[$group_data['nodeid']]))
+					$group_data['permission'] = $node_data[$group_data['nodeid']]['permission'];
+				else
+					$group_data['permission'] = PERM_DENY;
 			}
 					
 			if(eval('return ('.$group_data["permission"].' '.perm_mode2comparator($perm_mode).' '.$perm.')? 0 : 1;'))
@@ -521,8 +578,29 @@ COpt::counter_up('perm');
 
 		$db_nodes = DBselect('select n.nodeid,n.name, '.PERM_DENY.' as permission from nodes n '.$where_nodeid.' order by n.name');
 
-		while($node_data = DBfetch($db_nodes))
+		while(($node_data = DBfetch($db_nodes)) || (!isset($do_break) && !ZBX_DISTRIBUTED))
 		{
+			if(!ZBX_DISTRIBUTED)
+			{
+				if(!$node_data)
+				{
+					$node_data = array(
+						'nodeid'	=> $ZBX_LOCALNODEID,
+						'name'		=> 'local',
+						'permission'	=> PERM_READ_WRITE
+						);
+
+					$do_break = true;
+
+					if(is_array($nodeid) && !in_array($node_data['nodeid'],$nodeid))	continue;
+					else if(isset($nodeid) and $node_data['nodeid'] != $nodeid)		continue;
+				}
+				else
+				{
+					$node_perm[$node_data['nodeid']] = PERM_DENY;
+				}
+			}
+			
 			if(isset($node_perm[$node_data['nodeid']]))
 				$node_data['permission'] = $node_perm[$node_data['nodeid']];
 			elseif($node_data['nodeid'] == $ZBX_LOCALNODEID || $user_type == USER_TYPE_SUPPER_ADMIN)
