@@ -677,8 +677,6 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, int now)
 	value_esc[0]	= '\0';
 	value_double	= 0;
 
-	/* Required for nodata() */
-	item->lastclock = now;
 	
 	if(value->type & AR_UINT64)
 	{
@@ -802,6 +800,9 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, int now)
 		snprintf(sql,sizeof(sql)-1,"update items set status=%d where itemid=%d", ITEM_STATUS_ACTIVE, item->itemid);
 		DBexecute(sql);
 	}
+
+	/* Required for nodata() */
+	item->lastclock = now;
 
 	return ret;
 }
