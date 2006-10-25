@@ -27,6 +27,19 @@
 	"S_DATE_FORMAT_YMD"=>			"d M Y",
 	"S_HTML_CHARSET"=>			"iso-8859-1",
 
+//	node.php
+	"S_TIME_ZONE"=>				"Time zone",
+	"S_DO_NOT_KEEP_HISTORY_OLDER_THAN"=>	"Do not keep history older than (in days)",
+	"S_DO_NOT_KEEP_TRENDS_OLDER_THAN"=>	"Do not keep trends older than (in days)",
+	"S_MASTER_NODE"=>			"Master node",
+	"S_REMOTE"=>				"Remote",
+	"S_NODE_UPDATED"=>			"Node updated",
+	"S_CANNOT_UPDATE_NODE"=>		"Cannot update node",
+	"S_NODE_ADDED"=>			"Node added",
+	"S_CANNOT_ADD_NODE"=>			"Cannot add node",
+	"S_NODE_DELETED"=>			"Node deleted",
+	"S_CANNOT_DELETE_NODE"=>		"Cannot delete node",
+	
 //	acknow.php
 	"S_ACKNOWLEDGES"=>			"Acknowledges",
 	"S_ACKNOWLEDGE"=>			"Acknowledge",

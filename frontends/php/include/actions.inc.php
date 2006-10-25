@@ -87,11 +87,7 @@
 
 	function	add_action($actiontype,$userid,$subject,$message,$recipient,$maxrepeats,$repeatdelay,$status,$scripts)
 	{
-//		if(!check_right_on_trigger("A",$triggerid))
-//		{
-//                      error("Insufficient permissions");
-//                      return 0;
-//		}
+		// TODO check permission by new value.
 
 		if($actiontype == ACTION_TYPE_MESSAGE)
 		{
@@ -118,11 +114,8 @@
 
 	function	update_action($actionid,$actiontype,$userid,$subject,$message,$recipient,$maxrepeats,$repeatdelay,$status,$scripts)
 	{
-//		if(!check_right_on_trigger("U",$triggerid))
-//		{
-//                      error("Insufficient permissions");
-//                      return 0;
-//		}
+		// TODO check permission by new value.
+
 		if($actiontype == ACTION_TYPE_MESSAGE)
 		{
 			$scripts = "";

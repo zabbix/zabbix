@@ -64,20 +64,6 @@
 		}
 	}
 
-	/* NOTE:
-		LIMIT and OFFSET records
-		
-		Example: select 6-15 row.
-
-		MySQL:	
-			SELECT a FROM tbl LIMIT 5,10
-			SELECT a FROM tbl LIMIT 10 OFFSET 5
-		PostgreSQL:
-			SELECT a FROM tbl LIMIT 10 OFFSET 5
-		Oracle:
-			SELECT a FROM tbe WHERE ROWNUM < 15 // ONLY < 15
-			SELECT * FROM (SELECT ROWNUM as RN, * FROM tbl) WHERE RN BETWEEN 6 AND 15
-	*/
 
 	function	DBstart()
 	{
@@ -97,6 +83,21 @@
 			/* rollback  TODO */
 		}
 	}
+
+	/* NOTE:
+		LIMIT and OFFSET records
+		
+		Example: select 6-15 row.
+
+		MySQL:	
+			SELECT a FROM tbl LIMIT 5,10
+			SELECT a FROM tbl LIMIT 10 OFFSET 5
+		PostgreSQL:
+			SELECT a FROM tbl LIMIT 10 OFFSET 5
+		Oracle:
+			SELECT a FROM tbe WHERE ROWNUM < 15 // ONLY < 15
+			SELECT * FROM (SELECT ROWNUM as RN, * FROM tbl) WHERE RN BETWEEN 6 AND 15
+	*/
 
 	function	DBselect($query, $limit='NO')
 	{
