@@ -92,8 +92,8 @@
 		{
 			foreach($_REQUEST[$field] as $key => $val)
 			{
-				$expression = str_replace("{}",'$_REQUEST["'.$field.'"]['.$key.']',$expression);
-				if(calc_exp2($fields,$field,$expression)==FALSE)
+				$expression2 = str_replace("{}",'$_REQUEST["'.$field.'"]['.$key.']',$expression);
+				if(calc_exp2($fields,$field,$expression2)==FALSE)
 					return FALSE;
 			}	
 			return TRUE;
@@ -150,7 +150,7 @@
 
 	function 	check_type(&$field, $flags, &$var, $type)
 	{
-		if(is_array($var))
+		if(is_array($var) && $type != T_ZBX_IP)
 		{
 			$err = ZBX_VALID_OK;
 			foreach($var as $el)
@@ -160,6 +160,27 @@
 			return $err;
 		}
  
+		if($type == T_ZBX_IP)
+		{
+			if(!is_array($var)) $var = explode('.',$var);
+			if(!isset($var[0]) || !isset($var[1]) || !isset($var[2]) || !isset($var[3]))
+			{
+				if($flags&P_SYS)
+				{
+					info("Critical error. Field [".$field."] is not IP");
+					return ZBX_VALID_ERROR;
+				}
+				else
+				{
+					info("Warning. Field [".$field."] is not IP");
+					return ZBX_VALID_WARNING;
+				}
+			}
+			$err = ZBX_VALID_OK;
+			foreach($var as $el) $err |= check_type($field, $flags, $el, T_ZBX_INT);
+			return $err;
+		}
+		
 		if(($type == T_ZBX_INT) && !is_numeric($var)) {
 			if($flags&P_SYS)
 			{
@@ -219,6 +240,8 @@
 	function	check_field(&$fields, &$field, $checks)
 	{
 		list($type,$opt,$flags,$validation,$exception)=$checks;
+
+		if($type == T_ZBX_IP) $validation = BETWEEN(0,255);
 
 //echo "Field: $field<br>";
 
@@ -294,6 +317,12 @@
 				}
 			}
 		}
+		
+		if($type == T_ZBX_IP)
+		{
+			$_REQUEST[$field] = implode('.', $_REQUEST[$field]);
+		}
+
 		return ZBX_VALID_OK;
 	}
 

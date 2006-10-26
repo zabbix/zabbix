@@ -29,9 +29,9 @@
 			parent::CTag('input','no');
 			$this->tag_body_start = '';
 			$this->options['class'] = 'biginput';
-			$this->options['name'] = $name;
-			$this->options['size'] = $size;
-			$this->options['value'] = $value;
+			$this->AddOption('name', $name);
+			$this->AddOption('size', $size);
+			$this->AddOption('value',$value);
 			$this->SetReadonly($readonly);
 		}
 		function SetReadonly($value='yes')
@@ -64,15 +64,17 @@
 
 	class CNumericBox extends CTextBox
 	{
-		function CNumericBox($name='password',$value='',$size=20)
+		function CNumericBox($name='password',$value='',$size=20,$readonly="no")
 		{
-			parent::CTextBox($name,$value,$size);
-			$this->options['OnKeyPress'] = 
+			parent::CTextBox($name,$value,$size,$readonly);
+			$this->AddOption('MaxLength', $size);
+			$this->AddOption('Style', 'text-align: right;');
+			$this->AddOption('OnKeyPress',
 				" var c= (event.which) ? event.which : event.keyCode; ".
-				" if(c <= 31 || (c >= 48 && c <= 57)) return true; else return false; ";
+				" if(c <= 31 || (c >= 48 && c <= 57)) return true; else return false; ");
 		}
 	}
-/* TEST
+
 	class CIpBox
 	{
 		var $ip_parts = array();
@@ -88,7 +90,17 @@
 			for($i = 0; $i < 4; $i++)
 			{
 				$this->ip_parts[$i] = new CNumericBox($name.'['.$i.']', $value[$i], 3);
-				if($i < 3) $this->ip_parts[$i]->tag_end = '';
+				if($i != 3)
+				{
+					$this->ip_parts[$i]->tag_end = '';
+					$this->ip_parts[$i]->AddOption('OnKeyDown',
+						' this.maxlength = this.getAttribute("maxlength"); '.
+						' this.oldlength = this.value.length; ');
+					$this->ip_parts[$i]->AddOption('OnKeyUp',
+						' if(this.oldlength != this.value.length && this.value.length == this.maxlength) {'.
+						' var el = this.form.elements["'.$name.'['.($i+1).']'.'"];'.
+						' if(el) { el.focus(); el.select(); }}');
+				}
 				$this->ip_parts[$i] = unpack_object($this->ip_parts[$i]);
 			}
 		}
@@ -107,6 +119,5 @@
 			echo $this->ToString($destroy);
 		}
 	}
-TEST */
 
 ?>
