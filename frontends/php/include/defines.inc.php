@@ -26,6 +26,7 @@
 	define("T_ZBX_INT",			1);
 	define("T_ZBX_DBL",			2);
 	define("T_ZBX_PERIOD",			3);
+	define("T_ZBX_IP",			4);
 
 	define("O_MAND",			0);
 	define("O_OPT",				1);

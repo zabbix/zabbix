@@ -39,7 +39,7 @@ include_once "include/page_header.php";
 		
 		"name"=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})'),
 		"timezone"=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(-12,+13),'isset({save})'),
-		"ip"=>			array(T_ZBX_STR, O_OPT,	null,	DB_ID,		'isset({save})'),
+		"ip"=>			array(T_ZBX_IP,	 O_OPT,	null,	null,		'isset({save})'),
 		"port"=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(1,65535),'isset({save})'),
 		"slave_history"=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,65535),'isset({save})'),
 		"slave_trends"=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,65535),'isset({save})'),
@@ -95,7 +95,7 @@ include_once "include/page_header.php";
 		$node_data = get_node_by_nodeid($_REQUEST['nodeid']);
 		$result = delete_node($_REQUEST['nodeid']);
 		show_messages($result, S_NODE_DELETED, S_CANNOT_DELETE_NODE);
-		add_audit_if($result,AUDIT_ACTION_DELETE,'Node ['.$node_data['name'].'] id ['.$node_data['nodeid'].']');
+		add_audit_if($result,AUDIT_ACTION_DELETE,AUDIT_RESOURCE_NODE,'Node ['.$node_data['name'].'] id ['.$node_data['nodeid'].']');
 		if($result)
 		{
 			unset($_REQUEST['form'],$node_data);
@@ -118,7 +118,7 @@ include_once "include/page_header.php";
 
 		$db_nodes = DBselect('select * from nodes where nodeid in ('.
 			get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST).') '.
-			' order by nodetype desc,name ');
+			' order by nodetype desc, masterid, name ');
 		while($row=DBfetch($db_nodes))
 		{
 
