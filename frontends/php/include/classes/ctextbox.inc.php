@@ -70,8 +70,12 @@
 			$this->AddOption('MaxLength', $size);
 			$this->AddOption('Style', 'text-align: right;');
 			$this->AddOption('OnKeyPress',
-				" var c = (event.which || event.which==0) ? event.which : event.keyCode;".
-				" if(c <= 31 || (c >= 48 && c <= 57)) return true; else return false; ");
+				' var c = (window.event) ? event.keyCode : event.which;'.
+				' if(event.ctrlKey || c <= 31 || (c >= 48 && c <= 57)) return true; else return false; ');
+			$this->AddOption('OnChange',
+					'if(isNaN(parseInt(this.value))) this.value = 0; '.
+					' else this.value = parseInt(this.value);'
+				);
 		}
 	}
 
