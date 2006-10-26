@@ -163,7 +163,7 @@
 		if($type == T_ZBX_IP)
 		{
 			if(!is_array($var)) $var = explode('.',$var);
-			if(!isset($var[0]) || !isset($var[1]) || !isset($var[2]) || !isset($var[3]))
+			if(count($var) != 4)
 			{
 				if($flags&P_SYS)
 				{
@@ -317,12 +317,8 @@
 				}
 			}
 		}
-		
-		if($type == T_ZBX_IP)
-		{
-			$_REQUEST[$field] = implode('.', $_REQUEST[$field]);
-		}
 
+		
 		return ZBX_VALID_OK;
 	}
 
@@ -353,6 +349,11 @@
 		foreach($fields as $field => $checks)
 		{
 			$err |= check_field($fields, $field,$checks);
+			
+			if($checks[0] == T_ZBX_IP && isset($_REQUEST[$field]))
+			{
+				$_REQUEST[$field] = implode('.', $_REQUEST[$field]);
+			}
 		}
 
 		unset_not_in_list($fields);
