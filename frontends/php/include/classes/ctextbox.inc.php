@@ -70,7 +70,7 @@
 			$this->AddOption('MaxLength', $size);
 			$this->AddOption('Style', 'text-align: right;');
 			$this->AddOption('OnKeyPress',
-				" var c= (event.which) ? event.which : event.keyCode; ".
+				" var c = (event.which || event.which==0) ? event.which : event.keyCode;".
 				" if(c <= 31 || (c >= 48 && c <= 57)) return true; else return false; ");
 		}
 	}
