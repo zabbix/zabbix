@@ -26,7 +26,7 @@
 //	$DB_TYPE	="POSTGRESQL";
 	$DB_TYPE	="MYSQL";
 	$DB_SERVER	="localhost";
-	$DB_DATABASE	="1_3_rights1";
+	$DB_DATABASE	="osmiy1";
 	$DB_USER	="root";
 	$DB_PASSWORD	="";
 // END OF DATABASE CONFIGURATION
