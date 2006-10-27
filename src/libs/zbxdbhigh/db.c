@@ -561,15 +561,24 @@ int	DBinsert_id(int exec_result, const char *table, const char *field)
 
 #ifdef	HAVE_ORACLE
 	DB_ROW	row;
+	char    sql[MAX_STRING_LEN];
+	DB_RESULT       result;
+	int     id;
 	
 	zabbix_log(LOG_LEVEL_DEBUG, "In DBinsert_id()" );
 
 	if(exec_result == FAIL) return 0;
-	
-	row = DBfetch(DBselect("select %s_%s.currval from dual", table, field));
 
-	return atoi(row[0]);
+	zbx_snprintf(sql, sizeof(sql), "select %s_%s.currval from dual", table, field);
+
+	resulr=DBselect(sql);
 	
+	row = DBfetch(result);
+
+	id = atoi(row[0]);
+	DBfree_result(result);
+
+	return id;
 #endif
 }
 

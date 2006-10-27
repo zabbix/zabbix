@@ -246,30 +246,37 @@ COpt::savesqlrequest($query);
 		}
 	}
 
-/*
-	function	DBinsert_id($result,$table,$field)
+	function        DBinsert_id($result,$table,$field)
 	{
-		global	$DB,$DB_TYPE;
+		global  $DB,$DB_TYPE;
 
 		if($DB_TYPE == "MYSQL")
 		{
 			return mysql_insert_id($DB);
 		}
-
+		
 		if($DB_TYPE == "POSTGRESQL")
 		{
 			$oid=pg_getlastoid($result);
+//                      echo "OID:$oid<br>";
 			$sql="select $field from $table where oid=$oid";
 			$result=DBselect($sql);
 			return get_field($result,0,0);
 		}
 		if($DB_TYPE == "ORACLE")
 		{
+/*                      $sql="select max($field) from $table";
+			$parse=DBexecute($sql);
+			while(OCIFetch($parse))
+			{
+				$colvalue = OCIResult($parse, 1);
+				return $colvalue;
+			}
+*/
 			$res = DBfetch(DBselect('select '.$table.'_'.$field.'.currval from dual'));
 			return $res[0];
 		}
 	}
-*/
 
 /* string value prepearing */
 if($DB_TYPE == "ORACLE") {	
