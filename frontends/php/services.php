@@ -267,7 +267,7 @@ include_once "include/page_header.php";
 
 		if(isset($service) && $back_id == $service['serviceid'])	break;
 
-		array_push($menu_path, unpack_object(new CLink($back_name, '?serviceid='.$back_id.url_param('new_path',false,'path'))));
+		array_push($menu_path, unpack_object(new CLink($back_name, '?serviceid='.$back_id.url_param($new_path,false,'path'))));
 		array_push($new_path, $el);
 	}
 	$_REQUEST['path'] = $path = $new_path;

@@ -103,7 +103,8 @@
 
 	function url_param($parameter,$request=true,$name=null)
 	{
-	
+		if(!$request && !isset($name)) fatal_error('not request variable require url name [url_param]');
+		
 		$result = "";
 
 		if(!isset($name)) $name = $parameter;
@@ -116,9 +117,7 @@
 		}
 		else
 		{
-			global $$parameter;
-			
-			$var =& $$parameter;
+			$var =& $parameter;
 		}
 		
 		if(isset($var))

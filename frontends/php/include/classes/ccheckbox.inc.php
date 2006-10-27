@@ -32,6 +32,13 @@
 			$this->options['onClick'] = $action;
 			$this->SetChecked($checked);
 		}
+		function SetEnabled($value='yes')
+		{
+			if($value=='yes' || $value == true || $value === 1)
+				return $this->DelOption('disabled');
+
+			return $this->options['disabled'] = 'yes';
+		}
 		function SetChecked($value="yes")
 		{
 			if((is_string($value)&& ($value=="yes" || $value=="checked" || $value=="on") || $value=="1")

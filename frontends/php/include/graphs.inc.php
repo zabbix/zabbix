@@ -422,7 +422,7 @@
 		return $result;
 	}
 
-	function	delete_template_graphs($hostid, $templateid = null, $unlink_mode = false)
+	function	delete_template_graphs($hostid, $templateid = null /* array format 'arr[id]=name' */, $unlink_mode = false)
 	{
 		$db_graphs = get_graphs_by_hostid($hostid);
 		while($db_graph = DBfetch($db_graphs))
@@ -433,7 +433,12 @@
 			if($templateid != null)
 			{
 				$tmp_graph = get_graph_by_graphid($db_graph["templateid"]);
-				if($tmp_graph["hostid"] != $templateid)
+				if(is_array($templateid))
+				{
+					if(!isset($templateid[$tmp_graph["hostid"]]))
+						continue;
+				}
+				elseif($tmp_graph["hostid"] != $templateid)
 					continue;
 			}
 
@@ -451,12 +456,18 @@
 		}
 	}
 	
-	function	copy_template_graphs($hostid, $templateid = null, $copy_mode = false)
+	function	copy_template_graphs($hostid, $templateid = null /* array format 'arr[id]=name' */, $copy_mode = false)
 	{
 		if($templateid == null)
 		{
-			$host = get_host_by_hostid($hostid);	
-			$templateid = $host["templateid"];
+			$templateid = get_templates_by_hostid($hostid);
+		}
+		
+		if(is_array($templateid))
+		{
+			foreach($templateid as $id => $name)
+				copy_template_graphs($hostid, $id, $copy_mode); // attention recursion
+			return;
 		}
 
 		$db_graphs = get_graphs_by_hostid($templateid);

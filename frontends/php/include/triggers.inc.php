@@ -1014,7 +1014,7 @@
 		return strcmp($expr1,$trig2["expression"]);
 	}
 
-	function	delete_template_triggers($hostid, $templateid = null, $unlink_mode = false)
+	function	delete_template_triggers($hostid, $templateid = null /* array format 'arr[id]=name' */, $unlink_mode = false)
 	{
 		$triggers = get_triggers_by_hostid($hostid);
 		while($trigger = DBfetch($triggers))
@@ -1023,9 +1023,14 @@
 
 			if($templateid != null)
                         {
-                                $db_tmp_hosts = get_hostis_by_triggerid($trigger["templateid"]);
+                                $db_tmp_hosts = get_hosts_by_triggerid($trigger["templateid"]);
 				$tmp_host = DBfetch($db_tmp_hosts);
-                                if($tmp_host["hostid"] != $templateid)
+				if(is_array($templateid))
+				{
+					if(!isset($templateid[$tmp_host["hostid"]]))
+						continue;
+				}
+                                elseif($tmp_host["hostid"] != $templateid)
                                         continue;
                         }
 
@@ -1045,12 +1050,18 @@
 		return TRUE;
 	}
 	
-	function	copy_template_triggers($hostid, $templateid = null, $copy_mode = false)
+	function	copy_template_triggers($hostid, $templateid = null /* array format 'arr[id]=name' */, $copy_mode = false)
 	{
 		if(null == $templateid)
 		{
-			$host = get_host_by_hostid($hostid);	
-			$templateid = $host["templateid"];
+			$templateid = get_templates_by_hostid($hostid);;
+		}
+
+		if(is_array($templateid))
+		{
+			foreach($templateid as $id => $name)
+				copy_template_triggers($hostid, $id, $copy_mode); // attention recursion
+			return;
 		}
 
 		$triggers = get_triggers_by_hostid($templateid);

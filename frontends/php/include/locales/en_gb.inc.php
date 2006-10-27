@@ -419,6 +419,7 @@
 	"S_NO_HOST_GROUPS_DEFINED"=>		"No host groups defined",
 	"S_NO_LINKAGES_DEFINED"=>		"No linkages defined",
 	"S_NO_HOSTS_DEFINED"=>			"No hosts defined",
+	"S_NO_TEMPLATES_DEFINED"=>		"No templates defined",
 	"S_HOSTS_BIG"=>				"HOSTS",
 	"S_HOST"=>				"Host",
 	"S_IP"=>				"IP",
