@@ -147,160 +147,16 @@
 		return $result;
 	}
 
-	# Add action to hardlinked hosts
-
-	function	add_action_to_linked_hosts($actionid,$hostid=0)
-	{
-		if($actionid<=0)
-		{
-			return;
-		}
-
-		$action=get_action_by_actionid($actionid);
-		$trigger=get_trigger_by_triggerid($action["triggerid"]);
-
-		$sql="select distinct h.hostid from hosts h,functions f, items i where i.itemid=f.itemid and h.hostid=i.hostid and f.triggerid=".$action["triggerid"];
-		$result=DBselect($sql);
-		$row=DBfetch($result);
-		if(!$row)
-		{
-			return;
-		}
-
-		$host_template=get_host_by_hostid($row["hostid"]);
-
-		if($hostid==0)
-		{
-			$sql="select hostid,templateid,actions from hosts_templates where templateid=".$row["hostid"];
-		}
-		else
-		{
-			$sql="select hostid,templateid,actions from hosts_templates where hostid=$hostid and templateid=".$row["hostid"];
-		}
-		$result=DBselect($sql);
-		while($row=DBfetch($result))
-		{
-			if($row["actions"]&1 == 0)	continue;
-
-			$sql="select distinct f.triggerid from functions f,items i,triggers t where t.description=".zbx_dbstr($trigger["description"])." and t.triggerid=f.triggerid and i.itemid=f.itemid and i.hostid=".$row["hostid"];
-			$result2=DBselect($sql);
-			while($row2=DBfetch($result2))
-			{
-				$host=get_host_by_hostid($row["hostid"]);
-				$message=str_replace("{".$host_template["host"].":", "{".$host["host"].":",
-					$action["message"]);
-
-				add_action($action["actiontype"],$row2["triggerid"], $action["userid"], $action["good"], 
-					$action["subject"], $message, $action["scope"],
-					$action["severity"], $action["recipient"], $action["maxrepeats"],
-					$action["repeatdelay"],$action["scripts"]);
-			}
-		}
-	}
-
-	# Delete action from hardlinked hosts
-
-	function	delete_action_from_templates($actionid)
-	{
-		if($actionid<=0)
-		{
-			return;
-		}
-
-		$action=get_action_by_actionid($actionid);
-		$trigger=get_trigger_by_triggerid($action["triggerid"]);
-
-		$sql="select distinct h.hostid from hosts h,functions f, items i where i.itemid=f.itemid and h.hostid=i.hostid and f.triggerid=".$action["triggerid"];
-		$result=dbselect($sql);
-
-		$row=dbfetch($result);
-		if(!$row)	return;
-
-		$hostid=$row["hostid"];
-
-		$sql="select hostid,templateid,actions from hosts_templates where templateid=$hostid";
-		$result=dbselect($sql);
-		#enumerate hosts
-		while($row=dbfetch($result))
-		{
-			if($row["actions"]&4 == 0)	continue;
-
-			$sql="select distinct f.triggerid from functions f,items i,triggers t where t.description=".zbx_dbstr($trigger["description"])." and t.triggerid=f.triggerid and i.itemid=f.itemid and i.hostid=".$row["hostid"];
-			$result2=dbselect($sql);
-			#enumerate triggers
-			while($row2=dbfetch($result2))
-			{
-				$sql="select actionid from actions where triggerid=".$row2["triggerid"]." and subject=".zbx_dbstr($action["subject"])." and userid=".$action["userid"]." and good=".$action["good"]." and scope=".$action["scope"]." and recipient=".$action["recipient"]." and severity=".$action["severity"];
-				$result3=dbselect($sql);
-				#enumerate actions
-				while($row3=dbfetch($result3))
-				{
-					delete_action($row3["actionid"]);
-				}
-			}
-		}
-	}
-
-	# Update action from hardlinked hosts
-
-	function	update_action_from_linked_hosts($actionid)
-	{
-		if($actionid<=0)
-		{
-			return;
-		}
-
-		$action=get_action_by_actionid($actionid);
-		$trigger=get_trigger_by_triggerid($action["triggerid"]);
-
-		$sql="select distinct h.hostid from hosts h,functions f, items i where i.itemid=f.itemid and h.hostid=i.hostid and f.triggerid=".$action["triggerid"];
-		$result=dbselect($sql);
-		if(dbnum_rows($result)!=1)
-		{
-			return;
-		}
-
-		$row=dbfetch($result);
-
-		$hostid=$row["hostid"];
-		$host_template=get_host_by_hostid($hostid);
-
-		$sql="select hostid,templateid,actions from hosts_templates where templateid=$hostid";
-		$result=dbselect($sql);
-		#enumerate hosts
-		while($row=dbfetch($result))
-		{
-			if($row["actions"]&2 == 0)	continue;
-
-			$sql="select distinct f.triggerid from functions f,items i,triggers t where t.description=".zbx_dbstr($trigger["description"])." and t.triggerid=f.triggerid and i.itemid=f.itemid and i.hostid=".$row["hostid"];
-			$result2=dbselect($sql);
-			#enumerate triggers
-			while($row2=dbfetch($result2))
-			{
-				$sql="select actionid from actions where triggerid=".$row2["triggerid"]." and subject=".zbx_dbstr($action["subject"]);
-				$result3=dbselect($sql);
-				#enumerate actions
-				while($row3=dbfetch($result3))
-				{
-					$host=get_host_by_hostid($row["hostid"]);
-					$message=str_replace("{".$host_template["host"].":", "{".$host["host"].":", $action["message"]);
-					update_action($row3["actionid"], $action["actiontype"],$row2["triggerid"], $action["userid"], $action["good"], $action["subject"], $message, $action["scope"], $action["severity"], $action["recipient"], $action["maxrepeats"],$action["repeatdelay"],$action["scripts"]);
-
-				}
-			}
-		}
-	}
-
 	function	get_source_description($source)
 	{
-		$desc="Unknown";
+		$desc = S_UNKNOWN;
 		if($source==1)
 		{
-			$desc="IT Service";
+			$desc=S_IT_SERVICE;
 		}
 		elseif($source==0)
 		{
-			$desc="Trigger";
+			$desc=S_TRIGGER;
 		}
 		return $desc;
 	}

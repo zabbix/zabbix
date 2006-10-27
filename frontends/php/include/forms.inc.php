@@ -2557,7 +2557,8 @@
 		$location	= get_request("location","");
 		$notes		= get_request("notes","");
 
-		$templateid	= get_request("templateid",0);
+		$templates	= get_request("templates",array());
+		$clear_templates = get_request('clear_templates',array());
 
 		$frm_title	= $show_only_tmp ? S_TEMPLATE : S_HOST;
 
@@ -2565,6 +2566,12 @@
 		{
 			$db_host=get_host_by_hostid($_REQUEST["hostid"]);
 			$frm_title	.= SPACE."\"".$db_host["host"]."\"";
+
+			$original_templates = get_templates_by_hostid($_REQUEST["hostid"]);
+		}
+		else
+		{
+			$original_templates = array();
 		}
 
 		if(isset($_REQUEST["hostid"]) && !isset($_REQUEST["form_refresh"]))
@@ -2576,7 +2583,6 @@
 			$useip	= $db_host["useip"]==1 ? 'yes' : 'no';
 			$ip	= $db_host["ip"];
 
-			$templateid = $db_host["templateid"];
 // add groups
 			$db_groups=DBselect("select distinct groupid from hosts_groups where hostid=".$_REQUEST["hostid"].
 				" and groupid in (".
@@ -2608,12 +2614,12 @@
 				$location	= $db_profile["location"];
 				$notes		= $db_profile["notes"];
 			}
+			$templates = $original_templates;
 		}
-		$real_templateid = 0;
-		if(isset($db_host) && $db_host["templateid"] > 0)
-		{
-			$real_templateid = $templateid = $db_host["templateid"];
-		}
+
+		$clear_templates = array_intersect($clear_templates, array_keys($original_templates));
+		$clear_templates = array_diff($clear_templates,array_keys($templates));
+		asort($templates);
 
 		if($show_only_tmp){
 			$useip = "no";
@@ -2622,6 +2628,8 @@
 		$frmHost = new CFormTable($frm_title,"hosts.php");
 		$frmHost->SetHelp("web.hosts.host.php");
 		$frmHost->AddVar("config",get_request("config",0));
+
+		$frmHost->AddVar('clear_templates',$clear_templates);
 
 		if(isset($_REQUEST["hostid"]))		$frmHost->AddVar("hostid",$_REQUEST["hostid"]);
 		if(isset($_REQUEST["groupid"]))		$frmHost->AddVar("groupid",$_REQUEST["groupid"]);
@@ -2690,26 +2698,29 @@
 			$frmHost->AddRow(S_STATUS,$cmbStatus);	
 		}
 
-		$cmbHosts = new CComboBox("templateid",$templateid);
-		$btnUnlink = null;
-		$btnUnlinkAndClear = null;
-		if($real_templateid > 0)
+		$template_table = new CTable();
+		$template_table->SetCellPadding(0);
+		$template_table->SetCellSpacing(0);
+
+		foreach($templates as $id => $name)
 		{
-			$cmbHosts->SetEnabled(false);
-			$frmHost->AddVar("templateid",$templateid);
-			$btnUnlink = new CButton("unlink",S_UNLINK);
-			$btnUnlinkAndClear = new CButton("unlink_and_clear",S_UNLINK_AND_CLEAR);
+			$frmHost->AddVar('templates['.$id.']',$name);
+			$template_table->AddRow(array(
+					$name,
+					new CButton('unlink['.$id.']',S_UNLINK),
+					isset($original_templates[$id]) ? new CButton('unlink_and_clear['.$id.']',S_UNLINK_AND_CLEAR) : SPACE
+					)
+				);
 		}
 
-		$cmbHosts->AddItem(0,"...");
-		$hosts=DBselect("select host,hostid from hosts where status in (".HOST_STATUS_TEMPLATE.")".
-			" and hostid in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST,null,null,$ZBX_CURNODEID).") ".
-			" order by host");
-		while($host=DBfetch($hosts))
-		{
-			$cmbHosts->AddItem($host["hostid"],$host["host"]);
-		}
-		$frmHost->AddRow(S_LINK_WITH_TEMPLATE, array($cmbHosts,SPACE, $btnUnlink, $btnUnlinkAndClear));
+		$frmHost->AddRow(S_LINK_WITH_TEMPLATE, array($template_table,
+				new CButton('add_template',S_ADD,
+					"return PopUp('popup.php?dstfrm=".$frmHost->GetName().
+					"&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host".
+					url_param($templates,false,'existed_templates')."','new_win',".
+					"'width=450,height=450,resizable=1,scrollbars=1');",
+					'T')
+				));
 	
 		if($show_only_tmp)
 		{
@@ -2785,6 +2796,7 @@
 	{
 		global  $_REQUEST;
 		global	$USER_DETAILS;
+		global	$ZBX_CURNODEID;
 
 		$hosts = get_request("hosts",array());
 		$frm_title = S_HOST_GROUP;
@@ -2824,7 +2836,7 @@
 		$cmbHosts = new CListBox("hosts[]",$hosts,10);
 		$db_hosts=DBselect("select distinct hostid,host from hosts".
 			" where status<>".HOST_STATUS_DELETED.
-			" and hostid not in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT).")".
+			" and hostid in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,$ZBX_CURNODEID).")".
 			" order by host");
 		while($db_host=DBfetch($db_hosts))
 		{

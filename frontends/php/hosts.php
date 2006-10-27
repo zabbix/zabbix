@@ -74,7 +74,8 @@ include_once "include/page_header.php";
 		"status"=>	array(T_ZBX_INT, O_OPT,  NULL,   IN("0,1,3"),	'{config}==0&&isset({save})'),
 
 		"newgroup"=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	NULL),
-		"templateid"=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,	NULL),
+		"templates"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	NULL),
+		"clear_templates"=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,	NULL),
 
 		"useprofile"=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	NULL),
 		"devicetype"=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
@@ -127,23 +128,19 @@ include_once "include/page_header.php";
 
 /************ ACTIONS FOR HOSTS ****************/
 /* UNLINK HOST */
-	if(($_REQUEST["config"]==0 || $_REQUEST["config"]==3) && (isset($_REQUEST["unlink"]) || isset($_REQUEST["unlink_and_clear"]))
-		 && isset($_REQUEST["hostid"]))
+	if(($_REQUEST["config"]==0 || $_REQUEST["config"]==3) && (isset($_REQUEST["unlink"]) || isset($_REQUEST["unlink_and_clear"])))
 	{
-		$unlink_mode = false;
+		$_REQUEST['clear_templates'] = get_request('clear_templates', array());
 		if(isset($_REQUEST["unlink"]))
 		{
-			$unlink_mode = true;
+			$unlink_templates = array_keys($_REQUEST["unlink"]);
 		}
-
-		unlink_template($_REQUEST["hostid"], NULL /* future usage -> $_REQUEST["templateid"]*/, $unlink_mode);
-			
-		$host = get_host_by_hostid($_REQUEST["hostid"]);
-
-		add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST,
-			"Host [".$host["host"]."] [".$host['hostid']."] ".($unlink_mode ? S_UNLINKED_SMALL : S_CLEANED_SMALL));
-			
-		unset($_REQUEST["templateid"]);
+		else
+		{
+			$unlink_templates = array_keys($_REQUEST["unlink_and_clear"]);
+			$_REQUEST['clear_templates'] = array_merge($_REQUEST['clear_templates'],$unlink_templates);
+		}
+		foreach($unlink_templates as $id) unset($_REQUEST['templates'][$id]);
 	}
 /* SAVE HOST */
 	elseif(($_REQUEST["config"]==0 || $_REQUEST["config"]==3) && isset($_REQUEST["save"]))
@@ -165,11 +162,21 @@ include_once "include/page_header.php";
 
 		}
 
+		$templates = get_request('templates', array());
+
 		if(isset($_REQUEST["hostid"]))
 		{
+			if(isset($_REQUEST['clear_templates'])) 
+			{
+				foreach($_REQUEST['clear_templates'] as $id)
+				{
+					unlink_template($_REQUEST["hostid"], $id, false);
+				}
+			}
+
 			$result = update_host($_REQUEST["hostid"],
 				$_REQUEST["host"],$_REQUEST["port"],$_REQUEST["status"],$useip,
-				$_REQUEST["ip"],$_REQUEST["templateid"],$_REQUEST["newgroup"],$groups);
+				$_REQUEST["ip"],$templates,$_REQUEST["newgroup"],$groups);
 
 			$msg_ok 	= S_HOST_UPDATED;
 			$msg_fail 	= S_CANNOT_UPDATE_HOST;
@@ -179,7 +186,7 @@ include_once "include/page_header.php";
 		} else {
 			$hostid = add_host(
 				$_REQUEST["host"],$_REQUEST["port"],$_REQUEST["status"],$useip,
-				$_REQUEST["ip"],$_REQUEST["templateid"],$_REQUEST["newgroup"],$groups);
+				$_REQUEST["ip"],$templates,$_REQUEST["newgroup"],$groups);
 
 			$msg_ok 	= S_HOST_ADDED;
 			$msg_fail 	= S_CANNOT_ADD_HOST;
@@ -530,6 +537,7 @@ include_once "include/page_header.php";
 			show_table_header($show_only_tmp ? S_TEMPLATES_BIG : S_HOSTS_BIG, $frmForm);
 
 	/* table HOSTS */
+			
 			if(isset($_REQUEST["groupid"]) && $_REQUEST["groupid"]==0) unset($_REQUEST["groupid"]);
 
 			$form = new CForm();
@@ -540,6 +548,7 @@ include_once "include/page_header.php";
 			$table->setHeader(array(
 				array(new CCheckBox("all_hosts",NULL,"CheckAll('".$form->GetName()."','all_hosts');"),
 					SPACE.S_NAME),
+				S_TEMPLATES,
 				$show_only_tmp ? NULL : S_IP,
 				$show_only_tmp ? NULL : S_PORT,
 				$show_only_tmp ? NULL : S_STATUS,
@@ -562,13 +571,11 @@ include_once "include/page_header.php";
 		
 			while($row=DBfetch($result))
 			{
-				$template = get_template_path($row["hostid"]);
-				if($template == "/") $template = NULL;
+				$templates = get_templates_by_hostid($row["hostid"]);
 				
 				$host=new CCol(array(
 					new CCheckBox("hosts[]",NULL,NULL,$row["hostid"]),
 					SPACE,
-					new CSpan($template,"unknown"),
 					new CLink($row["host"],"hosts.php?form=update&hostid=".
 						$row["hostid"].url_param("groupid").url_param("config"), 'action')
 					));
@@ -618,6 +625,7 @@ include_once "include/page_header.php";
 
 				$table->addRow(array(
 					$host,
+					implode(', ',$templates),
 					$ip,
 					$port,
 					$status,
@@ -727,9 +735,10 @@ include_once "include/page_header.php";
 			" order by host");
 		while($template = DBfetch($templates))
 		{
-			$hosts = DBSelect("select * from hosts where templateid=".$template["hostid"].
-				" and status in (".HOST_STATUS_MONITORED.",".HOST_STATUS_NOT_MONITORED.")".
-				" and hostid in (".$available_hosts.")".
+			$hosts = DBSelect("select h.* from hosts h, hosts_templates ht where ht.templateid=".$template["hostid"].
+				" and ht.hostid=h.hostid ".
+				" and h.status not in (".HOST_STATUS_TEMPLATE.")".
+				" and h.hostid in (".$available_hosts.")".
 				" order by host");
 			$host_list = array();
 			while($host = DBfetch($hosts))
@@ -744,7 +753,7 @@ include_once "include/page_header.php";
 				}
 			}
 			$table->AddRow(array(
-				new CSpan(get_template_path($template["hostid"]).$template["host"],"unknown"),
+				new CSpan($template["host"],"unknown"),
 				implode(', ',$host_list)
 				));
 		}
