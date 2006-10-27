@@ -247,7 +247,7 @@
 
 // add items to child hosts
 
-		$db_hosts = DBselect("select hostid from hosts where templateid=".$host["hostid"]);
+		$db_hosts = get_hosts_by_templateid($host["hostid"]);
 		while($db_host = DBfetch($db_hosts))
 		{
 		// recursion
