@@ -777,6 +777,9 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 			ITEM_STATUS_ACTIVE, item->itemid);
 	}
 
+	/* Required for nodata() */
+	item->lastclock = now;
+
 	return ret;
 }
 
