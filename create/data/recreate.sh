@@ -1,12 +1,12 @@
-db_name="1_3_rights"
+db_name="node"
 local_id="1"
 
-#echo Killing servers
-#killall zabbix_server >/dev/null 2>/dev/null
-#sleep 1
-#killall -9 zabbix_server >/dev/null 2>/dev/null
-#echo Removing log files
-#rm ~zabbix/logs/node*
+echo Killing servers
+killall zabbix_server >/dev/null 2>/dev/null
+sleep 1
+killall -9 zabbix_server >/dev/null 2>/dev/null
+echo Removing log files
+rm ~zabbix/logs/node*
 
 echo Generate Database schems
 cd ../schema
@@ -51,10 +51,10 @@ for i in 1 2 3 4 5 6 7; do
 	echo "update images set imageid=imageid+0000100000000000000*$i"|mysql -uroot $db_name$i
 done
 
-echo Importing MySQL databases
-for i in 2 3 4 5 6 7; do
-	mysqldump --add-drop-table=false --add-locks=FALSE --no-create-db=FALSE --create-options=FALSE --no-create-info=TRUE --ignore-table="$db_name$i.help_items" --ignore-table="$db_name$i.nodes" -uroot $db_name$i | mysql -f -uroot $db_name$local_id
-done
+#echo Importing MySQL databases
+#for i in 2 3 4 5 6 7; do
+#	mysqldump --add-drop-table=false --add-locks=FALSE --no-create-db=FALSE --create-options=FALSE --no-create-info=TRUE --ignore-table="$db_name$i.help_items" --ignore-table="$db_name$i.nodes" -uroot $db_name$i | mysql -f -uroot $db_name$local_id
+#done
 
 #echo Making MySQL server
 #cd ../..
@@ -62,8 +62,8 @@ done
 #make clean >/dev/null
 #make install >/dev/null
 #cd - >/dev/null
-#echo Staring servers
-#for i in 1 2 3 4 5 6 7; do
-#	../../bin/zabbix_server -c /etc/zabbix/$db_name$i.conf >/dev/null
-#done
+echo Staring servers
+for i in 1 2 3 4 5 6 7; do
+	../../bin/zabbix_server -c /etc/zabbix/$db_name$i.conf >/dev/null
+done
 
