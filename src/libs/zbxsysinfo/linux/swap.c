@@ -194,6 +194,8 @@ static int 	get_swap_io(zbx_uint64_t *swapin, zbx_uint64_t *swapout)
 			
 			if(swapin)	*swapin  = value1;
 			if(swapout)	*swapout = value2;
+
+			fclose(f);
 			
 			return SYSINFO_RET_OK;
 		};
