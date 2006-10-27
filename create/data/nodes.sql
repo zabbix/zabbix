@@ -1,4 +1,4 @@
-connect 1_3_rights7;
+connect node7;
 delete from nodes;
 insert into nodes values (7, "Cologne",2, "127.0.0.1", 15057, 30, 365, 0, 0, 1, 5);
 insert into nodes values (6, "Berlin", 2, "127.0.0.1", 15056, 30, 365, 0, 0, 0, 5);
@@ -11,7 +11,7 @@ insert into events values (700000000000001, 700000000000003, 123456789, 0, 0);
 insert into events values (700000000000002, 700000000000012, 123456789, 0, 0);
 insert into events values (700000000000003, 700000000000023, 123456789, 0, 0);
 insert into events values (700000000000004, 700000000000045, 123456789, 0, 0);
-connect 1_3_rights6;
+connect node6;
 delete from nodes;
 insert into nodes values (7, "Cologne",2, "127.0.0.1", 15057, 30, 365, 0, 0, 0, 5);
 insert into nodes values (6, "Berlin", 2, "127.0.0.1", 15056, 30, 365, 0, 0, 1, 5);
@@ -21,7 +21,7 @@ insert into nodes values (3, "Latvia", 2, "127.0.0.1", 15053, 30, 365, 0, 0, 0, 
 insert into nodes values (2, "Riga",   2, "127.0.0.1", 15052, 30, 365, 0, 0, 0, 3);
 insert into nodes values (1, "Dpils",  2, "127.0.0.1", 15051, 30, 365, 0, 0, 0, 3);
 insert into events values (600000000000001, 600000000000103, 123456789, 1, 0);
-connect 1_3_rights5;
+connect node5;
 delete from nodes;
 insert into nodes values (7, "Cologne",2, "127.0.0.1", 15057, 30, 365, 0, 0, 0, 5);
 insert into nodes values (6, "Berlin", 2, "127.0.0.1", 15056, 30, 365, 0, 0, 0, 5);
@@ -31,7 +31,7 @@ insert into nodes values (3, "Latvia", 2, "127.0.0.1", 15053, 30, 365, 0, 0, 0, 
 insert into nodes values (2, "Riga",   2, "127.0.0.1", 15052, 30, 365, 0, 0, 0, 3);
 insert into nodes values (1, "Dpils",  2, "127.0.0.1", 15051, 30, 365, 0, 0, 0, 3);
 insert into events values (500000000000001, 500000000000122, 123456789, 1, 0);
-connect 1_3_rights4;
+connect node4;
 delete from nodes;
 insert into nodes values (7, "Cologne",2, "127.0.0.1", 15057, 30, 365, 0, 0, 0, 5);
 insert into nodes values (6, "Berlin", 2, "127.0.0.1", 15056, 30, 365, 0, 0, 0, 5);
@@ -40,7 +40,7 @@ insert into nodes values (4, "Zabbix", 2, "127.0.0.1", 15054, 30, 365, 0, 0, 1, 
 insert into nodes values (3, "Latvia", 2, "127.0.0.1", 15053, 30, 365, 0, 0, 0, 4);
 insert into nodes values (2, "Riga",   2, "127.0.0.1", 15052, 30, 365, 0, 0, 0, 3);
 insert into nodes values (1, "Dpils",  2, "127.0.0.1", 15051, 30, 365, 0, 0, 0, 3);
-connect 1_3_rights3;
+connect node3;
 delete from nodes;
 insert into nodes values (7, "Cologne",2, "127.0.0.1", 15057, 30, 365, 0, 0, 0, 5);
 insert into nodes values (6, "Berlin", 2, "127.0.0.1", 15056, 30, 365, 0, 0, 0, 5);
@@ -49,7 +49,7 @@ insert into nodes values (4, "Zabbix", 2, "127.0.0.1", 15054, 30, 365, 0, 0, 0, 
 insert into nodes values (3, "Latvia", 2, "127.0.0.1", 15053, 30, 365, 0, 0, 1, 4);
 insert into nodes values (2, "Riga",   2, "127.0.0.1", 15052, 30, 365, 0, 0, 0, 3);
 insert into nodes values (1, "Dpils",  2, "127.0.0.1", 15051, 30, 365, 0, 0, 0, 3);
-connect 1_3_rights2;
+connect node2;
 delete from nodes;
 insert into nodes values (7, "Cologne",2, "127.0.0.1", 15057, 30, 365, 0, 0, 0, 5);
 insert into nodes values (6, "Berlin", 2, "127.0.0.1", 15056, 30, 365, 0, 0, 0, 5);
@@ -58,7 +58,7 @@ insert into nodes values (4, "Zabbix", 2, "127.0.0.1", 15054, 30, 365, 0, 0, 0, 
 insert into nodes values (3, "Latvia", 2, "127.0.0.1", 15053, 30, 365, 0, 0, 0, 4);
 insert into nodes values (2, "Riga",   2, "127.0.0.1", 15052, 30, 365, 0, 0, 1, 3);
 insert into nodes values (1, "Dpils",  2, "127.0.0.1", 15051, 30, 365, 0, 0, 0, 3);
-connect 1_3_rights1;
+connect node1;
 delete from nodes;
 insert into nodes values (7, "Cologne",2, "127.0.0.1", 15057, 30, 365, 0, 0, 0, 5);
 insert into nodes values (6, "Berlin", 2, "127.0.0.1", 15056, 30, 365, 0, 0, 0, 5);
