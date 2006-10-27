@@ -9,6 +9,10 @@ Changes for 1.3:
  - pinger will use unique temporary file name (Alexei)
  - developed SLA calculation periods (Eugene)
  - developed flexible update intervals for items (Eugene)
+
+Integrated from 1.1.x
+
+ - added Dutch tranlation (Alexei)
  - fixed reversed icons on maps (Eugene)
  - fixed trigger description substitution in action comporation (Eugene) 
  - fixed trigger description substitution in message subject and body (Eugene) 

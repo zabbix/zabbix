@@ -79,6 +79,7 @@ frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
 frontends/php/include/classes/clist.inc.php -text
 frontends/php/include/images.inc.php -text
+frontends/php/include/locales/nl_nl.inc.php -text
 frontends/php/include/nodes.inc.php -text
 frontends/php/include/page_footer.php -text
 frontends/php/include/page_header.php -text
