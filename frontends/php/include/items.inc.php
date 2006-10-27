@@ -387,7 +387,7 @@
 		return $result;
 	}
 
-	function	delete_template_items($hostid, $templateid = null, $unlink_mode = false)
+	function	delete_template_items($hostid, $templateid = null /* array format 'arr[id]=name' */, $unlink_mode = false)
 	{
 		$db_items = get_items_by_hostid($hostid);
 		while($db_item = DBfetch($db_items))
@@ -398,8 +398,15 @@
 			if($templateid != null)
 			{
 				$db_tmp_item = get_item_by_itemid($db_item["templateid"]);
-				if($db_tmp_item["hostid"] != $templateid)
+				if(is_array($templateid))
+				{
+					if(!isset($templateid[$db_tmp_item["hostid"]]))
+						continue;
+				}
+				elseif($db_tmp_item["hostid"] != $templateid)
+				{
 					continue;
+				}
 			}
 
 			if($unlink_mode)
@@ -454,11 +461,21 @@
 			$copy_mode ? 0 : $db_tmp_item["itemid"]);
 	}
 
-	function	copy_template_items($hostid, $templateid = null, $copy_mode = false)
+	function	copy_template_items($hostid, $templateid = null /* array format 'arr[id]=name' */, $copy_mode = false)
 	{
-		$host = get_host_by_hostid($hostid);
+		if($templateid == null)
+		{
+			$templateid = get_templates_by_hostid($hostid);
+		}
+		
+		if(is_array($templateid))
+		{
+			foreach($templateid as $id => $name)
+				copy_template_items($hostid, $id, $copy_mode); // attention recursion
+			return;
+		}
 
-		$db_tmp_items = get_items_by_hostid($host["templateid"]);
+		$db_tmp_items = get_items_by_hostid($templateid);
 
 		while($db_tmp_item = DBfetch($db_tmp_items))
 		{
@@ -724,7 +741,7 @@ COpt::profiling_stop('prepare table');
 
 	function	delete_history_by_itemid($itemid, $use_housekeeper=0)
 	{
-		SDI('TODO: Correct housekeeper scheduling!'); /* TODO */ /* think about housekeeper scheduling, must be housekeeperid - unneeded */
+		SDI('TODO: Correct housekeeper scheduling [new elementid problem]!'); /* TODO */ /* think about housekeeper scheduling, must be housekeeperid - unneeded */
 		
 		$result = delete_trends_by_itemid($itemid,$use_housekeeper);
 		if(!$result)	return $result;
@@ -757,7 +774,7 @@ COpt::profiling_stop('prepare table');
 
 	function	delete_trends_by_itemid($itemid, $use_housekeeper=0)
 	{
-		SDI('TODO: Correct housekeeper scheduling!'); /* TODO */ /* think about housekeeper scheduling, must be housekeeperid - unneeded */
+		SDI('TODO: Correct housekeeper scheduling [new elementid problem]!'); /* TODO */ /* think about housekeeper scheduling, must be housekeeperid - unneeded */
 
 		if($use_housekeeper)
 		{

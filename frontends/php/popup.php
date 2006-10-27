@@ -29,6 +29,10 @@
 
 	switch($srctbl)
 	{
+		case 'templates':
+			$page["title"] = "S_TEMPLATES_BIG";
+			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
+			break;
 		case 'hosts':
 			$page["title"] = "S_HOSTS_BIG";
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
@@ -90,8 +94,12 @@ include_once "include/page_header.php";
 		"nodeid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		NULL),
 		"groupid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		NULL),
 		"hostid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		NULL),
+		"templates"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	NULL),
+		"existed_templates"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	NULL),
 		"only_hostid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		NULL),
-		"monitored_hosts"=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	NULL)
+		"monitored_hosts"=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	NULL),
+		
+		"select"=>	array(T_ZBX_STR,	O_OPT,	P_SYS|P_ACT,	NULL,	NULL)
 	);
 
 	check_fields($fields);
@@ -145,7 +153,7 @@ include_once "include/page_header.php";
 		array_push($validation_param, "always_select_first_host");
 		validate_group_with_host(PERM_READ_LIST,$validation_param);
 	}
-	elseif(in_array($srctbl,array("hosts")))
+	elseif(in_array($srctbl,array("hosts","templates")))
 	{
 		validate_group(PERM_READ_LIST,$validation_param);
 	}
@@ -174,10 +182,11 @@ include_once "include/page_header.php";
 				}
 				$frmTitle->AddItem(array(SPACE,S_NODE,SPACE,$cmbNode));
 			}
-			if(!isset($ok)) $nodeid = $ZBX_CURNODEID;
-			unset($ok);
 		}	
-		if(in_array($srctbl,array("hosts","triggers","logitems","items")))
+		if(!isset($ok)) $nodeid = $ZBX_CURNODEID;
+		unset($ok);
+		
+		if(in_array($srctbl,array("hosts","templates","triggers","logitems","items")))
 		{
 			$groupid = get_request("groupid",get_profile("web.popup.groupid",0));
 			
@@ -311,6 +320,120 @@ include_once "include/page_header.php";
 			unset($host);
 		}
 		$table->Show();
+	}
+	elseif($srctbl == "templates")
+	{
+		$existed_templates = get_request('existed_templates', array());
+		$templates = get_request('templates', array());
+		$templates = $templates + $existed_templates;
+
+		if(!validate_templates(array_keys($templates)))
+		{
+			show_error_message('Conflict between selected templates');
+		}
+		elseif(isset($_REQUEST['select']))
+		{
+			$new_templates = array_diff($templates, $existed_templates);
+			if(count($new_templates) > 0) 
+			{
+?>
+
+<script language="JavaScript" type="text/javascript">
+<!--
+function add_template(formname,id,name)
+{
+        var msg = '';
+        var form = window.opener.document.forms[formname];
+        if(!form)
+        {
+                alert('form '+formname+' not exist');
+                window.close();
+        }
+
+        new_variable = window.opener.document.createElement('input');
+        new_variable.type = 'hidden';
+        new_variable.name = 'templates[' + id + ']';
+        new_variable.value = name;
+
+        form.appendChild(new_variable);
+
+        return true;
+}
+-->
+</script>
+
+<?php
+				foreach($new_templates as $id => $name)
+				{
+?>
+
+<script language="JavaScript" type="text/javascript">
+<!--
+	add_template(
+		 '<?php echo $dstfrm; ?>',
+		 '<?php echo $id; ?>',
+		 '<?php echo $name; ?>'
+	);
+-->
+</script>
+
+<?php
+				} // foreach new_templates
+?>
+
+<script language="JavaScript" type="text/javascript">
+<!--
+        var form = window.opener.document.forms['<?php echo $dstfrm; ?>'];
+        form.submit();
+	window.close();
+-->
+</script>
+
+<?php
+			} // if count new_templates > 0
+			unset($new_templates);
+		}
+		
+		$table = new CTableInfo(S_NO_TEMPLATES_DEFINED);
+		$table->SetHeader(array(S_NAME));
+
+		$sql = "select distinct h.* from hosts h";
+		if(isset($groupid))
+			$sql .= ",hosts_groups hg where hg.groupid=".$groupid.
+				" and h.hostid=hg.hostid and ";
+		else
+			$sql .= " where ";
+
+		$sql .= DBid2nodeid("h.hostid")."=".$nodeid.
+				" and h.hostid in (".$accessible_hosts.") ".
+				" and h.status=".HOST_STATUS_TEMPLATE.
+				" order by h.host,h.hostid";
+
+		$db_hosts = DBselect($sql);
+		while($host = DBfetch($db_hosts))
+		{
+			$chk = new CCheckBox('templates['.$host["hostid"].']',isset($templates[$host["hostid"]]),
+					NULL,$host["host"]);
+			$chk->SetEnabled(!isset($existed_templates[$host["hostid"]]));
+
+			$table->AddRow(array(
+				array(
+					$chk,
+					$host["host"])
+				));
+
+			unset($host);
+		}
+		$table->SetFooter(new CButton('select',S_SELECT));
+		$form = new CForm();
+		$form->AddVar('existed_templates',$existed_templates);
+		$form->AddVar('dstfrm',$dstfrm);
+		$form->AddVar('dstfld1',$dstfld1);
+		$form->AddVar('srctbl',$srctbl);
+		$form->AddVar('srcfld1',$srcfld1);
+		$form->AddVar('srcfld2',$srcfld2);
+		$form->AddItem($table);
+		$form->Show();
 	}
 	elseif(in_array($srctbl,array("host_group")))
 	{

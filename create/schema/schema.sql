@@ -343,7 +343,6 @@ CREATE TABLE hosts (
 	error			{varchar}(128)		DEFAULT '' NOT NULL,
 	available		{integer}			DEFAULT '0' NOT NULL,
 	errors_from		{integer}			DEFAULT '0' NOT NULL,
-	templateid		{bigint}			DEFAULT '0' NOT NULL,
 	PRIMARY KEY	(hostid)
 ) {create_table_opt};
 
@@ -586,9 +585,6 @@ CREATE TABLE hosts_templates (
 	hosttemplateid		{bigint}		DEFAULT '0' NOT NULL,
 	hostid			{bigint}		DEFAULT '0' NOT NULL,
 	templateid		{bigint}		DEFAULT '0' NOT NULL,
-	items			{integer}		DEFAULT '0' NOT NULL,
-	triggers		{integer}		DEFAULT '0' NOT NULL,
-	graphs			{integer}		DEFAULT '0' NOT NULL,
 	PRIMARY KEY (hosttemplateid)
 ) {create_table_opt};
 

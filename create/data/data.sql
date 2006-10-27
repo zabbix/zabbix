@@ -61,22 +61,22 @@ INSERT INTO rights VALUES (3,2,'Default permission','R',0);
 -- Dumping data for table `hosts`
 --
 
-INSERT INTO hosts VALUES (10010,'a0',1,'127.0.0.1',10050,0,0,'',0,0,0);
-INSERT INTO hosts VALUES (10011,'a1',1,'127.0.0.1',10050,0,0,'',0,0,0);
-INSERT INTO hosts VALUES (10012,'a2',1,'127.0.0.1',10050,0,0,'',0,0,0);
-INSERT INTO hosts VALUES (10013,'a3',1,'127.0.0.1',10050,0,0,'',0,0,0);
-INSERT INTO hosts VALUES (10014,'a4',1,'127.0.0.1',10050,0,0,'',0,0,0);
-INSERT INTO hosts VALUES (10015,'a5',1,'127.0.0.1',10050,0,0,'',0,0,0);
-INSERT INTO hosts VALUES (10016,'a6',1,'127.0.0.1',10050,0,0,'',0,0,0);
-INSERT INTO hosts VALUES (10017,'a7',1,'127.0.0.1',10050,0,0,'',0,0,0);
-INSERT INTO hosts VALUES (10018,'a8',1,'127.0.0.1',10050,0,0,'',0,0,0);
-INSERT INTO hosts VALUES (10019,'a9',1,'127.0.0.1',10050,0,0,'',0,0,0);
-INSERT INTO hosts VALUES (10001,'Unix_t',0,'',10000,3,0,'',0,0,0);
---INSERT INTO hosts VALUES (10001,'Unix_t',1,'127.0.0.1',10050,0,0,'',0,0,0);
-INSERT INTO hosts VALUES (10002,'Windows_t',0,'',10000,3,0,'',0,0,0);
-INSERT INTO hosts VALUES (10004,'Standalone_t',0,'',10000,3,0,'',0,0,0);
-INSERT INTO hosts VALUES (10003,'MySQL_t',0,'',10000,3,0,'',0,0,0);
-INSERT INTO hosts VALUES (10007,'SNMP_t',0,'',161,3,0,'',0,0,0);
+INSERT INTO hosts VALUES (10010,'a0',1,'127.0.0.1',10050,0,0,'',0,0);
+INSERT INTO hosts VALUES (10011,'a1',1,'127.0.0.1',10050,0,0,'',0,0);
+INSERT INTO hosts VALUES (10012,'a2',1,'127.0.0.1',10050,0,0,'',0,0);
+INSERT INTO hosts VALUES (10013,'a3',1,'127.0.0.1',10050,0,0,'',0,0);
+INSERT INTO hosts VALUES (10014,'a4',1,'127.0.0.1',10050,0,0,'',0,0);
+INSERT INTO hosts VALUES (10015,'a5',1,'127.0.0.1',10050,0,0,'',0,0);
+INSERT INTO hosts VALUES (10016,'a6',1,'127.0.0.1',10050,0,0,'',0,0);
+INSERT INTO hosts VALUES (10017,'a7',1,'127.0.0.1',10050,0,0,'',0,0);
+INSERT INTO hosts VALUES (10018,'a8',1,'127.0.0.1',10050,0,0,'',0,0);
+INSERT INTO hosts VALUES (10019,'a9',1,'127.0.0.1',10050,0,0,'',0,0);
+INSERT INTO hosts VALUES (10001,'Unix_t',0,'',10000,3,0,'',0,0);
+--INSERT INTO hosts VALUES (10001,'Unix_t',1,'127.0.0.1',10050,0,0,'',0,0);
+INSERT INTO hosts VALUES (10002,'Windows_t',0,'',10000,3,0,'',0,0);
+INSERT INTO hosts VALUES (10004,'Standalone_t',0,'',10000,3,0,'',0,0);
+INSERT INTO hosts VALUES (10003,'MySQL_t',0,'',10000,3,0,'',0,0);
+INSERT INTO hosts VALUES (10007,'SNMP_t',0,'',161,3,0,'',0,0);
 
 INSERT INTO items VALUES (19020,0,'','',161,10010,'Ping to the server (TCP)','agent.ping',001,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,0,'');
 INSERT INTO items VALUES (19021,0,'','',161,10011,'Ping to the server (TCP)','agent.ping',001,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,0,'');
