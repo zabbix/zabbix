@@ -330,6 +330,7 @@
 		$cmbLang = new CComboBox('lang',$lang);
 		$cmbLang->AddItem("en_gb",S_ENGLISH_GB);
 		$cmbLang->AddItem("cn_zh",S_CHINESE_CN);
+		$cmbLang->AddItem("nl_nl",S_DUTCH_NL);
 		$cmbLang->AddItem("fr_fr",S_FRENCH_FR);
 		$cmbLang->AddItem("de_de",S_GERMAN_DE);
 		$cmbLang->AddItem("it_it",S_ITALIAN_IT);
