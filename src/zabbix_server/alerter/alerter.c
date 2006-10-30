@@ -79,6 +79,14 @@ static int execute_action(DB_ALERT *alert,DB_MEDIATYPE *mediatype, char *error, 
 
 	char	full_path[MAX_STRING_LEN];
 
+	char    env_alertid[128],env_actionid[128],env_clock[128],env_mediatypeid[128],
+		env_status[128],env_retries[128],env_delay[128];
+	char    *zbxenv[] = { (char *)&env_alertid, (char *)&env_actionid, (char *)&env_clock,
+		(char *)&env_mediatypeid, (char *)&env_status, (char *)&env_retries,
+		(char *)&env_delay,
+		(char *)0 };
+
+
 	zabbix_log( LOG_LEVEL_DEBUG, "In execute_action()");
 
 	if(mediatype->type==ALERT_TYPE_EMAIL)
@@ -109,7 +117,18 @@ static int execute_action(DB_ALERT *alert,DB_MEDIATYPE *mediatype, char *error, 
 			strncat(full_path,mediatype->exec_path,MAX_STRING_LEN);
 			ltrim_spaces(full_path);
 			zabbix_log( LOG_LEVEL_DEBUG, "Before executing [%s]", full_path);
-			if(-1 == execl(full_path,mediatype->exec_path,alert->sendto,alert->subject,alert->message,(char *)0))
+
+			zbx_snprintf(env_alertid,127,"ZABBIX_ALERT_ID=%d",alert->alertid);
+			zbx_snprintf(env_actionid,127,"ZABBIX_ACTION_ID=%d",alert->actionid);
+			zbx_snprintf(env_clock,127,"ZABBIX_ALERT_TIME=%d",alert->clock);
+			zbx_snprintf(env_mediatypeid,127,"ZABBIX_ALERT_MEDIATYPEID=%d",alert->mediatypeid);
+			zbx_snprintf(env_status,127,"ZABBIX_ALERT_STATUS=%d",alert->status);
+			zbx_snprintf(env_retries,127,"ZABBIX_ALERT_RETRIES=%d",alert->retries);
+			zbx_snprintf(env_delay,127,"ZABBIX_ALERT_DELAY=%d",alert->delay);
+
+/*			if(-1 == execl(full_path,mediatype->exec_path,alert->sendto,alert->subject,alert->message,(char *)0))*/
+			if(-1 == execle(full_path,mediatype->exec_path,alert->sendto,alert->subject,alert->message,(char *)0, zbxenv))
+
 			{
 				zabbix_log( LOG_LEVEL_ERR, "Error executing [%s] [%s]", full_path, strerror(errno));
 				zabbix_syslog("Error executing [%s] [%s]", full_path, strerror(errno));
