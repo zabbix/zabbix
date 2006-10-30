@@ -570,6 +570,8 @@ int	evaluate(int *result,char *exp, char *error, int maxerrlen)
 #define MVAR_TRIGGER_STATUS		"{TRIGGER.STATUS}"
 #define MVAR_TRIGGER_STATUS_OLD		"{STATUS}"
 #define MVAR_TRIGGER_SEVERITY		"{TRIGGER.SEVERITY}"
+#define MVAR_TRIGGER_ID			"{TRIGGER.ID}"
+#define MVAR_EVENT_ID			"{EVENT.ID}"
 
 #define STR_UNKNOWN_VARIAVLE		"*UNKNOWN*"
 
@@ -755,6 +757,22 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 				zbx_snprintf(replace_to, sizeof(replace_to), "OFF");
 			else
 				zbx_snprintf(replace_to, sizeof(replace_to), "ON");
+		}
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
+			strncmp(pr, MVAR_TRIGGER_ID, strlen(MVAR_TRIGGER_ID)) == 0)
+		{
+			/* NOTE: if you make changes for this bloc, don't forgot MVAR_TRIGGER_STATUS block */
+			var_len = strlen(MVAR_TRIGGER_ID);
+
+			zbx_snprintf(replace_to, sizeof(replace_to), "%d", event->triggerid);
+		}
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
+			strncmp(pr, MVAR_EVENT_ID, strlen(MVAR_EVENT_ID)) == 0)
+		{
+			/* NOTE: if you make changes for this bloc, don't forgot MVAR_TRIGGER_STATUS block */
+			var_len = strlen(MVAR_EVENT_ID);
+
+			zbx_snprintf(replace_to, sizeof(replace_to), "%d", event->eventid);
 		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) && 
 			strncmp(pr, MVAR_TRIGGER_SEVERITY, strlen(MVAR_TRIGGER_SEVERITY)) == 0)
