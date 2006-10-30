@@ -12,6 +12,7 @@ Changes for 1.3:
 
 Integrated from 1.1.x
 
+ - fixed calculation of delta(#N) (Alexei)
  - better processing of units 's', support for units 'uptime' (Alexei)
  - fixed calculation of nodata() (Alexei)
  - fixed occasional LIBSQLORA8-30002: Memory allocation error. (Alexei)
