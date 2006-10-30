@@ -718,15 +718,30 @@ static void	get_latest_event_status(zbx_uint64_t triggerid, int *prev_status, in
 	char		sql[MAX_STRING_LEN];
 	DB_RESULT	result;
 	DB_ROW		row;
+	int		alarmid_max=0;
+	int		alarmid_prev_max=0;
+	int		value_max;
+	int		value_prev_max;
+
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In latest_event()");
 
-	zbx_snprintf(sql,sizeof(sql),"select value from events where triggerid=" ZBX_FS_UI64 " order by clock desc",triggerid);
+	zbx_snprintf(sql,sizeof(sql),"select alarmid,value,clock from events where triggerid=" ZBX_FS_UI64 " order by clock desc",triggerid);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]", sql);
-	result = DBselectN(sql,2);
-	row = DBfetch(result);
+	result = DBselectN(sql,20);
 
-	if(!row || DBis_null(row[0])==SUCCEED)
+	while((row=DBfetch(result)))
+	{
+		if(atoi(row[0])>=alarmid_max)
+		{
+			alarmid_prev_max=alarmid_max;
+			value_prev_max=value_max;
+			alarmid_max=atoi(row[0]);
+			value_max=atoi(row[1]);
+		}
+	}
+	
+	if(alarmid_max == 0)
         {
 		zabbix_log(LOG_LEVEL_DEBUG, "Result for last is empty" );
                 *prev_status = TRIGGER_VALUE_UNKNOWN;
@@ -734,15 +749,13 @@ static void	get_latest_event_status(zbx_uint64_t triggerid, int *prev_status, in
         }
 	else
 	{
+		*latest_status = value_max;
                 *prev_status = TRIGGER_VALUE_FALSE;
-		*latest_status = atoi(row[0]);
 
-		row = DBfetch(result);
-		if(row && DBis_null(row[0]) != SUCCEED)
+		if(alarmid_prev_max != 0)
 		{
-			*prev_status = atoi(row[0]);
+			*prev_status = value_prev_max;
 		}
-
 	}
 	DBfree_result(result);
 }
