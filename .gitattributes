@@ -21,6 +21,7 @@ create/data/images/UPS.png -text svneol=unset#unset
 create/data/images/UPS_small.png -text svneol=unset#unset
 create/data/images/Workstation.png -text svneol=unset#unset
 create/data/images/Workstation_small.png -text svneol=unset#unset
+create/data/images_pgsql.sql -text
 create/data/nodes.sql -text
 create/data/nodes_psql.sql -text
 create/data/recreate.sh -text
