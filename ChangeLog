@@ -12,6 +12,10 @@ Changes for 1.3:
 
 Integrated from 1.1.x
 
+ - fixed problem when adding a graph under PostgreSQL (Alexei)
+ - support of environment variables for aleert scripts:
+   ZABBIX_ALERT_ID,ZABBIX_ACTION_ID,ZABBIX_ALERT_TIME,ZABBIX_ALERT_MEDIATYPEID,
+   ZABBIX_ALERT_STATUS,ZABBIX_ALERT_RETRIES,ZABBIX_ALERT_DELAY (Alexei)
  - added support of macro {TRIGGER.ID} (Alexei)
  - added support of macro {EVENT.ID} (Alexei)
  - better calculation of next check timestamp for active items (Alexei)
