@@ -355,10 +355,6 @@
 
 		DBexecute("update items set lastlogsize=0 where itemid=$itemid and key_<>".zbx_dbstr($key));
 
-		if($templateid==0){
-			update_item_status($itemid, $status);
-		}
-
 		$result = DBexecute("delete from items_applications where itemid=$itemid");
 		foreach($applications as $appid)
 		{
@@ -368,7 +364,7 @@
 
 		$result=DBexecute(
 			"update items set description=".zbx_dbstr($description).",key_=".zbx_dbstr($key).",".
-			"hostid=$hostid,delay=$delay,history=$history,nextcheck=0,type=$type,".
+			"hostid=$hostid,delay=$delay,history=$history,nextcheck=0,type=$type,status=".$status.','.
 			"snmp_community=".zbx_dbstr($snmp_community).",snmp_oid=".zbx_dbstr($snmp_oid).",".
 			"value_type=$value_type,trapper_hosts=".zbx_dbstr($trapper_hosts).",".
 			"snmp_port=$snmp_port,units=".zbx_dbstr($units).",multiplier=$multiplier,delta=$delta,".
