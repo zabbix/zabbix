@@ -703,7 +703,10 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 			DBescape_string(value_str,value_esc,MAX_STRING_LEN);
 /*			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='%s',lastclock=%d where itemid=%d",now+item->delay,value_esc,now,item->itemid);*/
 			DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='%s',lastclock=%d where itemid=" ZBX_FS_UI64,
-				calculate_item_nextcheck(item->itemid, item->delay, item->delay_flex, now),value_esc,(int)now,item->itemid);
+				calculate_item_nextcheck(item->itemid, item->type, item->delay, item->delay_flex, now),
+				value_esc,
+				(int)now,
+				item->itemid);
 
 			item->prevvalue=item->lastvalue;
 			item->lastvalue=value_double;
@@ -717,7 +720,9 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 		{
 /*			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,lastclock=%d where itemid=%d",now+item->delay,now,item->itemid);*/
 			DBexecute("update items set nextcheck=%d,lastclock=%d where itemid=" ZBX_FS_UI64,
-				calculate_item_nextcheck(item->itemid, item->delay, item->delay_flex, now),(int)now,item->itemid);
+				calculate_item_nextcheck(item->itemid, item->type, item->delay, item->delay_flex, now),
+				(int)now,
+				item->itemid);
 		}
 	}
 	/* Logic for delta as speed of change */
@@ -727,13 +732,20 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 		{
 /*			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue=%f,lastvalue='%f',lastclock=%d where itemid=%d",now+item->delay,value_double,(value_double - item->prevorgvalue)/(now-item->lastclock),now,item->itemid);*/
 			DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue=%f,lastvalue='%f',lastclock=%d where itemid=" ZBX_FS_UI64,
-				calculate_item_nextcheck(item->itemid, item->delay,item->delay_flex,now),value_double,(value_double - item->prevorgvalue)/(now-item->lastclock),(int)now,item->itemid);
+				calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
+				value_double,
+				(value_double - item->prevorgvalue)/(now-item->lastclock),
+				(int)now,
+				item->itemid);
 		}
 		else
 		{
 /*			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevorgvalue=%f,lastclock=%d where itemid=%d",now+item->delay,value_double,now,item->itemid);*/
 			DBexecute("update items set nextcheck=%d,prevorgvalue=%f,lastclock=%d where itemid=" ZBX_FS_UI64,
-				calculate_item_nextcheck(item->itemid, item->delay,item->delay_flex,now),value_double,(int)now,item->itemid);
+				calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
+				value_double,
+				(int)now,
+				item->itemid);
 		}
 
 		item->prevvalue=item->lastvalue;
@@ -750,12 +762,19 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 		if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value_double) )
 		{
 			DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue=%f,lastvalue='%f',lastclock=%d where itemid=" ZBX_FS_UI64,
-				calculate_item_nextcheck(item->itemid, item->delay,item->delay_flex,now),value_double,(value_double - item->prevorgvalue),(int)now,item->itemid);
+				calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
+				value_double,
+				(value_double - item->prevorgvalue),
+				(int)now,
+				item->itemid);
 		}
 		else
 		{
 			DBexecute("update items set nextcheck=%d,prevorgvalue=%f,lastclock=%d where itemid=" ZBX_FS_UI64,
-				calculate_item_nextcheck(item->itemid, item->delay,item->delay_flex, now),value_double,(int)now,item->itemid);
+				calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex, now),
+				value_double,
+				(int)now,
+				item->itemid);
 		}
 
 		item->prevvalue=item->lastvalue;

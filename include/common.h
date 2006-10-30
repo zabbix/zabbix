@@ -415,7 +415,7 @@ void	rtrim_spaces(char *c);
 void	delete_reol(char *c);
 int	get_param(const char *param, int num, char *buf, int maxlen);
 int	num_param(const char *param);
-int	calculate_item_nextcheck(int itemid, int delay, char *delay_flex, time_t now);
+int	calculate_item_nextcheck(int itemid, int item_type, int delay, char *delay_flex, time_t now);
 int	check_time_period(const char *period, time_t now);
 void	zbx_setproctitle(const char *fmt, ...);
 
