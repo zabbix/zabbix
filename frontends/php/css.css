@@ -604,6 +604,12 @@ table.sub_menu tr td
 .biginput:focus	{	border-color: black;	}
 .biginput:hover	{	border-color: black;	}
 
+.biginput[readonly] /* NOTE: Ignored by IE */
+{
+	border-color: #D0D0D0;
+	background-color: #EEEEEE;
+}
+
 .button
 {
 	font-family: Verdana, Helvetica, Geneva;
