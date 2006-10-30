@@ -129,8 +129,8 @@ static int calculate_checksums()
 			// select table,recid,md5(fields) from table union all ...
 			zbx_snprintf(tmp,sizeof(tmp),"union all select '%s','%s',%s,md5(concat(%s)) from %s where %s>=" ZBX_FS_UI64 " and %s<=" ZBX_FS_UI64 "\n",
 					tables[i].table, tables[i].recid, tables[i].recid, fields, tables[i].table,
-					tables[i].recid, (zbx_uint64_t)100000000000000*(zbx_uint64_t)nodeid,
-					tables[i].recid, (zbx_uint64_t)100000000000000*(zbx_uint64_t)nodeid+99999999999999);
+					tables[i].recid, (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid,
+					tables[i].recid, (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid+99999999999999);
 //		zabbix_log( LOG_LEVEL_WARNING, "TMP [%s]", tmp);
 			strncat(sql,tmp,sizeof(sql));
 		}
