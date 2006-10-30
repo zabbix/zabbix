@@ -7,6 +7,7 @@ insert into nodes values (4, "Zabbix", 2, "127.0.0.1", 15054, 30, 365, 0, 0, 0, 
 insert into nodes values (3, "Latvia", 2, "127.0.0.1", 15053, 30, 365, 0, 0, 0, 4);
 insert into nodes values (2, "Riga",   2, "127.0.0.1", 15052, 30, 365, 0, 0, 0, 3);
 insert into nodes values (1, "Dpils",  2, "127.0.0.1", 15051, 30, 365, 0, 0, 0, 3);
+insert into nodes values (1, "Dpils",  2, "127.0.0.1", 15051, 30, 365, 0, 0, 0, 3);
 insert into events values (700000000000001, 700000000000003, 123456789, 0, 0);
 insert into events values (700000000000002, 700000000000012, 123456789, 0, 0);
 insert into events values (700000000000003, 700000000000023, 123456789, 0, 0);

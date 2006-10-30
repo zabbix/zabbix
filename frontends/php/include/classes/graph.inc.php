@@ -949,7 +949,7 @@
 						);
 				}
 
-				$curr_data = &$this->data[$this->items[$i]["itemid"]][$type];
+				$curr_data = &$this->data[$this->items[$i]["itemid"]][$calc_type];
 				$curr_data->count = NULL;
 				$curr_data->min = NULL;
 				$curr_data->max = NULL;
