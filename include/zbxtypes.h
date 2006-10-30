@@ -42,8 +42,10 @@
 #	define zbx_uint64_t uint64_t
 #	if __WORDSIZE == 64
 #		define ZBX_FS_UI64 "%lu"
+#		define ZBX_OFFSET 10000000000000000UL
 #	else /* __WORDSIZE == 64 */
 #		define ZBX_FS_UI64 "%llu"
+#		define ZBX_OFFSET 10000000000000000ULL
 #	endif /* __WORDSIZE == 64 */
 
 #	define zbx_pid_t	pid_t
