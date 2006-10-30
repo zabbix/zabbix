@@ -146,7 +146,7 @@ void	zbx_setproctitle(const char *fmt, ...)
  *           New one: preserve period, if delay==5, nextcheck = 0,5,10,15,... *
  *                                                                            *
  ******************************************************************************/
-int	calculate_item_nextcheck(int itemid, int delay, char *delay_flex, time_t now)
+int	calculate_item_nextcheck(int itemid, int item_type, int delay, char *delay_flex, time_t now)
 {
 	int	i;
 	char	*p;
@@ -154,6 +154,13 @@ int	calculate_item_nextcheck(int itemid, int delay, char *delay_flex, time_t now
 	int	delay_val;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In calculate_item_nextcheck [%d, %d, %s, %d]",itemid,delay,delay_flex,now);
+
+/* Special processing of active items to see better view in queue */
+	if(item_type == ITEM_TYPE_ZABBIX_ACTIVE)
+	{
+		return (now+delay);
+	}
+
 
 	if(delay_flex && *delay_flex)
 	{
