@@ -624,7 +624,7 @@ int	VFS_FILE_MD5SUM(const char *cmd, const char *param, unsigned flags, AGENT_RE
 /* Convert MD5 hash to text form */
 	for(i=0;i<MD5_DIGEST_SIZE;i++)
 	{
-		zbx_snprintf(&hashText[i<<1], sizeof(hashText) - (i<<1), "%02x",hash[i]);
+		zbx_snprintf((char *)&hashText[i<<1], sizeof(hashText) - (i<<1), "%02x",hash[i]);
 	}
 	
 	SET_STR_RESULT(result, strdup((char*)hashText));

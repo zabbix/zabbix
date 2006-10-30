@@ -62,8 +62,6 @@ struct zbx_option longopts[] =
 	{0,0,0,0}
 };
 
-static	char	*CONFIG_HOSTS_ALLOWED	= NULL;
-
 #ifdef TODO
 void	child_signal_handler( int sig )
 {

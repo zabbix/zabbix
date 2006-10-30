@@ -338,6 +338,12 @@ void test()
 int main(int argc, char **argv)
 {
 	int	ch;
+
+	printf("Sizeof ZBX [%d]", sizeof(zbx_uint64_t));
+	printf("Sizeof Int [%d]", get_nodeid_by_id(100000000000000ULL));
+	printf("Sizeof Int [%d]", get_nodeid_by_id(500000000000000ULL));
+	printf("Sizeof Int [%d]", get_nodeid_by_id(5500000000000000ULL));
+	return;
 	
 #ifdef HAVE_ZZZ
 	DB_RESULT	result;

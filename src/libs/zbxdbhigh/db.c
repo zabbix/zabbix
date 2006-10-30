@@ -1945,8 +1945,8 @@ zbx_uint64_t DBget_nextid(char *table, char *field)
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_nextid(%s,%s)", table, field);
 
-	min = (zbx_uint64_t)100000000000000*(zbx_uint64_t)CONFIG_NODEID;
-	max = (zbx_uint64_t)100000000000000*(zbx_uint64_t)(CONFIG_NODEID+1)-1;
+	min = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)CONFIG_NODEID;
+	max = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)(CONFIG_NODEID+1)-1;
 
 	result = DBselect("select max(%s) from %s where %s>=" ZBX_FS_UI64 " and %s<=" ZBX_FS_UI64, field, table, field, min, field, max);
 //	zabbix_log(LOG_LEVEL_WARNING, "select max(%s) from %s where %s>=" ZBX_FS_UI64 " and %s<=" ZBX_FS_UI64, field, table, field, min, field, max);
@@ -1962,7 +1962,7 @@ zbx_uint64_t DBget_nextid(char *table, char *field)
 	else
 	{
 //	zabbix_log(LOG_LEVEL_WARNING,"4");
-		res=(zbx_uint64_t)100000000000000*(zbx_uint64_t)CONFIG_NODEID+1;
+		res=(zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)CONFIG_NODEID+1;
 	}
 	DBfree_result(result);
 //	zabbix_log(LOG_LEVEL_WARNING, ZBX_FS_UI64, res);
