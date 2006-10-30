@@ -26,7 +26,7 @@
 //	$DB_TYPE	="POSTGRESQL";
 	$DB_TYPE	="MYSQL";
 	$DB_SERVER	="localhost";
-	$DB_DATABASE	="osmiy1";
+	$DB_DATABASE	="zabbix";
 	$DB_USER	="root";
 	$DB_PASSWORD	="";
 // END OF DATABASE CONFIGURATION
@@ -296,7 +296,7 @@ if($DB_TYPE == "ORACLE") {
 
 	function id2nodeid($id_var)
 	{
-		return (int)($id_var / 100000000000000);
+		return (int)bcdiv("$id_var","100000000000000");
 	}
 
 	function	get_dbid($table,$field)
@@ -307,11 +307,11 @@ if($DB_TYPE == "ORACLE") {
 		$row=DBfetch($result);
 		if($row && !is_null($row["id"]))
 		{
-			return	++$row["id"];
+			return	bcadd($row["id"],1);
 		}
 		else
 		{
-			return $ZBX_CURNODEID*100000000000000+1;
+			return bcadd(bcmul($ZBX_CURNODEID,"100000000000000"),1);
 		}
 	}
 ?>

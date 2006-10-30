@@ -375,7 +375,7 @@ require_once "include/items.inc.php";
 
 	function	get_hosts_by_templateid($templateid)
 	{
-		return DBselect("select h.* from hosts h, hosts_templates ht where h.hostid=ht.hostid and ht.templateid=$templateid");
+		return DBselect("select * from hosts where templateid=$templateid");
 	}
 
 	# Update Host status

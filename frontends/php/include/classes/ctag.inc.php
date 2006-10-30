@@ -93,7 +93,10 @@
 		function ShowEnd()	{	echo $this->EndToString();	}
 		function Show($destroy=true)	{	echo $this->ToString($destroy);		}
 
-		function Destroy()	{	$this = null;			}
+		function Destroy()	{
+### TODO Problem under PHP 5.0  "Fatal error: Cannot re-assign $this in ..."
+#			$this = null;
+		}
 
 		function StartToString()
 		{

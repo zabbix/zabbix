@@ -148,40 +148,7 @@ include_once "include/page_header.php";
 
 		if(isset($_REQUEST["itemid"]))
 		{
-			$item_data = get_item_by_itemid($_REQUEST["itemid"]);
-			if($item_data['templateid'])
-			{
-				foreach(array(
-					"description"		=> null,
-					"key"			=> "key_",
-					"hostid"		=> null,
-					//"delay"		=> null,
-					//"history"		=> null,
-					//"status"		=> null,
-					"type"			=> null,
-					"snmp_community"	=> null,
-					"snmp_oid"		=> null,
-					"value_type"		=> null,
-					"trapper_hosts"		=> null,
-					"snmp_port"		=> null,
-					"units"			=> null,
-					"multiplier"		=> null,
-					//"delta"		=> null,
-					"snmpv3_securityname"	=> null,
-					"snmpv3_securitylevel"	=> null,
-					"snmpv3_authpassphrase"	=> null,
-					"snmpv3_privpassphrase"	=> null,
-					"formula"		=> null,
-					//"trends"		=> null,
-					"logtimefmt"		=> null,
-					"valuemapid"		=> null
-					) as $req_var_name => $db_varname)
-				{
-					if(!isset($db_varname)) $db_varname = $req_var_name;
-					$_REQUEST[$req_var_name] = $item_data[$db_varname];
-				}
-			}
-			$result = update_item($_REQUEST["itemid"],
+			$result=update_item($_REQUEST["itemid"],
 				$_REQUEST["description"],$_REQUEST["key"],$_REQUEST["hostid"],$_REQUEST["delay"],
 				$_REQUEST["history"],$_REQUEST["status"],$_REQUEST["type"],
 				$_REQUEST["snmp_community"],$_REQUEST["snmp_oid"],$_REQUEST["value_type"],
@@ -189,8 +156,7 @@ include_once "include/page_header.php";
 				$_REQUEST["multiplier"],$_REQUEST["delta"],$_REQUEST["snmpv3_securityname"],
 				$_REQUEST["snmpv3_securitylevel"],$_REQUEST["snmpv3_authpassphrase"],
 				$_REQUEST["snmpv3_privpassphrase"],$_REQUEST["formula"],$_REQUEST["trends"],
-				$_REQUEST["logtimefmt"],$_REQUEST["valuemapid"],$db_delay_flex,$applications,
-				$item_data['templateid']);
+				$_REQUEST["logtimefmt"],$_REQUEST["valuemapid"],$db_delay_flex,$applications);
 
 			$itemid = $_REQUEST["itemid"];
 			$action = AUDIT_ACTION_UPDATE;
@@ -530,29 +496,27 @@ include_once "include/page_header.php";
 			$show_applications == 1 ? S_APPLICATIONS : NULL,
 			S_ERROR));
 
-		$db_items = DBselect('select i.*,th.host as template_host,th.hostid as template_hostid from items i '.
-			' left join items ti on i.templateid=ti.itemid left join hosts th on ti.hostid=th.hostid '.
-			' where i.hostid='.$_REQUEST['hostid'].
-			' order by th.host,i.description, i.key_');
+		$db_items = DBselect("select i.* from hosts h,items i where h.hostid=i.hostid and".
+			" h.hostid=".$_REQUEST["hostid"]." order by i.templateid,i.description, i.key_");
 		while($db_item = DBfetch($db_items))
 		{
-			$description = array();
-
-			if($db_item["templateid"])
+			if($db_item["templateid"]==0)
 			{
+				$description = new CLink(
+					item_description($db_item["description"],$db_item["key_"]),
+					"items.php?form=update&itemid=".
+					$db_item["itemid"].url_param("hostid").url_param("groupid"),
+					'action');
+			} else {
 				$template_host = get_realhost_by_itemid($db_item["templateid"]);
-				array_push($description,		
+				$description = array(		
 					new CLink($template_host["host"],"items.php?".
 						"hostid=".$template_host["hostid"],
-						'uncnown'),
-					":");
+						'action'),
+					":",
+					item_description($db_item["description"],$db_item["key_"]),
+					);
 			}
-			
-			array_push($description, new CLink(
-				item_description($db_item["description"],$db_item["key_"]),
-				"items.php?form=update&itemid=".
-				$db_item["itemid"].url_param("hostid").url_param("groupid"),
-				'action'));
 
 			$status=new CCol(new CLink(item_status2str($db_item["status"]),
 					"items.php?group_itemid%5B%5D=".$db_item["itemid"].
