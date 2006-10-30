@@ -113,7 +113,11 @@
 		{
 			$res = implode('.',$this->ip_parts);
 			
-			if($destroy) $this = null;
+			if($destroy)
+			{
+### TODO Problem under PHP 5.0  "Fatal error: Cannot re-assign $this in ..."
+#				$this = null;
+			}
 
 			return $res;
 		}
