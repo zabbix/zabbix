@@ -111,7 +111,7 @@ printf("error1 %e\n",WSAGetLastError());
 
       if ((dwError==WSAECONNREFUSED)||(dwError==WSAENETUNREACH)||(dwError==WSAETIMEDOUT))
       {
-         *value=1;      // Port unreacheable
+         *value=0;      // Port unreacheable
          return SYSINFO_RC_SUCCESS;
       }
 printf("error2\n");
@@ -119,7 +119,7 @@ printf("error2\n");
    }
 
    closesocket(sock);
-   *value=0;      // Connection successful
+   *value=1;      // Connection successful
 
    return SYSINFO_RC_SUCCESS;
 }
