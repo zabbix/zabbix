@@ -12,6 +12,8 @@ Changes for 1.3:
 
 Integrated from 1.1.x
 
+ - added support of macro {TRIGGER.ID} (Alexei)
+ - added support of macro {EVENT.ID} (Alexei)
  - better calculation of next check timestamp for active items (Alexei)
  - new algorithm for housekeeping same for all DB engines (Alexei)
  - always draw graphs for items having type "trapper" (Alexei)
