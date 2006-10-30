@@ -92,7 +92,7 @@
 		{
 			foreach($_REQUEST[$field] as $key => $val)
 			{
-				$expression2 = str_replace("{}",'$_REQUEST["'.$field.'"]['.$key.']',$expression);
+				$expression2 = str_replace("{}",'$_REQUEST["'.$field.'"]["'.$key.'"]',$expression);
 				if(calc_exp2($fields,$field,$expression2)==FALSE)
 					return FALSE;
 			}	
