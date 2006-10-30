@@ -1,6 +1,5 @@
 Changes for 1.3:
 
- - fixed situations when latest_alarm() may return wrong value (Alexei)
  - developed multitemplate system (Eugene)
  - developed group permission system (Eugene)
  - added processing of distributed events (Alexei)
@@ -13,6 +12,8 @@ Changes for 1.3:
 
 Integrated from 1.1.x
 
+ - remove left spaces from script full path (Alexei)
+ - fixed situations when latest_alarm() may return wrong value (Alexei)
  - added Swedish translation. Thanks to "yeager". (Alexei)
  - fixed calculation of delta(#N) (Alexei)
  - better processing of units 's', support for units 'uptime' (Alexei)
