@@ -341,9 +341,6 @@ else
 	document.writeln('<BGSOUND SRC="<?php echo $filename; ?>" LOOP=0/>');
 // -->
 </SCRIPT>
-<NOSCRIPT>
-	<BGSOUND SRC="<?php echo $filename; ?>"/>
-</NOSCRIPT>
 <?php
 	}
 
