@@ -375,7 +375,7 @@ require_once "include/items.inc.php";
 
 	function	get_hosts_by_templateid($templateid)
 	{
-		return DBselect("select * from hosts where templateid=$templateid");
+		return DBselect("select h.* from hosts h, hosts_templates ht where h.hostid=ht.hostid and ht.templateid=$templateid");
 	}
 
 	# Update Host status
@@ -629,7 +629,7 @@ require_once "include/items.inc.php";
 		if(!$result)	return $result;
 
 		if($applicationid==null)
-		{
+		{// create application for childs
 			$applicationid = $applicationid_new;
 
 			$db_childs = get_hosts_by_templateid($hostid);
