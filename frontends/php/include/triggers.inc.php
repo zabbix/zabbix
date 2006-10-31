@@ -340,7 +340,7 @@
 		}
 
 		if($trig_host)
-		{
+		{// create trigger for childs
 			$child_hosts = get_hosts_by_templateid($trig_host["hostid"]);
 			while($child_host = DBfetch($child_hosts))
 			{
