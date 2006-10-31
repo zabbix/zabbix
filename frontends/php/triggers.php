@@ -91,11 +91,17 @@ include_once "include/page_header.php";
 
 		if(isset($_REQUEST["triggerid"]))
 		{
+			$trigger_data = get_trigger_by_triggerid($_REQUEST["triggerid"]);
+			if($trigger_data['templateid'])
+			{
+				$_REQUEST["description"] = $trigger_data["description"];
+				$_REQUEST["expression"] = explode_exp($trigger_data["expression"],0);
+			}
 			// TODO check permission by new value.
 			$result=update_trigger($_REQUEST["triggerid"],
 				$_REQUEST["expression"],$_REQUEST["description"],
 				$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"],
-				$deps);
+				$deps, $trigger_data['templateid']);
 
 			$triggerid = $_REQUEST["triggerid"];
 			$audit_action = AUDIT_ACTION_UPDATE;
@@ -359,34 +365,31 @@ include_once "include/page_header.php";
 			if($row["templateid"] > 0) $chkBox->SetEnabled(false);
 			$description = array($chkBox,SPACE);
 
-			if($row["templateid"] == 0)
+			if($row["templateid"])
 			{
-				array_push($description,
-					new CLink(expand_trigger_description($row["triggerid"]),
-					"triggers.php?form=update&triggerid=".$row["triggerid"].
-						"&hostid=".$row["hostid"], 'action')
-					);
-			} else {
 				$real_hosts = get_realhosts_by_triggerid($row["triggerid"]);
 				$real_host = DBfetch($real_hosts);
 				if($real_host)
 				{
 					array_push($description,
 						new CLink($real_host["host"],
-							"triggers.php?&hostid=".$real_host["hostid"], 'action'),
-						":",
-						expand_trigger_description($row["triggerid"])
+							"triggers.php?&hostid=".$real_host["hostid"], 'uncnown'),
+						":"
 						);
 				}
 				else
 				{
 					array_push($description,
 						new CSpan("error","on"),
-						":",
-						expand_trigger_description($row["triggerid"])
+						":"
 						);
 				}
 			}
+			array_push($description,
+				new CLink(expand_trigger_description($row["triggerid"]),
+				"triggers.php?form=update&triggerid=".$row["triggerid"].
+					"&hostid=".$row["hostid"], 'action')
+				);
 
 			//add dependences
 			$result1=DBselect("select t.triggerid,t.description from triggers t,trigger_depends d".

@@ -1,5 +1,6 @@
 Changes for 1.3:
 
+ - added availability of template triggers changing directly on host (Eugene)
  - added availability of template items changing directly on host (Eugene)
  - developed multitemplate system (Eugene)
  - developed group permission system (Eugene)

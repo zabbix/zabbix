@@ -109,6 +109,8 @@
 
 	function	get_hosts_by_expression($expression)
 	{
+		global $ZBX_CURNODEID;
+
 		$state="";
 		$host="";
 		$hosts=array();
@@ -124,7 +126,7 @@
 			if($expression[$i] == '}' && $state=="")
 			{
 				$state='';
-				$hosts[$host] = $host;
+				$hosts[$host] = '\''.$host.'\'';
 				continue;
 			}
 
@@ -161,12 +163,10 @@
 				continue;
 		}
 
-		$sql = "select distinct * from hosts where hostid=0";
-		foreach($hosts as $host)
-		{
-			$sql .= " or host=".zbx_dbstr($host);
-		}
-		return DBselect($sql);
+		if(count($hosts) == 0) $hosts = array('');
+
+		return DBselect('select distinct * from hosts where '.DBid2nodeid('hostid').'='.$ZBX_CURNODEID.
+			' and host in ('.implode(',',$hosts).')');
 	}
 
 	function	validate_expression($expression)
