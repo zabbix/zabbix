@@ -694,6 +694,8 @@ else
 // Does expression match server:key.function(param) ?
 	function	validate_simple_expression($expression)
 	{
+		global $ZBX_CURNODEID;
+
 //		echo "Validating simple:$expression<br>";
 // Before str()
 // 		if (eregi('^\{([0-9a-zA-Z[.-.]\_\.]+)\:([]\[0-9a-zA-Z\_\/\.\,]+)\.((diff)|(min)|(max)|(last)|(prev))\(([0-9\.]+)\)\}$', $expression, $arr)) 
@@ -712,12 +714,18 @@ else
 //SDI($parameter);
 
 			$sql="select count(*) as cnt from hosts h,items i where h.host=".zbx_dbstr($host).
-				" and i.key_=".zbx_dbstr($key)." and h.hostid=i.hostid";
+				" and i.key_=".zbx_dbstr($key)." and h.hostid=i.hostid ".
+				" and ".DBid2nodeid('h.hostid').'='.$ZBX_CURNODEID;
 //SDI($sql);
 			$row=DBfetch(DBselect($sql));
-			if($row["cnt"]!=1)
+			if($row["cnt"]==0)
 			{
 				error("No such host ($host) or monitored parameter ($key)");
+				return -1;
+			}
+			elseif($row["cnt"]!=1)
+			{
+				error("Too many hosts ($host) with parameter ($key)");
 				return -1;
 			}
 

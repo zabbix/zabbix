@@ -1198,6 +1198,8 @@
 		$dep_el=array();
 		$dependences = get_request("dependences",array());
 	
+		$limited = null;
+		
 		if(isset($_REQUEST["triggerid"]))
 		{
 			$frmTrig->AddVar("triggerid",$_REQUEST["triggerid"]);
@@ -1205,36 +1207,41 @@
 			$description	= htmlspecialchars(stripslashes($trigger["description"]));
 
 			$frmTrig->SetTitle(S_TRIGGER." \"".$description."\"");
+
+			$limited = $trigger['templateid'] ? 'yes' : null;
 		}
 
-		if(isset($_REQUEST["triggerid"]) && !isset($_REQUEST["form_refresh"]))
-		{
-			$expression	= explode_exp($trigger["expression"],0);
-			$priority	= $trigger["priority"];
-			$status		= $trigger["status"];
-			$comments	= $trigger["comments"];
-			$url		= $trigger["url"];
+		$expression	= get_request("expression"	,"");
+		$description	= get_request("description"	,"");
+		$priority	= get_request("priority"	,0);
+		$status		= get_request("status"		,0);
+		$comments	= get_request("comments"	,"");
+		$url		= get_request("url"		,"");
 
-			$trigs=DBselect("select t.triggerid,t.description from triggers t,trigger_depends d".
-				" where t.triggerid=d.triggerid_up and d.triggerid_down=".$_REQUEST["triggerid"]);
-			while($trig=DBfetch($trigs))
+		if((isset($_REQUEST["triggerid"]) && !isset($_REQUEST["form_refresh"]))  || isset($limited))
+		{
+			$description	= htmlspecialchars(stripslashes($trigger["description"]));
+			$expression	= explode_exp($trigger["expression"],0);
+
+			if(!isset($limited) || !isset($_REQUEST["form_refresh"]))
 			{
-				if(in_array($trig["triggerid"],$dependences))	continue;
-				array_push($dependences,$trig["triggerid"]);
+				$priority	= $trigger["priority"];
+				$status		= $trigger["status"];
+				$comments	= $trigger["comments"];
+				$url		= $trigger["url"];
+
+				$trigs=DBselect("select t.triggerid,t.description from triggers t,trigger_depends d".
+					" where t.triggerid=d.triggerid_up and d.triggerid_down=".$_REQUEST["triggerid"]);
+				while($trig=DBfetch($trigs))
+				{
+					if(in_array($trig["triggerid"],$dependences))	continue;
+					array_push($dependences,$trig["triggerid"]);
+				}
 			}
 		}
-		else
-		{
-			$expression	= get_request("expression"	,"");
-			$description	= get_request("description"	,"");
-			$priority	= get_request("priority"	,0);
-			$status		= get_request("status"		,0);
-			$comments	= get_request("comments"	,"");
-			$url		= get_request("url"		,"");
-		}
 
-		$frmTrig->AddRow(S_NAME, new CTextBox("description",$description,70));
-		$frmTrig->AddRow(S_EXPRESSION,new CTextBox("expression",$expression,70));
+		$frmTrig->AddRow(S_NAME, new CTextBox("description",$description,70, $limited));
+		$frmTrig->AddRow(S_EXPRESSION,new CTextBox("expression",$expression,70, $limited));
 
 	/* dependences */
 		foreach($dependences as $val){
