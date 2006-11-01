@@ -74,9 +74,9 @@ static void	add_trigger_info(DB_EVENT *event)
 
 	if(row)
 	{
-		strncpy(event->trigger_description, row[0], TRIGGER_DESCRIPTION_LEN_MAX);
+		zbx_strlcpy(event->trigger_description, row[0], TRIGGER_DESCRIPTION_LEN_MAX);
 		event->trigger_priority = atoi(row[1]);
-		strncpy(event->trigger_comments, row[2], TRIGGER_COMMENTS_LEN_MAX);
+		zbx_strlcpy(event->trigger_comments, row[2], TRIGGER_COMMENTS_LEN_MAX);
 	}
 
 	DBfree_result(result);

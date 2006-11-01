@@ -58,7 +58,7 @@ int	add_alias(const char *name, const char *value)
 			if (NULL != alias)
 			{
 				memset(alias,0,sizeof(ALIAS));
-				strncpy(alias->name, name, MAX_ALIAS_NAME-1);
+				zbx_strlcpy(alias->name, name, MAX_ALIAS_NAME-1);
 				alias->value = (char *)malloc(strlen(value)+1);
 				strcpy(alias->value,value);
 				alias->next=aliasList;
@@ -77,7 +77,7 @@ int	add_alias(const char *name, const char *value)
 
 			memset(alias, 0, sizeof(ALIAS));
 			
-			strncpy(alias->name, name, MAX_ALIAS_NAME-1);
+			zbx_strlcpy(alias->name, name, MAX_ALIAS_NAME-1);
 			
 			alias->value = (char *)malloc(strlen(value)+1);
 			strcpy(alias->value, value);
@@ -118,9 +118,9 @@ void	alias_expand(const char *orig, char *expanded, int exp_buf_len)
 	{
 		if (!strcmp(alias->name,orig))
 		{
-			strsncpy(expanded, alias->value, exp_buf_len);
+			zbx_strlcpy(expanded, alias->value, exp_buf_len);
 			return;
 		}
 	}
-	strsncpy(expanded, orig, exp_buf_len);
+	zbx_strlcpy(expanded, orig, exp_buf_len);
 }

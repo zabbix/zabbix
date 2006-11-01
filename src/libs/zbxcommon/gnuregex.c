@@ -4908,8 +4908,7 @@ regerror (errcode, preg, errbuf, errbuf_size)
     {
       if (msg_size > errbuf_size)
         {
-          strncpy (errbuf, msg, errbuf_size - 1);
-          errbuf[errbuf_size - 1] = 0;
+          zbx_strlcpy (errbuf, msg, errbuf_size - 1);
         }
       else
         strcpy (errbuf, msg);

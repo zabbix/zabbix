@@ -224,7 +224,7 @@ void zabbix_log(int level, const char *fmt, ...)
 				if(buf.st_size > MAX_LOG_FILE_LEN)
 				{
 					strscpy(filename_old,log_filename);
-					strncat(filename_old,".old",MAX_STRING_LEN);
+					zbx_strlcat(filename_old,".old",MAX_STRING_LEN);
 					remove(filename_old);
 					if(rename(log_filename,filename_old) != 0)
 					{

@@ -1240,7 +1240,7 @@ int	replace_value_by_map(char *value, zbx_uint64_t valuemapid)
 
 	del_zeroes(new_value);
 	or_value = sql;	/* sql variarbvle used as tmp - original value */
-	strncpy(sql,value,MAX_STRING_LEN);
+	zbx_strlcpy(sql,value,MAX_STRING_LEN);
 	
 	zbx_snprintf(value, MAX_STRING_LEN, "%s (%s)", new_value, or_value);
 

@@ -268,12 +268,12 @@ int parse_command( /* return value: 0 - error; 1 - command without parameters; 2
 	char localstr[MAX_STRING_LEN];
 	int ret = 2;
 
-	strncpy(localstr, command, MAX_STRING_LEN);
+	zbx_strlcpy(localstr, command, MAX_STRING_LEN);
 	
 	if(cmd)
-		strncpy(cmd, "", cmd_max_len);
+		zbx_strlcpy(cmd, "", cmd_max_len);
 	if(param)
-		strncpy(param, "", param_max_len);
+		zbx_strlcpy(param, "", param_max_len);
 	
 	pl = strstr(localstr, "[");
 	pr = strstr(localstr, "]");
@@ -290,10 +290,10 @@ int parse_command( /* return value: 0 - error; 1 - command without parameters; 2
 		pr[0] = 0;
 
 	if(cmd)
-		strncpy(cmd, localstr, cmd_max_len);
+		zbx_strlcpy(cmd, localstr, cmd_max_len);
 
 	if(pl && pr && param)
-		strncpy(param, &pl[1] , param_max_len);
+		zbx_strlcpy(param, &pl[1] , param_max_len);
 
 	if(!pl && !pr)
 		ret = 1;
@@ -388,13 +388,13 @@ int	replace_param(const char *cmd, const char *param, char *out, int outlen)
 	if(!cmd && !param)
 		return ret;
 	
-	strncpy(command, cmd, MAX_STRING_LEN);
+	zbx_strlcpy(command, cmd, MAX_STRING_LEN);
 			
 	pl = command;
 	while((pr = strchr(pl, '$')) && outlen > 0)
 	{
 		pr[0] = '\0';
-		strncat(out, pl, outlen);
+		zbx_strlcat(out, pl, outlen);
 		outlen -= MIN((int)strlen(pl), (int)outlen);
 		pr[0] = '$';
 		
@@ -404,14 +404,14 @@ int	replace_param(const char *cmd, const char *param, char *out, int outlen)
 
 			if(pr[1] == '0')
 			{
-				strncpy(buf, command, MAX_STRING_LEN);
+				zbx_strlcpy(buf, command, MAX_STRING_LEN);
 			}
 			else
 			{
 				get_param(param, (int)(pr[1] - '0'), buf, MAX_STRING_LEN);
 			}
 			
-			strncat(out, buf, outlen);
+			zbx_strlcat(out, buf, outlen);
 			outlen -= MIN((int)strlen(buf), (int)outlen);
 					
 			pl = pr + 2;
@@ -422,10 +422,10 @@ int	replace_param(const char *cmd, const char *param, char *out, int outlen)
 		}
 		
 		pl = pr + 1;
-		strncat(out, "$", outlen);
+		zbx_strlcat(out, "$", outlen);
 		outlen -= 1;
 	}
-	strncat(out, pl, outlen);
+	zbx_strlcat(out, pl, outlen);
 	outlen -= MIN((int)strlen(pl), (int)outlen);
 	
 	return ret;
@@ -485,7 +485,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 		{
 			if((flags & PROCESS_TEST) && (flags & PROCESS_USE_TEST_PARAM) && commands[i].test_param)
 			{
-				strncpy(usr_param, commands[i].test_param, MAX_STRING_LEN);
+				zbx_strlcpy(usr_param, commands[i].test_param, MAX_STRING_LEN);
 			}
 		} 
 		else
@@ -897,7 +897,7 @@ int	TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
         }	
 	
 	strscpy(pattern,porthex);
-	strncat(pattern," 00000000:0000 0A", MAX_STRING_LEN);
+	zbx_strlcat(pattern," 00000000:0000 0A", MAX_STRING_LEN);
 
 	if(NULL == (f = fopen("/proc/net/tcp","r")))
 	{
@@ -1014,8 +1014,8 @@ int	PROCCOUNT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	while((entries=readdir(dir))!=NULL)
 	{
 		strscpy(filename,"/proc/");	
-		strncat(filename,entries->d_name,MAX_STRING_LEN);
-		strncat(filename,"/psinfo",MAX_STRING_LEN);
+		zbx_strlcat(filename,entries->d_name,MAX_STRING_LEN);
+		zbx_strlcat(filename,"/psinfo",MAX_STRING_LEN);
 
 		if(stat(filename,&buf)==0)
 		{
@@ -1069,8 +1069,8 @@ int	PROCCOUNT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	while((entries=readdir(dir))!=NULL)
 	{
 		strscpy(filename,"/proc/");	
-		strncat(filename,entries->d_name,MAX_STRING_LEN);
-		strncat(filename,"/status",MAX_STRING_LEN);
+		zbx_strlcat(filename,entries->d_name,MAX_STRING_LEN);
+		zbx_strlcat(filename,"/status",MAX_STRING_LEN);
 
 		if(stat(filename,&buf)==0)
 		{
@@ -1225,7 +1225,7 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	cmd_result[len] = '\0';
 
 #else /* not _WINDOWS */
-	strsncpy(command, param, sizeof(command));
+	zbx_strlcpy(command, param, sizeof(command));
 
 	if(0 == (f = popen(command,"r")))
 	{

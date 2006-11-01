@@ -263,8 +263,7 @@ int	WEB_PAGE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		found = zbx_regexp_match(buffer,regexp,&l);
 		if(NULL != found)
 		{
-			strncpy(back,found, l);
-			back[l] = '\0';
+			zbx_strlcpy(back,found, l);
 			SET_STR_RESULT(result, strdup(back));
 		}
 		else	

@@ -26,6 +26,8 @@
 
 #define snprintf	ERROR_DO_NOT_USE_SNPRINTF_FUNCTION_TRY_TO_USE_ZBX_SNPRINTF
 #define sprintf		ERROR_DO_NOT_USE_SPRINTF_FUNCTION_TRY_TO_USE_ZBX_SNPRINTF
+#define strncpy		ERROR_DO_NOT_USE_STRNCPY_FUNCTION_TRY_TO_USE_ZBX_STRLCPY
+#define strncat		ERROR_DO_NOT_USE_STRNCAT_FUNCTION_TRY_TO_USE_ZBX_STRLCAT
 
 #define ON	1
 #define OFF	0
@@ -259,8 +261,7 @@
 #endif
 				    
 /* Secure string copy */
-#define strsncpy(x,y,size) { strncpy(x,y,size); x[size-1]='\0'; }
-#define strscpy(x,y) strsncpy(x,y,sizeof(x))
+#define strscpy(x,y) zbx_strlcpy(x,y,sizeof(x))
 
 #define zbx_free(ptr) { if(ptr){ free(ptr); ptr = NULL; } }
 #define zbx_fclose(f) { if(f){ fclose(f); f = NULL; } }
@@ -427,6 +428,8 @@ void	zbx_error(const char *fmt, ...);
 int	zbx_snprintf(char* str, size_t count, const char *fmt, ...);
 
 int	set_result_type(AGENT_RESULT *result, int value_type, char *c);
+size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);
+size_t	zbx_strlcat(char *dst, const char *src, size_t siz);
 
 int	replace_param(const char *cmd, const char *param, char *out, int outlen);
 
