@@ -72,7 +72,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 	{
 		zbx_snprintf(error,sizeof(error),"Error in get_value_SNMP. Wrong item type [%d]. Must be SNMP.", item->type);
 
-		zabbix_log( LOG_LEVEL_ERR, error);
+		zabbix_log( LOG_LEVEL_ERR, "%s", error);
 		SET_MSG_RESULT(value, strdup(error));
 
 		return FAIL;
@@ -137,7 +137,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 			{
 				zbx_snprintf(error,sizeof(error),"Error generating Ku from authentication pass phrase.");
 
-				zabbix_log( LOG_LEVEL_ERR, error);
+				zabbix_log( LOG_LEVEL_ERR, "%s", error);
 				SET_MSG_RESULT(value, strdup(error));
 
 				return FAIL;
@@ -160,7 +160,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 			{
 				zbx_snprintf(error,sizeof(error),"Error generating Ku from authentication pass phrase.");
 
-				zabbix_log( LOG_LEVEL_ERR, error);
+				zabbix_log( LOG_LEVEL_ERR, "%s", error);
 				SET_MSG_RESULT(value, strdup(error));
 
 				return FAIL;
@@ -179,7 +179,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 			{
 				zbx_snprintf(error,sizeof(error),"Error generating Ku from priv pass phrase.");
 
-				zabbix_log( LOG_LEVEL_ERR, error);
+				zabbix_log( LOG_LEVEL_ERR, "%s", error);
 				SET_MSG_RESULT(value, strdup(error));
 
 				return FAIL;
@@ -190,7 +190,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 	else
 	{
 		zbx_snprintf(error,sizeof(error),"Error in get_value_SNMP. Unsupported session.version [%d]",(int)session.version);
-		zabbix_log( LOG_LEVEL_ERR, error);
+		zabbix_log( LOG_LEVEL_ERR, "%s", error);
 		SET_MSG_RESULT(value, strdup(error));
 		
 		return FAIL;
@@ -206,7 +206,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 		SOCK_CLEANUP;
 
 		zbx_snprintf(error,sizeof(error),"Error doing snmp_open()");
-		zabbix_log( LOG_LEVEL_ERR, error);
+		zabbix_log( LOG_LEVEL_ERR, "%s", error);
 		SET_MSG_RESULT(value, strdup(error));
 
 		return FAIL;
@@ -322,14 +322,14 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 					else
 					{
 						zbx_snprintf(error,sizeof(error),"Cannot allocate required memory");
-						zabbix_log( LOG_LEVEL_ERR, error);
+						zabbix_log( LOG_LEVEL_ERR, "%s", error);
 						SET_MSG_RESULT(value, strdup(error));
 					}
 				}
 				else if(item->value_type != ITEM_VALUE_TYPE_STR)
 				{
 					zbx_snprintf(error,sizeof(error),"Cannot store SNMP string value (ASN_OCTET_STR) in item having numeric type");
-					zabbix_log( LOG_LEVEL_ERR, error);
+					zabbix_log( LOG_LEVEL_ERR, "%s", error);
 					SET_MSG_RESULT(value, strdup(error));
 
 					ret = NOTSUPPORTED;
@@ -347,7 +347,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 					else
 					{
 						zbx_snprintf(error,sizeof(error),"Cannot allocate required memory");
-						zabbix_log( LOG_LEVEL_ERR, error);
+						zabbix_log( LOG_LEVEL_ERR, "%s", error);
 						SET_MSG_RESULT(value, strdup(error));
 					}
 				}
@@ -363,7 +363,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 				if(item->value_type != ITEM_VALUE_TYPE_STR)
 				{
 					zbx_snprintf(error,sizeof(error),"Cannot store SNMP string value (ASN_IPADDRESS) in item having numeric type");
-					zabbix_log( LOG_LEVEL_ERR, error);
+					zabbix_log( LOG_LEVEL_ERR, "%s", error);
 					SET_MSG_RESULT(value, strdup(error));
 					ret = NOTSUPPORTED;
 				}
@@ -403,7 +403,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 
 				zbx_snprintf(error,sizeof(error),"OID [%s] value #%d has unknow type [%X]",item->snmp_oid, count,vars->type);
 
-				zabbix_log( LOG_LEVEL_ERR, error);
+				zabbix_log( LOG_LEVEL_ERR, "%s", error);
 				SET_MSG_RESULT(value, strdup(error));
 
 				ret  = NOTSUPPORTED;
@@ -420,7 +420,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 			{
 				zbx_snprintf(error,sizeof(error),"SNMP error [%s]", snmp_errstring(response->errstat));
 
-				zabbix_log( LOG_LEVEL_ERR, error);
+				zabbix_log( LOG_LEVEL_ERR, "%s", error);
 				SET_MSG_RESULT(value, strdup(error));
 
 				ret=NOTSUPPORTED;
@@ -429,7 +429,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 			{
 				zbx_snprintf(error,sizeof(error),"SNMP error [%s]", snmp_errstring(response->errstat));
 
-				zabbix_log( LOG_LEVEL_ERR, error);
+				zabbix_log( LOG_LEVEL_ERR, "%s", error);
 				SET_MSG_RESULT(value, strdup(error));
 
 				ret=FAIL;
@@ -440,7 +440,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 			zbx_snprintf(error,sizeof(error),"Timeout while connecting to [%s]",session.peername);
 
 /*			snmp_sess_perror("snmpget", ss);*/
-			zabbix_log( LOG_LEVEL_ERR, error);
+			zabbix_log( LOG_LEVEL_ERR, "%s", error);
 			SET_MSG_RESULT(value, strdup(error));
 
 			ret = NETWORK_ERROR;
@@ -449,7 +449,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 		{
 			zbx_snprintf(error,sizeof(error),"SNMP error [%d]",status);
 
-			zabbix_log( LOG_LEVEL_ERR, error);
+			zabbix_log( LOG_LEVEL_ERR, "%s", error);
 			SET_MSG_RESULT(value, strdup(error));
 
 			ret=FAIL;
