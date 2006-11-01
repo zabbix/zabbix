@@ -927,7 +927,7 @@ else
 		}
 
 // history & trends
-		if ($DB_TYPE == "MYSQL")
+/*		if ($DB_TYPE == "MYSQL")
 		{
 			$row=DBfetch(DBselect("show table status like 'history'"));
 			$status["history_count"]  = $row["Rows"];
@@ -955,7 +955,7 @@ else
 			$result=DBselect("select count(itemid) as cnt from trends");
 			$row=DBfetch($result);
 			$status["trends_count"]=$row["cnt"];
-		}
+		}*/
 // events
 		$row=DBfetch(DBselect("select count(eventid) as cnt from events"));
 		$status["events_count"]=$row["cnt"];
