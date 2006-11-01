@@ -279,7 +279,7 @@ void zabbix_log(int level, const char *fmt, ...)
 
 #else /* not _WINDOWS */
 
-		syslog(LOG_DEBUG,message);
+		syslog(LOG_DEBUG, "%s", message);
 		
 #endif /* _WINDOWS */
 	}

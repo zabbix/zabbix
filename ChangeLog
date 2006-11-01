@@ -14,6 +14,7 @@ Changes for 1.3:
 
 Integrated from 1.1.x
 
+ - fixed possible security issues raised by debian security audit (Alexei)
  - changed all zabbix_log(lev, str) to zabbix_log(lev,"%s", str) (Alexei)
  - introduced secure strcat and strcpy: zbx_strlcat, zbx_strlcpy (Alexei)
  - better format for Queue report (Alexei)
