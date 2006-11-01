@@ -45,7 +45,7 @@ include_once "include/page_header.php";
 	$form = new CForm();
 	$cmbMode = new CComboBox("show", $_REQUEST["show"], "submit();");
 	$cmbMode->AddItem(0, S_OVERVIEW);
-	$cmbMode->AddItem(1,S_DETAILS);
+	$cmbMode->AddItem(1, S_DETAILS);
 	$form->AddItem($cmbMode);
 
 	show_table_header(S_QUEUE_OF_ITEMS_TO_BE_UPDATED_BIG, $form);
@@ -67,25 +67,50 @@ include_once "include/page_header.php";
 
 	if($_REQUEST["show"]==0)
 	{
-		$sec_5 = $sec_10 = $sec_30 = $sec_60 = $sec_300 = $sec_rest = 0;
+		for($i=ITEM_TYPE_ZABBIX;$i<=ITEM_TYPE_AGGREGATE;$i++)
+		{
+			$sec_5[$i]=0;
+			$sec_10[$i]=0;
+			$sec_30[$i]=0;
+			$sec_60[$i]=0;
+			$sec_300[$i]=0;
+			$sec_rest[$i]=0;
+		}
 
 		while($row=DBfetch($result))
 		{
-			if($now-$row["nextcheck"]<=5)		$sec_5++;
-			elseif($now-$row["nextcheck"]<=10)	$sec_10++;
-			elseif($now-$row["nextcheck"]<=30)	$sec_30++;
-			elseif($now-$row["nextcheck"]<=60)	$sec_60++;
-			elseif($now-$row["nextcheck"]<=300)	$sec_300++;
-			else					$sec_rest++;
+			if(!check_right("Host","R",$row["hostid"]))
+			{
+				continue;
+			}
+			if($now-$row["nextcheck"]<=5)		$sec_5[$row["type"]]++;
+			elseif($now-$row["nextcheck"]<=10)	$sec_10[$row["type"]]++;
+			elseif($now-$row["nextcheck"]<=30)	$sec_30[$row["type"]]++;
+			elseif($now-$row["nextcheck"]<=60)	$sec_60[$row["type"]]++;
+			elseif($now-$row["nextcheck"]<=300)	$sec_300[$row["type"]]++;
+			else					$sec_rest[$row["type"]]++;
 
 		}
-		$table->SetHeader(array(S_DELAY,		S_COUNT));
-		$table->AddRow(array(S_5_SECONDS,		$sec_5));
-		$table->AddRow(array(S_10_SECONDS,		$sec_10));
-		$table->AddRow(array(S_30_SECONDS,		$sec_30));
-		$table->AddRow(array(S_1_MINUTE,		$sec_60));
-		$table->AddRow(array(S_5_MINUTES,		$sec_300));
-		$table->AddRow(array(S_MORE_THAN_5_MINUTES,	$sec_rest));
+		$table->setHeader(array(S_ITEMS,S_5_SECONDS,S_10_SECONDS,S_30_SECONDS,S_1_MINUTE,S_5_MINUTES,S_MORE_THAN_5_MINUTES));
+		$a=array(
+			S_ZABBIX_AGENT => ITEM_TYPE_ZABBIX,
+			S_ZABBIX_AGENT_ACTIVE => ITEM_TYPE_ZABBIX_ACTIVE,
+			S_SNMPV1_AGENT => ITEM_TYPE_SNMPV1,
+			S_SNMPV2_AGENT => ITEM_TYPE_SNMPV2C,
+			S_SNMPV3_AGENT => ITEM_TYPE_SNMPV3,
+			S_SIMPLE_CHECK => ITEM_TYPE_SIMPLE,
+			S_ZABBIX_INTERNAL => ITEM_TYPE_INTERNAL,
+			S_ZABBIX_AGGREGATE => ITEM_TYPE_AGGREGATE
+		);
+		foreach($a as $name => $type)
+		{
+			$elements=array($name,$sec_5[$type],$sec_10[$type],
+				new CCol($sec_30[$type],"warning"),
+				new CCol($sec_60[$type],"average"),
+				new CCol($sec_300[$type],"high"),
+				new CCol($sec_rest[$type],"disaster"));
+			$table->addRow($elements);
+		}
 	}
 	else
 	{
