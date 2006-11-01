@@ -127,7 +127,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	while((entries=readdir(dir))!=NULL)
 	{
 		strscpy(filename,"/proc/");	
-		strncat(filename,entries->d_name,MAX_STRING_LEN);
+		zbx_strlcat(filename,entries->d_name,MAX_STRING_LEN);
 
 		if(stat(filename,&buf)==0)
 		{
@@ -299,7 +299,7 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	while((entries=readdir(dir))!=NULL)
 	{
 		strscpy(filename,"/proc/");	
-		strncat(filename,entries->d_name,MAX_STRING_LEN);
+		zbx_strlcat(filename,entries->d_name,MAX_STRING_LEN);
 
 		if(stat(filename,&buf)==0)
 		{

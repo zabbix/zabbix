@@ -91,8 +91,8 @@ int	get_device_name(char *device,int mjr,int diskno)
 	dir=opendir("/dev");
 	while((entries=readdir(dir))!=NULL)
 	{
-		strncpy(filename,"/dev/",1024);	
-		strncat(filename,entries->d_name,1024);
+		zbx_strlcpy(filename,"/dev/",1024);	
+		zbx_strlcat(filename,entries->d_name,1024);
 
 		if(stat(filename,&buf)==0)
 		{
@@ -161,8 +161,7 @@ void	init_stats_diskdevices()
 				break;
 			s2++;
 	
-			strncpy(device,s,s2-s);
-			device[s2-s]=0;
+			zbx_strlcpy(device,s,s2-s);
 			sscanf(device,"(%d,%d):(%d,%d,%d,%d,%d)",&major,&diskno,&noinfo,&read_io_ops,&blks_read,&write_io_ops,&blks_write);
 /*			printf("Major:[%d] Minor:[%d] read_io_ops[%d]\n",major,diskno,read_io_ops);*/
 	
@@ -505,8 +504,7 @@ void	collect_stats_diskdevices(FILE *outfile)
 				break;
 			s2++;
 	
-			strncpy(device,s,s2-s);
-			device[s2-s]=0;
+			zbx_strlcpy(device,s,s2-s);
 			sscanf(device,"(%d,%d):(%d,%d,%d,%d,%d)",&major,&diskno,&noinfo,&read_io_ops,&blks_read,&write_io_ops,&blks_write);
 /*			printf("Major:[%d] Minor:[%d] read_io_ops[%d]\n",major,diskno,read_io_ops);*/
 			add_values_diskdevices(now,major,diskno,read_io_ops,blks_read,write_io_ops,blks_write);

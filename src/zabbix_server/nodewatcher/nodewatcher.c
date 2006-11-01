@@ -119,9 +119,9 @@ static int calculate_checksums()
 					j++;
 					continue;
 				}
-				strncat(fields,"quote(",sizeof(fields));
-				strncat(fields,tables[i].fields[j].name,sizeof(fields));
-				strncat(fields,"),",sizeof(fields));
+				zbx_strlcat(fields,"quote(",sizeof(fields));
+				zbx_strlcat(fields,tables[i].fields[j].name,sizeof(fields));
+				zbx_strlcat(fields,"),",sizeof(fields));
 				j++;
 			}
 			if(fields[0]!=0)	fields[strlen(fields)-1] = 0;
@@ -132,7 +132,7 @@ static int calculate_checksums()
 					tables[i].recid, (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid,
 					tables[i].recid, (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid+99999999999999);
 //		zabbix_log( LOG_LEVEL_WARNING, "TMP [%s]", tmp);
-			strncat(sql,tmp,sizeof(sql));
+			zbx_strlcat(sql,tmp,sizeof(sql));
 		}
 //		zabbix_log( LOG_LEVEL_WARNING, "SQL [%s]", sql);
 

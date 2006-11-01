@@ -98,7 +98,7 @@ int send_to_node(int dest_nodeid, int nodeid, char *data)
 		zabbix_log( LOG_LEVEL_WARNING, "Node [%d] in unknown", dest_nodeid);
 		return FAIL;
 	}
-	strncpy(ip,row[0],sizeof(ip));
+	zbx_strlcpy(ip,row[0],sizeof(ip));
 	port=atoi(row[1]);
 	DBfree_result(result);
 
