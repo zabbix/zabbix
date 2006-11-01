@@ -14,6 +14,7 @@ Changes for 1.3:
 
 Integrated from 1.1.x
 
+ - changed all zabbix_log(lev, str) to zabbix_log(lev,"%s", str) (Alexei)
  - introduced secure strcat and strcpy: zbx_strlcat, zbx_strlcpy (Alexei)
  - better format for Queue report (Alexei)
  - history stats removed from Status of ZABBIX report (Alexei)
