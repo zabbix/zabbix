@@ -42,8 +42,8 @@ include_once "include/page_header.php";
 	$status=get_status();
 
 	$table->AddRow(array(S_ZABBIX_SERVER_IS_RUNNING,new CSpan($status["zabbix_server"], ($status["zabbix_server"] == S_YES ? "off" : "on"))));
-	$table->AddRow(array(S_VALUES_STORED,$status["history_count"]));
-	$table->AddRow(array(S_TRENDS_STORED,$status["trends_count"]));
+//	$table->AddRow(array(S_VALUES_STORED,$status["history_count"]));
+//	$table->AddRow(array(S_TRENDS_STORED,$status["trends_count"]));
 	$table->AddRow(array(S_NUMBER_OF_HOSTS,array($status["hosts_count"]."(",
 		new CSpan($status["hosts_count_monitored"],"off"),"/",
 		new CSpan($status["hosts_count_not_monitored"],"on"),"/",
