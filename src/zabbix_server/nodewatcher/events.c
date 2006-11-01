@@ -92,7 +92,7 @@ static int process_node(int nodeid, int master_nodeid, zbx_uint64_t event_lastid
 	memset(data,0,DATA_MAX);
 
 	zbx_snprintf(tmp,sizeof(tmp),"Events|%d|%d\n", CONFIG_NODEID, nodeid);
-	strncat(data,tmp,DATA_MAX);
+	zbx_strlcat(data,tmp,DATA_MAX);
 
 	result = DBselect("select eventid,triggerid,clock,value,acknowledged from events where eventid>" ZBX_FS_UI64 " and " ZBX_COND_NODEID " order by eventid", event_lastid, ZBX_NODE("eventid", nodeid));
 	while((row=DBfetch(result)))
@@ -101,7 +101,7 @@ static int process_node(int nodeid, int master_nodeid, zbx_uint64_t event_lastid
 //		zabbix_log( LOG_LEVEL_WARNING, "Processing eventid " ZBX_FS_UI64, eventid);
 		found = 1;
 		zbx_snprintf(tmp,sizeof(tmp),"%s|%s|%s|%s|%s\n", row[0],row[1],row[2],row[3],row[4]);
-		strncat(data,tmp,DATA_MAX);
+		zbx_strlcat(data,tmp,DATA_MAX);
 	}
 	if(found == 1)
 	{

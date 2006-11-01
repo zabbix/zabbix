@@ -139,8 +139,8 @@ int	PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	comm_ok = 0;
         
         strscpy(filename,"/proc/");	
-        strncat(filename,entries->d_name,MAX_STRING_LEN);
-        strncat(filename,"/psinfo",MAX_STRING_LEN);
+        zbx_strlcat(filename,entries->d_name,MAX_STRING_LEN);
+        zbx_strlcat(filename,"/psinfo",MAX_STRING_LEN);
 
         if(stat(filename,&buf)==0)
         {
@@ -359,8 +359,8 @@ int	PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *r
 	    comm_ok = 0;
             
             strscpy(filename,"/proc/");	
-            strncat(filename,entries->d_name,MAX_STRING_LEN);
-            strncat(filename,"/psinfo",MAX_STRING_LEN);
+            zbx_strlcat(filename,entries->d_name,MAX_STRING_LEN);
+            zbx_strlcat(filename,"/psinfo",MAX_STRING_LEN);
     
             if(stat(filename,&buf)==0)
             {

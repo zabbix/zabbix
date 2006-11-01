@@ -602,7 +602,7 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 	while((pr = strchr(pl, '{')) && outlen > 0)
 	{
 		pr[0] = '\0';
-		strncat(str_out, pl, outlen);
+		zbx_strlcat(str_out, pl, outlen);
 		outlen -= MIN(strlen(pl), outlen);
 		pr[0] = '{';
 
@@ -794,11 +794,11 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 			else					zbx_snprintf(replace_to, sizeof(replace_to), "Unknown");
 		}
 
-		strncat(str_out, replace_to, outlen);
+		zbx_strlcat(str_out, replace_to, outlen);
 		outlen -= MIN(strlen(replace_to), outlen);
 		pl = pr + var_len;
 	}
-	strncat(str_out, pl, outlen);
+	zbx_strlcat(str_out, pl, outlen);
 	outlen -= MIN(strlen(pl), outlen);
 
 	zbx_snprintf(data, dala_max_len, "%s", str_out);
@@ -864,7 +864,7 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, char *data, int dala_
 
 		/* copy left side */
 		pr[0] = '\0';
-		strncat(str_out, pl, outlen);
+		zbx_strlcat(str_out, pl, outlen);
 		outlen -= MIN(strlen(pl), outlen);
 		pr[0] = '{';
 
@@ -910,11 +910,11 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, char *data, int dala_
 		}
 		pme[0] = '}';
 
-		strncat(str_out, replace_to, outlen);
+		zbx_strlcat(str_out, replace_to, outlen);
 		outlen -= MIN(strlen(replace_to), outlen);
 		pl = pr + var_len;
 	}
-	strncat(str_out, pl, outlen);
+	zbx_strlcat(str_out, pl, outlen);
 	outlen -= MIN(strlen(pl), outlen);
 
 	zbx_snprintf(data, dala_max_len, "%s", str_out);

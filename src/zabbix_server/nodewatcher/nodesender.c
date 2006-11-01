@@ -105,7 +105,7 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 
 //	snprintf(tmp,sizeof(tmp),"<Data type='config'>\n<Node id='%d'>\n</Node>\n<Version>1.4</Version>\n<Records>\n", nodeid);
 	zbx_snprintf(tmp,sizeof(tmp),"Data|%d|%d\n", CONFIG_NODEID, nodeid);
-	strncat(xml,tmp,ZBX_XML_MAX);
+	zbx_strlcat(xml,tmp,ZBX_XML_MAX);
 
 	while((row=DBfetch(result)))
 	{
@@ -128,8 +128,8 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 					continue;
 				}*/
 
-				strncat(fields,tables[i].fields[j].name,sizeof(fields));
-				strncat(fields,",",sizeof(fields));
+				zbx_strlcat(fields,tables[i].fields[j].name,sizeof(fields));
+				zbx_strlcat(fields,",",sizeof(fields));
 			}
 			if(fields[0]!=0)	fields[strlen(fields)-1]=0;
 
@@ -142,7 +142,7 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 				zbx_snprintf(tmp,sizeof(tmp),"%s|%s|%s",
 					row[0], row[1], row[2]);
 //					zabbix_log( LOG_LEVEL_WARNING, "TMP [%s]",tmp);
-				strncat(xml,tmp,ZBX_XML_MAX);
+				zbx_strlcat(xml,tmp,ZBX_XML_MAX);
 				/* for each field */
 				for(j=0;tables[i].fields[j].name!=0;j++)
 				{
@@ -170,9 +170,9 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 //						}
 					}
 //					zabbix_log( LOG_LEVEL_WARNING, "TMP [%s]",tmp);
-					strncat(xml,tmp,ZBX_XML_MAX);
+					zbx_strlcat(xml,tmp,ZBX_XML_MAX);
 				}
-				strncat(xml,"\n",ZBX_XML_MAX);
+				zbx_strlcat(xml,"\n",ZBX_XML_MAX);
 			}
 			else
 			{

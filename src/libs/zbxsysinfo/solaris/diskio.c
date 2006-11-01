@@ -94,7 +94,7 @@ static DISK_DATA *get_disk_data_record(const char *device)
 
       if (p)
 	{
-	  strncpy(p->name, device, MAX_STRING_LEN);
+	  zbx_strlcpy(p->name, device, MAX_STRING_LEN);
 
           if (p->name)
             {

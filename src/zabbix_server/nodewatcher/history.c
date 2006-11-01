@@ -91,7 +91,7 @@ static int process_node_history_str(int nodeid, int master_nodeid)
 	memset(data,0,DATA_MAX);
 
 	zbx_snprintf(tmp,sizeof(tmp),"History|%d|%d\n", CONFIG_NODEID, nodeid);
-	strncat(data,tmp,DATA_MAX);
+	zbx_strlcat(data,tmp,DATA_MAX);
 
 	zbx_snprintf(sql,sizeof(sql),"select id,itemid,clock,value from history_str_sync where nodeid=%d order by id", nodeid);
 
@@ -103,7 +103,7 @@ static int process_node_history_str(int nodeid, int master_nodeid)
 //		zabbix_log( LOG_LEVEL_WARNING, "Processing itemid " ZBX_FS_UI64, itemid);
 		found = 1;
 		zbx_snprintf(tmp,sizeof(tmp),"%d|%s|%s|%s\n", ZBX_TABLE_HISTORY_STR,row[1],row[2],row[3]);
-		strncat(data,tmp,DATA_MAX);
+		zbx_strlcat(data,tmp,DATA_MAX);
 	}
 	if(found == 1)
 	{
@@ -162,7 +162,7 @@ static int process_node_history_uint(int nodeid, int master_nodeid)
 	memset(data,0,DATA_MAX);
 
 	zbx_snprintf(tmp,sizeof(tmp),"History|%d|%d\n", CONFIG_NODEID, nodeid);
-	strncat(data,tmp,DATA_MAX);
+	zbx_strlcat(data,tmp,DATA_MAX);
 
 	zbx_snprintf(sql,sizeof(sql),"select id,itemid,clock,value from history_uint_sync where nodeid=%d order by id", nodeid);
 
@@ -174,7 +174,7 @@ static int process_node_history_uint(int nodeid, int master_nodeid)
 //		zabbix_log( LOG_LEVEL_WARNING, "Processing itemid " ZBX_FS_UI64, itemid);
 		found = 1;
 		zbx_snprintf(tmp,sizeof(tmp),"%d|%s|%s|%s\n", ZBX_TABLE_HISTORY_UINT,row[1],row[2],row[3]);
-		strncat(data,tmp,DATA_MAX);
+		zbx_strlcat(data,tmp,DATA_MAX);
 	}
 	if(found == 1)
 	{
@@ -233,7 +233,7 @@ static int process_node_history(int nodeid, int master_nodeid)
 	memset(data,0,DATA_MAX);
 
 	zbx_snprintf(tmp,sizeof(tmp),"History|%d|%d\n", CONFIG_NODEID, nodeid);
-	strncat(data,tmp,DATA_MAX);
+	zbx_strlcat(data,tmp,DATA_MAX);
 
 	zbx_snprintf(sql,sizeof(sql),"select id,itemid,clock,value from history_sync where nodeid=%d order by id", nodeid);
 
@@ -245,7 +245,7 @@ static int process_node_history(int nodeid, int master_nodeid)
 //		zabbix_log( LOG_LEVEL_WARNING, "Processing itemid " ZBX_FS_UI64, itemid);
 		found = 1;
 		zbx_snprintf(tmp,sizeof(tmp),"%d|%s|%s|%s\n", ZBX_TABLE_HISTORY,row[1],row[2],row[3]);
-		strncat(data,tmp,DATA_MAX);
+		zbx_strlcat(data,tmp,DATA_MAX);
 	}
 	if(found == 1)
 	{

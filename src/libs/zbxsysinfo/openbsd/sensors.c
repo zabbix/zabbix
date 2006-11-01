@@ -48,8 +48,8 @@ static int	get_sensor(const char *name, unsigned flags, AGENT_RESULT *result)
 	while((entries=readdir(dir))!=NULL)
 	{
 		strscpy(filename,"/proc/sys/dev/sensors/");	
-		strncat(filename,entries->d_name,MAX_STRING_LEN);
-		strncat(filename,name,MAX_STRING_LEN);
+		zbx_strlcat(filename,entries->d_name,MAX_STRING_LEN);
+		zbx_strlcat(filename,name,MAX_STRING_LEN);
 
 		if(stat(filename,&buf)==0)
 		{

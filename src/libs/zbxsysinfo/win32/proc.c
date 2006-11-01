@@ -60,8 +60,7 @@ static int GetProcessUsername(HANDLE hProcess, char *userName, int userNameLen) 
 
 	nlen = min(userNameLen-1,(int)nlen);
 
-	strncpy(userName, name, nlen);
-	userName[nlen] = 0;
+	zbx_strlcpy(userName, name, nlen);
 
 	return 1;
 

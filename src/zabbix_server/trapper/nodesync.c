@@ -124,7 +124,7 @@ static int	process_record(int nodeid, char *record)
 			if(strcmp(value,"NULL")==0)
 			{
 				zbx_snprintf(tmp,sizeof(tmp),"%s=NULL,", fieldname);
-				strncat(fields_update,tmp,sizeof(fields));
+				zbx_strlcat(fields_update,tmp,sizeof(fields));
 
 				zbx_snprintf(tmp,sizeof(tmp),"NULL,", value);
 			}
@@ -133,7 +133,7 @@ static int	process_record(int nodeid, char *record)
 				if(valuetype == ZBX_TYPE_INT || valuetype == ZBX_TYPE_UINT)
 				{
 					zbx_snprintf(tmp,sizeof(tmp),"%s=%s,", fieldname, value);
-					strncat(fields_update,tmp,sizeof(fields));
+					zbx_strlcat(fields_update,tmp,sizeof(fields));
 
 					zbx_snprintf(tmp,sizeof(tmp),"%s,", value);
 				}
@@ -142,16 +142,16 @@ static int	process_record(int nodeid, char *record)
 					DBescape_string(value, value_esc,MAX_STRING_LEN);
 
 					zbx_snprintf(tmp,sizeof(tmp),"%s='%s',", fieldname, value_esc);
-					strncat(fields_update,tmp,sizeof(fields));
+					zbx_strlcat(fields_update,tmp,sizeof(fields));
 	
 					zbx_snprintf(tmp,sizeof(tmp),"'%s',", value_esc);
 				}
 			}
 
-			strncat(values,tmp,sizeof(values));
+			zbx_strlcat(values,tmp,sizeof(values));
 //			zabbix_log( LOG_LEVEL_WARNING, "VALUES [%s]", values);
 			zbx_snprintf(tmp,sizeof(tmp),"%s,", fieldname);
-			strncat(fields,tmp,sizeof(fields));
+			zbx_strlcat(fields,tmp,sizeof(fields));
 //			zabbix_log( LOG_LEVEL_WARNING, "FIELDS [%s]", fields);
 		}
 		else
