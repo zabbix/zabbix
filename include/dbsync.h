@@ -125,8 +125,8 @@ static	ZBX_TABLE	tables[]={
 		{"sysmapid",	ZBX_TYPE_INT,	ZBX_SYNC},
 		{"elementid",	ZBX_TYPE_INT,	ZBX_SYNC},
 		{"elementtype",	ZBX_TYPE_INT,	ZBX_SYNC},
-		{"icon",	ZBX_TYPE_CHAR,	ZBX_SYNC},
-		{"icon_on",	ZBX_TYPE_CHAR,	ZBX_SYNC},
+		{"iconid_off",	ZBX_TYPE_INT,	ZBX_SYNC},
+		{"iconid_on",	ZBX_TYPE_INT,	ZBX_SYNC},
 		{"label",	ZBX_TYPE_CHAR,	ZBX_SYNC},
 		{"label_location",ZBX_TYPE_INT,	ZBX_SYNC},
 		{"x",		ZBX_TYPE_INT,	ZBX_SYNC},
@@ -141,7 +141,7 @@ static	ZBX_TABLE	tables[]={
 		{"name",	ZBX_TYPE_CHAR,	ZBX_SYNC},
 		{"width",	ZBX_TYPE_INT,	ZBX_SYNC},
 		{"height",	ZBX_TYPE_INT,	ZBX_SYNC},
-		{"background",	ZBX_TYPE_CHAR,	ZBX_SYNC},
+		{"backgroundid",ZBX_TYPE_INT,	ZBX_SYNC},
 		{"label_type",	ZBX_TYPE_INT,	ZBX_SYNC},
 		{"label_location",ZBX_TYPE_INT,	ZBX_SYNC},
 		{0}
@@ -276,7 +276,6 @@ static	ZBX_TABLE	tables[]={
 		{"error",		ZBX_TYPE_CHAR,	ZBX_SYNC},
 		{"available",		ZBX_TYPE_INT,	ZBX_SYNC},
 		{"errors_from",		ZBX_TYPE_INT,	ZBX_NOSYNC},
-		{"templateid",		ZBX_TYPE_INT,	ZBX_SYNC},
 		{0}
 		}
 	},
@@ -404,9 +403,9 @@ static	ZBX_TABLE	tables[]={
 	{"rights",	"rightid",	ZBX_SYNC,
 		{
 		{"rightid",		ZBX_TYPE_INT,	ZBX_SYNC},
-		{"userid",		ZBX_TYPE_INT,	ZBX_SYNC},
-		{"name",		ZBX_TYPE_CHAR,	ZBX_SYNC},
-		{"permission",		ZBX_TYPE_CHAR,	ZBX_SYNC},
+		{"groupid",		ZBX_TYPE_INT,	ZBX_SYNC},
+		{"type",		ZBX_TYPE_INT,	ZBX_SYNC},
+		{"permission",		ZBX_TYPE_INT,	ZBX_SYNC},
 		{"id",			ZBX_TYPE_INT,	ZBX_SYNC},
 		{0}
 		}

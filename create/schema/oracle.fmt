@@ -1,7 +1,0 @@
-{bigint}=>bigint
-{integer}=>integer
-{double}=>double
-{varchar}=>varchar
-{image_type}=>blob
-{blob}=>varchar(2048)
-{create_table_opt}=>type=InnoDB
