@@ -26,11 +26,9 @@ create/data/images_pgsql.sql -text
 create/data/nodes.sql -text
 create/data/nodes_psql.sql -text
 create/data/recreate.sh -text
-create/schema/generate_schemas.sh -text
-create/schema/mysql.fmt -text
-create/schema/oracle.fmt -text
-create/schema/postgresql.fmt -text
+create/schema/gen.pl -text
 create/schema/schema.sql -text
+create/schema/schema_new.sql -text
 frontends/php/admin.php -text
 frontends/php/audio/trigger_off.wav -text
 frontends/php/audio/trigger_on.wav -text
