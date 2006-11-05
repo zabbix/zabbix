@@ -499,9 +499,6 @@ static	ZBX_TABLE	tables[]={
 		{"hosttemplateid",	ZBX_TYPE_INT,	ZBX_SYNC},
 		{"hostid",		ZBX_TYPE_INT,	ZBX_SYNC},
 		{"templateid",		ZBX_TYPE_INT,	ZBX_SYNC},
-		{"items",		ZBX_TYPE_INT,	ZBX_SYNC},
-		{"triggers",		ZBX_TYPE_INT,	ZBX_SYNC},
-		{"graphs",		ZBX_TYPE_INT,	ZBX_SYNC},
 		{0}
 		}
 	},

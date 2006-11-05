@@ -95,7 +95,6 @@ src/zabbix_agent_win32/Debug/ZabbixW32.exe -text
 src/zabbix_agent_win32/Release/ZabbixW32.exe -text
 src/zabbix_server/events.c -text
 src/zabbix_server/events.h -text
-src/zabbix_server/nodewatcher/.deps/nodewatcher.Po -text
 src/zabbix_server/nodewatcher/Makefile.am -text
 src/zabbix_server/nodewatcher/events.c -text
 src/zabbix_server/nodewatcher/events.h -text
