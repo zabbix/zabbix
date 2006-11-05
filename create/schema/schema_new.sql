@@ -493,7 +493,7 @@ FIELD		|hostid		|t_id		|'0'	|NOT NULL	|
 FIELD		|devicetype	|t_varchar(64)	|''	|NOT NULL	|
 FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|
 FIELD		|os		|t_varchar(64)	|''	|NOT NULL	|
-FIELD		|t_serialno	|t_varchar(64)	|''	|NOT NULL	|
+FIELD		|serialno	|t_varchar(64)	|''	|NOT NULL	|
 FIELD		|tag		|t_varchar(64)	|''	|NOT NULL	|
 FIELD		|macaddress	|t_varchar(64)	|''	|NOT NULL	|
 FIELD		|hardware	|t_blob		|''	|NOT NULL	|
