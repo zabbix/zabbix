@@ -99,12 +99,14 @@ static void	add_trigger_info(DB_EVENT *event)
  ******************************************************************************/
 int	process_event(DB_EVENT *event)
 {
-	zabbix_log(LOG_LEVEL_DEBUG,"In process_event(" ZBX_FS_UI64 ")",event->eventid);
+	zabbix_log(LOG_LEVEL_DEBUG,"In process_event(eventid:" ZBX_FS_UI64 ",triggerid:" ZBX_FS_UI64 ")",
+			event->eventid, event->triggerid);
 
 	add_trigger_info(event);
 
 	if(event->eventid == 0)
 	{
+		/* TODO Not correct! */
 		event->eventid = DBinsert_id(
 			DBexecute("insert into events(triggerid,clock,value) values(" ZBX_FS_UI64 ",%d,%d)",
 				event->triggerid, event->clock, event->value),
