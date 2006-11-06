@@ -1313,7 +1313,7 @@ int	DBupdate_item_status_to_notsupported(zbx_uint64_t itemid, char *error)
 	return SUCCEED;
 }
 
-int	DBadd_trend(int itemid, double value, int clock)
+int	DBadd_trend(zbx_uint64_t itemid, double value, int clock)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
