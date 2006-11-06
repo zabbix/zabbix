@@ -718,30 +718,32 @@ static void	get_latest_event_status(zbx_uint64_t triggerid, int *prev_status, in
 	char		sql[MAX_STRING_LEN];
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		alarmid_max=0;
-	int		alarmid_prev_max=0;
+	zbx_uint64_t	eventid_max=0;
+	zbx_uint64_t	eventid_prev_max=0;
+	zbx_uint64_t	tmp;
 	int		value_max;
 	int		value_prev_max;
 
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In latest_event()");
 
-	zbx_snprintf(sql,sizeof(sql),"select alarmid,value,clock from events where triggerid=" ZBX_FS_UI64 " order by clock desc",triggerid);
+	zbx_snprintf(sql,sizeof(sql),"select eventid,value,clock from events where triggerid=" ZBX_FS_UI64 " order by clock desc",triggerid);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]", sql);
 	result = DBselectN(sql,20);
 
 	while((row=DBfetch(result)))
 	{
-		if(atoi(row[0])>=alarmid_max)
+		ZBX_STR2UINT64(tmp, row[0]);
+		if(tmp >= eventid_max)
 		{
-			alarmid_prev_max=alarmid_max;
+			eventid_prev_max=eventid_max;
 			value_prev_max=value_max;
-			alarmid_max=atoi(row[0]);
+			eventid_max=tmp;
 			value_max=atoi(row[1]);
 		}
 	}
 	
-	if(alarmid_max == 0)
+	if(eventid_max == 0)
         {
 		zabbix_log(LOG_LEVEL_DEBUG, "Result for last is empty" );
                 *prev_status = TRIGGER_VALUE_UNKNOWN;
@@ -752,7 +754,7 @@ static void	get_latest_event_status(zbx_uint64_t triggerid, int *prev_status, in
 		*latest_status = value_max;
                 *prev_status = TRIGGER_VALUE_FALSE;
 
-		if(alarmid_prev_max != 0)
+		if(eventid_prev_max != 0)
 		{
 			*prev_status = value_prev_max;
 		}
@@ -943,11 +945,11 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *re
 
 	if(reason==NULL)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG,"In update_trigger_value[" ZBX_FS_UI64 ",%d,%d]", trigger->triggerid, new_value, now);
+		zabbix_log(LOG_LEVEL_DEBUG,"In update_trigger_value[triggerid:" ZBX_FS_UI64 ",%d,%d]", trigger->triggerid, new_value, now);
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_DEBUG,"In update_trigger_value[" ZBX_FS_UI64 ",%d,%d,%s]", trigger->triggerid, new_value, now, reason);
+		zabbix_log(LOG_LEVEL_DEBUG,"In update_trigger_value[triggerid:" ZBX_FS_UI64 ",%d,%d,%s]", trigger->triggerid, new_value, now, reason);
 	}
 
 	/* New trigger value differs from current one */
@@ -980,7 +982,7 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *re
 				event.acknowledged = 0;
 
 				/* Processing event */
-				if(process_event(event) == SUCCEED)
+				if(process_event(&event) == SUCCEED)
 				{
 					zabbix_log(LOG_LEVEL_DEBUG,"Event processed OK");
 				}
