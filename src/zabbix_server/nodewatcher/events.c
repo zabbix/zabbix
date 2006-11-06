@@ -145,7 +145,7 @@ void main_eventsender()
 	int		nodeid;
 	int		master_nodeid;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In main_eventsender()");
+	zabbix_log( LOG_LEVEL_WARNING, "In main_eventsender()");
 
 	master_nodeid = get_master_node(CONFIG_NODEID);
 

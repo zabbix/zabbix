@@ -285,12 +285,12 @@ void	update_triggers(zbx_uint64_t itemid)
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In update_triggers [%d]", itemid);
+	zabbix_log( LOG_LEVEL_DEBUG, "In update_triggers [itemid:" ZBX_FS_UI64 "]", itemid);
 
 /* Does not work for PostgreSQL */
 /*		zbx_snprintf(sql, sizeof(sql), "select t.triggerid,t.expression,t.status,t.dep_level,t.priority,t.value from triggers t,functions f,items i where i.status<>3 and i.itemid=f.itemid and t.status=%d and f.triggerid=t.triggerid and f.itemid=%d group by t.triggerid,t.expression,t.dep_level",TRIGGER_STATUS_ENABLED,server_num);*/
 /* Is it correct SQL? */
-	result = DBselect("select distinct t.triggerid,t.expression,t.status,t.dep_level,t.priority,t.value,t.description from triggers t,functions f,items i where i.status<>%d and i.itemid=f.itemid and t.status=%d and f.triggerid=t.triggerid and f.itemid=%d",ITEM_STATUS_NOTSUPPORTED, TRIGGER_STATUS_ENABLED, itemid);
+	result = DBselect("select distinct t.triggerid,t.expression,t.status,t.dep_level,t.priority,t.value,t.description from triggers t,functions f,items i where i.status<>%d and i.itemid=f.itemid and t.status=%d and f.triggerid=t.triggerid and f.itemid=" ZBX_FS_UI64,ITEM_STATUS_NOTSUPPORTED, TRIGGER_STATUS_ENABLED, itemid);
 
 	while((row=DBfetch(result)))
 	{
