@@ -30,7 +30,7 @@ for i in `cat tmp`; do
 	expression=`echo $i|cut -f2 -d"_"`
 	recid=`echo $i|cut -f1 -d"_"`
 	id=`echo $i|cut -f2 -d"{"|cut -f1 -d "}"`
-	newid=`echo "$id+0000100000000000000"|bc`
+	newid=`echo "$id+0000100000000000000*$nodeid"|bc`
 	newexpression=`echo $expression|sed "s/{$id}/{$newid}/g"`
 	echo "update triggers set expression='$newexpression' where triggerid=$recid"|mysql -uroot $dbname
 done
