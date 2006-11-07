@@ -277,6 +277,7 @@ static int compare_checksums()
 int main_nodewatcher_loop()
 {
 	int start, end;
+	int	lastrun = 0;
 
 //	zabbix_log( LOG_LEVEL_WARNING, "In main_nodeupdater_loop()");
 	for(;;)
@@ -287,12 +288,18 @@ int main_nodewatcher_loop()
 		zabbix_log( LOG_LEVEL_DEBUG, "Starting sync with nodes");
 
 		DBconnect();
-		calculate_checksums();
-		compare_checksums();
-		update_checksums();
 
-		/* Send configuration changes to required nodes */
-		main_nodesender();
+		if(lastrun + 120 < start)
+		{
+			calculate_checksums();
+			compare_checksums();
+			update_checksums();
+
+			/* Send configuration changes to required nodes */
+			main_nodesender();
+
+			lastrun = start;
+		}
 
 		/* Send new events to master node */
 		main_eventsender();
@@ -302,13 +309,13 @@ int main_nodewatcher_loop()
 
 		DBclose();
 
-		zbx_setproctitle("sender [sleeping for %d seconds]", 30);
 		end = time(NULL);
 
-		if(end-start<30)
+		if(end-start<10)
 		{
-			zabbix_log( LOG_LEVEL_DEBUG, "Sleeping %d seconds", 30-(end-start));
-			sleep(30-(end-start));
+			zbx_setproctitle("sender [sleeping for %d seconds]", 10-(end-start));
+			zabbix_log( LOG_LEVEL_DEBUG, "Sleeping %d seconds", 10-(end-start));
+			sleep(10-(end-start));
 		}
 	}
 }
