@@ -88,7 +88,7 @@ static int calculate_checksums()
 
 	int	now;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In calculate_checksums");
+	zabbix_log( LOG_LEVEL_DEBUG, "In calculate_checksums");
 	DBexecute("delete from node_cksum where cksumtype=%d", NODE_CKSUM_TYPE_NEW);
 	// insert into node_cksum (select NULL,0,'items','itemid',itemid,0,md5(concat(key_)) as md5 from items);
 
@@ -284,7 +284,7 @@ int main_nodewatcher_loop()
 		start = time(NULL);
 
 		zbx_setproctitle("connecting to the database");
-		zabbix_log( LOG_LEVEL_WARNING, "Starting sync with nodes");
+		zabbix_log( LOG_LEVEL_DEBUG, "Starting sync with nodes");
 
 		DBconnect();
 		calculate_checksums();
@@ -307,7 +307,7 @@ int main_nodewatcher_loop()
 
 		if(end-start<30)
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Sleeping %d seconds", 30-(end-start));
+			zabbix_log( LOG_LEVEL_DEBUG, "Sleeping %d seconds", 30-(end-start));
 			sleep(30-(end-start));
 		}
 	}
