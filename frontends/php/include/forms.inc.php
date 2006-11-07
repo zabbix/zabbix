@@ -26,6 +26,33 @@
 	require_once 	"include/users.inc.php";
 	require_once 	"include/db.inc.php";
 
+	function	insert_configuration_form($file)
+	{
+		$type		= get_request('type',		'MYSQL');
+		$server		= get_request('server',		'localhost');
+		$database	= get_request('database',	'zabbix');
+		$user		= get_request('user',		'root');
+		$password	= get_request('password',	'');
+		
+		$form = new CFormTable(S_CONFIGURATION_OF_ZABBIX_DATABASE, null, 'post');
+		
+		$form->SetHelp("install_source_web.php");
+		$cmbType = new CComboBox('type', $type);
+		$cmbType->AddItem('MYSQL',	S_MYSQL);
+		$cmbType->AddItem('POSTGRESQL',	S_POSTGRESQL);
+		$cmbType->AddItem('ORACLE',	S_ORACLE);
+		$form->AddRow(S_TYPE, $cmbType);
+		
+		$form->AddRow(S_HOST, new CTextBox('server', $server));
+		$form->AddRow(S_NAME, new CTextBox('database', $database));
+		$form->AddRow(S_USER, new CTextBox('user', $user));
+		$form->AddRow(S_PASSWORD, new CPassBox('password', $password));
+		
+		$form->AddItemToBottomRow(new CButton('save',S_SAVE));
+		
+		$form->Show();
+	}
+	
 	function	insert_node_form()
 	{
 		global $ZBX_CURNODEID;

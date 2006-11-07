@@ -279,7 +279,7 @@ include_once "include/page_header.php";
 		ImageRectangle($im,0,0,$width-1,$height-1,$colors["Black"]);
 	}
 
-	ImageOut($im, MAP_OUTPUT_FORMAT);
+	ImageOut($im);
 
 	ImageDestroy($im);
 ?>

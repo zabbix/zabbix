@@ -19,51 +19,112 @@
 **/
 ?>
 <?php
-
-// DATABASE CONFIGURATION
-
-//	$DB_TYPE	="ORACLE";
-//	$DB_TYPE	="POSTGRESQL";
-	$DB_TYPE	="MYSQL";
-	$DB_SERVER	="localhost";
-	$DB_DATABASE	="osmiy1";
-	$DB_USER	="root";
-	$DB_PASSWORD	="";
-// END OF DATABASE CONFIGURATION
-
-	global $USER_DETAILS;
-
-	if($DB_TYPE == "MYSQL")
+	function	DBconnect(&$error)
 	{
-		$DB=mysql_pconnect($DB_SERVER,$DB_USER,$DB_PASSWORD);
-		if(!mysql_select_db($DB_DATABASE))
+		$result = true;
+		
+		global $DB, $DB_TYPE, $DB_SERVER, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
+
+		if(!isset($DB_TYPE))
 		{
-			echo "Error connecting to database [".mysql_error()."]";
-			exit;
+			$error = "Uncnown database type.";
+			$result = false;
 		}
-		mysql_select_db($DB_DATABASE);
-	}
-	if($DB_TYPE == "POSTGRESQL")
-	{
-		$DB=pg_pconnect("host='$DB_SERVER' dbname='$DB_DATABASE' user='$DB_USER' password='$DB_PASSWORD'");
-		if(!$DB)
+		else
 		{
-			echo "Error connecting to database";
-			exit;
+			if($DB_TYPE == "MYSQL")
+			{
+				$DB = mysql_pconnect($DB_SERVER,$DB_USER,$DB_PASSWORD);
+				if(!mysql_select_db($DB_DATABASE))
+				{
+					$error = "Error connecting to database [".mysql_error()."]";
+					$result = false;
+				}
+				else
+				{
+					mysql_select_db($DB_DATABASE);
+				}
+			}
+			if($DB_TYPE == "POSTGRESQL")
+			{
+				$DB=pg_pconnect("host='$DB_SERVER' dbname='$DB_DATABASE' user='$DB_USER' password='$DB_PASSWORD'");
+				if(!$DB)
+				{
+					$error = "Error connecting to database";
+					$result = false;
+				}
+			}
+
+			if($DB_TYPE == "ORACLE")
+			{
+				$DB = ocilogon($DB_USER, $DB_PASSWORD, "");
+		//		$DB = ocilogon($DB_USER, $DB_PASSWORD, "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=$DB_SERVER)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=$DB_DATABASE)))");
+				if(!$DB)
+				{
+					$error = "Error connecting to database";
+					$result = false;
+				}
+			}
 		}
+		return $result;
 	}
 
-	if($DB_TYPE == "ORACLE")
+	function	DBclose()
 	{
-		$DB = ocilogon($DB_USER, $DB_PASSWORD, "");
-//		$DB = ocilogon($DB_USER, $DB_PASSWORD, "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=$DB_SERVER)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=$DB_DATABASE)))");
-		if(!$DB)
+		global $DB, $DB_TYPE, $DB_SERVER, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
+
+		$result = false;
+
+		if($DB)
 		{
-			echo "Error connecting to database";
-			exit;
+			if($DB_TYPE == "MYSQL")			$result = mysql_close($DB);
+			elseif($DB_TYPE == "POSTGRESQL")	$result = pg_close($DB);
+			elseif($DB_TYPE == "ORACLE")		$result = ociclose($DB);
 		}
+		unset(
+			$GLOBALS['DB'],
+			$GLOBALS['DB_TYPE'],
+			$GLOBALS['DB_SERVER'],
+			$GLOBALS['DB_DATABASE'],
+			$GLOBALS['DB_USER'],
+			$GLOBALS['DB_PASSWORD']
+			);
+
+		
+		return $result;
 	}
 
+	function	DBloadfile($file, &$error)
+	{
+		global $DB_TYPE;
+
+		if(!file_exists($file))
+		{
+			$error = 'DBloadfile. Missing file['.$file.']';
+			return false;
+		}
+		
+		$fl = file($file);
+		
+		foreach($fl as $n => $l) if(substr($l,0,2)=='--') unset($fl[$n]);
+		
+		$fl = explode(";\n", implode("\n",$fl));
+		unset($fl[count($fl)-1]);
+		
+		$result = true;
+
+		foreach($fl as $sql)
+		{
+			if(empty($sql)) continue;
+
+			if(!DBexecute($sql,0))
+			{
+				$error = '';
+				return false;
+			}
+		}
+		return true;
+	}
 
 	function	DBstart()
 	{
@@ -103,7 +164,6 @@
 	{
 		global $DB,$DB_TYPE;
 
-//		echo $query,"<br>";
 COpt::savesqlrequest($query);
 
 		if($DB_TYPE == "MYSQL")
@@ -115,7 +175,7 @@ COpt::savesqlrequest($query);
 			$result=mysql_query($query,$DB);
 			if(!$result)
 			{
-				echo "Error in query [$query] [".mysql_error()."]";
+				error("Error in query [$query] [".mysql_error()."]");
 			}
 			return $result;
 		}
@@ -155,7 +215,6 @@ COpt::savesqlrequest($query);
 	{
 		global $DB,$DB_TYPE;
 
-//		echo $query,"<br>";
 COpt::savesqlrequest($query);
 
 		$result = FALSE;
@@ -201,7 +260,6 @@ COpt::savesqlrequest($query);
 		}
 		if($DB_TYPE == "ORACLE")
 		{
-//			echo "DBfetch<br>";
 			if(!ocifetchinto($cursor, $row, OCI_ASSOC+OCI_NUM+OCI_RETURN_NULLS))
 			{
 				return FALSE;
@@ -235,8 +293,7 @@ COpt::savesqlrequest($query);
 			$row=pg_fetch_row($result,$rownum);
 			if(!$row)
 			{
-				echo "Error getting row";
-				exit;
+				fatal_error("Error getting row");
 			}
 			return $row[$fieldnum];
 		}
@@ -258,7 +315,6 @@ COpt::savesqlrequest($query);
 		if($DB_TYPE == "POSTGRESQL")
 		{
 			$oid=pg_getlastoid($result);
-//                      echo "OID:$oid<br>";
 			$sql="select $field from $table where oid=$oid";
 			$result=DBselect($sql);
 			return get_field($result,0,0);
@@ -279,7 +335,7 @@ COpt::savesqlrequest($query);
 	}
 
 /* string value prepearing */
-if($DB_TYPE == "ORACLE") {	
+if(isset($DB_TYPE) && $DB_TYPE == "ORACLE") {	
 	function	zbx_dbstr($var)	{
 		return "'".ereg_replace('\'','\'\'',$var)."'";	
 	}

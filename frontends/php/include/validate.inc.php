@@ -331,12 +331,13 @@
 
 	function	invalid_url()
 	{
+		include_once "include/page_header.php";
 		unset_all();
 		show_error_message(S_INVALID_URL);
 		include_once "include/page_footer.php";
 	}
 	
-	function	check_fields(&$fields)
+	function	check_fields(&$fields, $show_messages=true)
 	{
 
 		global	$_REQUEST;
@@ -370,7 +371,7 @@
 			invalid_url();
 		}
 
-		show_messages();
+		if($show_messages) show_messages();
 
 		return ($err==ZBX_VALID_OK ? 1 : 0);
 	}

@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-	require_once "db.inc.php";
+	require_once "include/db.inc.php";
 
 	function	permission2str($group_permission)
 	{

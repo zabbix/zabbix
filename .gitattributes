@@ -29,16 +29,21 @@ create/data/recreate.sh -text
 create/schema/gen.pl -text
 create/schema/schema.sql -text
 create/schema/schema_new.sql -text
-frontends/php/admin.php -text
 frontends/php/audio/trigger_off.wav -text
 frontends/php/audio/trigger_on.wav -text
 frontends/php/audio/trigger_on_average.wav -text
 frontends/php/audio/trigger_on_disaster.wav -text
 frontends/php/audio/trigger_on_high.wav -text
 frontends/php/audio/trigger_on_warning.wav -text
+frontends/php/conf/COPYING -text
+frontends/php/create/data.sql -text
+frontends/php/create/mysql.sql -text
 frontends/php/images/flash/zbxclock.swf -text svneol=unset#unset
 frontends/php/images/general/closed.gif -text svneol=unset#unset
 frontends/php/images/general/help.gif -text svneol=unset#unset
+frontends/php/images/general/inst_completed.gif -text
+frontends/php/images/general/inst_current.gif -text
+frontends/php/images/general/inst_step.gif -text
 frontends/php/images/general/opened.gif -text svneol=unset#unset
 frontends/php/images/general/sortdown.gif -text svneol=unset#unset
 frontends/php/images/general/sortdown_off.gif -text svneol=unset#unset
@@ -84,12 +89,15 @@ frontends/php/include/locales/sv_se.inc.php -text
 frontends/php/include/nodes.inc.php -text
 frontends/php/include/page_footer.php -text
 frontends/php/include/page_header.php -text
+frontends/php/include/setup.inc.php -text
+frontends/php/instal.php -text
 frontends/php/media_types.php -text
 frontends/php/nodes.php -text
 frontends/php/popup_media.php -text
 frontends/php/popup_right.php -text
 frontends/php/popup_users.php -text
 frontends/php/popup_usrgrp.php -text
+frontends/php/setup.php -text
 include/dbsync.h -text
 src/zabbix_agent_win32/Debug/ZabbixW32.exe -text
 src/zabbix_agent_win32/Release/ZabbixW32.exe -text

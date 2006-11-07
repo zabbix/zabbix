@@ -145,7 +145,8 @@
 			}
 			elseif(is_a($item,'crow'))
 			{
-				$item->SetClass($rowClass);
+				if(isset($rowClass))
+					$item->SetClass($rowClass);
 			}
 			else
 			{
