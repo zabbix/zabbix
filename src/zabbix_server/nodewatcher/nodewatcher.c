@@ -276,9 +276,12 @@ static int compare_checksums()
  ******************************************************************************/
 int main_nodewatcher_loop()
 {
+	int start, end;
+
 //	zabbix_log( LOG_LEVEL_WARNING, "In main_nodeupdater_loop()");
 	for(;;)
 	{
+		start = time(NULL);
 
 		zbx_setproctitle("connecting to the database");
 		zabbix_log( LOG_LEVEL_WARNING, "Starting sync with nodes");
@@ -300,8 +303,12 @@ int main_nodewatcher_loop()
 		DBclose();
 
 		zbx_setproctitle("sender [sleeping for %d seconds]", 30);
+		end = time(NULL);
 
-		zabbix_log( LOG_LEVEL_WARNING, "Seleeping 30 seconds");
-		sleep(30);
+		if(end-start<30)
+		{
+			zabbix_log( LOG_LEVEL_WARNING, "Sleeping %d seconds", 30-(end-start));
+			sleep(30-(end-start));
+		}
 	}
 }

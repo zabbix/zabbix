@@ -266,7 +266,7 @@ void	process_trapper_child(int sockfd)
 	else
 	{
 		bufptr += nbytes;
-		zabbix_log( LOG_LEVEL_WARNING, "Old protocol");
+		zabbix_log( LOG_LEVEL_DEBUG, "Old protocol");
 		while ((nbytes = read(sockfd, bufptr, buffer + ZBX_MAX_PACKET_LEN - bufptr - 1)) != -1 && nbytes != 0)
 		{
 			if(read_len < buffer + ZBX_MAX_PACKET_LEN - bufptr - 1)

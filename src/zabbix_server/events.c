@@ -99,6 +99,9 @@ static void	add_trigger_info(DB_EVENT *event)
  ******************************************************************************/
 int	process_event(DB_EVENT *event)
 {
+	DB_RESULT	result;
+	DB_ROW		row;
+
 	zabbix_log(LOG_LEVEL_DEBUG,"In process_event(eventid:" ZBX_FS_UI64 ",triggerid:" ZBX_FS_UI64 ")",
 			event->eventid, event->triggerid);
 
@@ -106,17 +109,24 @@ int	process_event(DB_EVENT *event)
 
 	if(event->eventid == 0)
 	{
-		/* TODO Not correct! */
-		event->eventid = DBinsert_id(
-			DBexecute("insert into events(triggerid,clock,value) values(" ZBX_FS_UI64 ",%d,%d)",
-				event->triggerid, event->clock, event->value),
-				"events", "eventid");
+		result = DBselect("select event_maxid from nodes where nodeid=%d", CONFIG_NODEID);
+		row = DBfetch(result);
+
+		if(!row || DBis_null(row[0])==SUCCEED)
+		{
+			event->eventid = CONFIG_NODEID*(zbx_uint64_t)__UINT64_C(100000000000000) + 1;
+		}
+		else
+		{
+			ZBX_STR2UINT64(event->eventid, row[0]);
+		       	event->eventid++;
+		}
+		DBexecute("update nodes set event_maxid=" ZBX_FS_UI64 " where nodeid=%d",
+				event->eventid, CONFIG_NODEID);
+		DBfree_result(result);
 	}
-	else
-	{
-		DBexecute("insert into events(eventid,triggerid,clock,value) values(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d)",
-			event->eventid,event->triggerid, event->clock, event->value);
-	}
+	DBexecute("insert into events(eventid,triggerid,clock,value) values(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d)",
+		event->eventid,event->triggerid, event->clock, event->value);
 
 	/* Cancel currently active alerts */
 	if(event->value == TRIGGER_VALUE_FALSE || event->value == TRIGGER_VALUE_TRUE)
