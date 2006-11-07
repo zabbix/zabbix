@@ -114,7 +114,7 @@ static int process_node_history_str(int nodeid, int master_nodeid)
 		}
 		else
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Not updating nodes.history_str_lastid");
+			zabbix_log( LOG_LEVEL_DEBUG, "Not updating nodes.history_str_lastid");
 		}
 	}
 	DBfree_result(result);
@@ -188,7 +188,7 @@ static int process_node_history_uint(int nodeid, int master_nodeid)
 		}
 		else
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Not updating nodes.history_uint_lastid");
+			zabbix_log( LOG_LEVEL_DEBUG, "Not updating nodes.history_uint_lastid");
 		}
 	}
 	DBfree_result(result);
@@ -258,13 +258,13 @@ static int process_node_history(int nodeid, int master_nodeid)
 		zabbix_log( LOG_LEVEL_DEBUG, "Sending [%s]",data);
 		if(send_to_node(master_nodeid, nodeid, data) == SUCCEED)
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Updating nodes.history_lastid=" ZBX_FS_UI64, id);
+//			zabbix_log( LOG_LEVEL_WARNING, "Updating nodes.history_lastid=" ZBX_FS_UI64, id);
 			DBexecute("update nodes set history_lastid=" ZBX_FS_UI64 " where nodeid=%d", id, nodeid);
 			DBexecute("delete from history_sync where nodeid=%d and id<=" ZBX_FS_UI64, nodeid, id);
 		}
 		else
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Not updating nodes.history_lastid");
+			zabbix_log( LOG_LEVEL_DEBUG, "Not updating nodes.history_lastid");
 		}
 	}
 	DBfree_result(result);

@@ -436,7 +436,7 @@ void main_nodesender()
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In main_nodesender()");
+	zabbix_log( LOG_LEVEL_DEBUG, "In main_nodesender()");
 
 	result = DBselect("select nodeid from nodes where nodetype=%d",NODE_TYPE_LOCAL);
 
