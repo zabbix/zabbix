@@ -136,14 +136,6 @@ if(defined('USE_MEM_PROF')) {
 }
 		}
 
-		/* protected static */ function mem2str($size)
-		{
-			$prefix = 'B';
-			if($size > 1048576) {	$size = $size/1048576;	$prefix = 'M'; }
-			elseif($size > 1024) {	$size = $size/1024;	$prefix = 'K'; }
-			return round($size, 6).$prefix;
-		}
-
 		/* public static */ function counter_up($type=NULL)
 		{
 if(defined('USE_COUNTER_PROF'))
@@ -224,8 +216,8 @@ if(defined('USE_TIME_PROF'))
 if(defined('USE_MEM_PROF'))
 {
 			echo "(".$type.") Memory limit	 : ".ini_get('memory_limit')."<br/>\n";
-			echo "(".$type.") Memory usage	 : ".COpt::mem2str($memorystamp[$type])." - ".COpt::mem2str($memory)."\n<br/>\n";
-			echo "(".$type.") Memory leak	 : ".COpt::mem2str($memory - $memorystamp[$type])."\n<br/>\n";
+			echo "(".$type.") Memory usage	 : ".mem2str($memorystamp[$type])." - ".mem2str($memory)."\n<br/>\n";
+			echo "(".$type.") Memory leak	 : ".mem2str($memory - $memorystamp[$type])."\n<br/>\n";
 }
 if(defined('USE_VAR_MON'))
 {

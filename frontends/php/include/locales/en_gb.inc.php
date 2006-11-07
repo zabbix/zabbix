@@ -27,6 +27,18 @@
 	"S_DATE_FORMAT_YMD"=>			"d M Y",
 	"S_HTML_CHARSET"=>			"iso-8859-1",
 
+//	admin.php
+	"S_PREVIOUS"=>				"<< Previous",
+	"S_NEXT"=>				"Next >>",
+	"S_RETRY"=>				"Retry",
+	"S_FINISH"=>				"Finish",
+	"S_FAIL"=>				"Fail",
+	"S_UPDATE_BIG"=>			"UPDATE",
+	"S_INSTALLATION"=>			"Installation",
+	"S_NEW_INSTALLATION"=>			"New installation",
+	"S_NEW_INSTALLATION_BIG"=>		"NEW INSTALLATION",
+	"S_INSTALLATION_UPDATE"=>		"Installation/Update",
+	
 //	node.php
 	"S_TIME_ZONE"=>				"Time zone",
 	"S_DO_NOT_KEEP_HISTORY_OLDER_THAN"=>	"Do not keep history older than (in days)",

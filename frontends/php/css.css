@@ -719,7 +719,159 @@ table.server_info tr.status td{
 	white-space: nowrap;
 	word-spacing: nowrap;
 }
+/**************** SETUP WIZARD ***********/
 
+table.setup_wizard
+{
+	width:		640px;
+	height:		480px;
+	border-spacing:	0px; /* cellspacing */
+	border-collapse: collapse;
+	border-top:		2px gray solid;
+	border-left:		2px gray solid;
+	border-right:		2px #3F3F3F solid;
+	border-bottom:		2px #3F3F3F solid;
+}
+table.setup_wizard td
+{
+	padding-left:	0;
+	padding-right:	0;
+	padding-top: 	2px;
+	padding-bottom: 2px;
+}
+
+table.setup_wizard tr.header
+{
+	height:		24px;
+	border:		1px black solid;
+	background-color: #F00000;
+	color: 		white;
+	font-weight:	bold;
+}
+table.setup_wizard tr.footer
+{
+	height:		34px;
+	border-top:	1px black dotted;
+}
+
+table.setup_wizard tr.footer input.button
+{
+	height: 25px;
+}
+
+table.setup_wizard tr.title
+{
+	height:		28px;
+}
+table.setup_wizard tr.title td
+{
+	font-size:	24px;
+	font-weight:	normal;
+}
+table.setup_wizard td.left
+{
+	padding-left: 	10px;
+	padding-right: 	5px;
+	white-space: 	nowrap;
+	word-spacing: 	nowrap;
+	text-align: 	left;
+}
+table.setup_wizard td.right
+{
+	width:		100%;
+	padding-left:	5px;
+	padding-right:	10px;
+	text-align: 	right;
+	vertical-align:	text-top;
+}
+table.setup_wizard tr.center td.left
+{
+	vertical-align:	text-top;
+	padding-top: 0;
+}
+table.setup_wizard tr.center td.right
+{
+	padding: 	5px;
+	vertical-align:	middle;
+	text-align: 	center; 
+	border-top:	2px gray inset;
+	border-left:	2px gray inset;
+	background-color: white;
+}
+
+table.setup_wizard ul li
+{
+	font-size:	14px;
+	font-weight:	normal;
+	color:		gray;
+	list-style-image: url('images/general/inst_step.gif');
+}
+
+table.setup_wizard ul li.current
+{
+	color: black;
+	list-style-image: url('images/general/inst_current.gif');
+}
+
+table.setup_wizard ul li.completed
+{
+	color: black;
+	list-style-image: url('images/general/inst_completed.gif');
+}
+
+table.setup_wizard div.licence
+{
+	text-align: left;
+	height:	350px;
+	width:	100%;
+	border:	1px gray inset;
+	background-color: white;
+	overflow: scroll;
+}
+
+table.setup_wizard div.text
+{
+	text-align: left;
+	vertical-align:	text-top;
+	height:	100%;
+	width:	100%;
+	overflow: none;
+}
+
+/********** REQUIREMENTS TABLE *************/
+
+table.requirements
+{
+	background-color: white;
+	border-spacing:	0px; /* cellspacing */
+	border-collapse: collapse;
+	width: 80%;
+	border:	2px ridge gray;
+}
+
+table.requirements tr.fail
+{
+	background-color: #FF9999;
+}
+
+table.requirements td
+{
+	padding-left:	5px;
+	padding-right:	5px;
+	padding-top:	2px;
+	padding-bottom:	2px;
+	border-bottom:	1px gray dashed;
+}
+span.ok
+{
+	color:		green;
+	font-weight:	bold;
+}
+span.fail
+{
+	color:		red;
+	font-weight:	bold;
+}
 /**************** OTHERS ****************/
 
 span.divider{	color: #000000;	font-family: Verdana, Arial, sans-serif; font-size: 10px; font-weight: normal;}
@@ -883,4 +1035,8 @@ ul
 	border-top: none;
 	visibility: hidden;
 }
-
+.center
+{
+	width: 100%;
+	text-align: center;
+}

@@ -22,10 +22,11 @@
 	class CListItem extends CTag
 	{
 /* public */
-		function CListItem($value)
+		function CListItem($value,$class=null)
 		{
 			parent::CTag('li','yes');
 
+			$this->SetClass($class);
 			$this->AddItem($value);
 		}
 	}
@@ -40,25 +41,25 @@
 			$this->AddItem($value);
 			$this->SetClass($class);
 		}
-		function PrepareItem($value=NULL)
+		function PrepareItem($value=NULL,$class=null)
 		{
 			if(!is_null($value))
 			{
-				$value = new CListItem($value);
+				$value = new CListItem($value,$class);
 			}
 			return $value;
 		}
 		
-		function AddItem($value)
+		function AddItem($value,$class=null)
 		{
 			if(is_array($value))
 			{
 				foreach($value as $el)
-					parent::AddItem($this->PrepareItem($el));
+					parent::AddItem($this->PrepareItem($el,$class));
 			}
 			else
 			{
-				parent::AddItem($this->PrepareItem($value));
+				parent::AddItem($this->PrepareItem($value,$class));
 			}
 		}
 	}
