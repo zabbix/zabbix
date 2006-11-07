@@ -30,6 +30,7 @@ FIELD		|port		|t_integer	|'0'	|NOT NULL	|
 FIELD		|slave_history	|t_integer	|'0'	|NOT NULL	|
 FIELD		|slave_trends	|t_integer	|'0'	|NOT NULL	|
 FIELD		|event_lastid	|t_id		|'0'	|NOT NULL	|
+FIELD		|event_maxid	|t_id		|'0'	|NOT NULL	|
 FIELD		|history_lastid	|t_bigint	|'0'	|NOT NULL	|
 FIELD		|history_str_lastid|t_bigint	|'0'	|NOT NULL	|
 FIELD		|history_uint_lastid|t_bigint	|'0'	|NOT NULL	|
