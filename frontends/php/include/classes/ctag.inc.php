@@ -67,7 +67,7 @@
 		var $tag_end;
 
 /* public */
-		function CTag($tagname=NULL, $paired='no', $body=NULL)
+		function CTag($tagname=NULL, $paired='no', $body=NULL, $class=null)
 		{
 			if(!is_string($tagname))
 			{
@@ -86,6 +86,8 @@
 			{
 				CTag::AddItem($body);
 			}
+
+			$this->SetClass($class);
 
 		}
 		function ShowStart()	{	echo $this->StartToString();	}
@@ -145,6 +147,9 @@
 		{
 			if(isset($value))
 				$this->options['class'] = $value;
+			else
+				unset($this->options['class']);
+
 			return $value;
 		}
 		function DelOption($name)
@@ -161,21 +166,18 @@
 
 		function SetHint($text, $width='', $class='')
 		{
+			$text = addslashes(htmlspecialchars($text));
 			if($width != '' || $class!= '')
 			{
-				$this->AddOption(
-					'onMouseOver',
-					"show_hint_ext(this,'".$text."','".$width."','".$class."');"
-				);
+				$code = "show_hint_ext(this,event,'".$text."','".$width."','".$class."');";
 			}
 			else
 			{
-				$this->AddOption(
-					'onMouseOver',
-					"show_hint(this,'".$text."');"
-				);
+				$code = "show_hint(this,event,'".$text."');";
 			}
 
+			$this->AddOption('onMouseOver',	$code);
+			$this->AddOption('onMouseMove',	$code);
 		}
 
 		function OnClick($handle_code)

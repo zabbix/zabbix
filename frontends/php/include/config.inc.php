@@ -18,7 +18,8 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-function SDI($msg="SDI") { echo "DEBUG INFO: "; if(is_array($msg)) print_r($msg); else echo($msg); echo BR; } // DEBUG INFO!!!
+function SDI($msg="SDI") { echo "DEBUG INFO: "; var_export($msg); echo BR; } // DEBUG INFO!!!
+function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$msg.'"'.SPACE; var_dump($var); echo BR; } // DEBUG INFO!!!
 
 
 ?>
@@ -40,16 +41,6 @@ function SDI($msg="SDI") { echo "DEBUG INFO: "; if(is_array($msg)) print_r($msg)
 		$_COOKIE = zbx_stripslashes($_COOKIE);
 		$_REQUEST= zbx_stripslashes($_REQUEST);
 	}
-
-	require_once 	"include/defines.inc.php";
-	require_once 	"include/db.inc.php";
-	require_once 	"include/locales.inc.php";
-	require_once 	"include/perm.inc.php";
-	require_once 	"include/audit.inc.php";
-
-// Include Validation
-
-	require_once 	"include/validate.inc.php";
 
 // Include Classes
 	require_once("include/classes/ctag.inc.php");
@@ -77,10 +68,41 @@ function SDI($msg="SDI") { echo "DEBUG INFO: "; if(is_array($msg)) print_r($msg)
 
 // Include Tactical Overview modules
 
+	require_once 	"include/defines.inc.php";
+	require_once 	"include/locales.inc.php";
+
 	include_once("include/classes/chostsinfo.mod.php");
 	include_once("include/classes/ctriggerinfo.mod.php");
 	include_once("include/classes/cserverinfo.mod.php");
 	include_once("include/classes/cflashclock.mod.php");
+
+	require_once 	"include/db.inc.php";
+	require_once 	"include/perm.inc.php";
+	require_once 	"include/audit.inc.php";
+
+// Include Validation
+
+	require_once 	"include/validate.inc.php";
+
+	function zbx_err_handler($errno, $errstr, $errfile, $errline)
+	{
+		error($errstr.'['.$errfile.':'.$errline.']');
+	}
+	
+	set_error_handler('zbx_err_handler');
+
+	read_configuration_file();
+
+	$error = '';
+	if(!DBconnect($error))
+	{
+		error($error);
+		define('ZBX_DISTRIBUTED', false);
+		include_once "setup.php";
+	}
+	unset($error);
+
+	global $ZBX_LOCALNODEID;
 
 	/* Init LOCAL NODE ID */
 	if($local_node_data = DBfetch(DBselect('select nodeid from nodes where nodetype=1 order by nodeid')))
@@ -94,6 +116,25 @@ function SDI($msg="SDI") { echo "DEBUG INFO: "; if(is_array($msg)) print_r($msg)
 		define('ZBX_DISTRIBUTED', false);
 	}
 	unset($local_node_data);
+
+	function	read_configuration_file($file='conf/zabbix.conf.php')
+	{
+		global $ZBX_CONFIGURATION_FILE;
+
+		global $DB_TYPE, $DB_SERVER, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
+
+		$ZBX_CONFIGURATION_FILE = $file;
+
+		if(!file_exists($file) || isset($_COOKIE['ZBX_CONFIG']))
+		{
+			define('ZBX_DISTRIBUTED', false);
+			include_once "setup.php";
+		}
+		else
+		{
+			include $ZBX_CONFIGURATION_FILE;
+		}
+	}
 
 	function	access_deny()
 	{
@@ -152,8 +193,35 @@ function SDI($msg="SDI") { echo "DEBUG INFO: "; if(is_array($msg)) print_r($msg)
 
 	function fatal_error($msg)
 	{
+		include_once "include/page_header.php";
 		error($msg);
 		include_once "include/page_footer.php";
+	}
+	
+	function str2mem($val)
+	{
+		$val = trim($val);
+		$last = strtolower($val{strlen($val)-1});
+		switch($last)
+		{
+			// The 'G' modifier is available since PHP 5.1.0
+			case 'g':
+				$val *= 1024;
+			case 'm':
+				$val *= 1024;
+			case 'k':
+				$val *= 1024;
+		}
+
+		return $val;
+	}
+	
+	function mem2str($size)
+	{
+		$prefix = 'B';
+		if($size > 1048576) {	$size = $size/1048576;	$prefix = 'M'; }
+		elseif($size > 1024) {	$size = $size/1024;	$prefix = 'K'; }
+		return round($size, 6).$prefix;
 	}
 
 	function getmicrotime()
@@ -171,34 +239,34 @@ function SDI($msg="SDI") { echo "DEBUG INFO: "; if(is_array($msg)) print_r($msg)
 			return $ret;
 		}
 //Special processing of uptime
-	if($units=="uptime")
-	{
-		$ret="";
-		$days=floor($value/(24*3600));
-		if($days>0)
+		if($units=="uptime")
 		{
-			$value=$value-$days*(24*3600);
+			$ret="";
+			$days=floor($value/(24*3600));
+			if($days>0)
+			{
+				$value=$value-$days*(24*3600);
+			}
+			$hours=floor($value/(3600));
+			if($hours>0)
+			{
+				$value=$value-$hours*3600;
+			}
+			$min=floor($value/(60));
+			if($min>0)
+			{
+				$value=$value-$min*(60);
+			}
+			if($days==0)
+			{
+				$ret = sprintf("%02d:%02d:%02d", $hours, $min, $value);
+			}
+			else
+			{
+				$ret = sprintf("%d days, %02d:%02d:%02d", $days, $hours, $min, $value);
+			}
+			return $ret;
 		}
-		$hours=floor($value/(3600));
-		if($hours>0)
-		{
-			$value=$value-$hours*3600;
-		}
-		$min=floor($value/(60));
-		if($min>0)
-		{
-			$value=$value-$min*(60);
-		}
-		if($days==0)
-		{
-			$ret = sprintf("%02d:%02d:%02d", $hours, $min, $value);
-		}
-		else
-		{
-			$ret = sprintf("%d days, %02d:%02d:%02d", $days, $hours, $min, $value);
-		}
-		return $ret;
-	}
 // Special processing for seconds
 		if($units=="s")
 		{
@@ -1254,27 +1322,47 @@ function GetPos(obj)
 
 var hint_box = null;
 
+function get_cursor_position(e)
+{
+	e = e || window.event;
+	var cursor = {x:0, y:0};
+	if (e.pageX || e.pageY) {
+		cursor.x = e.pageX;
+		cursor.y = e.pageY;
+	} 
+	else {
+		var de = document.documentElement;
+		var b = document.body;
+		cursor.x = e.clientX + 
+		(de.scrollLeft || b.scrollLeft) - (de.clientLeft || 0);
+		cursor.y = e.clientY + 
+		(de.scrollTop || b.scrollTop) - (de.clientTop || 0);
+	}
+	return cursor;
+}
+
 function hide_hint()
 {
 	if(!hint_box) return;
 
 	hint_box.style.visibility="hidden"
-	//hint_box.style.width	= "0px"
-	hint_box.style.left	= "-" + hint_box.style.width;
+	hint_box.style.left	= "-" + ((hint_box.style.width) ? hint_box.style.width : 100) + "px";
 }
 
-function show_hint(obj, hint_text)
+function show_hint(obj, e, hint_text)
 {
-	show_hint_ext(obj, hint_text, "", "");
+	show_hint_ext(obj, e, hint_text, "", "");
 }
 
-function show_hint_ext(obj, hint_text, width, class)
+function show_hint_ext(obj, e, hint_text, width, class_name)
 {
 	if(!hint_box) return;
+
+	var cursor = get_cursor_position(e);
 	
-	if(class != "")
+	if(class_name != "")
 	{
-		hint_text = "<span class=" + class + ">" + hint_text + "</span>";
+		hint_text = "<span class=" + class_name + ">" + hint_text + "</"+"span>";
 	}
 
 	hint_box.innerHTML = hint_text;
@@ -1285,7 +1373,8 @@ function show_hint_ext(obj, hint_text, width, class)
 	hint_box.x	= pos[0];
 	hint_box.y	= pos[1];
 
-	hint_box.style.left	= hint_box.x + obj.offsetWidth + 10 + "px";
+	hint_box.style.left	= cursor.x + 10 + "px";
+	//hint_box.style.left	= hint_box.x + obj.offsetWidth + 10 + "px";
 	hint_box.style.top	= hint_box.y + obj.offsetHeight + "px";
 
 	hint_box.style.visibility = "visible";
@@ -1672,16 +1761,24 @@ else if (document.getElementById)
 		return true;
 	}
 
-	function	set_image_header($format=IMAGE_FORMAT_DEFAULT)
+	function	set_image_header($format=null)
 	{
+		global $IMAGE_FORMAT_DEFAULT;
+
+		if(is_null($format)) $format = $IMAGE_FORMAT_DEFAULT;
+		
 		if(IMAGE_FORMAT_JPEG == $format)	Header( "Content-type:  image/jpeg"); 
 		if(IMAGE_FORMAT_TEXT == $format)	Header( "Content-type:  text/html"); 
 		else					Header( "Content-type:  image/png"); 
 		Header( "Expires:  Mon, 17 Aug 1998 12:51:50 GMT"); 
 	}
 	
-	function ImageOut($image,$format=IMAGE_FORMAT_DEFAULT)
+	function ImageOut($image,$format=NULL)
 	{
+		global $IMAGE_FORMAT_DEFAULT;
+
+		if(is_null($format)) $format = $IMAGE_FORMAT_DEFAULT;
+		
 		if(IMAGE_FORMAT_JPEG == $format)
 			ImageJPEG($image);
 		else

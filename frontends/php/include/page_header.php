@@ -20,6 +20,7 @@
 ?>
 <?php
 	require_once("include/config.inc.php");
+	require_once("include/perm.inc.php");
 
 	global $USER_DETAILS;
 	global $ZBX_CURNODEID;
@@ -81,30 +82,32 @@ COpt::profiling_start("page");
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=<?php echo S_HTML_CHARSET; ?>">
-<meta name="Author" content="ZABBIX SIA (Alexei Vladishev, Eugene Grigorjev)">
-<link rel="stylesheet" href="css.css">
+  <head>
 <?php
 		if(isset($page['title']) && defined($page['title']))	$page['title'] = constant($page['title']);
 		
-		if(defined('ZBX_PAGE_DO_REFRESH') && $USER_DETAILS["refresh"])
-		{
-			echo "	<meta http-equiv=\"refresh\" content=\"".$USER_DETAILS["refresh"]."\">\n";
-
-			if(isset($page['title']))
-				$page['title'] .= ' [refreshed every '.$USER_DETAILS['refresh'].' sec]';
-		}
-
-		if(isset($page['title']))
+		if(!isset($page['title'])) $page['title'] = 'ZABBIX';
+		
+		if(defined('ZBX_DISTRIBUTED'))
 		{
 			if($curr_node_data = DBfetch(DBselect('select * from nodes where nodeid='.$ZBX_CURNODEID)))
 				$page['title'] = '('.$curr_node_data['name'].') '.$page['title'];
-
-			echo "	<title>".$page['title']."</title>\n";
 		}
+		
+		if(defined('ZBX_PAGE_DO_REFRESH') && $USER_DETAILS["refresh"])
+		{
 ?>
-</head>
+    <meta http-equiv=\"refresh\" content="<?php echo $USER_DETAILS["refresh"] ?>">
+<?php
+			$page['title'] .= ' [refreshed every '.$USER_DETAILS['refresh'].' sec]';
+		}
+	
+?>
+    <title><?php echo $page['title'] ?></title>
+    <link rel="stylesheet" href="css.css">
+    <meta http-equiv="Content-Type" content="text/html; charset=<?php echo S_HTML_CHARSET ?>">
+    <meta name="Author" content="ZABBIX SIA (Alexei Vladishev, Eugene Grigorjev)">
+  </head>
 <body>
 <?php
 		break; /* case PAGE_TYPE_HTML */
@@ -197,7 +200,6 @@ COpt::profiling_start("page");
 				"label"			=> S_ADMINISTRATION,
 				"default_page_id"	=> 0,
 				"pages"=>array(
-					array("url"=>"admin.php"	,"label"=>S_ADMINISTRATION	),
 					ZBX_DISTRIBUTED ? array("url"=>"nodes.php"	,"label"=>S_NODES) : null ,
 					array("url"=>"users.php"	,"label"=>S_USERS		,
 						"sub_pages"=>array("popup_media.php",
@@ -205,7 +207,9 @@ COpt::profiling_start("page");
 						),
 					array("url"=>"media_types.php"	,"label"=>S_MEDIA_TYPES		),
 					array("url"=>"audit.php"	,"label"=>S_AUDIT		),
-					array("url"=>"report4.php"	,"label"=>S_NOTIFICATIONS	)
+					array("url"=>"report4.php"	,"label"=>S_NOTIFICATIONS	),
+					array("url"=>"instal.php"	,"label"=>S_INSTALLATION	,
+						"sub_pages"=>array("setup.php"))
 					)
 				),
 		"login"=>array(

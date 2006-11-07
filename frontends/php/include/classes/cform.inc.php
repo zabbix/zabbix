@@ -41,9 +41,12 @@
 			{
 				if(isset($page['file']))
 				{
-					return $this->options['action'] = $page['file'];
+					$value = $page['file'];
 				}
-				return 1;
+				else
+				{
+					$value = "#";
+				}
 			}
 			return $this->options['action'] = $value;
 		}
