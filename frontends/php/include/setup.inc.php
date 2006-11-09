@@ -33,14 +33,14 @@
 		var $ZBX_CONFIG;
 		var $DISABLE_NEXT_BUTTON;
 		var $stage = array(
-			0 => array('title' => '1. Intoduction'			, 'fnc' => 'Stage0' ),
-			1 => array('title' => '2. License Agreement'		, 'fnc' => 'Stage1' ),
-			2 => array('title' => '3. Checking of requirements'	, 'fnc' => 'Stage2' ),
-			3 => array('title' => '4. Configure of DB connection'	, 'fnc' => 'Stage3' ),
+			0 => array('title' => '1. Introduction'			, 'fnc' => 'Stage0' ),
+			1 => array('title' => '2. Licence Agreement'		, 'fnc' => 'Stage1' ),
+			2 => array('title' => '3. Check of pre-requisites'	, 'fnc' => 'Stage2' ),
+			3 => array('title' => '4. Configure DB connection'	, 'fnc' => 'Stage3' ),
 			4 => array('title' => '5. Distributed monitoring'	, 'fnc' => 'Stage4' ),
-			5 => array('title' => '6. Pre-Installation Summery'	, 'fnc' => 'Stage5' ),
-			6 => array('title' => '7. Installing...'		, 'fnc' => 'Stage6' ),
-			7 => array('title' => '8. Finishing...'			, 'fnc' => 'Stage7' )
+			5 => array('title' => '6. Pre-Installation Summary'	, 'fnc' => 'Stage5' ),
+			6 => array('title' => '7. Install'			, 'fnc' => 'Stage6' ),
+			7 => array('title' => '8. Finish'			, 'fnc' => 'Stage7' )
 			);
 
 /* public */	
@@ -138,10 +138,10 @@
 		function Stage0()
 		{
 
-			return new CTag('div', 'yes', 'Welcom to the ZABBIX frontend installation guide.'.BR.BR.
-				'This installation guide will guide you through the installation of ZABBIX fromtend'.BR.BR.
-				'Click to "Next" button to proceed to the next screen. If you want to change somethong '.
-				'on previos screen, click "Previous" button'.BR.BR.
+			return new CTag('div', 'yes', 'Welcome to the ZABBIX frontend installation wizard.'.BR.BR.
+				'This installation wizard will guide you through the installation of ZABBIX frontend'.BR.BR.
+				'Click to "Next" button to proceed to the next screen. If you want to change something '.
+				'on a previos screen, click "Previous" button'.BR.BR.
 				'You may cancel installation at any time by clicking "Cancel" button', 'text');
 		}
 
@@ -163,7 +163,7 @@
 							'agree', 
 							$this->GetConfig('agree', false),
 							'submit();'),
-						'I\'m agree'),
+						'I agree'),
 					'center')
 				);
 		}
