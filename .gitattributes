@@ -1,4 +1,6 @@
 * text=auto !eol
+bin/win32/zabbix_agentd.exe -text
+bin/win64/zabbix_agentd.exe -text
 build/win32/project/zabbix_agentd.dsp -text
 build/win32/project/zabbix_agentd.dsw -text
 create/data/change_nodeid.sh -text

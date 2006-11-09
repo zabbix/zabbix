@@ -265,7 +265,7 @@ static int	get_active_checks(char *server, unsigned short port, char *error, int
 	servaddr_in.sin_addr.s_addr	= ((struct in_addr *)(hp->h_addr))->s_addr;
 	servaddr_in.sin_port		= htons(port);
 
-	if(INVALID_SOCKET == (s = socket(AF_INET,SOCK_STREAM,0)))
+	if(INVALID_SOCKET == (s = (ZBX_SOCKET)socket(AF_INET,SOCK_STREAM,0)))
 	{
 		zbx_snprintf(error, max_error_len, "Cannot create socket [%s]", strerror_from_system(errno));
 		zabbix_log(LOG_LEVEL_WARNING, error);
@@ -378,7 +378,7 @@ static int	send_value(char *server,unsigned short port,char *host, char *key,cha
 	servaddr_in.sin_addr.s_addr	= ((struct in_addr *)(hp->h_addr))->s_addr;
 	servaddr_in.sin_port		= htons(port);
 
-	if(INVALID_SOCKET == (s = socket(AF_INET,SOCK_STREAM,0)))
+	if(INVALID_SOCKET == (s = (ZBX_SOCKET)socket(AF_INET,SOCK_STREAM,0)))
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Error in socket() [%s:%u] [%s]",server, port, strerror_from_system(errno));
 		return	FAIL;

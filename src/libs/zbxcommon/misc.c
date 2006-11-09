@@ -158,7 +158,7 @@ int	calculate_item_nextcheck(int itemid, int item_type, int delay, char *delay_f
 /* Special processing of active items to see better view in queue */
 	if(item_type == ITEM_TYPE_ZABBIX_ACTIVE)
 	{
-		return (now+delay);
+		return (((int)now)+delay);
 	}
 
 
