@@ -91,7 +91,7 @@ COpt::profiling_start("page");
 		if(defined('ZBX_DISTRIBUTED'))
 		{
 			if($curr_node_data = DBfetch(DBselect('select * from nodes where nodeid='.$ZBX_CURNODEID)))
-				$page['title'] = '('.$curr_node_data['name'].') '.$page['title'];
+				$page['title'] .= ' ('.$curr_node_data['name'].')';
 		}
 		
 		if(defined('ZBX_PAGE_DO_REFRESH') && $USER_DETAILS["refresh"])
