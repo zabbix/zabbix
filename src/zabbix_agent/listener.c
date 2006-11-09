@@ -102,7 +102,7 @@ ZBX_THREAD_ENTRY(listener_thread, pSock)
 	{
 		accept_sock = SOCKET_ERROR;
 		nlen = sizeof(ZBX_SOCKADDR);
-		if(SOCKET_ERROR == (accept_sock = accept(sock, (struct sockaddr *)&serv_addr, &nlen)))
+		if(SOCKET_ERROR == (accept_sock = (ZBX_SOCKET)accept(sock, (struct sockaddr *)&serv_addr, &nlen)))
 		{
 			if(!ZBX_IS_RUNNING) break;
 

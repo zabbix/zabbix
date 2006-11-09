@@ -1565,7 +1565,7 @@ static int	tcp_expect(const char	*hostname, short port, const char *request, con
 	servaddr_in.sin_addr.s_addr	= ((struct in_addr *)(hp->h_addr))->s_addr;
 	servaddr_in.sin_port		= htons(port);
 
-	if(INVALID_SOCKET == (s = socket(AF_INET,SOCK_STREAM,0)))
+	if(INVALID_SOCKET == (s = (ZBX_SOCKET)socket(AF_INET,SOCK_STREAM,0)))
 	{
 		zabbix_log( LOG_LEVEL_DEBUG, "Error in socket() [%s:%u] [%s]", hostname, port, strerror_from_system(errno));
 		return SYSINFO_RET_OK;
@@ -1737,7 +1737,7 @@ static int	check_ssh(const char	*hostname, short port, int *value_int)
 	servaddr_in.sin_addr.s_addr	= ((struct in_addr *)(hp->h_addr))->s_addr;
 	servaddr_in.sin_port		= htons(port);
 
-	if(INVALID_SOCKET == (s = socket(AF_INET,SOCK_STREAM,0)))
+	if(INVALID_SOCKET == (s = (ZBX_SOCKET)socket(AF_INET,SOCK_STREAM,0)))
 	{
 		zabbix_log( LOG_LEVEL_DEBUG, "Error in socket() [%s:%u] [%s]", hostname, port, strerror_from_system(errno));
 		return SYSINFO_RET_OK;

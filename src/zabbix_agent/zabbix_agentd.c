@@ -212,7 +212,7 @@ static ZBX_SOCKET tcp_listen(void)
 	ZBX_SOCKADDR serv_addr;
 	int	on;
 
-	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
+	if ((sock = (ZBX_SOCKET)socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
 	{
 		zabbix_log( LOG_LEVEL_CRIT, "Unable to create socket. [%s]", strerror_from_system(zbx_sock_last_error()));
 		exit(1);
