@@ -278,7 +278,7 @@ int	check_ntp(char *host, unsigned short port, int *value_int)
 	servaddr_in.sin_addr.s_addr	= ((struct in_addr *)(hp->h_addr))->s_addr;
 	servaddr_in.sin_port		= htons(port);
 
-	if( SOCKET_ERROR == (s = socket(AF_INET,SOCK_DGRAM,0)) )
+	if( SOCKET_ERROR == (s = (ZBX_SOCKET)socket(AF_INET,SOCK_DGRAM,0)) )
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Cannot create socket for NTP server. [%s]", strerror_from_system(errno));
 		return	SYSINFO_RET_OK;

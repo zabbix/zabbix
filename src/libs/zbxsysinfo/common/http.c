@@ -60,7 +60,7 @@ static int	get_http_page(char *hostname, char *param, unsigned short port, char 
 	servaddr_in.sin_port		= htons(port);
 
 
-	if(INVALID_SOCKET == (s = socket(AF_INET,SOCK_STREAM,0)))
+	if(INVALID_SOCKET == (s = (ZBX_SOCKET)socket(AF_INET,SOCK_STREAM,0)))
 	{
 		zabbix_log( LOG_LEVEL_DEBUG, "get_http_page - Error in socket() [%s:%u] [%s]", hostname, port, strerror_from_system(errno));
 		return SYSINFO_RET_FAIL;

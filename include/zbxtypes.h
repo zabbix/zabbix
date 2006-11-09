@@ -22,6 +22,10 @@
 
 #if defined(_WINDOWS)
 
+#ifndef __UINT64_C
+#	define __UINT64_C(x)	x
+#endif /* __UINT64_C */
+
 #	define zbx_uint64_t __int64
 #	define ZBX_FS_UI64 "%I64u"
 
