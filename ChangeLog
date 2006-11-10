@@ -1,5 +1,6 @@
 Changes for 1.1.4:
 
+ - fixed swapped system CPU and nice CPU stats in ZABBIX agent (Alexei)
  - fixed processing of item calculated as delta speed per second (Alexei)
 
 Changes for 1.1.3:
