@@ -37,7 +37,8 @@ include_once "include/page_header.php";
 		"from"=>		array(T_ZBX_INT, O_OPT,	null,	'{}>=0',	null),
 		"width"=>		array(T_ZBX_INT, O_OPT,	null,	'{}>0',		null),
 		"height"=>		array(T_ZBX_INT, O_OPT,	null,	'{}>0',		null),
-		"border"=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null)
+		"border"=>		array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
+		"stime"=>               array(T_ZBX_STR, O_OPT,	P_SYS,	null,		null)
 	);
 
 	check_fields($fields);
@@ -57,6 +58,7 @@ include_once "include/page_header.php";
 	if(isset($_REQUEST["width"]))		$graph->SetWidth($_REQUEST["width"]);
 	if(isset($_REQUEST["height"]))		$graph->SetHeight($_REQUEST["height"]);
 	if(isset($_REQUEST["border"]))		$graph->SetBorder(0);
+	if(isset($_REQUEST["stime"]))		$graph->setSTime($_REQUEST["stime"]);
 	
 	$graph->AddItem($_REQUEST["itemid"], GRAPH_YAXIS_SIDE_RIGHT, CALC_FNC_ALL);
 
