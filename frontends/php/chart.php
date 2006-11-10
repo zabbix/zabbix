@@ -43,8 +43,11 @@
 	{
 		$graph->setBorder(0);
 	}
+	if(isset($_REQUEST["stime"]))
+	{
+		$graph->setSTime($_REQUEST["stime"]);
+	}
 	$graph->addItem($_REQUEST["itemid"], GRAPH_YAXIS_SIDE_RIGHT, CALC_FNC_ALL);
 
 	$graph->Draw();
 ?>
-

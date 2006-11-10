@@ -230,7 +230,7 @@
 */
 	if($_REQUEST["action"]=="showgraph" && $item_type != ITEM_VALUE_TYPE_LOG)
 	{
-		show_history($_REQUEST["itemid"],$_REQUEST["from"],$effectiveperiod);
+		show_history($_REQUEST["itemid"],$_REQUEST["from"],$_REQUEST["stime"],$effectiveperiod);
 	}
 	elseif($_REQUEST["action"]=="showvalues" || $_REQUEST["action"]=="showlatest")
 	{

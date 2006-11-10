@@ -1,5 +1,6 @@
 Changes for 1.1.4:
 
+ - fix for start time in graph navigation (Alexei)
  - minor fix for Spanish translation (Alexei)
  - fixed default config name for zabbix_agent (Alexei)
  - fixed swapped system CPU and nice CPU stats in ZABBIX agent (Alexei)
