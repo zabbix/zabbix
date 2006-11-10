@@ -237,7 +237,8 @@ COpt::savesqlrequest($query);
 
 		if($DB_TYPE == "POSTGRESQL")
 		{
-			$oid=pg_getlastoid($result);
+//			$oid=pg_getlastoid($result);
+			$oid=pg_last_oid($result);
 //			echo "OID:$oid<br>";
 			$sql="select $field from $table where oid=$oid";
 			$result=DBselect($sql);
