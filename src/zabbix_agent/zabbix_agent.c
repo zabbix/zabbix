@@ -105,7 +105,7 @@ void    init_config(void)
 
 	if(CONFIG_FILE == NULL)
 	{
-		CONFIG_FILE = strdup("/etc/zabbix/zabbix_agentd.conf");
+		CONFIG_FILE = strdup("/etc/zabbix/zabbix_agent.conf");
 	}
 	
 	parse_cfg_file(CONFIG_FILE,cfg);
