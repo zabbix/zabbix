@@ -17,6 +17,7 @@ Integrated from 1.1.x
 
 1.1.4
 
+ - minor fix for Spanish translation (Alexei)
  - fixed default config name for zabbix_agent (Alexei)
  - fixed swapped system CPU and nice CPU stats in ZABBIX agent (Alexei)
  - fixed processing of item calculated as delta speed per second (Alexei)
