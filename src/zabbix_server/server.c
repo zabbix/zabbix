@@ -100,6 +100,7 @@ int	CONFIG_POLLER_FORKS		= POLLER_FORKS;
 /* For trapper */
 int	CONFIG_TRAPPERD_FORKS		= TRAPPERD_FORKS;
 int	CONFIG_LISTEN_PORT		= 10051;
+char	*CONFIG_LISTEN_IP		= NULL;
 int	CONFIG_TRAPPER_TIMEOUT		= TRAPPER_TIMEOUT;
 /**/
 /*int	CONFIG_NOTIMEWAIT		=0;*/
@@ -341,6 +342,7 @@ void	init_config(void)
 		{"UnreachablePeriod",&CONFIG_UNREACHABLE_PERIOD,0,TYPE_INT,PARM_OPT,1,3600},
 		{"UnreachableDelay",&CONFIG_UNREACHABLE_DELAY,0,TYPE_INT,PARM_OPT,1,3600},
 		{"UnavailableDelay",&CONFIG_UNAVAILABLE_DELAY,0,TYPE_INT,PARM_OPT,1,3600},
+		{"ListenIP",&CONFIG_LISTEN_IP,0,TYPE_STRING,PARM_OPT,0,0},
 		{"ListenPort",&CONFIG_LISTEN_PORT,0,TYPE_INT,PARM_OPT,1024,32768},
 /*		{"NoTimeWait",&CONFIG_NOTIMEWAIT,0,TYPE_INT,PARM_OPT,0,1},*/
 		{"DisablePinger",&CONFIG_DISABLE_PINGER,0,TYPE_INT,PARM_OPT,0,1},
@@ -448,7 +450,14 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
 
 	bzero((char *) &serv_addr, sizeof(serv_addr));
 	serv_addr.sin_family      = AF_INET;
-	serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	if(CONFIG_LISTEN_IP == NULL)
+	{
+		serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+	}
+	else
+	{
+		serv_addr.sin_addr.s_addr = inet_addr(CONFIG_LISTEN_IP);
+	}
 	serv_addr.sin_port        = htons(port);
 
 	if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
