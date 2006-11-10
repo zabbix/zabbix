@@ -949,7 +949,7 @@ else
 
 	# Show History Graph
 
-	function	show_history($itemid,$from,$period)
+	function	show_history($itemid,$from,$stime,$period)
 	{
 		$till=date(S_DATE_FORMAT_YMDHMS,time(NULL)-$from*3600);   
 		show_table_header("TILL $till (".($period/3600)." HOURs)");
@@ -962,15 +962,15 @@ else
 		echo "<script language=\"JavaScript\" type=\"text/javascript\">";
 		echo "if (navigator.appName == \"Microsoft Internet Explorer\")";
 		echo "{";
-		echo " document.write(\"<IMG SRC='chart.php?itemid=$itemid&period=$period&from=$from&width=\"+(document.body.clientWidth-108)+\"'>\")";
+		echo " document.write(\"<IMG SRC='chart.php?itemid=$itemid&period=$period&from=$from&stime=$stime&width=\"+(document.body.clientWidth-108)+\"'>\")";
 		echo "}";
 		echo "else if (navigator.appName == \"Netscape\")";
 		echo "{";
-		echo " document.write(\"<IMG SRC='chart.php?itemid=$itemid&period=$period&from=$from&width=\"+(document.width-108)+\"'>\")";
+		echo " document.write(\"<IMG SRC='chart.php?itemid=$itemid&period=$period&from=$from&stime=$stime&width=\"+(document.width-108)+\"'>\")";
 		echo "}";
 		echo "else";
 		echo "{";
-		echo " document.write(\"<IMG SRC='chart.php?itemid=$itemid&period=$period&from=$from'>\")";
+		echo " document.write(\"<IMG SRC='chart.php?itemid=$itemid&period=$period&from=$from&stime=$stime'>\")";
 		echo "}";
 		echo "</script>";
 
