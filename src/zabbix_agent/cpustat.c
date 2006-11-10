@@ -364,8 +364,8 @@ static int	get_cpustat(int *now,float *cpu_user,float *cpu_system,float *cpu_nic
 
 	pstat_getdynamic(&stats, sizeof( struct pst_dynamic ), 1, 0 );
 	*cpu_user 	= (float)stats.psd_cpu_time[CP_USER];
-	*cpu_nice 	= (float)stats.psd_cpu_time[CP_SYS];
-	*cpu_system 	= (float)stats.psd_cpu_time[CP_NICE];
+	*cpu_nice 	= (float)stats.psd_cpu_time[CP_NICE];
+	*cpu_system 	= (float)stats.psd_cpu_time[CP_SYS];
 	*cpu_idle 	= (float)stats.psd_cpu_time[CP_IDLE];
 	
     #endif /* HAVE_SYS_PSTAT_H */
