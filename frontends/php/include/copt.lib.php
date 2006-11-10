@@ -96,6 +96,8 @@
 	define("USE_SQLREQUEST_PROF",1);
 	//define("SHOW_SQLREQUEST_DETAILS",1);
 	
+	if(!defined("OBR")) define("OBR","<br/>\n");
+	
 if(defined('USE_PROFILING'))
 {
 	$starttime=array();
@@ -208,16 +210,16 @@ if(defined('USE_SQLREQUEST_PROF'))
 
 			if(is_null($type)) $type='global';
 
-			echo "<br/>\n";
+			echo OBR;
 if(defined('USE_TIME_PROF'))
 {
-			echo "(".$type.") Time to execute: ".round($endtime - $starttime[$type],6)." seconds!\n<br/>\n";
+			echo "(".$type.") Time to execute: ".round($endtime - $starttime[$type],6)." seconds!".OBR;
 }
 if(defined('USE_MEM_PROF'))
 {
-			echo "(".$type.") Memory limit	 : ".ini_get('memory_limit')."<br/>\n";
-			echo "(".$type.") Memory usage	 : ".mem2str($memorystamp[$type])." - ".mem2str($memory)."\n<br/>\n";
-			echo "(".$type.") Memory leak	 : ".mem2str($memory - $memorystamp[$type])."\n<br/>\n";
+			echo "(".$type.") Memory limit	 : ".ini_get('memory_limit').OBR;
+			echo "(".$type.") Memory usage	 : ".mem2str($memorystamp[$type])." - ".mem2str($memory).OBR;
+			echo "(".$type.") Memory leak	 : ".mem2str($memory - $memorystamp[$type]).OBR;
 }
 if(defined('USE_VAR_MON'))
 {
@@ -225,7 +227,7 @@ if(defined('USE_VAR_MON'))
 			$var_diff = array_diff($curr_var_list, $var_list[$type]);
 			echo "(".$type.") Undeleted vars : ".count($var_diff)." [";
 			print_r(implode(', ',$var_diff));
-			echo "] <br/>";
+			echo "]".OBR;
 }
 if(defined('USE_COUNTER_PROF'))
 {
@@ -234,7 +236,7 @@ if(defined('USE_COUNTER_PROF'))
 				ksort($perf_counter[$type]);
 				foreach($perf_counter[$type] as $name => $value)
 				{
-					echo "(".$type.") Counter '".$name."' : ".$value."<br/>\n";
+					echo "(".$type.") Counter '".$name."' : ".$value.OBR;
 				}
 			}
 }
@@ -243,16 +245,16 @@ if(defined('USE_SQLREQUEST_PROF'))
 	if(defined('SHOW_SQLREQUEST_DETAILS'))
 	{
 			$requests_cnt = count($sqlrequests);
-			echo "(".$type.") SQL requests count: ".($requests_cnt - $sqlmark[$type])."<br/>\n";
+			echo "(".$type.") SQL requests count: ".($requests_cnt - $sqlmark[$type]).OBR;
 
 			for($i = $sqlmark[$type]; $i < $requests_cnt; $i++)
 			{
-				echo "(".$type.") SQL request    : ".$sqlrequests[$i]."<br/>\n";
+				echo "(".$type.") SQL request    : ".$sqlrequests[$i].OBR;
 			}
 	}
 	else
 	{
-			echo "(".$type.") SQL requests count: ".($sqlrequests - $sqlmark[$type])."<br/>\n";
+			echo "(".$type.") SQL requests count: ".($sqlrequests - $sqlmark[$type]).OBR;
 	}
 }
 		}
@@ -309,15 +311,15 @@ if(defined('USE_MENU_PROF'))
 			{
 if(defined('USE_MENU_DETAILS'))
 {
-				echo '<br/>(menu check) ['.$level."]<br/>\n";
+				echo OBR.'(menu check) ['.$level.OBR;
 				foreach($files_list as $file => $menu_list)
 				{
-					echo "(menu check)".SPACE.SPACE.SPACE.SPACE.$file.' {'.implode(',',$menu_list)."}<br/>\n";
+					echo "(menu check)".SPACE.SPACE.SPACE.SPACE.$file.' {'.implode(',',$menu_list)."}".OBR;
 				}
 }
 else
 {
-				echo '<br/>(menu check) ['.$level."] = ".count($files_list)."<br/>\n";
+				echo OBR.'(menu check) ['.$level."] = ".count($files_list).OBR;
 }
 			}
 }
