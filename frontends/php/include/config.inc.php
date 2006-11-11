@@ -174,7 +174,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 			return $ret;
 		}
 // Special processing of uptime
-		if($units=="s")
+		if($units=="uptime")
 		{
 			$ret="";
 			$days=floor($value/(24*3600));
