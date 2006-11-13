@@ -39,13 +39,12 @@
 	}
 
 ?>
-
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		"groupid"=>		array(T_ZBX_INT, O_OPT,	 P_SYS,		DB_ID,NULL),
 		"hostid"=>		array(T_ZBX_INT, O_OPT,  P_SYS,		DB_ID,NULL),
-		"graphid"=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,NULL),
+		"graphid"=>		array(T_ZBX_INT, O_OPT,  P_SYS,		DB_ID,NULL),
 		"dec"=>			array(T_ZBX_INT, O_OPT,  P_SYS, 	BETWEEN(0,65535*65535),NULL),
 		"inc"=>			array(T_ZBX_INT, O_OPT,  P_SYS, 	BETWEEN(0,65535*65535),NULL),
 		"left"=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	BETWEEN(0,65535*65535),NULL),
@@ -60,13 +59,18 @@
 
 	check_fields($fields);
 
+	if(isset($_REQUEST["graphid"]) && !isset($_REQUEST["hostid"]))
+	{
+		$_REQUEST["groupid"] = $_REQUEST["hostid"] = 0;
+	}
+
 	$_REQUEST["graphid"] = get_request("graphid", get_profile("web.charts.grapgid", 0));
 	$_REQUEST["keep"] = get_request("keep", 1); // possible excessed REQUEST variable !!!
 
 	$_REQUEST["period"] = get_request("period",get_profile("web.graph[".$_REQUEST["graphid"]."].period", 3600));
-	$effectiveperiod=navigation_bar_calc();
+	$effectiveperiod = navigation_bar_calc();
 
-	validate_group_with_host("R",array("allow_all_hosts","monitored_hosts","with_items"));
+	validate_group_with_host("R",array("allow_all_hosts","monitored_hosts","with_items", "always_select_first_host"));
 
 	if($_REQUEST["graphid"] > 0 && $_REQUEST["hostid"] > 0)
 	{
@@ -77,7 +81,6 @@
 			$_REQUEST["graphid"] = 0;
 	}
 ?>
-
 <?php
 	if($_REQUEST["graphid"] > 0 && $_REQUEST["period"] >= 3600)
 	{

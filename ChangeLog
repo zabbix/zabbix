@@ -1,5 +1,6 @@
 Changes for 1.1.4:
 
+ - fixed hosts remembering for graphs (Eugene)
  - fixed processing of unit "uptime" (Alexei)
  - support of ListenIP for ZABBIX server (Alexei)
  - changed PostgreSQL last OID function to pg_last_oid() (Alexei)
