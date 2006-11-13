@@ -23,6 +23,11 @@
 	define("GRAPH_TYPE_NORMAL",	0);
 	define("GRAPH_TYPE_STACKED",	1);
 
+	define('ZBX_MAX_TREND_DIFF', 3600);
+	
+	define('ZBX_GRAPH_MAX_SKIP_CELL', 16);
+	define('ZBX_GRAPH_MAX_SKIP_DELAY', 4);
+
 	class	Graph
 	{
 		var $period;
@@ -916,7 +921,7 @@
 				}
 				
 				$sql_arr = array();
-				if($this->period <= 24*3600)
+				if(($this->period / $this->sizeX) <= (ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL))
 				{
 					array_push($sql_arr,
 						'select itemid,round('.$x.'*(mod(clock+'.$z.','.$p.'))/('.$p.'),0) as i,'.
@@ -1203,9 +1208,9 @@
 					$delay	= $this->items[$item]["delay"];
 
 					if($cell > $delay)
-						$draw = $diff < 16*$cell;
+						$draw = $diff < ZBX_GRAPH_MAX_SKIP_CELL * $cell;
 					else		
-						$draw = $diff < 4*$delay;
+						$draw = $diff < ZBX_GRAPH_MAX_SKIP_DELAY * $delay;
 
 					if($draw == false && $this->items[$item]["calc_type"] == GRAPH_ITEM_AGGREGATED)
 						$draw = $i - $j < 5;
