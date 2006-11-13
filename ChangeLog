@@ -17,6 +17,8 @@ Integrated from 1.1.x
 
 1.1.4
 
+ - fixed graph displaying with period 1d - 2d8h (Eugene)
+ - fixed hosts remembering for graphs (Eugene)
  - fixed processing of unit "uptime" (Alexei)
  - support of ListenIP for ZABBIX server (Alexei)
  - changed PostgreSQL last OID function to pg_last_oid() (Alexei)
