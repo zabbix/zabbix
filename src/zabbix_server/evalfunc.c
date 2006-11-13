@@ -1078,8 +1078,8 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 	else if(strcmp(function,"fuzzytime")==0)
 	{
 		now=time(NULL);
-		fuzlow=(int)(now+atoi(parameter));
-		fuzhig=(int)(now-atoi(parameter));
+		fuzlow=(int)(now-atoi(parameter));
+		fuzhig=(int)(now+atoi(parameter));
 
 		if(item->lastvalue_null==1)
 		{
