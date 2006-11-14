@@ -1652,21 +1652,16 @@
 		if($resourcetype == SCREEN_RESOURCE_GRAPH)
 		{
 	// User-defined graph
-			$result=DBselect("select graphid,name from graphs order by name");
+			$result=DBselect("select h.host,g.graphid,g.name ".
+				" from graphs g,graphs_items gi,hosts h,items i ".
+				" where gi.graphid=g.graphid and h.hostid=i.hostid and gi.itemid=i.itemid ".
+				" and h.status=".HOST_STATUS_MONITORED." and i.status=".ITEM_STATUS_ACTIVE.
+				" group by g.graphid order by h.host,g.name");
 
 			$cmbGraphs = new CComboBox("resourceid",$resourceid);
 			while($row=DBfetch($result))
 			{
-				$db_hosts = get_hosts_by_graphid($row["graphid"]);
-				$db_host = DBfetch($db_hosts);
-				if($db_host)
-				{
-					$name = $db_host["host"].":".$row["name"];
-				}
-				else
-				{
-					$name = $row["name"];
-				}
+				$name = $row["host"].":".$row["name"];
 				$cmbGraphs->AddItem($row["graphid"],$name);
 			}
 
@@ -1679,7 +1674,6 @@
 				" from hosts h,items i where h.hostid=i.hostid".
 				" and h.status=".HOST_STATUS_MONITORED." and i.status=".ITEM_STATUS_ACTIVE.
 				" order by h.host,i.description");
-
 
 			$cmbItems = new CCombobox("resourceid",$resourceid);
 			while($row=DBfetch($result))
