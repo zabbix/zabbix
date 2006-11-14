@@ -1,5 +1,9 @@
 Changes for 1.1.4:
 
+ - added images import script for Oracle (Eugene)
+ - fixed Y asix value displaying for graphs (Eugene)
+ - fixed warning displaying (Eugene)
+ - added sorting by host in graph selection for screen element (Eugene)
  - fixed 'service_status[*]' for WinXX system (Eugene)
  - fixed trigger function fuzzytime() (Alexei)
  - fixed graph displaying with period 1d - 2d8h (Eugene)
