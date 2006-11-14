@@ -106,7 +106,7 @@ COpt::profiling_start("page");
     <title><?php echo $page['title'] ?></title>
     <link rel="stylesheet" href="css.css">
     <meta http-equiv="Content-Type" content="text/html; charset=<?php echo S_HTML_CHARSET ?>">
-    <meta name="Author" content="ZABBIX SIA (Alexei Vladishev, Eugene Grigorjev)">
+    <meta name="Author" content="ZABBIX SIA">
   </head>
 <body>
 <?php
