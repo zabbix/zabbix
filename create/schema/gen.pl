@@ -27,6 +27,7 @@ close(INFO);			# Close the file
 %mysql=("t_bigint"	=>	"bigint unsigned",
 	"t_id"		=>	"bigint unsigned",
 	"t_integer"	=>	"integer",
+	"t_time"	=>	"integer",
 	"t_serial"	=>	"serial",
 	"t_double"	=>	"double",
 	"t_varchar"	=>	"varchar",
