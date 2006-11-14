@@ -1,5 +1,6 @@
 Changes for 1.1.4:
 
+ - fixed 'service_status[*]' for WinXX system (Eugene)
  - fixed trigger function fuzzytime() (Alexei)
  - fixed graph displaying with period 1d - 2d8h (Eugene)
  - fixed hosts remembering for graphs (Eugene)

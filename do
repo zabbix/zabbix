@@ -7,6 +7,7 @@
 #	Eugene Grigorjev
 #
 
+win2nix="no"
 premake="no"
 copy="no"
 tgz="no"
@@ -23,24 +24,25 @@ def="--enable-agent --enable-server --with-mysql --with-ldap --with-net-snmp"
 for cmd
 do
   case "$cmd" in
-    copy )    copy="yes"; noparam=1;;
-    cpy )     copy="yes"; noparam=1;;
-    pre ) premake="yes"; noparam=1;;
-    premake ) premake="yes"; noparam=1;;
-    conf )      configure="yes"; noparam=1;;
-    config )    configure="yes"; noparam=1;;
-    configure ) configure="yes"; noparam=1;;
-    make )    domake="yes"; noparam=1;;
-    test )    dotest="yes"; noparam=1;;
-    tar )     tgz="yes"; noparam=1;;
-    nocat )   docat="no"; noparam=1;;
-    cat )   docat="yes"; noparam=1;;
-    def ) config_param="$config_param $def";;
-    --enable-* ) config_param="$config_param $cmd";; 
-    --with-* ) config_param="$config_param $cmd";;
-    --prefix=* ) config_param="$config_param $cmd";;
-    help ) help="yes";;
-    h ) help="yes";;
+    win2nix )	win2nix="yes";		noparam=1;;
+    copy )	copy="yes";		noparam=1;;
+    cpy )	copy="yes";		noparam=1;;
+    pre )	premake="yes";		noparam=1;;
+    premake )	premake="yes";		noparam=1;;
+    conf )	configure="yes";	noparam=1;;
+    config )	configure="yes";	noparam=1;;
+    configure )	configure="yes";	noparam=1;;
+    make )	domake="yes";		noparam=1;;
+    test )	dotest="yes";		noparam=1;;
+    tar )	tgz="yes";		noparam=1;;
+    nocat )	docat="no";		noparam=1;;
+    cat )	docat="yes";		noparam=1;;
+    def )		config_param="$config_param $def";;
+    --enable-* )	config_param="$config_param $cmd";; 
+    --with-* )		config_param="$config_param $cmd";;
+    --prefix=* )	config_param="$config_param $cmd";;
+    help )	help="yes";;
+    h )		help="yes";;
     * ) 
         echo "$0: ERROR: uncnown parameter \"$cmd\""; 
 	help="yes";
@@ -50,9 +52,23 @@ if [ "$help" = "yes" ] || [ $noparam = 0 ]
 then
         echo
         echo "Usage:"
-        echo "  $0 [copy|cpy] [premake|pre] [configure|config|conf] [def] [make] [test] [tar] [cat] [nocat] [--enable-*] [--with-*]"
-        echo
-	echo "  def = $def"
+        echo "  $0 [commands] [options]"
+	echo
+	echo " Commands:"
+	echo "   [win2nix]                - convers win EOL [\\r\\n] to nix EOL [\\r]"
+	echo "   [copy|cpy]               - copy automake files"
+	echo "   [premake|pre]            - make configuration file"
+	echo "   [configure|config|conf]  - configure make files"
+	echo "   [make]                   - make applications"
+	echo "   [test]                   - test applications"
+	echo "   [tar]                    - create ../zabbix.tar.gz of this folder"
+	echo
+	echo " Options:"
+	echo "   [def]            - default configuration \"$def\""
+	echo "   [cat]            - cat WARRNING file at the end (defaut - ON)"
+	echo "   [nocat]          - do not cat WARRNING file"
+	echo "   [--enable-*]     - option for configuration"
+	echo "   [--with-*]       - option for configuration"
         echo
         echo "Examples:"
         echo "  $0 conf def make test        - compyle, test, and sow report"
@@ -64,7 +80,8 @@ fi
 
 if [ "$copy" = "yes" ] || [ $premake = "yes" ] || 
   [ $configure = "yes" ] || [ $domake = "yes" ] || 
-  [ $dotest = "yes" ] || [ $tgz = "yes" ]
+  [ $dotest = "yes" ] || [ $tgz = "yes" ] ||
+  [ "$win2nix" = "yes" ]
 then
   cleanwarnings="yes"
 fi
@@ -72,6 +89,14 @@ fi
 if [ "$cleanwarnings" = "yes" ] 
 then
   rm -f WARNINGS
+fi
+
+if [ "$win2nix" = "yes" ]
+then
+  echo "Replacing..."
+  echo "Replacing..." >> WARNINGS
+  find ./ -name "configure.in" -exec vi "+%s/\\r$//" "+wq" "-es" {} ';' -print 2>> WARNINGS
+  find ./ -name "*.[hc]" -exec vi "+%s/\\r$//" "+wq" "-es" {} ';' -print 2>> WARNINGS
 fi
 
 if [ "$premake" = "yes" ] 

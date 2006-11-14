@@ -595,10 +595,11 @@ static LONG H_DiskInfo(char *cmd,char *arg,double *value)
 static LONG H_ServiceState(char *cmd,char *arg,double *value)
 {
    SC_HANDLE mgr,service;
+   char displayName[MAX_PATH];
+   unsigned long maxLenDisplayName = MAX_PATH;
    char serviceName[MAX_PATH];
 
-
-   GetParameterInstance(cmd,serviceName,MAX_PATH-1);
+   GetParameterInstance(cmd,displayName,MAX_PATH-1);
 
    mgr=OpenSCManager(NULL,NULL,GENERIC_READ);
    if (mgr==NULL)
@@ -606,34 +607,40 @@ static LONG H_ServiceState(char *cmd,char *arg,double *value)
       *value=255;    // Unable to retrieve information
       return SYSINFO_RC_SUCCESS;
    }
-
-   service=OpenService(mgr,serviceName,SERVICE_QUERY_STATUS);
-   if (service==NULL)
+   if(0 == GetServiceKeyName(mgr, displayName, serviceName, &maxLenDisplayName))
    {
-      *value=SYSINFO_RC_NOTSUPPORTED;
+	   *value=SYSINFO_RC_NOTSUPPORTED;
    }
    else
    {
-      SERVICE_STATUS status;
+	   service=OpenService(mgr,serviceName,SERVICE_QUERY_STATUS);
+	   if (service==NULL)
+	   {
+	      *value=SYSINFO_RC_NOTSUPPORTED;
+	   }
+	   else
+	   {
+	      SERVICE_STATUS status;
 
-      if (QueryServiceStatus(service,&status))
-      {
-         int i;
-         static DWORD states[7]={ SERVICE_RUNNING,SERVICE_PAUSED,SERVICE_START_PENDING,
-                                  SERVICE_PAUSE_PENDING,SERVICE_CONTINUE_PENDING,
-                                  SERVICE_STOP_PENDING,SERVICE_STOPPED };
+	      if (QueryServiceStatus(service,&status))
+	      {
+		 int i;
+		 static DWORD states[7]={ SERVICE_RUNNING,SERVICE_PAUSED,SERVICE_START_PENDING,
+					  SERVICE_PAUSE_PENDING,SERVICE_CONTINUE_PENDING,
+					  SERVICE_STOP_PENDING,SERVICE_STOPPED };
 
-         for(i=0;i<7;i++)
-            if (status.dwCurrentState==states[i])
-               break;
-         *value=(double)i;
-      }
-      else
-      {
-         *value=255;    // Unable to retrieve information
-      }
+		 for(i=0;i<7;i++)
+		    if (status.dwCurrentState==states[i])
+		       break;
+		 *value=(double)i;
+	      }
+	      else
+	      {
+		 *value=255;    // Unable to retrieve information
+	      }
 
-      CloseServiceHandle(service);
+	      CloseServiceHandle(service);
+	   }
    }
 
    CloseServiceHandle(mgr);
