@@ -21,7 +21,7 @@
 -- Dumping data for table images
 --
 
-CREATE OR REPLACE DIRECTORY image_dir AS '/home/osmiy/zabbix/branches/1.1.4/create/data/images'
+CREATE OR REPLACE DIRECTORY image_dir AS '/home/zabbix/zabbix/create/data/images'
 /
 
 CREATE OR REPLACE PROCEDURE LOAD_IMAGE (IMG_ID IN NUMBER, IMG_TYPE IN NUMBER, IMG_NAME IN VARCHAR2, FILE_NAME IN VARCHAR2) 
