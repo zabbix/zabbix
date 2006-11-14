@@ -38,7 +38,7 @@ ZBX_TABLE
 };
 
 static	ZBX_TABLE	tables[]={
-	{"nodes",	"nodeid",	ZBX_NOSYNC,
+	{"nodes",	"nodeid",	ZBX_SYNC,
 		{
 		{"nodeid",	ZBX_TYPE_INT,	ZBX_SYNC},
 		{"name",	ZBX_TYPE_CHAR,	ZBX_SYNC},
@@ -47,6 +47,13 @@ static	ZBX_TABLE	tables[]={
 		{"port",	ZBX_TYPE_INT,	ZBX_SYNC},
 		{"slave_history",ZBX_TYPE_INT,	ZBX_SYNC},
 		{"slave_trends",ZBX_TYPE_INT,	ZBX_SYNC},
+		{"slave_trends",ZBX_TYPE_INT,	ZBX_SYNC},
+		{"event_lastid",ZBX_TYPE_INT,	ZBX_NOSYNC},
+		{"event_maxid",	ZBX_TYPE_INT,	ZBX_NOSYNC},
+		{"history_lastid",ZBX_TYPE_INT,	ZBX_NOSYNC},
+		{"history_lastid",ZBX_TYPE_INT,	ZBX_NOSYNC},
+		{"history_str_lastid",ZBX_TYPE_INT,	ZBX_NOSYNC},
+		{"history_uint_lastid",ZBX_TYPE_INT,	ZBX_NOSYNC},
 		{"nodetype",	ZBX_TYPE_INT,	ZBX_SYNC},
 		{"masterid",	ZBX_TYPE_INT,	ZBX_SYNC},
 		{0}

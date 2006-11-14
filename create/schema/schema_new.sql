@@ -168,7 +168,7 @@ FIELD		|alertid	|t_id		|'0'	|NOT NULL	|
 FIELD		|actionid	|t_id		|'0'	|NOT NULL	|
 FIELD		|triggerid	|t_id		|'0'	|NOT NULL	|
 FIELD		|userid		|t_id		|'0'	|NOT NULL	|
-FIELD		|clock		|t_integer	|'0'	|NOT NULL	|
+FIELD		|clock		|t_time		|'0'	|NOT NULL	|
 FIELD		|mediatypeid	|t_id		|'0'	|NOT NULL	|
 FIELD		|sendto		|t_varchar(100)	|''	|NOT NULL	|
 FIELD		|subject	|t_varchar(255)	|''	|NOT NULL	|
@@ -211,7 +211,7 @@ INDEX		|1		|actionid
 TABLE|events|eventid|
 FIELD		|eventid		|t_id		|'0'	|NOT NULL	|
 FIELD		|triggerid	|t_id		|'0'	|NOT NULL	|
-FIELD		|clock		|t_integer	|'0'	|NOT NULL	|
+FIELD		|clock		|t_time		|'0'	|NOT NULL	|
 FIELD		|value		|t_integer	|'0'	|NOT NULL	|
 FIELD		|acknowledged	|t_integer	|'0'	|NOT NULL	|
 INDEX		|1		|triggerid,clock
@@ -229,7 +229,7 @@ INDEX		|2		|itemid,function,parameter
 
 TABLE|history||NO_SYNC
 FIELD		|itemid		|t_id		|'0'		|NOT NULL	|
-FIELD		|clock		|t_integer	|'0'		|NOT NULL	|
+FIELD		|clock		|t_time		|'0'		|NOT NULL	|
 FIELD		|value		|t_double(16,4)	|'0.0000'	|NOT NULL	|
 INDEX		|1		|itemid,clock
 
@@ -237,13 +237,13 @@ TABLE|history_sync|id|NO_SYNC
 FIELD		|id		|t_serial		|		|		|
 FIELD		|nodeid		|t_id		|'0'		|NOT NULL	|
 FIELD		|itemid		|t_id		|'0'		|NOT NULL	|
-FIELD		|clock		|t_integer	|'0'		|NOT NULL	|
+FIELD		|clock		|t_time		|'0'		|NOT NULL	|
 FIELD		|value		|t_double(16,4)	|'0.0000'	|NOT NULL	|
 INDEX		|1		|nodeid,id
 
 TABLE|history_uint||NO_SYNC
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|
-FIELD		|clock		|t_integer	|'0'	|NOT NULL	|
+FIELD		|clock		|t_time		|'0'	|NOT NULL	|
 FIELD		|value		|t_bigint		|'0'	|NOT NULL	|
 INDEX		|1		|itemid,clock
 
@@ -251,13 +251,13 @@ TABLE|history_uint_sync|id|NO_SYNC
 FIELD		|id		|t_serial		|	|		|
 FIELD		|nodeid		|t_id		|'0'	|NOT NULL	|
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|
-FIELD		|clock		|t_integer	|'0'	|NOT NULL	|
+FIELD		|clock		|t_time		|'0'	|NOT NULL	|
 FIELD		|value		|t_bigint		|'0'	|NOT NULL	|
 INDEX		|1		|nodeid,id
 
 TABLE|history_str||NO_SYNC
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|
-FIELD		|clock		|t_integer	|'0'	|NOT NULL	|
+FIELD		|clock		|t_time		|'0'	|NOT NULL	|
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|
 INDEX		|1		|itemid,clock
 
@@ -265,7 +265,7 @@ TABLE|history_str_sync|id|NO_SYNC
 FIELD		|id		|t_serial		|	|		|
 FIELD		|nodeid		|t_id		|'0'	|NOT NULL	|
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|
-FIELD		|clock		|t_integer	|'0'	|NOT NULL	|
+FIELD		|clock		|t_time		|'0'	|NOT NULL	|
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|
 INDEX		|1		|nodeid,id
 
@@ -295,9 +295,9 @@ FIELD		|key_		|t_varchar(64)	|''	|NOT NULL	|
 FIELD		|delay		|t_integer	|'0'	|NOT NULL	|
 FIELD		|history	|t_integer	|'90'	|NOT NULL	|
 FIELD		|trends		|t_integer	|'365'	|NOT NULL	|
-FIELD		|nextcheck	|t_integer	|'0'	|NOT NULL	|
+FIELD		|nextcheck	|t_time		|'0'	|NOT NULL	|
 FIELD		|lastvalue	|t_varchar(255)	|	|NULL		|
-FIELD		|lastclock	|t_integer	|	|NULL		|
+FIELD		|lastclock	|t_time		|	|NULL		|
 FIELD		|prevvalue	|t_varchar(255)	|	|NULL		|
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|
 FIELD		|value_type	|t_integer	|'0'	|NOT NULL	|
@@ -383,7 +383,7 @@ INDEX		|1		|alias
 TABLE|auditlog|auditid|
 FIELD		|auditid	|t_id		|'0'	|NOT NULL	|
 FIELD		|userid		|t_id		|'0'	|NOT NULL	|
-FIELD		|clock		|t_integer	|'0'	|NOT NULL	|
+FIELD		|clock		|t_time		|'0'	|NOT NULL	|
 FIELD		|action		|t_integer	|'0'	|NOT NULL	|
 FIELD		|resourcetype	|t_integer	|'0'	|NOT NULL	|
 FIELD		|details	|t_varchar(128)	|'0'	|NOT NULL	|
@@ -406,7 +406,7 @@ INDEX		|1		|groupid
 TABLE|service_alarms|servicealarmid|
 FIELD		|servicealarmid	|t_id		|'0'	|NOT NULL	|
 FIELD		|serviceid	|t_id		|'0'	|NOT NULL	|
-FIELD		|clock		|t_integer	|'0'	|NOT NULL	|
+FIELD		|clock		|t_time		|'0'	|NOT NULL	|
 FIELD		|value		|t_integer	|'0'	|NOT NULL	|
 INDEX		|1		|serviceid,clock
 INDEX		|2		|clock
@@ -455,7 +455,7 @@ INDEX		|1		|usrgrpid,userid
 
 TABLE|trends|itemid,clock|DB_NOSYNC
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|
-FIELD		|clock		|t_integer	|'0'	|NOT NULL	|
+FIELD		|clock		|t_time		|'0'	|NOT NULL	|
 FIELD		|num		|t_integer	|'0'	|NOT NULL	|
 FIELD		|value_min	|t_double(16,4)	|'0.0000'|NOT NULL	|
 FIELD		|value_avg	|t_double(16,4)	|'0.0000'|NOT NULL	|
@@ -477,7 +477,7 @@ INDEX		|1		|hostid,templateid
 TABLE|history_log|id|
 FIELD		|id		|t_id		|'0'	|NOT NULL	|
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|
-FIELD		|clock		|t_integer	|'0'	|NOT NULL	|
+FIELD		|clock		|t_time		|'0'	|NOT NULL	|
 FIELD		|timestamp	|t_integer	|'0'	|NOT NULL	|
 FIELD		|source		|t_varchar(64)	|''	|NOT NULL	|
 FIELD		|severity	|t_integer	|'0'	|NOT NULL	|
@@ -487,7 +487,7 @@ INDEX		|1		|itemid,clock
 TABLE|history_text|id|
 FIELD		|id		|t_id		|'0'	|NOT NULL	|
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|
-FIELD		|clock		|t_integer	|'0'	|NOT NULL	|
+FIELD		|clock		|t_time		|'0'	|NOT NULL	|
 FIELD		|value		|t_history_text	|''	|NOT NULL	|
 INDEX		|1		|itemid,clock
 
@@ -533,7 +533,7 @@ TABLE|acknowledges|acknowledgeid|
 FIELD		|acknowledgeid	|t_id		|'0'	|NOT NULL	|
 FIELD		|userid		|t_id		|'0'	|NOT NULL	|
 FIELD		|eventid	|t_id		|'0'	|NOT NULL	|
-FIELD		|clock		|t_integer	|'0'	|NOT NULL	|
+FIELD		|clock		|t_time		|'0'	|NOT NULL	|
 FIELD		|message	|t_varchar(255)	|''	|NOT NULL	|
 INDEX		|1		|userid
 INDEX		|2		|eventid

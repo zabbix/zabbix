@@ -1,6 +1,6 @@
 password=""
 user="root"
-dbname="z"
+dbname="zabbix"
 nodeid=$1
 
 echo "update config set configid=configid+0000100000000000000*$nodeid"|mysql --user="$user" --password="$password" $dbname
