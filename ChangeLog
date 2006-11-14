@@ -17,6 +17,7 @@ Integrated from 1.1.x
 
 1.1.4
 
+ - fixed processing of web.page.regexp[] (Alexei)
  - fixed trigger function fuzzytime() (Alexei)
  - fixed graph displaying with period 1d - 2d8h (Eugene)
  - fixed hosts remembering for graphs (Eugene)
