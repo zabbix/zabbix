@@ -60,8 +60,9 @@
 
 	/* public */ class CFlash extends CTag
 	{
+		/*
 		var $SrcParam;
-		var $EmbededFlash;
+		var $EmbededFlash; */
 
 		function CFlash($src=NULL, $width = NULL, $height = NULL)
 		{

@@ -47,29 +47,30 @@
 
 	class	Graph
 	{
-		var $period;
-		var $from;
+		/*
+		//var $period;
+		//var $from;
 		var $stime;
-		var $sizeX;
-		var $sizeY;
-		var $shiftXleft;
-		var $shiftXright;
-		var $shiftY;
-		var $border;
+		//var $sizeX;
+		//var $sizeY;
+		//var $shiftXleft;
+		//var $shiftXright;
+		//var $shiftY;
+		//var $border;
 
 		var $fullSizeX;
 		var $fullSizeY;
 
-		var $m_showWorkPeriod;
-		var $m_showTriggers;
+		//var $m_showWorkPeriod;
+		//var $m_showTriggers;
 
-		var $type; /* 0 - simple graph; 1 - stacked graph; */
+		//var $type; // 0 - simple graph; 1 - stacked graph;
 
-		var $yaxistype;
+		//var $yaxistype;
 		var $yaxismin;
 		var $yaxismax;
-		var $yaxisleft;
-		var $yaxisright;
+		//var $yaxisleft;
+		//var $yaxisright;
 		var $m_minY;
 		var $m_maxY;
 
@@ -84,7 +85,7 @@
 		var $clock;
 		var $count;
 		// Number of items
-		var $num;
+		//var $num;
 
 		var $header;
 
@@ -94,7 +95,67 @@
 		var $colors;
 		var $im;
 
-		var $triggers = array();
+		var $triggers = array();*/
+
+		function Graph($type = GRAPH_TYPE_NORMAL)
+		{
+			$this->stime = null;
+			$this->fullSizeX = null;
+			$this->fullSizeY = null;
+
+			$this->yaxismin = null;
+			$this->yaxismax = null;
+
+			$this->m_minY = null;
+			$this->m_maxY = null;
+
+			$this->data = array();
+
+			$this->items = null;
+
+			$this->min = null;
+			$this->max = null;
+			$this->avg = null;
+			$this->clock = null;
+			$this->count = null;
+
+			$this->header = null;
+
+			$this->from_time = null;
+			$this->to_time = null;
+
+			$this->colors = null;
+			$this->im = null;
+
+			$this->triggers = array();
+			
+			$this->period=3600;
+			$this->from=0;
+			$this->sizeX=900;
+			$this->sizeY=200;
+			$this->shiftXleft=10;
+			$this->shiftXright=60;
+			$this->shiftY=17;
+			$this->border=1;
+			$this->num=0;
+			$this->type = $type;
+			$this->yaxistype=GRAPH_YAXIS_TYPE_CALCULATED;
+			$this->yaxisright=0;
+			$this->yaxisleft=0;
+			
+			$this->m_showWorkPeriod = 1;
+			$this->m_showTriggers = 1;
+
+/*			if($this->period<=3600)
+			{
+				$this->date_format="H:i";
+			}
+			else
+			{
+				$this->date_format="m.d H:i";
+			}*/
+
+		}
 
 		function updateShifts()
 		{
@@ -169,36 +230,6 @@
 					$this->colors[$name]	= ImageColorAllocate($this->im,$RGBA[0],$RGBA[1],$RGBA[2]);
 				}
 			}
-		}
-
-		function Graph($type = GRAPH_TYPE_NORMAL)
-		{
-			$this->period=3600;
-			$this->from=0;
-			$this->sizeX=900;
-			$this->sizeY=200;
-			$this->shiftXleft=10;
-			$this->shiftXright=60;
-			$this->shiftY=17;
-			$this->border=1;
-			$this->num=0;
-			$this->type = $type;
-			$this->yaxistype=GRAPH_YAXIS_TYPE_CALCULATED;
-			$this->yaxisright=0;
-			$this->yaxisleft=0;
-			
-			$this->m_showWorkPeriod = 1;
-			$this->m_showTriggers = 1;
-
-/*			if($this->period<=3600)
-			{
-				$this->date_format="H:i";
-			}
-			else
-			{
-				$this->date_format="m.d H:i";
-			}*/
-
 		}
 
 		function ShowWorkPeriod($value)

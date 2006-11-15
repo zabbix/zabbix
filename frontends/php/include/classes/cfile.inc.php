@@ -30,14 +30,6 @@
 			$this->SetName($name);
 			$this->SetFile($value);
 		}
-		function SetName($value='textarea')
-		{
-			if(!is_string($value))
-			{
-				return $this->error("Incorrect value for SetName [$value]");
-			}
-			return $this->AddOption("name",$value);
-		}
 		function SetFile($value="")
 		{
 			if(!is_string($value))
