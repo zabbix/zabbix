@@ -28,10 +28,10 @@ function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$m
 	require_once	"include/copt.lib.php";
 
 // GLOBALS
+	global $USER_DETAILS, $USER_RIGHTS;
+
 	$USER_DETAILS	= array();
 	$USER_RIGHTS	= array();
-	$ERROR_MSG	= array();
-	$INFO_MSG	= array();
 // END OF GLOBALS
 
 // if magic quotes on then get rid of them
@@ -117,6 +117,7 @@ function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$m
 	}
 	unset($local_node_data);
 
+
 	function	read_configuration_file($file='conf/zabbix.conf.php')
 	{
 		global $ZBX_CONFIGURATION_FILE;
@@ -166,29 +167,22 @@ function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$m
 
 	function info($msg)
 	{
-		global $INFO_MSG;
+		global $ZBX_MESSAGES;
 
-		if(is_array($INFO_MSG))
-		{
-			array_push($INFO_MSG,$msg);
-		}
-		else
-		{
-			$INFO_MSG=array($msg);
-		}
+		if(is_null($ZBX_MESSAGES))
+			$ZBX_MESSAGES = array();
+
+		array_push($ZBX_MESSAGES, array('type' => 'info', 'message' => $msg));
 	}
 
 	function error($msg)
 	{
-		global $ERROR_MSG;
-		if(is_array($ERROR_MSG))
-		{
-			array_push($ERROR_MSG,$msg);
-		}
-		else
-		{
-			$ERROR_MSG=array($msg);
-		}
+		global $ZBX_MESSAGES;
+
+		if(is_null($ZBX_MESSAGES))
+			$ZBX_MESSAGES = array();
+
+		array_push($ZBX_MESSAGES, array('type' => 'error', 'message' => $msg));
 	}
 
 	function fatal_error($msg)
@@ -455,9 +449,7 @@ else
 
 	function	show_messages($bool=TRUE,$okmsg=NULL,$errmsg=NULL)
 	{
-		global	$ERROR_MSG;
-		global	$INFO_MSG;
-		global	$page;
+		global	$page, $ZBX_MESSAGES;
 
 		if(!isset($page["type"])) $page["type"] = PAGE_TYPE_HTML;
 
@@ -491,56 +483,41 @@ else
 			}
 		}
 
-		if(is_array($INFO_MSG) && count($INFO_MSG)>0)
-		{
-			switch($page["type"])
-			{
-				case PAGE_TYPE_IMAGE:
-					while($val = array_shift($INFO_MSG))
-					{
-						array_push($message, array(
-							'text'	=> $val,
-							'color'	=> array('R'=>155,'G'=>155,'B'=>55),
-							'font'	=> 2));
-						$width = max($width, ImageFontWidth(2) * strlen($val) + 1);
-						$height += imagefontheight(2) + 1;
-					}
-					break;			
-				case PAGE_TYPE_HTML:
-					echo "<p align=center class=\"info\">";
-					while($val = array_shift($INFO_MSG))
-					{
-						echo htmlspecialchars($val).BR;
-					}
-					echo "</p>";
-					break;
-			}
-		}
 
-		if(is_array($ERROR_MSG) && count($ERROR_MSG)>0)
+		if(isset($ZBX_MESSAGES))
 		{
-			switch($page["type"])
+			
+			if($page["type"] == PAGE_TYPE_IMAGE)
 			{
-				case PAGE_TYPE_IMAGE:
-					while($val = array_shift($ERROR_MSG))
+				foreach($ZBX_MESSAGES as $msg)
+				{
+					if($msg['type'] == 'error')
 					{
 						array_push($message, array(
-							'text'	=> $val,
+							'text'	=> $msg['message'],
 							'color'	=> array('R'=>255,'G'=>55,'B'=>55),
 							'font'	=> 2));
-						$width = max($width, ImageFontWidth(2) * strlen($val) + 1);
-						$height += imagefontheight(2) + 1;
 					}
-					break;			
-				case PAGE_TYPE_HTML:
-					echo "<p align=center class=\"error\">";
-					while($val = array_shift($ERROR_MSG))
+					else
 					{
-						echo htmlspecialchars($val).BR;
+						array_push($message, array(
+							'text'	=> $msg['message'],
+							'color'	=> array('R'=>155,'G'=>155,'B'=>55),
+							'font'	=> 2));
 					}
-					echo "</p>";
-					break;
+					$width = max($width, ImageFontWidth(2) * strlen($msg['message']) + 1);
+					$height += imagefontheight(2) + 1;
+				}
 			}
+			else
+			{
+				$lst_error = new CList(null,'messages');
+				foreach($ZBX_MESSAGES as $msg)
+					$lst_error->AddItem($msg['message'], $msg['type']);
+				$lst_error->Show(false);
+				unset($lst_error);
+			}
+			$ZBX_MESSAGES = null;
 		}
 
 		if($page["type"] == PAGE_TYPE_IMAGE && count($message) > 0)

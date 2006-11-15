@@ -86,11 +86,15 @@
 		var $do_redirect;*/
 
 		function CButtonQMessage($name, $caption, $msg=NULL, $vars=NULL, $do_redirect=true){
+			$this->vars = null;
+			$this->msg = null;
 			$this->name = $name;
+			$this->do_redirect = $do_redirect;
+			
 			parent::CButton($name,$caption);
+
 			$this->SetMessage($msg);
 			$this->SetVars($vars);
-			$this->do_redirect = $do_redirect;
 		}
 		function SetVars($value=NULL){
 			if(!is_string($value) && !is_null($value)){
