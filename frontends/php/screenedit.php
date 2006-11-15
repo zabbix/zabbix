@@ -36,7 +36,7 @@ include_once "include/page_header.php";
 	$fields=array(
 		"screenid"=>	array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
 		
-		"screenitemid"=>array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,			'{form}=="update"'),
+		"screenitemid"=>array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			'{form}=="update"&&(!isset({x})||!isset({y}))'),
 		"resourcetype"=>	array(T_ZBX_INT, O_OPT,  null,  
 					BETWEEN(SCREEN_RESOURCE_GRAPH,SCREEN_RESOURCE_EVENTS),	'isset({save})'),
 		"resourceid"=>	array(T_ZBX_INT, O_OPT,  null,  DB_ID,			'isset({save})'),
