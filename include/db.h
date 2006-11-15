@@ -42,8 +42,8 @@
 #	include <libpq-fe.h>
 #endif /* HAVE_PGSQL */
 
-#ifdef HAVE_SQLITE
-#	include <sqlite.h>
+#ifdef HAVE_SQLITE3
+#	include <sqlite3.h>
 #endif /* HAVE_PGSQL */
 
 extern	char	*CONFIG_DBHOST;
@@ -70,9 +70,9 @@ extern	int	CONFIG_DBPORT;
 #define DB_MEDIATYPE	struct mediatype_type
 #define DB_TRIGGER	struct trigger_type
 
-#ifdef HAVE_SQLITE
+#ifdef HAVE_SQLITE3
 	#define DB_ROW		char **
-	#define	DB_RESULT	sqlite3_stmt
+	#define	DB_RESULT	sqlite3_stmt *
 	#define	DBfree_result	sqlite3_finalize
 #endif
 
@@ -359,15 +359,13 @@ int DBexecute(const char *fmt, ...);
 /*long	DBaffected_rows();*/
 
 /*DB_RESULT	DBselect(char *query);*/
-char *DBselect(const char *fmt, ...);
-//sqlite3_stmt* DBselect(const char *fmt, ...);
-//DB_RESULT DBselect(const char *fmt, ...);
+DB_RESULT DBselect(const char *fmt, ...);
 DB_RESULT	DBselectN(char *query, int n);
 DB_ROW	DBfetch(DB_RESULT result);
 zbx_uint64_t DBget_nextid(char *table, char *field);
 /*char	*DBget_field(DB_RESULT result, int rownum, int fieldnum);*/
 /*int	DBnum_rows(DB_RESULT result);*/
-int	DBinsert_id(int exec_result, const char *table, const char *field);
+zbx_uint64_t	DBinsert_id(int exec_result, const char *table, const char *field);
 int	DBis_null(char *field);
 
 int	DBget_function_result(double *result,char *functionid);
@@ -397,7 +395,7 @@ int	DBget_queue_count(void);
 void    DBescape_string(char *from, char *to, int maxlen);
 void    DBget_item_from_db(DB_ITEM *item,DB_ROW row);
 
-int	DBadd_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available);
+zbx_uint64_t	DBadd_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available);
 int	DBhost_exists(char *server);
 int	DBget_host_by_hostid(int hostid,DB_HOST *host);
 int	DBsync_host_with_templates(int hostid);
