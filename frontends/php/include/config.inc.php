@@ -269,7 +269,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 				$value=$value/(1000*1000*1000);
 			}
 	
-			if(($value - round($value)) < 0.01)
+			if(round($value) == round($value,2))
 			{
 				$s=sprintf("%.0f",$value);
 			}
@@ -284,7 +284,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 
 		if($units=="")
 		{
-			if(($value - round($value)) < 0.01)
+			if(round($value) == round($value,2))
 			{
 				return sprintf("%.0f",$value);
 			}
@@ -321,7 +321,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 			$value=$value/(1024*1024*1024*1024);
 		}
 
-		if(($value - round($value)) < 0.01)
+		if(round($value) == round($value,2))
 		{
 			$s=sprintf("%.0f",$value);
 		}

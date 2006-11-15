@@ -1,8 +1,10 @@
+Changes for 1.1.5:
+ - fixed Y asix value displaying for graphs (Eugene)
+
 Changes for 1.1.4:
 
  - fixed processing of web.page.regexp[] (Alexei)
  - added images import script for Oracle (Eugene)
- - fixed Y asix value displaying for graphs (Eugene)
  - fixed warning displaying (Eugene)
  - added sorting by host in graph selection for screen element (Eugene)
  - fixed 'service_status[*]' for WinXX system (Eugene)
