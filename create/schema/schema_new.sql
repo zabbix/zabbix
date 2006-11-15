@@ -26,9 +26,9 @@ FIELD		|nodeid		|t_id		|'0'	|NOT NULL	|NO_SYNC
 FIELD		|name		|t_varchar(64)	|'0'	|NOT NULL	|NO_SYNC
 FIELD		|timezone	|t_integer	|'0'	|NOT NULL	|
 FIELD		|ip		|t_varchar(15)	|''	|NOT NULL	|
-FIELD		|port		|t_integer	|'0'	|NOT NULL	|
-FIELD		|slave_history	|t_integer	|'0'	|NOT NULL	|
-FIELD		|slave_trends	|t_integer	|'0'	|NOT NULL	|
+FIELD		|port		|t_integer	|'10051'|NOT NULL	|
+FIELD		|slave_history	|t_integer	|'30'	|NOT NULL	|
+FIELD		|slave_trends	|t_integer	|'365'	|NOT NULL	|
 FIELD		|event_lastid	|t_id		|'0'	|NOT NULL	|
 FIELD		|event_maxid	|t_id		|'0'	|NOT NULL	|
 FIELD		|history_lastid	|t_bigint	|'0'	|NOT NULL	|
