@@ -33,6 +33,10 @@
 #include "zlog.h"
 #include "common.h"
 
+#ifdef	HAVE_SQLITE
+	sqlite	*db;
+#endif
+
 #ifdef	HAVE_MYSQL
 	MYSQL	mysql;
 #endif
@@ -60,6 +64,9 @@ void	DBclose(void)
 #endif
 #ifdef	HAVE_ORACLE
 	sqlo_finish(oracle);
+#endif
+#ifdef	HAVE_SQLITE
+	sqlite3_close(sqlite);
 #endif
 }
 
@@ -125,6 +132,19 @@ void    DBconnect(void)
 	}
 	sqlo_autocommit_on(oracle);
 #endif
+#ifdef	HAVE_SQLITE
+	int res;
+
+	res = sqlite3_open(CONFIG_DBNAME, &db);
+
+/* check to see that the backend connection was successfully made */
+	if(res)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Can't open database: %s\n", sqlite3_errmsg(db));
+		DBclose();
+		exit(FAIL);
+	}
+#endif
 }
 
 /*
@@ -141,6 +161,10 @@ int DBexecute(const char *fmt, ...)
 #endif
 #ifdef	HAVE_ORACLE
 	int ret;
+#endif
+#ifdef	HAVE_SQLITE
+	int ret = SUCCEED;
+	char *error=0;
 #endif
 
 	va_start(args, fmt);
@@ -186,6 +210,16 @@ int DBexecute(const char *fmt, ...)
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", sqlo_geterror(oracle) );
 		zbx_error("Query::%s.",sql);
 		zbx_error("Query failed:%s.", sqlo_geterror(oracle) );
+		ret = FAIL;
+	}
+	return ret;
+#endif
+#ifdef	HAVE_SQLITE
+	if(SQLITE_OK != sqlite3_exec(db, sql, NULL, 0, &error))
+	{
+		zabbix_log( LOG_LEVEL_ERR, "Query::%s",sql);
+		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", error);
+		sqlite3_free(error);
 		ret = FAIL;
 	}
 	return ret;
