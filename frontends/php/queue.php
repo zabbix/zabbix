@@ -54,7 +54,7 @@ include_once "include/page_header.php";
 <?php
 	$now = time();
 
-	$result = DBselect("select i.itemid, i.nextcheck, i.description, i.key_, h.host,h.hostid ".
+	$result = DBselect("select i.itemid,i.nextcheck,i.description,i.key_,i.type,h.host,h.hostid ".
 		" from items i,hosts h ".
 		" where i.status=".ITEM_STATUS_ACTIVE." and i.type not in (".ITEM_TYPE_TRAPPER.") ".
 		" and ((h.status=".HOST_STATUS_MONITORED." and h.available != ".HOST_AVAILABLE_FALSE.") ".

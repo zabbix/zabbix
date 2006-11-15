@@ -42,6 +42,7 @@ frontends/php/create/data.sql -text
 frontends/php/create/mysql.sql -text
 frontends/php/images/flash/zbxclock.swf -text svneol=unset#unset
 frontends/php/images/general/closed.gif -text svneol=unset#unset
+frontends/php/images/general/error_small.gif -text
 frontends/php/images/general/help.gif -text svneol=unset#unset
 frontends/php/images/general/inst_completed.gif -text
 frontends/php/images/general/inst_current.gif -text
@@ -51,6 +52,7 @@ frontends/php/images/general/sortdown.gif -text svneol=unset#unset
 frontends/php/images/general/sortdown_off.gif -text svneol=unset#unset
 frontends/php/images/general/sortup.gif -text svneol=unset#unset
 frontends/php/images/general/sortup_off.gif -text svneol=unset#unset
+frontends/php/images/general/warning_small.gif -text
 frontends/php/images/general/zabbix.png -text svneol=unset#unset
 frontends/php/images/gradients/blink1.gif -text svneol=unset#unset
 frontends/php/images/gradients/blink2.gif -text svneol=unset#unset
