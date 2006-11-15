@@ -95,9 +95,9 @@ include_once "include/page_header.php";
 
 	$_REQUEST["applications"] = get_request("applications",get_profile("web.latest.applications",array()),PROFILE_TYPE_ARRAY);
 
-	if(isset($_REQUEST["open"]) && isset($_REQUEST["applicationid"]))
+	if(isset($_REQUEST["open"]))
 	{
-		if($_REQUEST["applicationid"] == -1)
+		if(!isset($_REQUEST["applicationid"]))
 		{
 			$_REQUEST["applications"] = array();
 			$show_all_apps = 1;
@@ -107,9 +107,9 @@ include_once "include/page_header.php";
 			array_push($_REQUEST["applications"],$_REQUEST["applicationid"]);
 		}
 		
-	} elseif(isset($_REQUEST["close"]) && isset($_REQUEST["applicationid"]))
+	} elseif(isset($_REQUEST["close"]))
 	{
-		if($_REQUEST["applicationid"] == -1)
+		if(!isset($_REQUEST["applicationid"]))
 		{
 			$_REQUEST["applications"] = array();
 		}
@@ -189,12 +189,12 @@ include_once "include/page_header.php";
 <?php
 	if(isset($show_all_apps))
 		$link = new CLink(new CImg("images/general/opened.gif"),
-			"latest.php?close=1&applicationid=-1".
+			"latest.php?close=1".
 			url_param("groupid").url_param("hostid").url_param("applications").
 			url_param("select"));
 	else
 		$link = new CLink(new CImg("images/general/closed.gif"),
-			"latest.php?open=1&applicationid=-1".
+			"latest.php?open=1".
 			url_param("groupid").url_param("hostid").url_param("applications").
 			url_param("select"));
 
