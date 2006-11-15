@@ -17,6 +17,9 @@ Integrated from 1.1.x
 
 1.1.4
 
+ - fixed Y asix value displaying for graphs (Eugene)
+ - fixed warning displaying (Eugene)
+ - added sorting by host in graph selection for screen element (Eugene)
  - fixed 'service_status[*]' for WinXX system (Eugene)
  - fixed processing of web.page.regexp[] (Alexei)
  - fixed trigger function fuzzytime() (Alexei)
