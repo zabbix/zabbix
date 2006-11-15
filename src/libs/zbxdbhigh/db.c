@@ -140,10 +140,76 @@ void    DBconnect(void)
 /* check to see that the backend connection was successfully made */
 	if(res)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Can't open database: %s\n", sqlite3_errmsg(sqlite));
+		zabbix_log(LOG_LEVEL_ERR, "Can't open database [%s]: %s\n", CONFIG_DBNAME, sqlite3_errmsg(sqlite));
 		DBclose();
 		exit(FAIL);
 	}
+#endif
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBbegin                                                          *
+ *                                                                            *
+ * Purpose: Start transaction                                                 *
+ *                                                                            *
+ * Parameters: -                                                              *
+ *                                                                            *
+ * Return value: -                                                            *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: Do nothing of DB does not support transactions                   *
+ *                                                                            *
+ ******************************************************************************/
+void DBbegin(void)
+{
+#ifdef	HAVE_SQLITE3
+	DBexecute("begin;");
+#endif
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBcommit                                                         *
+ *                                                                            *
+ * Purpose: Commit transaction                                                *
+ *                                                                            *
+ * Parameters: -                                                              *
+ *                                                                            *
+ * Return value: -                                                            *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: Do nothing of DB does not support transactions                   *
+ *                                                                            *
+ ******************************************************************************/
+void DBcommit(void)
+{
+#ifdef	HAVE_SQLITE3
+	DBexecute("commit;");
+#endif
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBrllback                                                        *
+ *                                                                            *
+ * Purpose: Rollback transaction                                              *
+ *                                                                            *
+ * Parameters: -                                                              *
+ *                                                                            *
+ * Return value: -                                                            *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: Do nothing of DB does not support transactions                   *
+ *                                                                            *
+ ******************************************************************************/
+void DBrollback(void)
+{
+#ifdef	HAVE_SQLITE3
+	DBexecute("rollback;");
 #endif
 }
 
@@ -395,7 +461,7 @@ DB_RESULT DBselect(const char *fmt, ...)
 	if(SQLITE_OK != sqlite3_prepare(sqlite, sql, -1, &stmt, 0))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Query::%s",sql);
-		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", "Error!");
+		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", sqlite3_errmsg(sqlite));
 		exit(FAIL);
 	}
 	return stmt;
