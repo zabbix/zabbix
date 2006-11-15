@@ -530,6 +530,7 @@
 //		$workingperiod = 3600;
 		if(!isset($_REQUEST["period"]))	$_REQUEST["period"]=3600;
 		if(!isset($_REQUEST["from"]))	$_REQUEST["from"]=0;
+		if(!isset($_REQUEST["stime"]))	$_REQUEST["stime"]=null;
 
 //		if(isset($_REQUEST["inc"]))		$workingperiod= $_REQUEST["period"]+$_REQUEST["inc"];
 //		if(isset($_REQUEST["dec"]))		$workingperiod= $workingperiod-$_REQUEST["dec"];
