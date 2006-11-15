@@ -777,10 +777,10 @@
 					$arr_of_dellays = explode(";",$db_delay_flex);
 					foreach($arr_of_dellays as $one_db_delay)
 					{
-						@list($one_delay,$one_time_period) = explode("/",$one_db_delay);
-						if(!isset($one_delay) || !isset($one_time_period)) continue;
+						$arr_of_delay = explode("/",$one_db_delay);
+						if(!isset($arr_of_delay[0]) || !isset($arr_of_delay[1])) continue;
 
-						array_push($delay_flex,array("delay"=>$one_delay,"period"=>$one_time_period));
+						array_push($delay_flex,array("delay"=>$arr_of_delay[0],"period"=>$arr_of_delay[1]));
 					}
 				}
 				
