@@ -59,7 +59,7 @@
 	class CComboBox extends CTag
 	{
 /* private */
-		var $value;
+		//var $value;
 
 /* public */
 		function CComboBox($name='combobox',$value=NULL,$action=NULL)
@@ -80,7 +80,7 @@
 		{
 			$this->value = $value;
 		}
-		function AddItem($value, $caption, $selected=NULL, $enabled='yes')
+		function AddItem($value, $caption='', $selected=NULL, $enabled='yes')
 		{
 //			if($enabled=='no') return;	/* disable item method 1 */
 

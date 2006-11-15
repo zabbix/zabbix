@@ -21,13 +21,16 @@
 <?php
 	class CTriggersInfo extends CTable
 	{
+		/*
 		var $style;
 		var $show_header;
-		var $nodeid;
+		var $nodeid;*/
 		
 		function CTriggersInfo($style = STYLE_HORISONTAL)
 		{
 			global $ZBX_CURNODEID;
+
+			$this->style = null;
 
 			parent::CTable(NULL,"triggers_info");
 			$this->SetOrientation($style);

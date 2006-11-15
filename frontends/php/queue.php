@@ -79,10 +79,6 @@ include_once "include/page_header.php";
 
 		while($row=DBfetch($result))
 		{
-			if(!check_right("Host","R",$row["hostid"]))
-			{
-				continue;
-			}
 			if($now-$row["nextcheck"]<=5)		$sec_5[$row["type"]]++;
 			elseif($now-$row["nextcheck"]<=10)	$sec_10[$row["type"]]++;
 			elseif($now-$row["nextcheck"]<=30)	$sec_30[$row["type"]]++;
