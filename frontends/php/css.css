@@ -274,6 +274,8 @@ table.tableinfo
 	border-color: #0B198C;
 }
 table.tableinfo td {
+	white-space: nowrap;
+	word-spacing: nowrap;
 	font-family:verdana, arial, helvetica, sans-serif;
 	font-size:8pt;
 	text-decoration: none;
@@ -1040,3 +1042,30 @@ ul
 	width: 100%;
 	text-align: center;
 }
+
+ul.messages
+{
+	vertical-align: top;
+	border: 1px dashed #000000;
+	background-color: #FFFFFF;
+	margin: 5px;
+}
+
+ul.messages li
+{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+}
+
+ul.messages li.info
+{
+	color:#000000;
+	list-style: url('images/general/warning_small.gif') inside;
+}
+
+ul.messages li.error
+{
+	color:#AA0000;
+	list-style: url('images/general/error_small.gif') inside;
+}
+

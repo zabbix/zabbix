@@ -198,7 +198,7 @@ COpt::profiling_start("page");
 				),
 		"admin"=>array(
 				"label"			=> S_ADMINISTRATION,
-				"default_page_id"	=> 0,
+				"default_page_id"	=> 1,
 				"pages"=>array(
 					ZBX_DISTRIBUTED ? array("url"=>"nodes.php"	,"label"=>S_NODES) : null ,
 					array("url"=>"users.php"	,"label"=>S_USERS		,
@@ -406,5 +406,16 @@ COpt::compare_files_with_menu($ZBX_MENU);
 	if((!isset($page_exist) || isset($denyed_page_requested)) && !isset($_REQUEST['message']))
 	{
 		access_deny();
+	}
+
+	if(version_compare(phpversion(), '5.1.0RC1', '>=') && $page['type'] != PAGE_TYPE_IMAGE)
+	{
+		$tmezone = ini_get('date.timezone');
+		if(empty($tmezone)) 
+		{
+			info('Timezone for PHP is not set. Please set "date.timezone" option in php.ini.');
+			date_default_timezone_set('UTC');
+		}
+		unset($tmezone);
 	}
 ?>
