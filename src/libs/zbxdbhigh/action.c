@@ -29,7 +29,7 @@
 #include "zlog.h"
 #include "common.h"
 
-int	DBadd_action(int triggerid, int userid, char *subject, char *message, int scope, int severity, int recipient, int usrgrpid)
+zbx_uint64_t	DBadd_action(zbx_uint64_t triggerid, zbx_uint64_t userid, char *subject, char *message, int scope, int severity, int recipient, zbx_uint64_t usrgrpid)
 {
 	int	actionid;
 	char	subject_esc[ACTION_SUBJECT_LEN_MAX];
@@ -44,7 +44,7 @@ int	DBadd_action(int triggerid, int userid, char *subject, char *message, int sc
 		userid = usrgrpid;
 	}
 
-	if(FAIL == (exec_res = DBexecute("insert into actions (triggerid, userid, subject, message, scope, severity, recipient) values (%d, %d, '%s', '%s', %d, %d, %d)", triggerid, userid, subject_esc, message_esc, scope, severity, recipient)))
+	if(FAIL == (exec_res = DBexecute("insert into actions (triggerid, userid, subject, message, scope, severity, recipient) values (' ZBX_FS_UI64 ',' ZBX_FS_UI64 ', '%s', '%s', %d, %d, %d)", triggerid, userid, subject_esc, message_esc, scope, severity, recipient)))
 	{
 		return FAIL;
 	}
@@ -59,7 +59,7 @@ int	DBadd_action(int triggerid, int userid, char *subject, char *message, int sc
 	return actionid;
 }
 
-int	DBget_action_by_actionid(int actionid,DB_ACTION *action)
+int	DBget_action_by_actionid(zbx_uint64_t actionid,DB_ACTION *action)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -67,7 +67,7 @@ int	DBget_action_by_actionid(int actionid,DB_ACTION *action)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In DBget_action_by_actionid(%d)", actionid);
 
-	result = DBselect("select userid,recipient,subject,message from actions where actionid=%d", actionid);
+	result = DBselect("select userid,recipient,subject,message from actions where actionid=" ZBX_FS_UI64, actionid);
 	row=DBfetch(result);
 
 	if(!row)
@@ -77,7 +77,7 @@ int	DBget_action_by_actionid(int actionid,DB_ACTION *action)
 	else
 	{
 		action->actionid=actionid;
-		action->userid=atoi(row[0]);
+		ZBX_STR2UINT64(action->userid, row[0]);
 		action->recipient=atoi(row[1]);
 		strscpy(action->subject,row[2]);
 		strscpy(action->message,row[3]);

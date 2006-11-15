@@ -33,8 +33,8 @@
 #include "zlog.h"
 #include "common.h"
 
-#ifdef	HAVE_SQLITE
-	sqlite	*db;
+#ifdef	HAVE_SQLITE3
+	sqlite3	*sqlite;
 #endif
 
 #ifdef	HAVE_MYSQL
@@ -65,7 +65,7 @@ void	DBclose(void)
 #ifdef	HAVE_ORACLE
 	sqlo_finish(oracle);
 #endif
-#ifdef	HAVE_SQLITE
+#ifdef	HAVE_SQLITE3
 	sqlite3_close(sqlite);
 #endif
 }
@@ -132,15 +132,15 @@ void    DBconnect(void)
 	}
 	sqlo_autocommit_on(oracle);
 #endif
-#ifdef	HAVE_SQLITE
+#ifdef	HAVE_SQLITE3
 	int res;
 
-	res = sqlite3_open(CONFIG_DBNAME, &db);
+	res = sqlite3_open(CONFIG_DBNAME, &sqlite);
 
 /* check to see that the backend connection was successfully made */
 	if(res)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Can't open database: %s\n", sqlite3_errmsg(db));
+		zabbix_log(LOG_LEVEL_ERR, "Can't open database: %s\n", sqlite3_errmsg(sqlite));
 		DBclose();
 		exit(FAIL);
 	}
@@ -162,7 +162,7 @@ int DBexecute(const char *fmt, ...)
 #ifdef	HAVE_ORACLE
 	int ret;
 #endif
-#ifdef	HAVE_SQLITE
+#ifdef	HAVE_SQLITE3
 	int ret = SUCCEED;
 	char *error=0;
 #endif
@@ -214,8 +214,8 @@ int DBexecute(const char *fmt, ...)
 	}
 	return ret;
 #endif
-#ifdef	HAVE_SQLITE
-	if(SQLITE_OK != sqlite3_exec(db, sql, NULL, 0, &error))
+#ifdef	HAVE_SQLITE3
+	if(SQLITE_OK != sqlite3_exec(sqlite, sql, NULL, 0, &error))
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",sql);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", error);
@@ -226,64 +226,6 @@ int DBexecute(const char *fmt, ...)
 #endif
 }
 
-
-/*
- * Execute SQL statement. For non-select statements only.
- * If fails, program terminates.
- */ 
-int	DBexecute_old(char *query)
-{
-/* Do not include any code here. Will break HAVE_PGSQL section */
-#ifdef	HAVE_MYSQL
-/*	if(strstr(query, "17828") != NULL)*/
-	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s",query);
-
-	if(mysql_query(&mysql,query) != 0)
-	{
-		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
-		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s [%d]", mysql_error(&mysql), mysql_errno(&mysql) );
-		return FAIL;
-	}
-	return (long)mysql_affected_rows(&mysql);
-#endif
-#ifdef	HAVE_PGSQL
-	int ret = SUCCEED;
-	PGresult	*result;
-
-	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s",query);
-	result = PQexec(conn,query);
-
-	if( result==NULL)
-	{
-		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
-		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", "Result is NULL" );
-		ret = FAIL;
-	} else if( PQresultStatus(result) != PGRES_COMMAND_OK)
-	{
-		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
-		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", PQresStatus(PQresultStatus(result)) );
-		ret = FAIL;
-	}
-	
-	ret = (int)PQoidValue(result); /* return object id, for insert id processing */
-	
-	PQclear(result);
-	return ret;
-#endif
-#ifdef	HAVE_ORACLE
-	int ret;
-	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s",query);
-	if ( (ret = sqlo_exec(oracle, query))<0 )
-	{
-		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
-		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", sqlo_geterror(oracle) );
-		zbx_error("Query::%s.",query);
-		zbx_error("Query failed:%s.", sqlo_geterror(oracle) );
-		ret = FAIL;
-	}
-	return ret;
-#endif
-}
 
 int	DBis_null(char *field)
 {
@@ -426,13 +368,13 @@ DB_RESULT DBselect(const char *fmt, ...)
 
 	if( result==NULL)
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Query::%s",sql);
+		zabbix_log(LOG_LEVEL_ERR, "Query::%s",sql);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", "Result is NULL" );
 		exit( FAIL );
 	}
 	if( PQresultStatus(result) != PGRES_TUPLES_OK)
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Query::%s",sql);
+		zabbix_log(LOG_LEVEL_ERR, "Query::%s",sql);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", PQresStatus(PQresultStatus(result)) );
 		exit( FAIL );
 	}
@@ -441,78 +383,23 @@ DB_RESULT DBselect(const char *fmt, ...)
 #ifdef	HAVE_ORACLE
 	if(0 > (sth = (sqlo_open(oracle, sql,0,NULL))))
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Query::%s",sql);
+		zabbix_log(LOG_LEVEL_ERR, "Query::%s",sql);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", sqlo_geterror(oracle));
 		exit(FAIL);
 	}
 	return sth;
 #endif
-}
+#ifdef HAVE_SQLITE3
+	sqlite3_stmt* stmt = 0;
 
-/*
- * Execute SQL statement. For select statements only.
- * If fails, program terminates.
- */ 
-DB_RESULT DBselect_old(char *query)
-{
-/* Do not include any code here. Will break HAVE_PGSQL section */
-#ifdef	HAVE_MYSQL
-	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s",query);
-
-	if(mysql_query(&mysql,query) != 0)
+	if(SQLITE_OK != sqlite3_prepare(sqlite, sql, -1, &stmt, 0))
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
-		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s [%d]", mysql_error(&mysql), mysql_errno(&mysql) );
-
+		zabbix_log(LOG_LEVEL_ERR, "Query::%s",sql);
+		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", "Error!");
 		exit(FAIL);
 	}
-	return	mysql_store_result(&mysql);
-#endif
-#ifdef	HAVE_PGSQL
-	PGresult		*pg_result;
-	ZBX_PG_DB_RESULT	*result = NULL;
+	return stmt;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s",query);
-
-	pg_result = PQexec(conn,query);
-
-	if( pg_result==NULL)
-	{
-		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
-		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", "Result is NULL" );
-		PQclear(pg_result);
-		exit( FAIL );
-	}
-	else if( PQresultStatus(pg_result) != PGRES_TUPLES_OK)
-	{
-		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
-		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", PQresStatus(PQresultStatus(pg_result)) );
-		PQclear(pg_result);
-		exit( FAIL );
-	}
-	else
-	{
-		result = malloc(sizeof(ZBX_PG_DB_RESULT));
-		result->pg_result	= pg_result;
-		result->row_num		= PQntuples(pg_result);
-		result->fld_num		= 0;
-		result->cursor		= 0;
-		result->values		= NULL;
-	}
-	
-	return result;
-#endif
-#ifdef	HAVE_ORACLE
-	sqlo_stmt_handle_t sth;
-
-	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s",query);
-	if(0 > (sth = (sqlo_open(oracle, query,0,NULL))))
-	{
-		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
-		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", sqlo_geterror(oracle));
-		exit(FAIL);
-	}
-	return sth;
 #endif
 }
 
@@ -530,6 +417,9 @@ DB_RESULT DBselectN(char *query, int n)
 #endif
 #ifdef	HAVE_ORACLE
 	return DBselect("select * from (%s) where rownum<=%d", query, n);
+#endif
+#ifdef	HAVE_SQLITE3
+	return DBselect("%s limit %d", query, n);
 #endif
 }
 
@@ -564,7 +454,7 @@ char	*DBget_field(DB_RESULT result, int rownum, int fieldnum)
 /*
  * Get value of autoincrement field for last insert or update statement
  */ 
-int	DBinsert_id(int exec_result, const char *table, const char *field)
+zbx_uint64_t	DBinsert_id(int exec_result, const char *table, const char *field)
 {
 #ifdef	HAVE_MYSQL
 	zabbix_log(LOG_LEVEL_DEBUG, "In DBinsert_id()" );
@@ -576,7 +466,7 @@ int	DBinsert_id(int exec_result, const char *table, const char *field)
 
 #ifdef	HAVE_PGSQL
 	DB_RESULT	tmp_res;
-	int		id_res = FAIL;
+	zbx_uint64_t	id_res = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In DBinsert_id()" );
 	
@@ -585,8 +475,9 @@ int	DBinsert_id(int exec_result, const char *table, const char *field)
 	if((Oid)exec_result == InvalidOid) return 0;
 	
 	tmp_res = DBselect("select %s from %s where oid=%i", field, table, exec_result);
-	
-	id_res = atoi(PQgetvalue(tmp_res->pg_result, 0, 0));
+
+	ZBX_STR2UINT64(id_res, PQgetvalue(tmp_res->pg_result, 0, 0));
+/*	id_res = atoi(PQgetvalue(tmp_res->pg_result, 0, 0));*/
 	
 	DBfree_result(tmp_res);
 	
@@ -597,7 +488,7 @@ int	DBinsert_id(int exec_result, const char *table, const char *field)
 	DB_ROW	row;
 	char    sql[MAX_STRING_LEN];
 	DB_RESULT       result;
-	int     id;
+	zbx_uint64_t	id;
 	
 	zabbix_log(LOG_LEVEL_DEBUG, "In DBinsert_id()" );
 
@@ -609,10 +500,14 @@ int	DBinsert_id(int exec_result, const char *table, const char *field)
 	
 	row = DBfetch(result);
 
-	id = atoi(row[0]);
+	ZBX_STR2UINT64(id, row[0]);
+/*	id = atoi(row[0]);*/
 	DBfree_result(result);
 
 	return id;
+#endif
+#ifdef	HAVE_SQLITE3
+	return (zbx_uint64_t)sqlite3_last_insert_rowid(sqlite);
 #endif
 }
 
