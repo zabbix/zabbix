@@ -37,11 +37,13 @@
 
 	/* public */ class CVar
 	{
+		/*
 		var $var_container = array();
-		var $var_name;
+		var $var_name;*/
 
 		function CVar($name,$value=null)
 		{
+			$this->var_container = array();
 			$this->var_name = $name;
 
 			$this->SetValue($value);

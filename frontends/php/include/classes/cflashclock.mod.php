@@ -21,10 +21,13 @@
 <?php
 	class CFlashClock extends CFlash
 	{
+		/*
 		var $timetype;
-		var $src;
+		var $src;*/
 		function CFlashClock($width = 200, $height = 200, $timetype = TIME_TYPE_LOCAL, $url = NULL)
 		{
+			$this->timetype = null;
+
 			if(!is_numeric($width) || $width < 24) $width = 200;
 			if(!is_numeric($height) || $height< 24) $height = 200;
 			

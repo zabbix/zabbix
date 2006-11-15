@@ -79,10 +79,11 @@
 
 	class CButtonQMessage extends CButton
 	{
+		/*
 		var $vars;
 		var $msg;
 		var $name;
-		var $do_redirect;
+		var $do_redirect;*/
 
 		function CButtonQMessage($name, $caption, $msg=NULL, $vars=NULL, $do_redirect=true){
 			$this->name = $name;
@@ -108,7 +109,7 @@
 			$this->msg = $value;
 			$this->SetAction(NULL);
 		}
-		function SetAction($value=NULL){
+		function SetAction($value=null, $event='onClick'){
 			if(!is_null($value))
 				return parent::SetAction($value);
 

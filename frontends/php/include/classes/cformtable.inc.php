@@ -21,18 +21,22 @@
 <?php
 	class CFormTable extends CForm
 	{
-/* private */
+/* private *//*
 		var $align;
 		var $title;
-		var $help;
-/* protected */
+		var $help;*/
+/* protected *//*
 		var $top_items = array();
 		var $center_items = array();
-		var $bottom_items = array();
+		var $bottom_items = array();*/
 /* public */
 		function CFormTable($title=null, $action=null, $method=null, $enctype=null, $form_variable=null)
 		{
 			global  $_REQUEST;
+
+			$this->top_items = array();
+			$this->center_items = array();
+			$this->bottom_items = array();
 
 			if( null == $method )
 			{
@@ -102,7 +106,7 @@
 		{
 			if(is_null($value)) {
 				$this->help = new CHelp();
-			} elseif(is_a($value,'chelp')) {
+			} elseif(strtolower(get_class($value)) == 'chelp') {
 				$this->help = $value;
 			} elseif(is_string($value)) {
 				$this->help = new CHelp($value);

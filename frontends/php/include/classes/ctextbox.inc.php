@@ -22,10 +22,11 @@
 	class CTextBox extends CTag
 	{
 /* private */
-		var $caption;
+		//var $caption;
 /* public */
 		function CTextBox($name='textbox',$value="",$size=20,$readonly="no")
 		{
+			$this->caption = null;
 			parent::CTag('input','no');
 			$this->tag_body_start = '';
 			$this->options['class'] = 'biginput';
@@ -81,10 +82,12 @@
 
 	class CIpBox
 	{
-		var $ip_parts = array();
+		//var $ip_parts = array();
 		
 		function CIPBox($name='ip',$value)
 		{
+			$this->ip_parts = array();
+
 			if(!is_array($value)) $value = explode('.', $value);
 			if(!isset($value[0])) $value[0] = 0;
 			if(!isset($value[1])) $value[1] = 0;

@@ -33,7 +33,7 @@
 		{
 			return $this->options['method'] = $value;
 		}
-		function SetAction($value=NULL)
+		function SetAction($value)
 		{
 			global $page;
 

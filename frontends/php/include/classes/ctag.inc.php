@@ -53,22 +53,24 @@
 
 	class CTag
 	{
-/* private */
-		var $destroyable_object;
+/* private *//*
 		var $tagname;
 		var $options = array();
-		var $paired;
-/* protected */
+		var $paired;*/
+/* protected *//*
 		var $items = array();
 
 		var $tag_body_start;
 		var $tag_body_end;
 		var $tag_start;
-		var $tag_end;
+		var $tag_end;*/
 
 /* public */
 		function CTag($tagname=NULL, $paired='no', $body=NULL, $class=null)
 		{
+			$this->options = array();
+			$this->items = array();
+
 			if(!is_string($tagname))
 			{
 				return $this->error('Incorrect tagname for CTag ['.$tagname.']');
@@ -135,7 +137,11 @@
 		}
 		function SetName($value)
 		{
-			$this->options['name'] = $value;
+			if(!is_string($value))
+			{
+				return $this->error("Incorrect value for SetName [$value]");
+			}
+			return $this->AddOption("name",$value);
 		}
 		function GetName()
 		{

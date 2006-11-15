@@ -29,7 +29,7 @@
 
 	class CSetupWizard extends CForm
 	{
-/* protected */
+/* protected *//*
 		var $ZBX_CONFIG;
 		var $DISABLE_NEXT_BUTTON;
 		var $stage = array(
@@ -42,6 +42,7 @@
 			6 => array('title' => '7. Install'			, 'fnc' => 'Stage6' ),
 			7 => array('title' => '8. Finish'			, 'fnc' => 'Stage7' )
 			);
+		*/
 
 /* public */	
 		function CSetupWizard(&$ZBX_CONFIG)
@@ -49,6 +50,17 @@
 			$this->DISABLE_NEXT_BUTTON = false;
 			
 			$this->ZBX_CONFIG = &$ZBX_CONFIG;
+
+			$this->stage = array(
+				0 => array('title' => '1. Introduction'			, 'fnc' => 'Stage0' ),
+				1 => array('title' => '2. Licence Agreement'		, 'fnc' => 'Stage1' ),
+				2 => array('title' => '3. Check of pre-requisites'	, 'fnc' => 'Stage2' ),
+				3 => array('title' => '4. Configure DB connection'	, 'fnc' => 'Stage3' ),
+				4 => array('title' => '5. Distributed monitoring'	, 'fnc' => 'Stage4' ),
+				5 => array('title' => '6. Pre-Installation Summary'	, 'fnc' => 'Stage5' ),
+				6 => array('title' => '7. Install'			, 'fnc' => 'Stage6' ),
+				7 => array('title' => '8. Finish'			, 'fnc' => 'Stage7' )
+				);
 			
 			$this->EventHandler();
 			

@@ -55,18 +55,16 @@
 		{
 			return $this->options['align'] = $value;
 		}
-		function AddItem($item=NULL)
+		function AddItem($item)
 		{
-                        if(is_a($item,'ccol'))
-			{
+			if(strtolower(get_class($item))=='ccol') {
 				parent::AddItem($item);
 			}
 			elseif(is_array($item))
 			{
 				foreach($item as $el)
 				{
-                        		if(is_a($el,'ccol'))
-					{
+                        		if(strtolower(get_class($el))=='ccol') {
                 		        	parent::AddItem($el);
 					} elseif(!is_null($el)) {
 						parent::AddItem('<td>'.unpack_object($el).'</td>');
@@ -82,7 +80,7 @@
 
 	class CTable extends CTag
 	{
-/* protected */
+/* protected *//*
 		var $oddRowClass;
 		var $evenRowClass;
 		var $header;
@@ -91,7 +89,7 @@
 		var $rownum;
 		var $footer;
 		var $footerClass;
-		var $message;
+		var $message;*/
 /* public */
 		function CTable($message=NULL,$class=NULL)
 		{
@@ -136,15 +134,13 @@
 		{
 			if(is_null($item)) return NULL;
 
-			if(is_a($item,'ccol'))
-			{
+			if(strtolower(get_class($item))=='ccol') {
 				if(isset($this->header) && !isset($item->options['colspan']))
 					$item->options['colspan'] = $this->colnum;
 
 				$item = new CRow($item,$rowClass);
 			}
-			elseif(is_a($item,'crow'))
-			{
+			if(strtolower(get_class($item))=='crow') {
 				if(isset($rowClass))
 					$item->SetClass($rowClass);
 			}
@@ -164,8 +160,7 @@
 		{
 			if(is_null($class)) $class = $this->headerClass;
 
-			if(is_a($value,'crow'))
-			{
+			if(strtolower(get_class($value))=='crow') {
 				if(!is_null($class))	$value->SetClass($class);
 			}else{
 				$value = new CRow($value,$class);

@@ -331,14 +331,29 @@ else
 }
 else
 {
-	class COpt
+	if(version_compare(phpversion(),'5.0','<'))
 	{
-		/* public static */ function profiling_start($type=NULL) {}
-		/* public static */ function profiling_stop($type=NULL) {}
-		/* public static */ function savesqlrequest($sql) {}
-		/* public static */ function showmemoryusage($descr=null) {}
-		/* public static */ function compare_files_with_menu($menu=null) {}
-		/* public static */ function counter_up($type=NULL) {}
+		class COpt
+		{
+			/* public static */ function profiling_start($type=NULL) {}
+			/* public static */ function profiling_stop($type=NULL) {}
+			/* public static */ function savesqlrequest($sql) {}
+			/* public static */ function showmemoryusage($descr=null) {}
+			/* public static */ function compare_files_with_menu($menu=null) {}
+			/* public static */ function counter_up($type=NULL) {}
+		}
+	}
+	else
+	{
+		class COpt
+		{
+			static function profiling_start($type=NULL) {}
+			static function profiling_stop($type=NULL) {}
+			static function savesqlrequest($sql) {}
+			static function showmemoryusage($descr=null) {}
+			static function compare_files_with_menu($menu=null) {}
+			static function counter_up($type=NULL) {}
+		}
 	}
 }
 
