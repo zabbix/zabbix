@@ -334,7 +334,7 @@ function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$m
 				$value=$value/(1000*1000*1000);
 			}
 	
-			if(round($value)==$value)
+			if(round($value) == round($value,2))
 			{
 				$s=sprintf("%.0f",$value);
 			}
@@ -349,7 +349,7 @@ function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$m
 
 		if($units=="")
 		{
-			if(round($value)==$value)
+			if(round($value) == round($value,2))
 			{
 				return sprintf("%.0f",$value);
 			}
@@ -386,7 +386,7 @@ function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$m
 			$value=$value/(1024*1024*1024*1024);
 		}
 
-		if(round($value)==$value)
+		if(round($value) == round($value,2))
 		{
 			$s=sprintf("%.0f",$value);
 		}
