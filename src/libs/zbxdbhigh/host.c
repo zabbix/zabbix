@@ -29,7 +29,7 @@
 #include "zlog.h"
 #include "common.h"
 
-int	DBadd_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available)
+zbx_uint64_t	DBadd_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available)
 {
 	int	hostid;
 	int	exec_res;

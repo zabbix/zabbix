@@ -552,47 +552,47 @@ if test "$server" = "yes"; then
 	AC_SUBST(ORACLE_LIBS)
 
 	AC_MSG_CHECKING(for SQLite support)
-	AC_ARG_WITH(sqlite,
+	AC_ARG_WITH(sqlite3,
 	[
 	What DBMS do you want to use (please select only one):
-	  --with-sqlite[=DIR]      Include SQLite support.  DIR is the SQLite base
+	  --with-sqlite3[=DIR]      Include SQLite3 support.  DIR is the SQLite base
 				 install directory, default is to search through
 				 a number of common places for the SQLite files.],
 	[
 	if test "$withval" != "no"; then
 		if test "$withval" = "yes"; then
-			if test -f /usr/include/sqlite.h; then
-				SQLITE_INCDIR=/usr/include
+			if test -f /usr/include/sqlite3.h; then
+				SQLITE3_INCDIR=/usr/include
+				SQLITE3_LIBDIR=/usr/lib
+			elif test -f /usr/lib/sqlite/include/sqlite3.h; then
+				SQLITE_INCDIR=/usr/lib/sqlite3/include
 				SQLITE_LIBDIR=/usr/lib
-			elif test -f /usr/lib/sqlite/include/sqlora.h; then
-				ORACLE_INCDIR=/usr/lib/sqlite/include
-				ORACLE_LIBDIR=/usr/lib
 			else
 				AC_MSG_RESULT(no)
-				AC_MSG_ERROR(Invalid SQLite directory - unable to find sqlite.h)
+				AC_MSG_ERROR(Invalid SQLite directory - unable to find sqlite3.h)
 			fi
 		else
-			if test -f $withval/include/sqlite.h; then
-				SQLITE_INCDIR=$withval/include
-				SQLITE_LIBDIR=$withval/lib
-			elif test -f $withval/lib/sqlite/include/sqlite.h; then
-				SQLITE_INCDIR=$withval/lib/sqlite/include
-				SQLITE_LIBDIR=$withval/lib
-			elif test -f $withval/sqlite/include/sqlora.h; then
-				SQLITE_INCDIR=$withval/sqlite/include
-				SQLITE_LIBDIR=$withval
+			if test -f $withval/include/sqlite3.h; then
+				SQLITE3_INCDIR=$withval/include
+				SQLITE3_LIBDIR=$withval/lib
+			elif test -f $withval/lib/sqlite/include/sqlite3.h; then
+				SQLITE3_INCDIR=$withval/lib/sqlite/include
+				SQLITE3_LIBDIR=$withval/lib
+			elif test -f $withval/sqlite/include/sqlite3.h; then
+				SQLITE3_INCDIR=$withval/sqlite/include
+				SQLITE3_LIBDIR=$withval
 			else
 				AC_MSG_RESULT(no)
-				AC_MSG_ERROR(Invalid SQLite directory - unable to find sqlite.h under $withval)
+				AC_MSG_ERROR(Invalid SQLite directory - unable to find sqlite3.h under $withval)
 			fi
 		fi
-		SQLITE_INCLUDE="-I$SQLITE_INCDIR"
-		SQLITE_LFLAGS="-L$SQLITE_LIBDIR"
-		ORACLE_LIBS="-lsqlite"
+		SQLITE3_INCLUDE="-I$SQLITE3_INCDIR"
+		SQLITE3_LFLAGS="-L$SQLITE3_LIBDIR"
+		SQLITE3_LIBS="-lsqlite3"
 
-		AC_DEFINE(HAVE_SQLITE,1,[Define to 1 if SQLite should be enabled.])
+		AC_DEFINE(HAVE_SQLITE3,1,[Define to 1 if SQLite should be enabled.])
 		AC_MSG_RESULT(yes)
-		have_db="SQLite"
+		have_db="SQLite v3.x"
 
 	else
 		AC_MSG_RESULT(no)
@@ -600,9 +600,9 @@ if test "$server" = "yes"; then
 	],[
 	  AC_MSG_RESULT(no)
 	])
-	AC_SUBST(SQLITE_INCLUDE)
-	AC_SUBST(SQLITE_LFLAGS)
-	AC_SUBST(SQLITE_LIBS)
+	AC_SUBST(SQLITE3_INCLUDE)
+	AC_SUBST(SQLITE3_LFLAGS)
+	AC_SUBST(SQLITE3_LIBS)
 
 	AC_MSG_CHECKING(for MySQL support)
 	AC_ARG_WITH(mysql,
