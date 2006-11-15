@@ -42,6 +42,10 @@
 #	include <libpq-fe.h>
 #endif /* HAVE_PGSQL */
 
+#ifdef HAVE_SQLITE
+#	include <sqlite.h>
+#endif /* HAVE_PGSQL */
+
 extern	char	*CONFIG_DBHOST;
 extern	char	*CONFIG_DBNAME;
 extern	char	*CONFIG_DBUSER;
@@ -65,6 +69,12 @@ extern	int	CONFIG_DBPORT;
 #define DB_MEDIA	struct media_type
 #define DB_MEDIATYPE	struct mediatype_type
 #define DB_TRIGGER	struct trigger_type
+
+#ifdef HAVE_SQLITE
+	#define DB_ROW		char **
+	#define	DB_RESULT	sqlite3_stmt
+	#define	DBfree_result	sqlite3_finalize
+#endif
 
 #ifdef HAVE_MYSQL
 	#define	DB_RESULT	MYSQL_RES *
@@ -349,7 +359,9 @@ int DBexecute(const char *fmt, ...);
 /*long	DBaffected_rows();*/
 
 /*DB_RESULT	DBselect(char *query);*/
-DB_RESULT DBselect(const char *fmt, ...);
+char *DBselect(const char *fmt, ...);
+//sqlite3_stmt* DBselect(const char *fmt, ...);
+//DB_RESULT DBselect(const char *fmt, ...);
 DB_RESULT	DBselectN(char *query, int n);
 DB_ROW	DBfetch(DB_RESULT result);
 zbx_uint64_t DBget_nextid(char *table, char *field);

@@ -551,6 +551,58 @@ if test "$server" = "yes"; then
 	AC_SUBST(ORACLE_LFLAGS)
 	AC_SUBST(ORACLE_LIBS)
 
+	AC_MSG_CHECKING(for SQLite support)
+	AC_ARG_WITH(sqlite,
+	[
+	What DBMS do you want to use (please select only one):
+	  --with-sqlite[=DIR]      Include SQLite support.  DIR is the SQLite base
+				 install directory, default is to search through
+				 a number of common places for the SQLite files.],
+	[
+	if test "$withval" != "no"; then
+		if test "$withval" = "yes"; then
+			if test -f /usr/include/sqlite.h; then
+				SQLITE_INCDIR=/usr/include
+				SQLITE_LIBDIR=/usr/lib
+			elif test -f /usr/lib/sqlite/include/sqlora.h; then
+				ORACLE_INCDIR=/usr/lib/sqlite/include
+				ORACLE_LIBDIR=/usr/lib
+			else
+				AC_MSG_RESULT(no)
+				AC_MSG_ERROR(Invalid SQLite directory - unable to find sqlite.h)
+			fi
+		else
+			if test -f $withval/include/sqlite.h; then
+				SQLITE_INCDIR=$withval/include
+				SQLITE_LIBDIR=$withval/lib
+			elif test -f $withval/lib/sqlite/include/sqlite.h; then
+				SQLITE_INCDIR=$withval/lib/sqlite/include
+				SQLITE_LIBDIR=$withval/lib
+			elif test -f $withval/sqlite/include/sqlora.h; then
+				SQLITE_INCDIR=$withval/sqlite/include
+				SQLITE_LIBDIR=$withval
+			else
+				AC_MSG_RESULT(no)
+				AC_MSG_ERROR(Invalid SQLite directory - unable to find sqlite.h under $withval)
+			fi
+		fi
+		SQLITE_INCLUDE="-I$SQLITE_INCDIR"
+		SQLITE_LFLAGS="-L$SQLITE_LIBDIR"
+		ORACLE_LIBS="-lsqlite"
+
+		AC_DEFINE(HAVE_SQLITE,1,[Define to 1 if SQLite should be enabled.])
+		AC_MSG_RESULT(yes)
+		have_db="SQLite"
+
+	else
+		AC_MSG_RESULT(no)
+	fi
+	],[
+	  AC_MSG_RESULT(no)
+	])
+	AC_SUBST(SQLITE_INCLUDE)
+	AC_SUBST(SQLITE_LFLAGS)
+	AC_SUBST(SQLITE_LIBS)
 
 	AC_MSG_CHECKING(for MySQL support)
 	AC_ARG_WITH(mysql,
@@ -678,7 +730,7 @@ if test "$server" = "yes"; then
 	AC_MSG_CHECKING(for ZABBIX server database selection)
 	if test "$have_db" = "no"; then
 		AC_MSG_RESULT(error)
-		AC_MSG_ERROR(No database selected for ZABBIX server. Use --with-mysql or --with-pgsql.)
+		AC_MSG_ERROR(No database selected for ZABBIX server. Use --with-mysql or --with-oracle or --with-pgsql or --with-sqlite.)
 	else
 		AC_MSG_RESULT(ok)
 	fi
