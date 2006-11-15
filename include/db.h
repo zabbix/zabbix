@@ -354,19 +354,17 @@ void    DBconnect(void);
 void    DBclose(void);
 void    DBvacuum(void);
 
-/*int	DBexecute( char *query );*/
-int DBexecute(const char *fmt, ...);
-/*long	DBaffected_rows();*/
+int	DBexecute(const char *fmt, ...);
 
-/*DB_RESULT	DBselect(char *query);*/
-DB_RESULT DBselect(const char *fmt, ...);
+DB_RESULT	DBselect(const char *fmt, ...);
 DB_RESULT	DBselectN(char *query, int n);
-DB_ROW	DBfetch(DB_RESULT result);
-zbx_uint64_t DBget_nextid(char *table, char *field);
-/*char	*DBget_field(DB_RESULT result, int rownum, int fieldnum);*/
-/*int	DBnum_rows(DB_RESULT result);*/
+DB_ROW		DBfetch(DB_RESULT result);
+zbx_uint64_t 	DBget_nextid(char *table, char *field);
 zbx_uint64_t	DBinsert_id(int exec_result, const char *table, const char *field);
-int	DBis_null(char *field);
+int		DBis_null(char *field);
+void		DBbegin();
+void		DBcommit();
+void		DBrollback();
 
 int	DBget_function_result(double *result,char *functionid);
 void	DBupdate_host_availability(zbx_uint64_t hostid,int available,int clock,char *error);
