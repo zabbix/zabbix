@@ -331,6 +331,14 @@ void test()
 	}
 	DBfree_result(result);
 	
+	result = DBselect("select * from users");
+	
+	while((row=DBfetch(result)))
+	{
+		printf("[%s|%s]\n",row[0],row[3]);
+	}
+	DBfree_result(result);
+	
 	printf("-= Test completed =-\n");
 
 	return 0;
