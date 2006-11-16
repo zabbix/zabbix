@@ -104,7 +104,7 @@ void    DBconnect(void)
 #endif
 #ifdef	HAVE_PGSQL
 /*	conn = PQsetdb(pghost, pgport, pgoptions, pgtty, dbName); */
-/*	conn = PQsetdb(NULL, NULL, NULL, NULL, dbname);*/
+/*	conn = PQsetdb(NULL, NULL, NULL, NULL, CONFIG_DBNAME);*/
 	conn = PQsetdbLogin(CONFIG_DBHOST, NULL, NULL, NULL, CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD );
 
 /* check to see that the backend connection was successfully made */
@@ -308,20 +308,9 @@ int	DBis_null(char *field)
 /* in db.h - #define DBfree_result   PG_DBfree_result */
 void	PG_DBfree_result(DB_RESULT result)
 {
-	int i = 0;
-
 	/* free old data */
 	if(result->values)
 	{
-/*		for(i = 0; i < result->fld_num; i++)
-		{
-			if(!result->values[i]) continue;
-			
-			free(result->values[i]);
-			result->values[i] = NULL;
-		}
-		result->fld_num = 0;
-!!!ALLOC OFF!!!*/
 		result->fld_num = 0;
 		free(result->values);
 		result->values = NULL;
@@ -365,15 +354,6 @@ DB_ROW	DBfetch(DB_RESULT result)
 	/* free old data */
 	if(result->values)
 	{
-/*		for(i = 0; i < result->fld_num; i++)
-		{
-			if(!result->values[i]) continue;
-			
-			free(result->values[i]);
-			result->values[i] = NULL;
-		}
-		result->fld_num = 0;
-!!!ALLOC OFF!!!*/
 		free(result->values);
 		result->values = NULL;
 	}
@@ -389,7 +369,6 @@ DB_ROW	DBfetch(DB_RESULT result)
 		result->values = malloc(sizeof(char*) * result->fld_num);
 		for(i = 0; i < result->fld_num; i++)
 		{
-			 /* result->values[i] = strdup(PQgetvalue(result->pg_result, result->cursor, i)); !!!ALLOC OFF!!! */
 			 result->values[i] = PQgetvalue(result->pg_result, result->cursor, i);
 		}
 	}
@@ -486,20 +465,20 @@ DB_RESULT DBselect(const char *fmt, ...)
 #endif
 #ifdef	HAVE_PGSQL
 	result = malloc(sizeof(ZBX_PG_DB_RESULT));
-	result->sq_result = PQexec(conn,sql);
+	result->pg_result = PQexec(conn,sql);
 	result->values = NULL;
 	result->cursor = 0;
 
-	if(result->sq_result==NULL)
+	if(result->pg_result==NULL)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Query::%s",sql);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", "Result is NULL" );
 		exit( FAIL );
 	}
-	if( PQresultStatus(result->sq_result) != PGRES_TUPLES_OK)
+	if( PQresultStatus(result->pg_result) != PGRES_TUPLES_OK)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Query::%s",sql);
-		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", PQresStatus(PQresultStatus(result->sq_result)) );
+		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", PQresStatus(PQresultStatus(result->pg_result)) );
 		exit( FAIL );
 	}
 	
