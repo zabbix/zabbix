@@ -305,6 +305,7 @@ int	DBis_null(char *field)
 }
 
 #ifdef  HAVE_PGSQL
+/* in db.h - #define DBfree_result   PG_DBfree_result */
 void	PG_DBfree_result(DB_RESULT result)
 {
 	int i = 0;
@@ -312,7 +313,7 @@ void	PG_DBfree_result(DB_RESULT result)
 	/* free old data */
 	if(result->values)
 	{
-		for(i = 0; i < result->fld_num; i++)
+/*		for(i = 0; i < result->fld_num; i++)
 		{
 			if(!result->values[i]) continue;
 			
@@ -320,11 +321,32 @@ void	PG_DBfree_result(DB_RESULT result)
 			result->values[i] = NULL;
 		}
 		result->fld_num = 0;
+!!!ALLOC OFF!!!*/
+		result->fld_num = 0;
 		free(result->values);
 		result->values = NULL;
 	}
 
 	PQclear(result->pg_result);
+	free(result);
+}
+#endif
+#ifdef  HAVE_SQLITE3
+/* in db.h - #define DBfree_result   SQ_DBfree_result */
+void	SQ_DBfree_result(DB_RESULT result)
+{
+	int i = 0;
+
+	/* free old data */
+	if(result->values)
+	{
+		result->fld_num = 0;
+		free(result->values);
+		result->values = NULL;
+	}
+
+	sqlite3_finalize(result->sq_result);
+	free(result);
 }
 #endif
 
@@ -343,7 +365,7 @@ DB_ROW	DBfetch(DB_RESULT result)
 	/* free old data */
 	if(result->values)
 	{
-		for(i = 0; i < result->fld_num; i++)
+/*		for(i = 0; i < result->fld_num; i++)
 		{
 			if(!result->values[i]) continue;
 			
@@ -351,6 +373,7 @@ DB_ROW	DBfetch(DB_RESULT result)
 			result->values[i] = NULL;
 		}
 		result->fld_num = 0;
+!!!ALLOC OFF!!!*/
 		free(result->values);
 		result->values = NULL;
 	}
@@ -366,7 +389,8 @@ DB_ROW	DBfetch(DB_RESULT result)
 		result->values = malloc(sizeof(char*) * result->fld_num);
 		for(i = 0; i < result->fld_num; i++)
 		{
-			 result->values[i] = strdup(PQgetvalue(result->pg_result, result->cursor, i));
+			 /* result->values[i] = strdup(PQgetvalue(result->pg_result, result->cursor, i)); !!!ALLOC OFF!!! */
+			 result->values[i] = PQgetvalue(result->pg_result, result->cursor, i);
 		}
 	}
 
@@ -393,6 +417,37 @@ DB_ROW	DBfetch(DB_RESULT result)
 		exit(FAIL);
 	}
 #endif
+#ifdef HAVE_SQLITE3
+	int	i;
+	
+	/* EOF */
+	if(!result)	return NULL;
+		
+	/* EOF */
+	if(sqlite3_step(result->sq_result) != SQLITE_ROW) return NULL;
+
+	/* free old data */
+	if(result->values)
+	{
+		result->fld_num = 0;
+		free(result->values);
+		result->values = NULL;
+	}
+
+	/* init result */
+	result->fld_num = sqlite3_column_count(result->sq_result);
+	
+	if(result->fld_num > 0)
+	{
+		result->values = malloc(sizeof(char*) * result->fld_num);
+		for(i = 0; i < result->fld_num; i++)
+		{
+			result->values[i] = (char*)sqlite3_column_text(result->sq_result, i);
+		}
+	}
+
+	return result->values;	
+#endif
 }
 
 /*
@@ -404,8 +459,8 @@ DB_RESULT DBselect(const char *fmt, ...)
 	char	sql[ZBX_MAX_SQL_LEN];
 
 	va_list args;
-#ifdef	HAVE_PGSQL
-	PGresult	*result;
+#if defined(HAVE_PGSQL) || defined(HAVE_SQLITE3)
+	DB_RESULT result;
 #endif
 #ifdef	HAVE_ORACLE
 	sqlo_stmt_handle_t sth;
@@ -430,20 +485,27 @@ DB_RESULT DBselect(const char *fmt, ...)
 	return	mysql_store_result(&mysql);
 #endif
 #ifdef	HAVE_PGSQL
-	result = PQexec(conn,sql);
+	result = malloc(sizeof(ZBX_PG_DB_RESULT));
+	result->sq_result = PQexec(conn,sql);
+	result->values = NULL;
+	result->cursor = 0;
 
-	if( result==NULL)
+	if(result->sq_result==NULL)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Query::%s",sql);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", "Result is NULL" );
 		exit( FAIL );
 	}
-	if( PQresultStatus(result) != PGRES_TUPLES_OK)
+	if( PQresultStatus(result->sq_result) != PGRES_TUPLES_OK)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Query::%s",sql);
-		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", PQresStatus(PQresultStatus(result)) );
+		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", PQresStatus(PQresultStatus(result->sq_result)) );
 		exit( FAIL );
 	}
+	
+	/* init rownum */	
+	result->row_num = PQntuples(result->pg_result);
+
 	return result;
 #endif
 #ifdef	HAVE_ORACLE
@@ -456,16 +518,19 @@ DB_RESULT DBselect(const char *fmt, ...)
 	return sth;
 #endif
 #ifdef HAVE_SQLITE3
-	sqlite3_stmt* stmt = 0;
+	result = malloc(sizeof(ZBX_SQ_DB_RESULT));
+	result->sq_result = NULL;
+	result->values = NULL;
+	result->fld_num = 0;
 
-	if(SQLITE_OK != sqlite3_prepare(sqlite, sql, -1, &stmt, 0))
+	if(SQLITE_OK != sqlite3_prepare(sqlite, sql, -1, &result->sq_result, 0))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Query::%s",sql);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", sqlite3_errmsg(sqlite));
 		exit(FAIL);
 	}
-	return stmt;
-
+	
+	return result;
 #endif
 }
 

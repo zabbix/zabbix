@@ -1,5 +1,8 @@
 Changes for 1.3:
 
+ - fixed PostgreSQl supporting (Eugene)
+ - improved error displaying (Eugene)
+ - improved stricted PHP5 supporting (Eugene)
  - developed frontend installation wizard (Eugene)
  - added availability of template triggers changing directly on host (Eugene)
  - added availability of template items changing directly on host (Eugene)
