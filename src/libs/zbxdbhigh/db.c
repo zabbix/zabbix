@@ -144,6 +144,9 @@ void    DBconnect(void)
 		DBclose();
 		exit(FAIL);
 	}
+
+	/* Do not return SQLITE_BUSY immediately, wait for N ms */
+	sqlite3_busy_timeout(sqlite, 60*1000);
 #endif
 }
 
