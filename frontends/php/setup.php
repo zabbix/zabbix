@@ -101,7 +101,9 @@
 ?>
 <?php
 
-	$wizard = new CSetupWizard($ZBX_CONFIG);
+	global $ZBX_SETUP_WIZARD;
+
+	$ZBX_SETUP_WIZARD = new CSetupWizard($ZBX_CONFIG);
 
 	setcookie('ZBX_CONFIG', serialize($ZBX_CONFIG), time()+3600);
 
@@ -110,7 +112,7 @@ include_once "include/page_header.php";
 	insert_showhint_javascript();
 
 	echo BR;
-	$wizard->Show();
+	$ZBX_SETUP_WIZARD->Show();
 
 	//SDI($ZBX_CONFIG);
 
