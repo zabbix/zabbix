@@ -318,14 +318,22 @@ void    run_commands(DB_TRIGGER *trigger,DB_ACTION *action);
 
 void test()
 {
-	time_t now = time(NULL);
-	char delay_flex[] = "10/1-3,07:00-20:00;15/1-7,20:01-22:00;5/4-4,11:00-11:40";
-
+	DB_RESULT	result;
+	DB_ROW		row;
+	
 	printf("-= Test Started =-\n");
-
-	printf("Next check: %d (%d)\n", calculate_item_nextcheck(1000, 20, delay_flex,now),now);
+	
+	result = DBselect("select hostid,host from hosts");
+	
+	while((row=DBfetch(result)))
+	{
+		printf("[%s|%s]\n",row[0],row[1]);
+	}
+	DBfree_result(result);
 	
 	printf("-= Test completed =-\n");
+
+	return 0;
 }
 #endif /* TEST */
 

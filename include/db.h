@@ -72,8 +72,18 @@ extern	int	CONFIG_DBPORT;
 
 #ifdef HAVE_SQLITE3
 	#define DB_ROW		char **
-	#define	DB_RESULT	sqlite3_stmt *
-	#define	DBfree_result	sqlite3_finalize
+	#define	DB_RESULT	ZBX_SQ_DB_RESULT*
+	#define	DBfree_result	SQ_DBfree_result
+
+	typedef struct zbx_sq_db_result_s
+	{
+		sqlite3_stmt	*sq_result;
+		int		fld_num;
+		DB_ROW		values;
+	} ZBX_SQ_DB_RESULT;
+
+void	SQ_DBfree_result(DB_RESULT result);
+
 #endif
 
 #ifdef HAVE_MYSQL
