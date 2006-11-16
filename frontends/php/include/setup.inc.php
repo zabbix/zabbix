@@ -282,6 +282,19 @@
 					implode(BR, $img_formats),
 					!isset($no_img_formats),
 					'Required images genetarion support [PNG]'));	
+			
+			if(version_compare(phpversion(), '5.1.0RC1', '>='))
+			{
+				$tmezone = ini_get('date.timezone');
+				$table->AddRow(
+					get_test_result(
+						$final_result,
+						'PHP Timezone:', 
+						empty($tmezone) ? 'n/a' : $tmezone,
+						!empty($tmezone),
+						'Timezone for PHP is not set. Please set "date.timezone" option in php.ini.'));
+				unset($tmezone);
+			}
 
 			if(!$final_result)
 			{
