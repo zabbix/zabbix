@@ -22,6 +22,7 @@
 	require_once("include/config.inc.php");
 	require_once("include/perm.inc.php");
 
+
 	global $USER_DETAILS;
 	global $ZBX_CURNODEID;
 	global $ZBX_LOCALNODEID;
@@ -30,8 +31,6 @@
 COpt::profiling_start("page");
 	
 	unset($denyed_page_requested);
-
-	/* Header for HTML pages */
 
 	if(!isset($page["type"])) $page["type"] = PAGE_TYPE_HTML;
 	if(!isset($page["file"])) $page["file"] = basename($_SERVER['PHP_SELF']);
@@ -396,8 +395,6 @@ COpt::compare_files_with_menu($ZBX_MENU);
 	}
 	unset($ZBX_MENU);
 		
-	destroy_objects();
-
 	unset($table, $top_page_row, $menu_table, $node_form);
 	unset($main_menu_row);
 	unset($db_nodes, $node_data);
