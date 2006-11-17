@@ -267,7 +267,7 @@ include_once "include/page_header.php";
 		}
 		else
 		{
-			$result = DBselect("select g.* from graphs g left join graphs_items gi on g.graphid=gi.graphid ".
+			$result = DBselect("select distinct g.* from graphs g left join graphs_items gi on g.graphid=gi.graphid ".
 				" left join items i on gi.itemid=i.itemid ".
 				" where ".DBid2nodeid("g.graphid")."=".$ZBX_CURNODEID.
 				" and ( i.hostid not in (".$denyed_hosts.")  OR i.hostid is NULL )".
