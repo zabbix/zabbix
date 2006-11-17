@@ -1,5 +1,6 @@
 Changes for 1.3:
 
+ - added "Host group" element to maps (Eugene)
  - fixed PostgreSQl supporting (Eugene)
  - improved error displaying (Eugene)
  - improved stricted PHP5 supporting (Eugene)
