@@ -27,6 +27,17 @@
 	"S_DATE_FORMAT_YMD"=>			"d M Y",
 	"S_HTML_CHARSET"=>			"iso-8859-1",
 
+//	exp_imp.php
+	"S_EXPORT_IMPORT"=>			"Export/Import",
+	"S_IMPORT_FILE"=>			"Import file",
+	"S_IMPORT"=>				"Import",
+	"S_IMPORT_BIG"=>			"IMPORT",
+	"S_IMPORT_HOSTS"=>			"Import hosts",
+	"S_IMPORT_HOSTS_BIG"=>			"IMPORT HOSTS",
+	"S_EXPORT"=>				"Export",
+	"S_EXPORT_FILE"=>			"Export file",
+	"S_EXPORT_BIG"=>			"EXPORT",
+
 //	admin.php
 	"S_PREVIOUS"=>				"<< Previous",
 	"S_NEXT"=>				"Next >>",

@@ -616,11 +616,11 @@ include_once "include/page_header.php";
 				else				$error = new CCol($row["error"],"on");
 
 				$show = array(
-					new CLink(S_ITEMS,"items.php?hostid=".$row["hostid"]),
+					new CLink(S_ITEMS,"items.php?hostid=".$row["hostid"],'action'),
 					SPACE.":".SPACE,
-					new CLink(S_TRIGGERS,"triggers.php?hostid=".$row["hostid"]),
+					new CLink(S_TRIGGERS,"triggers.php?hostid=".$row["hostid"],'action'),
 					SPACE.":".SPACE,
-					new CLink(S_GRAPHS,"graphs.php?hostid=".$row["hostid"])
+					new CLink(S_GRAPHS,"graphs.php?hostid=".$row["hostid"],'action')
 					);
 
 				$table->addRow(array(
