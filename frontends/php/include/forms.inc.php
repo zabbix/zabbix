@@ -3194,6 +3194,7 @@
 		$cmbType = new CComboBox("elementtype",$elementtype,"submit()");
 
 		$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT);
+		$allowed_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
 		
 		$db_hosts = DBselect("select distinct n.name as node_name,h.hostid,h.host from hosts h,nodes n ".
 			" where h.hostid not in(".$denyed_hosts.")".
@@ -3206,7 +3207,8 @@
 		if(DBfetch($db_maps))
 			$cmbType->AddItem(SYSMAP_ELEMENT_TYPE_MAP,	S_MAP);
 
-		$cmbType->AddItem(SYSMAP_ELEMENT_TYPE_IMAGE,	S_IMAGE);
+		$cmbType->AddItem(SYSMAP_ELEMENT_TYPE_TRIGGER,		S_TRIGGER);
+		$cmbType->AddItem(SYSMAP_ELEMENT_TYPE_HOST_GROUP,	S_HOST_GROUP);
 
 		$frmEl->AddRow(S_TYPE,$cmbType);
 
@@ -3224,9 +3226,9 @@
 		{
 			$host = "";
 
-			$host_info = DBfetch(DBselect("select distinct n.name as node_name,h.hostid,h.host from hosts h,nodes n ".
+			$host_info = DBfetch(DBselect("select distinct n.name as node_name,h.hostid,h.host from hosts h ".
+				" left join nodes n on n.nodeid=".DBid2nodeid("h.hostid").
 				" where h.hostid not in(".$denyed_hosts.") and  hostid=".$elementid.
-				" and n.nodeid=".DBid2nodeid("h.hostid").
 				" order by node_name,h.host"));
 			if($host_info)
 				$host = $host_info["host"];
@@ -3260,24 +3262,62 @@
 			}
 			$frmEl->AddRow(S_MAP, $cmbMaps);
 		}
-		elseif($elementtype==SYSMAP_ELEMENT_TYPE_IMAGE)
+		elseif($elementtype==SYSMAP_ELEMENT_TYPE_TRIGGER)
 		{
-			$cmbTriggers= new CComboBox("elementid",$elementid);
-			$cmbTriggers->AddItem(0,"-");
-			$db_triggers = DBselect("select distinct n.name as node_name,h.hostid,h.host,t.*".
-				" from triggers t,hosts h,items i,functions f,nodes n ".
-				" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid".
-				" and h.hostid not in (".$denyed_hosts.")".
-				" and ".DBid2nodeid("h.hostid")."=n.nodeid".
-				" order by node_name,h.host,t.description");
+			$trigger = "";
+			$trigger_info = DBfetch(DBselect("select distinct n.name as node_name,h.hostid,h.host,t.*".
+				" from triggers t left join functions f on t.triggerid=f.triggerid ".
+				" left join items i on i.itemid=f.itemid left join hosts h on h.hostid=i.hostid ".
+				" left join nodes n on n.nodeid=".DBid2nodeid("t.triggerid").
+				" where h.hostid not in (".$denyed_hosts.") and t.triggerid=".$elementid.
+				" order by node_name,h.host,t.description"));
 			
-			while($db_trigger = DBfetch($db_triggers))
+			if($trigger_info)
+				$trigger = expand_trigger_description_by_data($trigger_info);
+			else
+				$elementid=0;
+
+			if($elementid==0)
 			{
-				$cmbTriggers->AddItem(
-					$db_trigger["triggerid"],
-					"(".$db_trigger['node_name'].") ".expand_trigger_description($db_trigger["triggerid"]));
+				$trigger = "";
+				$elementid = 0;
 			}
-			$frmEl->AddRow(S_TRIGGER, $cmbTriggers);
+
+			$frmEl->AddVar("elementid",$elementid);
+			$frmEl->AddRow(S_TRIGGER, array(
+				new CTextBox("trigger",$trigger,32,'yes'),
+				new CButton("btn1",S_SELECT,"return PopUp('popup.php?dstfrm=".$frmEl->GetName().
+					"&dstfld1=elementid&dstfld2=trigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description','new_win',".
+					"'width=550,height=450,resizable=1,scrollbars=1');","T")
+			));
+		}
+		elseif($elementtype==SYSMAP_ELEMENT_TYPE_HOST_GROUP)
+		{
+			$group = "";
+
+			$group_info = DBfetch(DBselect("select distinct n.name as node_name,g.groupid,g.name from groups g ".
+				" left join nodes n on n.nodeid=".DBid2nodeid("g.groupid").
+				" where g.groupid in (".$allowed_groups.") and g.groupid=".$elementid.
+				" order by node_name,g.name"));
+
+			if($group_info)
+				$group = $group_info["name"];
+			else
+				$elementid=0;
+
+			if($elementid==0)
+			{
+				$group = "";
+				$elementid = 0;
+			}
+
+			$frmEl->AddVar("elementid",$elementid);
+			$frmEl->AddRow(S_HOST_GROUP, array(
+				new CTextBox("group",$group,32,'yes'),
+				new CButton("btn1",S_SELECT,"return PopUp('popup.php?dstfrm=".$frmEl->GetName().
+					"&dstfld1=elementid&dstfld2=group&srctbl=host_group&srcfld1=groupid&srcfld2=name','new_win',".
+					"'width=450,height=450,resizable=1,scrollbars=1');","T")
+			));
 		}
 
 		$cmbIconOff	= new CComboBox("iconid_off",$iconid_off);
@@ -3362,11 +3402,19 @@
 				$db_map = get_sysmap_by_sysmapid($db_selement["elementid"]);
 				$label .= ":".$db_map["name"];
 			}
-			elseif($db_selement["elementtype"] == SYSMAP_ELEMENT_TYPE_IMAGE)
+			elseif($db_selement["elementtype"] == SYSMAP_ELEMENT_TYPE_TRIGGER)
 			{
 				if($db_selement["elementid"]>0)
 				{
 					$label .= ":".expand_trigger_description($db_selement["elementid"]);
+				}
+			}
+			elseif($db_selement["elementtype"] == SYSMAP_ELEMENT_TYPE_HOST_GROUP)
+			{
+				if($db_selement["elementid"]>0)
+				{
+					$db_group = DBfetch(DBselect('select name from groups where groupid='.$db_selement["elementid"]));
+					$label .= ":".$db_group['name'];
 				}
 			}
 			$cmbElements1->AddItem($db_selement["selementid"],$label);
