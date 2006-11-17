@@ -915,12 +915,18 @@ else
 			" work_period=".zbx_dbstr($work_period));
 	}
 
-	function	show_table_header($col1, $col2=SPACE)
+	function	&get_table_header($col1, $col2=SPACE)
 	{
 		$table = new CTable(NULL,"header");
 		$table->SetCellSpacing(0);
 		$table->SetCellPadding(1);
 		$table->AddRow(array(new CCol($col1,"header_l"), new CCol($col2,"header_r")));
+		return $table;
+	}
+
+	function	show_table_header($col1, $col2=SPACE)
+	{
+		$table =& get_table_header($col1, $col2);
 		$table->Show();
 	}
 

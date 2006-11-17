@@ -2316,25 +2316,19 @@
 		if($resourcetype == SCREEN_RESOURCE_GRAPH)
 		{
 	// User-defined graph
-			$result = DBselect("select distinct g.graphid,g.name,n.name as node_name ".
-				" from graphs g, nodes n, graphs_items gi, items i, hosts h ".
-				" where n.nodeid=".DBid2nodeid("g.graphid")." and g.graphid=gi.graphid ".
-				" and gi.itemid=i.itemid and h.hostid=i.hostid".
-				" and i.hostid not in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT).")".
-				" order by node_name,host,name,graphid");
+			$result = DBselect("select g.graphid,g.name,n.name as node_name, h.host".
+				" from graphs g left join graphs_items gi on g.graphid=gi.graphid left join items i on gi.itemid=i.itemid ".
+				" left join hosts h on h.hostid=i.hostid left join nodes n on n.nodeid=".DBid2nodeid("g.graphid").
+				" where i.hostid not in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT).")".
+				" group by graphid,name,node_name".
+				" order by node_name,host,name,graphid"
+				);
 
 			$cmbGraphs = new CComboBox("resourceid",$resourceid);
 			while($row=DBfetch($result))
 			{
-				$db_host = DBfetch(get_hosts_by_graphid($row["graphid"]));
-				if($db_host)
-				{
-					$name = "(".$row["node_name"].") ".$db_host["host"].":".$row["name"];
-				}
-				else
-				{
-					$name = $row["name"];
-				}
+				$row["node_name"] = isset($row["node_name"]) ? "(".$row["node_name"].") " : '';
+				$name = $row["node_name"].$row["host"].":".$row["name"];
 				$cmbGraphs->AddItem($row["graphid"],$name);
 			}
 
