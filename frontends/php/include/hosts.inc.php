@@ -328,6 +328,9 @@ require_once "include/items.inc.php";
 
 	function	delete_host_group($groupid)
 	{
+		if(!delete_sysmaps_elements_with_groupid($groupid))
+			return false;
+		
 		if(!DBexecute("delete from hosts_groups where groupid=$groupid"))
 			return false;
 
