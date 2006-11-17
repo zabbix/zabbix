@@ -2509,7 +2509,8 @@
 		if(DBfetch($db_maps))
 			$cmbType->AddItem(SYSMAP_ELEMENT_TYPE_MAP,	S_MAP);
 
-		$cmbType->AddItem(SYSMAP_ELEMENT_TYPE_IMAGE,	S_IMAGE);
+		$cmbType->AddItem(SYSMAP_ELEMENT_TYPE_TRIGGER,		S_TRIGGER);
+		$cmbType->AddItem(SYSMAP_ELEMENT_TYPE_HOST_GROUP,	S_HOST_GROUP);
 
 		$frmEl->AddRow(S_TYPE,$cmbType);
 
@@ -2561,20 +2562,45 @@
 			}
 			$frmEl->AddRow(S_MAP, $cmbMaps);
 		}
-		elseif($elementtype==SYSMAP_ELEMENT_TYPE_IMAGE)
+		elseif($elementtype==SYSMAP_ELEMENT_TYPE_TRIGGER)
 		{
-			$cmbTriggers= new CComboBox("elementid",$elementid);
-			$cmbTriggers->AddItem(0,"-");
-			$db_triggers = DBselect("select triggerid from triggers");
-			while($db_trigger = DBfetch($db_triggers))
-			{
-				$cmbTriggers->AddItem(
-					$db_trigger["triggerid"],
-					expand_trigger_description($db_trigger["triggerid"]));
-			}
-			$frmEl->AddRow(S_TRIGGER, $cmbTriggers);
-		}
+			$trigger = "";
 
+			$trigger_info = DBfetch(DBselect("select triggerid from triggers where triggerid=".$elementid));
+			
+			if($trigger_info)
+				$trigger = expand_trigger_description($trigger_info["triggerid"]);
+			else
+				$elementid=0;
+
+			if($elementid==0)
+			{
+				$trigger = "";
+				$elementid = 0;
+			}
+
+			$frmEl->AddVar("elementid",$elementid);
+			$frmEl->AddRow(S_TRIGGER, array(
+				new CTextBox("trigger",$trigger,32,'yes'),
+				new CButton("btn1",S_SELECT,"return PopUp('popup.php?dstfrm=".$frmEl->GetName().
+					"&dstfld1=elementid&dstfld2=trigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description','new_win',".
+					"'width=550,height=450,resizable=1,scrollbars=1');","T")
+			));
+		}
+		elseif($elementtype==SYSMAP_ELEMENT_TYPE_HOST_GROUP)
+		{
+			$group = "";
+
+			$cmbGroup = new CComboBox('elementid', $elementid);
+			
+			$db_groups = DBselect('select distinct g.* from groups g');
+			while($group = DBfetch($db_groups))
+			{
+				$cmbGroup->AddItem($group['groupid'], $group['name']);
+			}
+			$frmEl->AddRow(S_HOST_GROUP, $cmbGroup);
+		}
+		
 		$cmbIcon = new CComboBox("icon",$icon);
 		$result=DBselect("select name from images where imagetype=1 order by name");
 		while($row=DBfetch($result))
@@ -2658,11 +2684,19 @@
 				$db_map = get_sysmap_by_sysmapid($db_selement["elementid"]);
 				$label .= ":".$db_map["name"];
 			}
-			elseif($db_selement["elementtype"] == SYSMAP_ELEMENT_TYPE_IMAGE)
+			elseif($db_selement["elementtype"] == SYSMAP_ELEMENT_TYPE_TRIGGER)
 			{
 				if($db_selement["elementid"]>0)
 				{
 					$label .= ":".expand_trigger_description($db_selement["elementid"]);
+				}
+			}
+			elseif($db_selement["elementtype"] == SYSMAP_ELEMENT_TYPE_HOST_GROUP)
+			{
+				if($db_selement["elementid"]>0)
+				{
+					$db_group = DBfetch(DBselect('select name from groups where groupid='.$db_selement["elementid"]));
+					$label .= ":".$db_group['name'];
 				}
 			}
 			$cmbElements1->AddItem($db_selement["selementid"],$label);

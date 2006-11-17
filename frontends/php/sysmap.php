@@ -43,7 +43,7 @@
 
 		"selementid"=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,		NULL),
 		"elementid"=>	array(T_ZBX_INT, O_OPT,  NULL, DB_ID,		'isset({save})'),
-		"elementtype"=>	array(T_ZBX_INT, O_OPT,  NULL, IN("0,1,2"),	'isset({save})'),
+		"elementtype"=>	array(T_ZBX_INT, O_OPT,  NULL, IN("0,1,2,3"),	'isset({save})'),
 		"label"=>	array(T_ZBX_STR, O_OPT,  NULL, NOT_EMPTY,	'isset({save})'),
 		"x"=>		array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,65535),'isset({save})'),
 		"y"=>           array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,65535),'isset({save})'),
@@ -185,9 +185,10 @@
 		while($db_element = DBfetch($db_elements))
 		{
 
-			if(    $db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_HOST)	$type = "Host";
-			elseif($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_MAP)	$type = "Map";
-			elseif($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_IMAGE)	$type = "Image";
+			if(    $db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_HOST)		$type = S_HOST;
+			elseif($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_MAP)		$type = S_MAP;
+			elseif($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_TRIGGER)	$type = S_TRIGGER;
+			elseif($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_HOST_GROUP)	$type = S_HOST_GROUP;
 			else $type = "Map element";
 
 			$table->addRow(array(

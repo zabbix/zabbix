@@ -204,11 +204,19 @@
 			}
 
 		}
-		elseif($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_IMAGE && $db_element["elementid"]>0)
+		elseif($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_TRIGGER && $db_element["elementid"]>0)
 		{
 			if($label_type==MAP_LABEL_TYPE_NAME)
 			{
 				$label_line = expand_trigger_description_simple($db_element["elementid"]);
+			}
+		}
+		elseif($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_HOST_GROUP && $db_element["elementid"]>0)
+		{
+			if($label_type==MAP_LABEL_TYPE_NAME)
+			{
+				$group = DBfetch(DBselect('select * from groups where groupid='.$db_element["elementid"]));
+				$label_line = $group["name"];
 			}
 		}
 

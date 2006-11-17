@@ -213,7 +213,17 @@
 	function	delete_sysmaps_elements_with_triggerid($triggerid)
 	{
 		$db_elements = DBselect("select selementid from sysmaps_elements".
-			" where elementid=$triggerid and elementtype=".SYSMAP_ELEMENT_TYPE_IMAGE);
+			" where elementid=$triggerid and elementtype=".SYSMAP_ELEMENT_TYPE_TRIGGER);
+		while($db_element = DBfetch($db_elements))
+		{
+			delete_sysmaps_element($db_element["selementid"]);
+		}
+		return TRUE;
+	}
+	function	delete_sysmaps_elements_with_groupid($groupid)
+	{
+		$db_elements = DBselect("select selementid from sysmaps_elements".
+			" where elementid=$groupid and elementtype=".SYSMAP_ELEMENT_TYPE_HOST_GROUP);
 		while($db_element = DBfetch($db_elements))
 		{
 			delete_sysmaps_element($db_element["selementid"]);
@@ -289,7 +299,7 @@
 				}
 			}
 		}
-		elseif($db_element["elementtype"]==SYSMAP_ELEMENT_TYPE_IMAGE)
+		elseif($db_element["elementtype"]==SYSMAP_ELEMENT_TYPE_TRIGGER)
 		{
 			if($db_element["elementid"]>0){
 				$trigger=get_trigger_by_triggerid($db_element["elementid"]);
@@ -303,6 +313,26 @@
 				{
 					$info=S_FALSE_BIG;
 				}
+			}
+		}
+		elseif($db_element["elementtype"]==SYSMAP_ELEMENT_TYPE_HOST_GROUP)
+		{
+			$db_triggers = DBselect("select distinct t.triggerid, t.priority ".
+				" from items i,functions f,triggers t,hosts h,hosts_groups hg ".
+				" where h.hostid=i.hostid".
+				" and hg.groupid=".$db_element["elementid"].
+				" and hg.hostid=h.hostid and i.itemid=f.itemid".
+				" and f.triggerid=t.triggerid and t.value=1 and t.status=0".
+				" and h.status=".HOST_STATUS_MONITORED." and i.status=0");
+
+			$trigger = DBfetch($db_triggers);
+			if($trigger)
+			{
+				for($count=1; DBfetch($db_triggers); $count++);
+
+				if ($trigger["priority"] > 3)           $color=$colors["Red"];
+				else                                    $color=$colors["Dark Yellow"];
+				$info = expand_trigger_description_simple($trigger["triggerid"]);
 			}
 		}
 
@@ -351,10 +381,15 @@
 
 				$alt = "Host: ".$map["name"]." ".$alt;
 			}
-			elseif($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_IMAGE)
+			elseif($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_TRIGGER)
 			{
 				if($url=="" && $db_element["elementid"]!=0)
 					$url="alarms.php?triggerid=".$db_element["elementid"];
+			}
+			elseif($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_HOST_GROUP)
+			{
+				if($url=="" && $db_element["elementid"]!=0)
+					$url="events.php?groupid=".$db_element["elementid"];
 			}
 
 			if($url=="")	continue;

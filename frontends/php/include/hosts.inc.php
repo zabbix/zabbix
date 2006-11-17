@@ -312,10 +312,13 @@
 
 	function	delete_host_group($groupid)
 	{
-		$sql="delete from hosts_groups where groupid=$groupid";
-		DBexecute($sql);
-		$sql="delete from groups where groupid=$groupid";
-		return DBexecute($sql);
+		if(!delete_sysmaps_elements_with_groupid($groupid))
+			return false;
+		
+		if(!DBexecute("delete from hosts_groups where groupid=$groupid"))
+			return false;
+
+		return DBexecute("delete from groups where groupid=$groupid");
 	}
 
 	function	get_hostgroup_by_groupid($groupid)

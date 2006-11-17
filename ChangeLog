@@ -1,4 +1,6 @@
 Changes for 1.1.5:
+
+ - added "Host group" element for maps (Eugene)
  - fixed Y asix value displaying for graphs (Eugene)
 
 Changes for 1.1.4:
