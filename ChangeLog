@@ -1,5 +1,6 @@
 Changes for 1.1.5:
 
+ - added support of macro TRIGGER.URL and TRIGGER.COMMENT (Alexei)
  - fixed dependences of item deletion (Eugene)
  - added "Host group" element for maps (Eugene)
  - fixed Y asix value displaying for graphs (Eugene)

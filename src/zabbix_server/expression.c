@@ -562,16 +562,18 @@ int	evaluate(int *result,char *exp, char *error, int maxerrlen)
  ******************************************************************************/
 /* definition of macros variables */
 #define MVAR_DATE			"{DATE}"
-#define MVAR_TIME			"{TIME}"
+#define MVAR_EVENT_ID			"{EVENT.ID}"
 #define MVAR_HOST_NAME			"{HOSTNAME}"
 #define MVAR_IPADDRESS			"{IPADDRESS}"
-#define MVAR_TRIGGER_NAME		"{TRIGGER.NAME}"
+#define MVAR_TIME			"{TIME}"
+#define MVAR_TRIGGER_COMMENT		"{TRIGGER.COMMENT}"
+#define MVAR_TRIGGER_ID			"{TRIGGER.ID}"
 #define MVAR_TRIGGER_KEY		"{TRIGGER.KEY}"
+#define MVAR_TRIGGER_NAME		"{TRIGGER.NAME}"
+#define MVAR_TRIGGER_SEVERITY		"{TRIGGER.SEVERITY}"
 #define MVAR_TRIGGER_STATUS		"{TRIGGER.STATUS}"
 #define MVAR_TRIGGER_STATUS_OLD		"{STATUS}"
-#define MVAR_TRIGGER_SEVERITY		"{TRIGGER.SEVERITY}"
-#define MVAR_TRIGGER_ID			"{TRIGGER.ID}"
-#define MVAR_EVENT_ID			"{EVENT.ID}"
+#define MVAR_TRIGGER_URL		"{TRIGGER.URL}"
 
 #define STR_UNKNOWN_VARIAVLE		"*UNKNOWN*"
 
@@ -741,6 +743,22 @@ void	substitute_simple_macros(int alarmid, DB_TRIGGER *trigger, DB_ACTION *actio
 			var_len = strlen(MVAR_TRIGGER_ID);
 
 			snprintf(replace_to, sizeof(replace_to), "%d", trigger->triggerid);
+		}
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) && 
+			strncmp(pr, MVAR_TRIGGER_URL, strlen(MVAR_TRIGGER_URL)) == 0)
+		{
+			/* NOTE: if you make changes for this bloc, don't forgot MVAR_TRIGGER_STATUS block */
+			var_len = strlen(MVAR_TRIGGER_URL);
+
+			snprintf(replace_to, sizeof(replace_to), "%s", trigger->url);
+		}
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) && 
+			strncmp(pr, MVAR_TRIGGER_COMMENT, strlen(MVAR_TRIGGER_COMMENT)) == 0)
+		{
+			/* NOTE: if you make changes for this bloc, don't forgot MVAR_TRIGGER_STATUS block */
+			var_len = strlen(MVAR_TRIGGER_COMMENT);
+
+			snprintf(replace_to, sizeof(replace_to), "%s", trigger->comments);
 		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) && 
 			strncmp(pr, MVAR_EVENT_ID, strlen(MVAR_EVENT_ID)) == 0)

@@ -861,8 +861,10 @@ void update_triggers_status_to_unknown(int hostid,int clock,char *reason)
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In update_triggers_status_to_unknown()");
 
+	memset(&trigger, 0, sizeof(trigger));
+
 /*	snprintf(sql,sizeof(sql)-1,"select distinct t.triggerid from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and h.hostid=%d and i.key_<>'%s'",hostid,SERVER_STATUS_KEY);*/
-	snprintf(sql,sizeof(sql)-1,"select distinct t.triggerid,t.value from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and h.hostid=%d and i.key_ not in ('%s','%s','%s')",hostid,SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY);
+	snprintf(sql,sizeof(sql)-1,"select distinct t.triggerid,t.value,t.url,t.comments from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and h.hostid=%d and i.key_ not in ('%s','%s','%s')",hostid,SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	result = DBselect(sql);
 
@@ -870,6 +872,8 @@ void update_triggers_status_to_unknown(int hostid,int clock,char *reason)
 	{
 		trigger.triggerid=atoi(row[0]);
 		trigger.value=atoi(row[1]);
+		strscpy(trigger.url, row[2]);
+		strscpy(trigger.comments, row[3]);
 		DBupdate_trigger_value(&trigger,TRIGGER_VALUE_UNKNOWN,clock,reason);
 	}
 
