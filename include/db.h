@@ -178,6 +178,7 @@ DB_EVENT
 	int		acknowledged;
 	char		trigger_description[TRIGGER_DESCRIPTION_LEN_MAX];
 	int		trigger_priority;
+	char		trigger_url[TRIGGER_URL_LEN_MAX];
 	char		trigger_comments[TRIGGER_COMMENTS_LEN_MAX];
 };
 
