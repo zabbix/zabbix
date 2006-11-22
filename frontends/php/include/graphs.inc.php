@@ -68,7 +68,7 @@
 
 	function	get_graphitem_by_itemid($itemid)
 	{
-		$result=DBselect("select * from graphs_items where itemid=$itemid");
+		$result = DBfetch(DBselect('select * from graphs_items where itemid='.$itemid));
 		$row=DBfetch($result);
 		if($row)
 		{

@@ -19,8 +19,27 @@
 **/
 ?>
 <?php
+	define("XML_TAG_ZABBIX_EXPORT",		'zabbix_export');
+	define("XML_TAG_HOSTS",			'hosts');
+	define("XML_TAG_HOST",			'host');
+	define("XML_TAG_GROUPS",		'groups');
+	define("XML_TAG_GROUP",			'group');
+	define("XML_TAG_ITEMS",			'items');
+	define("XML_TAG_ITEM",			'item');
+	define("XML_TAG_TRIGGERS",		'triggers');
+	define("XML_TAG_TRIGGER",		'trigger');
+	define("XML_TAG_GRAPHS",		'graphs');
+	define("XML_TAG_GRAPH",			'graph');
+	define("XML_TAG_GRAPH_ELEMENT",		'graph_element');
+	define("XML_TAG_GRAPH_ELEMENTS",	'graph_elements');
+	define("XML_TAG_SCREENS",		'screens');
+	define("XML_TAG_SCREEN",		'screen');
+	define("XML_TAG_SCREEN_ELEMENT",	'screen_element');
+	define("XML_TAG_SCREEN_ELEMENTS",	'screen_elements');
+	
 	define("PAGE_TYPE_HTML",	0);
 	define("PAGE_TYPE_IMAGE",	1);
+	define("PAGE_TYPE_XML",		2);
 
 	define("T_ZBX_STR",			0);
 	define("T_ZBX_INT",			1);
