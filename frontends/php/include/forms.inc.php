@@ -1474,7 +1474,7 @@
 		else
 		{
 			$itemid		= get_request("itemid", 	0);
-			$color		= get_request("color", 		0);
+			$color		= get_request("color", 		'Dark Green');
 			$drawtype	= get_request("drawtype",	0);
 			$sortorder	= get_request("sortorder",	0);
 			$yaxisside	= get_request("yaxisside",	1);

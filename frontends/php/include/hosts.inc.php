@@ -28,7 +28,7 @@ require_once "include/items.inc.php";
 	function	add_host_to_group($hostid, $groupid)
 	{
 		if(!is_numeric($hostid) || !is_numeric($groupid)){
-			error("incorrect parameters for 'add_host_to_group'");
+			error("incorrect parameters for 'add_host_to_group' [hostid:".$hostid."][groupid:".$groupid."]");
 			return false;
 		}
 		$hostgroupid=get_dbid("hosts_groups","hostgroupid");
@@ -198,6 +198,8 @@ require_once "include/items.inc.php";
 		$hostid = db_save_host($host,$port,$status,$useip,$ip,$templates);
 		if(!$hostid)
 			return $hostid;
+		else
+			info('Added new host ['.$host.']');
 
 		update_host_groups($hostid,$groups);
 

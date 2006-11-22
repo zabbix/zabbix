@@ -472,6 +472,9 @@ else
 					$width = max($width, ImageFontWidth(4) * strlen($msg) + 1);
 					$height += imagefontheight(4) + 1;
 					break;			
+				case PAGE_TYPE_XML:
+					echo htmlspecialchars($msg)."\n";
+					break;			
 				case PAGE_TYPE_HTML:
 				default:
 					echo "<p align=center>";
@@ -486,7 +489,6 @@ else
 
 		if(isset($ZBX_MESSAGES))
 		{
-			
 			if($page["type"] == PAGE_TYPE_IMAGE)
 			{
 				foreach($ZBX_MESSAGES as $msg)
@@ -507,6 +509,13 @@ else
 					}
 					$width = max($width, ImageFontWidth(2) * strlen($msg['message']) + 1);
 					$height += imagefontheight(2) + 1;
+				}
+			}
+			elseif($page["type"] == PAGE_TYPE_XML)
+			{
+				foreach($ZBX_MESSAGES as $msg)
+				{
+					echo '['.$msg['type'].'] '.$msg['message']."\n";
 				}
 			}
 			else
