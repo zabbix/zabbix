@@ -75,7 +75,11 @@ COpt::profiling_start("page");
 			set_image_header();
 			define('ZBX_PAGE_NO_MENU', 1);
 			break;
-
+		case PAGE_TYPE_XML:
+			header('Content-Type: text/xml');
+			header('Content-Disposition: attachment; filename="'.$page['file'].'"');
+			define('ZBX_PAGE_NO_MENU', 1);
+			break;
 		case PAGE_TYPE_HTML:
 		default:
 ?>
@@ -96,7 +100,7 @@ COpt::profiling_start("page");
 		if(defined('ZBX_PAGE_DO_REFRESH') && $USER_DETAILS["refresh"])
 		{
 ?>
-    <meta http-equiv=\"refresh\" content="<?php echo $USER_DETAILS["refresh"] ?>">
+    <meta http-equiv="refresh" content="<?php echo $USER_DETAILS["refresh"] ?>">
 <?php
 			$page['title'] .= ' [refreshed every '.$USER_DETAILS['refresh'].' sec]';
 		}
@@ -401,12 +405,12 @@ COpt::compare_files_with_menu($ZBX_MENU);
 	unset($db_nodes, $node_data);
 	unset($sub_menu_table, $sub_menu_row);
 
-	if((!isset($page_exist) || isset($denyed_page_requested)) && !isset($_REQUEST['message']))
+	if(((!isset($page_exist) && $page['type']!=PAGE_TYPE_XML) || isset($denyed_page_requested)) && !isset($_REQUEST['message']))
 	{
 		access_deny();
 	}
 
-	if(version_compare(phpversion(), '5.1.0RC1', '>=') && $page['type'] != PAGE_TYPE_IMAGE)
+	if(version_compare(phpversion(), '5.1.0RC1', '>=') && $page['type'] == PAGE_TYPE_HTML)
 	{
 		$tmezone = ini_get('date.timezone');
 		if(empty($tmezone)) 

@@ -457,7 +457,7 @@
 	
 	# Translate {10}>10 to something like localhost:procload.last(0)>10
 
-	function	explode_exp ($expression, $html)
+	function	explode_exp ($expression, $html,$template=false)
 	{
 #		echo "EXPRESSION:",$expression,"<Br>";
 
@@ -479,6 +479,8 @@
 					' from items i,functions f,hosts h'.
 					' where functionid='.$functionid.' and i.itemid=f.itemid and h.hostid=i.hostid')))
 				{
+					if($template) $function_data["host"] = '{HOSTNAME}';
+						
 					if($html == 0)
 					{
 						$exp .= "{".$function_data["host"].":".$function_data["key_"].".".
