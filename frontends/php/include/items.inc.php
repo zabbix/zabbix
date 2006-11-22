@@ -466,10 +466,10 @@
 		$result = delete_triggers_by_itemid($itemid);
 		if(!$result)	return	$result;
 
-		$db_gitems = get_graphitem_by_itemid($itemid);
+		$db_gitems = DBselect('select * from graphs_items where itemid='.$itemid);
 		while($db_gitem = DBfetch($db_gitems))
 		{
-			$result = delete_graph_by_itemid($db_gitem["graphid"]);
+			$result = delete_graph($db_gitem["graphid"]);
 			if(!$result)	return	$result;
 		}
 
