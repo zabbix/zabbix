@@ -561,17 +561,18 @@ int	evaluate(int *result,char *exp, char *error, int maxerrlen)
  ******************************************************************************/
 /* definition of macros variables */
 #define MVAR_DATE			"{DATE}"
-#define MVAR_TIME			"{TIME}"
+#define MVAR_EVENT_ID			"{EVENT.ID}"
 #define MVAR_HOST_NAME			"{HOSTNAME}"
 #define MVAR_IPADDRESS			"{IPADDRESS}"
-#define MVAR_TRIGGER_NAME		"{TRIGGER.NAME}"
+#define MVAR_TIME			"{TIME}"
 #define MVAR_TRIGGER_COMMENT		"{TRIGGER.COMMENT}"
+#define MVAR_TRIGGER_ID			"{TRIGGER.ID}"
 #define MVAR_TRIGGER_KEY		"{TRIGGER.KEY}"
+#define MVAR_TRIGGER_NAME		"{TRIGGER.NAME}"
+#define MVAR_TRIGGER_SEVERITY		"{TRIGGER.SEVERITY}"
 #define MVAR_TRIGGER_STATUS		"{TRIGGER.STATUS}"
 #define MVAR_TRIGGER_STATUS_OLD		"{STATUS}"
-#define MVAR_TRIGGER_SEVERITY		"{TRIGGER.SEVERITY}"
-#define MVAR_TRIGGER_ID			"{TRIGGER.ID}"
-#define MVAR_EVENT_ID			"{EVENT.ID}"
+#define MVAR_TRIGGER_URL		"{TRIGGER.URL}"
 
 #define STR_UNKNOWN_VARIAVLE		"*UNKNOWN*"
 
@@ -765,6 +766,14 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 			var_len = strlen(MVAR_TRIGGER_ID);
 
 			zbx_snprintf(replace_to, sizeof(replace_to), "%d", event->triggerid);
+		}
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
+			strncmp(pr, MVAR_TRIGGER_URL, strlen(MVAR_TRIGGER_URL)) == 0)
+		{
+			/* NOTE: if you make changes for this bloc, don't forgot MVAR_TRIGGER_STATUS block */
+			var_len = strlen(MVAR_TRIGGER_URL);
+
+			zbx_snprintf(replace_to, sizeof(replace_to), "%s", event->trigger_url);
 		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
 			strncmp(pr, MVAR_EVENT_ID, strlen(MVAR_EVENT_ID)) == 0)

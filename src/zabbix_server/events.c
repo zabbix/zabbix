@@ -68,15 +68,20 @@ static void	add_trigger_info(DB_EVENT *event)
 
 	if(event->triggerid == 0)	return;
 
-	result = DBselect("select description,priority,comments from triggers where triggerid=" ZBX_FS_UI64,
+	result = DBselect("select description,priority,comments,url from triggers where triggerid=" ZBX_FS_UI64,
 		event->triggerid);
 	row = DBfetch(result);
 
+	event->trigger_description[0]=0;
+	event->trigger_comments[0]=0;
+	event->trigger_url[0]=0;
+
 	if(row)
 	{
-		zbx_strlcpy(event->trigger_description, row[0], TRIGGER_DESCRIPTION_LEN_MAX);
+		strscpy(event->trigger_description, row[0]);
 		event->trigger_priority = atoi(row[1]);
-		zbx_strlcpy(event->trigger_comments, row[2], TRIGGER_COMMENTS_LEN_MAX);
+		strscpy(event->trigger_comments, row[2]);
+		strscpy(event->trigger_url, row[3]);
 	}
 
 	DBfree_result(result);

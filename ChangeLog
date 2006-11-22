@@ -19,6 +19,10 @@ Changes for 1.3:
 
 Integrated from 1.1.x
 
+1.1.5
+
+ - added support of macro TRIGGER.URL and TRIGGER.COMMENT (Alexei)
+
 1.1.4
 
  - fixed Y asix value displaying for graphs (Eugene)
