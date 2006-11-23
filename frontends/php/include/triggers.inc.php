@@ -358,14 +358,22 @@
 		return $triggerid;
 	}
 
+	function	get_trigger_dependences_by_triggerid($triggerid)
+	{
+		$result = array();
+
+		$db_deps = DBexecute("select * from trigger_depends where triggerid_down=".$triggerid);
+		while($db_dep = DBfetch($db_deps))
+			array_push($result, $db_dep["triggerid_up"]);
+			
+		return $result;
+	}
+
 	function	copy_trigger_to_host($triggerid, $hostid, $copy_mode = false)
 	{
 		$trigger = get_trigger_by_triggerid($triggerid);
 
-		$deps = array();
-		$db_deps = DBexecute("select * from trigger_depends where triggerid_down=".$triggerid);
-		while($db_dep = DBfetch($db_deps))
-			array_push($deps, $db_dep["triggerid_up"]);
+		$deps = get_trigger_dependences_by_triggerid($triggerid);
 
 		$host_triggers = get_triggers_by_hostid($hostid, "no");
 		while($host_trigger = DBfetch($host_triggers))
