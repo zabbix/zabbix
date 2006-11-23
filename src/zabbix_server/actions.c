@@ -420,9 +420,9 @@ static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigge
 	{
 		snprintf(sql,sizeof(sql)-1,"select distinct hg.groupid from hosts_groups hg,hosts h, items i, functions f, triggers t where hg.hostid=h.hostid and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=%d", trigger->triggerid);
 		result = DBselect(sql);
-		while((row=DBfetch(result)))
+		if(condition->operator == CONDITION_OPERATOR_EQUAL)
 		{
-			if(condition->operator == CONDITION_OPERATOR_EQUAL)
+			while((row=DBfetch(result)))
 			{
 				if(atoi(condition->value) == atoi(row[0]))
 				{
@@ -430,19 +430,22 @@ static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigge
 					break;
 				}
 			}
-			else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
+		}
+		else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
+		{
+			ret = SUCCEED;
+			while((row=DBfetch(result)))
 			{
-				if(atoi(condition->value) != atoi(row[0]))
+				if(atoi(condition->value) == atoi(row[0]))
 				{
-					ret = SUCCEED;
+					ret = FAIL;
 					break;
 				}
 			}
-			else
-			{
-				zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [%d]", condition->operator, condition->conditionid);
-				break;
-			}
+		}
+		else
+		{
+			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [%d]", condition->operator, condition->conditionid);
 		}
 		DBfree_result(result);
 	}
@@ -450,9 +453,9 @@ static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigge
 	{
 		snprintf(sql,sizeof(sql)-1,"select distinct h.hostid from hosts h, items i, functions f, triggers t where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=%d", trigger->triggerid);
 		result = DBselect(sql);
-		while((row=DBfetch(result)))
+		if(condition->operator == CONDITION_OPERATOR_EQUAL)
 		{
-			if(condition->operator == CONDITION_OPERATOR_EQUAL)
+			while((row=DBfetch(result)))
 			{
 				if(atoi(condition->value) == atoi(row[0]))
 				{
@@ -460,19 +463,22 @@ static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigge
 					break;
 				}
 			}
-			else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
+		}
+		else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
+		{
+			ret = SUCCEED;
+			while((row=DBfetch(result)))
 			{
-				if(atoi(condition->value) != atoi(row[0]))
+				if(atoi(condition->value) == atoi(row[0]))
 				{
-					ret = SUCCEED;
+					ret = FAIL;
 					break;
 				}
 			}
-			else
-			{
-				zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [%d]", condition->operator, condition->conditionid);
-				break;
-			}
+		}
+		else
+		{
+			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [%d]", condition->operator, condition->conditionid);
 		}
 		DBfree_result(result);
 	}

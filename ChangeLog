@@ -1,5 +1,6 @@
 Changes for 1.1.5:
 
+ - fixed "not equal" condition for hosts and host groups in actions (Alexei)
  - added support of macro TRIGGER.URL and TRIGGER.COMMENT (Alexei)
  - fixed dependences of item deletion (Eugene)
  - added "Host group" element for maps (Eugene)
