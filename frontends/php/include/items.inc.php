@@ -423,11 +423,6 @@
 	{
 		$db_tmp_item = get_item_by_itemid($itemid);
 
-		$parrent_applications = array();
-		$db_applications = get_applications_by_itemid($db_tmp_item["itemid"]);
-		while($db_application = DBfetch($db_applications))
-			array_push($parrent_applications,$db_application["applicationid"]);
-
 		add_item(
 			$db_tmp_item["description"],
 			$db_tmp_item["key_"],
@@ -453,7 +448,7 @@
 			$db_tmp_item["logtimefmt"],
 			$db_tmp_item["valuemapid"],
 			$db_tmp_item["delay_flex"],
-			get_same_applications_for_host($parrent_applications,$hostid),
+			get_same_applications_for_host(get_applications_by_itemid($db_tmp_item["itemid"]),$hostid),
 			$copy_mode ? 0 : $db_tmp_item["itemid"]);
 	}
 
@@ -473,14 +468,10 @@
 
 		$db_tmp_items = get_items_by_hostid($templateid);
 
+		$apps = get_same_applications_for_host(get_applications_by_itemid($db_tmp_item["itemid"]),$hostid);
+		
 		while($db_tmp_item = DBfetch($db_tmp_items))
 		{
-			$parrent_applications = array();
-			$db_applications = get_applications_by_itemid($db_tmp_item["itemid"]);
-			while($db_application = DBfetch($db_applications))
-				array_push($parrent_applications,$db_application["applicationid"]);
-
-
 			add_item(
 				$db_tmp_item["description"],
 				$db_tmp_item["key_"],
@@ -506,7 +497,7 @@
 				$db_tmp_item["logtimefmt"],
 				$db_tmp_item["valuemapid"],
 				$db_tmp_item["delay_flex"],
-				get_same_applications_for_host($parrent_applications,$hostid),
+				$apps,
 				$copy_mode ? 0 : $db_tmp_item["itemid"]);
 		}
 	}
@@ -727,10 +718,16 @@ COpt::profiling_stop('prepare table');
 		return $child_applications;
 	}
 
-	function get_applications_by_itemid($itemid)
+	function get_applications_by_itemid($itemid, $field='applicationid')
 	{
-		return DBselect("select distinct app.* from applications app, items_applications ia".
+		$result = array();
+		
+		$db_applications = DBselect("select distinct app.*,app.".$field." as result from applications app, items_applications ia".
 			" where app.applicationid=ia.applicationid and ia.itemid=".$itemid);
+		while($db_application = DBfetch($db_applications))
+			array_push($result,$db_application["result"]);
+
+		return $result;
 	}
 
 	# Delete from History

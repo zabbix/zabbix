@@ -28,6 +28,7 @@
 	"S_HTML_CHARSET"=>			"iso-8859-1",
 
 //	exp_imp.php
+	"S_ELEMENT"=>				"Element",
 	"S_ELEMENTS"=>				"Elements",
 	"S_ONLY_HOST_INFO"=>			"Only host info",
 	"S_EXPORT_IMPORT"=>			"Export/Import",
@@ -42,6 +43,10 @@
 	"S_PREVIEW"=>				"Preview",
 	"S_BACK"=>				"Back",
 	"S_NO_DATA_FOR_EXPORT"=>		"No data for export",
+	"S_RULES"=>				"Rules",
+	"S_SKIP"=>				"Skip",
+	"S_EXISTED"=>				"Existed",
+	"S_MISSED"=>				"Missed",
 
 //	admin.php
 	"S_PREVIOUS"=>				"<< Previous",

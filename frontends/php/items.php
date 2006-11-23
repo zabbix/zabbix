@@ -569,12 +569,7 @@ include_once "include/page_header.php";
 				$error=new CCol($db_item["error"],"on");
 			}
 
-			$applications = "";
-			$db_applications = get_applications_by_itemid($db_item["itemid"]);
-			while($db_app = DBfetch($db_applications))
-			{
-				$applications .= $db_app["name"].", ";
-			}
+			$applications = $show_applications == 1 ? implode(', ', get_applications_by_itemid($db_item["itemid"], 'name')) : null;
 
 			$chkBox = new CCheckBox("group_itemid[]",NULL,NULL,$db_item["itemid"]);
 			if($db_item["templateid"] > 0) $chkBox->SetEnabled(false);
@@ -586,7 +581,7 @@ include_once "include/page_header.php";
 				$db_item["trends"],
 				item_type2str($db_item['type']),
 				$status,
-				$show_applications == 1 ? trim($applications,", ") : NULL,
+				$applications,
 				$error
 				));
 		}

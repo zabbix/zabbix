@@ -784,12 +784,7 @@
 					}
 				}
 				
-				$db_applications = get_applications_by_itemid($_REQUEST["itemid"]);
-				while($db_app = DBfetch($db_applications))
-				{
-					if(in_array($db_app["applicationid"],$applications))	continue;
-					array_push($applications,$db_app["applicationid"]);
-				}
+				$applications = array_unique(array_merge($applications, get_applications_by_itemid($_REQUEST["itemid"])));
 			}
 		}
 
