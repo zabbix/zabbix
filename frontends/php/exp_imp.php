@@ -56,6 +56,7 @@ include_once "include/page_header.php";
 		"graphs"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 		
 		"update"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
+		"rules"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 		/*,
 		"screens"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null) */
 /* actions */
@@ -73,7 +74,17 @@ include_once "include/page_header.php";
 	validate_group(PERM_READ_ONLY);
 ?>
 <?php
-	if($config != 1)
+	if($config == 1)
+	{
+		$rules = get_request('rules', array());
+		foreach(array('host', 'item', 'trigger', 'graph') as $key)
+		{
+			if(!isset($rules[$key]['exist']))	$rules[$key]['exist']	= 0;
+			if(!isset($rules[$key]['missed']))	$rules[$key]['missed']	= 0;
+		}
+
+	}
+	else
 	{
 		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID);
 
@@ -99,7 +110,6 @@ include_once "include/page_header.php";
 		include_once "include/export.inc.php";
 		
 		$exporter = new CZabbixXMLExport();
-		
 		$exporter->Export($hosts,$items,$triggers,$graphs);
 
 		unset($exporter);
@@ -134,7 +144,7 @@ include_once "include/page_header.php";
 			include_once "include/import.inc.php";
 
 			$importer = new CZabbixXMLImport();
-			
+			$importer->SetRules($rules['host'],$rules['item'],$rules['trigger'],$rules['graph']);
 			$importer->Parse($_FILES['import_file']['tmp_name']);
 
 			unset($importer);
@@ -144,6 +154,29 @@ include_once "include/page_header.php";
 		$form = new CFormTable($frm_title,null,"post","multipart/form-data");
 		$form->AddVar('config', $config);
 		$form->AddRow(S_IMPORT_FILE, new CFile('import_file'));
+
+		$table = new CTable();
+		$table->SetHeader(array(S_ELEMENT, S_EXISTED, S_MISSED),'bold');
+
+		foreach(array(	'host'		=> S_HOST,
+				'item'		=> S_ITEM,
+				'trigger'	=> S_TRIGGER)
+			as $key => $title)
+		{
+			$cmbExist = new CComboBox('rules['.$key.'][exist]', $rules[$key]['exist']);
+			$cmbExist->AddItem(0, S_UPDATE);
+			$cmbExist->AddItem(1, S_SKIP);
+			
+			$cmbMissed = new CComboBox('rules['.$key.'][missed]', $rules[$key]['missed']);
+			$cmbMissed->AddItem(0, S_ADD);
+			$cmbMissed->AddItem(1, S_SKIP);
+
+			$table->AddRow(array($title, $cmbExist, $cmbMissed));
+		}
+		$table->AddRow(array(S_GRAPH, '-', 'Add'));
+
+		$form->AddRow(S_RULES, $table);
+
 		$form->AddItemToBottomRow(new CButton('import', S_IMPORT));
 		$form->Show();
 	}
@@ -198,7 +231,6 @@ include_once "include/page_header.php";
 			$form->AddVar('items', 		$items);
 			$form->AddVar('graphs', 	$graphs);
 			$form->AddVar('triggers',	$triggers);
-			
 
 			$form->AddItem(array(
 				new CButton('back', S_BACK),
