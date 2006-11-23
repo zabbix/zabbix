@@ -137,7 +137,7 @@ include_once "include/page_header.php";
 				" from triggers t left join functions f on t.triggerid=f.triggerid ".
 				" left join items i on f.itemid=i.itemid ".
 				" left join hosts h on i.hostid=h.hostid ".
-				" where t.triggerid=$triggerid")
+				" where t.triggerid=".$_REQUEST["triggerid"])
 			))
 		{
 			$result = delete_trigger($_REQUEST["triggerid"]);
