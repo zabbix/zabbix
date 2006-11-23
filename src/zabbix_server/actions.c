@@ -358,6 +358,7 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 	DB_ROW	row;
 	zbx_uint64_t	groupid;
 	zbx_uint64_t	hostid;
+	zbx_uint64_t	condition_value;
 
 	char tmp_str[MAX_STRING_LEN];
 	
@@ -367,73 +368,84 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 
 	if(condition->conditiontype == CONDITION_TYPE_HOST_GROUP)
 	{
+		ZBX_STR2UINT64(condition_value, condition->value);
 //		result = DBselect("select distinct hg.groupid from hosts_groups hg,hosts h, items i, functions f, triggers t where hg.hostid=h.hostid and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=%d", trigger->triggerid);
 		result = DBselect("select distinct hg.groupid from hosts_groups hg,hosts h, items i, functions f, triggers t where hg.hostid=h.hostid and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=" ZBX_FS_UI64,
 			event->triggerid);
-		while((row=DBfetch(result)))
+		if(condition->operator == CONDITION_OPERATOR_EQUAL)
 		{
-			ZBX_STR2UINT64(groupid, row[0]);
-			if(condition->operator == CONDITION_OPERATOR_EQUAL)
+			while((row=DBfetch(result)))
 			{
-				if(atoi(condition->value) == groupid)
+				ZBX_STR2UINT64(groupid, row[0]);
+				if(condition_value == groupid)
 				{
 					ret = SUCCEED;
 					break;
 				}
 			}
-			else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
+		}
+		else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
+		{
+			ret = SUCCEED;
+			while((row=DBfetch(result)))
 			{
-				if(atoi(condition->value) != groupid)
+				ZBX_STR2UINT64(groupid, row[0]);
+				if(condition_value == groupid)
 				{
-					ret = SUCCEED;
+					ret = FAIL;
 					break;
 				}
 			}
-			else
-			{
-				zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]", condition->operator, condition->conditionid);
-				break;
-			}
+		}
+		else
+		{
+			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]", condition->operator, condition->conditionid);
 		}
 		DBfree_result(result);
 	}
 	else if(condition->conditiontype == CONDITION_TYPE_HOST)
 	{
+		ZBX_STR2UINT64(condition_value, condition->value);
 //		result = DBselect("select distinct h.hostid from hosts h, items i, functions f, triggers t where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=%d", trigger->triggerid);
 		result = DBselect("select distinct h.hostid from hosts h, items i, functions f, triggers t where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=%d", event->triggerid);
-		while((row=DBfetch(result)))
+		if(condition->operator == CONDITION_OPERATOR_EQUAL)
 		{
-			ZBX_STR2UINT64(hostid, row[0]);
-			if(condition->operator == CONDITION_OPERATOR_EQUAL)
+			while((row=DBfetch(result)))
 			{
-				if(atoi(condition->value) == hostid)
+				ZBX_STR2UINT64(hostid, row[0]);
+				if(condition_value == hostid)
 				{
 					ret = SUCCEED;
 					break;
 				}
 			}
-			else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
+		}
+		else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
+		{
+			ret = SUCCEED;
+			while((row=DBfetch(result)))
 			{
-				if(atoi(condition->value) != hostid)
+				ZBX_STR2UINT64(hostid, row[0]);
+				if(condition_value == hostid)
 				{
-					ret = SUCCEED;
+					ret = FAIL;
 					break;
 				}
 			}
-			else
-			{
-				zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]", condition->operator, condition->conditionid);
-				break;
-			}
+		}
+		else
+		{
+			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]", condition->operator, condition->conditionid);
 		}
 		DBfree_result(result);
 	}
 	else if(condition->conditiontype == CONDITION_TYPE_TRIGGER)
 	{
+		ZBX_STR2UINT64(condition_value, condition->value);
 		if(condition->operator == CONDITION_OPERATOR_EQUAL)
 		{
 //			if(trigger->triggerid == atoi(condition->value))
-			if(event->triggerid == atoi(condition->value))
+			if(event->triggerid == condition_value)
 			{
 				ret = SUCCEED;
 			}
@@ -441,7 +453,7 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
 		{
 //			if(trigger->triggerid != atoi(condition->value))
-			if(event->triggerid != atoi(condition->value))
+			if(event->triggerid != condition_value)
 			{
 				ret = SUCCEED;
 			}
@@ -481,10 +493,11 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 	}
 	else if(condition->conditiontype == CONDITION_TYPE_TRIGGER_SEVERITY)
 	{
+		ZBX_STR2UINT64(condition_value, condition->value);
 		if(condition->operator == CONDITION_OPERATOR_EQUAL)
 		{
 //			if(trigger->priority == atoi(condition->value))
-			if(event->trigger_priority == atoi(condition->value))
+			if(event->trigger_priority == condition_value)
 			{
 				ret = SUCCEED;
 			}
@@ -492,7 +505,7 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
 		{
 //			if(trigger->priority != atoi(condition->value))
-			if(event->trigger_priority != atoi(condition->value))
+			if(event->trigger_priority != condition_value)
 			{
 				ret = SUCCEED;
 			}
@@ -500,7 +513,7 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		else if(condition->operator == CONDITION_OPERATOR_MORE_EQUAL)
 		{
 //			if(trigger->priority >= atoi(condition->value))
-			if(event->trigger_priority >= atoi(condition->value))
+			if(event->trigger_priority >= condition_value)
 			{
 				ret = SUCCEED;
 			}
@@ -508,7 +521,7 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		else if(condition->operator == CONDITION_OPERATOR_LESS_EQUAL)
 		{
 //			if(trigger->priority <= atoi(condition->value))
-			if(event->trigger_priority <= atoi(condition->value))
+			if(event->trigger_priority <= condition_value)
 			{
 				ret = SUCCEED;
 			}
