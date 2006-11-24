@@ -17,15 +17,12 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-?>
-<?php
 
 	require_once "include/config.inc.php";
 	require_once "include/forms.inc.php";
-
-	$_REQUEST['config'] = get_request('config', 0);
-	
-	if($_REQUEST['config'] == 0 && isset($_REQUEST['export']) && isset($_REQUEST['hosts']))
+?>
+<?php
+	if(isset($_REQUEST['config']) && $_REQUEST['config'] == 0 && isset($_REQUEST['export']) && isset($_REQUEST['hosts']))
 	{
 		$EXPORT_DATA = true;
         	$page["type"] = PAGE_TYPE_XML;
@@ -39,6 +36,8 @@
 
 include_once "include/page_header.php";
 
+	$_REQUEST["config"] = get_request("config",get_profile("web.exp_imp.config",0));
+	
 	if(!isset($EXPORT_DATA))
 	{
 		insert_confirm_javascript();
@@ -71,7 +70,7 @@ include_once "include/page_header.php";
 	$config = get_request('config', 0);
 	$update = get_request('update', null);
 	
-	validate_group(PERM_READ_ONLY);
+	update_profile("web.exp_imp.config", $config);
 ?>
 <?php
 	if($config == 1)
@@ -86,6 +85,8 @@ include_once "include/page_header.php";
 	}
 	else
 	{
+		validate_group(PERM_READ_ONLY);
+	
 		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID);
 
 		$hosts		= get_request('hosts', array());
@@ -160,7 +161,8 @@ include_once "include/page_header.php";
 
 		foreach(array(	'host'		=> S_HOST,
 				'item'		=> S_ITEM,
-				'trigger'	=> S_TRIGGER)
+				'trigger'	=> S_TRIGGER,
+				'graph'		=> S_GRAPH)
 			as $key => $title)
 		{
 			$cmbExist = new CComboBox('rules['.$key.'][exist]', $rules[$key]['exist']);
@@ -173,7 +175,6 @@ include_once "include/page_header.php";
 
 			$table->AddRow(array($title, $cmbExist, $cmbMissed));
 		}
-		$table->AddRow(array(S_GRAPH, '-', 'Add'));
 
 		$form->AddRow(S_RULES, $table);
 
@@ -394,6 +395,6 @@ include_once "include/page_header.php";
 ?>
 <?php
 
-include_once "include/page_footer.php"
+include_once "include/page_footer.php";
 
 ?>
