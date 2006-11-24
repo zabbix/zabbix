@@ -25,6 +25,8 @@
 	{
 		function CZabbixXMLImport()
 		{
+			global $USER_DETAILS, $ZBX_CURNODEID;
+
 			$this->main_node= null;
 			$this->sub_node	= null;
 			$this->data	= null;
@@ -32,6 +34,14 @@
 			$this->item	= array('exist' => 0, 'missed' => 0);
 			$this->trigger	= array('exist' => 0, 'missed' => 0);
 			$this->graph	= array('exist' => 0, 'missed' => 0);
+			
+			$this->accessible_groups = get_accessible_groups_by_user($USER_DETAILS,
+				PERM_READ_WRITE, null, PERM_RES_IDS_ARRAY, $ZBX_CURNODEID);
+		}
+		
+		function CharacterData($parser, $data) 
+		{
+			$this->element_data .= html_entity_decode($data);
 		}
 		
 		function StartElement($parser, $name, $attrs) 
@@ -79,57 +89,43 @@
 						' where host='.zbx_dbstr($data['name']).
 						' and '.DBid2nodeid('hostid').'='.$ZBX_CURNODEID)))
 					{ /* exist */
-						if($this->host['exist']==0) /* update */
-						{
-							$data['hostid']		= $host_data['hostid'];
-							$data['templates']	= get_templates_by_hostid($host_data['hostid']);
-						}
-						else /* skip */
+						if($this->host['exist']==1) /* skip */
 						{
 							$data['skip'] = true;
 							info('Host ['.$data['name'].'] skipped - user rule');
+							break; // case
 						}
+
+						$data['hostid']		= $host_data['hostid'];
+						$data['templates']	= get_templates_by_hostid($host_data['hostid']);
 					}
 					else
 					{ /* missed */
-						if($this->host['missed']==0) /* add */
-						{
-							$data['templates'] = array();
-							$data['hostid'] = add_host(
-								$data['name'],
-								10050,
-								HOST_STATUS_TEMPLATE,
-								'no',
-								0,
-								array(),
-								null,
-								array());
-						}
-						else /* skip */
+						if($this->host['missed']==1) /* skip */
 						{
 							$data['skip'] = true;
 							info('Host ['.$data['name'].'] skipped - user rule');
+							break; // case
 						}
+
+						$data['templates'] = array();
+						$data['hostid'] = add_host(
+							$data['name'],
+							10050,
+							HOST_STATUS_TEMPLATE,
+							'no',
+							0,
+							array(),
+							null,
+							array());
 					}
-					break;
+					break; // case
 				case XML_TAG_GRAPH:
 					$data		= $attrs;
+					$data['items']	= array();
 					$this->sub_node	= null;
 					array_push($this->main_node, $name);
-
-					if(isset($this->data[XML_TAG_HOST]['skip']) && $this->data[XML_TAG_HOST]['skip'])
-					{
-						info('Graph ['.$data['name'].'] skipped - user rule for host');
-						break;
-					}
-					
-					$data['graphid'] = add_graph(
-						$data['name'],
-						$data['width'],
-						$data['height'],
-						0,0,0,1,1,0);
-					
-					break;
+					break; // case
 				case XML_TAG_ITEM:
 				case XML_TAG_TRIGGER:
 				case XML_TAG_GRAPH_ELEMENT:
@@ -138,7 +134,7 @@
 					$data		= $attrs;
 					$this->sub_node	= null;
 					array_push($this->main_node, $name);
-					break;
+					break; // case
 				case XML_TAG_HOSTS:
 				case XML_TAG_ZABBIX_EXPORT:
 				case XML_TAG_ITEMS:
@@ -146,17 +142,11 @@
 				case XML_TAG_GRAPHS:
 				/* case XML_TAG_SCREENS:*/
 					$this->sub_node = null;
-					break;
+					break; // case
 				default:
 					$this->sub_node = $name;
-					break;
+					break; // case
 			}
-		}
-
-		function CharacterData($parser, $data) 
-		{
-			$this->element_data .= html_entity_decode($data);
-
 		}
 
 		function EndElement($parser, $name) 
@@ -174,180 +164,160 @@
 			switch($name)
 			{
 				case XML_TAG_HOST:
-					if(!$data['skip'] && $data['hostid'])
+					if($data['skip'] || !$data['hostid'])
+						break; // case
+					
+					if(!isset($data['port']))	$data['port']	= 10050;
+					if(!isset($data['status']))	$data['status']	= 0;
+					if(!isset($data['ip']))
 					{
-						if(!isset($data['port']))	$data['port']	= 10050;
-						if(!isset($data['status']))	$data['status']	= 0;
-						if(!isset($data['ip']))
-						{
-							$data['useip']	= 'no';
-							$data['ip']	= 0;
-						}
-						else
-						{
-							$data['useip']	= 'yes';
-						}
-
-						if(update_host(
-							$data['hostid'],
-							$data['name'],
-							$data['port'],
-							$data['status'],
-							$data['useip'],
-							$data['ip'],
-							$data['templates'],
-							null,
-							$data['groups']))
-						{
-							info('Host ['.$data['name'].'] updated');
-						}
-					}
-					break;
-				case XML_TAG_GROUP:
-					if(isset($this->data[XML_TAG_HOST]['hostid']) && $this->data[XML_TAG_HOST]['hostid'])
-					{
-						if($group = DBfetch(DBselect('select groupid, name from groups'.
-							' where '.DBid2nodeid('groupid').'='.$ZBX_CURNODEID.
-							' and name='.zbx_dbstr($this->element_data))))
-						{
-							if(in_array($group["groupid"], 
-								get_accessible_groups_by_user(
-									$USER_DETAILS,
-									PERM_READ_WRITE,
-									null,
-						                        PERM_RES_IDS_ARRAY,
-									$ZBX_CURNODEID)))
-							{
-								array_push($this->data[XML_TAG_HOST]['groups'], $group["groupid"]);
-							}
-							else
-							{
-								error('Group ['.$this->element_data.'] skipped - Access deny.');
-							}
-						}
-						else
-						{
-							error('Missed group ['.$this->element_data.']');
-						}
-					}
-					break;
-				case XML_TAG_ITEM:
-					if(isset($this->data[XML_TAG_HOST]['hostid']) && $this->data[XML_TAG_HOST]['hostid'])
-					{
-						if(!isset($data['description']))		$data['description']		= "";
-						if(!isset($data['delay']))			$data['delay']			= 30;
-						if(!isset($data['history']))			$data['history']		= 90;
-						if(!isset($data['trends']))			$data['trends']			= 365;
-						if(!isset($data['status']))			$data['status']			= 0;
-						if(!isset($data['units']))			$data['units']			= '';
-						if(!isset($data['multiplier']))			$data['multiplier']		= 0;
-						if(!isset($data['delta']))			$data['delta']			= 0;
-						if(!isset($data['formula']))			$data['formula']		= '';
-						if(!isset($data['lastlogsize']))		$data['lastlogsize']		= 0;
-						if(!isset($data['logtimefmt']))			$data['logtimefmt']		= '';
-						if(!isset($data['delay_flex']))			$data['delay_flex']		= '';
-						if(!isset($data['trapper_hosts']))		$data['trapper_hosts']		= '';
-						if(!isset($data['snmp_community']))		$data['snmp_community']		= '';
-						if(!isset($data['snmp_oid']))			$data['snmp_oid']		= '';
-						if(!isset($data['snmp_port']))			$data['snmp_port']		= 161;
-						if(!isset($data['snmpv3_securityname']))	$data['snmpv3_securityname']	= '';
-						if(!isset($data['snmpv3_securitylevel']))	$data['snmpv3_securitylevel']	= 0;
-						if(!isset($data['snmpv3_authpassphrase']))	$data['snmpv3_authpassphrase']	= '';
-						if(!isset($data['snmpv3_privpassphrase']))	$data['snmpv3_privpassphrase']	= '';
-
-						if($item = DBfetch(DBselect('select itemid,valuemapid,templateid from items'.
-							' where key_='.zbx_dbstr($data['key']).
-							' and hostid='.$this->data[XML_TAG_HOST]['hostid'].' and '.
-							DBid2nodeid('itemid').'='.$ZBX_CURNODEID)))
-						{ /* exist */
-							if($this->item['exist']==0) /* update */
-							{
-								update_item(
-									$item['itemid'],
-									$data['description'],
-									$data['key'],
-									$this->data[XML_TAG_HOST]['hostid'],
-									$data['delay'],
-									$data['history'],
-									$data['status'],
-									$data['type'],
-									$data['snmp_community'],
-									$data['snmp_oid'],
-									$data['value_type'],
-									$data['trapper_hosts'],
-									$data['snmp_port'],
-									$data['units'],
-									$data['multiplier'],
-									$data['delta'],
-									$data['snmpv3_securityname'],
-									$data['snmpv3_securitylevel'],
-									$data['snmpv3_authpassphrase'],
-									$data['snmpv3_privpassphrase'],
-									$data['formula'],
-									$data['trends'],
-									$data['logtimefmt'],
-									$item['valuemapid'],
-									$data['delay_flex'],
-									get_applications_by_itemid($item['itemid']),
-									$item['templateid']);
-							}
-							else /* skip */
-							{
-								// NOP
-								info('Item ['.$data['description'].'] skipped - user rule');
-							}
-						}
-						else
-						{ /* missed */
-							if($this->item['missed']==0) /* add */
-							{
-								add_item(
-									$data['description'],
-									$data['key'],
-									$this->data[XML_TAG_HOST]['hostid'],
-									$data['delay'],
-									$data['history'],
-									$data['status'],
-									$data['type'],
-									$data['snmp_community'],
-									$data['snmp_oid'],
-									$data['value_type'],
-									$data['trapper_hosts'],
-									$data['snmp_port'],
-									$data['units'],
-									$data['multiplier'],
-									$data['delta'],
-									$data['snmpv3_securityname'],
-									$data['snmpv3_securitylevel'],
-									$data['snmpv3_authpassphrase'],
-									$data['snmpv3_privpassphrase'],
-									$data['formula'],
-									$data['trends'],
-									$data['logtimefmt'],
-									0,
-									$data['delay_flex'],
-									array());
-							}
-							else /* skip */
-							{
-								// NOP
-								info('Item ['.$data['description'].'] skipped - user rule');
-							}
-								
-						}
+						$data['useip']	= 'no';
+						$data['ip']	= 0;
 					}
 					else
+					{
+						$data['useip']	= 'yes';
+					}
+
+					if(update_host($data['hostid'], $data['name'], $data['port'], $data['status'],
+						$data['useip'], $data['ip'], $data['templates'], null, $data['groups']))
+					{
+						info('Host ['.$data['name'].'] updated');
+					}
+					
+					break; // case
+				case XML_TAG_GROUP:
+					if(!isset($this->data[XML_TAG_HOST]['hostid']) || !$this->data[XML_TAG_HOST]['hostid'])
+						break; //case
+
+					if(!($group = DBfetch(DBselect('select groupid, name from groups'.
+						' where '.DBid2nodeid('groupid').'='.$ZBX_CURNODEID.
+						' and name='.zbx_dbstr($this->element_data)))))
+					{
+						error('Missed group ['.$this->element_data.']');
+						break; // case
+					}
+					
+					if(!in_array($group["groupid"], $this->accessible_groups))
+					{
+						error('Group ['.$this->element_data.'] skipped - Access deny.');
+						break; // case
+					}
+
+					array_push($this->data[XML_TAG_HOST]['groups'], $group["groupid"]);
+
+					break; // case
+				case XML_TAG_ITEM:
+					if(!isset($this->data[XML_TAG_HOST]['hostid']) || !$this->data[XML_TAG_HOST]['hostid'])
 					{
 						if(isset($this->data[XML_TAG_HOST]['skip']) && $this->data[XML_TAG_HOST]['skip'])
 						{
 							info('Item ['.$data['description'].'] skipped - user rule for host');
+							break; // case
 						}
-						else
-						{
-							error('Item ['.$data['description'].'] skipped - missed host');
-						}
+
+						error('Item ['.$data['description'].'] skipped - missed host');
+						break; // case
 					}
-					break;
+
+					if(!isset($data['description']))		$data['description']		= "";
+					if(!isset($data['delay']))			$data['delay']			= 30;
+					if(!isset($data['history']))			$data['history']		= 90;
+					if(!isset($data['trends']))			$data['trends']			= 365;
+					if(!isset($data['status']))			$data['status']			= 0;
+					if(!isset($data['units']))			$data['units']			= '';
+					if(!isset($data['multiplier']))			$data['multiplier']		= 0;
+					if(!isset($data['delta']))			$data['delta']			= 0;
+					if(!isset($data['formula']))			$data['formula']		= '';
+					if(!isset($data['lastlogsize']))		$data['lastlogsize']		= 0;
+					if(!isset($data['logtimefmt']))			$data['logtimefmt']		= '';
+					if(!isset($data['delay_flex']))			$data['delay_flex']		= '';
+					if(!isset($data['trapper_hosts']))		$data['trapper_hosts']		= '';
+					if(!isset($data['snmp_community']))		$data['snmp_community']		= '';
+					if(!isset($data['snmp_oid']))			$data['snmp_oid']		= '';
+					if(!isset($data['snmp_port']))			$data['snmp_port']		= 161;
+					if(!isset($data['snmpv3_securityname']))	$data['snmpv3_securityname']	= '';
+					if(!isset($data['snmpv3_securitylevel']))	$data['snmpv3_securitylevel']	= 0;
+					if(!isset($data['snmpv3_authpassphrase']))	$data['snmpv3_authpassphrase']	= '';
+					if(!isset($data['snmpv3_privpassphrase']))	$data['snmpv3_privpassphrase']	= '';
+
+					if($item = DBfetch(DBselect('select itemid,valuemapid,templateid from items'.
+						' where key_='.zbx_dbstr($data['key']).
+						' and hostid='.$this->data[XML_TAG_HOST]['hostid'].' and '.
+						DBid2nodeid('itemid').'='.$ZBX_CURNODEID)))
+					{ /* exist */
+						if($this->item['exist']==1) /* skip */
+						{
+							info('Item ['.$data['description'].'] skipped - user rule');
+							break;
+						}
+
+						update_item(
+							$item['itemid'],
+							$data['description'],
+							$data['key'],
+							$this->data[XML_TAG_HOST]['hostid'],
+							$data['delay'],
+							$data['history'],
+							$data['status'],
+							$data['type'],
+							$data['snmp_community'],
+							$data['snmp_oid'],
+							$data['value_type'],
+							$data['trapper_hosts'],
+							$data['snmp_port'],
+							$data['units'],
+							$data['multiplier'],
+							$data['delta'],
+							$data['snmpv3_securityname'],
+							$data['snmpv3_securitylevel'],
+							$data['snmpv3_authpassphrase'],
+							$data['snmpv3_privpassphrase'],
+							$data['formula'],
+							$data['trends'],
+							$data['logtimefmt'],
+							$item['valuemapid'],
+							$data['delay_flex'],
+							get_applications_by_itemid($item['itemid']),
+							$item['templateid']);
+					}
+					else
+					{ /* missed */
+						if($this->item['missed']==1) /* skip */
+						{
+							info('Item ['.$data['description'].'] skipped - user rule');
+							break; // case
+						}
+
+						add_item(
+							$data['description'],
+							$data['key'],
+							$this->data[XML_TAG_HOST]['hostid'],
+							$data['delay'],
+							$data['history'],
+							$data['status'],
+							$data['type'],
+							$data['snmp_community'],
+							$data['snmp_oid'],
+							$data['value_type'],
+							$data['trapper_hosts'],
+							$data['snmp_port'],
+							$data['units'],
+							$data['multiplier'],
+							$data['delta'],
+							$data['snmpv3_securityname'],
+							$data['snmpv3_securitylevel'],
+							$data['snmpv3_authpassphrase'],
+							$data['snmpv3_privpassphrase'],
+							$data['formula'],
+							$data['trends'],
+							$data['logtimefmt'],
+							0,
+							$data['delay_flex'],
+							array());
+					}
+
+					break; // case
 				case XML_TAG_TRIGGER:
 					if(!isset($data['expression']))		$data['expression']	= '';
 					if(!isset($data['description']))	$data['description']	= '';
@@ -356,10 +326,22 @@
 					if(!isset($data['comments']))		$data['comments']	= '';
 					if(!isset($data['url']))		$data['url']		= '';
 
-					if(isset($this->data[XML_TAG_HOST]['hostid']) && $this->data[XML_TAG_HOST]['hostid'])
+					if(!isset($this->data[XML_TAG_HOST]['hostid']) || !$this->data[XML_TAG_HOST]['hostid'])
 					{
-						$data['expression'] = str_replace(
-									'{HOSTNAME}',
+						if(isset($this->data[XML_TAG_HOST]['skip']) && $this->data[XML_TAG_HOST]['skip'])
+						{
+							info('Trigger ['.$data['description'].'] skipped - user rule for host');
+							break; // case
+						}
+						if(strstr($data['expression'],'{HOSTNAME}'))
+						{
+							error('Trigger ['.$data['description'].'] skipped - missed host');
+							break; // case
+						}
+					}
+					else
+					{
+						$data['expression'] = str_replace('{HOSTNAME}',
 									$this->data[XML_TAG_HOST]['name'],
 									$data['expression']);
 
@@ -369,72 +351,122 @@
 							' and i.hostid='.$this->data[XML_TAG_HOST]['hostid'].
 							' and t.description='.zbx_dbstr($data['description']))))
 						{ /* exist */
-							if($this->trigger['exist']==0) /* update */
-							{
-								update_trigger(
-									$trigger['triggerid'],
-									$data['expression'],
-									$data['description'],
-									$data['priority'],
-									$data['status'],
-									$data['comments'],
-									$data['url'],
-									get_trigger_dependences_by_triggerid($trigger['triggerid']),
-									$trigger['templateid']);
-							}
-							else /* skip */
+							if($this->trigger['exist']==1) /* skip */
 							{
 								info('Trigger ['.$data['description'].'] skipped - user rule');
+								break; // case
 							}
-							break;
+
+							update_trigger(
+								$trigger['triggerid'],
+								$data['expression'],
+								$data['description'],
+								$data['priority'],
+								$data['status'],
+								$data['comments'],
+								$data['url'],
+								get_trigger_dependences_by_triggerid($trigger['triggerid']),
+								$trigger['templateid']);
+
+							break; // case
 						}
 						else /* missed */
 						{
 							// continue [add_trigger]
 						}
 					}
-					else
+					
+					if($this->trigger['missed']==1) /* skip */
+					{
+						info('Trigger ['.$data['description'].'] skipped - user rule');
+						break; // case
+					}
+
+					add_trigger(
+						$data['expression'],
+						$data['description'],
+						$data['priority'],
+						$data['status'],
+						$data['comments'],
+						$data['url']);
+
+					break; // case
+				case XML_TAG_GRAPH:
+					if(isset($data['error']))
+					{
+						error('Graph ['.$data['name'].'] skipped - error occured');
+						break; // case
+					}
+
+					if(!isset($data['yaxistype']))		$data['yaxistype']		= 0;
+					if(!isset($data['show_work_period']))	$data['show_work_period']	= 1;
+					if(!isset($data['show_triggers']))	$data['show_triggers']		= 1;
+					if(!isset($data['graphtype']))		$data['graphtype']		= 0;
+					if(!isset($data['yaxismin']))		$data['yaxismin']		= 0;
+					if(!isset($data['yaxismax']))		$data['yaxismax']		= 0;
+					if(!isset($data['items']))		$data['items']			= array();
+
+					if(!isset($this->data[XML_TAG_HOST]['hostid']) || !$this->data[XML_TAG_HOST]['hostid'])
 					{
 						if(isset($this->data[XML_TAG_HOST]['skip']) && $this->data[XML_TAG_HOST]['skip'])
 						{
-							info('Trigger ['.$data['description'].'] skipped - user rule for host');
-							break;
+							info('Graph ['.$data['name'].'] skipped - user rule for host');
+							break; // case
 						}
-						if(strstr($data['expression'],'{HOSTNAME}'))
+						foreach($data['items'] as $id)
+
+						if(strstr($data['name'],'{HOSTNAME}'))
 						{
-							error('Trigger ['.$data['description'].'] skipped - missed host');
-							break;
+							error('Graph ['.$data['name'].'] skipped - missed host');
+							break; // case
+						}
+					}
+					else
+					{
+						if($graph = DBfetch(DBselect('select distinct g.graphid, g.templateid'.
+							' from graphs g, graphs_items gi, items i'.
+							' where g.graphid=gi.graphid and gi.itemid=i.itemid'.
+							' and g.name='.zbx_dbstr($data['name']).
+							' and i.hostid='.$this->data[XML_TAG_HOST]['hostid'])))
+						{ /* exist */
+							if($this->graph['exist']==1) /* skip */
+							{
+								info('Graph ['.$data['name'].'] skipped - user rule');
+								break; // case
+							}
+
+							$data['graphid'] = $graph['graphid'];
+
+							update_graph(
+								$data['graphid'],
+								$data['name'],
+								$data['width'],
+								$data['height'],
+								$data['yaxistype'],
+								$data['yaxismin'],
+								$data['yaxismax'],
+								$data['show_work_period'],
+								$data['show_triggers'],
+								$data['graphtype'],
+								$graph['templateid']);
+
+							DBexecute('delete from graphs_items where graphid='.$data['graphid']);
+						}
+						else
+						{ /* missed */
+							// continue [add_group]
 						}
 					}
 					
-					if($this->trigger['missed']==0) /* add */
+					if(!isset($data['graphid']))
 					{
-						add_trigger(
-							$data['expression'],
-							$data['description'],
-							$data['priority'],
-							$data['status'],
-							$data['comments'],
-							$data['url']);
-					}
-					else /* skip */
-					{
-						info('Trigger ['.$data['description'].'] skipped - user rule');
-					}
+						if($this->graph['missed']==1) /* skip */
+						{
+							info('Graph ['.$data['name'].'] skipped - user rule');
+							break; // case
+						}
 
-					break;
-				case XML_TAG_GRAPH:
-					if(isset($data['graphid']))
-					{
-						if(!isset($data['yaxistype']))		$data['yaxistype']		= 0;
-						if(!isset($data['show_work_period']))	$data['show_work_period']	= 1;
-						if(!isset($data['show_triggers']))	$data['show_triggers']		= 1;
-						if(!isset($data['graphtype']))		$data['graphtype']		= 0;
-						if(!isset($data['yaxismin']))		$data['yaxismin']		= 0;
-						if(!isset($data['yaxismax']))		$data['yaxismax']		= 0;
-						
-						update_graph(
-							$data['graphid'],
+						$data['graphid'] = add_graph(
 							$data['name'],
 							$data['width'],
 							$data['height'],
@@ -445,60 +477,67 @@
 							$data['show_triggers'],
 							$data['graphtype']);
 					}
-					break;
-				case XML_TAG_GRAPH_ELEMENT:
-					if(isset($this->data[XML_TAG_GRAPH]['graphid']))
+
+					foreach($data['items'] as $item)
 					{
-						$data['key'] = explode(':', $data['item']);
-						if(count($data['key']) >= 2)
-						{
-							$data['host']	= array_shift($data['key']);
-							$data['key']	= implode(':', $data['key']);
-						}
-						else
-						{
-							error('Incorrect element for graph ['.$data['name'].']');
-							break;
-						}
-
-						if(isset($this->data[XML_TAG_HOST]['name']))
-						{
-							$data['host'] = str_replace('{HOSTNAME}',$this->data[XML_TAG_HOST]['name'],$data['host']);
-						}
-
-						if(!isset($data['drawtype']))		$data['drawtype']	= 0;
-						if(!isset($data['sortorder']))		$data['sortorder']	= 0;
-						if(!isset($data['color']))		$data['color']		= 'Dark Green';
-						if(!isset($data['yaxisside']))		$data['yaxisside']	= 1;
-						if(!isset($data['calc_fnc']))		$data['calc_fnc']	= 2;
-						if(!isset($data['type']))		$data['type']		= 0;
-						if(!isset($data['periods_cnt']))	$data['periods_cnt']	= 5;
-
-						if($item = DBfetch(DBselect('select i.itemid from items i,hosts h'.
-							' where h.hostid=i.hostid and i.key_='.zbx_dbstr($data['key']).
-							' and h.host='.zbx_dbstr($data['host']))))
-						{
-							add_item_to_graph(
-								$this->data[XML_TAG_GRAPH]['graphid'],
-								$item['itemid'],
-								$data['color'],
-								$data['drawtype'],
-								$data['sortorder'],
-								$data['yaxisside'],
-								$data['calc_fnc'],
-								$data['type'],
-								$data['periods_cnt']);
-						}
-						else
-						{
-							error('Missed item ['.$data['key'].'] for host ['.$data['host'].']');
-							break;
-						}
+						add_item_to_graph(
+							$data['graphid'],
+							$item['itemid'],
+							$item['color'],
+							$item['drawtype'],
+							$item['sortorder'],
+							$item['yaxisside'],
+							$item['calc_fnc'],
+							$item['type'],
+							$item['periods_cnt']);
 					}
-					break;
+					break; // case
+				case XML_TAG_GRAPH_ELEMENT:
+					if(!isset($this->data[XML_TAG_GRAPH]))
+						break; // case
+						
+					$data['key'] = explode(':', $data['item']);
+					if(count($data['key']) < 2)
+					{
+						$this->data[XML_TAG_GRAPH]['error'] = true;
+						error('Incorrect element for graph ['.$data['name'].']');
+						break; // case
+					}
+
+					$data['host']	= array_shift($data['key']);
+					$data['key']	= implode(':', $data['key']);
+
+					if(isset($this->data[XML_TAG_HOST]['name']))
+					{
+						$data['host'] = str_replace('{HOSTNAME}',$this->data[XML_TAG_HOST]['name'],$data['host']);
+					}
+
+					if(!isset($data['drawtype']))		$data['drawtype']	= 0;
+					if(!isset($data['sortorder']))		$data['sortorder']	= 0;
+					if(!isset($data['color']))		$data['color']		= 'Dark Green';
+					if(!isset($data['yaxisside']))		$data['yaxisside']	= 1;
+					if(!isset($data['calc_fnc']))		$data['calc_fnc']	= 2;
+					if(!isset($data['type']))		$data['type']		= 0;
+					if(!isset($data['periods_cnt']))	$data['periods_cnt']	= 5;
+
+					if(!($item = DBfetch(DBselect('select i.itemid from items i,hosts h'.
+						' where h.hostid=i.hostid and i.key_='.zbx_dbstr($data['key']).
+						' and h.host='.zbx_dbstr($data['host'])))))
+					{
+						$this->data[XML_TAG_GRAPH]['error'] = true;
+
+						error('Missed item ['.$data['key'].'] for host ['.$data['host'].']');
+						break; // case
+					}
+
+					$data['itemid'] = $item['itemid'];
+
+					array_push($this->data[XML_TAG_GRAPH]['items'], $data);
+
+					break; // case
 				/*case XML_TAG_SCREEN:
 				case XML_TAG_SCREEN_ELEMENT:
-					break;*/
+					break; // case*/
 				default:
 					if(isset($this->sub_node) && isset($this->main_node))
 					{
