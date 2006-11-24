@@ -35,7 +35,7 @@ include_once "include/page_header.php";
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 
 // media form
-		"mediatypeid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),
+		"mediatypeid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,
 						'{form}=="update"'),
 		"type"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1,2"),
 						'(isset({save}))'),
