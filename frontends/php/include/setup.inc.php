@@ -364,7 +364,7 @@
 					new CTextBox('nodename', $this->GetConfig('nodename',    $_SERVER["SERVER_NAME"]), 40)
 					));
 				$table->AddRow(array(
-					'Node GUID',
+					'Node ID',
 					new CNumericBox('nodeid', $this->GetConfig('nodeid',      0), 10)
 					));
 				
