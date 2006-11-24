@@ -209,7 +209,7 @@ FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|
 INDEX		|1		|actionid
 
 TABLE|events|eventid|
-FIELD		|eventid		|t_id		|'0'	|NOT NULL	|
+FIELD		|eventid	|t_id		|'0'	|NOT NULL	|
 FIELD		|triggerid	|t_id		|'0'	|NOT NULL	|
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|
 FIELD		|value		|t_integer	|'0'	|NOT NULL	|

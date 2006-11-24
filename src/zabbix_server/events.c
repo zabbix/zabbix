@@ -124,10 +124,11 @@ int	process_event(DB_EVENT *event)
 		else
 		{
 			ZBX_STR2UINT64(event->eventid, row[0]);
-		       	event->eventid++;
+			event->eventid = CONFIG_NODEID*(zbx_uint64_t)__UINT64_C(100000000000000) + event->eventid;
+			event->eventid++;
 		}
-		DBexecute("update nodes set event_maxid=" ZBX_FS_UI64 " where nodeid=%d",
-				event->eventid, CONFIG_NODEID);
+		DBexecute("update nodes set event_maxid=event_maxid+1 where nodeid=%d",
+				CONFIG_NODEID);
 		DBfree_result(result);
 	}
 	DBexecute("insert into events(eventid,triggerid,clock,value) values(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d)",
