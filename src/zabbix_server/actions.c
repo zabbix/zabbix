@@ -409,7 +409,7 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 	{
 		ZBX_STR2UINT64(condition_value, condition->value);
 //		result = DBselect("select distinct h.hostid from hosts h, items i, functions f, triggers t where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=%d", trigger->triggerid);
-		result = DBselect("select distinct h.hostid from hosts h, items i, functions f, triggers t where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=%d", event->triggerid);
+		result = DBselect("select distinct h.hostid from hosts h, items i, functions f, triggers t where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=" ZBX_FS_UI64, event->triggerid);
 		if(condition->operator == CONDITION_OPERATOR_EQUAL)
 		{
 			while((row=DBfetch(result)))
@@ -659,7 +659,7 @@ void	apply_actions(DB_EVENT *event)
 		zabbix_log( LOG_LEVEL_DEBUG, "Check dependencies");
 
 //		result = DBselect("select count(*) from trigger_depends d,triggers t where d.triggerid_down=%d and d.triggerid_up=t.triggerid and t.value=%d",trigger->triggerid, TRIGGER_VALUE_TRUE);
-		result = DBselect("select count(*) from trigger_depends d,triggers t where d.triggerid_down=%d and d.triggerid_up=t.triggerid and t.value=%d",event->triggerid, TRIGGER_VALUE_TRUE);
+		result = DBselect("select count(*) from trigger_depends d,triggers t where d.triggerid_down=" ZBX_FS_UI64 " and d.triggerid_up=t.triggerid and t.value=%d",event->triggerid, TRIGGER_VALUE_TRUE);
 		row=DBfetch(result);
 		if(row && DBis_null(row[0]) != SUCCEED)
 		{

@@ -347,7 +347,7 @@ static int send_to_master_and_slave(int nodeid)
 		DBfree_result(result);
 		return SUCCEED;
 	}
-	sscanf(row[0], ZBX_FS_UI64, &maxlogid);
+	ZBX_STR2UINT64(maxlogid,row[0]);
 	DBfree_result(result);
 
 
