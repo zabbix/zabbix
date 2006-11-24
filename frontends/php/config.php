@@ -48,7 +48,7 @@ include_once "include/page_header.php";
 						'in_array({config},array(0,5,7))&&({save}=="Save")'),
 
 // image form
-		"imageid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),
+		"imageid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,
 						'{config}==3&&{form}=="update"'),
 		"name"=>		array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,
 						'{config}==3&&isset({save})'),
@@ -63,11 +63,11 @@ include_once "include/page_header.php";
 		"add_newvalue"=>	array(T_ZBX_STR, O_OPT, NULL,	NOT_EMPTY, 'isset({add_map})'),
 
 // autoregistration form
-		"autoregid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	BETWEEN(0,65535),
+		"autoregid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,
 						'{config}==4&&{form}=="update"'),
 		"pattern"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
 						'{config}==4&&isset({save})'),
-		"hostid"=>		array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(1,65535),
+		"hostid"=>		array(T_ZBX_INT, O_NO,	NULL,	DB_ID,
 						'{config}==4&&isset({save})'),
 		"priority"=>		array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),
 						'{config}==4&&isset({save})'),
