@@ -201,7 +201,7 @@ int main_alerter_loop()
 
 		while((row=DBfetch(result)))
 		{
-			alert.alertid=atoi(row[0]);
+			ZBX_STR2UINT64(alert.alertid,row[0]);
 			alert.mediatypeid=atoi(row[1]);
 			alert.sendto=row[2];
 			alert.subject=row[3];
@@ -209,7 +209,7 @@ int main_alerter_loop()
 			alert.status=atoi(row[5]);
 			alert.retries=atoi(row[6]);
 
-			mediatype.mediatypeid=atoi(row[7]);
+			ZBX_STR2UINT64(mediatype.mediatypeid,row[7]);
 			mediatype.type=atoi(row[8]);
 			mediatype.description=row[9];
 			mediatype.smtp_server=row[10];
@@ -234,16 +234,16 @@ int main_alerter_loop()
 
 			if(res==SUCCEED)
 			{
-				zabbix_log( LOG_LEVEL_DEBUG, "Alert ID [%d] was sent successfully", alert.alertid);
-				DBexecute("update alerts set repeats=repeats+1, nextcheck=%d where alertid=%d", now+alert.delay, alert.alertid);
-				DBexecute("update alerts set status=%d where alertid=%d and repeats>=maxrepeats and status=%d and retries<3", ALERT_STATUS_SENT, alert.alertid, ALERT_STATUS_NOT_SENT);
+				zabbix_log( LOG_LEVEL_DEBUG, "Alert ID [" ZBX_FS_UI64 "] was sent successfully", alert.alertid);
+				DBexecute("update alerts set repeats=repeats+1, nextcheck=%d where alertid=" ZBX_FS_UI64, now+alert.delay, alert.alertid);
+				DBexecute("update alerts set status=%d where alertid=" ZBX_FS_UI64 " and repeats>=maxrepeats and status=%d and retries<3", ALERT_STATUS_SENT, alert.alertid, ALERT_STATUS_NOT_SENT);
 			}
 			else
 			{
-				zabbix_log( LOG_LEVEL_DEBUG, "Error sending alert ID [%d]", alert.alertid);
-				zabbix_syslog("Error sending alert ID [%d]", alert.alertid);
+				zabbix_log( LOG_LEVEL_DEBUG, "Error sending alert ID [" ZBX_FS_UI64 "]", alert.alertid);
+				zabbix_syslog("Error sending alert ID [" ZBX_FS_UI64 "]", alert.alertid);
 				DBescape_string(error,error_esc,MAX_STRING_LEN);
-				DBexecute("update alerts set retries=retries+1,error='%s' where alertid=%d", error_esc, alert.alertid);
+				DBexecute("update alerts set retries=retries+1,error='%s' where alertid=" ZBX_FS_UI64, error_esc, alert.alertid);
 			}
 
 		}
