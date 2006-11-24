@@ -86,18 +86,18 @@ static int housekeeping_process_log()
 		housekeeper.housekeeperid=atoi(row[0]);
 		housekeeper.tablename=row[1];
 		housekeeper.field=row[2];
-		housekeeper.value=atoi(row[3]);
+		ZBX_STR2UINT64(housekeeper.value,row[3]);
 
 #ifdef HAVE_ORACLE
-		deleted = DBexecute("delete from %s where %s=%d and rownum<500",housekeeper.tablename, housekeeper.field,housekeeper.value);
+		deleted = DBexecute("delete from %s where %s=" ZBX_FS_UI64 " and rownum<500",housekeeper.tablename, housekeeper.field,housekeeper.value);
 #elif defined(HAVE_PGSQL)
-		deleted = DBexecute("delete from %s where oid in (select oid from %s where %s=%d limit 500)",
+		deleted = DBexecute("delete from %s where oid in (select oid from %s where %s=" ZBX_FS_UI64 " limit 500)",
 				housekeeper.tablename, 
 				housekeeper.tablename, 
 				housekeeper.field,
 				housekeeper.value);
 #else
-		deleted = DBexecute("delete from %s where %s=%d limit 500",housekeeper.tablename, housekeeper.field,housekeeper.value);
+		deleted = DBexecute("delete from %s where %s=" ZBX_FS_UI64 " limit 500",housekeeper.tablename, housekeeper.field,housekeeper.value);
 #endif
 		if(deleted == 0)
 		{
@@ -129,7 +129,7 @@ static int housekeeping_sessions(int now)
 
 static int housekeeping_alerts(int now)
 {
-	int		alert_history;
+	int	alert_history;
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		res = SUCCEED;
@@ -165,7 +165,7 @@ static int housekeeping_events(int now)
 	DB_RESULT	result2;
 	DB_ROW		row1;
 	DB_ROW		row2;
-	int 		eventid;
+	zbx_uint64_t	eventid;
 	int		res = SUCCEED;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In housekeeping_events(%d)", now);
@@ -186,11 +186,11 @@ static int housekeeping_events(int now)
 		result2 = DBselect("select eventid from events where clock<%d", now-24*3600*event_history);
 		while((row2=DBfetch(result2)))
 		{
-			eventid=atoi(row2[0]);
+			ZBX_STR2UINT64(eventid,row2[0]);
 			
-			DBexecute("delete from acknowledges where eventid=%d",eventid);
+			DBexecute("delete from acknowledges where eventid=" ZBX_FS_UI64,eventid);
 			
-			DBexecute("delete from events where eventid=%d",eventid);
+			DBexecute("delete from events where eventid=" ZBX_FS_UI64,eventid);
 		}
 		DBfree_result(result2);
 
@@ -222,9 +222,9 @@ static int delete_history(char *table, int itemid, int keep_history, int now)
 	DB_ROW          row;
 	int             min_clock;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In delete_history(%s,%d,%d,%d)", table, itemid, keep_history, now);
+	zabbix_log( LOG_LEVEL_DEBUG, "In delete_history(%s," ZBX_FS_UI64 ",%d,%d)", table, itemid, keep_history, now);
 
-	zbx_snprintf(sql,sizeof(sql)-1,"select min(clock) from %s where itemid=%d", table, itemid);
+	zbx_snprintf(sql,sizeof(sql)-1,"select min(clock) from %s where itemid=" ZBX_FS_UI64, table, itemid);
 	result = DBselect(sql);
 
 	row=DBfetch(result);
@@ -238,7 +238,7 @@ static int delete_history(char *table, int itemid, int keep_history, int now)
 	min_clock = atoi(row[0]);
 	DBfree_result(result);
 
-	zbx_snprintf(sql,sizeof(sql)-1,"delete from %s where itemid=%d and clock<%d",
+	zbx_snprintf(sql,sizeof(sql)-1,"delete from %s where itemid=" ZBX_FS_UI64 " and clock<%d",
 		table,
 		itemid,
 		MIN(now-24*3600*keep_history, min_clock+4*3600*CONFIG_HOUSEKEEPING_FREQUENCY)
@@ -280,7 +280,7 @@ static int housekeeping_history_and_trends(int now)
 
         while((row=DBfetch(result)))
         {
-                item.itemid=atoi(row[0]);
+		ZBX_STR2UINT64(item.itemid,row[0]);
                 item.history=atoi(row[1]);
                 item.trends=atoi(row[2]);
 
