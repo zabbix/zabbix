@@ -169,7 +169,7 @@
 		if(isset($userid))
 		{
 			global $USER_DETAILS;
-			if($userid == $USER_DETAILS['userid']) $profile = 1;
+/*			if($userid == $USER_DETAILS['userid']) $profile = 1;*/
 
 			$user=get_user_by_userid($userid);
 			$frm_title = S_USER." \"".$user["alias"]."\"";
