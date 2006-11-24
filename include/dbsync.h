@@ -300,9 +300,9 @@ static	ZBX_TABLE	tables[]={
 		{"history",		ZBX_TYPE_INT,	ZBX_SYNC},
 		{"trends",		ZBX_TYPE_INT,	ZBX_SYNC},
 		{"nextcheck",		ZBX_TYPE_INT,	ZBX_NOSYNC},
-		{"lastvalue",		ZBX_TYPE_CHAR,	ZBX_NOSYNC},
-		{"lastclock",		ZBX_TYPE_INT,	ZBX_NOSYNC},
-		{"prevvalue",		ZBX_TYPE_CHAR,	ZBX_NOSYNC},
+		{"lastvalue",		ZBX_TYPE_CHAR,	ZBX_SYNC}, // NOSYNC
+		{"lastclock",		ZBX_TYPE_INT,	ZBX_SYNC}, // NOSYNC
+		{"prevvalue",		ZBX_TYPE_CHAR,	ZBX_SYNC}, // NOSYNC
 		{"status",		ZBX_TYPE_INT,	ZBX_SYNC},
 		{"value_type",		ZBX_TYPE_INT,	ZBX_SYNC},
 		{"trapper_hosts",	ZBX_TYPE_CHAR,	ZBX_SYNC},
@@ -358,7 +358,7 @@ static	ZBX_TABLE	tables[]={
 		{"status",	ZBX_TYPE_INT,	ZBX_SYNC},
 		{"value",	ZBX_TYPE_INT,	ZBX_SYNC},
 		{"priority",	ZBX_TYPE_INT,	ZBX_SYNC},
-		{"lastchange",	ZBX_TYPE_INT,	ZBX_NOSYNC},
+		{"lastchange",	ZBX_TYPE_INT,	ZBX_SYNC},
 		{"dep_level",	ZBX_TYPE_INT,	ZBX_SYNC},
 		{"comments",	ZBX_TYPE_BLOB,	ZBX_SYNC},
 		{"error",	ZBX_TYPE_CHAR,	ZBX_SYNC},
