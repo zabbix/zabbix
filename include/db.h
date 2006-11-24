@@ -385,6 +385,8 @@ void		DBbegin();
 void		DBcommit();
 void		DBrollback();
 
+zbx_uint64_t	DBget_maxid(char *field);
+
 int	DBget_function_result(double *result,char *functionid);
 void	DBupdate_host_availability(zbx_uint64_t hostid,int available,int clock,char *error);
 int	DBupdate_item_status_to_notsupported(zbx_uint64_t itemid, char *error);

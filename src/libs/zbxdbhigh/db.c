@@ -1796,8 +1796,9 @@ int	DBadd_alert(zbx_uint64_t actionid, zbx_uint64_t userid, zbx_uint64_t trigger
 	DBescape_string(sendto,sendto_esc,MAX_STRING_LEN);
 	DBescape_string(subject,subject_esc,MAX_STRING_LEN);
 	DBescape_string(message,message_esc,MAX_STRING_LEN);
-	DBexecute("insert into alerts (actionid,triggerid,userid,clock,mediatypeid,sendto,subject,message,status,retries,maxrepeats,delay)"
-		" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",'%s','%s','%s',0,0,%d,%d)",
+	DBexecute("insert into alerts (alertid, actionid,triggerid,userid,clock,mediatypeid,sendto,subject,message,status,retries,maxrepeats,delay)"
+		" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",'%s','%s','%s',0,0,%d,%d)",
+		DBget_maxid("alert_maxid"),
 		actionid,triggerid,userid,now,mediatypeid,sendto_esc,subject_esc,message_esc, maxrepeats, repeatdelay);
 
 	return SUCCEED;
@@ -2012,4 +2013,30 @@ zbx_uint64_t DBget_nextid(char *table, char *field)
 //	zabbix_log(LOG_LEVEL_WARNING, ZBX_FS_UI64, res);
 
 	return res;
+}
+
+zbx_uint64_t DBget_maxid(char *field)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	ret;
+
+	result = DBselect("select %s from nodes where nodeid=%d", field, CONFIG_NODEID);
+	row = DBfetch(result);
+
+	if(!row || DBis_null(row[0])==SUCCEED)
+	{
+		ret = CONFIG_NODEID*(zbx_uint64_t)__UINT64_C(100000000000000) + 1;
+	}
+	else
+	{
+		ZBX_STR2UINT64(ret, row[0]);
+		ret = CONFIG_NODEID*(zbx_uint64_t)__UINT64_C(100000000000000) + ret;
+		ret++;
+	}
+	DBexecute("update nodes set %s=%s+1 where nodeid=%d",
+		field, field, CONFIG_NODEID);
+	DBfree_result(result);
+
+	return ret;
 }
