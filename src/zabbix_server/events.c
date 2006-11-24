@@ -114,6 +114,8 @@ int	process_event(DB_EVENT *event)
 
 	if(event->eventid == 0)
 	{
+		event->eventid = DBget_maxid("event_maxid");
+/*
 		result = DBselect("select event_maxid from nodes where nodeid=%d", CONFIG_NODEID);
 		row = DBfetch(result);
 
@@ -130,6 +132,7 @@ int	process_event(DB_EVENT *event)
 		DBexecute("update nodes set event_maxid=event_maxid+1 where nodeid=%d",
 				CONFIG_NODEID);
 		DBfree_result(result);
+		*/
 	}
 	DBexecute("insert into events(eventid,triggerid,clock,value) values(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d)",
 		event->eventid,event->triggerid, event->clock, event->value);

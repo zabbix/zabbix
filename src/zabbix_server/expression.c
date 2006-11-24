@@ -765,7 +765,7 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 			/* NOTE: if you make changes for this bloc, don't forgot MVAR_TRIGGER_STATUS block */
 			var_len = strlen(MVAR_TRIGGER_ID);
 
-			zbx_snprintf(replace_to, sizeof(replace_to), "%d", event->triggerid);
+			zbx_snprintf(replace_to, sizeof(replace_to), ZBX_FS_UI64, event->triggerid);
 		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
 			strncmp(pr, MVAR_TRIGGER_URL, strlen(MVAR_TRIGGER_URL)) == 0)
@@ -781,7 +781,7 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 			/* NOTE: if you make changes for this bloc, don't forgot MVAR_TRIGGER_STATUS block */
 			var_len = strlen(MVAR_EVENT_ID);
 
-			zbx_snprintf(replace_to, sizeof(replace_to), "%d", event->eventid);
+			zbx_snprintf(replace_to, sizeof(replace_to), ZBX_FS_UI64, event->eventid);
 		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) && 
 			strncmp(pr, MVAR_TRIGGER_SEVERITY, strlen(MVAR_TRIGGER_SEVERITY)) == 0)
