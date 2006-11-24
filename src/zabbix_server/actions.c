@@ -74,7 +74,9 @@ static	void	send_to_user_medias(DB_EVENT *event,DB_ACTION *action, zbx_uint64_t 
 	DB_RESULT result;
 	DB_ROW	row;
 
-	result = DBselect("select mediatypeid,sendto,active,severity,period from media where active=%d and userid=%d",MEDIA_STATUS_ACTIVE,userid);
+	zabbix_log( LOG_LEVEL_WARNING, "In send_to_user_medias(triggerid:" ZBX_FS_UI64 ")", event->triggerid);
+
+	result = DBselect("select mediatypeid,sendto,active,severity,period from media where active=%d and userid=" ZBX_FS_UI64,MEDIA_STATUS_ACTIVE,userid);
 
 	while((row=DBfetch(result)))
 	{
