@@ -134,7 +134,7 @@
 	}
 	
 	function zbx_xmlwriter_output_memory(&$mem, $val)
-	{
+	{ /* NOTE: use this function only in the end of xml file creation */
 		echo '>';
 	}
 	
