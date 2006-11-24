@@ -444,6 +444,7 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 	else if(condition->conditiontype == CONDITION_TYPE_TRIGGER)
 	{
 		ZBX_STR2UINT64(condition_value, condition->value);
+		zabbix_log( LOG_LEVEL_DEBUG, "CONDITION_TYPE_TRIGGER [" ZBX_FS_UI64 ":%s]", condition_value, condition->value);
 		if(condition->operator == CONDITION_OPERATOR_EQUAL)
 		{
 //			if(trigger->triggerid == atoi(condition->value))
@@ -536,6 +537,7 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 	}
 	else if(condition->conditiontype == CONDITION_TYPE_TRIGGER_VALUE)
 	{
+		zabbix_log( LOG_LEVEL_DEBUG, "CONDITION_TYPE_TRIGGER_VALUE [%s:%s]", event->value, condition->value);
 		if(condition->operator == CONDITION_OPERATOR_EQUAL)
 		{
 //			if(new_trigger_value == atoi(condition->value))
@@ -597,7 +599,7 @@ static int	check_action_conditions(DB_EVENT *event, zbx_uint64_t actionid)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In check_action_conditions [actionid:%d]", actionid);
 
-	result = DBselect("select conditionid,actionid,conditiontype,operator,value from conditions where actionid=%d order by conditiontype", actionid);
+	result = DBselect("select conditionid,actionid,conditiontype,operator,value from conditions where actionid=" ZBX_FS_UI64 " order by conditiontype", actionid);
 
 	while((row=DBfetch(result)))
 	{
@@ -689,7 +691,7 @@ void	apply_actions(DB_EVENT *event)
 //		if(check_action_conditions(trigger, trigger_value, action.actionid) == SUCCEED)
 		if(check_action_conditions(event, action.actionid) == SUCCEED)
 		{
-			zabbix_log( LOG_LEVEL_DEBUG, "Conditions match our trigger. Do apply actions.");
+			zabbix_log( LOG_LEVEL_WARNING, "Conditions match our trigger. Do apply actions.");
 			ZBX_STR2UINT64(action.userid, row[1]);
 //			action.userid=atoi(row[1]);
 			
