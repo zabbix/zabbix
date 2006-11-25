@@ -84,7 +84,7 @@ FIELD		|serviceupid	|t_id		|'0'	|NOT NULL	|
 FIELD		|servicedownid	|t_id		|'0'	|NOT NULL	|
 FIELD		|soft		|t_integer	|'0'	|NOT NULL	|
 INDEX		|links_1	|servicedownid
-INDEX		|links_2	|serviceupid,servicedownid
+UNIQUE		|links_2	|serviceupid,servicedownid
 
 TABLE|graphs_items|gitemid|
 FIELD		|gitemid	|t_id		|'0'	|NOT NULL	|
@@ -320,7 +320,7 @@ FIELD		|logtimefmt	|t_varchar(64)	|''	|NOT NULL	|
 FIELD		|templateid	|t_bigint		|'0'	|NOT NULL	|
 FIELD		|valuemapid	|t_bigint		|'0'	|NOT NULL	|
 FIELD		|delay_flex	|t_varchar(255)	|''	|NOT NULL	|
-INDEX		|1		|hostid,key_
+UNIQUE		|1		|hostid,key_
 INDEX		|2		|nextcheck
 INDEX		|3		|status
 
@@ -418,7 +418,7 @@ FIELD		|userid		|t_id		|'0'	|NOT NULL	|
 FIELD		|idx		|t_varchar(64)	|''	|NOT NULL	|
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|
 FIELD		|valuetype	|t_integer	|0	|NOT NULL	|
-INDEX		|1		|userid,idx
+UNIQUE		|1		|userid,idx
 
 TABLE|screens|screenid|
 FIELD		|screenid	|t_id		|'0'	|NOT NULL	|
@@ -473,7 +473,7 @@ TABLE|hosts_templates|hosttemplateid|
 FIELD		|hosttemplateid	|t_id		|'0'	|NOT NULL	|
 FIELD		|hostid		|t_id		|'0'	|NOT NULL	|
 FIELD		|templateid	|t_id		|'0'	|NOT NULL	|
-INDEX		|1		|hostid,templateid
+UNIQUE		|1		|hostid,templateid
 
 TABLE|history_log|id|
 FIELD		|id		|t_id		|'0'	|NOT NULL	|
@@ -546,7 +546,7 @@ FIELD		|hostid		|t_id		|'0'	|NOT NULL	|
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|
 FIELD		|templateid	|t_id		|'0'	|NOT NULL	|
 INDEX		|1		|templateid
-INDEX		|2		|hostid,name
+UNIQUE		|2		|hostid,name
 
 TABLE|items_applications|itemappid|
 FIELD		|itemappid	|t_id		|'0'	|NOT NULL	|

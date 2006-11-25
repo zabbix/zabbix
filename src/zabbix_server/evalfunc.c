@@ -246,6 +246,7 @@ static int evaluate_SUM(char *value, DB_ITEM *item, int parameter, int flag)
 	int		res = SUCCEED;
 	double		sum=0;
 	zbx_uint64_t	sum_uint64=0;
+	zbx_uint64_t	value_uint64;
 
 	if( (item->value_type != ITEM_VALUE_TYPE_FLOAT) && (item->value_type != ITEM_VALUE_TYPE_UINT64))
 	{
@@ -302,11 +303,10 @@ static int evaluate_SUM(char *value, DB_ITEM *item, int parameter, int flag)
 			if(item->value_type == ITEM_VALUE_TYPE_UINT64)
 			{
 				while((row=DBfetch(result)))
-#ifdef	HAVE_ATOLL
-					sum_uint64+=atoll(row[0]);
-#else
-					sum_uint64+=atol(row[0]);
-#endif
+				{
+					ZBX_STR2UINT64(value_uint64,row[0]);
+					sum_uint64+=value_uint64;
+				}
 				zbx_snprintf(value,MAX_STRING_LEN,ZBX_FS_UI64, sum_uint64);
 			}
 			else
@@ -496,11 +496,8 @@ static int evaluate_MIN(char *value,DB_ITEM	*item,int parameter, int flag)
 		{
 			if(item->value_type == ITEM_VALUE_TYPE_UINT64)
 			{
-#ifdef	HAVE_ATOLL
-				l=atoll(row[0]);
-#else
-				l=atol(row[0]);
-#endif
+				ZBX_STR2UINT64(l,row[0]);
+
 				if(rows==0)		min_uint64 = l;
 				else if(l<min_uint64)	min_uint64 = l;
 			}
@@ -627,11 +624,8 @@ static int evaluate_MAX(char *value,DB_ITEM *item,int parameter,int flag)
 		{
 			if(item->value_type == ITEM_VALUE_TYPE_UINT64)
 			{
-#ifdef	HAVE_ATOLL
-				l=atoll(row[0]);
-#else
-				l=atol(row[0]);
-#endif
+				ZBX_STR2UINT64(l,row[0]);
+
 				if(rows==0)	max_uint64 = l;
 				else if(l>max)	max_uint64 = l;
 			}
