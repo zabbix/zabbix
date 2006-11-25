@@ -125,10 +125,18 @@ sub process_field
 sub process_index
 {
 	local $line=$_[0];
+	local $unique=$_[1];
 
 	newstate("index");
 	($name,$fields)=split(/\|/, $line,2);
-	print "CREATE INDEX ${table_name}_$name\ on $table_name ($fields);\n";
+	if($unique == 1)
+	{
+		print "CREATE UNIQUE INDEX ${table_name}_$name\ on $table_name ($fields);\n";
+	}
+	else
+	{
+		print "CREATE INDEX ${table_name}_$name\ on $table_name ($fields);\n";
+	}
 }
 
 foreach $line (@lines)
@@ -143,7 +151,8 @@ foreach $line (@lines)
 
 	switch ($type) {
 		case "TABLE"	{ process_table($line); }
-		case "INDEX"	{ process_index($line); }
+		case "INDEX"	{ process_index($line,0); }
+		case "UNIQUE"	{ process_index($line,1); }
 		case "FIELD"	{ process_field($line); }
 	}
 }

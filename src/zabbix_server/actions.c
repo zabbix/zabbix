@@ -496,11 +496,10 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 	}
 	else if(condition->conditiontype == CONDITION_TYPE_TRIGGER_SEVERITY)
 	{
-		ZBX_STR2UINT64(condition_value, condition->value);
 		if(condition->operator == CONDITION_OPERATOR_EQUAL)
 		{
 //			if(trigger->priority == atoi(condition->value))
-			if(event->trigger_priority == condition_value)
+			if(event->trigger_priority == atoi(condition->value))
 			{
 				ret = SUCCEED;
 			}
@@ -508,7 +507,7 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
 		{
 //			if(trigger->priority != atoi(condition->value))
-			if(event->trigger_priority != condition_value)
+			if(event->trigger_priority != atoi(condition->value))
 			{
 				ret = SUCCEED;
 			}
@@ -516,7 +515,7 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		else if(condition->operator == CONDITION_OPERATOR_MORE_EQUAL)
 		{
 //			if(trigger->priority >= atoi(condition->value))
-			if(event->trigger_priority >= condition_value)
+			if(event->trigger_priority >= atoi(condition->value))
 			{
 				ret = SUCCEED;
 			}
@@ -524,7 +523,7 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		else if(condition->operator == CONDITION_OPERATOR_LESS_EQUAL)
 		{
 //			if(trigger->priority <= atoi(condition->value))
-			if(event->trigger_priority <= condition_value)
+			if(event->trigger_priority <= atoi(condition->value))
 			{
 				ret = SUCCEED;
 			}
