@@ -353,7 +353,22 @@ static	void	run_commands(DB_EVENT *event, DB_ACTION *action)
 	zabbix_log( LOG_LEVEL_DEBUG, "Run remote commands END");
 }
 
-//static int	check_action_condition(DB_TRIGGER *trigger,int new_trigger_value, DB_CONDITION *condition)
+/******************************************************************************
+ *                                                                            *
+ * Function: check_action_condition                                           *
+ *                                                                            *
+ * Purpose: check if event matches single condition                           *
+ *                                                                            *
+ * Parameters: event - event to check                                         *
+ *             condition - condition for matching                             *
+ *                                                                            *
+ * Return value: SUCCEED - matches, FAIL - otherwise                          *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
 static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 {
 	DB_RESULT result;
@@ -585,7 +600,23 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 	return ret;
 }
 
-//static int	check_action_conditions(DB_TRIGGER *trigger,int new_trigger_value, int actionid)
+/******************************************************************************
+ *                                                                            *
+ * Function: check_action_conditions                                          *
+ *                                                                            *
+ * Purpose: check if actions has to be processed for the event                *
+ *          (check all condition of the action)                               *
+ *                                                                            *
+ * Parameters: event - event to check                                         *
+ *             actionid - action ID for matching                             *
+ *                                                                            *
+ * Return value: SUCCEED - matches, FAIL - otherwise                          *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
 static int	check_action_conditions(DB_EVENT *event, zbx_uint64_t actionid)
 {
 	DB_RESULT result;
@@ -643,6 +674,21 @@ static int	check_action_conditions(DB_EVENT *event, zbx_uint64_t actionid)
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: apply_actions                                                    *
+ *                                                                            *
+ * Purpose: executed all actions that match single event                      *
+ *                                                                            *
+ * Parameters: event - event to apply actions for                             *
+ *                                                                            *
+ * Return value: -                                                            *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: we check also trigger dependencies                               *
+ *                                                                            *
+ ******************************************************************************/
 void	apply_actions(DB_EVENT *event)
 {
 	DB_RESULT result;
