@@ -104,9 +104,6 @@ static void	add_trigger_info(DB_EVENT *event)
  ******************************************************************************/
 int	process_event(DB_EVENT *event)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-
 	zabbix_log(LOG_LEVEL_DEBUG,"In process_event(eventid:" ZBX_FS_UI64 ",triggerid:" ZBX_FS_UI64 ")",
 			event->eventid, event->triggerid);
 

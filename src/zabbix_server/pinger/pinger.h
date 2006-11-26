@@ -20,6 +20,7 @@
 #ifndef ZABBIX_PINGER_H
 #define ZABBIX_PINGER_H
 
+extern	int	CONFIG_PINGER_FORKS;
 extern	int	CONFIG_PINGER_FREQUENCY;
 extern	int	CONFIG_DISABLE_PINGER;
 extern	char	*CONFIG_DBHOST;
@@ -33,6 +34,6 @@ extern	int	CONFIG_NODEID;
 
 extern	void	signal_handler( int sig );
 
-void main_pinger_loop();
+void main_pinger_loop(int num);
 
 #endif
