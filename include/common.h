@@ -234,15 +234,13 @@
 #define	ZBX_NOSYNC	2
 
 /* Types of nodes */
-#define	NODE_TYPE_REMOTE	0
-#define	NODE_TYPE_LOCAL		1
-
-#define	ZABBIX_FORKS	5
-
-#define	TRAPPERD_FORKS	5
-#define	POLLER_FORKS	11
+#define	ZBX_NODE_TYPE_REMOTE	0
+#define	ZBX_NODE_TYPE_LOCAL	1
 
 #define	POLLER_DELAY	5
+
+#define	ZBX_POLLER_TYPE_NORMAL		0
+#define	ZBX_POLLER_TYPE_UNREACHABLE	1
 
 #define	POLLER_TIMEOUT	5
 /* Do not perform more than this number of checks during unavailability period */

@@ -52,6 +52,8 @@
 
 #include "pinger.h"
 
+int pinger_num;
+
 /******************************************************************************
  *                                                                            *
  * Function: is_ip                                                            *
@@ -237,7 +239,7 @@ static int create_host_file(void)
 
 	now=time(NULL);
 	/* Select hosts monitored by IP */
-	result = DBselect("select distinct h.ip from hosts h,items i where i.hostid=h.hostid and (h.status=%d or (h.status=%d and h.available=%d and h.disable_until<=%d)) and (i.key_='%s' or i.key_='%s') and i.type=%d and i.status=%d and h.useip=1 and" ZBX_COND_NODEID, HOST_STATUS_MONITORED, HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE, now, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY, ITEM_TYPE_SIMPLE, ITEM_STATUS_ACTIVE, LOCAL_NODE("h.hostid"));
+	result = DBselect("select distinct h.ip from hosts h,items i where " ZBX_SQL_MOD(h.hostid,%d) "=%d and i.hostid=h.hostid and (h.status=%d or (h.status=%d and h.available=%d and h.disable_until<=%d)) and (i.key_='%s' or i.key_='%s') and i.type=%d and i.status=%d and h.useip=1 and" ZBX_COND_NODEID, CONFIG_PINGER_FORKS, pinger_num, HOST_STATUS_MONITORED, HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE, now, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY, ITEM_TYPE_SIMPLE, ITEM_STATUS_ACTIVE, LOCAL_NODE("h.hostid"));
 
 	while((row=DBfetch(result)))
 	{
@@ -251,7 +253,7 @@ static int create_host_file(void)
 	DBfree_result(result);
 
 	/* Select hosts monitored by hostname */
-	result = DBselect("select distinct h.host from hosts h,items i where i.hostid=h.hostid and (h.status=%d or (h.status=%d and h.available=%d and h.disable_until<=%d)) and (i.key_='%s' or i.key_='%s') and i.type=%d and i.status=%d and h.useip=0 and" ZBX_COND_NODEID, HOST_STATUS_MONITORED, HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE, now, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY, ITEM_TYPE_SIMPLE, ITEM_STATUS_ACTIVE, LOCAL_NODE("h.hostid"));
+	result = DBselect("select distinct h.host from hosts h,items i where "  ZBX_SQL_MOD(h.hostid,%d) "=%d and i.hostid=h.hostid and (h.status=%d or (h.status=%d and h.available=%d and h.disable_until<=%d)) and (i.key_='%s' or i.key_='%s') and i.type=%d and i.status=%d and h.useip=0 and" ZBX_COND_NODEID, CONFIG_PINGER_FORKS, pinger_num, HOST_STATUS_MONITORED, HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE, now, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY, ITEM_TYPE_SIMPLE, ITEM_STATUS_ACTIVE, LOCAL_NODE("h.hostid"));
 
 	while((row=DBfetch(result)))
 	{
@@ -379,11 +381,13 @@ static int do_ping(void)
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-void main_pinger_loop()
+void main_pinger_loop(int num)
 {
 	int ret = SUCCEED;
 
 	char	str[MAX_STRING_LEN];
+
+	pinger_num = num;
 
 	if(1 == CONFIG_DISABLE_PINGER)
 	{
