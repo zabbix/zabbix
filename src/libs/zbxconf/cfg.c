@@ -22,8 +22,8 @@
 #include "log.h"
 
 
-int	CONFIG_ZABBIX_FORKS		= ZABBIX_FORKS;
 char	*CONFIG_FILE			= NULL;
+int	CONFIG_ZABBIX_FORKS		= 5;
 
 
 char	*CONFIG_LOG_FILE		= NULL;

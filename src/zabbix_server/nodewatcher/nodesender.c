@@ -80,7 +80,7 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 	DB_ROW		row;
 	DB_ROW		row2;
 
-#define	ZBX_XML_MAX	16*1024*1024
+#define	ZBX_XML_MAX	64*1024*1024
 	char	*xml,*p;
 	char	fields[MAX_STRING_LEN];
 
@@ -458,7 +458,7 @@ void main_nodesender()
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In main_nodesender()");
 
-	result = DBselect("select nodeid from nodes where nodetype=%d",NODE_TYPE_LOCAL);
+	result = DBselect("select nodeid from nodes where nodetype=%d", ZBX_NODE_TYPE_LOCAL);
 
 	row = DBfetch(result);
 

@@ -25,11 +25,12 @@ extern  int     server_num;
 
 extern  int     CONFIG_TIMEOUT;
 extern  int     CONFIG_POLLER_FORKS;
+extern  int     CONFIG_UNREACHABLE_POLLER_FORKS;
 extern  int     CONFIG_REFRESH_UNSUPPORTED;
 extern  int     CONFIG_UNAVAILABLE_DELAY;
 extern  int     CONFIG_UNREACHABLE_PERIOD;
 extern  int     CONFIG_UNREACHABLE_DELAY;
 
-void main_poller_loop(int _servernum);
+void main_poller_loop(int type, int num);
 
 #endif

@@ -310,14 +310,12 @@ void	child_trapper_main(int i,int listenfd, int addrlen)
 	socklen_t	clilen;
 	struct sockaddr cliaddr;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In child_main()");
+	zabbix_log( LOG_LEVEL_DEBUG, "In child_trapper_main()");
 
 /*	zabbix_log( LOG_LEVEL_WARNING, "zabbix_trapperd %ld started",(long)getpid());*/
 	zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Trapper]", i);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Before DBconnect()");
 	DBconnect();
-	zabbix_log( LOG_LEVEL_DEBUG, "After DBconnect()");
 
 	for(;;)
 	{
