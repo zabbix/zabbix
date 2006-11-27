@@ -311,10 +311,10 @@ int main_nodewatcher_loop()
 
 		end = time(NULL);
 
-		if(end-start<10)
+		if(end-start<5)
 		{
-			zbx_setproctitle("sender [sleeping for %d seconds]", 10-(end-start));
-			zabbix_log( LOG_LEVEL_DEBUG, "Sleeping %d seconds", 10-(end-start));
+			zbx_setproctitle("sender [sleeping for %d seconds]", 5-(end-start));
+			zabbix_log( LOG_LEVEL_DEBUG, "Sleeping %d seconds", 5-(end-start));
 			sleep(10-(end-start));
 		}
 	}
