@@ -300,9 +300,9 @@ static	ZBX_TABLE	tables[]={
 		{"history",		ZBX_TYPE_INT,	ZBX_SYNC},
 		{"trends",		ZBX_TYPE_INT,	ZBX_SYNC},
 		{"nextcheck",		ZBX_TYPE_INT,	ZBX_NOSYNC},
-		{"lastvalue",		ZBX_TYPE_CHAR,	ZBX_SYNC}, // NOSYNC
-		{"lastclock",		ZBX_TYPE_INT,	ZBX_SYNC}, // NOSYNC
-		{"prevvalue",		ZBX_TYPE_CHAR,	ZBX_SYNC}, // NOSYNC
+		{"lastvalue",		ZBX_TYPE_CHAR,	ZBX_NOSYNC}, // NOSYNC
+		{"lastclock",		ZBX_TYPE_INT,	ZBX_NOSYNC}, // NOSYNC
+		{"prevvalue",		ZBX_TYPE_CHAR,	ZBX_NOSYNC}, // NOSYNC
 		{"status",		ZBX_TYPE_INT,	ZBX_SYNC},
 		{"value_type",		ZBX_TYPE_INT,	ZBX_SYNC},
 		{"trapper_hosts",	ZBX_TYPE_CHAR,	ZBX_SYNC},
