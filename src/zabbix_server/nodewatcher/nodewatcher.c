@@ -144,7 +144,7 @@ static int calculate_checksums()
 		while((row2=DBfetch(result2)))
 		{
 //			zabbix_log( LOG_LEVEL_WARNING, "Cksum [%s]", row2[3]);
-			DBexecute("insert into node_cksum (cksumid,nodeid,tablename,fieldname,recordid,cksumtype,cksum)"\
+			DBexecute("insert into node_cksum (cksumid,nodeid,tablename,fieldname,recordid,cksumtype,cksum) "\
 				"values (" ZBX_FS_UI64 ",%d,'%s','%s',%s,%d,'%s')",
 				DBget_nextid("node_cksum","cksumid"),
 				nodeid,row2[0],row2[1],row2[2],NODE_CKSUM_TYPE_NEW,row2[3]);
