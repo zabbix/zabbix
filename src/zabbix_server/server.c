@@ -320,6 +320,8 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
  *                                                                            *
  ******************************************************************************/
 
+//#define TEST
+
 #ifdef TEST
 
 void    run_commands(DB_TRIGGER *trigger,DB_ACTION *action);
@@ -328,6 +330,26 @@ void test()
 {
 	DB_RESULT	result;
 	DB_ROW		row;
+
+	char	*data;
+	int	offset=0;
+	int	allocated=1024;
+	int	i;
+
+	data=malloc(allocated);
+
+//	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "Test");
+	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "%s", "Test");
+	printf("[%s]\n",data);
+	printf("Allocated %d Offset %d\n",allocated, offset);
+
+	i = zbx_snprintf(data, 128,"test");
+	printf("[%s]\n",data);
+	printf("Written %d\n", i);
+
+	return;
+
+
 	
 	printf("-= Test Started =-\n");
 	
