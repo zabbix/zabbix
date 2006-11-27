@@ -109,7 +109,7 @@ static int process_node(int nodeid, int master_nodeid, zbx_uint64_t event_lastid
 	}
 	if(found == 1)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Sending [%s]",data);
+		zabbix_log( LOG_LEVEL_DEBUG, "Sending [%s]",data);
 		if(send_to_node(master_nodeid, nodeid, data) == SUCCEED)
 		{
 //			zabbix_log( LOG_LEVEL_WARNING, "Updating nodes.event_lastid");
