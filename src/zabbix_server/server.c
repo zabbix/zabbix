@@ -339,7 +339,7 @@ void test()
 	data=malloc(allocated);
 
 //	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "Test");
-	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "%s", "Test");
+	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "%s", "\n");
 	printf("[%s]\n",data);
 	printf("Allocated %d Offset %d\n",allocated, offset);
 
