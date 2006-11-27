@@ -283,14 +283,16 @@
 				zbx_xmlwriter_write_element ($memory, $xml_name, $data[$db_name]);
 			}
 				
-			zbx_xmlwriter_start_element ($memory,XML_TAG_GROUPS);
-			$db_groups = DBselect('select g.name from groups g, hosts_groups hg'.
-				' where g.groupid=hg.groupid and hg.hostid='.$hostid);
-			while($group = DBfetch($db_groups))
+			if($db_groups = DBselect('select g.name from groups g, hosts_groups hg'.
+				' where g.groupid=hg.groupid and hg.hostid='.$hostid))
 			{
-				zbx_xmlwriter_write_element ($memory, XML_TAG_GROUP, $group['name']);
+				zbx_xmlwriter_start_element ($memory,XML_TAG_GROUPS);
+				while($group = DBfetch($db_groups))
+				{
+					zbx_xmlwriter_write_element ($memory, XML_TAG_GROUP, $group['name']);
+				}
+				zbx_xmlwriter_end_element($memory); // XML_TAG_GROUP
 			}
-			zbx_xmlwriter_end_element($memory); // XML_TAG_GROUP
 
 			if($export_items)
 			{
