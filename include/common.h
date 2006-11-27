@@ -427,6 +427,7 @@ double	zbx_current_time (void);
 
 void	zbx_error(const char *fmt, ...);
 int	zbx_snprintf(char* str, size_t count, const char *fmt, ...);
+void	zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_len, const char *fmt, ...);
 
 int	set_result_type(AGENT_RESULT *result, int value_type, char *c);
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);

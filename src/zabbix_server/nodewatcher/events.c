@@ -78,21 +78,23 @@ static int process_node(int nodeid, int master_nodeid, zbx_uint64_t event_lastid
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		*data;
-	char		tmp[MAX_STRING_LEN];
 	int		found = 0;
 
-	zbx_uint64_t	eventid;
+	int		offset = 0;
+	int		allocated = 1024;
 
-#define DATA_MAX	1024*1024
+	zbx_uint64_t	eventid;
 
 //	zabbix_log( LOG_LEVEL_WARNING, "In process_node(local:%d, event_lastid:" ZBX_FS_UI64 ")",nodeid, event_lastid);
 	/* Begin work */
 
-	data = malloc(DATA_MAX);
-	memset(data,0,DATA_MAX);
+	data = malloc(allocated);
+	memset(data,0,allocated);
 
-	zbx_snprintf(tmp,sizeof(tmp),"Events|%d|%d\n", CONFIG_NODEID, nodeid);
-	zbx_strlcat(data,tmp,DATA_MAX);
+//	zbx_snprintf(tmp,sizeof(tmp),"Events|%d|%d\n", CONFIG_NODEID, nodeid);
+//	zbx_strlcat(data,tmp,DATA_MAX);
+
+	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "Events|%d|%d\n", CONFIG_NODEID, nodeid);
 
 	result = DBselect("select eventid,triggerid,clock,value,acknowledged from events where eventid>" ZBX_FS_UI64 " and " ZBX_COND_NODEID " order by eventid", event_lastid, ZBX_NODE("eventid", nodeid));
 	while((row=DBfetch(result)))
@@ -100,8 +102,10 @@ static int process_node(int nodeid, int master_nodeid, zbx_uint64_t event_lastid
 		ZBX_STR2UINT64(eventid,row[0])
 //		zabbix_log( LOG_LEVEL_WARNING, "Processing eventid " ZBX_FS_UI64, eventid);
 		found = 1;
-		zbx_snprintf(tmp,sizeof(tmp),"%s|%s|%s|%s|%s\n", row[0],row[1],row[2],row[3],row[4]);
-		zbx_strlcat(data,tmp,DATA_MAX);
+//		zbx_snprintf(tmp,sizeof(tmp),"%s|%s|%s|%s|%s\n", row[0],row[1],row[2],row[3],row[4]);
+//		zbx_strlcat(data,tmp,DATA_MAX);
+		zbx_snprintf_alloc(&data, &allocated, &offset, 1024, "%s|%s|%s|%s|%s\n",
+			       row[0],row[1],row[2],row[3],row[4]);
 	}
 	if(found == 1)
 	{
