@@ -215,8 +215,11 @@ int	node_sync(char *data)
 	int	nodeid=0;
 	int	sender_nodeid=0;
 	char	tmp[MAX_STRING_LEN];
+	int	datalen;
 
-//	zabbix_log( LOG_LEVEL_WARNING, "In node_sync(len:%d)", strlen(data));
+	datalen=strlen(data);
+
+//	zabbix_log( LOG_LEVEL_WARNING, "In node_sync(len:%d)", datalen);
 
        	s=(char *)strtok(data,"\n");
 	while(s!=NULL)
@@ -230,7 +233,7 @@ int	node_sync(char *data)
 			nodeid=atoi(tmp);
 			firstline=0;
 			zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Received data from node %d for node %d datalen %d",
-					CONFIG_NODEID, sender_nodeid, nodeid, strlen(data));
+					CONFIG_NODEID, sender_nodeid, nodeid, datalen);
 		}
 		else
 		{
