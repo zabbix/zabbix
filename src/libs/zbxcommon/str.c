@@ -198,6 +198,37 @@ int zbx_snprintf(char* str, size_t count, const char *fmt, ...)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_vsnprintf                                                    *
+ *                                                                            *
+ * Purpose: Sequire version of vsnprintf function.                            *
+ *          Add zero character at the end of string.                          *
+ *                                                                            *
+ * Parameters: str - distination buffer poiner                                *
+ *             count - size of distination buffer                             *
+ *             fmt - format                                                   *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev (see also zbx_snprintf)                           *
+ *                                                                            *
+ ******************************************************************************/
+int zbx_vsnprintf(char* str, size_t count, const char *fmt, va_list args)
+{
+	int	writen_len = 0;
+
+	assert(str);
+
+	writen_len = vsnprintf(str, count, fmt, args);
+	writen_len = MIN(writen_len, ((int)count) - 1);
+	writen_len = MAX(writen_len, 0);
+
+	str[writen_len] = '\0';
+
+	return writen_len;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_snprintf_alloc                                               *
  *                                                                            *
  * Purpose: Sequire version of snprintf function.                             *
@@ -218,10 +249,19 @@ int zbx_snprintf(char* str, size_t count, const char *fmt, ...)
 void zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_len, const char *fmt, ...)
 {
 	char	*c;
-	int	i;
+	int	written;
 
 	va_list	args;
 
+	assert(str);
+	assert(*str);
+
+	assert(alloc_len);
+	assert(offset);
+
+	assert(fmt);
+
+	va_start(args, fmt);
 	if(*offset + max_len >= *alloc_len)
 	{
 		c=realloc(*str, *alloc_len+128*max_len);
@@ -230,10 +270,10 @@ void zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_len, co
 		*str = c;
 	}
 
-	va_start(args, fmt);
-	i = zbx_snprintf(*str+*offset, *alloc_len - *offset, fmt, args);
+	written = zbx_vsnprintf(*str+*offset, *alloc_len - *offset, fmt, args);
+	*offset += written;
+
 	va_end(args);
-	*offset+=i;
 }
 
 
