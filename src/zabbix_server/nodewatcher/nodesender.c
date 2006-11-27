@@ -80,17 +80,16 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 	DB_ROW		row;
 	DB_ROW		row2;
 
-#define	ZBX_XML_MAX	64*1024*1024
-	char	*xml,*p;
+	char	*xml;
 	char	fields[MAX_STRING_LEN];
+	int	offset=0;
+	int	allocated=1024;
 
-	int	i,j,c;
+	int	i,j;
 
-	xml=malloc(ZBX_XML_MAX);
+	xml=malloc(allocated);
 
-	memset(xml,0,ZBX_XML_MAX);
-
-	p = xml;
+	memset(xml,0,allocated);
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In send_config_data(nodeid:%d,dest_node:%d,maxlogid:" ZBX_FS_UI64 ",type:%d)",nodeid, dest_nodeid,maxlogid,node_type);
 
@@ -104,16 +103,11 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 		result=DBselect("select tablename,recordid,operation from node_configlog where nodeid=" ZBX_FS_UI64 " and sync_slave=0 and conflogid<=" ZBX_FS_UI64 " order by tablename,operation", nodeid, maxlogid);
 	}
 
-//	snprintf(tmp,sizeof(tmp),"<Data type='config'>\n<Node id='%d'>\n</Node>\n<Version>1.4</Version>\n<Records>\n", nodeid);
-//	zbx_snprintf(tmp,sizeof(tmp),"Data|%d|%d\n", CONFIG_NODEID, nodeid);
-
-//	zbx_strlcat(xml,tmp,ZBX_XML_MAX);
-	c = zbx_snprintf(p,ZBX_XML_MAX,"Data|%d|%d\n", CONFIG_NODEID, nodeid);
-	p+=c;
+	zbx_snprintf_alloc(&xml, &allocated, &offset, 128, "Data|%d|%d\n", CONFIG_NODEID, nodeid);
 
 	while((row=DBfetch(result)))
 	{
-/*		zabbix_log( LOG_LEVEL_WARNING, "Fetched [%s,%s,%s]",row[0],row[1],row[2]);*/
+//		zabbix_log( LOG_LEVEL_WARNING, "Fetched [%s,%s,%s]",row[0],row[1],row[2]);
 		for(i=0;tables[i].table!=0;i++)
 		{
 			if(strcmp(tables[i].table, row[0])==0)	break;
@@ -126,12 +120,6 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 			/* for each field */
 			for(j=0;tables[i].fields[j].name!=0;j++)
 			{
-/*				if( (tables[i].fields[j].flags & ZBX_SYNC) ==0)
-				{
-					zabbix_log( LOG_LEVEL_WARNING, "Skip %s.%s fields[%s]", tables[i].table,tables[i].fields[j].name, fields);
-					continue;
-				}*/
-
 				zbx_strlcat(fields,tables[i].fields[j].name,sizeof(fields));
 				zbx_strlcat(fields,",",sizeof(fields));
 			}
@@ -144,55 +132,26 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 
 			if(row2)
 			{
-//				zbx_snprintf(tmp,sizeof(tmp),"%s|%s|%s",
-//					row[0], row[1], row[2]);
-				c = zbx_snprintf(p,ZBX_XML_MAX,"%s|%s|%s",
+				zbx_snprintf_alloc(&xml, &allocated, &offset, 16*1024, "%s|%s|%s",
 					row[0], row[1], row[2]);
-				p+=c;
-//					zabbix_log( LOG_LEVEL_WARNING, "TMP [%s]",tmp);
-//				zbx_strlcat(xml,tmp,ZBX_XML_MAX);
-//				c = zbx_snprintf(p,ZBX_XML_MAX,"%s", tmp);
-//				p+=c;
 				/* for each field */
 				for(j=0;tables[i].fields[j].name!=0;j++)
 				{
 					if( (tables[i].fields[j].flags & ZBX_SYNC) ==0)	continue;
-//					snprintf(tmp,sizeof(tmp),"<Record table='%s' field='%s' op='%s' recid='%s'>%s<Record>\n",
-//						row[0], tables[i].fields[j].name, row[2], row[1], row2[j]);
 //					// Fieldname, type, value
 					if(DBis_null(row2[j]) == SUCCEED)
 					{
 //						zabbix_log( LOG_LEVEL_WARNING, "Field name [%s] [%s]",tables[i].fields[j].name,row2[j]);
-//						if(strcmp("snmpv3_securityname",tables[i].fields[j].name)==0)
-//						{
-//							zabbix_log( LOG_LEVEL_WARNING, "snmpv3_securityname [%s]",row2[j]);
-//						}
-//						zbx_snprintf(tmp,sizeof(tmp),"|%s|%d|NULL",
-//							tables[i].fields[j].name,tables[i].fields[j].type);
-						c = zbx_snprintf(p,ZBX_XML_MAX,"|%s|%d|NULL",
+						zbx_snprintf_alloc(&xml, &allocated, &offset, 16*1024, "%d|%d|NULL",
 							tables[i].fields[j].name,tables[i].fields[j].type);
-						p+=c;
 					}
 					else
 					{
-//						zbx_snprintf(tmp,sizeof(tmp),"|%s|%d|%s",
-//							tables[i].fields[j].name,tables[i].fields[j].type,row2[j]);
-						c = zbx_snprintf(p,ZBX_XML_MAX,"|%s|%d|%s",
+						zbx_snprintf_alloc(&xml, &allocated, &offset, 16*1024, "%s|%d|%s",
 							tables[i].fields[j].name,tables[i].fields[j].type,row2[j]);
-						p+=c;
-//						if(strcmp("snmpv3_securityname",tables[i].fields[j].name)==0)
-//						{
-//							zabbix_log( LOG_LEVEL_WARNING, "snmpv3_securityname 2[%s]",row2[j]);
-//						}
 					}
-//					zabbix_log( LOG_LEVEL_WARNING, "TMP [%s]",tmp);
-//					zbx_strlcat(xml,tmp,ZBX_XML_MAX);
-//					c = zbx_snprintf(p,ZBX_XML_MAX,"%s", tmp);
-//					p+=c;
 				}
-//				zbx_strlcat(xml,"\n",ZBX_XML_MAX);
-				c = zbx_snprintf(p,ZBX_XML_MAX,"\n");
-				p+=c;
+				zbx_snprintf_alloc(&xml, &allocated, &offset, 3, "\n");
 			}
 			else
 			{
@@ -205,9 +164,6 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 			zabbix_log( LOG_LEVEL_WARNING, "Cannot find table [%s]",row[0]);
 		}
 	}
-//	snprintf(tmp,sizeof(tmp),"</Records></Data>\n");
-//	strncat(xml,tmp,ZBX_XML_MAX);
-//
 //	zabbix_log( LOG_LEVEL_WARNING, "DATA [%s]",xml);
 	if(send_to_node(dest_nodeid, nodeid, xml) == SUCCEED)
 	{
