@@ -142,16 +142,16 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 					if(DBis_null(row2[j]) == SUCCEED)
 					{
 //						zabbix_log( LOG_LEVEL_WARNING, "Field name [%s] [%s]",tables[i].fields[j].name,row2[j]);
-						zbx_snprintf_alloc(&xml, &allocated, &offset, 16*1024, "%d|%d|NULL",
+						zbx_snprintf_alloc(&xml, &allocated, &offset, 16*1024, "|%d|%d|NULL",
 							tables[i].fields[j].name,tables[i].fields[j].type);
 					}
 					else
 					{
-						zbx_snprintf_alloc(&xml, &allocated, &offset, 16*1024, "%s|%d|%s",
+						zbx_snprintf_alloc(&xml, &allocated, &offset, 16*1024, "|%s|%d|%s",
 							tables[i].fields[j].name,tables[i].fields[j].type,row2[j]);
 					}
 				}
-				zbx_snprintf_alloc(&xml, &allocated, &offset, 3, "\n");
+				zbx_snprintf_alloc(&xml, &allocated, &offset, 128, "\n");
 			}
 			else
 			{
@@ -164,7 +164,7 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 			zabbix_log( LOG_LEVEL_WARNING, "Cannot find table [%s]",row[0]);
 		}
 	}
-//	zabbix_log( LOG_LEVEL_WARNING, "DATA [%s]",xml);
+	zabbix_log( LOG_LEVEL_DEBUG, "DATA [%s]",xml);
 	if(send_to_node(dest_nodeid, nodeid, xml) == SUCCEED)
 	{
 		if(node_type == ZBX_NODE_MASTER)
