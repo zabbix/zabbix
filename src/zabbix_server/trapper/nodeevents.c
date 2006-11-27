@@ -107,8 +107,11 @@ int	node_events(char *data)
 	int	nodeid=0;
 	int	sender_nodeid=0;
 	char	tmp[MAX_STRING_LEN];
+	int	datalen;
 
-//	zabbix_log( LOG_LEVEL_WARNING, "In node_events(len:%d)", strlen(data));
+	datalen = strlen(data);
+
+//	zabbix_log( LOG_LEVEL_WARNING, "In node_events(len:%d)", datalen);
 
        	s=(char *)strtok(data,"\n");
 	while(s!=NULL)
@@ -122,7 +125,7 @@ int	node_events(char *data)
 			nodeid=atoi(tmp);
 			firstline=0;
 			zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Received events from node %d for node %d datalen %d",
-					CONFIG_NODEID, sender_nodeid, nodeid, strlen(data));
+					CONFIG_NODEID, sender_nodeid, nodeid, datalen);
 		}
 		else
 		{
