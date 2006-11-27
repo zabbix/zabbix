@@ -94,12 +94,19 @@ include_once "include/page_header.php";
 		$graphs		= get_request('graphs', array());
 		$triggers	= get_request('triggers', array());
 		
-		$fnc_inc = create_function('$x', 'return ++$x;');
-		$hosts		= array_map($fnc_inc, array_flip(array_intersect(array_keys($hosts),	$available_hosts)));
-		$items		= array_map($fnc_inc, array_flip(array_intersect(array_keys($items),	array_keys($hosts))));
-		$graphs		= array_map($fnc_inc, array_flip(array_intersect(array_keys($graphs),	array_keys($hosts))));
-		$triggers	= array_map($fnc_inc, array_flip(array_intersect(array_keys($triggers),	array_keys($hosts))));
-		unset($inc);
+		function &zbx_array_val_inc(&$arr, $inc_size = 1)
+		{
+			foreach($arr as $id => $val)
+			{
+				$arr[$id] = $val + $inc_size;
+			}
+			return $arr;
+		}
+		
+		$hosts		= zbx_array_val_inc(array_flip(array_intersect(array_keys($hosts),	$available_hosts)));
+		$items		= zbx_array_val_inc(array_flip(array_intersect(array_keys($items),	array_keys($hosts))));
+		$graphs		= zbx_array_val_inc(array_flip(array_intersect(array_keys($graphs),	array_keys($hosts))));
+		$triggers	= zbx_array_val_inc(array_flip(array_intersect(array_keys($triggers),	array_keys($hosts))));
 
 		if(count($hosts)==0) $hosts[-1] = 1;
 
