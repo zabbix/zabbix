@@ -164,7 +164,7 @@ void zbx_error(const char *fmt, ...)
  *                                                                            *
  * Function: zbx_snprintf                                                     *
  *                                                                            *
- * Purpose: Sequrity version of snprintf function.                            *
+ * Purpose: Sequire version of snprintf function.                             *
  *          Add zero character at the end of string.                          *
  *                                                                            *
  * Parameters: str - distination buffer poiner                                *
@@ -195,6 +195,47 @@ int zbx_snprintf(char* str, size_t count, const char *fmt, ...)
 
 	return writen_len;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_snprintf_alloc                                               *
+ *                                                                            *
+ * Purpose: Sequire version of snprintf function.                             *
+ *          Add zero character at the end of string.                          *
+ *          Reallocs memory if not enough.                                    *
+ *                                                                            *
+ * Parameters: str - distination buffer poiner                                *
+ *             alloc_len - already allocated memory                           *
+ *             offset - ofsset for writing                                    *
+ *             max_len - fmt + data won't write more than max_len bytes       *
+ *             fmt - format                                                   *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ ******************************************************************************/
+void zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_len, const char *fmt, ...)
+{
+	char	*c;
+	int	i;
+
+	va_list	args;
+
+	if(*offset + max_len >= *alloc_len)
+	{
+		c=realloc(*str, *alloc_len+128*max_len);
+/* TODO Check for return value */
+		*alloc_len += 128*max_len;
+		*str = c;
+	}
+
+	va_start(args, fmt);
+	i = zbx_snprintf(*str+*offset, *alloc_len - *offset, fmt, args);
+	va_end(args);
+	*offset+=i;
+}
+
 
 /* Has to be rewritten to avoi malloc */
 char *string_replace(char *str, const char *sub_str1, const char *sub_str2)
