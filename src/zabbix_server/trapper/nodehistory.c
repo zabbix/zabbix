@@ -142,13 +142,14 @@ int	node_history(char *data)
 	{
 		if(firstline == 1)
 		{
-//			zabbix_log( LOG_LEVEL_WARNING, "First line [%s]", s);
+			zabbix_log( LOG_LEVEL_WARNING, "First line [%s]", s);
 			zbx_get_field(s,tmp,1,'|');
 			sender_nodeid=atoi(tmp);
 			zbx_get_field(s,tmp,2,'|');
 			nodeid=atoi(tmp);
 			firstline=0;
-			zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Received history from node %d for node %d", CONFIG_NODEID, sender_nodeid, nodeid);
+			zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Received history from node %d for node %d datalen %d",
+					CONFIG_NODEID, sender_nodeid, nodeid, strlen(data));
 		}
 		else
 		{

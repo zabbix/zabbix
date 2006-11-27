@@ -229,7 +229,8 @@ int	node_sync(char *data)
 			zbx_get_field(s,tmp,2,'|');
 			nodeid=atoi(tmp);
 			firstline=0;
-			zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Received data from node %d for node %d", CONFIG_NODEID, sender_nodeid, nodeid);
+			zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Received data from node %d for node %d datalen %d",
+					CONFIG_NODEID, sender_nodeid, nodeid, strlen(data));
 		}
 		else
 		{
