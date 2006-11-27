@@ -85,6 +85,8 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 	int	offset=0;
 	int	allocated=1024;
 
+	int	found=0;
+
 	int	i,j;
 
 	xml=malloc(allocated);
@@ -103,10 +105,12 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 		result=DBselect("select tablename,recordid,operation from node_configlog where nodeid=" ZBX_FS_UI64 " and sync_slave=0 and conflogid<=" ZBX_FS_UI64 " order by tablename,operation", nodeid, maxlogid);
 	}
 
-	zbx_snprintf_alloc(&xml, &allocated, &offset, 128, "Data|%d|%d\n", CONFIG_NODEID, nodeid);
+	zbx_snprintf_alloc(&xml, &allocated, &offset, 128, "Data|%d|%d", CONFIG_NODEID, nodeid);
 
 	while((row=DBfetch(result)))
 	{
+		found = 1;
+
 //		zabbix_log( LOG_LEVEL_WARNING, "Fetched [%s,%s,%s]",row[0],row[1],row[2]);
 		for(i=0;tables[i].table!=0;i++)
 		{
@@ -132,7 +136,7 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 
 			if(row2)
 			{
-				zbx_snprintf_alloc(&xml, &allocated, &offset, 16*1024, "%s|%s|%s",
+				zbx_snprintf_alloc(&xml, &allocated, &offset, 16*1024, "\n%s|%s|%s",
 					row[0], row[1], row[2]);
 				/* for each field */
 				for(j=0;tables[i].fields[j].name!=0;j++)
@@ -151,7 +155,6 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 							tables[i].fields[j].name,tables[i].fields[j].type,row2[j]);
 					}
 				}
-				zbx_snprintf_alloc(&xml, &allocated, &offset, 128, "\n");
 			}
 			else
 			{
@@ -165,7 +168,7 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 		}
 	}
 	zabbix_log( LOG_LEVEL_DEBUG, "DATA [%s]",xml);
-	if(send_to_node(dest_nodeid, nodeid, xml) == SUCCEED)
+	if( (found == 1) && send_to_node(dest_nodeid, nodeid, xml) == SUCCEED)
 	{
 		if(node_type == ZBX_NODE_MASTER)
 		{

@@ -94,7 +94,7 @@ static int process_node(int nodeid, int master_nodeid, zbx_uint64_t event_lastid
 //	zbx_snprintf(tmp,sizeof(tmp),"Events|%d|%d\n", CONFIG_NODEID, nodeid);
 //	zbx_strlcat(data,tmp,DATA_MAX);
 
-	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "Events|%d|%d\n", CONFIG_NODEID, nodeid);
+	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "Events|%d|%d", CONFIG_NODEID, nodeid);
 
 	result = DBselect("select eventid,triggerid,clock,value,acknowledged from events where eventid>" ZBX_FS_UI64 " and " ZBX_COND_NODEID " order by eventid", event_lastid, ZBX_NODE("eventid", nodeid));
 	while((row=DBfetch(result)))
@@ -104,7 +104,7 @@ static int process_node(int nodeid, int master_nodeid, zbx_uint64_t event_lastid
 		found = 1;
 //		zbx_snprintf(tmp,sizeof(tmp),"%s|%s|%s|%s|%s\n", row[0],row[1],row[2],row[3],row[4]);
 //		zbx_strlcat(data,tmp,DATA_MAX);
-		zbx_snprintf_alloc(&data, &allocated, &offset, 1024, "%s|%s|%s|%s|%s\n",
+		zbx_snprintf_alloc(&data, &allocated, &offset, 1024, "\n%s|%s|%s|%s|%s",
 			       row[0],row[1],row[2],row[3],row[4]);
 	}
 	if(found == 1)

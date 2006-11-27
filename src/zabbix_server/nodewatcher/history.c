@@ -90,7 +90,7 @@ static int process_node_history_str(int nodeid, int master_nodeid)
 
 //	i = zbx_snprintf(data,DATA_MAX,"History|%d|%d\n", CONFIG_NODEID, nodeid);
 //	p+=i;
-	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "History|%d|%d\n", CONFIG_NODEID, nodeid);
+	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "History|%d|%d", CONFIG_NODEID, nodeid);
 
 	zbx_snprintf(sql,sizeof(sql),"select id,itemid,clock,value from history_str_sync where nodeid=%d order by id", nodeid);
 
@@ -102,7 +102,7 @@ static int process_node_history_str(int nodeid, int master_nodeid)
 //		i = zbx_snprintf(p,DATA_MAX,"%d|%s|%s|%s\n", ZBX_TABLE_HISTORY_STR,row[1],row[2],row[3]);
 //		p+=i;
 //		if(p>data+DATA_MAX-1) break;
-		zbx_snprintf_alloc(&data, &allocated, &offset, 1024, "%d|%s|%s|%s\n",
+		zbx_snprintf_alloc(&data, &allocated, &offset, 1024, "\n%d|%s|%s|%s",
 			       ZBX_TABLE_HISTORY_STR,row[1],row[2],row[3]);
 	}
 	if(found == 1)
