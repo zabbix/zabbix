@@ -210,7 +210,7 @@ static int compare_checksums()
 	/* Begin work */
 
 	/* Find updated records */
-	result = DBselect("select new.nodeid,new.tablename,new.recordid from node_cksum old, node_cksum new where new.tablename=old.tablename and new.recordid=old.recordid and new.fieldname=old.fieldname and new.nodeid=old.nodeid and new.cksum<>old.cksum and new.cksumtype=%d and old.cksumtype=%d", NODE_CKSUM_TYPE_NEW, NODE_CKSUM_TYPE_OLD);
+	result = DBselect("select curr.nodeid,curr.tablename,curr.recordid from node_cksum prev, node_cksum curr where curr.tablename=prev.tablename and curr.recordid=prev.recordid and curr.fieldname=prev.fieldname and curr.nodeid=prev.nodeid and curr.cksum<>prev.cksum and curr.cksumtype=%d and prev.cksumtype=%d", NODE_CKSUM_TYPE_NEW, NODE_CKSUM_TYPE_OLD);
 	while((row=DBfetch(result)))
 	{
 //		zabbix_log( LOG_LEVEL_WARNING, "Adding record to node_configlog");
@@ -222,10 +222,10 @@ static int compare_checksums()
 	DBfree_result(result);
 
 	/* Find new records */
-	result = DBselect("select new.nodeid,new.tablename,new.recordid from node_cksum new" \
-			  " left join node_cksum old" \
-			  " on new.tablename=old.tablename and new.recordid=old.recordid and new.fieldname=old.fieldname and new.nodeid=old.nodeid and new.cksumtype<>old.cksumtype" \
-			  " where old.cksumid is null and new.cksumtype=%d", NODE_CKSUM_TYPE_NEW);
+	result = DBselect("select curr.nodeid,curr.tablename,curr.recordid from node_cksum curr" \
+			  " left join node_cksum prev" \
+			  " on curr.tablename=prev.tablename and curr.recordid=prev.recordid and curr.fieldname=prev.fieldname and curr.nodeid=prev.nodeid and curr.cksumtype<>prev.cksumtype" \
+			  " where prev.cksumid is null and curr.cksumtype=%d", NODE_CKSUM_TYPE_NEW);
 
 	while((row=DBfetch(result)))
 	{
@@ -238,10 +238,10 @@ static int compare_checksums()
 	DBfree_result(result);
 
 	/* Find deleted records */
-	result = DBselect("select new.nodeid,new.tablename,new.recordid from node_cksum new" \
-			  " left join node_cksum old" \
-			  " on new.tablename=old.tablename and new.recordid=old.recordid and new.fieldname=old.fieldname and new.nodeid=old.nodeid and new.cksumtype<>old.cksumtype" \
-			  " where old.cksumid is null and new.cksumtype=%d", NODE_CKSUM_TYPE_OLD);
+	result = DBselect("select curr.nodeid,curr.tablename,curr.recordid from node_cksum curr" \
+			  " left join node_cksum prev" \
+			  " on curr.tablename=prev.tablename and curr.recordid=prev.recordid and curr.fieldname=prev.fieldname and curr.nodeid=prev.nodeid and curr.cksumtype<>prev.cksumtype" \
+			  " where prev.cksumid is null and curr.cksumtype=%d", NODE_CKSUM_TYPE_OLD);
 
 	while((row=DBfetch(result)))
 	{
