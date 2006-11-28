@@ -715,7 +715,7 @@ int MAIN_ZABBIX_ENTRY(void)
 
 void	zbx_on_exit()
 {
-	zabbix_log(LOG_LEVEL_WARNING, "zbx_on_exit() called.");
+	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called.");
 	
 #if !defined(_WINDOWS)
 	
@@ -723,7 +723,7 @@ void	zbx_on_exit()
 
 	if(threads != NULL)
 	{
-		for(i = 0; i < CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS; i++)
+		for(i = 1; i <= CONFIG_POLLER_FORKS+CONFIG_TRAPPERD_FORKS+CONFIG_PINGER_FORKS+CONFIG_ALERTER_FORKS+CONFIG_HOUSEKEEPER_FORKS+CONFIG_TIMER_FORKS+CONFIG_UNREACHABLE_POLLER_FORKS+CONFIG_NODEWATCHER_FORKS; i++)
 		{
 			if(threads[i]) {
 				kill(threads[i],SIGTERM);
