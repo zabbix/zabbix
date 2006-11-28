@@ -60,6 +60,6 @@ void	drop_pid_file(const char *pidfile)
 {
 	if(-1 == unlink(pidfile))
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Cannot remove PID file [%s] [%s]", pidfile, strerror(errno));
+		zabbix_log( LOG_LEVEL_DEBUG, "Cannot remove PID file [%s] [%s]", pidfile, strerror(errno));
 	}
 }
