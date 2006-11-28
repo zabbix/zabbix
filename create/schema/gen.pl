@@ -24,6 +24,8 @@ open(INFO, $file);		# Open the file
 @lines = <INFO>;		# Read it into an array
 close(INFO);			# Close the file
 
+local $output;
+
 %mysql=("t_bigint"	=>	"bigint unsigned",
 	"t_id"		=>	"bigint unsigned",
 	"t_integer"	=>	"integer",
@@ -51,17 +53,17 @@ close(INFO);			# Close the file
 	"t_blob"	=>	"blob"
 );
 
-%postgresql=("t_bigint"	=>	"bigint",
-	"t_id"		=>	"bigint",
+%postgresql=("t_bigint"	=>	"unsigned bigint",
+	"t_id"		=>	"unsigned bigint",
 	"t_integer"	=>	"integer",
 	"t_serial"	=>	"serial",
-	"t_double"	=>	"double",
+	"t_double"	=>	"float8",
 	"t_varchar"	=>	"varchar",
 	"t_char"	=>	"char",
-	"t_image"	=>	"longblob",
-	"t_history_log"	=>	"text",
+	"t_image"	=>	"bytea",
+	"t_history_log"	=>	"varchar(255)",
 	"t_history_text"=>	"text",
-	"t_blob"	=>	"blob"
+	"t_blob"	=>	"text"
 );
 
 %sqlite=("t_bigint"	=>	"bigint",
@@ -75,6 +77,12 @@ close(INFO);			# Close the file
 	"t_history_log"	=>	"text",
 	"t_history_text"=>	"text",
 	"t_blob"	=>	"blob"
+);
+
+%all=(	"mysql"		=>	%mysql,
+	"oracle"	=>	%oracle,
+	"postgresql"	=>	%postgresql,
+	"sqlite"	=>	%sqlite,
 );
 
 sub newstate
@@ -114,7 +122,7 @@ sub process_field
 	newstate("field");
 	($name,$type,$default,$null,$flags)=split(/\|/, $line,5);
 	($type_short)=split(/\(/, $type,2);
-	$a=$mysql{$type_short};
+	$a=$output{$type_short};
 	$_=$type;
 	s/$type_short/$a/g;
 	$type_2=$_;
@@ -139,22 +147,48 @@ sub process_index
 	}
 }
 
-foreach $line (@lines)
+sub usage
 {
-	$_ = $line;
-	$line = tr/\t//d;
-	$line=$_;
+	printf "Usage: gen.pl [mysql|oracle|postgresql|sqlite]\n";
+	printf "The script generates ZABBIX SQL schemas for different database engines.\n";
+	exit;
+}
 
-	chop($line);
+sub main
+{
+	if($#ARGV!=0)
+	{
+		usage();
+	};
 
-	($type,$line)=split(/\|/, $line,2);
+	$format=$ARGV[0];
+	switch ($format) {
+		case "mysql"		{ $output=%mysql; }
+		case "oracle"		{ $output=%oracle; }
+		case "postgresql"	{ $output=%postgresql; }
+		case "sqlite"		{ $output=%sqlite; }
+		else			{ usage(); }
+	}
 
-	switch ($type) {
-		case "TABLE"	{ process_table($line); }
-		case "INDEX"	{ process_index($line,0); }
-		case "UNIQUE"	{ process_index($line,1); }
-		case "FIELD"	{ process_field($line); }
+	foreach $line (@lines)
+	{
+		$_ = $line;
+		$line = tr/\t//d;
+		$line=$_;
+	
+		chop($line);
+	
+		($type,$line)=split(/\|/, $line,2);
+	
+		switch ($type) {
+			case "TABLE"	{ process_table($line); }
+			case "INDEX"	{ process_index($line,0); }
+			case "UNIQUE"	{ process_index($line,1); }
+			case "FIELD"	{ process_field($line); }
+		}
 	}
 }
+
+main();
 
 newstate("table");
