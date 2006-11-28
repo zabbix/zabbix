@@ -265,7 +265,9 @@ int DBexecute(const char *fmt, ...)
 	if( PQresultStatus(result) != PGRES_COMMAND_OK)
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",sql);
-		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", PQresStatus(PQresultStatus(result)) );
+		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s:%s",
+				PQresStatus(PQresultStatus(result)),
+			 	PQresultErrorMessage(result));
 		PQclear(result);
 		return FAIL;
 	}
@@ -481,7 +483,9 @@ DB_RESULT DBselect(const char *fmt, ...)
 	if( PQresultStatus(result->pg_result) != PGRES_TUPLES_OK)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Query::%s",sql);
-		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", PQresStatus(PQresultStatus(result->pg_result)) );
+		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s:%s",
+				PQresStatus(PQresultStatus(result->pg_result)),
+			 	PQresultErrorMessage(result->pg_result));
 		exit( FAIL );
 	}
 	
@@ -1814,7 +1818,6 @@ void	DBvacuum(void)
 			"sessions", "rights", "service_alarms", "profiles", "screens", "screens_items",
 			NULL};
 
-	char	sql[MAX_STRING_LEN];
 	char	*table;
 	int	i;
 
