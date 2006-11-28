@@ -40,7 +40,7 @@ void	child_signal_handler(int sig)
 	case SIGQUIT:
 	case SIGINT:
 	case SIGTERM:
-		zabbix_log( LOG_LEVEL_WARNING, "Got signal. Exiting ...");
+		zabbix_log( LOG_LEVEL_DEBUG, "Got signal. Exiting ...");
 		uninit();
 		exit( FAIL );
 		break;
