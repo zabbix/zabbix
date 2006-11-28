@@ -53,16 +53,17 @@ local $output;
 	"t_blob"	=>	"blob"
 );
 
-%postgresql=("t_bigint"	=>	"unsigned bigint",
-	"t_id"		=>	"unsigned bigint",
+%postgresql=("t_bigint"	=>	"bigint",
+	"t_id"		=>	"bigint",
 	"t_integer"	=>	"integer",
 	"t_serial"	=>	"serial",
-	"t_double"	=>	"float8",
+	"t_double"	=>	"numeric",
 	"t_varchar"	=>	"varchar",
 	"t_char"	=>	"char",
 	"t_image"	=>	"bytea",
 	"t_history_log"	=>	"varchar(255)",
 	"t_history_text"=>	"text",
+	"t_time"	=>	"integer",
 	"t_blob"	=>	"text"
 );
 
@@ -163,10 +164,10 @@ sub main
 
 	$format=$ARGV[0];
 	switch ($format) {
-		case "mysql"		{ $output=%mysql; }
-		case "oracle"		{ $output=%oracle; }
-		case "postgresql"	{ $output=%postgresql; }
-		case "sqlite"		{ $output=%sqlite; }
+		case "mysql"		{ %output=%mysql; }
+		case "oracle"		{ %output=%oracle; }
+		case "postgresql"	{ %output=%postgresql; }
+		case "sqlite"		{ %output=%sqlite; }
 		else			{ usage(); }
 	}
 
