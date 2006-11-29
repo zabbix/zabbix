@@ -220,6 +220,8 @@ int	node_sync(char *data)
 	datalen=strlen(data);
 
 //	zabbix_log( LOG_LEVEL_WARNING, "In node_sync(len:%d)", datalen);
+//
+	DBbegin();
 
        	s=(char *)strtok(data,"\n");
 	while(s!=NULL)
@@ -243,5 +245,7 @@ int	node_sync(char *data)
 
        		s=(char *)strtok(NULL,"\n");
 	}
+	DBcommit();
+
 	return SUCCEED;
 }
