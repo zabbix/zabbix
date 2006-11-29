@@ -261,6 +261,8 @@ int get_values(void)
 		init_result(&agent);
 		zabbix_log( LOG_LEVEL_DEBUG, "GOT VALUE TYPE [0x%X]", agent.type);
 		res = get_value(&item, &agent);
+
+		DBbegin();
 		
 		if(res == SUCCEED )
 		{
@@ -368,6 +370,7 @@ int get_values(void)
 			zabbix_log( LOG_LEVEL_WARNING, "The value is not stored in database.");
 		}
 		free_result(&agent);
+		DBcommit();
 	}
 
 	DBfree_result(result);

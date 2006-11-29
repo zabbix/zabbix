@@ -89,6 +89,9 @@ static int calculate_checksums()
 	int	now;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In calculate_checksums");
+
+	DBbegin();
+
 	DBexecute("delete from node_cksum where cksumtype=%d", NODE_CKSUM_TYPE_NEW);
 	// insert into node_cksum (select NULL,0,'items','itemid',itemid,0,md5(concat(key_)) as md5 from items);
 
@@ -155,6 +158,7 @@ static int calculate_checksums()
 	}
 	DBfree_result(result);
 
+	DBcommit();
 
 	return SUCCEED;
 }
@@ -177,10 +181,12 @@ static int calculate_checksums()
  ******************************************************************************/
 static int update_checksums()
 {
-	/* Begin work */
+	DBbegin();
+
 	DBexecute("delete from node_cksum where cksumtype=%d", NODE_CKSUM_TYPE_OLD);
 	DBexecute("update node_cksum set cksumtype=%d where cksumtype=%d", NODE_CKSUM_TYPE_OLD, NODE_CKSUM_TYPE_NEW);
-	/* Commit */
+
+	DBcommit();
 
 	return SUCCEED;
 }
@@ -208,6 +214,7 @@ static int compare_checksums()
 	DB_ROW		row;
 
 	/* Begin work */
+	DBbegin();
 
 	/* Find updated records */
 	result = DBselect("select curr.nodeid,curr.tablename,curr.recordid from node_cksum prev, node_cksum curr where curr.tablename=prev.tablename and curr.recordid=prev.recordid and curr.fieldname=prev.fieldname and curr.nodeid=prev.nodeid and curr.cksum<>prev.cksum and curr.cksumtype=%d and prev.cksumtype=%d", NODE_CKSUM_TYPE_NEW, NODE_CKSUM_TYPE_OLD);
@@ -254,6 +261,7 @@ static int compare_checksums()
 	DBfree_result(result);
 
 	/* Commit */
+	DBcommit();
 
 	return SUCCEED;
 }

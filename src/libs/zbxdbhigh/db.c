@@ -167,6 +167,10 @@ void    DBconnect(void)
  ******************************************************************************/
 void DBbegin(void)
 {
+#ifdef	HAVE_MYSQL
+// Fix autocommit in DBconnect
+//	DBexecute("begin;");
+#endif
 #ifdef	HAVE_SQLITE3
 	DBexecute("begin;");
 #endif
@@ -189,6 +193,10 @@ void DBbegin(void)
  ******************************************************************************/
 void DBcommit(void)
 {
+#ifdef	HAVE_MYSQL
+// Fix autocommit in DBconnect
+//	DBexecute("commit;");
+#endif
 #ifdef	HAVE_SQLITE3
 	DBexecute("commit;");
 #endif

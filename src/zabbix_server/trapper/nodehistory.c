@@ -140,6 +140,8 @@ int	node_history(char *data)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In node_history(len:%d)", datalen);
 
+	DBbegin();
+
        	s=(char *)strtok(data,"\n");
 	while(s!=NULL)
 	{
@@ -162,5 +164,7 @@ int	node_history(char *data)
 
        		s=(char *)strtok(NULL,"\n");
 	}
+	DBcommit();
+
 	return SUCCEED;
 }

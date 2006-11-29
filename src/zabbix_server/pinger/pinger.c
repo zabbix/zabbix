@@ -191,8 +191,10 @@ static int process_value(char *key, char *host, AGENT_RESULT *value)
 	item.multiplier=atoi(row[19]);
 	item.formula=row[20];
 
+	DBbegin();
 	process_new_value(&item,value);
 	update_triggers(item.itemid);
+	DBcommit();
  
 	DBfree_result(result);
 

@@ -112,7 +112,8 @@ int	node_events(char *data)
 	datalen = strlen(data);
 
 //	zabbix_log( LOG_LEVEL_WARNING, "In node_events(len:%d)", datalen);
-
+//
+	DBbegin();
        	s=(char *)strtok(data,"\n");
 	while(s!=NULL)
 	{
@@ -135,5 +136,6 @@ int	node_events(char *data)
 
        		s=(char *)strtok(NULL,"\n");
 	}
+	DBcommit();
 	return SUCCEED;
 }
