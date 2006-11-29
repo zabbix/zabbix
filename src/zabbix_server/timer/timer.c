@@ -100,8 +100,10 @@ void main_timer_loop()
 /*			zbx_snprintf(sql,sizeof(sql),"update functions set lastvalue='1' where itemid=%d and function='%s' and parameter='%s'" , itemid, function, parameter );
 			DBexecute(sql);*/
 
+			DBbegin();
 			update_functions(&item);
 			update_triggers(item.itemid);
+			DBcommit();
 		}
 
 		DBfree_result(result);

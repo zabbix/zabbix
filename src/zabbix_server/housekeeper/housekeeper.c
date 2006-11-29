@@ -320,6 +320,7 @@ int main_housekeeper_loop()
 
 		DBconnect();
 
+		DBbegin();
 
 /*		zbx_setproctitle("housekeeper [removing deleted hosts]");*/
 
@@ -351,6 +352,8 @@ int main_housekeeper_loop()
 		housekeeping_sessions(now);
 
 		zbx_setproctitle("housekeeper [vacuuming database]");
+
+		DBcommit();
 
 		DBvacuum();
 

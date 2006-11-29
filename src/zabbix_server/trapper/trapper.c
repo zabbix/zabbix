@@ -190,7 +190,10 @@ int	process_trap(int sockfd,char *s, int max_len)
 			severity[0]=0;
 		}
 
+		DBbegin();
 		ret=process_data(sockfd,server,key,value_string,lastlogsize,timestamp,source,severity);
+		DBcommit();
+		
 		if( SUCCEED == ret)
 		{
 			zbx_snprintf(result,sizeof(result),"OK\n");
