@@ -35,6 +35,7 @@
 
 #ifdef	HAVE_SQLITE3
 	sqlite3	*sqlite;
+	ZBX_MUTEX	sqlite_access;
 #endif
 
 #ifdef	HAVE_MYSQL
@@ -69,6 +70,7 @@ void	DBclose(void)
 	sqlite3_close(sqlite);
 #endif
 }
+
 
 /*
  * Connect to the database.
@@ -147,6 +149,14 @@ void    DBconnect(void)
 
 	/* Do not return SQLITE_BUSY immediately, wait for N ms */
 	sqlite3_busy_timeout(sqlite, 60*1000);
+
+	if(ZBX_MUTEX_ERROR == zbx_mutex_create(&sqlite_access, "sqlite"))
+	{
+		zbx_error("Unable to create mutex for sqlite");
+		exit(FAIL);
+	}
+
+
 #endif
 }
 
@@ -241,6 +251,7 @@ int DBexecute(const char *fmt, ...)
 #endif
 #ifdef	HAVE_SQLITE3
 	int ret = SUCCEED;
+	int sql_ret = SUCCEED;
 	char *error=0;
 #endif
 
@@ -294,13 +305,17 @@ int DBexecute(const char *fmt, ...)
 	return ret;
 #endif
 #ifdef	HAVE_SQLITE3
-	if(SQLITE_OK != sqlite3_exec(sqlite, sql, NULL, 0, &error))
+	zbx_mutex_lock(&sqlite_access);
+
+	if(SQLITE_OK != (sql_ret = sqlite3_exec(sqlite, sql, NULL, 0, &error)))
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",sql);
-		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", error);
+		zabbix_log(LOG_LEVEL_ERR, "Query failed [%i]:%s", sql_ret, error);
 		sqlite3_free(error);
 		ret = FAIL;
 	}
+
+	zbx_mutex_unlock(&sqlite_access);
 	return ret;
 #endif
 }
@@ -321,6 +336,8 @@ int	DBis_null(char *field)
 /* in db.h - #define DBfree_result   PG_DBfree_result */
 void	PG_DBfree_result(DB_RESULT result)
 {
+	if(!result) return;
+
 	/* free old data */
 	if(result->values)
 	{
@@ -337,17 +354,13 @@ void	PG_DBfree_result(DB_RESULT result)
 /* in db.h - #define DBfree_result   SQ_DBfree_result */
 void	SQ_DBfree_result(DB_RESULT result)
 {
-	int i = 0;
-
-	/* free old data */
-	if(result->values)
+	if(!result) return;
+	
+	if(result->data)
 	{
-		result->fld_num = 0;
-		free(result->values);
-		result->values = NULL;
+		sqlite3_free_table(result->data);
 	}
 
-	sqlite3_finalize(result->sq_result);
 	free(result);
 }
 #endif
@@ -416,29 +429,13 @@ DB_ROW	DBfetch(DB_RESULT result)
 	if(!result)	return NULL;
 		
 	/* EOF */
-	if(sqlite3_step(result->sq_result) != SQLITE_ROW) return NULL;
+	if(result->curow >= result->nrow) return NULL;
 
-	/* free old data */
-	if(result->values)
-	{
-		result->fld_num = 0;
-		free(result->values);
-		result->values = NULL;
-	}
+	if(!result->data) return NULL;
 
-	/* init result */
-	result->fld_num = sqlite3_column_count(result->sq_result);
-	
-	if(result->fld_num > 0)
-	{
-		result->values = malloc(sizeof(char*) * result->fld_num);
-		for(i = 0; i < result->fld_num; i++)
-		{
-			result->values[i] = (char*)sqlite3_column_text(result->sq_result, i);
-		}
-	}
+	result->curow++; /* NOTE: First row == header row */
 
-	return result->values;	
+	return &(result->data[result->curow * result->ncolumn]);	
 #endif
 }
 
@@ -456,6 +453,10 @@ DB_RESULT DBselect(const char *fmt, ...)
 #endif
 #ifdef	HAVE_ORACLE
 	sqlo_stmt_handle_t sth;
+#endif
+#ifdef	HAVE_SQLITE3
+	int sql_ret = SUCCEED;
+	char *error=0;
 #endif
 
 	va_start(args, fmt);
@@ -512,18 +513,21 @@ DB_RESULT DBselect(const char *fmt, ...)
 	return sth;
 #endif
 #ifdef HAVE_SQLITE3
-	result = malloc(sizeof(ZBX_SQ_DB_RESULT));
-	result->sq_result = NULL;
-	result->values = NULL;
-	result->fld_num = 0;
+	zbx_mutex_lock(&sqlite_access);
 
-	if(SQLITE_OK != sqlite3_prepare(sqlite, sql, -1, &result->sq_result, 0))
+	result = malloc(sizeof(ZBX_SQ_DB_RESULT));
+	result->curow = 0;
+
+	if(SQLITE_OK != (sql_ret = sqlite3_get_table(sqlite,sql,&result->data,&result->nrow, &result->ncolumn, &error)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Query::%s",sql);
-		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", sqlite3_errmsg(sqlite));
+		zabbix_log( LOG_LEVEL_ERR, "Query::%s",sql);
+		zabbix_log(LOG_LEVEL_ERR, "Query failed [%i]:%s", sql_ret, error);
+		sqlite3_free(error);
+		zbx_mutex_unlock(&sqlite_access);
 		exit(FAIL);
 	}
-	
+
+	zbx_mutex_unlock(&sqlite_access);
 	return result;
 #endif
 }
@@ -1906,7 +1910,7 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 	char	*s;
 
 	ZBX_STR2UINT64(item->itemid, row[0]);
-//	item->itemid=atoi(row[0]);
+/*	item->itemid=atoi(row[0]); */
 	strscpy(item->key,row[1]);
 	item->host=row[2];
 	item->port=atoi(row[3]);
@@ -1941,7 +1945,7 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 		item->prevvalue_str=s;
 		item->prevvalue=atof(s);
 	}
-//	item->hostid=atoi(row[15]);
+/*	item->hostid=atoi(row[15]); */
 	ZBX_STR2UINT64(item->hostid, row[15]);
 	item->host_status=atoi(row[16]);
 	item->value_type=atoi(row[17]);
@@ -1983,7 +1987,7 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 	item->trapper_hosts=row[32];
 	item->logtimefmt=row[33];
 	ZBX_STR2UINT64(item->valuemapid, row[34]);
-//	item->valuemapid=atoi(row[34]);
+/*	item->valuemapid=atoi(row[34]); */
 	item->delay_flex=row[35];
 }
 
@@ -2005,7 +2009,7 @@ zbx_uint64_t DBget_nextid(char *table, char *field)
 	max = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)(CONFIG_NODEID+1)-1;
 
 	result = DBselect("select max(%s) from %s where %s>=" ZBX_FS_UI64 " and %s<=" ZBX_FS_UI64, field, table, field, min, field, max);
-//	zabbix_log(LOG_LEVEL_WARNING, "select max(%s) from %s where %s>=" ZBX_FS_UI64 " and %s<=" ZBX_FS_UI64, field, table, field, min, field, max);
+/*	zabbix_log(LOG_LEVEL_WARNING, "select max(%s) from %s where %s>=" ZBX_FS_UI64 " and %s<=" ZBX_FS_UI64, field, table, field, min, field, max); */
 
 	row=DBfetch(result);
 
@@ -2017,11 +2021,11 @@ zbx_uint64_t DBget_nextid(char *table, char *field)
 	}
 	else
 	{
-//	zabbix_log(LOG_LEVEL_WARNING,"4");
+/*	zabbix_log(LOG_LEVEL_WARNING,"4"); */
 		res=(zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)CONFIG_NODEID+1;
 	}
 	DBfree_result(result);
-//	zabbix_log(LOG_LEVEL_WARNING, ZBX_FS_UI64, res);
+/*	zabbix_log(LOG_LEVEL_WARNING, ZBX_FS_UI64, res); */
 
 	return res;
 }
