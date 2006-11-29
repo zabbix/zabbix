@@ -320,58 +320,15 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
  *                                                                            *
  ******************************************************************************/
 
-//#define TEST
+/* #define TEST */
 
 #ifdef TEST
 
-void    run_commands(DB_TRIGGER *trigger,DB_ACTION *action);
-
 void test()
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-
-	char	*data;
-	int	offset=0;
-	int	allocated=1024;
-	int	i;
-
-	data=malloc(allocated);
-
-//	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "Test");
-	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "%s", "\n");
-	printf("[%s]\n",data);
-	printf("Allocated %d Offset %d\n",allocated, offset);
-
-	i = zbx_snprintf(data, 128,"test");
-	printf("[%s]\n",data);
-	printf("Written %d\n", i);
-
-	return;
-
-
-	
 	printf("-= Test Started =-\n");
 	
-	result = DBselect("select hostid,host from hosts");
-	
-	while((row=DBfetch(result)))
-	{
-		printf("[%s|%s]\n",row[0],row[1]);
-	}
-	DBfree_result(result);
-	
-	result = DBselect("select * from users");
-	
-	while((row=DBfetch(result)))
-	{
-		printf("[%s|%s]\n",row[0],row[3]);
-	}
-	DBfree_result(result);
-	
-	printf("-= Test completed =-\n");
-
-	return 0;
+	printf("\n-= Test completed =-\n");
 }
 #endif /* TEST */
 
@@ -503,7 +460,7 @@ int MAIN_ZABBIX_ENTRY(void)
 		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,CONFIG_LOG_FILE);
 	}
 
-//	zabbix_log( LOG_LEVEL_WARNING, "INFO [%s]", ZBX_SQL_MOD(a,%d));
+/*	zabbix_log( LOG_LEVEL_WARNING, "INFO [%s]", ZBX_SQL_MOD(a,%d)); */
 	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_server. ZABBIX %s.", ZABBIX_VERSION);
 
 	DBconnect();
@@ -560,13 +517,13 @@ int MAIN_ZABBIX_ENTRY(void)
 		}
 	}
 
-//	zabbix_log( LOG_LEVEL_WARNING, "zabbix_server #%d started",server_num);
+/*	zabbix_log( LOG_LEVEL_WARNING, "zabbix_server #%d started",server_num); */
 	/* Main process */
 	if(server_num == 0)
 	{
 		init_main_process();
 		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Main]",server_num);
-		for(;;)	sleep(3600);
+		for(;;)	zbx_sleep(3600);
 	}
 
 
@@ -590,8 +547,8 @@ int MAIN_ZABBIX_ENTRY(void)
 		}
 		child_trapper_main(server_num, listenfd, addrlen);
 
-//		threads[i] = child_trapper_make(i, listenfd, addrlen);
-//		child_trapper_make(server_num, listenfd, addrlen);
+/*		threads[i] = child_trapper_make(i, listenfd, addrlen); */
+/*		child_trapper_make(server_num, listenfd, addrlen); */
 	}
 	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS)
 	{
@@ -618,14 +575,14 @@ int MAIN_ZABBIX_ENTRY(void)
 	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS
 			+CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS)
 	{
-//		zabbix_log( LOG_LEVEL_WARNING, "%d<=%d",server_num,  CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS+CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS);
+/*		zabbix_log( LOG_LEVEL_WARNING, "%d<=%d",server_num,  CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS+CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS); */
 #ifdef HAVE_SNMP
 		init_snmp("zabbix_server");
 		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Poller for unreachable hosts. SNMP:ON]",server_num);
 #else
 		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Poller for unreachable hosts. SNMP:OFF]",server_num);
 #endif
-//		zabbix_log( LOG_LEVEL_WARNING, "Before main_poller_loop(%d,%d)",ZBX_POLLER_TYPE_UNREACHABLE,server_num - (CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS +CONFIG_ALERTER_FORKS+CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS));
+/*		zabbix_log( LOG_LEVEL_WARNING, "Before main_poller_loop(%d,%d)",ZBX_POLLER_TYPE_UNREACHABLE,server_num - (CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS +CONFIG_ALERTER_FORKS+CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS)); */
 		main_poller_loop(ZBX_POLLER_TYPE_UNREACHABLE,
 				server_num - (CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS+CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS));
 	}
@@ -744,6 +701,10 @@ void	zbx_on_exit()
 	
 	zabbix_log(LOG_LEVEL_INFORMATION, "ZABBIX Server stopped");
 	zabbix_close_log();
+	
+#ifdef  HAVE_SQLITE3
+	zbx_mutex_destroy(&sqlite_access);
+#endif /* HAVE_SQLITE3 */
 
 	exit(SUCCEED);
 }
