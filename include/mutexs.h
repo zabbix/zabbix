@@ -44,7 +44,7 @@
 #	define ZBX_MUTEX_SQLITE		1
 #	define ZBX_MUTEX_COUNT		2
 
-#	define ZBX_MUTEX_MAX_TRIES	5 /* seconds */
+#	define ZBX_MUTEX_MAX_TRIES	20 /* seconds */
 
 #endif /* _WINDOWS */
 

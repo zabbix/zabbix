@@ -73,8 +73,6 @@ int zbx_mutex_create(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name)
 	union semun semopts;
 	struct semid_ds seminfo;
 
-	zbx_error("Semaphore [%i] init", name); /* TEMP !!! */
-
 	if( -1 == (sem_key = ftok(CONFIG_FILE, (int)'z') ))
 	{
 		zbx_error("Can not create IPC key for path '%s', try to create for path '.' [%s]", CONFIG_FILE, strerror(errno));
@@ -85,37 +83,36 @@ int zbx_mutex_create(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name)
 		}
 	}			
 
-	if ( 0 <= (ZBX_SEM_LIST_ID = semget(sem_key, ZBX_MUTEX_COUNT, IPC_CREAT | IPC_EXCL | 0666 /* 0022 */)) )
+	if ( -1 != (ZBX_SEM_LIST_ID = semget(sem_key, ZBX_MUTEX_COUNT, IPC_CREAT | IPC_EXCL | 0666 /* 0022 */)) )
 	{
 		/* set default semaphore value */
-		for ( i = 0, semopts.val = 1; i < ZBX_MUTEX_COUNT; semctl(ZBX_SEM_LIST_ID, i++, SETVAL, semopts) );
+		semopts.val = 1;
+		
+		for ( i = 0; i < ZBX_MUTEX_COUNT; i++ )
+		{
+			if(-1 == semctl(ZBX_SEM_LIST_ID, i, SETVAL, semopts))
+			{
+				zbx_error("Semaphore [%i] error in semctl(SETVAL)", name);
+				return ZBX_MUTEX_ERROR;
+			}
 
-		zbx_mutex_lock(&name);		/* call semop to update sem_otime */
-		zbx_mutex_unlock(&name);	/* release semaphore */
-
-		/* TEMP!!! check sem_otime
-		semopts.buf = &seminfo;
-		semctl(ZBX_SEM_LIST_ID, name, IPC_STAT, semopts);
-		zbx_error("Semaphore [%i,%i] initialized", name, semopts.buf->sem_otime);
-		*/
+			zbx_mutex_lock(&i);	/* call semop to update sem_otime */
+			zbx_mutex_unlock(&i);	/* release semaphore */
+		}
 	}
 	else if(errno == EEXIST)
 	{
 		ZBX_SEM_LIST_ID = semget(sem_key, ZBX_MUTEX_COUNT, 0666 /* 0022 */);
 		semopts.buf = &seminfo;
-		/*
-		semctl(ZBX_SEM_LIST_ID, name, IPC_STAT, semopts);
-		if(semopts.buf->sem_otime ==0 )
-		{
-			for ( i = 0, semopts.val = 1; i < ZBX_MUTEX_COUNT; semctl(ZBX_SEM_LIST_ID, i++, SETVAL, semopts) );
-		}
-		*/
 		
 		/* wait for initialization */
 		for ( i = 0; i < ZBX_MUTEX_MAX_TRIES; i++)
 		{
-			semctl(ZBX_SEM_LIST_ID, name, IPC_STAT, semopts);
-			zbx_error("sem_otime: %d,%d", semopts.buf->sem_otime, semopts.buf->sem_nsems);/* TEMP!!! */
+			if( -1 == semctl(ZBX_SEM_LIST_ID, 0, IPC_STAT, semopts))
+			{
+				zbx_error("Semaphore [%i] error in semctl(IPC_STAT)", name);
+				break;
+			}
 			if(semopts.buf->sem_otime !=0 ) goto lbl_return;
 			zbx_sleep(1);
 		}
