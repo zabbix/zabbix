@@ -67,6 +67,8 @@ int zbx_mutex_create(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name)
 		return ZBX_MUTEX_ERROR;
 	}
 
+	/* NOTE: if(ERROR_ALREADY_EXISTS == GetLastError()) info("Successfully opened existed mutex!"); */
+
 #else /* not _WINDOWS */
 	int	i;
 	key_t	sem_key;

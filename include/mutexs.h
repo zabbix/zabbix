@@ -28,8 +28,8 @@
 
 #	define ZBX_MUTEX_NAME		char*
 
-#	define ZBX_MUTEX_LOG    	"zbx_log"
-#	define ZBX_MUTEX_SQLITE 	"zbx_sqlite"
+#	define ZBX_MUTEX_LOG    	"ZBX_MUTEX_LOG"
+#	define ZBX_MUTEX_SQLITE 	"ZBX_MUTEX_SQLITE"
 
 #else /* not _WINDOWS */
 
