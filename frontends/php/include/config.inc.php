@@ -118,7 +118,7 @@ function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$m
 	unset($local_node_data);
 
 
-	function	read_configuration_file($file='conf/zabbix.conf.php')
+	function	read_configuration_file($file='./conf/zabbix.conf.php')
 	{
 		global $ZBX_CONFIGURATION_FILE;
 
