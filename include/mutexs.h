@@ -22,21 +22,33 @@
 
 #if defined(_WINDOWS)
 
-	#define ZBX_MUTEX		HANDLE
-	#define ZBX_MUTEX_ERROR		(0)
-	#define ZBX_MUTEX_OK		(1)
+#	define ZBX_MUTEX		HANDLE
+#	define ZBX_MUTEX_ERROR		(0)
+#	define ZBX_MUTEX_OK		(1)
+
+#	define ZBX_MUTEX_NAME		char*
+
+#	define ZBX_MUTEX_LOG    	"zbx_log"
+#	define ZBX_MUTEX_SQLITE 	"zbx_sqlite"
 
 #else /* not _WINDOWS */
 
+#	define ZBX_MUTEX		int
 
-	#define ZBX_MUTEX		int
+#	define ZBX_MUTEX_ERROR		(-1)
+#	define ZBX_MUTEX_OK		(1)
+	
+#	define ZBX_MUTEX_NAME		int
 
-	#define ZBX_MUTEX_ERROR		(-1)
-	#define ZBX_MUTEX_OK		(1)
+#	define ZBX_MUTEX_LOG		0
+#	define ZBX_MUTEX_SQLITE		1
+#	define ZBX_MUTEX_COUNT		2
+
+#	define ZBX_MUTEX_MAX_TRIES	5 /* seconds */
 
 #endif /* _WINDOWS */
 
-int zbx_mutex_create(ZBX_MUTEX	*mutex, char *name);
+int zbx_mutex_create(ZBX_MUTEX	*mutex, ZBX_MUTEX_NAME name);
 int zbx_mutex_lock(ZBX_MUTEX	*mutex);
 int zbx_mutex_unlock(ZBX_MUTEX	*mutex);
 int zbx_mutex_destroy(ZBX_MUTEX	*mutex);

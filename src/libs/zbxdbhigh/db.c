@@ -152,7 +152,7 @@ void    DBconnect(void)
 	/* Do not return SQLITE_BUSY immediately, wait for N ms */
 	sqlite3_busy_timeout(sqlite, 60*1000);
 
-	if(ZBX_MUTEX_ERROR == zbx_mutex_create(&sqlite_access, "sqlite"))
+	if(ZBX_MUTEX_ERROR == zbx_mutex_create(&sqlite_access, ZBX_MUTEX_SQLITE))
 	{
 		zbx_error("Unable to create mutex for sqlite");
 		exit(FAIL);
