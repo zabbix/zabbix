@@ -75,7 +75,7 @@ static int calculate_checksums()
 {
 
 	char	*sql;
-	int	sql_allocated=64*1024, sql_offset=0;
+	int	sql_allocated, sql_offset;
 //	char	tmp[MAX_STRING_LEN];
 //	char	fields[MAX_STRING_LEN];
 
@@ -91,7 +91,6 @@ static int calculate_checksums()
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In calculate_checksums");
 
-	sql=malloc(sql_allocated);
 
 	DBbegin();
 
@@ -102,6 +101,10 @@ static int calculate_checksums()
 	result =DBselect("select nodeid from nodes");
 	while((row=DBfetch(result)))
 	{
+		sql_allocated=64*1024;
+		sql_offset=0;
+		sql=malloc(sql_allocated);
+
 		now  = time(NULL);
 		nodeid = atoi(row[0]);
 
@@ -172,7 +175,7 @@ static int calculate_checksums()
 //		zabbix_log( LOG_LEVEL_WARNING, "TMP [%s]", tmp);
 //			zbx_strlcat(sql,tmp,sizeof(sql));
 		}
-//		zabbix_log( LOG_LEVEL_WARNING, "SQL [%s]", sql);
+//		zabbix_log( LOG_LEVEL_WARNING, "SQL DUMP [%s]", sql);
 
 		result2 =DBselect(sql);
 
@@ -189,13 +192,13 @@ static int calculate_checksums()
 			i++;
 		}
 		DBfree_result(result2);
+		free(sql);
 //		zabbix_log( LOG_LEVEL_WARNING, "Added %d records in %d seconds", i, time(NULL)-now);
 	}
 	DBfree_result(result);
 
 	DBcommit();
 
-	free(sql);
 
 	return SUCCEED;
 }
