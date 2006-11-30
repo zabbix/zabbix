@@ -1,5 +1,6 @@
 Changes for 1.3.1:
 
+ - fixed multiple mutex system (Eugene)
  - added support of SQLite3 database (Eugene)
  - added transactional approach to ZABBIX server (Alexei)
  - new definition of parameter StartTrappers (Alexei)

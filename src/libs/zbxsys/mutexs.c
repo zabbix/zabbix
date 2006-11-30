@@ -33,6 +33,9 @@
 #	endif /* semun */
 
 #	include "cfg.h"
+#	include "threads.h"
+
+	static int	ZBX_SEM_LIST_ID = -1;
 
 #endif /* not _WINDOWS */
 
@@ -54,25 +57,24 @@
  * Comments: LINUX version can create ONLY ONE mutex!!!!!!!                   *
  *                                                                            *
  ******************************************************************************/
-
-int zbx_mutex_create(ZBX_MUTEX *mutex, char *name)
+int zbx_mutex_create(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name)
 {
 #if defined(_WINDOWS)	
 
-	/* ignore "name" */
-	if(NULL == ((*mutex) = CreateMutex(NULL, FALSE, NULL)))
+	if(NULL == ((*mutex) = CreateMutex(NULL, FALSE, name)))
 	{
 		zbx_error("Error on mutex creating. [%s]", strerror_from_system(GetLastError()));
 		return ZBX_MUTEX_ERROR;
 	}
 
 #else /* not _WINDOWS */
-
+	int	i;
 	key_t	sem_key;
-	int	sem_id;
 	union semun semopts;
+	struct semid_ds seminfo;
 
-	/* !!! ignore "name" !!! */
+	zbx_error("Semaphore [%i] init", name); /* TEMP !!! */
+
 	if( -1 == (sem_key = ftok(CONFIG_FILE, (int)'z') ))
 	{
 		zbx_error("Can not create IPC key for path '%s', try to create for path '.' [%s]", CONFIG_FILE, strerror(errno));
@@ -83,17 +85,53 @@ int zbx_mutex_create(ZBX_MUTEX *mutex, char *name)
 		}
 	}			
 
-	if ( -1 == (sem_id = semget(sem_key, 1, IPC_CREAT | /* 0022 */ 0666)) )
+	if ( 0 <= (ZBX_SEM_LIST_ID = semget(sem_key, ZBX_MUTEX_COUNT, IPC_CREAT | IPC_EXCL | 0666 /* 0022 */)) )
+	{
+		/* set default semaphore value */
+		for ( i = 0, semopts.val = 1; i < ZBX_MUTEX_COUNT; semctl(ZBX_SEM_LIST_ID, i++, SETVAL, semopts) );
+
+		zbx_mutex_lock(&name);		/* call semop to update sem_otime */
+		zbx_mutex_unlock(&name);	/* release semaphore */
+
+		/* TEMP!!! check sem_otime
+		semopts.buf = &seminfo;
+		semctl(ZBX_SEM_LIST_ID, name, IPC_STAT, semopts);
+		zbx_error("Semaphore [%i,%i] initialized", name, semopts.buf->sem_otime);
+		*/
+	}
+	else if(errno == EEXIST)
+	{
+		ZBX_SEM_LIST_ID = semget(sem_key, ZBX_MUTEX_COUNT, 0666 /* 0022 */);
+		semopts.buf = &seminfo;
+		/*
+		semctl(ZBX_SEM_LIST_ID, name, IPC_STAT, semopts);
+		if(semopts.buf->sem_otime ==0 )
+		{
+			for ( i = 0, semopts.val = 1; i < ZBX_MUTEX_COUNT; semctl(ZBX_SEM_LIST_ID, i++, SETVAL, semopts) );
+		}
+		*/
+		
+		/* wait for initialization */
+		for ( i = 0; i < ZBX_MUTEX_MAX_TRIES; i++)
+		{
+			semctl(ZBX_SEM_LIST_ID, name, IPC_STAT, semopts);
+			zbx_error("sem_otime: %d,%d", semopts.buf->sem_otime, semopts.buf->sem_nsems);/* TEMP!!! */
+			if(semopts.buf->sem_otime !=0 ) goto lbl_return;
+			zbx_sleep(1);
+		}
+		
+		zbx_error("Semaphore [%i] not initialized", name);
+		return ZBX_MUTEX_ERROR;
+	}
+	else
 	{
 		zbx_error("Can not create Semaphore [%s]", strerror(errno));
 		return ZBX_MUTEX_ERROR;
 	}
+	
+lbl_return:
 
-	/* set default semaphore value */
-	semopts.val = 1;
-	semctl(sem_id, 0, SETVAL, semopts);
-
-	*mutex = sem_id;
+	*mutex = name;
 	
 #endif /* _WINDOWS */
 
@@ -132,11 +170,11 @@ int zbx_mutex_lock(ZBX_MUTEX *mutex)
 
 #else /* not _WINDOWS */
 
-	struct sembuf sem_lock = { 0, -1, 0 };
+	struct sembuf sem_lock = { *mutex, -1, 0 };
 
 	if(!*mutex) return ZBX_MUTEX_OK;
 	
-	if (-1 == (semop(*mutex, &sem_lock, 1)))
+	if (-1 == (semop(ZBX_SEM_LIST_ID, &sem_lock, 1)))
 	{
 		zbx_error("Lock failed [%s]", strerror(errno));
 		return ZBX_MUTEX_ERROR;
@@ -179,11 +217,11 @@ int zbx_mutex_unlock(ZBX_MUTEX *mutex)
 
 #else /* not _WINDOWS */
 
-	struct sembuf sem_unlock = { 0, 1, 0};
+	struct sembuf sem_unlock = { *mutex, 1, 0};
 
 	if(!*mutex) return ZBX_MUTEX_OK;
 
-	if ((semop(*mutex, &sem_unlock, 1)) == -1)
+	if ((semop(ZBX_SEM_LIST_ID, &sem_unlock, 1)) == -1)
 	{
 		zbx_error("Unlock failed [%s]", strerror(errno));
 		return ZBX_MUTEX_ERROR;
@@ -227,7 +265,7 @@ int zbx_mutex_destroy(ZBX_MUTEX *mutex)
 	
 	if(!*mutex) return ZBX_MUTEX_OK;
 
-	semctl(*mutex, 0, IPC_RMID, 0);
+	semctl(ZBX_SEM_LIST_ID, 0, IPC_RMID, 0);
 
 #endif /* _WINDOWS */
 	

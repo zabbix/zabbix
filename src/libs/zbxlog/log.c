@@ -82,7 +82,7 @@ int zabbix_open_log(int type, int level, const char *filename)
 			return	FAIL;
 		}
 
-		if(ZBX_MUTEX_ERROR == zbx_mutex_create(&log_file_access, "log"))
+		if(ZBX_MUTEX_ERROR == zbx_mutex_create(&log_file_access, ZBX_MUTEX_LOG))
 		{
 			zbx_error("Unable to create mutex for log file");
 			return	FAIL;
@@ -102,7 +102,7 @@ int zabbix_open_log(int type, int level, const char *filename)
 	{
 		/* Not supported logging type */
 
-		if(ZBX_MUTEX_ERROR == zbx_mutex_create(&log_file_access, "log"))
+		if(ZBX_MUTEX_ERROR == zbx_mutex_create(&log_file_access, ZBX_MUTEX_LOG))
 		{
 			zbx_error("Unable to create mutex for log file");
 			return	FAIL;
