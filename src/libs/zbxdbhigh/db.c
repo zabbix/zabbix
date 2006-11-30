@@ -34,7 +34,8 @@
 #include "common.h"
 
 #ifdef	HAVE_SQLITE3
-	sqlite3	*sqlite;
+	int		sqlite_transaction_started = 0;
+	sqlite3		*sqlite;
 	ZBX_MUTEX	sqlite_access;
 #endif
 
@@ -67,6 +68,7 @@ void	DBclose(void)
 	sqlo_finish(oracle);
 #endif
 #ifdef	HAVE_SQLITE3
+	sqlite_transaction_started = 0;
 	sqlite3_close(sqlite);
 #endif
 }
@@ -156,7 +158,7 @@ void    DBconnect(void)
 		exit(FAIL);
 	}
 
-
+	sqlite_transaction_started = 0;
 #endif
 }
 
@@ -182,6 +184,10 @@ void DBbegin(void)
 //	DBexecute("begin;");
 #endif
 #ifdef	HAVE_SQLITE3
+	zbx_mutex_lock(&sqlite_access);
+
+	sqlite_transaction_started = 1;
+	
 	DBexecute("begin;");
 #endif
 }
@@ -209,6 +215,10 @@ void DBcommit(void)
 #endif
 #ifdef	HAVE_SQLITE3
 	DBexecute("commit;");
+
+	sqlite_transaction_started = 0;
+
+	zbx_mutex_unlock(&sqlite_access);
 #endif
 }
 
@@ -231,6 +241,10 @@ void DBrollback(void)
 {
 #ifdef	HAVE_SQLITE3
 	DBexecute("rollback;");
+
+	sqlite_transaction_started = 1;
+
+	zbx_mutex_unlock(&sqlite_access);
 #endif
 }
 
@@ -305,17 +319,27 @@ int DBexecute(const char *fmt, ...)
 	return ret;
 #endif
 #ifdef	HAVE_SQLITE3
-	zbx_mutex_lock(&sqlite_access);
+	if(!sqlite_transaction_started)
+	{
+		zbx_mutex_lock(&sqlite_access);
+	}
 
 	if(SQLITE_OK != (sql_ret = sqlite3_exec(sqlite, sql, NULL, 0, &error)))
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",sql);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed [%i]:%s", sql_ret, error);
 		sqlite3_free(error);
+		if(!sqlite_transaction_started)
+		{
+			zbx_mutex_unlock(&sqlite_access);
+		}
 		ret = FAIL;
 	}
 
-	zbx_mutex_unlock(&sqlite_access);
+	if(!sqlite_transaction_started)
+	{
+		zbx_mutex_unlock(&sqlite_access);
+	}
 	return ret;
 #endif
 }
@@ -513,7 +537,10 @@ DB_RESULT DBselect(const char *fmt, ...)
 	return sth;
 #endif
 #ifdef HAVE_SQLITE3
-	zbx_mutex_lock(&sqlite_access);
+	if(!sqlite_transaction_started)
+	{
+		zbx_mutex_lock(&sqlite_access);
+	}
 
 	result = malloc(sizeof(ZBX_SQ_DB_RESULT));
 	result->curow = 0;
@@ -523,11 +550,17 @@ DB_RESULT DBselect(const char *fmt, ...)
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",sql);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed [%i]:%s", sql_ret, error);
 		sqlite3_free(error);
-		zbx_mutex_unlock(&sqlite_access);
+		if(!sqlite_transaction_started)
+		{
+			zbx_mutex_unlock(&sqlite_access);
+		}
 		exit(FAIL);
 	}
 
-	zbx_mutex_unlock(&sqlite_access);
+	if(!sqlite_transaction_started)
+	{
+		zbx_mutex_unlock(&sqlite_access);
+	}
 	return result;
 #endif
 }
