@@ -323,9 +323,12 @@ int DBexecute(const char *fmt, ...)
 	{
 		zbx_mutex_lock(&sqlite_access);
 	}
-
+	
+lbl_exec:
 	if(SQLITE_OK != (sql_ret = sqlite3_exec(sqlite, sql, NULL, 0, &error)))
 	{
+		if(sql_ret == SQLITE_BUSY) goto lbl_exec; /* attention deadlock!!! */
+		
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",sql);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed [%i]:%s", sql_ret, error);
 		sqlite3_free(error);
@@ -545,8 +548,11 @@ DB_RESULT DBselect(const char *fmt, ...)
 	result = malloc(sizeof(ZBX_SQ_DB_RESULT));
 	result->curow = 0;
 
+lbl_get_table:
 	if(SQLITE_OK != (sql_ret = sqlite3_get_table(sqlite,sql,&result->data,&result->nrow, &result->ncolumn, &error)))
 	{
+		if(sql_ret == SQLITE_BUSY) goto lbl_get_table; /* attention deadlock!!! */
+		
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",sql);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed [%i]:%s", sql_ret, error);
 		sqlite3_free(error);
