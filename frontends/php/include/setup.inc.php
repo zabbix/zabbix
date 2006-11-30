@@ -439,6 +439,7 @@
 									new CSpan(S_FAIL,'fail')
 										));
 
+			/*
 			$table->AddRow(array('Table creation:',  $this->GetConfig('ZBX_TABLES_CREATED', false) ? 
 									new CSpan(S_OK,'ok') :
 									new CSpan(S_FAIL,'fail')
@@ -448,6 +449,7 @@
 									new CSpan(S_OK,'ok') :
 									new CSpan(S_FAIL,'fail')
 										));
+			*/
 
 			return array(
 				$table, BR,
@@ -456,7 +458,7 @@
 					array('Please install configuration file manualy.',BR,BR,
 						'By pressing "Save configuration file" button download configuration file ',
 						'and place them into the ',BR,
-						'"'.(dirname($_SERVER['SCRIPT_FILENAME']).'/'.$ZBX_CONFIGURATION_FILE).'"',BR,BR,
+						'"'.realpath($ZBX_CONFIGURATION_FILE).'"',BR,BR,
 						new CButton('save_config',"Save configuration file"),
 						BR,BR
 						)
@@ -499,6 +501,7 @@
 			return $result;
 		}
 		
+		/*
 		function CreateTables()
 		{
 			global $ZBX_CONFIGURATION_FILE;
@@ -540,7 +543,9 @@
 
 			return !isset($error);
 		}
+		*/
 
+		/*
 		function LoadData()
 		{
 			global $ZBX_CONFIGURATION_FILE;
@@ -580,6 +585,7 @@
 
 			return !isset($error);
 		}
+		*/
 
 		function CheckConfigurationFile()
 		{
@@ -699,6 +705,7 @@
 			{
 				$this->SetConfig('ZBX_CONFIG_FILE_CORRECT', $this->CheckConfigurationFile());
 				
+				/*
 				if($this->GetConfig('ZBX_CONFIG_FILE_CORRECT', false) && !$this->GetConfig('ZBX_TABLES_CREATED', false))
 				{
 					$this->SetConfig('ZBX_TABLES_CREATED', $this->CreateTables());
@@ -708,9 +715,10 @@
 				{
 					$this->SetConfig('ZBX_DATA_LOADED', $this->LoadData());
 				}
+				*/
 
-				if(!$this->GetConfig('ZBX_TABLES_CREATED', false) ||
-					!$this->GetConfig('ZBX_DATA_LOADED', false) ||
+				if(/*!$this->GetConfig('ZBX_TABLES_CREATED', false) ||
+					!$this->GetConfig('ZBX_DATA_LOADED', false) || */
 					!$this->GetConfig('ZBX_CONFIG_FILE_CORRECT', false))
 				{
 					$this->DISABLE_NEXT_BUTTON = true;
@@ -722,7 +730,7 @@
 
 					/* Make zabbix.conf.php downloadable */
 					header('Content-Type: application/x-httpd-php');
-					header('Content-Disposition: attachment; filename="'.$ZBX_CONFIGURATION_FILE.'"');
+					header('Content-Disposition: attachment; filename="'.basename($ZBX_CONFIGURATION_FILE).'"');
 					die(
 '<?php
 /* 
