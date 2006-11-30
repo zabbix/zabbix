@@ -74,9 +74,10 @@
 static int calculate_checksums()
 {
 
-	char	sql[64000];
-	char	tmp[MAX_STRING_LEN];
-	char	fields[MAX_STRING_LEN];
+	char	*sql;
+	int	sql_allocated=64*1024, sql_offset=0;
+//	char	tmp[MAX_STRING_LEN];
+//	char	fields[MAX_STRING_LEN];
 
 	int	i = 0;
 	int	j;
@@ -90,20 +91,24 @@ static int calculate_checksums()
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In calculate_checksums");
 
+	sql=malloc(sql_allocated);
+
 	DBbegin();
 
 	DBexecute("delete from node_cksum where cksumtype=%d", NODE_CKSUM_TYPE_NEW);
 	// insert into node_cksum (select NULL,0,'items','itemid',itemid,0,md5(concat(key_)) as md5 from items);
 
 	/* Select all nodes */
-	zbx_snprintf(sql,sizeof(sql),"select nodeid from nodes");
-	result =DBselect(sql);
+	result =DBselect("select nodeid from nodes");
 	while((row=DBfetch(result)))
 	{
 		now  = time(NULL);
 		nodeid = atoi(row[0]);
 
-		zbx_snprintf(sql,sizeof(sql),"select 'table                  ','field                ',itemid, '012345678901234' from items where 1=0\n");
+		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
+				"select 'table                  ','field                ',itemid, '012345678901234' from items where 1=0\n");
+
+//		zbx_snprintf(sql,sizeof(sql),"select 'table                  ','field                ',itemid, '012345678901234' from items where 1=0\n");
 
 		for(i=0;tables[i].table!=0;i++)
 		{
@@ -111,8 +116,16 @@ static int calculate_checksums()
 			/* Do not sync some of tables */
 			if( (tables[i].flags & ZBX_SYNC) ==0)	continue;
 
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 4096,
+#ifdef	HAVE_MYSQL
+					"union all select '%s','%s',%s,md5(concat(",
+#else
+					"union all select '%s','%s',%s,md5(",
+#endif
+					tables[i].table, tables[i].recid, tables[i].recid);
+
 			j=0;
-			fields[0]=0;
+//			fields[0]=0;
 			while(tables[i].fields[j].name != 0)
 			{
 //				zabbix_log( LOG_LEVEL_WARNING, "In calculate_checksums2 [%s,%s]", tables[i].table,tables[i].fields[j].name );
@@ -122,20 +135,42 @@ static int calculate_checksums()
 					j++;
 					continue;
 				}
-				zbx_strlcat(fields,"quote(",sizeof(fields));
-				zbx_strlcat(fields,tables[i].fields[j].name,sizeof(fields));
-				zbx_strlcat(fields,"),",sizeof(fields));
+#ifdef	HAVE_MYSQL
+				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, "coalesce(%s,'1234567890'),", tables[i].fields[j].name);
+#else
+				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, "coalesce(%s,'1234567890')||", tables[i].fields[j].name);
+#endif
+//				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 4096, "quote(%s),", tables[i].fields[j].name);
+//				zbx_strlcat(fields,"quote(",sizeof(fields));
+//				zbx_strlcat(fields,tables[i].fields[j].name,sizeof(fields));
+//				zbx_strlcat(fields,"),",sizeof(fields));
 				j++;
 			}
-			if(fields[0]!=0)	fields[strlen(fields)-1] = 0;
+#ifdef	HAVE_MYSQL
+			if(j>0)			sql_offset--; // Remove last ,
+#else
+			if(j>0)			sql_offset-=2; // Remove last ||
+#endif
+
+//			if(fields[0]!=0)	fields[strlen(fields)-1] = 0;
 
 			// select table,recid,md5(fields) from table union all ...
-			zbx_snprintf(tmp,sizeof(tmp),"union all select '%s','%s',%s,md5(concat(%s)) from %s where %s>=" ZBX_FS_UI64 " and %s<=" ZBX_FS_UI64 "\n",
-					tables[i].table, tables[i].recid, tables[i].recid, fields, tables[i].table,
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 4096,
+#ifdef	HAVE_MYSQL
+					")) from %s where %s>=" ZBX_FS_UI64 " and %s<=" ZBX_FS_UI64 "\n",
+#else
+					") from %s where %s>=" ZBX_FS_UI64 " and %s<=" ZBX_FS_UI64 "\n",
+#endif
+					tables[i].table,
 					tables[i].recid, (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid,
 					tables[i].recid, (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid+__UINT64_C(99999999999999));
+
+//			zbx_snprintf(tmp,sizeof(tmp),"union all select '%s','%s',%s,md5(concat(%s)) from %s where %s>=" ZBX_FS_UI64 " and %s<=" ZBX_FS_UI64 "\n",
+//					tables[i].table, tables[i].recid, tables[i].recid, fields, tables[i].table,
+//					tables[i].recid, (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid,
+//					tables[i].recid, (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid+__UINT64_C(99999999999999));
 //		zabbix_log( LOG_LEVEL_WARNING, "TMP [%s]", tmp);
-			zbx_strlcat(sql,tmp,sizeof(sql));
+//			zbx_strlcat(sql,tmp,sizeof(sql));
 		}
 //		zabbix_log( LOG_LEVEL_WARNING, "SQL [%s]", sql);
 
@@ -159,6 +194,8 @@ static int calculate_checksums()
 	DBfree_result(result);
 
 	DBcommit();
+
+	free(sql);
 
 	return SUCCEED;
 }
