@@ -4,9 +4,8 @@
 # Copyright (C) 2000-2005 SIA Zabbix
 #
 # This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
+# it under the terms of the GNU General Public License version 2 as
+# published by the Free Software Foundation
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -26,7 +25,11 @@ close(INFO);			# Close the file
 
 local $output;
 
-%mysql=("t_bigint"	=>	"bigint unsigned",
+%mysql=(
+	"type"		=>	"sql",
+	"before"	=>	"",
+	"after"		=>	"",
+	"t_bigint"	=>	"bigint unsigned",
 	"t_id"		=>	"bigint unsigned",
 	"t_integer"	=>	"integer",
 	"t_time"	=>	"integer",
@@ -40,7 +43,47 @@ local $output;
 	"t_blob"	=>	"blob"
 );
 
+%c=(	"type"		=>	"code",
+	"after"		=>	"\t{0}\n};\n",
+	"t_bigint"	=>	"ZBX_TYPE_UINT",
+	"t_id"		=>	"ZBX_TYPE_UINT",
+	"t_integer"	=>	"ZBX_TYPE_INT",
+	"t_time"	=>	"ZBX_TYPE_INT",
+	"t_serial"	=>	"ZBX_TYPE_UINT",
+	"t_double"	=>	"ZBX_TYPE_FLOAT",
+	"t_varchar"	=>	"ZBX_TYPE_CHAR",
+	"t_char"	=>	"ZBX_TYPE_CHAR",
+	"t_image"	=>	"ZBX_TYPE_BLOB",
+	"t_history_log"	=>	"ZBX_TYPE_TEXT",
+	"t_history_text"=>	"ZBX_TYPE_TEXT",
+	"t_blob"	=>	"ZBX_TYPE_BLOB"
+);
+
+$c{"before"}="
+#define ZBX_FIELD struct zbx_field_type
+ZBX_FIELD
+{
+	char    *name;
+	int	type;
+	int	flags;
+};
+
+#define ZBX_TABLE struct zbx_table_type
+ZBX_TABLE
+{
+	char    	*table;
+	char		*recid;
+	int		flags;
+	ZBX_FIELD	fields[64];
+};
+
+static	ZBX_TABLE	tables[]={
+";
+
 %oracle=("t_bigint"	=>	"bigint",
+	"before"	=>	"",
+	"after"		=>	"",
+	"type"		=>	"sql",
 	"t_id"		=>	"bigint",
 	"t_integer"	=>	"integer",
 	"t_serial"	=>	"serial",
@@ -54,6 +97,9 @@ local $output;
 );
 
 %postgresql=("t_bigint"	=>	"bigint",
+	"before"	=>	"",
+	"after"		=>	"",
+	"type"		=>	"sql",
 	"t_id"		=>	"bigint",
 	"t_integer"	=>	"integer",
 	"t_serial"	=>	"serial",
@@ -68,6 +114,9 @@ local $output;
 );
 
 %sqlite=("t_bigint"	=>	"bigint",
+	"before"	=>	"",
+	"after"		=>	"",
+	"type"		=>	"sql",
 	"t_id"		=>	"bigint",
 	"t_integer"	=>	"integer",
 	"t_serial"	=>	"serial",
@@ -80,12 +129,6 @@ local $output;
 	"t_blob"	=>	"blob"
 );
 
-%all=(	"mysql"		=>	%mysql,
-	"oracle"	=>	%oracle,
-	"postgresql"	=>	%postgresql,
-	"sqlite"	=>	%sqlite,
-);
-
 sub newstate
 {
 	local $new=$_[0];
@@ -93,14 +136,18 @@ sub newstate
 	switch ($state)
 	{
 		case "field"	{
-			if($new eq "index") { print $pkey; }
-			if($new eq "table") { print $pkey; }
+			if($output{"type"} eq "sql" && $new eq "index") { print $pkey; }
+			if($output{"type"} eq "sql" && $new eq "table") { print $pkey; }
+			if($output{"type"} eq "code" && $new eq "table") { print ",\n\t\t{0}\n\t\t}\n\t},\n"; }
 			if($new eq "field") { print ",\n" }
 		}
 		case "index"	{
-			if($new eq "table") { print "\n" }
+			if($output{"type"} eq "sql" && $new eq "table") { print "\n"; }
+			if($output{"type"} eq "code" && $new eq "table") { print ",\n\t\t{0}\n\t\t}\n\t},\n"; }
 		}
-		case "table"	{ print ""; }
+	 	case "table"	{
+			print "";
+		}
 	}
 	$state=$new;
 }
@@ -111,9 +158,22 @@ sub process_table
 
 	newstate("table");
 	($table_name,$pkey,$flags)=split(/\|/, $line,4);
-	if($pkey ne "")	{ $pkey=",\n\tPRIMARY KEY ($pkey)\n);\n" }
-	else { $pkey="\n);\n"; }
-	print "CREATE TABLE $table_name (\n";
+
+	if($output{"type"} eq "code")
+	{
+#	        {"services",    "serviceid",    ZBX_SYNC,
+		if($flags eq "")
+		{
+			$flags="0";
+		}
+		print "\t{\"${table_name}\",\t\"${pkey}\",\t${flags},\n\t\t{\n";
+	}
+	else
+	{
+		if($pkey ne "")	{ $pkey=",\n\tPRIMARY KEY ($pkey)\n);\n" }
+		else { $pkey="\n);\n"; }
+		print "CREATE TABLE $table_name (\n";
+	}
 }
 
 sub process_field
@@ -123,12 +183,25 @@ sub process_field
 	newstate("field");
 	($name,$type,$default,$null,$flags)=split(/\|/, $line,5);
 	($type_short)=split(/\(/, $type,2);
-	$a=$output{$type_short};
-	$_=$type;
-	s/$type_short/$a/g;
-	$type_2=$_;
-	if($default ne "")	{ $default="DEFAULT $default"; }
-	print "\t$name\t\t$type_2\t\t$default\t$null";
+	if($output{"type"} eq "code")
+	{
+		$type=$output{$type_short};
+#{"linkid",      ZBX_TYPE_INT,   ZBX_SYNC},
+		if($flags eq "")
+		{
+			$flags="0";
+		}
+		print "\t\t{\"${name}\",\t$type,\t${flags}}";
+	}
+	else
+	{
+		$a=$output{$type_short};
+		$_=$type;
+		s/$type_short/$a/g;
+		$type_2=$_;
+		if($default ne "")	{ $default="DEFAULT $default"; }
+		print "\t$name\t\t$type_2\t\t$default\t$null";
+	}
 }
 
 sub process_index
@@ -137,6 +210,12 @@ sub process_index
 	local $unique=$_[1];
 
 	newstate("index");
+
+	if($output{"type"} eq "code")
+	{
+		return;
+	}
+
 	($name,$fields)=split(/\|/, $line,2);
 	if($unique == 1)
 	{
@@ -150,8 +229,8 @@ sub process_index
 
 sub usage
 {
-	printf "Usage: gen.pl [mysql|oracle|postgresql|sqlite]\n";
-	printf "The script generates ZABBIX SQL schemas for different database engines.\n";
+	printf "Usage: gen.pl [c|mysql|oracle|php|postgresql|sqlite]\n";
+	printf "The script generates ZABBIX SQL schemas and C/PHP code for different database engines.\n";
 	exit;
 }
 
@@ -164,12 +243,16 @@ sub main
 
 	$format=$ARGV[0];
 	switch ($format) {
+		case "c"		{ %output=%c; }
 		case "mysql"		{ %output=%mysql; }
 		case "oracle"		{ %output=%oracle; }
+		case "php"		{ %output=%php; }
 		case "postgresql"	{ %output=%postgresql; }
 		case "sqlite"		{ %output=%sqlite; }
 		else			{ usage(); }
 	}
+
+	print $output{"before"};
 
 	foreach $line (@lines)
 	{
@@ -188,8 +271,9 @@ sub main
 			case "FIELD"	{ process_field($line); }
 		}
 	}
+
 }
 
 main();
-
 newstate("table");
+print $output{"after"};
