@@ -231,7 +231,6 @@
 
 /* Flags */
 #define	ZBX_SYNC	1
-#define	ZBX_NOSYNC	2
 
 /* Types of nodes */
 #define	ZBX_NODE_TYPE_REMOTE	0
