@@ -73,15 +73,17 @@ char *help_message[] = {
         "Options:",
         "  -c <file>       Specify configuration file",
         "  -h              give this help",
+        "  -n <nodeid>     covert database data to new nodeid",
         "  -v              display version number",
         0 /* end of text */
 };
 #else
 char *help_message[] = {
         "Options:",
-        "  -c --config <file>    Specify configuration file",
-        "  -h --help             give this help",
-        "  -v --version          display version number",
+        "  -c --config <file>       Specify configuration file",
+        "  -h --help                give this help",
+        "  -n --new-nodeid <nodeid> covert database data to new nodeid",
+        "  -v --version             display version number",
         0 /* end of text */
 };
 #endif
@@ -90,6 +92,7 @@ struct option longopts[] =
 {
 	{"config",	1,	0,	'c'},
 	{"help",	0,	0,	'h'},
+	{"new-nodeid",	0,	0,	'n'},
 	{"version",	0,	0,	'v'},
 	{0,0,0,0}
 };
@@ -351,6 +354,8 @@ int main(int argc, char **argv)
 {
 	int	ch;
 
+	zbx_uint64_t	nodeid;
+
 #ifdef HAVE_ZZZ
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -393,13 +398,19 @@ int main(int argc, char **argv)
 	progname = argv[0];
 
 /* Parse the command-line. */
-	while ((ch = getopt_long(argc, argv, "c:hv",longopts,NULL)) != EOF)
+	while ((ch = getopt_long(argc, argv, "cn:hv",longopts,NULL)) != EOF)
 	switch ((char) ch) {
 		case 'c':
 			CONFIG_FILE = optarg;
 			break;
 		case 'h':
 			help();
+			exit(-1);
+			break;
+		case 'n':
+			printf("[%s]\n", optarg);
+			ZBX_STR2UINT64(nodeid,optarg);
+			change_nodeid(0,nodeid);
 			exit(-1);
 			break;
 		case 'v':
