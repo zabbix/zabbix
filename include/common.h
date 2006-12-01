@@ -221,6 +221,7 @@
 #define	ZBX_TYPE_BLOB	3
 #define	ZBX_TYPE_TEXT	4
 #define	ZBX_TYPE_UINT	5
+#define	ZBX_TYPE_ID	6
 
 /* Flags for node history exchange */
 #define	ZBX_TABLE_HISTORY	0
