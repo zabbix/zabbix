@@ -56,10 +56,10 @@
 				1 => array('title' => '2. Licence Agreement'		, 'fnc' => 'Stage1' ),
 				2 => array('title' => '3. Check of pre-requisites'	, 'fnc' => 'Stage2' ),
 				3 => array('title' => '4. Configure DB connection'	, 'fnc' => 'Stage3' ),
-				4 => array('title' => '5. Distributed monitoring'	, 'fnc' => 'Stage4' ),
-				5 => array('title' => '6. Pre-Installation Summary'	, 'fnc' => 'Stage5' ),
-				6 => array('title' => '7. Install'			, 'fnc' => 'Stage6' ),
-				7 => array('title' => '8. Finish'			, 'fnc' => 'Stage7' )
+				//4 => array('title' => '5. Distributed monitoring'	, 'fnc' => 'Stage4' ),
+				4 => array('title' => '5. Pre-Installation Summary'	, 'fnc' => 'Stage5' ),
+				5 => array('title' => '6. Install'			, 'fnc' => 'Stage6' ),
+				6 => array('title' => '7. Finish'			, 'fnc' => 'Stage7' )
 				);
 			
 			$this->EventHandler();
@@ -350,7 +350,7 @@
 				new  CButton('retry', 'Test connection')
 				);
 		}
-		
+		/*
 		function Stage4()
 		{
 			global $_SERVER;
@@ -387,6 +387,7 @@
 				$table
 				), 'text');
 		}
+		*/
 		
 		function Stage5()
 		{
@@ -672,6 +673,7 @@
 				if(isset($_REQUEST['next'][$this->GetStep()]))		$this->DoNext();
 			}
 
+			/*
 			if($this->GetStep() == 4)
 			{
 				if(!isset($_REQUEST['next'][3]) && !isset($_REQUEST['back'][5]))
@@ -695,13 +697,14 @@
 					$this->SetConfig('nodeid', null);
 				}
 			}
+			*/
 
-			if($this->GetStep() == 5 && isset($_REQUEST['next'][$this->GetStep()]))
+			if($this->GetStep() == 4 && isset($_REQUEST['next'][$this->GetStep()]))
 			{
 				$this->DoNext();
 			}
 
-			if($this->GetStep() == 6)
+			if($this->GetStep() == 5)
 			{
 				$this->SetConfig('ZBX_CONFIG_FILE_CORRECT', $this->CheckConfigurationFile());
 				
