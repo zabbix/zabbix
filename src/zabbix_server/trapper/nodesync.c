@@ -130,7 +130,7 @@ static int	process_record(int nodeid, char *record)
 			}
 			else
 			{
-				if(valuetype == ZBX_TYPE_INT || valuetype == ZBX_TYPE_UINT)
+				if(valuetype == ZBX_TYPE_INT || valuetype == ZBX_TYPE_UINT || ZBX_TYPE_ID)
 				{
 					zbx_snprintf(tmp,sizeof(tmp),"%s=%s,", fieldname, value);
 					zbx_strlcat(fields_update,tmp,sizeof(fields));

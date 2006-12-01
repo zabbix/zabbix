@@ -3,7 +3,6 @@ bin/win32/zabbix_agentd.exe -text
 bin/win64/zabbix_agentd.exe -text
 build/win32/project/zabbix_agentd.dsp -text
 build/win32/project/zabbix_agentd.dsw -text
-create/data/change_nodeid.sh -text
 create/data/images/Hub.png -text svneol=unset#unset
 create/data/images/Hub_small.png -text svneol=unset#unset
 create/data/images/Network.png -text svneol=unset#unset
@@ -128,6 +127,9 @@ src/zabbix_server/trapper/nodehistory.c -text
 src/zabbix_server/trapper/nodehistory.h -text
 src/zabbix_server/trapper/nodesync.c -text
 src/zabbix_server/trapper/nodesync.h -text
+src/zabbix_server/utils/Makefile.am -text
+src/zabbix_server/utils/nodechange.c -text
+src/zabbix_server/utils/nodechange.h -text
 upgrades/dbpatches/1.0_to_1.1alpha1/mysql/Hub.png -text svneol=unset#unset
 upgrades/dbpatches/1.0_to_1.1alpha1/mysql/Hub_small.png -text svneol=unset#unset
 upgrades/dbpatches/1.0_to_1.1alpha1/mysql/Network.png -text svneol=unset#unset

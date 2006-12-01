@@ -46,7 +46,7 @@ local $output;
 %c=(	"type"		=>	"code",
 	"after"		=>	"\t{0}\n};\n",
 	"t_bigint"	=>	"ZBX_TYPE_UINT",
-	"t_id"		=>	"ZBX_TYPE_UINT",
+	"t_id"		=>	"ZBX_TYPE_ID",
 	"t_integer"	=>	"ZBX_TYPE_INT",
 	"t_time"	=>	"ZBX_TYPE_INT",
 	"t_serial"	=>	"ZBX_TYPE_UINT",
