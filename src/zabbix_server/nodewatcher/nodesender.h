@@ -21,5 +21,6 @@
 #define ZABBIX_NODESENDER_H
 
 void main_nodesender();
+int get_master_node(int nodeid);
 
 #endif
