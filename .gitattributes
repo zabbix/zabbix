@@ -30,7 +30,6 @@ create/data/nodes_slave.sql -text
 create/data/recreate.sh -text
 create/schema/gen.pl -text
 create/schema/schema.sql -text
-create/schema/schema_new.sql -text
 frontends/php/audio/trigger_off.wav -text
 frontends/php/audio/trigger_on.wav -text
 frontends/php/audio/trigger_on_average.wav -text

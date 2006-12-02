@@ -18,7 +18,7 @@
 
 use Switch;
 
-$file = 'schema_new.sql';	# Name the file
+$file = 'schema.sql';		# Name the file
 open(INFO, $file);		# Open the file
 @lines = <INFO>;		# Read it into an array
 close(INFO);			# Close the file
