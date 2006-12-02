@@ -26,6 +26,6 @@ extern	int	CONFIG_TIMEOUT;
 
 extern	void	signal_handler( int sig );
 
-pid_t	child_trapper_make(int i,int listenfd, int addrlen);
+void    child_trapper_main(int i,int listenfd, int addrlen);
 
 #endif

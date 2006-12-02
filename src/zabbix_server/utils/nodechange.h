@@ -17,9 +17,9 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#ifndef ZABBIX_NODEWATCHER_H
-#define ZABBIX_NODEWATCHER_H
+#ifndef ZABBIX_NODECHANGE_H
+#define ZABBIX_NODECHANGE_H
 
-int main_nodewatcher_loop();
+int change_nodeid(int old_id, int new_id);
 
 #endif

@@ -50,6 +50,7 @@
 #include "zlog.h"
 
 #include "nodecomms.h"
+#include "nodesender.h"
 #include "events.h"
 
 #define	ZBX_NODE_MASTER	0

@@ -339,6 +339,7 @@ void	child_trapper_main(int i,int listenfd, int addrlen)
 	DBclose();
 }
 
+/*
 pid_t	child_trapper_make(int i,int listenfd, int addrlen)
 {
 	pid_t	pid;
@@ -348,9 +349,7 @@ pid_t	child_trapper_make(int i,int listenfd, int addrlen)
 		return (pid);
 	}
 
-	/* never returns */
 	child_trapper_main(i, listenfd, addrlen);
 
-	/* avoid compilator warning */
 	return 0;
-}
+}*/
