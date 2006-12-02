@@ -54,7 +54,7 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int convert_trigger_expression(zbx_uint64_t old_id, zbx_uint64_t new_id, char *old_exp, char *new_exp)
+static int convert_trigger_expression(int old_id, int new_id, char *old_exp, char *new_exp)
 {
 	int	i;
 	char	id[MAX_STRING_LEN];
@@ -117,7 +117,7 @@ static int convert_trigger_expression(zbx_uint64_t old_id, zbx_uint64_t new_id, 
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int change_nodeid(zbx_uint64_t old_id, zbx_uint64_t new_id)
+int change_nodeid(int old_id, int new_id)
 {
 	int i,j;
 	DB_RESULT	result;
@@ -128,6 +128,12 @@ int change_nodeid(zbx_uint64_t old_id, zbx_uint64_t new_id)
 	if(old_id!=0)
 	{
 		printf("Conversion from non-zero node id is not supported.\n");
+		return FAIL;
+	}
+
+	if(new_id>999 || new_id<0)
+	{
+		printf("Node ID must be in range of 0-999.\n");
 		return FAIL;
 	}
 

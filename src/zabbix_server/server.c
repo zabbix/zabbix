@@ -354,7 +354,7 @@ int main(int argc, char **argv)
 {
 	int	ch;
 
-	zbx_uint64_t	nodeid;
+	int	nodeid;
 
 #ifdef HAVE_ZZZ
 	DB_RESULT	result;
@@ -409,7 +409,7 @@ int main(int argc, char **argv)
 			break;
 		case 'n':
 			nodeid=0;
-			if(optarg)	ZBX_STR2UINT64(nodeid,optarg);
+			if(optarg)	nodeid = atoi(optarg);
 			change_nodeid(0,nodeid);
 			exit(-1);
 			break;
