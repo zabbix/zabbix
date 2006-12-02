@@ -44,6 +44,7 @@
 #include "zlog.h"
 
 #include "actions.h"
+#include "functions.h"
 #include "events.h"
 
 /******************************************************************************

@@ -18,8 +18,8 @@
 **/
 
 
-#ifndef ZABBIX_NODEEVENTS_H
-#define ZABBIX_NODEEVENTS_H
+#ifndef ZABBIX_NODEHISTORY_H
+#define ZABBIX_NODEHISTORY_H
 
 extern	int	CONFIG_NODEID;
 

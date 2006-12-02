@@ -61,6 +61,7 @@
 #include "timer/timer.h"
 #include "trapper/trapper.h"
 #include "nodewatcher/nodewatcher.h"
+#include "utils/nodechange.h"
 
 #define       LISTENQ 1024
 
