@@ -39,6 +39,70 @@
 
 /******************************************************************************
  *                                                                            *
+ * Function: convert_trigger_expression                                       *
+ *                                                                            *
+ * Purpose: convert trigger expression to new node ID                         *
+ *                                                                            *
+ * Parameters: old_id - old id, new_id - new node id                          *
+ *             old_exp - old expression, new_exp - new expression             *
+ *                                                                            *
+ * Return value: SUCCESS - converted succesfully                              * 
+ *               FAIL - an error occured                                      *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int convert_trigger_expression(zbx_uint64_t old_id, zbx_uint64_t new_id, char *old_exp, char *new_exp)
+{
+	int	i;
+	char	id[MAX_STRING_LEN];
+	enum	state_t {NORMAL, ID} state = NORMAL;
+	char	*p, *p_id;
+	zbx_uint64_t	tmp;
+
+	p = new_exp;
+
+	for(i=0;old_exp[i]!=0;i++)
+	{
+		if(state == ID)
+		{
+			if(old_exp[i]=='}')
+			{
+				state = NORMAL;
+				ZBX_STR2UINT64(tmp,id);
+				tmp+=(zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)new_id;
+				p+=zbx_snprintf(p,MAX_STRING_LEN,ZBX_FS_UI64, tmp);
+				p[0] = old_exp[i];
+				p++;
+			}
+			else
+			{
+				p_id[0] = old_exp[i];
+				p_id++;
+			}
+		}
+		else if(old_exp[i]=='{')
+		{
+			state = ID;
+			memset(id,0,MAX_STRING_LEN);
+			p_id = id;
+			p[0] = old_exp[i];
+			p++;
+		}
+		else
+		{
+			p[0] = old_exp[i];
+			p++;
+		}
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: change_nodeid                                                    *
  *                                                                            *
  * Purpose: convert database data to new node ID                              *
@@ -56,6 +120,10 @@
 int change_nodeid(zbx_uint64_t old_id, zbx_uint64_t new_id)
 {
 	int i,j;
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		new_expression[MAX_STRING_LEN];
+	char		new_expression_esc[MAX_STRING_LEN];
 
 	if(old_id!=0)
 	{
@@ -67,9 +135,13 @@ int change_nodeid(zbx_uint64_t old_id, zbx_uint64_t new_id)
 
 	DBconnect();
 
+	printf("Converting tables ");
+	fflush(stdout);
+
 	for(i=0;tables[i].table!=0;i++)
 	{
-		printf("Converting table %s...\n", tables[i].table);
+		printf(".");
+		fflush(stdout);
 
 		j=0;
 		while(tables[i].fields[j].name != 0)
@@ -83,8 +155,21 @@ int change_nodeid(zbx_uint64_t old_id, zbx_uint64_t new_id)
 			j++;
 		}
 	}
+/* Special processing for trigger expressions */
+
+	result=DBselect("select expression,triggerid from triggers");
+	while((row=DBfetch(result)))
+	{
+		memset(new_expression, 0, MAX_STRING_LEN);
+		convert_trigger_expression(old_id, new_id, row[0], new_expression);
+		DBescape_string(new_expression, new_expression_esc,MAX_STRING_LEN);
+		DBexecute("update triggers set expression='%s' where triggerid=%s",
+				new_expression_esc, row[1]);
+	}
+	DBfree_result(result);
+	
 	DBclose();
-	printf("Done.\n");
+	printf(" done.\n\nConversion completed.\n");
 
 	return SUCCEED;
 }

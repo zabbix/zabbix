@@ -1,5 +1,6 @@
 Changes for 1.3.1:
 
+ - support of "-n" flag for ZABBIX server: change Node ID (Alexei)
  - fixed configuration file creation and reading (Eugene)
  - removed database creation from installation scriop (Eugene)
  - fixed multiple mutex system (Eugene)
