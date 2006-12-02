@@ -408,8 +408,8 @@ int main(int argc, char **argv)
 			exit(-1);
 			break;
 		case 'n':
-			printf("[%s]\n", optarg);
-			ZBX_STR2UINT64(nodeid,optarg);
+			nodeid=0;
+			if(optarg)	ZBX_STR2UINT64(nodeid,optarg);
 			change_nodeid(0,nodeid);
 			exit(-1);
 			break;
