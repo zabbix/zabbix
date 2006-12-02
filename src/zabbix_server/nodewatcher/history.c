@@ -172,7 +172,7 @@ static int process_node_history_uint(int nodeid, int master_nodeid)
 
 	zbx_snprintf(sql,sizeof(sql),"select id,itemid,clock,value from history_uint_sync where nodeid=%d order by id", nodeid);
 
-	result = DBselectN(sql, 100000);
+	result = DBselectN(sql, 10000);
 	while((row=DBfetch(result)))
 	{
 		ZBX_STR2UINT64(id,row[0])
@@ -251,7 +251,7 @@ static int process_node_history(int nodeid, int master_nodeid)
 
 	zbx_snprintf(sql,sizeof(sql),"select id,itemid,clock,value from history_sync where nodeid=%d order by id", nodeid);
 
-	result = DBselectN(sql, 100000);
+	result = DBselectN(sql, 10000);
 	while((row=DBfetch(result)))
 	{
 		ZBX_STR2UINT64(id,row[0])

@@ -74,7 +74,7 @@ char *help_message[] = {
         "Options:",
         "  -c <file>       Specify configuration file",
         "  -h              give this help",
-        "  -n <nodeid>     covert database data to new nodeid",
+        "  -n <nodeid>     convert database data to new nodeid",
         "  -v              display version number",
         0 /* end of text */
 };
@@ -83,7 +83,7 @@ char *help_message[] = {
         "Options:",
         "  -c --config <file>       Specify configuration file",
         "  -h --help                give this help",
-        "  -n --new-nodeid <nodeid> covert database data to new nodeid",
+        "  -n --new-nodeid <nodeid> convert database data to new nodeid",
         "  -v --version             display version number",
         0 /* end of text */
 };
