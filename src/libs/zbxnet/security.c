@@ -56,7 +56,7 @@
 int	check_security(ZBX_SOCKET sock, char *ip_list, int allow_if_empty)
 {
 	ZBX_SOCKADDR name;
-	int	nlen;
+	socklen_t	nlen;
 
 	struct  hostent *hp;
 
