@@ -90,7 +90,7 @@ ZBX_THREAD_ENTRY(listener_thread, pSock)
 
 	ZBX_SOCKET	sock, accept_sock;
 	ZBX_SOCKADDR	serv_addr;
-	int nlen = 0;
+	socklen_t nlen = 0;
 
 	assert(pSock);
 
