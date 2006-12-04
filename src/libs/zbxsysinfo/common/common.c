@@ -1578,7 +1578,7 @@ static int	tcp_expect(const char	*hostname, short port, const char *request, con
 
 	if(SOCKET_ERROR == connect(s,(struct sockaddr *)&servaddr_in,sizeof(ZBX_SOCKADDR)))
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Error in connect() [%s:%u] [%s]",hostname, port, strerror_from_system(errno));
+		zabbix_log( LOG_LEVEL_DEBUG, "Error in connect() [%s:%u] [%s]",hostname, port, strerror_from_system(errno));
 		zbx_sock_close(s);
 		return SYSINFO_RET_OK;
 	}
