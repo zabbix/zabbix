@@ -290,7 +290,7 @@ FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|snmp_community	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|snmp_oid	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|snmp_port	|t_integer	|'161'	|NOT NULL	|ZBX_SYNC
-FIELD		|hostid		|t_bigint		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|hostid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|description	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|key_		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|delay		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
@@ -317,7 +317,7 @@ FIELD		|error		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 
 FIELD		|lastlogsize	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|logtimefmt	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|templateid	|t_bigint		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|templateid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|valuemapid	|t_bigint		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|delay_flex	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 UNIQUE		|1		|hostid,key_
