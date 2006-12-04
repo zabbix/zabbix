@@ -105,8 +105,8 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 
 	if( (session.version == SNMP_VERSION_1) || (item->type == ITEM_TYPE_SNMPv2c))
 	{
-		session.community = item->snmp_community;
-		session.community_len = strlen(session.community);
+		session.community = (u_char *)item->snmp_community;
+		session.community_len = strlen((void *)session.community);
 		zabbix_log( LOG_LEVEL_DEBUG, "SNMP [%s@%s:%d]",session.community, session.peername, session.remote_port);
 	}
 	else if(session.version == SNMP_VERSION_3)
