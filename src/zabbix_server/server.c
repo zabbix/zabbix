@@ -93,7 +93,7 @@ struct option longopts[] =
 {
 	{"config",	1,	0,	'c'},
 	{"help",	0,	0,	'h'},
-	{"new-nodeid",	0,	0,	'n'},
+	{"new-nodeid",	1,	0,	'n'},
 	{"version",	0,	0,	'v'},
 	{0,0,0,0}
 };
@@ -356,6 +356,7 @@ int main(int argc, char **argv)
 	int	ch;
 
 	int	nodeid;
+	zbx_task_t	task  = ZBX_TASK_START;
 
 #ifdef HAVE_ZZZ
 	DB_RESULT	result;
@@ -402,7 +403,7 @@ int main(int argc, char **argv)
 	while ((ch = getopt_long(argc, argv, "c:n:hv",longopts,NULL)) != EOF)
 	switch ((char) ch) {
 		case 'c':
-			CONFIG_FILE = optarg;
+			CONFIG_FILE = strdup(optarg);
 			break;
 		case 'h':
 			help();
@@ -411,8 +412,7 @@ int main(int argc, char **argv)
 		case 'n':
 			nodeid=0;
 			if(optarg)	nodeid = atoi(optarg);
-			change_nodeid(0,nodeid);
-			exit(-1);
+			task = ZBX_TASK_CHANGE_NODEID;
 			break;
 		case 'v':
 			version();
@@ -424,9 +424,18 @@ int main(int argc, char **argv)
 			break;
         }
 
-	init_metrics();
+/*	init_metrics();*/
 
 	init_config();
+
+	switch (task) {
+		case ZBX_TASK_CHANGE_NODEID:
+			change_nodeid(0,nodeid);
+			exit(-1);
+			break;
+		default:
+			;
+	}
 
 #ifdef TEST
 	if(CONFIG_LOG_FILE == NULL)
