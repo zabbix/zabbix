@@ -153,7 +153,7 @@ static ZBX_THREAD_HANDLE	*threads = NULL;
 
 static int parse_commandline(int argc, char **argv)
 {
-	int	task	= ZBX_TASK_START;
+	zbx_task_t	task	= ZBX_TASK_START;
 	char	ch	= '\0';
 
 	/* Parse the command-line. */
