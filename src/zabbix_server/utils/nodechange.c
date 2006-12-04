@@ -154,9 +154,10 @@ int change_nodeid(int old_id, int new_id)
 		{
 			if(tables[i].fields[j].type == ZBX_TYPE_ID)
 			{
-				DBexecute("update %s set %s=%s+" ZBX_FS_UI64 "\n",
+				DBexecute("update %s set %s=%s+" ZBX_FS_UI64 " where %s>0\n",
 					tables[i].table, tables[i].fields[j].name, tables[i].fields[j].name,
-					(zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)new_id);
+					(zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)new_id,
+					tables[i].fields[j].name);
 			}
 			j++;
 		}
