@@ -22,7 +22,7 @@
 --
 
 TABLE|nodes|nodeid|
-FIELD		|nodeid		|t_id		|'0'	|NOT NULL	|0
+FIELD		|nodeid		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|name		|t_varchar(64)	|'0'	|NOT NULL	|0
 FIELD		|timezone	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|ip		|t_varchar(15)	|''	|NOT NULL	|ZBX_SYNC
@@ -36,7 +36,7 @@ FIELD		|history_lastid	|t_bigint	|'0'	|NOT NULL	|0
 FIELD		|history_str_lastid|t_bigint	|'0'	|NOT NULL	|0
 FIELD		|history_uint_lastid|t_bigint	|'0'	|NOT NULL	|0
 FIELD		|nodetype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|masterid	|t_id		|'0'	|NOT NULL	|0
+FIELD		|masterid	|t_integer	|'0'	|NOT NULL	|0
 
 TABLE|node_cksum|cksumid|0
 FIELD		|cksumid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC

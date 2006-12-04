@@ -468,10 +468,10 @@
 
 		$db_tmp_items = get_items_by_hostid($templateid);
 
-		$apps = get_same_applications_for_host(get_applications_by_itemid($db_tmp_item["itemid"]),$hostid);
 		
 		while($db_tmp_item = DBfetch($db_tmp_items))
 		{
+			$apps = get_same_applications_for_host(get_applications_by_itemid($db_tmp_item["itemid"]),$hostid);
 			add_item(
 				$db_tmp_item["description"],
 				$db_tmp_item["key_"],
