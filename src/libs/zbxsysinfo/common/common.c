@@ -1270,16 +1270,21 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 #endif /* _WINDOWS */
 
+	zabbix_log(LOG_LEVEL_DEBUG, "Before");
 	/* We got EOL only */
 	if(cmd_result[0] == '\n' || cmd_result[0] == '\0')
 	{
 		return SYSINFO_RET_FAIL;
 	}
 
-	for(i = len-1; i >= 0 && (cmd_result[i] == '\n' || cmd_result[i] == '\r' || cmd_result[i] == '\0'); i++)
-	{
-		cmd_result[i] = '\0';
-	}
+        for(i=strlen(cmd_result); i>0; i--)
+        {
+                if(cmd_result[i] == '\n')
+                {
+                        cmd_result[i] = '\0';
+                        break;
+                }
+        }
 
 	SET_TEXT_RESULT(result, strdup(cmd_result));
 
