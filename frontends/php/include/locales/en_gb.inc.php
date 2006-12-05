@@ -388,6 +388,8 @@
 	"S_CREATE_GRAPH"=>			"Create Graph",
 	"S_SHOW_WORKING_TIME"=>			"Show working time",
 	"S_SHOW_TRIGGERS"=>			"Show triggers",
+	"S_GRAPH_ITEM"=>			"Graph item",
+	"S_REQUIRED_ITEMS_FOR_GRAPH"=>		"Required items for graph",
 
 //	history.php
 	"S_LAST_HOUR_GRAPH"=>			"Last hour graph",

@@ -29,6 +29,11 @@
 	define('ZBX_VALID_ERROR',	1);
 	define('ZBX_VALID_WARNING',	2);
 
+	function	is_hex_color($value)
+	{
+		return eregi('[0-9,A-F]{6}', $value);
+	}
+	
 	function	BETWEEN($min,$max,$var=NULL)
 	{
 		return "({".$var."}>=".$min."&&{".$var."}<=".$max.")&&";
@@ -216,6 +221,20 @@
 			else
 			{
 				info("Warning. Field [".$field."] is not string");
+				return ZBX_VALID_WARNING;
+			}
+		}
+
+		if(($type == T_ZBX_CLR) && !is_hex_color($var)) {
+			$var = 'FFFFFF';
+			if($flags&P_SYS)
+			{
+				info("Critical error. Field [".$field."] is not color");
+				return ZBX_VALID_ERROR;
+			}
+			else
+			{
+				info("Warning. Field [".$field."] is not color");
 				return ZBX_VALID_WARNING;
 			}
 		}

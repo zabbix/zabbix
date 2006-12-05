@@ -220,7 +220,7 @@
 				if(isset($RGBA[3]) && 
 					function_exists("ImageColorExactAlpha") && 
 					function_exists("ImageCreateTrueColor") && 
-					@imagecreatetruecolor(1,1)
+					@ImageCreateTrueColor(1,1)
 				)
 				{
 					$this->colors[$name]	= ImageColorExactAlpha($this->im,$RGBA[0],$RGBA[1],$RGBA[2],$RGBA[3]);
@@ -242,7 +242,7 @@
 			$this->m_showTriggers = $value == 1 ? 1 : 0;;
 		}
 	
-		function addItem($itemid, $axis, $calc_fnc = CALC_FNC_AVG, $color=null, $drawtype=null, $type=null, $periods_cnt=null)
+		function AddItem($itemid, $axis, $calc_fnc = CALC_FNC_AVG, $color=null, $drawtype=null, $type=null, $periods_cnt=null)
 		{
 			$this->items[$this->num] = get_item_by_itemid($itemid);
 			$this->items[$this->num]["description"]=item_description($this->items[$this->num]["description"],$this->items[$this->num]["key_"]);
@@ -283,7 +283,7 @@
 			$this->yaxistype=$yaxistype;
 		}
 
-		function setSTime($stime)
+		function SetSTime($stime)
 		{
 			if($stime>200000000000 && $stime<220000000000)
 			{
@@ -345,7 +345,7 @@
 				$this->shiftY-1,
 				$this->sizeX+$this->shiftXleft-1,
 				$this->sizeY+$this->shiftY+1,
-				$this->colors["Black No Alpha"]
+				$this->GetColor("Black No Alpha")
 				);
 		}
 
@@ -353,12 +353,12 @@
 		{
 			ImageFilledRectangle($this->im,0,0,
 				$this->fullSizeX,$this->fullSizeY,
-				$this->colors["White"]);
+				$this->GetColor("White"));
 
 
 			if($this->border==1)
 			{
-				ImageRectangle($this->im,0,0,$this->fullSizeX-1,$this->fullSizeY-1,$this->colors["Black No Alpha"]);
+				ImageRectangle($this->im,0,0,$this->fullSizeX-1,$this->fullSizeY-1,$this->GetColor("Black No Alpha"));
 			}
 		}
 
@@ -407,7 +407,7 @@
 				$fontnum = 4;
 			}
 			$x=$this->fullSizeX/2-ImageFontWidth($fontnum)*strlen($str)/2;
-			ImageString($this->im, $fontnum,$x,1, $str , $this->colors["Dark Red No Alpha"]);
+			ImageString($this->im, $fontnum,$x,1, $str , $this->GetColor("Dark Red No Alpha"));
 		}
 
 		function setHeader($header)
@@ -420,24 +420,24 @@
 			$this->drawSmallRectangle();
 			for($i=1;$i<=5;$i++)
 			{
-				DashedLine($this->im,$this->shiftXleft,$i*$this->sizeY/6+$this->shiftY,$this->sizeX+$this->shiftXleft,$i*$this->sizeY/6+$this->shiftY,$this->colors["Gray"]);
+				DashedLine($this->im,$this->shiftXleft,$i*$this->sizeY/6+$this->shiftY,$this->sizeX+$this->shiftXleft,$i*$this->sizeY/6+$this->shiftY,$this->GetColor("Gray"));
 			}
 		
 			for($i=1;$i<=23;$i++)
 			{
-				DashedLine($this->im,$i*$this->sizeX/24+$this->shiftXleft,$this->shiftY,$i*$this->sizeX/24+$this->shiftXleft,$this->sizeY+$this->shiftY,$this->colors["Gray"]);
+				DashedLine($this->im,$i*$this->sizeX/24+$this->shiftXleft,$this->shiftY,$i*$this->sizeX/24+$this->shiftXleft,$this->sizeY+$this->shiftY,$this->GetColor("Gray"));
 			}
 
 			$old_day=-1;
 			for($i=0;$i<=24;$i++)
 			{
-				ImageStringUp($this->im, 1,$i*$this->sizeX/24+$this->shiftXleft-3, $this->sizeY+$this->shiftY+57, date("      H:i",$this->from_time+$i*$this->period/24) , $this->colors["Black No Alpha"]);
+				ImageStringUp($this->im, 1,$i*$this->sizeX/24+$this->shiftXleft-3, $this->sizeY+$this->shiftY+57, date("      H:i",$this->from_time+$i*$this->period/24) , $this->GetColor("Black No Alpha"));
 
 				$new_day=date("d",$this->from_time+$i*$this->period/24);
 				if( ($old_day != $new_day) ||($i==24))
 				{
 					$old_day=$new_day;
-					ImageStringUp($this->im, 1,$i*$this->sizeX/24+$this->shiftXleft-3, $this->sizeY+$this->shiftY+57, date("m.d H:i",$this->from_time+$i*$this->period/24) , $this->colors["Dark Red No Alpha"]);
+					ImageStringUp($this->im, 1,$i*$this->sizeX/24+$this->shiftXleft-3, $this->sizeY+$this->shiftY+57, date("m.d H:i",$this->from_time+$i*$this->period/24) , $this->GetColor("Dark Red No Alpha"));
 
 				}
 			}
@@ -462,7 +462,7 @@
 				$this->shiftY,
 				$this->sizeX+$this->shiftXleft,
 				$this->sizeY+$this->shiftY,
-				$this->colors["Not Work Period"]);
+				$this->GetColor("Not Work Period"));
 
 			$now = time();
 			if(isset($this->stime))
@@ -494,7 +494,7 @@
 					$this->shiftY,
 					$x2,
 					$this->sizeY+$this->shiftY,
-					$this->colors["White"]);
+					$this->GetColor("White"));
 
 				$start = find_period_start($periods,$end);
 			}
@@ -559,16 +559,39 @@
 					$trigger['y'],
 					$this->sizeX+$this->shiftXleft,
 					$trigger['y'],
-					$this->colors[$trigger['color']]);
+					$this->GetColor($trigger['color']));
 			}
 			
 		}
 
 		function drawLogo()
 		{
-			ImageStringUp($this->im,0,$this->fullSizeX-10,$this->fullSizeY-50, "http://www.zabbix.com", $this->colors["Gray"]);
+			ImageStringUp($this->im,0,$this->fullSizeX-10,$this->fullSizeY-50, "http://www.zabbix.com", $this->GetColor("Gray"));
 		}
 
+		function GetColor($color,$alfa=50)
+		{
+			if(isset($this->colors[$color]))
+				return $this->colors[$color];
+				
+			$RGB = array(
+				hexdec('0x'.substr($color, 0,2)),
+				hexdec('0x'.substr($color, 2,2)),
+				hexdec('0x'.substr($color, 4,2))
+				);
+			
+			if(isset($alfa) && 
+				function_exists("ImageColorExactAlpha") && 
+				function_exists("ImageCreateTrueColor") && 
+				@ImageCreateTrueColor(1,1)
+			)
+			{
+				return ImageColorExactAlpha($this->im,$RGB[0],$RGB[1],$RGB[2],$alfa);
+			}
+			
+			return ImageColorAllocate($this->im,$RGB[0],$RGB[1],$RGB[2]);
+		}
+		
 		function drawLegend()
 		{
 			$max_host_len=0;
@@ -584,11 +607,11 @@
 				if($this->items[$i]["calc_type"] == GRAPH_ITEM_AGGREGATED)
 				{
 					$fnc_name = "agr(".$this->items[$i]["periods_cnt"].")";
-					$color = $this->colors["HistoryMinMax"];
+					$color = $this->GetColor("HistoryMinMax");
 				}
 				else
 				{
-					$color = $this->colors[$this->items[$i]["color"]];
+					$color = $this->GetColor($this->items[$i]["color"]);
 					switch($this->items[$i]["calc_fnc"])
 					{
 						case CALC_FNC_MIN:	$fnc_name = "min";	break;
@@ -618,13 +641,13 @@
 				}
 	
 				ImageFilledRectangle($this->im,$this->shiftXleft,$this->sizeY+$this->shiftY+62+12*$i,$this->shiftXleft+5,$this->sizeY+$this->shiftY+5+62+12*$i,$color);
-				ImageRectangle($this->im,$this->shiftXleft,$this->sizeY+$this->shiftY+62+12*$i,$this->shiftXleft+5,$this->sizeY+$this->shiftY+5+62+12*$i,$this->colors["Black No Alpha"]);
+				ImageRectangle($this->im,$this->shiftXleft,$this->sizeY+$this->shiftY+62+12*$i,$this->shiftXleft+5,$this->sizeY+$this->shiftY+5+62+12*$i,$this->GetColor("Black No Alpha"));
 
 				ImageString($this->im, 2,
 					$this->shiftXleft+9,
 					$this->sizeY+$this->shiftY+(62-5)+12*$i,
 					$str,
-					$this->colors["Black No Alpha"]);
+					$this->GetColor("Black No Alpha"));
 			}
 
 			if($this->sizeY < 120) return;
@@ -636,14 +659,14 @@
 					$this->sizeY+$this->shiftY+2+62+12*$i,
 					6,
 					6,
-					$this->colors[$trigger["color"]]);
+					$this->GetColor($trigger["color"]));
 
 				ImageEllipse($this->im,
 					$this->shiftXleft + 2,
 					$this->sizeY+$this->shiftY+2+62+12*$i,
 					6,
 					6,
-					$this->colors["Black No Alpha"]);
+					$this->GetColor("Black No Alpha"));
 
 				ImageString(
 					$this->im, 
@@ -651,7 +674,7 @@
 					$this->shiftXleft+9,
 					$this->sizeY+$this->shiftY+(62-5)+12*$i,
 					$trigger['description'],
-					$this->colors["Black No Alpha"]);
+					$this->GetColor("Black No Alpha"));
 				++$i;
 			}
 		}
@@ -1127,7 +1150,7 @@
 				for($i=0;$i<=6;$i++)
 				{
 					$str = str_pad(convert_units($this->sizeY*$i/6*($maxY-$minY)/$this->sizeY+$minY,$units),10," ", STR_PAD_LEFT);
-					ImageString($this->im, 1, 5, $this->sizeY-$this->sizeY*$i/6-4+$this->shiftY, $str, $this->colors["Dark Red No Alpha"]);
+					ImageString($this->im, 1, 5, $this->sizeY-$this->sizeY*$i/6-4+$this->shiftY, $str, $this->GetColor("Dark Red No Alpha"));
 				}
 			}
 		}
@@ -1150,7 +1173,7 @@
 				for($i=0;$i<=6;$i++)
 				{
 					$str = str_pad(convert_units($this->sizeY*$i/6*($maxY-$minY)/$this->sizeY+$minY,$units),10," ");
-					ImageString($this->im, 1, $this->sizeX+$this->shiftXleft+2, $this->sizeY-$this->sizeY*$i/6-4+$this->shiftY, $str, $this->colors["Dark Red No Alpha"]);
+					ImageString($this->im, 1, $this->sizeX+$this->shiftXleft+2, $this->sizeY-$this->sizeY*$i/6-4+$this->shiftY, $str, $this->GetColor("Dark Red No Alpha"));
 				}
 			}
 		}
@@ -1212,10 +1235,10 @@
 				{
 					$drawtype	= GRAPH_DRAW_TYPE_LINE;
 
-					$max_color	= $this->colors["HistoryMax"];
-					$avg_color	= $this->colors["HistoryAvg"];
-					$min_color	= $this->colors["HistoryMin"];
-					$minmax_color	= $this->colors["HistoryMinMax"];
+					$max_color	= $this->GetColor("HistoryMax");
+					$avg_color	= $this->GetColor("HistoryAvg");
+					$min_color	= $this->GetColor("HistoryMin");
+					$minmax_color	= $this->GetColor("HistoryMinMax");
 
 					$calc_fnc	= CALC_FNC_ALL;
 				}
@@ -1223,10 +1246,10 @@
 				{
 					$drawtype	= $this->items[$item]["drawtype"];
 
-					$max_color	= $this->colors["ValueMax"];
-					$avg_color	= $this->colors[$this->items[$item]["color"]];
-					$min_color	= $this->colors["ValueMin"];
-					$minmax_color	= $this->colors["ValueMinMax"];
+					$max_color	= $this->GetColor("ValueMax");
+					$avg_color	= $this->GetColor($this->items[$item]["color"]);
+					$min_color	= $this->GetColor("ValueMin");
+					$minmax_color	= $this->GetColor("ValueMinMax");
 
 					$calc_fnc = $this->items[$item]["calc_fnc"];
 				}
@@ -1282,7 +1305,7 @@
 		
 			$end_time=getmicrotime();
 			$str=sprintf("%0.2f",($end_time-$start_time));
-			ImageString($this->im, 0,$this->fullSizeX-120,$this->fullSizeY-12,"Generated in $str sec", $this->colors["Gray"]);
+			ImageString($this->im, 0,$this->fullSizeX-120,$this->fullSizeY-12,"Generated in $str sec", $this->GetColor("Gray"));
 
 			ImageOut($this->im); 
 			ImageDestroy($this->im); 

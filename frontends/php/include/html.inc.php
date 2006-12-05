@@ -92,7 +92,9 @@
 		if(is_array($var))
 		{
 			foreach($var as $id => $par)
-				$result .= prepare_url($par,$varname."[".$id."]");
+				$result .= prepare_url($par,
+					isset($varname) ? $varname."[".$id."]": $id
+					);
 		}
 		else
 		{
@@ -103,11 +105,19 @@
 
 	function url_param($parameter,$request=true,$name=null)
 	{
-		if(!$request && !isset($name)) fatal_error('not request variable require url name [url_param]');
-		
 		$result = "";
 
-		if(!isset($name)) $name = $parameter;
+		
+		if(!is_array($parameter))
+		{
+			if(!isset($name))
+			{
+				if(!$request)
+					fatal_error('not request variable require url name [url_param]');
+
+				$name = $parameter;
+			}
+		}
 		
 		if($request)
 		{
