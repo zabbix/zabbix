@@ -189,7 +189,7 @@ COpt::profiling_start("page");
 						"sub_pages"=>array("sysmap.php")
 						),
 					array("url"=>"graphs.php"	,"label"=>S_GRAPHS		,
-						"sub_pages"=>array("graph.php")
+						"sub_pages"=>array("popup_gitem.php")
 						),
 					array("url"=>"screenconf.php"	,"label"=>S_SCREENS		,
 						"sub_pages"=>array("screenedit.php")

@@ -46,6 +46,7 @@
 	define("T_ZBX_DBL",			2);
 	define("T_ZBX_PERIOD",			3);
 	define("T_ZBX_IP",			4);
+	define("T_ZBX_CLR",			5);
 
 	define("O_MAND",			0);
 	define("O_OPT",				1);
@@ -158,6 +159,12 @@
 	define("ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV",0);
 	define("ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV",1);
 	define("ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV",2);
+
+	define('GRAPH_ITEM_DRAWTYPE_LINE',		0);
+	define('GRAPH_ITEM_DRAWTYPE_FILLED_REGION',	1);
+	define('GRAPH_ITEM_DRAWTYPE_BOLD_LINE',		2);
+	define('GRAPH_ITEM_DRAWTYPE_DOT',		3);
+	define('GRAPH_ITEM_DRAWTYPE_DASHED_LINE',	4);
 
 	define("SERVICE_ALGORITHM_NONE",0);
 	define("SERVICE_ALGORITHM_MAX",1);

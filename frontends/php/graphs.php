@@ -49,6 +49,13 @@ include_once "include/page_header.php";
 		"yaxismin"=>	array(T_ZBX_DBL, O_OPT,	 NULL,	BETWEEN(-65535,65535),	'isset({save})'),
 		"yaxismax"=>	array(T_ZBX_DBL, O_OPT,	 NULL,	BETWEEN(-65535,65535),	'isset({save})'),
 		"yaxismax"=>	array(T_ZBX_DBL, O_OPT,	 NULL,	BETWEEN(-65535,65535),	'isset({save})'),
+		
+		"items"=>		array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
+		"new_graph_item"=>	array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
+		"group_gid"=>		array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
+		"move_up"=>		array(T_ZBX_INT, O_OPT,  NULL,	null,		null),
+		"move_down"=>		array(T_ZBX_INT, O_OPT,  NULL,	null,		null),
+		
 		"showworkperiod"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("1"),	NULL),
 		"showtriggers"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("1"),	NULL),
 
@@ -56,6 +63,9 @@ include_once "include/page_header.php";
 		"copy_targetid"=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID, NULL),
 		"filter_groupid"=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, 'isset({copy})&&{copy_type}==0'),
 /* actions */
+		"add_item"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"delete_item"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		
 		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"copy"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -71,51 +81,63 @@ include_once "include/page_header.php";
 	validate_group_with_host(PERM_READ_WRITE,array("allow_all_hosts","always_select_first_host"));
 ?>
 <?php
+	$_REQUEST['items'] = get_request('items', array());
+	$_REQUEST['group_gid'] = get_request('group_gid', array());
+	
 	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, $ZBX_CURNODEID);
 	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
 
 	if(isset($_REQUEST["save"]))
 	{
-		$showworkperiod = 0;
-		if(isset($_REQUEST["showworkperiod"]))
-			$showworkperiod = 1;
-		$showtriggers = 0;
-		if(isset($_REQUEST["showtriggers"]))
-			$showtriggers = 1;
-
-		if(isset($_REQUEST["graphid"]))
+		$items = get_request('items', array());
+		foreach($items as $gitem)
 		{
-			// TODO check permission by new value.
-			$result=update_graph($_REQUEST["graphid"],
-				$_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],
-				$_REQUEST["yaxistype"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"],
-				$showworkperiod,$showtriggers,$_REQUEST["graphtype"]);
-
-			if($result)
+			$host = DBfetch(DBselect('select h.* from hosts h,items i where h.hostid=i.hostid and i.itemid='.$gitem['itemid']));
+			if(in_array($host['hostid'], explode(',',$denyed_hosts)))
 			{
-				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH,
-					"Graph ID [".$_REQUEST["graphid"]."] Graph [".
-					$_REQUEST["name"]."]");
+				access_deny();
 			}
-			show_messages($result, S_GRAPH_UPDATED, S_CANNOT_UPDATE_GRAPH);
+		}
+		if(count($items) <= 0)
+		{
+			info(S_REQUIRED_ITEMS_FOR_GRAPH);
 		}
 		else
 		{
-			if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
-				access_deny();
+			$showworkperiod	= isset($_REQUEST["showworkperiod"]) ? 1 : 0;
+			$showtriggers	= isset($_REQUEST["showtriggers"]) ? 1 : 0;
 
-			$result=add_graph($_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],
-				$_REQUEST["yaxistype"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"],
-				$showworkperiod,$showtriggers,$_REQUEST["graphtype"]);
-			if($result)
+			if(isset($_REQUEST["graphid"]))
 			{
-				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH,
-					"Graph [".$_REQUEST["name"]."]");
+				$result = update_graph_with_items($_REQUEST["graphid"],
+					$_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],
+					$_REQUEST["yaxistype"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"],
+					$showworkperiod,$showtriggers,$_REQUEST["graphtype"],$items);
+
+				if($result)
+				{
+					add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH,
+						"Graph ID [".$_REQUEST["graphid"]."] Graph [".
+						$_REQUEST["name"]."]");
+				}
+				show_messages($result, S_GRAPH_UPDATED, S_CANNOT_UPDATE_GRAPH);
 			}
-			show_messages($result, S_GRAPH_ADDED, S_CANNOT_ADD_GRAPH);
-		}
-		if($result){
-			unset($_REQUEST["form"]);
+			else
+			{
+				$result = add_graph_with_items($_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],
+					$_REQUEST["yaxistype"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"],
+					$showworkperiod,$showtriggers,$_REQUEST["graphtype"],$items);
+
+				if($result)
+				{
+					add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GRAPH,
+						"Graph [".$_REQUEST["name"]."]");
+				}
+				show_messages($result, S_GRAPH_ADDED, S_CANNOT_ADD_GRAPH);
+			}
+			if($result){
+				unset($_REQUEST["form"]);
+			}
 		}
 	}
 	elseif(isset($_REQUEST["delete"])&&isset($_REQUEST["graphid"]))
@@ -177,6 +199,51 @@ include_once "include/page_header.php";
 		}
 		show_messages();
 	}
+	elseif(isset($_REQUEST['delete_item']) && isset($_REQUEST['group_gid']))
+	{
+		foreach($_REQUEST['items'] as $gid => $data)
+		{
+			if(!isset($_REQUEST['group_gid'][$gid])) continue;
+			unset($_REQUEST['items'][$gid]);
+		}
+		unset($_REQUEST['delete_item'], $_REQUEST['group_gid']);
+	}
+	elseif(isset($_REQUEST['new_graph_item']))
+	{
+		$new_gitem = get_request('new_graph_item', array());
+		foreach($_REQUEST['items'] as $gid => $data)
+		{
+			if(	$new_gitem['itemid']		== $data['itemid'] &&
+				$new_gitem['yaxisside']		== $data['yaxisside'] &&
+				$new_gitem['calc_fnc']		== $data['calc_fnc'] &&
+				$new_gitem['type']		== $data['type'] &&
+				$new_gitem['periods_cnt']	== $data['periods_cnt']) 
+			{
+				$already_exist = true;
+				break;
+			}
+		}
+		if(!isset($already_exist))
+		{
+			array_push($_REQUEST['items'], $new_gitem);
+		}
+	}
+	elseif(isset($_REQUEST['move_up']) && isset($_REQUEST['items']))
+	{
+		SDI($_REQUEST['items'][$_REQUEST['move_up']]['sortorder']);
+		if(isset($_REQUEST['items'][$_REQUEST['move_up']]))
+			if($_REQUEST['items'][$_REQUEST['move_up']]['sortorder'] > 0)
+				$_REQUEST['items'][$_REQUEST['move_up']]['sortorder']
+					 = ''.($_REQUEST['items'][$_REQUEST['move_up']]['sortorder'] - 1);
+
+		SDI($_REQUEST['items'][$_REQUEST['move_up']]['sortorder']);
+	}
+	elseif(isset($_REQUEST['move_down']) && isset($_REQUEST['items']))
+	{
+		if(isset($_REQUEST['items'][$_REQUEST['move_down']]))
+			if($_REQUEST['items'][$_REQUEST['move_down']]['sortorder'] < 1000)
+				$_REQUEST['items'][$_REQUEST['move_down']]['sortorder']++;
+	}
 ?>
 <?php
 	$form = new CForm();
@@ -192,6 +259,13 @@ include_once "include/page_header.php";
 	else if(isset($_REQUEST["form"]))
 	{
 		insert_graph_form();
+		echo BR;
+		$table = new CTable(NULL,"graph");
+		$table->AddRow(new CImg('chart3.php?period=3600&from=0'.url_param('items').
+			url_param('name').url_param('width').url_param('height').url_param('yaxistype').
+			url_param('yaxismin').url_param('yaxismax').url_param('show_work_period').
+			url_param('show_triggers').url_param('graphtype')));
+		$table->Show();
 	} else {
 /* Table HEADER */
 		if(isset($_REQUEST["graphid"])&&($_REQUEST["graphid"]==0))
@@ -248,12 +322,12 @@ include_once "include/page_header.php";
 		$form->AddVar('hostid',$_REQUEST["hostid"]);
 
 		$table = new CTableInfo(S_NO_GRAPHS_DEFINED);
-		$table->setHeader(array(
+		$table->SetHeader(array(
 			$_REQUEST["hostid"] != 0 ? NULL : S_HOSTS,
 			array(	new CCheckBox("all_graphs",NULL,
 					"CheckAll('".$form->GetName()."','all_graphs');"),
 				S_NAME),
-			S_WIDTH,S_HEIGHT,S_GRAPH_TYPE,S_GRAPH));
+			S_WIDTH,S_HEIGHT,S_GRAPH_TYPE));
 
 		if($_REQUEST["hostid"] > 0)
 		{
@@ -295,8 +369,6 @@ include_once "include/page_header.php";
 				$name = new CLink($row["name"],
 					"graphs.php?graphid=".$row["graphid"]."&form=update".
 					url_param("groupid").url_param("hostid"),'action');
-				$edit = new CLink("Edit",
-					"graph.php?graphid=".$row["graphid"]);
 			} else {
 				$real_hosts = get_realhosts_by_graphid($row["templateid"]);
 				$real_host = DBfetch($real_hosts);
@@ -318,7 +390,6 @@ include_once "include/page_header.php";
 						expand_trigger_description($row["triggerid"])
 						);
 				}
-				$edit = SPACE;
 			}
 
 			$chkBox = new CCheckBox("group_graphid[]",NULL,NULL,$row["graphid"]);
@@ -334,8 +405,7 @@ include_once "include/page_header.php";
 				array($chkBox, $name),
 				$row["width"],
 				$row["height"],
-				$graphtype,
-				$edit
+				$graphtype
 				));
 		}
 

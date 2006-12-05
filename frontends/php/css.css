@@ -125,7 +125,7 @@ table.formtable td.form_row_l { /* left cell */
 	border-color:	#222255;
 	text-align:	left;
 	white-space:	nowrap;
-	word-spacing:	nowrap;
+	word-spacing:	0px;
 	width:		50%;
 }
 table.formtable td.form_row_c { /* center cell */
@@ -157,7 +157,7 @@ table.log_history_table {
 }
 table.log_history_table td {
 	white-space: nowrap;
-	word-spacing: nowrap;
+	word-spacing:	0px;
 	font-family:verdana, arial, helvetica, sans-serif;
 	font-size:8pt;
 	text-decoration: none;
@@ -176,7 +176,7 @@ table.log_history_table tr.header td {
 	padding-right: 5px;
 	padding-left: 5px;
 	white-space: nowrap;
-	word-spacing: nowrap;
+	word-spacing:	0px;
 	text-align: center;
 	font-weight: bold; 
 	background-color:#CCCCCC;
@@ -275,7 +275,7 @@ table.tableinfo
 }
 table.tableinfo td {
 	white-space: nowrap;
-	word-spacing: nowrap;
+	word-spacing:	0px;
 	font-family:verdana, arial, helvetica, sans-serif;
 	font-size:8pt;
 	text-decoration: none;
@@ -289,7 +289,7 @@ table.tableinfo td.message {
 }
 table.tableinfo tr.header td {
 	white-space: nowrap;
-	word-spacing: nowrap;
+	word-spacing:	0px;
 	font-weight: bold; 
 	background-color:#CCCCCC;
 }
@@ -299,7 +299,7 @@ table.tableinfo tr.vertical_header td {
 	padding-bottom: 5;
 	margin: 0;
 	white-space: nowrap;
-	word-spacing: nowrap;
+	word-spacing:	0px;
 	font-weight: bold; 
 	background-color:#CCCCCC;
 	vertical-align:text-top;
@@ -309,7 +309,7 @@ table.tableinfo tr.vertical_header td {
 }
 table.tableinfo tr.header td {
 	white-space: nowrap;
-	word-spacing: nowrap;
+	word-spacing:	0px;
 	font-weight: bold; 
 	background-color:#CCCCCC;
 }
@@ -419,7 +419,7 @@ table.header td.header_r
 
 table.header a
 {
-	color: #FFFFFF; !important
+	color: #FFFFFF;
 }
 /**************** Aknowledges ****************/
 
@@ -432,7 +432,7 @@ table.ack_msgs
 }
 table.ack_msgs tr.title {
 	height: 14px;
-	vertical-align: center;
+	vertical-align: middle;
 	color: #FFFFFF;
 	background: #5C7099 url(images/gradients/table_head2.gif) repeat-x top left; 
 }
@@ -490,7 +490,7 @@ table.right_table td
         padding: 0px;
 	text-align: right;
 	white-space: nowrap;
-	word-spacing: nowrap;
+	word-spacing:	0px;
 }
 
 table.right_table select
@@ -634,7 +634,7 @@ table.triggers_info {
 table.triggers_info td {
 	border: 0px;
 	white-space: nowrap;
-	word-spacing: nowrap;
+	word-spacing:	0px;
 	padding-left: 5px;
 	padding-right: 5px;
 	font-weight: bold;
@@ -666,7 +666,7 @@ table.hosts_info {
 table.hosts_info td {
 	border: 0px;
 	white-space: nowrap;
-	word-spacing: nowrap;
+	word-spacing:	0px;
 	padding-left: 5px;
 	padding-right: 5px;
 	font-weight: bold;
@@ -710,7 +710,7 @@ table.server_info td {
 	font-size: 11px;
 	background-color: #EFEFEF;
 	white-space: nowrap;
-	word-spacing: nowrap;
+	word-spacing:	0px;
 }
 
 table.server_info td.header {
@@ -719,7 +719,7 @@ table.server_info td.header {
 }
 table.server_info tr.status td{
 	white-space: nowrap;
-	word-spacing: nowrap;
+	word-spacing:	0px;
 }
 /**************** SETUP WIZARD ***********/
 
@@ -775,7 +775,7 @@ table.setup_wizard td.left
 	padding-left: 	10px;
 	padding-right: 	5px;
 	white-space: 	nowrap;
-	word-spacing: 	nowrap;
+	word-spacing:	0px;
 	text-align: 	left;
 }
 table.setup_wizard td.right
@@ -837,7 +837,7 @@ table.setup_wizard div.text
 	vertical-align:	text-top;
 	height:	100%;
 	width:	100%;
-	overflow: none;
+	overflow: hidden;
 }
 
 /********** REQUIREMENTS TABLE *************/
@@ -951,7 +951,7 @@ A.footer
 	color:#CCCCCC;
 }
 
-A 		{font-family:Verdana, Arial, Helvetica, sans-serif;font-size:8pt}
+A 		{font-family:Verdana, Arial, Helvetica, sans-serif;font-size:8pt;}
 A:link 		{color:black; text-decoration: none; }
 A:visited 	{color:black; text-decoration: none; }
 A:hover 	{color:black; text-decoration: underline; }
@@ -1018,12 +1018,12 @@ ul
 
 .nowrap {
 	white-space: nowrap;
-	word-spacing: nowrap;
+	word-spacing:	0px;
 }
 
 /**************** HINT BOX *****************/
 
-#hint_box{
+#hint_box {
 	top: 0;
 	z-index: 100;
 	position: absolute;
@@ -1037,6 +1037,38 @@ ul
 	border-top: none;
 	visibility: hidden;
 }
+
+/************** END OF HINT BOX ************/
+
+/************** COLOR PICKER ***************/
+
+#color_picker {
+	top: 0;
+	z-index: 100;
+	position: absolute;
+	background-color: white;
+	padding: 2px;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	line-height:15px;
+	border: 1px solid black;
+}
+
+#color_picker table tr td {
+	margin: 0px;
+	padding: 2px;
+}
+	
+#color_picker a {
+	text-decoration: none;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	padding: 0px;
+	margin: 0px;
+}
+
+/************ END OF COLOR PICKER ***********/
+
 .center
 {
 	width: 100%;
