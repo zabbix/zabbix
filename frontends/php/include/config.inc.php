@@ -1442,14 +1442,16 @@ else if (document.getElementById)
 		return false;
 	}
 
-	function CheckAll(form_name, chkMain)
+	function CheckAll(form_name, chkMain, shkName)
 	{
 		var frmForm = document.forms[form_name];
 		var value = frmForm.elements[chkMain].checked;
 		for (var i=0; i < frmForm.length; i++)
 		{
+			name = frmForm.elements[i].name.split('[')[0];
 			if(frmForm.elements[i].type != 'checkbox') continue;
-			if(frmForm.elements[i].name == chkMain) continue;
+			if(name == chkMain) continue;
+			if(shkName && shkName != name) continue;
 			if(frmForm.elements[i].disabled == true) continue;
 			frmForm.elements[i].checked = value;
 		}
