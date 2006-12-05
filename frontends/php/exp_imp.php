@@ -281,15 +281,21 @@ include_once "include/page_header.php";
 
 			$table = new CTableInfo(S_NO_HOSTS_DEFINED);
 			$table->SetHeader(array(
-				S_NAME,
+				array(	new CCheckBox("all_hosts",true, "CheckAll('".$form->GetName()."','all_hosts','hosts');"),
+					S_NAME),
 				S_IP,
 				S_PORT,
 				S_STATUS,
-				S_ITEMS,
-				S_TRIGGERS,
-				S_GRAPHS
-				/*,
-				S_SCREENS */
+				array(	new CCheckBox("all_items",true, "CheckAll('".$form->GetName()."','all_items','items');"),
+					S_ITEMS),
+				array(	new CCheckBox("all_triggers",true, "CheckAll('".$form->GetName()."','all_triggers','triggers');"),
+					S_TRIGGERS),
+				array(	new CCheckBox("all_graphs",true, "CheckAll('".$form->GetName()."','all_graphs','graphs');"),
+					S_GRAPHS)
+				/*
+				array(	new CCheckBox("all_screens",true, "CheckAll('".$form->GetName()."','all_screens','screens');")
+					S_GRAPHS)
+				*/
 				));
 		
 			$sql = "select h.* from";
