@@ -36,7 +36,7 @@ include_once "include/page_header.php";
 		"graphid"=>		array(T_ZBX_INT, O_MAND,	P_SYS,	DB_ID,		null),
 		"period"=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	BETWEEN(3600,12*31*24*3600),	null),
 		"from"=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	null,		null),
-		"stime"=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	null,		null),
+		"stime"=>		array(T_ZBX_STR, O_OPT,		P_SYS,		null,		null),
 		"border"=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	IN('0,1'),	null),
 		"width"=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	'{}>0',		null),
 		"height"=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	'{}>0',		null),

@@ -19,6 +19,48 @@
 **/
 ?>
 <?php
+	function	graph_item_type2str($type,$count=null)
+	{
+		switch($type)
+		{
+			case GRAPH_ITEM_AGGREGATED:	$type = S_AGGREGATED.(isset($count) ? '('.$count.')' : '');	break;
+			case GRAPH_ITEM_SIMPLE:
+			default:			$type = S_SIMPLE;	break;
+		}
+		return $type;
+	}
+	
+        function	graph_item_drawtype2str($drawtype,$type=null)
+        {
+		if($type == GRAPH_ITEM_AGGREGATED) return '-';
+
+		switch($drawtype)
+		{
+			case GRAPH_ITEM_DRAWTYPE_LINE:		$drawtype = "Line";		break;
+			case GRAPH_ITEM_DRAWTYPE_FILLED_REGION:	$drawtype = "Filled region";	break;
+			case GRAPH_ITEM_DRAWTYPE_BOLD_LINE:	$drawtype = "Bold line";	break;
+			case GRAPH_ITEM_DRAWTYPE_DOT:		$drawtype = "Dot";		break;
+			case GRAPH_ITEM_DRAWTYPE_DASHED_LINE:	$drawtype = "Dashed line";	break;
+			default: $drawtype = S_UNKNOWN;		break;
+		}
+		return $drawtype;
+        }
+
+	function	graph_item_calc_fnc2str($calc_fnc, $type=null)
+	{
+		if($type == GRAPH_ITEM_AGGREGATED) return '-';
+		
+		switch($calc_fnc)
+		{
+			case CALC_FNC_ALL:      $calc_fnc = S_ALL_SMALL;        break;
+			case CALC_FNC_MIN:      $calc_fnc = S_MIN_SMALL;        break;
+			case CALC_FNC_MAX:      $calc_fnc = S_MAX_SMALL;        break;
+			case CALC_FNC_AVG:
+			default:		$calc_fnc = S_AVG_SMALL;        break;
+		}
+		return $calc_fnc;
+	}
+	
 	function 	get_graph_by_gitemid($gitemid)
 	{
 		$db_graphs = DBselect("select distinct g.* from graphs g, graphs_items gi".
@@ -108,10 +150,37 @@
 		if($result)
 		{
 			info("Graph '$name' added");
+			$result = $graphid;
 		}
-		return $graphid;
+		return $result;
 	}
 
+	function	add_graph_with_items($name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype=GRAPH_TYPE_NORMAL,$items=array(),$templateid=0)
+	{
+		if($result = add_graph($name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype,$templateid))
+		{
+			foreach($items as $gitem)
+			{
+				if(!add_item_to_graph(
+					$result,
+					$gitem['itemid'],
+					$gitem['color'],
+					$gitem['drawtype'],
+					$gitem['sortorder'],
+					$gitem['yaxisside'],
+					$gitem['calc_fnc'],
+					$gitem['type'],
+					$gitem['periods_cnt']))
+				{
+					delete_graph($result);
+					return false;
+				}
+				
+			}
+		}
+		return $result;
+	}
+	
 	# Update Graph
 
 	function	update_graph($graphid,$name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype=GRAPH_TYPE_NORMAL,$templateid=0)
@@ -139,6 +208,36 @@
 			}
 
 			info("Graph '".$g_graph["name"]."' updated");
+		}
+		return $result;
+	}
+	
+	function	update_graph_with_items($graphid,$name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype=GRAPH_TYPE_NORMAL,$items=array(),$templateid=0)
+	{
+		$result = update_graph($graphid,$name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,
+						$showtriggers,$graphtype,$templateid);
+
+		if($result)	$result = DBexecute("delete from graphs_items where graphid=$graphid");
+
+		if($result)
+		{
+			foreach($items as $gitem)
+			{
+				if(!add_item_to_graph(
+					$graphid,
+					$gitem['itemid'],
+					$gitem['color'],
+					$gitem['drawtype'],
+					$gitem['sortorder'],
+					$gitem['yaxisside'],
+					$gitem['calc_fnc'],
+					$gitem['type'],
+					$gitem['periods_cnt']))
+				{
+					delete_graph($graphid);
+					return false;
+				}
+			}
 		}
 		return $result;
 	}
@@ -267,9 +366,10 @@
 		if($result)
 		{
 			info("Added Item '".$item["description"]."' for graph '".$graph["name"]."'");
+			$result = $gitemid;
 		}
 
-		return $gitemid;
+		return $result;
 	}
 	
 	function	update_graph_item($gitemid,$itemid,$color,$drawtype,$sortorder,$yaxisside,$calc_fnc,$type,$periods_cnt)

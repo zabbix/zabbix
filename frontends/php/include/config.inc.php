@@ -47,6 +47,7 @@ function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$m
 	require_once("include/classes/cvar.inc.php");
 	require_once("include/classes/cspan.inc.php");
 	require_once("include/classes/cimg.inc.php");
+	require_once("include/classes/ccolor.inc.php");
 	require_once("include/classes/clink.inc.php");
 	require_once("include/classes/chelp.inc.php");
 	require_once("include/classes/cbutton.inc.php");
@@ -183,6 +184,17 @@ function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$m
 			$ZBX_MESSAGES = array();
 
 		array_push($ZBX_MESSAGES, array('type' => 'error', 'message' => $msg));
+	}
+
+	function &asort_by_key(&$array, $key)
+	{
+		if(!is_array($array)) {
+			error('Incorrect type of asort_by_key');
+			return array();
+		}
+		$key = htmlspecialchars($key);
+		uasort($array, create_function('$a,$b', 'return $a[\''.$key.'\'] - $b[\''.$key.'\'];'));
+		return $array;
 	}
 
 	function fatal_error($msg)
@@ -1272,21 +1284,6 @@ else
 			DBexecute($sql);
 		}
 	}
-
-        function get_drawtype_description($drawtype)
-        {
-		if($drawtype==0)
-			return "Line";
-		if($drawtype==1)
-			return "Filled region";
-		if($drawtype==2)
-			return "Bold line";
-		if($drawtype==3)
-			return "Dot";
-		if($drawtype==4)
-			return "Dashed line";
-		return "Unknown";
-        }
 
 $SHOW_HINT_SCRIPT_ISERTTED = false; /* TODO rewrite with JS include */
 

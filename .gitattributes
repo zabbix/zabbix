@@ -36,6 +36,7 @@ frontends/php/audio/trigger_on_average.wav -text
 frontends/php/audio/trigger_on_disaster.wav -text
 frontends/php/audio/trigger_on_high.wav -text
 frontends/php/audio/trigger_on_warning.wav -text
+frontends/php/chart3.php -text
 frontends/php/conf/COPYING -text
 frontends/php/create/data.sql -text
 frontends/php/create/mysql.sql -text
@@ -86,6 +87,7 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
+frontends/php/include/classes/ccolor.inc.php -text
 frontends/php/include/classes/clist.inc.php -text
 frontends/php/include/export.inc.php -text
 frontends/php/include/images.inc.php -text
@@ -99,6 +101,7 @@ frontends/php/include/setup.inc.php -text
 frontends/php/instal.php -text
 frontends/php/media_types.php -text
 frontends/php/nodes.php -text
+frontends/php/popup_gitem.php -text
 frontends/php/popup_media.php -text
 frontends/php/popup_right.php -text
 frontends/php/popup_users.php -text

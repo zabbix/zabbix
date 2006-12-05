@@ -110,7 +110,7 @@ include_once "include/page_header.php";
 	$srcfld1	= get_request("srcfld1", '');	// source table field [can be different from fields of source table]
 	$srcfld2	= get_request("srcfld2", '');	// second source table field [can be different from fields of source table]
 	
-	$monitored_hosts = get_request("monitored_hosts", '');
+	$monitored_hosts = get_request("monitored_hosts", 0);
 	$only_hostid	 = get_request("only_hostid", null);
 ?>
 <?php
@@ -129,6 +129,10 @@ include_once "include/page_header.php";
 ?>
 <?php
 	$frmTitle = new CForm();
+		
+	if($monitored_hosts)
+		$frmTitle->AddVar('monitored_hosts', 1);
+
 	$frmTitle->AddVar("dstfrm",	$dstfrm);
 	$frmTitle->AddVar("dstfld1",	$dstfld1);
 	$frmTitle->AddVar("dstfld2",	$dstfld2);
@@ -158,16 +162,18 @@ include_once "include/page_header.php";
 		validate_group(PERM_READ_LIST,$validation_param);
 	}
 
+	$accessible_nodes	= get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST);
+	$denyed_hosts		= get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT);
+	$accessible_hosts	= get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+	$nodeid			= $ZBX_CURNODEID;
+
 	if(isset($only_hostid))
 	{
 		if(!isset($_REQUEST["hostid"]) || $_REQUEST["hostid"]!=$only_hostid) access_deny();
+		$hostid = $only_hostid;
 	}
 	else
 	{
-		$accessible_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST);
-		$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT);
-		$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
-
 		if(in_array($srctbl,array("hosts","host_group","triggers","logitems","items")))
 		{
 			if(ZBX_DISTRIBUTED)
@@ -427,6 +433,10 @@ function add_template(formname,id,name)
 		$table->SetFooter(new CButton('select',S_SELECT));
 		$form = new CForm();
 		$form->AddVar('existed_templates',$existed_templates);
+		
+		if($monitored_hosts)
+			$form->AddVar('monitored_hosts', 1);
+
 		$form->AddVar('dstfrm',$dstfrm);
 		$form->AddVar('dstfld1',$dstfld1);
 		$form->AddVar('srctbl',$srctbl);

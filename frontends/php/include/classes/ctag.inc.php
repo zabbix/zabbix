@@ -51,7 +51,52 @@
 		return $res;
 	}
 
-	class CTag
+	class CObject
+	{
+		function CObject($items=null)
+		{
+			$this->items = array();
+			if(isset($items))
+			{
+				$this->AddItems($items);
+			}
+		}
+		
+		function ToString($destroy=true)
+		{
+			$res = implode('',$this->items);
+			if($destroy) $this->Destroy();
+			return $res;
+		}
+
+		function Show($destroy=true)	{	echo $this->ToString($destroy);			}
+
+		function Destroy()
+		{
+### TODO Problem under PHP 5.0  "Fatal error: Cannot re-assign $this in ..."
+#			$this = null;
+			$this->CleanItems();
+		}
+
+		function CleanItems()		{	$this->items = array();				}
+		function ItemsCount()		{	return count($this->items);			}
+		function AddItem($value)
+		{
+			if(is_array($value))
+			{
+				foreach($value as $item)
+				{
+					array_push($this->items,unpack_object($item));
+				}
+			}
+			elseif(!is_null($value))
+			{
+				array_push($this->items,unpack_object($value));
+			}
+		}
+	}
+
+	class CTag extends CObject
 	{
 /* private *//*
 		var $tagname;
@@ -68,8 +113,9 @@
 /* public */
 		function CTag($tagname=NULL, $paired='no', $body=NULL, $class=null)
 		{
+			parent::CObject();
+
 			$this->options = array();
-			$this->items = array();
 
 			if(!is_string($tagname))
 			{
@@ -95,12 +141,6 @@
 		function ShowStart()	{	echo $this->StartToString();	}
 		function ShowBody()	{	echo $this->BodyToString();	}
 		function ShowEnd()	{	echo $this->EndToString();	}
-		function Show($destroy=true)	{	echo $this->ToString($destroy);		}
-
-		function Destroy()	{
-### TODO Problem under PHP 5.0  "Fatal error: Cannot re-assign $this in ..."
-#			$this = null;
-		}
 
 		function StartToString()
 		{
@@ -115,9 +155,11 @@
 		function BodyToString()
 		{
 			$res = $this->tag_body_start;
-			foreach($this->items as $item)
+			return $res.parent::ToString(false);
+			
+			/*foreach($this->items as $item)
 				$res .= $item;
-			return $res;
+			return $res;*/
 		}
 		function EndToString()
 		{
@@ -137,6 +179,8 @@
 		}
 		function SetName($value)
 		{
+			if(is_null($value)) return $value;
+
 			if(!is_string($value))
 			{
 				return $this->error("Incorrect value for SetName [$value]");
@@ -194,28 +238,6 @@
 		function AddOption($name, $value)
 		{
 			$this->options[$name] = htmlspecialchars(strval($value)); 
-		}
-		function CleanItems()
-		{
-			$this->items = array();
-		}
-		function ItemsCount()
-		{
-			return count($this->items);
-		}
-		function AddItem($value)
-		{
-			if(is_array($value))
-			{
-				foreach($value as $item)
-				{
-					array_push($this->items,unpack_object($item));
-				}
-			}
-			elseif(!is_null($value))
-			{
-				array_push($this->items,unpack_object($value));
-			}
 		}
 		function SetEnabled($value='yes')
 		{
