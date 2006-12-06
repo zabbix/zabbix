@@ -86,7 +86,7 @@ static int process_node(int nodeid, int master_nodeid, zbx_uint64_t event_lastid
 
 	zbx_uint64_t	eventid;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In process_node(local:%d, event_lastid:" ZBX_FS_UI64 ")",nodeid, event_lastid);
+	zabbix_log( LOG_LEVEL_DEBUG, "In process_node(local:%d, event_lastid:" ZBX_FS_UI64 ")",nodeid, event_lastid);
 	/* Begin work */
 
 	data = malloc(allocated);
