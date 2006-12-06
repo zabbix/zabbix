@@ -79,7 +79,7 @@ static int	process_record(int nodeid, char *record)
 	DB_RESULT	result;
 	DB_ROW		row;
 
-//	zabbix_log( LOG_LEVEL_WARNING, "In process_record [%s]", record);
+/*	zabbix_log( LOG_LEVEL_WARNING, "In process_record [%s]", record);*/
 
 	zbx_get_field(record,tablename,0,'|');
 	zbx_get_field(record,tmp,1,'|');
@@ -149,10 +149,10 @@ static int	process_record(int nodeid, char *record)
 			}
 
 			zbx_strlcat(values,tmp,sizeof(values));
-//			zabbix_log( LOG_LEVEL_WARNING, "VALUES [%s]", values);
+/*			zabbix_log( LOG_LEVEL_WARNING, "VALUES [%s]", values);*/
 			zbx_snprintf(tmp,sizeof(tmp),"%s,", fieldname);
 			zbx_strlcat(fields,tmp,sizeof(fields));
-//			zabbix_log( LOG_LEVEL_WARNING, "FIELDS [%s]", fields);
+/*			zabbix_log( LOG_LEVEL_WARNING, "FIELDS [%s]", fields);*/
 		}
 		else
 		{
@@ -166,8 +166,6 @@ static int	process_record(int nodeid, char *record)
 
 	if(op==NODE_CONFIGLOG_OP_UPDATE)
 	{
-//		zbx_snprintf(tmp,sizeof(tmp),"%s='%s',", fieldname, value);
-//		strncat(fields,tmp,sizeof(fields));
 		zbx_snprintf(sql,sizeof(sql),"update %s set %s where %s=" ZBX_FS_UI64, tablename, fields_update, key, recid);
 	}
 	else if(op==NODE_CONFIGLOG_OP_ADD)
@@ -184,7 +182,7 @@ static int	process_record(int nodeid, char *record)
 		}
 		DBfree_result(result);
 	}
-//	zabbix_log( LOG_LEVEL_WARNING, "SQL [%s]", sql);
+/*	zabbix_log( LOG_LEVEL_WARNING, "SQL [%s]", sql);*/
 	if(FAIL == DBexecute(sql))
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Failed [%s]", record);
@@ -219,8 +217,8 @@ int	node_sync(char *data)
 
 	datalen=strlen(data);
 
-//	zabbix_log( LOG_LEVEL_WARNING, "In node_sync(len:%d)", datalen);
-//
+	zabbix_log( LOG_LEVEL_DEBUG, "In node_sync(len:%d)", datalen);
+
 	DBbegin();
 
        	s=(char *)strtok(data,"\n");
@@ -228,7 +226,7 @@ int	node_sync(char *data)
 	{
 		if(firstline == 1)
 		{
-//			zabbix_log( LOG_LEVEL_WARNING, "First line [%s]", s);
+/*			zabbix_log( LOG_LEVEL_WARNING, "First line [%s]", s); */
 			zbx_get_field(s,tmp,1,'|');
 			sender_nodeid=atoi(tmp);
 			zbx_get_field(s,tmp,2,'|');
@@ -239,7 +237,7 @@ int	node_sync(char *data)
 		}
 		else
 		{
-//			zabbix_log( LOG_LEVEL_WARNING, "Got line [%s]", s);
+/*			zabbix_log( LOG_LEVEL_WARNING, "Got line [%s]", s);*/
 			process_record(nodeid, s);
 		}
 

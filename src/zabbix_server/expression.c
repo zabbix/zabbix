@@ -577,7 +577,6 @@ int	evaluate(int *result,char *exp, char *error, int maxerrlen)
 #define STR_UNKNOWN_VARIAVLE		"*UNKNOWN*"
 
 void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, int dala_max_len, int macro_type)
-//void	substitute_simple_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data, int dala_max_len, int macro_type)
 {
 
 	char
@@ -615,9 +614,7 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 		{
 			var_len = strlen(MVAR_TRIGGER_NAME);
 
-//			zbx_snprintf(replace_to, sizeof(replace_to), "%s", trigger->description);
 			zbx_snprintf(replace_to, sizeof(replace_to), "%s", event->trigger_description);
-//			substitute_simple_macros(trigger, action, replace_to, sizeof(replace_to), MACRO_TYPE_TRIGGER_DESCRIPTION);
 			substitute_simple_macros(event, action, replace_to, sizeof(replace_to), MACRO_TYPE_TRIGGER_DESCRIPTION);
 		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
@@ -625,7 +622,6 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 		{
 			var_len = strlen(MVAR_TRIGGER_COMMENT);
 
-//			zbx_snprintf(replace_to, sizeof(replace_to), "%s", trigger->comments);
 			zbx_snprintf(replace_to, sizeof(replace_to), "%s", event->trigger_comments);
 		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY | MACRO_TYPE_TRIGGER_DESCRIPTION) &&
@@ -635,17 +631,14 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 
 			result = DBselect("select distinct h.host from triggers t, functions f,items i, hosts h "
 				"where t.triggerid=" ZBX_FS_UI64 " and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid",
-//				trigger->triggerid);
 				event->triggerid);
 
 			row = DBfetch(result);
 
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
-	//			zabbix_log( LOG_LEVEL_ERR, "No hostname in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
 				zabbix_log( LOG_LEVEL_ERR, "No hostname in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
 					event->triggerid);
-//				zabbix_syslog("No hostname in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
 				zabbix_syslog("No hostname in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
 					event->triggerid);
 
@@ -664,17 +657,14 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 
 			result = DBselect("select distinct i.key_ from triggers t, functions f,items i, hosts h"
 				" where t.triggerid=" ZBX_FS_UI64 " and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid"
-//				" order by i.key_", trigger->triggerid);
 				" order by i.key_", event->triggerid);
 
 			row=DBfetch(result);
 
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
-//				zabbix_log( LOG_LEVEL_ERR, "No TRIGGER.KEY in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
 				zabbix_log( LOG_LEVEL_ERR, "No TRIGGER.KEY in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
 					event->triggerid);
-//				zabbix_syslog("No TRIGGER.KEY in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
 				zabbix_syslog("No TRIGGER.KEY in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
 					event->triggerid);
 				/* remove variable */
@@ -694,17 +684,14 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 
 			result = DBselect("select distinct h.ip from triggers t, functions f,items i, hosts h"
 				" where t.triggerid=" ZBX_FS_UI64 " and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and h.useip=1",
-//				trigger->triggerid);
 				event->triggerid);
 
 			row = DBfetch(result);
 
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
-//				zabbix_log( LOG_LEVEL_ERR, "No hostname in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
 				zabbix_log( LOG_LEVEL_ERR, "No hostname in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
 					event->triggerid);
-//				zabbix_syslog("No hostname in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
 				zabbix_syslog("No hostname in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
 					event->triggerid);
 
@@ -741,7 +728,6 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 			/* NOTE: if you make changes for this bloc, don't forgot MVAR_TRIGGER_STATUS_OLD block */
 			var_len = strlen(MVAR_TRIGGER_STATUS);
 
-//			if(trigger->value == TRIGGER_VALUE_TRUE)
 			if(event->value == TRIGGER_VALUE_TRUE)
 				zbx_snprintf(replace_to, sizeof(replace_to), "OFF");
 			else
@@ -753,7 +739,6 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 			/* NOTE: if you make changes for this bloc, don't forgot MVAR_TRIGGER_STATUS block */
 			var_len = strlen(MVAR_TRIGGER_STATUS_OLD);
 
-//			if(trigger->value == TRIGGER_VALUE_TRUE)
 			if(event->value == TRIGGER_VALUE_TRUE)
 				zbx_snprintf(replace_to, sizeof(replace_to), "OFF");
 			else
@@ -788,12 +773,6 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 		{
 			var_len = strlen(MVAR_TRIGGER_SEVERITY);
 
-//			if(trigger->priority == 0)	zbx_snprintf(replace_to, sizeof(replace_to), "Not classified");
-//                       else if(trigger->priority == 1)	zbx_snprintf(replace_to, sizeof(replace_to), "Information");
-//                      else if(trigger->priority == 2)	zbx_snprintf(replace_to, sizeof(replace_to), "Warning");
-//                     else if(trigger->priority == 3)	zbx_snprintf(replace_to, sizeof(replace_to), "Average");
-//                    else if(trigger->priority == 4)	zbx_snprintf(replace_to, sizeof(replace_to), "High");
-//                   else if(trigger->priority == 5)	zbx_snprintf(replace_to, sizeof(replace_to), "Disaster");
 			if(event->trigger_priority == 0)	zbx_snprintf(replace_to, sizeof(replace_to), "Not classified");
 			else if(event->trigger_priority == 1)	zbx_snprintf(replace_to, sizeof(replace_to), "Information");
 			else if(event->trigger_priority == 2)	zbx_snprintf(replace_to, sizeof(replace_to), "Warning");
@@ -833,7 +812,6 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
  * Comments: example: "{127.0.0.1:system[procload].last(0)}" to "1.34"        *
  *                                                                            *
  ******************************************************************************/
-//void	substitute_macros(DB_TRIGGER *trigger, DB_ACTION *action, char *data, int dala_max_len)
 void	substitute_macros(DB_EVENT *event, DB_ACTION *action, char *data, int dala_max_len)
 {
 	char	

@@ -111,15 +111,15 @@ int	node_events(char *data)
 
 	datalen = strlen(data);
 
-//	zabbix_log( LOG_LEVEL_WARNING, "In node_events(len:%d)", datalen);
-//
+	zabbix_log( LOG_LEVEL_DEBUG, "In node_events(len:%d)", datalen);
+
 	DBbegin();
        	s=(char *)strtok(data,"\n");
 	while(s!=NULL)
 	{
 		if(firstline == 1)
 		{
-//			zabbix_log( LOG_LEVEL_WARNING, "First line [%s]", s);
+/*			zabbix_log( LOG_LEVEL_WARNING, "First line [%s]", s); */
 			zbx_get_field(s,tmp,1,'|');
 			sender_nodeid=atoi(tmp);
 			zbx_get_field(s,tmp,2,'|');
@@ -130,7 +130,7 @@ int	node_events(char *data)
 		}
 		else
 		{
-//			zabbix_log( LOG_LEVEL_WARNING, "Got line [%s]", s);
+/*			zabbix_log( LOG_LEVEL_WARNING, "Got line [%s]", s); */
 			process_record(nodeid, s);
 		}
 

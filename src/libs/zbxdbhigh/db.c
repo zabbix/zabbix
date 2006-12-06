@@ -180,8 +180,7 @@ void    DBconnect(void)
 void DBbegin(void)
 {
 #ifdef	HAVE_MYSQL
-// Fix autocommit in DBconnect
-//	DBexecute("begin;");
+	DBexecute("begin;");
 #endif
 #ifdef	HAVE_SQLITE3
 	zbx_mutex_lock(&sqlite_access);
@@ -210,8 +209,7 @@ void DBbegin(void)
 void DBcommit(void)
 {
 #ifdef	HAVE_MYSQL
-// Fix autocommit in DBconnect
-//	DBexecute("commit;");
+	DBexecute("commit;");
 #endif
 #ifdef	HAVE_SQLITE3
 	DBexecute("commit;");
@@ -224,7 +222,7 @@ void DBcommit(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: DBrllback                                                        *
+ * Function: DBrollback                                                       *
  *                                                                            *
  * Purpose: Rollback transaction                                              *
  *                                                                            *
@@ -239,6 +237,9 @@ void DBcommit(void)
  ******************************************************************************/
 void DBrollback(void)
 {
+#ifdef	HAVE_MYSQL
+	DBexecute("rollback;");
+#endif
 #ifdef	HAVE_SQLITE3
 	DBexecute("rollback;");
 
