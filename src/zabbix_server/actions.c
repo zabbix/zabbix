@@ -67,7 +67,6 @@
  * Comments: Cannot use action->userid as it may also be groupid              *
  *                                                                            *
  ******************************************************************************/
-//static	void	send_to_user_medias(DB_TRIGGER *trigger,DB_ACTION *action, int userid)
 static	void	send_to_user_medias(DB_EVENT *event,DB_ACTION *action, zbx_uint64_t userid)
 {
 	DB_MEDIA media;
@@ -81,13 +80,11 @@ static	void	send_to_user_medias(DB_EVENT *event,DB_ACTION *action, zbx_uint64_t 
 	while((row=DBfetch(result)))
 	{
 		ZBX_STR2UINT64(media.mediatypeid, row[0]);
-//		media.mediatypeid=atoi(row[0]);
 		media.sendto=row[1];
 		media.active=atoi(row[2]);
 		media.severity=atoi(row[3]);
 		media.period=row[4];
 
-//		zabbix_log( LOG_LEVEL_DEBUG, "Trigger severity [%d] Media severity [%d] Period [%s]",trigger->priority, media.severity, media.period);
 		zabbix_log( LOG_LEVEL_DEBUG, "Trigger severity [%d] Media severity [%d] Period [%s]",event->trigger_priority, media.severity, media.period);
 		if(((1<<event->trigger_priority)&media.severity)==0)
 		{
@@ -121,7 +118,6 @@ static	void	send_to_user_medias(DB_EVENT *event,DB_ACTION *action, zbx_uint64_t 
  * Comments: action->recipient specifies user or group                        *
  *                                                                            *
  ******************************************************************************/
-//static	void	send_to_user(DB_TRIGGER *trigger,DB_ACTION *action)
 static	void	send_to_user(DB_EVENT *event, DB_ACTION *action)
 {
 	DB_RESULT	result;
@@ -130,7 +126,6 @@ static	void	send_to_user(DB_EVENT *event, DB_ACTION *action)
 
 	if(action->recipient == RECIPIENT_TYPE_USER)
 	{
-//		send_to_user_medias(trigger, action, action->userid);
 		send_to_user_medias(event, action, action->userid);
 	}
 	else if(action->recipient == RECIPIENT_TYPE_GROUP)
@@ -139,10 +134,8 @@ static	void	send_to_user(DB_EVENT *event, DB_ACTION *action)
 			action->userid);
 		while((row=DBfetch(result)))
 		{
-//			send_to_user_medias(trigger, action, atoi(row[0]));
 			ZBX_STR2UINT64(userid, row[0]);
 			send_to_user_medias(event, action, userid);
-//			send_to_user_medias(event, action, atoi(row[0]));
 		}
 		DBfree_result(result);
 	}
@@ -313,7 +306,6 @@ static int get_next_command(char** command_list, char** alias, int* is_group, ch
  * Comments: commands devided with newline                                    *
  *                                                                            *
  ******************************************************************************/
-//static	void	run_commands(DB_TRIGGER *trigger,DB_ACTION *action)
 static	void	run_commands(DB_EVENT *event, DB_ACTION *action)
 {
 	DB_RESULT result;
@@ -386,7 +378,6 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 	if(condition->conditiontype == CONDITION_TYPE_HOST_GROUP)
 	{
 		ZBX_STR2UINT64(condition_value, condition->value);
-//		result = DBselect("select distinct hg.groupid from hosts_groups hg,hosts h, items i, functions f, triggers t where hg.hostid=h.hostid and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=%d", trigger->triggerid);
 		result = DBselect("select distinct hg.groupid from hosts_groups hg,hosts h, items i, functions f, triggers t where hg.hostid=h.hostid and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=" ZBX_FS_UI64,
 			event->triggerid);
 		if(condition->operator == CONDITION_OPERATOR_EQUAL)
@@ -423,7 +414,6 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 	else if(condition->conditiontype == CONDITION_TYPE_HOST)
 	{
 		ZBX_STR2UINT64(condition_value, condition->value);
-//		result = DBselect("select distinct h.hostid from hosts h, items i, functions f, triggers t where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=%d", trigger->triggerid);
 		result = DBselect("select distinct h.hostid from hosts h, items i, functions f, triggers t where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=" ZBX_FS_UI64, event->triggerid);
 		if(condition->operator == CONDITION_OPERATOR_EQUAL)
 		{
@@ -462,7 +452,6 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		zabbix_log( LOG_LEVEL_DEBUG, "CONDITION_TYPE_TRIGGER [" ZBX_FS_UI64 ":%s]", condition_value, condition->value);
 		if(condition->operator == CONDITION_OPERATOR_EQUAL)
 		{
-//			if(trigger->triggerid == atoi(condition->value))
 			if(event->triggerid == condition_value)
 			{
 				ret = SUCCEED;
@@ -470,7 +459,6 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		}
 		else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
 		{
-//			if(trigger->triggerid != atoi(condition->value))
 			if(event->triggerid != condition_value)
 			{
 				ret = SUCCEED;
@@ -483,10 +471,8 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 	}
 	else if(condition->conditiontype == CONDITION_TYPE_TRIGGER_NAME)
 	{
-//		zbx_snprintf(tmp_str, sizeof(tmp_str), "%s",trigger->description);
 		zbx_snprintf(tmp_str, sizeof(tmp_str), "%s",event->trigger_description);
 		
-//		substitute_simple_macros(trigger, NULL, tmp_str, sizeof(tmp_str), MACRO_TYPE_TRIGGER_DESCRIPTION);
 		substitute_simple_macros(event, NULL, tmp_str, sizeof(tmp_str), MACRO_TYPE_TRIGGER_DESCRIPTION);
 		
 		if(condition->operator == CONDITION_OPERATOR_LIKE)
@@ -513,7 +499,6 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 	{
 		if(condition->operator == CONDITION_OPERATOR_EQUAL)
 		{
-//			if(trigger->priority == atoi(condition->value))
 			if(event->trigger_priority == atoi(condition->value))
 			{
 				ret = SUCCEED;
@@ -521,7 +506,6 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		}
 		else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
 		{
-//			if(trigger->priority != atoi(condition->value))
 			if(event->trigger_priority != atoi(condition->value))
 			{
 				ret = SUCCEED;
@@ -529,7 +513,6 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		}
 		else if(condition->operator == CONDITION_OPERATOR_MORE_EQUAL)
 		{
-//			if(trigger->priority >= atoi(condition->value))
 			if(event->trigger_priority >= atoi(condition->value))
 			{
 				ret = SUCCEED;
@@ -537,7 +520,6 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		}
 		else if(condition->operator == CONDITION_OPERATOR_LESS_EQUAL)
 		{
-//			if(trigger->priority <= atoi(condition->value))
 			if(event->trigger_priority <= atoi(condition->value))
 			{
 				ret = SUCCEED;
@@ -554,7 +536,6 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		zabbix_log( LOG_LEVEL_DEBUG, "CONDITION_TYPE_TRIGGER_VALUE [%s:%s]", event->value, condition->value);
 		if(condition->operator == CONDITION_OPERATOR_EQUAL)
 		{
-//			if(new_trigger_value == atoi(condition->value))
 			if(event->value == atoi(condition->value))
 			{
 				ret = SUCCEED;
@@ -634,9 +615,7 @@ static int	check_action_conditions(DB_EVENT *event, zbx_uint64_t actionid)
 	while((row=DBfetch(result)))
 	{
 		ZBX_STR2UINT64(condition.conditionid, row[0]);
-//		condition.conditionid=atoi(row[0]);
 		ZBX_STR2UINT64(condition.actionid, row[1]);
-//		condition.actionid=atoi(row[1]);
 		condition.conditiontype=atoi(row[2]);
 		condition.operator=atoi(row[3]);
 		condition.value=row[4];
@@ -644,7 +623,6 @@ static int	check_action_conditions(DB_EVENT *event, zbx_uint64_t actionid)
 		/* OR conditions */
 		if(old_type == condition.conditiontype)
 		{
-//			if(check_action_condition(trigger, new_trigger_value, &condition) == SUCCEED)
 			if(check_action_condition(event, &condition) == SUCCEED)
 				ret = SUCCEED;
 		}
@@ -653,7 +631,6 @@ static int	check_action_conditions(DB_EVENT *event, zbx_uint64_t actionid)
 		{
 			/* Break if PREVIOUS AND condition is FALSE */
 			if(ret == FAIL) break;
-//			if(check_action_condition(trigger, new_trigger_value, &condition) == FAIL)
 			if(check_action_condition(event, &condition) == FAIL)
 				ret = FAIL;
 		}
@@ -698,12 +675,10 @@ void	apply_actions(DB_EVENT *event)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In apply_actions(eventid:" ZBX_FS_UI64 ")",event->eventid);
 
-//	if(TRIGGER_VALUE_TRUE == trigger_value)
 	if(TRIGGER_VALUE_TRUE == event->value)
 	{
 		zabbix_log( LOG_LEVEL_DEBUG, "Check dependencies");
 
-//		result = DBselect("select count(*) from trigger_depends d,triggers t where d.triggerid_down=%d and d.triggerid_up=t.triggerid and t.value=%d",trigger->triggerid, TRIGGER_VALUE_TRUE);
 		result = DBselect("select count(*) from trigger_depends d,triggers t where d.triggerid_down=" ZBX_FS_UI64 " and d.triggerid_up=t.triggerid and t.value=%d",event->triggerid, TRIGGER_VALUE_TRUE);
 		row=DBfetch(result);
 		if(row && DBis_null(row[0]) != SUCCEED)
@@ -731,19 +706,14 @@ void	apply_actions(DB_EVENT *event)
 	while((row=DBfetch(result)))
 	{
 		ZBX_STR2UINT64(action.actionid, row[0]);
-//		action.actionid=atoi(row[0]);
 
-//		if(check_action_conditions(trigger, trigger_value, action.actionid) == SUCCEED)
 		if(check_action_conditions(event, action.actionid) == SUCCEED)
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Conditions match our trigger. Do apply actions.");
 			ZBX_STR2UINT64(action.userid, row[1]);
-//			action.userid=atoi(row[1]);
 			
 			strscpy(action.subject,row[2]);
 			strscpy(action.message,row[3]);
-//			substitute_macros(trigger, &action, action.message, sizeof(action.message));
-//			substitute_macros(trigger, &action, action.subject, sizeof(action.subject));
 			substitute_macros(event, &action, action.message, sizeof(action.message));
 			substitute_macros(event, &action, action.subject, sizeof(action.subject));
 
@@ -754,10 +724,8 @@ void	apply_actions(DB_EVENT *event)
 			action.actiontype=atoi(row[8]);
 
 			if(action.actiontype == ACTION_TYPE_MESSAGE)
-//				send_to_user(trigger,&action);
 				send_to_user(event,&action);
 			else
-//				run_commands(trigger,&action);
 				run_commands(event,&action);
 
 /*			zbx_snprintf(sql,sizeof(sql),"update actions set nextcheck=%d where actionid=%d",now+action.delay,action.actionid);

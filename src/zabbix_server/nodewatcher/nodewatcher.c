@@ -76,8 +76,6 @@ static int calculate_checksums()
 
 	char	*sql;
 	int	sql_allocated, sql_offset;
-//	char	tmp[MAX_STRING_LEN];
-//	char	fields[MAX_STRING_LEN];
 
 	int	i = 0;
 	int	j;
@@ -91,11 +89,7 @@ static int calculate_checksums()
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In calculate_checksums");
 
-
-	DBbegin();
-
 	DBexecute("delete from node_cksum where cksumtype=%d", NODE_CKSUM_TYPE_NEW);
-	// insert into node_cksum (select NULL,0,'items','itemid',itemid,0,md5(concat(key_)) as md5 from items);
 
 	/* Select all nodes */
 	result =DBselect("select nodeid from nodes");
@@ -111,11 +105,9 @@ static int calculate_checksums()
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
 				"select 'table                  ','field                ',itemid, '012345678901234' from items where 1=0\n");
 
-//		zbx_snprintf(sql,sizeof(sql),"select 'table                  ','field                ',itemid, '012345678901234' from items where 1=0\n");
-
 		for(i=0;tables[i].table!=0;i++)
 		{
-//			zabbix_log( LOG_LEVEL_WARNING, "In calculate_checksums2 [%s]", tables[i].table );
+/*			zabbix_log( LOG_LEVEL_WARNING, "In calculate_checksums2 [%s]", tables[i].table ); */
 			/* Do not sync some of tables */
 			if( (tables[i].flags & ZBX_SYNC) ==0)	continue;
 
@@ -128,13 +120,10 @@ static int calculate_checksums()
 					tables[i].table, tables[i].recid, tables[i].recid);
 
 			j=0;
-//			fields[0]=0;
 			while(tables[i].fields[j].name != 0)
 			{
-//				zabbix_log( LOG_LEVEL_WARNING, "In calculate_checksums2 [%s,%s]", tables[i].table,tables[i].fields[j].name );
 				if( (tables[i].fields[j].flags & ZBX_SYNC) ==0)
 				{
-//					zabbix_log( LOG_LEVEL_WARNING, "Skip %s.%s", tables[i].table,tables[i].fields[j].name );
 					j++;
 					continue;
 				}
@@ -143,21 +132,15 @@ static int calculate_checksums()
 #else
 				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, "coalesce(%s,'1234567890')||", tables[i].fields[j].name);
 #endif
-//				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 4096, "quote(%s),", tables[i].fields[j].name);
-//				zbx_strlcat(fields,"quote(",sizeof(fields));
-//				zbx_strlcat(fields,tables[i].fields[j].name,sizeof(fields));
-//				zbx_strlcat(fields,"),",sizeof(fields));
 				j++;
 			}
 #ifdef	HAVE_MYSQL
-			if(j>0)			sql_offset--; // Remove last ,
+			if(j>0)			sql_offset--; /* Remove last */
 #else
-			if(j>0)			sql_offset-=2; // Remove last ||
+			if(j>0)			sql_offset-=2; /* Remove last */
 #endif
 
-//			if(fields[0]!=0)	fields[strlen(fields)-1] = 0;
-
-			// select table,recid,md5(fields) from table union all ...
+			/* select table,recid,md5(fields) from table union all ... */
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 4096,
 #ifdef	HAVE_MYSQL
 					")) from %s where %s>=" ZBX_FS_UI64 " and %s<=" ZBX_FS_UI64 "\n",
@@ -168,23 +151,16 @@ static int calculate_checksums()
 					tables[i].recid, (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid,
 					tables[i].recid, (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid+__UINT64_C(99999999999999));
 
-//			zbx_snprintf(tmp,sizeof(tmp),"union all select '%s','%s',%s,md5(concat(%s)) from %s where %s>=" ZBX_FS_UI64 " and %s<=" ZBX_FS_UI64 "\n",
-//					tables[i].table, tables[i].recid, tables[i].recid, fields, tables[i].table,
-//					tables[i].recid, (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid,
-//					tables[i].recid, (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid+__UINT64_C(99999999999999));
-//		zabbix_log( LOG_LEVEL_WARNING, "TMP [%s]", tmp);
-//			zbx_strlcat(sql,tmp,sizeof(sql));
 		}
-//		zabbix_log( LOG_LEVEL_WARNING, "SQL DUMP [%s]", sql);
+/*		zabbix_log( LOG_LEVEL_WARNING, "SQL DUMP [%s]", sql); */
 
 		result2 =DBselect(sql);
 
-//		zabbix_log( LOG_LEVEL_WARNING, "Selected records in %d seconds", time(NULL)-now);
+/*		zabbix_log( LOG_LEVEL_WARNING, "Selected records in %d seconds", time(NULL)-now);*/
 		now = time(NULL);
 		i=0;
 		while((row2=DBfetch(result2)))
 		{
-//			zabbix_log( LOG_LEVEL_WARNING, "Cksum [%s]", row2[3]);
 			DBexecute("insert into node_cksum (cksumid,nodeid,tablename,fieldname,recordid,cksumtype,cksum) "\
 				"values (" ZBX_FS_UI64 ",%d,'%s','%s',%s,%d,'%s')",
 				DBget_nextid("node_cksum","cksumid"),
@@ -193,12 +169,8 @@ static int calculate_checksums()
 		}
 		DBfree_result(result2);
 		free(sql);
-//		zabbix_log( LOG_LEVEL_WARNING, "Added %d records in %d seconds", i, time(NULL)-now);
 	}
 	DBfree_result(result);
-
-	DBcommit();
-
 
 	return SUCCEED;
 }
@@ -221,12 +193,8 @@ static int calculate_checksums()
  ******************************************************************************/
 static int update_checksums()
 {
-	DBbegin();
-
 	DBexecute("delete from node_cksum where cksumtype=%d", NODE_CKSUM_TYPE_OLD);
 	DBexecute("update node_cksum set cksumtype=%d where cksumtype=%d", NODE_CKSUM_TYPE_OLD, NODE_CKSUM_TYPE_NEW);
-
-	DBcommit();
 
 	return SUCCEED;
 }
@@ -253,14 +221,11 @@ static int compare_checksums()
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	/* Begin work */
-	DBbegin();
-
 	/* Find updated records */
 	result = DBselect("select curr.nodeid,curr.tablename,curr.recordid from node_cksum prev, node_cksum curr where curr.tablename=prev.tablename and curr.recordid=prev.recordid and curr.fieldname=prev.fieldname and curr.nodeid=prev.nodeid and curr.cksum<>prev.cksum and curr.cksumtype=%d and prev.cksumtype=%d", NODE_CKSUM_TYPE_NEW, NODE_CKSUM_TYPE_OLD);
 	while((row=DBfetch(result)))
 	{
-//		zabbix_log( LOG_LEVEL_WARNING, "Adding record to node_configlog");
+/*		zabbix_log( LOG_LEVEL_WARNING, "Adding record to node_configlog");*/
 		DBexecute("insert into node_configlog (conflogid,nodeid,tablename,recordid,operation)" \
 				"values (" ZBX_FS_UI64 ",%s,'%s',%s,%d)",
 				DBget_nextid("node_configlog","conflogid"),
@@ -276,7 +241,7 @@ static int compare_checksums()
 
 	while((row=DBfetch(result)))
 	{
-//		zabbix_log( LOG_LEVEL_WARNING, "Adding record to node_configlog");
+/*		zabbix_log( LOG_LEVEL_WARNING, "Adding record to node_configlog"); */
 		DBexecute("insert into node_configlog (conflogid,nodeid,tablename,recordid,operation)" \
 			"values (" ZBX_FS_UI64 ",%s,'%s',%s,%d)",
 			DBget_nextid("node_configlog","conflogid"),
@@ -292,16 +257,13 @@ static int compare_checksums()
 
 	while((row=DBfetch(result)))
 	{
-//		zabbix_log( LOG_LEVEL_WARNING, "Adding record to node_configlog");
+/*		zabbix_log( LOG_LEVEL_WARNING, "Adding record to node_configlog");*/
 		DBexecute("insert into node_configlog (conflogid,nodeid,tablename,recordid,operation)" \
 				"values (" ZBX_FS_UI64 ",%s,'%s',%s,%d)",
 				DBget_nextid("node_configlog","conflogid"),
 				row[0],row[1],row[2],NODE_CONFIGLOG_OP_DELETE);
 	}
 	DBfree_result(result);
-
-	/* Commit */
-	DBcommit();
 
 	return SUCCEED;
 }
@@ -327,7 +289,7 @@ int main_nodewatcher_loop()
 	int start, end;
 	int	lastrun = 0;
 
-//	zabbix_log( LOG_LEVEL_WARNING, "In main_nodeupdater_loop()");
+	zabbix_log( LOG_LEVEL_WARNING, "In main_nodeupdater_loop()");
 	for(;;)
 	{
 		start = time(NULL);
@@ -339,12 +301,15 @@ int main_nodewatcher_loop()
 
 		if(lastrun + 120 < start)
 		{
+
+			DBbegin();
 			calculate_checksums();
 			compare_checksums();
 			update_checksums();
 
 			/* Send configuration changes to required nodes */
 			main_nodesender();
+			DBcommit();
 
 			lastrun = start;
 		}

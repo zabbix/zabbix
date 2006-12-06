@@ -88,10 +88,7 @@ int send_to_node(int dest_nodeid, int nodeid, char *data)
 	DB_RESULT	result;
 	DB_ROW		row;
 
-//	zabbix_log( LOG_LEVEL_WARNING, "In send_to_node (%d,%d)", nodeid, strlen(xml));
 	zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Sending data of node %d to node %d datalen %d", CONFIG_NODEID, nodeid, dest_nodeid, strlen(data));
-//	if(strlen(data)<1024*1024)
-//		zabbix_log( LOG_LEVEL_WARNING, "Data [%s]", data);
 
 	result = DBselect("select ip, port from nodes where nodeid=%d", dest_nodeid);
 	row = DBfetch(result);
@@ -105,7 +102,6 @@ int send_to_node(int dest_nodeid, int nodeid, char *data)
 	port=atoi(row[1]);
 	DBfree_result(result);
 
-//	zabbix_log( LOG_LEVEL_WARNING, "In send_to_node IP (%s:%d)", ip, port);
 	servaddr_in.sin_family=AF_INET;
 	hp=gethostbyname(ip);
 
@@ -150,7 +146,6 @@ int send_to_node(int dest_nodeid, int nodeid, char *data)
 	len64 = (zbx_uint64_t)strlen(data);
 
 	/* Write data length */
-//	zabbix_log( LOG_LEVEL_WARNING, "Sending data len [" ZBX_FS_UI64 "]", len64);
 	i=write(s, &len64, sizeof(len64));
 	if(i == -1)
 	{
@@ -169,10 +164,8 @@ int send_to_node(int dest_nodeid, int nodeid, char *data)
 			return	FAIL;
 		}
 		written+=i;
-//		zabbix_log( LOG_LEVEL_WARNING, "Wrote %d of %d bytes to node %d", written, strlen(xml), nodeid);
 	}
 	i=sizeof(struct sockaddr_in);
-/*	i=recvfrom(s,result,MAX_STRING_LEN-1,0,(struct sockaddr *)&servaddr_in,(socklen_t *)&i);*/
 	i=read(s,answer,MAX_STRING_LEN-1);
 	if(i==-1)
 	{
