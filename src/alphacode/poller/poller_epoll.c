@@ -124,7 +124,7 @@ int	main()
 		{
 			if(errno == EINPROGRESS)
 			{
-//				printf("Connection in progress\n");
+/*				printf("Connection in progress\n");*/
 			}
 			else
 			{
@@ -133,11 +133,11 @@ int	main()
 			}
 		}
 
-//		if(fcntl(s, F_SETFL, O_NONBLOCK) == -1)
-//		{
-//			perror("fcntl() failed\n");
-//			exit(-1);
-//		}
+/*		if(fcntl(s, F_SETFL, O_NONBLOCK) == -1)
+		{
+			perror("fcntl() failed\n");
+			exit(-1);
+		}*/
 
 		ev.events = EPOLLIN | EPOLLERR | EPOLLHUP | EPOLLOUT;
 		ev.data.fd = s;
@@ -146,7 +146,7 @@ int	main()
 			perror("epoll_ctl, adding listenfd\n");
 			exit(1);
 		} 
-//		printf("epoll_ctl ok fd [%d]\n", s);
+/*		printf("epoll_ctl ok fd [%d]\n", s); */
 	}
 
 	wait_connect();

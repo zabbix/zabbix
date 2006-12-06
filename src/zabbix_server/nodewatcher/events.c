@@ -86,14 +86,11 @@ static int process_node(int nodeid, int master_nodeid, zbx_uint64_t event_lastid
 
 	zbx_uint64_t	eventid;
 
-//	zabbix_log( LOG_LEVEL_WARNING, "In process_node(local:%d, event_lastid:" ZBX_FS_UI64 ")",nodeid, event_lastid);
+	zabbix_log( LOG_LEVEL_WARNING, "In process_node(local:%d, event_lastid:" ZBX_FS_UI64 ")",nodeid, event_lastid);
 	/* Begin work */
 
 	data = malloc(allocated);
 	memset(data,0,allocated);
-
-//	zbx_snprintf(tmp,sizeof(tmp),"Events|%d|%d\n", CONFIG_NODEID, nodeid);
-//	zbx_strlcat(data,tmp,DATA_MAX);
 
 	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "Events|%d|%d", CONFIG_NODEID, nodeid);
 
@@ -101,10 +98,7 @@ static int process_node(int nodeid, int master_nodeid, zbx_uint64_t event_lastid
 	while((row=DBfetch(result)))
 	{
 		ZBX_STR2UINT64(eventid,row[0])
-//		zabbix_log( LOG_LEVEL_WARNING, "Processing eventid " ZBX_FS_UI64, eventid);
 		found = 1;
-//		zbx_snprintf(tmp,sizeof(tmp),"%s|%s|%s|%s|%s\n", row[0],row[1],row[2],row[3],row[4]);
-//		zbx_strlcat(data,tmp,DATA_MAX);
 		zbx_snprintf_alloc(&data, &allocated, &offset, 1024, "\n%s|%s|%s|%s|%s",
 			       row[0],row[1],row[2],row[3],row[4]);
 	}
@@ -113,12 +107,12 @@ static int process_node(int nodeid, int master_nodeid, zbx_uint64_t event_lastid
 		zabbix_log( LOG_LEVEL_DEBUG, "Sending [%s]",data);
 		if(send_to_node(master_nodeid, nodeid, data) == SUCCEED)
 		{
-//			zabbix_log( LOG_LEVEL_WARNING, "Updating nodes.event_lastid");
+			zabbix_log( LOG_LEVEL_DEBUG, "Updating nodes.event_lastid");
 			DBexecute("update nodes set event_lastid=" ZBX_FS_UI64 " where nodeid=%d", eventid, nodeid);
 		}
 		else
 		{
-//			zabbix_log( LOG_LEVEL_WARNING, "Not updating nodes.event_lastid");
+			zabbix_log( LOG_LEVEL_DEBUG, "Not updating nodes.event_lastid");
 		}
 	}
 	DBfree_result(result);
@@ -152,6 +146,8 @@ void main_eventsender()
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In main_eventsender()");
 
+	DBbegin();
+
 	master_nodeid = get_master_node(CONFIG_NODEID);
 
 	if(master_nodeid == 0)		return;
@@ -167,4 +163,6 @@ void main_eventsender()
 	}
 
 	DBfree_result(result);
+
+	DBcommit();
 }

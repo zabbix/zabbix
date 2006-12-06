@@ -89,8 +89,6 @@ static int process_node_history_str(int nodeid, int master_nodeid)
 	data = malloc(allocated);
 	memset(data,0,allocated);
 
-//	i = zbx_snprintf(data,DATA_MAX,"History|%d|%d\n", CONFIG_NODEID, nodeid);
-//	p+=i;
 	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "History|%d|%d", CONFIG_NODEID, nodeid);
 
 	zbx_snprintf(sql,sizeof(sql),"select id,itemid,clock,value from history_str_sync where nodeid=%d order by id", nodeid);
@@ -100,18 +98,14 @@ static int process_node_history_str(int nodeid, int master_nodeid)
 	{
 		ZBX_STR2UINT64(id,row[0])
 		found = 1;
-//		i = zbx_snprintf(p,DATA_MAX,"%d|%s|%s|%s\n", ZBX_TABLE_HISTORY_STR,row[1],row[2],row[3]);
-//		p+=i;
-//		if(p>data+DATA_MAX-1) break;
 		zbx_snprintf_alloc(&data, &allocated, &offset, 1024, "\n%d|%s|%s|%s",
 			       ZBX_TABLE_HISTORY_STR,row[1],row[2],row[3]);
 	}
 	if(found == 1)
 	{
-//		zabbix_log( LOG_LEVEL_WARNING, "Sending [%s]",data);
 		if(send_to_node(master_nodeid, nodeid, data) == SUCCEED)
 		{
-//			zabbix_log( LOG_LEVEL_WARNING, "Updating nodes.history_lastid");
+/*			zabbix_log( LOG_LEVEL_WARNING, "Updating nodes.history_lastid");*/
 			DBexecute("update nodes set history_str_lastid=" ZBX_FS_UI64 " where nodeid=%d", id, nodeid);
 			DBexecute("delete from history_str_sync where nodeid=%d and id<=" ZBX_FS_UI64, nodeid, id);
 		}
@@ -164,10 +158,6 @@ static int process_node_history_uint(int nodeid, int master_nodeid)
 	data = malloc(allocated);
 	memset(data,0,allocated);
 
-//	p = data;
-//	i = zbx_snprintf(data,DATA_MAX,"History|%d|%d\n", CONFIG_NODEID, nodeid);
-//	p+=i;
-
 	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "History|%d|%d", CONFIG_NODEID, nodeid);
 
 	zbx_snprintf(sql,sizeof(sql),"select id,itemid,clock,value from history_uint_sync where nodeid=%d order by id", nodeid);
@@ -177,18 +167,14 @@ static int process_node_history_uint(int nodeid, int master_nodeid)
 	{
 		ZBX_STR2UINT64(id,row[0])
 		found = 1;
-//		i = zbx_snprintf(p,DATA_MAX,"%d|%s|%s|%s\n", ZBX_TABLE_HISTORY_UINT,row[1],row[2],row[3]);
-//		p+=i;
-//		if(p>data+DATA_MAX-1) break;
 		zbx_snprintf_alloc(&data, &allocated, &offset, 128, "\n%d|%s|%s|%s",
 			       ZBX_TABLE_HISTORY_UINT,row[1],row[2],row[3]);
 	}
 	if(found == 1)
 	{
-//		zabbix_log( LOG_LEVEL_WARNING, "Sending [%s]",data);
 		if(send_to_node(master_nodeid, nodeid, data) == SUCCEED)
 		{
-//			zabbix_log( LOG_LEVEL_WARNING, "Updating nodes.history_lastid");
+/*			zabbix_log( LOG_LEVEL_WARNING, "Updating nodes.history_lastid"); */
 			DBexecute("update nodes set history_uint_lastid=" ZBX_FS_UI64 " where nodeid=%d", id, nodeid);
 			DBexecute("delete from history_uint_sync where nodeid=%d and id<=" ZBX_FS_UI64, nodeid, id);
 		}
@@ -244,9 +230,6 @@ static int process_node_history(int nodeid, int master_nodeid)
 	data = malloc(allocated);
 	memset(data,0,allocated);
 
-//	p = data;
-//	i = zbx_snprintf(data,DATA_MAX,"History|%d|%d\n", CONFIG_NODEID, nodeid);
-//	p+=i;
 	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "History|%d|%d", CONFIG_NODEID, nodeid);
 
 	zbx_snprintf(sql,sizeof(sql),"select id,itemid,clock,value from history_sync where nodeid=%d order by id", nodeid);
@@ -256,9 +239,6 @@ static int process_node_history(int nodeid, int master_nodeid)
 	{
 		ZBX_STR2UINT64(id,row[0])
 		found = 1;
-//		i = zbx_snprintf(p,DATA_MAX,"%d|%s|%s|%s\n", ZBX_TABLE_HISTORY,row[1],row[2],row[3]);
-//		p+=i;
-//		if(p>data+DATA_MAX-1) break;
 		zbx_snprintf_alloc(&data, &allocated, &offset, 128, "\n%d|%s|%s|%s",
 			       ZBX_TABLE_HISTORY,row[1],row[2],row[3]);
 	}
@@ -267,7 +247,7 @@ static int process_node_history(int nodeid, int master_nodeid)
 		zabbix_log( LOG_LEVEL_DEBUG, "Sending [%s]",data);
 		if(send_to_node(master_nodeid, nodeid, data) == SUCCEED)
 		{
-//			zabbix_log( LOG_LEVEL_WARNING, "Updating nodes.history_lastid=" ZBX_FS_UI64, id);
+/*			zabbix_log( LOG_LEVEL_WARNING, "Updating nodes.history_lastid=" ZBX_FS_UI64, id); */
 			DBexecute("update nodes set history_lastid=" ZBX_FS_UI64 " where nodeid=%d", id, nodeid);
 			DBexecute("delete from history_sync where nodeid=%d and id<=" ZBX_FS_UI64, nodeid, id);
 		}
@@ -309,15 +289,13 @@ static void process_node(int nodeid, int master_nodeid)
 	process_node_history(nodeid, master_nodeid);
 	process_node_history_uint(nodeid, master_nodeid);
 	process_node_history_str(nodeid, master_nodeid);
-/*	process_node_history_log(nodeid, master_nodeid);
-	process_node_trends(nodeid, master_nodeid);*/
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: main_eventsender                                                 *
+ * Function: main_historysender                                               *
  *                                                                            *
- * Purpose: periodically sends new events to master node                      *
+ * Purpose: periodically sends historical data to master node                 *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -325,7 +303,7 @@ static void process_node(int nodeid, int master_nodeid)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments: never returns                                                    *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 void main_historysender()
@@ -337,6 +315,8 @@ void main_historysender()
 	int		master_nodeid;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In main_historysender()");
+
+	DBbegin();
 
 	master_nodeid = get_master_node(CONFIG_NODEID);
 
@@ -354,5 +334,5 @@ void main_historysender()
 
 	DBfree_result(result);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In main_historysender() END");
+	DBcommit();
 }

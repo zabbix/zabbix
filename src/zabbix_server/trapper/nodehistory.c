@@ -158,7 +158,7 @@ int	node_history(char *data)
 		}
 		else
 		{
-//			zabbix_log( LOG_LEVEL_WARNING, "Got line [%s]", s);
+/*			zabbix_log( LOG_LEVEL_WARNING, "Got line [%s]", s);*/
 			process_record(nodeid, s);
 		}
 

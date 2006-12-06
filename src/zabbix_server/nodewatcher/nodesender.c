@@ -112,7 +112,7 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 	{
 		found = 1;
 
-//		zabbix_log( LOG_LEVEL_WARNING, "Fetched [%s,%s,%s]",row[0],row[1],row[2]);
+/*		zabbix_log( LOG_LEVEL_WARNING, "Fetched [%s,%s,%s]",row[0],row[1],row[2]);*/
 		for(i=0;tables[i].table!=0;i++)
 		{
 			if(strcmp(tables[i].table, row[0])==0)	break;
@@ -131,7 +131,7 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 			if(fields[0]!=0)	fields[strlen(fields)-1]=0;
 
 			result2=DBselect("select %s from %s where %s=%s", fields, row[0], tables[i].recid,row[1]);
-//			zabbix_log( LOG_LEVEL_WARNING,"select %s from %s where %s=%s",fields, row[0], tables[i].recid,row[1]);
+/*			zabbix_log( LOG_LEVEL_WARNING,"select %s from %s where %s=%s",fields, row[0], tables[i].recid,row[1]);*/
  
 			row2=DBfetch(result2);
 
@@ -143,10 +143,10 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 				for(j=0;tables[i].fields[j].name!=0;j++)
 				{
 					if( (tables[i].fields[j].flags & ZBX_SYNC) ==0)	continue;
-//					// Fieldname, type, value
+					/* Fieldname, type, value */
 					if(DBis_null(row2[j]) == SUCCEED)
 					{
-//						zabbix_log( LOG_LEVEL_WARNING, "Field name [%s] [%s]",tables[i].fields[j].name,row2[j]);
+/*						zabbix_log( LOG_LEVEL_WARNING, "Field name [%s] [%s]",tables[i].fields[j].name,row2[j]);*/
 						zbx_snprintf_alloc(&xml, &allocated, &offset, 16*1024, "|%d|%d|NULL",
 							tables[i].fields[j].name,tables[i].fields[j].type);
 					}
@@ -211,8 +211,7 @@ static int get_slave_node(int nodeid)
 	int		ret = 0;
 	int		m;
 
-//	zabbix_log( LOG_LEVEL_WARNING, "In get_slave_node(%d,%d)",local_nodeid, nodeid);
-	/* Begin work */
+	zabbix_log( LOG_LEVEL_DEBUG, "In get_slave_node(%d)", nodeid);
 
 	result = DBselect("select masterid from nodes where nodeid=%d", nodeid);
 	row = DBfetch(result);
@@ -256,8 +255,7 @@ int get_master_node(int nodeid)
 	DB_ROW		row;
 	int		ret = 0;
 
-//	zabbix_log( LOG_LEVEL_WARNING, "In get_master_node(%d,%d)",local_nodeid, nodeid);
-	/* Begin work */
+	zabbix_log( LOG_LEVEL_DEBUG, "In get_master_node(%d)", nodeid);
 
 	result = DBselect("select masterid from nodes where nodeid=%d", CONFIG_NODEID);
 	row = DBfetch(result);
@@ -294,8 +292,7 @@ static int send_to_master_and_slave(int nodeid)
 	int		master_result, slave_result;
 	zbx_uint64_t	maxlogid;
 
-//	zabbix_log( LOG_LEVEL_WARNING, "In send_to_master_and_slave(local:%d,node:%d)",local_nodeid, nodeid);
-	/* Begin work */
+	zabbix_log( LOG_LEVEL_DEBUG, "In send_to_master_and_slave(node:%d)", nodeid);
 
 	result = DBselect("select max(conflogid) from node_configlog where nodeid=%d", nodeid);
 
@@ -303,7 +300,7 @@ static int send_to_master_and_slave(int nodeid)
 
 	if(DBis_null(row[0]) == SUCCEED)
 	{
-//		zabbix_log( LOG_LEVEL_WARNING, "No configuration changes of node %d on node %d", nodeid, local_nodeid);
+		zabbix_log( LOG_LEVEL_DEBUG, "No configuration changes of node %d", nodeid);
 		DBfree_result(result);
 		return SUCCEED;
 	}
@@ -311,13 +308,8 @@ static int send_to_master_and_slave(int nodeid)
 	DBfree_result(result);
 
 
-	/* Send data to master and slave if required */
-//	zabbix_log( LOG_LEVEL_WARNING, "Node [%d]", nodeid);
-//	zabbix_log( LOG_LEVEL_WARNING, "Local node [%d]", local_nodeid);
 	master_nodeid=get_master_node(nodeid);
-//	zabbix_log( LOG_LEVEL_WARNING, "Master node [%d]", master_nodeid);
 	slave_nodeid=get_slave_node(nodeid);
-//	zabbix_log( LOG_LEVEL_WARNING, "Slave node [%d]", slave_nodeid);
 
 	if(master_nodeid != 0)
 	{
@@ -334,7 +326,6 @@ static int send_to_master_and_slave(int nodeid)
 		if((master_result == SUCCEED) && (slave_result == SUCCEED))
 		{
 			DBexecute("delete from node_configlog where nodeid=%d and sync_slave=1 and sync_master=1 and conflogid<=" ZBX_FS_UI64, nodeid, maxlogid);
-//			zabbix_log(LOG_LEVEL_WARNING,"delete from node_configlog where nodeid=%d and sync_slave=1 and sync_master=1 and conflogid<=%d", nodeid, maxlogid);
 		}
 	}
 
@@ -343,7 +334,6 @@ static int send_to_master_and_slave(int nodeid)
 		if(master_result == SUCCEED)
 		{
 			DBexecute("delete from node_configlog where nodeid=%d and sync_master=1 and conflogid<=" ZBX_FS_UI64, nodeid, maxlogid);
-//			zabbix_log(LOG_LEVEL_WARNING,"delete from node_configlog where nodeid=%d and sync_master=1 and conflogid<=%d", nodeid, maxlogid);
 		}
 	}
 
@@ -352,7 +342,6 @@ static int send_to_master_and_slave(int nodeid)
 		if(slave_result == SUCCEED)
 		{
 			DBexecute("delete from node_configlog where nodeid=%d and sync_slave=1 and conflogid<=" ZBX_FS_UI64, nodeid, maxlogid);
-//			zabbix_log(LOG_LEVEL_WARNING,"delete from node_configlog where nodeid=%d and sync_slave=1 and conflogid<=%d", nodeid, maxlogid);
 		}
 	}
 
@@ -381,8 +370,7 @@ static int process_node(int nodeid)
 	DB_RESULT	result;
 	DB_ROW		row;
 
-//	zabbix_log( LOG_LEVEL_WARNING, "In process_node(local:%d,node:%d)",local_nodeid, nodeid);
-	/* Begin work */
+	zabbix_log( LOG_LEVEL_DEBUG, "In process_node(node:%d)", nodeid);
 
 	send_to_master_and_slave(nodeid);
 
