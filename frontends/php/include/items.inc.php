@@ -196,9 +196,8 @@
 			}
 		}
 
-		$db_items = DBexecute("select itemid,hostid from items".
-			" where hostid=$hostid and key_=".zbx_dbstr($key));
-		$db_item = DBfetch($db_items);
+		$db_item = DBfetch(DBselect("select itemid,hostid from items".
+			" where hostid=$hostid and key_=".zbx_dbstr($key)));
 		if($db_item && $templateid == 0)
 		{
 			error("An item with the same Key already exists for host ".$host["host"].".".
@@ -314,9 +313,8 @@
 			$delta=0;
 		}
 
-		$db_items = DBexecute("select itemid from items".
-			" where hostid=$hostid and itemid<>$itemid and key_=".zbx_dbstr($key));
-		$db_item = DBfetch($db_items);
+		$db_item = DBfetch(DBselect("select itemid from items".
+			" where hostid=$hostid and itemid<>$itemid and key_=".zbx_dbstr($key)));
 		if($db_item && $templateid == 0)
 		{
 			error("An item with the same Key already exists for host ".$host["host"].".".
@@ -534,7 +532,7 @@
 		return $result;
 	}
 
-	function	get_items_by_hostid($hostid)
+	function	&get_items_by_hostid($hostid)
 	{
 		return DBselect("select * from items where hostid=$hostid"); 
 	}

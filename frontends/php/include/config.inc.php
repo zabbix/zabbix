@@ -97,7 +97,9 @@ function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$m
 	$error = '';
 	if(!DBconnect($error))
 	{
-		error($error);
+		global	$_REQUEST;
+
+		$_REQUEST['message'] = $error;
 		define('ZBX_DISTRIBUTED', false);
 		include_once "setup.php";
 	}

@@ -46,9 +46,9 @@ require_once "include/items.inc.php";
 		}
 	
 		if($groupid==null)
-			$result = DBexecute("select * from groups where name=".zbx_dbstr($name));
+			$result = DBselect("select * from groups where name=".zbx_dbstr($name));
 		else
-			$result = DBexecute("select * from groups where name=".zbx_dbstr($name).
+			$result = DBselect("select * from groups where name=".zbx_dbstr($name).
 				" and groupid<>$groupid");
 		
 		if(DBfetch($result))
@@ -378,7 +378,7 @@ require_once "include/items.inc.php";
 		return	false;
 	}
 
-	function	get_hosts_by_templateid($templateid)
+	function	&get_hosts_by_templateid($templateid)
 	{
 		return DBselect("select h.* from hosts h, hosts_templates ht where h.hostid=ht.hostid and ht.templateid=$templateid");
 	}
@@ -593,9 +593,9 @@ require_once "include/items.inc.php";
 		}
 	
 		if($applicationid==null)
-			$result = DBexecute("select * from applications where name=".zbx_dbstr($name)." and hostid=".$hostid);
+			$result = DBselect("select * from applications where name=".zbx_dbstr($name)." and hostid=".$hostid);
 		else
-			$result = DBexecute("select * from applications where name=".zbx_dbstr($name)." and hostid=".$hostid.
+			$result = DBselect("select * from applications where name=".zbx_dbstr($name)." and hostid=".$hostid.
 				" and applicationid<>$applicationid");
 
 		$db_app = DBfetch($result);
@@ -709,7 +709,7 @@ require_once "include/items.inc.php";
 		
 	}
 
-	function	get_applications_by_templateid($applicationid)
+	function	&get_applications_by_templateid($applicationid)
 	{
 		return DBselect("select * from applications where templateid=".$applicationid);
 	}
@@ -736,12 +736,12 @@ require_once "include/items.inc.php";
 		return	false;
 	}
 
-	function	get_items_by_applicationid($applicationid)
+	function	&get_items_by_applicationid($applicationid)
 	{
 		return DBselect("select i.* from items i,items_applications ia where i.itemid=ia.itemid and ia.applicationid=$applicationid");
 	}
 
-	function	get_applications_by_hostid($hostid)
+	function	&get_applications_by_hostid($hostid)
 	{
 		return DBselect("select * from applications where hostid=$hostid");
 	}
