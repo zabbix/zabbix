@@ -362,7 +362,7 @@
 	{
 		$result = array();
 
-		$db_deps = DBexecute("select * from trigger_depends where triggerid_down=".$triggerid);
+		$db_deps = DBselect("select * from trigger_depends where triggerid_down=".$triggerid);
 		while($db_dep = DBfetch($db_deps))
 			array_push($result, $db_dep["triggerid_up"]);
 			
@@ -441,7 +441,7 @@
 			" where triggerid=$newtriggerid");
 // copy dependences
 		delete_dependencies_by_triggerid($newtriggerid);
-		$db_deps = DBexecute("select * from trigger_depends where".
+		$db_deps = DBselect("select * from trigger_depends where".
 			" triggerid_down=".$triggerid);
 		while($db_dep = DBfetch($db_deps))
 		{
@@ -915,7 +915,7 @@
 
 	function	delete_trigger_dependency($triggerid_down, $triggerid_up)
 	{
-		$result = DBexecute("select triggerid_up from trigger_depends".
+		$result = DBselect("select triggerid_up from trigger_depends".
 			" where triggerid_up=$triggerid_up and triggerid_down=$triggerid_down");
 		while($row=DBfetch($result))
 		{

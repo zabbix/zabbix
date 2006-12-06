@@ -42,6 +42,8 @@
 		"user"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		null),
 		"password"=>	array(T_ZBX_STR, O_OPT,	null,	null, 			null),
 		
+		"message"=>	array(T_ZBX_STR, O_OPT,	NULL,	NULL,			NULL),
+
 		"nodename"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		null),
 		"nodeid"=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,999),		null),
 /* actions */
@@ -109,6 +111,8 @@
 
 include_once "include/page_header.php";
 
+	if(isset($_REQUEST['message'])) show_error_message($_REQUEST['message']);
+	
 	insert_showhint_javascript();
 
 	echo BR;

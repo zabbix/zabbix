@@ -19,11 +19,15 @@
 **/
 ?>
 <?php
+	global $DB, $DB_TYPE, $DB_SERVER, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
+
 	function	DBconnect(&$error)
 	{
 		$result = true;
 		
 		global $DB, $DB_TYPE, $DB_SERVER, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
+
+		$DB = null;
 
 		if(!isset($DB_TYPE))
 		{
@@ -32,38 +36,48 @@
 		}
 		else
 		{
-			if($DB_TYPE == "MYSQL")
+			switch($DB_TYPE)
 			{
-				$DB = mysql_pconnect($DB_SERVER,$DB_USER,$DB_PASSWORD);
-				if(!mysql_select_db($DB_DATABASE))
-				{
-					$error = "Error connecting to database [".mysql_error()."]";
+				case "MYSQL":
+					$DB = mysql_pconnect($DB_SERVER,$DB_USER,$DB_PASSWORD);
+					if(!mysql_select_db($DB_DATABASE))
+					{
+						$error = "Error connecting to database [".mysql_error()."]";
+						$result = false;
+					}
+					else
+					{
+						mysql_select_db($DB_DATABASE);
+					}
+					break;
+				case "POSTGRESQL":
+					$DB=pg_pconnect("host='$DB_SERVER' dbname='$DB_DATABASE' user='$DB_USER' password='$DB_PASSWORD'");
+					if(!$DB)
+					{
+						$error = "Error connecting to database";
+						$result = false;
+					}
+					break;
+				case "ORACLE":
+					$DB = ocilogon($DB_USER, $DB_PASSWORD, "");
+			//		$DB = ocilogon($DB_USER, $DB_PASSWORD, "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=$DB_SERVER)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=$DB_DATABASE)))");
+					if(!$DB)
+					{
+						$error = "Error connecting to database";
+						$result = false;
+					}
+					break;
+				case "SQLITE3":
+					$DB = sqlite3_open($DB_DATABASE);
+					if(!$DB)
+					{
+						$error = "Error connecting to database";
+						$result = false;
+					}
+					break;
+				default:
+					$error = "Unsupported database";
 					$result = false;
-				}
-				else
-				{
-					mysql_select_db($DB_DATABASE);
-				}
-			}
-			if($DB_TYPE == "POSTGRESQL")
-			{
-				$DB=pg_pconnect("host='$DB_SERVER' dbname='$DB_DATABASE' user='$DB_USER' password='$DB_PASSWORD'");
-				if(!$DB)
-				{
-					$error = "Error connecting to database";
-					$result = false;
-				}
-			}
-
-			if($DB_TYPE == "ORACLE")
-			{
-				$DB = ocilogon($DB_USER, $DB_PASSWORD, "");
-		//		$DB = ocilogon($DB_USER, $DB_PASSWORD, "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=$DB_SERVER)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=$DB_DATABASE)))");
-				if(!$DB)
-				{
-					$error = "Error connecting to database";
-					$result = false;
-				}
 			}
 		}
 		return $result;
@@ -77,10 +91,16 @@
 
 		if($DB)
 		{
-			if($DB_TYPE == "MYSQL")			$result = mysql_close($DB);
-			elseif($DB_TYPE == "POSTGRESQL")	$result = pg_close($DB);
-			elseif($DB_TYPE == "ORACLE")		$result = ociclose($DB);
+			switch($DB_TYPE)
+			{
+				case "MYSQL":		$result = mysql_close($DB);	break;
+				case "POSTGRESQL":	$result = pg_close($DB);	break;
+				case "ORACLE":		$result = ociclose($DB);	break;
+				case "SQLITE3":		$result = true; sqlite3_close($DB);	break;
+				default:		break;
+			}
 		}
+
 		unset(
 			$GLOBALS['DB'],
 			$GLOBALS['DB_TYPE'],
@@ -89,7 +109,6 @@
 			$GLOBALS['DB_USER'],
 			$GLOBALS['DB_PASSWORD']
 			);
-
 		
 		return $result;
 	}
@@ -111,8 +130,6 @@
 		$fl = explode(";\n", implode("\n",$fl));
 		unset($fl[count($fl)-1]);
 		
-		$result = true;
-
 		foreach($fl as $sql)
 		{
 			if(empty($sql)) continue;
@@ -160,55 +177,86 @@
 			SELECT * FROM (SELECT ROWNUM as RN, * FROM tbl) WHERE RN BETWEEN 6 AND 15
 	*/
 
-	function	DBselect($query, $limit='NO')
+	function	&DBselect($query, $limit='NO')
 	{
-		global $DB,$DB_TYPE;
+		global $DB, $DB_TYPE;
 
 COpt::savesqlrequest($query);
 
-		if($DB_TYPE == "MYSQL")
-		{
-			if(is_numeric($limit))
-			{
-				$query .= ' limit '.intval($limit);
-			}
-			$result=mysql_query($query,$DB);
-			if(!$result)
-			{
-				error("Error in query [$query] [".mysql_error()."]");
-			}
-			return $result;
-		}
-		if($DB_TYPE == "POSTGRESQL")
-		{
-			if(is_numeric($limit))
-			{
-				$query .= ' limit '.intval($limit);
-			}
-			$result=pg_exec($DB,$query);
-			return $result;
-		}
-		if($DB_TYPE == "ORACLE")
-		{
-			if(is_numeric($limit))
-			{
-				$query = 'select * from ('.$query.') where rownum<'.intval($limit);
-			}
+		$result = false;
 
-			$stid=OCIParse($DB,$query);
-			if(!$stid)
-			{
-				$e=@ocierror();
-				error("SQL error [".$e["message"]."] in [".$e["sqltext"]."]");
-			}
-			$result=@OCIExecute($stid);
-			if(!$result)
-			{
-				$e=ocierror($stid);
-				error("SQL error [".$e["message"]."] in [".$e["sqltext"]."]");
-			}
-			return $stid;
+		switch($DB_TYPE)
+		{
+			case "MYSQL":
+				if(is_numeric($limit))
+				{
+					$query .= ' limit '.intval($limit);
+				}
+				$result=mysql_query($query,$DB);
+				if(!$result)
+				{
+					error("Error in query [$query] [".mysql_error()."]");
+				}
+				break;
+			case "POSTGRESQL":
+				if(is_numeric($limit))
+				{
+					$query .= ' limit '.intval($limit);
+				}
+				$result=pg_exec($DB,$query);
+				break;
+			case "ORACLE":
+				if(is_numeric($limit))
+				{
+					$query = 'select * from ('.$query.') where rownum<'.intval($limit);
+				}
+
+				$stid=OCIParse($DB,$query);
+				if(!$stid)
+				{
+					$e=@ocierror();
+					error("SQL error [".$e["message"]."] in [".$e["sqltext"]."]");
+				}
+				$result=@OCIExecute($stid);
+				if(!$result)
+				{
+					$e=ocierror($stid);
+					error("SQL error [".$e["message"]."] in [".$e["sqltext"]."]");
+				}
+				else
+				{
+					$result = $stid;
+				}
+				break;
+			case "SQLITE3":
+				if(!($result = sqlite3_query($DB,$query)))
+                                {
+                                        error("Error in query [$query] [".sqlite3_error($DB)."]");
+                                }
+				else
+				{
+					$data = array();
+
+					while($row = sqlite3_fetch_array($result))
+					{
+						foreach($row as $id => $name)
+						{
+							if(!strstr($id,'.')) continue;
+							$ids = explode('.',$id);
+							$row[array_pop($ids)] = $row[$id];
+							unset($row[$id]);
+						}
+						$data[] = $row;
+					}
+
+					sqlite3_query_close($result);
+
+					$result = &$data;
+				}
+				break;
 		}
+		
+		return $result;
 	}
 
 	function	DBexecute($query, $skip_error_messages=0)
@@ -217,122 +265,75 @@ COpt::savesqlrequest($query);
 
 COpt::savesqlrequest($query);
 
-		$result = FALSE;
+		$result = false;
 
-		if($DB_TYPE == "MYSQL")
+		switch($DB_TYPE)
 		{
-			$result=mysql_query($query,$DB);
+			case "MYSQL":
+				$result=mysql_query($query,$DB);
 
-			if(!$result && $skip_error_messages==0)
-			{
-				error("SQL error: ".mysql_error());
-				error("Query: $query");
-			}
+				if(!$result)
+				{
+					error("Error in query [$query] [".mysql_error()."]");
+				}
+				break;
+			case "POSTGRESQL":
+				$result = pg_exec($DB,$query);
+				break;
+			case "ORACLE":
+				$result = DBselect($query);
+				if(!$result)
+				{
+					$e = ocierror($stid);
+					error("SQL error [".$e["message"]."] in [".$e["sqltext"]."]");
+				}
+				break;
+			case "SQLITE3":
+				$result = sqlite3_exec($DB, $query);
+				if(!$result)
+				{
+					error("Error in query [$query] [".sqlite3_error($DB)."]");
+				}
+				break;
 		}
-		else if($DB_TYPE == "POSTGRESQL")
-		{
-			$result=pg_exec($DB,$query);
-		}
-		else if($DB_TYPE == "ORACLE")
-		{
-
-			return DBselect($query);
-		}
-
-//SDI("DBexecute($query) = '".$result."'");
 
 		return $result;
 	}
 
-	function	DBfetch($cursor)
+	function	DBfetch(&$cursor)
 	{
 		global $DB_TYPE;
-
-		if($DB_TYPE == "MYSQL")
-		{
-			$row=mysql_fetch_array($cursor);
-			return $row;
-		}
-		if($DB_TYPE == "POSTGRESQL")
-		{
-			$row=pg_fetch_array($cursor);
-			return $row;
-		}
-		if($DB_TYPE == "ORACLE")
-		{
-			if(!ocifetchinto($cursor, $row, OCI_ASSOC+OCI_NUM+OCI_RETURN_NULLS))
-			{
-				return FALSE;
-			}
-			else
-			{
-				$result=array();
-				$keys = (array_keys($row));
-           			foreach ($keys as $k)
-				{
-					$result[strtolower($k)]=$row[$k];
-				}
-			} 
-			return $result;
-		}
-		return FALSE;
-	}
-
-	function	get_field($result,$rownum,$fieldnum)
-	{
-		global $DB_TYPE;
-
-		if($DB_TYPE == "MYSQL")
-		{
-			mysql_data_seek($result,$rownum);
-			$row=mysql_fetch_row($result);
-			return $row[$fieldnum];
-		}
-		if($DB_TYPE == "POSTGRESQL")
-		{
-			$row=pg_fetch_row($result,$rownum);
-			if(!$row)
-			{
-				fatal_error("Error getting row");
-			}
-			return $row[$fieldnum];
-		}
-		if($DB_TYPE == "ORACLE")
-		{
-			$result=FALSE;
-		}
-	}
-
-	function        DBinsert_id($result,$table,$field)
-	{
-		global  $DB,$DB_TYPE;
-
-		if($DB_TYPE == "MYSQL")
-		{
-			return mysql_insert_id($DB);
-		}
+	
+		$result = false;
 		
-		if($DB_TYPE == "POSTGRESQL")
+		switch($DB_TYPE)
 		{
-//			$oid=pg_getlastoid($result);
-			$oid=pg_last_oid($result);
-			$sql="select $field from $table where oid=$oid";
-			$result=DBselect($sql);
-			return get_field($result,0,0);
+			case "MYSQL":
+				$result = mysql_fetch_array($cursor);
+				break;
+			case "POSTGRESQL":
+				$result = pg_fetch_array($cursor);
+				break;
+			case "ORACLE":
+				if(ocifetchinto($cursor, $row, OCI_ASSOC+OCI_NUM+OCI_RETURN_NULLS))
+				{
+					$result = array();
+					$keys = (array_keys($row));
+					foreach ($keys as $k)		$result[strtolower($k)] = $row[$k];
+				} 
+				break;
+			case "SQLITE3":
+				if($cursor)
+				{
+					$result = array_shift($cursor);
+
+					if(is_null($result)) $result = false;
+
+				}
+				break;
 		}
-		if($DB_TYPE == "ORACLE")
-		{
-/*                      $sql="select max($field) from $table";
-			$parse=DBexecute($sql);
-			while(OCIFetch($parse))
-			{
-				$colvalue = OCIResult($parse, 1);
-				return $colvalue;
-			}
-*/
-			$res = DBfetch(DBselect('select '.$table.'_'.$field.'.currval from dual'));
-			return $res[0];
-		}
+
+		return $result;
 	}
 
 /* string value prepearing */
@@ -348,7 +349,11 @@ if(isset($DB_TYPE) && $DB_TYPE == "ORACLE") {
 
 	function DBid2nodeid($id_name)
 	{
-		return '('.$id_name.' div 100000000000000)';
+		global $DB_TYPE;
+
+		if(isset($DB_TYPE) && $DB_TYPE == "SQLITE3") $odiv = '/'; else $odiv = 'div';
+
+		return '('.$id_name.' '.$odiv.' 100000000000000)';
 	}
 
 	function id2nodeid($id_var)

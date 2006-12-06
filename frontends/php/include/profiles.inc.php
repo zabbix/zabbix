@@ -25,7 +25,7 @@
 		$hostid,$devicetype,$name,$os,$serialno,$tag,$macaddress,
 		$hardware,$software,$contact,$location,$notes)
 	{
-		$result=DBexecute("select * from hosts_profiles where hostid=$hostid");
+		$result=DBselect("select * from hosts_profiles where hostid=$hostid");
 		if(DBfetch($result))
 		{
 			error("Host profile already exists");
