@@ -44,7 +44,7 @@
 			return 0;
 		}
 
-		if(DBfetch(DBexecute("select * from users where alias=".zbx_dbstr($alias)." and ".DBid2nodeid('userid')."=".$ZBX_CURNODEID)))
+		if(DBfetch(DBselect("select * from users where alias=".zbx_dbstr($alias)." and ".DBid2nodeid('userid')."=".$ZBX_CURNODEID)))
 		{
 			error('User "'.$alias.'" already exists');
 			return 0;
@@ -92,7 +92,7 @@
 	{
 		global $ZBX_CURNODEID;
 
-		if(DBfetch(DBexecute("select * from users where alias=".zbx_dbstr($alias).
+		if(DBfetch(DBselect("select * from users where alias=".zbx_dbstr($alias).
 			" and userid<>$userid and ".DBid2nodeid('userid')."=".$ZBX_CURNODEID)))
 		{
 			error("User '$alias' already exists");
@@ -161,7 +161,7 @@
 			return	false;
 		}
 
-		while($row=DBfetch(DBexecute('select actionid from actions where userid='.$userid)))
+		while($row=DBfetch(DBselect('select actionid from actions where userid='.$userid)))
 		{
 			$result = delete_action($row["actionid"]);
 			if(!$result) return $result;
@@ -200,7 +200,7 @@
 	{
 		global $ZBX_CURNODEID;
 
-		if(DBfetch(DBexecute("select * from usrgrp where name=".zbx_dbstr($name)." and ".DBid2nodeid('usrgrpid')."=".$ZBX_CURNODEID)))
+		if(DBfetch(DBselect("select * from usrgrp where name=".zbx_dbstr($name)." and ".DBid2nodeid('usrgrpid')."=".$ZBX_CURNODEID)))
 		{
 			error("Group '$name' already exists");
 			return 0;
@@ -235,7 +235,7 @@
 	{
 		global $ZBX_CURNODEID;
 
-		if(DBfetch(DBexecute("select * from usrgrp where name=".zbx_dbstr($name).
+		if(DBfetch(DBselect("select * from usrgrp where name=".zbx_dbstr($name).
 			" and usrgrpid<>".$usrgrpid." and ".DBid2nodeid('usrgrpid')."=".$ZBX_CURNODEID)))
 		{
 			error("Group '$name' already exists");
