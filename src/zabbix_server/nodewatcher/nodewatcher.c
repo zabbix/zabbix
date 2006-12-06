@@ -289,7 +289,7 @@ int main_nodewatcher_loop()
 	int start, end;
 	int	lastrun = 0;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In main_nodeupdater_loop()");
+	zabbix_log( LOG_LEVEL_DEBUG, "In main_nodeupdater_loop()");
 	for(;;)
 	{
 		start = time(NULL);
