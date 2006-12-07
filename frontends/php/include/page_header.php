@@ -208,7 +208,6 @@ COpt::profiling_start("page");
 						),
 					array("url"=>"services.php"	,"label"=>S_IT_SERVICES		),
 					array("url"=>"exp_imp.php"	,"label"=>S_EXPORT_IMPORT	),
-					array("url"=>"bulkloader.php"	,"label"=>S_MENU_BULKLOADER	),
 					array("url"=>"popup.php")
 					)
 				),
