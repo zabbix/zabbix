@@ -94,7 +94,7 @@ include_once "include/page_header.php";
 		$graphs		= get_request('graphs', array());
 		$triggers	= get_request('triggers', array());
 		
-		function &zbx_array_val_inc(&$arr, $inc_size = 1)
+		function &zbx_array_val_inc($arr, $inc_size = 1)
 		{
 			foreach($arr as $id => $val)
 			{

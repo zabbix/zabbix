@@ -365,7 +365,7 @@ include_once "include/page_header.php";
 		}
 		else
 		{
-			$form = new CForm();
+			$form = new CForm(null,'post');
 			$form->SetName('users');
 
 			show_table_header(S_USERS_BIG);

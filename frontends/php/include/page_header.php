@@ -43,11 +43,23 @@ COpt::profiling_start("page");
 		include_once "include/locales/".$USER_DETAILS["lang"].".inc.php";
 		process_locales();
 	}
+	else
+	{
+		$USER_DETAILS = array(
+			"alias" =>"guest",
+			"userid"=>0,
+			"lang"  =>"en_gb",
+			"type"  =>"0",
+			"node"  =>array(
+				"name"  =>'- uncnown -',
+				"nodeid"=>0));
+	}
+
 	include_once "include/locales/en_gb.inc.php";
 	process_locales();
 
 	/* Init CURRENT NODE ID */
-	if(ZBX_DISTRIBUTED)
+	if(!defined('ZBX_PAGE_NO_AUTHERIZATION') && ZBX_DISTRIBUTED)
 	{
 		$ZBX_CURNODEID = get_cookie('current_nodeid', $ZBX_LOCALNODEID); // Selected node
 		if(isset($_REQUEST['switch_node']))
@@ -227,20 +239,6 @@ COpt::profiling_start("page");
 				)
 		);
 
-
-	$help = new CLink(S_HELP, "http://www.zabbix.com/manual/v1.1/index.php", "small_font");
-	$help->SetTarget('_blank');
-	$page_header_r_col = array($help,
-		($USER_DETAILS["alias"] != "guest") ?
-			array("|", new CLink(S_PROFILE, "profile.php", "small_font")) :
-			null
-		);
-	$logo = new CLink(new CImg("images/general/zabbix.png","ZABBIX"),"http://www.zabbix.com");
-	$logo->SetTarget('_blank');
-
-	$top_page_row	= array(new CCol($logo, "page_header_l"), new CCol($page_header_r_col, "page_header_r"));
-	unset($logo, $page_header_r_col, $help);
-
 	$main_menu_row	= array();
 	$sub_menu_row	= array();
 
@@ -248,30 +246,33 @@ COpt::profiling_start("page");
 	{
 // Check permissions
 		unset($deny);
-		if($label!='login' && !isset($USER_DETAILS['type']))
+		if(!defined('ZBX_PAGE_NO_AUTHERIZATION'))
 		{
-			$deny = true;
-		}
-		elseif($label=='admin'	&& (!in_array($USER_DETAILS['type'], array(USER_TYPE_SUPER_ADMIN)) ||
-			!in_array($ZBX_CURNODEID, get_accessible_nodes_by_user(
-				$USER_DETAILS,PERM_READ_WRITE,null,
-				PERM_RES_IDS_ARRAY,$ZBX_CURNODEID))))
-		{
-			$deny = true;
-		}
-		elseif($label=='config'	&& (
-			!in_array($USER_DETAILS['type'], array(USER_TYPE_SUPER_ADMIN, USER_TYPE_ZABBIX_ADMIN)) ||
-			!in_array($ZBX_CURNODEID, get_accessible_nodes_by_user(
-				$USER_DETAILS,PERM_READ_LIST,null,
-				PERM_RES_IDS_ARRAY,$ZBX_CURNODEID))))
-		{
-			$deny = true;
-		}
-		elseif(!in_array($ZBX_CURNODEID, get_accessible_nodes_by_user(
-				$USER_DETAILS,PERM_READ_LIST,null,
-				PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
-		{
-			$deny = true;
+			if($label!='login' && !isset($USER_DETAILS['type']))
+			{
+				$deny = true;
+			}
+			elseif($label=='admin'	&& (!in_array($USER_DETAILS['type'], array(USER_TYPE_SUPER_ADMIN)) ||
+				!in_array($ZBX_CURNODEID, get_accessible_nodes_by_user(
+					$USER_DETAILS,PERM_READ_WRITE,null,
+					PERM_RES_IDS_ARRAY,$ZBX_CURNODEID))))
+			{
+				$deny = true;
+			}
+			elseif($label=='config'	&& (
+				!in_array($USER_DETAILS['type'], array(USER_TYPE_SUPER_ADMIN, USER_TYPE_ZABBIX_ADMIN)) ||
+				!in_array($ZBX_CURNODEID, get_accessible_nodes_by_user(
+					$USER_DETAILS,PERM_READ_LIST,null,
+					PERM_RES_IDS_ARRAY,$ZBX_CURNODEID))))
+			{
+				$deny = true;
+			}
+			elseif(!in_array($ZBX_CURNODEID, get_accessible_nodes_by_user(
+					$USER_DETAILS,PERM_READ_LIST,null,
+					PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+			{
+				$deny = true;
+			}
 		}
 
 // End of check permissions
@@ -344,8 +345,20 @@ COpt::profiling_start("page");
 
 	if(!defined('ZBX_PAGE_NO_MENU'))
 	{
-
 COpt::compare_files_with_menu($ZBX_MENU);
+
+		$help = new CLink(S_HELP, "http://www.zabbix.com/manual/v1.1/index.php", "small_font");
+		$help->SetTarget('_blank');
+		$page_header_r_col = array($help,
+			($USER_DETAILS["alias"] != "guest") ?
+				array("|", new CLink(S_PROFILE, "profile.php", "small_font")) :
+				null
+			);
+		$logo = new CLink(new CImg("images/general/zabbix.png","ZABBIX"),"http://www.zabbix.com");
+		$logo->SetTarget('_blank');
+
+		$top_page_row	= array(new CCol($logo, "page_header_l"), new CCol($page_header_r_col, "page_header_r"));
+		unset($logo, $page_header_r_col, $help);
 
 		$table = new CTable(NULL,"page_header");
 		$table->SetCellSpacing(0);
