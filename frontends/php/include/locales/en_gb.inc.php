@@ -855,6 +855,7 @@
 	"S_NO_SCREENS_TO_DISPLAY"=>		"No screens to display",
 	"S_SELECT_SCREEN_TO_DISPLAY"=>		"Select screen to display",
 	"S_SELECT_SCREEN_DOT_DOT_DOT"=>		"Select screen ...",
+	"S_NO_SCREENS_DEFINED"=>		"No screens defined",
 
 //	services.php
 	"S_ROOT_SMALL"=>			"root",
