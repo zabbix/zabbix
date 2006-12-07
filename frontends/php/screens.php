@@ -67,59 +67,71 @@ include_once "include/page_header.php";
 
 <?php
 	$text = array(S_SCREENS_BIG);
-	if(isset($_REQUEST["screenid"]))
+
+	$screenid = get_request('screenid', null);
+	if($screenid <= 0) $screenid = null;
+
+	if(isset($screenid))
 	{
-		$screen = get_screen_by_screenid($_REQUEST["screenid"]);
+		$screen = get_screen_by_screenid($screenid);
 		if($screen) {
-			$url = "screens.php?screenid=".$_REQUEST["screenid"];
+			$url = "screens.php?screenid=".$screenid;
 			if($_REQUEST["fullscreen"]==0) $url .= "&fullscreen=1";
 			array_push($text,nbsp(" / "),new CLink($screen["name"], $url));
 		}
 		else
 		{
-			unset($_REQUEST["screenid"]);
+			$screenid = null;
 			update_profile("web.screens.screenid",0);
 		}
 	}
-
 	$form = new CForm();
 	$form->AddVar("fullscreen",$_REQUEST["fullscreen"]);
 
-	$cmbScreens = new CComboBox("screenid",$_REQUEST["screenid"],"submit()");
+	$cmbScreens = new CComboBox("screenid",$screenid,"submit()");
 	unset($screen_correct);
 	unset($first_screen);
-	$result=DBselect("select screenid,name from screens where ".DBid2nodeid("screenid")."=".$ZBX_CURNODEID." order by name");
+
+	$result = DBselect("select screenid,name from screens where ".DBid2nodeid("screenid")."=".$ZBX_CURNODEID." order by name");
 	while($row=DBfetch($result))
 	{
 		if(!screen_accessiable($row["screenid"], PERM_READ_ONLY))
 			continue;
 
 		$cmbScreens->AddItem($row["screenid"],$row["name"]);
-		if($_REQUEST["screenid"] == $row["screenid"]) $screen_correct = 1;
+		if($screenid == $row["screenid"]) $screen_correct = 1;
 		if(!isset($first_screen)) $first_screen = $row["screenid"];
 	}
+
 	if(!isset($screen_correct) && isset($first_screen))
 	{
-		$_REQUEST["screenid"] = $first_screen;
+		$screenid = $first_screen;
 	}
 
-	if(isset($_REQUEST["screenid"]))
+	if(isset($screenid))
 	{
-		if(!screen_accessiable($_REQUEST["screenid"], PERM_READ_ONLY))
+		if(!screen_accessiable($screenid, PERM_READ_ONLY))
 			access_deny();
 	}
 			
-	$form->AddItem($cmbScreens);
+	if($cmbScreens->ItemsCount() > 0)
+		$form->AddItem($cmbScreens);
+
 	show_table_header($text,$form);
 ?>
 <?php
-	if(isset($_REQUEST["screenid"]))
+	if(isset($screenid))
 	{
+		SDI();
 		$effectiveperiod = navigation_bar_calc();
-		$table = get_screen($_REQUEST["screenid"], 0, $effectiveperiod);
+		$table = get_screen($screenid, 0, $effectiveperiod);
 		$table->Show();
 		
 		navigation_bar("screens.php");
+	}
+	else
+	{
+		echo unpack_object(new CTableInfo(S_NO_SCREENS_DEFINED));
 	}
 ?>
 <?php
