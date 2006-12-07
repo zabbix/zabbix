@@ -296,7 +296,7 @@
 				$cmbUserType = new CComboBox('user_type', $user_type, $perm_details ? 'submit();' : null);
 				$cmbUserType->AddItem(USER_TYPE_ZABBIX_USER,	user_type2str(USER_TYPE_ZABBIX_USER));
 				$cmbUserType->AddItem(USER_TYPE_ZABBIX_ADMIN,	user_type2str(USER_TYPE_ZABBIX_ADMIN));
-				$cmbUserType->AddItem(USER_TYPE_SUPPER_ADMIN,	user_type2str(USER_TYPE_SUPPER_ADMIN));
+				$cmbUserType->AddItem(USER_TYPE_SUPER_ADMIN,	user_type2str(USER_TYPE_SUPER_ADMIN));
 				$frmUser->AddRow(S_USER_TYPE, $cmbUserType);
 			}
 			

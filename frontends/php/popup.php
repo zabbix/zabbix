@@ -51,7 +51,7 @@
 			break;
 		case 'usrgrp':
 			$page["title"] = "S_GROUPS";
-			$min_user_type = USER_TYPE_SUPPER_ADMIN;
+			$min_user_type = USER_TYPE_SUPER_ADMIN;
 			break;
 		case 'items':
 			$page["title"] = "S_ITEMS_BIG";
