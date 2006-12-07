@@ -334,7 +334,7 @@
 	"S_COMPARE"=>				"Compare",
 
 //	Footer
-	"S_ZABBIX_VER"=>			"ZABBIX 1.3",
+	"S_ZABBIX_VER"=>			"ZABBIX 1.3.1",
 	"S_COPYRIGHT_BY"=>			"Copyright 2001-2006 by ",
 	"S_CONNECTED_AS"=>			"Connected as",
 	"S_SIA_ZABBIX"=>			"SIA Zabbix",
@@ -805,7 +805,7 @@
 	"S_RESOURCE"=>				"Resource",
 	"S_RESOURCES"=>				"Resources",
 	"S_RESOURCE_TYPE"=>			"Resource type",
-	"S_RIGHTS_OF_RESOURCES"=>		"Rights of resources",
+	"S_RIGHTS_OF_RESOURCES"=>		"User rights",
 	"S_NO_RESOURCES_DEFINED"=>		"No resources defined",
 	"S_SIMPLE_GRAPH"=>			"Simple graph",
 	"S_GRAPH_NAME"=>			"Graph name",
@@ -987,7 +987,7 @@
 //	users.php
 	"S_ZABBIX_USER"=>			"ZABBIX User",
 	"S_ZABBIX_ADMIN"=>			"ZABBIX Admin",
-	"S_SUPPER_ADMIN"=>			"ZABBIX Supper Admin",
+	"S_SUPER_ADMIN"=>			"ZABBIX Super Admin",
 	"S_USER_TYPE"=>				"User type",
 	"S_USERS"=>				"Users",
 	"S_USER_ADDED"=>			"User added",
@@ -1000,7 +1000,7 @@
 	"S_PERMISSION_ADDED"=>			"Permission added",
 	"S_CANNOT_ADD_PERMISSION"=>		"Cannot add permission",
 	"S_USER_UPDATED"=>			"User updated",
-	"S_ONLY_FOR_GUEST_ALLOWED_EMPTY_PASSWORD"=>	"Only for guest allowed empty passwod.",
+	"S_ONLY_FOR_GUEST_ALLOWED_EMPTY_PASSWORD"=>	"Only user 'guest' may have an empty password.",
 	"S_CANNOT_UPDATE_USER"=>		"Cannot update user",
 	"S_CANNOT_UPDATE_USER_BOTH_PASSWORDS"=>	"Cannot update user. Both passwords must be equal.",
 	"S_GROUP_ADDED"=>			"Group added",

@@ -23,7 +23,7 @@
 	{
 		$str_user_type[USER_TYPE_ZABBIX_USER]	= S_ZABBIX_USER;
 		$str_user_type[USER_TYPE_ZABBIX_ADMIN]	= S_ZABBIX_ADMIN;
-		$str_user_type[USER_TYPE_SUPPER_ADMIN]	= S_SUPPER_ADMIN;
+		$str_user_type[USER_TYPE_SUPER_ADMIN]	= S_SUPER_ADMIN;
 
 		if(isset($str_user_type[$user_type_int]))
 			return $str_user_type[$user_type_int];
@@ -38,7 +38,7 @@
 		global $USER_DETAILS;
 		global $ZBX_CURNODEID;
 
-		if($USER_DETAILS['type'] != USER_TYPE_SUPPER_ADMIN)
+		if($USER_DETAILS['type'] != USER_TYPE_SUPER_ADMIN)
 		{
 			error("Insufficient permissions");
 			return 0;

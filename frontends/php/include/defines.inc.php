@@ -263,7 +263,7 @@
 
 	define("USER_TYPE_ZABBIX_USER",		1);
 	define("USER_TYPE_ZABBIX_ADMIN",	2);
-	define("USER_TYPE_SUPPER_ADMIN",	3);
+	define("USER_TYPE_SUPER_ADMIN",		3);
 
 	define("PERM_MAX",		3);
 	define("PERM_READ_WRITE",	3);
