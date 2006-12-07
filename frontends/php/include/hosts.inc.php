@@ -223,7 +223,9 @@ require_once "include/items.inc.php";
 		
 		$old_host = get_host_by_hostid($hostid);
 
-		$result = db_save_host($host,$port,$status,$useip,$ip,$templates,$hostid);
+		$new_templates = array_diff($templates, $old_templates);
+
+		$result = db_save_host($host,$port,$status,$useip,$ip,$new_templates,$hostid);
 		if(!$result)
 			return $result;
 
@@ -231,7 +233,6 @@ require_once "include/items.inc.php";
 
 		add_group_to_host($hostid,$newgroup);
 
-		$new_templates = array_diff($templates, $old_templates);
 		if(count($new_templates) > 0)
 		{
 			sync_host_with_templates($hostid,$new_templates);
