@@ -35,7 +35,7 @@ include_once "include/page_header.php";
 	$fields=array(
 		"dstfrm"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,		NULL),
 		"permission"=>	array(T_ZBX_INT, O_MAND,P_SYS,	IN(PERM_DENY.','.PERM_READ_ONLY.','.PERM_READ_WRITE),	NULL),
-		"type"=>	array(T_ZBX_INT, O_OPT, P_SYS,	IN(RESOURCE_TYPE_NODE.','.RESOURCE_TYPE_GROUP),		NULL)
+		"type"=>	array(T_ZBX_INT, O_OPT, P_SYS,	IN(RESOURCE_TYPE_GROUP.(ZBX_DISTRIBUTED ? RESOURCE_TYPE_NODE.',' : '')), NULL)
 	);
 
 	check_fields($fields);
@@ -84,12 +84,15 @@ function add_right(formname,type,id,permission,name)
 	$frmTitle = new CForm();
 	$frmTitle->AddVar('dstfrm',$dstfrm);
 	$frmTitle->AddVar('permission', $permission);
-	$cmbResourceType = new CComboBox('type',$type,'submit();');
-	$cmbResourceType->AddItem(RESOURCE_TYPE_NODE, S_NODES);
-	$cmbResourceType->AddItem(RESOURCE_TYPE_GROUP, S_HOST_GROUPS);
-	$frmTitle->AddItem(array(
-		S_RESOURCE_TYPE, SPACE,
-		$cmbResourceType));
+	if(ZBX_DISTRIBUTED)
+	{
+		$cmbResourceType = new CComboBox('type',$type,'submit();');
+		$cmbResourceType->AddItem(RESOURCE_TYPE_NODE, S_NODES);
+		$cmbResourceType->AddItem(RESOURCE_TYPE_GROUP, S_HOST_GROUPS);
+		$frmTitle->AddItem(array(
+			S_RESOURCE_TYPE, SPACE,
+			$cmbResourceType));
+	}
 	show_table_header(permission2str($permission),$frmTitle);
 
 	$table = new CTableInfo(S_NO_RESOURCES_DEFINED);
@@ -97,26 +100,26 @@ function add_right(formname,type,id,permission,name)
 	
 	$db_resources = null;
 
-	if($type == RESOURCE_TYPE_NODE)
+	if(ZBX_DISTRIBUTED && $type == RESOURCE_TYPE_NODE)
 	{
 		$db_resources = DBselect('select n.name as name, n.nodeid as id from nodes n order by n.name');
 	}
 	elseif($type == RESOURCE_TYPE_GROUP)
 	{
-		$db_resources = DBselect('select CONCAT(n.name,":",g.name) as name, g.groupid as id from groups g, nodes n '.
-			' where '.DBid2nodeid('g.groupid').'=n.nodeid order by n.name, g.name');
-		
-			
+		$db_resources = DBselect('select n.name as node_name, g.name as name, g.groupid as id'.
+			' from groups g left join nodes n on '.DBid2nodeid('g.groupid').'=n.nodeid '.
+			' order by n.name, g.name');
 	}
 
 	while($db_resource = DBfetch($db_resources))
 	{
+		if(isset($db_resource['node_name']))
+			$db_resource['name'] = $db_resource['node_name'].':'.$db_resource['name'];
+
 		$name = new CLink($db_resource['name'],'#','action');
 		$name->SetAction("return add_right('".$dstfrm."',".$type.",".$db_resource['id'].",".$permission.",'".$db_resource['name']."');");
 
-		$table->AddRow(array(
-			$name
-			));
+		$table->AddRow(array($name));
 	}
 
 	$table->Show();

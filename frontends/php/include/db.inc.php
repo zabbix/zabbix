@@ -68,12 +68,39 @@
 					}
 					break;
 				case "SQLITE3":
+					function init_db_access()
+					{
+						global $ZBX_CONFIGURATION_FILE, $ZBX_SEM_ID;
+
+						$ZBX_SEM_ID = false;
+						if(function_exists('ftok') && function_exists('sem_get'))
+							$ZBX_SEM_ID = sem_get(ftok($ZBX_CONFIGURATION_FILE, 'z'), 1);
+					}
+
+					function lock_db_access()
+					{
+						global $ZBX_SEM_ID;
+
+						if($ZBX_SEM_ID && function_exists('sem_acquire'))
+							sem_acquire($ZBX_SEM_ID);
+					}
+
+					function unlock_db_access()
+					{
+						global $ZBX_SEM_ID;
+
+						if($ZBX_SEM_ID && function_exists('sem_release'))
+							sem_release($ZBX_SEM_ID);
+					}
+
 					$DB = sqlite3_open($DB_DATABASE);
 					if(!$DB)
 					{
 						$error = "Error connecting to database";
 						$result = false;
 					}
+
+					init_db_access();
 					break;
 				default:
 					$error = "Unsupported database";
@@ -96,7 +123,10 @@
 				case "MYSQL":		$result = mysql_close($DB);	break;
 				case "POSTGRESQL":	$result = pg_close($DB);	break;
 				case "ORACLE":		$result = ociclose($DB);	break;
-				case "SQLITE3":		$result = true; sqlite3_close($DB);	break;
+				case "SQLITE3":		
+					$result = true; 
+					sqlite3_close($DB);	
+					break;
 				default:		break;
 			}
 		}
@@ -146,6 +176,7 @@
 	function	DBstart()
 	{
 		/* TODO *//* start transaction */
+		// lock_db_access(); /* check DBselect & DBexecute */
 	}
 	
 	function	DBend($result)
@@ -160,6 +191,7 @@
 		{ // FAIL
 			/* rollback  TODO */
 		}
+		// unlock_db_access(); /* check DBselect & DBexecute */
 	}
 
 	/* NOTE:
@@ -229,6 +261,7 @@ COpt::savesqlrequest($query);
 				}
 				break;
 			case "SQLITE3":
+				lock_db_access();
 				if(!($result = sqlite3_query($DB,$query)))
                                 {
                                         error("Error in query [$query] [".sqlite3_error($DB)."]");
@@ -253,6 +286,7 @@ COpt::savesqlrequest($query);
 
 					$result = &$data;
 				}
+				unlock_db_access();
 				break;
 		}
 		
@@ -289,11 +323,13 @@ COpt::savesqlrequest($query);
 				}
 				break;
 			case "SQLITE3":
+				lock_db_access();
 				$result = sqlite3_exec($DB, $query);
 				if(!$result)
 				{
 					error("Error in query [$query] [".sqlite3_error($DB)."]");
 				}
+				unlock_db_access();
 				break;
 		}
 
@@ -347,6 +383,19 @@ if(isset($DB_TYPE) && $DB_TYPE == "ORACLE") {
 	}
 }
 
+	function	zbx_dbconcat($params)
+	{
+		global $DB_TYPE;
+
+		switch($DB_TYPE)
+		{
+			case "SQLITE3":
+				return implode(' || ',$params);
+			default:
+				return 'CONCAT('.implode(',',$params).')';
+		}
+	}
+
 	function DBid2nodeid($id_name)
 	{
 		global $DB_TYPE;
@@ -365,8 +414,7 @@ if(isset($DB_TYPE) && $DB_TYPE == "ORACLE") {
 	{
 		global	$ZBX_CURNODEID;
 
-		$result=DBselect("select max($field) as id from $table where ".DBid2nodeid($field)." in (".$ZBX_CURNODEID.")");
-		$row=DBfetch($result);
+		$row=DBfetch(DBselect("select max($field) as id from $table where ".DBid2nodeid($field)." in (".$ZBX_CURNODEID.")"));
 		if($row && !is_null($row["id"]))
 		{
 			return	bcadd($row["id"],1);

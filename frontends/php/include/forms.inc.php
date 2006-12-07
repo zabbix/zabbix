@@ -463,18 +463,21 @@
 
 			$group_rights = array();			
 			$sqls = array(
-				'select r.*i,n.name as name from rights r, nodes n where r.groupid='.$_REQUEST["usrgrpid"].
+				'select r.*,n.name as name from rights r, nodes n where r.groupid='.$_REQUEST["usrgrpid"].
 					' and r.type='.RESOURCE_TYPE_NODE.' and r.id=n.nodeid',
-				'select r.*i, CONCAT(n.name,":",g.name) as name from rights r, groups g, nodes n'.
-					' where r.groupid='.$_REQUEST["usrgrpid"].' and n.nodeid='.DBid2nodeid('g.groupid').
-					' and r.type='.RESOURCE_TYPE_GROUP.' and r.id=g.groupid',
-		
+				'select r.*, n.name as node_name, g.name as name from groups g '.
+					' left join rights r on r.type='.RESOURCE_TYPE_GROUP.' and r.id=g.groupid '.
+					' left join nodes n on n.nodeid='.DBid2nodeid('g.groupid').
+					' where r.groupid='.$_REQUEST["usrgrpid"],
 				);
 			foreach($sqls as $sql)
 			{
 				$db_rights = DBselect($sql);
 				while($db_right = DBfetch($db_rights))
 				{
+					if(isset($db_right['node_name']))
+						$db_right['name'] = $db_right['node_name'].':'.$db_right['name'];
+
 					$group_rights[$db_right['name']] = array(
 						'type'		=> $db_right['type'],
 						'permission'	=> $db_right['permission'],
