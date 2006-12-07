@@ -91,7 +91,7 @@
 		else
 		{
 			$USER_DETAILS = array(
-				"alias"	=>"- unknown -",
+				"alias"	=>"guest",
 				"userid"=>0,
 				"lang"	=>"en_gb",
 				"type"	=>"0",
