@@ -252,7 +252,7 @@ COpt::profiling_start("page");
 		{
 			$deny = true;
 		}
-		elseif($label=='admin'	&& (!in_array($USER_DETAILS['type'], array(USER_TYPE_SUPPER_ADMIN)) ||
+		elseif($label=='admin'	&& (!in_array($USER_DETAILS['type'], array(USER_TYPE_SUPER_ADMIN)) ||
 			!in_array($ZBX_CURNODEID, get_accessible_nodes_by_user(
 				$USER_DETAILS,PERM_READ_WRITE,null,
 				PERM_RES_IDS_ARRAY,$ZBX_CURNODEID))))
@@ -260,7 +260,7 @@ COpt::profiling_start("page");
 			$deny = true;
 		}
 		elseif($label=='config'	&& (
-			!in_array($USER_DETAILS['type'], array(USER_TYPE_SUPPER_ADMIN, USER_TYPE_ZABBIX_ADMIN)) ||
+			!in_array($USER_DETAILS['type'], array(USER_TYPE_SUPER_ADMIN, USER_TYPE_ZABBIX_ADMIN)) ||
 			!in_array($ZBX_CURNODEID, get_accessible_nodes_by_user(
 				$USER_DETAILS,PERM_READ_LIST,null,
 				PERM_RES_IDS_ARRAY,$ZBX_CURNODEID))))

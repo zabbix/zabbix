@@ -363,7 +363,7 @@ COpt::counter_up('perm');
 			/* deny if no rights defined (for local node read/write)*/
 			if(is_null($node_data['permission']))
 			{
-				if($user_type == USER_TYPE_SUPPER_ADMIN)
+				if($user_type == USER_TYPE_SUPER_ADMIN)
 					$node_data['permission'] = PERM_READ_WRITE;
 				else
 					$node_data['permission'] = 
@@ -627,7 +627,7 @@ COpt::counter_up('perm');
 			
 			if(isset($node_perm[$node_data['nodeid']]))
 				$node_data['permission'] = $node_perm[$node_data['nodeid']];
-			elseif($node_data['nodeid'] == $ZBX_LOCALNODEID || $user_type == USER_TYPE_SUPPER_ADMIN)
+			elseif($node_data['nodeid'] == $ZBX_LOCALNODEID || $user_type == USER_TYPE_SUPER_ADMIN)
 			/* for local node or superuser default permission is READ_WRITE */
 					$node_data['permission'] = PERM_READ_WRITE;
 
