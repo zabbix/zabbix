@@ -118,7 +118,6 @@ include_once "include/page_header.php";
 		"web.tr_status.groupid","web.tr_status.hostid");
 ?>
 <?php
-
 	if(isset($audio))
 	{
 		play_sound($audio);
