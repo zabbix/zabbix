@@ -112,7 +112,7 @@ int	process_event(DB_EVENT *event)
 
 	if(event->eventid == 0)
 	{
-		event->eventid = DBget_maxid("event_maxid");
+		event->eventid = DBget_maxid("events","eventid");
 	}
 	DBexecute("insert into events(eventid,triggerid,clock,value) values(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d)",
 		event->eventid,event->triggerid, event->clock, event->value);

@@ -393,7 +393,7 @@ void		DBbegin();
 void		DBcommit();
 void		DBrollback();
 
-zbx_uint64_t	DBget_maxid(char *field);
+zbx_uint64_t	DBget_maxid(char *table, char *field);
 
 int	DBget_function_result(double *result,char *functionid);
 void	DBupdate_host_availability(zbx_uint64_t hostid,int available,int clock,char *error);
