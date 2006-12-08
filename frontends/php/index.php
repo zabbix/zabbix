@@ -44,7 +44,7 @@
 	if(isset($_REQUEST["reconnect"]) && isset($_COOKIE["sessionid"]))
 	{
 		DBexecute("delete from sessions where sessionid=".zbx_dbstr($_COOKIE["sessionid"]));
-		setcookie("sessionid",$_COOKIE["sessionid"],time()-3600);
+		setcookie("sessionid",$_COOKIE["sessionid"],time()-3600); /* NOTE: don't use zbx_setcookie */
 		unset($_COOKIE["sessionid"]);
 	}
 
@@ -60,7 +60,7 @@
 		if($row)
 		{
 			$sessionid = md5(time().$password.$name.rand(0,10000000));
-			setcookie("sessionid",$sessionid,time()+3600);
+			setcookie("sessionid",$sessionid,time()+3600); /* NOTE: don't use zbx_setcookie */
 			$_COOKIE["sessionid"]	= $sessionid;	/* Required ! */
 			
 			DBexecute("insert into sessions (sessionid,userid,lastaccess)".

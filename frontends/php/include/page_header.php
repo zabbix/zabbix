@@ -74,7 +74,7 @@ COpt::profiling_start("page");
 			$ZBX_CURNODEID = $ZBX_LOCALNODEID;
 		}
 		
-		setcookie("current_nodeid",$ZBX_CURNODEID);
+		zbx_setcookie("current_nodeid",$ZBX_CURNODEID);
 	}
 	else
 	{
@@ -94,37 +94,22 @@ COpt::profiling_start("page");
 			break;
 		case PAGE_TYPE_HTML:
 		default:
-?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
-  <head>
-<?php
-		if(isset($page['title']) && defined($page['title']))	$page['title'] = constant($page['title']);
-		
-		if(!isset($page['title'])) $page['title'] = 'ZABBIX';
-		
-		if(defined('ZBX_DISTRIBUTED'))
-		{
-			if($curr_node_data = DBfetch(DBselect('select * from nodes where nodeid='.$ZBX_CURNODEID)))
-				$page['title'] .= ' ('.$curr_node_data['name'].')';
-		}
-		
-		if(defined('ZBX_PAGE_DO_REFRESH') && $USER_DETAILS["refresh"])
-		{
-?>
-    <meta http-equiv="refresh" content="<?php echo $USER_DETAILS["refresh"] ?>">
-<?php
-			$page['title'] .= ' [refreshed every '.$USER_DETAILS['refresh'].' sec]';
-		}
-	
-?>
-    <title><?php echo $page['title'] ?></title>
-    <link rel="stylesheet" href="css.css">
-    <meta http-equiv="Content-Type" content="text/html; charset=<?php echo S_HTML_CHARSET ?>">
-    <meta name="Author" content="ZABBIX SIA">
-  </head>
-<body>
-<?php
+			header('Content-Type: text/html; charset='.S_HTML_CHARSET);
+
+			if(isset($page['title']) && defined($page['title']))	$page['title'] = constant($page['title']);
+			
+			if(!isset($page['title'])) $page['title'] = 'ZABBIX';
+			
+			if(defined('ZBX_DISTRIBUTED'))
+			{
+				if($curr_node_data = DBfetch(DBselect('select * from nodes where nodeid='.$ZBX_CURNODEID)))
+					$page['title'] .= ' ('.$curr_node_data['name'].')';
+			}
+			if(defined('ZBX_PAGE_DO_REFRESH') && $USER_DETAILS["refresh"])
+			{
+				$page['title'] .= ' [refreshed every '.$USER_DETAILS['refresh'].' sec]';
+				/* header('Refresh: '.$USER_DETAILS["refresh"]); */ /* is not part of the official HTTP specification */
+			}
 		break; /* case PAGE_TYPE_HTML */
 	} /* switch($page["type"]) */
 
@@ -342,6 +327,41 @@ COpt::profiling_start("page");
 		unset($menu_url, $class);
 	}
 
+	if((!isset($page_exist) && $page['type']!=PAGE_TYPE_XML))
+	{
+		$denyed_page_requested = true;
+	}
+
+	if(isset($denyed_page_requested))	$unset_cookie = time() - 3600;
+
+	global $ZBX_PAGE_COOCIES;
+
+	if(isset($ZBX_PAGE_COOCIES))
+	{
+		foreach($ZBX_PAGE_COOCIES as $coockie)
+		{
+			setcookie($coockie[0], $coockie[1], isset($unset_cookie) ? $unset_cookie : $coockie[2]);
+		}
+		unset($ZBX_PAGE_COOCIES);
+	}
+
+	if($page["type"] == PAGE_TYPE_HTML)
+	{
+?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title><?php echo $page['title'] ?></title>
+<?php if(defined('ZBX_PAGE_DO_REFRESH') && $USER_DETAILS["refresh"]) { ?>
+    <meta http-equiv="refresh" content="<?php echo $USER_DETAILS["refresh"]; ?>">
+<?php } ?>
+    <link rel="stylesheet" href="css.css">
+    <meta name="Author" content="ZABBIX SIA">
+  </head>
+<body>
+<?php
+	}
+
 	if(!defined('ZBX_PAGE_NO_MENU'))
 	{
 COpt::compare_files_with_menu($ZBX_MENU);
@@ -417,7 +437,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 	unset($db_nodes, $node_data);
 	unset($sub_menu_table, $sub_menu_row);
 
-	if(((!isset($page_exist) && $page['type']!=PAGE_TYPE_XML) || isset($denyed_page_requested)) && !isset($_REQUEST['message']))
+	if(isset($denyed_page_requested))
 	{
 		access_deny();
 	}
