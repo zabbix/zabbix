@@ -313,7 +313,7 @@ int main_housekeeper_loop()
 
 	for(;;)
 	{
-		zabbix_log( LOG_LEVEL_DEBUG, "Executing housekeeper");
+		zabbix_log( LOG_LEVEL_WARNING, "Executing housekeeper");
 		now = time(NULL);
 
 		zbx_setproctitle("connecting to the database");
@@ -333,7 +333,7 @@ int main_housekeeper_loop()
 /*		zbx_setproctitle("housekeeper [removing old history]");*/
 
 		d = housekeeping_history_and_trends(now);
-		zabbix_log( LOG_LEVEL_DEBUG, "Deleted %d records from history and trends", d);
+		zabbix_log( LOG_LEVEL_WARNING, "Deleted %d records from history and trends", d);
 
 		zbx_setproctitle("housekeeper [removing old history]");
 
