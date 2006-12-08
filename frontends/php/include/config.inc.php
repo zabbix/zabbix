@@ -90,62 +90,74 @@ function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$m
 		error($errstr.'['.$errfile.':'.$errline.']');
 	}
 	
+	/********** START INITIALIZATION *********/
+
 	set_error_handler('zbx_err_handler');
 
-	read_configuration_file();
+	global $ZBX_LOCALNODEID, $ZBX_CONFIGURATION_FILE, $DB_TYPE, $DB_SERVER, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
 
-	$error = '';
-	if(!DBconnect($error))
+	$ZBX_LOCALNODEID = 0;
+
+	$ZBX_CONFIGURATION_FILE = './conf/zabbix.conf.php';
+
+	if(file_exists($ZBX_CONFIGURATION_FILE))
 	{
-		global	$_REQUEST;
+		include $ZBX_CONFIGURATION_FILE;
 
-		$_REQUEST['message'] = $error;
-		define('ZBX_DISTRIBUTED', false);
-		include_once "setup.php";
-	}
-	unset($error);
-
-	global $ZBX_LOCALNODEID;
-
-	/* Init LOCAL NODE ID */
-	if($local_node_data = DBfetch(DBselect('select nodeid from nodes where nodetype=1 order by nodeid')))
-	{
-		$ZBX_LOCALNODEID = $local_node_data['nodeid'];
-		define('ZBX_DISTRIBUTED', true);
-	}
-	else
-	{
-		$ZBX_LOCALNODEID = 0;
-		define('ZBX_DISTRIBUTED', false);
-	}
-	unset($local_node_data);
-
-
-	function	read_configuration_file($file='./conf/zabbix.conf.php')
-	{
-		global $ZBX_CONFIGURATION_FILE;
-
-		global $DB_TYPE, $DB_SERVER, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
-
-		$ZBX_CONFIGURATION_FILE = $file;
-
-		if(!file_exists($file) || isset($_COOKIE['ZBX_CONFIG']))
+		$error = '';
+		if(!DBconnect($error))
 		{
+			global	$_REQUEST;
+
+			$_REQUEST['message'] = $error;
+			
 			define('ZBX_DISTRIBUTED', false);
-			include_once "setup.php";
+			$show_setup = true;
 		}
 		else
 		{
-			include $ZBX_CONFIGURATION_FILE;
+			global $ZBX_LOCALNODEID;
+
+			/* Init LOCAL NODE ID */
+			if($local_node_data = DBfetch(DBselect('select nodeid from nodes where nodetype=1 order by nodeid')))
+			{
+				$ZBX_LOCALNODEID = $local_node_data['nodeid'];
+				define('ZBX_DISTRIBUTED', true);
+			}
+			else
+			{
+				define('ZBX_DISTRIBUTED', false);
+			}
+			unset($local_node_data);
 		}
+		unset($error);
 	}
+	else
+	{
+		define('ZBX_PAGE_NO_AUTHERIZATION', true);
+		define('ZBX_DISTRIBUTED', false);
+		$show_setup = true;
+	}
+
+	if(isset($_COOKIE['ZBX_CONFIG']))
+	{
+		$show_setup = true;
+	}
+
+	if(isset($show_setup))
+	{
+		unset($show_setup);
+		include_once "setup.php";
+	}
+
+	/********** END INITIALIZATION ************/
 
 	function	access_deny()
 	{
 		include_once "include/page_header.php";
 
 		show_error_message(S_NO_PERMISSIONS);
-		
+
 		include_once "include/page_footer.php";
 	}
 
@@ -1781,5 +1793,22 @@ else if (document.getElementById)
 			ImageJPEG($image);
 		else
 			ImagePNG($image);
+	}
+
+
+	/* function:
+	 *      zbx_setcookie
+	 *
+	 * description:
+	 *      set cookies after authorisation.
+	 *      require including of 'include/page_header.php'
+	 *
+	 * author: Eugene Grigorjev
+	 */
+	function	zbx_setcookie($name, $value, $time=null)
+	{
+		global $ZBX_PAGE_COOCIES;
+
+		$ZBX_PAGE_COOCIES[] = array($name, $value, $time);
 	}
 ?>

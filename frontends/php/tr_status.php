@@ -42,7 +42,7 @@
 
 	$new=explode(",",$tr_hash);
 	$old=explode(",",$triggers_hash);
-	setcookie("triggers_hash",$tr_hash,time()+1800);
+	zbx_setcookie("triggers_hash",$tr_hash,time()+1800);
 
 	if(!isset($_COOKIE["triggers_hash"]))
 	{

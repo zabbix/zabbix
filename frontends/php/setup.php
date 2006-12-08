@@ -67,7 +67,7 @@
 
 	if(isset($_REQUEST['cancel']) || isset($_REQUEST['finish']))
 	{
-		setcookie('ZBX_CONFIG', null, time()-3600);
+		setcookie('ZBX_CONFIG', null, time()-3600); /* NOTE: don't use zbx_setcookie */
 		unset($_COOKIE['ZBX_CONFIG']);
 		Redirect('index.php');
 	}
@@ -107,11 +107,17 @@
 
 	$ZBX_SETUP_WIZARD = new CSetupWizard($ZBX_CONFIG);
 
-	setcookie('ZBX_CONFIG', serialize($ZBX_CONFIG), time()+3600);
+	zbx_setcookie('ZBX_CONFIG', serialize($ZBX_CONFIG), time()+3600);
 
 include_once "include/page_header.php";
 
-	if(isset($_REQUEST['message'])) show_error_message($_REQUEST['message']);
+	global	$ZBX_CONFIGURATION_FILE;
+
+	if(file_exists($ZBX_CONFIGURATION_FILE))
+	{
+		if(isset($_REQUEST['message']))
+			show_error_message($_REQUEST['message']);
+	}
 	
 	insert_showhint_javascript();
 
