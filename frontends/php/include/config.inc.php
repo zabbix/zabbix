@@ -411,10 +411,15 @@ function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$m
 ?>
 <SCRIPT TYPE="text/javascript">
 <!-- 
-if (navigator.appName != "Microsoft Internet Explorer")
-	document.writeln('<EMBED SRC="<?php echo $filename; ?>" AUTOSTART=TRUE WIDTH=0 HEIGHT=0 LOOP=0><P/>');
-else
+if (navigator.appName == "Microsoft Internet Explorer")
+{
 	document.writeln('<BGSOUND SRC="<?php echo $filename; ?>" LOOP=0/>');
+}
+else
+{
+	document.writeln('<EMBED SRC="<?php echo $filename; ?>" AUTOSTART=TRUE WIDTH=0 HEIGHT=0 LOOP=0/>');
+	document.writeln('<NOEMBED><BGSOUND SRC="<?php echo $filename; ?>" LOOP=0/></NOEMBED>');
+}
 // -->
 </SCRIPT>
 <?php

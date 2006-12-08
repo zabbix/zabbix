@@ -127,7 +127,8 @@ include_once "include/page_header.php";
 		if(isset($_REQUEST["new_group"]))
 		{
 			$_REQUEST['user_groups'] = get_request('user_groups', array());
-			$_REQUEST['user_groups'][$_REQUEST['new_group']['usrgrpid']] = $_REQUEST['new_group']['name'];
+			foreach($_REQUEST['new_group'] as $id => $val)
+				$_REQUEST['user_groups'][$id] = $val;
 		}
 		elseif(isset($_REQUEST["new_media"]))
 		{

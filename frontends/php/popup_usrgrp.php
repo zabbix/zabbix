@@ -35,20 +35,21 @@ include_once "include/page_header.php";
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		"dstfrm"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	NULL),
-		"list_name"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	NULL),
-		"var_name"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	NULL)
+		"new_group"=>	array(T_ZBX_STR, O_OPT,P_SYS,	NOT_EMPTY,	NULL),
+
+		"select"=>	array(T_ZBX_STR,	O_OPT,	P_SYS|P_ACT,	NULL,	NULL)
 	);
 
 	check_fields($fields);
 
 	$dstfrm		= get_request("dstfrm",		0);	// destination form
-	$list_name	= get_request("list_name",	0);	// output field on destination form
-	$var_name	= get_request("var_name",	0);	// second output field on destination form
+	$new_group = get_request('new_group', array());
+
+	SDI($new_group);
 ?>
 <?php
 	show_table_header(S_GROUPS);
 ?>
-
 <script language="JavaScript" type="text/javascript">
 <!--
 function add_var_to_opener_obj(obj,name,value)
@@ -60,40 +61,59 @@ function add_var_to_opener_obj(obj,name,value)
 
         obj.appendChild(new_variable);
 }
+-->
+</script>
+<?php
 
-function add_group(formname,group_id,name)
+	if(isset($_REQUEST['select']) && count($new_group) > 0)
+	{
+?>
+<script language="JavaScript" type="text/javascript">
+form = window.opener.document.forms['<?php echo $dstfrm; ?>'];
+<!--
+<?php
+		foreach($new_group as $id => $name)
+		{
+			echo 'add_var_to_opener_obj(form,"new_group['.$id.']","'.$name.'")'."\r";
+		}
+?>
+if(form)
 {
-        var form = window.opener.document.forms[formname];
-
-        if(!form)
-        {
-                window.close();
-		return false;
-        }
-
-	add_var_to_opener_obj(form,'new_group[usrgrpid]',group_id);
-	add_var_to_opener_obj(form,'new_group[name]',name);
-
 	form.submit();
 	window.close();
-	return true;
 }
 -->
 </script>
-
-
 <?php
+	}
+
+	$form = new CForm();
+	$form->AddVar('dstfrm', $dstfrm);
+
+	$form->SetName('groups');
+
 	$table = new CTableInfo(S_NO_GROUPS_DEFINED);
-	$table->SetHeader(array(S_NAME));
+	$table->SetHeader(array(
+		array(	new CCheckBox("all_groups",NULL,
+				"CheckAll('".$form->GetName()."','all_groups');"),
+			S_NAME)
+		));
 
 	$result = DBselect("select * from usrgrp where ".DBid2nodeid('usrgrpid')."=$ZBX_CURNODEID order by name");
 	while($row = DBfetch($result))
 	{
-		$name = new CLink($row["name"],"#","action");
-		$name->SetAction('return add_group("'.$dstfrm.'",'.$row['usrgrpid'].',"'.$row['name'].'");');
-		$table->AddRow($name);
+		$table->AddRow(array(
+			array(	new CCheckBox('new_group['.$row['usrgrpid'].']',
+					isset($new_group[$row['usrgrpid']]),
+					NULL,
+					$row['name']),
+				$row['name'])
+			));
 	}
-	$table->Show();
+	$table->SetFooter(new CButton('select', S_SELECT));
+
+	$form->AddItem($table);
+	$form->Show();
 ?>
 <?php
 
