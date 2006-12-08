@@ -56,7 +56,7 @@
 				" and ((s.lastaccess+u.autologout>".time().") or (u.autologout=0))".
 				" and ".DBid2nodeid('u.userid')." = ".$ZBX_LOCALNODEID))))
 			{
-				setcookie("sessionid",$sessionid,time()-3600);
+				setcookie("sessionid",$sessionid,time()-3600); /* NOTE: don't use zbx_setcookie */
 				DBexecute("delete from sessions where sessionid=".zbx_dbstr($sessionid));
 				unset($_COOKIE["sessionid"]);
 				unset($sessionid);
@@ -65,7 +65,7 @@
 			}
 			else
 			{
-				setcookie("sessionid",$sessionid);
+				zbx_setcookie("sessionid",$sessionid);
 				DBexecute("update sessions set lastaccess=".time()." where sessionid=".zbx_dbstr($sessionid));
 			}
 		}
