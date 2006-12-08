@@ -1053,11 +1053,16 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *re
 	/* New trigger value differs from current one */
 	if(trigger->value != new_value)
 	{
+
 		get_latest_event_status(trigger->triggerid, &event_prev_status, &event_last_status);
+
+		zabbix_log(LOG_LEVEL_DEBUG,"tr value [%d] event_prev_value [%d] event_last_status [%d] new_value [%d]",
+				trigger->value, event_prev_status, event_last_status, new_value);
 
 		/* The lastest event has the same status, skip of so. */
 		if(event_last_status != new_value)
 		{
+			zabbix_log(LOG_LEVEL_DEBUG,"Updating trigger");
 			if(reason==NULL)
 			{
 				DBexecute("update triggers set value=%d,lastchange=%d,error='' where triggerid=" ZBX_FS_UI64,new_value,now,trigger->triggerid);
@@ -1068,8 +1073,10 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *re
 			}
 			if(	((trigger->value == TRIGGER_VALUE_TRUE) && (new_value == TRIGGER_VALUE_FALSE)) ||
 				((trigger->value == TRIGGER_VALUE_FALSE) && (new_value == TRIGGER_VALUE_TRUE)) ||
-				((event_prev_status == TRIGGER_VALUE_FALSE) && (trigger->value == TRIGGER_VALUE_UNKNOWN) && (new_value == TRIGGER_VALUE_TRUE)) ||
-				((event_prev_status == TRIGGER_VALUE_TRUE) && (trigger->value == TRIGGER_VALUE_UNKNOWN) && (new_value == TRIGGER_VALUE_FALSE)))
+				((event_last_status == TRIGGER_VALUE_FALSE) && (trigger->value == TRIGGER_VALUE_UNKNOWN) && (new_value == TRIGGER_VALUE_TRUE)) ||
+				((event_last_status == TRIGGER_VALUE_TRUE) && (trigger->value == TRIGGER_VALUE_UNKNOWN) && (new_value == TRIGGER_VALUE_FALSE)) ||
+				((event_prev_status == TRIGGER_VALUE_UNKNOWN) && (event_last_status == TRIGGER_VALUE_UNKNOWN) && (trigger->value == TRIGGER_VALUE_UNKNOWN) && (new_value == TRIGGER_VALUE_TRUE))
+			)
 			{
 				/* Preparing event for processing */
 				memset(&event,0,sizeof(DB_EVENT));
@@ -1102,7 +1109,7 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *re
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_DEBUG,"Alarm not added for triggerid [" ZBX_FS_UI64 "]", trigger->triggerid);
+			zabbix_log(LOG_LEVEL_DEBUG,"Event not added for triggerid [" ZBX_FS_UI64 "]", trigger->triggerid);
 			ret = FAIL;
 		}
 	}
