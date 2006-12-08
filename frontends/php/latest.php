@@ -320,7 +320,8 @@ include_once "include/page_header.php";
 		$lastvalue=format_lastvalue($db_item);
 
 		if( isset($db_item["lastvalue"]) && isset($db_item["prevvalue"]) &&
-			($db_item["value_type"] == 0) && ($db_item["lastvalue"]-$db_item["prevvalue"] != 0) )
+			($db_item["value_type"] == ITEM_VALUE_TYPE_FLOAT || $db_item["value_type"] == ITEM_VALUE_TYPE_UINT64) &&
+			($db_item["lastvalue"]-$db_item["prevvalue"] != 0) )
 		{
 			if($db_item["lastvalue"]-$db_item["prevvalue"]<0)
 			{
