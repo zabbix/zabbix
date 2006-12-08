@@ -1854,7 +1854,7 @@ int	DBadd_alert(zbx_uint64_t actionid, zbx_uint64_t userid, zbx_uint64_t trigger
 	DBescape_string(message,message_esc,MAX_STRING_LEN);
 	DBexecute("insert into alerts (alertid, actionid,triggerid,userid,clock,mediatypeid,sendto,subject,message,status,retries,maxrepeats,delay)"
 		" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",'%s','%s','%s',0,0,%d,%d)",
-		DBget_maxid("alert_maxid"),
+		DBget_maxid("alerts","alertid"),
 		actionid,triggerid,userid,now,mediatypeid,sendto_esc,subject_esc,message_esc, maxrepeats, repeatdelay);
 
 	return SUCCEED;
@@ -2070,28 +2070,47 @@ zbx_uint64_t DBget_nextid(char *table, char *field)
 	return res;
 }
 
-zbx_uint64_t DBget_maxid(char *field)
+zbx_uint64_t DBget_maxid(char *table, char *field)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	ret;
 
-	result = DBselect("select %s from nodes where nodeid=%d", field, CONFIG_NODEID);
-	row = DBfetch(result);
-
-	if(!row || DBis_null(row[0])==SUCCEED)
+	if(CONFIG_NODEID == 0)
 	{
-		ret = CONFIG_NODEID*(zbx_uint64_t)__UINT64_C(100000000000000) + 1;
+		result = DBselect("select max(%s) from %s where " ZBX_COND_NODEID, field, table, LOCAL_NODE(field));
+		row = DBfetch(result);
+
+		if(!row || DBis_null(row[0])==SUCCEED)
+		{
+			ret = 1;
+		}
+		else
+		{
+			ZBX_STR2UINT64(ret, row[0]);
+			ret = CONFIG_NODEID*(zbx_uint64_t)__UINT64_C(100000000000000) + ret;
+			ret++;
+		}
 	}
 	else
 	{
-		ZBX_STR2UINT64(ret, row[0]);
-		ret = CONFIG_NODEID*(zbx_uint64_t)__UINT64_C(100000000000000) + ret;
-		ret++;
+		result = DBselect("select %s_%s from nodes where nodeid=%d", table, field, CONFIG_NODEID);
+		row = DBfetch(result);
+	
+		if(!row || DBis_null(row[0])==SUCCEED)
+		{
+			ret = CONFIG_NODEID*(zbx_uint64_t)__UINT64_C(100000000000000) + 1;
+		}
+		else
+		{
+			ZBX_STR2UINT64(ret, row[0]);
+			ret = CONFIG_NODEID*(zbx_uint64_t)__UINT64_C(100000000000000) + ret;
+			ret++;
+		}
+		DBexecute("update nodes set %s_%s=%s_%s+1 where nodeid=%d",
+			table, field, table, field, CONFIG_NODEID);
+		DBfree_result(result);
 	}
-	DBexecute("update nodes set %s=%s+1 where nodeid=%d",
-		field, field, CONFIG_NODEID);
-	DBfree_result(result);
 
 	return ret;
 }
