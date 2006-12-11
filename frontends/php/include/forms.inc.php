@@ -55,7 +55,7 @@
 	
 	function	insert_node_form()
 	{
-		global $ZBX_CURNODEID;
+		global $ZBX_CURNODEID, $ZBX_CURMASTERID;
 		
 		$frm_title = S_NODE;
 			
@@ -63,7 +63,8 @@
 		{
 			$node_data = get_node_by_nodeid($_REQUEST['nodeid']);
 
-			$nodetype	= $node_data['nodetype'];
+			$node_type = detect_node_type($node_data);
+
 			$masterid	= $node_data['masterid'];
 
 			$frm_title = S_NODE." \"".$node_data["name"]."\"";
@@ -94,17 +95,35 @@
 			$port		= get_request('port',10051);
 			$slave_history	= get_request('slave_history',90);
 			$slave_trends	= get_request('slave_trends',365);
-			if(!isset($nodetype)) $nodetype	= get_request('nodetype',0);
-			if(!isset($masterid)) $masterid	= get_request('masterid', $ZBX_CURNODEID);
+			$node_type	= get_request('node_type', ZBX_NODE_REMOTE);
+
+			$masterid	= get_request('masterid', $ZBX_CURNODEID);
 		}
 
 		$master_node = DBfetch(DBselect('select name from nodes where nodeid='.$masterid));
 
 		$frmNode->AddRow(S_NAME, new CTextBox('name', $name, 40));
 
-		$frmNode->AddRow(S_MASTER_NODE, new CTextBox('master_name',	$master_node['name'], 40, 'yes'));
-		$frmNode->AddRow(S_TYPE, 	new CTextBox('node_type',	$nodetype ? S_LOCAL : S_REMOTE , null, 'yes'));
-	
+		if(!isset($_REQUEST['nodeid']))
+		{
+			$cmbNodeType = new CComboBox('node_type', $node_type, 'submit()');
+			$cmbNodeType->AddItem(ZBX_NODE_REMOTE, S_REMOTE);
+			if($ZBX_CURMASTERID == 0)
+			{
+				$cmbNodeType->AddItem(ZBX_NODE_MASTER, S_MASTER);
+			}
+		}
+		else
+		{
+			$cmbNodeType = new CTextBox('node_type_name', node_type2str($node_type), null, 'yes');
+		}
+		$frmNode->AddRow(S_TYPE, 	$cmbNodeType);
+
+		if($node_type == ZBX_NODE_REMOTE)
+		{
+			$frmNode->AddRow(S_MASTER_NODE, new CTextBox('master_name',	$master_node['name'], 40, 'yes'));
+		}
+
 		$cmbTimeZone = new CComboBox('timezone', $timezone);
 		for($i = -12; $i <= 13; $i++)
 		{
@@ -118,7 +137,7 @@
 
 		
 		$frmNode->AddItemToBottomRow(new CButton('save',S_SAVE));
-		if(isset($_REQUEST['nodeid']) && !DBfetch(DBselect('select * from nodes where masterid='.$_REQUEST['nodeid'])))
+		if(isset($_REQUEST['nodeid']) && $node_type != ZBX_NODE_LOCAL)
 		{
 			$frmNode->AddItemToBottomRow(SPACE);
 			$frmNode->AddItemToBottomRow(new CButtonDelete("Delete selected node?",

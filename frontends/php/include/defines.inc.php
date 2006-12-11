@@ -285,6 +285,10 @@
 	define("RESOURCE_TYPE_NODE",		0);
 	define("RESOURCE_TYPE_GROUP",		1);
 
+	define("ZBX_NODE_REMOTE",	0);
+	define("ZBX_NODE_LOCAL",	1);
+	define("ZBX_NODE_MASTER",	2);
+
 /* Support for PHP5. PHP5 does not have $HTTP_..._VARS */
 	if (!function_exists('version_compare'))
 	{
