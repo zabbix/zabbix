@@ -20,16 +20,73 @@
 	require_once 	"include/db.inc.php";
 ?>
 <?php
-	function	add_node($name,$timezone,$ip,$port,$slave_history,$slave_trends)
+	function	detect_node_type($node_data)
 	{
-		global $ZBX_CURNODEID;
+		global $ZBX_CURNODEID, $ZBX_CURMASTERID;
+
+		if($node_data['nodeid'] == $ZBX_CURNODEID)    		$node_type = ZBX_NODE_LOCAL;
+		else if($node_data['nodeid'] == $ZBX_CURMASTERID)	$node_type = ZBX_NODE_MASTER;
+		else if($node_data['masterid'] == $ZBX_CURNODEID)	$node_type = ZBX_NODE_REMOTE;
+		else $node_type = -1;
+
+		return $node_type;
+	}
+
+	function	node_type2str($node_type)
+	{
+		$result = '';
+		switch($node_type)
+		{
+			case ZBX_NODE_REMOTE:	$result = S_REMOTE;	break;
+			case ZBX_NODE_MASTER:	$result = S_MASTER;	break;
+			case ZBX_NODE_LOCAL:	$result = S_LOCAL;	break;
+			default:		$result = S_UNKNOWN;	break;
+		}
+
+		return $result;
+	}
+
+	function	add_node($name,$timezone,$ip,$port,$slave_history,$slave_trends,$node_type)
+	{
+		global $ZBX_CURNODEID, $ZBX_CURMASTERID;
+
+		switch($node_type)
+		{
+			case ZBX_NODE_REMOTE:
+				$masterid = $ZBX_CURNODEID;
+				$nodetype = 0;
+				break;
+			case ZBX_NODE_MASTER:
+				$masterid = 0;
+				$nodetype = 0;
+				if($ZBX_CURMASTERID)
+				{
+					error('Master node already exist');
+					return false;
+				}
+				break;
+			case ZBX_NODE_LOCAL:
+				$masterid = $ZBX_CURMASTERID;
+				$nodetype = 1;
+				break;
+			default:
+				error('Incorrect node type');
+				return false;
+				break;
+		}
 
 		$nodeid = DBfetch(DBselect('select max(nodeid) as max from nodes'));
 		$nodeid = $nodeid['max'] + 1;
 		$result = DBexecute('insert into nodes (nodeid,name,timezone,ip,port,slave_history,slave_trends,'.
 				'event_lastid,history_lastid,nodetype,masterid) values ('.
 				$nodeid.','.zbx_dbstr($name).','.$timezone.','.zbx_dbstr($ip).','.$port.','.$slave_history.','.$slave_trends.','.
-				'0,0,0,'.$ZBX_CURNODEID.')');
+				'0,0,'.$nodetype.','.$masterid.')');
+
+		if($result && $node_type == ZBX_NODE_MASTER)
+		{
+			DBexecute('update nodes set masterid='.$nodeid.' where nodeid='.$ZBX_CURNODEID);
+			$ZBX_CURMASTERID = $nodeid; /* applay Master node for this script */
+		}
 
 		return ($result ? $nodeid : $result);
 	}
@@ -45,9 +102,25 @@
 	function	delete_node($nodeid)
 	{
 		$result = false;
-		if(!DBfetch(DBselect('select * from nodes where masterid='.$nodeid)))
+		$node_data = DBfetch(DBselect('select * from nodes where nodeid='.$nodeid));
+
+		$node_type = detect_node_type($node_data);
+
+		if($node_type == ZBX_NODE_LOCAL)
 		{
-			$result = DBexecute('delete from nodes where nodeid='.$nodeid);
+			error('Unable to remove local node');
+		}
+		else
+		{
+			SDI('TODO: Correct housekeeper scheduling [node deletion]!'); /* TODO */ /* add node deletion by housekeeper */
+		
+			$housekeeperid = get_dbid('housekeeper','housekeeperid');
+			$result = (
+				DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)".
+					" values ($housekeeperid,'nodes','nodeid',$nodeid)") &&
+				DBexecute('delete from nodes where nodeid='.$nodeid) &&
+				DBexecute('update nodes set masterid=0 where masterid='.$nodeid)
+				);
 		}
 		return $result;
 	}
