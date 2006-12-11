@@ -141,6 +141,8 @@ int change_nodeid(int old_id, int new_id)
 
 	DBconnect();
 
+	DBbegin();
+
 	printf("Converting tables ");
 	fflush(stdout);
 
@@ -174,6 +176,9 @@ int change_nodeid(int old_id, int new_id)
 				new_expression_esc, row[1]);
 	}
 	DBfree_result(result);
+
+	DBexecute("insert into nodes (nodeid,name,ip,nodetype) values (%d,'Local node','127.0.0.1',1)", new_id);
+	DBcommit();
 	
 	DBclose();
 	printf(" done.\n\nConversion completed.\n");
