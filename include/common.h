@@ -26,11 +26,27 @@
 
 #undef snprintf
 
+
+#ifdef snprintf
+#undef snprintf
+#endif
 #define snprintf	ERROR_DO_NOT_USE_SNPRINTF_FUNCTION_TRY_TO_USE_ZBX_SNPRINTF
+
+#ifdef sprintf
+#undef sprintf
+#endif
 #define sprintf		ERROR_DO_NOT_USE_SPRINTF_FUNCTION_TRY_TO_USE_ZBX_SNPRINTF
+
+#ifdef strncpy
+#undef strncpy
+#endif
 #define strncpy		ERROR_DO_NOT_USE_STRNCPY_FUNCTION_TRY_TO_USE_ZBX_STRLCPY
-//#define strncat		ERROR_DO_NOT_USE_STRNCAT_FUNCTION_TRY_TO_USE_ZBX_STRLCAT
+
+#ifdef vsprintf
+#undef vsprintf
+#endif
 #define vsprintf	ERROR_DO_NOT_USE_VSPRINTF_FUNCTION_TRY_TO_USE_VSNPRINTF
+/*#define strncat		ERROR_DO_NOT_USE_STRNCAT_FUNCTION_TRY_TO_USE_ZBX_STRLCAT*/
 
 #define ON	1
 #define OFF	0
