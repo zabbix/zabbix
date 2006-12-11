@@ -144,7 +144,7 @@
 			return new CTag('div', 'yes', 'Welcome to the ZABBIX frontend installation wizard.'.BR.BR.
 				'This installation wizard will guide you through the installation of ZABBIX frontend'.BR.BR.
 				'Click to "Next" button to proceed to the next screen. If you want to change something '.
-				'on a previos screen, click "Previous" button'.BR.BR.
+				'on a previous screen, click "Previous" button'.BR.BR.
 				'You may cancel installation at any time by clicking "Cancel" button', 'text');
 		}
 
