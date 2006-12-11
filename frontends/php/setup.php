@@ -36,7 +36,7 @@
 		"distributed"=>	array(T_ZBX_STR, O_OPT,	null,	null,			null),
 		"trouble"=>	array(T_ZBX_STR, O_OPT,	null,	null,			null),
 
-		"type"=>	array(T_ZBX_STR, O_OPT,	null,	IN('"MYSQL","POSTGRESQL","ORACLE"'),	null),
+		"type"=>	array(T_ZBX_STR, O_OPT,	null,	IN('"MYSQL","POSTGRESQL","ORACLE","SQLITE3"'),	null),
 		"server"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		null),
 		"database"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		null),
 		"user"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		null),
@@ -95,6 +95,10 @@
 	{
 		$ZBX_CONFIG['allowed_db']['ORACLE'] = 'Oracle';
 	}
+	/* ORACLE */	if(zbx_is_callable(array('sqlite3_open', 'sqlite3_close', 'sqlite3_query', 'sqlite3_error', 'sqlite3_fetch_array', 'sqlite3_query_close', 'sqlite3_exec')))
+	{
+		$ZBX_CONFIG['allowed_db']['SQLITE3'] = 'SQLite3';
+	}
 	if(count($ZBX_CONFIG['allowed_db']) == 0)
 	{
 		$ZBX_CONFIG['allowed_db']['no'] = array('No');
@@ -102,7 +106,6 @@
 
 ?>
 <?php
-
 	global $ZBX_SETUP_WIZARD;
 
 	$ZBX_SETUP_WIZARD = new CSetupWizard($ZBX_CONFIG);
@@ -123,8 +126,6 @@ include_once "include/page_header.php";
 
 	echo BR;
 	$ZBX_SETUP_WIZARD->Show();
-
-	//SDI($ZBX_CONFIG);
 
 	global $_POST;
 	unset($_POST);
