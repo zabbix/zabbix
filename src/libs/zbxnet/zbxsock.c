@@ -79,7 +79,12 @@ int zbx_sock_read(ZBX_SOCKET sock, void *buf, int buflen, int timeout)
 
 	/* Wait for command from server */
 	FD_ZERO(&rdfs);
-	FD_SET(sock, &rdfs);		/* ignore WARNING '...whle(0)' */
+
+#pragma warning (disable: 4018) /* for FD_SET *//* ignore WARNING C4018:'...whle(0)' */
+
+	FD_SET(sock, &rdfs);		
+
+#pragma warning (default: 4018) /* for FD_SET */
 
 	time.tv_sec	= timeout;
 	time.tv_usec	= 0;
