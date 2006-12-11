@@ -35,14 +35,16 @@ include_once "include/page_header.php";
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 
 // media form
-		"nodeid"=>		array(T_ZBX_INT, O_NO,	null,	DB_ID,		'{form}=="update"'),
+		"nodeid"=>		array(T_ZBX_INT, O_NO,	null,	DB_ID,			'{form}=="update"'),
 		
-		"name"=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})'),
-		"timezone"=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(-12,+13),'isset({save})'),
-		"ip"=>			array(T_ZBX_IP,	 O_OPT,	null,	null,		'isset({save})'),
-		"port"=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(1,65535),'isset({save})'),
-		"slave_history"=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,65535),'isset({save})'),
-		"slave_trends"=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,65535),'isset({save})'),
+		"name"=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		'isset({save})'),
+		"timezone"=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(-12,+13),	'isset({save})'),
+		"ip"=>			array(T_ZBX_IP,	 O_OPT,	null,	null,			'isset({save})'),
+		"node_type"=>		array(T_ZBX_INT, O_OPT,	null,
+			IN(ZBX_NODE_REMOTE.','.ZBX_NODE_MASTER.','.ZBX_NODE_LOCAL),		'isset({save})&&!isset({nodeid})'),
+		"port"=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(1,65535),	'isset({save})'),
+		"slave_history"=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,65535),	'isset({save})'),
+		"slave_trends"=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,65535),	'isset({save})'),
 /* actions */
 		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -79,7 +81,7 @@ include_once "include/page_header.php";
 			$audit_action = AUDIT_ACTION_ADD;
 			$result = add_node(
 				$_REQUEST['name'], $_REQUEST['timezone'], $_REQUEST['ip'], $_REQUEST['port'],
-				$_REQUEST['slave_history'], $_REQUEST['slave_trends']);
+				$_REQUEST['slave_history'], $_REQUEST['slave_trends'], $_REQUEST['node_type']);
 			$nodeid = $result;
 			
 			show_messages($result, S_NODE_ADDED, S_CANNOT_ADD_NODE);
@@ -122,13 +124,16 @@ include_once "include/page_header.php";
 		while($row=DBfetch($db_nodes))
 		{
 
+			$node_type = detect_node_type($row);
+			$node_type_name = node_type2str($node_type);
+
 			$table->AddRow(array(
 				array(
 					get_node_path($row['masterid']),
 					new CLink(
 						($row['nodetype'] ? new CSpan($row["name"], 'bold') : $row["name"]),
 						"?&form=update&nodeid=".$row["nodeid"],'action')),
-				$row['nodetype'] ? new CSpan(S_LOCAL,'bold') : S_REMOTE,
+				$node_type == ZBX_NODE_LOCAL ? new CSpan($node_type_name, 'bold') : $node_type_name,
 				new CSpan("GMT".sprintf("%+03d:00", $row['timezone']),	$row['nodetype'] ? 'bold' : null),
 				new CSpan($row['ip'].':'.$row['port'], 			$row['nodetype'] ? 'bold' : null)
 				));

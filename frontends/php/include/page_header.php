@@ -24,8 +24,7 @@
 
 
 	global $USER_DETAILS;
-	global $ZBX_CURNODEID;
-	global $ZBX_LOCALNODEID;
+	global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID;
 	global $page;
 
 COpt::profiling_start("page");
@@ -59,19 +58,30 @@ COpt::profiling_start("page");
 	process_locales();
 
 	/* Init CURRENT NODE ID */
+	global $ZBX_CURNODEID, $ZBX_CURMASTERID;
+
 	if(!defined('ZBX_PAGE_NO_AUTHERIZATION') && ZBX_DISTRIBUTED)
 	{
 		$ZBX_CURNODEID = get_cookie('current_nodeid', $ZBX_LOCALNODEID); // Selected node
 		if(isset($_REQUEST['switch_node']))
 		{
-			if(DBfetch(DBselect("select nodeid from nodes where nodeid=".$_REQUEST['switch_node'])))
+			if($node_data = DBfetch(DBselect("select * from nodes where nodeid=".$_REQUEST['switch_node'])))
+			{
 				$ZBX_CURNODEID = $_REQUEST['switch_node'];
+			}
+			unset($node_data);
+		}
+
+		if($node_data = DBfetch(DBselect("select * from nodes where nodeid=".$ZBX_CURNODEID)))
+		{
+			$ZBX_CURMASTERID = $node_data['masterid'];
 		}
 		
 		if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST,null,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)) <= 0)
 		{
 			$denyed_page_requested = true;
 			$ZBX_CURNODEID = $ZBX_LOCALNODEID;
+			$ZBX_CURMASTERID = $ZBX_LOCMASTERID;
 		}
 		
 		zbx_setcookie("current_nodeid",$ZBX_CURNODEID);
@@ -79,6 +89,7 @@ COpt::profiling_start("page");
 	else
 	{
 		$ZBX_CURNODEID = $ZBX_LOCALNODEID;
+		$ZBX_CURMASTERID = $ZBX_LOCMASTERID;
 	}
 	
 	switch($page["type"])
