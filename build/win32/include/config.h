@@ -8,7 +8,10 @@
 #define HAVE_WINDOWS_H 1
 
 /* Define to 1 if you have the <winsock2.h> header file. */
-//#define HAVE_WINSOCK2_H 1
+#define HAVE_WINSOCK2_H 1
+
+/* Define to 1 if you have the <ws2tcpip.h> header file. */
+#define HAVE_WS2TCPIP_H
 
 /* Define to 1 if you have the <conio.h> header file. */
 #define HAVE_CONIO_H 1
@@ -26,10 +29,10 @@
 #define HAVE_SYS_TIMEB_H 1
 
 /* Define to 1 if you have the <Winldap.h> header file. */
-#define HAVE_WINLDAP_H
+#define HAVE_WINLDAP_H 1
 
 /* Define to 1 if you have the <Winber.h> header file. */
-#define HAVE_WINBER_H
+#define HAVE_WINBER_H 1
 
 /* Define to 1 if you have the <arpa/inet.h> header file. */
 //#define HAVE_ARPA_INET_H 1
