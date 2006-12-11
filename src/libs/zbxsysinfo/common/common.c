@@ -1368,15 +1368,12 @@ int	RUN_COMMAND(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 	if(strcmp(flag,"wait") == 0)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Run wait command '%s'",command);
 		return EXECUTE_STR(cmd,command,flags,result);
 	}
 	else if(strcmp(flag,"nowait") != 0)
 	{
 		return SYSINFO_RET_FAIL;
 	}
-	
-	zabbix_log(LOG_LEVEL_DEBUG, "Run nowait command '%s'",command);
 	
 #if defined(_WINDOWS)
 

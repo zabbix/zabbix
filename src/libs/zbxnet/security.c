@@ -28,8 +28,6 @@
 
 //#include <errno.h>
 
-/* config.h is required for socklen_t (undefined under Solaris) */
-#include "config.h"
 #include "common.h"
 #include "zbxsock.h"
 #include "log.h"
