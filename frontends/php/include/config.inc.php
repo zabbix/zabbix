@@ -94,13 +94,15 @@ function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$m
 
 	set_error_handler('zbx_err_handler');
 
-	global $ZBX_LOCALNODEID, $ZBX_CONFIGURATION_FILE, $DB_TYPE, $DB_SERVER, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
+	global $_COOKIE, $ZBX_LOCALNODEID, $ZBX_CONFIGURATION_FILE, $DB_TYPE, $DB_SERVER, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
 
 	$ZBX_LOCALNODEID = 0;
 
 	$ZBX_CONFIGURATION_FILE = './conf/zabbix.conf.php';
 
-	if(file_exists($ZBX_CONFIGURATION_FILE))
+	$ZBX_CONFIGURATION_FILE = realpath(dirname($ZBX_CONFIGURATION_FILE)).'/'.basename($ZBX_CONFIGURATION_FILE);
+
+	if(file_exists($ZBX_CONFIGURATION_FILE) && !isset($_COOKIE['ZBX_CONFIG']))
 	{
 		include $ZBX_CONFIGURATION_FILE;
 
@@ -136,11 +138,6 @@ function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$m
 	{
 		define('ZBX_PAGE_NO_AUTHERIZATION', true);
 		define('ZBX_DISTRIBUTED', false);
-		$show_setup = true;
-	}
-
-	if(isset($_COOKIE['ZBX_CONFIG']))
-	{
 		$show_setup = true;
 	}
 
@@ -198,6 +195,13 @@ function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$m
 			$ZBX_MESSAGES = array();
 
 		array_push($ZBX_MESSAGES, array('type' => 'error', 'message' => $msg));
+	}
+
+	function clear_messages()
+	{
+		global $ZBX_MESSAGES;
+
+		$ZBX_MESSAGES = null;
 	}
 
 	function &asort_by_key(&$array, $key)

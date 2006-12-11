@@ -68,35 +68,55 @@
 					}
 					break;
 				case "SQLITE3":
-					function init_db_access()
+					if(!function_exists('init_db_access'))
 					{
-						global $ZBX_CONFIGURATION_FILE, $ZBX_SEM_ID;
+						function init_db_access()
+						{
+							global $ZBX_CONFIGURATION_FILE, $ZBX_SEM_ID;
 
-						$ZBX_SEM_ID = false;
-						if(function_exists('ftok') && function_exists('sem_get'))
-							$ZBX_SEM_ID = sem_get(ftok($ZBX_CONFIGURATION_FILE, 'z'), 1);
+							$ZBX_SEM_ID = false;
+							if(function_exists('ftok') && function_exists('sem_get') &&
+								file_exists($ZBX_CONFIGURATION_FILE))
+							{
+								$ZBX_SEM_ID = sem_get(ftok($ZBX_CONFIGURATION_FILE, 'z'), 1);
+							}
+						}
 					}
 
-					function lock_db_access()
+					if(!function_exists('lock_db_access'))
 					{
-						global $ZBX_SEM_ID;
+						function lock_db_access()
+						{
+							global $ZBX_SEM_ID;
 
-						if($ZBX_SEM_ID && function_exists('sem_acquire'))
-							sem_acquire($ZBX_SEM_ID);
+							if($ZBX_SEM_ID && function_exists('sem_acquire'))
+								sem_acquire($ZBX_SEM_ID);
+						}
 					}
 
-					function unlock_db_access()
+					if(!function_exists('unlock_db_access'))
 					{
-						global $ZBX_SEM_ID;
+						function unlock_db_access()
+						{
+							global $ZBX_SEM_ID;
 
-						if($ZBX_SEM_ID && function_exists('sem_release'))
-							sem_release($ZBX_SEM_ID);
+							if($ZBX_SEM_ID && function_exists('sem_release'))
+								sem_release($ZBX_SEM_ID);
+						}
 					}
 
-					$DB = sqlite3_open($DB_DATABASE);
-					if(!$DB)
+					if(file_exists($DB_DATABASE))
 					{
-						$error = "Error connecting to database";
+						$DB = sqlite3_open($DB_DATABASE);
+						if(!$DB)
+						{
+							$error = "Error connecting to database";
+							$result = false;
+						}
+					}
+					else
+					{
+						$error = "Missed database";
 						$result = false;
 					}
 
