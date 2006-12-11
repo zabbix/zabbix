@@ -47,7 +47,6 @@
 		global	$ZBX_LOCALNODEID;
 
 		$USER_DETAILS = NULL;
-		
 		if(isset($_COOKIE["sessionid"]))
 		{
 			$sessionid = $_COOKIE["sessionid"];
@@ -65,7 +64,7 @@
 			}
 			else
 			{
-				zbx_setcookie("sessionid",$sessionid);
+				setcookie("sessionid",$sessionid,time()+3600); /* NOTE: don't use zbx_setcookie */
 				DBexecute("update sessions set lastaccess=".time()." where sessionid=".zbx_dbstr($sessionid));
 			}
 		}

@@ -32,16 +32,7 @@
 /* protected *//*
 		var $ZBX_CONFIG;
 		var $DISABLE_NEXT_BUTTON;
-		var $stage = array(
-			0 => array('title' => '1. Introduction'			, 'fnc' => 'Stage0' ),
-			1 => array('title' => '2. Licence Agreement'		, 'fnc' => 'Stage1' ),
-			2 => array('title' => '3. Check of pre-requisites'	, 'fnc' => 'Stage2' ),
-			3 => array('title' => '4. Configure DB connection'	, 'fnc' => 'Stage3' ),
-			4 => array('title' => '5. Distributed monitoring'	, 'fnc' => 'Stage4' ),
-			5 => array('title' => '6. Pre-Installation Summary'	, 'fnc' => 'Stage5' ),
-			6 => array('title' => '7. Install'			, 'fnc' => 'Stage6' ),
-			7 => array('title' => '8. Finish'			, 'fnc' => 'Stage7' )
-			);
+		var $stage = array();
 		*/
 
 /* public */	
@@ -326,7 +317,9 @@
 			$table = new CTable();
 			$table->SetAlign('center');
 			
-			$cmbType = new CComboBox('type', $this->GetConfig('DB_TYPE',     'MYSQL'));
+			$DB_TYPE = $this->GetConfig('DB_TYPE',     'MYSQL');
+
+			$cmbType = new CComboBox('type', $DB_TYPE,'submit()');
 			foreach($ZBX_CONFIG['allowed_db'] as $id => $name)
 			{
 				$cmbType->AddItem($id, $name);
@@ -336,7 +329,7 @@
 			$table->AddRow(array(S_NAME, new CTextBox('database',		$this->GetConfig('DB_DATABASE',	'zabbix'))));
 			$table->AddRow(array(S_USER, new CTextBox('user',		$this->GetConfig('DB_USER',	'root'))));
 			$table->AddRow(array(S_PASSWORD, new CPassBox('password',	$this->GetConfig('DB_PASSWORD',	''))));
-						
+
 			return array(
 				'Please create database manually.', BR,
 				'And set the configuration parameters of connection to this database.',
@@ -400,7 +393,7 @@
 			$table->AddRow(array('Database name',		$this->GetConfig('DB_DATABASE',	'uncnown')));
 			$table->AddRow(array('Database user',		$this->GetConfig('DB_USER',	'uncnown')));
 			$table->AddRow(array('Database password',	$this->GetConfig('DB_PASSWORD',	'uncnown')));
-			$table->AddRow(array('Distributed monitoring',	$this->GetConfig('distributed', null) ? 'Enabled' : 'Disabled'));
+			/* $table->AddRow(array('Distributed monitoring',	$this->GetConfig('distributed', null) ? 'Enabled' : 'Disabled')); */
 			if($this->GetConfig('distributed', null))
 			{
 				$table->AddRow(array('Node name',	$this->GetConfig('nodename',	'uncnown')));
@@ -417,16 +410,17 @@
 		{
 			global $_SERVER, $ZBX_CONFIGURATION_FILE;
 
-			if(is_writable($ZBX_CONFIGURATION_FILE))
+			/* Write the new contents */
+			if($f = fopen($ZBX_CONFIGURATION_FILE, 'w'))
 			{
-				/* Write the new contents */
-				if($f = fopen($ZBX_CONFIGURATION_FILE, 'w'))
+				if(fwrite($f, $this->GetNewConfigurationFileContent()))
 				{
-					if(fwrite($f, addslashes($config_content)))
+					if(fclose($f))
 					{
-						if(fclose($f))
+						if($this->SetConfig('ZBX_CONFIG_FILE_CORRECT', $this->CheckConfigurationFile()))
 						{
-							$config_saved = true;
+							clear_messages();
+							$this->DISABLE_NEXT_BUTTON = false;
 						}
 					}
 				}
@@ -459,7 +453,7 @@
 					array('Please install configuration file manualy.',BR,BR,
 						'By pressing "Save configuration file" button download configuration file ',
 						'and place them into the ',BR,
-						'"'.realpath($ZBX_CONFIGURATION_FILE).'"',BR,BR,
+						'"'.$ZBX_CONFIGURATION_FILE.'"',BR,BR,
 						new CButton('save_config',"Save configuration file"),
 						BR,BR
 						)
@@ -478,8 +472,15 @@
 
 		function CheckConnection()
 		{
-			global $DB_TYPE, $DB_SERVER, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
-			
+			global $DB, $DB_TYPE, $DB_SERVER, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
+
+			$old_DB		= $DB;
+			$old_DB_TYPE	= $DB_TYPE;
+			$old_DB_SERVER	= $DB_SERVER;
+			$old_DB_DATABASE= $DB_DATABASE;
+			$old_DB_USER	= $DB_USER;
+			$old_DB_PASSWORD= $DB_PASSWORD;
+
 			$DB_TYPE	= $this->GetConfig('DB_TYPE',		'MYSQL');
 			$DB_SERVER	= $this->GetConfig('DB_SERVER',		'localhost');
 			$DB_DATABASE	= $this->GetConfig('DB_DATABASE',	'zabbix');
@@ -494,10 +495,28 @@
 			else
 			{
 				$result = DBexecute('create table zabbix_installation_test ( test_row integer )');
-				$result |= DBexecute('drop table zabbix_installation_test');
+				$result &= DBexecute('drop table zabbix_installation_test');
 			}
 			
 			DBclose();
+
+			if($DB_TYPE == 'SQLITE3' && !zbx_is_callable(array('sem_get','sem_acquire','sem_release','sem_remove')))
+			{
+				error('SQLite3 required IPC functions');
+				$result &= false;
+			}
+			
+			/* restore connection */
+			global $DB, $DB_TYPE, $DB_SERVER, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
+
+			$DB		= $old_DB;
+			$DB_TYPE	= $old_DB_TYPE;
+			$DB_SERVER	= $old_DB_SERVER;
+			$DB_DATABASE	= $old_DB_DATABASE;
+			$DB_USER	= $old_DB_USER;
+			$DB_PASSWORD	= $old_DB_PASSWORD;
+
+			DBconnect($error);
 
 			return $result;
 		}
@@ -590,10 +609,19 @@
 
 		function CheckConfigurationFile()
 		{
-			global $ZBX_CONFIGURATION_FILE;
-			
+			global $DB, $DB_TYPE, $DB_SERVER, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
+
+			$old_DB		= $DB;
+			$old_DB_TYPE	= $DB_TYPE;
+			$old_DB_SERVER	= $DB_SERVER;
+			$old_DB_DATABASE= $DB_DATABASE;
+			$old_DB_USER	= $DB_USER;
+			$old_DB_PASSWORD= $DB_PASSWORD;
+
 			$error = null;
-			
+
+			global $ZBX_CONFIGURATION_FILE;
+						
 			if(file_exists($ZBX_CONFIGURATION_FILE))
 			{
 				include $ZBX_CONFIGURATION_FILE;
@@ -631,8 +659,19 @@
 				error($error);
 			}
 
-			return !isset($error);
+			/* restore connection */
+			global $DB, $DB_TYPE, $DB_SERVER, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
 
+			$DB		= $old_DB;
+			$DB_TYPE	= $old_DB_TYPE;
+			$DB_SERVER	= $old_DB_SERVER;
+			$DB_DATABASE	= $old_DB_DATABASE;
+			$DB_USER	= $old_DB_USER;
+			$DB_PASSWORD	= $old_DB_PASSWORD;
+
+			DBconnect($error2);
+
+			return !isset($error);
 		}
 		
 		function EventHandler()
@@ -734,7 +773,16 @@
 					/* Make zabbix.conf.php downloadable */
 					header('Content-Type: application/x-httpd-php');
 					header('Content-Disposition: attachment; filename="'.basename($ZBX_CONFIGURATION_FILE).'"');
-					die(
+					die($this->GetNewConfigurationFileContent());
+				 }
+			}
+			
+			if(isset($_REQUEST['next'][$this->GetStep()]))		$this->DoNext();
+		}
+
+		function GetNewConfigurationFileContent()
+		{
+			return 
 '<?php
 /* 
 ** ZABBIX
@@ -764,12 +812,7 @@ $DB_USER	= "'.$this->GetConfig('DB_USER'		,'uncnown').'";
 $DB_PASSWORD	= "'.$this->GetConfig('DB_PASSWORD'	,'').'";
 
 $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
-?>'
-					);
-				 }
-			}
-			
-			if(isset($_REQUEST['next'][$this->GetStep()]))		$this->DoNext();
+?>';
 		}
 	}
 ?>
