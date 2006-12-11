@@ -94,9 +94,10 @@ function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$m
 
 	set_error_handler('zbx_err_handler');
 
-	global $_COOKIE, $ZBX_LOCALNODEID, $ZBX_CONFIGURATION_FILE, $DB_TYPE, $DB_SERVER, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
+	global $_COOKIE, $ZBX_LOCALNODEID, $ZBX_LOCMASTERID, $ZBX_CONFIGURATION_FILE, $DB_TYPE, $DB_SERVER, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
 
 	$ZBX_LOCALNODEID = 0;
+	$ZBX_LOCMASTERID = 0;
 
 	$ZBX_CONFIGURATION_FILE = './conf/zabbix.conf.php';
 
@@ -118,12 +119,14 @@ function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$m
 		}
 		else
 		{
-			global $ZBX_LOCALNODEID;
+			global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID;
 
 			/* Init LOCAL NODE ID */
-			if($local_node_data = DBfetch(DBselect('select nodeid from nodes where nodetype=1 order by nodeid')))
+			if($local_node_data = DBfetch(DBselect('select * from nodes where nodetype=1 order by nodeid')))
 			{
 				$ZBX_LOCALNODEID = $local_node_data['nodeid'];
+				$ZBX_LOCMASTERID = $local_node_data['masterid'];
+
 				define('ZBX_DISTRIBUTED', true);
 			}
 			else
