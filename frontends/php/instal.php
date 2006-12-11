@@ -54,26 +54,14 @@ include_once "include/page_header.php"
 	$form->AddRow(
 		array(bold(S_NEW_INSTALLATION_BIG),BR,BR,
 			bold(S_DESCRIPTION),BR,
-			'todo todo todo todo todo ',
-			'todo todo todo todo todo ',
-			'todo todo todo todo todo ',BR,
-			'todo todo todo todo todo ',
-			'todo todo todo todo todo ',BR,
-			'todo todo todo todo todo ',
-			'todo todo todo todo todo ',
+			'Not implemented yet!',
 			BR,BR,BR
 			),
 		new CButton('install',S_NEW_INSTALLATION));
 	$form->AddRow(
 		array(bold(S_UPDATE_BIG),BR,BR,
 			bold(S_DESCRIPTION),BR,
-			'todo todo todo todo todo ',
-			'todo todo todo todo todo ',
-			'todo todo todo todo todo ',BR,
-			'todo todo todo todo todo ',BR,
-			'todo todo todo todo todo ',
-			'todo todo todo todo todo ',BR,
-			'todo todo todo todo todo ',
+			'Not implemented yet!',
 			BR,BR,BR
 			),
 		new CButton('update',S_UPDATE));
