@@ -1,0 +1,1069 @@
+dnl 
+dnl ZABBIX
+dnl Copyright (C) 2000-2005 SIA Zabbix
+dnl
+dnl This program is free software; you can redistribute it and/or modify
+dnl it under the terms of the GNU General Public License as published by
+dnl the Free Software Foundation; either version 2 of the License, or
+dnl (at your option) any later version.
+dnl
+dnl This program is distributed in the hope that it will be useful,
+dnl but WITHOUT ANY WARRANTY; without even the implied warranty of
+dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+dnl GNU General Public License for more details.
+dnl
+dnl You should have received a copy of the GNU General Public License
+dnl along with this program; if not, write to the Free Software
+dnl Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+dnl
+
+dnl Process this file with autoconf to produce a configure script.
+
+AC_INIT(src/zabbix_server/server.c)
+AM_INIT_AUTOMAKE([zabbix],[1.3])
+
+AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
+
+AC_PROG_MAKE_SET
+
+AM_CONFIG_HEADER(include/config.h)
+
+AC_CANONICAL_HOST
+
+dnl Checks for programs.
+AC_PROG_CC
+
+dnl Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
+  syslog.h time.h errno.h sys/types.h sys/stat.h netinet/in.h \
+  math.h sys/socket.h dirent.h ctype.h \
+  mtent.h fcntl.h sys/param.h sys/mount.h arpa/inet.h \
+  sys/vfs.h sys/pstat.h sys/sysinfo.h sys/statvfs.h \
+  sys/socket.h sys/loadavg.h netinet/in.h arpa/inet.h \
+  sys/swap.h sys/vmmeter.h strings.h sys/sysctl.h vm/vm_param.h \
+  sys/time.h kstat.h sys/syscall.h sys/sysmacros.h sys/procfs.h \
+  stdint.h mach/host_info.h mach/mach_host.h knlist.h pwd.h sys/proc.h \
+  sys/var.h resolv.h arpa/nameser.h assert.h sys/dkstat.h sys/disk.h \
+  nlist.h net/if.h kvm.h linux/kernel.h ldap.h getopt.h procinfo.h sys/dk.h \
+  sys/resource.h pthread.h windows.h process.h conio.h sys/wait.h regex.h \
+  stdarg.h winsock2.h pdh.h psapi.h sys/sem.h sys/ipc.h sys/shm.h Winldap.h \
+  sys/timeb.h Winber.h lber.h ws2tcpip.h)
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+AC_C_CONST
+AC_TYPE_PID_T
+
+dnl Checks for libraries.
+dnl Check for crypto moved under SNMP
+dnl Why I had -lsnmp before ???
+dnl AC_CHECK_LIB(snmp, main, LIBS="-lsnmp $LIBS")
+dnl Required for AIX when -lsnmp is used
+dnl AC_CHECK_LIB(isode, main)
+AC_CHECK_LIB(socket, main)
+#Solaris SNMP requires this
+AC_CHECK_LIB(kstat, main)
+AC_CHECK_LIB(nsl, main)
+AC_CHECK_LIB(resolv, main)
+AC_CHECK_LIB(kvm, main)
+dnl AC_CHECK_LIB(pthread, main)
+
+dnl Check for socklen_t
+AC_MSG_CHECKING(for socklen_t)
+AC_TRY_COMPILE(
+[#include <sys/types.h>
+#include <unistd.h>
+#include <sys/socket.h>],
+[socklen_t s;],
+AC_MSG_RESULT(yes),
+AC_DEFINE(socklen_t, int, [Define socklen_t type])
+AC_MSG_RESULT(no))
+
+dnl Check for /proc filesystem
+AC_MSG_CHECKING(for /proc filesystem)
+if test -d /proc; then
+	AC_MSG_RESULT(yes)
+	AC_DEFINE(HAVE_PROC,1,[Define to 1 if '/proc' file system should be used.])
+else
+	AC_MSG_RESULT(no)
+fi
+
+dnl Check for /proc filesystem
+AC_MSG_CHECKING(for file /proc/stat)
+if test -r /proc/stat; then
+	AC_MSG_RESULT(yes)
+	AC_DEFINE(HAVE_PROC_STAT,1,[Define to 1 if file '/proc/stat' should be used.])
+else
+	AC_MSG_RESULT(no)
+fi
+
+dnl Check for file /proc/1/status
+AC_MSG_CHECKING(for file /proc/1/status)
+if test -r /proc/1/status; then
+	AC_MSG_RESULT(yes)
+	AC_DEFINE(HAVE_PROC_1_STATUS,1,[Define to 1 if file '/proc/1/status' should be used.])
+else
+	AC_MSG_RESULT(no)
+fi
+
+dnl Check for file /proc/0/psinfo (Solaris)
+AC_MSG_CHECKING(for file /proc/0/psinfo)
+if test -r /proc/0/psinfo; then
+	AC_MSG_RESULT(yes)
+	AC_DEFINE(HAVE_PROC_0_PSINFO,1,[Define to 1 if file '/proc/0/psinfo' should be used.])
+else
+	AC_MSG_RESULT(no)
+fi
+
+dnl Check for file /proc/loadavg
+AC_MSG_CHECKING(for file /proc/loadavg)
+if test -r /proc/loadavg; then
+	AC_MSG_RESULT(yes)
+	AC_DEFINE(HAVE_PROC_LOADAVG,1,[Define to 1 if file '/proc/loadavg' should be used.])
+else
+	AC_MSG_RESULT(no)
+fi
+
+dnl Check for file /proc/net/dev
+AC_MSG_CHECKING(for file /proc/net/dev)
+if test -r /proc/net/dev; then
+	AC_MSG_RESULT(yes)
+	AC_DEFINE(HAVE_PROC_NET_DEV,1,[Define to 1 if file /proc/net/dev' should be used.])
+else
+	AC_MSG_RESULT(no)
+fi
+
+dnl Check for mem_unit in struct sysinfo
+AC_MSG_CHECKING(for mem_unit in struct sysinfo)
+AC_TRY_COMPILE([#include <sys/sysinfo.h>],
+[struct sysinfo sysinfo;
+sysinfo.mem_unit=0;
+],
+AC_DEFINE(HAVE_SYSINFO_MEM_UNIT,1,[Define to 1 if 'sysinfo.mem_unit' exist.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+dnl Check for freeswap in struct sysinfo
+AC_MSG_CHECKING(for freeswap in struct sysinfo)
+AC_TRY_COMPILE([#include <sys/sysinfo.h>],
+[struct sysinfo sysinfo;
+sysinfo.freeswap=0;
+],
+AC_DEFINE(HAVE_SYSINFO_FREESWAP,1,[Define to 1 if 'sysinfo.freeswap' exist.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+dnl Check for function setpriority in sys/resource.h
+AC_MSG_CHECKING(for function setpriority() in sys/resource.h)
+AC_TRY_COMPILE(
+[
+#include <sys/time.h>
+#include <sys/resource.h>
+],
+[	int i;
+
+	i=setpriority(PRIO_PROCESS,0,5);
+],
+AC_DEFINE(HAVE_SYS_RESOURCE_SETPRIORITY,1,[Define to 1 if function 'setpriority' exist.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+dnl Check for function sysconf in unistd.h
+AC_MSG_CHECKING(for function sysconf() in unistd.h)
+AC_TRY_COMPILE(
+[
+#include <unistd.h>
+],
+[	int i;
+
+	i=sysconf(_SC_PHYS_PAGES)*sysconf(_SC_PHYS_PAGES);
+	i=sysconf(_SC_AVPHYS_PAGES)*sysconf(_SC_PHYS_PAGES);
+],
+AC_DEFINE(HAVE_UNISTD_SYSCONF,1,[Define to 1 if function 'sysconf' exist.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+dnl Check for macro __va_copy in stdarg.h
+AC_MSG_CHECKING(for macro __va_copy() in stdarg.h)
+AC_TRY_COMPILE(
+[
+#include <stdarg.h>
+],
+[
+	va_list	src,dst;
+
+	
+	__va_copy(dst,src);
+],
+AC_DEFINE(HAVE___VA_COPY,1,[Define to 1 if function '__va_copy' exist.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+dnl Check for vmtotal in sys/vmmeter.h
+AC_MSG_CHECKING(for vmtotal in struct sys/vmmeter.h)
+AC_TRY_COMPILE(
+[
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/sysctl.h>
+#include <vm/vm_param.h>
+#include <sys/vmmeter.h>
+],
+[	int mib[2],len;
+	struct vmtotal v;
+
+	len=sizeof(struct vmtotal);
+	mib[0]=CTL_VM;
+	mib[1]=VM_METER;
+
+	sysctl(mib,2,&v,&len,NULL,0);
+],
+AC_DEFINE(HAVE_SYS_VMMETER_VMTOTAL,1,[Define to 1 if struct 'vmtotal' exist .])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+dnl Check for struct swaptable in sys/swap.h
+AC_MSG_CHECKING(for struct swaptable in sys/swap.h)
+AC_TRY_COMPILE(
+[
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/syscall.h>
+#include <sys/swap.h>
+],
+[
+    register int cnt, i;
+    register int t, f;
+    struct swaptable *swt;
+    struct swapent *ste;
+    static char path[256];
+
+    /* get total number of swap entries */
+    cnt = swapctl(SC_GETNSWP, 0);
+
+    /* allocate enough space to hold count + n swapents */
+    swt = (struct swaptable *)malloc(sizeof(int) +
+             cnt * sizeof(struct swapent));
+    if (swt == NULL)
+    {
+  return;
+    }
+    swt->swt_n = cnt;
+
+    /* fill in ste_path pointers: we don't care about the paths, so we
+point
+       them all to the same buffer */
+    ste = &(swt->swt_ent[0]);
+    i = cnt;
+    while (--i >= 0)
+    {
+  ste++->ste_path = path;
+    }
+
+    /* grab all swap info */
+    swapctl(SC_LIST, swt);
+
+    /* walk thru the structs and sum up the fields */
+    t = f = 0;
+    ste = &(swt->swt_ent[0]);
+    i = cnt;
+    while (--i >= 0)
+    {
+  /* dont count slots being deleted */
+  if (!(ste->ste_flags & ST_INDEL) &&
+      !(ste->ste_flags & ST_DOINGDEL))
+  {
+      t += ste->ste_pages;
+      f += ste->ste_free;
+  } ste++;
+    }
+
+    /* fill in the results */
+    free(swt);
+
+],
+AC_DEFINE(HAVE_SYS_SWAP_SWAPTABLE,1,[Define to 1 if struct 'swaptable' exist.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+dnl Check for totalswap in struct sysinfo
+AC_MSG_CHECKING(for totalswap in struct sysinfo)
+AC_TRY_COMPILE([#include <sys/sysinfo.h>],
+[struct sysinfo sysinfo;
+sysinfo.totalswap=0;
+],
+AC_DEFINE(HAVE_SYSINFO_TOTALSWAP,1,[Define to 1 if 'sysinfo.totalswap' exist.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+dnl Check for function sysctl (KERN_BOOTTIME)
+AC_MSG_CHECKING(for function sysctl (KERN_BOOTTIME))
+AC_TRY_COMPILE(
+[
+	#include <sys/types.h>
+	#include <sys/sysctl.h>
+	#include <unistd.h>
+	#include <time.h>
+	#include <sys/time.h>
+],
+[
+	struct timeval uptime;
+        int     mib[2],len;
+        int     now;
+
+        mib[0]=CTL_KERN;
+        mib[1]=KERN_BOOTTIME;
+        len=sizeof(uptime);
+        sysctl(mib,2,&uptime,&len,0,0);
+],
+AC_DEFINE(HAVE_FUNCTION_SYSCTL_KERN_BOOTTIME,1,[Define to 1 if 'KERN_BOOTTIME' exist.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+dnl Check for function sysctl (KERN_MAXFILES)
+AC_MSG_CHECKING(for function sysctl (KERN_MAXFILES))
+AC_TRY_COMPILE(
+[
+	#include <sys/types.h>
+	#include <sys/sysctl.h>
+],
+[
+        int     mib[2],len;
+        int     maxfiles;
+
+        mib[0]=CTL_KERN;
+        mib[1]=KERN_MAXFILES;
+        len=sizeof(maxfiles);
+        sysctl(mib,2,&maxfiles,&len,0,0);
+],
+AC_DEFINE(HAVE_FUNCTION_SYSCTL_KERN_MAXFILES,1,[Define to 1 if 'KERN_MAXFILES' exist.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+dnl Check for function sysctl (KENR_MAXPROC)
+AC_MSG_CHECKING(for function sysctl (KERN_MAXPROC))
+AC_TRY_COMPILE(
+[
+	#include <sys/types.h>
+	#include <sys/sysctl.h>
+],
+[
+        int     mib[2],len;
+        int     maxproc;
+
+        mib[0]=CTL_KERN;
+        mib[1]=KERN_MAXPROC;
+        len=sizeof(maxproc);
+        sysctl(mib,2,&maxproc,&len,0,0);
+],
+AC_DEFINE(HAVE_FUNCTION_SYSCTL_KERN_MAXPROC,1,[Define to 1 if 'KERN_MAXPROC' exist.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+dnl Check for function seteuid()
+AC_MSG_CHECKING(for function seteuid())
+AC_TRY_LINK(
+[
+	#include <sys/types.h>
+	#include <unistd.h>
+],
+[
+	seteuid(0);
+	setegid(0);
+],
+AC_DEFINE(HAVE_FUNCTION_SETEUID,1,[Define to 1 if function 'seteuid' and 'setegid' exist.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+dnl Check for function setproctitle()
+AC_MSG_CHECKING(for function setproctitle())
+AC_TRY_LINK(
+[
+	#include <sys/types.h>
+	#include <unistd.h>
+],
+[
+	setproctitle("Test %d", 1);
+],
+AC_DEFINE(HAVE_FUNCTION_SETPROCTITLE,1,[Define to 1 if function 'setproctitle' exist.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+dnl Check for totalram in struct sysinfo
+AC_MSG_CHECKING(for totalram in struct sysinfo)
+AC_TRY_COMPILE([#include <sys/sysinfo.h>],
+[struct sysinfo sysinfo;
+sysinfo.totalram=0;
+],
+AC_DEFINE(HAVE_SYSINFO_TOTALRAM,1,[Define to 1 if 'sysinfo.totalram' exist.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+dnl Check for sharedram in struct sysinfo
+AC_MSG_CHECKING(for sharedram in struct sysinfo)
+AC_TRY_COMPILE([#include <sys/sysinfo.h>],
+[struct sysinfo sysinfo;
+sysinfo.sharedram=0;
+],
+AC_DEFINE(HAVE_SYSINFO_SHAREDRAM,1,[Define to 1 if 'sysinfo.sharedram' exist.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+dnl Check for bufferram in struct sysinfo
+AC_MSG_CHECKING(for bufferram in struct sysinfo)
+AC_TRY_COMPILE([#include <sys/sysinfo.h>],
+[struct sysinfo sysinfo;
+sysinfo.bufferram=0;
+],
+AC_DEFINE(HAVE_SYSINFO_BUFFERRAM,1,[Define to 1 if 'sysinfo.bufferram' exist.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+dnl Check for freeram in struct sysinfo
+AC_MSG_CHECKING(for freeram in struct sysinfo)
+AC_TRY_COMPILE([#include <sys/sysinfo.h>],
+[struct sysinfo sysinfo;
+sysinfo.freeram=0;
+],
+AC_DEFINE(HAVE_SYSINFO_FREERAM,1,[Define to 1 if 'sysinfo.freeram' exist.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+dnl Check for uptime in struct sysinfo
+AC_MSG_CHECKING(for uptime in struct sysinfo)
+AC_TRY_COMPILE([#include <sys/sysinfo.h>],
+[struct sysinfo sysinfo;
+sysinfo.uptime=0;
+],
+AC_DEFINE(HAVE_SYSINFO_UPTIME,1,[Define to 1 if 'sysinfo.uptime' exist.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+dnl Check for procs in struct sysinfo
+AC_MSG_CHECKING(for procs in struct sysinfo)
+AC_TRY_COMPILE([#include <sys/sysinfo.h>],
+[struct sysinfo sysinfo;
+sysinfo.procs=0;
+],
+AC_DEFINE(HAVE_SYSINFO_PROCS,1,[Define to 1 if 'sysinfo.procs' exist.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+dnl Checks for library functions.
+AC_TYPE_SIGNAL
+#AC_FUNC_GETLOADAVG
+AC_REPLACE_FUNCS(getloadavg)
+AC_CHECK_FUNCS(socket strtod)
+AC_CHECK_FUNCS(snprintf)
+AC_CHECK_FUNCS(vasprintf)
+AC_CHECK_FUNCS(asprintf)
+AC_CHECK_FUNCS(vsnprintf)
+AC_CHECK_FUNCS(hstrerror)
+AC_CHECK_FUNCS(atoll)
+AC_CHECK_FUNCS(getopt_long)
+
+dnl Check if we want to compile everything with static
+ AC_ARG_ENABLE(static,[
+   --enable-static         Build statically linked binaries],
+	CFLAGS="-static $CFLAGS";
+	enable_static=yes)
+dnl			LIBS="")
+
+AC_ARG_ENABLE(server,
+[  --enable-server         Turn on build of server],
+[case "${enableval}" in
+  yes) server=yes ;;
+  no)  server=no ;;
+  *) AC_MSG_ERROR(bad value ${enableval} for --enable-server) ;;
+esac],
+[server=no])
+AM_CONDITIONAL(SERVER, test x$server = xyes)
+
+AC_ARG_ENABLE(agent,
+[  --enable-agent          Turn on build of agent],
+[case "${enableval}" in
+  yes) agent=yes ;;
+  no)  agent=no ;;
+  *) AC_MSG_ERROR(bad value ${enableval} for --enable-agent) ;;
+esac],
+[agent=no])
+AM_CONDITIONAL(AGENT, test x$agent = xyes)
+    
+have_db="no"
+
+if test "$server" = "yes"; then
+	AC_MSG_CHECKING(for Oracle support)
+	AC_ARG_WITH(oracle,
+	[
+	What DBMS do you want to use (please select only one):
+	  --with-oracle[=DIR]      Include Oracle support.  DIR is the Sqlora8 base
+				 install directory, default is to search through
+				 a number of common places for the Sqlora8 files.],
+	[
+	if test "$withval" != "no"; then
+		if test "$withval" = "yes"; then
+			if test -f /usr/include/sqlora.h; then
+				ORACLE_INCDIR=/usr/include
+				ORACLE_LIBDIR=/usr/lib
+			elif test -f /usr/lib/libsqlora8/include/sqlora.h; then
+				ORACLE_INCDIR=/usr/lib/libsqlora8/include
+				ORACLE_LIBDIR=/usr/lib
+			elif test -f $ORACLE_HOME/lib/sqlora8/include/sqlora.h; then
+				ORACLE_INCDIR=$ORACLE_HOME/lib/sqlora8/include
+				ORACLE_LIBDIR=$ORACLE_HOME/lib
+			elif test -f $ORACLE_HOME/include/sqlora.h; then
+				ORACLE_INCDIR=${ORACLE_HOME}/include
+				ORACLE_LIBDIR=${ORACLE_HOME}/lib
+			else
+				AC_MSG_RESULT(no)
+				AC_MSG_ERROR(Invalid Oracle directory - unable to find sqlora.h)
+			fi
+		else
+			if test -f $withval/include/sqlora.h; then
+				ORACLE_INCDIR=$withval/include
+				ORACLE_LIBDIR=$withval/lib
+			elif test -f $withval/lib/libsqlora8/include/sqlora.h; then
+				ORACLE_INCDIR=$withval/lib/libsqlora8/include
+				ORACLE_LIBDIR=$withval/lib
+			elif test -f $withval/libsqlora8/include/sqlora.h; then
+				ORACLE_INCDIR=$withval/libsqlora8/include
+				ORACLE_LIBDIR=$withval
+			else
+				AC_MSG_RESULT(no)
+				AC_MSG_ERROR(Invalid Oracle directory - unable to find sqlora.h under $withval)
+			fi
+		fi
+		ORACLE_INCLUDE="-I$ORACLE_INCDIR -I/home/zabbix/sqlora8/lib/libsqlora8/include"
+		ORACLE_LFLAGS="-L$ORACLE_LIBDIR"
+		ORACLE_LIBS="-lsqlora8"
+
+		AC_DEFINE(HAVE_ORACLE,1,[Define to 1 if Oracle should be enabled.])
+		AC_MSG_RESULT(yes)
+		have_db="Oracle"
+
+	else
+		AC_MSG_RESULT(no)
+	fi
+	],[
+	  AC_MSG_RESULT(no)
+	])
+	AC_SUBST(ORACLE_INCLUDE)
+	AC_SUBST(ORACLE_LFLAGS)
+	AC_SUBST(ORACLE_LIBS)
+
+	AC_MSG_CHECKING(for SQLite support)
+	AC_ARG_WITH(sqlite3,
+	[
+	What DBMS do you want to use (please select only one):
+	  --with-sqlite3[=DIR]      Include SQLite3 support.  DIR is the SQLite base
+				 install directory, default is to search through
+				 a number of common places for the SQLite files.],
+	[
+	if test "$withval" != "no"; then
+		if test "$withval" = "yes"; then
+			if test -f /usr/include/sqlite3.h; then
+				SQLITE3_INCDIR=/usr/include
+				SQLITE3_LIBDIR=/usr/lib
+			elif test -f /usr/lib/sqlite/include/sqlite3.h; then
+				SQLITE_INCDIR=/usr/lib/sqlite3/include
+				SQLITE_LIBDIR=/usr/lib
+			else
+				AC_MSG_RESULT(no)
+				AC_MSG_ERROR(Invalid SQLite directory - unable to find sqlite3.h)
+			fi
+		else
+			if test -f $withval/include/sqlite3.h; then
+				SQLITE3_INCDIR=$withval/include
+				SQLITE3_LIBDIR=$withval/lib
+			elif test -f $withval/lib/sqlite/include/sqlite3.h; then
+				SQLITE3_INCDIR=$withval/lib/sqlite/include
+				SQLITE3_LIBDIR=$withval/lib
+			elif test -f $withval/sqlite/include/sqlite3.h; then
+				SQLITE3_INCDIR=$withval/sqlite/include
+				SQLITE3_LIBDIR=$withval
+			else
+				AC_MSG_RESULT(no)
+				AC_MSG_ERROR(Invalid SQLite directory - unable to find sqlite3.h under $withval)
+			fi
+		fi
+		SQLITE3_INCLUDE="-I$SQLITE3_INCDIR"
+		SQLITE3_LFLAGS="-L$SQLITE3_LIBDIR"
+		SQLITE3_LIBS="-lsqlite3"
+
+		AC_DEFINE(HAVE_SQLITE3,1,[Define to 1 if SQLite should be enabled.])
+		AC_MSG_RESULT(yes)
+		have_db="SQLite v3.x"
+
+	else
+		AC_MSG_RESULT(no)
+	fi
+	],[
+	  AC_MSG_RESULT(no)
+	])
+	AC_SUBST(SQLITE3_INCLUDE)
+	AC_SUBST(SQLITE3_LFLAGS)
+	AC_SUBST(SQLITE3_LIBS)
+
+	AC_MSG_CHECKING(for MySQL support)
+	AC_ARG_WITH(mysql,
+	[
+	  --with-mysql[=DIR]       Include MySQL support.  DIR is the MySQL base
+				 install directory, default is to search through
+				 a number of common places for the MySQL files.],
+	[
+	  if test "$withval" != "no"; then
+		if test "$withval" = "yes"; then
+			if test -f /usr/local/mysql/include/mysql/mysql.h; then
+				MYSQL_INCDIR=/usr/local/mysql/include/mysql
+				MYSQL_LIBDIR=/usr/local/mysql/lib/mysql
+			elif test -f /usr/include/mysql/mysql.h; then
+				MYSQL_INCDIR=/usr/include/mysql
+				MYSQL_LIBDIR=/usr/lib/mysql
+			elif test -f /usr/include/mysql.h; then
+				MYSQL_INCDIR=/usr/include
+				MYSQL_LIBDIR=/usr/lib
+			elif test -f /usr/local/include/mysql/mysql.h; then
+				MYSQL_INCDIR=/usr/local/include/mysql
+				MYSQL_LIBDIR=/usr/local/lib/mysql
+			elif test -f /usr/local/include/mysql.h; then
+				MYSQL_INCDIR=/usr/local/include
+				MYSQL_LIBDIR=/usr/local/lib
+			else
+			AC_MSG_RESULT(no)
+			AC_MSG_ERROR(Invalid MySQL directory - unable to find mysql.h)
+			fi
+		else
+			if test -f $withval/include/mysql/mysql.h; then
+				MYSQL_INCDIR=$withval/include/mysql
+				MYSQL_LIBDIR=$withval/lib/mysql
+			elif test -f $withval/include/mysql.h; then
+				MYSQL_INCDIR=$withval/include
+				MYSQL_LIBDIR=$withval/lib
+			else
+			AC_MSG_RESULT(no)
+			AC_MSG_ERROR(Invalid MySQL directory - unable to find mysql.h under $withval)
+			fi
+		fi
+		MYSQL_INCLUDE="-I$MYSQL_INCDIR"
+		MYSQL_LFLAGS="-L$MYSQL_LIBDIR"
+		MYSQL_LIBS="-lmysqlclient"
+
+		AC_DEFINE(HAVE_MYSQL,1,[Define to 1 if MySQL should be enabled.])
+		AC_MSG_RESULT(yes)
+		have_db="MySQL"
+	    dnl MySQL requires -lm sometime
+	dnl	AC_CHECK_FUNC(floor, , AC_CHECK_LIB(m, floor, MYSQL_LFLAGS="$MYSQL_LFLAGS -lm"))
+		AC_CHECK_FUNC(floor, , AC_CHECK_LIB(m, floor, MYSQL_LIBS="$MYSQL_LIBS -lm"))
+	    dnl MySQL 3.23 requires -lz sometime
+	dnl This does not work for some reason
+	dnl    AC_CHECK_FUNC(compress, , AC_CHECK_LIB(z, compress, MYSQL_LFLAGS="$MYSQL_LFLAGS -lz"))
+	dnl	AC_CHECK_LIB(z, compress, MYSQL_LFLAGS="$MYSQL_LFLAGS -lz")
+		AC_CHECK_LIB(z, compress, MYSQL_LIBS="$MYSQL_LIBS -lz")
+
+		else
+			AC_MSG_RESULT(no)
+		fi
+	],[
+	  AC_MSG_RESULT(no)
+	])
+	AC_SUBST(MYSQL_INCLUDE)
+	AC_SUBST(MYSQL_LFLAGS)
+	AC_SUBST(MYSQL_LIBS)
+
+
+	AC_MSG_CHECKING(for PostgreSQL support)
+	AC_ARG_WITH(pgsql,
+	[  --with-pgsql[=DIR]       Include PostgreSQL support.  DIR is the PostgreSQL
+				 base install directory, defaults to /usr/local/pgsql.],
+	[
+	  if test "$withval" != "no"; then
+	      if test "$have_db" != "no"; then
+		  AC_MSG_RESULT(error)
+		  AC_MSG_ERROR("You can configure for only one database.");
+	      fi
+		if test "$withval" = "yes"; then
+			if test -f /usr/include/pgsql/libpq-fe.h; then
+				PGSQL_INCDIR=/usr/include/pgsql
+			elif test -f /usr/include/postgresql/libpq-fe.h; then
+				PGSQL_INCDIR=/usr/include/postgresql
+			elif test -f /usr/local/include/libpq-fe.h; then
+				PGSQL_INCDIR=/usr/local/include
+			elif test -f /usr/local/include/pgsql/libpq-fe.h; then
+				PGSQL_INCDIR=/usr/local/include/pgsql
+			else
+				PGSQL_INCDIR=/usr/local/pgsql/include
+			fi
+			if test -f /usr/lib/libpq.a; then
+				PGSQL_LIBDIR=/usr/lib
+			elif test -f /usr/local/lib/libpq.a; then
+				PGSQL_LIBDIR=/usr/local/lib
+			else
+				PGSQL_LIBDIR=/usr/local/pgsql/lib
+			fi
+		else
+			PGSQL_INCDIR=$withval/include
+			test -d $withval/include/pgsql && PGSQL_INCDIR=$withval/include/pgsql
+			PGSQL_LIBDIR=$withval/lib
+			test -d $withval/lib/pgsql && PGSQL_LIBDIR=$withval/lib/pgsql
+		fi
+	    PGSQL_INCLUDE="-I$PGSQL_INCDIR"
+	    PGSQL_LFLAGS="-L$PGSQL_LIBDIR"
+	    PGSQL_LIBS="-lpq"
+	dnl To avoid linking of crypt with the agent
+	dnl    AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt, LIBS="-lcrypt $LIBS"))
+	dnl    AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt,  PGSQL_LFLAGS="-lcrypt $PGSQL_LFLAGS"))
+	    AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt,  PGSQL_LIBS="-lcrypt $PGSQL_LIBS"))
+
+	    AC_DEFINE(HAVE_PGSQL,1,[Define to 1 if PostgreSQL should be enabled.])
+	    AC_MSG_RESULT(yes)
+	    have_db="PostgreSQL"
+	  else
+	    AC_MSG_RESULT(no)
+	  fi
+	],[
+	  AC_MSG_RESULT(no)
+	])
+	AC_SUBST(PGSQL_INCLUDE)
+	AC_SUBST(PGSQL_LFLAGS)
+	AC_SUBST(PGSQL_LIBS)
+
+	AC_MSG_CHECKING(for ZABBIX server database selection)
+	if test "$have_db" = "no"; then
+		AC_MSG_RESULT(error)
+		AC_MSG_ERROR(No database selected for ZABBIX server. Use --with-mysql or --with-oracle or --with-pgsql or --with-sqlite.)
+	else
+		AC_MSG_RESULT(ok)
+	fi
+fi
+
+AC_MSG_CHECKING(for NET-SNMP support)
+AC_ARG_WITH(net-snmp,
+[
+What SNMP package do you want to use (please select only one):
+  --with-net-snmp[=DIR]    Include SNMP support.  DIR is the NET-SNMP
+                         base install directory, default is to search 
+                         through a number of common places for the
+			 SNMP files.],
+[
+  if test "$withval" != "no"; then
+  	if test "$withval" = "yes"; then
+		if test -f /usr/local/net-snmp/include/net-snmp-includes.h; then
+			SNMP_INCDIR=/usr/local/net-snmp/include/
+			SNMP_LIBDIR=/usr/local/net-snmp/lib/
+		elif test -f /usr/include/net-snmp/net-snmp-includes.h; then
+dnl			SNMP_INCDIR=/usr/include/net-snmp
+dnl			SNMP_LIBDIR=/usr/lib/net-snmp
+			SNMP_INCDIR=/usr/include
+			SNMP_LIBDIR=/usr/lib
+		elif test -f /usr/include/net-snmp-includes.h; then
+			SNMP_INCDIR=/usr/include
+			SNMP_LIBDIR=/usr/lib
+		elif test -f /usr/local/include/net-snmp/net-snmp-includes.h; then
+dnl			SNMP_INCDIR=/usr/local/include/net-snmp
+dnl			SNMP_LIBDIR=/usr/local/lib/net-snmp
+			SNMP_INCDIR=/usr/local/include
+			SNMP_LIBDIR=/usr/local/lib
+		elif test -f /usr/local/include/net-snmp-includes.h; then
+			SNMP_INCDIR=/usr/local/include
+			SNMP_LIBDIR=/usr/local/lib
+		else
+    		AC_MSG_RESULT(no)
+    		AC_MSG_ERROR(Invalid NET-SNMP directory - unable to find net-snmp-includes.h)
+		fi
+   	else
+		if test -f $withval/include/net-snmp/net-snmp-includes.h; then
+dnl   			SNMP_INCDIR=$withval/include/net-snmp
+dnl   			SNMP_LIBDIR=$withval/lib/net-snmp
+   			SNMP_INCDIR=$withval/include
+   			SNMP_LIBDIR=$withval/lib
+		elif test -f $withval/include/net-snmp-includes.h; then
+   			SNMP_INCDIR=$withval/include
+   			SNMP_LIBDIR=$withval/lib
+		else
+    		AC_MSG_RESULT(no)
+    		AC_MSG_ERROR(Invalid NET-SNMP directory - unable to find net-snmp-includes.h under $withval)
+		fi
+   	fi
+
+dnl    AC_CHECK_LIB(crypto, main,  SNMP_LFLAGS="-lcrypto $SNMP_LFLAGS")
+    AC_CHECK_LIB(crypto, main,  SNMP_LIBS="$SNMP_LIBS -lcrypto")
+
+    SNMP_INCLUDE=-I$SNMP_INCDIR
+    SNMP_LFLAGS="-L$SNMP_LIBDIR $SNMP_LFLAGS"
+    SNMP_LIBS="-lnetsnmp $SNMP_LIBS"
+
+    AC_DEFINE(HAVE_NETSNMP,1,[Define to 1 if NETSNMP should be enabled.])
+    AC_DEFINE(HAVE_SNMP,1,[Define to 1 if SNMP should be enabled.])
+    AC_MSG_RESULT(yes)
+
+  else
+  	AC_MSG_RESULT(no)
+  fi
+],[
+  AC_MSG_RESULT(no)
+])
+AC_SUBST(SNMP_INCLUDE)
+AC_SUBST(SNMP_LFLAGS)
+AC_SUBST(SNMP_LIBS)
+
+AC_MSG_CHECKING(for UCD-SNMP support)
+AC_ARG_WITH(ucd-snmp,
+[  --with-ucd-snmp[=DIR]    Include SNMP support.  DIR is the UCD-SNMP
+                         base install directory, default is to search 
+                         through a number of common places for the
+			 SNMP files.],
+[
+  if test "$withval" != "no"; then
+  	if test "$withval" = "yes"; then
+		if test -f /usr/local/ucd-snmp/include/ucd-snmp-config.h; then
+			SNMP_INCDIR=/usr/local/ucd-snmp/include/
+			SNMP_LIBDIR=/usr/local/ucd-snmp/lib/
+		elif test -f /usr/include/ucd-snmp/ucd-snmp-config.h; then
+dnl			SNMP_INCDIR=/usr/include/ucd-snmp
+dnl			SNMP_LIBDIR=/usr/lib/ucd-snmp
+			SNMP_INCDIR=/usr/include
+			SNMP_LIBDIR=/usr/lib
+		elif test -f /usr/include/ucd-snmp-config.h; then
+			SNMP_INCDIR=/usr/include
+			SNMP_LIBDIR=/usr/lib
+		elif test -f /usr/local/include/ucd-snmp/ucd-snmp-config.h; then
+dnl			SNMP_INCDIR=/usr/local/include/ucd-snmp
+dnl			SNMP_LIBDIR=/usr/local/lib/ucd-snmp
+			SNMP_INCDIR=/usr/local/include
+			SNMP_LIBDIR=/usr/local/lib
+		elif test -f /usr/local/include/ucd-snmp-config.h; then
+			SNMP_INCDIR=/usr/local/include
+			SNMP_LIBDIR=/usr/local/lib
+		else
+    		AC_MSG_RESULT(no)
+    		AC_MSG_ERROR(Invalid UCD-SNMP directory - unable to find ucd-snmp-config.h)
+		fi
+   	else
+		if test -f $withval/include/ucd-snmp/ucd-snmp-config.h; then
+dnl   			SNMP_INCDIR=$withval/include/ucd-snmp
+dnl   			SNMP_LIBDIR=$withval/lib/ucd-snmp
+   			SNMP_INCDIR=$withval/include
+   			SNMP_LIBDIR=$withval/lib
+		elif test -f $withval/include/ucd-snmp-config.h; then
+   			SNMP_INCDIR=$withval/include
+   			SNMP_LIBDIR=$withval/lib
+		else
+    		AC_MSG_RESULT(no)
+    		AC_MSG_ERROR(Invalid UCD-SNMP directory - unable to find ucd-snmp-config.h under $withval)
+		fi
+   	fi
+dnl    AC_CHECK_LIB(crypto, main,  SNMP_LFLAGS="-lcrypto $SNMP_LFLAGS")
+    AC_CHECK_LIB(crypto, main,  SNMP_LIBS="$SNMP_LIBS -lcrypto")
+
+    SNMP_INCLUDE=-I$SNMP_INCDIR
+    SNMP_LFLAGS="-L$SNMP_LIBDIR $SNMP_LFLAGS"
+    SNMP_LIBS="-lsnmp $SNMP_LIBS"
+
+    AC_DEFINE(HAVE_UCDSNMP,1,[Define to 1 if UCDSNMP should be enabled.])
+    AC_DEFINE(HAVE_SNMP,1,[Define to 1 if SNMP should be enabled.])
+    AC_MSG_RESULT(yes)
+
+  else
+  	AC_MSG_RESULT(no)
+  fi
+],[
+  AC_MSG_RESULT(no)
+])
+AC_SUBST(SNMP_LFLAGS)
+AC_SUBST(SNMP_INCLUDE)
+
+AC_MSG_CHECKING(for LDAP support)
+AC_ARG_WITH(ldap,
+[
+If you want to check LDAP servers:
+  --with-ldap[=DIR]       Include LDAP support.  DIR is the LDAP
+			base install directory, default is to search 
+			through a number of common places for the
+			LDAP files.],
+[
+  if test "$withval" != "no"; then
+       if test "$withval" = "yes"; then
+               if test -f /usr/local/openldap/include/ldap.h; then
+                       LDAP_INCDIR=/usr/local/openldap/include/
+                       LDAP_LIBDIR=/usr/local/openldap/lib/
+               elif test -f /usr/include/ldap.h; then
+                       LDAP_INCDIR=/usr/include
+                       LDAP_LIBDIR=/usr/lib
+               elif test -f /usr/local/include/ldap.h; then
+                       LDAP_INCDIR=/usr/local/include
+                       LDAP_LIBDIR=/usr/local/lib
+               else
+               AC_MSG_RESULT(no)
+               AC_MSG_ERROR(Invalid LDAP directory - unable to find ldap.h)
+               fi
+       else
+               if test -f $withval/include/ldap.h; then
+                       LDAP_INCDIR=$withval/include
+                       LDAP_LIBDIR=$withval/lib
+               else
+               AC_MSG_RESULT(no)
+               AC_MSG_ERROR(Invalid LDAP directory - unable to find ldap.h under $withval)
+               fi
+       fi
+
+	LDAP_INCLUDE=-I$LDAP_INCDIR
+	LDAP_LFLAGS="-L$LDAP_LIBDIR $LDAP_LFLAGS"
+	LDAP_LIBS="-lldap"
+
+		if test x$enable_static = xyes; then
+			LDAP_LIBS=" -llber -lgnutls -lpthread -lsasl2 $LDAP_LIBS"
+		fi
+
+	AC_DEFINE(HAVE_LDAP,1,[Define to 1 if LDAP should be enabled.])
+	AC_MSG_RESULT(yes)
+
+  else
+	AC_MSG_RESULT(no)
+  fi
+],[
+  AC_MSG_RESULT(no)
+])
+AC_SUBST(LDAP_INCLUDE)
+AC_SUBST(LDAP_LFLAGS)
+AC_SUBST(LDAP_LIBS)
+
+#AC_SUBST(SUBDIRS)
+
+RANLIB="ranlib"
+AC_SUBST(RANLIB)
+
+dnl AC_CONFIG_HEADER(include/config.h)
+
+AC_MSG_CHECKING(for architecture)
+# Cheks for host_os 
+case "$host_os" in
+linux*)
+	ARCH="linux"
+
+	AC_MSG_RESULT([ok (${host_os})])
+
+	# Ok, this is linux. Check the kernel version
+	AC_MSG_CHECKING([for the kernel version])
+
+        kernel=`uname -r`
+
+        case "${kernel}" in
+             2.6.*) 
+        	    AC_MSG_RESULT([2.6 family (${kernel})])
+        	    AC_DEFINE([KERNEL_2_6], 1, [Define to 1 if you're using Linux 2.6.x])
+        	    ;;
+
+             2.4.*) 
+        	    AC_MSG_RESULT([2.4 family (${kernel})])
+        	    AC_DEFINE([KERNEL_2_4], 1, [Define to 1 if you're using Linux 2.4.x])
+        	    ;;
+        esac
+;;
+aix*)
+	ARCH="aix"
+
+	AC_MSG_RESULT([ok (${host_os})])
+;;
+darwin*|rhapsody*)
+	ARCH="osx"
+
+	AC_MSG_RESULT([ok (${host_os})])
+;;
+*solaris*)
+	ARCH="solaris"
+
+	AC_MSG_RESULT([ok (${host_os})])
+;;
+hpux*)
+	ARCH="hpux"
+
+	AC_MSG_RESULT([ok (${host_os})])
+;;
+freebsd*)
+	ARCH="freebsd"
+
+	AC_MSG_RESULT([ok (${host_os})])
+;;
+netbsd*)
+	ARCH="netbsd"
+
+	AC_MSG_RESULT([ok (${host_os})])
+;;
+osf*)
+	ARCH="osf"
+
+	AC_MSG_RESULT([ok (${host_os})])
+;;
+openbsd*)
+	ARCH="openbsd"
+
+	AC_MSG_RESULT([ok (${host_os})])
+;;
+*)
+	ARCH="unknown"
+
+	AC_MSG_RESULT([ok (${host_os})])
+dnl	AC_MSG_ERROR(${host_os} not supported)
+;;
+esac
+	AC_DEFINE_UNQUOTED([ARCH], "${ARCH}", [Define to os name for code  managing])
+
+dnl AM_CONDITIONAL(CONFIG_HOST_LINUX, test "x$ARCH" = "xlinux")
+dnl AC_SUBST(CONFIG_HOST_LINUX)
+
+dnl AM_CONDITIONAL(CONFIG_HOST_SOLARIS, test "x$ARCH" = "xsolaris")
+dnl AC_SUBST(CONFIG_HOST_SOLARIS)
+
+dnl AM_CONDITIONAL(CONFIG_HOST_HPUX, test "x$ARCH" = "xhpux")
+dnl AC_SUBST(CONFIG_HOST_HPUX)
+
+dnl AM_CONDITIONAL(CONFIG_HOST_FREEBSD, test "x$ARCH" = "xfreebsd")
+dnl AC_SUBST(CONFIG_HOST_FREEBSD)
+
+dnl AM_CONDITIONAL(CONFIG_HOST_OPENBSD, test "x$ARCH" = "xopenbsd")
+dnl AC_SUBST(CONFIG_HOST_OPENBSD)
+
+dnl AM_CONDITIONAL(CONFIG_HOST_UNKNOWN, test "x$ARCH" = "xunknown")
+dnl AC_SUBST(CONFIG_HOST_UNKNOWN)
+
+AC_SUBST(ARCH)
+
+AC_OUTPUT(Makefile src/Makefile src/libs/Makefile src/libs/zbxlog/Makefile src/libs/zbxcrypto/Makefile  \
+	src/libs/zbxnet/Makefile src/libs/zbxconf/Makefile src/zabbix_sender/Makefile \
+	src/libs/zbxdbhigh/Makefile src/libs/zbxemail/Makefile src/libs/zbxsysinfo/Makefile src/libs/zbxsms/Makefile \
+	src/zabbix_server/pinger/Makefile src/zabbix_agent/Makefile \
+	src/zabbix_server/housekeeper/Makefile src/zabbix_server/alerter/Makefile src/zabbix_server/Makefile \
+	src/zabbix_server/trapper/Makefile src/zabbix_server/poller/Makefile src/zabbix_server/timer/Makefile \
+	src/zabbix_server/nodewatcher/Makefile src/zabbix_server/utils/Makefile \
+	src/zabbix_get/Makefile src/libs/zbxcommon/Makefile src/libs/zbxsysinfo/linux/Makefile \
+	src/libs/zbxsysinfo/aix/Makefile src/libs/zbxsysinfo/freebsd/Makefile src/libs/zbxsysinfo/hpux/Makefile \
+	src/libs/zbxsysinfo/openbsd/Makefile src/libs/zbxsysinfo/osx/Makefile src/libs/zbxsysinfo/solaris/Makefile \
+	src/libs/zbxsysinfo/osf/Makefile src/libs/zbxsysinfo/netbsd/Makefile src/libs/zbxsysinfo/unknown/Makefile \
+	src/libs/zbxnix/Makefile src/libs/zbxplugin/Makefile src/libs/zbxsys/Makefile)
+
+echo "
+
+Configuration:
+
+  Detected OS:      ${host_os}
+  Install path:     ${prefix}
+  Compilation arch: ${ARCH}
+
+  Compiler:         ${CC}
+  Compiler flags:   ${CFLAGS}
+  Linker flags:     ${LDFLAGS}
+  Libraries:        ${LIBS}
+
+  Enable server:    ${server}
+  With database:    ${have_db}
+
+  Enable agent:     ${agent}"
+
+echo
+echo "***********************************************************"
+echo "*            Now run 'make install'                       *"
+echo "*                                                         *"
+echo "*            Thank you for using ZABBIX!                  *"
+echo "*              <http://www.zabbix.com>                    *"
+echo "***********************************************************"
+echo

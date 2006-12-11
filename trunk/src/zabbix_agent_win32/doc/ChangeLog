@@ -1,0 +1,94 @@
+1.0.1
+
+* Added configuration parameter LogLevel
+
+
+1.0.0-beta15
+
+* Fixed bug with memory[xxx] counters on systems with more than 2GB of memory
+
+
+1.0.0-beta11
+
+* Fixed bug in GetCounterName() function which causes agent crash on
+  Windows Server 2003
+* system[uname] now return correct information on Windows Server 2003
+
+
+1.0.0-beta10
+
+* Added support for non-english Windows versions - thanks to Harald Holzer
+* Added diskused[*] parameter
+
+
+1.0.0-beta9
+
+* Added API for subagents
+* Disk free space and total size now returned in bytes
+* Added support for external program execution (UserParameter)
+* Added support for check_port[] parameter
+
+
+1.0.0-beta8
+
+* Added support for multiple servers
+* Changes in communication protocol: on errors now returned special
+  text strings instead of negative integers
+* Added proc_info[*] parameter
+* Added memory[cached] parameter (supported only on Windows XP)
+* Added logging to system Event Log
+* PDH-related error messages are now more specific
+* Listener thread now will not exit on any accept() error
+* Added some parameters for agent statistics monitoring: number of accepted
+  and rejected connections, processing errors, etc.
+* Fixed bug in calculation of md5_hash[] and cksum[] parameters for
+  zero-length files
+* md5_hash[] and cksum[] now returns ZBX_UNSUPPORTED for files larger than
+  64MB (due to high performance impact caused by checksum computing for
+  large files).
+
+
+1.0.0-beta7
+
+* Added parameters for monitoring average and maximum processing time for
+  Zabbix agent's collector thread
+* Location of configuration file now can be specified in service mode
+* Fixed bug which doesn't allow to use space characters in service 
+  executable path
+
+
+1.0.0-alpha5
+
+* Added filesize[*] parameter
+* Added system[uptime] parameter
+* Added system[uname] parameter
+* Service installation ("zabbixw32.exe install" command) now creates service
+  with automatic startup, not manual
+
+
+1.0.0-alpha4
+
+* Added md5_hash[*] parameter for computing MD5 hashes of files
+* Added cksum[*] parameter
+* Internal representation of all numeric parameters was converted to double
+* Added "MaxCollectorProcessingTime" configuration file parameter
+
+
+1.0.0-alpha3
+
+* Added parameter aliases
+* Added request processing timeout (controlled by "Timeout" parameter
+  in configuration file)
+* Added support for user-specified performance counters
+
+
+1.0.0-alpha2
+
+* Added service_state[*] parameter for system services monitoring
+* Added perf_counter[*] parameter which allow to retrieve any performance
+  counter
+* Program now exits if no configuration file found
+* Added check-config command line option which allow to check configuration
+  file syntax without actually starting agent
+* Some configuration file options, which are standard for UNIX agent, are
+  now silently ignored (without error messages)

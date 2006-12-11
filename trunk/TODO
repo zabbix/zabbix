@@ -1,0 +1,337 @@
+1.3:
+
+ - introduce new value (3 - timeout) for simple checks
+ - add value mapping for messages
+ - fix ZABBIX crash if % us used in message body/subject
+ - parameter to disable log rotation
+ - fix order for displaying log files order by clock desc,id desc
+ - fix wrong ownership and possibly pid number for agent and server
+ - use of aggregates in triggers
+ - check shutdown of ZABBIX agent (removal of pid file, etc)
+ - http://www.zabbix.com/forum/showthread.php?t=3137
+ - make grid 0,20,40,60,80,100 in graphs
+ - support of PostgreSQL
+ - http://www.zabbix.com/forum/showthread.php?t=2736
+ - does ZABBIX maintain Host availability of monitored by SNMP
+ - when unlinking a host from template, add option (Unlink&Delete, Unlink Only)
+ - add optimisation flags -O2 to configure
+ - remember snmp community on per host level
+ - net.if.stat collected as double, must be as uint64
+
+ - remember different default values in different forms
+ - server side checks (new type of check)
+
+ - windows agent $1-$9: http://www.zabbix.com/forum/showthread.php?t=2163
+ - http://www.zabbix.com/forum/showthread.php?p=7611#post7611
+ - centralised management of agent configuration files
+ - how to disable unreachable hosts
+ - new item status: not available. If agent doesn't accept parameter.
+ - new function for item status to enable sending of notification in case if an item changes status to unknown (for example)
+ - do zabbix_sender for windows
+ - http://www.zabbix.com/forum/showthread.php?t=1141&page=3&pp=10
+ - update trigger value immediately after add or update
+
+TKOM:
+
+ - alarms forwarding to external systems (using SNMP traps, for example)
+ - alarm/trigger sounds
+ - SNMP trap processing
+ - SNMP trap sending
+
+ - clickable map in map configuration
+ - rus/lat characters for graphs
+<?
+print_r($_POST);
+?>
+<form method="POST" action="">
+<input type="image" src="images/image.jpg" name="imgname">
+</form>
+
+4. SNMP traps. Make possible action definition for the SNMP trap-related
+ events.
+
+OTHER:
+
+ - multi-institution support
+
+ - improve removal of item related data from history
+'-' doesn't work in trigger expressions (a-b=0)
+
+>  Atradu liekas, ka vienu bug: tad, ja updeito Host statusu zem Host, tad trigeris par "Host unreachable" pazuud, jo ir statusaa "unknown", bet pie alarms neparaadas
+>, ka tas buutu mainijis savu statusu.
+
+ - negative values in graphs
+ - check all screens if they are user friendly and present information in the best possible way
+ - possibility (a button) to recheck unsupported parameters
+ - add advanced task scheduler/executor to ZABBIX
+ - agent incorrectly returns amount of free/available memory on HP-UX (must be 24GB)
+
+ - add icons to a map by clicking mouse
+ - optionally support map generation in JPEG. PNG images are huge!
+
+printf calls w/o static format specifiers...
+in src and include:
+grep -R printf * | grep -v "\%\|Makefile\|Binary"
+
+ - in user administration, add many resources from a list (not by one ID)
+
+ Kak naschet dopolnenij k time & date:
+ * tipa month, day, year, hour, minute, ...
+
+ Nu i k 'str' dodlstj csjakie vsjakosti tipa
+ * substr, length, poisk pozicii simvola/podstroki (FIND/SEARCH v Excel),
+ podscet kolichestva simvola (tipa skoljko tam zapjatih)...
+
+ - add requirement for fping to the manual
+ - separate login.php and index.php
+ - remove icmpping and others from the QUEUE
+
+ - summarising report about triggers/actions/items. Show items without triggers,
+trigger wihout actions, etc etc
+ 5) When adding trigger, next page is without triggers of this host. Is  
+ it possible after adding triger to go back to triggers of this host page ?
+
+ - zabbix thinks that host is unrechable if it receives string for numeric item
+
+ - think about implementation of sinchronised items like cpu[usr], cpu[sys], cpu[idle]
+
+ - implement complex SLA calculation (donwtimes, working/non-working hours), etc. See
+forum Open Discussion for more info.
+ - add selection of MIN/MAX/AVG for graphs
+ - stacked graphs
+
+LATER:
+
+ - check return code for alert scripts
+ - trapper item. Source->Alarms do not grow when last status is unknown for
+latest trigger (item type  = TRAPPER)
+ - SNMP traps. Condition to switch expression off. New function which would return
+ status of the trigger could help. 
+
+ - when zabbix cannot evaluate expression it does not change status to UNKNOWN but adds ALARM (UNKNOWN) 
+ - preset time for graphs
+
+ - links to Zabbix frontend in alert emails
+ - strings items for graphs
+ - zabbix_trapperd does not start if PostgreSQL and DBConnectOnEach=1
+
+ - [10] Refresh stop ability. At least for graphs and triggers being selected.
+ - [10] IT Services. Show downtimes for weeks.
+ - [10] IT Services. User view, show algorithm.
+ - [10] BUG. When adding new service, service name is wrong.
+ - [10] IT Services. SLA for a period of time only (09:00-18:00)
+
+LS:
+
+ - graphs. Dobavljatj item so smescheniem vo vremeni
+ - check permissions for zabbix_agentd when started under root
+ - add item to group (not to all)
+ - update host from template
+
+change(N) - raznica mezhdu poslednim i na N vremeni ranee poluchennim
+znacheniem;
+abschange(N) = abs(change(N));
+
+trend(N) - linejnaja aproksimacija sled.znachenija po interval vremeni N;
+trend(N,M) - tozhe, no ne sled.znachenie, a vpered na interval vremeni M;
+
+!!!!! kstati bilo-bi neploho pozvolitj poljzovatsja ne toljko intervalom
+vremeni kak argumentom funkcij,
+no i ispoljzovatj kolichestvo otscetov, tipa srednee za poslednie 5
+scitivanij !!!!!
+* k primeru argument 5 oznachhaet pjatj sekund, a #5 - pjatj izmerenii !!!
+
+nu i massu matematicheskih mozhno - dlja super-advanced chuvakov:
+* SQRT, LOG, LOG10, trigonometricheskie, ...
+
+ - if 'Update', then default action (button 'Enter') must be Update
+ - do not check SNMP port existance if Item is not SNMP
+ - add item to host group
+ - add descriptions to items
+ - link host (group) to template
+
+graphs:
+
+ - min value (0 or automatic)
+ - customisation of font size
+ - link items to show them in one graph (network in/out) 
+
+ - snmp oid symbolic representation
+ - Latest values->Host->[Show not monitored]
+
+HP:
+
+ - add threshold,min,max line for user-defined graphs
+
+ - [3] Windows event log checking.
+ - [4] Latest values. Link to page which shows list of all triggers-related
+ to the item.
+ - [4] users.php. Link to page which shows all actions defined for this user.
+ - [5] Configuration of items/triggers. Add Select.
+ - [7] SLA algorithm (A - 0%, B - 100% -> availability of AB = 50%)
+ - [7] IT Service % must start at 01.01.20xx, not first day of the week
+ - [7] ALARMS. Ability to select events by specifying date from/to.
+ - [9] History of who and when changed trigger comment. As starting point: who and when
+ did latest changes.
+ - [9] ... the history to be used to see who did changes and who wrote specific parts
+ of comments to know who is in charge for the instructions
+ - [9] ... find outdated instructions to initiate its renewal (review)
+
+LS:
+
+ - detailed description for items
+
+TOP PRIORITY:
+
+ - fix update of 'status'. When added it never gets updated, if server is already unreachable.
+ - add more checks for forms (check all possible wrong values)
+ - support of fetch_html[*]
+ - zabbix_agentd to support swap[*] and memory[*] onder AIX
+
+BUGS:
+
+ - add protection from IT Service looping
+
+DIFFERENT TASKS:
+
+ - SNMP trapping
+ - distributed monitoring
+ - personalisation (refresh rate, graph size, default graph period, etc)
+ - SNMP-walk in WEB interface
+ - add UserParameter without restart of an agent
+
+TODO:
+
+- Agent
+ 1. An API so that I can build and active agent into
+    the centralized monitoring point of my application.
+ 2. max/min/average values during the poll pause along with last value to catch
+CPU spikes otherwise invisible (have had these problems with BMC Patrol).
+ 3. Ability to add a library of  userwritten c-functions with dlopen/dlsym to
+the agent with a predefined API that can return values to suckerd.
+
+Not ready yet:
+
+1. Monitoring of Windows (2000) services via SNMP
+This is an extension I wrote based on your SNMP checker that scans through the Windows SNMP mib to check if a specified
++process is running. I thought it may be able to be used in a similar situation to the new SIMPLE check.
+
+2. Basic schedule to monitor certain items during specified period.
+I made changes to the PHP frontend and zabbix_sucker.c to enable the user to specify a time period (like between 9am-5pm) when
++the item should be checked.
+(From: "Dave McCrudden" <dmccrudden@custcare.com.au>)
+
+
+ - do not send notifications at certain periods of time. Do not monitor services at certain periods of time.
+ - decrease number of TCP connections between server and agent
+ - add triggers for all hosts at once
+ - check new Mariusz patches
+ - add support for downtimes, user availablity, etc
+
+HB:
+
+ - LDAP authorisation (should work with MSWindows LDAP)
+
+ OTHER:
+
+ - collect network and other statistics using kstat()
+ - support for complex reports
+ - update trigger status to UNKNOWN if cannot evaluate function 
+
+ LATER:
+
+ - setup demo site
+
+ POSTGRESQL:
+
+> Some corrections for  zabbix 1.1alpha9, PostgreQL version
+> 1.)data.sql record for  itemid = 17201 is missing in table items
+>
+> 2.)  schema.sql some rows are commented using --; not valid pgsql syntax
+>
+> 3.)  schema.sql script for table images is missing
+>
+> CREATE TABLE images
+> (
+>    imageid serial NOT NULL,
+>    imagetype int4 NOT NULL DEFAULT 0,
+>    name varchar(64) NOT NULL DEFAULT 0,
+>    image oid NOT NULL,
+>    CONSTRAINT pk_imageid PRIMARY KEY (imageid),
+>    CONSTRAINT unq_type_name UNIQUE (imagetype, name)
+> )
+> WITH OIDS;
+> ALTER TABLE images OWNER TO zabbix;
+>
+>
+> 4.) fill table images - little bit problem. Blob objects can be added
+> only by pgsql supeuser
+>
+> My working work:
+>
+> Please, correct text in doc (paragraph 3):
+>
+> shell> cd ../data
+> shell> cat data.sql|psql -U <username> zabbix
+> # new
+> shell> cd ../data
+> shell> cat images.sql|sed s%addr%$PWD%|psql -U postgres zabbix
+> # end new
+>
+> file images.sql is icluded as images1.sql
+>
+>
+> (This mail was send to limo - Lukas Macura)
+> Bye Mike
+>
+> --
+> -- Zabbix
+> -- Copyright (C) 2000,2001,2002,2003,2004 Alexei Vladishev
+> --
+> -- This program is free software; you can redistribute it and/or modify
+> -- it under the terms of the GNU General Public License as published by
+> -- the Free Software Foundation; either version 2 of the License, or
+> -- (at your option) any later version.
+> --
+> -- This program is distributed in the hope that it will be useful,
+> -- but WITHOUT ANY WARRANTY; without even the implied warranty of
+> -- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> -- GNU General Public License for more details.
+> --
+> -- You should have received a copy of the GNU General Public License
+> -- along with this program; if not, write to the Free Software
+> -- Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+> --
+>
+> --
+> -- Dumping data for table `images`
+> --
+>
+> insert into images values('1','1','Hub',lo_import('./images/Hub.png'));
+> insert into images values('2','1','Hub (small)',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Hub_small.png'));
+> insert into images values('3','1','Network',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Network.png'));
+> insert into images values('4','1','Network (small)',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Network_small.pn
+g'));
+> insert into images values('5','1','Notebook',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Notebook.png'));
+> insert into images values('6','1','Notebook (small)',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Notebook_small.
+png'));
+> insert into images values('7','1','Phone',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Phone.png'));
+> insert into images values('8','1','Phone (small)',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Phone_small.png'))
+;
+> insert into images values('9','1','Printer',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Printer.png'));
+> insert into images values('10','1','Printer (small)',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Printer_small.p
+ng'));
+> insert into images values('11','1','Router',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Router.png'));
+> insert into images values('12','1','Router (small)',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Router_small.png
+'));
+> insert into images values('13','1','Satellite',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Satellite.png'));
+> insert into images values('14','1','Satellite (small)',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Satellite_sma
+ll.png'));
+> insert into images values('15','1','Server',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Server.png'));
+> insert into images values('16','1','Server (small)',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Server_small.png
+'));
+> insert into images values('17','1','UPS',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/UPS.png'));
+> insert into images values('18','1','UPS (small)',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/UPS_small.png'));
+> insert into images values('19','1','Workstation',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Workstation.png'));
+> insert into images values('20','1','Workstation (small)',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Workstation
+_small.png'));
