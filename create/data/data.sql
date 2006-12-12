@@ -517,13 +517,13 @@ INSERT INTO items VALUES (17207,4,'public','1.3.6.1.2.1.5.26.0',161,10007,'icmpO
 --
 
 INSERT INTO triggers VALUES (10001,'{10211}<10000','Lack of free memory on server {HOSTNAME}','',0,2,3,0,0,'','',0);
-INSERT INTO triggers VALUES (10002,'{10213}<10000','Low free disk space on {HOSTNAME}\'s volume /','',0,2,4,0,0,'','',0);
-INSERT INTO triggers VALUES (10189,'{10219}<10000','Low free disk space on {HOSTNAME}\\\'s volume /tmp','',0,2,4,0,0,'','',0);
-INSERT INTO triggers VALUES (10004,'{10217}<10000','Low free disk space on {HOSTNAME}\'s volume /usr','',0,2,4,0,0,'','',0);
-INSERT INTO triggers VALUES (10005,'{10221}<10000','Low number of free inodes on {HOSTNAME}\'s volume /','',0,2,4,0,0,'','',0);
-INSERT INTO triggers VALUES (10006,'{10223}<10000','Low number of free inodes on {HOSTNAME}\'s volume /opt','',0,2,4,0,0,'','',0);
-INSERT INTO triggers VALUES (10007,'{10222}<10000','Low number of free inodes on {HOSTNAME}\'s volume /tmp','',0,2,4,0,0,'','',0);
-INSERT INTO triggers VALUES (10008,'{10224}<10000','Low number of free inodes on {HOSTNAME}\'s volume /usr','',0,2,4,0,0,'','',0);
+INSERT INTO triggers VALUES (10002,'{10213}<10000','Low free disk space on {HOSTNAME} volume /','',0,2,4,0,0,'','',0);
+INSERT INTO triggers VALUES (10189,'{10219}<10000','Low free disk space on {HOSTNAME} volume /tmp','',0,2,4,0,0,'','',0);
+INSERT INTO triggers VALUES (10004,'{10217}<10000','Low free disk space on {HOSTNAME} volume /usr','',0,2,4,0,0,'','',0);
+INSERT INTO triggers VALUES (10005,'{10221}<10000','Low number of free inodes on {HOSTNAME} volume /','',0,2,4,0,0,'','',0);
+INSERT INTO triggers VALUES (10006,'{10223}<10000','Low number of free inodes on {HOSTNAME} volume /opt','',0,2,4,0,0,'','',0);
+INSERT INTO triggers VALUES (10007,'{10222}<10000','Low number of free inodes on {HOSTNAME} volume /tmp','',0,2,4,0,0,'','',0);
+INSERT INTO triggers VALUES (10008,'{10224}<10000','Low number of free inodes on {HOSTNAME} volume /usr','',0,2,4,0,0,'','',0);
 INSERT INTO triggers VALUES (10190,'{10233}>300','Too many processes on {HOSTNAME}','',0,2,4,0,0,'','',0);
 INSERT INTO triggers VALUES (10010,'{10010}>5','Processor load is too high on {HOSTNAME}','',0,2,3,0,0,'','',0);
 INSERT INTO triggers VALUES (10011,'{10234}>10','Too many processes running on {HOSTNAME}','',0,2,3,0,0,'','',0);
@@ -532,10 +532,10 @@ INSERT INTO triggers VALUES (10013,'{10013}>50','Too may users connected on serv
 INSERT INTO triggers VALUES (10014,'{10197}>0','/etc/inetd.conf has been changed on server {HOSTNAME}','',0,2,2,0,0,'','',0);
 INSERT INTO triggers VALUES (10015,'{10201}>0','/vmlinuz has been changed on server {HOSTNAME}','',0,2,2,0,0,'','',0);
 INSERT INTO triggers VALUES (10016,'{10199}>0','/etc/passwd has been changed on server {HOSTNAME}','',0,2,3,0,0,'','',0);
-INSERT INTO triggers VALUES (10017,'{10214}<10000','Low free disk space on {HOSTNAME}\'s volume /home','',0,2,4,0,0,'','',0);
-INSERT INTO triggers VALUES (10018,'{10220}<10000','Low number of free inodes on {HOSTNAME}\' volume /home','',0,2,4,0,0,'','',0);
-INSERT INTO triggers VALUES (10019,'{10218}<10000','Low free disk space on {HOSTNAME}\'s volume /var','',0,2,4,0,0,'','',0);
-INSERT INTO triggers VALUES (10020,'{10215}<10000','Low free disk space on {HOSTNAME}\'s volume /opt','',0,2,4,0,0,'','',0);
+INSERT INTO triggers VALUES (10017,'{10214}<10000','Low free disk space on {HOSTNAME} volume /home','',0,2,4,0,0,'','',0);
+INSERT INTO triggers VALUES (10018,'{10220}<10000','Low number of free inodes on {HOSTNAME} volume /home','',0,2,4,0,0,'','',0);
+INSERT INTO triggers VALUES (10019,'{10218}<10000','Low free disk space on {HOSTNAME} volume /var','',0,2,4,0,0,'','',0);
+INSERT INTO triggers VALUES (10020,'{10215}<10000','Low free disk space on {HOSTNAME} volume /opt','',0,2,4,0,0,'','',0);
 INSERT INTO triggers VALUES (10021,'{10196}<600','{HOSTNAME} has just been restarted','',0,2,1,0,0,'','',0);
 INSERT INTO triggers VALUES (10022,'{10205}=0','Email (SMTP) server is down on {HOSTNAME}','',0,2,3,0,0,'','',0);
 INSERT INTO triggers VALUES (10023,'{10206}=0','FTP server is down on {HOSTNAME}','',0,2,3,0,0,'','',0);
@@ -564,7 +564,7 @@ INSERT INTO triggers VALUES (10045,'{10235}>0','Version of zabbix_agent(d) was c
 INSERT INTO triggers VALUES (10046,'{10236}=0','WEB (HTTP) server is down on {HOSTNAME}','',0,2,3,0,0,'','',0);
 INSERT INTO triggers VALUES (10047,'{10228}=2','Server {HOSTNAME} is unreachable','',0,2,4,0,0,'','',0);
 INSERT INTO triggers VALUES (10048,'{10048}<10000','Lack of free memory on server {HOSTNAME}','',0,2,3,0,0,'','',0);
-INSERT INTO triggers VALUES (10049,'{10241}<10000','Low free disk space on {HOSTNAME}\'s volume c:','',0,2,3,0,0,'','',0);
+INSERT INTO triggers VALUES (10049,'{10241}<10000','Low free disk space on {HOSTNAME} volume c:','',0,2,3,0,0,'','',0);
 INSERT INTO triggers VALUES (10056,'{10056}>300','Too many processes on {HOSTNAME}','',0,2,3,0,0,'','',0);
 INSERT INTO triggers VALUES (10057,'{10057}>5','Processor load is too high on {HOSTNAME}','',0,2,3,0,0,'','',0);
 INSERT INTO triggers VALUES (10058,'{10058}>10','Too many processes running on {HOSTNAME}','',0,2,3,0,0,'','',0);
@@ -575,7 +575,7 @@ INSERT INTO triggers VALUES (10081,'{10081}<1','Apache is not running on {HOSTNA
 INSERT INTO triggers VALUES (10091,'{10091}>0','Host information was changed on {HOSTNAME}','',0,2,3,0,0,'','',0);
 INSERT INTO triggers VALUES (10092,'{10243}>0','Version of zabbix_agent(d) was changed on {HOSTNAME}','',0,2,1,0,0,'','',0);
 INSERT INTO triggers VALUES (10094,'{10094}=2','Server {HOSTNAME} is unreachable','',0,2,3,0,0,'','',0);
-INSERT INTO triggers VALUES (10191,'{10242}<10000','Low free disk space on {HOSTNAME}\\\'s volume d:','',0,2,3,0,0,'','',0);
+INSERT INTO triggers VALUES (10191,'{10242}<10000','Low free disk space on {HOSTNAME} volume d:','',0,2,3,0,0,'','',0);
 INSERT INTO triggers VALUES (10163,'{10189}<1','Email (SMTP) server is down on {HOSTNAME}','',0,2,3,0,0,'','',0);
 INSERT INTO triggers VALUES (10164,'{10190}<1','FTP server is down on {HOSTNAME}','',0,2,3,0,0,'','',0);
 INSERT INTO triggers VALUES (10165,'{10194}<1','SSH server is down on {HOSTNAME}','',0,2,3,0,0,'','',0);
