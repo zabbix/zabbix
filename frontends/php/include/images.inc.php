@@ -21,6 +21,14 @@
 <?php
 	function	get_image_by_imageid($imageid)
 	{
+		/*global $DB;
+
+		$st = sqlite3_query($DB, 'select * from images where imageid='.$imageid);
+		info(implode(',',sqlite3_fetch_array($st)));
+		info(sqlite3_column_type($st,3));
+		info(SQLITE3_INTEGER.','.SQLITE3_FLOAT.','.SQLITE3_TEXT.','.SQLITE3_BLOB.','.SQLITE3_NULL);
+		return 0;*/
+
 		$result = DBselect('select * from images where imageid='.$imageid);
 		$row = DBfetch($result);
 		if($row)
@@ -37,6 +45,10 @@
 			else if($DB_TYPE == "POSTGRESQL")
 			{
 				$row['image'] = pg_unescape_bytea($row['image']);
+			}
+			else if($DB_TYPE == "SQLITE3")
+			{
+				$row['image'] = pack('H*', $row['image']);
 			}
 			return	$row;
 		}
@@ -103,13 +115,9 @@
 				{
 					$image = pg_escape_bytea($image);
 				}
-				else if($DB_TYPE == "MYSQL")
+				else if($DB_TYPE == "SQLITE3")
 				{
-					//$image = zbx_dbstr($image);
-				}
-				else
-				{
-					$image = '';
+					$image = bin2hex($image);
 				}
 
 				return	DBexecute("insert into images (imageid,name,imagetype,image)".
@@ -187,6 +195,10 @@
 					$sql="update images set name=".zbx_dbstr($name).",imagetype=".zbx_dbstr($imagetype).
 						",image='".$image."' where imageid=$imageid";
 					return	DBexecute($sql);
+				}
+				else if($DB_TYPE == "SQLITE3")
+				{
+					$image = bin2hex($image);
 				}
 
 				$sql="update images set name=".zbx_dbstr($name).",imagetype=".zbx_dbstr($imagetype).
