@@ -60,7 +60,7 @@
 					break;
 				case "ORACLE":
 					$DB = ocilogon($DB_USER, $DB_PASSWORD, "");
-			//		$DB = ocilogon($DB_USER, $DB_PASSWORD, "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=$DB_SERVER)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=$DB_DATABASE)))");
+					//$DB = ocilogon($DB_USER, $DB_PASSWORD, "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=$DB_SERVER)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=$DB_DATABASE)))");
 					if(!$DB)
 					{
 						$error = "Error connecting to database";
@@ -142,7 +142,7 @@
 			{
 				case "MYSQL":		$result = mysql_close($DB);	break;
 				case "POSTGRESQL":	$result = pg_close($DB);	break;
-				case "ORACLE":		$result = ociclose($DB);	break;
+				case "ORACLE":		$result = ocilogoff($DB);	break;
 				case "SQLITE3":		
 					$result = true; 
 					sqlite3_close($DB);	
