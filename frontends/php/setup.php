@@ -101,7 +101,7 @@
 	}
 	if(count($ZBX_CONFIG['allowed_db']) == 0)
 	{
-		$ZBX_CONFIG['allowed_db']['no'] = array('No');
+		$ZBX_CONFIG['allowed_db']['no'] = 'No';
 	}
 
 ?>
