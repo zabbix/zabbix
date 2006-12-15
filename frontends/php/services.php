@@ -561,8 +561,7 @@ include_once "include/page_header.php";
 			new CButton("btn1",S_SELECT,
 				"return PopUp('popup.php?".
 				"dstfrm=".$frmService->GetName()."&dstfld1=triggerid&dstfld2=trigger".
-				"&srctbl=triggers&srcfld1=triggerid&&srcfld2=description','new_win',".
-				"'width=600,height=450,resizable=1,scrollbars=1');",
+				"&srctbl=triggers&srcfld1=triggerid&&srcfld2=description');",
 				'T')
 			));
 		$frmService->AddVar("triggerid",$triggerid);

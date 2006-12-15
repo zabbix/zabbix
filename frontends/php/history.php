@@ -98,34 +98,36 @@ include_once "include/page_header.php";
 			$main_header = count($_REQUEST["itemid"])." log files";
 		}
 		else
+		{
 			$_REQUEST["itemid"] = array_pop($_REQUEST["itemid"]);
+		}
 	}
 
 	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT);
 
 	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,$ZBX_CURNODEID);
 	
-	if(($item_data = DBfetch(DBselect("select h.host,i.hostid,i.description,i.key_ from items i,hosts h ".
+	if((DBfetch(DBselect("select h.host,i.hostid,i.description,i.key_ from items i,hosts h ".
 		" where i.itemid in (".(is_array($_REQUEST["itemid"]) ? implode(',', $_REQUEST["itemid"]) : $_REQUEST["itemid"]).") ".
 		" and h.hostid=i.hostid ".
 		" and h.hostid in (".$denyed_hosts.")"))))
 	{
 		access_deny();
 	}
+	
+	$item_data = DBfetch(DBselect("select h.host,i.hostid,i.* from items i,hosts h ".
+		" where i.itemid in (".(is_array($_REQUEST["itemid"]) ? implode(',', $_REQUEST["itemid"]) : $_REQUEST["itemid"]).") ".
+		" and h.hostid=i.hostid "));
+
+	$item_type = $item_data["value_type"];
+	$l_header = null;
 
 	if(!is_array($_REQUEST["itemid"]))
 	{
-		if(!($item = DBfetch(DBselect("select h.host,i.* from items i,hosts h ".
-			" where i.itemid =".$_REQUEST["itemid"]." and h.hostid=i.hostid ".
-			" and h.hostid in (".$availiable_hosts.")"))))
-		{
-			access_deny();
-		}
-		
-		$item_type = $item["value_type"];
+		$main_header = $item_data["host"].": ".item_description($item_data["description"],$item_data["key_"]);
 		
 		if(isset($_REQUEST["plaintext"]))
-			echo $item["host"].": ".item_description($item["description"], $item["key_"]).BR;
+			echo $main_header.BR;
 	
 		if($_REQUEST["action"]=="showgraph")
 		{
@@ -136,13 +138,13 @@ include_once "include/page_header.php";
 			}
 		}
 		
-		$l_header = array(new CLink($item['host'],"latest.php?hostid=".$item['hostid']),": ",
-			item_description($item["description"],$item["key_"]));
+		$l_header = array(new CLink($item_data['host'],"latest.php?hostid=".$item_data['hostid']),": ",
+			item_description($item_data["description"],$item_data["key_"]));
 	}
 
 	$effectiveperiod = navigation_bar_calc();
 
-	unset($item);
+	unset($item_data);
 
 	if(!isset($_REQUEST["plaintext"]))
 	{
@@ -185,8 +187,7 @@ include_once "include/page_header.php";
 				"Log files list",SPACE,
 				$cmbLogList,SPACE,
 				new CButton("add_log","Add","return PopUp('popup.php?".
-					"dstfrm=".$l_header->GetName()."&srctbl=logitems','new_win',".
-					"'width=600,height=450,resizable=1,scrollbars=1');"),SPACE,
+					"dstfrm=".$l_header->GetName()."&srctbl=logitems&dstfld1=itemid&srcfld1=itemid');"),SPACE,
 				$cmbLogList->ItemsCount() > 1 ? new CButton("remove_log","Remove selected") : null
 				));
 		}

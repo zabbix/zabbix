@@ -87,10 +87,10 @@ include_once "include/page_header.php";
 	$fields=array(
 		"dstfrm" =>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	NULL),
 		"dstfld1"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	NULL),
-		"dstfld2"=>	array(T_ZBX_STR, O_OPT,P_SYS,	NOT_EMPTY,	NULL),
+		"dstfld2"=>	array(T_ZBX_STR, O_OPT,P_SYS,	NULL,		NULL),
 		"srctbl" =>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	NULL),
 		"srcfld1"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	NULL),
-		"srcfld2"=>	array(T_ZBX_STR, O_OPT,P_SYS,	NOT_EMPTY,	NULL),
+		"srcfld2"=>	array(T_ZBX_STR, O_OPT,P_SYS,	NULL,		NULL),
 		"nodeid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		NULL),
 		"groupid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		NULL),
 		"hostid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		NULL),
