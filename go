@@ -6,6 +6,8 @@ rm -f WARNINGS
 
 echo Pre-making...
 aclocal
+echo "m4_include([m4/libcurl.m4])" >> aclocal.m4
+
 autoconf
 autoheader
 automake -a
