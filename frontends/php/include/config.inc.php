@@ -1462,9 +1462,20 @@ else if (document.getElementById)
 		else
 			return false;
 	}
-	function PopUp(url,form_name,param)
+	function PopUp(url,width,height,form_name)
 	{
-		window.open(url,form_name,param);
+		if(!width) width = 600;
+		if(!height) height = 450;
+		if(!form_name) form_name = 'zbx_popup';
+
+		var left = (screen.width-(width+150))/2; 
+		var top = (screen.height-(height+150))/2;
+		
+		var popup = window.open(url,form_name,'width=' + width +',height=' + height + ',top='+ top +',left='+ left +
+				',resizable=yes,scrollbars=yes,location=no,menubar=no');
+
+		popup.focus();
+		
 		return false;
 	}
 

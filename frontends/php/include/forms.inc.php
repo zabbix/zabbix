@@ -333,8 +333,7 @@
 					BR, 
 					new CButton('add_group',S_ADD,
 						"return PopUp('popup_usrgrp.php?dstfrm=".$frmUser->GetName().
-						"&list_name=user_groups_to_del[]&var_name=user_groups','new_group',".
-						"'width=450,height=450,resizable=1,scrollbars=1');"),
+						"&list_name=user_groups_to_del[]&var_name=user_groups',450, 450);"),
 					SPACE,
 					(count($user_groups) > 0) ? new CButton('del_user_group',S_DELETE_SELECTED) : null
 				));
@@ -366,8 +365,7 @@
 			}
 			$frmUser->AddRow(S_MEDIA, array($media_table,
 				new CButton('add_media',S_ADD,
-						'return PopUp("popup_media.php?dstfrm='.$frmUser->GetName().'","new_media",'.
-						'"width=550,height=400,resizable=1,scrollbars=1");'),
+						'return PopUp("popup_media.php?dstfrm='.$frmUser->GetName().'",550,400);'),
 				SPACE,
 				(count($user_medias) > 0) ? new CButton('del_user_media',S_DELETE_SELECTED) : null
 				));
@@ -545,8 +543,7 @@
 				BR, 
 				new CButton('add_user',S_ADD,
 					"return PopUp('popup_users.php?dstfrm=".$frmUserG->GetName().
-					"&list_name=group_users_to_del[]&var_name=group_users','new_user',".
-					"'width=450,height=450,resizable=1,scrollbars=1');"),
+					"&list_name=group_users_to_del[]&var_name=group_users',450,450);"),
 				(count($group_users) > 0) ? new CButton('del_group_user',S_DELETE_SELECTED) : null
 			));
 
@@ -569,18 +566,15 @@
 		$table_Rights->AddRow(array(
 			array(new CButton('add_read_write',S_ADD,
 					"return PopUp('popup_right.php?dstfrm=".$frmUserG->GetName().
-					"&permission=".PERM_READ_WRITE."','new_right',".
-					"'width=450,height=450,resizable=1,scrollbars=1');"),
+					"&permission=".PERM_READ_WRITE."',450,450);"),
 				new CButton('del_read_write',S_DELETE_SELECTED)),
 			array(	new CButton('add_read_only',S_ADD,
 					"return PopUp('popup_right.php?dstfrm=".$frmUserG->GetName().
-					"&permission=".PERM_READ_ONLY."','new_right',".
-					"'width=450,height=450,resizable=1,scrollbars=1');"),
+					"&permission=".PERM_READ_ONLY."',450,450);"),
 				new CButton('del_read_only',S_DELETE_SELECTED)),
 			array(new CButton('add_deny',S_ADD,
 					"return PopUp('popup_right.php?dstfrm=".$frmUserG->GetName().
-					"&permission=".PERM_DENY."','new_right',".
-					"'width=450,height=450,resizable=1,scrollbars=1');"),
+					"&permission=".PERM_DENY."',450,450);"),
 				new CButton('del_deny',S_DELETE_SELECTED))
 			));
 
@@ -939,8 +933,7 @@
 		{
 			$btnSelect = new CButton('btn1',S_SELECT,
 				"return PopUp('popup.php?dstfrm=".$frmItem->GetName().
-				"&dstfld1=key&srctbl=help_items&srcfld1=key_','new_win',".
-				"'width=650,height=450,resizable=1,scrollbars=1');");
+				"&dstfld1=key&srctbl=help_items&srcfld1=key_');");
 			$btnSelect->SetAccessKey('T');
 		}
 		
@@ -1289,7 +1282,7 @@
 		}
 
 		$frmTrig->AddRow(S_NAME, new CTextBox("description",$description,70, $limited));
-		$frmTrig->AddRow(S_EXPRESSION,new CTextBox("expression",$expression,70, $limited));
+		$frmTrig->AddRow(S_EXPRESSION, new CTextBox("expression",$expression,70, $limited));
 
 	/* dependences */
 		foreach($dependences as $val){
@@ -1318,8 +1311,8 @@
 
 		$btnSelect = new CButton('btn1',S_SELECT,
 				"return PopUp('popup.php?dstfrm=".$frmTrig->GetName().
-				"&dstfld1=new_dependence&dstfld2=trigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description','new_win',".
-				"'width=600,height=450,resizable=1,scrollbars=1');");
+				"&dstfld1=new_dependence&dstfld2=trigger&srctbl=triggers".
+				"&srcfld1=triggerid&srcfld2=description',600,450);");
 		
 		$btnSelect->SetAccessKey('T');
 		$frmTrig->AddRow("New dependency",array($txtCondVal, 
@@ -1514,8 +1507,7 @@
 						url_param($graphtype, false, 'graphtype').
 						url_param($gitem, false).
 						url_param($gid,false,'gid').
-						'","new_media",'.
-						'"width=550,height=400,resizable=1,scrollbars=1");');
+						'",550,400);');
 				
 				$items_table->AddRow(array(
 						new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
@@ -1542,8 +1534,7 @@
 						'return PopUp("popup_gitem.php?dstfrm='.$frmGraph->GetName().
 						url_param($only_hostid, false, 'only_hostid').
 						url_param($graphtype, false, 'graphtype').
-						'","new_media",'.
-						'"width=550,height=400,resizable=1,scrollbars=1");'),
+						'",550,400);'),
 					$dedlete_button
 				));
 		unset($items_table, $dedlete_button);
@@ -1611,8 +1602,7 @@
 		$btnSelect = new CButton('btn1',S_SELECT,
 				"return PopUp('popup.php?dstfrm=".$frmGItem->GetName().
 				"&dstfld1=itemid&dstfld2=description&".
-				"srctbl=items&srcfld1=itemid&srcfld2=description".$host_condition."','new_win',".
-				"'width=600,height=450,resizable=1,scrollbars=1');");
+				"srctbl=items&srcfld1=itemid&srcfld2=description".$host_condition."');");
 		
 		$btnSelect->SetAccessKey('T');
 		$frmGItem->AddRow(S_PARAMETER ,array($txtCondVal,$btnSelect));
@@ -1722,8 +1712,7 @@
 			new CTextBox("host",$host,32,'yes'),
 			new CButton("btn1",S_SELECT,
 				"return PopUp('popup.php?dstfrm=".$frmAutoReg->GetName().
-				"&dstfld1=hostid&dstfld2=host&srctbl=hosts&srcfld1=hostid&srcfld2=host','new_win',".
-				"'width=450,height=450,resizable=1,scrollbars=1');",
+				"&dstfld1=hostid&dstfld2=host&srctbl=hosts&srcfld1=hostid&srcfld2=host',450,450);",
 				'T')
 			));
 		$frmAutoReg->AddVar("hostid",$hostid);
@@ -1997,8 +1986,7 @@
 
 			$btnSelect = new CButton('btn1',S_SELECT,
 				"return PopUp('popup.php?dstfrm=".$frmAction->GetName().
-				"&dstfld1=new_condition_value&dstfld2=group&srctbl=host_group&srcfld1=groupid&srcfld2=name','new_win',".
-				"'width=450,height=450,resizable=1,scrollbars=1');");
+				"&dstfld1=new_condition_value&dstfld2=group&srctbl=host_group&srcfld1=groupid&srcfld2=name',450,450);");
 			$btnSelect->SetAccessKey('T');
 
 			array_push($rowCondition, $txtCondVal, $btnSelect);
@@ -2012,8 +2000,7 @@
 
 			$btnSelect = new CButton('btn1',S_SELECT,
 				"return PopUp('popup.php?dstfrm=".$frmAction->GetName().
-				"&dstfld1=new_condition_value&dstfld2=host&srctbl=hosts&srcfld1=hostid&srcfld2=host','new_win',".
-				"'width=450,height=450,resizable=1,scrollbars=1');");
+				"&dstfld1=new_condition_value&dstfld2=host&srctbl=hosts&srcfld1=hostid&srcfld2=host',450,450);");
 			$btnSelect->SetAccessKey('T');
 
 			array_push($rowCondition, $txtCondVal, $btnSelect);
@@ -2027,8 +2014,7 @@
 
 			$btnSelect = new CButton('btn1',S_SELECT,
 				"return PopUp('popup.php?dstfrm=".$frmAction->GetName().
-				"&dstfld1=new_condition_value&dstfld2=trigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description','new_win',".
-				"'width=600,height=450,resizable=1,scrollbars=1');");
+				"&dstfld1=new_condition_value&dstfld2=trigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description');");
 			$btnSelect->SetAccessKey('T');
 			array_push($rowCondition, $txtCondVal, $btnSelect);
 		}
@@ -2895,8 +2881,7 @@
 				new CButton('add_template',S_ADD,
 					"return PopUp('popup.php?dstfrm=".$frmHost->GetName().
 					"&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host".
-					url_param($templates,false,'existed_templates')."','new_win',".
-					"'width=450,height=450,resizable=1,scrollbars=1');",
+					url_param($templates,false,'existed_templates')."',450,450)l",
 					'T')
 				));
 	
@@ -3131,8 +3116,7 @@
 				new CTextBox("apphost",$apphost,32,'yes'),
 				new CButton("btn1",S_SELECT,
 					"return PopUp('popup.php?dstfrm=".$frmApp->GetName().
-					"&dstfld1=apphostid&dstfld2=apphost&srctbl=hosts&srcfld1=hostid&srcfld2=host','new_win',".
-					"'width=450,height=450,resizable=1,scrollbars=1');",
+					"&dstfld1=apphostid&dstfld2=apphost&srctbl=hosts&srcfld1=hostid&srcfld2=host',450,450);",
 					'T')
 				));
 		}
@@ -3331,8 +3315,8 @@
 			$frmEl->AddRow(S_HOST, array(
 				new CTextBox("host",$host,32,'yes'),
 				new CButton("btn1",S_SELECT,"return PopUp('popup.php?dstfrm=".$frmEl->GetName().
-					"&dstfld1=elementid&dstfld2=host&srctbl=hosts&srcfld1=hostid&srcfld2=host','new_win',".
-					"'width=450,height=450,resizable=1,scrollbars=1');","T")
+					"&dstfld1=elementid&dstfld2=host&srctbl=hosts&srcfld1=hostid&srcfld2=host',450,450);",
+					"T")
 			));
 		}
 		elseif($elementtype==SYSMAP_ELEMENT_TYPE_MAP)
@@ -3373,8 +3357,8 @@
 			$frmEl->AddRow(S_TRIGGER, array(
 				new CTextBox("trigger",$trigger,32,'yes'),
 				new CButton("btn1",S_SELECT,"return PopUp('popup.php?dstfrm=".$frmEl->GetName().
-					"&dstfld1=elementid&dstfld2=trigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description','new_win',".
-					"'width=550,height=450,resizable=1,scrollbars=1');","T")
+					"&dstfld1=elementid&dstfld2=trigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description');",
+					"T")
 			));
 		}
 		elseif($elementtype==SYSMAP_ELEMENT_TYPE_HOST_GROUP)
@@ -3401,8 +3385,8 @@
 			$frmEl->AddRow(S_HOST_GROUP, array(
 				new CTextBox("group",$group,32,'yes'),
 				new CButton("btn1",S_SELECT,"return PopUp('popup.php?dstfrm=".$frmEl->GetName().
-					"&dstfld1=elementid&dstfld2=group&srctbl=host_group&srcfld1=groupid&srcfld2=name','new_win',".
-					"'width=450,height=450,resizable=1,scrollbars=1');","T")
+					"&dstfld1=elementid&dstfld2=group&srctbl=host_group&srcfld1=groupid&srcfld2=name',450,450);",
+					"T")
 			));
 		}
 
@@ -3542,8 +3526,7 @@
 
 		$btnSelect = new CButton('btn1',S_SELECT,
 			"return PopUp('popup.php?dstfrm=".$frmCnct->GetName().
-			"&dstfld1=triggerid&dstfld2=trigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description','new_win',".
-			"'width=600,height=450,resizable=1,scrollbars=1');");
+			"&dstfld1=triggerid&dstfld2=trigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description');");
 		$btnSelect->SetAccessKey('T');
 		$frmCnct->AddRow("Link status indicator",array($txtTrigger, $btnSelect));
 
