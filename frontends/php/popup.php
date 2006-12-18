@@ -685,6 +685,9 @@ function add_variable(formname,value)
 			$row["description"] = item_description($row["description"],$row["key_"]);
 			
 			$description = new CLink($row["description"],"#","action");
+
+			$row["description"] = $row['host'].':'.$row["description"];
+
 			$description->SetAction(
 				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
 				get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).

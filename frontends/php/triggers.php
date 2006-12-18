@@ -83,7 +83,7 @@ include_once "include/page_header.php";
 /* FORM ACTIONS */
 	if(isset($_REQUEST["save"]))
 	{
-		$now=mktime();
+		$now=time();
 		if(isset($_REQUEST["status"]))	{ $status=1; }
 		else			{ $status=0; }
 
