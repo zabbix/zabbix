@@ -958,6 +958,11 @@
 	"S_URL"=>				"URL",
 	"S_INVALID_URL"=>			"Invalid URL",
 	"S_CREATE_TRIGGER"=>			"Create Trigger",
+	"S_INSERT"=>				"Insert",
+	"S_TIMES"=>				"Times",
+	"S_SECONDS"=>				"Seconds",
+	"S_COUNTS"=>				"Counts",
+	"S_LAST_OF"=>				"Last of",
 
 //	tr_comments.php
 	"S_TRIGGER_COMMENTS"=>			"Trigger comments",

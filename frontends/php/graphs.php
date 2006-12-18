@@ -230,13 +230,10 @@ include_once "include/page_header.php";
 	}
 	elseif(isset($_REQUEST['move_up']) && isset($_REQUEST['items']))
 	{
-		SDI($_REQUEST['items'][$_REQUEST['move_up']]['sortorder']);
 		if(isset($_REQUEST['items'][$_REQUEST['move_up']]))
 			if($_REQUEST['items'][$_REQUEST['move_up']]['sortorder'] > 0)
 				$_REQUEST['items'][$_REQUEST['move_up']]['sortorder']
 					 = ''.($_REQUEST['items'][$_REQUEST['move_up']]['sortorder'] - 1);
-
-		SDI($_REQUEST['items'][$_REQUEST['move_up']]['sortorder']);
 	}
 	elseif(isset($_REQUEST['move_down']) && isset($_REQUEST['items']))
 	{

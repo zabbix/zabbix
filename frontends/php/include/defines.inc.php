@@ -285,6 +285,9 @@
 	define("RESOURCE_TYPE_NODE",		0);
 	define("RESOURCE_TYPE_GROUP",		1);
 
+	define('PARAM_TYPE_SECONDS',	0);
+	define('PARAM_TYPE_COUNTS',	1);
+
 	define("ZBX_NODE_REMOTE",	0);
 	define("ZBX_NODE_LOCAL",	1);
 	define("ZBX_NODE_MASTER",	2);

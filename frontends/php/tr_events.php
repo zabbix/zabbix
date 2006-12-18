@@ -79,7 +79,7 @@ include_once "include/page_header.php";
 	$truesum=0;
 	$falsesum=0;
 	$dissum=0;
-	$clock=mktime();
+	$clock=time();
 	while($row=DBfetch($result))
 	{
 		$lclock=$clock;

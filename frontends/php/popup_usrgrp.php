@@ -44,8 +44,6 @@ include_once "include/page_header.php";
 
 	$dstfrm		= get_request("dstfrm",		0);	// destination form
 	$new_group = get_request('new_group', array());
-
-	SDI($new_group);
 ?>
 <?php
 	show_table_header(S_GROUPS);

@@ -106,6 +106,7 @@ frontends/php/nodes.php -text
 frontends/php/popup_gitem.php -text
 frontends/php/popup_media.php -text
 frontends/php/popup_right.php -text
+frontends/php/popup_trexpr.php -text
 frontends/php/popup_users.php -text
 frontends/php/popup_usrgrp.php -text
 frontends/php/setup.php -text
