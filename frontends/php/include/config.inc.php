@@ -1493,6 +1493,24 @@ else if (document.getElementById)
 			frmForm.elements[i].checked = value;
 		}
 	}
+
+	function GetSelectedText(obj)
+	{
+		if (navigator.appName == "Microsoft Internet Explorer")
+		{
+			obj.focus();
+			return document.selection.createRange().text;
+		}
+		else (obj.selectionStart)
+		{
+			if(obj.selectionStart != obj.selectionEnd) {
+				var s = obj.selectionStart;
+				var e = obj.selectionEnd;
+				return obj.value.substring(s, e);
+			}
+		}
+		return obj.value;
+	}
 //-->
 </script>
 <?php

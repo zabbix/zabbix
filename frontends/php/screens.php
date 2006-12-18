@@ -122,7 +122,6 @@ include_once "include/page_header.php";
 <?php
 	if(isset($screenid))
 	{
-		SDI();
 		$effectiveperiod = navigation_bar_calc();
 		$table = get_screen($screenid, 0, $effectiveperiod);
 		$table->Show();

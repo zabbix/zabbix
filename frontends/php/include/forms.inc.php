@@ -1281,8 +1281,14 @@
 			}
 		}
 
-		$frmTrig->AddRow(S_NAME, new CTextBox("description",$description,70, $limited));
-		$frmTrig->AddRow(S_EXPRESSION, new CTextBox("expression",$expression,70, $limited));
+		$frmTrig->AddRow(S_NAME, new CTextBox("description",$description,90, $limited));
+		$frmTrig->AddRow(S_EXPRESSION, array(
+				new CTextBox("expression",$expression,75, $limited),
+				new CButton('insert',S_INSERT,
+					"return PopUp('popup_trexpr.php?dstfrm=".$frmTrig->GetName().
+					"&dstfld1=expression&srctbl=expression".
+					"&srcfld1=expression&expression=' + escape(GetSelectedText(this.form.elements['expression'])),700,200);")
+			));
 
 	/* dependences */
 		foreach($dependences as $val){
@@ -1306,7 +1312,7 @@
 	/* new dependence */
 		$frmTrig->AddVar('new_dependence','0');
 
-		$txtCondVal = new CTextBox('trigger','',50);
+		$txtCondVal = new CTextBox('trigger','',75);
 		$txtCondVal->SetReadonly('yes');
 
 		$btnSelect = new CButton('btn1',S_SELECT,
@@ -1329,8 +1335,8 @@
 		}
 		$frmTrig->AddRow(S_SEVERITY,$cmbPrior);
 
-		$frmTrig->AddRow(S_COMMENTS,new CTextArea("comments",$comments,70,7));
-		$frmTrig->AddRow(S_URL,new CTextBox("url",$url,70));
+		$frmTrig->AddRow(S_COMMENTS,new CTextArea("comments",$comments,90,7));
+		$frmTrig->AddRow(S_URL,new CTextBox("url",$url,90));
 		$frmTrig->AddRow(S_DISABLED,new CCheckBox("status",$status));
  
 		$frmTrig->AddItemToBottomRow(new CButton("save",S_SAVE));

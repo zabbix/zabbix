@@ -191,7 +191,9 @@ COpt::profiling_start("page");
 						),
 					array("url"=>"hosts.php"	,"label"=>S_HOSTS		),
 					array("url"=>"items.php"	,"label"=>S_ITEMS		),
-					array("url"=>"triggers.php"	,"label"=>S_TRIGGERS		),
+					array("url"=>"triggers.php"	,"label"=>S_TRIGGERS		,
+						"sub_pages"=>array("popup_trexpr.php")
+						),
 					array("url"=>"actionconf.php"	,"label"=>S_ACTIONS		),
 					array("url"=>"sysmaps.php"	,"label"=>S_MAPS		,
 						"sub_pages"=>array("sysmap.php")
