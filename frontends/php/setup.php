@@ -95,7 +95,7 @@
 	{
 		$ZBX_CONFIG['allowed_db']['ORACLE'] = 'Oracle';
 	}
-	/* ORACLE */	if(zbx_is_callable(array('sqlite3_open', 'sqlite3_close', 'sqlite3_query', 'sqlite3_error', 'sqlite3_fetch_array', 'sqlite3_query_close', 'sqlite3_exec')))
+	/* SQLITE3 */	if(zbx_is_callable(array('sqlite3_open', 'sqlite3_close', 'sqlite3_query', 'sqlite3_error', 'sqlite3_fetch_array', 'sqlite3_query_close', 'sqlite3_exec')))
 	{
 		$ZBX_CONFIG['allowed_db']['SQLITE3'] = 'SQLite3';
 	}
