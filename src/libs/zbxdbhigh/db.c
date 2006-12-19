@@ -70,6 +70,8 @@ void	DBclose(void)
 #ifdef	HAVE_SQLITE3
 	sqlite_transaction_started = 0;
 	sqlite3_close(sqlite);
+
+	php_sem_remove(&sqlite_access);
 #endif
 }
 
@@ -152,7 +154,7 @@ void    DBconnect(void)
 	/* Do not return SQLITE_BUSY immediately, wait for N ms */
 	sqlite3_busy_timeout(sqlite, 60*1000);
 
-	if(ZBX_MUTEX_ERROR == zbx_mutex_create(&sqlite_access, ZBX_MUTEX_SQLITE))
+	if(ZBX_MUTEX_ERROR == php_sem_get(&sqlite_access, CONFIG_DBNAME))
 	{
 		zbx_error("Unable to create mutex for sqlite");
 		exit(FAIL);
@@ -183,7 +185,7 @@ void DBbegin(void)
 	DBexecute("begin;");
 #endif
 #ifdef	HAVE_SQLITE3
-	zbx_mutex_lock(&sqlite_access);
+	php_sem_acquire(&sqlite_access);
 
 	sqlite_transaction_started = 1;
 	
@@ -216,7 +218,7 @@ void DBcommit(void)
 
 	sqlite_transaction_started = 0;
 
-	zbx_mutex_unlock(&sqlite_access);
+	php_sem_release(&sqlite_access);
 #endif
 }
 
@@ -245,7 +247,7 @@ void DBrollback(void)
 
 	sqlite_transaction_started = 1;
 
-	zbx_mutex_unlock(&sqlite_access);
+	php_sem_release(&sqlite_access);
 #endif
 }
 
@@ -322,7 +324,7 @@ int DBexecute(const char *fmt, ...)
 #ifdef	HAVE_SQLITE3
 	if(!sqlite_transaction_started)
 	{
-		zbx_mutex_lock(&sqlite_access);
+		php_sem_acquire(&sqlite_access);
 	}
 	
 lbl_exec:
@@ -335,14 +337,14 @@ lbl_exec:
 		sqlite3_free(error);
 		if(!sqlite_transaction_started)
 		{
-			zbx_mutex_unlock(&sqlite_access);
+			php_sem_release(&sqlite_access);
 		}
 		ret = FAIL;
 	}
 
 	if(!sqlite_transaction_started)
 	{
-		zbx_mutex_unlock(&sqlite_access);
+		php_sem_release(&sqlite_access);
 	}
 	return ret;
 #endif
@@ -543,7 +545,7 @@ DB_RESULT DBselect(const char *fmt, ...)
 #ifdef HAVE_SQLITE3
 	if(!sqlite_transaction_started)
 	{
-		zbx_mutex_lock(&sqlite_access);
+		php_sem_acquire(&sqlite_access);
 	}
 
 	result = malloc(sizeof(ZBX_SQ_DB_RESULT));
@@ -559,14 +561,14 @@ lbl_get_table:
 		sqlite3_free(error);
 		if(!sqlite_transaction_started)
 		{
-			zbx_mutex_unlock(&sqlite_access);
+			php_sem_release(&sqlite_access);
 		}
 		exit(FAIL);
 	}
 
 	if(!sqlite_transaction_started)
 	{
-		zbx_mutex_unlock(&sqlite_access);
+		php_sem_release(&sqlite_access);
 	}
 	return result;
 #endif

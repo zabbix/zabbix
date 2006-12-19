@@ -72,13 +72,13 @@
 					{
 						function init_db_access()
 						{
-							global $ZBX_CONFIGURATION_FILE, $ZBX_SEM_ID;
+							global $DB_DATABASE, $ZBX_SEM_ID;
 
 							$ZBX_SEM_ID = false;
 							if(function_exists('ftok') && function_exists('sem_get') &&
-								file_exists($ZBX_CONFIGURATION_FILE))
+								file_exists($DB_DATABASE))
 							{
-								$ZBX_SEM_ID = sem_get(ftok($ZBX_CONFIGURATION_FILE, 'z'), 1);
+								$ZBX_SEM_ID = sem_get(ftok($DB_DATABASE, 'z'), 1);
 							}
 						}
 					}
