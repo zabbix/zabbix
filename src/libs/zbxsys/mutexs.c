@@ -262,7 +262,7 @@ int zbx_mutex_destroy(ZBX_MUTEX *mutex)
 }
 
 
-#if defined(HAVE_SQLITE3) && !defined(_WINDOWS)
+#if 0 && defined(HAVE_SQLITE3) && !defined(_WINDOWS)
 
 /*
    +----------------------------------------------------------------------+
@@ -483,10 +483,10 @@ int php_sem_remove(ZBX_MUTEX* sem_ptr)
 
 #else // !HAVE_SQLITE3 || _WINDOWS
 
-int php_sem_get(ZBX_MUTEX* sem_ptr, char* path_name);	{	return ZBX_MUTEX_OK;	}
-int php_sem_acquire(ZBX_MUTEX* sem_ptr);				{	return ZBX_MUTEX_OK;	}
-int php_sem_release(ZBX_MUTEX* sem_ptr);				{	return ZBX_MUTEX_OK;	}		
-int php_sem_remove(ZBX_MUTEX* sem_ptr)					{	return ZBX_MUTEX_OK;	}
+int php_sem_get(ZBX_MUTEX* sem_ptr, char* path_name)		{	return ZBX_MUTEX_OK;	}
+int php_sem_acquire(ZBX_MUTEX* sem_ptr)				{	return ZBX_MUTEX_OK;	}
+int php_sem_release(ZBX_MUTEX* sem_ptr)				{	return ZBX_MUTEX_OK;	}		
+int php_sem_remove(ZBX_MUTEX* sem_ptr)				{	return ZBX_MUTEX_OK;	}
 
 #endif // HAVE_SQLITE3 && !_WINDOWS
 
