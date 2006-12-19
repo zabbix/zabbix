@@ -90,7 +90,9 @@
 							global $ZBX_SEM_ID;
 
 							if($ZBX_SEM_ID && function_exists('sem_acquire'))
+							{
 								sem_acquire($ZBX_SEM_ID);
+							}
 						}
 					}
 
@@ -104,6 +106,20 @@
 								sem_release($ZBX_SEM_ID);
 						}
 					}
+
+					if(!function_exists('free_db_access'))
+					{
+						function free_db_access()
+						{
+							global $ZBX_SEM_ID;
+
+							if($ZBX_SEM_ID && function_exists('sem_remove'))
+								sem_remove($ZBX_SEM_ID);
+
+							$ZBX_SEM_ID = false;
+						}
+					}
+
 
 					if(file_exists($DB_DATABASE))
 					{
@@ -146,6 +162,7 @@
 				case "SQLITE3":		
 					$result = true; 
 					sqlite3_close($DB);	
+					free_db_access();
 					break;
 				default:		break;
 			}

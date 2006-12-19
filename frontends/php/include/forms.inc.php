@@ -2887,7 +2887,7 @@
 				new CButton('add_template',S_ADD,
 					"return PopUp('popup.php?dstfrm=".$frmHost->GetName().
 					"&dstfld1=new_template&srctbl=templates&srcfld1=hostid&srcfld2=host".
-					url_param($templates,false,'existed_templates')."',450,450)l",
+					url_param($templates,false,'existed_templates')."',450,450)",
 					'T')
 				));
 	

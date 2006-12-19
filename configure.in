@@ -551,7 +551,7 @@ if test "$server" = "yes"; then
 	AC_SUBST(ORACLE_LFLAGS)
 	AC_SUBST(ORACLE_LIBS)
 
-	AC_MSG_CHECKING(for SQLite support)
+	AC_MSG_CHECKING(for SQLite3 support)
 	AC_ARG_WITH(sqlite3,
 	[
 	What DBMS do you want to use (please select only one):
