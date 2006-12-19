@@ -369,25 +369,13 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 				}
 				else
 				{
-					zabbix_log( LOG_LEVEL_DEBUG, "ASN_OCTET_STR len[%d]", vars->val_len);
-					p = malloc(1024);
+					p = malloc(MAX_STRING_LEN);
 					if(p)
 					{
-						memset(p,0,1024);
-						snprint_value(p, 1023, vars->name, vars->name_length, vars);
-						/* Skip STRING: and STRING_HEX: */
-						c=strchr(p,':');
-						if(c==NULL)
-						{
-							SET_STR_RESULT(value, strdup(p));
-						}
-						else
-						{
-							SET_STR_RESULT(value, strdup(c+1));
-						}
-						zabbix_log( LOG_LEVEL_DEBUG, "ASN_OCTET_STR [%s]", p);
-						free(p);
-					}
+						ip = vars->val.string;
+						snprintf(p,MAX_STRING_LEN-1,"%d.%d.%d.%d",ip[0],ip[1],ip[2],ip[3]);
+						SET_STR_RESULT(value, p);
+                                        }
 					else
 					{
 						zbx_snprintf(error,MAX_STRING_LEN-1,"Cannot allocate required memory");
