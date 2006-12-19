@@ -1,4 +1,4 @@
-Changes for 1.3.1:
+Changes for 1.3.2:
 
  - improved sqlite3 database support (Eugene)
  - developed simple trigger expression editor (Eugene)
@@ -51,6 +51,7 @@ Integrated from 1.1.x
 
 1.1.5
 
+ - fixed agent's calculation of network statistics (Alexei)
  - fixed some compilation warnings (Alexei)
  - fixed "not equal" condition for hosts and host groups in actions (Alexei)
  - added support of macro TRIGGER.URL and TRIGGER.COMMENT (Alexei)
