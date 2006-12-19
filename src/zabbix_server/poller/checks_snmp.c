@@ -43,6 +43,8 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 	char 	*p,*c;
 	double dbl;
 
+	unsigned char *ip;
+
 	char error[MAX_STRING_LEN];
 
 	int ret=SUCCEED;
@@ -373,7 +375,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 					if(p)
 					{
 						ip = vars->val.string;
-						snprintf(p,MAX_STRING_LEN-1,"%d.%d.%d.%d",ip[0],ip[1],ip[2],ip[3]);
+						zbx_snprintf(p,MAX_STRING_LEN-1,"%d.%d.%d.%d",ip[0],ip[1],ip[2],ip[3]);
 						SET_STR_RESULT(value, p);
                                         }
 					else
