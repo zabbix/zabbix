@@ -405,12 +405,11 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 				}
 				else
 				{
-					p = malloc(16);
+					p = malloc(MAX_STRING_LEN);
 					if(p)
 					{
 						ip = vars->val.string;
 						snprintf(p,MAX_STRING_LEN-1,"%d.%d.%d.%d",ip[0],ip[1],ip[2],ip[3]);
-
 						SET_STR_RESULT(value, p);
 					}
 					else
