@@ -101,7 +101,6 @@ struct option longopts[] =
 
 pid_t	*threads=NULL;
 
-
 int	CONFIG_ALERTER_FORKS		= 1;
 int	CONFIG_HOUSEKEEPER_FORKS	= 1;
 int	CONFIG_NODEWATCHER_FORKS	= 1;
@@ -724,7 +723,7 @@ void	zbx_on_exit()
 	zabbix_close_log();
 	
 #ifdef  HAVE_SQLITE3
-	zbx_mutex_destroy(&sqlite_access);
+	php_sem_remove(&sqlite_access);
 #endif /* HAVE_SQLITE3 */
 
 	exit(SUCCEED);

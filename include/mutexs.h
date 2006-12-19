@@ -29,7 +29,6 @@
 #	define ZBX_MUTEX_NAME		char*
 
 #	define ZBX_MUTEX_LOG    	"ZBX_MUTEX_LOG"
-#	define ZBX_MUTEX_SQLITE 	"ZBX_MUTEX_SQLITE"
 
 #else /* not _WINDOWS */
 
@@ -41,10 +40,13 @@
 #	define ZBX_MUTEX_NAME		int
 
 #	define ZBX_MUTEX_LOG		0
-#	define ZBX_MUTEX_SQLITE		1
-#	define ZBX_MUTEX_COUNT		2
+#	define ZBX_MUTEX_COUNT		1
 
 #	define ZBX_MUTEX_MAX_TRIES	20 /* seconds */
+
+#	if defined(HAVE_SQLITE3)
+
+#	endif
 
 #endif /* _WINDOWS */
 
@@ -52,5 +54,10 @@ int zbx_mutex_create(ZBX_MUTEX	*mutex, ZBX_MUTEX_NAME name);
 int zbx_mutex_lock(ZBX_MUTEX	*mutex);
 int zbx_mutex_unlock(ZBX_MUTEX	*mutex);
 int zbx_mutex_destroy(ZBX_MUTEX	*mutex);
+
+int php_sem_get(ZBX_MUTEX* sem_ptr, char* path_name);
+int php_sem_acquire(ZBX_MUTEX* sem_ptr);
+int php_sem_release(ZBX_MUTEX* sem_ptr);
+int php_sem_remove(ZBX_MUTEX* sem_ptr);
 
 #endif /* ZABBIX_MUTEXS_H */
