@@ -329,8 +329,24 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
 
 void test()
 {
+	DB_RESULT       result;
+	DB_ROW          row;
+	int i=0;
+
 	printf("-= Test Started =-\n");
-	
+
+	DBconnect();
+	for(i = 0; i<1000000; i++)
+	{
+		result = DBselect("select key_ from items");
+		while(row = DBfetch(result))
+		{
+			//printf("[%s]\n",row[0]);
+		}
+		DBfree_result(result);
+	}
+	DBclose();
+
 	printf("\n-= Test completed =-\n");
 }
 #endif /* TEST */
@@ -447,9 +463,7 @@ int main(int argc, char **argv)
 	}
 
 	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_server. ZABBIX %s.", ZABBIX_VERSION);
-	DBconnect();
 	test();
-	DBclose();
 	return 0;
 #endif /* TEST */
 	
