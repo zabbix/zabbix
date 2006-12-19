@@ -229,7 +229,7 @@ DB_ITEM
 {
 	zbx_uint64_t	itemid;
 	zbx_uint64_t	hostid;
-	int	type;
+	zbx_item_type_t	type;
 	int	status;
 	char	*description;
 	char	key[ITEM_KEY_LEN_MAX];
@@ -259,7 +259,7 @@ DB_ITEM
 	int     prevvalue_null;
 	time_t  lastcheck;
 	time_t	nextcheck;
-	int	value_type;
+	zbx_item_value_type_t	value_type;
 	int	delta;
 	int	multiplier;
 	char	*units;
@@ -347,7 +347,7 @@ DB_CONDITION
 {
 	zbx_uint64_t	conditionid;
 	zbx_uint64_t	actionid;
-	int	conditiontype;
+	zbx_condition_type_t	conditiontype;
 	int	operator;
 	char	*value;
 };
