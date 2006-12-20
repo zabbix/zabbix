@@ -36,7 +36,7 @@
 #ifdef	HAVE_SQLITE3
 	int		sqlite_transaction_started = 0;
 	sqlite3		*sqlite;
-	ZBX_MUTEX	sqlite_access;
+	PHP_MUTEX	sqlite_access;
 #endif
 
 #ifdef	HAVE_MYSQL
@@ -174,7 +174,7 @@ void    DBconnect(void)
  *                                                                            *
  * Return value: -                                                            *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: Do nothing of DB does not support transactions                   *
  *                                                                            *
@@ -185,11 +185,18 @@ void DBbegin(void)
 	DBexecute("begin;");
 #endif
 #ifdef	HAVE_SQLITE3
-	php_sem_acquire(&sqlite_access);
-
-	sqlite_transaction_started = 1;
+	sqlite_transaction_started++;
 	
-	DBexecute("begin;");
+	if(sqlite_transaction_started == 1)
+	{
+		php_sem_acquire(&sqlite_access);
+
+		DBexecute("begin;");
+	}
+	else
+	{
+		zabbix_log( LOG_LEVEL_DEBUG, "POSSIBLE ERROR: Used incorect logic in database processing started subtransaction!");
+	}
 #endif
 }
 
@@ -203,7 +210,7 @@ void DBbegin(void)
  *                                                                            *
  * Return value: -                                                            *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: Do nothing of DB does not support transactions                   *
  *                                                                            *
@@ -214,11 +221,21 @@ void DBcommit(void)
 	DBexecute("commit;");
 #endif
 #ifdef	HAVE_SQLITE3
-	DBexecute("commit;");
 
-	sqlite_transaction_started = 0;
+	if(sqlite_transaction_started > 1)
+	{
+		sqlite_transaction_started--;
+	}
+	
+	if(sqlite_transaction_started == 1)
+	{
+		DBexecute("commit;");
 
-	php_sem_release(&sqlite_access);
+		sqlite_transaction_started = 0;
+
+		php_sem_release(&sqlite_access);
+	}
+
 #endif
 }
 
@@ -232,7 +249,7 @@ void DBcommit(void)
  *                                                                            *
  * Return value: -                                                            *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: Do nothing of DB does not support transactions                   *
  *                                                                            *
@@ -243,11 +260,21 @@ void DBrollback(void)
 	DBexecute("rollback;");
 #endif
 #ifdef	HAVE_SQLITE3
-	DBexecute("rollback;");
 
-	sqlite_transaction_started = 1;
+	if(sqlite_transaction_started > 1)
+	{
+		sqlite_transaction_started--;
+	}
 
-	php_sem_release(&sqlite_access);
+	if(sqlite_transaction_started == 1)
+	{
+		DBexecute("rollback;");
+
+		sqlite_transaction_started = 0;
+
+		php_sem_release(&sqlite_access);
+	}
+
 #endif
 }
 

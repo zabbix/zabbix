@@ -331,21 +331,59 @@ void test()
 {
 	DB_RESULT       result;
 	DB_ROW          row;
-	int i=0;
+	int i=0,j=0,k=0;
 
 	printf("-= Test Started =-\n");
 
-	DBconnect();
-	for(i = 0; i<1000000; i++)
+	for(k = 0; k < 10; k++)
 	{
-		result = DBselect("select key_ from items");
-		while(row = DBfetch(result))
-		{
-			//printf("[%s]\n",row[0]);
-		}
-		DBfree_result(result);
+	switch(fork())
+	{
+		case -1: SDI("FORK - FAIL"); exit(1); break;
+		case 0:
+			SDI("10 con");
+			for(j = 0; j < 10; j++)
+			{
+				DBconnect();
+				sleep(1);
+/*				DBbegin();
+				for(i = 0; i<1000; i++)
+				{
+					result = DBselect("select key_ from items");
+					while(row = DBfetch(result))
+					{
+						//printf("[%s]\n",row[0]);
+					}
+					DBfree_result(result);
+				}
+				DBcommit();
+*/
+				DBclose();
+			}
+			break;
+		default:
+			SDI("1 con");
+			DBconnect();
+					sleep(1);
+/*
+			for(j = 0; j < 10; j++)
+			{
+				DBbegin();
+				for(i = 0; i<1000; i++)
+				{
+					result = DBselect("select host from hosts");
+					while(row = DBfetch(result))
+					{
+						//printf("[%s]\n",row[0]);
+					}
+					DBfree_result(result);
+				}
+				DBcommit();
+			}
+*/
+			DBclose();
 	}
-	DBclose();
+	}
 
 	printf("\n-= Test completed =-\n");
 }
