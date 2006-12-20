@@ -262,7 +262,7 @@ int zbx_mutex_destroy(ZBX_MUTEX *mutex)
 }
 
 
-#if 0 && defined(HAVE_SQLITE3) && !defined(_WINDOWS)
+#if defined(HAVE_SQLITE3) && !defined(_WINDOWS)
 
 /*
    +----------------------------------------------------------------------+
@@ -270,9 +270,9 @@ int zbx_mutex_destroy(ZBX_MUTEX *mutex)
    +----------------------------------------------------------------------+
    | Copyright (c) 1997-2006 The PHP Group                                |
    +----------------------------------------------------------------------+
-   | This source file is subject to version 3.01 of the PHP license,      |
-   | that is bundled with this package in the file LICENSE, and is        |
-   | available through the world-wide-web at the following url:           |
+   | This part of source file is subject to version 3.01 of the           |
+   | PHP license, that is bundled with this package in the file LICENSE,  |
+   | and is available through the world-wide-web at the following url:    |
    | http://www.php.net/license/3_01.txt                                  |
    | If you did not receive a copy of the PHP license and are unable to   |
    | obtain it through the world-wide-web, please send a note to          |
@@ -302,7 +302,7 @@ int zbx_mutex_destroy(ZBX_MUTEX *mutex)
 #define SYSVSEM_USAGE	1
 #define SYSVSEM_SETVAL	2
 
-int php_sem_get(ZBX_MUTEX* sem_ptr, char* path_name)
+int php_sem_get(PHP_MUTEX* sem_ptr, char* path_name)
 {
 	int	
 		key,
@@ -311,14 +311,15 @@ int php_sem_get(ZBX_MUTEX* sem_ptr, char* path_name)
 
 	key_t	sem_key;
 
-	ZBX_MUTEX semid;
+	int	semid;
 	
 	struct sembuf	sop[3];
 	
 	assert(sem_ptr);
 	assert(path_name);
 
-	*sem_ptr = 0;
+	sem_ptr->semid = -1;
+	sem_ptr->count = 0;
 
 	if( -1 == (sem_key = ftok(path_name, (int)'z') ))
 	{
@@ -326,7 +327,7 @@ int php_sem_get(ZBX_MUTEX* sem_ptr, char* path_name)
 		if( -1 == (sem_key = ftok(".", (int)'z') ))
 		{
 			zbx_error("php_sem_get: Can not create IPC key for path '.' [%s]", strerror(errno));
-			return ZBX_MUTEX_ERROR;
+			return PHP_MUTEX_ERROR;
 		}
 	}			
 
@@ -339,7 +340,7 @@ int php_sem_get(ZBX_MUTEX* sem_ptr, char* path_name)
 	semid = semget(sem_key, 3, 0666 | IPC_CREAT);
 	if (semid == -1) {
 		zbx_error("php_sem_get: failed for key 0x%lx: %s", key, strerror(errno));
-		return ZBX_MUTEX_ERROR;
+		return PHP_MUTEX_ERROR;
 	}
 
 	/* Find out how many processes are using this semaphore.  Note
@@ -404,89 +405,95 @@ int php_sem_get(ZBX_MUTEX* sem_ptr, char* path_name)
 		}
 	}
 
-	*sem_ptr = semid;
+	sem_ptr->semid = semid;
 
-	return ZBX_MUTEX_OK;
+	return PHP_MUTEX_OK;
 }
 
-static int php_sysvsem_semop(ZBX_MUTEX* sem_ptr, int acquire)
+static int php_sysvsem_semop(PHP_MUTEX* sem_ptr, int acquire)
 {
 	struct sembuf sop;
 
 	assert(sem_ptr);
 
-	zbx_error("TMP!!! php_sysvsem_semop: %s semaphore (id %d)", acquire ? "acquire" : "release", *sem_ptr);
+	if(sem_ptr->semid < 0)	return PHP_MUTEX_OK;
 
-	if(!*sem_ptr)	return ZBX_MUTEX_OK;
+	if (!acquire && sem_ptr->count == 0) {
+		zbx_error("SysV semaphore (id %d) is not currently acquired.", sem_ptr->semid);
+		return PHP_MUTEX_ERROR;
+	}
 
 	sop.sem_num = SYSVSEM_SEM;
 	sop.sem_op  = acquire ? -1 : 1;
 	sop.sem_flg = SEM_UNDO;
 
-	while (semop(*sem_ptr, &sop, 1) == -1) {
+	while (semop(sem_ptr->semid, &sop, 1) == -1) {
 		if (errno != EINTR) {
-			zbx_error("php_sysvsem_semop: failed to %s semaphore (id 0x%d): %s", acquire ? "acquire" : "release", *sem_ptr, strerror(errno));
-			return ZBX_MUTEX_ERROR;
+			zbx_error("php_sysvsem_semop: failed to %s semaphore (id %d): %s", acquire ? "acquire" : "release", sem_ptr->semid, strerror(errno));
+			return PHP_MUTEX_ERROR;
 		}
 	}
+
+	sem_ptr->count -= acquire ? -1 : 1;
 			
-	return ZBX_MUTEX_OK;
+	return PHP_MUTEX_OK;
 }
 
-int php_sem_acquire(ZBX_MUTEX* sem_ptr)
+int php_sem_acquire(PHP_MUTEX* sem_ptr)
 {
 	return php_sysvsem_semop(sem_ptr, 1);
 }
 
-int php_sem_release(ZBX_MUTEX* sem_ptr)
+int php_sem_release(PHP_MUTEX* sem_ptr)
 {
 	return php_sysvsem_semop(sem_ptr, 0);
 }
 
-int php_sem_remove(ZBX_MUTEX* sem_ptr)
+int php_sem_remove(PHP_MUTEX* sem_ptr)
 {
 	union semun		un;
 	struct semid_ds	buf;
-	struct sembuf	sop;
-
+	struct sembuf	sop[2];
+	int opcnt = 1;
 
 	assert(sem_ptr);
 
-	if(!*sem_ptr)	return ZBX_MUTEX_OK;
+	if(sem_ptr->semid < 0)	return PHP_MUTEX_OK;
 
 	/* Decrement the usage count. */
 
-	sop.sem_num = SYSVSEM_USAGE;
-	sop.sem_op  = -1;
-	sop.sem_flg = SEM_UNDO;
+	sop[0].sem_num = SYSVSEM_USAGE;
+	sop[0].sem_op  = -1;
+	sop[0].sem_flg = SEM_UNDO;
 
-	if (semop(*sem_ptr, &sop, 1) == -1) {
-		zbx_error("php_sem_remove: failed for (id 0x%x): %s", *sem_ptr, strerror(errno));
-		return ZBX_MUTEX_ERROR;
+	if (sem_ptr->count) {
+		sop[1].sem_num = SYSVSEM_SEM;
+		sop[1].sem_op  = sem_ptr->count;
+		sop[1].sem_flg = SEM_UNDO;
+
+		opcnt++;
 	}
-	
+
+	if (semop(sem_ptr->semid, &sop, opcnt) == -1) {
+		zbx_error("php_sem_remove: failed for (id %d): %s", sem_ptr->semid, strerror(errno));
+		return PHP_MUTEX_ERROR;
+	}
+
 	un.buf = &buf;
-	if (semctl(*sem_ptr, 0, IPC_STAT, un) < 0) {
-		zbx_error("php_sem_remove: SysV semaphore (id 0x%x) does not (any longer) exist", *sem_ptr);
-		return ZBX_MUTEX_ERROR;
+	if (semctl(sem_ptr->semid, 0, IPC_STAT, un) < 0) {
+		zbx_error("php_sem_remove: SysV semaphore (id %d) does not (any longer) exist", sem_ptr->semid);
+		return PHP_MUTEX_ERROR;
 	}
 
-	if (semctl(*sem_ptr, 0, IPC_RMID, un) < 0) {
-		zbx_error("php_sem_remove: failed for SysV sempphore (id 0x%x): %s", *sem_ptr, strerror(errno));
-		return ZBX_MUTEX_ERROR;
+	if (semctl(sem_ptr->semid, 0, IPC_RMID, un) < 0) {
+		/* zbx_error("php_sem_remove: failed for SysV sempphore (id %d): %s", sem_ptr->semid, strerror(errno)); */
+		return PHP_MUTEX_ERROR;
 	}
 
-	*sem_ptr = 0;
+	sem_ptr->semid = -1;
 	
-	return ZBX_MUTEX_OK;
+	return PHP_MUTEX_OK;
 }
 
-#else // !HAVE_SQLITE3 || _WINDOWS
-
-int php_sem_get(ZBX_MUTEX* sem_ptr, char* path_name)		{	return ZBX_MUTEX_OK;	}
-int php_sem_acquire(ZBX_MUTEX* sem_ptr)				{	return ZBX_MUTEX_OK;	}
-int php_sem_release(ZBX_MUTEX* sem_ptr)				{	return ZBX_MUTEX_OK;	}		
-int php_sem_remove(ZBX_MUTEX* sem_ptr)				{	return ZBX_MUTEX_OK;	}
-
-#endif // HAVE_SQLITE3 && !_WINDOWS
+#endif /* HAVE_SQLITE3 && !_WINDOWS */
 

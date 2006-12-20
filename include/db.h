@@ -98,7 +98,7 @@ extern	int	CONFIG_DBPORT;
 
 void	SQ_DBfree_result(DB_RESULT result);
 
-	extern ZBX_MUTEX	sqlite_access;
+	extern PHP_MUTEX	sqlite_access;
 	
 #endif
 

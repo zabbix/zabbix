@@ -20,6 +20,9 @@
 #ifndef ZABBIX_COMMON_H
 #define ZABBIX_COMMON_H
 
+#define SDI(msg)	fprintf(stderr, "[%6i]DEBUG INFO: %s\n", getpid(), msg); fflush(stderr);
+#define SDI2(msg,p1)	fprintf(stderr, "[%6i]DEBUG INFO: " msg "\n", getpid(), p1); fflush(stderr);
+
 #include "sysinc.h"
 
 #include "zbxtypes.h"
