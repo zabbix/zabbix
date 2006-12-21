@@ -103,9 +103,7 @@ if [ "$premake" = "yes" ]
 then
   echo "Pre-making..."
   echo "Pre-making..." >> WARNINGS
-  aclocal 2>> WARNINGS
-  echo "m4_include([m4/libcurl.m4])" >> aclocal.m4
-
+  aclocal -I m4 2>> WARNINGS
   autoconf 2>> WARNINGS
   autoheader 2>> WARNINGS
   automake -a 2>> WARNINGS
