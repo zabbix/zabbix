@@ -323,8 +323,13 @@ void    init_config(void)
 		{
 	        	if(result.type & AR_STRING)
 			{
-				CONFIG_HOSTNAME=strdup(result.str);
+				CONFIG_HOSTNAME = strdup(result.str);
 			}
+			else if(result.type & AR_TEXT)
+			{
+				CONFIG_HOSTNAME = strdup(result.text);
+			}
+
 		}
 	        free_result(&result);
 

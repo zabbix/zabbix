@@ -1,5 +1,7 @@
 Changes for 1.1.5:
 
+ - improved errors messaging of startups (Eugene)
+ - fixed hostname receaving on startup of ZABBIX agent (Eugene)
  - fixed printing of stdout/stderr (Eugene)
  - fixed buffer overflow while processing SNMP IP addresses (Alexei)
  - fixed agent's calculation of network statistics (Alexei)
