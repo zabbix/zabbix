@@ -24,6 +24,31 @@
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_fork                                                         *
+ *                                                                            *
+ * Purpose: Flush stdout and stderr before forking                            *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: same as system fork function                                 *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *          Use this function instead of system fork function!                *
+ *                                                                            *
+ ******************************************************************************/
+#if !defined(_WINDOWS)
+int	zbx_fork()
+{
+	fflush(stdout);
+	fflush(stderr);
+	return fork();
+}
+#endif
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_thread_start                                                 *
  *                                                                            *
  * Purpose: Start the handled function as "thread"                            *
@@ -56,7 +81,7 @@ ZBX_THREAD_HANDLE zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), void *args
 
 #else /* not _WINDOWS */
 
-	thread = fork();
+	thread = zbx_fork();
 
 	if(thread == 0) /* child process */
 	{

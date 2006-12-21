@@ -21,6 +21,7 @@
 #include "daemon.h"
 
 #include "pid.h"
+#include "cfg.h"
 #include "log.h"
 
 char	*APP_PID_FILE	= NULL;
@@ -116,7 +117,7 @@ int	daemon_start(int allow_root)
 
 	}
 
-	if( (pid = fork()) != 0 )	
+	if( (pid = zbx_fork()) != 0 )	
 	{				
 		exit( 0 );		
 	}				
@@ -125,7 +126,7 @@ int	daemon_start(int allow_root)
 	
 	signal( SIGHUP, SIG_IGN );
 
-	if( (pid = fork()) !=0 )	
+	if( (pid = zbx_fork()) !=0 )	
 	{				
 		exit( 0 );		
 	}				
@@ -133,14 +134,19 @@ int	daemon_start(int allow_root)
 	chdir("/");
 	umask(0002);
 
-	for(i=0; i<MAXFD; i++)
-	{
-		/* Do not close stderr */
-		if(i == fileno(stderr)) continue; //TODO!!! redirection;
-		/* Do not close stdout */
-		if(i == fileno(stdout)) continue; //TODO!!! redirestion;
+	for(i=0; i<MAXFD; i++)	close(i);
 
-		close(i);
+	open("/dev/null", O_RDONLY);	/* stdin */
+
+	if(CONFIG_LOG_FILE)
+	{
+		fopen(CONFIG_LOG_FILE, "a+");	/* stdout */
+		fopen(CONFIG_LOG_FILE, "a+");	/* stderr */
+	}
+	else
+	{
+		open("/dev/null", O_RDWR);	/* stdout */
+		open("/dev/null", O_RDWR);	/* stderr */
 	}
 
 #ifdef HAVE_SYS_RESOURCE_SETPRIORITY

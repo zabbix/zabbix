@@ -337,7 +337,7 @@ void test()
 
 	for(k = 0; k < 10; k++)
 	{
-	switch(fork())
+	switch( zbx_fork() )
 	{
 		case -1: SDI("FORK - FAIL"); exit(1); break;
 		case 0:
@@ -501,6 +501,7 @@ int main(int argc, char **argv)
 	}
 
 	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_server. ZABBIX %s.", ZABBIX_VERSION);
+
 	test();
 	return 0;
 #endif /* TEST */
@@ -578,7 +579,7 @@ int MAIN_ZABBIX_ENTRY(void)
 
 	for(i=1; i<=CONFIG_POLLER_FORKS+CONFIG_TRAPPERD_FORKS+CONFIG_PINGER_FORKS+CONFIG_ALERTER_FORKS+CONFIG_HOUSEKEEPER_FORKS+CONFIG_TIMER_FORKS+CONFIG_UNREACHABLE_POLLER_FORKS+CONFIG_NODEWATCHER_FORKS; i++)
 	{
-		if((pid = fork()) == 0)
+		if((pid = zbx_fork()) == 0)
 		{
 			server_num = i;
 			break; 
