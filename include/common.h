@@ -20,8 +20,13 @@
 #ifndef ZABBIX_COMMON_H
 #define ZABBIX_COMMON_H
 
-#define SDI(msg)	fprintf(stderr, "[%6i]DEBUG INFO: %s\n", getpid(), msg); fflush(stderr);
-#define SDI2(msg,p1)	fprintf(stderr, "[%6i]DEBUG INFO: " msg "\n", getpid(), p1); fflush(stderr);
+#if defined(_WINDOWS)
+#	define SDI(msg)		fprintf(stderr, "DEBUG INFO: %s\n", msg); fflush(stderr);
+#	define SDI2(msg,p1)	fprintf(stderr, "DEBUG INFO: " msg "\n", p1); fflush(stderr);
+#else
+#	define SDI(msg)		fprintf(stderr, "[%6i]DEBUG INFO: %s\n", getpid(), msg); fflush(stderr);
+#	define SDI2(msg,p1)	fprintf(stderr, "[%6i]DEBUG INFO: " msg "\n", getpid(), p1); fflush(stderr);
+#endif
 
 #include "sysinc.h"
 

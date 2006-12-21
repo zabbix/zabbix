@@ -41,6 +41,8 @@
 	#define zbx_sleep(sec) Sleep(((DWORD)(sec))*((DWORD)1000))
 
 #else /* not _WINDOWS */
+	
+	int	zbx_fork();
 
 	#define ZBX_THREAD_ERROR (-1)
 
