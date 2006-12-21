@@ -21,7 +21,6 @@
 #include "daemon.h"
 
 #include "pid.h"
-#include "cfg.h"
 #include "log.h"
 
 char	*APP_PID_FILE	= NULL;
@@ -134,11 +133,15 @@ int	daemon_start(int allow_root)
 	chdir("/");
 	umask(0002);
 
-	for(i=0; i<MAXFD; i++)	close(i);
+	for(i=0; i<MAXFD; i++)
+	{
+		/* Do not close stderr */
+		if(i == fileno(stderr)) continue; //TODO!!! redirection;
+		/* Do not close stdout */
+		if(i == fileno(stdout)) continue; //TODO!!! redirestion;
 
-	open(NULL != CONFIG_LOG_FILE ? CONFIG_LOG_FILE : "/dev/null", O_RDONLY);	/* stdin */
-	open(NULL != CONFIG_LOG_FILE ? CONFIG_LOG_FILE : "/dev/null", O_RDWR);		/* stdout */
-	open(NULL != CONFIG_LOG_FILE ? CONFIG_LOG_FILE : "/dev/null", O_RDWR);		/* stderr */
+		close(i);
+	}
 
 #ifdef HAVE_SYS_RESOURCE_SETPRIORITY
 
