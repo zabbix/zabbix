@@ -501,7 +501,6 @@ int main(int argc, char **argv)
 	}
 
 	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_server. ZABBIX %s.", ZABBIX_VERSION);
-
 	test();
 	return 0;
 #endif /* TEST */
@@ -535,8 +534,6 @@ int MAIN_ZABBIX_ENTRY(void)
 
 /*	zabbix_log( LOG_LEVEL_WARNING, "INFO [%s]", ZBX_SQL_MOD(a,%d)); */
 	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_server. ZABBIX %s.", ZABBIX_VERSION);
-
-	zbx_error("TEST");
 
 	DBconnect();
 
