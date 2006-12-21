@@ -437,7 +437,13 @@ if(isset($DB_TYPE) && $DB_TYPE == "ORACLE") {
 	{
 		global $DB_TYPE;
 
-		if(isset($DB_TYPE) && $DB_TYPE == "SQLITE3") $odiv = '/'; else $odiv = 'div';
+		switch($DB_TYPE)
+		{
+			case "MYSQL":
+				$odiv = 'div';
+			default:
+				$odiv = '/';
+		}
 
 		return '('.$id_name.' '.$odiv.' 100000000000000)';
 	}
