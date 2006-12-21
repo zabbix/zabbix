@@ -88,3 +88,10 @@ int	comms_parse_response(char *xml,char *host,char *key, char *data, char *lastl
 
 	return ret;
 }
+
+int	zbx_fork()
+{
+	fflush(stdout);
+	fflush(stderr);
+	return fork();
+}

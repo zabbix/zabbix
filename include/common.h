@@ -459,4 +459,6 @@ int	cmp_double(double a,double b);
 
 int       SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
+int	zbx_fork();
+
 #endif

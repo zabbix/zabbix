@@ -1,5 +1,6 @@
 Changes for 1.1.5:
 
+ - fixed printing of stdout/stderr (Eugene)
  - fixed buffer overflow while processing SNMP IP addresses (Alexei)
  - fixed agent's calculation of network statistics (Alexei)
  - fixed some compilation warnings (Alexei)

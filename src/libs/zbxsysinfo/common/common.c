@@ -1362,14 +1362,14 @@ zabbix_log(LOG_LEVEL_WARNING, "RUN_COMMAND cmd = '%s'",cmd);
 	
 	zabbix_log(LOG_LEVEL_DEBUG, "RUN_COMMAND to be started as NOWAIT",flag);
 	
-	pid = fork(); /* run new thread 1 */
+	pid = zbx_fork(); /* run new thread 1 */
 	switch(pid)
 	{
 	case -1:
 		zabbix_log(LOG_LEVEL_WARNING, "fork failed for '%s'",command);
 		return SYSINFO_RET_FAIL;
 	case 0:
-		pid = fork(); /* run new tread 2 to replace by command */
+		pid = zbx_fork(); /* run new tread 2 to replace by command */
 		switch(pid)
 		{
 		case -1:

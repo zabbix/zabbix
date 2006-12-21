@@ -132,7 +132,7 @@ static int execute_action(DB_ALERT *alert,DB_MEDIATYPE *mediatype, char *error, 
 
 /*		if(-1 == execl("/home/zabbix/bin/lmt.sh","lmt.sh",alert->sendto,alert->subject,alert->message,(char *)0))*/
 
-		pid=fork();
+		pid = zbx_fork();
 		if(0 != pid)
 		{
 			waitpid(pid,NULL,0);

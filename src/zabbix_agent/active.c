@@ -564,7 +564,7 @@ pid_t	child_active_make(int i,char *server, int port)
 {
 	pid_t	pid;
 
-	if((pid = fork()) >0)
+	if((pid = zbx_fork()) >0)
 	{
 			return (pid);
 	}
