@@ -30,7 +30,7 @@
 		$result = false;
 
 		if($db_result = DBselect("select * from sysmaps_elements where sysmapid=".$sysmapid.
-			" and ".DBid2nodeid('sysmapid')." in (".get_accessible_nodes_by_user($USER_DETAILS,$perm).")"))
+			" and ".DBid2nodeid('sysmapid')." not in (".get_accessible_nodes_by_user($USER_DETAILS,$perm,PERM_MODE_LT).")"))
 		{
 			$result = true;
 			
@@ -67,6 +67,12 @@
 						break;
 				}
 			}
+		}
+		else
+		{
+			if(DBselect("select sysmapid from sysmaps where sysmapid=".$sysmapid.
+				" and ".DBid2nodeid('sysmapid')." not in (".get_accessible_nodes_by_user($USER_DETAILS,$perm,PERM_MODE_LT).")"))
+					$result = true;
 		}
 		return $result;
 	}

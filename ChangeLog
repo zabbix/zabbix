@@ -1,5 +1,6 @@
 Changes for 1.3.2:
 
+ - fixed permission system for empty maps (Eugene)
  - improved sqlite3 database support (Eugene)
  - developed simple trigger expression editor (Eugene)
  - fixed history viewing of log files (Eugene)
