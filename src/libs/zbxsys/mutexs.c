@@ -474,7 +474,7 @@ int php_sem_remove(PHP_MUTEX* sem_ptr)
 		opcnt++;
 	}
 
-	if (semop(sem_ptr->semid, &sop, opcnt) == -1) {
+	if (semop(sem_ptr->semid, sop, opcnt) == -1) {
 		zbx_error("php_sem_remove: failed for (id %d): %s", sem_ptr->semid, strerror(errno));
 		return PHP_MUTEX_ERROR;
 	}
