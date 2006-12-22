@@ -116,9 +116,9 @@ int	send_sms(char *device,char *number,char *message, char *error, int max_error
 /*  0  */	{"ATE0\r"		, "OK"		},	/* Turn off echo */
 /*  1  */	{"AT\r"			, "OK"		},	/* Init modem */
 /*  2  */	{"AT+CMGF=1\r"		, "OK"		},	/* Switch to text mode */
-/*  3  */	{"AT+CMGS="		, NULL		},	/* Set phone number */
+/*  3  */	{"AT+CMGS=\""		, NULL		},	/* Set phone number */
 /*  4  */	{number			, NULL		},	/* Write phone number */
-/*  5  */	{"\r"			, ">"		},	/* Set phone number */
+/*  5  */	{"\"\r"			, ">"		},	/* Set phone number */
 /*  6  */	{message		, NULL		},	/* Write message */
 /*  7  */	{"\x01a"		, "+CMGS: "	},	/* Send message */
 /*  8  */	{NULL			, "OK"		},
