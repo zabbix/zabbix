@@ -56,47 +56,85 @@ static int write_gsm(int fd, char *str, char *error, int max_error_len)
 	return ret;
 }
 
-static int read_gsm(int fd, char *expect, char *error, int max_error_len)
+static int read_gsm(int fd, const char *expect, char *error, int max_error_len)
 {
-	char	buffer[255];
-	char	*bufptr;
-	int	i,nbytes;
+	static char	buffer[0xFF];
+	static char	*ebuf = buffer;
+	static char	*sbuf = buffer;
+
+	int	i, nbytes;
 	int	ret = SUCCEED;
 
 	/* read characters into our string buffer until we get a CR or NL */
-	bufptr = buffer;
-	while ((nbytes = read(fd, bufptr, buffer + sizeof(buffer) - bufptr - 1)) > 0)
+	while ((nbytes = read(fd, ebuf, buffer + sizeof(buffer) - 1 - ebuf)) > 0)
 	{
-		bufptr += nbytes;
-		if (bufptr[-1] == '\n' || bufptr[-1] == '\r')
+		ebuf += nbytes;
+		if (ebuf[-1] == '\n' || ebuf[-1] == '\r')
 			break;
 	}
 	/* nul terminate the string and see if we got an OK response */
-	*bufptr = '\0';
-/*	printf("Read buffer [%s]\n", buffer);
-	for(i=0;i<strlen(buffer);i++)
-		printf("[%x]\n",buffer[i]);*/
-	zabbix_log(LOG_LEVEL_WARNING, "Read buffer [%s]\n", buffer);
-	for(i=0;i<strlen(buffer);i++)
-		zabbix_log(LOG_LEVEL_WARNING, "[%x]\n", buffer[i]);
-	if (strstr(buffer, expect) == NULL)
+	*ebuf = '\0';
+
+	for( ; sbuf < ebuf && (*sbuf == '\n' || *sbuf == '\r'); sbuf++); /* left trim of '\r' & '\n' */
+	for(i = 0 ; i < (ebuf - sbuf) && (sbuf[i] != '\n' && sbuf[i] != '\r'); i++); /* find first '\r' & '\n' */
+
+	if(i < ebuf - sbuf)	sbuf[i++] = '\0';
+
+	/* start WORNING info */
+	zabbix_log(LOG_LEVEL_DEBUG, "Read buffer [%s]", sbuf);
+	/* for(i=0;i<strlen(buffer);i++)
+		zabbix_log(LOG_LEVEL_DEBUG, "[%x]", buffer[i]); */
+	/* end WORNING info */
+
+	if (strstr(sbuf, expect) == NULL)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Read something unexpected from GSM modem");
+		zabbix_log(LOG_LEVEL_DEBUG, "Read something unexpected from GSM modem. Expected [%s]", expect);
 		zabbix_syslog("Read something unexpected from GSM modem");
 		snprintf(error,max_error_len-1, "Read something unexpected from GSM modem");
 		ret = FAIL;
 	}
+	
+	sbuf += i;
+
+	if(sbuf != buffer)
+	{
+		memmove(buffer, sbuf, ebuf - sbuf + 1); /* +1 for '\0' */
+		sbuf = buffer;
+	}
+
 	return ret;
 }
 
+typedef struct {
+	char 		*message;
+	const char 	*result;
+} zbx_sms_scenario;
+
 int	send_sms(char *device,char *number,char *message, char *error, int max_error_len)
 {
-	int	f;
-	char	str[MAX_STRING_LEN];
+	zbx_sms_scenario scenario[] = {
+/*  0  */	{"ATE0\r"		, "OK"		},	/* Turn off echo */
+/*  1  */	{"AT\r"			, "OK"		},	/* Init modem */
+/*  2  */	{"AT+CMGF=1\r"		, "OK"		},	/* Switch to text mode */
+/*  3  */	{"AT+CMGS=\""		, NULL		},	/* Set phone number */
+/*  4  */	{number			, NULL		},	/* Write phone number */
+/*  5  */	{"\"\r"			, ">"		},	/* Set phone number */
+/*  6  */	{message		, NULL		},	/* Write message */
+/*  7  */	{"\x01a"		, "+CMGS: "	},	/* Send message */
+/*  8  */	{NULL			, "OK"		},
+/* EOS */	{NULL			, NULL		}
+		};
 
-	struct termios options, old_options;
+	zbx_sms_scenario *step = NULL;
 
-	int	ret = SUCCEED;
+	struct termios
+		options,
+		old_options;
+
+	int	i,
+		f,
+		ret = SUCCEED;
+
 
 	f=open(device,O_RDWR | O_NOCTTY | O_NDELAY);
 	if(f == -1)
@@ -123,44 +161,18 @@ int	send_sms(char *device,char *number,char *message, char *error, int max_error
 	options.c_cc[VTIME] = 100;
 
 	tcsetattr(f, TCSANOW, &options);
-	
-	/* Turn off echo */
-	if(ret == SUCCEED)
-		ret = write_gsm(f,"ATE0\r", error, max_error_len);
-	if(ret == SUCCEED)
-		ret = read_gsm(f,"\rOK\r", error, max_error_len);
 
-	/* Init modem */
-	if(ret == SUCCEED)
-		ret = write_gsm(f,"AT\r", error, max_error_len);
-	if(ret == SUCCEED)
-		ret = read_gsm(f,"\rOK\r", error, max_error_len);
-
-	/* Switch to text mode */
-	if(ret == SUCCEED)
-		ret = write_gsm(f,"AT+CMGF=1\r", error, max_error_len);
-	if(ret == SUCCEED)
-		ret = read_gsm(f,"\rOK\r", error, max_error_len);
-
-	/* Send phone number */
-	if(ret == SUCCEED)
+	for(step = scenario; step->message || step->result; step++)
 	{
-		snprintf(str, MAX_STRING_LEN-1,"AT+CMGS=\"%s\"\r", number);
-		ret = write_gsm(f,str, error, max_error_len);
+		if(step->message)
+		{
+			if(FAIL == write_gsm(f, step->message, error, max_error_len)) break;
+		}
+		if(step->result)
+		{
+			if(FAIL == read_gsm(f, step->result, error, max_error_len)) break;
+		}
 	}
-	if(ret == SUCCEED)
-		ret = read_gsm(f,"\r> ", error, max_error_len);
-
-	/* Send message */
-	if(ret == SUCCEED)
-	{
-		snprintf(str, MAX_STRING_LEN-1,"%s\x01a", message);
-		ret = write_gsm(f, str, error, max_error_len);
-	}
-	if(ret == SUCCEED)
-		ret = read_gsm(f,"\r+CMGS: ", error, max_error_len);
-	if(ret == SUCCEED)
-		ret = read_gsm(f,"OK\r", error, max_error_len);
 
 	tcsetattr(f, TCSANOW, &old_options);
 	close(f);
