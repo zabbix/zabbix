@@ -105,7 +105,10 @@ COpt::savesqlrequest($query);
 			{
 				$query .= ' limit '.intval($limit);
 			}
-			$result=pg_exec($DB,$query);
+			if(!($result=pg_exec($DB,$query)))
+			{
+				echo "Error in query [$query] [".pg_errormessage()."]";
+			}
 			return $result;
 		}
 		if($DB_TYPE == "ORACLE")
@@ -152,7 +155,10 @@ COpt::savesqlrequest($query);
 		}
 		if($DB_TYPE == "POSTGRESQL")
 		{
-			$result=pg_exec($DB,$query);
+			if(!($result=pg_exec($DB,$query)))
+			{
+				echo "Error in query [$query] [".pg_errormessage()."]";
+			}
 		}
 		if($DB_TYPE == "ORACLE")
 		{
