@@ -89,7 +89,7 @@ static int read_gsm(int fd, const char *expect, char *error, int max_error_len)
 	if (strstr(sbuf, expect) == NULL)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Read something unexpected from GSM modem. Expected [%s]", expect);
-		zabbix_syslog("Read something unexpected from GSM modem"); !!!! segmentation falaut !!!!
+		zabbix_syslog("Read something unexpected from GSM modem");
 		zbx_snprintf(error,max_error_len, "Read something unexpected from GSM modem. Expected [%s]", expect);
 		ret = FAIL;
 	}
