@@ -1,5 +1,6 @@
 Changes for 1.1.5:
 
+ - added 'with oids' to PostgreSQL table definitions (Alexei)
  - fixed sms sender (Eugene)
  - improved errors messaging of startups (Eugene)
  - fixed hostname receaving on startup of ZABBIX agent (Eugene)
