@@ -272,7 +272,10 @@ COpt::savesqlrequest($query);
 				{
 					$query .= ' limit '.intval($limit);
 				}
-				$result=pg_exec($DB,$query);
+				if(!($result = pg_query($DB,$query)))
+				{
+					error("Error in query [$query] [".pg_last_error()."]");
+				}
 				break;
 			case "ORACLE":
 				if(is_numeric($limit))
@@ -349,7 +352,10 @@ COpt::savesqlrequest($query);
 				}
 				break;
 			case "POSTGRESQL":
-				$result = pg_exec($DB,$query);
+				if(!($result = pg_query($DB,$query)))
+				{
+					error("Error in query [$query] [".pg_last_error()."]");
+				}
 				break;
 			case "ORACLE":
 				$result = DBselect($query);
