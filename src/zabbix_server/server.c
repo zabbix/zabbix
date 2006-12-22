@@ -327,15 +327,27 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
 
 #ifdef TEST
 
+#include "zbxsock.h"
+
 void test()
 {
 	char err[0xFF];
+	struct hostent *host;
 
 	printf("-= Test Started =-\n");
 
-	send_sms("/tmp/test_sms", "222212", "message asd", err, sizeof(err));
+	host = zbx_gethost("www.zabbix.com");
 
-	printf("\n-= Test completed =-\n");
+	if(host)
+	{
+		SDI2("HOST: %s", 	host->h_name);
+		SDI2("HADDR: %i",	host->h_addr[0] & 0xFF);
+		SDI2("HADDR: %i",	host->h_addr[1] & 0xFF);
+		SDI2("HADDR: %i",	host->h_addr[2] & 0xFF);
+		SDI2("HADDR: %i",	host->h_addr[3] & 0xFF);
+	}
+
+	printf("-= Test completed =-\n");
 }
 #endif /* TEST */
 
