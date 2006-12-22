@@ -22,6 +22,31 @@
 
 #include "log.h"
 
+struct hostent	*zbx_gethost(char *hostname)
+{
+	unsigned int	addr;
+	struct hostent*	host;
+
+	assert(hostname);
+
+	host = gethostbyname(hostname);
+	if(host)	return host;
+
+	addr = inet_addr(hostname);
+
+	host = gethostbyaddr((char *)&addr, 4, AF_INET);
+
+	if(host)        return host;
+
+#ifdef	HAVE_HSTRERROR		
+	zabbix_log( LOG_LEVEL_WARNING, "gethost() failed for address '%s' [%s]", hostname, (char*)hstrerror((int)h_errno));
+#else
+	zabbix_log( LOG_LEVEL_WARNING, "gethost() failed for address '%s' [%s]", hostname, strerror_from_system(h_errno));
+#endif
+	return (struct hostent*) NULL;
+}
+
+
 #if defined(_WINDOWS)
 int	zbx_sock_init(void)
 {
