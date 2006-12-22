@@ -23,7 +23,7 @@
 #include "sysinc.h"
 
 #define	ZABBIX_REVDATE	"14 November 2006"
-#define	ZABBIX_VERSION	"1.1.4"
+#define	ZABBIX_VERSION	"1.1.5"
 
 #if defined(WIN32)
 #	pragma warning (disable: 4100)
