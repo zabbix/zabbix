@@ -208,11 +208,13 @@ include_once "include/page_header.php";
 					S_TRIGGERS	=> !isset($triggers[$host['hostid']]) ? null :
 								'select i.hostid, t.description as info, count(distinct i.hostid) as cnt'.
 								' from functions f, items i, triggers t'.
-								'  where t.triggerid=f.triggerid and f.itemid=i.itemid group by f.triggerid',
+								' where t.triggerid=f.triggerid and f.itemid=i.itemid'.
+								' group by f.triggerid, i.hostid, t.description',
 					S_GRAPHS	=> !isset($graphs[$host['hostid']]) ? null :
 								'select g.name as info, i.hostid, count(distinct i.hostid) as cnt'.
 								' from graphs_items gi, items i, graphs g '.
-								' where g.graphid=gi.graphid and gi.itemid=i.itemid group by gi.graphid'
+								' where g.graphid=gi.graphid and gi.itemid=i.itemid'.
+								' group by gi.graphid, i.hostid'
 
 					);
 				foreach($sqls as $el_type => $sql)
@@ -347,7 +349,7 @@ include_once "include/page_header.php";
 				/* calculate triggers */
 				$trigger_cnt = 0;
 				$db_triggers = DBselect('select f.triggerid, i.hostid, count(distinct i.hostid) as cnt from functions f, items i '.
-					' where f.itemid=i.itemid group by f.triggerid');
+					' where f.itemid=i.itemid group by f.triggerid, i.hostid');
 				while($db_tr = DBfetch($db_triggers)) if($db_tr['cnt'] == 1 && $db_tr['hostid'] == $row['hostid']) $trigger_cnt++;
 				if($trigger_cnt > 0)
 				{
@@ -365,7 +367,7 @@ include_once "include/page_header.php";
 				$graph_cnt = 0;
 				$db_graphs = DBselect('select gi.graphid, i.hostid, count(distinct i.hostid) as cnt'.
 					' from graphs_items gi, items i '.
-					' where gi.itemid=i.itemid group by gi.graphid');
+					' where gi.itemid=i.itemid group by gi.graphid, i.hostid');
 				while($db_tr = DBfetch($db_graphs)) if($db_tr['cnt'] == 1 && $db_tr['hostid'] == $row['hostid']) $graph_cnt++;
 				if($graph_cnt > 0)
 				{
