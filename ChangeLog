@@ -1,8 +1,6 @@
 Changes for 1.3.2:
 
  - fixed SQL statements for PostgreSQL (Eugene)
- - added error reporting of PostgreSQL for frontend (Eugene)
- - fixed sms sender (Eugene)
  - fixed printing of stdout/stderr (Eugene)
  - fixed permission system for empty maps (Eugene)
  - improved sqlite3 database support (Eugene)
@@ -56,6 +54,9 @@ Integrated from 1.1.x
 
 1.1.5
 
+ - improved 'service_status[*]' allowed service name and display name (Eugnene)
+ - added error reporting of PostgreSQL for frontend (Eugene)
+ - fixed sms sender (Eugene)
  - fixed buffer overflow while processing SNMP IP addresses (Alexei)
  - fixed agent's calculation of network statistics (Alexei)
  - fixed some compilation warnings (Alexei)
