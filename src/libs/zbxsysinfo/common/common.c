@@ -1208,6 +1208,11 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	if (!CreateProcess(NULL,command,NULL,NULL,TRUE,0,NULL,NULL,&si,&pi))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Unable to create process: '%s' [%s]", command, strerror_from_system(GetLastError()));
+
+		// Remove temporary file
+		CloseHandle(hOutput);
+		DeleteFile(szTempFile);
+
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -1223,6 +1228,10 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	ReadFile(hOutput, cmd_result, MAX_STRING_LEN-1, &len, NULL);
 
 	cmd_result[len] = '\0';
+	
+	// Remove temporary file
+	CloseHandle(hOutput);
+	DeleteFile(szTempFile);
 
 #else /* not _WINDOWS */
 	zbx_strlcpy(command, param, sizeof(command));
