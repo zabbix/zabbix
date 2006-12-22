@@ -309,7 +309,7 @@
 				zbx_xmlwriter_start_element ($memory,XML_TAG_TRIGGERS);
 				$db_triggers = DBselect('select f.triggerid, i.hostid, count(distinct i.hostid) as cnt '.
 					' from functions f, items i '.
-					' where f.itemid=i.itemid group by f.triggerid');
+					' where f.itemid=i.itemid group by f.triggerid, i.hostid');
 				while($trigger = DBfetch($db_triggers))
 				{
 					if($trigger['hostid'] != $hostid || $trigger['cnt']!=1) continue;
@@ -322,7 +322,7 @@
 				zbx_xmlwriter_start_element ($memory, XML_TAG_GRAPHS);
 				$db_graphs = DBselect('select gi.graphid, i.hostid, count(distinct i.hostid) as cnt '.
 					' from graphs_items gi, items i '.
-					' where gi.itemid=i.itemid group by gi.graphid');
+					' where gi.itemid=i.itemid group by gi.graphid, i.hostid');
 				while($graph = DBfetch($db_graphs))
 				{
 					if($graph['hostid'] != $hostid || $graph['cnt']!=1) continue;

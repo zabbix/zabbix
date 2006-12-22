@@ -175,17 +175,19 @@ COpt::counter_up('perm');
 			$where.' group by h.hostid'.
 			' order by n.name,n.nodeid, g.name, h.host');*/
 
-		$db_hosts = DBselect('select distinct n.nodeid,n.name as node_name,h.*, min(r.permission) as permission '.
+		$db_hosts = DBselect('select distinct n.nodeid,n.name as node_name,h.hostid,h.host, min(r.permission) as permission '.
 			' from hosts h left join hosts_groups hg on hg.hostid=h.hostid '.
 			' left join groups g on g.groupid=hg.groupid '.
 			' left join rights r on r.id=g.groupid and r.type='.RESOURCE_TYPE_GROUP.
 			' left join users_groups ug on ug.userid='.$userid.
 			' left join nodes n on '.DBid2nodeid('h.hostid').'=n.nodeid '.
-			$where.' group by h.hostid'.
-			' order by n.name,n.nodeid, g.name, h.host');
+			$where.' group by h.hostid,n.nodeid,n.name,h.host '.
+			' order by n.name,n.nodeid, h.host');
 
 		while($host_data = DBfetch($db_hosts))
 		{
+			$host_data += DBfetch(DBselect('select * from hosts where hostid='.$host_data['hostid']));
+
 			if(is_null($host_data['nodeid'])) $host_data['nodeid'] = id2nodeid($host_data['hostid']);
 
 			/* if no rights defined used node rights */
@@ -257,11 +259,11 @@ COpt::counter_up('perm');
 			$where.' group by hg.groupid, hg.name, g.userid '.
 			' order by n.name, hg.name');*/
 
-		$db_groups = DBselect('select n.nodeid as nodeid,n.name as node_name,hg.*, min(r.permission) as permission '.
+		$db_groups = DBselect('select n.nodeid as nodeid,n.name as node_name,hg.groupid,hg.name, min(r.permission) as permission '.
 			' from groups hg left join rights r on r.id=hg.groupid and r.type='.RESOURCE_TYPE_GROUP.
 			' left join users_groups g on r.groupid=g.usrgrpid and g.userid='.$userid.
 			' left join nodes n on '.DBid2nodeid('hg.groupid').'=n.nodeid '.
-			$where.' group by hg.groupid, hg.name, g.userid '.
+			$where.' group by n.nodeid, n.name, hg.groupid, hg.name, g.userid '.
 			' order by n.name, hg.name');
 
 		while($group_data = DBfetch($db_groups))
@@ -331,13 +333,18 @@ COpt::counter_up('perm');
 			' right join nodes n on r.id=n.nodeid'.$where_nodeid.
 			' group by n.nodeid');*/
 
-		$db_nodes = DBselect('select n.*,min(r.permission) as permission'.
+		$db_nodes = DBselect('select n.nodeid,min(r.permission) as permission'.
 			' from nodes n left join rights r on r.id=n.nodeid and r.type='.RESOURCE_TYPE_NODE.
 			' left join users_groups g on r.groupid=g.usrgrpid and g.userid='.$userid.
 			$where_nodeid.' group by n.nodeid');
 
 		while(($node_data = DBfetch($db_nodes)) || (!isset($do_break) && !ZBX_DISTRIBUTED))
 		{
+			if($node_data && $perm_res == PERM_RES_DATA_ARRAY)
+			{
+				$node_data += DBfetch(DBselect('select * from nodes where nodeid='.$node_data['nodeid']));
+			}
+
 			if(!ZBX_DISTRIBUTED)
 			{
 				if(!$node_data)

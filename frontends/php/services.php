@@ -300,7 +300,7 @@ include_once "include/page_header.php";
 			" and (sl.serviceupid".(!isset($service) ?
 				" is NULL " :
 				"=".$service['serviceid']." or s.serviceid=".$service['serviceid'] ).") ".
-			" order by sl.serviceupid,s.sortorder,s.name");
+			" order by s.sortorder,s.name");
 	
 	while($db_service_data = DBfetch($db_services))
 	{
