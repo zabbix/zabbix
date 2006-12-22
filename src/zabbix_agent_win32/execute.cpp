@@ -31,6 +31,7 @@ LONG H_Execute(char *cmd,char *arg,char **value)
    HANDLE hOutput;
    char szTempPath[MAX_PATH],szTempFile[MAX_PATH];
    DWORD dwBytes=0;
+   LONG ret = SYSINFO_RC_ERROR;
 
    // Extract command line
    ptr1=strchr(cmd,'{');
@@ -41,9 +42,11 @@ LONG H_Execute(char *cmd,char *arg,char **value)
    // Create temporary file to hold process output
    GetTempPath(MAX_PATH-1,szTempPath);
    GetTempFileName(szTempPath,"zbx",0,szTempFile);
-   sa.nLength=sizeof(SECURITY_ATTRIBUTES);
-   sa.lpSecurityDescriptor=NULL;
-   sa.bInheritHandle=TRUE;
+
+   sa.nLength			= sizeof(SECURITY_ATTRIBUTES);
+   sa.lpSecurityDescriptor	= NULL;
+   sa.bInheritHandle		= TRUE;
+
    hOutput=CreateFile(szTempFile,GENERIC_READ | GENERIC_WRITE,0,&sa,CREATE_ALWAYS,FILE_ATTRIBUTE_TEMPORARY,NULL);
    if (hOutput==INVALID_HANDLE_VALUE)
    {
@@ -53,45 +56,50 @@ LONG H_Execute(char *cmd,char *arg,char **value)
 
    // Fill in process startup info structure
    memset(&si,0,sizeof(STARTUPINFO));
-   si.cb=sizeof(STARTUPINFO);
-   si.dwFlags=STARTF_USESTDHANDLES;
-   si.hStdInput=GetStdHandle(STD_INPUT_HANDLE);
-   si.hStdOutput=hOutput;
-   si.hStdError=GetStdHandle(STD_ERROR_HANDLE);
+   si.cb	= sizeof(STARTUPINFO);
+   si.dwFlags	= STARTF_USESTDHANDLES;
+   si.hStdInput	= GetStdHandle(STD_INPUT_HANDLE);
+   si.hStdOutput= hOutput;
+   si.hStdError	= GetStdHandle(STD_ERROR_HANDLE);
 
    // Create new process
    if (!CreateProcess(NULL,ptr1,NULL,NULL,TRUE,0,NULL,NULL,&si,&pi))
    {
       WriteLog(MSG_CREATE_PROCESS_FAILED,EVENTLOG_ERROR_TYPE,"se",ptr1,GetLastError());
-      return SYSINFO_RC_NOTSUPPORTED;
+
+      ret = SYSINFO_RC_NOTSUPPORTED;
    }
+   else
+   {
+	   // Wait for process termination and close all handles
+	   WaitForSingleObject(pi.hProcess,INFINITE);
+	   CloseHandle(pi.hThread);
+	   CloseHandle(pi.hProcess);
 
-   // Wait for process termination and close all handles
-   WaitForSingleObject(pi.hProcess,INFINITE);
-   CloseHandle(pi.hThread);
-   CloseHandle(pi.hProcess);
+	   // Rewind temporary file for reading
+	   SetFilePointer(hOutput,0,NULL,FILE_BEGIN);
 
-   // Rewind temporary file for reading
-   SetFilePointer(hOutput,0,NULL,FILE_BEGIN);
+	   *value=(char *)malloc(MAX_STRING_LEN);	// Called and freed in function "ProcessCommand", pointer "strResult"
 
-   *value=(char *)malloc(MAX_STRING_LEN);	// Called and freed in function "ProcessCommand", pointer "strResult"
+	   // Read process output
+	   ReadFile(hOutput,*value,MAX_STRING_LEN-1,&dwBytes,NULL);
+	   (*value)[dwBytes]=0;
 
-   // Read process output
-   ReadFile(hOutput,*value,MAX_STRING_LEN-1,&dwBytes,NULL);
-   (*value)[dwBytes]=0;
+	   ptr1=strchr(*value,'\r');
+	   if (ptr1!=NULL)
+	      *ptr1=0;
+	   ptr1=strchr(*value,'\n');
+	   if (ptr1!=NULL)
+	      *ptr1=0;
 
-   ptr1=strchr(*value,'\r');
-   if (ptr1!=NULL)
-      *ptr1=0;
-   ptr1=strchr(*value,'\n');
-   if (ptr1!=NULL)
-      *ptr1=0;
+	   ret = SYSINFO_RC_SUCCESS;
+   }
 
    // Remove temporary file
    CloseHandle(hOutput);
    DeleteFile(szTempFile);
 
-   return SYSINFO_RC_SUCCESS;
+   return ret;
 }
 
 LONG H_RunCommand(char *cmd,char *arg,char **value)
