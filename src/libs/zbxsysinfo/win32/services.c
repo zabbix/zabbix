@@ -28,11 +28,11 @@ int	SERVICE_STATE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 		mgr,
 		service;
 
-	char	display_name[MAX_STRING_LEN];
+	char	name[MAX_STRING_LEN];
 	char	service_name[MAX_STRING_LEN];
 
 	unsigned long
-		max_len_display_name = MAX_STRING_LEN;
+		max_len_name = MAX_STRING_LEN;
 
 	int	ret = SYSINFO_RET_FAIL;
 	int	i;
@@ -42,11 +42,11 @@ int	SERVICE_STATE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 		return SYSINFO_RET_FAIL;
 	}
 
-	if(get_param(param, 1, display_name, sizeof(display_name)) != 0)
+	if(get_param(param, 1, name, sizeof(name)) != 0)
 	{
-		display_name[0] = '\0';
+		name[0] = '\0';
 	}
-	if(display_name[0] == '\0')
+	if(name[0] == '\0')
 	{
 		return SYSINFO_RET_FAIL;
 	}
@@ -57,46 +57,44 @@ int	SERVICE_STATE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 		return SYSINFO_RET_OK;
 	}
 
-	if(0 == GetServiceKeyName(mgr, display_name, service_name, &max_len_display_name))
+	service = OpenService(mgr,service_name,SERVICE_QUERY_STATUS);
+
+	if(NULL == service && 0 != GetServiceKeyName(mgr, name, service_name, &max_len_name))
+	{
+		service = OpenService(mgr,service_name,SERVICE_QUERY_STATUS);
+	}
+
+	if(NULL == service)
 	{
 		CloseServiceHandle(mgr);
 		return SYSINFO_RET_FAIL;
 	}
+
+	SERVICE_STATUS status;
+
+	if (QueryServiceStatus(service, &status))
+	{
+		static DWORD states[7] = 
+		{
+			SERVICE_RUNNING,
+			SERVICE_PAUSED,
+			SERVICE_START_PENDING,
+			SERVICE_PAUSE_PENDING,
+			SERVICE_CONTINUE_PENDING,
+			SERVICE_STOP_PENDING,
+			SERVICE_STOPPED 
+		};
+
+		for(i=0; i < 7 && status.dwCurrentState != states[i]; i++);
+		
+		SET_UI64_RESULT(result, i);
+	}
 	else
 	{
-		if(NULL != (service = OpenService(mgr,service_name,SERVICE_QUERY_STATUS)) )
-		{
-			SERVICE_STATUS status;
-
-			if (QueryServiceStatus(service, &status))
-			{
-				static DWORD states[7] = 
-				{
-					SERVICE_RUNNING,
-					SERVICE_PAUSED,
-					SERVICE_START_PENDING,
-					SERVICE_PAUSE_PENDING,
-					SERVICE_CONTINUE_PENDING,
-					SERVICE_STOP_PENDING,
-					SERVICE_STOPPED 
-				};
-
-				for(i=0; i < 7 && status.dwCurrentState != states[i]; i++);
-				
-				SET_UI64_RESULT(result, i);
-			}
-			else
-			{
-				SET_UI64_RESULT(result, 255);
-			}
-
-			CloseServiceHandle(service);
-		}
-		else
-		{
-			SET_UI64_RESULT(result, 255);
-		}
+		SET_UI64_RESULT(result, 255);
 	}
+
+	CloseServiceHandle(service);
 
 	CloseServiceHandle(mgr);
 
