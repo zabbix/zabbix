@@ -1,5 +1,6 @@
 Changes for 1.1.5:
 
+ - improved 'service_status[*]' allowed service name and display name (Eugnene)
  - added error reporting of PostgreSQL for frontend (Eugene)
  - added 'with oids' to PostgreSQL table definitions (Alexei)
  - fixed sms sender (Eugene)

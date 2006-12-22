@@ -95,8 +95,8 @@ if [ "$win2nix" = "yes" ]
 then
   echo "Replacing..."
   echo "Replacing..." >> WARNINGS
-  find ./ -name "configure.in" -exec vi "+%s/\\r$//" "+wq" "-es" {} ';' -print 2>> WARNINGS
-  find ./ -name "*.[hc]" -exec vi "+%s/\\r$//" "+wq" "-es" {} ';' -print 2>> WARNINGS
+  find ./src/zabbix_agent_win32/ -name "*.cpp" -exec vi "+%s/\\r$//" "+wq" "-es" {} ';' -print 2>> WARNINGS
+  find ./src/zabbix_agent_win32/ -name "*.h" -exec vi "+%s/\\r$//" "+wq" "-es" {} ';' -print 2>> WARNINGS
 fi
 
 if [ "$premake" = "yes" ] 
