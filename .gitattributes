@@ -112,8 +112,6 @@ frontends/php/popup_usrgrp.php -text
 frontends/php/setup.php -text
 misc/clock/clock.fla -text
 /splint -text
-src/zabbix_agent_win32/Debug/ZabbixW32.exe -text
-src/zabbix_agent_win32/Release/ZabbixW32.exe -text
 src/zabbix_server/events.c -text
 src/zabbix_server/events.h -text
 src/zabbix_server/nodewatcher/Makefile.am -text
