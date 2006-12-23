@@ -439,7 +439,8 @@ int main(int argc, char **argv)
 			break;
         }
 
-/*	init_metrics();*/
+	/* Required for simple checks */
+	init_metrics();
 
 	init_config();
 
