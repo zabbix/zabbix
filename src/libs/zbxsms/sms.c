@@ -131,8 +131,7 @@ int	send_sms(char *device,char *number,char *message, char *error, int max_error
 		options,
 		old_options;
 
-	int	i,
-		f,
+	int	f,
 		ret = SUCCEED;
 
 
