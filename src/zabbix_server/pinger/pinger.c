@@ -391,43 +391,33 @@ void main_pinger_loop(int num)
 
 	pinger_num = num;
 
-	if(1 == CONFIG_DISABLE_PINGER)
+	for(;;)
 	{
-		for(;;)
-		{
-			pause();
-		}
-	}
-	else
-	{
-		for(;;)
-		{
-			zbx_setproctitle("connecting to the database");
+		zbx_setproctitle("connecting to the database");
 
-			DBconnect();
+		DBconnect();
 	
 /*	zabbix_set_log_level(LOG_LEVEL_DEBUG);*/
 
-			ret = create_host_file();
+		ret = create_host_file();
 	
-			if( SUCCEED == ret)
-			{
-				zbx_setproctitle("pinging hosts");
+		if( SUCCEED == ret)
+		{
+			zbx_setproctitle("pinging hosts");
 
-				ret = do_ping();
-			}
-			zbx_snprintf(str,sizeof(str),"/tmp/zabbix_server_%d.pinger",getpid());
-			unlink(str);
+			ret = do_ping();
+		}
+		zbx_snprintf(str,sizeof(str),"/tmp/zabbix_server_%d.pinger",getpid());
+		unlink(str);
 	
 /*	zabbix_set_log_level(LOG_LEVEL_WARNING); */
 
-			DBclose();
+		DBclose();
 
-			zbx_setproctitle("pinger [sleeping for %d seconds]", CONFIG_PINGER_FREQUENCY);
+		zbx_setproctitle("pinger [sleeping for %d seconds]", CONFIG_PINGER_FREQUENCY);
 
-			sleep(CONFIG_PINGER_FREQUENCY);
-		}
+		sleep(CONFIG_PINGER_FREQUENCY);
 	}
-	
+
 	/* Never reached */
 }

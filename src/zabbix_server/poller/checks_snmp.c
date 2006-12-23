@@ -40,7 +40,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 	struct variable_list *vars;
 	int status;
 
-	char 	*p,*c;
+	char 	*p;
 	double dbl;
 
 	unsigned char *ip;
