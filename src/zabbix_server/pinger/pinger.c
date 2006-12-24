@@ -126,19 +126,18 @@ static int process_value(char *key, char *host, AGENT_RESULT *value)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	DB_ITEM	item;
-	char	*s;
+	DB_ITEM		item;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_value(%s@%s)", key, host);
 
 	/* IP address? */
 	if(is_ip(host) == SUCCEED)
 	{
-		result = DBselect("select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts,i.delta,i.units,i.multiplier,i.formula from items i,hosts h where h.status=%d and h.hostid=i.hostid and h.ip='%s' and i.key_='%s' and i.status=%d and i.type=%d and" ZBX_COND_NODEID, HOST_STATUS_MONITORED, host, key, ITEM_STATUS_ACTIVE, ITEM_TYPE_SIMPLE, LOCAL_NODE("h.hostid"));
+		result = DBselect("select %s where h.status=%d and h.hostid=i.hostid and h.ip='%s' and i.key_='%s' and i.status=%d and i.type=%d and" ZBX_COND_NODEID, ZBX_SQL_ITEM_SELECT, HOST_STATUS_MONITORED, host, key, ITEM_STATUS_ACTIVE, ITEM_TYPE_SIMPLE, LOCAL_NODE("h.hostid"));
 	}
 	else
 	{
-		result = DBselect("select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts,i.delta,i.units,i.multiplier,i.formula from items i,hosts h where h.status=%d and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type=%d and" ZBX_COND_NODEID, HOST_STATUS_MONITORED, host, key, ITEM_STATUS_ACTIVE, ITEM_TYPE_SIMPLE, LOCAL_NODE("configid"));
+		result = DBselect("select %s where h.status=%d and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type=%d and" ZBX_COND_NODEID, ZBX_SQL_ITEM_SELECT, HOST_STATUS_MONITORED, host, key, ITEM_STATUS_ACTIVE, ITEM_TYPE_SIMPLE, LOCAL_NODE("configid"));
 	}
 	row=DBfetch(result);
 
@@ -148,48 +147,7 @@ static int process_value(char *key, char *host, AGENT_RESULT *value)
 		return  FAIL;
 	}
 
-	item.itemid=atoi(row[0]);
-	strscpy(item.key,row[1]);
-	item.host=row[2];
-	item.port=atoi(row[3]);
-	item.delay=atoi(row[4]);
-	item.description=row[5];
-	item.nextcheck=atoi(row[6]);
-	item.type=atoi(row[7]);
-	item.snmp_community=row[8];
-	item.snmp_oid=row[9];
-	item.useip=atoi(row[10]);
-	item.ip=row[11];
-	item.history=atoi(row[12]);
-	s=row[13];
-	if(DBis_null(s)==SUCCEED)
-	{
-		item.lastvalue_null=1;
-	}
-	else
-	{
-		item.lastvalue_null=0;
-		item.lastvalue_str=s;
-		item.lastvalue=atof(s);
-	}
-	s=row[14];
-	if(DBis_null(s)==SUCCEED)
-	{
-		item.prevvalue_null=1;
-	}
-	else
-	{
-		item.prevvalue_null=0;
-		item.prevvalue_str=s;
-		item.prevvalue=atof(s);
-	}
-	item.value_type=atoi(row[15]);
-	item.trapper_hosts=row[16];
-	item.delta=atoi(row[17]);
-
-	item.units=row[18];
-	item.multiplier=atoi(row[19]);
-	item.formula=row[20];
+	DBget_item_from_db(&item,row);
 
 	DBbegin();
 	process_new_value(&item,value);
@@ -241,7 +199,7 @@ static int create_host_file(void)
 
 	now=time(NULL);
 	/* Select hosts monitored by IP */
-	result = DBselect("select distinct h.ip from hosts h,items i where " ZBX_SQL_MOD(h.hostid,%d) "=%d and i.hostid=h.hostid and (h.status=%d or (h.status=%d and h.available=%d and h.disable_until<=%d)) and (i.key_='%s' or i.key_='%s') and i.type=%d and i.status=%d and h.useip=1 and" ZBX_COND_NODEID, CONFIG_PINGER_FORKS, pinger_num, HOST_STATUS_MONITORED, HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE, now, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY, ITEM_TYPE_SIMPLE, ITEM_STATUS_ACTIVE, LOCAL_NODE("h.hostid"));
+	result = DBselect("select distinct h.ip from hosts h,items i where " ZBX_SQL_MOD(h.hostid,%d) "=%d and i.hostid=h.hostid and (h.status=%d or (h.status=%d and h.available=%d and h.disable_until<=%d)) and (i.key_='%s' or i.key_='%s') and i.type=%d and i.status=%d and h.useip=1 and" ZBX_COND_NODEID, CONFIG_PINGER_FORKS, pinger_num-1, HOST_STATUS_MONITORED, HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE, now, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY, ITEM_TYPE_SIMPLE, ITEM_STATUS_ACTIVE, LOCAL_NODE("h.hostid"));
 
 	while((row=DBfetch(result)))
 	{
@@ -255,7 +213,7 @@ static int create_host_file(void)
 	DBfree_result(result);
 
 	/* Select hosts monitored by hostname */
-	result = DBselect("select distinct h.host from hosts h,items i where "  ZBX_SQL_MOD(h.hostid,%d) "=%d and i.hostid=h.hostid and (h.status=%d or (h.status=%d and h.available=%d and h.disable_until<=%d)) and (i.key_='%s' or i.key_='%s') and i.type=%d and i.status=%d and h.useip=0 and" ZBX_COND_NODEID, CONFIG_PINGER_FORKS, pinger_num, HOST_STATUS_MONITORED, HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE, now, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY, ITEM_TYPE_SIMPLE, ITEM_STATUS_ACTIVE, LOCAL_NODE("h.hostid"));
+	result = DBselect("select distinct h.host from hosts h,items i where "  ZBX_SQL_MOD(h.hostid,%d) "=%d and i.hostid=h.hostid and (h.status=%d or (h.status=%d and h.available=%d and h.disable_until<=%d)) and (i.key_='%s' or i.key_='%s') and i.type=%d and i.status=%d and h.useip=0 and" ZBX_COND_NODEID, CONFIG_PINGER_FORKS, pinger_num-1, HOST_STATUS_MONITORED, HOST_STATUS_MONITORED, HOST_AVAILABLE_FALSE, now, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY, ITEM_TYPE_SIMPLE, ITEM_STATUS_ACTIVE, LOCAL_NODE("h.hostid"));
 
 	while((row=DBfetch(result)))
 	{
