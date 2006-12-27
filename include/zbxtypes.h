@@ -43,6 +43,10 @@
 
 #else /* _WINDOWS */
 
+#ifndef __UINT64_C
+#	define __UINT64_C	UINT64_C
+#endif /* __UINT64_C under AIX, Solaris*/
+
 #	define zbx_uint64_t uint64_t
 #	if __WORDSIZE == 64
 #		define ZBX_FS_UI64 "%lu"

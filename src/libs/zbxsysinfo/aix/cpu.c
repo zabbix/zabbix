@@ -149,7 +149,7 @@ CPU_FNCLIST
         if(type[0] == '\0')
 	{
 		/* default parameter */
-		zbx_snprintf(type, sizeof(type) "user");
+		zbx_snprintf(type, sizeof(type), "user");
 	}
 	
 	if(get_param(param, 3, mode, MAX_STRING_LEN) != 0)
