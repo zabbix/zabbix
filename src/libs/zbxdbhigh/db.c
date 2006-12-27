@@ -140,28 +140,28 @@ int	DBexecute(char *query)
 	return (long)mysql_affected_rows(&mysql);
 #endif
 #ifdef	HAVE_PGSQL
-	int ret = SUCCEED;
-	PGresult	*result;
+	PGresult        *result;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s",query);
 	result = PQexec(conn,query);
 
 	if( result==NULL)
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", "Result is NULL" );
-		ret = FAIL;
-	} else if( PQresultStatus(result) != PGRES_COMMAND_OK)
+		PQclear(result);
+		return FAIL;
+	}
+	if( PQresultStatus(result) != PGRES_COMMAND_OK)
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
-		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", PQresStatus(PQresultStatus(result)) );
-		ret = FAIL;
+		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s:%s",
+			PQresStatus(PQresultStatus(result)),
+			PQresultErrorMessage(result));
+			PQclear(result);
+		return FAIL;
 	}
-	
-	ret = (int)PQoidValue(result); /* return object id, for insert id processing */
-	
 	PQclear(result);
-	return ret;
+	return SUCCEED;
 #endif
 #ifdef	HAVE_ORACLE
 	int ret;
@@ -192,24 +192,18 @@ int	DBis_null(char *field)
 #ifdef  HAVE_PGSQL
 void	PG_DBfree_result(DB_RESULT result)
 {
-	int i = 0;
+	if(!result) return;
 
 	/* free old data */
 	if(result->values)
 	{
-		for(i = 0; i < result->fld_num; i++)
-		{
-			if(!result->values[i]) continue;
-			
-			free(result->values[i]);
-			result->values[i] = NULL;
-		}
 		result->fld_num = 0;
 		free(result->values);
 		result->values = NULL;
 	}
 
 	PQclear(result->pg_result);
+	free(result);
 }
 #endif
 
@@ -219,31 +213,22 @@ DB_ROW	DBfetch(DB_RESULT result)
 	return mysql_fetch_row(result);
 #endif
 #ifdef	HAVE_PGSQL
-
-	int	i;
+	int     i;
 
 	/* EOF */
-	if(!result)	return NULL;
-		
+	if(!result)     return NULL;
+
 	/* free old data */
 	if(result->values)
 	{
-		for(i = 0; i < result->fld_num; i++)
-		{
-			if(!result->values[i]) continue;
-			
-			free(result->values[i]);
-			result->values[i] = NULL;
-		}
-		result->fld_num = 0;
 		free(result->values);
 		result->values = NULL;
 	}
-	
+
 	/* EOF */
 	if(result->cursor == result->row_num) return NULL;
 
-	/* init result */	
+	/* init result */
 	result->fld_num = PQnfields(result->pg_result);
 
 	if(result->fld_num > 0)
@@ -251,13 +236,13 @@ DB_ROW	DBfetch(DB_RESULT result)
 		result->values = malloc(sizeof(char*) * result->fld_num);
 		for(i = 0; i < result->fld_num; i++)
 		{
-			 result->values[i] = strdup(PQgetvalue(result->pg_result, result->cursor, i));
+			result->values[i] = PQgetvalue(result->pg_result, result->cursor, i);
 		}
 	}
 
 	result->cursor++;
 
-	return result->values;	
+	return result->values;
 #endif
 #ifdef	HAVE_ORACLE
 	int res;
@@ -300,37 +285,31 @@ DB_RESULT DBselect(char *query)
 	return	mysql_store_result(&mysql);
 #endif
 #ifdef	HAVE_PGSQL
-	PGresult		*pg_result;
-	ZBX_PG_DB_RESULT	*result = NULL;
+	DB_RESULT result;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s",query);
+	result = malloc(sizeof(ZBX_PG_DB_RESULT));
+	result->pg_result = PQexec(conn,query);
+	result->values = NULL;
+	result->cursor = 0;
 
-	pg_result = PQexec(conn,query);
-
-	if( pg_result==NULL)
+	if(result->pg_result==NULL)
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
+		zabbix_log(LOG_LEVEL_ERR, "Query::%s",query);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", "Result is NULL" );
-		PQclear(pg_result);
 		exit( FAIL );
 	}
-	else if( PQresultStatus(pg_result) != PGRES_TUPLES_OK)
+	if( PQresultStatus(result->pg_result) != PGRES_TUPLES_OK)
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
-		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", PQresStatus(PQresultStatus(pg_result)) );
-		PQclear(pg_result);
+		zabbix_log(LOG_LEVEL_ERR, "Query::%s",query);
+		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s:%s",
+		PQresStatus(PQresultStatus(result->pg_result)),
+		PQresultErrorMessage(result->pg_result));
 		exit( FAIL );
 	}
-	else
-	{
-		result = malloc(sizeof(ZBX_PG_DB_RESULT));
-		result->pg_result	= pg_result;
-		result->row_num		= PQntuples(pg_result);
-		result->fld_num		= 0;
-		result->cursor		= 0;
-		result->values		= NULL;
-	}
-	
+
+	/* init rownum */
+	result->row_num = PQntuples(result->pg_result);
+
 	return result;
 #endif
 #ifdef	HAVE_ORACLE

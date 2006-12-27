@@ -1,5 +1,6 @@
 Changes for 1.1.5:
 
+ - improvements of PostgreSQL code (Alexei)
  - fixed temporary files deletion for WinXX agents (Eugene)
  - improved 'service_status[*]' allowed service name and display name (Eugnene)
  - added error reporting of PostgreSQL for frontend (Eugene)
