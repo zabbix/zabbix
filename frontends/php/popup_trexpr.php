@@ -43,57 +43,57 @@ include_once "include/page_header.php";
 
 	$functions = array(
 		'abschange'	=> array(
-			'description'	=> 'Absolute difference between last and previous value {OP} [N]',
+			'description'	=> 'Absolute difference between last and previous value {OP} N',
 			'operators'	=> $operators
 			),
 		'avg'		=> array(
-			'description'	=> 'Average value for period of [T] times {OP} [N]',
+			'description'	=> 'Average value for period of T times {OP} N',
 			'operators'	=> $operators,
 			'T'             => T_ZBX_INT
 			),
 		'delta'		=> array(
-			'description'	=> 'Difference between MAX and MIN value of [T] times {OP} [N]',
+			'description'	=> 'Difference between MAX and MIN value of T times {OP} N',
 			'operators'	=> $operators,
 			'T'             => T_ZBX_INT
 			),
 		'change'	=> array(
-			'description'	=> 'Difference between last and previous value of [T] times {OP} [N].',
+			'description'	=> 'Difference between last and previous value of T times {OP} N.',
 			'operators'	=> $operators
 			),
 		'count'		=> array(
-			'description'	=> 'Number of successfully retrieved values for period of time [T] {OP} [N].',
+			'description'	=> 'Number of successfully retrieved values for period of time T {OP} N.',
 			'operators'     => $operators,
 			'T'             => T_ZBX_INT
 			),
 		'diff'		=> array(
-			'description'	=> '[N] {OP} [X], where [X] is 1 - if last and previous values differs, 0 - otherwise.',
+			'description'	=> 'N {OP} X, where X is 1 - if last and previous values differs, 0 - otherwise.',
 			'operators'     => $limited_operators
 			),
 		'last'	=> array(
-			'description'	=> 'Last value {OP} [N]',
+			'description'	=> 'Last value {OP} N',
 			'operators'	=> $operators
 			),
 		'max'		=> array(
-			'description'	=> 'Maximal value for period of time [T] {OP} [N].',
+			'description'	=> 'Maximal value for period of time T {OP} N.',
 			'operators'     => $operators,
 			'T'             => T_ZBX_INT
 			),
 		'min'		=> array(
-			'description'	=> 'Minimal value for period of time [T] {OP} [N].',
+			'description'	=> 'Minimal value for period of time T {OP} N.',
 			'operators'     => $operators,
 			'T'             => T_ZBX_INT
 			),
 		'prev'		=> array(
-			'description'	=> 'Previous value {OP} [N].',
+			'description'	=> 'Previous value {OP} N.',
 			'operators'     => $operators
 			),
 		'str'		=> array(
-			'description'	=> 'Find string [T] last value. [N] {OP} [X], where [X] is 1 - if found, 0 - otherwise',
+			'description'	=> 'Find string T last value. N {OP} X, where X is 1 - if found, 0 - otherwise',
 			'operators'     => $limited_operators,
 			'T'		=> T_ZBX_STR
 			),
 		'sum'		=> array(
-			'description'	=> 'Sum of values for period of time [T] {OP} [N]',
+			'description'	=> 'Sum of values for period of time T {OP} N',
 			'operators'     => $operators,
 			'T'             => T_ZBX_INT
 			)
@@ -303,14 +303,14 @@ if(form)
 			$cmbParamType->AddItem(PARAM_TYPE_SECONDS, S_SECONDS);
 			$cmbParamType->AddItem(PARAM_TYPE_COUNTS, S_COUNTS);
 			
-			$form->AddRow(S_LAST_OF.' [T]', array(
+			$form->AddRow(S_LAST_OF.' T', array(
 				new CNumericBox('param', $param, 10),
 				$cmbParamType
 				)); 
 		}
 		else
 		{
-			$form->AddRow('[T]', new CTextBox('param', $param, 30));
+			$form->AddRow('T', new CTextBox('param', $param, 30));
 			$form->AddVar('paramtype', PARAM_TYPE_SECONDS);
 		}
 	}
@@ -320,7 +320,7 @@ if(form)
 		$form->AddVar('param', 0);
 	}
 
-	$form->AddRow('[N]', new CTextBox('value', $value, 10));
+	$form->AddRow('N', new CTextBox('value', $value, 10));
 	
 	$form->AddItemToBottomRow(new CButton('insert',S_INSERT));
 	$form->Show();
