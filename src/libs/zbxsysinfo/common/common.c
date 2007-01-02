@@ -34,9 +34,9 @@ ZBX_METRIC	parameters_common[]=
 	{
 	{"system.localtime",	0,		SYSTEM_LOCALTIME,	0,	0},
 	{"system.run",		CF_USEUPARAM,	RUN_COMMAND,	 	0,	"echo test"},
-	{"web.page.get",	CF_USEUPARAM,	WEB_PAGE_GET,	 	0,	"www.zabbix.com,,80"},
-	{"web.page.perf",	CF_USEUPARAM,	WEB_PAGE_PERF,	 	0,	"www.zabbix.com,,80"},
-	{"web.page.regexp",	CF_USEUPARAM,	WEB_PAGE_REGEXP,	0,	"www.zabbix.com,,80,OK"},
+	{"web.page.get",	CF_USEUPARAM,	WEB_PAGE_GET,	 	0,	"localhost,,80"},
+	{"web.page.perf",	CF_USEUPARAM,	WEB_PAGE_PERF,	 	0,	"localhost,,80"},
+	{"web.page.regexp",	CF_USEUPARAM,	WEB_PAGE_REGEXP,	0,	"localhost,,80,OK"},
 	{0}
 	};
 
