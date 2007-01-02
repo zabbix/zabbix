@@ -245,6 +245,7 @@ static int evaluate_SUM(char *value, DB_ITEM *item, int parameter, int flag)
 	int		res = SUCCEED;
 	double		sum=0;
 	zbx_uint64_t	sum_uint64=0;
+	int		rows = 0;
 
 	if( (item->value_type != ITEM_VALUE_TYPE_FLOAT) && (item->value_type != ITEM_VALUE_TYPE_UINT64))
 	{
@@ -289,29 +290,32 @@ static int evaluate_SUM(char *value, DB_ITEM *item, int parameter, int flag)
 		}
 		snprintf(sql,sizeof(sql)-1,"select value from %s where itemid=%d order by clock desc",table,item->itemid);
 		result = DBselectN(sql, parameter);
-		row = DBfetch(result);
-		if(!row || DBis_null(row[0])==SUCCEED)
+		if(item->value_type == ITEM_VALUE_TYPE_UINT64)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Result for SUM is empty" );
-			res = FAIL;
+			while((row=DBfetch(result)))
+			{
+				rows++;
+#ifdef	HAVE_ATOLL
+				sum_uint64+=atoll(row[0]);
+#else
+				sum_uint64+=atol(row[0]);
+#endif
+			}
+			if(rows>0)	snprintf(value,MAX_STRING_LEN-1,ZBX_FS_UI64, sum_uint64);
 		}
 		else
 		{
-			if(item->value_type == ITEM_VALUE_TYPE_UINT64)
+			while((row=DBfetch(result)))
 			{
-				while((row=DBfetch(result)))
-#ifdef	HAVE_ATOLL
-					sum_uint64+=atoll(row[0]);
-#else
-					sum_uint64+=atol(row[0]);
-#endif
-				snprintf(value,MAX_STRING_LEN-1,ZBX_FS_UI64, sum_uint64);
+				rows++;
+				sum+=atof(row[0]);
 			}
-			else
-			{
-				while((row=DBfetch(result))) sum+=atof(row[0]);
-				snprintf(value,MAX_STRING_LEN-1,"%f", sum);
-			}
+			if(rows>0)	snprintf(value,MAX_STRING_LEN-1,"%f", sum);
+		}
+		if(0 == rows)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Result for SUM is empty" );
+			res = FAIL;
 		}
 	}
 	else
@@ -591,11 +595,8 @@ static int evaluate_MAX(char *value,DB_ITEM *item,int parameter,int flag)
 		}
 		snprintf(sql,sizeof(sql)-1,"select max(value) from %s where clock>%d and itemid=%d",table,now-parameter,item->itemid);
 
-zabbix_log(LOG_LEVEL_DEBUG, "DBselect" );
 		result = DBselect(sql);
-zabbix_log(LOG_LEVEL_DEBUG, "DBfetch" );
 		row = DBfetch(result);
-zabbix_log(LOG_LEVEL_DEBUG, "After DBfetch" );
 
 		if(!row || DBis_null(row[0])==SUCCEED)
 		{
@@ -604,9 +605,7 @@ zabbix_log(LOG_LEVEL_DEBUG, "After DBfetch" );
 		}
 		else
 		{
-zabbix_log(LOG_LEVEL_DEBUG, "strcpy '0x%4x'",row[0]);
 			strcpy(value,row[0]);
-zabbix_log(LOG_LEVEL_DEBUG, "del_zeroes" );
 			del_zeroes(value);
 		}
 	}
