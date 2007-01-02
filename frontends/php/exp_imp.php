@@ -164,7 +164,7 @@ include_once "include/page_header.php";
 		$form->AddRow(S_IMPORT_FILE, new CFile('import_file'));
 
 		$table = new CTable();
-		$table->SetHeader(array(S_ELEMENT, S_EXISTED, S_MISSED),'bold');
+		$table->SetHeader(array(S_ELEMENT, S_EXISTING, S_MISSING),'bold');
 
 		foreach(array(	'host'		=> S_HOST,
 				'item'		=> S_ITEM,
