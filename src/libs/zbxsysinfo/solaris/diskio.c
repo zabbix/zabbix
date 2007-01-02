@@ -358,7 +358,7 @@ DEV_FNCLIST
                 return SYSINFO_RET_FAIL;
         }
 	
-	if(get_param(param, 2, mode, sizeof(mofe)) != 0)
+	if(get_param(param, 2, mode, sizeof(mode)) != 0)
         {
                 mode[0] = '\0';
         }

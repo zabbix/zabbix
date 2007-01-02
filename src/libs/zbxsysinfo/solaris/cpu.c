@@ -246,7 +246,7 @@ CPU_FNCLIST
 	if(cpuname[0] == '\0')
 	{
 		/* default parameter */
-		zbx_snprintf(cpuname, sizeof(spuname), "all");
+		zbx_snprintf(cpuname, sizeof(cpuname), "all");
 	}
 	if(strncmp(cpuname, "all", sizeof(cpuname)))
 	{
