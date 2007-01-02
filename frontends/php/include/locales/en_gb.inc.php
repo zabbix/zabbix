@@ -45,8 +45,8 @@
 	"S_NO_DATA_FOR_EXPORT"=>		"No data for export",
 	"S_RULES"=>				"Rules",
 	"S_SKIP"=>				"Skip",
-	"S_EXISTED"=>				"Existed",
-	"S_MISSED"=>				"Missed",
+	"S_EXISTING"=>				"Existing",
+	"S_MISSING"=>				"Missing",
 
 //	admin.php
 	"S_PREVIOUS"=>				"<< Previous",
