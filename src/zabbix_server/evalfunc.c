@@ -244,6 +244,7 @@ static int evaluate_SUM(char *value, DB_ITEM *item, int parameter, int flag)
 	char		table[MAX_STRING_LEN];
 	int		now;
 	int		res = SUCCEED;
+	int		rows = 0;
 	double		sum=0;
 	zbx_uint64_t	sum_uint64=0;
 	zbx_uint64_t	value_uint64;
@@ -292,28 +293,29 @@ static int evaluate_SUM(char *value, DB_ITEM *item, int parameter, int flag)
 		zbx_snprintf(sql,sizeof(sql),"select value from %s where itemid=" ZBX_FS_UI64 " order by clock desc",
 			table,item->itemid);
 		result = DBselectN(sql, parameter);
-		row = DBfetch(result);
-		if(!row || DBis_null(row[0])==SUCCEED)
+		if(item->value_type == ITEM_VALUE_TYPE_UINT64)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Result for SUM is empty" );
-			res = FAIL;
+			while((row=DBfetch(result)))
+			{
+				ZBX_STR2UINT64(value_uint64,row[0]);
+				sum_uint64+=value_uint64;
+				rows++;
+			}
+			if(rows>0)	zbx_snprintf(value,MAX_STRING_LEN,ZBX_FS_UI64, sum_uint64);
 		}
 		else
 		{
-			if(item->value_type == ITEM_VALUE_TYPE_UINT64)
+			while((row=DBfetch(result)))
 			{
-				while((row=DBfetch(result)))
-				{
-					ZBX_STR2UINT64(value_uint64,row[0]);
-					sum_uint64+=value_uint64;
-				}
-				zbx_snprintf(value,MAX_STRING_LEN,ZBX_FS_UI64, sum_uint64);
+				sum+=atof(row[0]);
+				rows++;
 			}
-			else
-			{
-				while((row=DBfetch(result))) sum+=atof(row[0]);
-				zbx_snprintf(value,MAX_STRING_LEN,"%f", sum);
-			}
+			if(rows>0)	zbx_snprintf(value,MAX_STRING_LEN,"%f", sum);
+		}
+		if(0 == rows)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Result for SUM is empty" );
+			res = FAIL;
 		}
 	}
 	else
