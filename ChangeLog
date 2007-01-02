@@ -55,6 +55,7 @@ Integrated from 1.1.x
 
 1.1.5
 
+ - www.zabbix.com replaced by localhost in agent (Alexei)
  - fixed calculation of sum(#N) (Alexei)
  - fixed temporary files deletion for WinXX agents (Eugene)
  - improved 'service_status[*]' allowed service name and display name (Eugnene)
