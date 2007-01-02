@@ -375,7 +375,7 @@ int	SYSTEM_SWAP_IN(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	zbx_snprintf(swapdev, sizeof(swapdev), "all");
     }
 
-    if(strncmp(swapdev, "all", sizeof(sapdev)))
+    if(strncmp(swapdev, "all", sizeof(swapdev)))
     {
 	return SYSINFO_RET_FAIL;
     }
@@ -437,7 +437,7 @@ int	SYSTEM_SWAP_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	zbx_snprintf(swapdev, sizeof(swapdev), "all");
     }
 
-    if(strncmp(swapdev, "all", sizeof(swapdef)))
+    if(strncmp(swapdev, "all", sizeof(swapdev)))
     {
 	return SYSINFO_RET_FAIL;
     }
