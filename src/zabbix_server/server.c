@@ -324,7 +324,7 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
  *                                                                            *
  ******************************************************************************/
 
-/* #define TEST */
+#define TEST
 
 #ifdef TEST
 
