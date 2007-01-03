@@ -110,6 +110,7 @@ frontends/php/popup_trexpr.php -text
 frontends/php/popup_users.php -text
 frontends/php/popup_usrgrp.php -text
 frontends/php/setup.php -text
+m4/libcurl.m4 -text
 misc/clock/clock.fla -text
 /splint -text
 src/zabbix_server/events.c -text

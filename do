@@ -103,7 +103,7 @@ if [ "$premake" = "yes" ]
 then
   echo "Pre-making..."
   echo "Pre-making..." >> WARNINGS
-  aclocal 2>> WARNINGS
+  aclocal -I m4 2>> WARNINGS
   autoconf 2>> WARNINGS
   autoheader 2>> WARNINGS
   automake -a 2>> WARNINGS
@@ -129,14 +129,15 @@ then
   echo "Configuring..." >> WARNINGS
   #export CFLAGS="-Wall"
   #export CFLAGS="-Wall -pedantic"
-  ./configure $config_param 2>>WARNINGS 
+  ./configure $config_param 2>> WARNINGS 
+  ./create/schema/gen.pl c 2>> WARNINGS > ./include/dbsync.h
 fi
 
 if [ "$domake" = "yes" ] 
 then
   echo "Cleaning..."
   echo "Cleaning..." >> WARNINGS
-  make clean 2>>WARNINGS 
+  make clean 2>> WARNINGS 
   echo "Making..."
   echo "Making..." >> WARNINGS
   make 2>>WARNINGS 

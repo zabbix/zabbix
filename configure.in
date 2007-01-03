@@ -70,14 +70,14 @@ dnl AC_CHECK_LIB(pthread, main)
 
 dnl Check for socklen_t
 AC_MSG_CHECKING(for socklen_t)
-AC_TRY_COMPILE(
-[#include <sys/types.h>
+AC_TRY_COMPILE([
+#include <sys/types.h>
 #include <unistd.h>
-#include <sys/socket.h>],
-[socklen_t s;],
+#include <sys/socket.h>
+],[socklen_t s;],
 AC_MSG_RESULT(yes),
-AC_DEFINE(socklen_t, int, [Define socklen_t type])
-AC_MSG_RESULT(no))
+[AC_DEFINE(socklen_t, int, [Define socklen_t type])
+AC_MSG_RESULT(no)])
 
 dnl Check for /proc filesystem
 AC_MSG_CHECKING(for /proc filesystem)
@@ -805,6 +805,8 @@ dnl    AC_CHECK_LIB(crypto, main,  SNMP_LFLAGS="-lcrypto $SNMP_LFLAGS")
 AC_SUBST(SNMP_INCLUDE)
 AC_SUBST(SNMP_LFLAGS)
 AC_SUBST(SNMP_LIBS)
+
+LIBCURL_CHECK_CONFIG([yes], [7.15.1], [],[])
 
 AC_MSG_CHECKING(for UCD-SNMP support)
 AC_ARG_WITH(ucd-snmp,
