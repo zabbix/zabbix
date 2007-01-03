@@ -382,7 +382,7 @@ void main_poller_loop(int type, int num)
 	int	now;
 	int	nextcheck,sleeptime;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In main_poller_loop(type:%d,num:%d)", type, num);
+	zabbix_log( LOG_LEVEL_WARNING, "In main_poller_loop(type:%d,num:%d)", type, num);
 
 	poller_type = type;
 	poller_num = num;
