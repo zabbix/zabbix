@@ -5,7 +5,7 @@ clear
 rm -f WARNINGS
 
 echo Pre-making...
-aclocal
+aclocal -I m4
 autoconf
 autoheader
 automake -a
@@ -32,8 +32,8 @@ cd create/schema
 cd -
 #export CFLAGS="-Wall -pedantic"
 #./configure --enable-agent --enable-server --with-sqlite3 --with-net-snmp --prefix=`pwd` 2>>WARNINGS >/dev/null
-./configure --enable-agent --enable-server --with-pgsql --with-net-snmp --prefix=`pwd` 2>>WARNINGS >/dev/null
-#./configure --enable-agent --enable-server --with-mysql --with-net-snmp --prefix=`pwd` 2>>WARNINGS >/dev/null
+#./configure --enable-agent --enable-server --with-pgsql --with-net-snmp --prefix=`pwd` 2>>WARNINGS >/dev/null
+./configure --enable-agent --enable-server --with-libcurl --with-mysql --with-net-snmp --prefix=`pwd` 2>>WARNINGS >/dev/null
 #./configure --enable-agent --enable-server --with-oracle=/home/zabbix/sqlora8 --with-net-snmp --prefix=`pwd` 2>>WARNINGS >/dev/null
 echo Cleaning...
 make clean 2>>WARNINGS >/dev/null
