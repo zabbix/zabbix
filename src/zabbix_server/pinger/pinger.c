@@ -347,6 +347,8 @@ void main_pinger_loop(int num)
 
 	char	str[MAX_STRING_LEN];
 
+	zabbix_log( LOG_LEVEL_WARNING, "In main_pinger_loop(num:%d)", num);
+
 	pinger_num = num;
 
 	for(;;)
