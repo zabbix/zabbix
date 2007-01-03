@@ -326,4 +326,8 @@
 #	include <procinfo.h>
 #endif
 
+#ifdef HAVE_LIBCURL
+#	include <curl/curl.h>
+#endif
+
 #endif
