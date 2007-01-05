@@ -23,13 +23,8 @@
 extern	void	signal_handler(int);
 extern  int     server_num;
 
-extern  int     CONFIG_TIMEOUT;
-extern  int     CONFIG_POLLER_FORKS;
-extern  int     CONFIG_UNREACHABLE_POLLER_FORKS;
-extern  int     CONFIG_REFRESH_UNSUPPORTED;
-extern  int     CONFIG_UNAVAILABLE_DELAY;
-extern  int     CONFIG_UNREACHABLE_PERIOD;
-extern  int     CONFIG_UNREACHABLE_DELAY;
+extern	int	CONFIG_NODEID;
+extern  int     CONFIG_HTTPPOLLER_FORKS;
 
 void main_httppoller_loop(int num);
 

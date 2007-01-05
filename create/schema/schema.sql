@@ -21,6 +21,15 @@
 -- Do not use spaces
 --
 
+TABLE|httptest|httptestid|ZBX_SYNC
+FIELD		|httptestid	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|hostid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|nextcheck	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|delay		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|status		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+INDEX		|httptest_1	|hostid
+
 TABLE|nodes|nodeid|
 FIELD		|nodeid		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|name		|t_varchar(64)	|'0'	|NOT NULL	|0
