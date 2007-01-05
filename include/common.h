@@ -190,6 +190,10 @@ typedef enum
 #define ITEM_STATUS_DELETED	4
 #define ITEM_STATUS_NOTAVAILABLE	5
 
+/* HTTP Tests statuses */
+#define HTTPTEST_STATUS_MONITORED	0
+#define HTTPTEST_STATUS_NOT_MONITORED	1
+
 /* Host statuses */
 #define HOST_STATUS_MONITORED	0
 #define HOST_STATUS_NOT_MONITORED	1
