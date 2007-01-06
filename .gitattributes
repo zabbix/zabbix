@@ -118,6 +118,8 @@ src/zabbix_server/events.h -text
 src/zabbix_server/httppoller/Makefile.am -text
 src/zabbix_server/httppoller/httppoller.c -text
 src/zabbix_server/httppoller/httppoller.h -text
+src/zabbix_server/httppoller/httptest.c -text
+src/zabbix_server/httppoller/httptest.h -text
 src/zabbix_server/nodewatcher/Makefile.am -text
 src/zabbix_server/nodewatcher/events.c -text
 src/zabbix_server/nodewatcher/events.h -text
