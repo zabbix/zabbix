@@ -45,12 +45,28 @@
 #include "common.h"
 #include "../functions.h"
 #include "../expression.h"
+#include "httptest.h"
 #include "httppoller.h"
 
 #include "daemon.h"
 
 int	httppoller_num;
 
+/******************************************************************************
+ *                                                                            *
+ * Function: get_minnextcheck                                                 *
+ *                                                                            *
+ * Purpose: calculate when we have to process earliest httptest               *
+ *                                                                            *
+ * Parameters: now - current timestamp                                        *
+ *                                                                            *
+ * Return value: timestamp of earliest check or -1 if not found               *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: never returns                                                    *
+ *                                                                            *
+ ******************************************************************************/
 static int get_minnextcheck(int now)
 {
 	DB_RESULT	result;
@@ -58,13 +74,13 @@ static int get_minnextcheck(int now)
 
 	int		res;
 
-	result = DBselect("select count(*),min(nextcheck) from httptest h where h.status=%d and " ZBX_SQL_MOD(h.httptestid,%d) "=%d and " ZBX_COND_NODEID, HTTPTEST_STATUS_MONITORED, CONFIG_HTTPPOLLER_FORKS, httppoller_num-1, LOCAL_NODE("h.hostid"));
+	result = DBselect("select count(*),min(nextcheck) from httptest t where t.status=%d and " ZBX_SQL_MOD(t.httptestid,%d) "=%d and " ZBX_COND_NODEID, HTTPTEST_STATUS_MONITORED, CONFIG_HTTPPOLLER_FORKS, httppoller_num-1, LOCAL_NODE("t.httptestid"));
 
 	row=DBfetch(result);
 
 	if(!row || DBis_null(row[0])==SUCCEED || DBis_null(row[1])==SUCCEED)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "No items to update for minnextcheck.");
+		zabbix_log(LOG_LEVEL_DEBUG, "No httptests to process in get_minnextcheck.");
 		res = FAIL; 
 	}
 	else
@@ -83,17 +99,27 @@ static int get_minnextcheck(int now)
 	return	res;
 }
 
-void process_httptests()
-{
-	sleep(1);
-}
-
+/******************************************************************************
+ *                                                                            *
+ * Function: main_httppoller_loop                                             *
+ *                                                                            *
+ * Purpose: main loop of processing of httptests                              *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: never returns                                                    *
+ *                                                                            *
+ ******************************************************************************/
 void main_httppoller_loop(int num)
 {
 	int	now;
 	int	nextcheck,sleeptime;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In main_httppoller_loop(num:%d)", num);
+	zabbix_log( LOG_LEVEL_DEBUG, "In main_httppoller_loop(num:%d)", num);
 
 	httppoller_num = num;
 
@@ -104,12 +130,12 @@ void main_httppoller_loop(int num)
 		zbx_setproctitle("http poller [getting values]");
 
 		now=time(NULL);
-		process_httptests();
+		process_httptests(now);
 
-		zabbix_log( LOG_LEVEL_WARNING, "Spent %d seconds while processing HTTP tests", (int)time(NULL)-now );
+		zabbix_log( LOG_LEVEL_DEBUG, "Spent %d seconds while processing HTTP tests", (int)time(NULL)-now );
 
 		nextcheck=get_minnextcheck(now);
-		zabbix_log( LOG_LEVEL_WARNING, "Nextcheck:%d Time:%d", nextcheck, (int)time(NULL) );
+		zabbix_log( LOG_LEVEL_DEBUG, "Nextcheck:%d Time:%d", nextcheck, (int)time(NULL) );
 
 		if( FAIL == nextcheck)
 		{
