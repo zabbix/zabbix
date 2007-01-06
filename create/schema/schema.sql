@@ -30,6 +30,16 @@ FIELD		|delay		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|httptest_1	|hostid
 
+TABLE|httpstep|httpstepid|ZBX_SYNC
+FIELD		|httpstepid	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|httptestid	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|no		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|url		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|timeout	|t_integer	|'30'	|NOT NULL	|ZBX_SYNC
+FIELD		|posts		|t_blob		|''	|NOT NULL	|ZBX_SYNC
+INDEX		|httpstep_1	|httptestid
+
 TABLE|nodes|nodeid|
 FIELD		|nodeid		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|name		|t_varchar(64)	|'0'	|NOT NULL	|0
