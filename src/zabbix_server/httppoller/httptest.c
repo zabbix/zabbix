@@ -51,6 +51,8 @@ int	process_httptest(zbx_uint64_t httptestid)
 	int	err;
 
 	long	rspcode;
+	double	total_time;
+	double	speed_download;
 
 	CURL            *easyhandle = NULL;
 
@@ -69,7 +71,7 @@ int	process_httptest(zbx_uint64_t httptestid)
 
 	while((row=DBfetch(result)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Processing step %d [%s]", row[1], row[3]);
+		zabbix_log(LOG_LEVEL_WARNING, "Processing step %s [%s]", row[1], row[3]);
 		if(row[5][0] != 0)
 		{
 			if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, row[5])))
@@ -97,7 +99,21 @@ int	process_httptest(zbx_uint64_t httptestid)
 			ret = FAIL;
 			break;
 		}
+		if(CURLE_OK != (err = curl_easy_getinfo(easyhandle,CURLINFO_TOTAL_TIME ,&total_time)))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "Error doing curl_easy_perform [%s]", curl_easy_strerror(err));
+			ret = FAIL;
+			break;
+		}
+		if(CURLE_OK != (err = curl_easy_getinfo(easyhandle,CURLINFO_SPEED_DOWNLOAD ,&speed_download)))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "Error doing curl_easy_perform [%s]", curl_easy_strerror(err));
+			ret = FAIL;
+			break;
+		}
 		zabbix_log(LOG_LEVEL_WARNING, "RSPCODE [%d]", rspcode);
+		zabbix_log(LOG_LEVEL_WARNING, "Time [%f]", total_time);
+		zabbix_log(LOG_LEVEL_WARNING, "Speed download [%f]", speed_download);
 	}
 	DBfree_result(result);
 
