@@ -49,6 +49,38 @@ size_t HEADERFUNCTION( void *ptr, size_t size, size_t nmemb, void *stream)
 }
 
 
+void	process_http_data()
+{
+	DB_RESULT	result;
+	DB_ROW	row;
+	char	server_esc[MAX_STRING_LEN];
+	char	key_esc[MAX_STRING_LEN];
+
+	DBescape_string(server, server_esc, MAX_STRING_LEN);
+	DBescape_string(key, key_esc, MAX_STRING_LEN);
+
+	result = DBselect("select %s where h.status=%d and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type in (%d,%d) and" ZBX_COND_NODEID, ZBX_SQL_ITEM_SELECT, HOST_STATUS_MONITORED, server_esc, key_esc, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, LOCAL_NODE("h.hostid"));
+
+	row=DBfetch(result);
+	DBget_item_from_db(&item,row);
+
+	if(set_result_type(&agent, item.value_type, value) == SUCCEED)
+	{
+		process_new_value(&item,&agent);
+		update_triggers(item.itemid);
+	}
+	else
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Type of received value [%s] is not suitable for [%s@%s]", value, item.key, item.host );
+		zabbix_syslog("Type of received value [%s] is not suitable for [%s@%s]", value, item.key, item.host );
+	}
+ 
+	DBfree_result(result);
+	DBfree_result(result);
+}
+
+
+
 /******************************************************************************
  *                                                                            *
  * Function: process_httptest                                                 *
@@ -123,6 +155,12 @@ int	process_httptest(zbx_uint64_t httptestid)
 			}
 		}
 		if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_URL, row[3])))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "Cannot set URL [%s]", curl_easy_strerror(err));
+			ret = FAIL;
+			break;
+		}
+		if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT, atoi(row[4]))))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "Cannot set URL [%s]", curl_easy_strerror(err));
 			ret = FAIL;
