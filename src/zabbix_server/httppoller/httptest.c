@@ -28,6 +28,27 @@
 #include "common.h"
 #include "httptest.h"
 
+size_t WRITEFUNCTION( void *ptr, size_t size, size_t nmemb, void *stream)
+{
+	size_t s = size*nmemb + 1;
+	char *str_dat = calloc(1, s);
+
+	zbx_snprintf(str_dat,s,ptr);
+//	ZBX_LIM_PRINT("WRITEFUNCTION", s, str_dat, 65535);
+//	zabbix_log(LOG_LEVEL_WARNING, "In WRITEFUNCTION");
+
+	return size*nmemb;
+}
+
+size_t HEADERFUNCTION( void *ptr, size_t size, size_t nmemb, void *stream)
+{
+//	ZBX_LIM_PRINT("HEADERFUNCTION", size*nmemb, ptr, 300);
+//	zabbix_log(LOG_LEVEL_WARNING, "In HEADERFUNCTION");
+
+	return size*nmemb;
+}
+
+
 /******************************************************************************
  *                                                                            *
  * Function: process_httptest                                                 *
@@ -63,6 +84,26 @@ int	process_httptest(zbx_uint64_t httptestid)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot init CURL");
 
+		return FAIL;
+	}
+	if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_COOKIEFILE, "")))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLOPT_COOKIEFILE [%s]", curl_easy_strerror(err));
+		return FAIL;
+	}
+	if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_FOLLOWLOCATION, 1)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLOPT_FOLLOWLOCATION [%s]", curl_easy_strerror(err));
+		return FAIL;
+	}
+	if(CURLE_OK != (err = curl_easy_setopt(easyhandle,CURLOPT_WRITEFUNCTION ,WRITEFUNCTION)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Error doing curl_easy_perform [%s]", curl_easy_strerror(err));
+		return FAIL;
+	}
+	if(CURLE_OK != (err = curl_easy_setopt(easyhandle,CURLOPT_HEADERFUNCTION ,HEADERFUNCTION)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Error doing curl_easy_perform [%s]", curl_easy_strerror(err));
 		return FAIL;
 	}
 
