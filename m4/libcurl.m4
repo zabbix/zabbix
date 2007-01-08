@@ -57,8 +57,10 @@ AC_DEFUN([LIBCURL_CHECK_CONFIG],
   AH_TEMPLATE([LIBCURL_PROTOCOL_TFTP],[Defined if libcurl supports TFTP])
 
   AC_ARG_WITH(libcurl,
-     AC_HELP_STRING([--with-libcurl=DIR],[look for the curl library in DIR]),
-     [_libcurl_with=$withval],[_libcurl_with=ifelse([$1],,[yes],[$1])])
+     [
+If you want to use cURL library:
+AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL library @<:@default=no@:>@, look for the curl library in DIR])],
+     [_libcurl_with=$withval],[_libcurl_with=ifelse([$1],,[no],[$1])])
 
   if test "$_libcurl_with" != "no" ; then
 

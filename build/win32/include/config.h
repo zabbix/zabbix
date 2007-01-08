@@ -158,7 +158,7 @@
 /* #undef HAVE_ORACLE */
 
 /* Define to 1 if PostgreSQL should be enabled. */
-/* #undef HAVE_PGSQL */
+/* #undef HAVE_POSTGRESQL */
 
 /* Define to 1 if '/proc' file system should be used. */
 //#define HAVE_PROC 1
