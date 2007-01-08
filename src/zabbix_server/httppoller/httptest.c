@@ -49,13 +49,16 @@ size_t HEADERFUNCTION( void *ptr, size_t size, size_t nmemb, void *stream)
 }
 
 
-void	process_http_data()
+/*
+void	process_http_data(int hostid,char *stat,char *httptest_name,char *httpstep_name)
 {
 #ifdef	HAVE_LIBCURL
 	DB_RESULT	result;
 	DB_ROW	row;
 	char	server_esc[MAX_STRING_LEN];
 	char	key_esc[MAX_STRING_LEN];
+
+	zabbix_log(LOG_LEVEL_WARNING, "In process_httptest(httptestid:" ZBX_FS_UI64 ")", httptestid);
 
 	DBescape_string(server, server_esc, MAX_STRING_LEN);
 	DBescape_string(key, key_esc, MAX_STRING_LEN);
@@ -78,8 +81,9 @@ void	process_http_data()
  
 	DBfree_result(result);
 	DBfree_result(result);
-#endif /* HAVE_LIBCURL */
+#endif
 }
+*/
 
 
 
@@ -193,9 +197,8 @@ int	process_httptest(zbx_uint64_t httptestid)
 			ret = FAIL;
 			break;
 		}
-		zabbix_log(LOG_LEVEL_WARNING, "RSPCODE [%d]", rspcode);
-		zabbix_log(LOG_LEVEL_WARNING, "Time [%f]", total_time);
-		zabbix_log(LOG_LEVEL_WARNING, "Speed download [%f]", speed_download);
+		zabbix_log(LOG_LEVEL_WARNING, "%s: Rspcode [%d] Time [%f] Speed download [%f]",
+			 row[2], rspcode, total_time, speed_download);
 	}
 	DBfree_result(result);
 
