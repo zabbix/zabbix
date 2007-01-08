@@ -1,5 +1,6 @@
 Changes for 1.3.3:
 
+ - improved databases determination of configuration script (Eugene)
  - new server parameter 'StartHTTPPollers' (Alexei)
 
 Changes for 1.3.2:

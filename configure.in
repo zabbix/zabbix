@@ -474,7 +474,7 @@ AC_ARG_ENABLE(server,
 [case "${enableval}" in
   yes) server=yes ;;
   no)  server=no ;;
-  *) AC_MSG_ERROR(bad value ${enableval} for --enable-server) ;;
+  *) AC_MSG_ERROR([bad value ${enableval} for --enable-server]) ;;
 esac],
 [server=no])
 AM_CONDITIONAL(SERVER, test x$server = xyes)
@@ -484,7 +484,7 @@ AC_ARG_ENABLE(agent,
 [case "${enableval}" in
   yes) agent=yes ;;
   no)  agent=no ;;
-  *) AC_MSG_ERROR(bad value ${enableval} for --enable-agent) ;;
+  *) AC_MSG_ERROR([bad value ${enableval} for --enable-agent]) ;;
 esac],
 [agent=no])
 AM_CONDITIONAL(AGENT, test x$agent = xyes)
@@ -492,15 +492,19 @@ AM_CONDITIONAL(AGENT, test x$agent = xyes)
 have_db="no"
 
 if test "$server" = "yes"; then
-	AC_MSG_CHECKING(for Oracle support)
+	
 	AC_ARG_WITH(oracle,
 	[
-	What DBMS do you want to use (please select only one):
-	  --with-oracle[=DIR]      Include Oracle support.  DIR is the Sqlora8 base
-				 install directory, default is to search through
-				 a number of common places for the Sqlora8 files.],
+What DBMS do you want to use (please select only one):
+AC_HELP_STRING([--with-oracle@<:@=ARG@:>@],
+		[use Sqlora8 library @<:@default=no@:>@, default is to search through a number of common places for the Sqlora8 files.])],
 	[
 	if test "$withval" != "no"; then
+		AC_MSG_CHECKING(for Oracle support)
+		if test "$have_db" != "no"; then
+			AC_MSG_RESULT(error)
+			AC_MSG_ERROR([You can configure for only one database.]);
+		fi
 		if test "$withval" = "yes"; then
 			if test -f /usr/include/sqlora.h; then
 				ORACLE_INCDIR=/usr/include
@@ -516,7 +520,7 @@ if test "$server" = "yes"; then
 				ORACLE_LIBDIR=${ORACLE_HOME}/lib
 			else
 				AC_MSG_RESULT(no)
-				AC_MSG_ERROR(Invalid Oracle directory - unable to find sqlora.h)
+				AC_MSG_ERROR([Invalid Oracle directory - unable to find sqlora.h])
 			fi
 		else
 			if test -f $withval/include/sqlora.h; then
@@ -530,7 +534,7 @@ if test "$server" = "yes"; then
 				ORACLE_LIBDIR=$withval
 			else
 				AC_MSG_RESULT(no)
-				AC_MSG_ERROR(Invalid Oracle directory - unable to find sqlora.h under $withval)
+				AC_MSG_ERROR([Invalid Oracle directory - unable to find sqlora.h under $withval])
 			fi
 		fi
 		ORACLE_INCLUDE="-I$ORACLE_INCDIR -I/home/zabbix/sqlora8/lib/libsqlora8/include"
@@ -540,197 +544,69 @@ if test "$server" = "yes"; then
 		AC_DEFINE(HAVE_ORACLE,1,[Define to 1 if Oracle should be enabled.])
 		AC_MSG_RESULT(yes)
 		have_db="Oracle"
-
-	else
-		AC_MSG_RESULT(no)
 	fi
-	],[
-	  AC_MSG_RESULT(no)
-	])
+	],[])
 	AC_SUBST(ORACLE_INCLUDE)
 	AC_SUBST(ORACLE_LFLAGS)
 	AC_SUBST(ORACLE_LIBS)
 
-	AC_MSG_CHECKING(for SQLite3 support)
-	AC_ARG_WITH(sqlite3,
-	[
-	What DBMS do you want to use (please select only one):
-	  --with-sqlite3[=DIR]      Include SQLite3 support.  DIR is the SQLite base
-				 install directory, default is to search through
-				 a number of common places for the SQLite files.],
-	[
-	if test "$withval" != "no"; then
-		if test "$withval" = "yes"; then
-			if test -f /usr/include/sqlite3.h; then
-				SQLITE3_INCDIR=/usr/include
-				SQLITE3_LIBDIR=/usr/lib
-			elif test -f /usr/lib/sqlite/include/sqlite3.h; then
-				SQLITE_INCDIR=/usr/lib/sqlite3/include
-				SQLITE_LIBDIR=/usr/lib
-			else
-				AC_MSG_RESULT(no)
-				AC_MSG_ERROR(Invalid SQLite directory - unable to find sqlite3.h)
-			fi
-		else
-			if test -f $withval/include/sqlite3.h; then
-				SQLITE3_INCDIR=$withval/include
-				SQLITE3_LIBDIR=$withval/lib
-			elif test -f $withval/lib/sqlite/include/sqlite3.h; then
-				SQLITE3_INCDIR=$withval/lib/sqlite/include
-				SQLITE3_LIBDIR=$withval/lib
-			elif test -f $withval/sqlite/include/sqlite3.h; then
-				SQLITE3_INCDIR=$withval/sqlite/include
-				SQLITE3_LIBDIR=$withval
-			else
-				AC_MSG_RESULT(no)
-				AC_MSG_ERROR(Invalid SQLite directory - unable to find sqlite3.h under $withval)
-			fi
+	dnl Checking for SQLite3 support
+	AX_LIB_SQLITE3()
+	if test "x$WANT_SQLITE3" = "xyes"; then
+		if test "$have_db" != "no"; then
+			AC_MSG_ERROR([You can configure for only one database.]);
 		fi
-		SQLITE3_INCLUDE="-I$SQLITE3_INCDIR"
-		SQLITE3_LFLAGS="-L$SQLITE3_LIBDIR"
-		SQLITE3_LIBS="-lsqlite3"
 
-		AC_DEFINE(HAVE_SQLITE3,1,[Define to 1 if SQLite should be enabled.])
-		AC_MSG_RESULT(yes)
-		have_db="SQLite v3.x"
-
-	else
-		AC_MSG_RESULT(no)
+		if test "$found_sqlite3" = "yes"; then
+			have_db="SQLite v3.x"
+		else
+			AC_MSG_ERROR([Not found SQLite3 library]);
+		fi
 	fi
-	],[
-	  AC_MSG_RESULT(no)
-	])
-	AC_SUBST(SQLITE3_INCLUDE)
-	AC_SUBST(SQLITE3_LFLAGS)
-	AC_SUBST(SQLITE3_LIBS)
 
-	AC_MSG_CHECKING(for MySQL support)
-	AC_ARG_WITH(mysql,
-	[
-	  --with-mysql[=DIR]       Include MySQL support.  DIR is the MySQL base
-				 install directory, default is to search through
-				 a number of common places for the MySQL files.],
-	[
-	  if test "$withval" != "no"; then
-		if test "$withval" = "yes"; then
-			if test -f /usr/local/mysql/include/mysql/mysql.h; then
-				MYSQL_INCDIR=/usr/local/mysql/include/mysql
-				MYSQL_LIBDIR=/usr/local/mysql/lib/mysql
-			elif test -f /usr/include/mysql/mysql.h; then
-				MYSQL_INCDIR=/usr/include/mysql
-				MYSQL_LIBDIR=/usr/lib/mysql
-			elif test -f /usr/include/mysql.h; then
-				MYSQL_INCDIR=/usr/include
-				MYSQL_LIBDIR=/usr/lib
-			elif test -f /usr/local/include/mysql/mysql.h; then
-				MYSQL_INCDIR=/usr/local/include/mysql
-				MYSQL_LIBDIR=/usr/local/lib/mysql
-			elif test -f /usr/local/include/mysql.h; then
-				MYSQL_INCDIR=/usr/local/include
-				MYSQL_LIBDIR=/usr/local/lib
-			else
-			AC_MSG_RESULT(no)
-			AC_MSG_ERROR(Invalid MySQL directory - unable to find mysql.h)
-			fi
-		else
-			if test -f $withval/include/mysql/mysql.h; then
-				MYSQL_INCDIR=$withval/include/mysql
-				MYSQL_LIBDIR=$withval/lib/mysql
-			elif test -f $withval/include/mysql.h; then
-				MYSQL_INCDIR=$withval/include
-				MYSQL_LIBDIR=$withval/lib
-			else
-			AC_MSG_RESULT(no)
-			AC_MSG_ERROR(Invalid MySQL directory - unable to find mysql.h under $withval)
-			fi
+	dnl Checking for MySQL support
+	AX_LIB_MYSQL()
+	if test "$want_mysql" = "yes"; then
+		if test "$have_db" != "no"; then
+			AC_MSG_ERROR([You can configure for only one database.]);
 		fi
-		MYSQL_INCLUDE="-I$MYSQL_INCDIR"
-		MYSQL_LFLAGS="-L$MYSQL_LIBDIR"
-		MYSQL_LIBS="-lmysqlclient"
 
-		AC_DEFINE(HAVE_MYSQL,1,[Define to 1 if MySQL should be enabled.])
-		AC_MSG_RESULT(yes)
-		have_db="MySQL"
-	    dnl MySQL requires -lm sometime
-	dnl	AC_CHECK_FUNC(floor, , AC_CHECK_LIB(m, floor, MYSQL_LFLAGS="$MYSQL_LFLAGS -lm"))
-		AC_CHECK_FUNC(floor, , AC_CHECK_LIB(m, floor, MYSQL_LIBS="$MYSQL_LIBS -lm"))
-	    dnl MySQL 3.23 requires -lz sometime
-	dnl This does not work for some reason
-	dnl    AC_CHECK_FUNC(compress, , AC_CHECK_LIB(z, compress, MYSQL_LFLAGS="$MYSQL_LFLAGS -lz"))
-	dnl	AC_CHECK_LIB(z, compress, MYSQL_LFLAGS="$MYSQL_LFLAGS -lz")
-		AC_CHECK_LIB(z, compress, MYSQL_LIBS="$MYSQL_LIBS -lz")
+		if test "$found_mysql" = "yes"; then
 
+			have_db="MySQL"
+
+			dnl MySQL requires -lm sometime
+			AC_CHECK_FUNC(floor, , AC_CHECK_LIB(m, floor, MYSQL_LDFLAGS="$MYSQL_LDFLAGS -lm"))
+
+			dnl MySQL 3.23 requires -lz sometime
+			AC_CHECK_LIB(z, compress, MYSQL_LDFLAGS="$MYSQL_LDFLAGS -lz")
 		else
-			AC_MSG_RESULT(no)
+			AC_MSG_ERROR([Not found MySQL library]);
 		fi
-	],[
-	  AC_MSG_RESULT(no)
-	])
-	AC_SUBST(MYSQL_INCLUDE)
-	AC_SUBST(MYSQL_LFLAGS)
-	AC_SUBST(MYSQL_LIBS)
+	fi
 
+	dnl Checking for PostgreSQL support
+	AX_LIB_POSTGRESQL()
+	if test "$want_postgresql" = "yes"; then
+		if test "$have_db" != "no"; then
+			AC_MSG_ERROR([You can configure for only one database.]);
+		fi
 
-	AC_MSG_CHECKING(for PostgreSQL support)
-	AC_ARG_WITH(pgsql,
-	[  --with-pgsql[=DIR]       Include PostgreSQL support.  DIR is the PostgreSQL
-				 base install directory, defaults to /usr/local/pgsql.],
-	[
-	  if test "$withval" != "no"; then
-	      if test "$have_db" != "no"; then
-		  AC_MSG_RESULT(error)
-		  AC_MSG_ERROR("You can configure for only one database.");
-	      fi
-		if test "$withval" = "yes"; then
-			if test -f /usr/include/pgsql/libpq-fe.h; then
-				PGSQL_INCDIR=/usr/include/pgsql
-			elif test -f /usr/include/postgresql/libpq-fe.h; then
-				PGSQL_INCDIR=/usr/include/postgresql
-			elif test -f /usr/local/include/libpq-fe.h; then
-				PGSQL_INCDIR=/usr/local/include
-			elif test -f /usr/local/include/pgsql/libpq-fe.h; then
-				PGSQL_INCDIR=/usr/local/include/pgsql
-			else
-				PGSQL_INCDIR=/usr/local/pgsql/include
-			fi
-			if test -f /usr/lib/libpq.a; then
-				PGSQL_LIBDIR=/usr/lib
-			elif test -f /usr/local/lib/libpq.a; then
-				PGSQL_LIBDIR=/usr/local/lib
-			else
-				PGSQL_LIBDIR=/usr/local/pgsql/lib
-			fi
+		if test "$found_postgresql" = "yes"; then
+
+			have_db="PostgreSQL"
+			
+			dnl To avoid linking of crypt with the agent
+			AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt,  POSTGRESQL_LDFLAGS="-lcrypt $POSTGRESQL_LDFLAGS"))
 		else
-			PGSQL_INCDIR=$withval/include
-			test -d $withval/include/pgsql && PGSQL_INCDIR=$withval/include/pgsql
-			PGSQL_LIBDIR=$withval/lib
-			test -d $withval/lib/pgsql && PGSQL_LIBDIR=$withval/lib/pgsql
+			AC_MSG_ERROR([Not found PostgreSQL library]);
 		fi
-	    PGSQL_INCLUDE="-I$PGSQL_INCDIR"
-	    PGSQL_LFLAGS="-L$PGSQL_LIBDIR"
-	    PGSQL_LIBS="-lpq"
-	dnl To avoid linking of crypt with the agent
-	dnl    AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt, LIBS="-lcrypt $LIBS"))
-	dnl    AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt,  PGSQL_LFLAGS="-lcrypt $PGSQL_LFLAGS"))
-	    AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt,  PGSQL_LIBS="-lcrypt $PGSQL_LIBS"))
-
-	    AC_DEFINE(HAVE_PGSQL,1,[Define to 1 if PostgreSQL should be enabled.])
-	    AC_MSG_RESULT(yes)
-	    have_db="PostgreSQL"
-	  else
-	    AC_MSG_RESULT(no)
-	  fi
-	],[
-	  AC_MSG_RESULT(no)
-	])
-	AC_SUBST(PGSQL_INCLUDE)
-	AC_SUBST(PGSQL_LFLAGS)
-	AC_SUBST(PGSQL_LIBS)
+	fi
 
 	AC_MSG_CHECKING(for ZABBIX server database selection)
 	if test "$have_db" = "no"; then
 		AC_MSG_RESULT(error)
-		AC_MSG_ERROR(No database selected for ZABBIX server. Use --with-mysql or --with-oracle or --with-pgsql or --with-sqlite.)
+		AC_MSG_ERROR([No database selected for ZABBIX server. Use --with-mysql or --with-oracle or --with-pgsql or --with-sqlite3.])
 	else
 		AC_MSG_RESULT(ok)
 	fi
@@ -740,10 +616,8 @@ AC_MSG_CHECKING(for NET-SNMP support)
 AC_ARG_WITH(net-snmp,
 [
 What SNMP package do you want to use (please select only one):
-  --with-net-snmp[=DIR]    Include SNMP support.  DIR is the NET-SNMP
-                         base install directory, default is to search 
-                         through a number of common places for the
-			 SNMP files.],
+AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
+		[use NET-SNMP package @<:@default=no@:>@, default is to search through a number of common places for the NET-SNMP files.])],
 [
   if test "$withval" != "no"; then
   	if test "$withval" = "yes"; then
@@ -768,7 +642,7 @@ dnl			SNMP_LIBDIR=/usr/local/lib/net-snmp
 			SNMP_LIBDIR=/usr/local/lib
 		else
     		AC_MSG_RESULT(no)
-    		AC_MSG_ERROR(Invalid NET-SNMP directory - unable to find net-snmp-includes.h)
+    		AC_MSG_ERROR([Invalid NET-SNMP directory - unable to find net-snmp-includes.h])
 		fi
    	else
 		if test -f $withval/include/net-snmp/net-snmp-includes.h; then
@@ -781,7 +655,7 @@ dnl   			SNMP_LIBDIR=$withval/lib/net-snmp
    			SNMP_LIBDIR=$withval/lib
 		else
     		AC_MSG_RESULT(no)
-    		AC_MSG_ERROR(Invalid NET-SNMP directory - unable to find net-snmp-includes.h under $withval)
+    		AC_MSG_ERROR([Invalid NET-SNMP directory - unable to find net-snmp-includes.h under $withval])
 		fi
    	fi
 
@@ -792,7 +666,7 @@ dnl    AC_CHECK_LIB(crypto, main,  SNMP_LFLAGS="-lcrypto $SNMP_LFLAGS")
     SNMP_LFLAGS="-L$SNMP_LIBDIR $SNMP_LFLAGS"
     SNMP_LIBS="-lnetsnmp $SNMP_LIBS"
 
-    AC_DEFINE(HAVE_NETSNMP,1,[Define to 1 if NETSNMP should be enabled.])
+    AC_DEFINE(HAVE_NETSNMP,1,[Define to 1 if NET-SNMP should be enabled.])
     AC_DEFINE(HAVE_SNMP,1,[Define to 1 if SNMP should be enabled.])
     AC_MSG_RESULT(yes)
 
@@ -806,14 +680,10 @@ AC_SUBST(SNMP_INCLUDE)
 AC_SUBST(SNMP_LFLAGS)
 AC_SUBST(SNMP_LIBS)
 
-LIBCURL_CHECK_CONFIG([yes], [7.15.1], [],[])
-
 AC_MSG_CHECKING(for UCD-SNMP support)
 AC_ARG_WITH(ucd-snmp,
-[  --with-ucd-snmp[=DIR]    Include SNMP support.  DIR is the UCD-SNMP
-                         base install directory, default is to search 
-                         through a number of common places for the
-			 SNMP files.],
+[AC_HELP_STRING([--with-ucd-snmp@<:@=ARG@:>@],
+		[use UCD-SNMP package @<:@default=no@:>@, default is to search through a number of common places for the UCD-SNMP files.])],
 [
   if test "$withval" != "no"; then
   	if test "$withval" = "yes"; then
@@ -838,7 +708,7 @@ dnl			SNMP_LIBDIR=/usr/local/lib/ucd-snmp
 			SNMP_LIBDIR=/usr/local/lib
 		else
     		AC_MSG_RESULT(no)
-    		AC_MSG_ERROR(Invalid UCD-SNMP directory - unable to find ucd-snmp-config.h)
+    		AC_MSG_ERROR([Invalid UCD-SNMP directory - unable to find ucd-snmp-config.h])
 		fi
    	else
 		if test -f $withval/include/ucd-snmp/ucd-snmp-config.h; then
@@ -851,7 +721,7 @@ dnl   			SNMP_LIBDIR=$withval/lib/ucd-snmp
    			SNMP_LIBDIR=$withval/lib
 		else
     		AC_MSG_RESULT(no)
-    		AC_MSG_ERROR(Invalid UCD-SNMP directory - unable to find ucd-snmp-config.h under $withval)
+    		AC_MSG_ERROR([Invalid UCD-SNMP directory - unable to find ucd-snmp-config.h under $withval])
 		fi
    	fi
 dnl    AC_CHECK_LIB(crypto, main,  SNMP_LFLAGS="-lcrypto $SNMP_LFLAGS")
@@ -874,14 +744,15 @@ dnl    AC_CHECK_LIB(crypto, main,  SNMP_LFLAGS="-lcrypto $SNMP_LFLAGS")
 AC_SUBST(SNMP_LFLAGS)
 AC_SUBST(SNMP_INCLUDE)
 
+LIBCURL_CHECK_CONFIG([yes], [7.15.1], [],[])
+
+
 AC_MSG_CHECKING(for LDAP support)
 AC_ARG_WITH(ldap,
 [
 If you want to check LDAP servers:
-  --with-ldap[=DIR]       Include LDAP support.  DIR is the LDAP
-			base install directory, default is to search 
-			through a number of common places for the
-			LDAP files.],
+AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],
+	[Include LDAP support @<:@default=no@:>@. DIR is the LDAP base install directory, default is to search through a number of common places for the LDAP files.])],
 [
   if test "$withval" != "no"; then
        if test "$withval" = "yes"; then
@@ -896,7 +767,7 @@ If you want to check LDAP servers:
                        LDAP_LIBDIR=/usr/local/lib
                else
                AC_MSG_RESULT(no)
-               AC_MSG_ERROR(Invalid LDAP directory - unable to find ldap.h)
+               AC_MSG_ERROR([Invalid LDAP directory - unable to find ldap.h])
                fi
        else
                if test -f $withval/include/ldap.h; then
@@ -904,7 +775,7 @@ If you want to check LDAP servers:
                        LDAP_LIBDIR=$withval/lib
                else
                AC_MSG_RESULT(no)
-               AC_MSG_ERROR(Invalid LDAP directory - unable to find ldap.h under $withval)
+               AC_MSG_ERROR([Invalid LDAP directory - unable to find ldap.h under $withval])
                fi
        fi
 

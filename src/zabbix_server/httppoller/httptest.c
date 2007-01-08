@@ -51,6 +51,7 @@ size_t HEADERFUNCTION( void *ptr, size_t size, size_t nmemb, void *stream)
 
 void	process_http_data()
 {
+#ifdef	HAVE_LIBCURL
 	DB_RESULT	result;
 	DB_ROW	row;
 	char	server_esc[MAX_STRING_LEN];
@@ -77,6 +78,7 @@ void	process_http_data()
  
 	DBfree_result(result);
 	DBfree_result(result);
+#endif /* HAVE_LIBCURL */
 }
 
 
@@ -98,6 +100,7 @@ void	process_http_data()
  ******************************************************************************/
 int	process_httptest(zbx_uint64_t httptestid)
 {
+#ifdef HAVE_LIBCURL
 	DB_RESULT	result;
 	DB_ROW	row;
 	int	ret = SUCCEED;
@@ -199,6 +202,7 @@ int	process_httptest(zbx_uint64_t httptestid)
 	(void)curl_easy_cleanup(easyhandle);
 
 	return ret;
+#endif /* HAVE_LIBCURL */
 }
 
 /******************************************************************************
@@ -218,6 +222,7 @@ int	process_httptest(zbx_uint64_t httptestid)
  ******************************************************************************/
 void process_httptests(int now)
 {
+#ifdef HAVE_LIBCURL
 	DB_RESULT	result;
 	DB_ROW	row;
 
@@ -234,4 +239,5 @@ void process_httptests(int now)
 		DBexecute("update httptest set nextcheck=%d+delay where httptestid=" ZBX_FS_UI64, now, httptestid);
 	}
 	DBfree_result(result);
+#endif /* HAVE_LIBCURL */
 }
