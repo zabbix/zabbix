@@ -110,6 +110,9 @@ frontends/php/popup_trexpr.php -text
 frontends/php/popup_users.php -text
 frontends/php/popup_usrgrp.php -text
 frontends/php/setup.php -text
+m4/ax_lib_mysql.m4 -text
+m4/ax_lib_postgresql.m4 -text
+m4/ax_lib_sqlite3.m4 -text
 m4/libcurl.m4 -text
 misc/clock/clock.fla -text
 /splint -text
