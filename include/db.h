@@ -38,13 +38,13 @@
 #	include "sqlora.h"
 #endif /* HAVE_ORACLE */
 
-#ifdef HAVE_PGSQL
+#ifdef HAVE_POSTGRESQL
 #	include <libpq-fe.h>
-#endif /* HAVE_PGSQL */
+#endif /* HAVE_POSTGRESQL */
 
 #ifdef HAVE_SQLITE3
 #	include <sqlite3.h>
-#endif /* HAVE_PGSQL */
+#endif /* HAVE_SQLITE3 */
 
 
 #ifdef HAVE_SQLITE3
@@ -108,7 +108,7 @@ void	SQ_DBfree_result(DB_RESULT result);
 	#define DB_ROW		MYSQL_ROW
 #endif
 
-#ifdef HAVE_PGSQL
+#ifdef HAVE_POSTGRESQL
 	#define DB_ROW		char **
 	#define	DB_RESULT	ZBX_PG_DB_RESULT*
 	#define	DBfree_result	PG_DBfree_result

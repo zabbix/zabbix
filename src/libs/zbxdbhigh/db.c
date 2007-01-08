@@ -43,7 +43,7 @@
 	MYSQL	mysql;
 #endif
 
-#ifdef	HAVE_PGSQL
+#ifdef	HAVE_POSTGRESQL
 	PGconn	*conn;
 #endif
 
@@ -61,7 +61,7 @@ void	DBclose(void)
 #ifdef	HAVE_MYSQL
 	mysql_close(&mysql);
 #endif
-#ifdef	HAVE_PGSQL
+#ifdef	HAVE_POSTGRESQL
 	PQfinish(conn);
 #endif
 #ifdef	HAVE_ORACLE
@@ -108,7 +108,7 @@ void    DBconnect(void)
 			exit(FAIL);
 	}
 #endif
-#ifdef	HAVE_PGSQL
+#ifdef	HAVE_POSTGRESQL
 /*	conn = PQsetdb(pghost, pgport, pgoptions, pgtty, dbName); */
 /*	conn = PQsetdb(NULL, NULL, NULL, NULL, CONFIG_DBNAME);*/
 	conn = PQsetdbLogin(CONFIG_DBHOST, NULL, NULL, NULL, CONFIG_DBNAME, CONFIG_DBUSER, CONFIG_DBPASSWORD );
@@ -287,7 +287,7 @@ int DBexecute(const char *fmt, ...)
 	char	sql[ZBX_MAX_SQL_LEN];
 
 	va_list args;
-#ifdef	HAVE_PGSQL
+#ifdef	HAVE_POSTGRESQL
 	PGresult	*result;
 #endif
 #ifdef	HAVE_ORACLE
@@ -315,7 +315,7 @@ int DBexecute(const char *fmt, ...)
 	}
 	return (long)mysql_affected_rows(&mysql);
 #endif
-#ifdef	HAVE_PGSQL
+#ifdef	HAVE_POSTGRESQL
 	result = PQexec(conn,sql);
 
 	if( result==NULL)
@@ -389,7 +389,7 @@ int	DBis_null(char *field)
 	return ret;
 }
 
-#ifdef  HAVE_PGSQL
+#ifdef  HAVE_POSTGRESQL
 /* in db.h - #define DBfree_result   PG_DBfree_result */
 void	PG_DBfree_result(DB_RESULT result)
 {
@@ -427,7 +427,7 @@ DB_ROW	DBfetch(DB_RESULT result)
 #ifdef	HAVE_MYSQL
 	return mysql_fetch_row(result);
 #endif
-#ifdef	HAVE_PGSQL
+#ifdef	HAVE_POSTGRESQL
 
 	int	i;
 
@@ -505,7 +505,7 @@ DB_RESULT DBselect(const char *fmt, ...)
 	char	sql[ZBX_MAX_SQL_LEN];
 
 	va_list args;
-#if defined(HAVE_PGSQL) || defined(HAVE_SQLITE3)
+#if defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3)
 	DB_RESULT result;
 #endif
 #ifdef	HAVE_ORACLE
@@ -534,7 +534,7 @@ DB_RESULT DBselect(const char *fmt, ...)
 	}
 	return	mysql_store_result(&mysql);
 #endif
-#ifdef	HAVE_PGSQL
+#ifdef	HAVE_POSTGRESQL
 	result = malloc(sizeof(ZBX_PG_DB_RESULT));
 	result->pg_result = PQexec(conn,sql);
 	result->values = NULL;
@@ -610,7 +610,7 @@ DB_RESULT DBselectN(char *query, int n)
 #ifdef	HAVE_MYSQL
 	return DBselect("%s limit %d", query, n);
 #endif
-#ifdef	HAVE_PGSQL
+#ifdef	HAVE_POSTGRESQL
 	return DBselect("%s limit %d", query, n);
 #endif
 #ifdef	HAVE_ORACLE
@@ -640,7 +640,7 @@ char	*DBget_field(DB_RESULT result, int rownum, int fieldnum)
 	}
 	return row[fieldnum];
 #endif
-#ifdef	HAVE_PGSQL
+#ifdef	HAVE_POSTGRESQL
 	return PQgetvalue(result, rownum, fieldnum);
 #endif
 #ifdef	HAVE_ORACLE
@@ -662,7 +662,7 @@ zbx_uint64_t	DBinsert_id(int exec_result, const char *table, const char *field)
 	return mysql_insert_id(&mysql);
 #endif
 
-#ifdef	HAVE_PGSQL
+#ifdef	HAVE_POSTGRESQL
 	DB_RESULT	tmp_res;
 	zbx_uint64_t	id_res = FAIL;
 
@@ -718,7 +718,7 @@ long    DBaffected_rows()
 #ifdef  HAVE_MYSQL
 	return (long)mysql_affected_rows(&mysql);
 #endif
-#ifdef  HAVE_PGSQL
+#ifdef  HAVE_POSTGRESQL
 	NOT IMPLEMENTED YET
 #endif
 #ifdef	HAVE_ORACLE
@@ -781,7 +781,7 @@ int	DBnum_rows(DB_RESULT result)
 	zabbix_log(LOG_LEVEL_DEBUG, "Result of DBnum_rows [%d]", rows);
 	return rows;
 #endif
-#ifdef	HAVE_PGSQL
+#ifdef	HAVE_POSTGRESQL
 	zabbix_log(LOG_LEVEL_DEBUG, "In DBnum_rows");
 	return PQntuples(result);
 #endif
@@ -1898,7 +1898,7 @@ int	DBadd_alert(zbx_uint64_t actionid, zbx_uint64_t userid, zbx_uint64_t trigger
 
 void	DBvacuum(void)
 {
-#ifdef	HAVE_PGSQL
+#ifdef	HAVE_POSTGRESQL
 	char *table_for_housekeeping[]={"services", "services_links", "graphs_items", "graphs", "sysmaps_links",
 			"sysmaps_elements", "sysmaps", "config", "groups", "hosts_groups", "alerts",
 			"actions", "events", "functions", "history", "history_str", "hosts", "trends",

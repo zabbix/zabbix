@@ -90,7 +90,7 @@ static int housekeeping_process_log()
 
 #ifdef HAVE_ORACLE
 		deleted = DBexecute("delete from %s where %s=" ZBX_FS_UI64 " and rownum<500",housekeeper.tablename, housekeeper.field,housekeeper.value);
-#elif defined(HAVE_PGSQL)
+#elif defined(HAVE_POSTGRESQL)
 		deleted = DBexecute("delete from %s where oid in (select oid from %s where %s=" ZBX_FS_UI64 " limit 500)",
 				housekeeper.tablename, 
 				housekeeper.tablename, 
