@@ -237,7 +237,10 @@
 
 		function AddOption($name, $value)
 		{
-			$this->options[$name] = htmlspecialchars(strval($value)); 
+			if(isset($value))
+				$this->options[$name] = htmlspecialchars(strval($value)); 
+			else
+				unset($this->options[$name]);
 		}
 		function SetEnabled($value='yes')
 		{
