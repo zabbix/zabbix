@@ -37,7 +37,7 @@
 			if($value=='yes' || $value == true || $value === 1)
 				return $this->DelOption('disabled');
 
-			return $this->options['disabled'] = 'yes';
+			return $this->options['disabled'] = 'disabled';
 		}
 		function SetChecked($value="yes")
 		{

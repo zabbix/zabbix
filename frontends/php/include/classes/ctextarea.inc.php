@@ -26,7 +26,7 @@
 		{
 			parent::CTag("textarea","yes");
 			$this->options['class'] = 'biginput';
-			$this->options['wrap'] = 'soft';
+			/* $this->options['wrap'] = 'soft'; */
 			$this->options['name'] = $name;
 			$this->options['rows'] = $rows;
 			$this->options['cols'] = $cols;
