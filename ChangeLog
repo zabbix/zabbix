@@ -1,5 +1,6 @@
 Changes for 1.1.5:
 
+ - fixed sort order of hosts for trigger overview (Eugene)
  - added filter for disabled items and triggers (Eugene)
  - fixed graphs filterinf on graphs screen (Eugene)
  - added support of "vfs.file.exists" key for WinXX (Eugene)
