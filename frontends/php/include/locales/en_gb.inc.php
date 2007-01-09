@@ -608,6 +608,8 @@
 	"S_UPDATE_EXISTING_NON_LINKED_ITEMS"=>	"update existing non linked items",
 	"S_COPY"=>				"Copy",
 	"S_SHOW_ITEMS_WITH_DESCRIPTION_LIKE"=>	"Show items with description like",
+	"S_SHOW_DISABLED_ITEMS"=>               "Show disabled items",
+	"S_HIDE_DISABLED_ITEMS"=>               "Hide disabled items",
 
 //	events.php
 	"S_LATEST_EVENTS"=>			"Latest events",
@@ -963,6 +965,8 @@
 	"S_SECONDS"=>				"Seconds",
 	"S_COUNTS"=>				"Counts",
 	"S_LAST_OF"=>				"Last of",
+	"S_SHOW_DISABLED_TRIGGERS"=>		"Show disabled triggers",
+	"S_HIDE_DISABLED_TRIGGERS"=>		"Hide disabled triggers",
 
 //	tr_comments.php
 	"S_TRIGGER_COMMENTS"=>			"Trigger comments",

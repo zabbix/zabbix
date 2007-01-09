@@ -24,6 +24,7 @@
 	require_once "include/triggers.inc.php";
 	require_once "include/forms.inc.php";
 
+
 	$page["title"] = "S_CONFIGURATION_OF_TRIGGERS";
 	$page["file"] = "triggers.php";
 
@@ -58,6 +59,8 @@ include_once "include/page_header.php";
 		"copy_targetid"=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID, NULL),
 		"filter_groupid"=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, 'isset({copy})&&{copy_type}==0'),
 
+		"showdisabled"=>	array(T_ZBX_INT, O_OPT, P_SYS, IN("0,1"),	NULL),
+		
 /* actions */
 		"add_dependence"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"del_dependence"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -74,11 +77,16 @@ include_once "include/page_header.php";
 		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
 	);
 
+	$_REQUEST["showdisabled"] = get_request("showdisabled", get_profile("web.latest.showdisabled", 0));
+	
 	check_fields($fields);
+
+	$showdisabled = get_request("showdisabled", 0);
 
 	validate_group_with_host(PERM_READ_WRITE,array("allow_all_hosts","always_select_first_host","with_items"));
 ?>
 <?php
+	update_profile("web.latest.showdisabled",$showdisabled);
 
 /* FORM ACTIONS */
 	if(isset($_REQUEST["save"]))
@@ -272,6 +280,11 @@ include_once "include/page_header.php";
 <?php
 	$r_form = new CForm();
 
+	$r_form->AddItem(array('[', 
+		new CLink($showdisabled ? S_HIDE_DISABLED_TRIGGERS : S_SHOW_DISABLED_TRIGGERS,
+			'triggers.php?showdisabled='.($showdisabled ? 0 : 1),'action'),
+		']', SPACE));
+
 	$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit()");
 	$cmbHosts = new CComboBox("hostid",$_REQUEST["hostid"],"submit()");
 
@@ -347,6 +360,9 @@ include_once "include/page_header.php";
 			" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid".
 			" and h.hostid not in (".$denyed_hosts.")".
 			" and ".DBid2nodeid("h.hostid")."=".$ZBX_CURNODEID;
+			
+		if($showdisabled == 0)
+		    $sql .= " and t.status <> ".TRIGGER_STATUS_DISABLED;
 
 		if($_REQUEST["hostid"] > 0) 
 			$sql .= " and h.hostid=".$_REQUEST["hostid"];
