@@ -80,6 +80,8 @@ include_once "include/page_header.php";
 		"filter_groupid"=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, 'isset({copy})&&{copy_type}==0'),
 		"applications"=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID, NULL),
 
+		"showdisabled"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1"),	NULL),
+		
 		"del_history"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"add_delay_flex"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"del_delay_flex"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -95,8 +97,12 @@ include_once "include/page_header.php";
 		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
 	);
 
+	$_REQUEST["showdisabled"] = get_request("showdisabled", get_profile("web.latest.showdisabled", 0));
+	
 	check_fields($fields);
 
+	$showdisabled = get_request("showdisabled", 0);
+	
 	$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,$ZBX_CURNODEID);
 
 	if(isset($_REQUEST['hostid']) && !in_array($_REQUEST['hostid'], explode(',',$accessible_hosts)))
@@ -105,6 +111,7 @@ include_once "include/page_header.php";
 	}
 		
 	validate_group_with_host(PERM_READ_WRITE,array("always_select_first_host","only_current_node"));
+	update_profile("web.latest.showdisabled",$showdisabled);
 ?>
 <?php
 	$result = 0;
@@ -459,7 +466,12 @@ include_once "include/page_header.php";
 
 // Table HEADER
 		$form = new CForm();
-
+		
+		$form->AddItem(array('[', 
+			new CLink($showdisabled ? S_HIDE_DISABLED_ITEMS : S_SHOW_DISABLED_ITEMS,
+				'items.php?showdisabled='.($showdisabled ? 0 : 1),'action'),
+			']', SPACE));
+		
 		$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit();");
 		$cmbGroup->AddItem(0,S_ALL_SMALL);
 
@@ -533,6 +545,7 @@ include_once "include/page_header.php";
 		$db_items = DBselect('select i.*,th.host as template_host,th.hostid as template_hostid from items i '.
 			' left join items ti on i.templateid=ti.itemid left join hosts th on ti.hostid=th.hostid '.
 			' where i.hostid='.$_REQUEST['hostid'].
+			($showdisabled == 0 ? " and i.status <> 1" : "").
 			' order by th.host,i.description, i.key_');
 		while($db_item = DBfetch($db_items))
 		{

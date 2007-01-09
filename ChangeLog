@@ -61,6 +61,7 @@ Integrated from 1.1.x
 
 1.1.5
 
+ - added filter for disabled items and triggers (Eugene)
  - www.zabbix.com replaced by localhost in agent (Alexei)
  - fixed calculation of sum(#N) (Alexei)
  - fixed temporary files deletion for WinXX agents (Eugene)
