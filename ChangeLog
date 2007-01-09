@@ -1,5 +1,6 @@
 Changes for 1.1.5:
 
+ - added support of "vfs.file.exists" key for WinXX (Eugene)
  - www.zabbix.com replaced by localhost in agent (Alexei)
  - fixed calculation of sum(#N) (Alexei)
  - improvements of PostgreSQL code (Alexei)

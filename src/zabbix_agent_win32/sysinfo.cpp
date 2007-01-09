@@ -21,7 +21,8 @@
 **/
 
 #include "zabbixw32.h"
-
+#include <sys/types.h>
+#include <sys/stat.h>
 
 //
 // Externals
@@ -900,7 +901,7 @@ INIT_CHECK_MEMORY(main);
 
    *value=(double)crc;
 
-CHECK_MEMORY(main, "H_FileSize","end");
+CHECK_MEMORY(main, "H_CRC32","end");
 
    return SYSINFO_RC_SUCCESS;
 }
@@ -944,6 +945,48 @@ CHECK_MEMORY(main, "H_FileSize","end");
    return SYSINFO_RC_SUCCESS;
 }
 
+//
+// Handler for vfs.file.exists[*] parameter
+//
+#ifndef S_ISREG
+#       define S_ISREG(x) (((x) & S_IFMT) == S_IFREG)
+#endif
+
+static LONG VFS_FILE_EXISTS(char *cmd,char *arg,double *value)
+{
+   char 
+	   param[MAX_PATH],
+	   *fileName;
+
+   struct _stat     buf;
+
+INIT_CHECK_MEMORY(main);
+
+   GetParameterInstance(cmd,param,MAX_PATH-1);
+
+    if(num_param(param) != 1)
+    {
+            return SYSINFO_RC_NOTSUPPORTED;
+    }
+
+	fileName = param;
+
+	*value = 0.;
+
+	/* File exists */
+        if(_stat(fileName,&buf) == 0)
+        {
+                /* Regular file */
+                if(S_ISREG(buf.st_mode))
+                {
+                        *value = 1.;
+                }
+        }
+
+CHECK_MEMORY(main, "VFS_FILE_EXISTS","end");
+
+   return SYSINFO_RC_SUCCESS;
+}
 
 //
 // Handler for system[uname] parameter
@@ -1074,6 +1117,8 @@ static AGENT_COMMAND commands[]=
 
 //   { "md5_hash[*]",				NULL,				H_MD5Hash,			NULL },
 	{ "vfs.file.md5sum[*]",			NULL,				H_MD5Hash,			NULL },
+
+	{ "vfs.file.exists[*]",			VFS_FILE_EXISTS,		NULL,				NULL },
 
 //	{ "swap[*]",					H_MemoryInfo,		NULL,				NULL },
 	{ "system.swap.size[*]",		H_SwapSize,			NULL,				NULL },
