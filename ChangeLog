@@ -61,6 +61,7 @@ Integrated from 1.1.x
 
 1.1.5
 
+ - fixed sort order of hosts for trigger overview (Eugene)
  - added filter for disabled items and triggers (Eugene)
  - www.zabbix.com replaced by localhost in agent (Alexei)
  - fixed calculation of sum(#N) (Alexei)
