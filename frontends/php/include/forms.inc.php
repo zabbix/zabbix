@@ -1513,7 +1513,7 @@
 						url_param($graphtype, false, 'graphtype').
 						url_param($gitem, false).
 						url_param($gid,false,'gid').
-						'",550,400);');
+						'",550,400,"graph_item_form");');
 				
 				$items_table->AddRow(array(
 						new CCheckBox('group_gid['.$gid.']',isset($group_gid[$gid])),
@@ -1540,7 +1540,7 @@
 						'return PopUp("popup_gitem.php?dstfrm='.$frmGraph->GetName().
 						url_param($only_hostid, false, 'only_hostid').
 						url_param($graphtype, false, 'graphtype').
-						'",550,400);'),
+						'",550,400,"graph_item_form");'),
 					$dedlete_button
 				));
 		unset($items_table, $dedlete_button);

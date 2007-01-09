@@ -1,5 +1,6 @@
 Changes for 1.3.3:
 
+ - fixed popups for screen of graph editing (Eugene)
  - improved databases determination of configuration script (Eugene)
  - new server parameter 'StartHTTPPollers' (Alexei)
 
