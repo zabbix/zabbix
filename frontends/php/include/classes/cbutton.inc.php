@@ -36,7 +36,7 @@
 		}
 		function SetAction($value='submit()', $event='onClick')
 		{
-			$this->options[$event] = $value;
+			$this->options[$event] = htmlspecialchars($value);
 		}
 		function SetTitle($value='button title')
 		{

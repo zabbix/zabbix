@@ -405,8 +405,8 @@
 			} else {
 				$template_host = get_realhost_by_itemid($db_item["templateid"]);
 				$description = array(		
-					new CLink($template_host["host"],"items.php?".
-						"hostid=".$template_host["hostid"],
+					new CLink($template_host["host"],"items.php?groupid=0".
+						"&hostid=".$template_host["hostid"],
 						'action'),
 					":",
 					item_description($db_item["description"],$db_item["key_"]),
