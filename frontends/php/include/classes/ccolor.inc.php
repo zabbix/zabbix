@@ -41,7 +41,7 @@ var color_table = <?php
 	foreach(array('0','3','6','8','9','A','C','E','F') as $c)
 	{
 		$color = $c.$c.$c.$c.$c.$c;
-		$table .= '<td>'.unpack_object(new CColorCell(null, $color, 'set_color(\''.$color.'\')')).'</td>';
+		$table .= '<td>'.unpack_object(new CColorCell(null, $color, 'set_color(\\\''.$color.'\\\')')).'</td>';
 	}
 	$table .= '</tr>';
 	
@@ -78,13 +78,13 @@ var color_table = <?php
 			
 			$color = $r.$r.$g.$g.$b.$b;
 
-			$table .= '<td>'.unpack_object(new CColorCell(null, $color, 'set_color(\''.$color.'\')')).'</td>';
+			$table .= '<td>'.unpack_object(new CColorCell(null, $color, 'set_color(\\\''.$color.'\\\')')).'</td>';
 		}
 		$table .= '</tr>';
 	}
 	$table .= '</table>';
 	$cancel = '<a href="javascript:hide_color_picker()">'.S_CANCEL.'</a>';
-	echo '\''.addslashes($table).$cancel.'\'';
+	echo '\''.$table.$cancel.'\'';
 	unset($table);
 ?>
 
