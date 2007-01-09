@@ -534,6 +534,8 @@
 	"S_LOG_TIME_FORMAT"=>			"Log time format",
 	"S_CREATE_ITEM"=>			"Create Item",
 	"S_ADD_ITEM"=>				"Add Item",
+	"S_SHOW_DISABLED_ITEMS"=>               "Show disabled items",
+	"S_HIDE_DISABLED_ITEMS"=>               "Hide disabled items",
 
 //	events.php
 	"S_LATEST_EVENTS"=>			"Latest events",
@@ -855,6 +857,8 @@
 	"S_DEPENDS_ON"=>			"Depends on",
 	"S_URL"=>				"URL",
 	"S_CREATE_TRIGGER"=>			"Create Trigger",
+	"S_SHOW_DISABLED_TRIGGERS"=>		"Show disabled triggers",
+	"S_HIDE_DISABLED_TRIGGERS"=>		"Hide disabled triggers",
 
 //	tr_comments.php
 	"S_TRIGGER_COMMENTS"=>			"Trigger comments",

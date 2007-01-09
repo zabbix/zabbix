@@ -1,5 +1,6 @@
 Changes for 1.1.5:
 
+ - added filter for disabled items and triggers (Eugene)
  - fixed graphs filterinf on graphs screen (Eugene)
  - added support of "vfs.file.exists" key for WinXX (Eugene)
  - www.zabbix.com replaced by localhost in agent (Alexei)

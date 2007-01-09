@@ -79,6 +79,8 @@
 		"group_itemid"=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID, NULL),
 		"applications"=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID, NULL),
 
+		"showdisabled"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1"),	NULL),
+		
 		"del_history"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 
 		"register"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -90,13 +92,18 @@
 		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
 	);
 
+	$_REQUEST["showdisabled"] = get_request("showdisabled", get_profile("web.latest.showdisabled", 0));
+	
 	check_fields($fields);
+
+	$showdisabled = get_request("showdisabled", 0);
 
 	validate_group_with_host("U",array("always_select_first_host"));
 ?>
 
 <?php
 	update_profile("web.menu.config.last",$page["file"]);
+	update_profile("web.latest.showdisabled",$showdisabled);
 ?>
 
 <?php
@@ -310,7 +317,12 @@
 
 // Table HEADER
 		$form = new CForm();
-
+		
+		$form->AddItem(array('[', 
+			new CLink($showdisabled ? S_HIDE_DISABLED_ITEMS : S_SHOW_DISABLED_ITEMS,
+				'items.php?showdisabled='.($showdisabled ? 0 : 1),'action'),
+			']', SPACE));
+		
 		$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit();");
 		$cmbGroup->AddItem(0,S_ALL_SMALL);
 		$result=DBselect("select groupid,name from groups order by name");
@@ -386,8 +398,15 @@
 			$show_applications == 1 ? S_APPLICATIONS : NULL,
 			S_ERROR));
 
-		$db_items = DBselect("select i.* from hosts h,items i where h.hostid=i.hostid and".
-			" h.hostid=".$_REQUEST["hostid"]." order by i.description, i.key_");
+		$sql = "select i.* from hosts h,items i where h.hostid=i.hostid and".
+			" h.hostid = ".$_REQUEST["hostid"];
+			
+		if($showdisabled == 0)
+		    $sql .= " and i.status <> 1";
+		    
+		$sql .= " order by i.description, i.key_";
+		
+		$db_items = DBselect($sql);
 		while($db_item = DBfetch($db_items))
 		{
 			if(!check_right("Item","U",$db_item["itemid"]))

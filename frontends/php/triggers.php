@@ -22,6 +22,7 @@
 	include "include/config.inc.php";
 	include "include/forms.inc.php";
 
+
 	$page["title"] = "S_CONFIGURATION_OF_TRIGGERS";
 	$page["file"] = "triggers.php";
 
@@ -60,6 +61,8 @@
 
 		"g_triggerid"=>	array(T_ZBX_INT, O_OPT,  NULL,	DB_ID, NULL),
 
+		"showdisabled"=>	array(T_ZBX_INT, O_OPT, P_SYS, IN("0,1"),	NULL),
+		
 /* actions */
 		"add_dependence"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"del_dependence"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -74,12 +77,17 @@
 		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
 	);
 
+	$_REQUEST["showdisabled"] = get_request("showdisabled", get_profile("web.latest.showdisabled", 0));
+	
 	check_fields($fields);
+
+	$showdisabled = get_request("showdisabled", 0);
 
 	validate_group_with_host("U",array("allow_all_hosts","with_items"));
 ?>
 <?php
 	update_profile("web.menu.config.last",$page["file"]);
+	update_profile("web.latest.showdisabled",$showdisabled);
 ?>
 
 <?php
@@ -198,6 +206,11 @@
 /* filter panel */
 		$form = new CForm();
 
+		$form->AddItem(array('[', 
+			new CLink($showdisabled ? S_HIDE_DISABLED_TRIGGERS : S_SHOW_DISABLED_TRIGGERS,
+				'triggers.php?showdisabled='.($showdisabled ? 0 : 1),'action'),
+			']', SPACE));
+		
 		$_REQUEST["groupid"] = get_request("groupid",0);
 		$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit();");
 		$cmbGroup->AddItem(0,S_ALL_SMALL);
@@ -278,6 +291,9 @@
 		$sql = "select distinct h.hostid,h.host,t.*".
 			" from triggers t,hosts h,items i,functions f".
 			" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid";
+			
+		if($showdisabled == 0)
+		    $sql .= " and t.status <> ".TRIGGER_STATUS_DISABLED;
 
 		if($_REQUEST["hostid"] > 0) 
 			$sql .= " and h.hostid=".$_REQUEST["hostid"];
