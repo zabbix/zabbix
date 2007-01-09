@@ -22,23 +22,29 @@
 --
 
 TABLE|httptest|httptestid|ZBX_SYNC
-FIELD		|httptestid	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|httptestid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|hostid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|nextcheck	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|delay		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|status		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|applicationid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|nextcheck	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|delay		|t_integer	|'60'	|NOT NULL	|ZBX_SYNC
+FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|httptest_1	|hostid
 
 TABLE|httpstep|httpstepid|ZBX_SYNC
-FIELD		|httpstepid	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|httptestid	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|httpstepid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|httptestid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|no		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|url		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|timeout	|t_integer	|'30'	|NOT NULL	|ZBX_SYNC
 FIELD		|posts		|t_blob		|''	|NOT NULL	|ZBX_SYNC
 INDEX		|httpstep_1	|httptestid
+
+TABLE|httpstepitem|httpstepitemid|ZBX_SYNC
+FIELD		|httpstepitemid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|httptestid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+UNIQUE		|httpstepitem_1	|httptestid,itemid
 
 TABLE|nodes|nodeid|
 FIELD		|nodeid		|t_integer	|'0'	|NOT NULL	|0
