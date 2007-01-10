@@ -53,8 +53,8 @@ size_t HEADERFUNCTION( void *ptr, size_t size, size_t nmemb, void *stream)
 void	process_http_data(DB_HTTPTEST *httptest, DB_HTTPSTEP *httpstep, S_ZBX_HTTPSTAT *stat)
 {
 #ifdef	HAVE_LIBCURL
-	zabbix_log(LOG_LEVEL_WARNING, "%s: Rspcode [%d] Time [%f] Speed download [%f]",
-		 httpstep->name, stat->rspcode, stat->total_time, stat->speed_download);
+	zabbix_log(LOG_LEVEL_WARNING, "Test [%s] Step [%s] [%s]: Rspcode [%d] Time [%f] Speed download [%f]",
+		 httptest->name, httpstep->name, httpstep->url, stat->rspcode, stat->total_time, stat->speed_download);
 /*	DB_RESULT	result;
 	DB_ROW	row;
 	char	server_esc[MAX_STRING_LEN];
@@ -113,7 +113,7 @@ int	process_httptest(DB_HTTPTEST *httptest)
 
 	CURL            *easyhandle = NULL;
 
-	zabbix_log(LOG_LEVEL_WARNING, "In process_httptest(httptestid:" ZBX_FS_UI64 ")", httptest->httptestid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In process_httptest(httptestid:" ZBX_FS_UI64 ")", httptest->httptestid);
 
 	easyhandle = curl_easy_init();
 	if(easyhandle == NULL)
@@ -154,7 +154,6 @@ int	process_httptest(DB_HTTPTEST *httptest)
 		httpstep.url=row[4];
 		httpstep.timeout=atoi(row[5]);
 		httpstep.posts=row[6];
-		zabbix_log(LOG_LEVEL_WARNING, "Processing step %d [%s]", httpstep.no, httpstep.url);
 		memset(&stat,0,sizeof(stat));
 		if(row[5][0] != 0)
 		{
