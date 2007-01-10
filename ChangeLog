@@ -1,5 +1,9 @@
 Changes for 1.1.5:
 
+ - added support of "system.swap.(in/out)[<swap><,param>]" for Linux 2.x
+    <param> accept next values: 'count', 'sectors', 'pages'
+    DEFAULT: <swap> = 'all', <param> = 'pages'
+    NOTE: pages allowed only when <swap> is 'all' (Eugene)
  - fixed sort order of hosts for trigger overview (Eugene)
  - added filter for disabled items and triggers (Eugene)
  - fixed graphs filterinf on graphs screen (Eugene)
