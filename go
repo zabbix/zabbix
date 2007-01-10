@@ -31,7 +31,7 @@ cd create/schema
 ./gen.pl c >../../include/dbsync.h
 cd -
 #export CFLAGS="-Wall -pedantic"
-#./configure --enable-agent --enable-server --with-sqlite3 --with-net-snmp --prefix=`pwd` 2>>WARNINGS >/dev/null
+#./configure --enable-agent --enable-server --with-libcurl --with-sqlite3 --with-net-snmp --prefix=`pwd` 2>>WARNINGS >/dev/null
 #./configure --enable-agent --enable-server --with-libcurl --with-pgsql --with-net-snmp --prefix=`pwd` 2>>WARNINGS >/dev/null
 ./configure --enable-agent --enable-server --with-libcurl --with-mysql --with-net-snmp --prefix=`pwd` 2>>WARNINGS >/dev/null
 #./configure --enable-agent --enable-server --with-oracle=/home/zabbix/sqlora8 --with-net-snmp --prefix=`pwd` 2>>WARNINGS >/dev/null
