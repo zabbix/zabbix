@@ -25,11 +25,9 @@
 
 	$page["title"] = "S_LATEST_VALUES";
 	$page["file"] = "latest.php";
-
 	define('ZBX_PAGE_DO_REFRESH', 1);
 	
 include_once "include/page_header.php";
-
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
@@ -50,41 +48,6 @@ include_once "include/page_header.php";
 	check_fields($fields);
 
 	validate_group_with_host(PERM_READ_ONLY,array("allow_all_hosts","always_select_first_host","monitored_hosts","with_monitored_items"));
-?>
-<?php
-	// Misc functions
-	function	format_lastvalue($db_item)
-	{
-		if(isset($db_item["lastvalue"]))
-		{
-			if($db_item["value_type"] == ITEM_VALUE_TYPE_FLOAT)
-			{
-				$lastvalue=convert_units($db_item["lastvalue"],$db_item["units"]);
-			}
-			else if($db_item["value_type"] == ITEM_VALUE_TYPE_UINT64)
-			{
-				$lastvalue=convert_units($db_item["lastvalue"],$db_item["units"]);
-			}
-			else if($db_item["value_type"] == ITEM_VALUE_TYPE_TEXT)
-			{
-				$lastvalue="...";
-			}
-			else
-			{
-				$lastvalue=nbsp(htmlspecialchars(substr($db_item["lastvalue"],0,20)));
-				if(strlen($db_item["lastvalue"]) > 20)
-					$lastvalue .= " ...";
-			}
-			if($db_item["valuemapid"] > 0);
-				$lastvalue = replace_value_by_map($lastvalue, $db_item["valuemapid"]);
-
-		}
-		else
-		{
-			$lastvalue=new CCol("-","center");
-		}
-		return $lastvalue;
-	}
 ?>
 <?php
 
@@ -237,7 +200,7 @@ include_once "include/page_header.php";
 			if(isset($db_item["lastclock"]))
 				$lastclock=date(S_DATE_FORMAT_YMDHMS,$db_item["lastclock"]);
 			else
-				$lastclock="-";
+				$lastclock = new CCol('-', 'center');
 
 			$lastvalue=format_lastvalue($db_item);
 
@@ -271,7 +234,7 @@ include_once "include/page_header.php";
 				$_REQUEST["hostid"] > 0 ? NULL : SPACE,
 				str_repeat(SPACE,6).item_description($db_item["description"],$db_item["key_"]),
 				$lastclock,
-				$lastvalue,
+				new CCol($lastvalue, $lastvalue=='-' ? 'center' : null),
 				$change,
 				$actions
 				)));
@@ -315,7 +278,7 @@ include_once "include/page_header.php";
 		if(isset($db_item["lastclock"]))
 			$lastclock=date(S_DATE_FORMAT_YMDHMS,$db_item["lastclock"]);
 		else
-			$lastclock="-";
+			$lastclock = new CCol('-', 'center');
 
 		$lastvalue=format_lastvalue($db_item);
 
@@ -351,7 +314,7 @@ include_once "include/page_header.php";
 			$_REQUEST["hostid"] > 0 ? NULL : $db_item["host"],
 			str_repeat(SPACE, ($any_app_exist ? 6 : 0)).item_description($db_item["description"],$db_item["key_"]),
 			$lastclock,
-			$lastvalue,
+			new CCol($lastvalue, $lastvalue == '-' ? 'center' : null),
 			$change,
 			$actions
 			)));
