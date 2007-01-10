@@ -582,7 +582,7 @@ COpt::profiling_start('prepare data');
 		sort($hosts);
 COpt::profiling_stop('prepare data');
 COpt::profiling_start('prepare table');
-		$header=array(new CCol(S_TRIGGERS,'center'));
+		$header=array(new CCol(S_ITEMS,'center'));
 		foreach($hosts as $hostname)
 		{
 			$header=array_merge($header,array(new CImg('vtext.php?text='.$hostname)));
