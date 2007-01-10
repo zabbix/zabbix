@@ -43,9 +43,14 @@
 <?php
 	if(isset($_REQUEST["reconnect"]) && isset($_COOKIE["sessionid"]))
 	{
+		add_audit(AUDIT_ACTION_LOGOUT,AUDIT_RESOURCE_USER,"Manual Logout");
+		
 		DBexecute("delete from sessions where sessionid=".zbx_dbstr($_COOKIE["sessionid"]));
 		setcookie("sessionid",$_COOKIE["sessionid"],time()-3600); /* NOTE: don't use zbx_setcookie */
 		unset($_COOKIE["sessionid"]);
+
+		Redirect("index.php");
+		return;
 	}
 
 	if(isset($_REQUEST["enter"])&&($_REQUEST["enter"]=="Enter"))
@@ -66,6 +71,8 @@
 			DBexecute("insert into sessions (sessionid,userid,lastaccess)".
 				" values (".zbx_dbstr($sessionid).",".$row["userid"].",".time().")");
 
+			add_audit(AUDIT_ACTION_LOGIN,AUDIT_RESOURCE_USER,"Correct login [".$name."]");
+			
 			if($row["url"] != '')
 			{
 				Redirect($row["url"]);
@@ -75,6 +82,7 @@
 		else
 		{
 			$_REQUEST['message'] = "Login name or password is incorrect";
+			add_audit(AUDIT_ACTION_LOGIN,AUDIT_RESOURCE_USER,"Login failed [".$name."]");
 		}
 	}
 

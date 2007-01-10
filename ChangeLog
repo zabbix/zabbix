@@ -61,6 +61,7 @@ Integrated from 1.1.x
 
 1.1.5
 
+  - added login/logout information into auditlog (Eugene)
   - fixed values viwing on overview screen (Eugene)
   - added support of "system.swap.(in/out)[<swap><,param>]" for Linux 2.x
      <param> accept next values: 'count', 'sectors', 'pages'
