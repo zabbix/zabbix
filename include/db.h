@@ -64,19 +64,21 @@ extern	int	CONFIG_DBPORT;
 #define DB_FULL_DELETE	0
 #define DB_PART_DELETE	1
 
-#define DB_ACTION	struct action_type
-#define DB_ALERT	struct alert_type
-#define DB_CONDITION	struct condition_type
-#define DB_EVENT	struct event_type
-#define DB_FUNCTION	struct function_type
-#define DB_GRAPH	struct graph_type
-#define DB_GRAPH_ITEM	struct graph_item_type
-#define DB_HOST		struct host_type
-#define DB_HOUSEKEEPER	struct housekeeper_type
-#define DB_ITEM		struct item_type
-#define DB_MEDIA	struct media_type
-#define DB_MEDIATYPE	struct mediatype_type
-#define DB_TRIGGER	struct trigger_type
+#define DB_ACTION	struct zbx_action_type
+#define DB_ALERT	struct zbx_alert_type
+#define DB_CONDITION	struct zbx_condition_type
+#define DB_EVENT	struct zbx_event_type
+#define DB_FUNCTION	struct zbx_function_type
+#define DB_GRAPH	struct zbx_graph_type
+#define DB_GRAPH_ITEM	struct zbx_graph_item_type
+#define DB_HOST		struct zbx_host_type
+#define DB_HOUSEKEEPER	struct zbx_housekeeper_type
+#define DB_ITEM		struct zbx_item_type
+#define DB_MEDIA	struct zbx_media_type
+#define DB_MEDIATYPE	struct zbx_mediatype_type
+#define DB_TRIGGER	struct zbx_trigger_type
+#define DB_HTTPTEST	struct zbx_httptest_type
+#define DB_HTTPSTEP	struct zbx_httpstep_type
 
 #ifdef HAVE_SQLITE3
 
@@ -375,6 +377,26 @@ DB_HOUSEKEEPER
 	zbx_uint64_t	value;
 };
 
+DB_HTTPTEST
+{
+	zbx_uint64_t	httptestid;
+	char		*name;
+	zbx_uint64_t	applicationid;
+	int		nextcheck;
+	int		status;
+	int		delay;
+};
+
+DB_HTTPSTEP
+{
+	zbx_uint64_t	httpstepid;
+	zbx_uint64_t	httptestid;
+	int		no;
+	char		*name;
+	char		*url;
+	int		timeout;
+	char		*posts;
+};
 
 void    DBconnect(void);
 

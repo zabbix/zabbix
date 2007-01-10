@@ -20,11 +20,15 @@
 #ifndef ZABBIX_HTTPTEST_H
 #define ZABBIX_HTTPTEST_H
 
-typedef struct s_zbx_step
+
+#define S_ZBX_HTTPSTAT	struct s_zbx_httpstat_t
+
+S_ZBX_HTTPSTAT
 {
-	char *url;
-	char *post;
-} zbx_step;
+	long    	rspcode;
+	double  	total_time;
+	double  	speed_download;
+};
 
 void process_httptests(int now);
 
