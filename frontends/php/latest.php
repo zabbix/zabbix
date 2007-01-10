@@ -237,7 +237,7 @@
 			if(isset($db_item["lastclock"]))
 				$lastclock=date(S_DATE_FORMAT_YMDHMS,$db_item["lastclock"]);
 			else
-				$lastclock="-";
+				$lastclock=new CCol("-","center");
 
 			$lastvalue=format_lastvalue($db_item);
 
@@ -272,7 +272,7 @@
 				$_REQUEST["hostid"] > 0 ? NULL : SPACE,
 				str_repeat(SPACE,6).item_description($db_item["description"],$db_item["key_"]),
 				$lastclock,
-				$lastvalue,
+				new CCol($lastvalue, $lastvalue=='-' ? 'center' : null),
 				$change,
 				$actions
 				)));
@@ -328,7 +328,7 @@
 		if(isset($db_item["lastclock"]))
 			$lastclock=date(S_DATE_FORMAT_YMDHMS,$db_item["lastclock"]);
 		else
-			$lastclock="-";
+			$lastclock=new CCol("-","center");
 
 		$lastvalue=format_lastvalue($db_item);
 
@@ -363,7 +363,7 @@
 			$_REQUEST["hostid"] > 0 ? NULL : $db_item["host"],
 			str_repeat(SPACE, ($any_app_exist ? 6 : 0)).item_description($db_item["description"],$db_item["key_"]),
 			$lastclock,
-			$lastvalue,
+			new CCol($lastvalue, $lastvalue=='-' ? 'center' : null),
 			$change,
 			$actions
 			)));

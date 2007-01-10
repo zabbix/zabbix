@@ -607,6 +607,9 @@ COpt::profiling_start('prepare table');
 
 					$value = format_lastvalue($ithosts[$hostname]);
 				}
+
+				if($value == '-') $style = 'center';
+
 				array_push($table_row,new CCol($value,$style));
 			}
 			$table->AddRow($table_row);
@@ -665,7 +668,7 @@ COpt::profiling_stop('prepare table');
 		}
 		else
 		{
-			$lastvalue=new CCol("-","center");
+			$lastvalue = "-";
 		}
 		return $lastvalue;
 	}
