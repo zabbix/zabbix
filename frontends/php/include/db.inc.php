@@ -463,6 +463,8 @@ if(isset($DB_TYPE) && $DB_TYPE == "ORACLE") {
 	{
 		global	$ZBX_CURNODEID;
 
+		if(!isset($ZBX_CURNODEID))	init_nodes();
+
 		$row=DBfetch(DBselect("select max($field) as id from $table where ".DBid2nodeid($field)." in (".$ZBX_CURNODEID.")"));
 		if($row && !is_null($row["id"]))
 		{

@@ -1110,6 +1110,7 @@
 	"S_GENERAL"=>				"General",
 	"S_AUDIT"=>				"Audit",
 	"S_LOGIN"=>				"Login",
+	"S_LOGOUT"=>				"Logout",
 	"S_LATEST_DATA"=>			"Latest data",
 
 //	Errors

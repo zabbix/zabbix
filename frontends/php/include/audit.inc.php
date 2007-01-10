@@ -58,6 +58,8 @@
 	{
 		global $USER_DETAILS;
 
+		if(!isset($USER_DETAILS["userid"]))	check_authorisation();
+		
 		$auditid	= get_dbid("auditlog","auditid");
 
 		if(($result = DBexecute("insert into auditlog (auditid,userid,clock,action,resourcetype,details) ".
