@@ -31,58 +31,35 @@ struct disk_stat_s {
 
 #if defined(KERNEL_2_4)
 #	define INFO_FILE_NAME	"/proc/partitions"
-#	define PARSE(line)	if(sscanf(line,ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t%s\t \
-					" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t \
-					" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t \
-					" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\n", \
-				&(tmp),			/* major  */ \
-				&(tmp),			/* minor  */ \
-				&(tmp),			/* #blocks */ \
+#	define PARSE(line)	if(sscanf(line,"%*d %*d %*d %s " \
+					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d " \
+					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d %*d %*d %*d", \
 				name, 			/* name */ \
 				&(result->rio), 	/* rio */ \
-				&(tmp), 		/* rmerge */ \
 				&(result->rsect),	/* rsect */ \
-				&(tmp),			/* ruse */ \
 				&(result->wio), 	/* rio */ \
-				&(tmp), 		/* wmerge */ \
-				&(result->wsect),	/* wsect */ \
-				&(tmp),			/* wuse */ \
-				&(tmp), 		/* running */ \
-				&(tmp),			/* use */ \
-			        &(tmp)	 		/* aveq */ \
-				) != 15) continue
+				&(result->wsect)	/* wsect */ \
+				) != 5) continue
 #else
 #	define INFO_FILE_NAME	"/proc/diskstats"
-#	define PARSE(line)	if(sscanf(line,ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t%s\t \
-					" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t \
-					" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t \
-					" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\n", \
-				&(tmp),			/* major  */ \
-				&(tmp),			/* minor  */ \
+#	define PARSE(line)	if(sscanf(line, "%*d %*d %s " \
+					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d " \
+					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d %*d %*d %*d", \
 				name, 			/* name */ \
 				&(result->rio), 	/* rio */ \
-				&(tmp), 		/* rmerge */ \
 				&(result->rsect),	/* rsect */ \
-				&(tmp),			/* ruse */ \
 				&(result->wio), 	/* wio */ \
-				&(tmp), 		/* wmerge */ \
-				&(result->wsect),	/* wsect */ \
-				&(tmp),			/* wuse */ \
-				&(tmp), 		/* running */ \
-				&(tmp),			/* use */ \
-			        &(tmp)	 		/* aveq */ \
-				) != 14)  \
-					if(sscanf(line,ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t%s\t \
-						" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t \
-						" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\n", \
-					&(tmp),			/* major  */ \
-					&(tmp),			/* minor  */ \
+				&(result->wsect)	/* wsect */ \
+				) != 5)  \
+					if(sscanf(line,"%*d %*d %s " \
+						ZBX_FS_UI64 " " ZBX_FS_UI64 " " \
+						ZBX_FS_UI64 " " ZBX_FS_UI64, \
 					name, 			/* name */ \
 					&(result->rio), 	/* rio */ \
 					&(result->rsect),	/* rsect */ \
 					&(result->wio), 	/* wio */ \
 					&(result->wsect)	/* wsect */ \
-					) != 7) continue
+					) != 5) continue
 #endif
 
 static int get_disk_stat(const char *interface, struct disk_stat_s *result)
@@ -91,7 +68,6 @@ static int get_disk_stat(const char *interface, struct disk_stat_s *result)
 	char line[MAX_STRING_LEN];
 
 	char name[MAX_STRING_LEN];
-	zbx_uint64_t tmp = 0; /* for PARSE */
 	
 	FILE *f;
 
