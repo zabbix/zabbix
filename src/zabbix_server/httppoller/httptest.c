@@ -30,12 +30,13 @@
 
 size_t WRITEFUNCTION( void *ptr, size_t size, size_t nmemb, void *stream)
 {
-	size_t s = size*nmemb + 1;
+/*	size_t s = size*nmemb + 1;
 	char *str_dat = calloc(1, s);
 
 	zbx_snprintf(str_dat,s,ptr);
-//	ZBX_LIM_PRINT("WRITEFUNCTION", s, str_dat, 65535);
-//	zabbix_log(LOG_LEVEL_WARNING, "In WRITEFUNCTION");
+	ZBX_LIM_PRINT("WRITEFUNCTION", s, str_dat, 65535);
+	zabbix_log(LOG_LEVEL_WARNING, "In WRITEFUNCTION");
+*/
 
 	return size*nmemb;
 }
@@ -49,16 +50,17 @@ size_t HEADERFUNCTION( void *ptr, size_t size, size_t nmemb, void *stream)
 }
 
 
-/*
-void	process_http_data(int hostid,char *stat,char *httptest_name,char *httpstep_name)
+void	process_http_data(DB_HTTPTEST *httptest, DB_HTTPSTEP *httpstep, S_ZBX_HTTPSTAT *stat)
 {
 #ifdef	HAVE_LIBCURL
-	DB_RESULT	result;
+	zabbix_log(LOG_LEVEL_WARNING, "%s: Rspcode [%d] Time [%f] Speed download [%f]",
+		 httpstep->name, stat->rspcode, stat->total_time, stat->speed_download);
+/*	DB_RESULT	result;
 	DB_ROW	row;
 	char	server_esc[MAX_STRING_LEN];
 	char	key_esc[MAX_STRING_LEN];
 
-	zabbix_log(LOG_LEVEL_WARNING, "In process_httptest(httptestid:" ZBX_FS_UI64 ")", httptestid);
+	zabbix_log(LOG_LEVEL_WARNING, "In process_httptest(httptestid:" ZBX_FS_UI64 ")", stat->httptestid);
 
 	DBescape_string(server, server_esc, MAX_STRING_LEN);
 	DBescape_string(key, key_esc, MAX_STRING_LEN);
@@ -79,13 +81,9 @@ void	process_http_data(int hostid,char *stat,char *httptest_name,char *httpstep_
 		zabbix_syslog("Type of received value [%s] is not suitable for [%s@%s]", value, item.key, item.host );
 	}
  
-	DBfree_result(result);
-	DBfree_result(result);
+	DBfree_result(result);*/
 #endif
 }
-*/
-
-
 
 /******************************************************************************
  *                                                                            *
@@ -102,21 +100,20 @@ void	process_http_data(int hostid,char *stat,char *httptest_name,char *httpstep_
  * Comments: SUCCEED or FAIL                                                  *
  *                                                                            *
  ******************************************************************************/
-int	process_httptest(zbx_uint64_t httptestid)
+int	process_httptest(DB_HTTPTEST *httptest)
 {
 #ifdef HAVE_LIBCURL
 	DB_RESULT	result;
-	DB_ROW	row;
-	int	ret = SUCCEED;
-	int	err;
+	DB_ROW		row;
+	DB_HTTPSTEP	httpstep;
+	int		ret = SUCCEED;
+	int		err;
 
-	long	rspcode;
-	double	total_time;
-	double	speed_download;
+	S_ZBX_HTTPSTAT	stat;
 
 	CURL            *easyhandle = NULL;
 
-	zabbix_log(LOG_LEVEL_WARNING, "In process_httptest(httptestid:" ZBX_FS_UI64 ")", httptestid);
+	zabbix_log(LOG_LEVEL_WARNING, "In process_httptest(httptestid:" ZBX_FS_UI64 ")", httptest->httptestid);
 
 	easyhandle = curl_easy_init();
 	if(easyhandle == NULL)
@@ -146,28 +143,35 @@ int	process_httptest(zbx_uint64_t httptestid)
 		return FAIL;
 	}
 
-	result = DBselect("select httpstepid,no,name,url,timeout,posts from httpstep where httptestid=" ZBX_FS_UI64 " order by no",
-				httptestid);
-
+	result = DBselect("select httpstepid,httptestid,no,name,url,timeout,posts from httpstep where httptestid=" ZBX_FS_UI64 " order by no",
+				httptest->httptestid);
 	while((row=DBfetch(result)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Processing step %s [%s]", row[1], row[3]);
+		ZBX_STR2UINT64(httpstep.httpstepid, row[0]);
+		ZBX_STR2UINT64(httpstep.httptestid, row[1]);
+		httpstep.no=atoi(row[2]);
+		httpstep.name=row[3];
+		httpstep.url=row[4];
+		httpstep.timeout=atoi(row[5]);
+		httpstep.posts=row[6];
+		zabbix_log(LOG_LEVEL_WARNING, "Processing step %d [%s]", httpstep.no, httpstep.url);
+		memset(&stat,0,sizeof(stat));
 		if(row[5][0] != 0)
 		{
-			if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, row[5])))
+			if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, httpstep.posts)))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "Cannot set POST vars [%s]", curl_easy_strerror(err));
 				ret = FAIL;
 				break;
 			}
 		}
-		if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_URL, row[3])))
+		if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_URL, httpstep.url)))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "Cannot set URL [%s]", curl_easy_strerror(err));
 			ret = FAIL;
 			break;
 		}
-		if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT, atoi(row[4]))))
+		if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT, httpstep.timeout)))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "Cannot set URL [%s]", curl_easy_strerror(err));
 			ret = FAIL;
@@ -179,26 +183,26 @@ int	process_httptest(zbx_uint64_t httptestid)
 			ret = FAIL;
 			break;
 		}
-		if(CURLE_OK != (err = curl_easy_getinfo(easyhandle,CURLINFO_RESPONSE_CODE ,&rspcode)))
+		if(CURLE_OK != (err = curl_easy_getinfo(easyhandle,CURLINFO_RESPONSE_CODE ,&stat.rspcode)))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "Error doing curl_easy_perform [%s]", curl_easy_strerror(err));
 			ret = FAIL;
 			break;
 		}
-		if(CURLE_OK != (err = curl_easy_getinfo(easyhandle,CURLINFO_TOTAL_TIME ,&total_time)))
+		if(CURLE_OK != (err = curl_easy_getinfo(easyhandle,CURLINFO_TOTAL_TIME ,&stat.total_time)))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "Error doing curl_easy_perform [%s]", curl_easy_strerror(err));
 			ret = FAIL;
 			break;
 		}
-		if(CURLE_OK != (err = curl_easy_getinfo(easyhandle,CURLINFO_SPEED_DOWNLOAD ,&speed_download)))
+		if(CURLE_OK != (err = curl_easy_getinfo(easyhandle,CURLINFO_SPEED_DOWNLOAD ,&stat.speed_download)))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "Error doing curl_easy_perform [%s]", curl_easy_strerror(err));
 			ret = FAIL;
 			break;
 		}
-		zabbix_log(LOG_LEVEL_WARNING, "%s: Rspcode [%d] Time [%f] Speed download [%f]",
-			 row[2], rspcode, total_time, speed_download);
+
+		process_http_data(httptest, &httpstep, &stat);
 	}
 	DBfree_result(result);
 
@@ -227,19 +231,24 @@ void process_httptests(int now)
 {
 #ifdef HAVE_LIBCURL
 	DB_RESULT	result;
-	DB_ROW	row;
+	DB_ROW		row;
 
-	zbx_uint64_t httptestid;
+	DB_HTTPTEST	httptest;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_httptests");
 
-	result = DBselect("select t.httptestid from httptest t where t.status=%d and t.nextcheck<=%d and " ZBX_SQL_MOD(t.httptestid,%d) "=%d and " ZBX_COND_NODEID, HTTPTEST_STATUS_MONITORED, now, CONFIG_HTTPPOLLER_FORKS, httppoller_num-1, LOCAL_NODE("t.httptestid"));
+	result = DBselect("select httptestid,name,applicationid,nextcheck,status,delay from httptest where status=%d and nextcheck<=%d and " ZBX_SQL_MOD(httptestid,%d) "=%d and " ZBX_COND_NODEID, HTTPTEST_STATUS_MONITORED, now, CONFIG_HTTPPOLLER_FORKS, httppoller_num-1, LOCAL_NODE("httptestid"));
 	while((row=DBfetch(result)))
 	{
-		ZBX_STR2UINT64(httptestid, row[0]);
-		process_httptest(httptestid);
+		ZBX_STR2UINT64(httptest.httptestid, row[0]);
+		httptest.name=row[1];
+		ZBX_STR2UINT64(httptest.applicationid, row[2]);
+		httptest.nextcheck=atoi(row[3]);
+		httptest.status=atoi(row[4]);
+		httptest.delay=atoi(row[5]);
+		process_httptest(&httptest);
 
-		DBexecute("update httptest set nextcheck=%d+delay where httptestid=" ZBX_FS_UI64, now, httptestid);
+		DBexecute("update httptest set nextcheck=%d+delay where httptestid=" ZBX_FS_UI64, now, httptest.httptestid);
 	}
 	DBfree_result(result);
 #endif /* HAVE_LIBCURL */
