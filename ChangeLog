@@ -1,5 +1,6 @@
 Changes for 1.1.5:
 
+ - added sorting by host in trigger status screen (Eugene)
  - added login/logout information into auditlog (Eugene)
  - fixed values viwing on overview screen (Eugene)
  - added support of "system.swap.(in/out)[<swap><,param>]" for Linux 2.x

@@ -213,8 +213,7 @@
 	$h2=$h2.SPACE.S_HOST.SPACE;
 	$h2=$h2."<select class=\"biginput\" name=\"hostid\" onChange=\"submit()\">";
 
-	if($_REQUEST["groupid"]==0)
-		$h2=$h2.form_select("hostid",0,S_ALL_SMALL);
+	$h2=$h2.form_select("hostid",0,S_ALL_SMALL);
 
 	if($_REQUEST["groupid"] > 0)
 	{
@@ -385,6 +384,23 @@
 	{
 		$fullscreen="";
 	}
+	
+	if($_REQUEST["hostid"] <= 0)
+	{
+		if(isset($sort) && $sort=="host")
+		{
+			$host=S_HOST_BIG;
+		}
+		else
+		{
+			if($select=="TRUE")
+				$host="<A HREF=\"tr_status.php?sort=host&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select$fullscreen$cond\">".S_NAME;
+			else
+				$host="<A HREF=\"tr_status.php?sort=host&onlytrue=$onlytrue&noactions=$noactions&compact=$compact$fullscreen$cond\">".S_HOST."</a>";
+		}
+		$header=array_merge($header,array($host));
+	}
+
 	if(isset($sort) && $sort=="description")
 	{
 		$description=S_NAME_BIG;
@@ -454,6 +470,11 @@
 
 	switch ($sort)
 	{
+		case "host":
+			$sort="order by h.host";
+			if($_REQUEST["hostid"] <= 0)
+				break;
+			/* else "description" */
 		case "description":
 			$sort="order by t.description";
 			break;
@@ -470,7 +491,7 @@
 	if($onlytrue=='true')
 	{
 		$result=DBselect("select distinct t.triggerid,t.status,t.description,t.expression,t.priority,".
-			"t.lastchange,t.comments,t.url,t.value from triggers t,hosts h,items i,functions f".$groupname.
+			"t.lastchange,t.comments,t.url,t.value,h.host from triggers t,hosts h,items i,functions f".$groupname.
 			" where t.value=1 and t.status=0 and f.itemid=i.itemid and h.hostid=i.hostid and t.description".
 			" $select_cond and t.triggerid=f.triggerid and i.status=".ITEM_STATUS_ACTIVE.
 			" and h.status=".HOST_STATUS_MONITORED." $cond $groupcond $sort");
@@ -478,7 +499,7 @@
 	else
 	{
 		$result=DBselect("select distinct t.triggerid,t.status,t.description,t.expression,t.priority,".
-			"t.lastchange,t.comments,t.url,t.value from triggers t,hosts h,items i,functions f".$groupname.
+			"t.lastchange,t.comments,t.url,t.value,h.host from triggers t,hosts h,items i,functions f".$groupname.
 			" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.status=0".
 			" and t.description $select_cond and i.status=".ITEM_STATUS_ACTIVE." and h.status=".HOST_STATUS_MONITORED.
 			" $cond $groupcond $sort");
@@ -621,6 +642,7 @@
 		}
 
 		$table->AddRow(array(
+				$_REQUEST["hostid"] > 0 ? null : $row['host'],
 				$description,
 				$value,
 				new CCol($priority,$priority_style),

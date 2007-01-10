@@ -397,6 +397,7 @@
 	"S_NO_HOSTS_DEFINED"=>			"No hosts defined",
 	"S_HOSTS_BIG"=>				"HOSTS",
 	"S_HOST"=>				"Host",
+	"S_HOST_BIG"=>				"HOST",
 	"S_IP"=>				"IP",
 	"S_PORT"=>				"Port",
 	"S_MONITORED"=>				"Monitored",
