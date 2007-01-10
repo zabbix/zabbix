@@ -1,5 +1,6 @@
 Changes for 1.1.5:
 
+ - fixed values viwing on overview screen (Eugene)
  - added support of "system.swap.(in/out)[<swap><,param>]" for Linux 2.x
     <param> accept next values: 'count', 'sectors', 'pages'
     DEFAULT: <swap> = 'all', <param> = 'pages'

@@ -541,7 +541,8 @@
 		}
 
 COpt::profiling_start('prepare data');
-		$result = DBselect('select distinct h.hostid, h.host,i.itemid, i.key_, i.value_type, i.lastvalue, i.units, i.description'.
+		$result = DBselect('select distinct h.hostid, h.host,i.itemid, i.key_, i.value_type,'.
+			' i.lastvalue, i.units, i.description, i.valuemapid'.
 			' from hosts h,items i '.$group_where.
 			' h.status='.HOST_STATUS_MONITORED.' and h.hostid=i.hostid and i.status='.ITEM_STATUS_ACTIVE.
 			' order by i.description');
@@ -573,7 +574,8 @@ COpt::profiling_start('prepare data');
 				'value_type'	=> $row['value_type'],
 				'lastvalue'	=> $row['lastvalue'],
 				'units'		=> $row['units'],
-				'description'	=> $row['description']);
+				'description'	=> $row['description'],
+				'valuemapid'	=> $row['valuemapid']);
 		}
 		if(!isset($hosts))
 		{
@@ -603,10 +605,7 @@ COpt::profiling_start('prepare table');
 						' and t.priority>1 and t.triggerid=f.triggerid and t.value='.TRIGGER_VALUE_TRUE);
 					if(DBfetch($db_item_triggers))	$style = "high";
 
-					if($ithosts[$hostname]["value_type"] == 0)
-						$value = convert_units($ithosts[$hostname]["lastvalue"],$ithosts[$hostname]["units"]);
-					else
-						$value = htmlspecialchars(substr($ithosts[$hostname]["lastvalue"],0,20)." ...");
+					$value = format_lastvalue($ithosts[$hostname]);
 				}
 				array_push($table_row,new CCol($value,$style));
 			}
@@ -636,5 +635,38 @@ COpt::profiling_stop('prepare table');
 	{
 		return DBselect("select distinct app.* from applications app, items_applications ia".
 			" where app.applicationid=ia.applicationid and ia.itemid=".$itemid);
+	}
+	
+	function	format_lastvalue($db_item)
+	{
+		if(isset($db_item["lastvalue"]))
+		{
+			if($db_item["value_type"] == ITEM_VALUE_TYPE_FLOAT)
+			{
+				$lastvalue=convert_units($db_item["lastvalue"],$db_item["units"]);
+			}
+			else if($db_item["value_type"] == ITEM_VALUE_TYPE_UINT64)
+			{
+				$lastvalue=convert_units($db_item["lastvalue"],$db_item["units"]);
+			}
+			else if($db_item["value_type"] == ITEM_VALUE_TYPE_TEXT)
+			{
+				$lastvalue="...";
+			}
+			else
+			{
+				$lastvalue=nbsp(htmlspecialchars(substr($db_item["lastvalue"],0,20)));
+				if(strlen($db_item["lastvalue"]) > 20)
+					$lastvalue .= " ...";
+			}
+			if($db_item["valuemapid"] > 0);
+				$lastvalue = replace_value_by_map($lastvalue, $db_item["valuemapid"]);
+
+		}
+		else
+		{
+			$lastvalue=new CCol("-","center");
+		}
+		return $lastvalue;
 	}
 ?>
