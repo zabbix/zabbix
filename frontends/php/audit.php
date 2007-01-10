@@ -117,6 +117,8 @@
 		if($row["action"]==AUDIT_ACTION_ADD)			$action = S_ADDED;
 		else if($row["action"]==AUDIT_ACTION_UPDATE)		$action = S_UPDATED;
 		else if($row["action"]==AUDIT_ACTION_DELETE)		$action = S_DELETED;
+		else if($row["action"]==AUDIT_ACTION_LOGIN)		$action = S_LOGIN;
+		else if($row["action"]==AUDIT_ACTION_LOGOUT)		$action = S_LOGOUT;
 		else							$action = S_UNKNOWN_ACTION;
 
 		$table->addRow(array(

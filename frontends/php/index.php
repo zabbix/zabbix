@@ -41,9 +41,16 @@
 <?php
 	if(isset($_REQUEST["reconnect"]) && isset($_COOKIE["sessionid"]))
 	{
+		add_audit(AUDIT_ACTION_LOGOUT,AUDIT_RESOURCE_USER,"Manual Logout");
+		
 		DBexecute("delete from sessions where sessionid=".zbx_dbstr($_COOKIE["sessionid"]));
 		setcookie("sessionid",$_COOKIE["sessionid"],time()-3600);
 		unset($_COOKIE["sessionid"]);
+
+		echo "<HTML><HEAD>";
+		echo "<META HTTP-EQUIV=\"Refresh\" CONTENT=\"0; URL=index.php\">";
+		echo "</HEAD></HTML>";
+		return;
 	}
 
 	if(isset($_REQUEST["enter"])&&($_REQUEST["enter"]=="Enter"))
@@ -70,6 +77,8 @@
 			DBexecute("insert into sessions (sessionid,userid,lastaccess)".
 				" values (".zbx_dbstr($sessionid).",".$USER_DETAILS["userid"].",".time().")");
 
+			add_audit(AUDIT_ACTION_LOGIN,AUDIT_RESOURCE_USER,"Correct login [".$name."]");
+			
 			if($USER_DETAILS["url"] != '')
 			{
 				echo "<HTML><HEAD>";
@@ -77,6 +86,10 @@
 				echo "</HEAD></HTML>";
 				return;
 			}
+		}
+		else
+		{
+			add_audit(AUDIT_ACTION_LOGIN,AUDIT_RESOURCE_USER,"Login failed [".$name."]");
 		}
 	}
 
