@@ -488,6 +488,8 @@ AC_ARG_ENABLE(agent,
 esac],
 [agent=no])
 AM_CONDITIONAL(AGENT, test x$agent = xyes)
+
+
     
 have_db="no"
 
@@ -743,6 +745,7 @@ dnl    AC_CHECK_LIB(crypto, main,  SNMP_LFLAGS="-lcrypto $SNMP_LFLAGS")
 ])
 AC_SUBST(SNMP_LFLAGS)
 AC_SUBST(SNMP_INCLUDE)
+
 
 LIBCURL_CHECK_CONFIG([yes], [7.15.1], [],[])
 
