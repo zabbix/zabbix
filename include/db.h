@@ -393,9 +393,9 @@ DB_HTTPSTEP
 	zbx_uint64_t	httptestid;
 	int		no;
 	char		*name;
-	char		*url;
+	char		url[MAX_STRING_LEN];
 	int		timeout;
-	char		*posts;
+	char		posts[MAX_STRING_LEN];
 };
 
 void    DBconnect(void);
