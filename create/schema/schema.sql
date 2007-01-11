@@ -46,6 +46,15 @@ FIELD		|httptestid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 UNIQUE		|httpstepitem_1	|httptestid,itemid
 
+TABLE|httpmacro|httpmacroid|ZBX_SYNC
+FIELD		|httpmacroid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|httptestid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|name		|t_varchar(64)	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|macro		|t_varchar(64)	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|value		|t_varchar(255)	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|note		|t_blob		|''	|NOT NULL	|ZBX_SYNC
+UNIQUE		|httpmacro_1	|httptestid,name
+
 TABLE|nodes|nodeid|
 FIELD		|nodeid		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|name		|t_varchar(64)	|'0'	|NOT NULL	|0

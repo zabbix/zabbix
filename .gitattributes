@@ -119,6 +119,8 @@ misc/clock/clock.fla -text
 src/zabbix_server/events.c -text
 src/zabbix_server/events.h -text
 src/zabbix_server/httppoller/Makefile.am -text
+src/zabbix_server/httppoller/httpmacro.c -text
+src/zabbix_server/httppoller/httpmacro.h -text
 src/zabbix_server/httppoller/httppoller.c -text
 src/zabbix_server/httppoller/httppoller.h -text
 src/zabbix_server/httppoller/httptest.c -text

@@ -576,7 +576,7 @@ int	evaluate(int *result,char *exp, char *error, int maxerrlen)
 
 #define STR_UNKNOWN_VARIAVLE		"*UNKNOWN*"
 
-void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, int dala_max_len, int macro_type)
+void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, int data_max_len, int macro_type)
 {
 
 	char
@@ -789,7 +789,7 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 	zbx_strlcat(str_out, pl, outlen);
 	outlen -= MIN(strlen(pl), outlen);
 
-	zbx_snprintf(data, dala_max_len, "%s", str_out);
+	zbx_snprintf(data, data_max_len, "%s", str_out);
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Result expression [%s]", data );
 }
