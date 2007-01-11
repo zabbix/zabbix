@@ -26,28 +26,28 @@
 <?php
 
 	$tr_hash=calc_trigger_hash();
-	setcookie("triggers_hash",$tr_hash,time()+1800);
+	setcookie("zbx_triggers_hash",$tr_hash,time()+1800);
 
-	if(!isset($_COOKIE["triggers_hash"]))
+	if(!isset($_COOKIE["zbx_triggers_hash"]))
 	{
 		$triggers_hash="0,0";
 	}
 	else
 	{
-		$triggers_hash=$_COOKIE["triggers_hash"];
+		$triggers_hash=$_COOKIE["zbx_triggers_hash"];
 	}
 
 	$new=explode(",",$tr_hash);
 	$old=explode(",",$triggers_hash);
-	setcookie("triggers_hash",$tr_hash,time()+1800);
+	setcookie("zbx_triggers_hash",$tr_hash,time()+1800);
 
-	if(!isset($_COOKIE["triggers_hash"]))
+	if(!isset($_COOKIE["zbx_triggers_hash"]))
 	{
 		$triggers_hash="0,0";
 	}
 	else
 	{
-		$triggers_hash=$_COOKIE["triggers_hash"];
+		$triggers_hash=$_COOKIE["zbx_triggers_hash"];
 	}
 
 	$new=explode(",",$tr_hash);

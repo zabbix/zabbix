@@ -18,29 +18,23 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
-
+function SDI($msg="SDI") { echo "DEBUG INFO: "; var_export($msg); echo BR; } // DEBUG INFO!!!
 
 ?>
 <?php
+	include_once("include/defines.inc.php");
+
 	include_once("include/copt.lib.php");
 
 // GLOBALS
+	global $USER_DETAILS, $USER_RIGHTS, $ERROR_MSG, $INFO_MSG;
+
 	$USER_DETAILS	= array();
 	$USER_RIGHTS	= array();
 	$ERROR_MSG	= array();
 	$INFO_MSG	= array();
 // END OF GLOBALS
 
-// if magic quotes on then get rid of them
-	if (get_magic_quotes_gpc()) {
-		$_GET    = zbx_stripslashes($_GET);
-		$_POST	 = zbx_stripslashes($_POST);
-		$_COOKIE = zbx_stripslashes($_COOKIE);
-		$_REQUEST= zbx_stripslashes($_REQUEST);
-	}
-
-	include_once 	"include/defines.inc.php";
 	include_once 	"include/db.inc.php";
 	include_once 	"include/html.inc.php";
 	include_once 	"include/locales.inc.php";
