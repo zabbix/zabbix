@@ -315,18 +315,7 @@ COpt::profiling_start("page");
 		$denyed_page_requested = true;
 	}
 
-	if(isset($denyed_page_requested))	$unset_cookie = time() - 3600;
-
-	global $ZBX_PAGE_COOCIES;
-
-	if(isset($ZBX_PAGE_COOCIES))
-	{
-		foreach($ZBX_PAGE_COOCIES as $coockie)
-		{
-			setcookie($coockie[0], $coockie[1], isset($unset_cookie) ? $unset_cookie : $coockie[2]);
-		}
-		unset($ZBX_PAGE_COOCIES);
-	}
+	zbx_flush_post_cookies(isset($denyed_page_requested));
 
 	if($page["type"] == PAGE_TYPE_HTML)
 	{
