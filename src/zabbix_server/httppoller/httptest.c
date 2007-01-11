@@ -28,7 +28,54 @@
 #include "common.h"
 #include "httptest.h"
 
-size_t WRITEFUNCTION2( void *ptr, size_t size, size_t nmemb, void *stream)
+/******************************************************************************
+ *                                                                            *
+ * Function: process_value                                                    *
+ *                                                                            *
+ * Purpose: process new item value                                            *
+ *                                                                            *
+ * Parameters: key - item key                                                 *
+ *             host - host name                                               *
+ *             value - new value of the item                                  *
+ *                                                                            *
+ * Return value: SUCCEED - new value sucesfully processed                     *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: can be done in process_data()                                    *
+ *                                                                            *
+ ******************************************************************************/
+static int process_value(zbx_uint64_t itemid, AGENT_RESULT *value)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	DB_ITEM		item;
+
+	zabbix_log( LOG_LEVEL_DEBUG, "In process_value(itemid:" ZBX_FS_UI64 ")", itemid);
+
+	result = DBselect("select %s where h.status=%d and h.hostid=i.hostid and i.status=%d and i.type=%d and i.itemid=" ZBX_FS_UI64 " and " ZBX_COND_NODEID, ZBX_SQL_ITEM_SELECT, HOST_STATUS_MONITORED, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, itemid, LOCAL_NODE("h.hostid"));
+	row=DBfetch(result);
+
+	if(!row)
+	{
+		DBfree_result(result);
+		return  FAIL;
+	}
+
+	DBget_item_from_db(&item,row);
+
+	DBbegin();
+	process_new_value(&item,value);
+	update_triggers(item.itemid);
+	DBcommit();
+ 
+	DBfree_result(result);
+
+	return SUCCEED;
+}
+
+static size_t WRITEFUNCTION2( void *ptr, size_t size, size_t nmemb, void *stream)
 {
 /*	size_t s = size*nmemb + 1;
 	char *str_dat = calloc(1, s);
@@ -41,7 +88,7 @@ size_t WRITEFUNCTION2( void *ptr, size_t size, size_t nmemb, void *stream)
 	return size*nmemb;
 }
 
-size_t HEADERFUNCTION2( void *ptr, size_t size, size_t nmemb, void *stream)
+static size_t HEADERFUNCTION2( void *ptr, size_t size, size_t nmemb, void *stream)
 {
 //	ZBX_LIM_PRINT("HEADERFUNCTION", size*nmemb, ptr, 300);
 //	zabbix_log(LOG_LEVEL_WARNING, "In HEADERFUNCTION");
@@ -50,11 +97,52 @@ size_t HEADERFUNCTION2( void *ptr, size_t size, size_t nmemb, void *stream)
 }
 
 
-void	process_http_data(DB_HTTPTEST *httptest, DB_HTTPSTEP *httpstep, S_ZBX_HTTPSTAT *stat)
+static void	process_http_data(DB_HTTPTEST *httptest, DB_HTTPSTEP *httpstep, S_ZBX_HTTPSTAT *stat)
 {
+	DB_RESULT	result;
+	DB_ROW		row;
+	DB_HTTPSTEPITEM	httpstepitem;
+
+	AGENT_RESULT    value;
+
 #ifdef	HAVE_LIBCURL
-	zabbix_log(LOG_LEVEL_WARNING, "Step [%s] [%s]: Rsp %d Time %f Speed %f",
+	zabbix_log(LOG_LEVEL_WARNING, "     Step [%s] [%s]: Rsp %d Time %f Speed %f",
 		 httpstep->name, httpstep->url, stat->rspcode, stat->total_time, stat->speed_download);
+
+	result = DBselect("select httpstepitemid,httpstepid,itemid,type from httpstepitem where httpstepid=" ZBX_FS_UI64,
+		httpstep->httpstepid);
+
+	while((row=DBfetch(result)))
+	{
+		ZBX_STR2UINT64(httpstepitem.httpstepitemid, row[0]);
+		ZBX_STR2UINT64(httpstepitem.httpstepid, row[1]);
+		ZBX_STR2UINT64(httpstepitem.itemid, row[2]);
+		httpstepitem.type=atoi(row[3]);
+
+		switch (httpstepitem.type) {
+			case ZBX_HTTPITEM_TYPE_RSPCODE:
+				init_result(&value);
+				SET_UI64_RESULT(&value, stat->rspcode);
+				process_value(httpstepitem.itemid,&value);
+				free_result(&value);
+				break;
+			case ZBX_HTTPITEM_TYPE_TIME:
+				init_result(&value);
+				SET_DBL_RESULT(&value, stat->total_time);
+				process_value(httpstepitem.itemid,&value);
+				free_result(&value);
+				break;
+			case ZBX_HTTPITEM_TYPE_SPEED:
+				init_result(&value);
+				SET_DBL_RESULT(&value, stat->speed_download);
+				process_value(httpstepitem.itemid,&value);
+				free_result(&value);
+				break;
+		}
+	}
+	
+	DBfree_result(result);
+
 /*	DB_RESULT	result;
 	DB_ROW	row;
 	char	server_esc[MAX_STRING_LEN];
@@ -100,7 +188,7 @@ void	process_http_data(DB_HTTPTEST *httptest, DB_HTTPSTEP *httpstep, S_ZBX_HTTPS
  * Comments: SUCCEED or FAIL                                                  *
  *                                                                            *
  ******************************************************************************/
-int	process_httptest(DB_HTTPTEST *httptest)
+static int	process_httptest(DB_HTTPTEST *httptest)
 {
 #ifdef HAVE_LIBCURL
 	DB_RESULT	result;

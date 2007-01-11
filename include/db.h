@@ -79,6 +79,7 @@ extern	int	CONFIG_DBPORT;
 #define DB_TRIGGER	struct zbx_trigger_type
 #define DB_HTTPTEST	struct zbx_httptest_type
 #define DB_HTTPSTEP	struct zbx_httpstep_type
+#define DB_HTTPSTEPITEM	struct zbx_httpstepitem_type
 
 #ifdef HAVE_SQLITE3
 
@@ -397,6 +398,16 @@ DB_HTTPSTEP
 	int		timeout;
 	char		posts[MAX_STRING_LEN];
 };
+
+DB_HTTPSTEPITEM
+{
+	zbx_uint64_t	httpstepitemid;
+	zbx_uint64_t	httpstepid;
+	zbx_uint64_t	itemid;
+	int		type;
+};
+
+void    DBconnect(void);
 
 void    DBconnect(void);
 
