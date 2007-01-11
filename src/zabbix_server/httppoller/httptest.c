@@ -26,6 +26,8 @@
 #include "zlog.h"
 
 #include "common.h"
+#include "../functions.h"
+#include "httpmacro.h"
 #include "httptest.h"
 
 /******************************************************************************
