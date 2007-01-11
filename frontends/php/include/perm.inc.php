@@ -42,29 +42,29 @@
 		global	$page;
 		global	$PHP_AUTH_USER,$PHP_AUTH_PW;
 		global	$USER_DETAILS;
-		global	$_COOKIE;
 		global	$_REQUEST;
 		global	$ZBX_LOCALNODEID;
 
 		$USER_DETAILS = NULL;
-		if(isset($_COOKIE["sessionid"]))
+		
+		$sessionid = get_cookie("zbx_sessionid");
+		
+		if(isset($sessionid))
 		{
-			$sessionid = $_COOKIE["sessionid"];
 			if(!($USER_DETAILS = DBfetch(DBselect("select u.*,s.* from sessions s,users u".
 				" where s.sessionid=".zbx_dbstr($sessionid)." and s.userid=u.userid".
 				" and ((s.lastaccess+u.autologout>".time().") or (u.autologout=0))".
 				" and ".DBid2nodeid('u.userid')." = ".$ZBX_LOCALNODEID))))
 			{
-				setcookie("sessionid",$sessionid,time()-3600); /* NOTE: don't use zbx_setcookie */
+				zbx_unsetcookie('zbx_sessionid');
 				DBexecute("delete from sessions where sessionid=".zbx_dbstr($sessionid));
-				unset($_COOKIE["sessionid"]);
 				unset($sessionid);
 
 				$incorrect_session = true;
 			}
 			else
 			{
-				setcookie("sessionid",$sessionid,time()+3600); /* NOTE: don't use zbx_setcookie */
+				zbx_setcookie("zbx_sessionid",$sessionid);
 				DBexecute("update sessions set lastaccess=".time()." where sessionid=".zbx_dbstr($sessionid));
 			}
 		}

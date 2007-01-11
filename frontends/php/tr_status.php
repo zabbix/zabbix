@@ -29,30 +29,17 @@
 
 ?>
 <?php
-	$tr_hash=calc_trigger_hash();
+	$tr_hash = calc_trigger_hash();
 
-	if(!isset($_COOKIE["triggers_hash"]))
-	{
-		$triggers_hash="0,0";
-	}
-	else
-	{
-		$triggers_hash=$_COOKIE["triggers_hash"];
-	}
+	$triggers_hash = get_cookie('zbx_triggers_hash', '0,0');
 
 	$new=explode(",",$tr_hash);
 	$old=explode(",",$triggers_hash);
-	zbx_setcookie("triggers_hash",$tr_hash,time()+1800);
 
-	if(!isset($_COOKIE["triggers_hash"]))
-	{
-		$triggers_hash="0,0";
-	}
-	else
-	{
-		$triggers_hash=$_COOKIE["triggers_hash"];
-	}
+	zbx_set_post_cookie("zbx_triggers_hash",$tr_hash,time()+1800);
 
+	$triggers_hash = get_cookie('zbx_triggers_hash', '0,0');
+	
 	$new=explode(",",$tr_hash);
 	$old=explode(",",$triggers_hash);
 
