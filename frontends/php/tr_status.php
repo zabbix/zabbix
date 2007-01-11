@@ -102,7 +102,7 @@ include_once "include/page_header.php";
 	$fields=array(
 		"groupid"=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null),
 		"hostid"=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null),
-		"sort"=>	array(T_ZBX_STR, O_OPT,  null,	IN('"priority","description","lastchange"'), null),
+		"sort"=>	array(T_ZBX_STR, O_OPT,  null,	IN('"host","priority","description","lastchange"'), null),
 		"noactions"=>	array(T_ZBX_STR, O_OPT,  null,	IN('"true","false"'), null),
 		"compact"=>	array(T_ZBX_STR, O_OPT,  null,	IN('"true","false"'), null),
 		"onlytrue"=>	array(T_ZBX_STR, O_OPT,  null,	IN('"true","false"'), null),
@@ -253,6 +253,8 @@ include_once "include/page_header.php";
 	$header=array();
 
 	$headers_array = array(
+		$_REQUEST['hostid'] > 0 ? null : 
+		array('select_label'=>S_HOST_BIG	, 'simple_label'=>S_HOST,		'sort'=>'host'),
 		array('select_label'=>S_NAME_BIG	, 'simple_label'=>S_NAME,		'sort'=>'description'),
 		array('simple_label'=>S_STATUS),
 		array('select_label'=>S_SEVERITY_BIG	, 'simple_label'=>S_SEVERITY,		'sort'=>'priority'),
@@ -287,6 +289,7 @@ include_once "include/page_header.php";
 
 	switch ($sort)
 	{
+		case "host":		$sort="order by h.host";	if($_REQUEST["hostid"] <= 0)	break; /* else "description" */
 		case "description":	$sort="order by t.description";				break;
 		case "priority":	$sort="order by t.priority desc, t.description";	break;
 		case "lastchange":	$sort="order by t.lastchange desc, t.priority";		break;
@@ -308,7 +311,7 @@ include_once "include/page_header.php";
 	if($onlytrue=='true')		$cond .= " and t.value=1 ";
 
 	$result = DBselect("select distinct t.triggerid,t.status,t.description,t.expression,t.priority,".
-		" t.lastchange,t.comments,t.url,t.value from triggers t,hosts h,items i,functions f".
+		" t.lastchange,t.comments,t.url,t.value,h.host from triggers t,hosts h,items i,functions f".
 		" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.status=".TRIGGER_STATUS_ENABLED.
 		" and t.description $select_cond and i.status=".ITEM_STATUS_ACTIVE.
 		" and ".DBid2nodeid("t.triggerid")."=".$ZBX_CURNODEID.
@@ -402,6 +405,7 @@ include_once "include/page_header.php";
 		}
 
 		$table->AddRow(array(
+				$_REQUEST['hostid'] > 0 ? null : $row['host'],
 				$description,
 				new CSpan($value['text'], $value['style']),
 				new CCol(
