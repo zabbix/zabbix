@@ -61,6 +61,7 @@ Integrated from 1.1.x
 
 1.1.5
 
+  - fixed conflict with cookies of other products (Eugene)
   - added sorting by host in trigger status screen (Eugene)
   - added login/logout information into auditlog (Eugene)
   - fixed values viwing on overview screen (Eugene)

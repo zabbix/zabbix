@@ -24,6 +24,7 @@ function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$m
 
 ?>
 <?php
+	require_once 	"include/defines.inc.php";
 	require_once 	"include/html.inc.php";
 	require_once	"include/copt.lib.php";
 
@@ -33,14 +34,6 @@ function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$m
 	$USER_DETAILS	= array();
 	$USER_RIGHTS	= array();
 // END OF GLOBALS
-
-// if magic quotes on then get rid of them
-	if (get_magic_quotes_gpc()) {
-		$_GET    = zbx_stripslashes($_GET);
-		$_POST	 = zbx_stripslashes($_POST);
-		$_COOKIE = zbx_stripslashes($_COOKIE);
-		$_REQUEST= zbx_stripslashes($_REQUEST);
-	}
 
 // Include Classes
 	require_once("include/classes/ctag.inc.php");
@@ -69,7 +62,6 @@ function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$m
 
 // Include Tactical Overview modules
 
-	require_once 	"include/defines.inc.php";
 	require_once 	"include/locales.inc.php";
 
 	include_once("include/classes/chostsinfo.mod.php");
@@ -160,7 +152,7 @@ function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$m
 
 		if(!defined('ZBX_PAGE_NO_AUTHERIZATION') && ZBX_DISTRIBUTED)
 		{
-			$ZBX_CURNODEID = get_cookie('current_nodeid', $ZBX_LOCALNODEID); // Selected node
+			$ZBX_CURNODEID = get_cookie('zbx_current_nodeid', $ZBX_LOCALNODEID); // Selected node
 			if(isset($_REQUEST['switch_node']))
 			{
 				if($node_data = DBfetch(DBselect("select * from nodes where nodeid=".$_REQUEST['switch_node'])))
@@ -182,7 +174,7 @@ function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$m
 				$ZBX_CURMASTERID = $ZBX_LOCMASTERID;
 			}
 			
-			zbx_setcookie("current_nodeid",$ZBX_CURNODEID);
+			zbx_set_post_cookie('zbx_current_nodeid',$ZBX_CURNODEID);
 		}
 		else
 		{
@@ -1273,13 +1265,6 @@ else
 		return ($var == "" ? 0 : 1);
 	}
 
-	function	get_cookie($name, $default_value)
-	{
-		if(isset($_COOKIE[$name]))	return $_COOKIE[$name];
-		// else
-		return $default_value;
-	}
-	
 	function	get_profile($idx,$default_value,$type=PROFILE_TYPE_UNCNOWN)
 	{
 		global $USER_DETAILS;
@@ -1557,6 +1542,7 @@ else if (document.getElementById)
 
 	function Redirect($url)
 	{
+		zbx_flush_post_cookies();
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--
@@ -1870,20 +1856,97 @@ else if (document.getElementById)
 			ImagePNG($image);
 	}
 
+	/* function:
+	 *      get_cookie
+	 *
+	 * description:
+	 *      return cookie value by name,
+	 *      if cookie is not present return $default_value.
+	 *
+	 * author: Eugene Grigorjev
+	 */
+	function	get_cookie($name, $default_value=null)
+	{
+		global $_COOKIE;
+
+		if(isset($_COOKIE[$name]))	return $_COOKIE[$name];
+		// else
+		return $default_value;
+	}
 
 	/* function:
 	 *      zbx_setcookie
 	 *
 	 * description:
-	 *      set cookies after authorisation.
-	 *      require including of 'include/page_header.php'
+	 *      set cookies.
 	 *
 	 * author: Eugene Grigorjev
 	 */
 	function	zbx_setcookie($name, $value, $time=null)
 	{
-		global $ZBX_PAGE_COOCIES;
+		global $_COOKIE;
 
-		$ZBX_PAGE_COOCIES[] = array($name, $value, $time);
+		setcookie($name, $value, isset($time) ? $time : (time() + 3600));
+		$_COOKIE[$name] = $value;
+	}
+	
+	/* function:
+	 *      zbx_unsetcookie
+	 *
+	 * description:
+	 *      unset and clear cookies.
+	 *
+	 * author: Eugene Grigorjev
+	 */
+	function	zbx_unsetcookie($name)
+	{
+		global $_COOKIE;
+		
+		setcookie($name, null, time() - 3600);
+		$_COOKIE[$name] = null;
+	}
+	
+	/* function:
+	 *     zbx_flush_post_cookies
+	 *
+	 * description:
+	 *     set posted cookies.
+	 *
+	 * author: Eugene Grigorjev
+	 */
+	function	zbx_flush_post_cookies($unset=false)
+	{
+		global $ZBX_PAGE_COOKIES;
+
+		if(isset($ZBX_PAGE_COOKIES))
+		{
+			foreach($ZBX_PAGE_COOKIES as $cookie)
+			{
+				if($unset)
+					zbx_unsetcookie($cookie[0]);
+				else
+					zbx_setcookie($cookie[0], $cookie[1], $cookie[2]);
+			}
+			unset($ZBX_PAGE_COOKIES);
+		}
+	}
+
+	/* function:
+	 *      zbx_set_post_cookie
+	 *
+	 * description:
+	 *      set cookies after authorisation.
+	 *      require calling 'zbx_flush_post_cookies' function
+	 *	Called from:
+	 *         a) in 'include/page_header.php'
+	 *         b) from 'Redirect()'
+	 *
+	 * author: Eugene Grigorjev
+	 */
+	function	zbx_set_post_cookie($name, $value, $time=null)
+	{
+		global $ZBX_PAGE_COOKIES;
+
+		$ZBX_PAGE_COOKIES[] = array($name, $value, isset($time) ? $time : (time() + 3600));
 	}
 ?>

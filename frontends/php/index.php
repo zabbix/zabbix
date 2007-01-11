@@ -41,13 +41,15 @@
 	check_fields($fields);
 ?>
 <?php
-	if(isset($_REQUEST["reconnect"]) && isset($_COOKIE["sessionid"]))
+	$sessionid = get_cookie('zbx_sessionid', null);
+	
+	if(isset($_REQUEST["reconnect"]) && isset($sessionid))
 	{
 		add_audit(AUDIT_ACTION_LOGOUT,AUDIT_RESOURCE_USER,"Manual Logout");
 		
-		DBexecute("delete from sessions where sessionid=".zbx_dbstr($_COOKIE["sessionid"]));
-		setcookie("sessionid",$_COOKIE["sessionid"],time()-3600); /* NOTE: don't use zbx_setcookie */
-		unset($_COOKIE["sessionid"]);
+		zbx_unsetcookie('zbx_sessionid');
+		DBexecute("delete from sessions where sessionid=".zbx_dbstr($sessionid));
+		unset($sessionid);
 
 		Redirect("index.php");
 		return;
@@ -65,8 +67,7 @@
 		if($row)
 		{
 			$sessionid = md5(time().$password.$name.rand(0,10000000));
-			setcookie("sessionid",$sessionid,time()+3600); /* NOTE: don't use zbx_setcookie */
-			$_COOKIE["sessionid"]	= $sessionid;	/* Required ! */
+			zbx_setcookie('zbx_sessionid',$sessionid);
 			
 			DBexecute("insert into sessions (sessionid,userid,lastaccess)".
 				" values (".zbx_dbstr($sessionid).",".$row["userid"].",".time().")");
@@ -91,7 +92,7 @@ include_once "include/page_header.php";
 	if(isset($_REQUEST['message'])) show_error_message($_REQUEST['message']);
 ?>
 <?php
-	if(!isset($_COOKIE["sessionid"]))
+	if(!isset($sessionid))
 	{
 		insert_login_form();
 	}

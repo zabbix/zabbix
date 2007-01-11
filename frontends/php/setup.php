@@ -61,21 +61,16 @@
 	check_fields($fields, false);
 ?>
 <?php
-	global $ZBX_CONFIG, $_COOKIE;
-
-	$ZBX_CONFIG = array();
+	global $ZBX_CONFIG;
 
 	if(isset($_REQUEST['cancel']) || isset($_REQUEST['finish']))
 	{
-		setcookie('ZBX_CONFIG', null, time()-3600); /* NOTE: don't use zbx_setcookie */
-		unset($_COOKIE['ZBX_CONFIG']);
+		zbx_unsetcookie('ZBX_CONFIG');
 		Redirect('index.php');
 	}
 	
-	if(isset($_COOKIE['ZBX_CONFIG']))
-	{
-		$ZBX_CONFIG = unserialize($_COOKIE['ZBX_CONFIG']);
-	}
+	$ZBX_CONFIG = get_cookie('ZBX_CONFIG', null);
+	$ZBX_CONFIG = isset($ZBX_CONFIG) ? unserialize($ZBX_CONFIG) : array();
 
 	if(!isset($ZBX_CONFIG['step'])) $ZBX_CONFIG['step'] = 0;
 	if(!isset($ZBX_CONFIG['agree'])) $ZBX_CONFIG['agree'] = false;
@@ -110,7 +105,7 @@
 
 	$ZBX_SETUP_WIZARD = new CSetupWizard($ZBX_CONFIG);
 
-	zbx_setcookie('ZBX_CONFIG', serialize($ZBX_CONFIG), time()+3600);
+	zbx_set_post_cookie('ZBX_CONFIG', serialize($ZBX_CONFIG));
 
 include_once "include/page_header.php";
 
