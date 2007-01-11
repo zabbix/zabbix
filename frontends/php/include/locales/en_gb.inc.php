@@ -458,6 +458,7 @@
 	"S_NO_TEMPLATES_DEFINED"=>		"No templates defined",
 	"S_HOSTS_BIG"=>				"HOSTS",
 	"S_HOST"=>				"Host",
+	"S_HOST_BIG"=>				"HOST",
 	"S_IP"=>				"IP",
 	"S_PORT"=>				"Port",
 	"S_MONITORED"=>				"Monitored",
