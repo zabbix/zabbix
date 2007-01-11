@@ -24,7 +24,14 @@
 	$page["file"] = "srv_status.php";
 	show_header($page["title"],1,0);
 ?>
-
+<?php
+	if(!check_anyright("Service","R"))
+	{
+		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
+		show_page_footer();
+		exit;
+	}
+?>
 <?php
 	update_profile("web.menu.view.last",$page["file"]);
 ?>

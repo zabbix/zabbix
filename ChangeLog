@@ -1,5 +1,6 @@
 Changes for 1.1.5:
 
+ - fixed permission system (Eugene)
  - fixed conflict with cookies of other products (Eugene)
  - added sorting by host in trigger status screen (Eugene)
  - added login/logout information into auditlog (Eugene)

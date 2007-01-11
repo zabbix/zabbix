@@ -991,9 +991,10 @@ COpt::profiling_start("page");
 <table class="menu" cellspacing=0 cellpadding=5>
 <tr>
 <?php
-	$i=0;
+	$i=-1;
 	foreach($menu as $label=>$sub)
 	{
+		$i++;
 // Check permissions
 		if($label=="configuration")
 		{
@@ -1017,6 +1018,11 @@ COpt::profiling_start("page");
 			}
 
 		}
+		if($label!='login' && !check_anyright("Default permission","R"))
+		{
+			continue;
+		}
+		
 // End of check permissions
 		$active=0;
 		foreach($sub["pages"] as $label2)
@@ -1047,9 +1053,7 @@ COpt::profiling_start("page");
 		{
 			$class = "horizontal_menu_n";
 		}
-
 		echo "<td class=\"$class\" height=24 colspan=9><b><a href=\"$url\" class=\"highlight\">".$sub["label"]."</a></b></td>\n";
-		$i++;
 	}
 ?>
 </tr>
@@ -1064,9 +1068,9 @@ COpt::profiling_start("page");
 // Check permissions
 		if(($sub["url"]=="latest.php")&&!check_anyright("Host","R"))							continue;
 		if(($sub["url"]=="overview.php")&&!check_anyright("Host","R"))							continue;
-		if(($sub["url"]=="tr_status.php?onlytrue=true&noactions=true&compact=true")&&!check_anyright("Host","R"))	continue;
+		if(($sub["url"]=="tr_status.php")&&!check_anyright("Host","R"))							continue;
 		if(($sub["url"]=="queue.php")&&!check_anyright("Host","R"))							continue;
-		if(($sub["url"]=="events.php")&&!check_anyright("Default permission","R"))				continue;
+		if(($sub["url"]=="events.php")&&!check_anyright("Default permission","R"))					continue;
 		if(($sub["url"]=="actions.php")&&!check_anyright("Default permission","R"))					continue;
 		if(($sub["url"]=="maps.php")&&!check_anyright("Network map","R"))						continue;
 		if(($sub["url"]=="charts.php")&&!check_anyright("Graph","R"))							continue;
@@ -1074,6 +1078,8 @@ COpt::profiling_start("page");
 		if(($sub["url"]=="srv_status.php")&&!check_anyright("Service","R"))						continue;
 		if(($sub["url"]=="report1.php")&&!check_anyright("Default permission","R"))					continue;
 		if(($sub["url"]=="report2.php")&&!check_anyright("Host","R"))							continue;
+		if(($sub["url"]=="report4.php")&&!check_anyright("User","R"))							continue;
+		if(($sub["url"]=="report5.php")&&!check_anyright("Host","R"))							continue;
 		if(($sub["url"]=="config.php")&&!check_anyright("Configuration of Zabbix","U"))					continue;
 		if(($sub["url"]=="users.php")&&!check_anyright("User","U"))							continue;
 		if(($sub["url"]=="media.php")&&!check_anyright("User","U"))							continue;
@@ -1088,6 +1094,7 @@ COpt::profiling_start("page");
 		if(($sub["url"]=="screenedit.php")&&!check_anyright("Screen","U"))						continue;
 		if(($sub["url"]=="screenconf.php")&&!check_anyright("Screen","U"))						continue;
 		if(($sub["url"]=="services.php")&&!check_anyright("Service","U"))						continue;
+		if(($sub["url"]=="hostprofiles.php")&&!check_anyright("Host","R"))						continue;
 
 		echo "<a href=\"".$sub["url"]."\" class=\"highlight\">".$sub["label"]."</a><span class=\"divider\">".SPACE.SPACE."|".SPACE."</span>\n";
 	}

@@ -22,6 +22,11 @@
 	include "include/config.inc.php";
 	include "include/classes/graph.inc.php";
 
+	if(!check_right("Graph","R",$_REQUEST["graphid"]))
+	{
+		exit;
+	}
+	
 	$graph=new Graph();
 	if(isset($_REQUEST["period"]))
 	{

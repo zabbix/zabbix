@@ -26,12 +26,12 @@
 ?>
 
 <?php
-//	if(!check_right("Host","R",0))
-//	{
-//		show_table_header("<font color=\"AA0000\">No permissions !</font>");
-//		show_page_footer();
-//		exit;
-//	}
+	if(!check_right("Host","R",0))
+	{
+		show_table_header("<font color=\"AA0000\">No permissions !</font>");
+		show_page_footer();
+		exit;
+	}
 ?>
 
 <?php
