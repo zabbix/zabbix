@@ -42,9 +42,10 @@ INDEX		|httpstep_1	|httptestid
 
 TABLE|httpstepitem|httpstepitemid|ZBX_SYNC
 FIELD		|httpstepitemid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|httptestid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|httpstepid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-UNIQUE		|httpstepitem_1	|httptestid,itemid
+FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+UNIQUE		|httpstepitem_1	|httpstepid,itemid
 
 TABLE|httpmacro|httpmacroid|ZBX_SYNC
 FIELD		|httpmacroid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
