@@ -326,7 +326,7 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
  *                                                                            *
  ******************************************************************************/
 
-/* #define TEST */
+/*#define TEST */
 
 #ifdef TEST
 
@@ -373,7 +373,8 @@ void test()
 	zbx_step	*stp = NULL;
 	zbx_step	steps[] = {
 		/*	URL						POST 			*/
-		{"http://www.zabbix.com/forum/",			NULL},
+		{"http://localhost/",				NULL},
+/*		{"http://www.zabbix.com/forum/",			NULL},
 		{"http://www.zabbix.com/forum/login.php",		"vb_login_username=Eugene"
 									"&cookieuser="
 									"&vb_login_password="
@@ -385,7 +386,7 @@ void test()
 		{"http://www.zabbix.com/forum/",			NULL},
 		{"http://www.zabbix.com/forum/usercp.php?",		NULL},
 		{"http://www.zabbix.com/forum/login.php?do=logout",	NULL},
-		{"http://www.zabbix.com/forum/",			NULL},
+		{"http://www.zabbix.com/forum/",			NULL},*/
 		{NULL, NULL}
 		};
 

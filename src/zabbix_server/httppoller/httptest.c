@@ -28,7 +28,7 @@
 #include "common.h"
 #include "httptest.h"
 
-size_t WRITEFUNCTION( void *ptr, size_t size, size_t nmemb, void *stream)
+size_t WRITEFUNCTION2( void *ptr, size_t size, size_t nmemb, void *stream)
 {
 /*	size_t s = size*nmemb + 1;
 	char *str_dat = calloc(1, s);
@@ -41,7 +41,7 @@ size_t WRITEFUNCTION( void *ptr, size_t size, size_t nmemb, void *stream)
 	return size*nmemb;
 }
 
-size_t HEADERFUNCTION( void *ptr, size_t size, size_t nmemb, void *stream)
+size_t HEADERFUNCTION2( void *ptr, size_t size, size_t nmemb, void *stream)
 {
 //	ZBX_LIM_PRINT("HEADERFUNCTION", size*nmemb, ptr, 300);
 //	zabbix_log(LOG_LEVEL_WARNING, "In HEADERFUNCTION");
@@ -132,12 +132,12 @@ int	process_httptest(DB_HTTPTEST *httptest)
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLOPT_FOLLOWLOCATION [%s]", curl_easy_strerror(err));
 		return FAIL;
 	}
-	if(CURLE_OK != (err = curl_easy_setopt(easyhandle,CURLOPT_WRITEFUNCTION ,WRITEFUNCTION)))
+	if(CURLE_OK != (err = curl_easy_setopt(easyhandle,CURLOPT_WRITEFUNCTION ,WRITEFUNCTION2)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Error doing curl_easy_perform [%s]", curl_easy_strerror(err));
 		return FAIL;
 	}
-	if(CURLE_OK != (err = curl_easy_setopt(easyhandle,CURLOPT_HEADERFUNCTION ,HEADERFUNCTION)))
+	if(CURLE_OK != (err = curl_easy_setopt(easyhandle,CURLOPT_HEADERFUNCTION ,HEADERFUNCTION2)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Error doing curl_easy_perform [%s]", curl_easy_strerror(err));
 		return FAIL;
@@ -155,7 +155,8 @@ int	process_httptest(DB_HTTPTEST *httptest)
 		httpstep.timeout=atoi(row[5]);
 		httpstep.posts=row[6];
 		memset(&stat,0,sizeof(stat));
-		if(row[5][0] != 0)
+
+		if(httpstep.posts[0] != 0)
 		{
 			if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, httpstep.posts)))
 			{
@@ -170,12 +171,12 @@ int	process_httptest(DB_HTTPTEST *httptest)
 			ret = FAIL;
 			break;
 		}
-		if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT, httpstep.timeout)))
+/*		if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT, httpstep.timeout)))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "Cannot set URL [%s]", curl_easy_strerror(err));
 			ret = FAIL;
 			break;
-		}
+		}*/
 		if(CURLE_OK != (err = curl_easy_perform(easyhandle)))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "Error doing curl_easy_perform [%s]", curl_easy_strerror(err));
