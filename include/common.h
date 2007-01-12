@@ -307,6 +307,7 @@
 				    
 /* Secure string copy */
 #define strscpy(x,y) { strncpy(x,y,sizeof(x)); x[sizeof(x)-1]=0; }
+#define strnscpy(x,y,n) { strncpy(x,y,n); x[n-1]=0; }
 
 /* list structure as item of agent return vaile */					 
 #define ZBX_LIST_ITEM struct zbx_list_item_s
@@ -460,5 +461,10 @@ int	cmp_double(double a,double b);
 int       SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
 int	zbx_fork();
+
+char* zbx_dsprintf(char *f, ...);
+	
+void	*zbx_malloc(size_t size);
+#define zbx_free(ptr) { if(ptr){ free(ptr); ptr = NULL; } }
 
 #endif

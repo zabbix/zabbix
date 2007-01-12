@@ -584,7 +584,7 @@ void	substitute_simple_macros(int alarmid, DB_TRIGGER *trigger, DB_ACTION *actio
 	char
 		*pl = NULL,
 		*pr = NULL,
-		str_out[MAX_STRING_LEN],
+		*str_out = NULL,
 		replace_to[MAX_STRING_LEN];
 	int	
 		outlen,
@@ -598,8 +598,10 @@ void	substitute_simple_macros(int alarmid, DB_TRIGGER *trigger, DB_ACTION *actio
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_simple_macros [%s]",data);
 
-	*str_out = '\0';
-	outlen = sizeof(str_out) - 1;
+	outlen	= strlen(data) * 3 / 2 + 1;
+	str_out	= zbx_malloc(outlen + 1);
+	*str_out= '\0';
+	
 	pl = data;
 	while((pr = strchr(pl, '{')) && outlen > 0)
 	{
@@ -791,6 +793,8 @@ void	substitute_simple_macros(int alarmid, DB_TRIGGER *trigger, DB_ACTION *actio
 
 	snprintf(data, dala_max_len, "%s", str_out);
 
+	zbx_free(str_out);
+
 	zabbix_log( LOG_LEVEL_DEBUG, "Result expression [%s]", data );
 }
 
@@ -815,7 +819,7 @@ void	substitute_simple_macros(int alarmid, DB_TRIGGER *trigger, DB_ACTION *actio
 void	substitute_macros(int alarmid, DB_TRIGGER *trigger, DB_ACTION *action, char *data, int dala_max_len)
 {
 	char	
-		str_out[MAX_STRING_LEN],
+		*str_out = NULL,
 		replace_to[MAX_STRING_LEN],
 		*pl = NULL,
 		*pr = NULL,
@@ -832,13 +836,14 @@ void	substitute_macros(int alarmid, DB_TRIGGER *trigger, DB_ACTION *action, char
 		outlen,
 		var_len;
 
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_macros([%s])",data);
-
+	
 	substitute_simple_macros(alarmid, trigger, action, data, dala_max_len, MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY);
 
-	*str_out = '\0';
-	outlen = sizeof(str_out) - 1;
+	outlen	= strlen(data) * 3 / 2 + 1;
+	str_out	= zbx_malloc(outlen + 1);
+	*str_out= '\0';
+	
 	pl = data;
 	while((pr = strchr(pl, '{')) && outlen > 0)
 	{
@@ -905,6 +910,8 @@ void	substitute_macros(int alarmid, DB_TRIGGER *trigger, DB_ACTION *action, char
 	outlen -= MIN(strlen(pl), outlen);
 
 	snprintf(data, dala_max_len, "%s", str_out);
+
+	zbx_free(str_out);
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Result expression:%s", data );
 }

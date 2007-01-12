@@ -1595,21 +1595,40 @@ int	DBget_queue_count(void)
 int	DBadd_alert(int actionid, int userid, int triggerid,  int mediatypeid, char *sendto, char *subject, char *message, int maxrepeats, int repeatdelay)
 {
 	int	now;
-	char	sql[MAX_STRING_LEN];
-	char	sendto_esc[MAX_STRING_LEN];
-	char	subject_esc[MAX_STRING_LEN];
-	char	message_esc[MAX_STRING_LEN];
+	char	*sql		= NULL;
+	char	*sendto_esc	= NULL;
+	char	*subject_esc	= NULL;
+	char	*message_esc	= NULL;
+
+	int	size;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_alert(triggerid[%d])",triggerid);
 
 	now = time(NULL);
+
+	size = strlen(sendto) * 3 / 2 + 1;
+	sendto_esc = zbx_malloc(size);
+	DBescape_string(sendto	, sendto_esc	, size);
+
+	size = strlen(subject) * 3 / 2 + 1;
+	subject_esc = zbx_malloc(size);
+	DBescape_string(subject	, subject_esc	, size);
+
+	size = strlen(message) * 3 / 2 + 1;
+	message_esc = zbx_malloc(size);
+	DBescape_string(message	, message_esc	, size);
+
 /* Does not work on PostgreSQL */
 /*	snprintf(sql,sizeof(sql)-1,"insert into alerts (alertid,actionid,clock,mediatypeid,sendto,subject,message,status,retries) values (NULL,%d,%d,%d,'%s','%s','%s',0,0)",actionid,now,mediatypeid,sendto,subject,message);*/
-	DBescape_string(sendto,sendto_esc,MAX_STRING_LEN);
-	DBescape_string(subject,subject_esc,MAX_STRING_LEN);
-	DBescape_string(message,message_esc,MAX_STRING_LEN);
-	snprintf(sql,sizeof(sql)-1,"insert into alerts (actionid,triggerid,userid,clock,mediatypeid,sendto,subject,message,status,retries,maxrepeats,delay) values (%d,%d,%d,%d,%d,'%s','%s','%s',0,0,%d,%d)",actionid,triggerid,userid,now,mediatypeid,sendto_esc,subject_esc,message_esc, maxrepeats, repeatdelay);
+	sql = zbx_dsprintf("insert into alerts (actionid,triggerid,userid,clock,mediatypeid,sendto,subject,message,status,retries,maxrepeats,delay) values (%d,%d,%d,%d,%d,'%s','%s','%s',0,0,%d,%d)",actionid,triggerid,userid,now,mediatypeid,sendto_esc,subject_esc,message_esc, maxrepeats, repeatdelay);
+
+	zbx_free(sendto_esc);
+	zbx_free(subject_esc);
+	zbx_free(message_esc);
+	
 	DBexecute(sql);
+	
+	zbx_free(sql);
 
 	return SUCCEED;
 }

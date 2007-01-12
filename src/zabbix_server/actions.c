@@ -718,15 +718,20 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 			action.userid=atoi(row[1]);
 			
 			strscpy(action.subject,row[2]);
-			strscpy(action.message,row[3]);
-			substitute_macros(alarmid, trigger, &action, action.message, sizeof(action.message));
-			substitute_macros(alarmid, trigger, &action, action.subject, sizeof(action.subject));
+			
+			action.message_len	= strlen(row[3]) * 3 / 2 + 1;
+			action.message		= zbx_malloc(action.message_len);
 
-			action.recipient=atoi(row[4]);
-			action.maxrepeats=atoi(row[5]);
-			action.repeatdelay=atoi(row[6]);
+			strnscpy(action.message,row[3], action.message_len);
+			
+			action.recipient	= atoi(row[4]);
+			action.maxrepeats	= atoi(row[5]);
+			action.repeatdelay	= atoi(row[6]);
 			strscpy(action.scripts,row[7]);
-			action.actiontype=atoi(row[8]);
+			action.actiontype	= atoi(row[8]);
+
+			substitute_macros(alarmid, trigger, &action, action.message, action.message_len);
+			substitute_macros(alarmid, trigger, &action, action.subject, sizeof(action.subject));
 
 			if(action.actiontype == ACTION_TYPE_MESSAGE)
 				send_to_user(trigger,&action);
@@ -735,6 +740,8 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 
 /*			snprintf(sql,sizeof(sql)-1,"update actions set nextcheck=%d where actionid=%d",now+action.delay,action.actionid);
 			DBexecute(sql);*/
+
+			zbx_free(action.message);
 		}
 		else
 		{
