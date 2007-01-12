@@ -20,9 +20,15 @@
 #ifndef ZABBIX_HTTPTEST_H
 #define ZABBIX_HTTPTEST_H
 
+#define S_ZBX_HTTPPAGE	struct s_zbx_httppage_t
+S_ZBX_HTTPPAGE
+{
+	char		*data;
+	int		allocated;
+	int		offset;
+};
 
 #define S_ZBX_HTTPSTAT	struct s_zbx_httpstat_t
-
 S_ZBX_HTTPSTAT
 {
 	long    	rspcode;

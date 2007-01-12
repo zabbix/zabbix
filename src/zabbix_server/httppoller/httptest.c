@@ -30,6 +30,8 @@
 #include "httpmacro.h"
 #include "httptest.h"
 
+S_ZBX_HTTPPAGE	page;
+
 /******************************************************************************
  *                                                                            *
  * Function: process_value                                                    *
@@ -86,6 +88,16 @@ static size_t WRITEFUNCTION2( void *ptr, size_t size, size_t nmemb, void *stream
 	ZBX_LIM_PRINT("WRITEFUNCTION", s, str_dat, 65535);
 	zabbix_log(LOG_LEVEL_WARNING, "In WRITEFUNCTION");
 */
+
+	/* First piece of data */
+	if(page.data == NULL)
+	{
+		page.allocated=8096;
+		page.offset=0;
+		page.data=malloc(page.allocated);
+	}
+
+	zbx_snprintf_alloc(&page.data, &page.allocated, &page.offset, 8096, ptr);
 
 	return size*nmemb;
 }
@@ -234,7 +246,7 @@ static int	process_httptest(DB_HTTPTEST *httptest)
 		return FAIL;
 	}
 
-	result = DBselect("select httpstepid,httptestid,no,name,url,timeout,posts from httpstep where httptestid=" ZBX_FS_UI64 " order by no",
+	result = DBselect("select httpstepid,httptestid,no,name,url,timeout,posts,required from httpstep where httptestid=" ZBX_FS_UI64 " order by no",
 				httptest->httptestid);
 	while((row=DBfetch(result)))
 	{
@@ -245,6 +257,8 @@ static int	process_httptest(DB_HTTPTEST *httptest)
 		strscpy(httpstep.url,row[4]);
 		httpstep.timeout=atoi(row[5]);
 		strscpy(httpstep.posts,row[6]);
+		strscpy(httpstep.required,row[7]);
+
 		memset(&stat,0,sizeof(stat));
 
 		/* Substitute macros */
@@ -272,12 +286,28 @@ static int	process_httptest(DB_HTTPTEST *httptest)
 			ret = FAIL;
 			break;
 		}*/
+
+		memset(&page, 0, sizeof(page));
 		if(CURLE_OK != (err = curl_easy_perform(easyhandle)))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "Error doing curl_easy_perform [%s]", curl_easy_strerror(err));
 			ret = FAIL;
 			break;
 		}
+zabbix_log(LOG_LEVEL_ERR, "Got %d bytes", strlen(page.data));
+
+		if(zbx_regexp_match(page.data,httpstep.required,NULL) != NULL)
+		{
+zabbix_log(LOG_LEVEL_ERR, "Page matched [%s]", httpstep.required);
+		}
+		else
+		{
+zabbix_log(LOG_LEVEL_ERR, "Page didn't match [%s]", httpstep.required);
+		}
+
+		free(page.data);
+
+
 		if(CURLE_OK != (err = curl_easy_getinfo(easyhandle,CURLINFO_RESPONSE_CODE ,&stat.rspcode)))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "Error doing curl_easy_perform [%s]", curl_easy_strerror(err));
