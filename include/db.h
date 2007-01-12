@@ -397,6 +397,7 @@ DB_HTTPSTEP
 	char		url[MAX_STRING_LEN];
 	int		timeout;
 	char		posts[MAX_STRING_LEN];
+	char		required[MAX_STRING_LEN];
 };
 
 DB_HTTPSTEPITEM
