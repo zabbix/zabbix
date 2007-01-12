@@ -137,7 +137,7 @@ void	PG_DBfree_result(DB_RESULT result);
 
 #define	MAX_HOST_HOST_LEN	64
 
-#define	MAX_ITEM_KEY_LEN	64
+#define	MAX_ITEM_KEY_LEN	255
 #define	MAX_ITEM_IP_LEN		15
 #define	MAX_ITEM_SNMP_COMMUNITY_LEN	64
 #define	MAX_ITEM_SNMP_OID_LEN	255

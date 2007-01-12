@@ -328,7 +328,7 @@ FIELD		|snmp_oid	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|snmp_port	|t_integer	|'161'	|NOT NULL	|ZBX_SYNC
 FIELD		|hostid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|description	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|key_		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|delay		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|history	|t_integer	|'90'	|NOT NULL	|ZBX_SYNC
 FIELD		|trends		|t_integer	|'365'	|NOT NULL	|ZBX_SYNC
@@ -592,5 +592,5 @@ INDEX		|1		|applicationid,itemid
 
 TABLE|help_items|itemtype,key_|0
 FIELD		|itemtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|key_		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|description	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
