@@ -388,16 +388,16 @@
 			
 			$table = new CTable(null, 'requirements');
 			$table->SetAlign('center');
-			$table->AddRow(array('Database type',		$allowed_db[$this->GetConfig('DB_TYPE',	'uncnown')]));
-			$table->AddRow(array('Database server',		$this->GetConfig('DB_SERVER',	'uncnown')));
-			$table->AddRow(array('Database name',		$this->GetConfig('DB_DATABASE',	'uncnown')));
-			$table->AddRow(array('Database user',		$this->GetConfig('DB_USER',	'uncnown')));
-			$table->AddRow(array('Database password',	$this->GetConfig('DB_PASSWORD',	'uncnown')));
+			$table->AddRow(array('Database type',		$allowed_db[$this->GetConfig('DB_TYPE',	'unknown')]));
+			$table->AddRow(array('Database server',		$this->GetConfig('DB_SERVER',	'unknown')));
+			$table->AddRow(array('Database name',		$this->GetConfig('DB_DATABASE',	'unknown')));
+			$table->AddRow(array('Database user',		$this->GetConfig('DB_USER',	'unknown')));
+			$table->AddRow(array('Database password',	$this->GetConfig('DB_PASSWORD',	'unknown')));
 			/* $table->AddRow(array('Distributed monitoring',	$this->GetConfig('distributed', null) ? 'Enabled' : 'Disabled')); */
 			if($this->GetConfig('distributed', null))
 			{
-				$table->AddRow(array('Node name',	$this->GetConfig('nodename',	'uncnown')));
-				$table->AddRow(array('Node GUID',	$this->GetConfig('nodeid',	'uncnown')));
+				$table->AddRow(array('Node name',	$this->GetConfig('nodename',	'unknown')));
+				$table->AddRow(array('Node GUID',	$this->GetConfig('nodeid',	'unknown')));
 			}
 			return array(
 				'Please check configuration parameters.', BR,
@@ -805,10 +805,10 @@
 
 global $DB_TYPE, $DB_SERVER, $DB_DATABASE, $DB_USER, $DB_PASSWORD, $IMAGE_FORMAT_DEFAULT;
 
-$DB_TYPE	= "'.$this->GetConfig('DB_TYPE'		,'uncnown').'";
-$DB_SERVER	= "'.$this->GetConfig('DB_SERVER'	,'uncnown').'";
-$DB_DATABASE	= "'.$this->GetConfig('DB_DATABASE'	,'uncnown').'";
-$DB_USER	= "'.$this->GetConfig('DB_USER'		,'uncnown').'";
+$DB_TYPE	= "'.$this->GetConfig('DB_TYPE'		,'unknown').'";
+$DB_SERVER	= "'.$this->GetConfig('DB_SERVER'	,'unknown').'";
+$DB_DATABASE	= "'.$this->GetConfig('DB_DATABASE'	,'unknown').'";
+$DB_USER	= "'.$this->GetConfig('DB_USER'		,'unknown').'";
 $DB_PASSWORD	= "'.$this->GetConfig('DB_PASSWORD'	,'').'";
 
 $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
