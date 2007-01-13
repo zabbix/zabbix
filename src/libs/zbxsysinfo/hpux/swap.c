@@ -307,7 +307,7 @@ SWP_FNCLIST
         if(mode[0] == '\0')
 	{
 		/* default parameter */
-		zbx_snprintf(mode, sizeof(mode)), "free");
+		zbx_snprintf(mode, sizeof(mode), "free");
 	}
 
 	for(i=0; fl[i].mode!=0; i++)
