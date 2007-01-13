@@ -447,6 +447,7 @@ if(isset($DB_TYPE) && $DB_TYPE == "ORACLE") {
 		{
 			case "MYSQL":
 				$odiv = 'div';
+				break;
 			default:
 				$odiv = '/';
 		}
