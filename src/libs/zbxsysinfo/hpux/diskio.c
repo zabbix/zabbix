@@ -181,7 +181,7 @@ DEV_FNCLIST
 		zbx_snprintf(type, sizeof(type), "bps");
 	}
 	
-	if(get_param(param, 3, mode, sieof(mode)) != 0)
+	if(get_param(param, 3, mode, sizof(mode)) != 0)
         {
                 mode[0] = '\0';
         }
