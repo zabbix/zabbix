@@ -73,6 +73,10 @@
 #	include <sys/types.h>
 #endif
 
+#ifdef HAVE_INTTYPES_H
+#	include <inttypes.h>
+#endif
+
 #ifdef HAVE_STRING_H
 #	include <string.h>
 #endif
