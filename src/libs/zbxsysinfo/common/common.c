@@ -24,6 +24,7 @@
 #include "md5.h"
 #include "log.h"
 #include "zbxsock.h"
+#include "threads.h"
 #include "cfg.h"
 
 ZBX_METRIC *commands=NULL;
