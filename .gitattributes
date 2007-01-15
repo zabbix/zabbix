@@ -145,6 +145,9 @@ src/zabbix_server/trapper/nodesync.h -text
 src/zabbix_server/utils/Makefile.am -text
 src/zabbix_server/utils/nodechange.c -text
 src/zabbix_server/utils/nodechange.h -text
+upgrades/dbpatches/1.3/mysql/changed_tables.sql -text
+upgrades/dbpatches/1.3/mysql/history_tables.sql -text
+upgrades/dbpatches/1.3/mysql/new_tables.sql -text
 upgrades/dbpatches/1.3/mysql/patch.sql -text
 upgrades/dbpatches/1.3/oracle/patch.sql -text
 upgrades/dbpatches/1.3/postgresql/patch.sql -text
