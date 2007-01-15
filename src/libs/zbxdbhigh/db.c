@@ -284,26 +284,22 @@ void DBrollback(void)
  */ 
 int DBexecute(const char *fmt, ...)
 {
-	char	sql[ZBX_MAX_SQL_LEN];
-
 	va_list args;
+	char	*sql = NULL;
+	int ret = SUCCEED;
+
 #ifdef	HAVE_POSTGRESQL
 	PGresult	*result;
 #endif
-#ifdef	HAVE_ORACLE
-	int ret;
-#endif
 #ifdef	HAVE_SQLITE3
-	int ret = SUCCEED;
-	int sql_ret = SUCCEED;
 	char *error=0;
 #endif
 
 	va_start(args, fmt);
-	vsnprintf(sql, ZBX_MAX_SQL_LEN-1, fmt, args);
-	va_end(args);
+	
+	sql = zbx_dvsprintf(fmt, args);
 
-	sql[ZBX_MAX_SQL_LEN-1]='\0';
+	va_end(args);
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s", sql);
 #ifdef	HAVE_MYSQL
@@ -311,9 +307,12 @@ int DBexecute(const char *fmt, ...)
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",sql);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s [%d]", mysql_error(&mysql), mysql_errno(&mysql) );
-		return FAIL;
+		ret = FAIL;
 	}
-	return (long)mysql_affected_rows(&mysql);
+	else
+	{
+		ret = (int)mysql_affected_rows(&mysql);
+	}
 #endif
 #ifdef	HAVE_POSTGRESQL
 	result = PQexec(conn,sql);
@@ -322,20 +321,17 @@ int DBexecute(const char *fmt, ...)
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",sql);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", "Result is NULL" );
-		PQclear(result);
-		return FAIL;
+		ret = FAIL;
 	}
-	if( PQresultStatus(result) != PGRES_COMMAND_OK)
+	else if( PQresultStatus(result) != PGRES_COMMAND_OK)
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",sql);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s:%s",
 				PQresStatus(PQresultStatus(result)),
 			 	PQresultErrorMessage(result));
-		PQclear(result);
-		return FAIL;
+		ret = FAIL;
 	}
 	PQclear(result);
-	return SUCCEED;
 #endif
 #ifdef	HAVE_ORACLE
 	if ( (ret = sqlo_exec(oracle, sql))<0 )
@@ -346,7 +342,6 @@ int DBexecute(const char *fmt, ...)
 		zbx_error("Query failed:%s.", sqlo_geterror(oracle) );
 		ret = FAIL;
 	}
-	return ret;
 #endif
 #ifdef	HAVE_SQLITE3
 	if(!sqlite_transaction_started)
@@ -373,8 +368,10 @@ lbl_exec:
 	{
 		php_sem_release(&sqlite_access);
 	}
-	return ret;
 #endif
+	
+	zbx_free(sql);
+	return ret;
 }
 
 
@@ -399,12 +396,12 @@ void	PG_DBfree_result(DB_RESULT result)
 	if(result->values)
 	{
 		result->fld_num = 0;
-		free(result->values);
+		zbx_free(result->values);
 		result->values = NULL;
 	}
 
 	PQclear(result->pg_result);
-	free(result);
+	zbx_free(result);
 }
 #endif
 #ifdef  HAVE_SQLITE3
@@ -418,7 +415,7 @@ void	SQ_DBfree_result(DB_RESULT result)
 		sqlite3_free_table(result->data);
 	}
 
-	free(result);
+	zbx_free(result);
 }
 #endif
 
@@ -437,7 +434,7 @@ DB_ROW	DBfetch(DB_RESULT result)
 	/* free old data */
 	if(result->values)
 	{
-		free(result->values);
+		zbx_free(result->values);
 		result->values = NULL;
 	}
 	
@@ -449,7 +446,7 @@ DB_ROW	DBfetch(DB_RESULT result)
 
 	if(result->fld_num > 0)
 	{
-		result->values = malloc(sizeof(char*) * result->fld_num);
+		result->values = zbx_malloc(sizeof(char*) * result->fld_num);
 		for(i = 0; i < result->fld_num; i++)
 		{
 			 result->values[i] = PQgetvalue(result->pg_result, result->cursor, i);
@@ -502,12 +499,10 @@ DB_ROW	DBfetch(DB_RESULT result)
  */ 
 DB_RESULT DBselect(const char *fmt, ...)
 {
-	char	sql[ZBX_MAX_SQL_LEN];
-
 	va_list args;
-#if defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3)
+	char	*sql = NULL;
 	DB_RESULT result;
-#endif
+
 #ifdef	HAVE_ORACLE
 	sqlo_stmt_handle_t sth;
 #endif
@@ -517,10 +512,10 @@ DB_RESULT DBselect(const char *fmt, ...)
 #endif
 
 	va_start(args, fmt);
-	vsnprintf(sql, ZBX_MAX_SQL_LEN-1, fmt, args);
-	va_end(args);
+	
+	sql = zbx_dvsprintf(fmt, args);
 
-	sql[ZBX_MAX_SQL_LEN-1]='\0';
+	va_end(args);
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s", sql);
 
@@ -532,10 +527,10 @@ DB_RESULT DBselect(const char *fmt, ...)
 
 		exit(FAIL);
 	}
-	return	mysql_store_result(&mysql);
+	result = mysql_store_result(&mysql);
 #endif
 #ifdef	HAVE_POSTGRESQL
-	result = malloc(sizeof(ZBX_PG_DB_RESULT));
+	result = zbx_malloc(sizeof(ZBX_PG_DB_RESULT));
 	result->pg_result = PQexec(conn,sql);
 	result->values = NULL;
 	result->cursor = 0;
@@ -558,7 +553,6 @@ DB_RESULT DBselect(const char *fmt, ...)
 	/* init rownum */	
 	result->row_num = PQntuples(result->pg_result);
 
-	return result;
 #endif
 #ifdef	HAVE_ORACLE
 	if(0 > (sth = (sqlo_open(oracle, sql,0,NULL))))
@@ -567,7 +561,7 @@ DB_RESULT DBselect(const char *fmt, ...)
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", sqlo_geterror(oracle));
 		exit(FAIL);
 	}
-	return sth;
+	result = sth;
 #endif
 #ifdef HAVE_SQLITE3
 	if(!sqlite_transaction_started)
@@ -575,16 +569,16 @@ DB_RESULT DBselect(const char *fmt, ...)
 		php_sem_acquire(&sqlite_access);
 	}
 
-	result = malloc(sizeof(ZBX_SQ_DB_RESULT));
+	result = zbx_malloc(sizeof(ZBX_SQ_DB_RESULT));
 	result->curow = 0;
 
 lbl_get_table:
-	if(SQLITE_OK != (sql_ret = sqlite3_get_table(sqlite,sql,&result->data,&result->nrow, &result->ncolumn, &error)))
+	if(SQLITE_OK != (ret = sqlite3_get_table(sqlite,sql,&result->data,&result->nrow, &result->ncolumn, &error)))
 	{
-		if(sql_ret == SQLITE_BUSY) goto lbl_get_table; /* attention deadlock!!! */
+		if(ret == SQLITE_BUSY) goto lbl_get_table; /* attention deadlock!!! */
 		
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",sql);
-		zabbix_log(LOG_LEVEL_ERR, "Query failed [%i]:%s", sql_ret, error);
+		zabbix_log(LOG_LEVEL_ERR, "Query failed [%i]:%s", ret, error);
 		sqlite3_free(error);
 		if(!sqlite_transaction_started)
 		{
@@ -597,8 +591,10 @@ lbl_get_table:
 	{
 		php_sem_release(&sqlite_access);
 	}
-	return result;
 #endif
+
+	zbx_free(sql);
+	return result;
 }
 
 /*
@@ -1563,12 +1559,7 @@ int	DBadd_history_text(zbx_uint64_t itemid, char *value, int clock)
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_history_text()");
 
 	value_esc_max_len = strlen(value)+1024;
-	value_esc = malloc(value_esc_max_len);
-	if(value_esc == NULL)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG,"Can't allocate required memory");
-		goto lbl_exit;
-	}
+	value_esc = zbx_malloc(value_esc_max_len);
 
 	DBescape_string(value, value_esc, value_esc_max_len-1);
 	value_esc_max_len = strlen(value_esc);
@@ -1629,7 +1620,7 @@ lbl_exit_loblp:
 
 lbl_exit:
 	if(sth >= 0)	sqlo_close(sth);
-	if(value_esc)	free(value_esc);
+	zbx_free(value_esc);
 
 	sqlo_autocommit_on(oracle);
 
@@ -1644,11 +1635,7 @@ lbl_exit:
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_history_str()");
 
 	value_esc_max_len = strlen(value)+1024;
-	value_esc = malloc(value_esc_max_len);
-	if(value_esc == NULL)
-	{
-		return FAIL;
-	}
+	value_esc = zbx_malloc(value_esc_max_len);
 
 	sql_max_len = value_esc_max_len+100;
 
@@ -1656,7 +1643,7 @@ lbl_exit:
 	DBexecute("insert into history_text (clock,itemid,value) values (%d," ZBX_FS_UI64 ",'%s')",
 		clock,itemid,value_esc);
 
-	free(value_esc);
+	zbx_free(value_esc);
 
 	return SUCCEED;
 
@@ -1876,22 +1863,39 @@ int	DBget_queue_count(void)
 int	DBadd_alert(zbx_uint64_t actionid, zbx_uint64_t userid, zbx_uint64_t triggerid,  zbx_uint64_t mediatypeid, char *sendto, char *subject, char *message, int maxrepeats, int repeatdelay)
 {
 	int	now;
-	char	sendto_esc[MAX_STRING_LEN];
-	char	subject_esc[MAX_STRING_LEN];
-	char	message_esc[MAX_STRING_LEN];
+	
+	char	*sendto_esc	= NULL;
+	char	*subject_esc	= NULL;
+	char	*message_esc	= NULL;
+	
+	int	size;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_alert(triggerid[%d])",triggerid);
 
 	now = time(NULL);
 /* Does not work on PostgreSQL */
 /*	zbx_snprintf(sql,sizeof(sql),"insert into alerts (alertid,actionid,clock,mediatypeid,sendto,subject,message,status,retries) values (NULL,%d,%d,%d,'%s','%s','%s',0,0)",actionid,now,mediatypeid,sendto,subject,message);*/
-	DBescape_string(sendto,sendto_esc,MAX_STRING_LEN);
-	DBescape_string(subject,subject_esc,MAX_STRING_LEN);
-	DBescape_string(message,message_esc,MAX_STRING_LEN);
+
+	size = strlen(sendto) * 3 / 2 + 1;
+	sendto_esc = zbx_malloc(size);
+	DBescape_string(sendto, sendto_esc, size);
+
+	size = strlen(subject) * 3 / 2 + 1;
+	subject_esc = zbx_malloc(size);
+	DBescape_string(subject,subject_esc,size);
+	
+	size = strlen(message) * 3 / 2 + 1;
+	message_esc = zbx_malloc(size);
+	DBescape_string(message,message_esc,size);
+	
 	DBexecute("insert into alerts (alertid, actionid,triggerid,userid,clock,mediatypeid,sendto,subject,message,status,retries,maxrepeats,delay)"
 		" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",'%s','%s','%s',0,0,%d,%d)",
 		DBget_maxid("alerts","alertid"),
 		actionid,triggerid,userid,now,mediatypeid,sendto_esc,subject_esc,message_esc, maxrepeats, repeatdelay);
+
+	zbx_free(sendto_esc);
+	zbx_free(subject_esc);
+	zbx_free(message_esc);
 
 	return SUCCEED;
 }
