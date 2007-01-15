@@ -36,6 +36,7 @@ char confFile[MAX_PATH]="C:\\zabbix_agentd.conf";
 char logFile[MAX_PATH]="{EventLog}";
 char confHostname[MAX_PATH]="0.0.0.0";
 char confServer[MAX_PATH]="0.0.0.0";
+char* CONFIG_LISTEN_IP = NULL;
 
 WORD confListenPort=10050; // Alexei: New defailt port 10000 -> 10050
 WORD confServerPort=10051;

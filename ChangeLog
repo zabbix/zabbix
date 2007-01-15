@@ -1,5 +1,6 @@
 Changes for 1.1.5:
 
+ - added parameter ListenIP to WinXX ZABBIX agent (Eugene)
  - increased message size for alerts (Eugene)
  - fixed permission system (Eugene)
  - fixed conflict with cookies of other products (Eugene)

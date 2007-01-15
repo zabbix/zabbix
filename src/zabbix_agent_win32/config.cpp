@@ -340,6 +340,18 @@ CHECK_MEMORY(main, "ReadConfig", "fopen==NULL");
          if ((rc=ParseServerList(ptr,sourceLine))>0)
             errors+=rc;
       }
+      else if (!stricmp(buffer,"ListenIP"))
+      {
+	      CONFIG_LISTEN_IP = strdup(ptr);
+
+	      if(INADDR_NONE == inet_addr(CONFIG_LISTEN_IP))
+	      {
+		      free(CONFIG_LISTEN_IP);
+		      CONFIG_LISTEN_IP = NULL;
+		      printf("Error in configuration file, line %d: invalid listen ip (%s)\n",sourceLine,ptr);
+		      
+	      }
+      }
       else if (!stricmp(buffer,"ListenPort"))
       {
          int n;
