@@ -68,6 +68,19 @@ AC_CHECK_LIB(resolv, main)
 AC_CHECK_LIB(kvm, main)
 dnl AC_CHECK_LIB(pthread, main)
 
+dnl Check for union semum
+AC_MSG_CHECKING(for union senum)
+AC_TRY_COMPILE(
+[
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/sem.h>
+],
+[union semun foo;],
+AC_DEFINE(HAVE_SEMNUM, 1 ,[Define to 1 if union 'semun' exist.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
 dnl Check for socklen_t
 AC_MSG_CHECKING(for socklen_t)
 AC_TRY_COMPILE([

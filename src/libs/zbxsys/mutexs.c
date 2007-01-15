@@ -22,7 +22,7 @@
 
 #if !defined(_WINDOWS)
 
-#	if !defined(semun)
+#	if !HAVE_SEMUN
 		union semun
 		{
 			int val;			/* <= value for SETVAL */
@@ -30,6 +30,10 @@
 			unsigned short int *array;	/* <= array for GETALL & SETALL */
 			struct seminfo *__buf;		/* <= buffer for IPC_INFO */
 		};
+
+#		undef HAVE_SEMUN
+#		define HAVE_SEMUN 1
+
 #	endif /* semun */
 
 #	include "cfg.h"
