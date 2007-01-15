@@ -1,5 +1,6 @@
 Changes for 1.3.3:
 
+ - fixed comilation on FreeBSD (Eugene)
  - misc HP-UX fixes (Alexei)
  - misc FreeBSD fixes (Alexei)
  - fixed false "Database corrupted" situations (Alexei)
