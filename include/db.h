@@ -340,7 +340,8 @@ DB_ACTION
 	int	lastcheck;
 	int	recipient;
 	char	subject[ACTION_SUBJECT_LEN_MAX];	/* don't use pointer, cose sizeof is used */
-	char	message[MAX_STRING_LEN];		/* don't use pointer, cose sizeof is used */
+	char	*message;
+	int	message_len;
 	int	maxrepeats;
 	int	repeatdelay;
 	char	scripts[MAX_STRING_LEN];

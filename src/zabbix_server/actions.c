@@ -533,7 +533,7 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 	}
 	else if(condition->conditiontype == CONDITION_TYPE_TRIGGER_VALUE)
 	{
-		zabbix_log( LOG_LEVEL_DEBUG, "CONDITION_TYPE_TRIGGER_VALUE [%s:%s]", event->value, condition->value);
+		zabbix_log( LOG_LEVEL_DEBUG, "CONDITION_TYPE_TRIGGER_VALUE [%d:%s]", event->value, condition->value);
 		if(condition->operator == CONDITION_OPERATOR_EQUAL)
 		{
 			if(event->value == atoi(condition->value))
@@ -713,15 +713,23 @@ void	apply_actions(DB_EVENT *event)
 			ZBX_STR2UINT64(action.userid, row[1]);
 			
 			strscpy(action.subject,row[2]);
-			strscpy(action.message,row[3]);
-			substitute_macros(event, &action, action.message, sizeof(action.message));
-			substitute_macros(event, &action, action.subject, sizeof(action.subject));
+			
+			action.message_len	= strlen(row[3]) * 3 / 2 + 1;
+			action.message		= zbx_malloc(action.message_len);
 
-			action.recipient=atoi(row[4]);
-			action.maxrepeats=atoi(row[5]);
-			action.repeatdelay=atoi(row[6]);
+			strnscpy(action.message,row[3], action.message_len);
+			
+			action.recipient	= atoi(row[4]);
+			action.maxrepeats	= atoi(row[5]);
+			action.repeatdelay	= atoi(row[6]);
 			strscpy(action.scripts,row[7]);
-			action.actiontype=atoi(row[8]);
+			action.actiontype	= atoi(row[8]);
+
+			substitute_macros(event, &action, action.message, action.message_len);
+			substitute_macros(event, &action, action.subject, sizeof(action.subject));
+			
+zabbix_log(LOG_LEVEL_CRIT,"Original [%d]: %s", strlen(row[3]), row[3]); // TMP!!!
+zabbix_log(LOG_LEVEL_CRIT,"Substituted [%d,%d]: %s", strlen(action.message), action.message_len, action.message); // TMP!!!
 
 			if(action.actiontype == ACTION_TYPE_MESSAGE)
 				send_to_user(event,&action);
@@ -730,6 +738,8 @@ void	apply_actions(DB_EVENT *event)
 
 /*			zbx_snprintf(sql,sizeof(sql),"update actions set nextcheck=%d where actionid=%d",now+action.delay,action.actionid);
 			DBexecute(sql);*/
+
+			zbx_free(action.message);
 		}
 		else
 		{

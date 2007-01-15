@@ -286,7 +286,7 @@
 		
 		$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_MODE_LT);
 		
-		$result=DBselect("select a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,".
+		$result=DBselect("select distinct a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,".
 				"a.error from alerts a,media_type mt,functions f,items i ".
 				" where mt.mediatypeid=a.mediatypeid and a.triggerid=f.triggerid and f.itemid=i.itemid ".
 				" and i.hostid not in (".$denyed_hosts.")".
