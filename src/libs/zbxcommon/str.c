@@ -720,3 +720,39 @@ size_t zbx_strlcat(char *dst, const char *src, size_t siz)
 
 	return(dlen + (s - src));        /* count does not include NUL */
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dvsprintf                                                     *
+ *                                                                            *
+ * Purpose: dinamical formatted output conversion                             *
+ *                                                                            *
+ * Return value: formated string                                              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:  required free allocated string with function 'zbx_free'         *
+ *                                                                            *
+ ******************************************************************************/
+char* zbx_dvsprintf(const char *f, va_list args)
+{
+	char	*string = NULL;
+	int	n, size = MAX_STRING_LEN >> 1;
+
+	while(1) {
+		string = zbx_malloc(size);
+
+		n = vsnprintf(string, size, f, args);
+
+		if(n >= 0 && n < size)
+			break;
+
+		if(n >= size)	size = n + 3;
+		else		size = size * 3 / 2 + 1;
+
+		zbx_free(string);
+	}
+
+	return string;
+}
+

@@ -39,7 +39,7 @@
 			$sql_cond = " and h.hostid=hg.hostid and hg.groupid=".$groupid;
 		}
 
-		$result = DBselect(" select t.triggerid,t.priority,t.description,h.host,e.clock,e.value ".
+		$result = DBselect("select distinct t.triggerid,t.priority,t.description,h.host,e.clock,e.value ".
 			" from events e, triggers t, functions f, items i, hosts h ".$sql_from.
 			" where ".DBid2nodeid("t.triggerid")."=".$nodeid.
 			" and e.triggerid=t.triggerid and t.triggerid=f.triggerid and f.itemid=i.itemid ".

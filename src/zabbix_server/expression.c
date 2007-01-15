@@ -549,7 +549,7 @@ int	evaluate(int *result,char *exp, char *error, int maxerrlen)
  * Parameters: trigger - trigger structure                                    *
  *             action - action structure (NULL if uncnown)                    *
  *             data - data string                                             *
- *             dala_max_len - max length of data string,include '\0'          *
+ *             data_max_len - max length of data string,include '\0'          *
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
@@ -582,10 +582,12 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 	char
 		*pl = NULL,
 		*pr = NULL,
-		str_out[MAX_STRING_LEN],
-		replace_to[MAX_STRING_LEN];
+		*str_out = NULL,
+		*replace_to = NULL;
 	int	
-		outlen,
+		replace_to_len,
+		str_out_len,
+		str_out_fill,
 		var_len;
 
 	time_t  now;
@@ -596,17 +598,22 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_simple_macros [%s]",data);
 
-	*str_out = '\0';
-	outlen = sizeof(str_out) - 1;
+	replace_to_len	= strlen(data);
+	replace_to	= zbx_malloc(replace_to_len);
+
+	str_out_fill 	= 0;
+	str_out_len 	= strlen(data) * 3 / 2 + 1;
+	str_out		= zbx_malloc(str_out_len + 1);
+	*str_out	= '\0';
+	
 	pl = data;
-	while((pr = strchr(pl, '{')) && outlen > 0)
+	while((pr = strchr(pl, '{')) && str_out_fill < str_out_len)
 	{
 		pr[0] = '\0';
-		zbx_strlcat(str_out, pl, outlen);
-		outlen -= MIN(strlen(pl), outlen);
+		str_out_fill = zbx_strlcat(str_out, pl, str_out_len);
 		pr[0] = '{';
 
-		zbx_snprintf(replace_to, sizeof(replace_to), "{");
+		zbx_snprintf(replace_to, replace_to_len, "{");
 		var_len = 1;
 
 		if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
@@ -614,15 +621,15 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 		{
 			var_len = strlen(MVAR_TRIGGER_NAME);
 
-			zbx_snprintf(replace_to, sizeof(replace_to), "%s", event->trigger_description);
-			substitute_simple_macros(event, action, replace_to, sizeof(replace_to), MACRO_TYPE_TRIGGER_DESCRIPTION);
+			zbx_snprintf(replace_to, replace_to_len, "%s", event->trigger_description);
+			substitute_simple_macros(event, action, replace_to, replace_to_len, MACRO_TYPE_TRIGGER_DESCRIPTION);
 		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
 			strncmp(pr, MVAR_TRIGGER_COMMENT, strlen(MVAR_TRIGGER_COMMENT)) == 0)
 		{
 			var_len = strlen(MVAR_TRIGGER_COMMENT);
 
-			zbx_snprintf(replace_to, sizeof(replace_to), "%s", event->trigger_comments);
+			zbx_snprintf(replace_to, replace_to_len, "%s", event->trigger_comments);
 		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY | MACRO_TYPE_TRIGGER_DESCRIPTION) &&
 			strncmp(pr, MVAR_HOST_NAME, strlen(MVAR_HOST_NAME)) == 0)
@@ -642,11 +649,11 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 				zabbix_syslog("No hostname in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
 					event->triggerid);
 
-				zbx_snprintf(replace_to, sizeof(replace_to), "%s", STR_UNKNOWN_VARIAVLE);
+				zbx_snprintf(replace_to, replace_to_len, "%s", STR_UNKNOWN_VARIAVLE);
 			}
 			else
 			{
-				zbx_snprintf(replace_to, sizeof(replace_to), "%s", row[0]);
+				zbx_snprintf(replace_to, replace_to_len, "%s", row[0]);
 			}
 			DBfree_result(result);
 		}
@@ -672,7 +679,7 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 			}
 			else
 			{
-				zbx_snprintf(replace_to, sizeof(replace_to), "%s", row[0]);
+				zbx_snprintf(replace_to, replace_to_len, "%s", row[0]);
 			}
 
 			DBfree_result(result);
@@ -695,11 +702,11 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 				zabbix_syslog("No hostname in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
 					event->triggerid);
 
-				zbx_snprintf(replace_to, sizeof(replace_to), "%s", STR_UNKNOWN_VARIAVLE);
+				zbx_snprintf(replace_to, replace_to_len, "%s", STR_UNKNOWN_VARIAVLE);
 			}
 			else
 			{
-				zbx_snprintf(replace_to, sizeof(replace_to), "%s", row[0]);
+				zbx_snprintf(replace_to, replace_to_len, "%s", row[0]);
 			}
 			DBfree_result(result);
 		}
@@ -710,7 +717,7 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 
 			now	= time(NULL);
 			tm	= localtime(&now);
-			zbx_snprintf(replace_to, sizeof(replace_to)-1, "%.4d.%.2d.%.2d", tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday);
+			zbx_snprintf(replace_to, replace_to_len-1, "%.4d.%.2d.%.2d", tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday);
 		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY)&&
 			strncmp(pr, MVAR_TIME, strlen(MVAR_TIME)) == 0)
@@ -719,7 +726,7 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 
 			now	= time(NULL);
 			tm	= localtime(&now);
-			zbx_snprintf(replace_to, sizeof(replace_to), "%.2d:%.2d:%.2d",tm->tm_hour,tm->tm_min,tm->tm_sec);
+			zbx_snprintf(replace_to, replace_to_len, "%.2d:%.2d:%.2d",tm->tm_hour,tm->tm_min,tm->tm_sec);
 
 		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
@@ -729,9 +736,9 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 			var_len = strlen(MVAR_TRIGGER_STATUS);
 
 			if(event->value == TRIGGER_VALUE_TRUE)
-				zbx_snprintf(replace_to, sizeof(replace_to), "OFF");
+				zbx_snprintf(replace_to, replace_to_len, "OFF");
 			else
-				zbx_snprintf(replace_to, sizeof(replace_to), "ON");
+				zbx_snprintf(replace_to, replace_to_len, "ON");
 		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) && 
 			strncmp(pr, MVAR_TRIGGER_STATUS_OLD, strlen(MVAR_TRIGGER_STATUS_OLD)) == 0)
@@ -740,9 +747,9 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 			var_len = strlen(MVAR_TRIGGER_STATUS_OLD);
 
 			if(event->value == TRIGGER_VALUE_TRUE)
-				zbx_snprintf(replace_to, sizeof(replace_to), "OFF");
+				zbx_snprintf(replace_to, replace_to_len, "OFF");
 			else
-				zbx_snprintf(replace_to, sizeof(replace_to), "ON");
+				zbx_snprintf(replace_to, replace_to_len, "ON");
 		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
 			strncmp(pr, MVAR_TRIGGER_ID, strlen(MVAR_TRIGGER_ID)) == 0)
@@ -750,7 +757,7 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 			/* NOTE: if you make changes for this bloc, don't forgot MVAR_TRIGGER_STATUS block */
 			var_len = strlen(MVAR_TRIGGER_ID);
 
-			zbx_snprintf(replace_to, sizeof(replace_to), ZBX_FS_UI64, event->triggerid);
+			zbx_snprintf(replace_to, replace_to_len, ZBX_FS_UI64, event->triggerid);
 		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
 			strncmp(pr, MVAR_TRIGGER_URL, strlen(MVAR_TRIGGER_URL)) == 0)
@@ -758,7 +765,7 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 			/* NOTE: if you make changes for this bloc, don't forgot MVAR_TRIGGER_STATUS block */
 			var_len = strlen(MVAR_TRIGGER_URL);
 
-			zbx_snprintf(replace_to, sizeof(replace_to), "%s", event->trigger_url);
+			zbx_snprintf(replace_to, replace_to_len, "%s", event->trigger_url);
 		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
 			strncmp(pr, MVAR_EVENT_ID, strlen(MVAR_EVENT_ID)) == 0)
@@ -766,30 +773,31 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 			/* NOTE: if you make changes for this bloc, don't forgot MVAR_TRIGGER_STATUS block */
 			var_len = strlen(MVAR_EVENT_ID);
 
-			zbx_snprintf(replace_to, sizeof(replace_to), ZBX_FS_UI64, event->eventid);
+			zbx_snprintf(replace_to, replace_to_len, ZBX_FS_UI64, event->eventid);
 		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) && 
 			strncmp(pr, MVAR_TRIGGER_SEVERITY, strlen(MVAR_TRIGGER_SEVERITY)) == 0)
 		{
 			var_len = strlen(MVAR_TRIGGER_SEVERITY);
 
-			if(event->trigger_priority == 0)	zbx_snprintf(replace_to, sizeof(replace_to), "Not classified");
-			else if(event->trigger_priority == 1)	zbx_snprintf(replace_to, sizeof(replace_to), "Information");
-			else if(event->trigger_priority == 2)	zbx_snprintf(replace_to, sizeof(replace_to), "Warning");
-			else if(event->trigger_priority == 3)	zbx_snprintf(replace_to, sizeof(replace_to), "Average");
-			else if(event->trigger_priority == 4)	zbx_snprintf(replace_to, sizeof(replace_to), "High");
-			else if(event->trigger_priority == 5)	zbx_snprintf(replace_to, sizeof(replace_to), "Disaster");
-			else					zbx_snprintf(replace_to, sizeof(replace_to), "Unknown");
+			if(event->trigger_priority == 0)	zbx_snprintf(replace_to, replace_to_len, "Not classified");
+			else if(event->trigger_priority == 1)	zbx_snprintf(replace_to, replace_to_len, "Information");
+			else if(event->trigger_priority == 2)	zbx_snprintf(replace_to, replace_to_len, "Warning");
+			else if(event->trigger_priority == 3)	zbx_snprintf(replace_to, replace_to_len, "Average");
+			else if(event->trigger_priority == 4)	zbx_snprintf(replace_to, replace_to_len, "High");
+			else if(event->trigger_priority == 5)	zbx_snprintf(replace_to, replace_to_len, "Disaster");
+			else					zbx_snprintf(replace_to, replace_to_len, "Unknown");
 		}
 
-		zbx_strlcat(str_out, replace_to, outlen);
-		outlen -= MIN(strlen(replace_to), outlen);
+		str_out_fill = zbx_strlcat(str_out, replace_to, str_out_len);
 		pl = pr + var_len;
 	}
-	zbx_strlcat(str_out, pl, outlen);
-	outlen -= MIN(strlen(pl), outlen);
+	str_out_fill = zbx_strlcat(str_out, pl, str_out_len);
 
 	zbx_snprintf(data, data_max_len, "%s", str_out);
+
+	zbx_free(str_out);
+	zbx_free(replace_to);
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Result expression [%s]", data );
 }
@@ -802,7 +810,7 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
  *                                                                            *
  * Parameters: trigger - trigger structure                                    *
  *             action - action structure                                      *
- *             dala_max_len - max length of data string,include '\0'          *
+ *             data_max_len - max length of data string,include '\0'          *
  *             data - data string                                             *
  *                                                                            *
  * Return value:                                                              *
@@ -812,11 +820,11 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
  * Comments: example: "{127.0.0.1:system[procload].last(0)}" to "1.34"        *
  *                                                                            *
  ******************************************************************************/
-void	substitute_macros(DB_EVENT *event, DB_ACTION *action, char *data, int dala_max_len)
+void	substitute_macros(DB_EVENT *event, DB_ACTION *action, char *data, int data_max_len)
 {
 	char	
-		str_out[MAX_STRING_LEN],
-		replace_to[MAX_STRING_LEN],
+		*str_out = NULL,
+		*replace_to = NULL,
 		*pl = NULL,
 		*pr = NULL,
 		*pms = NULL,
@@ -829,18 +837,25 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, char *data, int dala_
 		parameter[MAX_STRING_LEN];
 
 	int
-		outlen,
+		replace_to_len,
+		str_out_len,
+		str_out_fill,
 		var_len;
 
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_macros([%s])",data);
+	
+	substitute_simple_macros(event, action, data, data_max_len, MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY);
 
-	substitute_simple_macros(event, action, data, dala_max_len, MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY);
-
-	*str_out = '\0';
-	outlen = sizeof(str_out) - 1;
+	replace_to_len	= strlen(data);
+	replace_to	= zbx_malloc(replace_to_len);
+		
+	str_out_fill	= 0;
+	str_out_len	= strlen(data) * 3 / 2 + 1;
+	str_out		= zbx_malloc(str_out_len + 1);
+	*str_out	= '\0';
+	
 	pl = data;
-	while((pr = strchr(pl, '{')) && outlen > 0)
+	while((pr = strchr(pl, '{')) && str_out_fill < str_out_len)
 	{
 		if((pme = strchr(pr, '}')) == NULL)
 			break;
@@ -851,13 +866,12 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, char *data, int dala_
 
 		/* copy left side */
 		pr[0] = '\0';
-		zbx_strlcat(str_out, pl, outlen);
-		outlen -= MIN(strlen(pl), outlen);
+		str_out_fill = zbx_strlcat(str_out, pl, str_out_len);
 		pr[0] = '{';
 
 
 		/* copy original name of variable */
-		zbx_snprintf(replace_to, sizeof(replace_to), "%s}", pr);	/* in format used '}' */
+		zbx_snprintf(replace_to, replace_to_len, "%s}", pr);	/* in format used '}' */
 									/* cose in 'pr' string symbol '}' is changed to '\0' by 'pme'*/
 		var_len = strlen(replace_to);
 		
@@ -889,7 +903,7 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, char *data, int dala_
 						pms = p + 1;
 						
 						if(evaluate_FUNCTION2(replace_to,host,key,function,parameter) != SUCCEED)
-							zbx_snprintf(replace_to, sizeof(replace_to), "%s", STR_UNKNOWN_VARIAVLE);
+							zbx_snprintf(replace_to, replace_to_len, "%s", STR_UNKNOWN_VARIAVLE);
 					}
 				}
 			}
@@ -897,14 +911,15 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, char *data, int dala_
 		}
 		pme[0] = '}';
 
-		zbx_strlcat(str_out, replace_to, outlen);
-		outlen -= MIN(strlen(replace_to), outlen);
+		str_out_fill = zbx_strlcat(str_out, replace_to, str_out_len);
 		pl = pr + var_len;
 	}
-	zbx_strlcat(str_out, pl, outlen);
-	outlen -= MIN(strlen(pl), outlen);
+	str_out_fill = zbx_strlcat(str_out, pl, str_out_len);
 
-	zbx_snprintf(data, dala_max_len, "%s", str_out);
+	zbx_snprintf(data, data_max_len, "%s", str_out);
+
+	zbx_free(str_out);
+	zbx_free(replace_to);
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Result expression:%s", data );
 }

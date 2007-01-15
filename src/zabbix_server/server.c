@@ -326,102 +326,14 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
  *                                                                            *
  ******************************************************************************/
 
-/*#define TEST */
+/* #define TEST */
 
 #ifdef TEST
 
-#define ZBX_LIM_PRINT(msg, str_len, str, limit) \
-	printf(msg "(%i): %." #limit "s<br/>\n", str_len, str, str_len > limit ? "..." : "")
-
-//#define ZBX_LIM_PRINT(msg, str_len, str, limit) 
-
-size_t HEADERFUNCTION( void *ptr, size_t size, size_t nmemb, void *stream)
-{
-	ZBX_LIM_PRINT("HEADERFUNCTION", size*nmemb, ptr, 300);
-
-	return size*nmemb;
-}
-
-size_t WRITEFUNCTION( void *ptr, size_t size, size_t nmemb, void *stream)
-{
-	size_t s = size*nmemb + 1;
-	char *str_dat = calloc(1, s);
-
-	zbx_snprintf(str_dat,s,ptr);
-	ZBX_LIM_PRINT("WRITEFUNCTION", s, str_dat, 65535);
-
-	return size*nmemb;
-}
-
-#define XBX_CURL_ERR(msg) \
-	printf("ERROR: " msg " [%s]\n", curl_easy_strerror(err))
-
-#define ZBX_CURL_SET_OPT(opt_name, opt_val) \
-	if(CURLE_OK != (err = curl_easy_setopt(easyhandle, opt_name, opt_val))) \
-		XBX_CURL_ERR("curl_easy_setopt(" #opt_name ")")
-
-typedef struct s_zbx_step
-{
-	char *url;
-	char *post;
-} zbx_step;
-
 void test()
 {
-	int		err = CURLE_OK;
-	CURL		*easyhandle = NULL;
-	zbx_step	*stp = NULL;
-	zbx_step	steps[] = {
-		/*	URL						POST 			*/
-		{"http://localhost/",				NULL},
-/*		{"http://www.zabbix.com/forum/",			NULL},
-		{"http://www.zabbix.com/forum/login.php",		"vb_login_username=Eugene"
-									"&cookieuser="
-									"&vb_login_password="
-									"&s="
-									"&do=login"
-									"&forceredirect=1"
-									"&vb_login_md5password=ec5287c45f0e70ec22d52e8bcbeeb640"
-									"&vb_login_md5password_utf=ec5287c45f0e70ec22d52e8bcbeeb640"},
-		{"http://www.zabbix.com/forum/",			NULL},
-		{"http://www.zabbix.com/forum/usercp.php?",		NULL},
-		{"http://www.zabbix.com/forum/login.php?do=logout",	NULL},
-		{"http://www.zabbix.com/forum/",			NULL},*/
-		{NULL, NULL}
-		};
-
-
 	printf("-= Test Started =-\n");
-
-	if(NULL != (easyhandle = curl_easy_init()))
-	{
-		ZBX_CURL_SET_OPT(CURLOPT_COOKIEFILE,		"");
-		ZBX_CURL_SET_OPT(CURLOPT_FOLLOWLOCATION,	1);
-		ZBX_CURL_SET_OPT(CURLOPT_HEADERFUNCTION,	HEADERFUNCTION);
-		ZBX_CURL_SET_OPT(CURLOPT_WRITEFUNCTION,		WRITEFUNCTION);
-
-		for(stp=&steps[0];(*stp).url; stp++)
-		{
-			printf("****************************************************************\n");
-			printf("{{ %s }}\n", stp->url);
-			printf("****************************************************************\n");
-
-			if(stp->post)	ZBX_CURL_SET_OPT(CURLOPT_POSTFIELDS,	stp->post);
-
-			ZBX_CURL_SET_OPT(CURLOPT_URL,			stp->url);
-
-			if(CURLE_OK != curl_easy_perform(easyhandle)) /* post away! */
-				XBX_CURL_ERR("curl_easy_perform()");
-
-			fflush(stdout);
-		}
-		(void)curl_easy_cleanup(easyhandle);
-	}
-	else
-	{
-		XBX_CURL_ERR("curl_easy_init()");
-	}
-
+	
 	printf("\n-= Test completed =-\n");
 }
 #endif /* TEST */

@@ -305,8 +305,11 @@ typedef enum
 				    
 /* Secure string copy */
 #define strscpy(x,y) zbx_strlcpy(x,y,sizeof(x))
+#define strnscpy(x,y,n) zbx_strlcpy(x,y,n);
 
+void    *zbx_malloc(size_t size);
 #define zbx_free(ptr) { if(ptr){ free(ptr); ptr = NULL; } }
+	
 #define zbx_fclose(f) { if(f){ fclose(f); f = NULL; } }
 
 /* list structure as item of agent return vaile */					 
@@ -479,6 +482,8 @@ void	zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_len, co
 int	set_result_type(AGENT_RESULT *result, int value_type, char *c);
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);
 size_t	zbx_strlcat(char *dst, const char *src, size_t siz);
+
+char*	zbx_dvsprintf(const char *f, va_list args);
 
 int	replace_param(const char *cmd, const char *param, char *out, int outlen);
 
