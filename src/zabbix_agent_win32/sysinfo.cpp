@@ -655,56 +655,89 @@ static LONG H_ServiceState(char *cmd,char *arg,double *value)
 
 static LONG H_PerfCounter(char *cmd,char *arg,double *value)
 {
-   HQUERY query;
-   HCOUNTER counter;
-   PDH_RAW_COUNTER rawData;
-   PDH_FMT_COUNTERVALUE counterValue;
-   PDH_STATUS status;
-   char counterName[MAX_PATH];
+	HQUERY		query;
+	HCOUNTER	counter;
+	PDH_STATUS	status;
 
+	PDH_RAW_COUNTER		rawData;
+	PDH_FMT_COUNTERVALUE	counterValue;
 
-   GetParameterInstance(cmd,counterName,MAX_PATH-1);
+	char	counter_name[MAX_STRING_LEN];
+
+	LONG	ret = SYSINFO_RC_ERROR;
+
+	assert(value);
+
+	*value = 0;
+
+	GetParameterInstance(cmd,counter_name,sizeof(counter_name));
 
 LOG_DEBUG_INFO("s","H_PerfCounter: start");
-LOG_DEBUG_INFO("s", counterName);
+LOG_DEBUG_INFO("s", counter_name);
 
-   if (PdhOpenQuery(NULL,0,&query)!=ERROR_SUCCESS)
-   {
-      WriteLog(MSG_PDH_OPEN_QUERY_FAILED,EVENTLOG_ERROR_TYPE,"s",
-               GetSystemErrorText(GetLastError()));
-      return SYSINFO_RC_ERROR;
-   }
+	if(*counter_name)
+	{
+		if (ERROR_SUCCESS == PdhOpenQuery(NULL,0,&query))
+		{
+			if (ERROR_SUCCESS == (status = PdhAddCounter(query,counter_name,0,&counter)))
+			{
+				if (ERROR_SUCCESS == PdhCollectQueryData(query))
+				{
+					if(ERROR_SUCCESS == PdhGetRawCounterValue(counter, NULL, &rawData))
+					{
+						if( ERROR_SUCCESS == PdhCalculateCounterFromRawValue(
+							counter, 
+							PDH_FMT_DOUBLE, 
+							&rawData, 
+							NULL, 
+							&counterValue
+							) )
+						{
+							*value = counterValue.doubleValue;
+							
+							ret = SYSINFO_RC_SUCCESS;
+							LOG_DEBUG_INFO("s","H_PerfCounter: value");
+							LOG_DEBUG_INFO("d",*value);
+						}
+						else
+						{
+							WriteLog(MSG_INFORMATION,EVENTLOG_ERROR_TYPE,"ss","Can't format counter value", counter_name);
+						}
+					}
+					else
+					{
+						WriteLog(MSG_INFORMATION,EVENTLOG_ERROR_TYPE,"ss","Can't get counter value", counter_name);
+					}
+				}
+				else
+				{
+					WriteLog(MSG_PDH_COLLECT_QUERY_DATA_FAILED,EVENTLOG_ERROR_TYPE,"s",GetSystemErrorText(GetLastError()));
+				}
 
-   if ((status=PdhAddCounter(query,counterName,0,&counter))!=ERROR_SUCCESS)
-   {
-      WriteLog(MSG_PDH_ADD_COUNTER_FAILED,EVENTLOG_ERROR_TYPE,"ss",
-               counterName,GetPdhErrorText(status));
-      PdhCloseQuery(query);
-      return SYSINFO_RC_NOTSUPPORTED;
-   }
+				PdhRemoveCounter(&counter);
+			}
+			else
+			{
+				ret = SYSINFO_RC_NOTSUPPORTED;
+				WriteLog(MSG_PDH_ADD_COUNTER_FAILED,EVENTLOG_ERROR_TYPE,"ss", counter_name,GetPdhErrorText(status));
+			}
 
-   if (PdhCollectQueryData(query)!=ERROR_SUCCESS)
-   {
-      WriteLog(MSG_PDH_COLLECT_QUERY_DATA_FAILED,EVENTLOG_ERROR_TYPE,"s",
-               GetSystemErrorText(GetLastError()));
-	  PdhRemoveCounter(&counter);
-      PdhCloseQuery(query);
-      return SYSINFO_RC_ERROR;
-   }
+			PdhCloseQuery(query);
+		}
+		else
+		{
+			WriteLog(MSG_PDH_OPEN_QUERY_FAILED,EVENTLOG_ERROR_TYPE,"s", GetSystemErrorText(GetLastError()));
+		}
+	}
+	else
+	{
+		ret = SYSINFO_RC_NOTSUPPORTED;
+	}
 
-   PdhGetRawCounterValue(counter,NULL,&rawData);
-   PdhCalculateCounterFromRawValue(counter,PDH_FMT_DOUBLE,
-                                   &rawData,NULL,&counterValue);
-   PdhRemoveCounter(&counter);
+	LOG_DEBUG_INFO("s","H_PerfCounter: end");
 
-   PdhCloseQuery(query);
-   *value=counterValue.doubleValue;
-LOG_DEBUG_INFO("s","H_PerfCounter: value");
-LOG_DEBUG_INFO("d",*value);
-LOG_DEBUG_INFO("s","H_PerfCounter: end");
-   return SYSINFO_RC_SUCCESS;
+	return ret;
 }
-
 
 //
 // Handler for user counters
