@@ -209,7 +209,7 @@ int	VFS_FILE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		}
 		else
 		{
-			zbx_strlcpy(tmp,c,len);
+			zbx_strlcpy(tmp,c,len+1);
 		}
 
 		SET_STR_RESULT(result, strdup(tmp));
