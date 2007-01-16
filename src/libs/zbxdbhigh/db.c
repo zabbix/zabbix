@@ -33,6 +33,8 @@
 #include "zlog.h"
 #include "common.h"
 
+#include "../../zabbix_server/events.h"
+
 #ifdef	HAVE_SQLITE3
 	int		sqlite_transaction_started = 0;
 	sqlite3		*sqlite;
