@@ -138,9 +138,9 @@ require_once "include/items.inc.php";
 	{
 		global $ZBX_CURNODEID;
 		
- 		if (!eregi('^([0-9a-zA-Z\_\.-]+)$', $host)) 
+ 		if (!eregi('^([0-9a-zA-Z\_\.-\$]+)$', $host)) 
 		{
-			error("Hostname should contain 0-9a-zA-Z_.- characters only");
+			error("Hostname should contain '0-9a-zA-Z_.$'- characters only");
 			return false;
 		}
 
