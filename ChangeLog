@@ -66,12 +66,13 @@ Integrated from 1.1.x
 
 1.1.5
 
-  - increased message size for alerts (Eugene)
-  - fixed conflict with cookies of other products (Eugene)
-  - added sorting by host in trigger status screen (Eugene)
-  - added login/logout information into auditlog (Eugene)
-  - fixed values viwing on overview screen (Eugene)
-  - added support of "system.swap.(in/out)[<swap><,param>]" for Linux 2.x
+ - added availability to using '$' sign for hosts and item keys (Eugene)
+ - increased message size for alerts (Eugene)
+ - fixed conflict with cookies of other products (Eugene)
+ - added sorting by host in trigger status screen (Eugene)
+ - added login/logout information into auditlog (Eugene)
+ - fixed values viwing on overview screen (Eugene)
+ - added support of "system.swap.(in/out)[<swap><,param>]" for Linux 2.x
      <param> accept next values: 'count', 'sectors', 'pages'
      DEFAULT: <swap> = 'all', <param> = 'pages'
      NOTE: pages allowed only when <swap> is 'all' (Eugene)
