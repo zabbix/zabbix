@@ -1698,7 +1698,6 @@ void    DBescape_string(char *from, char *to, int maxlen)
 {
 	int     i,ptr;
 
-	assert(from);
 	assert(to);
 
 	maxlen--;

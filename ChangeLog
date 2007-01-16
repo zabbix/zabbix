@@ -1,5 +1,6 @@
 Changes for 1.1.5:
 
+ - fixed some assertions (Eugene)
  - fixed missing last symbol in vfs.file.regexp (Alexei)
  - fixed 'system.cpu.util[*]' for SunOS (Eugene)
  - added availability to using '$' sign for hosts and item keys (Eugene)
