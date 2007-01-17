@@ -126,7 +126,7 @@ LONG H_RunCommand(char *cmd,char *arg,char **value)
 	ptr1++;
 	*ptr2=0;
 
-	if((ptr2 = strrchr(ptr1,',')))
+	if(NULL != (ptr2 = strrchr(ptr1,',')))
 	{
 		*ptr2=0;
 		ptr2++;
