@@ -37,6 +37,9 @@ int	SERVICE_STATE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	int	ret = SYSINFO_RET_FAIL;
 	int	i;
 
+	SERVICE_STATUS status;
+
+
 	if(num_param(param) > 1)
 	{
 		return SYSINFO_RET_FAIL;
@@ -69,8 +72,6 @@ int	SERVICE_STATE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 		CloseServiceHandle(mgr);
 		return SYSINFO_RET_FAIL;
 	}
-
-	SERVICE_STATUS status;
 
 	if (QueryServiceStatus(service, &status))
 	{

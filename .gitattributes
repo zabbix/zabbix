@@ -116,6 +116,8 @@ m4/ax_lib_sqlite3.m4 -text
 m4/libcurl.m4 -text
 misc/clock/clock.fla -text
 /splint -text
+src/zabbix_agent/eventlog.c -text
+src/zabbix_agent/eventlog.h -text
 src/zabbix_server/events.c -text
 src/zabbix_server/events.h -text
 src/zabbix_server/httppoller/Makefile.am -text
