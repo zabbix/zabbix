@@ -439,6 +439,7 @@ int	send_value(char *server,int port,char *host, char *key,char *value,char *las
 	struct sockaddr_in myaddr_in;
 	struct sockaddr_in servaddr_in;
 	int	i, ret = SUCCEED;
+	unsigned int addr;
 
 LOG_FUNC_CALL("In send_value()");
 INIT_CHECK_MEMORY(main);
@@ -451,12 +452,16 @@ INIT_CHECK_MEMORY(main);
 
 
 	servaddr_in.sin_family=AF_INET;
-	hp=gethostbyname(server);
+
+	if(NULL == (hp = gethostbyname(server)))
+	{
+		addr = inet_addr(server);
+		hp = gethostbyaddr((char *)&addr, 4, AF_INET);
+	}
 
 	if(hp==NULL)
 	{
-		sprintf(tmp,"gethostbyname() failed");
-		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",tmp);
+		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","Incorrect server for active checks.");
 		ret = FAIL;
 		goto lbl_End;
 	}

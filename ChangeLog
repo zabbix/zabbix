@@ -1,5 +1,7 @@
 Changes for 1.1.5:
 
+ - added possibility of hostname using for 'Server' option of WinXX agent
+     configuration file (Eugene)
  - fixed some assertions (Eugene)
  - fixed missing last symbol in vfs.file.regexp (Alexei)
  - fixed 'system.cpu.util[*]' for SunOS (Eugene)
