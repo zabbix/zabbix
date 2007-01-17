@@ -276,16 +276,24 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 
 	struct sockaddr_in servaddr_in;
 
+	unsigned int addr;
+
 LOG_FUNC_CALL("In get_active_checks()");
 //	zabbix_log( LOG_LEVEL_DEBUG, "get_active_checks: host[%s] port[%d]", server, port);
 
 	servaddr_in.sin_family=AF_INET;
-	hp=gethostbyname(server);
+
+	if(NULL == (hp = gethostbyname(server)))
+	{
+		addr = inet_addr(server);
+		hp = gethostbyaddr((char *)&addr, 4, AF_INET);
+	}
 
 	if(hp==NULL)
 	{
 //		zabbix_log( LOG_LEVEL_WARNING, "gethostbyname() failed [%s]", hstrerror(h_errno));
 //		_snprintf(error, max_error_len,"gethostbyname() failed [%s]", hstrerror(h_errno));
+		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","Incorrect server for active checks.");
 		return	NETWORK_ERROR;
 	}
 

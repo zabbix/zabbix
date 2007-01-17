@@ -33,7 +33,7 @@ int process_eventlog(
 LOG_FUNC_CALL("In process_eventlog()");
 INIT_CHECK_MEMORY(main);
 
-    if (!MyOpenEventLog(source,&hAppLog,&LastID,&FirstID))
+    if (!MyOpenEventLog(source,&hAppLog,&LastID /* number */, &FirstID /* oldest */))
 	{
 		LastID += FirstID; 
 		FirstID = ((*lastlogsize) >= FirstID) ? (*lastlogsize)+1 : FirstID;
