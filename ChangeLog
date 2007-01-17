@@ -1,5 +1,6 @@
 Changes for 1.1.5:
 
+ - fixed 'eventlog[]' for WinXX (Eugene)
  - added possibility of hostname using for 'Server' option of WinXX agent
      configuration file (Eugene)
  - fixed some assertions (Eugene)

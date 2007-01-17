@@ -33,13 +33,17 @@ int process_eventlog(
 LOG_FUNC_CALL("In process_eventlog()");
 INIT_CHECK_MEMORY(main);
 
-    if (!MyOpenEventLog(source,&hAppLog,&LastID /* number */, &FirstID /* oldest */))
+	if (!MyOpenEventLog(source,&hAppLog,&LastID /* number */, &FirstID /* oldest */))
 	{
 		LastID += FirstID; 
-		FirstID = ((*lastlogsize) >= FirstID) ? (*lastlogsize)+1 : FirstID;
 
+		if(*lastlogsize > LastID)
+			*lastlogsize = FirstID;
+		else if((*lastlogsize) >= FirstID)
+			FirstID = (*lastlogsize)+1;
+		
 		for (i = FirstID; i < LastID; i++)
-        {
+		{
 			if(MyGetAEventLog(source,hAppLog,i,&time,src,message,&type,&category,&t) == 0)
 			{
 				sprintf(timestamp,"%ld",t);
@@ -55,8 +59,8 @@ INIT_CHECK_MEMORY(main);
 				break;
 			}
 		}
-        MyCloseEventLog(hAppLog);
-    }
+		MyCloseEventLog(hAppLog);
+	}
 
 CHECK_MEMORY(main, "process_eventlog","end");
 LOG_FUNC_CALL("End of process_eventlog()");
