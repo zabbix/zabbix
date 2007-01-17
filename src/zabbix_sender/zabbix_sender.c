@@ -71,6 +71,9 @@ static int send_value(char *server,int port,char *hostname, char *key,char *valu
 	int	i,s;
 	char	tosend[MAX_STRING_LEN];
 	char	result[MAX_STRING_LEN];
+
+	char	foo[MAX_STRING_LEN];
+	
 	struct hostent *hp;
 
 	struct sockaddr_in myaddr_in;
@@ -79,6 +82,8 @@ static int send_value(char *server,int port,char *hostname, char *key,char *valu
 /*	struct linger ling;*/
 
 /*	printf("In send_value(%s,%d,%s,%s,%s)\n", server, port, hostname, key, value);*/
+
+	foo[0] = '\0';
 
 	servaddr_in.sin_family=AF_INET;
 	hp=gethostbyname(server);
@@ -117,7 +122,7 @@ static int send_value(char *server,int port,char *hostname, char *key,char *valu
 
 /* Send <req><host>SERVER_B64</host><key>KEY_B64</key><data>VALUE_B64</data></req> */
 
-	comms_create_request(hostname, key, value, lastlogsize, tosend, sizeof(tosend)-1);
+	comms_create_request(hostname, key, value, lastlogsize, foo, foo, foo, tosend, sizeof(tosend)-1);
 
 /*	zbx_snprintf(tosend,sizeof(tosend),"%s:%s\n",shortname,value);
 	zbx_snprintf(tosend,sizeof(tosend),"<req><host>%s</host><key>%s</key><data>%s</data></req>",hostname_b64,key_b64,value_b64); */
