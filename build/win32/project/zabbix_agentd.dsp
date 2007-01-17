@@ -5954,6 +5954,14 @@ SOURCE=..\..\..\src\zabbix_agent\diskdevices.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\src\zabbix_agent\eventlog.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\zabbix_agent\eventlog.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\src\zabbix_agent\interfaces.c
 # End Source File
 # Begin Source File

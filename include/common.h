@@ -488,9 +488,10 @@ char*	zbx_dvsprintf(const char *f, va_list args);
 int	replace_param(const char *cmd, const char *param, char *out, int outlen);
 
 int	xml_get_data(char *xml,char *tag, char *data, int maxlen);
-int	comms_create_request(char *host, char *key, char *data, char *lastlogsize, char *request,int maxlen);
+int	comms_create_request(char *host, char *key, char *data, char *lastlogsize,
+		char *timestamp, char *source, char *severity, char *request,int maxlen);
 int	comms_parse_response(char *xml,char *host,char *key, char *data, char *lastlogsize, char *timestamp,
-		               char *source, char *severity, int maxlen);
+	       char *source, char *severity, int maxlen);
 
 int 	parse_command(const char *command, char *cmd, int cmd_max_len, char *param, int param_max_len);
 
@@ -508,5 +509,6 @@ int	get_nodeid_by_id(zbx_uint64_t id);
 int       SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
 int MAIN_ZABBIX_ENTRY(void);
+
 
 #endif

@@ -24,6 +24,7 @@
 #include "log.h"
 #include "sysinfo.h"
 #include "logfiles.h"
+#include "eventlog.h"
 #include "zbxsock.h"
 #include "threads.h"
 
@@ -350,7 +351,8 @@ static int	get_active_checks(char *server, unsigned short port, char *error, int
 	return SUCCEED;
 }
 
-static int	send_value(char *server,unsigned short port,char *host, char *key,char *value, char *lastlogsize)
+static int	send_value(char *server,unsigned short port,char *host, char *key,char *value, char *lastlogsize,
+		char *timestamp, char *source, char *severity)
 {
 	ZBX_SOCKET	s;
 	ZBX_SOCKADDR myaddr_in;
@@ -361,9 +363,18 @@ static int	send_value(char *server,unsigned short port,char *host, char *key,cha
 
 	struct hostent *hp;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In send_value('%s',%u,'%s','%s','%s')", server, port, host, key, lastlogsize);
+	unsigned int addr;
 
-	if( NULL == (hp = gethostbyname(server)) )
+	zabbix_log( LOG_LEVEL_DEBUG, "In send_value('%s',%u,'%s','%s','%s','%s','%s','%s')",
+		server, port, host, key, lastlogsize, timestamp, source, severity);
+
+	if(NULL == (hp = gethostbyname(server)))
+	{
+		addr = inet_addr(server);
+		hp = gethostbyaddr((char *)&addr, 4, AF_INET);
+	}
+
+	if( NULL == hp )
 	{
 #ifdef	HAVE_HSTRERROR		
 		zabbix_log( LOG_LEVEL_WARNING, "gethostbyname() failed for server '%s' [%s]", server, (char*)hstrerror((int)h_errno));
@@ -372,6 +383,7 @@ static int	send_value(char *server,unsigned short port,char *host, char *key,cha
 #endif
 		return	FAIL;
 	}
+
 	memset(&servaddr_in, 0, sizeof(ZBX_SOCKADDR));
 
 	servaddr_in.sin_family		= AF_INET;
@@ -395,7 +407,7 @@ static int	send_value(char *server,unsigned short port,char *host, char *key,cha
 		return	FAIL;
 	}
 
-	comms_create_request(host, key, value, lastlogsize, buf, sizeof(buf));
+	comms_create_request(host, key, value, lastlogsize, timestamp, source, severity,  buf, sizeof(buf));
 
 	zabbix_log(LOG_LEVEL_DEBUG, "XML before sending [%s]",buf);
 
@@ -439,6 +451,10 @@ static int	process_active_checks(char *server, unsigned short port)
 	int	i, now, count;
 	int	ret = SUCCEED;
 
+	char	timestamp[MAX_STRING_LEN]; /* ATTENTION! eventlog.c [245] contain reference to timestamp with MAX_STRING_LEN */
+	char	source[MAX_STRING_LEN];
+	char	severity[MAX_STRING_LEN]; /* ATTENTION! eventlog.c [252] contain reference to severity with MAX_STRING_LEN */
+
 	char	c[MAX_STRING_LEN];
 	char	*filename;
 
@@ -455,6 +471,10 @@ static int	process_active_checks(char *server, unsigned short port)
 		if(active_metrics[i].nextcheck > now)			continue;
 		if(active_metrics[i].status != ITEM_STATUS_ACTIVE)	continue;
 
+		timestamp[0]=0;
+		source[0]=0;
+		severity[0]=0;
+
 		/* Special processing for log files */
 		if(strncmp(active_metrics[i].key,"log[",4) == 0)
 		{
@@ -467,7 +487,35 @@ static int	process_active_checks(char *server, unsigned short port)
 			{
 				zbx_snprintf(lastlogsize, sizeof(lastlogsize), "%li", active_metrics[i].lastlogsize);
 
-				if(send_value(server,port,CONFIG_HOSTNAME,active_metrics[i].key,value,lastlogsize) == FAIL)
+				if(send_value(server,port,CONFIG_HOSTNAME,active_metrics[i].key,value,lastlogsize,timestamp,source,severity) == FAIL)
+				{
+					ret = FAIL;
+					break;
+				}
+				if(strcmp(value,"ZBX_NOTSUPPORTED\n")==0)
+				{
+					active_metrics[i].status = ITEM_STATUS_NOTSUPPORTED;
+					zabbix_log( LOG_LEVEL_WARNING, "Active check [%s] is not supported. Disabled.", active_metrics[i].key);
+					break;
+				}
+				count++;
+				/* Do not flood ZABBIX server if file grows too fast */
+				if(count >= (MAX_LINES_PER_SECOND * active_metrics[i].refresh))	break;
+			}
+		}
+		/* Special processing for eventlog */
+		else if(strncmp(active_metrics[i].key,"eventlog[",9) == 0)
+		{
+			strscpy(c,active_metrics[i].key);
+			filename=strtok(c,"[]");
+			filename=strtok(NULL,"[]");
+
+			count = 0;
+			while(process_eventlog(filename,&active_metrics[i].lastlogsize, timestamp, source, severity, value) == 0)
+			{
+				zbx_snprintf(lastlogsize, sizeof(lastlogsize), "%li", active_metrics[i].lastlogsize);
+
+				if(send_value(server,port,CONFIG_HOSTNAME,active_metrics[i].key,value,lastlogsize,timestamp,source,severity) == FAIL)
 				{
 					ret = FAIL;
 					break;
@@ -502,7 +550,7 @@ static int	process_active_checks(char *server, unsigned short port)
 
 			zabbix_log( LOG_LEVEL_DEBUG, "For key [%s] received value [%s]", active_metrics[i].key, value);
 
-			if(send_value(server,port,CONFIG_HOSTNAME,active_metrics[i].key,value,lastlogsize) == FAIL)
+			if(send_value(server,port,CONFIG_HOSTNAME,active_metrics[i].key,value,lastlogsize,timestamp,source,severity) == FAIL)
 			{
 				ret = FAIL;
 				break;
