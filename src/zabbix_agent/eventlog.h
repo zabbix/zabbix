@@ -22,7 +22,7 @@
 
 int	process_eventlog(
 		char *source,
-		int *lastlogsize, 
+		long *lastlogsize, 
 		char *timestamp, 
 		char *src, 
 		char *severity,
