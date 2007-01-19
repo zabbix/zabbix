@@ -1335,14 +1335,11 @@ else
 		}
 	}
 
-$SHOW_HINT_SCRIPT_ISERTTED = false; /* TODO rewrite with JS include */
-
 	function insert_showhint_javascript()
 	{
-		global $SHOW_HINT_SCRIPT_ISERTTED;
+		if(defined('SHOW_HINT_SCRIPT_INSERTTED')) return;
 
-		if($SHOW_HINT_SCRIPT_ISERTTED) return;
-		$SHOW_HINT_SCRIPT_ISERTTED = true;
+		define('SHOW_HINT_SCRIPT_INSERTTED', 1);
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--

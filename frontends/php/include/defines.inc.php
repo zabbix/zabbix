@@ -93,6 +93,7 @@
 	define("AUDIT_RESOURCE_MAP",		19);
 	define("AUDIT_RESOURCE_SCREEN",		20);
 	define("AUDIT_RESOURCE_NODE",		21);
+	define("AUDIT_RESOURCE_SCENARIO",	22);
 
 	define("CONDITION_TYPE_GROUP",		0);
 	define("CONDITION_TYPE_HOST",		1);
@@ -145,6 +146,7 @@
 	define("ITEM_TYPE_SNMPV3",6);
 	define("ITEM_TYPE_ZABBIX_ACTIVE",7);
 	define("ITEM_TYPE_AGGREGATE",8);
+	define("ITEM_TYPE_HTTPTEST",9);
 
 	define("ITEM_VALUE_TYPE_FLOAT",0);
 	define("ITEM_VALUE_TYPE_STR",1);
@@ -292,6 +294,9 @@
 	define("ZBX_NODE_LOCAL",	1);
 	define("ZBX_NODE_MASTER",	2);
 
+	define("HTTPTEST_STATUS_ACTIVE",0);
+	define("HTTPTEST_STATUS_DISABLED",1);
+	
 	define("BR",	"<br/>\n");
 	define("SPACE",	"&nbsp;");
 	define("RARR",	"&rArr;");

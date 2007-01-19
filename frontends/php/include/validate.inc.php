@@ -50,7 +50,11 @@
 	}
 	function	HEX($var=NULL)
 	{
-		return "ereg(\"^[a-zA-Z0-9]{1,}$\",{".$var."})";
+		return "ereg(\"^[a-zA-Z0-9]{1,}$\",{".$var."})&&";
+	}
+	function	KEY_PARAM($var=NULL)
+	{
+		return 'ereg(\'^([0-9a-zA-Z\_\.-\$ ]+)$\',{'.$var.'})&&';
 	}
 
 	define("NOT_EMPTY","({}!='')&&");
