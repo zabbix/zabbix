@@ -26,6 +26,180 @@
 	require_once 	"include/users.inc.php";
 	require_once 	"include/db.inc.php";
 
+	function	insert_httpstep_form()
+	{
+		$form = new CFormTable(S_STEP_OF_SCENARIO, null, 'post');
+		$form->SetHelp("web.webmon.httpconf.php");
+
+		$form->AddVar('dstfrm', get_request('dstfrm', null));
+		$form->AddVar('sid', get_request('sid', null));
+		$form->AddVar('list_name', get_request('list_name', null));
+
+		$sid = get_request('name', null);
+		$name = get_request('name', '');
+		$url = get_request('url', '');
+		$posts = get_request('posts', '');
+		$timeout = get_request('timeout', 15);
+		$required = get_request('required', '');
+		
+		$form->AddRow(S_NAME, new CTextBox('name', $name, 50));
+		$form->AddRow(S_URL, new CTextBox('url', $url, 80));
+		$form->AddRow(S_POST, new CTextArea('posts', $posts, 50, 10));
+		$form->AddRow(S_TIMEOUT, new CNumericBox('timeout', $timeout, 5));
+		$form->AddRow(S_REQUIRED, new CTextBox('required', $required, 80));
+		
+		$form->AddItemToBottomRow(new CButton("save", isset($sid) ? S_SAVE : S_ADD));
+
+		$form->AddItemToBottomRow(new CButton('cancel',S_CANCEL,'window.close();'));
+
+		$form->show();
+	}
+	
+	function	insert_httptest_form()
+	{
+		$form = new CFormTable(S_SCENARIO, null, 'post');
+		$form->SetHelp("web.webmon.httpconf.php");
+		
+		if(isset($_request["groupid"]))
+			$form->addvar("groupid",$_request["groupid"]);
+			
+		$form->AddVar("hostid",$_REQUEST["hostid"]);
+			
+		if(isset($_REQUEST["httptestid"]))
+		{
+			$form->AddVar("httptestid",$_REQUEST["httptestid"]);
+		}
+
+		$name		= get_request('name', '');
+		$application	= get_request('application', '');
+		$delay		= get_request('delay', 60);
+		$status		= get_request('status', HTTPTEST_STATUS_ACTIVE);
+		$agent		= get_request('agent', '');
+		$macros		= get_request('macros', array());
+		$steps		= get_request('steps', array());
+		
+		if((isset($_REQUEST["httptestid"]) && !isset($_REQUEST["form_refresh"])) || isset($limited))
+		{
+			$httptest_data = DBfetch(DBselect("select wt.*, a.name as application ".
+				" from httptest wt,applications a where wt.httptestid=".$_REQUEST["httptestid"].
+				" and a.applicationid=wt.applicationid"));
+		
+			$name		= $httptest_data['name'];
+			$application	= $httptest_data['application'];
+			$delay		= $httptest_data['delay'];
+			$status		= $httptest_data['status'];
+			$agent		= $httptest_data['agent'];
+			$macros		= $httptest_data['macros'];
+			
+			$steps		= array();
+			$db_steps = DBselect('select * from httpstep where httptestid='.$_REQUEST["httptestid"].' order by no');
+			while($step_data = DBfetch($db_steps))
+			{
+				$steps[$step_data['httpstepid']] = $step_data;
+			}
+		}
+		
+		$form->AddRow(S_APPLICATION,array(
+			new CTextBox('application', $application, 40),
+			SPACE,
+			new CButton('select_app',S_SELECT,
+				'return PopUp("popup.php?dstfrm='.$form->GetName().
+				'&dstfld1=application&srctbl=applications'.
+				'&srcfld1=name&only_hostid='.$_REQUEST['hostid'].'",200,300,"application");')
+			));
+
+		$form->AddRow(S_NAME, new CTextBox('name', $name, 40));
+		
+		$form->AddRow(S_UPDATE_INTERVAL_IN_SEC, new CNumericBox("delay",$delay,5));
+		
+		$form->AddRow(S_AGENT, new CTextBox('agent', $agent, 40));
+		
+		$cmbStatus = new CComboBox("status",$status);
+		foreach(array(HTTPTEST_STATUS_ACTIVE, HTTPTEST_STATUS_DISABLED) as $st)
+			$cmbStatus->AddItem($st, httptest_status2str($st));
+		$form->AddRow(S_STATUS,$cmbStatus);
+
+		$form->AddRow(S_VARIABLES, new CTextArea('macros', $macros, 40, 5));
+
+		$tblSteps = new CTableInfo();
+		$tblSteps->SetHeader(array(S_NAME,S_TIMEOUT,S_URL,S_REQUIRED,SPACE));
+		if(count($steps) > 0)
+		{
+			$first = min(array_keys($steps));
+			$last = max(array_keys($steps));
+		}
+		foreach($steps as $sid => $s)
+		{
+			if(!isset($s['name']))		$s['name'] = '';
+			if(!isset($s['timeout']))	$s['timeout'] = 15;
+			if(!isset($s['url']))       	$s['url'] = '';
+			if(!isset($s['posts']))       	$s['posts'] = '';
+			if(!isset($s['required']))       $s['required'] = '';
+			
+			$up = null;
+			if($sid != $first)
+			{
+				$up = new CLink(S_UP,'#','action');
+				$up->OnClick("return create_var('".$form->GetName()."','move_up',".$sid.", true);");
+			}
+			
+			$down = null;
+			if($sid != $last)
+			{
+				$down = new CLink(S_DOWN,'#','action');
+				$down->OnClick("return create_var('".$form->GetName()."','move_down',".$sid.", true);");
+			}
+
+			$name = new CLink($s['name'],'#','action');
+			$name->OnClick('return PopUp("popup_httpstep.php?dstfrm='.$form->GetName().
+				'&list_name=steps&sid='.$sid.
+				url_param($s['name'],false,'name').
+				url_param($s['timeout'],false,'timeout').
+				url_param($s['url'],false,'url').
+				url_param($s['posts'],false,'posts').
+				url_param($s['required'],false,'required').
+				'");');
+			
+			if(strlen($s['url']) > 70)
+			{
+				$url = new CTag('span','yes', substr($s['url'],0,35).SPACE.'...'.SPACE.substr($s['url'],strlen($s['url'])-25,25));
+				$url->SetHint($s['url']);
+			}
+			else
+			{
+				$url = $s['url'];
+			}
+
+			$tblSteps->AddRow(array(
+				array(new CCheckBox('sel_step[]',null,null,$sid), $name),
+				$s['timeout'].SPACE.S_SEC_SMALL,
+				$url,
+				$s['required'],
+				array($up, isset($up) && isset($down) ? SPACE : null, $down)
+				));
+		}
+		$form->AddVar('steps', $steps);
+
+		$form->AddRow(S_STEPS, array(
+			(count($steps) > 0) ? array ($tblSteps, BR) : null ,
+			new CButton('add_step',S_ADD,
+				'return PopUp("popup_httpstep.php?dstfrm='.$form->GetName().'");'),
+			(count($steps) > 0) ? new CButton('del_sel_step',S_DELETE_SELECTED) : null
+			));
+		
+		$form->AddItemToBottomRow(new CButton("save",S_SAVE));
+		if(isset($_REQUEST["httptestid"]))
+		{
+			$form->AddItemToBottomRow(SPACE);
+			$form->AddItemToBottomRow(new CButtonDelete(S_DELETE_SCENARIO_Q,
+				url_param("form").url_param("httptestid").url_param('hostid')));
+		}
+		$form->AddItemToBottomRow(SPACE);
+		$form->AddItemToBottomRow(new CButtonCancel());
+
+                $form->Show();
+	}
+	
 	function	insert_configuration_form($file)
 	{
 		$type		= get_request('type',		'MYSQL');
@@ -702,8 +876,8 @@
 		$frmItem->SetHelp("web.items.item.php");
 
 		$frmItem->AddVar("config",get_request("config",0));
-		if(isset($_REQUEST["groupid"]))
-			$frmItem->AddVar("groupid",$_REQUEST["groupid"]);
+		if(isset($_request["groupid"]))
+			$frmitem->addvar("groupid",$_request["groupid"]);
 
 		$frmItem->AddVar("hostid",$_REQUEST["hostid"]);
 
@@ -1016,9 +1190,8 @@
 		$frmItem->AddRow(S_KEEP_TRENDS_IN_DAYS, new CNumericBox("trends",$trends,8));
 
 		$cmbStatus = new CComboBox("status",$status);
-		$cmbStatus->AddItem(ITEM_STATUS_ACTIVE,S_MONITORED);
-		$cmbStatus->AddItem(ITEM_STATUS_DISABLED,S_DISABLED);
-		$cmbStatus->AddItem(ITEM_STATUS_NOTSUPPORTED,S_NOT_SUPPORTED);
+		foreach(array(ITEM_STATUS_ACTIVE,ITEM_STATUS_DISABLED,ITEM_STATUS_NOTSUPPORTED) as $st)
+			$cmbStatus->AddItem($st,item_status2str($st));
 		$frmItem->AddRow(S_STATUS,$cmbStatus);
 
 		if($value_type==ITEM_VALUE_TYPE_LOG)

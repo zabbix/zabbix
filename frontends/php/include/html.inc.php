@@ -94,7 +94,7 @@
 		}
 		else
 		{
-			$result = "&".$varname."=".$var;
+			$result = "&".$varname."=".urlencode($var);
 		}
 		return $result;
 	}

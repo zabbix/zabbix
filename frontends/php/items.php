@@ -469,7 +469,7 @@ include_once "include/page_header.php";
 		
 		$form->AddItem(array('[', 
 			new CLink($showdisabled ? S_HIDE_DISABLED_ITEMS : S_SHOW_DISABLED_ITEMS,
-				'items.php?showdisabled='.($showdisabled ? 0 : 1),'action'),
+				'?showdisabled='.($showdisabled ? 0 : 1),'action'),
 			']', SPACE));
 		
 		$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit();");
@@ -555,7 +555,7 @@ include_once "include/page_header.php";
 			{
 				$template_host = get_realhost_by_itemid($db_item["templateid"]);
 				array_push($description,		
-					new CLink($template_host["host"],"items.php?".
+					new CLink($template_host["host"],"?".
 						"hostid=".$template_host["hostid"],
 						'uncnown'),
 					":");
@@ -563,12 +563,12 @@ include_once "include/page_header.php";
 			
 			array_push($description, new CLink(
 				item_description($db_item["description"],$db_item["key_"]),
-				"items.php?form=update&itemid=".
+				"?form=update&itemid=".
 				$db_item["itemid"].url_param("hostid").url_param("groupid"),
 				'action'));
 
 			$status=new CCol(new CLink(item_status2str($db_item["status"]),
-					"items.php?group_itemid%5B%5D=".$db_item["itemid"].
+					"?group_itemid%5B%5D=".$db_item["itemid"].
 					"&hostid=".$_REQUEST["hostid"].
 					"&group_task=".($db_item["status"] ? "Activate+selected" : "Disable+selected"),
 					item_status2style($db_item["status"])));
@@ -600,19 +600,19 @@ include_once "include/page_header.php";
 		}
 
 		$footerButtons = array();
-		array_push($footerButtons, new CButton('group_task','Activate selected',
+		array_push($footerButtons, new CButton('group_task',S_ACTIVATE_SELECTED,
 			"return Confirm('".S_ACTIVATE_SELECTED_ITEMS_Q."');"));
 		array_push($footerButtons, SPACE);
-		array_push($footerButtons, new CButton('group_task','Disable selected',
+		array_push($footerButtons, new CButton('group_task',S_DISABLE_SELECTED,
 			"return Confirm('".S_DISABLE_SELECTED_ITEMS_Q."');"));
 		array_push($footerButtons, SPACE);
-		array_push($footerButtons, new CButton('group_task','Clean history selected items',
-			"return Confirm('History cleaning can take a long time. Continue?');"));
+		array_push($footerButtons, new CButton('group_task',S_CLEAN_HISTORY_SELECTED_ITEMS,
+			"return Confirm('".S_HISTORY_CLEANING_CAN_TAKE_A_LONG_TIME_CONTINUE_Q."');"));
 		array_push($footerButtons, SPACE);
-		array_push($footerButtons, new CButton('group_task','Delete selected',
+		array_push($footerButtons, new CButton('group_task',S_DELETE_SELECTED,
 			"return Confirm('".S_DELETE_SELECTED_ITEMS_Q."');"));
 		array_push($footerButtons, SPACE);
-		array_push($footerButtons, new CButton('form_copy_to','Copy selected to ...'));
+		array_push($footerButtons, new CButton('form_copy_to',S_COPY_SELECTED_TO));
 		$table->SetFooter(new CCol($footerButtons));
 
 		$form->AddItem($table);

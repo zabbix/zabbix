@@ -216,6 +216,8 @@
 
 		function SetHint($text, $width='', $class='')
 		{
+			insert_showhint_javascript();
+
 			$text = addslashes(htmlspecialchars($text));
 			if($width != '' || $class!= '')
 			{
