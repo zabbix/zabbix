@@ -43,6 +43,7 @@ frontends/php/conf/COPYING -text
 frontends/php/create/data.sql -text
 frontends/php/create/mysql.sql -text
 frontends/php/exp_imp.php -text
+frontends/php/httpconf.php -text
 frontends/php/images/flash/zbxclock.swf -text svneol=unset#unset
 frontends/php/images/general/closed.gif -text svneol=unset#unset
 frontends/php/images/general/error_small.gif -text
@@ -92,6 +93,7 @@ frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
 frontends/php/include/classes/ccolor.inc.php -text
 frontends/php/include/classes/clist.inc.php -text
 frontends/php/include/export.inc.php -text
+frontends/php/include/httptest.inc.php -text
 frontends/php/include/images.inc.php -text
 frontends/php/include/import.inc.php -text
 frontends/php/include/locales/nl_nl.inc.php -text
@@ -104,6 +106,7 @@ frontends/php/instal.php -text
 frontends/php/media_types.php -text
 frontends/php/nodes.php -text
 frontends/php/popup_gitem.php -text
+frontends/php/popup_httpstep.php -text
 frontends/php/popup_media.php -text
 frontends/php/popup_right.php -text
 frontends/php/popup_trexpr.php -text

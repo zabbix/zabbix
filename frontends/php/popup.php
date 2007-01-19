@@ -37,6 +37,10 @@
 			$page["title"] = "S_HOSTS_BIG";
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
+		case 'applications':
+			$page["title"] = "S_APPLICATIONS_BIG";
+			$min_user_type = USER_TYPE_ZABBIX_USER;
+			break;
 		case 'host_group':
 			$page["title"] = "S_HOST_GROUPS_BIG";
 			$min_user_type = USER_TYPE_ZABBIX_USER;
@@ -124,7 +128,7 @@ include_once "include/page_header.php";
 <?php
 	function get_window_opener($frame, $field, $value)
 	{
-		return "window.opener.document.forms['".addslashes($frame)."'].".addslashes($field).".value='".addslashes($value)."';";
+		return empty($field) ? "" : "window.opener.document.forms['".addslashes($frame)."'].".addslashes($field).".value='".addslashes($value)."';";
 	}
 ?>
 <?php
@@ -700,6 +704,38 @@ function add_variable(formname,value)
 				item_value_type2str($row['value_type']),
 				new CSpan(item_status2str($row['status']),item_status2style($row['status']))
 				));
+		}
+		$table->Show();
+	}
+	elseif($srctbl == "applications")
+	{
+		$table = new CTableInfo(S_NO_APPLICATIONS_DEFINED);
+		$table->SetHeader(array(
+			(isset($hostid) ? null : S_HOST),
+			S_NAME));
+
+		$sql = "select distinct h.host,a.* from hosts h,applications a ".
+			" where h.hostid=a.hostid and ".DBid2nodeid("a.applicationid")."=".$nodeid.
+			" and h.hostid not in (".$denyed_hosts.")".
+			($monitored_hosts ? " and h.status=".HOST_STATUS_MONITORED : "");
+
+		if(isset($hostid)) 
+			$sql .= " and h.hostid=$hostid";
+
+		$sql .= " order by h.host,a.name";
+			
+		$result = DBselect($sql);
+		while($row = DBfetch($result))
+		{
+
+			$name = new CLink($row["name"],"#","action");
+			
+			$name->SetAction(
+				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
+				(empty($srcfld2) ? "" : get_window_opener($dstfrm, $dstfld2, $row[$srcfld2])).
+				" window.close();");
+
+			$table->AddRow(array($name));
 		}
 		$table->Show();
 	}

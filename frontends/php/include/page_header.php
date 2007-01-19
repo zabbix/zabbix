@@ -159,6 +159,9 @@ COpt::profiling_start("page");
 					array("url"=>"config.php"	,"label"=>S_GENERAL		,
 						"sub_pages"=>array("image.php")
 						),
+					array("url"=>"httpconf.php"	,"label"=>S_WEB			,
+						"sub_pages"=>array("popup_httpstep.php")
+						),
 					array("url"=>"hosts.php"	,"label"=>S_HOSTS		),
 					array("url"=>"items.php"	,"label"=>S_ITEMS		),
 					array("url"=>"triggers.php"	,"label"=>S_TRIGGERS		,

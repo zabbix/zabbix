@@ -27,11 +27,11 @@
 			parent::CTag('input','no');
 			$this->options['type'] = 'hidden';
 			$this->options['name'] = $name;
-			$this->options['value'] = $value;
+			$this->SetValue($value);
 		}
 		function SetValue($value)
 		{ 
-			$this->options['value'] = $value;
+			$this->options['value'] = htmlspecialchars($value);
 		}
 	}
 

@@ -55,9 +55,9 @@
 	{
 		switch($status)
 		{
-			case 0:	$status = S_ACTIVE;		break;
-			case 1:	$status = S_DISABLED;		break;
-			case 3:	
+			case ITEM_STATUS_ACTIVE:	$status = S_ACTIVE;		break;
+			case ITEM_STATUS_DISABLED:	$status = S_DISABLED;		break;
+			case ITEM_STATUS_NOTSUPPORTED:	$status = S_NOT_SUPPORTED;	break;
 			default:
 				$status = S_UNKNOWN;		break;
 		}
@@ -68,9 +68,9 @@
 	{
 		switch($status)
 		{
-			case 0:	$status = 'off';	break;
-			case 1:	$status = 'on';		break;
-			case 3:	
+			case ITEM_STATUS_ACTIVE:	$status = 'off';	break;
+			case ITEM_STATUS_DISABLED:	$status = 'on';		break;
+			case ITEM_STATUS_NOTSUPPORTED:	
 			default:
 				$status = 'uncnown';	break;
 		}
@@ -200,7 +200,7 @@
 			" where hostid=$hostid and key_=".zbx_dbstr($key)));
 		if($db_item && $templateid == 0)
 		{
-			error("An item with the same Key already exists for host ".$host["host"].".".
+			error("An item with the Key [".$key."] already exists for host [".$host["host"]."].".
 				" The key must be unique.");
 			return FALSE;
 		} elseif ($db_item && $templateid != 0){
