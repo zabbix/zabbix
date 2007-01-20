@@ -141,7 +141,8 @@ include_once "include/page_header.php";
 		if(!is_null($link["triggerid"]))
 		{
 			$trigger=get_trigger_by_triggerid($link["triggerid"]);
-			if($trigger["value"] == TRIGGER_VALUE_TRUE)
+//			if($trigger["value"] == TRIGGER_VALUE_TRUE)
+			if($trigger["status"] == TRIGGER_STATUS_ENABLED && $trigger["value"] == TRIGGER_VALUE_TRUE)
 			{
 				$drawtype = $link["drawtype_on"];
 				$color = $colors[$link["color_on"]];
