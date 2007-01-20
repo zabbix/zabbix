@@ -156,13 +156,16 @@ typedef enum
 } zbx_condition_type_t;
 
 /* Condition operators */
-#define	CONDITION_OPERATOR_EQUAL	0
-#define	CONDITION_OPERATOR_NOT_EQUAL	1
-#define	CONDITION_OPERATOR_LIKE		2
-#define	CONDITION_OPERATOR_NOT_LIKE	3
-#define	CONDITION_OPERATOR_IN		4
-#define	CONDITION_OPERATOR_MORE_EQUAL	5
-#define	CONDITION_OPERATOR_LESS_EQUAL	6
+typedef enum
+{
+	CONDITION_OPERATOR_EQUAL = 0,
+	CONDITION_OPERATOR_NOT_EQUAL,
+	CONDITION_OPERATOR_LIKE,
+	CONDITION_OPERATOR_NOT_LIKE,
+	CONDITION_OPERATOR_IN,
+	CONDITION_OPERATOR_MORE_EQUAL,
+	CONDITION_OPERATOR_LESS_EQUAL
+} zbx_condition_op_t;
 
 /* Special item key used for storing server status */
 #define SERVER_STATUS_KEY	"status"
@@ -174,21 +177,30 @@ typedef enum
 #define SERVER_ZABBIXLOG_KEY	"zabbix[log]"
 
 /* Alert types */
-#define ALERT_TYPE_EMAIL	0
-#define ALERT_TYPE_EXEC		1
-#define ALERT_TYPE_SMS		2
+typedef enum
+{
+	ALERT_TYPE_EMAIL = 0,
+	ALERT_TYPE_EXEC,
+	ALERT_TYPE_SMS
+} zbx_alert_type_t;
 
 /* Alert statuses */
-#define ALERT_STATUS_NOT_SENT	0
-#define ALERT_STATUS_SENT	1
+typedef enum
+{
+	ALERT_STATUS_NOT_SENT = 0,
+	ALERT_STATUS_SENT
+} zbx_alert_status_t;
 
 /* Item statuses */
-#define ITEM_STATUS_ACTIVE	0
-#define ITEM_STATUS_DISABLED	1
-/*#define ITEM_STATUS_TRAPPED	2*/
-#define ITEM_STATUS_NOTSUPPORTED	3
-#define ITEM_STATUS_DELETED	4
-#define ITEM_STATUS_NOTAVAILABLE	5
+typedef enum
+{
+	ITEM_STATUS_ACTIVE = 0,
+	ITEM_STATUS_DISABLED,
+/*ITEM_STATUS_TRAPPED	2*/
+	ITEM_STATUS_NOTSUPPORTED = 3,
+	ITEM_STATUS_DELETED,
+	ITEM_STATUS_NOTAVAILABLE
+} zbx_item_status_t;
 
 /* HTTP Tests statuses */
 #define HTTPTEST_STATUS_MONITORED	0
