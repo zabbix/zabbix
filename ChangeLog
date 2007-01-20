@@ -1,5 +1,6 @@
 Changes for 1.1.5:
 
+ - fixed calculation of aggregate items under Oracle (Alexei)
  - added support of macro ITEM.NAME (Alexei)
  - fixed 'eventlog[]' for WinXX (Eugene)
  - added possibility of hostname using for 'Server' option of WinXX agent
