@@ -69,6 +69,7 @@ Integrated from 1.1.x
 
 1.1.5
 
+ - added support of macro ITEM.NAME (Alexei)
  - fixed some assertions (Eugene)
  - fixed missing last symbol in vfs.file.regexp (Alexei)
  - fixed 'system.cpu.util[*]' for SunOS (Eugene)
