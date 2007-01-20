@@ -17,18 +17,29 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
+#ifndef ZABBIX_COMMS_H
+#define ZABBIX_COMMS_H
 
-#ifndef ZABBIX_FUNCTIONS_H
-#define ZABBIX_FUNCTIONS_H
+typedef enum
+{
+	ZBX_BUF_TYPE_STAT = 0,
+	ZBX_BUF_TYPE_DYN
+} zbx_buf_type_t;
 
-#include "common.h"
-#include "comms.h"
-#include "db.h"
+typedef struct zbx_sock
+{
+	int		socket;
+	char		buf_stat[1024];
+	char		*buf_dyn;
+	zbx_buf_type_t	buf_type;
+	char		*error;
+} zbx_sock_t;
 
-void	update_services(zbx_uint64_t triggerid, int status);
-void    update_triggers (zbx_uint64_t itemid);
-int	process_data(zbx_sock_t *sock,char *server,char *key, char *value,char *lastlogsize,char *timestamp,
-			char *source, char *severity);
-void	process_new_value(DB_ITEM *item, AGENT_RESULT *value);
+void	zbx_tcp_init(zbx_sock_t *s);
+int	zbx_tcp_connect(zbx_sock_t *socket, char *ip, int port);
+int	zbx_tcp_send(zbx_sock_t *socket, char *data);
+int	zbx_tcp_recv(zbx_sock_t *socket, char **data);
+void	zbx_tcp_close(zbx_sock_t *socket);
+void	zbx_tcp_free(zbx_sock_t *socket);
 
 #endif

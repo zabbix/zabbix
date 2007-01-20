@@ -10,5 +10,5 @@ zabbix_server_LDADD = ../libs/zbxsysinfo/libzbxsysinfo.a ../libs/zbxsysinfo/@ARC
 alerter/libzbxalerter.a timer/libzbxtimer.a trapper/libzbxtrapper.a nodewatcher/libzbxnodewatcher.a \
 ../libs/zbxemail/libzbxemail.a utils/libzbxutils.a  httppoller/libzbxhttppoller.a \
 ../libs/zbxsms/libzbxsms.a ../libs/zbxdbhigh/libzbxdbhigh.a ../libs/zbxcommon/libzbxcommon.a \
-../libs/zbxcrypto/libzbxcrypto.a @ORACLE_LIBS@ @LDAP_LIBS@ @SNMP_LIBS@ @LIBCURL@
+../libs/zbxcrypto/libzbxcrypto.a ../libs/zbxcomms/libzbxcomms.a @ORACLE_LIBS@ @LDAP_LIBS@ @SNMP_LIBS@ @LIBCURL@
 zabbix_server_LDFLAGS=@MYSQL_LDFLAGS@ @POSTGRESQL_LDFLAGS@ @ORACLE_LFLAGS@ @SQLITE3_LDFLAGS@ @LDAP_LFLAGS@ @SNMP_LFLAGS@
