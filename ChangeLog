@@ -69,6 +69,7 @@ Integrated from 1.1.x
 
 1.1.5
 
+ - fixed calculation of aggregate items under Oracle (Alexei)
  - added support of macro ITEM.NAME (Alexei)
  - fixed some assertions (Eugene)
  - fixed missing last symbol in vfs.file.regexp (Alexei)
