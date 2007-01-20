@@ -23,9 +23,10 @@
 
 #include "common.h"
 #include "db.h"
+#include "comms.h"
 
 extern	int	CONFIG_NODEID;
 
-int	send_list_of_active_checks(int sockfd, char *host);
+int	send_list_of_active_checks(zbx_sock_t *sock, char *host);
 
 #endif
