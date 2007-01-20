@@ -135,8 +135,8 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
 		(strcmp(itemfunc,"sum") == 0)
 	)
 	{
-		zbx_snprintf(sql,sizeof(sql),"select h.itemid,i.value_type,%s(h.value) from items i,history h where h.itemid=i.itemid and h.itemid in (%s) and h.clock>%d group by 1,2",itemfunc, items, now - atoi(param));
-		zbx_snprintf(sql2,sizeof(sql),"select h.itemid,i.value_type,%s(h.value) from items i,history_uint h where h.itemid=i.itemid and h.itemid in (%s) and h.clock>%d group by 1,2",itemfunc, items, now - atoi(param));
+		zbx_snprintf(sql,sizeof(sql),"select h.itemid,i.value_type,%s(h.value) from items i,history h where h.itemid=i.itemid and h.itemid in (%s) and h.clock>%d group by h.itemid,i.value_type",itemfunc, items, now - atoi(param));
+		zbx_snprintf(sql2,sizeof(sql),"select h.itemid,i.value_type,%s(h.value) from items i,history_uint h where h.itemid=i.itemid and h.itemid in (%s) and h.clock>%d group by h.itemid,i.value_type",itemfunc, items, now - atoi(param));
 	}
 	else
 	{
