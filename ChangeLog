@@ -1,5 +1,6 @@
 Changes for 1.1.5:
 
+ - do not show connector as ON if trigger disabled (Alexei)
  - fixed calculation of aggregate items under Oracle (Alexei)
  - added support of macro ITEM.NAME (Alexei)
  - fixed 'eventlog[]' for WinXX (Eugene)
