@@ -40,6 +40,7 @@
 #include <unistd.h>
 
 #include "cfg.h"
+#include "comms.h"
 #include "pid.h"
 #include "db.h"
 #include "log.h"
@@ -57,9 +58,9 @@
 
 #include "daemon.h"
 
-extern int    send_list_of_active_checks(int sockfd, char *host);
+extern int    send_list_of_active_checks(zbx_sock_t *sock, char *host);
 
-int	process_trap(int sockfd,char *s, int max_len)
+int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 {
 	char	*p,*line,*host;
 	char	*server,*key,*value_string;
@@ -76,7 +77,7 @@ int	process_trap(int sockfd,char *s, int max_len)
 	for( p=s+strlen(s)-1; p>s && ( *p=='\r' || *p =='\n' || *p == ' ' ); --p );
 	p[1]=0;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Trapper got [%s]", s);
+	zabbix_log( LOG_LEVEL_DEBUG, "Trapper got [%s] len %d", s, strlen(s));
 
 /* Request for list of active checks */
 	if(strncmp(s,"ZBX_GET_ACTIVE_CHECKS", strlen("ZBX_GET_ACTIVE_CHECKS")) == 0)
@@ -97,7 +98,7 @@ int	process_trap(int sockfd,char *s, int max_len)
 			{
 				zabbix_log( LOG_LEVEL_DEBUG, "Host already exists [%s]", host);
 			}
-			ret=send_list_of_active_checks(sockfd, host);
+			ret=send_list_of_active_checks(sock, host);
 		}
 	}
 /* Process information sent by zabbix_sender */
@@ -110,10 +111,11 @@ int	process_trap(int sockfd,char *s, int max_len)
 			if(node_sync(s) == SUCCEED)
 			{
 				zbx_snprintf(result,sizeof(result),"OK\n");
-				if( write(sockfd,result,strlen(result)) == -1)
+				if( zbx_tcp_send(sock,result) != SUCCEED)
+//				if( write(sockfd,result,strlen(result)) == -1)
 				{
-					zabbix_log( LOG_LEVEL_WARNING, "Error sending confirmation to node [%s]",strerror(errno));
-					zabbix_syslog("Trapper: error sending confirmation to node [%s]",strerror(errno));
+					zabbix_log( LOG_LEVEL_WARNING, "Error sending confirmation to node");
+					zabbix_syslog("Trapper: error sending confirmation to node");
 				}
 			}
 			return ret;
@@ -125,10 +127,11 @@ int	process_trap(int sockfd,char *s, int max_len)
 			if(node_events(s) == SUCCEED)
 			{
 				zbx_snprintf(result,sizeof(result),"OK\n");
-				if( write(sockfd,result,strlen(result)) == -1)
+//				if( write(sockfd,result,strlen(result)) == -1)
+				if( zbx_tcp_send(sock,result) != SUCCEED)
 				{
-					zabbix_log( LOG_LEVEL_WARNING, "Error sending confirmation to node [%s]",strerror(errno));
-					zabbix_syslog("Trapper: error sending confirmation to node [%s]",strerror(errno));
+					zabbix_log( LOG_LEVEL_WARNING, "Error sending confirmation to node");
+					zabbix_syslog("Trapper: error sending confirmation to node");
 				}
 			}
 			return ret;
@@ -140,10 +143,11 @@ int	process_trap(int sockfd,char *s, int max_len)
 			if(node_history(s) == SUCCEED)
 			{
 				zbx_snprintf(result,sizeof(result),"OK\n");
-				if( write(sockfd,result,strlen(result)) == -1)
+//				if( write(sockfd,result,strlen(result)) == -1)
+				if( zbx_tcp_send(sock,result) != SUCCEED)
 				{
-					zabbix_log( LOG_LEVEL_WARNING, "Error sending confirmation to node [%s]",strerror(errno));
-					zabbix_syslog("Trapper: error sending confirmation to node [%s]",strerror(errno));
+					zabbix_log( LOG_LEVEL_WARNING, "Error sending confirmation to node]");
+					zabbix_syslog("Trapper: error sending confirmation to node");
 				}
 			}
 			return ret;
@@ -189,129 +193,63 @@ int	process_trap(int sockfd,char *s, int max_len)
 			source[0]=0;
 			severity[0]=0;
 		}
+		zabbix_log( LOG_LEVEL_DEBUG, "Value [%s]", value_string);
 
 		DBbegin();
-		ret=process_data(sockfd,server,key,value_string,lastlogsize,timestamp,source,severity);
+		ret=process_data(sock,server,key,value_string,lastlogsize,timestamp,source,severity);
 		DBcommit();
 		
 		if( SUCCEED == ret)
 		{
-			zbx_snprintf(result,sizeof(result),"OK\n");
+			zbx_snprintf(result,sizeof(result),"OK");
 		}
 		else
 		{
-			zbx_snprintf(result,sizeof(result),"NOT OK\n");
+			zbx_snprintf(result,sizeof(result),"NOT OK");
 		}
-		zabbix_log( LOG_LEVEL_DEBUG, "Sending back [%s]", result);
+//		zabbix_log( LOG_LEVEL_WARNING, "Sending back [%s]", result);
 		zabbix_log( LOG_LEVEL_DEBUG, "Length [%d]", strlen(result));
-		zabbix_log( LOG_LEVEL_DEBUG, "Sockfd [%d]", sockfd);
-		if( write(sockfd,result,strlen(result)) == -1)
+		if( zbx_tcp_send(sock,result) != SUCCEED)
+//		if( write(sockfd,result,strlen(result)) == -1)
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Error sending result back [%s]",strerror(errno));
-			zabbix_syslog("Trapper: error sending result back [%s]",strerror(errno));
+			zabbix_log( LOG_LEVEL_WARNING, "Error sending result back");
+			zabbix_syslog("Trapper: error sending result back");
 		}
 		zabbix_log( LOG_LEVEL_DEBUG, "After write()");
 	}	
 	return ret;
 }
 
-void	process_trapper_child(int sockfd)
+void	process_trapper_child(zbx_sock_t	*sock)
 {
-	ssize_t	nbytes;
-	char	*buffer;
-	static struct  sigaction phan;
-	char	*bufptr;
-	zbx_uint64_t	expected_len;
-	zbx_uint64_t	read_len=0;
+	char	*data;
 
-#define ZBX_MAX_PACKET_LEN	16*1024*1024
+	struct timeval tv;
+	suseconds_t    msec;
+	gettimeofday(&tv, NULL);
+	msec = tv.tv_usec;
 
-//	zabbix_log( LOG_LEVEL_WARNING, "In process_trapper_child");
+	alarm(CONFIG_TIMEOUT);
 
-	
-	buffer=malloc(ZBX_MAX_PACKET_LEN);
-
-	phan.sa_handler = &child_signal_handler;
-	sigemptyset(&phan.sa_mask);
-	phan.sa_flags = 0;
-	sigaction(SIGALRM, &phan, NULL);
-
-//	alarm(CONFIG_TIMEOUT);
-
-//	zabbix_log( LOG_LEVEL_WARNING, "Before read(%d)", ZBX_MAX_PACKET_LEN);
-/*	if( (nbytes = read(sockfd, line, MAX_BUF_LEN)) < 0)*/
-	memset(buffer,0,ZBX_MAX_PACKET_LEN);
-	bufptr = buffer;
-
-	nbytes=read(sockfd, bufptr, 5);
-
-	if(nbytes==5 && strncmp(bufptr,"ZBXD",4)==0 && bufptr[4] == 1)
+	if(zbx_tcp_recv(sock, &data) != SUCCEED)
 	{
-//		zabbix_log( LOG_LEVEL_WARNING, "Got new protocol");
-		nbytes=read(sockfd, (zbx_uint64_t *)&expected_len, sizeof(expected_len));
-//		zabbix_log( LOG_LEVEL_WARNING, "Read %d bytes", nbytes);
-		if(nbytes==sizeof(expected_len))
-		{
-//			zabbix_log( LOG_LEVEL_WARNING, "Expected data len [" ZBX_FS_UI64 "]", expected_len);
-		}
-		while ((nbytes = read(sockfd, bufptr, 1024)) != -1 && nbytes != 0)
-		{
-//			zabbix_log( LOG_LEVEL_WARNING, "Read %d bytes", nbytes);
-			read_len+=nbytes;
-			if(read_len >= expected_len)
-			{
-				break;
-			}
-			bufptr += nbytes;
-		}
-//		zabbix_log( LOG_LEVEL_WARNING, "Read total %d bytes", read_len);
-	}
-	else
-	{
-		bufptr += nbytes;
-		zabbix_log( LOG_LEVEL_DEBUG, "Old protocol");
-		while ((nbytes = read(sockfd, bufptr, buffer + ZBX_MAX_PACKET_LEN - bufptr - 1)) != -1 && nbytes != 0)
-		{
-			if(read_len < buffer + ZBX_MAX_PACKET_LEN - bufptr - 1)
-			{
-				bufptr += nbytes;
-				break;
-			}
-			bufptr += nbytes;
-		}
-	}
-//	zabbix_log( LOG_LEVEL_WARNING, "Read total %d bytes", nbytes);
-
-	if(nbytes < 0)
-	{
-		if(errno == EINTR)
-		{
-			zabbix_log( LOG_LEVEL_WARNING, "Read timeout");
-		}
-		else
-		{
-			zabbix_log( LOG_LEVEL_WARNING, "read() failed");
-		}
 		alarm(0);
-		free(buffer);
 		return;
 	}
 
-	zabbix_log( LOG_LEVEL_DEBUG, "After read() 3 [%d]",nbytes);
-
-	zabbix_log( LOG_LEVEL_DEBUG, "Got data:%s", buffer);
-
-	process_trap(sockfd,buffer, sizeof(buffer));
-
-	free(buffer);
+	process_trap(sock, data, sizeof(data));
 	alarm(0);
+
+	gettimeofday(&tv, NULL);
+	zabbix_log( LOG_LEVEL_WARNING, "Trap processed in %f seconds", (float)(tv.tv_usec-msec)/1000000 );
 }
 
 void	child_trapper_main(int i,int listenfd, int addrlen)
 {
-	int	connfd;
 	socklen_t	clilen;
 	struct sockaddr cliaddr;
+
+	zbx_sock_t	s;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In child_trapper_main()");
 
@@ -327,14 +265,15 @@ void	child_trapper_main(int i,int listenfd, int addrlen)
 		zbx_setproctitle("waiting for connection");
 
 		zabbix_log( LOG_LEVEL_DEBUG, "Before accept()");
-		connfd=accept(listenfd,&cliaddr, &clilen);
+		zbx_tcp_init(&s);
+		s.socket=accept(listenfd,&cliaddr, &clilen);
 		zabbix_log( LOG_LEVEL_DEBUG, "After accept()");
 
 		zbx_setproctitle("processing data");
 
-		process_trapper_child(connfd);
+		process_trapper_child(&s);
 
-		close(connfd);
+		zbx_tcp_close(&s);
 	}
 	DBclose();
 }

@@ -403,7 +403,7 @@ void	calc_timestamp(char *line,int *timestamp, char *format)
  * Comments: for trapper server process                                       *
  *                                                                            *
  ******************************************************************************/
-int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize, char *timestamp,
+int	process_data(zbx_sock_t *sock,char *server,char *key,char *value,char *lastlogsize, char *timestamp,
 			char *source, char *severity)
 {
 	AGENT_RESULT	agent;
@@ -438,7 +438,7 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 			DBfree_result(result);
 
 			/* Same SQL */
-			result = DBselect("select %s where h.status=%d and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type in (%d,%d) and" ZBX_COND_NODEID, ZBX_SQL_ITEM_SELECT, HOST_STATUS_MONITORED, server_esc, key_esc, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, LOCAL_NODE("hostid"));
+			result = DBselect("select %s where h.status=%d and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type in (%d,%d) and" ZBX_COND_NODEID, ZBX_SQL_ITEM_SELECT, HOST_STATUS_MONITORED, server_esc, key_esc, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, LOCAL_NODE("h.hostid"));
 			row = DBfetch(result);
 			if(!row)
 			{
@@ -455,7 +455,7 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 
 	DBget_item_from_db(&item,row);
 
-	if( (item.type==ITEM_TYPE_ZABBIX_ACTIVE) && (check_security(sockfd,item.trapper_hosts,1) == FAIL))
+	if( (item.type==ITEM_TYPE_ZABBIX_ACTIVE) && (check_security(sock->socket,item.trapper_hosts,1) == FAIL))
 	{
 		DBfree_result(result);
 		return  FAIL;

@@ -2,4 +2,4 @@ SUBDIRS=
 INCLUDES=-I@top_srcdir@/include @MYSQL_CFLAGS@ @ORACLE_INCLUDE@ @POSTGRESQL_CFLAGS@
 lib_LIBRARIES=libzbxtrapper.a
 libzbxtrapper_a_SOURCES=active.c autoregister.h autoregister.c trapper.c nodesync.c nodeevents.c nodehistory.c
-libzbxtrapper_a_LIBADD = ../../libs/zbxdbhigh/libzbxdbhigh.a
+#libzbxtrapper_a_LIBADD = ../../libs/zbxdbhigh/libzbxdbhigh.a

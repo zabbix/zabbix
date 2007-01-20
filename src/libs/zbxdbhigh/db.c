@@ -290,12 +290,18 @@ int DBexecute(const char *fmt, ...)
 	char	*sql = NULL;
 	int ret = SUCCEED;
 
+	struct timeval tv;
+	suseconds_t    msec;
+
 #ifdef	HAVE_POSTGRESQL
 	PGresult	*result;
 #endif
 #ifdef	HAVE_SQLITE3
 	char *error=0;
 #endif
+
+	gettimeofday(&tv, NULL);
+	msec = tv.tv_usec;
 
 	va_start(args, fmt);
 	
@@ -373,6 +379,9 @@ lbl_exec:
 #endif
 	
 	zbx_free(sql);
+
+	gettimeofday(&tv, NULL);
+	zabbix_log( LOG_LEVEL_WARNING, "Query processed in %f seconds", (float)(tv.tv_usec-msec)/1000000 );
 	return ret;
 }
 
@@ -505,6 +514,9 @@ DB_RESULT DBselect(const char *fmt, ...)
 	char	*sql = NULL;
 	DB_RESULT result;
 
+	struct timeval tv;
+	suseconds_t    msec;
+
 #ifdef	HAVE_ORACLE
 	sqlo_stmt_handle_t sth;
 #endif
@@ -512,6 +524,9 @@ DB_RESULT DBselect(const char *fmt, ...)
 	int sql_ret = SUCCEED;
 	char *error=0;
 #endif
+
+	gettimeofday(&tv, NULL);
+	msec = tv.tv_usec;
 
 	va_start(args, fmt);
 	
@@ -596,6 +611,9 @@ lbl_get_table:
 #endif
 
 	zbx_free(sql);
+
+	gettimeofday(&tv, NULL);
+	zabbix_log( LOG_LEVEL_WARNING, "Query processed in %f seconds", (float)(tv.tv_usec-msec)/1000000 );
 	return result;
 }
 
