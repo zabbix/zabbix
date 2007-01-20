@@ -567,6 +567,7 @@ int	evaluate(int *result,char *exp, char *error, int maxerrlen)
 #define MVAR_IPADDRESS			"{IPADDRESS}"
 #define MVAR_TIME			"{TIME}"
 #define MVAR_TRIGGER_COMMENT		"{TRIGGER.COMMENT}"
+#define MVAR_ITEM_NAME			"{ITEM.NAME}"
 #define MVAR_TRIGGER_ID			"{TRIGGER.ID}"
 #define MVAR_TRIGGER_KEY		"{TRIGGER.KEY}"
 #define MVAR_TRIGGER_NAME		"{TRIGGER.NAME}"
@@ -649,6 +650,32 @@ void	substitute_simple_macros(int alarmid, DB_TRIGGER *trigger, DB_ACTION *actio
 			{
 				snprintf(replace_to, replace_to_len, "%s", row[0]);
 			}
+			DBfree_result(result);
+		}
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
+			strncmp(pr, MVAR_ITEM_NAME, strlen(MVAR_ITEM_NAME)) == 0)
+		{
+			var_len = strlen(MVAR_ITEM_NAME);
+
+			snprintf(sql,sizeof(sql)-1,"select distinct i.description from triggers t, functions f,items i, hosts h"
+				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid"
+				" order by i.description", trigger->triggerid);
+
+			result = DBselect(sql);
+			row=DBfetch(result);
+
+			if(!row || DBis_null(row[0])==SUCCEED)
+			{
+				zabbix_log( LOG_LEVEL_ERR, "No ITEM_NAME in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+				zabbix_syslog("No ITEM_NAME in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+				/* remove variable */
+				*replace_to = '\0';
+			}
+			else
+			{
+				snprintf(replace_to, replace_to_len, "%s", row[0]);
+			}
+
 			DBfree_result(result);
 		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
