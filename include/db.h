@@ -233,7 +233,7 @@ DB_ITEM
 	zbx_uint64_t	itemid;
 	zbx_uint64_t	hostid;
 	zbx_item_type_t	type;
-	int	status;
+	zbx_item_status_t	status;
 	char	*description;
 	char	key[ITEM_KEY_LEN_MAX];
 	char	*host;
@@ -308,8 +308,8 @@ DB_MEDIA
 
 DB_MEDIATYPE
 {
-	zbx_uint64_t	mediatypeid;
-	int	type;
+	zbx_uint64_t		mediatypeid;
+	zbx_alert_type_t	type;
 	char	*description;
 	char	*smtp_server;
 	char	*smtp_helo;
@@ -352,7 +352,7 @@ DB_CONDITION
 	zbx_uint64_t	conditionid;
 	zbx_uint64_t	actionid;
 	zbx_condition_type_t	conditiontype;
-	int	operator;
+	zbx_condition_op_t	operator;
 	char	*value;
 };
 
@@ -366,7 +366,7 @@ DB_ALERT
 	char	*sendto;
 	char	*subject;
 	char	*message;
-	int	status;
+	zbx_alert_status_t	status;
 	int	retries;
 	int	delay;
 };
