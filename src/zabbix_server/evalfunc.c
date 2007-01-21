@@ -631,8 +631,8 @@ static int evaluate_MAX(char *value,DB_ITEM *item,int parameter,int flag)
 #else
 				l=atol(row[0]);
 #endif
-				if(rows==0)	max_uint64 = l;
-				else if(l>max)	max_uint64 = l;
+				if(rows==0)		max_uint64 = l;
+				else if(l>max_uint64)	max_uint64 = l;
 			}
 			else
 			{
