@@ -372,9 +372,9 @@ LOG_FUNC_CALL("In get_active_checks()");
 		{
 			amount_read += len;
 		}
-		if(len == -1)
+		if(len == SOCKET_ERROR)
 		{
-			switch (errno)
+			switch (WSAGetLastError())
 			{
 				case 	WSAETIMEDOUT:
 //						zabbix_log( LOG_LEVEL_WARNING, "Timeout while receiving data from [%s:%d]",server,port);
@@ -389,8 +389,9 @@ LOG_FUNC_CALL("In get_active_checks()");
 						return	NETWORK_ERROR;
 				default:
 //						zabbix_log( LOG_LEVEL_WARNING, "Error while receiving data from [%s:%d] [%s]",server,port,strerror(errno));
-						_snprintf(error, max_error_len,"Error while receiving data from [%s:%d] [%s]",server,port,strerror(errno));
+						_snprintf(error, max_error_len,"Error while receiving data from [%s:%d]",server,port);
 						WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",error);
+						WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"e",WSAGetLastError());
 			} 
 			closesocket(s);
 			return	FAIL;
@@ -736,8 +737,9 @@ INIT_CHECK_MEMORY(main);
 INIT_CHECK_MEMORY(for);
 		if(process_active_checks(confServer, confServerPort) == FAIL)
 		{
-			Sleep(60*1000);
 LOG_DEBUG_INFO("s","ActiveChecksThread - sleep 60000 (!!!)");
+			Sleep(60*1000);
+LOG_DEBUG_INFO("s","ActiveChecksThread - continue");
 			continue;
 		}
 
