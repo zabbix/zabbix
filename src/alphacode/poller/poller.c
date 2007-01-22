@@ -171,11 +171,9 @@ int	main()
 	for(i=0;i<NUM;i++)
 	{
 		servaddr_in.sin_family=AF_INET;
-		hp=gethostbyname(ip);
-
-		if(hp==NULL)
+		if(NULL == (hp = zbx_gethost(ip)))
 		{
-			perror("gethostbyname() failed");
+			perror("gethost() failed");
 		}
 
 		servaddr_in.sin_addr.s_addr=((struct in_addr *)(hp->h_addr))->s_addr;

@@ -37,19 +37,8 @@ static int	get_http_page(char *hostname, char *param, unsigned short port, char 
 
 	struct hostent *hp;
 
-	if(NULL == (hp = gethostbyname(hostname)) )
+	if(NULL == (hp = zbx_gethost(hostname)) )
 	{
-		zabbix_log(
-			LOG_LEVEL_DEBUG,
-			"get_http_page - gethostbyname() failed for host '%s' [%s]", 
-			hostname, 
-#ifdef	HAVE_HSTRERROR		
-			(char*)hstrerror((int)h_errno)
-#else
-			strerror_from_system(h_errno)
-#endif
-			);
-
 		return SYSINFO_RET_FAIL;
 	}
 

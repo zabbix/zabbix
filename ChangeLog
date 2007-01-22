@@ -1,5 +1,6 @@
 Changes for 1.3.3:
 
+ - added possibility of hostname using (Eugene)
  - new communication library and protocol (Alexei)
  - developed configuration interface of http monitoring (Eugene)
  - added support of 'eventlog[*]' for WinXX (Eugene)

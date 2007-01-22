@@ -23,9 +23,9 @@
 #include "alias.h"
 #include "md5.h"
 #include "log.h"
-#include "zbxsock.h"
 #include "threads.h"
 #include "cfg.h"
+#include "zbxsock.h"
 
 ZBX_METRIC *commands=NULL;
 extern ZBX_METRIC parameters_specific[];
@@ -1475,13 +1475,8 @@ static int	forward_request(char *proxy, char *command, int port, unsigned flags,
 
 	init_result(result);
 		
-	if(NULL == (hp = gethostbyname(proxy)) )
+	if(NULL == (hp = zbx_gethost(proxy)) )
 	{
-#ifdef	HAVE_HSTRERROR		
-		zabbix_log( LOG_LEVEL_DEBUG,"gethostbyname() failed for proxy '%s' [%s]", proxy, (char*)hstrerror((int)h_errno));
-#else
-		zabbix_log( LOG_LEVEL_DEBUG,"gethostbyname() failed for proxy '%s' [%s]", proxy, strerror_from_system(h_errno));
-#endif
 		SET_MSG_RESULT(result, strdup("ZBX_NETWORK_ERROR"));
 		return SYSINFO_RET_FAIL;
 	}
@@ -1555,19 +1550,8 @@ static int	tcp_expect(const char	*hostname, short port, const char *request, con
 
 	*value_int = 0;
 
-	if(NULL == (hp = gethostbyname(hostname)) )
+	if(NULL == (hp = zbx_gethost(hostname)) )
 	{
-		zabbix_log(
-			LOG_LEVEL_DEBUG,
-			"gethostbyname() failed for host '%s' [%s]", 
-			hostname, 
-#ifdef	HAVE_HSTRERROR		
-			(char*)hstrerror((int)h_errno)
-#else
-			strerror_from_system(h_errno)
-#endif
-			);
-
 		return SYSINFO_RET_OK;
 	}
 
@@ -1727,19 +1711,8 @@ static int	check_ssh(const char	*hostname, short port, int *value_int)
 
 	*value_int = 0;
 
-	if(NULL == (hp = gethostbyname(hostname)) )
+	if(NULL == (hp = zbx_gethost(hostname)) )
 	{
-		zabbix_log(
-			LOG_LEVEL_DEBUG,
-			"gethostbyname() failed for host '%s' [%s]", 
-			hostname, 
-#ifdef	HAVE_HSTRERROR		
-			(char*)hstrerror((int)h_errno)
-#else
-			strerror_from_system(h_errno)
-#endif
-			);
-
 		return SYSINFO_RET_OK;
 	}
 
