@@ -37,6 +37,7 @@
 #include "common.h"
 #include "log.h"
 #include "zlog.h"
+#include "zbxsock.h"
 
 #include "email.h"
 
@@ -65,15 +66,15 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	zabbix_log( LOG_LEVEL_DEBUG, "SENDING MAIL");
 
 	servaddr_in.sin_family=AF_INET;
-	hp=gethostbyname(smtp_server);
-	zabbix_log( LOG_LEVEL_DEBUG, "SENDING MAIL2");
-	if(hp==NULL)
+
+	if(NULL == (hp = zbx_gethost(smtp_server)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Cannot get IP for mailserver [%s]",smtp_server);
 		zabbix_syslog("Cannot get IP for mailserver [%s]",smtp_server);
 		zbx_snprintf(error,max_error_len,"Cannot get IP for mailserver [%s]",smtp_server);
 		return FAIL;
 	}
+	zabbix_log( LOG_LEVEL_DEBUG, "SENDING MAIL2");
 
 	servaddr_in.sin_addr.s_addr=((struct in_addr *)(hp->h_addr))->s_addr;
 	servaddr_in.sin_port=htons(25);

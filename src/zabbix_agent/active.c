@@ -249,14 +249,13 @@ static int	get_active_checks(char *server, unsigned short port, char *error, int
 
 	zabbix_log( LOG_LEVEL_DEBUG, "get_active_checks('%s',%u)", server, port);
 
-	if(NULL == (hp = gethostbyname(server)) )
+	if(NULL == (hp = zbx_gethost(server)) )
 	{
 #ifdef	HAVE_HSTRERROR		
-		zbx_snprintf(error, max_error_len,"gethostbyname() failed for server '%s' [%s]", server, (char*)hstrerror((int)h_errno));
+		zbx_snprintf(error, max_error_len,"gethost() failed for server '%s' [%s]", server, (char*)hstrerror((int)h_errno));
 #else
-		zbx_snprintf(error, max_error_len,"gethostbyname() failed for server '%s' [%s]", server, strerror_from_system(h_errno));
+		zbx_snprintf(error, max_error_len,"gethost() failed for server '%s' [%s]", server, strerror_from_system(h_errno));
 #endif
-		zabbix_log( LOG_LEVEL_WARNING, error);
 		return	NETWORK_ERROR;
 	}
 
@@ -368,18 +367,12 @@ static int	send_value(char *server,unsigned short port,char *host, char *key,cha
 	zabbix_log( LOG_LEVEL_DEBUG, "In send_value('%s',%u,'%s','%s','%s','%s','%s','%s')",
 		server, port, host, key, lastlogsize, timestamp, source, severity);
 
-	if(NULL == (hp = gethostbyname(server)))
-	{
-		addr = inet_addr(server);
-		hp = gethostbyaddr((char *)&addr, 4, AF_INET);
-	}
-
-	if( NULL == hp )
+	if( NULL == (hp = zbx_gethost(server)))
 	{
 #ifdef	HAVE_HSTRERROR		
-		zabbix_log( LOG_LEVEL_WARNING, "gethostbyname() failed for server '%s' [%s]", server, (char*)hstrerror((int)h_errno));
+		zabbix_log( LOG_LEVEL_WARNING, "gethost() failed for server '%s' [%s]", server, (char*)hstrerror((int)h_errno));
 #else
-		zabbix_log( LOG_LEVEL_WARNING, "gethostbyname() failed for server '%s' [%s]", server, strerror_from_system(h_errno));
+		zabbix_log( LOG_LEVEL_WARNING, "gethost() failed for server '%s' [%s]", server, strerror_from_system(h_errno));
 #endif
 		return	FAIL;
 	}

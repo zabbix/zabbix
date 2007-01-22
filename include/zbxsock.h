@@ -60,7 +60,7 @@ typedef struct sockaddr_in ZBX_SOCKADDR;
 int	zbx_sock_read(ZBX_SOCKET sock, void *buf, int buflen, int timeout);
 int	zbx_sock_write(ZBX_SOCKET sock, void *buf, int buflen);
 
-struct hostent	*zbx_gethost(char *addr);
+struct hostent	*zbx_gethost(const char *addr);
 
 #if defined (_WINDOWS)
 	int	zbx_sock_init(void);

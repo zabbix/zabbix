@@ -19,7 +19,7 @@ cleanwarnings="no"
 docat="yes"
 help="no"
 noparam=0;
-def="--enable-agent --enable-server --with-mysql --with-ldap --with-net-snmp"
+def="--enable-agent --enable-server --with-mysql"
 
 for cmd
 do

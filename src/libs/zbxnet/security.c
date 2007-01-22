@@ -87,11 +87,7 @@ int	check_security(ZBX_SOCKET sock, char *ip_list, int allow_if_empty)
 		while( NULL != host )
 		{
 			/* Allow IP addresses or DNS names for authorization */
-			if( 0 == (hp = gethostbyname(host)))
-			{
-				zabbix_log( LOG_LEVEL_WARNING, "Error on gethostbyname, can not resolve [%s]",host);
-			}
-			else
+			if( 0 != (hp = zbx_gethost(host)))
 			{
 				sip = inet_ntoa(*((struct in_addr *)hp->h_addr));
 				if( 0 == strcmp(sname, sip))

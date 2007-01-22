@@ -43,6 +43,8 @@
 
 #include "common.h"
 
+#include "zbxsock.h"
+
 char *progname = NULL;
 char title_message[] = "ZABBIX get - Communicate with ZABBIX agent";
 char usage_message[] = "[-hv] -s<host name or IP> [-p<port number>] -k<key>";
@@ -145,11 +147,10 @@ static int	get_value(char *server,int port,char *key,char *value)
 /*	printf("get_value([%s],[%d],[%s])",server,port,key);*/
 
 	servaddr_in.sin_family=AF_INET;
-	hp=gethostbyname(server);
 
-	if(hp==NULL)
+	if(NULL == (hp = zbx_gethost(server)));
 	{
-		zbx_error("Error on gethostbyname. [%s]", strerror(errno));
+		zbx_error("Error on gethost(). [%s]", strerror(errno));
 		return	FAIL;
 	}
 
