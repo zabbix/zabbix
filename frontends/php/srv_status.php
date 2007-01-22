@@ -52,7 +52,7 @@
 	if(isset($_REQUEST["serviceid"])&&isset($_REQUEST["showgraph"]))
 	{
 		$table  = new CTableInfo();
-		$table->AddRow("<IMG SRC=\"chart5.php?serviceid=".$_REQUEST["serviceid"]."\" border=0>");
+		$table->AddRow(new CCol("<IMG SRC=\"chart5.php?serviceid=".$_REQUEST["serviceid"]."\" border=0/>", "center"));
 		$table->Show();
 		show_page_footer();
 		exit;

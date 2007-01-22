@@ -22,6 +22,8 @@
 	include "include/config.inc.php";
 	include "include/classes/graph.inc.php";
 
+	check_authorisation();
+
 	if(!check_right("Graph","R",$_REQUEST["graphid"]))
 	{
 		exit;
