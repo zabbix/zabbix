@@ -420,6 +420,16 @@ int	process_data(int sockfd,char *server,char *key,char *value,char *lastlogsize
 	char	server_esc[MAX_STRING_LEN];
 	char	key_esc[MAX_STRING_LEN];
 
+	int i;
+
+	if(value && value[0]) /* trim right '\r\n\0'*/
+	{
+		for(
+			i = strlen(value);
+			i >= 0 && (value[i]=='\0' || value[i]=='\n' || value[i]=='\r');
+			value[i--] = '\0');
+	}
+	
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_data([%s],[%s],[%s],[%s])",server,key,value,lastlogsize);
 
 	init_result(&agent);
