@@ -574,8 +574,19 @@ int	evaluate(int *result,char *exp, char *error, int maxerrlen)
 #define MVAR_TRIGGER_STATUS		"{TRIGGER.STATUS}"
 #define MVAR_TRIGGER_STATUS_OLD		"{STATUS}"
 #define MVAR_TRIGGER_URL		"{TRIGGER.URL}"
+#define MVAR_PROFILE_DEVICETYPE		"{PROFILE.DEVICETYPE}"
+#define MVAR_PROFILE_NAME		"{PROFILE.NAME}"
+#define MVAR_PROFILE_OS			"{PROFILE.OS}"
+#define MVAR_PROFILE_SERIALNO		"{PROFILE.SERIALNO}"
+#define MVAR_PROFILE_TAG		"{PROFILE.TAG}"
+#define MVAR_PROFILE_MACADDRESS		"{PROFILE.MACADDRESS}"
+#define MVAR_PROFILE_HARDWARE		"{PROFILE.HARDWARE}"
+#define MVAR_PROFILE_SOFTWARE		"{PROFILE.SOFTWARE}"
+#define MVAR_PROFILE_CONTACT		"{PROFILE.CONTACT}"
+#define MVAR_PROFILE_LOCATION		"{PROFILE.LOCATION}"
+#define MVAR_PROFILE_NOTES		"{PROFILE.NOTES}"
 
-#define STR_UNKNOWN_VARIAVLE		"*UNKNOWN*"
+#define STR_UNKNOWN_VARIABLE		"*UNKNOWN*"
 
 void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, int data_max_len, int macro_type)
 {
@@ -632,6 +643,270 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 
 			zbx_snprintf(replace_to, replace_to_len, "%s", event->trigger_comments);
 		}
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
+			strncmp(pr, MVAR_PROFILE_DEVICETYPE, strlen(MVAR_PROFILE_DEVICETYPE)) == 0)
+		{
+			var_len = strlen(MVAR_PROFILE_DEVICETYPE);
+
+			result = DBselect("select distinct p.devicetype from triggers t, functions f,items i, hosts h, hosts_profiles p"
+				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
+				event->triggerid);
+
+			row = DBfetch(result);
+
+			if(!row || DBis_null(row[0])==SUCCEED)
+			{
+				zabbix_log( LOG_LEVEL_ERR, "No PROFILE.DEVECETYPE in substitute_simple_macros. Triggerid [%d]", event->triggerid);
+				zabbix_syslog("No PROFILE.DEVECETYPE in substitute_simple_macros. Triggerid [%d]", event->triggerid);
+
+				zbx_snprintf(replace_to, replace_to_len, "%s", STR_UNKNOWN_VARIABLE);
+			}
+			else
+			{
+				zbx_snprintf(replace_to, replace_to_len, "%s", row[0]);
+			}
+			DBfree_result(result);
+		}
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
+			strncmp(pr, MVAR_PROFILE_NAME, strlen(MVAR_PROFILE_NAME)) == 0)
+		{
+			var_len = strlen(MVAR_PROFILE_NAME);
+
+			result = DBselect("select distinct p.name from triggers t, functions f,items i, hosts h, hosts_profiles p"
+				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
+				event->triggerid);
+
+			row = DBfetch(result);
+
+			if(!row || DBis_null(row[0])==SUCCEED)
+			{
+				zabbix_log( LOG_LEVEL_ERR, "No PROFILE.NAME in substitute_simple_macros. Triggerid [%d]", event->triggerid);
+				zabbix_syslog("No PROFILE.NAME in substitute_simple_macros. Triggerid [%d]", event->triggerid);
+
+				zbx_snprintf(replace_to, replace_to_len, "%s", STR_UNKNOWN_VARIABLE);
+			}
+			else
+			{
+				zbx_snprintf(replace_to, replace_to_len, "%s", row[0]);
+			}
+			DBfree_result(result);
+		}
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
+			strncmp(pr, MVAR_PROFILE_OS, strlen(MVAR_PROFILE_OS)) == 0)
+		{
+			var_len = strlen(MVAR_PROFILE_OS);
+
+			result = DBselect("select distinct p.os from triggers t, functions f,items i, hosts h, hosts_profiles p"
+				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
+				event->triggerid);
+
+			row = DBfetch(result);
+
+			if(!row || DBis_null(row[0])==SUCCEED)
+			{
+				zabbix_log( LOG_LEVEL_ERR, "No PROFILE.OS in substitute_simple_macros. Triggerid [%d]", event->triggerid);
+				zabbix_syslog("No PROFILE.OS in substitute_simple_macros. Triggerid [%d]", event->triggerid);
+
+				zbx_snprintf(replace_to, replace_to_len, "%s", STR_UNKNOWN_VARIABLE);
+			}
+			else
+			{
+				zbx_snprintf(replace_to, replace_to_len, "%s", row[0]);
+			}
+			DBfree_result(result);
+		}
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
+			strncmp(pr, MVAR_PROFILE_SERIALNO, strlen(MVAR_PROFILE_SERIALNO)) == 0)
+		{
+			var_len = strlen(MVAR_PROFILE_SERIALNO);
+
+			result = DBselect("select distinct p.serialno from triggers t, functions f,items i, hosts h, hosts_profiles p"
+				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
+				event->triggerid);
+
+			row = DBfetch(result);
+
+			if(!row || DBis_null(row[0])==SUCCEED)
+			{
+				zabbix_log( LOG_LEVEL_ERR, "No PROFILE.SERIALNO in substitute_simple_macros. Triggerid [%d]", event->triggerid);
+				zabbix_syslog("No PROFILE.SERIALNO in substitute_simple_macros. Triggerid [%d]", event->triggerid);
+
+				zbx_snprintf(replace_to, replace_to_len, "%s", STR_UNKNOWN_VARIABLE);
+			}
+			else
+			{
+				zbx_snprintf(replace_to, replace_to_len, "%s", row[0]);
+			}
+			DBfree_result(result);
+		}
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
+			strncmp(pr, MVAR_PROFILE_TAG, strlen(MVAR_PROFILE_TAG)) == 0)
+		{
+			var_len = strlen(MVAR_PROFILE_TAG);
+
+			result = DBselect("select distinct p.tag from triggers t, functions f,items i, hosts h, hosts_profiles p"
+				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
+				event->triggerid);
+
+			row = DBfetch(result);
+
+			if(!row || DBis_null(row[0])==SUCCEED)
+			{
+				zabbix_log( LOG_LEVEL_ERR, "No PROFILE.TAG in substitute_simple_macros. Triggerid [%d]", event->triggerid);
+				zabbix_syslog("No PROFILE.TAG in substitute_simple_macros. Triggerid [%d]", event->triggerid);
+
+				zbx_snprintf(replace_to, replace_to_len, "%s", STR_UNKNOWN_VARIABLE);
+			}
+			else
+			{
+				zbx_snprintf(replace_to, replace_to_len, "%s", row[0]);
+			}
+			DBfree_result(result);
+		}
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
+			strncmp(pr, MVAR_PROFILE_MACADDRESS, strlen(MVAR_PROFILE_MACADDRESS)) == 0)
+		{
+			var_len = strlen(MVAR_PROFILE_MACADDRESS);
+
+			result = DBselect("select distinct p.macaddress from triggers t, functions f,items i, hosts h, hosts_profiles p"
+				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
+				event->triggerid);
+
+			row = DBfetch(result);
+
+			if(!row || DBis_null(row[0])==SUCCEED)
+			{
+				zabbix_log( LOG_LEVEL_ERR, "No PROFILE.MACADDRESS in substitute_simple_macros. Triggerid [%d]", event->triggerid);
+				zabbix_syslog("No PROFILE.MACADDRESS in substitute_simple_macros. Triggerid [%d]", event->triggerid);
+
+				zbx_snprintf(replace_to, replace_to_len, "%s", STR_UNKNOWN_VARIABLE);
+			}
+			else
+			{
+				zbx_snprintf(replace_to, replace_to_len, "%s", row[0]);
+			}
+			DBfree_result(result);
+		}
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
+			strncmp(pr, MVAR_PROFILE_HARDWARE, strlen(MVAR_PROFILE_HARDWARE)) == 0)
+		{
+			var_len = strlen(MVAR_PROFILE_HARDWARE);
+
+			result = DBselect("select distinct p.hardware from triggers t, functions f,items i, hosts h, hosts_profiles p"
+				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
+				event->triggerid);
+
+			row = DBfetch(result);
+
+			if(!row || DBis_null(row[0])==SUCCEED)
+			{
+				zabbix_log( LOG_LEVEL_ERR, "No PROFILE.HARDWARE in substitute_simple_macros. Triggerid [%d]", event->triggerid);
+				zabbix_syslog("No PROFILE.HARDWARE in substitute_simple_macros. Triggerid [%d]", event->triggerid);
+
+				zbx_snprintf(replace_to, replace_to_len, "%s", STR_UNKNOWN_VARIABLE);
+			}
+			else
+			{
+				zbx_snprintf(replace_to, replace_to_len, "%s", row[0]);
+			}
+			DBfree_result(result);
+		}
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
+			strncmp(pr, MVAR_PROFILE_SOFTWARE, strlen(MVAR_PROFILE_SOFTWARE)) == 0)
+		{
+			var_len = strlen(MVAR_PROFILE_SOFTWARE);
+
+			result = DBselect("select distinct p.software from triggers t, functions f,items i, hosts h, hosts_profiles p"
+				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
+				event->triggerid);
+
+			row = DBfetch(result);
+
+			if(!row || DBis_null(row[0])==SUCCEED)
+			{
+				zabbix_log( LOG_LEVEL_ERR, "No PROFILE.SOFTWARE in substitute_simple_macros. Triggerid [%d]", event->triggerid);
+				zabbix_syslog("No PROFILE.SOFTWARE in substitute_simple_macros. Triggerid [%d]", event->triggerid);
+
+				zbx_snprintf(replace_to, replace_to_len, "%s", STR_UNKNOWN_VARIABLE);
+			}
+			else
+			{
+				zbx_snprintf(replace_to, replace_to_len, "%s", row[0]);
+			}
+			DBfree_result(result);
+		}
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
+			strncmp(pr, MVAR_PROFILE_CONTACT, strlen(MVAR_PROFILE_CONTACT)) == 0)
+		{
+			var_len = strlen(MVAR_PROFILE_CONTACT);
+
+			result = DBselect("select distinct p.contact from triggers t, functions f,items i, hosts h, hosts_profiles p"
+				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
+				event->triggerid);
+
+			row = DBfetch(result);
+
+			if(!row || DBis_null(row[0])==SUCCEED)
+			{
+				zabbix_log( LOG_LEVEL_ERR, "No PROFILE.CONTACT in substitute_simple_macros. Triggerid [%d]", event->triggerid);
+				zabbix_syslog("No PROFILE.CONTACT in substitute_simple_macros. Triggerid [%d]", event->triggerid);
+
+				zbx_snprintf(replace_to, replace_to_len, "%s", STR_UNKNOWN_VARIABLE);
+			}
+			else
+			{
+				zbx_snprintf(replace_to, replace_to_len, "%s", row[0]);
+			}
+			DBfree_result(result);
+		}
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
+			strncmp(pr, MVAR_PROFILE_LOCATION, strlen(MVAR_PROFILE_LOCATION)) == 0)
+		{
+			var_len = strlen(MVAR_PROFILE_LOCATION);
+
+			result = DBselect("select distinct p.location from triggers t, functions f,items i, hosts h, hosts_profiles p"
+				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
+				event->triggerid);
+
+			row = DBfetch(result);
+
+			if(!row || DBis_null(row[0])==SUCCEED)
+			{
+				zabbix_log( LOG_LEVEL_ERR, "No PROFILE.LOCATION in substitute_simple_macros. Triggerid [%d]", event->triggerid);
+				zabbix_syslog("No PROFILE.LOCATION in substitute_simple_macros. Triggerid [%d]", event->triggerid);
+
+				zbx_snprintf(replace_to, replace_to_len, "%s", STR_UNKNOWN_VARIABLE);
+			}
+			else
+			{
+				zbx_snprintf(replace_to, replace_to_len, "%s", row[0]);
+			}
+			DBfree_result(result);
+		}
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
+			strncmp(pr, MVAR_PROFILE_NOTES, strlen(MVAR_PROFILE_NOTES)) == 0)
+		{
+			var_len = strlen(MVAR_PROFILE_NOTES);
+
+			result = DBselect("select distinct p.notes from triggers t, functions f,items i, hosts h, hosts_profiles p"
+				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
+				event->triggerid);
+
+			row = DBfetch(result);
+
+			if(!row || DBis_null(row[0])==SUCCEED)
+			{
+				zabbix_log( LOG_LEVEL_ERR, "No PROFILE.NOTES in substitute_simple_macros. Triggerid [%d]", event->triggerid);
+				zabbix_syslog("No PROFILE.NOTES in substitute_simple_macros. Triggerid [%d]", event->triggerid);
+
+				zbx_snprintf(replace_to, replace_to_len, "%s", STR_UNKNOWN_VARIABLE);
+			}
+			else
+			{
+				zbx_snprintf(replace_to, replace_to_len, "%s", row[0]);
+			}
+			DBfree_result(result);
+		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY | MACRO_TYPE_TRIGGER_DESCRIPTION) &&
 			strncmp(pr, MVAR_HOST_NAME, strlen(MVAR_HOST_NAME)) == 0)
 		{
@@ -650,7 +925,7 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 				zabbix_syslog("No hostname in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
 					event->triggerid);
 
-				zbx_snprintf(replace_to, replace_to_len, "%s", STR_UNKNOWN_VARIAVLE);
+				zbx_snprintf(replace_to, replace_to_len, "%s", STR_UNKNOWN_VARIABLE);
 			}
 			else
 			{
@@ -730,7 +1005,7 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char *data, in
 				zabbix_syslog("No hostname in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
 					event->triggerid);
 
-				zbx_snprintf(replace_to, replace_to_len, "%s", STR_UNKNOWN_VARIAVLE);
+				zbx_snprintf(replace_to, replace_to_len, "%s", STR_UNKNOWN_VARIABLE);
 			}
 			else
 			{
@@ -931,7 +1206,7 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, char *data, int data_
 						pms = p + 1;
 						
 						if(evaluate_FUNCTION2(replace_to,host,key,function,parameter) != SUCCEED)
-							zbx_snprintf(replace_to, replace_to_len, "%s", STR_UNKNOWN_VARIAVLE);
+							zbx_snprintf(replace_to, replace_to_len, "%s", STR_UNKNOWN_VARIABLE);
 					}
 				}
 			}
