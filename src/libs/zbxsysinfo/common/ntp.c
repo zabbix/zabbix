@@ -264,13 +264,8 @@ int	check_ntp(char *host, unsigned short port, int *value_int)
 
     	*value_int = 0;
 
-	if(NULL == (hp = gethostbyname(host)) )
+	if(NULL == (hp = zbx_gethost(host)) )
 	{
-#ifdef	HAVE_HSTRERROR		
-		zabbix_log( LOG_LEVEL_DEBUG, "gethostbyname() failed for NTP server [%d]", (char*)hstrerror((int)h_errno));
-#else
-		zabbix_log( LOG_LEVEL_DEBUG, "gethostbyname() failed for NTP server [%s]", strerror_from_system(h_errno));
-#endif
 		return	SYSINFO_RET_OK;
 	}
 

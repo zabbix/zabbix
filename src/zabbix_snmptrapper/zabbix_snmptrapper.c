@@ -144,9 +144,8 @@ int	send_value(char *server,int port,char *shortname,char *value)
 /*	struct linger ling;*/
 
 	servaddr_in.sin_family=AF_INET;
-	hp=gethostbyname(server);
 
-	if(hp==NULL)
+	if(NULL == (hp = zbx_gethost(server)))
 	{
 		return	FAIL;
 	}

@@ -48,6 +48,7 @@
 #include "db.h"
 #include "log.h"
 #include "zlog.h"
+#include "zbxsock.h"
 
 #include "nodecomms.h"
 
@@ -103,9 +104,8 @@ int send_to_node(int dest_nodeid, int nodeid, char *data)
 	DBfree_result(result);
 
 	servaddr_in.sin_family=AF_INET;
-	hp=gethostbyname(ip);
 
-	if(hp==NULL)
+	if(NULL == (hp = zbx_gethost(ip)))
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Cannot resolve [%s] for node [%d]", ip, dest_nodeid);
 		return	FAIL;

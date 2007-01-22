@@ -22,7 +22,7 @@
 
 #include "log.h"
 
-struct hostent	*zbx_gethost(char *hostname)
+struct hostent	*zbx_gethost(const char *hostname)
 {
 	unsigned int	addr;
 	struct hostent*	host;

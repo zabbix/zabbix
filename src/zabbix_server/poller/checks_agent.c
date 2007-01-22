@@ -18,6 +18,7 @@
 **/
 
 #include "checks_agent.h"
+#include "zbxsock.h"
 
 /******************************************************************************
  *                                                                            *
@@ -59,22 +60,20 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 	servaddr_in.sin_family=AF_INET;
 	if(item->useip==1)
 	{
-		hp=gethostbyname(item->ip);
+		hp = zbx_gethost(item->ip);
 	}
 	else
 	{
-		hp=gethostbyname(item->host);
+		hp = zbx_gethost(item->host);
 	}
 
 	if(hp==NULL)
 	{
 #ifdef	HAVE_HSTRERROR
-		zbx_snprintf(error,sizeof(error),"gethostbyname() failed [%s]", hstrerror(h_errno));
-		zabbix_log(LOG_LEVEL_WARNING, "%s", error);
+		zbx_snprintf(error,sizeof(error),"gethost() failed [%s]", hstrerror(h_errno));
 		result->msg=strdup(error);
 #else
-		zbx_snprintf(error,sizeof(error),"gethostbyname() failed [%d]", h_errno);
-		zabbix_log(LOG_LEVEL_WARNING, "%s", error);
+		zbx_snprintf(error,sizeof(error),"gethost() failed [%d]", h_errno);
 		result->msg=strdup(error);
 #endif
 		return	NETWORK_ERROR;

@@ -45,6 +45,7 @@
 
 #include "common.h"
 #include "comms.h"
+#include "zbxsock.h"
 
 void	zbx_tcp_init(zbx_sock_t *s)
 {
@@ -76,9 +77,8 @@ int     zbx_tcp_connect(zbx_sock_t *s, char *ip, int port)
 	memset(s, 0, sizeof(zbx_sock_t));
 
 	servaddr_in.sin_family=AF_INET;
-	hp=gethostbyname(ip);
 
-	if(hp==NULL)
+	if(NULL == (hp = zbx_gethost(ip)))
 	{
 //		zabbix_log( LOG_LEVEL_WARNING, "Cannot resolve [%s]", ip);
 		return	FAIL;
