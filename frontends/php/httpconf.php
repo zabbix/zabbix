@@ -271,6 +271,19 @@ include_once "include/page_header.php";
 	}
 ?>
 <?php
+	/* make steps with unique names */
+	$_REQUEST['steps'] = get_request('steps',array());
+	foreach($_REQUEST['steps'] as $s1id => $s1)
+	{
+		foreach($_REQUEST['steps'] as $s2id => $s2)
+		{
+			if($s1['name'] == $s2['name'] && $s1id != $s2id)
+			{
+				$_REQUEST['steps'][$s1id] = $_REQUEST['steps'][$s2id];
+				unset($_REQUEST['steps'][$s2id]);
+			}
+		}
+	}
 	$_REQUEST['steps'] = array_merge(get_request('steps',array())); /* reinitialize keys */
 
 	$form = new CForm();
