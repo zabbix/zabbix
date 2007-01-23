@@ -294,8 +294,12 @@
 	define("ZBX_NODE_LOCAL",	1);
 	define("ZBX_NODE_MASTER",	2);
 
-	define("HTTPTEST_STATUS_ACTIVE",0);
-	define("HTTPTEST_STATUS_DISABLED",1);
+	define("HTTPTEST_STATUS_ACTIVE",	0);
+	define("HTTPTEST_STATUS_DISABLED",	1);
+
+	define("HTTPSTEP_ITEM_TYPE_IN",		2);
+	define("HTTPSTEP_ITEM_TYPE_TIME",	1);
+	define("HTTPSTEP_ITEM_TYPE_RSPCODE",	0);
 	
 	define("BR",	"<br/>\n");
 	define("SPACE",	"&nbsp;");

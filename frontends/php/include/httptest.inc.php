@@ -47,7 +47,7 @@
 
 	function	db_save_step($hostid, $applicationid, $httptestid, $testname, $name, $no, $timeout, $url, $posts, $required)
 	{
-		$hystory = 30; // TODO !!! Allow user set this parametr
+		$history = 30; // TODO !!! Allow user set this parametr
 		$trends = 90; // TODO !!! Allow user set this parametr
 
 		if (!eregi('^([0-9a-zA-Z\_\.-\$ ]+)$', $name)) 
@@ -80,39 +80,45 @@
 
 		$monitored_items = array(
 			array(
-				'description' => 'Download speed for step \'$2\' of scenario \'$1\'',
-				'key_' => 'web.test.in['.$testname.','.$name.',bps]',
-				'type' => ITEM_VALUE_TYPE_UINT64,
-				'units' => 'bps'),
+				'description'	=> 'Download speed for step \'$2\' of scenario \'$1\'',
+				'key_'		=> 'web.test.in['.$testname.','.$name.',bps]',
+				'type'		=> ITEM_VALUE_TYPE_UINT64,
+				'units'		=> 'bps',
+				'httpstepitemtype'=> HTTPSTEP_ITEM_TYPE_IN),
 			array(
-				'description' => 'Response time for step \'$2\' of scenario \'$1\'',
-				'key_' => 'web.test.time['.$testname.','.$name.',resp]',
-				'type' => ITEM_VALUE_TYPE_UINT64,
-				'units' => 's'),
+				'description'	=> 'Response time for step \'$2\' of scenario \'$1\'',
+				'key_'		=> 'web.test.time['.$testname.','.$name.',resp]',
+				'type'		=> ITEM_VALUE_TYPE_UINT64,
+				'units'		=> 's',
+				'httpstepitemtype'=> HTTPSTEP_ITEM_TYPE_TIME),
 			array(
-				'description' => 'Response code for step \'$2\' of scenario \'$1\'',
-				'key_' => 'web.test.rspcode['.$testname.','.$name.']',
-				'type' => ITEM_VALUE_TYPE_UINT64,
-				'units' => ''),
+				'description'	=> 'Response code for step \'$2\' of scenario \'$1\'',
+				'key_'		=> 'web.test.rspcode['.$testname.','.$name.']',
+				'type'		=> ITEM_VALUE_TYPE_UINT64,
+				'units'		=> '',
+				'httpstepitemtype'=> HTTPSTEP_ITEM_TYPE_RSPCODE),
 			);
 		
 		foreach($monitored_items as $item)
 		{
-			if(!($item_data = DBfetch(DBselect('select itemid from items '.
-				' where hostid='.$hostid.' and key_='.zbx_dbstr($item['key_'])))))
+			if(!($item_data = DBfetch(DBselect('select i.itemid,i.history,i.trends,i.status,i.delta,i.valuemapid '.
+				' from items i, httpstepitem hi '.
+				' where hi.httpstepid='.$httpstepid.' and hi.itemid=i.itemid '.
+				' and hi.type='.$item['httpstepitemtype']))))
 			{
-				if (!($itemid = add_item($item['description'], $item['key_'], $hostid, 30, $hystory, ITEM_STATUS_ACTIVE,
-					ITEM_TYPE_HTTPTEST, '', '', $item['type'], 'localhost', 161, $item['units'], 0, 0, '', 0, '', '',
-					'', $trends, '', 0, '', array($applicationid))))
+				if (!($itemid = add_item($item['description'], $item['key_'], $hostid, 30,
+					$history, ITEM_STATUS_ACTIVE, ITEM_TYPE_HTTPTEST, '', '', $item['type'], 'localhost',
+					161, $item['units'], 0, 0, '', 0, '', '', '0', $trends, '', 0, '', array($applicationid))))
 					return false;
 			}
 			else
 			{
 				$itemid = $item_data['itemid'];
 
-				if (!(update_item($itemid, $item['description'], $item['key_'], $hostid, 30, $hystory, ITEM_STATUS_ACTIVE,
-					ITEM_TYPE_HTTPTEST, '', '', $item['type'], 'localhost', 161, $item['units'], 0, 0, '', 0, '', '',
-					'', $trends, '', 0, '', array($applicationid))))
+				if (!(update_item($itemid, $item['description'], $item['key_'], $hostid, 30, $item_data['history'],
+					$item_data['status'], ITEM_TYPE_HTTPTEST, '', '', $item['type'], 'localhost', 161,
+					$item['units'], 0, 0, $item_data['delta'], 0, '', '', '0', $item_data['trends'], '',
+					$item_data['valuemapid'], '', array($applicationid))))
 					return false;
 			}
 
@@ -122,8 +128,8 @@
 			DBexecute('delete from httpstepitem where itemid='.$itemid);
 
 			if (!DBexecute('insert into httpstepitem'.
-				' (httpstepitemid, httpstepid, itemid) '.
-				' values ('.$httpstepitemid.','.$httpstepid.','.$itemid.')'
+				' (httpstepitemid, httpstepid, itemid, type) '.
+				' values ('.$httpstepitemid.','.$httpstepid.','.$itemid.','.$item['httpstepitemtype'].')'
 				)) return false;
 
 		}
@@ -209,8 +215,7 @@
 				while($step_data = DBfetch($db_steps))
 				{
 					if(isset($httpstepids[$step_data['httpstepid']]))	continue;
-					delete_step($step_data['httpstepid']);
-					DBexecute('delete httpstep where httpstepid='.$step_data['httpstepid']);
+					delete_httpstep($step_data['httpstepid']);
 				}
 			}
 		}
@@ -249,7 +254,7 @@
 		while($httpstepitem_data = DBfetch($db_httpstepitems))
 		{
 			if(!DBexecute('delete from httpstepitem where httpstepitemid='.$httpstepitem_data['httpstepitemid'])) return false;
-			if(!DBexecute('delete from items where itemid='.$httpstepitem_data['itemid'])) return false;
+			if(!delete_item($httpstepitem_data['itemid'])) return false;
 		}
 			
 		return DBexecute('delete from httpstep where httpstepid='.$httpstepid);

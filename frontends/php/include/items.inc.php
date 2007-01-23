@@ -23,15 +23,16 @@
 	{
 		switch($type)
 		{
-			case 0:	$type = S_ZABBIX_AGENT;			break;
-			case 1:	$type = S_SNMPV1_AGENT;			break;
-			case 2:	$type = S_ZABBIX_TRAPPER;		break;
-			case 3:	$type = S_SIMPLE_CHECK;			break;
-			case 4:	$type = S_SNMPV2_AGENT;			break;
-			case 5:	$type = S_ZABBIX_INTERNAL;		break;
-			case 6:	$type = S_SNMPV3_AGENT;			break;
-			case 7:	$type = S_ZABBIX_AGENT_ACTIVE;		break;
-			case 8:	$type = S_ZABBIX_AGGREGATE;		break;
+			case ITEM_TYPE_ZABBIX:		$type = S_ZABBIX_AGENT;			break;
+			case ITEM_TYPE_SNMPV1:		$type = S_SNMPV1_AGENT;			break;
+			case ITEM_TYPE_TRAPPER:		$type = S_ZABBIX_TRAPPER;		break;
+			case ITEM_TYPE_SIMPLE:		$type = S_SIMPLE_CHECK;			break;
+			case ITEM_TYPE_SNMPV2C:		$type = S_SNMPV2_AGENT;			break;
+			case ITEM_TYPE_INTERNAL:	$type = S_ZABBIX_INTERNAL;		break;
+			case ITEM_TYPE_SNMPV3:		$type = S_SNMPV3_AGENT;			break;
+			case ITEM_TYPE_ZABBIX_ACTIVE:	$type = S_ZABBIX_AGENT_ACTIVE;		break;
+			case ITEM_TYPE_AGGREGATE:	$type = S_ZABBIX_AGGREGATE;		break;
+			case ITEM_TYPE_HTTPTEST:	$type = S_WEB_MONITORING;		break;
 			default:$type = S_UNKNOWN;			break;
 		}
 		return $type;

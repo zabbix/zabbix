@@ -53,7 +53,7 @@ include_once "include/page_header.php";
 		"delay_flex"=>	array(T_ZBX_STR, O_OPT,  NULL,  "",NULL),
 		"history"=>	array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,65535),'isset({save})'),
 		"status"=>	array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,65535),'isset({save})'),
-		"type"=>	array(T_ZBX_INT, O_OPT,  NULL,  IN("0,1,2,3,4,5,6,7,8"),'isset({save})'),
+		"type"=>	array(T_ZBX_INT, O_OPT,  NULL,  IN("0,1,2,3,4,5,6,7,8,9"),'isset({save})'),
 		"trends"=>	array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,65535),'isset({save})'),
 		"value_type"=>	array(T_ZBX_INT, O_OPT,  NULL,  IN("0,1,2,3,4"),'isset({save})'),
 		"valuemapid"=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID,'isset({save})'),
@@ -97,7 +97,7 @@ include_once "include/page_header.php";
 		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
 	);
 
-	$_REQUEST["showdisabled"] = get_request("showdisabled", get_profile("web.latest.showdisabled", 0));
+	$_REQUEST["showdisabled"] = get_request("showdisabled", get_profile("web.items.showdisabled", 0));
 	
 	check_fields($fields);
 
@@ -111,7 +111,7 @@ include_once "include/page_header.php";
 	}
 		
 	validate_group_with_host(PERM_READ_WRITE,array("always_select_first_host","only_current_node"));
-	update_profile("web.latest.showdisabled",$showdisabled);
+	update_profile("web.items.showdisabled",$showdisabled);
 ?>
 <?php
 	$result = 0;

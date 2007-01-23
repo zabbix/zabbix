@@ -597,6 +597,7 @@
 	"S_SNMPV3_AGENT"=>			"SNMPv3 agent",
 	"S_ZABBIX_INTERNAL"=>			"ZABBIX internal",
 	"S_ZABBIX_AGGREGATE"=>			"ZABBIX aggregate",
+	"S_WEB_MONITORING"=>			"Web monitoring",
 	"S_ZABBIX_UNKNOWN"=>			"Unknown",
 	"S_ACTIVE"=>				"Active",
 	"S_NOT_ACTIVE"=>			"Not active",
