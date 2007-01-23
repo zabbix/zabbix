@@ -77,7 +77,7 @@ include_once "include/page_header.php";
 		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
 	);
 
-	$_REQUEST["showdisabled"] = get_request("showdisabled", get_profile("web.latest.showdisabled", 0));
+	$_REQUEST["showdisabled"] = get_request("showdisabled", get_profile("web.triggers.showdisabled", 0));
 	
 	check_fields($fields);
 
@@ -86,7 +86,7 @@ include_once "include/page_header.php";
 	validate_group_with_host(PERM_READ_WRITE,array("allow_all_hosts","always_select_first_host","with_items"));
 ?>
 <?php
-	update_profile("web.latest.showdisabled",$showdisabled);
+	update_profile("web.triggers.showdisabled",$showdisabled);
 
 /* FORM ACTIONS */
 	if(isset($_REQUEST["save"]))

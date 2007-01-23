@@ -35,7 +35,7 @@
 		$form->AddVar('sid', get_request('sid', null));
 		$form->AddVar('list_name', get_request('list_name', null));
 
-		$sid = get_request('name', null);
+		$sid = get_request('sid', null);
 		$name = get_request('name', '');
 		$url = get_request('url', '');
 		$posts = get_request('posts', '');
@@ -95,7 +95,7 @@
 			$db_steps = DBselect('select * from httpstep where httptestid='.$_REQUEST["httptestid"].' order by no');
 			while($step_data = DBfetch($db_steps))
 			{
-				$steps[$step_data['httpstepid']] = $step_data;
+				$steps[] = $step_data;
 			}
 		}
 		
@@ -112,9 +112,24 @@
 		
 		$form->AddRow(S_UPDATE_INTERVAL_IN_SEC, new CNumericBox("delay",$delay,5));
 		
-		$form->AddRow(S_AGENT, new CTextBox('agent', $agent, 40));
+		$cmbAgent = new CEditableComboBox('agent', $agent, 80);
+		$cmbAgent->AddItem('Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 2.0.50727)',
+			'Internet Explorer 6.0 on Windows XP SP2 with .NET Framework 2.0 installed');
+		$cmbAgent->AddItem('Mozilla/5.0 (Windows; U; Windows NT 5.1; en-GB; rv:1.8.0.7) Gecko/20060909 Firefox/1.5.0.7',
+			'Mozilla Firefox 1.5.0.7 on Windows XP');
+		$cmbAgent->AddItem('Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.0.7) Gecko/20060909 Firefox/1.5.0.7',
+			'Mozilla Firefox 1.5.0.7 on Linux');
+		$cmbAgent->AddItem('Opera/9.02 (Windows NT 5.1; U; en)',
+			'Opera 9.02 on Windows XP');
+		$cmbAgent->AddItem('Opera/9.02 (X11; Linux i686; U; en)',
+			'Opera 9.02 on Linux');
+		$cmbAgent->AddItem('Lynx/2.8.4rel.1 libwww-FM/2.14',
+			'Lynx 2.8.4rel.1 on Linux');
+		$cmbAgent->AddItem('Googlebot/2.1 (+http://www.google.com/bot.html)',
+			'Googlebot');
+		$form->AddRow(S_AGENT, $cmbAgent);
 		
-		$cmbStatus = new CComboBox("status",$status);
+		$cmbStatus = new CComboBox("status", $status);
 		foreach(array(HTTPTEST_STATUS_ACTIVE, HTTPTEST_STATUS_DISABLED) as $st)
 			$cmbStatus->AddItem($st, httptest_status2str($st));
 		$form->AddRow(S_STATUS,$cmbStatus);
@@ -926,7 +941,7 @@
 				" from items i,hosts h where i.itemid=".$_REQUEST["itemid"].
 				" and h.hostid=i.hostid"));
 
-			$limited = $item_data['templateid'] == 0 ? null : 'yes';
+			$limited = ($item_data['templateid'] == 0  && $item_data['type'] != ITEM_TYPE_HTTPTEST) ? null : 'yes';
 		}
 
 		if((isset($_REQUEST["itemid"]) && !isset($_REQUEST["form_refresh"])) || isset($limited))
@@ -980,7 +995,7 @@
 
 		$delay_flex_el = array();
 
-		if($type != ITEM_TYPE_TRAPPER)
+		if($type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_HTTPTEST)
 		{
 			$i = 0;
 			foreach($delay_flex as $val)
@@ -1161,7 +1176,7 @@
 		{
 			$frmItem->AddVar("formula",$formula);
 		}
-		if($type != ITEM_TYPE_TRAPPER)
+		if($type != ITEM_TYPE_TRAPPER && $type != ITEM_TYPE_HTTPTEST)
 		{
 			$frmItem->AddRow(S_UPDATE_INTERVAL_IN_SEC, new CNumericBox("delay",$delay,5));
 			$frmItem->AddRow("Flexible intervals (sec)", $delay_flex_el);
@@ -1218,7 +1233,7 @@
 		
 		if(($value_type==ITEM_VALUE_TYPE_UINT64) || ($value_type == ITEM_VALUE_TYPE_STR))
 		{
-			if(isset($limited))
+			if(isset($limited) && $type != ITEM_TYPE_HTTPTEST)
 			{
 				$frmItem->AddVar("valuemapid", $valuemapid);
 				$map_name = S_AS_IS;
@@ -1256,15 +1271,25 @@
 			$frmItem->AddVar("trapper_hosts",$trapper_hosts);
 		}
 
-		$cmbApps = new CListBox("applications[]",$applications,6);
-		$cmbApps->AddItem(0,"-".S_NONE."-");
-                $db_applications = DBselect("select distinct applicationid,name from applications".
-                        " where hostid=".$_REQUEST["hostid"]." order by name");
-                while($db_app = DBfetch($db_applications))
-                {
-                        $cmbApps->AddItem($db_app["applicationid"],$db_app["name"]);
-                }
-                $frmItem->AddRow(S_APPLICATIONS,$cmbApps);
+		if($type==ITEM_TYPE_HTTPTEST)
+		{
+			$app_names = get_applications_by_itemid($_REQUEST["itemid"], 'name');
+			$frmItem->AddRow(S_APPLICATIONS, new CTextBox("application_name",
+				isset($app_names[0]) ? $app_names[0] : '', 20, $limited));
+			$frmItem->AddVar("applications",$applications,6);
+		}
+		else
+		{
+			$cmbApps = new CListBox("applications[]",$applications,6);
+			$cmbApps->AddItem(0,"-".S_NONE."-");
+			$db_applications = DBselect("select distinct applicationid,name from applications".
+				" where hostid=".$_REQUEST["hostid"]." order by name");
+			while($db_app = DBfetch($db_applications))
+			{
+				$cmbApps->AddItem($db_app["applicationid"],$db_app["name"]);
+			}
+			$frmItem->AddRow(S_APPLICATIONS,$cmbApps);
+		}
 
 		$frmRow = array(new CButton("save",S_SAVE));
 		if(isset($_REQUEST["itemid"]) && !isset($limited))
