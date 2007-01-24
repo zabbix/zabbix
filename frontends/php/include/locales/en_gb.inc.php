@@ -32,6 +32,15 @@
 	"S_DELETE_SELECTED"=>			"Delete selected",
 	"S_COPY_SELECTED_TO"=>			"Copy selected to ...",
 	
+//	httpdetails.php
+	"S_DETAILS_OF_SCENARIO"=>		"Details of scenario",
+	"S_DETAILS_OF_SCENARIO_BIG"=>		"DETAILS OF SCENARIO",
+
+//	httpmon.php
+	"S_STATUS_OF_WEB_MONITORING"=>		"Status of Web monitoring",
+	"S_STATUS_OF_WEB_MONITORING_BIG"=>	"STATUS OF WEB MONITORING",
+	"S_STATE"=>				"State",
+
 //	httpconf.php
 	"S_WEB"=>				"Web",
 	"S_CONFIGURATION_OF_WEB_MONITORING"=>	"Configuration of Web monitoring",
@@ -59,6 +68,7 @@
 	"S_CANNOT_DELETE_SCENARIO"=>		"Cannot delete scenario",
 	"S_AGENT"=>				"Agent",
 	"S_VARIABLES"=>				"Variables",
+	"S_STEP"=>				"Step",
 	"S_STEPS"=>				"Steps",
 	"S_TIMEOUT"=>				"Timeout",
 	"S_POST"=>				"Post",
