@@ -152,12 +152,12 @@ include_once "include/page_header.php";
 <?php
 	if(isset($show_all_apps))
 		$link = new CLink(new CImg("images/general/opened.gif"),
-			"latest.php?close=1".
+			"?close=1".
 			url_param("groupid").url_param("hostid").url_param("applications").
 			url_param("select"));
 	else
 		$link = new CLink(new CImg("images/general/closed.gif"),
-			"latest.php?open=1".
+			"?open=1".
 			url_param("groupid").url_param("hostid").url_param("applications").
 			url_param("select"));
 
@@ -243,12 +243,12 @@ include_once "include/page_header.php";
 		{
 			if(in_array($db_app["applicationid"],$_REQUEST["applications"]) || isset($show_all_apps))
 				$link = new CLink(new CImg("images/general/opened.gif"),
-					"latest.php?close=1&applicationid=".$db_app["applicationid"].
+					"?close=1&applicationid=".$db_app["applicationid"].
 					url_param("groupid").url_param("hostid").url_param("applications").
 					url_param("select"));
 			else
 				$link = new CLink(new CImg("images/general/closed.gif"),
-					"latest.php?open=1&applicationid=".$db_app["applicationid"].
+					"?open=1&applicationid=".$db_app["applicationid"].
 					url_param("groupid").url_param("hostid").url_param("applications").
 					url_param("select"));
 
@@ -326,12 +326,12 @@ include_once "include/page_header.php";
 		{
 			if(in_array(0,$_REQUEST["applications"]) || isset($show_all_apps))
 				$link = new CLink(new CImg("images/general/opened.gif"),
-					"latest.php?close=1&applicationid=0".
+					"?close=1&applicationid=0".
 					url_param("groupid").url_param("hostid").url_param("applications").
 					url_param("select"));
 			else
 				$link = new CLink(new CImg("images/general/closed.gif"),
-					"latest.php?open=1&applicationid=0".
+					"?open=1&applicationid=0".
 					url_param("groupid").url_param("hostid").url_param("applications").
 					url_param("select"));
 

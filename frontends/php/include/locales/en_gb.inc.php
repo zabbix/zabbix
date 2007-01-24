@@ -37,6 +37,7 @@
 	"S_CONFIGURATION_OF_WEB_MONITORING"=>	"Configuration of Web monitoring",
 	"S_CONFIGURATION_OF_WEB_MONITORING_BIG"=>"CONFIGURATION OF WEB MONITORING",
 	"S_SCENARIO"=>				"Scenario",
+	"S_SCENARIOS"=>				"Scenarios",
 	"S_SCENARIOS_BIG"=>			"SCENARIOS",
 	"S_CREATE_SCENARIO"=>			"Create scenario",
 	"S_HIDE_DISABLED_SCENARIOS"=>		"Hide disabled scenarios",

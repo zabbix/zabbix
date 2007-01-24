@@ -35,6 +35,11 @@ include_once "include/page_header.php";
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
+		"applications"=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,		NULL),
+		"applicationid"=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,		NULL),
+		"close"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("1"),	NULL),
+		"open"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("1"),	NULL),
+
 		"groupid"=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,NULL),
 		"hostid"=>	array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,'isset({form})||isset({save})'),
 
@@ -83,6 +88,42 @@ include_once "include/page_header.php";
 	validate_group_with_host(PERM_READ_WRITE,array("always_select_first_host","only_current_node"));
 
 	update_profile("web.httpconf.showdisabled",$showdisabled);
+?>
+<?php
+	$_REQUEST["applications"] = get_request("applications",get_profile("web.httpconf.applications",array()),PROFILE_TYPE_ARRAY);
+
+	if(isset($_REQUEST["open"]))
+	{
+		if(!isset($_REQUEST["applicationid"]))
+		{
+			$_REQUEST["applications"] = array();
+			$show_all_apps = 1;
+		}
+		elseif(!in_array($_REQUEST["applicationid"],$_REQUEST["applications"]))
+		{
+			array_push($_REQUEST["applications"],$_REQUEST["applicationid"]);
+		}
+		
+	} elseif(isset($_REQUEST["close"]))
+	{
+		if(!isset($_REQUEST["applicationid"]))
+		{
+			$_REQUEST["applications"] = array();
+		}
+		elseif(($i=array_search($_REQUEST["applicationid"], $_REQUEST["applications"])) !== FALSE)
+		{
+			unset($_REQUEST["applications"][$i]);
+		}
+	}
+
+	/* limit opened application count */
+	while(count($_REQUEST["applications"]) > 25)
+	{
+		array_shift($_REQUEST["applications"]);
+	}
+
+
+	update_profile("web.httpconf.applications",$_REQUEST["applications"],PROFILE_TYPE_ARRAY);
 ?>
 <?php
 	if(isset($_REQUEST['del_sel_step'])&&isset($_REQUEST['sel_step'])&&is_array($_REQUEST['sel_step']))
@@ -368,25 +409,45 @@ include_once "include/page_header.php";
 		$form->SetName('scenarios');
 		$form->AddVar('hostid',$_REQUEST["hostid"]);
 
-		$show_applications = 1;
+		if(isset($show_all_apps))
+			$link = new CLink(new CImg("images/general/opened.gif"),
+				"?close=1".
+				url_param("groupid").url_param("hostid"));
+		else
+			$link = new CLink(new CImg("images/general/closed.gif"),
+				"?open=1".
+				url_param("groupid").url_param("hostid"));
 
 		$table  = new CTableInfo();
 		$table->setHeader(array(
-			array(	new CCheckBox("all_httptests",NULL,
+			array(	$link, SPACE, new CCheckBox("all_httptests",NULL,
 					"CheckAll('".$form->GetName()."','all_httptests');"),
 				S_NAME),
 			S_NUMBER_OF_STEPS,
 			S_UPDATE_INTERVAL,
 			S_STATUS));
 
+	$any_app_exist = false;
+
+	$db_applications = DBselect('select distinct h.host,h.hostid,a.* from applications a,hosts h '.
+		' where a.hostid=h.hostid and h.hostid='.$_REQUEST['hostid'].
+		' order by a.name,a.applicationid,h.host');
+	while($db_app = DBfetch($db_applications))
+	{
 		$db_httptests = DBselect('select wt.*,a.name as application,h.host,h.hostid from httptest wt '.
 			' left join applications a on wt.applicationid=a.applicationid '.
 			' left join hosts h on h.hostid=a.hostid'.
-			' where a.hostid='.$_REQUEST['hostid'].
+			' where a.applicationid='.$db_app["applicationid"].
 			($showdisabled == 0 ? " and wt.status <> 1" : "").
 			' order by h.host,wt.name');
+
+		$app_rows = array();
+		$httptest_cnt = 0;
 		while($httptest_data = DBfetch($db_httptests))
 		{
+			++$httptest_cnt;
+			if(!in_array($db_app["applicationid"],$_REQUEST["applications"]) && !isset($show_all_apps)) continue;
+
 			$name = array();
 
 			/*
@@ -418,13 +479,37 @@ include_once "include/page_header.php";
 
 			/* if($httptest_data["templateid"] > 0) $chkBox->SetEnabled(false); // for future use */
 			
-			$table->AddRow(array(
-				array($chkBox, $name),
+			array_push($app_rows, new CRow(array(
+				array(str_repeat(SPACE,4),$chkBox, $name),
 				$step_cout,
 				$httptest_data["delay"],
 				$status
-				));
+				)));
 		}
+		if($httptest_cnt > 0)
+		{
+			if(in_array($db_app["applicationid"],$_REQUEST["applications"]) || isset($show_all_apps))
+				$link = new CLink(new CImg("images/general/opened.gif"),
+					"?close=1&applicationid=".$db_app["applicationid"].
+					url_param("groupid").url_param("hostid").url_param("applications").
+					url_param("select"));
+			else
+				$link = new CLink(new CImg("images/general/closed.gif"),
+					"?open=1&applicationid=".$db_app["applicationid"].
+					url_param("groupid").url_param("hostid").url_param("applications").
+					url_param("select"));
+
+			$col = new CCol(array($link,SPACE,bold($db_app["name"]),
+				SPACE."(".$httptest_cnt.SPACE.S_SCENARIOS.")"));
+
+			$table->AddRow($col);
+
+			$any_app_exist = true;
+		
+			foreach($app_rows as $row)
+				$table->AddRow($row);
+		}
+	}
 
 		$footerButtons = array();
 		array_push($footerButtons, new CButton('group_task',S_ACTIVATE_SELECTED,
