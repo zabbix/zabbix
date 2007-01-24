@@ -120,6 +120,7 @@ include_once "include/page_header.php";
 		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED.
 			" and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid".
 			" and i.status=".ITEM_STATUS_ACTIVE.
+			" and h.hostid in (".$availiable_hosts.") ".
 			" group by h.hostid,h.host order by h.host";
 	}
 	else

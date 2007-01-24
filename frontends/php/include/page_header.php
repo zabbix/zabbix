@@ -112,6 +112,9 @@ COpt::profiling_start("page");
 				"label"			=> S_MONITORING,
 				"default_page_id"	=> 0,
 				"pages"=>array(
+					array("url"=>"httpmon.php"	,"label"=>S_WEB	,
+						"sub_pages"=>array("httpdetails.php")
+						),
 					array("url"=>"overview.php"	,"label"=>S_OVERVIEW	),
 					array("url"=>"latest.php"	,"label"=>S_LATEST_DATA	,
 						"sub_pages"=>array("history.php","chart.php")
@@ -172,7 +175,7 @@ COpt::profiling_start("page");
 						"sub_pages"=>array("sysmap.php")
 						),
 					array("url"=>"graphs.php"	,"label"=>S_GRAPHS		,
-						"sub_pages"=>array("popup_gitem.php")
+						"sub_pages"=>array("popup_gitem.php","chart3.php")
 						),
 					array("url"=>"screenconf.php"	,"label"=>S_SCREENS		,
 						"sub_pages"=>array("screenedit.php")
@@ -276,7 +279,6 @@ COpt::profiling_start("page");
 
 		if(isset($menu_url)) /* active menu */
 		{
-
 			$class = "active";
 
 			update_profile('web.menu.'.$label.'.last', $menu_url);

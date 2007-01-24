@@ -35,41 +35,41 @@ include_once "include/page_header.php";
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"applications"=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,		NULL),
-		"applicationid"=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID,		NULL),
-		"close"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("1"),	NULL),
-		"open"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("1"),	NULL),
+		"applications"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
+		"applicationid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
+		"close"=>		array(T_ZBX_INT, O_OPT,	null,	IN("1"),	null),
+		"open"=>		array(T_ZBX_INT, O_OPT,	null,	IN("1"),	null),
 
-		"groupid"=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,NULL),
+		"groupid"=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,null),
 		"hostid"=>	array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,'isset({form})||isset({save})'),
 
 		"httptestid"=>	array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,'{form}=="update"'),
-		"application"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,'isset({save})'),
-		"name"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY.KEY_PARAM(),'isset({save})'),
-		"delay"=>	array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,86400),'isset({save})'),
-		"status"=>	array(T_ZBX_INT, O_OPT,  NULL,  IN('0,1'),'isset({save})'),
-		"agent"=>	array(T_ZBX_STR, O_OPT,  NULL,	NULL,'isset({save})'),
-		"macros"=>	array(T_ZBX_STR, O_OPT,  NULL,	NULL,'isset({save})'),
-		"steps"=>	array(T_ZBX_STR, O_OPT,  NULL,	NULL,'isset({save})'),
+		"application"=>	array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,'isset({save})'),
+		"name"=>	array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY.KEY_PARAM(),'isset({save})'),
+		"delay"=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,86400),'isset({save})'),
+		"status"=>	array(T_ZBX_INT, O_OPT,  null,  IN('0,1'),'isset({save})'),
+		"agent"=>	array(T_ZBX_STR, O_OPT,  null,	null,'isset({save})'),
+		"macros"=>	array(T_ZBX_STR, O_OPT,  null,	null,'isset({save})'),
+		"steps"=>	array(T_ZBX_STR, O_OPT,  null,	null,'isset({save})'),
 		
-		"new_httpstep"=>	array(T_ZBX_STR, O_OPT,  NULL,	NULL,NULL),
+		"new_httpstep"=>	array(T_ZBX_STR, O_OPT,  null,	null,null),
 
-		"move_up"=>		array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,65534), NULL),
-		"move_down"=>		array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,65534), NULL),
+		"move_up"=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65534), null),
+		"move_down"=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65534), null),
 		
-		"sel_step"=>		array(T_ZBX_INT, O_OPT,  NULL,  BETWEEN(0,65534), NULL),
+		"sel_step"=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65534), null),
 
-		"group_httptestid"=>	array(T_ZBX_INT, O_OPT,	NULL,	DB_ID, NULL),
+		"group_httptestid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID, null),
 		
-		"showdisabled"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1"),	NULL),
+		"showdisabled"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1"),	null),
 
-		"group_task"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"del_sel_step"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
+		"group_task"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"del_sel_step"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	null,	null,	null)
 	);
 
 	$_REQUEST["showdisabled"] = get_request("showdisabled", get_profile("web.httpconf.showdisabled", 0));
@@ -420,7 +420,7 @@ include_once "include/page_header.php";
 
 		$table  = new CTableInfo();
 		$table->setHeader(array(
-			array(	$link, SPACE, new CCheckBox("all_httptests",NULL,
+			array(	$link, SPACE, new CCheckBox("all_httptests",null,
 					"CheckAll('".$form->GetName()."','all_httptests');"),
 				S_NAME),
 			S_NUMBER_OF_STEPS,
@@ -472,7 +472,7 @@ include_once "include/page_header.php";
 					httptest_status2style($httptest_data["status"])));
 	
 
-			$chkBox = new CCheckBox("group_httptestid[]",NULL,NULL,$httptest_data["httptestid"]);
+			$chkBox = new CCheckBox("group_httptestid[]",null,null,$httptest_data["httptestid"]);
 			
 			$step_cout = DBfetch(DBselect('select count(*) from httpstep where httptestid='.$httptest_data["httptestid"]));
 			$step_cout = $step_cout[0];
