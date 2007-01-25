@@ -438,7 +438,7 @@ include_once "include/page_header.php";
 			$result = 0;
 			$applications = get_request("applications",array());
 
-			$db_applications = DBselect("select applicationid, name from applications ".
+			$db_applications = DBselect("select applicationid, name, hostid from applications ".
 				"where ".DBid2nodeid("applicationid")."=".$ZBX_CURNODEID);
 
 			while($db_app = DBfetch($db_applications))

@@ -59,24 +59,35 @@ include_once "include/page_header.php";
 
 // TABLE
 	$table  = new CTableInfo();
+	$table->SetHeader(array(S_STEP, 'Lastcheck', 'Speed', 'Time', 'Response code', 'Status'));
 
 	$db_httpsteps = DBselect('select * from httpstep where httptestid='.$httptest_data['httptestid'].' order by no');
 	while($httpstep_data = DBfetch($db_httpsteps))
 	{
 		$information = array(
-			S_STEP, ': ',
-			bold($httpstep_data['name']), BR,
-			S_LAST_CHECK, ": TODO: TT || UNCNOWN", BR,// TODO!!!
-			S_STATUS, ": TODO: FAIL || OK || UNCNOWN", BR // TODO!!!
+			bold($httpstep_data['name']) 
 			);
 
-		$chart1 = $chart2 = $chart3 = new CImg('chart3.php?period=3600&from=0&name=KEY_NAME&width=150&height=25');
+		$chart1 = $chart2 = $chart3 = '123.9 KBps';
 
-		$table->AddRow(array($information, $chart1, $chart2, $chart3));
+		$table->AddRow(array($information, '10/12/07 12:30', $chart1, $chart2, $chart3, new CSpan('Failed','disabled')));
 	}
-	$table->AddRow(array(bold('CONCLUSION'), $chart1, $chart2, $chart3));
+	$table->AddRow(array(bold('CONCLUSION'), 'Unknown', $chart1, $chart2, $chart3, new CSpan('Faild on step X fom Z', 'enabled')));
 
 	$table->Show();
+
+		$chart1 = $chart2 = $chart3 = new CImg('chart3.php?period=3600&from=0&name=KEY_NAME&height=150');
+
+	echo BR;
+
+	show_table_header('History'.' "'.bold($accessible_hosts['name']).'"');
+	$form = new CTableInfo();
+
+	$form->AddRow(array(bold('Speed per seconds') , new CCol($chart1, 'center')));
+	$form->AddRow(array(bold('Response time') , new CCol($chart1,'center')));
+
+	$form->Show();
+	navigation_bar("#",$to_save_request);
 ?>
 <?php
 

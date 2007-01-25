@@ -685,7 +685,21 @@ require_once "include/items.inc.php";
 			$result = delete_application($db_app["applicationid"]);
 			if(!$result)	return	$result;
 		}
+
+		if($info = DBfetch(DBselect('select name from httptest where applicationid='.$applicationid)))
+		{
+			info("Application '".$host["host"].":".$app["name"]."' used by scenario '".$info['name']."'");
+			return false;
+		}
  
+		if($info = DBfetch(DBselect('select i.key_, i.description from items_applications ia, items i '.
+			' where i.type='.ITEM_TYPE_HTTPTEST.' and i.itemid=ia.itemid and ia.applicationid='.$applicationid)))
+		{
+			info("Application '".$host["host"].":".$app["name"]."' used by item '".
+				item_description($info['description'], $info['key_'])."'");
+			return false;
+		}
+
 		$result = DBexecute("delete from items_applications where applicationid=$applicationid");
 
 		$result = DBexecute("delete from applications where applicationid=$applicationid");
