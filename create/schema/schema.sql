@@ -29,7 +29,7 @@ FIELD		|nextcheck	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|delay		|t_integer	|'60'	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|macros		|t_blob		|''	|NOT NULL	|ZBX_SYNC
-FIELD		|agent		|t_varchar(256)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|agent		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 INDEX		|httptest_1	|httptestid
 
 TABLE|httpstep|httpstepid|ZBX_SYNC
