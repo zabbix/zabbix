@@ -101,7 +101,7 @@ int	parent=0;
 /* Number of processed requests */
 int	stats_request=0;
 
-
+int	CONFIG_ALLOW_ROOT		= 0;
 char	*CONFIG_HOSTS_ALLOWED		= NULL;
 char	*CONFIG_HOSTNAME		= NULL;
 char	*CONFIG_FILE			= NULL;
@@ -186,7 +186,7 @@ void    daemon_init(void)
 	struct passwd   *pwd;
 
 	/* running as root ?*/
-	if((getuid()==0) || (getgid()==0))
+	if( (CONFIG_ALLOW_ROOT == 0) || (getuid()==0) || (getgid()==0))
 	{
 		pwd = getpwnam("zabbix");
 		if ( pwd == NULL )
@@ -284,6 +284,7 @@ void    init_config(void)
 	{
 /*               PARAMETER      ,VAR    ,FUNC,  TYPE(0i,1s),MANDATORY,MIN,MAX
 */
+		{"AllowRoot",&CONFIG_ALLOW_ROOT,0,TYPE_INT,PARM_OPT,0,1},
 		{"Server",&CONFIG_HOSTS_ALLOWED,0,TYPE_STRING,PARM_MAND,0,0},
 		{"Hostname",&CONFIG_HOSTNAME,0,TYPE_STRING,PARM_OPT,0,0},
 		{"PidFile",&CONFIG_PID_FILE,0,TYPE_STRING,PARM_OPT,0,0},

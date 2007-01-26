@@ -1,5 +1,6 @@
 Changes for 1.1.5:
 
+ - agent can be started as root, new parameter AllowRoot (Alexei)
  - fixed error loging for active chechs of WinXX (Eugene)
  - fixed status changing for active checks (Eugene)
  - new macros {PROFILE.DEVICETYPE}, {PROFILE.NAME}, {PROFILE.OS},
