@@ -140,28 +140,28 @@ int	DBexecute(char *query)
 	return (long)mysql_affected_rows(&mysql);
 #endif
 #ifdef	HAVE_PGSQL
-	int ret = SUCCEED;
-	PGresult	*result;
+	PGresult        *result;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s",query);
 	result = PQexec(conn,query);
 
 	if( result==NULL)
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", "Result is NULL" );
-		ret = FAIL;
-	} else if( PQresultStatus(result) != PGRES_COMMAND_OK)
+		PQclear(result);
+		return FAIL;
+	}
+	if( PQresultStatus(result) != PGRES_COMMAND_OK)
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
-		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", PQresStatus(PQresultStatus(result)) );
-		ret = FAIL;
+		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s:%s",
+			PQresStatus(PQresultStatus(result)),
+			PQresultErrorMessage(result));
+			PQclear(result);
+		return FAIL;
 	}
-	
-	ret = (int)PQoidValue(result); /* return object id, for insert id processing */
-	
 	PQclear(result);
-	return ret;
+	return SUCCEED;
 #endif
 #ifdef	HAVE_ORACLE
 	int ret;
@@ -192,24 +192,18 @@ int	DBis_null(char *field)
 #ifdef  HAVE_PGSQL
 void	PG_DBfree_result(DB_RESULT result)
 {
-	int i = 0;
+	if(!result) return;
 
 	/* free old data */
 	if(result->values)
 	{
-		for(i = 0; i < result->fld_num; i++)
-		{
-			if(!result->values[i]) continue;
-			
-			free(result->values[i]);
-			result->values[i] = NULL;
-		}
 		result->fld_num = 0;
 		free(result->values);
 		result->values = NULL;
 	}
 
 	PQclear(result->pg_result);
+	free(result);
 }
 #endif
 
@@ -219,31 +213,22 @@ DB_ROW	DBfetch(DB_RESULT result)
 	return mysql_fetch_row(result);
 #endif
 #ifdef	HAVE_PGSQL
-
-	int	i;
+	int     i;
 
 	/* EOF */
-	if(!result)	return NULL;
-		
+	if(!result)     return NULL;
+
 	/* free old data */
 	if(result->values)
 	{
-		for(i = 0; i < result->fld_num; i++)
-		{
-			if(!result->values[i]) continue;
-			
-			free(result->values[i]);
-			result->values[i] = NULL;
-		}
-		result->fld_num = 0;
 		free(result->values);
 		result->values = NULL;
 	}
-	
+
 	/* EOF */
 	if(result->cursor == result->row_num) return NULL;
 
-	/* init result */	
+	/* init result */
 	result->fld_num = PQnfields(result->pg_result);
 
 	if(result->fld_num > 0)
@@ -251,13 +236,13 @@ DB_ROW	DBfetch(DB_RESULT result)
 		result->values = malloc(sizeof(char*) * result->fld_num);
 		for(i = 0; i < result->fld_num; i++)
 		{
-			 result->values[i] = strdup(PQgetvalue(result->pg_result, result->cursor, i));
+			result->values[i] = PQgetvalue(result->pg_result, result->cursor, i);
 		}
 	}
 
 	result->cursor++;
 
-	return result->values;	
+	return result->values;
 #endif
 #ifdef	HAVE_ORACLE
 	int res;
@@ -300,37 +285,31 @@ DB_RESULT DBselect(char *query)
 	return	mysql_store_result(&mysql);
 #endif
 #ifdef	HAVE_PGSQL
-	PGresult		*pg_result;
-	ZBX_PG_DB_RESULT	*result = NULL;
+	DB_RESULT result;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s",query);
+	result = malloc(sizeof(ZBX_PG_DB_RESULT));
+	result->pg_result = PQexec(conn,query);
+	result->values = NULL;
+	result->cursor = 0;
 
-	pg_result = PQexec(conn,query);
-
-	if( pg_result==NULL)
+	if(result->pg_result==NULL)
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
+		zabbix_log(LOG_LEVEL_ERR, "Query::%s",query);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", "Result is NULL" );
-		PQclear(pg_result);
 		exit( FAIL );
 	}
-	else if( PQresultStatus(pg_result) != PGRES_TUPLES_OK)
+	if( PQresultStatus(result->pg_result) != PGRES_TUPLES_OK)
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Query::%s",query);
-		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", PQresStatus(PQresultStatus(pg_result)) );
-		PQclear(pg_result);
+		zabbix_log(LOG_LEVEL_ERR, "Query::%s",query);
+		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s:%s",
+		PQresStatus(PQresultStatus(result->pg_result)),
+		PQresultErrorMessage(result->pg_result));
 		exit( FAIL );
 	}
-	else
-	{
-		result = malloc(sizeof(ZBX_PG_DB_RESULT));
-		result->pg_result	= pg_result;
-		result->row_num		= PQntuples(pg_result);
-		result->fld_num		= 0;
-		result->cursor		= 0;
-		result->values		= NULL;
-	}
-	
+
+	/* init rownum */
+	result->row_num = PQntuples(result->pg_result);
+
 	return result;
 #endif
 #ifdef	HAVE_ORACLE
@@ -1616,21 +1595,40 @@ int	DBget_queue_count(void)
 int	DBadd_alert(int actionid, int userid, int triggerid,  int mediatypeid, char *sendto, char *subject, char *message, int maxrepeats, int repeatdelay)
 {
 	int	now;
-	char	sql[MAX_STRING_LEN];
-	char	sendto_esc[MAX_STRING_LEN];
-	char	subject_esc[MAX_STRING_LEN];
-	char	message_esc[MAX_STRING_LEN];
+	char	*sql		= NULL;
+	char	*sendto_esc	= NULL;
+	char	*subject_esc	= NULL;
+	char	*message_esc	= NULL;
+
+	int	size;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_alert(triggerid[%d])",triggerid);
 
 	now = time(NULL);
+
+	size = strlen(sendto) * 3 / 2 + 1;
+	sendto_esc = zbx_malloc(size);
+	DBescape_string(sendto	, sendto_esc	, size);
+
+	size = strlen(subject) * 3 / 2 + 1;
+	subject_esc = zbx_malloc(size);
+	DBescape_string(subject	, subject_esc	, size);
+
+	size = strlen(message) * 3 / 2 + 1;
+	message_esc = zbx_malloc(size);
+	DBescape_string(message	, message_esc	, size);
+
 /* Does not work on PostgreSQL */
 /*	snprintf(sql,sizeof(sql)-1,"insert into alerts (alertid,actionid,clock,mediatypeid,sendto,subject,message,status,retries) values (NULL,%d,%d,%d,'%s','%s','%s',0,0)",actionid,now,mediatypeid,sendto,subject,message);*/
-	DBescape_string(sendto,sendto_esc,MAX_STRING_LEN);
-	DBescape_string(subject,subject_esc,MAX_STRING_LEN);
-	DBescape_string(message,message_esc,MAX_STRING_LEN);
-	snprintf(sql,sizeof(sql)-1,"insert into alerts (actionid,triggerid,userid,clock,mediatypeid,sendto,subject,message,status,retries,maxrepeats,delay) values (%d,%d,%d,%d,%d,'%s','%s','%s',0,0,%d,%d)",actionid,triggerid,userid,now,mediatypeid,sendto_esc,subject_esc,message_esc, maxrepeats, repeatdelay);
+	sql = zbx_dsprintf("insert into alerts (actionid,triggerid,userid,clock,mediatypeid,sendto,subject,message,status,retries,maxrepeats,delay) values (%d,%d,%d,%d,%d,'%s','%s','%s',0,0,%d,%d)",actionid,triggerid,userid,now,mediatypeid,sendto_esc,subject_esc,message_esc, maxrepeats, repeatdelay);
+
+	zbx_free(sendto_esc);
+	zbx_free(subject_esc);
+	zbx_free(message_esc);
+	
 	DBexecute(sql);
+	
+	zbx_free(sql);
 
 	return SUCCEED;
 }
@@ -1700,7 +1698,6 @@ void    DBescape_string(char *from, char *to, int maxlen)
 {
 	int     i,ptr;
 
-	assert(from);
 	assert(to);
 
 	maxlen--;

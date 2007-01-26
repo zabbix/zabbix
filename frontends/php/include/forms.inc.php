@@ -1087,7 +1087,7 @@
 
 		$uid=NULL;
 
-		$frmAction = new CFormTable(S_ACTION,'actionconf.php');
+		$frmAction = new CFormTable(S_ACTION,'actionconf.php','post');
 		$frmAction->SetHelp('web.actions.action.php');
 
 		$conditions = get_request("conditions",array());

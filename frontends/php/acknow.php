@@ -53,6 +53,14 @@
 <?php
 
 	$alarm = get_alarm_by_alarmid($_REQUEST["alarmid"]);
+	
+	if(!check_right("Trigger comment","A",$alarm["triggerid"]))
+	{
+		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
+		show_page_footer();
+		exit;
+	}
+	
 	$trigger=get_trigger_by_triggerid($alarm["triggerid"]);
 	$expression=explode_exp($trigger["expression"],1);
 	$description=expand_trigger_description($alarm["triggerid"]);

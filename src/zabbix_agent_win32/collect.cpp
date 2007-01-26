@@ -63,6 +63,8 @@ void CollectorThread(void *)
    PDH_STATISTICS statData;
    char counterPath[MAX_COUNTER_PATH * 2 + 50];
 
+   int	started = 0;
+
    PDH_HCOUNTER 
 		cntCpuUsage[MAX_CPU+1], 
 		cntCpuQueue=NULL;
@@ -102,9 +104,6 @@ LOG_DEBUG_INFO("s", "CollectorThread start");
 
    sprintf(counterPath,"\\%s(_Total)\\%s",GetCounterName(PCI_PROCESSOR),GetCounterName(PCI_PROCESSOR_TIME));
 
-LOG_DEBUG_INFO("s","counterPath1");
-LOG_DEBUG_INFO("s",counterPath);
-
    if ((status=PdhAddCounter(query,counterPath, 0, &cntCpuUsage[0]))!=ERROR_SUCCESS)
    {
       WriteLog(MSG_PDH_ADD_COUNTER_FAILED,EVENTLOG_ERROR_TYPE,"ss",
@@ -115,9 +114,6 @@ LOG_DEBUG_INFO("s",counterPath);
    for(i=0;i<sysInfo.dwNumberOfProcessors;i++)
    {
       sprintf(counterPath,"\\%s(%d)\\%s", GetCounterName(PCI_PROCESSOR), i, GetCounterName(PCI_PROCESSOR_TIME));
-
-LOG_DEBUG_INFO("s","counterPath2");
-LOG_DEBUG_INFO("s",counterPath);
 
       if ((status=PdhAddCounter(query,counterPath,0,&cntCpuUsage[i+1]))!=ERROR_SUCCESS)
       {
@@ -141,9 +137,6 @@ LOG_DEBUG_INFO("s",counterPath);
 
    sprintf((char *) &counterPath, "\\%s\\%s", GetCounterName(PCI_SYSTEM), GetCounterName(PCI_PROCESSOR_QUEUE_LENGTH));
 
-LOG_DEBUG_INFO("s","counterPath3");
-LOG_DEBUG_INFO("s",counterPath);
-
    // Prepare for CPU execution queue usage collection
    if ((status=PdhAddCounter(query,(char *) &counterPath,0,&cntCpuQueue))!=ERROR_SUCCESS)
    {
@@ -159,9 +152,6 @@ LOG_DEBUG_INFO("s",counterPath);
    for(cptr=userCounterList;cptr!=NULL;cptr=cptr->next)
    {
 
-LOG_DEBUG_INFO("s","counterPath4");
-LOG_DEBUG_INFO("s",counterPath);
-
       if ((status=PdhAddCounter(query,cptr->counterPath,0,&cptr->handle))!=ERROR_SUCCESS)
       {
          cptr->interval=-1;   // Flag for unsupported counters
@@ -172,9 +162,6 @@ LOG_DEBUG_INFO("s",counterPath);
    }
 
    // Data collection loop
-   WriteLog(MSG_COLLECTOR_INIT_OK,EVENTLOG_INFORMATION_TYPE,NULL);
-   SetEvent(eventCollectorStarted);
-
    do
    {
       LONG sum;
@@ -296,6 +283,13 @@ INIT_CHECK_MEMORY(do);
       // Calculate sleeping time. We will sleep not less than 500 milliseconds even
       // if processing takes more than 500 milliseconds
       dwSleepTime=(dwTicksElapsed>500) ? 500 : (1000-dwTicksElapsed);
+
+      if(!started)
+      {
+		WriteLog(MSG_COLLECTOR_INIT_OK,EVENTLOG_INFORMATION_TYPE,NULL);
+		SetEvent(eventCollectorStarted);
+		started = 1;
+      }
 
 CHECK_MEMORY(do, "CollectorThread","end do");
    } while(WaitForSingleObject(eventShutdown,dwSleepTime)==WAIT_TIMEOUT);

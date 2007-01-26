@@ -255,7 +255,7 @@ pid_t	child_trapper_make(int i,int listenfd, int addrlen)
 {
 	pid_t	pid;
 
-	if((pid = fork()) >0)
+	if((pid = zbx_fork()) >0)
 	{
 		return (pid);
 	}

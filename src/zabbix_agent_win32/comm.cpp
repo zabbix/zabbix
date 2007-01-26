@@ -201,7 +201,14 @@ void ListenerThread(void *)
 	// Fill in local address structure
 	memset(&servAddr,0,sizeof(struct sockaddr_in));
 	servAddr.sin_family			= AF_INET;
-	servAddr.sin_addr.s_addr	= htonl(INADDR_ANY);
+	if(CONFIG_LISTEN_IP == NULL)
+	{
+		servAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	}
+	else
+	{
+		servAddr.sin_addr.s_addr = inet_addr(CONFIG_LISTEN_IP);
+	}
 	servAddr.sin_port			= htons(confListenPort);
 
 	// Bind socket

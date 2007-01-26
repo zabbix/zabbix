@@ -567,6 +567,7 @@ int	evaluate(int *result,char *exp, char *error, int maxerrlen)
 #define MVAR_IPADDRESS			"{IPADDRESS}"
 #define MVAR_TIME			"{TIME}"
 #define MVAR_TRIGGER_COMMENT		"{TRIGGER.COMMENT}"
+#define MVAR_ITEM_NAME			"{ITEM.NAME}"
 #define MVAR_TRIGGER_ID			"{TRIGGER.ID}"
 #define MVAR_TRIGGER_KEY		"{TRIGGER.KEY}"
 #define MVAR_TRIGGER_NAME		"{TRIGGER.NAME}"
@@ -575,7 +576,19 @@ int	evaluate(int *result,char *exp, char *error, int maxerrlen)
 #define MVAR_TRIGGER_STATUS_OLD		"{STATUS}"
 #define MVAR_TRIGGER_URL		"{TRIGGER.URL}"
 
-#define STR_UNKNOWN_VARIAVLE		"*UNKNOWN*"
+#define MVAR_PROFILE_DEVICETYPE		"{PROFILE.DEVICETYPE}"
+#define MVAR_PROFILE_NAME		"{PROFILE.NAME}"
+#define MVAR_PROFILE_OS			"{PROFILE.OS}"
+#define MVAR_PROFILE_SERIALNO		"{PROFILE.SERIALNO}"
+#define MVAR_PROFILE_TAG		"{PROFILE.TAG}"
+#define MVAR_PROFILE_MACADDRESS		"{PROFILE.MACADDRESS}"
+#define MVAR_PROFILE_HARDWARE		"{PROFILE.HARDWARE}"
+#define MVAR_PROFILE_SOFTWARE		"{PROFILE.SOFTWARE}"
+#define MVAR_PROFILE_CONTACT		"{PROFILE.CONTACT}"
+#define MVAR_PROFILE_LOCATION		"{PROFILE.LOCATION}"
+#define MVAR_PROFILE_NOTES		"{PROFILE.NOTES}"
+
+#define STR_UNKNOWN_VARIABLE		"*UNKNOWN*"
 
 void	substitute_simple_macros(int alarmid, DB_TRIGGER *trigger, DB_ACTION *action, char *data, int dala_max_len, int macro_type)
 {
@@ -584,10 +597,12 @@ void	substitute_simple_macros(int alarmid, DB_TRIGGER *trigger, DB_ACTION *actio
 	char
 		*pl = NULL,
 		*pr = NULL,
-		str_out[MAX_STRING_LEN],
-		replace_to[MAX_STRING_LEN];
+		*str_out = NULL,
+		*replace_to = NULL;
 	int	
+		replace_to_len,
 		outlen,
+		outfill,
 		var_len;
 
 	time_t  now;
@@ -598,17 +613,22 @@ void	substitute_simple_macros(int alarmid, DB_TRIGGER *trigger, DB_ACTION *actio
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_simple_macros [%s]",data);
 
-	*str_out = '\0';
-	outlen = sizeof(str_out) - 1;
+	replace_to_len	= strlen(data);
+	replace_to	= zbx_malloc(replace_to_len);
+	
+	outfill	= 0;
+	outlen	= strlen(data) * 3 / 2 + 1;
+	str_out	= zbx_malloc(outlen + 1);
+	*str_out= '\0';
+	
 	pl = data;
-	while((pr = strchr(pl, '{')) && outlen > 0)
+	while((pr = strchr(pl, '{')) && outfill < outlen)
 	{
 		pr[0] = '\0';
-		zbx_strlcat(str_out, pl, outlen);
-		outlen -= MIN(strlen(pl), outlen);
+		outfill = zbx_strlcat(str_out, pl, outlen);
 		pr[0] = '{';
 
-		snprintf(replace_to, sizeof(replace_to), "{");
+		snprintf(replace_to, replace_to_len, "{");
 		var_len = 1;
 
 		if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
@@ -616,8 +636,283 @@ void	substitute_simple_macros(int alarmid, DB_TRIGGER *trigger, DB_ACTION *actio
 		{
 			var_len = strlen(MVAR_TRIGGER_NAME);
 
-			snprintf(replace_to, sizeof(replace_to), "%s", trigger->description);
-			substitute_simple_macros(alarmid, trigger, action, replace_to, sizeof(replace_to), MACRO_TYPE_TRIGGER_DESCRIPTION);
+			snprintf(replace_to, replace_to_len, "%s", trigger->description);
+			substitute_simple_macros(alarmid, trigger, action, replace_to, replace_to_len, MACRO_TYPE_TRIGGER_DESCRIPTION);
+		}
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
+			strncmp(pr, MVAR_PROFILE_DEVICETYPE, strlen(MVAR_PROFILE_DEVICETYPE)) == 0)
+		{
+			var_len = strlen(MVAR_PROFILE_DEVICETYPE);
+
+			snprintf(sql,sizeof(sql)-1,"select distinct p.devicetype from triggers t, functions f,items i, hosts h, hosts_profiles p"
+				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
+				trigger->triggerid);
+
+			result = DBselect(sql);
+			row = DBfetch(result);
+
+			if(!row || DBis_null(row[0])==SUCCEED)
+			{
+				zabbix_log( LOG_LEVEL_ERR, "No PROFILE.DEVECETYPE in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+				zabbix_syslog("No PROFILE.DEVECETYPE in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+
+				snprintf(replace_to, replace_to_len, "%s", STR_UNKNOWN_VARIABLE);
+			}
+			else
+			{
+				snprintf(replace_to, replace_to_len, "%s", row[0]);
+			}
+			DBfree_result(result);
+		}
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
+			strncmp(pr, MVAR_PROFILE_NAME, strlen(MVAR_PROFILE_NAME)) == 0)
+		{
+			var_len = strlen(MVAR_PROFILE_NAME);
+
+			snprintf(sql,sizeof(sql)-1,"select distinct p.name from triggers t, functions f,items i, hosts h, hosts_profiles p"
+				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
+				trigger->triggerid);
+
+			result = DBselect(sql);
+			row = DBfetch(result);
+
+			if(!row || DBis_null(row[0])==SUCCEED)
+			{
+				zabbix_log( LOG_LEVEL_ERR, "No PROFILE.NAME in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+				zabbix_syslog("No PROFILE.NAME in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+
+				snprintf(replace_to, replace_to_len, "%s", STR_UNKNOWN_VARIABLE);
+			}
+			else
+			{
+				snprintf(replace_to, replace_to_len, "%s", row[0]);
+			}
+			DBfree_result(result);
+		}
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
+			strncmp(pr, MVAR_PROFILE_OS, strlen(MVAR_PROFILE_OS)) == 0)
+		{
+			var_len = strlen(MVAR_PROFILE_OS);
+
+			snprintf(sql,sizeof(sql)-1,"select distinct p.os from triggers t, functions f,items i, hosts h, hosts_profiles p"
+				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
+				trigger->triggerid);
+
+			result = DBselect(sql);
+			row = DBfetch(result);
+
+			if(!row || DBis_null(row[0])==SUCCEED)
+			{
+				zabbix_log( LOG_LEVEL_ERR, "No PROFILE.OS in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+				zabbix_syslog("No PROFILE.OS in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+
+				snprintf(replace_to, replace_to_len, "%s", STR_UNKNOWN_VARIABLE);
+			}
+			else
+			{
+				snprintf(replace_to, replace_to_len, "%s", row[0]);
+			}
+			DBfree_result(result);
+		}
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
+			strncmp(pr, MVAR_PROFILE_SERIALNO, strlen(MVAR_PROFILE_SERIALNO)) == 0)
+		{
+			var_len = strlen(MVAR_PROFILE_SERIALNO);
+
+			snprintf(sql,sizeof(sql)-1,"select distinct p.serialno from triggers t, functions f,items i, hosts h, hosts_profiles p"
+				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
+				trigger->triggerid);
+
+			result = DBselect(sql);
+			row = DBfetch(result);
+
+			if(!row || DBis_null(row[0])==SUCCEED)
+			{
+				zabbix_log( LOG_LEVEL_ERR, "No PROFILE.SERIALNO in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+				zabbix_syslog("No PROFILE.SERIALNO in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+
+				snprintf(replace_to, replace_to_len, "%s", STR_UNKNOWN_VARIABLE);
+			}
+			else
+			{
+				snprintf(replace_to, replace_to_len, "%s", row[0]);
+			}
+			DBfree_result(result);
+		}
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
+			strncmp(pr, MVAR_PROFILE_TAG, strlen(MVAR_PROFILE_TAG)) == 0)
+		{
+			var_len = strlen(MVAR_PROFILE_TAG);
+
+			snprintf(sql,sizeof(sql)-1,"select distinct p.tag from triggers t, functions f,items i, hosts h, hosts_profiles p"
+				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
+				trigger->triggerid);
+
+			result = DBselect(sql);
+			row = DBfetch(result);
+
+			if(!row || DBis_null(row[0])==SUCCEED)
+			{
+				zabbix_log( LOG_LEVEL_ERR, "No PROFILE.TAG in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+				zabbix_syslog("No PROFILE.TAG in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+
+				snprintf(replace_to, replace_to_len, "%s", STR_UNKNOWN_VARIABLE);
+			}
+			else
+			{
+				snprintf(replace_to, replace_to_len, "%s", row[0]);
+			}
+			DBfree_result(result);
+		}
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
+			strncmp(pr, MVAR_PROFILE_MACADDRESS, strlen(MVAR_PROFILE_MACADDRESS)) == 0)
+		{
+			var_len = strlen(MVAR_PROFILE_MACADDRESS);
+
+			snprintf(sql,sizeof(sql)-1,"select distinct p.macaddress from triggers t, functions f,items i, hosts h, hosts_profiles p"
+				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
+				trigger->triggerid);
+
+			result = DBselect(sql);
+			row = DBfetch(result);
+
+			if(!row || DBis_null(row[0])==SUCCEED)
+			{
+				zabbix_log( LOG_LEVEL_ERR, "No PROFILE.MACADDRESS in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+				zabbix_syslog("No PROFILE.MACADDRESS in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+
+				snprintf(replace_to, replace_to_len, "%s", STR_UNKNOWN_VARIABLE);
+			}
+			else
+			{
+				snprintf(replace_to, replace_to_len, "%s", row[0]);
+			}
+			DBfree_result(result);
+		}
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
+			strncmp(pr, MVAR_PROFILE_HARDWARE, strlen(MVAR_PROFILE_HARDWARE)) == 0)
+		{
+			var_len = strlen(MVAR_PROFILE_HARDWARE);
+
+			snprintf(sql,sizeof(sql)-1,"select distinct p.hardware from triggers t, functions f,items i, hosts h, hosts_profiles p"
+				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
+				trigger->triggerid);
+
+			result = DBselect(sql);
+			row = DBfetch(result);
+
+			if(!row || DBis_null(row[0])==SUCCEED)
+			{
+				zabbix_log( LOG_LEVEL_ERR, "No PROFILE.HARDWARE in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+				zabbix_syslog("No PROFILE.HARDWARE in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+
+				snprintf(replace_to, replace_to_len, "%s", STR_UNKNOWN_VARIABLE);
+			}
+			else
+			{
+				snprintf(replace_to, replace_to_len, "%s", row[0]);
+			}
+			DBfree_result(result);
+		}
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
+			strncmp(pr, MVAR_PROFILE_SOFTWARE, strlen(MVAR_PROFILE_SOFTWARE)) == 0)
+		{
+			var_len = strlen(MVAR_PROFILE_SOFTWARE);
+
+			snprintf(sql,sizeof(sql)-1,"select distinct p.software from triggers t, functions f,items i, hosts h, hosts_profiles p"
+				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
+				trigger->triggerid);
+
+			result = DBselect(sql);
+			row = DBfetch(result);
+
+			if(!row || DBis_null(row[0])==SUCCEED)
+			{
+				zabbix_log( LOG_LEVEL_ERR, "No PROFILE.SOFTWARE in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+				zabbix_syslog("No PROFILE.SOFTWARE in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+
+				snprintf(replace_to, replace_to_len, "%s", STR_UNKNOWN_VARIABLE);
+			}
+			else
+			{
+				snprintf(replace_to, replace_to_len, "%s", row[0]);
+			}
+			DBfree_result(result);
+		}
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
+			strncmp(pr, MVAR_PROFILE_CONTACT, strlen(MVAR_PROFILE_CONTACT)) == 0)
+		{
+			var_len = strlen(MVAR_PROFILE_CONTACT);
+
+			snprintf(sql,sizeof(sql)-1,"select distinct p.contact from triggers t, functions f,items i, hosts h, hosts_profiles p"
+				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
+				trigger->triggerid);
+
+			result = DBselect(sql);
+			row = DBfetch(result);
+
+			if(!row || DBis_null(row[0])==SUCCEED)
+			{
+				zabbix_log( LOG_LEVEL_ERR, "No PROFILE.CONTACT in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+				zabbix_syslog("No PROFILE.CONTACT in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+
+				snprintf(replace_to, replace_to_len, "%s", STR_UNKNOWN_VARIABLE);
+			}
+			else
+			{
+				snprintf(replace_to, replace_to_len, "%s", row[0]);
+			}
+			DBfree_result(result);
+		}
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
+			strncmp(pr, MVAR_PROFILE_LOCATION, strlen(MVAR_PROFILE_LOCATION)) == 0)
+		{
+			var_len = strlen(MVAR_PROFILE_LOCATION);
+
+			snprintf(sql,sizeof(sql)-1,"select distinct p.location from triggers t, functions f,items i, hosts h, hosts_profiles p"
+				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
+				trigger->triggerid);
+
+			result = DBselect(sql);
+			row = DBfetch(result);
+
+			if(!row || DBis_null(row[0])==SUCCEED)
+			{
+				zabbix_log( LOG_LEVEL_ERR, "No PROFILE.LOCATION in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+				zabbix_syslog("No PROFILE.LOCATION in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+
+				snprintf(replace_to, replace_to_len, "%s", STR_UNKNOWN_VARIABLE);
+			}
+			else
+			{
+				snprintf(replace_to, replace_to_len, "%s", row[0]);
+			}
+			DBfree_result(result);
+		}
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
+			strncmp(pr, MVAR_PROFILE_NOTES, strlen(MVAR_PROFILE_NOTES)) == 0)
+		{
+			var_len = strlen(MVAR_PROFILE_NOTES);
+
+			snprintf(sql,sizeof(sql)-1,"select distinct p.notes from triggers t, functions f,items i, hosts h, hosts_profiles p"
+				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
+				trigger->triggerid);
+
+			result = DBselect(sql);
+			row = DBfetch(result);
+
+			if(!row || DBis_null(row[0])==SUCCEED)
+			{
+				zabbix_log( LOG_LEVEL_ERR, "No PROFILE.NOTES in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+				zabbix_syslog("No PROFILE.NOTES in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+
+				snprintf(replace_to, replace_to_len, "%s", STR_UNKNOWN_VARIABLE);
+			}
+			else
+			{
+				snprintf(replace_to, replace_to_len, "%s", row[0]);
+			}
+			DBfree_result(result);
 		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY | MACRO_TYPE_TRIGGER_DESCRIPTION) &&
 			strncmp(pr, MVAR_HOST_NAME, strlen(MVAR_HOST_NAME)) == 0)
@@ -636,12 +931,38 @@ void	substitute_simple_macros(int alarmid, DB_TRIGGER *trigger, DB_ACTION *actio
 				zabbix_log( LOG_LEVEL_ERR, "No hostname in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
 				zabbix_syslog("No hostname in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
 
-				snprintf(replace_to, sizeof(replace_to), "%s", STR_UNKNOWN_VARIAVLE);
+				snprintf(replace_to, replace_to_len, "%s", STR_UNKNOWN_VARIABLE);
 			}
 			else
 			{
-				snprintf(replace_to, sizeof(replace_to), "%s", row[0]);
+				snprintf(replace_to, replace_to_len, "%s", row[0]);
 			}
+			DBfree_result(result);
+		}
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
+			strncmp(pr, MVAR_ITEM_NAME, strlen(MVAR_ITEM_NAME)) == 0)
+		{
+			var_len = strlen(MVAR_ITEM_NAME);
+
+			snprintf(sql,sizeof(sql)-1,"select distinct i.description from triggers t, functions f,items i, hosts h"
+				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid"
+				" order by i.description", trigger->triggerid);
+
+			result = DBselect(sql);
+			row=DBfetch(result);
+
+			if(!row || DBis_null(row[0])==SUCCEED)
+			{
+				zabbix_log( LOG_LEVEL_ERR, "No ITEM_NAME in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+				zabbix_syslog("No ITEM_NAME in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
+				/* remove variable */
+				*replace_to = '\0';
+			}
+			else
+			{
+				snprintf(replace_to, replace_to_len, "%s", row[0]);
+			}
+
 			DBfree_result(result);
 		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
@@ -665,7 +986,7 @@ void	substitute_simple_macros(int alarmid, DB_TRIGGER *trigger, DB_ACTION *actio
 			}
 			else
 			{
-				snprintf(replace_to, sizeof(replace_to), "%s", row[0]);
+				snprintf(replace_to, replace_to_len, "%s", row[0]);
 			}
 
 			DBfree_result(result);
@@ -687,11 +1008,11 @@ void	substitute_simple_macros(int alarmid, DB_TRIGGER *trigger, DB_ACTION *actio
 				zabbix_log( LOG_LEVEL_ERR, "No hostname in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
 				zabbix_syslog("No hostname in substitute_simple_macros. Triggerid [%d]", trigger->triggerid);
 
-				snprintf(replace_to, sizeof(replace_to), "%s", STR_UNKNOWN_VARIAVLE);
+				snprintf(replace_to, replace_to_len, "%s", STR_UNKNOWN_VARIABLE);
 			}
 			else
 			{
-				snprintf(replace_to, sizeof(replace_to), "%s", row[0]);
+				snprintf(replace_to, replace_to_len, "%s", row[0]);
 			}
 			DBfree_result(result);
 		}
@@ -702,7 +1023,7 @@ void	substitute_simple_macros(int alarmid, DB_TRIGGER *trigger, DB_ACTION *actio
 
 			now	= time(NULL);
 			tm	= localtime(&now);
-			snprintf(replace_to, sizeof(replace_to)-1, "%.4d.%.2d.%.2d", tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday);
+			snprintf(replace_to, replace_to_len-1, "%.4d.%.2d.%.2d", tm->tm_year+1900, tm->tm_mon+1, tm->tm_mday);
 		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY)&&
 			strncmp(pr, MVAR_TIME, strlen(MVAR_TIME)) == 0)
@@ -711,7 +1032,7 @@ void	substitute_simple_macros(int alarmid, DB_TRIGGER *trigger, DB_ACTION *actio
 
 			now	= time(NULL);
 			tm	= localtime(&now);
-			snprintf(replace_to, sizeof(replace_to), "%.2d:%.2d:%.2d",tm->tm_hour,tm->tm_min,tm->tm_sec);
+			snprintf(replace_to, replace_to_len, "%.2d:%.2d:%.2d",tm->tm_hour,tm->tm_min,tm->tm_sec);
 
 		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
@@ -721,9 +1042,9 @@ void	substitute_simple_macros(int alarmid, DB_TRIGGER *trigger, DB_ACTION *actio
 			var_len = strlen(MVAR_TRIGGER_STATUS);
 
 			if(trigger->value == TRIGGER_VALUE_TRUE)
-				snprintf(replace_to, sizeof(replace_to), "OFF");
+				snprintf(replace_to, replace_to_len, "OFF");
 			else
-				snprintf(replace_to, sizeof(replace_to), "ON");
+				snprintf(replace_to, replace_to_len, "ON");
 		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) && 
 			strncmp(pr, MVAR_TRIGGER_STATUS_OLD, strlen(MVAR_TRIGGER_STATUS_OLD)) == 0)
@@ -732,9 +1053,9 @@ void	substitute_simple_macros(int alarmid, DB_TRIGGER *trigger, DB_ACTION *actio
 			var_len = strlen(MVAR_TRIGGER_STATUS_OLD);
 
 			if(trigger->value == TRIGGER_VALUE_TRUE)
-				snprintf(replace_to, sizeof(replace_to), "OFF");
+				snprintf(replace_to, replace_to_len, "OFF");
 			else
-				snprintf(replace_to, sizeof(replace_to), "ON");
+				snprintf(replace_to, replace_to_len, "ON");
 		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) && 
 			strncmp(pr, MVAR_TRIGGER_ID, strlen(MVAR_TRIGGER_ID)) == 0)
@@ -742,7 +1063,7 @@ void	substitute_simple_macros(int alarmid, DB_TRIGGER *trigger, DB_ACTION *actio
 			/* NOTE: if you make changes for this bloc, don't forgot MVAR_TRIGGER_STATUS block */
 			var_len = strlen(MVAR_TRIGGER_ID);
 
-			snprintf(replace_to, sizeof(replace_to), "%d", trigger->triggerid);
+			snprintf(replace_to, replace_to_len, "%d", trigger->triggerid);
 		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) && 
 			strncmp(pr, MVAR_TRIGGER_URL, strlen(MVAR_TRIGGER_URL)) == 0)
@@ -750,7 +1071,7 @@ void	substitute_simple_macros(int alarmid, DB_TRIGGER *trigger, DB_ACTION *actio
 			/* NOTE: if you make changes for this bloc, don't forgot MVAR_TRIGGER_STATUS block */
 			var_len = strlen(MVAR_TRIGGER_URL);
 
-			snprintf(replace_to, sizeof(replace_to), "%s", trigger->url);
+			snprintf(replace_to, replace_to_len, "%s", trigger->url);
 		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) && 
 			strncmp(pr, MVAR_TRIGGER_COMMENT, strlen(MVAR_TRIGGER_COMMENT)) == 0)
@@ -758,7 +1079,7 @@ void	substitute_simple_macros(int alarmid, DB_TRIGGER *trigger, DB_ACTION *actio
 			/* NOTE: if you make changes for this bloc, don't forgot MVAR_TRIGGER_STATUS block */
 			var_len = strlen(MVAR_TRIGGER_COMMENT);
 
-			snprintf(replace_to, sizeof(replace_to), "%s", trigger->comments);
+			snprintf(replace_to, replace_to_len, "%s", trigger->comments);
 		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) && 
 			strncmp(pr, MVAR_EVENT_ID, strlen(MVAR_EVENT_ID)) == 0)
@@ -766,30 +1087,31 @@ void	substitute_simple_macros(int alarmid, DB_TRIGGER *trigger, DB_ACTION *actio
 			/* NOTE: if you make changes for this bloc, don't forgot MVAR_TRIGGER_STATUS block */
 			var_len = strlen(MVAR_EVENT_ID);
 
-			snprintf(replace_to, sizeof(replace_to), "%d", alarmid);
+			snprintf(replace_to, replace_to_len, "%d", alarmid);
 		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) && 
 			strncmp(pr, MVAR_TRIGGER_SEVERITY, strlen(MVAR_TRIGGER_SEVERITY)) == 0)
 		{
 			var_len = strlen(MVAR_TRIGGER_SEVERITY);
 
-			if(trigger->priority == 0)	snprintf(replace_to, sizeof(replace_to), "Not classified");
-                        else if(trigger->priority == 1)	snprintf(replace_to, sizeof(replace_to), "Information");
-                        else if(trigger->priority == 2)	snprintf(replace_to, sizeof(replace_to), "Warning");
-                        else if(trigger->priority == 3)	snprintf(replace_to, sizeof(replace_to), "Average");
-                        else if(trigger->priority == 4)	snprintf(replace_to, sizeof(replace_to), "High");
-                        else if(trigger->priority == 5)	snprintf(replace_to, sizeof(replace_to), "Disaster");
-                        else				snprintf(replace_to, sizeof(replace_to), "Unknown");
+			if(trigger->priority == 0)	snprintf(replace_to, replace_to_len, "Not classified");
+                        else if(trigger->priority == 1)	snprintf(replace_to, replace_to_len, "Information");
+                        else if(trigger->priority == 2)	snprintf(replace_to, replace_to_len, "Warning");
+                        else if(trigger->priority == 3)	snprintf(replace_to, replace_to_len, "Average");
+                        else if(trigger->priority == 4)	snprintf(replace_to, replace_to_len, "High");
+                        else if(trigger->priority == 5)	snprintf(replace_to, replace_to_len, "Disaster");
+                        else				snprintf(replace_to, replace_to_len, "Unknown");
 		}
 
-		zbx_strlcat(str_out, replace_to, outlen);
-		outlen -= MIN(strlen(replace_to), outlen);
+		outfill = zbx_strlcat(str_out, replace_to, outlen);
 		pl = pr + var_len;
 	}
-	zbx_strlcat(str_out, pl, outlen);
-	outlen -= MIN(strlen(pl), outlen);
+	outfill = zbx_strlcat(str_out, pl, outlen);
 
 	snprintf(data, dala_max_len, "%s", str_out);
+
+	zbx_free(str_out);
+	zbx_free(replace_to);
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Result expression [%s]", data );
 }
@@ -815,8 +1137,8 @@ void	substitute_simple_macros(int alarmid, DB_TRIGGER *trigger, DB_ACTION *actio
 void	substitute_macros(int alarmid, DB_TRIGGER *trigger, DB_ACTION *action, char *data, int dala_max_len)
 {
 	char	
-		str_out[MAX_STRING_LEN],
-		replace_to[MAX_STRING_LEN],
+		*str_out = NULL,
+		*replace_to = NULL,
 		*pl = NULL,
 		*pr = NULL,
 		*pms = NULL,
@@ -829,18 +1151,25 @@ void	substitute_macros(int alarmid, DB_TRIGGER *trigger, DB_ACTION *action, char
 		parameter[MAX_STRING_LEN];
 
 	int
+		replace_to_len,
 		outlen,
+		outfill,
 		var_len;
 
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_macros([%s])",data);
-
+	
 	substitute_simple_macros(alarmid, trigger, action, data, dala_max_len, MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY);
 
-	*str_out = '\0';
-	outlen = sizeof(str_out) - 1;
+	replace_to_len	= strlen(data);
+	replace_to	= zbx_malloc(replace_to_len);
+	
+	outfill	= 0;
+	outlen	= strlen(data) * 3 / 2 + 1;
+	str_out	= zbx_malloc(outlen + 1);
+	*str_out= '\0';
+	
 	pl = data;
-	while((pr = strchr(pl, '{')) && outlen > 0)
+	while((pr = strchr(pl, '{')) && outfill < outlen)
 	{
 		if((pme = strchr(pr, '}')) == NULL)
 			break;
@@ -851,13 +1180,12 @@ void	substitute_macros(int alarmid, DB_TRIGGER *trigger, DB_ACTION *action, char
 
 		/* copy left side */
 		pr[0] = '\0';
-		zbx_strlcat(str_out, pl, outlen);
-		outlen -= MIN(strlen(pl), outlen);
+		outfill = zbx_strlcat(str_out, pl, outlen);
 		pr[0] = '{';
 
 
 		/* copy original name of variable */
-		snprintf(replace_to, sizeof(replace_to), "%s}", pr);	/* in format used '}' */
+		snprintf(replace_to, replace_to_len, "%s}", pr);	/* in format used '}' */
 									/* cose in 'pr' string symbol '}' is changed to '\0' by 'pme'*/
 		var_len = strlen(replace_to);
 		
@@ -889,7 +1217,7 @@ void	substitute_macros(int alarmid, DB_TRIGGER *trigger, DB_ACTION *action, char
 						pms = p + 1;
 						
 						if(evaluate_FUNCTION2(replace_to,host,key,function,parameter) != SUCCEED)
-							snprintf(replace_to, sizeof(replace_to), "%s", STR_UNKNOWN_VARIAVLE);
+							snprintf(replace_to, replace_to_len, "%s", STR_UNKNOWN_VARIABLE);
 					}
 				}
 			}
@@ -897,14 +1225,15 @@ void	substitute_macros(int alarmid, DB_TRIGGER *trigger, DB_ACTION *action, char
 		}
 		pme[0] = '}';
 
-		zbx_strlcat(str_out, replace_to, outlen);
-		outlen -= MIN(strlen(replace_to), outlen);
+		outfill = zbx_strlcat(str_out, replace_to, outlen);
 		pl = pr + var_len;
 	}
-	zbx_strlcat(str_out, pl, outlen);
-	outlen -= MIN(strlen(pl), outlen);
+	outfill = zbx_strlcat(str_out, pl, outlen);
 
 	snprintf(data, dala_max_len, "%s", str_out);
+
+	zbx_free(str_out);
+	zbx_free(replace_to);
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Result expression:%s", data );
 }

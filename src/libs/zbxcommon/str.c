@@ -1,5 +1,6 @@
 #include "common.h"
 
+#include <stdarg.h>
 #include <sys/types.h>
 #include <string.h>
 #include <stdlib.h>
@@ -504,4 +505,42 @@ void	lrtrim_spaces(char *c)
 {
 	ltrim_spaces(c);
 	rtrim_spaces(c);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dsprintf                                                     *
+ *                                                                            *
+ * Purpose: dinamical formatted output conversion                             *
+ *                                                                            *
+ * Return value: formated string                                              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:  required free allocated string with function 'zbx_free'         *
+ *                                                                            *
+ ******************************************************************************/
+char* zbx_dsprintf(char *f, ...)
+{
+	va_list args;
+	char	*string = NULL;
+	int 	n, size = MAX_STRING_LEN >> 1;
+
+	while(1) {
+		string = zbx_malloc(size);
+
+		va_start(args, f);
+		n = vsnprintf(string, size, f, args);
+		va_end(args);
+
+		if(n >= 0 && n < size)
+			break;
+		
+		if(n >= size)	size = n + 3;
+		else		size = size * 3 / 2 + 1;
+
+		zbx_free(string);
+	}
+
+	return string;
 }

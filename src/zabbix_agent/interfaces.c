@@ -117,8 +117,7 @@ void	init_stats_interfaces()
 	{
 		if( (s=strstr(line,":")) == NULL)
 			continue;
-		zbx_strlcpy(interface,line,s-line);
-		interface[s-line]=0;
+		zbx_strlcpy(interface,line,s-line+1);
 		j1=0;
 		for(j=0;j<(int)strlen(interface);j++)
 		{
@@ -356,8 +355,7 @@ void	collect_stats_interfaces(FILE *outfile)
 	{
 		if( (s=strstr(line,":")) == NULL)
 			continue;
-		zbx_strlcpy(interface,line,s-line);
-		interface[s-line]=0;
+		zbx_strlcpy(interface,line,s-line+1);
 		j1=0;
 		for(i1=0;i1<(int)strlen(interface);i1++)
 		{

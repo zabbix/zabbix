@@ -147,7 +147,7 @@
 	// Check if at least one host with read permission exists for this group
 			$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg".
 				" where h.hostid=i.hostid and hg.groupid=".$row["groupid"].
-				" and hg.hostid=h.hostid and h.status=".HOST_STATUS_MONITORED.
+				" and hg.hostid=h.hostid".
 				" group by h.hostid,h.host order by h.host");
 			while($row2=DBfetch($result2))
 			{
@@ -169,13 +169,13 @@
 		{
 			$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg".
 				" where h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"].
-				" and hg.hostid=h.hostid"." and h.status=".HOST_STATUS_MONITORED.
+				" and hg.hostid=h.hostid".
 				" group by h.hostid,h.host order by h.host";
 		}
 		else
 		{
 			$sql="select h.hostid,h.host from hosts h,items i where h.hostid=i.hostid".
-				" and h.status=".HOST_STATUS_MONITORED." group by h.hostid,h.host".
+				" group by h.hostid,h.host".
 				" order by h.host";
 		}
 
@@ -190,7 +190,7 @@
 			if($_REQUEST["hostid"] == $row["hostid"]) $host_ok = 1;
 		}
 		$form->AddItem($cmbHosts);
-		if(!$host_ok && $_REQUEST["hostid"]!=0)
+		if(!$host_ok && $_REQUEST["groupid"] > 0)
 			$_REQUEST["hostid"] = $first_host;
 
 		show_header2(S_GRAPHS_BIG, $form);
@@ -242,8 +242,8 @@
 				if($real_host)
 				{
 					$name = array(
-						new CLink($real_host["host"],"graphs.php?".
-							"hostid=".$real_host["hostid"],
+						new CLink($real_host["host"],"graphs.php?groupid=0".
+							"&hostid=".$real_host["hostid"],
 							'action'),
 						":",
 						$row["name"]

@@ -22,8 +22,8 @@
 
 #include "sysinc.h"
 
-#define	ZABBIX_REVDATE	"14 November 2006"
-#define	ZABBIX_VERSION	"1.1.4"
+#define	ZABBIX_REVDATE	"26 January 2007"
+#define	ZABBIX_VERSION	"1.1.5"
 
 #if defined(WIN32)
 #	pragma warning (disable: 4100)
@@ -307,6 +307,7 @@
 				    
 /* Secure string copy */
 #define strscpy(x,y) { strncpy(x,y,sizeof(x)); x[sizeof(x)-1]=0; }
+#define strnscpy(x,y,n) { strncpy(x,y,n); x[n-1]=0; }
 
 /* list structure as item of agent return vaile */					 
 #define ZBX_LIST_ITEM struct zbx_list_item_s
@@ -458,5 +459,12 @@ char    *zbx_regexp_match(const char *string, const char *pattern, int *len);
 int	cmp_double(double a,double b);
 
 int       SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+
+int	zbx_fork();
+
+char* zbx_dsprintf(char *f, ...);
+	
+void	*zbx_malloc(size_t size);
+#define zbx_free(ptr) { if(ptr){ free(ptr); ptr = NULL; } }
 
 #endif

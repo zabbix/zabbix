@@ -18,29 +18,23 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
-
+function SDI($msg="SDI") { echo "DEBUG INFO: "; var_export($msg); echo BR; } // DEBUG INFO!!!
 
 ?>
 <?php
+	include_once("include/defines.inc.php");
+
 	include_once("include/copt.lib.php");
 
 // GLOBALS
+	global $USER_DETAILS, $USER_RIGHTS, $ERROR_MSG, $INFO_MSG;
+
 	$USER_DETAILS	= array();
 	$USER_RIGHTS	= array();
 	$ERROR_MSG	= array();
 	$INFO_MSG	= array();
 // END OF GLOBALS
 
-// if magic quotes on then get rid of them
-	if (get_magic_quotes_gpc()) {
-		$_GET    = zbx_stripslashes($_GET);
-		$_POST	 = zbx_stripslashes($_POST);
-		$_COOKIE = zbx_stripslashes($_COOKIE);
-		$_REQUEST= zbx_stripslashes($_REQUEST);
-	}
-
-	include_once 	"include/defines.inc.php";
 	include_once 	"include/db.inc.php";
 	include_once 	"include/html.inc.php";
 	include_once 	"include/locales.inc.php";
@@ -686,7 +680,7 @@ function SDI($msg="SDI") { echo "DEBUG INFO: $msg ".BR; } // DEBUG INFO!!!
 // 		if (eregi('^\{([0-9a-zA-Z[.-.]\_\.]+)\:([]\[0-9a-zA-Z\_\/\.\,]+)\.((diff)|(min)|(max)|(last)|(prev))\(([0-9\.]+)\)\}$', $expression, $arr)) 
 //		if (eregi('^\{([0-9a-zA-Z[.-.]\_\.]+)\:([]\[0-9a-zA-Z\_\/\.\,]+)\.((diff)|(min)|(max)|(last)|(prev)|(str))\(([0-9a-zA-Z\.\_\/\,]+)\)\}$', $expression, $arr)) 
 // 		if (eregi('^\{([0-9a-zA-Z\_\.-]+)\:([]\[0-9a-zA-Z\_\*\/\.\,\:\(\) -]+)\.([a-z]{3,11})\(([#0-9a-zA-Z\_\/\.\,]+)\)\}$', $expression, $arr)) 
-		if (eregi('^\{([0-9a-zA-Z\_\.-]+)\:([]\[0-9a-zA-Z\_\*\/\.\,\:\(\)\+ -]+)\.([a-z]{3,11})\(([#0-9a-zA-Z\_\/\.\,[:space:]]+)\)\}$', $expression, $arr))
+		if (eregi('^\{([0-9a-zA-Z\_\.-\$]+)\:([]\[0-9a-zA-Z\_\*\/\.\,\:\(\)\+\$ -]+)\.([a-z]{3,11})\(([#0-9a-zA-Z\_\/\.\,[:space:]]+)\)\}$', $expression, $arr))
 		{
 			$host=$arr[1];
 			$key=$arr[2];
@@ -997,9 +991,10 @@ COpt::profiling_start("page");
 <table class="menu" cellspacing=0 cellpadding=5>
 <tr>
 <?php
-	$i=0;
+	$i=-1;
 	foreach($menu as $label=>$sub)
 	{
+		$i++;
 // Check permissions
 		if($label=="configuration")
 		{
@@ -1023,6 +1018,11 @@ COpt::profiling_start("page");
 			}
 
 		}
+		if($label!='login' && !check_anyright("Default permission","R"))
+		{
+			continue;
+		}
+		
 // End of check permissions
 		$active=0;
 		foreach($sub["pages"] as $label2)
@@ -1053,9 +1053,7 @@ COpt::profiling_start("page");
 		{
 			$class = "horizontal_menu_n";
 		}
-
 		echo "<td class=\"$class\" height=24 colspan=9><b><a href=\"$url\" class=\"highlight\">".$sub["label"]."</a></b></td>\n";
-		$i++;
 	}
 ?>
 </tr>
@@ -1070,9 +1068,9 @@ COpt::profiling_start("page");
 // Check permissions
 		if(($sub["url"]=="latest.php")&&!check_anyright("Host","R"))							continue;
 		if(($sub["url"]=="overview.php")&&!check_anyright("Host","R"))							continue;
-		if(($sub["url"]=="tr_status.php?onlytrue=true&noactions=true&compact=true")&&!check_anyright("Host","R"))	continue;
+		if(($sub["url"]=="tr_status.php")&&!check_anyright("Host","R"))							continue;
 		if(($sub["url"]=="queue.php")&&!check_anyright("Host","R"))							continue;
-		if(($sub["url"]=="events.php")&&!check_anyright("Default permission","R"))				continue;
+		if(($sub["url"]=="events.php")&&!check_anyright("Default permission","R"))					continue;
 		if(($sub["url"]=="actions.php")&&!check_anyright("Default permission","R"))					continue;
 		if(($sub["url"]=="maps.php")&&!check_anyright("Network map","R"))						continue;
 		if(($sub["url"]=="charts.php")&&!check_anyright("Graph","R"))							continue;
@@ -1080,6 +1078,8 @@ COpt::profiling_start("page");
 		if(($sub["url"]=="srv_status.php")&&!check_anyright("Service","R"))						continue;
 		if(($sub["url"]=="report1.php")&&!check_anyright("Default permission","R"))					continue;
 		if(($sub["url"]=="report2.php")&&!check_anyright("Host","R"))							continue;
+		if(($sub["url"]=="report4.php")&&!check_anyright("User","R"))							continue;
+		if(($sub["url"]=="report5.php")&&!check_anyright("Host","R"))							continue;
 		if(($sub["url"]=="config.php")&&!check_anyright("Configuration of Zabbix","U"))					continue;
 		if(($sub["url"]=="users.php")&&!check_anyright("User","U"))							continue;
 		if(($sub["url"]=="media.php")&&!check_anyright("User","U"))							continue;
@@ -1094,6 +1094,7 @@ COpt::profiling_start("page");
 		if(($sub["url"]=="screenedit.php")&&!check_anyright("Screen","U"))						continue;
 		if(($sub["url"]=="screenconf.php")&&!check_anyright("Screen","U"))						continue;
 		if(($sub["url"]=="services.php")&&!check_anyright("Service","U"))						continue;
+		if(($sub["url"]=="hostprofiles.php")&&!check_anyright("Host","R"))						continue;
 
 		echo "<a href=\"".$sub["url"]."\" class=\"highlight\">".$sub["label"]."</a><span class=\"divider\">".SPACE.SPACE."|".SPACE."</span>\n";
 	}

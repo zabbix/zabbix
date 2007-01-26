@@ -280,7 +280,7 @@
 	"S_COMPARE"=>				"Compare",
 
 //	Footer
-	"S_ZABBIX_VER"=>			"ZABBIX 1.1.4",
+	"S_ZABBIX_VER"=>			"ZABBIX 1.1.5",
 	"S_COPYRIGHT_BY"=>			"Copyright 2001-2006 by ",
 	"S_CONNECTED_AS"=>			"Connected as",
 	"S_SIA_ZABBIX"=>			"SIA Zabbix",
@@ -397,6 +397,7 @@
 	"S_NO_HOSTS_DEFINED"=>			"No hosts defined",
 	"S_HOSTS_BIG"=>				"HOSTS",
 	"S_HOST"=>				"Host",
+	"S_HOST_BIG"=>				"HOST",
 	"S_IP"=>				"IP",
 	"S_PORT"=>				"Port",
 	"S_MONITORED"=>				"Monitored",
@@ -534,6 +535,8 @@
 	"S_LOG_TIME_FORMAT"=>			"Log time format",
 	"S_CREATE_ITEM"=>			"Create Item",
 	"S_ADD_ITEM"=>				"Add Item",
+	"S_SHOW_DISABLED_ITEMS"=>               "Show disabled items",
+	"S_HIDE_DISABLED_ITEMS"=>               "Hide disabled items",
 
 //	events.php
 	"S_LATEST_EVENTS"=>			"Latest events",
@@ -855,6 +858,8 @@
 	"S_DEPENDS_ON"=>			"Depends on",
 	"S_URL"=>				"URL",
 	"S_CREATE_TRIGGER"=>			"Create Trigger",
+	"S_SHOW_DISABLED_TRIGGERS"=>		"Show disabled triggers",
+	"S_HIDE_DISABLED_TRIGGERS"=>		"Hide disabled triggers",
 
 //	tr_comments.php
 	"S_TRIGGER_COMMENTS"=>			"Trigger comments",
@@ -1005,6 +1010,7 @@
 	"S_GENERAL"=>				"General",
 	"S_AUDIT"=>				"Audit",
 	"S_LOGIN"=>				"Login",
+	"S_LOGOUT"=>				"Logout",
 	"S_LATEST_DATA"=>			"Latest data",
 
 //	Errors

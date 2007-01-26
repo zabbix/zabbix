@@ -276,16 +276,24 @@ int	get_active_checks(char *server, int port, char *error, int max_error_len)
 
 	struct sockaddr_in servaddr_in;
 
+	unsigned int addr;
+
 LOG_FUNC_CALL("In get_active_checks()");
 //	zabbix_log( LOG_LEVEL_DEBUG, "get_active_checks: host[%s] port[%d]", server, port);
 
 	servaddr_in.sin_family=AF_INET;
-	hp=gethostbyname(server);
+
+	if(NULL == (hp = gethostbyname(server)))
+	{
+		addr = inet_addr(server);
+		hp = gethostbyaddr((char *)&addr, 4, AF_INET);
+	}
 
 	if(hp==NULL)
 	{
 //		zabbix_log( LOG_LEVEL_WARNING, "gethostbyname() failed [%s]", hstrerror(h_errno));
 //		_snprintf(error, max_error_len,"gethostbyname() failed [%s]", hstrerror(h_errno));
+		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","Incorrect server for active checks.");
 		return	NETWORK_ERROR;
 	}
 
@@ -364,9 +372,9 @@ LOG_FUNC_CALL("In get_active_checks()");
 		{
 			amount_read += len;
 		}
-		if(len == -1)
+		if(len == SOCKET_ERROR)
 		{
-			switch (errno)
+			switch (WSAGetLastError())
 			{
 				case 	WSAETIMEDOUT:
 //						zabbix_log( LOG_LEVEL_WARNING, "Timeout while receiving data from [%s:%d]",server,port);
@@ -381,8 +389,9 @@ LOG_FUNC_CALL("In get_active_checks()");
 						return	NETWORK_ERROR;
 				default:
 //						zabbix_log( LOG_LEVEL_WARNING, "Error while receiving data from [%s:%d] [%s]",server,port,strerror(errno));
-						_snprintf(error, max_error_len,"Error while receiving data from [%s:%d] [%s]",server,port,strerror(errno));
+						_snprintf(error, max_error_len,"Error while receiving data from [%s:%d]",server,port);
 						WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",error);
+						WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"e",WSAGetLastError());
 			} 
 			closesocket(s);
 			return	FAIL;
@@ -439,6 +448,7 @@ int	send_value(char *server,int port,char *host, char *key,char *value,char *las
 	struct sockaddr_in myaddr_in;
 	struct sockaddr_in servaddr_in;
 	int	i, ret = SUCCEED;
+	unsigned int addr;
 
 LOG_FUNC_CALL("In send_value()");
 INIT_CHECK_MEMORY(main);
@@ -451,12 +461,16 @@ INIT_CHECK_MEMORY(main);
 
 
 	servaddr_in.sin_family=AF_INET;
-	hp=gethostbyname(server);
+
+	if(NULL == (hp = gethostbyname(server)))
+	{
+		addr = inet_addr(server);
+		hp = gethostbyaddr((char *)&addr, 4, AF_INET);
+	}
 
 	if(hp==NULL)
 	{
-		sprintf(tmp,"gethostbyname() failed");
-		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s",tmp);
+		WriteLog(MSG_ACTIVE_CHECKS,EVENTLOG_ERROR_TYPE,"s","Incorrect server for active checks.");
 		ret = FAIL;
 		goto lbl_End;
 	}
@@ -723,8 +737,9 @@ INIT_CHECK_MEMORY(main);
 INIT_CHECK_MEMORY(for);
 		if(process_active_checks(confServer, confServerPort) == FAIL)
 		{
-			Sleep(60*1000);
 LOG_DEBUG_INFO("s","ActiveChecksThread - sleep 60000 (!!!)");
+			Sleep(60*1000);
+LOG_DEBUG_INFO("s","ActiveChecksThread - continue");
 			continue;
 		}
 

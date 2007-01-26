@@ -44,7 +44,7 @@
 		}
 		function SetUrl($value)
 		{
-			$this->options['href'] = $value;
+			$this->options['href'] = htmlspecialchars($value);
 		}
 		function SetTarget($value=NULL)
 		{

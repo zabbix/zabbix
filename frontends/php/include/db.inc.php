@@ -26,7 +26,7 @@
 //	$DB_TYPE	="POSTGRESQL";
 	$DB_TYPE	="MYSQL";
 	$DB_SERVER	="localhost";
-	$DB_DATABASE	="demo";
+	$DB_DATABASE	="zabbix";
 	$DB_USER	="root";
 	$DB_PASSWORD	="";
 // END OF DATABASE CONFIGURATION
@@ -105,7 +105,10 @@ COpt::savesqlrequest($query);
 			{
 				$query .= ' limit '.intval($limit);
 			}
-			$result=pg_exec($DB,$query);
+			if(!($result=pg_exec($DB,$query)))
+			{
+				echo "Error in query [$query] [".pg_errormessage()."]";
+			}
 			return $result;
 		}
 		if($DB_TYPE == "ORACLE")
@@ -152,7 +155,10 @@ COpt::savesqlrequest($query);
 		}
 		if($DB_TYPE == "POSTGRESQL")
 		{
-			$result=pg_exec($DB,$query);
+			if(!($result=pg_exec($DB,$query)))
+			{
+				echo "Error in query [$query] [".pg_errormessage()."]";
+			}
 		}
 		if($DB_TYPE == "ORACLE")
 		{

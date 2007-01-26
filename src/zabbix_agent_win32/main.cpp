@@ -36,6 +36,7 @@ char confFile[MAX_PATH]="C:\\zabbix_agentd.conf";
 char logFile[MAX_PATH]="{EventLog}";
 char confHostname[MAX_PATH]="0.0.0.0";
 char confServer[MAX_PATH]="0.0.0.0";
+char* CONFIG_LISTEN_IP = NULL;
 
 WORD confListenPort=10050; // Alexei: New defailt port 10000 -> 10050
 WORD confServerPort=10051;
@@ -190,12 +191,8 @@ static void	FreeSubagentList(void)
 
 BOOL Initialize(void)
 {
-   WSAData sockInfo;
    int i;
    char counterPath[MAX_COUNTER_PATH * 2 + 50];
-
-   // Initialize Windows Sockets API
-   WSAStartup(0x0002,&sockInfo);
 
    // Dynamically import functions that may not be presented in all Windows versions
    ImportSymbols();
@@ -289,6 +286,7 @@ void Main(void)
 
 int main(int argc,char *argv[])
 {
+	WSAData sockInfo;
 	int ret = 0;
 
 INIT_CHECK_MEMORY(main);
@@ -298,6 +296,10 @@ INIT_CHECK_MEMORY(main);
       ret = 1;
 	  goto lbl_End;
    }
+
+   // 
+   // Initialize Windows Sockets API
+   WSAStartup(0x0002,&sockInfo);
 
    if (!ReadConfig())
    {
