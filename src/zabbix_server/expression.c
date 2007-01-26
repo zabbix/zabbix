@@ -611,8 +611,6 @@ void	substitute_simple_macros(int alarmid, DB_TRIGGER *trigger, DB_ACTION *actio
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	DB_PROFILE	profile;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_simple_macros [%s]",data);
 
 	replace_to_len	= strlen(data);
