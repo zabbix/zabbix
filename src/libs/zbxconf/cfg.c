@@ -27,7 +27,7 @@ int	CONFIG_ZABBIX_FORKS		= 5;
 
 
 char	*CONFIG_LOG_FILE		= NULL;
-char	CONFIG_ALLOW_ROOT_PERMISSION	= 0;
+char	CONFIG_ALLOW_ROOT		= 0;
 int	CONFIG_TIMEOUT			= AGENT_TIMEOUT;
 
 /******************************************************************************
