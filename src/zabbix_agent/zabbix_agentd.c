@@ -425,7 +425,7 @@ int	main(int argc, char **argv)
 			break;
 	}
 
-	START_MAIN_ZABBIX_ENTRY(CONFIG_ALLOW_ROOT_PERMISSION);
+	START_MAIN_ZABBIX_ENTRY(CONFIG_ALLOW_ROOT);
 
 	exit(SUCCEED);
 }

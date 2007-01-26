@@ -38,7 +38,7 @@ extern int	CONFIG_ZABBIX_FORKS;
 extern char	*CONFIG_FILE;
 
 extern char	*CONFIG_LOG_FILE;
-extern char	CONFIG_ALLOW_ROOT_PERMISSION;
+extern char	CONFIG_ALLOW_ROOT;
 extern int	CONFIG_TIMEOUT;
 
 struct cfg_line

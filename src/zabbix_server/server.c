@@ -456,7 +456,7 @@ int main(int argc, char **argv)
 	return 0;
 #endif /* TEST */
 	
-	return daemon_start(CONFIG_ALLOW_ROOT_PERMISSION);
+	return daemon_start(CONFIG_ALLOW_ROOT);
 }
 
 int MAIN_ZABBIX_ENTRY(void)

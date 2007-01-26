@@ -70,6 +70,7 @@ Integrated from 1.1.x
 
 1.1.5
 
+ - agent can be started as root, new parameter AllowRoot (Alexei)
  - new macros {PROFILE.DEVICETYPE}, {PROFILE.NAME}, {PROFILE.OS},
    {PROFILE.SERIALNO}, {PROFILE.TAG}, {PROFILE.MACADDRESS},
    {PROFILE.HARDWARE}, {PROFILE.SOFTWARE}, {PROFILE.CONTACT},
