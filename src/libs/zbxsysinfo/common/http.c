@@ -279,7 +279,7 @@ int main()
 {
 	char buffer[100*1024];
 
-	get_http_page("www.zabbix.com", "", 80, buffer, 100*1024);
+	get_http_page("localhost", "", 80, buffer, 100*1024);
 
 	printf("Back [%d] [%s]\n", strlen(buffer), buffer);
 }

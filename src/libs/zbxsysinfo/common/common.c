@@ -40,9 +40,9 @@ ZBX_METRIC	parameters_common[]=
 	{"vfs.file.regexp",	CF_USEUPARAM,	VFS_FILE_REGEXP,	0,	"/etc/passwd,root"},
 	{"vfs.file.regmatch",	CF_USEUPARAM,	VFS_FILE_REGMATCH, 	0,	"/etc/passwd,root"},
 	{"system.run",		CF_USEUPARAM,	RUN_COMMAND,	 	0,	"echo test"},
-	{"web.page.get",	CF_USEUPARAM,	WEB_PAGE_GET,	 	0,	"www.zabbix.com,,80"},
-	{"web.page.perf",	CF_USEUPARAM,	WEB_PAGE_PERF,	 	0,	"www.zabbix.com,,80"},
-	{"web.page.regexp",	CF_USEUPARAM,	WEB_PAGE_REGEXP,	0,	"www.zabbix.com,,80"},
+	{"web.page.get",	CF_USEUPARAM,	WEB_PAGE_GET,	 	0,	"localhost,,80"},
+	{"web.page.perf",	CF_USEUPARAM,	WEB_PAGE_PERF,	 	0,	"localhost,,80"},
+	{"web.page.regexp",	CF_USEUPARAM,	WEB_PAGE_REGEXP,	0,	"localhost,,80"},
 	{0}
 	};
 
@@ -1362,14 +1362,14 @@ zabbix_log(LOG_LEVEL_WARNING, "RUN_COMMAND cmd = '%s'",cmd);
 	
 	zabbix_log(LOG_LEVEL_DEBUG, "RUN_COMMAND to be started as NOWAIT",flag);
 	
-	pid = fork(); /* run new thread 1 */
+	pid = zbx_fork(); /* run new thread 1 */
 	switch(pid)
 	{
 	case -1:
 		zabbix_log(LOG_LEVEL_WARNING, "fork failed for '%s'",command);
 		return SYSINFO_RET_FAIL;
 	case 0:
-		pid = fork(); /* run new tread 2 to replace by command */
+		pid = zbx_fork(); /* run new tread 2 to replace by command */
 		switch(pid)
 		{
 		case -1:

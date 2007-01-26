@@ -27,46 +27,75 @@ int     OLD_CPU(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	return	get_stat(cmd, flags, result);
 }
 
-static int get_cpu_data(unsigned long long *idle,
-                        unsigned long long *system,
-                        unsigned long long *user,
-                        unsigned long long *iowait)
+static int get_cpu_data(
+	const char* cpuname,
+	unsigned long long *idle,
+	unsigned long long *system,
+	unsigned long long *user,
+	unsigned long long *iowait)
 {
-    kstat_ctl_t	*kc;
-    kstat_t	*k;
-    cpu_stat_t	*cpu;
-       	
-    int cpu_count = 0;
-    
-    *idle = 0LL;
-    *system = 0LL;
-    *user = 0LL;
-    *iowait = 0LL;
+	kstat_ctl_t	*kc;
+	kstat_t		*k;
+	cpu_stat_t	*cpu;
 
-    kc = kstat_open();
-    if (kc)
-    {
-    	k = kc->kc_chain;
-	while (k)
+	static int			first_run = 1;
+	static unsigned long long	old_cpu[CPU_STATES];
+	unsigned long long		new_cpu[CPU_STATES];
+
+	char ks_name[MAX_STRING_LEN];
+
+	int cpu_count = 0, i;
+
+	assert(cpuname);
+	assert(idle);
+	assert(system);
+	assert(user);
+	assert(iowait);
+
+	if(first_run)    for(i = 0; i < CPU_STATES; old_cpu[i++] = 0LL);
+
+	for(i = 0; i < CPU_STATES; new_cpu[i++] = 0LL);
+
+        snprintf(ks_name, sizeof(ks_name), "cpu_stat%s", cpuname);
+
+	kc = kstat_open();
+	if (kc)
 	{
-	    if ((strncmp(k->ks_name, "cpu_stat", 8) == 0)
-		&& (kstat_read(kc, k, NULL) != -1)
-	    )
-	    {
-		cpu = (cpu_stat_t *) k->ks_data;
+		k = kc->kc_chain;
+		while (k)
+		{
+			if ((strncmp(k->ks_name, ks_name, strlen(ks_name)) == 0)
+				&& (kstat_read(kc, k, NULL) != -1)
+				)
+			{
+				cpu = (cpu_stat_t *) k->ks_data;
 
-		*idle	+=  cpu->cpu_sysinfo.cpu[CPU_IDLE];
-		*system +=  cpu->cpu_sysinfo.cpu[CPU_KERNEL];
-		*iowait +=  cpu->cpu_sysinfo.cpu[CPU_WAIT];
-		*user	+=  cpu->cpu_sysinfo.cpu[CPU_USER];
+				for(i = 0; i < CPU_STATES; i++)
+					new_cpu[i] += cpu->cpu_sysinfo.cpu[i];
 
-		cpu_count += 1;
-  	    }
-	    k = k->ks_next;
-        }
-	kstat_close(kc);
-    }
-    return cpu_count;
+				cpu_count += 1;
+			}
+			k = k->ks_next;
+		}
+		kstat_close(kc);
+	}
+    
+	if(first_run)
+	{
+		*idle = *system = *iowait = *user = 0LL;
+		first_run = 0;
+	}
+	else
+	{
+		*idle	=  new_cpu[CPU_IDLE]	- old_cpu[CPU_IDLE];
+		*system =  new_cpu[CPU_KERNEL]	- old_cpu[CPU_KERNEL];
+		*iowait =  new_cpu[CPU_WAIT]	- old_cpu[CPU_WAIT];
+		*user	=  new_cpu[CPU_USER]	- old_cpu[CPU_USER];
+	}
+	
+	for(i = 0; i < CPU_STATES; i++)	old_cpu[i] = new_cpu[i];
+	
+	return cpu_count;
 }
 
 #define CPU_I 0
@@ -100,11 +129,12 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	/* default parameter */
         sprintf(cpuname, "all");
     }
-    if(strncmp(cpuname, "all", MAX_STRING_LEN))
+
+    if(0 == strncmp(cpuname, "all", MAX_STRING_LEN))
     {
-	return SYSINFO_RET_FAIL;
+	    cpuname[0] = '\0';
     }
-	
+    
     if(get_param(param, 2, mode, MAX_STRING_LEN) != 0)
     {
 	mode[0] = '\0';
@@ -137,16 +167,19 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	return SYSINFO_RET_FAIL;
     }
     
-    if (get_cpu_data(&cpu_val[CPU_I], &cpu_val[CPU_K], &cpu_val[CPU_U], &cpu_val[CPU_W]))
+    if (get_cpu_data(cpuname,&cpu_val[CPU_I], &cpu_val[CPU_K], &cpu_val[CPU_U], &cpu_val[CPU_W]))
     {
         interval_size =	cpu_val[CPU_I] + cpu_val[CPU_K] + cpu_val[CPU_U] + cpu_val[CPU_W];
         
 	if (interval_size > 0)
 	{
 		SET_DBL_RESULT(result, (cpu_val[info_id] * 100.0)/interval_size);
-
-            ret = SYSINFO_RET_OK;
         }
+	else
+	{
+		SET_DBL_RESULT(result, 0);
+	}
+    ret = SYSINFO_RET_OK;
     }
     return ret;
 }

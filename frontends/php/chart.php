@@ -22,6 +22,13 @@
 	include "include/config.inc.php";
 	include "include/classes/graph.inc.php";
 
+	check_authorisation();
+
+	if(!check_right("Item","R",$_REQUEST["itemid"]))
+	{
+		exit;
+	}
+	
 	$graph=new Graph();
 	if(isset($_REQUEST["period"]))
 	{

@@ -88,3 +88,32 @@ int	comms_parse_response(char *xml,char *host,char *key, char *data, char *lastl
 
 	return ret;
 }
+
+int	zbx_fork()
+{
+	fflush(stdout);
+	fflush(stderr);
+	return fork();
+}
+
+void	*zbx_malloc(size_t size)
+{
+	int max_attempts;
+	void *ptr = NULL;
+
+	assert(size);
+
+	for(	max_attempts = 10;
+		max_attempts > 0 && !ptr;
+		ptr = malloc(size),
+		max_attempts--
+	);
+
+	if(ptr)	return ptr;
+
+	zabbix_log(LOG_LEVEL_CRIT,"out of memory. requested '%i' bytes.", size);
+	exit(FAIL);
+
+	 /* Program will never reach this point. */
+	return ptr;
+}

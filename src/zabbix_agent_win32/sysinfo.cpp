@@ -21,7 +21,8 @@
 **/
 
 #include "zabbixw32.h"
-
+#include <sys/types.h>
+#include <sys/stat.h>
 
 //
 // Externals
@@ -595,11 +596,11 @@ static LONG H_DiskInfo(char *cmd,char *arg,double *value)
 static LONG H_ServiceState(char *cmd,char *arg,double *value)
 {
    SC_HANDLE mgr,service;
-   char displayName[MAX_PATH];
+   char name[MAX_PATH];
    unsigned long maxLenDisplayName = MAX_PATH;
    char serviceName[MAX_PATH];
 
-   GetParameterInstance(cmd,displayName,MAX_PATH-1);
+   GetParameterInstance(cmd,name,MAX_PATH-1);
 
    mgr=OpenSCManager(NULL,NULL,GENERIC_READ);
    if (mgr==NULL)
@@ -607,42 +608,42 @@ static LONG H_ServiceState(char *cmd,char *arg,double *value)
       *value=255;    // Unable to retrieve information
       return SYSINFO_RC_SUCCESS;
    }
-   if(0 == GetServiceKeyName(mgr, displayName, serviceName, &maxLenDisplayName))
+
+   service = OpenService(mgr,name,SERVICE_QUERY_STATUS);
+
+   if(service == NULL && 0 != GetServiceKeyName(mgr, name, serviceName, &maxLenDisplayName))
    {
-	   *value=SYSINFO_RC_NOTSUPPORTED;
+	   service = OpenService(mgr,serviceName,SERVICE_QUERY_STATUS);
+   }
+
+   if (service==NULL)
+   {
+      *value=SYSINFO_RC_NOTSUPPORTED;
    }
    else
    {
-	   service=OpenService(mgr,serviceName,SERVICE_QUERY_STATUS);
-	   if (service==NULL)
-	   {
-	      *value=SYSINFO_RC_NOTSUPPORTED;
-	   }
-	   else
-	   {
-	      SERVICE_STATUS status;
+      SERVICE_STATUS status;
 
-	      if (QueryServiceStatus(service,&status))
-	      {
-		 int i;
-		 static DWORD states[7]={ SERVICE_RUNNING,SERVICE_PAUSED,SERVICE_START_PENDING,
-					  SERVICE_PAUSE_PENDING,SERVICE_CONTINUE_PENDING,
-					  SERVICE_STOP_PENDING,SERVICE_STOPPED };
+      if (QueryServiceStatus(service,&status))
+      {
+	 int i;
+	 static DWORD states[7]={ SERVICE_RUNNING,SERVICE_PAUSED,SERVICE_START_PENDING,
+				  SERVICE_PAUSE_PENDING,SERVICE_CONTINUE_PENDING,
+				  SERVICE_STOP_PENDING,SERVICE_STOPPED };
 
-		 for(i=0;i<7;i++)
-		    if (status.dwCurrentState==states[i])
-		       break;
-		 *value=(double)i;
-	      }
-	      else
-	      {
-		 *value=255;    // Unable to retrieve information
-	      }
+	 for(i=0;i<7;i++)
+	    if (status.dwCurrentState==states[i])
+	       break;
+	 *value=(double)i;
+      }
+      else
+      {
+	 *value=255;    // Unable to retrieve information
+      }
 
-	      CloseServiceHandle(service);
-	   }
+      CloseServiceHandle(service);
    }
-
+   
    CloseServiceHandle(mgr);
    return SYSINFO_RC_SUCCESS;
 }
@@ -654,56 +655,89 @@ static LONG H_ServiceState(char *cmd,char *arg,double *value)
 
 static LONG H_PerfCounter(char *cmd,char *arg,double *value)
 {
-   HQUERY query;
-   HCOUNTER counter;
-   PDH_RAW_COUNTER rawData;
-   PDH_FMT_COUNTERVALUE counterValue;
-   PDH_STATUS status;
-   char counterName[MAX_PATH];
+	HQUERY		query;
+	HCOUNTER	counter;
+	PDH_STATUS	status;
 
+	PDH_RAW_COUNTER		rawData;
+	PDH_FMT_COUNTERVALUE	counterValue;
 
-   GetParameterInstance(cmd,counterName,MAX_PATH-1);
+	char	counter_name[MAX_STRING_LEN];
+
+	LONG	ret = SYSINFO_RC_ERROR;
+
+	assert(value);
+
+	*value = 0;
+
+	GetParameterInstance(cmd,counter_name,sizeof(counter_name));
 
 LOG_DEBUG_INFO("s","H_PerfCounter: start");
-LOG_DEBUG_INFO("s", counterName);
+LOG_DEBUG_INFO("s", counter_name);
 
-   if (PdhOpenQuery(NULL,0,&query)!=ERROR_SUCCESS)
-   {
-      WriteLog(MSG_PDH_OPEN_QUERY_FAILED,EVENTLOG_ERROR_TYPE,"s",
-               GetSystemErrorText(GetLastError()));
-      return SYSINFO_RC_ERROR;
-   }
+	if(*counter_name)
+	{
+		if (ERROR_SUCCESS == PdhOpenQuery(NULL,0,&query))
+		{
+			if (ERROR_SUCCESS == (status = PdhAddCounter(query,counter_name,0,&counter)))
+			{
+				if (ERROR_SUCCESS == PdhCollectQueryData(query))
+				{
+					if(ERROR_SUCCESS == PdhGetRawCounterValue(counter, NULL, &rawData))
+					{
+						if( ERROR_SUCCESS == PdhCalculateCounterFromRawValue(
+							counter, 
+							PDH_FMT_DOUBLE, 
+							&rawData, 
+							NULL, 
+							&counterValue
+							) )
+						{
+							*value = counterValue.doubleValue;
+							
+							ret = SYSINFO_RC_SUCCESS;
+							LOG_DEBUG_INFO("s","H_PerfCounter: value");
+							LOG_DEBUG_INFO("d",*value);
+						}
+						else
+						{
+							WriteLog(MSG_INFORMATION,EVENTLOG_ERROR_TYPE,"ss","Can't format counter value", counter_name);
+						}
+					}
+					else
+					{
+						WriteLog(MSG_INFORMATION,EVENTLOG_ERROR_TYPE,"ss","Can't get counter value", counter_name);
+					}
+				}
+				else
+				{
+					WriteLog(MSG_PDH_COLLECT_QUERY_DATA_FAILED,EVENTLOG_ERROR_TYPE,"s",GetSystemErrorText(GetLastError()));
+				}
 
-   if ((status=PdhAddCounter(query,counterName,0,&counter))!=ERROR_SUCCESS)
-   {
-      WriteLog(MSG_PDH_ADD_COUNTER_FAILED,EVENTLOG_ERROR_TYPE,"ss",
-               counterName,GetPdhErrorText(status));
-      PdhCloseQuery(query);
-      return SYSINFO_RC_NOTSUPPORTED;
-   }
+				PdhRemoveCounter(&counter);
+			}
+			else
+			{
+				ret = SYSINFO_RC_NOTSUPPORTED;
+				WriteLog(MSG_PDH_ADD_COUNTER_FAILED,EVENTLOG_ERROR_TYPE,"ss", counter_name,GetPdhErrorText(status));
+			}
 
-   if (PdhCollectQueryData(query)!=ERROR_SUCCESS)
-   {
-      WriteLog(MSG_PDH_COLLECT_QUERY_DATA_FAILED,EVENTLOG_ERROR_TYPE,"s",
-               GetSystemErrorText(GetLastError()));
-	  PdhRemoveCounter(&counter);
-      PdhCloseQuery(query);
-      return SYSINFO_RC_ERROR;
-   }
+			PdhCloseQuery(query);
+		}
+		else
+		{
+			WriteLog(MSG_PDH_OPEN_QUERY_FAILED,EVENTLOG_ERROR_TYPE,"s", GetSystemErrorText(GetLastError()));
+		}
+	}
+	else
+	{
+		ret = SYSINFO_RC_NOTSUPPORTED;
+	}
 
-   PdhGetRawCounterValue(counter,NULL,&rawData);
-   PdhCalculateCounterFromRawValue(counter,PDH_FMT_DOUBLE,
-                                   &rawData,NULL,&counterValue);
-   PdhRemoveCounter(&counter);
+	LOG_DEBUG_INFO("s","H_PerfCounter: end");
 
-   PdhCloseQuery(query);
-   *value=counterValue.doubleValue;
-LOG_DEBUG_INFO("s","H_PerfCounter: value");
-LOG_DEBUG_INFO("d",*value);
-LOG_DEBUG_INFO("s","H_PerfCounter: end");
-   return SYSINFO_RC_SUCCESS;
+	return ret;
 }
-
 
 //
 // Handler for user counters
@@ -900,7 +934,7 @@ INIT_CHECK_MEMORY(main);
 
    *value=(double)crc;
 
-CHECK_MEMORY(main, "H_FileSize","end");
+CHECK_MEMORY(main, "H_CRC32","end");
 
    return SYSINFO_RC_SUCCESS;
 }
@@ -944,6 +978,48 @@ CHECK_MEMORY(main, "H_FileSize","end");
    return SYSINFO_RC_SUCCESS;
 }
 
+//
+// Handler for vfs.file.exists[*] parameter
+//
+#ifndef S_ISREG
+#       define S_ISREG(x) (((x) & S_IFMT) == S_IFREG)
+#endif
+
+static LONG VFS_FILE_EXISTS(char *cmd,char *arg,double *value)
+{
+   char 
+	   param[MAX_PATH],
+	   *fileName;
+
+   struct _stat     buf;
+
+INIT_CHECK_MEMORY(main);
+
+   GetParameterInstance(cmd,param,MAX_PATH-1);
+
+    if(num_param(param) != 1)
+    {
+            return SYSINFO_RC_NOTSUPPORTED;
+    }
+
+	fileName = param;
+
+	*value = 0.;
+
+	/* File exists */
+        if(_stat(fileName,&buf) == 0)
+        {
+                /* Regular file */
+                if(S_ISREG(buf.st_mode))
+                {
+                        *value = 1.;
+                }
+        }
+
+CHECK_MEMORY(main, "VFS_FILE_EXISTS","end");
+
+   return SYSINFO_RC_SUCCESS;
+}
 
 //
 // Handler for system[uname] parameter
@@ -1074,6 +1150,8 @@ static AGENT_COMMAND commands[]=
 
 //   { "md5_hash[*]",				NULL,				H_MD5Hash,			NULL },
 	{ "vfs.file.md5sum[*]",			NULL,				H_MD5Hash,			NULL },
+
+	{ "vfs.file.exists[*]",			VFS_FILE_EXISTS,		NULL,				NULL },
 
 //	{ "swap[*]",					H_MemoryInfo,		NULL,				NULL },
 	{ "system.swap.size[*]",		H_SwapSize,			NULL,				NULL },

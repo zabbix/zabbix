@@ -53,6 +53,7 @@ extern	int	CONFIG_DBPORT;
 #define DB_PART_DELETE	1
 
 #define DB_HOST		struct host_type
+#define DB_PROFILE	struct profile_type
 #define DB_ITEM		struct item_type
 #define DB_TRIGGER	struct trigger_type
 #define DB_ACTION	struct action_type
@@ -150,6 +151,21 @@ DB_HOST
 	int	errors_from;
 	char	error[HOST_ERROR_LEN_MAX];
 	int	available;
+};
+
+DB_PROFILE
+{
+	char	*devicetype;
+	char	*name;
+	char	*os;
+	char	*serialno;
+	char	*tag;
+	char	*macaddress;
+	char	*hardware;
+	char	*software;
+	char	*contact;
+	char	*location;
+	char	*notes;
 };
 
 DB_GRAPH
@@ -284,7 +300,8 @@ DB_ACTION
 	int	lastcheck;
 	int	recipient;
 	char	subject[ACTION_SUBJECT_LEN_MAX];	/* don't use pointer, cose sizeof is used */
-	char	message[MAX_STRING_LEN];		/* don't use pointer, cose sizeof is used */
+	char	*message;
+	int	message_len;
 	int	maxrepeats;
 	int	repeatdelay;
 	char	scripts[MAX_STRING_LEN];
@@ -304,7 +321,6 @@ DB_ALERT
 	int	alertid;
 	int 	actionid;
 	int 	clock;
-/*	char	*type;*/
 	int	mediatypeid;
 	char	*sendto;
 	char	*subject;
@@ -369,6 +385,7 @@ void    DBget_item_from_db(DB_ITEM *item,DB_ROW row);
 int	DBadd_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available);
 int	DBhost_exists(char *server);
 int	DBget_host_by_hostid(int hostid,DB_HOST *host);
+int	DBget_profile_by_hostid(int hostid,DB_PROFILE *profile);
 int	DBsync_host_with_templates(int hostid);
 int	DBsync_host_with_template(int hostid,int templateid,int items,int triggers,int graphs);
 int	DBadd_templates_to_host(int hostid,int host_templateid);

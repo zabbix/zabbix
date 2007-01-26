@@ -241,35 +241,172 @@ int     OLD_SWAP(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
         return ret;
 }
 
-static int 	get_swap_io(zbx_uint64_t *swapin, zbx_uint64_t *swapout)
+struct swap_stat_s {
+	zbx_uint64_t rio;
+	zbx_uint64_t rsect;
+	zbx_uint64_t rpag;
+	zbx_uint64_t wio;
+	zbx_uint64_t wsect;
+	zbx_uint64_t wpag;
+};
+
+#if defined(KERNEL_2_4)
+#	define INFO_FILE_NAME	"/proc/partitions"
+#	define PARSE(line)	if(sscanf(line,"%*d %*d %*d %s " \
+					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d " \
+					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d %*d %*d %*d", \
+				name, 			/* name */ \
+				&(result->rio), 	/* rio */ \
+				&(result->rsect),	/* rsect */ \
+				&(result->wio), 	/* rio */ \
+				&(result->wsect)	/* wsect */ \
+				) != 5) continue
+#else
+#	define INFO_FILE_NAME	"/proc/diskstats"
+#	define PARSE(line)	if(sscanf(line, "%*d %*d %s " \
+					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d " \
+					ZBX_FS_UI64 " %*d " ZBX_FS_UI64 " %*d %*d %*d %*d", \
+				name, 			/* name */ \
+				&(result->rio), 	/* rio */ \
+				&(result->rsect),	/* rsect */ \
+				&(result->wio), 	/* wio */ \
+				&(result->wsect)	/* wsect */ \
+				) != 5)  \
+					if(sscanf(line,"%*d %*d %s " \
+						ZBX_FS_UI64 " " ZBX_FS_UI64 " " \
+						ZBX_FS_UI64 " " ZBX_FS_UI64, \
+					name, 			/* name */ \
+					&(result->rio), 	/* rio */ \
+					&(result->rsect),	/* rsect */ \
+					&(result->wio), 	/* wio */ \
+					&(result->wsect)	/* wsect */ \
+					) != 5) continue
+#endif
+
+static int get_swap_dev_stat(const char *interface, struct swap_stat_s *result)
 {
-	FILE	*f = NULL;
-	char	line[MAX_STRING_LEN];
-	char	name[20];
+	int ret = SYSINFO_RET_FAIL;
+	char line[MAX_STRING_LEN];
+
+	char name[MAX_STRING_LEN];
+
+	FILE *f;
+
+	assert(result);
+
+	if(NULL != (f = fopen(INFO_FILE_NAME,"r")))
+	{
+		while(fgets(line,MAX_STRING_LEN,f) != NULL)
+		{
+			PARSE(line);
+		
+			if(strncmp(name, interface, MAX_STRING_LEN) == 0)
+			{
+				ret = SYSINFO_RET_OK;
+				break;
+			}
+		}
+		fclose(f);
+	}
+
+	if(ret != SYSINFO_RET_OK)
+	{
+		result->rio	= 0;
+		result->rsect	= 0;
+		result->wio	= 0;
+		result->wsect	= 0;
+	}
+	return ret;
+}
+	
+static int	get_swap_pages(struct swap_stat_s *result)
+{
+	int ret = SYSINFO_RET_FAIL;
+	char line[MAX_STRING_LEN];
+	char name[MAX_STRING_LEN];
+
 	zbx_uint64_t
 		value1,
 		value2;
+	
+	FILE *f;
+
+	assert(result);
 
 	if(NULL != (f = fopen("/proc/stat","r")) )
 	{
 		while(fgets(line, sizeof(line), f))
 		{
-			if(sscanf(line, "%10s\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\n", name, &value1, &value2) != 3)
+			if(sscanf(line, "%10s " ZBX_FS_UI64 " " ZBX_FS_UI64, name, &value1, &value2) != 3)
 				continue;
 			
 			if(strcmp(name, "swap"))
 				continue;
 			
-			if(swapin)	*swapin  = value1;
-			if(swapout)	*swapout = value2;
-
-			fclose(f);
+			result->wpag	= value1;
+			result->rpag	= value2;
 			
-			return SYSINFO_RET_OK;
+			ret = SYSINFO_RET_OK;
+			break;
 		};
 		fclose(f);
 	}
-	return SYSINFO_RET_FAIL;
+	
+	if(ret != SYSINFO_RET_OK)
+	{
+		result->wpag	= 0;
+		result->rpag	= 0;
+	}
+
+	return ret;
+}
+
+static int 	get_swap_stat(const char *interface, struct swap_stat_s *result)
+{
+	int ret = SYSINFO_RET_FAIL;
+	
+	struct swap_stat_s curr;
+	
+	FILE *f;
+
+	char line[MAX_STRING_LEN], *s;
+	
+	assert(result);
+
+	memset(result, 0, sizeof(struct swap_stat_s));
+
+	if(0 == strcmp(interface, "all"))
+	{
+		ret = get_swap_pages(result);
+		interface = NULL;
+	}
+
+	if(NULL != (f = fopen("/proc/swaps","r")) )
+	{
+		while (fgets(line, sizeof(line), f))
+		{
+			s = strchr(line,' ');
+			if (s && s != line && strncmp(line, "/dev/", 5) == 0)
+			{
+				*s = 0;
+
+				if(interface && 0 != strcmp(interface, line+5)) continue;
+				
+				if(SYSINFO_RET_OK == get_swap_dev_stat(line+5, &curr))
+				{
+					result->rio	+= curr.rio;
+					result->rsect	+= curr.rsect;
+					result->wio	+= curr.wio;
+					result->wsect	+= curr.wsect;
+					
+					ret = SYSINFO_RET_OK;
+				}
+			}
+		}
+		fclose(f);
+	}
+
+	return ret;
 }
 
 int	SYSTEM_SWAP_IN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -277,7 +414,8 @@ int	SYSTEM_SWAP_IN(const char *cmd, const char *param, unsigned flags, AGENT_RES
 	int		ret = SYSINFO_RET_FAIL;
 	char    	swapdev[10];
 	char    	mode[20];
-	zbx_uint64_t	value = 0;
+
+	struct swap_stat_s	ss;
 
 	assert(result);
 
@@ -299,11 +437,6 @@ int	SYSTEM_SWAP_IN(const char *cmd, const char *param, unsigned flags, AGENT_RES
 		sprintf(swapdev, "all");
 	}
 
-	if(strcmp(swapdev, "all"))
-	{
-		return SYSINFO_RET_FAIL;
-	}
-
 	if(get_param(param, 2, mode, sizeof(mode)) != 0)
 	{
 		mode[0] = '\0';
@@ -315,14 +448,29 @@ int	SYSTEM_SWAP_IN(const char *cmd, const char *param, unsigned flags, AGENT_RES
 		sprintf(mode, "pages");
 	}
 
-	if(strcmp(mode,"pages") != 0)
+	ret = get_swap_stat(swapdev, &ss);
+
+	if(ret == SYSINFO_RET_OK)
 	{
-		return SYSINFO_RET_FAIL;
-	}
-	
-	if( SYSINFO_RET_OK == (ret = get_swap_io(&value, NULL)) )
-	{
-		SET_UI64_RESULT(result, value);
+		if(strncmp(mode, "sectors", MAX_STRING_LEN)==0)
+		{
+			SET_UI64_RESULT(result, ss.wsect);
+			ret = SYSINFO_RET_OK;
+		}
+		else if(strncmp(mode, "count", MAX_STRING_LEN)==0)
+		{
+			SET_UI64_RESULT(result, ss.wio);
+			ret = SYSINFO_RET_OK;
+		}
+		else if(strncmp(mode, "pages", MAX_STRING_LEN)==0 && strcmp(swapdev, "all")==0)
+		{
+			SET_UI64_RESULT(result, ss.wpag);
+			ret = SYSINFO_RET_OK;
+		}
+		else
+		{
+			ret = SYSINFO_RET_FAIL;
+		}
 	}
 
 	return ret;
@@ -333,7 +481,8 @@ int	SYSTEM_SWAP_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	int		ret = SYSINFO_RET_FAIL;
 	char    	swapdev[10];
 	char    	mode[20];
-	zbx_uint64_t	value = 0;
+
+	struct swap_stat_s	ss;
 
 	assert(result);
 
@@ -355,11 +504,6 @@ int	SYSTEM_SWAP_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		sprintf(swapdev, "all");
 	}
 
-	if(strcmp(swapdev, "all"))
-	{
-		return SYSINFO_RET_FAIL;
-	}
-
 	if(get_param(param, 2, mode, sizeof(mode)) != 0)
 	{
 		mode[0] = '\0';
@@ -371,14 +515,29 @@ int	SYSTEM_SWAP_OUT(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		sprintf(mode, "pages");
 	}
 
-	if(strcmp(mode,"pages") != 0)
+	ret = get_swap_stat(swapdev, &ss);
+
+	if(ret == SYSINFO_RET_OK)
 	{
-		return SYSINFO_RET_FAIL;
-	}
-	
-	if( SYSINFO_RET_OK == (ret = get_swap_io(NULL, &value)) )
-	{
-		SET_UI64_RESULT(result, value);
+		if(strncmp(mode, "sectors", MAX_STRING_LEN)==0)
+		{
+			SET_UI64_RESULT(result, ss.rsect);
+			ret = SYSINFO_RET_OK;
+		}
+		else if(strncmp(mode, "count", MAX_STRING_LEN)==0)
+		{
+			SET_UI64_RESULT(result, ss.rio);
+			ret = SYSINFO_RET_OK;
+		}
+		else if(strncmp(mode, "pages", MAX_STRING_LEN)==0 && strcmp(swapdev, "all")==0)
+		{
+			SET_UI64_RESULT(result, ss.rpag);
+			ret = SYSINFO_RET_OK;
+		}
+		else
+		{
+			ret = SYSINFO_RET_FAIL;
+		}
 	}
 
 	return ret;

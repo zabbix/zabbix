@@ -36,9 +36,9 @@ define("GROUP_RIGHT",		0);
 		$USER_DETAILS = NULL;
 		$USER_RIGHTS = array();
 
-		if(isset($_COOKIE["sessionid"]))
+		if(isset($_COOKIE["zbx_sessionid"]))
 		{
-			$sessionid = $_COOKIE["sessionid"];
+			$sessionid = $_COOKIE["zbx_sessionid"];
 			$USER_DETAILS = DBfetch(DBselect("select u.*,s.* from sessions s,users u".
 				" where s.sessionid=".zbx_dbstr($sessionid)." and s.userid=u.userid".
 				" and ((s.lastaccess+u.autologout>".time().") or (u.autologout=0))"));
@@ -47,8 +47,8 @@ define("GROUP_RIGHT",		0);
 			{
 				$USER_DETAILS = array("alias"=>"- unknown -","userid"=>0);
 
-				setcookie("sessionid",$sessionid,time()-3600);
-				unset($_COOKIE["sessionid"]);
+				setcookie("zbx_sessionid",$sessionid,time()-3600);
+				unset($_COOKIE["zbx_sessionid"]);
 				unset($sessionid);
 
 				show_header("Login",0,0,1);
@@ -64,7 +64,7 @@ define("GROUP_RIGHT",		0);
 		{
 			if(isset($sessionid))
 			{
-				setcookie("sessionid",$sessionid);
+				setcookie("zbx_sessionid",$sessionid);
 				DBexecute("update sessions set lastaccess=".time()." where sessionid=".zbx_dbstr($sessionid));
 			}
 
@@ -92,8 +92,8 @@ define("GROUP_RIGHT",		0);
 
 		if(isset($sessionid))
 		{
-			setcookie("sessionid",$sessionid,time()-3600);
-			unset($_COOKIE["sessionid"]);
+			setcookie("zbx_sessionid",$sessionid,time()-3600);
+			unset($_COOKIE["zbx_sessionid"]);
 		}
 
 		if($page["file"]!="index.php")

@@ -1,5 +1,52 @@
 Changes for 1.1.5:
 
+ - agent can be started as root, new parameter AllowRoot (Alexei)
+ - fixed error loging for active chechs of WinXX (Eugene)
+ - fixed status changing for active checks (Eugene)
+ - new macros {PROFILE.DEVICETYPE}, {PROFILE.NAME}, {PROFILE.OS},
+ {PROFILE.SERIALNO}, {PROFILE.TAG}, {PROFILE.MACADDRESS},
+ {PROFILE.HARDWARE}, {PROFILE.SOFTWARE}, {PROFILE.CONTACT},
+ {PROFILE.LOCATION}, {PROFILE.NOTES} (Alexei)
+ - fixed function max(#N) (Alexei)
+ - do not show connector as ON if trigger disabled (Alexei)
+ - fixed calculation of aggregate items under Oracle (Alexei)
+ - added support of macro ITEM.NAME (Alexei)
+ - fixed 'eventlog[]' for WinXX (Eugene)
+ - added possibility of hostname using for 'Server' option of WinXX agent
+     configuration file (Eugene)
+ - fixed some assertions (Eugene)
+ - fixed missing last symbol in vfs.file.regexp (Alexei)
+ - fixed 'system.cpu.util[*]' for SunOS (Eugene)
+ - added availability to using '$' sign for hosts and item keys (Eugene)
+ - fixed 'perf_counter[*]' for WinXX (Eugene)
+ - added parameter ListenIP to WinXX ZABBIX agent (Eugene)
+ - increased message size for alerts (Eugene)
+ - fixed permission system (Eugene)
+ - fixed conflict with cookies of other products (Eugene)
+ - added sorting by host in trigger status screen (Eugene)
+ - added login/logout information into auditlog (Eugene)
+ - fixed values viwing on overview screen (Eugene)
+ - added support of "system.swap.(in/out)[<swap><,param>]" for Linux 2.x
+    <param> accept next values: 'count', 'sectors', 'pages'
+    DEFAULT: <swap> = 'all', <param> = 'pages'
+    NOTE: pages allowed only when <swap> is 'all' (Eugene)
+ - fixed sort order of hosts for trigger overview (Eugene)
+ - added filter for disabled items and triggers (Eugene)
+ - fixed graphs filterinf on graphs screen (Eugene)
+ - added support of "vfs.file.exists" key for WinXX (Eugene)
+ - www.zabbix.com replaced by localhost in agent (Alexei)
+ - fixed calculation of sum(#N) (Alexei)
+ - improvements of PostgreSQL code (Alexei)
+ - fixed temporary files deletion for WinXX agents (Eugene)
+ - improved 'service_status[*]' allowed service name and display name (Eugnene)
+ - added error reporting of PostgreSQL for frontend (Eugene)
+ - added 'with oids' to PostgreSQL table definitions (Alexei)
+ - fixed sms sender (Eugene)
+ - improved errors messaging of startups (Eugene)
+ - fixed hostname receaving on startup of ZABBIX agent (Eugene)
+ - fixed printing of stdout/stderr (Eugene)
+ - fixed buffer overflow while processing SNMP IP addresses (Alexei)
+ - fixed agent's calculation of network statistics (Alexei)
  - fixed some compilation warnings (Alexei)
  - fixed "not equal" condition for hosts and host groups in actions (Alexei)
  - added support of macro TRIGGER.URL and TRIGGER.COMMENT (Alexei)

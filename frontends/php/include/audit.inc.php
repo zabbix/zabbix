@@ -23,6 +23,8 @@
 	{
 		global $USER_DETAILS;
 
+		if(!isset($USER_DETAILS["userid"]))	check_authorisation();
+
 		$userid=$USER_DETAILS["userid"];
 		$clock=time();
 		$sql="insert into auditlog (userid,clock,action,resourcetype,details) values ($userid,$clock,$action,$resourcetype,".zbx_dbstr($details).")";

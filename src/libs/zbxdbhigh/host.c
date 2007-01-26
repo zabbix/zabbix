@@ -197,3 +197,42 @@ int	DBget_host_by_hostid(int hostid,DB_HOST *host)
 
 	return ret;
 }
+
+int	DBget_profile_by_hostid(int hostid,DB_PROFILE *profile)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	char	sql[MAX_STRING_LEN];
+	int	ret = SUCCEED;
+
+	zabbix_log( LOG_LEVEL_DEBUG, "In DBget_profile_by_hostid(%d)", hostid);
+
+	snprintf(sql,sizeof(sql)-1,"select devicetype,name,os,serialno,tag,macaddress,hardware,software,contact,location,notes from hosts_profiles where hostid=%d", hostid);
+	result=DBselect(sql);
+
+	row=DBfetch(result);
+	if(!row)
+	{
+		ret = FAIL;
+	}
+	else
+	{
+		profile->devicetype = row[0];
+		profile->name = row[1];
+		profile->os = row[2];
+		profile->serialno = row[3];
+		profile->tag = row[4];
+		profile->macaddress = row[5];
+		profile->hardware = row[6];
+		profile->software = row[7];
+		profile->contact = row[8];
+		profile->location = row[9];
+		profile->notes = row[10];
+	}
+
+	DBfree_result(result);
+
+	zabbix_log( LOG_LEVEL_DEBUG, "End of DBget_profile_by_hostid");
+
+	return ret;
+}

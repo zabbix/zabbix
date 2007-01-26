@@ -287,7 +287,7 @@ void	daemon_init(void)
 		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,CONFIG_LOG_FILE);
 	}
 
-	if( (pid = fork()) != 0 )
+	if( (pid = zbx_fork()) != 0 )
 	{
 		exit( 0 );
 	}
@@ -295,19 +295,29 @@ void	daemon_init(void)
 
 	signal( SIGHUP, SIG_IGN );
 
-	if( (pid = fork()) !=0 )
+	if( (pid = zbx_fork()) !=0 )
 	{
 		exit( 0 );
 	}
 
 	chdir("/");
 
-/*	umask(022);*/
-	umask(002);
+/*	umask(0022);*/
+	umask(0002);
 
-	for(i=0;i<MAXFD;i++)
+	for(i=0; i<MAXFD; i++)	close(i);
+
+	open("/dev/null", O_RDONLY);    /* stdin */
+
+	if(CONFIG_LOG_FILE)
 	{
-		if(i != fileno(stderr)) close(i);
+		fopen(CONFIG_LOG_FILE, "a+");   /* stdout */
+		fopen(CONFIG_LOG_FILE, "a+");   /* stderr */
+	}
+	else
+	{
+		open("/dev/null", O_RDWR);      /* stdout */
+		open("/dev/null", O_RDWR);      /* stderr */
 	}
 }
 
@@ -492,9 +502,9 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-/*
-#define USE_TEST_FUNCTION 1 
-*/
+
+/* #define USE_TEST_FUNCTION 1 */
+
 
 #ifdef USE_TEST_FUNCTION
 
@@ -503,7 +513,7 @@ void    run_commands(DB_TRIGGER *trigger,DB_ACTION *action);
 void test()
 {
 	printf("-= Test Started =-\n");
-
+	
 	printf("-= Test completed =-\n");
 }
 #endif
@@ -676,7 +686,7 @@ int main(int argc, char **argv)
 
 	for(i=1;i<CONFIG_POLLER_FORKS;i++)
 	{
-		if((pid = fork()) == 0)
+		if((pid = zbx_fork()) == 0)
 		{
 			server_num=i;
 			break;

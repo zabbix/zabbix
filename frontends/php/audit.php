@@ -24,11 +24,17 @@
 	$page["file"] = "audit.php";
 	show_header($page["title"],1,0);
 ?>
-
+<?php
+	if(!check_anyright("Configuration of Zabbix","R"))
+	{
+		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
+		show_page_footer();
+		exit;
+	}
+?>
 <?php
 	update_profile("web.menu.config.last",$page["file"]);
 ?>
-
 <?php
 	if(isset($_REQUEST["start"])&&isset($_REQUEST["prev"]))
 	{
@@ -117,6 +123,8 @@
 		if($row["action"]==AUDIT_ACTION_ADD)			$action = S_ADDED;
 		else if($row["action"]==AUDIT_ACTION_UPDATE)		$action = S_UPDATED;
 		else if($row["action"]==AUDIT_ACTION_DELETE)		$action = S_DELETED;
+		else if($row["action"]==AUDIT_ACTION_LOGIN)		$action = S_LOGIN;
+		else if($row["action"]==AUDIT_ACTION_LOGOUT)		$action = S_LOGOUT;
 		else							$action = S_UNKNOWN_ACTION;
 
 		$table->addRow(array(

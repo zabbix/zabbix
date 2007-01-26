@@ -38,7 +38,7 @@ CREATE TABLE hosts (
   errors_from		int4		DEFAULT '0'		NOT NULL,
   templateid		int4		DEFAULT '0'		NOT NULL,
   PRIMARY KEY (hostid)
-);
+) with oids;
 
 CREATE INDEX hosts_status on hosts (status);
 CREATE UNIQUE INDEX hosts_host on hosts (host);
@@ -86,7 +86,7 @@ CREATE TABLE items (
 	valuemapid		int4		 DEFAULT '0' NOT NULL,
 	PRIMARY KEY (itemid)
 	--  FOREIGN KEY (hostid) REFERENCES hosts
-);
+) with oids;
 
 CREATE UNIQUE INDEX items_hostid_key on items (hostid,key_);
 --CREATE INDEX items_hostid on items (hostid);
@@ -106,7 +106,7 @@ CREATE TABLE config (
   alarm_history		int4		DEFAULT '0' NOT NULL,
   refresh_unsupported	int4		DEFAULT '0' NOT NULL,
   work_period		varchar(100)	DEFAULT '1-5,00:00-24:00' NOT NULL
-);
+) with oids;
 
 --
 -- Table structure for table 'groups'
@@ -118,7 +118,7 @@ CREATE TABLE groups (
   groupid		integer DEFAULT nextval('groups_groupid_seq') NOT NULL,
   name			varchar(64)     DEFAULT '' NOT NULL,
   PRIMARY KEY (groupid)
-);
+) with oids;
 
 CREATE UNIQUE INDEX groups_name on groups (name);
 
@@ -130,7 +130,7 @@ CREATE TABLE hosts_groups (
   hostid		int4		DEFAULT '0' NOT NULL,
   groupid		int4		DEFAULT '0' NOT NULL,
   PRIMARY KEY (hostid,groupid)
-);
+) with oids;
 
 --CREATE UNIQUE INDEX hosts_groups_name on hosts_groups (hostid,groupid);
 
@@ -153,7 +153,7 @@ CREATE TABLE triggers (
   error			varchar(128)	DEFAULT '' NOT NULL,
   templateid		int4 DEFAULT '0' NOT NULL,
   PRIMARY KEY (triggerid)
-);
+) with oids;
 
 CREATE INDEX triggers_value on triggers (value);
 CREATE INDEX triggers_status on triggers (status);
@@ -166,7 +166,7 @@ CREATE TABLE trigger_depends (
   triggerid_down	int4	DEFAULT '0' NOT NULL,
   triggerid_up		int4	DEFAULT '0' NOT NULL,
   PRIMARY KEY		(triggerid_down, triggerid_up)
-);
+) with oids;
 
 --CREATE INDEX trigger_depends_down on trigger_depends (triggerid_down);
 CREATE INDEX trigger_depends_up   on trigger_depends (triggerid_up);
@@ -187,7 +187,7 @@ CREATE TABLE users (
   lang			varchar(5)	DEFAULT 'en_gb' NOT NULL,
   refresh		int4		DEFAULT '30' NOT NULL,
   PRIMARY KEY (userid)
-);
+) with oids;
 
 CREATE UNIQUE INDEX users_alias on users (alias);
 
@@ -203,7 +203,7 @@ CREATE TABLE auditlog (
   resourcetype		int4		DEFAULT '0' NOT NULL,
   details		varchar(128)	DEFAULT '0' NOT NULL,
   PRIMARY KEY (auditid)
-);
+) with oids;
 
 CREATE INDEX auditlog_userid_clock on auditlog (userid,clock);
 CREATE INDEX auditlog_clock on auditlog (clock);
@@ -231,7 +231,7 @@ CREATE TABLE actions (
 --  FOREIGN KEY (triggerid) REFERENCES triggers
 --  could be groupid
 --  FOREIGN KEY (userid) REFERENCES users
-);
+) with oids;
 
 --
 -- Table structure for table 'conditions'
@@ -245,7 +245,7 @@ CREATE TABLE conditions (
   value			varchar(255)	DEFAULT '' NOT NULL,
   PRIMARY KEY (conditionid)
 --  FOREIGN KEY (actionid) REFERENCES actions
-);
+) with oids;
 
 CREATE INDEX conditiond_actionid on conditions (actionid);
 
@@ -265,7 +265,7 @@ CREATE TABLE media_type (
   exec_path		varchar(255)	DEFAULT '' NOT NULL,
   gsm_modem		varchar(255)	DEFAULT '' NOT NULL,
   PRIMARY KEY(mediatypeid)
-);
+) with oids;
 
 
 --
@@ -294,7 +294,7 @@ CREATE TABLE alerts (
 --  FOREIGN KEY (actionid) REFERENCES actions,
 --  FOREIGN KEY (triggerid) REFERENCES triggers,
 --  FOREIGN KEY (mediatypeid) REFERENCES media_type
-);
+) with oids;
 
 CREATE INDEX alerts_actionid on alerts (actionid);
 CREATE INDEX alerts_clock on alerts (clock);
@@ -315,7 +315,7 @@ CREATE TABLE alarms (
   acknowledged		int2		DEFAULT '0' NOT NULL,
   PRIMARY KEY (alarmid)
 --  FOREIGN KEY (triggerid) REFERENCES triggers
-);
+) with oids;
 
 CREATE INDEX alarms_triggerid_clock on alarms (triggerid, clock);
 CREATE INDEX alarms_clock on alarms (clock);
@@ -336,7 +336,7 @@ CREATE TABLE functions (
   PRIMARY KEY (functionid)
 --  FOREIGN KEY (itemid) REFERENCES items,
 --  FOREIGN KEY (triggerid) REFERENCES triggers
-);
+) with oids;
 
 CREATE INDEX funtions_triggerid on functions (triggerid);
 CREATE INDEX functions_i_f_p on functions (itemid,function,parameter);
@@ -351,7 +351,7 @@ CREATE TABLE history (
   value			float8		DEFAULT '0.0000' NOT NULL
 --  PRIMARY KEY (itemid,clock),
 --  FOREIGN KEY (itemid) REFERENCES items
-);
+) with oids;
 
 CREATE INDEX history_i_c on history (itemid, clock);
 
@@ -365,7 +365,7 @@ CREATE TABLE history_uint (
   value			double precision	DEFAULT '0' NOT NULL
 --  PRIMARY KEY (itemid,clock),
 --  FOREIGN KEY (itemid) REFERENCES items
-);
+) with oids;
 
 CREATE INDEX history_uint_i_c on history_uint (itemid, clock);
 
@@ -379,7 +379,7 @@ CREATE TABLE history_str (
   value                 varchar(255)    DEFAULT '' NOT NULL
 --  PRIMARY KEY (itemid,clock),
 --  FOREIGN KEY (itemid) REFERENCES items
-);
+) with oids;
 
 CREATE INDEX history_str_i_c on history_str (itemid, clock);
 
@@ -399,7 +399,7 @@ CREATE TABLE media (
   PRIMARY KEY (mediaid)
 --  FOREIGN KEY (userid) REFERENCES users,
 --  FOREIGN KEY (mediatypeid) REFERENCES media_type
-);
+) with oids;
 
 CREATE INDEX media_userid on media (userid);
 CREATE INDEX media_mediatypeid on media (mediatypeid);
@@ -417,7 +417,7 @@ CREATE TABLE sysmaps (
   label_type		int4		DEFAULT '0' NOT NULL,
   label_location	int2		DEFAULT '0' NOT NULL,
   PRIMARY KEY (sysmapid)
-);
+) with oids;
 
 CREATE UNIQUE INDEX sysmaps_name on sysmaps (name);
 
@@ -440,7 +440,7 @@ CREATE TABLE sysmaps_elements (
   PRIMARY KEY (selementid)
 --  FOREIGN KEY (sysmapid) REFERENCES sysmaps,
 --  FOREIGN KEY (hostid) REFERENCES hosts
-);
+) with oids;
 
 --
 -- Table structure for table 'sysmaps_links'
@@ -461,7 +461,7 @@ CREATE TABLE sysmaps_links (
 --  FOREIGN KEY (sysmapid) REFERENCES sysmaps,
 --  FOREIGN KEY (shostid1) REFERENCES sysmaps_hosts,
 --  FOREIGN KEY (shostid2) REFERENCES sysmaps_hosts
-);
+) with oids;
 
 --
 -- Table structure for table 'graphs'
@@ -479,7 +479,7 @@ CREATE TABLE graphs (
   show_work_period	int2		DEFAULT '1' NOT NULL,
   show_triggers		int2		DEFAULT '1' NOT NULL,
   PRIMARY KEY (graphid)
-);
+) with oids;
 
 CREATE INDEX graphs_name on graphs (name);
 
@@ -501,7 +501,7 @@ CREATE TABLE graphs_items (
   PRIMARY KEY (gitemid)
 --  FOREIGN KEY (graphid) REFERENCES graphs,
 --  FOREIGN KEY (itemid) REFERENCES items
-);
+) with oids;
 
 --
 -- Table structure for table 'services'
@@ -517,7 +517,7 @@ CREATE TABLE services (
   goodsla		float8		DEFAULT '99.9' NOT NULL,
   sortorder		int4		DEFAULT '0' NOT NULL,
   PRIMARY KEY (serviceid)
-);
+) with oids;
 
 --
 -- Table structure for table 'services_links'
@@ -529,7 +529,7 @@ CREATE TABLE services_links (
   servicedownid		int4		DEFAULT '0' NOT NULL,
   soft			int2		DEFAULT '0' NOT NULL,
   PRIMARY KEY (linkid)
-);
+) with oids;
 
 --CREATE INDEX services_links_serviceupid on services_links (serviceupid);
 CREATE INDEX services_links_servicedownid on services_links (servicedownid);
@@ -544,7 +544,7 @@ CREATE TABLE rights (
   permission            char(1)		DEFAULT '' NOT NULL,
   id                    int4,
   PRIMARY KEY (rightid)
-);
+) with oids;
 
 CREATE INDEX rights_userid on rights (userid);
 
@@ -554,7 +554,7 @@ CREATE TABLE sessions (
 	lastaccess	int4		DEFAULT '0' NOT NULL,
 	PRIMARY KEY (sessionid),
 	FOREIGN KEY (userid) REFERENCES users
-);
+) with oids;
 
 --
 -- Table structure for table 'services_alarms'
@@ -566,7 +566,7 @@ CREATE TABLE service_alarms (
   clock			int4		DEFAULT '0' NOT NULL,
   value			int4		DEFAULT '0' NOT NULL,
   PRIMARY KEY (servicealarmid)
-);
+) with oids;
 
 CREATE INDEX services_alarms_serviceid_clock on service_alarms (serviceid,clock);
 CREATE INDEX services_alarms_clock on service_alarms (clock);
@@ -582,7 +582,7 @@ CREATE TABLE profiles (
   value                 varchar(255)    DEFAULT '' NOT NULL,
   valuetype             int4            DEFAULT 0 NOT NULL,
   PRIMARY KEY (profileid)
-);
+) with oids;
 
 --CREATE INDEX profiles_userid on profiles (userid);
 CREATE UNIQUE INDEX profiles_userid_idx on profiles (userid,idx);
@@ -597,7 +597,7 @@ CREATE TABLE screens (
   hsize			int4		DEFAULT '1' NOT NULL,
   vsize			int4		DEFAULT '1' NOT NULL,
   PRIMARY KEY  (screenid)
-);
+) with oids;
 
 --
 -- Table structure for table 'screens_items'
@@ -620,7 +620,7 @@ CREATE TABLE screens_items (
 	style		int4		DEFAULT '0' NOT NULL,
 	url		varchar(255)	DEFAULT '' NOT NULL,
   PRIMARY KEY  (screenitemid)
-);
+) with oids;
 
 --
 -- Table structure for table 'stats'
@@ -648,7 +648,7 @@ CREATE TABLE usrgrp (
   usrgrpid		integer DEFAULT nextval('usrgrp_usrgrpid_seq') NOT NULL,
   name			varchar(64)	DEFAULT '' NOT NULL,
   PRIMARY KEY (usrgrpid)
-);
+) with oids;
 
 CREATE UNIQUE INDEX usrgrp_name on usrgrp (name);
 
@@ -662,7 +662,7 @@ CREATE TABLE users_groups (
   PRIMARY KEY (usrgrpid,userid)
 --  FOREIGN KEY (usrgrpid) REFERENCES usrgrp,
 --  FOREIGN KEY (userid) REFERENCES users
-);
+) with oids;
 
 --
 -- Table structure for table 'trends'
@@ -677,7 +677,7 @@ CREATE TABLE trends (
   value_max		float8		DEFAULT '0.0000' NOT NULL,
   PRIMARY KEY (itemid,clock)
 --  FOREIGN KEY (itemid) REFERENCES items
-);
+) with oids;
 
 --
 -- Table structure for table 'images'
@@ -691,7 +691,7 @@ CREATE TABLE images (
   name			varchar(64)	DEFAULT '0' NOT NULL,
   image			bytea,
   PRIMARY KEY (imageid)
-);
+) with oids;
 
 CREATE UNIQUE INDEX images_name_imagetype on images (name, imagetype);
 
@@ -707,7 +707,7 @@ CREATE TABLE hosts_templates (
   triggers		int2		DEFAULT '0' NOT NULL,
   graphs		int2		DEFAULT '0' NOT NULL,
   PRIMARY KEY (hosttemplateid)
-);
+) with oids;
 
 CREATE UNIQUE INDEX hosts_templates_hostid_templateid on hosts_templates (hostid, templateid);
 
@@ -725,7 +725,7 @@ CREATE TABLE history_log (
   value                 varchar(255)    DEFAULT '' NOT NULL,
   PRIMARY KEY (id)
 --  FOREIGN KEY (itemid) REFERENCES items
-);
+) with oids;
 
 CREATE INDEX history_log_i_c on history_str (itemid, clock);
 
@@ -739,7 +739,7 @@ CREATE TABLE history_text (
   clock			int4	DEFAULT '0' NOT NULL,
   value			text	DEFAULT '' NOT NULL,
   PRIMARY KEY (id)
-);
+) with oids;
 
 CREATE UNIQUE INDEX history_text_itemid_clock on history_text (itemid, clock);
 
@@ -761,7 +761,7 @@ CREATE TABLE hosts_profiles (
   location		text		DEFAULT '' NOT NULL,
   notes			text		DEFAULT '' NOT NULL,
   PRIMARY KEY (hostid)
-);
+) with oids;
 
 --
 -- Table structure for table 'autoreg'
@@ -773,7 +773,7 @@ CREATE TABLE autoreg (
   pattern               varchar(255)	DEFAULT '' NOT NULL,
   hostid                int4		DEFAULT '0' NOT NULL,
   PRIMARY KEY (id)
-);
+) with oids;
 
 --
 -- Table structure for table 'valuemaps'
@@ -783,7 +783,7 @@ CREATE TABLE valuemaps (
   valuemapid		serial,
   name			varchar(64)	DEFAULT '' NOT NULL,
   PRIMARY KEY (valuemapid)
-);
+) with oids;
 
 CREATE UNIQUE INDEX valuemaps_name on valuemaps (name);
 
@@ -797,7 +797,7 @@ CREATE TABLE mappings (
   value			varchar(64)	DEFAULT '' NOT NULL,
   newvalue		varchar(64)	DEFAULT '' NOT NULL,
   PRIMARY KEY (mappingid)
-);
+) with oids;
 
 CREATE INDEX mappings_valuemapid on mappings (valuemapid);
 
@@ -811,7 +811,7 @@ CREATE TABLE housekeeper (
   field			varchar(64)	DEFAULT '' NOT NULL,
   value			int4		DEFAULT '0' NOT NULL,
   PRIMARY KEY (housekeeperid)
-);
+) with oids;
 
 --
 -- Table structure for table 'acknowledges'
@@ -826,7 +826,7 @@ CREATE TABLE acknowledges (
 	PRIMARY KEY (acknowledgeid)
 --	FOREIGN KEY (alarmid) REFERENCES alarms,
 --	FOREIGN KEY (userid) REFERENCES users
-);
+) with oids;
 
 CREATE INDEX acknowledges_userid on acknowledges (userid);
 CREATE INDEX acknowledges_alarmid on acknowledges (alarmid);
@@ -843,7 +843,7 @@ CREATE TABLE applications (
 	templateid		int4		DEFAULT '0' NOT NULL,
         PRIMARY KEY (applicationid)
 --        FOREIGN KEY hostid (hostid) REFERENCES hosts
-);
+) with oids;
 
 CREATE INDEX applications_templateid on applications (templateid);
 CREATE UNIQUE INDEX applications_hostid_key on applications (hostid,name);
@@ -858,7 +858,7 @@ CREATE TABLE items_applications (
         PRIMARY KEY (applicationid,itemid)
 --        FOREIGN KEY (applicationid) REFERENCES applications,
  --       FOREIGN KEY (itemid) REFERENCES items
-);
+) with oids;
 
 --
 -- Table structure for table 'help_items'
@@ -869,7 +869,7 @@ CREATE TABLE help_items (
 	key_		varchar(64)	DEFAULT '' NOT NULL,
 	description	varchar(255)	DEFAULT '' NOT NULL,
 	PRIMARY KEY	(itemtype, key_)
-);
+) with oids;
 
 
 VACUUM ANALYZE;

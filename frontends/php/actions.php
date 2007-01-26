@@ -24,7 +24,14 @@
 	$page["file"] = "actions.php";
 	show_header($page["title"],1,0);
 ?>
-
+<?php
+	if(!check_anyright("Default permission","R"))
+	{
+		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
+		show_page_footer();
+		exit;
+	}
+?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(

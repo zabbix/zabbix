@@ -223,31 +223,46 @@ static int ParseServerList(char *args,int sourceLine)
 {
    char *sptr,*eptr;
    int errors=0;
+   struct  hostent	*hp;
 
 INIT_CHECK_MEMORY(main);
 
-   for(sptr=args;(sptr!=(char *)1)&&(confServerCount<MAX_SERVERS);sptr=eptr+1)
-   {
-      eptr=strchr(sptr,',');
-      if (eptr!=NULL)
-         *eptr=0;
-
-	if(confServerCount==0)
+	for(sptr=args;(sptr!=(char *)1)&&(confServerCount<MAX_SERVERS);sptr=eptr+1)
 	{
-		strcpy(confServer,sptr);
+		eptr=strchr(sptr,',');
+		if (eptr!=NULL)
+			*eptr=0;
+
+		if(confServerCount==0)
+		{
+			strcpy(confServer,sptr);
+		}
+		
+		confServerAddr[confServerCount] = INADDR_NONE;
+
+		if (isalpha(*sptr))
+		{
+			if(NULL != (hp = gethostbyname(sptr)))
+			{
+				confServerAddr[confServerCount] = ((struct in_addr *)hp->h_addr)->s_addr;
+			}
+		}
+		else
+		{
+			confServerAddr[confServerCount] = inet_addr(sptr);
+		}
+
+		if (confServerAddr[confServerCount] == INADDR_NONE)
+		{
+			errors++;
+			if (IsStandalone()) 
+				printf("Error in configuration file, line %d: invalid server's address (%s)\n",sourceLine,sptr);
+		}
+		else
+		{
+			confServerCount++;
+		}
 	}
-      confServerAddr[confServerCount]=inet_addr(sptr);
-      if (confServerAddr[confServerCount]==INADDR_NONE)
-      {
-         errors++;
-         if (IsStandalone())  
-            printf("Error in configuration file, line %d: invalid server's IP address (%s)\n",sourceLine,sptr);
-      }
-      else
-      {
-         confServerCount++;
-      }
-   }
 
 CHECK_MEMORY(main, "ParseServerList", "end");
 
@@ -339,6 +354,18 @@ CHECK_MEMORY(main, "ReadConfig", "fopen==NULL");
 
          if ((rc=ParseServerList(ptr,sourceLine))>0)
             errors+=rc;
+      }
+      else if (!stricmp(buffer,"ListenIP"))
+      {
+	      CONFIG_LISTEN_IP = strdup(ptr);
+
+	      if(INADDR_NONE == inet_addr(CONFIG_LISTEN_IP))
+	      {
+		      free(CONFIG_LISTEN_IP);
+		      CONFIG_LISTEN_IP = NULL;
+		      printf("Error in configuration file, line %d: invalid listen ip (%s)\n",sourceLine,ptr);
+		      
+	      }
       }
       else if (!stricmp(buffer,"ListenPort"))
       {

@@ -101,7 +101,7 @@ int	parent=0;
 /* Number of processed requests */
 int	stats_request=0;
 
-
+int	CONFIG_ALLOW_ROOT		= 0;
 char	*CONFIG_HOSTS_ALLOWED		= NULL;
 char	*CONFIG_HOSTNAME		= NULL;
 char	*CONFIG_FILE			= NULL;
@@ -186,7 +186,7 @@ void    daemon_init(void)
 	struct passwd   *pwd;
 
 	/* running as root ?*/
-	if((getuid()==0) || (getgid()==0))
+	if( (CONFIG_ALLOW_ROOT == 0) || (getuid()==0) || (getgid()==0))
 	{
 		pwd = getpwnam("zabbix");
 		if ( pwd == NULL )
@@ -217,7 +217,7 @@ void    daemon_init(void)
 	else
 		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,CONFIG_LOG_FILE);
 
-	if( (pid = fork()) != 0 )
+	if( (pid = zbx_fork()) != 0 )
 	{
 		exit( 0 );
 	}
@@ -226,19 +226,28 @@ void    daemon_init(void)
 	
 	signal( SIGHUP, SIG_IGN );
 
-	if( (pid = fork()) !=0 )
+	if( (pid = zbx_fork()) !=0 )
 	{
 		exit( 0 );
 	}
 
 	chdir("/");
 /*	umask(022);*/
-	umask(002);
+	umask(0002);
 
-	for(i=0;i<MAXFD;i++)
+	for(i=0; i<MAXFD; i++)	close(i);
+
+	open("/dev/null", O_RDONLY);    /* stdin */
+
+	if(CONFIG_LOG_FILE)
 	{
-		/* Do not close stderr */
-		if(i != fileno(stderr)) close(i);
+		fopen(CONFIG_LOG_FILE, "a+");   /* stdout */
+		fopen(CONFIG_LOG_FILE, "a+");   /* stderr */
+	}
+	else
+	{
+		open("/dev/null", O_RDWR);      /* stdout */
+		open("/dev/null", O_RDWR);      /* stderr */
 	}
 
 /*	openlog("zabbix_agentd",LOG_LEVEL_PID,LOG_USER);
@@ -275,6 +284,7 @@ void    init_config(void)
 	{
 /*               PARAMETER      ,VAR    ,FUNC,  TYPE(0i,1s),MANDATORY,MIN,MAX
 */
+		{"AllowRoot",&CONFIG_ALLOW_ROOT,0,TYPE_INT,PARM_OPT,0,1},
 		{"Server",&CONFIG_HOSTS_ALLOWED,0,TYPE_STRING,PARM_MAND,0,0},
 		{"Hostname",&CONFIG_HOSTNAME,0,TYPE_STRING,PARM_OPT,0,0},
 		{"PidFile",&CONFIG_PID_FILE,0,TYPE_STRING,PARM_OPT,0,0},
@@ -314,8 +324,13 @@ void    init_config(void)
 		{
 	        	if(result.type & AR_STRING)
 			{
-				CONFIG_HOSTNAME=strdup(result.str);
+				CONFIG_HOSTNAME = strdup(result.str);
 			}
+			else if(result.type & AR_TEXT)
+			{
+				CONFIG_HOSTNAME = strdup(result.text);
+			}
+
 		}
 	        free_result(&result);
 
@@ -505,7 +520,7 @@ pid_t	child_passive_make(int i,int listenfd, int addrlen)
 {
 	pid_t	pid;
 
-	if((pid = fork()) >0)
+	if((pid = zbx_fork()) >0)
 	{
 			return (pid);
 	}

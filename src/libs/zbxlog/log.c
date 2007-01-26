@@ -35,7 +35,7 @@
 static	char log_filename[MAX_STRING_LEN];
 
 static	int log_type = LOG_TYPE_UNDEFINED;
-static	int log_level;
+static	int log_level = LOG_LEVEL_ERR;
 
 int zabbix_open_log(int type,int level, const char *filename)
 {
@@ -143,7 +143,18 @@ void zabbix_log(int level, const char *fmt, ...)
 	}
 	else
 	{
+		t=time(NULL);
+		tm=localtime(&t);
 		/* Log is not opened */
+		fprintf(stderr, "%.6d:%.4d%.2d%.2d:%.2d%.2d%.2d ",(int)getpid(),tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday,tm->tm_hour,tm->tm_min,tm->tm_sec);
+
+		va_start(ap,fmt);
+		vfprintf(stderr, fmt,ap);
+		va_end(ap);
+
+		fprintf(stderr, "\n");
+
+		fflush(stderr);
 	}	
         return;
 }

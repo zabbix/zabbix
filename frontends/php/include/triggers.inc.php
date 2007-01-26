@@ -1061,6 +1061,7 @@
 		{
 			return $table;
 		}
+		sort($hosts);
 
 		$header=array(new CCol(S_TRIGGERS,'center'));
 		foreach($hosts as $hostname)

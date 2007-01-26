@@ -24,7 +24,6 @@
 	$page["file"] = "latest.php";
 	show_header($page["title"],1,0);
 ?>
-
 <?php
         if(!check_anyright("Host","R"))
         {
@@ -33,7 +32,6 @@
                 exit;
         }
 ?>
-
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
@@ -54,7 +52,6 @@
 
 	validate_group_with_host("R",array("allow_all_hosts","always_select_first_host","monitored_hosts","with_monitored_items"));
 ?>
-
 <?php
         if($_REQUEST["hostid"] > 0 && !check_right("Host","R",$_REQUEST["hostid"]))
         {
@@ -63,42 +60,6 @@
                 exit;
         }
 	update_profile("web.menu.view.last",$page["file"]);
-?>
-
-<?php
-	// Misc functions
-	function	format_lastvalue($db_item)
-	{
-		if(isset($db_item["lastvalue"]))
-		{
-			if($db_item["value_type"] == ITEM_VALUE_TYPE_FLOAT)
-			{
-				$lastvalue=convert_units($db_item["lastvalue"],$db_item["units"]);
-			}
-			else if($db_item["value_type"] == ITEM_VALUE_TYPE_UINT64)
-			{
-				$lastvalue=convert_units($db_item["lastvalue"],$db_item["units"]);
-			}
-			else if($db_item["value_type"] == ITEM_VALUE_TYPE_TEXT)
-			{
-				$lastvalue="...";
-			}
-			else
-			{
-				$lastvalue=nbsp(htmlspecialchars(substr($db_item["lastvalue"],0,20)));
-				if(strlen($db_item["lastvalue"]) > 20)
-					$lastvalue .= " ...";
-			}
-			if($db_item["valuemapid"] > 0);
-				$lastvalue = replace_value_by_map($lastvalue, $db_item["valuemapid"]);
-
-		}
-		else
-		{
-			$lastvalue=new CCol("-","center");
-		}
-		return $lastvalue;
-	}
 ?>
 <?php
 
@@ -142,7 +103,6 @@
 
 	update_profile("web.latest.applications",$_REQUEST["applications"],PROFILE_TYPE_ARRAY);
 ?>
-
 <?php
 	$r_form = new CForm();
 
@@ -214,7 +174,6 @@
 
 	show_header2(NULL, $r_form);
 ?>
-
 <?php
 	if(isset($show_all_apps))
 		$link = new CLink(new CImg("images/general/opened.gif"),
@@ -278,7 +237,7 @@
 			if(isset($db_item["lastclock"]))
 				$lastclock=date(S_DATE_FORMAT_YMDHMS,$db_item["lastclock"]);
 			else
-				$lastclock="-";
+				$lastclock=new CCol("-","center");
 
 			$lastvalue=format_lastvalue($db_item);
 
@@ -313,7 +272,7 @@
 				$_REQUEST["hostid"] > 0 ? NULL : SPACE,
 				str_repeat(SPACE,6).item_description($db_item["description"],$db_item["key_"]),
 				$lastclock,
-				$lastvalue,
+				new CCol($lastvalue, $lastvalue=='-' ? 'center' : null),
 				$change,
 				$actions
 				)));
@@ -369,7 +328,7 @@
 		if(isset($db_item["lastclock"]))
 			$lastclock=date(S_DATE_FORMAT_YMDHMS,$db_item["lastclock"]);
 		else
-			$lastclock="-";
+			$lastclock=new CCol("-","center");
 
 		$lastvalue=format_lastvalue($db_item);
 
@@ -404,7 +363,7 @@
 			$_REQUEST["hostid"] > 0 ? NULL : $db_item["host"],
 			str_repeat(SPACE, ($any_app_exist ? 6 : 0)).item_description($db_item["description"],$db_item["key_"]),
 			$lastclock,
-			$lastvalue,
+			new CCol($lastvalue, $lastvalue=='-' ? 'center' : null),
 			$change,
 			$actions
 			)));
