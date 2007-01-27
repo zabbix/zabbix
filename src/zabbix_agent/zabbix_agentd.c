@@ -186,7 +186,7 @@ void    daemon_init(void)
 	struct passwd   *pwd;
 
 	/* running as root ?*/
-	if( (CONFIG_ALLOW_ROOT == 0) || (getuid()==0) || (getgid()==0))
+	if( (CONFIG_ALLOW_ROOT == 0) && ((getuid()==0) || (getgid()==0)))
 	{
 		pwd = getpwnam("zabbix");
 		if ( pwd == NULL )
