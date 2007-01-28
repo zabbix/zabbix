@@ -1,5 +1,6 @@
 Changes for 1.1.6:
 
+ - fix for adding trigger expressions having sign '-' (Alexei)
  - fix for adding hosts names having character '-' (Alexei)
 
 Changes for 1.1.5:
