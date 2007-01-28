@@ -70,6 +70,7 @@ Integrated from 1.1.x
 
 1.1.6
 
+ - fix for adding trigger expressions having sign '-' (Alexei)
  - fix for adding hosts names having character '-' (Alexei)
 
 1.1.5
