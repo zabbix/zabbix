@@ -362,8 +362,6 @@ static int	send_value(char *server,unsigned short port,char *host, char *key,cha
 
 	struct hostent *hp;
 
-	unsigned int addr;
-
 	zabbix_log( LOG_LEVEL_DEBUG, "In send_value('%s',%u,'%s','%s','%s','%s','%s','%s')",
 		server, port, host, key, lastlogsize, timestamp, source, severity);
 

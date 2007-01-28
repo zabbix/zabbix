@@ -845,7 +845,19 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 		}
 		else
 		{
-			if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) || (item->value_type==ITEM_VALUE_TYPE_UINT64))
+			switch (item->value_type) {
+				case ITEM_VALUE_TYPE_FLOAT:
+					zbx_snprintf(value,MAX_STRING_LEN,"%f",item->lastvalue_dbl);
+					del_zeroes(value);
+					break;
+				case ITEM_VALUE_TYPE_UINT64:
+					zbx_snprintf(value,MAX_STRING_LEN,ZBX_FS_UI64,item->lastvalue_uint64);
+					break;
+				default:
+					strcpy(value,item->lastvalue_str);
+					break;
+			}
+/*			if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) || (item->value_type==ITEM_VALUE_TYPE_UINT64))
 			{
 				zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 1");
 				zbx_snprintf(value,MAX_STRING_LEN,"%f",item->lastvalue);
@@ -854,11 +866,10 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 			}
 			else
 			{
-/*				*value=strdup(item->lastvalue_str);*/
 				zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 3 [%s] [%s]",value,item->lastvalue_str);
 				strcpy(value,item->lastvalue_str);
 				zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 4");
-			}
+			}*/
 		}
 	}
 	else if(strcmp(function,"prev")==0)
@@ -869,7 +880,19 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 		}
 		else
 		{
-			if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) || (item->value_type==ITEM_VALUE_TYPE_UINT64))
+			switch (item->value_type) {
+				case ITEM_VALUE_TYPE_FLOAT:
+					zbx_snprintf(value,MAX_STRING_LEN,"%f",item->prevvalue_dbl);
+					del_zeroes(value);
+					break;
+				case ITEM_VALUE_TYPE_UINT64:
+					zbx_snprintf(value,MAX_STRING_LEN,ZBX_FS_UI64,item->prevvalue_dbl);
+					break;
+				default:
+					strcpy(value,item->prevvalue_str);
+					break;
+			}
+/*			if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) || (item->value_type==ITEM_VALUE_TYPE_UINT64))
 			{
 				zbx_snprintf(value,MAX_STRING_LEN,"%f",item->prevvalue);
 				del_zeroes(value);
@@ -877,7 +900,7 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 			else
 			{
 				strcpy(value,item->prevvalue_str);
-			}
+			}*/
 		}
 	}
 	else if(strcmp(function,"min")==0)
@@ -952,7 +975,27 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 		}
 		else
 		{
-			if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) || (item->value_type==ITEM_VALUE_TYPE_UINT64))
+			switch (item->value_type) {
+				case ITEM_VALUE_TYPE_FLOAT:
+					zbx_snprintf(value,MAX_STRING_LEN,"%f",
+						(double)abs(item->lastvalue_dbl-item->prevvalue_dbl));
+					del_zeroes(value);
+					break;
+				case ITEM_VALUE_TYPE_UINT64:
+					zbx_snprintf(value,MAX_STRING_LEN,ZBX_FS_UI64, labs(item->lastvalue_uint64-item->prevvalue_uint64));
+					break;
+				default:
+					if(strcmp(item->lastvalue_str, item->prevvalue_str) == 0)
+					{
+						strcpy(value,"0");
+					}
+					else
+					{
+						strcpy(value,"1");
+					}
+					break;
+			}
+/*			if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) || (item->value_type==ITEM_VALUE_TYPE_UINT64))
 			{
 				zbx_snprintf(value,MAX_STRING_LEN,"%f",(float)abs(item->lastvalue-item->prevvalue));
 				del_zeroes(value);
@@ -967,7 +1010,7 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 				{
 					strcpy(value,"1");
 				}
-			}
+			}*/
 		}
 	}
 	else if(strcmp(function,"change")==0)
@@ -978,7 +1021,27 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 		}
 		else
 		{
-			if(item->value_type==ITEM_VALUE_TYPE_FLOAT)
+			switch (item->value_type) {
+				case ITEM_VALUE_TYPE_FLOAT:
+					zbx_snprintf(value,MAX_STRING_LEN,"%f",
+						item->lastvalue_dbl-item->prevvalue_dbl);
+					del_zeroes(value);
+					break;
+				case ITEM_VALUE_TYPE_UINT64:
+					zbx_snprintf(value,MAX_STRING_LEN,ZBX_FS_UI64, item->lastvalue_uint64-item->prevvalue_uint64);
+					break;
+				default:
+					if(strcmp(item->lastvalue_str, item->prevvalue_str) == 0)
+					{
+						strcpy(value,"0");
+					}
+					else
+					{
+						strcpy(value,"1");
+					}
+					break;
+			}
+/*			if(item->value_type==ITEM_VALUE_TYPE_FLOAT)
 			{
 				zbx_snprintf(value,MAX_STRING_LEN,"%f",item->lastvalue-item->prevvalue);
 				del_zeroes(value);
@@ -993,19 +1056,50 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 				{
 					strcpy(value,"1");
 				}
-			}
+			}*/
 		}
 	}
 	else if(strcmp(function,"diff")==0)
 	{
-		zabbix_log( LOG_LEVEL_DEBUG, "Evaluating diff [%s] [%s]",item->lastvalue_str,item->prevvalue_str);
 		if((item->lastvalue_null==1)||(item->prevvalue_null==1))
 		{
 			ret = FAIL;
 		}
 		else
 		{
-			if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) || (item->value_type==ITEM_VALUE_TYPE_UINT64))
+			switch (item->value_type) {
+				case ITEM_VALUE_TYPE_FLOAT:
+					if(cmp_double(item->lastvalue_dbl, item->prevvalue_dbl) == 0)
+					{
+						strcpy(value,"0");
+					}
+					else
+					{
+						strcpy(value,"2");
+					}
+					break;
+				case ITEM_VALUE_TYPE_UINT64:
+					if(item->lastvalue_dbl == item->prevvalue_dbl)
+					{
+						strcpy(value,"1");
+					}
+					else
+					{
+						strcpy(value,"0");
+					}
+					break;
+				default:
+					if(strcmp(item->lastvalue_str, item->prevvalue_str) == 0)
+					{
+						strcpy(value,"0");
+					}
+					else
+					{
+						strcpy(value,"1");
+					}
+					break;
+			}
+/*			if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) || (item->value_type==ITEM_VALUE_TYPE_UINT64))
 			{
 				if(cmp_double(item->lastvalue, item->prevvalue) == 0)
 				{
@@ -1026,7 +1120,7 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 				{
 					strcpy(value,"1");
 				}
-			}
+			}*/
 		}
 	}
 	else if(strcmp(function,"str")==0)
@@ -1083,15 +1177,30 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 		}
 		else
 		{
-			zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() fuzzytime [%s] [%s]",value,item->lastvalue);
-
-			if((item->lastvalue>=fuzlow)&&(item->lastvalue<=fuzhig))
-			{
-				strcpy(value,"1");
-			}
-			else
-			{
-				strcpy(value,"0");
+			switch (item->value_type) {
+				case ITEM_VALUE_TYPE_FLOAT:
+					if((item->lastvalue_dbl>=fuzlow)&&(item->lastvalue_dbl<=fuzhig))
+					{
+						strcpy(value,"1");
+					}
+					else
+					{
+						strcpy(value,"0");
+					}
+					break;
+				case ITEM_VALUE_TYPE_UINT64:
+					if((item->lastvalue_uint64>=fuzlow)&&(item->lastvalue_uint64<=fuzhig))
+					{
+						strcpy(value,"1");
+					}
+					else
+					{
+						strcpy(value,"0");
+					}
+					break;
+				default:
+					ret = FAIL;
+					break;
 			}
 		}
 	}

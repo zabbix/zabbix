@@ -394,7 +394,7 @@ FIELD		|trapper_hosts	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|units		|t_varchar(10)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|multiplier	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|delta		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|prevorgvalue	|t_double(16,4)	|	|NULL		|0
+FIELD		|prevorgvalue	|t_varchar(255)	|	|NULL		|0
 FIELD		|snmpv3_securityname|t_varchar(64)|''	|NOT NULL	|ZBX_SYNC
 FIELD		|snmpv3_securitylevel|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|snmpv3_authpassphrase|t_varchar(64)|''	|NOT NULL	|ZBX_SYNC
