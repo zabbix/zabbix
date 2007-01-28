@@ -289,7 +289,7 @@ CREATE TABLE items_tmp (
 	units		varchar(10)		DEFAULT ''	NOT NULL,
 	multiplier		integer		DEFAULT '0'	NOT NULL,
 	delta		integer		DEFAULT '0'	NOT NULL,
-	prevorgvalue		double(16,4)			NULL,
+	prevorgvalue		varchar(255)			NULL,
 	snmpv3_securityname		varchar(64)		DEFAULT ''	NOT NULL,
 	snmpv3_securitylevel		integer		DEFAULT '0'	NOT NULL,
 	snmpv3_authpassphrase		varchar(64)		DEFAULT ''	NOT NULL,

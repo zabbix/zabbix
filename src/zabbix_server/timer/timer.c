@@ -96,10 +96,6 @@ void main_timer_loop()
 		{
 			DBget_item_from_db(&item,row);
 
-/* Update triggers will update value for NODATA */
-/*			zbx_snprintf(sql,sizeof(sql),"update functions set lastvalue='1' where itemid=%d and function='%s' and parameter='%s'" , itemid, function, parameter );
-			DBexecute(sql);*/
-
 			DBbegin();
 			update_functions(&item);
 			update_triggers(item.itemid);

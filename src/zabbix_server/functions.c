@@ -420,8 +420,6 @@ int	process_data(zbx_sock_t *sock,char *server,char *key,char *value,char *lastl
 
 	init_result(&agent);
 
-/*	zbx_snprintf(sql,sizeof(sql),"select i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.value_type,i.trapper_hosts,i.delta,i.units,i.multiplier,i.formula,i.logtimefmt from items i,hosts h where h.status=%d and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type in (%d,%d)", HOST_STATUS_MONITORED, server, key, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE);*/
-
 	DBescape_string(server, server_esc, MAX_STRING_LEN);
 	DBescape_string(key, key_esc, MAX_STRING_LEN);
 
@@ -556,27 +554,26 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 			/* Delta as speed of change */
 			else if(item->delta == ITEM_STORE_SPEED_PER_SECOND)
 			{
-				zabbix_log( LOG_LEVEL_DEBUG, "ITEM_STORE_SPEED_PER_SECOND(%s,%f,%f)", item->key, item->prevorgvalue, value->dbl);
 				/* Save delta */
 				if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) && (value->type & AR_DOUBLE))
 				{
-					if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value->dbl))
+					if((item->prevorgvalue_null == 0) && (item->prevorgvalue_dbl <= value->dbl))
 					{
-						DBadd_history(item->itemid, (value->dbl - item->prevorgvalue)/(now-item->lastclock), now);
+						DBadd_history(item->itemid, (value->dbl - item->prevorgvalue_dbl)/(now-item->lastclock), now);
 					}
 				}
 				else if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) && (value->type & AR_UINT64))
 				{
-					if((item->prevorgvalue_null == 0) && ((zbx_uint64_t)item->prevorgvalue <= (double)value->ui64))
+					if((item->prevorgvalue_null == 0) && (item->prevorgvalue_dbl <= (double)value->ui64))
 					{
-						DBadd_history(item->itemid, ((double)value->ui64 - (zbx_uint64_t)item->prevorgvalue)/(now-item->lastclock), now);
+						DBadd_history(item->itemid, ((double)value->ui64 - item->prevorgvalue_dbl)/(now-item->lastclock), now);
 					}
 				}
 				else if((item->value_type==ITEM_VALUE_TYPE_UINT64) && (value->type & AR_UINT64))
 				{
-					if((item->prevorgvalue_null == 0) && ((zbx_uint64_t)item->prevorgvalue <= value->ui64))
+					if((item->prevorgvalue_null == 0) && (item->prevorgvalue_uint64 <= value->ui64))
 					{
-						DBadd_history_uint(item->itemid, (zbx_uint64_t)(value->ui64 - (zbx_uint64_t)item->prevorgvalue)/(now-item->lastclock), now);
+						DBadd_history_uint(item->itemid, (zbx_uint64_t)(value->ui64 - item->prevorgvalue_uint64)/(now-item->lastclock), now);
 					}
 				}
 			}
@@ -586,23 +583,23 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 				/* Save delta */
 				if((item->value_type==ITEM_VALUE_TYPE_FLOAT) && (value->type & AR_DOUBLE))
 				{
-					if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value->dbl) )
+					if((item->prevorgvalue_null == 0) && (item->prevorgvalue_dbl <= value->dbl) )
 					{
-						DBadd_history(item->itemid, (value->dbl - item->prevorgvalue), now);
+						DBadd_history(item->itemid, (value->dbl - item->prevorgvalue_dbl), now);
 					}
 				}
 				else if((item->value_type==ITEM_VALUE_TYPE_FLOAT) && (value->type & AR_UINT64))
 				{
-					if((item->prevorgvalue_null == 0) && ((zbx_uint64_t)item->prevorgvalue <= (double)value->ui64) )
+					if((item->prevorgvalue_null == 0) && (item->prevorgvalue_dbl <= (double)value->ui64) )
 					{
-						DBadd_history(item->itemid, ((double)value->ui64 - (zbx_uint64_t)item->prevorgvalue), now);
+						DBadd_history(item->itemid, ((double)value->ui64 - item->prevorgvalue_dbl), now);
 					}
 				}
 				else if((item->value_type==ITEM_VALUE_TYPE_UINT64) && (value->type & AR_UINT64))
 				{
-					if((item->prevorgvalue_null == 0) && ((zbx_uint64_t)item->prevorgvalue <= value->ui64) )
+					if((item->prevorgvalue_null == 0) && (item->prevorgvalue_uint64 <= value->ui64) )
 					{
-						DBadd_history_uint(item->itemid, (value->ui64 - (zbx_uint64_t)item->prevorgvalue), now);
+						DBadd_history_uint(item->itemid, value->ui64 - item->prevorgvalue_uint64, now);
 					}
 				}
 			}
@@ -659,26 +656,22 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
  ******************************************************************************/
 static int	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 {
-	char	value_esc[MAX_STRING_LEN];
-	char	value_str[MAX_STRING_LEN];
-	double	value_double;
+	char		value_esc[MAX_STRING_LEN];
+	char		value_str[MAX_STRING_LEN];
 	int ret = SUCCEED;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In update_item()");
 
 	value_str[0]	= '\0';
 	value_esc[0]	= '\0';
-	value_double	= 0;
 	
 	if(value->type & AR_UINT64)
 	{
 		zbx_snprintf(value_str, sizeof(value_str),ZBX_FS_UI64, value->ui64);
-		value_double = (double)value->ui64;
 	}
 	if(value->type & AR_DOUBLE)
 	{
 		zbx_snprintf(value_str,sizeof(value_str),"%f", value->dbl);
-		value_double = value->dbl;
 	}
 	if(value->type & AR_STRING)
 	{
@@ -691,97 +684,191 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 
 	if(item->delta == ITEM_STORE_AS_IS)
 	{
-/*		if((item->prevvalue_null == 1) || (strcmp(value_str,item->lastvalue_str) != 0) || (strcmp(item->prevvalue_str,item->lastvalue_str) != 0) )*/
-/* Fixed crash when lastvalue == NULL */
-		if((value->type & AR_TEXT) == 0 && ((item->prevvalue_null == 1) || (item->lastvalue_null == 1) ||
-			(strcmp(value_str,item->lastvalue_str) != 0) ||
-			(strcmp(item->prevvalue_str,item->lastvalue_str) != 0)))
-		{
-			DBescape_string(value_str,value_esc,MAX_STRING_LEN);
-/*			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='%s',lastclock=%d where itemid=%d",now+item->delay,value_esc,now,item->itemid);*/
-			DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='%s',lastclock=%d where itemid=" ZBX_FS_UI64,
-				calculate_item_nextcheck(item->itemid, item->type, item->delay, item->delay_flex, now),
-				value_esc,
-				(int)now,
-				item->itemid);
-
-			item->prevvalue=item->lastvalue;
-			item->lastvalue=value_double;
-			item->prevvalue_str=item->lastvalue_str;
-	/* Risky !!!*/
-			item->lastvalue_str=value_str;
-			item->prevvalue_null=item->lastvalue_null;
-			item->lastvalue_null=0;
-		}
-		else
-		{
-/*			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,lastclock=%d where itemid=%d",now+item->delay,now,item->itemid);*/
-			DBexecute("update items set nextcheck=%d,lastclock=%d where itemid=" ZBX_FS_UI64,
-				calculate_item_nextcheck(item->itemid, item->type, item->delay, item->delay_flex, now),
-				(int)now,
-				item->itemid);
+		switch(value->type) {
+			case AR_DOUBLE:
+				DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='%f',lastclock=%d where itemid=" ZBX_FS_UI64,
+					calculate_item_nextcheck(item->itemid, item->type, item->delay, item->delay_flex, now),
+					value->dbl,
+					(int)now,
+					item->itemid);
+				break;
+			case AR_UINT64:
+				DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='" ZBX_FS_UI64 "',lastclock=%d where itemid=" ZBX_FS_UI64,
+					calculate_item_nextcheck(item->itemid, item->type, item->delay, item->delay_flex, now),
+					value->ui64,
+					(int)now,
+					item->itemid);
+				break;
+			case AR_STRING:
+				DBescape_string(value_str,value_esc,MAX_STRING_LEN);
+				DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='%s',lastclock=%d where itemid=" ZBX_FS_UI64,
+					calculate_item_nextcheck(item->itemid, item->type, item->delay, item->delay_flex, now),
+					value_esc,
+					(int)now,
+					item->itemid);
+				break;
+			default:
+				break;
 		}
 	}
 	/* Logic for delta as speed of change */
 	else if(item->delta == ITEM_STORE_SPEED_PER_SECOND)
 	{
-		if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value_double) )
+		if((value->type & AR_DOUBLE) && (item->value_type == ITEM_VALUE_TYPE_FLOAT))
 		{
-/*			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue=%f,lastvalue='%f',lastclock=%d where itemid=%d",now+item->delay,value_double,(value_double - item->prevorgvalue)/(now-item->lastclock),now,item->itemid);*/
-			DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue=%f,lastvalue='%f',lastclock=%d where itemid=" ZBX_FS_UI64,
-				calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
-				value_double,
-				(value_double - item->prevorgvalue)/(now-item->lastclock),
-				(int)now,
-				item->itemid);
+			if((item->prevorgvalue_null == 0) && (item->prevorgvalue_dbl <= value->dbl) )
+			{
+				DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue='%f',lastvalue='%f',lastclock=%d where itemid=" ZBX_FS_UI64,
+					calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
+					value->dbl,
+					(value->dbl - item->prevorgvalue_dbl)/(now-item->lastclock),
+					(int)now,
+					item->itemid);
+			}
+			else
+			{
+				DBexecute("update items set nextcheck=%d,prevorgvalue='%f',lastclock=%d where itemid=" ZBX_FS_UI64,
+					calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
+					value->dbl,
+					(int)now,
+					item->itemid);
+			}
 		}
-		else
+		else if((value->type & AR_DOUBLE) && (item->value_type == ITEM_VALUE_TYPE_UINT64))
 		{
-/*			snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d,prevorgvalue=%f,lastclock=%d where itemid=%d",now+item->delay,value_double,now,item->itemid);*/
-			DBexecute("update items set nextcheck=%d,prevorgvalue=%f,lastclock=%d where itemid=" ZBX_FS_UI64,
-				calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
-				value_double,
-				(int)now,
-				item->itemid);
+			if((item->prevorgvalue_null == 0) && ((double)item->prevorgvalue_uint64 <= value->dbl) )
+			{
+				DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue='%f',lastvalue='%f',lastclock=%d where itemid=" ZBX_FS_UI64,
+					calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
+					value->dbl,
+					(value->dbl - (double)(item->prevorgvalue_uint64))/(now-item->lastclock),
+					(int)now,
+					item->itemid);
+			}
+			else
+			{
+				DBexecute("update items set nextcheck=%d,prevorgvalue='%f',lastclock=%d where itemid=" ZBX_FS_UI64,
+					calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
+					value->dbl,
+					(int)now,
+					item->itemid);
+			}
 		}
-
-		item->prevvalue=item->lastvalue;
-		item->lastvalue=(value_double - item->prevorgvalue)/(now-item->lastclock);
-		item->prevvalue_str=item->lastvalue_str;
-	/* Risky !!!*/
-		item->lastvalue_str=value_str;
-		item->prevvalue_null=item->lastvalue_null;
-		item->lastvalue_null=0;
+		else if((value->type & AR_UINT64) && (item->value_type == ITEM_VALUE_TYPE_UINT64))
+		{
+			if((item->prevorgvalue_null == 0) && (item->prevorgvalue_uint64 <= value->ui64) )
+			{
+				DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue='" ZBX_FS_UI64 "',lastvalue='%f',lastclock=%d where itemid=" ZBX_FS_UI64,
+					calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
+					value->ui64,
+					((double)(value->ui64 - item->prevorgvalue_uint64))/(now-item->lastclock),
+					(int)now,
+					item->itemid);
+			}
+			else
+			{
+				DBexecute("update items set nextcheck=%d,prevorgvalue='" ZBX_FS_UI64 "',lastclock=%d where itemid=" ZBX_FS_UI64,
+					calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
+					value->ui64,
+					(int)now,
+					item->itemid);
+			}
+		}
 	}
 	/* Real delta: simple difference between values */
 	else if(item->delta == ITEM_STORE_SIMPLE_CHANGE)
 	{
-		if((item->prevorgvalue_null == 0) && (item->prevorgvalue <= value_double) )
+		if((value->type & AR_DOUBLE) && (item->value_type == ITEM_VALUE_TYPE_FLOAT))
 		{
-			DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue=%f,lastvalue='%f',lastclock=%d where itemid=" ZBX_FS_UI64,
-				calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
-				value_double,
-				(value_double - item->prevorgvalue),
-				(int)now,
-				item->itemid);
+			if((item->prevorgvalue_null == 0) && (item->prevorgvalue_dbl <= value->dbl))
+			{
+				DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue='%f',lastvalue='%f',lastclock=%d where itemid=" ZBX_FS_UI64,
+					calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
+					value->dbl,
+					(value->dbl - item->prevorgvalue_dbl),
+					(int)now,
+					item->itemid);
+			}
+			else
+			{
+				DBexecute("update items set nextcheck=%d,prevorgvalue='%f',lastclock=%d where itemid=" ZBX_FS_UI64,
+					calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex, now),
+					value->dbl,
+					(int)now,
+					item->itemid);
+			}
 		}
-		else
+		else if((value->type & AR_DOUBLE) && (item->value_type == ITEM_VALUE_TYPE_UINT64))
 		{
-			DBexecute("update items set nextcheck=%d,prevorgvalue=%f,lastclock=%d where itemid=" ZBX_FS_UI64,
-				calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex, now),
-				value_double,
-				(int)now,
-				item->itemid);
+			if((item->prevorgvalue_null == 0) && ((double)item->prevorgvalue_uint64 <= value->dbl))
+			{
+				DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue='%f',lastvalue='%f',lastclock=%d where itemid=" ZBX_FS_UI64,
+					calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
+					value->dbl,
+					(value->dbl - (double)item->prevorgvalue_uint64),
+					(int)now,
+					item->itemid);
+			}
+			else
+			{
+				DBexecute("update items set nextcheck=%d,prevorgvalue='%f',lastclock=%d where itemid=" ZBX_FS_UI64,
+					calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex, now),
+					value->dbl,
+					(int)now,
+					item->itemid);
+			}
 		}
-
-		item->prevvalue=item->lastvalue;
-		item->lastvalue=(value_double - item->prevorgvalue);
-		item->prevvalue_str=item->lastvalue_str;
-	/* Risky !!!*/
-		item->lastvalue_str=value_str;
-		item->prevvalue_null=item->lastvalue_null;
-		item->lastvalue_null=0;
+		else if((value->type & AR_UINT64) && (item->value_type == ITEM_VALUE_TYPE_UINT64))
+		{
+			if((item->prevorgvalue_null == 0) && (item->prevorgvalue_uint64 <= value->ui64))
+			{
+				DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue='" ZBX_FS_UI64 "',lastvalue='" ZBX_FS_UI64 "',lastclock=%d where itemid=" ZBX_FS_UI64,
+					calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
+					value->ui64,
+					(value->ui64 - item->prevorgvalue_uint64),
+					(int)now,
+					item->itemid);
+			}
+			else
+			{
+				DBexecute("update items set nextcheck=%d,prevorgvalue='" ZBX_FS_UI64 "',lastclock=%d where itemid=" ZBX_FS_UI64,
+					calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex, now),
+					value->ui64,
+					(int)now,
+					item->itemid);
+			}
+		}
+		else if((value->type & AR_UINT64) && (item->value_type == ITEM_VALUE_TYPE_FLOAT))
+		{
+			if((item->prevorgvalue_null == 0) && (item->prevorgvalue_uint64 <= value->ui64))
+			{
+				DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue='" ZBX_FS_UI64 "',lastvalue='%f',lastclock=%d where itemid=" ZBX_FS_UI64,
+					calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
+					value->ui64,
+					((double)value->ui64 - item->prevorgvalue_uint64),
+					(int)now,
+					item->itemid);
+			}
+			else
+			{
+				DBexecute("update items set nextcheck=%d,prevorgvalue='" ZBX_FS_UI64 "',lastclock=%d where itemid=" ZBX_FS_UI64,
+					calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex, now),
+					value->ui64,
+					(int)now,
+					item->itemid);
+			}
+		}
 	}
+
+	item->prevvalue_str=item->lastvalue_str;
+	item->prevvalue_dbl=item->lastvalue_dbl;
+	item->prevvalue_uint64=item->lastvalue_uint64;
+	item->prevvalue_null=item->lastvalue_null;
+
+	item->lastvalue_uint64=value->ui64;
+	item->lastvalue_dbl=value->dbl;
+	item->lastvalue_str=value->str;
+	item->lastvalue_null=0;
 
 /* Update item status if required */
 	if(item->status == ITEM_STATUS_NOTSUPPORTED)
@@ -816,18 +903,12 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 void	process_new_value(DB_ITEM *item, AGENT_RESULT *value)
 {
 	time_t 	now;
-/*	char	value_str[MAX_STRING_LEN];
-	double	value_double;*/
 	double	multiplier;
 	char	*e;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_new_value()");
 
 	now = time(NULL);
-
-/*	strscpy(value_str, value);*/
-
-/*	value_double=strtod(value_str,&e);*/
 
 	if(item->multiplier == ITEM_MULTIPLIER_USE)
 	{

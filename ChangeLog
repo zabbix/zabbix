@@ -1,5 +1,6 @@
 Changes for 1.3.3:
 
+ - changed type of items.prevorgvalue to preserve data precision (Alexei)
  - added possibility of hostname using (Eugene)
  - new communication library and protocol (Alexei)
  - developed configuration interface of http monitoring (Eugene)

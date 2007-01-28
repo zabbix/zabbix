@@ -378,10 +378,12 @@ lbl_exec:
 	}
 #endif
 	
-	zbx_free(sql);
 
 	gettimeofday(&tv, NULL);
-	zabbix_log( LOG_LEVEL_WARNING, "Query processed in %f seconds", (float)(tv.tv_usec-msec)/1000000 );
+	if((float)(tv.tv_usec-msec)/1000000 > 0.03)
+		zabbix_log( LOG_LEVEL_WARNING, "%f sec, query %s", (float)(tv.tv_usec-msec)/1000000, sql );
+
+	zbx_free(sql);
 	return ret;
 }
 
@@ -610,10 +612,11 @@ lbl_get_table:
 	}
 #endif
 
-	zbx_free(sql);
-
 	gettimeofday(&tv, NULL);
-	zabbix_log( LOG_LEVEL_WARNING, "Query processed in %f seconds", (float)(tv.tv_usec-msec)/1000000 );
+	if((float)(tv.tv_usec-msec)/1000000 > 0.03)
+		zabbix_log( LOG_LEVEL_WARNING, "%f sec, query %s", (float)(tv.tv_usec-msec)/1000000, sql );
+
+	zbx_free(sql);
 	return result;
 }
 
@@ -2022,6 +2025,8 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 	item->useip=atoi(row[10]);
 	item->ip=row[11];
 	item->history=atoi(row[12]);
+	item->value_type=atoi(row[17]);
+
 	s=row[13];
 	if(DBis_null(s)==SUCCEED)
 	{
@@ -2030,8 +2035,17 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 	else
 	{
 		item->lastvalue_null=0;
-		item->lastvalue_str=s;
-		item->lastvalue=atof(s);
+		switch(item->value_type) {
+			case ITEM_VALUE_TYPE_FLOAT:
+				item->lastvalue_dbl=atof(s);
+				break;
+			case ITEM_VALUE_TYPE_UINT64:
+				ZBX_STR2UINT64(item->lastvalue_uint64,s);
+				break;
+			default:
+				item->lastvalue_str=s;
+				break;
+		}	
 	}
 	s=row[14];
 	if(DBis_null(s)==SUCCEED)
@@ -2041,13 +2055,20 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 	else
 	{
 		item->prevvalue_null=0;
-		item->prevvalue_str=s;
-		item->prevvalue=atof(s);
+		switch(item->value_type) {
+			case ITEM_VALUE_TYPE_FLOAT:
+				item->prevvalue_dbl=atof(s);
+				break;
+			case ITEM_VALUE_TYPE_UINT64:
+				ZBX_STR2UINT64(item->prevvalue_uint64,s);
+				break;
+			default:
+				item->prevvalue_str=s;
+				break;
+		}	
 	}
-/*	item->hostid=atoi(row[15]); */
 	ZBX_STR2UINT64(item->hostid, row[15]);
 	item->host_status=atoi(row[16]);
-	item->value_type=atoi(row[17]);
 
 	item->host_errors_from=atoi(row[18]);
 	item->snmp_port=atoi(row[19]);
@@ -2061,7 +2082,17 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 	else
 	{
 		item->prevorgvalue_null=0;
-		item->prevorgvalue=atof(s);
+		switch(item->value_type) {
+			case ITEM_VALUE_TYPE_FLOAT:
+				item->prevorgvalue_dbl=atof(s);
+				break;
+			case ITEM_VALUE_TYPE_UINT64:
+				ZBX_STR2UINT64(item->prevorgvalue_uint64,s);
+				break;
+			default:
+				item->prevorgvalue_str=s;
+				break;
+		}	
 	}
 	s=row[22];
 	if(DBis_null(s)==SUCCEED)

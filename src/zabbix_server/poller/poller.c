@@ -171,6 +171,8 @@ static void update_key_status(zbx_uint64_t hostid,int host_status)
 	DB_RESULT	result;
 	DB_ROW		row;
 
+	int		update;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In update_key_status(" ZBX_FS_UI64 ",%d)",
 		hostid,host_status);
 
@@ -184,8 +186,11 @@ static void update_key_status(zbx_uint64_t hostid,int host_status)
 		DBget_item_from_db(&item,row);
 
 /* Do not process new value for status, if previous status is the same */
-		zabbix_log( LOG_LEVEL_DEBUG, "item.lastvalue[%f] new host status[%d]",item.lastvalue,host_status);
-		if( (item.lastvalue_null==1) || (cmp_double(item.lastvalue, (double)host_status) == 1))
+		update = (item.lastvalue_null==1);
+		update = update || ((item.value_type == ITEM_VALUE_TYPE_FLOAT) &&(cmp_double(item.lastvalue_dbl, (double)host_status) == 1));
+		update = update || ((item.value_type == ITEM_VALUE_TYPE_UINT64) &&(item.lastvalue_uint64 == host_status));
+
+		if(update)
 		{
 			init_result(&agent);
 			SET_UI64_RESULT(&agent, host_status);
