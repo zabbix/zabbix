@@ -112,7 +112,8 @@ typedef enum
 	ITEM_TYPE_INTERNAL,
 	ITEM_TYPE_SNMPv3,
 	ITEM_TYPE_ZABBIX_ACTIVE,
-	ITEM_TYPE_AGGREGATE
+	ITEM_TYPE_AGGREGATE,
+	ITEM_TYPE_HTTPTEST
 } zbx_item_type_t;
 
 /* Item value types */
@@ -124,6 +125,14 @@ typedef enum
 	ITEM_VALUE_TYPE_UINT64,
 	ITEM_VALUE_TYPE_TEXT
 } zbx_item_value_type_t;
+
+/* HTTP test states */
+typedef enum
+{
+	HTTPTEST_STATE_IDLE = 0,
+	HTTPTEST_STATE_BUSY
+} zbx_httptest_state_type_t;
+
 
 /* Item snmpv3 security levels */
 #define ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV	0

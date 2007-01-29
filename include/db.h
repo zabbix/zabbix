@@ -391,6 +391,10 @@ DB_HTTPTEST
 	int		nextcheck;
 	int		status;
 	int		delay;
+	char		*macros;
+	char		*agent;
+	double		speed;
+	double		time;
 };
 
 DB_HTTPSTEP

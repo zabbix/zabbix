@@ -45,21 +45,18 @@
  ******************************************************************************/
 void http_substitute_macros(DB_HTTPTEST *httptest, char *data, int data_max_len)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In http_substitute_macros(httptestid:" ZBX_FS_UI64 ", data:%s)",
-		httptest->httptestid, data);
-
 	char
 		*pl = NULL,
 		*pr = NULL,
 		str_out[MAX_STRING_LEN],
 		replace_to[MAX_STRING_LEN],
-		*c, save;
+		*c,*c2, save,*replacement,save2;
 	int	
 		outlen,
 		var_len;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In http_substitute_macros(httptestid:" ZBX_FS_UI64 ", data:%s)",
+		httptest->httptestid, data);
 
 	assert(data);
 
@@ -81,7 +78,28 @@ void http_substitute_macros(DB_HTTPTEST *httptest, char *data, int data_max_len)
 		{
 			/* Macro in pr */
 			save = c[1]; c[1]=0;
-			result = DBselect("select value from httpmacro where macro='%s' and httptestid=" ZBX_FS_UI64,
+
+			if(NULL != (c2 = strstr(httptest->macros,pr)))
+			{
+				if(NULL != (replacement = strchr(c2,'=')))
+				{
+					replacement++;
+					if(NULL != (c2 = strchr(replacement,'\r')))
+					{
+						save2 = c2[0]; c2[0]=0;
+						var_len = strlen(pr);
+						zbx_snprintf(replace_to, sizeof(replace_to), "%s", replacement);
+						c2[0] = save2;
+					}
+					else
+					{
+						var_len = strlen(pr);
+						zbx_snprintf(replace_to, sizeof(replace_to), "%s", replacement);
+					}
+				}
+				
+			}
+/*			result = DBselect("select value from httpmacro where macro='%s' and httptestid=" ZBX_FS_UI64,
 				pr, httptest->httptestid);
 			row = DBfetch(result);
 			if(row)
@@ -89,7 +107,7 @@ void http_substitute_macros(DB_HTTPTEST *httptest, char *data, int data_max_len)
 				var_len = strlen(pr);
 				zbx_snprintf(replace_to, sizeof(replace_to), "%s", row[0]);
 			}
-			DBfree_result(result);
+			DBfree_result(result);*/
 			/* Restore pr */
 			c[1]=save;
 		}

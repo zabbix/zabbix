@@ -25,11 +25,16 @@ TABLE|httptest|httptestid|ZBX_SYNC
 FIELD		|httptestid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|applicationid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|lastcheck	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|nextcheck	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|curstate	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|curstep	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|lastfailedstep	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|delay		|t_integer	|'60'	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|macros		|t_blob		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|agent		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|time		|t_double(16,4)	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|httptest_1	|httptestid
 
 TABLE|httpstep|httpstepid|ZBX_SYNC
@@ -49,15 +54,6 @@ FIELD		|httpstepid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 UNIQUE		|httpstepitem_1	|httpstepid,itemid
-
-TABLE|httpmacro|httpmacroid|ZBX_SYNC
-FIELD		|httpmacroid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|httptestid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|name		|t_varchar(64)	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|macro		|t_varchar(64)	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|value		|t_varchar(255)	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|note		|t_blob		|''	|NOT NULL	|ZBX_SYNC
-UNIQUE		|httpmacro_1	|httptestid,name
 
 TABLE|nodes|nodeid|
 FIELD		|nodeid		|t_integer	|'0'	|NOT NULL	|0
