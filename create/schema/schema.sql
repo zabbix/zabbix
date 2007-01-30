@@ -55,6 +55,14 @@ FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 UNIQUE		|httpstepitem_1	|httpstepid,itemid
 
+TABLE|httptestitem|httptestitemid|ZBX_SYNC
+FIELD		|httptestitemid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|httptestid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+UNIQUE		|httptestitem_1	|httptestid,itemid
+
+
 TABLE|nodes|nodeid|
 FIELD		|nodeid		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|name		|t_varchar(64)	|'0'	|NOT NULL	|0
