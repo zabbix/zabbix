@@ -23,11 +23,35 @@
 
 	global $USER_DETAILS;
 	global $page;
+	global $ZBX_PAGE_POST_JS;
+
+	if(!defined('PAGE_HEADER_LOADED'))
+	{
+		define ('PAGE_HEADER_LOADED', 1);
+	}
 
 	show_messages();
 		
 	if($page['type'] == PAGE_TYPE_HTML)
 	{
+?>
+<script language="JavaScript" type="text/javascript">
+<!--
+function zbxCallPostScripts()
+{
+<?php
+		if(isset($ZBX_PAGE_POST_JS))
+		{
+			foreach($ZBX_PAGE_POST_JS as $script)
+			{
+				echo $script."\n";
+			}
+		}
+?>
+}
+-->
+</script>
+<?php
 
 		if(!defined('ZBX_PAGE_NO_MENU') && !defined('ZBX_PAGE_NO_FOOTER'))
 		{

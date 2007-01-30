@@ -121,6 +121,7 @@
 	"S_CANNOT_ADD_NODE"=>			"Cannot add node",
 	"S_NODE_DELETED"=>			"Node deleted",
 	"S_CANNOT_DELETE_NODE"=>		"Cannot delete node",
+	"S_CURRENT_NODE"=>			"Current node",
 	
 //	acknow.php
 	"S_ACKNOWLEDGES"=>			"Acknowledges",
@@ -393,6 +394,7 @@
 	"S_CONFIGURATION_OF_GRAPH_BIG"=>	"CONFIGURATION OF GRAPH",
 	"S_ITEM_ADDED"=>			"Item added",
 	"S_ITEM_UPDATED"=>			"Item updated",
+	"S_ITEMS_UPDATED"=>			"Items updated",
 	"S_SORT_ORDER_UPDATED"=>		"Sort order updated",
 	"S_CANNOT_UPDATE_SORT_ORDER"=>		"Cannot update sort order",
 	"S_DISPLAYED_PARAMETERS_BIG"=>		"DISPLAYED PARAMETERS",
@@ -663,6 +665,16 @@
 	"S_SHOW_DISABLED_ITEMS"=>               "Show disabled items",
 	"S_HIDE_DISABLED_ITEMS"=>               "Hide disabled items",
 	"S_HISTORY_CLEANING_CAN_TAKE_A_LONG_TIME_CONTINUE_Q" => "History cleaning can take a long time. Continue?",
+	"S_ITEM_SELECTION"=>			"Item selection",
+	"S_SELECTION_MODE"=>			"Selection mode",
+	"S_ADVENCED"=>				"Advenced",
+	"S_SIMPLE"=>				"Simple",
+	"S_MASS_UPDATE"=>			"Mass update",
+	"S_SEARCH"=>				"Search",
+	"S_EXTERNAL_FILER"=>			"External filer",
+	"S_ORIGINAL"=>				"Original",
+	"S_NEW_FLEXIBLE_INTERVAL"=>		"New flexible interval",
+	"S_FLEXIBLE_INTERVALS"=>		"Flexible intervals (sec)",
 
 //	events.php
 	"S_LATEST_EVENTS"=>			"Latest events",

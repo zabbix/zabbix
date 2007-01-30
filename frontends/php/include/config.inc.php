@@ -147,6 +147,7 @@ function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$m
 	function	init_nodes()
 	{
 		/* Init CURRENT NODE ID */
+		global $USER_DETAILS;
 		global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID;
 		global $ZBX_CURNODEID, $ZBX_CURMASTERID;
 
@@ -192,6 +193,36 @@ function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$m
 		include_once "include/page_footer.php";
 	}
 
+
+	/* function:
+	 *     zbx_jsstr 
+	 *
+	 * description:
+	 *	convert PHP string variable to string
+	 *	for using in JavaScrip block.
+	 *
+	 * author: Eugene Grigorjev
+	 */
+	function zbx_jsstr($str)
+	{
+			return htmlspecialchars(str_replace("\n", '\n', str_replace("\r", '', $str)));
+	}
+
+	/* function:
+	 *     zbx_add_post_js
+	 *
+	 * description:
+	 *	add JavaScript for calling after page loaging.
+	 *
+	 * author: Eugene Grigorjev
+	 */
+	function zbx_add_post_js($script)
+	{
+		global $ZBX_PAGE_POST_JS;
+
+		$ZBX_PAGE_POST_JS[] = $script;
+	}
+
 	function zbx_stripslashes($value){
 		if(is_array($value)){
 			foreach($value as $id => $data)
@@ -203,7 +234,7 @@ function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$m
 		return $value;
 	}
 
-	function get_request($name, $def){
+	function get_request($name, $def=NULL){
 		global  $_REQUEST;
 		if(isset($_REQUEST[$name]))
 			return $_REQUEST[$name];
@@ -520,7 +551,9 @@ else
 	{
 		global	$page, $ZBX_MESSAGES;
 
-		if(!isset($page["type"])) $page["type"] = PAGE_TYPE_HTML;
+		if (! defined('PAGE_HEADER_LOADED')) return;
+
+		if (!isset($page["type"])) $page["type"] = PAGE_TYPE_HTML;
 
 		$message = array();
 		$width = 0;
@@ -1265,7 +1298,13 @@ else
 		return ($var == "" ? 0 : 1);
 	}
 
-	function	get_profile($idx,$default_value,$type=PROFILE_TYPE_UNCNOWN)
+	function	empty2null($var)
+	{
+		return empty($var) ? null : $var;
+	}
+
+
+	function	get_profile($idx,$default_value=null,$type=PROFILE_TYPE_UNCNOWN)
 	{
 		global $USER_DETAILS;
 

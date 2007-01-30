@@ -266,6 +266,11 @@
 
 		if($type == T_ZBX_IP) $validation = BETWEEN(0,255);
 
+		if($flags&P_UNSET_EMPTY && isset($_REQUEST[$field]) && $_REQUEST[$field]=='')
+		{
+			unset_request($field,'P_UNSET_EMPTY');
+		}
+
 //echo "Field: $field<br>";
 
 		if($exception==NULL)	$except=FALSE;

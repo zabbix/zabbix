@@ -85,7 +85,7 @@ include_once "include/page_header.php";
 		unset($_REQUEST['hostid']);
 	}
 		
-	validate_group_with_host(PERM_READ_WRITE,array("always_select_first_host","only_current_node"));
+	validate_group_with_host(PERM_READ_WRITE,array("always_select_first_host","only_current_node"),'web.last.conf.groupid', 'web.last.conf.hostid');
 
 	update_profile("web.httpconf.showdisabled",$showdisabled);
 ?>
