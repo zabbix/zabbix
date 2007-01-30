@@ -110,16 +110,60 @@ static size_t HEADERFUNCTION2( void *ptr, size_t size, size_t nmemb, void *strea
 	return size*nmemb;
 }
 
+static void	process_test_data(DB_HTTPTEST *httptest, S_ZBX_HTTPSTAT *stat)
+{
+#ifdef	HAVE_LIBCURL
+	DB_RESULT	result;
+	DB_ROW		row;
+	DB_HTTPTESTITEM	httptestitem;
+
+	AGENT_RESULT    value;
+
+	zabbix_log(LOG_LEVEL_WARNING, "     TEST [%s]: Time %f Last step %d",
+		 httptest->name, stat->test_total_time, stat->test_last_step);
+
+	result = DBselect("select httptestitemid,httptestid,itemid,type from httptestitem where httptestid=" ZBX_FS_UI64,
+		httptest->httptestid);
+
+	while((row=DBfetch(result)))
+	{
+		ZBX_STR2UINT64(httptestitem.httptestitemid, row[0]);
+		ZBX_STR2UINT64(httptestitem.httptestid, row[1]);
+		ZBX_STR2UINT64(httptestitem.itemid, row[2]);
+		httptestitem.type=atoi(row[3]);
+
+		switch (httptestitem.type) {
+			case ZBX_HTTPITEM_TYPE_TIME:
+				init_result(&value);
+				SET_DBL_RESULT(&value, stat->test_total_time);
+				process_value(httptestitem.itemid,&value);
+				free_result(&value);
+				break;
+			case ZBX_HTTPITEM_TYPE_LASTSTEP:
+				init_result(&value);
+				SET_UI64_RESULT(&value, stat->test_last_step);
+				process_value(httptestitem.itemid,&value);
+				free_result(&value);
+				break;
+			default:
+				break;
+		}
+	}
+	
+	DBfree_result(result);
+#endif
+}
+
 
 static void	process_step_data(DB_HTTPTEST *httptest, DB_HTTPSTEP *httpstep, S_ZBX_HTTPSTAT *stat)
 {
+#ifdef	HAVE_LIBCURL
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_HTTPSTEPITEM	httpstepitem;
 
 	AGENT_RESULT    value;
 
-#ifdef	HAVE_LIBCURL
 	zabbix_log(LOG_LEVEL_WARNING, "     Step [%s] [%s]: Rsp %d Time %f Speed %f",
 		 httpstep->name, httpstep->url, stat->rspcode, stat->total_time, stat->speed_download);
 
@@ -151,6 +195,8 @@ static void	process_step_data(DB_HTTPTEST *httptest, DB_HTTPSTEP *httpstep, S_ZB
 				SET_DBL_RESULT(&value, stat->speed_download);
 				process_value(httpstepitem.itemid,&value);
 				free_result(&value);
+				break;
+			default:
 				break;
 		}
 	}
@@ -361,7 +407,10 @@ zabbix_log(LOG_LEVEL_ERR, "[%s]", page.data);
 		httptest->time,
 		httptest->httptestid);
 
-//	process_test_data(httptest, httptest->time);
+	stat.test_total_time =  httptest->time;
+	stat.test_last_step = lastfailedstep;
+
+	process_test_data(httptest, &stat);
 
 	zabbix_log(LOG_LEVEL_WARNING, "TOTAL: Time %f", httptest->time);
 

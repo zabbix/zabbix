@@ -289,9 +289,13 @@ typedef enum
 #define	ZBX_TABLE_HISTORY_TEXT	4
 
 /* HTTP item types */
-#define	ZBX_HTTPITEM_TYPE_RSPCODE	0
-#define	ZBX_HTTPITEM_TYPE_TIME		1
-#define	ZBX_HTTPITEM_TYPE_SPEED		2
+typedef enum
+{
+	ZBX_HTTPITEM_TYPE_RSPCODE = 0,
+	ZBX_HTTPITEM_TYPE_TIME,
+	ZBX_HTTPITEM_TYPE_SPEED,
+	ZBX_HTTPITEM_TYPE_LASTSTEP
+} zbx_httpitem_type_t;
 
 /* Flags */
 #define	ZBX_SYNC	1

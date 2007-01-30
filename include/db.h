@@ -80,6 +80,7 @@ extern	int	CONFIG_DBPORT;
 #define DB_HTTPTEST	struct zbx_httptest_type
 #define DB_HTTPSTEP	struct zbx_httpstep_type
 #define DB_HTTPSTEPITEM	struct zbx_httpstepitem_type
+#define DB_HTTPTESTITEM	struct zbx_httptestitem_type
 
 #ifdef HAVE_SQLITE3
 
@@ -414,8 +415,17 @@ DB_HTTPSTEPITEM
 	zbx_uint64_t	httpstepitemid;
 	zbx_uint64_t	httpstepid;
 	zbx_uint64_t	itemid;
-	int		type;
+	zbx_httpitem_type_t	type;
 };
+
+DB_HTTPTESTITEM
+{
+	zbx_uint64_t	httptestitemid;
+	zbx_uint64_t	httptestid;
+	zbx_uint64_t	itemid;
+	zbx_httpitem_type_t	type;
+};
+
 
 void    DBconnect(void);
 
