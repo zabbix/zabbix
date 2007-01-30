@@ -1,0 +1,14 @@
+CREATE TABLE users (
+	userid		bigint unsigned		DEFAULT '0'	NOT NULL,
+	alias		varchar(100)		DEFAULT ''	NOT NULL,
+	name		varchar(100)		DEFAULT ''	NOT NULL,
+	surname		varchar(100)		DEFAULT ''	NOT NULL,
+	passwd		char(32)		DEFAULT ''	NOT NULL,
+	url		varchar(255)		DEFAULT ''	NOT NULL,
+	autologout		integer		DEFAULT '900'	NOT NULL,
+	lang		varchar(5)		DEFAULT 'en_gb'	NOT NULL,
+	refresh		integer		DEFAULT '30'	NOT NULL,
+	type		integer		DEFAULT '0'	NOT NULL,
+	PRIMARY KEY (userid)
+);
+CREATE INDEX users_1 on users (alias);
