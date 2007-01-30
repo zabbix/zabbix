@@ -78,7 +78,8 @@ include_once "include/page_header.php";
 
 	check_fields($fields);
 
-	validate_group_with_host(PERM_READ_WRITE,array("allow_all_hosts","always_select_first_host"));
+	validate_group_with_host(PERM_READ_WRITE,array("allow_all_hosts","always_select_first_host"),
+		'web.last.conf.groupid', 'web.last.conf.hostid');
 ?>
 <?php
 	$_REQUEST['items'] = get_request('items', array());

@@ -149,7 +149,7 @@ function update_httpstep(formname,list_name,sid,name,timeout,url,posts,required)
 			$_REQUEST['name']."',".
 			$_REQUEST['timeout'].",'".
 			$_REQUEST['url']."','".
-			str_replace("\n", '\n', str_replace("\r", '', $_REQUEST['posts']))."','".
+			zbx_jsstr($_REQUEST['posts'])."','".
 			$_REQUEST['required']."');\n";
 ?>
 -->

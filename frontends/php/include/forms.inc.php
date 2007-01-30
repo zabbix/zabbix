@@ -60,8 +60,8 @@
 		$form = new CFormTable(S_SCENARIO, null, 'post');
 		$form->SetHelp("web.webmon.httpconf.php");
 		
-		if(isset($_request["groupid"]))
-			$form->addvar("groupid",$_request["groupid"]);
+		if(isset($_REQUEST["groupid"]))
+			$form->AddVar("groupid",$_REQUEST["groupid"]);
 			
 		$form->AddVar("hostid",$_REQUEST["hostid"]);
 			
@@ -879,6 +879,284 @@
 		return $table;
 	}
 
+	function	insert_item_selection_form()
+	{
+		global  $ZBX_CURNODEID;
+
+		if(isset($_REQUEST['form_refresh']) && isset($_REQUEST['select']))
+		{
+			$selection_mode			= get_request("selection_mode"			,0);
+			    				                   			    
+			$with_node			= empty2null(get_request("with_node"));
+			$with_group			= empty2null(get_request("with_group"));
+			$with_host			= empty2null(get_request("with_host"));
+			$with_application		= empty2null(get_request("with_application"));
+			$with_description		= empty2null(get_request("with_description"));
+			$with_type			= get_request("with_type"			,-1);
+			$with_key			= empty2null(get_request("with_key"));
+			$with_snmp_community		= empty2null(get_request("with_snmp_community"));
+			$with_snmp_oid			= empty2null(get_request("with_snmp_oid"));
+			$with_snmp_port			= empty2null(get_request("with_snmp_port"));
+			$with_snmpv3_securityname	= empty2null(get_request("with_snmpv3_securityname"));
+			$with_snmpv3_securitylevel	= get_request("with_snmpv3_securitylevel"	,-1);
+			$with_snmpv3_authpassphrase	= empty2null(get_request("with_snmpv3_authpassphrase"));
+			$with_snmpv3_privpassphrase	= empty2null(get_request("with_snmpv3_privpassphrase"));
+			$with_value_type		= get_request("with_value_type"			,-1);
+			$with_units			= empty2null(get_request("with_units"));
+			$with_formula			= empty2null(get_request("with_formula"));
+			$with_delay			= empty2null(get_request("with_delay"));
+			$with_history			= empty2null(get_request("with_history"));
+			$with_trends			= empty2null(get_request("with_trends"));
+			$with_status			= empty2null(get_request("with_status"));
+			$with_logtimefmt		= empty2null(get_request("with_logtimefmt"));
+			$with_delta			= empty2null(get_request("with_delta"));
+			$with_trapper_hosts		= empty2null(get_request("with_trapper_hosts"));
+		}
+		else
+		{
+			$selection_mode			= get_request("selection_mode"            ,get_profile("selection_mode",		0));
+			    								    
+			$with_node			= empty2null(get_request("with_node"                 ,get_profile("with_node")));
+			$with_group			= empty2null(get_request("with_group"                ,get_profile("with_group")));
+			$with_host			= empty2null(get_request("with_host"                 ,get_profile("with_host")));
+			$with_application		= empty2null(get_request("with_application"          ,get_profile("with_application")));
+			$with_description		= empty2null(get_request("with_description"          ,get_profile("with_description")));
+			$with_type			= get_request("with_type"                 ,get_profile("with_type",			-1));
+			$with_key			= empty2null(get_request("with_key"                  ,get_profile("with_key")));
+			$with_snmp_community		= empty2null(get_request("with_snmp_community"       ,get_profile("with_snmp_community")));
+			$with_snmp_oid			= empty2null(get_request("with_snmp_oid"             ,get_profile("with_snmp_oid")));
+			$with_snmp_port			= empty2null(get_request("with_snmp_port"            ,get_profile("with_snmp_port")));
+			$with_snmpv3_securityname	= empty2null(get_request("with_snmpv3_securityname"  ,get_profile("with_snmpv3_securityname")));
+			$with_snmpv3_securitylevel	= get_request("with_snmpv3_securitylevel" ,get_profile("with_snmpv3_securitylevel",	-1));
+			$with_snmpv3_authpassphrase	= empty2null(get_request("with_snmpv3_authpassphrase",get_profile("with_snmpv3_authpassphrase")));
+			$with_snmpv3_privpassphrase	= empty2null(get_request("with_snmpv3_privpassphrase",get_profile("with_snmpv3_privpassphrase")));
+			$with_value_type		= get_request("with_value_type"           ,get_profile("with_value_type",		-1));
+			$with_units			= empty2null(get_request("with_units"                ,get_profile("with_units")));
+			$with_formula			= empty2null(get_request("with_formula"              ,get_profile("with_formula")));
+			$with_delay			= empty2null(get_request("with_delay"                ,get_profile("with_delay")));
+			$with_history			= empty2null(get_request("with_history"              ,get_profile("with_history")));
+			$with_trends			= empty2null(get_request("with_trends"               ,get_profile("with_trends")));
+			$with_status			= empty2null(get_request("with_status"               ,get_profile("with_status")));
+			$with_logtimefmt		= empty2null(get_request("with_logtimefmt"           ,get_profile("with_logtimefmt")));
+			$with_delta			= empty2null(get_request("with_delta"                ,get_profile("with_delta")));
+			$with_trapper_hosts		= empty2null(get_request("with_trapper_hosts"        ,get_profile("with_trapper_hosts")));
+		}
+
+		if($selection_mode == 0)
+		{
+			$with_node = null;
+			$with_group = null;
+			//$with_host = null;
+			$with_application = null;
+			//$with_description = null;
+			$with_type = -1;
+			//$with_key = null;
+			$with_snmp_community = null;
+			$with_snmp_oid = null;
+			$with_snmp_port = null;
+			$with_snmpv3_securityname = null;
+			$with_snmpv3_securitylevel = -1;
+			$with_snmpv3_authpassphrase = null;
+			$with_snmpv3_privpassphrase = null;
+			$with_value_type = -1;
+			$with_units = null;
+			$with_formula = null;
+			$with_delay = null;
+			$with_history = null;
+			$with_trends = null;
+			$with_status = null;
+			$with_logtimefmt = null;
+			$with_delta = null;
+			$with_trapper_hosts = null;
+		}
+		
+		update_profile("selection_mode"            , $_REQUEST['selection_mode']             = $selection_mode);
+							        			     			
+		update_profile("with_node"                 , $_REQUEST['with_node']                  = $with_node);
+		update_profile("with_group"                , $_REQUEST['with_group']                 = $with_group);
+		update_profile("with_host"                 , $_REQUEST['with_host']                  = $with_host);
+		update_profile("with_application"          , $_REQUEST['with_application']           = $with_application);
+		update_profile("with_description"          , $_REQUEST['with_description']           = $with_description);
+		update_profile("with_type"                 , $_REQUEST['with_type']                  = $with_type);
+		update_profile("with_key"                  , $_REQUEST['with_key']                   = $with_key);
+		update_profile("with_snmp_community"       , $_REQUEST['with_snmp_community']        = $with_snmp_community);
+		update_profile("with_snmp_oid"             , $_REQUEST['with_snmp_oid']              = $with_snmp_oid);
+		update_profile("with_snmp_port"            , $_REQUEST['with_snmp_port']             = $with_snmp_port);
+		update_profile("with_snmpv3_securityname"  , $_REQUEST['with_snmpv3_securityname']   = $with_snmpv3_securityname);
+		update_profile("with_snmpv3_securitylevel" , $_REQUEST['with_snmpv3_securitylevel']  = $with_snmpv3_securitylevel);
+		update_profile("with_snmpv3_authpassphrase", $_REQUEST['with_snmpv3_authpassphrase'] = $with_snmpv3_authpassphrase);
+		update_profile("with_snmpv3_privpassphrase", $_REQUEST['with_snmpv3_privpassphrase'] = $with_snmpv3_privpassphrase);
+		update_profile("with_value_type"           , $_REQUEST['with_value_type']            = $with_value_type);
+		update_profile("with_units"                , $_REQUEST['with_units']                 = $with_units);
+		update_profile("with_formula"              , $_REQUEST['with_formula']               = $with_formula);
+		update_profile("with_delay"                , $_REQUEST['with_delay']                 = $with_delay);
+		update_profile("with_history"              , $_REQUEST['with_history']               = $with_history);
+		update_profile("with_trends"               , $_REQUEST['with_trends']                = $with_trends);
+		update_profile("with_status"               , $_REQUEST['with_status']                = $with_status);
+		update_profile("with_logtimefmt"           , $_REQUEST['with_logtimefmt']            = $with_logtimefmt);
+		update_profile("with_delta"                , $_REQUEST['with_delta']                 = $with_delta);
+		update_profile("with_trapper_hosts"        , $_REQUEST['with_trapper_hosts']         = $with_trapper_hosts);
+
+		$form = new CFormTable(S_ITEM_SELECTION);
+		$form->SetName('frmselection');
+
+		$form->AddVar('hostid',get_request('hostid'));
+		$form->AddVar('external_filter', 1);
+
+		$form->SetTitle(S_ITEM_SELECTION,SPACE);
+
+		$form->AddVar('selection_mode', $selection_mode);
+
+		$modeLink = new CLink($selection_mode == 0 ? S_ADVENCED : S_SIMPLE, '#','action');
+		$modeLink->SetAction('create_var(\''.$form->GetName().'\',\'selection_mode\','.($selection_mode == 0 ? 1 : 0).',true)');
+		$form->AddRow(S_SELECTION_MODE,$modeLink);
+
+		if(ZBX_DISTRIBUTED && $selection_mode)
+		{
+			$form->AddRow('from '.bold(S_NODE).' like', array(
+				new CTextBox('with_node',$with_node,32),
+				new CButton("btn_node",S_SELECT,"return PopUp('popup.php?dstfrm=".$form->GetName().
+					"&dstfld1=with_node&srctbl=nodes&srcfld1=name',450,450);",
+					"G")
+			));
+		}
+
+		if($selection_mode)
+		{
+			$form->AddRow('from '.bold(S_HOST_GROUP).' like', array(
+				new CTextBox('with_group',$with_group,32),
+				new CButton("btn_group",S_SELECT,"return PopUp('popup.php?dstfrm=".$form->GetName().
+					"&dstfld1=with_group&srctbl=host_group&srcfld1=name',450,450);",
+					"G")
+			));
+		}
+
+		$form->AddRow('from '.bold(S_HOST).' like',array(
+			new CTextBox('with_host',$with_host,32),
+			new CButton("btn_host",S_SELECT,
+				"return PopUp('popup.php?dstfrm=".$form->GetName().
+				"&dstfld1=with_host&dstfld2=hostid&srctbl=hosts&srcfld1=host&srcfld2=hostid',450,450);",
+				'H')
+			));
+
+		if($selection_mode)
+		{
+			$form->AddRow('from '.bold(S_APPLICATION).' like',array(
+				new CTextBox('with_application', $with_application, 32),
+				new CButton('btn_app',S_SELECT,
+					'return PopUp("popup.php?dstfrm='.$form->GetName().
+					'&dstfld1=with_application&srctbl=applications'.
+					'&srcfld1=name",400,300,"application");',
+					'A')
+				));
+		}
+
+		$form->AddRow('with '.bold(S_DESCRIPTION).' like', new CTextBox("with_description",$with_description,40));
+
+		if($selection_mode)
+		{
+			$cmbType = new CComboBox("with_type",$with_type, "submit()");
+			$cmbType->AddItem(-1, S_ALL);
+			foreach(array(ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SIMPLE,
+				ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3, ITEM_TYPE_TRAPPER,
+				ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_HTTPTEST) as $it)
+					$cmbType->AddItem($it, item_type2str($it));
+			$form->AddRow('with '.bold(S_TYPE), $cmbType);
+		}
+
+		$form->AddRow('with '.bold(S_KEY).' like', array(new CTextBox("with_key",$with_key,40)));
+
+		if($selection_mode)
+		{
+			if(($with_type==ITEM_TYPE_SNMPV1)||($with_type==ITEM_TYPE_SNMPV2C)||$with_type==ITEM_TYPE_SNMPV3)
+			{ 
+				$form->AddRow('with '.bold(S_SNMP_COMMUNITY).' like',
+					new CTextBox("with_snmp_community",$with_snmp_community,16));
+				$form->AddRow('with '.bold(S_SNMP_OID).' like',
+					new CTextBox("with_snmp_oid",$with_snmp_oid,40));
+				$form->AddRow('with '.bold(S_SNMP_PORT).' like',
+					new CNumericBox("with_snmp_port",$with_snmp_port,5,null,true));
+			}
+
+			if($with_type==ITEM_TYPE_SNMPV3)
+			{
+				$form->AddRow('with '.bold(S_SNMPV3_SECURITY_NAME).' like',
+					new CTextBox("with_snmpv3_securityname",$with_snmpv3_securityname,64));
+
+				$cmbSecLevel = new CComboBox("with_snmpv3_securitylevel",$with_snmpv3_securitylevel);
+				$cmbSecLevel->AddItem(-1,S_ALL);
+				$cmbSecLevel->AddItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,"NoAuthPriv");
+				$cmbSecLevel->AddItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,"AuthNoPriv");
+				$cmbSecLevel->AddItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,"AuthPriv");
+				$form->AddRow('with '.bold(S_SNMPV3_SECURITY_LEVEL), $cmbSecLevel);
+
+				$form->AddRow('with '.bold(S_SNMPV3_AUTH_PASSPHRASE).' like',
+					new CTextBox("with_snmpv3_authpassphrase",$with_snmpv3_authpassphrase,64));
+
+				$form->AddRow('with '.bold(S_SNMPV3_PRIV_PASSPHRASE).' like',
+					new CTextBox("with_snmpv3_privpassphrase",$with_snmpv3_privpassphrase,64));
+			}
+
+
+			$cmbValType = new CComboBox("with_value_type",$with_value_type,"submit()");
+			$cmbValType->AddItem(-1,	S_ALL);
+			$cmbValType->AddItem(ITEM_VALUE_TYPE_UINT64,	S_NUMERIC_UINT64);
+			$cmbValType->AddItem(ITEM_VALUE_TYPE_FLOAT,	S_NUMERIC_FLOAT);
+			$cmbValType->AddItem(ITEM_VALUE_TYPE_STR, 	S_CHARACTER);
+			$cmbValType->AddItem(ITEM_VALUE_TYPE_LOG, 	S_LOG);
+			$cmbValType->AddItem(ITEM_VALUE_TYPE_TEXT,	S_TEXT);
+			$form->AddRow('with '.bold(S_TYPE_OF_INFORMATION),$cmbValType);
+			
+			if( ($with_value_type==ITEM_VALUE_TYPE_FLOAT) || ($with_value_type==ITEM_VALUE_TYPE_UINT64))
+			{
+				$form->AddRow('with '.bold(S_UNITS), new CTextBox("with_units",$with_units,40));
+				$form->AddRow('with '.bold(S_CUSTOM_MULTIPLIER).' like', new CTextBox("with_formula",$with_formula,40));
+			}
+
+			if($with_type != ITEM_TYPE_TRAPPER && $with_type != ITEM_TYPE_HTTPTEST)
+			{
+				$form->AddRow('with '.bold(S_UPDATE_INTERVAL_IN_SEC),
+					new CNumericBox("with_delay",$with_delay,5,null,true));
+			}
+
+			$form->AddRow('with '.bold(S_KEEP_HISTORY_IN_DAYS),
+				new CNumericBox("with_history",$with_history,8,null,true));
+
+			$form->AddRow('with '.bold(S_KEEP_TRENDS_IN_DAYS), new CNumericBox("with_trends",$with_trends,8,null,true));
+
+			$cmbStatus = new CComboBox("with_status",$with_status);
+			$cmbStatus->AddItem(-1,S_ALL);
+			foreach(array(ITEM_STATUS_ACTIVE,ITEM_STATUS_DISABLED,ITEM_STATUS_NOTSUPPORTED) as $st)
+				$cmbStatus->AddItem($st,item_status2str($st));
+			$form->AddRow('with '.bold(S_STATUS),$cmbStatus);
+
+			if($with_value_type==ITEM_VALUE_TYPE_LOG)
+			{
+				$form->AddRow('with '.bold(S_LOG_TIME_FORMAT), new CTextBox("with_logtimefmt",$with_logtimefmt,16));
+			}
+
+			if( ($with_value_type==ITEM_VALUE_TYPE_FLOAT) || ($with_value_type==ITEM_VALUE_TYPE_UINT64))
+			{
+				$cmbDelta= new CComboBox("with_delta",$with_delta);
+				$cmbDelta->AddItem(-1,S_ALL);
+				$cmbDelta->AddItem(0,S_AS_IS);
+				$cmbDelta->AddItem(1,S_DELTA_SPEED_PER_SECOND);
+				$cmbDelta->AddItem(2,S_DELTA_SIMPLE_CHANGE);
+				$form->AddRow('with '.bold(S_STORE_VALUE),$cmbDelta);
+			}
+			
+			if($with_type==ITEM_TYPE_TRAPPER)
+			{
+				$form->AddRow('with '.bold(S_ALLOWED_HOSTS).' like', new CTextBox("with_trapper_hosts",$with_trapper_hosts,40));
+			}
+		}
+
+		$form->AddItemToBottomRow(array(
+			new CButton('select',S_SEARCH),
+			new CButton('cancel',S_CANCEL)));
+
+		$form->Show();
+	}
 
 	# Insert form for Item information
 	function	insert_item_form()
@@ -887,12 +1165,12 @@
 		global  $USER_DETAILS;
 		global  $ZBX_CURNODEID;
 
-		$frmItem = new CFormTable(S_ITEM,"items.php");
+		$frmItem = new CFormTable(S_ITEM);
 		$frmItem->SetHelp("web.items.item.php");
 
 		$frmItem->AddVar("config",get_request("config",0));
-		if(isset($_request["groupid"]))
-			$frmitem->addvar("groupid",$_request["groupid"]);
+		if(isset($_REQUEST["groupid"]))
+			$frmItem->AddVar("groupid",$_REQUEST["groupid"]);
 
 		$frmItem->AddVar("hostid",$_REQUEST["hostid"]);
 
@@ -1328,6 +1606,208 @@
 		$frmItem->AddItemToBottomRow($cmbAction);
 		$frmItem->AddItemToBottomRow(SPACE);
 		$frmItem->AddItemToBottomRow(new CButton("register","do"));
+
+		$frmItem->Show();
+	}
+
+	function	insert_mass_update_item_form($elements_array_name)
+	{
+		global  $_REQUEST;
+		global  $USER_DETAILS;
+		global  $ZBX_CURNODEID;
+
+		$frmItem = new CFormTable(S_ITEM,null,'post');
+		$frmItem->SetHelp("web.items.item.php");
+		$frmItem->SetTitle(S_MASS_UPDATE);
+
+		$frmItem->AddVar("form_mass_update",1);
+
+		$frmItem->AddVar("group_itemid",get_request("group_itemid",array()));
+		$frmItem->AddVar("config",get_request("config",0));
+		if(isset($_REQUEST["groupid"]))
+			$frmItem->AddVar("groupid",$_REQUEST["groupid"]);
+
+		$frmItem->AddVar("hostid",$_REQUEST["hostid"]);
+
+		$description	= get_request("description"	,"");
+		$key		= get_request("key"		,"");
+		$host		= get_request("host",		null);
+		$delay		= get_request("delay"		,30);
+		$history	= get_request("history"		,90);
+		$status		= get_request("status"		,0);
+		$type		= get_request("type"		,0);
+		$snmp_community	= get_request("snmp_community"	,"public");
+		$snmp_oid	= get_request("snmp_oid"	,"interfaces.ifTable.ifEntry.ifInOctets.1");
+		$snmp_port	= get_request("snmp_port"	,161);
+		$value_type	= get_request("value_type"	,ITEM_VALUE_TYPE_UINT64);
+		$trapper_hosts	= get_request("trapper_hosts"	,"");
+		$units		= get_request("units"		,'');
+		$valuemapid	= get_request("valuemapid"	,0);
+		$multiplier	= get_request("multiplier"	,0);
+		$delta		= get_request("delta"		,0);
+		$trends		= get_request("trends"		,365);
+		$applications	= get_request("applications"	,array());
+		$delay_flex	= get_request("delay_flex"	,array());
+
+		$snmpv3_securityname	= get_request("snmpv3_securityname"	,"");
+		$snmpv3_securitylevel	= get_request("snmpv3_securitylevel"	,0);
+		$snmpv3_authpassphrase	= get_request("snmpv3_authpassphrase"	,"");
+		$snmpv3_privpassphrase	= get_request("snmpv3_privpassphrase"	,"");
+
+		$formula	= get_request("formula"		,"1");
+		$logtimefmt	= get_request("logtimefmt"	,"");
+
+		$add_groupid	= get_request("add_groupid"	,get_request("groupid",0));
+
+		$delay_flex_el = array();
+
+		$i = 0;
+		foreach($delay_flex as $val)
+		{
+			if(!isset($val["delay"]) && !isset($val["period"])) continue;
+
+			array_push($delay_flex_el,
+				array(
+					new CCheckBox("rem_delay_flex[]", 'no', null,$i),
+						$val["delay"],
+						" sec at ",
+						$val["period"]
+				),
+				BR);
+			$frmItem->AddVar("delay_flex[".$i."][delay]", $val['delay']);
+			$frmItem->AddVar("delay_flex[".$i."][period]", $val['period']);
+			$i++;
+			if($i >= 7) break; /* limit count of  intervals
+					    * 7 intervals by 30 symbols = 210 characters
+					    * db storage field is 256
+					    */
+		}
+
+		if(count($delay_flex_el)==0)
+			array_push($delay_flex_el, "No flexible intervals");
+		else
+			array_push($delay_flex_el, new CButton('del_delay_flex','delete selected'));
+
+		if(count($applications)==0)  array_push($applications,0);
+
+		$cmbType = new CComboBox('type',$type);
+		$cmbType->AddItem(ITEM_TYPE_ZABBIX,S_ZABBIX_AGENT);
+		$cmbType->AddItem(ITEM_TYPE_ZABBIX_ACTIVE,S_ZABBIX_AGENT_ACTIVE);
+		$cmbType->AddItem(ITEM_TYPE_SIMPLE,S_SIMPLE_CHECK);
+		$cmbType->AddItem(ITEM_TYPE_SNMPV1,S_SNMPV1_AGENT);
+		$cmbType->AddItem(ITEM_TYPE_SNMPV2C,S_SNMPV2_AGENT);
+		$cmbType->AddItem(ITEM_TYPE_SNMPV3,S_SNMPV3_AGENT);
+		$cmbType->AddItem(ITEM_TYPE_TRAPPER,S_ZABBIX_TRAPPER);
+		$cmbType->AddItem(ITEM_TYPE_INTERNAL,S_ZABBIX_INTERNAL);
+		$cmbType->AddItem(ITEM_TYPE_AGGREGATE,S_ZABBIX_AGGREGATE);
+		$frmItem->AddRow(array( new CVisibilityBox('type_visible', get_request('type_visible'), 'type', S_ORIGINAL),
+			S_TYPE), $cmbType);
+
+		$frmItem->AddRow(array( new CVisibilityBox('community_visible', get_request('community_visible'), 'snmp_community', S_ORIGINAL),
+			S_SNMP_COMMUNITY), new CTextBox('snmp_community',$snmp_community,16));
+
+		$frmItem->AddRow(array( new CVisibilityBox('securityname_visible', get_request('securityname_visible'), 'snmpv3_securityname',
+			S_ORIGINAL), S_SNMPV3_SECURITY_NAME), new CTextBox('snmpv3_securityname',$snmpv3_securityname,64));
+
+		$cmbSecLevel = new CComboBox('snmpv3_securitylevel',$snmpv3_securitylevel);
+		$cmbSecLevel->AddItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,"NoAuthPriv");
+		$cmbSecLevel->AddItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,"AuthNoPriv");
+		$cmbSecLevel->AddItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,"AuthPriv");
+		$frmItem->AddRow(array( new CVisibilityBox('securitylevel_visible',  get_request('securitylevel_visible'), 'snmpv3_securitylevel',
+			S_ORIGINAL), S_SNMPV3_SECURITY_LEVEL), $cmbSecLevel);
+		$frmItem->AddRow(array( new CVisibilityBox('authpassphrase_visible', get_request('authpassphrase_visible'), 
+			'snmpv3_authpassphrase', S_ORIGINAL), S_SNMPV3_AUTH_PASSPHRASE),
+			new CTextBox('snmpv3_authpassphrase',$snmpv3_authpassphrase,64));
+
+		$frmItem->AddRow(array( new CVisibilityBox('privpassphras_visible', get_request('privpassphras_visible'), 'snmpv3_privpassphrase',
+			S_ORIGINAL), S_SNMPV3_PRIV_PASSPHRASE), new CTextBox('snmpv3_privpassphrase',$snmpv3_privpassphrase,64));
+
+		$frmItem->AddRow(array( new CVisibilityBox('port_visible', get_request('port_visible'), 'snmp_port', S_ORIGINAL), S_SNMP_PORT),
+			new CNumericBox('snmp_port',$snmp_port,5));
+
+		$cmbValType = new CComboBox('value_type',$value_type);
+		$cmbValType->AddItem(ITEM_VALUE_TYPE_UINT64,	S_NUMERIC_UINT64);
+		$cmbValType->AddItem(ITEM_VALUE_TYPE_FLOAT,	S_NUMERIC_FLOAT);
+		$cmbValType->AddItem(ITEM_VALUE_TYPE_STR, 	S_CHARACTER);
+		$cmbValType->AddItem(ITEM_VALUE_TYPE_LOG, 	S_LOG);
+		$cmbValType->AddItem(ITEM_VALUE_TYPE_TEXT,	S_TEXT);
+		$frmItem->AddRow(array( new CVisibilityBox('value_type_visible', get_request('value_type_visible'), 'value_type', S_ORIGINAL),
+			S_TYPE_OF_INFORMATION), $cmbValType);
+		
+		$frmItem->AddRow(array( new CVisibilityBox('units_visible', get_request('units_visible'), 'units', S_ORIGINAL), S_UNITS),
+			new CTextBox('units',$units,40));
+
+		$frmItem->AddRow(array( new CVisibilityBox('formula_visible', get_request('formula_visible'), 'formula', S_ORIGINAL),
+			S_CUSTOM_MULTIPLIER), new CTextBox('formula',$formula,40));
+
+		$frmItem->AddRow(array( new CVisibilityBox('delay_visible', get_request('delay_visible'), 'delay', S_ORIGINAL),
+			S_UPDATE_INTERVAL_IN_SEC), new CNumericBox('delay',$delay,5));
+
+		$delay_flex_el = new CTag('a', 'yes', $delay_flex_el);
+		$delay_flex_el->AddOption('name', 'delay_flex_list');
+		$delay_flex_el->AddOption('style', 'text-decoration: none');
+		$frmItem->AddRow(array( new CVisibilityBox('delay_flex_visible', get_request('delay_flex_visible'), 
+			array('delay_flex_list', 'new_delay_flex_el'), S_ORIGINAL), S_FLEXIBLE_INTERVALS), $delay_flex_el);
+		$new_delay_flex_el = new CTag('a', 'yes', 
+			array(
+				S_DELAY, SPACE,
+				new CNumericBox("new_delay_flex[delay]","50",5), 
+				S_PERIOD, SPACE,
+				new CTextBox("new_delay_flex[period]","1-7,00:00-23:59",27), BR,
+				new CButton("add_delay_flex",S_ADD)
+			));
+		$new_delay_flex_el->AddOption('name', 'new_delay_flex_el');
+		$new_delay_flex_el->AddOption('style', 'text-decoration: none');
+		$frmItem->AddRow(S_NEW_FLEXIBLE_INTERVAL, $new_delay_flex_el);
+
+		$frmItem->AddRow(array( new CVisibilityBox('history_visible', get_request('history_visible'), 'history', S_ORIGINAL),
+			S_KEEP_HISTORY_IN_DAYS), new CNumericBox('history',$history,8));
+		$frmItem->AddRow(array( new CVisibilityBox('trends_visible', get_request('trends_visible'), 'trends', S_ORIGINAL),
+			S_KEEP_TRENDS_IN_DAYS), new CNumericBox('trends',$trends,8));
+
+		$cmbStatus = new CComboBox('status',$status);
+		foreach(array(ITEM_STATUS_ACTIVE,ITEM_STATUS_DISABLED,ITEM_STATUS_NOTSUPPORTED) as $st)
+			$cmbStatus->AddItem($st,item_status2str($st));
+		$frmItem->AddRow(array( new CVisibilityBox('status_visible', get_request('status_visible'), 'status', S_ORIGINAL), S_STATUS),
+			$cmbStatus);
+
+		$frmItem->AddRow(array( new CVisibilityBox('logtimefmt_visible', get_request('logtimefmt_visible'), 'logtimefmt', S_ORIGINAL),
+			S_LOG_TIME_FORMAT), new CTextBox("logtimefmt",$logtimefmt,16));
+
+		$cmbDelta= new CComboBox('delta',$delta);
+		$cmbDelta->AddItem(0,S_AS_IS);
+		$cmbDelta->AddItem(1,S_DELTA_SPEED_PER_SECOND);
+		$cmbDelta->AddItem(2,S_DELTA_SIMPLE_CHANGE);
+		$frmItem->AddRow(array( new CVisibilityBox('delta_visible', get_request('delta_visible'), 'delta', S_ORIGINAL),
+			S_STORE_VALUE),$cmbDelta);
+		
+		$cmbMap = new CComboBox('valuemapid',$valuemapid);
+		$cmbMap->AddItem(0,S_AS_IS);
+		$db_valuemaps = DBselect("select * from valuemaps where ".DBid2nodeid("valuemapid")."=".$ZBX_CURNODEID);
+		while($db_valuemap = DBfetch($db_valuemaps))
+			$cmbMap->AddItem($db_valuemap["valuemapid"],$db_valuemap["name"]);
+		
+		$link = new CLink("throw map","config.php?config=6","action");
+		$link->AddOption("target","_blank");
+		$frmItem->AddRow(array( new CVisibilityBox('valuemapid_visible', get_request('valuemapid_visible'), 'valuemapid', S_ORIGINAL),
+			S_SHOW_VALUE, SPACE, $link),$cmbMap);
+			
+		$frmItem->AddRow(array( new CVisibilityBox('trapper_hosts_visible', get_request('trapper_hosts_visible'), 'trapper_hosts',
+			S_ORIGINAL), S_ALLOWED_HOSTS), new CTextBox('trapper_hosts',$trapper_hosts,40));
+
+		$cmbApps = new CListBox('applications[]',$applications,6);
+		$cmbApps->AddItem(0,"-".S_NONE."-");
+		$db_applications = DBselect("select distinct applicationid,name from applications".
+			" where hostid=".$_REQUEST["hostid"]." order by name");
+		while($db_app = DBfetch($db_applications))
+		{
+			$cmbApps->AddItem($db_app["applicationid"],$db_app["name"]);
+		}
+		$frmItem->AddRow(array( new CVisibilityBox('applications_visible', get_request('applications_visible'), 'applications[]',
+			S_ORIGINAL), S_APPLICATIONS),$cmbApps);
+
+		$frmItem->AddItemToBottomRow(array(new CButton("update",S_UPDATE),
+			SPACE, new CButtonCancel(url_param("groupid").url_param("hostid").url_param("config"))));
 
 		$frmItem->Show();
 	}

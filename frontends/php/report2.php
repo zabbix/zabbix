@@ -85,15 +85,9 @@ include_once "include/page_header.php";
 
 ?>
 <?php
-	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
-	
 	if(isset($_REQUEST["triggerid"]))
 	{
-		if (!$row = DBfetch(DBselect("select distinct h.hostid,h.host,t.description from hosts h,items i,functions f,triggers t ".
-			" where t.triggerid=".$_REQUEST["triggerid"]." and t.triggerid=f.triggerid ".
-			" and f.itemid=i.itemid and i.hostid=h.hostid ".
-			" and h.hostid not in (".$denyed_hosts.") and ".DBid2nodeid("t.triggerid")."=".$ZBX_CURNODEID.
-			" order by h.host,t.description ")))
+		if(!check_right_on_trigger_by_triggerid(PERM_READ_ONLY, $_REQUEST['triggerid']))
 			access_deny();
 		
 		show_table_header(array(new CLink($row["host"],"?hostid=".$row["hostid"])," : \"",expand_trigger_description_by_data($row),"\""));
@@ -111,14 +105,19 @@ include_once "include/page_header.php";
 			" from triggers t,hosts h,items i,functions f ".
 			" where f.itemid=i.itemid and h.hostid=i.hostid and t.status=".TRIGGER_STATUS_ENABLED.
 			" and t.triggerid=f.triggerid and h.hostid=".$_REQUEST["hostid"]." and h.status=".HOST_STATUS_MONITORED.
-			" and h.hostid not in (".$denyed_hosts.") and ".DBid2nodeid("t.triggerid")."=".$ZBX_CURNODEID.
+			" and ".DBid2nodeid("t.triggerid")."=".$ZBX_CURNODEID.
 			" and i.status=".ITEM_STATUS_ACTIVE.
 			" order by h.host, t.description");
 
+		$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+	
 		$table = new CTableInfo();
 		$table->setHeader(array(S_NAME,S_TRUE,S_FALSE,S_UNKNOWN,S_GRAPH));
 		while($row=DBfetch($result))
 		{
+			if(!check_right_on_trigger_by_triggerid(null, $row['triggerid'], $accessible_hosts))
+				continue;
+
 			$availability = calculate_availability($row["triggerid"],0,0);
 
 			$true	= new CSpan(sprintf("%.4f%%",$availability["true"]), "on");

@@ -35,10 +35,12 @@ include_once "include/page_header.php";
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID);
 	if(isset($_REQUEST["hostid"]) && $_REQUEST["hostid"] > 0 && !in_array($_REQUEST["hostid"], $available_hosts)) 
 	{
+		SDI('deni1');
 		access_deny();
 	}
 	if(isset($_REQUEST["apphostid"]) && $_REQUEST["apphostid"] > 0 && !in_array($_REQUEST["apphostid"], $available_hosts)) 
 	{
+		SDI('deni2');
 		access_deny();
 	}
 
@@ -50,6 +52,7 @@ include_once "include/page_header.php";
 		if(!in_array($_REQUEST["groupid"], get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,null,
 			PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
 		{
+		SDI('deni3');
 			access_deny();
 		}
 	}
@@ -115,12 +118,14 @@ include_once "include/page_header.php";
 		"form_refresh"=>array(T_ZBX_STR, O_OPT, NULL,	NULL,	NULL)
 	);
 
+	$_REQUEST["config"] = get_request("config",get_profile("web.host.config",0));
+
 	check_fields($fields);
 
 	if($_REQUEST["config"]==4)
-		validate_group_with_host(PERM_READ_WRITE,array("always_select_first_host"));
+		validate_group_with_host(PERM_READ_WRITE,array("always_select_first_host"),'web.last.conf.groupid', 'web.last.conf.hostid');
 	elseif($_REQUEST["config"]==0 || $_REQUEST["config"]==3)
-		validate_group(PERM_READ_WRITE);
+		validate_group(PERM_READ_WRITE,array(),'web.last.conf.groupid');
 
 	update_profile("web.hosts.config",$_REQUEST["config"]);
 ?>
@@ -151,9 +156,12 @@ include_once "include/page_header.php";
 		
 		if(count($groups) > 0)
 		{
-			if(count(array_intersect($groups,
-				get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY))) > 0)
-					access_deny();
+			$accessible_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,null,PERM_RES_IDS_ARRAY);
+			foreach($groups as $gid)
+			{
+				if(isset($accessible_groups[$gid])) continue;
+				access_deny();
+			}
 		}
 		else
 		{

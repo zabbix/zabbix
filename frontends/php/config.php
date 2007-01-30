@@ -84,7 +84,7 @@ include_once "include/page_header.php";
 ?>
 
 <?php
-	$_REQUEST["config"]=get_request("config",get_profile("web.config.config",0));
+	$_REQUEST["config"] = get_request("config",get_profile("web.config.config",0));
 
 	check_fields($fields);
 
