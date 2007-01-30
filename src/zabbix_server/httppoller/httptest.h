@@ -34,6 +34,8 @@ S_ZBX_HTTPSTAT
 	long    	rspcode;
 	double  	total_time;
 	double  	speed_download;
+	double		test_total_time;
+	int		test_last_step;
 };
 
 void process_httptests(int now);
