@@ -53,9 +53,10 @@
 	define("O_NO",				2);
 
 	define("P_SYS",				1);
-	define("P_USR",				2);
-	define("P_GET",				4);
-	define("P_POST",			8);
+	define("P_UNSET_EMPTY",			2);
+//	define("P_USR",				2);
+//	define("P_GET",				4);
+//	define("P_POST",			8);
 	define("P_ACT",				16);
 	define("P_NZERO",			32);
 

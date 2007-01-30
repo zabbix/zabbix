@@ -548,10 +548,13 @@ require_once "include/items.inc.php";
 		
 		if($_REQUEST["groupid"] == -1)
 		{
-			if($_REQUEST["hostid"] > 0)
-				$_REQUEST["groupid"] = 0;
-			else 
-				$_REQUEST["groupid"] = get_profile($group_var,0);
+			$_REQUEST["groupid"] = get_profile($group_var,0);
+
+			if ($_REQUEST["hostid"] > 0 && !DBfetch(DBselect('select groupid from hosts_groups '.
+				' where hostid='.$_REQUEST["hostid"].' and groupid='.$_REQUEST["groupid"])))
+			{
+					$_REQUEST["groupid"] = 0;
+			}
 		}
 		
 //		SDI("ig:".$_REQUEST["groupid"]);	

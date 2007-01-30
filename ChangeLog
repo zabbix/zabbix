@@ -1,5 +1,7 @@
 Changes for 1.3.3:
 
+ - fixed permissions for triggers (Eugene)
+ - developed 'mass update' functionality for items (Eugene)
  - changed type of items.prevorgvalue to preserve data precision (Alexei)
  - added possibility of hostname using (Eugene)
  - new communication library and protocol (Alexei)

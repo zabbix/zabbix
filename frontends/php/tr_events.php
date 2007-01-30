@@ -41,16 +41,12 @@ include_once "include/page_header.php";
 	);
 	check_fields($fields);
 	
-	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
-	
-	if(! ($trigger_data = DBfetch(DBselect('select h.host, t.* from hosts h, items i, functions f, triggers t '.
-	                        ' where i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid='.$_REQUEST["triggerid"].
-				" and i.hostid not in (".$denyed_hosts.") and h.hostid=i.hostid ".
-				" and ".DBid2nodeid("t.triggerid")."=".$ZBX_CURNODEID
-				))))
-	{
+	if(!check_right_on_trigger_by_triggerid(PERM_READ_ONLY, $_REQUEST["triggerid"]))
 		access_deny();
-	}
+
+	$trigger_data = DBfetch(DBselect('select h.host, t.* from hosts h, items i, functions f, triggers t '.
+	                        ' where i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid='.$_REQUEST["triggerid"].
+				" and h.hostid=i.hostid and ".DBid2nodeid("t.triggerid")."=".$ZBX_CURNODEID));
 ?>
 <?php
 	$_REQUEST["limit"] = get_request("limit","NO");

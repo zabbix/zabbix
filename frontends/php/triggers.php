@@ -81,16 +81,27 @@ include_once "include/page_header.php";
 	
 	check_fields($fields);
 
+	if(isset($_REQUEST["triggerid"]))
+		if(!check_right_on_trigger_by_triggerid(PERM_READ_WRITE, $_REQUEST["triggerid"]))
+			access_deny();
+
 	$showdisabled = get_request("showdisabled", 0);
 
-	validate_group_with_host(PERM_READ_WRITE,array("allow_all_hosts","always_select_first_host","with_items"));
+	validate_group_with_host(PERM_READ_WRITE,array("allow_all_hosts","always_select_first_host","with_items"),
+		'web.last.conf.groupid', 'web.last.conf.hostid');
 ?>
 <?php
 	update_profile("web.triggers.showdisabled",$showdisabled);
 
+	$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE, null, null, $ZBX_CURNODEID);
+
 /* FORM ACTIONS */
 	if(isset($_REQUEST["save"]))
 	{
+		show_messages();
+		if(!check_right_on_trigger_by_expression(PERM_READ_WRITE, $_REQUEST["expression"]))
+			access_deny();
+
 		$now=time();
 		if(isset($_REQUEST["status"]))	{ $status=1; }
 		else			{ $status=0; }
@@ -105,7 +116,7 @@ include_once "include/page_header.php";
 				$_REQUEST["description"] = $trigger_data["description"];
 				$_REQUEST["expression"] = explode_exp($trigger_data["expression"],0);
 			}
-			// TODO check permission by new value.
+
 			$result=update_trigger($_REQUEST["triggerid"],
 				$_REQUEST["expression"],$_REQUEST["description"],
 				$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"],
@@ -116,9 +127,6 @@ include_once "include/page_header.php";
 
 			show_messages($result, S_TRIGGER_UPDATED, S_CANNOT_UPDATE_TRIGGER);
 		} else {
-			if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
-				access_deny();
-
 			$triggerid=add_trigger($_REQUEST["expression"],$_REQUEST["description"],
 				$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"],
 				$deps);
@@ -224,6 +232,8 @@ include_once "include/page_header.php";
 	{
 		foreach($_REQUEST["g_triggerid"] as $triggerid)
 		{
+			if(!check_right_on_trigger_by_triggerid(null, $triggerid, $accessible_hosts)) continue;
+
 			$result=DBselect("select triggerid from triggers t where t.triggerid=".zbx_dbstr($triggerid));
 			if(!($row = DBfetch($result))) continue;
 			if($result = update_trigger_status($row["triggerid"],0))
@@ -242,6 +252,8 @@ include_once "include/page_header.php";
 	{
 		foreach($_REQUEST["g_triggerid"] as $triggerid)
 		{
+			if(!check_right_on_trigger_by_triggerid(null, $triggerid, $accessible_hosts)) continue;
+
 			$result=DBselect("select triggerid from triggers t where t.triggerid=".zbx_dbstr($triggerid));
 			if(!($row = DBfetch($result))) continue;
 			if($result = update_trigger_status($row["triggerid"],1));
@@ -260,6 +272,8 @@ include_once "include/page_header.php";
 	{
 		foreach($_REQUEST["g_triggerid"] as $triggerid)
 		{
+			if(!check_right_on_trigger_by_triggerid(null, $triggerid, $accessible_hosts)) continue;
+
 			$result=DBselect("select triggerid,templateid from triggers t where t.triggerid=".zbx_dbstr($triggerid));
 			if(!($row = DBfetch($result))) continue;
 			if($row["templateid"] <> 0)	continue;
@@ -290,10 +304,8 @@ include_once "include/page_header.php";
 
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
 	
-	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE, null, null, $ZBX_CURNODEID);
-
 	$result=DBselect("select distinct g.groupid,g.name from groups g, hosts_groups hg, hosts h, items i ".
-		" where h.hostid in (".$availiable_hosts.") ".
+		" where h.hostid in (".$accessible_hosts.") ".
 		" and hg.groupid=g.groupid ".
 		" and h.hostid=i.hostid and hg.hostid=h.hostid ".
 		" order by g.name");
@@ -307,7 +319,7 @@ include_once "include/page_header.php";
 	{
 		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where ".
 			" h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid".
-			" and h.hostid in (".$availiable_hosts.") ".
+			" and h.hostid in (".$accessible_hosts.") ".
 			" group by h.hostid,h.host order by h.host";
 	}
 	else
@@ -315,7 +327,7 @@ include_once "include/page_header.php";
 		$cmbHosts->AddItem(0,S_ALL_SMALL);
 		$sql="select h.hostid,h.host from hosts h,items i ".
 			" where h.hostid=i.hostid ".
-			" and h.hostid in (".$availiable_hosts.") ".
+			" and h.hostid in (".$accessible_hosts.") ".
 			" group by h.hostid,h.host order by h.host";
 	}
 	$result=DBselect($sql);
@@ -340,8 +352,6 @@ include_once "include/page_header.php";
 	else
 	{
 /* TABLE */
-		$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE, PERM_MODE_LT);
-		
 		$form = new CForm('triggers.php');
 		$form->SetName('triggers');
 		$form->AddVar('hostid',$_REQUEST["hostid"]);
@@ -358,7 +368,6 @@ include_once "include/page_header.php";
 		$sql = "select distinct h.hostid,h.host,t.*".
 			" from triggers t,hosts h,items i,functions f".
 			" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid".
-			" and h.hostid not in (".$denyed_hosts.")".
 			" and ".DBid2nodeid("h.hostid")."=".$ZBX_CURNODEID;
 			
 		if($showdisabled == 0)
@@ -372,6 +381,9 @@ include_once "include/page_header.php";
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
+			if(!check_right_on_trigger_by_triggerid(null, $row['triggerid'], $accessible_hosts))
+				continue;
+
 			$chkBox =  new CCheckBox(
                                         "g_triggerid[]",        /* name */
                                         NULL,                   /* checked */

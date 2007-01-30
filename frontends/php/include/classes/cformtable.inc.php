@@ -96,11 +96,13 @@
 				unset($this->title);
 				return 0;
 			}
-			elseif(!is_string($value))
+/*			elseif(!is_string($value))
 			{
 				return $this->error("Incorrect value for SetTitle [$value]");
 			}
 			$this->title = nbsp($value);
+			*/
+			$this->title = unpack_object($value);
 		}
 		function SetHelp($value=NULL)
 		{

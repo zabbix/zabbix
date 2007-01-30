@@ -35,7 +35,7 @@ include_once "include/page_header.php";
 	$fields=array(
 		"dstfrm"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,		NULL),
 		"permission"=>	array(T_ZBX_INT, O_MAND,P_SYS,	IN(PERM_DENY.','.PERM_READ_ONLY.','.PERM_READ_WRITE),	NULL),
-		"type"=>	array(T_ZBX_INT, O_OPT, P_SYS,	IN(RESOURCE_TYPE_GROUP.(ZBX_DISTRIBUTED ? RESOURCE_TYPE_NODE.',' : '')), NULL)
+		"type"=>	array(T_ZBX_INT, O_OPT, P_SYS,	IN(RESOURCE_TYPE_GROUP.(ZBX_DISTRIBUTED ? ','.RESOURCE_TYPE_NODE : '')), NULL)
 	);
 
 	check_fields($fields);

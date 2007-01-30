@@ -382,6 +382,63 @@
 		return $result;
 	}
 
+	function	smart_update_item($itemid,$description,$key,$hostid,$delay,$history,$status,$type,
+		$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,
+		$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,
+		$formula,$trends,$logtimefmt,$valuemapid,$delay_flex,$applications)
+	{
+		$restore_rules= array(
+					"description"		=> array(),
+					"key"			=> array( 'db_varname' => 'key_' ),
+					"hostid"		=> array(),
+					"delay"			=> array('template' => 1),
+					"history"		=> array('template' => 1 , 'httptest' => 1),
+					"status"		=> array('template' => 1 , 'httptest' => 1),
+					"type"			=> array(),
+					"snmp_community"	=> array(),
+					"snmp_oid"		=> array(),
+					"value_type"		=> array(),
+					"trapper_hosts"		=> array(),
+					"snmp_port"		=> array(),
+					"units"			=> array(),
+					"multiplier"		=> array(),
+					"delta"		=> array('template' => 1 , 'httptest' => 1),
+					"snmpv3_securityname"	=> array(),
+					"snmpv3_securitylevel"	=> array(),
+					"snmpv3_authpassphrase"	=> array(),
+					"snmpv3_privpassphrase"	=> array(),
+					"formula"		=> array(),
+					"trends"		=> array('template' => 1 , 'httptest' => 1),
+					"logtimefmt"		=> array(),
+					"valuemapid"		=> array('httptest' => 1),
+					"delay_flex"		=> array());
+
+		$item_data = get_item_by_itemid($itemid);
+
+		foreach($restore_rules as $var_name => $info)
+		{
+			if (!isset($info['db_varname'])) $info['db_varname'] = $var_name;
+
+			if ($item_data['type'] == ITEM_TYPE_HTTPTEST && !isset($info['httptest']))
+				$$var_name = $item_data[$info['db_varname']];
+			if (0 !=$item_data['templateid'] && !isset($info['template']))
+				$$var_name = $item_data[$info['db_varname']];
+			if(!isset($$var_name))
+				$$var_name = $item_data[$info['db_varname']];
+		}
+
+		return update_item($itemid,
+			$description,$key,$hostid,$delay,
+			$history,$status,$type,
+			$snmp_community,$snmp_oid,$value_type,
+			$trapper_hosts,$snmp_port,$units,
+			$multiplier,$delta,$snmpv3_securityname,
+			$snmpv3_securitylevel,$snmpv3_authpassphrase,
+			$snmpv3_privpassphrase,$formula,$trends,
+			$logtimefmt,$valuemapid,$delay_flex,$applications,
+			$item_data['templateid']);
+	}
+
 	function	delete_template_items($hostid, $templateid = null /* array format 'arr[id]=name' */, $unlink_mode = false)
 	{
 		$db_items = get_items_by_hostid($hostid);

@@ -44,7 +44,6 @@
 			" where ".DBid2nodeid("t.triggerid")."=".$nodeid.
 			" and e.triggerid=t.triggerid and t.triggerid=f.triggerid and f.itemid=i.itemid ".
 			" and i.hostid=h.hostid ".$sql_cond." and h.status=".HOST_STATUS_MONITORED.
-			" and h.hostid not in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE, PERM_MODE_LT).") ".
 			" order by e.clock desc,h.host,t.priority,t.description,t.triggerid ",
 			10*($start+$num)
 			);
@@ -53,9 +52,13 @@
 		$table->SetHeader(array(S_TIME, $hostid == 0 ? S_HOST : null, S_DESCRIPTION, S_VALUE, S_SEVERITY));
 		$col=0;
 		
+		$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+		 
 		$skip = $start;
 		while(($row=DBfetch($result))&&($col<$num))
 		{
+			if(!check_right_on_trigger_by_triggerid(null, $row['triggerid'], $accessible_hosts)) continue;
+
 			if($skip > 0) 
 			{
 				$skip--;

@@ -64,18 +64,21 @@ include_once "include/page_header.php";
 		default:	$time_dif=24*3600;	break;
 	}
 
-	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
+	$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 	
         $result=DBselect("select h.host, t.triggerid, t.description, t.priority, count(distinct e.eventid) as count ".
 		" from hosts h, triggers t, functions f, items i, events e where ".
 		" h.hostid = i.hostid and i.itemid = f.itemid and t.triggerid=f.triggerid and ".
 		" t.triggerid=e.triggerid and e.clock>".(time()-$time_dif).
-		" and h.hostid not in (".$denyed_hosts.") and ".DBid2nodeid("e.triggerid")."=".$ZBX_CURNODEID.
+		" and h.hostid in (".$accessible_hosts.") and ".DBid2nodeid("e.triggerid")."=".$ZBX_CURNODEID.
 		" group by h.host,t.triggerid,t.description,t.priority ".
 		" order by count desc, h.host, t.description, t.triggerid", 100);
 
         while($row=DBfetch($result))
         {
+		if(!check_right_on_trigger_by_triggerid(null, $row['triggerid'], $accessible_hosts))
+			continue;
+
             	$table->addRow(array(
 			$row["host"],
 			expand_trigger_description_by_data($row),

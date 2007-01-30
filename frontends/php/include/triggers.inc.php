@@ -122,35 +122,12 @@
 				$state='HOST';
 				continue;
 			}
-			
-			if($expression[$i] == '}' && $state=="")
-			{
-				$state='';
-				$hosts[$host] = '\''.$host.'\'';
-				continue;
-			}
 
-			if($expression[$i] == '(' && $state == "FUNCTION")
-			{
-				$state='PARAMETER';
-				continue;
-			}
-			
-			if($expression[$i] == ')' && $state == "PARAMETER")
-			{
-				$state='';
-				continue;
-			}
-			
 			if($expression[$i] == ':' && $state == "HOST")
 			{
-				$state="KEY";
-				continue;
-			}
-
-			if($expression[$i] == '.' && ($state == "KEY" || $state == "FUNCTION"))
-			{
-				$state="FUNCTION";
+				$state="";
+				$hosts[$host] = '\''.$host.'\'';
+				$host = '';
 				continue;
 			}
 
@@ -159,11 +136,9 @@
 				$host .= $expression[$i];
 				continue;
 			}
-			if($state == "KEY" || $state == "FUNCTION" || $state == "PARAMETER")
-				continue;
 		}
 
-		if(count($hosts) == 0) $hosts = array('');
+		if(count($hosts) == 0) $hosts = array('0');
 
 		return DBselect('select distinct * from hosts where '.DBid2nodeid('hostid').'='.$ZBX_CURNODEID.
 			' and host in ('.implode(',',$hosts).')');
@@ -891,16 +866,31 @@
 		return $result;
 	}
 
-	function	check_right_on_trigger($permission,$triggerid)	/* TODO */
+	function	check_right_on_trigger_by_triggerid($permission,$triggerid,$accessible_hosts=null)
 	{
-		/*
-                $result=DBselect("select distinct h.hostid from functions f,items i,hosts h".
-			" where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=$triggerid");
-		while($row=DBfetch($result))
-			if(check_right("Host",$permission,$row["hostid"]))
-				return 1;
-		*/
-		return	0;
+		$trigger_data = DBfetch(DBselect('select expression from triggers where triggerid='.$triggerid));
+
+		if(!$trigger_data) return false;
+
+		return check_right_on_trigger_by_expression($permission, explode_exp($trigger_data['expression'], 0), $accessible_hosts);
+	}
+
+	function	check_right_on_trigger_by_expression($permission,$expression,$accessible_hosts=null)
+	{
+		if(is_null($accessible_hosts))
+		{
+			global $USER_DETAILS;
+			$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS, $permission, null, PERM_RES_IDS_ARRAY);
+		}
+		if(!is_array($accessible_hosts)) $accessible_hosts = explode(',', $accessible_hosts);
+
+                $db_hosts = get_hosts_by_expression($expression);
+		while($host_data = DBfetch($db_hosts))
+		{
+			if(!in_array($host_data['hostid'], $accessible_hosts)) return false;
+		}
+
+		return true;
 	}
 
 	function	delete_dependencies_by_triggerid($triggerid)

@@ -65,6 +65,13 @@
 			$page["title"] = "S_STANDARD_ITEMS_BIG";
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
+		case 'nodes':
+			if(ZBX_DISTRIBUTED)
+			{
+				$page["title"] = "S_NODES_BIG";
+				$min_user_type = USER_TYPE_ZABBIX_USER;
+				break;
+			}
 		default:
 			$page["title"] = "S_ERROR";
 			$error = true;
@@ -112,7 +119,7 @@ include_once "include/page_header.php";
 	$dstfld1	= get_request("dstfld1", '');	// output field on destination form
 	$dstfld2	= get_request("dstfld2", '');	// second output field on destination form
 	$srcfld1	= get_request("srcfld1", '');	// source table field [can be different from fields of source table]
-	$srcfld2	= get_request("srcfld2", '');	// second source table field [can be different from fields of source table]
+	$srcfld2	= get_request("srcfld2", null);	// second source table field [can be different from fields of source table]
 	
 	$monitored_hosts = get_request("monitored_hosts", 0);
 	$only_hostid	 = get_request("only_hostid", null);
@@ -178,7 +185,7 @@ include_once "include/page_header.php";
 	}
 	else
 	{
-		if(in_array($srctbl,array("hosts","host_group","triggers","logitems","items")))
+		if(in_array($srctbl,array("hosts","host_group","triggers","logitems","items",'applications')))
 		{
 			if(ZBX_DISTRIBUTED)
 			{
@@ -196,7 +203,7 @@ include_once "include/page_header.php";
 		if(!isset($ok)) $nodeid = $ZBX_CURNODEID;
 		unset($ok);
 		
-		if(in_array($srctbl,array("hosts","templates","triggers","logitems","items")))
+		if(in_array($srctbl,array("hosts","templates","triggers","logitems","items",'applications')))
 		{
 			$groupid = get_request("groupid",get_profile("web.popup.groupid",0));
 			
@@ -228,7 +235,7 @@ include_once "include/page_header.php";
 			$cmbTypes->AddItem(ITEM_TYPE_AGGREGATE,S_ZABBIX_AGGREGATE);
 			$frmTitle->AddItem(array(S_TYPE,SPACE,$cmbTypes));
 		}
-		if(in_array($srctbl,array("triggers","logitems","items")))
+		if(in_array($srctbl,array("triggers","logitems","items",'applications')))
 		{
 			$hostid = get_request("hostid",get_profile("web.popup.hostid",0));
 			$cmbHosts = new CComboBox("hostid",$hostid,"submit()");
@@ -298,7 +305,7 @@ include_once "include/page_header.php";
 			$name = new CLink($host["host"],"#","action");
 			$name->SetAction(
 				get_window_opener($dstfrm, $dstfld1, $host[$srcfld1]).
-				get_window_opener($dstfrm, $dstfld2, $host[$srcfld2]).
+				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $host[$srcfld2]) : '').
 				" window.close();");
 
 			if($host["status"] == HOST_STATUS_MONITORED)	
@@ -463,7 +470,7 @@ function add_template(formname,id,name)
 			$name = new CLink($row["name"],"#","action");
 			$name->SetAction(
 				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
-				get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
+				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '').
 				" window.close();");
 
 			$table->AddRow($name);
@@ -481,7 +488,7 @@ function add_template(formname,id,name)
 			$name = new CLink($row["name"],"#","action");
 			$name->SetAction(
 				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
-				get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
+				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '').
 				" window.close();");
 
 			$table->AddRow($name);
@@ -694,7 +701,7 @@ function add_variable(formname,value)
 
 			$description->SetAction(
 				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
-				get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
+				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '').
 				" window.close();");
 
 			$table->AddRow(array(
@@ -732,10 +739,30 @@ function add_variable(formname,value)
 			
 			$name->SetAction(
 				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
-				(empty($srcfld2) ? "" : get_window_opener($dstfrm, $dstfld2, $row[$srcfld2])).
+				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '').
 				" window.close();");
 
-			$table->AddRow(array($name));
+			$table->AddRow(array(isset($hostid) ? null : $row['host'], $name));
+		}
+		$table->Show();
+	}
+	elseif($srctbl == "nodes")
+	{
+		$table = new CTableInfo(S_NO_NODES_DEFINED);
+		$table->SetHeader(S_NAME);
+
+		$result = DBselect('select distinct * from nodes where nodeid in ('.$accessible_nodes.')');
+		while($row = DBfetch($result))
+		{
+
+			$name = new CLink($row["name"],"#","action");
+			
+			$name->SetAction(
+				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
+				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '').
+				" window.close();");
+
+			$table->AddRow($name);
 		}
 		$table->Show();
 	}

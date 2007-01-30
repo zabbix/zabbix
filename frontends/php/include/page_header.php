@@ -240,7 +240,7 @@ COpt::profiling_start("page");
 			{
 				$deny = true;
 			}
-			elseif(!in_array($ZBX_CURNODEID, get_accessible_nodes_by_user(
+			elseif($label!='login' && !in_array($ZBX_CURNODEID, get_accessible_nodes_by_user(
 					$USER_DETAILS,PERM_READ_LIST,null,
 					PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
 			{
@@ -335,9 +335,11 @@ COpt::profiling_start("page");
     <link rel="stylesheet" href="css.css">
     <meta name="Author" content="ZABBIX SIA">
   </head>
-<body>
+<body onLoad="zbxCallPostScripts();">
 <?php
 	}
+
+	define ('PAGE_HEADER_LOADED', 1);
 
 	if(!defined('ZBX_PAGE_NO_MENU'))
 	{
@@ -367,6 +369,8 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$menu_table->SetCellPadding(5);
 		$menu_table->AddRow($main_menu_row);
 
+		$node_form = null;
+
 		if(ZBX_DISTRIBUTED)
 		{
 			$lst_nodes = new CComboBox('switch_node', $ZBX_CURNODEID);
@@ -378,15 +382,14 @@ COpt::compare_files_with_menu($ZBX_MENU);
 				$lst_nodes->AddItem($node_data['nodeid'],$node_data['name']);
 			}
 
-			$node_form = new CForm();
-			$node_form->AddItem('Current node ['.$ZBX_CURNODEID.'] ');
-			$node_form->AddItem($lst_nodes);
-			unset($lst_nodes);
-			$node_form->AddItem(new CButton('submit',S_SWITCH));
-		}
-		else
-		{
-			$node_form = null;
+			if($lst_nodes->ItemsCount())
+			{
+				$node_form = new CForm();
+				$node_form->AddItem(S_CURRENT_NODE.' ['.$ZBX_CURNODEID.'] ');
+				$node_form->AddItem($lst_nodes);
+				unset($lst_nodes);
+				$node_form->AddItem(new CButton('submit',S_SWITCH));
+			}
 		}
 		
 		$table = new CTable();
@@ -429,4 +432,6 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		}
 		unset($tmezone);
 	}
+
+	show_messages();
 ?>
