@@ -242,8 +242,12 @@
 			$this->m_showTriggers = $value == 1 ? 1 : 0;;
 		}
 	
-		function AddItem($itemid, $axis, $calc_fnc = CALC_FNC_AVG, $color=null, $drawtype=null, $type=null, $periods_cnt=null)
+		function AddItem($itemid, $axis=GRAPH_YAXIS_SIDE_RIGHT, $calc_fnc=CALC_FNC_AVG,
+					$color=null, $drawtype=null, $type=null, $periods_cnt=null)
 		{
+			if($this->type == GRAPH_TYPE_STACKED /* stacked graph */)
+				$drawtype = GRAPH_DRAW_TYPE_FILL;
+
 			$this->items[$this->num] = get_item_by_itemid($itemid);
 			$this->items[$this->num]["description"]=item_description($this->items[$this->num]["description"],$this->items[$this->num]["key_"]);
 			$host=get_host_by_hostid($this->items[$this->num]["hostid"]);
@@ -251,15 +255,17 @@
 			$this->items[$this->num]["host"] = $host["host"];
 			$this->items[$this->num]["color"] = is_null($color) ? "Dark Green" : $color;
 			$this->items[$this->num]["drawtype"] = is_null($drawtype) ? GRAPH_DRAW_TYPE_LINE : $drawtype;
-			$this->items[$this->num]["axisside"] = $axis;
-			$this->items[$this->num]["calc_fnc"] = $calc_fnc;
+			$this->items[$this->num]["axisside"] = is_null($axis) ? GRAPH_YAXIS_SIDE_RIGHT : $axis;
+			$this->items[$this->num]["calc_fnc"] = is_null($calc_fnc) ? CALC_FNC_AVG : $calc_fnc;
 			$this->items[$this->num]["calc_type"] = is_null($type) ? GRAPH_ITEM_SIMPLE : $type;
 			$this->items[$this->num]["periods_cnt"] = is_null($periods_cnt) ? 0 : $periods_cnt;
 
-			if($axis==GRAPH_YAXIS_SIDE_LEFT)
+			if($this->items[$this->num]["calc_fnc"] == GRAPH_YAXIS_SIDE_LEFT)
 				$this->yaxisleft=1;
-			if($axis==GRAPH_YAXIS_SIDE_RIGHT)
+
+			if($this->items[$this->num]["calc_fnc"] == GRAPH_YAXIS_SIDE_RIGHT)
 				$this->yaxisright=1;
+
 			$this->num++;
 		}
 
@@ -1128,6 +1134,7 @@
 					}
 				}
 			}
+
 			/* end calculation of stacked graphs */
 
 		}
@@ -1276,7 +1283,6 @@
 
 					if($draw)
 					{
-
 						$this->drawElement(
 							$data,
 							$i, $j,
@@ -1290,6 +1296,7 @@
 							$calc_fnc
 							);
 					}
+
 					$j = $i;
 				}
 			}
