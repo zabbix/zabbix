@@ -332,7 +332,8 @@ COpt::counter_up('perm');
 					$node_data = array(
 						'nodeid'	=> $ZBX_LOCALNODEID,
 						'name'		=> 'local',
-						'permission'	=> PERM_READ_WRITE
+						'permission'	=> PERM_READ_WRITE,
+						'userid'	=> null
 						);
 
 					$do_break = true;
