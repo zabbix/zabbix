@@ -537,7 +537,7 @@ include_once "include/page_header.php";
 			if(ZBX_DISTRIBUTED && isset($_REQUEST['with_node']))
 			{
 				$from_tables['n'] = 'nodes n';
-				$where_case[] = 'n.nodeid='.('i.itemid');
+				$where_case[] = 'n.nodeid='.DBid2nodeid('i.itemid');
 				$where_case[] = 'n.name like '.zbx_dbstr('%'.$_REQUEST['with_node'].'%');
 			}
 			if(isset($_REQUEST['with_group']))

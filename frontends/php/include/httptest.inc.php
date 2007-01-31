@@ -45,11 +45,8 @@
 		return $status;
 	}
 
-	function	db_save_step($hostid, $applicationid, $httptestid, $testname, $name, $no, $timeout, $url, $posts, $required)
+	function	db_save_step($hostid, $applicationid, $httptestid, $testname, $name, $no, $timeout, $url, $posts, $required, $delay, $history, $trends)
 	{
-		$history = 30; // TODO !!! Allow user set this parametr
-		$trends = 90; // TODO !!! Allow user set this parametr
-
 		if (!eregi('^([0-9a-zA-Z\_\.-\$ ]+)$', $name)) 
 		{
 			error("Scenario step name should contain '0-9a-zA-Z_ .$'- characters only");
@@ -101,12 +98,20 @@
 		
 		foreach($monitored_items as $item)
 		{
-			if(!($item_data = DBfetch(DBselect('select i.itemid,i.history,i.trends,i.status,i.delta,i.valuemapid '.
+			$item_data = DBfetch(DBselect('select i.itemid,i.history,i.trends,i.status,i.delta,i.valuemapid '.
 				' from items i, httpstepitem hi '.
 				' where hi.httpstepid='.$httpstepid.' and hi.itemid=i.itemid '.
-				' and hi.type='.$item['httpstepitemtype']))))
+				' and hi.type='.$item['httpstepitemtype']));
+
+			if(!$item_data)
 			{
-				if (!($itemid = add_item($item['description'], $item['key_'], $hostid, 30,
+				$item_data = DBfetch(DBselect('select i.itemid,i.history,i.trends,i.status,i.delta,i.valuemapid '.
+					' from items i where i.key_='.zbx_dbstr($item['key_']).' and i.hostid='.$hostid));
+			}
+
+			if(!$item_data)
+			{
+				if (!($itemid = add_item($item['description'], $item['key_'], $hostid, $delay,
 					$history, ITEM_STATUS_ACTIVE, ITEM_TYPE_HTTPTEST, '', '', $item['type'], 'localhost',
 					161, $item['units'], 0, 0, '', 0, '', '', '0', $trends, '', 0, '', array($applicationid))))
 					return false;
@@ -115,7 +120,7 @@
 			{
 				$itemid = $item_data['itemid'];
 
-				if (!(update_item($itemid, $item['description'], $item['key_'], $hostid, 30, $item_data['history'],
+				if (!(update_item($itemid, $item['description'], $item['key_'], $hostid, $delay, $item_data['history'],
 					$item_data['status'], ITEM_TYPE_HTTPTEST, '', '', $item['type'], 'localhost', 161,
 					$item['units'], 0, 0, $item_data['delta'], 0, '', '', '0', $item_data['trends'], '',
 					$item_data['valuemapid'], '', array($applicationid))))
@@ -139,6 +144,9 @@
 
 	function	db_save_httptest($httptestid, $hostid, $application, $name, $delay, $status, $agent, $macros, $steps)
 	{
+		$history = 30; // TODO !!! Allow user set this parametr
+		$trends = 90; // TODO !!! Allow user set this parametr
+
  		if (!eregi('^([0-9a-zA-Z\_\.-\$ ]+)$', $name)) 
 		{
 			error("Scenario name should contain '0-9a-zA-Z_.$ '- characters only");
@@ -202,7 +210,8 @@
 				if(!isset($s['required']))       $s['required'] = '';
 			
 				$result = db_save_step($hostid, $applicationid, $httptestid,
-						$name, $s['name'], $sid, $s['timeout'], $s['url'], $s['posts'], $s['required']);
+						$name, $s['name'], $sid, $s['timeout'], $s['url'], $s['posts'], $s['required'],
+						$delay, $history, $trends);
 				
 				if(!$result) break;
 				
@@ -220,7 +229,75 @@
 			}
 		}
 
-		// TODO !!! Create items for httptest
+		if($result)
+		{
+			$monitored_items = array(
+				array(
+					'description'	=> 'Download speed for scenario \'$1\'',
+					'key_'		=> 'web.test.in['.$name.',,bps]',
+					'type'		=> ITEM_VALUE_TYPE_FLOAT,
+					'units'		=> 'bps',
+					'httptestitemtype'=> HTTPSTEP_ITEM_TYPE_IN),
+				array(
+					'description'	=> 'Failed step of scenario \'$1\'',
+					'key_'		=> 'web.test.fail['.$name.']',
+					'type'		=> ITEM_VALUE_TYPE_UINT64,
+					'units'		=> '',
+					'httptestitemtype'=> HTTPSTEP_ITEM_TYPE_LASTSTEP)
+				);
+			
+			foreach($monitored_items as $item)
+			{
+				$item_data = DBfetch(DBselect('select i.itemid,i.history,i.trends,i.status,i.delta,i.valuemapid '.
+					' from items i, httptestitem hi '.
+					' where hi.httptestid='.$httptestid.' and hi.itemid=i.itemid '.
+					' and hi.type='.$item['httptestitemtype']));
+
+				if(!$item_data)
+				{
+					$item_data = DBfetch(DBselect('select i.itemid,i.history,i.trends,i.status,i.delta,i.valuemapid '.
+						' from items i where i.key_='.zbx_dbstr($item['key_']).' and i.hostid='.$hostid));
+				}
+
+				if(!$item_data)
+				{
+					if (!($itemid = add_item($item['description'], $item['key_'], $hostid, $delay,
+						$history, ITEM_STATUS_ACTIVE, ITEM_TYPE_HTTPTEST, '', '', $item['type'], 'localhost',
+						161, $item['units'], 0, 0, '', 0, '', '', '0', $trends, '', 0, '', array($applicationid))))
+					{
+						$result = false;
+						break;
+					}
+				}
+				else
+				{
+					$itemid = $item_data['itemid'];
+
+					if (!(update_item($itemid, $item['description'], $item['key_'], $hostid, $delay, $item_data['history'],
+						$item_data['status'], ITEM_TYPE_HTTPTEST, '', '', $item['type'], 'localhost', 161,
+						$item['units'], 0, 0, $item_data['delta'], 0, '', '', '0', $item_data['trends'], '',
+						$item_data['valuemapid'], '', array($applicationid))))
+					{
+						$result = false;
+						break;
+					}
+				}
+
+				
+				$httptestitemid = get_dbid('httptestitem', 'httptestitemid');
+
+				DBexecute('delete from httptestitem where itemid='.$itemid);
+
+				if (!DBexecute('insert into httptestitem'.
+					' (httptestitemid, httptestid, itemid, type) '.
+					' values ('.$httptestitemid.','.$httptestid.','.$itemid.','.$item['httptestitemtype'].')'
+					))
+				{
+					$result = false;
+					break;
+				}
+			}
+		}
 
 		if(!$result && isset($test_added))	delete_httptest($httptestid);
 		else	$restult = $httptestid;

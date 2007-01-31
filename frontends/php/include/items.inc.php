@@ -427,6 +427,9 @@
 				$$var_name = $item_data[$info['db_varname']];
 		}
 
+		if($item_data['type'] == ITEM_TYPE_HTTPTEST)
+			$applications = get_applications_by_itemid($itemid);
+
 		return update_item($itemid,
 			$description,$key,$hostid,$delay,
 			$history,$status,$type,
