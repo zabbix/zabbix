@@ -375,8 +375,24 @@
 		}
 		return true;
 	}
+
 	function	get_httptest_by_httptestid($httptestid)
 	{
 		return DBfetch(DBselect('select * from httptest where httptestid='.$httptestid));
+	}
+
+	function	get_httpsteps_by_httptestid($httptestid)
+	{
+		return DBselect('select * from httpstep where httptestid='.$httptestid);
+	}
+
+	function	get_httpstep_by_httpstepid($httpstepid)
+	{
+		return DBfetch(DBselect('select * from httpstep where httpstepid='.$httpstepid));
+	}
+
+	function	get_httpstep_by_no($httptestid, $no)
+	{
+		return DBfetch(DBselect('select * from httpstep where httptestid='.$httptestid.' and no='.$no));
 	}
 ?>
