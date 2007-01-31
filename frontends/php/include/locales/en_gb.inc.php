@@ -35,6 +35,10 @@
 //	httpdetails.php
 	"S_DETAILS_OF_SCENARIO"=>		"Details of scenario",
 	"S_DETAILS_OF_SCENARIO_BIG"=>		"DETAILS OF SCENARIO",
+	"S_SPEED_PER_SECONDS"=>			"Speed per seconds",
+	"S_RESPONSE_CODE"=>			"Response code",
+	"S_TOTAL_BIG"=>				"TOTAL",
+	"S_RESPONSE_TIME"=>			"Response time",
 
 //	httpmon.php
 	"S_STATUS_OF_WEB_MONITORING"=>		"Status of Web monitoring",

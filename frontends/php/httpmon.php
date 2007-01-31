@@ -26,6 +26,7 @@
 
         $page["title"] = "S_STATUS_OF_WEB_MONITORING";
         $page["file"] = "httpmon.php";
+	define('ZBX_PAGE_DO_REFRESH', 1);
 
 include_once "include/page_header.php";
 
@@ -189,24 +190,45 @@ include_once "include/page_header.php";
 			$name = array();
 
 			array_push($name, new CLink($httptest_data["name"],"httpdetails.php?httptestid=".$httptest_data['httptestid'],'action'));
-
-			$status=new CCol(new CLink(httptest_status2str($httptest_data["status"]),
-					"?group_httptestid%5B%5D=".$httptest_data["httptestid"].
-					"&hostid=".$_REQUEST["hostid"].
-					"&group_task=".($httptest_data["status"] ? "Activate+selected" : "Disable+selected"),
-					httptest_status2style($httptest_data["status"])));
 	
 
 			$step_cout = DBfetch(DBselect('select count(*) from httpstep where httptestid='.$httptest_data["httptestid"]));
 			$step_cout = $step_cout[0];
 
+			if(isset($httptest_data["lastcheck"]))
+				$lastcheck = date(S_DATE_FORMAT_YMDHMS,$httptest_data["lastcheck"]);
+			else
+				$lastcheck = new CCol('-', 'center');
+
+			if($httptest_data['curstate'] > 0)
+			{
+				$step_data = get_httpstep_by_no($httptest_data['httptestid'], $httptest_data['curstate'] - 1);
+				$state = 'In check "'.$step_data['name'].'"';
+			}
+			else
+			{
+				$state = "Idle till ".date(S_DATE_FORMAT_YMDHMS,$httptest_data['nextcheck']);
+			}
+
+			if($httptest_data['lastfailedstep'] > 0)
+			{
+				$step_data = get_httpstep_by_no($httptest_data['httptestid'], $httptest_data['lastfailedstep'] - 1);
+				$status['msg'] = 'Failed on "'.$step_data['name'].'"';
+				$status['style'] = 'disabled';
+			}
+			else
+			{
+				$status['msg'] = 'OK';
+				$status['style'] = 'enabled';
+			}
+
 			array_push($app_rows, new CRow(array(
 				$_REQUEST["hostid"] > 0 ? NULL : SPACE,
 				array(str_repeat(SPACE,6), $name),
 				$step_cout,
-				"TODO: Idle till TT || In check (X of Z)", // TODO!!!
-				"TODO: TT", // TODO!!!
-				"TODO: failed on step X of Z || OK" // TODO!!!
+				$state,
+				$lastcheck,
+				new CSpan($status['msg'], $status['style'])
 				)));
 		}
 		if($httptest_cnt > 0)
