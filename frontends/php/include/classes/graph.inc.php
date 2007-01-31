@@ -1100,7 +1100,7 @@
 			{
 				for($i=1; $i<$this->num; $i++)
 				{
-					$curr_data = &$this->data[$this->items[$i]["itemid"]][$this->items[$i]["type"]];
+					$curr_data = &$this->data[$this->items[$i]["itemid"]][$this->items[$i]["calc_type"]];
 
 					if(!isset($curr_data))	continue;
 
