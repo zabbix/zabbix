@@ -82,13 +82,13 @@
 			array(
 				'description'	=> 'Download speed for step \'$2\' of scenario \'$1\'',
 				'key_'		=> 'web.test.in['.$testname.','.$name.',bps]',
-				'type'		=> ITEM_VALUE_TYPE_UINT64,
+				'type'		=> ITEM_VALUE_TYPE_FLOAT,
 				'units'		=> 'bps',
 				'httpstepitemtype'=> HTTPSTEP_ITEM_TYPE_IN),
 			array(
 				'description'	=> 'Response time for step \'$2\' of scenario \'$1\'',
 				'key_'		=> 'web.test.time['.$testname.','.$name.',resp]',
-				'type'		=> ITEM_VALUE_TYPE_UINT64,
+				'type'		=> ITEM_VALUE_TYPE_FLOAT,
 				'units'		=> 's',
 				'httpstepitemtype'=> HTTPSTEP_ITEM_TYPE_TIME),
 			array(
