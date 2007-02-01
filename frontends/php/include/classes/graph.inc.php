@@ -1001,7 +1001,8 @@
 
 								if($first_idx == $ci && $var_name == 'clock')
 								{
-									$var[$ci - ($dx - $cj)] = $var[$first_idx] - ($p / $this->sizeX * $cj);
+									$var[$ci - ($dx - $cj)] = 
+										$var[$first_idx] - ($p / $this->sizeX * ($dx - $cj));
 									continue;
 								}
 
@@ -1025,7 +1026,8 @@
 
 							if($var_name == 'clock')
 							{
-								$var[$first_idx + ($dx - $cj)] = $var[$first_idx] + ($p / $this->sizeX * $cj);
+								$var[$first_idx + ($dx - $cj)] = 
+									$var[$first_idx] + ($p / $this->sizeX * ($dx - $cj));
 								continue;
 							}
 							$var[$first_idx + ($dx - $cj)] = $var[$first_idx];
