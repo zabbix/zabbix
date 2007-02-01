@@ -12,7 +12,7 @@ CREATE TABLE hosts_profiles_tmp (
 	location		blob		DEFAULT ''	NOT NULL,
 	notes		blob		DEFAULT ''	NOT NULL,
 	PRIMARY KEY (hostid)
-);
+) ENGINE=InnoDB;
 
 insert into hosts_profiles_tmp select * from hosts_profiles;
 drop table hosts_profiles;

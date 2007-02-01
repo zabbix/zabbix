@@ -3,7 +3,7 @@ CREATE TABLE users_groups_tmp (
 	usrgrpid		bigint unsigned		DEFAULT '0'	NOT NULL,
 	userid		bigint unsigned		DEFAULT '0'	NOT NULL,
 	PRIMARY KEY (id)
-);
+) ENGINE=InnoDB;
 CREATE INDEX users_groups_1 on users_groups_tmp (usrgrpid,userid);
 
 insert into users_groups_tmp select NULL,usrgrpid,userid from users_groups;
@@ -15,7 +15,7 @@ CREATE TABLE users_groups_tmp (
 	usrgrpid		bigint unsigned		DEFAULT '0'	NOT NULL,
 	userid		bigint unsigned		DEFAULT '0'	NOT NULL,
 	PRIMARY KEY (id)
-);
+) ENGINE=InnoDB;
 CREATE INDEX users_groups_1 on users_groups_tmp (usrgrpid,userid);
 
 insert into users_groups_tmp select * from users_groups;

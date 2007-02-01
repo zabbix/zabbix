@@ -16,7 +16,7 @@ CREATE TABLE alerts_tmp (
 	nextcheck		integer		DEFAULT '0'	NOT NULL,
 	delay		integer		DEFAULT '0'	NOT NULL,
 	PRIMARY KEY (alertid)
-);
+) ENGINE=InnoDB ;
 CREATE INDEX alerts_1 on alerts_tmp (actionid);
 CREATE INDEX alerts_2 on alerts_tmp (clock);
 CREATE INDEX alerts_3 on alerts_tmp (triggerid);

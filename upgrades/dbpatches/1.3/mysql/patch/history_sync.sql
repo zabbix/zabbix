@@ -5,5 +5,5 @@ CREATE TABLE history_sync (
 	clock		integer		DEFAULT '0'	NOT NULL,
 	value		double(16,4)		DEFAULT '0.0000'	NOT NULL,
 	PRIMARY KEY (id)
-);
+) ENGINE=InnoDB;
 CREATE INDEX history_sync_1 on history_sync (nodeid,id);

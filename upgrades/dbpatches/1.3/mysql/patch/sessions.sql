@@ -3,7 +3,7 @@ CREATE TABLE sessions_tmp (
 	userid		bigint unsigned		DEFAULT '0'	NOT NULL,
 	lastaccess		integer		DEFAULT '0'	NOT NULL,
 	PRIMARY KEY (sessionid)
-);
+) ENGINE=InnoDB;
 
 insert into sessions_tmp select * from sessions;
 drop table sessions;

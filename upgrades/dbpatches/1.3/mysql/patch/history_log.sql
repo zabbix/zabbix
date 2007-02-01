@@ -7,7 +7,7 @@ CREATE TABLE history_log_tmp (
 	severity		integer		DEFAULT '0'	NOT NULL,
 	value		text		DEFAULT ''	NOT NULL,
 	PRIMARY KEY (id)
-);
+) ENGINE=InnoDB;
 CREATE INDEX history_log_1 on history_log_tmp (itemid,clock);
 
 insert into history_log_tmp select * from history_log;

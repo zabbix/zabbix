@@ -13,5 +13,5 @@ CREATE TABLE httptest (
 	agent		varchar(255)		DEFAULT ''	NOT NULL,
 	time		double(16,4)		DEFAULT '0'	NOT NULL,
 	PRIMARY KEY (httptestid)
-);
+) ENGINE=InnoDB;
 CREATE INDEX httptest_httptest_1 on httptest (httptestid);
