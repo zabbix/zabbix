@@ -672,12 +672,14 @@
 
 		$form->AddItem(S_PERIOD.SPACE);
 
-		if(in_array($_REQUEST["period"],array(3600,2*3600,4*3600,8*3600,12*3600,24*3600,7*24*3600,31*24*3600,365*24*3600)))
+		$period = get_request('period', 3600);
+
+		if(in_array($period,array(3600,2*3600,4*3600,8*3600,12*3600,24*3600,7*24*3600,31*24*3600,365*24*3600)))
 			$custom_per = 3*3600;
 		else
-			$custom_per = $_REQUEST["period"];
+			$custom_per = $period;
 
-		$cmbPeriod = new CComboBox("period",$_REQUEST["period"],"submit()");
+		$cmbPeriod = new CComboBox("period",$period,"submit()");
 		$cmbPeriod->AddItem($custom_per,"custom");
 		$cmbPeriod->AddItem(3600,"1h");
 		$cmbPeriod->AddItem(2*3600,"2h");

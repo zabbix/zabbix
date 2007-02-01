@@ -36,6 +36,14 @@ include_once "include/page_header.php";
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
+		"from"=>	array(T_ZBX_INT, O_OPT,	 null,	'{}>=0', null),
+		"period"=>	array(T_ZBX_INT, O_OPT,	 null,	'{}>=3600', null),
+		"dec"=>		array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		"inc"=>		array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		"left"=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		"right"=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
+		"stime"=>	array(T_ZBX_STR, O_OPT,	 null,	null, null),
+
 		"httptestid"=>	array(T_ZBX_INT, O_MAND,	null,	DB_ID,		null),
 
 		"groupid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
@@ -53,6 +61,7 @@ include_once "include/page_header.php";
 		access_deny();
 	}
 	
+	navigation_bar_calc();
 ?>
 <?php
 	$lnkCancel = new CLink(S_CANCEL,'httpmon.php'.url_param('groupid').url_param('hostid'));
@@ -61,37 +70,77 @@ include_once "include/page_header.php";
 
 // TABLE
 	$table  = new CTableInfo();
-	$table->SetHeader(array(S_STEP, S_SPEED_PER_SECONDS, S_RESPONSE_TIME, S_RESPONSE_CODE, S_STATUS));
+	$table->SetHeader(array(S_STEP, S_SPEED, S_RESPONSE_TIME, S_RESPONSE_CODE, S_STATUS));
 
 	$items = array();
 	$total_data = array( HTTPSTEP_ITEM_TYPE_IN => null, HTTPSTEP_ITEM_TYPE_TIME => null );
 
 	$color = array(
-		'current' => 1,
-		1 => array('color' => 'Red', 		'next' => '2'),
-		2  => array('color' => 'Green',		'next' => '3'),
+		'current' => 0,
+		0  => array('next' => '1'),
+		1  => array('color' => 'Red', 		'next' => '2'),
+		2  => array('color' => 'Dark Green',	'next' => '3'),
 		3  => array('color' => 'Blue', 		'next' => '4'),
-		4  => array('color' => 'Yellow', 	'next' => '5'),
+		4  => array('color' => 'Dark Yellow', 	'next' => '5'),
 		5  => array('color' => 'Cyan', 		'next' => '6'),
 		6  => array('color' => 'Gray',		'next' => '7'),
 		7  => array('color' => 'Dark Red',	'next' => '8'),
-		8  => array('color' => 'Dark Green',	'next' => '9'),
+		8  => array('color' => 'Green',		'next' => '9'),
 		9  => array('color' => 'Dark Blue', 	'next' => '10'),
-		10 => array('color' => 'Dark Yellow', 	'next' => '11'),
+		10 => array('color' => 'Yellow', 	'next' => '11'),
 		11 => array('color' => 'Black',	 	'next' => '1')
 		);
 
 	$db_httpsteps = DBselect('select * from httpstep where httptestid='.$httptest_data['httptestid'].' order by no');
 	while($httpstep_data = DBfetch($db_httpsteps))
 	{
+		$status['msg'] = S_OK_BIG;
+		$status['style'] = 'enabled';
+
+		if($httptest_data['curstate'] > 0)
+		{
+			if($httptest_data['curstate'] == ($httpstep_data['no'] + 1))
+			{
+				$status['msg'] = S_IN_PROGRESS;
+				$status['style'] = 'unknown';
+				$status['skip'] = true;
+			}
+			elseif($httptest_data['curstate'] < ($httpstep_data['no'] + 1))
+			{
+				$status['msg'] = S_UNKNOWN;
+				$status['style'] = 'unknown';
+				$status['skip'] = true;
+			}
+		}
+		else
+		{
+			if($httptest_data['lastfailedstep'] > 0)
+			{
+				if($httptest_data['lastfailedstep'] == ($httpstep_data['no'] + 1))
+				{
+					$status['msg'] = S_FAIL.' - '.S_ERROR.': '.$httptest_data['error'];
+					$status['style'] = 'disabled';
+					$status['skip'] = true;
+				}
+				else if($httptest_data['lastfailedstep'] < ($httpstep_data['no'] + 1))
+				{
+					$status['msg'] = S_UNKNOWN;
+					$status['style'] = 'unknown';
+					$status['skip'] = true;
+				}
+			}
+		}
+
 		$db_items = DBselect('select i.*, hi.type as httpitem_type from items i, httpstepitem hi '.
 			' where hi.itemid=i.itemid and hi.httpstepid='.$httpstep_data['httpstepid']);
 		while($item_data = DBfetch($db_items))
 		{
+			if(isset($status['skip'])) $item_data['lastvalue'] = null;
+
 			$httpstep_data['item_data'][$item_data['httpitem_type']] = $item_data;
 
 			if (!in_array($item_data['httpitem_type'], array(HTTPSTEP_ITEM_TYPE_IN, HTTPSTEP_ITEM_TYPE_TIME))) continue;
-
+	
 			if(isset($total_data[$item_data['httpitem_type']]))
 			{
 				$total_data[$item_data['httpitem_type']]['lastvalue'] += $item_data['lastvalue'];
@@ -106,23 +155,6 @@ include_once "include/page_header.php";
 				'sortorder' => 'no');
 		}
 
-		$status['msg'] = S_OK;
-		$status['style'] = 'enabled';
-
-		if($httptest_data['lastfailedstep'] > 0)
-		{
-			if($httptest_data['lastfailedstep'] == ($httpstep_data['no'] + 1))
-			{
-				$status['msg'] = S_FAIL;
-				$status['style'] = 'disabled';
-			}
-			else if($httptest_data['lastfailedstep'] < ($httpstep_data['no'] + 1))
-			{
-				$status['msg'] = S_UNKNOWN;
-				$status['style'] = 'unknown';
-			}
-		}
-
 		$table->AddRow(array(
 			$httpstep_data['name'],
 			format_lastvalue($httpstep_data['item_data'][HTTPSTEP_ITEM_TYPE_IN]),
@@ -132,32 +164,37 @@ include_once "include/page_header.php";
 			));
 	}
 
-	$status['msg'] = S_OK;
+	$status['msg'] = S_OK_BIG;
 	$status['style'] = 'enabled';
 
-	if($httptest_data['lastfailedstep'] > 0)
+	if($httptest_data['curstate'] > 0)
 	{
-		$status['msg'] = S_FAIL;
+		$status['msg'] = S_IN_PROGRESS;
+		$status['style'] = 'unknown';
+	}
+	else if($httptest_data['lastfailedstep'] > 0)
+	{
+		$status['msg'] = S_FAIL.' - '.S_ERROR.': '.$httptest_data['error'];
 		$status['style'] = 'disabled';
 	}
 
 	$table->AddRow(array(
 		new CCol(S_TOTAL_BIG, 'bold'), 
-		format_lastvalue($total_data[HTTPSTEP_ITEM_TYPE_IN]),
-		format_lastvalue($total_data[HTTPSTEP_ITEM_TYPE_TIME]),
-		SPACE,
-		new CSpan($status['msg'], $status['style'])
+		new CCol(SPACE, 'bold'),
+		new CCol(format_lastvalue($total_data[HTTPSTEP_ITEM_TYPE_TIME]), 'bold'),
+		new CCol(SPACE, 'bold'),
+		new CCol(new CSpan($status['msg'], $status['style']), 'bold')
 		));
 
 	$table->Show();
 
 	echo BR;
 
-	show_table_header('History'.' "'.bold($accessible_hosts['name']).'"');
+	show_table_header(S_HISTORY.' "'.bold($httptest_data['name']).'"');
 	$form = new CTableInfo();
 
-	$form->AddRow(array(bold(S_SPEED_PER_SECONDS) , new CCol(
-		new CImg('chart3.php?period=3600&from=0'.
+	$form->AddRow(array(bold(S_SPEED) , new CCol(
+		new CImg('chart3.php?'.url_param('period').url_param('from').
 			url_param($httptest_data['name'], false,'name').
 			url_param(150, false,'height').
 			url_param($items[HTTPSTEP_ITEM_TYPE_IN], false, 'items').
@@ -166,7 +203,7 @@ include_once "include/page_header.php";
 		, 'center')));
 
 	$form->AddRow(array(bold(S_RESPONSE_TIME) , new CCol(
-		new CImg('chart3.php?period=3600&from=0'.
+		new CImg('chart3.php?'.url_param('period').url_param('from').
 			url_param($httptest_data['name'], false,'name').
 			url_param(150, false,'height').
 			url_param($items[HTTPSTEP_ITEM_TYPE_TIME], false, 'items').
@@ -174,6 +211,7 @@ include_once "include/page_header.php";
 		,'center')));
 
 	$form->Show();
+
 	navigation_bar("#", array('httptestid'));
 ?>
 <?php
