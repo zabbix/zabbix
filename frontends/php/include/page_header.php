@@ -112,10 +112,10 @@ COpt::profiling_start("page");
 				"label"			=> S_MONITORING,
 				"default_page_id"	=> 0,
 				"pages"=>array(
+					array("url"=>"overview.php"	,"label"=>S_OVERVIEW	),
 					array("url"=>"httpmon.php"	,"label"=>S_WEB	,
 						"sub_pages"=>array("httpdetails.php")
 						),
-					array("url"=>"overview.php"	,"label"=>S_OVERVIEW	),
 					array("url"=>"latest.php"	,"label"=>S_LATEST_DATA	,
 						"sub_pages"=>array("history.php","chart.php")
 						),
