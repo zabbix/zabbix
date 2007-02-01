@@ -260,10 +260,10 @@
 			$this->items[$this->num]["calc_type"] = is_null($type) ? GRAPH_ITEM_SIMPLE : $type;
 			$this->items[$this->num]["periods_cnt"] = is_null($periods_cnt) ? 0 : $periods_cnt;
 
-			if($this->items[$this->num]["calc_fnc"] == GRAPH_YAXIS_SIDE_LEFT)
+			if($this->items[$this->num]["axisside"] == GRAPH_YAXIS_SIDE_LEFT)
 				$this->yaxisleft=1;
 
-			if($this->items[$this->num]["calc_fnc"] == GRAPH_YAXIS_SIDE_RIGHT)
+			if($this->items[$this->num]["axisside"] == GRAPH_YAXIS_SIDE_RIGHT)
 				$this->yaxisright=1;
 
 			$this->num++;
@@ -1039,7 +1039,13 @@
 				}
 
 				/* calculate missed points */
+				
 				$first_idx = 0;
+				/* 
+					ci - current index
+					cj - count of missed
+					dx - offset to first value
+				*/
 				for($ci = 0, $cj=0; $ci < $this->sizeX; $ci++)
 				{
 					if(!isset($curr_data->count[$ci]) || $curr_data->count[$ci] == 0)
@@ -1066,12 +1072,12 @@
 
 								if($first_idx == $ci && $var_name == 'clock')
 								{
-									$var[$ci - $cj] = $var[$first_idx] - ($p / $this->sizeX * $cj);
+									$var[$ci - ($dx - $cj)] = $var[$first_idx] - ($p / $this->sizeX * $cj);
 									continue;
 								}
 
 								$dy = $var[$ci] - $var[$first_idx];
-								$var[$ci - $cj] = $var[$first_idx] + ($cj * $dy) / $dx;
+								$var[$ci - ($dx - $cj)] = $var[$first_idx] + ($cj * $dy) / $dx;
 							}
 						}
 					}
@@ -1090,10 +1096,10 @@
 
 							if($var_name == 'clock')
 							{
-								$var[$first_idx + $cj] = $var[$first_idx] + ($p / $this->sizeX * $cj);
+								$var[$first_idx + ($dx - $cj)] = $var[$first_idx] + ($p / $this->sizeX * $cj);
 								continue;
 							}
-							$var[$first_idx + $cj] = $var[$first_idx];
+							$var[$first_idx + ($dx - $cj)] = $var[$first_idx];
 						}
 					}
 				}
@@ -1102,7 +1108,8 @@
 			}
 
 			/* calculte shift for stacked graphs */
-			if($this->type == GRAPH_TYPE_STACKED /* stacked graph */)
+			
+			if($this->type == GRAPH_TYPE_STACKED)
 			{
 				for($i=1; $i<$this->num; $i++)
 				{
