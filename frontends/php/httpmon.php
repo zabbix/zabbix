@@ -221,7 +221,7 @@ include_once "include/page_header.php";
 				}
 				else
 				{
-					$status['msg'] = S_OK;
+					$status['msg'] = S_OK_BIG;
 					$status['style'] = 'enabled';
 				}
 			}

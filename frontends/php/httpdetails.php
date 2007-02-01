@@ -194,20 +194,19 @@ include_once "include/page_header.php";
 	$form = new CTableInfo();
 
 	$form->AddRow(array(bold(S_SPEED) , new CCol(
-		new CImg('chart3.php?'.url_param('period').url_param('from').
+		get_dynamic_chart('chart3.php?'.url_param('period').url_param('from').
 			url_param($httptest_data['name'], false,'name').
 			url_param(150, false,'height').
 			url_param($items[HTTPSTEP_ITEM_TYPE_IN], false, 'items').
-			url_param(GRAPH_TYPE_STACKED, false, 'graphtype')
-			)
+			url_param(GRAPH_TYPE_STACKED, false, 'graphtype'),'-100')
 		, 'center')));
 
 	$form->AddRow(array(bold(S_RESPONSE_TIME) , new CCol(
-		new CImg('chart3.php?'.url_param('period').url_param('from').
+		get_dynamic_chart('chart3.php?'.url_param('period').url_param('from').
 			url_param($httptest_data['name'], false,'name').
 			url_param(150, false,'height').
 			url_param($items[HTTPSTEP_ITEM_TYPE_TIME], false, 'items').
-			url_param(GRAPH_TYPE_STACKED, false, 'graphtype'))
+			url_param(GRAPH_TYPE_STACKED, false, 'graphtype'),'-100')
 		,'center')));
 
 	$form->Show();
