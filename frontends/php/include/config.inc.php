@@ -1074,6 +1074,33 @@ else
 		echo "</center>";
 	}
 
+	function	get_dynamic_chart($img_src,$width=0)
+	{
+		if(is_int($width) && $width > 0) $img_src.= url_param($width, false, 'width');
+$result = 
+"<script language=\"JavaScript\" type=\"text/javascript\">
+<!--
+	var width = \"".((!(is_int($width) && $width > 0)) ? $width : '')."\";
+	var img_src = \"".$img_src."\";
+
+	if(width!=\"\")
+	{
+		var scr_width = 0;
+		if(document.body.clientWidth)
+			scr_width = document.body.clientWidth;
+		else 
+			scr_width = document.width;
+
+		width = \"&width=\" + (scr_width - 100 + parseInt(width));
+	}
+
+	document.write(\"<IMG ALT=\\\"chart\\\" SRC=\\\"\" + img_src + width + \"\\\"/>\");
+
+-->
+</script>";
+		return $result;
+	}
+
 	function	get_status()
 	{
 		global $DB_TYPE;
@@ -1570,6 +1597,18 @@ else if (document.getElementById)
 			}
 		}
 		return obj.value;
+	}
+
+	function ScaleChartToParenElement(obj_name)
+	{
+		var obj = document.getElementsByName(obj_name);
+
+		if(obj.length <= 0) throw "Can't find objects with name [" + obj_name +"]";
+
+		for(i = obj.length-1; i>=0; i--)
+		{
+			obj[i].src += "&width=" + (obj[i].parentNode.offsetWidth - obj[i].parentNode.offsetLeft - 10);
+		}
 	}
 //-->
 </script>
