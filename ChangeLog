@@ -1,5 +1,6 @@
 Changes for 1.3.3:
 
+ - added support of system.boottime (Andrey)
  - fixed permissions for triggers (Eugene)
  - developed 'mass update' functionality for items (Eugene)
  - changed type of items.prevorgvalue to preserve data precision (Alexei)
