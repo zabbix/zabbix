@@ -8,7 +8,7 @@ CREATE TABLE services_tmp (
 	goodsla		double(5,2)		DEFAULT '99.9'	NOT NULL,
 	sortorder		integer		DEFAULT '0'	NOT NULL,
 	PRIMARY KEY (serviceid)
-);
+) ENGINE=InnoDB;
 
 insert into services_tmp select * from services;
 drop table services;

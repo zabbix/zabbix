@@ -8,5 +8,5 @@ CREATE TABLE httpstep (
 	posts		blob		DEFAULT ''	NOT NULL,
 	required		varchar(255)		DEFAULT ''	NOT NULL,
 	PRIMARY KEY (httpstepid)
-);
+) ENGINE=InnoDB;
 CREATE INDEX httpstep_httpstep_1 on httpstep (httptestid);

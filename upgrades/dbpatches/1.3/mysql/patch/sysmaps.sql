@@ -7,7 +7,7 @@ CREATE TABLE sysmaps_tmp (
 	label_type		integer		DEFAULT '0'	NOT NULL,
 	label_location		integer		DEFAULT '0'	NOT NULL,
 	PRIMARY KEY (sysmapid)
-);
+) ENGINE=InnoDB;
 CREATE INDEX sysmaps_1 on sysmaps_tmp (name);
 
 insert into sysmaps_tmp select * from sysmaps;

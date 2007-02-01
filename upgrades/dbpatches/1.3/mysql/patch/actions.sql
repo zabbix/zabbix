@@ -11,7 +11,7 @@ CREATE TABLE actions_tmp (
 	status		integer		DEFAULT '0'	NOT NULL,
 	scripts		blob		DEFAULT ''	NOT NULL,
 	PRIMARY KEY (actionid)
-);
+) ENGINE=InnoDB ;
 
 insert into actions_tmp select * from actions;
 drop table actions;

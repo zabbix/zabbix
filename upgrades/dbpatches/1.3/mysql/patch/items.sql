@@ -33,7 +33,7 @@ CREATE TABLE items_tmp (
 	valuemapid		bigint unsigned		DEFAULT '0'	NOT NULL,
 	delay_flex		varchar(255)		DEFAULT ''	NOT NULL,
 	PRIMARY KEY (itemid)
-);
+) ENGINE=InnoDB;
 CREATE UNIQUE INDEX items_1 on items_tmp (hostid,key_);
 CREATE INDEX items_2 on items_tmp (nextcheck);
 CREATE INDEX items_3 on items_tmp (status);

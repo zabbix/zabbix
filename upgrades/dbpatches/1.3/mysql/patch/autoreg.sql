@@ -4,7 +4,7 @@ CREATE TABLE autoreg_tmp (
 	pattern		varchar(255)		DEFAULT ''	NOT NULL,
 	hostid		bigint unsigned		DEFAULT '0'	NOT NULL,
 	PRIMARY KEY (id)
-);
+) ENGINE=InnoDB;
 
 insert into autoreg_tmp select * from autoreg;
 drop table autoreg;
