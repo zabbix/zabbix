@@ -76,6 +76,7 @@ ZBX_METRIC	parameters_specific[]=
 
 	{"system.uname",	0,	SYSTEM_UNAME,		0,	0},
 	{"system.uptime",	0,	SYSTEM_UPTIME,		0,	0},
+	{"system.boottime",     0,      SYSTEM_BOOTTIME,        0,      0},
 	{"system.users.num",	0,	SYSTEM_UNUM, 		0,	0},
 
 	{0}

@@ -60,6 +60,7 @@ int     get_stat(const char *key, unsigned flags, AGENT_RESULT *result);
 
 #ifdef  HAVE_PROC
 int     getPROC(char *file, int lineno, int fieldno, unsigned flags, AGENT_RESULT *result);
+int	getPROC2(char *file, char *param, int fieldno, unsigned flags, int type, AGENT_RESULT *result);
 #endif
 
 /* external system functions */
@@ -91,6 +92,7 @@ int     SYSTEM_SWAP_SIZE(const char *cmd, const char *param, unsigned flags, AGE
 int     SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     SYSTEM_UNUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+int     SYSTEM_BOOTTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int     VFS_FILE_CKSUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
