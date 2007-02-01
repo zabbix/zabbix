@@ -391,7 +391,7 @@ function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$m
 				$ret=$ret.$t."m";
 				$value=$value-$t*(60);
 			}
-			$ret=$ret.round($value)."s";
+			$ret=$ret.round($value, 2)."s";
 		
 			return $ret;	
 		}

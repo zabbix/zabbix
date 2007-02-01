@@ -53,6 +53,7 @@ include_once "include/page_header.php";
 		"left"=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
 		"right"=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
 		"stime"=>	array(T_ZBX_STR, O_OPT,	 null,	null, null),
+
 		"filter_task"=>	array(T_ZBX_STR, O_OPT,	 null,	
 			IN(FILTER_TAST_SHOW.','.FILTER_TAST_HIDE.','.FILTER_TAST_MARK.','.FILTER_TAST_INVERT_MARK), null),
 		"filter"=>	array(T_ZBX_STR, O_OPT,	 null,	null, null),

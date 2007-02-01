@@ -191,7 +191,6 @@ include_once "include/page_header.php";
 
 			array_push($name, new CLink($httptest_data["name"],"httpdetails.php?httptestid=".$httptest_data['httptestid'],'action'));
 	
-
 			$step_cout = DBfetch(DBselect('select count(*) from httpstep where httptestid='.$httptest_data["httptestid"]));
 			$step_cout = $step_cout[0];
 
@@ -203,23 +202,28 @@ include_once "include/page_header.php";
 			if($httptest_data['curstate'] > 0)
 			{
 				$step_data = get_httpstep_by_no($httptest_data['httptestid'], $httptest_data['curstate'] - 1);
-				$state = 'In check "'.$step_data['name'].'"';
-			}
-			else
-			{
-				$state = "Idle till ".date(S_DATE_FORMAT_YMDHMS,$httptest_data['nextcheck']);
-			}
+				$state = S_IN_CHECK.' "'.$step_data['name'].'" ['.$httptest_data['curstate'].' '.S_OF_SMALL.' '.$step_cout.']';
 
-			if($httptest_data['lastfailedstep'] > 0)
-			{
-				$step_data = get_httpstep_by_no($httptest_data['httptestid'], $httptest_data['lastfailedstep'] - 1);
-				$status['msg'] = 'Failed on "'.$step_data['name'].'"';
-				$status['style'] = 'disabled';
+				$status['msg'] = S_IN_PROGRESS;
+				$status['style'] = 'unknown';
 			}
 			else
 			{
-				$status['msg'] = 'OK';
-				$status['style'] = 'enabled';
+				$state = S_IDLE_TILL." ".date(S_DATE_FORMAT_YMDHMS,$httptest_data['nextcheck']);
+
+				if($httptest_data['lastfailedstep'] > 0)
+				{
+					$step_data = get_httpstep_by_no($httptest_data['httptestid'], $httptest_data['lastfailedstep'] - 1);
+					$status['msg'] = S_FAILED_ON.' "'.$step_data['name'].'" '.
+						'['.$httptest_data['lastfailedstep'].' '.S_OF_SMALL.' '.$step_cout.'] '.
+						' '.S_ERROR.': '.$httptest_data['error'];
+					$status['style'] = 'disabled';
+				}
+				else
+				{
+					$status['msg'] = S_OK;
+					$status['style'] = 'enabled';
+				}
 			}
 
 			array_push($app_rows, new CRow(array(
