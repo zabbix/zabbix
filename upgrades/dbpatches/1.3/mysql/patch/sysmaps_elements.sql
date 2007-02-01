@@ -11,7 +11,7 @@ CREATE TABLE sysmaps_elements_tmp (
 	y		integer		DEFAULT '0'	NOT NULL,
 	url		varchar(255)		DEFAULT ''	NOT NULL,
 	PRIMARY KEY (selementid)
-);
+) ENGINE=InnoDB;
 
 insert into sysmaps_elements_tmp select * from sysmaps_elements;
 drop table sysmaps_elements;

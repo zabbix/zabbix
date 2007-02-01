@@ -119,7 +119,7 @@ static void	process_test_data(DB_HTTPTEST *httptest, S_ZBX_HTTPSTAT *stat)
 
 	AGENT_RESULT    value;
 
-	zabbix_log(LOG_LEVEL_WARNING, "     TEST [%s]: Time %f Last step %d",
+	zabbix_log(LOG_LEVEL_DEBUG, "     TEST [%s]: Time %f Last step %d",
 		 httptest->name, stat->test_total_time, stat->test_last_step);
 
 	result = DBselect("select httptestitemid,httptestid,itemid,type from httptestitem where httptestid=" ZBX_FS_UI64,
@@ -164,7 +164,7 @@ static void	process_step_data(DB_HTTPTEST *httptest, DB_HTTPSTEP *httpstep, S_ZB
 
 	AGENT_RESULT    value;
 
-	zabbix_log(LOG_LEVEL_WARNING, "     Step [%s] [%s]: Rsp %d Time %f Speed %f",
+	zabbix_log(LOG_LEVEL_DEBUG, "     Step [%s] [%s]: Rsp %d Time %f Speed %f",
 		 httpstep->name, httpstep->url, stat->rspcode, stat->total_time, stat->speed_download);
 
 	result = DBselect("select httpstepitemid,httpstepid,itemid,type from httpstepitem where httpstepid=" ZBX_FS_UI64,
@@ -264,8 +264,11 @@ static int	process_httptest(DB_HTTPTEST *httptest)
 	CURL            *easyhandle = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_httptest(httptestid:" ZBX_FS_UI64 ")", httptest->httptestid);
-	zabbix_log(LOG_LEVEL_WARNING, "Test [%s]", httptest->name);
+	zabbix_log(LOG_LEVEL_DEBUG, "Test [%s]", httptest->name);
 
+	DBexecute("update httptest set lastcheck=%d where httptestid=" ZBX_FS_UI64,
+		now,
+		httptest->httptestid);
 
 	easyhandle = curl_easy_init();
 	if(easyhandle == NULL)
@@ -300,11 +303,11 @@ static int	process_httptest(DB_HTTPTEST *httptest)
 		return FAIL;
 	}
 
-	now=time(NULL);
 	lastfailedstep=0;
 	httptest->time = 0;
 	result = DBselect("select httpstepid,httptestid,no,name,url,timeout,posts,required from httpstep where httptestid=" ZBX_FS_UI64 " order by no",
 				httptest->httptestid);
+	now=time(NULL);
 	while((row=DBfetch(result)))
 	{
 		ZBX_STR2UINT64(httpstep.httpstepid, row[0]);
@@ -362,8 +365,8 @@ static int	process_httptest(DB_HTTPTEST *httptest)
 
 		if(zbx_regexp_match(page.data,httpstep.required,NULL) == NULL)
 		{
-zabbix_log(LOG_LEVEL_ERR, "Page didn't match [%s]", httpstep.required);
-zabbix_log(LOG_LEVEL_ERR, "[%s]", page.data);
+zabbix_log(LOG_LEVEL_DEBUG, "Page didn't match [%s]", httpstep.required);
+zabbix_log(LOG_LEVEL_DEBUG, "[%s]", page.data);
 			lastfailedstep = httpstep.no;
 		}
 
@@ -399,9 +402,8 @@ zabbix_log(LOG_LEVEL_ERR, "[%s]", page.data);
 
 	(void)curl_easy_cleanup(easyhandle);
 
-	DBexecute("update httptest set curstep=0,curstate=%d,lastcheck=%d,nextcheck=%d+delay,lastfailedstep=%d,time=%f where httptestid=" ZBX_FS_UI64,
+	DBexecute("update httptest set curstep=0,curstate=%d,nextcheck=%d+delay,lastfailedstep=%d,time=%f where httptestid=" ZBX_FS_UI64,
 		HTTPTEST_STATE_IDLE,
-		now,
 		now,
 		lastfailedstep,
 		httptest->time,
@@ -412,7 +414,7 @@ zabbix_log(LOG_LEVEL_ERR, "[%s]", page.data);
 
 	process_test_data(httptest, &stat);
 
-	zabbix_log(LOG_LEVEL_WARNING, "TOTAL: Time %f", httptest->time);
+	zabbix_log(LOG_LEVEL_DEBUG, "TOTAL: Time %f", httptest->time);
 
 	return ret;
 #endif /* HAVE_LIBCURL */

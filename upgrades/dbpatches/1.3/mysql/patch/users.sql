@@ -10,7 +10,7 @@ CREATE TABLE users_tmp (
 	refresh		integer		DEFAULT '30'	NOT NULL,
 	type		integer		DEFAULT '0'	NOT NULL,
 	PRIMARY KEY (userid)
-);
+) ENGINE=InnoDB;
 CREATE INDEX users_1 on users_tmp (alias);
 
 insert into users_tmp select userid,alias,name,surname,passwd,url,autologout,lang,refresh,3 from users;

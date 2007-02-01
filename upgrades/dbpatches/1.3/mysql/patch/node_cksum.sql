@@ -7,5 +7,5 @@ CREATE TABLE node_cksum (
 	cksumtype		integer		DEFAULT '0'	NOT NULL,
 	cksum		char(32)		DEFAULT ''	NOT NULL,
 	PRIMARY KEY (cksumid)
-);
+) ENGINE=InnoDB;
 CREATE INDEX node_cksum_cksum_1 on node_cksum (nodeid,tablename,fieldname,recordid,cksumtype);

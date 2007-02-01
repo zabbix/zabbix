@@ -3,7 +3,7 @@ CREATE TABLE hosts_groups_tmp (
 	hostid		bigint unsigned		DEFAULT '0'	NOT NULL,
 	groupid		bigint unsigned		DEFAULT '0'	NOT NULL,
 	PRIMARY KEY (hostgroupid)
-);
+) ENGINE=InnoDB;
 CREATE INDEX hosts_groups_groups_1 on hosts_groups_tmp (hostid,groupid);
 
 insert into hosts_groups_tmp select NULL,hostid,groupid from hosts_groups;
@@ -16,7 +16,7 @@ CREATE TABLE hosts_groups_tmp (
 	hostid		bigint unsigned		DEFAULT '0'	NOT NULL,
 	groupid		bigint unsigned		DEFAULT '0'	NOT NULL,
 	PRIMARY KEY (hostgroupid)
-);
+) ENGINE=InnoDB;
 CREATE INDEX hosts_groups_groups_1 on hosts_groups_tmp (hostid,groupid);
 
 insert into hosts_groups_tmp select * from hosts_groups;

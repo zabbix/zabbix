@@ -8,7 +8,7 @@ CREATE TABLE media_type_tmp (
 	exec_path		varchar(255)		DEFAULT ''	NOT NULL,
 	gsm_modem		varchar(255)		DEFAULT ''	NOT NULL,
 	PRIMARY KEY (mediatypeid)
-);
+) ENGINE=InnoDB;
 
 insert into media_type_tmp select * from media_type;
 drop table media_type;

@@ -10,7 +10,7 @@ CREATE TABLE hosts_tmp (
 	available		integer		DEFAULT '0'	NOT NULL,
 	errors_from		integer		DEFAULT '0'	NOT NULL,
 	PRIMARY KEY (hostid)
-);
+) ENGINE=InnoDB;
 CREATE INDEX hosts_1 on hosts_tmp (host);
 CREATE INDEX hosts_2 on hosts_tmp (status);
 

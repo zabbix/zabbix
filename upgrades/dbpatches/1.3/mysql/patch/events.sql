@@ -5,7 +5,7 @@ CREATE TABLE events (
 	value		integer		DEFAULT '0'	NOT NULL,
 	acknowledged		integer		DEFAULT '0'	NOT NULL,
 	PRIMARY KEY (eventid)
-);
+) ENGINE=InnoDB;
 CREATE INDEX events_1 on events (triggerid,clock);
 CREATE INDEX events_2 on events (clock);
 
