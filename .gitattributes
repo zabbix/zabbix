@@ -124,6 +124,7 @@ misc/clock/clock.fla -text
 /splint -text
 src/libs/zbxcomms/Makefile.am -text
 src/libs/zbxcomms/comms.c -text
+src/libs/zbxsysinfo/linux/boottime.c -text
 src/zabbix_agent/eventlog.c -text
 src/zabbix_agent/eventlog.h -text
 src/zabbix_server/events.c -text
