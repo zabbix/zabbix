@@ -134,7 +134,7 @@
 			$cmbStatus->AddItem($st, httptest_status2str($st));
 		$form->AddRow(S_STATUS,$cmbStatus);
 
-		$form->AddRow(S_VARIABLES, new CTextArea('macros', $macros, 40, 5));
+		$form->AddRow(S_VARIABLES, new CTextArea('macros', $macros, 84, 5));
 
 		$tblSteps = new CTableInfo();
 		$tblSteps->SetHeader(array(S_NAME,S_TIMEOUT,S_URL,S_REQUIRED,SPACE));
