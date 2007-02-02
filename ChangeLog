@@ -1,5 +1,6 @@
 Changes for 1.3.3:
 
+ - new command line parameters for zabbix_sender (Andrey)
  - added support of system.boottime (Andrey)
  - fixed permissions for triggers (Eugene)
  - developed 'mass update' functionality for items (Eugene)
