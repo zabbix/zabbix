@@ -35,6 +35,7 @@ FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|macros		|t_blob		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|agent		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|time		|t_double(16,4)	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|error		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 INDEX		|httptest_1	|httptestid
 
 TABLE|httpstep|httpstepid|ZBX_SYNC
