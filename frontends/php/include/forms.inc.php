@@ -3072,11 +3072,10 @@
 		if($resourcetype == SCREEN_RESOURCE_GRAPH)
 		{
 	// User-defined graph
-			$result = DBselect("select g.graphid,g.name,n.name as node_name, h.host".
+			$result = DBselect("select distinct g.graphid,g.name,n.name as node_name, h.host".
 				" from graphs g left join graphs_items gi on g.graphid=gi.graphid left join items i on gi.itemid=i.itemid ".
 				" left join hosts h on h.hostid=i.hostid left join nodes n on n.nodeid=".DBid2nodeid("g.graphid").
 				" where i.hostid not in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT).")".
-				" group by graphid,name,node_name".
 				" order by node_name,host,name,graphid"
 				);
 
