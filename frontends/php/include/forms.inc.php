@@ -556,10 +556,9 @@
 	        while($group=DBfetch($groups))
 	        {
 // Check if at least one host with read permission exists for this group
-	                $hosts=DBselect("select h.hostid,h.host from hosts h,hosts_groups hg".
+	                $hosts=DBselect("select distinct h.hostid,h.host from hosts h,hosts_groups hg".
 				" where hg.groupid=".$group["groupid"]." and hg.hostid=h.hostid".
-				" and h.status<>".HOST_STATUS_DELETED." group by h.hostid,h.host".
-				" order by h.host");
+				" and h.status<>".HOST_STATUS_DELETED." order by h.host");
 	                while($host=DBfetch($hosts))
 	                {
 	                        if(!check_right("Host","U",$host["hostid"])) continue;
@@ -1652,11 +1651,11 @@
 		if($resourcetype == SCREEN_RESOURCE_GRAPH)
 		{
 	// User-defined graph
-			$result=DBselect("select h.host,g.graphid,g.name ".
+			$result=DBselect("select distinct h.host,g.graphid,g.name ".
 				" from graphs g,graphs_items gi,hosts h,items i ".
 				" where gi.graphid=g.graphid and h.hostid=i.hostid and gi.itemid=i.itemid ".
 				" and h.status=".HOST_STATUS_MONITORED." and i.status=".ITEM_STATUS_ACTIVE.
-				" group by g.graphid order by h.host,g.name");
+				" order by h.host,g.name");
 
 			$cmbGraphs = new CComboBox("resourceid",$resourceid);
 			while($row=DBfetch($result))
@@ -1670,7 +1669,7 @@
 		elseif($resourcetype == SCREEN_RESOURCE_SIMPLE_GRAPH)
 		{
 	// Simple graph
-			$result=DBselect("select h.host,i.description,i.itemid,i.key_".
+			$result=DBselect("select distinct h.host,i.description,i.itemid,i.key_".
 				" from hosts h,items i where h.hostid=i.hostid".
 				" and h.status=".HOST_STATUS_MONITORED." and i.status=".ITEM_STATUS_ACTIVE.
 				" order by h.host,i.description");
@@ -1743,9 +1742,9 @@
 				$result=DBselect("select groupid,name from groups order by name");
 				while($row=DBfetch($result))
 				{
-					$result2=DBselect("select h.hostid,h.host from hosts h,items i,hosts_groups hg where".
+					$result2=DBselect("select distinct h.hostid,h.host from hosts h,items i,hosts_groups hg where".
 						" h.status=".HOST_STATUS_MONITORED." and h.hostid=i.hostid and hg.groupid=".$row["groupid"].
-						" and hg.hostid=h.hostid group by h.hostid,h.host order by h.host");
+						" and hg.hostid=h.hostid order by h.host");
 					while($row2=DBfetch($result2))
 					{
 						if(!check_right("Host","R",$row2["hostid"]))    continue;

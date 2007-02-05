@@ -88,7 +88,7 @@ define("GROUP_RIGHT",		0);
 			$USER_DETAILS = array("alias"=>"- unknown -","userid"=>0);
 		}
 
-// Incorrect login
+		// Incorrect login
 
 		if(isset($sessionid))
 		{
@@ -106,7 +106,6 @@ define("GROUP_RIGHT",		0);
 		insert_login_form();
 		show_page_footer();
 		
-		//END TODO
 		exit;
 	}
 
@@ -173,7 +172,7 @@ define("GROUP_RIGHT",		0);
 		}
 
 		if($id == ANY_ELEMENT_RIGHT)
-			$access = $any_permission;
+			$access = permission_max($any_permission, $default_permission);
 		else
 			$access = $id_permission;
 		

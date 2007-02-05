@@ -1018,11 +1018,21 @@ COpt::profiling_start("page");
 			}
 
 		}
-		if($label!='login' && !check_anyright("Default permission","R"))
+		
+		if($label=='cm' && !check_anyright("Host","R"))
 		{
 			continue;
 		}
 		
+		if(	$label=='reports' 
+			&&!check_anyright("Default permission","R")
+			&&!check_anyright("Host","R")
+			&&!check_anyright("User","R")
+			&&!check_anyright("Host","R"))
+		{
+			continue;
+		}
+
 // End of check permissions
 		$active=0;
 		foreach($sub["pages"] as $label2)

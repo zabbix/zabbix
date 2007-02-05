@@ -23,12 +23,12 @@
 // DATABASE CONFIGURATION
 
 //	$DB_TYPE	="ORACLE";
-//	$DB_TYPE	="POSTGRESQL";
-	$DB_TYPE	="MYSQL";
+	$DB_TYPE	="POSTGRESQL";
+//	$DB_TYPE	="MYSQL";
 	$DB_SERVER	="localhost";
-	$DB_DATABASE	="zabbix";
-	$DB_USER	="root";
-	$DB_PASSWORD	="";
+	$DB_DATABASE	="osmiy_1_1";
+	$DB_USER	="eugene";
+	$DB_PASSWORD	="eugene";
 // END OF DATABASE CONFIGURATION
 
 	global $USER_DETAILS;

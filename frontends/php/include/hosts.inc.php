@@ -440,8 +440,8 @@
 			$groupid = $a_groupid;
 
 			if($groupid > 0) 
-				if(!DBfetch(DBselect("select hg.groupid from hosts_groups hg".
-					" where hg.groupid=".$groupid." group by hg.groupid")))
+				if(!DBfetch(DBselect("select distinct hg.groupid from hosts_groups hg".
+					" where hg.groupid=".$groupid)))
 						$groupid = 0;
 
 			if($groupid > 0)
