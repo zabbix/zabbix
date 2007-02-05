@@ -84,22 +84,22 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 	if(item->useip == 1)
 	{
 	#ifdef NEW_APPROACH
-		zbx_snprintf(temp,sizeof(temp),"%s:%d", item->ip, item->snmp_port);
+		zbx_snprintf(temp,sizeof(temp),"%s:%d", item->host_ip, item->snmp_port);
 		session.peername = temp;
 		session.remote_port = item->snmp_port;
 	#else
-		session.peername = item->ip;
+		session.peername = item->host_ip;
 		session.remote_port = item->snmp_port;
 	#endif
 	}
 	else
 	{
 	#ifdef NEW_APPROACH
-		zbx_snprintf(temp, sizeof(temp), "%s:%d", item->host, item->snmp_port);
+		zbx_snprintf(temp, sizeof(temp), "%s:%d", item->host_dns, item->snmp_port);
 		session.peername = temp;
 		session.remote_port = item->snmp_port;
 	#else
-		session.peername = item->host;
+		session.peername = item->host_dns;
 		session.remote_port = item->snmp_port;
 	#endif
 	}
