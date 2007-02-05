@@ -327,8 +327,8 @@ int get_values(void)
 /*			if(HOST_STATUS_UNREACHABLE == item.host_status)*/
 			if(HOST_AVAILABLE_TRUE != item.host_available)
 			{
-				zabbix_log( LOG_LEVEL_WARNING, "Enabling host [%s]", item.host );
-				zabbix_syslog("Enabling host [%s]", item.host );
+				zabbix_log( LOG_LEVEL_WARNING, "Enabling host [%s]", item.host_name);
+				zabbix_syslog("Enabling host [%s]", item.host_name);
 				DBupdate_host_availability(item.hostid,HOST_AVAILABLE_TRUE,now,agent.msg);
 				update_key_status(item.hostid, HOST_STATUS_MONITORED); /* 0 */
 				item.host_available=HOST_AVAILABLE_TRUE;
@@ -355,14 +355,14 @@ int get_values(void)
 			}
 			else
 			{
-				zabbix_log( LOG_LEVEL_WARNING, "Parameter [%s] is not supported by agent on host [%s] Old status [%d]", item.key, item.host, item.status);
-				zabbix_syslog("Parameter [%s] is not supported by agent on host [%s]", item.key, item.host );
+				zabbix_log( LOG_LEVEL_WARNING, "Parameter [%s] is not supported by agent on host [%s] Old status [%d]", item.key, item.host_name, item.status);
+				zabbix_syslog("Parameter [%s] is not supported by agent on host [%s]", item.key, item.host_name);
 				DBupdate_item_status_to_notsupported(item.itemid, agent.str);
 	/*			if(HOST_STATUS_UNREACHABLE == item.host_status)*/
 				if(HOST_AVAILABLE_TRUE != item.host_available)
 				{
-					zabbix_log( LOG_LEVEL_WARNING, "Enabling host [%s]", item.host );
-					zabbix_syslog("Enabling host [%s]", item.host );
+					zabbix_log( LOG_LEVEL_WARNING, "Enabling host [%s]", item.host_name);
+					zabbix_syslog("Enabling host [%s]", item.host_name);
 					DBupdate_host_availability(item.hostid,HOST_AVAILABLE_TRUE,now,agent.msg);
 					update_key_status(item.hostid, HOST_STATUS_MONITORED);	/* 0 */
 					item.host_available=HOST_AVAILABLE_TRUE;
@@ -376,8 +376,8 @@ int get_values(void)
 			/* First error */
 			if(item.host_errors_from==0)
 			{
-				zabbix_log( LOG_LEVEL_WARNING, "Host [%s]: first network error, wait for %d seconds", item.host, CONFIG_UNREACHABLE_DELAY);
-				zabbix_syslog("Host [%s]: first network error, wait for %d seconds", item.host, CONFIG_UNREACHABLE_DELAY);
+				zabbix_log( LOG_LEVEL_WARNING, "Host [%s]: first network error, wait for %d seconds", item.host_name, CONFIG_UNREACHABLE_DELAY);
+				zabbix_syslog("Host [%s]: first network error, wait for %d seconds", item.host_name, CONFIG_UNREACHABLE_DELAY);
 
 				item.host_errors_from=now;
 				DBexecute("update hosts set errors_from=%d,disable_until=%d where hostid=" ZBX_FS_UI64,
@@ -387,8 +387,8 @@ int get_values(void)
 			{
 				if(now-item.host_errors_from>CONFIG_UNREACHABLE_PERIOD)
 				{
-					zabbix_log( LOG_LEVEL_WARNING, "Host [%s] will be checked after %d seconds", item.host, CONFIG_UNAVAILABLE_DELAY);
-					zabbix_syslog("Host [%s] will be checked after %d seconds", item.host, CONFIG_UNAVAILABLE_DELAY);
+					zabbix_log( LOG_LEVEL_WARNING, "Host [%s] will be checked after %d seconds", item.host_name, CONFIG_UNAVAILABLE_DELAY);
+					zabbix_syslog("Host [%s] will be checked after %d seconds", item.host_name, CONFIG_UNAVAILABLE_DELAY);
 
 					DBupdate_host_availability(item.hostid,HOST_AVAILABLE_FALSE,now,agent.msg);
 					update_key_status(item.hostid,HOST_AVAILABLE_FALSE); /* 2 */
@@ -400,8 +400,8 @@ int get_values(void)
 				/* Still unavailable, but won't change status to UNAVAILABLE yet */
 				else
 				{
-					zabbix_log( LOG_LEVEL_WARNING, "Host [%s]: another network error, wait for %d seconds", item.host, CONFIG_UNREACHABLE_DELAY);
-					zabbix_syslog("Host [%s]: another network error, wait for %d seconds", item.host, CONFIG_UNREACHABLE_DELAY);
+					zabbix_log( LOG_LEVEL_WARNING, "Host [%s]: another network error, wait for %d seconds", item.host_name, CONFIG_UNREACHABLE_DELAY);
+					zabbix_syslog("Host [%s]: another network error, wait for %d seconds", item.host_name, CONFIG_UNREACHABLE_DELAY);
 
 					DBexecute("update hosts set disable_until=%d where hostid=" ZBX_FS_UI64,
 						now+CONFIG_UNREACHABLE_DELAY, item.hostid);
@@ -413,16 +413,16 @@ int get_values(void)
 /* Possibly, other logic required? */
 		else if(res == AGENT_ERROR)
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Getting value of [%s] from host [%s] failed (ZBX_ERROR)", item.key, item.host );
-			zabbix_syslog("Getting value of [%s] from host [%s] failed (ZBX_ERROR)", item.key, item.host );
+			zabbix_log( LOG_LEVEL_WARNING, "Getting value of [%s] from host [%s] failed (ZBX_ERROR)", item.key, item.host_name);
+			zabbix_syslog("Getting value of [%s] from host [%s] failed (ZBX_ERROR)", item.key, item.host_name);
 			zabbix_log( LOG_LEVEL_WARNING, "The value is not stored in database.");
 
 			stop=1;
 		}
 		else
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Getting value of [%s] from host [%s] failed", item.key, item.host );
-			zabbix_syslog("Getting value of [%s] from host [%s] failed", item.key, item.host );
+			zabbix_log( LOG_LEVEL_WARNING, "Getting value of [%s] from host [%s] failed", item.key, item.host_name );
+			zabbix_syslog("Getting value of [%s] from host [%s] failed", item.key, item.host_name);
 			zabbix_log( LOG_LEVEL_WARNING, "The value is not stored in database.");
 		}
 		free_result(&agent);

@@ -463,8 +463,8 @@ int	process_data(zbx_sock_t *sock,char *server,char *key,char *value,char *lastl
 
 	if(strcmp(value,"ZBX_NOTSUPPORTED") ==0)
 	{
-			zabbix_log( LOG_LEVEL_WARNING, "Active parameter [%s] is not supported by agent on host [%s]", item.key, item.host );
-			zabbix_syslog("Active parameter [%s] is not supported by agent on host [%s]", item.key, item.host );
+			zabbix_log( LOG_LEVEL_WARNING, "Active parameter [%s] is not supported by agent on host [%s]", item.key, item.host_name);
+			zabbix_syslog("Active parameter [%s] is not supported by agent on host [%s]", item.key, item.host_name);
 			DBupdate_item_status_to_notsupported(item.itemid, "Not supported by agent");
 	}
 	
@@ -490,8 +490,8 @@ int	process_data(zbx_sock_t *sock,char *server,char *key,char *value,char *lastl
 	}
 	else
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Type of received value [%s] is not suitable for [%s@%s]", value, item.key, item.host );
-		zabbix_syslog("Type of received value [%s] is not suitable for [%s@%s]", value, item.key, item.host );
+		zabbix_log( LOG_LEVEL_WARNING, "Type of received value [%s] is not suitable for [%s@%s]", value, item.key, item.host_name);
+		zabbix_syslog("Type of received value [%s] is not suitable for [%s@%s]", value, item.key, item.host_name);
 	}
  
 	DBfree_result(result);
@@ -873,8 +873,8 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 /* Update item status if required */
 	if(item->status == ITEM_STATUS_NOTSUPPORTED)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Parameter [%s] became supported by agent on host [%s]", item->key, item->host );
-		zabbix_syslog("Parameter [%s] became supported by agent on host [%s]", item->key, item->host );
+		zabbix_log( LOG_LEVEL_WARNING, "Parameter [%s] became supported by agent on host [%s]", item->key, item->host_name);
+		zabbix_syslog("Parameter [%s] became supported by agent on host [%s]", item->key, item->host_name);
 		item->status = ITEM_STATUS_ACTIVE;
 		DBexecute("update items set status=%d where itemid=" ZBX_FS_UI64,
 			ITEM_STATUS_ACTIVE, item->itemid);

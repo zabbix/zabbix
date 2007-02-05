@@ -327,6 +327,7 @@ FIELD		|description	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 TABLE|hosts|hostid|ZBX_SYNC
 FIELD		|hostid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|host		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|dns		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|useip		|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|ip		|t_varchar(15)	|'127.0.0.1'|NOT NULL	|ZBX_SYNC
 FIELD		|port		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC

@@ -2014,7 +2014,7 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 	ZBX_STR2UINT64(item->itemid, row[0]);
 /*	item->itemid=atoi(row[0]); */
 	strscpy(item->key,row[1]);
-	item->host=row[2];
+	item->host_name=row[2];
 	item->port=atoi(row[3]);
 	item->delay=atoi(row[4]);
 	item->description=row[5];
@@ -2023,7 +2023,7 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 	item->snmp_community=row[8];
 	item->snmp_oid=row[9];
 	item->useip=atoi(row[10]);
-	item->ip=row[11];
+	item->host_ip=row[11];
 	item->history=atoi(row[12]);
 	item->value_type=atoi(row[17]);
 
@@ -2119,6 +2119,7 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 	ZBX_STR2UINT64(item->valuemapid, row[34]);
 /*	item->valuemapid=atoi(row[34]); */
 	item->delay_flex=row[35];
+	item->host_dns=row[36];
 }
 
 /*

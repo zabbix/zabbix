@@ -180,15 +180,16 @@ static void run_remote_command(char* host_name, char* command)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "run_remote_command START [hostname: '%s', command: '%s']", host_name, command);
 
-	result = DBselect("select distinct host,ip,useip,port from hosts where host='%s' and " ZBX_COND_NODEID,
+	result = DBselect("select distinct host,ip,useip,port,dns from hosts where host='%s' and " ZBX_COND_NODEID,
 			host_name, LOCAL_NODE("hostid"));
 	row = DBfetch(result);
 	if(row)
 	{
-		item.host = row[0];
-		item.ip=row[1];
+		item.host_name = row[0];
+		item.host_ip=row[1];
 		item.useip=atoi(row[2]);
 		item.port=atoi(row[3]);
+		item.host_dns=row[4];
 		
 		zbx_snprintf(item.key,ITEM_KEY_LEN_MAX,"system.run[%s,nowait]",command);
 		
