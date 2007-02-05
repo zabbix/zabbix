@@ -158,6 +158,8 @@ void	PG_DBfree_result(DB_RESULT result);
 
 #define HOST_HOST_LEN			64
 #define HOST_HOST_LEN_MAX		HOST_HOST_LEN+1
+#define HOST_DNS_LEN			64
+#define HOST_DNS_LEN_MAX		HOST_DNS_LEN+1
 #define HOST_IP_LEN			15
 #define HOST_IP_LEN_MAX			HOST_IP_LEN+1
 #define HOST_ERROR_LEN			128
@@ -177,7 +179,7 @@ void	PG_DBfree_result(DB_RESULT result);
 #define ACTION_SUBJECT_LEN		255
 #define ACTION_SUBJECT_LEN_MAX		ACTION_SUBJECT_LEN+1
 
-#define ZBX_SQL_ITEM_SELECT	"i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.errors_from,i.snmp_port,i.delta,i.prevorgvalue,i.lastclock,i.units,i.multiplier,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula,h.available,i.status,i.trapper_hosts,i.logtimefmt,i.valuemapid,i.delay_flex from hosts h, items i"
+#define ZBX_SQL_ITEM_SELECT	"i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.errors_from,i.snmp_port,i.delta,i.prevorgvalue,i.lastclock,i.units,i.multiplier,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula,h.available,i.status,i.trapper_hosts,i.logtimefmt,i.valuemapid,i.delay_flex,h.dns from hosts h, items i"
 
 #define ZBX_MAX_SQL_LEN			65535
 
@@ -198,6 +200,7 @@ DB_HOST
 {
 	zbx_uint64_t     hostid;
 	char    host[HOST_HOST_LEN_MAX];
+	char    dns[HOST_DNS_LEN_MAX];
 	int     useip;
 	char    ip[HOST_IP_LEN_MAX];
 	int	port;
@@ -237,12 +240,13 @@ DB_ITEM
 	zbx_item_status_t	status;
 	char	*description;
 	char	key[ITEM_KEY_LEN_MAX];
-	char	*host;
+	char	*host_name;
+	char	*host_ip;
+	char	*host_dns;
 	int	host_status;
 	int	host_available;
 	int	host_errors_from;
 	int	useip;
-	char	*ip;
 	char	*shortname;
 	char	*snmp_community;
 	char	*snmp_oid;

@@ -49,11 +49,11 @@ int	get_value_simple(DB_ITEM *item, AGENT_RESULT *result)
 			zbx_strlcpy( param,l+1, r-l-1);
 			if(item->useip==1)
 			{
-				zbx_snprintf(c,sizeof(c),"net.tcp.service[%s,%s]",item->key,item->ip);
+				zbx_snprintf(c,sizeof(c),"net.tcp.service[%s,%s]",item->key,item->host_ip);
 			}
 			else
 			{
-				zbx_snprintf(c,sizeof(c),"net.tcp.service[%s,%s]",item->key,item->host);
+				zbx_snprintf(c,sizeof(c),"net.tcp.service[%s,%s]",item->key,item->host_ip);
 			}
 		}
 	}
@@ -74,7 +74,7 @@ int	get_value_simple(DB_ITEM *item, AGENT_RESULT *result)
 		}
 		else
 		{
-			zbx_snprintf(error,sizeof(error),"You must use IP address in Host %s definition", item->host);
+			zbx_snprintf(error,sizeof(error),"You must use IP address in Host %s definition", item->host_name);
 			zabbix_log( LOG_LEVEL_WARNING, "%s", error);
 			result->str=strdup(error);
 			return NOTSUPPORTED;
@@ -126,11 +126,11 @@ int	get_value_simple(DB_ITEM *item, AGENT_RESULT *result)
 		{
 			if(item->useip==1)
 			{
-				strscpy(ip,item->ip);
+				strscpy(ip,item->host_ip);
 			}
 			else
 			{
-				strscpy(ip,item->host);
+				strscpy(ip,item->host_dns);
 			}
 
 			t = strstr(service,"_perf");
