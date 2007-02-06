@@ -190,7 +190,8 @@ typedef enum
 {
 	ALERT_TYPE_EMAIL = 0,
 	ALERT_TYPE_EXEC,
-	ALERT_TYPE_SMS
+	ALERT_TYPE_SMS,
+	ALERT_TYPE_JABBER
 } zbx_alert_type_t;
 
 /* Alert statuses */
