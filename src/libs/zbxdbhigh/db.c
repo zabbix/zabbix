@@ -32,6 +32,7 @@
 #include "log.h"
 #include "zlog.h"
 #include "common.h"
+#include "actions.h"
 
 #ifdef	HAVE_MYSQL
 	MYSQL	mysql;
@@ -45,7 +46,6 @@
 	sqlo_db_handle_t oracle;
 #endif
 
-extern void    apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value);
 extern void    update_services(int triggerid, int status);
 
 void	DBclose(void)
@@ -764,7 +764,7 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *re
 
 	if(trigger->value != new_value)
 	{
-		trigger->prevvalue=DBget_prev_trigger_value(trigger->triggerid);
+		trigger->prevvalue = DBget_prev_trigger_value(trigger->triggerid);
 		if(add_alarm(trigger->triggerid,new_value,now,&alarmid) == SUCCEED)
 		{
 			if(reason==NULL)
@@ -808,28 +808,6 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *re
 	return ret;
 }
 
-/*
-int	DBupdate_trigger_value(int triggerid,int value,int clock)
-{
-	char	sql[MAX_STRING_LEN];
-
-	zabbix_log(LOG_LEVEL_DEBUG,"In update_trigger_value[%d,%d,%d]", triggerid, value, clock);
-	add_alarm(triggerid,value,clock);
-
-	snprintf(sql,sizeof(sql)-1,"update triggers set value=%d,lastchange=%d where triggerid=%d",value,clock,triggerid);
-	DBexecute(sql);
-
-	if(TRIGGER_VALUE_UNKNOWN == value)
-	{
-		snprintf(sql,sizeof(sql)-1,"update functions set lastvalue=NULL where triggerid=%d",triggerid);
-		DBexecute(sql);
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG,"End of update_trigger_value()");
-	return SUCCEED;
-}
-*/
-
 void update_triggers_status_to_unknown(int hostid,int clock,char *reason)
 {
 	char	sql[MAX_STRING_LEN];
@@ -842,17 +820,21 @@ void update_triggers_status_to_unknown(int hostid,int clock,char *reason)
 
 	memset(&trigger, 0, sizeof(trigger));
 
-/*	snprintf(sql,sizeof(sql)-1,"select distinct t.triggerid from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and h.hostid=%d and i.key_<>'%s'",hostid,SERVER_STATUS_KEY);*/
-	snprintf(sql,sizeof(sql)-1,"select distinct t.triggerid,t.value,t.url,t.comments from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and h.hostid=%d and i.key_ not in ('%s','%s','%s')",hostid,SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY);
+	snprintf(sql,sizeof(sql)-1,"select distinct t.triggerid,t.expression,t.description,t.status,t.priority,t.value,t.url,t.comments from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and h.hostid=%d and i.key_ not in ('%s','%s','%s')",hostid,SERVER_STATUS_KEY, SERVER_ICMPPING_KEY, SERVER_ICMPPINGSEC_KEY);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	result = DBselect(sql);
 
 	while((row=DBfetch(result)))
 	{
-		trigger.triggerid=atoi(row[0]);
-		trigger.value=atoi(row[1]);
-		strscpy(trigger.url, row[2]);
-		strscpy(trigger.comments, row[3]);
+		trigger.triggerid	= atoi(row[0]);
+		strscpy(trigger.expression,row[1]);
+		strscpy(trigger.description,row[2]);
+		trigger.status		= atoi(row[3]);
+		trigger.priority	= atoi(row[4]);
+		trigger.value		= atoi(row[5]);
+		trigger.url		= row[6];
+		trigger.comments	= row[7];
+
 		DBupdate_trigger_value(&trigger,TRIGGER_VALUE_UNKNOWN,clock,reason);
 	}
 
@@ -1018,14 +1000,20 @@ void DBupdate_triggers_status_after_restart(void)
 
 	now=time(NULL);
 
-	snprintf(sql,sizeof(sql)-1,"select distinct t.triggerid,t.value from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and i.nextcheck+i.delay<%d and i.key_<>'%s' and h.status not in (%d,%d)",now,SERVER_STATUS_KEY, HOST_STATUS_DELETED, HOST_STATUS_TEMPLATE);
+	snprintf(sql,sizeof(sql)-1,"select distinct t.triggerid,t.expression,t.description,t.status,t.priority,t.value,t.url,t.comments from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and i.nextcheck+i.delay<%d and i.key_<>'%s' and h.status not in (%d,%d)",now,SERVER_STATUS_KEY, HOST_STATUS_DELETED, HOST_STATUS_TEMPLATE);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
 	result = DBselect(sql);
 
 	while((row=DBfetch(result)))
 	{
-		trigger.triggerid=atoi(row[0]);
-		trigger.value=atoi(row[1]);
+		trigger.triggerid	= atoi(row[0]);
+		strscpy(trigger.expression,row[1]);
+		strscpy(trigger.description,row[2]);
+		trigger.status		= atoi(row[3]);
+		trigger.priority	= atoi(row[4]);
+		trigger.value		= atoi(row[5]);
+		trigger.url		= row[6];
+		trigger.comments	= row[7];
 
 		snprintf(sql,sizeof(sql)-1,"select min(i.nextcheck+i.delay) from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and i.nextcheck<>0 and t.triggerid=%d and i.type<>%d",trigger.triggerid,ITEM_TYPE_TRAPPER);
 		zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]",sql);
@@ -1620,7 +1608,7 @@ int	DBadd_alert(int actionid, int userid, int triggerid,  int mediatypeid, char 
 
 /* Does not work on PostgreSQL */
 /*	snprintf(sql,sizeof(sql)-1,"insert into alerts (alertid,actionid,clock,mediatypeid,sendto,subject,message,status,retries) values (NULL,%d,%d,%d,'%s','%s','%s',0,0)",actionid,now,mediatypeid,sendto,subject,message);*/
-	sql = zbx_dsprintf("insert into alerts (actionid,triggerid,userid,clock,mediatypeid,sendto,subject,message,status,retries,maxrepeats,delay) values (%d,%d,%d,%d,%d,'%s','%s','%s',0,0,%d,%d)",actionid,triggerid,userid,now,mediatypeid,sendto_esc,subject_esc,message_esc, maxrepeats, repeatdelay);
+	sql = zbx_dsprintf(sql, "insert into alerts (actionid,triggerid,userid,clock,mediatypeid,sendto,subject,message,status,retries,maxrepeats,delay) values (%d,%d,%d,%d,%d,'%s','%s','%s',0,0,%d,%d)",actionid,triggerid,userid,now,mediatypeid,sendto_esc,subject_esc,message_esc, maxrepeats, repeatdelay);
 
 	zbx_free(sendto_esc);
 	zbx_free(subject_esc);

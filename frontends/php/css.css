@@ -758,6 +758,8 @@ table.home
 img.top		{	vertical-align:text-top		}
 img.bottom	{	vertical-align:text-bottom	}
 
+.top {	vertical-align: top;	}
+
 ul
 {
 	margin-left: 0px;

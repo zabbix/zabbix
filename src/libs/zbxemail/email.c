@@ -47,7 +47,7 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 {
 	int	s;
 	int	i,e;
-	char	c[MAX_STRING_LEN];
+	char	c[MAX_STRING_LEN], *cp = NULL;
 	struct hostent *hp;
 
 	char	str_time[MAX_STRING_LEN];
@@ -80,15 +80,6 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 
 	zabbix_log( LOG_LEVEL_DEBUG, "SENDING MAIL3");
 
-/*	if(hp==NULL)
-	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot get IP for mailserver [%s]",smtp_server);
-		return FAIL;
-	}
-
-	servaddr_in.sin_addr.s_addr=((struct in_addr *)(hp->h_addr))->s_addr;
-	servaddr_in.sin_port=htons(25);*/
-
 	s=socket(AF_INET,SOCK_STREAM,0);
 	zabbix_log( LOG_LEVEL_DEBUG, "SENDING MAIL4");
 	if(s == -1)
@@ -114,8 +105,6 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	zabbix_log( LOG_LEVEL_DEBUG, "SENDING MAIL5");
 
 	memset(c,0,MAX_STRING_LEN);
-/*	i=sizeof(struct sockaddr_in);
-	i=recvfrom(s,c,MAX_STRING_LEN,0,(struct sockaddr *)&servaddr_in,&i);*/
 	i=read(s,c,MAX_STRING_LEN);
 	zabbix_log( LOG_LEVEL_DEBUG, "SENDING MAIL6");
 	if(i == -1)
@@ -139,7 +128,6 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	{
 		memset(c,0,MAX_STRING_LEN);
 		snprintf(c,sizeof(c)-1,"HELO %s\r\n",smtp_helo);
-/*		e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); */
 		e=write(s,c,strlen(c)); 
 		zabbix_log( LOG_LEVEL_DEBUG, "SENDING MAIL7");
 		if(e == -1)
@@ -152,8 +140,6 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 		}
 				
 		memset(c,0,MAX_STRING_LEN);
-/*		i=sizeof(struct sockaddr_in);
-		i=recvfrom(s,c,MAX_STRING_LEN,0,(struct sockaddr *)&servaddr_in,&i);*/
 		i=read(s,c,MAX_STRING_LEN);
 		zabbix_log( LOG_LEVEL_DEBUG, "SENDING MAIL8");
 		if(i == -1)
@@ -175,9 +161,7 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	}
 			
 	memset(c,0,MAX_STRING_LEN);
-/*	sprintf(c,"MAIL FROM: %s\r\n",smtp_email);*/
 	snprintf(c,sizeof(c)-1,"MAIL FROM: <%s>\r\n",smtp_email);
-/*	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); */
 	e=write(s,c,strlen(c)); 
 	zabbix_log( LOG_LEVEL_DEBUG, "SENDING MAIL9");
 	if(e == -1)
@@ -190,8 +174,6 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	}
 
 	memset(c,0,MAX_STRING_LEN);
-/*	i=sizeof(struct sockaddr_in);
-	i=recvfrom(s,c,MAX_STRING_LEN,0,(struct sockaddr *)&servaddr_in,&i);*/
 	i=read(s,c,MAX_STRING_LEN);
 	zabbix_log( LOG_LEVEL_DEBUG, "SENDING MAIL10");
 	if(i == -1)
@@ -213,7 +195,6 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 			
 	memset(c,0,MAX_STRING_LEN);
 	snprintf(c,sizeof(c)-1,"RCPT TO: <%s>\r\n",mailto);
-/*	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); */
 	e=write(s,c,strlen(c)); 
 	zabbix_log( LOG_LEVEL_DEBUG, "SENDING MAIL11");
 	if(e == -1)
@@ -225,8 +206,6 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 		return FAIL;
 	}
 	memset(c,0,MAX_STRING_LEN);
-/*	i=sizeof(struct sockaddr_in);
-	i=recvfrom(s,c,MAX_STRING_LEN,0,(struct sockaddr *)&servaddr_in,&i);*/
 	i=read(s,c,MAX_STRING_LEN);
 	zabbix_log( LOG_LEVEL_DEBUG, "SENDING MAIL12");
 	if(i == -1)
@@ -249,7 +228,6 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	
 	memset(c,0,MAX_STRING_LEN);
 	snprintf(c,sizeof(c)-1,"DATA\r\n");
-/*	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); */
 	e=write(s,c,strlen(c)); 
 	zabbix_log( LOG_LEVEL_DEBUG, "SENDING MAIL13");
 	if(e == -1)
@@ -261,8 +239,6 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 		return FAIL;
 	}
 	memset(c,0,MAX_STRING_LEN);
-/*	i=sizeof(struct sockaddr_in);
-	i=recvfrom(s,c,MAX_STRING_LEN,0,(struct sockaddr *)&servaddr_in,&i);*/
 	i=read(s,c,MAX_STRING_LEN);
 	zabbix_log( LOG_LEVEL_DEBUG, "SENDING MAIL14");
 	if(i == -1)
@@ -286,11 +262,9 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	time(&email_time);
 	local_time = localtime(&email_time);
 	strftime( str_time, MAX_STRING_LEN, "%a, %d %b %Y %H:%M:%S %z", local_time );
-/*	sprintf(c,"Subject: %s\r\n%s",mailsubject, mailbody);*/
-/*	snprintf(c,sizeof(c)-1,"From:<%s>\r\nTo:<%s>\r\nSubject: %s\r\n\r\n%s",smtp_email,mailto,mailsubject, mailbody);*/
-	snprintf(c,sizeof(c)-1,"From:<%s>\r\nTo:<%s>\r\nDate: %s\r\nSubject: %s\r\n\r\n%s",smtp_email,mailto,str_time,mailsubject, mailbody);
-/*	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); */
-	e=write(s,c,strlen(c)); 
+	cp = zbx_dsprintf(cp,"From:<%s>\r\nTo:<%s>\r\nDate: %s\r\nSubject: %s\r\n\r\n%s",smtp_email,mailto,str_time,mailsubject, mailbody);
+	e=write(s,cp,strlen(cp)); 
+	zbx_free(cp);
 	if(e == -1)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Error sending mail subject and body to mailserver [%s]", strerror(errno));
@@ -302,7 +276,6 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 
 	memset(c,0,MAX_STRING_LEN);
 	snprintf(c,sizeof(c)-1,"\r\n.\r\n");
-/*	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); */
 	e=write(s,c,strlen(c)); 
 	zabbix_log( LOG_LEVEL_DEBUG, "SENDING MAIL15");
 	if(e == -1)
@@ -314,8 +287,6 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 		return FAIL;
 	}
 	memset(c,0,MAX_STRING_LEN);
-/*	i=sizeof(struct sockaddr_in);
-	i=recvfrom(s,c,MAX_STRING_LEN,0,(struct sockaddr *)&servaddr_in,&i);*/
 	i=read(s,c,MAX_STRING_LEN);
 	zabbix_log( LOG_LEVEL_DEBUG, "SENDING MAIL16");
 	if(i == -1)
@@ -337,7 +308,6 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	
 	memset(c,0,MAX_STRING_LEN);
 	snprintf(c,sizeof(c)-1,"QUIT\r\n");
-/*	e=sendto(s,c,strlen(c),0,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)); */
 	e=write(s,c,strlen(c)); 
 	zabbix_log( LOG_LEVEL_DEBUG, "SENDING MAIL18");
 	if(e == -1)

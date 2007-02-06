@@ -277,44 +277,42 @@ void	update_triggers(int itemid)
 	char	exp[MAX_STRING_LEN];
 	char	error[MAX_STRING_LEN];
 	int	exp_value;
-	time_t	now;
 	DB_TRIGGER	trigger;
 	DB_RESULT	result;
 	DB_ROW		row;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In update_triggers [%d]", itemid);
 
-/* Does not work for PostgreSQL */
-/*		sprintf(sql,"select t.triggerid,t.expression,t.status,t.dep_level,t.priority,t.value from triggers t,functions f,items i where i.status<>3 and i.itemid=f.itemid and t.status=%d and f.triggerid=t.triggerid and f.itemid=%d group by t.triggerid,t.expression,t.dep_level",TRIGGER_STATUS_ENABLED,server_num);*/
-/* Is it correct SQL? */
-	snprintf(sql,sizeof(sql)-1,"select distinct t.triggerid,t.expression,t.status,t.dep_level,t.priority,t.value,t.description from triggers t,functions f,items i where i.status<>%d and i.itemid=f.itemid and t.status=%d and f.triggerid=t.triggerid and f.itemid=%d",ITEM_STATUS_NOTSUPPORTED, TRIGGER_STATUS_ENABLED, itemid);
+	snprintf(sql,sizeof(sql)-1,"select distinct t.triggerid,t.expression,t.description,t.status,t.priority,t.value,t.url,t.comments from triggers t,functions f,items i where i.status<>%d and i.itemid=f.itemid and t.status=%d and f.triggerid=t.triggerid and f.itemid=%d",ITEM_STATUS_NOTSUPPORTED, TRIGGER_STATUS_ENABLED, itemid);
 
 	result = DBselect(sql);
 
 	while((row=DBfetch(result)))
 	{
-		trigger.triggerid=atoi(row[0]);
+		trigger.triggerid	= atoi(row[0]);
 		strscpy(trigger.expression,row[1]);
-		trigger.status=atoi(row[2]);
-		trigger.priority=atoi(row[4]);
-		trigger.value=atoi(row[5]);
-		strscpy(trigger.description,row[6]);
+		strscpy(trigger.description,row[2]);
+		trigger.status		= atoi(row[3]);
+		trigger.priority	= atoi(row[4]);
+		trigger.value		= atoi(row[5]);
+		trigger.url		= row[6];
+		trigger.comments	= row[7];
 
-		strscpy(exp, trigger.expression);
+		/* NOTE: function 'evaluate_expression' require 'exp' with 'MAX_STRING_LEN' length*/
+		memset(exp, 0, MAX_STRING_LEN);
+		strncpy(exp, trigger.expression, MAX_STRING_LEN-1);
 		if( evaluate_expression(&exp_value, exp, error, sizeof(error)) != 0 )
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Expression [%s] cannot be evaluated [%s]",trigger.expression, error);
 			zabbix_syslog("Expression [%s] cannot be evaluated [%s]",trigger.expression, error);
-/* We shouldn't update triggervalue if expressions failed */
-/*			now = time(NULL);
-			DBupdate_trigger_value(&trigger, exp_value, now, error);*/
-			continue;
+//			DBupdate_trigger_value(&trigger, exp_value, time(NULL), NULL); /* We shouldn't update triggervalue if expressions failed */
 		}
+		else
+		{
+			zabbix_log( LOG_LEVEL_DEBUG, "exp_value trigger.value trigger.prevvalue [%d] [%d] [%d]", exp_value, trigger.value, trigger.prevvalue);
 
-		zabbix_log( LOG_LEVEL_DEBUG, "exp_value trigger.value trigger.prevvalue [%d] [%d] [%d]", exp_value, trigger.value, trigger.prevvalue);
-
-		now = time(NULL);
-		DBupdate_trigger_value(&trigger, exp_value, now, NULL);
+			DBupdate_trigger_value(&trigger, exp_value, time(NULL), NULL);
+		}
 	}
 	DBfree_result(result);
 	zabbix_log( LOG_LEVEL_DEBUG, "End of update_triggers [%d]", itemid);

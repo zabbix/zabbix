@@ -1,5 +1,7 @@
 Changes for 1.1.6:
 
+ - fixed macros substitution for messages (Eugene)
+ - increased message size for alerts (Eugene)
  - fixed permission system (Eugene)
  - fixed SQLs for PostgreSQL (Eugene)
  - fix for adding trigger expressions having sign '-' (Alexei)

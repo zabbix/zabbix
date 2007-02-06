@@ -462,7 +462,8 @@ int       SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, A
 
 int	zbx_fork();
 
-char* zbx_dsprintf(char *f, ...);
+char* zbx_dsprintf(char *dst, char *f, ...);
+char* zbx_strdcat(char *dst, const char* src);
 	
 void	*zbx_malloc(size_t size);
 #define zbx_free(ptr) { if(ptr){ free(ptr); ptr = NULL; } }

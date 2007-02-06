@@ -520,7 +520,7 @@ void	lrtrim_spaces(char *c)
  * Comments:  required free allocated string with function 'zbx_free'         *
  *                                                                            *
  ******************************************************************************/
-char* zbx_dsprintf(char *f, ...)
+char* zbx_dsprintf(char *dest, char *f, ...)
 {
 	va_list args;
 	char	*string = NULL;
@@ -542,5 +542,49 @@ char* zbx_dsprintf(char *f, ...)
 		zbx_free(string);
 	}
 
+	if(dest) zbx_free(dest);
+
 	return string;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_strdcat                                                      *
+ *                                                                            *
+ * Purpose: dinamical cating of strings                                       *
+ *                                                                            *
+ * Return value: new pointer of string                                        *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:  required free allocated string with function 'zbx_free'         *
+ *                                                                            *
+ ******************************************************************************/
+char* zbx_strdcat(char *dest, const char *src)
+{
+	register int new_len = 0;
+	char *new_dest = NULL;
+
+	if(!src || !src[0])	return dest;
+	
+	if(dest)	new_len += strlen(dest);
+
+	new_len += strlen(src);
+	
+	new_dest = zbx_malloc(new_len + 1);
+	
+	if(dest)
+	{
+		strcpy(new_dest, dest);
+		strcat(new_dest, src);
+		zbx_free(dest);
+	}
+	else
+	{
+		strcpy(new_dest, src);
+	}
+
+	new_dest[new_len] = '\0';
+
+	return new_dest;
 }

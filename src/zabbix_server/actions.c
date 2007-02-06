@@ -411,6 +411,7 @@ static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigge
 	DB_RESULT result;
 	DB_ROW	row;
 	char sql[MAX_STRING_LEN];
+	char	*tmp = NULL;
 
 	int	ret = FAIL;
 
@@ -505,20 +506,20 @@ static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigge
 	}
 	else if(condition->conditiontype == CONDITION_TYPE_TRIGGER_NAME)
 	{
-		sprintf(sql,"%s",trigger->description); /* NOTE: 'sql' variable used as temporally veriable */
+		tmp = zbx_dsprintf(tmp, "%s", trigger->description);
 		
-		substitute_simple_macros(0, trigger, NULL, sql, sizeof(sql), MACRO_TYPE_TRIGGER_DESCRIPTION);
+		substitute_simple_macros(0, trigger, NULL, &tmp, MACRO_TYPE_TRIGGER_DESCRIPTION);
 		
 		if(condition->operator == CONDITION_OPERATOR_LIKE)
 		{
-			if(strstr(sql, condition->value) != NULL)
+			if(strstr(tmp, condition->value) != NULL)
 			{
 				ret = SUCCEED;
 			}
 		}
 		else if(condition->operator == CONDITION_OPERATOR_NOT_LIKE)
 		{
-			if(strstr(sql, condition->value) == NULL)
+			if(strstr(tmp, condition->value) == NULL)
 			{
 				ret = SUCCEED;
 			}
@@ -527,6 +528,7 @@ static int	check_action_condition(DB_TRIGGER *trigger,int alarmid,int new_trigge
 		{
 			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [%d]", condition->operator, condition->conditionid);
 		}
+		zbx_free(tmp);
 	}
 	else if(condition->conditiontype == CONDITION_TYPE_TRIGGER_SEVERITY)
 	{
@@ -717,22 +719,21 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 			zabbix_log( LOG_LEVEL_DEBUG, "Conditions match our trigger. Do apply actions.");
 			action.userid=atoi(row[1]);
 			
-			strscpy(action.subject,row[2]);
+			action.subject		= strdup(row[2]);
 			
-			action.message_len	= strlen(row[3]) * 3 / 2 + 1;
-			action.message		= zbx_malloc(action.message_len);
+			action.message		= strdup(row[3]);
 
-			strnscpy(action.message,row[3], action.message_len);
-			
 			action.recipient	= atoi(row[4]);
 			action.maxrepeats	= atoi(row[5]);
 			action.repeatdelay	= atoi(row[6]);
-			strscpy(action.scripts,row[7]);
+			
+			action.scripts		= strdup(row[7]);
+			
 			action.actiontype	= atoi(row[8]);
 
-			substitute_macros(alarmid, trigger, &action, action.message, action.message_len);
-			substitute_macros(alarmid, trigger, &action, action.subject, sizeof(action.subject));
-
+			substitute_macros(alarmid, trigger, &action, &action.subject);
+			substitute_macros(alarmid, trigger, &action, &action.message);
+		
 			if(action.actiontype == ACTION_TYPE_MESSAGE)
 				send_to_user(trigger,&action);
 			else
@@ -742,6 +743,8 @@ void	apply_actions(DB_TRIGGER *trigger,int alarmid,int trigger_value)
 			DBexecute(sql);*/
 
 			zbx_free(action.message);
+			zbx_free(action.subject);
+			zbx_free(action.scripts);
 		}
 		else
 		{

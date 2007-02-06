@@ -1244,7 +1244,7 @@ int	replace_value_by_map(char *value, int valuemapid)
 	
 	snprintf(value, MAX_STRING_LEN-1, "%s (%s)", new_value, or_value);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Value: $s", value);
+	zabbix_log(LOG_LEVEL_DEBUG, "Value: %s", value);
 	return SUCCEED;
 }
 

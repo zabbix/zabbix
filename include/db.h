@@ -283,8 +283,8 @@ DB_TRIGGER
 	int	triggerid;
 	char	expression[TRIGGER_EXPRESSION_LEN_MAX];
 	char	description[TRIGGER_DESCRIPTION_LEN_MAX];
-	char	url[TRIGGER_URL_LEN_MAX];
-	char	comments[TRIGGER_COMMENTS_LEN_MAX];
+	char	*url;
+	char	*comments;
 	int	status;
 	int	value;
 	int	prevvalue;
@@ -299,12 +299,11 @@ DB_ACTION
 /*	int	delay;*/
 	int	lastcheck;
 	int	recipient;
-	char	subject[ACTION_SUBJECT_LEN_MAX];	/* don't use pointer, cose sizeof is used */
+	char	*subject;
 	char	*message;
-	int	message_len;
 	int	maxrepeats;
 	int	repeatdelay;
-	char	scripts[MAX_STRING_LEN];
+	char	*scripts;
 };
 
 DB_CONDITION

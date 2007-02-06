@@ -406,7 +406,7 @@
 		$result=DBselect($sql,10*$start+$num);
 
 		$table = new CTableInfo(S_NO_ACTIONS_FOUND);
-		$table->setHeader(array(S_TIME, S_TYPE, S_STATUS, S_RECIPIENTS, S_SUBJECT, S_MESSAGE, S_ERROR));
+		$table->setHeader(array(S_TIME, S_TYPE, S_STATUS, S_RECIPIENTS, S_MESSAGE, S_ERROR));
 		$col=0;
 		$skip=$start;
 		while(($row=DBfetch($result))&&($col<$num))
@@ -424,15 +424,17 @@
 
 			if($row["status"] == 1)
 			{
-				$status=new CCol(S_SENT,"off");
+				$status=new CSpan(S_SENT,"off");
 			}
 			else
 			{
-				$status=new CCol(S_NOT_SENT,"on");
+				$status=new CSpan(S_NOT_SENT,"on");
 			}
 			$sendto=htmlspecialchars($row["sendto"]);
-			$subject="<pre>".htmlspecialchars($row["subject"])."</pre>";
-			$message="<pre>".htmlspecialchars($row["message"])."</pre>";
+			
+			$subject = empty($row["subject"]) ? '' : "<pre>".bold(S_SUBJECT.': ').htmlspecialchars($row["subject"])."</pre>";
+			$message = array($subject,"<pre>".htmlspecialchars($row["message"])."</pre>");
+
 			if($row["error"] == "")
 			{
 				$error=new CSpan(SPACE,"off");
@@ -442,13 +444,12 @@
 				$error=new CSpan($row["error"],"on");
 			}
 			$table->addRow(array(
-			$time,
-			$row["description"],
-			$status,
-			$sendto,
-			$subject,
-			$message,
-			$error));
+				new CCol($time, 'top'),
+				new CCol($row["description"], 'top'),
+				new CCol($status, 'top'),
+				new CCol($sendto, 'top'),
+				new CCol($message, 'top'),
+				new CCol($error, 'top')));
 			$col++;
 		}
 
