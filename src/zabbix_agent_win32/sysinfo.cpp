@@ -605,8 +605,7 @@ static LONG H_ServiceState(char *cmd,char *arg,double *value)
    mgr=OpenSCManager(NULL,NULL,GENERIC_READ);
    if (mgr==NULL)
    {
-      *value=255;    // Unable to retrieve information
-      return SYSINFO_RC_SUCCESS;
+      return SYSINFO_RC_NOTSUPPORTED;
    }
 
    service = OpenService(mgr,name,SERVICE_QUERY_STATUS);
@@ -618,7 +617,7 @@ static LONG H_ServiceState(char *cmd,char *arg,double *value)
 
    if (service==NULL)
    {
-      *value=SYSINFO_RC_NOTSUPPORTED;
+      *value=255;
    }
    else
    {
@@ -634,11 +633,11 @@ static LONG H_ServiceState(char *cmd,char *arg,double *value)
 	 for(i=0;i<7;i++)
 	    if (status.dwCurrentState==states[i])
 	       break;
-	 *value=(double)i;
+	 *value=(double)i; /* 7 - unknown  state */
       }
       else
       {
-	 *value=255;    // Unable to retrieve information
+	 *value=7;    // Unable to retrieve information
       }
 
       CloseServiceHandle(service);

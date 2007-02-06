@@ -285,7 +285,6 @@
 	"S_COMPARE"=>				"Jämför",
 
 //	Footer
-	"S_ZABBIX_VER"=>			"ZABBIX 1.1.2",
 	"S_COPYRIGHT_BY"=>			"Copyright 2001-2006 ",
 	"S_CONNECTED_AS"=>			"Ansluten som",
 	"S_SIA_ZABBIX"=>			"SIA Zabbix",

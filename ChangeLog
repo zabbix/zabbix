@@ -1,5 +1,6 @@
 Changes for 1.1.6:
 
+ - fixed 'service_state[*]' for WinXX (Eugene)
  - fixed 'Hystory of events' and 'Server info' screen componets (Eugene)
  - fixed stderr/stdout redirection (Eugene)
  - fixed macros substitution for messages (Eugene)
@@ -49,7 +50,7 @@ Changes for 1.1.5:
  - fixed calculation of sum(#N) (Alexei)
  - improvements of PostgreSQL code (Alexei)
  - fixed temporary files deletion for WinXX agents (Eugene)
- - improved 'service_status[*]' allowed service name and display name (Eugnene)
+ - improved 'service_state[*]' allowed service name and display name (Eugene)
  - added error reporting of PostgreSQL for frontend (Eugene)
  - added 'with oids' to PostgreSQL table definitions (Alexei)
  - fixed sms sender (Eugene)
@@ -71,7 +72,7 @@ Changes for 1.1.4:
  - added images import script for Oracle (Eugene)
  - fixed warning displaying (Eugene)
  - added sorting by host in graph selection for screen element (Eugene)
- - fixed 'service_status[*]' for WinXX system (Eugene)
+ - fixed 'service_state[*]' for WinXX system (Eugene)
  - fixed trigger function fuzzytime() (Alexei)
  - fixed graph displaying with period 1d - 2d8h (Eugene)
  - fixed hosts remembering for graphs (Eugene)
