@@ -77,6 +77,7 @@ Integrated from 1.1.x
 
 1.1.6
 
+ - fixed 'service_state[*]' for WinXX (Eugene)
  - fixed SQLs for PostgreSQL (Eugene)
  - fix for adding trigger expressions having sign '-' (Alexei)
  - fix for adding hosts names having character '-' (Alexei)
@@ -110,7 +111,7 @@ Integrated from 1.1.x
  - www.zabbix.com replaced by localhost in agent (Alexei)
  - fixed calculation of sum(#N) (Alexei)
  - fixed temporary files deletion for WinXX agents (Eugene)
- - improved 'service_status[*]' allowed service name and display name (Eugnene)
+ - improved 'service_state[*]' allowed service name and display name (Eugene)
  - added error reporting of PostgreSQL for frontend (Eugene)
  - fixed sms sender (Eugene)
  - fixed buffer overflow while processing SNMP IP addresses (Alexei)
@@ -125,7 +126,7 @@ Integrated from 1.1.x
 
  - fixed warning displaying (Eugene)
  - added sorting by host in graph selection for screen element (Eugene)
- - fixed 'service_status[*]' for WinXX system (Eugene)
+ - fixed 'service_state[*]' for WinXX system (Eugene)
  - fixed processing of web.page.regexp[] (Alexei)
  - fixed trigger function fuzzytime() (Alexei)
  - fixed graph displaying with period 1d - 2d8h (Eugene)
