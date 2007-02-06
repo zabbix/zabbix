@@ -659,7 +659,10 @@ static LONG H_PerfCounter(char *cmd,char *arg,double *value)
 	PDH_STATUS	status;
 
 	PDH_RAW_COUNTER		rawData;
+	PDH_RAW_COUNTER		rawData2;
 	PDH_FMT_COUNTERVALUE	counterValue;
+
+	DWORD dwTicksStart;
 
 	char	counter_name[MAX_STRING_LEN];
 
@@ -680,23 +683,36 @@ LOG_DEBUG_INFO("s", counter_name);
 		{
 			if (ERROR_SUCCESS == (status = PdhAddCounter(query,counter_name,0,&counter)))
 			{
-				if (ERROR_SUCCESS == PdhCollectQueryData(query))
+				dwTicksStart = GetTickCount();
+				if (ERROR_SUCCESS == (status = PdhCollectQueryData(query)))
 				{
-					if(ERROR_SUCCESS == PdhGetRawCounterValue(counter, NULL, &rawData))
+					if(ERROR_SUCCESS == (status = PdhGetRawCounterValue(counter, NULL, &rawData)) &&
+						(rawData.CStatus == PDH_CSTATUS_VALID_DATA || rawData.CStatus == PDH_CSTATUS_NEW_DATA))
 					{
-						if( ERROR_SUCCESS == PdhCalculateCounterFromRawValue(
+						if( PDH_CSTATUS_INVALID_DATA == (status = PdhCalculateCounterFromRawValue(
 							counter, 
 							PDH_FMT_DOUBLE, 
 							&rawData, 
 							NULL, 
 							&counterValue
-							) )
+							)))
+						{
+							dwTicksStart = GetTickCount() - dwTicksStart;
+							Sleep(1000 - MAX(dwTicksStart, 500));
+							PdhCollectQueryData(query);
+							PdhGetRawCounterValue(counter, NULL, &rawData2);
+							status = PdhCalculateCounterFromRawValue(
+								counter, 
+								PDH_FMT_DOUBLE, 
+								&rawData2, 
+								&rawData, 
+								&counterValue);
+						}
+
+						if(ERROR_SUCCESS == status)
 						{
 							*value = counterValue.doubleValue;
-							
 							ret = SYSINFO_RC_SUCCESS;
-							LOG_DEBUG_INFO("s","H_PerfCounter: value");
-							LOG_DEBUG_INFO("d",*value);
 						}
 						else
 						{
@@ -705,12 +721,14 @@ LOG_DEBUG_INFO("s", counter_name);
 					}
 					else
 					{
-						WriteLog(MSG_INFORMATION,EVENTLOG_ERROR_TYPE,"ss","Can't get counter value", counter_name);
+						if(ERROR_SUCCESS == status) status = rawData.CStatus;
+
+						WriteLog(MSG_PDH_GET_RAW_DATA_FAILED,EVENTLOG_ERROR_TYPE,"ss", counter_name, GetPdhErrorText(status));
 					}
 				}
 				else
 				{
-					WriteLog(MSG_PDH_COLLECT_QUERY_DATA_FAILED,EVENTLOG_ERROR_TYPE,"s",GetSystemErrorText(GetLastError()));
+					WriteLog(MSG_PDH_COLLECT_QUERY_DATA_FAILED,EVENTLOG_ERROR_TYPE,"ss",counter_name, GetPdhErrorText(status));
 				}
 
 				PdhRemoveCounter(&counter);

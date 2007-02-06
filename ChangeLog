@@ -1,5 +1,6 @@
 Changes for 1.1.6:
 
+ - improved 'perf_counter[*]' for WinXX (Eugene)
  - fixed 'service_state[*]' for WinXX (Eugene)
  - fixed 'Hystory of events' and 'Server info' screen componets (Eugene)
  - fixed stderr/stdout redirection (Eugene)

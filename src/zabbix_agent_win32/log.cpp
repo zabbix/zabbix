@@ -168,10 +168,11 @@ void WriteLog(DWORD msg,WORD wType,char *format...)
          {
             case 's':
                ptmp = va_arg(args,char *);
+
                if(ptmp)
 				   strings[numStrings] = strdup(ptmp);
 			   else
-				   strings[numStrings] = 0;
+				   strings[numStrings] = strdup("");
                break;
             case 'd':
                strings[numStrings]=(char *)malloc(16);

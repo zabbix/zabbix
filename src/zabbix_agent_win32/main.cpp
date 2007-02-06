@@ -226,9 +226,9 @@ LOG_DEBUG_INFO("s","AddAlias == FAIL");
    _beginthread(CollectorThread,0,NULL);
    WaitForSingleObject(eventCollectorStarted,INFINITE);  // Allow collector thread to initialize
 
-   _beginthread(ListenerThread,0,NULL);
+   if(!test_cmd) _beginthread(ListenerThread,0,NULL);
 
-   _beginthread(ActiveChecksThread,0,NULL);
+   if(!test_cmd) _beginthread(ActiveChecksThread,0,NULL);
 
    CloseHandle(eventCollectorStarted);
 

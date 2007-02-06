@@ -35,7 +35,7 @@ Unable to add performance counter "%1" to query: %2
 MessageId=
 SymbolicName=MSG_PDH_COLLECT_QUERY_DATA_FAILED
 Language=English
-Call to PdhCollectQueryData() failed: %1
+Call to PdhCollectQueryData() failed for [%1]: %2
 .
 
 MessageId=
@@ -234,6 +234,12 @@ MessageId=
 SymbolicName=MSG_INFORMATION
 Language=English
 Information: %1 %2
+.
+
+MessageId=
+SymbolicName=MSG_PDH_GET_RAW_DATA_FAILED
+Language=English
+Call to PdhGetRawCounterValue() failed for [%1]: %2
 .
 
 ;#endif

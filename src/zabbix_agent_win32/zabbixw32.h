@@ -27,6 +27,7 @@
 #include <process.h>
 #include <stdio.h>
 #include <pdh.h>
+#include <pdhmsg.h>
 #include <psapi.h>
 #include "common.h"
 #include "md5.h"

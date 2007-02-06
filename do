@@ -97,6 +97,7 @@ then
   echo "Replacing..." >> WARNINGS
   find ./src/zabbix_agent_win32/ -name "*.cpp" -exec vi "+%s/\\r$//" "+wq" "-es" {} ';' -print 2>> WARNINGS
   find ./src/zabbix_agent_win32/ -name "*.h" -exec vi "+%s/\\r$//" "+wq" "-es" {} ';' -print 2>> WARNINGS
+  find ./src/zabbix_agent_win32/ -name "*.mc" -exec vi "+%s/\\r$//" "+wq" "-es" {} ';' -print 2>> WARNINGS
 fi
 
 if [ "$premake" = "yes" ] 
