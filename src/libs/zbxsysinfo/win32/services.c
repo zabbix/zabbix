@@ -56,8 +56,7 @@ int	SERVICE_STATE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 
 	if(NULL == (mgr = OpenSCManager(NULL,NULL,GENERIC_READ)) )
 	{
-		SET_UI64_RESULT(result, 255);
-		return SYSINFO_RET_OK;
+		return SYSINFO_RET_FAIL;
 	}
 
 	service = OpenService(mgr,service_name,SERVICE_QUERY_STATUS);
@@ -69,33 +68,34 @@ int	SERVICE_STATE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 
 	if(NULL == service)
 	{
-		CloseServiceHandle(mgr);
-		return SYSINFO_RET_FAIL;
-	}
-
-	if (QueryServiceStatus(service, &status))
-	{
-		static DWORD states[7] = 
-		{
-			SERVICE_RUNNING,
-			SERVICE_PAUSED,
-			SERVICE_START_PENDING,
-			SERVICE_PAUSE_PENDING,
-			SERVICE_CONTINUE_PENDING,
-			SERVICE_STOP_PENDING,
-			SERVICE_STOPPED 
-		};
-
-		for(i=0; i < 7 && status.dwCurrentState != states[i]; i++);
-		
-		SET_UI64_RESULT(result, i);
+		SET_UI64_RESULT(result, 255);
 	}
 	else
 	{
-		SET_UI64_RESULT(result, 255);
-	}
+		if (QueryServiceStatus(service, &status))
+		{
+			static DWORD states[7] = 
+			{
+				SERVICE_RUNNING,
+				SERVICE_PAUSED,
+				SERVICE_START_PENDING,
+				SERVICE_PAUSE_PENDING,
+				SERVICE_CONTINUE_PENDING,
+				SERVICE_STOP_PENDING,
+				SERVICE_STOPPED 
+			};
 
-	CloseServiceHandle(service);
+			for(i=0; i < 7 && status.dwCurrentState != states[i]; i++);
+			
+			SET_UI64_RESULT(result, i);
+		}
+		else
+		{
+			SET_UI64_RESULT(result, 7);
+		}
+
+		CloseServiceHandle(service);
+	}
 
 	CloseServiceHandle(mgr);
 
