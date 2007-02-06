@@ -48,8 +48,8 @@
 			$this->AddRow(S_NUMBER_OF_USERS_SHORT.": ".$status["users_count"]."(".$status["users_online"].")");
 			$this->AddRow(new CCol(array("Logged in as ", new CLink($USER_DETAILS["alias"],"profile.php","action"))));
 			$this->AddRow(new CCol(array(new CLink("ZABBIX server","http://www.zabbix.com","action")," is ",$server)),"status");
-			$this->AddRow(S_VALUES_STORED.": ".$status["history_count"]);
-			$this->AddRow(S_TRENDS_STORED.": ".$status["trends_count"]);
+			//$this->AddRow(S_VALUES_STORED.": ".$status["history_count"]);
+			//$this->AddRow(S_TRENDS_STORED.": ".$status["trends_count"]);
 			$this->AddRow(new CCol(array(S_NUMBER_OF_HOSTS_SHORT.": ".$status["hosts_count"]."(",
 				new CSpan($status["hosts_count_monitored"],"off"),"/",
 				new CSpan($status["hosts_count_not_monitored"],"on"),"/",
@@ -66,8 +66,8 @@
 				new CSpan($status["triggers_count_unknown"],"unknown"),"/",
 				new CSpan($status["triggers_count_off"],"off"),"]"
 				)));
-			$this->AddRow(S_NUMBER_OF_ALARMS.": ".$status["alarms_count"]);
-			$this->AddRow(S_NUMBER_OF_ALERTS.": ".$status["alerts_count"]);
+			//$this->AddRow(S_NUMBER_OF_ALARMS.": ".$status["alarms_count"]);
+			//$this->AddRow(S_NUMBER_OF_ALERTS.": ".$status["alerts_count"]);
 
 			return parent::BodyToString();
 		}

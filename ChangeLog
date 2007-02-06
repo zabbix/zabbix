@@ -1,5 +1,6 @@
 Changes for 1.1.6:
 
+ - fixed 'Hystory of events' and 'Server info' screen componets (Eugene)
  - fixed stderr/stdout redirection (Eugene)
  - fixed macros substitution for messages (Eugene)
  - increased message size for alerts (Eugene)

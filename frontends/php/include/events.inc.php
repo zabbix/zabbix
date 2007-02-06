@@ -40,7 +40,7 @@
 		$table->setHeader(array(S_TIME, S_DESCRIPTION, S_VALUE, S_SEVERITY));
 		$col=0;
 		$skip=$start;
-		while(($row=DBfetch($result))&&($col<100))
+		while(($row=DBfetch($result))&&($col<$num))
 		{
 			if(!check_right_on_trigger("R",$row["triggerid"]))
 			{
