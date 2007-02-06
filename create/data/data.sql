@@ -27,7 +27,7 @@ INSERT INTO config VALUES (1,365,365,600,'1-5,00:00-24:00');
 -- Dumping data for table `media_type`
 --
 
-INSERT INTO media_type VALUES (1,0,'Email','localhost','localhost','zabbix@localhost','','');
+INSERT INTO media_type VALUES (1,0,'Email','localhost','localhost','zabbix@localhost','','','','');
 
 --
 -- Dumping data for table `users`
@@ -61,11 +61,11 @@ INSERT INTO rights VALUES (3,2,'Default permission','R',0);
 -- Dumping data for table `hosts`
 --
 
-INSERT INTO hosts VALUES (10001,'Unix_t',0,'',10050,3,0,'',0,0);
-INSERT INTO hosts VALUES (10002,'Windows_t',0,'',10050,3,0,'',0,0);
-INSERT INTO hosts VALUES (10004,'Standalone_t',0,'',10050,3,0,'',0,0);
-INSERT INTO hosts VALUES (10003,'MySQL_t',0,'',10050,3,0,'',0,0);
-INSERT INTO hosts VALUES (10007,'SNMP_t',0,'',161,3,0,'',0,0);
+INSERT INTO hosts VALUES (10001,'Unix_t','Unix_t',0,'',10050,3,0,'',0,0);
+INSERT INTO hosts VALUES (10002,'Windows_t','Windows_t',0,'',10050,3,0,'',0,0);
+INSERT INTO hosts VALUES (10004,'Standalone_t','Standalone_t',0,'',10050,3,0,'',0,0);
+INSERT INTO hosts VALUES (10003,'MySQL_t','MySQL_t',0,'',10050,3,0,'',0,0);
+INSERT INTO hosts VALUES (10007,'SNMP_t','SNMP_t',0,'',161,3,0,'',0,0);
 
 --
 -- Dumping data for table `groups`
