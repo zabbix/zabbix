@@ -34,5 +34,6 @@
 int zabbix_open_log(int type,int level, const char *filename);
 void zabbix_log(int level, const char *fmt, ...);
 void zabbix_set_log_level(int level);
+void redirect_std(const char *filename);
 
 #endif

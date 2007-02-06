@@ -307,18 +307,7 @@ void	daemon_init(void)
 
 	for(i=0; i<MAXFD; i++)	close(i);
 
-	open("/dev/null", O_RDONLY);    /* stdin */
-
-	if(CONFIG_LOG_FILE)
-	{
-		fopen(CONFIG_LOG_FILE, "a+");   /* stdout */
-		fopen(CONFIG_LOG_FILE, "a+");   /* stderr */
-	}
-	else
-	{
-		open("/dev/null", O_RDWR);      /* stdout */
-		open("/dev/null", O_RDWR);      /* stderr */
-	}
+	redirect_std(CONFIG_LOG_FILE);
 }
 
 /******************************************************************************

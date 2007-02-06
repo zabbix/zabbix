@@ -37,6 +37,24 @@ static	char log_filename[MAX_STRING_LEN];
 static	int log_type = LOG_TYPE_UNDEFINED;
 static	int log_level = LOG_LEVEL_ERR;
 
+void redirect_std(const char *filename)
+{
+	close(0);	close(1);	close(2);
+
+	open("/dev/null", O_RDONLY);    /* stdin */
+
+	if(!filename || !*filename)
+	{
+		open("/dev/null", O_RDWR);      /* stdout */
+		open("/dev/null", O_RDWR);      /* stderr */
+	}
+	else
+	{
+		fopen(filename, "a+");   /* stdout */
+		fopen(filename, "a+");   /* stderr */
+	}
+}
+
 int zabbix_open_log(int type,int level, const char *filename)
 {
 	FILE *log_file = NULL;
@@ -138,6 +156,7 @@ void zabbix_log(int level, const char *fmt, ...)
 				{
 /*					exit(1);*/
 				}
+				redirect_std(log_filename);
 			}
 		}
 	}

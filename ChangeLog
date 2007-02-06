@@ -1,5 +1,6 @@
 Changes for 1.1.6:
 
+ - fixed stderr/stdout redirection (Eugene)
  - fixed macros substitution for messages (Eugene)
  - increased message size for alerts (Eugene)
  - fixed permission system (Eugene)

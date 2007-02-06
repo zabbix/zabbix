@@ -237,22 +237,7 @@ void    daemon_init(void)
 
 	for(i=0; i<MAXFD; i++)	close(i);
 
-	open("/dev/null", O_RDONLY);    /* stdin */
-
-	if(CONFIG_LOG_FILE)
-	{
-		fopen(CONFIG_LOG_FILE, "a+");   /* stdout */
-		fopen(CONFIG_LOG_FILE, "a+");   /* stderr */
-	}
-	else
-	{
-		open("/dev/null", O_RDWR);      /* stdout */
-		open("/dev/null", O_RDWR);      /* stderr */
-	}
-
-/*	openlog("zabbix_agentd",LOG_LEVEL_PID,LOG_USER);
-	setlogmask(LOG_UPTO(LOG_WARNING));*/
-
+	redirect_std(CONFIG_LOG_FILE);
 
 #ifdef HAVE_SYS_RESOURCE_SETPRIORITY
 	if(setpriority(PRIO_PROCESS,0,5)!=0)
