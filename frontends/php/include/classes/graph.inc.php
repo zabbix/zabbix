@@ -920,22 +920,23 @@
 					$to_time	= $this->to_time;
 				}
 				
+				$calc_field = 'round('.$x.'*(mod(clock+'.$z.','.$p.'))/('.$p.'),0)'; /* required for 'group by' support of Oracle */
 				$sql_arr = array();
 				if(($this->period / $this->sizeX) <= (ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL))
 				{
 					array_push($sql_arr,
-						'select itemid,round('.$x.'*(mod(clock+'.$z.','.$p.'))/('.$p.'),0) as i,'.
+						'select itemid,'.$calc_field.' as i,'.
 						' count(*) as count,avg(value) as avg,min(value) as min,'.
 						' max(value) as max,max(clock) as clock'.
 						' from history where itemid='.$this->items[$i]['itemid'].' and clock>='.$from_time.
-						' and clock<='.$to_time.' group by itemid, i' //' round('.$x.'*(mod(clock+'.$z.','.$p.'))/('.$p.'),0)',
+						' and clock<='.$to_time.' group by itemid,'.$calc_field
 						,
 
 						'select itemid,round('.$x.'*(mod(clock+'.$z.','.$p.'))/('.$p.'),0) as i,'.
 						' count(*) as count,avg(value) as avg,min(value) as min,'.
 						' max(value) as max,max(clock) as clock'.
 						' from history_uint where itemid='.$this->items[$i]['itemid'].' and clock>='.$from_time.
-						' and clock<='.$to_time.' group by itemid, i' //' round('.$x.'*(mod(clock+'.$z.','.$p.'))/('.$p.'),0)'
+						' and clock<='.$to_time.' group by itemid,'.$calc_field
 						);
 				}
 				else
@@ -945,7 +946,7 @@
 						' sum(num) as count,avg(value_avg) as avg,min(value_min) as min,'.
 						' max(value_max) as max,max(clock) as clock'.
 						' from trends where itemid='.$this->items[$i]['itemid'].' and clock>='.$from_time.
-						' and clock<='.$to_time.' group by itemid, i' //' round('.$x.'*(mod(clock+'.$z.','.$p.'))/('.$p.'),0)'
+						' and clock<='.$to_time.' group by itemid,'.$calc_field
 						);
 				}
 

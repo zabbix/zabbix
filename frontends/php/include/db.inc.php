@@ -22,13 +22,13 @@
 
 // DATABASE CONFIGURATION
 
-//	$DB_TYPE	="ORACLE";
+	$DB_TYPE	="ORACLE";
 //	$DB_TYPE	="POSTGRESQL";
-	$DB_TYPE	="MYSQL";
+//	$DB_TYPE	="MYSQL";
 	$DB_SERVER	="localhost";
-	$DB_DATABASE	="osmiy_1_1";
-	$DB_USER	="root";
-	$DB_PASSWORD	="";
+	$DB_DATABASE	="";
+	$DB_USER	="scott";
+	$DB_PASSWORD	="tiger";
 // END OF DATABASE CONFIGURATION
 
 	global $USER_DETAILS;
@@ -83,8 +83,11 @@
 	{
 		global $DB,$DB_TYPE;
 
-//		echo $query,"<br>";
+//SDI('DBselect: ['.$query.']');
+
 COpt::savesqlrequest($query);
+
+		$result = false;
 
 		if($DB_TYPE == "MYSQL")
 		{
@@ -97,7 +100,6 @@ COpt::savesqlrequest($query);
 			{
 				echo "Error in query [$query] [".mysql_error()."]";
 			}
-			return $result;
 		}
 		if($DB_TYPE == "POSTGRESQL")
 		{
@@ -109,7 +111,6 @@ COpt::savesqlrequest($query);
 			{
 				echo "Error in query [$query] [".pg_errormessage()."]";
 			}
-			return $result;
 		}
 		if($DB_TYPE == "ORACLE")
 		{
@@ -121,24 +122,28 @@ COpt::savesqlrequest($query);
 			$stid=OCIParse($DB,$query);
 			if(!$stid)
 			{
-				$e=@ocierror();
+				$e=ocierror();
 				error("SQL error [".$e["message"]."] in [".$e["sqltext"]."]");
 			}
-			$result=@OCIExecute($stid);
+			$result=OCIExecute($stid);
 			if(!$result)
 			{
 				$e=ocierror($stid);
 				error("SQL error [".$e["message"]."] in [".$e["sqltext"]."]");
 			}
-			return $stid;
+			$result = $stid;
 		}
+
+//SDI("DBselect: result = '".$result."'");
+		return $result;
 	}
 
 	function	DBexecute($query, $skip_error_messages=0)
 	{
 		global $DB,$DB_TYPE;
 
-//		echo $query,"<br>";
+//SDI('DBexecute: ['.$query.']');
+
 COpt::savesqlrequest($query);
 
 		$result = FALSE;
@@ -163,10 +168,10 @@ COpt::savesqlrequest($query);
 		if($DB_TYPE == "ORACLE")
 		{
 
-			return DBselect($query);
+			$result = DBselect($query);
 		}
 
-//SDI("DBexecute($query) = '".$result."'");
+//SDI("DBexecute: result = '".$result."'");
 
 		return $result;
 	}

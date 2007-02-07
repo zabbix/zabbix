@@ -1,5 +1,6 @@
 Changes for 1.1.6:
 
+ - fixed graphs in Oracle system (Eugene)
  - fixed trigger expressions with ':' (Eugene)
  - improved 'perf_counter[*]' for WinXX (Eugene)
  - fixed 'service_state[*]' for WinXX (Eugene)
