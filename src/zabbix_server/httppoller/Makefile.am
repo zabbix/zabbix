@@ -1,4 +1,10 @@
-SUBDIRS=
-INCLUDES=-I@top_srcdir@/include @MYSQL_CFLAGS@ @ORACLE_INCLUDE@ @POSTGRESQL_CFLAGS@ @SNMP_INCLUDE@
-lib_LIBRARIES=libzbxhttppoller.a
-libzbxhttppoller_a_SOURCES=httpmacro.c httptest.c httppoller.c
+## Process this file with automake to produce Makefile.in
+
+noinst_LIBRARIES = libzbxhttppoller.a
+
+libzbxhttppoller_a_SOURCES = \
+	httpmacro.c httpmacro.h \
+	httptest.c httptest.h \
+	httppoller.c httppoller.h
+
+libzbxhttppoller_a_CPPFLAGS = $(DB_CPPFLAGS) $(SNMP_INCLUDE)

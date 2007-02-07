@@ -1,7 +1,12 @@
-if AGENT
-AGENT_DIRS = zbxcrypto zbxcommon zbxlog zbxnet zbxnix zbxconf zbxsysinfo zbxplugin zbxsys
-endif
+## Process this file with automake to produce Makefile.in
+
+SERVER_DIRS = zbxdbhigh zbxemail zbxsms zbxcomms
+
 if SERVER
-SERVER_DIRS = zbxcrypto zbxcommon zbxlog zbxnet zbxnix zbxconf zbxdbhigh zbxemail zbxsms zbxsysinfo zbxplugin zbxsys zbxcomms
+SERVER_SUBDIRS = $(SERVER_DIRS)
+else
+EXTRA_SUBDIRS = $(SERVER_DIRS)
 endif
-SUBDIRS=$(AGENT_DIRS) $(SERVER_DIRS)
+
+SUBDIRS = zbxcrypto zbxcommon zbxlog zbxnet zbxnix zbxconf zbxsysinfo zbxplugin zbxsys $(SERVER_SUBDIRS)
+

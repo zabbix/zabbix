@@ -51,9 +51,9 @@
 #include "zlog.h"
 #include "email.h"
 #include "sms.h"
+#include "daemon.h"
 
 #include "alerter.h"
-#include "daemon.h"
 
 /******************************************************************************
  *                                                                            *
