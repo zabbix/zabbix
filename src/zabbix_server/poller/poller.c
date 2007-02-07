@@ -83,7 +83,7 @@ int	get_value(DB_ITEM *item, AGENT_RESULT *result)
 		res=get_value_snmp(item, result);
 #else
 		zabbix_log(LOG_LEVEL_WARNING, "Support of SNMP parameters was not compiled in");
-		zabbix_syslog("Support of SNMP parameters was not compiled in. Cannot process [%s:%s]", item->host, item->key);
+		zabbix_syslog("Support of SNMP parameters was not compiled in. Cannot process [%s:%s]", item->host_name, item->key);
 		res=NOTSUPPORTED;
 #endif
 	}
