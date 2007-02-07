@@ -932,7 +932,7 @@
 						' and clock<='.$to_time.' group by itemid,'.$calc_field
 						,
 
-						'select itemid,round('.$x.'*(mod(clock+'.$z.','.$p.'))/('.$p.'),0) as i,'.
+						'select itemid,'.$calc_field.' as i,'.
 						' count(*) as count,avg(value) as avg,min(value) as min,'.
 						' max(value) as max,max(clock) as clock'.
 						' from history_uint where itemid='.$this->items[$i]['itemid'].' and clock>='.$from_time.
@@ -942,7 +942,7 @@
 				else
 				{
 					array_push($sql_arr,
-						'select itemid,round('.$x.'*(mod(clock+'.$z.','.$p.'))/('.$p.'),0) as i,'.
+						'select itemid,'.$calc_field.' as i,'.
 						' sum(num) as count,avg(value_avg) as avg,min(value_min) as min,'.
 						' max(value_max) as max,max(clock) as clock'.
 						' from trends where itemid='.$this->items[$i]['itemid'].' and clock>='.$from_time.
