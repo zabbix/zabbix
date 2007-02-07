@@ -1,4 +1,7 @@
-SUBDIRS=
-INCLUDES=-I@top_srcdir@/include @MYSQL_CFLAGS@ @ORACLE_INCLUDE@ @POSTGRESQL_CFLAGS@
-lib_LIBRARIES=libzbxhousekeeper.a
-libzbxhousekeeper_a_SOURCES=housekeeper.c
+## Process this file with automake to produce Makefile.in
+
+noinst_LIBRARIES = libzbxhousekeeper.a
+
+libzbxhousekeeper_a_SOURCES = housekeeper.c housekeeper.h
+
+libzbxhousekeeper_a_CPPFLAGS = $(DB_CPPFLAGS)

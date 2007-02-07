@@ -552,27 +552,25 @@ AC_HELP_STRING([--with-oracle@<:@=ARG@:>@],
 				AC_MSG_ERROR([Invalid Oracle directory - unable to find sqlora.h under $withval])
 			fi
 		fi
-		ORACLE_INCLUDE="-I$ORACLE_INCDIR -I/home/zabbix/sqlora8/lib/libsqlora8/include"
-		ORACLE_LFLAGS="-L$ORACLE_LIBDIR"
-		ORACLE_LIBS="-lsqlora8"
+		ORACLE_CFLAGS="-I$ORACLE_INCDIR"
+		ORACLE_LDFLAGS="-L$ORACLE_LIBDIR -lsqlora8"
 
 		AC_DEFINE(HAVE_ORACLE,1,[Define to 1 if Oracle should be enabled.])
 		AC_MSG_RESULT(yes)
 		have_db="Oracle"
 	fi
 	],[])
-	AC_SUBST(ORACLE_INCLUDE)
-	AC_SUBST(ORACLE_LFLAGS)
-	AC_SUBST(ORACLE_LIBS)
+	AC_SUBST(ORACLE_CFLAGS)
+	AC_SUBST(ORACLE_LDFLAGS)
 
 	dnl Checking for SQLite3 support
 	AX_LIB_SQLITE3()
 	if test "x$WANT_SQLITE3" = "xyes"; then
-		if test "$have_db" != "no"; then
+		if test "x$have_db" != "xno"; then
 			AC_MSG_ERROR([You can configure for only one database.]);
 		fi
 
-		if test "$found_sqlite3" = "yes"; then
+		if test "x$found_sqlite3" = "xyes"; then
 			have_db="SQLite v3.x"
 		else
 			AC_MSG_ERROR([Not found SQLite3 library]);
@@ -581,12 +579,12 @@ AC_HELP_STRING([--with-oracle@<:@=ARG@:>@],
 
 	dnl Checking for MySQL support
 	AX_LIB_MYSQL()
-	if test "$want_mysql" = "yes"; then
-		if test "$have_db" != "no"; then
+	if test "x$want_mysql" = "xyes"; then
+		if test "x$have_db" != "xno"; then
 			AC_MSG_ERROR([You can configure for only one database.]);
 		fi
 
-		if test "$found_mysql" = "yes"; then
+		if test "x$found_mysql" = "xyes"; then
 
 			have_db="MySQL"
 
@@ -602,12 +600,12 @@ AC_HELP_STRING([--with-oracle@<:@=ARG@:>@],
 
 	dnl Checking for PostgreSQL support
 	AX_LIB_POSTGRESQL()
-	if test "$want_postgresql" = "yes"; then
-		if test "$have_db" != "no"; then
+	if test "x$want_postgresql" = "xyes"; then
+		if test "x$have_db" != "xno"; then
 			AC_MSG_ERROR([You can configure for only one database.]);
 		fi
 
-		if test "$found_postgresql" = "yes"; then
+		if test "x$found_postgresql" = "xyes"; then
 
 			have_db="PostgreSQL"
 			
@@ -619,12 +617,18 @@ AC_HELP_STRING([--with-oracle@<:@=ARG@:>@],
 	fi
 
 	AC_MSG_CHECKING(for ZABBIX server database selection)
-	if test "$have_db" = "no"; then
+	if test "x$have_db" = "xno"; then
 		AC_MSG_RESULT(error)
 		AC_MSG_ERROR([No database selected for ZABBIX server. Use --with-mysql or --with-oracle or --with-pgsql or --with-sqlite3.])
 	else
 		AC_MSG_RESULT(ok)
 	fi
+
+	DB_CPPFLAGS="$ORACLE_CFLAGS $SQLITE_CFLAGS $MYSQL_CFLAGS $POSTGRESQL_CFLAGS"
+	DB_LDFLAGS="$ORACLE_LDFLAGS $SQLITE_LDFLAGS $MYSQL_LDFLAGS $POSTGRESQL_LDFLAGS"
+
+	AC_SUBST(DB_CPPFLAGS)
+	AC_SUBST(DB_LDFLAGS)
 fi
 
 AC_MSG_CHECKING(for NET-SNMP support)
@@ -917,18 +921,18 @@ dnl AC_SUBST(CONFIG_HOST_UNKNOWN)
 
 AC_SUBST(ARCH)
 
-AC_OUTPUT(Makefile src/Makefile src/libs/Makefile src/libs/zbxlog/Makefile src/libs/zbxcrypto/Makefile  \
-	src/libs/zbxnet/Makefile src/libs/zbxconf/Makefile src/zabbix_sender/Makefile \
-	src/libs/zbxdbhigh/Makefile src/libs/zbxemail/Makefile src/libs/zbxsysinfo/Makefile src/libs/zbxsms/Makefile \
-	src/zabbix_server/pinger/Makefile src/zabbix_agent/Makefile \
-	src/zabbix_server/housekeeper/Makefile src/zabbix_server/alerter/Makefile src/zabbix_server/Makefile \
-	src/zabbix_server/trapper/Makefile src/zabbix_server/poller/Makefile src/zabbix_server/timer/Makefile \
-	src/zabbix_server/nodewatcher/Makefile src/zabbix_server/utils/Makefile src/zabbix_server/httppoller/Makefile\
-	src/zabbix_get/Makefile src/libs/zbxcommon/Makefile src/libs/zbxsysinfo/linux/Makefile \
-	src/libs/zbxsysinfo/aix/Makefile src/libs/zbxsysinfo/freebsd/Makefile src/libs/zbxsysinfo/hpux/Makefile \
-	src/libs/zbxsysinfo/openbsd/Makefile src/libs/zbxsysinfo/osx/Makefile src/libs/zbxsysinfo/solaris/Makefile \
-	src/libs/zbxsysinfo/osf/Makefile src/libs/zbxsysinfo/netbsd/Makefile src/libs/zbxsysinfo/unknown/Makefile \
-	src/libs/zbxnix/Makefile src/libs/zbxplugin/Makefile src/libs/zbxsys/Makefile src/libs/zbxcomms/Makefile)
+AC_OUTPUT([Makefile src/Makefile src/libs/Makefile src/libs/zbxlog/Makefile src/libs/zbxcrypto/Makefile
+	src/libs/zbxnet/Makefile src/libs/zbxconf/Makefile src/zabbix_sender/Makefile
+	src/libs/zbxdbhigh/Makefile src/libs/zbxemail/Makefile src/libs/zbxsysinfo/Makefile src/libs/zbxsms/Makefile
+	src/zabbix_server/pinger/Makefile src/zabbix_agent/Makefile
+	src/zabbix_server/housekeeper/Makefile src/zabbix_server/alerter/Makefile src/zabbix_server/Makefile
+	src/zabbix_server/trapper/Makefile src/zabbix_server/poller/Makefile src/zabbix_server/timer/Makefile
+	src/zabbix_server/nodewatcher/Makefile src/zabbix_server/utils/Makefile src/zabbix_server/httppoller/Makefile
+	src/zabbix_get/Makefile src/libs/zbxcommon/Makefile src/libs/zbxsysinfo/linux/Makefile
+	src/libs/zbxsysinfo/aix/Makefile src/libs/zbxsysinfo/freebsd/Makefile src/libs/zbxsysinfo/hpux/Makefile
+	src/libs/zbxsysinfo/openbsd/Makefile src/libs/zbxsysinfo/osx/Makefile src/libs/zbxsysinfo/solaris/Makefile
+	src/libs/zbxsysinfo/osf/Makefile src/libs/zbxsysinfo/netbsd/Makefile src/libs/zbxsysinfo/unknown/Makefile
+	src/libs/zbxnix/Makefile src/libs/zbxplugin/Makefile src/libs/zbxsys/Makefile src/libs/zbxcomms/Makefile])
 
 echo "
 
