@@ -182,7 +182,7 @@
 //			echo "Expression:$expression<br>";
 			$arr="";
 // The minus sing '-' must be the last one in the list, otherwise it won't work!
-			if (eregi('^((.)*)([0-9\.]+[A-Z]{0,1})[ ]*([\&\|\>\<\=\+\*\/\#-]{1})[ ]*([0-9\.]+[A-Z]{0,1})((.)*)$', $expression, $arr)) 
+			if (eregi('^((.)*)([0-9\.]+[A-Z]{0,1})[ ]*([\&\|\>\<\=\+\*\/\#[.-.]]{1})[ ]*([0-9\.]+[A-Z]{0,1})((.)*)$', $expression, $arr)) 
 			{
 //				echo "OK<br>";
 //				for($i=0;$i<50;$i++)

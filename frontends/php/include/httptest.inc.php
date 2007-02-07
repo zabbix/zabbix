@@ -47,7 +47,7 @@
 
 	function	db_save_step($hostid, $applicationid, $httptestid, $testname, $name, $no, $timeout, $url, $posts, $required, $delay, $history, $trends)
 	{
-		if (!eregi('^([0-9a-zA-Z\_\.-\$ ]+)$', $name)) 
+		if (!eregi('^([0-9a-zA-Z\_\.[.-.]\$ ]+)$', $name)) 
 		{
 			error("Scenario step name should contain '0-9a-zA-Z_ .$'- characters only");
 			return false;
@@ -147,7 +147,7 @@
 		$history = 30; // TODO !!! Allow user set this parametr
 		$trends = 90; // TODO !!! Allow user set this parametr
 
- 		if (!eregi('^([0-9a-zA-Z\_\.-\$ ]+)$', $name)) 
+ 		if (!eregi('^([0-9a-zA-Z\_\.[.-.]\$ ]+)$', $name)) 
 		{
 			error("Scenario name should contain '0-9a-zA-Z_.$ '- characters only");
 			return false;
