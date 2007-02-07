@@ -1,4 +1,7 @@
-SUBDIRS=
-INCLUDES=-I@top_srcdir@/include @MYSQL_CFLAGS@ @ORACLE_INCLUDE@ @POSTGRESQL_CFLAGS@
-lib_LIBRARIES=libzbxtimer.a
-libzbxtimer_a_SOURCES=timer.c
+## Process this file with automake to produce Makefile.in
+
+noinst_LIBRARIES = libzbxtimer.a
+
+libzbxtimer_a_SOURCES = timer.c timer.h
+
+libzbxtimer_a_CPPFLAGS = $(DB_CPPFLAGS)

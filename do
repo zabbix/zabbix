@@ -103,6 +103,7 @@ if [ "$premake" = "yes" ]
 then
   echo "Pre-making..."
   echo "Pre-making..." >> WARNINGS
+#  aclocal 2>> WARNINGS
   aclocal -I m4 2>> WARNINGS
   autoconf 2>> WARNINGS
   autoheader 2>> WARNINGS

@@ -1,4 +1,12 @@
-SUBDIRS=
-INCLUDES=-I@top_srcdir@/include @MYSQL_CFLAGS@ @ORACLE_INCLUDE@ @POSTGRESQL_CFLAGS@
-lib_LIBRARIES=libzbxnodewatcher.a
-libzbxnodewatcher_a_SOURCES=nodewatcher.c nodesender.c nodecomms.c events.c history.c
+## Process this file with automake to produce Makefile.in
+
+noinst_LIBRARIES = libzbxnodewatcher.a
+
+libzbxnodewatcher_a_SOURCES = \
+	nodewatcher.c nodewatcher.h \
+	nodesender.c nodesender.h \
+	nodecomms.c nodecomms.h \
+	events.c events.h \
+	history.c history.h
+
+libzbxnodewatcher_a_CPPFLAGS = $(DB_CPPFLAGS)
