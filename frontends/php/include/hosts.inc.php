@@ -139,7 +139,7 @@ require_once "include/items.inc.php";
 		global $ZBX_CURNODEID;
 		
 /* Character '-' must be last in the list of symbols, otherwise it won't be accepted */
- 		if (!eregi('^([0-9a-zA-Z\_\.\$-]+)$', $host)) 
+ 		if (!eregi('^([0-9a-zA-Z\_\.\$[.-.]]+)$', $host)) 
 		{
 			error("Hostname should contain '0-9a-zA-Z_.$'- characters only");
 			return false;

@@ -54,7 +54,7 @@
 	}
 	function	KEY_PARAM($var=NULL)
 	{
-		return 'ereg(\'^([0-9a-zA-Z\_\.-\$ ]+)$\',{'.$var.'})&&';
+		return 'ereg(\'^([0-9a-zA-Z\_\.[.-.]\$ ]+)$\',{'.$var.'})&&';
 	}
 
 	define("NOT_EMPTY","({}!='')&&");
