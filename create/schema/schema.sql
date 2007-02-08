@@ -32,7 +32,7 @@ FIELD		|curstep	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastfailedstep	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|delay		|t_integer	|'60'	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|macros		|t_text		|''	|NOT NULL	|ZBX_SYNC
+FIELD		|macros		|t_blob		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|agent		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|time		|t_double(16,4)	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|error		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
@@ -45,7 +45,7 @@ FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|no		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|url		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|timeout	|t_integer	|'30'	|NOT NULL	|ZBX_SYNC
-FIELD		|posts		|t_text		|''	|NOT NULL	|ZBX_SYNC
+FIELD		|posts		|t_blob		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|required	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 INDEX		|httpstep_1	|httptestid
 
@@ -147,7 +147,7 @@ FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|mediatypeid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|sendto		|t_varchar(100)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|subject	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|message	|t_text		|''	|NOT NULL	|ZBX_SYNC
+FIELD		|message	|t_blob		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|retries	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|error		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
@@ -230,14 +230,14 @@ TABLE|actions|actionid|ZBX_SYNC
 FIELD		|actionid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|userid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|subject	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|message	|t_text		|''	|NOT NULL	|ZBX_SYNC
+FIELD		|message	|t_blob		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|recipient	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|maxrepeats	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|repeatdelay	|t_integer	|'600'	|NOT NULL	|ZBX_SYNC
 FIELD		|source		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|actiontype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|scripts	|t_text		|''	|NOT NULL	|ZBX_SYNC
+FIELD		|scripts	|t_blob		|''	|NOT NULL	|ZBX_SYNC
 
 TABLE|applications|applicationid|ZBX_SYNC
 FIELD		|applicationid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
@@ -353,11 +353,11 @@ FIELD		|os		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|serialno	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|tag		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|macaddress	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|hardware	|t_text		|''	|NOT NULL	|ZBX_SYNC
-FIELD		|software	|t_text		|''	|NOT NULL	|ZBX_SYNC
-FIELD		|contact	|t_text		|''	|NOT NULL	|ZBX_SYNC
-FIELD		|location	|t_text		|''	|NOT NULL	|ZBX_SYNC
-FIELD		|notes		|t_text		|''	|NOT NULL	|ZBX_SYNC
+FIELD		|hardware	|t_blob		|''	|NOT NULL	|ZBX_SYNC
+FIELD		|software	|t_blob		|''	|NOT NULL	|ZBX_SYNC
+FIELD		|contact	|t_blob		|''	|NOT NULL	|ZBX_SYNC
+FIELD		|location	|t_blob		|''	|NOT NULL	|ZBX_SYNC
+FIELD		|notes		|t_blob		|''	|NOT NULL	|ZBX_SYNC
 
 TABLE|hosts_templates|hosttemplateid|ZBX_SYNC
 FIELD		|hosttemplateid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
@@ -569,7 +569,7 @@ FIELD		|value		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|priority	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastchange	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|dep_level	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|comments	|t_text		|	|		|ZBX_SYNC
+FIELD		|comments	|t_blob		|	|		|ZBX_SYNC
 FIELD		|error		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|templateid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|status

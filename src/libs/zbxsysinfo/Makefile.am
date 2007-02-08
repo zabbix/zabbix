@@ -12,16 +12,27 @@ libzbxsysinfo_a_SOURCES = \
 	common/http.c \
 	@ARCH@/@ARCH@.c
 
-EXTRA_SUBDIRS = \
-	aix aix/aix.c \
-	common \
-	freebsd freebsd/freebsd.c \
-	hpux hpux/hpux.c \
-	linux linux/linux.c \
-	netbsd netbsd/netbsd.c \
-	openbsd openbsd/openbsd.c \
-	osf osf/osf.c \
-	osx osx/osx.c \
-	solaris solaris/solaris.c \
-	unknown unknown/unknown.c \
+DIST_SUBDIRS = \
+	aix \
+	freebsd \
+	hpux \
+	linux \
+	netbsd \
+	openbsd \
+	osf \
+	osx \
+	solaris \
+	unknown
+
+EXTRA_DIST = \
+	aix/aix.c \
+	freebsd/freebsd.c \
+	hpux/hpux.c \
+	linux/linux.c \
+	netbsd/netbsd.c \
+	openbsd/openbsd.c \
+	osf/osf.c \
+	osx/osx.c \
+	solaris/solaris.c \
+	unknown/unknown.c \
 	win32

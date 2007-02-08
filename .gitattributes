@@ -3,6 +3,7 @@ bin/win32/zabbix_agentd.exe -text
 bin/win64/zabbix_agentd.exe -text
 build/win32/project/zabbix_agentd.dsp -text
 build/win32/project/zabbix_agentd.dsw -text
+create/Makefile.am -text
 create/data/images/Hub.png -text svneol=unset#unset
 create/data/images/Hub_small.png -text svneol=unset#unset
 create/data/images/Network.png -text svneol=unset#unset
@@ -30,6 +31,7 @@ create/data/nodes_master.sql -text
 create/data/nodes_psql.sql -text
 create/data/nodes_slave.sql -text
 create/data/recreate.sh -text
+create/schema/Makefile.am -text
 create/schema/gen.pl -text
 create/schema/schema.sql -text
 frontends/php/audio/trigger_off.wav -text
@@ -119,7 +121,12 @@ include/comms.h -text
 m4/ax_lib_mysql.m4 -text
 m4/ax_lib_postgresql.m4 -text
 m4/ax_lib_sqlite3.m4 -text
+m4/ldap.m4 -text
 m4/libcurl.m4 -text
+m4/netsnmp.m4 -text
+m4/sqlora8.m4 -text
+m4/ucdsnmp.m4 -text
+misc/Makefile.am -text
 misc/clock/clock.fla -text
 /splint -text
 src/libs/zbxcomms/Makefile.am -text

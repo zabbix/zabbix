@@ -17,7 +17,7 @@
 #
 #   This macro calls:
 #
-#     AC_SUBST(SQLITE3_CFLAGS)
+#     AC_SUBST(SQLITE3_CPPFLAGS)
 #     AC_SUBST(SQLITE3_LDFLAGS)
 #     AC_SUBST(SQLITE3_VERSION)
 #
@@ -129,7 +129,7 @@ dnl      AC_LANG_POP([C++])
 
         if test "$found_sqlite3" = "yes"; then
 
-            SQLITE3_CFLAGS="$ac_sqlite3_cppflags"
+            SQLITE3_CPPFLAGS="$ac_sqlite3_cppflags"
             SQLITE3_LDFLAGS="$ac_sqlite3_ldflags"
 
             ac_sqlite3_header_path="$ac_sqlite3_path/include/$ac_sqlite3_header"
@@ -146,7 +146,7 @@ dnl      AC_LANG_POP([C++])
                 fi
             fi
 
-            AC_SUBST(SQLITE3_CFLAGS)
+            AC_SUBST(SQLITE3_CPPFLAGS)
             AC_SUBST(SQLITE3_LDFLAGS)
             AC_SUBST(SQLITE3_VERSION)
             AC_DEFINE(HAVE_SQLITE3, [1], [Define to 1 if SQLite libraries are available])

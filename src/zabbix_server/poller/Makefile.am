@@ -10,4 +10,4 @@ libzbxpoller_a_SOURCES = \
 	checks_aggregate.c checks_aggregate.h \
 	poller.c poller.h
 
-libzbxpoller_a_CPPFLAGS = $(DB_CPPFLAGS) $(SNMP_INCLUDE)
+libzbxpoller_a_CPPFLAGS = $(DB_CPPFLAGS) $(SNMP_CPPFLAGS)

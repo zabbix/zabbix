@@ -25,7 +25,7 @@
 #
 #   This macro calls:
 #
-#     AC_SUBST(MYSQL_CFLAGS)
+#     AC_SUBST(MYSQL_CPPFLAGS)
 #     AC_SUBST(MYSQL_LDFLAGS)
 #     AC_SUBST(MYSQL_VERSION)
 #
@@ -64,7 +64,7 @@ AC_DEFUN([AX_LIB_MYSQL],
         [want_mysql="no"]
     )
 
-    MYSQL_CFLAGS=""
+    MYSQL_CPPFLAGS=""
     MYSQL_LDFLAGS=""
     MYSQL_VERSION=""
 
@@ -81,7 +81,7 @@ AC_DEFUN([AX_LIB_MYSQL],
         if test "$MYSQL_CONFIG" != "no"; then
             AC_MSG_CHECKING([for MySQL libraries])
 
-            MYSQL_CFLAGS="`$MYSQL_CONFIG --cflags`"
+            MYSQL_CPPFLAGS="`$MYSQL_CONFIG --cflags`"
             MYSQL_LDFLAGS="`$MYSQL_CONFIG --libs`"
 
             MYSQL_VERSION=`$MYSQL_CONFIG --version`
@@ -143,6 +143,6 @@ AC_DEFUN([AX_LIB_MYSQL],
     fi
 
     AC_SUBST([MYSQL_VERSION])
-    AC_SUBST([MYSQL_CFLAGS])
+    AC_SUBST([MYSQL_CPPFLAGS])
     AC_SUBST([MYSQL_LDFLAGS])
 ])
