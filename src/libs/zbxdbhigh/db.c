@@ -358,12 +358,12 @@ int DBexecute(const char *fmt, ...)
 	}
 	
 lbl_exec:
-	if(SQLITE_OK != (sql_ret = sqlite3_exec(sqlite, sql, NULL, 0, &error)))
+	if(SQLITE_OK != (ret = sqlite3_exec(sqlite, sql, NULL, 0, &error)))
 	{
-		if(sql_ret == SQLITE_BUSY) goto lbl_exec; /* attention deadlock!!! */
+		if(ret == SQLITE_BUSY) goto lbl_exec; /* attention deadlock!!! */
 		
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",sql);
-		zabbix_log(LOG_LEVEL_ERR, "Query failed [%i]:%s", sql_ret, error);
+		zabbix_log(LOG_LEVEL_ERR, "Query failed [%i]:%s", ret, error);
 		sqlite3_free(error);
 		if(!sqlite_transaction_started)
 		{
@@ -523,8 +523,8 @@ DB_RESULT DBselect(const char *fmt, ...)
 	sqlo_stmt_handle_t sth;
 #endif
 #ifdef	HAVE_SQLITE3
-	int sql_ret = SUCCEED;
-	char *error=0;
+	int ret = FAIL;
+	char *error=NULL;
 #endif
 
 	gettimeofday(&tv, NULL);

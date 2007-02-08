@@ -7,4 +7,4 @@ libzbxhttppoller_a_SOURCES = \
 	httptest.c httptest.h \
 	httppoller.c httppoller.h
 
-libzbxhttppoller_a_CPPFLAGS = $(DB_CPPFLAGS) $(SNMP_INCLUDE)
+libzbxhttppoller_a_CPPFLAGS = $(DB_CPPFLAGS) $(SNMP_CPPFLAGS)

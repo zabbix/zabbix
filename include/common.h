@@ -60,8 +60,8 @@
 #define OFF	0
 
 #define	APPLICATION_NAME	"ZABBIX Agent"
-#define	ZABBIX_REVDATE		"11 December 2006"
-#define	ZABBIX_VERSION		"1.3.2"
+#define	ZABBIX_REVDATE		"XX ???????? 2007"
+#define	ZABBIX_VERSION		"1.3.3"
 
 #if defined(_WINDOWS)
 /*#	pragma warning (disable: 4100)*/

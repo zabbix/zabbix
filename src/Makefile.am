@@ -1,19 +1,24 @@
 ## Process this file with automake to produce Makefile.in
 
-AGENT_DIRS = zabbix_agent zabbix_get zabbix_sender
-SERVER_DIRS = zabbix_server
+DIST_SUBDIRS = \
+	libs \
+	zabbix_agent \
+	zabbix_get \
+	zabbix_sender \
+	zabbix_server
 
 if AGENT
-AGENT_SUBDIRS = $(AGENT_DIRS)
-else
-AGENT_EXTRA_SUBDIRS = $(AGENT_DIRS)
+AGENT_SUBDIRS = \
+	zabbix_agent \
+	zabbix_get \
+	zabbix_sender
 endif
 
 if SERVER
-SERVER_SUBDIRS = $(SERVER_DIRS)
-else
-SERVER_EXTRA_SUBDIRS = $(SERVER_DIRS)
+SERVER_SUBDIRS = zabbix_server
 endif
 
-SUBDIRS = libs $(AGENT_SUBDIRS) $(SERVER_SUBDIRS)
-EXTRA_SUBDIRS = $(AGENT_EXTRA_SUBDIRS) $(SERVER_EXTRA_SUBDIRS)
+SUBDIRS = \
+	libs \
+	$(AGENT_SUBDIRS) \
+	$(SERVER_SUBDIRS)

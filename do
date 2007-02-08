@@ -108,7 +108,7 @@ then
   autoconf 2>> WARNINGS
   autoheader 2>> WARNINGS
   automake -a 2>> WARNINGS
-  automake 2>> WARNINGS
+#  automake 2>> WARNINGS
 fi
 
 if [ "$copy" = "yes" ] 
