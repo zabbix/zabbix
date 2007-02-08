@@ -20,7 +20,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT(src/zabbix_server/server.c)
-AM_INIT_AUTOMAKE([zabbix],[1.3.2])
+AM_INIT_AUTOMAKE([zabbix],[1.3.3])
 
 AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
 
@@ -476,14 +476,11 @@ AC_CHECK_FUNCS(atoll)
 AC_CHECK_FUNCS(getopt_long)
 
 dnl Check if we want to compile everything with static
- AC_ARG_ENABLE(static,[
-   --enable-static         Build statically linked binaries],
-	CFLAGS="-static $CFLAGS";
-	enable_static=yes)
-dnl			LIBS="")
+AC_ARG_ENABLE(static,[  --enable-static         Build statically linked binaries],
+[ CFLAGS="-static $CFLAGS";
+  enable_static=yes])
 
-AC_ARG_ENABLE(server,
-[  --enable-server         Turn on build of server],
+AC_ARG_ENABLE(server,[  --enable-server         Turn on build of server],
 [case "${enableval}" in
   yes) server=yes ;;
   no)  server=no ;;
@@ -492,8 +489,7 @@ esac],
 [server=no])
 AM_CONDITIONAL(SERVER, test x$server = xyes)
 
-AC_ARG_ENABLE(agent,
-[  --enable-agent          Turn on build of agent],
+AC_ARG_ENABLE(agent,[  --enable-agent          Turn on build of agent],
 [case "${enableval}" in
   yes) agent=yes ;;
   no)  agent=no ;;
@@ -502,66 +498,31 @@ esac],
 [agent=no])
 AM_CONDITIONAL(AGENT, test x$agent = xyes)
 
-
-    
 have_db="no"
 
 if test "$server" = "yes"; then
 	
-	AC_ARG_WITH(oracle,
-	[
-What DBMS do you want to use (please select only one):
-AC_HELP_STRING([--with-oracle@<:@=ARG@:>@],
-		[use Sqlora8 library @<:@default=no@:>@, default is to search through a number of common places for the Sqlora8 files.])],
-	[
-	if test "$withval" != "no"; then
-		AC_MSG_CHECKING(for Oracle support)
-		if test "$have_db" != "no"; then
-			AC_MSG_RESULT(error)
+	dnl Checking for Oracle support
+	LIBSQLORA8_CHECK_CONFIG()
+	if test "x$want_sqlora8" = "xyes"; then
+		if test "x$have_db" != "xno"; then
 			AC_MSG_ERROR([You can configure for only one database.]);
 		fi
-		if test "$withval" = "yes"; then
-			if test -f /usr/include/sqlora.h; then
-				ORACLE_INCDIR=/usr/include
-				ORACLE_LIBDIR=/usr/lib
-			elif test -f /usr/lib/libsqlora8/include/sqlora.h; then
-				ORACLE_INCDIR=/usr/lib/libsqlora8/include
-				ORACLE_LIBDIR=/usr/lib
-			elif test -f $ORACLE_HOME/lib/sqlora8/include/sqlora.h; then
-				ORACLE_INCDIR=$ORACLE_HOME/lib/sqlora8/include
-				ORACLE_LIBDIR=$ORACLE_HOME/lib
-			elif test -f $ORACLE_HOME/include/sqlora.h; then
-				ORACLE_INCDIR=${ORACLE_HOME}/include
-				ORACLE_LIBDIR=${ORACLE_HOME}/lib
-			else
-				AC_MSG_RESULT(no)
-				AC_MSG_ERROR([Invalid Oracle directory - unable to find sqlora.h])
-			fi
-		else
-			if test -f $withval/include/sqlora.h; then
-				ORACLE_INCDIR=$withval/include
-				ORACLE_LIBDIR=$withval/lib
-			elif test -f $withval/lib/libsqlora8/include/sqlora.h; then
-				ORACLE_INCDIR=$withval/lib/libsqlora8/include
-				ORACLE_LIBDIR=$withval/lib
-			elif test -f $withval/libsqlora8/include/sqlora.h; then
-				ORACLE_INCDIR=$withval/libsqlora8/include
-				ORACLE_LIBDIR=$withval
-			else
-				AC_MSG_RESULT(no)
-				AC_MSG_ERROR([Invalid Oracle directory - unable to find sqlora.h under $withval])
-			fi
-		fi
-		ORACLE_CFLAGS="-I$ORACLE_INCDIR"
-		ORACLE_LDFLAGS="-L$ORACLE_LIBDIR -lsqlora8"
 
-		AC_DEFINE(HAVE_ORACLE,1,[Define to 1 if Oracle should be enabled.])
-		AC_MSG_RESULT(yes)
-		have_db="Oracle"
+		if test "x$found_sqlora8" = "xyes"; then
+			have_db="Oracle"
+
+			ORACLE_CPPFLAGS = $SQLORA8_CPPFLAGS
+			ORACLE_LDFLAGS = $SQLORA8_LDFLAGS
+
+			AC_SUBST(ORACLE_CPPFLAGS)
+			AC_SUBST(ORACLE_LDFLAGS)
+
+			AC_DEFINE(HAVE_ORACLE,1,[Define to 1 if Oracle should be enabled.])
+		else
+			AC_MSG_ERROR([Not found Sqlora8 library]);
+		fi
 	fi
-	],[])
-	AC_SUBST(ORACLE_CFLAGS)
-	AC_SUBST(ORACLE_LDFLAGS)
 
 	dnl Checking for SQLite3 support
 	AX_LIB_SQLITE3()
@@ -624,203 +585,43 @@ AC_HELP_STRING([--with-oracle@<:@=ARG@:>@],
 		AC_MSG_RESULT(ok)
 	fi
 
-	DB_CPPFLAGS="$ORACLE_CFLAGS $SQLITE_CFLAGS $MYSQL_CFLAGS $POSTGRESQL_CFLAGS"
-	DB_LDFLAGS="$ORACLE_LDFLAGS $SQLITE_LDFLAGS $MYSQL_LDFLAGS $POSTGRESQL_LDFLAGS"
+	DB_CPPFLAGS="$ORACLE_CPPFLAGS $SQLITE3_CPPFLAGS $MYSQL_CPPFLAGS $POSTGRESQL_CPPFLAGS"
+	DB_LDFLAGS="$ORACLE_LDFLAGS $SQLITE3_LDFLAGS $MYSQL_LDFLAGS $POSTGRESQL_LDFLAGS"
 
 	AC_SUBST(DB_CPPFLAGS)
 	AC_SUBST(DB_LDFLAGS)
 fi
 
-AC_MSG_CHECKING(for NET-SNMP support)
-AC_ARG_WITH(net-snmp,
-[
-What SNMP package do you want to use (please select only one):
-AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
-		[use NET-SNMP package @<:@default=no@:>@, default is to search through a number of common places for the NET-SNMP files.])],
-[
-  if test "$withval" != "no"; then
-  	if test "$withval" = "yes"; then
-		if test -f /usr/local/net-snmp/include/net-snmp-includes.h; then
-			SNMP_INCDIR=/usr/local/net-snmp/include/
-			SNMP_LIBDIR=/usr/local/net-snmp/lib/
-		elif test -f /usr/include/net-snmp/net-snmp-includes.h; then
-dnl			SNMP_INCDIR=/usr/include/net-snmp
-dnl			SNMP_LIBDIR=/usr/lib/net-snmp
-			SNMP_INCDIR=/usr/include
-			SNMP_LIBDIR=/usr/lib
-		elif test -f /usr/include/net-snmp-includes.h; then
-			SNMP_INCDIR=/usr/include
-			SNMP_LIBDIR=/usr/lib
-		elif test -f /usr/local/include/net-snmp/net-snmp-includes.h; then
-dnl			SNMP_INCDIR=/usr/local/include/net-snmp
-dnl			SNMP_LIBDIR=/usr/local/lib/net-snmp
-			SNMP_INCDIR=/usr/local/include
-			SNMP_LIBDIR=/usr/local/lib
-		elif test -f /usr/local/include/net-snmp-includes.h; then
-			SNMP_INCDIR=/usr/local/include
-			SNMP_LIBDIR=/usr/local/lib
-		else
-    		AC_MSG_RESULT(no)
-    		AC_MSG_ERROR([Invalid NET-SNMP directory - unable to find net-snmp-includes.h])
-		fi
-   	else
-		if test -f $withval/include/net-snmp/net-snmp-includes.h; then
-dnl   			SNMP_INCDIR=$withval/include/net-snmp
-dnl   			SNMP_LIBDIR=$withval/lib/net-snmp
-   			SNMP_INCDIR=$withval/include
-   			SNMP_LIBDIR=$withval/lib
-		elif test -f $withval/include/net-snmp-includes.h; then
-   			SNMP_INCDIR=$withval/include
-   			SNMP_LIBDIR=$withval/lib
-		else
-    		AC_MSG_RESULT(no)
-    		AC_MSG_ERROR([Invalid NET-SNMP directory - unable to find net-snmp-includes.h under $withval])
-		fi
-   	fi
+dnl Check for NET-SNMP [by default - skip]
+LIBNETSNMP_CHECK_CONFIG([no])
+if test "x$want_netsnmp" = "xyes"; then
+	if test "x$found_netsnmp" != "xyes"; then
+		AC_MSG_ERROR([Invalid NET-SNMP directory - unable to find net-snmp-config.h])
+	fi
+fi
 
-dnl    AC_CHECK_LIB(crypto, main,  SNMP_LFLAGS="-lcrypto $SNMP_LFLAGS")
-    AC_CHECK_LIB(crypto, main,  SNMP_LIBS="$SNMP_LIBS -lcrypto")
+dnl Check for UCD-SNMP [by default - skip]
+LIBSNMP_CHECK_CONFIG([no])
+if test "x$want_snmp" = "xyes"; then
+	if test "x$found_snmp" != "xyes"; then
+		AC_MSG_ERROR([Invalid UCD-SNMP directory - unable to find ucd-snmp-config.h])
+	fi
 
-    SNMP_INCLUDE=-I$SNMP_INCDIR
-    SNMP_LFLAGS="-L$SNMP_LIBDIR $SNMP_LFLAGS"
-    SNMP_LIBS="-lnetsnmp $SNMP_LIBS"
+	if test  "x$found_netsnmp" = "xyes"; then
+		AC_MSG_ERROR([You can configure for only one SNMP library.]);
+	fi
+fi
 
-    AC_DEFINE(HAVE_NETSNMP,1,[Define to 1 if NET-SNMP should be enabled.])
-    AC_DEFINE(HAVE_SNMP,1,[Define to 1 if SNMP should be enabled.])
-    AC_MSG_RESULT(yes)
+dnl Check for libLDAP [by default - skip]
+LIBLDAP_CHECK_CONFIG([no])
+if test "x$want_ldap" = "xyes"; then
+	if test "x$found_ldap" != "xyes"; then
+		AC_MSG_ERROR([Invalid LDAP directory - unable to find ldap.h])
+	fi
+fi
 
-  else
-  	AC_MSG_RESULT(no)
-  fi
-],[
-  AC_MSG_RESULT(no)
-])
-AC_SUBST(SNMP_INCLUDE)
-AC_SUBST(SNMP_LFLAGS)
-AC_SUBST(SNMP_LIBS)
-
-AC_MSG_CHECKING(for UCD-SNMP support)
-AC_ARG_WITH(ucd-snmp,
-[AC_HELP_STRING([--with-ucd-snmp@<:@=ARG@:>@],
-		[use UCD-SNMP package @<:@default=no@:>@, default is to search through a number of common places for the UCD-SNMP files.])],
-[
-  if test "$withval" != "no"; then
-  	if test "$withval" = "yes"; then
-		if test -f /usr/local/ucd-snmp/include/ucd-snmp-config.h; then
-			SNMP_INCDIR=/usr/local/ucd-snmp/include/
-			SNMP_LIBDIR=/usr/local/ucd-snmp/lib/
-		elif test -f /usr/include/ucd-snmp/ucd-snmp-config.h; then
-dnl			SNMP_INCDIR=/usr/include/ucd-snmp
-dnl			SNMP_LIBDIR=/usr/lib/ucd-snmp
-			SNMP_INCDIR=/usr/include
-			SNMP_LIBDIR=/usr/lib
-		elif test -f /usr/include/ucd-snmp-config.h; then
-			SNMP_INCDIR=/usr/include
-			SNMP_LIBDIR=/usr/lib
-		elif test -f /usr/local/include/ucd-snmp/ucd-snmp-config.h; then
-dnl			SNMP_INCDIR=/usr/local/include/ucd-snmp
-dnl			SNMP_LIBDIR=/usr/local/lib/ucd-snmp
-			SNMP_INCDIR=/usr/local/include
-			SNMP_LIBDIR=/usr/local/lib
-		elif test -f /usr/local/include/ucd-snmp-config.h; then
-			SNMP_INCDIR=/usr/local/include
-			SNMP_LIBDIR=/usr/local/lib
-		else
-    		AC_MSG_RESULT(no)
-    		AC_MSG_ERROR([Invalid UCD-SNMP directory - unable to find ucd-snmp-config.h])
-		fi
-   	else
-		if test -f $withval/include/ucd-snmp/ucd-snmp-config.h; then
-dnl   			SNMP_INCDIR=$withval/include/ucd-snmp
-dnl   			SNMP_LIBDIR=$withval/lib/ucd-snmp
-   			SNMP_INCDIR=$withval/include
-   			SNMP_LIBDIR=$withval/lib
-		elif test -f $withval/include/ucd-snmp-config.h; then
-   			SNMP_INCDIR=$withval/include
-   			SNMP_LIBDIR=$withval/lib
-		else
-    		AC_MSG_RESULT(no)
-    		AC_MSG_ERROR([Invalid UCD-SNMP directory - unable to find ucd-snmp-config.h under $withval])
-		fi
-   	fi
-dnl    AC_CHECK_LIB(crypto, main,  SNMP_LFLAGS="-lcrypto $SNMP_LFLAGS")
-    AC_CHECK_LIB(crypto, main,  SNMP_LIBS="$SNMP_LIBS -lcrypto")
-
-    SNMP_INCLUDE=-I$SNMP_INCDIR
-    SNMP_LFLAGS="-L$SNMP_LIBDIR $SNMP_LFLAGS"
-    SNMP_LIBS="-lsnmp $SNMP_LIBS"
-
-    AC_DEFINE(HAVE_UCDSNMP,1,[Define to 1 if UCDSNMP should be enabled.])
-    AC_DEFINE(HAVE_SNMP,1,[Define to 1 if SNMP should be enabled.])
-    AC_MSG_RESULT(yes)
-
-  else
-  	AC_MSG_RESULT(no)
-  fi
-],[
-  AC_MSG_RESULT(no)
-])
-AC_SUBST(SNMP_LFLAGS)
-AC_SUBST(SNMP_INCLUDE)
-
-
+dnl Check for libCurl [default - yes]
 LIBCURL_CHECK_CONFIG([yes], [7.15.1], [],[])
-
-
-AC_MSG_CHECKING(for LDAP support)
-AC_ARG_WITH(ldap,
-[
-If you want to check LDAP servers:
-AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],
-	[Include LDAP support @<:@default=no@:>@. DIR is the LDAP base install directory, default is to search through a number of common places for the LDAP files.])],
-[
-  if test "$withval" != "no"; then
-       if test "$withval" = "yes"; then
-               if test -f /usr/local/openldap/include/ldap.h; then
-                       LDAP_INCDIR=/usr/local/openldap/include/
-                       LDAP_LIBDIR=/usr/local/openldap/lib/
-               elif test -f /usr/include/ldap.h; then
-                       LDAP_INCDIR=/usr/include
-                       LDAP_LIBDIR=/usr/lib
-               elif test -f /usr/local/include/ldap.h; then
-                       LDAP_INCDIR=/usr/local/include
-                       LDAP_LIBDIR=/usr/local/lib
-               else
-               AC_MSG_RESULT(no)
-               AC_MSG_ERROR([Invalid LDAP directory - unable to find ldap.h])
-               fi
-       else
-               if test -f $withval/include/ldap.h; then
-                       LDAP_INCDIR=$withval/include
-                       LDAP_LIBDIR=$withval/lib
-               else
-               AC_MSG_RESULT(no)
-               AC_MSG_ERROR([Invalid LDAP directory - unable to find ldap.h under $withval])
-               fi
-       fi
-
-	LDAP_INCLUDE=-I$LDAP_INCDIR
-	LDAP_LFLAGS="-L$LDAP_LIBDIR $LDAP_LFLAGS"
-	LDAP_LIBS="-lldap"
-
-		if test x$enable_static = xyes; then
-			LDAP_LIBS=" -llber -lgnutls -lpthread -lsasl2 $LDAP_LIBS"
-		fi
-
-	AC_DEFINE(HAVE_LDAP,1,[Define to 1 if LDAP should be enabled.])
-	AC_MSG_RESULT(yes)
-
-  else
-	AC_MSG_RESULT(no)
-  fi
-],[
-  AC_MSG_RESULT(no)
-])
-AC_SUBST(LDAP_INCLUDE)
-AC_SUBST(LDAP_LFLAGS)
-AC_SUBST(LDAP_LIBS)
-
-#AC_SUBST(SUBDIRS)
 
 RANLIB="ranlib"
 AC_SUBST(RANLIB)
@@ -901,24 +702,6 @@ dnl	AC_MSG_ERROR(${host_os} not supported)
 esac
 	AC_DEFINE_UNQUOTED([ARCH], "${ARCH}", [Define to os name for code  managing])
 
-dnl AM_CONDITIONAL(CONFIG_HOST_LINUX, test "x$ARCH" = "xlinux")
-dnl AC_SUBST(CONFIG_HOST_LINUX)
-
-dnl AM_CONDITIONAL(CONFIG_HOST_SOLARIS, test "x$ARCH" = "xsolaris")
-dnl AC_SUBST(CONFIG_HOST_SOLARIS)
-
-dnl AM_CONDITIONAL(CONFIG_HOST_HPUX, test "x$ARCH" = "xhpux")
-dnl AC_SUBST(CONFIG_HOST_HPUX)
-
-dnl AM_CONDITIONAL(CONFIG_HOST_FREEBSD, test "x$ARCH" = "xfreebsd")
-dnl AC_SUBST(CONFIG_HOST_FREEBSD)
-
-dnl AM_CONDITIONAL(CONFIG_HOST_OPENBSD, test "x$ARCH" = "xopenbsd")
-dnl AC_SUBST(CONFIG_HOST_OPENBSD)
-
-dnl AM_CONDITIONAL(CONFIG_HOST_UNKNOWN, test "x$ARCH" = "xunknown")
-dnl AC_SUBST(CONFIG_HOST_UNKNOWN)
-
 AC_SUBST(ARCH)
 
 AC_OUTPUT([Makefile src/Makefile src/libs/Makefile src/libs/zbxlog/Makefile src/libs/zbxcrypto/Makefile
@@ -932,7 +715,8 @@ AC_OUTPUT([Makefile src/Makefile src/libs/Makefile src/libs/zbxlog/Makefile src/
 	src/libs/zbxsysinfo/aix/Makefile src/libs/zbxsysinfo/freebsd/Makefile src/libs/zbxsysinfo/hpux/Makefile
 	src/libs/zbxsysinfo/openbsd/Makefile src/libs/zbxsysinfo/osx/Makefile src/libs/zbxsysinfo/solaris/Makefile
 	src/libs/zbxsysinfo/osf/Makefile src/libs/zbxsysinfo/netbsd/Makefile src/libs/zbxsysinfo/unknown/Makefile
-	src/libs/zbxnix/Makefile src/libs/zbxplugin/Makefile src/libs/zbxsys/Makefile src/libs/zbxcomms/Makefile])
+	src/libs/zbxnix/Makefile src/libs/zbxplugin/Makefile src/libs/zbxsys/Makefile src/libs/zbxcomms/Makefile
+	misc/Makefile create/Makefile create/schema/Makefile])
 
 echo "
 

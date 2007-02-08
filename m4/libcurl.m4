@@ -14,7 +14,7 @@
 # Note that using --without-libcurl does run ACTION-IF-NO.
 #
 # This macro #defines HAVE_LIBCURL if a working libcurl setup is
-# found, and sets @LIBCURL@ and @LIBCURL_CPPFLAGS@ to the necessary
+# found, and sets @LIBCURL_LDFLAGS@ and @LIBCURL_CPPFLAGS@ to the necessary
 # values.  Other useful defines are LIBCURL_FEATURE_xxx where xxx are
 # the various features supported by libcurl, and LIBCURL_PROTOCOL_yyy
 # where yyy are the various protocols supported by libcurl.  Both xxx
@@ -26,7 +26,7 @@
 # curl-config list (e.g. it's "HTTP" and not "http").
 #
 # Users may override the detected values by doing something like:
-# LIBCURL="-lcurl" LIBCURL_CPPFLAGS="-I/usr/myinclude" ./configure
+# LIBCURL_LDFLAGS="-lcurl" LIBCURL_CPPFLAGS="-I/usr/myinclude" ./configure
 #
 # For the sake of sanity, this macro assumes that any libcurl that is
 # found is after version 7.7.2, the first version that included the
@@ -57,20 +57,18 @@ AC_DEFUN([LIBCURL_CHECK_CONFIG],
   AH_TEMPLATE([LIBCURL_PROTOCOL_TFTP],[Defined if libcurl supports TFTP])
 
   AC_ARG_WITH(libcurl,
-     [
-If you want to use cURL library:
-AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL library @<:@default=no@:>@, look for the curl library in DIR])],
+     [If you want to use cURL library:
+AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL library @<:@default=yes@:>@, look for the curl library in DIR])],
         [
         if test "$withval" = "no"; then
             _libcurl_with="no"
         elif test "$withval" = "yes"; then
             _libcurl_with="yes"
         else
-            _libcurl_with="yes"
+            _libcurl_with=$withval
         fi
         ],
-        [_libcurl_with="no"])
-dnl     [_libcurl_with=$withval],[_libcurl_with=ifelse([$1],,[no],[$1])])
+        [_libcurl_with=ifelse([$1],,[yes],[$1])])
 
   if test "$_libcurl_with" != "no" ; then
 
@@ -112,15 +110,15 @@ dnl     [_libcurl_with=$withval],[_libcurl_with=ifelse([$1],,[no],[$1])])
            if test x"$LIBCURL_CPPFLAGS" = "x" ; then
               LIBCURL_CPPFLAGS=`$_libcurl_config --cflags`
            fi
-           if test x"$LIBCURL" = "x" ; then
-              LIBCURL=`$_libcurl_config --libs`
+           if test x"$LIBCURL_LDFLAGS" = "x" ; then
+              LIBCURL_LDFLAGS=`$_libcurl_config --libs`
 
               # This is so silly, but Apple actually has a bug in their
 	      # curl-config script.  Fixed in Tiger, but there are still
 	      # lots of Panther installs around.
               case "${host}" in
                  powerpc-apple-darwin7*)
-                    LIBCURL=`echo $LIBCURL | sed -e 's|-arch i386||g'`
+                    LIBCURL_LDFLAGS=`echo $LIBCURL_LDFLAGS | sed -e 's|-arch i386||g'`
                  ;;
               esac
            fi
@@ -143,7 +141,7 @@ dnl     [_libcurl_with=$withval],[_libcurl_with=ifelse([$1],,[no],[$1])])
 
         # we didn't find curl-config, so let's see if the user-supplied
         # link line (or failing that, "-lcurl") is enough.
-        LIBCURL=${LIBCURL-"$_libcurl_ldflags -lcurl"}
+        LIBCURL_LDFLAGS=${LIBCURL_LDFLAGS-"$_libcurl_ldflags -lcurl"}
 
         AC_CACHE_CHECK([whether libcurl is usable],
            [libcurl_cv_lib_curl_usable],
@@ -151,7 +149,7 @@ dnl     [_libcurl_with=$withval],[_libcurl_with=ifelse([$1],,[no],[$1])])
            _libcurl_save_cppflags=$CPPFLAGS
            CPPFLAGS="$LIBCURL_CPPFLAGS $CPPFLAGS"
            _libcurl_save_libs=$LIBS
-           LIBS="$LIBCURL $LIBS"
+           LIBS="$LIBCURL_LDFLAGS $LIBS"
 
            AC_LINK_IFELSE(AC_LANG_PROGRAM([#include <curl/curl.h>],[
 /* Try and use a few common options to force a failure if we are
@@ -180,7 +178,7 @@ x=CURLOPT_VERBOSE;
            _libcurl_save_cppflags=$CPPFLAGS
            CPPFLAGS="$CPPFLAGS $LIBCURL_CPPFLAGS"
            _libcurl_save_libs=$LIBS
-           LIBS="$LIBS $LIBCURL"
+           LIBS="$LIBS $LIBCURL_LDFLAGS"
 
            AC_CHECK_FUNC(curl_free,,
   	      AC_DEFINE(curl_free,free,
@@ -194,7 +192,7 @@ x=CURLOPT_VERBOSE;
            AC_DEFINE(HAVE_LIBCURL,1,
              [Define to 1 if you have a functional curl library.])
            AC_SUBST(LIBCURL_CPPFLAGS)
-           AC_SUBST(LIBCURL)
+           AC_SUBST(LIBCURL_LDFLAGS)
 
            for _libcurl_feature in $_libcurl_features ; do
 	      AC_DEFINE_UNQUOTED(AS_TR_CPP(libcurl_feature_$_libcurl_feature),[1])
@@ -223,7 +221,7 @@ x=CURLOPT_VERBOSE;
 	      eval AS_TR_SH(libcurl_protocol_$_libcurl_protocol)=yes
            done
 	else
-	   unset LIBCURL
+	   unset LIBCURL_LDFLAGS
 	   unset LIBCURL_CPPFLAGS
         fi
      fi

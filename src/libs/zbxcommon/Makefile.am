@@ -11,4 +11,4 @@ libzbxcommon_a_SOURCES = \
 	zbxgetopt.c \
 	alias.c
 
-EXTRA_DIR = gnuregex.c
+EXTRA_DIST = gnuregex.c
