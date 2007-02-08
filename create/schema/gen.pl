@@ -40,7 +40,8 @@ local $output;
 	"t_image"	=>	"longblob",
 	"t_history_log"	=>	"text",
 	"t_history_text"=>	"text",
-	"t_blob"	=>	"blob"
+#	"t_text"	=>	"blob"
+	"t_text"	=>	"text"
 );
 
 %c=(	"type"		=>	"code",
@@ -56,7 +57,7 @@ local $output;
 	"t_image"	=>	"ZBX_TYPE_BLOB",
 	"t_history_log"	=>	"ZBX_TYPE_TEXT",
 	"t_history_text"=>	"ZBX_TYPE_TEXT",
-	"t_blob"	=>	"ZBX_TYPE_BLOB"
+	"t_text"	=>	"ZBX_TYPE_BLOB"
 );
 
 $c{"before"}="
@@ -80,20 +81,20 @@ ZBX_TABLE
 static	ZBX_TABLE	tables[]={
 ";
 
-%oracle=("t_bigint"	=>	"bigint",
+%oracle=("t_bigint"	=>	"number(21)",
 	"before"	=>	"",
 	"after"		=>	"",
 	"type"		=>	"sql",
-	"t_id"		=>	"bigint",
-	"t_integer"	=>	"integer",
+	"t_id"		=>	"number(21)",
+	"t_integer"	=>	"number(10)",
 	"t_serial"	=>	"serial",
-	"t_double"	=>	"double",
-	"t_varchar"	=>	"varchar",
-	"t_char"	=>	"char",
-	"t_image"	=>	"longblob",
-	"t_history_log"	=>	"text",
-	"t_history_text"=>	"text",
-	"t_blob"	=>	"blob"
+	"t_double"	=>	"number(20,4)",
+	"t_varchar"	=>	"varchar2",
+	"t_char"	=>	"varchar2",
+	"t_image"	=>	"blob",
+	"t_history_log"	=>	"varchar2(4000)",
+	"t_history_text"=>	"CLOB",
+	"t_text"	=>	"varchar2(4000)"
 );
 
 %postgresql=("t_bigint"	=>	"bigint",
@@ -110,7 +111,7 @@ static	ZBX_TABLE	tables[]={
 	"t_history_log"	=>	"varchar(255)",
 	"t_history_text"=>	"text",
 	"t_time"	=>	"integer",
-	"t_blob"	=>	"text"
+	"t_text"	=>	"text"
 );
 
 %sqlite=("t_bigint"	=>	"bigint",
@@ -126,7 +127,7 @@ static	ZBX_TABLE	tables[]={
 	"t_image"	=>	"longblob",
 	"t_history_log"	=>	"text",
 	"t_history_text"=>	"text",
-	"t_blob"	=>	"blob"
+	"t_text"	=>	"blob"
 );
 
 sub newstate
