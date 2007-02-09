@@ -78,6 +78,7 @@ Integrated from 1.1.x
 
 1.1.6
 
+ - fixed stderr/stdout redirection during logrotation (Eugene)
  - fixed graphs in Oracle system (Eugene)
  - fixed trigger expressions with ':' (Eugene)
  - fixed 'Server info' screen componets (Eugene)
