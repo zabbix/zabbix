@@ -41,4 +41,10 @@ void zabbix_set_log_level(int level);
 char *strerror_from_system(unsigned long error);
 char *strerror_from_module(unsigned long error, const char *module);
 
+#if defined(_WINDOWS)
+#	define redirect_std(filename)
+#else
+	void redirect_std(const char *filename);
+#endif
+
 #endif
