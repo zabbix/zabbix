@@ -127,12 +127,10 @@ int	comms_parse_response(char *xml,char *host,char *key, char *data, char *lastl
 
 void    *zbx_malloc(size_t size)
 {
-	int max_attempts;
+	register int max_attempts;
 	void *ptr = NULL;
 
-	assert(size);
-
-	for(	max_attempts = 10;
+	for(	max_attempts = 10, size = MAX(size, 1);
 		max_attempts > 0 && !ptr;
 		ptr = malloc(size),
 		max_attempts--
