@@ -57,6 +57,10 @@
 #	include <pdh.h>
 #endif
 
+#ifdef HAVE_PDHMSG_H
+#	include <pdhmsg.h>
+#endif
+
 #ifdef HAVE_PSAPI_H
 #	include <psapi.h>
 #endif

@@ -161,6 +161,8 @@ int zbx_mutex_lock(ZBX_MUTEX *mutex)
 {
 #if defined(_WINDOWS)	
 
+	if(!*mutex) return ZBX_MUTEX_OK;
+
 	if(WaitForSingleObject(*mutex, INFINITE) != WAIT_OBJECT_0)
 	{
 		zbx_error("Error on mutex locking. [%s]", strerror_from_system(GetLastError()));

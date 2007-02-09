@@ -22,6 +22,9 @@
 /* Define to 1 if you have the <pdh.h> header file. */
 #define HAVE_PDH_H 1
 
+/* Define to 1 if you have the <pdhmsg.h> header file. */
+#define HAVE_PDHMSG_H 1
+
 /* Define to 1 if you have the <psapi.h> header file. */
 #define HAVE_PSAPI_H 1
 
