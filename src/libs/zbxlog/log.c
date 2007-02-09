@@ -39,7 +39,29 @@ static ZBX_MUTEX log_file_access;
 
 static HANDLE system_log_handle = INVALID_HANDLE_VALUE;
 
-#endif
+#endif /* _WINDOWS */
+
+#if !defined(_WINDOWS)
+
+void redirect_std(const char *filename)
+{
+	close(0);	close(1);	close(2);
+
+	open("/dev/null", O_RDONLY);    /* stdin */
+
+	if(!filename || !*filename)
+	{
+		open("/dev/null", O_RDWR);      /* stdout */
+		open("/dev/null", O_RDWR);      /* stderr */
+	}
+	else
+	{
+		fopen(filename, "a+");   /* stdout */
+		fopen(filename, "a+");   /* stderr */
+	}
+}
+
+#endif /* not _WINDOWS */
 
 int zabbix_open_log(int type, int level, const char *filename)
 {
@@ -230,6 +252,7 @@ void zabbix_log(int level, const char *fmt, ...)
 					{
 						zbx_error("Can't rename log file [%s] to [%s] [%s]", log_filename, filename_old, strerror(errno));
 					}
+					redirect_std(log_filename);
 				}
 			}
 		}
