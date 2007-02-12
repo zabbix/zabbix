@@ -10,4 +10,4 @@ libzbxdbhigh_a_SOURCES = \
 	host.c \
 	db.c
 
-libzbxdbhigh_a_CPPFLAGS = $(DB_CPPFLAGS)
+libzbxdbhigh_a_CPPFLAGS = -I@top_srcdir@/src/zabbix_server/ $(DB_CPPFLAGS)

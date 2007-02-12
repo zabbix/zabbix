@@ -509,7 +509,9 @@ int	set_result_type(AGENT_RESULT *result, int value_type, char *c);
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);
 size_t	zbx_strlcat(char *dst, const char *src, size_t siz);
 
-char*	zbx_dvsprintf(const char *f, va_list args);
+char* zbx_dvsprintf(char *dest, const char *f, va_list args);
+char* zbx_dsprintf(char *dest, const char *f, ...);
+char* zbx_strdcat(char *dest, const char *src);
 
 int	replace_param(const char *cmd, const char *param, char *out, int outlen);
 

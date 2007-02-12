@@ -53,8 +53,6 @@
 #include "nodesender.h"
 #include "history.h"
 
-extern	int	CONFIG_NODEID;
-
 /******************************************************************************
  *                                                                            *
  * Function: process_node_history_str                                         *

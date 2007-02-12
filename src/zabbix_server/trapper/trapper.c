@@ -58,8 +58,6 @@
 
 #include "daemon.h"
 
-extern int    send_list_of_active_checks(zbx_sock_t *sock, char *host);
-
 int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 {
 	char	*p,*line,*host;

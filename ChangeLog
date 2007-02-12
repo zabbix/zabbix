@@ -1,5 +1,6 @@
 Changes for 1.3.3:
 
+ - fixed large SQLs calling (Eugene)
  - new templates Unix_t, Windows_t, Standalone_t (Alexei)
  - added media_type.username, media_type.passwd (Alexei)
  - added hosts.dns. Host name is for informational purposes only. (Alexei)
@@ -78,6 +79,8 @@ Integrated from 1.1.x
 
 1.1.6
 
+ - increased message size for alerts (Eugene)
+ - fixed macros substitution for messages (Eugene)
  - improved 'perf_counter[*]' for WinXX (Eugene)
  - fixed stderr/stdout redirection during logrotation (Eugene)
  - fixed graphs in Oracle system (Eugene)

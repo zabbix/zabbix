@@ -80,10 +80,11 @@ static	void	send_to_user_medias(DB_EVENT *event,DB_ACTION *action, zbx_uint64_t 
 	while((row=DBfetch(result)))
 	{
 		ZBX_STR2UINT64(media.mediatypeid, row[0]);
-		media.sendto=row[1];
-		media.active=atoi(row[2]);
-		media.severity=atoi(row[3]);
-		media.period=row[4];
+
+		media.sendto	= row[1];
+		media.active	= atoi(row[2]);
+		media.severity	= atoi(row[3]);
+		media.period	= row[4];
 
 		zabbix_log( LOG_LEVEL_DEBUG, "Trigger severity [%d] Media severity [%d] Period [%s]",event->trigger_priority, media.severity, media.period);
 		if(((1<<event->trigger_priority)&media.severity)==0)
@@ -370,8 +371,8 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 	zbx_uint64_t	hostid;
 	zbx_uint64_t	condition_value;
 
-	char tmp_str[MAX_STRING_LEN];
-	
+	char *tmp_str = NULL;
+
 	int	ret = FAIL;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In check_action_condition [actionid:" ZBX_FS_UI64 ",conditionid:" ZBX_FS_UI64 ",cond.value:%s]", condition->actionid, condition->conditionid, condition->value);
@@ -472,9 +473,9 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 	}
 	else if(condition->conditiontype == CONDITION_TYPE_TRIGGER_NAME)
 	{
-		zbx_snprintf(tmp_str, sizeof(tmp_str), "%s",event->trigger_description);
+		tmp_str = zbx_dsprintf(tmp_str, "%s", event->trigger_description);
 		
-		substitute_simple_macros(event, NULL, tmp_str, sizeof(tmp_str), MACRO_TYPE_TRIGGER_DESCRIPTION);
+		substitute_simple_macros(event, NULL, &tmp_str, MACRO_TYPE_TRIGGER_DESCRIPTION);
 		
 		if(condition->operator == CONDITION_OPERATOR_LIKE)
 		{
@@ -495,6 +496,7 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
 				condition->operator, condition->conditionid);
 		}
+		zbx_free(tmp_str);
 	}
 	else if(condition->conditiontype == CONDITION_TYPE_TRIGGER_SEVERITY)
 	{
@@ -711,36 +713,29 @@ void	apply_actions(DB_EVENT *event)
 		if(check_action_conditions(event, action.actionid) == SUCCEED)
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Conditions match our trigger. Do apply actions.");
+
 			ZBX_STR2UINT64(action.userid, row[1]);
 			
-			strscpy(action.subject,row[2]);
-			
-			action.message_len	= strlen(row[3]) * 3 / 2 + 1;
-			action.message		= zbx_malloc(action.message_len);
+			action.subject		= strdup(row[2]);
+			action.message		= strdup(row[3]);
+			action.scripts		= strdup(row[7]);
 
-			strnscpy(action.message,row[3], action.message_len);
-			
 			action.recipient	= atoi(row[4]);
 			action.maxrepeats	= atoi(row[5]);
 			action.repeatdelay	= atoi(row[6]);
-			strscpy(action.scripts,row[7]);
 			action.actiontype	= atoi(row[8]);
 
-			substitute_macros(event, &action, action.message, action.message_len);
-			substitute_macros(event, &action, action.subject, sizeof(action.subject));
+			substitute_macros(event, &action, &action.message);
+			substitute_macros(event, &action, &action.subject);
 			
-zabbix_log(LOG_LEVEL_CRIT,"Original [%d]: %s", strlen(row[3]), row[3]); // TMP!!!
-zabbix_log(LOG_LEVEL_CRIT,"Substituted [%d,%d]: %s", strlen(action.message), action.message_len, action.message); // TMP!!!
-
 			if(action.actiontype == ACTION_TYPE_MESSAGE)
 				send_to_user(event,&action);
 			else
 				run_commands(event,&action);
 
-/*			zbx_snprintf(sql,sizeof(sql),"update actions set nextcheck=%d where actionid=%d",now+action.delay,action.actionid);
-			DBexecute(sql);*/
-
 			zbx_free(action.message);
+			zbx_free(action.subject);
+			zbx_free(action.scripts);
 		}
 		else
 		{
