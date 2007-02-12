@@ -163,6 +163,9 @@ src/zabbix_server/trapper/nodesync.h -text
 src/zabbix_server/utils/Makefile.am -text
 src/zabbix_server/utils/nodechange.c -text
 src/zabbix_server/utils/nodechange.h -text
+src/zabbix_server/watchdog/Makefile.am -text
+src/zabbix_server/watchdog/watchdog.c -text
+src/zabbix_server/watchdog/watchdog.h -text
 upgrades/dbpatches/1.3/mysql/1.1/acknowledges.sql -text
 upgrades/dbpatches/1.3/mysql/1.1/actions.sql -text
 upgrades/dbpatches/1.3/mysql/1.1/alarms.sql -text

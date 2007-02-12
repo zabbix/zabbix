@@ -9,6 +9,7 @@ SUBDIRS = \
 	timer \
 	trapper \
 	nodewatcher \
+	watchdog \
 	utils
 
 bin_PROGRAMS = zabbix_server
@@ -32,6 +33,7 @@ zabbix_server_LDADD = \
 	nodewatcher/libzbxnodewatcher.a \
 	utils/libzbxutils.a \
 	httppoller/libzbxhttppoller.a \
+	watchdog/libzbxwatchdog.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libzbxsysinfo2.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \

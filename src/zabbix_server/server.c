@@ -62,6 +62,7 @@
 #include "timer/timer.h"
 #include "trapper/trapper.h"
 #include "nodewatcher/nodewatcher.h"
+#include "watchdog/watchdog.h"
 #include "utils/nodechange.h"
 
 #define       LISTENQ 1024
@@ -546,7 +547,8 @@ int MAIN_ZABBIX_ENTRY(void)
 	{
 		init_main_process();
 		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Main]",server_num);
-		for(;;)	zbx_sleep(3600);
+		main_watchdog_loop();
+/*		for(;;)	zbx_sleep(3600);*/
 	}
 
 
