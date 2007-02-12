@@ -254,7 +254,7 @@ DEV_FNCLIST
         if(type[0] == '\0')
 	{
 		/* default parameter */
-		zbx_snprintf(type, sizeof(type) "bps");
+		zbx_snprintf(type, sizeof(type), "bps");
 	}
 	
 	if(get_param(param, 3, mode, sizeof(mode)) != 0)

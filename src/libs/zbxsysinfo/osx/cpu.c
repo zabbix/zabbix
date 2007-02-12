@@ -135,7 +135,7 @@ CPU_FNCLIST
 	if(cpuname[0] == '\0')
 	{
 		/* default parameter */
-		zbx_snprintf(cpuname, sizeof(cpumame), "all");
+		zbx_snprintf(cpuname, sizeof(cpuname), "all");
 	}
 	if(strncmp(cpuname, "all", sizeof(cpuname)))
 	{
@@ -509,7 +509,7 @@ CPU_FNCLIST
 	if(cpuname[0] == '\0')
 	{
 		/* default parameter */
-		zbx_snprintf(cpuname, sizeof(cpumode), "all");
+		zbx_snprintf(cpuname, sizeof(cpuname), "all");
 	}
 	if(strncmp(cpuname, "all", MAX_STRING_LEN))
 	{
