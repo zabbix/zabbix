@@ -56,8 +56,6 @@
 #define	ZBX_NODE_MASTER	0
 #define	ZBX_NODE_SLAVE	1
 
-extern	int	CONFIG_NODEID;
-
 /******************************************************************************
  *                                                                            *
  * Function: send_config_data                                                 *

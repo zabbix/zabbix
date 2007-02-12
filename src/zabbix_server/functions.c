@@ -50,8 +50,6 @@
 #include "functions.h"
 #include "expression.h"
 
-extern int autoregister(char *server);
-
 /******************************************************************************
  *                                                                            *
  * Function: update_functions                                                 *
@@ -280,7 +278,6 @@ void	update_triggers(zbx_uint64_t itemid)
 	char	exp[MAX_STRING_LEN];
 	char	error[MAX_STRING_LEN];
 	int	exp_value;
-	time_t	now;
 	DB_TRIGGER	trigger;
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -292,26 +289,27 @@ void	update_triggers(zbx_uint64_t itemid)
 	while((row=DBfetch(result)))
 	{
 		ZBX_STR2UINT64(trigger.triggerid,row[0]);
-//		trigger.triggerid=atoi(row[0]);
 		strscpy(trigger.expression,row[1]);
-		trigger.status=atoi(row[2]);
-		trigger.priority=atoi(row[4]);
-		trigger.value=atoi(row[5]);
 		strscpy(trigger.description,row[6]);
+		trigger.status		= atoi(row[2]);
+		trigger.priority	= atoi(row[4]);
+		trigger.value		= atoi(row[5]);
+		trigger.url		= row[6];
+		trigger.comments	= row[7];
 
-		strscpy(exp, trigger.expression);
+		/* NOTE: function 'evaluate_expression' require 'exp' with 'MAX_STRING_LEN' length*/
+		memset(exp, 0, MAX_STRING_LEN);
+		zbx_strlcpy(exp, trigger.expression, MAX_STRING_LEN-1);
 		if( evaluate_expression(&exp_value, exp, error, sizeof(error)) != 0 )
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Expression [%s] cannot be evaluated [%s]",trigger.expression, error);
 			zabbix_syslog("Expression [%s] cannot be evaluated [%s]",trigger.expression, error);
-/* We shouldn't update triggervalue if expressions failed */
-/*			now = time(NULL);
-			DBupdate_trigger_value(&trigger, exp_value, now, error);*/
-			continue;
+/*			DBupdate_trigger_value(&trigger, exp_value, time(NULL), error);*//* We shouldn't update triggervalue if expressions failed */
 		}
-
-		now = time(NULL);
-		DBupdate_trigger_value(&trigger, exp_value, now, NULL);
+		else
+		{
+			DBupdate_trigger_value(&trigger, exp_value, time(NULL), NULL);
+		}
 	}
 	DBfree_result(result);
 	zabbix_log( LOG_LEVEL_DEBUG, "End of update_triggers [%d]", itemid);

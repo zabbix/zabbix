@@ -43,7 +43,7 @@
 
 char *progname = NULL;
 char title_message[] = "ZABBIX send";
-char usage_message[] = "[-vh] [-z <zabbix_server>] [-p <port>] [-s <host>] [-k <metric>] [-o <value>] [-i <input_file>]";
+char usage_message[] = "[-vh] {-zpsko | -i}";
 
 #ifdef HAVE_GETOPT_LONG
 char *help_message[] = {
@@ -88,11 +88,11 @@ struct zbx_option longopts[] =
         {0,0,0,0}
 };
 
-void    signal_handler( int sig )
+static void    zbx_sender_signal_handler( int sig )
 {
 	if( SIGALRM == sig )
 	{
-		signal( SIGALRM, signal_handler );
+		signal( SIGALRM, zbx_sender_signal_handler );
 		fprintf(stderr,"Timeout while executing operation.\n");
 	}
  
@@ -158,10 +158,10 @@ int main(int argc, char **argv)
 
 	progname = argv[0];
 
-	signal( SIGINT,  signal_handler );
-	signal( SIGQUIT, signal_handler );
-	signal( SIGTERM, signal_handler );
-	signal( SIGALRM, signal_handler );
+	signal( SIGINT,  zbx_sender_signal_handler );
+	signal( SIGQUIT, zbx_sender_signal_handler );
+	signal( SIGTERM, zbx_sender_signal_handler );
+	signal( SIGALRM, zbx_sender_signal_handler );
 
 	while ((ch = zbx_getopt_long(argc, argv, "z:p:s:k:o:i:hv", longopts, NULL)) != EOF)
 	{

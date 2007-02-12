@@ -59,7 +59,7 @@
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments:                                                                  *
+ * Comments: use 'free_trigger_info' function to clear allocated memory     *
  *                                                                            *
  ******************************************************************************/
 static void	add_trigger_info(DB_EVENT *event)
@@ -69,23 +69,42 @@ static void	add_trigger_info(DB_EVENT *event)
 
 	if(event->triggerid == 0)	return;
 
-	result = DBselect("select description,priority,comments,url from triggers where triggerid=" ZBX_FS_UI64,
-		event->triggerid);
+	result = DBselect("select description,priority,comments,url from triggers where triggerid=" ZBX_FS_UI64,event->triggerid);
 	row = DBfetch(result);
-
 	event->trigger_description[0]=0;
-	event->trigger_comments[0]=0;
-	event->trigger_url[0]=0;
+	zbx_free(event->trigger_comments);
+	zbx_free(event->trigger_url);
 
 	if(row)
 	{
 		strscpy(event->trigger_description, row[0]);
 		event->trigger_priority = atoi(row[1]);
-		strscpy(event->trigger_comments, row[2]);
-		strscpy(event->trigger_url, row[3]);
+		event->trigger_comments	= strdup(row[2]);
+		event->trigger_url	= strdup(row[3]);
 	}
 
 	DBfree_result(result);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: free_trigger_info                                              *
+ *                                                                            *
+ * Purpose: clean allocated memory by function 'add_trigger_info'             *
+ *                                                                            *
+ * Parameters: event - event data (event.triggerid)                           *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	free_trigger_info(DB_EVENT *event)
+{
+	zbx_free(event->trigger_url);
+	zbx_free(event->trigger_comments);
 }
 
 /******************************************************************************
@@ -128,13 +147,14 @@ int	process_event(DB_EVENT *event)
 
 	if(event->value == TRIGGER_VALUE_TRUE)
 	{
-//		update_services(trigger->triggerid, trigger->priority);
 		update_services(event->triggerid, event->trigger_priority);
 	}
 	else
 	{
 		update_services(event->triggerid, 0);
 	}
+
+	free_trigger_info(event);
 
 	zabbix_log(LOG_LEVEL_DEBUG,"End of add_event()");
 	

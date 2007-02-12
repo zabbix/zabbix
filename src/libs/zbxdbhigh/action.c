@@ -79,8 +79,8 @@ int	DBget_action_by_actionid(zbx_uint64_t actionid,DB_ACTION *action)
 		action->actionid=actionid;
 		ZBX_STR2UINT64(action->userid, row[0]);
 		action->recipient=atoi(row[1]);
-		strscpy(action->subject,row[2]);
-		strscpy(action->message,row[3]);
+		action->subject=strdup(row[2]);
+		action->message=strdup(row[3]);
 	}
 
 	DBfree_result(result);

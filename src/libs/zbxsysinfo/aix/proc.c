@@ -27,18 +27,6 @@
 #define DO_MIN 2
 #define DO_AVG 3
 				    
-
-#ifndef HAVE_SYS_PROCFS_H
-	extern int getprocs(
-		struct procsinfo *ProcessBuffer,
-		int ProcessSize,
-		struct fdsinfo *FileBuffer,
-		int FileSize,
-		pid_t *IndexPointer,
-		int Count
-		);
-#endif /* ndef HAVE_SYS_PROCFS_H */
-
 int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 { /* usage: <function name>[ <process name>, <user name>, <mode>, <command> ] */
 	

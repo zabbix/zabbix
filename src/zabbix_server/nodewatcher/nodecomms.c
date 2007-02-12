@@ -52,8 +52,6 @@
 
 #include "nodecomms.h"
 
-extern     int     CONFIG_NODEID;
-
 /******************************************************************************
  *                                                                            *
  * Function: send_to_node                                                     *

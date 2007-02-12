@@ -43,8 +43,6 @@
 
 #include "nodeevents.h"
 
-extern int     process_event(DB_EVENT *event);
-
 /******************************************************************************
  *                                                                            *
  * Function: process_record                                                   *

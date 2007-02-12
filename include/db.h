@@ -61,6 +61,9 @@ extern	char	*CONFIG_DBPASSWORD;
 extern	char	*CONFIG_DBSOCKET;
 extern	int	CONFIG_DBPORT;
 
+extern int	CONFIG_NODEID;
+extern int	CONFIG_MASTER_NODEID;
+
 #define DB_FULL_DELETE	0
 #define DB_PART_DELETE	1
 
@@ -192,8 +195,8 @@ DB_EVENT
 	int		acknowledged;
 	char		trigger_description[TRIGGER_DESCRIPTION_LEN_MAX];
 	int		trigger_priority;
-	char		trigger_url[TRIGGER_URL_LEN_MAX];
-	char		trigger_comments[TRIGGER_COMMENTS_LEN_MAX];
+	char		*trigger_url;
+	char		*trigger_comments;
 };
 
 DB_HOST
@@ -332,8 +335,8 @@ DB_TRIGGER
 	zbx_uint64_t	triggerid;
 	char	expression[TRIGGER_EXPRESSION_LEN_MAX];
 	char	description[TRIGGER_DESCRIPTION_LEN_MAX];
-	char	url[TRIGGER_URL_LEN_MAX];
-	char	comments[TRIGGER_COMMENTS_LEN_MAX];
+	char	*url;
+	char	*comments;
 	int	status;
 	int	value;
 //	int	prevvalue;
@@ -348,12 +351,12 @@ DB_ACTION
 /*	int	delay;*/
 	int	lastcheck;
 	int	recipient;
-	char	subject[ACTION_SUBJECT_LEN_MAX];	/* don't use pointer, cose sizeof is used */
+	char	*subject;
 	char	*message;
 	int	message_len;
 	int	maxrepeats;
 	int	repeatdelay;
-	char	scripts[MAX_STRING_LEN];
+	char	*scripts;
 };
 
 DB_CONDITION
@@ -476,7 +479,7 @@ int	DBget_trends_count(void);
 int	DBget_triggers_count(void);
 int	DBget_queue_count(void);
 
-void    DBescape_string(char *from, char *to, int maxlen);
+void    DBescape_string(const char *from, char *to, int maxlen);
 void    DBget_item_from_db(DB_ITEM *item,DB_ROW row);
 
 zbx_uint64_t	DBadd_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available);

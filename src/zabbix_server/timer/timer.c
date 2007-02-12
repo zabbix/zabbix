@@ -44,9 +44,6 @@
 #include "common.h"
 #include "timer.h"
 
-extern void	update_triggers(int itemid);
-extern void	update_functions(DB_ITEM *item);
-
 /******************************************************************************
  *                                                                            *
  * Function: main_timer_loop                                                  *

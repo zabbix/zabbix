@@ -1,3 +1,5 @@
+.top { vertical-align: top;    }
+
 body
 {
         background-color:#e5e5e5;
@@ -1101,4 +1103,3 @@ ul.messages li.error
 	color:#AA0000;
 	list-style: url('images/general/error_small.gif') inside;
 }
-

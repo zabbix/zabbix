@@ -1349,7 +1349,7 @@ int	replace_value_by_map(char *value, zbx_uint64_t valuemapid)
 	
 	zbx_snprintf(value, MAX_STRING_LEN, "%s (%s)", new_value, or_value);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Value: $s", value);
+	zabbix_log(LOG_LEVEL_DEBUG, "Value: %s", value);
 	return SUCCEED;
 }
 

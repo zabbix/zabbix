@@ -734,25 +734,99 @@ size_t zbx_strlcat(char *dst, const char *src, size_t siz)
  * Comments:  required free allocated string with function 'zbx_free'         *
  *                                                                            *
  ******************************************************************************/
-char* zbx_dvsprintf(const char *f, va_list args)
+char* zbx_dvsprintf(char *dest, const char *f, va_list args)
 {
 	char	*string = NULL;
 	int	n, size = MAX_STRING_LEN >> 1;
 
+	va_list curr;
+
 	while(1) {
 		string = zbx_malloc(size);
 
-		n = vsnprintf(string, size, f, args);
+		va_copy(curr, args);
+		n = vsnprintf(string, size, f, curr);
+		va_end(curr);
 
 		if(n >= 0 && n < size)
 			break;
 
-		if(n >= size)	size = n + 3;
+		if(n >= size)	size = n + 1;
 		else		size = size * 3 / 2 + 1;
 
 		zbx_free(string);
 	}
 
+	if(dest) zbx_free(dest);
+
 	return string;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dsprintf                                                     *
+ *                                                                            *
+ * Purpose: dinamical formatted output conversion                             *
+ *                                                                            *
+ * Return value: formated string                                              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:  required free allocated string with function 'zbx_free'         *
+ *                                                                            *
+ ******************************************************************************/
+char* zbx_dsprintf(char *dest, const char *f, ...)
+{
+	char	*string = NULL;
+	va_list args;
+
+	va_start(args, f);
+
+	string = zbx_dvsprintf(dest, f, args);
+
+	va_end(args);
+
+	return string;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_strdcat                                                      *
+ *                                                                            *
+ * Purpose: dinamical cating of strings                                       *
+ *                                                                            *
+ * Return value: new pointer of string                                        *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:  required free allocated string with function 'zbx_free'         *
+ *                                                                            *
+ ******************************************************************************/
+char* zbx_strdcat(char *dest, const char *src)
+{
+	register int new_len = 0;
+	char *new_dest = NULL;
+
+	if(!src || !src[0])	return dest;
+	
+	if(dest)	new_len += strlen(dest);
+
+	new_len += strlen(src);
+	
+	new_dest = zbx_malloc(new_len + 1);
+	
+	if(dest)
+	{
+		strcpy(new_dest, dest);
+		strcat(new_dest, src);
+		zbx_free(dest);
+	}
+	else
+	{
+		strcpy(new_dest, src);
+	}
+
+	new_dest[new_len] = '\0';
+
+	return new_dest;
+}
