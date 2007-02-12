@@ -34,8 +34,6 @@
 #include "log.h"
 #include "zlog.h"
 
-extern        int     CONFIG_NODEID;
-
 /******************************************************************************
  *                                                                            *
  * Function: zabbix_syslog                                                    *

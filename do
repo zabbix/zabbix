@@ -55,7 +55,7 @@ then
         echo "  $0 [commands] [options]"
 	echo
 	echo " Commands:"
-	echo "   [win2nix]                - convers win EOL [\\r\\n] to nix EOL [\\r]"
+	echo "   [win2nix]                - convers win EOL [\\\\r\\\\n] to nix EOL [\\\\n]"
 	echo "   [copy|cpy]               - copy automake files"
 	echo "   [premake|pre]            - make configuration file"
 	echo "   [configure|config|conf]  - configure make files"

@@ -195,6 +195,8 @@ void zabbix_log(int level, const char *fmt, ...)
 
 	struct	stat	buf;
 
+	static size_t	old_size = 0;
+
 	char	filename_old[MAX_STRING_LEN];
 #if defined(_WINDOWS)
 
@@ -252,8 +254,14 @@ void zabbix_log(int level, const char *fmt, ...)
 					{
 						zbx_error("Can't rename log file [%s] to [%s] [%s]", log_filename, filename_old, strerror(errno));
 					}
+				}
+
+				if(old_size > buf.st_size)
+				{
 					redirect_std(log_filename);
 				}
+
+				old_size = buf.st_size;
 			}
 		}
 

@@ -131,4 +131,15 @@ int	SERVICE_STATE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 int	PROC_INFO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 #endif /* _WINDOWS */
 
+#ifndef HAVE_SYS_PROCFS_H
+int	getprocs(
+	struct procsinfo *ProcessBuffer,
+	int ProcessSize,
+	struct fdsinfo *FileBuffer,
+	int FileSize,
+	pid_t *IndexPointer,
+	int Count
+	);
+#endif /* ndef HAVE_SYS_PROCFS_H */
+
 #endif
