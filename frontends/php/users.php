@@ -115,11 +115,6 @@ include_once "include/page_header.php";
 
 	check_fields($fields);
 
-	if(isset($_REQUEST["usrgrpid"]) and 
-		DBfetch(DBselect('select id from users_groups where userid='.$USER_DETAILS['userid'].' and usrgrpid='.$_REQUEST["usrgrpid"])))
-	{
-			access_deny();
-	}
 ?>
 <?php
 	if($_REQUEST["config"]==0)
@@ -451,7 +446,6 @@ include_once "include/page_header.php";
 					" order by alias");
 
 				while($db_user=DBfetch($db_users))	$users[$db_user['userid']] = $db_user["alias"];
-				if(isset($users[$USER_DETAILS['userid']])) continue;
 
 				$table->addRow(array(
 					array(
