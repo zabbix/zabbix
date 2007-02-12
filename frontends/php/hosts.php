@@ -35,12 +35,10 @@ include_once "include/page_header.php";
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID);
 	if(isset($_REQUEST["hostid"]) && $_REQUEST["hostid"] > 0 && !in_array($_REQUEST["hostid"], $available_hosts)) 
 	{
-		SDI('deni1');
 		access_deny();
 	}
 	if(isset($_REQUEST["apphostid"]) && $_REQUEST["apphostid"] > 0 && !in_array($_REQUEST["apphostid"], $available_hosts)) 
 	{
-		SDI('deni2');
 		access_deny();
 	}
 
@@ -52,7 +50,6 @@ include_once "include/page_header.php";
 		if(!in_array($_REQUEST["groupid"], get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,null,
 			PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
 		{
-		SDI('deni3');
 			access_deny();
 		}
 	}
