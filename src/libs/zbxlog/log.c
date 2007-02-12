@@ -108,6 +108,8 @@ void zabbix_log(int level, const char *fmt, ...)
 	struct	tm	*tm;
 	va_list ap;
 
+	static size_t	old_size = 0;
+
 	struct stat	buf;
 	char	filename_old[MAX_STRING_LEN];
 	
@@ -156,8 +158,11 @@ void zabbix_log(int level, const char *fmt, ...)
 				{
 /*					exit(1);*/
 				}
-				redirect_std(log_filename);
 			}
+			if(old_size > buf.st_size)
+				redirect_std(log_filename);
+
+			old_size = buf.st_size;
 		}
 	}
 	else
