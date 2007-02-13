@@ -13,13 +13,14 @@ copy="no"
 tgz="no"
 configure="no"
 domake="no"
-config_param="--prefix=`pwd`"
+doinstall="no"
+config_param=""
 dotest="no"
 cleanwarnings="no"
 docat="yes"
 help="no"
-noparam=0;
-def="--enable-agent --enable-server --with-mysql"
+noparam=0
+def="--enable-agent --enable-server --with-mysql --prefix=`echo $HOME`/local/zabbix"
 
 for cmd
 do
@@ -32,7 +33,10 @@ do
     conf )	configure="yes";	noparam=1;;
     config )	configure="yes";	noparam=1;;
     configure )	configure="yes";	noparam=1;;
+    mk )	domake="yes";		noparam=1;;
     make )	domake="yes";		noparam=1;;
+    inst )	doinstall="yes";	noparam=1;;
+    install )	doinstall="yes";	noparam=1;;
     test )	dotest="yes";		noparam=1;;
     tar )	tgz="yes";		noparam=1;;
     nocat )	docat="no";		noparam=1;;
@@ -61,6 +65,7 @@ then
 	echo "   [configure|config|conf]  - configure make files"
 	echo "   [make]                   - make applications"
 	echo "   [test]                   - test applications"
+	echo "   [inst|install]           - install applications"
 	echo "   [tar]                    - create ../zabbix.tar.gz of this folder"
 	echo
 	echo " Options:"
@@ -81,7 +86,7 @@ fi
 if [ "$copy" = "yes" ] || [ $premake = "yes" ] || 
   [ $configure = "yes" ] || [ $domake = "yes" ] || 
   [ $dotest = "yes" ] || [ $tgz = "yes" ] ||
-  [ "$win2nix" = "yes" ]
+  [ "$win2nix" = "yes" ] || [ $doinstall = "yes" ]
 then
   cleanwarnings="yes"
 fi
@@ -157,6 +162,13 @@ then
   echo "   Agent TEST RESULTS   " >> WARNINGS 
   echo "------------------------" >> WARNINGS 
   ./src/zabbix_agent/zabbix_agentd -p >> WARNINGS
+fi
+
+if [ "$doinstall" = "yes" ] 
+then
+  echo "Instalation..."
+  echo "Instalation..." >> WARNINGS
+  make install 2>> WARNINGS 
 fi
 
 if [ "$tgz" = "yes" ] 
