@@ -1,5 +1,6 @@
 Changes for 1.3.3:
 
+ - improved detection of runned ZABBIX applications (Eugene)
  - fixed large SQLs calling (Eugene)
  - new templates Unix_t, Windows_t, Standalone_t (Alexei)
  - added media_type.username, media_type.passwd (Alexei)
