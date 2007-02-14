@@ -41,6 +41,8 @@
 #include "log.h"
 #include "zlog.h"
 
+#include "../events.h"
+
 #include "nodeevents.h"
 
 /******************************************************************************

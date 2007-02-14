@@ -55,6 +55,7 @@
 #include "nodeevents.h"
 #include "nodehistory.h"
 #include "trapper.h"
+#include "active.h"
 
 #include "daemon.h"
 
