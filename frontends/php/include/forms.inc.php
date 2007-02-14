@@ -3387,8 +3387,9 @@
 		$host 	= get_request("host",	"");
 		$port 	= get_request("port",	get_profile("HOST_PORT",10050));
 		$status	= get_request("status",	HOST_STATUS_MONITORED);
-		$useip	= get_request("useip",	"no");
-		$ip	= get_request("ip",	"");
+		$useip	= get_request("useip",	0);
+		$dns	= get_request("dns",	"");
+		$ip	= get_request("ip",	"0.0.0.0");
 
 		$useprofile = get_request("useprofile","no");
 
@@ -3427,7 +3428,8 @@
 			$host	= $db_host["host"];
 			$port	= $db_host["port"];
 			$status	= $db_host["status"];
-			$useip	= $db_host["useip"]==1 ? 'yes' : 'no';
+			$useip	= $db_host["useip"];
+			$dns	= $db_host["dns"];
 			$ip	= $db_host["ip"];
 
 // add groups
@@ -3468,10 +3470,6 @@
 		$clear_templates = array_diff($clear_templates,array_keys($templates));
 		asort($templates);
 
-		if($show_only_tmp){
-			$useip = "no";
-		}
-
 		$frmHost = new CFormTable($frm_title,"hosts.php");
 		$frmHost->SetHelp("web.hosts.host.php");
 		$frmHost->AddVar("config",get_request("config",0));
@@ -3509,22 +3507,21 @@
 // onChange does not work on some browsers: MacOS, KDE browser
 		if($show_only_tmp)
 		{
-			$useip = "no";
-			$frmHost->AddVar("useip",$useip);
+			$frmHost->AddVar("useip",0);
+			$frmHost->AddVar("ip","");
+			$frmHost->AddVar("dns","");
 		}
 		else
 		{
-			$frmHost->AddRow(S_USE_IP_ADDRESS,new CCheckBox("useip",$useip,"submit()"));
+			$frmHost->AddRow(S_DNS_NAME,new CTextBox("dns",$dns,"40"));
+			$frmHost->AddRow(S_IP_ADDRESS,new CTextBox("ip",$ip,"15"));
+
+			$cmbConnectBy = new CComboBox('useip', $useip);
+			$cmbConnectBy->AddItem(0, S_DNS_NAME);
+			$cmbConnectBy->AddItem(1, S_IP_ADDRESS);
+			$frmHost->AddRow(S_CONNECT_TO,$cmbConnectBy);
 		}
 
-		if($useip=="yes")
-		{
-			$frmHost->AddRow(S_IP_ADDRESS,new CTextBox("ip",$ip,"15"));
-		}
-		else
-		{
-			$frmHost->AddVar("ip",$ip);
-		}
 
 		if($show_only_tmp)
 		{
@@ -3536,11 +3533,10 @@
 		}
 		else
 		{
-			$frmHost->AddRow(S_PORT,new CTextBox("port",$port,6));	
+			$frmHost->AddRow(S_PORT,new CNumericBox("port",$port,5));	
 
 			$cmbStatus = new CComboBox("status",$status);
 			$cmbStatus->AddItem(HOST_STATUS_MONITORED,	S_MONITORED);
-//			$cmbStatus->AddItem(HOST_STATUS_TEMPLATE,	S_TEMPLATE);
 			$cmbStatus->AddItem(HOST_STATUS_NOT_MONITORED,	S_NOT_MONITORED);
 			$frmHost->AddRow(S_STATUS,$cmbStatus);	
 		}

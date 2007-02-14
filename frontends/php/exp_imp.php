@@ -205,12 +205,12 @@ include_once "include/page_header.php";
 					S_ITEM		=> !isset($items[$host['hostid']]) ? null : 
 								' select hostid, description as info, 1 as cnt from items'.
 								' where hostid='.$host['hostid'],
-					S_TRIGGERS	=> !isset($triggers[$host['hostid']]) ? null :
+					S_TRIGGER	=> !isset($triggers[$host['hostid']]) ? null :
 								'select i.hostid, t.description as info, count(distinct i.hostid) as cnt'.
 								' from functions f, items i, triggers t'.
 								' where t.triggerid=f.triggerid and f.itemid=i.itemid'.
 								' group by f.triggerid, i.hostid, t.description',
-					S_GRAPHS	=> !isset($graphs[$host['hostid']]) ? null :
+					S_GRAPH		=> !isset($graphs[$host['hostid']]) ? null :
 								'select g.name as info, i.hostid, count(distinct i.hostid) as cnt'.
 								' from graphs_items gi, items i, graphs g '.
 								' where g.graphid=gi.graphid and gi.itemid=i.itemid'.
@@ -229,7 +229,7 @@ include_once "include/page_header.php";
 					}
 				}
 				
-				$table->ShowRow(array($host['host'],$el_table));
+				$table->ShowRow(array(new CCol($host['host'], 'top'),$el_table));
 				unset($el_table);
 			}
 			
@@ -285,6 +285,7 @@ include_once "include/page_header.php";
 			$table->SetHeader(array(
 				array(	new CCheckBox("all_hosts",true, "CheckAll('".$form->GetName()."','all_hosts','hosts');"),
 					S_NAME),
+				S_DNS,
 				S_IP,
 				S_PORT,
 				S_STATUS,
@@ -383,10 +384,28 @@ include_once "include/page_header.php";
 				
 				/* $screens = 0; */
 
+				if($row["status"] == HOST_STATUS_TEMPLATE)
+				{
+					$ip = $dns = $port = '-';
+				}
+				else
+				{
+					$ip = $row["ip"];
+					$dns = $row["dns"];
+
+					if($row["useip"]==1)
+						$ip = bold($ip);
+					else
+						$dns = bold($dns);
+
+					$port = $row["port"];
+				}
+
 				$table->AddRow(array(
 					$host,
-					$row["useip"]==1 ? $row["ip"] : "-",
-					$row["port"],
+					$dns,
+					$ip,
+					$port,
 					$status,
 					$item_cnt,
 					$trigger_cnt,

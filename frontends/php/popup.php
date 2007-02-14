@@ -284,7 +284,7 @@ include_once "include/page_header.php";
 	if($srctbl == "hosts")
 	{
 		$table = new CTableInfo(S_NO_HOSTS_DEFINED);
-		$table->SetHeader(array(S_HOST,S_IP,S_PORT,S_STATUS,S_AVAILABILITY));
+		$table->SetHeader(array(S_HOST,S_DNS,S_IP,S_PORT,S_STATUS,S_AVAILABILITY));
 
 		$sql = "select distinct h.* from hosts h";
 		if(isset($groupid))
@@ -319,17 +319,36 @@ include_once "include/page_header.php";
 			else
 				$status=S_UNKNOWN;
 
-			if($host["available"] == HOST_AVAILABLE_TRUE)	
-				$available=new CSpan(S_AVAILABLE,"off");
-			else if($host["available"] == HOST_AVAILABLE_FALSE)
-				$available=new CSpan(S_NOT_AVAILABLE,"on");
-			else if($host["available"] == HOST_AVAILABLE_UNKNOWN)
-				$available=new CSpan(S_UNKNOWN,"unknown");
+			if($host["status"] == HOST_STATUS_TEMPLATE)
+			{
+				$dns = $ip = $port = $available = '-';
+			}
+			else
+			{
+				$dns = $host['dns'];
+				$ip = $host['ip'];
+
+				if($host["useip"]==1)
+					$ip = bold($ip);
+				else
+					$dns = bold($dns);
+
+				$port = $host["port"];
+
+				if($host["available"] == HOST_AVAILABLE_TRUE)	
+					$available=new CSpan(S_AVAILABLE,"off");
+				else if($host["available"] == HOST_AVAILABLE_FALSE)
+					$available=new CSpan(S_NOT_AVAILABLE,"on");
+				else if($host["available"] == HOST_AVAILABLE_UNKNOWN)
+					$available=new CSpan(S_UNKNOWN,"unknown");
+
+			}
 
 			$table->AddRow(array(
 				$name,
-				$host["useip"]==1 ? $host["ip"] : "-",
-				$host["port"],
+				$dns,
+				$ip,
+				$port,
 				$status,
 				$available
 				));
