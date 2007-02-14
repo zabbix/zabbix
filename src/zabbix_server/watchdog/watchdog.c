@@ -19,24 +19,7 @@
 
 #include "config.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/stat.h>
-
-#include <string.h>
-
-
-/* Required for getpwuid */
-#include <pwd.h>
-
-#include <signal.h>
-#include <errno.h>
-
-#include <time.h>
-
 #include "cfg.h"
-#include "pid.h"
 #include "db.h"
 #include "log.h"
 #include "zlog.h"

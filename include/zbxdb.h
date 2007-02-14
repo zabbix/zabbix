@@ -24,9 +24,9 @@
 #include "config.h"
 #include "common.h"
 
-#define	ZBX_DB_OK	0
-#define	ZBX_DB_FAIL	1
-#define	ZBX_DB_DOWN	2
+#define	ZBX_DB_OK	(0)
+#define	ZBX_DB_FAIL	(-1)
+#define	ZBX_DB_DOWN	(-2)
 
 #ifdef HAVE_MYSQL
 #	include "mysql.h"
