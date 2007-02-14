@@ -88,7 +88,8 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	if( ! mysql_real_connect( &mysql, host, user, password, dbname, port, dbsocket,0 ) )
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Failed to connect to database: Error: %s",mysql_error(&mysql) );
+		zabbix_log(LOG_LEVEL_ERR, "Failed to connect to database: Error: %s [%d]",
+			mysql_error(&mysql), mysql_errno(&mysql));
 		ret = ZBX_DB_FAIL;
 	}
 
@@ -96,7 +97,8 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	{
 		if( mysql_select_db( &mysql, dbname ) != 0 )
 		{
-			zabbix_log(LOG_LEVEL_ERR, "Failed to select database: Error: %s",mysql_error(&mysql) );
+			zabbix_log(LOG_LEVEL_ERR, "Failed to select database: Error: %s [%d]",
+				mysql_error(&mysql), mysql_errno(&mysql));
 			ret = ZBX_DB_FAIL;
 		}
 	}
@@ -105,16 +107,21 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	{
 		if(mysql_autocommit(&mysql, 1) != 0)
 		{
-			zabbix_log(LOG_LEVEL_ERR, "Failed to set autocommit to 1: Error: %s",mysql_error(&mysql));
+			zabbix_log(LOG_LEVEL_ERR, "Failed to set autocommit to 1: Error: %s [%d]",
+				mysql_error(&mysql), mysql_errno(&mysql));
 			ret = ZBX_DB_FAIL;
 		}
 	}
 
 	if(ZBX_DB_FAIL  == ret)
 	{
-		if(mysql_errno(&mysql) == CR_SERVER_GONE_ERROR)
-		{
-			ret = ZBX_DB_DOWN;
+		switch(mysql_errno(&mysql)) {
+			case	CR_SERVER_GONE_ERROR:
+			case	CR_CONNECTION_ERROR:
+				ret = ZBX_DB_DOWN;
+				break;
+			default:
+				break;
 		}
 	}
 
@@ -322,7 +329,7 @@ void zbx_db_rollback(void)
 int zbx_db_vexecute(const char *fmt, va_list args)
 {
 	char	*sql = NULL;
-	int ret = SUCCEED;
+	int	ret = ZBX_DB_OK;
 
 	struct timeval tv;
 	suseconds_t    msec;
@@ -341,14 +348,14 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s", sql);
 #ifdef	HAVE_MYSQL
-	while(mysql_query(&mysql,sql) != 0)
+	if(mysql_query(&mysql,sql) != 0)
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Query::%s",sql);
-		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s [%d]", mysql_error(&mysql), mysql_errno(&mysql) );
-		zabbix_log( LOG_LEVEL_ERR, "Will retry in 1 second...",sql);
-		sleep(1);
+		ret = (mysql_errno(&mysql) == CR_SERVER_GONE_ERROR)?ZBX_DB_DOWN:ZBX_DB_FAIL;
 	}
-	ret = (int)mysql_affected_rows(&mysql);
+	else
+	{
+		ret = (int)mysql_affected_rows(&mysql);
+	}
 #endif
 #ifdef	HAVE_POSTGRESQL
 	result = PQexec(conn,sql);
@@ -357,7 +364,7 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",sql);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", "Result is NULL" );
-		ret = FAIL;
+		ret = ZBX_DB_FAIL;
 	}
 	else if( PQresultStatus(result) != PGRES_COMMAND_OK)
 	{
@@ -365,18 +372,23 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s:%s",
 				PQresStatus(PQresultStatus(result)),
 			 	PQresultErrorMessage(result));
-		ret = FAIL;
+		ret = ZBX_DB_FAIL;
+	}
+
+	if(ret == ZBX_DB_OK)
+	{
+		ret = PQntuples(result);
 	}
 	PQclear(result);
 #endif
 #ifdef	HAVE_ORACLE
-	if ( (ret = sqlo_exec(oracle, sql))<0 )
+	if ((ret = sqlo_exec(oracle, sql))<0)
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",sql);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s", sqlo_geterror(oracle) );
 		zbx_error("Query::%s.",sql);
 		zbx_error("Query failed:%s.", sqlo_geterror(oracle) );
-		ret = FAIL;
+		ret = ZBX_DB_FAIL;
 	}
 #endif
 #ifdef	HAVE_SQLITE3
@@ -406,7 +418,6 @@ lbl_exec:
 	}
 #endif
 	
-
 	gettimeofday(&tv, NULL);
 	if((float)(tv.tv_usec-msec)/1000000 > 0.05)
 		zabbix_log( LOG_LEVEL_WARNING, "Long query: %f sec, query %s", (float)(tv.tv_usec-msec)/1000000, sql );
@@ -562,14 +573,16 @@ DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s", sql);
 
 #ifdef	HAVE_MYSQL
-	while(mysql_query(&mysql,sql) != 0)
+	if(mysql_query(&mysql,sql) != 0)
 	{
 		zabbix_log( LOG_LEVEL_ERR, "Query::%s",sql);
 		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s [%d]", mysql_error(&mysql), mysql_errno(&mysql) );
-		zabbix_log( LOG_LEVEL_ERR, "Will retry in 1 second");
-		sleep(1);
+		result = (mysql_errno(&mysql) == CR_SERVER_GONE_ERROR)?(DB_RESULT)ZBX_DB_DOWN:(DB_RESULT)ZBX_DB_FAIL;
 	}
-	result = mysql_store_result(&mysql);
+	else
+	{
+		result = mysql_store_result(&mysql);
+	}
 #endif
 #ifdef	HAVE_POSTGRESQL
 	result = zbx_malloc(sizeof(ZBX_PG_DB_RESULT));

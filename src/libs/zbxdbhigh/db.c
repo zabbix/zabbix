@@ -64,7 +64,11 @@ void    DBconnect(int flag)
 				{
 					exit(FAIL);
 				}
-				loop = 1;
+				else
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "Database is down. Reconnecting in 10 seconds");
+					sleep(10);
+				}
 				break;
 			default:
 				exit(FAIL);
@@ -160,13 +164,21 @@ void DBrollback(void)
 int DBexecute(const char *fmt, ...)
 {
 	va_list args;
-	int ret;
+	int ret = ZBX_DB_DOWN;
 
-	va_start(args, fmt);
-	
-	ret = zbx_db_vexecute(fmt, args);
-
-	va_end(args);
+	while(ret == ZBX_DB_DOWN)
+	{
+		va_start(args, fmt);
+		ret = zbx_db_vexecute(fmt, args);
+		va_end(args);
+		if( ret == ZBX_DB_DOWN)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds");
+			sleep(10);
+			DBclose();
+			DBconnect(ZBX_DB_CONNECT_NORMAL);
+		}
+	}
 
 	return ret;
 }
@@ -190,13 +202,21 @@ DB_ROW	DBfetch(DB_RESULT result)
 DB_RESULT DBselect(const char *fmt, ...)
 {
 	va_list args;
-	DB_RESULT result;
+	DB_RESULT result = (DB_RESULT)ZBX_DB_DOWN;
 
-	va_start(args, fmt);
-	
-	result = zbx_db_vselect(fmt, args);
-
-	va_end(args);
+	while(result == (DB_RESULT)ZBX_DB_DOWN)
+	{
+		va_start(args, fmt);
+		result = zbx_db_vselect(fmt, args);
+		va_end(args);
+		if( result == (DB_RESULT)ZBX_DB_DOWN)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds");
+			sleep(10);
+			DBclose();
+			DBconnect(ZBX_DB_CONNECT_NORMAL);
+		}
+	}
 
 	return result;
 }
