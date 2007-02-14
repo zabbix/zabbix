@@ -44,6 +44,7 @@ zabbix_server_LDADD = \
 	$(top_srcdir)/src/libs/zbxnet/libzbxnet.a \
 	$(top_srcdir)/src/libs/zbxsms/libzbxsms.a \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
+	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a

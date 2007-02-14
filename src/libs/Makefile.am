@@ -2,6 +2,7 @@
 
 DIST_SUBDIRS = \
 	zbxdbhigh \
+	zbxdb \
 	zbxemail \
 	zbxsms \
 	zbxcomms \
@@ -16,7 +17,7 @@ DIST_SUBDIRS = \
 	zbxsys 
 
 if SERVER
-SERVER_SUBDIRS = zbxdbhigh zbxemail zbxsms zbxcomms
+SERVER_SUBDIRS = zbxdb zbxdbhigh zbxemail zbxsms zbxcomms
 endif
 
 SUBDIRS = zbxcrypto zbxcommon zbxlog zbxnet zbxnix zbxconf zbxsysinfo zbxplugin zbxsys $(SERVER_SUBDIRS)
