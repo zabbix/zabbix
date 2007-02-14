@@ -37,20 +37,25 @@ include_once "include/page_header.php";
 // media form
 		"mediatypeid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,
 						'{form}=="update"'),
-		"type"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1,2"),
+		"type"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN(implode(',',
+						array(ALERT_TYPE_EMAIL,ALERT_TYPE_EXEC,ALERT_TYPE_SMS,ALERT_TYPE_JABBER))),
 						'(isset({save}))'),
 		"description"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
 						'(isset({save}))'),
 		"smtp_server"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
-						'({type}==0)'),
+						'({type}=='.ALERT_TYPE_EMAIL.')&&isset({save})'),
 		"smtp_helo"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
-						'({type}==0)'),
+						'({type}=='.ALERT_TYPE_EMAIL.')&&isset({save})'),
 		"smtp_email"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
-						'({type}==0)'),
+						'({type}=='.ALERT_TYPE_EMAIL.')&&isset({save})'),
 		"exec_path"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
-						'({type}==1)&&isset({save})'),
+						'({type}=='.ALERT_TYPE_EXEC.')&&isset({save})'),
 		"gsm_modem"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
-						'({type}==2)&&isset({save})'),
+						'({type}=='.ALERT_TYPE_SMS.')&&isset({save})'),
+		"username"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
+						'({type}=='.ALERT_TYPE_JABBER.')&&isset({save})'),
+		"password"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
+						'({type}=='.ALERT_TYPE_JABBER.')&&isset({save})'),
 /* actions */
 		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -73,9 +78,9 @@ include_once "include/page_header.php";
 /* UPDATE */
 			$action = AUDIT_ACTION_UPDATE;
 			$result=update_mediatype($_REQUEST["mediatypeid"],
-				$_REQUEST["type"],$_REQUEST["description"],$_REQUEST["smtp_server"],
-				$_REQUEST["smtp_helo"],$_REQUEST["smtp_email"],$_REQUEST["exec_path"],
-				$_REQUEST["gsm_modem"]);
+				$_REQUEST["type"],$_REQUEST["description"],get_request("smtp_server"),
+				get_request("smtp_helo"),get_request("smtp_email"),get_request("exec_path"),
+				get_request("gsm_modem"),get_request('username'),get_request('password'));
 
 			show_messages($result, S_MEDIA_TYPE_UPDATED, S_MEDIA_TYPE_WAS_NOT_UPDATED);
 		}
@@ -84,9 +89,9 @@ include_once "include/page_header.php";
 /* ADD */
 			$action = AUDIT_ACTION_ADD;
 			$result=add_mediatype(
-				$_REQUEST["type"],$_REQUEST["description"],$_REQUEST["smtp_server"],
-				$_REQUEST["smtp_helo"],$_REQUEST["smtp_email"],$_REQUEST["exec_path"],
-				$_REQUEST["gsm_modem"]);
+				$_REQUEST["type"],$_REQUEST["description"],get_request("smtp_server"),
+				get_request("smtp_helo"),get_request("smtp_email"),get_request("exec_path"),
+				get_request("gsm_modem"),get_request('username'),get_request('password'));
 
 			show_messages($result, S_ADDED_NEW_MEDIA_TYPE, S_NEW_MEDIA_TYPE_WAS_NOT_ADDED);
 		}
@@ -127,11 +132,11 @@ include_once "include/page_header.php";
 	else
 	{
 		$table=new CTableInfo(S_NO_MEDIA_TYPES_DEFINED);
-		$table->setHeader(array(S_DESCRIPTION,S_TYPE,S_DETAILS));
+		$table->setHeader(array(S_TYPE,S_DESCRIPTION,S_DETAILS));
 
-		$result=DBselect("select mt.* from media_type mt".
+		$result=DBselect("select * from media_type ".
 			" where ".DBid2nodeid('mediatypeid')."=".$ZBX_CURNODEID.
-			" order by mt.type");
+			" order by type, description");
 		while($row=DBfetch($result))
 		{
 			switch($row['type'])
@@ -148,13 +153,16 @@ include_once "include/page_header.php";
 				case ALERT_TYPE_SMS:
 					$details = S_GSM_MODEM.": '".$row['gsm_modem']."'";
 					break;
+				case ALERT_TYPE_JABBER:
+					$details = S_JABBER_IDENTIFIER.": '".$row['username']."'";
+					break;
 				default:
 					$details = '';
 			}
 			
 			$table->addRow(array(
-				new CLink($row["description"],"?&form=update&mediatypeid=".$row["mediatypeid"],'action'),
 				media_type2str($row['type']),
+				new CLink($row["description"],"?&form=update&mediatypeid=".$row["mediatypeid"],'action'),
 				$details));
 		}
 		$table->show();

@@ -1,6 +1,7 @@
 Changes for 1.3.3:
 
- - split hostname and DNS name (Eugene)
+ - developed configuration of Jabber messaging (Eugene)
+ - split hostname and DNS name in frontend (Eugene)
  - improved detection of runned ZABBIX applications (Eugene)
  - fixed large SQLs calling (Eugene)
  - new templates Unix_t, Windows_t, Standalone_t (Alexei)

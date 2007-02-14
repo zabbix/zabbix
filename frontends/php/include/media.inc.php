@@ -25,6 +25,7 @@
 		$str_type[ALERT_TYPE_EMAIL]	= S_EMAIL;
 		$str_type[ALERT_TYPE_EXEC]	= S_SCRIPT;
 		$str_type[ALERT_TYPE_SMS]	= S_SMS;
+		$str_type[ALERT_TYPE_JABBER]	= S_JABBER;
 		
 		if(isset($str_type[$type]))
 			return $str_type[$type];
@@ -115,7 +116,7 @@
 
 	# Update media type
 
-	function	update_mediatype($mediatypeid,$type,$description,$smtp_server,$smtp_helo,$smtp_email,$exec_path,$gsm_modem)
+	function	update_mediatype($mediatypeid,$type,$description,$smtp_server,$smtp_helo,$smtp_email,$exec_path,$gsm_modem,$username,$password)
 	{
 		$ret = 0;
 
@@ -127,7 +128,7 @@
 		}
 		else
 		{
-			$sql="update media_type set type=$type,description=".zbx_dbstr($description).",smtp_server=".zbx_dbstr($smtp_server).",smtp_helo=".zbx_dbstr($smtp_helo).",smtp_email=".zbx_dbstr($smtp_email).",exec_path=".zbx_dbstr($exec_path).",gsm_modem=".zbx_dbstr($gsm_modem)." where mediatypeid=$mediatypeid";
+			$sql="update media_type set type=$type,description=".zbx_dbstr($description).",smtp_server=".zbx_dbstr($smtp_server).",smtp_helo=".zbx_dbstr($smtp_helo).",smtp_email=".zbx_dbstr($smtp_email).",exec_path=".zbx_dbstr($exec_path).",gsm_modem=".zbx_dbstr($gsm_modem).",username=".zbx_dbstr($username).",passwd=".zbx_dbstr($password)." where mediatypeid=$mediatypeid";
 			$ret =	DBexecute($sql);
 		}
 		return $ret;
@@ -135,7 +136,7 @@
 
 	# Add Media type
 
-	function	add_mediatype($type,$description,$smtp_server,$smtp_helo,$smtp_email,$exec_path,$gsm_modem)
+	function	add_mediatype($type,$description,$smtp_server,$smtp_helo,$smtp_email,$exec_path,$gsm_modem,$username,$password)
 	{
 		$ret = 0;
 
@@ -153,7 +154,7 @@
 		else
 		{
 			$mediatypeid=get_dbid("media_type","mediatypeid");
-			$sql="insert into media_type (mediatypeid,type,description,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem) values ($mediatypeid,$type,".zbx_dbstr($description).",".zbx_dbstr($smtp_server).",".zbx_dbstr($smtp_helo).",".zbx_dbstr($smtp_email).",".zbx_dbstr($exec_path).",".zbx_dbstr($gsm_modem).")";
+			$sql="insert into media_type (mediatypeid,type,description,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem,username,passwd) values ($mediatypeid,$type,".zbx_dbstr($description).",".zbx_dbstr($smtp_server).",".zbx_dbstr($smtp_helo).",".zbx_dbstr($smtp_email).",".zbx_dbstr($exec_path).",".zbx_dbstr($gsm_modem).",".zbx_dbstr($username).",".zbx_dbstr($password).")";
 			$ret = DBexecute($sql);
 			if($ret)	$ret = $mediatypeid;
 		}
