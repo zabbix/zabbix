@@ -49,6 +49,7 @@
 #include "evalfunc.h"
 #include "functions.h"
 #include "expression.h"
+#include "trapper/autoregister.h"
 
 /******************************************************************************
  *                                                                            *

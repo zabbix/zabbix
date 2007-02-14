@@ -305,6 +305,10 @@
 #	include <sys/shm.h>
 #endif
 
+#ifdef HAVE_SYS_FILE_H
+#	include <sys/file.h>
+#endif
+
 #ifdef HAVE_MATH_H
 #	include <math.h>
 #endif
