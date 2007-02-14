@@ -118,6 +118,7 @@ frontends/php/popup_users.php -text
 frontends/php/popup_usrgrp.php -text
 frontends/php/setup.php -text
 include/comms.h -text
+include/zbxdb.h -text
 m4/ax_lib_mysql.m4 -text
 m4/ax_lib_postgresql.m4 -text
 m4/ax_lib_sqlite3.m4 -text
@@ -131,6 +132,8 @@ misc/clock/clock.fla -text
 /splint -text
 src/libs/zbxcomms/Makefile.am -text
 src/libs/zbxcomms/comms.c -text
+src/libs/zbxdb/Makefile.am -text
+src/libs/zbxdb/db.c -text
 src/libs/zbxsysinfo/linux/boottime.c -text
 src/zabbix_agent/eventlog.c -text
 src/zabbix_agent/eventlog.h -text

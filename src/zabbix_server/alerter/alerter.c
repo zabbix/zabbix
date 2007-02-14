@@ -192,7 +192,7 @@ int main_alerter_loop()
 
 		zbx_setproctitle("connecting to the database");
 
-		DBconnect();
+		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 		now  = time(NULL);
 

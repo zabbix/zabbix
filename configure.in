@@ -717,6 +717,7 @@ AC_OUTPUT([Makefile src/Makefile src/libs/Makefile src/libs/zbxlog/Makefile src/
 	src/libs/zbxsysinfo/openbsd/Makefile src/libs/zbxsysinfo/osx/Makefile src/libs/zbxsysinfo/solaris/Makefile
 	src/libs/zbxsysinfo/osf/Makefile src/libs/zbxsysinfo/netbsd/Makefile src/libs/zbxsysinfo/unknown/Makefile
 	src/libs/zbxnix/Makefile src/libs/zbxplugin/Makefile src/libs/zbxsys/Makefile src/libs/zbxcomms/Makefile
+	src/libs/zbxdb/Makefile
 	misc/Makefile create/Makefile create/schema/Makefile])
 
 echo "

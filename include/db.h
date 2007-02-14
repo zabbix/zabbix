@@ -26,33 +26,7 @@
 
 #include "config.h"
 #include "common.h"
-
-#ifdef HAVE_MYSQL
-#	include "mysql.h"
-#	include "errmsg.h"
-#	include "mysqld_error.h"
-#	define	DB_HANDLE	MYSQL
-#endif /* HAVE_MYSQL */
-
-#ifdef HAVE_ORACLE
-#	include "sqlora.h"
-#endif /* HAVE_ORACLE */
-
-#ifdef HAVE_POSTGRESQL
-#	include <libpq-fe.h>
-#endif /* HAVE_POSTGRESQL */
-
-#ifdef HAVE_SQLITE3
-#	include <sqlite3.h>
-#endif /* HAVE_SQLITE3 */
-
-
-#ifdef HAVE_SQLITE3
-/* We have to put double % here for sprintf */
-#	define ZBX_SQL_MOD(x,y) #x "%%" #y
-#else
-#	define ZBX_SQL_MOD(x,y) "mod(" #x "," #y ")"
-#endif
+#include "zbxdb.h"
 
 extern	char	*CONFIG_DBHOST;
 extern	char	*CONFIG_DBNAME;
@@ -60,9 +34,11 @@ extern	char	*CONFIG_DBUSER;
 extern	char	*CONFIG_DBPASSWORD;
 extern	char	*CONFIG_DBSOCKET;
 extern	int	CONFIG_DBPORT;
+extern	int	CONFIG_NODEID;
+extern	int	CONFIG_MASTER_NODEID;
 
-extern int	CONFIG_NODEID;
-extern int	CONFIG_MASTER_NODEID;
+#define	ZBX_DB_CONNECT_NORMAL	0
+#define	ZBX_DB_CONNECT_EXIT	1
 
 #define DB_FULL_DELETE	0
 #define DB_PART_DELETE	1
@@ -84,60 +60,6 @@ extern int	CONFIG_MASTER_NODEID;
 #define DB_HTTPSTEP	struct zbx_httpstep_type
 #define DB_HTTPSTEPITEM	struct zbx_httpstepitem_type
 #define DB_HTTPTESTITEM	struct zbx_httptestitem_type
-
-#ifdef HAVE_SQLITE3
-
-	#include "mutexs.h"
-
-	#define DB_ROW		char **
-	#define	DB_RESULT	ZBX_SQ_DB_RESULT*
-	#define	DBfree_result	SQ_DBfree_result
-
-	typedef struct zbx_sq_db_result_s
-	{
-		int		curow;
-		char		**data;
-		int		nrow;
-		int		ncolumn;
-
-		DB_ROW		values;
-	} ZBX_SQ_DB_RESULT;
-
-void	SQ_DBfree_result(DB_RESULT result);
-
-	extern PHP_MUTEX	sqlite_access;
-	
-#endif
-
-#ifdef HAVE_MYSQL
-	#define	DB_RESULT	MYSQL_RES *
-	#define	DBfree_result	mysql_free_result
-	#define DB_ROW		MYSQL_ROW
-#endif
-
-#ifdef HAVE_POSTGRESQL
-	#define DB_ROW		char **
-	#define	DB_RESULT	ZBX_PG_DB_RESULT*
-	#define	DBfree_result	PG_DBfree_result
-
-	typedef struct zbx_pg_db_result_s
-	{
-		PGresult	*pg_result;
-		int		row_num;
-		int		fld_num;
-		int		cursor;
-		DB_ROW		values;
-	} ZBX_PG_DB_RESULT;
-
-void	PG_DBfree_result(DB_RESULT result);
-
-#endif
-
-#ifdef HAVE_ORACLE
-	#define	DB_RESULT	sqlo_stmt_handle_t
-	#define	DBfree_result	sqlo_close
-	#define DB_ROW		char **
-#endif
 
 #define	MAX_HOST_HOST_LEN	64
 
@@ -434,9 +356,9 @@ DB_HTTPTESTITEM
 };
 
 
-void    DBconnect(void);
+int	DBping(void);
 
-void    DBconnect(void);
+void    DBconnect(int flag);
 
 void    DBclose(void);
 void    DBvacuum(void);

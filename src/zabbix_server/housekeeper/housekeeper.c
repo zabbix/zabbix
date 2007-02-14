@@ -318,7 +318,7 @@ int main_housekeeper_loop()
 
 		zbx_setproctitle("connecting to the database");
 
-		DBconnect();
+		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 		DBbegin();
 

@@ -255,7 +255,7 @@ void	child_trapper_main(int i,int listenfd, int addrlen)
 /*	zabbix_log( LOG_LEVEL_WARNING, "zabbix_trapperd %ld started",(long)getpid());*/
 	zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Trapper]", i);
 
-	DBconnect();
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for(;;)
 	{

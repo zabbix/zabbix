@@ -355,7 +355,7 @@ void main_pinger_loop(int num)
 	{
 		zbx_setproctitle("connecting to the database");
 
-		DBconnect();
+		DBconnect(ZBX_DB_CONNECT_NORMAL);
 	
 /*	zabbix_set_log_level(LOG_LEVEL_DEBUG);*/
 

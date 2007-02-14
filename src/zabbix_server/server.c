@@ -487,7 +487,7 @@ int MAIN_ZABBIX_ENTRY(void)
 /*	zabbix_log( LOG_LEVEL_WARNING, "INFO [%s]", ZBX_SQL_MOD(a,%d)); */
 	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_server. ZABBIX %s.", ZABBIX_VERSION);
 
-	DBconnect();
+	DBconnect(ZBX_DB_CONNECT_EXIT);
 
 	result = DBselect("select refresh_unsupported from config where " ZBX_COND_NODEID, LOCAL_NODE("configid"));
 	row = DBfetch(result);
@@ -511,6 +511,11 @@ int MAIN_ZABBIX_ENTRY(void)
 /* DBconnect() already made in init_config() */
 /*	DBconnect();*/
 	DBupdate_triggers_status_after_restart();
+	DBclose();
+
+/* To make sure that we can connect to the database before forking new processes */
+	DBconnect(ZBX_DB_CONNECT_EXIT);
+	DBclose();
 
 /*#define CALC_TREND*/
 
@@ -518,7 +523,6 @@ int MAIN_ZABBIX_ENTRY(void)
 	trend();
 	return 0;
 #endif
-	DBclose();
 	threads = calloc(1+CONFIG_POLLER_FORKS+CONFIG_TRAPPERD_FORKS+CONFIG_PINGER_FORKS+CONFIG_ALERTER_FORKS
 		+CONFIG_HOUSEKEEPER_FORKS+CONFIG_TIMER_FORKS+CONFIG_UNREACHABLE_POLLER_FORKS
 		+CONFIG_NODEWATCHER_FORKS+CONFIG_HTTPPOLLER_FORKS,sizeof(pid_t));
@@ -546,7 +550,7 @@ int MAIN_ZABBIX_ENTRY(void)
 	if(server_num == 0)
 	{
 		init_main_process();
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Main]",server_num);
+		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Main. Watchdog.]",server_num);
 		main_watchdog_loop();
 /*		for(;;)	zbx_sleep(3600);*/
 	}

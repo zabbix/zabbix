@@ -297,7 +297,7 @@ int main_nodewatcher_loop()
 		zbx_setproctitle("connecting to the database");
 		zabbix_log( LOG_LEVEL_DEBUG, "Starting sync with nodes");
 
-		DBconnect();
+		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 		if(lastrun + 120 < start)
 		{

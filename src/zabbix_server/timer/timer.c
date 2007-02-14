@@ -77,7 +77,7 @@ void main_timer_loop()
 	{
 		zbx_setproctitle("updating nodata() functions");
 
-		DBconnect();
+		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 		now=time(NULL);
 /*

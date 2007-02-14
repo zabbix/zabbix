@@ -123,7 +123,7 @@ void main_httppoller_loop(int num)
 
 	httppoller_num = num;
 
-	DBconnect();
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for(;;)
 	{
