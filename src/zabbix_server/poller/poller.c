@@ -443,7 +443,7 @@ void main_poller_loop(int type, int num)
 	poller_type = type;
 	poller_num = num;
 
-	DBconnect();
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for(;;)
 	{

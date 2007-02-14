@@ -139,7 +139,7 @@ int change_nodeid(int old_id, int new_id)
 
 	zabbix_set_log_level(LOG_LEVEL_WARNING);
 
-	DBconnect();
+	DBconnect(ZBX_DB_CONNECT_EXIT);
 
 	DBbegin();
 
