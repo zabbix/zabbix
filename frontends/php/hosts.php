@@ -66,12 +66,13 @@ include_once "include/page_header.php";
 		"groups"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 		"applications"=>array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 /* host */
-		"hostid"=>	array(T_ZBX_INT, O_OPT,  P_SYS,  DB_ID,		'{config}==0&&{form}=="update"'),
-		"host"=>	array(T_ZBX_STR, O_OPT,  NULL,   NOT_EMPTY,	'{config}==0&&isset({save})'),
-		"useip"=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	NULL),
-		"ip"=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,		'isset({useip})'),
-		"port"=>	array(T_ZBX_INT, O_OPT,  NULL,   BETWEEN(0,65535),'{config}==0&&isset({save})'),
-		"status"=>	array(T_ZBX_INT, O_OPT,  NULL,   IN("0,1,3"),	'{config}==0&&isset({save})'),
+		"hostid"=>	array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,		'{config}==0&&{form}=="update"'),
+		"host"=>	array(T_ZBX_STR, O_OPT,	NULL,   NOT_EMPTY,	'{config}==0&&isset({save})'),
+		"dns"=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'{config}==0&&isset({save})'),
+		"useip"=>	array(T_ZBX_STR, O_OPT, NULL,	IN('0,1'),	'{config}==0&&isset({save})'),
+		"ip"=>		array(T_ZBX_STR, O_OPT, NULL,	NULL,		'({useip}==1)'),
+		"port"=>	array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,65535),'{config}==0&&isset({save})'),
+		"status"=>	array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1,3"),	'{config}==0&&isset({save})'),
 
 		"newgroup"=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	NULL),
 		"templates"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	NULL),
@@ -147,7 +148,7 @@ include_once "include/page_header.php";
 /* SAVE HOST */
 	elseif(($_REQUEST["config"]==0 || $_REQUEST["config"]==3) && isset($_REQUEST["save"]))
 	{
-		$useip = get_request("useip","no");
+		$useip = get_request("useip",0);
 
 		$groups=get_request("groups",array());
 		
@@ -180,7 +181,7 @@ include_once "include/page_header.php";
 			}
 
 			$result = update_host($_REQUEST["hostid"],
-				$_REQUEST["host"],$_REQUEST["port"],$_REQUEST["status"],$useip,
+				$_REQUEST["host"],$_REQUEST["port"],$_REQUEST["status"],$useip,$_REQUEST["dns"],
 				$_REQUEST["ip"],$templates,$_REQUEST["newgroup"],$groups);
 
 			$msg_ok 	= S_HOST_UPDATED;
@@ -190,7 +191,7 @@ include_once "include/page_header.php";
 			$hostid = $_REQUEST["hostid"];
 		} else {
 			$hostid = add_host(
-				$_REQUEST["host"],$_REQUEST["port"],$_REQUEST["status"],$useip,
+				$_REQUEST["host"],$_REQUEST["port"],$_REQUEST["status"],$useip,$_REQUEST["dns"],
 				$_REQUEST["ip"],$templates,$_REQUEST["newgroup"],$groups);
 
 			$msg_ok 	= S_HOST_ADDED;
@@ -553,9 +554,10 @@ include_once "include/page_header.php";
 			$table->setHeader(array(
 				array(new CCheckBox("all_hosts",NULL,"CheckAll('".$form->GetName()."','all_hosts');"),
 					SPACE.S_NAME),
-				S_TEMPLATES,
+				$show_only_tmp ? NULL : S_DNS,
 				$show_only_tmp ? NULL : S_IP,
 				$show_only_tmp ? NULL : S_PORT,
+				S_TEMPLATES,
 				$show_only_tmp ? NULL : S_STATUS,
 				$show_only_tmp ? NULL : S_AVAILABILITY,
 				$show_only_tmp ? NULL : S_ERROR,
@@ -586,40 +588,53 @@ include_once "include/page_header.php";
 					));
 		
 				
-				if($show_only_tmp)	$ip = NULL;
-				else			$ip=$row["useip"]==1 ? $row["ip"] : "-";
-
-				if($show_only_tmp)	$port = NULL;
-				else			$port = $row["port"];
-
-				if($show_only_tmp)	$status = NULL;
-				elseif($row["status"] == HOST_STATUS_MONITORED){
-					$status=new CLink(S_MONITORED,"hosts.php?hosts%5B%5D=".$row["hostid"].
-						"&disable=1".url_param("config").url_param("groupid"),
-						"off");
-				} else if($row["status"] == HOST_STATUS_NOT_MONITORED) {
-					$status=new CLink(S_NOT_MONITORED,"hosts.php?hosts%5B%5D=".$row["hostid"].
-						"&activate=1".url_param("config").url_param("groupid"),
-						"on");
-				} else if($row["status"] == HOST_STATUS_TEMPLATE)
-					$status=new CCol(S_TEMPLATE,"unknown");
-				else if($row["status"] == HOST_STATUS_DELETED)
-					$status=new CCol(S_DELETED,"unknown");
+				if($show_only_tmp)
+				{
+					$dns = NULL;
+					$ip = NULL;
+					$port = NULL;
+					$status = NULL;
+					$available = NULL;
+					$error = NULL;
+				}
 				else
-					$status=S_UNKNOWN;
-		
-				if($show_only_tmp)	$available = NULL;
-				elseif($row["available"] == HOST_AVAILABLE_TRUE)	
-					$available=new CCol(S_AVAILABLE,"off");
-				else if($row["available"] == HOST_AVAILABLE_FALSE)
-					$available=new CCol(S_NOT_AVAILABLE,"on");
-				else if($row["available"] == HOST_AVAILABLE_UNKNOWN)
-					$available=new CCol(S_UNKNOWN,"unknown");
-		
-				if($show_only_tmp)		$error = NULL;
-				elseif($row["error"] == "")	$error = new CCol(SPACE,"off");
-				else				$error = new CCol($row["error"],"on");
+				{
+					$dns = $row['dns'];
+					$ip = $row['ip'];
+					$port = $row["port"];
 
+					if(1 == $row['useip'])
+						$ip = bold($ip);
+					else
+						$dns = bold($dns);
+
+					if($row["status"] == HOST_STATUS_MONITORED){
+						$status=new CLink(S_MONITORED,"hosts.php?hosts%5B%5D=".$row["hostid"].
+							"&disable=1".url_param("config").url_param("groupid"),
+							"off");
+					} else if($row["status"] == HOST_STATUS_NOT_MONITORED) {
+						$status=new CLink(S_NOT_MONITORED,"hosts.php?hosts%5B%5D=".$row["hostid"].
+							"&activate=1".url_param("config").url_param("groupid"),
+							"on");
+					} else if($row["status"] == HOST_STATUS_TEMPLATE)
+						$status=new CCol(S_TEMPLATE,"unknown");
+					else if($row["status"] == HOST_STATUS_DELETED)
+						$status=new CCol(S_DELETED,"unknown");
+					else
+						$status=S_UNKNOWN;
+
+					if($row["available"] == HOST_AVAILABLE_TRUE)	
+						$available=new CCol(S_AVAILABLE,"off");
+					else if($row["available"] == HOST_AVAILABLE_FALSE)
+						$available=new CCol(S_NOT_AVAILABLE,"on");
+					else if($row["available"] == HOST_AVAILABLE_UNKNOWN)
+						$available=new CCol(S_UNKNOWN,"unknown");
+
+					if($row["error"] == "")	$error = new CCol(SPACE,"off");
+					else			$error = new CCol($row["error"],"on");
+
+				}
+		
 				$show = array(
 					new CLink(S_ITEMS,"items.php?hostid=".$row["hostid"],'action'),
 					SPACE.":".SPACE,
@@ -630,9 +645,10 @@ include_once "include/page_header.php";
 
 				$table->addRow(array(
 					$host,
-					implode(', ',$templates),
+					$dns,
 					$ip,
 					$port,
+					implode(', ',$templates),
 					$status,
 					$available,
 					$error,
