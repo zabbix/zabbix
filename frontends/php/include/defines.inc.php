@@ -183,6 +183,7 @@
 	define("ALERT_TYPE_EMAIL",0);
 	define("ALERT_TYPE_EXEC",1);
 	define("ALERT_TYPE_SMS",2);
+	define("ALERT_TYPE_JABBER",3);
 
 	define("ACTION_STATUS_ENABLED",0);
 	define("ACTION_STATUS_DISABLED",1);
