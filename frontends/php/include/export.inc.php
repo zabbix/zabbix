@@ -29,6 +29,7 @@
 				'host'		=> 'name'),
 			'elements'	=> array(
 				'useip'		=> '',
+				'dns'		=> '',
 				'ip'		=> '',
 				'port'		=> '',
 				'status'	=> '')

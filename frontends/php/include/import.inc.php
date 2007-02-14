@@ -113,8 +113,9 @@
 							$data['name'],
 							10050,
 							HOST_STATUS_TEMPLATE,
-							'no',
-							0,
+							0, /* useip */
+							"", /* dns */
+							"", /* ip */
 							array(),
 							null,
 							array());
@@ -169,18 +170,12 @@
 					
 					if(!isset($data['port']))	$data['port']	= 10050;
 					if(!isset($data['status']))	$data['status']	= 0;
-					if(!isset($data['ip']))
-					{
-						$data['useip']	= 'no';
-						$data['ip']	= 0;
-					}
-					else
-					{
-						$data['useip']	= 'yes';
-					}
+					if(!isset($data['useip']))	$data['useip'] = 0;
+					if(!isset($data['dns']))	$data['dns'] = "";
+					if(!isset($data['ip']))		$data['ip'] = "";
 
 					if(update_host($data['hostid'], $data['name'], $data['port'], $data['status'],
-						$data['useip'], $data['ip'], $data['templates'], null, $data['groups']))
+						$data['useip'], $data['dns'], $data['ip'], $data['templates'], null, $data['groups']))
 					{
 						info('Host ['.$data['name'].'] updated');
 					}
