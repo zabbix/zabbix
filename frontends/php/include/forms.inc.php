@@ -1170,7 +1170,6 @@
 
 		$frmItem->AddVar("config",get_request("config",0));
 		if(isset($_REQUEST["groupid"]))
-			$frmItem->AddVar("groupid",$_REQUEST["groupid"]);
 
 		$frmItem->AddVar("hostid",$_REQUEST["hostid"]);
 
@@ -1643,7 +1642,6 @@
 		$trapper_hosts	= get_request("trapper_hosts"	,"");
 		$units		= get_request("units"		,'');
 		$valuemapid	= get_request("valuemapid"	,0);
-		$multiplier	= get_request("multiplier"	,0);
 		$delta		= get_request("delta"		,0);
 		$trends		= get_request("trends"		,365);
 		$applications	= get_request("applications"	,array());
@@ -1738,7 +1736,7 @@
 			new CTextBox('units',$units,40));
 
 		$frmItem->AddRow(array( new CVisibilityBox('formula_visible', get_request('formula_visible'), 'formula', S_ORIGINAL),
-			S_CUSTOM_MULTIPLIER), new CTextBox('formula',$formula,40));
+			S_CUSTOM_MULTIPLIER.' (0 - '.S_DISABLED.')'), new CTextBox('formula',$formula,40));
 
 		$frmItem->AddRow(array( new CVisibilityBox('delay_visible', get_request('delay_visible'), 'delay', S_ORIGINAL),
 			S_UPDATE_INTERVAL_IN_SEC), new CNumericBox('delay',$delay,5));
