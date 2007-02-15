@@ -594,6 +594,10 @@ table.sub_menu tr td
 	padding-bottom: 0px;
 }
 
+table.sub_menu tr td span.active a
+{
+	color: #ffcc00;
+}
 
 /**************** FORM ELEMENTS ****************/
 .biginput
