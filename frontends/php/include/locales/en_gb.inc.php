@@ -974,6 +974,7 @@
 	"S_TRIGGER"=>				"Trigger",
 	"S_SERVER"=>				"Server",
 	"S_DELETE"=>				"Delete",
+	"S_CLONE"=>				"Clone",
 	"S_DELETE_SELECTED"=>			"Delete selected",
 	"S_DELETE_SELECTED_SERVICES"=>		"Delete selected services?",
 	"S_DELETE_SELECTED_LINKS"=>		"Delete selected links?",

@@ -68,6 +68,7 @@ include_once "include/page_header.php";
 		"group_disable"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"group_delete"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"copy"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"clone"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
@@ -96,7 +97,12 @@ include_once "include/page_header.php";
 	$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE, null, null, $ZBX_CURNODEID);
 
 /* FORM ACTIONS */
-	if(isset($_REQUEST["save"]))
+	if(isset($_REQUEST["clone"]) && isset($_REQUEST["triggerid"]))
+	{
+		unset($_REQUEST["triggerid"]);
+		$_REQUEST["form"] = "clone";
+	}
+	else if(isset($_REQUEST["save"]))
 	{
 		show_messages();
 		if(!check_right_on_trigger_by_expression(PERM_READ_WRITE, $_REQUEST["expression"]))

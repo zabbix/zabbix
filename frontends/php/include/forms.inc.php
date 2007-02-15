@@ -206,6 +206,8 @@
 		if(isset($_REQUEST["httptestid"]))
 		{
 			$form->AddItemToBottomRow(SPACE);
+			$form->AddItemToBottomRow(new CButton("clone",S_CLONE));
+			$form->AddItemToBottomRow(SPACE);
 			$form->AddItemToBottomRow(new CButtonDelete(S_DELETE_SCENARIO_Q,
 				url_param("form").url_param("httptestid").url_param('hostid')));
 		}
@@ -1569,14 +1571,21 @@
 		}
 
 		$frmRow = array(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["itemid"]) && !isset($limited))
+		if(isset($_REQUEST["itemid"]))
 		{
 			array_push($frmRow,
 				SPACE,
-				new CButtonDelete("Delete selected item?",
-					url_param("form").url_param("groupid").url_param("hostid").url_param("config").
-					url_param("itemid"))
-			);
+				new CButton("clone",S_CLONE));
+
+			if(!isset($limited))
+			{
+				array_push($frmRow,
+					SPACE,
+					new CButtonDelete("Delete selected item?",
+						url_param("form").url_param("groupid").url_param("hostid").url_param("config").
+						url_param("itemid"))
+				);
+			}
 		}
 		array_push($frmRow,
 			SPACE,
@@ -2019,6 +2028,8 @@
 		if(isset($_REQUEST["triggerid"]))
 		{
 			$frmTrig->AddItemToBottomRow(SPACE);
+			$frmTrig->AddItemToBottomRow(new CButton("clone",S_CLONE));
+			$frmTrig->AddItemToBottomRow(SPACE);
 			$frmTrig->AddItemToBottomRow(new CButtonDelete("Delete trigger?",
 				url_param("form").url_param("groupid").url_param("hostid").
 				url_param("triggerid")));
@@ -2224,6 +2235,8 @@
 		$frmGraph->AddItemToBottomRow(new CButton("save",S_SAVE));
 		if(isset($_REQUEST["graphid"]))
 		{
+			$frmGraph->AddItemToBottomRow(SPACE);
+			$frmGraph->AddItemToBottomRow(new CButton("clone",S_CLONE));
 			$frmGraph->AddItemToBottomRow(SPACE);
 			$frmGraph->AddItemToBottomRow(new CButtonDelete(S_DELETE_GRAPH_Q,url_param("graphid").
 				url_param("groupid").url_param("hostid")));
@@ -2804,6 +2817,8 @@
 		$frmAction->AddItemToBottomRow(new CButton('save',S_SAVE));
 		if(isset($_REQUEST["actionid"]))
 		{
+			$frmAction->AddItemToBottomRow(SPACE);
+			$frmAction->AddItemToBottomRow(new CButton('clone',S_CLONE));
 			$frmAction->AddItemToBottomRow(SPACE);
 			$frmAction->AddItemToBottomRow(new CButtonDelete("Delete selected action?",
 				url_param("form").url_param("actiontype").url_param("actionid").
@@ -3601,8 +3616,8 @@
 		$frmHost->AddItemToBottomRow(new CButton("save",S_SAVE));
 		if(isset($_REQUEST["hostid"]))
 		{
-//			$frmHost->AddItemToBottomRow(SPACE);
-//			$frmHost->AddItemToBottomRow(new CButton("register","add items from template"));
+			$frmHost->AddItemToBottomRow(SPACE);
+			$frmHost->AddItemToBottomRow(new CButton("clone",S_CLONE));
 			$frmHost->AddItemToBottomRow(SPACE);
 			$frmHost->AddItemToBottomRow(
 				new CButtonDelete(S_DELETE_SELECTED_HOST_Q,
@@ -3646,7 +3661,7 @@
 		if(isset($_REQUEST["groupid"]) && !isset($_REQUEST["form_refresh"]))
 		{
 			$name=$group["name"];
-			$db_hosts=DBselect("select distinct h.hostid from hosts h, hosts_groups hg".
+			$db_hosts=DBselect("select distinct h.hostid,host from hosts h, hosts_groups hg".
 				" where h.status<>".HOST_STATUS_DELETED.
 				" and h.hostid=hg.hostid".
 				" and hg.groupid=".$_REQUEST["groupid"].
@@ -3685,6 +3700,8 @@
 		$frmHostG->AddItemToBottomRow(new CButton("save",S_SAVE));
 		if(isset($_REQUEST["groupid"]))
 		{
+			$frmHostG->AddItemToBottomRow(SPACE);
+			$frmHostG->AddItemToBottomRow(new CButton("clone",S_CLONE));
 			$frmHostG->AddItemToBottomRow(SPACE);
 			$frmHostG->AddItemToBottomRow(
 				new CButtonDelete("Delete selected group?",

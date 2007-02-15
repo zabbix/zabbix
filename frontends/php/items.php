@@ -137,6 +137,7 @@ include_once "include/page_header.php";
 		"register"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		"group_task"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"clone"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		"update"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		"copy"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		"select"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -202,6 +203,11 @@ include_once "include/page_header.php";
 		}
 		unset($_REQUEST["itemid"]);
 		unset($_REQUEST["form"]);
+	}
+	else if(isset($_REQUEST["clone"]) && isset($_REQUEST["itemid"]))
+	{
+		unset($_REQUEST["itemid"]);
+		$_REQUEST["form"] = "clone";
 	}
 	else if(isset($_REQUEST["save"]))
 	{
