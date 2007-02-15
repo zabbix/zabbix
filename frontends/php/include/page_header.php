@@ -252,7 +252,7 @@ COpt::profiling_start("page");
 // End of check permissions
 
 		unset($menu_url);
-		foreach($sub['pages'] as $sub_pages)
+		foreach($sub['pages'] as $id => $sub_pages)
 		{
 				
 			if($page['file'] == $sub_pages['url'])
@@ -280,6 +280,8 @@ COpt::profiling_start("page");
 
 		if(isset($menu_url)) /* active menu */
 		{
+			$sub['pages'][$id]['active'] = true; /* mark as active */
+			
 			$class = "active";
 
 			update_profile('web.menu.'.$label.'.last', $menu_url);
@@ -294,8 +296,11 @@ COpt::profiling_start("page");
 			{
 				if(!isset($sub_pages['label'])) continue;
 
+				$label = new CLink($sub_pages['label'], $sub_pages['url'],'highlight');
+				if(isset($sub_pages['active'])) $label = new CSpan($label, 'active');
+				
 				array_push($sub_menu_row, 
-					new CLink($sub_pages['label'], $sub_pages['url'],'highlight'), 
+					$label,
 					new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider')
 					);
 			}
