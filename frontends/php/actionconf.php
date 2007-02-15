@@ -76,6 +76,7 @@ include_once "include/page_header.php";
 		"add_condition"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"del_condition"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"clone"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 /* other */
@@ -94,7 +95,12 @@ include_once "include/page_header.php";
 	update_profile("web.actionconf.actiontype",$_REQUEST["actiontype"]);
 ?>
 <?php
-	if(isset($_REQUEST["save"]))
+	if(isset($_REQUEST["clone"]) && isset($_REQUEST["actionid"]))
+	{
+		unset($_REQUEST["actionid"]);
+		$_REQUEST["form"] = "clone";
+	}
+	elseif(isset($_REQUEST["save"]))
 	{
 		if($_REQUEST["repeat"]==0)
 		{

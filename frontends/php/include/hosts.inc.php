@@ -771,14 +771,18 @@ require_once "include/items.inc.php";
 
 			if($templateid != null)
 			{
-				$db_tmp_apps = get_applications_by_hostid($db_app["templateid"]);
-				if(is_array($templateid))
+				unset($skip);
+				$db_tmp_apps =& get_applications_by_hostid($db_app["templateid"]);
+				while($tmp_apps_data = DBfetch($db_tmp_apps))
 				{
-					if(!isset($templateid[$db_tmp_app["hostid"]]))
-						continue;
+					if(!isset($templateid[$tmp_app_data["hostid"]]))
+					{
+						$skip = true;
+						break;
+					}
 				}
-				elseif($templateid != $db_tmp_app["hostid"])
-					continue;
+				if(isset($skip)) continue;
+				
 			}
 			
 			if($unlink_mode)

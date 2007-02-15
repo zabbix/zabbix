@@ -66,6 +66,7 @@ include_once "include/page_header.php";
 		"delete_item"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		
 		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"clone"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"copy"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
@@ -87,7 +88,12 @@ include_once "include/page_header.php";
 	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, $ZBX_CURNODEID);
 	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
 
-	if(isset($_REQUEST["save"]))
+	if(isset($_REQUEST["clone"]) && isset($_REQUEST["graphid"]))
+	{
+		unset($_REQUEST["graphid"]);
+		$_REQUEST["form"] = "clone";
+	}
+	else if(isset($_REQUEST["save"]))
 	{
 		$items = get_request('items', array());
 		foreach($items as $gitem)
