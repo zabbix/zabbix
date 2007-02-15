@@ -64,6 +64,7 @@ include_once "include/page_header.php";
 		"showdisabled"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1"),	null),
 
 		"group_task"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"clone"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		"del_sel_step"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -175,6 +176,11 @@ include_once "include/page_header.php";
 		}
 		unset($_REQUEST["httptestid"]);
 		unset($_REQUEST["form"]);
+	}
+	else if(isset($_REQUEST["clone"]) && isset($_REQUEST["httptestid"]))
+	{
+		unset($_REQUEST["httptestid"]);
+		$_REQUEST["form"] = "clone";
 	}
 	else if(isset($_REQUEST["save"]))
 	{

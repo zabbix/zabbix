@@ -92,7 +92,7 @@ include_once "include/page_header.php";
 		"notes"=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
 /* group */
 		"groupid"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'{config}==1&&{form}=="update"'),
-		"gname"=>	array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'{config}==1&&isset({save})'),
+		"gname"=>	array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'{config}==1&&isset({save})'),
 
 /* application */
 		"applicationid"=>array(T_ZBX_INT,O_OPT,	P_SYS,	DB_ID,		'{config}==4&&{form}=="update"'),
@@ -108,6 +108,7 @@ include_once "include/page_header.php";
 		"unlink_and_clear"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	NULL),
 
 		"save"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+		"clone"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"delete_and_clear"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"cancel"=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
@@ -144,6 +145,12 @@ include_once "include/page_header.php";
 			$_REQUEST['clear_templates'] = array_merge($_REQUEST['clear_templates'],$unlink_templates);
 		}
 		foreach($unlink_templates as $id) unset($_REQUEST['templates'][$id]);
+	}
+/* CLONE HOST */
+	elseif(($_REQUEST["config"]==0 || $_REQUEST["config"]==3) && isset($_REQUEST["clone"]) && isset($_REQUEST["hostid"]))
+	{
+		unset($_REQUEST["hostid"]);
+		$_REQUEST["form"] = "clone";
 	}
 /* SAVE HOST */
 	elseif(($_REQUEST["config"]==0 || $_REQUEST["config"]==3) && isset($_REQUEST["save"]))
@@ -306,7 +313,13 @@ include_once "include/page_header.php";
 	}
 
 /****** ACTIONS FOR GROUPS **********/
-	if($_REQUEST["config"]==1&&isset($_REQUEST["save"]))
+/* CLONE HOST */
+	elseif($_REQUEST["config"]==1 && isset($_REQUEST["clone"]) && isset($_REQUEST["groupid"]))
+	{
+		unset($_REQUEST["groupid"]);
+		$_REQUEST["form"] = "clone";
+	}
+	elseif($_REQUEST["config"]==1&&isset($_REQUEST["save"]))
 	{
 		$hosts = get_request("hosts",array());
 		if(isset($_REQUEST["groupid"]))

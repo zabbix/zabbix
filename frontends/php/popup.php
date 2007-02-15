@@ -544,7 +544,7 @@ function add_template(formname,id,name)
 			S_STATUS));
 
 
-		$sql = "select h.host,t.*,count(d.triggerid_up) as dep_count ".
+		$sql = "select h.host,t.triggerid,t.description,t.priority,t.status,count(d.triggerid_up) as dep_count ".
 			" from hosts h,items i,functions f, triggers t left join trigger_depends d on d.triggerid_down=t.triggerid ".
 			" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid".
 			" and ".DBid2nodeid("t.triggerid")."=".$nodeid.
@@ -554,7 +554,7 @@ function add_template(formname,id,name)
 		if(isset($hostid)) 
 			$sql .= " and h.hostid=$hostid";
 
-		$sql .= " group by h.host, t.triggerid".
+		$sql .= " group by h.host, t.triggerid, t.description, t.priority, t.status".
 			" order by h.host,t.description";
 
 		$result=DBselect($sql);

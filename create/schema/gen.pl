@@ -17,11 +17,12 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 use Switch;
+use File::Basename;
 
-$file = 'schema.sql';		# Name the file
-open(INFO, $file);		# Open the file
-@lines = <INFO>;		# Read it into an array
-close(INFO);			# Close the file
+$file = dirname($0)."/schema.sql";	# Name the file
+open(INFO, $file);			# Open the file
+@lines = <INFO>;			# Read it into an array
+close(INFO);				# Close the file
 
 local $output;
 
@@ -229,7 +230,7 @@ sub process_index
 
 sub usage
 {
-	printf "Usage: gen.pl [c|mysql|oracle|php|postgresql|sqlite]\n";
+	printf "Usage: $0 [c|mysql|oracle|php|postgresql|sqlite]\n";
 	printf "The script generates ZABBIX SQL schemas and C/PHP code for different database engines.\n";
 	exit;
 }
