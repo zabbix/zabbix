@@ -25,8 +25,13 @@
         $page["title"] = "S_INSTALLATION";
         $page["file"] = "instal.php";
 
-include_once "include/page_header.php"
+include_once "include/page_header.php";
+include_once "setup.php";
+include_once "include/page_footer.php";
 
+/*******************************/
+/* THIS POINT NEVER BE REACHED */
+/*******************************/
 ?>
 <?php
 	$fields=array(
