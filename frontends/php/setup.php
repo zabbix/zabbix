@@ -25,7 +25,8 @@
         $page["title"] = "S_INSTALLATION";
         $page["file"] = "setup.php";
 
-	define('ZBX_PAGE_NO_MENU', false);
+	if(!defined("PAGE_HEADER_LOADED"))
+		define('ZBX_PAGE_NO_MENU', 1);
 
 ?>
 <?php
