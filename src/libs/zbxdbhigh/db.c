@@ -34,6 +34,7 @@
 #include "zlog.h"
 #include "common.h"
 #include "actions.h"
+#include "events.h"
 
 void	DBclose(void)
 {

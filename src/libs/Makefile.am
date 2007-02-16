@@ -14,12 +14,17 @@ DIST_SUBDIRS = \
 	zbxconf \
 	zbxsysinfo \
 	zbxplugin \
-	zbxsys 
+	zbxsys \
+	zbxjabber
 
 if SERVER
 SERVER_SUBDIRS = zbxdb zbxdbhigh zbxemail zbxsms zbxcomms
 endif
 
-SUBDIRS = zbxcrypto zbxcommon zbxlog zbxnet zbxnix zbxconf zbxsysinfo zbxplugin zbxsys $(SERVER_SUBDIRS)
+if JABBER
+JABBER_SUBDIRS = zbxjabber
+endif
+
+SUBDIRS = zbxcrypto zbxcommon zbxlog zbxnet zbxnix zbxconf zbxsysinfo zbxplugin zbxsys $(JABBER_SUBDIRS) $(SERVER_SUBDIRS)
 
 EXTRA_DISTR = zbxwin32

@@ -23,6 +23,10 @@ zabbix_server_SOURCES = \
 	functions.c functions.h \
 	server.c
 
+if JABBER 
+JABBER_LDADD = $(top_srcdir)/src/libs/zbxjabber/libzbxjabber.a
+endif
+
 zabbix_server_LDADD = \
 	alerter/libzbxalerter.a \
 	pinger/libzbxpinger.a \
@@ -47,8 +51,9 @@ zabbix_server_LDADD = \
 	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
-	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a
+	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
+	$(JABBER_LDADD)
 
-zabbix_server_CPPFLAGS = -DZABBIX_DAEMON $(DB_CPPFLAGS) $(SNMP_CPPFLAGS) $(LDAP_CPPFLAGS) $(LIBCURL_CPPFLAGS)
+zabbix_server_CPPFLAGS = -DZABBIX_DAEMON $(DB_CPPFLAGS) $(SNMP_CPPFLAGS) $(LDAP_CPPFLAGS) $(LIBCURL_CPPFLAGS) $(JABBER_CPPFLAGS)
 
-zabbix_server_LDFLAGS = $(DB_LDFLAGS) $(SNMP_LDFLAGS) $(LDAP_LDFLAGS) $(LIBCURL_LDFLAGS)
+zabbix_server_LDFLAGS = $(DB_LDFLAGS) $(SNMP_LDFLAGS) $(LDAP_LDFLAGS) $(LIBCURL_LDFLAGS) $(JABBER_LDFLAGS)

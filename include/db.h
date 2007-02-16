@@ -250,6 +250,8 @@ DB_MEDIATYPE
 	char	*smtp_email;
 	char	*exec_path;
 	char	*gsm_modem;
+	char	*username;
+	char	*passwd;
 };
 
 DB_TRIGGER
