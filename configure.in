@@ -501,7 +501,7 @@ AM_CONDITIONAL(AGENT, test x$agent = xyes)
 have_db="no"
 
 if test "$server" = "yes"; then
-	
+
 	dnl Checking for Oracle support
 	LIBSQLORA8_CHECK_CONFIG()
 	if test "x$want_sqlora8" = "xyes"; then
@@ -590,7 +590,18 @@ if test "$server" = "yes"; then
 
 	AC_SUBST(DB_CPPFLAGS)
 	AC_SUBST(DB_LDFLAGS)
+
+	dnl Checking for Jabber libraries
+	JABBER_CHECK_CONFIG()
+	if test "x$want_jabber" = "xyes"; then
+		if test "x$found_jabber" != "xyes"; then
+			AC_MSG_ERROR([Not found Jabber library]);
+		fi
+	fi
+	
 fi
+
+AM_CONDITIONAL(JABBER,  test "x$found_jabber" = "xyes")
 
 dnl Check for NET-SNMP [by default - skip]
 LIBNETSNMP_CHECK_CONFIG([no])
@@ -707,7 +718,7 @@ AC_SUBST(ARCH)
 AC_OUTPUT([Makefile src/Makefile src/libs/Makefile src/libs/zbxlog/Makefile src/libs/zbxcrypto/Makefile
 	src/libs/zbxnet/Makefile src/libs/zbxconf/Makefile src/zabbix_sender/Makefile
 	src/libs/zbxdbhigh/Makefile src/libs/zbxemail/Makefile src/libs/zbxsysinfo/Makefile src/libs/zbxsms/Makefile
-	src/zabbix_server/pinger/Makefile src/zabbix_agent/Makefile
+	src/zabbix_server/pinger/Makefile src/zabbix_agent/Makefile src/libs/zbxjabber/Makefile
 	src/zabbix_server/housekeeper/Makefile src/zabbix_server/alerter/Makefile src/zabbix_server/Makefile
 	src/zabbix_server/trapper/Makefile src/zabbix_server/poller/Makefile src/zabbix_server/timer/Makefile
 	src/zabbix_server/nodewatcher/Makefile src/zabbix_server/utils/Makefile src/zabbix_server/httppoller/Makefile
