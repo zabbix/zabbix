@@ -35,6 +35,7 @@
 #include "common.h"
 #include "actions.h"
 #include "events.h"
+#include "threads.h"
 
 void	DBclose(void)
 {
@@ -48,17 +49,13 @@ void	DBclose(void)
  */ 
 void    DBconnect(int flag)
 {
-	int	i;
+	int	err;
 
-	int	loop = 0;
+	do {
+		err = zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME, CONFIG_DBSOCKET, CONFIG_DBPORT);
 
-	while(loop == 0)
-	{
-		i = zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD, CONFIG_DBNAME, CONFIG_DBSOCKET, CONFIG_DBPORT);
-
-		switch(i) {
+		switch(err) {
 			case ZBX_DB_OK:
-				loop = 1;
 				break;
 			case ZBX_DB_DOWN:
 				if(flag == ZBX_DB_CONNECT_EXIT)
@@ -68,13 +65,13 @@ void    DBconnect(int flag)
 				else
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "Database is down. Reconnecting in 10 seconds");
-					sleep(10);
+					zbx_sleep(10);
 				}
 				break;
 			default:
 				exit(FAIL);
 		}
-	}
+	} while(ZBX_DB_OK != err);
 }
 
 /******************************************************************************

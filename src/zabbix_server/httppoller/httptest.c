@@ -104,8 +104,10 @@ static size_t WRITEFUNCTION2( void *ptr, size_t size, size_t nmemb, void *stream
 
 static size_t HEADERFUNCTION2( void *ptr, size_t size, size_t nmemb, void *stream)
 {
-//	ZBX_LIM_PRINT("HEADERFUNCTION", size*nmemb, ptr, 300);
-//	zabbix_log(LOG_LEVEL_WARNING, "In HEADERFUNCTION");
+/*	
+	ZBX_LIM_PRINT("HEADERFUNCTION", size*nmemb, ptr, 300);
+	zabbix_log(LOG_LEVEL_WARNING, "In HEADERFUNCTION");
+*/
 
 	return size*nmemb;
 }

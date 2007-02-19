@@ -941,7 +941,7 @@ int getPROC2(char *file, char *param, int fieldno, unsigned flags, int type, AGE
 		return SYSINFO_RET_FAIL;
 	}
 
-	// find line
+	/* find line */
 	found = 0;
 	while ( fgets(buf, MAX_STRING_LEN, f) != NULL ) 
 	{
@@ -954,8 +954,8 @@ int getPROC2(char *file, char *param, int fieldno, unsigned flags, int type, AGE
 
 	if (!found) return SYSINFO_RET_FAIL;
 
-	// find field
-	res = (char *)strtok(buf, " "); // btime field1 field2
+	/* find field */
+	res = (char *)strtok(buf, " "); /* btime field1 field2 */
 	for(i=1; i<=fieldno; i++)
 	{
 		res = (char *)strtok(NULL," ");
@@ -968,7 +968,7 @@ int getPROC2(char *file, char *param, int fieldno, unsigned flags, int type, AGE
 		return SYSINFO_RET_FAIL;
 	}
 
-	// convert field to right type
+	/* convert field to right type */
 	switch (type)
 	{
 	case AR_UINT64:
@@ -1272,7 +1272,7 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Unable to create process: '%s' [%s]", command, strerror_from_system(GetLastError()));
 
-		// Remove temporary file
+		/* Remove temporary file */
 		CloseHandle(hOutput);
 		DeleteFile(szTempFile);
 
@@ -1292,7 +1292,7 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 
 	cmd_result[len] = '\0';
 	
-	// Remove temporary file
+	/* Remove temporary file */
 	CloseHandle(hOutput);
 	DeleteFile(szTempFile);
 

@@ -133,7 +133,7 @@ int	find_char(char *str,char c)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-//#define ZBX_STDERR_FILE "zbx_errors.log"
+/* #define ZBX_STDERR_FILE "zbx_errors.log" */
 
 void zbx_error(const char *fmt, ...)
 {

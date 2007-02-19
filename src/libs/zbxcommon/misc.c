@@ -224,7 +224,6 @@ int	calculate_item_nextcheck(int itemid, int item_type, int delay, char *delay_f
  ******************************************************************************/
 int	check_time_period(const char *period, time_t now)
 {
-	//time_t	now;
 	char	tmp[MAX_STRING_LEN];
 	char	*s;
 	int	d1,d2,h1,h2,m1,m2;

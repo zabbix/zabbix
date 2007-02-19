@@ -89,7 +89,7 @@ void	update_functions(DB_ITEM *item)
 		function.function=row[0];
 		function.parameter=row[1];
 		ZBX_STR2UINT64(function.itemid,row[2]);
-//		function.itemid=atoi(row[2]);
+/*		function.itemid=atoi(row[2]); */
 		lastvalue=row[3];
 
 		zabbix_log( LOG_LEVEL_DEBUG, "ItemId:" ZBX_FS_UI64 " Evaluating %s(%d)",
@@ -154,7 +154,6 @@ void	update_services_rec(zbx_uint64_t serviceid)
 	while((row=DBfetch(result)))
 	{
 		ZBX_STR2UINT64(serviceupid,row[0]);
-//		serviceupid=atoi(row[0]);
 		algorithm=atoi(row[1]);
 		if(SERVICE_ALGORITHM_NONE == algorithm)
 		{

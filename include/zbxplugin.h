@@ -43,13 +43,13 @@ typedef struct
 
 struct zbx_plugin_list
 {
-	struct zbx_plugin_list	*next;	// Pointer to next element in a chain
+	struct zbx_plugin_list	*next;	/* Pointer to next element in a chain */
 
-	ZBX_MODULE	hModule;	// DLL module handle
+	ZBX_MODULE	hModule;	/* DLL module handle */
 	int		runned;
 	int	(__zabbix_api * init)(char *,ZBX_PLUGIN_ARGS **);
 	void	(__zabbix_api * shutdown)(void);
-	ZBX_PLUGIN_ARGS *args;       // List of subagent's commands
+	ZBX_PLUGIN_ARGS *args;       /* List of subagent's commands */
 };
 
 typedef struct zbx_plugin_list ZBX_PLUGIN_LIST;

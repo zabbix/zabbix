@@ -26,9 +26,9 @@
 #define	PARM_OPT	0
 #define	PARM_MAND	1
 
-//
-// Application flags
-//
+/*
+ * Application flags
+ */
 
 #define AF_STANDALONE               0x0001
 #define AF_USE_EVENT_LOG            0x0002

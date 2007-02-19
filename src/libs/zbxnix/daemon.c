@@ -20,6 +20,7 @@
 #include "common.h"
 #include "daemon.h"
 
+#include "mutexs.h"
 #include "pid.h"
 #include "cfg.h"
 #include "log.h"
@@ -147,7 +148,7 @@ int	daemon_start(int allow_root)
 
 #endif /* HAVE_SYS_RESOURCE_SETPRIORITY */
 
-//------------------------------------------------
+/*------------------------------------------------*/
 
 	if( FAIL == create_pid_file(APP_PID_FILE))
 	{

@@ -47,21 +47,23 @@
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_mutex_create                                                 *
+ * Function: zbx_mutex_create_ext                                             *
  *                                                                            *
  * Purpose: Create the mutex                                                  *
  *                                                                            *
  * Parameters:  mutex - handle of mutex                                       *
+ *              name - name of mutex (index for nix system)                   *
+ *              forced - remove mutex if exist (only for nix)                 *
  *                                                                            *
  * Return value: If the function succeeds, the return ZBX_MUTEX_OK,           *
  *               ZBX_MUTEX_ERROR on an error                                  *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
- * Comments:                                                                  *
+ * Comments: you can use alias 'zbx_mutex_create' and 'zbx_mutex_create_force'*
  *                                                                            *
  ******************************************************************************/
-int zbx_mutex_create(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name)
+int zbx_mutex_create_ext(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, unsigned char forced)
 {
 #if defined(_WINDOWS)	
 
@@ -89,11 +91,11 @@ int zbx_mutex_create(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name)
 		}
 	}			
 
+lbl_create:
 	if ( -1 != (ZBX_SEM_LIST_ID = semget(sem_key, ZBX_MUTEX_COUNT, IPC_CREAT | IPC_EXCL | 0666 /* 0022 */)) )
 	{
 		/* set default semaphore value */
 		semopts.val = 1;
-		
 		for ( i = 0; i < ZBX_MUTEX_COUNT; i++ )
 		{
 			if(-1 == semctl(ZBX_SEM_LIST_ID, i, SETVAL, semopts))
@@ -110,6 +112,11 @@ int zbx_mutex_create(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name)
 	{
 		ZBX_SEM_LIST_ID = semget(sem_key, ZBX_MUTEX_COUNT, 0666 /* 0022 */);
 		semopts.buf = &seminfo;
+
+		if(forced) {
+			semctl(ZBX_SEM_LIST_ID, 0, IPC_RMID, 0);
+			goto lbl_create;
+		}
 		
 		/* wait for initialization */
 		for ( i = 0; i < ZBX_MUTEX_MAX_TRIES; i++)
