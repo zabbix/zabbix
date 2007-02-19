@@ -263,7 +263,7 @@ DB_TRIGGER
 	char	*comments;
 	int	status;
 	int	value;
-//	int	prevvalue;
+/*	int	prevvalue; */
 	int	priority;
 };
 

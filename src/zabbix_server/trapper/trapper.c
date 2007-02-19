@@ -106,12 +106,12 @@ int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 		/* Node data exchange? */
 		if(strncmp(s,"Data",4) == 0)
 		{
-//			zabbix_log( LOG_LEVEL_WARNING, "Node data received [len:%d]", strlen(s));
+/*			zabbix_log( LOG_LEVEL_WARNING, "Node data received [len:%d]", strlen(s)); */
 			if(node_sync(s) == SUCCEED)
 			{
 				zbx_snprintf(result,sizeof(result),"OK\n");
 				if( zbx_tcp_send(sock,result) != SUCCEED)
-//				if( write(sockfd,result,strlen(result)) == -1)
+/*				if( write(sockfd,result,strlen(result)) == -1) */
 				{
 					zabbix_log( LOG_LEVEL_WARNING, "Error sending confirmation to node");
 					zabbix_syslog("Trapper: error sending confirmation to node");
@@ -122,11 +122,11 @@ int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 		/* Slave node events? */
 		if(strncmp(s,"Events",6) == 0)
 		{
-//			zabbix_log( LOG_LEVEL_WARNING, "Slave node events received [len:%d]", strlen(s));
+/*			zabbix_log( LOG_LEVEL_WARNING, "Slave node events received [len:%d]", strlen(s)); */
 			if(node_events(s) == SUCCEED)
 			{
 				zbx_snprintf(result,sizeof(result),"OK\n");
-//				if( write(sockfd,result,strlen(result)) == -1)
+/*				if( write(sockfd,result,strlen(result)) == -1) */
 				if( zbx_tcp_send(sock,result) != SUCCEED)
 				{
 					zabbix_log( LOG_LEVEL_WARNING, "Error sending confirmation to node");
@@ -138,11 +138,11 @@ int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 		/* Slave node history ? */
 		if(strncmp(s,"History",7) == 0)
 		{
-//			zabbix_log( LOG_LEVEL_WARNING, "Slave node history received [len:%d]", strlen(s));
+/*			zabbix_log( LOG_LEVEL_WARNING, "Slave node history received [len:%d]", strlen(s)); */
 			if(node_history(s) == SUCCEED)
 			{
 				zbx_snprintf(result,sizeof(result),"OK\n");
-//				if( write(sockfd,result,strlen(result)) == -1)
+/*				if( write(sockfd,result,strlen(result)) == -1) */
 				if( zbx_tcp_send(sock,result) != SUCCEED)
 				{
 					zabbix_log( LOG_LEVEL_WARNING, "Error sending confirmation to node]");
@@ -206,10 +206,10 @@ int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 		{
 			zbx_snprintf(result,sizeof(result),"NOT OK");
 		}
-//		zabbix_log( LOG_LEVEL_WARNING, "Sending back [%s]", result);
+/*		zabbix_log( LOG_LEVEL_WARNING, "Sending back [%s]", result); */
 		zabbix_log( LOG_LEVEL_DEBUG, "Length [%d]", strlen(result));
 		if( zbx_tcp_send(sock,result) != SUCCEED)
-//		if( write(sockfd,result,strlen(result)) == -1)
+/*		if( write(sockfd,result,strlen(result)) == -1) */
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Error sending result back");
 			zabbix_syslog("Trapper: error sending result back");

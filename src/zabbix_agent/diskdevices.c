@@ -31,7 +31,7 @@ void	collect_stats_diskdevices(ZBX_DISKDEVICES_DATA *pdiskdevices)
 
 #if OFF && (!defined(_WINDOWS) || (defined(TODO) && defined(_WINDOWS)))
 
-//TODO!!! Make same as cpustat.c
+/*TODO!!! Make same as cpustat.c */
 
 #include <netdb.h>
 

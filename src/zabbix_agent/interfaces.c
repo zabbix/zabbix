@@ -31,7 +31,7 @@ void	collect_stats_interfaces(ZBX_INTERFACES_DATA *pinterfaces)
 
 #if OFF && (!defined(_WINDOWS) || (defined(TODO) && defined(_WINDOWS)))
 
-//TODO!!! Make same as cpustat.c
+/*TODO!!! Make same as cpustat.c*/
 
 #include <netdb.h>
 
