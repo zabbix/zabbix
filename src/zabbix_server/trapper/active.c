@@ -74,7 +74,7 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *host)
 	{
 		zbx_snprintf(s,sizeof(s),"%s:%s:%s\n",row[0],row[1],row[2]);
 		zabbix_log( LOG_LEVEL_DEBUG, "Sending [%s]", s);
-//		if( write(sockfd,s,strlen(s)) == -1 )
+/*		if( write(sockfd,s,strlen(s)) == -1 ) */
 		if( zbx_tcp_send(sock,s) != SUCCEED )
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Error while sending list of active checks");
@@ -86,7 +86,7 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *host)
 
 	zbx_snprintf(s,sizeof(s),"%s\n","ZBX_EOF");
 	zabbix_log( LOG_LEVEL_DEBUG, "Sending [%s]", s);
-//	if( write(sockfd,s,strlen(s)) == -1 )
+/*	if( write(sockfd,s,strlen(s)) == -1 ) */
 	if( zbx_tcp_send(sock,s) != SUCCEED )
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Error while sending list of active checks");

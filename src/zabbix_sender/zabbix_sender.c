@@ -145,7 +145,7 @@ int main(int argc, char **argv)
 {
 	int	ret=SUCCEED;
 	char	line[MAX_STRING_LEN];
-	char	port_str[MAX_STRING_LEN]="10051"; // default value
+	char	port_str[MAX_STRING_LEN]="10051"; /* default value */
 	char	zabbix_server[MAX_STRING_LEN]="";
 	char	server[MAX_STRING_LEN]="";
 	char	key[MAX_STRING_LEN]="";
@@ -188,7 +188,7 @@ int main(int argc, char **argv)
 		
 		alarm(SENDER_TIMEOUT);
 
-		//printf("Run with options: z=%s, p=%s, s=%s, k=%s, o=%s\n", zabbix_server, port_str, server, key, value);
+		/*printf("Run with options: z=%s, p=%s, s=%s, k=%s, o=%s\n", zabbix_server, port_str, server, key, value);*/
 		ret = send_value(zabbix_server, atoi(port_str), server, key, value,"0");
 
 		alarm(0);
@@ -221,7 +221,7 @@ int main(int argc, char **argv)
 			strscpy(key,s);
 			s=(char *)strtok(NULL," ");
 			strscpy(value,s);
-			//printf("Run with options from file(%s): z=%s, s=%s, p=%s, k=%s, o=%s\n", input_file, zabbix_server, server, port_str, key, value);
+			/*printf("Run with options from file(%s): z=%s, s=%s, p=%s, k=%s, o=%s\n", input_file, zabbix_server, server, port_str, key, value);*/
 			ret = send_value(zabbix_server,atoi(port_str),server,key,value,"0");
 
 			alarm(0);

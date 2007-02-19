@@ -333,8 +333,16 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
 
 void test()
 {
+	char error[MAX_STRING_LEN];
+
 	printf("-= Test Started =-\n");
 	
+	printf("send_jabber result '%i'\n",
+		send_jabber("zabbix@xmpp.ru", "zabbixthebest", "zabbix@xmpp.ru", "test from ZABBIX server", error, sizeof(error))
+		);
+
+	printf("send_jabber error: '%s'\n", error);
+		
 	printf("\n-= Test completed =-\n");
 }
 #endif /* TEST */
@@ -454,6 +462,8 @@ int main(int argc, char **argv)
 	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_server. ZABBIX %s.", ZABBIX_VERSION);
 
 	test();
+
+	zbx_on_exit();
 	return 0;
 #endif /* TEST */
 	

@@ -80,7 +80,7 @@ int     zbx_tcp_connect(zbx_sock_t *s, char *ip, int port)
 
 	if(NULL == (hp = zbx_gethost(ip)))
 	{
-//		zabbix_log( LOG_LEVEL_WARNING, "Cannot resolve [%s]", ip);
+/*		zabbix_log( LOG_LEVEL_WARNING, "Cannot resolve [%s]", ip); */
 		return	FAIL;
 	}
 
@@ -91,7 +91,7 @@ int     zbx_tcp_connect(zbx_sock_t *s, char *ip, int port)
 	s->socket = socket(AF_INET,SOCK_STREAM,0);
 	if(s->socket == -1)
 	{
-//		zabbix_log( LOG_LEVEL_WARNING, "Cannot create socket [%s:%d] [%s]", ip, port ,strerror(errno));
+/*		zabbix_log( LOG_LEVEL_WARNING, "Cannot create socket [%s:%d] [%s]", ip, port ,strerror(errno)); */
 		return	FAIL;
 	}
 
@@ -101,7 +101,7 @@ int     zbx_tcp_connect(zbx_sock_t *s, char *ip, int port)
 
 	if( connect(s->socket,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
 	{
-//		zabbix_log( LOG_LEVEL_WARNING, "Cannot connect to [%s:%d] [%s]", ip, port, strerror(errno));
+/*		zabbix_log( LOG_LEVEL_WARNING, "Cannot connect to [%s:%d] [%s]", ip, port, strerror(errno)); */
 		zbx_tcp_close(s);
 		return	FAIL;
 	}

@@ -27,7 +27,7 @@
 #define MAX_INSERT_STRS 64
 #define MAX_MSG_LENGTH 1024
 
-// open event logger and return number of records
+/* open event logger and return number of records */
 static long    zbx_open_eventlog(
 	char	*source,
 	HANDLE	*eventlog_handle,
@@ -42,17 +42,17 @@ static long    zbx_open_eventlog(
 	*eventlog_handle = 0;
 	*pNumRecords = 0;
 
-	eventlog_handle = OpenEventLog(NULL, source);              // open log file
+	eventlog_handle = OpenEventLog(NULL, source);              /* open log file */
 
 	if (!eventlog_handle)	return GetLastError();
 
-	GetNumberOfEventLogRecords(eventlog_handle,(unsigned long*)pNumRecords); // get number of records
+	GetNumberOfEventLogRecords(eventlog_handle,(unsigned long*)pNumRecords); /* get number of records */
 	GetOldestEventLogRecord(eventlog_handle,(unsigned long*)pLatestRecord);
 
 	return(0);
 }
 
-// close event logger
+/* close event logger */
 static long	zbx_close_eventlog(HANDLE eventlog_handle)
 {
 	if (eventlog_handle)  CloseEventLog(eventlog_handle);
@@ -60,7 +60,7 @@ static long	zbx_close_eventlog(HANDLE eventlog_handle)
 	return(0);
 }
 
-// get Nth error from event log. 1 is the first.
+/* get Nth error from event log. 1 is the first. */
 static long    zbx_get_eventlog_message(
 		char *source,
 		HANDLE eventlog_handle,
@@ -83,9 +83,9 @@ static long    zbx_get_eventlog_message(
     DWORD           Type;
     HINSTANCE       hLib = NULL;                        /* handle to the messagetable DLL */
     char            *pCh = NULL, *pFile = NULL, *pNextFile = NULL;
-    char            *aInsertStrs[MAX_INSERT_STRS];      // array of pointers to insert
+    char            *aInsertStrs[MAX_INSERT_STRS];      /* array of pointers to insert */
     long            i;
-    LPTSTR          msgBuf = NULL;                       // hold text of the error message that we
+    LPTSTR          msgBuf = NULL;                       /* hold text of the error message that we */
     long            err = 0;
 
 	if (!eventlog_handle)        return(0);
@@ -104,16 +104,16 @@ static long    zbx_get_eventlog_message(
 		return GetLastError();
 	}
 
-	pELR = (EVENTLOGRECORD*)bBuffer;                    // point to data
+	pELR = (EVENTLOGRECORD*)bBuffer;                    /* point to data */
 
-	*pTime		= (double)pELR->TimeGenerated;		// return double timestamp
-	*pType		= pELR->EventType;                  // return event type
-	*pCategory	= pELR->EventCategory;				// return category
-	*timestamp	= pELR->TimeGenerated;				// return timestamp
+	*pTime		= (double)pELR->TimeGenerated;		/* return double timestamp */
+	*pType		= pELR->EventType;                  /* return event type */
+	*pCategory	= pELR->EventCategory;				/* return category */
+	*timestamp	= pELR->TimeGenerated;				/* return timestamp */
 
-	strcpy(pSource,((char*)pELR + sizeof(EVENTLOGRECORD)));// copy source name
+	strcpy(pSource,((char*)pELR + sizeof(EVENTLOGRECORD)));/* copy source name */
 
-// Get path to message dll
+/* Get path to message dll */
 	strcpy(temp,"SYSTEM\\CurrentControlSet\\Services\\EventLog\\");
 	strcat(temp,source);
 	strcat(temp,"\\");
@@ -177,7 +177,7 @@ static long    zbx_get_eventlog_message(
 
 				if(msgBuf)
 				{
-					strcpy(pMessage,msgBuf);                    // copy message
+					strcpy(pMessage,msgBuf);                    /* copy message */
 					err = 0;
 
 					/* Free the buffer that FormatMessage allocated for us. */

@@ -89,12 +89,12 @@ static	void	send_to_user_medias(DB_EVENT *event,DB_ACTION *action, zbx_uint64_t 
 		zabbix_log( LOG_LEVEL_DEBUG, "Trigger severity [%d] Media severity [%d] Period [%s]",event->trigger_priority, media.severity, media.period);
 		if(((1<<event->trigger_priority)&media.severity)==0)
 		{
-			zabbix_log( LOG_LEVEL_DEBUG, "Won't send message");
+			zabbix_log( LOG_LEVEL_DEBUG, "Won't send message (severity)");
 			continue;
 		}
 		if(check_time_period(media.period, (time_t)NULL) == 0)
 		{
-			zabbix_log( LOG_LEVEL_DEBUG, "Won't send message");
+			zabbix_log( LOG_LEVEL_DEBUG, "Won't send message (period)");
 			continue;
 		}
 

@@ -526,7 +526,7 @@ include_once "include/page_header.php";
 	{
 		echo BR;
 		insert_copy_elements_to_forms("group_itemid");
-	} elseif (!(isset($_REQUEST["form"]) && ($_REQUEST["form"]==S_CREATE_ITEM || $_REQUEST["form"]=="update"))) {
+	} elseif (!isset($_REQUEST["form"]) ||  !in_array($_REQUEST["form"],array(S_CREATE_ITEM,"update","clone"))) {
 		echo BR;
 // Table HEADER
 		$form = new CForm();
@@ -824,7 +824,7 @@ include_once "include/page_header.php";
 
 	}
 
-	if(isset($_REQUEST["form"]) && ($_REQUEST["form"]==S_CREATE_ITEM || $_REQUEST["form"]=="update" || 
+	if(isset($_REQUEST["form"]) && (in_array($_REQUEST["form"],array(S_CREATE_ITEM,"update","clone")) ||
 		($_REQUEST["form"]=="mass_update" && isset($_REQUEST['group_itemid']))))
 	{
 // FORM

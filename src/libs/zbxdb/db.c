@@ -35,16 +35,16 @@
 
 #ifdef	HAVE_SQLITE3
 	int		sqlite_transaction_started = 0;
-	sqlite3		*sqlite;
+	sqlite3		*conn = NULL;
 	PHP_MUTEX	sqlite_access;
 #endif
 
 #ifdef	HAVE_MYSQL
-	MYSQL	mysql;
+	MYSQL	*conn = NULL;
 #endif
 
 #ifdef	HAVE_POSTGRESQL
-	PGconn	*conn;
+	PGconn	*conn = NULL;
 #endif
 
 #ifdef	HAVE_ORACLE
@@ -54,18 +54,20 @@
 void	zbx_db_close(void)
 {
 #ifdef	HAVE_MYSQL
-	mysql_close(&mysql);
+	mysql_close(conn);
+	conn = NULL;
 #endif
 #ifdef	HAVE_POSTGRESQL
 	PQfinish(conn);
+	conn = NULL
 #endif
 #ifdef	HAVE_ORACLE
 	sqlo_finish(oracle);
 #endif
 #ifdef	HAVE_SQLITE3
 	sqlite_transaction_started = 0;
-	sqlite3_close(sqlite);
-
+	sqlite3_close(conn);
+	conn = NULL;
 	php_sem_remove(&sqlite_access);
 #endif
 }
@@ -82,40 +84,40 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	/*	zabbix_log(LOG_LEVEL_ERR, "[%s] [%s] [%s]\n",dbname, dbuser, dbpassword ); */
 #ifdef	HAVE_MYSQL
 	/* For MySQL >3.22.00 */
-	/*	if( ! mysql_connect( &mysql, NULL, dbuser, dbpassword ) )*/
+	/*	if( ! mysql_connect( conn, NULL, dbuser, dbpassword ) )*/
 
-	mysql_init(&mysql);
+	conn = mysql_init(NULL);
 
-	if( ! mysql_real_connect( &mysql, host, user, password, dbname, port, dbsocket,0 ) )
+	if( ! mysql_real_connect( conn, host, user, password, dbname, port, dbsocket,0 ) )
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Failed to connect to database: Error: %s [%d]",
-			mysql_error(&mysql), mysql_errno(&mysql));
+			mysql_error(conn), mysql_errno(conn));
 		ret = ZBX_DB_FAIL;
 	}
 
 	if(ZBX_DB_OK == ret)
 	{
-		if( mysql_select_db( &mysql, dbname ) != 0 )
+		if( mysql_select_db( conn, dbname ) != 0 )
 		{
 			zabbix_log(LOG_LEVEL_ERR, "Failed to select database: Error: %s [%d]",
-				mysql_error(&mysql), mysql_errno(&mysql));
+				mysql_error(conn), mysql_errno(conn));
 			ret = ZBX_DB_FAIL;
 		}
 	}
 
 	if(ZBX_DB_OK == ret)
 	{
-		if(mysql_autocommit(&mysql, 1) != 0)
+		if(mysql_autocommit(conn, 1) != 0)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "Failed to set autocommit to 1: Error: %s [%d]",
-				mysql_error(&mysql), mysql_errno(&mysql));
+				mysql_error(conn), mysql_errno(conn));
 			ret = ZBX_DB_FAIL;
 		}
 	}
 
 	if(ZBX_DB_FAIL  == ret)
 	{
-		switch(mysql_errno(&mysql)) {
+		switch(mysql_errno(conn)) {
 			case	CR_SERVER_GONE_ERROR:
 			case	CR_CONNECTION_ERROR:
 				ret = ZBX_DB_DOWN;
@@ -160,18 +162,18 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 #ifdef	HAVE_SQLITE3
 	int res;
 
-	res = sqlite3_open(name, &sqlite);
+	res = sqlite3_open(name, &conn);
 
 /* check to see that the backend connection was successfully made */
 	if(res)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Can't open database [%s]: %s\n", name, sqlite3_errmsg(sqlite));
+		zabbix_log(LOG_LEVEL_ERR, "Can't open database [%s]: %s\n", name, sqlite3_errmsg(conn));
 		DBclose();
 		exit(FAIL);
 	}
 
 	/* Do not return SQLITE_BUSY immediately, wait for N ms */
-	sqlite3_busy_timeout(sqlite, 60*1000);
+	sqlite3_busy_timeout(conn, 60*1000);
 
 	if(ZBX_MUTEX_ERROR == php_sem_get(&sqlite_access, name))
 	{
@@ -348,13 +350,21 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s", sql);
 #ifdef	HAVE_MYSQL
-	if(mysql_query(&mysql,sql) != 0)
+	if(!conn)
 	{
-		ret = (mysql_errno(&mysql) == CR_SERVER_GONE_ERROR)?ZBX_DB_DOWN:ZBX_DB_FAIL;
+		zabbix_log( LOG_LEVEL_ERR, "Query executing require connection to database!");
+		ret = ZBX_DB_FAIL;
 	}
 	else
 	{
-		ret = (int)mysql_affected_rows(&mysql);
+		if(mysql_query(conn,sql) != 0)
+		{
+			ret = (mysql_errno(conn) == CR_SERVER_GONE_ERROR)?ZBX_DB_DOWN:ZBX_DB_FAIL;
+		}
+		else
+		{
+			ret = (int)mysql_affected_rows(conn);
+		}
 	}
 #endif
 #ifdef	HAVE_POSTGRESQL
@@ -398,7 +408,7 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 	}
 	
 lbl_exec:
-	if(SQLITE_OK != (ret = sqlite3_exec(sqlite, sql, NULL, 0, &error)))
+	if(SQLITE_OK != (ret = sqlite3_exec(conn, sql, NULL, 0, &error)))
 	{
 		if(ret == SQLITE_BUSY) goto lbl_exec; /* attention deadlock!!! */
 		
@@ -474,6 +484,8 @@ void	SQ_DBfree_result(DB_RESULT result)
 DB_ROW	zbx_db_fetch(DB_RESULT result)
 {
 #ifdef	HAVE_MYSQL
+	if(!result)	return NULL;
+
 	return mysql_fetch_row(result);
 #endif
 #ifdef	HAVE_POSTGRESQL
@@ -543,6 +555,8 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 
 	return &(result->data[result->curow * result->ncolumn]);	
 #endif
+
+	return NULL;
 }
 
 /*
@@ -573,15 +587,23 @@ DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s", sql);
 
 #ifdef	HAVE_MYSQL
-	if(mysql_query(&mysql,sql) != 0)
+	if(!conn)
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Query::%s",sql);
-		zabbix_log(LOG_LEVEL_ERR, "Query failed:%s [%d]", mysql_error(&mysql), mysql_errno(&mysql) );
-		result = (mysql_errno(&mysql) == CR_SERVER_GONE_ERROR)?(DB_RESULT)ZBX_DB_DOWN:(DB_RESULT)ZBX_DB_FAIL;
+		zabbix_log( LOG_LEVEL_ERR, "Query executing require connection to database!");
+		result = NULL;
 	}
 	else
 	{
-		result = mysql_store_result(&mysql);
+		if(mysql_query(conn,sql) != 0)
+		{
+			zabbix_log( LOG_LEVEL_ERR, "Query::%s",sql);
+			zabbix_log(LOG_LEVEL_ERR, "Query failed:%s [%d]", mysql_error(conn), mysql_errno(conn) );
+			result = (mysql_errno(conn) == CR_SERVER_GONE_ERROR)?(DB_RESULT)ZBX_DB_DOWN:(DB_RESULT)ZBX_DB_FAIL;
+		}
+		else
+		{
+			result = mysql_store_result(conn);
+		}
 	}
 #endif
 #ifdef	HAVE_POSTGRESQL
@@ -628,7 +650,7 @@ DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 	result->curow = 0;
 
 lbl_get_table:
-	if(SQLITE_OK != (ret = sqlite3_get_table(sqlite,sql,&result->data,&result->nrow, &result->ncolumn, &error)))
+	if(SQLITE_OK != (ret = sqlite3_get_table(conn,sql,&result->data,&result->nrow, &result->ncolumn, &error)))
 	{
 		if(ret == SQLITE_BUSY) goto lbl_get_table; /* attention deadlock!!! */
 		
@@ -666,7 +688,7 @@ zbx_uint64_t	zbx_db_insert_id(int exec_result, const char *table, const char *fi
 	
 	if(exec_result == FAIL) return 0;
 	
-	return mysql_insert_id(&mysql);
+	return mysql_insert_id(conn);
 #endif
 
 #ifdef	HAVE_POSTGRESQL
@@ -712,7 +734,7 @@ zbx_uint64_t	zbx_db_insert_id(int exec_result, const char *table, const char *fi
 	return id;
 #endif
 #ifdef	HAVE_SQLITE3
-	return (zbx_uint64_t)sqlite3_last_insert_rowid(sqlite);
+	return (zbx_uint64_t)sqlite3_last_insert_rowid(conn);
 #endif
 }
 

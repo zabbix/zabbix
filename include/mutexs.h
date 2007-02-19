@@ -50,7 +50,9 @@
 
 #endif /* _WINDOWS */
 
-int zbx_mutex_create(ZBX_MUTEX	*mutex, ZBX_MUTEX_NAME name);
+#define zbx_mutex_create(mutex, name)		zbx_mutex_create_ext(mutex, name, 0)
+#define zbx_mutex_create_force(mutex, name)	zbx_mutex_create_ext(mutex, name, 1)
+int zbx_mutex_create_ext(ZBX_MUTEX	*mutex, ZBX_MUTEX_NAME name, unsigned char forced);
 int zbx_mutex_lock(ZBX_MUTEX	*mutex);
 int zbx_mutex_unlock(ZBX_MUTEX	*mutex);
 int zbx_mutex_destroy(ZBX_MUTEX	*mutex);

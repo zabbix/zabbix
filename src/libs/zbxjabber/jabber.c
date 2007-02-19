@@ -62,14 +62,14 @@ typedef struct jabber_session {
 
 static jabber_session_p jsess = NULL;
 
-int on_result (jabber_session_p sess, ikspak *pak)
+static int on_result (jabber_session_p sess, ikspak *pak)
 {
 	zabbix_log (LOG_LEVEL_DEBUG, "JABBER: ready");
 	sess->status = JABBER_READY;
 	return IKS_FILTER_EAT;
 }
 
-int disconnect_jabber()
+static int disconnect_jabber()
 {
 	zabbix_log(LOG_LEVEL_INFORMATION, "JABBER: disconnecting");
 	iks_disconnect(jsess->prs);
@@ -79,7 +79,7 @@ int disconnect_jabber()
 	return SUCCEED;
 }
 
-int on_stream (jabber_session_p sess, int type, iks *node)
+static int on_stream (jabber_session_p sess, int type, iks *node)
 {
 	iks *x = NULL;
 	ikspak *pak = NULL;
@@ -154,13 +154,13 @@ int on_stream (jabber_session_p sess, int type, iks *node)
 	return IKS_OK;
 }
 
-int on_error (void *user_data, ikspak *pak)
+static int on_error (void *user_data, ikspak *pak)
 {
 	zabbix_log (LOG_LEVEL_WARNING, "JABBER: authorization failed");
 	return IKS_FILTER_EAT;
 }
 
-void on_log (jabber_session_p sess, const char *data, size_t size, int is_incoming)
+static void on_log (jabber_session_p sess, const char *data, size_t size, int is_incoming)
 {
 	char msg[16] = "";
 	if (iks_is_secure (sess->prs)) strcat(msg, "Sec");
@@ -168,7 +168,7 @@ void on_log (jabber_session_p sess, const char *data, size_t size, int is_incomi
 	zabbix_log(LOG_LEVEL_DEBUG, "%s [%s]\n", msg, data);
 }
 
-void j_setup_filter (jabber_session_p sess)
+static void j_setup_filter (jabber_session_p sess)
 {
 	if (sess->my_filter) iks_filter_delete (sess->my_filter);
 	sess->my_filter = iks_filter_new ();
@@ -184,7 +184,7 @@ void j_setup_filter (jabber_session_p sess)
 		IKS_RULE_DONE);
 }
 
-int connect_jabber(char *jabber_id, char *password, int use_sasl, char *error, int len)
+static int connect_jabber(char *jabber_id, char *password, int use_sasl, char *error, int len)
 {
 	char *buf = NULL;
 		
@@ -274,7 +274,8 @@ int	send_jabber(char *username, char *passwd, char *sendto, char *message, char 
 	zabbix_log( LOG_LEVEL_DEBUG, "JABBER: sending message");
 
 	if (NULL == jsess || jsess->status == JABBER_DISCONNECTED || jsess->status == JABBER_ERROR) {
-		connect_jabber(username, passwd, 1, error, max_error_len);
+		if (SUCCEED != connect_jabber(username, passwd, 1, error, max_error_len))
+			return FAIL;
 	}
 
 	if ( NULL == (x = iks_new ("message")) ||
