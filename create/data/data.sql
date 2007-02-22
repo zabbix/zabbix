@@ -29,6 +29,7 @@ INSERT INTO config VALUES (1,365,365,600,'1-5,00:00-24:00');
 
 INSERT INTO media_type VALUES (1,0,'Email','localhost','localhost','zabbix@localhost','','','','');
 INSERT INTO media_type VALUES (2,2,'SMS','localhost','localhost','zabbix@localhost','','/dev/ttyS0','','');
+INSERT INTO media_type VALUES (3,3,'Jabber','localhost','localhost','zabbix@localhost','','/dev/ttyS0','zabbix@jabber.org','');
 
 --
 -- Dumping data for table `users`
@@ -54,9 +55,9 @@ INSERT INTO usrgrp VALUES (7,'Zabbix administrators');
 -- Dumping data for table `rights`
 --
 
-INSERT INTO rights VALUES (1,1,'Default permission','U',0);
-INSERT INTO rights VALUES (2,1,'Default permission','A',0);
-INSERT INTO rights VALUES (3,2,'Default permission','R',0);
+INSERT INTO rights VALUES (1,1,0,'Default permission','U',0);
+INSERT INTO rights VALUES (2,1,0,'Default permission','A',0);
+INSERT INTO rights VALUES (3,2,0,'Default permission','R',0);
 
 --
 -- Dumping data for table `hosts`
