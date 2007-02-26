@@ -63,7 +63,7 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	char	*OK_251="251";
 	char	*OK_354="354";
 
-	zabbix_log( LOG_LEVEL_DEBUG, "SENDING MAIL");
+	zabbix_log( LOG_LEVEL_WARNING, "SENDING MAIL server[%s]", smtp_server);
 
 	servaddr_in.sin_family=AF_INET;
 

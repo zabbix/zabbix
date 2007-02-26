@@ -75,7 +75,7 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int execute_action(DB_ALERT *alert,DB_MEDIATYPE *mediatype, char *error, int max_error_len)
+int execute_action(DB_ALERT *alert,DB_MEDIATYPE *mediatype, char *error, int max_error_len)
 {
 	int 	res=FAIL;
 	int	pid;
@@ -90,7 +90,7 @@ static int execute_action(DB_ALERT *alert,DB_MEDIATYPE *mediatype, char *error, 
 		(char *)0 };
 
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In execute_action()");
+	zabbix_log( LOG_LEVEL_WARNING, "In execute_action(%s)", mediatype->smtp_server);
 
 	if(mediatype->type==ALERT_TYPE_EMAIL)
 	{
@@ -162,7 +162,7 @@ static int execute_action(DB_ALERT *alert,DB_MEDIATYPE *mediatype, char *error, 
 		res=FAIL;
 	}
 
-	zabbix_log( LOG_LEVEL_DEBUG, "End of execute_action()");
+	zabbix_log( LOG_LEVEL_WARNING, "End of execute_action()");
 
 	return res;
 }

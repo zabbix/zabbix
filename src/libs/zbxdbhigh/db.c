@@ -64,7 +64,7 @@ void    DBconnect(int flag)
 				}
 				else
 				{
-					zabbix_log(LOG_LEVEL_WARNING, "Database is down. Reconnecting in 10 seconds");
+					zabbix_log(LOG_LEVEL_DEBUG, "Database is down. Reconnecting in 10 seconds");
 					zbx_sleep(10);
 				}
 				break;
@@ -171,7 +171,7 @@ int DBexecute(const char *fmt, ...)
 		va_end(args);
 		if( ret == ZBX_DB_DOWN)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds");
+			zabbix_log(LOG_LEVEL_DEBUG, "Database is down. Retrying in 10 seconds");
 			sleep(10);
 			DBclose();
 			DBconnect(ZBX_DB_CONNECT_NORMAL);
@@ -209,7 +209,7 @@ DB_RESULT DBselect(const char *fmt, ...)
 		va_end(args);
 		if( result == (DB_RESULT)ZBX_DB_DOWN)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Database is down. Retrying in 10 seconds");
+			zabbix_log(LOG_LEVEL_DEBUG, "Database is down. Retrying in 10 seconds");
 			sleep(10);
 			DBclose();
 			DBconnect(ZBX_DB_CONNECT_NORMAL);

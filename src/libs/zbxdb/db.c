@@ -120,6 +120,9 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		switch(mysql_errno(conn)) {
 			case	CR_SERVER_GONE_ERROR:
 			case	CR_CONNECTION_ERROR:
+			case	CR_SERVER_LOST:
+			case	ER_SERVER_SHUTDOWN:
+			case	ER_UNKNOWN_ERROR:
 				ret = ZBX_DB_DOWN;
 				break;
 			default:
@@ -185,7 +188,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 #endif
 }
 
-static int zbx_db_execute(const char *fmt, ...)
+int zbx_db_execute(const char *fmt, ...)
 {
 	va_list args;
 	int ret;
@@ -359,7 +362,18 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 	{
 		if(mysql_query(conn,sql) != 0)
 		{
-			ret = (mysql_errno(conn) == CR_SERVER_GONE_ERROR)?ZBX_DB_DOWN:ZBX_DB_FAIL;
+			switch(mysql_errno(conn)) {
+				case	CR_SERVER_GONE_ERROR:
+				case	CR_CONNECTION_ERROR:
+				case	CR_SERVER_LOST:
+				case	ER_SERVER_SHUTDOWN:
+				case	ER_UNKNOWN_ERROR:
+					ret = ZBX_DB_DOWN;
+					break;
+				default:
+					ret = ZBX_DB_FAIL;
+					break;
+			}
 		}
 		else
 		{
@@ -428,9 +442,9 @@ lbl_exec:
 	}
 #endif
 	
-	gettimeofday(&tv, NULL);
-	if((float)(tv.tv_usec-msec)/1000000 > 0.05)
-		zabbix_log( LOG_LEVEL_WARNING, "Long query: %f sec, query %s", (float)(tv.tv_usec-msec)/1000000, sql );
+/*	gettimeofday(&tv, NULL);
+	if((float)(tv.tv_usec-msec)/1000000 > 0.1)
+		zabbix_log( LOG_LEVEL_WARNING, "Long query: %f sec, query %s", (float)(tv.tv_usec-msec)/1000000, sql );*/
 
 	zbx_free(sql);
 	return ret;
@@ -598,7 +612,18 @@ DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 		{
 			zabbix_log( LOG_LEVEL_ERR, "Query::%s",sql);
 			zabbix_log(LOG_LEVEL_ERR, "Query failed:%s [%d]", mysql_error(conn), mysql_errno(conn) );
-			result = (mysql_errno(conn) == CR_SERVER_GONE_ERROR)?(DB_RESULT)ZBX_DB_DOWN:(DB_RESULT)ZBX_DB_FAIL;
+			switch(mysql_errno(conn)) {
+				case	CR_SERVER_GONE_ERROR:
+				case	CR_CONNECTION_ERROR:
+				case	CR_SERVER_LOST:
+				case	ER_SERVER_SHUTDOWN:
+				case	ER_UNKNOWN_ERROR:
+					result = (DB_RESULT)ZBX_DB_DOWN;
+					break;
+				default:
+					result = (DB_RESULT)ZBX_DB_FAIL;
+					break;
+			}
 		}
 		else
 		{
@@ -670,9 +695,9 @@ lbl_get_table:
 	}
 #endif
 
-	gettimeofday(&tv, NULL);
-	if((float)(tv.tv_usec-msec)/1000000 > 0.05)
-		zabbix_log( LOG_LEVEL_WARNING, "Long query: %f sec, query %s", (float)(tv.tv_usec-msec)/1000000, sql );
+/*	gettimeofday(&tv, NULL);
+	if((float)(tv.tv_usec-msec)/1000000 > 0.1)
+		zabbix_log( LOG_LEVEL_WARNING, "Long query: %f sec, query %s", (float)(tv.tv_usec-msec)/1000000, sql );*/
 
 	zbx_free(sql);
 	return result;
