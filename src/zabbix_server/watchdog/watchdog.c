@@ -21,17 +21,149 @@
 
 #include "cfg.h"
 #include "db.h"
+#include "zbxdb.h"
 #include "log.h"
 #include "zlog.h"
 
 #include "common.h"
+#include "zlog.h"
 #include "watchdog.h"
+
+#define ZBX_RECIPIENT struct zbx_recipient_t
+
+ZBX_RECIPIENT
+{
+	DB_ALERT	alert;
+	DB_MEDIATYPE	mediatype;
+};
+
+#define	ZBX_MAX_RECIPIENTS	32
+
+ZBX_RECIPIENT	recipients[ZBX_MAX_RECIPIENTS];
+
+static	int num = 0;
+static	int lastsent = 0;
+
+/******************************************************************************
+ *                                                                            *
+ * Function: send_alerts                                                      *
+ *                                                                            *
+ * Purpose: send warning message to all interested                            *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void send_alerts()
+{
+	int	i,now;
+	char	error[MAX_STRING_LEN];
+
+	now = time(NULL);
+
+	if(now>lastsent+900)
+	{
+		for(i=0;i<num;i++)
+		{
+			execute_action(&recipients[i].alert,&recipients[i].mediatype, error, sizeof(error));
+		}
+		lastsent = now;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: init_config                                                      *
+ *                                                                            *
+ * Purpose: init list of medias to send notifications in case if DB is down   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void init_config()
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In init_config()");
+
+	result = DBselect("select mt.mediatypeid, mt.type, mt.description, mt.smtp_server, mt.smtp_helo, mt.smtp_email, mt.exec_path, mt.gsm_modem, mt.username, mt.passwd, m.mediaid,m.userid,m.mediatypeid,m.sendto,m.severity,m.period from media m, users_groups u, config c,media_type mt where m.userid=u.userid and u.usrgrpid=c.alert_usrgrpid and m.mediatypeid=mt.mediatypeid and m.active=%d",
+		MEDIA_STATUS_ACTIVE);
+	while((row=DBfetch(result)))
+	{
+		if(num>=ZBX_MAX_RECIPIENTS)	break;
+
+		memset(&recipients[num].mediatype, 0, sizeof(DB_MEDIATYPE));
+		memset(&recipients[num].alert, 0, sizeof(DB_ALERT));
+
+		ZBX_STR2UINT64(recipients[num].mediatype.mediatypeid,row[0]);
+		recipients[num].mediatype.type=atoi(row[1]);
+		recipients[num].mediatype.description=strdup(row[2]);
+		recipients[num].mediatype.smtp_server=strdup(row[3]);
+		recipients[num].mediatype.smtp_helo=strdup(row[4]);
+		recipients[num].mediatype.smtp_email=strdup(row[5]);
+		recipients[num].mediatype.exec_path=strdup(row[6]);
+		recipients[num].mediatype.gsm_modem=strdup(row[7]);
+		recipients[num].mediatype.username=strdup(row[8]);
+		recipients[num].mediatype.passwd=strdup(row[9]);
+
+		recipients[num].alert.sendto=strdup(row[13]);
+		recipients[num].alert.subject=strdup("ZABBIX database is down.");
+		recipients[num].alert.message=strdup("ZABBIX database is down.");
+
+		num++;
+	}
+
+	DBfree_result(result);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: ping_database                                                    *
+ *                                                                            *
+ * Purpose: check availability of database                                    *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void ping_database()
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In ping_database()");
+	/* This is test SQL query, it does nothing */
+	if(zbx_db_execute("update config set alert_usrgrpid=alert_usrgrpid where 0=1") == ZBX_DB_DOWN)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Watchdog: Database is down");
+		send_alerts();
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Watchdog: Database is up");
+	}
+}
 
 /******************************************************************************
  *                                                                            *
  * Function: main_watchdog_loop                                               *
  *                                                                            *
- * Purpose: periodically checks availability of database                      *
+ * Purpose: periodically checks availability of database and alerts admin if  *
+ *          down                                                              *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -44,31 +176,19 @@
  ******************************************************************************/
 void main_watchdog_loop()
 {
+	/* Disable writing to database in zabbix_syslog() */
+	CONFIG_ENABLE_LOG = 0;
+
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+	init_config();
+
 	for(;;)
 	{
-/*		zbx_setproctitle("updating nodata() functions");
-
-		DBconnect();
-
-		now=time(NULL);
-
-		result = DBselect("select distinct %s, functions f where h.hostid=i.hostid and h.status=%d and i.status=%d and f.function in ('nodata','date','dayofweek','time','now') and i.itemid=f.itemid and" ZBX_COND_NODEID, ZBX_SQL_ITEM_SELECT, HOST_STATUS_MONITORED, ITEM_STATUS_ACTIVE, LOCAL_NODE("h.hostid"));
-
-		while((row=DBfetch(result)))
-		{
-			DBget_item_from_db(&item,row);
-
-			DBbegin();
-			update_functions(&item);
-			update_triggers(item.itemid);
-			DBcommit();
-		}
-
-		DBfree_result(result);
-		DBclose();
-
-		zbx_setproctitle("sleeping for 60 sec");*/
-
+		ping_database();
 		sleep(60);
 	}
+
+	/* We will never reach this point */
+	DBclose();
 }
