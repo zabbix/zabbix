@@ -140,6 +140,9 @@ int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
 int	CONFIG_NODEID			= 0;
 int	CONFIG_MASTER_NODEID		= 0;
 
+/* Global variable to control if we should write warnings to log[] */
+int	CONFIG_ENABLE_LOG		= 1;
+
 /* From table config */
 int	CONFIG_REFRESH_UNSUPPORTED	= 0;
 
