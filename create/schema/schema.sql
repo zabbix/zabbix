@@ -21,6 +21,12 @@
 -- Do not use spaces
 --
 
+TABLE|ids|nodeid,table_name,field_name|ZBX_SYNC
+FIELD		|nodeid		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|table_name	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|field_name	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|nextid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+
 TABLE|httptest|httptestid|ZBX_SYNC
 FIELD		|httptestid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
@@ -73,8 +79,6 @@ FIELD		|port		|t_integer	|'10051'|NOT NULL	|ZBX_SYNC
 FIELD		|slave_history	|t_integer	|'30'	|NOT NULL	|ZBX_SYNC
 FIELD		|slave_trends	|t_integer	|'365'	|NOT NULL	|ZBX_SYNC
 FIELD		|event_lastid	|t_id		|'0'	|NOT NULL	|0
-FIELD		|events_eventid	|t_id		|'0'	|NOT NULL	|0
-FIELD		|alerts_alertid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|history_lastid	|t_bigint	|'0'	|NOT NULL	|0
 FIELD		|history_str_lastid|t_bigint	|'0'	|NOT NULL	|0
 FIELD		|history_uint_lastid|t_bigint	|'0'	|NOT NULL	|0

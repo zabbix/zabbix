@@ -1,5 +1,6 @@
 Changes for 1.3.3:
 
+ - added new table 'ids' which will store last IDs for all tables (Alexei)
  - added highlighting for second level menu (Eugene)
  - added "Clone" functionality (Eugene)
  - added Watchdog for database availability (Alexei)
