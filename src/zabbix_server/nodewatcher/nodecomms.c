@@ -127,11 +127,11 @@ int send_to_node(int dest_nodeid, int nodeid, char *data)
 		return  FAIL;
 	}
 
-	zabbix_log( LOG_LEVEL_WARNING, "Answer [%s]", answer);
+	zabbix_log( LOG_LEVEL_DEBUG, "Answer [%s]", answer);
 
 	if(strcmp(answer,"OK") == 0)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "OK");
+		zabbix_log( LOG_LEVEL_DEBUG, "OK");
 		ret = SUCCEED;
 	}
 	else
