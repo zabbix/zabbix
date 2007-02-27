@@ -109,7 +109,7 @@ int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 /*			zabbix_log( LOG_LEVEL_WARNING, "Node data received [len:%d]", strlen(s)); */
 			if(node_sync(s) == SUCCEED)
 			{
-				zbx_snprintf(result,sizeof(result),"OK\n");
+				zbx_snprintf(result,sizeof(result),"OK");
 				if( zbx_tcp_send(sock,result) != SUCCEED)
 /*				if( write(sockfd,result,strlen(result)) == -1) */
 				{
@@ -125,7 +125,7 @@ int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 /*			zabbix_log( LOG_LEVEL_WARNING, "Slave node events received [len:%d]", strlen(s)); */
 			if(node_events(s) == SUCCEED)
 			{
-				zbx_snprintf(result,sizeof(result),"OK\n");
+				zbx_snprintf(result,sizeof(result),"OK");
 /*				if( write(sockfd,result,strlen(result)) == -1) */
 				if( zbx_tcp_send(sock,result) != SUCCEED)
 				{
@@ -141,7 +141,7 @@ int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 /*			zabbix_log( LOG_LEVEL_WARNING, "Slave node history received [len:%d]", strlen(s)); */
 			if(node_history(s) == SUCCEED)
 			{
-				zbx_snprintf(result,sizeof(result),"OK\n");
+				zbx_snprintf(result,sizeof(result),"OK");
 /*				if( write(sockfd,result,strlen(result)) == -1) */
 				if( zbx_tcp_send(sock,result) != SUCCEED)
 				{
