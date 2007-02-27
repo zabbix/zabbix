@@ -21,11 +21,11 @@
 -- Do not use spaces
 --
 
-TABLE|ids|nodeid,table_name,field_name|ZBX_SYNC
-FIELD		|nodeid		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|table_name	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|field_name	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|nextid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+TABLE|ids|nodeid,table_name,field_name|
+FIELD		|nodeid		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|table_name	|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|field_name	|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|nextid		|t_id		|'0'	|NOT NULL	|0
 
 TABLE|httptest|httptestid|ZBX_SYNC
 FIELD		|httptestid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
