@@ -55,9 +55,9 @@ INSERT INTO usrgrp VALUES (7,'Zabbix administrators');
 -- Dumping data for table `rights`
 --
 
-INSERT INTO rights VALUES (1,1,0,'Default permission','U',0);
-INSERT INTO rights VALUES (2,1,0,'Default permission','A',0);
-INSERT INTO rights VALUES (3,2,0,'Default permission','R',0);
+INSERT INTO rights VALUES (1,1,0,0,0);
+INSERT INTO rights VALUES (2,1,0,0,0);
+INSERT INTO rights VALUES (3,2,0,0,0);
 
 --
 -- Dumping data for table `hosts`
