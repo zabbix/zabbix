@@ -486,7 +486,7 @@ if(isset($DB_TYPE) && $DB_TYPE == "ORACLE") {
 				$row=DBfetch(DBselect("select max($field) as id from $table where ".DBid2nodeid($field)." in (".$ZBX_CURNODEID.")"));
 				if(!$row || is_null($row["id"]))
 				{
-					DBexecute("insert into ids (nodeid,table_name,field_name,nextid) values ($ZBX_CURNODEID,'$table','$field',1)");
+					DBexecute("insert into ids (nodeid,table_name,field_name,nextid) values ($ZBX_CURNODEID,'$table','$field',".bcadd(bcmul($ZBX_CURNODEID,"100000000000000"),1).")");
 				}
 				else
 				{
@@ -518,6 +518,6 @@ if(isset($DB_TYPE) && $DB_TYPE == "ORACLE") {
 		}
 		while(false == $found);
 
-		return bcadd(bcmul($ZBX_CURNODEID,"100000000000000"),$ret2);
+		return $ret2;
 	}
 ?>

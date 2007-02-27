@@ -88,6 +88,7 @@ int send_to_node(int dest_nodeid, int nodeid, char *data)
 	DB_ROW		row;
 
 	zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Sending data of node %d to node %d datalen %d", CONFIG_NODEID, nodeid, dest_nodeid, strlen(data));
+/*	zabbix_log( LOG_LEVEL_WARNING, "Data [%s]", data);*/
 
 	result = DBselect("select ip, port from nodes where nodeid=%d", dest_nodeid);
 	row = DBfetch(result);
