@@ -466,7 +466,7 @@ if(isset($DB_TYPE) && $DB_TYPE == "ORACLE") {
 
 		if(!isset($ZBX_CURNODEID))	init_nodes();
 
-		$row=DBfetch(DBselect("select max($field) as id from $table where ".DBid2nodeid($field)." in (".$ZBX_CURNODEID.")"));
+/*		$row=DBfetch(DBselect("select max($field) as id from $table where ".DBid2nodeid($field)." in (".$ZBX_CURNODEID.")"));
 		if($row && !is_null($row["id"]))
 		{
 			return	bcadd($row["id"],1);
@@ -474,6 +474,50 @@ if(isset($DB_TYPE) && $DB_TYPE == "ORACLE") {
 		else
 		{
 			return bcadd(bcmul($ZBX_CURNODEID,"100000000000000"),1);
+		}*/
+
+
+		$found = false;
+		do
+		{
+			$row = DBfetch(DBselect("select nextid from ids where nodeid=$ZBX_CURNODEID and table_name='$table' and field_name='$field'"));
+			if(!$row || is_null($row["nextid"]))
+			{
+				$row=DBfetch(DBselect("select max($field) as id from $table where ".DBid2nodeid($field)." in (".$ZBX_CURNODEID.")"));
+				if(!$row || is_null($row["id"]))
+				{
+					DBexecute("insert into ids (nodeid,table_name,field_name,nextid) values ($ZBX_CURNODEID,'$table','$field',1)");
+				}
+				else
+				{
+					DBexecute("insert into ids (nodeid,table_name,field_name,nextid) values ($ZBX_CURNODEID,'$table','$field',".$row["id"].")");
+				}
+				continue;
+			}
+			else
+			{
+				$ret1 = $row["nextid"];
+	
+				DBexecute("update ids set nextid=nextid+1 where nodeid=$ZBX_CURNODEID and table_name='$table' and field_name='$field'");
+	
+				$row = DBfetch(DBselect("select nextid from ids where nodeid=$ZBX_CURNODEID and table_name='$table' and field_name='$field'"));
+				if(!$row || is_null($row["nextid"]))
+				{
+					/* Should never be here */
+					continue;
+				}
+				else
+				{
+					$ret2 = $row["nextid"];
+					if(bccomp(bcadd($ret1,1),$ret2) ==0)
+					{
+						$found = true;
+					}
+				}
+			}
 		}
+		while(false == $found);
+
+		return bcadd(bcmul($ZBX_CURNODEID,"100000000000000"),$ret2);
 	}
 ?>

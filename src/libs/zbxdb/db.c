@@ -362,7 +362,8 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 	{
 		if(mysql_query(conn,sql) != 0)
 		{
-			zabbix_log(LOG_LEVEL_ERR, "Query failed:%s [%d]", mysql_error(conn), mysql_errno(conn) );
+			zabbix_log(LOG_LEVEL_ERR, "Query failed: [%s] %s [%d]",
+				sql, mysql_error(conn), mysql_errno(conn) );
 			switch(mysql_errno(conn)) {
 				case	CR_SERVER_GONE_ERROR:
 				case	CR_CONNECTION_ERROR:

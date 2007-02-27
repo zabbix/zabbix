@@ -1441,9 +1441,73 @@ zbx_uint64_t DBget_maxid(char *table, char *field)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	ret;
+	zbx_uint64_t	ret1,ret2;
+	int		found  = FAIL;
 
-	if(CONFIG_NODEID == 0)
+	zabbix_log(LOG_LEVEL_WARNING,"In DBget_maxid(%s,%s)",table,field);
+
+	do
+	{
+		result = DBselect("select nextid from ids where nodeid=%d and table_name='%s' and field_name='%s'",
+			CONFIG_NODEID, table, field);
+		row = DBfetch(result);
+		if(!row || DBis_null(row[0])==SUCCEED)
+		{
+			DBfree_result(result);
+			result = DBselect("select max(%s) from %s where " ZBX_COND_NODEID,
+				field, table, LOCAL_NODE(field));
+			row = DBfetch(result);
+			if(!row || DBis_null(row[0])==SUCCEED)
+			{
+				zabbix_log(LOG_LEVEL_WARNING,"Insert 1");
+				DBexecute("insert into ids (nodeid,table_name,field_name,nextid) values (%d,'%s','%s',%d)",
+					CONFIG_NODEID, table, field, 1);
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_WARNING,"Insert %s", row[0]);
+				DBexecute("insert into ids (nodeid,table_name,field_name,nextid) values (%d,'%s','%s',%s)",
+					CONFIG_NODEID, table, field, row[0]);
+			}
+			DBfree_result(result);
+			continue;
+		}
+		else
+		{
+			ZBX_STR2UINT64(ret1, row[0]);
+			DBfree_result(result);
+
+			DBexecute("update ids set nextid=nextid+1 where nodeid=%d and table_name='%s' and field_name='%s'",
+				CONFIG_NODEID, table, field);
+
+			result = DBselect("select nextid from ids where nodeid=%d and table_name='%s' and field_name='%s'",
+				CONFIG_NODEID, table, field);
+			row = DBfetch(result);
+			if(!row || DBis_null(row[0])==SUCCEED)
+			{
+				/* Should never be here */
+				DBfree_result(result);
+				continue;
+			}
+			else
+			{
+				ZBX_STR2UINT64(ret2, row[0]);
+				DBfree_result(result);
+				if(ret1+1 == ret2)
+				{
+					found = SUCCEED;
+				}
+			}
+		}
+	}
+	while(FAIL == found);
+	zabbix_log(LOG_LEVEL_WARNING, ZBX_FS_UI64, CONFIG_NODEID*(zbx_uint64_t)__UINT64_C(100000000000000) + ret2);
+
+	return CONFIG_NODEID*(zbx_uint64_t)__UINT64_C(100000000000000) + ret2;
+
+
+
+/*	if(CONFIG_NODEID == 0)
 	{
 		result = DBselect("select max(%s) from %s where " ZBX_COND_NODEID, field, table, LOCAL_NODE(field));
 		row = DBfetch(result);
@@ -1479,5 +1543,5 @@ zbx_uint64_t DBget_maxid(char *table, char *field)
 		DBfree_result(result);
 	}
 
-	return ret;
+	return ret;*/
 }

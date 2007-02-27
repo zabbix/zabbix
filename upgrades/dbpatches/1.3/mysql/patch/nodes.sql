@@ -7,8 +7,6 @@ CREATE TABLE nodes (
 	slave_history		integer		DEFAULT '30'	NOT NULL,
 	slave_trends		integer		DEFAULT '365'	NOT NULL,
 	event_lastid		bigint unsigned		DEFAULT '0'	NOT NULL,
-	events_eventid		bigint unsigned		DEFAULT '0'	NOT NULL,
-	alerts_alertid		bigint unsigned		DEFAULT '0'	NOT NULL,
 	history_lastid		bigint unsigned		DEFAULT '0'	NOT NULL,
 	history_str_lastid		bigint unsigned		DEFAULT '0'	NOT NULL,
 	history_uint_lastid		bigint unsigned		DEFAULT '0'	NOT NULL,
