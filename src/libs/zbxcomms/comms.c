@@ -243,9 +243,12 @@ int	zbx_tcp_recv(zbx_sock_t *s, char **data)
 	{
 		nbytes=read(s->socket, (void *)&expected_len, sizeof(zbx_uint64_t));
 
+/*		printf("Expected len: " ZBX_FS_UI64 "\n", expected_len);*/
+
 		/* The rest was already cleared */
 		memset(s->buf_stat,0,5);
 		nbytes = read(s->socket, s->buf_stat, sizeof(s->buf_stat) - 1 );
+		read_max = sizeof(s->buf_stat) - 1;
 
 		*data = s->buf_stat;
 	}
@@ -264,6 +267,7 @@ int	zbx_tcp_recv(zbx_sock_t *s, char **data)
 
 	if(nbytes == read_max)
 	{
+/*		printf("Read max\n");*/
 		s->buf_type = ZBX_BUF_TYPE_DYN;
 		allocated = ZBX_BUF_LEN;
 		s->buf_dyn=zbx_malloc(allocated);
@@ -272,11 +276,12 @@ int	zbx_tcp_recv(zbx_sock_t *s, char **data)
 		strnscpy(s->buf_dyn, s->buf_stat, ZBX_BUF_LEN);
 		offset = strlen(s->buf_dyn);
 	
-		while (read_bytes<expected_len && (nbytes = read(s->socket, s->buf_stat, ZBX_STAT_BUF_LEN-1-1)) != -1 && nbytes != 0)
+		while (read_bytes<expected_len && (nbytes = read(s->socket, s->buf_stat, sizeof(s->buf_stat)-2)) != -1 && nbytes != 0)
 		{
 			s->buf_stat[nbytes]='\0';
 			zbx_snprintf_alloc(&s->buf_dyn, &allocated, &offset, ZBX_BUF_LEN-1, "%s", s->buf_stat);
 			read_bytes+=nbytes;
+/*			printf("Read bytes %d\n", read_bytes);*/
 		}
 		*data = s->buf_dyn;
 	}
