@@ -1444,7 +1444,7 @@ zbx_uint64_t DBget_maxid(char *table, char *field)
 	zbx_uint64_t	ret1,ret2;
 	int		found  = FAIL;
 
-	zabbix_log(LOG_LEVEL_WARNING,"In DBget_maxid(%s,%s)",table,field);
+	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_maxid(%s,%s)",table,field);
 
 	do
 	{
@@ -1459,14 +1459,12 @@ zbx_uint64_t DBget_maxid(char *table, char *field)
 			row = DBfetch(result);
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
-				zabbix_log(LOG_LEVEL_WARNING,"Insert 1");
 				DBexecute("insert into ids (nodeid,table_name,field_name,nextid) values (%d,'%s','%s',%d)",
 					CONFIG_NODEID, table, field,
 					CONFIG_NODEID*(zbx_uint64_t)__UINT64_C(100000000000000)+1);
 			}
 			else
 			{
-				zabbix_log(LOG_LEVEL_WARNING,"Insert %s", row[0]);
 				DBexecute("insert into ids (nodeid,table_name,field_name,nextid) values (%d,'%s','%s',%s)",
 					CONFIG_NODEID, table, field, row[0]);
 			}
@@ -1502,7 +1500,7 @@ zbx_uint64_t DBget_maxid(char *table, char *field)
 		}
 	}
 	while(FAIL == found);
-	zabbix_log(LOG_LEVEL_WARNING, ZBX_FS_UI64, ret2);
+	zabbix_log(LOG_LEVEL_DEBUG, ZBX_FS_UI64, ret2);
 
 	return ret2;
 
