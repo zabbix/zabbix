@@ -50,6 +50,7 @@
 #include "zlog.h"
 #include "zbxsock.h"
 
+#include "comms.h"
 #include "nodecomms.h"
 
 /******************************************************************************
@@ -71,7 +72,7 @@
 int send_to_node(int dest_nodeid, int nodeid, char *data)
 {
 	int	i,s;
-	char	answer[MAX_STRING_LEN];
+/*	char	answer[MAX_STRING_LEN];*/
 	struct hostent *hp;
 
 	struct sockaddr_in myaddr_in;
@@ -86,6 +87,9 @@ int send_to_node(int dest_nodeid, int nodeid, char *data)
 
 	DB_RESULT	result;
 	DB_ROW		row;
+
+	zbx_sock_t	sock;
+	char		*answer;
 
 	zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Sending data of node %d to node %d datalen %d", CONFIG_NODEID, nodeid, dest_nodeid, strlen(data));
 /*	zabbix_log( LOG_LEVEL_WARNING, "Data [%s]", data);*/
@@ -102,7 +106,44 @@ int send_to_node(int dest_nodeid, int nodeid, char *data)
 	port=atoi(row[1]);
 	DBfree_result(result);
 
-	servaddr_in.sin_family=AF_INET;
+	if( FAIL == zbx_tcp_connect(&sock, ip, port))
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Unable to connect to Node [%d]", dest_nodeid);
+		return  FAIL;
+	}
+
+
+	if( FAIL == zbx_tcp_send(&sock, data))
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Error while sending data to Node [%d]", dest_nodeid);
+		zbx_tcp_close(&sock);
+		return  FAIL;
+	}
+
+	if( FAIL == zbx_tcp_recv(&sock, &answer))
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Error while receiving answer from Node [%d]", dest_nodeid);
+		zbx_tcp_close(&sock);
+		return  FAIL;
+	}
+
+	zabbix_log( LOG_LEVEL_WARNING, "Answer [%s]", answer);
+
+	if(strcmp(answer,"OK") == 0)
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "OK");
+		ret = SUCCEED;
+	}
+	else
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "NOT OK");
+	}
+
+	zbx_tcp_close(&sock);
+
+
+
+/*	servaddr_in.sin_family=AF_INET;
 
 	if(NULL == (hp = zbx_gethost(ip)))
 	{
@@ -134,7 +175,6 @@ int send_to_node(int dest_nodeid, int nodeid, char *data)
 
 	written = 0;
 
-	/* Write header */
 	i=write(s, header, 5);
 	if(i == -1)
 	{
@@ -144,7 +184,6 @@ int send_to_node(int dest_nodeid, int nodeid, char *data)
 	}
 	len64 = (zbx_uint64_t)strlen(data);
 
-	/* Write data length */
 	i=write(s, &len64, sizeof(len64));
 	if(i == -1)
 	{
@@ -175,19 +214,20 @@ int send_to_node(int dest_nodeid, int nodeid, char *data)
 
 	answer[i-1]=0;
 
+	zabbix_log( LOG_LEVEL_WARNING, "Read [%s]", answer);
 	if(strcmp(answer,"OK") == 0)
 	{
-		zabbix_log( LOG_LEVEL_DEBUG, "OK");
+		zabbix_log( LOG_LEVEL_WARNING, "OK");
 		ret = SUCCEED;
 	}
 	else
 	{
-		zabbix_log( LOG_LEVEL_DEBUG, "NOT OK");
+		zabbix_log( LOG_LEVEL_WARNING, "NOT OK");
 	}
  
 	if( close(s)!=0 )
 	{
-	}
+	}*/
 
 	return ret;
 }
