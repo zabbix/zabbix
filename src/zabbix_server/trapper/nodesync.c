@@ -104,7 +104,7 @@ static int	process_record(int nodeid, char *record)
 	if(op==NODE_CONFIGLOG_OP_DELETE)
 	{
 		zbx_snprintf(tmp,sizeof(tmp),"delete from %s where %s=" ZBX_FS_UI64 " and nodeid=%d", tablename, key, recid, nodeid);
-		zabbix_log( LOG_LEVEL_WARNING, "SQL [%s]", sql);
+		zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]", sql);
 		return SUCCEED;
 	}
 
