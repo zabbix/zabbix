@@ -240,7 +240,7 @@ void	process_trapper_child(zbx_sock_t	*sock)
 	alarm(0);
 
 	gettimeofday(&tv, NULL);
-	zabbix_log( LOG_LEVEL_WARNING, "Trap processed in %f seconds", (float)(tv.tv_usec-msec)/1000000 );
+	zabbix_log( LOG_LEVEL_DEBUG, "Trap processed in %f seconds", (float)(tv.tv_usec-msec)/1000000 );
 }
 
 void	child_trapper_main(int i,int listenfd, int addrlen)
