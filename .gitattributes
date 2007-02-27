@@ -316,6 +316,7 @@ upgrades/dbpatches/1.3/mysql/patch/httpstep.sql -text
 upgrades/dbpatches/1.3/mysql/patch/httpstepitem.sql -text
 upgrades/dbpatches/1.3/mysql/patch/httptest.sql -text
 upgrades/dbpatches/1.3/mysql/patch/httptestitem.sql -text
+upgrades/dbpatches/1.3/mysql/patch/ids.sql -text
 upgrades/dbpatches/1.3/mysql/patch/images.sql -text
 upgrades/dbpatches/1.3/mysql/patch/items.sql -text
 upgrades/dbpatches/1.3/mysql/patch/items_applications.sql -text
