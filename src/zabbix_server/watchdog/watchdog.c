@@ -147,7 +147,7 @@ static void ping_database()
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In ping_database()");
 	/* This is test SQL query, it does nothing */
-	if(zbx_db_execute("update config set alert_usrgrpid=alert_usrgrpid where 0=1") == ZBX_DB_DOWN)
+	if(DBping() == FAIL)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Watchdog: Database is down");
 		send_alerts();
