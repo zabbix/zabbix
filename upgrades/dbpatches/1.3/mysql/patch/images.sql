@@ -7,6 +7,6 @@ CREATE TABLE images_tmp (
 ) ENGINE=InnoDB;
 CREATE INDEX images_1 on images_tmp (imagetype,name);
 
-insert into images_tmp select * from images`;
+insert into images_tmp select * from images;
 drop table images;
 alter table images_tmp rename images;
