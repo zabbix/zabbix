@@ -3,7 +3,7 @@ CREATE TABLE usrgrp_tmp (
 	name		varchar(64)		DEFAULT ''	NOT NULL,
 	PRIMARY KEY (usrgrpid)
 ) ENGINE=InnoDB;
-CREATE INDEX usrgrp_1 on usrgrp (name);
+CREATE INDEX usrgrp_1 on usrgrp_tmp (name);
 
 insert into usrgrp_tmp select * from usrgrp;
 drop table usrgrp;
