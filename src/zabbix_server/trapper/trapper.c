@@ -228,16 +228,16 @@ void	process_trapper_child(zbx_sock_t	*sock)
 	gettimeofday(&tv, NULL);
 	msec = tv.tv_usec;
 
-	alarm(CONFIG_TIMEOUT);
+/*	alarm(CONFIG_TIMEOUT);*/
 
 	if(zbx_tcp_recv(sock, &data) != SUCCEED)
 	{
-		alarm(0);
+/*		alarm(0);*/
 		return;
 	}
 
 	process_trap(sock, data, sizeof(data));
-	alarm(0);
+/*	alarm(0);*/
 
 	gettimeofday(&tv, NULL);
 	zabbix_log( LOG_LEVEL_DEBUG, "Trap processed in %f seconds", (float)(tv.tv_usec-msec)/1000000 );
