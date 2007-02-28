@@ -71,19 +71,9 @@
  ******************************************************************************/
 int send_to_node(int dest_nodeid, int nodeid, char *data)
 {
-	int	i,s;
-/*	char	answer[MAX_STRING_LEN];*/
-	struct hostent *hp;
-
-	struct sockaddr_in myaddr_in;
-	struct sockaddr_in servaddr_in;
 	char	ip[MAX_STRING_LEN];
 	int	port;
 	int	ret = FAIL;
-	int	written;
-
-	char	header[5]="ZBXD\1";
-	zbx_uint64_t	len64;
 
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -140,94 +130,6 @@ int send_to_node(int dest_nodeid, int nodeid, char *data)
 	}
 
 	zbx_tcp_close(&sock);
-
-
-
-/*	servaddr_in.sin_family=AF_INET;
-
-	if(NULL == (hp = zbx_gethost(ip)))
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "Cannot resolve [%s] for node [%d]", ip, dest_nodeid);
-		return	FAIL;
-	}
-
-	servaddr_in.sin_addr.s_addr=((struct in_addr *)(hp->h_addr))->s_addr;
-
-	servaddr_in.sin_port=htons(port);
-
-	s=socket(AF_INET,SOCK_STREAM,0);
-	if(s == -1)
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "Cannot create socket [%s] for node [%d]", ip, dest_nodeid);
-		return	FAIL;
-	}
-
-	myaddr_in.sin_family = AF_INET;
-	myaddr_in.sin_port=0;
-	myaddr_in.sin_addr.s_addr=INADDR_ANY;
-
-	if( connect(s,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "Cannot connect [%s] to node [%d]", ip, dest_nodeid);
-		close(s);
-		return	FAIL;
-	}
-
-	written = 0;
-
-	i=write(s, header, 5);
-	if(i == -1)
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "Error writing to node [%d] [%s]", dest_nodeid, strerror(errno));
-		close(s);
-		return	FAIL;
-	}
-	len64 = (zbx_uint64_t)strlen(data);
-
-	i=write(s, &len64, sizeof(len64));
-	if(i == -1)
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "Error writing to node [%d] [%s]", dest_nodeid, strerror(errno));
-		close(s);
-		return	FAIL;
-	}
-
-	while(written<strlen(data))
-	{
-		i=write(s, data+written,strlen(data)-written);
-		if(i == -1)
-		{
-			zabbix_log( LOG_LEVEL_WARNING, "Error writing to node [%d] [%s]", dest_nodeid, strerror(errno));
-			close(s);
-			return	FAIL;
-		}
-		written+=i;
-	}
-	i=sizeof(struct sockaddr_in);
-	i=read(s,answer,MAX_STRING_LEN-1);
-	if(i==-1)
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "Error reading from node [%d]", dest_nodeid);
-		close(s);
-		return	FAIL;
-	}
-
-	answer[i-1]=0;
-
-	zabbix_log( LOG_LEVEL_WARNING, "Read [%s]", answer);
-	if(strcmp(answer,"OK") == 0)
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "OK");
-		ret = SUCCEED;
-	}
-	else
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "NOT OK");
-	}
- 
-	if( close(s)!=0 )
-	{
-	}*/
 
 	return ret;
 }
