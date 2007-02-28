@@ -1,7 +1,7 @@
 CREATE TABLE acknowledges_tmp (
-	acknowledgeid		bigint DEFAULT '0'	NOT NULL,
-	userid		bigint unsigned		DEFAULT '0'	NOT NULL,
-	eventid		bigint unsigned		DEFAULT '0'	NOT NULL,
+	acknowledgeid	bigint DEFAULT '0'	NOT NULL,
+	userid		bigint DEFAULT '0'	NOT NULL,
+	eventid		bigint DEFAULT '0'	NOT NULL,
 	clock		integer		DEFAULT '0'	NOT NULL,
 	message		varchar(255)		DEFAULT ''	NOT NULL,
 	PRIMARY KEY (acknowledgeid)
@@ -12,4 +12,4 @@ CREATE INDEX acknowledges_3 on acknowledges_tmp (clock);
 
 insert into acknowledges_tmp select * from acknowledges;
 drop table acknowledges;
-alter table acknowledges_tmp rename acknowledges;
+alter table acknowledges_tmp rename to acknowledges;
