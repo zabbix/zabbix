@@ -15,6 +15,6 @@ CREATE TABLE hosts_tmp (
 CREATE INDEX hosts_1 on hosts_tmp (host);
 CREATE INDEX hosts_2 on hosts_tmp (status);
 
-insert into hosts_tmp select hostid,host,dns,useip,ip,port,status,disable_until,error,available,errors_from from hosts;
+insert into hosts_tmp select hostid,host,host,useip,ip,port,status,disable_until,error,available,errors_from from hosts;
 drop table hosts;
 alter table hosts_tmp rename hosts;
