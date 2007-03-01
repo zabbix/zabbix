@@ -218,7 +218,7 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 		return NOTSUPPORTED;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "RESULT_STR [%c]", c);
+	zabbix_log(LOG_LEVEL_DEBUG, "RESULT_STR [%s]", c);
 
 	return SUCCEED;
 }

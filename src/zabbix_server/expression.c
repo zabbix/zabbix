@@ -449,6 +449,7 @@ int	evaluate_simple (double *result,char *exp,char *error,int maxerrlen)
 		zabbix_syslog("%s", error);
 		return FAIL;
 	}
+	zabbix_log( LOG_LEVEL_DEBUG, "Evaluating simple expression END [%lf]", *result);
 	return SUCCEED;
 }
 
@@ -468,39 +469,45 @@ int	evaluate_simple (double *result,char *exp,char *error,int maxerrlen)
  * Comments: example: ({15}>10)|({123}=1)                                     *
  *                                                                            *
  ******************************************************************************/
-int	evaluate(int *result,char *exp, char *error, int maxerrlen)
+int	evaluate(int *result, char *exp, char *error, int maxerrlen)
 {
 	double	value;
-	char	res[MAX_STRING_LEN];
+	char	*res;
 	char	simple[MAX_STRING_LEN];
+	char	tmp[MAX_STRING_LEN];
+	char	value_str[MAX_STRING_LEN];
 	int	i,l,r;
+	char	c;
+	int	t;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate([%s])",exp);
+	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate(%s)",exp);
 
-	strscpy( res,exp );
+	res = NULL;
 
-	while( find_char( exp, ')' ) != FAIL )
+	strscpy(tmp, exp);
+	t=0;
+	while( find_char( tmp, ')' ) != FAIL )
 	{
 		l=-1;
-		r=find_char(exp,')');
+		r=find_char(tmp,')');
 		for(i=r;i>=0;i--)
 		{
-			if( exp[i] == '(' )
+			if( tmp[i] == '(' )
 			{
 				l=i;
 				break;
 			}
 		}
-		if( r == -1 )
+		if( l == -1 )
 		{
-			zbx_snprintf(error, maxerrlen, "Cannot find left bracket [(]. Expression:[%s]", exp);
+			zbx_snprintf(error, maxerrlen, "Cannot find left bracket [(]. Expression:[%s]", tmp);
 			zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 			zabbix_syslog("%s", error);
 			return	FAIL;
 		}
 		for(i=l+1;i<r;i++)
 		{
-			simple[i-l-1]=exp[i];
+			simple[i-l-1]=tmp[i];
 		} 
 		simple[r-l-1]=0;
 
@@ -512,23 +519,21 @@ int	evaluate(int *result,char *exp, char *error, int maxerrlen)
 			return	FAIL;
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "Expression1:[%s]", exp );
+		/* res = first+simple+second */
+		c=tmp[l]; tmp[l]='\0';
+		res = zbx_strdcat(res, tmp);
+		tmp[l]=c;
 
-		exp[l]='%';
-		exp[l+1]='l';
-		exp[l+2]='f';
-/*		exp[l]='%';
-		exp[l+1]='f';
-		exp[l+2]=' ';*/
+		zbx_snprintf(value_str,MAX_STRING_LEN-1,"%lf",value);
+		res = zbx_strdcat(res, value_str);
+		res = zbx_strdcat(res, tmp+r+1);
 
-		for(i=l+3;i<=r;i++) exp[i]=' ';
-
-		zbx_snprintf(res,sizeof(res),exp,value);
-		strcpy(exp,res);
 		delete_spaces(res);
-		zabbix_log(LOG_LEVEL_DEBUG, "Expression4:[%s]", res );
+		strscpy(tmp,res);
+
+		zbx_free(res); res = NULL;
 	}
-	if( evaluate_simple( &value, res, error, maxerrlen ) != SUCCEED )
+	if( evaluate_simple( &value, tmp, error, maxerrlen ) != SUCCEED )
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 		zabbix_syslog("%s", error);
@@ -572,6 +577,7 @@ int	evaluate(int *result,char *exp, char *error, int maxerrlen)
 #define MVAR_TRIGGER_SEVERITY		"{TRIGGER.SEVERITY}"
 #define MVAR_TRIGGER_STATUS		"{TRIGGER.STATUS}"
 #define MVAR_TRIGGER_STATUS_OLD		"{STATUS}"
+#define MVAR_TRIGGER_VALUE		"{TRIGGER.VALUE}"
 #define MVAR_TRIGGER_URL		"{TRIGGER.URL}"
 #define MVAR_PROFILE_DEVICETYPE		"{PROFILE.DEVICETYPE}"
 #define MVAR_PROFILE_NAME		"{PROFILE.NAME}"
@@ -1051,6 +1057,13 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char **data, i
 
 			replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->triggerid);
 		}
+		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY | MACRO_TYPE_TRIGGER_EXPRESSION) &&
+			strncmp(pr, MVAR_TRIGGER_VALUE, strlen(MVAR_TRIGGER_VALUE)) == 0)
+		{
+			var_len = strlen(MVAR_TRIGGER_VALUE);
+
+			replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64, event->value);
+		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
 			strncmp(pr, MVAR_TRIGGER_URL, strlen(MVAR_TRIGGER_URL)) == 0)
 		{
@@ -1227,72 +1240,52 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, char **data)
  * Comments: example: "({15}>10)|({123}=0)" => "(6.456>10)|(0=0)              *
  *                                                                            *
  ******************************************************************************/
-int	substitute_functions(char *exp, char *error, int maxerrlen)
+int	substitute_functions(char **exp, char *error, int maxerrlen)
 {
-	double	value;
+	char	*value;
 	char	functionid[MAX_STRING_LEN];
-	char	res[MAX_STRING_LEN];
-	int	i,l,r;
+	int	i,j;
+	int	len;
+	char	*out = NULL;
+	char	c;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "BEGIN substitute_functions (%s)", exp);
+	zabbix_log(LOG_LEVEL_DEBUG, "BEGIN substitute_functions (%s)", *exp);
 
-	while( find_char(exp,'{') != FAIL )
+	i = 0;
+	len = strlen(*exp);
+	while(i<len)
 	{
-		l=find_char(exp,'{');
-		r=find_char(exp,'}');
-		if( r == FAIL )
+		if((*exp)[i] == '{')
 		{
-			zbx_snprintf(error,maxerrlen,"Cannot find right bracket. Expression:[%s]", exp);
-			zabbix_log( LOG_LEVEL_WARNING, "%s", error);
-			zabbix_syslog("%s", error);
-			return	FAIL;
-		}
-		if( r < l )
-		{
-			zbx_snprintf(error,maxerrlen, "Right bracket is before left one. Expression:[%s]", exp);
-			zabbix_log( LOG_LEVEL_WARNING, "%s", error);
-			zabbix_syslog("%s", error);
-			return	FAIL;
-		}
-
-		for(i=l+1;i<r;i++)
-		{
-			functionid[i-l-1]=exp[i];
-		} 
-		functionid[r-l-1]=0;
-
-		if( DBget_function_result( &value, functionid ) != SUCCEED )
-		{
+			for(j=i+1;((*exp)[j]!='}')&&((*exp)[j]!='\0');j++)
+			{
+				functionid[j-i-1]=(*exp)[j];
+			}
+			functionid[j-i-1]='\0';
+			if( DBget_function_result( &value, functionid ) != SUCCEED )
+			{
 /* It may happen because of functions.lastvalue is NULL, so this is not warning  */
-			zbx_snprintf(error,maxerrlen, "Unable to get value for functionid [%s]", functionid);
-			zabbix_log( LOG_LEVEL_DEBUG, "%s", error);
-			zabbix_syslog("%s", error);
-			return	FAIL;
+				zbx_snprintf(error,maxerrlen, "Unable to get value for functionid [%s]", functionid);
+				zabbix_log( LOG_LEVEL_DEBUG, "%s", error);
+				zabbix_syslog("%s", error);
+				return	FAIL;
+			}
+			out =  zbx_strdcat(out,value);
+			zbx_free(value);
+			i=j+1;
 		}
-
-
-		zabbix_log( LOG_LEVEL_DEBUG, "Expression1:[%s]", exp );
-
-		exp[l]='%';
-		exp[l+1]='l';
-		exp[l+2]='f';
-/*		exp[l]='%';
-		exp[l+1]='f';
-		exp[l+2]=' ';*/
-
-		zabbix_log( LOG_LEVEL_DEBUG, "Expression2:[%s]", exp );
-
-		for(i=l+3;i<=r;i++) exp[i]=' ';
-
-		zabbix_log( LOG_LEVEL_DEBUG, "Expression3:[%s]", exp );
-
-		zbx_snprintf(res,sizeof(res),exp,value);
-		strcpy(exp,res);
-		delete_spaces(exp);
-		zabbix_log( LOG_LEVEL_DEBUG, "Expression4:[%s]", exp );
+		else
+		{
+			c=(*exp)[i+1]; (*exp)[i+1]='\0';
+			out = zbx_strdcat(out, (*exp+i));
+			(*exp)[i+1]=c;
+			i++;
+		}	
 	}
-	zabbix_log( LOG_LEVEL_DEBUG, "Expression:[%s]", exp );
-	zabbix_log( LOG_LEVEL_DEBUG, "END substitute_functions" );
+	zbx_free(*exp);
+
+	*exp = out;
+	zabbix_log( LOG_LEVEL_DEBUG, "END substitute_functions [%s]", *exp );
 
 	return SUCCEED;
 }
@@ -1317,20 +1310,32 @@ int	substitute_functions(char *exp, char *error, int maxerrlen)
  *                    ({a0:system[procload].max(300)}>3)                      *
  *                                                                            *
  ******************************************************************************/
-int	evaluate_expression(int *result,char *expression, char *error, int maxerrlen)
+int	evaluate_expression(int *result,char **expression, int trigger_value, char *error, int maxerrlen)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate_expression(%s)", expression );
+	/* Required for substitution of macros */
+	DB_EVENT	event;
+	DB_ACTION	action;
 
-	delete_spaces(expression);
+	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate_expression(%s)", *expression );
+
+	/* Substitute macros first */
+	memset(&event,0,sizeof(DB_EVENT));	
+	memset(&action,0,sizeof(DB_ACTION));	
+	event.value = trigger_value;
+
+	substitute_simple_macros(&event, &action, expression, MACRO_TYPE_TRIGGER_EXPRESSION);
+
+	/* Evaluate expression */
+	delete_spaces(*expression);
 	if( substitute_functions(expression, error, maxerrlen) == SUCCEED)
 	{
-		if( evaluate(result, expression, error, maxerrlen) == SUCCEED)
+		if( evaluate(result, *expression, error, maxerrlen) == SUCCEED)
 		{
 			return SUCCEED;
 		}
 	}
-	zabbix_log(LOG_LEVEL_WARNING, "Evaluation of expression [%s] failed [%s]", expression, error );
-	zabbix_syslog("Evaluation of expression [%s] failed [%s]", expression, error );
+	zabbix_log(LOG_LEVEL_DEBUG, "Evaluation of expression [%s] failed [%s]", *expression, error );
+	zabbix_syslog("Evaluation of expression [%s] failed [%s]", *expression, error );
 
 	return FAIL;
 }

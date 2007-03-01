@@ -459,7 +459,11 @@
 			if($expression[$i] == '}')
 			{
 				$state='';
-				if($function_data = DBfetch(DBselect('select h.host,i.key_,f.function,f.parameter,i.itemid,i.value_type'.
+				if($functionid=="TRIGGER.VALUE")
+				{
+					$exp .= "{".$functionid."}";
+				}
+				else if($function_data = DBfetch(DBselect('select h.host,i.key_,f.function,f.parameter,i.itemid,i.value_type'.
 					' from items i,functions f,hosts h'.
 					' where functionid='.$functionid.' and i.itemid=f.itemid and h.hostid=i.hostid')))
 				{
@@ -517,6 +521,13 @@
 					$state='HOST';
 					continue;
 				}
+			}
+// Processing of macros {TRIGGER.VALUE}
+			if( ($expression[$i] == '}')&&($state=="HOST") )
+			{
+				$exp = $exp."{".$host."}";
+				$state="";
+				continue;
 			}
 			if( ($expression[$i] == '}')&&($state=="") )
 			{
