@@ -243,7 +243,7 @@ zbx_uint64_t	DBinsert_id(int exec_result, const char *table, const char *field)
 /*
  * Get function value.
  */ 
-int     DBget_function_result(double *result,char *functionid)
+int     DBget_function_result(char **result,char *functionid)
 {
 	DB_RESULT dbresult;
 	DB_ROW	row;
@@ -267,7 +267,7 @@ int     DBget_function_result(double *result,char *functionid)
 	}
 	else
 	{
-        	*result=atof(row[1]);
+		*result = strdup(row[1]);
 	}
         DBfree_result(dbresult);
 

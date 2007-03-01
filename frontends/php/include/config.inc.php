@@ -923,7 +923,9 @@ else
 				return -1;
 			}
 		}
-		else
+	# Process macros
+		else if($expression!="{TRIGGER.VALUE}")
+		
 		{
 			error("Expression [$expression] does not match to [server:key.func(param)]");
 			return -1;
