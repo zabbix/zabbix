@@ -101,7 +101,6 @@ void	update_functions(DB_ITEM *item)
 			zabbix_log( LOG_LEVEL_DEBUG, "Evaluation failed for function:%s",function.function);
 			continue;
 		}
-		zabbix_log( LOG_LEVEL_DEBUG, "Result of evaluate_FUNCTION [%s]",value);
 		if (ret == SUCCEED)
 		{
 			/* Update only if lastvalue differs from new one */
@@ -119,6 +118,8 @@ void	update_functions(DB_ITEM *item)
 	}
 
 	DBfree_result(result);
+
+	zabbix_log( LOG_LEVEL_DEBUG, "End update_functions()");
 }
 
 /******************************************************************************
@@ -311,7 +312,7 @@ void	update_triggers(zbx_uint64_t itemid)
 		zbx_free(exp);
 	}
 	DBfree_result(result);
-	zabbix_log( LOG_LEVEL_DEBUG, "End of update_triggers [%d]", itemid);
+	zabbix_log( LOG_LEVEL_DEBUG, "End update_triggers [%d]", itemid);
 }
 
 void	calc_timestamp(char *line,int *timestamp, char *format)
@@ -880,6 +881,8 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 	/* Required for nodata() */
 	item->lastclock = now;
 
+	zabbix_log( LOG_LEVEL_DEBUG, "End update_item()");
+
 	return ret;
 }
 
@@ -903,7 +906,7 @@ void	process_new_value(DB_ITEM *item, AGENT_RESULT *value)
 	double	multiplier;
 	char	*e;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In process_new_value()");
+	zabbix_log( LOG_LEVEL_DEBUG, "In process_new_value(%s)", item->key);
 
 	now = time(NULL);
 

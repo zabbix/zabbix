@@ -835,7 +835,7 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 	int	day;
 	int	len;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() Function [%s]",function);
+	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION(%s)",function);
 
 	if(strcmp(function,"last")==0)
 	{
@@ -857,19 +857,6 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 					strcpy(value,item->lastvalue_str);
 					break;
 			}
-/*			if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) || (item->value_type==ITEM_VALUE_TYPE_UINT64))
-			{
-				zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 1");
-				zbx_snprintf(value,MAX_STRING_LEN,"%f",item->lastvalue);
-				del_zeroes(value);
-				zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 2 value [%s]", value);
-			}
-			else
-			{
-				zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 3 [%s] [%s]",value,item->lastvalue_str);
-				strcpy(value,item->lastvalue_str);
-				zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 4");
-			}*/
 		}
 	}
 	else if(strcmp(function,"prev")==0)
@@ -1219,13 +1206,7 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 		ret = FAIL;
 	}
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() pre-7");
-	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 7 Formula [%s]", item->formula);
-	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 7 Value [%s]", value);
-	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 7 Units [%s]", item->units);
-	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION() 7 Value [%s] Units [%s] Formula [%s]", value, item->units, item->formula);
-
-	zabbix_log( LOG_LEVEL_DEBUG, "End of evaluate_FUNCTION. Result [%s]",value);
+	zabbix_log( LOG_LEVEL_DEBUG, "End of evaluate_FUNCTION(result:%s)",value);
 	return ret;
 }
 
@@ -1380,7 +1361,7 @@ int evaluate_FUNCTION2(char *value,char *host,char *key,char *function,char *par
 
 	int	res;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate_FUNCTION2()" );
+	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate_FUNCTION2(%s,%s,%s,%s)",host,key,function,parameter);
 
 	result = DBselect("select %s where h.host='%s' and h.hostid=i.hostid and i.key_='%s' and" ZBX_COND_NODEID, ZBX_SQL_ITEM_SELECT, host, key, LOCAL_NODE("h.hostid"));
 
@@ -1396,10 +1377,6 @@ int evaluate_FUNCTION2(char *value,char *host,char *key,char *function,char *par
 
 	DBget_item_from_db(&item,row);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Itemid:" ZBX_FS_UI64, item.itemid );
-
-	zabbix_log(LOG_LEVEL_DEBUG, "Before evaluate_FUNCTION()" );
-
 /*	res = evaluate_FUNCTION(value,&item,function,parameter, EVALUATE_FUNCTION_SUFFIX); */
 	res = evaluate_FUNCTION(value,&item,function,parameter);
 
@@ -1410,5 +1387,7 @@ int evaluate_FUNCTION2(char *value,char *host,char *key,char *function,char *par
 
 /* Cannot call DBfree_result until evaluate_FUNC */
 	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End evaluate_FUNCTION2(result:%s)",value);
 	return res;
 }
