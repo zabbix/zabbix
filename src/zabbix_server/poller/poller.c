@@ -66,6 +66,8 @@ int	get_value(DB_ITEM *item, AGENT_RESULT *result)
 
 	struct	sigaction phan;
 
+	zabbix_log(LOG_LEVEL_WARNING, "In get_value()");
+
 	phan.sa_handler = &child_signal_handler;
 	sigemptyset(&phan.sa_mask);
 	phan.sa_flags = 0;
@@ -107,6 +109,7 @@ int	get_value(DB_ITEM *item, AGENT_RESULT *result)
 	}
 	alarm(0);
 
+	zabbix_log(LOG_LEVEL_WARNING, "End get_value()");
 	return res;
 }
 
@@ -308,14 +311,11 @@ int get_values(void)
 		}
 	}
 
-	zabbix_log( LOG_LEVEL_DEBUG, "After DBselect()");
-
 	while((row=DBfetch(result))&&(stop==0))
 	{
 		DBget_item_from_db(&item,row);
 
 		init_result(&agent);
-		zabbix_log( LOG_LEVEL_DEBUG, "GOT VALUE TYPE [0x%X]", agent.type);
 		res = get_value(&item, &agent);
 
 		DBbegin();
@@ -430,6 +430,7 @@ int get_values(void)
 	}
 
 	DBfree_result(result);
+	zabbix_log( LOG_LEVEL_DEBUG, "End get_values()");
 	return SUCCEED;
 }
 

@@ -88,8 +88,6 @@ void	delete_spaces(char *c)
 {
 	int i,j;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Before deleting spaces:%s", c );
-
 	j=0;
 	for(i=0;c[i]!=0;i++)
 	{
@@ -100,8 +98,6 @@ void	delete_spaces(char *c)
 		}
 	}
 	c[j]=0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "After deleting spaces:%s", c );
 }
 
 /******************************************************************************
@@ -122,20 +118,19 @@ void	delete_spaces(char *c)
  *           It is recursive function!                                        *
  *                                                                            *
  ******************************************************************************/
-int	evaluate_simple (double *result,char *exp,char *error,int maxerrlen)
+int	evaluate_simple(double *result,char *exp,char *error,int maxerrlen)
 {
 	double	value1,value2;
 	char	first[MAX_STRING_LEN],second[MAX_STRING_LEN];
 	char 	*p;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Evaluating simple expression [%s]", exp );
+	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_simple(%s)", exp);
 
 /* Remove left and right spaces */
 	lrtrim_spaces(exp);
 
 	if( is_double_prefix(exp) == SUCCEED )
 	{
-/*		*result=atof(exp);*/
 /* str2double support prefixes */
 		*result=str2double(exp);
 		return SUCCEED;
@@ -143,24 +138,12 @@ int	evaluate_simple (double *result,char *exp,char *error,int maxerrlen)
 
 	if( (p = strstr(exp,"|")) != NULL )
 	{
-		zabbix_log( LOG_LEVEL_DEBUG, "| is found" );
-
 		*p=0;
 		strscpy( first, exp);
 		*p='|';
 		p++;
 		strscpy( second, p);
 
-/*		l=find_char(exp,'|');
-		strscpy( first, exp );
-		first[l]=0;
-		j=0;
-		for(i=l+1;exp[i]!=0;i++)
-		{
-			second[j]=exp[i];
-			j++;
-		}
-		second[j]=0;*/
 		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
@@ -188,14 +171,12 @@ int	evaluate_simple (double *result,char *exp,char *error,int maxerrlen)
 	}
 	if( (p = strstr(exp,"&")) != NULL )
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "& is found" );
 		*p=0;
 		strscpy( first, exp);
 		*p='|';
 		p++;
 		strscpy( second, p);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "[%s] [%s]",first,second );
 		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
@@ -220,7 +201,6 @@ int	evaluate_simple (double *result,char *exp,char *error,int maxerrlen)
 	}
 	if( (p = strstr(exp,">")) != NULL )
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "> is found" );
 		*p=0;
 		strscpy( first, exp);
 		*p='|';
@@ -250,13 +230,11 @@ int	evaluate_simple (double *result,char *exp,char *error,int maxerrlen)
 	}
 	if( (p = strstr(exp,"<")) != NULL )
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "< is found" );
 		*p=0;
 		strscpy( first, exp);
 		*p='|';
 		p++;
 		strscpy( second, p);
-		zabbix_log(LOG_LEVEL_DEBUG, "[%s] [%s]",first,second );
 		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
@@ -282,7 +260,6 @@ int	evaluate_simple (double *result,char *exp,char *error,int maxerrlen)
 	}
 	if( (p = strstr(exp,"*")) != NULL )
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "* is found" );
 		*p=0;
 		strscpy( first, exp);
 		*p='|';
@@ -305,7 +282,6 @@ int	evaluate_simple (double *result,char *exp,char *error,int maxerrlen)
 	}
 	if( (p = strstr(exp,"/")) != NULL )
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "/ is found" );
 		*p=0;
 		strscpy( first, exp);
 		*p='|';
@@ -338,7 +314,6 @@ int	evaluate_simple (double *result,char *exp,char *error,int maxerrlen)
 	}
 	if( (p = strstr(exp,"+")) != NULL )
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "+ is found" );
 		*p=0;
 		strscpy( first, exp);
 		*p='|';
@@ -361,7 +336,6 @@ int	evaluate_simple (double *result,char *exp,char *error,int maxerrlen)
 	}
 	if( (p = strstr(exp,"-")) != NULL )
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "- is found" );
 		*p=0;
 		strscpy( first, exp);
 		*p='|';
@@ -384,7 +358,6 @@ int	evaluate_simple (double *result,char *exp,char *error,int maxerrlen)
 	}
 	if( (p = strstr(exp,"=")) != NULL )
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "= is found" );
 		*p=0;
 		strscpy( first, exp);
 		*p='|';
@@ -414,7 +387,6 @@ int	evaluate_simple (double *result,char *exp,char *error,int maxerrlen)
 	}
 	if( (p = strstr(exp,"#")) != NULL )
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "# is found" );
 		*p=0;
 		strscpy( first, exp);
 		*p='|';
@@ -449,7 +421,7 @@ int	evaluate_simple (double *result,char *exp,char *error,int maxerrlen)
 		zabbix_syslog("%s", error);
 		return FAIL;
 	}
-	zabbix_log( LOG_LEVEL_DEBUG, "Evaluating simple expression END [%lf]", *result);
+
 	return SUCCEED;
 }
 
@@ -1331,11 +1303,13 @@ int	evaluate_expression(int *result,char **expression, int trigger_value, char *
 	{
 		if( evaluate(result, *expression, error, maxerrlen) == SUCCEED)
 		{
+			zabbix_log(LOG_LEVEL_DEBUG, "End evaluate_expression()");
 			return SUCCEED;
 		}
 	}
 	zabbix_log(LOG_LEVEL_DEBUG, "Evaluation of expression [%s] failed [%s]", *expression, error );
 	zabbix_syslog("Evaluation of expression [%s] failed [%s]", *expression, error );
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End evaluate_expression()");
 	return FAIL;
 }
