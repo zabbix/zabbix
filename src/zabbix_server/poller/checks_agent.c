@@ -55,7 +55,8 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 
 	init_result(result);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "get_value_agent: host[%s] ip[%s] key [%s]", item->host_name, item->host_ip, item->key );
+	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_agent(host:%s,ip:%s,key:%s",
+		item->host_name, item->host_ip, item->key );
 
 	servaddr_in.sin_family=AF_INET;
 	if(item->useip==1)
@@ -126,7 +127,6 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 	}
 
 	zbx_snprintf(c, sizeof(c), "%s\n",item->key);
-	zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", c);
 	if( write(s,c,strlen(c)) == -1 )
 	{
 		switch (errno)
@@ -218,7 +218,7 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 		return NOTSUPPORTED;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "RESULT_STR [%s]", c);
+	zabbix_log( LOG_LEVEL_DEBUG, "End get_value_agent(result:%s)", c);
 
 	return SUCCEED;
 }

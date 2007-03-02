@@ -146,18 +146,21 @@ void	zbx_setproctitle(const char *fmt, ...)
  *           New one: preserve period, if delay==5, nextcheck = 0,5,10,15,... *
  *                                                                            *
  ******************************************************************************/
-int	calculate_item_nextcheck(int itemid, int item_type, int delay, char *delay_flex, time_t now)
+int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char *delay_flex, time_t now)
 {
 	int	i;
 	char	*p;
 	char	delay_period[30];
 	int	delay_val;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In calculate_item_nextcheck [%d, %d, %s, %d]",itemid,delay,delay_flex,now);
+	zabbix_log( LOG_LEVEL_DEBUG, "In calculate_item_nextcheck (" ZBX_FS_UI64 ",%d,%s,%d)",
+		itemid,delay,delay_flex,now);
 
 /* Special processing of active items to see better view in queue */
 	if(item_type == ITEM_TYPE_ZABBIX_ACTIVE)
 	{
+		zabbix_log( LOG_LEVEL_DEBUG, "End calculate_item_nextcheck (result:%d)",
+			(((int)now)+delay));
 		return (((int)now)+delay);
 	}
 
@@ -196,12 +199,11 @@ int	calculate_item_nextcheck(int itemid, int item_type, int delay, char *delay_f
 /*	Old algorithm */
 /*	i=delay*(int)(now/delay);*/
 	
-	zabbix_log( LOG_LEVEL_DEBUG, "Delay is [%d]",delay);
-
 	i=delay*(int)(now/delay)+(itemid % delay);
 
 	while(i<=now)	i+=delay;
 
+	zabbix_log( LOG_LEVEL_DEBUG, "End calculate_item_nextcheck (result:%d)", i);
 	return i;
 }
 
