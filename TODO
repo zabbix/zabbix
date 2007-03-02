@@ -1,30 +1,16 @@
 1.3:
 
- - introduce new value (3 - timeout) for simple checks
  - add value mapping for messages
- - fix ZABBIX crash if % us used in message body/subject
  - parameter to disable log rotation
  - fix order for displaying log files order by clock desc,id desc
- - fix wrong ownership and possibly pid number for agent and server
  - use of aggregates in triggers
- - check shutdown of ZABBIX agent (removal of pid file, etc)
- - http://www.zabbix.com/forum/showthread.php?t=3137
  - make grid 0,20,40,60,80,100 in graphs
- - support of PostgreSQL
- - http://www.zabbix.com/forum/showthread.php?t=2736
  - does ZABBIX maintain Host availability of monitored by SNMP
  - when unlinking a host from template, add option (Unlink&Delete, Unlink Only)
- - add optimisation flags -O2 to configure
- - remember snmp community on per host level
- - net.if.stat collected as double, must be as uint64
 
  - remember different default values in different forms
  - server side checks (new type of check)
 
- - windows agent $1-$9: http://www.zabbix.com/forum/showthread.php?t=2163
- - http://www.zabbix.com/forum/showthread.php?p=7611#post7611
- - centralised management of agent configuration files
- - how to disable unreachable hosts
  - new item status: not available. If agent doesn't accept parameter.
  - new function for item status to enable sending of notification in case if an item changes status to unknown (for example)
  - do zabbix_sender for windows
@@ -35,10 +21,7 @@ TKOM:
 
  - alarms forwarding to external systems (using SNMP traps, for example)
  - alarm/trigger sounds
- - SNMP trap processing
- - SNMP trap sending
 
- - clickable map in map configuration
  - rus/lat characters for graphs
 <?
 print_r($_POST);
@@ -54,11 +37,7 @@ OTHER:
 
  - multi-institution support
 
- - improve removal of item related data from history
 '-' doesn't work in trigger expressions (a-b=0)
-
->  Atradu liekas, ka vienu bug: tad, ja updeito Host statusu zem Host, tad trigeris par "Host unreachable" pazuud, jo ir statusaa "unknown", bet pie alarms neparaadas
->, ka tas buutu mainijis savu statusu.
 
  - negative values in graphs
  - check all screens if they are user friendly and present information in the best possible way
@@ -67,13 +46,6 @@ OTHER:
  - agent incorrectly returns amount of free/available memory on HP-UX (must be 24GB)
 
  - add icons to a map by clicking mouse
- - optionally support map generation in JPEG. PNG images are huge!
-
-printf calls w/o static format specifiers...
-in src and include:
-grep -R printf * | grep -v "\%\|Makefile\|Binary"
-
- - in user administration, add many resources from a list (not by one ID)
 
  Kak naschet dopolnenij k time & date:
  * tipa month, day, year, hour, minute, ...
@@ -128,18 +100,8 @@ LS:
  - add item to group (not to all)
  - update host from template
 
-change(N) - raznica mezhdu poslednim i na N vremeni ranee poluchennim
-znacheniem;
-abschange(N) = abs(change(N));
-
 trend(N) - linejnaja aproksimacija sled.znachenija po interval vremeni N;
 trend(N,M) - tozhe, no ne sled.znachenie, a vpered na interval vremeni M;
-
-!!!!! kstati bilo-bi neploho pozvolitj poljzovatsja ne toljko intervalom
-vremeni kak argumentom funkcij,
-no i ispoljzovatj kolichestvo otscetov, tipa srednee za poslednie 5
-scitivanij !!!!!
-* k primeru argument 5 oznachhaet pjatj sekund, a #5 - pjatj izmerenii !!!
 
 nu i massu matematicheskih mozhno - dlja super-advanced chuvakov:
 * SQRT, LOG, LOG10, trigonometricheskie, ...
@@ -163,7 +125,6 @@ HP:
 
  - add threshold,min,max line for user-defined graphs
 
- - [3] Windows event log checking.
  - [4] Latest values. Link to page which shows list of all triggers-related
  to the item.
  - [4] users.php. Link to page which shows all actions defined for this user.
@@ -241,97 +202,3 @@ HB:
  LATER:
 
  - setup demo site
-
- POSTGRESQL:
-
-> Some corrections for  zabbix 1.1alpha9, PostgreQL version
-> 1.)data.sql record for  itemid = 17201 is missing in table items
->
-> 2.)  schema.sql some rows are commented using --; not valid pgsql syntax
->
-> 3.)  schema.sql script for table images is missing
->
-> CREATE TABLE images
-> (
->    imageid serial NOT NULL,
->    imagetype int4 NOT NULL DEFAULT 0,
->    name varchar(64) NOT NULL DEFAULT 0,
->    image oid NOT NULL,
->    CONSTRAINT pk_imageid PRIMARY KEY (imageid),
->    CONSTRAINT unq_type_name UNIQUE (imagetype, name)
-> )
-> WITH OIDS;
-> ALTER TABLE images OWNER TO zabbix;
->
->
-> 4.) fill table images - little bit problem. Blob objects can be added
-> only by pgsql supeuser
->
-> My working work:
->
-> Please, correct text in doc (paragraph 3):
->
-> shell> cd ../data
-> shell> cat data.sql|psql -U <username> zabbix
-> # new
-> shell> cd ../data
-> shell> cat images.sql|sed s%addr%$PWD%|psql -U postgres zabbix
-> # end new
->
-> file images.sql is icluded as images1.sql
->
->
-> (This mail was send to limo - Lukas Macura)
-> Bye Mike
->
-> --
-> -- Zabbix
-> -- Copyright (C) 2000,2001,2002,2003,2004 Alexei Vladishev
-> --
-> -- This program is free software; you can redistribute it and/or modify
-> -- it under the terms of the GNU General Public License as published by
-> -- the Free Software Foundation; either version 2 of the License, or
-> -- (at your option) any later version.
-> --
-> -- This program is distributed in the hope that it will be useful,
-> -- but WITHOUT ANY WARRANTY; without even the implied warranty of
-> -- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> -- GNU General Public License for more details.
-> --
-> -- You should have received a copy of the GNU General Public License
-> -- along with this program; if not, write to the Free Software
-> -- Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-> --
->
-> --
-> -- Dumping data for table `images`
-> --
->
-> insert into images values('1','1','Hub',lo_import('./images/Hub.png'));
-> insert into images values('2','1','Hub (small)',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Hub_small.png'));
-> insert into images values('3','1','Network',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Network.png'));
-> insert into images values('4','1','Network (small)',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Network_small.pn
-g'));
-> insert into images values('5','1','Notebook',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Notebook.png'));
-> insert into images values('6','1','Notebook (small)',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Notebook_small.
-png'));
-> insert into images values('7','1','Phone',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Phone.png'));
-> insert into images values('8','1','Phone (small)',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Phone_small.png'))
-;
-> insert into images values('9','1','Printer',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Printer.png'));
-> insert into images values('10','1','Printer (small)',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Printer_small.p
-ng'));
-> insert into images values('11','1','Router',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Router.png'));
-> insert into images values('12','1','Router (small)',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Router_small.png
-'));
-> insert into images values('13','1','Satellite',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Satellite.png'));
-> insert into images values('14','1','Satellite (small)',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Satellite_sma
-ll.png'));
-> insert into images values('15','1','Server',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Server.png'));
-> insert into images values('16','1','Server (small)',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Server_small.png
-'));
-> insert into images values('17','1','UPS',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/UPS.png'));
-> insert into images values('18','1','UPS (small)',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/UPS_small.png'));
-> insert into images values('19','1','Workstation',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Workstation.png'));
-> insert into images values('20','1','Workstation (small)',lo_import('/usr/src/zabbix-1.1alpha9/create/data/images/Workstation
-_small.png'));
