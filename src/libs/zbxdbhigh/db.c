@@ -436,7 +436,9 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *re
 				((trigger->value == TRIGGER_VALUE_FALSE) && (new_value == TRIGGER_VALUE_TRUE)) ||
 				((event_last_status == TRIGGER_VALUE_FALSE) && (trigger->value == TRIGGER_VALUE_UNKNOWN) && (new_value == TRIGGER_VALUE_TRUE)) ||
 				((event_last_status == TRIGGER_VALUE_TRUE) && (trigger->value == TRIGGER_VALUE_UNKNOWN) && (new_value == TRIGGER_VALUE_FALSE)) ||
-				((event_prev_status == TRIGGER_VALUE_UNKNOWN) && (event_last_status == TRIGGER_VALUE_UNKNOWN) && (trigger->value == TRIGGER_VALUE_UNKNOWN) && (new_value == TRIGGER_VALUE_TRUE))
+				((event_prev_status == TRIGGER_VALUE_UNKNOWN) && (event_last_status == TRIGGER_VALUE_UNKNOWN) && (trigger->value == TRIGGER_VALUE_UNKNOWN) && (new_value == TRIGGER_VALUE_TRUE)) ||
+				((event_prev_status == TRIGGER_VALUE_FALSE) && (event_last_status == TRIGGER_VALUE_UNKNOWN) && (trigger->value == TRIGGER_VALUE_UNKNOWN) && (new_value == TRIGGER_VALUE_TRUE)) ||
+				((event_prev_status == TRIGGER_VALUE_TRUE) && (event_last_status == TRIGGER_VALUE_UNKNOWN) && (trigger->value == TRIGGER_VALUE_UNKNOWN) && (new_value == TRIGGER_VALUE_FALSE))
 			)
 			{
 				/* Preparing event for processing */
