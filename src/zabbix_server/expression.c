@@ -1221,7 +1221,7 @@ int	substitute_functions(char **exp, char *error, int maxerrlen)
 	char	*out = NULL;
 	char	c;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "BEGIN substitute_functions (%s)", *exp);
+	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_functions(%s)", *exp);
 
 	i = 0;
 	len = strlen(*exp);
@@ -1257,7 +1257,7 @@ int	substitute_functions(char **exp, char *error, int maxerrlen)
 	zbx_free(*exp);
 
 	*exp = out;
-	zabbix_log( LOG_LEVEL_DEBUG, "END substitute_functions [%s]", *exp );
+	zabbix_log( LOG_LEVEL_DEBUG, "End substitute_functions [%s]", *exp );
 
 	return SUCCEED;
 }
@@ -1303,13 +1303,13 @@ int	evaluate_expression(int *result,char **expression, int trigger_value, char *
 	{
 		if( evaluate(result, *expression, error, maxerrlen) == SUCCEED)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "End evaluate_expression()");
+			zabbix_log(LOG_LEVEL_DEBUG, "End evaluate_expression(result:%d)", *result);
 			return SUCCEED;
 		}
 	}
 	zabbix_log(LOG_LEVEL_DEBUG, "Evaluation of expression [%s] failed [%s]", *expression, error );
 	zabbix_syslog("Evaluation of expression [%s] failed [%s]", *expression, error );
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End evaluate_expression()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End evaluate_expression(result:FAIL)");
 	return FAIL;
 }
