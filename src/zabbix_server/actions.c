@@ -73,7 +73,7 @@ static	void	send_to_user_medias(DB_EVENT *event,DB_ACTION *action, zbx_uint64_t 
 	DB_RESULT result;
 	DB_ROW	row;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In send_to_user_medias(triggerid:" ZBX_FS_UI64 ")", event->triggerid);
+	zabbix_log( LOG_LEVEL_DEBUG, "In send_to_user_medias(triggerid:" ZBX_FS_UI64 ")", event->triggerid);
 
 	result = DBselect("select mediatypeid,sendto,active,severity,period from media where active=%d and userid=" ZBX_FS_UI64,MEDIA_STATUS_ACTIVE,userid);
 
@@ -101,6 +101,8 @@ static	void	send_to_user_medias(DB_EVENT *event,DB_ACTION *action, zbx_uint64_t 
 		DBadd_alert(action->actionid, userid, event->triggerid, media.mediatypeid,media.sendto,action->subject,action->message, action->maxrepeats, action->repeatdelay);
 	}
 	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End send_to_user_medias()");
 }
 
 /******************************************************************************
@@ -125,6 +127,8 @@ static	void	send_to_user(DB_EVENT *event, DB_ACTION *action)
 	DB_ROW		row;
 	zbx_uint64_t	userid;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In send_to_user()");
+
 	if(action->recipient == RECIPIENT_TYPE_USER)
 	{
 		send_to_user_medias(event, action, action->userid);
@@ -147,6 +151,7 @@ static	void	send_to_user(DB_EVENT *event, DB_ACTION *action)
 		zabbix_syslog("Unknown recipient type [%d] for actionid [" ZBX_FS_UI64 "]",
 			action->recipient,action->actionid);
 	}
+	zabbix_log(LOG_LEVEL_DEBUG, "End send_to_user()");
 }
 
 
@@ -179,7 +184,7 @@ static void run_remote_command(char* host_name, char* command)
 	assert(host_name);
 	assert(command);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "run_remote_command START [hostname: '%s', command: '%s']", host_name, command);
+	zabbix_log(LOG_LEVEL_DEBUG, "In run_remote_command(hostname:%s,command:%s)", host_name, command);
 
 	result = DBselect("select distinct host,ip,useip,port,dns from hosts where host='%s' and " ZBX_COND_NODEID,
 			host_name, LOCAL_NODE("hostid"));
@@ -202,7 +207,7 @@ static void run_remote_command(char* host_name, char* command)
 	}
 	DBfree_result(result);
 	
-	zabbix_log(LOG_LEVEL_DEBUG, "run_remote_command [result:%i]", ret);
+	zabbix_log(LOG_LEVEL_DEBUG, "End run_remote_command(result:%d)", ret);
 }
 
 /******************************************************************************
@@ -239,7 +244,7 @@ static int get_next_command(char** command_list, char** alias, int* is_group, ch
 	assert(is_group);
 	assert(command);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "get_next_command START [command_list: '%s']", *command_list);
+	zabbix_log(LOG_LEVEL_DEBUG, "In get_next_command(command_list:%s)", *command_list);
 
 	*alias = NULL;
 	*is_group = 0;
@@ -287,7 +292,7 @@ static int get_next_command(char** command_list, char** alias, int* is_group, ch
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Result of get_next_command [alias:%s, is_group:%i, command:%s]", *alias, *is_group, *command);
+	zabbix_log(LOG_LEVEL_DEBUG, "End get_next_command [alias:%s,is_group:%i,command:%s]", *alias, *is_group, *command);
 	
 	return 0;
 }
@@ -321,9 +326,9 @@ static	void	run_commands(DB_EVENT *event, DB_ACTION *action)
 	assert(event);
 	assert(action);
 
-	cmd_list = action->scripts;
-	zabbix_log( LOG_LEVEL_DEBUG, "Run remote commands START [actionid:" ZBX_FS_UI64 "]",
+	zabbix_log( LOG_LEVEL_DEBUG, "In run_commands(actionid:" ZBX_FS_UI64 ")",
 		action->actionid);
+	cmd_list = action->scripts;
 	while(get_next_command(&cmd_list,&alias,&is_group,&command)!=1)
 	{
 		if(!alias || !command) continue;
@@ -344,7 +349,7 @@ static	void	run_commands(DB_EVENT *event, DB_ACTION *action)
 		}
 /*		DBadd_alert(action->actionid,trigger->triggerid, userid, media.mediatypeid,media.sendto,action->subject,action->scripts, action->maxrepeats, action->repeatdelay); */ /* TODO !!! Add alert for remote commands !!! */
 	}
-	zabbix_log( LOG_LEVEL_DEBUG, "Run remote commands END");
+	zabbix_log( LOG_LEVEL_DEBUG, "End run_commands()");
 }
 
 /******************************************************************************
@@ -581,6 +586,7 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		zabbix_log( LOG_LEVEL_DEBUG, "Condition is TRUE");
 	}
 
+	zabbix_log( LOG_LEVEL_DEBUG, "End check_action_condition()");
 	return ret;
 }
 
@@ -611,7 +617,7 @@ static int	check_action_conditions(DB_EVENT *event, zbx_uint64_t actionid)
 	int	ret = SUCCEED;
 	int	old_type = -1;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In check_action_conditions [actionid:%d]", actionid);
+	zabbix_log( LOG_LEVEL_DEBUG, "In check_action_conditions (actionid:%d)", actionid);
 
 	result = DBselect("select conditionid,actionid,conditiontype,operator,value from conditions where actionid=" ZBX_FS_UI64 " order by conditiontype", actionid);
 
@@ -642,14 +648,7 @@ static int	check_action_conditions(DB_EVENT *event, zbx_uint64_t actionid)
 	}
 	DBfree_result(result);
 
-	if(FAIL==ret)
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "Conditions are FALSE");
-	}
-	else
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "Conditions are TRUE");
-	}
+	zabbix_log( LOG_LEVEL_DEBUG, "End check_action_conditions (result:%d)", (FAIL==ret)?"FALSE":"TRUE");
 
 	return ret;
 }
@@ -712,7 +711,7 @@ void	apply_actions(DB_EVENT *event)
 
 		if(check_action_conditions(event, action.actionid) == SUCCEED)
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Conditions match our trigger. Do apply actions.");
+			zabbix_log( LOG_LEVEL_DEBUG, "Conditions match our trigger. Do apply actions.");
 
 			ZBX_STR2UINT64(action.userid, row[1]);
 			
@@ -742,6 +741,6 @@ void	apply_actions(DB_EVENT *event)
 			zabbix_log( LOG_LEVEL_DEBUG, "Conditions do not match our trigger. Do not apply actions.");
 		}
 	}
-	zabbix_log( LOG_LEVEL_DEBUG, "Actions applied for eventid " ZBX_FS_UI64, event->eventid);
 	DBfree_result(result);
+	zabbix_log( LOG_LEVEL_DEBUG, "End apply_actions()");
 }
