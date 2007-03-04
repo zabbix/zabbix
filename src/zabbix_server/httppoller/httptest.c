@@ -64,6 +64,7 @@ static int process_value(zbx_uint64_t itemid, AGENT_RESULT *value)
 	if(!row)
 	{
 		DBfree_result(result);
+		zabbix_log( LOG_LEVEL_DEBUG, "End process_value(result:FAIL)");
 		return  FAIL;
 	}
 
@@ -76,6 +77,7 @@ static int process_value(zbx_uint64_t itemid, AGENT_RESULT *value)
  
 	DBfree_result(result);
 
+	zabbix_log( LOG_LEVEL_DEBUG, "End process_value()");
 	return SUCCEED;
 }
 
@@ -121,7 +123,7 @@ static void	process_test_data(DB_HTTPTEST *httptest, S_ZBX_HTTPSTAT *stat)
 
 	AGENT_RESULT    value;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "     TEST [%s]: Time %f Last step %d",
+	zabbix_log(LOG_LEVEL_DEBUG, "In process_test_data(test:%s,time:%f,last step:%d)",
 		 httptest->name, stat->test_total_time, stat->test_last_step);
 
 	result = DBselect("select httptestitemid,httptestid,itemid,type from httptestitem where httptestid=" ZBX_FS_UI64,
@@ -153,6 +155,7 @@ static void	process_test_data(DB_HTTPTEST *httptest, S_ZBX_HTTPSTAT *stat)
 	}
 	
 	DBfree_result(result);
+	zabbix_log(LOG_LEVEL_DEBUG, "End process_test_data()");
 #endif
 }
 
@@ -166,7 +169,7 @@ static void	process_step_data(DB_HTTPTEST *httptest, DB_HTTPSTEP *httpstep, S_ZB
 
 	AGENT_RESULT    value;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "     Step [%s] [%s]: Rsp %d Time %f Speed %f",
+	zabbix_log(LOG_LEVEL_DEBUG, "In process_step_data(step:%s,url:%s,rsp:%d,time:%f,speed:%f)",
 		 httpstep->name, httpstep->url, stat->rspcode, stat->total_time, stat->speed_download);
 
 	result = DBselect("select httpstepitemid,httpstepid,itemid,type from httpstepitem where httpstepid=" ZBX_FS_UI64,
@@ -204,6 +207,7 @@ static void	process_step_data(DB_HTTPTEST *httptest, DB_HTTPSTEP *httpstep, S_ZB
 	}
 	
 	DBfree_result(result);
+	zabbix_log(LOG_LEVEL_DEBUG, "End process_step_data()");
 
 /*	DB_RESULT	result;
 	DB_ROW	row;
@@ -265,8 +269,8 @@ static int	process_httptest(DB_HTTPTEST *httptest)
 
 	CURL            *easyhandle = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In process_httptest(httptestid:" ZBX_FS_UI64 ")", httptest->httptestid);
-	zabbix_log(LOG_LEVEL_DEBUG, "Test [%s]", httptest->name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In process_httptest(httptestid:" ZBX_FS_UI64 ",name:%s)",
+		httptest->httptestid, httptest->name);
 
 	DBexecute("update httptest set lastcheck=%d where httptestid=" ZBX_FS_UI64,
 		now,
@@ -416,7 +420,8 @@ zabbix_log(LOG_LEVEL_DEBUG, "[%s]", page.data);
 
 	process_test_data(httptest, &stat);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "TOTAL: Time %f", httptest->time);
+	zabbix_log(LOG_LEVEL_DEBUG, "End process_httptest(total time:%f)",
+		httptest->time);
 
 	return ret;
 #endif /* HAVE_LIBCURL */
@@ -445,7 +450,7 @@ void process_httptests(int now)
 
 	DB_HTTPTEST	httptest;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In process_httptests");
+	zabbix_log(LOG_LEVEL_DEBUG, "In process_httptests()");
 
 	result = DBselect("select httptestid,name,applicationid,nextcheck,status,delay,macros,agent from httptest where status=%d and nextcheck<=%d and " ZBX_SQL_MOD(httptestid,%d) "=%d and " ZBX_COND_NODEID, HTTPTEST_STATUS_MONITORED, now, CONFIG_HTTPPOLLER_FORKS, httppoller_num-1, LOCAL_NODE("httptestid"));
 	while((row=DBfetch(result)))
@@ -462,5 +467,6 @@ void process_httptests(int now)
 		process_httptest(&httptest);
 	}
 	DBfree_result(result);
+	zabbix_log(LOG_LEVEL_DEBUG, "End process_httptests()");
 #endif /* HAVE_LIBCURL */
 }
