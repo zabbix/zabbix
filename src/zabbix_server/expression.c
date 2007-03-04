@@ -511,7 +511,7 @@ int	evaluate(int *result, char *exp, char *error, int maxerrlen)
 		zabbix_syslog("%s", error);
 		return	FAIL;
 	}
-	zabbix_log( LOG_LEVEL_DEBUG, "Evaluate end:[%lf]", value );
+	zabbix_log(LOG_LEVEL_DEBUG, "End evaluate(result:%lf)",value);
 	*result=value;
 
 	return SUCCEED;
@@ -584,7 +584,7 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char **data, i
 
 	if(!data || !*data) return;
 	
-	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_simple_macros [%s]",*data);
+	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_simple_macros (data:%s)",*data);
 
 	if('\0' == *data[0]) return;
 
@@ -1077,7 +1077,7 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char **data, i
 
 	*data = str_out;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Result expression [%s]", *data );
+	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_simple_macros [result:%s]",*data);
 }
 
 /******************************************************************************
@@ -1169,11 +1169,11 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, char **data)
 						*p = ')';
 						pms = p + 1;
 						
-						/* function 'evaluate_FUNCTION2' require 'replace_to' with size 'MAX_STRING_LEN' */
+						/* function 'evaluate_function2' require 'replace_to' with size 'MAX_STRING_LEN' */
 						zbx_free(replace_to);
 						replace_to = zbx_malloc(MAX_STRING_LEN);
 
-						if(evaluate_FUNCTION2(replace_to,host,key,function,parameter) != SUCCEED)
+						if(evaluate_function2(replace_to,host,key,function,parameter) != SUCCEED)
 							zbx_snprintf(replace_to, MAX_STRING_LEN, "%s", STR_UNKNOWN_VARIABLE);
 					}
 				}
