@@ -95,7 +95,7 @@ void	update_functions(DB_ITEM *item)
 		zabbix_log( LOG_LEVEL_DEBUG, "ItemId:" ZBX_FS_UI64 " Evaluating %s(%d)",
 			function.itemid,function.function,function.parameter);
 
-		ret = evaluate_FUNCTION(value,item,function.function,function.parameter);
+		ret = evaluate_function(value,item,function.function,function.parameter);
 		if( FAIL == ret)	
 		{
 			zabbix_log( LOG_LEVEL_DEBUG, "Evaluation failed for function:%s",function.function);

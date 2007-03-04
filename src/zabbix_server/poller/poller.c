@@ -66,7 +66,7 @@ int	get_value(DB_ITEM *item, AGENT_RESULT *result)
 
 	struct	sigaction phan;
 
-	zabbix_log(LOG_LEVEL_WARNING, "In get_value()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In get_value()");
 
 	phan.sa_handler = &child_signal_handler;
 	sigemptyset(&phan.sa_mask);
@@ -109,7 +109,7 @@ int	get_value(DB_ITEM *item, AGENT_RESULT *result)
 	}
 	alarm(0);
 
-	zabbix_log(LOG_LEVEL_WARNING, "End get_value()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End get_value()");
 	return res;
 }
 

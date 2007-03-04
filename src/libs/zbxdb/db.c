@@ -351,7 +351,7 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 
 	sql = zbx_dvsprintf(sql, fmt, args);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s", sql);
+	zabbix_log( LOG_LEVEL_DEBUG, "Query [%s]", sql);
 #ifdef	HAVE_MYSQL
 	if(!conn)
 	{
@@ -600,7 +600,7 @@ DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 
 	sql = zbx_dvsprintf(sql, fmt, args);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Executing query:%s", sql);
+	zabbix_log( LOG_LEVEL_DEBUG, "Query [%s]", sql);
 
 #ifdef	HAVE_MYSQL
 	if(!conn)
