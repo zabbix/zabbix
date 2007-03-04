@@ -806,7 +806,7 @@ static int evaluate_NODATA(char *value,DB_ITEM	*item,int parameter)
 
 /******************************************************************************
  *                                                                            *
- * Function: evaluate_FUNCTION                                                *
+ * Function: evaluate_function                                                *
  *                                                                            *
  * Purpose: evaluate function                                                 *
  *                                                                            *
@@ -824,7 +824,7 @@ static int evaluate_NODATA(char *value,DB_ITEM	*item,int parameter)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
+int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 {
 	int	ret  = SUCCEED;
 	time_t  now;
@@ -835,7 +835,7 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 	int	day;
 	int	len;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_FUNCTION(%s)",function);
+	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_function(%s)",function);
 
 	if(strcmp(function,"last")==0)
 	{
@@ -1206,7 +1206,7 @@ int evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter)
 		ret = FAIL;
 	}
 
-	zabbix_log( LOG_LEVEL_DEBUG, "End of evaluate_FUNCTION(result:%s)",value);
+	zabbix_log( LOG_LEVEL_DEBUG, "End of evaluate_function(result:%s)",value);
 	return ret;
 }
 
@@ -1336,7 +1336,7 @@ int	replace_value_by_map(char *value, zbx_uint64_t valuemapid)
 
 /******************************************************************************
  *                                                                            *
- * Function: evaluate_FUNCTION2                                               *
+ * Function: evaluate_function2                                               *
  *                                                                            *
  * Purpose: evaluate function                                                 *
  *                                                                            *
@@ -1353,7 +1353,7 @@ int	replace_value_by_map(char *value, zbx_uint64_t valuemapid)
  * Comments: Used for evaluation of notification macros                       *
  *                                                                            *
  ******************************************************************************/
-int evaluate_FUNCTION2(char *value,char *host,char *key,char *function,char *parameter)
+int evaluate_function2(char *value,char *host,char *key,char *function,char *parameter)
 {
 	DB_ITEM	item;
 	DB_RESULT result;
@@ -1361,7 +1361,7 @@ int evaluate_FUNCTION2(char *value,char *host,char *key,char *function,char *par
 
 	int	res;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate_FUNCTION2(%s,%s,%s,%s)",host,key,function,parameter);
+	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate_function2(%s,%s,%s,%s)",host,key,function,parameter);
 
 	result = DBselect("select %s where h.host='%s' and h.hostid=i.hostid and i.key_='%s' and" ZBX_COND_NODEID, ZBX_SQL_ITEM_SELECT, host, key, LOCAL_NODE("h.hostid"));
 
@@ -1378,7 +1378,7 @@ int evaluate_FUNCTION2(char *value,char *host,char *key,char *function,char *par
 	DBget_item_from_db(&item,row);
 
 /*	res = evaluate_FUNCTION(value,&item,function,parameter, EVALUATE_FUNCTION_SUFFIX); */
-	res = evaluate_FUNCTION(value,&item,function,parameter);
+	res = evaluate_function(value,&item,function,parameter);
 
 	if(replace_value_by_map(value, item.valuemapid) != SUCCEED)
 	{
@@ -1388,6 +1388,6 @@ int evaluate_FUNCTION2(char *value,char *host,char *key,char *function,char *par
 /* Cannot call DBfree_result until evaluate_FUNC */
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End evaluate_FUNCTION2(result:%s)",value);
+	zabbix_log(LOG_LEVEL_DEBUG, "End evaluate_function2(result:%s)",value);
 	return res;
 }

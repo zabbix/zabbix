@@ -500,6 +500,24 @@ int MAIN_ZABBIX_ENTRY(void)
 /*	zabbix_log( LOG_LEVEL_WARNING, "INFO [%s]", ZBX_SQL_MOD(a,%d)); */
 	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_server. ZABBIX %s.", ZABBIX_VERSION);
 
+	zabbix_log( LOG_LEVEL_WARNING, "**** Enabled features ****");
+#ifdef	HAVE_SNMP
+	zabbix_log( LOG_LEVEL_WARNING, "SNMP monitoring:       YES");
+#else
+	zabbix_log( LOG_LEVEL_WARNING, "SNMP monitoring:        NO");
+#endif
+#ifdef	HAVE_LIBCURL
+	zabbix_log( LOG_LEVEL_WARNING, "WEB monitoring:        YES");
+#else
+	zabbix_log( LOG_LEVEL_WARNING, "WEB monitoring:         NO");
+#endif
+#ifdef	HAVE_JABBER
+	zabbix_log( LOG_LEVEL_WARNING, "Jabber notifications:  YES");
+#else
+	zabbix_log( LOG_LEVEL_WARNING, "Jabber notifications:   NO");
+#endif
+	zabbix_log( LOG_LEVEL_WARNING, "**************************");
+
 	DBconnect(ZBX_DB_CONNECT_EXIT);
 
 	result = DBselect("select refresh_unsupported from config where " ZBX_COND_NODEID, LOCAL_NODE("configid"));
