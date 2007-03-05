@@ -197,7 +197,7 @@ FS_FNCLIST
                 return SYSINFO_RET_FAIL;
         }
 
-        if(get_param(param, 1, fsname, sizeof(fsname))) != 0)
+        if(get_param(param, 1, fsname, sizeof(fsname)) != 0)
         {
                 return SYSINFO_RET_FAIL;
         }

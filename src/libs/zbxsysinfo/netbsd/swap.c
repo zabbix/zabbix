@@ -291,7 +291,7 @@ SWP_FNCLIST
         if(swapdev[0] == '\0')
 	{
 		/* default parameter */
-		zbx_snprintf(swapdev, sizeof(swadev), "all");
+		zbx_snprintf(swapdev, sizeof(swapdev), "all");
 	}
 
 	if(strncmp(swapdev, "all", sizeof(swapdev)))
