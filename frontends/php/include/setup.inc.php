@@ -239,6 +239,26 @@
 					!isset($ZBX_CONFIG['allowed_db']['no']),
 					'Required any databases support [MySQL or PostgreSQL or Oracle]'));
 
+			/* Check BC math */
+			$bcmath_fnc_exist = 
+				function_exists('bcadd') &&
+				function_exists('bccomp') &&
+				function_exists('bcdiv') &&
+				function_exists('bcmod') &&
+				function_exists('bcmul') &&
+				function_exists('bcpow') &&
+				function_exists('bcpowmod') &&
+				function_exists('bcscale') &&
+				function_exists('bcsqrt') &&
+				function_exists('bcsub');
+			$table->AddRow(
+				get_test_result(
+					$final_result,
+					'PHP BC math support',
+					$bcmath_fnc_exist ? 'yes' : 'no',
+					$bcmath_fnc_exist,
+					'Required bcmath module [configured PHP with --enable-bcmath]'));
+
 			/* Check GD existence */
 			$gd_version = S_NO;
 			if(is_callable('gd_info'))
