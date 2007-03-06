@@ -157,10 +157,10 @@ include_once "include/page_header.php";
 
 	while($db_element = DBfetch($db_elements))
 	{
-		$img = get_png_by_selementid($db_element["selementid"]);
-
-		if($img)
+		if( ($img = get_png_by_selementid($db_element["selementid"])) )
+		{
 			ImageCopy($im,$img,$db_element["x"],$db_element["y"],0,0,ImageSX($img),ImageSY($img));
+		}
 
 		if($label_type==MAP_LABEL_TYPE_NOTHING)	continue;
 
@@ -172,53 +172,32 @@ include_once "include/page_header.php";
 
 		$label_line = $db_element["label"];
 
+		$el_info = get_info_by_selementid($db_element["selementid"]);
+
+		$info_line	= $el_info['info'];
+		$color		= $el_info['color'];
+
 		if($label_type==MAP_LABEL_TYPE_STATUS)
+		{
 			$label_line = "";
+		}
+		else if($label_type==MAP_LABEL_TYPE_NAME)
+		{
+			$label_line = $el_info['name'];
+		}
+
+		unset($el_info);
 
 		if($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_HOST)
 		{
 			$host = get_host_by_hostid($db_element["elementid"]);
-
-			if($label_type==MAP_LABEL_TYPE_NAME)
-			{
-				$label_line=$host["host"];
-			}
-			else if($label_type==MAP_LABEL_TYPE_IP)
-			{
+			
+			if( $label_type==MAP_LABEL_TYPE_IP )
 				$label_line=$host["ip"];
-			}
 
-			if($host["status"] == HOST_STATUS_NOT_MONITORED)
-			{
+			if( $host["status"] == HOST_STATUS_NOT_MONITORED )
 				$label_color=$darkred;
-			}
 		}
-		elseif($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_MAP)
-		{
-			$map = get_sysmap_by_sysmapid($db_element["elementid"]);
-			if($label_type==MAP_LABEL_TYPE_NAME)
-			{
-				$label_line=$map["name"];
-			}
-
-		}
-		elseif($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_TRIGGER && $db_element["elementid"]>0)
-		{
-			if($label_type==MAP_LABEL_TYPE_NAME)
-			{
-				$label_line = expand_trigger_description_simple($db_element["elementid"]);
-			}
-		}
-		elseif($db_element["elementtype"] == SYSMAP_ELEMENT_TYPE_HOST_GROUP && $db_element["elementid"]>0)
-		{
-			if($label_type==MAP_LABEL_TYPE_NAME)
-			{
-				$group = DBfetch(DBselect('select * from groups where groupid='.$db_element["elementid"]));
-				$label_line = $group["name"];
-			}
-		}
-
-		get_info_by_selementid($db_element["selementid"],$info_line, $color);
 
 		if($label_line=="" && $info_line=="")	continue;
 
