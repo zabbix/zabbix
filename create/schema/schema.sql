@@ -548,7 +548,7 @@ FIELD		|elementid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|elementtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|iconid_off	|t_bigint		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|iconid_on	|t_bigint		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|iconid_uncnown	|t_bigint		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|iconid_unknown	|t_bigint		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|label		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|label_location	|t_integer	|	|NULL		|ZBX_SYNC
 FIELD		|x		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
