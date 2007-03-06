@@ -40,7 +40,7 @@
 			case HTTPTEST_STATUS_ACTIVE:	$status = 'off';	break;
 			case HTTPTEST_STATUS_DISABLED:	$status = 'on';		break;
 			default:
-				$status = 'uncnown';	break;
+				$status = 'unknown';	break;
 		}
 		return $status;
 	}

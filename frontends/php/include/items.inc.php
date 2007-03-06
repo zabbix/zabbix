@@ -73,7 +73,7 @@
 			case ITEM_STATUS_DISABLED:	$status = 'on';		break;
 			case ITEM_STATUS_NOTSUPPORTED:	
 			default:
-				$status = 'uncnown';	break;
+				$status = 'unknown';	break;
 		}
 		return $status;
 	}

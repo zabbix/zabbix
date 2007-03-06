@@ -593,7 +593,7 @@ function add_template(formname,id,name)
 			}
 			else if($row["status"] == TRIGGER_STATUS_UNKNOWN)
 			{
-				$status= new CSpan(S_UNCNOWN, 'uncnown');
+				$status= new CSpan(S_UNKNOWN, 'unknown');
 			}
 			else if($row["status"] == TRIGGER_STATUS_ENABLED)
 			{
