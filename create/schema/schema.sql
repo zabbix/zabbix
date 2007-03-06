@@ -240,6 +240,7 @@ FIELD		|maxrepeats	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|repeatdelay	|t_integer	|'600'	|NOT NULL	|ZBX_SYNC
 FIELD		|source		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|actiontype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|evaltype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|scripts	|t_blob		|''	|NOT NULL	|ZBX_SYNC
 

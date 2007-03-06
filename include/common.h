@@ -155,6 +155,14 @@ typedef enum
 /* Condition types */
 typedef enum
 {
+	ACTION_EVAL_TYPE_AND_OR	= 0,
+	ACTION_EVAL_TYPE_AND,
+	ACTION_EVAL_TYPE_OR,
+}	zbx_action_eval_type_t;
+
+/* Condition types */
+typedef enum
+{
 	CONDITION_TYPE_HOST_GROUP = 0,
 	CONDITION_TYPE_HOST,
 	CONDITION_TYPE_TRIGGER,
