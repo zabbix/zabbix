@@ -98,7 +98,7 @@ static	void	send_to_user_medias(DB_EVENT *event,DB_ACTION *action, zbx_uint64_t 
 			continue;
 		}
 
-		DBadd_alert(action->actionid, userid, event->triggerid, media.mediatypeid,media.sendto,action->subject,action->message, action->maxrepeats, action->repeatdelay);
+		DBadd_alert(action->actionid, userid, event->triggerid, media.mediatypeid,media.sendto,action->subject,action->message);
 	}
 	DBfree_result(result);
 
@@ -347,7 +347,7 @@ static	void	run_commands(DB_EVENT *event, DB_ACTION *action)
 		{
 			run_remote_command(alias, command);
 		}
-/*		DBadd_alert(action->actionid,trigger->triggerid, userid, media.mediatypeid,media.sendto,action->subject,action->scripts, action->maxrepeats, action->repeatdelay); */ /* TODO !!! Add alert for remote commands !!! */
+/*		DBadd_alert(action->actionid,trigger->triggerid, userid, media.mediatypeid,media.sendto,action->subject,action->scripts); */ /* TODO !!! Add alert for remote commands !!! */
 	}
 	zabbix_log( LOG_LEVEL_DEBUG, "End run_commands()");
 }
@@ -746,18 +746,12 @@ void	apply_actions(DB_EVENT *event)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Applying actions");
 
-/*	now = time(NULL);*/
-
-/*	zbx_snprintf(sql,sizeof(sql),"select actionid,userid,delay,subject,message,scope,severity,recipient,good from actions where (scope=%d and triggerid=%d and good=%d and nextcheck<=%d) or (scope=%d and good=%d) or (scope=%d and good=%d)",ACTION_SCOPE_TRIGGER,trigger->triggerid,trigger_value,now,ACTION_SCOPE_HOST,trigger_value,ACTION_SCOPE_HOSTS,trigger_value);*/
-/*	zbx_snprintf(sql,sizeof(sql),"select actionid,userid,delay,subject,message,recipient,maxrepeats,repeatdelay,scripts,actiontype from actions where nextcheck<=%d and status=%d", now, ACTION_STATUS_ACTIVE);*/
-
-	/* No support of action delay anymore */
-	result = DBselect("select actionid,userid,subject,message,recipient,maxrepeats,repeatdelay,scripts,actiontype,evaltype from actions where status=%d and" ZBX_COND_NODEID, ACTION_STATUS_ACTIVE, LOCAL_NODE("actionid"));
+	result = DBselect("select actionid,userid,subject,message,recipient,scripts,actiontype,evaltype from actions where status=%d and" ZBX_COND_NODEID, ACTION_STATUS_ACTIVE, LOCAL_NODE("actionid"));
 
 	while((row=DBfetch(result)))
 	{
 		ZBX_STR2UINT64(action.actionid, row[0]);
-		action.evaltype		= atoi(row[9]);
+		action.evaltype		= atoi(row[7]);
 
 		if(check_action_conditions(event, &action) == SUCCEED)
 		{
@@ -767,12 +761,9 @@ void	apply_actions(DB_EVENT *event)
 			
 			action.subject		= strdup(row[2]);
 			action.message		= strdup(row[3]);
-			action.scripts		= strdup(row[7]);
-
 			action.recipient	= atoi(row[4]);
-			action.maxrepeats	= atoi(row[5]);
-			action.repeatdelay	= atoi(row[6]);
-			action.actiontype	= atoi(row[8]);
+			action.scripts		= strdup(row[5]);
+			action.actiontype	= atoi(row[6]);
 
 			substitute_macros(event, &action, &action.message);
 			substitute_macros(event, &action, &action.subject);

@@ -11,10 +11,7 @@ CREATE TABLE alerts_tmp (
 	status		integer	DEFAULT '0'	NOT NULL,
 	retries		integer	DEFAULT '0'	NOT NULL,
 	error		varchar(128)		DEFAULT ''	NOT NULL,
-	repeats		integer	DEFAULT '0'	NOT NULL,
-	maxrepeats	integer	DEFAULT '0'	NOT NULL,
 	nextcheck	integer	DEFAULT '0'	NOT NULL,
-	delay		integer	DEFAULT '0'	NOT NULL,
 	PRIMARY KEY (alertid)
 );
 CREATE INDEX alerts_1 on alerts_tmp (actionid);
@@ -24,6 +21,6 @@ CREATE INDEX alerts_4 on alerts_tmp (status,retries);
 CREATE INDEX alerts_5 on alerts_tmp (mediatypeid);
 CREATE INDEX alerts_6 on alerts_tmp (userid);
 
-insert into alerts_tmp select * from alerts;
+insert into alerts_tmp select alertid,actionid,triggerid,userid,clock,mediatypeid,sendto,subject,message,status,retries,error,nextcheck from alerts;
 drop table alerts;
 alter table alerts_tmp rename to alerts;

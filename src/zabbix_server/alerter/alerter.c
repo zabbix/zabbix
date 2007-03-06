@@ -90,7 +90,7 @@ int execute_action(DB_ALERT *alert,DB_MEDIATYPE *mediatype, char *error, int max
 		(char *)0 };
 
 
-	zabbix_log( LOG_LEVEL_WARNING, "In execute_action(%s)", mediatype->smtp_server);
+	zabbix_log( LOG_LEVEL_DEBUG, "In execute_action(%s)", mediatype->smtp_server);
 
 	if(mediatype->type==ALERT_TYPE_EMAIL)
 	{
@@ -162,7 +162,7 @@ int execute_action(DB_ALERT *alert,DB_MEDIATYPE *mediatype, char *error, int max
 		res=FAIL;
 	}
 
-	zabbix_log( LOG_LEVEL_WARNING, "End of execute_action()");
+	zabbix_log( LOG_LEVEL_DEBUG, "End execute_action()");
 
 	return res;
 }
@@ -205,7 +205,7 @@ int main_alerter_loop()
 
 		now  = time(NULL);
 
-		result = DBselect("select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,a.retries,mt.mediatypeid,mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path,a.delay,mt.gsm_modem,mt.username,mt.passwd from alerts a,media_type mt where a.status=%d and a.retries<3 and (a.repeats<a.maxrepeats or a.maxrepeats=0) and a.nextcheck<=%d and a.mediatypeid=mt.mediatypeid and " ZBX_COND_NODEID " order by a.clock", ALERT_STATUS_NOT_SENT, now, LOCAL_NODE("mt.mediatypeid"));
+		result = DBselect("select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,a.retries,mt.mediatypeid,mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path,a.delay,mt.gsm_modem,mt.username,mt.passwd from alerts a,media_type mt where a.status=%d and a.retries<3 and a.mediatypeid=mt.mediatypeid and " ZBX_COND_NODEID " order by a.clock", ALERT_STATUS_NOT_SENT, LOCAL_NODE("mt.mediatypeid"));
 
 		while((row=DBfetch(result)))
 		{
@@ -245,8 +245,8 @@ int main_alerter_loop()
 			if(res==SUCCEED)
 			{
 				zabbix_log( LOG_LEVEL_DEBUG, "Alert ID [" ZBX_FS_UI64 "] was sent successfully", alert.alertid);
-				DBexecute("update alerts set repeats=repeats+1, nextcheck=%d where alertid=" ZBX_FS_UI64, now+alert.delay, alert.alertid);
-				DBexecute("update alerts set status=%d where alertid=" ZBX_FS_UI64 " and repeats>=maxrepeats and status=%d and retries<3", ALERT_STATUS_SENT, alert.alertid, ALERT_STATUS_NOT_SENT);
+				DBexecute("update alerts set status=%d where status=%d and alertid=" ZBX_FS_UI64,
+					ALERT_STATUS_SENT, ALERT_STATUS_NOT_SENT, alert.alertid);
 			}
 			else
 			{
