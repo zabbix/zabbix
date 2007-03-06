@@ -155,10 +155,7 @@ FIELD		|message	|t_blob		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|retries	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|error		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|repeats	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|maxrepeats	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|nextcheck	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|delay		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|actionid
 INDEX		|2		|clock
 INDEX		|3		|triggerid
@@ -236,8 +233,6 @@ FIELD		|userid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|subject	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|message	|t_blob		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|recipient	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|maxrepeats	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|repeatdelay	|t_integer	|'600'	|NOT NULL	|ZBX_SYNC
 FIELD		|source		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|actiontype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|evaltype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC

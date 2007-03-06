@@ -10,6 +10,6 @@ CREATE TABLE sysmaps_tmp (
 ) ENGINE=InnoDB;
 CREATE INDEX sysmaps_1 on sysmaps_tmp (name);
 
-insert into sysmaps_tmp select * from sysmaps;
+insert into sysmaps_tmp select s.sysmapid,s.name,s.width,s.height,i.imageid,s.label_type,s.label_location from sysmaps s,images i where s.background=i.name;
 drop table sysmaps;
 alter table sysmaps_tmp rename sysmaps;

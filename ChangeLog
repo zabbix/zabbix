@@ -1,7 +1,11 @@
 Changes for 1.3.4:
 
+ - removed support of action repeats (Alexei)
+ - fixed upgrade of rights,sysmaps,sysmaps_elements (Alexei)
+ - fixed initial creation of user rights in data.sql (Alexei)
+ - fixes of PostgreSQL compile (Alexei)
+ - added icons for elements of map having Unknown status (Eugene)
  - added installation check for 'BC math' (Eugene)
- - added 'UNKNOWN' status for elements of map (Eugene)
  - added actions.evaltype (Alexei)
  - added support of all AND, all OR and AND/OR action conditions (Alexei)
  - fixed processing of Text items (Alexei)

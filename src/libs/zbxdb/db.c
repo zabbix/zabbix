@@ -59,7 +59,7 @@ void	zbx_db_close(void)
 #endif
 #ifdef	HAVE_POSTGRESQL
 	PQfinish(conn);
-	conn = NULL
+	conn = NULL;
 #endif
 #ifdef	HAVE_ORACLE
 	sqlo_finish(oracle);
@@ -135,14 +135,16 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 #ifdef	HAVE_POSTGRESQL
 /*	conn = PQsetdb(pghost, pgport, pgoptions, pgtty, dbName); */
 /*	conn = PQsetdb(NULL, NULL, NULL, NULL, CONFIG_DBNAME);*/
-	conn = PQsetdbLogin(CONFIG_DBHOST, NULL, NULL, NULL, dbname, user, password );
+	conn = PQsetdbLogin(host, NULL, NULL, NULL, dbname, user, password );
 
 /* check to see that the backend connection was successfully made */
 	if (PQstatus(conn) != CONNECTION_OK)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Connection to database '%s' failed.", dbname);
-		exit(FAIL);
+		ret = ZBX_DB_FAIL;
 	}
+
+	return ret;
 #endif
 #ifdef	HAVE_ORACLE
 	char    connect[MAX_STRING_LEN];
@@ -728,7 +730,7 @@ zbx_uint64_t	zbx_db_insert_id(int exec_result, const char *table, const char *fi
 	if(exec_result == FAIL) return 0;
 	if((Oid)exec_result == InvalidOid) return 0;
 	
-	tmp_res = DBselect("select %s from %s where oid=%i", field, table, exec_result);
+	tmp_res = zbx_db_select("select %s from %s where oid=%i", field, table, exec_result);
 
 	ZBX_STR2UINT64(id_res, PQgetvalue(tmp_res->pg_result, 0, 0));
 /*	id_res = atoi(PQgetvalue(tmp_res->pg_result, 0, 0));*/
