@@ -2542,6 +2542,7 @@
 			$repeatdelay	= $action["repeatdelay"];
 			$status 	= $action["status"];
 			$scripts 	= $action["scripts"];
+			$evaltype	= $action["evaltype"];
 
 			if(isset($_REQUEST["repeat"]))
 			{
@@ -2585,6 +2586,7 @@
 			$status		= get_request("status",ACTION_STATUS_ENABLED);
 			$uid 		= get_request("userid",0);
 			$scripts	= get_request("scripts","");
+			$evaltype	= get_request("evaltype",ACTION_EVAL_TYPE_AND_OR);
 
 		}
 
@@ -2593,37 +2595,82 @@
 		$cmbActionType->AddItem(ACTION_TYPE_COMMAND,S_REMOTE_COMMAND);
 		$frmAction->AddRow(S_ACTION_TYPE, $cmbActionType);
 
+		$cmbSource =  new CComboBox('source', $source);
+		$cmbSource->AddItem(0, S_TRIGGER);
+		$frmAction->AddRow(S_SOURCE, $cmbSource);
 
 // prepare condition list
-		$cond_el=array();
+		sort($conditions);
+
+		$grouped_conditions = array();
+		$cond_el = new CTable();
 		$i=0;
 		foreach($conditions as $val)
 		{
-			array_push($cond_el, 
-				array(
+			$label = chr(65 + $i);
+			$cond_el->AddRow(array(
+					'('.$label.')',
 					new CCheckBox("rem_condition[]", 'no', null,$i),
 					get_condition_desc(
 						$val["type"],
 						$val["operator"],
 						$val["value"]
 					)
-				),
-				BR);
+				));
+				
 			$frmAction->AddVar("conditions[$i][type]", 	$val["type"]);
 			$frmAction->AddVar("conditions[$i][operator]", 	$val["operator"]);
 			$frmAction->AddVar("conditions[$i][value]", 	$val["value"]);
+
+			if(!isset($grouped_conditions[$val["type"]]) || !is_array($grouped_conditions[$val["type"]]))
+				$grouped_conditions[$val["type"]] = array();
+
+			array_push($grouped_conditions[$val["type"]], $label);
+
 			$i++;
 		}
+		unset($conditions);
 
-		if(count($cond_el)==0)
-			array_push($cond_el, S_NO_CONDITIONS_DEFINED);
+		if($cond_el->ItemsCount() == 0)
+			$cond_el = S_NO_CONDITIONS_DEFINED;
 		else
-			array_push($cond_el, new CButton('del_condition','delete selected'));
-// end of condition list preparation
+		{
+			if($cond_el->ItemsCount() > 1)
+			{
+				switch($evaltype)
+				{
+					case ACTION_EVAL_TYPE_AND:
+						$group_op = $glog_op = S_AND;
+						break;
+					case ACTION_EVAL_TYPE_OR:
+						$group_op = $glog_op = S_OR;
+						break;
+					default:
+						$group_op = S_OR;
+						$glog_op = S_AND;
+				}
 
-		$cmbSource =  new CComboBox('source', $source);
-		$cmbSource->AddItem(0, S_TRIGGER);
-		$frmAction->AddRow(S_SOURCE, $cmbSource);
+				foreach($grouped_conditions as $id => $val)
+				{
+					$grouped_conditions[$id] = '('.implode(' '.$group_op.' ', $val).')';
+				}
+				$grouped_conditions = implode(' '.$glog_op.' ', $grouped_conditions);
+
+				$cmb_calc_type = new CComboBox('evaltype', $evaltype, 'submit()');
+				$cmb_calc_type->AddItem(ACTION_EVAL_TYPE_AND_OR, S_AND_OR_BIG);
+				$cmb_calc_type->AddItem(ACTION_EVAL_TYPE_AND, S_AND_BIG);
+				$cmb_calc_type->AddItem(ACTION_EVAL_TYPE_OR, S_OR_BIG);
+				$frmAction->AddRow(S_TYPE_OF_CALCULATION, array($cmb_calc_type,new CTextBox('preview', $grouped_conditions, 60,'yes')));
+			}
+			else
+			{
+				$frmAction->AddVar('evaltype', ACTION_EVAL_TYPE_AND_OR);
+			}
+			$cond_el = array($cond_el, new CButton('del_condition','delete selected'));
+		}
+		unset($grouped_conditions);
+
+// end of condition list preparation
 
 		$frmAction->AddRow(S_CONDITIONS, $cond_el); 
 
