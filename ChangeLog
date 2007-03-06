@@ -1,5 +1,6 @@
 Changes for 1.3.4:
 
+ - added support of AND, OR, AND/OR calculation of action conditions [GUI] (Eugene)
  - removed support of action repeats (Alexei)
  - fixed upgrade of rights,sysmaps,sysmaps_elements (Alexei)
  - fixed initial creation of user rights in data.sql (Alexei)

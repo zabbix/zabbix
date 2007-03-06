@@ -207,6 +207,12 @@
 	"S_NO_REPEATS"=>			"No repeats",
 	"S_NUMBER_OF_REPEATS"=>			"Number of repeats",
 	"S_DELAY_BETWEEN_REPEATS"=>		"Delay between repeats",
+	"S_AND_OR_BIG"=>			"AND / OR",
+	"S_AND_BIG"=>				"AND",
+	"S_AND"=>				"and",
+	"S_OR_BIG"=>				"OR",
+	"S_OR"=>				"or",
+	"S_TYPE_OF_CALCULATION"=>		"Type of calculation",
 	"S_CREATE_ACTION"=>			"Create Action",
 
 //	alarms.php

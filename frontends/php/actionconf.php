@@ -49,6 +49,7 @@ include_once "include/page_header.php";
 		"scripts"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,	'{actiontype}==1&&isset({save})'),
 		"repeat"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0,1"), 	'isset({save})'),
 		"status"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0,1"), 	'isset({save})'),
+		"evaltype"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN(ACTION_EVAL_TYPE_AND_OR.','.ACTION_EVAL_TYPE_AND.','.ACTION_EVAL_TYPE_OR), 	'isset({save})'),
 
 		"maxrepeats"=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),'{repeat}==1&&isset({save})'),
 		"repeatdelay"=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),'{repeat}==1&&isset({save})'),
@@ -116,7 +117,7 @@ include_once "include/page_header.php";
 				$_REQUEST['actiontype'],$_REQUEST['userid'],
 				$_REQUEST["subject"], $_REQUEST["message"],$_REQUEST["recipient"],
 				$_REQUEST["maxrepeats"],$_REQUEST["repeatdelay"],$_REQUEST["status"],
-				$_REQUEST["scripts"]);
+				$_REQUEST["scripts"],$_REQUEST["evaltype"]);
 
 			show_messages($result,S_ACTION_UPDATED,S_CANNOT_UPDATE_ACTION);
 		} else {
@@ -127,7 +128,7 @@ include_once "include/page_header.php";
 				$_REQUEST['actiontype'],$_REQUEST['userid'], 
 				$_REQUEST["subject"],$_REQUEST["message"],$_REQUEST["recipient"],
 				$_REQUEST["maxrepeats"],$_REQUEST["repeatdelay"],$_REQUEST["status"],
-				$_REQUEST["scripts"]);
+				$_REQUEST["scripts"],$_REQUEST["evaltype"]);
 			$result=$actionid;
 
 			show_messages($result,S_ACTION_ADDED,S_CANNOT_ADD_ACTION);
