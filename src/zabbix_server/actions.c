@@ -607,46 +607,95 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	check_action_conditions(DB_EVENT *event, zbx_uint64_t actionid)
+static int	check_action_conditions(DB_EVENT *event, DB_ACTION *action)
 {
 	DB_RESULT result;
 	DB_ROW row;
 
 	DB_CONDITION	condition;
-	
+
+	/* SUCCEED required for ACTION_EVAL_TYPE_AND_OR */	
 	int	ret = SUCCEED;
 	int	old_type = -1;
+	int	cond;
+	int	num = 0;
+	int	exit = 0;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In check_action_conditions (actionid:%d)", actionid);
+	zabbix_log( LOG_LEVEL_DEBUG, "In check_action_conditions (actionid:" ZBX_FS_UI64 ")",
+		action->actionid);
 
-	result = DBselect("select conditionid,actionid,conditiontype,operator,value from conditions where actionid=" ZBX_FS_UI64 " order by conditiontype", actionid);
+	result = DBselect("select conditionid,actionid,conditiontype,operator,value from conditions where actionid=" ZBX_FS_UI64 " order by conditiontype", action->actionid);
 
 	while((row=DBfetch(result)))
 	{
+		num++;
+
 		ZBX_STR2UINT64(condition.conditionid, row[0]);
 		ZBX_STR2UINT64(condition.actionid, row[1]);
 		condition.conditiontype=atoi(row[2]);
 		condition.operator=atoi(row[3]);
 		condition.value=row[4];
 
-		/* OR conditions */
-		if(old_type == condition.conditiontype)
-		{
-			if(check_action_condition(event, &condition) == SUCCEED)
-				ret = SUCCEED;
-		}
-		/* AND conditions */
-		else
-		{
-			/* Break if PREVIOUS AND condition is FALSE */
-			if(ret == FAIL) break;
-			if(check_action_condition(event, &condition) == FAIL)
-				ret = FAIL;
-		}
+		switch (action->evaltype) {
+			case ACTION_EVAL_TYPE_AND_OR:
+				/* OR conditions */
+				if(old_type == condition.conditiontype)
+				{
+					if(check_action_condition(event, &condition) == SUCCEED)
+						ret = SUCCEED;
+				}
+				/* AND conditions */
+				else
+				{
+					/* Break if PREVIOUS AND condition is FALSE */
+					if(ret == FAIL)
+					{
+						exit = 1;
+					}
+					else if(check_action_condition(event, &condition) == FAIL)
+					{
+						ret = FAIL;
+					}
+				}
 		
-		old_type = condition.conditiontype;
+				old_type = condition.conditiontype;
+				break;
+			case ACTION_EVAL_TYPE_AND:
+				cond = check_action_condition(event, &condition);
+				/* Break if any of AND conditions is FALSE */
+				if(cond == FAIL)
+				{
+					ret = FAIL; exit = 1;
+				}
+				else
+				{
+					ret = SUCCEED;
+				}
+				break;
+			case ACTION_EVAL_TYPE_OR:
+				cond = check_action_condition(event, &condition);
+				/* Break if any of OR conditions is TRUE */
+				if(cond == SUCCEED)
+				{
+					ret = SUCCEED; exit = 1;
+				}
+				else
+				{
+					ret = FAIL;
+				}
+				break;
+			default:
+				zabbix_log( LOG_LEVEL_DEBUG, "End check_action_conditions (result:%d)", (FAIL==ret)?"FALSE":"TRUE");
+				ret = FAIL;
+				break;
+
+		}
+
 	}
 	DBfree_result(result);
+
+	/* Ifnot conditions defined, return SUCCEED*/ 
+	if(num == 0)	ret = SUCCEED;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "End check_action_conditions (result:%d)", (FAIL==ret)?"FALSE":"TRUE");
 
@@ -703,13 +752,14 @@ void	apply_actions(DB_EVENT *event)
 /*	zbx_snprintf(sql,sizeof(sql),"select actionid,userid,delay,subject,message,recipient,maxrepeats,repeatdelay,scripts,actiontype from actions where nextcheck<=%d and status=%d", now, ACTION_STATUS_ACTIVE);*/
 
 	/* No support of action delay anymore */
-	result = DBselect("select actionid,userid,subject,message,recipient,maxrepeats,repeatdelay,scripts,actiontype from actions where status=%d and" ZBX_COND_NODEID, ACTION_STATUS_ACTIVE, LOCAL_NODE("actionid"));
+	result = DBselect("select actionid,userid,subject,message,recipient,maxrepeats,repeatdelay,scripts,actiontype,evaltype from actions where status=%d and" ZBX_COND_NODEID, ACTION_STATUS_ACTIVE, LOCAL_NODE("actionid"));
 
 	while((row=DBfetch(result)))
 	{
 		ZBX_STR2UINT64(action.actionid, row[0]);
+		action.evaltype		= atoi(row[9]);
 
-		if(check_action_conditions(event, action.actionid) == SUCCEED)
+		if(check_action_conditions(event, &action) == SUCCEED)
 		{
 			zabbix_log( LOG_LEVEL_DEBUG, "Conditions match our trigger. Do apply actions.");
 

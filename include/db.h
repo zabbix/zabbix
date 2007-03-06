@@ -271,6 +271,7 @@ DB_ACTION
 {
 	zbx_uint64_t	actionid;
 	int	actiontype;
+	int	evaltype;
 	zbx_uint64_t	userid;
 /*	int	delay;*/
 	int	lastcheck;
