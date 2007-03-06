@@ -705,6 +705,14 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 					(int)now,
 					item->itemid);
 				break;
+			case AR_TEXT:
+				DBescape_string(value_str,value_esc,MAX_STRING_LEN);
+				DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='%s',lastclock=%d where itemid=" ZBX_FS_UI64,
+					calculate_item_nextcheck(item->itemid, item->type, item->delay, item->delay_flex, now),
+					value_esc,
+					(int)now,
+					item->itemid);
+				break;
 			default:
 				break;
 		}

@@ -1,5 +1,6 @@
 Changes for 1.3.4:
 
+ - fixed processing of Text items (Alexei)
  - NetBSD compilation fixes (Alexei)
 
 Changes for 1.3.3:
