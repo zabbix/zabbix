@@ -463,7 +463,7 @@ include_once "include/page_header.php";
 				array_push($name,		
 					new CLink($template_host["host"],"?".
 						"hostid=".$template_host["hostid"],
-						'uncnown'),
+						'unknown'),
 					":");
 			} // for future use */
 			

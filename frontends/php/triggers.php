@@ -407,7 +407,7 @@ include_once "include/page_header.php";
 				{
 					array_push($description,
 						new CLink($real_host["host"],
-							"triggers.php?&hostid=".$real_host["hostid"], 'uncnown'),
+							"triggers.php?&hostid=".$real_host["hostid"], 'unknown'),
 						":"
 						);
 				}
@@ -455,10 +455,10 @@ include_once "include/page_header.php";
 			}
 			else if($row["status"] == TRIGGER_STATUS_UNKNOWN)
 			{
-				$status= new CLink(S_UNCNOWN,
+				$status= new CLink(S_UNKNOWN,
 					"triggers.php?group_disable=1&g_triggerid%5B%5D=".$row["triggerid"].
 						"&hostid=".$row["hostid"],
-					'uncnown');
+					'unknown');
 			}
 			else if($row["status"] == TRIGGER_STATUS_ENABLED)
 			{

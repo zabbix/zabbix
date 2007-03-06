@@ -103,7 +103,7 @@
 			}
 
 			$trok	= new CCol($ok.SPACE.S_OK,		"normal");
-			$uncn	= new CCol($uncn.SPACE.S_NOT_CLASSIFIED,"uncnown");
+			$uncn	= new CCol($uncn.SPACE.S_NOT_CLASSIFIED,"unknown");
 			$info	= new CCol($info.SPACE.S_INFORMATION,	"information");
 			$warn	= new CCol($warn.SPACE.S_WARNING,	"warning");
 			$avg	= new CCol($avg.SPACE.S_AVERAGE,	"average");

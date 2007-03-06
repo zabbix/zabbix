@@ -31,7 +31,7 @@
 
 		if(!isset($DB_TYPE))
 		{
-			$error = "Uncnown database type.";
+			$error = "Unknown database type.";
 			$result = false;
 		}
 		else

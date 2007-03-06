@@ -759,7 +759,7 @@ include_once "include/page_header.php";
 				array_push($description,		
 					new CLink($template_host["host"],"?".
 						"hostid=".$template_host["hostid"],
-						'uncnown'),
+						'unknown'),
 					":");
 			}
 			

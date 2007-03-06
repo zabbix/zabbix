@@ -30,7 +30,7 @@
 		if(isset($str_perm[$group_permission]))
 			return $str_perm[$group_permission];
 
-		return S_UNCNOWN;
+		return S_UNKNOWN;
 	}
 
 /*****************************************
@@ -83,7 +83,7 @@
 			$USER_DETAILS['node'] = DBfetch(DBselect('select * from nodes where nodeid='.id2nodeid($USER_DETAILS['userid'])));
 			if(empty($USER_DETAILS['node']))
 			{
-				$USER_DETAILS['node']['name'] = '- uncnown -';
+				$USER_DETAILS['node']['name'] = '- unknown -';
 				$USER_DETAILS['node']['nodeid'] = $ZBX_LOCALNODEID;
 			}
 		}
@@ -95,7 +95,7 @@
 				"lang"	=>"en_gb",
 				"type"	=>"0",
 				"node"	=>array(
-					"name"	=>'- uncnown -',
+					"name"	=>'- unknown -',
 					"nodeid"=>0));
 		}
 		
