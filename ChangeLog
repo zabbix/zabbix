@@ -1,5 +1,6 @@
 Changes for 1.3.4:
 
+ - added 'UNKNOWN' status for elements of map (Eugene)
  - added actions.evaltype (Alexei)
  - added support of all AND, all OR and AND/OR action conditions (Alexei)
  - fixed processing of Text items (Alexei)
