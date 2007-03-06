@@ -17,6 +17,11 @@ body
        line-height:16px;
 }
 
+table
+{
+	border-spacing:	0px; /* cellspacing */
+}
+
 /**************** PAGE TABLE ****************/
 /* header */
 table.page_header
