@@ -51,7 +51,7 @@ COpt::profiling_start("page");
 			"lang"  =>"en_gb",
 			"type"  =>"0",
 			"node"  =>array(
-				"name"  =>'- uncnown -',
+				"name"  =>'- unknown -',
 				"nodeid"=>0));
 	}
 

@@ -264,7 +264,7 @@
 			{ // group
 				if(!DBfetch(DBselect("select groupid from groups where name=".zbx_dbstr($cmd_items[1]))))
 				{
-					error("Uncnown group name: '".$cmd_items[1]."' in command ".$cmd."'");
+					error("Unknown group name: '".$cmd_items[1]."' in command ".$cmd."'");
 					return FALSE;
 				}
 			}
@@ -272,7 +272,7 @@
 			{ // host
 				if(!DBfetch(DBselect("select hostid from hosts where host=".zbx_dbstr($cmd_items[1]))))
 				{
-					error("Uncnown host name '".$cmd_items[1]."' in command '".$cmd."'");
+					error("Unknown host name '".$cmd_items[1]."' in command '".$cmd."'");
 					return FALSE;
 				}
 			}

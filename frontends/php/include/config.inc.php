@@ -1329,7 +1329,7 @@ $result =
 	}
 
 
-	function	get_profile($idx,$default_value=null,$type=PROFILE_TYPE_UNCNOWN)
+	function	get_profile($idx,$default_value=null,$type=PROFILE_TYPE_UNKNOWN)
 	{
 		global $USER_DETAILS;
 
@@ -1341,7 +1341,7 @@ $result =
 
 			if($profile)
 			{
-				if($type==PROFILE_TYPE_UNCNOWN)
+				if($type==PROFILE_TYPE_UNKNOWN)
 					$type = $profile["valuetype"];
 
 				$result = $profile["value"];
@@ -1362,7 +1362,7 @@ $result =
 		return $result;
 	}
 
-	function	update_profile($idx,$value,$type=PROFILE_TYPE_UNCNOWN)
+	function	update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN)
 	{
 // SDI("Save profile:".$idx." = ".$value);
 
@@ -1373,7 +1373,7 @@ $result =
 			return;
 		}
 
-		if($type==PROFILE_TYPE_UNCNOWN && is_array($value))	$type = PROFILE_TYPE_ARRAY;
+		if($type==PROFILE_TYPE_UNKNOWN && is_array($value))	$type = PROFILE_TYPE_ARRAY;
 		if($type==PROFILE_TYPE_ARRAY && !is_array($value))	$value = array($value);
 
 		switch($type)

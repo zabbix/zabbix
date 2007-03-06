@@ -28,7 +28,7 @@
 		if(isset($str_user_type[$user_type_int]))
 			return $str_user_type[$user_type_int];
 
-		return S_UNCNOWN;
+		return S_UNKNOWN;
 	}
 
 	# Add User definition

@@ -211,7 +211,7 @@
 				"Priority"		=> array(100,100,100),
 				"Not Work Period"	=> array(230,230,230),
 
-				"UncnownData"		=> array(130,130,130, 50)
+				"UnknownData"		=> array(130,130,130, 50)
 			);
 
 // I should rename No Alpha to Alpha at some point to get rid of some confusion
