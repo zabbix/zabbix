@@ -48,7 +48,7 @@ do
     help )	help="yes";;
     h )		help="yes";;
     * ) 
-        echo "$0: ERROR: uncnown parameter \"$cmd\""; 
+        echo "$0: ERROR: unknown parameter \"$cmd\""; 
 	help="yes";
   esac
 done

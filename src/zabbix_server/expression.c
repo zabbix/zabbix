@@ -524,7 +524,7 @@ int	evaluate(int *result, char *exp, char *error, int maxerrlen)
  * Purpose: substitute simple macros in data string with real values          *
  *                                                                            *
  * Parameters: trigger - trigger structure                                    *
- *             action - action structure (NULL if uncnown)                    *
+ *             action - action structure (NULL if unknown)                    *
  *             data - data string                                             *
  *                                                                            *
  * Return value:                                                              *
