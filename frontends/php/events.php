@@ -44,7 +44,7 @@ include_once "include/page_header.php";
 
 	check_fields($fields);
 
-	validate_group_with_host(PERM_READ_ONLY, array("allow_all_hosts","always_select_first_host","monitored_hosts","with_items"));
+	validate_group_with_host(PERM_READ_ONLY, array("allow_all_hosts","monitored_hosts","with_items"));
 ?>
 <?php
 	$_REQUEST["start"] = get_request("start", 0);
@@ -81,6 +81,7 @@ include_once "include/page_header.php";
 	}
 	$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
 	
+	$cmbHosts->AddItem(0,S_ALL_SMALL);
 	if($_REQUEST["groupid"] > 0)
 	{
 		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED.
@@ -90,7 +91,6 @@ include_once "include/page_header.php";
 	}
 	else
 	{
-		$cmbHosts->AddItem(0,S_ALL_SMALL);
 		$sql="select h.hostid,h.host from hosts h,items i where h.status=".HOST_STATUS_MONITORED.
 			" and h.hostid=i.hostid".
 			" and h.hostid in (".$availiable_hosts.") ".
