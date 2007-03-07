@@ -376,6 +376,10 @@
 	"S_CREATE_IMAGE"=>			"Create Image",
 	"S_CREATE_RULE"=>			"Create Rule",
 	"S_WORKING_TIME"=>			"Working time",
+	"S_USER_GROUP_FOR_DATABASE_DOWN_MESSAGE"=>"User group for database down message",
+	"S_INCORRECT_GROUP"=>			"Incorrect group",
+	"S_NOTHING_TO_DO"=>			"Nothing to do",
+	"S_ICORRECT_WORK_PERIOD"=>		"Icorrect work period",
 	
 //	nodes.php
 	"S_NODE"=>				"Node",
