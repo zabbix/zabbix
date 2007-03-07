@@ -101,8 +101,16 @@ include_once "include/page_header.php";
 
 	check_fields($fields);
 
+	$_REQUEST["onlytrue"] = get_request("onlytrue", get_profile("web.tr_status.onlytrue", 'true'));
+	$_REQUEST["noactions"] = get_request("noactions", get_profile("web.tr_status.noactions", 'true'));
+	$_REQUEST["compact"] = get_request("compact", get_profile("web.tr_status.compact", 'true'));
+
 	validate_group_with_host(PERM_READ_ONLY,array("allow_all_hosts","always_select_first_host","monitored_hosts","with_monitored_items"),
 		"web.tr_status.groupid","web.tr_status.hostid");
+
+	update_profile("web.tr_status.onlytrue",$_REQUEST["onlytrue"]);
+	update_profile("web.tr_status.noactions",$_REQUEST["noactions"]);
+	update_profile("web.tr_status.compact",$_REQUEST["compact"]);
 ?>
 <?php
 	if(isset($audio))
@@ -356,9 +364,7 @@ include_once "include/page_header.php";
 		else
 		{
 			$actions=array(
-				new CLink(S_CHANGE,"triggers.php?triggerid=".$row["triggerid"].
-					($_REQUEST["hostid"] > 0 ? "&hostid=".$_REQUEST["hostid"] : "" ).
-					"#form","action")
+				new CLink(S_CHANGE,'triggers.php?form=update&triggerid='.$row["triggerid"].url_param('hostid'),"action")
 				);
 		}
 
