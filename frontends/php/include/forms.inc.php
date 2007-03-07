@@ -3396,12 +3396,13 @@
 		$frmHouseKeep = new CFormTable(S_HOUSEKEEPER,"config.php");
 		$frmHouseKeep->SetHelp("web.config.housekeeper.php");
 		$frmHouseKeep->AddVar("config",get_request("config",0));
-		$frmHouseKeep->AddVar("refresh_unsupported",$config["refresh_unsupported"]);
-		$frmHouseKeep->AddVar("work_period",$config["work_period"]);
+
 		$frmHouseKeep->AddRow(S_DO_NOT_KEEP_ACTIONS_OLDER_THAN,
 			new CTextBox("alert_history",$config["alert_history"],8));
+
 		$frmHouseKeep->AddRow(S_DO_NOT_KEEP_EVENTS_OLDER_THAN,
 			new CTextBox("event_history",$config["event_history"],8));
+
 		$frmHouseKeep->AddItemToBottomRow(new CButton("save",S_SAVE));
 		$frmHouseKeep->Show();
 	}
@@ -3413,28 +3414,37 @@
 		$frmHouseKeep = new CFormTable(S_WORKING_TIME,"config.php");
 		$frmHouseKeep->SetHelp("web.config.workperiod.php");
 		$frmHouseKeep->AddVar("config",get_request("config",7));
-		$frmHouseKeep->AddVar("alert_history",$config["alert_history"]);
-		$frmHouseKeep->AddVar("event_history",$config["event_history"]);
-		$frmHouseKeep->AddVar("refresh_unsupported",$config["refresh_unsupported"]);
+
 		$frmHouseKeep->AddRow(S_WORKING_TIME,
 			new CTextBox("work_period",$config["work_period"],35));
+
 		$frmHouseKeep->AddItemToBottomRow(new CButton("save",S_SAVE));
 		$frmHouseKeep->Show();
 	}
 
 	function	insert_other_parameters_form()
 	{
+		global $ZBX_CURNODEID;
+
 		$config=select_config();
 		
-		$frmHouseKeep = new CFormTable(S_OTHER_PARAMETERS,"config.php");
-		$frmHouseKeep->SetHelp("web.config.other.php");
-		$frmHouseKeep->AddVar("config",get_request("config",5));
-		$frmHouseKeep->AddVar("alert_history",$config["alert_history"]);
-		$frmHouseKeep->AddVar("event_history",$config["event_history"]);
-		$frmHouseKeep->AddVar("work_period",$config["work_period"]);
+		$frmHouseKeep = new CFormTable(S_OTHER_PARAMETERS,'config.php');
+		$frmHouseKeep->SetHelp('web.config.other.php');
+		$frmHouseKeep->AddVar('config',get_request('config',5));
+		
 		$frmHouseKeep->AddRow(S_REFRESH_UNSUPPORTED_ITEMS,
-			new CTextBox("refresh_unsupported",$config["refresh_unsupported"],8));
-		$frmHouseKeep->AddItemToBottomRow(new CButton("save",S_SAVE));
+			new CTextBox('refresh_unsupported',$config['refresh_unsupported'],8));
+
+		$cmbUsrGrp = new CComboBox('alert_usrgrpid', $config['alert_usrgrpid']);
+		$cmbUsrGrp->AddItem(0, S_NONE);
+		$result=DBselect('select usrgrpid,name from usrgrp'.
+				' where '.DBid2nodeid('usrgrpid').'='.$ZBX_CURNODEID.
+				' order by name');
+		while($row=DBfetch($result))
+			$cmbUsrGrp->AddItem($row['usrgrpid'], $row['name']);
+		$frmHouseKeep->AddRow(S_USER_GROUP_FOR_DATABASE_DOWN_MESSAGE,$cmbUsrGrp);
+
+		$frmHouseKeep->AddItemToBottomRow(new CButton('save',S_SAVE));
 		$frmHouseKeep->Show();
 	}
 

@@ -38,14 +38,11 @@ include_once "include/page_header.php";
 		"config"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,3,4,5,6,7"),	NULL),
 
 // other form
-		"alert_history"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),
-						'in_array({config},array(0,5,7))&&({save}=="Save")'),
-		"event_history"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),
-						'in_array({config},array(0,5,7))&&({save}=="Save")'),
-		"refresh_unsupported"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),
-						'in_array({config},array(0,5,7))&&({save}=="Save")'),
-		"work_period"=>		array(T_ZBX_STR, O_NO,	NULL,	NULL,
-						'in_array({config},array(0,5,7))&&({save}=="Save")'),
+		"alert_history"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),	'({config}==0)&&({save}=="Save")'),
+		"event_history"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),	'({config}==0)&&({save}=="Save")'),
+		"work_period"=>		array(T_ZBX_STR, O_NO,	NULL,	NULL,			'({config}==7)&&({save}=="Save")'),
+		"refresh_unsupported"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),	'({config}==5)&&({save}=="Save")'),
+		"alert_usrgrpid"=>	array(T_ZBX_INT, O_NO,	NULL,	DB_ID,			'({config}==5)&&({save}=="Save")'),
 
 // image form
 		"imageid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,
@@ -93,9 +90,6 @@ include_once "include/page_header.php";
 	$result = 0;
 	if($_REQUEST["config"]==3)
 	{
-
-
-
 /* IMAGES ACTIONS */
 		if(isset($_REQUEST["save"]))
 		{
@@ -144,9 +138,6 @@ include_once "include/page_header.php";
 	}
 	elseif($_REQUEST["config"]==4)
 	{
-
-
-
 /* AUTOREG ACTIONS */
 		if(isset($_REQUEST["save"]))
 		{
@@ -202,16 +193,41 @@ include_once "include/page_header.php";
 			access_deny();
 
 /* OTHER ACTIONS */
-		$result=update_config($_REQUEST["event_history"],$_REQUEST["alert_history"],
-			$_REQUEST["refresh_unsupported"],$_REQUEST["work_period"]);
+		$result=update_config(
+			get_request('event_history'),
+			get_request('alert_history'),
+			get_request('refresh_unsupported'),
+			get_request('work_period'),
+			get_request('alert_usrgrpid'));
 
 		show_messages($result, S_CONFIGURATION_UPDATED, S_CONFIGURATION_WAS_NOT_UPDATED);
 		if($result)
 		{
-			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,
-				"Alarm history [".$_REQUEST["event_history"]."]".
-				" alert history [".$_REQUEST["alert_history"]."]".
-				" refresh unsupported items [".$_REQUEST["refresh_unsupported"]."]");
+			$msg = array();
+			if(!is_null($val = get_request('event_history')))
+				$msg[] = S_DO_NOT_KEEP_EVENTS_OLDER_THAN.' ['.$val.']';
+			if(!is_null($val = get_request('alert_history')))
+				$msg[] = S_DO_NOT_KEEP_ACTIONS_OLDER_THAN.' ['.$val.']';
+			if(!is_null($val = get_request('refresh_unsupported')))
+				$msg[] = S_REFRESH_UNSUPPORTED_ITEMS.' ['.$val.']';
+			if(!is_null($val = get_request('work_period')))
+				$msg[] = S_WORKING_TIME.' ['.$val.']';
+			if(!is_null($val = get_request('alert_usrgrpid')))
+			{
+				if(0 == $val) 
+				{
+					$val = S_NONE;
+				}
+				else
+				{
+					$val = DBfetch(DBselect('select name from usrgrp where usrgrpid='.$val));
+					$val = $val['name'];
+				}
+
+				$msg[] = S_USER_GROUP_FOR_DATABASE_DOWN_MESSAGE.' ['.$val.']';
+			}
+
+			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,implode('; ',$msg));
 		}
 	}
 	elseif($_REQUEST["config"]==6)
