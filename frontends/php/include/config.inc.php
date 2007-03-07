@@ -1011,17 +1011,51 @@ else
 
 	# Update configuration
 
-	function	update_config($event_history,$alert_history,$refresh_unsupported,$work_period)
+	function	update_config($event_history,$alert_history,$refresh_unsupported,$work_period,$alert_usrgrpid)
 	{
-		if(validate_period($work_period) != 0)
+		global $ZBX_CURNODEID;
+
+		$update = array();
+
+		if(!is_null($event_history))
 		{
-			error("Icorrect work period");
+			$update[] = 'event_history='.$event_history;
+		}
+		if(!is_null($alert_history))
+		{
+			$update[] = 'alert_history='.$alert_history;
+		}
+		if(!is_null($refresh_unsupported))
+		{
+			$update[] = 'refresh_unsupported='.$refresh_unsupported;
+		}
+		if(!is_null($work_period))
+		{
+			if(validate_period($work_period) != 0)
+			{
+				error(S_ICORRECT_WORK_PERIOD);
+				return NULL;
+			}
+			$update[] = 'work_period='.zbx_dbstr($work_period);
+		}
+		if(!is_null($alert_usrgrpid))
+		{
+			if($alert_usrgrpid != 0 && !DBfetch(DBselect('select usrgrpid from usrgrp where usrgrpid='.$alert_usrgrpid)))
+			{
+				error(S_INCORRECT_GROUP);;
+				return NULL;
+			}
+			$update[] = 'alert_usrgrpid='.$alert_usrgrpid;
+		}
+		if(count($update) == 0)
+		{
+			error(S_NOTHING_TO_DO);
 			return NULL;
 		}
 
-		return	DBexecute("update config set event_history=$event_history,alert_history=$alert_history,".
-			" refresh_unsupported=$refresh_unsupported,".
-			" work_period=".zbx_dbstr($work_period));
+		return	DBexecute('update config set '.implode(',',$update).
+			' where '.DBid2nodeid('configid')."=".$ZBX_CURNODEID);
+
 	}
 
 	function	&get_table_header($col1, $col2=SPACE)
