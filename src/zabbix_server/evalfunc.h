@@ -32,7 +32,7 @@
 
 extern	int	CONFIG_NODEID;
 
-int	evaluate_FUNCTION(char *value,DB_ITEM *item,char *function,char *parameter);
-int	evaluate_FUNCTION2(char *value,char *host,char *key,char *function,char *parameter);
+int	evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter);
+int	evaluate_function2(char *value,char *host,char *key,char *function,char *parameter);
 
 #endif
