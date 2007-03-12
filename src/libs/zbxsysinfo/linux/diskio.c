@@ -17,10 +17,10 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#include "config.h"
-
 #include "common.h"
 #include "sysinfo.h"
+
+#include "../common/common.h"
 
 struct disk_stat_s {
 	zbx_uint64_t rio;

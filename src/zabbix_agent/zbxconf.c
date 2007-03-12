@@ -99,7 +99,8 @@ void    load_config(int exit_on_error)
 		{0}
 	};
 
-	AGENT_RESULT	result;	
+	AGENT_RESULT	result;
+	char		**value = NULL;
 
 	memset(&result, 0, sizeof(AGENT_RESULT));
 	
@@ -121,9 +122,9 @@ void    load_config(int exit_on_error)
 	{
 	  	if(SUCCEED == process("system.hostname", 0, &result))
 		{
-	        	if(result.type & AR_STRING)
+			if( NULL != (value = GET_STR_RESULT(&result)) )
 			{
-				CONFIG_HOSTNAME = strdup(result.str);
+				CONFIG_HOSTNAME = strdup(*value);
 			}
 		}
 	        free_result(&result);

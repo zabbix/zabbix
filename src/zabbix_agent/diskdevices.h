@@ -29,10 +29,10 @@ typedef struct c_single_diskdevice_data
 	int	major;
 	int	diskno;
 	int	clock[60*15];
-	float	read_io_ops[60*15];
-	float	blks_read[60*15];
-	float	write_io_ops[60*15];
-	float	blks_write[60*15];
+	double	read_io_ops[60*15];
+	double	blks_read[60*15];
+	double	write_io_ops[60*15];
+	double	blks_write[60*15];
 } ZBX_SINGLE_DISKDEVICE_DATA;
 
 typedef struct c_diskdevices_data
@@ -52,10 +52,10 @@ DISKDEVICE
 	int	major;
 	int	diskno;
 	int	clock[60*15];
-	float	read_io_ops[60*15];
-	float	blks_read[60*15];
-	float	write_io_ops[60*15];
-	float	blks_write[60*15];
+	double	read_io_ops[60*15];
+	double	blks_read[60*15];
+	double	write_io_ops[60*15];
+	double	blks_write[60*15];
 };
 
 void	collect_stats_diskdevices(FILE *outfile);

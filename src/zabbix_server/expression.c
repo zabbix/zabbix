@@ -113,7 +113,7 @@ void	delete_spaces(char *c)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments: format: <float> or <float> <operator> <float>                    *
+ * Comments: format: <double> or <double> <operator> <double>                 *
  *                                                                            *
  *           It is recursive function!                                        *
  *                                                                            *
@@ -255,7 +255,7 @@ int	evaluate_simple(double *result,char *exp,char *error,int maxerrlen)
 		{
 			*result=0;
 		}
-		zabbix_log(LOG_LEVEL_DEBUG, "Result [%f]",*result );
+		zabbix_log(LOG_LEVEL_DEBUG, "Result [" ZBX_FS_DBL "]",*result );
 		return SUCCEED;
 	}
 	if( (p = strstr(exp,"*")) != NULL )

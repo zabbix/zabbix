@@ -20,14 +20,11 @@
 #ifndef ZABBIX_CHECKS_AGGREGATE_H
 #define ZABBIX_CHECKS_AGGREGATE_H
 
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "common.h"
 #include "config.h"
 #include "db.h"
 #include "log.h"
+#include "sysinfo.h"
 
 extern  int     CONFIG_NODEID;
 

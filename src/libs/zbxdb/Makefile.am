@@ -4,5 +4,3 @@ noinst_LIBRARIES = libzbxdb.a
 
 libzbxdb_a_SOURCES = \
 	db.c
-
-libzbxdb_a_CPPFLAGS = $(DB_CPPFLAGS)

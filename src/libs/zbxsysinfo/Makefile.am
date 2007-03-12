@@ -1,18 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
-SUBDIRS = $(ARCH)
-
-noinst_LIBRARIES = libzbxsysinfo.a
-
-libzbxsysinfo_a_SOURCES = \
-	common/common.c \
-	common/file.c \
-	common/ntp.c \
-	common/system.c \
-	common/http.c \
-	@ARCH@/@ARCH@.c
-
 DIST_SUBDIRS = \
+	common \
 	aix \
 	freebsd \
 	hpux \
@@ -21,8 +10,14 @@ DIST_SUBDIRS = \
 	openbsd \
 	osf \
 	osx \
+	simple \
 	solaris \
-	unknown
+	unknown 
+
+SUBDIRS = \
+	common \
+	simple \
+	@ARCH@
 
 EXTRA_DIST = \
 	aix/aix.c \
@@ -36,3 +31,24 @@ EXTRA_DIST = \
 	solaris/solaris.c \
 	unknown/unknown.c \
 	win32
+
+noinst_LIBRARIES = \
+	libzbxagentsysinfo.a \
+	libzbxserversysinfo.a
+
+# AGENT version of sysinfo library
+libzbxagentsysinfo_a_CPPFLAGS = \
+	-DWITH_COMMON_METRICS \
+	-DWITH_SIMPLE_METRICS \
+	-DWITH_SPECIFIC_METRICS
+
+libzbxagentsysinfo_a_SOURCES = \
+	sysinfo.c \
+	@ARCH@/@ARCH@.c specsysinfo.h
+
+# SERVER version of sysinfo library
+libzbxserversysinfo_a_CPPFLAGS = \
+	-DWITH_SIMPLE_METRICS
+
+libzbxserversysinfo_a_SOURCES = \
+	sysinfo.c

@@ -17,42 +17,66 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#include "config.h"
-
 #include "common.h"
 #include "sysinfo.h"
 
+#include "system.h"
+
 int	SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	int ret = SYSINFO_RET_OK;
-
 	assert(result);
 
         init_result(result);
 	
 	SET_UI64_RESULT(result, time(NULL));
 
-	return ret;
+	return SYSINFO_RET_OK;
 }
 
-#if !defined(_WINDOWS)
+int     SYSTEM_UNUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+#if defined(_WINDOWS)
+#	ifdef TODO
+#		error Realize function SYSTEM_UNUM!!!
+#	endif /* todo */
+	return SYSINFO_RET_FAIL;
+#else
+        assert(result);
+
+        init_result(result);
+
+        return EXECUTE_INT(cmd, "who|wc -l", flags, result);
+#endif /* _WINDOWS */
+}
 
 int     SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
+#if defined(_WINDOWS)
+#	ifdef TODO
+#		error Realize function SYSTEM_UNAME!!!
+#	endif /* todo */
+	return SYSINFO_RET_FAIL;
+#else
         assert(result);
 
         init_result(result);
 
         return EXECUTE_STR(cmd, "uname -a", flags, result);
+#endif /* _WINDOWS */
 }
 
 int     SYSTEM_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
+#if defined(_WINDOWS)
+#	ifdef TODO
+#		error Realize function SYSTEM_HOSTNAME!!!
+#	endif /* todo */
+	return SYSINFO_RET_FAIL;
+#else
         assert(result);
 
         init_result(result);
 
         return EXECUTE_STR(cmd, "hostname", flags, result);
+#endif /* _WINDOWS */
 }
-
-#endif /* not _WINDOWS */

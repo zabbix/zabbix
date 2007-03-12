@@ -9,5 +9,3 @@ libzbxtrapper_a_SOURCES = \
 	nodesync.c nodesync.h \
 	nodeevents.c nodeevents.h \
 	nodehistory.c nodehistory.h
-
-libzbxtrapper_a_CPPFLAGS = $(DB_CPPFLAGS)

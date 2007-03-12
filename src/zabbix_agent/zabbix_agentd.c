@@ -238,7 +238,9 @@ static ZBX_SOCKET tcp_listen(void)
 	if (bind(sock,(struct sockaddr *)&serv_addr,sizeof(ZBX_SOCKADDR)) == SOCKET_ERROR)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Cannot bind to port %u for server %s. Error [%s]. Another zabbix_agentd already running ?",
-				CONFIG_LISTEN_PORT, CONFIG_LISTEN_IP, strerror_from_system(zbx_sock_last_error()));
+				CONFIG_LISTEN_PORT,
+				CONFIG_LISTEN_IP ? CONFIG_LISTEN_IP : "[ANY]",
+				strerror_from_system(zbx_sock_last_error()));
 
 		exit(1);
 	}
@@ -432,11 +434,30 @@ int	main(int argc, char **argv)
 
 #else /* ZABBIX_TEST */
 
-#include "messages.h"
+#if defined(_WINDOWS)
+#	include "messages.h"
+#endif /* _WINDOWS */
 
 int main()
 {
 #if ON
+	AGENT_RESULT    result;
+	
+	SET_UI64_RESULT(&result, 123456789123456789123456789ull);
+	printf("UI: '" ZBX_FS_UI64 "'\n", result.ui64);
+
+	printf("UI_TO_DBL: '" ZBX_FS_DBL "'\n", *GET_DBL_RESULT(&result));
+
+	UNSET_RESULT_EXCLUDING(&result, AR_UINT64);
+	printf("UI_TO_STR: '%s'\n", *GET_STR_RESULT(&result));
+
+	UNSET_RESULT_EXCLUDING(&result, AR_UINT64);
+	printf("UI_TO_TEXT: '%s'\n", *GET_TEXT_RESULT(&result));
+
+	UNSET_RESULT_EXCLUDING(&result, AR_UINT64);
+	printf("UI_TO_UI64: '" ZBX_FS_UI64 "'\n", *GET_UI64_RESULT(&result));
+
+#elif OFF
 	int res, val;
 
 	if(FAIL == zbx_sock_init())

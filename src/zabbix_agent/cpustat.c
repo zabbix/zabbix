@@ -23,28 +23,7 @@
 #include "log.h"
 
 #ifdef _WINDOWS
-
 	#include "perfmon.h"
-
-#else /* not _WINDOWS */
-
-	static int	get_cpustat(
-		int *now,
-		float *cpu_user,
-		float *cpu_system,
-		float *cpu_nice,
-		float *cpu_idle
-		);
-
-	static void	apply_cpustat(
-		ZBX_CPUS_STAT_DATA *pcpus,
-		int now, 
-		float cpu_user, 
-		float cpu_system,
-		float cpu_nice,
-		float cpu_idle
-		);
-
 #endif /* _WINDOWS */
 
 
@@ -193,6 +172,191 @@ void	close_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 
 }
 
+#if !defined(_WINDOWS)
+
+static int	get_cpustat(int *now,zbx_uint64_t *cpu_user,zbx_uint64_t *cpu_system,zbx_uint64_t *cpu_nice,zbx_uint64_t *cpu_idle)
+{
+    #if defined(HAVE_PROC_STAT)
+	
+	FILE	*file;
+	char	line[MAX_STRING_LEN];
+	
+    #elif defined(HAVE_SYS_PSTAT_H) /* not HAVE_PROC_STAT */
+	
+	struct pst_dynamic stats;
+	
+    #else /* not HAVE_SYS_PSTAT_H */
+
+	return 1;
+	
+    #endif /* HAVE_PROC_STAT */
+
+	*now = time(NULL);
+
+    #if defined(HAVE_PROC_STAT)
+	
+	if(NULL == (file = fopen("/proc/stat","r") ))
+	{
+		zbx_error("Cannot open [%s] [%s]\n","/proc/stat", strerror(errno));
+		return 1;
+	}
+
+	*cpu_user = *cpu_nice = *cpu_system = *cpu_idle = -1;
+
+	while(fgets(line,1024,file) != NULL)
+	{
+		if(strstr(line,"cpu ") == NULL) continue;
+
+		sscanf(line, "cpu " ZBX_FS_UI64 " " ZBX_FS_UI64 " " ZBX_FS_UI64 " " ZBX_FS_UI64, cpu_user, cpu_nice, cpu_system, cpu_idle);
+		break;
+	}
+	zbx_fclose(file);
+
+	if(*cpu_user < 0) 
+		return 1;
+	
+    #elif defined(HAVE_SYS_PSTAT_H) /* HAVE_PROC_STAT */
+
+	pstat_getdynamic(&stats, sizeof( struct pst_dynamic ), 1, 0 );
+	*cpu_user 	= (zbx_uint64_t)stats.psd_cpu_time[CP_USER];
+	*cpu_nice 	= (zbx_uint64_t)stats.psd_cpu_time[CP_NICE];
+	*cpu_system 	= (zbx_uint64_t)stats.psd_cpu_time[CP_SYS];
+	*cpu_idle 	= (zbx_uint64_t)stats.psd_cpu_time[CP_IDLE];
+	
+    #endif /* HAVE_SYS_PSTAT_H */
+	return 0;
+}
+
+
+static void	apply_cpustat(
+	ZBX_CPUS_STAT_DATA *pcpus,
+	int now, 
+	zbx_uint64_t cpu_user, 
+	zbx_uint64_t cpu_system,
+	zbx_uint64_t cpu_nice,
+	zbx_uint64_t cpu_idle
+	)
+{
+	register int	i	= 0;
+
+	int	time	= 0,
+		time1	= 0,
+		time5	= 0,
+		time15	= 0;
+
+	zbx_uint64_t
+		idle,
+		idle1,
+		idle5,
+		idle15,
+		user,
+		user1,
+		user5,
+		user15,
+		system,
+		system1,
+		system5,
+		system15,
+		nice,
+		nice1,
+		nice5,
+		nice15,
+		all,
+		all1,
+		all5,
+		all15;
+
+
+	for(i=0; i < MAX_CPU_HISTORY; i++)
+	{
+		if(pcpus->clock[i] < now - MAX_CPU_HISTORY)
+		{
+			pcpus->clock[i]	= now;
+
+			user	= pcpus->h_user[i]	= cpu_user;
+			system	= pcpus->h_system[i]	= cpu_system;
+			nice	= pcpus->h_nice[i]	= cpu_nice;
+			idle	= pcpus->h_idle[i]	= cpu_idle;
+
+			all	= cpu_idle + cpu_user + cpu_nice + cpu_system;
+			break;
+		}
+	}
+
+	time = time1 = time5 = time15 = now+1;
+
+	for(i=0; i < MAX_CPU_HISTORY; i++)
+	{
+		if(0 == pcpus->clock[i])	continue;
+
+		if(pcpus->clock[i] == now)
+		{
+			idle	= pcpus->h_idle[i];
+			user	= pcpus->h_user[i];
+			nice	= pcpus->h_nice[i];
+			system	= pcpus->h_system[i];
+			all	= idle + user + nice + system;
+		}
+
+		if((pcpus->clock[i] >= (now - 60)) && (time1 > pcpus->clock[i]))
+		{
+			time1	= pcpus->clock[i];
+			idle1	= pcpus->h_idle[i];
+			user1	= pcpus->h_user[i];
+			nice1	= pcpus->h_nice[i];
+			system1	= pcpus->h_system[i];
+			all1	= idle1 + user1 + nice1 + system1;
+		}
+		if((pcpus->clock[i] >= (now - (5*60))) && (time5 > pcpus->clock[i]))
+		{
+			time5	= pcpus->clock[i];
+			idle5	= pcpus->h_idle[i];
+			user5	= pcpus->h_user[i];
+			nice5	= pcpus->h_nice[i];
+			system5	= pcpus->h_system[i];
+			all5	= idle5 + user5 + nice5 + system5;
+		}
+		if((pcpus->clock[i] >= (now - (15*60))) && (time15 > pcpus->clock[i]))
+		{
+			time15		= pcpus->clock[i];
+			idle15		= pcpus->h_idle[i];
+			user15		= pcpus->h_user[i];
+			nice15		= pcpus->h_nice[i];
+			system15	= pcpus->h_system[i];
+			all15		= idle15 + user15 + nice15 + system15;
+		}
+	}
+
+#define CALC_CPU_LOAD(type, time)							\
+	if((type) - (type ## time) > 0 && (all) - (all ## time) > 0)			\
+	{										\
+		pcpus->type ## time = 100. * ((double)((type) - (type ## time)))/	\
+				((double)((all) - (all ## time)));			\
+	}										\
+	else										\
+	{										\
+		pcpus->type ## time = 0.;						\
+	}
+
+	CALC_CPU_LOAD(idle, 1);
+	CALC_CPU_LOAD(idle, 5);
+	CALC_CPU_LOAD(idle, 15);
+
+	CALC_CPU_LOAD(user, 1);
+	CALC_CPU_LOAD(user, 5);
+	CALC_CPU_LOAD(user, 15);
+
+	CALC_CPU_LOAD(nice, 1);
+	CALC_CPU_LOAD(nice, 5);
+	CALC_CPU_LOAD(nice, 15);
+
+	CALC_CPU_LOAD(system, 1);
+	CALC_CPU_LOAD(system, 5);
+	CALC_CPU_LOAD(system, 15);
+}
+
+#endif /* not _WINDOWS */
+
 void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 {
 #ifdef _WINDOWS
@@ -306,7 +470,7 @@ void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 #else /* not _WINDOWS */
 
 	int	now = 0;
-	float	cpu_user, cpu_nice, cpu_system, cpu_idle;
+	zbx_uint64_t cpu_user, cpu_nice, cpu_system, cpu_idle;
 
 
 	if(0 != get_cpustat(&now, &cpu_user, &cpu_system, &cpu_nice, &cpu_idle))
@@ -316,163 +480,3 @@ void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 
 #endif /* _WINDOWS */
 }
-
-#if !defined(_WINDOWS)
-
-static int	get_cpustat(int *now,float *cpu_user,float *cpu_system,float *cpu_nice,float *cpu_idle)
-{
-    #if defined(HAVE_PROC_STAT)
-	
-	FILE	*file;
-	char	line[MAX_STRING_LEN];
-	
-    #elif defined(HAVE_SYS_PSTAT_H) /* not HAVE_PROC_STAT */
-	
-	struct pst_dynamic stats;
-	
-    #else /* not HAVE_SYS_PSTAT_H */
-
-	return 1;
-	
-    #endif /* HAVE_PROC_STAT */
-
-	*now = time(NULL);
-
-    #if defined(HAVE_PROC_STAT)
-	
-	if(NULL == (file = fopen("/proc/stat","r") ))
-	{
-		zbx_error("Cannot open [%s] [%s]\n","/proc/stat", strerror(errno));
-		return 1;
-	}
-
-	*cpu_user = *cpu_nice = *cpu_system = *cpu_idle = -1;
-
-	while(fgets(line,1024,file) != NULL)
-	{
-		if(strstr(line,"cpu ") == NULL) continue;
-
-		sscanf(line, "cpu %f %f %f %f", cpu_user, cpu_nice, cpu_system, cpu_idle);
-		break;
-	}
-	zbx_fclose(file);
-
-	if(*cpu_user < 0) 
-		return 1;
-	
-    #elif defined(HAVE_SYS_PSTAT_H) /* HAVE_PROC_STAT */
-
-	pstat_getdynamic(&stats, sizeof( struct pst_dynamic ), 1, 0 );
-	*cpu_user 	= (float)stats.psd_cpu_time[CP_USER];
-	*cpu_nice 	= (float)stats.psd_cpu_time[CP_NICE];
-	*cpu_system 	= (float)stats.psd_cpu_time[CP_SYS];
-	*cpu_idle 	= (float)stats.psd_cpu_time[CP_IDLE];
-	
-    #endif /* HAVE_SYS_PSTAT_H */
-	return 0;
-}
-
-
-#define CALC_CPU_LOAD(now_val, tim_val, now_all_val, tim_all_val)                             \
-	if((now_val) - (tim_val) > 0 && (now_all_val) - (tim_all_val) > 0)                    \
-	{                                                                                     \
-		tim_val = 100 * (float)((now_val) - (tim_val)/(now_all_val) - (tim_all_val)); \
-	}                                                                                     \
-	else                                                                                  \
-	{                                                                                     \
-		tim_val = 0;                                                                  \
-	}
-
-static void	apply_cpustat(
-	ZBX_CPUS_STAT_DATA *pcpus,
-	int now, 
-	float cpu_user, 
-	float cpu_system,
-	float cpu_nice,
-	float cpu_idle
-	)
-{
-	int	i	= 0,
-		time	= 0,
-		time1	= 0,
-		time5	= 0,
-		time15	= 0;
-
-	for(i=0; i < MAX_CPU_HISTORY; i++)
-	{
-		if(pcpus->clock[i] < now - MAX_CPU_HISTORY)
-		{
-			pcpus->clock[i]	= now;
-
-			pcpus->user	= pcpus->h_user[i]	= cpu_user;
-			pcpus->system	= pcpus->h_system[i]	= cpu_system;
-			pcpus->nice	= pcpus->h_nice[i]	= cpu_nice;
-			pcpus->idle	= pcpus->h_idle[i]	= cpu_idle;
-
-			pcpus->all	= cpu_idle + cpu_user + cpu_nice + cpu_system;
-			break;
-		}
-	}
-
-	time = time1 = time5 = time15 = now+1;
-
-	for(i=0; i < MAX_CPU_HISTORY; i++)
-	{
-		if(0 == pcpus->clock[i])	continue;
-
-		if(pcpus->clock[i] == now)
-		{
-			pcpus->idle	= pcpus->h_idle[i];
-			pcpus->user	= pcpus->h_user[i];
-			pcpus->nice	= pcpus->h_nice[i];
-			pcpus->system	= pcpus->h_system[i];
-			pcpus->all	= pcpus->idle + pcpus->user + pcpus->nice + pcpus->system;
-		}
-
-		if((pcpus->clock[i] >= (now - 60)) && (time1 > pcpus->clock[i]))
-		{
-			time1		= pcpus->clock[i];
-			pcpus->idle1	= pcpus->h_idle[i];
-			pcpus->user1	= pcpus->h_user[i];
-			pcpus->nice1	= pcpus->h_nice[i];
-			pcpus->system1	= pcpus->h_system[i];
-			pcpus->all1	= pcpus->idle1 + pcpus->user1 + pcpus->nice1 + pcpus->system1;
-		}
-		if((pcpus->clock[i] >= (now - (5*60))) && (time5 > pcpus->clock[i]))
-		{
-			time5		= pcpus->clock[i];
-			pcpus->idle5	= pcpus->h_idle[i];
-			pcpus->user5	= pcpus->h_user[i];
-			pcpus->nice5	= pcpus->h_nice[i];
-			pcpus->system5	= pcpus->h_system[i];
-			pcpus->all5	= pcpus->idle5 + pcpus->user5 + pcpus->nice5 + pcpus->system5;
-		}
-		if((pcpus->clock[i] >= (now - (15*60))) && (time15 > pcpus->clock[i]))
-		{
-			time15		= pcpus->clock[i];
-			pcpus->idle15	= pcpus->h_idle[i];
-			pcpus->user15	= pcpus->h_user[i];
-			pcpus->nice15	= pcpus->h_nice[i];
-			pcpus->system15	= pcpus->h_system[i];
-			pcpus->all15	= pcpus->idle15 + pcpus->user15 + pcpus->nice15 + pcpus->system15;
-		}
-	}
-
-	CALC_CPU_LOAD(pcpus->idle, pcpus->idle1,	pcpus->all, pcpus->all1);
-	CALC_CPU_LOAD(pcpus->idle, pcpus->idle5,	pcpus->all, pcpus->all5);
-	CALC_CPU_LOAD(pcpus->idle, pcpus->idle15,	pcpus->all, pcpus->all15);
-
-	CALC_CPU_LOAD(pcpus->user, pcpus->user1,	pcpus->all, pcpus->all1);
-	CALC_CPU_LOAD(pcpus->user, pcpus->user5,	pcpus->all, pcpus->all5);
-	CALC_CPU_LOAD(pcpus->user, pcpus->user15,	pcpus->all, pcpus->all15);
-
-	CALC_CPU_LOAD(pcpus->nice, pcpus->nice1,	pcpus->all, pcpus->all1);
-	CALC_CPU_LOAD(pcpus->nice, pcpus->nice5,	pcpus->all, pcpus->all5);
-	CALC_CPU_LOAD(pcpus->nice, pcpus->nice15,	pcpus->all, pcpus->all15);
-
-	CALC_CPU_LOAD(pcpus->system, pcpus->system1,	pcpus->all, pcpus->all1);
-	CALC_CPU_LOAD(pcpus->system, pcpus->system5,	pcpus->all, pcpus->all5);
-	CALC_CPU_LOAD(pcpus->system, pcpus->system15,	pcpus->all, pcpus->all15);
-}
-
-#endif /* not _WINDOWS */

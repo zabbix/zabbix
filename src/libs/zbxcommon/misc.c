@@ -274,9 +274,9 @@ int	check_time_period(const char *period, time_t now)
  *                                                                            *
  * Function: cmp_double                                                       *
  *                                                                            *
- * Purpose: compares two float values                                         *
+ * Purpose: compares two double values                                        *
  *                                                                            *
- * Parameters: a,b - floats to compare                                        *
+ * Parameters: a,b - doubled to compare                                       *
  *                                                                            *
  * Return value:  0 - the values are equal                                    *
  *                1 - otherwise                                               *
@@ -299,11 +299,11 @@ int	cmp_double(double a,double b)
  *                                                                            *
  * Function: is_double_prefix                                                 *
  *                                                                            *
- * Purpose: check if the string is float                                      *
+ * Purpose: check if the string is double                                     *
  *                                                                            *
  * Parameters: c - string to check                                            *
  *                                                                            *
- * Return value:  SUCCEED - the string is float                               *
+ * Return value:  SUCCEED - the string is double                              *
  *                FAIL - otherwise                                            *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -347,11 +347,11 @@ int	is_double_prefix(char *c)
  *                                                                            *
  * Function: is_double                                                        *
  *                                                                            *
- * Purpose: check if the string is float                                      *
+ * Purpose: check if the string is double                                     *
  *                                                                            *
  * Parameters: c - string to check                                            *
  *                                                                            *
- * Return value:  SUCCEED - the string is float                               *
+ * Return value:  SUCCEED - the string is double                              *
  *                FAIL - otherwise                                            *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -456,55 +456,3 @@ int	is_uint(char *c)
 	return SUCCEED;
 }
 
-int	set_result_type(AGENT_RESULT *result, int value_type, char *c)
-{
-	int ret = FAIL;
-
-	if(value_type == ITEM_VALUE_TYPE_UINT64)
-	{
-		del_zeroes(c);
-		if(is_uint(c) == SUCCEED)
-		{
-#ifdef HAVE_ATOLL
-			SET_UI64_RESULT(result, atoll(c));
-#else
-			SET_UI64_RESULT(result, atol(c));
-#endif
-			ret = SUCCEED;
-		}
-	}
-	else if(value_type == ITEM_VALUE_TYPE_FLOAT)
-	{
-		if(is_double(c) == SUCCEED)
-		{
-			SET_DBL_RESULT(result, atof(c));
-			ret = SUCCEED;
-		}
-		else if(is_uint(c) == SUCCEED)
-		{
-#ifdef HAVE_ATOLL
-			SET_DBL_RESULT(result, (double)atoll(c));
-#else
-			SET_DBL_RESULT(result, (double)atol(c));
-#endif
-			ret = SUCCEED;
-		}
-	}
-	else if(value_type == ITEM_VALUE_TYPE_STR)
-	{
-		SET_STR_RESULT(result, strdup(c));
-		ret = SUCCEED;
-	}
-	else if(value_type == ITEM_VALUE_TYPE_TEXT)
-	{
-		SET_TEXT_RESULT(result, strdup(c));
-		ret = SUCCEED;
-	}
-	else if(value_type == ITEM_VALUE_TYPE_LOG)
-	{
-		SET_STR_RESULT(result, strdup(c));
-		ret = SUCCEED;
-	}
-
-	return ret;
-}

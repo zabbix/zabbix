@@ -3,5 +3,3 @@
 noinst_LIBRARIES = libzbxtimer.a
 
 libzbxtimer_a_SOURCES = timer.c timer.h
-
-libzbxtimer_a_CPPFLAGS = $(DB_CPPFLAGS)

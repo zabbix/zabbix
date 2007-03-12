@@ -288,28 +288,19 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 			)
 			{
 				SET_UI64_RESULT(value, (zbx_uint64_t)*vars->val.integer);
-/*				*result=(long)*vars->val.integer;
-				zbx_snprintf(result_str,sizeof(result_str),"%ld",(long)*vars->val.integer);*/
 			}
 #ifdef OPAQUE_SPECIAL_TYPES
 			else if(vars->type == ASN_FLOAT)
 			{
-/*				*result=(double)*vars->val.floatVal;
-				zbx_snprintf(result_str,sizeof(result_str),"%f",(double)*vars->val.floatVal);*/
-				
 				SET_DBL_RESULT(value, *vars->val.floatVal);
 			}
 			else if(vars->type == ASN_DOUBLE)
 			{
-/*				*result=(double)*vars->val.doubleVal;
-				zbx_snprintf(result_str,sizeof(result_str),"%lf",(double)*vars->val.doubleVal);*/
 				SET_DBL_RESULT(value, *vars->val.doubleVal);
 			}
 #endif
 			else if(vars->type == ASN_OCTET_STR)
 			{
-/*				memcpy(result_str,vars->val.string,vars->val_len);
-				result_str[vars->val_len] = '\0';*/
 				if(item->value_type == ITEM_VALUE_TYPE_FLOAT)
 				{
 					p = malloc(vars->val_len+1);

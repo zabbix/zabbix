@@ -56,6 +56,14 @@
 #define vsprintf	ERROR_DO_NOT_USE_VSPRINTF_FUNCTION_TRY_TO_USE_VSNPRINTF
 /*#define strncat		ERROR_DO_NOT_USE_STRNCAT_FUNCTION_TRY_TO_USE_ZBX_STRLCAT*/
 
+#ifdef HAVE_ATOLL
+#	define zbx_atoui64(str)	((zbx_uint64_t)atoll(str))
+#else
+#	define zbx_atoui64(str)	((zbx_uint64_t)atol(str))
+#endif
+
+#define zbx_atod(str)	strtod(str, (char **)NULL)
+
 #define ON	1
 #define OFF	0
 
@@ -78,8 +86,6 @@
 #endif /* ndef HAVE_GETOPT_LONG */
 
 #define ZBX_UNUSED(a) ((void)0)(a)
-
-#define	ZBX_FS_DBL	"%f"
 
 #define MAX_LOG_FILE_LEN (1024*1024)
 
@@ -346,115 +352,9 @@ void    *zbx_malloc(size_t size);
 	
 #define zbx_fclose(f) { if(f){ fclose(f); f = NULL; } }
 
-/* list structure as item of agent return vaile */					 
-#define ZBX_LIST_ITEM struct zbx_list_item_s
-ZBX_LIST_ITEM {
-	char text[MAX_STRING_LEN];
-};	
-
-#define ZBX_LIST struct zbx_list_s
-ZBX_LIST {
-	int 		cnt;
-	ZBX_LIST_ITEM 	*item;
-};	
-					   
-/* agent return value */					 
-#define AGENT_RESULT struct zbx_result_s
-AGENT_RESULT {
-	int	 	type;
-	zbx_uint64_t	ui64;
-	double		dbl;
-	char		*str;
-	char		*text;
-	char		*msg;
-	ZBX_LIST	list;
-};
-
 #define ZBX_COND_NODEID " %s>=100000000000000*%d and %s<=(100000000000000*%d+99999999999999) "
 #define LOCAL_NODE(fieldid) fieldid, CONFIG_NODEID, fieldid, CONFIG_NODEID
 #define ZBX_NODE(fieldid,nodeid) fieldid, nodeid, fieldid, nodeid
-
-/* agent result types */
-#define AR_UINT64	1
-#define AR_DOUBLE	2
-#define AR_STRING	4
-#define AR_MESSAGE	8
-#define AR_LIST		16
-#define AR_TEXT		32
-
-
-/* SET RESULT */
-
-#define SET_DBL_RESULT(res, val) \
-	{ \
-	(res)->type |= AR_DOUBLE; \
-	(res)->dbl = (double)(val); \
-	}
-
-#define SET_UI64_RESULT(res, val) \
-	{ \
-	(res)->type |= AR_UINT64; \
-	(res)->ui64 = (zbx_uint64_t)(val); \
-	}
-
-#define SET_STR_RESULT(res, val) \
-	{ \
-	(res)->type |= AR_STRING; \
-	(res)->str = (char*)(val); \
-	} 
-
-#define SET_TEXT_RESULT(res, val) \
-	{ \
-	(res)->type |= AR_TEXT; \
-	(res)->text = (char*)(val); \
-	} 
-
-#define SET_MSG_RESULT(res, val) \
-	{ \
-	(res)->type |= AR_MESSAGE; \
-	(res)->msg = (char*)(val); \
-	}
-
-/* UNSER RESULT */
-
-#define UNSET_DBL_RESULT(res)           \
-	{                               \
-	(res)->type &= ~AR_DOUBLE;      \
-	(res)->dbl = (double)(0);        \
-	}
-
-#define UNSET_UI64_RESULT(res)             \
-	{                                  \
-	(res)->type &= ~AR_UINT64;         \
-	(res)->ui64 = (zbx_uint64_t)(0); \
-	}
-
-#define UNSET_STR_RESULT(res)                      \
-	{                                          \
-		if((res)->type & AR_STRING){       \
-			free((res)->str);          \
-			(res)->str = NULL;         \
-			(res)->type &= ~AR_STRING; \
-		}                                  \
-	}
-
-#define UNSET_TEXT_RESULT(res)                   \
-	{                                        \
-		if((res)->type & AR_TEXT){       \
-			free((res)->text);       \
-			(res)->text = NULL;      \
-			(res)->type &= ~AR_TEXT; \
-		}                                \
-	}
-
-#define UNSET_MSG_RESULT(res)                       \
-	{                                           \
-		if((res)->type & AR_MESSAGE){       \
-			free((res)->msg);           \
-			(res)->msg = NULL;          \
-			(res)->type &= ~AR_MESSAGE; \
-		}                                   \
-	}
 
 
 extern char *progname;
@@ -484,10 +384,6 @@ typedef enum
 	ZBX_TASK_CHANGE_NODEID
 } zbx_task_t;
 
-void   	init_result(AGENT_RESULT *result);
-int    	copy_result(AGENT_RESULT *src, AGENT_RESULT *dist);
-void   	free_result(AGENT_RESULT *result);
-
 char	*string_replace(char *str, const char *sub_str1, const char *sub_str2);
 void	del_zeroes(char *s);
 int	find_char(char *str,char c);
@@ -513,7 +409,6 @@ int	zbx_snprintf(char* str, size_t count, const char *fmt, ...);
 int	zbx_vsnprintf(char* str, size_t count, const char *fmt, va_list args);
 void	zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_len, const char *fmt, ...);
 
-int	set_result_type(AGENT_RESULT *result, int value_type, char *c);
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);
 size_t	zbx_strlcat(char *dst, const char *src, size_t siz);
 
@@ -541,8 +436,6 @@ int     zbx_get_field(char *line, char *result, int num, char delim);
 void	zbx_on_exit();
 
 int	get_nodeid_by_id(zbx_uint64_t id);
-
-int       SYSTEM_LOCALTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
 int MAIN_ZABBIX_ENTRY(void);
 
