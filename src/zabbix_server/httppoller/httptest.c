@@ -308,6 +308,12 @@ static int	process_httptest(DB_HTTPTEST *httptest)
 		zabbix_log(LOG_LEVEL_ERR, "Error doing curl_easy_perform [%s]", curl_easy_strerror(err));
 		return FAIL;
 	}
+	/* Process self-signed certificates. Do not verify certificate. */
+	if(CURLE_OK != (err = curl_easy_setopt(easyhandle,CURLOPT_SSL_VERIFYPEER , 0)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Error doing curl_easy_perform [%s]", curl_easy_strerror(err));
+		return FAIL;
+	}
 
 	lastfailedstep=0;
 	httptest->time = 0;
