@@ -198,7 +198,7 @@ include_once "include/page_header.php";
 		{
 			$res = update_action_status($row["actionid"],0);
 			if($res)
-				array_push($row["actionid"], $actionids);
+				$actionids[] = $row["actionid"];
 		}
 		if(isset($res))
 		{
@@ -217,7 +217,7 @@ include_once "include/page_header.php";
 		{
 			$res = update_action_status($row["actionid"],1);
 			if($res) 
-				array_push($row["actionid"], $actionids);
+				$actionids[] = $row["actionid"];
 		}
 		if(isset($res))
 		{
@@ -236,7 +236,7 @@ include_once "include/page_header.php";
 		{
 			$del_res = delete_action($row["actionid"]);
 			if($del_res) 
-				array_push($actionids, $row["actionid"]);
+				$actionids[] = $row["actionid"];
 		}
 		if(isset($del_res))
 		{
