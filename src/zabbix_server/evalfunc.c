@@ -357,17 +357,30 @@ static int evaluate_AVG(char *value,DB_ITEM	*item,int parameter,int flag)
 	int		rows;
 	double		sum=0;
 
-	if(item->value_type != ITEM_VALUE_TYPE_FLOAT)
+	char		table[MAX_STRING_LEN];
+
+	if( (item->value_type != ITEM_VALUE_TYPE_FLOAT) && (item->value_type != ITEM_VALUE_TYPE_UINT64))
 	{
 		return	FAIL;
 	}
 
 	now=time(NULL);
 
+	if(item->value_type == ITEM_VALUE_TYPE_UINT64)
+	{
+		strscpy(table,"history_uint");
+	}
+	else
+	{
+		strscpy(table,"history");
+	}
+
 	if(flag == ZBX_FLAG_SEC)
 	{
-		result = DBselect("select avg(value) from history where clock>%d and itemid=" ZBX_FS_UI64,
-			now-parameter,item->itemid);
+		result = DBselect("select avg(value) from %s where clock>%d and itemid=" ZBX_FS_UI64,
+			table,
+			now-parameter,
+			item->itemid);
 
 		row = DBfetch(result);
 		
@@ -384,7 +397,8 @@ static int evaluate_AVG(char *value,DB_ITEM	*item,int parameter,int flag)
 	}
 	else if(flag == ZBX_FLAG_VALUES)
 	{
-		zbx_snprintf(sql,sizeof(sql),"select value from history where itemid=" ZBX_FS_UI64 " order by clock desc",
+		zbx_snprintf(sql,sizeof(sql),"select value from %s where itemid=" ZBX_FS_UI64 " order by clock desc",
+			table,
 			item->itemid);
 		result = DBselectN(sql, parameter);
 		rows=0;
@@ -455,16 +469,17 @@ static int evaluate_MIN(char *value,DB_ITEM	*item,int parameter, int flag)
 
 	now=time(NULL);
 
+	if(item->value_type == ITEM_VALUE_TYPE_UINT64)
+	{
+		strscpy(table,"history_uint");
+	}
+	else
+	{
+		strscpy(table,"history");
+	}
+
 	if(flag == ZBX_FLAG_SEC)
 	{
-		if(item->value_type == ITEM_VALUE_TYPE_UINT64)
-		{
-			strscpy(table,"history_uint");
-		}
-		else
-		{
-			strscpy(table,"history");
-		}
 		result = DBselect("select min(value) from %s where clock>%d and itemid=" ZBX_FS_UI64,
 			table, now-parameter,item->itemid);
 		row = DBfetch(result);
@@ -481,14 +496,6 @@ static int evaluate_MIN(char *value,DB_ITEM	*item,int parameter, int flag)
 	}
 	else if(flag == ZBX_FLAG_VALUES)
 	{
-		if(item->value_type == ITEM_VALUE_TYPE_UINT64)
-		{
-			strscpy(table,"history_uint");
-		}
-		else
-		{
-			strscpy(table,"history");
-		}
 		zbx_snprintf(sql,sizeof(sql),"select value from %s where itemid=" ZBX_FS_UI64 " order by clock desc",
 			table,item->itemid);
 		result = DBselectN(sql,parameter);

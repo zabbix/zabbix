@@ -1,5 +1,6 @@
 Changes for 1.3.4:
 
+ - added support of avg() for items having integer type (Alexei)
  - added user group for database down messages (Alexei/Eugene)
  - removed support of action repeats (Alexei)
  - fixed upgrade of rights,sysmaps,sysmaps_elements (Alexei)
