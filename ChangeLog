@@ -1,5 +1,6 @@
 Changes for 1.3.4:
 
+ - removed housekeeper warnings from front-end (Alexei)
  - HTTP poller won't verify SSL certificates to enable self-signed (Alexei)
  - fixed warning when enabling/disabling action (Alexei)
  - added support of avg() for items having integer type (Alexei)

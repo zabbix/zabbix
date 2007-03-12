@@ -112,8 +112,6 @@
 		}
 		else
 		{
-			SDI('TODO: Correct housekeeper scheduling [node deletion]!'); /* TODO */ /* add node deletion by housekeeper */
-		
 			$housekeeperid = get_dbid('housekeeper','housekeeperid');
 			$result = (
 				DBexecute("insert into housekeeper (housekeeperid,tablename,field,value)".
@@ -121,6 +119,7 @@
 				DBexecute('delete from nodes where nodeid='.$nodeid) &&
 				DBexecute('update nodes set masterid=0 where masterid='.$nodeid)
 				);
+			error('Please be aware that database still contains data related to the deleted Node');
 		}
 		return $result;
 	}
