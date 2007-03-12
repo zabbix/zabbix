@@ -794,8 +794,6 @@ COpt::profiling_stop('prepare table');
 
 	function	delete_history_by_itemid($itemid, $use_housekeeper=0)
 	{
-		SDI('TODO: Correct housekeeper scheduling [new elementid problem]!'); /* TODO */ /* think about housekeeper scheduling, must be housekeeperid - unneeded */
-		
 		$result = delete_trends_by_itemid($itemid,$use_housekeeper);
 		if(!$result)	return $result;
 
@@ -827,8 +825,6 @@ COpt::profiling_stop('prepare table');
 
 	function	delete_trends_by_itemid($itemid, $use_housekeeper=0)
 	{
-		SDI('TODO: Correct housekeeper scheduling [new elementid problem]!'); /* TODO */ /* think about housekeeper scheduling, must be housekeeperid - unneeded */
-
 		if($use_housekeeper)
 		{
 			$housekeeperid = get_dbid('housekeeper','housekeeperid');
