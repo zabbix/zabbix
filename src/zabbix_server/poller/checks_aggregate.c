@@ -27,15 +27,11 @@ static	int	evaluate_one(double *result, int *num, char *grpfunc, char const *val
 
 	if(valuetype == ITEM_VALUE_TYPE_FLOAT)
 	{
-		value = atof(value_str);
+		value = zbx_atod(value_str);
 	}
 	else if(valuetype == ITEM_VALUE_TYPE_UINT64)
 	{
-#ifdef HAVE_ATOLL
-			value = (double)atoll(value_str);
-#else
-			value = (double)atol(value_str);
-#endif
+		value = (double)zbx_atoui64(value_str);
 	}
 
 	if(strcmp(grpfunc,"grpsum") == 0)
@@ -188,7 +184,7 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
 		SET_DBL_RESULT(res, d);
 	}
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Result([%f])",d);
+	zabbix_log( LOG_LEVEL_DEBUG, "Result([" ZBX_FS_DBL "])",d);
 	return SUCCEED;
 }
 

@@ -3,5 +3,3 @@
 noinst_LIBRARIES = libzbxutils.a
 
 libzbxutils_a_SOURCES = nodechange.c nodechange.h
-
-libzbxutils_a_CPPFLAGS = $(DB_CPPFLAGS)

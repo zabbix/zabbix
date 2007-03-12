@@ -3,5 +3,3 @@
 noinst_LIBRARIES = libzbxpinger.a
 
 libzbxpinger_a_SOURCES = pinger.c pinger.h
-
-libzbxpinger_a_CPPFLAGS = $(DB_CPPFLAGS)

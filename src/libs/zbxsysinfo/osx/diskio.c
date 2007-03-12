@@ -22,216 +22,15 @@
 #include "common.h"
 #include "sysinfo.h"
 
-static int	DISKREADOPS1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char	key[MAX_STRING_LEN];
-
-	zbx_snprintf(key,sizeof(key),"disk_read_ops1[%s]",param);
-
-	return	get_stat(key, flags, result);
-}
-
-static int	DISKREADOPS5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char	key[MAX_STRING_LEN];
-
-	zbx_snprintf(key,sizeof(key),"disk_read_ops5[%s]",param);
-
-	return	get_stat(key, flags, result);
-}
-
-static int	DISKREADOPS15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char	key[MAX_STRING_LEN];
-
-	zbx_snprintf(key,sizeof(key),"disk_read_ops15[%s]",param);
-
-	return	get_stat(key, flags, result);
-}
-
-static int	DISKREADBLKS1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char	key[MAX_STRING_LEN];
-
-	zbx_snprintf(key,sizeof(key),"disk_read_blks1[%s]",param);
-
-	return	get_stat(key, flags, result);
-}
-
-static int	DISKREADBLKS5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char	key[MAX_STRING_LEN];
-
-	zbx_snprintf(key,sizeof(key),"disk_read_blks5[%s]",param);
-
-	return	get_stat(key, flags, result);
-}
-
-static int	DISKREADBLKS15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char	key[MAX_STRING_LEN];
-
-	zbx_snprintf(key,sizeof(key),"disk_read_blks15[%s]",param);
-
-	return	get_stat(key, flags, result);
-}
-
-static int	DISKWRITEOPS1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char	key[MAX_STRING_LEN];
-
-	zbx_snprintf(key,sizeof(key),"disk_write_ops1[%s]",param);
-
-	return	get_stat(key, flags, result);
-}
-
-static int	DISKWRITEOPS5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char	key[MAX_STRING_LEN];
-
-	zbx_snprintf(key,sizeof(key),"disk_write_ops5[%s]",param);
-
-	return	get_stat(key, flags, result);
-}
-
-static int	DISKWRITEOPS15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char	key[MAX_STRING_LEN];
-
-	zbx_snprintf(key,sizeof(key),"disk_write_ops15[%s]",param);
-
-	return	get_stat(key, flags, result);
-}
-
-static int	DISKWRITEBLKS1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char	key[MAX_STRING_LEN];
-
-	zbx_snprintf(key,sizeof(key),"disk_write_blks1[%s]",param);
-
-	return	get_stat(key, flags, result);
-}
-
-static int	DISKWRITEBLKS5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char	key[MAX_STRING_LEN];
-
-	zbx_snprintf(key,sizeof(key),"disk_write_blks5[%s]",param);
-
-	return	get_stat(key, flags, result);
-}
-
-static int	DISKWRITEBLKS15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	char	key[MAX_STRING_LEN];
-
-	zbx_snprintf(key,sizeof(key),"disk_write_blks15[%s]",param);
-
-	return	get_stat(key, flags, result);
-}
-
 int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-
-#define DEV_FNCLIST struct dev_fnclist_s
-DEV_FNCLIST
-{
-	char *type;
-	char *mode;
-	int (*function)();
-};
-
-	DEV_FNCLIST fl[] = 
-	{
-		{"ops",	"avg1" ,	DISKWRITEOPS1},
-		{"ops",	"avg5" ,	DISKWRITEOPS5},
-		{"ops",	"avg15",	DISKWRITEOPS15},
-		{"bps",	"avg1" ,	DISKWRITEBLKS1},
-		{"bps",	"avg5" ,	DISKWRITEBLKS5},
-		{"bps",	"avg15",	DISKWRITEBLKS15},
-		{0,	0,		0}
-	};
-
+#ifndef TODO
+	return SYSINFO_RET_FAIL; 
+#else
+	/* !!!TODO!!! */
 	char devname[MAX_STRING_LEN];
 	char type[MAX_STRING_LEN];
 	char mode[MAX_STRING_LEN];
-	int i;
-	
-        assert(result);
-
-        init_result(result);
-	
-        if(num_param(param) > 3)
-        {
-                return SYSINFO_RET_FAIL;
-        }
-
-        if(get_param(param, 1, devname, sizeof(devname)) != 0)
-        {
-                return SYSINFO_RET_FAIL;
-        }
-	
-	if(get_param(param, 2, type, sizeof(type)) != 0)
-        {
-                type[0] = '\0';
-        }
-        if(type[0] == '\0')
-	{
-		/* default parameter */
-		zbx_snprintf(type, sizeof(type), "bps");
-	}
-	
-	if(get_param(param, 3, mode, MAX_STRING_LEN) != 0)
-        {
-                mode[0] = '\0';
-        }
-	
-        if(mode[0] == '\0')
-	{
-		/* default parameter */
-		zbx_snprintf(mode, sizeof(mode), "avg1");
-	}
-	
-	for(i=0; fl[i].type!=0; i++)
-	{
-		if(strncmp(type, fl[i].type, MAX_STRING_LEN)==0)
-		{
-			if(strncmp(mode, fl[i].mode, MAX_STRING_LEN)==0)
-			{
-				return (fl[i].function)(cmd, devname, flags, result);
-			}
-		}
-	}
-	
-	return SYSINFO_RET_FAIL;
-}
-
-int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-
-#define DEV_FNCLIST struct dev_fnclist_s
-DEV_FNCLIST
-{
-	char *type;
-	char *mode;
-	int (*function)();
-};
-
-	DEV_FNCLIST fl[] = 
-	{
-		{"ops",	"avg1" ,	DISKREADOPS1},
-		{"ops",	"avg5" ,	DISKREADOPS5},
-		{"ops",	"avg15",	DISKREADOPS15},
-		{"bps",	"avg1" ,	DISKREADBLKS1},
-		{"bps",	"avg5" ,	DISKREADBLKS5},
-		{"bps",	"avg15",	DISKREADBLKS15},
-		{0,	0,		0}
-	};
-
-	char devname[MAX_STRING_LEN];
-	char type[MAX_STRING_LEN];
-	char mode[MAX_STRING_LEN];
-	int i;
 	
         assert(result);
 
@@ -267,19 +66,112 @@ DEV_FNCLIST
 		/* default parameter */
 		zbx_snprintf(mode, sizeof(mode), "avg1");
 	}
-	
-	for(i=0; fl[i].type!=0; i++)
+
+	if(NULL == collector)
 	{
-		if(strncmp(type, fl[i].type, MAX_STRING_LEN)==0)
-		{
-			if(strncmp(mode, fl[i].mode, MAX_STRING_LEN)==0)
-			{
-				return (fl[i].function)(cmd, devname, flags, result);
-			}
-		}
+		SET_MSG_RESULT(result, strdup("Collector is not started!"));
+		return SYSINFO_RET_OK;
+	}
+
+	if( 0 == strcmp(type,"ops"))
+	{
+		if( 0 == strcmp(mode,"avg1"))		SET_DBL_RESULT(result, collector->diskdevices.XXX1)
+		else if( 0 == strcmp(mode,"avg5"))	SET_DBL_RESULT(result, collector->diskdevices.XXX5)
+		else if( 0 == strcmp(mode,"avg15"))	SET_DBL_RESULT(result, collector->diskdevices.XXX15)
+		else return SYSINFO_RET_FAIL;
+
+	}
+	else if( 0 == strcmp(type,"bps"))
+	{
+		if( 0 == strcmp(mode,"avg1")) 		SET_DBL_RESULT(result, collector->diskdevices.XXX1)
+		else if( 0 == strcmp(mode,"avg5")) 	SET_DBL_RESULT(result, collector->diskdevices.XXX5)
+		else if( 0 == strcmp(mode,"avg15"))	SET_DBL_RESULT(result, collector->diskdevices.XXX15)
+		else return SYSINFO_RET_FAIL;
+
+	}
+	else
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	return SYSINFO_RET_OK;
+#endif /* TODO */
+}
+
+int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+#ifndef TODO
+	return SYSINFO_RET_FAIL; 
+#else
+	/* !!!TODO!!! */
+	char devname[MAX_STRING_LEN];
+	char type[MAX_STRING_LEN];
+	char mode[MAX_STRING_LEN];
+	
+        assert(result);
+
+        init_result(result);
+	
+        if(num_param(param) > 3)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+
+        if(get_param(param, 1, devname, sizeof(devname)) != 0)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+	
+	if(get_param(param, 2, type, sizeof(type)) != 0)
+        {
+                type[0] = '\0';
+        }
+        if(type[0] == '\0')
+	{
+		/* default parameter */
+		zbx_snprintf(type, sizeof(type), "bps");
 	}
 	
-	return SYSINFO_RET_FAIL;
+	if(get_param(param, 3, mode, sizeof(mode)) != 0)
+        {
+                mode[0] = '\0';
+        }
+	
+        if(mode[0] == '\0')
+	{
+		/* default parameter */
+		zbx_snprintf(mode, sizeof(mode), "avg1");
+	}
+
+	if(NULL == collector)
+	{
+		SET_MSG_RESULT(result, strdup("Collector is not started!"));
+		return SYSINFO_RET_OK;
+	}
+
+	if( 0 == strcmp(type,"ops"))
+	{
+		if( 0 == strcmp(mode,"avg1"))		SET_DBL_RESULT(result, collector->diskdevices.XXX1)
+		else if( 0 == strcmp(mode,"avg5"))	SET_DBL_RESULT(result, collector->diskdevices.XXX5)
+		else if( 0 == strcmp(mode,"avg15"))	SET_DBL_RESULT(result, collector->diskdevices.XXX15)
+		else return SYSINFO_RET_FAIL;
+
+	}
+	else if( 0 == strcmp(type,"bps"))
+	{
+		if( 0 == strcmp(mode,"avg1")) 		SET_DBL_RESULT(result, collector->diskdevices.XXX1)
+		else if( 0 == strcmp(mode,"avg5")) 	SET_DBL_RESULT(result, collector->diskdevices.XXX5)
+		else if( 0 == strcmp(mode,"avg15"))	SET_DBL_RESULT(result, collector->diskdevices.XXX15)
+		else return SYSINFO_RET_FAIL;
+
+	}
+	else
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	return SYSINFO_RET_OK;
+#endif /* TODO */
 }
 
 static int	DISK_IO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
@@ -341,7 +233,7 @@ int	OLD_IO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *res
                 return SYSINFO_RET_FAIL;
         }
 
-        if(get_param(param, 1, key, MAX_STRING_LEN) != 0)
+        if(get_param(param, 1, key, sizeof(key)) != 0)
         {
                 return SYSINFO_RET_FAIL;
         }

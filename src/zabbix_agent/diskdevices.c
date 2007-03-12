@@ -238,10 +238,10 @@ void	report_stats_diskdevices(FILE *file, int now)
 	 * [2] - avg5
 	 * [3] - avg15
 	 */
-	float   read_io_ops[4];
-	float   blks_read[4];
-	float   write_io_ops[4];
-	float   blks_write[4];
+	double   read_io_ops[4];
+	double   blks_read[4];
+	double   write_io_ops[4];
+	double   blks_write[4];
 
 	int	i,j;
 
@@ -321,7 +321,7 @@ void	report_stats_diskdevices(FILE *file, int now)
 
 		if((read_io_ops[0]!=0)&&(read_io_ops[1]!=0))
 		{
-			fprintf(file,"disk_read_ops1[%s] %f\n", diskdevices[i].device, (float)((read_io_ops[0]-read_io_ops[1])/(now-time1)));
+			fprintf(file,"disk_read_ops1[%s] " ZBX_FS_DBL "\n", diskdevices[i].device, (double)((read_io_ops[0]-read_io_ops[1])/(now-time1)));
 		}
 		else
 		{
@@ -329,7 +329,7 @@ void	report_stats_diskdevices(FILE *file, int now)
 		}
 		if((read_io_ops[0]!=0)&&(read_io_ops[2]!=0))
 		{
-			fprintf(file,"disk_read_ops5[%s] %f\n", diskdevices[i].device, (float)((read_io_ops[0]-read_io_ops[2])/(now-time5)));
+			fprintf(file,"disk_read_ops5[%s] " ZBX_FS_DBL "\n", diskdevices[i].device, (double)((read_io_ops[0]-read_io_ops[2])/(now-time5)));
 		}
 		else
 		{
@@ -337,7 +337,7 @@ void	report_stats_diskdevices(FILE *file, int now)
 		}
 		if((read_io_ops[0]!=0)&&(read_io_ops[3]!=0))
 		{
-			fprintf(file,"disk_read_ops15[%s] %f\n", diskdevices[i].device, (float)((read_io_ops[0]-read_io_ops[3])/(now-time15)));
+			fprintf(file,"disk_read_ops15[%s] " ZBX_FS_DBL "\n", diskdevices[i].device, (double)((read_io_ops[0]-read_io_ops[3])/(now-time15)));
 		}
 		else
 		{
@@ -346,7 +346,7 @@ void	report_stats_diskdevices(FILE *file, int now)
 
 		if((blks_read[0]!=0)&&(blks_read[1]!=0))
 		{
-			fprintf(file,"disk_read_blks1[%s] %f\n", diskdevices[i].device, (float)((blks_read[0]-blks_read[1])/(now-time1)));
+			fprintf(file,"disk_read_blks1[%s] " ZBX_FS_DBL "\n", diskdevices[i].device, (double)((blks_read[0]-blks_read[1])/(now-time1)));
 		}
 		else
 		{
@@ -354,7 +354,7 @@ void	report_stats_diskdevices(FILE *file, int now)
 		}
 		if((blks_read[0]!=0)&&(blks_read[2]!=0))
 		{
-			fprintf(file,"disk_read_blks5[%s] %f\n", diskdevices[i].device, (float)((blks_read[0]-blks_read[2])/(now-time5)));
+			fprintf(file,"disk_read_blks5[%s] " ZBX_FS_DBL "\n", diskdevices[i].device, (double)((blks_read[0]-blks_read[2])/(now-time5)));
 		}
 		else
 		{
@@ -362,7 +362,7 @@ void	report_stats_diskdevices(FILE *file, int now)
 		}
 		if((blks_read[0]!=0)&&(blks_read[3]!=0))
 		{
-			fprintf(file,"disk_read_blks15[%s] %f\n", diskdevices[i].device, (float)((blks_read[0]-blks_read[3])/(now-time15)));
+			fprintf(file,"disk_read_blks15[%s] " ZBX_FS_DBL "\n", diskdevices[i].device, (double)((blks_read[0]-blks_read[3])/(now-time15)));
 		}
 		else
 		{
@@ -371,7 +371,7 @@ void	report_stats_diskdevices(FILE *file, int now)
 
 		if((write_io_ops[0]!=0)&&(write_io_ops[1]!=0))
 		{
-			fprintf(file,"disk_write_ops1[%s] %f\n", diskdevices[i].device, (float)((write_io_ops[0]-write_io_ops[1])/(now-time1)));
+			fprintf(file,"disk_write_ops1[%s] " ZBX_FS_DBL "\n", diskdevices[i].device, (double)((write_io_ops[0]-write_io_ops[1])/(now-time1)));
 		}
 		else
 		{
@@ -379,7 +379,7 @@ void	report_stats_diskdevices(FILE *file, int now)
 		}
 		if((write_io_ops[0]!=0)&&(write_io_ops[2]!=0))
 		{
-			fprintf(file,"disk_write_ops5[%s] %f\n", diskdevices[i].device, (float)((write_io_ops[0]-write_io_ops[2])/(now-time5)));
+			fprintf(file,"disk_write_ops5[%s] " ZBX_FS_DBL "\n", diskdevices[i].device, (double)((write_io_ops[0]-write_io_ops[2])/(now-time5)));
 		}
 		else
 		{
@@ -387,7 +387,7 @@ void	report_stats_diskdevices(FILE *file, int now)
 		}
 		if((write_io_ops[0]!=0)&&(write_io_ops[3]!=0))
 		{
-			fprintf(file,"disk_write_ops15[%s] %f\n", diskdevices[i].device, (float)((write_io_ops[0]-write_io_ops[3])/(now-time15)));
+			fprintf(file,"disk_write_ops15[%s] " ZBX_FS_DBL "\n", diskdevices[i].device, (double)((write_io_ops[0]-write_io_ops[3])/(now-time15)));
 		}
 		else
 		{
@@ -396,7 +396,7 @@ void	report_stats_diskdevices(FILE *file, int now)
 
 		if((blks_write[0]!=0)&&(blks_write[1]!=0))
 		{
-			fprintf(file,"disk_write_blks1[%s] %f\n", diskdevices[i].device, (float)((blks_write[0]-blks_write[1])/(now-time1)));
+			fprintf(file,"disk_write_blks1[%s] " ZBX_FS_DBL "\n", diskdevices[i].device, (double)((blks_write[0]-blks_write[1])/(now-time1)));
 		}
 		else
 		{
@@ -404,7 +404,7 @@ void	report_stats_diskdevices(FILE *file, int now)
 		}
 		if((blks_write[0]!=0)&&(blks_write[2]!=0))
 		{
-			fprintf(file,"disk_write_blks5[%s] %f\n", diskdevices[i].device, (float)((blks_write[0]-blks_write[2])/(now-time5)));
+			fprintf(file,"disk_write_blks5[%s] " ZBX_FS_DBL "\n", diskdevices[i].device, (double)((blks_write[0]-blks_write[2])/(now-time5)));
 		}
 		else
 		{
@@ -412,7 +412,7 @@ void	report_stats_diskdevices(FILE *file, int now)
 		}
 		if((blks_write[0]!=0)&&(blks_write[3]!=0))
 		{
-			fprintf(file,"disk_write_blks15[%s] %f\n", diskdevices[i].device, (float)((blks_write[0]-blks_write[3])/(now-time15)));
+			fprintf(file,"disk_write_blks15[%s] " ZBX_FS_DBL "\n", diskdevices[i].device, (double)((blks_write[0]-blks_write[3])/(now-time15)));
 		}
 		else
 		{
@@ -424,11 +424,11 @@ void	report_stats_diskdevices(FILE *file, int now)
 }
 
 
-void	add_values_diskdevices(int now,int major,int diskno,float read_io_ops,float blks_read,float write_io_ops,float blks_write)
+void	add_values_diskdevices(int now,int major,int diskno,double read_io_ops,double blks_read,double write_io_ops,double blks_write)
 {
 	int i,j;
 
-/*	printf("Add_values [%s] [%f] [%f]\n",interface,value_sent,value_received);*/
+/*	printf("Add_values [%s] [" ZBX_FS_DBL "] [" ZBX_FS_DBL "]\n",interface,value_sent,value_received);*/
 
 	for(i=0;i<MAX_DISKDEVICES;i++)
 	{

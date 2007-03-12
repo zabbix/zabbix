@@ -30,11 +30,11 @@
 #include "log.h"
 #include "cfg.h"
 
-#if defined(ZABBIX_SERVICE)
+#if defined(_WINDOWS)
 #	include "service.h"
-#elif defined(ZABBIX_DAEMON) /* ZABBIX_SERVICE */
+#else
 #	include "daemon.h"
-#endif /* ZABBIX_DAEMON */
+#endif /* _WINDOWS */
 
 ZBX_COLLECTOR_DATA *collector = NULL;
 
@@ -194,4 +194,3 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 
 	zbx_tread_exit(0);
 }
-

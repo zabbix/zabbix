@@ -17,27 +17,6 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <netinet/in.h>
-#include <netdb.h>
-
-#include <signal.h>
-
-#include <string.h>
-
-#include <time.h>
-
-#include <sys/socket.h>
-#include <errno.h>
-
-/* Functions: pow(), round() */
-#include <math.h>
-
 #include "common.h"
 #include "db.h"
 #include "log.h"
@@ -310,7 +289,7 @@ static int evaluate_SUM(char *value, DB_ITEM *item, int parameter, int flag)
 				sum+=atof(row[0]);
 				rows++;
 			}
-			if(rows>0)	zbx_snprintf(value,MAX_STRING_LEN,"%f", sum);
+			if(rows>0)	zbx_snprintf(value,MAX_STRING_LEN, ZBX_FS_DBL, sum);
 		}
 		if(0 == rows)
 		{
@@ -414,7 +393,7 @@ static int evaluate_AVG(char *value,DB_ITEM	*item,int parameter,int flag)
 		}
 		else
 		{
-			zbx_snprintf(value,MAX_STRING_LEN,"%f", sum/(double)rows);
+			zbx_snprintf(value,MAX_STRING_LEN, ZBX_FS_DBL, sum/(double)rows);
 		}
 	}
 	else
@@ -532,7 +511,7 @@ static int evaluate_MIN(char *value,DB_ITEM	*item,int parameter, int flag)
 			}
 			else
 			{
-				zbx_snprintf(value,MAX_STRING_LEN,"%f", min);
+				zbx_snprintf(value,MAX_STRING_LEN, ZBX_FS_DBL, min);
 			}
 		}
 	}
@@ -659,7 +638,7 @@ static int evaluate_MAX(char *value,DB_ITEM *item,int parameter,int flag)
 			}
 			else
 			{
-				zbx_snprintf(value,MAX_STRING_LEN,"%f", max);
+				zbx_snprintf(value,MAX_STRING_LEN, ZBX_FS_DBL, max);
 			}
 		}
 	}
@@ -759,7 +738,7 @@ static int evaluate_DELTA(char *value,DB_ITEM *item,int parameter, int flag)
 		}
 		else
 		{
-			zbx_snprintf(value,MAX_STRING_LEN,"%f", max-min);
+			zbx_snprintf(value,MAX_STRING_LEN, ZBX_FS_DBL, max-min);
 		}
 	}
 	else
@@ -854,7 +833,7 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 		{
 			switch (item->value_type) {
 				case ITEM_VALUE_TYPE_FLOAT:
-					zbx_snprintf(value,MAX_STRING_LEN,"%f",item->lastvalue_dbl);
+					zbx_snprintf(value,MAX_STRING_LEN,ZBX_FS_DBL,item->lastvalue_dbl);
 					del_zeroes(value);
 					break;
 				case ITEM_VALUE_TYPE_UINT64:
@@ -876,7 +855,7 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 		{
 			switch (item->value_type) {
 				case ITEM_VALUE_TYPE_FLOAT:
-					zbx_snprintf(value,MAX_STRING_LEN,"%f",item->prevvalue_dbl);
+					zbx_snprintf(value,MAX_STRING_LEN,ZBX_FS_DBL,item->prevvalue_dbl);
 					del_zeroes(value);
 					break;
 				case ITEM_VALUE_TYPE_UINT64:
@@ -886,15 +865,6 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 					strcpy(value,item->prevvalue_str);
 					break;
 			}
-/*			if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) || (item->value_type==ITEM_VALUE_TYPE_UINT64))
-			{
-				zbx_snprintf(value,MAX_STRING_LEN,"%f",item->prevvalue);
-				del_zeroes(value);
-			}
-			else
-			{
-				strcpy(value,item->prevvalue_str);
-			}*/
 		}
 	}
 	else if(strcmp(function,"min")==0)
@@ -971,7 +941,7 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 		{
 			switch (item->value_type) {
 				case ITEM_VALUE_TYPE_FLOAT:
-					zbx_snprintf(value,MAX_STRING_LEN,"%f",
+					zbx_snprintf(value,MAX_STRING_LEN,ZBX_FS_DBL,
 						(double)abs(item->lastvalue_dbl-item->prevvalue_dbl));
 					del_zeroes(value);
 					break;
@@ -989,22 +959,6 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 					}
 					break;
 			}
-/*			if( (item->value_type==ITEM_VALUE_TYPE_FLOAT) || (item->value_type==ITEM_VALUE_TYPE_UINT64))
-			{
-				zbx_snprintf(value,MAX_STRING_LEN,"%f",(float)abs(item->lastvalue-item->prevvalue));
-				del_zeroes(value);
-			}
-			else
-			{
-				if(strcmp(item->lastvalue_str, item->prevvalue_str) == 0)
-				{
-					strcpy(value,"0");
-				}
-				else
-				{
-					strcpy(value,"1");
-				}
-			}*/
 		}
 	}
 	else if(strcmp(function,"change")==0)
@@ -1017,7 +971,7 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 		{
 			switch (item->value_type) {
 				case ITEM_VALUE_TYPE_FLOAT:
-					zbx_snprintf(value,MAX_STRING_LEN,"%f",
+					zbx_snprintf(value,MAX_STRING_LEN,ZBX_FS_DBL,
 						item->lastvalue_dbl-item->prevvalue_dbl);
 					del_zeroes(value);
 					break;
@@ -1035,22 +989,6 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 					}
 					break;
 			}
-/*			if(item->value_type==ITEM_VALUE_TYPE_FLOAT)
-			{
-				zbx_snprintf(value,MAX_STRING_LEN,"%f",item->lastvalue-item->prevvalue);
-				del_zeroes(value);
-			}
-			else
-			{
-				if(strcmp(item->lastvalue_str, item->prevvalue_str) == 0)
-				{
-					strcpy(value,"0");
-				}
-				else
-				{
-					strcpy(value,"1");
-				}
-			}*/
 		}
 	}
 	else if(strcmp(function,"diff")==0)
@@ -1236,8 +1174,8 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
  ******************************************************************************/
 int	add_value_suffix(char *value, DB_ITEM *item)
 {
-	float	value_float;
-	float	value_float_abs;
+	double	value_double;
+	double	value_double_abs;
 
 	char	suffix[MAX_STRING_LEN];
 
@@ -1249,46 +1187,46 @@ int	add_value_suffix(char *value, DB_ITEM *item)
 		(strlen(item->units)>0))
 	)	return FAIL;
 		
-	value_float=atof(value);
+	value_double=atof(value);
 	/* Custom multiplier? */
 /*
 	if(item->multiplier == 1)
 	{
-		value_float=value_float*atof(item->formula);
+		value_double=value_double*atof(item->formula);
 	}*/
 
-	value_float_abs=abs(value_float);
+	value_double_abs=abs(value_double);
 
-	if(value_float_abs<1024)
+	if(value_double_abs<1024)
 	{
 		strscpy(suffix,"");
 	}
-	else if(value_float_abs<1024*1024)
+	else if(value_double_abs<1024*1024)
 	{
 		strscpy(suffix,"K");
-		value_float=value_float/1024;
+		value_double=value_double/1024;
 	}
-	else if(value_float_abs<1024*1024*1024)
+	else if(value_double_abs<1024*1024*1024)
 	{
 		strscpy(suffix,"M");
-		value_float=value_float/(1024*1024);
+		value_double=value_double/(1024*1024);
 	}
 	else
 	{
 		strscpy(suffix,"G");
-		value_float=value_float/(1024*1024*1024);
+		value_double=value_double/(1024*1024*1024);
 	}
-/*		if(cmp_double((double)round(value_float), value_float) == 0) */
-	if(cmp_double((int)(value_float+0.5), value_float) == 0)
+/*		if(cmp_double((double)round(value_double), value_double) == 0) */
+	if(cmp_double((int)(value_double+0.5), value_double) == 0)
 	{
-		zbx_snprintf(value, MAX_STRING_LEN, "%.0f %s%s", value_float, suffix, item->units);
+		zbx_snprintf(value, MAX_STRING_LEN, ZBX_FS_DBL_EXT(0) " %s%s", value_double, suffix, item->units);
 	}
 	else
 	{
-		zbx_snprintf(value, MAX_STRING_LEN, "%.2f %s%s", value_float, suffix, item->units);
+		zbx_snprintf(value, MAX_STRING_LEN, ZBX_FS_DBL_EXT(2) " %s%s", value_double, suffix, item->units);
 	}
 	
-	zabbix_log(LOG_LEVEL_DEBUG, "Value [%s] [%f] Suffix [%s] Units [%s]",value,value_float,suffix,item->units);
+	zabbix_log(LOG_LEVEL_DEBUG, "Value [%s] [" ZBX_FS_DBL "] Suffix [%s] Units [%s]",value,value_double,suffix,item->units);
 	return SUCCEED;
 }
 
@@ -1384,7 +1322,6 @@ int evaluate_function2(char *value,char *host,char *key,char *function,char *par
 
 	DBget_item_from_db(&item,row);
 
-/*	res = evaluate_FUNCTION(value,&item,function,parameter, EVALUATE_FUNCTION_SUFFIX); */
 	res = evaluate_function(value,&item,function,parameter);
 
 	if(replace_value_by_map(value, item.valuemapid) != SUCCEED)

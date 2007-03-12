@@ -447,8 +447,8 @@ lbl_exec:
 #endif
 	
 /*	gettimeofday(&tv, NULL);
-	if((float)(tv.tv_usec-msec)/1000000 > 0.1)
-		zabbix_log( LOG_LEVEL_WARNING, "Long query: %f sec, query %s", (float)(tv.tv_usec-msec)/1000000, sql );*/
+	if((double)(tv.tv_usec-msec)/1000000 > 0.1)
+		zabbix_log( LOG_LEVEL_WARNING, "Long query: " ZBX_FS_DBL " sec, query %s", (double)(tv.tv_usec-msec)/1000000, sql );*/
 
 	zbx_free(sql);
 	return ret;
@@ -700,8 +700,8 @@ lbl_get_table:
 #endif
 
 /*	gettimeofday(&tv, NULL);
-	if((float)(tv.tv_usec-msec)/1000000 > 0.1)
-		zabbix_log( LOG_LEVEL_WARNING, "Long query: %f sec, query %s", (float)(tv.tv_usec-msec)/1000000, sql );*/
+	if((double)(tv.tv_usec-msec)/1000000 > 0.1)
+		zabbix_log( LOG_LEVEL_WARNING, "Long query: " ZBX_FS_DBL " sec, query %s", (double)(tv.tv_usec-msec)/1000000, sql );*/
 
 	zbx_free(sql);
 	return result;

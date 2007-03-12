@@ -21,103 +21,13 @@
 
 #include "common.h"
 #include "sysinfo.h"
-
-static int	SYSTEM_CPU_IDLE1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[idle1]", flags, result);
-}
-
-static int	SYSTEM_CPU_IDLE5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[idle5]", flags, result);
-}
-
-static int	SYSTEM_CPU_IDLE15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[idle15]", flags, result);
-}
-
-static int	SYSTEM_CPU_NICE1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[nice1]", flags, result);
-}
-
-static int	SYSTEM_CPU_NICE5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[nice5]", flags, result);
-}
-static int	SYSTEM_CPU_NICE15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[nice15]", flags, result);
-}
-
-static int	SYSTEM_CPU_USER1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[user1]", flags, result);
-}
-
-static int	SYSTEM_CPU_USER5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[user5]", flags, result);
-}
-
-static int	SYSTEM_CPU_USER15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[user15]", flags, result);
-}
-
-static int	SYSTEM_CPU_SYS1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[system1]", flags, result);
-}
-
-static int	SYSTEM_CPU_SYS5(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[system5]", flags, result);
-}
-
-static int	SYSTEM_CPU_SYS15(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat("cpu[system15]", flags, result);
-}
-
-int     OLD_CPU(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat(cmd, flags, result);
-}
+#include "stats.h"
 
 int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-
-#define CPU_FNCLIST struct cpu_fnclist_s
-CPU_FNCLIST
-{
-	char *type;
-	char *mode;
-	int (*function)();
-};
-
-	CPU_FNCLIST fl[] = 
-	{
-		{"idle",	"avg1" ,	SYSTEM_CPU_IDLE1},
-		{"idle",	"avg5" ,	SYSTEM_CPU_IDLE5},
-		{"idle",	"avg15",	SYSTEM_CPU_IDLE15},
-		{"nice",	"avg1" ,	SYSTEM_CPU_NICE1},
-		{"nice",	"avg5" ,	SYSTEM_CPU_NICE5},
-		{"nice",	"avg15",	SYSTEM_CPU_NICE15},
-		{"user",	"avg1" ,	SYSTEM_CPU_USER1},
-		{"user",	"avg5" ,	SYSTEM_CPU_USER5},
-		{"user",	"avg15",	SYSTEM_CPU_USER15},
-		{"system",	"avg1" ,	SYSTEM_CPU_SYS1},
-		{"system",	"avg5" ,	SYSTEM_CPU_SYS5},
-		{"system",	"avg15",	SYSTEM_CPU_SYS15},
-		{0,		0,		0}
-	};
-
 	char cpuname[MAX_STRING_LEN];
 	char type[MAX_STRING_LEN];
 	char mode[MAX_STRING_LEN];
-	int i;
 	
         assert(result);
 
@@ -162,18 +72,49 @@ CPU_FNCLIST
 		/* default parameter */
 		zbx_snprintf(mode, sizeof(mode), "avg1");
 	}
-	
-	for(i=0; fl[i].type!=0; i++)
+
+	if(NULL == collector)
 	{
-		if(strncmp(type, fl[i].type, MAX_STRING_LEN)==0)
-		{
-			if(strncmp(mode, fl[i].mode, MAX_STRING_LEN)==0)
-			{
-				return (fl[i].function)(cmd, param, flags, result);
-			}
-		}
+		SET_MSG_RESULT(result, strdup("Collector is not started!"));
+		return SYSINFO_RET_OK;
 	}
-	return SYSINFO_RET_FAIL;
+
+	if( 0 == strcmp(type,"idle"))
+	{
+		if( 0 == strcmp(mode,"avg1"))		SET_DBL_RESULT(result, collector->cpus.idle1)
+		else if( 0 == strcmp(mode,"avg5"))	SET_DBL_RESULT(result, collector->cpus.idle5)
+		else if( 0 == strcmp(mode,"avg15"))	SET_DBL_RESULT(result, collector->cpus.idle15)
+		else return SYSINFO_RET_FAIL;
+
+	}
+	else if( 0 == strcmp(type,"nice"))
+	{
+		if( 0 == strcmp(mode,"avg1")) 		SET_DBL_RESULT(result, collector->cpus.nice1)
+		else if( 0 == strcmp(mode,"avg5")) 	SET_DBL_RESULT(result, collector->cpus.nice5)
+		else if( 0 == strcmp(mode,"avg15"))	SET_DBL_RESULT(result, collector->cpus.nice15)
+		else return SYSINFO_RET_FAIL;
+
+	}
+	else if( 0 == strcmp(type,"user"))
+	{
+		if( 0 == strcmp(mode,"avg1")) 		SET_DBL_RESULT(result, collector->cpus.user1)
+		else if( 0 == strcmp(mode,"avg5")) 	SET_DBL_RESULT(result, collector->cpus.user5)
+		else if( 0 == strcmp(mode,"avg15"))	SET_DBL_RESULT(result, collector->cpus.user15)
+		else return SYSINFO_RET_FAIL;
+	}
+	else if( 0 == strcmp(type,"system"))
+	{
+		if( 0 == strcmp(mode,"avg1")) 		SET_DBL_RESULT(result, collector->cpus.system1)
+		else if( 0 == strcmp(mode,"avg5")) 	SET_DBL_RESULT(result, collector->cpus.system5)
+		else if( 0 == strcmp(mode,"avg15"))	SET_DBL_RESULT(result, collector->cpus.system15)
+		else return SYSINFO_RET_FAIL;
+	}
+	else
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	return SYSINFO_RET_OK;
 }
 
 /* AIX CPU info */

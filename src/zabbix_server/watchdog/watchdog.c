@@ -25,6 +25,8 @@
 #include "log.h"
 #include "zlog.h"
 
+#include "../alerter/alerter.h"
+
 #include "common.h"
 #include "zlog.h"
 #include "watchdog.h"

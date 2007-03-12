@@ -1,8 +1,10 @@
 ## Process this file with automake to produce Makefile.in
 
-noinst_LIBRARIES = libzbxsysinfo2.a
+noinst_LIBRARIES = libspecsysinfo.a
 
-libzbxsysinfo2_a_SOURCES = \
+libspecsysinfo_a_CPPFLAGS = -I@top_srcdir@/src/zabbix_agent/
+
+libspecsysinfo_a_SOURCES = \
 	cpu.c \
 	diskio.c \
 	diskspace.c \

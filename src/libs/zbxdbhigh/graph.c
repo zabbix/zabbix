@@ -37,7 +37,7 @@ int	DBadd_graph(char *name, int width, int height, int yaxistype, double yaxismi
 
 	DBescape_string(name,name_esc,GRAPH_NAME_LEN_MAX);
 
-	if(FAIL == (exec_res = DBexecute("insert into graphs (name,width,height,yaxistype,yaxismin,yaxismax) values ('%s',%d,%d,%d,%f,%f)", name_esc, width, height, yaxistype, yaxismin, yaxismax)))
+	if(FAIL == (exec_res = DBexecute("insert into graphs (name,width,height,yaxistype,yaxismin,yaxismax) values ('%s',%d,%d,%d," ZBX_FS_DBL "," ZBX_FS_DBL ")", name_esc, width, height, yaxistype, yaxismin, yaxismax)))
 	{
 		return FAIL;
 	}

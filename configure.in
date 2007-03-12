@@ -591,14 +591,23 @@ if test "$server" = "yes"; then
 	AC_SUBST(DB_CPPFLAGS)
 	AC_SUBST(DB_LDFLAGS)
 
+	CFLAGS="${CFLAGS} ${DB_CPPFLAGS}"
+	LDFLAGS="${LDFLAGS} ${DB_LDFLAGS}"
+	
 	dnl Checking for Jabber libraries
 	JABBER_CHECK_CONFIG()
 	if test "x$want_jabber" = "xyes"; then
 		if test "x$found_jabber" != "xyes"; then
 			AC_MSG_ERROR([Not found Jabber library]);
 		fi
+		CFLAGS="${CFLAGS} ${JABBER_CPPFLAGS}"
+		LDFLAGS="${LDFLAGS} ${JABBER_LDFLAGS}"
 	fi
-	
+
+	dnl Check for libCurl [default - yes]
+	LIBCURL_CHECK_CONFIG([yes], [7.15.1], [],[])
+	CFLAGS="${CFLAGS} ${LIBCURL_CPPFLAGS}"
+	LDFLAGS="${LDFLAGS} ${LIBCURL_LDFLAGS}"
 fi
 
 AM_CONDITIONAL(JABBER,  test "x$found_jabber" = "xyes")
@@ -609,6 +618,8 @@ if test "x$want_netsnmp" = "xyes"; then
 	if test "x$found_netsnmp" != "xyes"; then
 		AC_MSG_ERROR([Invalid NET-SNMP directory - unable to find net-snmp-config.h])
 	fi
+	CFLAGS="${CFLAGS} ${SNMP_CPPFLAGS}"
+	LDFLAGS="${LDFLAGS} ${SNMP_LDFLAGS}"
 fi
 
 dnl Check for UCD-SNMP [by default - skip]
@@ -621,6 +632,8 @@ if test "x$want_snmp" = "xyes"; then
 	if test  "x$found_netsnmp" = "xyes"; then
 		AC_MSG_ERROR([You can configure for only one SNMP library.]);
 	fi
+	CFLAGS="${CFLAGS} ${SNMP_CPPFLAGS}"
+	LDFLAGS="${LDFLAGS} ${SNMP_LDFLAGS}"
 fi
 
 dnl Check for libLDAP [by default - skip]
@@ -629,10 +642,9 @@ if test "x$want_ldap" = "xyes"; then
 	if test "x$found_ldap" != "xyes"; then
 		AC_MSG_ERROR([Invalid LDAP directory - unable to find ldap.h])
 	fi
+	CFLAGS="${CFLAGS} ${LDAP_CPPFLAGS}"
+	LDFLAGS="${LDFLAGS} ${LDAP_LDFLAGS}"
 fi
-
-dnl Check for libCurl [default - yes]
-LIBCURL_CHECK_CONFIG([yes], [7.15.1], [],[])
 
 RANLIB="ranlib"
 AC_SUBST(RANLIB)
@@ -715,21 +727,55 @@ esac
 
 AC_SUBST(ARCH)
 
-AC_OUTPUT([Makefile src/Makefile src/libs/Makefile src/libs/zbxlog/Makefile src/libs/zbxcrypto/Makefile
-	src/libs/zbxnet/Makefile src/libs/zbxconf/Makefile src/zabbix_sender/Makefile
-	src/libs/zbxdbhigh/Makefile src/libs/zbxemail/Makefile src/libs/zbxsysinfo/Makefile src/libs/zbxsms/Makefile
-	src/zabbix_server/pinger/Makefile src/zabbix_agent/Makefile src/libs/zbxjabber/Makefile
-	src/zabbix_server/housekeeper/Makefile src/zabbix_server/alerter/Makefile src/zabbix_server/Makefile
-	src/zabbix_server/trapper/Makefile src/zabbix_server/poller/Makefile src/zabbix_server/timer/Makefile
-	src/zabbix_server/nodewatcher/Makefile src/zabbix_server/utils/Makefile src/zabbix_server/httppoller/Makefile
-	src/zabbix_server/watchdog/Makefile
-	src/zabbix_get/Makefile src/libs/zbxcommon/Makefile src/libs/zbxsysinfo/linux/Makefile
-	src/libs/zbxsysinfo/aix/Makefile src/libs/zbxsysinfo/freebsd/Makefile src/libs/zbxsysinfo/hpux/Makefile
-	src/libs/zbxsysinfo/openbsd/Makefile src/libs/zbxsysinfo/osx/Makefile src/libs/zbxsysinfo/solaris/Makefile
-	src/libs/zbxsysinfo/osf/Makefile src/libs/zbxsysinfo/netbsd/Makefile src/libs/zbxsysinfo/unknown/Makefile
-	src/libs/zbxnix/Makefile src/libs/zbxplugin/Makefile src/libs/zbxsys/Makefile src/libs/zbxcomms/Makefile
+AC_OUTPUT([
+	Makefile
+	create/Makefile
+	create/schema/Makefile
+	misc/Makefile
+	src/Makefile
+	src/libs/Makefile
+	src/libs/zbxlog/Makefile
+	src/libs/zbxcrypto/Makefile
+	src/libs/zbxnet/Makefile
+	src/libs/zbxconf/Makefile
+	src/libs/zbxdbhigh/Makefile
+	src/libs/zbxemail/Makefile
+	src/libs/zbxsysinfo/Makefile
+	src/libs/zbxsms/Makefile
+	src/libs/zbxjabber/Makefile
+	src/libs/zbxcommon/Makefile
+	src/libs/zbxsysinfo/common/Makefile
+	src/libs/zbxsysinfo/simple/Makefile
+	src/libs/zbxsysinfo/linux/Makefile
+	src/libs/zbxsysinfo/aix/Makefile
+	src/libs/zbxsysinfo/freebsd/Makefile
+	src/libs/zbxsysinfo/hpux/Makefile
+	src/libs/zbxsysinfo/openbsd/Makefile
+	src/libs/zbxsysinfo/osx/Makefile
+	src/libs/zbxsysinfo/solaris/Makefile
+	src/libs/zbxsysinfo/osf/Makefile
+	src/libs/zbxsysinfo/netbsd/Makefile
+	src/libs/zbxsysinfo/unknown/Makefile
+	src/libs/zbxnix/Makefile
+	src/libs/zbxplugin/Makefile
+	src/libs/zbxsys/Makefile
+	src/libs/zbxcomms/Makefile
 	src/libs/zbxdb/Makefile
-	misc/Makefile create/Makefile create/schema/Makefile])
+	src/zabbix_agent/Makefile
+	src/zabbix_get/Makefile
+	src/zabbix_sender/Makefile
+	src/zabbix_server/pinger/Makefile
+	src/zabbix_server/housekeeper/Makefile
+	src/zabbix_server/alerter/Makefile
+	src/zabbix_server/Makefile
+	src/zabbix_server/trapper/Makefile
+	src/zabbix_server/poller/Makefile
+	src/zabbix_server/timer/Makefile
+	src/zabbix_server/nodewatcher/Makefile
+	src/zabbix_server/utils/Makefile
+	src/zabbix_server/httppoller/Makefile
+	src/zabbix_server/watchdog/Makefile
+	])
 
 echo "
 
@@ -741,8 +787,7 @@ Configuration:
 
   Compiler:         ${CC}
   Compiler flags:   ${CFLAGS}
-  Linker flags:     ${LDFLAGS}
-  Libraries:        ${LIBS}
+  Linker flags:     ${LDFLAGS} ${LIBS}
 
   Enable server:    ${server}
   With database:    ${have_db}

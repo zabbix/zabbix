@@ -3,5 +3,3 @@
 noinst_LIBRARIES = libzbxhousekeeper.a
 
 libzbxhousekeeper_a_SOURCES = housekeeper.c housekeeper.h
-
-libzbxhousekeeper_a_CPPFLAGS = $(DB_CPPFLAGS)

@@ -807,12 +807,12 @@ int	DBadd_trend(zbx_uint64_t itemid, double value, int clock)
 		if(value>value_max)	value_max=value;
 		value_avg=(num*value_avg+value)/(num+1);
 		num++;
-		DBexecute("update trends set num=%d, value_min=%f, value_avg=%f, value_max=%f where itemid=" ZBX_FS_UI64 " and clock=%d",
+		DBexecute("update trends set num=%d, value_min=" ZBX_FS_DBL ", value_avg=" ZBX_FS_DBL ", value_max=" ZBX_FS_DBL " where itemid=" ZBX_FS_UI64 " and clock=%d",
 			num, value_min, value_avg, value_max, itemid, hour);
 	}
 	else
 	{
-		DBexecute("insert into trends (clock,itemid,num,value_min,value_avg,value_max) values (%d," ZBX_FS_UI64 ",%d,%f,%f,%f)",
+		DBexecute("insert into trends (clock,itemid,num,value_min,value_avg,value_max) values (%d," ZBX_FS_UI64 ",%d," ZBX_FS_DBL "," ZBX_FS_DBL "," ZBX_FS_DBL ")",
 			hour, itemid, 1, value, value, value);
 	}
 
@@ -825,14 +825,14 @@ int	DBadd_history(zbx_uint64_t itemid, double value, int clock)
 {
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_history()");
 
-	DBexecute("insert into history (clock,itemid,value) values (%d," ZBX_FS_UI64 ",%f)",
+	DBexecute("insert into history (clock,itemid,value) values (%d," ZBX_FS_UI64 "," ZBX_FS_DBL ")",
 		clock,itemid,value);
 
 	DBadd_trend(itemid, value, clock);
 
 	if(CONFIG_MASTER_NODEID>0)
 	{
-		DBexecute("insert into history_sync (nodeid,clock,itemid,value) values (%d,%d," ZBX_FS_UI64 ",%f)",
+		DBexecute("insert into history_sync (nodeid,clock,itemid,value) values (%d,%d," ZBX_FS_UI64 "," ZBX_FS_DBL ")",
 			get_nodeid_by_id(itemid),clock,itemid,value);
 	}
 
@@ -1223,9 +1223,8 @@ int	DBadd_alert(zbx_uint64_t actionid, zbx_uint64_t userid, zbx_uint64_t trigger
 	DBescape_string(message,message_esc,size);
 	
 	DBexecute("insert into alerts (alertid, actionid,triggerid,userid,clock,mediatypeid,sendto,subject,message,status,retries)"
-		" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",'%s','%s','%s',0,0,%d,%d)",
-		DBget_maxid("alerts","alertid"),
-		actionid,triggerid,userid,now,mediatypeid,sendto_esc,subject_esc,message_esc);
+		" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",'%s','%s','%s',0,0)",
+		DBget_maxid("alerts","alertid"), actionid,triggerid,userid,now,mediatypeid,sendto_esc,subject_esc,message_esc);
 
 	zbx_free(sendto_esc);
 	zbx_free(subject_esc);

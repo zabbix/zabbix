@@ -27,8 +27,8 @@ typedef struct s_single_interface_data
 {
 	char    *name;
 	int	clock[60*15];
-	float	sent[60*15];
-	float	received[60*15];
+	double	sent[60*15];
+	double	received[60*15];
 } ZBX_SINGLE_INTERFACE_DATA;
 
 typedef struct s_interfaces_data
@@ -46,8 +46,8 @@ INTERFACE
 {
 	char    *interface;
 	int	clock[60*15];
-	float	sent[60*15];
-	float	received[60*15];
+	double	sent[60*15];
+	double	received[60*15];
 };
 
 void	collect_stats_interfaces(FILE *outfile);

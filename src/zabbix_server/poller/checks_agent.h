@@ -20,24 +20,10 @@
 #ifndef ZABBIX_CHECKS_AGENT_H
 #define ZABBIX_CHECKS_AGENT_H
 
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <errno.h>
-
-#include "config.h"
-
-#ifdef HAVE_NETDB_H
-	#include <netdb.h>
-#endif
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-
 #include "common.h"
 #include "db.h"
 #include "log.h"
+#include "sysinfo.h"
 
 extern  int     CONFIG_NOTIMEWAIT;
 
