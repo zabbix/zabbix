@@ -227,32 +227,6 @@ void	init_config(void)
 
 }
 
-/*
-void	trend(void)
-{
-	char		sql[MAX_STRING_LEN];
- 
-	DB_RESULT	result;
-	DB_RESULT	result2;
-
-	int		i,j;
-
-	result2 = DBselect("select itemid from items");
-	for(i=0;i<DBnum_rows(result2);i++)
-	{
-		result = DBselect("select clock-clock%%3600, count(*),min(value),avg(value),max(value) from history where itemid=%d group by 1",atoi(DBget_field(result2,i,0)));
-	
-		for(j=0;j<DBnum_rows(result);j++)
-		{
-			zbx_snprintf(sql,sizeof(sql),"insert into trends (itemid, clock, num, value_min, value_avg, value_max) values (%d,%d,%d,%f,%f,%f)",atoi(DBget_field(result2,i,0)), atoi(DBget_field(result,j,0)),atoi(DBget_field(result,j,1)),atof(DBget_field(result,j,2)),atof(DBget_field(result,j,3)),atof(DBget_field(result,j,4)));
-			DBexecute(sql);
-		}
-		DBfree_result(result);
-	}
-	DBfree_result(result2);
-}
-*/
-
 int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
 {
 	int	sockfd;

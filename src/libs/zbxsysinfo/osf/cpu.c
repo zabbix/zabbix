@@ -22,11 +22,6 @@
 #include "common.h"
 #include "sysinfo.h"
 
-int     OLD_CPU(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat(cmd, flags, result);
-}
-
 static int	SYSTEM_CPU_IDLE1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	return EXECUTE_INT(cmd, "iostat 1 2 | tail -n 1 | awk '{printf(\"%s\",$(NF))}'", flags, result);

@@ -148,11 +148,8 @@ static int	get_value(char *server,int port,char *key,char *value)
 
 	servaddr_in.sin_family=AF_INET;
 
-	if(NULL == (hp = zbx_gethost(server)));
-	{
-		zbx_error("Error on gethost(). [%s]", strerror(errno));
+	if(NULL == (hp = zbx_gethost(server)))
 		return	FAIL;
-	}
 
 	servaddr_in.sin_addr.s_addr=((struct in_addr *)(hp->h_addr))->s_addr;
 

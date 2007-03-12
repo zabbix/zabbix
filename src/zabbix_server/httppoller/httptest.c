@@ -123,7 +123,7 @@ static void	process_test_data(DB_HTTPTEST *httptest, S_ZBX_HTTPSTAT *stat)
 
 	AGENT_RESULT    value;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In process_test_data(test:%s,time:%f,last step:%d)",
+	zabbix_log(LOG_LEVEL_DEBUG, "In process_test_data(test:%s,time:" ZBX_FS_DBL ",last step:%d)",
 		 httptest->name, stat->test_total_time, stat->test_last_step);
 
 	result = DBselect("select httptestitemid,httptestid,itemid,type from httptestitem where httptestid=" ZBX_FS_UI64,
@@ -169,7 +169,7 @@ static void	process_step_data(DB_HTTPTEST *httptest, DB_HTTPSTEP *httpstep, S_ZB
 
 	AGENT_RESULT    value;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In process_step_data(step:%s,url:%s,rsp:%d,time:%f,speed:%f)",
+	zabbix_log(LOG_LEVEL_DEBUG, "In process_step_data(step:%s,url:%s,rsp:%d,time:" ZBX_FS_DBL ",speed:" ZBX_FS_DBL ")",
 		 httpstep->name, httpstep->url, stat->rspcode, stat->total_time, stat->speed_download);
 
 	result = DBselect("select httpstepitemid,httpstepid,itemid,type from httpstepitem where httpstepid=" ZBX_FS_UI64,
@@ -414,7 +414,7 @@ zabbix_log(LOG_LEVEL_DEBUG, "[%s]", page.data);
 
 	(void)curl_easy_cleanup(easyhandle);
 
-	DBexecute("update httptest set curstep=0,curstate=%d,nextcheck=%d+delay,lastfailedstep=%d,time=%f where httptestid=" ZBX_FS_UI64,
+	DBexecute("update httptest set curstep=0,curstate=%d,nextcheck=%d+delay,lastfailedstep=%d,time=" ZBX_FS_DBL " where httptestid=" ZBX_FS_UI64,
 		HTTPTEST_STATE_IDLE,
 		now,
 		lastfailedstep,
@@ -426,7 +426,7 @@ zabbix_log(LOG_LEVEL_DEBUG, "[%s]", page.data);
 
 	process_test_data(httptest, &stat);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End process_httptest(total time:%f)",
+	zabbix_log(LOG_LEVEL_DEBUG, "End process_httptest(total time:" ZBX_FS_DBL ")",
 		httptest->time);
 
 	return ret;

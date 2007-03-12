@@ -63,32 +63,26 @@
 
 	typedef struct s_cpus_stat_data
 	{
+		/* private */
 		int	clock[MAX_CPU_HISTORY];
-		float	h_user[MAX_CPU_HISTORY];
-		float	h_system[MAX_CPU_HISTORY];
-		float	h_nice[MAX_CPU_HISTORY];
-		float	h_idle[MAX_CPU_HISTORY];
+		zbx_uint64_t	h_user[MAX_CPU_HISTORY];
+		zbx_uint64_t	h_system[MAX_CPU_HISTORY];
+		zbx_uint64_t	h_nice[MAX_CPU_HISTORY];
+		zbx_uint64_t	h_idle[MAX_CPU_HISTORY];
 
-		float	idle;
-		float	idle1;
-		float	idle5;
-		float	idle15;
-		float	user;
-		float	user1;
-		float	user5;
-		float	user15;
-		float	system;
-		float	system1;
-		float	system5;
-		float	system15;
-		float	nice;
-		float	nice1;
-		float	nice5;
-		float	nice15;
-		float	all;
-		float	all1;
-		float	all5;
-		float	all15;
+		/* public */
+		double	idle1;
+		double	idle5;
+		double	idle15;
+		double	user1;
+		double	user5;
+		double	user15;
+		double	system1;
+		double	system5;
+		double	system15;
+		double	nice1;
+		double	nice5;
+		double	nice15;
 
 	} ZBX_CPUS_STAT_DATA;
 

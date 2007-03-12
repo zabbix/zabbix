@@ -3,5 +3,3 @@
 noinst_LIBRARIES = libzbxalerter.a
 
 libzbxalerter_a_SOURCES = alerter.c alerter.h
-
-libzbxalerter_a_CPPFLAGS = $(DB_CPPFLAGS)

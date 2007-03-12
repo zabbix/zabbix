@@ -8,5 +8,3 @@ libzbxnodewatcher_a_SOURCES = \
 	nodecomms.c nodecomms.h \
 	events.c events.h \
 	history.c history.h
-
-libzbxnodewatcher_a_CPPFLAGS = $(DB_CPPFLAGS)

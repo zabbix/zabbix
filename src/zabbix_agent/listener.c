@@ -36,13 +36,13 @@
 
 static void	process_listener(ZBX_SOCKET sock)
 {
+	register char *p;
+
 	AGENT_RESULT	result;
 
 	char	command[MAX_STRING_LEN];
-	char	value[MAX_STRING_LEN];
+	char	**value = NULL;
 	int	ret = 0;
-
-	init_result(&result);
 
 	memset(&command, 0, MAX_STRING_LEN);
 
@@ -59,24 +59,24 @@ static void	process_listener(ZBX_SOCKET sock)
 		return;
 	}
 
-	/*command[ret-2] = '\0'; *//* remove '\r\n' sumbols from recived command (_WINDOWS) !!!TODO!!! correct win32 agent !!!TODO!!! */
-	command[ret-1] = '\0'; /* remove '\n' sumbols from recived command (LINUX) !!!TODO!!! */
+	for(p = &command[ret - 1]; p >= &command[0] && ('\0' == *p || '\r' == *p || '\n' == *p); p--) *p = '\0'; /* rtrim(\r\n) */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Requested [%s]", command);
 
+	init_result(&result);
+
 	process(command, 0, &result);
 
-        if(result.type & AR_DOUBLE)		zbx_snprintf(value, sizeof(value), "%f", result.dbl);
-        else if(result.type & AR_UINT64)	zbx_snprintf(value, sizeof(value), ZBX_FS_UI64, result.ui64);
-        else if(result.type & AR_STRING)	zbx_snprintf(value, sizeof(value), "%s", result.str);
-        else if(result.type & AR_TEXT)		zbx_snprintf(value, sizeof(value), "%s", result.text);
-        else if(result.type & AR_MESSAGE)	zbx_snprintf(value, sizeof(value), "%s", result.msg);
+	if( NULL == (value = GET_TEXT_RESULT(&result)) )
+		value = GET_MSG_RESULT(&result);
+
+	if(value)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Sending back [%s]", *value);
+		ret = zbx_sock_write(sock, *value, (int)strlen(*value));
+	}
 
         free_result(&result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "Sending back [%s]", value);
-
-	ret = zbx_sock_write(sock, value, (int)strlen(value));
 
 	if(ret == SOCKET_ERROR)
 	{

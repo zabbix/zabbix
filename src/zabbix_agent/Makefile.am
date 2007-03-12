@@ -1,8 +1,10 @@
 ## Process this file with automake to produce Makefile.in
 
 agents_ldadd = \
-	$(top_srcdir)/src/libs/zbxsysinfo/libzbxsysinfo.a \
-	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libzbxsysinfo2.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspecsysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/src/libs/zbxsys/libzbxsys.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
@@ -17,13 +19,13 @@ bin_PROGRAMS = \
 
 zabbix_agent_SOURCES = \
 	zabbix_agent.c zabbix_agent.h \
+	stats.c stats.h \
+	cpustat.c cpustat.h \
+	diskdevices.c diskdevices.h \
+	interfaces.c interfaces.h \
 	zbxconf.c zbxconf.h
 
 zabbix_agent_LDADD = $(agents_ldadd)
-
-zabbix_agent_CPPFLAGS = $(LDAP_CPPFLAGS)
-
-zabbix_agent_LDFLAGS = $(LDAP_LDFLAGS)
 
 zabbix_agentd_SOURCES = \
 	active.c active.h \
@@ -39,6 +41,4 @@ zabbix_agentd_SOURCES = \
 
 zabbix_agentd_LDADD = $(agents_ldadd)
 
-zabbix_agentd_CPPFLAGS = -DZABBIX_DAEMON $(LDAP_CPPFLAGS)
-
-zabbix_agentd_LDFLAGS = $(LDAP_LDFLAGS)
+zabbix_agentd_CPPFLAGS = -DZABBIX_DAEMON

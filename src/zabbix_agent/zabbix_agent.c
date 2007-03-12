@@ -200,7 +200,7 @@ int	main(int argc, char **argv)
 	
 	process(s, 0, &result);
 	if(result.type & AR_DOUBLE)
-		zbx_snprintf(value, sizeof(value), "%f", result.dbl);
+		zbx_snprintf(value, sizeof(value), ZBX_FS_DBL, result.dbl);
 	else if(result.type & AR_UINT64)
 		zbx_snprintf(value, sizeof(value), ZBX_FS_UI64, result.ui64);
 	else if(result.type & AR_STRING)

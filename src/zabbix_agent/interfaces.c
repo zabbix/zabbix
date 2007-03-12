@@ -152,7 +152,7 @@ void	report_stats_interfaces(FILE *file, int now)
 		time1=0,
 		time5=0,
 		time15=0;
-	float
+	double
 		sent=0,
 		sent1=0,
 		sent5=0,
@@ -227,7 +227,7 @@ void	report_stats_interfaces(FILE *file, int now)
 		}
 		if((sent!=0)&&(sent1!=0))
 		{
-			fprintf(file,"netloadout1[%s] %f\n", interfaces[i].interface, (float)((sent-sent1)/(now-time1)));
+			fprintf(file,"netloadout1[%s] " ZBX_FS_DBL "\n", interfaces[i].interface, (double)((sent-sent1)/(now-time1)));
 		}
 		else
 		{
@@ -235,7 +235,7 @@ void	report_stats_interfaces(FILE *file, int now)
 		}
 		if((sent!=0)&&(sent5!=0))
 		{
-			fprintf(file,"netloadout5[%s] %f\n", interfaces[i].interface, (float)((sent-sent5)/(now-time5)));
+			fprintf(file,"netloadout5[%s] " ZBX_FS_DBL "\n", interfaces[i].interface, (double)((sent-sent5)/(now-time5)));
 		}
 		else
 		{
@@ -243,7 +243,7 @@ void	report_stats_interfaces(FILE *file, int now)
 		}
 		if((sent!=0)&&(sent15!=0))
 		{
-			fprintf(file,"netloadout15[%s] %f\n", interfaces[i].interface, (float)((sent-sent15)/(now-time15)));
+			fprintf(file,"netloadout15[%s] " ZBX_FS_DBL "\n", interfaces[i].interface, (double)((sent-sent15)/(now-time15)));
 		}
 		else
 		{
@@ -251,7 +251,7 @@ void	report_stats_interfaces(FILE *file, int now)
 		}
 		if((received!=0)&&(received1!=0))
 		{
-			fprintf(file,"netloadin1[%s] %f\n", interfaces[i].interface, (float)((received-received1)/(now-time1)));
+			fprintf(file,"netloadin1[%s] " ZBX_FS_DBL "\n", interfaces[i].interface, (double)((received-received1)/(now-time1)));
 		}
 		else
 		{
@@ -259,7 +259,7 @@ void	report_stats_interfaces(FILE *file, int now)
 		}
 		if((received!=0)&&(received5!=0))
 		{
-			fprintf(file,"netloadin5[%s] %f\n", interfaces[i].interface, (float)((received-received5)/(now-time5)));
+			fprintf(file,"netloadin5[%s] " ZBX_FS_DBL "\n", interfaces[i].interface, (double)((received-received5)/(now-time5)));
 		}
 		else
 		{
@@ -267,7 +267,7 @@ void	report_stats_interfaces(FILE *file, int now)
 		}
 		if((received!=0)&&(received15!=0))
 		{
-			fprintf(file,"netloadin15[%s] %f\n", interfaces[i].interface, (float)((received-received15)/(now-time15)));
+			fprintf(file,"netloadin15[%s] " ZBX_FS_DBL "\n", interfaces[i].interface, (double)((received-received15)/(now-time15)));
 		}
 		else
 		{
@@ -278,13 +278,13 @@ void	report_stats_interfaces(FILE *file, int now)
 }
 
 
-void	add_values_interfaces(int now,char *interface,float value_sent,float value_received)
+void	add_values_interfaces(int now,char *interface,double value_sent,double value_received)
 {
 	int i,j;
 
 	int bounced;
 
-/*	printf("Add_values [%s] [%f] [%f]\n",interface,value_sent,value_received);*/
+/*	printf("Add_values [%s] [" ZBX_FS_DBL "] [" ZBX_FS_DBL "]\n",interface,value_sent,value_received);*/
 
 	for(i=0;i<MAX_INTERFACE;i++)
 	{
@@ -341,7 +341,7 @@ void	collect_stats_interfaces(FILE *outfile)
 	int	i1,j1;
 	char	interface[MAX_STRING_LEN];
 	int	now;
-	float	received=0,sent;
+	double	received=0,sent;
 
 	/* Must be static */
 	static	int initialised=0;

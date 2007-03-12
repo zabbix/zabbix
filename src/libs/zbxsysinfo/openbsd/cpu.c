@@ -22,11 +22,6 @@
 #include "common.h"
 #include "sysinfo.h"
 
-int     OLD_CPU(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
-{
-	return	get_stat(cmd, flags, result);
-}
-
 static int get_cpu_data(unsigned long long *idle,
                         unsigned long long *user,
                         unsigned long long *nice,

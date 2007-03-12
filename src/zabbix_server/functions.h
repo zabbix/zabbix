@@ -23,6 +23,7 @@
 #include "common.h"
 #include "comms.h"
 #include "db.h"
+#include "sysinfo.h"
 
 void	update_services(zbx_uint64_t triggerid, int status);
 void    update_triggers (zbx_uint64_t itemid);

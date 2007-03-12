@@ -24,6 +24,8 @@
 #include "zbxsock.h"
 #include "cfg.h"
 
+#include "http.h"
+
 static int	get_http_page(char *hostname, char *param, unsigned short port, char *buffer, int max_buf_len)
 {
 	char	request[MAX_STRING_LEN];

@@ -20,6 +20,9 @@
 #ifndef ZABBIX_TYPES_H
 #define ZABBIX_TYPES_H
 
+#define	ZBX_FS_DBL	"%lf"
+#define	ZBX_FS_DBL_EXT(p)	"%." #p "lf"
+
 #if defined(_WINDOWS)
 
 #ifndef __UINT64_C

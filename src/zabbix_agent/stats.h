@@ -34,7 +34,6 @@ typedef struct s_collector_data
  
 extern ZBX_COLLECTOR_DATA *collector;
 
-
 ZBX_THREAD_ENTRY(collector_thread, pSemColectorStarted);
 
 void	init_collector_data(void);

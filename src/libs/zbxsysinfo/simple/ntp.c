@@ -167,11 +167,11 @@ endian problems.  Note that it ignores fields irrelevant to SNTP. */
 /*
 static void display_data (ntp_data *data) {
 
-    printf("sta = %d ver = %d mod = %d str = %d pol = %d dis = %.6f ref = %.6f\n",
+    printf("sta = %d ver = %d mod = %d str = %d pol = %d dis = " ZBX_FS_DBL_EXT(6) " ref = " ZBX_FS_DBL_EXT(6) "\n",
         data->status,data->version,data->mode,data->stratum,data->polling,
         data->dispersion,data->reference);
-    printf("ori = %.6f rec = %.6f\n",data->originate, data->receive);
-    printf("tra = %.6f cur = %.6f\n",data->transmit, data->current);
+    printf("ori = " ZBX_FS_DBL_EXT(6) " rec = " ZBX_FS_DBL_EXT(6) "\n",data->originate, data->receive);
+    printf("tra = " ZBX_FS_DBL_EXT(6) " cur = " ZBX_FS_DBL_EXT(6) "\n",data->transmit, data->current);
 }
 */
 
