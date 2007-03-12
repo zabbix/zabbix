@@ -357,16 +357,30 @@ static int evaluate_AVG(char *value,DB_ITEM	*item,int parameter,int flag)
 	int		rows;
 	double		sum=0;
 
-	if(item->value_type != ITEM_VALUE_TYPE_FLOAT)
+	char		table[MAX_STRING_LEN];
+
+	if( (item->value_type != ITEM_VALUE_TYPE_FLOAT) && (item->value_type != ITEM_VALUE_TYPE_UINT64))
 	{
 		return	FAIL;
 	}
 
 	now=time(NULL);
 
+	if(item->value_type == ITEM_VALUE_TYPE_UINT64)
+	{
+		strscpy(table,"history_uint");
+	}
+	else
+	{
+		strscpy(table,"history");
+	}
+
 	if(flag == ZBX_FLAG_SEC)
 	{
-		snprintf(sql,sizeof(sql)-1,"select avg(value) from history where clock>%d and itemid=%d",now-parameter,item->itemid);
+		snprintf(sql,sizeof(sql)-1,"select avg(value) from %s where clock>%d and itemid=%d",
+			table,
+			now-parameter,
+			item->itemid);
 
 		result = DBselect(sql);
 		row = DBfetch(result);
@@ -384,7 +398,9 @@ static int evaluate_AVG(char *value,DB_ITEM	*item,int parameter,int flag)
 	}
 	else if(flag == ZBX_FLAG_VALUES)
 	{
-		snprintf(sql,sizeof(sql)-1,"select value from history where itemid=%d order by clock desc",item->itemid);
+		snprintf(sql,sizeof(sql)-1,"select value from %s where itemid=%d order by clock desc",
+			table,
+			item->itemid);
 		result = DBselectN(sql, parameter);
 		rows=0;
 		while((row=DBfetch(result)))
