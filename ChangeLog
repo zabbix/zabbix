@@ -6,7 +6,7 @@ Changes for 1.3.4:
  - fixed warning when enabling/disabling action (Alexei)
  - added support of avg() for items having integer type (Alexei)
  - added user group for database down messages (Alexei/Eugene)
- - removed support of action repeats (Alexei)
+ - removed support of action repeats (Alexei/Eugene)
  - fixed upgrade of rights,sysmaps,sysmaps_elements (Alexei)
  - fixed initial creation of user rights in data.sql (Alexei)
  - fixes of PostgreSQL compile (Alexei)

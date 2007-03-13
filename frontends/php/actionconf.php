@@ -47,12 +47,8 @@ include_once "include/page_header.php";
 		"subject"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,	'{actiontype}==0&&isset({save})'),
 		"message"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,	'{actiontype}==0&&isset({save})'),
 		"scripts"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,	'{actiontype}==1&&isset({save})'),
-		"repeat"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0,1"), 	'isset({save})'),
 		"status"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0,1"), 	'isset({save})'),
 		"evaltype"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN(ACTION_EVAL_TYPE_AND_OR.','.ACTION_EVAL_TYPE_AND.','.ACTION_EVAL_TYPE_OR), 	'isset({save})'),
-
-		"maxrepeats"=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),'{repeat}==1&&isset({save})'),
-		"repeatdelay"=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),'{repeat}==1&&isset({save})'),
 
 		"conditions"=>	array(NULL, O_OPT, NULL, NULL, NULL),
 //		"conditions[i][type]"=>		array(T_ZBX_INT, O_OPT,  NULL,	NULL,	NULL),
@@ -103,12 +99,6 @@ include_once "include/page_header.php";
 	}
 	elseif(isset($_REQUEST["save"]))
 	{
-		if($_REQUEST["repeat"]==0)
-		{
-			$_REQUEST["maxrepeats"]=0;
-			$_REQUEST["repeatdelay"]=600;
-		}
-
 		if(isset($_REQUEST["actionid"]))
 		{
 			// TODO check permission by new value.
@@ -116,8 +106,7 @@ include_once "include/page_header.php";
 			$result = update_action($actionid,
 				$_REQUEST['actiontype'],$_REQUEST['userid'],
 				$_REQUEST["subject"], $_REQUEST["message"],$_REQUEST["recipient"],
-				$_REQUEST["maxrepeats"],$_REQUEST["repeatdelay"],$_REQUEST["status"],
-				$_REQUEST["scripts"],$_REQUEST["evaltype"]);
+				$_REQUEST["status"],$_REQUEST["scripts"],$_REQUEST["evaltype"]);
 
 			show_messages($result,S_ACTION_UPDATED,S_CANNOT_UPDATE_ACTION);
 		} else {
@@ -127,8 +116,7 @@ include_once "include/page_header.php";
 			$actionid=add_action(
 				$_REQUEST['actiontype'],$_REQUEST['userid'], 
 				$_REQUEST["subject"],$_REQUEST["message"],$_REQUEST["recipient"],
-				$_REQUEST["maxrepeats"],$_REQUEST["repeatdelay"],$_REQUEST["status"],
-				$_REQUEST["scripts"],$_REQUEST["evaltype"]);
+				$_REQUEST["status"],$_REQUEST["scripts"],$_REQUEST["evaltype"]);
 			$result=$actionid;
 
 			show_messages($result,S_ACTION_ADDED,S_CANNOT_ADD_ACTION);
@@ -281,7 +269,6 @@ include_once "include/page_header.php";
 			S_CONDITIONS,
 			$_REQUEST["actiontype"] == ACTION_TYPE_MESSAGE ? S_SEND_MESSAGE_TO : S_REMOTE_COMMAND,
 			$_REQUEST["actiontype"] == ACTION_TYPE_MESSAGE ? S_SUBJECT : NULL,
-			S_REPEATS,
 			S_STATUS));
 
 		$result=DBselect("select * from actions where actiontype=".$_REQUEST["actiontype"].
@@ -350,7 +337,6 @@ include_once "include/page_header.php";
 				$conditions,
 				$recipient,
 				$subject,
-				$row["maxrepeats"] == 0 ? S_NO_REPEATS : $row["maxrepeats"],
 				$status
 				));	
 		}

@@ -78,11 +78,6 @@
 	"S_AVERAGE"=>				"Average",
 	"S_HIGH"=>				"High",
 	"S_DISASTER"=>				"Disaster",
-	"S_REPEAT"=>				"繰り返し",
-	"S_REPEATS"=>				"繰り返し",
-	"S_NO_REPEATS"=>			"繰り返し",
-	"S_NUMBER_OF_REPEATS"=>			"繰り返し回数",
-	"S_DELAY_BETWEEN_REPEATS"=>		"繰り返し間隔",
 
 //	alarms.php
 	"S_ALARMS"=>				"アラーム",
