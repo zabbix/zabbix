@@ -374,7 +374,6 @@ static char* get_programm_name(char *path)
 
 	return filename;
 }
-
 #ifndef ZABBIX_TEST
 
 int	main(int argc, char **argv)
@@ -443,7 +442,9 @@ int main()
 #if ON
 	AGENT_RESULT    result;
 	
-	SET_UI64_RESULT(&result, 123456789123456789123456789ull);
+	init_result(&result);
+
+	SET_UI64_RESULT(&result, 123456789123456789);
 	printf("UI: '" ZBX_FS_UI64 "'\n", result.ui64);
 
 	printf("UI_TO_DBL: '" ZBX_FS_DBL "'\n", *GET_DBL_RESULT(&result));

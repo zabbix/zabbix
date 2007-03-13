@@ -199,7 +199,7 @@ int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char
 /*	Old algorithm */
 /*	i=delay*(int)(now/delay);*/
 	
-	i=delay*(int)(now/delay)+(itemid % delay);
+	i=delay*(int)(now/(time_t)delay)+(int)(itemid % (zbx_uint64_t)delay);
 
 	while(i<=now)	i+=delay;
 

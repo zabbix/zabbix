@@ -742,6 +742,7 @@ char* zbx_dvsprintf(char *dest, const char *f, va_list args)
 	va_list curr;
 
 	while(1) {
+
 		string = zbx_malloc(size);
 
 		va_copy(curr, args);
@@ -809,9 +810,9 @@ char* zbx_strdcat(char *dest, const char *src)
 
 	if(!src || !src[0])	return dest;
 	
-	if(dest)	new_len += strlen(dest);
+	if(dest)	new_len += (int)strlen(dest);
 
-	new_len += strlen(src);
+	new_len += (int)strlen(src);
 	
 	new_dest = zbx_malloc(new_len + 1);
 	
