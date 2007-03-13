@@ -17,12 +17,7 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#include "config.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-
-#include <string.h>
+#include "common.h"
 
 #include "cfg.h"
 #include "pid.h"
@@ -30,10 +25,6 @@
 #include "log.h"
 #include "zlog.h"
 
-#include <sys/types.h>
-#include <regex.h>
-
-#include "common.h"
 #include "autoregister.h"
 
 static void	register_new_host(char *server, int host_templateid);

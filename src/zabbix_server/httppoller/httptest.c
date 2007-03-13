@@ -17,7 +17,7 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#include "config.h"
+#include "common.h"
 
 #include "cfg.h"
 #include "pid.h"
@@ -25,7 +25,6 @@
 #include "log.h"
 #include "zlog.h"
 
-#include "common.h"
 #include "../functions.h"
 #include "httpmacro.h"
 #include "httptest.h"

@@ -21,7 +21,6 @@
 #ifndef ZABBIX_ZBXDB_H
 #define ZABBIX_ZBXDB_H
 
-#include "config.h"
 #include "common.h"
 
 #define	ZBX_DB_OK	(0)

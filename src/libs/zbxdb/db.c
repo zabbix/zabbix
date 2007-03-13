@@ -17,21 +17,12 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
+#include "common.h"
 
-#include <stdlib.h>
-#include <stdio.h>
-
-/* for setproctitle() */
-#include <sys/types.h>
-#include <unistd.h>
-
-#include <string.h>
-#include <strings.h>
-
+#include "db.h"
 #include "zbxdb.h"
 #include "log.h"
 #include "zlog.h"
-#include "common.h"
 
 #ifdef	HAVE_SQLITE3
 	int		sqlite_transaction_started = 0;
@@ -163,16 +154,16 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		exit(FAIL);
 	}
 	sqlo_autocommit_on(oracle);
+
+	return ret
 #endif
 #ifdef	HAVE_SQLITE3
-	int res;
-
-	res = sqlite3_open(name, &conn);
+	ret = sqlite3_open(dbname, &conn);
 
 /* check to see that the backend connection was successfully made */
-	if(res)
+	if(ret)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Can't open database [%s]: %s\n", name, sqlite3_errmsg(conn));
+		zabbix_log(LOG_LEVEL_ERR, "Can't open database [%s]: %s\n", dbname, sqlite3_errmsg(conn));
 		DBclose();
 		exit(FAIL);
 	}
@@ -180,13 +171,15 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	/* Do not return SQLITE_BUSY immediately, wait for N ms */
 	sqlite3_busy_timeout(conn, 60*1000);
 
-	if(ZBX_MUTEX_ERROR == php_sem_get(&sqlite_access, name))
+	if(ZBX_MUTEX_ERROR == php_sem_get(&sqlite_access, dbname))
 	{
 		zbx_error("Unable to create mutex for sqlite");
 		exit(FAIL);
 	}
 
 	sqlite_transaction_started = 0;
+
+	return ret;
 #endif
 }
 
@@ -550,16 +543,14 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 	}
 	else if(SQLO_NO_DATA == res)
 	{
-		return 0;
+		return NULL;
 	}
-	else
-	{
-		zabbix_log( LOG_LEVEL_ERR, "Fetch failed:%s\n", sqlo_geterror(oracle) );
-		exit(FAIL);
-	}
+
+	zabbix_log( LOG_LEVEL_ERR, "Fetch failed:%s\n", sqlo_geterror(oracle) );
+	exit(FAIL);
+	return NULL;
 #endif
 #ifdef HAVE_SQLITE3
-	int	i;
 	
 	/* EOF */
 	if(!result)	return NULL;
