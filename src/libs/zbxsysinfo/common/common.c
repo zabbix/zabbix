@@ -269,20 +269,14 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 #endif /* _WINDOWS */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Before");
+
+        for(i=(int)strlen(cmd_result); i>0 && (cmd_result[i] == '\n' || cmd_result[i] == '\r' || cmd_result[i] == '\0'); cmd_result[i--] = '\0');
+
 	/* We got EOL only */
-	if(cmd_result[0] == '\n' || cmd_result[0] == '\0')
+	if(cmd_result[0] == '\0')
 	{
 		return SYSINFO_RET_FAIL;
 	}
-
-        for(i=strlen(cmd_result); i>0; i--)
-        {
-                if(cmd_result[i] == '\n')
-                {
-                        cmd_result[i] = '\0';
-                        break;
-                }
-        }
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Run remote command [%s] Result [%d] [%s]", command, strlen(cmd_result), cmd_result);
 

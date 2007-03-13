@@ -32,8 +32,13 @@
 
 #include "zbxtypes.h"
 
-#undef snprintf
-
+#ifndef va_copy
+#	if defined(__va_copy)
+#		define va_copy(d, s) __va_copy(d, s)
+#	else
+#		define va_copy(d, s) memcpy (&d,&s, sizeof(va_list))
+#	endif /* __va_copy */
+#endif /* va_copy */
 
 #ifdef snprintf
 #undef snprintf
