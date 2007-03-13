@@ -101,11 +101,6 @@
 	"S_AVERAGE"=>				"Medel",
 	"S_HIGH"=>				"Hög",
 	"S_DISASTER"=>				"Allvarlig",
-	"S_REPEAT"=>				"Upprepa",
-	"S_REPEATS"=>				"Upprepningar",
-	"S_NO_REPEATS"=>			"Inga upprepningar",
-	"S_NUMBER_OF_REPEATS"=>			"Antal upprepningar",
-	"S_DELAY_BETWEEN_REPEATS"=>		"Fördröjning mellan upprepningar",
 	"S_CREATE_ACTION"=>			"Skapa åtgärd",
 
 //	alarms.php

@@ -2538,24 +2538,10 @@
 			$subject	= $action["subject"];
 			$message	= $action["message"];
 			$recipient	= $action["recipient"];
-			$maxrepeats	= $action["maxrepeats"];
-			$repeatdelay	= $action["repeatdelay"];
 			$status 	= $action["status"];
 			$scripts 	= $action["scripts"];
 			$evaltype	= $action["evaltype"];
 
-			if(isset($_REQUEST["repeat"]))
-			{
-				$repeat=$_REQUEST["repeat"];
-			}
-			else if($maxrepeats==0)
-			{
-				$repeat=0;
-			}
-			else
-			{
-				$repeat=1;
-			}
 			$result=DBselect("select conditiontype, operator, value from conditions".
 				" where actionid=".$_REQUEST["actionid"]." order by conditiontype");
 
@@ -2580,9 +2566,6 @@
 			$scope		= get_request("scope",0);
 			$recipient	= get_request("recipient",RECIPIENT_TYPE_GROUP);
 			$severity	= get_request("severity",0);
-			$maxrepeats	= get_request("maxrepeats",0);
-			$repeatdelay	= get_request("repeatdelay",600);
-			$repeat		= get_request("repeat",0);
 			$status		= get_request("status",ACTION_STATUS_ENABLED);
 			$uid 		= get_request("userid",0);
 			$scripts	= get_request("scripts","");
@@ -2840,20 +2823,6 @@
 			$frmAction->AddVar("userid",$uid);
 			$frmAction->AddVar("subject",$subject);
 			$frmAction->AddVar("message",$message);
-		}
-
-		$cmbRepeat = new CComboBox('repeat',$repeat,'submit()');
-		$cmbRepeat->AddItem(0,S_NO_REPEATS);
-		$cmbRepeat->AddItem(1,S_REPEAT);
-		$frmAction->AddRow(S_REPEAT, $cmbRepeat);
-
-		if($repeat>0)
-		{
-			$frmAction->AddRow(S_NUMBER_OF_REPEATS, new CTextBox('maxrepeats',$maxrepeats,5));
-			$frmAction->AddRow(S_DELAY_BETWEEN_REPEATS, new CTextBox('repeatdelay',$repeatdelay,5));
-		} else {
-			$frmAction->AddVar("maxrepeats",$maxrepeats);
-			$frmAction->AddVar("repeatdelay",$repeatdelay);
 		}
 
 		$cmbStatus = new CComboBox('status',$status);
