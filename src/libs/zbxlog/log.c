@@ -256,7 +256,7 @@ void zabbix_log(int level, const char *fmt, ...)
 					}
 				}
 
-				if(old_size > buf.st_size)
+				if(old_size > (size_t)(buf.st_size))
 				{
 					redirect_std(log_filename);
 				}

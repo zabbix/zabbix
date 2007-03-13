@@ -28,6 +28,7 @@
 
 static int	get_http_page(char *hostname, char *param, unsigned short port, char *buffer, int max_buf_len)
 {
+	register int i = 0;
 	char	request[MAX_STRING_LEN];
 	
 	ZBX_SOCKET	s;
@@ -76,6 +77,8 @@ static int	get_http_page(char *hostname, char *param, unsigned short port, char 
 	memset(buffer, 0, max_buf_len);
 
 	for(total=0; (n = zbx_sock_read(s, buffer+total, max_buf_len-1-total, CONFIG_TIMEOUT)) > 0; total+=n);
+
+	for(i=(int)strlen(buffer); i>0 && (buffer[i] == '\n' || buffer[i] == '\r' || buffer[i] == '\0'); buffer[i--] = '\0');
 
 	ret = SYSINFO_RET_OK;
 

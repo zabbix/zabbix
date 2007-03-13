@@ -48,7 +48,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /MT /W3 /GX /O2 /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "HAVE_LDAP" /D "HAVE_ASSERT_H" /D "_CONSOLE" /D "_MBCS" /D "ZABBIX_SERVICE" /FR /YX /FD /c
+# ADD CPP /nologo /MT /W3 /GX /O2 /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "HAVE_LDAP" /D "HAVE_ASSERT_H" /D "_CONSOLE" /D "_MBCS" /D "ZABBIX_SERVICE" /D "WITH_COMMON_METRICS" /D "WITH_SPECIFIC_METRICS" /FR /YX /FD /c
 # ADD BASE RSC /l 0x419 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
 BSC32=bscmake.exe
@@ -72,7 +72,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_CONSOLE" /D "_MBCS" /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "HAVE_LDAP" /D "HAVE_ASSERT_H" /D "_CONSOLE" /D "_MBCS" /D "ZABBIX_SERVICE" /FR /YX /FD /GZ /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "HAVE_LDAP" /D "HAVE_ASSERT_H" /D "_CONSOLE" /D "_MBCS" /D "ZABBIX_SERVICE" /D "WITH_COMMON_METRICS" /D "WITH_SPECIFIC_METRICS" /D "WITH_SIMPLE_METRICS" /FR /YX /FD /GZ /c
 # ADD BASE RSC /l 0x419 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -97,7 +97,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "../include/" /I "../../../include/" /D "_DEBUG" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /FR /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "TODO" /D "WIN32" /D "_WINDOWS" /D "HAVE_LDAP" /D "HAVE_ASSERT_H" /D "_CONSOLE" /D "_MBCS" /D "ZABBIX_SERVICE" /FR /YX /FD /GZ /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "TODO" /D "WIN32" /D "_WINDOWS" /D "HAVE_LDAP" /D "HAVE_ASSERT_H" /D "_CONSOLE" /D "_MBCS" /D "ZABBIX_SERVICE" /D "WITH_COMMON_METRICS" /D "WITH_SPECIFIC_METRICS" /FR /YX /FD /GZ /c
 # ADD BASE RSC /l 0x409 /fo"Debug/zabbixw32.res" /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -122,7 +122,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /FR /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "ZABBIX_TEST" /D "WIN32" /D "_WINDOWS" /D "HAVE_LDAP" /D "HAVE_ASSERT_H" /D "_CONSOLE" /D "_MBCS" /D "ZABBIX_SERVICE" /FR /YX /FD /GZ /c
+# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "ZABBIX_TEST" /D "WIN32" /D "_WINDOWS" /D "HAVE_LDAP" /D "HAVE_ASSERT_H" /D "_CONSOLE" /D "_MBCS" /D "ZABBIX_SERVICE" /D "WITH_COMMON_METRICS" /D "WITH_SPECIFIC_METRICS" /FR /YX /FD /GZ /c
 # ADD BASE RSC /l 0x409 /fo"Debug/zabbixw32.res" /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -147,7 +147,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "HAVE_LDAP" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "ZABBIX_SERVICE" /FR /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Od /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "_WIN64" /D "_WINDOWS" /D "HAVE_LDAP" /D "HAVE_ASSERT_H" /D "_CONSOLE" /D "_MBCS" /D "ZABBIX_SERVICE" /FD /Wp64 /c
+# ADD CPP /nologo /MTd /W3 /Od /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "_WIN64" /D "_WINDOWS" /D "HAVE_LDAP" /D "HAVE_ASSERT_H" /D "_CONSOLE" /D "_MBCS" /D "ZABBIX_SERVICE" /D "WITH_COMMON_METRICS" /D "WITH_SPECIFIC_METRICS" /FD /Wp64 /c
 # SUBTRACT CPP /Fr
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
@@ -174,7 +174,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "NDEBUG" /D "HAVE_LDAP" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "ZABBIX_SERVICE" /FR /YX /FD /c
-# ADD CPP /nologo /MT /W3 /O2 /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "NDEBUG" /D "_WIN64" /D "_WINDOWS" /D "HAVE_LDAP" /D "HAVE_ASSERT_H" /D "_CONSOLE" /D "_MBCS" /D "ZABBIX_SERVICE" /FD /Wp64 /c
+# ADD CPP /nologo /MT /W3 /O2 /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "NDEBUG" /D "_WIN64" /D "_WINDOWS" /D "HAVE_LDAP" /D "HAVE_ASSERT_H" /D "_CONSOLE" /D "_MBCS" /D "ZABBIX_SERVICE" /D "WITH_COMMON_METRICS" /D "WITH_SPECIFIC_METRICS" /FD /Wp64 /c
 # SUBTRACT CPP /Fr
 # ADD BASE RSC /l 0x409 /d "NDEBUG"
 # ADD RSC /l 0x409 /d "NDEBUG"
@@ -201,7 +201,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "ZABBIX_TEST" /D "HAVE_LDAP" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "ZABBIX_SERVICE" /FR /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Od /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "ZABBIX_TEST" /D "_WIN64" /D "_WINDOWS" /D "HAVE_LDAP" /D "HAVE_ASSERT_H" /D "_CONSOLE" /D "_MBCS" /D "ZABBIX_SERVICE" /FR /FD /Wp64 /c
+# ADD CPP /nologo /MTd /W3 /Od /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "ZABBIX_TEST" /D "_WIN64" /D "_WINDOWS" /D "HAVE_LDAP" /D "HAVE_ASSERT_H" /D "_CONSOLE" /D "_MBCS" /D "ZABBIX_SERVICE" /D "WITH_COMMON_METRICS" /D "WITH_SPECIFIC_METRICS" /FR /FD /Wp64 /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -227,7 +227,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "TODO" /D "HAVE_LDAP" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "ZABBIX_SERVICE" /FR /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Od /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "TODO" /D "_WIN64" /D "_WINDOWS" /D "HAVE_LDAP" /D "HAVE_ASSERT_H" /D "_CONSOLE" /D "_MBCS" /D "ZABBIX_SERVICE" /FR /FD /Wp64 /c
+# ADD CPP /nologo /MTd /W3 /Od /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "TODO" /D "_WIN64" /D "_WINDOWS" /D "HAVE_LDAP" /D "HAVE_ASSERT_H" /D "_CONSOLE" /D "_MBCS" /D "ZABBIX_SERVICE" /D "WITH_COMMON_METRICS" /D "WITH_SPECIFIC_METRICS" /FR /FD /Wp64 /c
 # ADD BASE RSC /l 0x409 /d "_DEBUG"
 # ADD RSC /l 0x409 /d "_DEBUG"
 BSC32=bscmake.exe
@@ -5738,10 +5738,6 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\win32\swap.c
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\src\libs\zbxsysinfo\win32\system_w32.c
-# End Source File
-# Begin Source File
-
 SOURCE=..\..\..\src\libs\zbxsysinfo\win32\uptime.c
 # End Source File
 # Begin Source File
@@ -5755,24 +5751,422 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\win32\win32.c
 # Begin Source File
 
 SOURCE=..\..\..\src\libs\zbxsysinfo\common\common.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+# PROP Intermediate_Dir "Release/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Intermediate_Dir "Debug/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+# PROP Intermediate_Dir "TODO/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+# PROP Intermediate_Dir "Test/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
+
+# PROP Intermediate_Dir "Debug_AMD64/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
+
+# PROP Intermediate_Dir "Release_AMD64/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
+
+# PROP Intermediate_Dir "Test_AMD64/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
+
+# PROP Intermediate_Dir "TODO_AMD64/sysinfo/common/"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\common\common.h
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+# PROP Intermediate_Dir "Release/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Intermediate_Dir "Debug/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+# PROP Intermediate_Dir "TODO/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+# PROP Intermediate_Dir "Test/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
+
+# PROP Intermediate_Dir "Debug_AMD64/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
+
+# PROP Intermediate_Dir "Release_AMD64/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
+
+# PROP Intermediate_Dir "Test_AMD64/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
+
+# PROP Intermediate_Dir "TODO_AMD64/sysinfo/common/"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\..\src\libs\zbxsysinfo\common\file.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+# PROP Intermediate_Dir "Release/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Intermediate_Dir "Debug/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+# PROP Intermediate_Dir "TODO/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+# PROP Intermediate_Dir "Test/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
+
+# PROP Intermediate_Dir "Debug_AMD64/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
+
+# PROP Intermediate_Dir "Release_AMD64/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
+
+# PROP Intermediate_Dir "Test_AMD64/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
+
+# PROP Intermediate_Dir "TODO_AMD64/sysinfo/common/"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\common\file.h
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+# PROP Intermediate_Dir "Release/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Intermediate_Dir "Debug/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+# PROP Intermediate_Dir "TODO/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+# PROP Intermediate_Dir "Test/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
+
+# PROP Intermediate_Dir "Debug_AMD64/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
+
+# PROP Intermediate_Dir "Release_AMD64/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
+
+# PROP Intermediate_Dir "Test_AMD64/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
+
+# PROP Intermediate_Dir "TODO_AMD64/sysinfo/common/"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\..\src\libs\zbxsysinfo\common\http.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+# PROP Intermediate_Dir "Release/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Intermediate_Dir "Debug/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+# PROP Intermediate_Dir "TODO/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+# PROP Intermediate_Dir "Test/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
+
+# PROP Intermediate_Dir "Debug_AMD64/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
+
+# PROP Intermediate_Dir "Release_AMD64/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
+
+# PROP Intermediate_Dir "Test_AMD64/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
+
+# PROP Intermediate_Dir "TODO_AMD64/sysinfo/common/"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\..\src\libs\zbxsysinfo\common\ntp.c
+SOURCE=..\..\..\src\libs\zbxsysinfo\common\http.h
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+# PROP Intermediate_Dir "Release/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Intermediate_Dir "Debug/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+# PROP Intermediate_Dir "TODO/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+# PROP Intermediate_Dir "Test/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
+
+# PROP Intermediate_Dir "Debug_AMD64/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
+
+# PROP Intermediate_Dir "Release_AMD64/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
+
+# PROP Intermediate_Dir "Test_AMD64/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
+
+# PROP Intermediate_Dir "TODO_AMD64/sysinfo/common/"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\common\net.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+# PROP Intermediate_Dir "Release/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Intermediate_Dir "Debug/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+# PROP Intermediate_Dir "TODO/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+# PROP Intermediate_Dir "Test/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
+
+# PROP Intermediate_Dir "Debug_AMD64/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
+
+# PROP Intermediate_Dir "Release_AMD64/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
+
+# PROP Intermediate_Dir "Test_AMD64/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
+
+# PROP Intermediate_Dir "TODO_AMD64/sysinfo/common/"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\common\net.h
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+# PROP Intermediate_Dir "Release/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Intermediate_Dir "Debug/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+# PROP Intermediate_Dir "TODO/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+# PROP Intermediate_Dir "Test/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
+
+# PROP Intermediate_Dir "Debug_AMD64/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
+
+# PROP Intermediate_Dir "Release_AMD64/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
+
+# PROP Intermediate_Dir "Test_AMD64/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
+
+# PROP Intermediate_Dir "TODO_AMD64/sysinfo/common/"
+
+!ENDIF 
+
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\..\src\libs\zbxsysinfo\common\system.c
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+# PROP Intermediate_Dir "Release/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Intermediate_Dir "Debug/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+# PROP Intermediate_Dir "TODO/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+# PROP Intermediate_Dir "Test/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
+
+# PROP Intermediate_Dir "Debug_AMD64/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
+
+# PROP Intermediate_Dir "Release_AMD64/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
+
+# PROP Intermediate_Dir "Test_AMD64/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
+
+# PROP Intermediate_Dir "TODO_AMD64/sysinfo/common/"
+
+!ENDIF 
+
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\common\system.h
+
+!IF  "$(CFG)" == "zabbix_agentd - Win32 Release"
+
+# PROP Intermediate_Dir "Release/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
+
+# PROP Intermediate_Dir "Debug/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
+
+# PROP Intermediate_Dir "TODO/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
+
+# PROP Intermediate_Dir "Test/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
+
+# PROP Intermediate_Dir "Debug_AMD64/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
+
+# PROP Intermediate_Dir "Release_AMD64/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
+
+# PROP Intermediate_Dir "Test_AMD64/sysinfo/common/"
+
+!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
+
+# PROP Intermediate_Dir "TODO_AMD64/sysinfo/common/"
+
+!ENDIF 
+
 # End Source File
 # End Group
+# Begin Group "simple"
+
+# PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\simple\ntp.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\simple\ntp.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\simple\simple.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\simple\simple.h
+# End Source File
+# End Group
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\specsysinfo.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\libs\zbxsysinfo\sysinfo.c
+# End Source File
 # End Group
 # Begin Group "zbxwin32"
 
@@ -5994,6 +6388,10 @@ SOURCE=..\..\..\src\zabbix_agent\stats.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\src\zabbix_agent\zabbix_agent.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\src\zabbix_agent\zabbix_agentd.c
 # End Source File
 # Begin Source File
@@ -6116,6 +6514,10 @@ SOURCE=..\..\..\include\zlog.h
 # Begin Group "Resource Files"
 
 # PROP Default_Filter "ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
+# Begin Source File
+
+SOURCE=.\messages.h
+# End Source File
 # Begin Source File
 
 SOURCE=.\messages.mc
