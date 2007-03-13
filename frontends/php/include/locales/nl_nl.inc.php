@@ -96,11 +96,6 @@
 	"S_AVERAGE"=>						"Gemiddelde",
 	"S_HIGH"=>							"Hoog",
 	"S_DISASTER"=>						"Catastrofe",
-	"S_REPEAT"=>						"Herhaal",
-	"S_REPEATS"=>						"Herhalingen",
-	"S_NO_REPEATS"=>					"Geen herhalingen",
-	"S_NUMBER_OF_REPEATS"=>				"Nummer herhalingen",
-	"S_DELAY_BETWEEN_REPEATS"=>			"Vertraging tussen herhalingen",
 	"S_CREATE_ACTION"=>					"Maak een actie",
 
 //	alarms.php

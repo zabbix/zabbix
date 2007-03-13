@@ -85,7 +85,7 @@
 
 	# Add Action
 
-	function	add_action($actiontype,$userid,$subject,$message,$recipient,$maxrepeats,$repeatdelay,$status,$scripts,$evaltype)
+	function	add_action($actiontype,$userid,$subject,$message,$recipient,$status,$scripts,$evaltype)
 	{
 		// TODO check permission by new value.
 
@@ -102,8 +102,8 @@
 		}
 		$actionid=get_dbid("actions","actionid");
 		$sql="insert into actions (actionid,actiontype,userid,subject,message,recipient,".
-			"maxrepeats,repeatdelay,status,scripts,evaltype) values ($actionid,$actiontype,$userid,".zbx_dbstr($subject).",".
-			zbx_dbstr($message).",$recipient,$maxrepeats,$repeatdelay,$status,".zbx_dbstr($scripts).",$evaltype)";
+			"status,scripts,evaltype) values ($actionid,$actiontype,$userid,".zbx_dbstr($subject).",".
+			zbx_dbstr($message).",$recipient,$status,".zbx_dbstr($scripts).",$evaltype)";
 		$result=DBexecute($sql);
 		if(!$result)
 			return $result;
@@ -112,7 +112,7 @@
 
 	# Update Action
 
-	function	update_action($actionid,$actiontype,$userid,$subject,$message,$recipient,$maxrepeats,$repeatdelay,$status,$scripts,$evaltype)
+	function	update_action($actionid,$actiontype,$userid,$subject,$message,$recipient,$status,$scripts,$evaltype)
 	{
 		// TODO check permission by new value.
 
@@ -128,7 +128,7 @@
 			if(!check_commands($scripts))	return FALSE;
 		}
 
-		$result=DBexecute("update actions set actiontype=$actiontype,userid=$userid,subject=".zbx_dbstr($subject).",message=".zbx_dbstr($message).",recipient=$recipient,maxrepeats=$maxrepeats, repeatdelay=$repeatdelay,status=$status,scripts=".zbx_dbstr($scripts).",evaltype=$evaltype where actionid=$actionid");
+		$result=DBexecute("update actions set actiontype=$actiontype,userid=$userid,subject=".zbx_dbstr($subject).",message=".zbx_dbstr($message).",recipient=$recipient,status=$status,scripts=".zbx_dbstr($scripts).",evaltype=$evaltype where actionid=$actionid");
 		return $result;
 	}
 

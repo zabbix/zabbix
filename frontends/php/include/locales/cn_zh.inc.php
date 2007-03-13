@@ -62,11 +62,6 @@
 	"S_AVERAGE"=>				"Average",
 	"S_HIGH"=>				"严重",
 	"S_DISASTER"=>				"灾难",
-	"S_REPEAT"=>				"重复",
-	"S_REPEATS"=>				"重复",
-	"S_NO_REPEATS"=>			"不重复",
-	"S_NUMBER_OF_REPEATS"=>			"重复次数",
-	"S_DELAY_BETWEEN_REPEATS"=>		"重复间隔",
 
 //	alarms.php
 	"S_ALARMS"=>				"alarms",
