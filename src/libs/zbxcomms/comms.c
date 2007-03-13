@@ -17,32 +17,6 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#include "config.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-
-#include <sys/wait.h>
-
-#include <string.h>
-
-#ifdef HAVE_NETDB_H
-	#include <netdb.h>
-#endif
-
-/* Required for getpwuid */
-#include <pwd.h>
-
-#include <signal.h>
-#include <errno.h>
-
-#include <time.h>
-
 #include "common.h"
 #include "comms.h"
 #include "zbxsock.h"

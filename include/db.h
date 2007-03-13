@@ -24,7 +24,6 @@
 /* time_t */
 #include <time.h>
 
-#include "config.h"
 #include "common.h"
 #include "zbxdb.h"
 
