@@ -55,11 +55,7 @@
  *
  **************************************************************/
 
-#ifndef NO_CONFIG_H /* for some tests */
-#include "config.h"
-#else
-#define NULL 0
-#endif
+#include "common.h"
 
 #ifdef TEST_SNPRINTF /* need math library headers for testing */
 #include <math.h>

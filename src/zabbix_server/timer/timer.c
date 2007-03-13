@@ -17,23 +17,7 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#include "config.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/stat.h>
-
-#include <string.h>
-
-
-/* Required for getpwuid */
-#include <pwd.h>
-
-#include <signal.h>
-#include <errno.h>
-
-#include <time.h>
+#include "common.h"
 
 #include "cfg.h"
 #include "pid.h"
@@ -41,7 +25,6 @@
 #include "log.h"
 #include "zlog.h"
 
-#include "common.h"
 #include "timer.h"
 #include "../functions.h"
 

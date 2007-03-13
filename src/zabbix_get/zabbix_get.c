@@ -17,30 +17,6 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#include "config.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <netinet/in.h>
-#include <netdb.h>
-
-#include <string.h>
-
-/* OpenBSD*/
-#ifdef HAVE_SYS_SOCKET_H
-	#include <sys/socket.h>
-#endif
-
-#include <signal.h>
-#include <time.h>
-
-#include <errno.h>
-
-#include <string.h>
-
 #include "common.h"
 
 #include "zbxsock.h"

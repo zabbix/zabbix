@@ -17,9 +17,8 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#include "config.h"
-
 #include "common.h"
+
 #include "sysinfo.h"
 
 static int get_cpu_data(unsigned long long *idle,
