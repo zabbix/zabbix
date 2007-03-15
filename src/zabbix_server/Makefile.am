@@ -2,6 +2,7 @@
 
 SUBDIRS = \
 	alerter \
+	discoverer \
 	housekeeper \
 	pinger \
 	poller \
@@ -29,6 +30,7 @@ endif
 
 zabbix_server_LDADD = \
 	alerter/libzbxalerter.a \
+	discoverer/libzbxdiscoverer.a \
 	pinger/libzbxpinger.a \
 	poller/libzbxpoller.a \
 	housekeeper/libzbxhousekeeper.a \

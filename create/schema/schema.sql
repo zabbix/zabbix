@@ -21,6 +21,42 @@
 -- Do not use spaces
 --
 
+TABLE|drules|druleid|ZBX_SYNC
+FIELD		|druleid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|ipfirst	|t_varchar(15)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|iplast		|t_varchar(15)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|delay		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|nextcheck	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|upevent	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|downevent	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|svcupevent	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|svcdownevent	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+
+TABLE|dchecks|dcheckid|ZBX_SYNC
+FIELD		|dcheckid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|druleid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|ports		|t_varchar(255)	|'0'	|NOT NULL	|ZBX_SYNC
+
+TABLE|dhosts|dhostid|ZBX_SYNC
+FIELD		|dhostid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|druleid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|ip		|t_varchar(15)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|lastup		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|lastdown	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+
+TABLE|dservices|dserviceid|ZBX_SYNC
+FIELD		|dserviceid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|dhostid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|port		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|lastup		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|lastdown	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+
 TABLE|ids|nodeid,table_name,field_name|
 FIELD		|nodeid		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|table_name	|t_varchar(64)	|''	|NOT NULL	|0
