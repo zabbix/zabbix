@@ -144,6 +144,12 @@ typedef enum
 	HTTPTEST_STATE_BUSY
 } zbx_httptest_state_type_t;
 
+/* Service supported by discoverer */
+typedef enum
+{
+	SSH = 0
+} zbx_dservice_type_t;
+
 
 /* Item snmpv3 security levels */
 #define ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV	0
@@ -235,8 +241,12 @@ typedef enum
 #define HTTPTEST_STATUS_MONITORED	0
 #define HTTPTEST_STATUS_NOT_MONITORED	1
 
+/* DIscovery rule */
+#define DRULE_STATUS_MONITORED		0
+#define DRULE_STATUS_NOT_MONITORED	1
+
 /* Host statuses */
-#define HOST_STATUS_MONITORED	0
+#define HOST_STATUS_MONITORED		0
 #define HOST_STATUS_NOT_MONITORED	1
 /*#define HOST_STATUS_UNREACHABLE	2*/
 #define HOST_STATUS_TEMPLATE	3
