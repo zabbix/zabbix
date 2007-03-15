@@ -155,6 +155,9 @@ src/libs/zbxsysinfo/specsysinfo.h -text
 src/libs/zbxsysinfo/sysinfo.c -text
 src/zabbix_agent/eventlog.c -text
 src/zabbix_agent/eventlog.h -text
+src/zabbix_server/discoverer/Makefile.am -text
+src/zabbix_server/discoverer/discoverer.c -text
+src/zabbix_server/discoverer/discoverer.h -text
 src/zabbix_server/events.c -text
 src/zabbix_server/events.h -text
 src/zabbix_server/httppoller/Makefile.am -text
@@ -195,6 +198,10 @@ upgrades/dbpatches/1.3/mysql/patch/auditlog.sql -text
 upgrades/dbpatches/1.3/mysql/patch/autoreg.sql -text
 upgrades/dbpatches/1.3/mysql/patch/conditions.sql -text
 upgrades/dbpatches/1.3/mysql/patch/config.sql -text
+upgrades/dbpatches/1.3/mysql/patch/dchecks.sql -text
+upgrades/dbpatches/1.3/mysql/patch/dhosts.sql -text
+upgrades/dbpatches/1.3/mysql/patch/drules.sql -text
+upgrades/dbpatches/1.3/mysql/patch/dservices.sql -text
 upgrades/dbpatches/1.3/mysql/patch/events.sql -text
 upgrades/dbpatches/1.3/mysql/patch/functions.sql -text
 upgrades/dbpatches/1.3/mysql/patch/graphs.sql -text
@@ -256,6 +263,10 @@ upgrades/dbpatches/1.3/postgresql/patch/auditlog.sql -text
 upgrades/dbpatches/1.3/postgresql/patch/autoreg.sql -text
 upgrades/dbpatches/1.3/postgresql/patch/conditions.sql -text
 upgrades/dbpatches/1.3/postgresql/patch/config.sql -text
+upgrades/dbpatches/1.3/postgresql/patch/dchecks.sql -text
+upgrades/dbpatches/1.3/postgresql/patch/dhosts.sql -text
+upgrades/dbpatches/1.3/postgresql/patch/drules.sql -text
+upgrades/dbpatches/1.3/postgresql/patch/dservices.sql -text
 upgrades/dbpatches/1.3/postgresql/patch/events.sql -text
 upgrades/dbpatches/1.3/postgresql/patch/functions.sql -text
 upgrades/dbpatches/1.3/postgresql/patch/graphs.sql -text

@@ -1,5 +1,8 @@
 Changes for 1.3.4:
 
+ - new tables drules,dchecks,dhosts,dservices (Alexei)
+ - basic support of auto-discovery (Alexei)
+ - new Server parameter StartDiscoverers (Alexei)
  - fixed "system.cpu.util[]" (Eugene)
  - removed housekeeper warnings from front-end (Alexei)
  - HTTP poller won't verify SSL certificates to enable self-signed (Alexei)

@@ -45,6 +45,8 @@ extern	int	CONFIG_MASTER_NODEID;
 #define DB_ACTION	struct zbx_action_type
 #define DB_ALERT	struct zbx_alert_type
 #define DB_CONDITION	struct zbx_condition_type
+#define DB_DRULE	struct zbx_drule_type
+#define DB_DCHECK	struct zbx_dcheck_type
 #define DB_EVENT	struct zbx_event_type
 #define DB_FUNCTION	struct zbx_function_type
 #define DB_GRAPH	struct zbx_graph_type
@@ -106,6 +108,30 @@ extern	int	CONFIG_MASTER_NODEID;
 #define ZBX_SQL_ITEM_SELECT	"i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.errors_from,i.snmp_port,i.delta,i.prevorgvalue,i.lastclock,i.units,i.multiplier,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula,h.available,i.status,i.trapper_hosts,i.logtimefmt,i.valuemapid,i.delay_flex,h.dns from hosts h, items i"
 
 #define ZBX_MAX_SQL_LEN			65535
+
+DB_DRULE
+{
+	zbx_uint64_t	druleid;
+	char		*ipfirst;
+	char		*iplast;
+	int		delay;
+	int		nextcheck;
+	char		*name;
+	int		status;
+	int		upevent;
+	int		downevent;
+	int		svcupevent;
+	int		svndownevent;
+};
+
+DB_DCHECK
+{
+	zbx_uint64_t	dcheckid;
+	zbx_uint64_t	druleid;
+	int		type;
+	char		*ports;
+	int		status;
+};
 
 DB_EVENT
 {
