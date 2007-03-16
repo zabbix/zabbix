@@ -149,3 +149,17 @@ function ScaleChartToParenElement(obj_name)
 		obj[i].src += "&width=" + (obj[i].parentNode.offsetWidth - obj[i].parentNode.offsetLeft - 10);
 	}
 }
+
+function insert_sizeable_graph(url)
+{
+	var width;
+
+	if(document.body.clientWidth)
+		width = document.body.clientWidth;
+	else if(document.width)
+		width = document.width;
+
+	if(width) url += "&amp;width=" + (width - 108);
+
+	document.write("<IMG SRC=\"" + url + "\">");
+}
