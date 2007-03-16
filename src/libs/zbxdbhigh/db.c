@@ -303,7 +303,9 @@ static void	get_latest_event_status(zbx_uint64_t triggerid, int *prev_status, in
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In latest_event()");
 
-	zbx_snprintf(sql,sizeof(sql),"select eventid,value,clock from events where triggerid=" ZBX_FS_UI64 " order by clock desc",triggerid);
+	zbx_snprintf(sql,sizeof(sql),"select eventid,value,clock from events where source=%d and objectid=" ZBX_FS_UI64 " order by clock desc",
+		EVENT_SOURCE_TRIGGERS,
+		triggerid);
 	zabbix_log(LOG_LEVEL_DEBUG,"SQL [%s]", sql);
 	result = DBselectN(sql,20);
 
@@ -446,8 +448,9 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *re
 				/* Preparing event for processing */
 				memset(&event,0,sizeof(DB_EVENT));
 				event.eventid = 0;
-				event.source = EVENT_SOURCE_TRIGGER;
-				event.sourceid = trigger->triggerid;
+				event.source = EVENT_SOURCE_TRIGGERS;
+				event.object = EVENT_OBJECT_TRIGGER;
+				event.objectid = trigger->triggerid;
 				event.clock = now;
 				event.value = new_value;
 				event.acknowledged = 0;
