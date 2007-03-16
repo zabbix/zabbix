@@ -74,12 +74,14 @@ static int	process_record(int nodeid, char *record)
 	zbx_get_field(record,tmp,0,'|');
 	sscanf(tmp,ZBX_FS_UI64,&event.eventid);
 	zbx_get_field(record,tmp,1,'|');
-	sscanf(tmp,ZBX_FS_UI64,&event.triggerid);
+	event.source=atoi(tmp);
 	zbx_get_field(record,tmp,2,'|');
-	event.clock=atoi(tmp);
+	sscanf(tmp,ZBX_FS_UI64,&event.sourceid);
 	zbx_get_field(record,tmp,3,'|');
-	event.value=atoi(tmp);
+	event.clock=atoi(tmp);
 	zbx_get_field(record,tmp,4,'|');
+	event.value=atoi(tmp);
+	zbx_get_field(record,tmp,5,'|');
 	event.acknowledged=atoi(tmp);
 
 	return process_event(&event);

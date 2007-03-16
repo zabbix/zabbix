@@ -73,7 +73,7 @@ static	void	send_to_user_medias(DB_EVENT *event,DB_ACTION *action, zbx_uint64_t 
 	DB_RESULT result;
 	DB_ROW	row;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In send_to_user_medias(triggerid:" ZBX_FS_UI64 ")", event->triggerid);
+	zabbix_log( LOG_LEVEL_DEBUG, "In send_to_user_medias(sourceid:" ZBX_FS_UI64 ")", event->sourceid);
 
 	result = DBselect("select mediatypeid,sendto,active,severity,period from media where active=%d and userid=" ZBX_FS_UI64,MEDIA_STATUS_ACTIVE,userid);
 
@@ -98,7 +98,7 @@ static	void	send_to_user_medias(DB_EVENT *event,DB_ACTION *action, zbx_uint64_t 
 			continue;
 		}
 
-		DBadd_alert(action->actionid, userid, event->triggerid, media.mediatypeid,media.sendto,action->subject,action->message);
+		DBadd_alert(action->actionid, userid, event->sourceid, media.mediatypeid,media.sendto,action->subject,action->message);
 	}
 	DBfree_result(result);
 
@@ -386,7 +386,7 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 	{
 		ZBX_STR2UINT64(condition_value, condition->value);
 		result = DBselect("select distinct hg.groupid from hosts_groups hg,hosts h, items i, functions f, triggers t where hg.hostid=h.hostid and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=" ZBX_FS_UI64,
-			event->triggerid);
+			event->sourceid);
 		if(condition->operator == CONDITION_OPERATOR_EQUAL)
 		{
 			while((row=DBfetch(result)))
@@ -421,7 +421,7 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 	else if(condition->conditiontype == CONDITION_TYPE_HOST)
 	{
 		ZBX_STR2UINT64(condition_value, condition->value);
-		result = DBselect("select distinct h.hostid from hosts h, items i, functions f, triggers t where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=" ZBX_FS_UI64, event->triggerid);
+		result = DBselect("select distinct h.hostid from hosts h, items i, functions f, triggers t where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=" ZBX_FS_UI64, event->sourceid);
 		if(condition->operator == CONDITION_OPERATOR_EQUAL)
 		{
 			while((row=DBfetch(result)))
@@ -459,14 +459,14 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		zabbix_log( LOG_LEVEL_DEBUG, "CONDITION_TYPE_TRIGGER [" ZBX_FS_UI64 ":%s]", condition_value, condition->value);
 		if(condition->operator == CONDITION_OPERATOR_EQUAL)
 		{
-			if(event->triggerid == condition_value)
+			if(event->sourceid == condition_value)
 			{
 				ret = SUCCEED;
 			}
 		}
 		else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
 		{
-			if(event->triggerid != condition_value)
+			if(event->sourceid != condition_value)
 			{
 				ret = SUCCEED;
 			}
@@ -730,7 +730,7 @@ void	apply_actions(DB_EVENT *event)
 	{
 		zabbix_log( LOG_LEVEL_DEBUG, "Check dependencies");
 
-		result = DBselect("select count(*) from trigger_depends d,triggers t where d.triggerid_down=" ZBX_FS_UI64 " and d.triggerid_up=t.triggerid and t.value=%d",event->triggerid, TRIGGER_VALUE_TRUE);
+		result = DBselect("select count(*) from trigger_depends d,triggers t where d.triggerid_down=" ZBX_FS_UI64 " and d.triggerid_up=t.triggerid and t.value=%d",event->sourceid, TRIGGER_VALUE_TRUE);
 		row=DBfetch(result);
 		if(row && DBis_null(row[0]) != SUCCEED)
 		{

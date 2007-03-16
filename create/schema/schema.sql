@@ -201,11 +201,12 @@ INDEX		|6		|userid
 
 TABLE|events|eventid|0
 FIELD		|eventid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|triggerid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|source		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|sourceid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|value		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|acknowledged	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-INDEX		|1		|triggerid,clock
+INDEX		|1		|triggerid,source,clock
 INDEX		|2		|clock
 
 TABLE|history||0

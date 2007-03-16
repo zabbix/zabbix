@@ -127,6 +127,13 @@ typedef enum
 	ITEM_TYPE_HTTPTEST
 } zbx_item_type_t;
 
+/* Event sources */
+typedef enum
+{
+	EVENT_SOURCE_TRIGGER = 0,
+	EVENT_SOURCE_DISCOVERY,
+} zbx_event_source_t;
+
 /* Item value types */
 typedef enum
 {

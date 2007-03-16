@@ -446,7 +446,8 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *re
 				/* Preparing event for processing */
 				memset(&event,0,sizeof(DB_EVENT));
 				event.eventid = 0;
-				event.triggerid = trigger->triggerid;
+				event.source = EVENT_SOURCE_TRIGGER;
+				event.sourceid = trigger->triggerid;
 				event.clock = now;
 				event.value = new_value;
 				event.acknowledged = 0;
