@@ -130,9 +130,17 @@ typedef enum
 /* Event sources */
 typedef enum
 {
-	EVENT_SOURCE_TRIGGER = 0,
+	EVENT_SOURCE_TRIGGERS = 0,
 	EVENT_SOURCE_DISCOVERY,
 } zbx_event_source_t;
+
+/* Event objects */
+typedef enum
+{
+	EVENT_OBJECT_TRIGGER = 0,
+	EVENT_OBJECT_DHOST,
+	EVENT_OBJECT_DSERVICE
+} zbx_event_object_t;
 
 /* Item value types */
 typedef enum
@@ -154,7 +162,15 @@ typedef enum
 /* Service supported by discoverer */
 typedef enum
 {
-	SSH = 0
+	SVC_SSH = 0,
+	SVC_LDAP,
+	SVC_SMTP,
+	SVC_FTP,
+	SVC_HTTP,
+	SVC_POP,
+	SVC_NNTP,
+	SVC_IMAP,
+	SVC_TCP
 } zbx_dservice_type_t;
 
 
