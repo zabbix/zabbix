@@ -136,7 +136,8 @@ DB_DCHECK
 DB_EVENT
 {
 	zbx_uint64_t	eventid;
-	zbx_uint64_t	triggerid;
+	int		source;
+	zbx_uint64_t	sourceid;
 	int		clock;
 	int		value;
 	int		acknowledged;
