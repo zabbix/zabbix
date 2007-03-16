@@ -1131,27 +1131,30 @@
 			$table_row = array(nbsp($descr));
 			foreach($hosts as $hostname)
 			{
-				$style = NULL;
+				$css_class = NULL;
+
 				unset($tr_ov_menu);
 				if(isset($trhosts[$hostname]))
 				{
 					switch($trhosts[$hostname]['value'])
 					{
 						case TRIGGER_VALUE_TRUE:
-							$style = get_severity_style($trhosts[$hostname]['priority']);
+							$css_class = get_severity_style($trhosts[$hostname]['priority']);
 							break;
 						case TRIGGER_VALUE_FALSE:
-							$style = 'normal';
+							$css_class = 'normal';
 						default:
-							$style = 'unknown_trigger';
+							$css_class = 'unknown_trigger';
 					}
 
+					$style = 'cursor: pointer; ';
+
 					if((time(NULL)-$trhosts[$hostname]['lastchange'])<300)
-						$style_img = 'background-image: url(images/gradients/blink1.gif); '.
+						$style .= 'background-image: url(images/gradients/blink1.gif); '.
 							'background-position: top left; '.
 							'background-repeat: repeate;';
 					elseif((time(NULL)-$trhosts[$hostname]['lastchange'])<900)
-						$style_img = 'background-image: url(images/gradients/blink2.gif); '.
+						$style .= 'background-image: url(images/gradients/blink2.gif); '.
 							'background-position: top left; '.
 							'background-repeat: repeate;';
 
@@ -1212,14 +1215,19 @@
 					unset($item_menu);
 				}
 
-				$status_col = new CCol(SPACE,$style);
-				if(isset($style_img))
-					$status_col->AddOption('style', $style_img);
+				$status_col = new CCol(SPACE,$css_class);
+				if(isset($style))
+				{
+					$status_col->AddOption('style', $style);
+				}
 
 				if(isset($tr_ov_menu))
 				{
 					$tr_ov_menu  = new CPUMenu($tr_ov_menu,170);
 					$status_col->OnClick($tr_ov_menu->GetOnActionJS());
+					$status_col->AddAction('onmouseover',
+						'this.old_border=this.style.border; this.style.border=\'1px dotted #0C0CF0\'');
+					$status_col->AddAction('onmouseout', 'this.style.border=this.old_border;');
 				}
 				array_push($table_row,$status_col);
 			}

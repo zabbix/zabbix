@@ -742,19 +742,61 @@ COpt::profiling_start('prepare table');
 			$table_row = array(nbsp($descr));
 			foreach($hosts as $hostname)
 			{
-				$style = NULL;
+				$css_class = NULL;
+				unset($it_ov_menu);
+
 				$value = '-';
 				if(isset($ithosts[$hostname]))
 				{
 					if($ithosts[$hostname]['tr_value'] == TRIGGER_VALUE_TRUE)
-						$style = get_severity_style($ithosts[$hostname]['severity']);
+						$css_class = get_severity_style($ithosts[$hostname]['severity']);
 					
 					$value = format_lastvalue($ithosts[$hostname]);
+
+					$it_ov_menu = array(
+						array(S_VALUES,	null, null, 
+							array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))),
+						array(S_500_LATEST_VALUES, 'history.php?action=showlatest&itemid='.$ithosts[$hostname]['itemid'],
+							array('tw'=>'_blank'))
+						);
+
+					switch($ithosts[$hostname]['value_type'])
+					{
+						case ITEM_VALUE_TYPE_UINT64:
+						case ITEM_VALUE_TYPE_FLOAT:
+							$it_ov_menu = array_merge(array(
+								/* name, url, (target [tw], statusbar [sb]), css, submenu */
+								array(S_GRAPHS, null,  null, 
+									array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))
+									),
+								array(S_LAST_HOUR_GRAPH, 'history.php?period=3600&action=showgraph&itemid='.
+									$ithosts[$hostname]['itemid'], array('tw'=>'_blank')),
+								array(S_LAST_WEEK_GRAPH, 'history.php?period=604800&action=showgraph&itemid='.
+									$ithosts[$hostname]['itemid'], array('tw'=>'_blank')),
+								array(S_LAST_MONTH_GRAPH, 'history.php?period=2678400&action=showgraph&itemid='.
+									$ithosts[$hostname]['itemid'], array('tw'=>'_blank'))
+								), $it_ov_menu);
+							break;
+						default:
+							break;
+					}
 				}
 
-				if($value == '-')	$style = 'center';
+				if($value == '-')	$css_class = 'center';
+				$value_col = new CCol($value,$css_class);
 
-				array_push($table_row,new CCol($value,$style));
+				if(isset($it_ov_menu))
+				{
+					$it_ov_menu  = new CPUMenu($it_ov_menu,170);
+					$value_col->OnClick($it_ov_menu->GetOnActionJS());
+					$value_col->AddOption('style', 'cursor: pointer;');
+					$value_col->AddAction('onmouseover',
+						'this.old_border=this.style.border; this.style.border=\'1px dotted #0C0CF0\'');
+					$value_col->AddAction('onmouseout', 'this.style.border=this.old_border;');
+					unset($it_ov_menu);
+				}
+
+				array_push($table_row,$value_col);
 			}
 			$table->AddRow($table_row);
 		}
