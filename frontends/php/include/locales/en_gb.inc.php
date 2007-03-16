@@ -458,6 +458,8 @@
 
 //	history.php
 	"S_LAST_HOUR_GRAPH"=>			"Last hour graph",
+	"S_LAST_WEEK_GRAPH"=>			"Last week graph",
+	"S_LAST_MONTH_GRAPH"=>			"Last month graph",
 	"S_VALUES_OF_LAST_HOUR"=>		"Values of last hour",
 	"S_500_LATEST_VALUES"=>			"500 latest values",
 	"S_GRAPH_OF_SPECIFIED_PERIOD"=>		"Graph of specified period",
