@@ -160,8 +160,6 @@ static zbx_uint64_t register_host(DB_DCHECK *check, zbx_uint64_t druleid, char *
  ******************************************************************************/
 static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
 	zbx_uint64_t	dhostid;
 	zbx_uint64_t	dserviceid = 0;
 	int		now;
@@ -298,13 +296,42 @@ static int discover_service(zbx_dservice_type_t type, char *ip, int port)
  ******************************************************************************/
 static void process_check(DB_DRULE *rule, DB_DCHECK *check, char *ip)
 {
-	int port=22;
+	int	port;
+	char	*s,*c;
+	char	tmp[MAX_STRING_LEN];
+	int	first,last;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In process_check(ip:%s, ports:%s, type:%d)",
+	zabbix_log(LOG_LEVEL_WARNING, "In process_check(ip:%s, ports:%s, type:%d)",
 		ip, check->ports, check->type);
 
-	check->status = discover_service(check->type,ip,port);
-	update_service(rule, check, ip, port);
+	zbx_snprintf(tmp,sizeof(tmp)-1,"%s",check->ports);
+
+	s=(char *)strtok(tmp,",");
+	while(s!=NULL)
+	{
+		c=strchr(s,'-');
+		if(c == NULL)
+		{
+			first=atoi(s);
+			last=first;
+		}
+		else
+		{
+			c[0] = 0;
+			first=atoi(s);
+			last=atoi(c+1);
+			c[0] = '-';
+		}
+
+		for(port=first;port<=last;port++)
+		{	
+			zabbix_log(LOG_LEVEL_WARNING, "Port %d", port);
+			check->status = discover_service(check->type,ip,port);
+			update_service(rule, check, ip, port);
+		}
+		s=(char *)strtok(NULL,"\n");
+	}
+
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End process_check()");
 }
@@ -331,6 +358,8 @@ static void process_rule(DB_DRULE *rule)
 	DB_DCHECK	check;
 
 	char		ip[MAX_STRING_LEN];
+	int		first,last;
+	char		*c;
 
 	int		i;
 
@@ -345,13 +374,18 @@ static void process_rule(DB_DRULE *rule)
 		check.type		= atoi(row[2]);
 		check.ports		= row[3];
 
-		for(i=1;i<6;i++)
+		first=atoi(strrchr(rule->ipfirst,'.')+1);
+		last=atoi(strrchr(rule->iplast,'.')+1);
+
+		c = strrchr(rule->ipfirst,'.');
+		c[0] = 0;
+		for(i=first;i<=last;i++)
 		{
-			zbx_snprintf(ip,MAX_STRING_LEN-1,"192.168.3.%d",i);
-			zabbix_log( LOG_LEVEL_DEBUG, "Processing IP %s", ip);
+			zbx_snprintf(ip,MAX_STRING_LEN-1,"%s.%d",rule->ipfirst, i);
 
 			process_check(rule, &check, ip);
 		}
+		c[0] = '.';
 	}
 	DBfree_result(result);
 
