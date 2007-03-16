@@ -1108,6 +1108,16 @@ else
 		$table->Show();
 	}
 
+	function	insert_sizeable_graph($url)
+	{
+?>
+<script language="JavaScript" type="text/javascript">
+<!--
+	insert_sizeable_graph(<?php echo zbx_jsvalue($url); ?>);
+-->
+</script>
+<?php
+	}
 	# Show History Graph
 
 	function	show_history($itemid,$from,$stime,$period)
@@ -1120,20 +1130,10 @@ else
 		echo "<TR BGCOLOR=#DDDDDD>";
 		echo "<TD ALIGN=CENTER>";
 
-		echo "<script language=\"JavaScript\" type=\"text/javascript\">";
-		echo "if (navigator.appName == \"Microsoft Internet Explorer\")";
-		echo "{";
-		echo " document.write(\"<IMG SRC='chart.php?itemid=$itemid&period=$period&from=$from&stime=$stime&width=\"+(document.body.clientWidth-108)+\"'>\")";
-		echo "}";
-		echo "else if (navigator.appName == \"Netscape\")";
-		echo "{";
-		echo " document.write(\"<IMG SRC='chart.php?itemid=$itemid&period=$period&from=$from&stime=$stime&width=\"+(document.width-108)+\"'>\")";
-		echo "}";
-		echo "else";
-		echo "{";
-		echo " document.write(\"<IMG SRC='chart.php?itemid=$itemid&period=$period&from=$from&stime=$stime'>\")";
-		echo "}";
-		echo "</script>";
+		insert_sizeable_graph('chart.php?itemid='.$itemid.
+			url_param($from,false,'form').
+			url_param($stime,false,'stime').
+			url_param($period,false,'period'));
 
 		echo "</TD>";
 		echo "</TR>";
