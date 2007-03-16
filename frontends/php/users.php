@@ -30,7 +30,6 @@
 
 include_once "include/page_header.php";
 
-	insert_confirm_javascript();
 ?>
 <?php
 	$_REQUEST["config"]=get_request("config",get_profile("web.users.config",0));

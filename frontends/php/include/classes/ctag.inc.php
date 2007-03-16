@@ -228,13 +228,21 @@
 				$code = "show_hint(this,event,'".$text."');";
 			}
 
-			$this->AddOption('onMouseOver',	$code);
-			$this->AddOption('onMouseMove',	$code);
+			$this->AddAction('onMouseOver',	$code);
+			$this->AddAction('onMouseMove',	$code);
 		}
 
 		function OnClick($handle_code)
 		{
-			$this->AddOption('onClick', $handle_code);
+			$this->AddAction('onClick', $handle_code);
+		}
+
+		function AddAction($name, $value)
+		{
+			if(isset($value))
+				$this->options[$name] = str_replace("\n", '', strval($value)); 
+			else
+				unset($this->options[$name]);
 		}
 
 		function AddOption($name, $value)
@@ -244,6 +252,7 @@
 			else
 				unset($this->options[$name]);
 		}
+
 		function SetEnabled($value='yes')
 		{
 			if((is_string($value) && ($value == 'yes' || $value == 'enabled' || $value=='on') || $value=='1')

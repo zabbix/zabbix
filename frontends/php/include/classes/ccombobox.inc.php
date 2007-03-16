@@ -177,8 +177,8 @@
 			inseret_javascript_for_editable_combobox();
 
 			parent::CComboBox($name,$value,$action);
-			parent::AddOption('onfocus','CEditableComboBoxInit(this);');
-			parent::AddOption('onchange','CEditableComboBoxOnChange(this,'.$size.');');
+			parent::AddAction('onfocus','CEditableComboBoxInit(this);');
+			parent::AddAction('onchange','CEditableComboBoxOnChange(this,'.$size.');');
 		}
 
 		function AddItem($value, $caption='', $selected=NULL, $enabled='yes')

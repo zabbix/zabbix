@@ -28,8 +28,6 @@
 
 include_once "include/page_header.php";
 
-	insert_confirm_javascript();
-	
 	$_REQUEST["config"] = get_request("config",get_profile("web.hosts.config",0));
 	
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID);
