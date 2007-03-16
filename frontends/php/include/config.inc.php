@@ -58,6 +58,7 @@ function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$m
 	require_once("include/classes/cmap.inc.php");
 	require_once("include/classes/cflash.inc.php");
 	require_once("include/classes/ciframe.inc.php");
+	require_once("include/classes/cpumenu.inc.php");
 	require_once("include/classes/graph.inc.php");
 
 // Include Tactical Overview modules
@@ -205,7 +206,41 @@ function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$m
 	 */
 	function zbx_jsstr($str)
 	{
-			return htmlspecialchars(str_replace("\n", '\n', str_replace("\r", '', $str)));
+		return htmlspecialchars(str_replace("\n", '\n', str_replace("\r", '', $str)));
+	}
+
+	/* function:
+	 *     zbx_jsvalue
+	 *
+	 * description:
+	 *	convert PHP variable to string version
+	 *      of JavaScrip style 
+	 *
+	 * author: Eugene Grigorjev
+	 */
+	function zbx_jsvalue(&$value)
+	{
+		if(!is_array($value)) 
+		{
+			if(is_object($value)) return unpack_object($value);
+			if(is_string($value)) return '\''.str_replace('\'','\\\'',zbx_jsstr($value)).'\'';
+			if(is_null($value)) return 'null';
+			return strval($value);
+		}
+
+		if(count($value) == 0) return '[]';
+
+		foreach($value as $id => $v)
+		{
+			if(!isset($is_object) && is_string($id)) $is_object = true;
+
+			$value[$id] = (isset($is_object) ? '\''.$id.'\' : ' : '').zbx_jsvalue($v);
+		}
+
+		if(isset($is_object))
+			return '{'.implode(',',$value).'}';
+		else
+			return '['.implode(',',$value).']';
 	}
 
 	/* function:
@@ -1456,25 +1491,6 @@ function GetPos(obj)
 
 var hint_box = null;
 
-function get_cursor_position(e)
-{
-	e = e || window.event;
-	var cursor = {x:0, y:0};
-	if (e.pageX || e.pageY) {
-		cursor.x = e.pageX;
-		cursor.y = e.pageY;
-	} 
-	else {
-		var de = document.documentElement;
-		var b = document.body;
-		cursor.x = e.clientX + 
-		(de.scrollLeft || b.scrollLeft) - (de.clientLeft || 0);
-		cursor.y = e.clientY + 
-		(de.scrollTop || b.scrollTop) - (de.clientTop || 0);
-	}
-	return cursor;
-}
-
 function hide_hint()
 {
 	if(!hint_box) return;
@@ -1538,110 +1554,6 @@ else if (document.getElementById)
 {
 	window.onload	= create_hint_box;
 }
-//-->
-</script>
-<?php
-	}
-
-	function insert_confirm_javascript()
-	{
-?>
-<script language="JavaScript" type="text/javascript">
-<!--
-	function Redirect(url) {
-		window.location = url;
-		return false;
-	}	
-
-	function create_var(form_name, var_name, var_val, submit)
-	{
-		var frmForm = document.forms[form_name];
-
-		if(!frmForm) return false;
-
-		var objVar = document.createElement('input');
-
-		if(!objVar) return false;
-
-		objVar.setAttribute('type', 	'hidden');
-		objVar.setAttribute('name', 	var_name);
-		objVar.setAttribute('value', 	var_val);
-
-		frmForm.appendChild(objVar);
-		if(submit)
-			frmForm.submit();
-
-		return false;
-	}
-
-	function Confirm(msg)
-	{
-		if(confirm(msg,'title'))
-			return true;
-		else
-			return false;
-	}
-	function PopUp(url,width,height,form_name)
-	{
-		if(!width) width = 600;
-		if(!height) height = 450;
-		if(!form_name) form_name = 'zbx_popup';
-
-		var left = (screen.width-(width+150))/2; 
-		var top = (screen.height-(height+150))/2;
-		
-		var popup = window.open(url,form_name,'width=' + width +',height=' + height + ',top='+ top +',left='+ left +
-				',resizable=yes,scrollbars=yes,location=no,menubar=no');
-
-		popup.focus();
-		
-		return false;
-	}
-
-	function CheckAll(form_name, chkMain, shkName)
-	{
-		var frmForm = document.forms[form_name];
-		var value = frmForm.elements[chkMain].checked;
-		for (var i=0; i < frmForm.length; i++)
-		{
-			name = frmForm.elements[i].name.split('[')[0];
-			if(frmForm.elements[i].type != 'checkbox') continue;
-			if(name == chkMain) continue;
-			if(shkName && shkName != name) continue;
-			if(frmForm.elements[i].disabled == true) continue;
-			frmForm.elements[i].checked = value;
-		}
-	}
-
-	function GetSelectedText(obj)
-	{
-		if (navigator.appName == "Microsoft Internet Explorer")
-		{
-			obj.focus();
-			return document.selection.createRange().text;
-		}
-		else (obj.selectionStart)
-		{
-			if(obj.selectionStart != obj.selectionEnd) {
-				var s = obj.selectionStart;
-				var e = obj.selectionEnd;
-				return obj.value.substring(s, e);
-			}
-		}
-		return obj.value;
-	}
-
-	function ScaleChartToParenElement(obj_name)
-	{
-		var obj = document.getElementsByName(obj_name);
-
-		if(obj.length <= 0) throw "Can't find objects with name [" + obj_name +"]";
-
-		for(i = obj.length-1; i>=0; i--)
-		{
-			obj[i].src += "&width=" + (obj[i].parentNode.offsetWidth - obj[i].parentNode.offsetLeft - 10);
-		}
-	}
 //-->
 </script>
 <?php

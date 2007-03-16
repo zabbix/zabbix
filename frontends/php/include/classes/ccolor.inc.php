@@ -209,7 +209,7 @@ else if (document.getElementById)
 
 			$txt = new CTextBox($name,$value,7);
 			$txt->AddOption('id', $name);
-			$txt->AddOption('onChange', 'set_color_by_name(\''.$name.'\',this.value)');
+			$txt->AddAction('onChange', 'set_color_by_name(\''.$name.'\',this.value)');
 			$txt->AddOption('style', 'margin: 0px');
 			$this->AddItem(array($txt, $lbl));
 			

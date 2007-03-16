@@ -28,7 +28,6 @@
 
 include_once "include/page_header.php";
 
-	insert_confirm_javascript();
 ?>
 <?php
 	if($USER_DETAILS["alias"]=="guest")

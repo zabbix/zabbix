@@ -70,10 +70,10 @@
 			parent::CTextBox($name,$value,$size,$readonly);
 			$this->AddOption('MaxLength', $size);
 			$this->AddOption('Style', 'text-align: right;');
-			$this->AddOption('OnKeyPress',
+			$this->AddAction('OnKeyPress',
 				' var c = (window.event) ? event.keyCode : event.which;'.
 				' if(event.ctrlKey || c <= 31 || (c >= 48 && c <= 57)) return true; else return false; ');
-			$this->AddOption('OnChange',
+			$this->AddAction('OnChange',
 					($allowempty ? ' if(this.value.length==0 || this.value==null) this.value = \'\'; else ' : '').
 					' if(isNaN(parseInt(this.value))) this.value = 0; '.
 					' else this.value = parseInt(this.value);'
@@ -101,10 +101,10 @@
 				if($i != 3)
 				{
 					$this->ip_parts[$i]->tag_end = '';
-					$this->ip_parts[$i]->AddOption('OnKeyDown',
+					$this->ip_parts[$i]->AddAction('OnKeyDown',
 						' this.maxlength = this.getAttribute("maxlength"); '.
 						' this.oldlength = this.value.length; ');
-					$this->ip_parts[$i]->AddOption('OnKeyUp',
+					$this->ip_parts[$i]->AddAction('OnKeyUp',
 						' if(this.oldlength != this.value.length && this.value.length == this.maxlength) {'.
 						' var el = this.form.elements["'.$name.'['.($i+1).']'.'"];'.
 						' if(el) { el.focus(); el.select(); }}');

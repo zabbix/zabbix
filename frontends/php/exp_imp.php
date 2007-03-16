@@ -38,10 +38,6 @@ include_once "include/page_header.php";
 
 	$_REQUEST["config"] = get_request("config",get_profile("web.exp_imp.config",0));
 	
-	if(!isset($EXPORT_DATA))
-	{
-		insert_confirm_javascript();
-	}
 ?>
 <?php
 	$fields=array(

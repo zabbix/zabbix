@@ -795,6 +795,9 @@
 	"S_OVERVIEW_BIG"=>			"OVERVIEW",
 	"S_EXCL"=>				"!",
 	"S_DATA"=>				"Data",
+	"S_SHOW_GRAPH_OF_ITEM"=>		"Show graph of item",
+	"S_SHOW_VALUES_OF_ITEM"=>		"Show values of item",
+	"S_VALUES"=>				"Values",
 
 //	queue.php
 	"S_QUEUE_BIG"=>				"QUEUE",

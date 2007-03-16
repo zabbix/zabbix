@@ -89,8 +89,6 @@ include_once "include/page_header.php";
 		invalid_url();
 	}
 	
-	insert_confirm_javascript();
-
 	if(defined($page["title"]))     $page["title"] = constant($page["title"]);
 ?>
 <?php
