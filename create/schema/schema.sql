@@ -47,6 +47,7 @@ FIELD		|ip		|t_varchar(15)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastup		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastdown	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|eventsent	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 
 TABLE|dservices|dserviceid|ZBX_SYNC
 FIELD		|dserviceid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
@@ -56,6 +57,7 @@ FIELD		|port		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastup		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastdown	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|eventsent	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 
 TABLE|ids|nodeid,table_name,field_name|
 FIELD		|nodeid		|t_integer	|'0'	|NOT NULL	|0
@@ -202,11 +204,12 @@ INDEX		|6		|userid
 TABLE|events|eventid|0
 FIELD		|eventid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|source		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|sourceid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|object		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|objectid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|value		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|acknowledged	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-INDEX		|1		|triggerid,source,clock
+INDEX		|1		|source,triggerid,clock
 INDEX		|2		|clock
 
 TABLE|history||0

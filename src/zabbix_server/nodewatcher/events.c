@@ -67,13 +67,15 @@ static int process_node(int nodeid, int master_nodeid, zbx_uint64_t event_lastid
 
 	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "Events|%d|%d", CONFIG_NODEID, nodeid);
 
-	result = DBselect("select eventid,source,sourceid,clock,value,acknowledged from events where eventid>" ZBX_FS_UI64 " and " ZBX_COND_NODEID " order by eventid", event_lastid, ZBX_NODE("eventid", nodeid));
+	result = DBselect("select eventid,source,object,objectid,clock,value,acknowledged from events where eventid>" ZBX_FS_UI64 " and " ZBX_COND_NODEID " order by eventid",
+		event_lastid,
+		ZBX_NODE("eventid", nodeid));
 	while((row=DBfetch(result)))
 	{
 		ZBX_STR2UINT64(eventid,row[0])
 		found = 1;
-		zbx_snprintf_alloc(&data, &allocated, &offset, 1024, "\n%s|%s|%s|%s|%s|%s",
-			       row[0],row[1],row[2],row[3],row[4],row[5]);
+		zbx_snprintf_alloc(&data, &allocated, &offset, 1024, "\n%s|%s|%s|%s|%s|%s|%s",
+			       row[0],row[1],row[2],row[3],row[4],row[5],row[6]);
 	}
 	if(found == 1)
 	{

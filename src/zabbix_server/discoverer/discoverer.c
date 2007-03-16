@@ -36,9 +36,73 @@ int	discoverer_num;
 
 /******************************************************************************
  *                                                                            *
- * Function: register_host                                                    *
+ * Function: add_host_event                                                   *
  *                                                                            *
- * Purpose: register host if one does not exist                               *
+ * Purpose: generate host UP/DOWN event if required                           *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void add_host_event(DB_DHOST *host, zbx_uint64_t dserviceid)
+{
+	DB_EVENT	event;
+	int		now;
+
+	zabbix_log(LOG_LEVEL_WARNING, "In add_host_event()");
+
+	now = time(NULL); 
+
+	memset(&event,0,sizeof(DB_EVENT));
+
+	event.eventid		= 0;
+	event.source		= EVENT_SOURCE_DISCOVERY;
+	event.object		= EVENT_OBJECT_DHOST;
+	event.objectid		= dserviceid;
+	event.clock 		= now;
+	event.value 		= host->status;
+	event.acknowledged 	= 0;
+
+	process_event(&event);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: generate_host_event                                              *
+ *                                                                            *
+ * Purpose: generate host UP/DOWN event if required                           *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void update_dhost(DB_DHOST *host)
+{
+	DBexecute("update dhosts set druleid=" ZBX_FS_UI64 ",ip='%s',status=%d,lastup=%d,lastdown=%d,eventsent=%d where dhostid=" ZBX_FS_UI64,
+			host->druleid,
+			host->ip,
+			host->status,
+			host->lastup,
+			host->lastdown,
+			host->eventsent,
+			host->dhostid);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: register_service                                                 *
+ *                                                                            *
+ * Purpose: register service if one does not exist                            *
  *                                                                            *
  * Parameters: host ip address                                                *
  *                                                                            *
@@ -105,16 +169,16 @@ static zbx_uint64_t register_service(DB_DRULE *rule,DB_DCHECK *check,zbx_uint64_
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint64_t register_host(DB_DCHECK *check, zbx_uint64_t druleid, char *ip)
+static void register_host(DB_DHOST *host,DB_DCHECK *check, zbx_uint64_t druleid, char *ip)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	dhostid = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In register_host(ip:%s)",
 		ip);
 
-	result = DBselect("select dhostid from dhosts where ip='%s' and " ZBX_COND_NODEID,
+	host->dhostid=0;
+	result = DBselect("select dhostid,druleid,ip,status,lastup,lastdown,eventsent from dhosts where ip='%s' and " ZBX_COND_NODEID,
 		ip,
 		LOCAL_NODE("dhostid"));
 	row=DBfetch(result);
@@ -123,24 +187,34 @@ static zbx_uint64_t register_host(DB_DCHECK *check, zbx_uint64_t druleid, char *
 		/* Add host only if service is up */
 		if(check->status == SERVICE_UP)
 		{
-			dhostid = DBget_maxid("dhosts","dhostid");
+			host->dhostid = DBget_maxid("dhosts","dhostid");
 			DBexecute("insert into dhosts (dhostid,druleid,ip) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s')",
-				dhostid,
+				host->dhostid,
 				druleid,
 				ip);
 			zabbix_log(LOG_LEVEL_WARNING, "New host discovered at %s", ip);
+			host->druleid	= druleid;
+			host->ip	= ip;
+			host->status	= 0;
+			host->lastup	= 0;
+			host->lastdown  = 0;
+			host->eventsent	= 0;
 		}
 	}
 	else
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Host is already in database");
-		ZBX_STR2UINT64(dhostid,row[0]);
+		ZBX_STR2UINT64(host->dhostid,row[0]);
+		ZBX_STR2UINT64(host->druleid,row[1]);
+		host->ip		= row[2];
+		host->status		= atoi(row[3]);
+		host->lastup		= atoi(row[4]);
+		host->lastdown		= atoi(row[5]);
+		host->eventsent		= atoi(row[6]);
 	}
 	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End register_host()");
-
-	return dhostid;
 }
 
 /******************************************************************************
@@ -160,20 +234,20 @@ static zbx_uint64_t register_host(DB_DCHECK *check, zbx_uint64_t druleid, char *
  ******************************************************************************/
 static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 {
-	zbx_uint64_t	dhostid;
 	zbx_uint64_t	dserviceid = 0;
 	int		now;
+	DB_DHOST	host;
 
 	zabbix_log(LOG_LEVEL_WARNING, "In update_check(ip:%s, port:%d, status:%s)",
 		ip, port, (check->status==SERVICE_UP?"up":"down"));
 
 	/* Register host if is not registered yet */
-	dhostid = register_host(check,rule->druleid,ip);
+	register_host(&host,check,rule->druleid,ip);
 
-	if(dhostid>0)
+	if(host.dhostid>0)
 	{
 		/* Register service if is not registered yet */
-		dserviceid = register_service(rule,check,dhostid,ip,port);
+		dserviceid = register_service(rule,check,host.dhostid,ip,port);
 	}
 
 	if(dserviceid == 0)
@@ -186,13 +260,16 @@ static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 	if(check->status == SERVICE_UP)
 	{
 		/* Update host status */
-		DBexecute("update dhosts set status=%d, lastup=%d, lastdown=0 where (status=%d or (lastup=0 and lastdown=0)) and dhostid=" ZBX_FS_UI64,
-			SERVICE_UP,
-			now,
-			SERVICE_DOWN,
-			dhostid);
+		if((host.status == SERVICE_DOWN)||(host.lastup==0 && host.lastdown==0))
+		{
+			host.status=SERVICE_UP;
+			host.lastdown=0;
+			host.lastup=now;
+			host.eventsent=0;
+			update_dhost(&host);
+		}
 		/* Update service status */
-		DBexecute("update dservices set status=%d, lastup=%d, lastdown=0 where (status=%d or (lastup=0 and lastdown=0)) and dserviceid=" ZBX_FS_UI64,
+		DBexecute("update dservices set status=%d,lastup=%d,lastdown=0,eventsent=0 where (status=%d or (lastup=0 and lastdown=0)) and dserviceid=" ZBX_FS_UI64,
 			SERVICE_UP,
 			now,
 			SERVICE_DOWN,
@@ -201,18 +278,40 @@ static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 	/* SERVICE_DOWN */
 	else
 	{
-		/* Update host status */
-		DBexecute("update dhosts set status=%d, lastup=0, lastdown=%d where (status=%d or (lastup=0 and lastdown=0)) and dhostid=" ZBX_FS_UI64,
-			SERVICE_DOWN,
-			now,
-			SERVICE_UP,
-			dhostid);
+		if((host.status == SERVICE_UP)||(host.lastup==0 && host.lastdown==0))
+		{
+			host.status=SERVICE_DOWN;
+			host.lastup=now;
+			host.lastdown=0;
+			host.eventsent=0;
+			update_dhost(&host);
+		}
 		/* Update service status */
-		DBexecute("update dservices set status=%d, lastup=0, lastdown=%d where (status=%d or (lastup=0 and lastdown=0)) and dserviceid=" ZBX_FS_UI64,
+		DBexecute("update dservices set status=%d,lastup=0,lastdown=%d,eventsent=0 where (status=%d or (lastup=0 and lastdown=0)) and dserviceid=" ZBX_FS_UI64,
 			SERVICE_DOWN,
 			now,
 			SERVICE_UP,
 			dserviceid);
+	}
+
+	zabbix_log(LOG_LEVEL_WARNING, "ALEX");
+	/* Generating host events */
+	if(host.eventsent == 0)
+	{
+		if(host.status == SERVICE_UP && (host.lastup<=now-rule->upevent))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Generating host event for %s", host.ip);
+			host.eventsent=1;
+
+			update_dhost(&host);
+			add_host_event(&host,dserviceid);
+		}
+		if(host.status == SERVICE_DOWN && (host.lastdown<=now-rule->downevent))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Generating host event for %s", host.ip);
+			host.eventsent=1;
+			update_dhost(&host);
+		}
 	}
 }
 
@@ -245,9 +344,32 @@ static int discover_service(zbx_dservice_type_t type, char *ip, int port)
 	init_result(&value);
 
 	switch(type) {
-		case SSH:
-			zabbix_log(LOG_LEVEL_DEBUG, "Checking SSH");
+		case SVC_SSH:
 			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[ssh,%s,%d]", ip, port);
+			break;
+		case SVC_LDAP:
+			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[ldap,%s,%d]", ip, port);
+			break;
+		case SVC_SMTP:
+			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[smtp,%s,%d]", ip, port);
+			break;
+		case SVC_FTP:
+			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[ftp,%s,%d]", ip, port);
+			break;
+		case SVC_HTTP:
+			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[http,%s,%d]", ip, port);
+			break;
+		case SVC_POP:
+			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[pop,%s,%d]", ip, port);
+			break;
+		case SVC_NNTP:
+			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[nntp,%s,%d]", ip, port);
+			break;
+		case SVC_IMAP:
+			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[imap,%s,%d]", ip, port);
+			break;
+		case SVC_TCP:
+			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[tcp,%s,%d]", ip, port);
 			break;
 		default:
 			ret = FAIL;

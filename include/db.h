@@ -45,6 +45,7 @@ extern	int	CONFIG_MASTER_NODEID;
 #define DB_ACTION	struct zbx_action_type
 #define DB_ALERT	struct zbx_alert_type
 #define DB_CONDITION	struct zbx_condition_type
+#define DB_DHOST	struct zbx_dhost_type
 #define DB_DRULE	struct zbx_drule_type
 #define DB_DCHECK	struct zbx_dcheck_type
 #define DB_EVENT	struct zbx_event_type
@@ -133,11 +134,23 @@ DB_DCHECK
 	int		status;
 };
 
+DB_DHOST
+{
+	zbx_uint64_t	dhostid;
+	zbx_uint64_t	druleid;
+	char		*ip;
+	int		status;
+	int		lastup;
+	int		lastdown;
+	int		eventsent;
+};
+
 DB_EVENT
 {
 	zbx_uint64_t	eventid;
 	int		source;
-	zbx_uint64_t	sourceid;
+	int		object;
+	zbx_uint64_t	objectid;
 	int		clock;
 	int		value;
 	int		acknowledged;

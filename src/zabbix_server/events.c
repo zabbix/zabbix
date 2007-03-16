@@ -67,10 +67,10 @@ static void	add_trigger_info(DB_EVENT *event)
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	if(event->sourceid == 0)	return;
+	if(event->objectid == 0)	return;
 
 	result = DBselect("select description,priority,comments,url from triggers where triggerid=" ZBX_FS_UI64,
-		event->sourceid);
+		event->objectid);
 	row = DBfetch(result);
 	event->trigger_description[0]=0;
 	zbx_free(event->trigger_comments);
@@ -125,9 +125,9 @@ static void	free_trigger_info(DB_EVENT *event)
  ******************************************************************************/
 int	process_event(DB_EVENT *event)
 {
-	zabbix_log(LOG_LEVEL_DEBUG,"In process_event(eventid:" ZBX_FS_UI64 ",sourceid:" ZBX_FS_UI64 ")",
+	zabbix_log(LOG_LEVEL_DEBUG,"In process_event(eventid:" ZBX_FS_UI64 ",objectid:" ZBX_FS_UI64 ")",
 			event->eventid,
-			event->sourceid);
+			event->objectid);
 
 	add_trigger_info(event);
 
@@ -135,10 +135,11 @@ int	process_event(DB_EVENT *event)
 	{
 		event->eventid = DBget_maxid("events","eventid");
 	}
-	DBexecute("insert into events(eventid,source,sourceid,clock,value) values(" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",%d,%d)",
+	DBexecute("insert into events(eventid,source,object,objectid,clock,value) values(" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 ",%d,%d)",
 		event->eventid,
 		event->source,
-		event->sourceid,
+		event->object,
+		event->objectid,
 		event->clock,
 		event->value);
 
@@ -153,11 +154,11 @@ int	process_event(DB_EVENT *event)
 
 	if(event->value == TRIGGER_VALUE_TRUE)
 	{
-		update_services(event->sourceid, event->trigger_priority);
+		update_services(event->objectid, event->trigger_priority);
 	}
 	else
 	{
-		update_services(event->sourceid, 0);
+		update_services(event->objectid, 0);
 	}
 
 	free_trigger_info(event);
