@@ -1095,7 +1095,7 @@
 			$group_where = ' where';
 		}
 
-		$result=DBselect('select distinct t.description,t.value,t.priority,t.lastchange,h.hostid,h.host'.
+		$result=DBselect('select distinct t.triggerid,t.description,t.value,t.priority,t.lastchange,h.hostid,h.host'.
 			' from hosts h,items i,triggers t, functions f '.$group_where.
 			' h.status='.HOST_STATUS_MONITORED.' and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid'.
 			' and h.hostid in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, $nodeid).') '.
@@ -1107,6 +1107,8 @@
 		{
 			$hosts[$row['host']] = $row['host'];
 			$triggers[$row['description']][$row['host']] = array(
+				'hostid'	=> $row['hostid'], 
+				'triggerid'	=> $row['triggerid'], 
 				'value'		=> $row['value'], 
 				'lastchange'	=> $row['lastchange'],
 				'priority'	=> $row['priority']);
@@ -1130,6 +1132,7 @@
 			foreach($hosts as $hostname)
 			{
 				$style = NULL;
+				unset($tr_ov_menu);
 				if(isset($trhosts[$hostname]))
 				{
 					switch($trhosts[$hostname]['value'])
@@ -1143,10 +1146,82 @@
 							$style = 'unknown_trigger';
 					}
 
-					if((time(NULL)-$trhosts[$hostname]['lastchange'])<300)	 	$style .= '_blink1';
-					elseif((time(NULL)-$trhosts[$hostname]['lastchange'])<900) 	$style .= '_blink2';
+					if((time(NULL)-$trhosts[$hostname]['lastchange'])<300)
+						$style_img = 'background-image: url(images/gradients/blink1.gif); '.
+							'background-position: top left; '.
+							'background-repeat: repeate;';
+					elseif((time(NULL)-$trhosts[$hostname]['lastchange'])<900)
+						$style_img = 'background-image: url(images/gradients/blink2.gif); '.
+							'background-position: top left; '.
+							'background-repeat: repeate;';
+
+					unset($item_menu);
+					$tr_ov_menu = array(
+						/* name, url, (target [tw], statusbar [sb]), css, submenu */
+						array(S_TRIGGER, null,  null, 
+							array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))
+							),
+						array(S_EVENTS, 'tr_events.php?triggerid='.$trhosts[$hostname]['triggerid'], array('tw'=>'_blank'))
+						);
+
+					$db_items = DBselect('select distinct i.itemid, i.description, i.key_, i.value_type '.
+						' from items i, functions f '.
+						' where f.itemid=i.itemid and f.triggerid='.$trhosts[$hostname]['triggerid']);
+
+					while($item_data = DBfetch($db_items))
+					{
+						$description = item_description($item_data['description'], $item_data['key_']);
+						switch($item_data['value_type'])
+						{
+							case ITEM_VALUE_TYPE_UINT64:
+							case ITEM_VALUE_TYPE_FLOAT:
+								$action = 'showgraph';
+								$status_bar = S_SHOW_GRAPH_OF_ITEM.' \''.$description.'\'';
+								break;
+							case ITEM_VALUE_TYPE_LOG:
+							case ITEM_VALUE_TYPE_STR:
+							case ITEM_VALUE_TYPE_TEXT:
+							default:
+								$action = 'showlatest';
+								$status_bar = S_SHOW_VALUES_OF_ITEM.' \''.$description.'\'';
+								break;
+						}
+						
+						if(strlen($description) > 25) $description = substr($description,0,22).'...';
+
+						$item_menu[$action][] = array(
+							$description,
+							'history.php?action='.$action.'&itemid='.$item_data['itemid'].'&period=3600',
+							 array('tw'=>'_blank', 'sb'=>$status_bar));
+					}
+					if(isset($item_menu['showgraph']))
+					{
+						$tr_ov_menu[] = array(S_GRAPHS,	null, null,
+							array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))
+							);
+						$tr_ov_menu = array_merge($tr_ov_menu, $item_menu['showgraph']);
+					}
+					if(isset($item_menu['showlatest']))
+					{
+						$tr_ov_menu[] = array(S_VALUES,	null, null, 
+							array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))
+							);
+						$tr_ov_menu = array_merge($tr_ov_menu, $item_menu['showlatest']);
+					}
+
+					unset($item_menu);
 				}
-				array_push($table_row,new CCol(SPACE,$style));
+
+				$status_col = new CCol(SPACE,$style);
+				if(isset($style_img))
+					$status_col->AddOption('style', $style_img);
+
+				if(isset($tr_ov_menu))
+				{
+					$tr_ov_menu  = new CPUMenu($tr_ov_menu,170);
+					$status_col->OnClick($tr_ov_menu->GetOnActionJS());
+				}
+				array_push($table_row,$status_col);
 			}
 			$table->AddRow($table_row);
 		}

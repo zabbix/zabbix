@@ -340,6 +340,7 @@ COpt::profiling_start("page");
 <?php } ?>
     <link rel="stylesheet" href="css.css">
     <meta name="Author" content="ZABBIX SIA">
+    <script type="text/javascript" src="js/common.js"></script>
   </head>
 <body onLoad="zbxCallPostScripts();">
 <?php

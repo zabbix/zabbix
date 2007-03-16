@@ -30,8 +30,6 @@
 
 include_once "include/page_header.php";
 	
-	insert_confirm_javascript();
-
 	$_REQUEST["actiontype"] = get_request("actiontype",get_profile("web.actionconf.actiontype",0));
 ?>
 <?php

@@ -37,9 +37,6 @@
 
 include_once "include/page_header.php";
 	
-	if(!isset($_REQUEST["plaintext"]))
-		insert_confirm_javascript();
-
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION

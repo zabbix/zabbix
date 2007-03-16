@@ -1,5 +1,6 @@
 Changes for 1.3.4:
 
+ - developed PopUp menu for overview (Eugene)
  - added events.source (Alexei)
  - renamed events.triggerid -> events.sourceid (Alexei)
  - new tables drules,dchecks,dhosts,dservices (Alexei)
