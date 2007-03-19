@@ -67,24 +67,24 @@ static void	add_trigger_info(DB_EVENT *event)
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	if(event->objectid == 0)	return;
-
-	result = DBselect("select description,priority,comments,url from triggers where triggerid=" ZBX_FS_UI64,
-		event->objectid);
-	row = DBfetch(result);
-	event->trigger_description[0]=0;
-	zbx_free(event->trigger_comments);
-	zbx_free(event->trigger_url);
-
-	if(row)
+	if(event->object==EVENT_OBJECT_TRIGGER && event->objectid == 0)
 	{
-		strscpy(event->trigger_description, row[0]);
-		event->trigger_priority = atoi(row[1]);
-		event->trigger_comments	= strdup(row[2]);
-		event->trigger_url	= strdup(row[3]);
-	}
+		result = DBselect("select description,priority,comments,url from triggers where triggerid=" ZBX_FS_UI64,
+			event->objectid);
+		row = DBfetch(result);
+		event->trigger_description[0]=0;
+		zbx_free(event->trigger_comments);
+		zbx_free(event->trigger_url);
 
-	DBfree_result(result);
+		if(row)
+		{
+			strscpy(event->trigger_description, row[0]);
+			event->trigger_priority = atoi(row[1]);
+			event->trigger_comments	= strdup(row[2]);
+			event->trigger_url	= strdup(row[3]);
+		}
+		DBfree_result(result);
+	}
 }
 
 /******************************************************************************
@@ -125,8 +125,9 @@ static void	free_trigger_info(DB_EVENT *event)
  ******************************************************************************/
 int	process_event(DB_EVENT *event)
 {
-	zabbix_log(LOG_LEVEL_DEBUG,"In process_event(eventid:" ZBX_FS_UI64 ",objectid:" ZBX_FS_UI64 ")",
+	zabbix_log(LOG_LEVEL_WARNING,"In process_event(eventid:" ZBX_FS_UI64 ",object:%d,objectid:" ZBX_FS_UI64 ")",
 			event->eventid,
+			event->object,
 			event->objectid);
 
 	add_trigger_info(event);
