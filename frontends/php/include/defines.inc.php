@@ -311,6 +311,13 @@
 	define("HTTPSTEP_ITEM_TYPE_TIME",	1);
 	define("HTTPSTEP_ITEM_TYPE_IN",		2);
 	define("HTTPSTEP_ITEM_TYPE_LASTSTEP",	3);
+
+	define('EVENT_SOURCE_TRIGGERS',		0);
+	define('EVENT_SOURCE_DISCOVERY',	1);
+
+	define('EVENT_OBJECT_TRIGGER',		0);
+	define('EVENT_OBJECT_DHOST',		1);
+	define('EVENT_OBJECT_DSERVICE',		2);
 	
 	define("BR",	"<br/>\n");
 	define("SPACE",	"&nbsp;");
