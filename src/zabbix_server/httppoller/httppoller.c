@@ -56,7 +56,11 @@ static int get_minnextcheck(int now)
 
 	int		res;
 
-	result = DBselect("select count(*),min(nextcheck) from httptest t where t.status=%d and " ZBX_SQL_MOD(t.httptestid,%d) "=%d and " ZBX_COND_NODEID, HTTPTEST_STATUS_MONITORED, CONFIG_HTTPPOLLER_FORKS, httppoller_num-1, LOCAL_NODE("t.httptestid"));
+	result = DBselect("select count(*),min(nextcheck) from httptest t where t.status=%d and " ZBX_SQL_MOD(t.httptestid,%d) "=%d and " ZBX_COND_NODEID,
+		HTTPTEST_STATUS_MONITORED,
+		CONFIG_HTTPPOLLER_FORKS,
+		httppoller_num-1,
+		LOCAL_NODE("t.httptestid"));
 
 	row=DBfetch(result);
 
@@ -101,7 +105,8 @@ void main_httppoller_loop(int num)
 	int	now;
 	int	nextcheck,sleeptime;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In main_httppoller_loop(num:%d)", num);
+	zabbix_log( LOG_LEVEL_DEBUG, "In main_httppoller_loop(num:%d)",
+		num);
 
 	httppoller_num = num;
 
@@ -114,10 +119,13 @@ void main_httppoller_loop(int num)
 		now=time(NULL);
 		process_httptests(now);
 
-		zabbix_log( LOG_LEVEL_DEBUG, "Spent %d seconds while processing HTTP tests", (int)time(NULL)-now );
+		zabbix_log( LOG_LEVEL_DEBUG, "Spent %d seconds while processing HTTP tests",
+			(int)time(NULL)-now);
 
 		nextcheck=get_minnextcheck(now);
-		zabbix_log( LOG_LEVEL_DEBUG, "Nextcheck:%d Time:%d", nextcheck, (int)time(NULL) );
+		zabbix_log( LOG_LEVEL_DEBUG, "Nextcheck:%d Time:%d",
+			nextcheck,
+			(int)time(NULL));
 
 		if( FAIL == nextcheck)
 		{

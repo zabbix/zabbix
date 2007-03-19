@@ -93,12 +93,15 @@ void	update_functions(DB_ITEM *item)
 		lastvalue=row[3];
 
 		zabbix_log( LOG_LEVEL_DEBUG, "ItemId:" ZBX_FS_UI64 " Evaluating %s(%d)",
-			function.itemid,function.function,function.parameter);
+			function.itemid,
+			function.function,
+			function.parameter);
 
 		ret = evaluate_function(value,item,function.function,function.parameter);
 		if( FAIL == ret)	
 		{
-			zabbix_log( LOG_LEVEL_DEBUG, "Evaluation failed for function:%s",function.function);
+			zabbix_log( LOG_LEVEL_DEBUG, "Evaluation failed for function:%s",
+				function.function);
 			continue;
 		}
 		if (ret == SUCCEED)
@@ -108,7 +111,10 @@ void	update_functions(DB_ITEM *item)
 			{
 				DBescape_string(value,value_esc,MAX_STRING_LEN);
 				DBexecute("update functions set lastvalue='%s' where itemid=" ZBX_FS_UI64 " and function='%s' and parameter='%s'",
-					value_esc, function.itemid, function.function, function.parameter );
+					value_esc,
+					function.itemid,
+					function.function,
+					function.parameter );
 			}
 			else
 			{
@@ -199,12 +205,15 @@ void	update_services_rec(zbx_uint64_t serviceid)
 			now=time(NULL);
 			DBadd_service_alarm(serviceupid,status,now);
 			DBexecute("update services set status=%d where serviceid=" ZBX_FS_UI64,
-				status,serviceupid);
+				status,
+				serviceupid);
 		}
 		else
 		{
-			zabbix_log( LOG_LEVEL_ERR, "Unknown calculation algorithm of service status [%d]", algorithm);
-			zabbix_syslog("Unknown calculation algorithm of service status [%d]", algorithm);
+			zabbix_log( LOG_LEVEL_ERR, "Unknown calculation algorithm of service status [%d]",
+				algorithm);
+			zabbix_syslog("Unknown calculation algorithm of service status [%d]",
+				algorithm);
 		}
 	}
 	DBfree_result(result);
@@ -244,7 +253,8 @@ void	update_services(zbx_uint64_t triggerid, int status)
 	DB_RESULT result;
 
 	DBexecute("update services set status=%d where triggerid=" ZBX_FS_UI64,
-		status,triggerid);
+		status,
+		triggerid);
 
 	result = DBselect("select serviceid from services where triggerid=" ZBX_FS_UI64,
 		triggerid);
@@ -283,9 +293,13 @@ void	update_triggers(zbx_uint64_t itemid)
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In update_triggers [itemid:" ZBX_FS_UI64 "]", itemid);
+	zabbix_log( LOG_LEVEL_DEBUG, "In update_triggers [itemid:" ZBX_FS_UI64 "]",
+		itemid);
 
-	result = DBselect("select distinct t.triggerid,t.expression,t.status,t.dep_level,t.priority,t.value,t.description from triggers t,functions f,items i where i.status<>%d and i.itemid=f.itemid and t.status=%d and f.triggerid=t.triggerid and f.itemid=" ZBX_FS_UI64,ITEM_STATUS_NOTSUPPORTED, TRIGGER_STATUS_ENABLED, itemid);
+	result = DBselect("select distinct t.triggerid,t.expression,t.status,t.dep_level,t.priority,t.value,t.description from triggers t,functions f,items i where i.status<>%d and i.itemid=f.itemid and t.status=%d and f.triggerid=t.triggerid and f.itemid=" ZBX_FS_UI64,
+		ITEM_STATUS_NOTSUPPORTED,
+		TRIGGER_STATUS_ENABLED,
+		itemid);
 
 	while((row=DBfetch(result)))
 	{
@@ -301,8 +315,12 @@ void	update_triggers(zbx_uint64_t itemid)
 		exp = strdup(trigger.expression);
 		if( evaluate_expression(&exp_value, &exp, trigger.value, error, sizeof(error)) != 0 )
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Expression [%s] cannot be evaluated [%s]",trigger.expression, error);
-			zabbix_syslog("Expression [%s] cannot be evaluated [%s]",trigger.expression, error);
+			zabbix_log( LOG_LEVEL_WARNING, "Expression [%s] cannot be evaluated [%s]",
+				trigger.expression,
+				error);
+			zabbix_syslog("Expression [%s] cannot be evaluated [%s]",
+				trigger.expression,
+				error);
 /*			DBupdate_trigger_value(&trigger, exp_value, time(NULL), error);*//* We shouldn't update triggervalue if expressions failed */
 		}
 		else
@@ -312,7 +330,8 @@ void	update_triggers(zbx_uint64_t itemid)
 		zbx_free(exp);
 	}
 	DBfree_result(result);
-	zabbix_log( LOG_LEVEL_DEBUG, "End update_triggers [%d]", itemid);
+	zabbix_log( LOG_LEVEL_DEBUG, "End update_triggers [" ZBX_FS_UI64 "]",
+		itemid);
 }
 
 void	calc_timestamp(char *line,int *timestamp, char *format)
@@ -360,7 +379,13 @@ void	calc_timestamp(char *line,int *timestamp, char *format)
 		}
 	}
 
-	zabbix_log( LOG_LEVEL_DEBUG, "hh [%d] mm [%d] ss [%d] yyyy [%d] dd [%d] MM [%d]",hh,mm,ss,yyyy,dd,MM);
+	zabbix_log( LOG_LEVEL_DEBUG, "hh [%d] mm [%d] ss [%d] yyyy [%d] dd [%d] MM [%d]",
+		hh,
+		mm,
+		ss,
+		yyyy,
+		dd,
+		MM);
 
 	if(hh!=0&&mm!=0&&ss!=0&&yyyy!=0&&dd!=0&&MM!=0)
 	{
@@ -377,8 +402,10 @@ void	calc_timestamp(char *line,int *timestamp, char *format)
 			*timestamp=t;
 		}
 	}
-	zabbix_log( LOG_LEVEL_DEBUG, "end timestamp [%d]", t);
-	zabbix_log( LOG_LEVEL_DEBUG, "end timestamp [%d]", *timestamp);
+	zabbix_log( LOG_LEVEL_DEBUG, "End timestamp [%d]",
+		t);
+	zabbix_log( LOG_LEVEL_DEBUG, "End timestamp [%d]",
+		*timestamp);
 }
 
 /******************************************************************************
@@ -414,27 +441,48 @@ int	process_data(zbx_sock_t *sock,char *server,char *key,char *value,char *lastl
 	char	server_esc[MAX_STRING_LEN];
 	char	key_esc[MAX_STRING_LEN];
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In process_data([%s],[%s],[%s],[%s])",server,key,value,lastlogsize);
+	zabbix_log( LOG_LEVEL_DEBUG, "In process_data([%s],[%s],[%s],[%s])",
+		server,
+		key,
+		value,
+		lastlogsize);
 
 	init_result(&agent);
 
 	DBescape_string(server, server_esc, MAX_STRING_LEN);
 	DBescape_string(key, key_esc, MAX_STRING_LEN);
 
-	result = DBselect("select %s where h.status=%d and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type in (%d,%d) and" ZBX_COND_NODEID, ZBX_SQL_ITEM_SELECT, HOST_STATUS_MONITORED, server_esc, key_esc, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, LOCAL_NODE("h.hostid"));
+	result = DBselect("select %s where h.status=%d and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type in (%d,%d) and" ZBX_COND_NODEID,
+		ZBX_SQL_ITEM_SELECT,
+		HOST_STATUS_MONITORED,
+		server_esc,
+		key_esc,
+		ITEM_STATUS_ACTIVE,
+		ITEM_TYPE_TRAPPER,
+		ITEM_TYPE_ZABBIX_ACTIVE,
+		LOCAL_NODE("h.hostid"));
 
 	row=DBfetch(result);
 
 	if(!row)
 	{
-		zabbix_log( LOG_LEVEL_DEBUG, "Before checking autoregistration for [%s]",server);
+		zabbix_log( LOG_LEVEL_DEBUG, "Before checking autoregistration for [%s]",
+			server);
 
 		if(autoregister(server) == SUCCEED)
 		{
 			DBfree_result(result);
 
 			/* Same SQL */
-			result = DBselect("select %s where h.status=%d and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type in (%d,%d) and" ZBX_COND_NODEID, ZBX_SQL_ITEM_SELECT, HOST_STATUS_MONITORED, server_esc, key_esc, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, LOCAL_NODE("h.hostid"));
+			result = DBselect("select %s where h.status=%d and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type in (%d,%d) and" ZBX_COND_NODEID,
+				ZBX_SQL_ITEM_SELECT,
+				HOST_STATUS_MONITORED,
+				server_esc,
+				key_esc,
+				ITEM_STATUS_ACTIVE,
+				ITEM_TYPE_TRAPPER,
+				ITEM_TYPE_ZABBIX_ACTIVE,
+				LOCAL_NODE("h.hostid"));
 			row = DBfetch(result);
 			if(!row)
 			{
@@ -457,12 +505,17 @@ int	process_data(zbx_sock_t *sock,char *server,char *key,char *value,char *lastl
 		return  FAIL;
 	}
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Processing [%s]", value);
+	zabbix_log( LOG_LEVEL_DEBUG, "Processing [%s]",
+		value);
 
 	if(strcmp(value,"ZBX_NOTSUPPORTED") ==0)
 	{
-			zabbix_log( LOG_LEVEL_WARNING, "Active parameter [%s] is not supported by agent on host [%s]", item.key, item.host_name);
-			zabbix_syslog("Active parameter [%s] is not supported by agent on host [%s]", item.key, item.host_name);
+			zabbix_log( LOG_LEVEL_WARNING, "Active parameter [%s] is not supported by agent on host [%s]",
+				item.key,
+				item.host_name);
+			zabbix_syslog("Active parameter [%s] is not supported by agent on host [%s]",
+				item.key,
+				item.host_name);
 			DBupdate_item_status_to_notsupported(item.itemid, "Not supported by agent");
 	}
 	
@@ -478,7 +531,10 @@ int	process_data(zbx_sock_t *sock,char *server,char *key,char *value,char *lastl
 
 		item.eventlog_severity=atoi(severity);
 		item.eventlog_source=source;
-		zabbix_log(LOG_LEVEL_DEBUG, "Value [%s] Lastlogsize [%s] Timestamp [%s]", value, lastlogsize, timestamp);
+		zabbix_log(LOG_LEVEL_DEBUG, "Value [%s] Lastlogsize [%s] Timestamp [%s]",
+			value,
+			lastlogsize,
+			timestamp);
 	}
 
 	if(set_result_type(&agent, item.value_type, value) == SUCCEED)
@@ -488,8 +544,14 @@ int	process_data(zbx_sock_t *sock,char *server,char *key,char *value,char *lastl
 	}
 	else
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Type of received value [%s] is not suitable for [%s@%s]", value, item.key, item.host_name);
-		zabbix_syslog("Type of received value [%s] is not suitable for [%s@%s]", value, item.key, item.host_name);
+		zabbix_log( LOG_LEVEL_WARNING, "Type of received value [%s] is not suitable for [%s@%s]",
+			value,
+			item.key,
+			item.host_name);
+		zabbix_syslog("Type of received value [%s] is not suitable for [%s@%s]",
+			value,
+			item.key,
+			item.host_name);
 	}
  
 	DBfree_result(result);
@@ -518,16 +580,27 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 {
 	int ret = SUCCEED;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In add_history(%s,,%X,%X)", item->key, item->value_type,value->type);
+	zabbix_log( LOG_LEVEL_DEBUG, "In add_history(%s,,%X,%X)",
+		item->key,
+		item->value_type,
+		value->type);
 
 	if(value->type & AR_UINT64)
-		zabbix_log( LOG_LEVEL_DEBUG, "In add_history(%d,UINT64:" ZBX_FS_UI64 ")", item->itemid, value->ui64);
+		zabbix_log( LOG_LEVEL_DEBUG, "In add_history(%d,UINT64:" ZBX_FS_UI64 ")",
+			item->itemid,
+			value->ui64);
 	if(value->type & AR_STRING)
-		zabbix_log( LOG_LEVEL_DEBUG, "In add_history(%d,STRING:%s)", item->itemid, value->str);
+		zabbix_log( LOG_LEVEL_DEBUG, "In add_history(%d,STRING:%s)",
+			item->itemid,
+			value->str);
 	if(value->type & AR_DOUBLE)
-		zabbix_log( LOG_LEVEL_DEBUG, "In add_history(%d,DOUBLE:" ZBX_FS_DBL ")", item->itemid, value->dbl);
+		zabbix_log( LOG_LEVEL_DEBUG, "In add_history(%d,DOUBLE:" ZBX_FS_DBL ")",
+			item->itemid,
+			value->dbl);
 	if(value->type & AR_TEXT)
-		zabbix_log( LOG_LEVEL_DEBUG, "In add_history(%d,TEXT:[%s])", item->itemid, value->text);
+		zabbix_log( LOG_LEVEL_DEBUG, "In add_history(%d,TEXT:[%s])",
+			item->itemid,
+			value->text);
 
 	if(item->history>0)
 	{
@@ -593,8 +666,12 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 			}
 			else
 			{
-				zabbix_log(LOG_LEVEL_ERR, "Value not stored for itemid [%d]. Unknown delta [%d]", item->itemid, item->delta);
-				zabbix_syslog("Value not stored for itemid [%d]. Unknown delta [%d]", item->itemid, item->delta);
+				zabbix_log(LOG_LEVEL_ERR, "Value not stored for itemid [%d]. Unknown delta [%d]",
+					item->itemid,
+					item->delta);
+				zabbix_syslog("Value not stored for itemid [%d]. Unknown delta [%d]",
+					item->itemid,
+					item->delta);
 				ret = FAIL;
 			}
 		}
@@ -608,7 +685,8 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 			if(GET_STR_RESULT(value))
 				DBadd_history_log(item->itemid,value->str,now,item->timestamp,item->eventlog_source,item->eventlog_severity);
 			DBexecute("update items set lastlogsize=%d where itemid=" ZBX_FS_UI64,
-				item->lastlogsize,item->itemid);
+				item->lastlogsize,
+				item->itemid);
 		}
 		else if(item->value_type==ITEM_VALUE_TYPE_TEXT)
 		{
@@ -618,7 +696,8 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 		else
 		{
 			zabbix_log(LOG_LEVEL_ERR, "Unknown value type [%d] for itemid [" ZBX_FS_UI64 "]",
-				item->value_type,item->itemid);
+				item->value_type,
+				item->itemid);
 		}
 	}
 
@@ -781,10 +860,16 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 /* Update item status if required */
 	if(item->status == ITEM_STATUS_NOTSUPPORTED)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Parameter [%s] became supported by agent on host [%s]", item->key, item->host_name);
-		zabbix_syslog("Parameter [%s] became supported by agent on host [%s]", item->key, item->host_name);
+		zabbix_log( LOG_LEVEL_WARNING, "Parameter [%s] became supported by agent on host [%s]",
+			item->key,
+			item->host_name);
+		zabbix_syslog("Parameter [%s] became supported by agent on host [%s]",
+			item->key,
+			item->host_name);
 		item->status = ITEM_STATUS_ACTIVE;
-		DBexecute("update items set status=%d where itemid=" ZBX_FS_UI64, ITEM_STATUS_ACTIVE, item->itemid);
+		DBexecute("update items set status=%d where itemid=" ZBX_FS_UI64,
+			ITEM_STATUS_ACTIVE,
+			item->itemid);
 	}
 
 	/* Required for nodata() */
@@ -813,7 +898,8 @@ void	process_new_value(DB_ITEM *item, AGENT_RESULT *value)
 {
 	time_t 	now;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In process_new_value(%s)", item->key);
+	zabbix_log( LOG_LEVEL_DEBUG, "In process_new_value(%s)",
+		item->key);
 
 	now = time(NULL);
 

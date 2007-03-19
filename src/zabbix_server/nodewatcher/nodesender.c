@@ -67,19 +67,29 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 
 	memset(xml,0,allocated);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In send_config_data(nodeid:%d,dest_node:%d,maxlogid:" ZBX_FS_UI64 ",type:%d)",nodeid, dest_nodeid,maxlogid,node_type);
+	zabbix_log( LOG_LEVEL_DEBUG, "In send_config_data(nodeid:%d,dest_node:%d,maxlogid:" ZBX_FS_UI64 ",type:%d)",
+		nodeid,
+		dest_nodeid,
+		maxlogid,
+		node_type);
 
 	/* Begin work */
 	if(node_type == ZBX_NODE_MASTER)
 	{
-		result=DBselect("select tablename,recordid,operation from node_configlog where nodeid=" ZBX_FS_UI64  " and sync_master=0 and conflogid<=" ZBX_FS_UI64 " order by tablename,operation", nodeid, maxlogid);
+		result=DBselect("select tablename,recordid,operation from node_configlog where nodeid=" ZBX_FS_UI64  " and sync_master=0 and conflogid<=" ZBX_FS_UI64 " order by tablename,operation",
+			nodeid,
+			maxlogid);
 	}
 	else
 	{
-		result=DBselect("select tablename,recordid,operation from node_configlog where nodeid=" ZBX_FS_UI64 " and sync_slave=0 and conflogid<=" ZBX_FS_UI64 " order by tablename,operation", nodeid, maxlogid);
+		result=DBselect("select tablename,recordid,operation from node_configlog where nodeid=" ZBX_FS_UI64 " and sync_slave=0 and conflogid<=" ZBX_FS_UI64 " order by tablename,operation",
+			nodeid,
+			maxlogid);
 	}
 
-	zbx_snprintf_alloc(&xml, &allocated, &offset, 128, "Data|%d|%d", CONFIG_NODEID, nodeid);
+	zbx_snprintf_alloc(&xml, &allocated, &offset, 128, "Data|%d|%d",
+		CONFIG_NODEID,
+		nodeid);
 
 	while((row=DBfetch(result)))
 	{
@@ -103,7 +113,11 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 			}
 			if(fields[0]!=0)	fields[strlen(fields)-1]=0;
 
-			result2=DBselect("select %s from %s where %s=%s", fields, row[0], tables[i].recid,row[1]);
+			result2=DBselect("select %s from %s where %s=%s",
+				fields,
+				row[0],
+				tables[i].recid,
+				row[1]);
 /*			zabbix_log( LOG_LEVEL_WARNING,"select %s from %s where %s=%s",fields, row[0], tables[i].recid,row[1]);*/
  
 			row2=DBfetch(result2);
@@ -111,7 +125,9 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 			if(row2)
 			{
 				zbx_snprintf_alloc(&xml, &allocated, &offset, 16*1024, "\n%s|%s|%s",
-					row[0], row[1], row[2]);
+					row[0],
+					row[1],
+					row[2]);
 				/* for each field */
 				for(j=0;tables[i].fields[j].name!=0;j++)
 				{
@@ -121,36 +137,47 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 					{
 /*						zabbix_log( LOG_LEVEL_WARNING, "Field name [%s] [%s]",tables[i].fields[j].name,row2[j]);*/
 						zbx_snprintf_alloc(&xml, &allocated, &offset, 16*1024, "|%d|%d|NULL",
-							tables[i].fields[j].name,tables[i].fields[j].type);
+							tables[i].fields[j].name,
+							tables[i].fields[j].type);
 					}
 					else
 					{
 						zbx_snprintf_alloc(&xml, &allocated, &offset, 16*1024, "|%s|%d|%s",
-							tables[i].fields[j].name,tables[i].fields[j].type,row2[j]);
+							tables[i].fields[j].name,
+							tables[i].fields[j].type,
+							row2[j]);
 					}
 				}
 			}
 			else
 			{
-				zabbix_log( LOG_LEVEL_WARNING, "Cannot select %s from table [%s]",tables[i].fields[j],row[0]);
+				zabbix_log( LOG_LEVEL_WARNING, "Cannot select %s from table [%s]",
+					tables[i].fields[j],
+					row[0]);
 			}
 			DBfree_result(result2);
 		}
 		else
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Cannot find table [%s]",row[0]);
+			zabbix_log( LOG_LEVEL_WARNING, "Cannot find table [%s]",
+				row[0]);
 		}
 	}
-	zabbix_log( LOG_LEVEL_DEBUG, "DATA [%s]",xml);
+	zabbix_log( LOG_LEVEL_DEBUG, "DATA [%s]",
+		xml);
 	if( (found == 1) && send_to_node(dest_nodeid, nodeid, xml) == SUCCEED)
 	{
 		if(node_type == ZBX_NODE_MASTER)
 		{
-			DBexecute("update node_configlog set sync_master=1 where nodeid=%d and sync_master=0 and conflogid<=" ZBX_FS_UI64, nodeid, maxlogid);
+			DBexecute("update node_configlog set sync_master=1 where nodeid=%d and sync_master=0 and conflogid<=" ZBX_FS_UI64,
+				nodeid,
+				maxlogid);
 		}
 		else
 		{
-			DBexecute("update node_configlog set sync_slave=1 where nodeid=%d and sync_slave=0 and conflogid<=" ZBX_FS_UI64, nodeid, maxlogid);
+			DBexecute("update node_configlog set sync_slave=1 where nodeid=%d and sync_slave=0 and conflogid<=" ZBX_FS_UI64,
+				nodeid,
+				maxlogid);
 		}
 	}
 
@@ -184,9 +211,11 @@ static int get_slave_node(int nodeid)
 	int		ret = 0;
 	int		m;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In get_slave_node(%d)", nodeid);
+	zabbix_log( LOG_LEVEL_DEBUG, "In get_slave_node(%d)",
+		nodeid);
 
-	result = DBselect("select masterid from nodes where nodeid=%d", nodeid);
+	result = DBselect("select masterid from nodes where nodeid=%d",
+		nodeid);
 	row = DBfetch(result);
 	if(row)
 	{
@@ -228,9 +257,11 @@ int get_master_node(int nodeid)
 	DB_ROW		row;
 	int		ret = 0;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In get_master_node(%d)", nodeid);
+	zabbix_log( LOG_LEVEL_DEBUG, "In get_master_node(%d)",
+		nodeid);
 
-	result = DBselect("select masterid from nodes where nodeid=%d", CONFIG_NODEID);
+	result = DBselect("select masterid from nodes where nodeid=%d",
+		CONFIG_NODEID);
 	row = DBfetch(result);
 	if(row)
 	{
@@ -265,15 +296,18 @@ static int send_to_master_and_slave(int nodeid)
 	int		master_result, slave_result;
 	zbx_uint64_t	maxlogid;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In send_to_master_and_slave(node:%d)", nodeid);
+	zabbix_log( LOG_LEVEL_DEBUG, "In send_to_master_and_slave(node:%d)",
+		nodeid);
 
-	result = DBselect("select max(conflogid) from node_configlog where nodeid=%d", nodeid);
+	result = DBselect("select max(conflogid) from node_configlog where nodeid=%d",
+		nodeid);
 
 	row = DBfetch(result);
 
 	if(DBis_null(row[0]) == SUCCEED)
 	{
-		zabbix_log( LOG_LEVEL_DEBUG, "No configuration changes of node %d", nodeid);
+		zabbix_log( LOG_LEVEL_DEBUG, "No configuration changes of node %d",
+			nodeid);
 		DBfree_result(result);
 		return SUCCEED;
 	}
@@ -298,7 +332,9 @@ static int send_to_master_and_slave(int nodeid)
 	{
 		if((master_result == SUCCEED) && (slave_result == SUCCEED))
 		{
-			DBexecute("delete from node_configlog where nodeid=%d and sync_slave=1 and sync_master=1 and conflogid<=" ZBX_FS_UI64, nodeid, maxlogid);
+			DBexecute("delete from node_configlog where nodeid=%d and sync_slave=1 and sync_master=1 and conflogid<=" ZBX_FS_UI64,
+				nodeid,
+				maxlogid);
 		}
 	}
 
@@ -306,7 +342,9 @@ static int send_to_master_and_slave(int nodeid)
 	{
 		if(master_result == SUCCEED)
 		{
-			DBexecute("delete from node_configlog where nodeid=%d and sync_master=1 and conflogid<=" ZBX_FS_UI64, nodeid, maxlogid);
+			DBexecute("delete from node_configlog where nodeid=%d and sync_master=1 and conflogid<=" ZBX_FS_UI64,
+				nodeid,
+				maxlogid);
 		}
 	}
 
@@ -314,7 +352,9 @@ static int send_to_master_and_slave(int nodeid)
 	{
 		if(slave_result == SUCCEED)
 		{
-			DBexecute("delete from node_configlog where nodeid=%d and sync_slave=1 and conflogid<=" ZBX_FS_UI64, nodeid, maxlogid);
+			DBexecute("delete from node_configlog where nodeid=%d and sync_slave=1 and conflogid<=" ZBX_FS_UI64,
+				nodeid,
+				maxlogid);
 		}
 	}
 
@@ -343,11 +383,13 @@ static int process_node(int nodeid)
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In process_node(node:%d)", nodeid);
+	zabbix_log( LOG_LEVEL_DEBUG, "In process_node(node:%d)",
+		nodeid);
 
 	send_to_master_and_slave(nodeid);
 
-	result = DBselect("select nodeid from nodes where masterid=%d", nodeid);
+	result = DBselect("select nodeid from nodes where masterid=%d",
+		nodeid);
 	while((row=DBfetch(result)))
 	{
 		process_node(atoi(row[0]));
@@ -379,7 +421,8 @@ void main_nodesender()
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In main_nodesender()");
 
-	result = DBselect("select nodeid from nodes where nodetype=%d", ZBX_NODE_TYPE_LOCAL);
+	result = DBselect("select nodeid from nodes where nodetype=%d",
+		ZBX_NODE_TYPE_LOCAL);
 
 	row = DBfetch(result);
 

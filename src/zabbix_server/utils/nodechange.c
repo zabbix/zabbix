@@ -146,7 +146,9 @@ int change_nodeid(int old_id, int new_id)
 			if(tables[i].fields[j].type == ZBX_TYPE_ID)
 			{
 				DBexecute("update %s set %s=%s+" ZBX_FS_UI64 " where %s>0\n",
-					tables[i].table, tables[i].fields[j].name, tables[i].fields[j].name,
+					tables[i].table,
+					tables[i].fields[j].name,
+					tables[i].fields[j].name,
 					(zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)new_id,
 					tables[i].fields[j].name);
 			}
@@ -162,11 +164,13 @@ int change_nodeid(int old_id, int new_id)
 		convert_trigger_expression(old_id, new_id, row[0], new_expression);
 		DBescape_string(new_expression, new_expression_esc,MAX_STRING_LEN);
 		DBexecute("update triggers set expression='%s' where triggerid=%s",
-				new_expression_esc, row[1]);
+				new_expression_esc,
+				row[1]);
 	}
 	DBfree_result(result);
 
-	DBexecute("insert into nodes (nodeid,name,ip,nodetype) values (%d,'Local node','127.0.0.1',1)", new_id);
+	DBexecute("insert into nodes (nodeid,name,ip,nodetype) values (%d,'Local node','127.0.0.1',1)",
+		new_id);
 	DBcommit();
 	
 	DBclose();

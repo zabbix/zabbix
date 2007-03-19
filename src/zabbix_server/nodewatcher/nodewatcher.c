@@ -64,7 +64,8 @@ static int calculate_checksums()
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In calculate_checksums");
 
-	DBexecute("delete from node_cksum where cksumtype=%d", NODE_CKSUM_TYPE_NEW);
+	DBexecute("delete from node_cksum where cksumtype=%d",
+		NODE_CKSUM_TYPE_NEW);
 
 	/* Select all nodes */
 	result =DBselect("select nodeid from nodes");
@@ -92,7 +93,9 @@ static int calculate_checksums()
 #else
 					"union all select '%s','%s',%s,md5(",
 #endif
-					tables[i].table, tables[i].recid, tables[i].recid);
+					tables[i].table,
+					tables[i].recid,
+					tables[i].recid);
 
 			j=0;
 			while(tables[i].fields[j].name != 0)
@@ -103,9 +106,11 @@ static int calculate_checksums()
 					continue;
 				}
 #ifdef	HAVE_MYSQL
-				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, "coalesce(%s,'1234567890'),", tables[i].fields[j].name);
+				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, "coalesce(%s,'1234567890'),",
+					tables[i].fields[j].name);
 #else
-				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, "coalesce(%s,'1234567890')||", tables[i].fields[j].name);
+				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, "coalesce(%s,'1234567890')||",
+					tables[i].fields[j].name);
 #endif
 				j++;
 			}
@@ -123,8 +128,10 @@ static int calculate_checksums()
 					") from %s where %s>=" ZBX_FS_UI64 " and %s<=" ZBX_FS_UI64 "\n",
 #endif
 					tables[i].table,
-					tables[i].recid, (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid,
-					tables[i].recid, (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid+__UINT64_C(99999999999999));
+					tables[i].recid,
+					(zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid,
+					tables[i].recid,
+					(zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid+__UINT64_C(99999999999999));
 
 		}
 /*		zabbix_log( LOG_LEVEL_WARNING, "SQL DUMP [%s]", sql); */
@@ -139,7 +146,12 @@ static int calculate_checksums()
 			DBexecute("insert into node_cksum (cksumid,nodeid,tablename,fieldname,recordid,cksumtype,cksum) "\
 				"values (" ZBX_FS_UI64 ",%d,'%s','%s',%s,%d,'%s')",
 				DBget_nextid("node_cksum","cksumid"),
-				nodeid,row2[0],row2[1],row2[2],NODE_CKSUM_TYPE_NEW,row2[3]);
+				nodeid,
+				row2[0],
+				row2[1],
+				row2[2],
+				NODE_CKSUM_TYPE_NEW,
+				row2[3]);
 			i++;
 		}
 		DBfree_result(result2);
@@ -168,8 +180,11 @@ static int calculate_checksums()
  ******************************************************************************/
 static int update_checksums()
 {
-	DBexecute("delete from node_cksum where cksumtype=%d", NODE_CKSUM_TYPE_OLD);
-	DBexecute("update node_cksum set cksumtype=%d where cksumtype=%d", NODE_CKSUM_TYPE_OLD, NODE_CKSUM_TYPE_NEW);
+	DBexecute("delete from node_cksum where cksumtype=%d",
+		NODE_CKSUM_TYPE_OLD);
+	DBexecute("update node_cksum set cksumtype=%d where cksumtype=%d",
+		NODE_CKSUM_TYPE_OLD,
+		NODE_CKSUM_TYPE_NEW);
 
 	return SUCCEED;
 }
@@ -197,14 +212,19 @@ static int compare_checksums()
 	DB_ROW		row;
 
 	/* Find updated records */
-	result = DBselect("select curr.nodeid,curr.tablename,curr.recordid from node_cksum prev, node_cksum curr where curr.tablename=prev.tablename and curr.recordid=prev.recordid and curr.fieldname=prev.fieldname and curr.nodeid=prev.nodeid and curr.cksum<>prev.cksum and curr.cksumtype=%d and prev.cksumtype=%d", NODE_CKSUM_TYPE_NEW, NODE_CKSUM_TYPE_OLD);
+	result = DBselect("select curr.nodeid,curr.tablename,curr.recordid from node_cksum prev, node_cksum curr where curr.tablename=prev.tablename and curr.recordid=prev.recordid and curr.fieldname=prev.fieldname and curr.nodeid=prev.nodeid and curr.cksum<>prev.cksum and curr.cksumtype=%d and prev.cksumtype=%d",
+		NODE_CKSUM_TYPE_NEW,
+		NODE_CKSUM_TYPE_OLD);
 	while((row=DBfetch(result)))
 	{
 /*		zabbix_log( LOG_LEVEL_WARNING, "Adding record to node_configlog");*/
 		DBexecute("insert into node_configlog (conflogid,nodeid,tablename,recordid,operation)" \
 				"values (" ZBX_FS_UI64 ",%s,'%s',%s,%d)",
 				DBget_nextid("node_configlog","conflogid"),
-				row[0],row[1],row[2],NODE_CONFIGLOG_OP_UPDATE);
+				row[0],
+				row[1],
+				row[2],
+				NODE_CONFIGLOG_OP_UPDATE);
 	}
 	DBfree_result(result);
 
@@ -212,7 +232,8 @@ static int compare_checksums()
 	result = DBselect("select curr.nodeid,curr.tablename,curr.recordid from node_cksum curr" \
 			  " left join node_cksum prev" \
 			  " on curr.tablename=prev.tablename and curr.recordid=prev.recordid and curr.fieldname=prev.fieldname and curr.nodeid=prev.nodeid and curr.cksumtype<>prev.cksumtype" \
-			  " where prev.cksumid is null and curr.cksumtype=%d", NODE_CKSUM_TYPE_NEW);
+			  " where prev.cksumid is null and curr.cksumtype=%d",
+			NODE_CKSUM_TYPE_NEW);
 
 	while((row=DBfetch(result)))
 	{
@@ -220,7 +241,10 @@ static int compare_checksums()
 		DBexecute("insert into node_configlog (conflogid,nodeid,tablename,recordid,operation)" \
 			"values (" ZBX_FS_UI64 ",%s,'%s',%s,%d)",
 			DBget_nextid("node_configlog","conflogid"),
-			row[0],row[1],row[2],NODE_CONFIGLOG_OP_ADD);
+			row[0],
+			row[1],
+			row[2],
+			NODE_CONFIGLOG_OP_ADD);
 	}
 	DBfree_result(result);
 
@@ -228,7 +252,8 @@ static int compare_checksums()
 	result = DBselect("select curr.nodeid,curr.tablename,curr.recordid from node_cksum curr" \
 			  " left join node_cksum prev" \
 			  " on curr.tablename=prev.tablename and curr.recordid=prev.recordid and curr.fieldname=prev.fieldname and curr.nodeid=prev.nodeid and curr.cksumtype<>prev.cksumtype" \
-			  " where prev.cksumid is null and curr.cksumtype=%d", NODE_CKSUM_TYPE_OLD);
+			  " where prev.cksumid is null and curr.cksumtype=%d",
+			NODE_CKSUM_TYPE_OLD);
 
 	while((row=DBfetch(result)))
 	{
@@ -236,7 +261,10 @@ static int compare_checksums()
 		DBexecute("insert into node_configlog (conflogid,nodeid,tablename,recordid,operation)" \
 				"values (" ZBX_FS_UI64 ",%s,'%s',%s,%d)",
 				DBget_nextid("node_configlog","conflogid"),
-				row[0],row[1],row[2],NODE_CONFIGLOG_OP_DELETE);
+				row[0],
+				row[1],
+				row[2],
+				NODE_CONFIGLOG_OP_DELETE);
 	}
 	DBfree_result(result);
 
@@ -299,10 +327,12 @@ int main_nodewatcher_loop()
 
 		end = time(NULL);
 
-		if(end-start<5)
+		if(end-start<10)
 		{
-			zbx_setproctitle("sender [sleeping for %d seconds]", 5-(end-start));
-			zabbix_log( LOG_LEVEL_DEBUG, "Sleeping %d seconds", 5-(end-start));
+			zbx_setproctitle("sender [sleeping for %d seconds]",
+				10-(end-start));
+			zabbix_log( LOG_LEVEL_DEBUG, "Sleeping %d seconds",
+				10-(end-start));
 			sleep(10-(end-start));
 		}
 	}
