@@ -69,8 +69,8 @@ include_once "include/page_header.php";
         $result=DBselect("select h.host, t.triggerid, t.description, t.priority, count(distinct e.eventid) as count ".
 		" from hosts h, triggers t, functions f, items i, events e where ".
 		" h.hostid = i.hostid and i.itemid = f.itemid and t.triggerid=f.triggerid and ".
-		" t.triggerid=e.triggerid and e.clock>".(time()-$time_dif).
-		" and h.hostid in (".$accessible_hosts.") and ".DBid2nodeid("e.triggerid")."=".$ZBX_CURNODEID.
+		' t.triggerid=e.objectid and e.object='.EVENT_OBJECT_TRIGGER.' and e.clock>'.(time()-$time_dif).
+		" and h.hostid in (".$accessible_hosts.") and ".DBid2nodeid("t.triggerid")."=".$ZBX_CURNODEID.
 		" group by h.host,t.triggerid,t.description,t.priority ".
 		" order by count desc, h.host, t.description, t.triggerid", 100);
 

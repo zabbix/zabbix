@@ -42,7 +42,7 @@
 		$result = DBselect("select distinct t.triggerid,t.priority,t.description,h.host,e.clock,e.value ".
 			" from events e, triggers t, functions f, items i, hosts h ".$sql_from.
 			" where ".DBid2nodeid("t.triggerid")."=".$nodeid.
-			" and e.triggerid=t.triggerid and t.triggerid=f.triggerid and f.itemid=i.itemid ".
+			' and e.objectid=t.triggerid and e.object='.EVENT_OBJECT_TRIGGER.' and t.triggerid=f.triggerid and f.itemid=i.itemid '.
 			" and i.hostid=h.hostid ".$sql_cond." and h.status=".HOST_STATUS_MONITORED.
 			" order by e.clock desc,h.host,t.priority,t.description,t.triggerid ",
 			10*($start+$num)
