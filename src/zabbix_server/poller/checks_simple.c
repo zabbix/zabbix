@@ -36,24 +36,30 @@ int	get_value_simple(DB_ITEM *item, AGENT_RESULT *result)
 
 	init_result(result);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_simple([%s]", item->key);
+	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_simple([%s]",
+		item->key);
 
 	if(0 == strncmp(item->key,"service.ntp",11))
 	{
 		l=strstr(item->key,"[");
 		r=strstr(item->key,"]");
 		if(l==NULL || r==NULL)
-			zbx_snprintf(c,sizeof(c),"net.tcp.service[%s]",item->key);
+			zbx_snprintf(c,sizeof(c),"net.tcp.service[%s]",
+				item->key);
 		else
 		{
 			zbx_strlcpy( param,l+1, r-l-1);
 			if(item->useip==1)
 			{
-				zbx_snprintf(c,sizeof(c),"net.tcp.service[%s,%s]",item->key,item->host_ip);
+				zbx_snprintf(c,sizeof(c),"net.tcp.service[%s,%s]",
+					item->key,
+					item->host_ip);
 			}
 			else
 			{
-				zbx_snprintf(c,sizeof(c),"net.tcp.service[%s,%s]",item->key,item->host_ip);
+				zbx_snprintf(c,sizeof(c),"net.tcp.service[%s,%s]",
+					item->key,
+					item->host_ip);
 			}
 		}
 	}
@@ -64,18 +70,22 @@ int	get_value_simple(DB_ITEM *item, AGENT_RESULT *result)
 			l=strstr(item->key,"[");
 			r=strstr(item->key,"]");
 			if(l==NULL || r==NULL)
-				zbx_snprintf(c,sizeof(c),"%s",item->key);
+				zbx_snprintf(c,sizeof(c),"%s",
+					item->key);
 			else
 			{
 				zbx_strlcpy( param,l+1, r-l-1);
 /*				zbx_snprintf(c,sizeof(c),"dns[%s,%s]",item->ip,param);*/
-				zbx_snprintf(c,sizeof(c),"dns[%s]",param);
+				zbx_snprintf(c,sizeof(c),"dns[%s]",
+					param);
 			}
 		}
 		else
 		{
-			zbx_snprintf(error,sizeof(error),"You must use IP address in Host %s definition", item->host_name);
-			zabbix_log( LOG_LEVEL_WARNING, "%s", error);
+			zbx_snprintf(error,sizeof(error),"You must use IP address in Host %s definition",
+				item->host_name);
+			zabbix_log( LOG_LEVEL_WARNING, "%s",
+				error);
 			result->str=strdup(error);
 			return NOTSUPPORTED;
 		}
@@ -108,16 +118,20 @@ int	get_value_simple(DB_ITEM *item, AGENT_RESULT *result)
 			}
 			else
 			{
-				zbx_snprintf(error,sizeof(error),"Port number must be numeric in [%s]", item->key);
-				zabbix_log( LOG_LEVEL_WARNING, "%s", error);
+				zbx_snprintf(error,sizeof(error),"Port number must be numeric in [%s]",
+					item->key);
+				zabbix_log( LOG_LEVEL_WARNING, "%s",
+					error);
 				result->str=strdup(error);
 				ret = NOTSUPPORTED;
 			}
 		}
 		else
 		{
-			zbx_snprintf(error,sizeof(error),"Too many parameters in [%s]", item->key);
-			zabbix_log( LOG_LEVEL_WARNING, "%s", error);
+			zbx_snprintf(error,sizeof(error),"Too many parameters in [%s]",
+				item->key);
+			zabbix_log( LOG_LEVEL_WARNING, "%s",
+				error);
 			result->str=strdup(error);
 			ret = NOTSUPPORTED;
 		}
@@ -143,13 +157,21 @@ int	get_value_simple(DB_ITEM *item, AGENT_RESULT *result)
 
 			if(port_int == 0)
 			{
-				zbx_snprintf(c,sizeof(c),"%s[%s,%s]",service_sysinfo,service,ip);
+				zbx_snprintf(c,sizeof(c),"%s[%s,%s]",
+					service_sysinfo,
+					service,
+					ip);
 			}
 			else
 			{
-				zbx_snprintf(c,sizeof(c),"%s[%s,%s,%d]",service_sysinfo,service,ip,port_int);
+				zbx_snprintf(c,sizeof(c),"%s[%s,%s,%d]",
+					service_sysinfo,
+					service,
+					ip,
+					port_int);
 			}
-			zabbix_log( LOG_LEVEL_DEBUG, "Sysinfo [%s]", c);
+			zabbix_log( LOG_LEVEL_DEBUG, "Sysinfo [%s]",
+				c);
 		}
 		else
 		{
@@ -187,8 +209,10 @@ int	get_value_simple(DB_ITEM *item, AGENT_RESULT *result)
 
 	if(process(c, 0, result) == NOTSUPPORTED)
 	{
-		zbx_snprintf(error,sizeof(error),"Simple check [%s] is not supported", c);
-		zabbix_log( LOG_LEVEL_WARNING, "%s", error);
+		zbx_snprintf(error,sizeof(error),"Simple check [%s] is not supported",
+			c);
+		zabbix_log( LOG_LEVEL_WARNING, "%s",
+			error);
 		result->str=strdup(error);
 		ret = NOTSUPPORTED;
 	}

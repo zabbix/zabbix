@@ -187,12 +187,13 @@ static void register_host(DB_DHOST *host,DB_DCHECK *check, zbx_uint64_t druleid,
 		/* Add host only if service is up */
 		if(check->status == SERVICE_UP)
 		{
+			zabbix_log(LOG_LEVEL_WARNING, "New host discovered at %s",
+				ip);
 			host->dhostid = DBget_maxid("dhosts","dhostid");
 			DBexecute("insert into dhosts (dhostid,druleid,ip) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s')",
 				host->dhostid,
 				druleid,
 				ip);
-			zabbix_log(LOG_LEVEL_WARNING, "New host discovered at %s", ip);
 			host->druleid	= druleid;
 			strscpy(host->ip,ip);
 			host->status	= 0;
@@ -239,7 +240,9 @@ static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 	DB_DHOST	host;
 
 	zabbix_log(LOG_LEVEL_WARNING, "In update_check(ip:%s, port:%d, status:%s)",
-		ip, port, (check->status==SERVICE_UP?"up":"down"));
+		ip,
+		port,
+		(check->status==SERVICE_UP?"up":"down"));
 
 	/* Register host if is not registered yet */
 	register_host(&host,check,rule->druleid,ip);
@@ -299,7 +302,8 @@ static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 	{
 		if(host.status == SERVICE_UP && (host.lastup<=now-rule->upevent))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Generating host event for %s", host.ip);
+			zabbix_log(LOG_LEVEL_WARNING, "Generating host event for %s",
+				host.ip);
 			host.eventsent=1;
 
 			update_dhost(&host);
@@ -307,7 +311,8 @@ static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 		}
 		if(host.status == SERVICE_DOWN && (host.lastdown<=now-rule->downevent))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Generating host event for %s", host.ip);
+			zabbix_log(LOG_LEVEL_WARNING, "Generating host event for %s",
+				host.ip);
 			host.eventsent=1;
 			update_dhost(&host);
 		}
@@ -338,37 +343,57 @@ static int discover_service(zbx_dservice_type_t type, char *ip, int port)
 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In discover_service(ip:%s, port:%d, type:%d)",
-		ip, port, type);
+		ip,
+		port,
+		type);
 
 	init_result(&value);
 
 	switch(type) {
 		case SVC_SSH:
-			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[ssh,%s,%d]", ip, port);
+			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[ssh,%s,%d]",
+				ip,
+				port);
 			break;
 		case SVC_LDAP:
-			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[ldap,%s,%d]", ip, port);
+			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[ldap,%s,%d]",
+				ip,
+				port);
 			break;
 		case SVC_SMTP:
-			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[smtp,%s,%d]", ip, port);
+			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[smtp,%s,%d]",
+				ip,
+				port);
 			break;
 		case SVC_FTP:
-			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[ftp,%s,%d]", ip, port);
+			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[ftp,%s,%d]",
+				ip,
+				port);
 			break;
 		case SVC_HTTP:
-			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[http,%s,%d]", ip, port);
+			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[http,%s,%d]",
+				ip,
+				port);
 			break;
 		case SVC_POP:
-			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[pop,%s,%d]", ip, port);
+			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[pop,%s,%d]",
+				ip,
+				port);
 			break;
 		case SVC_NNTP:
-			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[nntp,%s,%d]", ip, port);
+			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[nntp,%s,%d]",
+				ip,
+				port);
 			break;
 		case SVC_IMAP:
-			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[imap,%s,%d]", ip, port);
+			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[imap,%s,%d]",
+				ip,
+				port);
 			break;
 		case SVC_TCP:
-			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[tcp,%s,%d]", ip, port);
+			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[tcp,%s,%d]",
+				ip,
+				port);
 			break;
 		default:
 			ret = FAIL;
@@ -423,9 +448,12 @@ static void process_check(DB_DRULE *rule, DB_DCHECK *check, char *ip)
 	int	first,last;
 
 	zabbix_log(LOG_LEVEL_WARNING, "In process_check(ip:%s, ports:%s, type:%d)",
-		ip, check->ports, check->type);
+		ip,
+		check->ports,
+		check->type);
 
-	zbx_snprintf(tmp,sizeof(tmp)-1,"%s",check->ports);
+	zbx_snprintf(tmp,sizeof(tmp)-1,"%s",
+		check->ports);
 
 	s=(char *)strtok(tmp,",");
 	while(s!=NULL)
@@ -446,7 +474,8 @@ static void process_check(DB_DRULE *rule, DB_DCHECK *check, char *ip)
 
 		for(port=first;port<=last;port++)
 		{	
-			zabbix_log(LOG_LEVEL_WARNING, "Port %d", port);
+			zabbix_log(LOG_LEVEL_WARNING, "Port %d",
+				port);
 			check->status = discover_service(check->type,ip,port);
 			update_service(rule, check, ip, port);
 		}
@@ -484,7 +513,8 @@ static void process_rule(DB_DRULE *rule)
 
 	int		i;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In process_rule(name:%s)", rule->name);
+	zabbix_log( LOG_LEVEL_DEBUG, "In process_rule(name:%s)",
+		rule->name);
 
 	result = DBselect("select dcheckid,druleid,type,ports from dchecks where druleid=" ZBX_FS_UI64,
 		rule->druleid);
@@ -502,7 +532,9 @@ static void process_rule(DB_DRULE *rule)
 		c[0] = 0;
 		for(i=first;i<=last;i++)
 		{
-			zbx_snprintf(ip,MAX_STRING_LEN-1,"%s.%d",rule->ipfirst, i);
+			zbx_snprintf(ip,MAX_STRING_LEN-1,"%s.%d",
+				rule->ipfirst,
+				i);
 
 			process_check(rule, &check, ip);
 		}
@@ -536,7 +568,8 @@ void main_discoverer_loop(int num)
 	DB_ROW		row;
 	DB_DRULE	rule;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In main_discoverer_loop(num:%d)", num);
+	zabbix_log( LOG_LEVEL_DEBUG, "In main_discoverer_loop(num:%d)",
+		num);
 
 	discoverer_num = num;
 

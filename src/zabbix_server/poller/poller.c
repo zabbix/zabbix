@@ -63,7 +63,9 @@ int	get_value(DB_ITEM *item, AGENT_RESULT *result)
 		res=get_value_snmp(item, result);
 #else
 		zabbix_log(LOG_LEVEL_WARNING, "Support of SNMP parameters was not compiled in");
-		zabbix_syslog("Support of SNMP parameters was not compiled in. Cannot process [%s:%s]", item->host_name, item->key);
+		zabbix_syslog("Support of SNMP parameters was not compiled in. Cannot process [%s:%s]",
+			item->host_name,
+			item->key);
 		res=NOTSUPPORTED;
 #endif
 	}
@@ -81,8 +83,10 @@ int	get_value(DB_ITEM *item, AGENT_RESULT *result)
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Not supported item type:%d",item->type);
-		zabbix_syslog("Not supported item type:%d",item->type);
+		zabbix_log(LOG_LEVEL_WARNING, "Not supported item type:%d",
+			item->type);
+		zabbix_syslog("Not supported item type:%d",
+			item->type);
 		res=NOTSUPPORTED;
 	}
 	alarm(0);
@@ -178,10 +182,13 @@ static void update_key_status(zbx_uint64_t hostid,int host_status)
 	int		update;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In update_key_status(" ZBX_FS_UI64 ",%d)",
-		hostid,host_status);
+		hostid,
+		host_status);
 
 	result = DBselect("select %s where h.hostid=i.hostid and h.hostid=" ZBX_FS_UI64 " and i.key_='%s'",
-		ZBX_SQL_ITEM_SELECT, hostid,SERVER_STATUS_KEY);
+		ZBX_SQL_ITEM_SELECT,
+		hostid,
+		SERVER_STATUS_KEY);
 
 	row = DBfetch(result);
 
@@ -305,8 +312,10 @@ int get_values(void)
 /*			if(HOST_STATUS_UNREACHABLE == item.host_status)*/
 			if(HOST_AVAILABLE_TRUE != item.host_available)
 			{
-				zabbix_log( LOG_LEVEL_WARNING, "Enabling host [%s]", item.host_name);
-				zabbix_syslog("Enabling host [%s]", item.host_name);
+				zabbix_log( LOG_LEVEL_WARNING, "Enabling host [%s]",
+					item.host_name);
+				zabbix_syslog("Enabling host [%s]",
+					item.host_name);
 				DBupdate_host_availability(item.hostid,HOST_AVAILABLE_TRUE,now,agent.msg);
 				update_key_status(item.hostid, HOST_STATUS_MONITORED); /* 0 */
 				item.host_available=HOST_AVAILABLE_TRUE;
@@ -329,18 +338,27 @@ int get_values(void)
 				/* It is not correct */
 /*				snprintf(sql,sizeof(sql)-1,"update items set nextcheck=%d, lastclock=%d where itemid=%d",calculate_item_nextcheck(item.itemid, CONFIG_REFRESH_UNSUPPORTED,now), now, item.itemid);*/
 				DBexecute("update items set nextcheck=%d, lastclock=%d where itemid=" ZBX_FS_UI64,
-					CONFIG_REFRESH_UNSUPPORTED+now, now, item.itemid);
+					CONFIG_REFRESH_UNSUPPORTED+now,
+					now,
+					item.itemid);
 			}
 			else
 			{
-				zabbix_log( LOG_LEVEL_WARNING, "Parameter [%s] is not supported by agent on host [%s] Old status [%d]", item.key, item.host_name, item.status);
-				zabbix_syslog("Parameter [%s] is not supported by agent on host [%s]", item.key, item.host_name);
+				zabbix_log( LOG_LEVEL_WARNING, "Parameter [%s] is not supported by agent on host [%s] Old status [%d]",
+					item.key,
+					item.host_name,
+					item.status);
+				zabbix_syslog("Parameter [%s] is not supported by agent on host [%s]",
+					item.key,
+					item.host_name);
 				DBupdate_item_status_to_notsupported(item.itemid, agent.str);
 	/*			if(HOST_STATUS_UNREACHABLE == item.host_status)*/
 				if(HOST_AVAILABLE_TRUE != item.host_available)
 				{
-					zabbix_log( LOG_LEVEL_WARNING, "Enabling host [%s]", item.host_name);
-					zabbix_syslog("Enabling host [%s]", item.host_name);
+					zabbix_log( LOG_LEVEL_WARNING, "Enabling host [%s]",
+						item.host_name);
+					zabbix_syslog("Enabling host [%s]",
+						item.host_name);
 					DBupdate_host_availability(item.hostid,HOST_AVAILABLE_TRUE,now,agent.msg);
 					update_key_status(item.hostid, HOST_STATUS_MONITORED);	/* 0 */
 					item.host_available=HOST_AVAILABLE_TRUE;
@@ -354,35 +372,51 @@ int get_values(void)
 			/* First error */
 			if(item.host_errors_from==0)
 			{
-				zabbix_log( LOG_LEVEL_WARNING, "Host [%s]: first network error, wait for %d seconds", item.host_name, CONFIG_UNREACHABLE_DELAY);
-				zabbix_syslog("Host [%s]: first network error, wait for %d seconds", item.host_name, CONFIG_UNREACHABLE_DELAY);
+				zabbix_log( LOG_LEVEL_WARNING, "Host [%s]: first network error, wait for %d seconds",
+					item.host_name,
+					CONFIG_UNREACHABLE_DELAY);
+				zabbix_syslog("Host [%s]: first network error, wait for %d seconds",
+					item.host_name,
+					CONFIG_UNREACHABLE_DELAY);
 
 				item.host_errors_from=now;
 				DBexecute("update hosts set errors_from=%d,disable_until=%d where hostid=" ZBX_FS_UI64,
-					now, now+CONFIG_UNREACHABLE_DELAY, item.hostid);
+					now,
+					now+CONFIG_UNREACHABLE_DELAY,
+					item.hostid);
 			}
 			else
 			{
 				if(now-item.host_errors_from>CONFIG_UNREACHABLE_PERIOD)
 				{
-					zabbix_log( LOG_LEVEL_WARNING, "Host [%s] will be checked after %d seconds", item.host_name, CONFIG_UNAVAILABLE_DELAY);
-					zabbix_syslog("Host [%s] will be checked after %d seconds", item.host_name, CONFIG_UNAVAILABLE_DELAY);
+					zabbix_log( LOG_LEVEL_WARNING, "Host [%s] will be checked after %d seconds",
+						item.host_name,
+						CONFIG_UNAVAILABLE_DELAY);
+					zabbix_syslog("Host [%s] will be checked after %d seconds",
+						item.host_name,
+						CONFIG_UNAVAILABLE_DELAY);
 
 					DBupdate_host_availability(item.hostid,HOST_AVAILABLE_FALSE,now,agent.msg);
 					update_key_status(item.hostid,HOST_AVAILABLE_FALSE); /* 2 */
 					item.host_available=HOST_AVAILABLE_FALSE;
 
 					DBexecute("update hosts set disable_until=%d where hostid=" ZBX_FS_UI64,
-						now+CONFIG_UNAVAILABLE_DELAY, item.hostid);
+						now+CONFIG_UNAVAILABLE_DELAY,
+						item.hostid);
 				}
 				/* Still unavailable, but won't change status to UNAVAILABLE yet */
 				else
 				{
-					zabbix_log( LOG_LEVEL_WARNING, "Host [%s]: another network error, wait for %d seconds", item.host_name, CONFIG_UNREACHABLE_DELAY);
-					zabbix_syslog("Host [%s]: another network error, wait for %d seconds", item.host_name, CONFIG_UNREACHABLE_DELAY);
+					zabbix_log( LOG_LEVEL_WARNING, "Host [%s]: another network error, wait for %d seconds",
+						item.host_name,
+						CONFIG_UNREACHABLE_DELAY);
+					zabbix_syslog("Host [%s]: another network error, wait for %d seconds",
+						item.host_name,
+						CONFIG_UNREACHABLE_DELAY);
 
 					DBexecute("update hosts set disable_until=%d where hostid=" ZBX_FS_UI64,
-						now+CONFIG_UNREACHABLE_DELAY, item.hostid);
+						now+CONFIG_UNREACHABLE_DELAY,
+						item.hostid);
 				}
 			}
 
@@ -391,16 +425,24 @@ int get_values(void)
 /* Possibly, other logic required? */
 		else if(res == AGENT_ERROR)
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Getting value of [%s] from host [%s] failed (ZBX_ERROR)", item.key, item.host_name);
-			zabbix_syslog("Getting value of [%s] from host [%s] failed (ZBX_ERROR)", item.key, item.host_name);
+			zabbix_log( LOG_LEVEL_WARNING, "Getting value of [%s] from host [%s] failed (ZBX_ERROR)",
+				item.key,
+				item.host_name);
+			zabbix_syslog("Getting value of [%s] from host [%s] failed (ZBX_ERROR)",
+				item.key,
+				item.host_name);
 			zabbix_log( LOG_LEVEL_WARNING, "The value is not stored in database.");
 
 			stop=1;
 		}
 		else
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Getting value of [%s] from host [%s] failed", item.key, item.host_name );
-			zabbix_syslog("Getting value of [%s] from host [%s] failed", item.key, item.host_name);
+			zabbix_log( LOG_LEVEL_WARNING, "Getting value of [%s] from host [%s] failed",
+				item.key,
+				item.host_name );
+			zabbix_syslog("Getting value of [%s] from host [%s] failed",
+				item.key,
+				item.host_name);
 			zabbix_log( LOG_LEVEL_WARNING, "The value is not stored in database.");
 		}
 		free_result(&agent);
@@ -417,7 +459,9 @@ void main_poller_loop(int type, int num)
 	int	now;
 	int	nextcheck,sleeptime;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In main_poller_loop(type:%d,num:%d)", type, num);
+	zabbix_log( LOG_LEVEL_DEBUG, "In main_poller_loop(type:%d,num:%d)",
+		type,
+		num);
 
 	poller_type = type;
 	poller_num = num;
@@ -431,10 +475,13 @@ void main_poller_loop(int type, int num)
 		now=time(NULL);
 		get_values();
 
-		zabbix_log( LOG_LEVEL_DEBUG, "Spent %d seconds while updating values", (int)time(NULL)-now );
+		zabbix_log( LOG_LEVEL_DEBUG, "Spent %d seconds while updating values",
+			(int)time(NULL)-now );
 
 		nextcheck=get_minnextcheck(now);
-		zabbix_log( LOG_LEVEL_DEBUG, "Nextcheck:%d Time:%d", nextcheck, (int)time(NULL) );
+		zabbix_log( LOG_LEVEL_DEBUG, "Nextcheck:%d Time:%d",
+			nextcheck,
+			(int)time(NULL) );
 
 		if( FAIL == nextcheck)
 		{
