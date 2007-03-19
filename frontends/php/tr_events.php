@@ -64,8 +64,8 @@ include_once "include/page_header.php";
 	show_table_header(S_ALARMS_BIG.": \"".$description."\"".BR."$expression", $form);
 ?>
 <?php
-	$result=DBselect("select * from events where triggerid=".$_REQUEST["triggerid"].
-		" order by clock desc",
+	$result=DBselect('select * from events where objectid='.$_REQUEST['triggerid'].
+		' and object='.EVENT_OBJECT_TRIGGER.' order by clock desc',
 		$_REQUEST["limit"]);
 
 	$table = new CTableInfo();

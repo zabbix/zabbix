@@ -696,7 +696,8 @@
 	{
 		if(is_null($time)) $time = time();
 
-		$result = DBselect('select value from events where triggerid='.$triggerid.' order by clock desc',1);
+		$result = DBselect('select value from events where objectid='.$triggerid.' and object='.EVENT_OBJECT_TRIGGER.
+			' order by clock desc',1);
 		$last_value = DBfetch($result);
 		if($last_value)
 		{
@@ -704,7 +705,8 @@
 				return false;
 		}
 		$eventid = get_dbid("events","eventid");
-		$result = DBexecute('insert into events(eventid,triggerid,clock,value) values('.$eventid.','.$triggerid.','.$time.','.$value.')');
+		$result = DBexecute('insert into events(eventid,source,object,objectid,clock,value) '.
+				' values('.$eventid.','.EVENT_SOURCE_TRIGGERS.','.EVENT_OBJECT_TRIGGER.','.$triggerid.','.$time.','.$value.')');
 		if($value == TRIGGER_VALUE_FALSE || $value == TRIGGER_VALUE_TRUE)
 		{
 			DBexesute('update alerts set retries=3,error=\'Trigger changed its status. WIll not send repeats.\''.
@@ -968,7 +970,7 @@
 
 	function	delete_events_by_triggerid($triggerid)
 	{
-		return	DBexecute("delete from events where triggerid=$triggerid");
+		return	DBexecute('delete from events where objectid='.$triggerid.' and object='.EVENT_OBJECT_TRIGGER);
 	}
 
 	function	delete_triggers_by_itemid($itemid)
@@ -1253,14 +1255,11 @@
 
 	function	calculate_availability($triggerid,$period_start,$period_end)
 	{
-		if(($period_start==0)&&($period_end==0))
-		{
-	        	$sql="select count(*) as cnt,min(clock) as minn,max(clock) as maxx from events where triggerid=$triggerid";
-		}
-		else
-		{
-	        	$sql="select count(*) as cnt,min(clock) as minn,max(clock) as maxx from events where triggerid=$triggerid and clock>=$period_start and clock<=$period_end";
-		}
+		$sql='select count(*) as cnt,min(clock) as minn,max(clock) as maxx from events '.
+			' where objectid='.$triggerid.' and object='.EVENT_OBJECT_TRIGGER;
+
+		if($period_start!=0)	$sql .= ' and clock>='.$period_start;
+		if($period_end!=0)	$sql .= ' and clock<='.$period_end;
 
 		$row=DBfetch(DBselect($sql));
 		if($row["cnt"]>0)
@@ -1287,7 +1286,8 @@
 			}
 		}
 
-		$result=DBselect("select clock,value from events where triggerid=$triggerid and clock>=$min and clock<=$max");
+		$result=DBselect('select clock,value from events where objectid='.$triggerid.' and object='.EVENT_OBJECT_TRIGGER
+			.' and clock>='.$min.' and clock<='.$max);
 
 		$state		= -1;
 		$true_time	= 0;

@@ -47,8 +47,8 @@ include_once "include/page_header.php";
 	
 	if(! ($db_data = DBfetch(DBselect('select distinct  e.*,t.triggerid,t.expression,t.description,h.host,h.hostid '.
 			' from hosts h, items i, functions f, events e, triggers t'.
-			' where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=e.triggerid and e.eventid='.$_REQUEST["eventid"].
-			' and i.hostid not in ('.$denyed_hosts.') and e.triggerid=t.triggerid'.
+			' where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and e.eventid='.$_REQUEST["eventid"].
+			' and i.hostid not in ('.$denyed_hosts.') and e.objectid=t.triggerid and e.object='.EVENT_OBJECT_TRIGGER.
 			' and '.DBid2nodeid('e.eventid').'='.$ZBX_CURNODEID
 			))))
 	{
