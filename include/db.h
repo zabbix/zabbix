@@ -138,7 +138,7 @@ DB_DHOST
 {
 	zbx_uint64_t	dhostid;
 	zbx_uint64_t	druleid;
-	char		*ip;
+	char		ip[HOST_IP_LEN_MAX];
 	int		status;
 	int		lastup;
 	int		lastdown;
