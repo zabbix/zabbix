@@ -179,7 +179,9 @@ static int evaluate_COUNT(char *value, DB_ITEM *item, int parameter)
 		strscpy(table,"history");
 	}
 	result = DBselect("select count(value) from %s where clock>%d and itemid=" ZBX_FS_UI64,
-		table,now-parameter,item->itemid);
+		table,
+		now-parameter,
+		item->itemid);
 
 	row = DBfetch(result);
 
@@ -246,7 +248,9 @@ static int evaluate_SUM(char *value, DB_ITEM *item, int parameter, int flag)
 			strscpy(table,"history");
 		}
 		result = DBselect("select sum(value) from %s where clock>%d and itemid=" ZBX_FS_UI64,
-			table, now-parameter,item->itemid);
+			table,
+			now-parameter,
+			item->itemid);
 
 		row = DBfetch(result);
 		if(!row || DBis_null(row[0])==SUCCEED)
@@ -270,7 +274,8 @@ static int evaluate_SUM(char *value, DB_ITEM *item, int parameter, int flag)
 			strscpy(table,"history");
 		}
 		zbx_snprintf(sql,sizeof(sql),"select value from %s where itemid=" ZBX_FS_UI64 " order by clock desc",
-			table,item->itemid);
+			table,
+			item->itemid);
 		result = DBselectN(sql, parameter);
 		if(item->value_type == ITEM_VALUE_TYPE_UINT64)
 		{
@@ -299,7 +304,10 @@ static int evaluate_SUM(char *value, DB_ITEM *item, int parameter, int flag)
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Unknown flag [%d] Expected [%d] or [%d]", flag, ZBX_FLAG_SEC, ZBX_FLAG_VALUES);
+		zabbix_log(LOG_LEVEL_WARNING, "Unknown flag [%d] Expected [%d] or [%d]",
+			flag,
+			ZBX_FLAG_SEC,
+			ZBX_FLAG_VALUES);
 		return	FAIL;
 	}
 
@@ -398,7 +406,10 @@ static int evaluate_AVG(char *value,DB_ITEM	*item,int parameter,int flag)
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Unknown flag [%d] Expected [%d] or [%d]", flag, ZBX_FLAG_SEC, ZBX_FLAG_VALUES);
+		zabbix_log(LOG_LEVEL_WARNING, "Unknown flag [%d] Expected [%d] or [%d]",
+			flag,
+			ZBX_FLAG_SEC,
+			ZBX_FLAG_VALUES);
 		return	FAIL;
 	}
 
@@ -460,7 +471,9 @@ static int evaluate_MIN(char *value,DB_ITEM	*item,int parameter, int flag)
 	if(flag == ZBX_FLAG_SEC)
 	{
 		result = DBselect("select min(value) from %s where clock>%d and itemid=" ZBX_FS_UI64,
-			table, now-parameter,item->itemid);
+			table,
+			now-parameter,
+			item->itemid);
 		row = DBfetch(result);
 		if(!row || DBis_null(row[0])==SUCCEED)
 		{
@@ -476,7 +489,8 @@ static int evaluate_MIN(char *value,DB_ITEM	*item,int parameter, int flag)
 	else if(flag == ZBX_FLAG_VALUES)
 	{
 		zbx_snprintf(sql,sizeof(sql),"select value from %s where itemid=" ZBX_FS_UI64 " order by clock desc",
-			table,item->itemid);
+			table,
+			item->itemid);
 		result = DBselectN(sql,parameter);
 
 		rows=0;
@@ -517,7 +531,10 @@ static int evaluate_MIN(char *value,DB_ITEM	*item,int parameter, int flag)
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Unknown flag [%d] Expected [%d] or [%d]", flag, ZBX_FLAG_SEC, ZBX_FLAG_VALUES);
+		zabbix_log(LOG_LEVEL_WARNING, "Unknown flag [%d] Expected [%d] or [%d]",
+			flag,
+			ZBX_FLAG_SEC,
+			ZBX_FLAG_VALUES);
 		return	FAIL;
 	}
 
@@ -579,7 +596,9 @@ static int evaluate_MAX(char *value,DB_ITEM *item,int parameter,int flag)
 			strscpy(table,"history");
 		}
 		result = DBselect("select max(value) from %s where clock>%d and itemid=" ZBX_FS_UI64,
-			table,now-parameter,item->itemid);
+			table,
+			now-parameter,
+			item->itemid);
 
 		row = DBfetch(result);
 
@@ -605,7 +624,8 @@ static int evaluate_MAX(char *value,DB_ITEM *item,int parameter,int flag)
 			strscpy(table,"history");
 		}
 		zbx_snprintf(sql,sizeof(sql),"select value from %s where itemid=" ZBX_FS_UI64 " order by clock desc",
-			table,item->itemid);
+			table,
+			item->itemid);
 		result = DBselectN(sql,parameter);
 		rows=0;
 		while((row=DBfetch(result)))
@@ -644,7 +664,10 @@ static int evaluate_MAX(char *value,DB_ITEM *item,int parameter,int flag)
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Unknown flag [%d] Expected [%d] or [%d]", flag, ZBX_FLAG_SEC, ZBX_FLAG_VALUES);
+		zabbix_log(LOG_LEVEL_WARNING, "Unknown flag [%d] Expected [%d] or [%d]",
+			flag,
+			ZBX_FLAG_SEC,
+			ZBX_FLAG_VALUES);
 		return	FAIL;
 	}
 
@@ -696,7 +719,8 @@ static int evaluate_DELTA(char *value,DB_ITEM *item,int parameter, int flag)
 	if(flag == ZBX_FLAG_SEC)
 	{
 		result = DBselect("select max(value)-min(value) from history where clock>%d and itemid=" ZBX_FS_UI64,
-			now-parameter,item->itemid);
+			now-parameter,
+			item->itemid);
 
 		row = DBfetch(result);
 		if(!row || DBis_null(row[0])==SUCCEED)
@@ -743,7 +767,10 @@ static int evaluate_DELTA(char *value,DB_ITEM *item,int parameter, int flag)
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Unknown flag [%d] Expected [%d] or [%d]", flag, ZBX_FLAG_SEC, ZBX_FLAG_VALUES);
+		zabbix_log(LOG_LEVEL_WARNING, "Unknown flag [%d] Expected [%d] or [%d]",
+			flag,
+			ZBX_FLAG_SEC,
+			ZBX_FLAG_VALUES);
 		return	FAIL;
 	}
 
@@ -821,7 +848,8 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 	int	day;
 	int	len;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_function(%s)",function);
+	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_function(%s)",
+		function);
 
 	if(strcmp(function,"last")==0)
 	{
@@ -914,7 +942,10 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 	{
 		now=time(NULL);
                 tm=localtime(&now);
-                zbx_snprintf(value,MAX_STRING_LEN,"%.4d%.2d%.2d",tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday);
+                zbx_snprintf(value,MAX_STRING_LEN,"%.4d%.2d%.2d",
+			tm->tm_year+1900,
+			tm->tm_mon+1,
+			tm->tm_mday);
 	}
 	else if(strcmp(function,"dayofweek")==0)
 	{
@@ -923,13 +954,17 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 		/* The number of days since Sunday, in the range 0 to 6. */
 		day=tm->tm_wday;
 		if(0 == day)	day=7;
-                zbx_snprintf(value,MAX_STRING_LEN,"%d", day);
+                zbx_snprintf(value,MAX_STRING_LEN,"%d",
+			day);
 	}
 	else if(strcmp(function,"time")==0)
 	{
 		now=time(NULL);
                 tm=localtime(&now);
-                zbx_snprintf(value,MAX_STRING_LEN,"%.2d%.2d%.2d",tm->tm_hour,tm->tm_min,tm->tm_sec);
+                zbx_snprintf(value,MAX_STRING_LEN,"%.2d%.2d%.2d",
+			tm->tm_hour,
+			tm->tm_min,
+			tm->tm_sec);
 	}
 	else if(strcmp(function,"abschange")==0)
 	{
@@ -946,7 +981,8 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 					del_zeroes(value);
 					break;
 				case ITEM_VALUE_TYPE_UINT64:
-					zbx_snprintf(value,MAX_STRING_LEN,ZBX_FS_UI64, labs(item->lastvalue_uint64-item->prevvalue_uint64));
+					zbx_snprintf(value,MAX_STRING_LEN,ZBX_FS_UI64,
+						labs(item->lastvalue_uint64-item->prevvalue_uint64));
 					break;
 				default:
 					if(strcmp(item->lastvalue_str, item->prevvalue_str) == 0)
@@ -976,7 +1012,8 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 					del_zeroes(value);
 					break;
 				case ITEM_VALUE_TYPE_UINT64:
-					zbx_snprintf(value,MAX_STRING_LEN,ZBX_FS_UI64, item->lastvalue_uint64-item->prevvalue_uint64);
+					zbx_snprintf(value,MAX_STRING_LEN,ZBX_FS_UI64,
+						item->lastvalue_uint64-item->prevvalue_uint64);
 					break;
 				default:
 					if(strcmp(item->lastvalue_str, item->prevvalue_str) == 0)
@@ -1146,12 +1183,15 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 	}
 	else
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Unsupported function:%s",function);
-		zabbix_syslog("Unsupported function:%s",function);
+		zabbix_log( LOG_LEVEL_WARNING, "Unsupported function:%s",
+			function);
+		zabbix_syslog("Unsupported function:%s",
+			function);
 		ret = FAIL;
 	}
 
-	zabbix_log( LOG_LEVEL_DEBUG, "End of evaluate_function(result:%s)",value);
+	zabbix_log( LOG_LEVEL_DEBUG, "End of evaluate_function(result:%s)",
+		value);
 	return ret;
 }
 
@@ -1179,7 +1219,8 @@ int	add_value_suffix(char *value, DB_ITEM *item)
 
 	char	suffix[MAX_STRING_LEN];
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In add_value_suffix() Value [%s]",value);
+	zabbix_log( LOG_LEVEL_DEBUG, "In add_value_suffix() Value [%s]",
+		value);
 	
 	/* Add suffix: 1000000 -> 1 MB */
 	if(!(
@@ -1219,14 +1260,24 @@ int	add_value_suffix(char *value, DB_ITEM *item)
 /*		if(cmp_double((double)round(value_double), value_double) == 0) */
 	if(cmp_double((int)(value_double+0.5), value_double) == 0)
 	{
-		zbx_snprintf(value, MAX_STRING_LEN, ZBX_FS_DBL_EXT(0) " %s%s", value_double, suffix, item->units);
+		zbx_snprintf(value, MAX_STRING_LEN, ZBX_FS_DBL_EXT(0) " %s%s",
+			value_double,
+			suffix,
+			item->units);
 	}
 	else
 	{
-		zbx_snprintf(value, MAX_STRING_LEN, ZBX_FS_DBL_EXT(2) " %s%s", value_double, suffix, item->units);
+		zbx_snprintf(value, MAX_STRING_LEN, ZBX_FS_DBL_EXT(2) " %s%s",
+			value_double,
+			suffix,
+			item->units);
 	}
 	
-	zabbix_log(LOG_LEVEL_DEBUG, "Value [%s] [" ZBX_FS_DBL "] Suffix [%s] Units [%s]",value,value_double,suffix,item->units);
+	zabbix_log(LOG_LEVEL_DEBUG, "Value [%s] [" ZBX_FS_DBL "] Suffix [%s] Units [%s]",
+		value,
+		value_double,
+		suffix,
+		item->units);
 	return SUCCEED;
 }
 
@@ -1261,7 +1312,8 @@ int	replace_value_by_map(char *value, zbx_uint64_t valuemapid)
 	if(valuemapid == 0)	return FAIL;
 	
 	result = DBselect("select newvalue from mappings where valuemapid=" ZBX_FS_UI64 " and value='%s'",
-			valuemapid, value);
+			valuemapid,
+			value);
 	row = DBfetch(result);
 
 	if(!row || DBis_null(row[0])==SUCCEED)		return FAIL;
@@ -1273,9 +1325,12 @@ int	replace_value_by_map(char *value, zbx_uint64_t valuemapid)
 	or_value = sql;	/* sql variarbvle used as tmp - original value */
 	zbx_strlcpy(sql,value,MAX_STRING_LEN);
 	
-	zbx_snprintf(value, MAX_STRING_LEN, "%s (%s)", new_value, or_value);
+	zbx_snprintf(value, MAX_STRING_LEN, "%s (%s)",
+		new_value,
+		or_value);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Value: %s", value);
+	zabbix_log(LOG_LEVEL_DEBUG, "End replace_value_by_map(result:%s)",
+		value);
 	return SUCCEED;
 }
 
@@ -1306,9 +1361,17 @@ int evaluate_function2(char *value,char *host,char *key,char *function,char *par
 
 	int	res;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate_function2(%s,%s,%s,%s)",host,key,function,parameter);
+	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate_function2(%s,%s,%s,%s)",
+		host,
+		key,
+		function,
+		parameter);
 
-	result = DBselect("select %s where h.host='%s' and h.hostid=i.hostid and i.key_='%s' and" ZBX_COND_NODEID, ZBX_SQL_ITEM_SELECT, host, key, LOCAL_NODE("h.hostid"));
+	result = DBselect("select %s where h.host='%s' and h.hostid=i.hostid and i.key_='%s' and" ZBX_COND_NODEID,
+		ZBX_SQL_ITEM_SELECT,
+		host,
+		key,
+		LOCAL_NODE("h.hostid"));
 
 	row = DBfetch(result);
 
@@ -1332,6 +1395,7 @@ int evaluate_function2(char *value,char *host,char *key,char *function,char *par
 /* Cannot call DBfree_result until evaluate_FUNC */
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End evaluate_function2(result:%s)",value);
+	zabbix_log(LOG_LEVEL_DEBUG, "End evaluate_function2(result:%s)",
+		value);
 	return res;
 }
