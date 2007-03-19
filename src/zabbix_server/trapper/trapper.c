@@ -55,7 +55,9 @@ int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 	for( p=s+strlen(s)-1; p>s && ( *p=='\r' || *p =='\n' || *p == ' ' ); --p );
 	p[1]=0;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Trapper got [%s] len %d", s, strlen(s));
+	zabbix_log( LOG_LEVEL_DEBUG, "Trapper got [%s] len %d",
+		s,
+		strlen(s));
 
 /* Request for list of active checks */
 	if(strncmp(s,"ZBX_GET_ACTIVE_CHECKS", strlen("ZBX_GET_ACTIVE_CHECKS")) == 0)
@@ -70,11 +72,13 @@ int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 		{
 			if(autoregister(host) == SUCCEED)
 			{
-				zabbix_log( LOG_LEVEL_DEBUG, "New host registered [%s]", host);
+				zabbix_log( LOG_LEVEL_DEBUG, "New host registered [%s]",
+					host);
 			}
 			else
 			{
-				zabbix_log( LOG_LEVEL_DEBUG, "Host already exists [%s]", host);
+				zabbix_log( LOG_LEVEL_DEBUG, "Host already exists [%s]",
+					host);
 			}
 			ret=send_list_of_active_checks(sock, host);
 		}
@@ -219,7 +223,8 @@ void	process_trapper_child(zbx_sock_t	*sock)
 /*	alarm(0);*/
 
 	gettimeofday(&tv, NULL);
-	zabbix_log( LOG_LEVEL_DEBUG, "Trap processed in " ZBX_FS_DBL " seconds", (double)(tv.tv_usec-msec)/1000000 );
+	zabbix_log( LOG_LEVEL_DEBUG, "Trap processed in " ZBX_FS_DBL " seconds",
+		(double)(tv.tv_usec-msec)/1000000 );
 }
 
 void	child_trapper_main(int i,int listenfd, int addrlen)
@@ -232,7 +237,8 @@ void	child_trapper_main(int i,int listenfd, int addrlen)
 	zabbix_log( LOG_LEVEL_DEBUG, "In child_trapper_main()");
 
 /*	zabbix_log( LOG_LEVEL_WARNING, "zabbix_trapperd %ld started",(long)getpid());*/
-	zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Trapper]", i);
+	zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Trapper]",
+		i);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 

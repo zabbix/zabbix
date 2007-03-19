@@ -55,7 +55,8 @@ void http_substitute_macros(DB_HTTPTEST *httptest, char *data, int data_max_len)
 		var_len;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In http_substitute_macros(httptestid:" ZBX_FS_UI64 ", data:%s)",
-		httptest->httptestid, data);
+		httptest->httptestid,
+		data);
 
 	assert(data);
 
@@ -127,5 +128,6 @@ void http_substitute_macros(DB_HTTPTEST *httptest, char *data, int data_max_len)
 
 	zbx_snprintf(data, data_max_len, "%s", str_out);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Result expression [%s]", data );
+	zabbix_log( LOG_LEVEL_DEBUG, "Result expression [%s]",
+		data);
 }

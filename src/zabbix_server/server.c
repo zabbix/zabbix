@@ -254,7 +254,8 @@ int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
 
 	if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
 	{
-		zabbix_log( LOG_LEVEL_CRIT, "Cannot bind to port %d. Another zabbix_server running? Shutting down...", port);
+		zabbix_log( LOG_LEVEL_CRIT, "Cannot bind to port %d. Another zabbix_server running? Shutting down...",
+			port);
 		exit(FAIL);
 	}
 	
@@ -475,7 +476,8 @@ int MAIN_ZABBIX_ENTRY(void)
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
 
-	result = DBselect("select refresh_unsupported from config where " ZBX_COND_NODEID, LOCAL_NODE("configid"));
+	result = DBselect("select refresh_unsupported from config where " ZBX_COND_NODEID,
+		LOCAL_NODE("configid"));
 	row = DBfetch(result);
 
 	if( (row != NULL) && DBis_null(row[0]) != SUCCEED)
@@ -484,7 +486,8 @@ int MAIN_ZABBIX_ENTRY(void)
 	}
 	DBfree_result(result);
 
-	result = DBselect("select masterid from nodes where nodeid=%d", CONFIG_NODEID);
+	result = DBselect("select masterid from nodes where nodeid=%d",
+		CONFIG_NODEID);
 	row = DBfetch(result);
 
 	if( (row != NULL) && DBis_null(row[0]) != SUCCEED)
@@ -539,7 +542,8 @@ int MAIN_ZABBIX_ENTRY(void)
 	if(server_num == 0)
 	{
 		init_main_process();
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Watchdog]",server_num);
+		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Watchdog]",
+			server_num);
 		main_watchdog_loop();
 /*		for(;;)	zbx_sleep(3600);*/
 	}
@@ -549,9 +553,11 @@ int MAIN_ZABBIX_ENTRY(void)
 	{
 #ifdef HAVE_SNMP
 		init_snmp("zabbix_server");
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Poller. SNMP:ON]",server_num);
+		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Poller. SNMP:ON]",
+			server_num);
 #else
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Poller. SNMP:OFF]",server_num);
+		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Poller. SNMP:OFF]",
+			server_num);
 #endif
 		main_poller_loop(ZBX_POLLER_TYPE_NORMAL, server_num);
 	}
@@ -570,24 +576,28 @@ int MAIN_ZABBIX_ENTRY(void)
 	}
 	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [ICMP pinger]",server_num);
+		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [ICMP pinger]",
+			server_num);
 		main_pinger_loop(server_num-(CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS));
 	}
 	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Alerter]",server_num);
+		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Alerter]",
+			server_num);
 		main_alerter_loop();
 	}
 	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS
 			+CONFIG_HOUSEKEEPER_FORKS)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Housekeeper]",server_num);
+		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Housekeeper]",
+			server_num);
 		main_housekeeper_loop();
 	}
 	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS
 			+CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Timer]",server_num);
+		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Timer]",
+			server_num);
 		main_timer_loop();
 	}
 	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS
@@ -596,9 +606,11 @@ int MAIN_ZABBIX_ENTRY(void)
 /*		zabbix_log( LOG_LEVEL_WARNING, "%d<=%d",server_num,  CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS+CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS); */
 #ifdef HAVE_SNMP
 		init_snmp("zabbix_server");
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Poller for unreachable hosts. SNMP:ON]",server_num);
+		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Poller for unreachable hosts. SNMP:ON]",
+			server_num);
 #else
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Poller for unreachable hosts. SNMP:OFF]",server_num);
+		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Poller for unreachable hosts. SNMP:OFF]",
+			server_num);
 #endif
 /*		zabbix_log( LOG_LEVEL_WARNING, "Before main_poller_loop(%d,%d)",ZBX_POLLER_TYPE_UNREACHABLE,server_num - (CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS +CONFIG_ALERTER_FORKS+CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS)); */
 		main_poller_loop(ZBX_POLLER_TYPE_UNREACHABLE,
@@ -609,7 +621,8 @@ int MAIN_ZABBIX_ENTRY(void)
 			+ CONFIG_NODEWATCHER_FORKS)
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Node watcher. Node ID:%d]",
-				server_num, CONFIG_NODEID);
+				server_num,
+				CONFIG_NODEID);
 		main_nodewatcher_loop();
 	}
 	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS

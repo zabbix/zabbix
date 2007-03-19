@@ -56,15 +56,20 @@ static int process_node_history_str(int nodeid, int master_nodeid)
 
 	zbx_uint64_t	id;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In process_node_history_str(nodeid:%d, master_nodeid:%d",nodeid, master_nodeid);
+	zabbix_log( LOG_LEVEL_DEBUG, "In process_node_history_str(nodeid:%d, master_nodeid:%d",
+		nodeid,
+		master_nodeid);
 	/* Begin work */
 
 	data = malloc(allocated);
 	memset(data,0,allocated);
 
-	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "History|%d|%d", CONFIG_NODEID, nodeid);
+	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "History|%d|%d",
+		CONFIG_NODEID,
+		nodeid);
 
-	zbx_snprintf(sql,sizeof(sql),"select id,itemid,clock,value from history_str_sync where nodeid=%d order by id", nodeid);
+	zbx_snprintf(sql,sizeof(sql),"select id,itemid,clock,value from history_str_sync where nodeid=%d order by id",
+		nodeid);
 
 	result = DBselectN(sql, 10000);
 	while((row=DBfetch(result)))
@@ -72,15 +77,22 @@ static int process_node_history_str(int nodeid, int master_nodeid)
 		ZBX_STR2UINT64(id,row[0])
 		found = 1;
 		zbx_snprintf_alloc(&data, &allocated, &offset, 1024, "\n%d|%s|%s|%s",
-			       ZBX_TABLE_HISTORY_STR,row[1],row[2],row[3]);
+			       ZBX_TABLE_HISTORY_STR,
+				row[1],
+				row[2],
+				row[3]);
 	}
 	if(found == 1)
 	{
 		if(send_to_node(master_nodeid, nodeid, data) == SUCCEED)
 		{
 /*			zabbix_log( LOG_LEVEL_WARNING, "Updating nodes.history_lastid");*/
-			DBexecute("update nodes set history_str_lastid=" ZBX_FS_UI64 " where nodeid=%d", id, nodeid);
-			DBexecute("delete from history_str_sync where nodeid=%d and id<=" ZBX_FS_UI64, nodeid, id);
+			DBexecute("update nodes set history_str_lastid=" ZBX_FS_UI64 " where nodeid=%d",
+				id,
+				nodeid);
+			DBexecute("delete from history_str_sync where nodeid=%d and id<=" ZBX_FS_UI64,
+				nodeid,
+				id);
 		}
 		else
 		{
@@ -123,7 +135,9 @@ static int process_node_history_uint(int nodeid, int master_nodeid)
 
 	zbx_uint64_t	id;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In process_node_history_uint(nodeid:%d, master_nodeid:%d)",nodeid, master_nodeid);
+	zabbix_log( LOG_LEVEL_DEBUG, "In process_node_history_uint(nodeid:%d, master_nodeid:%d)",
+		nodeid,
+		master_nodeid);
 	/* Begin work */
 
 	start = time(NULL);
@@ -131,9 +145,12 @@ static int process_node_history_uint(int nodeid, int master_nodeid)
 	data = malloc(allocated);
 	memset(data,0,allocated);
 
-	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "History|%d|%d", CONFIG_NODEID, nodeid);
+	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "History|%d|%d",
+		CONFIG_NODEID,
+		nodeid);
 
-	zbx_snprintf(sql,sizeof(sql),"select id,itemid,clock,value from history_uint_sync where nodeid=%d order by id", nodeid);
+	zbx_snprintf(sql,sizeof(sql),"select id,itemid,clock,value from history_uint_sync where nodeid=%d order by id",
+		nodeid);
 
 	result = DBselectN(sql, 10000);
 	while((row=DBfetch(result)))
@@ -141,15 +158,22 @@ static int process_node_history_uint(int nodeid, int master_nodeid)
 		ZBX_STR2UINT64(id,row[0])
 		found = 1;
 		zbx_snprintf_alloc(&data, &allocated, &offset, 128, "\n%d|%s|%s|%s",
-			       ZBX_TABLE_HISTORY_UINT,row[1],row[2],row[3]);
+				ZBX_TABLE_HISTORY_UINT,
+				row[1],
+				row[2],
+				row[3]);
 	}
 	if(found == 1)
 	{
 		if(send_to_node(master_nodeid, nodeid, data) == SUCCEED)
 		{
 /*			zabbix_log( LOG_LEVEL_WARNING, "Updating nodes.history_lastid"); */
-			DBexecute("update nodes set history_uint_lastid=" ZBX_FS_UI64 " where nodeid=%d", id, nodeid);
-			DBexecute("delete from history_uint_sync where nodeid=%d and id<=" ZBX_FS_UI64, nodeid, id);
+			DBexecute("update nodes set history_uint_lastid=" ZBX_FS_UI64 " where nodeid=%d",
+				id,
+				nodeid);
+			DBexecute("delete from history_uint_sync where nodeid=%d and id<=" ZBX_FS_UI64,
+				nodeid,
+				id);
 		}
 		else
 		{
@@ -161,7 +185,8 @@ static int process_node_history_uint(int nodeid, int master_nodeid)
 
 	end = time(NULL);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Spent %d seconds in process_node_history_uint",end-start);
+	zabbix_log( LOG_LEVEL_DEBUG, "Spent %d seconds in process_node_history_uint",
+		end-start);
 
 	return SUCCEED;
 }
@@ -196,16 +221,21 @@ static int process_node_history(int nodeid, int master_nodeid)
 
 	zbx_uint64_t	id;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In process_node_history(nodeid:%d, master_nodeid:%d",nodeid, master_nodeid);
+	zabbix_log( LOG_LEVEL_DEBUG, "In process_node_history(nodeid:%d, master_nodeid:%d",
+		nodeid,
+		master_nodeid);
 	/* Begin work */
 	start = time(NULL);
 
 	data = malloc(allocated);
 	memset(data,0,allocated);
 
-	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "History|%d|%d", CONFIG_NODEID, nodeid);
+	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "History|%d|%d",
+		CONFIG_NODEID,
+		nodeid);
 
-	zbx_snprintf(sql,sizeof(sql),"select id,itemid,clock,value from history_sync where nodeid=%d order by id", nodeid);
+	zbx_snprintf(sql,sizeof(sql),"select id,itemid,clock,value from history_sync where nodeid=%d order by id",
+		nodeid);
 
 	result = DBselectN(sql, 10000);
 	while((row=DBfetch(result)))
@@ -213,16 +243,24 @@ static int process_node_history(int nodeid, int master_nodeid)
 		ZBX_STR2UINT64(id,row[0])
 		found = 1;
 		zbx_snprintf_alloc(&data, &allocated, &offset, 128, "\n%d|%s|%s|%s",
-			       ZBX_TABLE_HISTORY,row[1],row[2],row[3]);
+			       ZBX_TABLE_HISTORY,
+				row[1],
+				row[2],
+				row[3]);
 	}
 	if(found == 1)
 	{
-		zabbix_log( LOG_LEVEL_DEBUG, "Sending [%s]",data);
+		zabbix_log( LOG_LEVEL_DEBUG, "Sending [%s]",
+			data);
 		if(send_to_node(master_nodeid, nodeid, data) == SUCCEED)
 		{
 /*			zabbix_log( LOG_LEVEL_WARNING, "Updating nodes.history_lastid=" ZBX_FS_UI64, id); */
-			DBexecute("update nodes set history_lastid=" ZBX_FS_UI64 " where nodeid=%d", id, nodeid);
-			DBexecute("delete from history_sync where nodeid=%d and id<=" ZBX_FS_UI64, nodeid, id);
+			DBexecute("update nodes set history_lastid=" ZBX_FS_UI64 " where nodeid=%d",
+				id,
+				nodeid);
+			DBexecute("delete from history_sync where nodeid=%d and id<=" ZBX_FS_UI64,
+				nodeid,
+				id);
 		}
 		else
 		{
@@ -234,7 +272,8 @@ static int process_node_history(int nodeid, int master_nodeid)
 
 	end = time(NULL);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Spent %d seconds in process_node_history",end-start);
+	zabbix_log( LOG_LEVEL_DEBUG, "Spent %d seconds in process_node_history",
+		end-start);
 
 	return SUCCEED;
 }
@@ -257,7 +296,9 @@ static int process_node_history(int nodeid, int master_nodeid)
  ******************************************************************************/
 static void process_node(int nodeid, int master_nodeid)
 {
-	zabbix_log( LOG_LEVEL_DEBUG, "In process_node(local:%d, master_nodeid:" ZBX_FS_UI64 ")",nodeid, master_nodeid);
+	zabbix_log( LOG_LEVEL_DEBUG, "In process_node(local:%d, master_nodeid:" ZBX_FS_UI64 ")",
+		nodeid,
+		master_nodeid);
 
 	process_node_history(nodeid, master_nodeid);
 	process_node_history_uint(nodeid, master_nodeid);

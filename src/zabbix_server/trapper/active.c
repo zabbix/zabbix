@@ -68,12 +68,21 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *host)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In send_list_of_active_checks()");
 
-	result = DBselect("select i.key_,i.delay,i.lastlogsize from items i,hosts h where i.hostid=h.hostid and h.status=%d and i.status=%d and i.type=%d and h.host='%s' and" ZBX_COND_NODEID, HOST_STATUS_MONITORED, ITEM_STATUS_ACTIVE, ITEM_TYPE_ZABBIX_ACTIVE, host, LOCAL_NODE("h.hostid"));
+	result = DBselect("select i.key_,i.delay,i.lastlogsize from items i,hosts h where i.hostid=h.hostid and h.status=%d and i.status=%d and i.type=%d and h.host='%s' and" ZBX_COND_NODEID,
+		HOST_STATUS_MONITORED,
+		ITEM_STATUS_ACTIVE,
+		ITEM_TYPE_ZABBIX_ACTIVE,
+		host,
+		LOCAL_NODE("h.hostid"));
 
 	while((row=DBfetch(result)))
 	{
-		zbx_snprintf(s,sizeof(s),"%s:%s:%s\n",row[0],row[1],row[2]);
-		zabbix_log( LOG_LEVEL_DEBUG, "Sending [%s]", s);
+		zbx_snprintf(s,sizeof(s),"%s:%s:%s\n",
+			row[0],
+			row[1],
+			row[2]);
+		zabbix_log( LOG_LEVEL_DEBUG, "Sending [%s]",
+			s);
 /*		if( write(sockfd,s,strlen(s)) == -1 ) */
 		if( zbx_tcp_send(sock,s) != SUCCEED )
 		{
@@ -84,8 +93,10 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *host)
 	}
 	DBfree_result(result);
 
-	zbx_snprintf(s,sizeof(s),"%s\n","ZBX_EOF");
-	zabbix_log( LOG_LEVEL_DEBUG, "Sending [%s]", s);
+	zbx_snprintf(s,sizeof(s),"%s\n",
+		"ZBX_EOF");
+	zabbix_log( LOG_LEVEL_DEBUG, "Sending [%s]",
+		s);
 /*	if( write(sockfd,s,strlen(s)) == -1 ) */
 	if( zbx_tcp_send(sock,s) != SUCCEED )
 	{

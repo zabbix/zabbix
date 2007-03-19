@@ -67,7 +67,8 @@ static int	process_record(int nodeid, char *record)
 
 	DB_EVENT	event;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In process_record [%s]", record);
+	zabbix_log( LOG_LEVEL_DEBUG, "In process_record [%s]",
+		record);
 
 	memset(&event,0,sizeof(DB_EVENT));
 
@@ -115,7 +116,8 @@ int	node_events(char *data)
 
 	datalen = strlen(data);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In node_events(len:%d)", datalen);
+	zabbix_log( LOG_LEVEL_DEBUG, "In node_events(len:%d)",
+		datalen);
 
 	DBbegin();
        	s=(char *)strtok(data,"\n");
@@ -130,7 +132,10 @@ int	node_events(char *data)
 			nodeid=atoi(tmp);
 			firstline=0;
 			zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Received events from node %d for node %d datalen %d",
-					CONFIG_NODEID, sender_nodeid, nodeid, datalen);
+					CONFIG_NODEID,
+					sender_nodeid,
+					nodeid,
+					datalen);
 		}
 		else
 		{
