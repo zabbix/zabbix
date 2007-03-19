@@ -194,7 +194,7 @@ static void register_host(DB_DHOST *host,DB_DCHECK *check, zbx_uint64_t druleid,
 				ip);
 			zabbix_log(LOG_LEVEL_WARNING, "New host discovered at %s", ip);
 			host->druleid	= druleid;
-			host->ip	= ip;
+			strscpy(host->ip,ip);
 			host->status	= 0;
 			host->lastup	= 0;
 			host->lastdown  = 0;
@@ -206,7 +206,7 @@ static void register_host(DB_DHOST *host,DB_DCHECK *check, zbx_uint64_t druleid,
 		zabbix_log(LOG_LEVEL_DEBUG, "Host is already in database");
 		ZBX_STR2UINT64(host->dhostid,row[0]);
 		ZBX_STR2UINT64(host->druleid,row[1]);
-		host->ip		= row[2];
+		strscpy(host->ip,	row[2]);
 		host->status		= atoi(row[3]);
 		host->lastup		= atoi(row[4]);
 		host->lastdown		= atoi(row[5]);
@@ -294,7 +294,6 @@ static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 			dserviceid);
 	}
 
-	zabbix_log(LOG_LEVEL_WARNING, "ALEX");
 	/* Generating host events */
 	if(host.eventsent == 0)
 	{
