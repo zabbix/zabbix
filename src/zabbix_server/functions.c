@@ -92,7 +92,7 @@ void	update_functions(DB_ITEM *item)
 /*		function.itemid=atoi(row[2]); */
 		lastvalue=row[3];
 
-		zabbix_log( LOG_LEVEL_DEBUG, "ItemId:" ZBX_FS_UI64 " Evaluating %s(%d)",
+		zabbix_log( LOG_LEVEL_DEBUG, "ItemId:" ZBX_FS_UI64 " Evaluating %s(%s)",
 			function.itemid,
 			function.function,
 			function.parameter);

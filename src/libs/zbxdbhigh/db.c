@@ -883,10 +883,11 @@ int	DBadd_history_str(zbx_uint64_t itemid, char *value, int clock)
 int	DBadd_history_text(zbx_uint64_t itemid, char *value, int clock)
 {
 #ifdef HAVE_ORACLE
-	char	sql[MAX_STRING_LEN];
-	char	*value_esc;
-	int	value_esc_max_len = 0;
-	int	ret = FAIL;
+	char		sql[MAX_STRING_LEN];
+	char		*value_esc;
+	int		value_esc_max_len = 0;
+	int		ret = FAIL;
+	zbx_uint64_t	id;
 
 	sqlo_lob_desc_t		loblp;		/* the lob locator */
 	sqlo_stmt_handle_t	sth;
@@ -908,9 +909,12 @@ int	DBadd_history_text(zbx_uint64_t itemid, char *value, int clock)
 		goto lbl_exit;
 	}
 
-	zbx_snprintf(sql, sizeof(sql), "insert into history_text (clock,itemid,value)"
-		" values (%d," ZBX_FS_UI64 ", EMPTY_CLOB()) returning value into :1",
-		clock, itemid);
+	id = DBget_maxid("history_log", "id");
+	zbx_snprintf(sql, sizeof(sql), "insert into history_text (id,clock,itemid,value)"
+		" values (" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ", EMPTY_CLOB()) returning value into :1",
+		id,
+		clock,
+		itemid);
 
 	zabbix_log(LOG_LEVEL_DEBUG,"Query:%s", sql);
 
@@ -965,9 +969,10 @@ lbl_exit:
 
 #else /* HAVE_ORACLE */
 
-	char    *value_esc;
-	int	value_esc_max_len = 0;
-	int	sql_max_len = 0;
+	char		*value_esc;
+	int		value_esc_max_len = 0;
+	int		sql_max_len = 0;
+	zbx_uint64_t	id;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_history_str()");
 
@@ -977,8 +982,12 @@ lbl_exit:
 	sql_max_len = value_esc_max_len+100;
 
 	DBescape_string(value,value_esc,value_esc_max_len);
-	DBexecute("insert into history_text (clock,itemid,value) values (%d," ZBX_FS_UI64 ",'%s')",
-		clock,itemid,value_esc);
+	id = DBget_maxid("history_text", "id");
+	DBexecute("insert into history_text (id,clock,itemid,value) values (" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",'%s')",
+		id,
+		clock,
+		itemid,
+		value_esc);
 
 	zbx_free(value_esc);
 
@@ -990,15 +999,23 @@ lbl_exit:
 
 int	DBadd_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp,char *source, int severity)
 {
-	char	value_esc[MAX_STRING_LEN];
-	char	source_esc[MAX_STRING_LEN];
+	char		value_esc[MAX_STRING_LEN];
+	char		source_esc[MAX_STRING_LEN];
+	zbx_uint64_t	id;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_history_log()");
 
 	DBescape_string(value,value_esc,MAX_STRING_LEN);
 	DBescape_string(source,source_esc,MAX_STRING_LEN);
-	DBexecute("insert into history_log (clock,itemid,timestamp,value,source,severity) values (%d," ZBX_FS_UI64 ",%d,'%s','%s',%d)",
-		clock,itemid,timestamp,value_esc,source_esc,severity);
+	id = DBget_maxid("history_log", "id");
+	DBexecute("insert into history_log (id,clock,itemid,timestamp,value,source,severity) values (" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",%d,'%s','%s',%d)",
+		id,
+		clock,
+		itemid,
+		timestamp,
+		value_esc,
+		source_esc,
+		severity);
 
 	return SUCCEED;
 }
