@@ -1,5 +1,7 @@
 Changes for 1.3.4:
 
+ - fixed processing of text items (Alexei)
+ - fixed processing of aggregate items (Alexei)
  - added events.object (Alexei)
  - developed PopUp menu for overview (Eugene)
  - added events.source (Alexei)
