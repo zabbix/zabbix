@@ -44,6 +44,7 @@ frontends/php/chart3.php -text
 frontends/php/conf/COPYING -text
 frontends/php/create/data.sql -text
 frontends/php/create/mysql.sql -text
+frontends/php/discoveryconf.php -text
 frontends/php/exp_imp.php -text
 frontends/php/httpconf.php -text
 frontends/php/httpdetails.php -text
@@ -97,6 +98,7 @@ frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
 frontends/php/include/classes/ccolor.inc.php -text
 frontends/php/include/classes/clist.inc.php -text
 frontends/php/include/classes/cpumenu.inc.php -text
+frontends/php/include/discovery.inc.php -text
 frontends/php/include/export.inc.php -text
 frontends/php/include/httptest.inc.php -text
 frontends/php/include/images.inc.php -text

@@ -26,6 +26,119 @@
 	require_once 	"include/users.inc.php";
 	require_once 	"include/db.inc.php";
 
+	function	insert_drule_form()
+	{
+		$frm_title = S_DISCOVERY_RULE;
+			
+		if(isset($_REQUEST['druleid']))
+		{
+			if( ($rule_data = DBfetch(DBselect("select * from drules where druleid=".$_REQUEST["druleid"]))))
+				$frm_title = S_DISCOVERY_RULE." \"".$rule_data["name"]."\"";
+		}
+		
+		$form = new CFormTable($frm_title, null, 'post');
+		$form->SetHelp("web.discovery.rule.php");
+
+		if(isset($_REQUEST['druleid']))
+		{
+			$form->AddVar('druleid', $_REQUEST['druleid']);
+		}
+		
+		if(isset($_REQUEST['druleid']) && $rule_data && (!isset($_REQUEST["form_refresh"]) || isset($_REQUEST["register"])))
+		{
+
+			$name		= $rule_data['name'];
+			$ipfirst	= $rule_data['ipfirst'];
+			$iplast		= $rule_data['iplast'];
+			$delay		= $rule_data['delay'];
+			$status		= $rule_data['status'];
+			$upevent	= round($rule_data['upevent']/3600);		/* convert seconds to hours */
+			$downevent	= round($rule_data['downevent']/3600);		/* convert seconds to hours */
+			$svcupevent	= round($rule_data['svcupevent']/3600);		/* convert seconds to hours */
+			$svcdownevent	= round($rule_data['svcdownevent']/3600);	/* convert seconds to hours */
+
+			//TODO init checks
+			$dchecks = array();
+			$db_checks = DBselect('select * from dchecks where druleid='.$_REQUEST['druleid']);
+			while($check_data = DBfetch($db_checks))
+			{
+				$dchecks[] = array( 'type' => $check_data['type'], 'ports' => $check_data['ports'] );
+			}
+		}
+		else
+		{
+			$name		= get_request('name','');
+			$ipfirst	= get_request('ipfirst','192.168.0.1');
+			$iplast		= get_request('iplast','192.168.0.255');
+			$delay		= get_request('delay',3600);
+			$status		= get_request('status',DRULE_STATUS_ACTIVE);
+			$upevent	= get_request('upevent',24);
+			$downevent	= get_request('downevent',48);
+			$svcupevent	= get_request('svcupevent',1);
+			$svcdownevent	= get_request('svcdownevent',4);
+
+			$dchecks	= get_request('dchecks',array());
+		}
+		$new_check_type	= get_request('new_check_type', SVC_HTTP);
+		$new_check_ports= get_request('new_check_ports', '80,8080');
+
+		$form->AddRow(S_NAME, new CTextBox('name', $name, 40));
+		$form->AddRow(S_IP_FIRST, new CTextBox('ipfirst', $ipfirst, 27));
+		$form->AddRow(S_IP_LAST, new CTextBox('iplast', $iplast, 27));
+		$form->AddRow(S_DELAY.' (seconds)', new CNumericBox('delay', $delay, 8));
+		$form->AddRow(S_UPEVENT, new CNumericBox('upevent', $upevent, 8));
+		$form->AddRow(S_DOWNEVENT, new CNumericBox('downevent', $downevent, 8));
+		$form->AddRow(S_SVCUPEVENT, new CNumericBox('svcupevent', $svcupevent, 8));
+		$form->AddRow(S_SVCDOWNEVENT, new CNumericBox('svcdownevent', $svcdownevent, 8));
+
+		$form->AddVar('dchecks', $dchecks);
+
+		foreach($dchecks as $id => $data)
+		{
+			$dchecks[$id] = array(
+				new CCheckBox('selected_checks[]',null,null,$id), SPACE,
+				discovery_check_type2str($data['type']), SPACE,
+				'('.$data['ports'].')',
+				BR
+			);
+		}
+
+		if(count($dchecks))
+		{
+			$dchecks[] = new CButton('delete_ckecks', S_DELETE_SELECTED);
+			$form->AddRow(S_CHECKS, $dchecks);
+		}
+
+		$cmbChkType = new CComboBox('new_check_type',$new_check_type);
+		foreach(array(SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP) as $type_int)
+			$cmbChkType->AddItem($type_int, discovery_check_type2str($type_int));
+
+		$form->AddRow(S_NEW_CHECK, array(
+			$cmbChkType, SPACE,
+			S_PORTS_SMALL, SPACE, new CTextBox('new_check_ports', $new_check_ports),
+			new CButton('add_check', S_ADD)
+		));
+
+		$cmbStatus = new CComboBox("status", $status);
+		foreach(array(DRULE_STATUS_ACTIVE, DRULE_STATUS_DISABLED) as $st)
+			$cmbStatus->AddItem($st, discovery_status2str($st));
+		$form->AddRow(S_STATUS,$cmbStatus);
+
+		$form->AddItemToBottomRow(new CButton("save",S_SAVE));
+		if(isset($_REQUEST["druleid"]))
+		{
+			$form->AddItemToBottomRow(SPACE);
+			$form->AddItemToBottomRow(new CButton("clone",S_CLONE));
+			$form->AddItemToBottomRow(SPACE);
+			$form->AddItemToBottomRow(new CButtonDelete(S_DELETE_RULE_Q,
+				url_param("form").url_param("druleid")));
+		}
+		$form->AddItemToBottomRow(SPACE);
+		$form->AddItemToBottomRow(new CButtonCancel());
+
+		$form->Show();
+	}
+
 	function	insert_httpstep_form()
 	{
 		$form = new CFormTable(S_STEP_OF_SCENARIO, null, 'post');
