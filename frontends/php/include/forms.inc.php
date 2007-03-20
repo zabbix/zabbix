@@ -80,7 +80,7 @@
 			$dchecks	= get_request('dchecks',array());
 		}
 		$new_check_type	= get_request('new_check_type', SVC_HTTP);
-		$new_check_ports= get_request('new_check_ports', '80,8080');
+		$new_check_ports= get_request('new_check_ports', '80');
 
 		$form->AddRow(S_NAME, new CTextBox('name', $name, 40));
 		$form->AddRow(S_IP_FIRST, new CTextBox('ipfirst', $ipfirst, 27));
@@ -109,9 +109,27 @@
 			$form->AddRow(S_CHECKS, $dchecks);
 		}
 
-		$cmbChkType = new CComboBox('new_check_type',$new_check_type);
+		$cmbChkType = new CComboBox('new_check_type',$new_check_type,
+			"if(add_variable(this, 'type_changed', 1)) submit()"
+			);
 		foreach(array(SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP) as $type_int)
 			$cmbChkType->AddItem($type_int, discovery_check_type2str($type_int));
+
+		if(isset($_REQUEST['type_changed']))
+		{
+			switch($new_check_type)
+			{
+				case SVC_SSH:	$new_check_ports = 22;	break;
+				case SVC_LDAP:	$new_check_ports = 389;	break;
+				case SVC_SMTP:	$new_check_ports = 25;	break;
+				case SVC_FTP:	$new_check_ports = 21;	break;
+				case SVC_HTTP:	$new_check_ports = 80;	break;
+				case SVC_POP:	$new_check_ports = 110;	break;
+				case SVC_NNTP:	$new_check_ports = 119;	break;
+				case SVC_IMAP:	$new_check_ports = 143;	break;
+				case SVC_TCP:	$new_check_ports = 80;	break;
+			}
+		}
 
 		$form->AddRow(S_NEW_CHECK, array(
 			$cmbChkType, SPACE,

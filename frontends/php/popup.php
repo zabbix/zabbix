@@ -619,27 +619,21 @@ function add_template(formname,id,name)
 
 <script language="JavaScript" type="text/javascript">
 <!--
-function add_variable(formname,value)
+function add_item_variable(s_formname,x_value)
 {
-        var msg = '';
-        var form = window.opener.document.forms[formname];
-        if(!form)
-        {
-                alert('form '+formname+' not exist');
-                window.close();
-        }
+	if(add_variable(null, "itemid[]", x_value, s_formname, window.opener.document))
+	{
+		var o_form;
 
-        new_variable = window.opener.document.createElement('input');
-        new_variable.type = 'hidden';
-        new_variable.name = 'itemid[]';
-        new_variable.value = value;
+		if( !(o_form = window.opener.document.forms[s_formname]) )
+			 throw "Missed form with name '"+s_formname+"'.";
 
-        form.appendChild(new_variable);
+		var element = o_form.elements['itemid'];
+		if(element)     element.name = 'itemid[]';
 
-        var element = form.elements['itemid'];
-        if(element)     element.name = 'itemid[]';
+		o_form.submit();
+	}
 
-        form.submit();
 	window.close();
         return true;
 }
@@ -665,7 +659,7 @@ function add_variable(formname,value)
 		while($db_item = DBfetch($db_items))
 		{
 			$description = new CLink(item_description($db_item["description"],$db_item["key_"]),"#","action");
-			$description->SetAction("return add_variable('".$dstfrm."',".$db_item["itemid"].");");
+			$description->SetAction("return add_item_variable('".$dstfrm."',".$db_item["itemid"].");");
 
 			switch($db_item["status"]){
 				case 0: $status=new CCol(S_ACTIVE,"enabled");		break;
