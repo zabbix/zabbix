@@ -54,7 +54,7 @@ static void add_host_event(DB_DHOST *host, zbx_uint64_t dserviceid)
 	DB_EVENT	event;
 	int		now;
 
-	zabbix_log(LOG_LEVEL_WARNING, "In add_host_event()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In add_host_event()");
 
 	now = time(NULL); 
 
@@ -139,7 +139,7 @@ static zbx_uint64_t register_service(DB_DRULE *rule,DB_DCHECK *check,zbx_uint64_
 				dserviceid,
 				check->type,
 				port);
-			zabbix_log(LOG_LEVEL_WARNING, "New service discovered on port %d", port);
+			zabbix_log(LOG_LEVEL_DEBUG, "New service discovered on port %d", port);
 		}
 	}
 	else
@@ -187,7 +187,7 @@ static void register_host(DB_DHOST *host,DB_DCHECK *check, zbx_uint64_t druleid,
 		/* Add host only if service is up */
 		if(check->status == SERVICE_UP)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "New host discovered at %s",
+			zabbix_log(LOG_LEVEL_DEBUG, "New host discovered at %s",
 				ip);
 			host->dhostid = DBget_maxid("dhosts","dhostid");
 			DBexecute("insert into dhosts (dhostid,druleid,ip) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s')",
@@ -239,7 +239,7 @@ static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 	int		now;
 	DB_DHOST	host;
 
-	zabbix_log(LOG_LEVEL_WARNING, "In update_check(ip:%s, port:%d, status:%s)",
+	zabbix_log(LOG_LEVEL_DEBUG, "In update_check(ip:%s, port:%d, status:%s)",
 		ip,
 		port,
 		(check->status==SERVICE_UP?"up":"down"));
@@ -302,7 +302,7 @@ static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 	{
 		if(host.status == SERVICE_UP && (host.lastup<=now-rule->upevent))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Generating host event for %s",
+			zabbix_log(LOG_LEVEL_DEBUG, "Generating host event for %s",
 				host.ip);
 			host.eventsent=1;
 
@@ -311,7 +311,7 @@ static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 		}
 		if(host.status == SERVICE_DOWN && (host.lastdown<=now-rule->downevent))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Generating host event for %s",
+			zabbix_log(LOG_LEVEL_DEBUG, "Generating host event for %s",
 				host.ip);
 			host.eventsent=1;
 			update_dhost(&host);
@@ -447,7 +447,7 @@ static void process_check(DB_DRULE *rule, DB_DCHECK *check, char *ip)
 	char	tmp[MAX_STRING_LEN];
 	int	first,last;
 
-	zabbix_log(LOG_LEVEL_WARNING, "In process_check(ip:%s, ports:%s, type:%d)",
+	zabbix_log(LOG_LEVEL_DEBUG, "In process_check(ip:%s, ports:%s, type:%d)",
 		ip,
 		check->ports,
 		check->type);
@@ -474,8 +474,6 @@ static void process_check(DB_DRULE *rule, DB_DCHECK *check, char *ip)
 
 		for(port=first;port<=last;port++)
 		{	
-			zabbix_log(LOG_LEVEL_WARNING, "Port %d",
-				port);
 			check->status = discover_service(check->type,ip,port);
 			update_service(rule, check, ip, port);
 		}
