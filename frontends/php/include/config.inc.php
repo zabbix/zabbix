@@ -1968,4 +1968,23 @@ else if (document.getElementById)
 
 		$ZBX_PAGE_COOKIES[] = array($name, $value, isset($time) ? $time : (time() + 3600));
 	}
+
+	function	inarr_isset($keys, $array=null)
+	{
+		global $_REQUEST;
+
+		if(is_null($array)) $array =& $_REQUEST;
+
+		if(is_array($keys))
+		{
+			foreach($keys as $id => $key)
+			{
+				if( !isset($array[$key]) )
+					return false;
+			}
+			return true;
+		}
+
+		return isset($array[$keys]);
+	}
 ?>
