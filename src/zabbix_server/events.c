@@ -125,7 +125,7 @@ static void	free_trigger_info(DB_EVENT *event)
  ******************************************************************************/
 int	process_event(DB_EVENT *event)
 {
-	zabbix_log(LOG_LEVEL_WARNING,"In process_event(eventid:" ZBX_FS_UI64 ",object:%d,objectid:" ZBX_FS_UI64 ")",
+	zabbix_log(LOG_LEVEL_DEBUG,"In process_event(eventid:" ZBX_FS_UI64 ",object:%d,objectid:" ZBX_FS_UI64 ")",
 			event->eventid,
 			event->object,
 			event->objectid);
