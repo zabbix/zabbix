@@ -46,6 +46,8 @@
 
 	function	IN($array,$var='')
 	{
+		if(is_array($array)) $array = implode(',', $array);
+
 		return "in_array({".$var."},array(".$array."))&&";
 	}
 	function	HEX($var=NULL)
@@ -187,6 +189,15 @@
 			}
 			$err = ZBX_VALID_OK;
 			foreach($var as $el) $err |= check_type($field, $flags, $el, T_ZBX_INT);
+			return $err;
+		}
+
+		if($type == T_ZBX_PORTS)
+		{
+			$err = ZBX_VALID_OK;
+			foreach(explode(',', $var) as $el)
+				foreach(explode('-', $el) as $p)
+					$err |= check_type($field, $flags, $p, T_ZBX_INT);
 			return $err;
 		}
 		

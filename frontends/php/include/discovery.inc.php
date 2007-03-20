@@ -1,0 +1,154 @@
+<?php
+/*
+** ZABBIX
+** Copyright (C) 2000-2005 SIA Zabbix
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+**/
+?>
+<?php
+	function	discovery_check_type2str($type_int)
+	{
+		$str_type[SVC_SSH]	= S_SSH;
+		$str_type[SVC_LDAP]	= S_LDAP;
+		$str_type[SVC_SMTP]	= S_SMTP;
+		$str_type[SVC_FTP]	= S_FTP;
+		$str_type[SVC_HTTP]	= S_HTTP;
+		$str_type[SVC_POP]	= S_POP;
+		$str_type[SVC_NNTP]	= S_NNTP;
+		$str_type[SVC_IMAP]	= S_IMAP;
+		$str_type[SVC_TCP]	= S_TCP;
+
+		if(isset($str_type[$type_int]))
+			return $str_type[$type_int];
+
+		return S_UNKNOWN;
+	}
+
+	function	discovery_status2str($status_int)
+	{
+		switch($status_int)
+		{
+			case DRULE_STATUS_ACTIVE:	$status = S_ACTIVE;		break;
+			case DRULE_STATUS_DISABLED:	$status = S_DISABLED;		break;
+			default:
+				$status = S_UNKNOWN;		break;
+		}
+		return $status;
+	}
+
+	function	discovery_status2style($status)
+	{
+		switch($status)
+		{
+			case DRULE_STATUS_ACTIVE:	$status = 'off';	break;
+			case DRULE_STATUS_DISABLED:	$status = 'on';		break;
+			default:
+				$status = 'unknown';	break;
+		}
+		return $status;
+	}
+
+	function	get_discovery_rule_by_druleid($druleid)
+	{
+		return DBfetch(DBselect('select * from drules where druleid='.$druleid));
+	}
+
+	function	set_discovery_rule_status($druleid, $status)
+	{
+		return DBexecute('update drules set status='.$status.' where druleid='.$druleid);
+	}
+
+	function	add_discovery_check($druleid, $type, $ports)
+	{
+		$dcheckid = get_dbid('dchecks', 'dcheckid');
+		$result = DBexecute('insert into dchecks (dcheckid,druleid,type,ports) '.
+			' values ('.$dcheckid.','.$druleid.','.$type.','.zbx_dbstr($ports).')');
+
+		if(!$result)
+			return $result;
+
+		return $dcheckid;
+	}
+
+	function	add_discovery_rule($name, $ipfirst, $iplast,
+			$delay, $status, $upevent, $downevent,
+			$svcupevent, $svcdownevent, $dchecks)
+	{
+		$upevent	*= 3600; /* convert hours to seconds */
+		$downevent	*= 3600; /* convert hours to seconds */
+		$svcupevent	*= 3600; /* convert hours to seconds */
+		$svcdownevent	*= 3600; /* convert hours to seconds */
+
+		$ip_1 = explode('.', $ipfirst);
+		$ip_2 = explode('.', $iplast);
+		for($i=0; $i<3; $i++)
+		{
+			if($ip_1[$i] != $ip_2[$i])
+			{
+				error('Incorrect IP range.');
+				return false;
+			}
+		}
+
+		$druleid = get_dbid('drules', 'druleid');
+		$result = DBexecute('insert into drules (druleid,name,ipfirst,iplast,delay,status,upevent,downevent,svcupevent,svcdownevent) '.
+			' values ('.$druleid.','.zbx_dbstr($name).','.zbx_dbstr($ipfirst).','.zbx_dbstr($iplast).','.$delay.','.$status.
+			','.$upevent.','.$downevent.','.$svcupevent.','.$svcdownevent.')');
+
+		if($result)
+		{
+			DBexecute('delete from dchecks where druleid='.$druleid);
+			if(isset($dchecks)) foreach($dchecks as $val)
+				add_discovery_check($druleid,$val["type"],$val["ports"]);
+
+			$result = $druleid;
+		}
+
+		return $result;
+	}
+
+	function	update_discovery_rule($druleid, $name, $ipfirst, $iplast,
+			$delay, $status, $upevent, $downevent,
+			$svcupevent, $svcdownevent, $dchecks)
+	{
+		$upevent	*= 3600; /* convert hours to seconds */
+		$downevent	*= 3600; /* convert hours to seconds */
+		$svcupevent	*= 3600; /* convert hours to seconds */
+		$svcdownevent	*= 3600; /* convert hours to seconds */
+
+		$result = DBexecute('update drules set name='.zbx_dbstr($name).',ipfirst='.zbx_dbstr($ipfirst).','.
+			'iplast='.zbx_dbstr($iplast).',delay='.$delay.',status='.$status.',upevent='.$upevent.','.
+			'downevent='.$downevent.',svcupevent='.$svcupevent.',svcdownevent='.$svcdownevent.' '.
+			' where druleid='.$druleid);
+
+		if($result)
+		{
+			DBexecute('delete from dchecks where druleid='.$druleid);
+			if(isset($dchecks)) foreach($dchecks as $val)
+				add_discovery_check($druleid,$val["type"],$val["ports"]);
+		}
+		return $result;
+	}
+
+	function	delete_discovery_rule($druleid)
+	{
+		if($result = DBexecute('delete from drules where druleid='.$druleid))
+		{
+			$result = DBexecute('delete from dchecks where druleid='.$druleid);
+		}
+		return $result;
+	}
+?>

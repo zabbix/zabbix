@@ -47,6 +47,7 @@
 	define("T_ZBX_PERIOD",			3);
 	define("T_ZBX_IP",			4);
 	define("T_ZBX_CLR",			5);
+	define("T_ZBX_PORTS",			5);
 
 	define("O_MAND",			0);
 	define("O_OPT",				1);
@@ -95,6 +96,7 @@
 	define("AUDIT_RESOURCE_SCREEN",		20);
 	define("AUDIT_RESOURCE_NODE",		21);
 	define("AUDIT_RESOURCE_SCENARIO",	22);
+	define("AUDIT_RESOURCE_DISCOVERY_RULE",	23);
 
 	define("CONDITION_TYPE_GROUP",		0);
 	define("CONDITION_TYPE_HOST",		1);
@@ -103,6 +105,9 @@
 	define("CONDITION_TYPE_TRIGGER_SEVERITY",4);
 	define("CONDITION_TYPE_TRIGGER_VALUE",	5);
 	define("CONDITION_TYPE_TIME_PERIOD",	6);
+	define("CONDITION_TYPE_DHOST_IP",	7); /* = # => <= */	/* TODO!!!! */
+	define("CONDITION_TYPE_DSERVICE_TYPE",	8); /* = # */		/* TODO!!!! */
+	define("CONDITION_TYPE_DSERVICE_PORT",	9); /* = # => <= */	/* TODO!!!! */
 
 	define("CONDITION_OPERATOR_EQUAL",	0);
 	define("CONDITION_OPERATOR_NOT_EQUAL",	1);
@@ -318,6 +323,20 @@
 	define('EVENT_OBJECT_TRIGGER',		0);
 	define('EVENT_OBJECT_DHOST',		1);
 	define('EVENT_OBJECT_DSERVICE',		2);
+
+	define('DRULE_STATUS_ACTIVE',		0);
+	define('DRULE_STATUS_DISABLED',		1);
+
+	define('SVC_SSH',	0);
+	define('SVC_LDAP',	1);
+	define('SVC_SMTP',	2);
+	define('SVC_FTP',	3);
+	define('SVC_HTTP',	4);
+	define('SVC_POP',	5);
+	define('SVC_NNTP',	6);
+	define('SVC_IMAP',	7);
+	define('SVC_TCP',	8);
+
 	
 	define("BR",	"<br/>\n");
 	define("SPACE",	"&nbsp;");

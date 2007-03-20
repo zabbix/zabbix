@@ -133,8 +133,8 @@
 			if(is_string($item1))
 				$item1=nbsp($item1);
 
-			if(is_null($item1)) $item1 = SPACE;
-			if(is_null($item2)) $item2 = SPACE;
+			if(empty($item1)) $item1 = SPACE;
+			if(empty($item2)) $item2 = SPACE;
 
 			$row = new CRow(array(
 					new CCol($item1,'form_row_l'),
