@@ -16,6 +16,47 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
+function SDI(msg)
+{
+	alert("DEBUG INFO: " + msg);
+}
+
+function add_variable(o_el, s_name, x_value, s_formname, o_document)
+{
+	var form;
+
+	if(!o_document)	o_document = document;
+
+	if(s_formname)
+	{
+		if( !(form = o_document.forms[s_formname]) )
+			 throw "Missed form with name '"+s_formname+"'.";
+	}
+	else if(o_el)
+	{
+		
+		if( !(form = o_el.form) )
+			throw "Missed form in 'o_el' object";
+	}
+	else
+	{
+		if( !(form = this.form) )
+			throw "Missed form in 'this' object";
+	}
+
+        var o_variable = o_document.createElement('input');
+
+	if( !o_variable )	throw "Can't create element";
+
+        o_variable.type = 'hidden';
+        o_variable.name = s_name;
+        o_variable.value = x_value;
+
+        form.appendChild(o_variable);
+
+        return true;
+}
+
 function get_scroll_pos()
 {
 	var scrOfX = 0, scrOfY = 0;
