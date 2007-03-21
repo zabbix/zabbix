@@ -70,7 +70,7 @@
 				" and i.status=".ITEM_STATUS_ACTIVE.
 				' and h.hostid in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,
 					null, null, $this->nodeid).') '.
-				" group by priority");
+				" group by priority,t.value");
 			while($row=DBfetch($db_priority))
 			{
 				switch($row["value"])

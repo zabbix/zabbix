@@ -1531,6 +1531,18 @@ function show_hint_ext(obj, e, hint_text, width, class_name)
 	obj.onmouseout	= hide_hint;
 }
 
+function update_hint(obj, e)
+{
+	if(!hint_box) return;
+
+	var cursor = get_cursor_position(e);
+
+	var pos = GetPos(obj);
+
+	hint_box.style.left     = cursor.x + 10 + "px";
+	hint_box.style.top      = hint_box.y + obj.offsetHeight + "px";
+}
+
 function create_hint_box()
 {
 	if(hint_box) return;

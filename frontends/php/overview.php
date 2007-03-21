@@ -93,7 +93,36 @@ include_once "include/page_header.php";
 	$cmbType->AddItem(SHOW_DATA,	S_DATA);
 	$form->AddItem(array(S_TYPE.SPACE,$cmbType));
 
-	show_table_header(S_OVERVIEW_BIG, $form);
+	$help = new CHelp('web.view.php','left');
+	$help_table = new CTableInfo();
+	$help_table->AddOption('style', 'width: 200px');
+	if($_REQUEST["type"]==SHOW_TRIGGERS)
+	{
+		$help_table->AddRow(array(new CCol(SPACE, 'normal'), S_DISABLED));
+	}
+	foreach(array(1,2,3,4,5) as $tr_severity)
+		$help_table->AddRow(array(new CCol(get_severity_description($tr_severity),get_severity_style($tr_severity)),S_ENABLED));
+	$help_table->AddRow(array(new CCol(SPACE, 'unknown_trigger'), S_UNKNOWN));
+	if($_REQUEST["type"]==SHOW_TRIGGERS)
+	{
+		$col = new CCol(SPACE, 'unknown_trigger');
+		$col->AddOption('style','background-image: url(images/gradients/blink1.gif); '.
+			'background-position: top left; background-repeat: repeate;');
+		$help_table->AddRow(array($col, S_5_MIN));
+		$col = new CCol(SPACE, 'unknown_trigger');
+		$col->AddOption('style','background-image: url(images/gradients/blink2.gif); '.
+			'background-position: top left; background-repeat: repeate;');
+		$help_table->AddRow(array($col, S_15_MIN));
+		$help_table->AddRow(array(new CCol(SPACE), S_NO_TRIGGER));
+	}
+	else
+	{
+		$help_table->AddRow(array(new CCol(SPACE), S_DISABLED.' '.S_OR.' '.S_NO_TRIGGER));
+	}
+
+	$help->SetHint($help_table);
+	show_table_header(array($help, S_OVERVIEW_BIG), $form);
+	unset($help, $help_table, $form, $col);
 ?>
 
 <?php
