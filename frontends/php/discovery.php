@@ -58,6 +58,7 @@ include_once "include/page_header.php";
 	);
 
 	$services = array();
+	$discovery_info = array();
 
 	while($drule_data = DBfetch($db_dhosts))
 	{
