@@ -358,7 +358,13 @@ table.tableinfo tr td.unknown_trigger		{	background-color: #BCBCBC;	border: 1px 
 table.tableinfo tr:hover td.unknown_trigger	{	background-color: #BCB7BC;	border: 1px #BCB7BC solid; }
 
 table.tableinfo tr td.normal			{	background-color: #AADDAA;	border: 1px #AADDAA solid; }
+table.tableinfo tr:hover td.normal		{	background-color: #AAD9AA;	border: 1px #AAD9AA solid; }
 
+table.tableinfo tr td.active			{	background-color: #AADDAA;	border: 1px #AADDAA solid; }
+table.tableinfo tr:hover td.active		{	background-color: #AAD9AA;	border: 1px #AAD9AA solid; }
+
+table.tableinfo tr td.disabled			{	background-color: #FF8888;	border: 1px #FF8888 solid; }
+table.tableinfo tr:hover td.disabled		{	background-color: #FA8388;	border: 1px #FA8388 solid; }
 /****** HEADER *********/
 
 table.header
@@ -1081,6 +1087,25 @@ ul
 }
 
 /************ END OF COLOR PICKER ***********/
+
+/************** DISCOVERY STATUS ************/
+.dhosts_active {
+	padding: 5px;
+	text-align: center;
+	color: #0FA00F;
+}
+.dhosts_disabled {
+	padding: 5px;
+	text-align: center;
+	color: #A00F0F;
+}
+.dservice_active {
+	background: #0FA00F;
+}
+.dservice_disabled {
+	background: #A00F0F;
+}
+/********** END OF DISCOVERY STATUS *********/
 
 .center
 {

@@ -218,7 +218,7 @@
 		{
 			insert_showhint_javascript();
 
-			$text = addslashes(htmlspecialchars($text));
+			$text = addslashes(htmlspecialchars(unpack_object($text)));
 			if($width != '' || $class!= '')
 			{
 				$code = "show_hint_ext(this,event,'".$text."','".$width."','".$class."');";
@@ -229,7 +229,7 @@
 			}
 
 			$this->AddAction('onMouseOver',	$code);
-			$this->AddAction('onMouseMove',	$code);
+			$this->AddAction('onMouseMove',	'update_hint(this,event);');
 		}
 
 		function OnClick($handle_code)
