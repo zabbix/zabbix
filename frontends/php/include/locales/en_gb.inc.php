@@ -74,6 +74,8 @@
 	'S_CANNOT_UPDATE_DISCOVERY_RULE'=>	'Cannot update discovery rule',
 	'S_DISCOVERY_RULE_ADDED'=>		'Discovery rule added',
 	'S_CANNOT_ADD_DISCOVERY_RULE'=>		'Cannot add discovery rule',
+	'S_STATUS_OF_DISCOVERY_BIG'=>		'STATUS OF DISCOVERY',
+	'S_STATUS_OF_DISCOVERY'=>		'Status of discovery',
 
 //	httpdetails.php
 	"S_DETAILS_OF_SCENARIO"=>		"Details of scenario",
@@ -843,6 +845,8 @@
 	"S_SHOW_GRAPH_OF_ITEM"=>		"Show graph of item",
 	"S_SHOW_VALUES_OF_ITEM"=>		"Show values of item",
 	"S_VALUES"=>				"Values",
+	"S_5_MIN"=>				"5 min",
+	"S_15_MIN"=>				"15 min",
 
 //	queue.php
 	"S_QUEUE_BIG"=>				"QUEUE",
@@ -1054,12 +1058,14 @@
 //	srv_status.php
 	"S_IT_SERVICES_BIG"=>			"IT SERVICES",
 	"S_SERVICE"=>				"Service",
+	"S_SERVICES"=>				"Services",
 	"S_REASON"=>				"Reason",
 	"S_SLA_LAST_7_DAYS"=>			"SLA (last 7 days)",
 	"S_PLANNED_CURRENT_SLA"=>		"Planned/current SLA",
 	"S_TRIGGER_BIG"=>			"TRIGGER",
 
 //	triggers.php
+	"S_NO_TRIGGER"=>			"No trigger",
 	"S_NO_TRIGGERS_DEFINED"=>		"No triggers defined",
 	"S_CONFIGURATION_OF_TRIGGERS"=>		"Configuration of triggers",
 	"S_CONFIGURATION_OF_TRIGGERS_BIG"=>	"CONFIGURATION OF TRIGGERS",

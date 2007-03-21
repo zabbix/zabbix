@@ -327,6 +327,9 @@
 	define('DRULE_STATUS_ACTIVE',		0);
 	define('DRULE_STATUS_DISABLED',		1);
 
+	define('DSVC_STATUS_ACTIVE',		0);
+	define('DSVC_STATUS_DISABLED',		1);
+
 	define('SVC_SSH',	0);
 	define('SVC_LDAP',	1);
 	define('SVC_SMTP',	2);
@@ -337,6 +340,8 @@
 	define('SVC_IMAP',	7);
 	define('SVC_TCP',	8);
 
+	define('DHOST_STATUS_ACTIVE',		0);
+	define('DHOST_STATUS_DISABLED',		1);
 	
 	define("BR",	"<br/>\n");
 	define("SPACE",	"&nbsp;");
