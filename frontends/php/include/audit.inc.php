@@ -40,6 +40,7 @@
 		$str_resource[AUDIT_RESOURCE_SCREEN]		= S_SCREEN;
 		$str_resource[AUDIT_RESOURCE_NODE]		= S_NODE;
 		$str_resource[AUDIT_RESOURCE_SCENARIO]		= S_SCENARIO;
+		$str_resource[AUDIT_RESOURCE_DISCOVERY_RULE]	= S_DISCOVERY_RULE;
 
 		if(isset($str_resource[$resource_type]))
 			return $str_resource[$resource_type];
