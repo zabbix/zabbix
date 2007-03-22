@@ -181,7 +181,7 @@
 		
 		$form->AddItemToBottomRow(new CButton("save", isset($sid) ? S_SAVE : S_ADD));
 
-		$form->AddItemToBottomRow(new CButton('cancel',S_CANCEL,'window.close();'));
+		$form->AddItemToBottomRow(new CButtonCancel('close_window();'));
 
 		$form->show();
 	}
@@ -494,7 +494,7 @@
 		$frmMsg->AddRow(S_MESSAGE, new CTextArea("message","",80,6));
 
 		$frmMsg->AddItemToBottomRow(new CButton("save",$btn_txt));
-		$frmMsg->AddItemToBottomRow(new CButton("cancel",S_CANCEL));
+		$frmMsg->AddItemToBottomRow(new CButtonCancel(url_param('"eventid')));
 
 		$frmMsg->Show(false);
 
@@ -654,8 +654,8 @@
 					$lstGroups, 
 					BR, 
 					new CButton('add_group',S_ADD,
-						"return PopUp('popup_usrgrp.php?dstfrm=".$frmUser->GetName().
-						"&list_name=user_groups_to_del[]&var_name=user_groups',450, 450);"),
+						'return PopUp("popup_usrgrp.php?dstfrm='.$frmUser->GetName().
+						'&list_name=user_groups_to_del[]&var_name=user_groups",450, 450);'),
 					SPACE,
 					(count($user_groups) > 0) ? new CButton('del_user_group',S_DELETE_SELECTED) : null
 				));
@@ -1286,7 +1286,7 @@
 
 		$form->AddItemToBottomRow(array(
 			new CButton('select',S_SEARCH),
-			new CButton('cancel',S_CANCEL)));
+			new CButtonCancel('&external_filter=1')));
 
 		$form->Show();
 	}
@@ -1532,7 +1532,7 @@
 		{
 			$btnSelect = new CButton('btn1',S_SELECT,
 				"return PopUp('popup.php?dstfrm=".$frmItem->GetName().
-				"&dstfld1=key&srctbl=help_items&srcfld1=key_');");
+				"&dstfld1=key&srctbl=help_items&srcfld1=key_&itemtype=".$type."');");
 			$btnSelect->SetAccessKey('T');
 		}
 		
@@ -1974,7 +1974,7 @@
 		$cmbCopyType->AddItem(1,S_HOST_GROUPS);
 		$frmCopy->AddRow(S_TARGET_TYPE, $cmbCopyType);
 
-		$target_sql = 'select distinct g.groupid target_id, g.name target_name'.
+		$target_sql = 'select distinct g.groupid as target_id, g.name as target_name'.
 			' from groups g, hosts_groups hg'.
 			' where hg.groupid=g.groupid';
 
@@ -1989,7 +1989,7 @@
 			}
 			$frmCopy->AddRow('Group', $cmbGroup);
 
-			$target_sql = 'select h.hostid target_id, h.host target_name from hosts h';
+			$target_sql = 'select h.hostid as target_id, h.host as target_name from hosts h';
 			if($filter_groupid > 0)
 			{
 				$target_sql .= ', hosts_groups hg where hg.hostid=h.hostid and hg.groupid='.$filter_groupid;
@@ -2181,7 +2181,7 @@
 		$frmComent->AddVar("triggerid",$triggerid);
 		$frmComent->AddRow(S_COMMENTS,new CTextArea("comments",stripslashes($trigger["comments"]),100,25));
 		$frmComent->AddItemToBottomRow(new CButton("save",S_SAVE));
-		$frmComent->AddItemToBottomRow(new CButton("cancel",S_CANCEL));
+		$frmComent->AddItemToBottomRow(new CButtonCancel('&triggerid='.$triggerid));
 
 		$frmComent->Show();
 	}
@@ -2493,7 +2493,7 @@
 
 		$frmGItem->AddItemToBottomRow(new CButton("save", isset($gid) ? S_SAVE : S_ADD));
 
-		$frmGItem->AddItemToBottomRow(new CButton('cancel',S_CANCEL,'window.close();'));
+		$frmGItem->AddItemToBottomRow(new CButtonCancel('close_window();'));
 		$frmGItem->Show();
 	}
 
@@ -3485,7 +3485,7 @@
 	
 		$frmMedia->AddItemToBottomRow(new CButton("add", S_ADD));
 		$frmMedia->AddItemToBottomRow(SPACE);
-		$frmMedia->AddItemToBottomRow(new CButton('cancel',S_CANCEL,'window.close();'));
+		$frmMedia->AddItemToBottomRow(new CButtonCancel(null, 'close_window();'));
 		$frmMedia->Show();
 	}
 

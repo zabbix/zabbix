@@ -84,7 +84,7 @@ function add_httpstep(formname,name,timeout,url,posts,required)
 
         if(!form)
         {
-                window.close();
+                close_window();
 		return false;
         }
 
@@ -95,7 +95,7 @@ function add_httpstep(formname,name,timeout,url,posts,required)
 	add_var_to_opener_obj(form,'new_httpstep[required]',required);
 	
 	form.submit();
-	window.close();
+	close_window();
 	return true;
 }
 
@@ -124,7 +124,7 @@ function update_httpstep(formname,list_name,sid,name,timeout,url,posts,required)
 
         if(!form)
         {
-                window.close();
+                close_window();
 		return false;
         }
 
@@ -136,7 +136,7 @@ function update_httpstep(formname,list_name,sid,name,timeout,url,posts,required)
 	
 	
 	form.submit();
-	window.close();
+	close_window();
 	return true;
 }
 

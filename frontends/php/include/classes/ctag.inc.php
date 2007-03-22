@@ -218,7 +218,7 @@
 		{
 			insert_showhint_javascript();
 
-			$text = addslashes(htmlspecialchars(unpack_object($text)));
+			$text = unpack_object($text);
 			if($width != '' || $class!= '')
 			{
 				$code = "show_hint_ext(this,event,'".$text."','".$width."','".$class."');";
@@ -239,10 +239,8 @@
 
 		function AddAction($name, $value)
 		{
-			if(isset($value))
-				$this->options[$name] = str_replace("\n", '', strval($value)); 
-			else
-				unset($this->options[$name]);
+			if(!empty($value))
+				$this->options[$name] = htmlentities(str_replace("\n", '', strval($value)),ENT_COMPAT); 
 		}
 
 		function AddOption($name, $value)

@@ -77,7 +77,7 @@ form = window.opener.document.forms['<?php echo $dstfrm; ?>'];
 if(form)
 {
 	form.submit();
-	window.close();
+	close_window();
 }
 -->
 </script>

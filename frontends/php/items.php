@@ -782,7 +782,7 @@ include_once "include/page_header.php";
 				$error=new CCol($db_item["error"],"on");
 			}
 
-			$applications = $show_applications == 1 ? implode(', ', get_applications_by_itemid($db_item["itemid"], 'name')) : null;
+			$applications = $show_applications ? implode(', ', get_applications_by_itemid($db_item["itemid"], 'name')) : null;
 
 			$chkBox = new CCheckBox("group_itemid[]",null,null,$db_item["itemid"]);
 			//if($db_item["templateid"] > 0) $chkBox->SetEnabled(false);
@@ -795,23 +795,20 @@ include_once "include/page_header.php";
 				$db_item["trends"],
 				item_type2str($db_item['type']),
 				$status,
-				$show_applications ? $applications : null,
+				$applications,
 				$error
 				));
 		}
 
 		$footerButtons = array();
-		array_push($footerButtons, new CButton('group_task',S_ACTIVATE_SELECTED,
-			"return Confirm('".S_ACTIVATE_SELECTED_ITEMS_Q."');"));
+		array_push($footerButtons, new CButtonQMessage('group_task',S_ACTIVATE_SELECTED,S_ACTIVATE_SELECTED_ITEMS_Q));
 		array_push($footerButtons, SPACE);
-		array_push($footerButtons, new CButton('group_task',S_DISABLE_SELECTED,
-			"return Confirm('".S_DISABLE_SELECTED_ITEMS_Q."');"));
+		array_push($footerButtons, new CButtonQMessage('group_task',S_DISABLE_SELECTED,S_DISABLE_SELECTED_ITEMS_Q));
 		array_push($footerButtons, SPACE);
-		array_push($footerButtons, new CButton('group_task',S_CLEAN_HISTORY_SELECTED_ITEMS,
-			"return Confirm('".S_HISTORY_CLEANING_CAN_TAKE_A_LONG_TIME_CONTINUE_Q."');"));
+		array_push($footerButtons, new CButtonQMessage('group_task',S_CLEAN_HISTORY_SELECTED_ITEMS,
+			S_HISTORY_CLEANING_CAN_TAKE_A_LONG_TIME_CONTINUE_Q));
 		array_push($footerButtons, SPACE);
-		array_push($footerButtons, new CButton('group_task',S_DELETE_SELECTED,
-			"return Confirm('".S_DELETE_SELECTED_ITEMS_Q."');"));
+		array_push($footerButtons, new CButtonQMessage('group_task',S_DELETE_SELECTED,S_DELETE_SELECTED_ITEMS_Q));
 		array_push($footerButtons, SPACE);
 		array_push($footerButtons, new CButton('form_copy_to',S_COPY_SELECTED_TO));
 		array_push($footerButtons, SPACE);
