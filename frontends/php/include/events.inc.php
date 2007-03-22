@@ -20,7 +20,7 @@
 ?>
 <?php
 
-	function get_history_of_events($start,$num, $groupid=0, $hostid=0, $nodeid=null)
+	function get_history_of_triggers_events($start,$num, $groupid=0, $hostid=0, $nodeid=null)
 	{
 		global $ZBX_CURNODEID;
 		global $USER_DETAILS;
@@ -84,6 +84,77 @@
 				new CLink(expand_trigger_description_by_data($row),"tr_events.php?triggerid=".$row["triggerid"],"action"),
 				$value,
 				new CCol(get_severity_description($row["priority"]), get_severity_style($row["priority"]))));
+
+			$col++;
+		}
+		return $table;
+	}
+
+	function get_history_of_discovery_events($start,$num,$nodeid=null)
+	{
+		global $ZBX_CURNODEID;
+		global $USER_DETAILS;
+		
+		if(is_null($nodeid)) $nodeid = $ZBX_CURNODEID;
+			
+		$db_events = DBselect('select distinct e.source,e.object,e.objectid,e.clock,e.value from events e'.
+			' where '.' e.source='.EVENT_SOURCE_DISCOVERY.' order by e.clock desc',
+			10*($start+$num)
+			);
+       
+		$table = new CTableInfo(S_NO_EVENTS_FOUND); 
+		$table->SetHeader(array(S_TIME, S_IP, S_DESCRIPTION, S_STATUS));
+		$col=0;
+		
+		$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
+		 
+		$skip = $start;
+		while(($event_data = DBfetch($db_events))&&($col<$num))
+		{
+			if($skip > 0) 
+			{
+				$skip--;
+				continue;
+			}
+
+			if($event_data["value"] == 0)
+			{
+				$value=new CCol(S_DOWN,"off");
+			}
+			elseif($event_data["value"] == 1)
+			{
+				$value=new CCol(S_UP,"on");
+			}
+			else
+			{
+				$value=new CCol(S_UNKNOWN_BIG,"unknown");
+			}
+
+
+			switch($event_data['object'])
+			{
+				case EVENT_OBJECT_DHOST:
+					$object_data = DBfetch(DBselect('select ip from dhosts where dhostid='.$event_data['objectid']));
+					$description = SPACE;
+					break;
+				case EVENT_OBJECT_DSERVICE:
+					$object_data = DBfetch(DBselect('select h.ip,s.type,s.port from dhosts h,dservices s '.
+						' where h.dhostid=s.dhostid, s.dserviceid='.$event_data['objectid']));
+					$description = S_SERVICE.': '.discovery_check_type2str($object_data['type']).'; '.
+						S_PORT.': '.$object_data['port'];
+					break;
+				default:
+					continue;
+			}
+
+			if(!$object_data) continue;
+
+
+			$table->AddRow(array(
+				date("Y.M.d H:i:s",$event_data["clock"]),
+				$object_data['ip'],
+				$description,
+				$value));
 
 			$col++;
 		}

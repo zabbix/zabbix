@@ -1244,6 +1244,7 @@
 	"S_INVENTORY"=>				"Inventory",
 	"S_QUEUE"=>				"Queue",
 	"S_EVENTS"=>				"Events",
+	"S_EVENTS_BIG"=>			"EVENTS",
 	"S_MAPS"=>				"Maps",
 	"S_REPORTS"=>				"Reports",
 	"S_GENERAL"=>				"General",
