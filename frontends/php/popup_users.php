@@ -66,7 +66,7 @@ function add_user(formname,user_id,alias)
 
         if(!form)
         {
-                window.close();
+                close_window();
 		return false;
         }
 
@@ -74,7 +74,7 @@ function add_user(formname,user_id,alias)
 	add_var_to_opener_obj(form,'new_user[alias]',alias);
 
 	form.submit();
-	window.close();
+	close_window();
 	return true;
 }
 -->

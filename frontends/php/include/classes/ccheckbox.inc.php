@@ -29,7 +29,7 @@
 			$this->options['type'] = 'checkbox';
 			$this->options['value'] = $value;
 			$this->options['name'] = $name;
-			$this->options['onClick'] = $action;
+			$this->SetAction($action);
 			$this->SetChecked($checked);
 		}
 		function SetEnabled($value='yes')
@@ -49,7 +49,7 @@
 		}
 		function SetAction($value='submit()', $event='onClick')
 		{
-			$this->options[$event] = $value;
+			$this->AddAction('onClick', $value);
 		}
 	}
 

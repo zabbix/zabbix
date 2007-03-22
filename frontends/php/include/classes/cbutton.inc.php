@@ -28,15 +28,14 @@
 			$this->tag_body_start = '';
 			$this->options['type'] = 'submit';
 			$this->AddOption('value', $caption);
-//			$this->options["type"] = "button";
 			$this->options['class'] = 'button';
 			$this->SetName($name);
 			$this->SetAction($action);
 			$this->SetAccessKey($accesskey);
 		}
-		function SetAction($value='submit()', $event='onClick')
+		function SetAction($value=null)
 		{
-			$this->AddOption($event, $value);
+			$this->AddAction('onClick', $value);
 		}
 		function SetTitle($value='button title')
 		{
@@ -54,19 +53,21 @@
 
 	class CButtonCancel extends CButton
 	{
-		function CButtonCancel($vars=NULL){
+		function CButtonCancel($vars=NULL,$action=NULL){
 			parent::CButton('cancel',S_CANCEL);
+			$this->options['type'] = 'button';
 			$this->SetVars($vars);
+			$this->SetAction($action);
 		}
 		function SetVars($value=NULL){
 			global $page;
 
-			$url = $page["file"]."?cancel=1";
+			$url = "?cancel=1";
 
 			if(!is_null($value))
 				$url = $url.$value;
 
-			return $this->SetAction("return Redirect('$url')");
+			return parent::SetAction("return Redirect('$url')");
 		}
 	}
 
@@ -82,19 +83,18 @@
 		/*
 		var $vars;
 		var $msg;
-		var $name;
-		var $do_redirect;*/
+		var $name;*/
 
-		function CButtonQMessage($name, $caption, $msg=NULL, $vars=NULL, $do_redirect=true){
+		function CButtonQMessage($name, $caption, $msg=NULL, $vars=NULL){
 			$this->vars = null;
 			$this->msg = null;
 			$this->name = $name;
-			$this->do_redirect = $do_redirect;
 			
 			parent::CButton($name,$caption);
 
 			$this->SetMessage($msg);
 			$this->SetVars($vars);
+			$this->SetAction(NULL);
 		}
 		function SetVars($value=NULL){
 			if(!is_string($value) && !is_null($value)){
@@ -113,7 +113,7 @@
 			$this->msg = $value;
 			$this->SetAction(NULL);
 		}
-		function SetAction($value=null, $event='onClick'){
+		function SetAction($value=null){
 			if(!is_null($value))
 				return parent::SetAction($value);
 
@@ -121,7 +121,7 @@
 
 			$confirmation = "Confirm('".$this->msg."')";
 			
-			if($this->do_redirect)
+			if(isset($this->vars))
 			{
 				$redirect = "Redirect('".$page["file"]."?".$this->name."=1".$this->vars."')";
 			}

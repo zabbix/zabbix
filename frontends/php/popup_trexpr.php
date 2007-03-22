@@ -260,7 +260,7 @@ if(form)
 	if(el)
 	{
 		InsertText(el, '<?php echo $expression; ?>');
-		window.close();
+		close_window();
 	}
 }
 -->

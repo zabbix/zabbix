@@ -94,22 +94,27 @@ include_once "include/page_header.php";
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"dstfrm" =>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	NULL),
-		"dstfld1"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	NULL),
-		"dstfld2"=>	array(T_ZBX_STR, O_OPT,P_SYS,	NULL,		NULL),
-		"srctbl" =>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	NULL),
-		"srcfld1"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	NULL),
-		"srcfld2"=>	array(T_ZBX_STR, O_OPT,P_SYS,	NULL,		NULL),
-		"nodeid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		NULL),
-		"groupid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		NULL),
-		"hostid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		NULL),
-		"templates"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	NULL),
-		"existed_templates"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	NULL),
-		"only_hostid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		NULL),
-		"monitored_hosts"=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	NULL),
+		"dstfrm" =>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	null),
+		"dstfld1"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	null),
+		"dstfld2"=>	array(T_ZBX_STR, O_OPT,P_SYS,	null,		null),
+		"srctbl" =>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	null),
+		"srcfld1"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	null),
+		"srcfld2"=>	array(T_ZBX_STR, O_OPT,P_SYS,	null,		null),
+		"nodeid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
+		"groupid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
+		"hostid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
+		"templates"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	null),
+		"existed_templates"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	null),
+		"only_hostid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
+		"monitored_hosts"=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
+		'itemtype'=>	array(T_ZBX_INT, O_OPT, null,   null,		null),
 		
-		"select"=>	array(T_ZBX_STR,	O_OPT,	P_SYS|P_ACT,	NULL,	NULL)
+		"select"=>	array(T_ZBX_STR,	O_OPT,	P_SYS|P_ACT,	null,	null)
 	);
+	
+	if(isset($_REQUEST['itemtype']) && !in_array($_REQUEST['itemtype'],
+		array(ITEM_TYPE_ZABBIX,ITEM_TYPE_SIMPLE,ITEM_TYPE_INTERNAL,ITEM_TYPE_AGGREGATE)))
+			unset($_REQUEST['itemtype']);
 
 	check_fields($fields);
 
@@ -271,7 +276,7 @@ include_once "include/page_header.php";
 			$btnEmpty = new CButton("empty",S_EMPTY,
 				get_window_opener($dstfrm, $dstfld1, 0).
 				get_window_opener($dstfrm, $dstfld2, '').
-				" window.close();");
+				" close_window(); return false;");
 
 			$frmTitle->AddItem(array(SPACE,$btnEmpty));
 		}
@@ -304,7 +309,7 @@ include_once "include/page_header.php";
 			$name->SetAction(
 				get_window_opener($dstfrm, $dstfld1, $host[$srcfld1]).
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $host[$srcfld2]) : '').
-				" window.close();");
+				" close_window(); return false;");
 
 			if($host["status"] == HOST_STATUS_MONITORED)	
 				$status=new CSpan(S_MONITORED,"off");
@@ -370,44 +375,13 @@ include_once "include/page_header.php";
 			$new_templates = array_diff($templates, $existed_templates);
 			if(count($new_templates) > 0) 
 			{
-?>
-
-<script language="JavaScript" type="text/javascript">
-<!--
-function add_template(formname,id,name)
-{
-        var msg = '';
-        var form = window.opener.document.forms[formname];
-        if(!form)
-        {
-                alert('form '+formname+' not exist');
-                window.close();
-        }
-
-        new_variable = window.opener.document.createElement('input');
-        new_variable.type = 'hidden';
-        new_variable.name = 'templates[' + id + ']';
-        new_variable.value = name;
-
-        form.appendChild(new_variable);
-
-        return true;
-}
--->
-</script>
-
-<?php
 				foreach($new_templates as $id => $name)
 				{
 ?>
 
 <script language="JavaScript" type="text/javascript">
 <!--
-	add_template(
-		 '<?php echo $dstfrm; ?>',
-		 '<?php echo $id; ?>',
-		 '<?php echo $name; ?>'
-	);
+	add_variable(null,"templates[" + "<?php echo $id; ?>" + "]","<?php echo $name; ?>","<?php echo $dstfrm; ?>",window.opener.document);
 -->
 </script>
 
@@ -418,8 +392,8 @@ function add_template(formname,id,name)
 <script language="JavaScript" type="text/javascript">
 <!--
         var form = window.opener.document.forms['<?php echo $dstfrm; ?>'];
-        form.submit();
-	window.close();
+        if(form) form.submit();
+	close_window();
 -->
 </script>
 
@@ -447,7 +421,7 @@ function add_template(formname,id,name)
 		while($host = DBfetch($db_hosts))
 		{
 			$chk = new CCheckBox('templates['.$host["hostid"].']',isset($templates[$host["hostid"]]),
-					NULL,$host["host"]);
+					null,$host["host"]);
 			$chk->SetEnabled(!isset($existed_templates[$host["hostid"]]));
 
 			$table->AddRow(array(
@@ -488,7 +462,7 @@ function add_template(formname,id,name)
 			$name->SetAction(
 				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '').
-				" window.close();");
+				" return close_window();");
 
 			$table->AddRow($name);
 		}
@@ -506,7 +480,7 @@ function add_template(formname,id,name)
 			$name->SetAction(
 				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '').
-				" window.close();");
+				" close_window(); return false;");
 
 			$table->AddRow($name);
 		}
@@ -523,8 +497,8 @@ function add_template(formname,id,name)
 		{
 			$name = new CLink($row["key_"],"#","action");
 			$name->SetAction(
-				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
-				" window.close();");
+				get_window_opener($dstfrm, $dstfld1, html_entity_decode($row[$srcfld1])).
+				" close_window(); return false;");
 
 			$table->AddRow(array(
 				$name,
@@ -563,7 +537,7 @@ function add_template(formname,id,name)
 			$description->SetAction(
 				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
 				get_window_opener($dstfrm, $dstfld2, $exp_desc).
-				" window.close();");
+				" close_window(); return false;");
 
 			if($row['dep_count'] > 0)
 			{
@@ -634,7 +608,7 @@ function add_item_variable(s_formname,x_value)
 		o_form.submit();
 	}
 
-	window.close();
+	close_window();
         return true;
 }
 -->
@@ -644,7 +618,7 @@ function add_item_variable(s_formname,x_value)
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 
 		$table->SetHeader(array(
-			!isset($hostid) ? S_HOST : NULL,
+			!isset($hostid) ? S_HOST : null,
 			S_DESCRIPTION,S_KEY,nbsp(S_UPDATE_INTERVAL),
 			S_STATUS));
 
@@ -669,7 +643,7 @@ function add_item_variable(s_formname,x_value)
 			}
 
 			$table->AddRow(array(
-				!isset($hostid) ? $db_item["host"] : NULL,
+				!isset($hostid) ? $db_item["host"] : null,
 				$description,
 				$db_item["key_"],
 				$db_item["delay"],
@@ -713,7 +687,7 @@ function add_item_variable(s_formname,x_value)
 			$description->SetAction(
 				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '').
-				" window.close();");
+				" close_window(); return false;");
 
 			$table->AddRow(array(
 				(isset($hostid) ? null : $row['host']),
@@ -751,7 +725,7 @@ function add_item_variable(s_formname,x_value)
 			$name->SetAction(
 				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '').
-				" window.close();");
+				" close_window(); return false;");
 
 			$table->AddRow(array(isset($hostid) ? null : $row['host'], $name));
 		}
@@ -771,7 +745,7 @@ function add_item_variable(s_formname,x_value)
 			$name->SetAction(
 				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '').
-				" window.close();");
+				" close_window(); return false;");
 
 			$table->AddRow($name);
 		}
