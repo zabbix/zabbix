@@ -119,11 +119,11 @@
 
 			if($event_data["value"] == 0)
 			{
-				$value=new CCol(S_DOWN,"off");
+				$value=new CCol(S_UP,"off");
 			}
 			elseif($event_data["value"] == 1)
 			{
-				$value=new CCol(S_UP,"on");
+				$value=new CCol(S_DOWN,"on");
 			}
 			else
 			{
