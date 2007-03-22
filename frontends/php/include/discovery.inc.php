@@ -17,8 +17,26 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
+	 require_once "include/perm.inc.php";
+
 ?>
 <?php
+	function	check_right_on_discovery($permission)
+	{
+		global $USER_DETAILS;
+		global $ZBX_CURNODEID;
+
+		if( $USER_DETAILS['type'] >= USER_TYPE_ZABBIX_ADMIN )
+		{
+			$accessible_nodes = get_accessible_nodes_by_user($USER_DETAILS, $permission, null, PERM_RES_IDS_ARRAY);
+
+			if( in_array($ZBX_CURNODEID, $accessible_nodes) )
+				return true;
+		}
+
+		return false;
+	}
+
 	function	discovery_check_type2str($type_int)
 	{
 		$str_type[SVC_SSH]	= S_SSH;

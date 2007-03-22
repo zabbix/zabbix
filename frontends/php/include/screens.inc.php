@@ -370,7 +370,7 @@
 				}
 				elseif( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_EVENTS) )
 				{
-					$item = array(get_history_of_events(0, $elements));
+					$item = array(get_history_of_triggers_events(0, $elements));
 					if($editmode == 1)      array_push($item,new CLink(S_CHANGE,$action));
 				}
 				else

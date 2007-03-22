@@ -1,5 +1,6 @@
 Changes for 1.3.4:
 
+ - added viwer of dicovery events (Eugene)
  - added quick help for overview (Eugene)
  - developed Dicovery system (Alexei/Eugene)
  - fixed processing of text items (Alexei)
