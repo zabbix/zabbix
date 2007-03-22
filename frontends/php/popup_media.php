@@ -71,7 +71,7 @@ function add_media(formname,mediatypeid,sendto,period,active,severity)
 
         if(!form)
         {
-                window.close();
+                close_window();
 		return false;
         }
 
@@ -82,7 +82,7 @@ function add_media(formname,mediatypeid,sendto,period,active,severity)
 	add_var_to_opener_obj(form,'new_media[severity]',severity);
 
 	form.submit();
-	window.close();
+	close_window();
 	return true;
 }
 -->

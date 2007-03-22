@@ -21,6 +21,12 @@ function SDI(msg)
 	alert("DEBUG INFO: " + msg);
 }
 
+function close_window()
+{
+	window.setTimeout("window.close()", 500); /* Solve bug for Internet Explorer */
+	return false;
+}
+
 function add_variable(o_el, s_name, x_value, s_formname, o_document)
 {
 	var form;

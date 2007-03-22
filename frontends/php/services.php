@@ -341,7 +341,7 @@ include_once "include/page_header.php";
 			));
 	}
 
-	$table->SetFooter(new CCol(new CButtonQMessage('delete',S_DELETE_SELECTED,S_DELETE_SELECTED_SERVICES,null,false)));
+	$table->SetFooter(new CCol(new CButtonQMessage('delete',S_DELETE_SELECTED,S_DELETE_SELECTED_SERVICES)));
 	$form->AddItem($table);
 	$form->Show();
 ?>
@@ -387,7 +387,7 @@ include_once "include/page_header.php";
 				$row["soft"] == 0 ? S_HARD : S_SOFT
 				));
 		}
-		$table->SetFooter(new CCol(new CButtonQMessage('delete',S_DELETE_SELECTED,S_DELETE_SELECTED_SERVICES,null,false)));
+		$table->SetFooter(new CCol(new CButtonQMessage('delete',S_DELETE_SELECTED,S_DELETE_SELECTED_SERVICES)));
 		$form->AddItem($table);
 		$form->Show();
 	}

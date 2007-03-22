@@ -278,6 +278,7 @@ table.screen_view tr td.right_bttm {	text-align: right;	vertical-align: bottom;	
 
 table.tableinfo
 {
+	empty-cells:show;
 	color: #000000;
 	width: 100%;
 	background-color: #AAAAAA;
@@ -292,6 +293,9 @@ table.tableinfo tr td {
 	text-decoration: none;
 	text-align: left;
 	border-width: 0px;
+	padding-top: 0px;
+	padding-bottom: 0px;
+	height: 20px;
 }
 table.tableinfo tr td.message {
 	text-align: center;
@@ -331,13 +335,13 @@ table.tableinfo tr.footer td {
 	padding-right: 5px;
 	padding-left: 5px;
 }
-table.tableinfo tr.odd_row td		{	background-color: #DDDDDD; border: 1px #DDDDDD solid; }
-table.tableinfo tr.odd_row:hover td 	{	background-color: #DDDDEE; border: 1px #DDDDEE solid; }
+table.tableinfo tr.odd_row td			{	background-color: #DDDDDD; border: 1px #DDDDDD solid; }
+table.tableinfo tr.odd_row:hover td		{	background-color: #DDDDEE; border: 1px #DDDDEE solid; }
 
-table.tableinfo tr.even_row td		{	background-color: #EEEEEE; border: 1px #EEEEEE solid; }
-table.tableinfo tr.even_row:hover td 	{	background-color: #EEEEFE; border: 1px #EEEEFE solid; }
+table.tableinfo tr.even_row td			{	background-color: #EEEEEE; border: 1px #EEEEEE solid; }
+table.tableinfo tr.even_row:hover td		{	background-color: #EEEEFE; border: 1px #EEEEFE solid; }
 
-table.tableinfo tr td.center		{vertical-align: middle; text-align: center; }
+table.tableinfo tr td.center			{	vertical-align: middle; text-align: center; }
 
 table.tableinfo tr td.disaster			{	background-color: #FF0000;	border: 1px #FF0000 solid; }
 table.tableinfo tr:hover td.disaster		{	background-color: #FA0000;	border: 1px #FA0000 solid; }
@@ -582,14 +586,16 @@ table.sub_menu tr td span.active a.highlight
 {
 	font-family: Verdana, Helvetica, Geneva;
 	font-size: 10px;
-	border: solid;
-	border-width: 1px;
-	border-color: gray;
+	border: 1px solid gray;
 	background-color: white;
 	margin: 2px;
 }
-.biginput:focus	{	border-color: black;	}
-.biginput:hover	{	border-color: black;	}
+.biginput:focus	{
+	border-color: black;
+}
+.biginput:hover	{
+	border-color: black;
+}
 
 .biginput[readonly] /* NOTE: Ignored by IE */
 {
@@ -597,18 +603,19 @@ table.sub_menu tr td span.active a.highlight
 	background-color: #EEEEEE;
 }
 
-.button
-{
+.button {
 	font-family: Verdana, Helvetica, Geneva;
 	font-size: 10px;
-	border: solid;
-	border-width: 1px;
-	border-color: gray;
-	background: gray url(images/gradients/button.gif) repeat-x top left;
+	background: #F0F0F0 url(images/gradients/button.gif) repeat-x top left;
+	border: 1px solid #808080;
+	height: 18px;
+	padding: 0px 5px 0px 5px;
 	margin: 2px;
-/*	margin-right:5px; */
 }
-.button:hover	{	text-decoration: underline;	border-color: black;	}
+.button:hover {
+	text-decoration: underline;
+	border-color: black;
+}
 
 /**************** TRIGGERS INFORMATION MODULE ****************/
 table.triggers_info {

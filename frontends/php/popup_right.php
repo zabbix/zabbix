@@ -64,7 +64,7 @@ function add_right(formname,type,id,permission,name)
 
         if(!form)
         {
-                window.close();
+                close_window();
 		return false;
         }
 
@@ -74,7 +74,7 @@ function add_right(formname,type,id,permission,name)
 	add_var_to_opener_obj(form,'new_right[name]',name);
 
 	form.submit();
-	window.close();
+	close_window();
 	return true;
 }
 -->

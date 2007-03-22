@@ -80,7 +80,7 @@ function add_graph_item(formname,itemid,color,drawtype,sortorder,yaxisside,calc_
 
         if(!form)
         {
-                window.close();
+                close_window();
 		return false;
         }
 
@@ -94,7 +94,7 @@ function add_graph_item(formname,itemid,color,drawtype,sortorder,yaxisside,calc_
 	add_var_to_opener_obj(form,'new_graph_item[periods_cnt]',periods_cnt);
 	
 	form.submit();
-	window.close();
+	close_window();
 	return true;
 }
 
@@ -104,7 +104,7 @@ function update_graph_item(formname,list_name,gid,itemid,color,drawtype,sortorde
 
         if(!form)
         {
-                window.close();
+                close_window();
 		return false;
         }
 
@@ -118,7 +118,7 @@ function update_graph_item(formname,list_name,gid,itemid,color,drawtype,sortorde
 	add_var_to_opener_obj(form,list_name + '[' + gid + '][periods_cnt]',periods_cnt);
 	
 	form.submit();
-	window.close();
+	close_window();
 	return true;
 }
 -->
