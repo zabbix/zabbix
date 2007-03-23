@@ -1140,7 +1140,7 @@
 
 		$form->AddVar('selection_mode', $selection_mode);
 
-		$modeLink = new CLink($selection_mode == 0 ? S_ADVENCED : S_SIMPLE, '#','action');
+		$modeLink = new CLink($selection_mode == 0 ? S_ADVANCED : S_SIMPLE, '#','action');
 		$modeLink->SetAction('create_var(\''.$form->GetName().'\',\'selection_mode\','.($selection_mode == 0 ? 1 : 0).',true)');
 		$form->AddRow(S_SELECTION_MODE,$modeLink);
 
