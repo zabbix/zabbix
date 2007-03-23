@@ -406,13 +406,20 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *re
 
 	if(reason==NULL)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG,"In update_trigger_value(triggerid:" ZBX_FS_UI64 ",%d,%d)",
-			trigger->triggerid, new_value, now);
+		zabbix_log(LOG_LEVEL_DEBUG,"In update_trigger_value(triggerid:" ZBX_FS_UI64 ",old:%d,new:%d,%d)",
+			trigger->triggerid,
+			trigger->value,
+			new_value,
+			now);
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_DEBUG,"In update_trigger_value(triggerid:" ZBX_FS_UI64 ",%d,%d,%s)",
-			trigger->triggerid, new_value, now, reason);
+		zabbix_log(LOG_LEVEL_DEBUG,"In update_trigger_value(triggerid:" ZBX_FS_UI64 ",old:%d,new:%d,%d,%s)",
+			trigger->triggerid,
+			trigger->value,
+			new_value,
+			now,
+			reason);
 	}
 
 	/* New trigger value differs from current one */
