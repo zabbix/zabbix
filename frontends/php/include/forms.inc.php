@@ -1608,9 +1608,7 @@
 		$frmItem->AddRow(S_KEEP_HISTORY_IN_DAYS, array(
 			new CNumericBox("history",$history,8),
 			(!isset($_REQUEST["itemid"])) ? null :
-				new CButton("del_history",
-					"Clean history",
-					"return Confirm('History cleaning can take a long time. Continue?');")
+				new CButtonQMessage("del_history",S_CLEAN_HISTORY,S_HISTORY_CLEANING_CAN_TAKE_A_LONG_TIME_CONTINUE_Q)
 			));
 		$frmItem->AddRow(S_KEEP_TRENDS_IN_DAYS, new CNumericBox("trends",$trends,8));
 

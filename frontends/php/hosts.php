@@ -667,17 +667,13 @@ include_once "include/page_header.php";
 			}
 
 			$footerButtons = array(
-				$show_only_tmp ? NULL : new CButton('activate','Activate selected',
-					"return Confirm('".S_ACTIVATE_SELECTED_HOSTS_Q."');"),
+				$show_only_tmp ? NULL : new CButtonQMessage('activate',S_ACTIVATE_SELECTED,S_ACTIVATE_SELECTED_HOSTS_Q),
 				$show_only_tmp ? NULL : SPACE,
-				$show_only_tmp ? NULL : new CButton('disable','Disable selected',
-					"return Confirm('".S_DISABLE_SELECTED_HOSTS_Q."');"),
+				$show_only_tmp ? NULL : new CButtonQMessage('disable',S_DISABLE_SELECTED,S_DISABLE_SELECTED_HOSTS_Q),
 				$show_only_tmp ? NULL : SPACE,
-				new CButton('delete','Delete selected',
-					"return Confirm('".S_DELETE_SELECTED_HOSTS_Q."');"),
+				new CButtonQMessage('delete',S_DELETE_SELECTED,S_DELETE_SELECTED_HOSTS_Q),
 				$show_only_tmp ? SPACE : NULL,
-				$show_only_tmp ? new CButton('delete_and_clear','Delete selected with linked elements',
-					"return Confirm('".S_DELETE_SELECTED_HOSTS_Q."');") : NULL
+				$show_only_tmp ? new CButtonQMessage('delete_and_clear',S_DELETE_SELECTED_WITH_LINKED_ELEMENTS,S_DELETE_SELECTED_HOSTS_Q) : NULL
 				);
 			$table->SetFooter(new CCol($footerButtons));
 
@@ -740,16 +736,13 @@ include_once "include/page_header.php";
 					implode(', ',$hosts)
 					));
 			}
-			$footerButtons = array();
-			array_push($footerButtons, new CButton('activate','Activate selected',
-				"return Confirm('".S_ACTIVATE_SELECTED_HOSTS_Q."');"));
-			array_push($footerButtons, SPACE);
-			array_push($footerButtons, new CButton('disable','Disable selected',
-				"return Confirm('".S_DISABLE_SELECTED_HOSTS_Q."');"));
-			array_push($footerButtons, SPACE);
-			array_push($footerButtons, new CButton('delete','Delete selected',
-				"return Confirm('".S_DELETE_SELECTED_GROUPS_Q."');"));
-			$table->SetFooter(new CCol($footerButtons));
+			$table->SetFooter(new CCol(array(
+				new CButtonQMessage('activate',S_ACTIVATE_SELECTED,S_ACTIVATE_SELECTED_HOSTS_Q),
+				SPACE,
+				new CButtonQMessage('disable',S_DISABLE_SELECTED,S_DISABLE_SELECTED_HOSTS_Q),
+				SPACE,
+				new CButtonQMessage('delete',S_DELETE_SELECTED,S_DELETE_SELECTED_GROUPS_Q)
+			)));
 
 			$form->AddItem($table);
 			$form->Show();
@@ -887,16 +880,13 @@ include_once "include/page_header.php";
 					SPACE."($rows)")
 					));
 			}
-			$footerButtons = array();
-			array_push($footerButtons, new CButton('activate','Activate Items',
-				"return Confirm('".S_ACTIVATE_ITEMS_FROM_SELECTED_APPLICATIONS_Q."');"));
-			array_push($footerButtons, SPACE);
-			array_push($footerButtons, new CButton('disable','Disable Items',
-				"return Confirm('".S_DISABLE_ITEMS_FROM_SELECTED_APPLICATIONS_Q."');"));
-			array_push($footerButtons, SPACE);
-			array_push($footerButtons, new CButton('delete','Delete selected',
-				"return Confirm('".S_DELETE_SELECTED_APPLICATIONS_Q."');"));
-			$table->SetFooter(new CCol($footerButtons));
+			$table->SetFooter(new CCol(array(
+				new CButtonQMessage('activate',S_ACTIVATE_ITEMS,S_ACTIVATE_ITEMS_FROM_SELECTED_APPLICATIONS_Q),
+				SPACE,
+				new CButtonQMessage('disable',S_DISABLE_ITEMS,S_DISABLE_ITEMS_FROM_SELECTED_APPLICATIONS_Q),
+				SPACE,
+				new CButtonQMessage('delete',S_DELETE_SELECTED,S_DELETE_SELECTED_APPLICATIONS_Q)
+			)));
 			$form->AddItem($table);
 			$form->Show();
 		}
