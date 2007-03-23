@@ -339,14 +339,11 @@ include_once "include/page_header.php";
 				));	
 		}
 		$footerButtons = array();
-		array_push($footerButtons, new CButton('group_enable','Enable selected',
-			"return Confirm('Enable selected actions?');"));
+		array_push($footerButtons, new CButtonQMessage('group_enable',S_ENABLE_SELECTED,S_ENABLE_SELECTED_ACTIONS_Q));
 		array_push($footerButtons, SPACE);
-		array_push($footerButtons, new CButton('group_disable','Disable selected',
-			"return Confirm('Disable selected actions?');"));
+		array_push($footerButtons, new CButtonQMessage('group_disable',S_DISABLE_SELECTED,S_DISABLE_SELECTED_ACTIONS_Q));
 		array_push($footerButtons, SPACE);
-		array_push($footerButtons, new CButton('group_delete','Delete selected',
-			"return Confirm('Delete selected action?');"));
+		array_push($footerButtons, new CButtonQMessage('group_delete',S_DELETE_SELECTED,S_DELETE_SELECTED_APPLICATIONS_Q));
 		$tblActions->SetFooter(new CCol($footerButtons));
 
 		$form->AddItem($tblActions);

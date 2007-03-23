@@ -252,9 +252,9 @@ include_once "include/page_header.php";
 				));	
 		}
 		$tblDiscovery->SetFooter(new CCol(array(
-			new CButton('group_enable',S_ENABLE_SELECTED, "return Confirm('".S_ENABLE_SELECTED_RULES_Q."');"), SPACE,
-			new CButton('group_disable',S_DISABLE_SELECTED, "return Confirm('".S_DISABLE_SELECTED_RULES_Q."');"), SPACE,
-			new CButton('group_delete',S_DELETE_SELECTED, "return Confirm('".S_DELETE_SELECTED_RULES_Q."');"),
+			new CButtonQMessage('group_enable',S_ENABLE_SELECTED, S_ENABLE_SELECTED_RULES_Q), SPACE,
+			new CButtonQMessage('group_disable',S_DISABLE_SELECTED, S_DISABLE_SELECTED_RULES_Q), SPACE,
+			new CButtonQMessage('group_delete',S_DELETE_SELECTED, S_DELETE_SELECTED_RULES_Q)
 		)));
 
 		$form->AddItem($tblDiscovery);

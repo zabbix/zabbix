@@ -408,8 +408,7 @@ include_once "include/page_header.php";
 					$online
 					));
 			}
-			$table->SetFooter(new CCol(new CButton('delete_selected',S_DELETE_SELECTED,
-				"return Confirm('".S_DELETE_SELECTED_USERS_Q."');")));
+			$table->SetFooter(new CCol(new CButtonQMessage('delete_selected',S_DELETE_SELECTED,S_DELETE_SELECTED_USERS_Q)));
 
 			$form->AddItem($table);
 			$form->show();
@@ -455,8 +454,7 @@ include_once "include/page_header.php";
 					),
 					implode(', ',$users)));
 			}
-			$table->SetFooter(new CCol(new CButton('delete_selected',S_DELETE_SELECTED,
-				"return Confirm('".S_DELETE_SELECTED_GROUPS_Q."');")));
+			$table->SetFooter(new CCol(new CButtonQMessage('delete_selected',S_DELETE_SELECTED,S_DELETE_SELECTED_GROUPS_Q)));
 
 			$form->AddItem($table);
 			$form->Show();

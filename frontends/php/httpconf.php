@@ -517,17 +517,13 @@ include_once "include/page_header.php";
 	}
 
 		$footerButtons = array();
-		array_push($footerButtons, new CButton('group_task',S_ACTIVATE_SELECTED,
-			"return Confirm('".S_ACTIVATE_SELECTED_SCENARIOS_Q."');"));
+		array_push($footerButtons, new CButtonQMessage('group_task',S_ACTIVATE_SELECTED,S_ACTIVATE_SELECTED_SCENARIOS_Q));
 		array_push($footerButtons, SPACE);
-		array_push($footerButtons, new CButton('group_task',S_DISABLE_SELECTED,
-			"return Confirm('".S_DISABLE_SELECTED_SCENARIOS_Q."');"));
+		array_push($footerButtons, new CButtonQMessage('group_task',S_DISABLE_SELECTED,S_DISABLE_SELECTED_SCENARIOS_Q));
 		array_push($footerButtons, SPACE);
-		array_push($footerButtons, new CButton('group_task',S_CLEAN_HISTORY_SELECTED_SCENARIOS,
-			"return Confirm('".S_HISTORY_CLEANING_CAN_TAKE_A_LONG_TIME_CONTINUE_Q."');"));
+		array_push($footerButtons, new CButtonQMessage('group_task',S_CLEAN_HISTORY_SELECTED_SCENARIOS,S_HISTORY_CLEANING_CAN_TAKE_A_LONG_TIME_CONTINUE_Q));
 		array_push($footerButtons, SPACE);
-		array_push($footerButtons, new CButton('group_task',S_DELETE_SELECTED,
-			"return Confirm('".S_DELETE_SELECTED_SCENARIOS_Q."');"));
+		array_push($footerButtons, new CButtonQMessage('group_task',S_DELETE_SELECTED,S_DELETE_SELECTED_SCENARIOS_Q));
 		$table->SetFooter(new CCol($footerButtons));
 
 		$form->AddItem($table);

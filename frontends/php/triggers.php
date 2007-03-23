@@ -481,18 +481,15 @@ include_once "include/page_header.php";
 			));
 		}
 		
-		$footerButtons = array();
-		array_push($footerButtons, new CButton('group_enable','Enable selected',
-			"return Confirm('".S_ENABLE_SELECTED_TRIGGERS_Q."');"));
-		array_push($footerButtons, SPACE);
-		array_push($footerButtons, new CButton('group_disable','Disable selected',
-			"return Confirm('".S_DISABLE_SELECTED_TRIGGERS_Q."');"));
-		array_push($footerButtons, SPACE);
-		array_push($footerButtons, new CButton('group_delete','Delete selected',
-			"return Confirm('".S_DELETE_SELECTED_TRIGGERS_Q."');"));
-		array_push($footerButtons, SPACE);
-		array_push($footerButtons, new CButton('form_copy_to','Copy selected to ...'));
-		$table->SetFooter(new CCol($footerButtons));
+		$table->SetFooter(new CCol(array(
+			new CButtonQMessage('group_enable',S_ENABLE_SELECTED,S_ENABLE_SELECTED_TRIGGERS_Q),
+			SPACE,
+			new CButtonQMessage('group_disable',S_DISABLE_SELECTED,S_DISABLE_SELECTED_TRIGGERS_Q),
+			SPACE,
+			new CButtonQMessage('group_delete',S_DELETE_SELECTED,S_DELETE_SELECTED_TRIGGERS_Q),
+			SPACE,
+			new CButton('form_copy_to',S_COPY_SELECTED_TO)
+		)));
 
 		$form->AddItem($table);
 		$form->Show();
