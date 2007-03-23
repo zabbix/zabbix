@@ -57,6 +57,7 @@ extern	int	CONFIG_MASTER_NODEID;
 #define DB_ITEM		struct zbx_item_type
 #define DB_MEDIA	struct zbx_media_type
 #define DB_MEDIATYPE	struct zbx_mediatype_type
+#define DB_OPERATION	struct zbx_operation_type
 #define DB_TRIGGER	struct zbx_trigger_type
 #define DB_HTTPTEST	struct zbx_httptest_type
 #define DB_HTTPSTEP	struct zbx_httpstep_type
@@ -309,16 +310,21 @@ DB_TRIGGER
 DB_ACTION
 {
 	zbx_uint64_t	actionid;
-	int	actiontype;
-	int	evaltype;
-	zbx_uint64_t	userid;
-/*	int	delay;*/
-	int	lastcheck;
-	int	recipient;
-	char	*subject;
-	char	*message;
-	int	message_len;
-	char	*scripts;
+	int		actiontype;
+	int		evaltype;
+	int		status;
+	int		eventsource;
+};
+
+DB_OPERATION
+{
+	zbx_uint64_t	operationid;
+	zbx_uint64_t	actionid;
+	int		operationtype;
+	int		object;
+	zbx_uint64_t	objectid;
+	char		*shortdata;
+	char		*longdata;
 };
 
 DB_CONDITION
@@ -456,8 +462,6 @@ int	DBadd_template_linkage(int hostid,int templateid,int items,int triggers,int 
 int	DBget_item_by_itemid(int itemid,DB_ITEM *item);
 int	DBadd_item_to_linked_hosts(int itemid, int hostid);
 int	DBadd_item(char *description, char *key, int hostid, int delay, int history, int status, int type, char *snmp_community, char *snmp_oid,int value_type,char *trapper_hosts,int snmp_port,char *units,int multiplier,int delta, char *snmpv3_securityname,int snmpv3_securitylevel,char *snmpv3_authpassphrase,char *snmpv3_privpassphrase,char *formula,int trends,char *logtimefmt);
-
-int	DBadd_action_to_linked_hosts(int actionid,int hostid);
 
 int	DBget_trigger_by_triggerid(int triggerid,DB_TRIGGER *trigger);
 int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid);
