@@ -80,7 +80,7 @@ include_once "include/page_header.php";
 
 			if(DSVC_STATUS_DISABLED == $dservice_data['status'])
 			{
-				$class = 'disabled';
+				$class = 'inactive';
 				$time = 'lastdown';
 			}
 
