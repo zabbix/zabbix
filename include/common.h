@@ -188,9 +188,9 @@ typedef enum
 #define ITEM_STORE_SPEED_PER_SECOND	1
 #define ITEM_STORE_SIMPLE_CHANGE	2
 
-/* Recipient types for actions */
-#define RECIPIENT_TYPE_USER	0
-#define RECIPIENT_TYPE_GROUP	1
+/* Object types for operations */
+#define OPERATION_OBJECT_USER	0
+#define OPERATION_OBJECT_GROUP	1
 
 /* Condition types */
 typedef enum
@@ -311,9 +311,9 @@ typedef enum
 #define ACTION_STATUS_ACTIVE	0
 #define ACTION_STATUS_DISABLED	1
 
-/* Action type */
-#define ACTION_TYPE_MESSAGE	0
-#define ACTION_TYPE_COMMAND	1
+/* Operatio types */
+#define OPERATION_TYPE_MESSAGE	0
+#define OPERATION_TYPE_COMMAND	1
 
 /* Algorithms for service status calculation */
 #define SERVICE_ALGORITHM_NONE	0

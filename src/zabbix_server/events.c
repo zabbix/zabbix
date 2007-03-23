@@ -151,7 +151,7 @@ int	process_event(DB_EVENT *event)
 			event->triggerid, ALERT_STATUS_NOT_SENT);
 	}*/
 
-	apply_actions(event);
+	process_actions(event);
 
 	if(event->value == TRIGGER_VALUE_TRUE)
 	{
