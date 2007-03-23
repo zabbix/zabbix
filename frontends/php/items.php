@@ -712,7 +712,7 @@ include_once "include/page_header.php";
 			$form->AddItem($cmbHosts);
 
 			$form->AddItem(SPACE);
-			$form->AddItem(new CButton("external_filter",S_EXTERNAL_FILER));
+			$form->AddItem(new CButton("external_filter",S_EXTERNAL_FILTER));
 
 			if($host_info = DBfetch(DBselect('select host from hosts where hostid='.$_REQUEST["hostid"])))
 			{
