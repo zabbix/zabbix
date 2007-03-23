@@ -269,15 +269,19 @@ INDEX		|3		|clock
 
 TABLE|actions|actionid|ZBX_SYNC
 FIELD		|actionid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|userid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|subject	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|message	|t_blob		|''	|NOT NULL	|ZBX_SYNC
-FIELD		|recipient	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|source		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|actiontype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|eventsource	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|evaltype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|scripts	|t_blob		|''	|NOT NULL	|ZBX_SYNC
+
+TABLE|operations|operationid|ZBX_SYNC
+FIELD		|operationid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|actionid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|operationtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|object		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|objectid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|shortdata	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|longdata	|t_blob		|''	|NOT NULL	|ZBX_SYNC
+INDEX		|1		|actionid
 
 TABLE|applications|applicationid|ZBX_SYNC
 FIELD		|applicationid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC

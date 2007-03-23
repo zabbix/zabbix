@@ -3,7 +3,6 @@
 noinst_LIBRARIES = libzbxdbhigh.a
 
 libzbxdbhigh_a_SOURCES = \
-	action.c \
 	graph.c \
 	item.c \
 	trigger.c \

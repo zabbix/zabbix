@@ -26,6 +26,6 @@
 
 extern	int	CONFIG_NODEID;
 
-void    apply_actions(DB_EVENT *event);
+void    process_actions(DB_EVENT *event);
 
 #endif

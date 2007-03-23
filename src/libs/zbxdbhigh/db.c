@@ -464,16 +464,6 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *re
 				{
 					zabbix_log(LOG_LEVEL_WARNING,"Event processed not OK");
 				}
-/*				zabbix_log(LOG_LEVEL_DEBUG,"In update_trigger_value. Before apply_actions. Triggerid [%d] prev [%d] curr [%d] new [%d]", trigger->triggerid, event_prev_status, trigger->value, new_value);
-				apply_actions(trigger,new_value);
-				if(new_value == TRIGGER_VALUE_TRUE)
-				{
-					update_services(trigger->triggerid, trigger->priority);
-				}
-				else
-				{
-					update_services(trigger->triggerid, 0);
-				}*/
 			}
 		}
 		else

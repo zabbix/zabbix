@@ -241,6 +241,7 @@ upgrades/dbpatches/1.3/mysql/patch/media_type.sql -text
 upgrades/dbpatches/1.3/mysql/patch/node_cksum.sql -text
 upgrades/dbpatches/1.3/mysql/patch/node_configlog.sql -text
 upgrades/dbpatches/1.3/mysql/patch/nodes.sql -text
+upgrades/dbpatches/1.3/mysql/patch/operations.sql -text
 upgrades/dbpatches/1.3/mysql/patch/profiles.sql -text
 upgrades/dbpatches/1.3/mysql/patch/rights.sql -text
 upgrades/dbpatches/1.3/mysql/patch/screens.sql -text
@@ -306,6 +307,7 @@ upgrades/dbpatches/1.3/postgresql/patch/media_type.sql -text
 upgrades/dbpatches/1.3/postgresql/patch/node_cksum.sql -text
 upgrades/dbpatches/1.3/postgresql/patch/node_configlog.sql -text
 upgrades/dbpatches/1.3/postgresql/patch/nodes.sql -text
+upgrades/dbpatches/1.3/postgresql/patch/operations.sql -text
 upgrades/dbpatches/1.3/postgresql/patch/profiles.sql -text
 upgrades/dbpatches/1.3/postgresql/patch/rights.sql -text
 upgrades/dbpatches/1.3/postgresql/patch/screens.sql -text

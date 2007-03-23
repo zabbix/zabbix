@@ -67,7 +67,7 @@
  * Comments: Cannot use action->userid as it may also be groupid              *
  *                                                                            *
  ******************************************************************************/
-static	void	send_to_user_medias(DB_EVENT *event,DB_ACTION *action, zbx_uint64_t userid)
+static	void	send_to_user_medias(DB_EVENT *event,DB_OPERATION *operation, zbx_uint64_t userid)
 {
 	DB_MEDIA media;
 	DB_RESULT result;
@@ -104,7 +104,7 @@ static	void	send_to_user_medias(DB_EVENT *event,DB_ACTION *action, zbx_uint64_t 
 			continue;
 		}
 
-		DBadd_alert(action->actionid, userid, event->objectid, media.mediatypeid,media.sendto,action->subject,action->message);
+		DBadd_alert(operation->actionid, userid, event->objectid, media.mediatypeid,media.sendto,operation->shortdata,operation->longdata);
 	}
 	DBfree_result(result);
 
@@ -127,7 +127,7 @@ static	void	send_to_user_medias(DB_EVENT *event,DB_ACTION *action, zbx_uint64_t 
  * Comments: action->recipient specifies user or group                        *
  *                                                                            *
  ******************************************************************************/
-static	void	send_to_user(DB_EVENT *event, DB_ACTION *action)
+static	void	send_to_user(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -135,29 +135,29 @@ static	void	send_to_user(DB_EVENT *event, DB_ACTION *action)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In send_to_user()");
 
-	if(action->recipient == RECIPIENT_TYPE_USER)
+	if(operation->object == OPERATION_OBJECT_USER)
 	{
-		send_to_user_medias(event, action, action->userid);
+		send_to_user_medias(event, operation, operation->objectid);
 	}
-	else if(action->recipient == RECIPIENT_TYPE_GROUP)
+	else if(operation->object == OPERATION_OBJECT_GROUP)
 	{
 		result = DBselect("select u.userid from users u, users_groups ug where ug.usrgrpid=" ZBX_FS_UI64 " and ug.userid=u.userid",
-			action->userid);
+			operation->objectid);
 		while((row=DBfetch(result)))
 		{
 			ZBX_STR2UINT64(userid, row[0]);
-			send_to_user_medias(event, action, userid);
+			send_to_user_medias(event, operation, userid);
 		}
 		DBfree_result(result);
 	}
 	else
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Unknown recipient type [%d] for actionid [" ZBX_FS_UI64 "]",
-			action->recipient,
-			action->actionid);
-		zabbix_syslog("Unknown recipient type [%d] for actionid [" ZBX_FS_UI64 "]",
-			action->recipient,
-			action->actionid);
+		zabbix_log( LOG_LEVEL_WARNING, "Unknown object type [%d] for operationid [" ZBX_FS_UI64 "]",
+			operation->object,
+			operation->operationid);
+		zabbix_syslog("Unknown object type [%d] for operationid [" ZBX_FS_UI64 "]",
+			operation->object,
+			operation->operationid);
 	}
 	zabbix_log(LOG_LEVEL_DEBUG, "End send_to_user()");
 }
@@ -329,7 +329,7 @@ static int get_next_command(char** command_list, char** alias, int* is_group, ch
  * Comments: commands devided with newline                                    *
  *                                                                            *
  ******************************************************************************/
-static	void	run_commands(DB_EVENT *event, DB_ACTION *action)
+static	void	run_commands(DB_EVENT *event, DB_OPERATION *operation)
 {
 	DB_RESULT result;
 	DB_ROW		row;
@@ -340,11 +340,12 @@ static	void	run_commands(DB_EVENT *event, DB_ACTION *action)
 	int is_group = 0;
 
 	assert(event);
-	assert(action);
+	assert(operation);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In run_commands(actionid:" ZBX_FS_UI64 ")",
-		action->actionid);
-	cmd_list = action->scripts;
+	zabbix_log( LOG_LEVEL_DEBUG, "In run_commands(operationid:" ZBX_FS_UI64 ")",
+		operation->operationid);
+
+	cmd_list = operation->longdata;
 	while(get_next_command(&cmd_list,&alias,&is_group,&command)!=1)
 	{
 		if(!alias || !command) continue;
@@ -806,9 +807,61 @@ static int	check_action_conditions(DB_EVENT *event, DB_ACTION *action)
 
 /******************************************************************************
  *                                                                            *
- * Function: apply_actions                                                    *
+ * Function: execute_operations                                               *
  *                                                                            *
- * Purpose: executed all actions that match single event                      *
+ * Purpose: execute all operations linked to the action                       *
+ *                                                                            *
+ * Parameters: action - action to execute operations for                      *
+ *                                                                            *
+ * Return value: -                                                            *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	execute_operations(DB_EVENT *event, DB_ACTION *action)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	
+	DB_OPERATION	operation;
+
+	zabbix_log( LOG_LEVEL_DEBUG, "In execute_operations(actionid:" ZBX_FS_UI64 ")",
+		action->actionid);
+
+	result = DBselect("select operationid,actionid,operationtype,object,objectid,shortdata,longdata from operations where actionid=" ZBX_FS_UI64,
+			action->actionid);
+	while((row=DBfetch(result)))
+	{
+		ZBX_STR2UINT64(operation.operationid,	row[0]);
+		ZBX_STR2UINT64(operation.actionid,	row[1]);
+		operation.operationtype			= atoi(row[2]);
+		operation.object			= atoi(row[3]);
+		ZBX_STR2UINT64(operation.objectid,	row[4]);
+
+		operation.shortdata		= strdup(row[5]);
+		operation.longdata		= strdup(row[6]);
+
+		substitute_macros(event, action, &operation.shortdata);
+		substitute_macros(event, action, &operation.longdata);
+			
+		if(operation.operationtype == OPERATION_TYPE_MESSAGE)
+			send_to_user(event,action,&operation);
+		else
+			run_commands(event,&operation);
+
+		zbx_free(operation.shortdata);
+		zbx_free(operation.longdata);
+	}
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Function: process_actions                                                  *
+ *                                                                            *
+ * Purpose: process all actions that match single event                       *
  *                                                                            *
  * Parameters: event - event to apply actions for                             *
  *                                                                            *
@@ -819,14 +872,14 @@ static int	check_action_conditions(DB_EVENT *event, DB_ACTION *action)
  * Comments: we check also trigger dependencies                               *
  *                                                                            *
  ******************************************************************************/
-void	apply_actions(DB_EVENT *event)
+void	process_actions(DB_EVENT *event)
 {
 	DB_RESULT result;
 	DB_ROW row;
 	
 	DB_ACTION action;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In apply_actions(eventid:" ZBX_FS_UI64 ")",
+	zabbix_log( LOG_LEVEL_DEBUG, "In process_actions(eventid:" ZBX_FS_UI64 ")",
 		event->eventid);
 
 	if(TRIGGER_VALUE_TRUE == event->value)
@@ -849,46 +902,32 @@ void	apply_actions(DB_EVENT *event)
 		DBfree_result(result);
 	}
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Applying actions");
+	zabbix_log( LOG_LEVEL_DEBUG, "Processing actions");
 
-	result = DBselect("select actionid,userid,subject,message,recipient,scripts,actiontype,evaltype from actions where status=%d and" ZBX_COND_NODEID,
+	result = DBselect("select actionid,evaltype,status,eventsource from actions where status=%d and eventsource=%d and" ZBX_COND_NODEID,
 		ACTION_STATUS_ACTIVE,
+		event->source,
 		LOCAL_NODE("actionid"));
 
 	while((row=DBfetch(result)))
 	{
 		ZBX_STR2UINT64(action.actionid, row[0]);
-		action.evaltype		= atoi(row[7]);
+		action.evaltype		= atoi(row[1]);
+		action.status		= atoi(row[2]);
+		action.eventsource	= atoi(row[3]);
 
 		if(check_action_conditions(event, &action) == SUCCEED)
 		{
-			zabbix_log( LOG_LEVEL_DEBUG, "Conditions match our event. Do apply actions.");
+			zabbix_log( LOG_LEVEL_DEBUG, "Conditions match our event. Execute operations.");
 
-			ZBX_STR2UINT64(action.userid, row[1]);
-			
-			action.subject		= strdup(row[2]);
-			action.message		= strdup(row[3]);
-			action.recipient	= atoi(row[4]);
-			action.scripts		= strdup(row[5]);
-			action.actiontype	= atoi(row[6]);
+			execute_operations(event, &action);
 
-			substitute_macros(event, &action, &action.message);
-			substitute_macros(event, &action, &action.subject);
-			
-			if(action.actiontype == ACTION_TYPE_MESSAGE)
-				send_to_user(event,&action);
-			else
-				run_commands(event,&action);
-
-			zbx_free(action.message);
-			zbx_free(action.subject);
-			zbx_free(action.scripts);
 		}
 		else
 		{
-			zabbix_log( LOG_LEVEL_DEBUG, "Conditions do not match our trigger. Do not apply actions.");
+			zabbix_log( LOG_LEVEL_DEBUG, "Conditions do not match our event. Do not execute operations.");
 		}
 	}
 	DBfree_result(result);
-	zabbix_log( LOG_LEVEL_DEBUG, "End apply_actions()");
+	zabbix_log( LOG_LEVEL_DEBUG, "End process_actions()");
 }
