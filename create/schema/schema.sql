@@ -269,6 +269,7 @@ INDEX		|3		|clock
 
 TABLE|actions|actionid|ZBX_SYNC
 FIELD		|actionid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|eventsource	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|evaltype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
