@@ -1,5 +1,6 @@
 CREATE TABLE actions_tmp (
         actionid                bigintd         DEFAULT '0'     NOT NULL,
+        name                    varchar(255)            DEFAULT ''      NOT NULL,
         eventsource             integer         DEFAULT '0'     NOT NULL,
         evaltype                integer         DEFAULT '0'     NOT NULL,
         status          integer         DEFAULT '0'     NOT NULL,
@@ -19,7 +20,7 @@ CREATE TABLE operations (
 );
 CREATE INDEX operations_1 on operations (actionid);
 
-insert into actions_tmp select actionid,source,0,status from actions;
+insert into actions_tmp select actionid,actionid,source,0,status from actions;
 
 insert into operations select actionid,actionid,actiontype,recipient,userid,subject,message,scripts from actions;
 update operations set longdata=scripts_tmp where operationtype=1;
