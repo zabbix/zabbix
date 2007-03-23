@@ -130,7 +130,7 @@ static int process_value(char *key, char *host, AGENT_RESULT *value)
 			key,
 			ITEM_STATUS_ACTIVE,
 			ITEM_TYPE_SIMPLE,
-			LOCAL_NODE("configid"));
+			LOCAL_NODE("h.hostid"));
 	}
 	row=DBfetch(result);
 
