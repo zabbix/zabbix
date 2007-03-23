@@ -123,14 +123,14 @@
 			
 			if(isset($this->vars))
 			{
-				$redirect = "Redirect('".$page["file"]."?".$this->name."=1".$this->vars."')";
+				$action = "Redirect('".$page["file"]."?".$this->name."=1".$this->vars."')";
 			}
 			else
 			{
-				$redirect = 'true';
+				$action = 'true';
 			}
 			
-			return parent::SetAction("if(".$confirmation.") return ".$redirect."; else return false;");
+			return parent::SetAction("if(".$confirmation.") return ".$action."; else return false;");
 		}
 	}
 ?>
