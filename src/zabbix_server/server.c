@@ -108,6 +108,7 @@ int	CONFIG_UNREACHABLE_DELAY	= 15;
 int	CONFIG_UNAVAILABLE_DELAY	= 60;
 int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 char	*CONFIG_ALERT_SCRIPTS_PATH	= NULL;
+char	*CONFIG_EXTERNALSCRIPTS		= NULL;
 char	*CONFIG_FPING_LOCATION		= NULL;
 char	*CONFIG_DBHOST			= NULL;
 char	*CONFIG_DBNAME			= NULL;
@@ -170,6 +171,7 @@ void	init_config(void)
 		{"PidFile",&APP_PID_FILE,0,TYPE_STRING,PARM_OPT,0,0},
 		{"LogFile",&CONFIG_LOG_FILE,0,TYPE_STRING,PARM_OPT,0,0},
 		{"AlertScriptsPath",&CONFIG_ALERT_SCRIPTS_PATH,0,TYPE_STRING,PARM_OPT,0,0},
+		{"ExternalScripts",&CONFIG_EXTERNALSCRIPTS,0,TYPE_STRING,PARM_OPT,0,0},
 		{"DBHost",&CONFIG_DBHOST,0,TYPE_STRING,PARM_OPT,0,0},
 		{"DBName",&CONFIG_DBNAME,0,TYPE_STRING,PARM_MAND,0,0},
 		{"DBUser",&CONFIG_DBUSER,0,TYPE_STRING,PARM_OPT,0,0},
@@ -205,7 +207,10 @@ void	init_config(void)
 	{
 		CONFIG_FPING_LOCATION=strdup("/usr/sbin/fping");
 	}
-
+	if(CONFIG_EXTERNALSCRIPTS == NULL)
+	{
+		CONFIG_EXTERNALSCRIPTS=strdup("/etc/zabbix/externalscripts");
+	}
 }
 
 int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
