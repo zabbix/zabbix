@@ -27,6 +27,7 @@
 
 #include "checks_agent.h"
 #include "checks_aggregate.h"
+#include "checks_external.h"
 #include "checks_internal.h"
 #include "checks_simple.h"
 #include "checks_snmp.h"
@@ -80,6 +81,10 @@ int	get_value(DB_ITEM *item, AGENT_RESULT *result)
 	else if(item->type == ITEM_TYPE_AGGREGATE)
 	{
 		res=get_value_aggregate(item, result);
+	}
+	else if(item->type == ITEM_TYPE_EXTERNAL)
+	{
+		res=get_value_external(item, result);
 	}
 	else
 	{
