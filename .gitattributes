@@ -184,6 +184,8 @@ src/zabbix_server/nodewatcher/nodesender.c -text
 src/zabbix_server/nodewatcher/nodesender.h -text
 src/zabbix_server/nodewatcher/nodewatcher.c -text
 src/zabbix_server/nodewatcher/nodewatcher.h -text
+src/zabbix_server/poller/checks_external.c -text
+src/zabbix_server/poller/checks_external.h -text
 src/zabbix_server/trapper/nodeevents.c -text
 src/zabbix_server/trapper/nodeevents.h -text
 src/zabbix_server/trapper/nodehistory.c -text
