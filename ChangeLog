@@ -1,5 +1,6 @@
 Changes for 1.3.4:
 
+ - support of macros in remote commands (Alexei)
  - minor fix for simple checks (Alexei)
  - fixed calculation of some functions where item is integer. (Alexei)
  - added new table slides and slideshows (Alexei)
