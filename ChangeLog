@@ -1,5 +1,6 @@
 Changes for 1.3.4:
 
+ - fixed calculation of some functions where item is integer. (Alexei)
  - added new table slides and slideshows (Alexei)
  - added server-side support of external checks. Thanks to Mike Nestor. (Alexei)
  - fixed incorrect SQL statement for ICMP check (Alexei)
