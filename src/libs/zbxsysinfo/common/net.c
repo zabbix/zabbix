@@ -98,7 +98,7 @@ int	tcp_expect(const char	*hostname, short port, const char *request, const char
 
 	buf[sizeof(buf)-1] = '\0';
 
-	if( strcmp(buf, expect) == 0 )
+	if( strncmp(buf, expect, strlen(expect)) == 0 )
 	{
 		*value_int = 1;
 	}
