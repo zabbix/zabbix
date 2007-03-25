@@ -21,6 +21,17 @@
 -- Do not use spaces
 --
 
+TABLE|slideshows|slideshowid|ZBX_SYNC
+FIELD		|slideshowid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|delay		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+
+TABLE|slides|slideid|ZBX_SYNC
+FIELD		|slideid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|slideshowid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|delay		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+INDEX		|slides_1	|slideshowid
+
 TABLE|drules|druleid|ZBX_SYNC
 FIELD		|druleid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC

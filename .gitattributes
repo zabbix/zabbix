@@ -253,6 +253,8 @@ upgrades/dbpatches/1.3/mysql/patch/services.sql -text
 upgrades/dbpatches/1.3/mysql/patch/services_links.sql -text
 upgrades/dbpatches/1.3/mysql/patch/services_times.sql -text
 upgrades/dbpatches/1.3/mysql/patch/sessions.sql -text
+upgrades/dbpatches/1.3/mysql/patch/slides.sql -text
+upgrades/dbpatches/1.3/mysql/patch/slideshows.sql -text
 upgrades/dbpatches/1.3/mysql/patch/sysmaps.sql -text
 upgrades/dbpatches/1.3/mysql/patch/sysmaps_elements.sql -text
 upgrades/dbpatches/1.3/mysql/patch/sysmaps_links.sql -text
@@ -319,6 +321,8 @@ upgrades/dbpatches/1.3/postgresql/patch/services.sql -text
 upgrades/dbpatches/1.3/postgresql/patch/services_links.sql -text
 upgrades/dbpatches/1.3/postgresql/patch/services_times.sql -text
 upgrades/dbpatches/1.3/postgresql/patch/sessions.sql -text
+upgrades/dbpatches/1.3/postgresql/patch/slides.sql -text
+upgrades/dbpatches/1.3/postgresql/patch/slideshows.sql -text
 upgrades/dbpatches/1.3/postgresql/patch/sysmaps.sql -text
 upgrades/dbpatches/1.3/postgresql/patch/sysmaps_elements.sql -text
 upgrades/dbpatches/1.3/postgresql/patch/sysmaps_links.sql -text
