@@ -887,7 +887,7 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 					del_zeroes(value);
 					break;
 				case ITEM_VALUE_TYPE_UINT64:
-					zbx_snprintf(value,MAX_STRING_LEN,ZBX_FS_UI64,item->prevvalue_dbl);
+					zbx_snprintf(value,MAX_STRING_LEN,ZBX_FS_UI64,item->prevvalue_uint64);
 					break;
 				default:
 					strcpy(value,item->prevvalue_str);
@@ -1048,7 +1048,7 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 					}
 					break;
 				case ITEM_VALUE_TYPE_UINT64:
-					if(item->lastvalue_dbl == item->prevvalue_dbl)
+					if(item->lastvalue_uint64 == item->prevvalue_uint64)
 					{
 						strcpy(value,"1");
 					}
