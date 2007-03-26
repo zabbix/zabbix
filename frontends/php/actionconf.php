@@ -23,6 +23,7 @@
 	require_once "include/actions.inc.php";
 	require_once "include/hosts.inc.php";
 	require_once "include/triggers.inc.php";
+	require_once "include/events.inc.php";
 	require_once "include/forms.inc.php";
 
 	$page["title"]	= "S_CONFIGURATION_OF_ACTIONS";
@@ -30,53 +31,53 @@
 
 include_once "include/page_header.php";
 	
-	$_REQUEST["actiontype"] = get_request("actiontype",get_profile("web.actionconf.actiontype",0));
+	$_REQUEST['eventsource'] = get_request('eventsource',get_profile('web.actionconf.eventsource',EVENT_SOURCE_TRIGGERS));
 ?>
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"actiontype"=>	array(T_ZBX_INT, O_MAND, NULL,	IN("0,1"),	NULL),
 
-		"actionid"=>	array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,		NULL),
-		"source"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0"),	'isset({save})'),
-		"recipient"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0,1"), 	'isset({save})'),
-		"userid"=>	array(T_ZBX_INT, O_OPT,	 NULL,	DB_ID, 		'isset({save})'),
-/*		"delay"=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),'isset({save})'),*/
-		"subject"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,	'{actiontype}==0&&isset({save})'),
-		"message"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,	'{actiontype}==0&&isset({save})'),
-		"scripts"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,	'{actiontype}==1&&isset({save})'),
-		"status"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0,1"), 	'isset({save})'),
-		"evaltype"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN(ACTION_EVAL_TYPE_AND_OR.','.ACTION_EVAL_TYPE_AND.','.ACTION_EVAL_TYPE_OR), 	'isset({save})'),
+		"actionid"=>	array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,					null),
+		"name"=>	array(T_ZBX_STR, O_OPT,	 null,	NOT_EMPTY,				'isset({save})'),
+		"eventsource"=>	array(T_ZBX_INT, O_MAND, null,
+			IN(array(EVENT_SOURCE_TRIGGERS,EVENT_SOURCE_DISCOVERY)),	null),
+		"evaltype"=>	array(T_ZBX_INT, O_OPT,	 null,
+			IN(array(ACTION_EVAL_TYPE_AND_OR,ACTION_EVAL_TYPE_AND,ACTION_EVAL_TYPE_OR)), 	'isset({save})'),
+		"status"=>	array(T_ZBX_INT, O_OPT,	 null,
+			IN(array(ACTION_STATUS_ENABLED,ACTION_STATUS_DISABLED)),			'isset({save})'),
 
-		"conditions"=>	array(NULL, O_OPT, NULL, NULL, NULL),
-//		"conditions[i][type]"=>		array(T_ZBX_INT, O_OPT,  NULL,	NULL,	NULL),
-//		"conditions[i][operator]"=>	array(T_ZBX_INT, O_OPT,  NULL,	NULL,	NULL),
-//		"conditions[i][value]"=>	array(NULL, 	 O_OPT,  NULL,	NULL,	NULL),
+		"g_actionid"=>	array(T_ZBX_INT, O_OPT,  null,	DB_ID,		null),
 
-		"rem_condition"=> array(NULL, O_OPT, NULL, NULL, NULL),
-//		"rem_condition[i][type]"=>	array(T_ZBX_INT, O_OPT,  NULL,	NULL, NULL);	
-//		"rem_condition[i][operator]"=>	array(T_ZBX_INT, O_OPT,  NULL,	NULL, NULL);
-//		"rem_condition[i][value]"=>	array(NULL, 	 O_OPT,  NULL,	NULL, NULL);
+		"conditions"=>	array(null, O_OPT, null, null, null),
+		"g_conditionid"=> array(null, O_OPT, null, null, null),
 
-		"g_actionid"=>	array(T_ZBX_INT, O_OPT,  NULL,	DB_ID,		NULL),
+		"new_condition"=>		array(null, 	 O_OPT,  null,	null,	'isset({add_condition})'),
 
-		"new_condition_type"=>		array(T_ZBX_INT, O_OPT,  NULL,	NULL,	'isset({add_condition})'),
-		"new_condition_operator"=>	array(T_ZBX_INT, O_OPT,  NULL,	NULL,	'isset({add_condition})'),
-		"new_condition_value"=>		array(NULL, 	 O_OPT,  NULL,	NULL,	'isset({add_condition})'),
+		"operations"=>		array(null, O_OPT, null, null, null),
+		"g_operationid"=>	array(null, O_OPT, null, null, null),
+
+		"edit_operationid"=>	array(null, O_OPT, P_ACT,	DB_ID,	null),
+
+		"new_operation"=>	array(null, O_OPT,  null,	null,	'isset({add_operation})'),
+
 
 /* actions */
-		"group_delete"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"group_enable"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"group_disable"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"add_condition"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"del_condition"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"clone"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
-		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+		"group_delete"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"group_enable"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"group_disable"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"add_condition"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"del_condition"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"cancel_new_condition"=>array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"add_operation"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"del_operation"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"cancel_new_operation"=>array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"clone"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 /* other */
-		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
-		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
+		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	null,	null,	null)
 	);
 
 	check_fields($fields);
@@ -87,104 +88,153 @@ include_once "include/page_header.php";
 	}
 ?>
 <?php
-	update_profile("web.actionconf.actiontype",$_REQUEST["actiontype"]);
+	update_profile('web.actionconf.eventsource',$_REQUEST['eventsource']);
 ?>
 <?php
-	if(isset($_REQUEST["clone"]) && isset($_REQUEST["actionid"]))
+	if(inarr_isset(array('clone','actionid')))
 	{
-		unset($_REQUEST["actionid"]);
-		$_REQUEST["form"] = "clone";
+		unset($_REQUEST['actionid']);
+		$_REQUEST['form'] = 'clone';
 	}
-	elseif(isset($_REQUEST["save"]))
+	elseif(isset($_REQUEST['cancel_new_condition']))
 	{
-		if(isset($_REQUEST["actionid"]))
+		unset($_REQUEST['new_condition']);
+	}
+	elseif(isset($_REQUEST['cancel_new_operation']))
+	{
+		unset($_REQUEST['new_operation']);
+	}
+	elseif(isset($_REQUEST['save']))
+	{
+		global $USER_DETAILS, $ZBX_CURNODEID;
+
+		if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+			access_deny();
+
+		$conditions = get_request('conditions', array());
+		$operations = get_request('operations', array());
+
+		if(isset($_REQUEST['actionid']))
 		{
-			// TODO check permission by new value.
-			$actionid=$_REQUEST["actionid"];
+			$actionid=$_REQUEST['actionid'];
 			$result = update_action($actionid,
-				$_REQUEST['actiontype'],$_REQUEST['userid'],
-				$_REQUEST["subject"], $_REQUEST["message"],$_REQUEST["recipient"],
-				$_REQUEST["status"],$_REQUEST["scripts"],$_REQUEST["evaltype"]);
+				$_REQUEST['name'],$_REQUEST['eventsource'],
+				$_REQUEST['evaltype'],$_REQUEST['status'],
+				$conditions, $operations
+				);
 
 			show_messages($result,S_ACTION_UPDATED,S_CANNOT_UPDATE_ACTION);
 		} else {
-			if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
-				access_deny();
-
 			$actionid=add_action(
-				$_REQUEST['actiontype'],$_REQUEST['userid'], 
-				$_REQUEST["subject"],$_REQUEST["message"],$_REQUEST["recipient"],
-				$_REQUEST["status"],$_REQUEST["scripts"],$_REQUEST["evaltype"]);
+				$_REQUEST['name'],$_REQUEST['eventsource'],
+				$_REQUEST['evaltype'],$_REQUEST['status'],
+				$conditions, $operations
+				);
 			$result=$actionid;
 
 			show_messages($result,S_ACTION_ADDED,S_CANNOT_ADD_ACTION);
 		}
 
-//			add_action_to_linked_hosts($actionid);
-
 		if($result) // result - OK
 		{
+			add_audit(!isset($_REQUEST['actionid']) ? AUDIT_ACTION_ADD : AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ACTION, 
+				S_NAME.': '.$_REQUEST['name']);
 
-			DBexecute("delete from conditions where actionid=$actionid");
-			if(isset($_REQUEST["conditions"])) foreach($_REQUEST["conditions"] as $val)
-				add_action_condition($actionid,$val["type"],$val["operator"],$val["value"]);
-
-			if($_REQUEST["actiontype"] == ACTION_TYPE_MESSAGE)
-				$msg =  "subject [".$_REQUEST["subject"]."]";
-			else
-				$msg = "command [".$_REQUEST["scripts"]."]";
-
-			add_audit(!isset($_REQUEST["actionid"]) ? AUDIT_ACTION_ADD : AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ACTION, $msg);
-
-			unset($_REQUEST["form"]);
+			unset($_REQUEST['form']);
 		}
 	}
-	elseif(isset($_REQUEST["delete"])&&isset($_REQUEST["actionid"]))
+	elseif(inarr_isset(array('delete','actionid')))
 	{
-//			delete_action_from_templates($_REQUEST["actionid"]);
+		global $USER_DETAILS, $ZBX_CURNODEID;
 
-		$result=delete_action($_REQUEST["actionid"]);
+		if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+			access_deny();
+
+		$result = delete_action($_REQUEST['actionid']);
 		show_messages($result,S_ACTION_DELETED,S_CANNOT_DELETE_ACTION);
 		if($result)
 		{
 			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_ACTION,
-				"Subject [".$_REQUEST["subject"]."]");
-			unset($_REQUEST["form"]);
-			unset($_REQUEST["actionid"]);
+				S_NAME.': '.$_REQUEST['name']);
+			unset($_REQUEST['form']);
+			unset($_REQUEST['actionid']);
 		}
 	}
-	elseif(isset($_REQUEST["add_condition"]))
+	elseif(inarr_isset(array('add_condition','new_condition')))
 	{
-		$new_condition = array(
-			"type"=>	$_REQUEST["new_condition_type"], 
-			"operator"=>	$_REQUEST["new_condition_operator"],
-			"value"=>	$_REQUEST["new_condition_value"]);
+		$new_condition = $_REQUEST['new_condition'];
 
-		$_REQUEST["conditions"] = get_request("conditions",array());
-		if(!in_array($new_condition,$_REQUEST["conditions"]))
-			array_push($_REQUEST["conditions"],$new_condition);
+		$_REQUEST['conditions'] = get_request('conditions',array());
+		if(!in_array($new_condition,$_REQUEST['conditions']))
+			array_push($_REQUEST['conditions'],$new_condition);
+
+		unset($_REQUEST['new_condition']);
 	}
-	elseif(isset($_REQUEST["del_condition"])&&isset($_REQUEST["rem_condition"]))
+	elseif(inarr_isset(array('del_condition','g_conditionid')))
 	{
-		$_REQUEST["conditions"] = get_request("conditions",array());
-		foreach($_REQUEST["rem_condition"] as $val){
-			unset($_REQUEST["conditions"][$val]);
+		$_REQUEST['conditions'] = get_request('conditions',array());
+		foreach($_REQUEST['g_conditionid'] as $val){
+			unset($_REQUEST['conditions'][$val]);
+		}
+	}
+	elseif(inarr_isset(array('add_operation','new_operation')))
+	{
+		$new_operation = $_REQUEST['new_operation'];
+		zbx_rksort($new_operation);
+
+		$_REQUEST['operations'] = get_request('operations',array());
+
+		if(!isset($new_operation['id']))
+		{
+			if(!in_array($new_operation,$_REQUEST['operations']))
+				array_push($_REQUEST['operations'],$new_operation);
+		}
+		else
+		{
+			$id = $new_operation['id'];
+			unset($new_operation['id']);
+			$_REQUEST['operations'][$id] = $new_operation;
+		}
+
+		unset($_REQUEST['new_operation']);
+	}
+	elseif(inarr_isset(array('del_operation','g_operationid')))
+	{
+		$_REQUEST['operations'] = get_request('operations',array());
+		foreach($_REQUEST['g_operationid'] as $val){
+			unset($_REQUEST['operations'][$val]);
+		}
+	}
+	elseif(inarr_isset(array('edit_operationid')))
+	{	
+		$_REQUEST['edit_operationid'] = array_keys($_REQUEST['edit_operationid']);
+		$edit_operationid = $_REQUEST['edit_operationid'] =array_pop($_REQUEST['edit_operationid']);
+		$_REQUEST['operations'] = get_request('operations',array());
+		if(isset($_REQUEST['operations'][$edit_operationid]))
+		{
+			$_REQUEST['new_operation'] = $_REQUEST['operations'][$edit_operationid];
+			$_REQUEST['new_operation']['id'] = $edit_operationid;
 		}
 	}
 /* GROUP ACTIONS */
-	elseif(isset($_REQUEST["group_enable"])&&isset($_REQUEST["g_actionid"]))
+	elseif(isset($_REQUEST['group_enable'])&&isset($_REQUEST['g_actionid']))
 	{
-		$result=DBselect("select distinct actionid from actions".
-				" where ".DBid2nodeid("actionid")."=".$ZBX_CURNODEID.
-				" and actionid in (".implode($_REQUEST["g_actionid"]).") "
+		global $USER_DETAILS, $ZBX_CURNODEID;
+
+		if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+			access_deny();
+
+		$result=DBselect('select distinct actionid from actions'.
+				' where '.DBid2nodeid('actionid').'='.$ZBX_CURNODEID.
+				' and actionid in ('.implode(',',$_REQUEST['g_actionid']).') '
 				);
 		
 		$actionids = array();
 		while($row=DBfetch($result))
 		{
-			$res = update_action_status($row["actionid"],0);
+			$res = update_action_status($row['actionid'],0);
 			if($res)
-				$actionids[] = $row["actionid"];
+				$actionids[] = $row['actionid'];
 		}
 		if(isset($res))
 		{
@@ -192,18 +242,23 @@ include_once "include/page_header.php";
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',',$actionids).'] enabled');
 		}
 	}
-	elseif(isset($_REQUEST["group_disable"])&&isset($_REQUEST["g_actionid"]))
+	elseif(isset($_REQUEST['group_disable'])&&isset($_REQUEST['g_actionid']))
 	{
-		$result=DBselect("select distinct actionid from actions".
-				" where ".DBid2nodeid("actionid")."=".$ZBX_CURNODEID.
-				" and actionid in (".implode($_REQUEST["g_actionid"]).") "
+		global $USER_DETAILS, $ZBX_CURNODEID;
+
+		if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+			access_deny();
+
+		$result=DBselect('select distinct actionid from actions'.
+				' where '.DBid2nodeid('actionid').'='.$ZBX_CURNODEID.
+				' and actionid in ('.implode(',',$_REQUEST['g_actionid']).') '
 				);
 		$actionids = array();
 		while($row=DBfetch($result))
 		{
-			$res = update_action_status($row["actionid"],1);
+			$res = update_action_status($row['actionid'],1);
 			if($res) 
-				$actionids[] = $row["actionid"];
+				$actionids[] = $row['actionid'];
 		}
 		if(isset($res))
 		{
@@ -211,18 +266,23 @@ include_once "include/page_header.php";
 			add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ACTION, ' Actions ['.implode(',',$actionids).'] disabled');
 		}
 	}
-	elseif(isset($_REQUEST["group_delete"])&&isset($_REQUEST["g_actionid"]))
+	elseif(isset($_REQUEST['group_delete'])&&isset($_REQUEST['g_actionid']))
 	{
-		$result=DBselect("select distinct actionid from actions".
-				" where ".DBid2nodeid("actionid")."=".$ZBX_CURNODEID.
-				" and actionid in (".implode($_REQUEST["g_actionid"]).") "
+		global $USER_DETAILS, $ZBX_CURNODEID;
+
+		if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+			access_deny();
+
+		$result=DBselect('select distinct actionid from actions'.
+				' where '.DBid2nodeid('actionid').'='.$ZBX_CURNODEID.
+				' and actionid in ('.implode(',',$_REQUEST['g_actionid']).') '
 				);
 		$actionids = array();
 		while($row=DBfetch($result))
 		{
-			$del_res = delete_action($row["actionid"]);
+			$del_res = delete_action($row['actionid']);
 			if($del_res) 
-				$actionids[] = $row["actionid"];
+				$actionids[] = $row['actionid'];
 		}
 		if(isset($del_res))
 		{
@@ -235,116 +295,102 @@ include_once "include/page_header.php";
 <?php
 /* header */
 	$form = new CForm();
-
-	$cmbType = new CComboBox("actiontype",$_REQUEST["actiontype"],"submit()");
-	$cmbType->AddItem(ACTION_TYPE_MESSAGE,S_SEND_MESSAGE);
-	$cmbType->AddItem(ACTION_TYPE_COMMAND,S_REMOTE_COMMAND);
-	$form->AddItem($cmbType);
-
-	$form->AddItem(SPACE."|".SPACE);
-	$form->AddItem(new CButton("form",S_CREATE_ACTION));
-
+	$form->AddVar('eventsource', $_REQUEST['eventsource']);
+	$form->AddItem(new CButton('form',S_CREATE_ACTION));
 	show_table_header(S_CONFIGURATION_OF_ACTIONS_BIG, $form);
 	echo BR;
 
-	if(isset($_REQUEST["form"]))
+	if(isset($_REQUEST['form']))
 	{
 /* form */
 		insert_action_form();
 	}
 	else
 	{
-		show_table_header(S_ACTIONS_BIG);
+		$form = new CForm();
+
+		$cmbSource = new CComboBox('eventsource',$_REQUEST['eventsource'],'submit()');
+		$cmbSource->AddItem(EVENT_SOURCE_TRIGGERS,S_TRIGGERS);
+		$cmbSource->AddItem(EVENT_SOURCE_DISCOVERY,S_DISCOVERY);
+		$form->AddItem(array(S_EVENT_SOURCE, SPACE, $cmbSource));
+
+		show_table_header(S_ACTIONS_BIG, $form);
+		unset($form, $cmbSource);
 /* table */
 		$form = new CForm();
 		$form->SetName('actions');
 
 		$tblActions = new CTableInfo(S_NO_ACTIONS_DEFINED);
 		$tblActions->SetHeader(array(
-			array(	new CCheckBox("all_items",NULL,"CheckAll('".$form->GetName()."','all_items');"),
-				S_SOURCE
+			array(	new CCheckBox('all_items',null,'CheckAll("'.$form->GetName().'","all_items");'),
+				S_NAME
 			),
 			S_CONDITIONS,
-			$_REQUEST["actiontype"] == ACTION_TYPE_MESSAGE ? S_SEND_MESSAGE_TO : S_REMOTE_COMMAND,
-			$_REQUEST["actiontype"] == ACTION_TYPE_MESSAGE ? S_SUBJECT : NULL,
+			S_OPERATIONS,
 			S_STATUS));
 
-		$result=DBselect("select * from actions where actiontype=".$_REQUEST["actiontype"].
-			" and ".DBid2nodeid("actionid")."=".$ZBX_CURNODEID.
-			" order by actiontype, source");
-		while($row=DBfetch($result))
+		$db_actions = DBselect('select * from actions where eventsource='.$_REQUEST['eventsource'].
+			' and '.DBid2nodeid('actionid').'='.$ZBX_CURNODEID.' order by name,actionid');
+		while($action_data = DBfetch($db_actions))
 		{
-			if(!action_accessiable($row['actionid'], PERM_READ_WRITE)) continue;
+			if(!action_accessiable($action_data['actionid'], PERM_READ_WRITE)) continue;
 
-			$conditions="";
-			$result2=DBselect("select * from conditions where actionid=".$row["actionid"].
-				" order by conditiontype");
-			while($condition=DBfetch($result2))
+			$conditions='';
+			$db_conditions = DBselect('select * from conditions where actionid='.$action_data['actionid'].
+				' order by conditiontype,conditionid');
+			while($condition_data = DBfetch($db_conditions))
 			{
 				$conditions .= get_condition_desc(
-							$condition["conditiontype"],
-							$condition["operator"],
-							$condition["value"]).BR;
+							$condition_data['conditiontype'],
+							$condition_data['operator'],
+							$condition_data['value']).BR;
 			}
+			unset($db_conditions, $condition_data);
 
+			$operations='';
+			$db_operations = DBselect('select * from operations where actionid='.$action_data['actionid'].
+				' order by operationtype,operationid');
+			while($operation_data = DBfetch($db_operations))
+				$operations .= get_operation_desc(SHORT_DESCRITION, $operation_data).BR;
 				
-			if($_REQUEST["actiontype"] == ACTION_TYPE_MESSAGE)
-			{			
-				if($row["recipient"] == RECIPIENT_TYPE_USER)
-				{
-					$user		= get_user_by_userid($row["userid"]);
-					$recipient	= $user["alias"];
-				}
-				else
-				{
-					$groupd		= get_group_by_usrgrpid($row["userid"]);
-					$recipient	= $groupd["name"];
-				}
-				$subject = htmlspecialchars($row["subject"]);
-			}elseif($_REQUEST["actiontype"] == ACTION_TYPE_COMMAND)
-			{
-				$recipient = nl2br(htmlspecialchars($row["scripts"]));
-				$subject = NULL;
-			}
-
-			if($row["status"] == ACTION_STATUS_DISABLED)
+			if($action_data['status'] == ACTION_STATUS_DISABLED)
 			{
 				$status= new CLink(S_DISABLED,
-					"actionconf.php?group_enable=1&g_actionid%5B%5D=".$row["actionid"].url_param("actiontype"),
+					'actionconf.php?group_enable=1&g_actionid%5B%5D='.$action_data['actionid'].url_param('eventsource'),
 					'disabled');
 			}
-			else if($row["status"] == ACTION_STATUS_ENABLED)
+			else
 			{
 				$status= new CLink(S_ENABLED,
-					"actionconf.php?group_disable=1&g_actionid%5B%5D=".$row["actionid"].url_param("actiontype"),
+					'actionconf.php?group_disable=1&g_actionid%5B%5D='.$action_data['actionid'].url_param('eventsource'),
 					'enabled');
 			}
 
 			$tblActions->AddRow(array(
 				array(
 					new CCheckBox(
-						"g_actionid[]",	/* name */
-						NULL,			/* checked */
-						NULL,			/* action */
-						$row["actionid"]),	/* value */
+						'g_actionid[]',			/* name */
+						null,				/* checked */
+						null,				/* action */
+						$action_data['actionid']),	/* value */
 					SPACE,
 					new CLink(
-						get_source_description($row["source"]),
-						"actionconf.php?form=update&actionid=".$row['actionid'],'action'),
+						$action_data['name'],
+						'actionconf.php?form=update&actionid='.$action_data['actionid'],'action'),
 					),
 				$conditions,
-				$recipient,
-				$subject,
+				$operations,
 				$status
 				));	
 		}
-		$footerButtons = array();
-		array_push($footerButtons, new CButtonQMessage('group_enable',S_ENABLE_SELECTED,S_ENABLE_SELECTED_ACTIONS_Q));
-		array_push($footerButtons, SPACE);
-		array_push($footerButtons, new CButtonQMessage('group_disable',S_DISABLE_SELECTED,S_DISABLE_SELECTED_ACTIONS_Q));
-		array_push($footerButtons, SPACE);
-		array_push($footerButtons, new CButtonQMessage('group_delete',S_DELETE_SELECTED,S_DELETE_SELECTED_APPLICATIONS_Q));
-		$tblActions->SetFooter(new CCol($footerButtons));
+
+		$tblActions->SetFooter(new CCol(array(
+			new CButtonQMessage('group_enable',S_ENABLE_SELECTED,S_ENABLE_SELECTED_ACTIONS_Q),
+			SPACE,
+			new CButtonQMessage('group_disable',S_DISABLE_SELECTED,S_DISABLE_SELECTED_ACTIONS_Q),
+			SPACE,
+			new CButtonQMessage('group_delete',S_DELETE_SELECTED,S_DELETE_SELECTED_APPLICATIONS_Q)
+		)));
 
 		$form->AddItem($tblActions);
 		$form->Show();

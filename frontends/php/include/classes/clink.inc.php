@@ -22,7 +22,7 @@
 	class CLink extends CTag
 	{
 /* public */
-		function CLink($item=NULL,$url=NULL,$class=NULL)
+		function CLink($item=NULL,$url=NULL,$class=NULL,$action=NULL)
 		{
 			parent::CTag("a","yes");
 
@@ -34,6 +34,7 @@
 			if(!is_null($class))	$this->SetClass($class);
 			if(!is_null($item))	$this->AddItem($item);
 			if(!is_null($url))	$this->SetUrl($url);
+			if(!is_null($action))	$this->SetAction($action);
 		}
 		function SetAction($value=NULL)
 		{

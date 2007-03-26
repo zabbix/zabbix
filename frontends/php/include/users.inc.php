@@ -188,7 +188,7 @@
 		{
 			return	$row;
 		}
-		error("No user with id [$userid]");
+		/* error("No user with id [$userid]"); */
 		return	false;
 	}
 
@@ -286,7 +286,7 @@
 		{
 			return $row;
 		}
-		error("No user groups with id [$usrgrpid]");
+		/* error("No user groups with id [$usrgrpid]"); */
 		return  FALSE;
 	}
 ?>
