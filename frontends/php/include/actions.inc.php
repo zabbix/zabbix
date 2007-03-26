@@ -167,12 +167,16 @@
 	{
 		if(!is_array($conditions) || count($conditions) == 0)
 		{
+			/*
 			error(S_NO_CONDITIONS_DEFINED);
 			return false;
+			*/
 		}
-
-		if(!check_permission_for_action_conditions($conditions))
-			return false;
+		else
+		{
+			if(!check_permission_for_action_conditions($conditions))
+				return false;
+		}
 
 		if(!is_array($operations) || count($operations) == 0)
 		{
@@ -218,12 +222,16 @@
 	{
 		if(!is_array($conditions) || count($conditions) == 0)
 		{
+			/*
 			error(S_NO_CONDITIONS_DEFINED);
 			return false;
+			*/
 		}
-
-		if(!check_permission_for_action_conditions($conditions))
-			return false;
+		else
+		{
+			if(!check_permission_for_action_conditions($conditions))
+				return false;
+		}
 
 		if(!is_array($operations) || count($operations) == 0)
 		{
