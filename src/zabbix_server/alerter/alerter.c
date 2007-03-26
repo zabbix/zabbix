@@ -58,10 +58,9 @@ int execute_action(DB_ALERT *alert,DB_MEDIATYPE *mediatype, char *error, int max
 	char	full_path[MAX_STRING_LEN];
 
 	char    env_alertid[128],env_actionid[128],env_clock[128],env_mediatypeid[128],
-		env_status[128],env_retries[128],env_delay[128];
+		env_status[128];
 	char    *zbxenv[] = { (char *)&env_alertid, (char *)&env_actionid, (char *)&env_clock,
-		(char *)&env_mediatypeid, (char *)&env_status, (char *)&env_retries,
-		(char *)&env_delay,
+		(char *)&env_mediatypeid, (char *)&env_status,
 		(char *)0 };
 
 
@@ -116,10 +115,6 @@ int execute_action(DB_ALERT *alert,DB_MEDIATYPE *mediatype, char *error, int max
 				alert->mediatypeid);
 			zbx_snprintf(env_status,127,"ZABBIX_ALERT_STATUS=%d",
 				alert->status);
-			zbx_snprintf(env_retries,127,"ZABBIX_ALERT_RETRIES=%d",
-				alert->retries);
-			zbx_snprintf(env_delay,127,"ZABBIX_ALERT_DELAY=%d",
-				alert->delay);
 
 /*			if(-1 == execl(full_path,mediatype->exec_path,alert->sendto,alert->subject,alert->message,(char *)0))*/
 			if(-1 == execle(full_path,mediatype->exec_path,alert->sendto,alert->subject,alert->message,(char *)0, zbxenv))
@@ -202,7 +197,7 @@ int main_alerter_loop()
 
 		now  = time(NULL);
 
-		result = DBselect("select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,a.retries,mt.mediatypeid,mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path,a.delay,mt.gsm_modem,mt.username,mt.passwd from alerts a,media_type mt where a.status=%d and a.retries<3 and a.mediatypeid=mt.mediatypeid and " ZBX_COND_NODEID " order by a.clock",
+		result = DBselect("select a.alertid,a.mediatypeid,a.sendto,a.subject,a.message,a.status,mt.mediatypeid,mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,mt.exec_path,mt.gsm_modem,mt.username,mt.passwd from alerts a,media_type mt where a.status=%d and a.retries<3 and a.mediatypeid=mt.mediatypeid and " ZBX_COND_NODEID " order by a.clock",
 			ALERT_STATUS_NOT_SENT,
 			LOCAL_NODE("mt.mediatypeid"));
 
@@ -214,21 +209,18 @@ int main_alerter_loop()
 			alert.subject=row[3];
 			alert.message=row[4];
 			alert.status=atoi(row[5]);
-			alert.retries=atoi(row[6]);
 
-			ZBX_STR2UINT64(mediatype.mediatypeid,row[7]);
-			mediatype.type=atoi(row[8]);
-			mediatype.description=row[9];
-			mediatype.smtp_server=row[10];
-			mediatype.smtp_helo=row[11];
-			mediatype.smtp_email=row[12];
-			mediatype.exec_path=row[13];
+			ZBX_STR2UINT64(mediatype.mediatypeid,row[6]);
+			mediatype.type=atoi(row[7]);
+			mediatype.description=row[8];
+			mediatype.smtp_server=row[9];
+			mediatype.smtp_helo=row[10];
+			mediatype.smtp_email=row[11];
+			mediatype.exec_path=row[12];
 
-			alert.delay=atoi(row[14]);
-
-			mediatype.gsm_modem=row[15];
-			mediatype.username=row[16];
-			mediatype.passwd=row[17];
+			mediatype.gsm_modem=row[13];
+			mediatype.username=row[14];
+			mediatype.passwd=row[15];
 
 			phan.sa_handler = child_signal_handler;
 			sigemptyset(&phan.sa_mask);
