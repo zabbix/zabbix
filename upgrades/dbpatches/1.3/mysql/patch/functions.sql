@@ -1,6 +1,6 @@
 CREATE TABLE functions_tmp (
 	functionid		bigint unsigned		DEFAULT '0'	NOT NULL,
-	itemid		bigint unsigned		DEFAULT '0'	NOT NULL,
+	itemid			bigint unsigned		DEFAULT '0'	NOT NULL,
 	triggerid		bigint unsigned		DEFAULT '0'	NOT NULL,
 	lastvalue		varchar(255)			,
 	function		varchar(12)		DEFAULT ''	NOT NULL,

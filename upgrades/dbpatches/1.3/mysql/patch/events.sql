@@ -11,5 +11,5 @@ CREATE TABLE events (
 CREATE INDEX events_1 on events (triggerid,source,clock);
 CREATE INDEX events_2 on events (clock);
 
-insert into events select eventid,0,0,triggerid,clock,value,acknowledged from alarms;
+insert into events select alarmid,0,0,triggerid,clock,value,acknowledged from alarms;
 drop table alarms;
