@@ -20,6 +20,7 @@
 
 function SDI($msg="SDI") { echo "DEBUG INFO: "; var_export($msg); echo BR; } // DEBUG INFO!!!
 function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$msg.'"'.SPACE; var_dump($var); echo BR; } // DEBUG INFO!!!
+function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 
 
 ?>
@@ -1998,5 +1999,25 @@ else if (document.getElementById)
 		}
 
 		return isset($array[$keys]);
+	}
+
+	/* function:
+	 *      zbx_rksort
+	 *
+	 * description:
+	 *      Recursively sort an array by key
+	 *
+	 * author: Eugene Grigorjev
+	 */
+	function	zbx_rksort(&$array, $flags=NULL)
+	{
+		if(is_array($array))
+		{
+			foreach($array as $id => $data)
+				zbx_rksort($array[$id]);
+
+			ksort($array,$flags);
+		}
+		return $array;
 	}
 ?>

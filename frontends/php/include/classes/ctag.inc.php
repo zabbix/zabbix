@@ -51,6 +51,16 @@
 		return $res;
 	}
 
+	function implode_objects($glue, &$pieces)
+	{
+		if( !is_array($pieces) )	return unpack_object($pieces);
+
+		foreach($pieces as $id => $piece)
+			$pieces[$id] = unpack_object($piece);
+
+		return implode($glue, $pieces);
+	}
+
 	class CObject
 	{
 		function CObject($items=null)
@@ -240,7 +250,7 @@
 		function AddAction($name, $value)
 		{
 			if(!empty($value))
-				$this->options[$name] = htmlentities(str_replace("\n", '', strval($value)),ENT_COMPAT); 
+				$this->options[$name] = htmlentities(str_replace(array("\r", "\n"), '', strval($value)),ENT_COMPAT); 
 		}
 
 		function AddOption($name, $value)
