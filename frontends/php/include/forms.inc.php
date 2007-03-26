@@ -402,6 +402,7 @@
 		
 		if(isset($_REQUEST['nodeid']) && (!isset($_REQUEST["form_refresh"]) || isset($_REQUEST["register"])))
 		{
+			$new_nodeid	= $node_data['nodeid'];
 			$name		= $node_data['name'];
 			$timezone	= $node_data['timezone'];
 			$ip		= $node_data['ip'];
@@ -411,6 +412,7 @@
 		}
 		else
 		{
+			$new_nodeid	= get_request('new_nodeid',0);
 			$name 		= get_request('name','');
 			$timezone 	= get_request('timezone', 0);
 			$ip		= get_request('ip','127.0.0.1');
@@ -425,6 +427,8 @@
 		$master_node = DBfetch(DBselect('select name from nodes where nodeid='.$masterid));
 
 		$frmNode->AddRow(S_NAME, new CTextBox('name', $name, 40));
+
+		$frmNode->AddRow(S_ID, new CNumericBox('new_nodeid', $new_nodeid, 10));
 
 		if(!isset($_REQUEST['nodeid']))
 		{
