@@ -67,7 +67,7 @@ static void	add_trigger_info(DB_EVENT *event)
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	if(event->object==EVENT_OBJECT_TRIGGER && event->objectid == 0)
+	if(event->object==EVENT_OBJECT_TRIGGER && event->objectid != 0)
 	{
 		result = DBselect("select description,priority,comments,url from triggers where triggerid=" ZBX_FS_UI64,
 			event->objectid);
