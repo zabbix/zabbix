@@ -28,6 +28,7 @@
 
 #include "daemon.h"
 #include "discoverer.h"
+#include "../events.h"
 
 #define SERVICE_UP	0
 #define SERVICE_DOWN	1
