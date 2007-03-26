@@ -97,6 +97,18 @@ table.formtable tr td {
         font-size:10px;
 	border-width: 1px;
 	height: 24px;
+	white-space: nowrap;
+	word-spacing:	0px;
+}
+
+table.formtable tr.new {
+	text-decoration: none;
+	background-color: #E0F0E0;
+}
+
+table.formtable tr.edit {
+	text-decoration: none;
+	background-color: #F0F0E0;
 }
 table.formtable tr.form_odd_row td{
 	text-decoration: none;
@@ -1144,4 +1156,9 @@ ul.messages li.error
 {
 	color:#AA0000;
 	list-style: url('images/general/error_small.gif') inside;
+}
+
+table.nowrap tr td {
+	white-space: nowrap;
+	word-spacing:	0px;
 }

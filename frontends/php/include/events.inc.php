@@ -19,8 +19,17 @@
 **/
 ?>
 <?php
+	function	event_source2str($sourceid)
+	{
+		switch($sourceid)
+		{
+			case EVENT_SOURCE_TRIGGERS:	return S_TRIGGERS;
+			case EVENT_SOURCE_DISCOVERY:	return S_DISCOVERY;
+			default:			return S_UNKNOWN;
+		}
+	}
 
-	function get_history_of_triggers_events($start,$num, $groupid=0, $hostid=0, $nodeid=null)
+	function	get_history_of_triggers_events($start,$num, $groupid=0, $hostid=0, $nodeid=null)
 	{
 		global $ZBX_CURNODEID;
 		global $USER_DETAILS;
@@ -90,7 +99,7 @@
 		return $table;
 	}
 
-	function get_history_of_discovery_events($start,$num,$nodeid=null)
+	function	get_history_of_discovery_events($start,$num,$nodeid=null)
 	{
 		global $ZBX_CURNODEID;
 		global $USER_DETAILS;

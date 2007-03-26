@@ -67,6 +67,48 @@
 		return $result;
 	}
 
+	function	check_permission_for_action_conditions($conditions)
+	{
+		global $USER_DETAILS;
+
+		$result = true;
+
+		$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
+		$denyed_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
+		
+		foreach($conditions as $ac_data)
+		{
+			if($ac_data['operator'] != 0) continue;
+
+			switch($ac_data['type'])
+			{
+				case CONDITION_TYPE_GROUP:
+					if(in_array($ac_data['value'],explode(',',$denyed_groups)))
+					{
+						$result = false;
+					}
+					break;
+				case CONDITION_TYPE_HOST:
+					if(in_array($ac_data['value'],explode(',',$denyed_hosts)))
+					{
+						$result = false;
+					}
+					break;
+				case CONDITION_TYPE_TRIGGER:
+					if(!DBfetch(DBselect("select distinct t.*".
+						" from triggers t,items i,functions f".
+						" where f.itemid=i.itemid and t.triggerid=f.triggerid".
+						" and i.hostid not in (".$denyed_hosts.") and t.triggerid=".$ac_data['value'])))
+					{
+						$result = false;
+					}
+					break;
+			}
+			if(!$result) break;
+		}
+		return $result;
+	}
+
 	function	get_action_by_actionid($actionid)
 	{
 		$sql="select * from actions where actionid=$actionid"; 
@@ -83,52 +125,136 @@
 		return	$result;
 	}
 
-	# Add Action
+	# Add Action's condition
 
-	function	add_action($actiontype,$userid,$subject,$message,$recipient,$status,$scripts,$evaltype)
+	function	add_action_condition($actionid, $condition)
 	{
-		// TODO check permission by new value.
+		$conditionid = get_dbid("conditions","conditionid");
 
-		if($actiontype == ACTION_TYPE_MESSAGE)
-		{
-			$scripts = "";
-		}
-		elseif($actiontype == ACTION_TYPE_COMMAND)
-		{
-			$subject = $message = "";
-			$userid = 0;			
-			$recipient = 0;	
-			if(!check_commands($scripts))	return FALSE;
-		}
-		$actionid=get_dbid("actions","actionid");
-		$sql="insert into actions (actionid,actiontype,userid,subject,message,recipient,".
-			"status,scripts,evaltype) values ($actionid,$actiontype,$userid,".zbx_dbstr($subject).",".
-			zbx_dbstr($message).",$recipient,$status,".zbx_dbstr($scripts).",$evaltype)";
-		$result=DBexecute($sql);
+		$result = DBexecute('insert into conditions (conditionid,actionid,conditiontype,operator,value)'.
+			' values ('.$conditionid.','.$actionid.','.
+				$condition['type'].','.
+				$condition['operator'].','.
+				zbx_dbstr($condition['value']).
+			')');
+		
 		if(!$result)
 			return $result;
+
+		return $conditionid;
+	}
+
+	function	add_action_operation($actionid, $operation)
+	{
+		$operationid = get_dbid('operations','operationid');
+
+		$result = DBexecute('insert into operations (operationid,actionid,operationtype,object,objectid,shortdata,longdata)'.
+			' values('.$operationid.','.$actionid.','.
+				$operation['operationtype'].','.
+				$operation['object'].','.
+				$operation['objectid'].','.
+				zbx_dbstr($operation['shortdata']).','.
+				zbx_dbstr($operation['longdata']).
+			')');
+		if(!$result)
+			return $result;
+
+		return $operationid;
+	}
+	# Add Action
+
+	function	add_action($name, $eventsource, $evaltype, $status, $conditions, $operations)
+	{
+		if(!is_array($conditions) || count($conditions) == 0)
+		{
+			error(S_NO_CONDITIONS_DEFINED);
+			return false;
+		}
+
+		if(!check_permission_for_action_conditions($conditions))
+			return false;
+
+		if(!is_array($operations) || count($operations) == 0)
+		{
+			error(S_NO_OPERATIONS_DEFINED);
+			return false;
+		}
+
+		foreach($operations as $operation)
+			if($operation['operationtype'] == OPERATION_TYPE_COMMAND && !check_commands($operation['longdata']))
+				return false;
+
+		$actionid=get_dbid("actions","actionid");
+
+		$result = DBexecute('insert into actions (actionid,name,eventsource,evaltype,status)'.
+			' values ('.$actionid.','.zbx_dbstr($name).','.$eventsource.','.$evaltype.','.$status.')');
+
+		if(!$result)
+			return $result;
+
+		foreach($operations as $operation)
+			if( !($result = add_action_operation($actionid, $operation)))
+				break;
+
+		if($result)
+		{
+			foreach($conditions as $condition)
+			if( !($result = add_action_condition($actionid, $condition)))
+				break;
+		}
+
+		if(!$result)
+		{
+			delete_action($actionid);
+			$actionid = $result;
+		}
+
 		return $actionid;
 	}
 
 	# Update Action
 
-	function	update_action($actionid,$actiontype,$userid,$subject,$message,$recipient,$status,$scripts,$evaltype)
+	function	update_action($actionid, $name, $eventsource, $evaltype, $status, $conditions, $operations)
 	{
-		// TODO check permission by new value.
-
-		if($actiontype == ACTION_TYPE_MESSAGE)
+		if(!is_array($conditions) || count($conditions) == 0)
 		{
-			$scripts = "";
-		}
-		elseif($actiontype == ACTION_TYPE_COMMAND)
-		{
-			$subject = $message = "";
-			$userid = 0;
-			$recipient = 0;	
-			if(!check_commands($scripts))	return FALSE;
+			error(S_NO_CONDITIONS_DEFINED);
+			return false;
 		}
 
-		$result=DBexecute("update actions set actiontype=$actiontype,userid=$userid,subject=".zbx_dbstr($subject).",message=".zbx_dbstr($message).",recipient=$recipient,status=$status,scripts=".zbx_dbstr($scripts).",evaltype=$evaltype where actionid=$actionid");
+		if(!check_permission_for_action_conditions($conditions))
+			return false;
+
+		if(!is_array($operations) || count($operations) == 0)
+		{
+			error(S_NO_OPERATIONS_DEFINED);
+			return false;
+		}
+
+		foreach($operations as $operation)
+			if($operation['operationtype'] == OPERATION_TYPE_COMMAND && !check_commands($operation['longdata']))
+				return false;
+
+		$result = DBexecute('update actions set name='.zbx_dbstr($name).',eventsource='.$eventsource.','.
+			'evaltype='.$evaltype.',status='.$status.' where actionid='.$actionid);
+
+		if($result)
+		{
+			DBexecute('delete from conditions where actionid='.$actionid);
+			DBexecute('delete from operations where actionid='.$actionid);
+
+			foreach($operations as $operation)
+				if( !($result = add_action_operation($actionid, $operation)))
+					break;
+
+			if($result)
+			{
+				foreach($conditions as $condition)
+				if( !($result = add_action_condition($actionid, $condition)))
+					break;
+			}
+		}
+
 		return $result;
 	}
 
@@ -139,26 +265,15 @@
 		$return = DBexecute('delete from conditions where actionid='.$actionid);
 
 		if($return)
+			$result = DBexecute('delete from operations where actionid='.$actionid);
+
+		if($return)
 			$result = DBexecute('delete from alerts where actionid='.$actionid);
 
 		if($return)
 			$result = DBexecute('delete from actions where actionid='.$actionid);
 
 		return $result;
-	}
-
-	function	get_source_description($source)
-	{
-		$desc = S_UNKNOWN;
-		if($source==1)
-		{
-			$desc=S_IT_SERVICE;
-		}
-		elseif($source==0)
-		{
-			$desc=S_TRIGGER;
-		}
-		return $desc;
 	}
 
 	function	get_condition_desc($conditiontype, $operator, $value)
@@ -232,17 +347,62 @@
 		return $desc;
 	}
 
-	# Add Action's condition
-
-	function	add_action_condition($actionid, $conditiontype, $operator, $value)
+	define('LONG_DESCRITION', 0);
+	define('SHORT_DESCRITION', 1);
+	function get_operation_desc($type=SHORT_DESCRITION, $data)
 	{
-		$conditionid=get_dbid("conditions","conditionid");
-		$sql="insert into conditions (conditionid,actionid,conditiontype,operator,value)".
-			" values ($conditionid,$actionid,$conditiontype,$operator,".zbx_dbstr($value).")";
-		$result=DBexecute($sql);
-		if(!$result)
-			return $result;
-		return $conditionid;
+		global $cashed_data_for_oper_desc;
+
+		$cash_id = sprintf("%s%02d%02d", $data['objectid'], $data['operationtype'], $data['object']);
+
+		if(!isset($cashed_data_for_oper_desc[$cash_id]))
+		{
+			unset($cashed_data_for_oper_desc);
+
+			switch($data['object'])
+			{
+				case OPERATION_OBJECT_USER:
+					$cashed_data_for_oper_desc[$cash_id] = get_user_by_userid($data['objectid']);
+					$cashed_data_for_oper_desc[$cash_id] = S_USER.' "'.$cashed_data_for_oper_desc[$cash_id]['name'].'"';
+					break;
+				case OPERATION_OBJECT_GROUP:
+					$cashed_data_for_oper_desc[$cash_id] = get_group_by_usrgrpid($data['objectid']);
+					$cashed_data_for_oper_desc[$cash_id] = S_GROUP.' "'.$cashed_data_for_oper_desc[$cash_id]['name'].'"';
+					break;
+			}
+		}
+
+		switch($type)
+		{
+			case SHORT_DESCRITION:
+				switch($data['operationtype'])
+				{
+					case OPERATION_TYPE_MESSAGE:
+						$result = S_SEND_MESSAGE_TO.' '.$cashed_data_for_oper_desc[$cash_id];
+						break;
+					case OPERATION_TYPE_COMMAND:
+						$result = S_RUN_REMOTE_COMMANDS;
+						break;
+					default: break;
+				}
+				break;
+			case LONG_DESCRITION:
+			default:
+				switch($data['operationtype'])
+				{
+					case OPERATION_TYPE_MESSAGE:
+						$result = bold(S_SUBJECT).': '.$data['shortdata']."\n";
+						$result .= bold(S_MESSAGE).":\n".$data['longdata'];
+						break;
+					case OPERATION_TYPE_COMMAND:
+						$result = bold(S_REMOTE_COMMANDS).":\n".$data['longdata'];
+						break;
+					default: break;
+				}
+				break;
+		}
+
+		return $result;
 	}
 
 	function	update_action_status($actionid, $status)

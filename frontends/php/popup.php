@@ -55,7 +55,11 @@
 			break;
 		case 'usrgrp':
 			$page["title"] = "S_GROUPS";
-			$min_user_type = USER_TYPE_SUPER_ADMIN;
+			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
+			break;
+		case 'users':
+			$page["title"] = "S_USERS";
+			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
 		case 'items':
 			$page["title"] = "S_ITEMS_BIG";
@@ -138,7 +142,7 @@ include_once "include/page_header.php";
 <?php
 	function get_window_opener($frame, $field, $value)
 	{
-		return empty($field) ? "" : "window.opener.document.forms['".addslashes($frame)."'].".addslashes($field).".value='".addslashes($value)."';";
+		return empty($field) ? "" : "window.opener.document.forms['".addslashes($frame)."'].elements['".addslashes($field)."'].value='".addslashes($value)."';";
 	}
 ?>
 <?php
@@ -474,6 +478,24 @@ include_once "include/page_header.php";
 		$table->SetHeader(array(S_NAME));
 
 		$result = DBselect("select * from usrgrp where ".DBid2nodeid("usrgrpid")."=".$ZBX_CURNODEID." order by name");
+		while($row = DBfetch($result))
+		{
+			$name = new CLink($row["name"],"#","action");
+			$name->SetAction(
+				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
+				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '').
+				" close_window(); return false;");
+
+			$table->AddRow($name);
+		}
+		$table->Show();
+	}
+	elseif($srctbl == "users")
+	{
+		$table = new CTableInfo(S_NO_USERS_DEFINED);
+		$table->SetHeader(array(S_NAME));
+
+		$result = DBselect("select * from users where ".DBid2nodeid("userid")."=".$ZBX_CURNODEID." order by name");
 		while($row = DBfetch($result))
 		{
 			$name = new CLink($row["name"],"#","action");
