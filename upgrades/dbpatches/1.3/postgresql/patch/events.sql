@@ -7,7 +7,7 @@ CREATE TABLE events (
 	acknowledged	integer		DEFAULT '0'	NOT NULL,
 	PRIMARY KEY (eventid)
 );
-CREATE INDEX events_1 on events (triggerid,source,clock);
+CREATE INDEX events_1 on events (source,object,objectid,clock);
 CREATE INDEX events_2 on events (clock);
 
 insert into events select alarmid,0,triggerid,clock,value,acknowledged from alarms;
