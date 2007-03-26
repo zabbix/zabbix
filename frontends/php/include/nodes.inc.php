@@ -46,7 +46,7 @@
 		return $result;
 	}
 
-	function	add_node($name,$timezone,$ip,$port,$slave_history,$slave_trends,$node_type)
+	function	add_node($new_nodeid,$name,$timezone,$ip,$port,$slave_history,$slave_trends,$node_type)
 	{
 		global $ZBX_CURNODEID, $ZBX_CURMASTERID;
 
@@ -75,25 +75,30 @@
 				break;
 		}
 
-		$nodeid = DBfetch(DBselect('select max(nodeid) as max from nodes'));
-		$nodeid = $nodeid['max'] + 1;
+		if(DBfetch(DBselect('select nodeid from nodes where nodeid='.$new_nodeid)))
+		{
+			error('Node with same ID already exist.');
+			return false;
+		}
+
 		$result = DBexecute('insert into nodes (nodeid,name,timezone,ip,port,slave_history,slave_trends,'.
 				'event_lastid,history_lastid,nodetype,masterid) values ('.
-				$nodeid.','.zbx_dbstr($name).','.$timezone.','.zbx_dbstr($ip).','.$port.','.$slave_history.','.$slave_trends.','.
+				$new_nodeid.','.zbx_dbstr($name).','.$timezone.','.zbx_dbstr($ip).','.$port.','.$slave_history.','.$slave_trends.','.
 				'0,0,'.$nodetype.','.$masterid.')');
 
 		if($result && $node_type == ZBX_NODE_MASTER)
 		{
-			DBexecute('update nodes set masterid='.$nodeid.' where nodeid='.$ZBX_CURNODEID);
-			$ZBX_CURMASTERID = $nodeid; /* applay Master node for this script */
+			DBexecute('update nodes set masterid='.$new_nodeid.' where nodeid='.$ZBX_CURNODEID);
+			$ZBX_CURMASTERID = $new_nodeid; /* applay Master node for this script */
 		}
 
-		return ($result ? $nodeid : $result);
+		return ($result ? $new_nodeid : $result);
 	}
 
-	function	update_node($nodeid,$name,$timezone,$ip,$port,$slave_history,$slave_trends)
+	function	update_node($nodeid,$new_nodeid,$name,$timezone,$ip,$port,$slave_history,$slave_trends)
 	{
-		$result = DBexecute('update nodes set name='.zbx_dbstr($name).',timezone='.$timezone.',ip='.zbx_dbstr($ip).',port='.$port.','.
+		$result = DBexecute('update nodes set nodeid='.$new_nodeid.',name='.zbx_dbstr($name).','.
+				'timezone='.$timezone.',ip='.zbx_dbstr($ip).',port='.$port.','.
 				'slave_history='.$slave_history.',slave_trends='.$slave_trends.
 				' where nodeid='.$nodeid);
 		return $result;
