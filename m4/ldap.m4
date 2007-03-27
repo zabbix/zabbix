@@ -53,8 +53,8 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>
                fi
        else
                if test -f $_libldap_with/include/ldap.h; then
-                       LIBLDAP_INCDIR=$_libldap_with/include
-                       LIBLDAP_LIBDIR=$_libldap_with/lib
+                       LDAP_INCDIR=$_libldap_with/include
+                       LDAP_LIBDIR=$_libldap_with/lib
                else
                        found_ldap="no"
                        AC_MSG_RESULT(no)
@@ -67,8 +67,8 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>
                        LDAP_LIBS=" -llber -lgnutls -lpthread -lsasl2 $LDAP_LIBS"
                fi
 
-               LIBLDAP_CPPFLAGS=-I$LIBLDAP_INCDIR
-               LIBLDAP_LDFLAGS="-L$LIBLDAP_LIBDIR -lldap $LDAP_LIBS"
+               LDAP_CPPFLAGS=-I$LDAP_INCDIR
+               LDAP_LDFLAGS="-L$LDAP_LIBDIR -lldap $LDAP_LIBS"
 
                found_ldap="yes"
                AC_DEFINE(HAVE_LDAP,1,[Define to 1 if LDAP should be enabled.])
@@ -76,8 +76,8 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>
        fi
   fi
 
-  AC_SUBST(LIBLDAP_CPPFLAGS)
-  AC_SUBST(LIBLDAP_LDFLAGS)
+  AC_SUBST(LDAP_CPPFLAGS)
+  AC_SUBST(LDAP_LDFLAGS)
 
   unset _libldap_with
 ])dnl
