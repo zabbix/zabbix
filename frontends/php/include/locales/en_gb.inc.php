@@ -889,7 +889,7 @@
 	'S_VALUES_STORED'=>			'Values stored',
 	'S_NUMBER_OF_TRENDS_STORED'=>		'Number of trends stored',
 	'S_TRENDS_STORED'=>			'Trends stored',
-	'S_NUMBER_OF_ALARMS'=>			'Number of alarms',
+	'S_NUMBER_OF_EVENTS'=>			'Number of events',
 	'S_NUMBER_OF_ALERTS'=>			'Number of alerts',
 	'S_NUMBER_OF_TRIGGERS'=>		'Number of triggers (enabled/disabled)[true/unknown/false]',
 	'S_NUMBER_OF_TRIGGERS_SHORT'=>		'Triggers (e/d)[t/u/f]',
