@@ -776,6 +776,7 @@ AC_OUTPUT([
 	src/zabbix_server/trapper/Makefile
 	src/zabbix_server/utils/Makefile
 	src/zabbix_server/watchdog/Makefile
+	upgrades/Makefile
 	])
 
 echo "

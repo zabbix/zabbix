@@ -8,5 +8,5 @@ libzbxpoller_a_SOURCES = \
 	checks_simple.c checks_simple.h \
 	checks_snmp.c checks_snmp.h \
 	checks_aggregate.c checks_aggregate.h \
-	checks_external.c \
+	checks_external.c checks_external.h \
 	poller.c poller.h
