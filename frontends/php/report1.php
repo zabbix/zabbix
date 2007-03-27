@@ -60,7 +60,7 @@ include_once "include/page_header.php";
 		new CSpan($status["triggers_count_unknown"],"unknown"),"/",
 		new CSpan($status["triggers_count_off"],"off"),"]"
 		)));
-	$table->AddRow(array(S_NUMBER_OF_ALARMS,$status["events_count"]));
+	$table->AddRow(array(S_NUMBER_OF_EVENTS,$status["events_count"]));
 	$table->AddRow(array(S_NUMBER_OF_ALERTS,$status["alerts_count"]));
 	$table->Show();
 ?>
