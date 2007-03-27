@@ -224,7 +224,7 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 		if(!is_array($value)) 
 		{
 			if(is_object($value)) return unpack_object($value);
-			if(is_string($value)) return '\''.str_replace('\'','\\\'',zbx_jsstr($value)).'\'';
+			if(is_string($value)) return '\''.str_replace('\'','\\\'',str_replace("\n", '\n', str_replace("\r", '', ($value)))).'\'';
 			if(is_null($value)) return 'null';
 			return strval($value);
 		}
