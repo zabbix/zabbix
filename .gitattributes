@@ -265,7 +265,7 @@ upgrades/dbpatches/1.3/mysql/patch/users.sql -text
 upgrades/dbpatches/1.3/mysql/patch/users_groups.sql -text
 upgrades/dbpatches/1.3/mysql/patch/usrgrp.sql -text
 upgrades/dbpatches/1.3/mysql/patch/valuemaps.sql -text
-upgrades/dbpatches/1.3/oracle/patch.sql -text
+upgrades/dbpatches/1.3/oracle/patch/patch.sql -text
 upgrades/dbpatches/1.3/postgresql/patch/acknowledges.sql -text
 upgrades/dbpatches/1.3/postgresql/patch/actions.sql -text
 upgrades/dbpatches/1.3/postgresql/patch/alerts.sql -text
