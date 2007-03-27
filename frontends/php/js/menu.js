@@ -224,7 +224,12 @@ function menu_expand (n_id) {
 // --------------------------------------------------------------------------------
 function menu_onclick (n_id) {
 	// don't go anywhere if item has no link defined
-	return Boolean(this.a_index[n_id].a_config[1]);
+	if(Boolean(this.a_index[n_id].a_config[1]))
+	{
+		this.collapse(0);
+		return true;
+	}
+	return false;
 }
 
 // --------------------------------------------------------------------------------

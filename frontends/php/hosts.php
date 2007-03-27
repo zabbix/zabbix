@@ -102,6 +102,9 @@ include_once "include/page_header.php";
 		"activate"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),	
 		"disable"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL),	
 
+		"add_to_group"=>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT, DB_ID, NULL),	
+		"delete_from_group"=>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT, DB_ID, NULL),	
+
 		"unlink"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	NULL),
 		"unlink_and_clear"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,   NULL,	NULL),
 
@@ -273,6 +276,38 @@ include_once "include/page_header.php";
 		unset($_REQUEST["delete"]);
 	}
 /* ACTIVATE / DISABLE HOSTS */
+	elseif(($_REQUEST["config"]==0 || $_REQUEST["config"]==3) && 
+		(inarr_isset(array('add_to_group','hostid'))))
+	{
+		global $USER_DETAILS;
+
+		if(!in_array($_REQUEST['add_to_group'], get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,null,
+			PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+		{
+			access_deny();
+		}
+
+		show_messages(
+			add_host_to_group($_REQUEST['hostid'], $_REQUEST['add_to_group']),
+			S_HOST_UPDATED,
+			S_CANNOT_UPDATE_HOST);
+	}
+	elseif(($_REQUEST["config"]==0 || $_REQUEST["config"]==3) && 
+		(inarr_isset(array('delete_from_group','hostid'))))
+	{
+		global $USER_DETAILS;
+
+		if(!in_array($_REQUEST['delete_from_group'], get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,null,
+			PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+		{
+			access_deny();
+		}
+
+		if( delete_host_from_group($_REQUEST['hostid'], $_REQUEST['delete_from_group']) )
+		{
+			show_messages(true, S_HOST_UPDATED);
+		}
+	}
 	elseif(($_REQUEST["config"]==0 || $_REQUEST["config"]==3) && 
 		(isset($_REQUEST["activate"])||isset($_REQUEST["disable"])))
 	{
@@ -572,7 +607,7 @@ include_once "include/page_header.php";
 				$show_only_tmp ? NULL : S_STATUS,
 				$show_only_tmp ? NULL : S_AVAILABILITY,
 				$show_only_tmp ? NULL : S_ERROR,
-				S_SHOW
+				S_ACTIONS
 				));
 		
 			$sql="select h.* from";
@@ -589,6 +624,9 @@ include_once "include/page_header.php";
 		
 			while($row=DBfetch($result))
 			{
+				$add_to = array();
+				$delete_from = array();
+
 				$templates = get_templates_by_hostid($row["hostid"]);
 				
 				$host=new CCol(array(
@@ -645,14 +683,55 @@ include_once "include/page_header.php";
 					else			$error = new CCol($row["error"],"on");
 
 				}
-		
-				$show = array(
-					new CLink(S_ITEMS,"items.php?hostid=".$row["hostid"],'action'),
-					SPACE.":".SPACE,
-					new CLink(S_TRIGGERS,"triggers.php?hostid=".$row["hostid"],'action'),
-					SPACE.":".SPACE,
-					new CLink(S_GRAPHS,"graphs.php?hostid=".$row["hostid"],'action')
+
+				$popup_menu_actions = array(
+					array(S_SHOW, null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))),
+					array(S_ITEMS, 'items.php?hostid='.$row['hostid'], array('tw'=>'_blank')),
+					array(S_TRIGGERS, 'triggers.php?hostid='.$row['hostid'], array('tw'=>'_blank')),
+					array(S_GRAPHS, 'graphs.php?hostid='.$row['hostid'], array('tw'=>'_blank')),
 					);
+
+				$db_groups = DBselect('select g.groupid, g.name from groups g left join hosts_groups hg '.
+						' on g.groupid=hg.groupid and hg.hostid='.$row['hostid'].
+						' where hostid is NULL order by name,groupid');
+				while($group_data = DBfetch($db_groups))
+				{
+					$add_to[] = array($group_data['name'], '?'.
+							url_param($group_data['groupid'], false, 'add_to_group').
+							url_param($row['hostid'], false, 'hostid')
+							);
+				}
+
+				$db_groups = DBselect('select g.groupid, g.name from groups g, hosts_groups hg '.
+						' where g.groupid=hg.groupid and hg.hostid='.$row['hostid'].
+						' order by name,groupid');
+				while($group_data = DBfetch($db_groups))
+				{
+					$delete_from[] = array($group_data['name'], '?'.
+							url_param($group_data['groupid'], false, 'delete_from_group').
+							url_param($row['hostid'], false, 'hostid')
+							);
+				}
+
+				if(count($add_to) > 0 || count($delete_from) > 0)
+				{
+					$popup_menu_actions[] = array(S_GROUPS, null, null,
+						array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader')));
+				}
+				if(count($add_to) > 0)
+				{
+					$popup_menu_actions[] = array_merge(array(S_ADD_TO_GROUP, null, null, 
+						array('outer' => 'pum_o_submenu', 'inner'=>array('pum_i_submenu'))), $add_to);
+				}
+				if(count($delete_from) > 0)
+				{
+					$popup_menu_actions[] = array_merge(array(S_DELETE_FROM_GROUP, null, null, 
+						array('outer' => 'pum_o_submenu', 'inner'=>array('pum_i_submenu'))), $delete_from);
+				}
+
+				$mnuActions = new CPUMenu($popup_menu_actions);
+
+				$show = new CLink(S_SELECT, '#', 'action', $mnuActions->GetOnActionJS());
 
 				$table->addRow(array(
 					$host,

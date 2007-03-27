@@ -1059,6 +1059,24 @@ ul
 
 }
 
+/* menu menu item with submenu */
+.pum_o_submenu{
+	font-family: sans-serif, Tahoma, Verdana, Geneva, Arial, Helvetica;
+	font-size: 12px;
+	text-decoration: none;
+	background: #ECECFF;
+	border: black 1px solid;
+	margin: 0px;
+}
+.pum_o_submenu:hover {
+	text-decoration: none;
+	background-color: #FDFDFF;
+}
+.pum_i_submenu{
+	margin: 3px 0px 0px 8px;
+
+}
+
 /* menu group header */
 .pum_oheader { 
 	cursor: default;

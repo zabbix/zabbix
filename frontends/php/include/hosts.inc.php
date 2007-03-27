@@ -38,6 +38,15 @@ require_once "include/items.inc.php";
 		return $hostgroupid;
 	}
 
+	function	delete_host_from_group($hostid, $groupid)
+	{
+		if(!is_numeric($hostid) || !is_numeric($groupid)){
+			error("incorrect parameters for 'add_host_to_group' [hostid:".$hostid."][groupid:".$groupid."]");
+			return false;
+		}
+		return DBexecute('delete from hosts_groups where hostid='.$hostid.' and groupid='.$groupid);
+	}
+
 	function	db_save_group($name,$groupid=null)
 	{
 		if(!is_string($name)){
