@@ -50,7 +50,7 @@ int	discoverer_num;
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void add_host_event(DB_DHOST *host, zbx_uint64_t dserviceid)
+static void add_host_event(DB_DHOST *host, DB_DSERVICE *service)
 {
 	DB_EVENT	event;
 	int		now;
@@ -64,7 +64,7 @@ static void add_host_event(DB_DHOST *host, zbx_uint64_t dserviceid)
 	event.eventid		= 0;
 	event.source		= EVENT_SOURCE_DISCOVERY;
 	event.object		= EVENT_OBJECT_DHOST;
-	event.objectid		= dserviceid;
+	event.objectid		= service->dhostid;
 	event.clock 		= now;
 	event.value 		= host->status;
 	event.acknowledged 	= 0;
@@ -74,9 +74,74 @@ static void add_host_event(DB_DHOST *host, zbx_uint64_t dserviceid)
 
 /******************************************************************************
  *                                                                            *
- * Function: generate_host_event                                              *
+ * Function: add_service_event                                                *
  *                                                                            *
- * Purpose: generate host UP/DOWN event if required                           *
+ * Purpose: generate service UP/DOWN event if required                        *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void add_service_event(DB_DSERVICE *service)
+{
+	DB_EVENT	event;
+	int		now;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In add_host_event()");
+
+	now = time(NULL); 
+
+	memset(&event,0,sizeof(DB_EVENT));
+
+	event.eventid		= 0;
+	event.source		= EVENT_SOURCE_DISCOVERY;
+	event.object		= EVENT_OBJECT_DSERVICE;
+	event.objectid		= service->dserviceid;
+	event.clock 		= now;
+	event.value 		= service->status;
+	event.acknowledged 	= 0;
+
+	process_event(&event);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: update_dservice                                                  *
+ *                                                                            *
+ * Purpose: update descovered service details                                 *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void update_dservice(DB_DSERVICE *service)
+{
+	DBexecute("update dservices set dhostid=" ZBX_FS_UI64 ",type=%d,port=%d,status=%d,lastup=%d,lastdown=%d,eventsent=%d where dserviceid=" ZBX_FS_UI64,
+			service->dhostid,
+			service->type,
+			service->port,
+			service->status,
+			service->lastup,
+			service->lastdown,
+			service->eventsent,
+			service->dserviceid);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: update_host                                                      *
+ *                                                                            *
+ * Purpose: update descovered host details                                    *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
@@ -114,7 +179,7 @@ static void update_dhost(DB_DHOST *host)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint64_t register_service(DB_DRULE *rule,DB_DCHECK *check,zbx_uint64_t dhostid,char *ip,int port)
+static void register_service(DB_DSERVICE *service,DB_DRULE *rule,DB_DCHECK *check,zbx_uint64_t dhostid,char *ip,int port)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -124,7 +189,7 @@ static zbx_uint64_t register_service(DB_DRULE *rule,DB_DCHECK *check,zbx_uint64_
 		ip,
 		port);
 
-	result = DBselect("select dserviceid from dservices where dhostid=" ZBX_FS_UI64 " and type=%d and port=%d",
+	result = DBselect("select dserviceid,dhostid,type,port,status,lastup,lastdown,eventsent from dservices where dhostid=" ZBX_FS_UI64 " and type=%d and port=%d",
 		dhostid,
 		check->type,
 		port);
@@ -134,25 +199,40 @@ static zbx_uint64_t register_service(DB_DRULE *rule,DB_DCHECK *check,zbx_uint64_
 		/* Add host only if service is up */
 		if(check->status == SERVICE_UP)
 		{
+			zabbix_log(LOG_LEVEL_DEBUG, "New service discovered on port %d", port);
 			dserviceid = DBget_maxid("dservices","dserviceid");
-			DBexecute("insert into dservices (dhostid,dserviceid,type,port) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d)",
+			DBexecute("insert into dservices (dhostid,dserviceid,type,port,status) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,%d)",
 				dhostid,
 				dserviceid,
 				check->type,
-				port);
-			zabbix_log(LOG_LEVEL_DEBUG, "New service discovered on port %d", port);
+				port,
+				SERVICE_UP);
+
+			service->dserviceid	= dserviceid;
+			service->dhostid	= dhostid;
+			service->type		= check->type;
+			service->port		= port;
+			service->status		= SERVICE_UP;
+			service->lastup		= 0;
+			service->lastdown	= 0;
+			service->eventsent	= 0;
 		}
 	}
 	else
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Service is already in database");
-		ZBX_STR2UINT64(dserviceid,row[0]);
+		ZBX_STR2UINT64(service->dserviceid,	row[0]);
+		ZBX_STR2UINT64(service->dhostid,	row[1]);
+		service->type		= atoi(row[2]);
+		service->port		= atoi(row[3]);
+		service->status		= atoi(row[4]);
+		service->lastup		= atoi(row[5]);
+		service->lastdown	= atoi(row[6]);
+		service->eventsent	= atoi(row[7]);
 	}
 	DBfree_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End register_service()");
-
-	return dserviceid;
 }
 
 /******************************************************************************
@@ -236,14 +316,16 @@ static void register_host(DB_DHOST *host,DB_DCHECK *check, zbx_uint64_t druleid,
  ******************************************************************************/
 static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 {
-	zbx_uint64_t	dserviceid = 0;
 	int		now;
 	DB_DHOST	host;
+	DB_DSERVICE	service;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In update_check(ip:%s, port:%d, status:%s)",
 		ip,
 		port,
 		(check->status==SERVICE_UP?"up":"down"));
+
+	service.dserviceid=0;
 
 	/* Register host if is not registered yet */
 	register_host(&host,check,rule->druleid,ip);
@@ -251,10 +333,11 @@ static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 	if(host.dhostid>0)
 	{
 		/* Register service if is not registered yet */
-		dserviceid = register_service(rule,check,host.dhostid,ip,port);
+/*		dserviceid = register_service(rule,check,host.dhostid,ip,port);*/
+		register_service(&service,rule,check,host.dhostid,ip,port);
 	}
 
-	if(dserviceid == 0)
+	if(service.dserviceid == 0)
 	{
 		/* Service wasn't registered because we do not add down service */
 		return;
@@ -277,7 +360,7 @@ static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 			SERVICE_UP,
 			now,
 			SERVICE_DOWN,
-			dserviceid);
+			service.dserviceid);
 	}
 	/* SERVICE_DOWN */
 	else
@@ -295,7 +378,7 @@ static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 			SERVICE_DOWN,
 			now,
 			SERVICE_UP,
-			dserviceid);
+			service.dserviceid);
 	}
 
 	/* Generating host events */
@@ -308,14 +391,39 @@ static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 			host.eventsent=1;
 
 			update_dhost(&host);
-			add_host_event(&host,dserviceid);
+			add_host_event(&host,&service);
 		}
 		if(host.status == SERVICE_DOWN && (host.lastdown<=now-rule->downevent))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Generating host event for %s",
 				host.ip);
 			host.eventsent=1;
+
 			update_dhost(&host);
+			add_host_event(&host,&service);
+		}
+	}
+
+	/* Generating service events */
+	if(service.eventsent == 0)
+	{
+		if(service.status == SERVICE_UP && (service.lastup<=now-rule->svcupevent))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Generating service event for %s",
+				host.ip);
+			service.eventsent=1;
+
+			update_dservice(&service);
+			add_service_event(&service);
+		}
+		if(service.status == SERVICE_DOWN && (service.lastdown<=now-rule->svcdownevent))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Generating service event for %s",
+				host.ip);
+			service.eventsent=1;
+
+			update_dservice(&service);
+			add_service_event(&service);
 		}
 	}
 }
@@ -596,7 +704,7 @@ void main_discoverer_loop(int num)
 			rule.upevent		= atoi(row[7]);
 			rule.downevent		= atoi(row[8]);
 			rule.svcupevent		= atoi(row[9]);
-			rule.svndownevent	= atoi(row[10]);
+			rule.svcdownevent	= atoi(row[10]);
 			
 			process_rule(&rule);
 		}

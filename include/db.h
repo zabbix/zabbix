@@ -47,6 +47,7 @@ extern	int	CONFIG_MASTER_NODEID;
 #define DB_CONDITION	struct zbx_condition_type
 #define DB_DHOST	struct zbx_dhost_type
 #define DB_DRULE	struct zbx_drule_type
+#define DB_DSERVICE	struct zbx_dservice_type
 #define DB_DCHECK	struct zbx_dcheck_type
 #define DB_EVENT	struct zbx_event_type
 #define DB_FUNCTION	struct zbx_function_type
@@ -123,7 +124,7 @@ DB_DRULE
 	int		upevent;
 	int		downevent;
 	int		svcupevent;
-	int		svndownevent;
+	int		svcdownevent;
 };
 
 DB_DCHECK
@@ -140,6 +141,18 @@ DB_DHOST
 	zbx_uint64_t	dhostid;
 	zbx_uint64_t	druleid;
 	char		ip[HOST_IP_LEN_MAX];
+	int		status;
+	int		lastup;
+	int		lastdown;
+	int		eventsent;
+};
+
+DB_DSERVICE
+{
+	zbx_uint64_t	dserviceid;
+	zbx_uint64_t	dhostid;
+	int		type;
+	int		port;
 	int		status;
 	int		lastup;
 	int		lastdown;
