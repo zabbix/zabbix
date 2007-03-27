@@ -20,7 +20,7 @@ cleanwarnings="no"
 docat="yes"
 help="no"
 noparam=0
-def="--enable-agent --enable-server --with-mysql --prefix=`echo $HOME`/local/zabbix"
+def="--enable-agent --enable-server --with-mysql --prefix=`echo $HOME`/local/zabbix --with-ldap --with-net-snmp --with-libcurl --with-jabber"
 
 for cmd
 do
