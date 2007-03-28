@@ -312,6 +312,7 @@ int get_values(void)
 		
 		if(res == SUCCEED )
 		{
+
 			process_new_value(&item,&agent);
 
 /*			if(HOST_STATUS_UNREACHABLE == item.host_status)*/
@@ -321,7 +322,10 @@ int get_values(void)
 					item.host_name);
 				zabbix_syslog("Enabling host [%s]",
 					item.host_name);
+
+				now = time(NULL);
 				DBupdate_host_availability(item.hostid,HOST_AVAILABLE_TRUE,now,agent.msg);
+
 				update_key_status(item.hostid, HOST_STATUS_MONITORED); /* 0 */
 				item.host_available=HOST_AVAILABLE_TRUE;
 
@@ -338,6 +342,7 @@ int get_values(void)
 		}
 		else if(res == NOTSUPPORTED)
 		{
+			now = time(NULL);
 			if(item.status == ITEM_STATUS_NOTSUPPORTED)
 			{
 				/* It is not correct */
@@ -374,6 +379,8 @@ int get_values(void)
 		}
 		else if(res == NETWORK_ERROR)
 		{
+			now = time(NULL);
+
 			/* First error */
 			if(item.host_errors_from==0)
 			{
