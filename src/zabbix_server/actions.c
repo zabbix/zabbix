@@ -405,7 +405,7 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		condition->conditionid,
 		condition->value);
 
-	if(condition->conditiontype == CONDITION_TYPE_HOST_GROUP)
+	if(event->source == EVENT_SOURCE_TRIGGERS && condition->conditiontype == CONDITION_TYPE_HOST_GROUP)
 	{
 		ZBX_STR2UINT64(condition_value, condition->value);
 		result = DBselect("select distinct hg.groupid from hosts_groups hg,hosts h, items i, functions f, triggers t where hg.hostid=h.hostid and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=" ZBX_FS_UI64,
@@ -443,7 +443,7 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		}
 		DBfree_result(result);
 	}
-	else if(condition->conditiontype == CONDITION_TYPE_HOST)
+	else if(event->source == EVENT_SOURCE_TRIGGERS && condition->conditiontype == CONDITION_TYPE_HOST)
 	{
 		ZBX_STR2UINT64(condition_value, condition->value);
 		result = DBselect("select distinct h.hostid from hosts h, items i, functions f, triggers t where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid=" ZBX_FS_UI64,
@@ -481,7 +481,7 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		}
 		DBfree_result(result);
 	}
-	else if(condition->conditiontype == CONDITION_TYPE_TRIGGER)
+	else if(event->source == EVENT_SOURCE_TRIGGERS && condition->conditiontype == CONDITION_TYPE_TRIGGER)
 	{
 		ZBX_STR2UINT64(condition_value, condition->value);
 		zabbix_log( LOG_LEVEL_DEBUG, "CONDITION_TYPE_TRIGGER [" ZBX_FS_UI64 ":%s]",
@@ -508,7 +508,7 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 				condition->conditionid);
 		}
 	}
-	else if(condition->conditiontype == CONDITION_TYPE_TRIGGER_NAME)
+	else if(event->source == EVENT_SOURCE_TRIGGERS && condition->conditiontype == CONDITION_TYPE_TRIGGER_NAME)
 	{
 		tmp_str = zbx_dsprintf(tmp_str, "%s", event->trigger_description);
 		
@@ -536,7 +536,7 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		}
 		zbx_free(tmp_str);
 	}
-	else if(condition->conditiontype == CONDITION_TYPE_TRIGGER_SEVERITY)
+	else if(event->source == EVENT_SOURCE_TRIGGERS && condition->conditiontype == CONDITION_TYPE_TRIGGER_SEVERITY)
 	{
 		if(condition->operator == CONDITION_OPERATOR_EQUAL)
 		{
@@ -573,7 +573,7 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 				condition->conditionid);
 		}
 	}
-	else if(condition->conditiontype == CONDITION_TYPE_TRIGGER_VALUE)
+	else if(event->source == EVENT_SOURCE_TRIGGERS && condition->conditiontype == CONDITION_TYPE_TRIGGER_VALUE)
 	{
 		zabbix_log( LOG_LEVEL_DEBUG, "CONDITION_TYPE_TRIGGER_VALUE [%d:%s]",
 			event->value,
@@ -592,7 +592,7 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 				condition->conditionid);
 		}
 	}
-	else if(condition->conditiontype == CONDITION_TYPE_TIME_PERIOD)
+	else if(event->source == EVENT_SOURCE_TRIGGERS && condition->conditiontype == CONDITION_TYPE_TIME_PERIOD)
 	{
 		zabbix_log( LOG_LEVEL_DEBUG, "CONDITION_TYPE_TRIGGER_VALUE [%d:%s]",
 			event->value,
@@ -611,11 +611,11 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 				condition->conditionid);
 		}
 	}
-	else if(condition->conditiontype == CONDITION_TYPE_DHOST_IP)
+	else if(event->source == EVENT_SOURCE_DISCOVERY && condition->conditiontype == CONDITION_TYPE_DHOST_IP)
 	{
 		/* Not implemente yet */
 	}
-	else if(condition->conditiontype == CONDITION_TYPE_DSERVICE_TYPE)
+	else if(event->source == EVENT_SOURCE_DISCOVERY && condition->conditiontype == CONDITION_TYPE_DSERVICE_TYPE)
 	{
 		zabbix_log( LOG_LEVEL_DEBUG, "CONDITION_TYPE_DSERVICE_TYPE [%d:%s]",
 			event->value,
@@ -639,14 +639,17 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		}
 		DBfree_result(result);
 	}
-	else if(condition->conditiontype == CONDITION_TYPE_DSERVICE_PORT)
+	else if(event->source == EVENT_SOURCE_DISCOVERY &&
+		event->object == EVENT_OBJECT_DSERVICE &&
+		condition->conditiontype == CONDITION_TYPE_DSERVICE_PORT)
 	{
-		zabbix_log( LOG_LEVEL_DEBUG, "CONDITION_TYPE_DSERVICE_TYPE [%d:%s]",
+		zabbix_log( LOG_LEVEL_DEBUG, "CONDITION_TYPE_DSERVICE_PORT [%d:%s]",
 			event->value,
 			condition->value);
 		value_int = atoi(condition->value);
 		result = DBselect("select port from dservices where dserviceid=" ZBX_FS_UI64,
 			event->objectid);
+		row = DBfetch(result);
 		if(row && DBis_null(row[0]) != SUCCEED)
 		{
 			if(condition->operator == CONDITION_OPERATOR_EQUAL)
@@ -672,7 +675,8 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 	}
 	else
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Condition type [%d] is unknown for condition id [" ZBX_FS_UI64 "]",
+		zabbix_log( LOG_LEVEL_ERR, "Event source [%d] and condition type [%d] is unknown for condition id [" ZBX_FS_UI64 "]",
+			event->source,
 			condition->conditiontype,
 			condition->conditionid);
 	}
@@ -879,7 +883,8 @@ void	process_actions(DB_EVENT *event)
 	
 	DB_ACTION action;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In process_actions(eventid:" ZBX_FS_UI64 ")",
+	zabbix_log( LOG_LEVEL_DEBUG, "In process_actions(source:%s,eventid:" ZBX_FS_UI64 ")",
+		(event->source == EVENT_SOURCE_TRIGGERS)?"TRIGGERS":"DISCOVERY",
 		event->eventid);
 
 	if(TRIGGER_VALUE_TRUE == event->value)
