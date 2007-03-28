@@ -1,5 +1,6 @@
 Changes for 1.3.5:
 
+ - added filering of log items by regexp on agentside (Eugene)
  - removed check of function bcpowmod() in GUI Wizard (Alexei)
  - updated poller to have current system date (Alexei)
  - removed unnecessary dependencies fron autoconf script (Alexei)

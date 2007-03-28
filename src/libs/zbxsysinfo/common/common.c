@@ -38,6 +38,7 @@
 
 static int	AGENT_PING(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 static int	AGENT_VERSION(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
+static int	ONLY_ACTIVE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
 ZBX_METRIC	parameters_common[]=
 /*      KEY                     FLAG    FUNCTION        ADD_PARAM       TEST_PARAM */
@@ -67,9 +68,20 @@ ZBX_METRIC	parameters_common[]=
 	{"system.uname",	0,		SYSTEM_UNAME,		0,	0},
 
 	{"system.users.num",	0,		SYSTEM_UNUM, 		0,	0},
+	{"log",			CF_USEUPARAM,	ONLY_ACTIVE, 		0,	"logfile"},
+	{"eventlog",		CF_USEUPARAM,	ONLY_ACTIVE, 		0,	"system"},
 
 	{0}
 	};
+
+static int	ONLY_ACTIVE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	assert(result);
+
+        init_result(result);	
+	SET_MSG_RESULT(result, strdup("Accessible only as active check!"));
+	return SYSINFO_RET_FAIL;
+}
 
 int	getPROC(char *file, int lineno, int fieldno, unsigned flags, AGENT_RESULT *result)
 {
