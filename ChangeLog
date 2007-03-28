@@ -1,5 +1,6 @@
 Changes for 1.3.5:
 
+ - removed unnecessary dependencies fron autoconf script (Alexei)
  - added generation of service up/down events (Alexei)
  - fixed '--with-ldap' compilation (Eugene)
  - added popup menu for quick hosts controlling in configuration screen (Eugene)

@@ -571,7 +571,8 @@ if test "$server" = "yes"; then
 			have_db="PostgreSQL"
 			
 			dnl To avoid linking of crypt with the agent
-			AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt,  POSTGRESQL_LDFLAGS="-lcrypt $POSTGRESQL_LDFLAGS"))
+			dnl It seems PostgreSQL does not require this
+			dnl AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt,  POSTGRESQL_LDFLAGS="-lcrypt $POSTGRESQL_LDFLAGS"))
 		else
 			AC_MSG_ERROR([Not found PostgreSQL library]);
 		fi
