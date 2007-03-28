@@ -1,5 +1,6 @@
 Changes for 1.3.5:
 
+ - removed check of function bcpowmod() in GUI Wizard (Alexei)
  - updated poller to have current system date (Alexei)
  - removed unnecessary dependencies fron autoconf script (Alexei)
  - added generation of service up/down events (Alexei)
