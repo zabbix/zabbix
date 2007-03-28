@@ -130,6 +130,9 @@ void    *zbx_malloc(size_t size)
 	register int max_attempts;
 	void *ptr = NULL;
 
+	zabbix_log(LOG_LEVEL_DEBUG,"In zbx_malloc(size:%d)",
+		size);
+
 	for(	max_attempts = 10, size = MAX(size, 1);
 		max_attempts > 0 && !ptr;
 		ptr = malloc(size),

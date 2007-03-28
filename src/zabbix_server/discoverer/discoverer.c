@@ -356,11 +356,14 @@ static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 			update_dhost(&host);
 		}
 		/* Update service status */
-		DBexecute("update dservices set status=%d,lastup=%d,lastdown=0,eventsent=0 where (status=%d or (lastup=0 and lastdown=0)) and dserviceid=" ZBX_FS_UI64,
-			SERVICE_UP,
-			now,
-			SERVICE_DOWN,
-			service.dserviceid);
+		if((service.status == SERVICE_DOWN)||(service.lastup==0 && service.lastdown==0))
+		{
+			service.status=SERVICE_UP;
+			service.lastdown=0;
+			service.lastup=now;
+			service.eventsent=0;
+			update_dservice(&service);
+		}
 	}
 	/* SERVICE_DOWN */
 	else
@@ -374,11 +377,14 @@ static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 			update_dhost(&host);
 		}
 		/* Update service status */
-		DBexecute("update dservices set status=%d,lastup=0,lastdown=%d,eventsent=0 where (status=%d or (lastup=0 and lastdown=0)) and dserviceid=" ZBX_FS_UI64,
-			SERVICE_DOWN,
-			now,
-			SERVICE_UP,
-			service.dserviceid);
+		if((service.status == SERVICE_UP)||(service.lastup==0 && service.lastdown==0))
+		{
+			service.status=SERVICE_DOWN;
+			service.lastup=now;
+			service.lastdown=0;
+			service.eventsent=0;
+			update_dservice(&service);
+		}
 	}
 
 	/* Generating host events */

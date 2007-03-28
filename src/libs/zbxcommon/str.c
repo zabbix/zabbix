@@ -808,7 +808,10 @@ char* zbx_strdcat(char *dest, const char *src)
 	register int new_len = 0;
 	char *new_dest = NULL;
 
-	if(!src || !src[0])	return dest;
+	/* zbx_strdcat(NULL,"") must return "", not NULL! */
+/*	if(!src || !src[0])	return dest;*/
+	if(!src)		return dest;
+	if(!dest && !src[0])	return strdup(src);
 	
 	if(dest)	new_len += (int)strlen(dest);
 

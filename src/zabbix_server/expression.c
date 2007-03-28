@@ -629,6 +629,8 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char **data, i
 	DB_RESULT	result;
 	DB_ROW		row;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_simple_macros()");
+
 	if(!data || !*data) return;
 	
 	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_simple_macros (data:%s)",
@@ -640,7 +642,9 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char **data, i
 	while((pr = strchr(pl, '{')))
 	{
 		pr[0] = '\0';
+zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
 		str_out = zbx_strdcat(str_out, pl);
+zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
 		pr[0] = '{';
 
 		replace_to = zbx_dsprintf(replace_to, "{");
@@ -651,9 +655,12 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char **data, i
 		{
 			var_len = strlen(MVAR_TRIGGER_NAME);
 
+			zabbix_log(LOG_LEVEL_DEBUG, "Before replace_to [%s]", replace_to);
 			replace_to = zbx_dsprintf(replace_to, "%s", event->trigger_description);
+			zabbix_log(LOG_LEVEL_DEBUG, "After replace_to [%s]", replace_to);
 
-			substitute_simple_macros(event, action, &replace_to, MACRO_TYPE_TRIGGER_DESCRIPTION);
+			/* Why it was here? */
+/*			substitute_simple_macros(event, action, &replace_to, MACRO_TYPE_TRIGGER_DESCRIPTION);*/
 		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
 			strncmp(pr, MVAR_TRIGGER_COMMENT, strlen(MVAR_TRIGGER_COMMENT)) == 0)
@@ -1017,8 +1024,9 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char **data, i
 				zabbix_syslog("No ITEM.NAME in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
 					event->objectid);
 
-				replace_to = zbx_dsprintf(replace_to, "%S",
+				replace_to = zbx_dsprintf(replace_to, "%s",
 					STR_UNKNOWN_VARIABLE);
+zabbix_log( LOG_LEVEL_WARNING, "ALEX");
 			}
 			else
 			{
@@ -1178,18 +1186,23 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char **data, i
 			else					replace_to = zbx_dsprintf(replace_to, "Unknown");
 		}
 
+zabbix_log(LOG_LEVEL_DEBUG, "str_out2 [%s] replace_to [%s]", str_out, replace_to);
 		str_out = zbx_strdcat(str_out, replace_to);
+zabbix_log(LOG_LEVEL_DEBUG, "str_out2 [%s] replace_to [%s]", str_out, replace_to);
 		pl = pr + var_len;
 
 		zbx_free(replace_to);
 	}
+zabbix_log(LOG_LEVEL_DEBUG, "str_out3 [%s] pl [%s]", str_out, pl);
 	str_out = zbx_strdcat(str_out, pl);
+zabbix_log(LOG_LEVEL_DEBUG, "str_out3 [%s] pl [%s]", str_out, pl);
 
 	zbx_free(*data);
 
 	*data = str_out;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In substitute_simple_macros (result:%s)",
+	zabbix_log(LOG_LEVEL_DEBUG, "End substitute_simple_macros ()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End substitute_simple_macros (result:%s)",
 		*data);
 }
 
@@ -1233,7 +1246,9 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, char **data)
 
 	if('\0' == *data[0]) return;
 	
+	zabbix_log(LOG_LEVEL_DEBUG, "Before substitute_simple_macros(%s)", *data);
 	substitute_simple_macros(event, action, data, MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY);
+	zabbix_log(LOG_LEVEL_DEBUG, "After substitute_simple_macros(%s)", *data);
 
 	pl = *data;
 	while((pr = strchr(pl, '{')))
