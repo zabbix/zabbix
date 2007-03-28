@@ -83,6 +83,7 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *host)
 			row[2]);
 		zabbix_log( LOG_LEVEL_DEBUG, "Sending [%s]",
 			s);
+
 /*		if( write(sockfd,s,strlen(s)) == -1 ) */
 		if( zbx_tcp_send(sock,s) != SUCCEED )
 		{
@@ -97,6 +98,7 @@ int	send_list_of_active_checks(zbx_sock_t *sock, char *host)
 		"ZBX_EOF");
 	zabbix_log( LOG_LEVEL_DEBUG, "Sending [%s]",
 		s);
+
 /*	if( write(sockfd,s,strlen(s)) == -1 ) */
 	if( zbx_tcp_send(sock,s) != SUCCEED )
 	{
