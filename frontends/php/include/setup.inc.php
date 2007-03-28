@@ -247,7 +247,8 @@
 				function_exists('bcmod') &&
 				function_exists('bcmul') &&
 				function_exists('bcpow') &&
-				function_exists('bcpowmod') &&
+				/* This function is supported by PHP5 only */
+/*				function_exists('bcpowmod') &&*/
 				function_exists('bcscale') &&
 				function_exists('bcsqrt') &&
 				function_exists('bcsub');
