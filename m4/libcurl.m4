@@ -111,7 +111,17 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL library @<:@default=yes@:>
               LIBCURL_CPPFLAGS=`$_libcurl_config --cflags`
            fi
            if test x"$LIBCURL_LDFLAGS" = "x" ; then
-              LIBCURL_LDFLAGS=`$_libcurl_config --libs`
+		_full_libcurl_libs=`$_libcurl_config --libs`
+
+		for i in $_full_libcurl_libs; do
+			case $i in
+				-L*)
+					LIBCURL_LDFLAGS="$LIBCURL_LDFLAGS $i"
+			;;
+			esac
+		done
+
+		LIBCURL_LDFLAGS="$LIBCURL_LDFLAGS -lcurl"
 
               # This is so silly, but Apple actually has a bug in their
 	      # curl-config script.  Fixed in Tiger, but there are still
