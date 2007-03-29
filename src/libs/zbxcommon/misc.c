@@ -22,6 +22,32 @@
 
 /******************************************************************************
  *                                                                            *
+ * Function: get_programm_name                                                *
+ *                                                                            *
+ * Purpose: return program name without path                                  *
+ *                                                                            *
+ * Parameters: path                                                           *
+ *                                                                            *
+ * Return value: program name without path                                    *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ *  Comments:                                                                 *
+ *                                                                            *
+ ******************************************************************************/
+char* get_programm_name(char *path)
+{
+	char	*filename = NULL;
+
+	for(filename = path; path && *path; path++)
+		if(*path == '\\' || *path == '/')
+			filename = path+1;
+
+	return filename;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: get_nodeid_by_id                                                 *
  *                                                                            *
  * Purpose: Get Node ID by resource ID                                        *

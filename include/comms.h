@@ -36,7 +36,7 @@ typedef struct zbx_sock
 } zbx_sock_t;
 
 void	zbx_tcp_init(zbx_sock_t *s);
-int	zbx_tcp_connect(zbx_sock_t *socket, char *ip, int port);
+int	zbx_tcp_connect(zbx_sock_t *socket, const char *ip, int port);
 int	zbx_tcp_send(zbx_sock_t *socket, char *data);
 int	zbx_tcp_recv(zbx_sock_t *socket, char **data);
 void	zbx_tcp_close(zbx_sock_t *socket);

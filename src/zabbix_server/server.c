@@ -48,7 +48,7 @@
 
 char *progname = NULL;
 char title_message[] = "ZABBIX Server (daemon)";
-char usage_message[] = "[-hv] [-c <file>]";
+char usage_message[] = "[-hV] [-c <file>]";
 
 #ifndef HAVE_GETOPT_LONG
 char *help_message[] = {
@@ -56,7 +56,7 @@ char *help_message[] = {
         "  -c <file>       Specify configuration file",
         "  -h              give this help",
         "  -n <nodeid>     convert database data to new nodeid",
-        "  -v              display version number",
+        "  -V              display version number",
         0 /* end of text */
 };
 #else
@@ -65,7 +65,7 @@ char *help_message[] = {
         "  -c --config <file>       Specify configuration file",
         "  -h --help                give this help",
         "  -n --new-nodeid <nodeid> convert database data to new nodeid",
-        "  -v --version             display version number",
+        "  -V --version             display version number",
         0 /* end of text */
 };
 #endif
@@ -75,7 +75,7 @@ struct option longopts[] =
 	{"config",	1,	0,	'c'},
 	{"help",	0,	0,	'h'},
 	{"new-nodeid",	1,	0,	'n'},
-	{"version",	0,	0,	'v'},
+	{"version",	0,	0,	'V'},
 	{0,0,0,0}
 };
 
@@ -389,7 +389,7 @@ int main(int argc, char **argv)
 			if(optarg)	nodeid = atoi(optarg);
 			task = ZBX_TASK_CHANGE_NODEID;
 			break;
-		case 'v':
+		case 'V':
 			version();
 			exit(-1);
 			break;
@@ -410,7 +410,7 @@ int main(int argc, char **argv)
 			exit(-1);
 			break;
 		default:
-			;
+			break;
 	}
 
 #ifdef TEST

@@ -67,7 +67,7 @@ char title_message[] = APPLICATION_NAME
 /* application USAGE message */
 
 char usage_message[] = 
-	"[-vhp]"
+	"[-Vhp]"
 #if defined(_WINDOWS)
 	" [-idsx]"
 #endif /* _WINDOWS */
@@ -84,7 +84,7 @@ char *help_message[] = {
 	"",
 	"  -c --config <file>  Specify configuration file",
 	"  -h --help           give this help",
-	"  -v --version        display version number",
+	"  -V --version        display version number",
 	"  -p --print          print supported metrics and exit",
 	"  -t --test <metric>  test specified metric and exit",
 /*	"  -u --usage <metric> test specified metric and exit",	*/ /* !!! TODO - print metric usage !!! */
@@ -117,7 +117,7 @@ static struct zbx_option longopts[] =
 {
 	{"config",	1,	0,	'c'},
 	{"help",	0,	0,	'h'},
-	{"version",	0,	0,	'v'},
+	{"version",	0,	0,	'V'},
 	{"print",	0,	0,	'p'},
 	{"test",	1,	0,	't'},
 
@@ -137,7 +137,7 @@ static struct zbx_option longopts[] =
 /* short options */
 
 static char	shortopts[] = 
-	"c:hvpt:"
+	"c:hVpt:"
 #if defined (_WINDOWS)
 	"idsx"
 #endif /* _WINDOWS */
@@ -151,7 +151,7 @@ static char	*TEST_METRIC = NULL;
 
 static ZBX_THREAD_HANDLE	*threads = NULL;
 
-static int parse_commandline(int argc, char **argv)
+static zbx_task_t parse_commandline(int argc, char **argv)
 {
 	zbx_task_t	task	= ZBX_TASK_START;
 	char	ch	= '\0';
@@ -166,7 +166,7 @@ static int parse_commandline(int argc, char **argv)
 			help();
 			exit(-1);
 			break;
-		case 'v':
+		case 'V':
 			version();
 			exit(-1);
 			break;
@@ -308,11 +308,10 @@ int MAIN_ZABBIX_ENTRY(void)
 	/* wait for all threads exiting */
 	for(i = 0; i < CONFIG_ZABBIX_FORKS; i++)
 	{
-		if(zbx_thread_wait(threads[i]))
-		{
-			zabbix_log( LOG_LEVEL_DEBUG, "%li: thread is terminated", threads[i]);
-			ZBX_DO_EXIT();
-		}
+		zbx_thread_wait(threads[i]);
+
+		zabbix_log( LOG_LEVEL_DEBUG, "%li: thread is terminated", threads[i]);
+		ZBX_DO_EXIT();
 	}
 
 	free_collector_data();
@@ -363,22 +362,11 @@ void	zbx_on_exit()
 	exit(SUCCEED);
 }
 
-static char* get_programm_name(char *path)
-{
-	char	*p;
-	char	*filename;
-
-	for(filename = p = path; p && *p; p++)
-		if(*p == '\\' || *p == '/')
-			filename = p+1;
-
-	return filename;
-}
 #ifndef ZABBIX_TEST
 
 int	main(int argc, char **argv)
 {
-	int	task = ZBX_TASK_START;
+	int task = ZBX_TASK_START;
 
 	progname = get_programm_name(argv[0]);
 
