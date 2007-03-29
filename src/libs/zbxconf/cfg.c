@@ -48,7 +48,7 @@ int	CONFIG_TIMEOUT			= AGENT_TIMEOUT;
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	parse_cfg_file(char *cfg_file,struct cfg_line *cfg)
+int	parse_cfg_file(const char *cfg_file,struct cfg_line *cfg)
 {
 	FILE	*file;
 	int	lineno;

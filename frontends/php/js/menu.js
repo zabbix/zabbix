@@ -39,6 +39,8 @@ function show_popup_menu(e, content, width)
 	var cursor = get_cursor_position(e);
 
 	new popup_menu (content, pos, cursor.x, cursor.y);
+
+	return false;
 }
 
 // --------------------------------------------------------------------------------
