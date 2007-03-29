@@ -405,6 +405,8 @@ void    *zbx_malloc(size_t size);
 #define LOCAL_NODE(fieldid) fieldid, CONFIG_NODEID, fieldid, CONFIG_NODEID
 #define ZBX_NODE(fieldid,nodeid) fieldid, nodeid, fieldid, nodeid
 
+#define MIN_ZABBIX_PORT 1024
+#define MAX_ZABBIX_PORT 65535
 
 extern char *progname;
 extern char title_message[];
@@ -417,6 +419,8 @@ void	version();
 
 /* MAX Length of base64 data */
 #define ZBX_MAX_B64_LEN 16*1024
+
+char* get_programm_name(char *path);
 
 typedef enum
 {
@@ -468,8 +472,8 @@ char* zbx_strdcat(char *dest, const char *src);
 int	replace_param(const char *cmd, const char *param, char *out, int outlen);
 
 int	xml_get_data(char *xml,char *tag, char *data, int maxlen);
-int	comms_create_request(char *host, char *key, char *data, char *lastlogsize,
-		char *timestamp, char *source, char *severity, char *request,int maxlen);
+int	comms_create_request(const char *host, const char *key, const char *data, const char *lastlogsize,
+		const char *timestamp, const char *source, const char *severity, char *request,int maxlen);
 int	comms_parse_response(char *xml,char *host,char *key, char *data, char *lastlogsize, char *timestamp,
 	       char *source, char *severity, int maxlen);
 

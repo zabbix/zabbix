@@ -23,7 +23,7 @@
 
 char *progname = NULL;
 char title_message[] = "ZABBIX get - Communicate with ZABBIX agent";
-char usage_message[] = "[-hv] -s<host name or IP> [-p<port number>] -k<key>";
+char usage_message[] = "[-hV] -s<host name or IP> [-p<port number>] -k<key>";
 #ifndef HAVE_GETOPT_LONG
 char *help_message[] = {
         "Options:",
@@ -31,7 +31,7 @@ char *help_message[] = {
 	"  -s <host name or IP>     Specify host name or IP address of a host.",
 	"  -k <key of metric>       Specify metric name (key) we want to retrieve.",
 	"  -h                       give this help",
-	"  -v                       display version number",
+	"  -V                       display version number",
 	"",
 	"Example: zabbix_get -s127.0.0.1 -p10050 -k\"system[procload]\"",
         0 /* end of text */
@@ -43,7 +43,7 @@ char *help_message[] = {
 	"  -s --host <host name or IP>    Specify host name or IP address of a host.",
 	"  -k --key <key of metric>       Specify metric name (key) we want to retrieve.",
 	"  -h --help                      give this help",
-	"  -v --version                   display version number",
+	"  -V --version                   display version number",
 	"",
 	"Example: zabbix_get -s127.0.0.1 -p10050 -k\"system[procload]\"",
         0 /* end of text */
@@ -56,7 +56,7 @@ struct option longopts[] =
 	{"host",	1,	0,	's'},
 	{"key",		1,	0,	'k'},
 	{"help",	0,	0,	'h'},
-	{"version",	0,	0,	'v'},
+	{"version",	0,	0,	'V'},
 	{0,0,0,0}
 };
 
@@ -221,7 +221,7 @@ int main(int argc, char **argv)
 			help();
 			exit(-1);
 			break;
-		case 'v':
+		case 'V':
 			version();
 			exit(-1);
 			break;

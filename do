@@ -154,9 +154,13 @@ then
   echo "Testing..."
   echo "Testing..." >> WARNINGS
   ./src/zabbix_agent/zabbix_agent -h >> WARNINGS
+  echo "------------------------" >> WARNINGS
   ./src/zabbix_agent/zabbix_agentd -h >> WARNINGS
+  echo "------------------------" >> WARNINGS
   ./src/zabbix_get/zabbix_get -h >> WARNINGS
+  echo "------------------------" >> WARNINGS
   ./src/zabbix_sender/zabbix_sender -h >> WARNINGS
+  echo "------------------------" >> WARNINGS
   ./src/zabbix_server/zabbix_server -h >> WARNINGS
   echo "------------------------" >> WARNINGS 
   echo "   Agent TEST RESULTS   " >> WARNINGS 

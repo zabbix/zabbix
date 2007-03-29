@@ -98,16 +98,16 @@
 	define('AUDIT_RESOURCE_SCENARIO',	22);
 	define('AUDIT_RESOURCE_DISCOVERY_RULE',	23);
 
-	define('CONDITION_TYPE_GROUP',		0);
+	define('CONDITION_TYPE_GROUP',		0);	/* host deleted */
 	define('CONDITION_TYPE_HOST',		1);
 	define('CONDITION_TYPE_TRIGGER',	2);
 	define('CONDITION_TYPE_TRIGGER_NAME',	3);
 	define('CONDITION_TYPE_TRIGGER_SEVERITY',4);
 	define('CONDITION_TYPE_TRIGGER_VALUE',	5);
 	define('CONDITION_TYPE_TIME_PERIOD',	6);
-	define('CONDITION_TYPE_DHOST_IP',	7); /* = # => <= */	/* TODO!!!! */
+	define('CONDITION_TYPE_DHOST_IP',	7); /* = # range ,-*/	/* TODO!!!! */
 	define('CONDITION_TYPE_DSERVICE_TYPE',	8); /* = # */		/* TODO!!!! */
-	define('CONDITION_TYPE_DSERVICE_PORT',	9); /* = # => <= */	/* TODO!!!! */
+	define('CONDITION_TYPE_DSERVICE_PORT',	9); /* = # range ,-*/	/* TODO!!!! */
 
 	define('CONDITION_OPERATOR_EQUAL',	0);
 	define('CONDITION_OPERATOR_NOT_EQUAL',	1);
@@ -197,8 +197,14 @@
 	define('ACTION_STATUS_ENABLED',0);
 	define('ACTION_STATUS_DISABLED',1);
 
-	define('OPERATION_TYPE_MESSAGE',	0);
-	define('OPERATION_TYPE_COMMAND',	1);
+	define('OPERATION_TYPE_MESSAGE',	0); /* !!!!! */
+	define('OPERATION_TYPE_COMMAND',	1); /* !!!!! */
+	define('OPERATION_TYPE_',	2); /* TODO!!!
+#define OPERATION_TYPE_GROUP_ADD        2	grouid
+#define OPERATION_TYPE_GROUP_REMOVE     3	grouid
+#define OPERATION_TYPE_TEMPLATE_ADD     4
+#define OPERATION_TYPE_TEMPLATE_REMOVE  5 */
+
 
 	define('ACTION_EVAL_TYPE_AND_OR',0);
 	define('ACTION_EVAL_TYPE_AND',1);

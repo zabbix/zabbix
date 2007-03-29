@@ -21,8 +21,8 @@
 #include "log.h"
 #include "base64.h"
 
-int	comms_create_request(char *host, char *key, char *data, char *lastlogsize,
-		char *timestamp, char *source, char *severity, char *request,int maxlen)
+int	comms_create_request(const char *host, const char *key, const char *data, const char *lastlogsize,
+		const char *timestamp, const char *source, const char *severity, char *request, int maxlen)
 {
 	int ret = SUCCEED;
 	char host_b64[MAX_STRING_LEN];
@@ -32,6 +32,8 @@ int	comms_create_request(char *host, char *key, char *data, char *lastlogsize,
 	char timestamp_b64[MAX_STRING_LEN];
 	char source_b64[MAX_STRING_LEN];
 	char severity_b64[MAX_STRING_LEN];
+
+	assert(request);
 
 	memset(request,0,maxlen);
 	memset(host_b64,0,sizeof(host_b64));
@@ -46,21 +48,21 @@ int	comms_create_request(char *host, char *key, char *data, char *lastlogsize,
 	str_base64_encode(key, key_b64, (int)strlen(key));
 	str_base64_encode(data, data_b64, (int)strlen(data));
 	
-	if(lastlogsize[0]!=0)	str_base64_encode(lastlogsize, lastlogsize_b64, (int)strlen(lastlogsize));
-	if(timestamp[0])	str_base64_encode(timestamp, timestamp_b64, (int)strlen(timestamp));
-	if(source[0])		str_base64_encode(source, source_b64, (int)strlen(source));
-	if(severity[0])		str_base64_encode(severity, severity_b64, (int)strlen(severity));
+	if(lastlogsize && lastlogsize[0])	str_base64_encode(lastlogsize, lastlogsize_b64, (int)strlen(lastlogsize));
+	if(timestamp && timestamp[0])		str_base64_encode(timestamp, timestamp_b64, (int)strlen(timestamp));
+	if(source && source[0])			str_base64_encode(source, source_b64, (int)strlen(source));
+	if(severity && severity[0])		str_base64_encode(severity, severity_b64, (int)strlen(severity));
 	
 /*	fprintf(stderr, "Data Base64 [%s]\n", data_b64);*/
 
-	if(lastlogsize[0]==0)
+	if( !lastlogsize || !lastlogsize[0] )
 	{
 		zbx_snprintf(request,maxlen,"<req><host>%s</host><key>%s</key><data>%s</data></req>",host_b64,key_b64,data_b64);
 		
 	}
 	else
 	{
-		if(timestamp[0] == 0)
+		if( !timestamp || !timestamp[0] )
 		{
 			zbx_snprintf(request,maxlen,"<req><host>%s</host><key>%s</key><data>%s</data><lastlogsize>%s</lastlogsize></req>",
 				host_b64,key_b64,data_b64,lastlogsize_b64);
@@ -89,6 +91,14 @@ int	comms_parse_response(char *xml,char *host,char *key, char *data, char *lastl
 	char timestamp_b64[MAX_STRING_LEN];
 	char source_b64[ZBX_MAX_B64_LEN];
 	char severity_b64[MAX_STRING_LEN];
+
+	assert(key);
+	assert(host);
+	assert(data);
+	assert(lastlogsize);
+	assert(timestamp);
+	assert(source);
+	assert(severity);
 
 	memset(host_b64,0,sizeof(host_b64));
 	memset(key_b64,0,sizeof(key_b64));

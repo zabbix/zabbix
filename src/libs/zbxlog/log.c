@@ -123,7 +123,7 @@ int zabbix_open_log(int type, int level, const char *filename)
 	else
 	{
 		/* Not supported logging type */
-
+		/*
 		if(ZBX_MUTEX_ERROR == zbx_mutex_create_force(&log_file_access, ZBX_MUTEX_LOG))
 		{
 			zbx_error("Unable to create mutex for log file");
@@ -132,6 +132,7 @@ int zabbix_open_log(int type, int level, const char *filename)
 
 		zbx_error("Not supported loggin type [%d]", type);
 		return	FAIL;
+		*/
 	}
 
 	return	SUCCEED;
@@ -159,7 +160,9 @@ void zabbix_close_log(void)
 	else
 	{
 		/* Not supported loggin type */
+		/*
 		zbx_mutex_destroy(&log_file_access);
+		*/
 	}
 }
 

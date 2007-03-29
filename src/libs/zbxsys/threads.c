@@ -111,7 +111,7 @@ ZBX_THREAD_HANDLE zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), void *args
  *                                                                            *
  * Parameters: "thread" handle                                                *
  *                                                                            *
- * Return value: If the function succeeds, the return 1,0 on an error         *
+ * Return value: process or thread exit code                                  *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -121,31 +121,41 @@ ZBX_THREAD_HANDLE zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), void *args
 
 int zbx_thread_wait(ZBX_THREAD_HANDLE thread)
 {
+	int status = 0; /* significant 8 bits of the status */
+
 #if defined(_WINDOWS)	
 
 	if(WaitForSingleObject(thread, INFINITE) != WAIT_OBJECT_0)
 	{
 		zbx_error("Error on thread waiting. [%s]", strerror_from_system(GetLastError()));
-		return (0);
+		return ZBX_THREAD_ERROR;
+	}
+
+	if( 0 == GetExitCodeThread(thread, &status) )
+	{
+		zbx_error("Error on thread exit code receaving. [%s]", strerror_from_system(GetLastError()));
+		return ZBX_THREAD_ERROR;
 	}
 
 	if(CloseHandle(thread) == 0)
 	{
 		zbx_error("Error on thread closing. [%s]", strerror_from_system(GetLastError()));
-		return (0);
+		return ZBX_THREAD_ERROR;
 	}
 
 #else /* not _WINDOWS */
 
-	if(waitpid(thread, (int *)0, 0) <= 0)
+	if(waitpid(thread, &status, 0) <= 0)
 	{
 		zbx_error("Error on thread waiting.");
-		return (0);
+		return ZBX_THREAD_ERROR;
 	}
+
+	status = WEXITSTATUS(status);
 
 #endif /* _WINDOWS */
 
-	return (1);
+	return status;
 }
 
 long int zbx_get_thread_id(void)

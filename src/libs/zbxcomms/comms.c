@@ -42,7 +42,7 @@ void	zbx_tcp_init(zbx_sock_t *s)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int     zbx_tcp_connect(zbx_sock_t *s, char *ip, int port)
+int     zbx_tcp_connect(zbx_sock_t *s, const char *ip, int port)
 {
 	struct	sockaddr_in myaddr_in;
 	struct	sockaddr_in servaddr_in;

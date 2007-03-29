@@ -126,7 +126,7 @@ static unsigned char char_base64_decode(char c)
  * Comments	:
  *
  *----------------------------------------------------------------------*/
-void str_base64_encode(char *p_str, char *p_b64str, int in_size)
+void str_base64_encode(const char *p_str, char *p_b64str, int in_size)
 {
 	int 	i;
 	unsigned char from1=0,from2=0,from3=0;
@@ -136,7 +136,10 @@ void str_base64_encode(char *p_str, char *p_b64str, int in_size)
 	{
 		return;
 	};
-	
+
+	assert(p_str);
+	assert(p_b64str);
+
 	for ( i = 0; i < in_size ; i += 3 )
 	{
 		from1 = from2 = from3 = 0;
@@ -200,7 +203,7 @@ void str_base64_encode(char *p_str, char *p_b64str, int in_size)
  * Comments	:
  *
  *----------------------------------------------------------------------*/
-void str_base64_decode(char *p_b64str, char *p_str, int *p_out_size)
+void str_base64_decode(const char *p_b64str, char *p_str, int *p_out_size)
 {
 	int i;
 	int j = 0;
@@ -211,7 +214,10 @@ void str_base64_decode(char *p_b64str, char *p_str, int *p_out_size)
 					* after removing the non-base64 
 					* characters
 					*/
-		
+	assert(p_b64str);
+	assert(p_str);
+	assert(p_out_size);
+
 	in_size = (int)strlen(p_b64str);
 	memset(str_clean, 0, sizeof(str_clean));
 	*p_out_size = 0;

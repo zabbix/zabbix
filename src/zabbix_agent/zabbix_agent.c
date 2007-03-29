@@ -29,13 +29,13 @@
 
 char *progname = NULL;
 char title_message[] = "ZABBIX Agent";
-char usage_message[] = "[-vhp] [-c <file>] [-t <metric>]";
+char usage_message[] = "[-Vhp] [-c <file>] [-t <metric>]";
 #ifndef HAVE_GETOPT_LONG
 char *help_message[] = {
 	"Options:",
 	"  -c <file>     Specify configuration file",
 	"  -h            give this help",
-	"  -v            display version number",
+	"  -V            display version number",
 	"  -p            print supported metrics and exit",
 	"  -t <metric>   test specified metric and exit",
 	0 /* end of text */
@@ -45,7 +45,7 @@ char *help_message[] = {
 	"Options:",
 	"  -c --config <file>  Specify configuration file",
 	"  -h --help           give this help",
-	"  -v --version        display version number",
+	"  -V --version        display version number",
 	"  -p --print          print supported metrics and exit",
 	"  -t --test <metric>  test specified metric and exit",
 	0 /* end of text */
@@ -56,7 +56,7 @@ struct zbx_option longopts[] =
 {
 	{"config",	1,	0,	'c'},
 	{"help",	0,	0,	'h'},
-	{"version",	0,	0,	'v'},
+	{"version",	0,	0,	'V'},
 	{"print",	0,	0,	'p'},
 	{"test",	1,	0,	't'},
 	{0,0,0,0}
@@ -128,16 +128,16 @@ int	main(int argc, char **argv)
 	progname = argv[0];
 
 /* Parse the command-line. */
-	while ((ch = zbx_getopt_long(argc, argv, "c:hvpt:", longopts, NULL)) != EOF)
+	while ((ch = zbx_getopt_long(argc, argv, "c:hVpt:", longopts, NULL)) != EOF)
 		switch ((char) ch) {
 		case 'c':
-			CONFIG_FILE = zbx_optarg;
+			CONFIG_FILE = strdup(zbx_optarg);
 			break;
 		case 'h':
 			help();
 			exit(-1);
 			break;
-		case 'v':
+		case 'V':
 			version();
 			exit(-1);
 			break;
@@ -149,7 +149,7 @@ int	main(int argc, char **argv)
 			if(task == ZBX_TASK_START)
 			{
 				task = ZBX_TASK_TEST_METRIC;
-				TEST_METRIC = zbx_optarg;
+				TEST_METRIC = strdup(zbx_optarg);
 			}
 			break;
 		default:
