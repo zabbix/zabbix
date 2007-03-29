@@ -312,9 +312,13 @@ typedef enum
 #define ACTION_STATUS_ACTIVE	0
 #define ACTION_STATUS_DISABLED	1
 
-/* Operatio types */
-#define OPERATION_TYPE_MESSAGE	0
-#define OPERATION_TYPE_COMMAND	1
+/* Operation types */
+#define OPERATION_TYPE_MESSAGE		0
+#define OPERATION_TYPE_COMMAND		1
+#define OPERATION_TYPE_GROUP_ADD	2
+#define OPERATION_TYPE_GROUP_REMOVE	3
+#define OPERATION_TYPE_TEMPLATE_ADD	4
+#define OPERATION_TYPE_TEMPLATE_REMOVE	5
 
 /* Algorithms for service status calculation */
 #define SERVICE_ALGORITHM_NONE	0
