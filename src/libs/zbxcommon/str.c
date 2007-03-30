@@ -588,3 +588,58 @@ char* zbx_strdcat(char *dest, const char *src)
 
 	return new_dest;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: check_time_period                                                *
+ *                                                                            *
+ * Purpose: check if current time is within given period                      *
+ *                                                                            *
+ * Parameters: period - time period in format [d1-d2,hh:mm-hh:mm]*            *
+ *                                                                            *
+ * Return value: 0 - out of period, 1 - within the period                     *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	check_time_period(const char *period)
+{
+	time_t	now;
+	char	tmp[MAX_STRING_LEN];
+	char	*s;
+	int	d1,d2,h1,h2,m1,m2;
+	int	day, hour, min;
+	struct  tm      *tm;
+	int	ret = 0;
+
+	now = time(NULL);
+	tm = localtime(&now);
+
+	day=tm->tm_wday;
+	if(0 == day)	day=7;
+	hour = tm->tm_hour;
+	min = tm->tm_min;
+
+	strscpy(tmp,period);
+       	s=(char *)strtok(tmp,";");
+	while(s!=NULL)
+	{
+		if(sscanf(s,"%d-%d,%d:%d-%d:%d",&d1,&d2,&h1,&m1,&h2,&m2) == 6)
+		{
+			if( (day>=d1) && (day<=d2) && (60*hour+min>=60*h1+m1) && (60*hour+min<=60*h2+m2))
+			{
+				ret = 1;
+				break;
+			}
+		}
+		else
+		{
+/*			zabbix_log( LOG_LEVEL_ERR, "Time period format is wrong [%s]",period);*/
+		}
+
+       		s=(char *)strtok(NULL,";");
+	}
+	return ret;
+}

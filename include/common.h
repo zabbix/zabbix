@@ -468,4 +468,6 @@ char* zbx_strdcat(char *dst, const char* src);
 void	*zbx_malloc(size_t size);
 #define zbx_free(ptr) { if(ptr){ free(ptr); ptr = NULL; } }
 
+int     check_time_period(const char *period);
+
 #endif

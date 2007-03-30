@@ -1,5 +1,6 @@
 Changes for 1.1.7:
 
+ - fixed (not-)sending of repeat messages at out of media time period (Alexei)
  - added support of avg() for items having integer type (Alexei)
  - fixed processing of cmd line in proc.mem and proc.num under Linux 2.6.x (Alexei)
 

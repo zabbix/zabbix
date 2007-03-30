@@ -211,6 +211,8 @@ int main_alerter_loop()
 
 	DB_RESULT	result;
 	DB_ROW		row;
+	DB_RESULT	result2;
+	DB_ROW		row2;
 	DB_ALERT	alert;
 	DB_MEDIATYPE	mediatype;
 
@@ -249,6 +251,31 @@ int main_alerter_loop()
 			alert.delay=atoi(row[14]);
 
 			mediatype.gsm_modem=row[15];
+
+			snprintf(sql,sizeof(sql)-1,"select period from media where mediatypeid=%d and sendto='%s'",
+				mediatype.mediatypeid, alert.sendto);
+			result2 = DBselect(sql);
+			row2=DBfetch(result2);
+			if(row2 && DBis_null(row2[0])!=SUCCEED)
+			{
+				if(check_time_period(row2[0]) == 0)
+				{
+					zabbix_log( LOG_LEVEL_DEBUG, "Alert ID [%d] is out of time period [%s]",
+							alert.alertid, row2[0]);
+					snprintf(sql,sizeof(sql)-1,"update alerts set repeats=repeats+1, nextcheck=%d where alertid=%d", now+alert.delay, alert.alertid);
+					DBexecute(sql);
+					snprintf(sql,sizeof(sql)-1,"update alerts set status=%d where alertid=%d and repeats>=maxrepeats and status=%d and retries<3", ALERT_STATUS_SENT, alert.alertid, ALERT_STATUS_NOT_SENT);
+					DBexecute(sql);
+					DBfree_result(result2);
+					continue;
+				}
+				else
+				{
+					zabbix_log( LOG_LEVEL_DEBUG, "Alert ID [%d] is in time period [%s]",
+							alert.alertid, row2[0]);
+				}
+			}
+			DBfree_result(result2);
 
 			phan.sa_handler = &signal_handler;
 			sigemptyset(&phan.sa_mask);
