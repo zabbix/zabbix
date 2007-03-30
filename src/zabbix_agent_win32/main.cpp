@@ -45,6 +45,7 @@ DWORD confServerCount=0;
 DWORD confTimeout=3000;    // 3 seconds default timeout
 DWORD confMaxProcTime=1000; // 1000 milliseconds is default acceptable collector sample processing time
 DWORD confEnableRemoteCommands=0; // by default disabled
+DWORD confDisableActive=0; //by default enabled
 DWORD g_dwLogLevel = EVENTLOG_ERROR_TYPE | EVENTLOG_WARNING_TYPE | EVENTLOG_INFORMATION_TYPE;
 
 SUBAGENT *subagentList;    // List of loaded subagents
@@ -228,7 +229,7 @@ LOG_DEBUG_INFO("s","AddAlias == FAIL");
 
    if(!test_cmd) _beginthread(ListenerThread,0,NULL);
 
-   if(!test_cmd) _beginthread(ActiveChecksThread,0,NULL);
+   if(!test_cmd && !confDisableActive) _beginthread(ActiveChecksThread,0,NULL);
 
    CloseHandle(eventCollectorStarted);
 

@@ -257,6 +257,7 @@ extern WORD confServerPort;
 extern DWORD confTimeout;
 extern DWORD confMaxProcTime;
 extern DWORD confEnableRemoteCommands;
+extern DWORD confDisableActive;
 extern char*	CONFIG_LISTEN_IP;
 
 extern USER_COUNTER *userCounterList;

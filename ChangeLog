@@ -1,5 +1,6 @@
 Changes for 1.1.7:
 
+ - added parameter DisableActive for WinXX agent (Eugene)
  - fixed sms sender (Eugene)
  - fixed (not-)sending of repeat messages at out of media time period (Alexei)
  - added support of avg() for items having integer type (Alexei)

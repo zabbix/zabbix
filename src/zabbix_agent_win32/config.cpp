@@ -495,6 +495,10 @@ CHECK_MEMORY(main, "ReadConfig", "fopen==NULL");
       {
          // Ignore these parameters, they are for compatibility with UNIX agent only
       }
+      else if (!stricmp(buffer,"DisableActive"))
+      {
+         confDisableActive = atoi(ptr);
+      }
       else
       {
          errors++;
