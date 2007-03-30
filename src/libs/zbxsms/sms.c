@@ -99,6 +99,7 @@ static int read_gsm(int fd, const char *expect, char *error, int max_error_len)
 	if(sbuf != buffer)
 	{
 		memmove(buffer, sbuf, ebuf - sbuf + 1); /* +1 for '\0' */
+		ebuf -= sbuf - buffer;
 		sbuf = buffer;
 	}
 
