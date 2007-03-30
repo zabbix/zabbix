@@ -43,7 +43,7 @@ static int write_gsm(int fd, char *str, char *error, int max_error_len)
 
 	len = strlen(str);
 
-	zabbix_log(LOG_LEVEL_WARNING, "Write [%s]\n", str);
+	zabbix_log(LOG_LEVEL_WARNING, "Write [%s]", str);
 
 	if (write(fd, str, len) < len)
 	{
@@ -99,6 +99,7 @@ static int read_gsm(int fd, const char *expect, char *error, int max_error_len)
 	if(sbuf != buffer)
 	{
 		memmove(buffer, sbuf, ebuf - sbuf + 1); /* +1 for '\0' */
+		ebuf -= sbuf - buffer;
 		sbuf = buffer;
 	}
 
