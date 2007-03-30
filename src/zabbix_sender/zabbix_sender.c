@@ -112,6 +112,8 @@ static char*	ZABBIX_HOSTNAME = NULL;
 static char*	ZABBIX_KEY = NULL;
 static char*	ZABBIX_KEY_VALUE = NULL;
 
+#if !defined(_WINDOWS)
+
 static void    send_signal_handler( int sig )
 {
 	if( SIGALRM == sig )
@@ -126,6 +128,8 @@ static void    send_signal_handler( int sig )
 	}
 	exit( FAIL );
 }
+
+#endif /* NOT _WINDOWS */
 
 typedef struct zbx_active_metric_type
 {
@@ -161,12 +165,16 @@ static ZBX_THREAD_ENTRY(send_value, args)
 		sentdval_args->key_value
 		);
 
+#if !defined(_WINDOWS)
+
 	signal( SIGINT,  send_signal_handler );
 	signal( SIGQUIT, send_signal_handler );
 	signal( SIGTERM, send_signal_handler );
 	signal( SIGALRM, send_signal_handler );
 
 	alarm(SENDER_TIMEOUT);
+
+#endif /* NOT _WINDOWS */
 
 	if( FAIL != zbx_tcp_connect(&sock, sentdval_args->server, sentdval_args->port) )
 	{
@@ -192,7 +200,11 @@ static ZBX_THREAD_ENTRY(send_value, args)
 		zbx_tcp_close(&sock);
 	}
 
+#if !defined(_WINDOWS)
+
 	alarm(0);
+
+#endif /* NOT _WINDOWS */
 
 	zbx_tread_exit(ret);
 }
