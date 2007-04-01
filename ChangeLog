@@ -1,5 +1,6 @@
 Changes for 1.3.5:
 
+ - do not start HTTP poller if libcurl is not included (Alexei)
  - fixed function diff for integer items (Alexei)
  - fixed SMS sender (Eugene)
  - improved ZABBIX sender (Eugene)
