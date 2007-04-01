@@ -1050,11 +1050,11 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 				case ITEM_VALUE_TYPE_UINT64:
 					if(item->lastvalue_uint64 == item->prevvalue_uint64)
 					{
-						strcpy(value,"1");
+						strcpy(value,"0");
 					}
 					else
 					{
-						strcpy(value,"0");
+						strcpy(value,"1");
 					}
 					break;
 				default:
