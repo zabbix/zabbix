@@ -377,51 +377,6 @@
 		return $result;
 	}
 	
-	function	update_graph_item($gitemid,$itemid,$color,$drawtype,$sortorder,$yaxisside,$calc_fnc,$type,$periods_cnt)
-	{
-		$gitem = get_graphitem_by_gitemid($gitemid);
-
-		$item = get_item_by_itemid($itemid);
-		$graph = get_graph_by_gitemid($gitemid);
-
-		$childs = get_graphs_by_templateid($graph["graphid"]);
-		while($child = DBfetch($childs))
-		{
-			$chd_hosts = get_hosts_by_graphid($child["graphid"]);
-			$chd_host = DBfetch($chd_hosts);
-			$db_items = DBselect("select itemid from items".
-				" where key_=".zbx_dbstr($item["key_"]).
-				" and hostid=".$chd_host["hostid"]);
-			$db_item = DBfetch($db_items);
-			if(!$db_item)
-				return FALSE;
-
-			$chd_gitems = get_graphitems_by_graphid($child["graphid"]);
-			while($chd_gitem = DBfetch($chd_gitems))
-			{
-				if(cmp_graphitems($gitem, $chd_gitem))	continue;
-
-			// recursion
-				$result = update_graph_item($chd_gitem["gitemid"],$db_item["itemid"],
-					$color,$drawtype,$sortorder,$yaxisside,$calc_fnc,$type,$periods_cnt);
-				if(!$result)
-					return $reslut;
-				break;
-			}
-		}
-		$result = DBexecute("update graphs_items set itemid=$itemid,color=".zbx_dbstr($color).",".
-			"drawtype=$drawtype,sortorder=$sortorder,yaxisside=$yaxisside,calc_fnc=$calc_fnc".
-			",type=".$type.",periods_cnt=".$periods_cnt.
-			" where gitemid=$gitemid");
-		if($result)
-		{
-			$host = get_host_by_itemid($item["itemid"]);
-			info("Graph item '".$host["host"].": ".$item["description"].
-				" for graph '".$graph["name"]."' updated");
-		}
-		return $result;
-	}
-
 	function	delete_graph_item($gitemid)
 	{
 		
@@ -455,73 +410,6 @@
 			{
 				return delete_graph($graph["graphid"]);
 			}
-		}
-		return $result;
-	}
-
-	function 	move_up_graph_item($gitemid)
-	{
-		if($gitemid<=0)		return;
-
-		$gitem = get_graphitem_by_gitemid($gitemid);
-
-		$graph = get_graph_by_gitemid($gitemid);
-		$childs = get_graphs_by_templateid($graph["graphid"]);
-		while($child = DBfetch($childs))
-		{
-			$chd_gitems = get_graphitems_by_graphid($child["graphid"]);
-			while($chd_gitem = DBfetch($chd_gitems))
-			{
-				if(cmp_graphitems($gitem, $chd_gitem))	continue;
-
-			// recursion
-				$result = move_up_graph_item($chd_gitem["gitemid"]);
-				if(!$result)
-					return $reslut;
-				break;
-			}
-		}
-		$result = DBexecute("update graphs_items set sortorder=sortorder-1".
-			" where sortorder>0 and gitemid=$gitemid");
-		if($result)
-		{
-			$item = get_item_by_itemid($gitem["itemid"]);
-			info("Sort order updated for item '".$item["description"]."'".
-				" in graph '".$graph["name"]."'");
-		}
-		return $result;
-
-	}
-	
-	function 	move_down_graph_item($gitemid)
-	{
-		if($gitemid<=0)		return;
-
-		$gitem = get_graphitem_by_gitemid($gitemid);
-
-		$graph = get_graph_by_gitemid($gitemid);
-		$childs = get_graphs_by_templateid($graph["graphid"]);
-		while($child = DBfetch($childs))
-		{
-			$chd_gitems = get_graphitems_by_graphid($child["graphid"]);
-			while($chd_gitem = DBfetch($chd_gitems))
-			{
-				if(cmp_graphitems($gitem, $chd_gitem))	continue;
-
-			// recursion
-				$result = move_down_graph_item($chd_gitem["gitemid"]);
-				if(!$result)
-					return $reslut;
-				break;
-			}
-		}
-		$result = DBexecute("update graphs_items set sortorder=sortorder+1".
-			" where sortorder<100 and gitemid=$gitemid");
-		if($result)
-		{
-			$item = get_item_by_itemid($gitem["itemid"]);
-			info("Sort order updated for item '".$item["description"]."'".
-				" in graph '".$graph["name"]."'");
 		}
 		return $result;
 	}
