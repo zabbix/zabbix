@@ -1,6 +1,10 @@
 Changes for 1.3.5:
 
- - Developed action configurations for discodery events (Eugene)
+ - fixed remembering of previous charts viewed (Eugene)
+ - fixed color validation (Eugene)
+ - fixed template graphs editing (Eugene)
+ - fixed trigger overview status (Eugene)
+ - developed action configurations for discodery events (Eugene)
  - do not start HTTP poller if libcurl is not included (Alexei)
  - fixed function diff for integer items (Alexei)
  - fixed SMS sender (Eugene)
