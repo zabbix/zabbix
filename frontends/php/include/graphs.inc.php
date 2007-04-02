@@ -204,7 +204,8 @@
 		{
 			if($g_graph['graphtype'] != $graphtype && $graphtype == GRAPH_TYPE_STACKED)
 			{
-				$result = DBexecute("update graphs_items set calc_fnc=".CALC_FNC_AVG.",drawtype=1,type=".GRAPH_ITEM_SIMPLE);
+				$result = DBexecute('update graphs_items set calc_fnc='.CALC_FNC_AVG.',drawtype=1,type='.GRAPH_ITEM_SIMPLE.
+					' where graphid='.$graphid);
 			}
 
 			info("Graph '".$g_graph["name"]."' updated");
@@ -217,10 +218,14 @@
 		$result = update_graph($graphid,$name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,
 						$showtriggers,$graphtype,$templateid);
 
-		if($result)	$result = DBexecute("delete from graphs_items where graphid=$graphid");
-
 		if($result)
 		{
+			$db_graphs_items = DBselect('select gitemid from graphs_items where graphid='.$graphid);
+			while($gitem_data = DBfetch($db_graphs_items))
+			{
+				delete_graph_item($gitem_data['gitemid']);
+			}
+
 			foreach($items as $gitem)
 			{
 				if(!add_item_to_graph(

@@ -66,7 +66,7 @@ include_once "include/page_header.php";
 		$_REQUEST["groupid"] = $_REQUEST["hostid"] = 0;
 	}
 
-	$_REQUEST["graphid"] = get_request("graphid", get_profile("web.charts.grapgid", 0));
+	$_REQUEST["graphid"] = get_request("graphid", get_profile("web.charts.graphid", 0));
 	
 	$_REQUEST["keep"] = get_request("keep", 1); // possible excessed REQUEST variable !!!
 

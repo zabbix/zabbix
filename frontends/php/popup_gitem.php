@@ -51,6 +51,7 @@ include_once "include/page_header.php";
 		"graphtype"=>	array(T_ZBX_INT, O_OPT,	 null,	IN("0,1"),		'isset({save})'),
 
 		"only_hostid"=>	array(T_ZBX_INT, O_OPT,  null,	DB_ID,			null),
+		"monitored_hosts"=>array(T_ZBX_INT, O_OPT,  null,	IN("0,1"),	null),
 /* actions */
 		"add"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		"save"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
