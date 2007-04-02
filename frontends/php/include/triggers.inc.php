@@ -23,25 +23,49 @@
 
 	function	get_severity_style($severity)
 	{
-		if($severity == 1)	return "information";
-		elseif($severity == 2)	return "warning";
-		elseif($severity == 3)	return "average";
-		elseif($severity == 4)	return "high";
-		elseif($severity == 5)	return "disaster";
+		if($severity == TRIGGER_SEVERITY_INFORMATION)	return 'information';
+		elseif($severity == TRIGGER_SEVERITY_WARNING)	return 'warning';
+		elseif($severity == TRIGGER_SEVERITY_AVERAGE)	return 'average';
+		elseif($severity == TRIGGER_SEVERITY_HIGH)	return 'high';
+		elseif($severity == TRIGGER_SEVERITY_DISASTER)	return 'disaster';
 
-		return "";
+		return '';
 	}
 
 	function	get_severity_description($severity)
 	{
-		if($severity == 0)	return S_NOT_CLASSIFIED;
-		else if($severity == 1)	return S_INFORMATION;
-		else if($severity == 2)	return S_WARNING;
-		else if($severity == 3)	return S_AVERAGE;
-		else if($severity == 4)	return S_HIGH;
-		else if($severity == 5)	return S_DISASTER;
+		if($severity == TRIGGER_SEVERITY_NOT_CLASSIFIED)	return S_NOT_CLASSIFIED;
+		else if($severity == TRIGGER_SEVERITY_INFORMATION)	return S_INFORMATION;
+		else if($severity == TRIGGER_SEVERITY_WARNING)		return S_WARNING;
+		else if($severity == TRIGGER_SEVERITY_AVERAGE)		return S_AVERAGE;
+		else if($severity == TRIGGER_SEVERITY_HIGH)		return S_HIGH;
+		else if($severity == TRIGGER_SEVERITY_DISASTER)		return S_DISASTER;
 
-		return "Unknown";
+		return S_UNKNOWN;
+	}
+
+	function	get_trigger_value_style($value)
+	{
+		$str_val[TRIGGER_VALUE_FALSE]	= 'off';
+		$str_val[TRIGGER_VALUE_TRUE]	= 'on';
+		$str_val[TRIGGER_VALUE_UNKNOWN]	= 'unknown';
+
+		if(isset($str_val[$value]))
+			return $str_val[$value];
+
+		return '';
+	}
+
+	function	trigger_value2str($value)
+	{
+		$str_val[TRIGGER_VALUE_FALSE]	= S_FALSE_BIG;
+		$str_val[TRIGGER_VALUE_TRUE]	= S_TRUE_BIG;
+		$str_val[TRIGGER_VALUE_UNKNOWN]	= S_UNKNOWN_BIG;
+
+		if(isset($str_val[$value]))
+			return $str_val[$value];
+
+		return S_UNKNOWN;
 	}
 
 	function        get_realhosts_by_triggerid($triggerid)

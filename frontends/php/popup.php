@@ -29,6 +29,7 @@
 
 	switch($srctbl)
 	{
+		case 'host_templates':
 		case 'templates':
 			$page["title"] = "S_TEMPLATES_BIG";
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
@@ -108,6 +109,7 @@ include_once "include/page_header.php";
 		"groupid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 		"hostid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 		"templates"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	null),
+		"host_templates"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	null),
 		"existed_templates"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	null),
 		"only_hostid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 		"monitored_hosts"=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
@@ -175,7 +177,7 @@ include_once "include/page_header.php";
 		array_push($validation_param, "always_select_first_host");
 		validate_group_with_host(PERM_READ_LIST,$validation_param);
 	}
-	elseif(in_array($srctbl,array("hosts","templates")))
+	elseif(in_array($srctbl,array('hosts','templates','host_templates')))
 	{
 		validate_group(PERM_READ_LIST,$validation_param);
 	}
@@ -210,7 +212,7 @@ include_once "include/page_header.php";
 		if(!isset($ok)) $nodeid = $ZBX_CURNODEID;
 		unset($ok);
 		
-		if(in_array($srctbl,array("hosts","templates","triggers","logitems","items",'applications')))
+		if(in_array($srctbl,array('hosts','templates','triggers','logitems','items','applications','host_templates')))
 		{
 			$groupid = get_request("groupid",get_profile("web.popup.groupid",0));
 			
@@ -467,6 +469,34 @@ include_once "include/page_header.php";
 				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '').
 				" return close_window();");
+
+			$table->AddRow($name);
+		}
+		$table->Show();
+	}
+	elseif(in_array($srctbl,array('host_templates')))
+	{
+		$table = new CTableInfo(S_NO_TEMPLATES_DEFINED);
+		$table->SetHeader(array(S_NAME));
+
+		$sql = 'select distinct h.* from hosts h';
+		if(isset($groupid))
+			$sql .= ',hosts_groups hg where hg.groupid='.$groupid.
+				' and h.hostid=hg.hostid and ';
+		else
+			$sql .= ' where ';
+
+		$sql .= DBid2nodeid('h.hostid').'='.$nodeid.' and status='.HOST_STATUS_TEMPLATE.
+				' and h.hostid in ('.$accessible_hosts.') '.
+				' order by h.host,h.hostid';
+		$db_hosts = DBselect($sql);
+		while($row = DBfetch($db_hosts))
+		{
+			$name = new CLink($row['host'],'#','action');
+			$name->SetAction(
+				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
+				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '').
+				' return close_window();');
 
 			$table->AddRow($name);
 		}

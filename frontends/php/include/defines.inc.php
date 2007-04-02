@@ -98,16 +98,17 @@
 	define('AUDIT_RESOURCE_SCENARIO',	22);
 	define('AUDIT_RESOURCE_DISCOVERY_RULE',	23);
 
-	define('CONDITION_TYPE_GROUP',		0);	/* host deleted */
+	define('CONDITION_TYPE_HOST_GROUP',	0);
 	define('CONDITION_TYPE_HOST',		1);
 	define('CONDITION_TYPE_TRIGGER',	2);
 	define('CONDITION_TYPE_TRIGGER_NAME',	3);
 	define('CONDITION_TYPE_TRIGGER_SEVERITY',4);
 	define('CONDITION_TYPE_TRIGGER_VALUE',	5);
 	define('CONDITION_TYPE_TIME_PERIOD',	6);
-	define('CONDITION_TYPE_DHOST_IP',	7); /* = # range ,-*/	/* TODO!!!! */
-	define('CONDITION_TYPE_DSERVICE_TYPE',	8); /* = # */		/* TODO!!!! */
-	define('CONDITION_TYPE_DSERVICE_PORT',	9); /* = # range ,-*/	/* TODO!!!! */
+	define('CONDITION_TYPE_DHOST_IP',	7);
+	define('CONDITION_TYPE_DSERVICE_TYPE',	8);
+	define('CONDITION_TYPE_DSERVICE_PORT',	9);
+	define('CONDITION_TYPE_DSTATUS',	10);
 
 	define('CONDITION_OPERATOR_EQUAL',	0);
 	define('CONDITION_OPERATOR_NOT_EQUAL',	1);
@@ -186,6 +187,13 @@
 	define('TRIGGER_VALUE_TRUE',1);
 	define('TRIGGER_VALUE_UNKNOWN',2);
 
+	define('TRIGGER_SEVERITY_NOT_CLASSIFIED',	0);
+	define('TRIGGER_SEVERITY_INFORMATION',		1);
+	define('TRIGGER_SEVERITY_WARNING',		2);
+	define('TRIGGER_SEVERITY_AVERAGE',		3);
+	define('TRIGGER_SEVERITY_HIGH',			4);
+	define('TRIGGER_SEVERITY_DISASTER',		5);
+
 	define('ALERT_STATUS_NOT_SENT',0);
 	define('ALERT_STATUS_SENT',1);
 
@@ -199,12 +207,12 @@
 
 	define('OPERATION_TYPE_MESSAGE',	0); /* !!!!! */
 	define('OPERATION_TYPE_COMMAND',	1); /* !!!!! */
-	define('OPERATION_TYPE_',	2); /* TODO!!!
-#define OPERATION_TYPE_GROUP_ADD        2	grouid
-#define OPERATION_TYPE_GROUP_REMOVE     3	grouid
-#define OPERATION_TYPE_TEMPLATE_ADD     4
-#define OPERATION_TYPE_TEMPLATE_REMOVE  5 */
-
+	define('OPERATION_TYPE_HOST_ADD',	2); /* TODO!!! */
+	define('OPERATION_TYPE_HOST_REMOVE',	3); /* TODO!!! */
+	define('OPERATION_TYPE_GROUP_ADD',	4); /* TODO!!! */
+	define('OPERATION_TYPE_GROUP_REMOVE',	5); /* TODO!!! */
+	define('OPERATION_TYPE_TEMPLATE_ADD',	6); /* TODO!!! */
+	define('OPERATION_TYPE_TEMPLATE_REMOVE',7); /* TODO!!! */
 
 	define('ACTION_EVAL_TYPE_AND_OR',0);
 	define('ACTION_EVAL_TYPE_AND',1);
@@ -329,6 +337,9 @@
 	define('EVENT_OBJECT_TRIGGER',		0);
 	define('EVENT_OBJECT_DHOST',		1);
 	define('EVENT_OBJECT_DSERVICE',		2);
+
+	define('DOBJECT_STATUS_UP',	0);
+	define('DOBJECT_STATUS_DOWN',	1);
 
 	define('DRULE_STATUS_ACTIVE',		0);
 	define('DRULE_STATUS_DISABLED',		1);

@@ -226,6 +226,8 @@
 
 		function SetHint($text, $width='', $class='')
 		{
+			if(empty($text)) return false;
+
 			insert_showhint_javascript();
 
 			$text = unpack_object($text);

@@ -59,6 +59,45 @@
 		return 'ereg(\'^([0-9a-zA-Z\_\.[.-.]\$ ]+)$\',{'.$var.'})&&';
 	}
 
+	function	validate_ip($str,&$arr)
+	{
+		if( !ereg('^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$', $str, $arr) )	return false;
+		for($i=1; $i<=4; $i++)	if( !is_numeric($arr[$i]) || $arr[$i] > 255 || $arr[$i] < 0 )	return false;
+		return true;
+	}
+
+	function	validate_ip_list($str)
+	{
+		foreach(explode(',',$str) as $ip_range)
+		{
+			$networks = array();
+			$ip_range = explode('-', $ip_range);
+			if(count($ip_range) > 2) return false;
+			foreach($ip_range as $ip)
+			{
+				if( !validate_ip($ip, $arr) ) return false;
+				$network = $arr[1].'.'.$arr['2'].'.'.$arr[3];
+				$networks[$network] = $network;
+			}
+			if( count($networks) > 1 ) return false;
+		}
+		return true;
+	}
+
+	function	validate_port_list($str)
+	{
+		foreach(explode(',',$str) as $port_range)
+		{
+			$port_range = explode('-', $port_range);
+			if(count($port_range) > 2) return false;
+			foreach($port_range as $port)
+				if( !is_numeric($port) || $port > 65535 || $port < 0 )
+					return false;
+		}
+		return true;
+	}
+
+
 	define("NOT_EMPTY","({}!='')&&");
 	define("DB_ID","({}>=0&&bccomp('{}',\"10000000000000000000\")<0)&&");
 
@@ -173,8 +212,7 @@
  
 		if($type == T_ZBX_IP)
 		{
-			if(!is_array($var)) $var = explode('.',$var);
-			if(count($var) != 4)
+			if( !validate_ip($var) )
 			{
 				if($flags&P_SYS)
 				{
@@ -187,9 +225,7 @@
 					return ZBX_VALID_WARNING;
 				}
 			}
-			$err = ZBX_VALID_OK;
-			foreach($var as $el) $err |= check_type($field, $flags, $el, T_ZBX_INT);
-			return $err;
+			return ZBX_VALID_OK;
 		}
 
 		if($type == T_ZBX_PORTS)
@@ -274,8 +310,6 @@
 	function	check_field(&$fields, &$field, $checks)
 	{
 		list($type,$opt,$flags,$validation,$exception)=$checks;
-
-		if($type == T_ZBX_IP) $validation = BETWEEN(0,255);
 
 		if($flags&P_UNSET_EMPTY && isset($_REQUEST[$field]) && $_REQUEST[$field]=='')
 		{
@@ -389,11 +423,6 @@
 		foreach($fields as $field => $checks)
 		{
 			$err |= check_field($fields, $field,$checks);
-			
-			if($checks[0] == T_ZBX_IP && isset($_REQUEST[$field]))
-			{
-				$_REQUEST[$field] = implode('.', $_REQUEST[$field]);
-			}
 		}
 
 		unset_not_in_list($fields);

@@ -79,6 +79,17 @@
 		return $status;
 	}
 
+	function	discovery_object_status2str($status)
+	{
+		$str_stat[DOBJECT_STATUS_UP] = S_UP;
+		$str_stat[DOBJECT_STATUS_DOWN] = S_DOWN;
+
+		if(isset($str_stat[$status]))
+			return $str_stat[$status];
+
+		return S_UNKNOWN;
+	}
+
 	function	get_discovery_rule_by_druleid($druleid)
 	{
 		return DBfetch(DBselect('select * from drules where druleid='.$druleid));

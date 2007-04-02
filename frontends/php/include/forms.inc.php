@@ -135,7 +135,7 @@
 			$cmbChkType, SPACE,
 			S_PORTS_SMALL, SPACE, new CTextBox('new_check_ports', $new_check_ports),
 			new CButton('add_check', S_ADD)
-		));
+		),'new');
 
 		$cmbStatus = new CComboBox("status", $status);
 		foreach(array(DRULE_STATUS_ACTIVE, DRULE_STATUS_DISABLED) as $st)
@@ -1536,8 +1536,8 @@
 		{
 			$btnSelect = new CButton('btn1',S_SELECT,
 				"return PopUp('popup.php?dstfrm=".$frmItem->GetName().
-				"&dstfld1=key&srctbl=help_items&srcfld1=key_&itemtype=".$type."');");
-			$btnSelect->SetAccessKey('T');
+				"&dstfld1=key&srctbl=help_items&srcfld1=key_&itemtype=".$type."');",
+				'T');
 		}
 		
 		$frmItem->AddRow(S_KEY, array(new CTextBox("key",$key,40,$limited), $btnSelect));
@@ -1601,7 +1601,7 @@
 					S_PERIOD, SPACE,
 					new CTextBox("new_delay_flex[period]","1-7,00:00-23:59",27), BR,
 					new CButton("add_delay_flex",S_ADD)
-				));
+				),'new');
 		}
 		else
 		{
@@ -1898,7 +1898,7 @@
 			));
 		$new_delay_flex_el->AddOption('name', 'new_delay_flex_el');
 		$new_delay_flex_el->AddOption('style', 'text-decoration: none');
-		$frmItem->AddRow(S_NEW_FLEXIBLE_INTERVAL, $new_delay_flex_el);
+		$frmItem->AddRow(S_NEW_FLEXIBLE_INTERVAL, $new_delay_flex_el, 'new');
 
 		$frmItem->AddRow(array( new CVisibilityBox('history_visible', get_request('history_visible'), 'history', S_ORIGINAL),
 			S_KEEP_HISTORY_IN_DAYS), new CNumericBox('history',$history,8));
@@ -2130,15 +2130,14 @@
 	/* new dependence */
 		$frmTrig->AddVar('new_dependence','0');
 
-		$txtCondVal = new CTextBox('trigger','',75);
-		$txtCondVal->SetReadonly('yes');
+		$txtCondVal = new CTextBox('trigger','',75,'yes');
 
 		$btnSelect = new CButton('btn1',S_SELECT,
 				"return PopUp('popup.php?dstfrm=".$frmTrig->GetName().
 				"&dstfld1=new_dependence&dstfld2=trigger&srctbl=triggers".
-				"&srcfld1=triggerid&srcfld2=description',600,450);");
+				"&srcfld1=triggerid&srcfld2=description',600,450);",
+				'T');
 		
-		$btnSelect->SetAccessKey('T');
 		$frmTrig->AddRow("New dependency",array($txtCondVal, 
 			$btnSelect, BR,
 			new CButton("add_dependence","add")
@@ -2414,8 +2413,7 @@
 		$frmGItem->AddVar('graphtype',$graphtype);
 		$frmGItem->AddVar('only_hostid',$only_hostid);
 
-		$txtCondVal = new CTextBox('description',$description,50);
-		$txtCondVal->SetReadonly('yes');
+		$txtCondVal = new CTextBox('description',$description,50,'yes');
 
 		$host_condition = "";
 		if(isset($only_hostid))
@@ -2430,9 +2428,9 @@
 		$btnSelect = new CButton('btn1',S_SELECT,
 				"return PopUp('popup.php?dstfrm=".$frmGItem->GetName().
 				"&dstfld1=itemid&dstfld2=description&".
-				"srctbl=items&srcfld1=itemid&srcfld2=description".$host_condition."');");
+				"srctbl=items&srcfld1=itemid&srcfld2=description".$host_condition."');",
+				'T');
 		
-		$btnSelect->SetAccessKey('T');
 		$frmGItem->AddRow(S_PARAMETER ,array($txtCondVal,$btnSelect));
 
 		if($graphtype == GRAPH_TYPE_NORMAL)
@@ -2643,6 +2641,9 @@
 
 	function	insert_action_form()
 	{
+
+include_once 'include/discovery.inc.php';
+
 		global  $_REQUEST;
 		global  $ZBX_CURNODEID;
 
@@ -2709,6 +2710,9 @@
 			$status 	= get_request('status');
 		}
 
+		$allowed_conditions = get_conditions_by_eventsource($eventsource);
+		$allowed_operations = get_operations_by_eventsource($eventsource);
+
 		/* init new_condition variable */
 		$new_condition = get_request('new_condition', array());
 		if( !is_array($new_condition) )	$new_condition = array();
@@ -2716,6 +2720,9 @@
 		if( !isset($new_condition['type']) )	$new_condition['type']		= CONDITION_TYPE_TRIGGER_NAME;
 		if( !isset($new_condition['operator']))	$new_condition['operator']	= CONDITION_OPERATOR_LIKE;
 		if( !isset($new_condition['value']) )	$new_condition['value']		= '';
+
+		if( !in_array($new_condition['type'], $allowed_conditions) )
+			$new_condition['type'] = $allowed_conditions[0];
 
 		/* init new_operation variable */
 		$new_operation = get_request('new_operation', array());
@@ -2730,20 +2737,26 @@
 		$frmAction->AddRow(S_NAME, new CTextBox('name', $name, 50));
 
 		/* form row generation */
-		$cmbSource =  new CComboBox('eventsource', $eventsource);
+		$cmbSource =  new CComboBox('eventsource', $eventsource, 'submit()');
 		$cmbSource->AddItem(EVENT_SOURCE_TRIGGERS, S_TRIGGERS);
-		$cmbSource->AddItem(EVENT_SOURCE_DISCOVERY, S_DISCOVERY, null, 'no');
+		$cmbSource->AddItem(EVENT_SOURCE_DISCOVERY, S_DISCOVERY);
 		$frmAction->AddRow(S_EVENT_SOURCE, $cmbSource);
 
-// prepare condition list
+// show CONDITION LIST
 		zbx_rksort($conditions);
 
 		/* group conditions by type */
 		$grouped_conditions = array();
-		$cond_el = new CTable();
+		$cond_el = new CTable(S_NO_CONDITIONS_DEFINED);
 		$i=0;
 		foreach($conditions as $val)
 		{
+			if( !isset($val['type']) )	$val['type'] = 0;
+			if( !isset($val['operator']) )	$val['operator'] = 0;
+			if( !isset($val['value']) )	$val['value'] = 0;
+
+			if( !in_array($val["type"], $allowed_conditions) ) continue;
+
 			$label = chr(ord('A') + $i);
 			$cond_el->AddRow(array('('.$label.')',array(
 					new CCheckBox("g_conditionid[]", 'no', null,$i),
@@ -2767,15 +2780,12 @@
 			$cond_buttons[] = new CButton('new_condition',S_NEW);
 		}
 
-		if($cond_el->ItemsCount() == 0)
-		{
-			$cond_el = array(S_NO_CONDITIONS_DEFINED,BR);
-			$frmAction->AddVar('evaltype', ACTION_EVAL_TYPE_AND_OR);
-		}
-		else
+		if($cond_el->ItemsCount() > 0)
 		{
 			if($cond_el->ItemsCount() > 1)
 			{
+
+				/* prepare condition calcuation type selector */
 				switch($evaltype)
 				{
 					case ACTION_EVAL_TYPE_AND:	$group_op = 		$glog_op = S_AND;	break;
@@ -2795,6 +2805,7 @@
 				$frmAction->AddRow(S_TYPE_OF_CALCULATION, 
 					array($cmb_calc_type, new CTextBox('preview', $grouped_conditions, 60,'yes')));
 				unset($cmb_calc_type, $group_op, $glog_op);
+				/* end of calcuation type selector */
 			}
 			else
 			{
@@ -2802,139 +2813,135 @@
 			}
 			$cond_buttons[] = new CButton('del_condition',S_DELETE_SELECTED);
 		}
-
-// end of condition list preparation
+		else
+		{
+			$frmAction->AddVar('evaltype', ACTION_EVAL_TYPE_AND_OR);
+		}
 
 		$frmAction->AddRow(S_CONDITIONS, array($cond_el, $cond_buttons)); 
 		unset($grouped_conditions,$cond_el,$cond_buttons);
 
+// end of CONDITION LIST
+
+// NEW CONDITION
 		if(isset($_REQUEST['new_condition']))
 		{
-// prepare new condition
 			$rowCondition=array();
 
 	// add condition type
 			$cmbCondType = new CComboBox('new_condition[type]',$new_condition['type'],'submit()');
-			$cmbCondType->AddItem(CONDITION_TYPE_GROUP,		S_HOST_GROUP);
-			$cmbCondType->AddItem(CONDITION_TYPE_HOST,		S_HOST);
-			$cmbCondType->AddItem(CONDITION_TYPE_TRIGGER,		S_TRIGGER);
-			$cmbCondType->AddItem(CONDITION_TYPE_TRIGGER_NAME,	S_TRIGGER_NAME);
-			$cmbCondType->AddItem(CONDITION_TYPE_TRIGGER_SEVERITY,	S_TRIGGER_SEVERITY);
-			$cmbCondType->AddItem(CONDITION_TYPE_TRIGGER_VALUE,	S_TRIGGER_VALUE);
-			$cmbCondType->AddItem(CONDITION_TYPE_TIME_PERIOD,	S_TIME_PERIOD);
+			foreach($allowed_conditions as $cond)
+				$cmbCondType->AddItem($cond, condition_type2str($cond));
 
 			array_push($rowCondition,$cmbCondType);
 
 	// add condition operation
 			$cmbCondOp = new CComboBox('new_condition[operator]');
-			if(in_array($new_condition['type'], array(
-					CONDITION_TYPE_GROUP,
-					CONDITION_TYPE_HOST,
-					CONDITION_TYPE_TRIGGER,
-					CONDITION_TYPE_TRIGGER_SEVERITY,
-					CONDITION_TYPE_TRIGGER_VALUE)))
-				$cmbCondOp->AddItem(CONDITION_OPERATOR_EQUAL,		'=');
-			if(in_array($new_condition['type'],array(
-					CONDITION_TYPE_GROUP,
-					CONDITION_TYPE_HOST,
-					CONDITION_TYPE_TRIGGER,
-					CONDITION_TYPE_TRIGGER_SEVERITY)))
-				$cmbCondOp->AddItem(CONDITION_OPERATOR_NOT_EQUAL,	'<>');
-			if(in_array($new_condition['type'],array(CONDITION_TYPE_TRIGGER_NAME)))
-				$cmbCondOp->AddItem(CONDITION_OPERATOR_LIKE,		'like');
-			if(in_array($new_condition['type'],array(CONDITION_TYPE_TRIGGER_NAME)))
-				$cmbCondOp->AddItem(CONDITION_OPERATOR_NOT_LIKE,	'not like');
-			if(in_array($new_condition['type'],array(CONDITION_TYPE_TIME_PERIOD)))
-				$cmbCondOp->AddItem(CONDITION_OPERATOR_IN,		'in');
-			if(in_array($new_condition['type'],array(CONDITION_TYPE_TRIGGER_SEVERITY)))
-				$cmbCondOp->AddItem(CONDITION_OPERATOR_MORE_EQUAL,	'>=');
-			if(in_array($new_condition['type'],array(CONDITION_TYPE_TRIGGER_SEVERITY)))
-				$cmbCondOp->AddItem(CONDITION_OPERATOR_LESS_EQUAL,	'<=');
+			foreach(get_operators_by_conditiontype($new_condition['type']) as $op)
+				$cmbCondOp->AddItem($op, condition_operator2str($op));
 
 			array_push($rowCondition,$cmbCondOp);
 
 
 	// add condition value
-			if($new_condition['type'] == CONDITION_TYPE_GROUP)
+			switch($new_condition['type'])
 			{
-				$frmAction->AddVar('new_condition[value]','0');
+				case CONDITION_TYPE_HOST_GROUP:
+					$frmAction->AddVar('new_condition[value]','0');
+					$rowCondition[] = array(
+						new CTextBox('group','',20,'yes'),
+						new CButton('btn1',S_SELECT,
+							"return PopUp('popup.php?dstfrm=".$frmAction->GetName().
+							"&dstfld1=new_condition%5Bvalue%5D&dstfld2=group&srctbl=host_group".
+							"&srcfld1=groupid&srcfld2=name',450,450);",
+							'T')
+						);
+					break;
+				case CONDITION_TYPE_HOST:
+					$frmAction->AddVar('new_condition[value]','0');
+					$rowCondition[] = array(
+						new CTextBox('host','',20,'yes'),
+						new CButton('btn1',S_SELECT,
+							"return PopUp('popup.php?dstfrm=".$frmAction->GetName().
+							"&dstfld1=new_condition%5Bvalue%5D&dstfld2=host&srctbl=hosts".
+							"&srcfld1=hostid&srcfld2=host',450,450);",
+							'T')
+						);
+					break;
+				case CONDITION_TYPE_TRIGGER:
+					$frmAction->AddVar('new_condition[value]','0');
+					$rowCondition[] = array(
+						new CTextBox('trigger','',20,'yes'),
+						new CButton('btn1',S_SELECT,
+							"return PopUp('popup.php?dstfrm=".$frmAction->GetName().
+							"&dstfld1=new_condition%5Bvalue%5D&dstfld2=trigger&srctbl=triggers".
+							"&srcfld1=triggerid&srcfld2=description');",
+							'T')
+						);
+					break;
+				case CONDITION_TYPE_TRIGGER_NAME:
+					$rowCondition[] = new CTextBox('new_condition[value]', "", 40);
+					break;
+				case CONDITION_TYPE_TRIGGER_VALUE:
+					$cmbCondVal = new CComboBox('new_condition[value]');
+					foreach(array(TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE) as $tr_val)
+						$cmbCondVal->AddItem($tr_val, trigger_value2str($tr_val));
 
-				$txtCondVal = new CTextBox('group','',20);
-				$txtCondVal->SetReadonly('yes');
+					$rowCondition[] = $cmbCondVal;
+					break;
+				case CONDITION_TYPE_TIME_PERIOD:
+					$rowCondition[] = new CTextBox('new_condition[value]', "1-7,00:00-23:59", 40);
+					break;
+				case CONDITION_TYPE_TRIGGER_SEVERITY:
+					$cmbCondVal = new CComboBox('new_condition[value]');
+					foreach(array(TRIGGER_SEVERITY_INFORMATION,
+						TRIGGER_SEVERITY_WARNING,
+						TRIGGER_SEVERITY_AVERAGE,
+						TRIGGER_SEVERITY_HIGH,
+						TRIGGER_SEVERITY_DISASTER) as $id)
+						$cmbCondVal->AddItem($id,get_severity_description($id));
 
-				$btnSelect = new CButton('btn1',S_SELECT,
-					"return PopUp('popup.php?dstfrm=".$frmAction->GetName().
-					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=group&srctbl=host_group&srcfld1=groupid&srcfld2=name',450,450);");
-				$btnSelect->SetAccessKey('T');
+					$rowCondition[] = $cmbCondVal;
+					break;
+				case CONDITION_TYPE_DHOST_IP:
+					$rowCondition[] = new CTextBox('new_condition[value]', '192.168.0.1-192.168.0.127,192.168.2.1', 50);
+					break;
+				case CONDITION_TYPE_DSERVICE_TYPE:
+					$cmbCondVal = new CComboBox('new_condition[value]');
+					foreach(array(SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP,
+						SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP) as $svc)
+						$cmbCondVal->AddItem($svc,discovery_check_type2str($svc));
 
-				array_push($rowCondition, $txtCondVal, $btnSelect);
+					$rowCondition[] = $cmbCondVal;
+					break;
+				case CONDITION_TYPE_DSERVICE_PORT:
+					$rowCondition[] = new CTextBox('new_condition[value]', '0-1023,1024-49151', 40);
+					break;
+				case CONDITION_TYPE_DSTATUS:
+					$cmbCondVal = new CComboBox('new_condition[value]');
+					foreach(array(DOBJECT_STATUS_UP, DOBJECT_STATUS_DOWN) as $stat)
+						$cmbCondVal->AddItem($stat,discovery_object_status2str($stat));
+
+					$rowCondition[] = $cmbCondVal;
+					break;
 			}
-			else if($new_condition['type'] == CONDITION_TYPE_HOST)
-			{
-				$frmAction->AddVar('new_condition[value]','0');
 
-				$txtCondVal = new CTextBox('host','',20);
-				$txtCondVal->SetReadonly('yes');
-
-				$btnSelect = new CButton('btn1',S_SELECT,
-					"return PopUp('popup.php?dstfrm=".$frmAction->GetName().
-					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=host&srctbl=hosts&srcfld1=hostid&srcfld2=host',450,450);");
-				$btnSelect->SetAccessKey('T');
-
-				array_push($rowCondition, $txtCondVal, $btnSelect);
-			}
-			else if($new_condition['type'] == CONDITION_TYPE_TRIGGER)
-			{
-				$frmAction->AddVar('new_condition[value]','0');
-
-				$txtCondVal = new CTextBox('trigger','',20);
-				$txtCondVal->SetReadonly('yes');
-
-				$btnSelect = new CButton('btn1',S_SELECT,
-					"return PopUp('popup.php?dstfrm=".$frmAction->GetName().
-					"&dstfld1=new_condition%5Bvalue%5D&dstfld2=trigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description');");
-				$btnSelect->SetAccessKey('T');
-				array_push($rowCondition, $txtCondVal, $btnSelect);
-			}
-			else if($new_condition['type'] == CONDITION_TYPE_TRIGGER_NAME)
-			{
-				array_push($rowCondition, new CTextBox('new_condition[value]', "", 40));
-			}
-			else if($new_condition['type'] == CONDITION_TYPE_TRIGGER_VALUE)
-			{
-				$cmbCondVal = new CComboBox('new_condition[value]');
-				$cmbCondVal->AddItem(0,"OFF");
-				$cmbCondVal->AddItem(1,"ON");
-				array_push($rowCondition,$cmbCondVal);
-			}
-			else if($new_condition['type'] == CONDITION_TYPE_TIME_PERIOD)
-			{
-				array_push($rowCondition, new CTextBox('new_condition[value]', "1-7,00:00-23:59", 40));
-			}
-			else if($new_condition['type'] == CONDITION_TYPE_TRIGGER_SEVERITY)
-			{
-				$cmbCondVal = new CComboBox('new_condition[value]');
-				foreach(array(0,1,2,3,4,5) as $id)
-					$cmbCondVal->AddItem($id,get_severity_description($id));
-
-				array_push($rowCondition,$cmbCondVal);
-			}
-	// add condition button
-			array_push($rowCondition,
+			$frmAction->AddRow(S_NEW_CONDITION, array(
+				$rowCondition,
 				BR,
 				new CButton('add_condition',S_ADD),
-				new CButton('cancel_new_condition',S_CANCEL)
-				);
-
-			$frmAction->AddRow(S_NEW_CONDITION, $rowCondition, 'new');
-// end of new condition preparation
+				new CButton('cancel_new_condition',S_CANCEL)),
+				'new');
+// end of NEW CONDITION
 		}
 
 		zbx_rksort($operations);
 		
-		$oper_el = new CTable();
+		$oper_el = new CTable(S_NO_OPERATIONS_DEFINED);
 		foreach($operations as $id => $val)
 		{
+			if( !in_array($val['operationtype'], $allowed_operations) )	continue;
+
 			$oper_details = new CSpan(get_operation_desc(SHORT_DESCRITION, $val));
 			$oper_details->SetHint(nl2br(get_operation_desc(LONG_DESCRITION, $val)));
 
@@ -2951,6 +2958,7 @@
 			$frmAction->AddVar('operations['.$id.'][shortdata]'	,$val['shortdata']	);
 			$frmAction->AddVar('operations['.$id.'][longdata]'	,$val['longdata']	);
 		}
+		unset($operations);
 
 		$oper_buttons = array();
 
@@ -2959,12 +2967,7 @@
 			$oper_buttons[] = new CButton('new_operation',S_NEW);
 		}
 
-		if(count($operations) <= 0)
-		{
-			$operations = array();
-			$operations[] = S_NO_OPERATIONS_DEFINED;
-		}
-		else
+		if($oper_el->ItemsCount() > 0 )
 		{
 			$oper_buttons[] =new CButton('del_operation',S_DELETE_SELECTED);
 		}
@@ -2972,7 +2975,7 @@
 // end of condition list preparation
 
 		$frmAction->AddRow(S_OPERATIONS, array($oper_el, $oper_buttons));
-		unset($operations, $oper_el, $oper_buttons);
+		unset($oper_el, $oper_buttons);
 
 		if(isset($_REQUEST['new_operation']))
 		{
@@ -2986,54 +2989,152 @@
 			$tblNewOperation = new CTable(null,'nowrap');
 
 			$cmbOpType = new CComboBox('new_operation[operationtype]', $new_operation['operationtype'],'submit()');
-			$cmbOpType->AddItem(OPERATION_TYPE_MESSAGE,S_SEND_MESSAGE);
-			$cmbOpType->AddItem(OPERATION_TYPE_COMMAND,S_REMOTE_COMMAND);
+			foreach($allowed_operations as $oper)
+				$cmbOpType->AddItem($oper, operation_type2str($oper));
 			$tblNewOperation->AddRow(array(S_OPERATION_TYPE, $cmbOpType));
 
-			if($new_operation['operationtype'] == OPERATION_TYPE_MESSAGE)
+			switch($new_operation['operationtype'])
 			{
-				if( $new_operation['object'] == OPERATION_OBJECT_GROUP)
-				{
-					$object_srctbl = 'usrgrp';
-					$object_srcfld1 = 'usrgrpid';
-					$object_name = get_group_by_usrgrpid($new_operation['objectid']);
-				}
-				else
-				{
-					$object_srctbl = 'users';
-					$object_srcfld1 = 'userid';
-					$object_name = get_user_by_userid($new_operation['objectid']);
-				}
+				case OPERATION_TYPE_MESSAGE:
+					if( $new_operation['object'] == OPERATION_OBJECT_GROUP)
+					{
+						$object_srctbl = 'usrgrp';
+						$object_srcfld1 = 'usrgrpid';
+						$object_name = get_group_by_usrgrpid($new_operation['objectid']);
+					}
+					else
+					{
+						$object_srctbl = 'users';
+						$object_srcfld1 = 'userid';
+						$object_name = get_user_by_userid($new_operation['objectid']);
+					}
 
-				$frmAction->AddVar('new_operation[objectid]', $new_operation['objectid']); 
+					$frmAction->AddVar('new_operation[objectid]', $new_operation['objectid']); 
 
-				if($object_name)	$object_name = $object_name['name'];
+					if($object_name)	$object_name = $object_name['name'];
 
-				$cmbObject = new CComboBox('new_operation[object]', $new_operation['object'],'submit()');
-				$cmbObject->AddItem(OPERATION_OBJECT_USER,S_SINGLE_USER);
-				$cmbObject->AddItem(OPERATION_OBJECT_GROUP,S_USER_GROUP);
+					$cmbObject = new CComboBox('new_operation[object]', $new_operation['object'],'submit()');
+					$cmbObject->AddItem(OPERATION_OBJECT_USER,S_SINGLE_USER);
+					$cmbObject->AddItem(OPERATION_OBJECT_GROUP,S_USER_GROUP);
 
-				$tblNewOperation->AddRow(array(S_SEND_MESSAGE_TO, array(
-						$cmbObject,
-						new CTextBox('object_name', $object_name, 40, 'yes'),
-						new CButton('select_object',S_SELECT,
-							'return PopUp("popup.php?dstfrm='.$frmAction->GetName().
-							'&dstfld1=new_operation%5Bobjectid%5D&dstfld2=object_name'.
-							'&srctbl='.$object_srctbl.'&srcfld1='.$object_srcfld1.'&srcfld2=name'.
-							'",450,450)',
-							'T')
-					)));
+					$tblNewOperation->AddRow(array(S_SEND_MESSAGE_TO, array(
+							$cmbObject,
+							new CTextBox('object_name', $object_name, 40, 'yes'),
+							new CButton('select_object',S_SELECT,
+								'return PopUp("popup.php?dstfrm='.$frmAction->GetName().
+								'&dstfld1=new_operation%5Bobjectid%5D&dstfld2=object_name'.
+								'&srctbl='.$object_srctbl.'&srcfld1='.$object_srcfld1.'&srcfld2=name'.
+								'",450,450)',
+								'T')
+						)));
 
-				$tblNewOperation->AddRow(array(S_SUBJECT, new CTextBox('new_operation[shortdata]',$new_operation['shortdata'],77)));
-				$tblNewOperation->AddRow(array(S_MESSAGE, new CTextArea('new_operation[longdata]',$new_operation['longdata'],77,7)));
-			}
-			else
-			{
-				$frmAction->AddVar('new_operation[object]',0);
-				$frmAction->AddVar('new_operation[objectid]',0);
-				$frmAction->AddVar('new_operation[shortdata]','');
+					$tblNewOperation->AddRow(array(S_SUBJECT,
+						new CTextBox('new_operation[shortdata]', $new_operation['shortdata'],77)));
+					$tblNewOperation->AddRow(array(S_MESSAGE,
+						new CTextArea('new_operation[longdata]', $new_operation['longdata'],77,7)));
+					break;
+				case OPERATION_TYPE_COMMAND:
+					$frmAction->AddVar('new_operation[object]',0);
+					$frmAction->AddVar('new_operation[objectid]',0);
+					$frmAction->AddVar('new_operation[shortdata]','');
 
-				$tblNewOperation->AddRow(array(S_REMOTE_COMMAND, new CTextArea('new_operation[longdata]',$new_operation['longdata'],77,7)));
+					$tblNewOperation->AddRow(array(S_REMOTE_COMMAND,
+						new CTextArea('new_operation[longdata]', $new_operation['longdata'],77,7)));
+					break;
+				case OPERATION_TYPE_HOST_ADD:
+					$frmAction->AddVar('new_operation[object]',0);
+					$frmAction->AddVar('new_operation[objectid]',0);
+					$frmAction->AddVar('new_operation[shortdata]','');
+					$frmAction->AddVar('new_operation[longdata]','');
+					break;
+				case OPERATION_TYPE_HOST_REMOVE:
+					$frmAction->AddVar('new_operation[object]',0);
+					$frmAction->AddVar('new_operation[objectid]',0);
+					$frmAction->AddVar('new_operation[shortdata]','');
+					$frmAction->AddVar('new_operation[longdata]','');
+					break;
+				case OPERATION_TYPE_GROUP_ADD:
+					$frmAction->AddVar('new_operation[object]',0);
+					$frmAction->AddVar('new_operation[objectid]',$new_operation['objectid']);
+					$frmAction->AddVar('new_operation[shortdata]','');
+					$frmAction->AddVar('new_operation[longdata]','');
+
+					if($object_name= DBfetch(DBselect('select name from groups where groupid='.$new_operation['objectid'])))
+					{
+						$object_name = $object_name['name'];
+					}
+					$tblNewOperation->AddRow(array(S_GROUP, array(
+							new CTextBox('object_name', $object_name, 40, 'yes'),
+							new CButton('select_object',S_SELECT,
+								'return PopUp("popup.php?dstfrm='.$frmAction->GetName().
+								'&dstfld1=new_operation%5Bobjectid%5D&dstfld2=object_name'.
+								'&srctbl=host_group&srcfld1=groupid&srcfld2=name'.
+								'",450,450)',
+								'T')
+						)));
+					break;
+				case OPERATION_TYPE_GROUP_REMOVE:
+					$frmAction->AddVar('new_operation[object]',0);
+					$frmAction->AddVar('new_operation[objectid]',$new_operation['objectid']);
+					$frmAction->AddVar('new_operation[shortdata]','');
+					$frmAction->AddVar('new_operation[longdata]','');
+
+					if($object_name= DBfetch(DBselect('select name from groups where groupid='.$new_operation['objectid'])))
+					{
+						$object_name = $object_name['name'];
+					}
+					$tblNewOperation->AddRow(array(S_GROUP, array(
+							new CTextBox('object_name', $object_name, 40, 'yes'),
+							new CButton('select_object',S_SELECT,
+								'return PopUp("popup.php?dstfrm='.$frmAction->GetName().
+								'&dstfld1=new_operation%5Bobjectid%5D&dstfld2=object_name'.
+								'&srctbl=host_group&srcfld1=groupid&srcfld2=name'.
+								'",450,450)',
+								'T')
+						)));
+					break;
+				case OPERATION_TYPE_TEMPLATE_ADD:
+					$frmAction->AddVar('new_operation[object]',0);
+					$frmAction->AddVar('new_operation[objectid]',$new_operation['objectid']);
+					$frmAction->AddVar('new_operation[shortdata]','');
+					$frmAction->AddVar('new_operation[longdata]','');
+
+					if($object_name= DBfetch(DBselect('select host from hosts '.
+						' where status='.HOST_STATUS_TEMPLATE.' and hostid='.$new_operation['objectid'])))
+					{
+						$object_name = $object_name['host'];
+					}
+					$tblNewOperation->AddRow(array(S_TEMPLATE, array(
+							new CTextBox('object_name', $object_name, 40, 'yes'),
+							new CButton('select_object',S_SELECT,
+								'return PopUp("popup.php?dstfrm='.$frmAction->GetName().
+								'&dstfld1=new_operation%5Bobjectid%5D&dstfld2=object_name'.
+								'&srctbl=host_templates&srcfld1=hostid&srcfld2=host'.
+								'",450,450)',
+								'T')
+						)));
+					break;
+				case OPERATION_TYPE_TEMPLATE_REMOVE:
+					$frmAction->AddVar('new_operation[object]',0);
+					$frmAction->AddVar('new_operation[objectid]',$new_operation['objectid']);
+					$frmAction->AddVar('new_operation[shortdata]','');
+					$frmAction->AddVar('new_operation[longdata]','');
+
+					if($object_name= DBfetch(DBselect('select host from hosts '.
+						' where status='.HOST_STATUS_TEMPLATE.' and hostid='.$new_operation['objectid'])))
+					{
+						$object_name = $object_name['host'];
+					}
+					$tblNewOperation->AddRow(array(S_TEMPLATE, array(
+							new CTextBox('object_name', $object_name, 40, 'yes'),
+							new CButton('select_object',S_SELECT,
+								'return PopUp("popup.php?dstfrm='.$frmAction->GetName().
+								'&dstfld1=new_operation%5Bobjectid%5D&dstfld2=object_name'.
+								'&srctbl=host_templates&srcfld1=hostid&srcfld2=host'.
+								'",450,450)',
+								'T')
+						)));
+					break;
 			}
 
 			$tblNewOperation->AddRow(new CCol(array(
@@ -4474,13 +4575,12 @@
 		else
 			$trigger = "";
 
-		$txtTrigger = new CTextBox('trigger',$trigger,60);
-		$txtTrigger->SetReadonly('yes');
+		$txtTrigger = new CTextBox('trigger',$trigger,60,'yes');
 
 		$btnSelect = new CButton('btn1',S_SELECT,
 			"return PopUp('popup.php?dstfrm=".$frmCnct->GetName().
-			"&dstfld1=triggerid&dstfld2=trigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description');");
-		$btnSelect->SetAccessKey('T');
+			"&dstfld1=triggerid&dstfld2=trigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description');",
+			'T');
 		$frmCnct->AddRow("Link status indicator",array($txtTrigger, $btnSelect));
 
 		$frmCnct->AddRow("Type (OFF)",$cmbType_off);
