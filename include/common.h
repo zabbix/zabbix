@@ -143,6 +143,12 @@ typedef enum
 	EVENT_OBJECT_DSERVICE
 } zbx_event_object_t;
 
+typedef enum
+{
+	DOBJECT_STATUS_UP	= 0,
+	DOBJECT_STATUS_DOWN
+} zbx_dstatus_t
+
 /* Item value types */
 typedef enum
 {
@@ -304,6 +310,14 @@ typedef enum
 #define TRIGGER_VALUE_FALSE	0
 #define TRIGGER_VALUE_TRUE	1
 #define TRIGGER_VALUE_UNKNOWN	2
+
+/* Trigger severity */
+#define TRIGGER_SEVERITY_NOT_CLASSIFIED	0
+#define TRIGGER_SEVERITY_INFORMATION	1
+#define TRIGGER_SEVERITY_WARNING	2
+#define TRIGGER_SEVERITY_AVERAGE	3
+#define TRIGGER_SEVERITY_HIGH		4
+#define TRIGGER_SEVERITY_DISASTER	5
 
 /* Media statuses */
 #define MEDIA_STATUS_ACTIVE	0

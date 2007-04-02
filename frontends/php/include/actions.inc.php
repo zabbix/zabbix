@@ -17,6 +17,9 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
+
+include_once 'include/discovery.inc.php';
+
 ?>
 <?php
 	function	action_accessiable($actionid,$perm)
@@ -40,7 +43,7 @@
 
 				switch($ac_data['conditiontype'])
 				{
-					case CONDITION_TYPE_GROUP:
+					case CONDITION_TYPE_HOST_GROUP:
 						if(in_array($ac_data['value'],explode(',',$denyed_groups)))
 						{
 							$result = false;
@@ -82,15 +85,17 @@
 
 			switch($ac_data['type'])
 			{
-				case CONDITION_TYPE_GROUP:
+				case CONDITION_TYPE_HOST_GROUP:
 					if(in_array($ac_data['value'],explode(',',$denyed_groups)))
 					{
+						error(S_INCORRECT_GROUP);
 						$result = false;
 					}
 					break;
 				case CONDITION_TYPE_HOST:
 					if(in_array($ac_data['value'],explode(',',$denyed_hosts)))
 					{
+						error(S_INCORRECT_HOST);
 						$result = false;
 					}
 					break;
@@ -100,6 +105,7 @@
 						" where f.itemid=i.itemid and t.triggerid=f.triggerid".
 						" and i.hostid not in (".$denyed_hosts.") and t.triggerid=".$ac_data['value'])))
 					{
+						error(S_INCORRECT_TRIGGER);
 						$result = false;
 					}
 					break;
@@ -176,6 +182,9 @@
 		{
 			if(!check_permission_for_action_conditions($conditions))
 				return false;
+
+			foreach($conditions as $condition)
+				if( !validate_condition($condition['type'], $condition['value']) ) return false;
 		}
 
 		if(!is_array($operations) || count($operations) == 0)
@@ -185,8 +194,7 @@
 		}
 
 		foreach($operations as $operation)
-			if($operation['operationtype'] == OPERATION_TYPE_COMMAND && !check_commands($operation['longdata']))
-				return false;
+			if( !validate_operation($operation) )	return false;
 
 		$actionid=get_dbid("actions","actionid");
 
@@ -231,6 +239,9 @@
 		{
 			if(!check_permission_for_action_conditions($conditions))
 				return false;
+
+			foreach($conditions as $condition)
+				if( !validate_condition($condition['type'],$condition['value']) ) return false;
 		}
 
 		if(!is_array($operations) || count($operations) == 0)
@@ -240,8 +251,7 @@
 		}
 
 		foreach($operations as $operation)
-			if($operation['operationtype'] == OPERATION_TYPE_COMMAND && !check_commands($operation['longdata']))
-				return false;
+			if( !validate_operation($operation) )	return false;
 
 		$result = DBexecute('update actions set name='.zbx_dbstr($name).',eventsource='.$eventsource.','.
 			'evaltype='.$evaltype.',status='.$status.' where actionid='.$actionid);
@@ -284,101 +294,100 @@
 		return $result;
 	}
 
+	function	condition_operator2str($operator)
+	{
+		$str_op[CONDITION_OPERATOR_EQUAL] 	= '=';
+		$str_op[CONDITION_OPERATOR_NOT_EQUAL]	= '<>';
+		$str_op[CONDITION_OPERATOR_LIKE]	= 'like';
+		$str_op[CONDITION_OPERATOR_NOT_LIKE]	= 'not like';
+		$str_op[CONDITION_OPERATOR_IN]		= 'in';
+		$str_op[CONDITION_OPERATOR_MORE_EQUAL]	= '>=';
+		$str_op[CONDITION_OPERATOR_LESS_EQUAL]	= '<=';
+
+		if(isset($str_op[$operator]))
+			return $str_op[$operator];
+
+		return S_UNKNOWN;
+	}
+
+	function	condition_type2str($conditiontype)
+	{
+		$str_type[CONDITION_TYPE_HOST_GROUP]		= S_HOST_GROUP;
+		$str_type[CONDITION_TYPE_TRIGGER]		= S_TRIGGER;
+		$str_type[CONDITION_TYPE_HOST]			= S_HOST;
+		$str_type[CONDITION_TYPE_TRIGGER_NAME]		= S_TRIGGER_DESCRIPTION;
+		$str_type[CONDITION_TYPE_TRIGGER_VALUE]		= S_TRIGGER_VALUE;
+		$str_type[CONDITION_TYPE_TRIGGER_SEVERITY]	= S_TRIGGER_SEVERITY;
+		$str_type[CONDITION_TYPE_TIME_PERIOD]		= S_TIME_PERIOD;
+		$str_type[CONDITION_TYPE_DHOST_IP]		= S_HOST_IP;
+		$str_type[CONDITION_TYPE_DSERVICE_TYPE]		= S_SERVICE_TYPE;
+		$str_type[CONDITION_TYPE_DSERVICE_PORT]		= S_SERVICE_PORT;
+		$str_type[CONDITION_TYPE_DSTATUS]		= S_DISCOVERY_STATUS;
+
+		if(isset($str_type[$conditiontype]))
+			return $str_type[$conditiontype];
+
+		return S_UNKNOWN;
+	}
+		
+	function	condition_value2str($conditiontype, $value)
+	{
+		switch($conditiontype)
+		{
+			case CONDITION_TYPE_HOST_GROUP:
+				$str_val = get_hostgroup_by_groupid($value);
+				$str_val = $str_val['name'];
+				break;
+			case CONDITION_TYPE_TRIGGER:
+				$str_val = expand_trigger_description($value);
+				break;
+			case CONDITION_TYPE_HOST:
+				$str_val = get_host_by_hostid($value);
+				$str_val = $str_val['host'];
+				break;
+			case CONDITION_TYPE_TRIGGER_NAME:
+				$str_val = $value;
+				break;
+			case CONDITION_TYPE_TRIGGER_VALUE:
+				$str_val = trigger_value2str($value);
+				break;
+			case CONDITION_TYPE_TRIGGER_SEVERITY:
+				$str_val = get_severity_description($value);
+				break;
+			case CONDITION_TYPE_TIME_PERIOD:
+				$str_val = $value;
+				break;
+			case CONDITION_TYPE_DHOST_IP:
+				$str_val = $value;
+				break;
+			case CONDITION_TYPE_DSERVICE_TYPE:
+				$str_val = discovery_check_type2str($value);
+				break;
+			case CONDITION_TYPE_DSERVICE_PORT:
+				$str_val = $value;
+				break;
+			case CONDITION_TYPE_DSTATUS:
+				$str_val = discovery_object_status2str($value);
+				break;
+			default:
+				return S_UNKNOWN;
+				break;
+		}
+		return '"'.$str_val.'"';
+	}
+
 	function	get_condition_desc($conditiontype, $operator, $value)
 	{
-		if($operator == CONDITION_OPERATOR_EQUAL)
-		{
-			$op="=";
-		}
-		else if($operator == CONDITION_OPERATOR_NOT_EQUAL)
-		{
-			$op="<>";
-		}
-		else if($operator == CONDITION_OPERATOR_LIKE)
-		{
-			$op="like";
-		}
-		else if($operator == CONDITION_OPERATOR_NOT_LIKE)
-		{
-			$op="not like";
-		}
-		else if($operator == CONDITION_OPERATOR_IN)
-		{
-			$op="in";
-		}
-		else if($operator == CONDITION_OPERATOR_MORE_EQUAL)
-		{
-			$op=">=";
-		}
-		else if($operator == CONDITION_OPERATOR_LESS_EQUAL)
-		{
-			$op="<=";
-		}
-
-		$desc=S_UNKNOWN;
-		if($conditiontype==CONDITION_TYPE_GROUP)
-		{
-			$group=get_hostgroup_by_groupid($value);
-			if($group) $desc=S_HOST_GROUP." $op "."\"".$group["name"]."\"";
-		}
-		if($conditiontype==CONDITION_TYPE_TRIGGER)
-		{
-			$desc=S_TRIGGER." $op "."\"".expand_trigger_description($value)."\"";
-		}
-		else if($conditiontype==CONDITION_TYPE_HOST)
-		{
-			$host=get_host_by_hostid($value);
-			if($host) $desc=S_HOST." $op "."\"".$host["host"]."\"";
-		}
-		else if($conditiontype==CONDITION_TYPE_TRIGGER_NAME)
-		{
-			$desc=S_TRIGGER_DESCRIPTION." $op "."\"".$value."\"";
-		}
-		else if($conditiontype==CONDITION_TYPE_TRIGGER_VALUE)
-		{
-			if($value==0)
-				$desc=S_TRIGGER_VALUE." $op "."\"OFF\"";
-			if($value==1)
-				$desc=S_TRIGGER_VALUE." $op "."\"ON\"";
-		}
-		else if($conditiontype==CONDITION_TYPE_TRIGGER_SEVERITY)
-		{
-			$desc=S_TRIGGER_SEVERITY." $op "."\"".get_severity_description($value)."\"";
-		}
-		else if($conditiontype==CONDITION_TYPE_TIME_PERIOD)
-		{
-			$desc=S_TIME." $op "."\"".$value."\"";
-		}
-		else
-		{
-		}
-		return $desc;
+		return condition_type2str($conditiontype).' '.
+			condition_operator2str($operator).' '.
+			condition_value2str($conditiontype, $value);
 	}
 
 	define('LONG_DESCRITION', 0);
 	define('SHORT_DESCRITION', 1);
 	function get_operation_desc($type=SHORT_DESCRITION, $data)
 	{
-		global $cashed_data_for_oper_desc;
-
-		$cash_id = sprintf("%s%02d%02d", $data['objectid'], $data['operationtype'], $data['object']);
-
-		if(!isset($cashed_data_for_oper_desc[$cash_id]))
-		{
-			unset($cashed_data_for_oper_desc);
-
-			switch($data['object'])
-			{
-				case OPERATION_OBJECT_USER:
-					$cashed_data_for_oper_desc[$cash_id] = get_user_by_userid($data['objectid']);
-					$cashed_data_for_oper_desc[$cash_id] = S_USER.' "'.$cashed_data_for_oper_desc[$cash_id]['name'].'"';
-					break;
-				case OPERATION_OBJECT_GROUP:
-					$cashed_data_for_oper_desc[$cash_id] = get_group_by_usrgrpid($data['objectid']);
-					$cashed_data_for_oper_desc[$cash_id] = S_GROUP.' "'.$cashed_data_for_oper_desc[$cash_id]['name'].'"';
-					break;
-			}
-		}
+		$result = null;
 
 		switch($type)
 		{
@@ -386,16 +395,48 @@
 				switch($data['operationtype'])
 				{
 					case OPERATION_TYPE_MESSAGE:
-						$result = S_SEND_MESSAGE_TO.' '.$cashed_data_for_oper_desc[$cash_id];
+						switch($data['object'])
+						{
+							case OPERATION_OBJECT_USER:
+								$obj_data = get_user_by_userid($data['objectid']);
+								$obj_data = S_USER.' "'.$obj_data['name'].'"';
+								break;
+							case OPERATION_OBJECT_GROUP:
+								$obj_data = get_group_by_usrgrpid($data['objectid']);
+								$obj_data = S_GROUP.' "'.$obj_data['name'].'"';
+								break;
+						}
+						$result = S_SEND_MESSAGE_TO.' '.$obj_data;
 						break;
 					case OPERATION_TYPE_COMMAND:
 						$result = S_RUN_REMOTE_COMMANDS;
+						break;
+					case OPERATION_TYPE_HOST_ADD:
+						$result = S_ADD_HOST;
+						break;
+					case OPERATION_TYPE_HOST_REMOVE:
+						$result = S_REMOVE_HOST;
+						break;
+					case OPERATION_TYPE_GROUP_ADD:
+						$obj_data = get_hostgroup_by_groupid($data['objectid']);
+						$result = S_ADD_TO_GROUP.' "'.$obj_data['name'].'"';
+						break;
+					case OPERATION_TYPE_GROUP_REMOVE:
+						$obj_data = get_hostgroup_by_groupid($data['objectid']);
+						$result = S_DELETE_FROM_GROUP.' "'.$obj_data['name'].'"';
+						break;
+					case OPERATION_TYPE_TEMPLATE_ADD:
+						$obj_data = get_host_by_hostid($data['objectid']);
+						$result = S_LINK_TO_TEMPLATE.' "'.$obj_data['host'].'"';
+						break;
+					case OPERATION_TYPE_TEMPLATE_REMOVE:
+						$obj_data = get_host_by_hostid($data['objectid']);
+						$result = S_UNLINK_FROM_TEMPLATE.' "'.$obj_data['host'].'"';
 						break;
 					default: break;
 				}
 				break;
 			case LONG_DESCRITION:
-			default:
 				switch($data['operationtype'])
 				{
 					case OPERATION_TYPE_MESSAGE:
@@ -408,9 +449,127 @@
 					default: break;
 				}
 				break;
+			default:
+				break;
 		}
 
 		return $result;
+	}
+
+	function	get_conditions_by_eventsource($eventsource)
+	{
+		$conditions[EVENT_SOURCE_TRIGGERS] = array(
+				CONDITION_TYPE_HOST_GROUP,
+				CONDITION_TYPE_HOST,
+				CONDITION_TYPE_TRIGGER,
+				CONDITION_TYPE_TRIGGER_NAME,
+				CONDITION_TYPE_TRIGGER_SEVERITY,
+				CONDITION_TYPE_TRIGGER_VALUE,
+				CONDITION_TYPE_TIME_PERIOD
+			);
+		$conditions[EVENT_SOURCE_DISCOVERY] = array(
+				CONDITION_TYPE_DHOST_IP,
+				CONDITION_TYPE_DSERVICE_TYPE,
+				CONDITION_TYPE_DSERVICE_PORT,
+				CONDITION_TYPE_DSTATUS
+			);
+
+		if(isset($conditions[$eventsource]))
+			return $conditions[$eventsource];
+
+		return $conditions[EVENT_SOURCE_TRIGGERS];
+	}
+
+	function	get_operations_by_eventsource($eventsource)
+	{
+		$operations[EVENT_SOURCE_TRIGGERS] = array(
+				OPERATION_TYPE_MESSAGE,
+				OPERATION_TYPE_COMMAND
+			);
+		$operations[EVENT_SOURCE_DISCOVERY] = array(
+				OPERATION_TYPE_MESSAGE,
+				OPERATION_TYPE_COMMAND,
+				OPERATION_TYPE_HOST_ADD,
+				OPERATION_TYPE_HOST_REMOVE,
+				OPERATION_TYPE_GROUP_ADD,
+				OPERATION_TYPE_GROUP_REMOVE,
+				OPERATION_TYPE_TEMPLATE_ADD,
+				OPERATION_TYPE_TEMPLATE_REMOVE
+			);
+
+		if(isset($operations[$eventsource]))
+			return $operations[$eventsource];
+
+		return $operations[EVENT_SOURCE_TRIGGERS];
+	}
+
+	function	operation_type2str($type)
+	{
+		$str_type[OPERATION_TYPE_MESSAGE]		= S_SEND_MESSAGE;
+		$str_type[OPERATION_TYPE_COMMAND]		= S_REMOTE_COMMAND;
+		$str_type[OPERATION_TYPE_HOST_ADD]		= S_ADD_HOST;
+		$str_type[OPERATION_TYPE_HOST_REMOVE]		= S_REMOVE_HOST;
+		$str_type[OPERATION_TYPE_GROUP_ADD]		= S_ADD_TO_GROUP;
+		$str_type[OPERATION_TYPE_GROUP_REMOVE]		= S_DELETE_FROM_GROUP;
+		$str_type[OPERATION_TYPE_TEMPLATE_ADD]		= S_LINK_TO_TEMPLATE;
+		$str_type[OPERATION_TYPE_TEMPLATE_REMOVE]	= S_UNLINK_FROM_TEMPLATE;
+
+		if(isset($str_type[$type]))
+			return $str_type[$type];
+
+		return S_UNKNOWN;
+	}
+
+	function	get_operators_by_conditiontype($conditiontype)
+	{
+		$operators[CONDITION_TYPE_HOST_GROUP] = array(
+				CONDITION_OPERATOR_EQUAL,
+				CONDITION_OPERATOR_NOT_EQUAL
+			);
+		$operators[CONDITION_TYPE_HOST] = array(
+				CONDITION_OPERATOR_EQUAL,
+				CONDITION_OPERATOR_NOT_EQUAL
+			);
+		$operators[CONDITION_TYPE_TRIGGER] = array(
+				CONDITION_OPERATOR_EQUAL,
+				CONDITION_OPERATOR_NOT_EQUAL
+			);
+		$operators[CONDITION_TYPE_TRIGGER_NAME] = array(
+				CONDITION_OPERATOR_LIKE,
+				CONDITION_OPERATOR_NOT_LIKE	
+			);
+		$operators[CONDITION_TYPE_TRIGGER_SEVERITY] = array(
+				CONDITION_OPERATOR_EQUAL,
+				CONDITION_OPERATOR_NOT_EQUAL,
+				CONDITION_OPERATOR_MORE_EQUAL,
+				CONDITION_OPERATOR_LESS_EQUAL
+			);
+		$operators[CONDITION_TYPE_TRIGGER_VALUE] = array(
+				CONDITION_OPERATOR_EQUAL
+			);
+		$operators[CONDITION_TYPE_TIME_PERIOD] = array(
+				CONDITION_OPERATOR_IN
+			);
+		$operators[CONDITION_TYPE_DHOST_IP] = array(
+				CONDITION_OPERATOR_EQUAL,
+				CONDITION_OPERATOR_NOT_EQUAL
+			);
+		$operators[CONDITION_TYPE_DSERVICE_TYPE] = array(
+				CONDITION_OPERATOR_EQUAL,
+				CONDITION_OPERATOR_NOT_EQUAL
+			);
+		$operators[CONDITION_TYPE_DSERVICE_PORT] = array(
+				CONDITION_OPERATOR_EQUAL,
+				CONDITION_OPERATOR_NOT_EQUAL
+			);
+		$operators[CONDITION_TYPE_DSTATUS] = array(
+				CONDITION_OPERATOR_EQUAL,
+			);
+
+		if(isset($operators[$conditiontype]))
+			return $operators[$conditiontype];
+
+		return array();
 	}
 
 	function	update_action_status($actionid, $status)
@@ -418,7 +577,145 @@
 		return DBexecute("update actions set status=$status where actionid=$actionid");
 	}
 
-	function check_commands($commands)
+	function validate_condition($conditiontype, $value)
+	{
+		global $USER_DETAILS, $ZBX_CURNODEID;
+
+		switch($conditiontype)
+		{
+			case CONDITION_TYPE_HOST_GROUP:
+				if(!in_array($value,
+					get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,null,
+						PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+				{
+					error(S_INCORRECT_GROUP);
+					return false;
+				}
+				break;
+			case CONDITION_TYPE_TRIGGER:
+				if( !DBfetch(DBselect('select triggerid from triggers where triggerid='.$value)) || 
+					!check_right_on_trigger_by_triggerid(PERM_READ_ONLY, $value) )
+				{
+					error(S_INCORRECT_TRIGGER);
+					return false;
+				}
+				break;
+			case CONDITION_TYPE_HOST:
+				if(!in_array($value,
+					get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,
+						PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+				{
+					error(S_INCORRECT_HOST);
+					return false;
+				}
+				break;
+			case CONDITION_TYPE_TIME_PERIOD:
+				if( !validate_period($value) )
+				{
+					error(S_INCORRECT_PERIOD.' ['.$value.']');
+					return false;
+				}
+				break;
+			case CONDITION_TYPE_DHOST_IP:
+				if( !validate_ip_list($value) )
+				{
+					error(S_INCORRECT_IP.' ['.$value.']');
+					return false;
+				}
+				break;
+			case CONDITION_TYPE_DSERVICE_TYPE:
+				if( S_UNKNOWN == discovery_check_type2str($value) )
+				{
+					error(S_INCORRECT_DISCOVERY_CHECK);
+					return false;
+				}
+				break;
+			case CONDITION_TYPE_DSERVICE_PORT:
+				if( !validate_port_list($value) )
+				{
+					error(S_INCORRECT_PORT.' ['.$value.']');
+					return false;
+				}
+				break;
+			case CONDITION_TYPE_DSTATUS:
+				if( S_UNKNOWN == discovery_status2str($value) )
+				{
+					error(S_INCORRECT_DISCOVERY_STATUS);
+					return false;
+				}
+				break;
+			case CONDITION_TYPE_TRIGGER_NAME:
+			case CONDITION_TYPE_TRIGGER_VALUE:
+			case CONDITION_TYPE_TRIGGER_SEVERITY:
+				break;
+			default:
+				error(S_INCORRECT_CONDITION_TYPE);
+				return false;
+				break;
+		}
+		return true;
+	}
+
+	function	validate_operation($operation)
+	{
+		global $USER_DETAILS, $ZBX_CURNODEID;
+
+		switch($operation['operationtype'])
+		{
+			case OPERATION_TYPE_MESSAGE:
+				switch($operation['object'])
+				{
+					case OPERATION_OBJECT_USER:
+						if( !get_user_by_userid($operation['objectid']) )
+						{
+							error(S_INCORRECT_USER);
+							return false;
+						}
+						break;
+					case OPERATION_OBJECT_GROUP:
+						if( !get_group_by_usrgrpid($operation['objectid']) )
+						{
+							error(S_INCORRECT_GROUP);
+							return false;
+						}
+						break;
+					default:
+						error(S_INCORRECT_OBJECT_TYPE);
+						return false;
+				}
+				break;
+			case OPERATION_TYPE_COMMAND:
+				return validate_commands($operation['longdata']);
+			case OPERATION_TYPE_HOST_ADD:
+			case OPERATION_TYPE_HOST_REMOVE:
+				break;
+			case OPERATION_TYPE_GROUP_ADD:
+			case OPERATION_TYPE_GROUP_REMOVE:
+				if(!in_array($operation['objectid'],
+					get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,null,
+						PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+				{
+					error(S_INCORRECT_GROUP);
+					return false;
+				}
+				break;
+			case OPERATION_TYPE_TEMPLATE_ADD:
+			case OPERATION_TYPE_TEMPLATE_REMOVE:
+				if(!in_array($operation['objectid'],
+					get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,
+						PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+				{
+					error(S_INCORRECT_HOST);
+					return false;
+				}
+			default:
+				error(S_INCORRECT_OPERATION_TYPE);
+				return false;
+		}
+		return true;
+	}
+
+	function validate_commands($commands)
 	{
 		$cmd_list = split("\n",$commands);
 		foreach($cmd_list as $cmd)
