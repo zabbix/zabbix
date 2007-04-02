@@ -33,6 +33,11 @@
 	'S_COPY_SELECTED_TO'=>			'Copy selected to ...',
 	
 //	dicoveryconf.php
+	'S_HOST_IP'=>				'Host ip',
+	'S_SERVICE_TYPE'=>			'Service type',
+	'S_SERVICE_PORT'=>			'Service port',
+	'S_DISCOVERY_STATUS'=>			'Discovery status',
+
 	'S_DISCOVERY_RULE'=>			'Discovery rule',
 	'S_DISCOVERY'=>				'Discovery',
 	'S_DISCOVERY_BIG'=>			'DISCOVERY',
@@ -221,6 +226,22 @@
 	'S_CANNOT_DELETE_ACTIONS'=>		'Cannot delete actions',
 	'S_NO_OPERATIONS_DEFINED'=>		'No operations defined',
 	'S_NEW'=>				'New',
+	'S_ADD_HOST'=>				'Add host',
+	'S_REMOVE_HOST'=>			'Remove host',
+	'S_LINK_TO_TEMPLATE'=>			'Link to template',
+	'S_UNLINK_FROM_TEMPLATE'=>		'Unlink from template',
+
+	'S_INCORRECT_TRIGGER'=>			'Incorrect trigger',
+	'S_INCORRECT_HOST'=>			'Incorrect host',
+	'S_INCORRECT_PERIOD'=>			'Incorrect period',
+	'S_INCORRECT_IP'=>			'Incorrect ip',
+	'S_INCORRECT_DISCOVERY_CHECK'=>		'Incorrect discovery check',
+	'S_INCORRECT_PORT'=>			'Incorrect port',
+	'S_INCORRECT_DISCOVERY_STATUS'=>	'Incorrect discovery status',
+	'S_INCORRECT_CONDITION_TYPE'=>		'Incorrect condition type',
+
+	'S_INCORRECT_OPERATION_TYPE'=>		'Incorrect operation type',
+	'S_INCORRECT_USER'=>			'Incorrect user',
 
 //	actions.php
 	'S_ACTIONS'=>				'Actions',

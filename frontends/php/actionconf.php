@@ -150,12 +150,14 @@ include_once "include/page_header.php";
 		if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
 			access_deny();
 
+		$action_data = DBfetch(DBselect('select name from actions where actionid='.$_REQUEST['actionid']));
+
 		$result = delete_action($_REQUEST['actionid']);
 		show_messages($result,S_ACTION_DELETED,S_CANNOT_DELETE_ACTION);
 		if($result)
 		{
 			add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_ACTION,
-				S_NAME.': '.$_REQUEST['name']);
+				'Id ['.$_REQUEST['actionid'].'] '.S_NAME.' ['.$action_data['name'].']');
 			unset($_REQUEST['form']);
 			unset($_REQUEST['actionid']);
 		}
@@ -164,11 +166,14 @@ include_once "include/page_header.php";
 	{
 		$new_condition = $_REQUEST['new_condition'];
 
-		$_REQUEST['conditions'] = get_request('conditions',array());
-		if(!in_array($new_condition,$_REQUEST['conditions']))
-			array_push($_REQUEST['conditions'],$new_condition);
+		if( validate_condition($new_condition['type'],$new_condition['value']) )
+		{
+			$_REQUEST['conditions'] = get_request('conditions',array());
+			if(!in_array($new_condition,$_REQUEST['conditions']))
+				array_push($_REQUEST['conditions'],$new_condition);
 
-		unset($_REQUEST['new_condition']);
+			unset($_REQUEST['new_condition']);
+		}
 	}
 	elseif(inarr_isset(array('del_condition','g_conditionid')))
 	{
@@ -180,23 +185,27 @@ include_once "include/page_header.php";
 	elseif(inarr_isset(array('add_operation','new_operation')))
 	{
 		$new_operation = $_REQUEST['new_operation'];
-		zbx_rksort($new_operation);
 
-		$_REQUEST['operations'] = get_request('operations',array());
-
-		if(!isset($new_operation['id']))
+		if( validate_operation($new_operation) )
 		{
-			if(!in_array($new_operation,$_REQUEST['operations']))
-				array_push($_REQUEST['operations'],$new_operation);
-		}
-		else
-		{
-			$id = $new_operation['id'];
-			unset($new_operation['id']);
-			$_REQUEST['operations'][$id] = $new_operation;
-		}
+			zbx_rksort($new_operation);
 
-		unset($_REQUEST['new_operation']);
+			$_REQUEST['operations'] = get_request('operations',array());
+
+			if(!isset($new_operation['id']))
+			{
+				if(!in_array($new_operation,$_REQUEST['operations']))
+					array_push($_REQUEST['operations'],$new_operation);
+			}
+			else
+			{
+				$id = $new_operation['id'];
+				unset($new_operation['id']);
+				$_REQUEST['operations'][$id] = $new_operation;
+			}
+
+			unset($_REQUEST['new_operation']);
+		}
 	}
 	elseif(inarr_isset(array('del_operation','g_operationid')))
 	{

@@ -349,13 +349,7 @@ include_once "include/page_header.php";
 		else
 			$blink = array(1=>"", 		2=>"");
 		
-		if($row["value"]==0)
-			$value = array( 'text' => $blink[1].S_FALSE_BIG.$blink[2],	'style'=> "off" );
-		else if($row["value"]==2)
-			$value = array( 'text' => $blink[1].S_UNKNOWN_BIG.$blink[2],	'style'=> "unknown" );
-		else
-			$value = array( 'text' => S_TRUE_BIG,				'style'=> "on" );
-
+		$value = new CSpan($blink[1].trigger_value2str($row["value"].$blink[2]), get_trigger_value_style($row["value"]));
 
 		if($noactions=='true')
 		{
@@ -400,7 +394,7 @@ include_once "include/page_header.php";
 		$table->AddRow(array(
 				$_REQUEST['hostid'] > 0 ? null : $row['host'],
 				$description,
-				new CSpan($value['text'], $value['style']),
+				$value,
 				new CCol(
 					get_severity_description($row["priority"]),
 					get_severity_style($row["priority"])),

@@ -30,9 +30,6 @@
 #include "discoverer.h"
 #include "../events.h"
 
-#define SERVICE_UP	0
-#define SERVICE_DOWN	1
-
 int	discoverer_num;
 
 /******************************************************************************
@@ -197,7 +194,7 @@ static void register_service(DB_DSERVICE *service,DB_DRULE *rule,DB_DCHECK *chec
 	if(!row || DBis_null(row[0])==SUCCEED)
 	{
 		/* Add host only if service is up */
-		if(check->status == SERVICE_UP)
+		if(check->status == DOBJECT_STATUS_UP)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "New service discovered on port %d", port);
 			dserviceid = DBget_maxid("dservices","dserviceid");
@@ -206,13 +203,13 @@ static void register_service(DB_DSERVICE *service,DB_DRULE *rule,DB_DCHECK *chec
 				dserviceid,
 				check->type,
 				port,
-				SERVICE_UP);
+				DOBJECT_STATUS_UP);
 
 			service->dserviceid	= dserviceid;
 			service->dhostid	= dhostid;
 			service->type		= check->type;
 			service->port		= port;
-			service->status		= SERVICE_UP;
+			service->status		= DOBJECT_STATUS_UP;
 			service->lastup		= 0;
 			service->lastdown	= 0;
 			service->eventsent	= 0;
@@ -266,7 +263,7 @@ static void register_host(DB_DHOST *host,DB_DCHECK *check, zbx_uint64_t druleid,
 	if(!row || DBis_null(row[0])==SUCCEED)
 	{
 		/* Add host only if service is up */
-		if(check->status == SERVICE_UP)
+		if(check->status == DOBJECT_STATUS_UP)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "New host discovered at %s",
 				ip);
@@ -323,7 +320,7 @@ static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 	zabbix_log(LOG_LEVEL_DEBUG, "In update_check(ip:%s, port:%d, status:%s)",
 		ip,
 		port,
-		(check->status==SERVICE_UP?"up":"down"));
+		(check->status==DOBJECT_STATUS_UP?"up":"down"));
 
 	service.dserviceid=0;
 
@@ -344,42 +341,42 @@ static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 	}
 
 	now = time(NULL);
-	if(check->status == SERVICE_UP)
+	if(check->status == DOBJECT_STATUS_UP)
 	{
 		/* Update host status */
-		if((host.status == SERVICE_DOWN)||(host.lastup==0 && host.lastdown==0))
+		if((host.status == DOBJECT_STATUS_DOWN)||(host.lastup==0 && host.lastdown==0))
 		{
-			host.status=SERVICE_UP;
+			host.status=DOBJECT_STATUS_UP;
 			host.lastdown=0;
 			host.lastup=now;
 			host.eventsent=0;
 			update_dhost(&host);
 		}
 		/* Update service status */
-		if((service.status == SERVICE_DOWN)||(service.lastup==0 && service.lastdown==0))
+		if((service.status == DOBJECT_STATUS_DOWN)||(service.lastup==0 && service.lastdown==0))
 		{
-			service.status=SERVICE_UP;
+			service.status=DOBJECT_STATUS_UP;
 			service.lastdown=0;
 			service.lastup=now;
 			service.eventsent=0;
 			update_dservice(&service);
 		}
 	}
-	/* SERVICE_DOWN */
+	/* DOBJECT_STATUS_DOWN */
 	else
 	{
-		if((host.status == SERVICE_UP)||(host.lastup==0 && host.lastdown==0))
+		if((host.status == DOBJECT_STATUS_UP)||(host.lastup==0 && host.lastdown==0))
 		{
-			host.status=SERVICE_DOWN;
+			host.status=DOBJECT_STATUS_DOWN;
 			host.lastup=now;
 			host.lastdown=0;
 			host.eventsent=0;
 			update_dhost(&host);
 		}
 		/* Update service status */
-		if((service.status == SERVICE_UP)||(service.lastup==0 && service.lastdown==0))
+		if((service.status == DOBJECT_STATUS_UP)||(service.lastup==0 && service.lastdown==0))
 		{
-			service.status=SERVICE_DOWN;
+			service.status=DOBJECT_STATUS_DOWN;
 			service.lastup=now;
 			service.lastdown=0;
 			service.eventsent=0;
@@ -390,7 +387,7 @@ static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 	/* Generating host events */
 	if(host.eventsent == 0)
 	{
-		if(host.status == SERVICE_UP && (host.lastup<=now-rule->upevent))
+		if(host.status == DOBJECT_STATUS_UP && (host.lastup<=now-rule->upevent))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Generating host event for %s",
 				host.ip);
@@ -399,7 +396,7 @@ static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 			update_dhost(&host);
 			add_host_event(&host,&service);
 		}
-		if(host.status == SERVICE_DOWN && (host.lastdown<=now-rule->downevent))
+		if(host.status == DOBJECT_STATUS_DOWN && (host.lastdown<=now-rule->downevent))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Generating host event for %s",
 				host.ip);
@@ -413,7 +410,7 @@ static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 	/* Generating service events */
 	if(service.eventsent == 0)
 	{
-		if(service.status == SERVICE_UP && (service.lastup<=now-rule->svcupevent))
+		if(service.status == DOBJECT_STATUS_UP && (service.lastup<=now-rule->svcupevent))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Generating service event for %s",
 				host.ip);
@@ -422,7 +419,7 @@ static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 			update_dservice(&service);
 			add_service_event(&service);
 		}
-		if(service.status == SERVICE_DOWN && (service.lastdown<=now-rule->svcdownevent))
+		if(service.status == DOBJECT_STATUS_DOWN && (service.lastdown<=now-rule->svcdownevent))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Generating service event for %s",
 				host.ip);
