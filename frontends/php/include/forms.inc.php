@@ -181,7 +181,7 @@
 		
 		$form->AddItemToBottomRow(new CButton("save", isset($sid) ? S_SAVE : S_ADD));
 
-		$form->AddItemToBottomRow(new CButtonCancel('close_window();'));
+		$form->AddItemToBottomRow(new CButtonCancel(null,'close_window();'));
 
 		$form->show();
 	}
@@ -2300,6 +2300,8 @@
 		}
 
 		$only_hostid = null;
+		$monitored_hosts = null;
+
 		if(count($items))
 		{
 			$frmGraph->AddVar('items', $items);
@@ -2313,6 +2315,7 @@
 				$item = get_item_by_itemid($gitem['itemid']);
 
 				if($host['status'] == HOST_STATUS_TEMPLATE) $only_hostid = $host['hostid'];
+				else $monitored_hosts = 1;
 
 				if($gitem["type"] == GRAPH_ITEM_AGGREGATED)
 					$color = "-";
@@ -2329,6 +2332,7 @@
 				$description->OnClick(
 						'return PopUp("popup_gitem.php?list_name=items&dstfrm='.$frmGraph->GetName().
 						url_param($only_hostid, false, 'only_hostid').
+						url_param($monitored_hosts, false, 'monitored_hosts').
 						url_param($graphtype, false, 'graphtype').
 						url_param($gitem, false).
 						url_param($gid,false,'gid').
@@ -2351,13 +2355,13 @@
 		{
 			$items_table = $dedlete_button = null;
 		}
-
 		$frmGraph->AddRow(S_ITEMS,
 				array(
 					$items_table,
 					new CButton('add_item',S_ADD,
 						'return PopUp("popup_gitem.php?dstfrm='.$frmGraph->GetName().
 						url_param($only_hostid, false, 'only_hostid').
+						url_param($monitored_hosts, false, 'monitored_hosts').
 						url_param($graphtype, false, 'graphtype').
 						'",550,400,"graph_item_form");'),
 					$dedlete_button
@@ -2399,6 +2403,7 @@
 		$type		= get_request("type",		0);
 		$periods_cnt	= get_request("periods_cnt",	5);
 		$only_hostid	= get_request("only_hostid",	null);
+		$monitored_hosts = get_request('monitored_hosts', null);
 
 		$description = '';
 		if($itemid > 0)
@@ -2420,7 +2425,7 @@
 		{// graph for template must use only one host
 			$host_condition = "&only_hostid=".$only_hostid;
 		}
-		else
+		else if(isset($monitored_hosts))
 		{
 			$host_condition = "&monitored_hosts=1";
 		}
@@ -2493,7 +2498,7 @@
 
 		$frmGItem->AddItemToBottomRow(new CButton("save", isset($gid) ? S_SAVE : S_ADD));
 
-		$frmGItem->AddItemToBottomRow(new CButtonCancel('close_window();'));
+		$frmGItem->AddItemToBottomRow(new CButtonCancel(null,'close_window();'));
 		$frmGItem->Show();
 	}
 

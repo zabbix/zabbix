@@ -1169,6 +1169,7 @@
 							break;
 						case TRIGGER_VALUE_FALSE:
 							$css_class = 'normal';
+							break;
 						default:
 							$css_class = 'unknown_trigger';
 					}

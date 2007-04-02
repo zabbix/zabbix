@@ -47,7 +47,7 @@
 	define('T_ZBX_PERIOD',			3);
 	define('T_ZBX_IP',			4);
 	define('T_ZBX_CLR',			5);
-	define('T_ZBX_PORTS',			5);
+	define('T_ZBX_PORTS',			6);
 
 	define('O_MAND',			0);
 	define('O_OPT',				1);
