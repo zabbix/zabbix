@@ -100,13 +100,13 @@ include_once "include/page_header.php";
 
 	if($_REQUEST["graphid"] > 0)
 	{
-		if(! ($row = DBfetch(DBselect(" select distinct g.name from hosts h, items i, graphs_items gi, graphs g ".
+		if(! ($row = DBfetch(DBselect(" select distinct h.host, g.name from hosts h, items i, graphs_items gi, graphs g ".
 					" where h.status=".HOST_STATUS_MONITORED.
 					" and h.hostid=i.hostid and g.graphid=".$_REQUEST["graphid"].
 					" and i.itemid=gi.itemid and gi.graphid=g.graphid".
 					" and h.hostid not in (".$denyed_hosts.") ".
 					" and ".DBid2nodeid("g.graphid")."=".$ZBX_CURNODEID.
-					" order by h.host"
+					" order by h.host, g.name"
 				))))
 		{
 			update_profile("web.charts.graphid",0);
