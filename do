@@ -19,8 +19,8 @@ cleanwarnings="no"
 docat="yes"
 help="no"
 noparam=0
-def="--enable-agent --enable-server --with-mysql --prefix=`echo $HOME`/local/zabbix --with-ldap --with-net-snmp"
-#def="--enable-agent --enable-server --with-mysql --prefix=`echo $HOME`/local/zabbix --with-ldap --with-net-snmp --with-libcurl --with-jabber"
+#def="--enable-agent --enable-server --with-mysql --prefix=`echo $HOME`/local/zabbix --with-ldap --with-net-snmp"
+def="--enable-agent --enable-server --with-mysql --prefix=`echo $HOME`/local/zabbix --with-ldap --with-net-snmp --with-libcurl --with-jabber"
 
 for cmd
 do
@@ -108,23 +108,28 @@ then
   echo "Pre-making..."
   echo "Pre-making..." >> WARNINGS
 #  aclocal 2>> WARNINGS
+  echo -n " 1"
   aclocal -I m4 2>> WARNINGS
-  if [ "x$?" == "x0" ] 
+  if [ "x$?" = "x0" ] 
   then
+    echo -n "2"
     autoconf 2>> WARNINGS
-    if [ "x$?" == "x0" ] 
+    if [ "x$?" = "x0" ] 
     then
+      echo -n "3"
       autoheader 2>> WARNINGS
-      if [ "x$?" == "x0" ] 
+      if [ "x$?" = "x0" ] 
       then
+        echo -n "4"
         automake -a 2>> WARNINGS
-        if [ "x$?" == "x0" ] 
+        if [ "x$?" = "x0" ] 
         then
           premake_is_ok=1
         fi
       fi
     fi
   fi
+  echo
 fi
 
 if [ "$copy" = "yes" ] 
@@ -149,10 +154,10 @@ then
   export CFLAGS="-Wall"
   #export CFLAGS="-Wall -pedantic"
   ./configure $config_param 2>> WARNINGS 
-  if [ "x$?" == "x0" ]
+  if [ "x$?" = "x0" ]
   then
     ./create/schema/gen.pl c 2>> WARNINGS > ./include/dbsync.h
-    if [ "x$?" == "x0" ]
+    if [ "x$?" = "x0" ]
     then
       configure_is_ok=1
     fi
@@ -169,7 +174,7 @@ then
   echo "Making..."
   echo "Making..." >> WARNINGS
   make 2>>WARNINGS 
-  if [ "x$?" == "x0" ] 
+  if [ "x$?" = "x0" ] 
   then
     make_is_ok=1
   fi
