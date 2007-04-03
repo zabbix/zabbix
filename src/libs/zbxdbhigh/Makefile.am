@@ -9,4 +9,4 @@ libzbxdbhigh_a_SOURCES = \
 	host.c \
 	db.c
 
-libzbxdbhigh_a_CPPFLAGS = -I@top_srcdir@/src/zabbix_server/
+libzbxdbhigh_a_CFLAGS = -I@top_srcdir@/src/zabbix_server/

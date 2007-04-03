@@ -512,8 +512,8 @@ if test "$server" = "yes"; then
 		if test "x$found_sqlora8" = "xyes"; then
 			have_db="Oracle"
 
-			ORACLE_CPPFLAGS = $SQLORA8_CPPFLAGS
-			ORACLE_LDFLAGS = $SQLORA8_LDFLAGS
+			ORACLE_CPPFLAGS="$SQLORA8_CPPFLAGS"
+			ORACLE_LDFLAGS="$SQLORA8_LDFLAGS"
 
 			AC_SUBST(ORACLE_CPPFLAGS)
 			AC_SUBST(ORACLE_LDFLAGS)
@@ -554,6 +554,15 @@ if test "$server" = "yes"; then
 
 			dnl MySQL 3.23 requires -lz sometime
 			AC_CHECK_LIB(z, compress, MYSQL_LDFLAGS="$MYSQL_LDFLAGS -lz")
+
+			dnl Check forql_autocommit in MySQL
+			AC_MSG_CHECKING(for mysql_autocommit in MySQL)
+			AC_TRY_COMPILE(
+			[#include <mysql.h>
+			],[mysql_autocommit(NULL, 0);],
+			AC_DEFINE(HAVE_MYSQL_AUTOCOMMIT,1,[Define to 1 if 'mysql_autocommit' exist .])
+			AC_MSG_RESULT(yes),
+			AC_MSG_RESULT(no))
 		else
 			AC_MSG_ERROR([Not found MySQL library]);
 		fi
@@ -607,8 +616,13 @@ if test "$server" = "yes"; then
 
 	dnl Check for libCurl [default - yes]
 	LIBCURL_CHECK_CONFIG([yes], [7.15.1], [],[])
-	CFLAGS="${CFLAGS} ${LIBCURL_CPPFLAGS}"
-	LDFLAGS="${LDFLAGS} ${LIBCURL_LDFLAGS}"
+	if test "x$want_curl" = "xyes"; then
+		if test "x$found_curl" != "xyes"; then
+			AC_MSG_ERROR([Not found Curl library]);
+		fi
+		CFLAGS="${CFLAGS} ${LIBCURL_CPPFLAGS}"
+		LDFLAGS="${LDFLAGS} ${LIBCURL_LDFLAGS}"
+	fi
 fi
 
 AM_CONDITIONAL(JABBER,  test "x$found_jabber" = "xyes")

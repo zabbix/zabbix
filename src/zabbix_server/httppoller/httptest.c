@@ -29,7 +29,9 @@
 #include "httpmacro.h"
 #include "httptest.h"
 
-S_ZBX_HTTPPAGE	page;
+#ifdef	HAVE_LIBCURL
+
+static S_ZBX_HTTPPAGE	page;
 
 /******************************************************************************
  *                                                                            *
@@ -122,7 +124,6 @@ static size_t HEADERFUNCTION2( void *ptr, size_t size, size_t nmemb, void *strea
 
 static void	process_test_data(DB_HTTPTEST *httptest, S_ZBX_HTTPSTAT *stat)
 {
-#ifdef	HAVE_LIBCURL
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_HTTPTESTITEM	httptestitem;
@@ -164,13 +165,11 @@ static void	process_test_data(DB_HTTPTEST *httptest, S_ZBX_HTTPSTAT *stat)
 	
 	DBfree_result(result);
 	zabbix_log(LOG_LEVEL_DEBUG, "End process_test_data()");
-#endif
 }
 
 
 static void	process_step_data(DB_HTTPTEST *httptest, DB_HTTPSTEP *httpstep, S_ZBX_HTTPSTAT *stat)
 {
-#ifdef	HAVE_LIBCURL
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_HTTPSTEPITEM	httpstepitem;
@@ -248,7 +247,6 @@ static void	process_step_data(DB_HTTPTEST *httptest, DB_HTTPSTEP *httpstep, S_ZB
 	}
  
 	DBfree_result(result);*/
-#endif
 }
 
 /******************************************************************************
@@ -268,7 +266,6 @@ static void	process_step_data(DB_HTTPTEST *httptest, DB_HTTPSTEP *httpstep, S_ZB
  ******************************************************************************/
 static int	process_httptest(DB_HTTPTEST *httptest)
 {
-#ifdef HAVE_LIBCURL
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_HTTPSTEP	httpstep;
@@ -455,7 +452,6 @@ zabbix_log(LOG_LEVEL_DEBUG, "[%s]", page.data);
 		httptest->time);
 
 	return ret;
-#endif /* HAVE_LIBCURL */
 }
 
 /******************************************************************************
@@ -475,7 +471,6 @@ zabbix_log(LOG_LEVEL_DEBUG, "[%s]", page.data);
  ******************************************************************************/
 void process_httptests(int now)
 {
-#ifdef HAVE_LIBCURL
 	DB_RESULT	result;
 	DB_ROW		row;
 
@@ -504,5 +499,6 @@ void process_httptests(int now)
 	}
 	DBfree_result(result);
 	zabbix_log(LOG_LEVEL_DEBUG, "End process_httptests()");
-#endif /* HAVE_LIBCURL */
 }
+
+#endif /* HAVE_LIBCURL */
