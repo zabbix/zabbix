@@ -58,7 +58,7 @@
 			parent::CForm(null, 'post');
 		}
 
-		function GetConfig($name, $default)
+		function GetConfig($name, $default = null)
 		{
 			return isset($this->ZBX_CONFIG[$name]) ? $this->ZBX_CONFIG[$name] : $default;
 		}
@@ -338,7 +338,7 @@
 			$table = new CTable();
 			$table->SetAlign('center');
 			
-			$DB_TYPE = $this->GetConfig('DB_TYPE',     'MYSQL');
+			$DB_TYPE = $this->GetConfig('DB_TYPE');
 
 			$cmbType = new CComboBox('type', $DB_TYPE,'submit()');
 			foreach($ZBX_CONFIG['allowed_db'] as $id => $name)
@@ -502,7 +502,9 @@
 			$old_DB_USER	= $DB_USER;
 			$old_DB_PASSWORD= $DB_PASSWORD;
 
-			$DB_TYPE	= $this->GetConfig('DB_TYPE',		'MYSQL');
+			$DB_TYPE	= $this->GetConfig('DB_TYPE');
+			if(is_null($DB_TYPE))	return false;
+
 			$DB_SERVER	= $this->GetConfig('DB_SERVER',		'localhost');
 			$DB_DATABASE	= $this->GetConfig('DB_DATABASE',	'zabbix');
 			$DB_USER	= $this->GetConfig('DB_USER',		'root');
@@ -719,7 +721,7 @@
 			}
 			if($this->GetStep() == 3)
 			{
-				$this->SetConfig('DB_TYPE',	get_request('type',	$this->GetConfig('DB_TYPE',	'MYSQL')));
+				$this->SetConfig('DB_TYPE',	get_request('type',	$this->GetConfig('DB_TYPE')));
 				$this->SetConfig('DB_SERVER',	get_request('server',	$this->GetConfig('DB_SERVER',	'localhost')));
 				$this->SetConfig('DB_DATABASE',	get_request('database',	$this->GetConfig('DB_DATABASE',	'zabbix')));
 				$this->SetConfig('DB_USER',	get_request('user',	$this->GetConfig('DB_USER',	'root')));
