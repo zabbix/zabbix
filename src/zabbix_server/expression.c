@@ -682,9 +682,7 @@ zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
 
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
-				zabbix_log( LOG_LEVEL_ERR, "No PROFILE.DEVECETYPE in substitute_simple_macros. Triggerid [%d]",
-					event->objectid);
-				zabbix_syslog("No PROFILE.DEVECETYPE in substitute_simple_macros. Triggerid [%d]",
+				zabbix_log( LOG_LEVEL_DEBUG, "No PROFILE.DEVECETYPE in substitute_simple_macros. Triggerid [%d]",
 					event->objectid);
 
 				replace_to = zbx_dsprintf(replace_to, "%s",
@@ -710,9 +708,7 @@ zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
 
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
-				zabbix_log( LOG_LEVEL_ERR, "No PROFILE.NAME in substitute_simple_macros. Triggerid [%d]",
-					event->objectid);
-				zabbix_syslog("No PROFILE.NAME in substitute_simple_macros. Triggerid [%d]",
+				zabbix_log( LOG_LEVEL_DEBUG, "No PROFILE.NAME in substitute_simple_macros. Triggerid [%d]",
 					event->objectid);
 
 				replace_to = zbx_dsprintf(replace_to, "%s",
@@ -738,9 +734,7 @@ zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
 
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
-				zabbix_log( LOG_LEVEL_ERR, "No PROFILE.OS in substitute_simple_macros. Triggerid [%d]",
-					event->objectid);
-				zabbix_syslog("No PROFILE.OS in substitute_simple_macros. Triggerid [%d]",
+				zabbix_log( LOG_LEVEL_DEBUG, "No PROFILE.OS in substitute_simple_macros. Triggerid [%d]",
 					event->objectid);
 
 				replace_to = zbx_dsprintf(replace_to, "%s",
@@ -766,9 +760,7 @@ zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
 
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
-				zabbix_log( LOG_LEVEL_ERR, "No PROFILE.SERIALNO in substitute_simple_macros. Triggerid [%d]",
-					event->objectid);
-				zabbix_syslog("No PROFILE.SERIALNO in substitute_simple_macros. Triggerid [%d]",
+				zabbix_log( LOG_LEVEL_DEBUG, "No PROFILE.SERIALNO in substitute_simple_macros. Triggerid [%d]",
 					event->objectid);
 
 				replace_to = zbx_dsprintf(replace_to, "%s",
@@ -794,9 +786,7 @@ zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
 
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
-				zabbix_log( LOG_LEVEL_ERR, "No PROFILE.TAG in substitute_simple_macros. Triggerid [%d]",
-					event->objectid);
-				zabbix_syslog("No PROFILE.TAG in substitute_simple_macros. Triggerid [%d]",
+				zabbix_log( LOG_LEVEL_DEBUG, "No PROFILE.TAG in substitute_simple_macros. Triggerid [%d]",
 					event->objectid);
 
 				replace_to = zbx_dsprintf(replace_to, "%s",
@@ -822,9 +812,7 @@ zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
 
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
-				zabbix_log( LOG_LEVEL_ERR, "No PROFILE.MACADDRESS in substitute_simple_macros. Triggerid [%d]",
-					event->objectid);
-				zabbix_syslog("No PROFILE.MACADDRESS in substitute_simple_macros. Triggerid [%d]",
+				zabbix_log( LOG_LEVEL_DEBUG, "No PROFILE.MACADDRESS in substitute_simple_macros. Triggerid [%d]",
 					event->objectid);
 
 				replace_to = zbx_dsprintf(replace_to, "%s",
@@ -850,9 +838,7 @@ zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
 
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
-				zabbix_log( LOG_LEVEL_ERR, "No PROFILE.HARDWARE in substitute_simple_macros. Triggerid [%d]", 
-					event->objectid);
-				zabbix_syslog("No PROFILE.HARDWARE in substitute_simple_macros. Triggerid [%d]",
+				zabbix_log( LOG_LEVEL_DEBUG, "No PROFILE.HARDWARE in substitute_simple_macros. Triggerid [%d]", 
 					event->objectid);
 
 				replace_to = zbx_dsprintf(replace_to, "%s",
@@ -878,9 +864,7 @@ zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
 
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
-				zabbix_log( LOG_LEVEL_ERR, "No PROFILE.SOFTWARE in substitute_simple_macros. Triggerid [%d]",
-					event->objectid);
-				zabbix_syslog("No PROFILE.SOFTWARE in substitute_simple_macros. Triggerid [%d]",
+				zabbix_log( LOG_LEVEL_DEBUG, "No PROFILE.SOFTWARE in substitute_simple_macros. Triggerid [%d]",
 					event->objectid);
 
 				replace_to = zbx_dsprintf(replace_to, "%s",
@@ -906,9 +890,7 @@ zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
 
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
-				zabbix_log( LOG_LEVEL_ERR, "No PROFILE.CONTACT in substitute_simple_macros. Triggerid [%d]",
-					event->objectid);
-				zabbix_syslog("No PROFILE.CONTACT in substitute_simple_macros. Triggerid [%d]",
+				zabbix_log( LOG_LEVEL_DEBUG, "No PROFILE.CONTACT in substitute_simple_macros. Triggerid [%d]",
 					event->objectid);
 
 				replace_to = zbx_dsprintf(replace_to, "%s",
@@ -934,9 +916,7 @@ zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
 
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
-				zabbix_log( LOG_LEVEL_ERR, "No PROFILE.LOCATION in substitute_simple_macros. Triggerid [%d]",
-					event->objectid);
-				zabbix_syslog("No PROFILE.LOCATION in substitute_simple_macros. Triggerid [%d]",
+				zabbix_log( LOG_LEVEL_DEBUG, "No PROFILE.LOCATION in substitute_simple_macros. Triggerid [%d]",
 					event->objectid);
 
 				replace_to = zbx_dsprintf(replace_to, "%s",
@@ -962,9 +942,7 @@ zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
 
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
-				zabbix_log( LOG_LEVEL_ERR, "No PROFILE.NOTES in substitute_simple_macros. Triggerid [%d]",
-					event->objectid);
-				zabbix_syslog("No PROFILE.NOTES in substitute_simple_macros. Triggerid [%d]",
+				zabbix_log( LOG_LEVEL_DEBUG, "No PROFILE.NOTES in substitute_simple_macros. Triggerid [%d]",
 					event->objectid);
 
 				replace_to = zbx_dsprintf(replace_to, "%s",
@@ -990,9 +968,7 @@ zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
 
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
-				zabbix_log( LOG_LEVEL_ERR, "No hostname in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
-					event->objectid);
-				zabbix_syslog("No hostname in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
+				zabbix_log( LOG_LEVEL_DEBUG, "No hostname in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
 					event->objectid);
 
 				replace_to = zbx_dsprintf(replace_to, "%s",
@@ -1019,9 +995,7 @@ zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
 
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
-				zabbix_log( LOG_LEVEL_ERR, "No ITEM.NAME in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
-					event->objectid);
-				zabbix_syslog("No ITEM.NAME in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
+				zabbix_log( LOG_LEVEL_DEBUG, "No ITEM.NAME in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
 					event->objectid);
 
 				replace_to = zbx_dsprintf(replace_to, "%s",
@@ -1050,9 +1024,7 @@ zabbix_log( LOG_LEVEL_WARNING, "ALEX");
 
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
-				zabbix_log( LOG_LEVEL_ERR, "No TRIGGER.KEY in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
-					event->objectid);
-				zabbix_syslog("No TRIGGER.KEY in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
+				zabbix_log( LOG_LEVEL_DEBUG, "No TRIGGER.KEY in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
 					event->objectid);
 
 				replace_to = zbx_dsprintf(replace_to, "%s",
@@ -1079,9 +1051,7 @@ zabbix_log( LOG_LEVEL_WARNING, "ALEX");
 
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
-				zabbix_log( LOG_LEVEL_ERR, "No hostname in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
-					event->objectid);
-				zabbix_syslog("No hostname in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
+				zabbix_log( LOG_LEVEL_DEBUG, "No hostname in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
 					event->objectid);
 
 				replace_to = zbx_dsprintf(replace_to, "%s",

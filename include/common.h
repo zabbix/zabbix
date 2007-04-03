@@ -147,7 +147,7 @@ typedef enum
 {
 	DOBJECT_STATUS_UP	= 0,
 	DOBJECT_STATUS_DOWN
-} zbx_dstatus_t
+} zbx_dstatus_t;
 
 /* Item value types */
 typedef enum
