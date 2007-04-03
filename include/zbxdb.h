@@ -32,18 +32,22 @@
 #	include "errmsg.h"
 #	include "mysqld_error.h"
 #	define	DB_HANDLE	MYSQL
+extern MYSQL	*conn = NULL;
 #endif /* HAVE_MYSQL */
 
 #ifdef HAVE_ORACLE
 #	include "sqlora.h"
+extern sqlo_db_handle_t oracle;
 #endif /* HAVE_ORACLE */
 
 #ifdef HAVE_POSTGRESQL
 #	include <libpq-fe.h>
+extern PGconn	*conn = NULL;
 #endif /* HAVE_POSTGRESQL */
 
 #ifdef HAVE_SQLITE3
 #	include <sqlite3.h>
+extern sqlite3		*conn = NULL;
 #endif /* HAVE_SQLITE3 */
 
 #ifdef HAVE_SQLITE3

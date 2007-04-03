@@ -98,12 +98,14 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	if(ZBX_DB_OK == ret)
 	{
+#ifdef HAVE_MYSQL_AUTOCOMMIT
 		if(mysql_autocommit(conn, 1) != 0)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "Failed to set autocommit to 1: Error: %s [%d]",
 				mysql_error(conn), mysql_errno(conn));
 			ret = ZBX_DB_FAIL;
 		}
+#endif /* HAVE_MYSQL_AUTOCOMMIT */
 	}
 
 	if(ZBX_DB_FAIL  == ret)
@@ -155,7 +157,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	}
 	sqlo_autocommit_on(oracle);
 
-	return ret
+	return ret;
 #endif
 #ifdef	HAVE_SQLITE3
 	ret = sqlite3_open(dbname, &conn);
@@ -539,7 +541,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 
 	if(SQLO_SUCCESS == res)
 	{
-		return sqlo_values(result, NULL, 1);
+		return (DB_ROW)sqlo_values(result, NULL, 1);
 	}
 	else if(SQLO_NO_DATA == res)
 	{
@@ -743,7 +745,7 @@ zbx_uint64_t	zbx_db_insert_id(int exec_result, const char *table, const char *fi
 
 	zbx_snprintf(sql, sizeof(sql), "select %s_%s.currval from dual", table, field);
 
-	resulr=DBselect(sql);
+	result=DBselect(sql);
 	
 	row = DBfetch(result);
 

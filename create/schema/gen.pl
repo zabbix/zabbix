@@ -16,6 +16,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
+use utf8;
+
 use Switch;
 use File::Basename;
 
@@ -264,6 +266,8 @@ sub main
 		chop($line);
 	
 		($type,$line)=split(/\|/, $line,2);
+
+		utf8::decode($type);
 	
 		switch ($type) {
 			case "TABLE"	{ process_table($line); }

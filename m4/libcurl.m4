@@ -61,10 +61,13 @@ AC_DEFUN([LIBCURL_CHECK_CONFIG],
 AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL library @<:@default=yes@:>@, look for the curl library in DIR])],
         [
         if test "$withval" = "no"; then
+            want_curl="no"
             _libcurl_with="no"
         elif test "$withval" = "yes"; then
+            want_curl="yes"
             _libcurl_with="yes"
         else
+            want_curl="yes"
             _libcurl_with=$withval
         fi
         ],
@@ -203,6 +206,7 @@ x=CURLOPT_VERBOSE;
              [Define to 1 if you have a functional curl library.])
            AC_SUBST(LIBCURL_CPPFLAGS)
            AC_SUBST(LIBCURL_LDFLAGS)
+           found_curl="yes"
 
            for _libcurl_feature in $_libcurl_features ; do
 	      AC_DEFINE_UNQUOTED(AS_TR_CPP(libcurl_feature_$_libcurl_feature),[1])
