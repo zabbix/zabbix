@@ -610,9 +610,9 @@ if test "$server" = "yes"; then
 		if test "x$found_jabber" != "xyes"; then
 			AC_MSG_ERROR([Not found Jabber library]);
 		fi
-		CFLAGS="${CFLAGS} ${JABBER_CPPFLAGS}"
-		LDFLAGS="${LDFLAGS} ${JABBER_LDFLAGS}"
 	fi
+	CFLAGS="${CFLAGS} ${JABBER_CPPFLAGS}"
+	LDFLAGS="${LDFLAGS} ${JABBER_LDFLAGS}"
 
 	dnl Check for libCurl [default - yes]
 	LIBCURL_CHECK_CONFIG([yes], [7.15.1], [],[])
@@ -620,9 +620,9 @@ if test "$server" = "yes"; then
 		if test "x$found_curl" != "xyes"; then
 			AC_MSG_ERROR([Not found Curl library]);
 		fi
-		CFLAGS="${CFLAGS} ${LIBCURL_CPPFLAGS}"
-		LDFLAGS="${LDFLAGS} ${LIBCURL_LDFLAGS}"
 	fi
+	CFLAGS="${CFLAGS} ${LIBCURL_CPPFLAGS}"
+	LDFLAGS="${LDFLAGS} ${LIBCURL_LDFLAGS}"
 fi
 
 AM_CONDITIONAL(JABBER,  test "x$found_jabber" = "xyes")
@@ -633,9 +633,9 @@ if test "x$want_netsnmp" = "xyes"; then
 	if test "x$found_netsnmp" != "xyes"; then
 		AC_MSG_ERROR([Invalid NET-SNMP directory - unable to find net-snmp-config.h])
 	fi
-	CFLAGS="${CFLAGS} ${SNMP_CPPFLAGS}"
-	LDFLAGS="${LDFLAGS} ${SNMP_LDFLAGS}"
 fi
+CFLAGS="${CFLAGS} ${SNMP_CPPFLAGS}"
+LDFLAGS="${LDFLAGS} ${SNMP_LDFLAGS}"
 
 dnl Check for UCD-SNMP [by default - skip]
 LIBSNMP_CHECK_CONFIG([no])
@@ -647,9 +647,9 @@ if test "x$want_snmp" = "xyes"; then
 	if test  "x$found_netsnmp" = "xyes"; then
 		AC_MSG_ERROR([You can configure for only one SNMP library.]);
 	fi
-	CFLAGS="${CFLAGS} ${SNMP_CPPFLAGS}"
-	LDFLAGS="${LDFLAGS} ${SNMP_LDFLAGS}"
 fi
+CFLAGS="${CFLAGS} ${SNMP_CPPFLAGS}"
+LDFLAGS="${LDFLAGS} ${SNMP_LDFLAGS}"
 
 dnl Check for libLDAP [by default - skip]
 LIBLDAP_CHECK_CONFIG([no])
@@ -657,9 +657,9 @@ if test "x$want_ldap" = "xyes"; then
 	if test "x$found_ldap" != "xyes"; then
 		AC_MSG_ERROR([Invalid LDAP directory - unable to find ldap.h])
 	fi
-	CFLAGS="${CFLAGS} ${LDAP_CPPFLAGS}"
-	LDFLAGS="${LDFLAGS} ${LDAP_LDFLAGS}"
 fi
+CFLAGS="${CFLAGS} ${LDAP_CPPFLAGS}"
+LDFLAGS="${LDFLAGS} ${LDAP_LDFLAGS}"
 
 RANLIB="ranlib"
 AC_SUBST(RANLIB)
