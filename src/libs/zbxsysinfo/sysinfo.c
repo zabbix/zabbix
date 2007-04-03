@@ -416,7 +416,7 @@ int	replace_param(const char *cmd, const char *param, char *out, int outlen)
 int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 {
 	register char	*p;
-	register int	i;
+	register int	i = 0;
 
 	int	(*function)() = NULL;
 	int	ret = SUCCEED;

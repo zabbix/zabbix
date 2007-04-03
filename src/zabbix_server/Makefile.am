@@ -58,4 +58,4 @@ zabbix_server_LDADD = \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(JABBER_LDADD)
 
-zabbix_server_CPPFLAGS = -DZABBIX_DAEMON
+zabbix_server_CFLAGS = -DZABBIX_DAEMON

@@ -41,4 +41,4 @@ zabbix_agentd_SOURCES = \
 
 zabbix_agentd_LDADD = $(agents_ldadd)
 
-zabbix_agentd_CPPFLAGS = -DZABBIX_DAEMON
+zabbix_agentd_CFLAGS = -DZABBIX_DAEMON

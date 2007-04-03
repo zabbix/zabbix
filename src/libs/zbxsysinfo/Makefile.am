@@ -37,7 +37,7 @@ noinst_LIBRARIES = \
 	libzbxserversysinfo.a
 
 # AGENT version of sysinfo library
-libzbxagentsysinfo_a_CPPFLAGS = \
+libzbxagentsysinfo_a_CFLAGS = \
 	-DWITH_COMMON_METRICS \
 	-DWITH_SIMPLE_METRICS \
 	-DWITH_SPECIFIC_METRICS
@@ -47,7 +47,7 @@ libzbxagentsysinfo_a_SOURCES = \
 	@ARCH@/@ARCH@.c specsysinfo.h
 
 # SERVER version of sysinfo library
-libzbxserversysinfo_a_CPPFLAGS = \
+libzbxserversysinfo_a_CFLAGS = \
 	-DWITH_SIMPLE_METRICS
 
 libzbxserversysinfo_a_SOURCES = \

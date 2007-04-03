@@ -38,11 +38,14 @@ S_ZBX_HTTPSTAT
 	int		test_last_step;
 };
 
-void process_httptests(int now);
+#ifdef	HAVE_LIBCURL
+	void process_httptests(int now);
+#else
+#	define process_httptests(now)
+#endif /* HAVE_LIBCURL */
 
 extern	int	httppoller_num;
 
-extern	int	CONFIG_NODEID;
 extern  int     CONFIG_HTTPPOLLER_FORKS;
 
 #endif

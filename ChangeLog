@@ -1,5 +1,9 @@
 Changes for 1.3.5:
 
+ - fixed support of 'curl' library (Eugene)
+ - added suport of 'automake' v1.6 (Eugene)
+ - fixed oracle support (Eugene)
+ - added support of MySQL v3.23 (Eugene)
  - fixed unnecessary check of MySQL if other database is selected in Wizard (Alexei)
  - fixed remembering of previous charts viewed (Eugene)
  - fixed color validation (Eugene)

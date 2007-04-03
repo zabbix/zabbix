@@ -52,46 +52,46 @@ AC_HELP_STRING([--with-oracle@<:@=ARG@:>@],
   fi
 
   if test "x$_libsqlora8_with" != x"no"; then
-	AC_MSG_CHECKING(for Oracle support)
+	AC_MSG_CHECKING([for Oracle support])
 
 	if test "$_libsqlora8_with" = "yes"; then
 		if test -f /usr/include/sqlora.h; then
-			SQLORA8_INCDIR=/usr/include
+			SQLORA8_INCDIR=/usr
 			SQLORA8_LIBDIR=/usr/lib
 		elif test -f /usr/lib/libsqlora8/include/sqlora.h; then
-			SQLORA8_INCDIR=/usr/lib/libsqlora8/include
+			SQLORA8_INCDIR=/usr/lib/libsqlora8
 			SQLORA8_LIBDIR=/usr/lib
 		elif test -f $SQLORA8_HOME/lib/sqlora8/include/sqlora.h; then
-			SQLORA8_INCDIR=$SQLORA8_HOME/lib/sqlora8/include
+			SQLORA8_INCDIR=$SQLORA8_HOME/lib/sqlora8
 			SQLORA8_LIBDIR=$SQLORA8_HOME/lib
 		elif test -f $SQLORA8_HOME/include/sqlora.h; then
-			SQLORA8_INCDIR=${SQLORA8_HOME}/include
+			SQLORA8_INCDIR=${SQLORA8_HOME}
 			SQLORA8_LIBDIR=${SQLORA8_HOME}/lib
 		else
-			found_libsqlora8="no"
-			AC_MSG_RESULT(no)
+			found_sqlora8="no"
+			AC_MSG_RESULT([no])
 		fi
 	else
 		if test -f $_libsqlora8_with/include/sqlora.h; then
-			SQLORA8_INCDIR=$_libsqlora8_with/include
+			SQLORA8_INCDIR=$_libsqlora8_with
 			SQLORA8_LIBDIR=$_libsqlora8_with/lib
-		elif test -f $withval/lib/libsqlora8/include/sqlora.h; then
-			SQLORA8_INCDIR=$_libsqlora8_with/lib/libsqlora8/include
+		elif test -f $_libsqlora8_with/lib/libsqlora8/include/sqlora.h; then
+			SQLORA8_INCDIR=$_libsqlora8_with/lib/libsqlora8
 			SQLORA8_LIBDIR=$_libsqlora8_with/lib
-		elif test -f $withval/libsqlora8/include/sqlora.h; then
-			SQLORA8_INCDIR=$_libsqlora8_with/libsqlora8/include
+		elif test -f $_libsqlora8_with/libsqlora8/include/sqlora.h; then
+			SQLORA8_INCDIR=$_libsqlora8_with/libsqlora8
 			SQLORA8_LIBDIR=$_libsqlora8_with
 		else
-			found_libsqlora8="no"
-			AC_MSG_RESULT(no)
+			found_sqlora8="no"
+			AC_MSG_RESULT([no])
 		fi
 	fi
 
-	if test "x$found_libsqlora8" != "xno" ; then
-		$found_libsqlora8="yes"
-		AC_MSG_RESULT(yes)
+	if test "x$found_sqlora8" != "xno" ; then
+		found_sqlora8="yes"
+		AC_MSG_RESULT([yes])
 
-		SQLORA8_CPPFLAGS="-I$SQLORA8_INCDIR"
+		SQLORA8_CPPFLAGS="-I$SQLORA8_INCDIR/include -I$SQLORA8_INCDIR/lib/libsqlora8/include"
 		SQLORA8_LDFLAGS="-L$SQLORA8_LIBDIR -lsqlora8"
 
 		AC_DEFINE(HAVE_SQLORA8,1,[Define to 1 if SQLORA8 library should be enabled.])
