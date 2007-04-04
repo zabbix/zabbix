@@ -396,7 +396,7 @@ include_once "include/page_header.php";
                                         $row["triggerid"]);     /* value */
 
 			if($row["templateid"] > 0) $chkBox->SetEnabled(false);
-			$description = array($chkBox,SPACE);
+			$description = array('['.$row["triggerid"].']',$chkBox,SPACE);
 
 			if($row["templateid"])
 			{
@@ -404,37 +404,29 @@ include_once "include/page_header.php";
 				$real_host = DBfetch($real_hosts);
 				if($real_host)
 				{
-					array_push($description,
-						new CLink($real_host["host"],
-							"triggers.php?&hostid=".$real_host["hostid"], 'unknown'),
-						":"
-						);
+					$description[] = new CLink($real_host["host"],
+							"triggers.php?&hostid=".$real_host["hostid"], 'unknown');
 				}
 				else
 				{
-					array_push($description,
-						new CSpan("error","on"),
-						":"
-						);
+					$description[] = new CSpan("error","on");
 				}
+				$description[] = ':';
 			}
-			array_push($description,
-				new CLink(expand_trigger_description($row["triggerid"]),
+
+			$description[] = new CLink(expand_trigger_description($row["triggerid"]),
 				"triggers.php?form=update&triggerid=".$row["triggerid"].
-					"&hostid=".$row["hostid"], 'action')
-				);
+					"&hostid=".$row["hostid"], 'action');
 
 			//add dependences
-			$result1=DBselect("select t.triggerid,t.description from triggers t,trigger_depends d".
-				" where t.triggerid=d.triggerid_up and d.triggerid_down=".$row["triggerid"]);
-			if($row1=DBfetch($result1))
+			$deps = get_trigger_dependences_by_triggerid($row["triggerid"]);
+			if(count($deps) > 0)
 			{
-				array_push($description,BR.BR."<strong>".S_DEPENDS_ON."</strong>".SPACE.BR);
-				do
-				{
-					array_push($description,expand_trigger_description($row1["triggerid"]).BR);
-				} while($row1=DBfetch($result1));
-				array_push($description,BR);
+				$description[] = BR.BR."<strong>".S_DEPENDS_ON."</strong>".SPACE.BR;
+				foreach($deps as $val)
+					$description[] = '['.$val.']'.expand_trigger_description($val).BR;
+
+				$description[] = BR;
 			}
 	
 			if($row["priority"]==0)		$priority=S_NOT_CLASSIFIED;
