@@ -2140,8 +2140,8 @@
 		
 		$frmTrig->AddRow("New dependency",array($txtCondVal, 
 			$btnSelect, BR,
-			new CButton("add_dependence","add")
-			));
+			new CButton("add_dependence",S_ADD)
+			),'new');
 			
 	/* end new dwpendence */
 

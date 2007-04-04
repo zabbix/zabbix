@@ -364,16 +364,30 @@
 
 		$db_deps = DBselect("select * from trigger_depends where triggerid_down=".$triggerid);
 		while($db_dep = DBfetch($db_deps))
-			array_push($result, $db_dep["triggerid_up"]);
+				$result[] = $db_dep['triggerid_up'];
 			
 		return $result;
+	}
+
+	function	replace_template_dependences($deps, $hostid)
+	{
+		foreach($deps as $id => $val)
+		{
+			if($db_new_dep = DBfetch(DBselect('select t.triggerid from triggers t,functions f,items i '.
+				' where t.templateid='.$val.' and f.triggerid=t.triggerid '.
+				' and f.itemid=i.itemid and i.hostid='.$hostid)))
+					$deps[$id] = $db_new_dep['triggerid'];
+		}
+		return $deps;
 	}
 
 	function	copy_trigger_to_host($triggerid, $hostid, $copy_mode = false)
 	{
 		$trigger = get_trigger_by_triggerid($triggerid);
 
-		$deps = get_trigger_dependences_by_triggerid($triggerid);
+		$deps = replace_template_dependences(
+				get_trigger_dependences_by_triggerid($triggerid),
+				$hostid);
 
 		$host_triggers = get_triggers_by_hostid($hostid, "no");
 		while($host_trigger = DBfetch($host_triggers))
@@ -441,11 +455,9 @@
 			" where triggerid=$newtriggerid");
 // copy dependences
 		delete_dependencies_by_triggerid($newtriggerid);
-		$db_deps = DBselect("select * from trigger_depends where".
-			" triggerid_down=".$triggerid);
-		while($db_dep = DBfetch($db_deps))
+		foreach($deps as $dep_id)
 		{
-			add_trigger_dependency($newtriggerid, $db_dep["triggerid_up"]);
+			add_trigger_dependency($newtriggerid, $dep_id);
 		}
 
 		info("Added trigger '".$trigger["description"]."' to host '".$host["host"]."'");
@@ -746,7 +758,7 @@
 		{
 			return $result;
 		}
-		add_additional_dependencies($triggerid,$depid);
+		//add_additional_dependencies($triggerid,$depid);
 		return $result;
 	}
 
@@ -856,7 +868,7 @@
 					NULL,		// status
 					$comments,
 					$url,
-					$deps,
+					replace_template_dependences($deps, $chd_trig_host['hostid']),
 					$triggerid);
 			}
 		}
@@ -969,7 +981,8 @@
 		return DBexecute("update triggers set dep_level=dep_level+1 where triggerid=$triggerid_up");
 	}
 
-	// If 1 depends on 2, and 2 depends on 3, then add dependency 1->3
+	/* INCORRECT LOGIC: If 1 depends on 2, and 2 depends on 3, then add dependency 1->3
+	
 	function	add_additional_dependencies($triggerid_down,$triggerid_up)
 	{
 		$result=DBselect("select triggerid_down from trigger_depends".
@@ -986,6 +999,7 @@
 			add_additional_dependencies($triggerid_down,$row["triggerid_up"]);
 		}
 	}
+	*/
 
 	function	delete_function_by_triggerid($triggerid)
 	{
@@ -1106,6 +1120,30 @@
 		while($trigger = DBfetch($triggers))
 		{
 			copy_trigger_to_host($trigger["triggerid"], $hostid, $copy_mode);
+		}
+
+		update_template_dependences_for_host($hostid);
+	}
+
+	function	update_template_dependences_for_host($hostid)
+	{
+		$db_triggers = get_triggers_by_hostid($hostid);
+		while($trigger_data = DBfetch($db_triggers))
+		{
+			$db_chd_triggers = get_triggers_by_templateid($trigger_data['triggerid']);
+			while($chd_trigger_data = DBfetch($db_chd_triggers))
+				update_trigger($chd_trigger_data['triggerid'],
+					/*$expression*/		NULL,
+					/*$description*/	NULL,
+					/*$priority*/		NULL,
+					/*$status*/		NULL,
+					/*$comments*/		NULL,
+					/*$url*/		NULL,
+					replace_template_dependences(
+						get_trigger_dependences_by_triggerid($trigger_data['triggerid']),
+						$hostid),
+					$trigger_data['triggerid']);
+
 		}
 	}
 

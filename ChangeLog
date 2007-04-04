@@ -1,5 +1,6 @@
 Changes for 1.3.5:
 
+ - fixed trigger dependencies for templated triggers (Eugene)
  - fixed support of 'curl' library (Eugene)
  - added suport of 'automake' v1.6 (Eugene)
  - fixed oracle support (Eugene)
