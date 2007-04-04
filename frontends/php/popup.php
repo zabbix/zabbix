@@ -593,22 +593,14 @@ include_once "include/page_header.php";
 
 			if($row['dep_count'] > 0)
 			{
-				$description = array($description);
+				$description = array(
+					$description,BR.BR.
+					"<strong>".S_DEPENDS_ON."</strong>".BR);
+
+				$deps = get_trigger_dependences_by_triggerid($row["triggerid"]);
 				
-				$result1=DBselect("select h.host,t.triggerid,t.description ".
-					" from triggers t,trigger_depends d,functions f,items i,hosts h ".
-					" where t.triggerid=d.triggerid_up and d.triggerid_down=".$row["triggerid"].
-					" and ".DBid2nodeid("t.triggerid")."=".$nodeid.
-					" and t.triggerid=f.triggerid and f.itemid=i.itemid and i.hostid=h.hostid");
-				if($row1=DBfetch($result1))
-				{
-					array_push($description,BR.BR."<strong>".S_DEPENDS_ON."</strong>".SPACE.BR);
-					do
-					{
-						array_push($description,expand_trigger_description_by_data($row1).BR);
-					} while( $row1=DBfetch($result1));
-					array_push($description,BR);
-				}
+				foreach($deps as $val)
+					$description[] = expand_trigger_description($val).BR;
 			}
 
 			if($row["status"] == TRIGGER_STATUS_DISABLED)
