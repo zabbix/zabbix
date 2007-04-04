@@ -54,9 +54,22 @@ include_once "include/page_header.php";
 <?php
 	$now = time();
 
+	$item_types = array(
+			ITEM_TYPE_ZABBIX,
+			ITEM_TYPE_ZABBIX_ACTIVE,
+			ITEM_TYPE_SNMPV1,
+			//ITEM_TYPE_TRAPPER,
+			ITEM_TYPE_SNMPV2C,
+			ITEM_TYPE_SNMPV3,
+			ITEM_TYPE_SIMPLE,
+			ITEM_TYPE_INTERNAL,
+			ITEM_TYPE_AGGREGATE,
+			//ITEM_TYPE_HTTPTEST,
+			ITEM_TYPE_EXTERNAL);
+
 	$result = DBselect("select i.itemid,i.nextcheck,i.description,i.key_,i.type,h.host,h.hostid ".
 		" from items i,hosts h ".
-		" where i.status=".ITEM_STATUS_ACTIVE." and i.type not in (".ITEM_TYPE_TRAPPER.",".ITEM_TYPE_HTTPTEST.") ".
+		" where i.status=".ITEM_STATUS_ACTIVE." and i.type in (".implode(',',$item_types).") ".
 		" and ((h.status=".HOST_STATUS_MONITORED." and h.available != ".HOST_AVAILABLE_FALSE.") ".
 		" or (h.status=".HOST_STATUS_MONITORED." and h.available=".HOST_AVAILABLE_FALSE." and h.disable_until<=$now)) ".
 		" and i.hostid=h.hostid and i.nextcheck<$now and i.key_ not in ('status','icmpping','icmppingsec','zabbix[log]') ".
@@ -67,14 +80,15 @@ include_once "include/page_header.php";
 
 	if($_REQUEST["show"]==0)
 	{
-		for($i=ITEM_TYPE_ZABBIX;$i<=ITEM_TYPE_AGGREGATE;$i++)
+
+		foreach($item_types as $type)
 		{
-			$sec_5[$i]=0;
-			$sec_10[$i]=0;
-			$sec_30[$i]=0;
-			$sec_60[$i]=0;
-			$sec_300[$i]=0;
-			$sec_rest[$i]=0;
+			$sec_5[$type]=0;
+			$sec_10[$type]=0;
+			$sec_30[$type]=0;
+			$sec_60[$type]=0;
+			$sec_300[$type]=0;
+			$sec_rest[$type]=0;
 		}
 
 		while($row=DBfetch($result))
@@ -88,19 +102,9 @@ include_once "include/page_header.php";
 
 		}
 		$table->setHeader(array(S_ITEMS,S_5_SECONDS,S_10_SECONDS,S_30_SECONDS,S_1_MINUTE,S_5_MINUTES,S_MORE_THAN_5_MINUTES));
-		$a=array(
-			S_ZABBIX_AGENT => ITEM_TYPE_ZABBIX,
-			S_ZABBIX_AGENT_ACTIVE => ITEM_TYPE_ZABBIX_ACTIVE,
-			S_SNMPV1_AGENT => ITEM_TYPE_SNMPV1,
-			S_SNMPV2_AGENT => ITEM_TYPE_SNMPV2C,
-			S_SNMPV3_AGENT => ITEM_TYPE_SNMPV3,
-			S_SIMPLE_CHECK => ITEM_TYPE_SIMPLE,
-			S_ZABBIX_INTERNAL => ITEM_TYPE_INTERNAL,
-			S_ZABBIX_AGGREGATE => ITEM_TYPE_AGGREGATE
-		);
-		foreach($a as $name => $type)
+		foreach($item_types as $type)
 		{
-			$elements=array($name,$sec_5[$type],$sec_10[$type],
+			$elements=array(item_type2str($type),$sec_5[$type],$sec_10[$type],
 				new CCol($sec_30[$type],"warning"),
 				new CCol($sec_60[$type],"average"),
 				new CCol($sec_300[$type],"high"),
