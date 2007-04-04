@@ -33,6 +33,7 @@
 			case ITEM_TYPE_ZABBIX_ACTIVE:	$type = S_ZABBIX_AGENT_ACTIVE;		break;
 			case ITEM_TYPE_AGGREGATE:	$type = S_ZABBIX_AGGREGATE;		break;
 			case ITEM_TYPE_HTTPTEST:	$type = S_WEB_MONITORING;		break;
+			case ITEM_TYPE_EXTERNAL:	$type = S_EXTERNAL_CHECK;		break;
 			default:$type = S_UNKNOWN;			break;
 		}
 		return $type;

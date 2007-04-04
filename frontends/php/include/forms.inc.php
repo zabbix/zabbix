@@ -1457,15 +1457,10 @@
 		else
 		{
 			$cmbType = new CComboBox("type",$type,"submit()");
-			$cmbType->AddItem(ITEM_TYPE_ZABBIX,S_ZABBIX_AGENT);
-			$cmbType->AddItem(ITEM_TYPE_ZABBIX_ACTIVE,S_ZABBIX_AGENT_ACTIVE);
-			$cmbType->AddItem(ITEM_TYPE_SIMPLE,S_SIMPLE_CHECK);
-			$cmbType->AddItem(ITEM_TYPE_SNMPV1,S_SNMPV1_AGENT);
-			$cmbType->AddItem(ITEM_TYPE_SNMPV2C,S_SNMPV2_AGENT);
-			$cmbType->AddItem(ITEM_TYPE_SNMPV3,S_SNMPV3_AGENT);
-			$cmbType->AddItem(ITEM_TYPE_TRAPPER,S_ZABBIX_TRAPPER);
-			$cmbType->AddItem(ITEM_TYPE_INTERNAL,S_ZABBIX_INTERNAL);
-			$cmbType->AddItem(ITEM_TYPE_AGGREGATE,S_ZABBIX_AGGREGATE);
+			foreach(array(ITEM_TYPE_ZABBIX,ITEM_TYPE_ZABBIX_ACTIVE,ITEM_TYPE_SIMPLE,
+				ITEM_TYPE_SNMPV1,ITEM_TYPE_SNMPV2C,ITEM_TYPE_SNMPV3,ITEM_TYPE_TRAPPER,
+				ITEM_TYPE_INTERNAL,ITEM_TYPE_AGGREGATE,ITEM_TYPE_EXTERNAL) as $it)
+					$cmbType->AddItem($it,item_type2str($it));
 			$frmItem->AddRow(S_TYPE, $cmbType);
 		}
 
@@ -1831,15 +1826,11 @@
 		if(count($applications)==0)  array_push($applications,0);
 
 		$cmbType = new CComboBox('type',$type);
-		$cmbType->AddItem(ITEM_TYPE_ZABBIX,S_ZABBIX_AGENT);
-		$cmbType->AddItem(ITEM_TYPE_ZABBIX_ACTIVE,S_ZABBIX_AGENT_ACTIVE);
-		$cmbType->AddItem(ITEM_TYPE_SIMPLE,S_SIMPLE_CHECK);
-		$cmbType->AddItem(ITEM_TYPE_SNMPV1,S_SNMPV1_AGENT);
-		$cmbType->AddItem(ITEM_TYPE_SNMPV2C,S_SNMPV2_AGENT);
-		$cmbType->AddItem(ITEM_TYPE_SNMPV3,S_SNMPV3_AGENT);
-		$cmbType->AddItem(ITEM_TYPE_TRAPPER,S_ZABBIX_TRAPPER);
-		$cmbType->AddItem(ITEM_TYPE_INTERNAL,S_ZABBIX_INTERNAL);
-		$cmbType->AddItem(ITEM_TYPE_AGGREGATE,S_ZABBIX_AGGREGATE);
+		foreach(array(ITEM_TYPE_ZABBIX,ITEM_TYPE_ZABBIX_ACTIVE,ITEM_TYPE_SIMPLE,ITEM_TYPE_SNMPV1,
+			ITEM_TYPE_SNMPV2C,ITEM_TYPE_SNMPV3,ITEM_TYPE_TRAPPER,ITEM_TYPE_INTERNAL,
+			ITEM_TYPE_AGGREGATE,ITEM_TYPE_AGGREGATE,ITEM_TYPE_EXTERNAL) as $it)
+				$cmbType->AddItem($it, item_type2str($it));
+
 		$frmItem->AddRow(array( new CVisibilityBox('type_visible', get_request('type_visible'), 'type', S_ORIGINAL),
 			S_TYPE), $cmbType);
 

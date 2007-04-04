@@ -117,9 +117,10 @@ include_once "include/page_header.php";
 		
 		"select"=>	array(T_ZBX_STR,	O_OPT,	P_SYS|P_ACT,	null,	null)
 	);
-	
-	if(isset($_REQUEST['itemtype']) && !in_array($_REQUEST['itemtype'],
-		array(ITEM_TYPE_ZABBIX,ITEM_TYPE_SIMPLE,ITEM_TYPE_INTERNAL,ITEM_TYPE_AGGREGATE)))
+
+	$allowed_item_types = array(ITEM_TYPE_ZABBIX,ITEM_TYPE_SIMPLE,ITEM_TYPE_INTERNAL,ITEM_TYPE_AGGREGATE);
+
+	if(isset($_REQUEST['itemtype']) && !in_array($_REQUEST['itemtype'], $allowed_item_types))
 			unset($_REQUEST['itemtype']);
 
 	check_fields($fields);
@@ -238,10 +239,8 @@ include_once "include/page_header.php";
 		{
 			$itemtype = get_request("itemtype",get_profile("web.popup.itemtype",0));
 			$cmbTypes = new CComboBox("itemtype",$itemtype,"submit()");
-			$cmbTypes->AddItem(ITEM_TYPE_ZABBIX,S_ZABBIX_AGENT);
-			$cmbTypes->AddItem(ITEM_TYPE_SIMPLE,S_SIMPLE_CHECK);
-			$cmbTypes->AddItem(ITEM_TYPE_INTERNAL,S_ZABBIX_INTERNAL);
-			$cmbTypes->AddItem(ITEM_TYPE_AGGREGATE,S_ZABBIX_AGGREGATE);
+			foreach($allowed_item_types as $type)
+				$cmbTypes->AddItem($type, item_type2str($type));
 			$frmTitle->AddItem(array(S_TYPE,SPACE,$cmbTypes));
 		}
 		if(in_array($srctbl,array("triggers","logitems","items",'applications')))
