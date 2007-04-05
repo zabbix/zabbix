@@ -993,6 +993,16 @@
 	'S_EDIT'=>				'Edit',
 	'S_DIMENSION_COLS_ROWS'=>		'Dimension (cols x rows)',
 
+	'S_SLIDESHOWS'=>			'Slideshows',
+	'S_SLIDESHOW'=>				'Slideshow',
+	'S_CONFIGURATION_OF_SLIDESHOWS_BIG'=>	'CONFIGURATION OF SLIDESHOWS',
+	'S_SLIDESHOWS_BIG'=>			'SLIDESHOWS',
+	'S_NO_SLIDESHOWS_DEFINED'=>		'No slideshows defined',
+	'S_COUNT_OF_SLIDES'=>			'Count of slides',
+	'S_NO_SLIDES_DEFINED'=>			'No slides defined',
+	'S_SLIDES'=>				'Slides',
+	'S_NEW_SLIDE'=>				'New slide',
+
 //	screenedit.php
 	'S_MAP'=>				'Map',
 	'S_AS_PLAIN_TEXT'=>			'As plain text',
@@ -1035,6 +1045,14 @@
 	'S_SELECT_SCREEN_DOT_DOT_DOT'=>		'Select screen ...',
 	'S_NO_SCREENS_DEFINED'=>		'No screens defined',
 
+	'S_SLIDESHOW_UPDATED'=>			'Slideshow updated',
+	'S_CANNOT_UPDATE_SLIDESHOW'=>		'Cannot_update slideshow',
+	'S_SLIDESHOW_ADDED'=>			'Slideshow added',
+	'S_CANNOT_ADD_SLIDESHOW'=>		'Cannot add slideshow',
+	'S_SLIDESHOW_DELETED'=>			'Slideshow deleted',
+	'S_CANNOT_DELETE_SLIDESHOW'=>		'Cannot delete slideshow',
+	'S_DELETE_SLIDESHOW_Q'=>		'Delete slideshow?',
+
 //	services.php
 	'S_ROOT_SMALL'=>			'root',
 	'S_IT_SERVICE'=>			'IT service',
@@ -1066,7 +1084,7 @@
 	'S_ACCEPTABLE_SLA_IN_PERCENT'=>		'Acceptabe SLA (in %)',
 	'S_LINK_TO_TRIGGER_Q'=>			'Link to trigger?',
 	'S_SORT_ORDER_0_999'=>			'Sort order (0->999)',
-	'S_DELETE_SERVICE_Q'=>			'S_DELETE_SERVICE_Q',
+	'S_DELETE_SERVICE_Q'=>			'Delete service?',
 	'S_LINK_TO'=>				'Link to',
 	'S_SOFT_LINK_Q'=>			'Soft link?',
 	'S_ADD_SERVER_DETAILS'=>		'Add server details',

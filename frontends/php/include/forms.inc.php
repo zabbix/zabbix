@@ -26,6 +26,137 @@
 	require_once 	"include/users.inc.php";
 	require_once 	"include/db.inc.php";
 
+	function	insert_slideshow_form()
+	{
+		$form = new CFormTable(S_SLIDESHOW, null, 'post');
+		$form->SetHelp('config_advanced.php');
+		
+		$form->AddVar('configid', 1);
+			
+		if(isset($_REQUEST['slideshowid']))
+		{
+			$form->AddVar('slideshowid', $_REQUEST['slideshowid']);
+		}
+
+		$name		= get_request('name', '');
+		$delay		= get_request('delay', 5);
+		$steps		= get_request('steps', array());
+
+		$new_step	= get_request('new_step', null);
+		
+		if((isset($_REQUEST['slideshowid']) && !isset($_REQUEST['form_refresh'])))
+		{
+			$slideshow_data = DBfetch(DBselect('select * from slideshows where slideshowid='.$_REQUEST['slideshowid']));
+		
+			$name		= $slideshow_data['name'];
+			$delay		= $slideshow_data['delay'];
+			$steps		= array();
+			$db_steps = DBselect('select * from slides where slideshowid='.$_REQUEST['slideshowid'].' order by step');
+			while($step_data = DBfetch($db_steps))
+			{
+				$steps[$step_data['step']] = array(
+						'screenid' => $step_data['screenid'],
+						'delay' => $step_data['delay']
+					);
+			}
+		}
+		
+		$form->AddRow(S_NAME, new CTextBox('name', $name, 40));
+		
+		$form->AddRow(S_UPDATE_INTERVAL_IN_SEC, new CNumericBox("delay",$delay,5));
+		
+		$tblSteps = new CTableInfo(S_NO_SLIDES_DEFINED);
+		$tblSteps->SetHeader(array(S_SCREEN, S_DELAY, SPACE));
+		if(count($steps) > 0)
+		{
+			ksort($steps);
+			$first = min(array_keys($steps));
+			$last = max(array_keys($steps));
+		}
+		foreach($steps as $sid => $s)
+		{
+			if( !isset($s['screenid']) ) $s['screenid'] = 0;
+
+			if(isset($s['delay']) && $s['delay'] > 0 )
+				$s['delay'] = bold($s['delay']);
+			else	
+				$s['delay'] = $delay;
+			
+			$up = null;
+			if($sid != $first)
+			{
+				$up = new CLink(S_UP,'#','action');
+				$up->OnClick("return create_var('".$form->GetName()."','move_up',".$sid.", true);");
+			}
+			
+			$down = null;
+			if($sid != $last)
+			{
+				$down = new CLink(S_DOWN,'#','action');
+				$down->OnClick("return create_var('".$form->GetName()."','move_down',".$sid.", true);");
+			}
+			
+			$screen_data = get_screen_by_screenid($s['screenid']);
+			$name = new CLink($screen_data['name'],'#','action');
+			$name->OnClick("return create_var('".$form->GetName()."','edit_step',".$sid.", true);");
+			
+			$tblSteps->AddRow(array(
+				array(new CCheckBox('sel_step[]',null,null,$sid), $name),
+				$s['delay'],
+				array($up, isset($up) && isset($down) ? SPACE : null, $down)
+				));
+		}
+		$form->AddVar('steps', $steps);
+
+		$form->AddRow(S_SLIDES, array(
+			$tblSteps,
+			!isset($new_step) ? new CButton('add_step',S_ADD,
+				"return create_var('".$form->GetName()."','add_step',1, true);") : null,
+			(count($steps) > 0) ? new CButton('del_sel_step',S_DELETE_SELECTED) : null
+			));
+
+		if(isset($new_step))
+		{
+			if( !isset($new_step['screenid']) )	$new_step['screenid'] = 0;
+			if( !isset($new_step['delay']) )	$new_step['delay'] = 0;
+
+			if( isset($new_step['sid']) )
+				$form->AddVar('new_step[sid]',$new_step['sid']);
+
+			$form->AddVar('new_step[screenid]',$new_step['screenid']);
+
+			$screen_data = get_screen_by_screenid($new_step['screenid']);
+
+			$form->AddRow(S_NEW_SLIDE, array(
+					new CTextBox('screen_name', $screen_data['name'], 25, 'yes'),
+					new CButton('select_screen',S_SELECT,
+						'return PopUp("popup.php?dstfrm='.$form->GetName().'&srctbl=screens'.
+						'&dstfld1=screen_name&srcfld1=name'.
+						'&dstfld2=new_step%5Bscreenid%5D&srcfld2=screenid");'),
+					S_DELAY,
+					new CNumericBox('new_step[delay]', $new_step['delay'], 5), BR,
+					new CButton('add_step', isset($new_step['sid']) ? S_SAVE : S_ADD),
+					new CButton('cancel_step', S_CANCEL)
+
+				),
+				isset($new_step['sid']) ? 'edit' : 'new');
+		}
+		
+		$form->AddItemToBottomRow(new CButton("save",S_SAVE));
+		if(isset($_REQUEST['slideshowid']))
+		{
+			$form->AddItemToBottomRow(SPACE);
+			$form->AddItemToBottomRow(new CButton('clone',S_CLONE));
+			$form->AddItemToBottomRow(SPACE);
+			$form->AddItemToBottomRow(new CButtonDelete(S_DELETE_SLIDESHOW_Q,
+				url_param('form').url_param('slideshowid').url_param('configid')));
+		}
+		$form->AddItemToBottomRow(SPACE);
+		$form->AddItemToBottomRow(new CButtonCancel());
+
+                $form->Show();
+	}
+
 	function	insert_drule_form()
 	{
 		$frm_title = S_DISCOVERY_RULE;
@@ -3327,6 +3458,8 @@ include_once 'include/discovery.inc.php';
 		$frmScr = new CFormTable($frm_title,"screenconf.php");
 		$frmScr->SetHelp("web.screenconf.screen.php");
 
+		$frmScr->AddVar('configid', 0);
+
 		if(isset($_REQUEST["screenid"]))
 		{
 			$frmScr->AddVar("screenid",$_REQUEST["screenid"]);
@@ -3338,6 +3471,8 @@ include_once 'include/discovery.inc.php';
 		$frmScr->AddItemToBottomRow(new CButton("save",S_SAVE));
 		if(isset($_REQUEST["screenid"]))
 		{
+			$form->AddItemToBottomRow(SPACE);
+			$form->AddItemToBottomRow(new CButton('clone',S_CLONE));
 			$frmScr->AddItemToBottomRow(SPACE);
 			$frmScr->AddItemToBottomRow(new CButtonDelete(S_DELETE_SCREEN_Q,
 				url_param("form").url_param("screenid")));
