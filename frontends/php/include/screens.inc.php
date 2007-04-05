@@ -114,6 +114,9 @@
                 $result=DBexecute("delete from screens_items where resourceid=$screenid and resourcetype=".SCREEN_RESOURCE_SCREEN);
                 if(!$result)	return  $result;
 
+		$result=DBexecute('delete from slides where screenid='.$screenid);
+		if(!$result)    return  $result;
+
                 return  DBexecute("delete from screens where screenid=$screenid");
         }
 
@@ -155,7 +158,7 @@
 		{
 			return	$row;
 		}
-		error("No screen with screenid=[$screenid]");
+		// error("No screen with screenid=[$screenid]");
 		return FALSE;
 	}
 
@@ -214,7 +217,7 @@
 			}
 		}
 		$table = new CTable(
-			new CLink("No rows in screen ".$row["name"],"screenconf.php?form=update&screenid=".$screenid),
+			new CLink("No rows in screen ".$row["name"],"screenconf.php?config=0&form=update&screenid=".$screenid),
 			($editmode == 0 || $editmode == 2) ? "screen_view" : "screen_edit");
 	
 		for($r=0;$r<$row["vsize"];$r++)
@@ -400,4 +403,105 @@
 		}
 		return $table;
 	}
+
+	function	slideshow_accessiable($slideshowid, $perm)
+	{
+		global $USER_DETAILS;
+
+		$result = false;
+
+		if(DBselect("select slideshowid from slideshows where slideshowid=".$slideshowid.
+			" and ".DBid2nodeid('slideshowid')." in (".get_accessible_nodes_by_user($USER_DETAILS,$perm).")"))
+		{
+			$result = true;
+			$db_slides = DBselect('select distinct screenid from slides where slideshowid='.$slideshowid);
+			while($slide_data = DBfetch($db_slides))
+			{
+				if( !($result = screen_accessiable($slide_data["screenid"], PERM_READ_ONLY)) ) break;
+			}
+		}
+		return $result;
+	}
+
+	function	get_slideshow_by_slideshowid($slideshowid)
+	{
+		return DBfetch(DBselect('select * from slideshows where slideshowid='.$slideshowid));
+	}
+
+	function	validate_slide($slide)
+	{
+		if(!screen_accessiable($slide["screenid"], PERM_READ_ONLY)) return false;
+
+		if( !is_numeric($slide['delay']) ) return false;
+
+		return true;
+	}
+
+	function	add_slideshow($name, $delay, $slides)
+	{
+		foreach($slides as $slide)
+		{
+			if( !validate_slide($slide) )
+				return false;
+		}
+
+		$slideshowid = get_dbid('slideshows','slideshowid');
+		$result = DBexecute('insert into slideshows (slideshowid,name,delay) '.
+			' values ('.$slideshowid.','.zbx_dbstr($name).','.$delay.')');
+
+		$i = 0;
+		foreach($slides as $slide)
+		{
+			$slideid = get_dbid('slides','slideid');
+			if( !($result = DBexecute('insert into slides (slideid,slideshowid,screenid,step,delay) '.
+				' values ('.$slideid.','.$slideshowid.','.$slide['screenid'].','.($i++).','.$slide['delay'].')')) )
+			{
+				break;
+			}
+		}
+		
+		if( !$result )
+		{
+			delete_slideshow($slideshowid);
+			return false;
+		}
+		return $slideshowid;
+	}
+
+	function	update_slideshow($slideshowid, $name, $delay, $slides)
+	{
+		foreach($slides as $slide)
+		{
+			if( !validate_slide($slide) )
+				return false;
+		}
+
+		if( !($result = DBexecute('update slideshows set name='.zbx_dbstr($name).',delay='.$delay.' where slideshowid='.$slideshowid)) )
+			return false;
+
+		DBexecute('delete from slides where slideshowid='.$slideshowid);
+
+		$i = 0;
+		foreach($slides as $slide)
+		{
+			$slideid = get_dbid('slides','slideid');
+			if( !($result = DBexecute('insert into slides (slideid,slideshowid,screenid,step,delay) '.
+				' values ('.$slideid.','.$slideshowid.','.$slide['screenid'].','.($i++).','.$slide['delay'].')')) )
+			{
+				return false;
+			}
+		}
+		
+		return true;
+	}
+
+	function	delete_slideshow($slideshowid)
+	{
+		return (
+			DBexecute('delete from slideshows where slideshowid='.$slideshowid) &&
+			DBexecute('delete from slides where slideshowid='.$slideshowid)
+		);
+	}
+
+
 ?>

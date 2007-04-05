@@ -70,6 +70,10 @@
 			$page["title"] = "S_STANDARD_ITEMS_BIG";
 			$min_user_type = USER_TYPE_ZABBIX_USER;
 			break;
+		case 'screens':
+			$page["title"] = "S_SCREENS_BIG";
+			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
+			break;
 		case 'nodes':
 			if(ZBX_DISTRIBUTED)
 			{
@@ -195,7 +199,7 @@ include_once "include/page_header.php";
 	}
 	else
 	{
-		if(in_array($srctbl,array("hosts","host_group","triggers","logitems","items",'applications')))
+		if(in_array($srctbl,array("hosts","host_group","triggers","logitems","items",'applications','screens')))
 		{
 			if(ZBX_DISTRIBUTED)
 			{
@@ -792,6 +796,30 @@ function add_item_variable(s_formname,x_value)
 
 			$table->AddRow($name);
 		}
+		$table->Show();
+	}
+	elseif($srctbl == 'screens')
+	{
+		require_once "include/screens.inc.php";
+
+		$table = new CTableInfo(S_NO_NODES_DEFINED);
+		$table->SetHeader(S_NAME);
+
+		$result = DBselect('select screenid,name from screens where '.DBid2nodeid('screenid').'='.$nodeid.' order by name');
+		while($row=DBfetch($result))
+		{
+			if(!screen_accessiable($row["screenid"], PERM_READ_ONLY))
+				continue;
+
+			$name = new CLink($row["name"],"#","action");
+			$name->SetAction(
+				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
+				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '').
+				' close_window(); return false;');
+
+			$table->AddRow($name);
+		}
+
 		$table->Show();
 	}
 ?>

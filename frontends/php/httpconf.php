@@ -53,8 +53,8 @@ include_once "include/page_header.php";
 		
 		"new_httpstep"=>	array(T_ZBX_STR, O_OPT,  null,	null,null),
 
-		"move_up"=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65534), null),
-		"move_down"=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65534), null),
+		"move_up"=>		array(T_ZBX_INT, O_OPT,  P_ACT,  BETWEEN(0,65534), null),
+		"move_down"=>		array(T_ZBX_INT, O_OPT,  P_ACT,  BETWEEN(0,65534), null),
 		
 		"sel_step"=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65534), null),
 
