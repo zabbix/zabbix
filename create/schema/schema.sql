@@ -29,6 +29,7 @@ FIELD		|delay		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 TABLE|slides|slideid|ZBX_SYNC
 FIELD		|slideid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|slideshowid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|screenid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|step		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|delay		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|slides_1	|slideshowid
