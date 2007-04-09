@@ -1,5 +1,6 @@
 Changes for 1.3.5:
 
+ - fixed canceling of frontend installation screen (Eugene)
  - fixed processing of COUNTER64 SNMP values (Alexei)
  - added frontend-side support of external checks. (Eugene)
  - fixed trigger dependencies for templated triggers (Eugene)
