@@ -68,6 +68,7 @@
 	{
 		zbx_unsetcookie('ZBX_CONFIG');
 		Redirect('index.php');
+		exit;
 	}
 	
 	$ZBX_CONFIG = get_cookie('ZBX_CONFIG', null);
