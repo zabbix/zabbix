@@ -254,7 +254,7 @@ include_once "include/page_header.php";
 				if(!screen_accessiable($row["screenid"], PERM_READ_WRITE)) continue;
 
 				$table->AddRow(array(
-					new CLink($row["name"],"?config=1&form=update&screenid=".$row["screenid"],
+					new CLink($row["name"],"?config=0&form=update&screenid=".$row["screenid"],
 						'action'),
 					$row["hsize"]." x ".$row["vsize"],
 					new CLink(S_EDIT,"screenedit.php?screenid=".$row["screenid"])
