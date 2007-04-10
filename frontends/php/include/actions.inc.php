@@ -399,7 +399,7 @@ include_once 'include/discovery.inc.php';
 						{
 							case OPERATION_OBJECT_USER:
 								$obj_data = get_user_by_userid($data['objectid']);
-								$obj_data = S_USER.' "'.$obj_data['name'].'"';
+								$obj_data = S_USER.' "'.$obj_data['alias'].'"';
 								break;
 							case OPERATION_OBJECT_GROUP:
 								$obj_data = get_group_by_usrgrpid($data['objectid']);

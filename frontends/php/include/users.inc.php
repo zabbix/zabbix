@@ -161,11 +161,7 @@
 			return	false;
 		}
 
-		while($row=DBfetch(DBselect('select actionid from actions where userid='.$userid)))
-		{
-			$result = delete_action($row["actionid"]);
-			if(!$result) return $result;
-		}
+		DBexecute('delete from operations where object='.OPERATION_OBJECT_USER.' and objectid='.$userid);
 
 		$result = DBexecute('delete from media where userid='.$userid);
 		if(!$result) return $result;
@@ -272,6 +268,8 @@
 	{
 		$result = DBexecute("delete from rights where groupid=$usrgrpid");
 		if(!$result)	return	$result;
+
+		DBexecute('delete from operations where object='.OPERATION_OBJECT_GROUP.' and objectid='.$usrgrpid);
 
 		$result = DBexecute("delete from users_groups where usrgrpid=$usrgrpid");
 		if(!$result)	return	$result;
