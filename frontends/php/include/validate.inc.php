@@ -212,7 +212,7 @@
  
 		if($type == T_ZBX_IP)
 		{
-			if( !validate_ip($var) )
+			if( !validate_ip($var,$arr) )
 			{
 				if($flags&P_SYS)
 				{
