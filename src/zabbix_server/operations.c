@@ -360,3 +360,135 @@ void	op_run_commands(DB_EVENT *event, DB_OPERATION *operation)
 	}
 	zabbix_log( LOG_LEVEL_DEBUG, "End run_commands()");
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: op_host_add                                                      *
+ *                                                                            *
+ * Purpose: add discovered host                                               *
+ *                                                                            *
+ * Parameters: trigger - trigger data                                         *
+ *             action  - action data                                          *
+ *                                                                            *
+ * Return value: nothing                                                      *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	op_host_add(DB_EVENT *event)
+{
+	DB_RESULT	result;
+	DB_RESULT	result2;
+	DB_ROW		row;
+	DB_ROW		row2;
+	zbx_uint64_t	hostid;
+	char		*ip;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In op_host_add()");
+
+	if(event->object == EVENT_OBJECT_DHOST)
+	{
+		result = DBselect("select ip from dhosts where dhostid=" ZBX_FS_UI64,
+			event->objectid);
+		row = DBfetch(result);
+		if(row && DBis_null(row[0]) != SUCCEED)
+		{
+			ip=row[0];
+			result2 = DBselect("select hostid from hosts where ip='%s' and " ZBX_COND_NODEID,
+				ip,
+				LOCAL_NODE("hostid"));
+			row2 = DBfetch(result2);
+			if(!row2 || DBis_null(row2[0]) == SUCCEED)
+			{
+				hostid = DBget_maxid("hosts","hostid");
+				DBexecute("insert into hosts (hostid,host,useip,ip) values (" ZBX_FS_UI64 ",'%s',1,'%s')",
+					hostid,
+					ip,
+					ip);
+			}
+			DBfree_result(result2);
+		}
+		DBfree_result(result);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End op_host_add()");
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: add host if not added already                                    *
+ *                                                                            *
+ * Purpose: add discovered host                                               *
+ *                                                                            *
+ * Parameters: dhostid - discovered host id                                   *
+ *                                                                            *
+ * Return value: hostid - new/existing hostid                                 *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_uint64_t	add_discovered_host(zbx_uint64_t dhostid)
+{
+	zabbix_log(LOG_LEVEL_WARNING, "In add_discovered_host(dhostid:" ZBX_FS_UI64 ")",
+		dhostid);
+	zabbix_log(LOG_LEVEL_WARNING, "End add_discovered_host");
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: op_group_add                                                     *
+ *                                                                            *
+ * Purpose: add group to discovered host                                      *
+ *                                                                            *
+ * Parameters: trigger - trigger data                                         *
+ *             action  - action data                                          *
+ *                                                                            *
+ * Return value: nothing                                                      *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	op_group_add(DB_EVENT *event, DB_ACTION *action)
+{
+	DB_RESULT	result;
+	DB_RESULT	result2;
+	DB_ROW		row;
+	DB_ROW		row2;
+	zbx_uint64_t	hostid;
+	char		*ip;
+
+	zabbix_log(LOG_LEVEL_WARNING, "In op_group_add()");
+
+	if(event->object == EVENT_OBJECT_DHOST)
+	{
+		result = DBselect("select ip from dhosts where dhostid=" ZBX_FS_UI64,
+			event->objectid);
+		row = DBfetch(result);
+		if(row && DBis_null(row[0]) != SUCCEED)
+		{
+			ip=row[0];
+			result2 = DBselect("select hostid from hosts where ip='%s' and " ZBX_COND_NODEID,
+				ip,
+				LOCAL_NODE("hostid"));
+			row2 = DBfetch(result2);
+			if(!row2 || DBis_null(row2[0]) == SUCCEED)
+			{
+				hostid = DBget_maxid("hosts","hostid");
+				DBexecute("insert into hosts (hostid,host,useip,ip) values (" ZBX_FS_UI64 ",'%s',1,'%s')",
+					hostid,
+					ip,
+					ip);
+			}
+			DBfree_result(result2);
+		}
+		DBfree_result(result);
+	}
+
+	zabbix_log(LOG_LEVEL_WARNING, "End op_group_add()");
+}
