@@ -151,7 +151,7 @@ include_once "include/page_header.php";
 					"]");
 			}
 			
-			if($row["status"]==0 || $service["serviceid"] == $row["serviceid"])
+			if($row["status"]==0 || (isset($service) && $service["serviceid"] == $row["serviceid"]))
 			{
 				$reason="-";
 			}
