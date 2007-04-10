@@ -539,10 +539,12 @@ void	execute_operations(DB_EVENT *event, DB_ACTION *action)
 				op_run_commands(event,&operation);
 				break;
 			case	OPERATION_TYPE_HOST_ADD:
+				op_host_add(event);
 				break;
 			case	OPERATION_TYPE_HOST_REMOVE:
 				break;
 			case	OPERATION_TYPE_GROUP_ADD:
+				op_group_add(event,action);
 				break;
 			case	OPERATION_TYPE_GROUP_REMOVE:
 				break;
