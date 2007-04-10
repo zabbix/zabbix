@@ -19,13 +19,13 @@
 **/
 ?>
 <?php
+	define('ZBX_PAGE_NO_AUTHERIZATION', 1);
+	
 	require_once "include/config.inc.php";
 
 	$page['file'] = 'vtext.php';
 	$page['type'] = PAGE_TYPE_IMAGE;
 
-	define('ZBX_PAGE_NO_AUTHERIZATION', 1);
-	
 include_once "include/page_header.php";
 
 ?>
