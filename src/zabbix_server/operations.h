@@ -26,7 +26,7 @@
 
 extern	int	CONFIG_NODEID;
 
-void	op_run_command(DB_EVENT *event, DB_OPERATION *operation);
+void	op_run_commands(DB_EVENT *event, DB_OPERATION *operation);
 void	op_notify_user(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation);
 
 #endif
