@@ -19,6 +19,7 @@ zabbix_server_SOURCES = \
 	evalfunc.c evalfunc.h \
 	expression.c expression.h \
 	actions.c actions.h \
+	operations.c operations.h \
 	events.c events.h \
 	zlog.c \
 	functions.c functions.h \

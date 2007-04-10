@@ -45,331 +45,11 @@
 #include "security.h"
 
 #include "actions.h"
+#include "operations.h"
 #include "expression.h"
 
 #include "poller/poller.h"
 #include "poller/checks_agent.h"
-
-/******************************************************************************
- *                                                                            *
- * Function: send_to_user_medias                                              *
- *                                                                            *
- * Purpose: send notifications to user's medias (email, sms, whatever)        *
- *                                                                            *
- * Parameters: trigger - trigger data                                         *
- *             action  - action data                                          *
- *             userid  - user id                                              *
- *                                                                            *
- * Return value: nothing                                                      *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments: Cannot use action->userid as it may also be groupid              *
- *                                                                            *
- ******************************************************************************/
-static	void	send_to_user_medias(DB_EVENT *event,DB_OPERATION *operation, zbx_uint64_t userid)
-{
-	DB_MEDIA media;
-	DB_RESULT result;
-	DB_ROW	row;
-
-	zabbix_log( LOG_LEVEL_DEBUG, "In send_to_user_medias(objectid:" ZBX_FS_UI64 ")",
-		event->objectid);
-
-	result = DBselect("select mediatypeid,sendto,active,severity,period from media where active=%d and userid=" ZBX_FS_UI64,
-		MEDIA_STATUS_ACTIVE,
-		userid);
-
-	while((row=DBfetch(result)))
-	{
-		ZBX_STR2UINT64(media.mediatypeid, row[0]);
-
-		media.sendto	= row[1];
-		media.active	= atoi(row[2]);
-		media.severity	= atoi(row[3]);
-		media.period	= row[4];
-
-		zabbix_log( LOG_LEVEL_DEBUG, "Trigger severity [%d] Media severity [%d] Period [%s]",
-			event->trigger_priority,
-			media.severity,
-			media.period);
-		if(((1<<event->trigger_priority)&media.severity)==0)
-		{
-			zabbix_log( LOG_LEVEL_DEBUG, "Won't send message (severity)");
-			continue;
-		}
-		if(check_time_period(media.period, (time_t)NULL) == 0)
-		{
-			zabbix_log( LOG_LEVEL_DEBUG, "Won't send message (period)");
-			continue;
-		}
-
-		DBadd_alert(operation->actionid, userid, event->objectid, media.mediatypeid,media.sendto,operation->shortdata,operation->longdata);
-	}
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End send_to_user_medias()");
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: send_to_user                                                     *
- *                                                                            *
- * Purpose: send notifications to user or user groupd                         *
- *                                                                            *
- * Parameters: trigger - trigger data                                         *
- *             action  - action data                                          *
- *                                                                            *
- * Return value: nothing                                                      *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments: action->recipient specifies user or group                        *
- *                                                                            *
- ******************************************************************************/
-static	void	send_to_user(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_uint64_t	userid;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In send_to_user()");
-
-	if(operation->object == OPERATION_OBJECT_USER)
-	{
-		send_to_user_medias(event, operation, operation->objectid);
-	}
-	else if(operation->object == OPERATION_OBJECT_GROUP)
-	{
-		result = DBselect("select u.userid from users u, users_groups ug where ug.usrgrpid=" ZBX_FS_UI64 " and ug.userid=u.userid",
-			operation->objectid);
-		while((row=DBfetch(result)))
-		{
-			ZBX_STR2UINT64(userid, row[0]);
-			send_to_user_medias(event, operation, userid);
-		}
-		DBfree_result(result);
-	}
-	else
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "Unknown object type [%d] for operationid [" ZBX_FS_UI64 "]",
-			operation->object,
-			operation->operationid);
-		zabbix_syslog("Unknown object type [%d] for operationid [" ZBX_FS_UI64 "]",
-			operation->object,
-			operation->operationid);
-	}
-	zabbix_log(LOG_LEVEL_DEBUG, "End send_to_user()");
-}
-
-
-/******************************************************************************
- *                                                                            *
- * Function: run_remote_commands                                              *
- *                                                                            *
- * Purpose: run remote command on specific host                               *
- *                                                                            *
- * Parameters: host_name - host name                                          *
- *             command - remote command                                       *
- *                                                                            *
- * Return value: nothing                                                      *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-
-static void run_remote_command(char* host_name, char* command)
-{
-	int ret = 9;
-	
-	AGENT_RESULT	agent_result;
-	DB_ITEM         item;
-	DB_RESULT	result;
-	DB_ROW		row;
-	
-	assert(host_name);
-	assert(command);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In run_remote_command(hostname:%s,command:%s)",
-		host_name,
-		command);
-
-	result = DBselect("select distinct host,ip,useip,port,dns from hosts where host='%s' and " ZBX_COND_NODEID,
-			host_name,
-			LOCAL_NODE("hostid"));
-	row = DBfetch(result);
-	if(row)
-	{
-		item.host_name = row[0];
-		item.host_ip=row[1];
-		item.useip=atoi(row[2]);
-		item.port=atoi(row[3]);
-		item.host_dns=row[4];
-		
-		zbx_snprintf(item.key,ITEM_KEY_LEN_MAX,"system.run[%s,nowait]",command);
-		
-		alarm(CONFIG_TIMEOUT);
-		
-		ret = get_value_agent(&item, &agent_result);
-
-		alarm(0);
-	}
-	DBfree_result(result);
-	
-	zabbix_log(LOG_LEVEL_DEBUG, "End run_remote_command(result:%d)",
-		ret);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: get_next_command                                                 *
- *                                                                            *
- * Purpose: parse action script on remote commands                            *
- *                                                                            *
- * Parameters: command_list - command list                                    *
- *             alias - (output) of host name or group name                    *
- *             is_group - (output) 0 if alias is a host name                  *
- *                               1 if alias is a group name                   *
- *             command - (output) remote command                              *
- *                                                                            *
- * Return value: 0 - correct comand is readed                                 *
- *               1 - EOL                                                      *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-
-#define CMD_ALIAS 0
-#define CMD_REM_COMMAND 1
-
-static int get_next_command(char** command_list, char** alias, int* is_group, char** command)
-{
-	int state = CMD_ALIAS;
-	int len = 0;
-	int i = 0;
-	
-	assert(alias);
-	assert(is_group);
-	assert(command);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In get_next_command(command_list:%s)",
-		*command_list);
-
-	*alias = NULL;
-	*is_group = 0;
-	*command = NULL;
-	
-
-	if((*command_list)[0] == '\0' || (*command_list)==NULL) {
-		zabbix_log(LOG_LEVEL_DEBUG, "Result get_next_command [EOL]");
-		return 1;
-	}
-
-	*alias = *command_list;
-	len = strlen(*command_list);
-
-	for(i=0; i < len; i++)
-	{
-		if(state == CMD_ALIAS)
-		{
-			if((*command_list)[i] == '#'){
-				*is_group = 1;
-				(*command_list)[i] = '\0';
-				state = CMD_REM_COMMAND;
-				*command = &(*command_list)[i+1];
-			}else if((*command_list)[i] == ':'){
-				*is_group = 0;
-				(*command_list)[i] = '\0';
-				state = CMD_REM_COMMAND;
-				*command = &(*command_list)[i+1];
-			}
-		} else if(state == CMD_REM_COMMAND) {
-			if((*command_list)[i] == '\r')
-			{
-				(*command_list)[i] = '\0';
-			} else if((*command_list)[i] == '\n')
-			{
-				(*command_list)[i] = '\0';
-				(*command_list) = &(*command_list)[i+1];
-				break;
-			}
-		}
-		if((*command_list)[i+1] == '\0')
-		{
-			(*command_list) = &(*command_list)[i+1];
-			break;
-		}
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End get_next_command(alias:%s,is_group:%i,command:%s)",
-		*alias,
-		*is_group,
-		*command);
-	
-	return 0;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: run_commands                                                     *
- *                                                                            *
- * Purpose: run remote commandlist for specific action                        *
- *                                                                            *
- * Parameters: trigger - trigger data                                         *
- *             action  - action data                                          *
- *                                                                            *
- * Return value: nothing                                                      *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments: commands devided with newline                                    *
- *                                                                            *
- ******************************************************************************/
-static	void	run_commands(DB_EVENT *event, DB_OPERATION *operation)
-{
-	DB_RESULT result;
-	DB_ROW		row;
-
-	char *cmd_list = NULL;
-	char *alias = NULL;
-	char *command = NULL;
-	int is_group = 0;
-
-	assert(event);
-	assert(operation);
-
-	zabbix_log( LOG_LEVEL_DEBUG, "In run_commands(operationid:" ZBX_FS_UI64 ")",
-		operation->operationid);
-
-	cmd_list = operation->longdata;
-	while(get_next_command(&cmd_list,&alias,&is_group,&command)!=1)
-	{
-		if(!alias || !command) continue;
-		if(alias == '\0' || command == '\0') continue;
-		if(is_group)
-		{
-			result = DBselect("select distinct h.host from hosts_groups hg,hosts h, groups g where hg.hostid=h.hostid and hg.groupid=g.groupid and g.name='%s' and" ZBX_COND_NODEID,
-				alias,
-				LOCAL_NODE("h.hostid"));
-			while((row=DBfetch(result)))
-			{
-				run_remote_command(row[0], command);
-			}
-			
-			DBfree_result(result);
-		}
-		else
-		{
-			run_remote_command(alias, command);
-		}
-/*		DBadd_alert(action->actionid,trigger->triggerid, userid, media.mediatypeid,media.sendto,action->subject,action->scripts); */ /* TODO !!! Add alert for remote commands !!! */
-	}
-	zabbix_log( LOG_LEVEL_DEBUG, "End run_commands()");
-}
 
 /******************************************************************************
  *                                                                            *
@@ -849,12 +529,31 @@ void	execute_operations(DB_EVENT *event, DB_ACTION *action)
 
 		substitute_macros(event, action, &operation.shortdata);
 		substitute_macros(event, action, &operation.longdata);
-			
-		if(operation.operationtype == OPERATION_TYPE_MESSAGE)
-			send_to_user(event,action,&operation);
-		else
-			run_commands(event,&operation);
 
+		switch(operation.operationtype)
+		{
+			case	OPERATION_TYPE_MESSAGE:
+				op_notify_user(event,action,&operation);
+				break;
+			case	OPERATION_TYPE_COMMAND:
+				op_run_commands(event,&operation);
+				break;
+			case	OPERATION_TYPE_HOST_ADD:
+				break;
+			case	OPERATION_TYPE_HOST_REMOVE:
+				break;
+			case	OPERATION_TYPE_GROUP_ADD:
+				break;
+			case	OPERATION_TYPE_GROUP_REMOVE:
+				break;
+			case	OPERATION_TYPE_TEMPLATE_ADD:
+				break;
+			case	OPERATION_TYPE_TEMPLATE_REMOVE:
+				break;
+			default:
+				break;
+		}
+	
 		zbx_free(operation.shortdata);
 		zbx_free(operation.longdata);
 	}
