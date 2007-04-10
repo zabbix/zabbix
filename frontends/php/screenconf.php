@@ -37,12 +37,11 @@ include_once "include/page_header.php";
 		"config"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1"),	null), // 0 - screens, 1 - slides
 
 		"screenid"=>		array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,		'{config}==0&&{form}=="update"'),
-		"name"=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,	'{config}==0&&isset({save})'),
 		"hsize"=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,100),	'{config}==0&&isset({save})'),
 		"vsize"=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,100),	'{config}==0&&isset({save})'),
 
 		"slideshowid"=>		array(T_ZBX_INT, O_NO,	 P_SYS,	DB_ID,		'{config}==1&&{form}=="update"'),
-		"name"=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,	'{config}==1&&isset({save})'),
+		"name"=>		array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,	'isset({save})'),
 		"delay"=>		array(T_ZBX_INT, O_OPT,  null,	BETWEEN(1,86400),'{config}==1&&isset({save})'),
 
 		"steps"=>		array(null,	O_OPT,	null,	null,	null),
