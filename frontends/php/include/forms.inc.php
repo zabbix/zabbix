@@ -31,7 +31,7 @@
 		$form = new CFormTable(S_SLIDESHOW, null, 'post');
 		$form->SetHelp('config_advanced.php');
 		
-		$form->AddVar('configid', 1);
+		$form->AddVar('config', 1);
 			
 		if(isset($_REQUEST['slideshowid']))
 		{
@@ -149,7 +149,7 @@
 			$form->AddItemToBottomRow(new CButton('clone',S_CLONE));
 			$form->AddItemToBottomRow(SPACE);
 			$form->AddItemToBottomRow(new CButtonDelete(S_DELETE_SLIDESHOW_Q,
-				url_param('form').url_param('slideshowid').url_param('configid')));
+				url_param('form').url_param('slideshowid').url_param('config')));
 		}
 		$form->AddItemToBottomRow(SPACE);
 		$form->AddItemToBottomRow(new CButtonCancel());
@@ -3458,7 +3458,7 @@ include_once 'include/discovery.inc.php';
 		$frmScr = new CFormTable($frm_title,"screenconf.php");
 		$frmScr->SetHelp("web.screenconf.screen.php");
 
-		$frmScr->AddVar('configid', 0);
+		$frmScr->AddVar('config', 0);
 
 		if(isset($_REQUEST["screenid"]))
 		{
