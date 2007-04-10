@@ -798,14 +798,16 @@
 
 		DBexecute("update sysmaps_links set triggerid=NULL where triggerid=$triggerid");
 		
-		$db_actions = DBselect("select distinct c.actionid from conditions c, triggers t".
-			" where c.conditiontype=".CONDITION_TYPE_TRIGGER.
-			" and c.value=t.triggerid and t.triggerid=".$triggerid);
+	// disable actions
+		$db_actions = DBselect("select distinct actionid from conditions ".
+			" where conditiontype=".CONDITION_TYPE_TRIGGER." and value=".$triggerid);
 		while($db_action = DBfetch($db_actions))
 		{
 			DBexecute("update actions set status=".ACTION_STATUS_DISABLED.
 				" where actionid=".$db_action["actionid"]);
 		}
+	// delete action conditions
+		DBexecute('delete from conditions where conditiontype='.CONDITION_TYPE_TRIGGER.' and value='.$triggerid);
 
 		$trigger = get_trigger_by_triggerid($triggerid);
 
