@@ -328,6 +328,17 @@ require_once "include/items.inc.php";
 	// delete host from template linkages
 		DBexecute("delete from hosts_templates where hostid=$hostid");
 
+	// disable actions
+		$db_actions = DBselect("select distinct actionid from conditions ".
+			" where conditiontype=".CONDITION_TYPE_HOST." and value=".$hostid);
+		while($db_action = DBfetch($db_actions))
+		{
+			DBexecute("update actions set status=".ACTION_STATUS_DISABLED.
+				" where actionid=".$db_action["actionid"]);
+		}
+	// delete action conditions
+		DBexecute('delete from conditions where conditiontype='.CONDITION_TYPE_HOST.' and value='.$hostid);
+
 	// delete host profile
 		delete_host_profile($hostid);
 
