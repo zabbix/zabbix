@@ -458,12 +458,14 @@ include_once "include/page_header.php";
 	}
 	elseif(in_array($srctbl,array("host_group")))
 	{
+		$accessible_groups	= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
+
 		$table = new CTableInfo(S_NO_GROUPS_DEFINED);
 		$table->SetHeader(array(S_NAME));
 
-		$db_groups = DBselect("select distinct g.groupid,g.name from groups g, hosts_groups hg ".
-			" where ".DBid2nodeid("g.groupid")."=".$nodeid.
-			" and g.groupid=hg.groupid and hg.hostid in (".$accessible_hosts.") ".
+		$db_groups = DBselect("select distinct groupid,name from groups ".
+			" where ".DBid2nodeid("groupid")."=".$nodeid.
+			" and groupid in (".$accessible_groups.") ".
 			" order by name");
 		while($row = DBfetch($db_groups))
 		{
