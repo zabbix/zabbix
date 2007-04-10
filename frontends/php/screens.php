@@ -33,7 +33,11 @@
 	{
 		define('ZBX_PAGE_NO_MENU', 1);
 	}
-	define('ZBX_PAGE_DO_REFRESH', 1);
+
+	$_REQUEST['config'] = get_request('config',get_profile('web.screens.config',0));
+
+	if( 1 != $_REQUEST['config'])
+		define('ZBX_PAGE_DO_REFRESH', 1);
 	
 include_once "include/page_header.php";
 
@@ -42,7 +46,10 @@ include_once "include/page_header.php";
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"screenid"=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,NULL),
+		"config"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1"),	null), // 0 - screens, 1 - slides
+
+		"elementid"=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,NULL),
+		"step"=>		array(T_ZBX_INT, O_OPT,  P_SYS,		BETWEEN(0,65535),NULL),
 		"dec"=>			array(T_ZBX_INT, O_OPT,  P_SYS, 	BETWEEN(0,65535*65535),NULL),
 		"inc"=>			array(T_ZBX_INT, O_OPT,  P_SYS, 	BETWEEN(0,65535*65535),NULL),
 		"from"=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	BETWEEN(0,65535*65535),NULL),
@@ -52,85 +59,142 @@ include_once "include/page_header.php";
 		"stime"=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	NULL,NULL),
 		"action"=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	IN("'go'"),NULL),
 		"reset"=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	IN("'reset'"),NULL),
-		"fullscreen"=>		array(T_ZBX_INT, O_OPT,	P_SYS,		IN("0,1"),		NULL)
+		"fullscreen"=>		array(T_ZBX_INT, O_OPT,	P_SYS,		IN("0,1,2"),		NULL)
 	);
 
 	check_fields($fields);
+
+	$config = $_REQUEST['config'] = get_request('config', 0);
+
+	if( 2 != $_REQUEST["fullscreen"] )
+		update_profile('web.screens.config', $_REQUEST['config']);
 ?>
 
 <?php
-	$_REQUEST["screenid"] = get_request("screenid",get_profile("web.screens.screenid", null));
+	$_REQUEST["elementid"] = get_request("elementid",get_profile("web.screens.elementid", null));
 	$_REQUEST["fullscreen"] = get_request("fullscreen", 0);
 
-	update_profile("web.screens.screenid",$_REQUEST["screenid"]);
+	if( 2 != $_REQUEST["fullscreen"] )
+		update_profile("web.screens.elementid",$_REQUEST["elementid"]);
 ?>
 
 <?php
 	$text = array(S_SCREENS_BIG);
 
-	$screenid = get_request('screenid', null);
-	if($screenid <= 0) $screenid = null;
+	$elementid = get_request('elementid', null);
+	if($elementid <= 0) $elementid = null;
 
-	if(isset($screenid))
+	if(isset($elementid))
 	{
-		$screen = get_screen_by_screenid($screenid);
-		if($screen) {
-			$url = "screens.php?screenid=".$screenid;
-			if($_REQUEST["fullscreen"]==0) $url .= "&fullscreen=1";
-			array_push($text,nbsp(" / "),new CLink($screen["name"], $url));
+		if( 0 == $config )
+		{
+			$element = get_screen_by_screenid($elementid);
 		}
 		else
 		{
-			$screenid = null;
-			update_profile("web.screens.screenid",0);
+			$element = get_slideshow_by_slideshowid($elementid);
+		}
+
+		if( $element ) {
+			$url = "?elementid=".$elementid;
+			if($_REQUEST["fullscreen"]==0) $url .= "&fullscreen=1";
+			$text[] = array(nbsp(" / "),new CLink($element["name"], $url));
+		}
+		else
+		{
+			$elementid = null;
+			update_profile("web.screens.elementid",0);
 		}
 	}
 	$form = new CForm();
 	$form->AddVar("fullscreen",$_REQUEST["fullscreen"]);
 
-	$cmbScreens = new CComboBox("screenid",$screenid,"submit()");
+	$cmbConfig = new CComboBox('config', $config, 'submit()');
+	$cmbConfig->AddItem(0, S_SCREENS);
+	$cmbConfig->AddItem(1, S_SLIDESHOWS);
+
+	$form->AddItem($cmbConfig);
+
+	$cmbElements = new CComboBox("elementid",$elementid,"submit()");
 	unset($screen_correct);
 	unset($first_screen);
 
-	$result = DBselect("select screenid,name from screens where ".DBid2nodeid("screenid")."=".$ZBX_CURNODEID." order by name");
-	while($row=DBfetch($result))
+	if( 0 == $config )
 	{
-		if(!screen_accessiable($row["screenid"], PERM_READ_ONLY))
-			continue;
+		$result = DBselect("select screenid as elementid,name from screens where ".DBid2nodeid("screenid")."=".$ZBX_CURNODEID." order by name");
+		while($row=DBfetch($result))
+		{
+			if(!screen_accessiable($row["elementid"], PERM_READ_ONLY))
+				continue;
 
-		$cmbScreens->AddItem($row["screenid"],$row["name"]);
-		if($screenid == $row["screenid"]) $screen_correct = 1;
-		if(!isset($first_screen)) $first_screen = $row["screenid"];
-	}
-
-	if(!isset($screen_correct) && isset($first_screen))
-	{
-		$screenid = $first_screen;
-	}
-
-	if(isset($screenid))
-	{
-		if(!screen_accessiable($screenid, PERM_READ_ONLY))
-			access_deny();
-	}
-			
-	if($cmbScreens->ItemsCount() > 0)
-		$form->AddItem($cmbScreens);
-
-	show_table_header($text,$form);
-?>
-<?php
-	if(isset($screenid))
-	{
-		$effectiveperiod = navigation_bar_calc();
-		$table = get_screen($screenid, 0, $effectiveperiod);
-		$table->Show();
-		
-		navigation_bar("screens.php");
+			$cmbElements->AddItem($row["elementid"],$row["name"]);
+			if($elementid == $row["elementid"]) $element_correct = 1;
+			if(!isset($first_element)) $first_element = $row["elementid"];
+		}
 	}
 	else
 	{
-		echo unpack_object(new CTableInfo(S_NO_SCREENS_DEFINED));
+		$result = DBselect("select slideshowid as elementid,name from slideshows where ".DBid2nodeid("slideshowid")."=".$ZBX_CURNODEID." order by name");
+		while($row=DBfetch($result))
+		{
+			if(!slideshow_accessiable($row["elementid"], PERM_READ_ONLY))
+				continue;
+
+			$cmbElements->AddItem($row["elementid"],$row["name"]);
+			if($elementid == $row["elementid"]) $element_correct = 1;
+			if(!isset($first_element)) $first_element = $row["elementid"];
+		}
+	}
+
+	if(!isset($element_correct) && isset($first_element))
+	{
+		$elementid = $first_element;
+	}
+
+	if(isset($elementid))
+	{
+		if( 0 == $config )
+		{
+			if(!screen_accessiable($elementid, PERM_READ_ONLY))
+				access_deny();
+		}
+		else
+		{
+			if(!slideshow_accessiable($elementid, PERM_READ_ONLY))
+				access_deny();
+		}
+	}
+			
+	if($cmbElements->ItemsCount() > 0)
+		$form->AddItem($cmbElements);
+
+	if( 2 != $_REQUEST["fullscreen"] )
+		show_table_header($text,$form);
+?>
+<?php
+	if(isset($elementid))
+	{
+		$effectiveperiod = navigation_bar_calc();
+		if( 0 == $config )
+		{
+			$element = get_screen($elementid, 0, $effectiveperiod);
+		}
+		else
+		{
+			$element = get_slideshow($elementid, get_request('step', null), $effectiveperiod);
+		}
+		if($element) $element->Show();
+		
+		if( 2 != $_REQUEST["fullscreen"] )
+			navigation_bar("screens.php");
+	}
+	else
+	{
+		echo unpack_object(new CTableInfo(
+					0 == $config ?
+						S_NO_SCREENS_DEFINED :
+						S_NO_SLIDESHOWS_DEFINED
+					));
 	}
 ?>
 <?php

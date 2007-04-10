@@ -36,7 +36,7 @@ COpt::profiling_start("page");
 	if(!isset($page["file"])) $page["file"] = basename($_SERVER['PHP_SELF']);
 
 	/* Authorize user */
-	if(!defined('ZBX_PAGE_NO_AUTHERIZATION'))
+	/*if(!defined('ZBX_PAGE_NO_AUTHERIZATION'))
 	{
 		check_authorisation();
 
@@ -53,7 +53,7 @@ COpt::profiling_start("page");
 			"node"  =>array(
 				"name"  =>'- unknown -',
 				"nodeid"=>0));
-	}
+	}*/
 
 	include_once "include/locales/en_gb.inc.php";
 	process_locales();

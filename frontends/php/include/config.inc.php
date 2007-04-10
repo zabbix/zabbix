@@ -146,6 +146,25 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 		include_once "setup.php";
 	}
 
+	if(!defined('ZBX_PAGE_NO_AUTHERIZATION'))
+	{
+		check_authorisation();
+
+		include_once "include/locales/".$USER_DETAILS["lang"].".inc.php";
+		process_locales();
+	}
+	else
+	{
+		$USER_DETAILS = array(
+			"alias" =>"guest",
+			"userid"=>0,
+			"lang"  =>"en_gb",
+			"type"  =>"0",
+			"node"  =>array(
+				"name"  =>'- unknown -',
+				"nodeid"=>0));
+	}
+
 	/********** END INITIALIZATION ************/
 
 	function	init_nodes()
@@ -1574,13 +1593,17 @@ else if (document.getElementById)
 <?php
 	}
 
-	function Redirect($url)
+	function Redirect($url,$timeout=null)
 	{
 		zbx_flush_post_cookies();
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--
-	window.location = '<?php echo $url; ?>';
+<?php		if( is_numeric($timeout) ) { ?>
+	setTimeout('Redirect(\'<?php echo $url; ?>\')', <?php echo ($timeout*1000); ?>);
+<?php 		} else { ?>
+	Redirect('<?php echo $url; ?>');
+<?php		} ?>
 //-->
 </script>
 <?php

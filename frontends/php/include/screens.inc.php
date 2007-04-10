@@ -178,6 +178,46 @@
 	
 
 
+	function get_slideshow($slideshowid, $step, $effectiveperiod=NULL)
+	{
+		$slide_data = DBfetch(DBselect('select min(step) as min_step, max(step) as max_step from slides '.
+					' where slideshowid='.$slideshowid));
+
+		if(!$slide_data || is_null($slide_data['min_step']))
+		{
+			return new CTableInfo(S_NO_SLIDES_DEFINED);
+		}
+
+		if(!isset($step) || $step < $slide_data['min_step'] || $step > $slide_data['max_step'])
+		{
+			$curr_step = $slide_data['min_step'];
+		}
+		else
+		{
+			$curr_step = $step;
+		}
+		
+		if(!isset($step))
+		{
+			return new CIFrame('screens.php?config=1&fullscreen=2&elementid='.$slideshowid.'&step='.$curr_step.
+					'&period='.$effectiveperiod.url_param('stime').url_param('from'));
+		}
+
+		$slide_data = DBfetch(DBselect('select sl.screenid,sl.delay,ss.delay as ss_delay from slides sl,slideshows ss '.
+				       ' where ss.slideshowid='.$slideshowid.' and ss.slideshowid=sl.slideshowid and sl.step='.$curr_step));
+
+		if( $slide_data['delay'] <= 0 )
+		{
+			$slide_data['delay'] = $slide_data['ss_delay'];
+		}
+
+		Redirect('screens.php?config=1&fullscreen=2&elementid='.$slideshowid.'&step='.($curr_step + 1).
+				'&period='.$effectiveperiod.url_param('stime').url_param('from'),
+				$slide_data['delay']);
+
+		return get_screen($slide_data['screenid'],2,$effectiveperiod);
+	}
+
 	// editmode: 0 - view with actions, 1 - edit mode, 2 - view without any actions
 	function get_screen($screenid, $editmode, $effectiveperiod=NULL)
 	{
