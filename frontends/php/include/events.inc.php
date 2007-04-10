@@ -107,7 +107,7 @@
 		if(is_null($nodeid)) $nodeid = $ZBX_CURNODEID;
 			
 		$db_events = DBselect('select distinct e.source,e.object,e.objectid,e.clock,e.value from events e'.
-			' where '.' e.source='.EVENT_SOURCE_DISCOVERY.' order by e.clock desc',
+			' where e.source='.EVENT_SOURCE_DISCOVERY.' order by e.clock desc',
 			10*($start+$num)
 			);
        
@@ -148,7 +148,7 @@
 					break;
 				case EVENT_OBJECT_DSERVICE:
 					$object_data = DBfetch(DBselect('select h.ip,s.type,s.port from dhosts h,dservices s '.
-						' where h.dhostid=s.dhostid, s.dserviceid='.$event_data['objectid']));
+						' where h.dhostid=s.dhostid and s.dserviceid='.$event_data['objectid']));
 					$description = S_SERVICE.': '.discovery_check_type2str($object_data['type']).'; '.
 						S_PORT.': '.$object_data['port'];
 					break;
