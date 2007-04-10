@@ -1600,9 +1600,9 @@ else if (document.getElementById)
 <script language="JavaScript" type="text/javascript">
 <!--
 <?php		if( is_numeric($timeout) ) { ?>
-	setTimeout('Redirect(\'<?php echo $url; ?>\')', <?php echo ($timeout*1000); ?>);
+	setTimeout('window.location=\'<?php echo $url; ?>\'', <?php echo ($timeout*1000); ?>);
 <?php 		} else { ?>
-	Redirect('<?php echo $url; ?>');
+	window.location = '<?php echo $url; ?>';
 <?php		} ?>
 //-->
 </script>
