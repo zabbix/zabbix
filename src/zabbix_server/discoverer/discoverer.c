@@ -539,7 +539,7 @@ static int discover_service(zbx_dservice_type_t type, char *ip, int port)
 
 /******************************************************************************
  *                                                                            *
- * Function: process_service                                                  *
+ * Function: process_check                                                    *
  *                                                                            *
  * Purpose: check if service is avaiable and update database                  *
  *                                                                            *
