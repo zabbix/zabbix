@@ -363,6 +363,44 @@ void	op_run_commands(DB_EVENT *event, DB_OPERATION *operation)
 
 /******************************************************************************
  *                                                                            *
+ * Function: select hostid of discovered host                                 *
+ *                                                                            *
+ * Purpose: select discovered host                                            *
+ *                                                                            *
+ * Parameters: dhostid - discovered host id                                   *
+ *                                                                            *
+ * Return value: hostid - existing hostid, o - if not found                   *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_uint64_t	select_discovered_host(zbx_uint64_t dhostid)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	hostid = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In select_discovered_host(dhostid:" ZBX_FS_UI64 ")",
+		dhostid);
+
+	result = DBselect("select h.hostid from dhosts d,hosts h where h.ip=d.ip and d.dhostid=" ZBX_FS_UI64,
+		dhostid);
+	row = DBfetch(result);
+	if(row && DBis_null(row[0]) != SUCCEED)
+	{
+		ZBX_STR2UINT64(hostid, row[0]);
+	}
+	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End select_discovered_host()");
+
+	return hostid;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: add host if not added already                                    *
  *                                                                            *
  * Purpose: add discovered host                                               *
@@ -449,7 +487,6 @@ void	op_host_add(DB_EVENT *event)
 	zabbix_log(LOG_LEVEL_DEBUG, "End op_host_add()");
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: op_group_add                                                     *
@@ -497,4 +534,41 @@ void	op_group_add(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation)
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End op_group_add()");
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: op_group_del                                                     *
+ *                                                                            *
+ * Purpose: delete group from discovered host                                 *
+ *                                                                            *
+ * Parameters: trigger - trigger data                                         *
+ *             action  - action data                                          *
+ *                                                                            *
+ * Return value: nothing                                                      *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	op_group_del(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation)
+{
+	zbx_uint64_t	groupid, hostid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In op_group_del()");
+
+	if(operation->operationtype != OPERATION_TYPE_GROUP_REMOVE)	return;
+	if(event->object != EVENT_OBJECT_DHOST)				return;
+
+	hostid = select_discovered_host(event->objectid);
+	if(hostid != 0)
+	{
+		groupid = operation->objectid;
+		DBexecute("delete from hosts_groups where hostid=" ZBX_FS_UI64 " and groupid=" ZBX_FS_UI64,
+				hostid,
+				groupid);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End op_group_del()");
 }
