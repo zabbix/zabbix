@@ -186,7 +186,7 @@ include_once "include/page_header.php";
 		if($element) $element->Show();
 		
 		if( 2 != $_REQUEST["fullscreen"] )
-			navigation_bar("screens.php");
+			navigation_bar("screens.php",array('config','elementid'));
 	}
 	else
 	{
