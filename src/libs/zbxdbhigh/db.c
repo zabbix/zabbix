@@ -1515,9 +1515,6 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 }
 
 /*
- * Execute SQL statement. For select statements only.
- * If fails, program terminates.
- */ 
 zbx_uint64_t DBget_nextid(char *table, char *field)
 {
 	DB_RESULT	result;
@@ -1538,7 +1535,7 @@ zbx_uint64_t DBget_nextid(char *table, char *field)
 		min,
 		field,
 		max);
-/*	zabbix_log(LOG_LEVEL_WARNING, "select max(%s) from %s where %s>=" ZBX_FS_UI64 " and %s<=" ZBX_FS_UI64, field, table, field, min, field, max); */
+	zabbix_log(LOG_LEVEL_DEBUG, "select max(%s) from %s where %s>=" ZBX_FS_UI64 " and %s<=" ZBX_FS_UI64, field, table, field, min, field, max); 
 
 	row=DBfetch(result);
 
@@ -1550,14 +1547,14 @@ zbx_uint64_t DBget_nextid(char *table, char *field)
 	}
 	else
 	{
-/*	zabbix_log(LOG_LEVEL_WARNING,"4"); */
 		res=(zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)CONFIG_NODEID+1;
 	}
 	DBfree_result(result);
-/*	zabbix_log(LOG_LEVEL_WARNING, ZBX_FS_UI64, res); */
+	zabbix_log(LOG_LEVEL_DEBUG, ZBX_FS_UI64, res);
 
 	return res;
 }
+*/
 
 zbx_uint64_t DBget_maxid(char *table, char *field)
 {
@@ -1585,7 +1582,7 @@ zbx_uint64_t DBget_maxid(char *table, char *field)
 			row = DBfetch(result);
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
-				DBexecute("insert into ids (nodeid,table_name,field_name,nextid) values (%d,'%s','%s',%d)",
+				DBexecute("insert into ids (nodeid,table_name,field_name,nextid) values (%d,'%s','%s'," ZBX_FS_UI64 ")",
 					CONFIG_NODEID,
 					table,
 					field,
@@ -1635,6 +1632,7 @@ zbx_uint64_t DBget_maxid(char *table, char *field)
 		}
 	}
 	while(FAIL == found);
+
 	zabbix_log(LOG_LEVEL_DEBUG, ZBX_FS_UI64, ret2);
 
 	return ret2;

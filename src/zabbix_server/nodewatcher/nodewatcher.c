@@ -145,7 +145,8 @@ static int calculate_checksums()
 		{
 			DBexecute("insert into node_cksum (cksumid,nodeid,tablename,fieldname,recordid,cksumtype,cksum) "\
 				"values (" ZBX_FS_UI64 ",%d,'%s','%s',%s,%d,'%s')",
-				DBget_nextid("node_cksum","cksumid"),
+/*				DBget_nextid("node_cksum","cksumid"),*/
+				DBget_maxid("node_cksum","cksumid"),
 				nodeid,
 				row2[0],
 				row2[1],
@@ -220,7 +221,8 @@ static int compare_checksums()
 /*		zabbix_log( LOG_LEVEL_WARNING, "Adding record to node_configlog");*/
 		DBexecute("insert into node_configlog (conflogid,nodeid,tablename,recordid,operation)" \
 				"values (" ZBX_FS_UI64 ",%s,'%s',%s,%d)",
-				DBget_nextid("node_configlog","conflogid"),
+/*				DBget_nextid("node_configlog","conflogid"),*/
+				DBget_maxid("node_configlog","conflogid"),
 				row[0],
 				row[1],
 				row[2],
@@ -240,7 +242,8 @@ static int compare_checksums()
 /*		zabbix_log( LOG_LEVEL_WARNING, "Adding record to node_configlog"); */
 		DBexecute("insert into node_configlog (conflogid,nodeid,tablename,recordid,operation)" \
 			"values (" ZBX_FS_UI64 ",%s,'%s',%s,%d)",
-			DBget_nextid("node_configlog","conflogid"),
+/*			DBget_nextid("node_configlog","conflogid"),*/
+			DBget_maxid("node_configlog","conflogid"),
 			row[0],
 			row[1],
 			row[2],
@@ -260,7 +263,8 @@ static int compare_checksums()
 /*		zabbix_log( LOG_LEVEL_WARNING, "Adding record to node_configlog");*/
 		DBexecute("insert into node_configlog (conflogid,nodeid,tablename,recordid,operation)" \
 				"values (" ZBX_FS_UI64 ",%s,'%s',%s,%d)",
-				DBget_nextid("node_configlog","conflogid"),
+/*				DBget_nextid("node_configlog","conflogid"),*/
+				DBget_maxid("node_configlog","conflogid"),
 				row[0],
 				row[1],
 				row[2],

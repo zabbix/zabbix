@@ -544,7 +544,7 @@ void	execute_operations(DB_EVENT *event, DB_ACTION *action)
 			case	OPERATION_TYPE_HOST_REMOVE:
 				break;
 			case	OPERATION_TYPE_GROUP_ADD:
-				op_group_add(event,action);
+				op_group_add(event,action,&operation);
 				break;
 			case	OPERATION_TYPE_GROUP_REMOVE:
 				break;
