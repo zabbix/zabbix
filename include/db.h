@@ -427,7 +427,6 @@ int	DBexecute(const char *fmt, ...);
 DB_RESULT	DBselect(const char *fmt, ...);
 DB_RESULT	DBselectN(char *query, int n);
 DB_ROW		DBfetch(DB_RESULT result);
-zbx_uint64_t 	DBget_nextid(char *table, char *field);
 zbx_uint64_t	DBinsert_id(int exec_result, const char *table, const char *field);
 int		DBis_null(char *field);
 void		DBbegin();
