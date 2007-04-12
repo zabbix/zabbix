@@ -49,7 +49,6 @@
 #include "evalfunc.h"
 #include "functions.h"
 #include "expression.h"
-#include "trapper/autoregister.h"
 
 /******************************************************************************
  *                                                                            *
@@ -466,6 +465,9 @@ int	process_data(zbx_sock_t *sock,char *server,char *key,char *value,char *lastl
 
 	if(!row)
 	{
+
+		return FAIL;
+/*
 		zabbix_log( LOG_LEVEL_DEBUG, "Before checking autoregistration for [%s]",
 			server);
 
@@ -473,7 +475,6 @@ int	process_data(zbx_sock_t *sock,char *server,char *key,char *value,char *lastl
 		{
 			DBfree_result(result);
 
-			/* Same SQL */
 			result = DBselect("select %s where h.status=%d and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type in (%d,%d) and" ZBX_COND_NODEID,
 				ZBX_SQL_ITEM_SELECT,
 				HOST_STATUS_MONITORED,
@@ -495,6 +496,7 @@ int	process_data(zbx_sock_t *sock,char *server,char *key,char *value,char *lastl
 			DBfree_result(result);
 			return  FAIL;
 		}
+*/
 	}
 
 	DBget_item_from_db(&item,row);
