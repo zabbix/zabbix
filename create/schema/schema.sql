@@ -315,12 +315,6 @@ FIELD		|details	|t_varchar(128)	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|userid,clock
 INDEX		|2		|clock
 
-TABLE|autoreg|id|ZBX_SYNC
-FIELD		|id		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|priority	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|pattern	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|hostid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-
 TABLE|conditions|conditionid|ZBX_SYNC
 FIELD		|conditionid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|actionid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
