@@ -29,7 +29,6 @@
 #include "../functions.h"
 #include "../expression.h"
 
-#include "autoregister.h"
 #include "nodesync.h"
 #include "nodeevents.h"
 #include "nodehistory.h"
@@ -70,7 +69,7 @@ int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 		}
 		else
 		{
-			if(autoregister(host) == SUCCEED)
+/*			if(autoregister(host) == SUCCEED)
 			{
 				zabbix_log( LOG_LEVEL_DEBUG, "New host registered [%s]",
 					host);
@@ -79,7 +78,7 @@ int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 			{
 				zabbix_log( LOG_LEVEL_DEBUG, "Host already exists [%s]",
 					host);
-			}
+			}*/
 			ret=send_list_of_active_checks(sock, host);
 		}
 	}
