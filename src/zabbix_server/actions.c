@@ -75,6 +75,8 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 	zbx_uint64_t	hostid;
 	zbx_uint64_t	condition_value;
 	int		value_int;
+	int		now;
+	int		tmp_int;
 
 	char		*tmp_str = NULL;
 
@@ -316,6 +318,130 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 			zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
 				condition->operator,
 				condition->conditionid);
+		}
+		DBfree_result(result);
+	}
+	else if(event->source == EVENT_SOURCE_DISCOVERY &&
+		event->object == EVENT_OBJECT_DHOST &&
+		condition->conditiontype == CONDITION_TYPE_DSTATUS)
+	{
+		zabbix_log( LOG_LEVEL_DEBUG, "CONDITION_TYPE_DSTATUS [%d:%s]",
+			event->value,
+			condition->value);
+		value_int = atoi(condition->value);
+		result = DBselect("select status from dhosts where dhostid=" ZBX_FS_UI64,
+			event->objectid);
+		row = DBfetch(result);
+		if(row && DBis_null(row[0]) != SUCCEED)
+		{
+			if(condition->operator == CONDITION_OPERATOR_EQUAL)
+			{
+				if(value_int == atoi(row[0]))	ret = SUCCEED;
+			}
+			else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
+			{
+				if(atoi(row[0]) != value_int)	ret = SUCCEED;
+			}
+			else
+			{
+				zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+					condition->operator,
+					condition->conditionid);
+			}
+		}
+		DBfree_result(result);
+	}
+	else if(event->source == EVENT_SOURCE_DISCOVERY &&
+		event->object == EVENT_OBJECT_DSERVICE &&
+		condition->conditiontype == CONDITION_TYPE_DSTATUS)
+	{
+		zabbix_log( LOG_LEVEL_DEBUG, "CONDITION_TYPE_DSERVICE [%d:%s]",
+			event->value,
+			condition->value);
+		value_int = atoi(condition->value);
+		result = DBselect("select status from dservices where dserviceid=" ZBX_FS_UI64,
+			event->objectid);
+		row = DBfetch(result);
+		if(row && DBis_null(row[0]) != SUCCEED)
+		{
+			if(condition->operator == CONDITION_OPERATOR_EQUAL)
+			{
+				if(value_int == atoi(row[0]))	ret = SUCCEED;
+			}
+			else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
+			{
+				if(atoi(row[0]) != value_int)	ret = SUCCEED;
+			}
+			else
+			{
+				zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+					condition->operator,
+					condition->conditionid);
+			}
+		}
+		DBfree_result(result);
+	}
+	else if(event->source == EVENT_SOURCE_DISCOVERY &&
+		event->object == EVENT_OBJECT_DHOST &&
+		condition->conditiontype == CONDITION_TYPE_DUPTIME)
+	{
+		zabbix_log( LOG_LEVEL_DEBUG, "CONDITION_TYPE_DUPTIME [%d:%s]",
+			event->value,
+			condition->value);
+		value_int = atoi(condition->value);
+		result = DBselect("select status,lastup,lastdown from dhosts where dhostid=" ZBX_FS_UI64,
+			event->objectid);
+		row = DBfetch(result);
+		if(row && DBis_null(row[0]) != SUCCEED)
+		{
+			tmp_int = (atoi(row[0]) == DOBJECT_STATUS_UP)?atoi(row[1]):atoi(row[2]);
+			now = time(NULL);
+			if(condition->operator == CONDITION_OPERATOR_LESS_EQUAL)
+			{
+				if(tmp_int != 0 && (now-value_int)<=value_int)	ret = SUCCEED;
+			}
+			else if(condition->operator == CONDITION_OPERATOR_MORE_EQUAL)
+			{
+				if(tmp_int != 0 && (now-value_int)>=value_int)	ret = SUCCEED;
+			}
+			else
+			{
+				zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+					condition->operator,
+					condition->conditionid);
+			}
+		}
+		DBfree_result(result);
+	}
+	else if(event->source == EVENT_SOURCE_DISCOVERY &&
+		event->object == EVENT_OBJECT_DSERVICE &&
+		condition->conditiontype == CONDITION_TYPE_DUPTIME)
+	{
+		zabbix_log( LOG_LEVEL_DEBUG, "CONDITION_TYPE_DUPTIME [%d:%s]",
+			event->value,
+			condition->value);
+		value_int = atoi(condition->value);
+		result = DBselect("select status,lastup,lastdown from dservices where dserviceid=" ZBX_FS_UI64,
+			event->objectid);
+		row = DBfetch(result);
+		if(row && DBis_null(row[0]) != SUCCEED)
+		{
+			tmp_int = (atoi(row[0]) == DOBJECT_STATUS_UP)?atoi(row[1]):atoi(row[2]);
+			now = time(NULL);
+			if(condition->operator == CONDITION_OPERATOR_LESS_EQUAL)
+			{
+				if(tmp_int != 0 && (now-value_int)<=value_int)	ret = SUCCEED;
+			}
+			else if(condition->operator == CONDITION_OPERATOR_MORE_EQUAL)
+			{
+				if(tmp_int != 0 && (now-value_int)>=value_int)	ret = SUCCEED;
+			}
+			else
+			{
+				zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+					condition->operator,
+					condition->conditionid);
+			}
 		}
 		DBfree_result(result);
 	}

@@ -60,7 +60,6 @@ FIELD		|ip		|t_varchar(15)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastup		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastdown	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|eventsent	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 
 TABLE|dservices|dserviceid|ZBX_SYNC
 FIELD		|dserviceid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
@@ -70,7 +69,6 @@ FIELD		|port		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastup		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastdown	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|eventsent	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 
 TABLE|ids|nodeid,table_name,field_name|
 FIELD		|nodeid		|t_integer	|'0'	|NOT NULL	|0
