@@ -47,26 +47,42 @@ int	discoverer_num;
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static void add_host_event(DB_DHOST *host, DB_DSERVICE *service)
+static void add_host_event(char *ip)
 {
+	DB_RESULT	result;
+	DB_ROW		row;
 	DB_EVENT	event;
 	int		now;
+	int		status;
+	zbx_uint64_t	dhostid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In add_host_event()");
+	zabbix_log(LOG_LEVEL_WARNING, "In add_host_event(ip:%s)",
+		ip);
 
-	now = time(NULL); 
+	result = DBselect("select status,dhostid from dhosts where ip='%s'",
+		ip);
+	row=DBfetch(result);
+	if(row && DBis_null(row[0])!=SUCCEED)
+	{
+		now = time(NULL); 
+		status = atoi(row[0]);
+		ZBX_STR2UINT64(dhostid, row[1]);
 
-	memset(&event,0,sizeof(DB_EVENT));
+		memset(&event,0,sizeof(DB_EVENT));
 
-	event.eventid		= 0;
-	event.source		= EVENT_SOURCE_DISCOVERY;
-	event.object		= EVENT_OBJECT_DHOST;
-	event.objectid		= service->dhostid;
-	event.clock 		= now;
-	event.value 		= host->status;
-	event.acknowledged 	= 0;
+		event.eventid		= 0;
+		event.source		= EVENT_SOURCE_DISCOVERY;
+		event.object		= EVENT_OBJECT_DHOST;
+		event.objectid		= dhostid;
+		event.clock 		= now;
+		event.value 		= status;
+		event.acknowledged 	= 0;
 
-	process_event(&event);
+		process_event(&event);
+	}
+	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_WARNING, "End add_host_event()");
 }
 
 /******************************************************************************
@@ -89,7 +105,7 @@ static void add_service_event(DB_DSERVICE *service)
 	DB_EVENT	event;
 	int		now;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In add_host_event()");
+	zabbix_log(LOG_LEVEL_WARNING, "In add_service_event()");
 
 	now = time(NULL); 
 
@@ -104,6 +120,8 @@ static void add_service_event(DB_DSERVICE *service)
 	event.acknowledged 	= 0;
 
 	process_event(&event);
+
+	zabbix_log(LOG_LEVEL_WARNING, "End add_service_event()");
 }
 
 /******************************************************************************
@@ -123,14 +141,13 @@ static void add_service_event(DB_DSERVICE *service)
  ******************************************************************************/
 static void update_dservice(DB_DSERVICE *service)
 {
-	DBexecute("update dservices set dhostid=" ZBX_FS_UI64 ",type=%d,port=%d,status=%d,lastup=%d,lastdown=%d,eventsent=%d where dserviceid=" ZBX_FS_UI64,
+	DBexecute("update dservices set dhostid=" ZBX_FS_UI64 ",type=%d,port=%d,status=%d,lastup=%d,lastdown=%d where dserviceid=" ZBX_FS_UI64,
 			service->dhostid,
 			service->type,
 			service->port,
 			service->status,
 			service->lastup,
 			service->lastdown,
-			service->eventsent,
 			service->dserviceid);
 }
 
@@ -151,13 +168,12 @@ static void update_dservice(DB_DSERVICE *service)
  ******************************************************************************/
 static void update_dhost(DB_DHOST *host)
 {
-	DBexecute("update dhosts set druleid=" ZBX_FS_UI64 ",ip='%s',status=%d,lastup=%d,lastdown=%d,eventsent=%d where dhostid=" ZBX_FS_UI64,
+	DBexecute("update dhosts set druleid=" ZBX_FS_UI64 ",ip='%s',status=%d,lastup=%d,lastdown=%d where dhostid=" ZBX_FS_UI64,
 			host->druleid,
 			host->ip,
 			host->status,
 			host->lastup,
 			host->lastdown,
-			host->eventsent,
 			host->dhostid);
 }
 
@@ -186,7 +202,7 @@ static void register_service(DB_DSERVICE *service,DB_DRULE *rule,DB_DCHECK *chec
 		ip,
 		port);
 
-	result = DBselect("select dserviceid,dhostid,type,port,status,lastup,lastdown,eventsent from dservices where dhostid=" ZBX_FS_UI64 " and type=%d and port=%d",
+	result = DBselect("select dserviceid,dhostid,type,port,status,lastup,lastdown from dservices where dhostid=" ZBX_FS_UI64 " and type=%d and port=%d",
 		dhostid,
 		check->type,
 		port);
@@ -212,7 +228,6 @@ static void register_service(DB_DSERVICE *service,DB_DRULE *rule,DB_DCHECK *chec
 			service->status		= DOBJECT_STATUS_UP;
 			service->lastup		= 0;
 			service->lastdown	= 0;
-			service->eventsent	= 0;
 		}
 	}
 	else
@@ -225,7 +240,6 @@ static void register_service(DB_DSERVICE *service,DB_DRULE *rule,DB_DCHECK *chec
 		service->status		= atoi(row[4]);
 		service->lastup		= atoi(row[5]);
 		service->lastdown	= atoi(row[6]);
-		service->eventsent	= atoi(row[7]);
 	}
 	DBfree_result(result);
 
@@ -256,7 +270,7 @@ static void register_host(DB_DHOST *host,DB_DCHECK *check, zbx_uint64_t druleid,
 		ip);
 
 	host->dhostid=0;
-	result = DBselect("select dhostid,druleid,ip,status,lastup,lastdown,eventsent from dhosts where ip='%s' and " ZBX_COND_NODEID,
+	result = DBselect("select dhostid,druleid,ip,status,lastup,lastdown from dhosts where ip='%s' and " ZBX_COND_NODEID,
 		ip,
 		LOCAL_NODE("dhostid"));
 	row=DBfetch(result);
@@ -277,7 +291,6 @@ static void register_host(DB_DHOST *host,DB_DCHECK *check, zbx_uint64_t druleid,
 			host->status	= 0;
 			host->lastup	= 0;
 			host->lastdown  = 0;
-			host->eventsent	= 0;
 		}
 	}
 	else
@@ -289,7 +302,6 @@ static void register_host(DB_DHOST *host,DB_DCHECK *check, zbx_uint64_t druleid,
 		host->status		= atoi(row[3]);
 		host->lastup		= atoi(row[4]);
 		host->lastdown		= atoi(row[5]);
-		host->eventsent		= atoi(row[6]);
 	}
 	DBfree_result(result);
 
@@ -349,7 +361,6 @@ static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 			host.status=DOBJECT_STATUS_UP;
 			host.lastdown=0;
 			host.lastup=now;
-			host.eventsent=0;
 			update_dhost(&host);
 		}
 		/* Update service status */
@@ -358,7 +369,6 @@ static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 			service.status=DOBJECT_STATUS_UP;
 			service.lastdown=0;
 			service.lastup=now;
-			service.eventsent=0;
 			update_dservice(&service);
 		}
 	}
@@ -370,7 +380,6 @@ static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 			host.status=DOBJECT_STATUS_DOWN;
 			host.lastup=now;
 			host.lastdown=0;
-			host.eventsent=0;
 			update_dhost(&host);
 		}
 		/* Update service status */
@@ -379,56 +388,11 @@ static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 			service.status=DOBJECT_STATUS_DOWN;
 			service.lastup=now;
 			service.lastdown=0;
-			service.eventsent=0;
 			update_dservice(&service);
 		}
 	}
 
-	/* Generating host events */
-	if(host.eventsent == 0)
-	{
-		if(host.status == DOBJECT_STATUS_UP && (host.lastup<=now-rule->upevent))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Generating host event for %s",
-				host.ip);
-			host.eventsent=1;
-
-			update_dhost(&host);
-			add_host_event(&host,&service);
-		}
-		if(host.status == DOBJECT_STATUS_DOWN && (host.lastdown<=now-rule->downevent))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Generating host event for %s",
-				host.ip);
-			host.eventsent=1;
-
-			update_dhost(&host);
-			add_host_event(&host,&service);
-		}
-	}
-
-	/* Generating service events */
-	if(service.eventsent == 0)
-	{
-		if(service.status == DOBJECT_STATUS_UP && (service.lastup<=now-rule->svcupevent))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Generating service event for %s",
-				host.ip);
-			service.eventsent=1;
-
-			update_dservice(&service);
-			add_service_event(&service);
-		}
-		if(service.status == DOBJECT_STATUS_DOWN && (service.lastdown<=now-rule->svcdownevent))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Generating service event for %s",
-				host.ip);
-			service.eventsent=1;
-
-			update_dservice(&service);
-			add_service_event(&service);
-		}
-	}
+	add_service_event(&service);
 }
 
 /******************************************************************************
@@ -626,31 +590,31 @@ static void process_rule(DB_DRULE *rule)
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_rule(name:%s)",
 		rule->name);
 
-	result = DBselect("select dcheckid,druleid,type,ports from dchecks where druleid=" ZBX_FS_UI64,
-		rule->druleid);
-	while((row=DBfetch(result)))
+
+	first=atoi(strrchr(rule->ipfirst,'.')+1);
+	last=atoi(strrchr(rule->iplast,'.')+1);
+	c = strrchr(rule->ipfirst,'.');
+	for(i=first;i<=last;i++)
 	{
-		ZBX_STR2UINT64(check.dcheckid,row[0]);
-		ZBX_STR2UINT64(check.druleid,row[1]);
-		check.type		= atoi(row[2]);
-		check.ports		= row[3];
-
-		first=atoi(strrchr(rule->ipfirst,'.')+1);
-		last=atoi(strrchr(rule->iplast,'.')+1);
-
-		c = strrchr(rule->ipfirst,'.');
 		c[0] = 0;
-		for(i=first;i<=last;i++)
+		zbx_snprintf(ip,MAX_STRING_LEN-1,"%s.%d",
+			rule->ipfirst,
+			i);
+		result = DBselect("select dcheckid,druleid,type,ports from dchecks where druleid=" ZBX_FS_UI64,
+			rule->druleid);
+		while((row=DBfetch(result)))
 		{
-			zbx_snprintf(ip,MAX_STRING_LEN-1,"%s.%d",
-				rule->ipfirst,
-				i);
-
+			ZBX_STR2UINT64(check.dcheckid,row[0]);
+			ZBX_STR2UINT64(check.druleid,row[1]);
+			check.type		= atoi(row[2]);
+			check.ports		= row[3];
+	
 			process_check(rule, &check, ip);
 		}
+		DBfree_result(result);
+		add_host_event(ip);
 		c[0] = '.';
 	}
-	DBfree_result(result);
 
 	zabbix_log( LOG_LEVEL_DEBUG, "End process_rule()");
 }
@@ -689,7 +653,7 @@ void main_discoverer_loop(int num)
 	{
 		now=time(NULL);
 
-		result = DBselect("select druleid,ipfirst,iplast,delay,nextcheck,name,status,upevent,downevent,svcupevent,svcdownevent from drules where status=%d and nextcheck<=%d and " ZBX_SQL_MOD(druleid,%d) "=%d and" ZBX_COND_NODEID,
+		result = DBselect("select druleid,ipfirst,iplast,delay,nextcheck,name,status from drules where status=%d and nextcheck<=%d and " ZBX_SQL_MOD(druleid,%d) "=%d and" ZBX_COND_NODEID,
 			DRULE_STATUS_MONITORED,
 			now,
 			CONFIG_DISCOVERER_FORKS,
@@ -704,10 +668,6 @@ void main_discoverer_loop(int num)
 			rule.nextcheck		= atoi(row[4]);
 			rule.name		= row[5];
 			rule.status		= atoi(row[6]);
-			rule.upevent		= atoi(row[7]);
-			rule.downevent		= atoi(row[8]);
-			rule.svcupevent		= atoi(row[9]);
-			rule.svcdownevent	= atoi(row[10]);
 			
 			process_rule(&rule);
 		}

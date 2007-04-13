@@ -5,6 +5,5 @@ CREATE TABLE dhosts (
         status          integer         DEFAULT '0'     NOT NULL,
         lastup          integer         DEFAULT '0'     NOT NULL,
         lastdown        integer         DEFAULT '0'     NOT NULL,
-        eventsent       integer         DEFAULT '0'     NOT NULL,
         PRIMARY KEY (dhostid)
 ) type=InnoDB;

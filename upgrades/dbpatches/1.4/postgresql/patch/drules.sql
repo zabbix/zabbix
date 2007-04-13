@@ -6,9 +6,5 @@ CREATE TABLE drules (
         delay           integer         DEFAULT '0'     NOT NULL,
         nextcheck       integer         DEFAULT '0'     NOT NULL,
         status          integer         DEFAULT '0'     NOT NULL,
-        upevent         integer         DEFAULT '0'     NOT NULL,
-        downevent               integer         DEFAULT '0'     NOT NULL,
-        svcupevent              integer         DEFAULT '0'     NOT NULL,
-        svcdownevent            integer         DEFAULT '0'     NOT NULL,
         PRIMARY KEY (druleid)
 );
