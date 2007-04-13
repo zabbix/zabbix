@@ -84,7 +84,7 @@ int     get_value_external(DB_ITEM *item, AGENT_RESULT *result)
 		return NOTSUPPORTED;
 	}
 
-	zbx_snprintf(cmd, MAX_STRING_LEN-1, "%s%s %s %s", CONFIG_EXTERNALSCRIPTS, scriptname, item->host_name, params);
+	zbx_snprintf(cmd, MAX_STRING_LEN-1, "%s/%s %s %s", CONFIG_EXTERNALSCRIPTS, scriptname, item->host_name, params);
 	zabbix_log( LOG_LEVEL_DEBUG, cmd );
 	if (NULL == (fp = popen(cmd, "r"))) 
 	{
