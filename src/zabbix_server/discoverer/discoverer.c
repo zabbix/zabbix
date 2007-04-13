@@ -56,7 +56,7 @@ static void add_host_event(char *ip)
 	int		status;
 	zbx_uint64_t	dhostid;
 
-	zabbix_log(LOG_LEVEL_WARNING, "In add_host_event(ip:%s)",
+	zabbix_log(LOG_LEVEL_DEBUG, "In add_host_event(ip:%s)",
 		ip);
 
 	result = DBselect("select status,dhostid from dhosts where ip='%s'",
@@ -82,7 +82,7 @@ static void add_host_event(char *ip)
 	}
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_WARNING, "End add_host_event()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End add_host_event()");
 }
 
 /******************************************************************************
@@ -105,7 +105,7 @@ static void add_service_event(DB_DSERVICE *service)
 	DB_EVENT	event;
 	int		now;
 
-	zabbix_log(LOG_LEVEL_WARNING, "In add_service_event()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In add_service_event()");
 
 	now = time(NULL); 
 
@@ -121,7 +121,7 @@ static void add_service_event(DB_DSERVICE *service)
 
 	process_event(&event);
 
-	zabbix_log(LOG_LEVEL_WARNING, "End add_service_event()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End add_service_event()");
 }
 
 /******************************************************************************
