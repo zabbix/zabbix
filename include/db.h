@@ -121,10 +121,6 @@ DB_DRULE
 	int		nextcheck;
 	char		*name;
 	int		status;
-	int		upevent;
-	int		downevent;
-	int		svcupevent;
-	int		svcdownevent;
 };
 
 DB_DCHECK
@@ -144,7 +140,6 @@ DB_DHOST
 	int		status;
 	int		lastup;
 	int		lastdown;
-	int		eventsent;
 };
 
 DB_DSERVICE
@@ -156,7 +151,6 @@ DB_DSERVICE
 	int		status;
 	int		lastup;
 	int		lastdown;
-	int		eventsent;
 };
 
 DB_EVENT
