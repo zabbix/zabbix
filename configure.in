@@ -751,7 +751,6 @@ AC_OUTPUT([
 	src/libs/Makefile
 	src/libs/zbxlog/Makefile
 	src/libs/zbxcrypto/Makefile
-	src/libs/zbxnet/Makefile
 	src/libs/zbxconf/Makefile
 	src/libs/zbxdbhigh/Makefile
 	src/libs/zbxemail/Makefile

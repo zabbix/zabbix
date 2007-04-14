@@ -9,7 +9,6 @@ DIST_SUBDIRS = \
 	zbxcommon \
 	zbxcomms \
 	zbxlog \
-	zbxnet \
 	zbxnix \
 	zbxconf \
 	zbxsysinfo \
