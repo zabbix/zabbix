@@ -323,6 +323,7 @@ include_once 'include/discovery.inc.php';
 		$str_type[CONDITION_TYPE_DSERVICE_TYPE]		= S_SERVICE_TYPE;
 		$str_type[CONDITION_TYPE_DSERVICE_PORT]		= S_SERVICE_PORT;
 		$str_type[CONDITION_TYPE_DSTATUS]		= S_DISCOVERY_STATUS;
+		$str_type[CONDITION_TYPE_DUPTIME]		= S_UPTIME_DOWNTIME;
 
 		if(isset($str_type[$conditiontype]))
 			return $str_type[$conditiontype];
@@ -368,6 +369,9 @@ include_once 'include/discovery.inc.php';
 				break;
 			case CONDITION_TYPE_DSTATUS:
 				$str_val = discovery_object_status2str($value);
+				break;
+			case CONDITION_TYPE_DUPTIME:
+				$str_val = $value;
 				break;
 			default:
 				return S_UNKNOWN;
@@ -471,7 +475,8 @@ include_once 'include/discovery.inc.php';
 				CONDITION_TYPE_DHOST_IP,
 				CONDITION_TYPE_DSERVICE_TYPE,
 				CONDITION_TYPE_DSERVICE_PORT,
-				CONDITION_TYPE_DSTATUS
+				CONDITION_TYPE_DSTATUS,
+				CONDITION_TYPE_DUPTIME
 			);
 
 		if(isset($conditions[$eventsource]))
@@ -565,6 +570,10 @@ include_once 'include/discovery.inc.php';
 		$operators[CONDITION_TYPE_DSTATUS] = array(
 				CONDITION_OPERATOR_EQUAL,
 			);
+		$operators[CONDITION_TYPE_DUPTIME] = array(
+				CONDITION_OPERATOR_MORE_EQUAL,
+				CONDITION_OPERATOR_LESS_EQUAL
+			);
 
 		if(isset($operators[$conditiontype]))
 			return $operators[$conditiontype];
@@ -647,6 +656,7 @@ include_once 'include/discovery.inc.php';
 			case CONDITION_TYPE_TRIGGER_NAME:
 			case CONDITION_TYPE_TRIGGER_VALUE:
 			case CONDITION_TYPE_TRIGGER_SEVERITY:
+			case CONDITION_TYPE_DUPTIME:
 				break;
 			default:
 				error(S_INCORRECT_CONDITION_TYPE);
