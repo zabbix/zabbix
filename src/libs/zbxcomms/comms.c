@@ -31,6 +31,8 @@
 #	define ZBX_TCP_WRITE(s, b, bl)	((ssize_t)send((s), (b), (bl), 0))
 #	define ZBX_TCP_READ(s, b, bl)	((ssize_t)recv((s), (b), (bl), 0))
 
+#	define ZBX_TCP_READ_EOF(readed, requested) ( 0 == (readed) )
+
 #	define ZBX_TCP_ERROR	SOCKET_ERROR
 #	define ZBX_SOCK_ERROR	INVALID_SOCKET
 
@@ -40,6 +42,8 @@
 
 #	define ZBX_TCP_WRITE(s, b, bl)	((ssize_t)write((s), (b), (bl)))
 #	define ZBX_TCP_READ(s, b, bl)	((ssize_t)read((s), (b), (bl)))
+
+#	define ZBX_TCP_READ_EOF(readed, requested) ( (requested) > (readed) || 0 == (readed) )
 
 #	define ZBX_TCP_ERROR	-1
 #	define ZBX_SOCK_ERROR	-1
@@ -566,9 +570,12 @@ int	zbx_tcp_recv(zbx_sock_t *s, char **data)
 	if( ZBX_TCP_ERROR != nbytes )
 	{
 		/* fill static buffer */
-		while( ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ( s->socket, s->buf_stat + read_bytes, sizeof(s->buf_stat) - read_bytes - 1)) && nbytes > 0)
+		while(	(sizeof(s->buf_stat) - read_bytes - 1) > 0
+			&& ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ( s->socket, s->buf_stat + read_bytes, sizeof(s->buf_stat) - read_bytes - 1)))
 		{
 			read_bytes += nbytes;
+
+			if( ZBX_TCP_READ_EOF(nbytes, sizeof(s->buf_stat) - read_bytes - 1) )	break;
 		}
 		s->buf_stat[read_bytes] = '\0';
 
@@ -583,13 +590,14 @@ int	zbx_tcp_recv(zbx_sock_t *s, char **data)
 			memcpy(s->buf_dyn, s->buf_stat, sizeof(s->buf_stat));
 
 			offset = read_bytes;
-
 			/* fill dynamic buffer */
-			while( read_bytes < expected_len && ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ(s->socket, s->buf_stat, sizeof(s->buf_stat)-1)) && nbytes > 0 )
+			while( read_bytes < expected_len && ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ(s->socket, s->buf_stat, sizeof(s->buf_stat)-1)) )
 			{
 				s->buf_stat[nbytes] = '\0';
 				zbx_snprintf_alloc(&(s->buf_dyn), &allocated, &offset, sizeof(s->buf_stat), "%s", s->buf_stat);
 				read_bytes += nbytes;
+
+				if( ZBX_TCP_READ_EOF(nbytes, sizeof(s->buf_stat) - 1) )	break;
 			}
 
 			*data = s->buf_dyn;
