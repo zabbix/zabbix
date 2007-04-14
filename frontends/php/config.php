@@ -20,7 +20,6 @@
 ?>
 <?php
 	require_once "include/config.inc.php";
-	require_once "include/autoregistration.inc.php";
 	require_once "include/images.inc.php";
 	require_once "include/forms.inc.php";
 
@@ -34,7 +33,7 @@ include_once "include/page_header.php";
 	$fields=array(
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 
-		"config"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,3,4,5,6,7"),	NULL),
+		"config"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,3,5,6,7"),	NULL),
 
 // other form
 		"alert_history"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),	'({config}==0)&&({save}=="Save")'),
@@ -58,15 +57,6 @@ include_once "include/page_header.php";
 		"add_value"=>		array(T_ZBX_STR, O_OPT, NULL,	NOT_EMPTY, 'isset({add_map})'),
 		"add_newvalue"=>	array(T_ZBX_STR, O_OPT, NULL,	NOT_EMPTY, 'isset({add_map})'),
 
-// autoregistration form
-		"autoregid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,
-						'{config}==4&&{form}=="update"'),
-		"pattern"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,
-						'{config}==4&&isset({save})'),
-		"hostid"=>		array(T_ZBX_INT, O_NO,	NULL,	DB_ID,
-						'{config}==4&&isset({save})'),
-		"priority"=>		array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),
-						'{config}==4&&isset({save})'),
 /* actions */
 		"add_map"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"del_map"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -133,56 +123,6 @@ include_once "include/page_header.php";
 				unset($_REQUEST["form"]);
 			}
 			unset($_REQUEST["imageid"]);
-		}
-	}
-	elseif($_REQUEST["config"]==4)
-	{
-/* AUTOREG ACTIONS */
-		if(isset($_REQUEST["save"]))
-		{
-			if(isset($_REQUEST["autoregid"]))
-			{
-	/* UPDATE */
-				$result=update_autoregistration($_REQUEST["autoregid"],
-					$_REQUEST["pattern"],$_REQUEST["priority"],$_REQUEST["hostid"]);
-
-				$msg_ok = S_AUTOREGISTRATION_UPDATED;
-				$msg_fail = S_AUTOREGISTRATION_WAS_NOT_UPDATED;
-				$audit_action = AUDIT_ACTION_UPDATE;
-			} else {
-	/* ADD */
-				if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,
-						PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
-				{
-					access_deny();
-				}
-				$result=add_autoregistration(
-					$_REQUEST["pattern"],$_REQUEST["priority"],$_REQUEST["hostid"]);
-
-				$msg_ok = S_AUTOREGISTRATION_ADDED;
-				$msg_fail = S_CANNOT_ADD_AUTOREGISTRATION;
-				$audit_action = AUDIT_ACTION_ADD;
-			}
-
-			if($result)
-			{
-				add_audit($audit_action, AUDIT_RESOURCE_AUTOREGISTRATION,
-					"Autoregistration [".$_REQUEST["pattern"]."]");
-
-				unset($_REQUEST["form"]);
-			}
-			show_messages($result, $msg_ok, $msg_fail);
-
-		} elseif(isset($_REQUEST["delete"])&&isset($_REQUEST["autoregid"])) {
-	/* DELETE */
-			$result=delete_autoregistration($_REQUEST["autoregid"]);
-			if($result)
-			{
-				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_AUTOREGISTRATION,
-					"Autoregistration [".$_REQUEST["pattern"]."]");
-				unset($_REQUEST["form"]);
-			}
-			show_messages($result, S_AUTOREGISTRATION_DELETED, S_AUTOREGISTRATION_WAS_NOT_DELETED);
 		}
 	}
 	elseif(isset($_REQUEST["save"])&&in_array($_REQUEST["config"],array(0,5,7)))
@@ -316,7 +256,7 @@ include_once "include/page_header.php";
 	$cmbConfig->AddItem(0,S_HOUSEKEEPER);
 //	$cmbConfig->AddItem(2,S_ESCALATION_RULES);
 	$cmbConfig->AddItem(3,S_IMAGES);
-	$cmbConfig->AddItem(4,S_AUTOREGISTRATION);
+//	$cmbConfig->AddItem(4,S_AUTOREGISTRATION);
 	$cmbConfig->AddItem(6,S_VALUE_MAPPING);
 	$cmbConfig->AddItem(7,S_WORKING_TIME);
 	$cmbConfig->AddItem(5,S_OTHER);
@@ -326,10 +266,6 @@ include_once "include/page_header.php";
 	case 3:
 		$form->AddItem(SPACE."|".SPACE);
 		$form->AddItem(new CButton("form",S_CREATE_IMAGE));
-		break;
-	case 4:
-		$form->AddItem(SPACE."|".SPACE);
-		$form->AddItem(new CButton("form",S_CREATE_RULE));
 		break;
 	case 6:
 		$form->AddItem(SPACE."|".SPACE);
@@ -385,45 +321,6 @@ include_once "include/page_header.php";
 						new CImg("image.php?height=24&imageid=".$row["imageid"],"no image",NULL),
 						"image.php?imageid=".$row["imageid"])
 					));
-			}
-			$table->show();
-		}
-	}
-	elseif($_REQUEST["config"]==4)
-	{
-		if(isset($_REQUEST["form"]))
-		{
-			insert_autoregistration_form();
-		}
-		else
-		{
-			show_table_header(S_AUTOREGISTRATION_RULES_BIG);
-
-			$table=new CTableInfo(S_NO_AUTOREGISTRATION_RULES_DEFINED);
-			$table->setHeader(array(S_PRIORITY,S_PATTERN,S_HOST));
-
-			$result=DBselect("select * from autoreg".
-					" where ".DBid2nodeid("id")."=".$ZBX_CURNODEID.
-					" order by priority");
-			while($row=DBfetch($result))
-			{
-				if($row["hostid"]==0)
-				{
-					$name=SPACE;
-				}
-				else
-				{
-					$host=get_host_by_hostid($row["hostid"]);
-					$name=$host["host"];
-				}
-				$pattern=new CLink($row["pattern"],
-					"config.php?form=update".url_param("config")."&autoregid=".$row["id"],
-					'action');
-
-				$table->addRow(array(
-					$row["priority"],
-					$pattern,
-					$name));
 			}
 			$table->show();
 		}

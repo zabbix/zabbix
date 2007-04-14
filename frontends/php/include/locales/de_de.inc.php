@@ -199,17 +199,8 @@
 	"S_IMAGE_UPDATED"=>	"Grafik aktualisiert",
 	"S_CANNOT_UPDATE_IMAGE"=>	"Grafik konnte nicht aktualisiert werden",
 	"S_UPDATE_SELECTED_IMAGE"=>	"Ausgew&auml;hlte Grafik aktualisieren?",
-	"S_AUTOREGISTRATION"=>	"Automatische Systemregistrierung",
-	"S_AUTOREGISTRATION_RULES_BIG"=>	"EINSTELLUNGEN ZUR AUTOMATISCHEN SYSTEMREGISTRIERUNG",
 	"S_PRIORITY"=>	"Priorit&auml;t",
 	"S_PATTERN"=>	"Raster",
-	"S_NO_AUTOREGISTRATION_RULES_DEFINED"=>	"Keine Regeln zur automatischen Systemregistrierung definiert",
-	"S_AUTOREGISTRATION_ADDED"=>	"Autoregistration added",
-	"S_CANNOT_ADD_AUTOREGISTRATION"=>	"Automatische Systemregistrierung konnte nicht hinzugef&uml;gt werden",
-	"S_AUTOREGISTRATION_UPDATED"=>	"Automatische Systemregistrierung aktualisiert",
-	"S_AUTOREGISTRATION_WAS_NOT_UPDATED"=>	"Automatische Systemregistrierung konnte nicht aktualisiert werden",
-	"S_AUTOREGISTRATION_DELETED"=>	"Automatische Systemregistrierung gel&ouml;scht",
-	"S_AUTOREGISTRATION_WAS_NOT_DELETED"=>	"Automatische Systemregistrierung konnte nicht gel&ouml;scht werden",
 
 //      Latest values
         "S_LATEST_VALUES"=>	"Aktueller Wert",
