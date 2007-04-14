@@ -229,35 +229,35 @@ static double GetProcessAttribute(HANDLE hProcess,int attr,int type,int count,do
          if(NULL == zbx_GetProcessIoCounters)
 	     return SYSINFO_RET_FAIL;
 
-         GetProcessIoCounters(hProcess,&ioCounters);
+         zbx_GetProcessIoCounters(hProcess,&ioCounters);
          value=(double)((__int64)ioCounters.ReadOperationCount);
          break;
       case 9:        /* io_write_b */
          if(NULL == zbx_GetProcessIoCounters)
 	     return SYSINFO_RET_FAIL;
 
-         GetProcessIoCounters(hProcess,&ioCounters);
+         zbx_GetProcessIoCounters(hProcess,&ioCounters);
          value=(double)((__int64)ioCounters.WriteTransferCount);
          break;
       case 10:       /* io_write_op */
          if(NULL == zbx_GetProcessIoCounters)
 	     return SYSINFO_RET_FAIL;
 
-         GetProcessIoCounters(hProcess,&ioCounters);
+         zbx_GetProcessIoCounters(hProcess,&ioCounters);
          value=(double)((__int64)ioCounters.WriteOperationCount);
          break;
       case 11:       /* io_other_b */
          if(NULL == zbx_GetProcessIoCounters)
 	     return SYSINFO_RET_FAIL;
 
-         GetProcessIoCounters(hProcess,&ioCounters);
+         zbx_GetProcessIoCounters(hProcess,&ioCounters);
          value=(double)((__int64)ioCounters.OtherTransferCount);
          break;
       case 12:       /* io_other_op */
          if(NULL == zbx_GetProcessIoCounters)
 	     return SYSINFO_RET_FAIL;
 
-         GetProcessIoCounters(hProcess,&ioCounters);
+         zbx_GetProcessIoCounters(hProcess,&ioCounters);
          value=(double)((__int64)ioCounters.OtherOperationCount);
          break;
 

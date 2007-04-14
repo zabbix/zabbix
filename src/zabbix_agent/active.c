@@ -25,7 +25,7 @@
 #include "sysinfo.h"
 #include "logfiles.h"
 #include "eventlog.h"
-#include "zbxsock.h"
+#include "comms.h"
 #include "threads.h"
 
 #if defined(ZABBIX_SERVICE)
@@ -147,7 +147,7 @@ static void	add_check(char *key, int refresh, long lastlogsize)
 	i++;
 
 	/* allocate memory for last metric */
-	active_metrics	= realloc(active_metrics, (i+1) * sizeof(ZBX_ACTIVE_METRIC));
+	active_metrics	= zbx_realloc(active_metrics, (i+1) * sizeof(ZBX_ACTIVE_METRIC));
 
 	/* inicialize last metric */
 	memset(&active_metrics[i], 0, sizeof(ZBX_ACTIVE_METRIC));
@@ -237,204 +237,139 @@ static int	parse_list_of_checks(char *str)
 	return SUCCEED;
 }
 
-static int	get_active_checks(char *server, unsigned short port)
+/******************************************************************************
+ *                                                                            *
+ * Function: get_active_checks                                                *
+ *                                                                            *
+ * Purpose: Retrive from ZABBIX server list of active checks                  *
+ *                                                                            *
+ * Parameters: host - IP or Hostname of ZABBIX server                         *
+ *             port - port of ZABBIX server                                   *
+ *                                                                            *
+ * Return value: returns SUCCEED on succesfull parsing,                       *
+ *               FAIL on other cases                                          *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_active_checks(
+	const char		*host, 
+	unsigned short	port
+	)
 {
 
-	ZBX_SOCKET	s;
-	ZBX_SOCKADDR	servaddr_in;
+	zbx_sock_t	s;
 
-	struct hostent *hp;
+	char
+		*buf,
+		packet[MAX_BUF_LEN];
 
-	char	buf[MAX_BUF_LEN];
+	int	ret;
 
-	int	len;
-	int	amount_read;
+	zabbix_log( LOG_LEVEL_DEBUG, "get_active_checks('%s',%u)", host, port);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "get_active_checks('%s',%u)", server, port);
 
-	if(NULL == (hp = zbx_gethost(server)) )
+	if( SUCCEED == (ret = zbx_tcp_connect(&s, host, port)) )
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "gethost() failed for server '%s' [%s]", server, 
-#ifdef	HAVE_HSTRERROR		
-			(char*)hstrerror((int)h_errno)
-#else
-			strerror_from_system(h_errno)
-#endif
-			);
-		return	NETWORK_ERROR;
-	}
 
-	memset(&servaddr_in, 0, sizeof(ZBX_SOCKADDR));
+		zbx_snprintf(packet, sizeof(packet), "%s\n%s\n","ZBX_GET_ACTIVE_CHECKS", CONFIG_HOSTNAME);
+		zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", packet);
 
-	servaddr_in.sin_family		= AF_INET;
-	servaddr_in.sin_addr.s_addr	= ((struct in_addr *)(hp->h_addr))->s_addr;
-	servaddr_in.sin_port		= htons(port);
-
-	if(INVALID_SOCKET == (s = (ZBX_SOCKET)socket(AF_INET,SOCK_STREAM,0)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot create socket for server '%s' [%s]", server, strerror_from_system(errno));
-		return	FAIL;
-	}
- 
-	if(SOCKET_ERROR == connect(s,(struct sockaddr *)&servaddr_in,sizeof(ZBX_SOCKADDR)))
-	{
-		switch (errno)
+		if( SUCCEED == (ret = zbx_tcp_send(&s, packet)) )
 		{
-			case EINTR:
-				zabbix_log(LOG_LEVEL_WARNING,"Timeout while connecting to [%s:%u]",server,port);
-				break;
-			case EHOSTUNREACH:
-				zabbix_log(LOG_LEVEL_WARNING,"No route to host [%s:%u]",server,port);
-				break;
-			default:
-				zabbix_log(LOG_LEVEL_WARNING,"Cannot connect to [%s:%u] [%s]",server,port,strerror_from_system(errno));
-				break;
-		} 
-		zbx_sock_close(s);
-		return	NETWORK_ERROR;
-	}
+			zabbix_log(LOG_LEVEL_DEBUG, "Before read");
 
-	zbx_snprintf(buf, sizeof(buf), "%s\n%s\n","ZBX_GET_ACTIVE_CHECKS", CONFIG_HOSTNAME);
-	zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", buf);
-
-	if(SOCKET_ERROR == zbx_sock_write(s, buf, (int)strlen(buf)))
-	{
-		switch (errno)
-		{
-			case EINTR:
-				zabbix_log(LOG_LEVEL_WARNING,"Timeout while sending data to [%s:%u]",server,port);
-				break;
-			default:
-				zabbix_log(LOG_LEVEL_WARNING,"Error while sending data to [%s:%u] [%s]",server,port,
-					strerror_from_system(errno));
-				break;
-		} 
-		zbx_sock_close(s);
-		return	FAIL;
-	} 
-
-
-	zabbix_log(LOG_LEVEL_DEBUG, "Before read");
-
-	amount_read = 0;
-	memset(buf, 0, sizeof(buf));
-
-	do
-	{
-		len = zbx_sock_read(s, buf + amount_read, (sizeof(buf)-1) - amount_read, CONFIG_TIMEOUT);
-
-		if(SOCKET_ERROR == len)
-		{
-			switch (errno)
+			if( SUCCEED == (ret = zbx_tcp_recv(&s, &buf)) )
 			{
-				case 	EINTR:
-						zabbix_log( LOG_LEVEL_WARNING,"Timeout while receiving data from [%s:%u]",server,port);
-						break;
-				case	ECONNRESET:
-						zabbix_log( LOG_LEVEL_WARNING,"Connection reset by peer.");
-						break;
-				default:
-						zabbix_log( LOG_LEVEL_WARNING,"Error while receiving data from [%s:%u] [%s]",server,port,
-							strerror_from_system(errno));
-						break;
-			} 
-			zbx_sock_close(s);
-			return	FAIL;
+				parse_list_of_checks(buf);
+			}
 		}
-
-		amount_read += len;
 	}
-	while (len > 0);
+	zbx_tcp_close(&s);
 
-	parse_list_of_checks(buf);
-
-	zbx_sock_close(s);
-	return SUCCEED;
+	if( FAIL == ret )
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Get active checks error: %s", zbx_tcp_strerror());
+	}	
+	return ret;
 }
 
-static int	send_value(char *server,unsigned short port,char *host, char *key,char *value, char *lastlogsize,
-		char *timestamp, char *source, char *severity)
+
+/******************************************************************************
+ *                                                                            *
+ * Function: send_value                                                       *
+ *                                                                            *
+ * Purpose: Send value of specified key to ZABBIX server                      *
+ *                                                                            *
+ * Parameters: host - IP or Hostname of ZABBIX server                         *
+ *             port - port of ZABBIX server                                   *
+ *             hostname - name of host in ZABBIX database                     *
+ *             key - name of metric                                           *
+ *             value - string version os key value                            *
+ *             lastlogsize - size of readed logfile                           *
+ *             timestamp - timestamp of readed value                          *
+ *             source - name of logged data source                            *
+ *             severity - severity of logged data sources                     *
+ *                                                                            *
+ * Return value: returns SUCCEED on succesfull parsing,                       *
+ *               FAIL on other cases                                          *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	send_value(
+		const char		*host,
+		unsigned short	port,
+		const char		*hostname,
+		const char		*key,
+		const char		*value,
+		const char		*lastlogsize,
+		const char		*timestamp,
+		const char		*source, 
+		const char		*severity
+	)
 {
-	ZBX_SOCKET	s;
-	ZBX_SOCKADDR myaddr_in;
-	ZBX_SOCKADDR servaddr_in;
+	zbx_sock_t	s;
 
-	char	buf[MAX_BUF_LEN];
-	int	len;
+	char
+		*buf,
+		request[MAX_BUF_LEN];
 
-	struct hostent *hp;
+	int		ret;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In send_value('%s',%u,'%s','%s','%s','%s','%s','%s')",
-		server, port, host, key, lastlogsize, timestamp, source, severity);
-
-	if( NULL == (hp = zbx_gethost(server)))
+	if( SUCCEED == (ret = zbx_tcp_connect(&s, host, port)) )
 	{
-#ifdef	HAVE_HSTRERROR		
-		zabbix_log( LOG_LEVEL_WARNING, "gethost() failed for server '%s' [%s]", server, (char*)hstrerror((int)h_errno));
-#else
-		zabbix_log( LOG_LEVEL_WARNING, "gethost() failed for server '%s' [%s]", server, strerror_from_system(h_errno));
-#endif
-		return	FAIL;
+		comms_create_request(hostname, key, value, lastlogsize, timestamp, source, severity,  request, sizeof(request));
+		zabbix_log(LOG_LEVEL_DEBUG, "XML before sending [%s]",request);
+
+		if( SUCCEED == (ret = zbx_tcp_send(&s, request)) )
+		{
+			if( SUCCEED == (ret = zbx_tcp_recv(&s, &buf)) )
+			{
+				/* !!! REMOVE '\n' AT THE AND (always must be present) !!! */
+				zbx_rtrim(buf, "\r\n\0");
+				if(strcmp(buf,"OK") == 0)
+				{
+					zabbix_log( LOG_LEVEL_DEBUG, "OK");
+				}
+				else
+				{
+					zabbix_log( LOG_LEVEL_DEBUG, "NOT OK [%s:%s] [%s]", host, key, buf);
+				}
+			}
+		}
 	}
+	zbx_tcp_close(&s);
 
-	memset(&servaddr_in, 0, sizeof(ZBX_SOCKADDR));
-
-	servaddr_in.sin_family		= AF_INET;
-	servaddr_in.sin_addr.s_addr	= ((struct in_addr *)(hp->h_addr))->s_addr;
-	servaddr_in.sin_port		= htons(port);
-
-	if(INVALID_SOCKET == (s = (ZBX_SOCKET)socket(AF_INET,SOCK_STREAM,0)))
+	if( FAIL == ret )
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Error in socket() [%s:%u] [%s]",server, port, strerror_from_system(errno));
-		return	FAIL;
+		zabbix_log(LOG_LEVEL_DEBUG, "Send value error: %s", zbx_tcp_strerror());
 	}
-	 
-	myaddr_in.sin_family		= AF_INET;
-	myaddr_in.sin_addr.s_addr	= INADDR_ANY;
-	myaddr_in.sin_port		= 0;
-
-	if(SOCKET_ERROR == connect(s,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)))
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "Error in connect() [%s:%u] [%s]",server, port, strerror_from_system(errno));
-		zbx_sock_close(s);
-		return	FAIL;
-	}
-
-	comms_create_request(host, key, value, lastlogsize, timestamp, source, severity,  buf, sizeof(buf));
-
-	zabbix_log(LOG_LEVEL_DEBUG, "XML before sending [%s]",buf);
-
-	if(SOCKET_ERROR == zbx_sock_write(s, buf, (int)strlen(buf)))
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "Error during sending [%s:%u] [%s]",server, port, strerror_from_system(errno));
-		zbx_sock_close(s);
-		return	FAIL;
-	} 
-
-	memset(buf, 0, sizeof(buf));
-
-	if(SOCKET_ERROR == (len = zbx_sock_read(s, buf, sizeof(buf)-1, CONFIG_TIMEOUT)))
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "Error in recvfrom() [%s:%u] [%s]",server, port, strerror_from_system(errno));
-		zbx_sock_close(s);
-		return	FAIL;
-	}
-
-	/* !!! REMOVE '\n' AT THE AND (always must be present) !!! */
-	buf[len-1] = '\0';
-
-	if(strcmp(buf,"OK") == 0)
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "OK");
-	}
-	else
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "NOT OK [%s:%s] [%s]", host, key, buf);
-	}
- 
-	zbx_sock_close(s);
-
-	return SUCCEED;
+	return ret;
 }
 
 static int	process_active_checks(char *server, unsigned short port)

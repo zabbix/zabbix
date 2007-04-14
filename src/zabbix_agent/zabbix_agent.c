@@ -159,7 +159,8 @@ int	main(int argc, char **argv)
 
 	init_metrics(); /* Must be before init_config() */
 
-	load_config(1);
+	if ( ZBX_TASK_START == task )
+		load_config();
 
 	/* Do not create debug files */
 	zabbix_open_log(LOG_TYPE_SYSLOG,LOG_LEVEL_EMPTY,NULL);

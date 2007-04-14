@@ -19,7 +19,7 @@
 
 #include "common.h"
 #include "sysinfo.h"
-#include "zbxsock.h"
+#include "comms.h"
 #include "log.h"
 #include "cfg.h"
 
@@ -175,195 +175,49 @@ static void display_data (ntp_data *data) {
 }
 */
 
-#if OFF
-
-static time_t convert_time (double value, int *millisecs) {
-
-/* Convert the time to the ANSI C form. */
-
-    time_t result = (time_t)value;
-
-    if ((*millisecs = (int)(1000.0*(value-result))) >= 1000) {
-        *millisecs = 0;
-        ++result;
-    }
-    return result;
-}
-
-/* !!! damaged function !!! for using correct tham !!! */
-static int format_time (
-	char *text, 
-	int length, 
-	double offset, 
-	double error,	/* not USED */
-	double drift,	/* not USED */
-	double drifterr /* not USED */
-	) {
-
-/* Format the current time into a string, with the extra information as
-requested.  Note that the rest of the program uses the correction needed, which
-is what is printed for diagnostics, but this formats the error in the local
-system for display to users.  So the results from this are the negation of
-those printed by the verbose options. */
-
-    int 
-	    milli,
-	    len;
-    time_t
-	    now;
-    struct tm	
-	    *gmt;
-    static const char 
-	    *months[] = {
-        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-    };
-
-
-/* Work out and format the current local time.  Note that some semi-ANSI
-systems do not set the return value from (s)printf. */
-
-    now = convert_time(zbx_time() + offset,&milli);
-    errno = 0;
-
-    if ((gmt = localtime(&now)) == NULL)
-    {
-        zbx_error("unable to work out local time");
-	return -1;
-    }
-    len = 24;
-    if (length <= len)
-    {
-	    zbx_error("internal error calling format_time");
-	    return -1;
-    }
-
-    errno = 0;
-    printf("%.4d %s %.2d %.2d:%.2d:%.2d.%.3d\n",
-            gmt->tm_year+1900,months[gmt->tm_mon],gmt->tm_mday,
-            gmt->tm_hour,gmt->tm_min,gmt->tm_sec,milli);
-
-    return now;
-}
-
-#endif /* OFF */
-
 int	check_ntp(char *host, unsigned short port, int *value_int)
 {
 
-	ZBX_SOCKET	s;
-	ZBX_SOCKADDR	servaddr_in;
+	zbx_sock_t	s;
 
-	int		len;
-	unsigned char	buf[MAX_STRING_LEN];
-
-	struct hostent *hp;
+	int		ret;
+	char	*buf = NULL;
 
 	ntp_data	data;
-	unsigned char	packet[NTP_PACKET_MIN];
+	char		packet[NTP_PACKET_MIN];
 
-    	*value_int = 0;
+	assert(value_int);
 
-	if(NULL == (hp = zbx_gethost(host)) )
+	*value_int = 0;
+
+	if( SUCCEED == (ret = zbx_tcp_connect(&s, host, port)) )
 	{
-		return	SYSINFO_RET_OK;
-	}
+		make_packet(&data);
 
-	servaddr_in.sin_family		= AF_INET;
-	servaddr_in.sin_addr.s_addr	= ((struct in_addr *)(hp->h_addr))->s_addr;
-	servaddr_in.sin_port		= htons(port);
+		pack_ntp(packet, sizeof(packet), &data);
 
-	if( SOCKET_ERROR == (s = (ZBX_SOCKET)socket(AF_INET,SOCK_DGRAM,0)) )
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Cannot create socket for NTP server. [%s]", strerror_from_system(errno));
-		return	SYSINFO_RET_OK;
-	}
- 
-	if(SOCKET_ERROR == connect(s, (struct sockaddr *)&servaddr_in, sizeof(ZBX_SOCKADDR)) )
-	{
-		switch (errno)
+		if( SUCCEED == (ret = zbx_tcp_send_raw(&s, packet)) )
 		{
-			case EINTR:
-				zabbix_log(LOG_LEVEL_DEBUG, "Timeout while connecting to NTP server.");
-				break;
-			case EHOSTUNREACH:
-				zabbix_log(LOG_LEVEL_DEBUG, "No route to NTP server.");
-				break;
-			default:
-				zabbix_log(LOG_LEVEL_DEBUG, "Cannot connect to NTP server. [%s]", strerror(errno));
-				break;
-		} 
-		goto lbl_error;
-	}
+			if( SUCCEED == (ret = zbx_tcp_recv(&s, &buf)) )
+			{
+			
+				unpack_ntp(&data, (unsigned char *)buf, strlen(buf));
 
-	make_packet(&data);
-
-/*	display_data(&data); */
-
-	pack_ntp(packet, sizeof(packet), &data);
-
-	if(SOCKET_ERROR == zbx_sock_write(s, packet, sizeof(packet)))
-	{
-		switch (errno)
-		{
-			case EINTR:
-				zabbix_log(LOG_LEVEL_DEBUG, "Timeout while sending data to NTP server.");
-				break;
-			default:
-				zabbix_log(LOG_LEVEL_DEBUG, "Error while sending data to NTP server. [%s]", strerror(errno));
-				break;
-		} 
-		goto lbl_error;
-	} 
-
-	memset(buf, 0, sizeof(buf));
-
-	if( SOCKET_ERROR == (len = zbx_sock_read(s, buf, sizeof(buf), CONFIG_TIMEOUT)))
-	{
-		switch (errno)
-		{
-			case 	EINTR:
-				zabbix_log( LOG_LEVEL_DEBUG,"Timeout while receiving data from NTP server");
-				break;
-			case	ECONNRESET:
-				zabbix_log( LOG_LEVEL_DEBUG,"Connection to NTP server reseted by peer.");
-				break;
-			default:
-				zabbix_log( LOG_LEVEL_DEBUG,"Error while receiving data from NTP server [%s]", strerror(errno));
-				break;
-		} 
-		goto lbl_error;
-	}
-
-	unpack_ntp(&data, buf, len);
-
-	zbx_sock_close(s);
-
-/*	display_data(&data); */
-
-/*        format_time(text,sizeof(text),offset,error,0.0,-1.0);*/
-
-/*    if (dispersion < data->dispersion) dispersion = data->dispersion;
-        x = data->receive-data->originate;
-        y = (data->transmit == 0.0 ? 0.0 : data->transmit-data->current);
-        *off = 0.5*(x+y);
-        *err = x-y;
-        x = data->current-data->originate;
-        if (0.5*x > *err) *err = 0.5*x; */
-
-/*        *value_int = format_time(text,sizeof(text),0,0,0.0,-1.0); */
-
-#if OFF
-	*value_int = time(NULL);						/* local time */
+#if OFF 
+			/* local time */	*value_int = time(NULL);
 #else
-	*value_int = (data.receive > 0) ? (int)(data.receive - ZBX_JAN_1970_IN_SEC) : 0;	/* server time */
+			/* server time */	*value_int = (data.receive > 0) ? (int)(data.receive - ZBX_JAN_1970_IN_SEC) : 0;
 #endif
+			}
+		}
+	}
+	zbx_tcp_close(&s);
+
+	if( FAIL == ret )
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "NTP check error: %s", zbx_tcp_strerror());
+	}
 
 	return SYSINFO_RET_OK;
-
-lbl_error:
-	zbx_sock_close(s);
-
-	return	SYSINFO_RET_OK;
 }
 

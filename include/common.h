@@ -412,6 +412,8 @@ typedef enum
 #define strnscpy(x,y,n) zbx_strlcpy(x,y,n);
 
 void    *zbx_malloc(size_t size);
+void    *zbx_realloc(void *src, size_t size);
+
 #define zbx_free(ptr) { if(ptr){ free(ptr); ptr = NULL; } }
 	
 #define zbx_fclose(f) { if(f){ fclose(f); f = NULL; } }
@@ -458,6 +460,8 @@ int	find_char(char *str,char c);
 int	is_double_prefix(char *str);
 int	is_double(char *c);
 int	is_uint(char *c);
+void	zbx_rtrim(char *str, const char *charlist);
+void	zbx_ltrim(register char *str, const char *charlist);
 void	lrtrim_spaces(char *c);
 void	ltrim_spaces(char *c);
 void	rtrim_spaces(char *c);

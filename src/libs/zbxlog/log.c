@@ -27,7 +27,12 @@
 static	char log_filename[MAX_STRING_LEN];
 
 static	int log_type = LOG_TYPE_UNDEFINED;
-static	int log_level = LOG_LEVEL_DEBUG;
+static	int log_level = 
+#if defined(DEBUG)
+	LOG_LEVEL_DEBUG;
+#else
+	LOG_LEVEL_WARNING;
+#endif /* DEBUG */
 
 static ZBX_MUTEX log_file_access;
 

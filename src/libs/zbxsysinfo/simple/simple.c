@@ -19,7 +19,7 @@
 
 #include "common.h"
 #include "sysinfo.h"
-#include "zbxsock.h"
+#include "comms.h"
 #include "log.h"
 #include "cfg.h"
 
@@ -103,82 +103,48 @@ lbl_ret:
  *  0- NOT OK
  *  1 - OK
  * */
-static int	check_ssh(const char	*hostname, short port, int *value_int)
+static int	check_ssh(const char *host, unsigned short port, int *value_int)
 {
+	int ret;
 
-	ZBX_SOCKET	s;
-	ZBX_SOCKADDR	servaddr_in;
+	zbx_sock_t	s;
 
-	struct hostent *hp;
-
-	char	buf[MAX_BUF_LEN];
-	char	buf2[MAX_BUF_LEN];
-	char	*ssh_server, 
+	char	
+		send_buf[MAX_BUF_LEN],
+		*recv_buf,
+		*ssh_server, 
 		*ssh_proto;
 	
-	int	len;
-
-	assert(hostname);
 	assert(value_int);
 
 	*value_int = 0;
 
-	if(NULL == (hp = zbx_gethost(hostname)) )
+	if( SUCCEED == (ret = zbx_tcp_connect(&s, host, port)) )
 	{
-		return SYSINFO_RET_OK;
+		if( SUCCEED == (ret = zbx_tcp_recv(&s, &recv_buf)) )
+		{
+			if ( 0 == strncmp(recv_buf, "SSH", 3) )
+			{
+				ssh_server = ssh_proto = recv_buf + 4;
+				ssh_server += strspn (ssh_proto, "0123456789-. ") ;
+				ssh_server[-1] = '\0';
+
+				zbx_snprintf(send_buf,sizeof(send_buf),"SSH-%s-%s\n", ssh_proto, "zabbix_agent");
+				*value_int = 1;
+			}
+			else
+			{
+				zbx_snprintf(send_buf,sizeof(send_buf),"0\n");
+			}
+			ret = zbx_tcp_send_raw(&s, send_buf);
+		}
 	}
+	zbx_tcp_close(&s);
 
-	memset(&servaddr_in, 0, sizeof(ZBX_SOCKADDR));
-
-	servaddr_in.sin_family		= AF_INET;
-	servaddr_in.sin_addr.s_addr	= ((struct in_addr *)(hp->h_addr))->s_addr;
-	servaddr_in.sin_port		= htons(port);
-
-	if(INVALID_SOCKET == (s = (ZBX_SOCKET)socket(AF_INET,SOCK_STREAM,0)))
+	if( FAIL == ret )
 	{
-		zabbix_log( LOG_LEVEL_DEBUG, "Error in socket() [%s:%u] [%s]", hostname, port, strerror_from_system(errno));
-		return SYSINFO_RET_OK;
+		zabbix_log(LOG_LEVEL_DEBUG, "SSH check error: %s", zbx_tcp_strerror());
 	}
-
-	if(SOCKET_ERROR == connect(s,(struct sockaddr *)&servaddr_in,sizeof(ZBX_SOCKADDR)))
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "Error in connect() [%s:%u] [%s]",hostname, port, strerror_from_system(errno));
-		zbx_sock_close(s);
-		return SYSINFO_RET_OK;
-	}
-
-	memset(buf, 0, sizeof(buf));
-
-	if(SOCKET_ERROR == (len = zbx_sock_read(s, buf, sizeof(buf)-1, CONFIG_TIMEOUT)))
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "Error in reading() [%s:%u] [%s]",hostname, port, strerror_from_system(errno));
-		zbx_sock_close(s);
-		return SYSINFO_RET_OK;
-	}
-
-	buf[sizeof(buf)-1] = '\0';
-
-	if ( strncmp(buf, "SSH", 3) == 0 )
-	{
-		ssh_server = ssh_proto = buf + 4;
-		ssh_server += strspn (ssh_proto, "0123456789-. ") ;
-		ssh_server[-1] = '\0';
-
-		zbx_snprintf(buf2,sizeof(buf2),"SSH-%s-%s\n", ssh_proto, "zabbix_agent");
-		*value_int = 1;
-	}
-	else
-	{
-		zbx_snprintf(buf2,sizeof(buf2),"0\n");
-		*value_int = 0;
-	}
-
-	if(SOCKET_ERROR == zbx_sock_write(s, buf2, (int)strlen(buf2)))
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "Error during sending [%s:%u] [%s]",hostname, port, strerror_from_system(errno));
-	}
-
-	zbx_sock_close(s);
 
 	return	SYSINFO_RET_OK;
 }

@@ -24,7 +24,6 @@
 #include "log.h"
 #include "alias.h"
 #include "zbxconf.h"
-#include "zbxsock.h"
 #include "perfmon.h"
 
 static int ZabbixRemoveEventSource(void);
@@ -98,9 +97,6 @@ static VOID WINAPI ServiceEntry(DWORD argc,LPTSTR *argv)
 	serviceStatus.dwWaitHint		= 2000;
 
 	SetServiceStatus(serviceHandle, &serviceStatus);
-
-	if(FAIL == zbx_sock_init())
-		return;
 
 	/* Now service is running */
 	serviceStatus.dwCurrentState	= SERVICE_RUNNING;

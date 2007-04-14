@@ -248,9 +248,6 @@ int zbx_vsnprintf(char* str, size_t count, const char *fmt, va_list args)
  ******************************************************************************/
 void zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_len, const char *fmt, ...)
 {
-	char	*c;
-	int	written;
-
 	va_list	args;
 
 	assert(str);
@@ -262,16 +259,14 @@ void zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_len, co
 	assert(fmt);
 
 	va_start(args, fmt);
+
 	if(*offset + max_len >= *alloc_len)
 	{
-		c=realloc(*str, *alloc_len+128*max_len);
-/* TODO Check for return value */
+		*str = zbx_realloc(*str, (*alloc_len)+128*max_len);
 		*alloc_len += 128*max_len;
-		*str = c;
 	}
 
-	written = zbx_vsnprintf(*str+*offset, *alloc_len - *offset, fmt, args);
-	*offset += written;
+	*offset += zbx_vsnprintf(*str+*offset, max_len, fmt, args);
 
 	va_end(args);
 }
@@ -489,6 +484,71 @@ void	delete_reol(char *c)
 		if( c[i] != '\n')	break;
 		c[i]=0;
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_rtrim                                                        *
+ *                                                                            *
+ * Purpose: Strip haracters from the end of a string                          *
+ *                                                                            *
+ * Parameters: str - string to processing                                     *
+ *             charlist - null terminated list of characters                  *
+ *                                                                            *
+ * Return value: Stripped string                                              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_rtrim(char *str, const char *charlist)
+{
+	register char *p;
+
+	if( !str || !charlist || !*str || !*charlist ) return;
+
+	for(
+		p = str + strlen(str) - 1;
+		p >= str && NULL != strchr(charlist,*p);
+		p--)
+			*p = '\0';
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_ltrim                                                        *
+ *                                                                            *
+ * Purpose: Strip haracters from the beginning of a string                    *
+ *                                                                            *
+ * Parameters: str - string to processing                                     *
+ *             charlist - null terminated list of characters                  *
+ *                                                                            *
+ * Return value: Stripped string                                              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_ltrim(register char *str, const char *charlist)
+{
+	register char *p;
+
+	if( !str || !charlist || !*str || !*charlist ) return;
+
+	for( p = str; *p && NULL != strchr(charlist,*p); p++ );
+
+	if( p == str )	return;
+	
+	while( *p )
+	{
+		*str = *p;
+		str++;
+		p++;
+	}
+
+	*str = '\0';
 }
 
 /******************************************************************************

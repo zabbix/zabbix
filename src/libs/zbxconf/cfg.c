@@ -51,76 +51,84 @@ int	CONFIG_TIMEOUT			= AGENT_TIMEOUT;
 int	parse_cfg_file(const char *cfg_file,struct cfg_line *cfg)
 {
 	FILE	*file;
-	int	lineno;
 
-	char	line[MAX_STRING_LEN];
-	char	*parameter;
-	char	*value;
+	register int
+		i, lineno;
 
-	int	i,var;
+	char	
+		line[MAX_STRING_LEN],
+		*parameter,
+		*value;
 
-	if(NULL == (file = fopen(cfg_file,"r")))
+	int	var;
+
+	assert(cfg);
+
+	if(cfg_file)
 	{
-		zbx_error("Cannot open config file [%s] [%s].",cfg_file,strerror(errno));
-		return	FAIL;
-	}
-
-	
-	for(lineno = 1; fgets(line,MAX_STRING_LEN,file) != NULL; lineno++)
-	{
-		if(line[0]=='#')	continue;
-		if(strlen(line) < 3)	continue;
-
-		parameter	= line;
-
-		value		= strstr(line,"=");
-		if(NULL == value)
+		if( NULL == (file = fopen(cfg_file,"r")) )
 		{
-			zbx_error("Error in line [%d] \"%s\"", lineno, line);
-			return	FAIL;
+			zbx_error("Cannot open config file [%s] [%s].",cfg_file,strerror(errno));
 		}
-
-		*value = '\0';
-		value++;
-
-		for(i = 0; value[i] != '\0'; i++)
+		else
 		{
-			if(value[i] == '\n')
+			for(lineno = 1; fgets(line,MAX_STRING_LEN,file) != NULL; lineno++)
 			{
-				value[i] = '\0';
-				break;
-			}
-		}
+				if(line[0]=='#')	continue;
+				if(strlen(line) < 3)	continue;
 
-		for(i = 0; cfg[i].parameter != 0; i++)
-		{
-			if(strcmp(cfg[i].parameter, parameter))
-				continue;
+				parameter	= line;
 
-			/* zbx_error("Accepted configuration parameter: '%s' = '%s'",parameter, value); */
+				value		= strstr(line,"=");
+				if(NULL == value)
+				{
+					zbx_error("Error in line [%d] \"%s\"", lineno, line);
+					return	FAIL;
+				}
 
-			if(cfg[i].function != 0)
-			{
-				if(cfg[i].function(value) != SUCCEED)
-					goto lbl_incorrect_config;
-			}
-			else if(TYPE_INT == cfg[i].type)
-			{
-				var = atoi(value);
+				*value = '\0';
+				value++;
 
-				if(cfg[i].min) 
-					if(var < cfg[i].min)
-						goto lbl_incorrect_config;
+				for(i = 0; value[i] != '\0'; i++)
+				{
+					if(value[i] == '\n')
+					{
+						value[i] = '\0';
+						break;
+					}
+				}
 
-				if(cfg[i].max) 
-					if(var > cfg[i].max)
-						goto lbl_incorrect_config;
+				for(i = 0; cfg[i].parameter != 0; i++)
+				{
+					if(strcmp(cfg[i].parameter, parameter))
+						continue;
 
-				*((int*)cfg[i].variable) = var;
-			}
-			else
-			{
-				*((char **)cfg[i].variable) = strdup(value);
+					/* zbx_error("Accepted configuration parameter: '%s' = '%s'",parameter, value); */
+
+					if(cfg[i].function != 0)
+					{
+						if(cfg[i].function(value) != SUCCEED)
+							goto lbl_incorrect_config;
+					}
+					else if(TYPE_INT == cfg[i].type)
+					{
+						var = atoi(value);
+
+						if(cfg[i].min) 
+							if(var < cfg[i].min)
+								goto lbl_incorrect_config;
+
+						if(cfg[i].max) 
+							if(var > cfg[i].max)
+								goto lbl_incorrect_config;
+
+						*((int*)cfg[i].variable) = var;
+					}
+					else
+					{
+						*((char **)cfg[i].variable) = strdup(value);
+					}
+				}
 			}
 		}
 	}
@@ -128,7 +136,7 @@ int	parse_cfg_file(const char *cfg_file,struct cfg_line *cfg)
 	/* Check for mandatory parameters */
 	for(i = 0; cfg[i].parameter != 0; i++)
 	{
-		if(!cfg[i].mandatory)
+		if(PARM_MAND != cfg[i].mandatory)
 			continue;
 
 		if(TYPE_INT == cfg[i].type)
@@ -147,9 +155,9 @@ int	parse_cfg_file(const char *cfg_file,struct cfg_line *cfg)
 
 lbl_missing_mandatory:
 	zbx_error("Missing mandatory parameter [%s].", cfg[i].parameter);
-	return	FAIL;
+	exit(1);
 
 lbl_incorrect_config:
 	zbx_error("Wrong value of [%s] in line %d.", cfg[i].parameter, lineno);
-	return	FAIL;
+	exit(1);
 }

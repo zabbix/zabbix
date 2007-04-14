@@ -140,10 +140,10 @@ void    *zbx_malloc(size_t size)
 	register int max_attempts;
 	void *ptr = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In zbx_malloc(size:%d)",
-		size);
+	zabbix_log(LOG_LEVEL_DEBUG,"In zbx_malloc(size:%d)", size);
 
-	for(	max_attempts = 10, size = MAX(size, 1);
+	for(
+		max_attempts = 10, size = MAX(size, 1);
 		max_attempts > 0 && !ptr;
 		ptr = malloc(size),
 		max_attempts--
@@ -157,4 +157,30 @@ void    *zbx_malloc(size_t size)
 	/* Program will never reach this point. */
 	return ptr;
 }
+
+void    *zbx_realloc(void *src, size_t size)
+{
+	register int max_attempts;
+	void *ptr = NULL;
+
+	assert(src);
+
+	zabbix_log(LOG_LEVEL_DEBUG,"In zbx_realloc(size:%d)", size);
+
+	for(
+		max_attempts = 10, size = MAX(size, 1);
+		max_attempts > 0 && !ptr;
+		ptr = realloc(src, size),
+		max_attempts--
+	);
+
+	if(ptr) return ptr;
+
+	zabbix_log(LOG_LEVEL_CRIT,"out of memory. requested '%i' bytes.", size);
+	exit(FAIL);
+
+	/* Program will never reach this point. */
+	return ptr;
+}
+
 

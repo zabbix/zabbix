@@ -37,7 +37,7 @@
 #include "common.h"
 #include "log.h"
 #include "zlog.h"
-#include "zbxsock.h"
+#include "comms.h"
 
 #include "email.h"
 

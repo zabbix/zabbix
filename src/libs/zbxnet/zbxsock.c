@@ -17,64 +17,12 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
+#if 0
+
 #include "common.h"
-#include "zbxsock.h"
 
 #include "log.h"
 
-struct hostent	*zbx_gethost(const char *hostname)
-{
-	unsigned int	addr;
-	struct hostent*	host;
-
-	assert(hostname);
-
-	host = gethostbyname(hostname);
-	if(host)	return host;
-
-	addr = inet_addr(hostname);
-
-	host = gethostbyaddr((char *)&addr, 4, AF_INET);
-
-	if(host)        return host;
-
-#ifdef	HAVE_HSTRERROR		
-	zabbix_log( LOG_LEVEL_WARNING, "gethost() failed for address '%s' [%s]", hostname, (char*)hstrerror((int)h_errno));
-#else
-	zabbix_log( LOG_LEVEL_WARNING, "gethost() failed for address '%s' [%s]", hostname, strerror_from_system(h_errno));
-#endif
-	return (struct hostent*) NULL;
-}
-
-
-#if defined(_WINDOWS)
-int	zbx_sock_init(void)
-{
-	WSADATA sockInfo;
-
-	/* Initialize Windows Sockets APIa */
-	switch(WSAStartup(0x0002,&sockInfo))
-	{
-		case WSASYSNOTREADY:
-			zabbix_log( LOG_LEVEL_CRIT, "Underlying network subsystem is not ready for network communication.");
-			return FAIL;
-		case WSAVERNOTSUPPORTED:
-			zabbix_log( LOG_LEVEL_CRIT, "The version of Windows Sockets support requested is not provided.");
-			return FAIL;
-		case WSAEINPROGRESS:
-			zabbix_log( LOG_LEVEL_CRIT, "A blocking Windows Sockets 1.1 operation is in progress.");
-			return FAIL;
-		case WSAEPROCLIM:
-			zabbix_log( LOG_LEVEL_CRIT, "Limit on the number of tasks supported by the Windows Sockets implementation has been reached.");
-			return FAIL;
-		case WSAEFAULT:
-			zabbix_log( LOG_LEVEL_CRIT, "The lpWSAData is not a valid pointer.");
-			return FAIL;
-	}
-
-	return SUCCEED;
-}
-#endif /* WIN 32 */
 
 #if !defined(_WINDOWS)
 
@@ -168,3 +116,5 @@ int zbx_sock_write(ZBX_SOCKET sock, void *buf, int buflen)
 #endif /* _WINDOWS */
 
 }
+
+#endif
