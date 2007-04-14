@@ -484,7 +484,6 @@ static int discover_service(zbx_dservice_type_t type, char *ip, int port)
 		sigaction(SIGALRM, &phan, NULL);
 		alarm(10);
 
-		zabbix_log(LOG_LEVEL_WARNING, "Beforfe process(%s)", key);
 		if(process(key, 0, &value) == SUCCEED)
 		{
 			if(GET_UI64_RESULT(&value))
@@ -494,7 +493,6 @@ static int discover_service(zbx_dservice_type_t type, char *ip, int port)
 			else ret = FAIL;
 		}
 		else	ret = FAIL;
-		zabbix_log(LOG_LEVEL_WARNING, "After process(%s)", key);
 		alarm(0);
 	}
 
@@ -536,7 +534,6 @@ static void process_check(DB_DRULE *rule, DB_DCHECK *check, char *ip)
 	s=(char *)strtok(tmp,",");
 	while(s!=NULL)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "s [%s]", s);
 		c=strchr(s,'-');
 		if(c == NULL)
 		{
@@ -599,7 +596,6 @@ static void process_rule(DB_DRULE *rule)
         s=(char *)strtok(tmp,",");
         while(s!=NULL)
         {
-		zabbix_log(LOG_LEVEL_WARNING,"IP [%s]", s);
 		if(sscanf(s,"%d.%d.%d.%d-%d",&i1,&i2,&i3,&i4,&i5) == 5)
 		{
 			zbx_snprintf(ip1,sizeof(ip)-1,"%d.%d.%d",i1,i2,i3);
@@ -621,7 +617,7 @@ static void process_rule(DB_DRULE *rule)
 
 		for(i=first;i<=last;i++)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "I [%d]", i);
+			zabbix_log(LOG_LEVEL_WARNING, "IP [%d]", i);
 			zbx_snprintf(ip,sizeof(ip)-1,"%s.%d",
 				ip1,
 				i);
