@@ -459,15 +459,11 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		{
 			if(condition->operator == CONDITION_OPERATOR_EQUAL)
 			{
-				if(value_int == atoi(row[0]))	ret = SUCCEED;
+				if(int_in_list(row[0], value_int) == SUCCEED)	ret = SUCCEED;
 			}
-			else if(condition->operator == CONDITION_OPERATOR_LESS_EQUAL)
+			else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
 			{
-				if(atoi(row[0]) <= value_int)	ret = SUCCEED;
-			}
-			else if(condition->operator == CONDITION_OPERATOR_MORE_EQUAL)
-			{
-				if(atoi(row[0]) >= value_int)	ret = SUCCEED;
+				if(int_in_list(row[0], value_int) == FAIL)	ret = SUCCEED;
 			}
 			else
 			{

@@ -115,8 +115,7 @@ extern	int	CONFIG_MASTER_NODEID;
 DB_DRULE
 {
 	zbx_uint64_t	druleid;
-	char		*ipfirst;
-	char		*iplast;
+	char		*iprange;
 	int		delay;
 	int		nextcheck;
 	char		*name;

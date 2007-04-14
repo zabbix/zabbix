@@ -235,6 +235,61 @@ int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char
 
 /******************************************************************************
  *                                                                            *
+ * Function: int_in_list                                                      *
+ *                                                                            *
+ * Purpose: check if integer matches a list of integers                       *
+ *                                                                            *
+ * Parameters: list -  integers [i1-i2,i3,i4,i5-i6] (10-25,45,67-699          *
+ *             value-  value                                                  *
+ *                                                                            *
+ * Return value: FAIL - out of period, SUCCEED - within the period            *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	int_in_list(const char *list, int value)
+{
+	char	tmp[MAX_STRING_LEN];
+	char	*s;
+	int	i1,i2;
+	int	ret = FAIL;
+
+
+	zabbix_log( LOG_LEVEL_WARNING, "In int_in_list(list:%s,value:%d)", list, value);
+
+	strscpy(tmp,list);
+       	s=(char *)strtok(tmp,",");
+	while(s!=NULL)
+	{
+		zabbix_log(LOG_LEVEL_WARNING,"Int [%s]", s);
+		if(sscanf(s,"%d-%d",&i1,&i2) == 2)
+		{
+			if(value>=i1 && value<=i2)
+			{
+				ret = SUCCEED;
+				break;
+			}
+		}
+		else
+		{
+			if(atoi(s) == value)
+			{
+				ret = SUCCEED;
+				break;
+			}
+		}
+       		s=(char *)strtok(NULL,",");
+	}
+
+	zabbix_log( LOG_LEVEL_WARNING, "End int_in_list(ret:%s)", ret == SUCCEED?"SUCCEED":"FAIL");
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: check_time_period                                                *
  *                                                                            *
  * Purpose: check if current time is within given period                      *
