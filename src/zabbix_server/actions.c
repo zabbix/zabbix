@@ -292,9 +292,34 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 				condition->conditionid);
 		}
 	}
-	else if(event->source == EVENT_SOURCE_DISCOVERY && condition->conditiontype == CONDITION_TYPE_DHOST_IP)
+	else if(event->source == EVENT_SOURCE_DISCOVERY &&
+		event->object == EVENT_OBJECT_DHOST &&
+		condition->conditiontype == CONDITION_TYPE_DHOST_IP)
 	{
-		/* Not implemente yet */
+		zabbix_log( LOG_LEVEL_DEBUG, "CONDITION_TYPE_DHOST_IP [%d:%s]",
+			event->value,
+			condition->value);
+		result = DBselect("select ip from dhosts where dhostid=" ZBX_FS_UI64,
+			event->objectid);
+		row = DBfetch(result);
+		if(row && DBis_null(row[0]) != SUCCEED)
+		{
+			if(condition->operator == CONDITION_OPERATOR_EQUAL)
+			{
+				if(ip_in_list(row[0], condition->value) == SUCCEED)	ret = SUCCEED;
+			}
+			else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
+			{
+				if(ip_in_list(row[0], condition->value) == FAIL)	ret = SUCCEED;
+			}
+			else
+			{
+				zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+					condition->operator,
+					condition->conditionid);
+			}
+		}
+		DBfree_result(result);
 	}
 	else if(event->source == EVENT_SOURCE_DISCOVERY && condition->conditiontype == CONDITION_TYPE_DSERVICE_TYPE)
 	{
