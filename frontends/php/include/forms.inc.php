@@ -2624,66 +2624,6 @@
 		$frmGItem->Show();
 	}
 
-	# Insert autoregistration form
-	function	insert_autoregistration_form()
-	{
-		$frmAutoReg = new CFormTable(S_AUTOREGISTRATION,"config.php");
-		$frmAutoReg->SetHelp("web.autoregistration.php");
-		$frmAutoReg->AddVar("config",$_REQUEST["config"]);
-
-		if(isset($_REQUEST["autoregid"]))
-		{
-			$frmAutoReg->AddVar("autoregid",$_REQUEST["autoregid"]);
-			$result	= DBselect("select * from autoreg  where id=".$_REQUEST["autoregid"]);
-
-			$row	= DBfetch($result);
-			$pattern= $row["pattern"];
-
-			$frmAutoReg->SetTitle(S_AUTOREGISTRATION." \"".$pattern."\"");
-		}
-		
-		if(isset($_REQUEST["autoregid"]) && !isset($_REQUEST["form_refresh"]))
-		{
-			$priority	= $row["priority"];
-			$hostid		= $row["hostid"];
-			$h		= get_host_by_hostid($hostid);
-			$host		= $h["host"];
-		}
-		else
-		{
-			$pattern	= get_request("pattern", "*");
-			$priority	= get_request("priority", 10);
-			$hostid		= get_request("hostid", 0);
-			$host		= get_request("host", "");
-		}
-
-		$col=0;
-
-		$frmAutoReg->AddRow(S_PATTERN,new CTextBox("pattern",$pattern,64));
-		$frmAutoReg->AddRow(S_PRIORITY,new CTextBox("priority",$priority,4));
-		$frmAutoReg->AddRow(S_HOST,array(
-			new CTextBox("host",$host,32,'yes'),
-			new CButton("btn1",S_SELECT,
-				"return PopUp('popup.php?dstfrm=".$frmAutoReg->GetName().
-				"&dstfld1=hostid&dstfld2=host&srctbl=hosts&srcfld1=hostid&srcfld2=host',450,450);",
-				'T')
-			));
-		$frmAutoReg->AddVar("hostid",$hostid);
-		
-		$frmAutoReg->AddItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["autoregid"]))
-		{
-			$frmAutoReg->AddItemToBottomRow(SPACE);
-			$frmAutoReg->AddItemToBottomRow(new CButtonDelete(
-				"Delete selected autoregistration rule?",
-				url_param("form").url_param("config").url_param("autoregid").
-				"&pattern=".$pattern));
-		}
-		$frmAutoReg->AddItemToBottomRow(SPACE);
-		$frmAutoReg->AddItemToBottomRow(new CButtonCancel(url_param("config")));
-		$frmAutoReg->Show();
-	}
-
 	function	insert_value_mapping_form()
 	{
 		$frmValmap = new CFormTable(S_VALUE_MAP);
