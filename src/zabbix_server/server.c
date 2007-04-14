@@ -445,8 +445,7 @@ int MAIN_ZABBIX_ENTRY(void)
 	int	i;
 	pid_t	pid;
 
-	int		listenfd;
-	socklen_t	addrlen;
+	zbx_sock_t	listen_sock;
 
 	char		host[128];
 	
@@ -527,7 +526,11 @@ int MAIN_ZABBIX_ENTRY(void)
 
 	if(CONFIG_TRAPPERD_FORKS > 0)
 	{
-		listenfd = tcp_listen(host,CONFIG_LISTEN_PORT,&addrlen);
+		if( FAIL == zbx_tcp_listen(&listen_sock, host, (unsigned short)CONFIG_LISTEN_PORT) )
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "Listener failed with error: %s.", zbx_tcp_strerror());
+			exit(1);
+		}
 	}
 
 	for(	i=1;
@@ -577,7 +580,7 @@ int MAIN_ZABBIX_ENTRY(void)
 			zabbix_log( LOG_LEVEL_CRIT, "gethostname() failed");
 			exit(FAIL);
 		}
-		child_trapper_main(server_num, listenfd, addrlen);
+		child_trapper_main(server_num, &listen_sock);
 
 /*		threads[i] = child_trapper_make(i, listenfd, addrlen); */
 /*		child_trapper_make(server_num, listenfd, addrlen); */

@@ -194,7 +194,7 @@ int	check_ntp(char *host, unsigned short port, int *value_int)
 	{
 		make_packet(&data);
 
-		pack_ntp(packet, sizeof(packet), &data);
+		pack_ntp((unsigned char*)packet, sizeof(packet), &data);
 
 		if( SUCCEED == (ret = zbx_tcp_send_raw(&s, packet)) )
 		{

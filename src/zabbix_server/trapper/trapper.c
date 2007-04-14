@@ -226,37 +226,25 @@ void	process_trapper_child(zbx_sock_t	*sock)
 		(double)(tv.tv_usec-msec)/1000000 );
 }
 
-void	child_trapper_main(int i,int listenfd, int addrlen)
+void	child_trapper_main(int i, zbx_sock_t *s)
 {
-	socklen_t	clilen;
-	struct sockaddr cliaddr;
-
-	zbx_sock_t	s;
-
 	zabbix_log( LOG_LEVEL_DEBUG, "In child_trapper_main()");
 
-/*	zabbix_log( LOG_LEVEL_WARNING, "zabbix_trapperd %ld started",(long)getpid());*/
-	zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Trapper]",
-		i);
+	zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Trapper]", i);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for(;;)
 	{
-		clilen = addrlen;
-
 		zbx_setproctitle("waiting for connection");
 
-		zabbix_log( LOG_LEVEL_DEBUG, "Before accept()");
-		zbx_tcp_init(&s);
-		s.socket=accept(listenfd,&cliaddr, &clilen);
-		zabbix_log( LOG_LEVEL_DEBUG, "After accept()");
+		zbx_tcp_accept(s);
 
 		zbx_setproctitle("processing data");
 
-		process_trapper_child(&s);
+		process_trapper_child(s);
 
-		zbx_tcp_close(&s);
+		zbx_tcp_unaccept(s);
 	}
 	DBclose();
 }

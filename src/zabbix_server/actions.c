@@ -42,7 +42,6 @@
 #include "db.h"
 #include "log.h"
 #include "zlog.h"
-#include "security.h"
 
 #include "actions.h"
 #include "operations.h"
