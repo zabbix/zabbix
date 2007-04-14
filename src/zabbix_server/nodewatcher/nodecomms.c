@@ -23,7 +23,6 @@
 #include "db.h"
 #include "log.h"
 #include "zlog.h"
-#include "zbxsock.h"
 
 #include "comms.h"
 #include "nodecomms.h"
@@ -79,8 +78,7 @@ int send_to_node(int dest_nodeid, int nodeid, char *data)
 
 	if( FAIL == zbx_tcp_connect(&sock, ip, port))
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Unable to connect to Node [%d]",
-			dest_nodeid);
+		zabbix_log(LOG_LEVEL_DEBUG, "Unable to connect to Node [%d] error: %s", dest_nodeid, zbx_tcp_strerror());
 		return  FAIL;
 	}
 

@@ -59,7 +59,7 @@ int	CONFIG_LOG_LEVEL		= LOG_LEVEL_INFORMATION;
 char	CONFIG_LOG_UNRES_SYMB		= 0;
 
 
-void    load_config(int exit_on_error)
+void    load_config()
 {
 	struct cfg_line cfg[]=
 	{
@@ -132,10 +132,7 @@ void    load_config(int exit_on_error)
 		if(CONFIG_HOSTNAME == NULL)
 		{
 			zabbix_log( LOG_LEVEL_CRIT, "Hostname is not defined");
-			if(exit_on_error) 
-			{
-				exit(1);
-			}
+			exit(1);
 		}
 	}
 }

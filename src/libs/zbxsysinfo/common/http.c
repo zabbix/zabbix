@@ -21,92 +21,69 @@
 #include "sysinfo.h"
 
 #include "log.h"
-#include "zbxsock.h"
+#include "comms.h"
 #include "cfg.h"
 
 #include "http.h"
 
-static int	get_http_page(char *hostname, char *param, unsigned short port, char *buffer, int max_buf_len)
+#define	ZABBIX_MAX_WEBPAGE_SIZE	1*1024*1024
+
+static int	get_http_page(char *host, char *param, unsigned short port, char *buffer, int max_buf_len)
 {
-	register int i = 0;
-	char	request[MAX_STRING_LEN];
+	char
+		*buf,
+		request[MAX_STRING_LEN];
 	
-	ZBX_SOCKET	s;
-	ZBX_SOCKADDR	servaddr_in;
-	int	
-		n, 
-		total, 
-		ret = SYSINFO_RET_FAIL;
+	zbx_sock_t		s;
 
-	struct hostent *hp;
+	int	ret;
 
-	if(NULL == (hp = zbx_gethost(hostname)) )
+	assert(buffer);
+
+	if( SUCCEED == (ret = zbx_tcp_connect(&s, host, port)) )
 	{
+		zbx_snprintf(request, sizeof(request), "GET /%s HTTP/1.1\nHost: %s\nConnection: close\n\n", param, host);
+
+		if( SUCCEED == (ret = zbx_tcp_send_raw(&s, request)) )
+		{
+			if( SUCCEED == (ret = zbx_tcp_recv(&s, &buf)) )
+			{
+				zbx_rtrim(buf, "\n\r\0");
+
+				zbx_snprintf(buffer, max_buf_len, buf);
+			}
+		}
+	}
+	zbx_tcp_close(&s);
+
+	if( FAIL == ret )
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "HTTP get error: %s", zbx_tcp_strerror());
 		return SYSINFO_RET_FAIL;
 	}
-
-	memset(&servaddr_in, 0, sizeof(ZBX_SOCKADDR));
-
-	servaddr_in.sin_family		= AF_INET;
-	servaddr_in.sin_addr.s_addr	= ((struct in_addr *)(hp->h_addr))->s_addr;
-	servaddr_in.sin_port		= htons(port);
-
-
-	if(INVALID_SOCKET == (s = (ZBX_SOCKET)socket(AF_INET,SOCK_STREAM,0)))
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "get_http_page - Error in socket() [%s:%u] [%s]", hostname, port, strerror_from_system(errno));
-		return SYSINFO_RET_FAIL;
-	}
-
-	if(SOCKET_ERROR == connect(s,(struct sockaddr *)&servaddr_in,sizeof(ZBX_SOCKADDR)))
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "get_http_page - Error in connect() [%s:%u] [%s]",hostname, port, strerror_from_system(errno));
-		zbx_sock_close(s);
-		return SYSINFO_RET_FAIL;
-	}
-
-	zbx_snprintf(request, sizeof(request), "GET /%s HTTP/1.1\nHost: %s\nConnection: close\n\n", param, hostname);
-
-	if(SOCKET_ERROR == zbx_sock_write(s, (void *)request, (int)strlen(request)))
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "get_http_page - Error during sending [%s:%u] [%s]",hostname, port, strerror_from_system(errno));
-		zbx_sock_close(s);
-		return SYSINFO_RET_FAIL;
-	}
-
-	memset(buffer, 0, max_buf_len);
-
-	for(total=0; (n = zbx_sock_read(s, buffer+total, max_buf_len-1-total, CONFIG_TIMEOUT)) > 0; total+=n);
-
-	for(i=(int)strlen(buffer); i>0 && (buffer[i] == '\n' || buffer[i] == '\r' || buffer[i] == '\0'); buffer[i--] = '\0');
-
-	ret = SYSINFO_RET_OK;
-
-	zbx_sock_close(s);
-	return ret;
+	return SYSINFO_RET_OK;
 }
 
 int	WEB_PAGE_GET(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#define	ZABBIX_MAX_WEBPAGE_SIZE	100*1024
 	char	hostname[MAX_STRING_LEN];
 	char	path[MAX_STRING_LEN];
 	char	port_str[MAX_STRING_LEN];
 
 	char	*buffer;
 
-        assert(result);
+	assert(result);
 
-        init_result(result);
-	
-        if(num_param(param) > 3)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+	init_result(result);
+
+	if(num_param(param) > 3)
+	{
+		return SYSINFO_RET_FAIL;
+	}
         
 	if(get_param(param, 1, hostname, MAX_STRING_LEN) != 0)
 	{
-                return SYSINFO_RET_FAIL;
+		return SYSINFO_RET_FAIL;
 	}
 
 	if(get_param(param, 2, path, MAX_STRING_LEN) != 0)
@@ -140,7 +117,6 @@ int	WEB_PAGE_GET(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 
 int	WEB_PAGE_PERF(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#define	ZABBIX_MAX_WEBPAGE_SIZE	100*1024
 	char	hostname[MAX_STRING_LEN];
 	char	path[MAX_STRING_LEN];
 	char	port_str[MAX_STRING_LEN];
@@ -196,7 +172,6 @@ int	WEB_PAGE_PERF(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 
 int	WEB_PAGE_REGEXP(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#define	ZABBIX_MAX_WEBPAGE_SIZE	100*1024
 	char	hostname[MAX_STRING_LEN];
 	char	path[MAX_STRING_LEN];
 	char	port_str[MAX_STRING_LEN];

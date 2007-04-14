@@ -27,7 +27,7 @@
 #include "log.h"
 #include "zbxconf.h"
 #include "zbxgetopt.h"
-#include "zbxsock.h"
+#include "comms.h"
 #include "mutexs.h"
 #include "alias.h"
 
@@ -206,61 +206,13 @@ static zbx_task_t parse_commandline(int argc, char **argv)
 	return task;
 }
 
-static ZBX_SOCKET tcp_listen(void)
-{
-	ZBX_SOCKET sock;
-	ZBX_SOCKADDR serv_addr;
-	int	on;
-
-	if ((sock = (ZBX_SOCKET)socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
-	{
-		zabbix_log( LOG_LEVEL_CRIT, "Unable to create socket. [%s]", strerror_from_system(zbx_sock_last_error()));
-		exit(1);
-	}
-	
-	/* Enable address reuse */
-	/* This is to immediately use the address even if it is in TIME_WAIT state */
-	/* http://www-128.ibm.com/developerworks/linux/library/l-sockpit/index.html */
-	on = 1;
-	if( -1 == setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (void *)&on, sizeof(on) ))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot setsockopt SO_REUSEADDR [%s]", strerror(errno));
-	}
-
-	/* Create socket	Fill in local address structure */
-	memset(&serv_addr, 0, sizeof(ZBX_SOCKADDR));
-
-	serv_addr.sin_family		= AF_INET;
-	serv_addr.sin_addr.s_addr	= CONFIG_LISTEN_IP ? inet_addr(CONFIG_LISTEN_IP) : htonl(INADDR_ANY);
-	serv_addr.sin_port		= htons((unsigned short)CONFIG_LISTEN_PORT);
-
-	/* Bind socket */
-	if (bind(sock,(struct sockaddr *)&serv_addr,sizeof(ZBX_SOCKADDR)) == SOCKET_ERROR)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "Cannot bind to port %u for server %s. Error [%s]. Another zabbix_agentd already running ?",
-				CONFIG_LISTEN_PORT,
-				CONFIG_LISTEN_IP ? CONFIG_LISTEN_IP : "[ANY]",
-				strerror_from_system(zbx_sock_last_error()));
-
-		exit(1);
-	}
-
-	if(listen(sock, SOMAXCONN) == SOCKET_ERROR)
-	{
-		zabbix_log( LOG_LEVEL_CRIT, "Listen failed. [%s]", strerror_from_system(zbx_sock_last_error()));
-		exit(1);
-	}
-
-	return sock;
-}
-
 int MAIN_ZABBIX_ENTRY(void)
 {
 	ZBX_THREAD_ACTIVECHK_ARGS	activechk_args;
 
 	int	i = 0;
 
-	ZBX_SOCKET	sock;
+	zbx_sock_t	listen_sock;
 
 	zabbix_open_log(
 #if ON	/* !!! normal case must be ON !!! */
@@ -277,7 +229,11 @@ int MAIN_ZABBIX_ENTRY(void)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "zabbix_agentd started. ZABBIX %s.", ZABBIX_VERSION);
 
-	sock = tcp_listen();
+	if( FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT) )
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Listener failed with error: %s.", zbx_tcp_strerror());
+		exit(1);
+	}
 
 	init_collector_data();
 
@@ -290,7 +246,7 @@ int MAIN_ZABBIX_ENTRY(void)
 	/* start listeners */
 	for(i++; i < CONFIG_ZABBIX_FORKS - ((0 == CONFIG_DISABLE_ACTIVE) ? 1 : 0); i++)
 	{
-		threads[i] = zbx_thread_start(listener_thread, &sock);
+		threads[i] = zbx_thread_start(listener_thread, &listen_sock);
 	}
 
 	/* start active chack */
@@ -376,12 +332,10 @@ int	main(int argc, char **argv)
 
 	init_metrics(); /* Must be before load_config().  load_config - use metrics!!! */
 
-	load_config(task == 0);
+	if( ZBX_TASK_START == task )
+		load_config();
 
 	load_user_parameters();
-
-	if(FAIL == zbx_sock_init())
-		exit(FAIL);
 
 	switch(task)
 	{

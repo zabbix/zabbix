@@ -21,7 +21,7 @@
 
 #include "sysinfo.h"
 
-int	tcp_expect(const char	*hostname, short port, const char *request, const char *expect, const char *sendtoclose, int *value_int);
+int	tcp_expect(const char	*host, unsigned short port, const char *request, const char *expect, const char *sendtoclose, int *value_int);
 int	TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	CHECK_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
