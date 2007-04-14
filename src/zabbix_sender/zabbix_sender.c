@@ -107,7 +107,7 @@ static int	CONFIG_LOG_LEVEL = LOG_LEVEL_CRIT;
 static char*	INPUT_FILE = NULL;
 
 static char*	ZABBIX_SERVER = NULL;
-int		ZABBIX_SERVER_PORT = 0;
+unsigned short	ZABBIX_SERVER_PORT = 0;
 static char*	ZABBIX_HOSTNAME = NULL;
 static char*	ZABBIX_KEY = NULL;
 static char*	ZABBIX_KEY_VALUE = NULL;
@@ -286,7 +286,7 @@ static zbx_task_t parse_commandline(int argc, char **argv)
 				ZABBIX_SERVER = strdup(zbx_optarg);
 				break;
 			case 'p':
-				ZABBIX_SERVER_PORT = atoi(zbx_optarg);
+				ZABBIX_SERVER_PORT = (unsigned short)atoi(zbx_optarg);
 				break;
 			case 's':
 				ZABBIX_HOSTNAME = strdup(zbx_optarg);
@@ -405,9 +405,9 @@ int main(int argc, char **argv)
 			if( ZABBIX_SERVER_PORT )
 				sentdval_args.port	= ZABBIX_SERVER_PORT;
 			else
-				sentdval_args.port = atoi(str_port);
+				sentdval_args.port	= (unsigned short)atoi(str_port);
 
-			if( MIN_ZABBIX_PORT > sentdval_args.port || sentdval_args.port > MAX_ZABBIX_PORT )
+			if( MIN_ZABBIX_PORT > sentdval_args.port /* || sentdval_args.port > MAX_ZABBIX_PORT (MAX_ZABBIX_PORT == max unsigned short) */)
 			{
 				zabbix_log( LOG_LEVEL_WARNING, "[line %i] Incorrect port number [%i]. Allowed [%i:%i]",
 					total_count, sentdval_args.port, MIN_ZABBIX_PORT, MAX_ZABBIX_PORT);
@@ -440,7 +440,7 @@ int main(int argc, char **argv)
 
 			if( !ZABBIX_SERVER_PORT )	ZABBIX_SERVER_PORT = 10051;
 
-			if( MIN_ZABBIX_PORT > ZABBIX_SERVER_PORT || ZABBIX_SERVER_PORT > MAX_ZABBIX_PORT )
+			if( MIN_ZABBIX_PORT > ZABBIX_SERVER_PORT /* || ZABBIX_SERVER_PORT > MAX_ZABBIX_PORT (MAX_ZABBIX_PORT == max unsigned short) */)
 			{
 				zabbix_log( LOG_LEVEL_WARNING, "Incorrect port number [%i]. Allowed [%i:%i]",
 					ZABBIX_SERVER_PORT, MIN_ZABBIX_PORT, MAX_ZABBIX_PORT);

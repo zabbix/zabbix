@@ -10,5 +10,4 @@ zabbix_sender_LDADD = \
 	../libs/zbxsys/libzbxsys.a \
 	../libs/zbxcrypto/libzbxcrypto.a \
 	../libs/zbxconf/libzbxconf.a \
-	../libs/zbxcomms/libzbxcomms.a \
-	../libs/zbxnet/libzbxnet.a
+	../libs/zbxcomms/libzbxcomms.a

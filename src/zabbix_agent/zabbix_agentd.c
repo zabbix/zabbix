@@ -20,7 +20,6 @@
 #include "common.h"
 
 #include "sysinfo.h"
-#include "security.h"
 #include "zabbix_agent.h"
 
 #include "cfg.h"

@@ -165,7 +165,7 @@ static int	zbx_tcp_start(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tcp_init                                                     *
+ * Function: zbx_tcp_clean                                                    *
  *                                                                            *
  * Purpose: initialize socket                                                 *
  *                                                                            *
@@ -178,11 +178,34 @@ static int	zbx_tcp_start(void)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	zbx_tcp_init(zbx_sock_t *s)
+static void	zbx_tcp_clean(zbx_sock_t *s)
 {
+	assert(s);
+
 	memset(s, 0, sizeof(zbx_sock_t));
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_tcp_init                                                     *
+ *                                                                            *
+ * Purpose: initialize structure of zabbix socket with specified socket       *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              * 
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_tcp_init(zbx_sock_t *s, ZBX_SOCKET o)
+{
+	zbx_tcp_clean(s);
+
+	s->socket = o;
+}
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tcp_connect                                                  *
@@ -208,7 +231,7 @@ int     zbx_tcp_connect(zbx_sock_t *s, const char *ip, unsigned short port)
 
 	ZBX_TCP_START();
 
-	zbx_tcp_init(s);
+	zbx_tcp_clean(s);
 
 	if(NULL == (hp = zbx_gethost(ip)))
 	{
@@ -356,7 +379,7 @@ int zbx_tcp_listen(
 
 	ZBX_TCP_START();
 
-	zbx_tcp_init(s);
+	zbx_tcp_clean(s);
 
 	if( ZBX_SOCK_ERROR == (s->socket = socket(AF_INET,SOCK_STREAM,0)) )
 	{
@@ -420,9 +443,9 @@ int zbx_tcp_listen(
 int	zbx_tcp_accept(zbx_sock_t *s)
 {
 	ZBX_SOCKADDR	serv_addr;
-	ZBX_SOCKET		accepted_socket;
+	ZBX_SOCKET	accepted_socket;
 
-	int	nlen;
+	socklen_t	nlen;
 
 	nlen = sizeof(ZBX_SOCKADDR);
 

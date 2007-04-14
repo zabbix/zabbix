@@ -26,6 +26,6 @@ extern	int	CONFIG_TIMEOUT;
 
 extern	void	signal_handler( int sig );
 
-void    child_trapper_main(int i,int listenfd, int addrlen);
+void	child_trapper_main(int i, zbx_sock_t *s);
 
 #endif
