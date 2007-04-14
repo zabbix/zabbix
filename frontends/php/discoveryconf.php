@@ -34,14 +34,9 @@ include_once "include/page_header.php";
 	$fields=array(
 		"druleid"=>	array(T_ZBX_INT, O_OPT,  P_SYS,	DB_ID,		'{form}=="update"'),
 		"name"=>	array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,	'isset({save})'),
-		"ipfirst"=>	array(T_ZBX_IP, O_OPT,  null,	NOT_EMPTY,	'isset({save})'),
-		"iplast"=>	array(T_ZBX_IP, O_OPT,  null,	NOT_EMPTY,	'isset({save})'),
+		"iprange"=>	array(T_ZBX_IP_RANGE, O_OPT,  null,	NOT_EMPTY,	'isset({save})'),
 		"delay"=>	array(T_ZBX_INT, O_OPT,	 null,	null, 		'isset({save})'),
 		"status"=>	array(T_ZBX_INT, O_OPT,	 null,	IN("0,1"), 	'isset({save})'),
-		"upevent"=>	array(T_ZBX_INT, O_OPT,	 null,	null, 		'isset({save})'),
-		"downevent"=>	array(T_ZBX_INT, O_OPT,	 null,	null, 		'isset({save})'),
-		"svcupevent"=>	array(T_ZBX_INT, O_OPT,	 null,	null, 		'isset({save})'),
-		"svcdownevent"=>array(T_ZBX_INT, O_OPT,	 null,	null, 		'isset({save})'),
 
 		"g_druleid"=>	array(T_ZBX_INT, O_OPT,  null,	DB_ID,		null),
 
@@ -97,9 +92,8 @@ include_once "include/page_header.php";
 			$msg_ok = S_DISCOVERY_RULE_UPDATED;
 			$msg_fail = S_CANNOT_UPDATE_DISCOVERY_RULE;
 
-			$result = update_discovery_rule($_REQUEST["druleid"], $_REQUEST['name'], $_REQUEST['ipfirst'], $_REQUEST['iplast'], 
-				$_REQUEST['delay'], $_REQUEST['status'], $_REQUEST['upevent'], $_REQUEST['downevent'], 
-				$_REQUEST['svcupevent'], $_REQUEST['svcdownevent'], $_REQUEST['dchecks']);
+			$result = update_discovery_rule($_REQUEST["druleid"], $_REQUEST['name'], $_REQUEST['iprange'], 
+				$_REQUEST['delay'], $_REQUEST['status'], $_REQUEST['dchecks']);
 
 			$druleid = $_REQUEST["druleid"];
 		}
@@ -108,9 +102,8 @@ include_once "include/page_header.php";
 			$msg_ok = S_DISCOVERY_RULE_ADDED;
 			$msg_fail = S_CANNOT_ADD_DISCOVERY_RULE;
 
-			$druleid = add_discovery_rule($_REQUEST['name'], $_REQUEST['ipfirst'], $_REQUEST['iplast'], 
-				$_REQUEST['delay'], $_REQUEST['status'], $_REQUEST['upevent'], $_REQUEST['downevent'], 
-				$_REQUEST['svcupevent'], $_REQUEST['svcdownevent'], $_REQUEST['dchecks']);
+			$druleid = add_discovery_rule($_REQUEST['name'], $_REQUEST['iprange'],
+				$_REQUEST['delay'], $_REQUEST['status'], $_REQUEST['dchecks']);
 
 			$result = $druleid;
 		}
@@ -203,10 +196,8 @@ include_once "include/page_header.php";
 			array(	new CCheckBox('all_drules',null,"CheckAll('".$form->GetName()."','all_drules');"),
 				S_NAME
 			),
-			S_IP_FIRST,
-			S_IP_LAST,
+			S_IP_RANGE,
 			S_DELAY,
-			S_INTERVALS.' (up/down)',
 			S_CHECKS,
 			S_STATUS));
 
@@ -221,11 +212,6 @@ include_once "include/page_header.php";
 			{
 				$cheks[] = discovery_check_type2str($check_data['type']);
 			}
-
-			$intervals = '[host]('.($rule_data['upevent'] / (60*60)).
-				'/'.($rule_data['downevent'] / (60*60)).
-				') [service]('.($rule_data['svcupevent'] / (60*60)).
-				'/'.($rule_data['svcdownevent'] / (60*60)).')';
 
 			$status = new CCol(new CLink(discovery_status2str($rule_data["status"]),
 				'?g_druleid%5B%5D='.$rule_data['druleid'].
@@ -243,10 +229,8 @@ include_once "include/page_header.php";
 					new CLink($rule_data['name'],
 						"?form=update&druleid=".$rule_data['druleid'],'action'),
 					),
-				$rule_data['ipfirst'],
-				$rule_data['iplast'],
+				$rule_data['iprange'],
 				$rule_data['delay'],
-				$intervals,
 				implode(',', $cheks),
 				$status
 				));	

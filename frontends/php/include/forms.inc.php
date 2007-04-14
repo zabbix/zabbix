@@ -179,14 +179,9 @@
 		{
 
 			$name		= $rule_data['name'];
-			$ipfirst	= $rule_data['ipfirst'];
-			$iplast		= $rule_data['iplast'];
+			$iprange	= $rule_data['iprange'];
 			$delay		= $rule_data['delay'];
 			$status		= $rule_data['status'];
-			$upevent	= round($rule_data['upevent']/3600);		/* convert seconds to hours */
-			$downevent	= round($rule_data['downevent']/3600);		/* convert seconds to hours */
-			$svcupevent	= round($rule_data['svcupevent']/3600);		/* convert seconds to hours */
-			$svcdownevent	= round($rule_data['svcdownevent']/3600);	/* convert seconds to hours */
 
 			//TODO init checks
 			$dchecks = array();
@@ -199,14 +194,9 @@
 		else
 		{
 			$name		= get_request('name','');
-			$ipfirst	= get_request('ipfirst','192.168.0.1');
-			$iplast		= get_request('iplast','192.168.0.255');
+			$iprange	= get_request('iprange','192.168.0.1-255');
 			$delay		= get_request('delay',3600);
 			$status		= get_request('status',DRULE_STATUS_ACTIVE);
-			$upevent	= get_request('upevent',24);
-			$downevent	= get_request('downevent',48);
-			$svcupevent	= get_request('svcupevent',1);
-			$svcdownevent	= get_request('svcdownevent',4);
 
 			$dchecks	= get_request('dchecks',array());
 		}
@@ -214,13 +204,8 @@
 		$new_check_ports= get_request('new_check_ports', '80');
 
 		$form->AddRow(S_NAME, new CTextBox('name', $name, 40));
-		$form->AddRow(S_IP_FIRST, new CTextBox('ipfirst', $ipfirst, 27));
-		$form->AddRow(S_IP_LAST, new CTextBox('iplast', $iplast, 27));
+		$form->AddRow(S_IP_RANGE, new CTextBox('iprange', $iprange, 27));
 		$form->AddRow(S_DELAY.' (seconds)', new CNumericBox('delay', $delay, 8));
-		$form->AddRow(S_UPEVENT, new CNumericBox('upevent', $upevent, 8));
-		$form->AddRow(S_DOWNEVENT, new CNumericBox('downevent', $downevent, 8));
-		$form->AddRow(S_SVCUPEVENT, new CNumericBox('svcupevent', $svcupevent, 8));
-		$form->AddRow(S_SVCDOWNEVENT, new CNumericBox('svcdownevent', $svcdownevent, 8));
 
 		$form->AddVar('dchecks', $dchecks);
 
