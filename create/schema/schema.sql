@@ -41,10 +41,6 @@ FIELD		|iprange	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|delay		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|nextcheck	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|upevent	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|downevent	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|svcupevent	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|svcdownevent	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 
 TABLE|dchecks|dcheckid|ZBX_SYNC
 FIELD		|dcheckid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC

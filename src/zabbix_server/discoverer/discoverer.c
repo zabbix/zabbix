@@ -616,7 +616,7 @@ static void process_rule(DB_DRULE *rule)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Wrong format of IP range [%s]",
 				rule->iprange);
-			break;
+			continue;
 		}
 
 		for(i=first;i<=last;i++)
@@ -643,7 +643,7 @@ static void process_rule(DB_DRULE *rule)
 		s=(char *)strtok(NULL,",");
 	}
 
-	zabbix_log( LOG_LEVEL_DEBUG, "End process_rule()");
+	zabbix_log( LOG_LEVEL_WARNING, "End process_rule()");
 }
 
 /******************************************************************************
