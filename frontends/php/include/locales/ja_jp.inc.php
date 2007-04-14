@@ -208,17 +208,8 @@
 	"S_IMAGE_UPDATED"=>			"Image updated",
 	"S_CANNOT_UPDATE_IMAGE"=>		"Cannot update image",
 	"S_UPDATE_SELECTED_IMAGE"=>		"Update selected image?",
-	"S_AUTOREGISTRATION"=>			"自動登録",
-	"S_AUTOREGISTRATION_RULES_BIG"=>	"自動登録ルール",
 	"S_PRIORITY"=>				"優先順位",
 	"S_PATTERN"=>				"パターン",
-	"S_NO_AUTOREGISTRATION_RULES_DEFINED"=>	"自動登録ルールが設定されていません",
-	"S_AUTOREGISTRATION_ADDED"=>		"自動登録ルールを追加しました",
-	"S_CANNOT_ADD_AUTOREGISTRATION"=>	"自動登録ルールを追加できません",
-	"S_AUTOREGISTRATION_UPDATED"=>		"自動登録ルールを更新しました",
-	"S_AUTOREGISTRATION_WAS_NOT_UPDATED"=>	"自動登録ルールを更新できません",
-	"S_AUTOREGISTRATION_DELETED"=>		"自動登録ルールを削除しました",
-	"S_AUTOREGISTRATION_WAS_NOT_DELETED"=>	"自動登録ルールを削除できません",
 
 //	Latest values
 	"S_LATEST_VALUES"=>			"最新データ",
