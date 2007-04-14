@@ -249,7 +249,7 @@ int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	ip_in_list(const char *list, char *ip)
+int	ip_in_list(char *list, char *ip)
 {
 	char	tmp[MAX_STRING_LEN];
 	char	tmp_ip[MAX_STRING_LEN];
@@ -266,7 +266,7 @@ int	ip_in_list(const char *list, char *ip)
        	s=(char *)strtok(tmp,",");
 	while(s!=NULL)
 	{
-		zabbix_log(LOG_LEVEL_WARNING,"IP [%s]", s);
+		zabbix_log(LOG_LEVEL_WARNING,"Next [%s]", s);
 
 		if(sscanf(s,"%d.%d.%d.%d-%d",&i1,&i2,&i3,&i4,&i5) == 5)
 		{
@@ -315,22 +315,27 @@ int	ip_in_list(const char *list, char *ip)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	int_in_list(const char *list, int value)
+int	int_in_list(char *list, int value)
 {
-	char	tmp[MAX_STRING_LEN];
-	char	*s;
+	char	*start, *end;
 	int	i1,i2;
 	int	ret = FAIL;
-
+	char	c;
 
 	zabbix_log( LOG_LEVEL_WARNING, "In int_in_list(list:%s,value:%d)", list, value);
 
-	strscpy(tmp,list);
-       	s=(char *)strtok(tmp,",");
-	while(s!=NULL)
+	for(start = list; start[0] != '\0';)
 	{
-		zabbix_log(LOG_LEVEL_WARNING,"Int [%s]", s);
-		if(sscanf(s,"%d-%d",&i1,&i2) == 2)
+		end=strchr(start, ',');
+
+		if(end != NULL)
+		{	
+			c=end[0];
+			end[0]='\0';
+		}
+		
+		zabbix_log(LOG_LEVEL_WARNING,"Next [%s]", start);
+		if(sscanf(start,"%d-%d",&i1,&i2) == 2)
 		{
 			if(value>=i1 && value<=i2)
 			{
@@ -340,13 +345,22 @@ int	int_in_list(const char *list, int value)
 		}
 		else
 		{
-			if(atoi(s) == value)
+			if(atoi(start) == value)
 			{
 				ret = SUCCEED;
 				break;
 			}
 		}
-       		s=(char *)strtok(NULL,",");
+
+		if(end != NULL)
+		{
+			end[0]=c;
+			start=end+1;
+		}
+		else
+		{
+			break;
+		}
 	}
 
 	zabbix_log( LOG_LEVEL_WARNING, "End int_in_list(ret:%s)", ret == SUCCEED?"SUCCEED":"FAIL");
