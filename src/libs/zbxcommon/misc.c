@@ -235,6 +235,72 @@ int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char
 
 /******************************************************************************
  *                                                                            *
+ * Function: ip_in_list                                                       *
+ *                                                                            *
+ * Purpose: check if ip matches range of ip addresses                         *
+ *                                                                            *
+ * Parameters: list -  IPs [192.168.1.1-244,192.168.1.250]                    *
+ *             value-  value                                                  *
+ *                                                                            *
+ * Return value: FAIL - out of range, SUCCEED - within the range              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	ip_in_list(const char *list, char *ip)
+{
+	char	tmp[MAX_STRING_LEN];
+	char	tmp_ip[MAX_STRING_LEN];
+	char	*s;
+	int	i1,i2,i3,i4,i5;
+	int	ret = FAIL;
+
+
+	zabbix_log( LOG_LEVEL_WARNING, "In ip_in_list(list:%s,ip:%s)",
+		list,
+		ip);
+
+	strscpy(tmp,list);
+       	s=(char *)strtok(tmp,",");
+	while(s!=NULL)
+	{
+		zabbix_log(LOG_LEVEL_WARNING,"IP [%s]", s);
+
+		if(sscanf(s,"%d.%d.%d.%d-%d",&i1,&i2,&i3,&i4,&i5) == 5)
+		{
+			zbx_snprintf(tmp_ip,sizeof(tmp_ip)-1,"%d.%d.%d.%d",i1,i2,i3,i4);
+			if(strcmp(ip,tmp_ip)>=0)
+			{
+				zbx_snprintf(tmp_ip,sizeof(tmp_ip)-1,"%d.%d.%d.%d",i1,i2,i3,i5);
+				if(strcmp(ip,tmp_ip)<=0)
+				{
+					ret = SUCCEED;
+					break;
+				}
+			}
+		}
+		else if(sscanf(s,"%d.%d.%d.%d",&i1,&i2,&i3,&i4) == 4)
+		{
+			zbx_snprintf(tmp_ip,sizeof(tmp_ip)-1,"%d.%d.%d.%d",i1,i2,i3,i4);
+			if(strcmp(ip,tmp_ip) == 0)
+			{
+				ret = SUCCEED;
+				break;
+			}
+		}
+
+       		s=(char *)strtok(NULL,",");
+	}
+
+	zabbix_log( LOG_LEVEL_WARNING, "End ip_in_list(ret:%s)", ret == SUCCEED?"SUCCEED":"FAIL");
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: int_in_list                                                      *
  *                                                                            *
  * Purpose: check if integer matches a list of integers                       *
