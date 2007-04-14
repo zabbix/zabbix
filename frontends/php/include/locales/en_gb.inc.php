@@ -38,6 +38,8 @@
 	'S_SERVICE_PORT'=>			'Service port',
 	'S_DISCOVERY_STATUS'=>			'Discovery status',
 
+	'S_UPTIME_DOWNTIME'=>			'Uptime/Downtime',
+
 	'S_DISCOVERY_RULE'=>			'Discovery rule',
 	'S_DISCOVERY'=>				'Discovery',
 	'S_DISCOVERY_BIG'=>			'DISCOVERY',
