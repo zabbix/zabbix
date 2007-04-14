@@ -151,7 +151,7 @@ then
   configure_is_ok=0
   echo "Configuring..."
   echo "Configuring..." >> WARNINGS
-  export CFLAGS="-Wall"
+  export CFLAGS="-Wall -DDEBUG"
   #export CFLAGS="-Wall -pedantic"
   ./configure $config_param 2>> WARNINGS 
   if [ "x$?" = "x0" ]
