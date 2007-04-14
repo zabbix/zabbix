@@ -418,7 +418,7 @@ static int discover_service(zbx_dservice_type_t type, char *ip, int port)
 	struct	sigaction phan;
 
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In discover_service(ip:%s, port:%d, type:%d)",
+	zabbix_log(LOG_LEVEL_WARNING, "In discover_service(ip:%s, port:%d, type:%d)",
 		ip,
 		port,
 		type);
@@ -484,6 +484,7 @@ static int discover_service(zbx_dservice_type_t type, char *ip, int port)
 		sigaction(SIGALRM, &phan, NULL);
 		alarm(10);
 
+		zabbix_log(LOG_LEVEL_WARNING, "Beforfe process(%s)", key);
 		if(process(key, 0, &value) == SUCCEED)
 		{
 			if(GET_UI64_RESULT(&value))
@@ -493,10 +494,11 @@ static int discover_service(zbx_dservice_type_t type, char *ip, int port)
 			else ret = FAIL;
 		}
 		else	ret = FAIL;
+		zabbix_log(LOG_LEVEL_WARNING, "After process(%s)", key);
 		alarm(0);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End discover_service()");
+	zabbix_log(LOG_LEVEL_WARNING, "End discover_service()");
 
 	return ret;
 }
@@ -523,7 +525,7 @@ static void process_check(DB_DRULE *rule, DB_DCHECK *check, char *ip)
 	char	tmp[MAX_STRING_LEN];
 	int	first,last;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In process_check(ip:%s, ports:%s, type:%d)",
+	zabbix_log(LOG_LEVEL_WARNING, "In process_check(ip:%s, ports:%s, type:%d)",
 		ip,
 		check->ports,
 		check->type);
@@ -534,6 +536,7 @@ static void process_check(DB_DRULE *rule, DB_DCHECK *check, char *ip)
 	s=(char *)strtok(tmp,",");
 	while(s!=NULL)
 	{
+		zabbix_log(LOG_LEVEL_WARNING, "s [%s]", s);
 		c=strchr(s,'-');
 		if(c == NULL)
 		{
@@ -557,7 +560,7 @@ static void process_check(DB_DRULE *rule, DB_DCHECK *check, char *ip)
 	}
 
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End process_check()");
+	zabbix_log(LOG_LEVEL_WARNING, "End process_check()");
 }
 
 /******************************************************************************
@@ -582,38 +585,62 @@ static void process_rule(DB_DRULE *rule)
 	DB_DCHECK	check;
 
 	char		ip[MAX_STRING_LEN];
-	int		first,last;
-	char		*c;
+	char		ip1[MAX_STRING_LEN];
+	char		tmp[MAX_STRING_LEN];
+	int		i1,i2,i3,i4,i5;
+	char		*s;
+	int		first, last, i;
 
-	int		i;
+	zabbix_log(LOG_LEVEL_WARNING, "In process_rule(name:%s,range:%s)",
+		rule->name,
+		rule->iprange);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In process_rule(name:%s)",
-		rule->name);
-
-
-	first=atoi(strrchr(rule->ipfirst,'.')+1);
-	last=atoi(strrchr(rule->iplast,'.')+1);
-	c = strrchr(rule->ipfirst,'.');
-	for(i=first;i<=last;i++)
-	{
-		c[0] = 0;
-		zbx_snprintf(ip,MAX_STRING_LEN-1,"%s.%d",
-			rule->ipfirst,
-			i);
-		result = DBselect("select dcheckid,druleid,type,ports from dchecks where druleid=" ZBX_FS_UI64,
-			rule->druleid);
-		while((row=DBfetch(result)))
+        strscpy(tmp,rule->iprange);
+        s=(char *)strtok(tmp,",");
+        while(s!=NULL)
+        {
+		zabbix_log(LOG_LEVEL_WARNING,"IP [%s]", s);
+		if(sscanf(s,"%d.%d.%d.%d-%d",&i1,&i2,&i3,&i4,&i5) == 5)
 		{
-			ZBX_STR2UINT64(check.dcheckid,row[0]);
-			ZBX_STR2UINT64(check.druleid,row[1]);
-			check.type		= atoi(row[2]);
-			check.ports		= row[3];
-	
-			process_check(rule, &check, ip);
+			zbx_snprintf(ip1,sizeof(ip)-1,"%d.%d.%d",i1,i2,i3);
+			first = i4;
+			last = i5;
 		}
-		DBfree_result(result);
-		add_host_event(ip);
-		c[0] = '.';
+		else if(sscanf(s,"%d.%d.%d.%d",&i1,&i2,&i3,&i4) == 4)
+		{
+			zbx_snprintf(ip1,sizeof(ip)-1,"%d.%d.%d",i1,i2,i3);
+			first = i4;
+			last = i4;
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Wrong format of IP range [%s]",
+				rule->iprange);
+			break;
+		}
+
+		for(i=first;i<=last;i++)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "I [%d]", i);
+			zbx_snprintf(ip,sizeof(ip)-1,"%s.%d",
+				ip1,
+				i);
+			result = DBselect("select dcheckid,druleid,type,ports from dchecks where druleid=" ZBX_FS_UI64,
+				rule->druleid);
+			while((row=DBfetch(result)))
+			{
+				ZBX_STR2UINT64(check.dcheckid,row[0]);
+				ZBX_STR2UINT64(check.druleid,row[1]);
+				check.type		= atoi(row[2]);
+				check.ports		= row[3];
+		
+				process_check(rule, &check, ip);
+			}
+			DBfree_result(result);
+			add_host_event(ip);
+		}
+
+		s=(char *)strtok(NULL,",");
 	}
 
 	zabbix_log( LOG_LEVEL_DEBUG, "End process_rule()");
@@ -653,7 +680,7 @@ void main_discoverer_loop(int num)
 	{
 		now=time(NULL);
 
-		result = DBselect("select druleid,ipfirst,iplast,delay,nextcheck,name,status from drules where status=%d and nextcheck<=%d and " ZBX_SQL_MOD(druleid,%d) "=%d and" ZBX_COND_NODEID,
+		result = DBselect("select druleid,iprange,delay,nextcheck,name,status from drules where status=%d and nextcheck<=%d and " ZBX_SQL_MOD(druleid,%d) "=%d and" ZBX_COND_NODEID,
 			DRULE_STATUS_MONITORED,
 			now,
 			CONFIG_DISCOVERER_FORKS,
@@ -662,12 +689,11 @@ void main_discoverer_loop(int num)
 		while((row=DBfetch(result)))
 		{
 			ZBX_STR2UINT64(rule.druleid,row[0]);
-			rule.ipfirst 		= row[1];
-			rule.iplast		= row[2];
-			rule.delay		= atoi(row[3]);
-			rule.nextcheck		= atoi(row[4]);
-			rule.name		= row[5];
-			rule.status		= atoi(row[6]);
+			rule.iprange 		= row[1];
+			rule.delay		= atoi(row[2]);
+			rule.nextcheck		= atoi(row[3]);
+			rule.name		= row[4];
+			rule.status		= atoi(row[5]);
 			
 			process_rule(&rule);
 		}

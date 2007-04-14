@@ -37,8 +37,7 @@ INDEX		|slides_1	|slideshowid
 TABLE|drules|druleid|ZBX_SYNC
 FIELD		|druleid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|ipfirst	|t_varchar(15)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|iplast		|t_varchar(15)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|iprange	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|delay		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|nextcheck	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
