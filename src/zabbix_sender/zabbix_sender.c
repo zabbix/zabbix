@@ -134,7 +134,7 @@ static void    send_signal_handler( int sig )
 typedef struct zbx_active_metric_type
 {
 	char*	server;
-	int	port;
+	unsigned short	port;
 	char*	hostname;
 	char*	key;
 	char*	key_value;
@@ -150,7 +150,7 @@ static ZBX_THREAD_ENTRY(send_value, args)
 
 	char	*answer = NULL;
 
-	int	ret = FAIL;
+	int		tcp_ret = FAIL, ret = FAIL;
 
 	assert(args);
 
@@ -176,16 +176,16 @@ static ZBX_THREAD_ENTRY(send_value, args)
 
 #endif /* NOT _WINDOWS */
 
-	if( FAIL != zbx_tcp_connect(&sock, sentdval_args->server, sentdval_args->port) )
+	if( SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, sentdval_args->server, sentdval_args->port)) )
 	{
 		comms_create_request(sentdval_args->hostname, sentdval_args->key, sentdval_args->key_value,
 			NULL, NULL, NULL, NULL, tosend, sizeof(tosend)-1);
 
 		zabbix_log( LOG_LEVEL_DEBUG, "Send data: '%s'", tosend);
 
-		if( FAIL != zbx_tcp_send(&sock, tosend) )
+		if( SUCCEED == (tcp_ret = zbx_tcp_send(&sock, tosend)) )
 		{
-			if( FAIL != zbx_tcp_recv(&sock, &answer) )
+			if( SUCCEED == (tcp_ret = zbx_tcp_recv(&sock, &answer)) )
 			{
 				if( !answer || strcmp(answer,"OK") )
 				{
@@ -197,7 +197,12 @@ static ZBX_THREAD_ENTRY(send_value, args)
 				}
 			}
 		}
-		zbx_tcp_close(&sock);
+	}
+	zbx_tcp_close(&sock);
+
+	if( FAIL == tcp_ret )
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Send value error: %s", zbx_tcp_strerror());
 	}
 
 #if !defined(_WINDOWS)

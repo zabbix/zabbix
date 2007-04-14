@@ -32,7 +32,7 @@ extern char	*CONFIG_LISTEN_IP;
 extern int	CONFIG_LOG_LEVEL;
 extern char	CONFIG_LOG_UNRES_SYMB;
 
-void    load_config(int exit_on_error);
+void    load_config();
 void    load_user_parameters(void);
 
 #endif /* ZABBIX_ZBXCONF_H */

@@ -20,13 +20,12 @@
 #include "common.h"
 #include "listener.h"
 
-#include "zbxsock.h"
+#include "comms.h"
 #include "cfg.h"
 #include "zbxconf.h"
 #include "stats.h"
 #include "sysinfo.h"
 #include "log.h"
-#include "zbxsecurity.h"
 
 #if defined(ZABBIX_SERVICE)
 #	include "service.h"
@@ -34,109 +33,88 @@
 #	include "daemon.h"
 #endif /* ZABBIX_DAEMON */
 
-static void	process_listener(ZBX_SOCKET sock)
+static void	process_listener(zbx_sock_t *s)
 {
-	register char *p;
-
 	AGENT_RESULT	result;
 
-	char	command[MAX_STRING_LEN];
+	char	*command;
 	char	**value = NULL;
-	int	ret = 0;
+	int		ret;
 
-	memset(&command, 0, MAX_STRING_LEN);
-
-	ret = zbx_sock_read(sock, (void *)command, MAX_STRING_LEN, CONFIG_TIMEOUT);
-
-	if(ret == SOCKET_ERROR)
+	if( SUCCEED == (ret = zbx_tcp_recv(s, &command)) )
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Error receiving data from socket: %s", strerror(errno));
-		return;
-	}
-	else if(ret == 0)
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "Read timeout");
-		return;
-	}
+		zbx_rtrim(command, "\r\n\0");
 
-	for(p = &command[ret - 1]; p >= &command[0] && ('\0' == *p || '\r' == *p || '\n' == *p); p--) *p = '\0'; /* rtrim(\r\n) */
+		zabbix_log(LOG_LEVEL_DEBUG, "Requested [%s]", command);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Requested [%s]", command);
+		init_result(&result);
 
-	init_result(&result);
+		process(command, 0, &result);
 
-	process(command, 0, &result);
+		if( NULL == (value = GET_TEXT_RESULT(&result)) )
+			value = GET_MSG_RESULT(&result);
 
-	if( NULL == (value = GET_TEXT_RESULT(&result)) )
-		value = GET_MSG_RESULT(&result);
+		if(value)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Sending back [%s]", *value);
 
-	if(value)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Sending back [%s]", *value);
-		ret = zbx_sock_write(sock, *value, (int)strlen(*value));
+			ret = zbx_tcp_send(s, *value);
+		}
+		
+		free_result(&result);	
 	}
 
-        free_result(&result);
-
-	if(ret == SOCKET_ERROR)
+	if( FAIL == ret )
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Error writing to socket [%s]", strerror(errno));
+		zabbix_log(LOG_LEVEL_DEBUG, "Process listener error: %s", zbx_tcp_strerror());
 	}
 }
 
 ZBX_THREAD_ENTRY(listener_thread, pSock)
 {
-	int local_request_failed = 0;
+	int 
+		ret,
+		local_request_failed = 0;
 
-	ZBX_SOCKET	sock, accept_sock;
-	ZBX_SOCKADDR	serv_addr;
-	socklen_t nlen = 0;
+	zbx_sock_t	s;
 
 	assert(pSock);
 
 	zabbix_log( LOG_LEVEL_INFORMATION, "zabbix_agentd listener started");
 
-	sock = *((ZBX_SOCKET *)pSock);
+	memcpy(&s, ((zbx_sock_t *)pSock), sizeof(zbx_sock_t));
 
 	while(ZBX_IS_RUNNING)
 	{
-		accept_sock = SOCKET_ERROR;
-		nlen = sizeof(ZBX_SOCKADDR);
-		if(SOCKET_ERROR == (accept_sock = (ZBX_SOCKET)accept(sock, (struct sockaddr *)&serv_addr, &nlen)))
+		if( SUCCEED == (ret = zbx_tcp_accept(&s)) )
 		{
-			if(!ZBX_IS_RUNNING) break;
+			local_request_failed = 0;     /* Reset consecutive errors counter */
+			
+			zbx_setproctitle("processing request");
 
-			if (EINTR != zbx_sock_last_error())
+			zabbix_log(LOG_LEVEL_DEBUG, "Processing request.");
+
+			if( SUCCEED == (ret = zbx_tcp_check_security(&s, CONFIG_HOSTS_ALLOWED, 0)) )
 			{
-				zabbix_log( LOG_LEVEL_WARNING, "Unable to accept incoming connection: [%s]", strerror_from_system(zbx_sock_last_error()));
+				process_listener(&s);
 			}
 
-			local_request_failed++;
-
-			if (local_request_failed > 1000)
-			{
-				zabbix_log( LOG_LEVEL_WARNING, "Too many consecutive errors on accept() call.");
-				local_request_failed = 0;
-			}
-			zbx_sleep(1);
-			continue;
+			zbx_tcp_unaccept(&s);
 		}
-		if(!ZBX_IS_RUNNING) break;
 
-		local_request_failed = 0;     /* Reset consecutive errors counter */
-		
-		zbx_setproctitle("processing request");
-
-		zabbix_log(LOG_LEVEL_DEBUG, "Processing request.");
-
-		if(SUCCEED == check_security(accept_sock, CONFIG_HOSTS_ALLOWED, 0))
+		if( FAIL == ret )
 		{
-			process_listener(accept_sock);
+			zabbix_log(LOG_LEVEL_DEBUG, "Listener error: %s", zbx_tcp_strerror());
 		}
 
-		shutdown(accept_sock,2);
+		if (local_request_failed++ > 1000)
+		{
+			zabbix_log( LOG_LEVEL_WARNING, "Too many consecutive errors on accept() call.");
+			local_request_failed = 0;
+		}
 
-		zbx_sock_close(accept_sock);
+		if(ZBX_IS_RUNNING)
+			zbx_sleep(1);		
 	}
 
 	zabbix_log( LOG_LEVEL_INFORMATION, "zabbix_agentd listener stopped");

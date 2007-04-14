@@ -19,8 +19,6 @@
 
 #include "common.h"
 
-#include "zbxsock.h"
-
 char *progname = NULL;
 char title_message[] = "ZABBIX get - Communicate with ZABBIX agent";
 char usage_message[] = "[-hV] -s<host name or IP> [-p<port number>] -k<key>";

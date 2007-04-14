@@ -20,7 +20,7 @@
 #include "common.h"
 #include "sysinfo.h"
 
-#include "zbxsock.h"
+#include "comms.h"
 #include "log.h"
 #include "cfg.h"
 
@@ -30,92 +30,54 @@
  * 0 - NOT OK
  * 1 - OK
  * */
-int	tcp_expect(const char	*hostname, short port, const char *request, const char *expect, const char *sendtoclose, int *value_int)
+int	tcp_expect(
+		   const char		*host, 
+		   unsigned short	port,
+		   const char		*request, 
+		   const char		*expect, 
+		   const char		*sendtoclose, 
+		   int				*value_int
+	   )
 {
-	ZBX_SOCKET	s;
-	ZBX_SOCKADDR	servaddr_in;
+	zbx_sock_t	s;
+	char	*buf;
+	int	ret;
 
-	struct hostent *hp;
-
-	char	buf[MAX_BUF_LEN];
-	
-	int	len;
-
-	assert(hostname);
 	assert(value_int);
 
 	*value_int = 0;
 
-	if(NULL == (hp = zbx_gethost(hostname)) )
+	if( SUCCEED == (ret = zbx_tcp_connect(&s, host, port)) )
 	{
-		return SYSINFO_RET_OK;
-	}
-
-	memset(&servaddr_in, 0, sizeof(ZBX_SOCKADDR));
-
-	servaddr_in.sin_family		= AF_INET;
-	servaddr_in.sin_addr.s_addr	= ((struct in_addr *)(hp->h_addr))->s_addr;
-	servaddr_in.sin_port		= htons(port);
-
-	if(INVALID_SOCKET == (s = (ZBX_SOCKET)socket(AF_INET,SOCK_STREAM,0)))
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "Error in socket() [%s:%u] [%s]", hostname, port, strerror_from_system(errno));
-		return SYSINFO_RET_OK;
-	}
-
-	if(SOCKET_ERROR == connect(s,(struct sockaddr *)&servaddr_in,sizeof(ZBX_SOCKADDR)))
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "Error in connect() [%s:%u] [%s]",hostname, port, strerror_from_system(errno));
-		zbx_sock_close(s);
-		return SYSINFO_RET_OK;
-	}
-
-	if(NULL != request)
-	{
-		if(SOCKET_ERROR == zbx_sock_write(s, (void *)request, (int)strlen(request)))
+		if( SUCCEED == (ret = zbx_tcp_send_raw(&s, request)) )
 		{
-			zabbix_log( LOG_LEVEL_DEBUG, "Error during sending [%s:%u] [%s]",hostname, port, strerror_from_system(errno));
-			zbx_sock_close(s);
-			return SYSINFO_RET_OK;
+			if( NULL != expect )
+			{
+				if( SUCCEED == (ret = zbx_tcp_recv(&s, &buf)) )
+				{
+					if( 0 == strncmp(buf, expect, strlen(expect)) )
+					{
+						*value_int = 1;
+					}
+				}
+			}
+			else
+			{
+				*value_int = 1;
+			}
+
+			if(SUCCEED == ret && NULL != sendtoclose)
+			{
+				/* ret = (skip errors) */ zbx_tcp_send_raw(&s, sendtoclose);
+			}
 		}
 	}
+	zbx_tcp_close(&s);
 
-	if( NULL == expect)
+	if( FAIL == ret )
 	{
-		zbx_sock_close(s);
-		*value_int = 1;
-		return SYSINFO_RET_OK;
+		zabbix_log(LOG_LEVEL_DEBUG, "TCP expect error: %s", zbx_tcp_strerror());
 	}
-
-	memset(buf, 0, sizeof(buf));
-
-	if(SOCKET_ERROR == (len = zbx_sock_read(s, buf, sizeof(buf)-1, CONFIG_TIMEOUT)))
-	{
-		zabbix_log( LOG_LEVEL_DEBUG, "Error in reading() [%s:%u] [%s]",hostname, port, strerror_from_system(errno));
-		zbx_sock_close(s);
-		return SYSINFO_RET_OK;
-	}
-
-	buf[sizeof(buf)-1] = '\0';
-
-	if( strncmp(buf, expect, strlen(expect)) == 0 )
-	{
-		*value_int = 1;
-	}
-	else
-	{
-		*value_int = 0;
-	}
-
-	if(NULL != sendtoclose)
-	{
-		if(SOCKET_ERROR == zbx_sock_write(s, (void *)sendtoclose, (int)strlen(sendtoclose)))
-		{
-			zabbix_log( LOG_LEVEL_DEBUG, "Error during close string sending [%s:%u] [%s]",hostname, port, strerror_from_system(errno));
-		}
-	}
-
-	zbx_sock_close(s);
 
 	return SYSINFO_RET_OK;
 }
@@ -181,16 +143,16 @@ int	CHECK_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
         assert(result);
 
 	init_result(result);
-	
-        if(num_param(param) > 2)
-        {
-                return SYSINFO_RET_FAIL;
-        }
+		
+    if(num_param(param) > 2)
+    {
+        return SYSINFO_RET_FAIL;
+    }
         
 	if(get_param(param, 1, ip, MAX_STRING_LEN) != 0)
-        {
-               ip[0] = '\0';
-        }
+    {
+           ip[0] = '\0';
+    }
 	
 	if(ip[0] == '\0')
 	{
@@ -198,9 +160,9 @@ int	CHECK_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 	}
 
 	if(get_param(param, 2, port_str, MAX_STRING_LEN) != 0)
-        {
-                port_str[0] = '\0';
-        }
+    {
+        port_str[0] = '\0';
+    }
 
 	if(port_str[0] == '\0')
 	{
@@ -210,7 +172,7 @@ int	CHECK_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 	port=atoi(port_str);
 
 	ret = tcp_expect(ip,port,NULL,NULL,"",&value_int);
-	
+		
 	if(ret == SYSINFO_RET_OK)
 	{
 		SET_UI64_RESULT(result, value_int);
