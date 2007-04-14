@@ -112,30 +112,18 @@
 		return $dcheckid;
 	}
 
-	function	add_discovery_rule($name, $ipfirst, $iplast,
-			$delay, $status, $upevent, $downevent,
-			$svcupevent, $svcdownevent, $dchecks)
+	function	add_discovery_rule($name, $iprange, $delay, $status, $dchecks)
 	{
-		$upevent	*= 3600; /* convert hours to seconds */
-		$downevent	*= 3600; /* convert hours to seconds */
-		$svcupevent	*= 3600; /* convert hours to seconds */
-		$svcdownevent	*= 3600; /* convert hours to seconds */
-
-		$ip_1 = explode('.', $ipfirst);
-		$ip_2 = explode('.', $iplast);
-		for($i=0; $i<3; $i++)
+		if( !validate_ip_range($iprange) )
 		{
-			if($ip_1[$i] != $ip_2[$i])
-			{
-				error('Incorrect IP range.');
-				return false;
-			}
+			error('Incorrect IP range.');
+			return false;
+		
 		}
 
 		$druleid = get_dbid('drules', 'druleid');
-		$result = DBexecute('insert into drules (druleid,name,ipfirst,iplast,delay,status,upevent,downevent,svcupevent,svcdownevent) '.
-			' values ('.$druleid.','.zbx_dbstr($name).','.zbx_dbstr($ipfirst).','.zbx_dbstr($iplast).','.$delay.','.$status.
-			','.$upevent.','.$downevent.','.$svcupevent.','.$svcdownevent.')');
+		$result = DBexecute('insert into drules (druleid,name,iprange,delay,status) '.
+			' values ('.$druleid.','.zbx_dbstr($name).','.zbx_dbstr($iprange).','.$delay.','.$status.')');
 
 		if($result)
 		{
@@ -149,19 +137,17 @@
 		return $result;
 	}
 
-	function	update_discovery_rule($druleid, $name, $ipfirst, $iplast,
-			$delay, $status, $upevent, $downevent,
-			$svcupevent, $svcdownevent, $dchecks)
+	function	update_discovery_rule($druleid, $name, $iprange, $delay, $status, $dchecks)
 	{
-		$upevent	*= 3600; /* convert hours to seconds */
-		$downevent	*= 3600; /* convert hours to seconds */
-		$svcupevent	*= 3600; /* convert hours to seconds */
-		$svcdownevent	*= 3600; /* convert hours to seconds */
+		if( !validate_ip_range($iprange) )
+		{
+			error('Incorrect IP range.');
+			return false;
+		
+		}
 
-		$result = DBexecute('update drules set name='.zbx_dbstr($name).',ipfirst='.zbx_dbstr($ipfirst).','.
-			'iplast='.zbx_dbstr($iplast).',delay='.$delay.',status='.$status.',upevent='.$upevent.','.
-			'downevent='.$downevent.',svcupevent='.$svcupevent.',svcdownevent='.$svcdownevent.' '.
-			' where druleid='.$druleid);
+		$result = DBexecute('update drules set name='.zbx_dbstr($name).',iprange='.zbx_dbstr($iprange).','.
+			'delay='.$delay.',status='.$status.' where druleid='.$druleid);
 
 		if($result)
 		{

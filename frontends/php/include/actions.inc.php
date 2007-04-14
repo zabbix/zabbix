@@ -617,7 +617,7 @@ include_once 'include/discovery.inc.php';
 				}
 				break;
 			case CONDITION_TYPE_DHOST_IP:
-				if( !validate_ip_list($value) )
+				if( !validate_ip_range($value) )
 				{
 					error(S_INCORRECT_IP.' ['.$value.']');
 					return false;
