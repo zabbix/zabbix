@@ -509,6 +509,8 @@ void	zbx_on_exit();
 
 int	get_nodeid_by_id(zbx_uint64_t id);
 
+int	int_in_list(const char *list, int value);
+
 int MAIN_ZABBIX_ENTRY(void);
 
 
