@@ -21,7 +21,6 @@
 #include "db.h"
 #include "log.h"
 #include "zlog.h"
-#include "security.h"
 
 #include "evalfunc.h"
 

@@ -72,7 +72,6 @@ void	collect_stats_diskdevices(ZBX_DISKDEVICES_DATA *pdiskdevices)
 #include <dirent.h>
 
 #include "sysinfo.h"
-#include "security.h"
 #include "zabbix_agent.h"
 
 #include "log.h"

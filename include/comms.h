@@ -51,7 +51,7 @@ char*	zbx_tcp_strerror(void);
 
 struct hostent	*zbx_gethost(const char *hostname);
 
-void	zbx_tcp_init(zbx_sock_t *s);
+void	zbx_tcp_init(zbx_sock_t *s, ZBX_SOCKET o);
 int     zbx_tcp_connect(zbx_sock_t *s, const char *ip, unsigned short port);
 
 #define ZBX_TCP_NEW_PROTOCOL	0x01

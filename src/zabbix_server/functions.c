@@ -18,33 +18,12 @@
 **/
 
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <netinet/in.h>
-#include <netdb.h>
-
-#include <signal.h>
-
-#include <string.h>
-
-#include <time.h>
-
-#include <sys/socket.h>
-#include <errno.h>
-
-#include <ctype.h>
-
-/* Functions: pow(), round() */
-#include <math.h>
-
 #include "common.h"
+
+#include "comms.h"
 #include "db.h"
 #include "log.h"
 #include "zlog.h"
-#include "security.h"
 
 #include "evalfunc.h"
 #include "functions.h"
@@ -501,7 +480,7 @@ int	process_data(zbx_sock_t *sock,char *server,char *key,char *value,char *lastl
 
 	DBget_item_from_db(&item,row);
 
-	if( (item.type==ITEM_TYPE_ZABBIX_ACTIVE) && (check_security(sock->socket,item.trapper_hosts,1) == FAIL))
+	if( (item.type==ITEM_TYPE_ZABBIX_ACTIVE) && (zbx_tcp_check_security(sock,item.trapper_hosts,1) == FAIL))
 	{
 		DBfree_result(result);
 		return  FAIL;
