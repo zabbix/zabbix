@@ -32,7 +32,6 @@ SUBDIRS = \
 	zbxcrypto \
 	zbxcommon \
 	zbxlog \
-	zbxnet \
 	zbxnix \
 	zbxconf \
 	zbxsysinfo \

@@ -23,7 +23,6 @@
 #include "cfg.h"
 #include "log.h"
 #include "sysinfo.h"
-#include "security.h"
 #include "zbxconf.h"
 #include "zbxgetopt.h"
 
