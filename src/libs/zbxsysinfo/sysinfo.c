@@ -20,6 +20,7 @@
 #include "common.h"
 #include "sysinfo.h"
 #include "log.h"
+#include "cfg.h"
 #include "alias.h"
 
 #include "common/common.h"
@@ -321,9 +322,6 @@ void	test_parameters(void)
 	register int	i;
 	AGENT_RESULT	result;
 
-#if defined(_WINDOWS)
-#endif
-
 	memset(&result, 0, sizeof(AGENT_RESULT));
 	
 	for(i=0; 0 != commands[i].key; i++)
@@ -430,7 +428,6 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 
 	char	param[MAX_STRING_LEN];
 		
-
         assert(result);
         init_result(result);
 	
@@ -543,7 +540,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 		}
 		ret = TIMEOUT_ERROR;
 	}
-	
+
 	return ret;
 }
 
