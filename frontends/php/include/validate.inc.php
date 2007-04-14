@@ -66,20 +66,25 @@
 		return true;
 	}
 
-	function	validate_ip_list($str)
+	function	validate_ip_range($str)
 	{
 		foreach(explode(',',$str) as $ip_range)
 		{
-			$networks = array();
-			$ip_range = explode('-', $ip_range);
-			if(count($ip_range) > 2) return false;
-			foreach($ip_range as $ip)
+			$ip_parts = explode('.', $ip_range);
+			if(count($ip_parts) != 4) return false;
+
+			if( !is_numeric($ip_parts[0]) || $ip_parts[0] < 0 || $ip_parts[0] > 255 ) return false;
+			if( !is_numeric($ip_parts[1]) || $ip_parts[1] < 0 || $ip_parts[1] > 255 ) return false;
+			if( !is_numeric($ip_parts[2]) || $ip_parts[2] < 0 || $ip_parts[2] > 255 ) return false;
+
+			$last_part = explode('-', $ip_parts[3]);
+			if(count($last_part) > 2) return false;
+			foreach($last_part as $ip_p)
 			{
-				if( !validate_ip($ip, $arr) ) return false;
-				$network = $arr[1].'.'.$arr['2'].'.'.$arr[3];
-				$networks[$network] = $network;
+				if( !is_numeric($ip_p) || $ip_p < 0 || $ip_p > 255 ) return false;
 			}
-			if( count($networks) > 1 ) return false;
+			if(count($last_part) == 2 && $last_part[0] > $last_part[1]) return false;
+
 		}
 		return true;
 	}
@@ -222,6 +227,24 @@
 				else
 				{
 					info("Warning. Field [".$field."] is not IP");
+					return ZBX_VALID_WARNING;
+				}
+			}
+			return ZBX_VALID_OK;
+		}
+
+		if($type == T_ZBX_IP_RANGE)
+		{
+			if( !validate_ip_range($var) )
+			{
+				if($flags&P_SYS)
+				{
+					info("Critical error. Field [".$field."] is not IP range");
+					return ZBX_VALID_ERROR;
+				}
+				else
+				{
+					info("Warning. Field [".$field."] is not IP range");
 					return ZBX_VALID_WARNING;
 				}
 			}

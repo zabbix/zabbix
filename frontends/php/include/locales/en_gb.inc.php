@@ -44,8 +44,7 @@
 	'S_CONFIGURATION_OF_DISCOVERY'=>	'Configuration of discovery',
 	'S_CONFIGURATION_OF_DISCOVERY_BIG'=>	'CONFIGURATION OF DISCOVERY',
 	'S_NO_DISCOVERY_RULES_DEFINED'=>	'No discovery rules defined',
-	'S_IP_FIRST'=>				'IP first',
-	'S_IP_LAST'=>				'IP last',
+	'S_IP_RANGE'=>				'IP range',
 	'S_INTERVALS'=>				'Intervals',
 	'S_CHECKS'=>				'Checks',
 	'S_ENABLE_SELECTED_RULES_Q'=>		'Enable selected rules?',
@@ -55,11 +54,6 @@
 	'S_DELETE_RULE_Q'=>			'Delete rule?',
 
 	'S_EVENT_SOURCE'=>			'Event source',
-
-	'S_UPEVENT'=>				'Up event (hours)',
-	'S_DOWNEVENT'=>				'Down event (hours)',
-	'S_SVCUPEVENT'=>			'Service up event (hours)',
-	'S_SVCDOWNEVENT'=>			'Service down event (hours)',
 
 	'S_NEW_CHECK'=>				'New check',
 	'S_SSH'=>				'SSH',
