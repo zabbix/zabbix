@@ -49,21 +49,22 @@ int	tcp_expect(
 
 	if( SUCCEED == (ret = zbx_tcp_connect(&s, host, port)) )
 	{
-		if( SUCCEED == (ret = zbx_tcp_send_raw(&s, request)) )
+		if( NULL == request )
 		{
-			if( NULL != expect )
-			{
-				if( SUCCEED == (ret = zbx_tcp_recv(&s, &buf)) )
-				{
-					if( 0 == strncmp(buf, expect, strlen(expect)) )
-					{
-						*value_int = 1;
-					}
-				}
-			}
-			else
+			*value_int = 1;
+		}
+		else if( SUCCEED == (ret = zbx_tcp_send_raw(&s, request)) )
+		{
+			if( NULL == expect )
 			{
 				*value_int = 1;
+			}
+			else if( SUCCEED == (ret = zbx_tcp_recv(&s, &buf)) )
+			{
+				if( 0 == strncmp(buf, expect, strlen(expect)) )
+				{
+					*value_int = 1;
+				}
 			}
 
 			if(SUCCEED == ret && NULL != sendtoclose)
@@ -184,8 +185,6 @@ int	CHECK_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 
 int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-#ifdef TODO
-
 #if !defined(PACKETSZ)
 #	define PACKETSZ 512
 #endif /* PACKETSZ */
@@ -254,7 +253,4 @@ int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	SET_UI64_RESULT(result, res != -1 ? 1 : 0);
 
 	return SYSINFO_RET_OK;
-
-#endif /* TODO */
-	return SYSINFO_RET_FAIL;
 }
