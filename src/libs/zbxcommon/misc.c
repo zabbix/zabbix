@@ -251,24 +251,30 @@ int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char
  ******************************************************************************/
 int	ip_in_list(char *list, char *ip)
 {
-	char	tmp[MAX_STRING_LEN];
 	char	tmp_ip[MAX_STRING_LEN];
-	char	*s;
+	char	c;
 	int	i1,i2,i3,i4,i5;
 	int	ret = FAIL;
+	char	*start, *end;
 
 
 	zabbix_log( LOG_LEVEL_WARNING, "In ip_in_list(list:%s,ip:%s)",
 		list,
 		ip);
 
-	strscpy(tmp,list);
-       	s=(char *)strtok(tmp,",");
-	while(s!=NULL)
+	for(start = list; start[0] != '\0';)
 	{
-		zabbix_log(LOG_LEVEL_WARNING,"Next [%s]", s);
+		end=strchr(start, ',');
 
-		if(sscanf(s,"%d.%d.%d.%d-%d",&i1,&i2,&i3,&i4,&i5) == 5)
+		if(end != NULL)
+		{	
+			c=end[0];
+			end[0]='\0';
+		}
+
+		zabbix_log(LOG_LEVEL_WARNING,"Next [%s]", start);
+
+		if(sscanf(start,"%d.%d.%d.%d-%d",&i1,&i2,&i3,&i4,&i5) == 5)
 		{
 			zbx_snprintf(tmp_ip,sizeof(tmp_ip)-1,"%d.%d.%d.%d",i1,i2,i3,i4);
 			if(strcmp(ip,tmp_ip)>=0)
@@ -281,7 +287,7 @@ int	ip_in_list(char *list, char *ip)
 				}
 			}
 		}
-		else if(sscanf(s,"%d.%d.%d.%d",&i1,&i2,&i3,&i4) == 4)
+		else if(sscanf(start,"%d.%d.%d.%d",&i1,&i2,&i3,&i4) == 4)
 		{
 			zbx_snprintf(tmp_ip,sizeof(tmp_ip)-1,"%d.%d.%d.%d",i1,i2,i3,i4);
 			if(strcmp(ip,tmp_ip) == 0)
@@ -291,7 +297,15 @@ int	ip_in_list(char *list, char *ip)
 			}
 		}
 
-       		s=(char *)strtok(NULL,",");
+		if(end != NULL)
+		{
+			end[0]=c;
+			start=end+1;
+		}
+		else
+		{
+			break;
+		}
 	}
 
 	zabbix_log( LOG_LEVEL_WARNING, "End ip_in_list(ret:%s)", ret == SUCCEED?"SUCCEED":"FAIL");

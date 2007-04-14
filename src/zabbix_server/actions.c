@@ -306,11 +306,11 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		{
 			if(condition->operator == CONDITION_OPERATOR_EQUAL)
 			{
-				if(ip_in_list(row[0], condition->value) == SUCCEED)	ret = SUCCEED;
+				if(ip_in_list(condition->value, row[0]) == SUCCEED)	ret = SUCCEED;
 			}
 			else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
 			{
-				if(ip_in_list(row[0], condition->value) == FAIL)	ret = SUCCEED;
+				if(ip_in_list(condition->value, row[0]) == FAIL)	ret = SUCCEED;
 			}
 			else
 			{
@@ -476,7 +476,6 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		zabbix_log( LOG_LEVEL_DEBUG, "CONDITION_TYPE_DSERVICE_PORT [%d:%s]",
 			event->value,
 			condition->value);
-		value_int = atoi(condition->value);
 		result = DBselect("select port from dservices where dserviceid=" ZBX_FS_UI64,
 			event->objectid);
 		row = DBfetch(result);
@@ -484,11 +483,11 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		{
 			if(condition->operator == CONDITION_OPERATOR_EQUAL)
 			{
-				if(int_in_list(row[0], value_int) == SUCCEED)	ret = SUCCEED;
+				if(int_in_list(condition->value, atoi(row[0])) == SUCCEED)	ret = SUCCEED;
 			}
 			else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
 			{
-				if(int_in_list(row[0], value_int) == FAIL)	ret = SUCCEED;
+				if(int_in_list(condition->value, atoi(row[0])) == FAIL)	ret = SUCCEED;
 			}
 			else
 			{
