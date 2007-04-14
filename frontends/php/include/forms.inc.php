@@ -2956,7 +2956,7 @@ include_once 'include/discovery.inc.php';
 					$rowCondition[] = $cmbCondVal;
 					break;
 				case CONDITION_TYPE_DHOST_IP:
-					$rowCondition[] = new CTextBox('new_condition[value]', '192.168.0.1-192.168.0.127,192.168.2.1', 50);
+					$rowCondition[] = new CTextBox('new_condition[value]', '192.168.0.1-127,192.168.2.1', 50);
 					break;
 				case CONDITION_TYPE_DSERVICE_TYPE:
 					$cmbCondVal = new CComboBox('new_condition[value]');
