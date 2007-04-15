@@ -617,10 +617,10 @@ static void process_rule(DB_DRULE *rule)
 
 		for(i=first;i<=last;i++)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "IP [%d]", i);
 			zbx_snprintf(ip,sizeof(ip)-1,"%s.%d",
 				ip1,
 				i);
+			zabbix_log(LOG_LEVEL_WARNING, "IP [%s]", ip);
 			result = DBselect("select dcheckid,druleid,type,ports from dchecks where druleid=" ZBX_FS_UI64,
 				rule->druleid);
 			while((row=DBfetch(result)))

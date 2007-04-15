@@ -272,8 +272,6 @@ int	ip_in_list(char *list, char *ip)
 			end[0]='\0';
 		}
 
-		zabbix_log(LOG_LEVEL_WARNING,"Next [%s]", start);
-
 		if(sscanf(start,"%d.%d.%d.%d-%d",&i1,&i2,&i3,&i4,&i5) == 5)
 		{
 			zbx_snprintf(tmp_ip,sizeof(tmp_ip)-1,"%d.%d.%d.%d",i1,i2,i3,i4);
@@ -348,7 +346,6 @@ int	int_in_list(char *list, int value)
 			end[0]='\0';
 		}
 		
-		zabbix_log(LOG_LEVEL_WARNING,"Next [%s]", start);
 		if(sscanf(start,"%d-%d",&i1,&i2) == 2)
 		{
 			if(value>=i1 && value<=i2)
