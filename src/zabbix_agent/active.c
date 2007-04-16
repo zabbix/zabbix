@@ -100,7 +100,7 @@ static int	get_min_nextcheck()
 
 	for(i = 0; NULL != active_metrics[i].key; i++)
 	{
-		if(ITEM_STATUS_ACTIVE == active_metrics[i].status)
+		if(ITEM_STATUS_ACTIVE != active_metrics[i].status)
 			continue;
 
 		if(active_metrics[i].nextcheck < min || ((-1) == min))
