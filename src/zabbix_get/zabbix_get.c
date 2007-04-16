@@ -201,7 +201,7 @@ int main(int argc, char **argv)
 
 	if(ret == SUCCEED)
 	{
-#if !defined(WINDOWS)
+#if !defined(_WINDOWS)
 		signal( SIGINT,  signal_handler );
 		signal( SIGQUIT, signal_handler );
 		signal( SIGTERM, signal_handler );
@@ -212,7 +212,7 @@ int main(int argc, char **argv)
 
 		ret = get_value(host, port, key, value, sizeof(value));
 
-#if !defined(WINDOWS)
+#if !defined(_WINDOWS)
 		alarm(0);
 #endif /* not WINDOWS */
 

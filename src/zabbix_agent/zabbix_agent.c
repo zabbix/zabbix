@@ -175,7 +175,7 @@ int	main(int argc, char **argv)
 			break;
 	}
 
-#if !defined(WINDOWS)
+#if !defined(_WINDOWS)
 	signal( SIGINT,  child_signal_handler);
 	signal( SIGQUIT, child_signal_handler );
 	signal( SIGTERM, child_signal_handler );
@@ -220,7 +220,7 @@ int	main(int argc, char **argv)
   
 	fflush(stdout);
 
-#if !defined(WINDOWS)
+#if !defined(_WINDOWS)
 	alarm(0);
 #endif /* not WONDOWS */
 
