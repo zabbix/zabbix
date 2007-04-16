@@ -1572,7 +1572,7 @@ zbx_uint64_t DBget_maxid(char *table, char *field)
 			table,
 			field);
 		row = DBfetch(result);
-		if(!row || DBis_null(row[0])==SUCCEED)
+		if(!row || DBis_null(row[0])==SUCCEED || !*row[0])
 		{
 			DBfree_result(result);
 			result = DBselect("select max(%s) from %s where " ZBX_COND_NODEID,
@@ -1580,7 +1580,7 @@ zbx_uint64_t DBget_maxid(char *table, char *field)
 				table,
 				LOCAL_NODE(field));
 			row = DBfetch(result);
-			if(!row || DBis_null(row[0])==SUCCEED)
+			if(!row || DBis_null(row[0])==SUCCEED || !*row[0])
 			{
 				DBexecute("insert into ids (nodeid,table_name,field_name,nextid) values (%d,'%s','%s'," ZBX_FS_UI64 ")",
 					CONFIG_NODEID,
@@ -1590,7 +1590,7 @@ zbx_uint64_t DBget_maxid(char *table, char *field)
 			}
 			else
 			{
-				DBexecute("insert into ids (nodeid,table_name,field_name,nextid) values (%d,'%s','%s',%s)",
+				DBexecute("insert into ids ( nodeid,table_name,field_name,nextid) values (%d,'%s','%s',%s)",
 					CONFIG_NODEID,
 					table,
 					field,
