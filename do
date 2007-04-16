@@ -20,7 +20,7 @@ docat="yes"
 help="no"
 noparam=0
 #def="--enable-agent --enable-server --with-mysql --prefix=`echo $HOME`/local/zabbix --with-ldap --with-net-snmp"
-def="--enable-agent --enable-server --with-pgsql --prefix=`echo $HOME`/local/zabbix --with-ldap --with-net-snmp --with-libcurl"
+def="--enable-agent --enable-server --with-mysql --prefix=`pwd` --with-ldap --with-net-snmp --with-libcurl"
 
 for cmd
 do
