@@ -258,7 +258,7 @@ int	ip_in_list(char *list, char *ip)
 	char	*start, *end;
 
 
-	zabbix_log( LOG_LEVEL_WARNING, "In ip_in_list(list:%s,ip:%s)",
+	zabbix_log( LOG_LEVEL_DEBUG, "In ip_in_list(list:%s,ip:%s)",
 		list,
 		ip);
 
@@ -306,7 +306,7 @@ int	ip_in_list(char *list, char *ip)
 		}
 	}
 
-	zabbix_log( LOG_LEVEL_WARNING, "End ip_in_list(ret:%s)", ret == SUCCEED?"SUCCEED":"FAIL");
+	zabbix_log( LOG_LEVEL_DEBUG, "End ip_in_list(ret:%s)", ret == SUCCEED?"SUCCEED":"FAIL");
 
 	return ret;
 }
@@ -334,7 +334,7 @@ int	int_in_list(char *list, int value)
 	int	ret = FAIL;
 	char	c;
 
-	zabbix_log( LOG_LEVEL_WARNING, "In int_in_list(list:%s,value:%d)", list, value);
+	zabbix_log( LOG_LEVEL_DEBUG, "In int_in_list(list:%s,value:%d)", list, value);
 
 	for(start = list; start[0] != '\0';)
 	{
@@ -374,7 +374,7 @@ int	int_in_list(char *list, int value)
 		}
 	}
 
-	zabbix_log( LOG_LEVEL_WARNING, "End int_in_list(ret:%s)", ret == SUCCEED?"SUCCEED":"FAIL");
+	zabbix_log( LOG_LEVEL_DEBUG, "End int_in_list(ret:%s)", ret == SUCCEED?"SUCCEED":"FAIL");
 
 	return ret;
 }
