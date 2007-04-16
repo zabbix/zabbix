@@ -74,7 +74,11 @@ void	zbx_tcp_unaccept(zbx_sock_t *s);
 
 void    zbx_tcp_free(zbx_sock_t *s);
 
-int	zbx_tcp_recv(zbx_sock_t *s, char **data);
+#define ZBX_TCP_READ_UNTIL_CLOSE 0x01
+
+#define	zbx_tcp_recv(s, data) 	zbx_tcp_recv_ext(s, data, 0)
+
+int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags);
 
 int	zbx_tcp_check_security(
 	zbx_sock_t *s, 

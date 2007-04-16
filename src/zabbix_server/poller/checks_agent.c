@@ -69,7 +69,7 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Before read");
 
-			ret = zbx_tcp_recv(&s, &buf);
+			ret = zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE);
 		}
 	}
 
