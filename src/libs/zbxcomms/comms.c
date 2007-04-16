@@ -424,7 +424,6 @@ int zbx_tcp_listen(
 		ZBX_TCP_ERR_START "Listen failed. [%s]", strerror_from_system(zbx_sock_last_error()) ZBX_TCP_ERR_END;
 		return	FAIL;
 	}
-
 	return SUCCEED;
 }
 
@@ -454,6 +453,7 @@ int	zbx_tcp_accept(zbx_sock_t *s)
 	nlen = sizeof(ZBX_SOCKADDR);
 
 	zbx_tcp_unaccept(s);
+
 
 	if(ZBX_TCP_ERROR == (accepted_socket = (ZBX_SOCKET)accept(s->socket, (struct sockaddr *)&serv_addr, &nlen)))
 	{
