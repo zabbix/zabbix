@@ -216,67 +216,6 @@ void	init_config(void)
 #endif
 }
 
-int	tcp_listen(const char *host, int port, socklen_t *addrlenp)
-{
-	int	sockfd;
-	struct	sockaddr_in      serv_addr;
-	int	on;
-/*	struct linger ling;*/
-
-	if ( (sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
-	{
-		zabbix_log( LOG_LEVEL_CRIT, "Cannot create socket");
-		exit(1);
-	}
-
-	/* Enable address reuse */
-	/* This is to immediately use the address even if it is in TIME_WAIT state */
-	/* http://www-128.ibm.com/developerworks/linux/library/l-sockpit/index.html */
-	on = 1;
-	if( -1 == setsockopt( sockfd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on) ))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot setsockopt SO_REUSEADDR [%s]", strerror(errno));
-	}
-
-/*	if(CONFIG_NOTIMEWAIT == 1)
-	{
-		ling.l_onoff=1;
-		ling.l_linger=0;
-		if(setsockopt(sockfd,SOL_SOCKET,SO_LINGER,&ling,sizeof(ling))==-1)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot setsockopt SO_LINGER [%s]", strerror(errno));
-		}
-	}*/
-
-	bzero((char *) &serv_addr, sizeof(serv_addr));
-	serv_addr.sin_family      = AF_INET;
-	if(CONFIG_LISTEN_IP == NULL)
-	{
-		serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	}
-	else
-	{
-		serv_addr.sin_addr.s_addr = inet_addr(CONFIG_LISTEN_IP);
-	}
-	serv_addr.sin_port        = htons(port);
-
-	if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
-	{
-		zabbix_log( LOG_LEVEL_CRIT, "Cannot bind to port %d. Another zabbix_server running? Shutting down...",
-			port);
-		exit(FAIL);
-	}
-	
-	if(listen(sockfd, LISTENQ) !=0 )
-	{
-		zabbix_log( LOG_LEVEL_CRIT, "listen() failed");
-		exit(FAIL);
-	}
-
-	*addrlenp = sizeof(serv_addr);
-
-	return  sockfd;
-}
 
 /******************************************************************************
  *                                                                            *
@@ -447,8 +386,6 @@ int MAIN_ZABBIX_ENTRY(void)
 
 	zbx_sock_t	listen_sock;
 
-	char		host[128];
-	
 	int		server_num = 0;
 
 	if(CONFIG_LOG_FILE == NULL)
@@ -526,7 +463,7 @@ int MAIN_ZABBIX_ENTRY(void)
 
 	if(CONFIG_TRAPPERD_FORKS > 0)
 	{
-		if( FAIL == zbx_tcp_listen(&listen_sock, host, (unsigned short)CONFIG_LISTEN_PORT) )
+		if( FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT) )
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "Listener failed with error: %s.", zbx_tcp_strerror());
 			exit(1);
@@ -575,11 +512,6 @@ int MAIN_ZABBIX_ENTRY(void)
 	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS)
 	{
 /* Run trapper processes then do housekeeping */
-		if(gethostname(host,127) != 0)
-		{
-			zabbix_log( LOG_LEVEL_CRIT, "gethostname() failed");
-			exit(FAIL);
-		}
 		child_trapper_main(server_num, &listen_sock);
 
 /*		threads[i] = child_trapper_make(i, listenfd, addrlen); */
@@ -658,78 +590,6 @@ int MAIN_ZABBIX_ENTRY(void)
 	}
 
 	return SUCCEED;
-/*
-	if( server_num == 0)
-	{
-		
-		if(gethostname(host,127) != 0)
-		{
-			zabbix_log( LOG_LEVEL_CRIT, "gethostname() failed");
-			exit(FAIL);
-		}
-
-		listenfd = tcp_listen(host,CONFIG_LISTEN_PORT,&addrlen);
-
-		for(i = CONFIG_POLLER_FORKS; i < CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS; i++)
-		{
-			threads[i] = child_trapper_make(i, listenfd, addrlen);
-		}
-
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Housekeeper]",server_num);
-
-		for(i=0; i < CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS; i++)
-		{
-				zabbix_log( LOG_LEVEL_DEBUG, "%d. PID=[%d]", i, threads[i]);
-		}
-		zabbix_log( LOG_LEVEL_CRIT, "ZABBIX server is up.");
-
-		init_main_process();
-
-		main_housekeeper_loop();
-	}
-	else if(server_num == 1)
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Alerter]",server_num);
-		main_alerter_loop();
-	}
-	else if(server_num == 2)
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Timer]",server_num);
-		main_timer_loop();
-	}
-	else if(server_num == 3)
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [ICMP pinger]",server_num);
-		main_pinger_loop();
-	}
-	else if(server_num == 4)
-	{
-#ifdef HAVE_SNMP
-		init_snmp("zabbix_server");
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Poller for unreachable hosts. SNMP:ON]",server_num);
-#else
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Poller for unreachable hosts. SNMP:OFF]",server_num);
-#endif
-		main_poller_loop(server_num);
-	}
-	else if(server_num == 5)
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Node watcher]",server_num);
-		main_nodewatcher_loop();
-	}
-	else
-	{
-#ifdef HAVE_SNMP
-		init_snmp("zabbix_server");
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Poller. SNMP:ON]",server_num);
-#else
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Poller. SNMP:OFF]",server_num);
-#endif
-
-		main_poller_loop(server_num);
-	}
-
-	return SUCCEED;*/
 }
 
 void	zbx_on_exit()

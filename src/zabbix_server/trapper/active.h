@@ -27,6 +27,6 @@
 
 extern	int	CONFIG_NODEID;
 
-int	send_list_of_active_checks(zbx_sock_t *sock, char *host);
+int	send_list_of_active_checks(zbx_sock_t *sock, const char *host);
 
 #endif
