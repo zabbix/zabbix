@@ -547,11 +547,13 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags)
 	read_bytes = 0;
 	s->buf_type = ZBX_BUF_TYPE_STAT;
 
-	nbytes = ZBX_TCP_READ(s->socket, s->buf_stat, ZBX_TCP_HEADER_LEN);
+	left = ZBX_TCP_HEADER_LEN;
+	nbytes = ZBX_TCP_READ(s->socket, s->buf_stat, left);
 
 	if( ZBX_TCP_HEADER_LEN == nbytes && 0 == strncmp(s->buf_stat, ZBX_TCP_HEADER, ZBX_TCP_HEADER_LEN) )
 	{
-		nbytes = ZBX_TCP_READ(s->socket, (void *)&expected_len, sizeof(zbx_uint64_t));
+		left = sizeof(zbx_uint64_t);
+		nbytes = ZBX_TCP_READ(s->socket, (void *)&expected_len, left);
 
 		/* The rest was already cleared */
 		memset(s->buf_stat,0,ZBX_TCP_HEADER_LEN);
@@ -564,6 +566,13 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags)
 
 	if( ZBX_TCP_ERROR != nbytes )
 	{
+		if( flags & ZBX_TCP_READ_UNTIL_CLOSE ) {
+			if(nbytes == 0)		return	SUCCEED;
+		} else {
+			if(nbytes < left)	return	SUCCEED;
+		}
+
+
 		left = sizeof(s->buf_stat) - read_bytes - 1;
 
 		/* fill static buffer */
