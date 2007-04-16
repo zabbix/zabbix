@@ -32,6 +32,7 @@ local $output;
 	"type"		=>	"sql",
 	"before"	=>	"",
 	"after"		=>	"",
+	"table_options"	=>	" type=InnoDB",
 	"t_bigint"	=>	"bigint unsigned",
 	"t_id"		=>	"bigint unsigned",
 	"t_integer"	=>	"integer",
@@ -103,6 +104,7 @@ static	ZBX_TABLE	tables[]={
 	"before"	=>	"",
 	"after"		=>	"",
 	"type"		=>	"sql",
+	"table_options"	=>	" with OIDS",
 	"t_id"		=>	"bigint",
 	"t_integer"	=>	"integer",
 	"t_serial"	=>	"serial",
@@ -158,6 +160,7 @@ sub newstate
 sub process_table
 {
 	local $line=$_[0];
+	local $tmp;
 
 	newstate("table");
 	($table_name,$pkey,$flags)=split(/\|/, $line,4);
@@ -173,8 +176,16 @@ sub process_table
 	}
 	else
 	{
-		if($pkey ne "")	{ $pkey=",\n\tPRIMARY KEY ($pkey)\n);\n" }
-		else { $pkey="\n);\n"; }
+		if($pkey ne "")
+		{
+			$pkey=",\n\tPRIMARY KEY ($pkey)\n)";
+		}
+		else
+		{
+			$pkey="\n)";
+		}
+		$tmp=$output{"table_options"};
+		$pkey="$pkey$tmp;\n";
 		print "CREATE TABLE $table_name (\n";
 	}
 }
