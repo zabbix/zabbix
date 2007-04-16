@@ -418,7 +418,7 @@ static int discover_service(zbx_dservice_type_t type, char *ip, int port)
 	struct	sigaction phan;
 
 
-	zabbix_log(LOG_LEVEL_WARNING, "In discover_service(ip:%s, port:%d, type:%d)",
+	zabbix_log(LOG_LEVEL_DEBUG, "In discover_service(ip:%s, port:%d, type:%d)",
 		ip,
 		port,
 		type);
@@ -496,7 +496,7 @@ static int discover_service(zbx_dservice_type_t type, char *ip, int port)
 		alarm(0);
 	}
 
-	zabbix_log(LOG_LEVEL_WARNING, "End discover_service()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End discover_service()");
 
 	return ret;
 }
@@ -523,7 +523,7 @@ static void process_check(DB_DRULE *rule, DB_DCHECK *check, char *ip)
 	char	tmp[MAX_STRING_LEN];
 	int	first,last;
 
-	zabbix_log(LOG_LEVEL_WARNING, "In process_check(ip:%s, ports:%s, type:%d)",
+	zabbix_log(LOG_LEVEL_DEBUG, "In process_check(ip:%s, ports:%s, type:%d)",
 		ip,
 		check->ports,
 		check->type);
@@ -557,7 +557,7 @@ static void process_check(DB_DRULE *rule, DB_DCHECK *check, char *ip)
 	}
 
 
-	zabbix_log(LOG_LEVEL_WARNING, "End process_check()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End process_check()");
 }
 
 /******************************************************************************
@@ -588,7 +588,7 @@ static void process_rule(DB_DRULE *rule)
 	char		*s;
 	int		first, last, i;
 
-	zabbix_log(LOG_LEVEL_WARNING, "In process_rule(name:%s,range:%s)",
+	zabbix_log(LOG_LEVEL_DEBUG, "In process_rule(name:%s,range:%s)",
 		rule->name,
 		rule->iprange);
 
@@ -620,7 +620,7 @@ static void process_rule(DB_DRULE *rule)
 			zbx_snprintf(ip,sizeof(ip)-1,"%s.%d",
 				ip1,
 				i);
-			zabbix_log(LOG_LEVEL_WARNING, "IP [%s]", ip);
+			zabbix_log(LOG_LEVEL_DEBUG, "IP [%s]", ip);
 			result = DBselect("select dcheckid,druleid,type,ports from dchecks where druleid=" ZBX_FS_UI64,
 				rule->druleid);
 			while((row=DBfetch(result)))
@@ -639,7 +639,7 @@ static void process_rule(DB_DRULE *rule)
 		s=(char *)strtok(NULL,",");
 	}
 
-	zabbix_log( LOG_LEVEL_WARNING, "End process_rule()");
+	zabbix_log( LOG_LEVEL_DEBUG, "End process_rule()");
 }
 
 /******************************************************************************
