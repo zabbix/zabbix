@@ -114,7 +114,7 @@ static int	check_ssh(const char *host, unsigned short port, int *value_int)
 		*recv_buf,
 		*ssh_server, 
 		*ssh_proto;
-	
+
 	assert(value_int);
 
 	*value_int = 0;
