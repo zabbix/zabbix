@@ -454,7 +454,6 @@ int	zbx_tcp_accept(zbx_sock_t *s)
 
 	zbx_tcp_unaccept(s);
 
-
 	if(ZBX_TCP_ERROR == (accepted_socket = (ZBX_SOCKET)accept(s->socket, (struct sockaddr *)&serv_addr, &nlen)))
 	{
 		ZBX_TCP_ERR_START "accept() failed [%s]", strerror_from_system(zbx_sock_last_error()) ZBX_TCP_ERR_END;
@@ -658,7 +657,7 @@ int	zbx_tcp_check_security(
 	}
 
 	nlen = sizeof(ZBX_SOCKADDR);
-	if( ZBX_TCP_ERROR != getpeername(s->socket,  (struct sockaddr*)&name, &nlen))
+	if( ZBX_TCP_ERROR == getpeername(s->socket,  (struct sockaddr*)&name, &nlen))
 	{
 		ZBX_TCP_ERR_START "Connection rejected. Getpeername failed [%s]", strerror_from_system(zbx_sock_last_error()) ZBX_TCP_ERR_END;
 		return FAIL;
@@ -669,7 +668,7 @@ int	zbx_tcp_check_security(
 
 		strscpy(tmp,ip_list);
 
-        host = (char *)strtok(tmp,",");
+		host = (char *)strtok(tmp,",");
 
 		while( NULL != host )
 		{

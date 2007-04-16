@@ -102,10 +102,9 @@ ZBX_THREAD_ENTRY(listener_thread, pSock)
 			zbx_tcp_unaccept(&s);
 		}
 
-		if( FAIL == ret )
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Listener error: %s", zbx_tcp_strerror());
-		}
+		if( SUCCEED == ret )	continue;
+
+		zabbix_log(LOG_LEVEL_DEBUG, "Listener error: %s", zbx_tcp_strerror());
 
 		if (local_request_failed++ > 1000)
 		{

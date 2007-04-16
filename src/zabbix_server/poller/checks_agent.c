@@ -43,16 +43,14 @@
  ******************************************************************************/
 int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 {
-	int	s;
-	int	len;
-	char	c[MAX_STRING_LEN];
-	char	error[MAX_STRING_LEN];
+	zbx_sock_t	s;
 
-	struct hostent *hp;
+	char
+		*buf,
+		packet[MAX_STRING_LEN],
+		error[MAX_STRING_LEN];
 
-	struct sockaddr_in servaddr_in;
-
-/*	struct linger ling;*/
+	int	ret = SUCCEED;
 
 	init_result(result);
 
@@ -61,200 +59,76 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 		item->host_ip,
 		item->key );
 
-	servaddr_in.sin_family=AF_INET;
-	if(item->useip==1)
+	if( SUCCEED == (ret = zbx_tcp_connect(&s, item->useip==1 ? item->host_ip : item->host_dns, item->port)) )
 	{
-		hp = zbx_gethost(item->host_ip);
+
+		zbx_snprintf(packet, sizeof(packet), "%s\n",item->key);
+		zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", packet);
+
+		if( SUCCEED == (ret = zbx_tcp_send(&s, packet)) )
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Before read");
+
+			ret = zbx_tcp_recv(&s, &buf);
+		}
+	}
+
+	if( SUCCEED == ret )
+	{
+		zbx_rtrim(buf, " \r\n\0");
+		zbx_ltrim(buf, " ");
+
+		if( strcmp(buf,"ZBX_NOTSUPPORTED") == 0)
+		{
+			zbx_snprintf(error,sizeof(error),"Not supported by ZABBIX agent");
+			SET_MSG_RESULT(result, strdup(error));
+			ret = NOTSUPPORTED;
+		}
+		else if( strcmp(buf,"ZBX_ERROR") == 0)
+		{
+			zbx_snprintf(error,sizeof(error),"ZABBIX agent non-critical error");
+			SET_MSG_RESULT(result, strdup(error));
+			ret = AGENT_ERROR;
+		}
+		/* The section should be improved */
+		else if(buf[0]==0)
+		{
+			zbx_snprintf(error,sizeof(error),"Got empty string from [%s] IP [%s] Parameter [%s]",
+				item->host_name,
+				item->host_ip,
+				item->key);
+			zabbix_log( LOG_LEVEL_WARNING, "%s",
+				error);
+			zabbix_log( LOG_LEVEL_WARNING, "Assuming that agent dropped connection because of access permissions");
+			SET_MSG_RESULT(result, strdup(error));
+			ret = NETWORK_ERROR;
+		}
+		else if(set_result_type(result, item->value_type, buf) == FAIL)
+		{
+			zbx_snprintf(error,sizeof(error), "Type of received value [%s] is not sutable for [%s@%s] having type [%d]",
+				buf,
+				item->key,
+				item->host_name,
+				item->value_type);
+			zabbix_log( LOG_LEVEL_WARNING, "%s",
+				error);
+			zabbix_log( LOG_LEVEL_WARNING, "Returning NOTSUPPORTED");
+			result->msg=strdup(error);
+			ret = NOTSUPPORTED;
+		}
+
+		zabbix_log( LOG_LEVEL_DEBUG, "End get_value_agent(result:%s)",
+			buf);
+
 	}
 	else
 	{
-		hp = zbx_gethost(item->host_dns);
-	}
+		zabbix_log(LOG_LEVEL_DEBUG, "Get value from agent failed. Error: %s", zbx_tcp_strerror());
+		SET_MSG_RESULT(result, strdup(zbx_tcp_strerror()));
+		ret = FAIL;
 
-	if(hp==NULL)
-	{
-#ifdef	HAVE_HSTRERROR
-		zbx_snprintf(error,sizeof(error),"gethost() failed [%s]",
-			hstrerror(h_errno));
-		result->msg=strdup(error);
-#else
-		zbx_snprintf(error,sizeof(error),"gethost() failed [%d]",
-			h_errno);
-		result->msg=strdup(error);
-#endif
-		return	NETWORK_ERROR;
-	}
+	}	
+	zbx_tcp_close(&s);
 
-	servaddr_in.sin_addr.s_addr=((struct in_addr *)(hp->h_addr))->s_addr;
-
-	servaddr_in.sin_port=htons(item->port);
-
-	s=socket(AF_INET,SOCK_STREAM,0);
-/*
-	if(CONFIG_NOTIMEWAIT == 1)
-	{
-		ling.l_onoff=1;
-		ling.l_linger=0;
-		if(setsockopt(s,SOL_SOCKET,SO_LINGER,&ling,sizeof(ling))==-1)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Cannot setsockopt SO_LINGER [%s]", strerror(errno));
-		}
-	}*/
-	if(s == -1)
-	{
-		zbx_snprintf(error,sizeof(error),"Cannot create socket [%s]",
-			strerror(errno));
-		zabbix_log(LOG_LEVEL_WARNING, "%s",
-			error);
-		result->msg=strdup(error);
-		return	FAIL;
-	}
- 
-	if( connect(s,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
-	{
-		switch (errno)
-		{
-			case EINTR:
-				zbx_snprintf(error,sizeof(error),"Timeout while connecting to [%s]",
-					item->host_name);
-				zabbix_log(LOG_LEVEL_WARNING, "%s",
-					error);
-				result->msg=strdup(error);
-				break;
-			case EHOSTUNREACH:
-				zbx_snprintf(error,sizeof(error),"No route to host [%s]",
-					item->host_name);
-				zabbix_log(LOG_LEVEL_WARNING, "%s",
-					error);
-				result->msg=strdup(error);
-				break;
-			default:
-				zbx_snprintf(error,sizeof(error),"Cannot connect to [%s] [%s]",
-					item->host_name,
-					strerror(errno));
-				zabbix_log(LOG_LEVEL_WARNING, "%s",
-					error);
-				result->msg=strdup(error);
-		} 
-		close(s);
-		return	NETWORK_ERROR;
-	}
-
-	zbx_snprintf(c, sizeof(c), "%s\n",item->key);
-	if( write(s,c,strlen(c)) == -1 )
-	{
-		switch (errno)
-		{
-			case EINTR:
-				zbx_snprintf(error,sizeof(error),"Timeout while sending data to [%s]",
-					item->host_name);
-				zabbix_log(LOG_LEVEL_WARNING, "%s",
-					error);
-				result->msg=strdup(error);
-				break;
-			default:
-				zbx_snprintf(error,sizeof(error),"Error while sending data to [%s] [%s]",
-					item->host_name,
-					strerror(errno));
-				zabbix_log(LOG_LEVEL_WARNING, "%s",
-					error);
-				result->msg=strdup(error);
-		} 
-		close(s);
-		return	FAIL;
-	} 
-
-	memset(c,0,MAX_STRING_LEN);
-	len=read(s, c, MAX_STRING_LEN);
-	if(len == -1)
-	{
-		switch (errno)
-		{
-			case 	EINTR:
-					zbx_snprintf(error,sizeof(error),"Timeout while receiving data from [%s]",
-						item->host_name);
-					zabbix_log(LOG_LEVEL_WARNING, "%s",
-						error);
-					result->msg=strdup(error);
-					break;
-			case	ECONNRESET:
-					zbx_snprintf(error,sizeof(error),"Connection reset by peer.");
-					zabbix_log(LOG_LEVEL_WARNING, "%s",
-						error);
-					result->msg=strdup(error);
-					close(s);
-					return	NETWORK_ERROR;
-			default:
-				zbx_snprintf(error,sizeof(error),"Error while receiving data from [%s] [%s]",
-					item->host_name,
-					strerror(errno));
-				zabbix_log(LOG_LEVEL_WARNING, "%s",
-					error);
-				result->msg=strdup(error);
-		} 
-		close(s);
-		return	FAIL;
-	}
-
-	if( close(s)!=0 )
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Problem with close [%s]",
-			strerror(errno));
-	}
-
-	delete_reol(c);
-	lrtrim_spaces(c);
-
-/*	if(len>0)
-	{
-		c[len]=0;
-	}*/
-
-/*	if(item->itemid == 17828)
-		zabbix_log(LOG_LEVEL_WARNING, "Got string:[%d] [%s]", len, c);*/
-
-	if( strcmp(c,"ZBX_NOTSUPPORTED") == 0)
-	{
-		zbx_snprintf(error,sizeof(error),"Not supported by ZABBIX agent");
-		result->msg=strdup(error);
-		return NOTSUPPORTED;
-	}
-	else if( strcmp(c,"ZBX_ERROR") == 0)
-	{
-		zbx_snprintf(error,sizeof(error),"ZABBIX agent non-critical error");
-		result->msg=strdup(error);
-		return AGENT_ERROR;
-	}
-	/* The section should be improved */
-	else if(c[0]==0)
-	{
-		zbx_snprintf(error,sizeof(error),"Got empty string from [%s] IP [%s] Parameter [%s]",
-			item->host_name,
-			item->host_ip,
-			item->key);
-		zabbix_log( LOG_LEVEL_WARNING, "%s",
-			error);
-		zabbix_log( LOG_LEVEL_WARNING, "Assuming that agent dropped connection because of access permissions");
-		result->msg=strdup(error);
-		return	NETWORK_ERROR;
-	}
-
-	if(set_result_type(result, item->value_type, c) == FAIL)
-	{
-		zbx_snprintf(error,sizeof(error), "Type of received value [%s] is not sutable for [%s@%s] having type [%d]",
-			c,
-			item->key,
-			item->host_name,
-			item->value_type);
-		zabbix_log( LOG_LEVEL_WARNING, "%s",
-			error);
-		zabbix_log( LOG_LEVEL_WARNING, "Returning NOTSUPPORTED");
-		result->msg=strdup(error);
-		return NOTSUPPORTED;
-	}
-
-	zabbix_log( LOG_LEVEL_DEBUG, "End get_value_agent(result:%s)",
-		c);
-
-	return SUCCEED;
+	return ret;
 }
