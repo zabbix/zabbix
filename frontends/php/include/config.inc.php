@@ -140,12 +140,6 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 		$show_setup = true;
 	}
 
-	if(isset($show_setup))
-	{
-		unset($show_setup);
-		include_once "setup.php";
-	}
-
 	if(!defined('ZBX_PAGE_NO_AUTHERIZATION'))
 	{
 		check_authorisation();
@@ -164,6 +158,13 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 				"name"  =>'- unknown -',
 				"nodeid"=>0));
 	}
+
+	if(isset($show_setup))
+	{
+		unset($show_setup);
+		include_once "setup.php";
+	}
+
 
 	/********** END INITIALIZATION ************/
 
