@@ -185,6 +185,8 @@ int	CHECK_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 
 int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
+#if !defined(_WINDOWS)
+
 #if !defined(PACKETSZ)
 #	define PACKETSZ 512
 #endif /* PACKETSZ */
@@ -253,4 +255,7 @@ int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 	SET_UI64_RESULT(result, res != -1 ? 1 : 0);
 
 	return SYSINFO_RET_OK;
+#else
+	return SYSINFO_RET_FAIL;
+#endif /* not WINDOWS */
 }
