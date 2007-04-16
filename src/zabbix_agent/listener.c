@@ -48,7 +48,6 @@ static void	process_listener(zbx_sock_t *s)
 		zabbix_log(LOG_LEVEL_DEBUG, "Requested [%s]", command);
 
 		init_result(&result);
-
 		process(command, 0, &result);
 
 		if( NULL == (value = GET_TEXT_RESULT(&result)) )
@@ -57,7 +56,6 @@ static void	process_listener(zbx_sock_t *s)
 		if(value)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Sending back [%s]", *value);
-
 			ret = zbx_tcp_send(s, *value);
 		}
 		
@@ -93,7 +91,6 @@ ZBX_THREAD_ENTRY(listener_thread, pSock)
 			zbx_setproctitle("processing request");
 
 			zabbix_log(LOG_LEVEL_DEBUG, "Processing request.");
-
 			if( SUCCEED == (ret = zbx_tcp_check_security(&s, CONFIG_HOSTS_ALLOWED, 0)) )
 			{
 				process_listener(&s);
