@@ -31,8 +31,6 @@
 #	define ZBX_TCP_WRITE(s, b, bl)	((ssize_t)send((s), (b), (bl), 0))
 #	define ZBX_TCP_READ(s, b, bl)	((ssize_t)recv((s), (b), (bl), 0))
 
-#	define ZBX_TCP_READ_EOF(readed, requested) ( 0 == (readed) )
-
 #	define ZBX_TCP_ERROR	SOCKET_ERROR
 #	define ZBX_SOCK_ERROR	INVALID_SOCKET
 
@@ -42,8 +40,6 @@
 
 #	define ZBX_TCP_WRITE(s, b, bl)	((ssize_t)write((s), (b), (bl)))
 #	define ZBX_TCP_READ(s, b, bl)	((ssize_t)read((s), (b), (bl)))
-
-#	define ZBX_TCP_READ_EOF(readed, requested) ( (requested) > (readed) || 0 == (readed) )
 
 #	define ZBX_TCP_ERROR	-1
 #	define ZBX_SOCK_ERROR	-1
@@ -533,11 +529,11 @@ void    zbx_tcp_free(zbx_sock_t *s)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tcp_recv(zbx_sock_t *s, char **data)
+int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags)
 {
 #define ZBX_BUF_LEN			ZBX_STAT_BUF_LEN*8
 
-	ssize_t	nbytes;
+	ssize_t	nbytes, left;
 	ssize_t	read_bytes;
 
 	int	allocated, offset;
@@ -568,13 +564,23 @@ int	zbx_tcp_recv(zbx_sock_t *s, char **data)
 
 	if( ZBX_TCP_ERROR != nbytes )
 	{
+		left = sizeof(s->buf_stat) - read_bytes - 1;
+
 		/* fill static buffer */
-		while(	read_bytes < expected_len && (sizeof(s->buf_stat) - read_bytes - 1) > 0
-			&& ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ( s->socket, s->buf_stat + read_bytes, sizeof(s->buf_stat) - read_bytes - 1)))
+		while(	read_bytes < expected_len && left > 0
+			&& ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ( s->socket, s->buf_stat + read_bytes, left)))
 		{
 			read_bytes += nbytes;
-			if( ZBX_TCP_READ_EOF(nbytes, sizeof(s->buf_stat) - read_bytes - 1) )	break;
+
+			if( flags & ZBX_TCP_READ_UNTIL_CLOSE ) {
+				if(nbytes == 0)	break;
+			} else {
+				if(nbytes < left) break;
+			}
+
+			left -= nbytes;
 		}
+
 		s->buf_stat[read_bytes] = '\0';
 		if( (sizeof(s->buf_stat) - 1) == read_bytes) /* static buffer is full */
 		{
@@ -594,7 +600,11 @@ int	zbx_tcp_recv(zbx_sock_t *s, char **data)
 				zbx_snprintf_alloc(&(s->buf_dyn), &allocated, &offset, sizeof(s->buf_stat), "%s", s->buf_stat);
 				read_bytes += nbytes;
 
-				if( ZBX_TCP_READ_EOF(nbytes, sizeof(s->buf_stat) - 1) )	break;
+				if( flags & ZBX_TCP_READ_UNTIL_CLOSE ) {
+					if(nbytes == 0)	break;
+				} else {
+					if(nbytes < sizeof(s->buf_stat) - 1) break;
+				}
 			}
 
 			*data = s->buf_dyn;
