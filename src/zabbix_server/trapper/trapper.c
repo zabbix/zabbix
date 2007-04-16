@@ -37,12 +37,11 @@
 
 #include "daemon.h"
 
-int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
+static int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 {
-	char	*p,*line,*host;
+	char	*line,*host;
 	char	*server,*key,*value_string;
 	char	copy[MAX_STRING_LEN];
-	char	result[MAX_STRING_LEN];
 	char	host_dec[MAX_STRING_LEN],key_dec[MAX_STRING_LEN],value_dec[MAX_STRING_LEN];
 	char	lastlogsize[MAX_STRING_LEN];
 	char	timestamp[MAX_STRING_LEN];
@@ -51,8 +50,7 @@ int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 
 	int	ret=SUCCEED;
 
-	for( p=s+strlen(s)-1; p>s && ( *p=='\r' || *p =='\n' || *p == ' ' ); --p );
-	p[1]=0;
+	zbx_rtrim(s, " \r\n\0");
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Trapper got [%s] len %d",
 		s,
@@ -69,17 +67,7 @@ int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 		}
 		else
 		{
-/*			if(autoregister(host) == SUCCEED)
-			{
-				zabbix_log( LOG_LEVEL_DEBUG, "New host registered [%s]",
-					host);
-			}
-			else
-			{
-				zabbix_log( LOG_LEVEL_DEBUG, "Host already exists [%s]",
-					host);
-			}*/
-			ret=send_list_of_active_checks(sock, host);
+			ret = send_list_of_active_checks(sock, host);
 		}
 	}
 /* Process information sent by zabbix_sender */
@@ -91,9 +79,7 @@ int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 /*			zabbix_log( LOG_LEVEL_WARNING, "Node data received [len:%d]", strlen(s)); */
 			if(node_sync(s) == SUCCEED)
 			{
-				zbx_snprintf(result,sizeof(result),"OK");
-				if( zbx_tcp_send(sock,result) != SUCCEED)
-/*				if( write(sockfd,result,strlen(result)) == -1) */
+				if( zbx_tcp_send_raw(sock,"OK") != SUCCEED)
 				{
 					zabbix_log( LOG_LEVEL_WARNING, "Error sending confirmation to node");
 					zabbix_syslog("Trapper: error sending confirmation to node");
@@ -107,9 +93,7 @@ int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 /*			zabbix_log( LOG_LEVEL_WARNING, "Slave node events received [len:%d]", strlen(s)); */
 			if(node_events(s) == SUCCEED)
 			{
-				zbx_snprintf(result,sizeof(result),"OK");
-/*				if( write(sockfd,result,strlen(result)) == -1) */
-				if( zbx_tcp_send(sock,result) != SUCCEED)
+				if( zbx_tcp_send_raw(sock,"OK") != SUCCEED)
 				{
 					zabbix_log( LOG_LEVEL_WARNING, "Error sending confirmation to node");
 					zabbix_syslog("Trapper: error sending confirmation to node");
@@ -123,9 +107,7 @@ int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 /*			zabbix_log( LOG_LEVEL_WARNING, "Slave node history received [len:%d]", strlen(s)); */
 			if(node_history(s) == SUCCEED)
 			{
-				zbx_snprintf(result,sizeof(result),"OK");
-/*				if( write(sockfd,result,strlen(result)) == -1) */
-				if( zbx_tcp_send(sock,result) != SUCCEED)
+				if( zbx_tcp_send_raw(sock,"OK") != SUCCEED)
 				{
 					zabbix_log( LOG_LEVEL_WARNING, "Error sending confirmation to node]");
 					zabbix_syslog("Trapper: error sending confirmation to node");
@@ -180,18 +162,7 @@ int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 		ret=process_data(sock,server,key,value_string,lastlogsize,timestamp,source,severity);
 		DBcommit();
 		
-		if( SUCCEED == ret)
-		{
-			zbx_snprintf(result,sizeof(result),"OK");
-		}
-		else
-		{
-			zbx_snprintf(result,sizeof(result),"NOT OK");
-		}
-/*		zabbix_log( LOG_LEVEL_WARNING, "Sending back [%s]", result); */
-		zabbix_log( LOG_LEVEL_DEBUG, "Length [%d]", strlen(result));
-		if( zbx_tcp_send(sock,result) != SUCCEED)
-/*		if( write(sockfd,result,strlen(result)) == -1) */
+		if( zbx_tcp_send_raw(sock, SUCCEED == ret ? "OK" : "NOT OK") != SUCCEED)
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Error sending result back");
 			zabbix_syslog("Trapper: error sending result back");
@@ -201,7 +172,7 @@ int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 	return ret;
 }
 
-void	process_trapper_child(zbx_sock_t	*sock)
+void	process_trapper_child(zbx_sock_t *sock)
 {
 	char	*data;
 
@@ -237,11 +208,9 @@ void	child_trapper_main(int i, zbx_sock_t *s)
 	for(;;)
 	{
 		zbx_setproctitle("waiting for connection");
-
 		zbx_tcp_accept(s);
 
 		zbx_setproctitle("processing data");
-
 		process_trapper_child(s);
 
 		zbx_tcp_unaccept(s);
