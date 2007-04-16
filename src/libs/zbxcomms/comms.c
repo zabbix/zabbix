@@ -569,15 +569,13 @@ int	zbx_tcp_recv(zbx_sock_t *s, char **data)
 	if( ZBX_TCP_ERROR != nbytes )
 	{
 		/* fill static buffer */
-		while(	(sizeof(s->buf_stat) - read_bytes - 1) > 0
+		while(	read_bytes < expected_len && (sizeof(s->buf_stat) - read_bytes - 1) > 0
 			&& ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ( s->socket, s->buf_stat + read_bytes, sizeof(s->buf_stat) - read_bytes - 1)))
 		{
 			read_bytes += nbytes;
-
 			if( ZBX_TCP_READ_EOF(nbytes, sizeof(s->buf_stat) - read_bytes - 1) )	break;
 		}
 		s->buf_stat[read_bytes] = '\0';
-
 		if( (sizeof(s->buf_stat) - 1) == read_bytes) /* static buffer is full */
 		{
 			allocated		= ZBX_BUF_LEN;
