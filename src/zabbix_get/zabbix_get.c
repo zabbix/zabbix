@@ -19,11 +19,16 @@
 
 #include "common.h"
 
+#include "threads.h"
 #include "comms.h"
+#include "cfg.h"
+#include "log.h"
+#include "zbxgetopt.h"
 
 char *progname = NULL;
 char title_message[] = "ZABBIX get - Communicate with ZABBIX agent";
-char usage_message[] = "[-hV] -s<host name or IP> [-p<port number>] -k<key>";
+char usage_message[] = "[-hV] -s<host name or IP> [-p<port>] -k<key>";
+
 #ifndef HAVE_GETOPT_LONG
 char *help_message[] = {
         "Options:",
@@ -50,7 +55,10 @@ char *help_message[] = {
 };
 #endif
 
-struct option longopts[] =
+/* COMMAND LINE OPTIONS */
+
+/* long options */
+struct zbx_option longopts[] =
 {
 	{"port",	1,	0,	'p'},
 	{"host",	1,	0,	's'},
@@ -60,6 +68,14 @@ struct option longopts[] =
 	{0,0,0,0}
 };
 
+/* short options */
+
+static char     shortopts[] = "k:p:s:hV";
+
+/* end of COMMAND LINE OPTIONS*/
+
+
+#if !defined(_WINDOWS)
 
 /******************************************************************************
  *                                                                            *
@@ -91,6 +107,8 @@ void    signal_handler( int sig )
 	exit( FAIL );
 }
 
+#endif /* not WINDOWS */
+
 /******************************************************************************
  *                                                                            *
  * Function: get_value                                                        *
@@ -112,7 +130,7 @@ void    signal_handler( int sig )
  ******************************************************************************/
 static int	get_value(
 	const char	*host,
-	const int	port,
+	unsigned short	port,
 	const char	*key,
 	char		*value,
 	int		value_max_len
@@ -129,7 +147,7 @@ static int	get_value(
 		zbx_snprintf(request, sizeof(request),"%s\n",key);
 		if( SUCCEED == (ret = zbx_tcp_send(&s, request)) )
 		{
-			if( SUCCEED == (ret = zbx_tcp_recv(&s, &buf)) )
+			if( SUCCEED == (ret = zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE)) )
 			{
 				zbx_rtrim(buf,"\r\n\0");
 				zbx_snprintf(value, value_max_len, "%s", buf);
@@ -158,40 +176,40 @@ static int	get_value(
  ******************************************************************************/
 int main(int argc, char **argv)
 {
-	int	port	= 10050;
+	unsigned short	port	= 10050;
 	int	ret	= SUCCEED;
 	char	value[MAX_STRING_LEN];
 	char	*host	= NULL;
 	char	*key	= NULL;
-	int	ch;
+	char	ch;
 
-	progname = argv[0];
+	progname = get_programm_name(argv[0]);
 
 	/* Parse the command-line. */
-	while ((ch = getopt_long(argc, argv, "k:p:s:hv", longopts, NULL)) != EOF)
-	switch ((char) ch) {
-		case 'k':
-			key = strdup(optarg);
-			break;
-		case 'p':
-			port = atoi(optarg);
-			break;
-		case 's':
-			host = strdup(optarg);
-			break;
-		case 'h':
-			help();
-			exit(-1);
-			break;
-		case 'V':
-			version();
-			exit(-1);
-			break;
-		default:
-			usage();
-			exit(-1);
-			break;
-	}
+	while ((ch = zbx_getopt_long(argc, argv, shortopts, longopts, NULL)) != EOF)
+		switch ((char) ch) {
+			case 'k':
+				key = strdup(zbx_optarg);
+				break;
+			case 'p':
+				port = (unsigned short)atoi(zbx_optarg);
+				break;
+			case 's':
+				host = strdup(zbx_optarg);
+				break;
+			case 'h':
+				help();
+				exit(-1);
+				break;
+			case 'V':
+				version();
+				exit(-1);
+				break;
+			default:
+				usage();
+				exit(-1);
+				break;
+		}
 
 	if( (host==NULL) || (key==NULL))
 	{

@@ -281,7 +281,7 @@ static int	get_active_checks(
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Before read");
 
-			if( SUCCEED == (ret = zbx_tcp_recv(&s, &buf)) )
+			if( SUCCEED == (ret = zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE)) )
 			{
 				parse_list_of_checks(buf);
 			}
