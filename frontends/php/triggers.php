@@ -353,8 +353,11 @@ include_once "include/page_header.php";
 /* FORM */
 		echo BR;
 		insert_trigger_form();
-	}
-	else
+	} else if(isset($_REQUEST["form_copy_to"]) && isset($_REQUEST["g_triggerid"]))
+	{
+		echo BR;
+		insert_copy_elements_to_forms("g_triggerid");
+	} else
 	{
 /* TABLE */
 		$form = new CForm('triggers.php');
