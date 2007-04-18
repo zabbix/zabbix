@@ -1079,7 +1079,7 @@ COpt::profiling_start("page");
 		if(($sub["url"]=="events.php")&&!check_anyright("Default permission","R"))					continue;
 		if(($sub["url"]=="actions.php")&&!check_anyright("Default permission","R"))					continue;
 		if(($sub["url"]=="maps.php")&&!check_anyright("Network map","R"))						continue;
-		if(($sub["url"]=="charts.php")&&!check_anyright("Graph","R"))							continue;
+		if(($sub["url"]=="charts.php")&&!check_anyright("Graph","R")&&!check_anyright("Host","R"))			continue;
 		if(($sub["url"]=="screens.php")&&!check_anyright("Screen","R"))							continue;
 		if(($sub["url"]=="srv_status.php")&&!check_anyright("Service","R"))						continue;
 		if(($sub["url"]=="report1.php")&&!check_anyright("Default permission","R"))					continue;

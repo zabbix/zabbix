@@ -38,7 +38,7 @@
 		show_header($page["title"],0,$nomenu);
 	}
 
-	if(!check_anyright("Host","R"))
+	if(!check_anyright("Host","R") && !check_anyright("Graph","R"))
 	{
 		show_table_header("<font color=\"AA0000\">".S_NO_PERMISSIONS."</font>");
 		show_page_footer();
