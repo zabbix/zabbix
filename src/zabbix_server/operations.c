@@ -363,6 +363,44 @@ void	op_run_commands(DB_EVENT *event, DB_OPERATION *operation)
 
 /******************************************************************************
  *                                                                            *
+ * Function: select dhostid by dserviceid                                     *
+ *                                                                            *
+ * Purpose: select discovered host id                                         *
+ *                                                                            *
+ * Parameters: dserviceid - servce id                                         *
+ *                                                                            *
+ * Return value: dhostid - existing dhostid, 0 - if not found                   *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_uint64_t	select_dhostid_by_dserviceid(zbx_uint64_t dserviceid)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	dhostid = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In select_dhostid_by_dserviceid(dserviceid:" ZBX_FS_UI64 ")",
+		dserviceid);
+
+	result = DBselect("select dhostid from dservices where dserviceid=" ZBX_FS_UI64,
+		dserviceid);
+	row = DBfetch(result);
+	if(row && DBis_null(row[0]) != SUCCEED)
+	{
+		ZBX_STR2UINT64(dhostid, row[0]);
+	}
+	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End select_dhostid_by_dserviceid()");
+
+	return dhostid;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: select hostid of discovered host                                 *
  *                                                                            *
  * Purpose: select discovered host                                            *
@@ -475,14 +513,20 @@ static zbx_uint64_t	add_discovered_host(zbx_uint64_t dhostid)
  ******************************************************************************/
 void	op_host_add(DB_EVENT *event)
 {
-	zbx_uint64_t	hostid;
+	zbx_uint64_t	hostid, dhostid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In op_host_add()");
 
 	if(event->object == EVENT_OBJECT_DHOST)
 	{
-		hostid = add_discovered_host(event->objectid);
+		dhostid = event->objectid;
 	}
+	else if(event->object == EVENT_OBJECT_DSERVICE)
+	{
+		dhostid = select_dhostid_by_dserviceid(event->objectid);
+	}
+
+	hostid = add_discovered_host(dhostid);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End op_host_add()");
 }
@@ -507,14 +551,25 @@ void	op_group_add(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	hostgroupid, groupid, hostid;
+	zbx_uint64_t	hostgroupid, groupid, hostid, dhostid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In op_group_add()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In op_group_add(object:%d)",
+		event->object);
 
-	if(operation->operationtype != OPERATION_TYPE_GROUP_ADD)	return;
-	if(event->object != EVENT_OBJECT_DHOST)				return;
+	if(operation->operationtype != OPERATION_TYPE_GROUP_ADD)				return;
+	if(event->object != EVENT_OBJECT_DHOST && event->object != EVENT_OBJECT_DSERVICE)	return;
 
-	hostid = add_discovered_host(event->objectid);
+
+	if(event->object == EVENT_OBJECT_DSERVICE)
+	{
+		dhostid = select_dhostid_by_dserviceid(event->objectid);
+	}
+	else
+	{
+		dhostid = event->objectid;
+	}
+
+	hostid = add_discovered_host(dhostid);
 	if(hostid != 0)
 	{
 		groupid = operation->objectid;
@@ -554,14 +609,23 @@ void	op_group_add(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation)
  ******************************************************************************/
 void	op_group_del(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation)
 {
-	zbx_uint64_t	groupid, hostid;
+	zbx_uint64_t	groupid, hostid, dhostid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In op_group_del()");
 
 	if(operation->operationtype != OPERATION_TYPE_GROUP_REMOVE)	return;
-	if(event->object != EVENT_OBJECT_DHOST)				return;
+	if(event->object != EVENT_OBJECT_DHOST && event->object != EVENT_OBJECT_DSERVICE)	return;
 
-	hostid = select_discovered_host(event->objectid);
+	if(event->object == EVENT_OBJECT_DSERVICE)
+	{
+		dhostid = select_dhostid_by_dserviceid(event->objectid);
+	}
+	else
+	{
+		dhostid = event->objectid;
+	}
+
+	hostid = select_discovered_host(dhostid);
 	if(hostid != 0)
 	{
 		groupid = operation->objectid;

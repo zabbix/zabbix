@@ -177,7 +177,10 @@ typedef enum
 	SVC_POP,
 	SVC_NNTP,
 	SVC_IMAP,
-	SVC_TCP
+	SVC_TCP,
+	SVC_AGENT,
+	SVC_SNMPv1,
+	SVC_SNMPv2c
 } zbx_dservice_type_t;
 
 
@@ -221,7 +224,8 @@ typedef enum
 	CONDITION_TYPE_DSERVICE_TYPE,
 	CONDITION_TYPE_DSERVICE_PORT,
 	CONDITION_TYPE_DSTATUS,
-	CONDITION_TYPE_DUPTIME
+	CONDITION_TYPE_DUPTIME,
+	CONDITION_TYPE_DVALUE
 } zbx_condition_type_t;
 
 /* Condition operators */
