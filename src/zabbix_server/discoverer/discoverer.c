@@ -141,13 +141,18 @@ static void add_service_event(DB_DSERVICE *service)
  ******************************************************************************/
 static void update_dservice(DB_DSERVICE *service)
 {
-	DBexecute("update dservices set dhostid=" ZBX_FS_UI64 ",type=%d,port=%d,status=%d,lastup=%d,lastdown=%d where dserviceid=" ZBX_FS_UI64,
+	char	key_esc[MAX_STRING_LEN];
+
+	DBescape_string(service->key_, key_esc, sizeof(key_esc)-1);
+
+	DBexecute("update dservices set dhostid=" ZBX_FS_UI64 ",type=%d,port=%d,status=%d,lastup=%d,lastdown=%d,key_='%s' where dserviceid=" ZBX_FS_UI64,
 			service->dhostid,
 			service->type,
 			service->port,
 			service->status,
 			service->lastup,
 			service->lastdown,
+			key_esc,
 			service->dserviceid);
 }
 
@@ -196,15 +201,20 @@ static void register_service(DB_DSERVICE *service,DB_DRULE *rule,DB_DCHECK *chec
 {
 	DB_RESULT	result;
 	DB_ROW		row;
+	char		value_esc[MAX_STRING_LEN];
+	char		key_esc[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In register_service(ip:%s,port:%d)",
 		ip,
 		port);
 
-	result = DBselect("select dserviceid,dhostid,type,port,status,lastup,lastdown,value from dservices where dhostid=" ZBX_FS_UI64 " and type=%d and port=%d",
+	DBescape_string(check->key_, key_esc, sizeof(key_esc)-1);
+
+	result = DBselect("select dserviceid,dhostid,type,port,status,lastup,lastdown,value,key_ from dservices where dhostid=" ZBX_FS_UI64 " and type=%d and port=%d and key_='%s'",
 		dhostid,
 		check->type,
-		port);
+		port,
+		key_esc);
 	row=DBfetch(result);
 	if(!row || DBis_null(row[0])==SUCCEED)
 	{
@@ -220,16 +230,20 @@ static void register_service(DB_DSERVICE *service,DB_DRULE *rule,DB_DCHECK *chec
 			service->status		= DOBJECT_STATUS_UP;
 			service->lastup		= 0;
 			service->lastdown	= 0;
-			DBescape_string(check->value, service->value, sizeof(service->value)-1);
+			strscpy(service->value, check->value);
+			strscpy(service->key_, check->key_);
 
-			DBexecute("insert into dservices (dhostid,dserviceid,type,port,status,value) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,%d,'%s')",
+			DBescape_string(service->value, value_esc, sizeof(value_esc)-1);
+			DBescape_string(service->key_, key_esc, sizeof(key_esc)-1);
+
+			DBexecute("insert into dservices (dhostid,dserviceid,type,port,status,value,key_) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,%d,'%s','%s')",
 				service->dhostid,
 				service->dserviceid,
 				check->type,
 				service->port,
 				service->status,
-				service->value);
-
+				value_esc,
+				key_esc);
 		}
 	}
 	else
@@ -244,6 +258,7 @@ static void register_service(DB_DSERVICE *service,DB_DRULE *rule,DB_DCHECK *chec
 		service->lastup		= atoi(row[5]);
 		service->lastdown	= atoi(row[6]);
 		strscpy(service->value,row[7]);
+		strscpy(service->key_,row[8]);
 	}
 	DBfree_result(result);
 

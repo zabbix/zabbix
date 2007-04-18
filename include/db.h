@@ -157,6 +157,7 @@ DB_DSERVICE
 	int		lastup;
 	int		lastdown;
 	char		value[DSERVICE_VALUE_LEN_MAX];
+	char		key_[MAX_ITEM_KEY_LEN];
 };
 
 DB_EVENT
