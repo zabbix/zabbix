@@ -46,6 +46,8 @@ TABLE|dchecks|dcheckid|ZBX_SYNC
 FIELD		|dcheckid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|druleid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|key_		|t_varchar(255)	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|snmp_community	|t_varchar(255)	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|ports		|t_varchar(255)	|'0'	|NOT NULL	|ZBX_SYNC
 
 TABLE|dhosts|dhostid|ZBX_SYNC
@@ -60,6 +62,8 @@ TABLE|dservices|dserviceid|ZBX_SYNC
 FIELD		|dserviceid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|dhostid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|key_		|t_varchar(255)	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|value		|t_varchar(255)	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|port		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastup		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
