@@ -196,13 +196,12 @@ static void register_service(DB_DSERVICE *service,DB_DRULE *rule,DB_DCHECK *chec
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	dserviceid = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In register_service(ip:%s,port:%d)",
 		ip,
 		port);
 
-	result = DBselect("select dserviceid,dhostid,type,port,status,lastup,lastdown from dservices where dhostid=" ZBX_FS_UI64 " and type=%d and port=%d",
+	result = DBselect("select dserviceid,dhostid,type,port,status,lastup,lastdown,value from dservices where dhostid=" ZBX_FS_UI64 " and type=%d and port=%d",
 		dhostid,
 		check->type,
 		port);
@@ -213,26 +212,30 @@ static void register_service(DB_DSERVICE *service,DB_DRULE *rule,DB_DCHECK *chec
 		if(check->status == DOBJECT_STATUS_UP)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "New service discovered on port %d", port);
-			dserviceid = DBget_maxid("dservices","dserviceid");
-			DBexecute("insert into dservices (dhostid,dserviceid,type,port,status) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,%d)",
-				dhostid,
-				dserviceid,
-				check->type,
-				port,
-				DOBJECT_STATUS_UP);
 
-			service->dserviceid	= dserviceid;
+			service->dserviceid	= DBget_maxid("dservices","dserviceid");
 			service->dhostid	= dhostid;
 			service->type		= check->type;
 			service->port		= port;
 			service->status		= DOBJECT_STATUS_UP;
 			service->lastup		= 0;
 			service->lastdown	= 0;
+			DBescape_string(check->value, service->value, sizeof(service->value)-1);
+
+			DBexecute("insert into dservices (dhostid,dserviceid,type,port,status,value) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d,%d,'%s')",
+				service->dhostid,
+				service->dserviceid,
+				check->type,
+				service->port,
+				service->status,
+				service->value);
+
 		}
 	}
 	else
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Service is already in database");
+
 		ZBX_STR2UINT64(service->dserviceid,	row[0]);
 		ZBX_STR2UINT64(service->dhostid,	row[1]);
 		service->type		= atoi(row[2]);
@@ -240,6 +243,7 @@ static void register_service(DB_DSERVICE *service,DB_DRULE *rule,DB_DCHECK *chec
 		service->status		= atoi(row[4]);
 		service->lastup		= atoi(row[5]);
 		service->lastdown	= atoi(row[6]);
+		strscpy(service->value,row[7]);
 	}
 	DBfree_result(result);
 
@@ -410,22 +414,23 @@ static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int discover_service(zbx_dservice_type_t type, char *ip, int port)
+static int discover_service(DB_DCHECK *check, char *ip, int port)
 {
 	int		ret = SUCCEED;
 	char		key[MAX_STRING_LEN];
 	AGENT_RESULT 	value;
+	DB_ITEM		item;
 	struct	sigaction phan;
 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In discover_service(ip:%s, port:%d, type:%d)",
 		ip,
 		port,
-		type);
+		check->type);
 
 	init_result(&value);
 
-	switch(type) {
+	switch(check->type) {
 		case SVC_SSH:
 			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[ssh,%s,%d]",
 				ip,
@@ -471,6 +476,8 @@ static int discover_service(zbx_dservice_type_t type, char *ip, int port)
 				ip,
 				port);
 			break;
+		case SVC_AGENT:
+			break;
 		default:
 			ret = FAIL;
 			break;
@@ -484,15 +491,70 @@ static int discover_service(zbx_dservice_type_t type, char *ip, int port)
 		sigaction(SIGALRM, &phan, NULL);
 		alarm(10);
 
-		if(process(key, 0, &value) == SUCCEED)
-		{
-			if(GET_UI64_RESULT(&value))
-			{
-				if(value.ui64 == 0)	ret = FAIL;
-			}
-			else ret = FAIL;
+		switch(check->type) {
+			/* Agent and SNMP checks */
+			case SVC_AGENT:
+			case SVC_SNMPv1:
+			case SVC_SNMPv2c:
+				memset(&item,0,sizeof(DB_ITEM));
+				strscpy(item.key,check->key_);
+				item.host_name	= ip;
+				item.host_ip	= ip;
+				item.host_dns	= ip;
+				item.useip	= 1;
+				item.port	= port;
+
+				item.value_type	= ITEM_VALUE_TYPE_STR;
+
+				item.snmp_community	= check->key_;
+				item.snmp_oid		= check->key_;
+				item.snmp_community	= check->snmp_community;
+				item.snmp_port		= port;
+
+				if(check->type==SVC_AGENT)
+				{
+					if(SUCCEED == get_value_agent(&item, &value))
+					{
+						if(GET_STR_RESULT(&value))
+						{
+							strscpy(check->value, value.str);
+						}
+						else ret = FAIL;
+					}
+					else
+					{
+						ret = FAIL;
+					}
+				}
+				else
+				{
+					if(SUCCEED == get_value_snmp(&item, &value))
+					{
+						if(GET_STR_RESULT(&value))
+						{
+							strscpy(check->value, value.str);
+						}
+						else ret = FAIL;
+					}
+					else
+					{
+						ret = FAIL;
+					}
+				}
+				break;
+			/* Simple checks */
+			default:
+				if(process(key, 0, &value) == SUCCEED)
+				{
+					if(GET_UI64_RESULT(&value))
+					{
+						if(value.ui64 == 0)	ret = FAIL;
+					}
+					else ret = FAIL;
+				}
+				else	ret = FAIL;
+				break;
 		}
-		else	ret = FAIL;
 		alarm(0);
 	}
 
@@ -550,7 +612,7 @@ static void process_check(DB_DRULE *rule, DB_DCHECK *check, char *ip)
 
 		for(port=first;port<=last;port++)
 		{	
-			check->status = discover_service(check->type,ip,port);
+			check->status = discover_service(check,ip,port);
 			update_service(rule, check, ip, port);
 		}
 		s=(char *)strtok(NULL,"\n");
@@ -621,14 +683,16 @@ static void process_rule(DB_DRULE *rule)
 				ip1,
 				i);
 			zabbix_log(LOG_LEVEL_DEBUG, "IP [%s]", ip);
-			result = DBselect("select dcheckid,druleid,type,ports from dchecks where druleid=" ZBX_FS_UI64,
+			result = DBselect("select dcheckid,druleid,type,key_,snmp_community,ports from dchecks where druleid=" ZBX_FS_UI64,
 				rule->druleid);
 			while((row=DBfetch(result)))
 			{
 				ZBX_STR2UINT64(check.dcheckid,row[0]);
 				ZBX_STR2UINT64(check.druleid,row[1]);
 				check.type		= atoi(row[2]);
-				check.ports		= row[3];
+				check.key_		= row[3];
+				check.snmp_community	= row[4];
+				check.ports		= row[5];
 		
 				process_check(rule, &check, ip);
 			}

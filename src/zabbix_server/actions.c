@@ -293,6 +293,52 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		}
 	}
 	else if(event->source == EVENT_SOURCE_DISCOVERY &&
+		event->object == EVENT_OBJECT_DSERVICE &&
+		condition->conditiontype == CONDITION_TYPE_DVALUE)
+	{
+		zabbix_log( LOG_LEVEL_DEBUG, "CONDITION_TYPE_DVALUE [%d:%s]",
+			event->value,
+			condition->value);
+
+		result = DBselect("select value from dservices where dserviceid=" ZBX_FS_UI64,
+				event->objectid);
+		row = DBfetch(result);
+		if(row && DBis_null(row[0]) != SUCCEED)
+		{
+			if(condition->operator == CONDITION_OPERATOR_EQUAL)
+			{
+				if(strcmp(condition->value, row[0]) == 0)	ret = SUCCEED;
+			}
+			else if(condition->operator == CONDITION_OPERATOR_NOT_EQUAL)
+			{
+				if(strcmp(condition->value, row[0]) != 0)	ret = SUCCEED;
+			}
+			else if(condition->operator == CONDITION_OPERATOR_MORE_EQUAL)
+			{
+				if(strcmp(row[0], condition->value) >= 0)	ret = SUCCEED;
+			}
+			else if(condition->operator == CONDITION_OPERATOR_LESS_EQUAL)
+			{
+				if(strcmp(row[0], condition->value) <= 0)	ret = SUCCEED;
+			}
+			else if(condition->operator == CONDITION_OPERATOR_LIKE)
+			{
+				if(strstr(row[0], condition->value) != NULL)	ret = SUCCEED;
+			}
+			else if(condition->operator == CONDITION_OPERATOR_NOT_LIKE)
+			{
+				if(strstr(row[0], condition->value) == NULL)	ret = SUCCEED;
+			}
+			else
+			{
+				zabbix_log( LOG_LEVEL_ERR, "Unsupported operator [%d] for condition id [" ZBX_FS_UI64 "]",
+					condition->operator,
+					condition->conditionid);
+			}
+		}
+		DBfree_result(result);
+	}
+	else if(event->source == EVENT_SOURCE_DISCOVERY &&
 		(event->object == EVENT_OBJECT_DHOST || event->object == EVENT_OBJECT_DSERVICE) &&
 		condition->conditiontype == CONDITION_TYPE_DHOST_IP)
 	{
@@ -463,7 +509,7 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 	}
 	else
 	{
-		zabbix_log( LOG_LEVEL_ERR, "Event source [%d] and condition type [%d] is unknown for condition id [" ZBX_FS_UI64 "]",
+		zabbix_log( LOG_LEVEL_DEBUG, "Event source [%d] and condition type [%d] is unknown for condition id [" ZBX_FS_UI64 "]",
 			event->source,
 			condition->conditiontype,
 			condition->conditionid);

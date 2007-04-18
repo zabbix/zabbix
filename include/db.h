@@ -108,6 +108,9 @@ extern	int	CONFIG_MASTER_NODEID;
 #define ACTION_SUBJECT_LEN		255
 #define ACTION_SUBJECT_LEN_MAX		ACTION_SUBJECT_LEN+1
 
+#define DSERVICE_VALUE_LEN		255
+#define DSERVICE_VALUE_LEN_MAX		DSERVICE_VALUE_LEN+1
+
 #define ZBX_SQL_ITEM_SELECT	"i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.errors_from,i.snmp_port,i.delta,i.prevorgvalue,i.lastclock,i.units,i.multiplier,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula,h.available,i.status,i.trapper_hosts,i.logtimefmt,i.valuemapid,i.delay_flex,h.dns from hosts h, items i"
 
 #define ZBX_MAX_SQL_LEN			65535
@@ -128,7 +131,10 @@ DB_DCHECK
 	zbx_uint64_t	druleid;
 	int		type;
 	char		*ports;
+	char		*key_;
+	char		*snmp_community;
 	int		status;
+	char		value[DSERVICE_VALUE_LEN_MAX];
 };
 
 DB_DHOST
@@ -150,6 +156,7 @@ DB_DSERVICE
 	int		status;
 	int		lastup;
 	int		lastdown;
+	char		value[DSERVICE_VALUE_LEN_MAX];
 };
 
 DB_EVENT
