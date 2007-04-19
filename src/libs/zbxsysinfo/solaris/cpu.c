@@ -50,7 +50,7 @@ static int get_cpu_data(
 
 	for(i = 0; i < CPU_STATES; new_cpu[i++] = 0LL);
 
-        snprintf(ks_name, sizeof(ks_name), "cpu_stat%s", cpuname);
+        zbx_snprintf(ks_name, sizeof(ks_name), "cpu_stat%s", cpuname);
 
 	kc = kstat_open();
 	if (kc)
