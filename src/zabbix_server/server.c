@@ -317,7 +317,7 @@ int main(int argc, char **argv)
 	progname = argv[0];
 
 /* Parse the command-line. */
-	while ((ch = getopt_long(argc, argv, "c:n:hv",longopts,NULL)) != EOF)
+	while ((ch = getopt_long(argc, argv, "c:n:hV",longopts,NULL)) != EOF)
 	switch ((char) ch) {
 		case 'c':
 			CONFIG_FILE = strdup(optarg);
