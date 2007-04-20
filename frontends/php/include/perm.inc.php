@@ -161,8 +161,8 @@ define("GROUP_RIGHT",		0);
 						$id_permission = permission_max($id_permission, $int_permision);
 					if($usr_right["id"] == GROUP_RIGHT)
 						$group_permission = permission_max($group_permission, $int_permision);
-					else
-						$any_permission = permission_max($any_permission, $int_permision);
+
+					$any_permission = permission_max($any_permission, $int_permision);
 				}
 				if($usr_right["name"] == 'Default permission') 
 				{
