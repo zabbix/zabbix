@@ -71,13 +71,6 @@
 		}
 	}
 
-	class CButtonDelete extends CButtonQMessage
-	{
-		function CButtonDelete($msg=NULL, $vars=NULL){
-			parent::CButtonQMessage("delete",S_DELETE,$msg,$vars);
-		}
-	}
-
 	class CButtonQMessage extends CButton
 	{
 		/*
@@ -131,6 +124,13 @@
 			}
 			
 			return parent::SetAction("if(".$confirmation.") return ".$action."; else return false;");
+		}
+	}
+
+	class CButtonDelete extends CButtonQMessage
+	{
+		function CButtonDelete($msg=NULL, $vars=NULL){
+			parent::CButtonQMessage("delete",S_DELETE,$msg,$vars);
 		}
 	}
 ?>
