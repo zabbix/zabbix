@@ -125,7 +125,7 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Get value from agent failed. Error: %s", zbx_tcp_strerror());
 		SET_MSG_RESULT(result, strdup(zbx_tcp_strerror()));
-		ret = FAIL;
+		ret = NETWORK_ERROR;
 
 	}	
 	zbx_tcp_close(&s);

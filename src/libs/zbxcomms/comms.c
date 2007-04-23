@@ -34,10 +34,11 @@
 #	define ZBX_TCP_ERROR	SOCKET_ERROR
 #	define ZBX_SOCK_ERROR	INVALID_SOCKET
 
-#	define	zbx_sock_close(s)		if( ZBX_SOCK_ERROR != (s) ) closesocket(s)
-#	define  zbx_sock_last_error()	WSAGetLastError()
-#else
+#	define zbx_sock_close(s)		if( ZBX_SOCK_ERROR != (s) ) closesocket(s)
+#	define zbx_sock_last_error()	WSAGetLastError()
 
+#	define ZBX_SOCK_ERR_TIMEDOUT	WSAETIMEDOUT
+#else
 #	define ZBX_TCP_WRITE(s, b, bl)	((ssize_t)write((s), (b), (bl)))
 #	define ZBX_TCP_READ(s, b, bl)	((ssize_t)read((s), (b), (bl)))
 
@@ -46,6 +47,9 @@
 
 #	define	zbx_sock_close(s)		if( ZBX_SOCK_ERROR != (s) ) close(s)
 #	define  zbx_sock_last_error()	errno
+
+#	define ZBX_SOCK_ERR_TIMEDOUT	EINTR
+
 #endif /* _WINDOWS */
 
 /******************************************************************************
@@ -64,6 +68,16 @@
  *                                                                            *
  ******************************************************************************/
 #define ZBX_TCP_MAX_STRERROR	255
+
+int	zbx_tcp_error(void)
+{
+	if( ZBX_SOCK_ERR_TIMEDOUT == zbx_sock_last_error() )
+	{
+		return ZBX_TCP_ERR_TIMEOUT;
+	}
+
+	return ZBX_TCP_ERR_NETWORK;
+}
 
 static char zbx_tcp_strerror_message[ZBX_TCP_MAX_STRERROR];
 
