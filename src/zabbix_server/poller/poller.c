@@ -364,7 +364,7 @@ int get_values(void)
 			}
 		       	update_triggers(item.itemid);
 		}
-		else if(res == NOTSUPPORTED)
+		else if(res == NOTSUPPORTED || res == AGENT_ERROR)
 		{
 			now = time(NULL);
 			if(item.status == ITEM_STATUS_NOTSUPPORTED)
@@ -458,28 +458,10 @@ int get_values(void)
 
 			stop=1;
 		}
-/* Possibly, other logic required? */
-		else if(res == AGENT_ERROR)
-		{
-			zabbix_log( LOG_LEVEL_WARNING, "Getting value of [%s] from host [%s] failed (ZBX_ERROR)",
-				item.key,
-				item.host_name);
-			zabbix_syslog("Getting value of [%s] from host [%s] failed (ZBX_ERROR)",
-				item.key,
-				item.host_name);
-			zabbix_log( LOG_LEVEL_WARNING, "The value is not stored in database.");
-
-			stop=1;
-		}
 		else
 		{
-			zabbix_log( LOG_LEVEL_WARNING, "Getting value of [%s] from host [%s] failed",
-				item.key,
-				item.host_name );
-			zabbix_syslog("Getting value of [%s] from host [%s] failed",
-				item.key,
-				item.host_name);
-			zabbix_log( LOG_LEVEL_WARNING, "The value is not stored in database.");
+			zabbix_log( LOG_LEVEL_CRIT, "Unknown response code returned.");
+			assert(0==1);
 		}
 		free_result(&agent);
 		DBcommit();
