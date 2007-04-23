@@ -78,7 +78,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 			error);
 		SET_MSG_RESULT(value, strdup(error));
 
-		return FAIL;
+		return NOTSUPPORTED;
 	}
 
 
@@ -150,7 +150,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 				zabbix_log( LOG_LEVEL_ERR, "%s", error);
 				SET_MSG_RESULT(value, strdup(error));
 
-				return FAIL;
+				return NOTSUPPORTED;
 			}
 		}
 		else if(item->snmpv3_securitylevel == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV)
@@ -173,7 +173,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 				zabbix_log( LOG_LEVEL_ERR, "%s", error);
 				SET_MSG_RESULT(value, strdup(error));
 
-				return FAIL;
+				return NOTSUPPORTED;
 			}
 			
 			/* set the private method to DES */
@@ -192,7 +192,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 				zabbix_log( LOG_LEVEL_ERR, "%s", error);
 				SET_MSG_RESULT(value, strdup(error));
 
-				return FAIL;
+				return NOTSUPPORTED;
 			}
 		}
 		zabbix_log( LOG_LEVEL_DEBUG, "SNMPv3 [%s@%s:%d]",
@@ -208,7 +208,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 			error);
 		SET_MSG_RESULT(value, strdup(error));
 		
-		return FAIL;
+		return NOTSUPPORTED;
 	}
 
 	zabbix_log( LOG_LEVEL_DEBUG, "OID [%s]",
@@ -226,7 +226,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 			error);
 		SET_MSG_RESULT(value, strdup(error));
 
-		return FAIL;
+		return NOTSUPPORTED;
 	}
 	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_SNMP() 0.2");
 
@@ -450,7 +450,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 					error);
 				SET_MSG_RESULT(value, strdup(error));
 
-				ret=FAIL;
+				ret=NOTSUPPORTED;
 			}
 		}
 		else if(status == STAT_TIMEOUT)
@@ -474,7 +474,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 				error);
 			SET_MSG_RESULT(value, strdup(error));
 
-			ret=FAIL;
+			ret=NOTSUPPORTED;
 		}
 	}
 
