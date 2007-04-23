@@ -628,7 +628,7 @@
 		$result = delete_triggers_by_itemid($itemid);
 		if(!$result)	return	$result;
 
-		$db_gitems = DBselect('select * from graphs_items where itemid='.$itemid);
+		$db_gitems = DBselect('select distinct graphid from graphs_items where itemid='.$itemid);
 		while($db_gitem = DBfetch($db_gitems))
 		{
 			$result = delete_graph($db_gitem["graphid"]);

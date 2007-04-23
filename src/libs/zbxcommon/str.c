@@ -894,3 +894,23 @@ char* zbx_strdcat(char *dest, const char *src)
 
 	return new_dest;
 }
+
+char* zbx_strdcatf(char *dest, const char *f, ...)
+{
+	char *string = NULL;
+	char *result = NULL;
+
+	va_list args;
+
+	va_start(args, f);
+
+	string = zbx_dvsprintf(dest, f, args);
+
+	va_end(args);
+
+	result = zbx_strdcat(dest, string);
+
+	zbx_free(string);
+
+	return result;
+}

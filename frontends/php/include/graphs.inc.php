@@ -424,13 +424,13 @@
 
 			if($templateid != null)
 			{
-				$tmp_graph = get_graph_by_graphid($db_graph["templateid"]);
+				$tmp_host = DBfetch(get_hosts_by_graphid($db_graph["templateid"]));
 				if(is_array($templateid))
 				{
-					if(!isset($templateid[$tmp_graph["hostid"]]))
+					if(!isset($templateid[$tmp_host["hostid"]]))
 						continue;
 				}
-				elseif($tmp_graph["hostid"] != $templateid)
+				elseif($tmp_host["hostid"] != $templateid)
 					continue;
 			}
 
