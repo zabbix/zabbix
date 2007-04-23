@@ -240,6 +240,14 @@ typedef enum
 	CONDITION_OPERATOR_LESS_EQUAL
 } zbx_condition_op_t;
 
+typedef enum
+{
+	SYSMAP_ELEMENT_TYPE_HOST = 0,
+	SYSMAP_ELEMENT_TYPE_MAP,
+	SYSMAP_ELEMENT_TYPE_TRIGGER,
+	SYSMAP_ELEMENT_TYPE_HOST_GROUP
+} zbx_sysmap_element_types_t;
+
 /* Special item key used for storing server status */
 #define SERVER_STATUS_KEY	"status"
 /* Special item key used for ICMP pings */
@@ -491,6 +499,7 @@ size_t	zbx_strlcat(char *dst, const char *src, size_t siz);
 char* zbx_dvsprintf(char *dest, const char *f, va_list args);
 char* zbx_dsprintf(char *dest, const char *f, ...);
 char* zbx_strdcat(char *dest, const char *src);
+char* zbx_strdcatf(char *dest, const char *f, ...);
 
 int	replace_param(const char *cmd, const char *param, char *out, int outlen);
 

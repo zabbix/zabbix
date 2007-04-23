@@ -946,29 +946,16 @@
 
 	function	delete_dependencies_by_triggerid($triggerid)
 	{
-		$db_deps = DBselect("select triggerid_up, triggerid_down from trigger_depends".
-			" where triggerid_down=".$triggerid);
+		$db_deps = DBselect('select triggerid_up, triggerid_down from trigger_depends'.
+			' where triggerid_down='.$triggerid);
 		while($db_dep = DBfetch($db_deps))
 		{
-			delete_trigger_dependency($db_dep["triggerid_down"],$db_dep["triggerid_up"]);
+			DBexecute('update triggers set dep_level=dep_level-1 where triggerid='.$db_dep['triggerid_up']);
+			DBexecute('delete from trigger_depends'.
+				' where triggerid_up='.$db_dep['triggerid_up'].
+				' and triggerid_down='.$db_dep['triggerid_down']);
 		}
-		return TRUE;
-	}
-
-	function	delete_trigger_dependency($triggerid_down, $triggerid_up)
-	{
-		$result = DBselect("select triggerid_up from trigger_depends".
-			" where triggerid_up=$triggerid_up and triggerid_down=$triggerid_down");
-		while($row=DBfetch($result))
-		{
-			DBexecute("update triggers set dep_level=dep_level-1".
-				" where triggerid=".$row["triggerid_up"]);
-		}
-
-		DBexecute("delete from trigger_depends".
-			" where triggerid_up=$triggerid_up and triggerid_down=$triggerid_down");
-
-		return	TRUE;
+		return true;
 	}
 
 	function	insert_dependency($triggerid_down,$triggerid_up)

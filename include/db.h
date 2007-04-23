@@ -466,22 +466,16 @@ void    DBget_item_from_db(DB_ITEM *item,DB_ROW row);
 zbx_uint64_t	DBadd_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available);
 int	DBhost_exists(char *server);
 int	DBget_host_by_hostid(int hostid,DB_HOST *host);
-int	DBsync_host_with_templates(int hostid);
-int	DBsync_host_with_template(int hostid,int templateid,int items,int triggers,int graphs);
 int	DBadd_templates_to_host(int hostid,int host_templateid);
 
 int	DBadd_template_linkage(int hostid,int templateid,int items,int triggers,int graphs);
 
 int	DBget_item_by_itemid(int itemid,DB_ITEM *item);
-int	DBadd_item_to_linked_hosts(int itemid, int hostid);
-int	DBadd_item(char *description, char *key, int hostid, int delay, int history, int status, int type, char *snmp_community, char *snmp_oid,int value_type,char *trapper_hosts,int snmp_port,char *units,int multiplier,int delta, char *snmpv3_securityname,int snmpv3_securitylevel,char *snmpv3_authpassphrase,char *snmpv3_privpassphrase,char *formula,int trends,char *logtimefmt);
 
 int	DBget_trigger_by_triggerid(int triggerid,DB_TRIGGER *trigger);
 int	DBadd_trigger_to_linked_hosts(int triggerid,int hostid);
-void	DBdelete_triggers_by_itemid(zbx_uint64_t itemid);
 void	DBdelete_sysmaps_hosts_by_hostid(zbx_uint64_t hostid);
 
-int	DBadd_graph(char *name, int width, int height, int yaxistype, double yaxismin, double yaxismax);
 int	DBget_graph_item_by_gitemid(int gitemid, DB_GRAPH_ITEM *graph_item);
 int	DBget_graph_by_graphid(int graphid, DB_GRAPH *graph);
 int	DBadd_graph_item_to_linked_hosts(int gitemid,int hostid);

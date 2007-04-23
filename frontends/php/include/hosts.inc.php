@@ -626,7 +626,7 @@ require_once "include/items.inc.php";
 			return false;
 		}
 		if($db_app && $applicationid!=null)
-		{ // delete old item with same name
+		{ // delete old application with same name
 			delete_application($db_app["applicationid"]);
 		}
 
@@ -679,7 +679,7 @@ require_once "include/items.inc.php";
 			return $applicationid;
 
 		if($templateid == 0){
-			delete_application($itemid);
+			delete_application($applicationid);
 		}
 
 	}
