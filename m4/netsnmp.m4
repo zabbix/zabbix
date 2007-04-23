@@ -36,51 +36,68 @@ AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
      ],[_libnetsnmp_with=ifelse([$1],,[no],[$1])])
 
   if test "x$_libnetsnmp_with" != x"no"; then
-       AC_MSG_CHECKING(for NET-SNMP support)
-  	if test "$_libnetsnmp_with" = "yes"; then
-		if test -f /usr/local/net-snmp/include/net-snmp-includes.h; then
-			SNMP_INCDIR=/usr/local/net-snmp/include/
-			SNMP_LIBDIR=/usr/local/net-snmp/lib/
-		elif test -f /usr/include/net-snmp/net-snmp-includes.h; then
-			SNMP_INCDIR=/usr/include
-			SNMP_LIBDIR=/usr/lib
-		elif test -f /usr/include/net-snmp-includes.h; then
-			SNMP_INCDIR=/usr/include
-			SNMP_LIBDIR=/usr/lib
-		elif test -f /usr/local/include/net-snmp/net-snmp-includes.h; then
-			SNMP_INCDIR=/usr/local/include
-			SNMP_LIBDIR=/usr/local/lib
-		elif test -f /usr/local/include/net-snmp-includes.h; then
-			SNMP_INCDIR=/usr/local/include
-			SNMP_LIBDIR=/usr/local/lib
-		else
-			found_netsnmp="no"
-			AC_MSG_RESULT(no)
+
+        if test -d "$_libnetsnmp_with" ; then
+           SNMP_INCDIR="-I$withval/include"
+           _libnetsnmp_ldflags="-L$_libnetsnmp_with/lib"
+           AC_PATH_PROG([_libnetsnmp_config],["$_libnetsnmp_with/bin/net-snmp-config"])
+        else
+   	   AC_PATH_PROG([_libnetsnmp_config],[net-snmp-config])
+        fi
+
+	if test "x$_libnetsnmp_config" != "x" ; then
+		_full_libnetsnmp_libs=`$_libnetsnmp_config --libs`
+		for i in $_full_libnetsnmp_libs; do
+			case $i in
+				-L*)
+					SNMP_LIBDIRS="$SNMP_LIBDIRS $i"
+
+			;;
+			esac
+		done
+
+		if test "x$enable_static" = "xyes"; then
+
+			for i in $_full_libnetsnmp_libs; do
+				case $i in
+					-lnetsnmp)
+				;;
+					-l*)
+						_lib_name=`echo "$i" | cut -b3-`
+						AC_CHECK_LIB($_lib_name , main, , AC_MSG_ERROR([Not found $_lib_name library]))
+						SNMP_LIBS="$SNMP_LIBS $i"
+
+				;;
+				esac
+			done
 		fi
-   	else
-		if test -f $_libnetsnmp_with/include/net-snmp/net-snmp-includes.h; then
-   			SNMP_INCDIR=$_libnetsnmp_with/include
-   			SNMP_LIBDIR=$_libnetsnmp_with/lib
-		elif test -f $withval/include/net-snmp-includes.h; then
-   			SNMP_INCDIR=$_libnetsnmp_with/include
-   			SNMP_LIBDIR=$_libnetsnmp_with/lib
-		else
-			found_netsnmp="no"
-			AC_MSG_RESULT(no)
+
+		AC_CHECK_LIB(netsnmp, main, , AC_MSG_ERROR([Not found netsnmp library]))
+		SNMP_LIBS="$SNMP_LIBS -lnetsnmp"
+
+		_full_libnetsnmp_cflags=`$_libnetsnmp_config --cflags`
+		for i in $_full_libnetsnmp_cflags; do
+			case $i in
+				-I*)
+					SNMP_INCDIRS="$SNMP_INCDIRS $i"
+
+			;;
+			esac
+		done
+
+		_libnetsnmp_libdir=`$_libnetsnmp_config --libdir`
+
+		if test "x$found_netsnmp" != "xno"; then
+			found_netsnmp="yes"
+
+			SNMP_CPPFLAGS="$SNMP_INCDIRS"
+			SNMP_LDFLAGS="$SNMP_LIBDIRS $SNMP_LFLAGS $SNMP_LIBS"
+
+			AC_DEFINE(HAVE_NETSNMP,1,[Define to 1 if NET-SNMP should be enabled.])
+			AC_DEFINE(HAVE_SNMP,1,[Define to 1 if SNMP should be enabled.])
 		fi
-   	fi
-
-	if test "x$found_netsnmp" != "xno"; then
-		found_netsnmp="yes"
-                AC_MSG_RESULT(yes)
-
-                AC_CHECK_LIB(crypto, main,  SNMP_LIBS="$SNMP_LIBS -lcrypto")
-
-                SNMP_CPPFLAGS=-I$SNMP_INCDIR
-                SNMP_LDFLAGS="-L$SNMP_LIBDIR $SNMP_LFLAGS -lnetsnmp $SNMP_LIBS"
-
-                AC_DEFINE(HAVE_NETSNMP,1,[Define to 1 if NET-SNMP should be enabled.])
-                AC_DEFINE(HAVE_SNMP,1,[Define to 1 if SNMP should be enabled.])
+	else
+		found_netsnmp="no"
 	fi
   fi
 
