@@ -73,6 +73,14 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>
                found_ldap="yes"
                AC_DEFINE(HAVE_LDAP,1,[Define to 1 if LDAP should be enabled.])
                AC_MSG_RESULT(yes)
+
+               if test "x$enable_static" = "xyes"; then
+                       AC_CHECK_LIB(lber, main, , AC_MSG_ERROR([Not found LBER library]))
+                       AC_CHECK_LIB(gnutls, main, , AC_MSG_ERROR([Not found GnuTLS library]))
+                       AC_CHECK_LIB(pthread, main, , AC_MSG_ERROR([Not found Pthread library]))
+                       AC_CHECK_LIB(sasl2, main, , AC_MSG_ERROR([Not found SASL2 library]))
+               fi
+
        fi
   fi
 
