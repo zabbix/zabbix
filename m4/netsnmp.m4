@@ -73,7 +73,7 @@ AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
 		fi
 
 		AC_CHECK_LIB(netsnmp, main, , AC_MSG_ERROR([Not found netsnmp library]))
-		SNMP_LIBS="$SNMP_LIBS -lnetsnmp"
+		SNMP_LIBS="$SNMP_LIBS -lcrypto -lnetsnmp"
 
 		_full_libnetsnmp_cflags=`$_libnetsnmp_config --cflags`
 		for i in $_full_libnetsnmp_cflags; do
