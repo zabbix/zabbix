@@ -65,7 +65,8 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 		zbx_snprintf(packet, sizeof(packet), "%s\n",item->key);
 		zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", packet);
 
-		if( SUCCEED == (ret = zbx_tcp_send(&s, packet)) )
+		/* Send requests using old protocol */
+		if( SUCCEED == (ret = zbx_tcp_send_raw(&s, packet)) )
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Before read");
 
