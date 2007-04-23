@@ -638,7 +638,8 @@ if test "x$want_netsnmp" = "xyes"; then
 	fi
 fi
 CFLAGS="${CFLAGS} ${SNMP_CPPFLAGS}"
-LDFLAGS="${LDFLAGS} ${SNMP_LDFLAGS}"
+LDFLAGS="${LDFLAGS}"
+LIBS="${LIBS} ${SNMP_LDFLAGS}"
 
 dnl Check for UCD-SNMP [by default - skip]
 LIBSNMP_CHECK_CONFIG([no])
