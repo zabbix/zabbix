@@ -242,7 +242,9 @@ static void update_key_status(zbx_uint64_t hostid,int host_status)
 int get_values(void)
 {
 	DB_RESULT	result;
+	DB_RESULT	result2;
 	DB_ROW	row;
+	DB_ROW	row2;
 
 	int		now;
 	int		res;
@@ -257,8 +259,7 @@ int get_values(void)
 	/* Poller for unreachable hosts */
 	if(poller_type == ZBX_POLLER_TYPE_UNREACHABLE)
 	{
-		result = DBselect("select %s where " ZBX_SQL_MOD(h.hostid,%d) "=%d and i.nextcheck<=%d and i.status in (%d) and i.type not in (%d,%d,%d) and h.status=%d and h.disable_until<=%d and h.errors_from!=0 and h.hostid=i.hostid and i.key_ not in ('%s','%s','%s','%s') and " ZBX_COND_NODEID " order by i.nextcheck",
-			ZBX_SQL_ITEM_SELECT,
+		result = DBselect("select h.hostid,i.itemid from hosts h,items i where " ZBX_SQL_MOD(h.hostid,%d) "=%d and i.nextcheck<=%d and i.status in (%d) and i.type not in (%d,%d,%d) and h.status=%d and h.disable_until<=%d and h.errors_from!=0 and h.hostid=i.hostid and i.key_ not in ('%s','%s','%s','%s') and " ZBX_COND_NODEID " group by h.hostid order by i.nextcheck",
 			CONFIG_UNREACHABLE_POLLER_FORKS,
 			poller_num-1,
 			now,
@@ -301,9 +302,32 @@ int get_values(void)
 		}
 	}
 
-	while((row=DBfetch(result))&&(stop==0))
+	/* Do not stop when select is made by poller for unreachable hosts */
+	while((row=DBfetch(result))&&(stop==0 || poller_type == ZBX_POLLER_TYPE_UNREACHABLE))
 	{
-		DBget_item_from_db(&item,row);
+		/* Poller for unreachable hosts */
+		if(poller_type == ZBX_POLLER_TYPE_UNREACHABLE)
+		{
+			result2 = DBselect("select %s where h.hostid=i.hostid and i.itemid=%s and" ZBX_COND_NODEID,
+				ZBX_SQL_ITEM_SELECT,
+				row[1],
+				LOCAL_NODE("h.hostid"));
+
+			row2 = DBfetch(result2);
+
+			if(!row2)
+			{
+				DBfree_result(result2);
+				continue;
+			}
+			DBget_item_from_db(&item,row2);
+
+			DBfree_result(result2);
+		}
+		else
+		{
+			DBget_item_from_db(&item,row);
+		}
 
 		init_result(&agent);
 		res = get_value(&item, &agent);
