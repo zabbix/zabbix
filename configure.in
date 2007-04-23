@@ -479,7 +479,7 @@ AC_CHECK_FUNCS(getopt_long)
 
 dnl Check if we want to compile everything with static
 AC_ARG_ENABLE(static,[  --enable-static         Build statically linked binaries],
-[ LDFLAGS="-static ${LDFLAGS}";
+[ LDFLAGS="${LDFLAGS} -static";
  enable_static=yes])
 
 AC_ARG_ENABLE(server,[  --enable-server         Turn on build of server],
@@ -604,7 +604,8 @@ if test "$server" = "yes"; then
 	AC_SUBST(DB_LDFLAGS)
 
 	CFLAGS="${CFLAGS} ${DB_CPPFLAGS}"
-	LDFLAGS="${LDFLAGS} ${DB_LDFLAGS}"
+	LDFLAGS="${LDFLAGS}"
+	LIBS="${LIBS} ${DB_LDFLAGS}"
 	
 	dnl Checking for Jabber libraries
 	JABBER_CHECK_CONFIG()
