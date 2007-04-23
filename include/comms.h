@@ -20,6 +20,12 @@
 #ifndef ZABBIX_COMMS_H
 #define ZABBIX_COMMS_H
 
+typedef enum {
+	ZBX_TCP_ERR_NETWORK = 1,
+	ZBX_TCP_ERR_TIMEOUT
+} zbx_tcp_errors;
+
+
 #if defined(SOCKET)
 	typedef SOCKET ZBX_SOCKET;
 #else /* not SOCKET */
@@ -48,6 +54,7 @@ typedef struct zbx_sock
 } zbx_sock_t;
 
 char*	zbx_tcp_strerror(void);
+int	zbx_tcp_error(void);
 
 struct hostent	*zbx_gethost(const char *hostname);
 
