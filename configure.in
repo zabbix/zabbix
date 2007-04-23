@@ -32,6 +32,8 @@ AC_CANONICAL_HOST
 
 dnl Checks for programs.
 AC_PROG_CC
+dnl AC_PROG_RANLIB
+dnl AM_PROG_LIBTOOL
 
 dnl Checks for header files.
 AC_HEADER_STDC
@@ -477,8 +479,8 @@ AC_CHECK_FUNCS(getopt_long)
 
 dnl Check if we want to compile everything with static
 AC_ARG_ENABLE(static,[  --enable-static         Build statically linked binaries],
-[ CFLAGS="-static $CFLAGS";
-  enable_static=yes])
+[ LDFLAGS="-static ${LDFLAGS}";
+ enable_static=yes])
 
 AC_ARG_ENABLE(server,[  --enable-server         Turn on build of server],
 [case "${enableval}" in
@@ -506,7 +508,7 @@ if test "$server" = "yes"; then
 	LIBSQLORA8_CHECK_CONFIG()
 	if test "x$want_sqlora8" = "xyes"; then
 		if test "x$have_db" != "xno"; then
-			AC_MSG_ERROR([You can configure for only one database.]);
+			AC_MSG_ERROR([You can configure for only one database.])
 		fi
 
 		if test "x$found_sqlora8" = "xyes"; then
@@ -520,7 +522,7 @@ if test "$server" = "yes"; then
 
 			AC_DEFINE(HAVE_ORACLE,1,[Define to 1 if Oracle should be enabled.])
 		else
-			AC_MSG_ERROR([Not found Sqlora8 library]);
+			AC_MSG_ERROR([Not found Sqlora8 library])
 		fi
 	fi
 
@@ -528,13 +530,13 @@ if test "$server" = "yes"; then
 	AX_LIB_SQLITE3()
 	if test "x$WANT_SQLITE3" = "xyes"; then
 		if test "x$have_db" != "xno"; then
-			AC_MSG_ERROR([You can configure for only one database.]);
+			AC_MSG_ERROR([You can configure for only one database.])
 		fi
 
 		if test "x$found_sqlite3" = "xyes"; then
 			have_db="SQLite v3.x"
 		else
-			AC_MSG_ERROR([Not found SQLite3 library]);
+			AC_MSG_ERROR([Not found SQLite3 library])
 		fi
 	fi
 
@@ -542,7 +544,7 @@ if test "$server" = "yes"; then
 	AX_LIB_MYSQL()
 	if test "x$want_mysql" = "xyes"; then
 		if test "x$have_db" != "xno"; then
-			AC_MSG_ERROR([You can configure for only one database.]);
+			AC_MSG_ERROR([You can configure for only one database.])
 		fi
 
 		if test "x$found_mysql" = "xyes"; then
@@ -564,7 +566,7 @@ if test "$server" = "yes"; then
 			AC_MSG_RESULT(yes),
 			AC_MSG_RESULT(no))
 		else
-			AC_MSG_ERROR([Not found MySQL library]);
+			AC_MSG_ERROR([Not found MySQL library])
 		fi
 	fi
 
@@ -572,7 +574,7 @@ if test "$server" = "yes"; then
 	AX_LIB_POSTGRESQL()
 	if test "x$want_postgresql" = "xyes"; then
 		if test "x$have_db" != "xno"; then
-			AC_MSG_ERROR([You can configure for only one database.]);
+			AC_MSG_ERROR([You can configure for only one database.])
 		fi
 
 		if test "x$found_postgresql" = "xyes"; then
@@ -583,7 +585,7 @@ if test "$server" = "yes"; then
 			dnl It seems PostgreSQL does not require this
 			dnl AC_CHECK_FUNC(crypt, , AC_CHECK_LIB(crypt, crypt,  POSTGRESQL_LDFLAGS="-lcrypt $POSTGRESQL_LDFLAGS"))
 		else
-			AC_MSG_ERROR([Not found PostgreSQL library]);
+			AC_MSG_ERROR([Not found PostgreSQL library])
 		fi
 	fi
 
@@ -608,7 +610,7 @@ if test "$server" = "yes"; then
 	JABBER_CHECK_CONFIG()
 	if test "x$want_jabber" = "xyes"; then
 		if test "x$found_jabber" != "xyes"; then
-			AC_MSG_ERROR([Not found Jabber library]);
+			AC_MSG_ERROR([Not found Jabber library])
 		fi
 	fi
 	CFLAGS="${CFLAGS} ${JABBER_CPPFLAGS}"
@@ -618,7 +620,7 @@ if test "$server" = "yes"; then
 	LIBCURL_CHECK_CONFIG([yes], [7.15.1], [],[])
 	if test "x$want_curl" = "xyes"; then
 		if test "x$found_curl" != "xyes"; then
-			AC_MSG_ERROR([Not found Curl library]);
+			AC_MSG_ERROR([Not found Curl library])
 		fi
 	fi
 	CFLAGS="${CFLAGS} ${LIBCURL_CPPFLAGS}"
@@ -631,7 +633,7 @@ dnl Check for NET-SNMP [by default - skip]
 LIBNETSNMP_CHECK_CONFIG([no])
 if test "x$want_netsnmp" = "xyes"; then
 	if test "x$found_netsnmp" != "xyes"; then
-		AC_MSG_ERROR([Invalid NET-SNMP directory - unable to find net-snmp-config.h])
+		AC_MSG_ERROR([Invalid NET-SNMP directory - unable to find net-snmp-config])
 	fi
 fi
 CFLAGS="${CFLAGS} ${SNMP_CPPFLAGS}"
@@ -645,7 +647,7 @@ if test "x$want_snmp" = "xyes"; then
 	fi
 
 	if test  "x$found_netsnmp" = "xyes"; then
-		AC_MSG_ERROR([You can configure for only one SNMP library.]);
+		AC_MSG_ERROR([You can configure for only one SNMP library.])
 	fi
 fi
 CFLAGS="${CFLAGS} ${SNMP_CPPFLAGS}"
@@ -667,6 +669,7 @@ AC_SUBST(RANLIB)
 dnl AC_CONFIG_HEADER(include/config.h)
 
 AC_MSG_CHECKING(for architecture)
+
 # Cheks for host_os 
 case "$host_os" in
 linux*)

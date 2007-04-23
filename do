@@ -108,27 +108,38 @@ then
   echo "Pre-making..."
   echo "Pre-making..." >> WARNINGS
 #  aclocal 2>> WARNINGS
-  echo -n " 1"
-  aclocal -I m4 2>> WARNINGS
-  if [ "x$?" = "x0" ] 
-  then
-    echo -n "2"
-    autoconf 2>> WARNINGS
+
+#  echo -n " 0"
+#  echo " 0. libtoolize" >> WARNINGS
+#  libtoolize -f 2>> WARNINGS
+#  if [ "x$?" = "x0" ] 
+#  then
+    echo -n "1"
+    echo " 1. aclocal" >> WARNINGS
+    aclocal -I m4 2>> WARNINGS
     if [ "x$?" = "x0" ] 
     then
-      echo -n "3"
-      autoheader 2>> WARNINGS
+      echo -n "2"
+      echo " 2. autoconf" >> WARNINGS
+      autoconf 2>> WARNINGS
       if [ "x$?" = "x0" ] 
       then
-        echo -n "4"
-        automake -a 2>> WARNINGS
+        echo -n "3"
+        echo " 3. autoheader" >> WARNINGS
+        autoheader 2>> WARNINGS
         if [ "x$?" = "x0" ] 
         then
-          premake_is_ok=1
+          echo -n "4"
+          echo " 4. automake" >> WARNINGS
+          automake -a 2>> WARNINGS
+          if [ "x$?" = "x0" ] 
+          then
+            premake_is_ok=1
+          fi
         fi
       fi
     fi
-  fi
+#  fi
   echo
 fi
 
