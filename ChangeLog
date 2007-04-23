@@ -1,9 +1,10 @@
 Changes for 1.3.5:
 
+ - new logic for poller for unreachable hosts (Alexei)
  - fixed fatal error in cbutton.inc.php for some platforms (Alexei)
  - fixed zabbix_server's option -V (Alexei)
  - fixed compilation under Solaris (Alexei)
- - added discovery based on data receivedfrom ZABBIX and SNMP agents (Alexei)
+ - added discovery based on data received from ZABBIX and SNMP agents (Alexei)
 
 Changes for 1.3.5:
 
