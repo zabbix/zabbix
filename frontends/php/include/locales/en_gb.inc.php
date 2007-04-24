@@ -465,7 +465,7 @@
 	'S_COMPARE'=>				'Compare',
 
 //	Footer
-	'S_ZABBIX_VER'=>			'ZABBIX 1.3.5',
+	'S_ZABBIX_VER'=>			'ZABBIX 1.3.6',
 	'S_COPYRIGHT_BY'=>			'Copyright 2001-2007 by ',
 	'S_CONNECTED_AS'=>			'Connected as',
 	'S_SIA_ZABBIX'=>			'SIA Zabbix',
