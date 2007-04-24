@@ -25,7 +25,7 @@
 #
 #   This macro calls:
 #
-#     AC_SUBST(MYSQL_CPPFLAGS)
+#     AC_SUBST(MYSQL_CFLAGS)
 #     AC_SUBST(MYSQL_LDFLAGS)
 #     AC_SUBST(MYSQL_VERSION)
 #
@@ -64,8 +64,9 @@ AC_DEFUN([AX_LIB_MYSQL],
         [want_mysql="no"]
     )
 
-    MYSQL_CPPFLAGS=""
+    MYSQL_CFLAGS=""
     MYSQL_LDFLAGS=""
+    MYSQL_LIBS=""
     MYSQL_VERSION=""
 
     dnl
@@ -79,10 +80,45 @@ AC_DEFUN([AX_LIB_MYSQL],
         fi
 
         if test "$MYSQL_CONFIG" != "no"; then
-            AC_MSG_CHECKING([for MySQL libraries])
+dnl            AC_MSG_CHECKING([for MySQL libraries])
 
-            MYSQL_CPPFLAGS="`$MYSQL_CONFIG --cflags`"
-            MYSQL_LDFLAGS="`$MYSQL_CONFIG --libs`"
+            MYSQL_CFLAGS="`$MYSQL_CONFIG --cflags`"
+
+            if test "x$enable_static" = "xyes"; then
+               _full_libmysql_libs="`$MYSQL_CONFIG --libs`"
+ 
+               for i in $_full_libmysql_libs; do
+                   case $i in
+           	   -lmysqlclient)
+           	;;
+                      -L*)
+                           MYSQL_LDFLAGS="${MYSQL_LDFLAGS} $i"
+                   ;;
+                      -l*)
+                           _lib_name="`echo "$i" | cut -b3-`"
+                           MYSQL_LIBS="${MYSQL_LIBS} ${i}"
+                   ;;
+                   esac
+               done
+            fi
+
+		_save_mysql_libs="${LIBS}"
+		_save_mysql_ldflags="${LDFLAGS}"
+		_save_mysql_cflags="${CFLAGS}"
+		LIBS="${LIBS} ${MYSQL_LIBS}"
+		LDFLAGS="${LDFLAGS} ${MYSQL_LDFLAGS}"
+		CFLAGS="${CFLAGS} ${MYSQL_CFLAGS}"
+
+		AC_CHECK_LIB(mysqlclient , main, , AC_MSG_ERROR([Not found mysqlclient library]))
+
+		LIBS="${_save_mysql_libs}"
+		LDFLAGS="${_save_mysql_ldflags}"
+		CFLAGS="${_save_mysql_cflags}"
+		unset _save_mysql_libs
+		unset _save_mysql_ldflags
+		unset _save_mysql_cflags
+
+	    MYSQL_LIBS="-lmysqlclient ${MYSQL_LIBS}"
 
             MYSQL_VERSION=`$MYSQL_CONFIG --version`
 
@@ -90,10 +126,10 @@ AC_DEFUN([AX_LIB_MYSQL],
                 [Define to 1 if MySQL libraries are available])
 
             found_mysql="yes"
-            AC_MSG_RESULT([yes])
+dnl            AC_MSG_RESULT([yes])
         else
             found_mysql="no"
-            AC_MSG_RESULT([no])
+dnl            AC_MSG_RESULT([no])
         fi
     fi
 
@@ -143,6 +179,7 @@ AC_DEFUN([AX_LIB_MYSQL],
     fi
 
     AC_SUBST([MYSQL_VERSION])
-    AC_SUBST([MYSQL_CPPFLAGS])
+    AC_SUBST([MYSQL_CFLAGS])
     AC_SUBST([MYSQL_LDFLAGS])
+    AC_SUBST([MYSQL_LIBS])
 ])
