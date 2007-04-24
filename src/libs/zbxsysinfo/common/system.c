@@ -54,7 +54,10 @@ int     SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_R
 #if defined(_WINDOWS)
 	DWORD	dwSize;
 	char	*cpuType,
-		computerName[MAX_COMPUTERNAME_LENGTH],
+
+		/* NOTE: The buffer size should be large enough to contain MAX_COMPUTERNAME_LENGTH + 1 characters.*/
+		computerName[MAX_COMPUTERNAME_LENGTH + 1],
+
 		osVersion[256],
 		buffer[MAX_STRING_LEN];
 	SYSTEM_INFO
@@ -62,8 +65,10 @@ int     SYSTEM_UNAME(const char *cmd, const char *param, unsigned flags, AGENT_R
 	OSVERSIONINFO
 		versionInfo;
 
-	dwSize = MAX_COMPUTERNAME_LENGTH;
-	GetComputerName(computerName,&dwSize);
+	dwSize = sizeof(computerName);
+	
+	if( 0 == GetComputerName(computerName,&dwSize))
+		computerName[0] = '\0';
 
 	versionInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
 	GetVersionEx(&versionInfo);
@@ -165,11 +170,14 @@ int     SYSTEM_HOSTNAME(const char *cmd, const char *param, unsigned flags, AGEN
 {
 #if defined(_WINDOWS)
 	DWORD dwSize;
-	char buffer[MAX_COMPUTERNAME_LENGTH];
+
+	/* NOTE: The buffer size should be large enough to contain MAX_COMPUTERNAME_LENGTH + 1 characters.*/
+	char buffer[MAX_COMPUTERNAME_LENGTH + 1];
 
 
-	dwSize = MAX_COMPUTERNAME_LENGTH;
-	GetComputerName(buffer, &dwSize);
+	dwSize = sizeof(buffer);
+	if( 0 == GetComputerName(buffer, &dwSize) )
+		buffer[0] = '\0';
 
 	SET_STR_RESULT(result, strdup(buffer));
 
