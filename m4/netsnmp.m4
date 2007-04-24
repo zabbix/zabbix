@@ -68,7 +68,7 @@ dnl		AC_MSG_CHECKING([for NET-SNMP libraries])
 		done
 
 		if test "x$enable_static" = "xyes"; then
-			_full_libnetsnmp_libs="`$_libnetsnmp_config --libs`"
+			_full_libnetsnmp_libs="`$_libnetsnmp_config --libs` -lcrypto"
 
 			for i in $_full_libnetsnmp_libs; do
 				case $i in

@@ -806,7 +806,7 @@ Configuration:
   Compiler:         ${CC}
   Compiler flags:   ${CFLAGS}
   Linker flags:     ${LDFLAGS}
-  Libraryes:        ${LIBS}
+  Libraries:        ${LIBS}
 
   Enable server:    ${server}
   With database:    ${have_db}
