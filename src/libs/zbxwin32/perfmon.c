@@ -32,7 +32,9 @@ char *GetCounterName(DWORD index)
 {
 	PERFCOUNTER	*counterName;
 	DWORD		dwSize;
-	char		hostname[MAX_COMPUTERNAME_LENGTH];
+
+	/* NOTE: The buffer size should be large enough to contain MAX_COMPUTERNAME_LENGTH + 1 characters.*/
+	char		hostname[MAX_COMPUTERNAME_LENGTH +1 + 2]; /* +2 for '\\' symbols */
 
 	counterName = PerfCounterList;
 	while(counterName!=NULL)
@@ -50,9 +52,10 @@ char *GetCounterName(DWORD index)
 
 		hostname[0] = hostname[1] = '\\';
 		dwSize = sizeof(hostname) - 2;
-		if(GetComputerName(hostname + 2, &dwSize)==0)
+		if( 0 == GetComputerName(hostname + 2, &dwSize) )
 		{
 			zabbix_log(LOG_LEVEL_ERR, "GetComputerName failed: %s", strerror_from_system(GetLastError()));
+			return "UnknownPerformanceCounter";
 		}
 
 		dwSize = sizeof(counterName->name);
