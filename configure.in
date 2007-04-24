@@ -551,12 +551,6 @@ if test "$server" = "yes"; then
 
 			have_db="MySQL"
 
-			dnl MySQL requires -lm sometime
-			AC_CHECK_FUNC(floor, , AC_CHECK_LIB(m, floor, MYSQL_LDFLAGS="$MYSQL_LDFLAGS -lm"))
-
-			dnl MySQL 3.23 requires -lz sometime
-			AC_CHECK_LIB(z, compress, MYSQL_LDFLAGS="$MYSQL_LDFLAGS -lz")
-
 			dnl Check forql_autocommit in MySQL
 			AC_MSG_CHECKING(for mysql_autocommit in MySQL)
 			AC_TRY_COMPILE(
@@ -597,15 +591,17 @@ if test "$server" = "yes"; then
 		AC_MSG_RESULT(ok)
 	fi
 
-	DB_CPPFLAGS="$ORACLE_CPPFLAGS $SQLITE3_CPPFLAGS $MYSQL_CPPFLAGS $POSTGRESQL_CPPFLAGS"
+	DB_CPPFLAGS="$ORACLE_CPPFLAGS $SQLITE3_CPPFLAGS $MYSQL_CFLAGS $POSTGRESQL_CPPFLAGS"
 	DB_LDFLAGS="$ORACLE_LDFLAGS $SQLITE3_LDFLAGS $MYSQL_LDFLAGS $POSTGRESQL_LDFLAGS"
+	DB_LIBS="$ORACLE_LIBS $SQLITE3_LIBS $MYSQL_LIBS $POSTGRESQL_LIBS"
 
 	AC_SUBST(DB_CPPFLAGS)
 	AC_SUBST(DB_LDFLAGS)
+	AC_SUBST(DB_LIBS)
 
 	CFLAGS="${CFLAGS} ${DB_CPPFLAGS}"
-	LDFLAGS="${LDFLAGS}"
-	LIBS="${LIBS} ${DB_LDFLAGS}"
+	LDFLAGS="${LDFLAGS} ${DB_LDFLAGS}"
+	LIBS="${LIBS} ${DB_LIBS}"
 	
 	dnl Checking for Jabber libraries
 	JABBER_CHECK_CONFIG()
@@ -617,8 +613,8 @@ if test "$server" = "yes"; then
 	CFLAGS="${CFLAGS} ${JABBER_CPPFLAGS}"
 	LDFLAGS="${LDFLAGS} ${JABBER_LDFLAGS}"
 
-	dnl Check for libCurl [default - no]
-	LIBCURL_CHECK_CONFIG([no], [7.15.1], [],[])
+	dnl Check for libCurl [default - yes]
+	LIBCURL_CHECK_CONFIG([yes], [7.15.1], [],[])
 	if test "x$want_curl" = "xyes"; then
 		if test "x$found_curl" != "xyes"; then
 			AC_MSG_ERROR([Not found Curl library])
@@ -626,6 +622,7 @@ if test "$server" = "yes"; then
 	fi
 	CFLAGS="${CFLAGS} ${LIBCURL_CPPFLAGS}"
 	LDFLAGS="${LDFLAGS} ${LIBCURL_LDFLAGS}"
+	LIBS="${LIBS} ${LIBCURL_LIBS}"
 fi
 
 AM_CONDITIONAL(JABBER,  test "x$found_jabber" = "xyes")
@@ -637,9 +634,9 @@ if test "x$want_netsnmp" = "xyes"; then
 		AC_MSG_ERROR([Invalid NET-SNMP directory - unable to find net-snmp-config])
 	fi
 fi
-CFLAGS="${CFLAGS} ${SNMP_CPPFLAGS}"
-LDFLAGS="${LDFLAGS}"
-LIBS="${LIBS} ${SNMP_LDFLAGS}"
+CFLAGS="${CFLAGS} ${SNMP_CFLAGS}"
+LDFLAGS="${LDFLAGS} ${SNMP_LDFLAGS}"
+LIBS="${LIBS} ${SNMP_LIBS}"
 
 dnl Check for UCD-SNMP [by default - skip]
 LIBSNMP_CHECK_CONFIG([no])
@@ -808,7 +805,8 @@ Configuration:
 
   Compiler:         ${CC}
   Compiler flags:   ${CFLAGS}
-  Linker flags:     ${LDFLAGS} ${LIBS}
+  Linker flags:     ${LDFLAGS}
+  Libraryes:        ${LIBS}
 
   Enable server:    ${server}
   With database:    ${have_db}
