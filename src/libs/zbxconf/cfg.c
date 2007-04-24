@@ -62,6 +62,8 @@ int	parse_cfg_file(const char *cfg_file,struct cfg_line *cfg)
 
 	int	var;
 
+	int	result = SUCCEED;
+
 	assert(cfg);
 
 	if(cfg_file)
@@ -83,11 +85,16 @@ int	parse_cfg_file(const char *cfg_file,struct cfg_line *cfg)
 				if(NULL == value)
 				{
 					zbx_error("Error in line [%d] \"%s\"", lineno, line);
-					return	FAIL;
+					result = FAIL;
+					break;
 				}
 
 				*value = '\0';
 				value++;
+
+				zbx_rtrim(value, " \r\n\0");
+
+				zabbix_log(LOG_LEVEL_DEBUG, "cfg: para: [%s] val [%s]", parameter, value);
 
 				for(i = 0; value[i] != '\0'; i++)
 				{
@@ -114,12 +121,8 @@ int	parse_cfg_file(const char *cfg_file,struct cfg_line *cfg)
 					{
 						var = atoi(value);
 
-						if(cfg[i].min) 
-							if(var < cfg[i].min)
-								goto lbl_incorrect_config;
-
-						if(cfg[i].max) 
-							if(var > cfg[i].max)
+						if ( (cfg[i].min && var < cfg[i].min) ||
+							(cfg[i].max && var > cfg[i].max) )
 								goto lbl_incorrect_config;
 
 						*((int*)cfg[i].variable) = var;
@@ -130,6 +133,7 @@ int	parse_cfg_file(const char *cfg_file,struct cfg_line *cfg)
 					}
 				}
 			}
+			fclose(file);
 		}
 	}
 
