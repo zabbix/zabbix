@@ -410,14 +410,6 @@ static int	DBadd_graph(
 	return result;
 }
 
-static int	DBdelete_graph_item(
-		zbx_uint64_t graphid
-	)
-{
-//--	!!!TODO!!!
-	return FAIL;
-}
-
 static int	DBdelete_graph(
 		zbx_uint64_t graphid
 	)
@@ -460,6 +452,71 @@ static int	DBdelete_graph(
 	return result;
 }
 
+static int	DBdelete_graph_item(
+		zbx_uint64_t gitemid
+	)
+{
+	DB_RESULT	db_graphs;
+	DB_RESULT	db_chd_gitems;
+
+	DB_ROW		graph_data;
+	DB_ROW		chd_gitem_data;
+
+	zbx_uint64_t
+		graphid,
+		templateid,
+		chd_gitemid;
+
+	int		result;
+
+	db_graphs = DBselect("select g.graphid,g.name,g.templateid from graphs g,graphs_ietms gi "
+			" gi.gitemid=" ZBX_FS_UI64 " and gi.graphid=g.graphid ");
+
+	if( (graph_data = DBfetch(db_graphs)) )
+	{
+		ZBX_STR2UINT64(graphid, graph_data[0]);
+		ZBX_STR2UINT64(templateid, graph_data[2]);
+
+		db_chd_gitems = DBselect("select distinct cgi.gitemid from graphs cg,graphs_items cgi,graphs_items tgi,items ci,items ti "
+				" where tgi.gitemid=" ZBX_FS_UI64 " and cg.templateid=tgi.graphid and cgi.graphid=cg.graphid and "
+				" cgi.drawtype=tgi.drawtype and cgi.sortorder=tgi.sortorder and cgi.color=tgi.color "
+				" and cgi.yaxisside=tgi.yaxisside and cgi.itemid=ci.itemid and tgi.itemid=ti.itemid and ci.key_=ti.key_");
+
+		while( (chd_gitem_data = DBfetch(db_chd_gitems)) )
+		{
+			ZBX_STR2UINT64(chd_gitemid, chd_gitem_data[0]);
+
+			/* recursion */
+			if( SUCCEED != (result = DBdelete_graph_item(chd_gitemid)) )
+				break;
+		}
+
+		DBfree_result(db_chd_gitems);
+
+		if( SUCCEED == result )
+		/* delete graph items */
+		if( SUCCEED == (result = DBexecute("delete from graphs_items where gitemid=" ZBX_FS_UI64, gitemid)) )
+		{
+			zabbix_log(LOG_LEVEL_DEBUG,"Graphitem with ID [" ZBX_FS_UI64 "] deleted from graph '%s'", gitemid, graph_data[1]);
+
+			db_chd_gitems = DBselect("select count(*) from graphs_items where graphid=" ZBX_FS_UI64, graphid);
+
+			if( (chd_gitem_data = DBfetch(db_chd_gitems)) )
+			{
+				if( templateid > 0 && 0 == atoi(chd_gitem_data[0]))
+				{ /* delete empty child graphs */
+					return DBdelete_graph(graphid);
+				}
+			}
+
+			DBfree_result(db_chd_gitems);
+		}
+	}
+
+	DBfree_result(db_graphs);
+
+	return result;
+}
 
 static int	DBdelete_item(
 		zbx_uint64_t itemid
@@ -1223,11 +1280,11 @@ static int	DBadd_item(
 
 	DB_RESULT	db_hosts;
 	DB_RESULT	db_items;
-	DB_RESULT	db_ch_hosts;
+	DB_RESULT	db_chd_hosts;
 
 	DB_ROW		host_data;
 	DB_ROW		item_data;
-	DB_ROW		ch_host_data;
+	DB_ROW		chd_host_data;
 
 	zbx_uint64_t
 		itemid,
@@ -1329,12 +1386,12 @@ static int	DBadd_item(
 				}
 
 				/* add items to child hosts */
-				db_ch_hosts = DBselect("select hostid from hosts where templateid=" ZBX_FS_UI64, hostid);
+				db_chd_hosts = DBselect("select hostid from hosts where templateid=" ZBX_FS_UI64, hostid);
 
-				while( (ch_host_data = DBfetch(db_ch_hosts)) )
+				while( (chd_host_data = DBfetch(db_chd_hosts)) )
 				{	/* recursion */
 
-					ZBX_STR2UINT64(chd_hostid, ch_host_data[0]);
+					ZBX_STR2UINT64(chd_hostid, chd_host_data[0]);
 
 					DBget_same_applications_for_host(apps, chd_hostid, applications, sizeof(applications) / sizeof(zbx_uint64_t));
 
@@ -1349,7 +1406,7 @@ static int	DBadd_item(
 							break;
 				}
 
-				DBfree_result(db_ch_hosts);
+				DBfree_result(db_chd_hosts);
 
 				if( SUCCEED != result )
 				{
@@ -1482,6 +1539,211 @@ static int	DBreset_items_nextcheck(
 	return SUCCEED;
 }
 
+static int	DBreplace_template_dependences(
+		zbx_uint64_t	*dependences_in,
+		zbx_uint64_t	hostid,
+		zbx_uint64_t	*dependences,
+		int		max_dependences
+	)
+{
+	DB_RESULT	db_triggers;
+
+	DB_ROW		trigger_data;
+
+	register int	i = 0, j = 0;
+
+	while( 0 < dependences_in[i] )
+	{
+		db_triggers = DBselect("select t.triggerid from triggers t,functions f,items i "
+				" where t.templateid=" ZBX_FS_UI64 " and f.triggerid=t.triggerid "
+				" and f.itemid=i.itemid and i.hostid=" ZBX_FS_UI64,
+				dependences_in[i], hostid);
+
+		if( j < (max_dependences - 1) && (trigger_data = DBfetch(db_triggers)) )
+		{
+			ZBX_STR2UINT64(dependences[j], trigger_data[0]);
+			j++;
+		}
+
+		DBfree_result(db_triggers);
+
+		i++;
+	}
+
+	dependences[j] = 0;
+
+	return j;
+}
+
+static int	DBadd_event(
+		zbx_uint64_t	triggerid,
+		int		value,
+		time_t		now
+		)
+{
+	DB_RESULT	db_events;
+
+	DB_ROW		event_data;
+
+	zbx_uint64_t
+		eventid;
+
+	int	result = FAIL;;
+
+	if( !now )	now = time(NULL);
+
+	db_events = DBselect("select value,clock from events where objectid=" ZBX_FS_UI64 " and object=%i "
+		" order by clock desc", triggerid, EVENT_OBJECT_TRIGGER);
+
+	if( (event_data = DBfetch(db_events)) )
+	{
+		if( value != atoi(event_data[0]) )
+			result = SUCCEED;
+	}
+
+	if( SUCCEED == result )
+	{
+		eventid = DBget_maxid("events","eventid");
+
+		DBexecute("insert into events(eventid,source,object,objectid,clock,value) "
+				" values(" ZBX_FS_UI64 ",%i,%i," ZBX_FS_UI64 ",%lu,%i)",
+				eventid, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid, now, value);
+
+		if(value == TRIGGER_VALUE_FALSE || value == TRIGGER_VALUE_TRUE)
+		{
+			DBexecute("update alerts set retries=3,error='Trigger changed its status. WIll not send repeats.'"
+				" where triggerid=" ZBX_FS_UI64 " and repeats>0 and status=%i",
+				triggerid, ALERT_STATUS_NOT_SENT);
+		}
+	}
+	return result;
+}
+
+static char*	DBimplode_exp (
+		const char *expression,
+		zbx_uint64_t	triggerid
+	)
+{
+	return NULL;
+//--	TODO!!!
+#if 0
+	# Translate localhost:procload.last(0)>10 to {12}>10
+//		echo "Expression:$expression<br>";
+		$exp='';
+		$state="";
+		for($i=0,$max=strlen($expression); $i<$max; $i++)
+		{
+			if($expression[$i] == '{')
+			{
+				if($state=="")
+				{
+					$host='';
+					$key='';
+					$function='';
+					$parameter='';
+					$state='HOST';
+					continue;
+				}
+			}
+// Processing of macros {TRIGGER.VALUE}
+			if( ($expression[$i] == '}')&&($state=="HOST") )
+			{
+				$exp = $exp."{".$host."}";
+				$state="";
+				continue;
+			}
+			if( ($expression[$i] == '}')&&($state=="") )
+			{
+//				echo "HOST:$host<BR>";
+//				echo "KEY:$key<BR>";
+//				echo "FUNCTION:$function<BR>";
+//				echo "PARAMETER:$parameter<BR>";
+				$state='';
+		
+				$res=DBselect("select i.itemid from items i,hosts h".
+					" where i.key_=".zbx_dbstr($key).
+					" and h.host=".zbx_dbstr($host).
+					" and h.hostid=i.hostid");
+				$row=DBfetch($res);
+
+				$itemid=$row["itemid"];
+	
+				$functionid = get_dbid("functions","functionid");
+				$res=DBexecute("insert into functions (functionid,itemid,triggerid,function,parameter)".
+					" values ($functionid,$itemid,$triggerid,".zbx_dbstr($function).",".
+					zbx_dbstr($parameter).")");
+				if(!$res)
+				{
+					return	$res;
+				}
+
+				$exp=$exp.'{'.$functionid.'}';
+
+				continue;
+			}
+			if($expression[$i] == '(')
+			{
+				if($state == "FUNCTION")
+				{
+					$state='PARAMETER';
+					continue;
+				}
+			}
+			if($expression[$i] == ')')
+			{
+				if($state == "PARAMETER")
+				{
+					$state='';
+					continue;
+				}
+			}
+			if(($expression[$i] == ':') && ($state == "HOST"))
+			{
+				$state="KEY";
+				continue;
+			}
+			if($expression[$i] == '.')
+			{
+				if($state == "KEY")
+				{
+					$state="FUNCTION";
+					continue;
+				}
+				// Support for '.' in KEY
+				if($state == "FUNCTION")
+				{
+					$state="FUNCTION";
+					$key=$key.".".$function;
+					$function="";
+					continue;
+				}
+			}
+			if($state == "HOST")
+			{
+				$host=$host.$expression[$i];
+				continue;
+			}
+			if($state == "KEY")
+			{
+				$key=$key.$expression[$i];
+				continue;
+			}
+			if($state == "FUNCTION")
+			{
+				$function=$function.$expression[$i];
+				continue;
+			}
+			if($state == "PARAMETER")
+			{
+				$parameter=$parameter.$expression[$i];
+				continue;
+			}
+			$exp=$exp.$expression[$i];
+		}
+		return $exp;
+#endif
+}
+
 static int	DBupdate_trigger(
 		zbx_uint64_t	triggerid,
 		const char	*expression,
@@ -1494,69 +1756,106 @@ static int	DBupdate_trigger(
 		zbx_uint64_t	templateid
 	)
 {
-#if 0
-	char *sql = NULL;
+	DB_RESULT	db_triggers;
+	DB_RESULT	db_chd_triggers;
+	DB_RESULT	db_chd_hosts;
 
-	db_trigger = DBselect("select description from triggers where triggerid=" ZBX_FS_UI64, triggerid);
+	DB_ROW		trigger_data;
+	DB_ROW		chd_trigger_data;
+	DB_ROW		chd_host_data;
+
+	zbx_uint64_t
+		chd_hostid,
+		chd_triggerid,
+		new_dependences[ZBX_MAX_DEPENDENCES];
+
+	char 
+		*search = NULL,
+		*replace = NULL,
+		*new_expression = NULL,
+		*short_expression = NULL,
+		*sql = NULL;
+
+	int	result = FAIL,
+		i = 0;
+
+	db_triggers = DBselect("select distinct t.description,h.host from triggers t,functions f,items i,hosts h "
+		       " where t.triggerid=" ZBX_FS_UI64 " and f.triggerid=t.triggerid "
+		       " and i.itemid=f.itemid and i.hostid=h.hostid", triggerid);
 
 	if( (trigger_data = DBfetch(db_triggers)) )
 	{
-// !!!TODO!!!
-                $trig_host      = DBfetch($trig_hosts);
+		search = zbx_dsprintf(search, "{%s:", trigger_data[1] /* template host */);
 
-                $exp_hosts      = get_hosts_by_expression($expression);
-                $chd_hosts      = get_hosts_by_templateid($trig_host["hostid"]);
+		db_chd_triggers = DBselect("select distinct triggerid from triggers where templateid=" ZBX_FS_UI64, triggerid);
 
-                if(DBfetch($chd_hosts))
-                {
-                        $exp_host = DBfetch($exp_hosts);
-                        $db_chd_triggers = get_triggers_by_templateid($triggerid);
-                        while($db_chd_trigger = DBfetch($db_chd_triggers))
-                        {
-                                $chd_trig_hosts = get_hosts_by_triggerid($db_chd_trigger["triggerid"]);
-                                $chd_trig_host = DBfetch($chd_trig_hosts);
-
-                                $newexpression = str_replace(
-                                        "{".$exp_host["host"].":",
-                                        "{".$chd_trig_host["host"].":",
-                                        $expression);
-                        // recursion
-                                DBupdate_trigger(
-                                        $db_chd_trigger["triggerid"],
-                                        $newexpression,
-                                        $description,
-                                        $priority,
-                                        -1,           /* status */
-                                        $comments,
-                                        $url,
-                                        replace_template_dependences($deps, $chd_trig_host['hostid']),
-                                        $triggerid);
-                        }
-                }
-
-                if( SUCCEED == (result = DBexecute("delete from functions where triggerid=" ZBX_FS_UI64, triggerid)) )
+		while( (chd_trigger_data = DBfetch(db_chd_triggers)) )
 		{
+			ZBX_STR2UINT64(chd_triggerid, chd_trigger_data[0]);
 
-			$expression = implode_exp($expression,$triggerid);
-			
-			add_event($triggerid,TRIGGER_VALUE_UNKNOWN);
+			db_chd_hosts = DBselect("select distinct h.hostid,h.host from hosts h,items i,functions f "
+					" where f.triggerid=" ZBX_FS_UI64 " and f.itemid=i.itemid and i.hostid=h.hostid");
 
-			DBreset_items_nextcheck($triggerid);
+			if( (chd_host_data = DBfetch(db_chd_hosts)) )
+			{
+				ZBX_STR2UINT64(chd_hostid, chd_host_data[0]);
 
-			sql = zbx_strdcat(sql, "update triggers set"); /*!!! sql must be NULL !!!*/
+				replace = zbx_dsprintf(replace, "{%s:", db_chd_hosts[0] /* child host */);
 
-			if( expression )	sql = zbx_strdcatf(sql, " expression='%s',",	expression);
+				new_expression = string_replace(expression, search, replace);
+
+				zbx_free(replace);
+
+				DBreplace_template_dependences(dependences, chd_hostid, new_dependences, sizeof(new_dependences) / sizeof(zbx_uint64_t));
+
+				/* recursion */
+				DBupdate_trigger(
+					chd_triggerid,
+					new_expression,
+					description,
+					priority,
+					-1,           /* status */
+					comments,
+					url,
+					new_dependences,
+					triggerid);
+
+				zbx_free(new_expression);				
+			}
+
+			DBfree_result(db_chd_hosts);
+		}
+
+		zbx_free(search);
+
+		DBfree_result(db_chd_triggers);
+
+		if( SUCCEED == (result = DBexecute("delete from functions where triggerid=" ZBX_FS_UI64, triggerid)) )
+		{
+			sql = zbx_strdcat(NULL, "update triggers set");
+
+			if( expression ) {
+
+				short_expression = DBimplode_exp(expression, triggerid);
+				sql = zbx_strdcatf(sql, " expression='%s',",	short_expression);
+
+			}
 			if( description )	sql = zbx_strdcatf(sql, " description='%s',",	description);
 			if( priority >= 0 )	sql = zbx_strdcatf(sql, " priority=%i,",	priority);
 			if( status >= 0 )	sql = zbx_strdcatf(sql, " status=%i,",		status);
 			if( comments )		sql = zbx_strdcatf(sql, " comments='%s',",	comments);
 			if( url )		sql = zbx_strdcatf(sql, " url='%s',",		url);
 			if( templateid )	sql = zbx_strdcatf(sql, " templateid=" ZBX_FS_UI64 ",", templateid);
+
 			sql = zbx_strdcatf(sql, " value=2 where triggerid=" ZBX_FS_UI64,	triggerid);
+
+			zbx_free(sql);
 
 			result = DBexecute(sql);
 
-			zbx_free(sql);
+			DBreset_items_nextcheck(triggerid);
+
+			DBadd_event(triggerid,TRIGGER_VALUE_UNKNOWN,0);
 
 			DBdelete_dependencies_by_triggerid(triggerid);
 
@@ -1564,7 +1863,7 @@ static int	DBupdate_trigger(
 			{
 				for( i=0; 0 < dependences[i]; i++ )
 				{
-					DBinsert_trigger_dependency(triggerid, dependence[i]);
+					DBinsert_dependency(triggerid, dependences[i]);
 				}
 
 				zabbix_log(LOG_LEVEL_DEBUG, "Trigger '%s' updated", trigger_data[0]);;
@@ -1572,9 +1871,9 @@ static int	DBupdate_trigger(
 		}
 	}
 
+	DBfree_result(db_triggers);
+
 	return result;
-#endif /* 0 */
-	return FAIL;
 }
 
 static int	DBcopy_trigger_to_host(
@@ -1583,8 +1882,8 @@ static int	DBcopy_trigger_to_host(
 		unsigned char copy_mode
 	)
 {
+//--	TODO!!!
 #if 0
-//--		!!!TODO!!!
 	$trigger = get_trigger_by_triggerid($triggerid);
 
 	$deps = replace_template_dependences(
@@ -1659,7 +1958,7 @@ static int	DBcopy_trigger_to_host(
 	delete_dependencies_by_triggerid($newtriggerid);
 	foreach($deps as $dep_id)
 	{
-		add_trigger_dependency($newtriggerid, $dep_id);
+		DBinsert_dependency($newtriggerid, $dep_id);
 	}
 
 	info("Added trigger '".$trigger["description"]."' to host '".$host["host"]."'");
@@ -1704,42 +2003,6 @@ static int	DBget_trigger_dependences_by_triggerid(
 	dependences[i] = 0;
 
 	return i;
-}
-
-static int	DBreplace_template_dependences(
-		zbx_uint64_t	*dependences_in,
-		zbx_uint64_t	hostid,
-		zbx_uint64_t	*dependences,
-		int		max_dependences
-	)
-{
-	DB_RESULT	db_triggers;
-
-	DB_ROW		trigger_data;
-
-	register int	i = 0, j = 0;
-
-	while( 0 < dependences_in[i] )
-	{
-		db_triggers = DBselect("select t.triggerid from triggers t,functions f,items i "
-				" where t.templateid=" ZBX_FS_UI64 " and f.triggerid=t.triggerid "
-				" and f.itemid=i.itemid and i.hostid=" ZBX_FS_UI64,
-				dependences_in[i], hostid);
-
-		if( j < (max_dependences - 1) && (trigger_data = DBfetch(db_triggers)) )
-		{
-			ZBX_STR2UINT64(dependences[j], trigger_data[0]);
-			j++;
-		}
-
-		DBfree_result(db_triggers);
-
-		i++;
-	}
-
-	dependences[j] = 0;
-
-	return j;
 }
 
 static int	DBupdate_template_dependences_for_host(
@@ -1988,7 +2251,7 @@ static int	DBadd_item_to_graph(
 		if( SUCCEED == result)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Added graph item with ID [" ZBX_FS_UI64 "]", gitemid);
-			//$result = $gitemid;
+			/* $result = $gitemid; // skip fo C version */
 		}
 		else
 		{
