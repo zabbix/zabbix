@@ -92,8 +92,6 @@
 
 #define ZBX_UNUSED(a) ((void)0)(a)
 
-#define MAX_LOG_FILE_LEN (1024*1024)
-
 #define	SUCCEED		0
 #define	FAIL		(-1)
 #define	NOTSUPPORTED	(-2)
