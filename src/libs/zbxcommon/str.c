@@ -273,52 +273,45 @@ void zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_len, co
 
 
 /* Has to be rewritten to avoi malloc */
-char *string_replace(char *str, const char *sub_str1, const char *sub_str2)
+char *string_replace(const char *str, const char *sub_str1, const char *sub_str2)
 {
         char *new_str;
-        const char *p;
-        const char *q;
-        const char *r;
+        char *p;
+        char *q;
+        char *r;
         char *t;
         long len;
         long diff;
         unsigned long count = 0;
 
 	assert(str);
-
-        if ( (p=strstr(str, sub_str1)) == NULL )
-                return str;
-        ++count;
+	assert(sub_str1);
+	assert(sub_str2);
 
         len = (long)strlen(sub_str1);
 
         /* count the number of occurances of sub_str1 */
-        for ( p+=len; (p=strstr(p, sub_str1)) != NULL; p+=len )
-                ++count;
+        for ( p+=len; p=strstr(p, sub_str1); p+=len, count++; );
+
+	if ( 0 == count )	return strdup(str);
 
         diff = (long)strlen(sub_str2) - len;
 
         /* allocate new memory */
-        if ( (new_str=(char *)malloc((size_t)(strlen(str) + count*diff)*sizeof(char)))
-                        == NULL )
-                return NULL;
+        new_str = zbx_malloc((size_t)(strlen(str) + count*diff)*sizeof(char));
 
-        q = str;
-        t = new_str;
-        for (p=strstr(str, sub_str1); p!=NULL; p=strstr(p, sub_str1))
+        for (q=str,t=new_str,p=str; p=strstr(p, sub_str1); )
         {
                 /* copy until next occurance of sub_str1 */
-                for ( ; q < p; *t++ = *q++)
-                        ;
+                for ( ; q < p; *t++ = *q++);
                 q += len;
                 p = q;
-                for ( r = sub_str2; (*t++ = *r++); )
-                        ;
+                for ( r = sub_str2; (*t++ = *r++); );
                 --t;
         }
         /* copy the tail of str */
-        while ( (*t++ = *q++) )
-                ;
+        while ( (*t++ = *q++) );
+	
         return new_str;
 
 }
@@ -861,6 +854,7 @@ char* zbx_dsprintf(char *dest, const char *f, ...)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments:  required free allocated string with function 'zbx_free'         *
+ *            zbx_strdcat(NULL,"") must return "", not NULL!                  *
  *                                                                            *
  ******************************************************************************/
 char* zbx_strdcat(char *dest, const char *src)
@@ -868,13 +862,10 @@ char* zbx_strdcat(char *dest, const char *src)
 	register int new_len = 0;
 	char *new_dest = NULL;
 
-	/* zbx_strdcat(NULL,"") must return "", not NULL! */
-/*	if(!src || !src[0])	return dest;*/
-	if(!src)		return dest;
-	if(!dest && !src[0])	return strdup(src);
+	if(!src)	return dest;
+	if(!dest)	return strdup(src);
 	
-	if(dest)	new_len += (int)strlen(dest);
-
+	new_len += (int)strlen(dest);
 	new_len += (int)strlen(src);
 	
 	new_dest = zbx_malloc(new_len + 1);

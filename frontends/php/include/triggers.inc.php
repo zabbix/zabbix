@@ -732,7 +732,7 @@
 	{
 		if(is_null($time)) $time = time();
 
-		$result = DBselect('select value from events where objectid='.$triggerid.' and object='.EVENT_OBJECT_TRIGGER.
+		$result = DBselect('select value,clock from events where objectid='.$triggerid.' and object='.EVENT_OBJECT_TRIGGER.
 			' order by clock desc',1);
 		$last_value = DBfetch($result);
 		if($last_value)
