@@ -251,9 +251,9 @@ void zabbix_log(int level, const char *fmt, ...)
 			fprintf(log_file,"\n");
 			zbx_fclose(log_file);
 
-			if(stat(log_filename,&buf) == 0)
+			if(CONFIG_LOG_FILE_SIZE != 0 && stat(log_filename,&buf) == 0)
 			{
-				if(buf.st_size > MAX_LOG_FILE_LEN)
+				if(buf.st_size > CONFIG_LOG_FILE_SIZE*1024*1024)
 				{
 					strscpy(filename_old,log_filename);
 					zbx_strlcat(filename_old,".old",MAX_STRING_LEN);
