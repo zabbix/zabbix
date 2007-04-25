@@ -1,5 +1,6 @@
 Changes for 1.3.5:
 
+ - support of parameter LogFileSize (Alexei)
  - fixed configuration file reading for WinXX (Eugene)
  - fixed uname for WinXX (Eugene)
  - updated Spanish translation. Thanks to Ignacio Martin. (Alexei)

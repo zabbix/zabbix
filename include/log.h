@@ -32,6 +32,8 @@
 #define LOG_TYPE_SYSLOG		1
 #define LOG_TYPE_FILE		2
 
+extern int	CONFIG_LOG_FILE_SIZE;
+
 /* Type - 0 (syslog), 1 - file */
 int zabbix_open_log(int type,int level, const char *filename);
 void zabbix_log(int level, const char *fmt, ...);
