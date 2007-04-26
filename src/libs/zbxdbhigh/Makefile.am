@@ -3,9 +3,6 @@
 noinst_LIBRARIES = libzbxdbhigh.a
 
 libzbxdbhigh_a_SOURCES = \
-	graph.c \
-	item.c \
-	trigger.c \
 	host.c \
 	db.c
 

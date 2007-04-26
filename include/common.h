@@ -464,7 +464,7 @@ typedef enum
 	ZBX_TASK_CHANGE_NODEID
 } zbx_task_t;
 
-char *string_replace(const char *str, const char *sub_str1, const char *sub_str2);
+char *string_replace(char *str, char *sub_str1, char *sub_str2);
 
 void	del_zeroes(char *s);
 int	find_char(char *str,char c);

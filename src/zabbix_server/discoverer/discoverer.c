@@ -29,6 +29,8 @@
 #include "daemon.h"
 #include "discoverer.h"
 #include "../events.h"
+#include "../poller/checks_agent.h"
+#include "../poller/checks_snmp.h"
 
 int	discoverer_num;
 
