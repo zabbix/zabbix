@@ -537,6 +537,9 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 #ifdef	HAVE_ORACLE
 	int res;
 
+	/* EOF */
+	if(!result)	return NULL;
+
 	res = sqlo_fetch(result, 1);
 
 	if(SQLO_SUCCESS == res)
@@ -618,7 +621,7 @@ DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 					result = (DB_RESULT)ZBX_DB_DOWN;
 					break;
 				default:
-					result = (DB_RESULT)ZBX_DB_FAIL;
+					result = NULL;
 					break;
 			}
 		}
