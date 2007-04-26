@@ -1620,133 +1620,216 @@ static int	DBadd_event(
 }
 
 static char*	DBimplode_exp (
-		const char *expression,
+		char		*expression,
 		zbx_uint64_t	triggerid
 	)
 {
-	return NULL;
-//--	TODO!!!
-#if 0
-	# Translate localhost:procload.last(0)>10 to {12}>10
-//		echo "Expression:$expression<br>";
-		$exp='';
-		$state="";
-		for($i=0,$max=strlen($expression); $i<$max; $i++)
+	typedef enum {
+		EXP_NONE = 0,
+		EXP_HOST,
+		EXP_KEY,
+		EXP_FUNCTION,
+		EXP_PARAMETER
+	} expression_parsing_states;
+
+	DB_RESULT	db_items;
+
+	DB_ROW		item_data;
+
+	zbx_uint64_t
+		functionid,
+		itemid;
+
+	int	state = EXP_NONE;
+	char	*exp = NULL;
+
+	int
+		host_len = 0,
+		key_len = 0,
+		function_len = 0,
+		parameter_len = 0;
+
+	char	tmp_c,
+		*sql = NULL,
+		*host = NULL,
+		*key = NULL,
+		*function = NULL,
+		*parameter = NULL;
+
+	register char *c;
+
+	int	result = SUCCEED;
+
+	/* Translate localhost:procload.last(0)>10 to {12}>10 */
+
+	for ( c = expression; c && *c; c++ )
+	{
+		if( '{' == *c && EXP_NONE == state )
 		{
-			if($expression[$i] == '{')
-			{
-				if($state=="")
-				{
-					$host='';
-					$key='';
-					$function='';
-					$parameter='';
-					$state='HOST';
-					continue;
-				}
-			}
-// Processing of macros {TRIGGER.VALUE}
-			if( ($expression[$i] == '}')&&($state=="HOST") )
-			{
-				$exp = $exp."{".$host."}";
-				$state="";
-				continue;
-			}
-			if( ($expression[$i] == '}')&&($state=="") )
-			{
-//				echo "HOST:$host<BR>";
-//				echo "KEY:$key<BR>";
-//				echo "FUNCTION:$function<BR>";
-//				echo "PARAMETER:$parameter<BR>";
-				$state='';
-		
-				$res=DBselect("select i.itemid from items i,hosts h".
-					" where i.key_=".zbx_dbstr($key).
-					" and h.host=".zbx_dbstr($host).
-					" and h.hostid=i.hostid");
-				$row=DBfetch($res);
+			state 		= EXP_HOST;
 
-				$itemid=$row["itemid"];
-	
-				$functionid = get_dbid("functions","functionid");
-				$res=DBexecute("insert into functions (functionid,itemid,triggerid,function,parameter)".
-					" values ($functionid,$itemid,$triggerid,".zbx_dbstr($function).",".
-					zbx_dbstr($parameter).")");
-				if(!$res)
-				{
-					return	$res;
-				}
+			host		= c+1;
+			key		= NULL;
+			function	= NULL;
+			parameter	= NULL;
 
-				$exp=$exp.'{'.$functionid.'}';
-
-				continue;
-			}
-			if($expression[$i] == '(')
-			{
-				if($state == "FUNCTION")
-				{
-					$state='PARAMETER';
-					continue;
-				}
-			}
-			if($expression[$i] == ')')
-			{
-				if($state == "PARAMETER")
-				{
-					$state='';
-					continue;
-				}
-			}
-			if(($expression[$i] == ':') && ($state == "HOST"))
-			{
-				$state="KEY";
-				continue;
-			}
-			if($expression[$i] == '.')
-			{
-				if($state == "KEY")
-				{
-					$state="FUNCTION";
-					continue;
-				}
-				// Support for '.' in KEY
-				if($state == "FUNCTION")
-				{
-					$state="FUNCTION";
-					$key=$key.".".$function;
-					$function="";
-					continue;
-				}
-			}
-			if($state == "HOST")
-			{
-				$host=$host.$expression[$i];
-				continue;
-			}
-			if($state == "KEY")
-			{
-				$key=$key.$expression[$i];
-				continue;
-			}
-			if($state == "FUNCTION")
-			{
-				$function=$function.$expression[$i];
-				continue;
-			}
-			if($state == "PARAMETER")
-			{
-				$parameter=$parameter.$expression[$i];
-				continue;
-			}
-			$exp=$exp.$expression[$i];
+			host_len	= 0;
+			key_len		= 0;
+			function_len	= 0;
+			parameter_len	= 0;
+			continue;
 		}
-		return $exp;
-#endif
+		if( '}' == *c && EXP_HOST == state )
+		{ /* Processing of macros: {TRIGGER.VALUE} */
+			state = EXP_NONE;
+
+			if( host && host_len )
+			{
+				tmp_c = host[host_len];
+				host[host_len] = '\0';
+				exp = zbx_strdcatf(exp, "{%s}", host);
+				host[host_len] = tmp_c;
+			}
+			host = NULL;
+			continue;
+		}
+		if( '}' == *c && EXP_NONE == state )
+		{
+			if( host && host_len && key && key_len && function && function_len && parameter && parameter_len )
+			{
+				sql = zbx_strdcat(NULL, "select distinct i.itemid from items i,hosts h where h.hostid=i.hostid ");
+				/* adding host */
+				tmp_c = host[host_len];
+				host[host_len] = '\0';
+				sql = zbx_strdcatf(sql, " and h.host='%s'", host);
+				host[host_len] = tmp_c;
+				/* adding key */
+				tmp_c = key[key_len];
+				key[key_len] = '\0';
+				sql = zbx_strdcatf(sql, " and i.key_='%s'", key);
+				key[key_len] = tmp_c;
+
+				db_items = DBselect(sql);
+
+				zbx_free(sql);
+
+				if( SUCCEED == (item_data = DBfetch(db_items)) )
+				{
+					ZBX_STR2UINT64(itemid, item_data[0]);
+
+					functionid = DBget_maxid("functions","functionid");
+
+					sql = zbx_dsprintf(NULL, "insert into functions (functionid,itemid,triggerid,function,parameter)"
+							" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",",
+							functionid, itemid, triggerid);
+					/* adding function */
+					tmp_c = function[function_len];
+					function[function_len] = '\0';
+					sql = zbx_strdcatf(sql, "'%s',", function);
+					function[function_len] = tmp_c;
+					/* adding parameter */
+					tmp_c = parameter[parameter_len];
+					parameter[parameter_len] = '\0';
+					sql = zbx_strdcatf(sql, "'%s')", parameter);
+					parameter[parameter_len] = tmp_c;
+
+					if( SUCCEED == (result = DBexecute(sql)) )
+					{
+						exp = zbx_strdcatf(exp, "{" ZBX_FS_UI64 "}", functionid);
+					}
+
+					zbx_free(sql);
+				}
+
+				DBfree_result(db_items);
+			}
+
+			continue;
+		}
+		if( '(' == *c && EXP_FUNCTION == state )
+		{
+			state = EXP_PARAMETER;
+
+			parameter = c+1;
+			parameter_len = 0;
+			continue;
+		}
+		if( ')' == *c && EXP_PARAMETER == state)
+		{
+			state = EXP_NONE;
+			continue;
+		}
+		if( ':' == *c && EXP_HOST == state )
+		{
+			state = EXP_KEY;
+
+			key = c+1;
+			key_len = 0;
+			continue;
+		}
+		if( '.' == *c )
+		{
+			if( EXP_KEY == state )
+			{
+				state = EXP_FUNCTION;
+
+				function = c+1;
+				function_len = 0;
+				continue;
+			}
+			/* Support for '.' in KEY */
+			if( EXP_FUNCTION == state )
+			{
+				key_len += function_len + 1;
+
+				function = c+1;
+				function_len = 0;
+				continue;
+			}
+		}
+		switch( state )
+		{
+			case EXP_HOST:		host_len++;				break;
+			case EXP_KEY:		key_len++;				break;
+			case EXP_FUNCTION:	function_len++;				break;
+			case EXP_PARAMETER:	parameter_len++;			break;
+			default:		exp = zbx_strdcatf(exp, "%c", *c);	break;
+
+		}
+	}
+	return exp;
+}
+
+static int	DBget_trigger_dependences_by_triggerid(
+		zbx_uint64_t	triggerid,
+		zbx_uint64_t	*dependences,
+		int		max_dependences
+	)
+{
+	DB_RESULT	db_triggers;
+
+	DB_ROW		trigger_data;
+
+	register int	i = 0;
+
+	db_triggers = DBselect("select triggerid_up from trigger_depends where triggerid_down=" ZBX_FS_UI64, triggerid);
+
+	while( i < (max_dependences - 1) && (trigger_data = DBfetch(db_triggers)) )
+	{
+		ZBX_STR2UINT64(dependences[i], trigger_data[0]);
+		i++;
+	}
+
+	DBfree_result(db_triggers);
+
+	dependences[i] = 0;
+
+	return i;
 }
 
 static int	DBupdate_trigger(
 		zbx_uint64_t	triggerid,
-		const char	*expression,
+		char		*expression,
 		const char	*description,
 		int		priority,
 		int		status,
@@ -1876,133 +1959,248 @@ static int	DBupdate_trigger(
 	return result;
 }
 
+static int	DBcmp_triggers(
+		zbx_uint64_t triggerid1,
+		zbx_uint64_t triggerid2
+	)
+{
+	DB_RESULT	db_trigers1;
+	DB_RESULT	db_trigers2;
+	DB_RESULT	db_functions;
+
+	DB_ROW		trigger1_data;
+	DB_ROW		trigger2_data;
+	DB_ROW		function_data;
+
+	char
+		*search = NULL,
+		*replace = NULL,
+		*expr = NULL;
+
+	int	result = 1;
+
+	db_trigers1 = DBselect("select expression from triggers where triggerid=" ZBX_FS_UI64, triggerid1);
+
+	if( (trigger1_data = DBfetch(db_trigers1)) )
+	{
+		db_trigers2 = DBselect("select expression from triggers where triggerid=" ZBX_FS_UI64, triggerid2);
+
+		if( (trigger2_data = DBfetch(db_trigers2)) )
+		{
+			expr = strdup(trigger2_data[0]);
+
+			db_functions = DBselect("select f1.functionid,f2.functionid from functions f1,functions f2,items i1,items i2 "
+			" where f1.function=f2.function and f1.parameter=f2.parameter and i1.key_=i2.key_ "
+			" and i1.itemid=f1.itemid and i2.f2.itemid and f1.triggerid=" ZBX_FS_UI64 " and f2.triggerid=" ZBX_FS_UI64,
+				triggerid1, triggerid2);
+
+			while( (function_data = DBfetch(db_functions)) )
+			{
+				search = zbx_dsprintf(NULL, "{%s}", function_data[0]);
+				replace = zbx_dsprintf(NULL, "{%s}", function_data[1]);
+
+				expr = string_replace(expr, search, replace);
+
+				zbx_free(replace);
+				zbx_free(search);
+			}
+
+			DBfree_result(db_functions);
+
+			result = strcmp(trigger1_data[0], expr);
+
+			zbx_free(expr);
+		}
+
+		DBfree_result(db_trigers2);
+	}
+
+	DBfree_result(db_trigers1);
+
+	return result;
+}
+
 static int	DBcopy_trigger_to_host(
-		zbx_uint64_t elementid,
+		zbx_uint64_t triggerid,
 		zbx_uint64_t hostid,
 		unsigned char copy_mode
 	)
 {
-//--	TODO!!!
-#if 0
-	$trigger = get_trigger_by_triggerid($triggerid);
-
-	$deps = replace_template_dependences(
-			get_trigger_dependences_by_triggerid($triggerid),
-			$hostid);
-
-	$host_triggers = get_triggers_by_hostid($hostid, "no");
-	while($host_trigger = DBfetch($host_triggers))
-	{
-		if($host_trigger["templateid"] != 0)                            continue;
-		if(cmp_triggers($triggerid, $host_trigger["triggerid"]))        continue;
-
-		// link not linked trigger with same expression
-		return DBupdate_trigger(
-			$host_trigger["triggerid"],
-			NULL,	/* expression */
-			$trigger["description"],
-			$trigger["priority"],
-			-1,	/* status */
-			$trigger["comments"],
-			$trigger["url"],
-			$deps,
-			$copy_mode ? 0 : $triggerid);
-	}
-
-	$newtriggerid=get_dbid("triggers","triggerid");
-
-	$result = DBexecute("insert into triggers".
-		" (triggerid,description,priority,status,comments,url,value,expression,templateid)".
-		" values ($newtriggerid,".zbx_dbstr($trigger["description"]).",".$trigger["priority"].",".
-		$trigger["status"].",".zbx_dbstr($trigger["comments"]).",".
-		zbx_dbstr($trigger["url"]).",2,'{???:???}',".
-		($copy_mode ? 0 : $triggerid).")");
-
-	if(!$result)
-		return $result;
-
-	$host = get_host_by_hostid($hostid);
-	$newexpression = $trigger["expression"];
-
-	// Loop: functions
-	$functions = get_functions_by_triggerid($triggerid);
-	while($function = DBfetch($functions))
-	{
-		$item = get_item_by_itemid($function["itemid"]);
-
-		$host_items = DBselect("select * from items".
-			" where key_=".zbx_dbstr($item["key_"]).
-			" and hostid=".$host["hostid"]);
-		$host_item = DBfetch($host_items);
-		if(!$host_item)
-		{
-			error("Missing key '".$item["key_"]."' for host '".$host["host"]."'");
-			return FALSE;
-		}
-
-		$newfunctionid=get_dbid("functions","functionid");
-
-		$result = DBexecute("insert into functions (functionid,itemid,triggerid,function,parameter)".
-			" values ($newfunctionid,".$host_item["itemid"].",$newtriggerid,".
-			zbx_dbstr($function["function"]).",".zbx_dbstr($function["parameter"]).")");
-
-		$newexpression = str_replace(
-			"{".$function["functionid"]."}",
-			"{".$newfunctionid."}",
-			$newexpression);
-	}
-
-	DBexecute("update triggers set expression=".zbx_dbstr($newexpression).
-		" where triggerid=$newtriggerid");
-// copy dependences
-	delete_dependencies_by_triggerid($newtriggerid);
-	foreach($deps as $dep_id)
-	{
-		DBinsert_dependency($newtriggerid, $dep_id);
-	}
-
-	info("Added trigger '".$trigger["description"]."' to host '".$host["host"]."'");
-
-// Copy triggers to the child hosts
-	$child_hosts = get_hosts_by_templateid($hostid);
-	while($child_host = DBfetch($child_hosts))
-	{// recursion
-		$result = copy_trigger_to_host($newtriggerid, $child_host["hostid"]);
-		if(!$result){
-			return result;
-		}
-	}
-
-	return $newtriggerid;
-#endif /* 0 */
-	return FAIL;
-}
-
-static int	DBget_trigger_dependences_by_triggerid(
-		zbx_uint64_t	triggerid,
-		zbx_uint64_t	*dependences,
-		int		max_dependences
-	)
-{
 	DB_RESULT	db_triggers;
+	DB_RESULT	db_host_triggers;
+	DB_RESULT	db_chd_hosts;
+	DB_RESULT	db_functions;
+	DB_RESULT	db_items;
 
 	DB_ROW		trigger_data;
+	DB_ROW		host_trigger_data;
+	DB_ROW		chd_host_data;
+	DB_ROW		function_data;
+	DB_ROW		item_data;
 
-	register int	i = 0;
+	zbx_uint64_t
+		itemid,
+		h_triggerid,
+		ht_templateid,
+		chd_hostid,
+		functionid,
+		new_triggerid,
+		new_functionid,
+		dependences[ZBX_MAX_DEPENDENCES],
+		new_dependences[ZBX_MAX_DEPENDENCES];
 
-	db_triggers = DBselect("select triggerid_up from trigger_depends where triggerid_down=" ZBX_FS_UI64, triggerid);
+	char
+		*old_expression = NULL,
+		*new_expression = NULL,
+		*search = NULL,
+		*replace = NULL;
 
-	while( i < (max_dependences - 1) && (trigger_data = DBfetch(db_triggers)) )
+	int	i = 0;
+
+	int	result = SUCCEED;
+
+	db_triggers = DBselect("select description,priority,status,comments,url,expression from triggers where triggerid=" ZBX_FS_UI64, triggerid);
+
+	if( (trigger_data = DBfetch(db_triggers)) )
 	{
-		ZBX_STR2UINT64(dependences[i], trigger_data[0]);
-		i++;
+		result = FAIL;
+
+		DBget_trigger_dependences_by_triggerid(triggerid, dependences, sizeof(dependences) / sizeof(zbx_uint64_t));
+		DBreplace_template_dependences(dependences, hostid, new_dependences, sizeof(new_dependences) / sizeof(zbx_uint64_t));
+
+		db_host_triggers = DBselect("select distinct t.triggerid,t.templateid from funtions f,items i "
+				" where t.triggerid=f.triggerid and i.itemid=f.functionid and i.hostid=" ZBX_FS_UI64, hostid);
+
+		while( (host_trigger_data = DBfetch(db_host_triggers)) )
+		{
+			ZBX_STR2UINT64(h_triggerid, host_trigger_data[0]);
+			ZBX_STR2UINT64(ht_templateid, host_trigger_data[1]);
+
+			if( 0 != ht_templateid )			continue;
+			if( DBcmp_triggers(triggerid, h_triggerid) )	continue;
+
+			/* link not linked trigger with same expression */
+			result = DBupdate_trigger(
+				h_triggerid,
+				NULL,			/* expression */
+				trigger_data[0],	/* description */
+				atoi(trigger_data[1]),	/* priority */
+				-1,			/* status */
+				trigger_data[3],	/* comments */
+				trigger_data[4],	/* url */
+				new_dependences,
+				copy_mode ? 0 : triggerid);
+
+			break;
+		}
+
+		DBfree_result(db_host_triggers);
+
+		if( SUCCEED != result )
+		{ /* create triger if no updated triggers */
+
+			new_triggerid = DBget_maxid("triggers","triggerid");
+
+			if( SUCCEED == (result = DBexecute("insert into triggers"
+				" (triggerid,description,priority,status,comments,url,value,expression,templateid)"
+				" values (" ZBX_FS_UI64 ",'%s',%i,%i,'%s','%s',2,'{???:???}'," ZBX_FS_UI64,
+					new_triggerid,
+					trigger_data[0],	/* description */
+					atoi(trigger_data[1]),	/* priority */
+					atoi(trigger_data[2]),	/* status */
+					trigger_data[3],	/* comments */
+					trigger_data[4],	/* url */
+					copy_mode ? 0 : triggerid)) )
+			{
+				new_expression = strdup(trigger_data[5]);
+
+				/* Loop: functions */
+				db_functions = DBselect("select itemid,function,parameter,functionid from functions "
+							" where triggerid=" ZBX_FS_UI64, triggerid);
+
+				while( SUCCEED == result && (function_data = DBfetch(db_functions)) )
+				{
+					ZBX_STR2UINT64(itemid, function_data[0]);
+					ZBX_STR2UINT64(functionid, function_data[3]);
+
+					search = zbx_dsprintf(NULL, "{" ZBX_FS_UI64 "}", functionid);
+
+					db_items = DBselect("select i2.itemid from items i1, items i2 "
+							" where i2.key_=i1.key_ and i2.hostid=" ZBX_FS_UI64
+							" and i1.itemid=" ZBX_FS_UI64, hostid, itemid);
+					
+					if( (item_data = DBfetch(db_items)) )
+					{
+						ZBX_STR2UINT64(itemid, item_data[0]);
+
+						new_functionid = DBget_maxid("functions","functionid");
+
+						replace = zbx_dsprintf(NULL, "{" ZBX_FS_UI64 "}", new_functionid);
+
+						result = DBexecute("insert into functions (functionid,itemid,triggerid,function,parameter)"
+							" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s','%s')",
+									new_functionid,
+									itemid,
+									new_triggerid,
+									function_data[1],
+									function_data[2]
+								);
+
+						old_expression = new_expression;
+						new_expression = string_replace(old_expression, search, replace);
+						zbx_free(old_expression);
+					}
+					else
+					{
+						zabbix_log(LOG_LEVEL_DEBUG, "Missing similar key [" ZBX_FS_UI64 "] for host [" ZBX_FS_UI64 "]",
+								itemid, hostid);
+						result = FALSE;
+					}
+
+					DBfree_result(db_items);
+
+					zbx_free(search);
+
+				}
+
+				zbx_free(new_expression);
+
+				DBfree_result(db_functions);
+
+				if( SUCCEED == result )
+				{
+					DBexecute("update triggers set expression='%s' where triggerid=" ZBX_FS_UI64, new_expression, new_triggerid);
+
+					/* copy dependences */
+					DBdelete_dependencies_by_triggerid(new_triggerid);
+					for( i=0; 0 < new_dependences[i]; i++ )
+					{
+						DBinsert_dependency(new_triggerid, new_dependences[i]);
+					}
+
+					zabbix_log(LOG_LEVEL_DEBUG, "Added trigger '%s' to host [" ZBX_FS_UI64 "]", trigger_data[0], hostid);
+
+					/* Copy triggers to the child hosts */
+					db_chd_hosts = DBselect("select hostid from hosts where templateid=" ZBX_FS_UI64, hostid);
+
+					while( (chd_host_data = DBfetch(db_chd_hosts)) )
+					{
+						ZBX_STR2UINT64(chd_hostid, chd_host_data[0]);
+
+						/* recursion */
+						if( SUCCEED != (result = DBcopy_trigger_to_host(new_triggerid, chd_hostid, copy_mode)) )
+							break;
+					}
+
+					DBfree_result(db_chd_hosts);
+				}
+			}
+		}
 	}
 
 	DBfree_result(db_triggers);
 
-	dependences[i] = 0;
-
-	return i;
+	return result;
 }
 
 static int	DBupdate_template_dependences_for_host(
@@ -2251,7 +2449,7 @@ static int	DBadd_item_to_graph(
 		if( SUCCEED == result)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "Added graph item with ID [" ZBX_FS_UI64 "]", gitemid);
-			/* $result = $gitemid; // skip fo C version */
+			/* result = gitemid; // skip fo C version */
 		}
 		else
 		{
