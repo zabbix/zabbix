@@ -1372,31 +1372,64 @@ void	DBvacuum(void)
 #endif
 }
 
-void    DBescape_string(const char *from, char *to, int maxlen)
-{
+void    DBescape_string(const char *str, char *to, int maxlen)
+{  /* NOTE: sync changes with 'DBdyn_escape_string' */
 	register int     i,ptr;
-
+#ifdef  HAVE_ORACLE
+#	define ZBX_DB_ESC_CH	'\''
+#else /* not HAVE_ORACLE */
+#	define ZBX_DB_ESC_CH	'\\'
+#endif /* HAVE_ORACLE */
 	assert(to);
 
 	maxlen--;
-	for(i=0, ptr=0; from && from[i] && ptr < maxlen; i++)
+	for(i=0, ptr=0; str && str[i] && ptr < maxlen; i++)
 	{
-		if( from[i] == '\r' ) continue;
+		if( str[i] == '\r' ) continue;
 
-#ifdef	HAVE_ORACLE
-		if( (from[i] == '\''))
+		if(	( str[i] == '\'' ) 
+#ifndef	HAVE_ORACLE
+			|| ( str[i] == '\\' )
+#endif /* not HAVE_ORACLE */
+		)
 		{
-			to[ptr++] = '\'';
-#else /* HAVE_ORACLE */
-		if( (from[i] == '\'') || (from[i] == '\\'))
-		{
-			to[ptr++] = '\\';
-#endif
+			to[ptr++] = ZBX_DB_ESC_CH;
 			if(ptr >= maxlen)       break;
 		}
-		to[ptr++] = from[i];
+		to[ptr++] = str[i];
 	}
 	to[ptr] = '\0';
+}
+
+char*	DBdyn_escape_string(const char *str)
+{  /* NOTE: sync changes with 'DBescape_string' */
+	register int i;
+
+	char *str_esc = NULL;
+
+	int	str_esc_len;
+	
+	assert(str);
+
+	str_esc_len = strlen(str);
+
+	for(i=0; str[i]; i++)
+	{
+		if(	( str[i] == '\'' ) 
+#ifndef	HAVE_ORACLE
+			|| ( str[i] == '\\' )
+#endif /* not HAVE_ORACLE */
+		)
+		{
+			str_esc_len++;
+		}
+	}
+
+	str_esc = zbx_malloc(str_esc_len);
+
+	DBescape_string(str, str_esc, str_esc_len);
+
+	return str_esc;
 }
 
 void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)

@@ -461,6 +461,8 @@ int	DBget_triggers_count(void);
 int	DBget_queue_count(void);
 
 void    DBescape_string(const char *from, char *to, int maxlen);
+char*   DBdyn_escape_string(const char *str);
+
 void    DBget_item_from_db(DB_ITEM *item,DB_ROW row);
 
 zbx_uint64_t	DBadd_host(char *server, int port, int status, int useip, char *ip, int disable_until, int available);
@@ -479,4 +481,24 @@ void	DBdelete_sysmaps_hosts_by_hostid(zbx_uint64_t hostid);
 int	DBget_graph_item_by_gitemid(int gitemid, DB_GRAPH_ITEM *graph_item);
 int	DBget_graph_by_graphid(int graphid, DB_GRAPH *graph);
 int	DBadd_graph_item_to_linked_hosts(int gitemid,int hostid);
+
+
+void	DBdelete_template_elements(
+		zbx_uint64_t  hostid,
+		zbx_uint64_t templateid,
+		unsigned char unlink_mode
+	);
+int	DBcopy_template_elements(
+		zbx_uint64_t hostid,
+		zbx_uint64_t templateid,
+		unsigned char copy_mode
+	);
+int	DBsync_host_with_template(
+		zbx_uint64_t hostid,
+		zbx_uint64_t templateid
+	);
+int	DBsync_host_with_templates(
+		zbx_uint64_t hostid
+	);
+
 #endif

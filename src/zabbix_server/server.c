@@ -240,17 +240,34 @@ void	init_config(void)
 
 void test()
 {
-	char error[MAX_STRING_LEN];
+	zbx_uint64_t	hosttemplateid;
 
-	printf("-= Test Started =-\n");
+	zbx_uint64_t	hostid = 10016;
+
+	// 10004 - Standalone_t
 	
-	printf("send_jabber result '%i'\n",
-		send_jabber("zabbix@xmpp.ru", "zabbixthebest", "zabbix@xmpp.ru", "test from ZABBIX server", error, sizeof(error))
-		);
+	zbx_uint64_t	templateid = 10004;
 
-	printf("send_jabber error: '%s'\n", error);
+	DBconnect(ZBX_DB_CONNECT_EXIT);
+
+	zabbix_set_log_level(LOG_LEVEL_DEBUG);
+
+	printf("-= Test Started =-\n\n");
+
+	hosttemplateid = DBget_maxid("hosts_templates", "hosttemplateid");
+
+	DBexecute("insert into hosts_templates (hosttemplateid,hostid,templateid)"
+				"values(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
+				hosttemplateid, hostid, templateid);
+
+	if( SUCCEED == DBsync_host_with_template(hostid, templateid))
+		printf("###### SUCCEED ######\n");
+	else
+		printf("###### FAIL ######\n");
 		
 	printf("\n-= Test completed =-\n");
+
+	DBclose();
 }
 #endif /* TEST */
 
