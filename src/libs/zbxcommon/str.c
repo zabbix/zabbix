@@ -273,7 +273,7 @@ void zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_len, co
 
 
 /* Has to be rewritten to avoi malloc */
-char *string_replace(const char *str, const char *sub_str1, const char *sub_str2)
+char *string_replace(char *str, char *sub_str1, char *sub_str2)
 {
         char *new_str;
         char *p;
@@ -291,7 +291,7 @@ char *string_replace(const char *str, const char *sub_str1, const char *sub_str2
         len = (long)strlen(sub_str1);
 
         /* count the number of occurances of sub_str1 */
-        for ( p+=len; p=strstr(p, sub_str1); p+=len, count++; );
+        for ( p+=len; (p = strstr(p, sub_str1)); p+=len, count++ );
 
 	if ( 0 == count )	return strdup(str);
 
@@ -300,7 +300,7 @@ char *string_replace(const char *str, const char *sub_str1, const char *sub_str2
         /* allocate new memory */
         new_str = zbx_malloc((size_t)(strlen(str) + count*diff)*sizeof(char));
 
-        for (q=str,t=new_str,p=str; p=strstr(p, sub_str1); )
+        for (q=str,t=new_str,p=str; (p = strstr(p, sub_str1)); )
         {
                 /* copy until next occurance of sub_str1 */
                 for ( ; q < p; *t++ = *q++);
