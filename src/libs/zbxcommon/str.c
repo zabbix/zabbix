@@ -291,7 +291,7 @@ char *string_replace(char *str, char *sub_str1, char *sub_str2)
         len = (long)strlen(sub_str1);
 
         /* count the number of occurances of sub_str1 */
-        for ( p+=len; (p = strstr(p, sub_str1)); p+=len, count++ );
+        for ( p=str; (p = strstr(p, sub_str1)); p+=len, count++ );
 
 	if ( 0 == count )	return strdup(str);
 
@@ -895,7 +895,7 @@ char* zbx_strdcatf(char *dest, const char *f, ...)
 
 	va_start(args, f);
 
-	string = zbx_dvsprintf(dest, f, args);
+	string = zbx_dvsprintf(NULL, f, args);
 
 	va_end(args);
 
