@@ -490,7 +490,7 @@ static zbx_uint64_t	add_discovered_host(zbx_uint64_t dhostid)
 	}
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End op_host_add()");
+	zabbix_log(LOG_LEVEL_DEBUG, "End add_discovered_host()");
 
 	return hostid;
 }
@@ -529,6 +529,45 @@ void	op_host_add(DB_EVENT *event)
 	hostid = add_discovered_host(dhostid);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End op_host_add()");
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: op_host_del                                                      *
+ *                                                                            *
+ * Purpose: delete host                                                       *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: nothing                                                      *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	op_host_del(DB_EVENT *event)
+{
+	zbx_uint64_t	hostid, dhostid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In op_host_del()");
+
+	if(event->object == EVENT_OBJECT_DSERVICE)
+	{
+		dhostid = select_dhostid_by_dserviceid(event->objectid);
+	}
+	else
+	{
+		dhostid = event->objectid;
+	}
+
+	hostid = select_discovered_host(dhostid);
+	if(hostid != 0)
+	{
+		DBdelete_host(hostid);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End op_host_del()");
 }
 
 /******************************************************************************

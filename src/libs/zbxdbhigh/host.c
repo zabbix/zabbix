@@ -426,7 +426,7 @@ static int	DBdelete_graph(
 	if( (graph_data = DBfetch(db_graphs)) )
 	{
 		/* first delete child graphs */
-		db_elements = DBselect("select graphid,name from graphs where templateid=" ZBX_FS_UI64, graphid);
+		db_elements = DBselect("select graphid from graphs where templateid=" ZBX_FS_UI64, graphid);
 
 		while( (element_data = DBfetch(db_elements)) )
 		{ /* recursion */
@@ -530,7 +530,7 @@ static int	DBdelete_item(
 	zbx_uint64_t
 		elementid;
 
-	int result = FAIL;
+	int result = SUCCEED;
 
 	db_items = DBselect("select i.itemid ,i.key_,h.host from items i,"
 				" hosts h where h.hostid=i.hostid and i.itemid=" ZBX_FS_UI64, itemid);
@@ -2830,6 +2830,44 @@ static int	DBcopy_template_graphs(
 	return result;
 }
 
+static int	DBdelete_sysmaps_element(
+		zbx_uint64_t	selementid
+	)
+{
+	DBexecute("delete from sysmaps_links"
+		" where selementid1=" ZBX_FS_UI64 " or selementid2=" ZBX_FS_UI64,
+		selementid, selementid);
+
+	DBexecute("delete from sysmaps_elements where selementid=" ZBX_FS_UI64, selementid);
+
+	return SUCCEED;
+}
+
+static int	DBdelete_sysmaps_elements_with_hostid(
+		zbx_uint64_t	hostid
+	)
+{
+	DB_RESULT	db_elements;
+
+	DB_ROW		element_data;
+
+	zbx_uint64_t
+		elementid;
+
+	db_elements = DBselect("select selementid from sysmaps_elements"
+		" where elementid=" ZBX_FS_UI64 " and elementtype=%i", hostid, SYSMAP_ELEMENT_TYPE_HOST);
+
+	while( (element_data = DBfetch(db_elements)) )
+	{
+		ZBX_STR2UINT64(elementid, element_data[0]);
+
+		DBdelete_sysmaps_element(elementid);
+	}
+
+	DBfree_result(db_elements);
+
+	return SUCCEED;
+}
 
 /* public */ void	DBdelete_template_elements(
 		zbx_uint64_t  hostid,
@@ -2897,4 +2935,84 @@ static int	DBcopy_template_graphs(
 	DBfree_result(db_templates);
 
 	return result;
+}
+/* public */ void	DBunlink_template(
+		zbx_uint64_t	hostid,
+	       	zbx_uint64_t	templateid
+	)
+{
+	DBdelete_template_elements(hostid, templateid, 1 /* unlink, not delete */);
+
+	DBexecute("delete from hosts_templates where hostid=" ZBX_FS_UI64 " and templateid=" ZBX_FS_UI64,
+			hostid, templateid);
+}
+
+
+/* public */ int	DBdelete_host(
+		zbx_uint64_t hostid
+	)
+{
+	DB_RESULT	db_elements;
+
+	DB_ROW		element_data;
+
+	zbx_uint64_t
+		elementid;
+
+	/* unlink child hosts */
+	db_elements = DBselect("select hostid from hosts_templates where templateid=" ZBX_FS_UI64, hostid);
+
+	while( (element_data = DBfetch(db_elements)) )
+	{
+		ZBX_STR2UINT64(elementid, element_data[0]);
+		DBunlink_template(elementid, hostid);
+	}
+
+	DBfree_result(db_elements);
+
+	/* delete items -> triggers -> graphs */
+	db_elements = DBselect("select itemid from items where hostid=" ZBX_FS_UI64, hostid);
+
+	while( (element_data = DBfetch(db_elements)) )
+	{
+		ZBX_STR2UINT64(elementid, element_data[0]);
+
+		DBdelete_item(elementid);
+	}
+
+	DBfree_result(db_elements);
+
+	/* delete host from maps */
+	DBdelete_sysmaps_elements_with_hostid(hostid);
+
+	/* delete host from group */
+	DBexecute("delete from hosts_groups where hostid=" ZBX_FS_UI64, hostid);
+
+	/* delete host from template linkages */
+	DBexecute("delete from hosts_templates where hostid=" ZBX_FS_UI64, hostid);
+
+	/* disable actions */
+	db_elements = DBselect("select distinct actionid from conditions "
+		" where conditiontype=%i and value=" ZBX_FS_UI64,CONDITION_TYPE_HOST, hostid);
+
+	while( (element_data = DBfetch(db_elements)) )
+	{
+		ZBX_STR2UINT64(elementid, element_data[0]);
+
+		DBexecute("update actions set status=%s where actionid=" ZBX_FS_UI64, 
+			ACTION_STATUS_DISABLED, elementid);
+	}
+
+	DBfree_result(db_elements);
+
+	/* delete action conditions */
+	DBexecute("delete from conditions where conditiontype=%i and value=" ZBX_FS_UI64, CONDITION_TYPE_HOST, hostid);
+
+	/* delete host profile */
+	DBexecute("delete from hosts_profiles where hostid=" ZBX_FS_UI64, hostid);
+
+	/* delete host */
+	DBexecute("delete from hosts where hostid=" ZBX_FS_UI64, hostid);
+
+	return SUCCEED;
 }

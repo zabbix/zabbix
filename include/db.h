@@ -500,5 +500,8 @@ int	DBsync_host_with_template(
 int	DBsync_host_with_templates(
 		zbx_uint64_t hostid
 	);
+int	DBdelete_host(
+		zbx_uint64_t hostid
+	);
 
 #endif
