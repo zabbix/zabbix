@@ -2979,6 +2979,9 @@ include_once 'include/discovery.inc.php';
 				case CONDITION_TYPE_DUPTIME:
 					$rowCondition[] = new CNumericBox('new_condition[value]','600',15);
 					break;
+				case CONDITION_TYPE_DVALUE:
+					$rowCondition[] = new CTextBox('new_condition[value]', "", 40);
+					break;
 			}
 
 			$frmAction->AddRow(S_NEW_CONDITION, array(
