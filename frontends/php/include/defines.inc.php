@@ -361,6 +361,9 @@
 	define('SVC_NNTP',	6);
 	define('SVC_IMAP',	7);
 	define('SVC_TCP',	8);
+	define('SVC_AGENT',	9);
+	define('SVC_SNMPv1',	10);
+	define('SVC_SNMPv2',	11);
 
 	define('DHOST_STATUS_ACTIVE',		0);
 	define('DHOST_STATUS_DISABLED',		1);
