@@ -214,7 +214,7 @@
 
 		foreach($dchecks as $id => $data)
 		{
-			switch($new_check_type)
+			switch($data['type'])
 			{
 				case SVC_SNMPv1:
 				case SVC_SNMPv2:
