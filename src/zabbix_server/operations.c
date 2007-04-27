@@ -636,3 +636,127 @@ void	op_group_del(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End op_group_del()");
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: op_template_add                                                  *
+ *                                                                            *
+ * Purpose: link host with template                                           *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: nothing                                                      *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	op_template_add(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	hosttemplateid, templateid, hostid, dhostid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In op_template_add(object:%d)",
+		event->object);
+
+	if(operation->operationtype != OPERATION_TYPE_TEMPLATE_ADD)				return;
+	if(event->object != EVENT_OBJECT_DHOST && event->object != EVENT_OBJECT_DSERVICE)	return;
+
+
+	if(event->object == EVENT_OBJECT_DSERVICE)
+	{
+		dhostid = select_dhostid_by_dserviceid(event->objectid);
+	}
+	else
+	{
+		dhostid = event->objectid;
+	}
+
+	hostid = add_discovered_host(dhostid);
+	if(hostid != 0)
+	{
+		templateid = operation->objectid;
+
+		result = DBselect("select hosttemplateid hostgroupid from hosts_templates where templateid=" ZBX_FS_UI64 " and hostid=" ZBX_FS_UI64,
+			templateid,
+			hostid);
+		row = DBfetch(result);
+		if(!row || DBis_null(row[0]) == SUCCEED)
+		{
+			hosttemplateid = DBget_maxid("hosts_templates","hosttemplateid");
+			DBexecute("insert into hosts_templates (hosttemplateid,hostid,templateid) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
+				hosttemplateid,
+				hostid,
+				templateid);
+
+			DBsync_host_with_template(hostid, templateid);
+		}
+		DBfree_result(result);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End op_template_add()");
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: op_template_del                                                  *
+ *                                                                            *
+ * Purpose: unlink and clear host from template                               *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: nothing                                                      *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	op_template_del(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	zbx_uint64_t	templateid, hostid, dhostid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In op_template_del(object:%d)",
+		event->object);
+
+	if(operation->operationtype != OPERATION_TYPE_TEMPLATE_ADD)				return;
+	if(event->object != EVENT_OBJECT_DHOST && event->object != EVENT_OBJECT_DSERVICE)	return;
+
+
+	if(event->object == EVENT_OBJECT_DSERVICE)
+	{
+		dhostid = select_dhostid_by_dserviceid(event->objectid);
+	}
+	else
+	{
+		dhostid = event->objectid;
+	}
+
+	hostid = select_discovered_host(dhostid);
+	if(hostid != 0)
+	{
+		templateid = operation->objectid;
+
+		result = DBselect("select hosttemplateid hostgroupid from hosts_templates where templateid=" ZBX_FS_UI64 " and hostid=" ZBX_FS_UI64,
+			templateid,
+			hostid);
+
+		if( (row = DBfetch(result)) )
+		{
+			DBdelete_template_elements(hostid, templateid, 0 /* not a unlink mode */);
+
+			DBexecute("delete from hosts_templates where "
+					" and hostid=" ZBX_FS_UI64 " and templateid=" ZBX_FS_UI64 ")",
+				hostid,
+				templateid);
+		}
+		DBfree_result(result);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End op_template_del()");
+}
+
