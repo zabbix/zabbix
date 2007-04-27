@@ -240,35 +240,13 @@ void	init_config(void)
 
 void test()
 {
-	zbx_uint64_t	hosttemplateid;
-
-	zbx_uint64_t	hostid = 10016;
-
-	// 10004 - Standalone_t
-	// 10014 - Unix_t
-	
-	zbx_uint64_t	templateid = 10014;
-
-	DBconnect(ZBX_DB_CONNECT_EXIT);
-
 	zabbix_set_log_level(LOG_LEVEL_DEBUG);
 
 	printf("-= Test Started =-\n\n");
 
-	hosttemplateid = DBget_maxid("hosts_templates", "hosttemplateid");
-
-	DBexecute("insert into hosts_templates (hosttemplateid,hostid,templateid)"
-			"values(" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
-				hosttemplateid, hostid, templateid);
-
-	if( SUCCEED == DBsync_host_with_template(hostid, templateid))
-		printf("###### SUCCEED ######\n");
-	else
-		printf("###### FAIL ######\n");
 		
 	printf("\n-= Test completed =-\n");
 
-	DBclose();
 }
 #endif /* TEST */
 
