@@ -1,5 +1,6 @@
 Changes for 1.3.5:
 
+ - developed template synchronizator for ZABBIX server (Eugene)
  - fixed compilation of agent under OpenBSD (Alexei)
  - support of parameter LogFileSize (Alexei)
  - fixed configuration file reading for WinXX (Eugene)

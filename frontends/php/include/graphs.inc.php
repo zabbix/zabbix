@@ -424,7 +424,8 @@
 
 			if($templateid != null)
 			{
-				$tmp_host = DBfetch(get_hosts_by_graphid($db_graph["templateid"]));
+				$hosts = get_hosts_by_graphid($db_graph["templateid"]);
+				$tmp_host = DBfetch($hosts);
 				if(is_array($templateid))
 				{
 					if(!isset($templateid[$tmp_host["hostid"]]))
