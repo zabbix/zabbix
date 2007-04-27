@@ -202,6 +202,8 @@
 		}
 		$new_check_type	= get_request('new_check_type', SVC_HTTP);
 		$new_check_ports= get_request('new_check_ports', '80');
+		$new_check_key= get_request('new_check_key', '');
+		$new_check_snmp_community= get_request('new_check_snmp_community', '');
 
 		$form->AddRow(S_NAME, new CTextBox('name', $name, 40));
 		$form->AddRow(S_IP_RANGE, new CTextBox('iprange', $iprange, 27));
@@ -228,7 +230,7 @@
 		$cmbChkType = new CComboBox('new_check_type',$new_check_type,
 			"if(add_variable(this, 'type_changed', 1)) submit()"
 			);
-		foreach(array(SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP) as $type_int)
+		foreach(array(SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP, SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP, SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2) as $type_int)
 			$cmbChkType->AddItem($type_int, discovery_check_type2str($type_int));
 
 		if(isset($_REQUEST['type_changed']))
@@ -244,12 +246,25 @@
 				case SVC_NNTP:	$new_check_ports = 119;	break;
 				case SVC_IMAP:	$new_check_ports = 143;	break;
 				case SVC_TCP:	$new_check_ports = 80;	break;
+				case SVC_AGENT:	$new_check_ports = 10050;	break;
+				case SVC_SNMPv1:$new_check_ports = 161;	break;
+				case SVC_SNMPv2:$new_check_ports = 161;	break;
 			}
+		}
+		$external_param = array();
+		switch($new_check_type)
+		{
+			case SVC_SNMPv1:
+				$external_param = array_merge($external_param, array(BR, S_SNMP_COMMUNITY, SPACE, new CTextBox('new_check_snmp_community', $new_check_snmp_community)));
+			case SVC_SNMPv2:
+			case SVC_AGENT:	
+				$external_param = array_merge($external_param, array(BR, S_KEY, new CTextBox('new_check_key', $new_check_key), BR));
 		}
 
 		$form->AddRow(S_NEW_CHECK, array(
 			$cmbChkType, SPACE,
 			S_PORTS_SMALL, SPACE, new CTextBox('new_check_ports', $new_check_ports),
+			$external_param,
 			new CButton('add_check', S_ADD)
 		),'new');
 
@@ -2961,7 +2976,7 @@ include_once 'include/discovery.inc.php';
 				case CONDITION_TYPE_DSERVICE_TYPE:
 					$cmbCondVal = new CComboBox('new_condition[value]');
 					foreach(array(SVC_SSH, SVC_LDAP, SVC_SMTP, SVC_FTP, SVC_HTTP,
-						SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP) as $svc)
+						SVC_POP, SVC_NNTP, SVC_IMAP, SVC_TCP,SVC_AGENT,SVC_SNMPv1,SVC_SNMPv2) as $svc)
 						$cmbCondVal->AddItem($svc,discovery_check_type2str($svc));
 
 					$rowCondition[] = $cmbCondVal;

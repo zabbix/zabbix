@@ -48,6 +48,8 @@ include_once "include/page_header.php";
 										'isset({add_check})'),
 
 		"new_check_ports"=>	array(T_ZBX_PORTS, O_OPT,  null,	NOT_EMPTY,	'isset({add_check})'),
+		"new_check_key"=>	array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,	'isset({add_check})'),
+		"new_check_snmp_community"=>	array(T_ZBX_STR, O_OPT,  null,	NOT_EMPTY,	'isset({add_check})'),
 
 		"type_changed"=>	array(T_ZBX_INT, O_OPT, null, IN(1), null),
 
@@ -71,11 +73,13 @@ include_once "include/page_header.php";
 	
 ?>
 <?php
-	if(inarr_isset(array('add_check', 'new_check_type', 'new_check_ports')))
+	if(inarr_isset(array('add_check', 'new_check_type', 'new_check_ports', 'new_check_key', 'new_check_snmp_community')))
 	{
 		$new_dcheck = array(
 			'type' => $_REQUEST['new_check_type'],
 			'ports'=> $_REQUEST['new_check_ports']
+			'key'=> $_REQUEST['new_check_key']
+			'snmp_community'=> $_REQUEST['new_check_snmp_community']
 			);
 		if( !in_array($new_dcheck, $_REQUEST['dchecks']))
 			$_REQUEST['dchecks'][] = $new_dcheck;
