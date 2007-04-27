@@ -52,7 +52,7 @@ static int	get_sensor(const char *name, unsigned flags, AGENT_RESULT *result)
 
 		if(stat(filename,&buf)==0)
 		{
-			if(NULL == (f = fopen(filename,"r"))
+			if(NULL == (f = fopen(filename,"r")))
 			{
 				continue;
 			}
