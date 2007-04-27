@@ -762,7 +762,7 @@ void	op_template_del(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation
 	zabbix_log(LOG_LEVEL_DEBUG, "In op_template_del(object:%d)",
 		event->object);
 
-	if(operation->operationtype != OPERATION_TYPE_TEMPLATE_ADD)				return;
+	if(operation->operationtype != OPERATION_TYPE_TEMPLATE_REMOVE)				return;
 	if(event->object != EVENT_OBJECT_DHOST && event->object != EVENT_OBJECT_DSERVICE)	return;
 
 
@@ -789,7 +789,7 @@ void	op_template_del(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation
 			DBdelete_template_elements(hostid, templateid, 0 /* not a unlink mode */);
 
 			DBexecute("delete from hosts_templates where "
-					" and hostid=" ZBX_FS_UI64 " and templateid=" ZBX_FS_UI64 ")",
+					"hostid=" ZBX_FS_UI64 " and templateid=" ZBX_FS_UI64,
 				hostid,
 				templateid);
 		}
