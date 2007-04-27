@@ -732,6 +732,7 @@ include_once 'include/discovery.inc.php';
 					error(S_INCORRECT_HOST);
 					return false;
 				}
+				break;
 			default:
 				error(S_INCORRECT_OPERATION_TYPE);
 				return false;
