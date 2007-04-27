@@ -48,6 +48,9 @@
 		$str_type[SVC_NNTP]	= S_NNTP;
 		$str_type[SVC_IMAP]	= S_IMAP;
 		$str_type[SVC_TCP]	= S_TCP;
+		$str_type[SVC_AGENT]	= S_ZABBIX_AGENT;
+		$str_type[SVC_SNMPv1]	= S_SNMPV1_AGENT;
+		$str_type[SVC_SNMPv2]	= S_SNMPV2_AGENT;
 
 		if(isset($str_type[$type_int]))
 			return $str_type[$type_int];
@@ -100,11 +103,12 @@
 		return DBexecute('update drules set status='.$status.' where druleid='.$druleid);
 	}
 
-	function	add_discovery_check($druleid, $type, $ports)
+	function	add_discovery_check($druleid, $type, $ports, $key, $snmp_community)
 	{
 		$dcheckid = get_dbid('dchecks', 'dcheckid');
-		$result = DBexecute('insert into dchecks (dcheckid,druleid,type,ports) '.
-			' values ('.$dcheckid.','.$druleid.','.$type.','.zbx_dbstr($ports).')');
+		$result = DBexecute('insert into dchecks (dcheckid,druleid,type,ports,key_,snmp_community) '.
+			' values ('.$dcheckid.','.$druleid.','.$type.','.zbx_dbstr($ports).','.
+				zbx_dbstr($key).','.zbx_dbstr($snmp_community).')');
 
 		if(!$result)
 			return $result;
@@ -129,7 +133,7 @@
 		{
 			DBexecute('delete from dchecks where druleid='.$druleid);
 			if(isset($dchecks)) foreach($dchecks as $val)
-				add_discovery_check($druleid,$val["type"],$val["ports"]);
+				add_discovery_check($druleid,$val["type"],$val["ports"],$val["key"],$val["snmp_community"]);
 
 			$result = $druleid;
 		}
@@ -153,7 +157,7 @@
 		{
 			DBexecute('delete from dchecks where druleid='.$druleid);
 			if(isset($dchecks)) foreach($dchecks as $val)
-				add_discovery_check($druleid,$val["type"],$val["ports"]);
+				add_discovery_check($druleid,$val["type"],$val["ports"],$val["key"],$val["snmp_community"]);
 		}
 		return $result;
 	}
