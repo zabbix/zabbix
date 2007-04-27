@@ -37,6 +37,7 @@
 	'S_SERVICE_TYPE'=>			'Service type',
 	'S_SERVICE_PORT'=>			'Service port',
 	'S_DISCOVERY_STATUS'=>			'Discovery status',
+	'S_RECEIVED_VALUE'=>			'Received value',
 
 	'S_UPTIME_DOWNTIME'=>			'Uptime/Downtime',
 
