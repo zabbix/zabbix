@@ -97,7 +97,7 @@ CPU_PARAMLIST
     if(cpuname[0] == '\0')
     {
         /* default parameter */
-        zbx_snprintf(cpuname, sizeof(cpuname) "all");
+        zbx_snprintf(cpuname, sizeof(cpuname), "all");
     }
     if(strncmp(cpuname, "all", sizeof(cpuname)))
     {
