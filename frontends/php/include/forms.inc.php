@@ -188,7 +188,8 @@
 			$db_checks = DBselect('select * from dchecks where druleid='.$_REQUEST['druleid']);
 			while($check_data = DBfetch($db_checks))
 			{
-				$dchecks[] = array( 'type' => $check_data['type'], 'ports' => $check_data['ports'] );
+				$dchecks[] = array( 'type' => $check_data['type'], 'ports' => $check_data['ports'] ,
+						'key' => $check_data['key_'], 'snmp_community' => $check_data['snmp_community']);
 			}
 		}
 		else
@@ -213,10 +214,22 @@
 
 		foreach($dchecks as $id => $data)
 		{
+			switch($new_check_type)
+			{
+				case SVC_SNMPv1:
+				case SVC_SNMPv2:
+					$external_param = '"'.$data['snmp_community'].'":"'.$data['key'].'"';
+					break;
+				case SVC_AGENT:	
+					$external_param = ' "'.$data['key'].'"';
+					break;
+				default:
+					$external_param = null;
+			}
 			$dchecks[$id] = array(
 				new CCheckBox('selected_checks[]',null,null,$id), SPACE,
 				discovery_check_type2str($data['type']), SPACE,
-				'('.$data['ports'].')',
+				'('.$data['ports'].')'.SPACE.$external_param,
 				BR
 			);
 		}
@@ -255,10 +268,17 @@
 		switch($new_check_type)
 		{
 			case SVC_SNMPv1:
-				$external_param = array_merge($external_param, array(BR, S_SNMP_COMMUNITY, SPACE, new CTextBox('new_check_snmp_community', $new_check_snmp_community)));
 			case SVC_SNMPv2:
+				$external_param = array_merge($external_param, array(BR, S_SNMP_COMMUNITY, SPACE, new CTextBox('new_check_snmp_community', $new_check_snmp_community)));
+				$external_param = array_merge($external_param, array(BR, S_SNMP_OID, new CTextBox('new_check_key', $new_check_key), BR));
+				break;
 			case SVC_AGENT:	
+				$form->AddVar('new_check_snmp_community', '');
 				$external_param = array_merge($external_param, array(BR, S_KEY, new CTextBox('new_check_key', $new_check_key), BR));
+				break;
+			default:
+				$form->AddVar('new_check_snmp_community', '');
+				$form->AddVar('new_check_key', '');
 		}
 
 		$form->AddRow(S_NEW_CHECK, array(
