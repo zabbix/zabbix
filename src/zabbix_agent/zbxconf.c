@@ -73,6 +73,7 @@ void    load_config()
 #endif /* USE_PID_FILE */
 
 		{"LogFile",		&CONFIG_LOG_FILE,	0,TYPE_STRING,	PARM_OPT,	0,0},
+		{"LogFileSize",		&CONFIG_LOG_FILE_SIZE,	0,TYPE_INT,	PARM_OPT,	0,1024},
 		{"DisableActive",	&CONFIG_DISABLE_ACTIVE,	0,TYPE_INT,	PARM_OPT,	0,1},
 		{"Timeout",		&CONFIG_TIMEOUT,	0,TYPE_INT,	PARM_OPT,	1,30},
 		{"ListenPort",		&CONFIG_LISTEN_PORT,	0,TYPE_INT,	PARM_OPT,	1024,32767},
