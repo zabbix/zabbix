@@ -513,7 +513,6 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
 			case SVC_AGENT:
 			case SVC_SNMPv1:
 			case SVC_SNMPv2c:
-#ifdef HAVE_SNMP
 				memset(&item,0,sizeof(DB_ITEM));
 				strscpy(item.key,check->key_);
 				item.host_name	= ip;
@@ -545,6 +544,7 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
 					}
 				}
 				else
+#ifdef HAVE_SNMP
 				{
 					if(SUCCEED == get_value_snmp(&item, &value))
 					{
@@ -560,7 +560,9 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
 					}
 				}
 #else
-				ret = FAIL;
+				{
+					ret = FAIL;
+				}
 #endif
 				break;
 			/* Simple checks */
