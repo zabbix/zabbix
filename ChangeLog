@@ -1,5 +1,6 @@
 Changes for 1.3.6:
 
+ - added exporting of applications and valuemap linkage (Eugene)
  - new templates (Alexei)
  - support of host template actions (Eugene)
  - developed template synchronizator for ZABBIX server (Eugene)

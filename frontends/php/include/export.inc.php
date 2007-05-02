@@ -170,6 +170,23 @@
 				if(empty($xml_name)) $xml_name = $db_name;
 				zbx_xmlwriter_write_element ($memory, $xml_name, $data[$db_name]);
 			}
+
+			if( !empty($data['valuemapid']) && $valuemap = DBfetch(DBselect('select name from valuemaps where valuemapid='.$data['valuemapid'])))
+			{
+				zbx_xmlwriter_write_element($memory, 'valuemap', $valuemap['name']);
+			}
+
+			$db_applications=DBselect('select distinct a.name from applications a,items_applications ia '.
+				       ' where ia.applicationid=a.applicationid and ia.itemid='.$itemid);
+			if ($application = DBfetch($db_applications))
+			{
+				zbx_xmlwriter_start_element ($memory,XML_TAG_APPLICATIONS);
+				do {
+					zbx_xmlwriter_write_element ($memory, XML_TAG_APPLICATION, $application['name']);
+				} while($application = DBfetch($db_applications));
+				zbx_xmlwriter_end_element($memory); // XML_TAG_APPLICATIONS
+			}
+
 			zbx_xmlwriter_end_element($memory); // XML_TAG_ITEM
 		}
 		
