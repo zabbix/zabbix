@@ -77,6 +77,7 @@ INSERT INTO hosts VALUES (10013,'Template_HPUX','Template_HPUX',0,'',10050,3,0,'
 INSERT INTO hosts VALUES (10014,'Template_MacOS_X','Template_MacOS_X',0,'',10050,3,0,'',0,0);
 INSERT INTO hosts VALUES (10015,'Template_Solaris','Template_Solaris',0,'',10050,3,0,'',0,0);
 INSERT INTO hosts VALUES (10016,'Template_SNMPv1_Device','',0,'',10050,3,0,'',0,0);
+INSERT INTO hosts VALUES (10017,'ZABBIX-Server','',1,'127.0.0.1',10050,0,0,'',0,0);
 
 --
 -- Dumping data for table `applications`
@@ -235,6 +236,7 @@ INSERT INTO valuemaps VALUES (3,'Windows service state');
 INSERT INTO groups VALUES (2,'Linux servers');
 INSERT INTO groups VALUES (1,'Templates');
 INSERT INTO groups VALUES (3,'Windows servers');
+INSERT INTO groups VALUES (4,'ZABBIX Servers');
 
 --
 -- Dumping data for table `hosts_groups`
@@ -1698,6 +1700,108 @@ INSERT INTO items VALUES (18431,1,'public','1.3.6.1.4.1.9.2.1.47.0',161,10016,'l
 INSERT INTO items VALUES (18432,1,'public','1.3.6.1.4.1.9.2.1.8.0',161,10016,'lmemFreeMem','lmemFreeMem',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'');
 INSERT INTO items VALUES (18433,1,'public','1.3.6.1.4.1.9.2.1.1.0',161,10016,'lmemRomID','lmemRomID',60,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'');
 INSERT INTO items VALUES (18434,1,'public','1.3.6.1.2.1.1.5.0',161,10016,'sysName','sysName',60,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'');
+INSERT INTO items VALUES (18435,0,'','',161,10017,'Ping to the server (TCP)','agent.ping',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10020,1,'');
+INSERT INTO items VALUES (18436,0,'','',161,10017,'Version of zabbix_agent(d) running','agent.version',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','0','',0,'',10059,0,'');
+INSERT INTO items VALUES (18437,0,'','',161,10017,'Size of $1','filesize[/var/log/syslog]',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10015,0,'');
+INSERT INTO items VALUES (18438,0,'','',161,10017,'Maximum number of opened files','kernel.maxfiles',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10056,0,'');
+INSERT INTO items VALUES (18439,0,'','',161,10017,'Maximum number of processes','kernel.maxproc',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10055,0,'');
+INSERT INTO items VALUES (18440,0,'','',161,10017,'Incoming traffic on interface $1','net.if.in[eth0,bytes]',5,7,365,0,NULL,NULL,NULL,0,0,'','Bps',0,1,NULL,'',0,'','','0','',0,'',10075,0,'');
+INSERT INTO items VALUES (18441,0,'','',161,10017,'Incoming traffic on interface $1','net.if.in[eth1,bytes]',5,7,365,0,NULL,NULL,NULL,0,0,'','Bps',0,1,NULL,'',0,'','','0','',0,'',10078,0,'');
+INSERT INTO items VALUES (18442,0,'','',161,10017,'Incoming traffic on interface $1','net.if.in[lo,bytes]',5,7,365,0,NULL,NULL,NULL,0,0,'','Bps',0,1,NULL,'',0,'','','0','',0,'',10072,0,'');
+INSERT INTO items VALUES (18443,0,'','',161,10017,'Outgoing traffic on interface $1','net.if.out[eth0,bytes]',5,7,365,0,NULL,NULL,NULL,0,0,'','Bps',0,1,NULL,'',0,'','','0','',0,'',10084,0,'');
+INSERT INTO items VALUES (18444,0,'','',161,10017,'Outgoing traffic on interface $1','net.if.out[eth1,bytes]',5,7,365,0,NULL,NULL,NULL,0,0,'','Bps',0,1,NULL,'',0,'','','0','',0,'',10087,0,'');
+INSERT INTO items VALUES (18445,0,'','',161,10017,'Outgoing traffic on interface $1','net.if.out[lo,bytes]',5,7,365,0,NULL,NULL,NULL,0,0,'','Bps',0,1,NULL,'',0,'','','0','',0,'',10081,0,'');
+INSERT INTO items VALUES (18446,0,'','',161,10017,'FTP server is running','net.tcp.service[ftp]',60,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10032,1,'');
+INSERT INTO items VALUES (18447,0,'','',161,10017,'WEB (HTTP) server is running','net.tcp.service[http]',60,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10060,1,'');
+INSERT INTO items VALUES (18448,0,'','',161,10017,'IMAP server is running','net.tcp.service[imap]',60,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10037,1,'');
+INSERT INTO items VALUES (18449,0,'','',161,10017,'News (NNTP) server is running','net.tcp.service[nntp]',60,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10046,1,'');
+INSERT INTO items VALUES (18450,0,'','',161,10017,'POP3 server is running','net.tcp.service[pop]',60,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10036,1,'');
+INSERT INTO items VALUES (18451,0,'','',161,10017,'Email (SMTP) server is running','net.tcp.service[smtp]',60,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10031,1,'');
+INSERT INTO items VALUES (18452,0,'','',161,10017,'SSH server is running','net.tcp.service[ssh]',60,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10033,1,'');
+INSERT INTO items VALUES (18453,0,'','',161,10017,'Number of running processes','proc.num[,,run]',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10013,0,'');
+INSERT INTO items VALUES (18454,0,'','',161,10017,'Number of running processes apache','proc.num[httpd]',60,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10048,0,'');
+INSERT INTO items VALUES (18455,0,'','',161,10017,'Number of running processes inetd','proc.num[inetd]',60,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10047,0,'');
+INSERT INTO items VALUES (18456,0,'','',161,10017,'Number of running processes mysqld','proc.num[mysqld]',60,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10049,0,'');
+INSERT INTO items VALUES (18457,0,'','',161,10017,'Number of running processes sshd','proc.num[sshd]',60,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10051,0,'');
+INSERT INTO items VALUES (18458,0,'','',161,10017,'Number of running processes syslogd','proc.num[syslogd]',60,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10050,0,'');
+INSERT INTO items VALUES (18459,0,'','',161,10017,'Number of running processes $1','proc.num[zabbix_agentd]',60,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10052,0,'');
+INSERT INTO items VALUES (18460,0,'','',161,10017,'Number of running processes $1','proc.num[zabbix_server]',60,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10053,0,'');
+INSERT INTO items VALUES (18461,0,'','',161,10017,'Number of processes','proc.num[]',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10009,0,'');
+INSERT INTO items VALUES (18462,0,'','',161,10017,'Temperature of mainboard','sensor[temp1]',30,7,365,0,NULL,NULL,NULL,0,0,'','C',0,0,NULL,'',0,'','','0','',0,'',10418,0,'');
+INSERT INTO items VALUES (18463,0,'','',161,10017,'Temperature of CPU 1of2','sensor[temp2]',30,7,365,0,NULL,NULL,NULL,0,0,'','C',0,0,NULL,'',0,'','','0','',0,'',10419,0,'');
+INSERT INTO items VALUES (18464,0,'','',161,10017,'Temperature of CPU 2of2','sensor[temp3]',30,7,365,0,NULL,NULL,NULL,0,0,'','C',0,0,NULL,'',0,'','','0','',0,'',10420,0,'');
+INSERT INTO items VALUES (18465,0,'','',161,10017,'Host status','status',60,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10061,2,'');
+INSERT INTO items VALUES (18466,0,'public','interfaces.ifTable.ifEntry.ifInOctets.1',161,10017,'Host boot time','system.boottime',300,90,365,0,NULL,NULL,NULL,0,3,'','unixtime',0,0,NULL,'',0,'','','1','',0,'',17318,0,'');
+INSERT INTO items VALUES (18467,0,'','',161,10017,'Processor load15','system.cpu.load[,avg15]',20,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','0','',0,'',10012,0,'');
+INSERT INTO items VALUES (18468,0,'','',161,10017,'Processor load','system.cpu.load[,avg1]',5,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','0','',0,'',10010,0,'');
+INSERT INTO items VALUES (18469,0,'','',161,10017,'Processor load5','system.cpu.load[,avg5]',10,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','0','',0,'',10011,0,'');
+INSERT INTO items VALUES (18470,0,'public','interfaces.ifTable.ifEntry.ifInOctets.1',161,10017,'CPU $2 time ($3)','system.cpu.util[,idle,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',17354,0,'');
+INSERT INTO items VALUES (18471,0,'public','interfaces.ifTable.ifEntry.ifInOctets.1',161,10017,'CPU $2 time ($3)','system.cpu.util[,nice,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',17358,0,'');
+INSERT INTO items VALUES (18472,0,'public','interfaces.ifTable.ifEntry.ifInOctets.1',161,10017,'CPU $2 time ($3)','system.cpu.util[,system,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',17360,0,'');
+INSERT INTO items VALUES (18473,0,'public','interfaces.ifTable.ifEntry.ifInOctets.1',161,10017,'CPU user time (avg1)','system.cpu.util[,user,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',17356,0,'');
+INSERT INTO items VALUES (18474,0,'public','interfaces.ifTable.ifEntry.ifInOctets.1',161,10017,'CPU $2 time ($3)','system.cpu.util[,wait,avg1]',10,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',17362,0,'');
+INSERT INTO items VALUES (18475,0,'','',161,10017,'Host name','system.hostname',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','0','',0,'',10057,0,'');
+INSERT INTO items VALUES (18476,0,'public','interfaces.ifTable.ifEntry.ifInOctets.1',161,10017,'Host local time','system.localtime',30,90,365,0,NULL,NULL,NULL,0,3,'','unixtime',0,0,NULL,'',0,'','','1','',0,'',17352,0,'');
+INSERT INTO items VALUES (18477,0,'','',161,10017,'Free swap space','system.swap.size[,free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',10014,0,'');
+INSERT INTO items VALUES (18478,0,'public','interfaces.ifTable.ifEntry.ifInOctets.1',161,10017,'Free swap space in %','system.swap.size[,pfree]',30,7,365,0,NULL,NULL,NULL,0,0,'','%',0,0,NULL,'',0,'','','1','',0,'',17350,0,'');
+INSERT INTO items VALUES (18479,0,'','',161,10017,'Total swap space','system.swap.size[,total]',1800,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',10030,0,'');
+INSERT INTO items VALUES (18480,0,'','',161,10017,'Host information','system.uname',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','0','',0,'',10058,0,'');
+INSERT INTO items VALUES (18481,0,'','',161,10017,'Host uptime (in sec)','system.uptime',300,7,365,0,NULL,NULL,NULL,0,3,'','uptime',0,0,NULL,'',0,'','','0','',0,'',10025,0,'');
+INSERT INTO items VALUES (18482,0,'','',161,10017,'Number of users connected','system.users.num',60,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10016,0,'');
+INSERT INTO items VALUES (18483,0,'','',161,10017,'Checksum of $1','vfs.file.cksum[/etc/inetd.conf]',600,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10017,0,'');
+INSERT INTO items VALUES (18484,0,'','',161,10017,'Checksum of $1','vfs.file.cksum[/etc/passwd]',600,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10019,0,'');
+INSERT INTO items VALUES (18485,0,'','',161,10017,'Checksum of $1','vfs.file.cksum[/etc/services]',600,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10040,0,'');
+INSERT INTO items VALUES (18486,0,'','',161,10017,'Checksum of $1','vfs.file.cksum[/usr/bin/ssh]',600,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10039,0,'');
+INSERT INTO items VALUES (18487,0,'','',161,10017,'Checksum of $1','vfs.file.cksum[/usr/sbin/sshd]',600,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10038,0,'');
+INSERT INTO items VALUES (18488,0,'','',161,10017,'Checksum of $1','vfs.file.cksum[/vmlinuz]',600,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10018,0,'');
+INSERT INTO items VALUES (18489,0,'','',161,10017,'Free number of inodes on $1','vfs.fs.inode[/,free]',60,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10005,0,'');
+INSERT INTO items VALUES (18490,0,'public','interfaces.ifTable.ifEntry.ifInOctets.1',161,10017,'Free number of inodes on $1 in %','vfs.fs.inode[/,pfree]',30,7,365,0,NULL,NULL,NULL,0,0,'','%',0,0,NULL,'',0,'','','1','',0,'',17330,0,'');
+INSERT INTO items VALUES (18491,0,'','',161,10017,'Total number of inodes on $1','vfs.fs.inode[/,total]',3600,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10062,0,'');
+INSERT INTO items VALUES (18492,0,'','',161,10017,'Free number of inodes on $1','vfs.fs.inode[/home,free]',60,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10022,0,'');
+INSERT INTO items VALUES (18493,0,'public','interfaces.ifTable.ifEntry.ifInOctets.1',161,10017,'Free number of inodes on $1 in %','vfs.fs.inode[/home,pfree]',30,7,365,0,NULL,NULL,NULL,0,0,'','%',0,0,NULL,'',0,'','','1','',0,'',17332,0,'');
+INSERT INTO items VALUES (18494,0,'','',161,10017,'Total number of inodes on $1','vfs.fs.inode[/home,total]',3600,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10066,0,'');
+INSERT INTO items VALUES (18495,0,'','',161,10017,'Free number of inodes on $1','vfs.fs.inode[/opt,free]',60,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10006,0,'');
+INSERT INTO items VALUES (18496,0,'public','interfaces.ifTable.ifEntry.ifInOctets.1',161,10017,'Free number of inodes on $1 in %','vfs.fs.inode[/opt,pfree]',30,7,365,0,NULL,NULL,NULL,0,0,'','%',0,0,NULL,'',0,'','','1','',0,'',17334,0,'');
+INSERT INTO items VALUES (18497,0,'','',161,10017,'Total number of inodes on $1','vfs.fs.inode[/opt,total]',3600,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10063,0,'');
+INSERT INTO items VALUES (18498,0,'','',161,10017,'Free number of inodes on $1','vfs.fs.inode[/tmp,free]',60,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10007,0,'');
+INSERT INTO items VALUES (18499,0,'public','interfaces.ifTable.ifEntry.ifInOctets.1',161,10017,'Free number of inodes on $1 in %','vfs.fs.inode[/tmp,pfree]',30,7,365,0,NULL,NULL,NULL,0,0,'','%',0,0,NULL,'',0,'','','1','',0,'',17336,0,'');
+INSERT INTO items VALUES (18500,0,'','',161,10017,'Total number of inodes on $1','vfs.fs.inode[/tmp,total]',3600,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10064,0,'');
+INSERT INTO items VALUES (18501,0,'','',161,10017,'Free number of inodes on $1','vfs.fs.inode[/usr,free]',60,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10008,0,'');
+INSERT INTO items VALUES (18502,0,'public','interfaces.ifTable.ifEntry.ifInOctets.1',161,10017,'Free number of inodes on $1 in %','vfs.fs.inode[/usr,pfree]',30,7,365,0,NULL,NULL,NULL,0,0,'','%',0,0,NULL,'',0,'','','1','',0,'',17338,0,'');
+INSERT INTO items VALUES (18503,0,'','',161,10017,'Total number of inodes on $1','vfs.fs.inode[/usr,total]',3600,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10065,0,'');
+INSERT INTO items VALUES (18504,0,'','',161,10017,'Free disk space on $1','vfs.fs.size[/,free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',1,0,NULL,'',0,'','','1024','',0,'',10002,0,'');
+INSERT INTO items VALUES (18505,0,'public','interfaces.ifTable.ifEntry.ifInOctets.1',161,10017,'Free disk space on $1 in %','vfs.fs.size[/,pfree]',30,7,365,0,NULL,NULL,NULL,0,0,'','%',0,0,NULL,'',0,'','','1','',0,'',17322,0,'');
+INSERT INTO items VALUES (18506,0,'public','interfaces.ifTable.ifEntry.ifInOctets.1',161,10017,'Used disk space on $1 in %','vfs.fs.size[/,pused]',30,7,365,0,NULL,NULL,NULL,0,0,'','%',0,0,NULL,'',0,'','','1','',0,'',17340,0,'');
+INSERT INTO items VALUES (18507,0,'','',161,10017,'Total disk space on $1','vfs.fs.size[/,total]',3600,7,365,0,NULL,NULL,NULL,0,3,'','B',1,0,NULL,'',0,'','','1024','',0,'',10067,0,'');
+INSERT INTO items VALUES (18508,0,'','',161,10017,'Used disk space on $1','vfs.fs.size[/,used]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',1,0,NULL,'',0,'','','1024','',0,'',10412,0,'');
+INSERT INTO items VALUES (18509,0,'','',161,10017,'Free disk space on $1','vfs.fs.size[/home,free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',1,0,NULL,'',0,'','','1024','',0,'',10021,0,'');
+INSERT INTO items VALUES (18510,0,'public','interfaces.ifTable.ifEntry.ifInOctets.1',161,10017,'Free disk space on $1 in %','vfs.fs.size[/home,pfree]',30,7,365,0,NULL,NULL,NULL,0,0,'','%',0,0,NULL,'',0,'','','1','',0,'',17324,0,'');
+INSERT INTO items VALUES (18511,0,'','',161,10017,'Total disk space on $1','vfs.fs.size[/home,total]',3600,7,365,0,NULL,NULL,NULL,0,3,'','B',1,0,NULL,'',0,'','','1024','',0,'',10071,0,'');
+INSERT INTO items VALUES (18512,0,'','',161,10017,'Used disk space on $1','vfs.fs.size[/home,used]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',1,0,NULL,'',0,'','','1024','',0,'',10417,0,'');
+INSERT INTO items VALUES (18513,0,'','',161,10017,'Free disk space on $1','vfs.fs.size[/opt,free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',1,0,NULL,'',0,'','','1024','',0,'',10024,0,'');
+INSERT INTO items VALUES (18514,0,'public','interfaces.ifTable.ifEntry.ifInOctets.1',161,10017,'Free disk space on $1 in %','vfs.fs.size[/opt,pfree]',30,7,365,0,NULL,NULL,NULL,0,0,'','%',0,0,NULL,'',0,'','','1','',0,'',17326,0,'');
+INSERT INTO items VALUES (18515,0,'public','interfaces.ifTable.ifEntry.ifInOctets.1',161,10017,'Used disk space on $1 in %','vfs.fs.size[/opt,pused]',30,7,365,0,NULL,NULL,NULL,0,0,'','%',0,0,NULL,'',0,'','','1','',0,'',17342,0,'');
+INSERT INTO items VALUES (18516,0,'','',161,10017,'Total disk space on $1','vfs.fs.size[/opt,total]',3600,7,365,0,NULL,NULL,NULL,0,3,'','B',1,0,NULL,'',0,'','','1024','',0,'',10068,0,'');
+INSERT INTO items VALUES (18517,0,'','',161,10017,'Used disk space on $1','vfs.fs.size[/opt,used]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',1,0,NULL,'',0,'','','1024','',0,'',10413,0,'');
+INSERT INTO items VALUES (18518,0,'','',161,10017,'Free disk space on $1','vfs.fs.size[/tmp,free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',1,0,NULL,'',0,'','','1024','',0,'',10003,0,'');
+INSERT INTO items VALUES (18519,0,'public','interfaces.ifTable.ifEntry.ifInOctets.1',161,10017,'Free disk space on $1 in %','vfs.fs.size[/tmp,pfree]',30,7,365,0,NULL,NULL,NULL,0,0,'','%',0,0,NULL,'',0,'','','1','',0,'',17328,0,'');
+INSERT INTO items VALUES (18520,0,'public','interfaces.ifTable.ifEntry.ifInOctets.1',161,10017,'Used disk space on $1 in %','vfs.fs.size[/tmp,pused]',30,7,365,0,NULL,NULL,NULL,0,0,'','%',0,0,NULL,'',0,'','','1','',0,'',17344,0,'');
+INSERT INTO items VALUES (18521,0,'','',161,10017,'Total disk space on $1','vfs.fs.size[/tmp,total]',3600,7,365,0,NULL,NULL,NULL,0,3,'','B',1,0,NULL,'',0,'','','1024','',0,'',10069,0,'');
+INSERT INTO items VALUES (18522,0,'','',161,10017,'Used disk space on $1','vfs.fs.size[/tmp,used]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',1,0,NULL,'',0,'','','1024','',0,'',10415,0,'');
+INSERT INTO items VALUES (18523,0,'','',161,10017,'Free disk space on $1','vfs.fs.size[/usr,free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',1,0,NULL,'',0,'','','1024','',0,'',10004,0,'');
+INSERT INTO items VALUES (18524,0,'public','interfaces.ifTable.ifEntry.ifInOctets.1',161,10017,'Free disk space on $1 in %','vfs.fs.size[/usr,pfree]',30,7,365,0,NULL,NULL,NULL,0,0,'','%',0,0,NULL,'',0,'','','1','',0,'',17320,0,'');
+INSERT INTO items VALUES (18525,0,'public','interfaces.ifTable.ifEntry.ifInOctets.1',161,10017,'Used disk space on $1 in %','vfs.fs.size[/usr,pused]',30,7,365,0,NULL,NULL,NULL,0,0,'','%',0,0,NULL,'',0,'','','1','',0,'',17346,0,'');
+INSERT INTO items VALUES (18526,0,'','',161,10017,'Total disk space on $1','vfs.fs.size[/usr,total]',3600,7,365,0,NULL,NULL,NULL,0,3,'','B',1,0,NULL,'',0,'','','1024','',0,'',10070,0,'');
+INSERT INTO items VALUES (18527,0,'','',161,10017,'Used disk space on $1','vfs.fs.size[/usr,used]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',1,0,NULL,'',0,'','','1024','',0,'',10416,0,'');
+INSERT INTO items VALUES (18528,0,'','',161,10017,'Free disk space on $1','vfs.fs.size[/var,free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',1,0,NULL,'',0,'','','1024','',0,'',10023,0,'');
+INSERT INTO items VALUES (18529,0,'public','interfaces.ifTable.ifEntry.ifInOctets.1',161,10017,'Free disk space on $1 in %','vfs.fs.size[/var,pfree]',30,90,365,0,NULL,NULL,NULL,0,0,'','%',0,0,NULL,'',0,'','','1','',0,'',17373,0,'');
+INSERT INTO items VALUES (18530,0,'public','interfaces.ifTable.ifEntry.ifInOctets.1',161,10017,'Used disk space on $1 in %','vfs.fs.size[/var,pused]',30,7,365,0,NULL,NULL,NULL,0,0,'','%',0,0,NULL,'',0,'','','1','',0,'',17348,0,'');
+INSERT INTO items VALUES (18531,0,'','',161,10017,'Used disk space on $1','vfs.fs.size[/var,used]',30,7,365,0,NULL,NULL,NULL,0,0,'','B',1,0,NULL,'',0,'','','1024','',0,'',10414,0,'');
+INSERT INTO items VALUES (18532,0,'','',161,10017,'Buffers memory','vm.memory.size[buffers]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',10028,0,'');
+INSERT INTO items VALUES (18533,0,'','',161,10017,'Cached memory','vm.memory.size[cached]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',10029,0,'');
+INSERT INTO items VALUES (18534,0,'','',161,10017,'Free memory','vm.memory.size[free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',10001,0,'');
+INSERT INTO items VALUES (18535,0,'','',161,10017,'Shared memory','vm.memory.size[shared]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',10027,0,'');
+INSERT INTO items VALUES (18536,0,'','',161,10017,'Total memory','vm.memory.size[total]',1800,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',10026,0,'');
 
 --
 -- Dumping data for table `triggers`
@@ -2534,6 +2638,50 @@ INSERT INTO triggers VALUES (12764,'{11853}>100','icmpOutTimestampReps on {HOSTN
 INSERT INTO triggers VALUES (12765,'{11854}>100','icmpOutAddrMasks on {HOSTNAME} is too High','',0,2,3,0,0,' ','Trigger just added. No status update so far.',0);
 INSERT INTO triggers VALUES (12766,'{11855}>100','icmpOutAddrMaskReps on {HOSTNAME} is too High','',0,2,3,0,0,' ','Trigger just added. No status update so far.',0);
 INSERT INTO triggers VALUES (12767,'{11856}>1000','icmpOutRedirects on {HOSTNAME} is too High','',0,2,3,0,0,' ','Trigger just added. No status update so far.',0);
+INSERT INTO triggers VALUES (12768,'{11857}>0','Version of zabbix_agent(d) was changed on {HOSTNAME}','',0,2,3,0,0,'','',10045);
+INSERT INTO triggers VALUES (12769,'{11858}<512','Configured max number of opened files is too low on {HOSTNAME}','',0,2,1,0,0,'','',10042);
+INSERT INTO triggers VALUES (12770,'{11859}<256','Configured max number of processes is too low on {HOSTNAME}','',0,2,1,0,0,'','',10041);
+INSERT INTO triggers VALUES (12771,'{11860}=0','FTP server is down on {HOSTNAME}','',0,2,3,0,0,'','',10023);
+INSERT INTO triggers VALUES (12772,'{11861}=0','WEB (HTTP) server is down on {HOSTNAME}','',0,2,3,0,0,'','',10046);
+INSERT INTO triggers VALUES (12773,'{11862}=0','IMAP server is down on {HOSTNAME}','',0,2,3,0,0,'','',10028);
+INSERT INTO triggers VALUES (12774,'{11863}=0','News (NNTP) server is down on {HOSTNAME}','',0,2,3,0,0,'','',10032);
+INSERT INTO triggers VALUES (12775,'{11864}=0','POP3 server is down on {HOSTNAME}','',0,2,3,0,0,'','',10027);
+INSERT INTO triggers VALUES (12776,'{11865}=0','Email (SMTP) server is down on {HOSTNAME}','',0,2,3,0,0,'','',10022);
+INSERT INTO triggers VALUES (12777,'{11866}=0','SSH server is down on {HOSTNAME}','',0,2,3,0,0,'','',10024);
+INSERT INTO triggers VALUES (12778,'{11867}>10','Too many processes running on {HOSTNAME}','',0,2,3,0,0,'','',10011);
+INSERT INTO triggers VALUES (12779,'{11868}<1','Apache is not running on {HOSTNAME}','',0,2,3,0,0,'','',10034);
+INSERT INTO triggers VALUES (12780,'{11869}<1','Inetd is not running on {HOSTNAME}','',0,2,3,0,0,'','',10033);
+INSERT INTO triggers VALUES (12781,'{11870}<1','Mysql is not running on {HOSTNAME}','',0,2,3,0,0,'','',10035);
+INSERT INTO triggers VALUES (12782,'{11871}<1','Sshd is not running on {HOSTNAME}','',0,2,3,0,0,'','',10037);
+INSERT INTO triggers VALUES (12783,'{11872}<1','Syslogd is not running on {HOSTNAME}','',0,2,3,0,0,'','',10036);
+INSERT INTO triggers VALUES (12784,'{11873}<1','Zabbix_agentd is not running on {HOSTNAME}','',0,2,3,0,0,'','',10038);
+INSERT INTO triggers VALUES (12785,'{11874}<1','Zabbix_server is not running on {HOSTNAME}','',0,2,3,0,0,'','',10039);
+INSERT INTO triggers VALUES (12786,'{11875}>300','Too many processes on {HOSTNAME}','',0,2,4,0,0,'','',10190);
+INSERT INTO triggers VALUES (12787,'{11876}=2','Server {HOSTNAME} is unreachable','',0,2,4,0,0,'','',10047);
+INSERT INTO triggers VALUES (12788,'{11877}>5','Processor load is too high on {HOSTNAME}','',0,2,3,0,0,'','',10010);
+INSERT INTO triggers VALUES (12789,'{11878}>0','Hostname was changed on {HOSTNAME}','',0,2,1,0,0,'','',10043);
+INSERT INTO triggers VALUES (12790,'{11879}<100000','Lack of free swap space on {HOSTNAME}','',0,2,4,0,0,'','',10012);
+INSERT INTO triggers VALUES (12791,'{11880}>0','Host information was changed on {HOSTNAME}','',0,2,1,0,0,'','',10044);
+INSERT INTO triggers VALUES (12792,'{11881}<600','{HOSTNAME} has just been restarted','',0,2,1,0,0,'','',10021);
+INSERT INTO triggers VALUES (12793,'{11882}>50','Too may users connected on server {HOSTNAME}','',0,2,3,0,0,'','',10013);
+INSERT INTO triggers VALUES (12794,'{11883}>0','/etc/inetd.conf has been changed on server {HOSTNAME}','',0,2,2,0,0,'','',10014);
+INSERT INTO triggers VALUES (12795,'{11884}>0','/etc/passwd has been changed on server {HOSTNAME}','',0,2,3,0,0,'','',10016);
+INSERT INTO triggers VALUES (12796,'{11885}>0','/etc/services has been changed on server {HOSTNAME}','',0,2,3,0,0,'','',10031);
+INSERT INTO triggers VALUES (12797,'{11886}>0','/usr/bin/ssh has been changed on server {HOSTNAME}','',0,2,3,0,0,'','',10030);
+INSERT INTO triggers VALUES (12798,'{11887}>0','/usr/sbin/sshd has been changed on server {HOSTNAME}','',0,2,3,0,0,'','',10029);
+INSERT INTO triggers VALUES (12799,'{11888}>0','/vmlinuz has been changed on server {HOSTNAME}','',0,2,2,0,0,'','',10015);
+INSERT INTO triggers VALUES (12800,'{11889}<10','Low number of free inodes on {HOSTNAME} volume /','',0,2,4,0,0,'','',10005);
+INSERT INTO triggers VALUES (12801,'{11890}<10','Low number of free inodes on {HOSTNAME} volume /home','',0,2,4,0,0,'','',10018);
+INSERT INTO triggers VALUES (12802,'{11891}<10','Low number of free inodes on {HOSTNAME} volume /opt','',0,2,4,0,0,'','',10006);
+INSERT INTO triggers VALUES (12803,'{11892}<10','Low number of free inodes on {HOSTNAME} volume /tmp','',0,2,4,0,0,'','',10007);
+INSERT INTO triggers VALUES (12804,'{11893}<10','Low number of free inodes on {HOSTNAME} volume /usr','',0,2,4,0,0,'','',10008);
+INSERT INTO triggers VALUES (12805,'{11894}<10','Low free disk space on {HOSTNAME} volume /','',0,2,4,0,0,'','',10002);
+INSERT INTO triggers VALUES (12806,'{11895}<10','Low free disk space on {HOSTNAME} volume /home','',0,2,4,0,0,'','',10017);
+INSERT INTO triggers VALUES (12807,'{11896}<10','Low free disk space on {HOSTNAME} volume /opt','',0,2,4,0,0,'','',10020);
+INSERT INTO triggers VALUES (12808,'{11897}<10','Low free disk space on {HOSTNAME} volume /tmp','',0,2,4,0,0,'','',10189);
+INSERT INTO triggers VALUES (12809,'{11898}<10','Low free disk space on {HOSTNAME} volume /usr','',0,2,4,0,0,'','',10004);
+INSERT INTO triggers VALUES (12810,'{11899}<10','Low free disk space on {HOSTNAME} volume /var','',0,2,4,0,0,'','',10019);
+INSERT INTO triggers VALUES (12811,'{11900}<10000','Lack of free memory on server {HOSTNAME}','',0,2,3,0,0,'','',10001);
 
 --
 -- Dumping data for table `functions`
@@ -3370,10 +3518,55 @@ INSERT INTO functions VALUES (11853,18252,12764,NULL,'delta','0');
 INSERT INTO functions VALUES (11854,18242,12765,NULL,'delta','0');
 INSERT INTO functions VALUES (11855,18241,12766,NULL,'delta','0');
 INSERT INTO functions VALUES (11856,18249,12767,NULL,'delta','0');
+INSERT INTO functions VALUES (11857,18436,12768,NULL,'diff','0');
+INSERT INTO functions VALUES (11858,18438,12769,NULL,'last','0');
+INSERT INTO functions VALUES (11859,18439,12770,NULL,'last','0');
+INSERT INTO functions VALUES (11860,18446,12771,NULL,'last','0');
+INSERT INTO functions VALUES (11861,18447,12772,NULL,'last','0');
+INSERT INTO functions VALUES (11862,18448,12773,NULL,'last','0');
+INSERT INTO functions VALUES (11863,18449,12774,NULL,'last','0');
+INSERT INTO functions VALUES (11864,18450,12775,NULL,'last','0');
+INSERT INTO functions VALUES (11865,18451,12776,NULL,'last','0');
+INSERT INTO functions VALUES (11866,18452,12777,NULL,'last','0');
+INSERT INTO functions VALUES (11867,18453,12778,NULL,'last','0');
+INSERT INTO functions VALUES (11868,18454,12779,NULL,'last','0');
+INSERT INTO functions VALUES (11869,18455,12780,NULL,'last','0');
+INSERT INTO functions VALUES (11870,18456,12781,NULL,'last','0');
+INSERT INTO functions VALUES (11871,18457,12782,NULL,'last','0');
+INSERT INTO functions VALUES (11872,18458,12783,NULL,'last','0');
+INSERT INTO functions VALUES (11873,18459,12784,NULL,'last','0');
+INSERT INTO functions VALUES (11874,18460,12785,NULL,'last','0');
+INSERT INTO functions VALUES (11875,18461,12786,NULL,'last','0');
+INSERT INTO functions VALUES (11876,18465,12787,NULL,'last','0');
+INSERT INTO functions VALUES (11877,18468,12788,NULL,'last','0');
+INSERT INTO functions VALUES (11878,18475,12789,NULL,'diff','0');
+INSERT INTO functions VALUES (11879,18477,12790,NULL,'last','0');
+INSERT INTO functions VALUES (11880,18480,12791,NULL,'diff','0');
+INSERT INTO functions VALUES (11881,18481,12792,NULL,'last','0');
+INSERT INTO functions VALUES (11882,18482,12793,NULL,'last','0');
+INSERT INTO functions VALUES (11883,18483,12794,NULL,'diff','0');
+INSERT INTO functions VALUES (11884,18484,12795,NULL,'diff','0');
+INSERT INTO functions VALUES (11885,18485,12796,NULL,'diff','0');
+INSERT INTO functions VALUES (11886,18486,12797,NULL,'diff','0');
+INSERT INTO functions VALUES (11887,18487,12798,NULL,'diff','0');
+INSERT INTO functions VALUES (11888,18488,12799,NULL,'diff','0');
+INSERT INTO functions VALUES (11889,18490,12800,NULL,'last','0');
+INSERT INTO functions VALUES (11890,18493,12801,NULL,'last','0');
+INSERT INTO functions VALUES (11891,18496,12802,NULL,'last','0');
+INSERT INTO functions VALUES (11892,18499,12803,NULL,'last','0');
+INSERT INTO functions VALUES (11893,18502,12804,NULL,'last','0');
+INSERT INTO functions VALUES (11894,18505,12805,NULL,'last','0');
+INSERT INTO functions VALUES (11895,18510,12806,NULL,'last','0');
+INSERT INTO functions VALUES (11896,18514,12807,NULL,'last','0');
+INSERT INTO functions VALUES (11897,18519,12808,NULL,'last','0');
+INSERT INTO functions VALUES (11898,18524,12809,NULL,'last','0');
+INSERT INTO functions VALUES (11899,18529,12810,NULL,'last','0');
+INSERT INTO functions VALUES (11900,18534,12811,NULL,'last','0');
 
 --
 -- Dumping data for table `items_applications`
 --
+
 
 INSERT INTO items_applications VALUES (138,1,10016);
 INSERT INTO items_applications VALUES (694,1,10025);
@@ -4962,6 +5155,177 @@ INSERT INTO items_applications VALUES (2269,142,18224);
 INSERT INTO items_applications VALUES (2271,142,18225);
 INSERT INTO items_applications VALUES (2273,142,18226);
 INSERT INTO items_applications VALUES (2275,142,18227);
+INSERT INTO items_applications VALUES (2336,143,18477);
+INSERT INTO items_applications VALUES (2338,143,18478);
+INSERT INTO items_applications VALUES (2339,143,18479);
+INSERT INTO items_applications VALUES (2352,143,18489);
+INSERT INTO items_applications VALUES (2354,143,18490);
+INSERT INTO items_applications VALUES (2356,143,18491);
+INSERT INTO items_applications VALUES (2358,143,18492);
+INSERT INTO items_applications VALUES (2360,143,18493);
+INSERT INTO items_applications VALUES (2362,143,18494);
+INSERT INTO items_applications VALUES (2364,143,18495);
+INSERT INTO items_applications VALUES (2366,143,18496);
+INSERT INTO items_applications VALUES (2368,143,18497);
+INSERT INTO items_applications VALUES (2370,143,18498);
+INSERT INTO items_applications VALUES (2372,143,18499);
+INSERT INTO items_applications VALUES (2374,143,18500);
+INSERT INTO items_applications VALUES (2376,143,18501);
+INSERT INTO items_applications VALUES (2378,143,18502);
+INSERT INTO items_applications VALUES (2380,143,18503);
+INSERT INTO items_applications VALUES (2382,143,18504);
+INSERT INTO items_applications VALUES (2384,143,18505);
+INSERT INTO items_applications VALUES (2386,143,18506);
+INSERT INTO items_applications VALUES (2388,143,18507);
+INSERT INTO items_applications VALUES (2390,143,18508);
+INSERT INTO items_applications VALUES (2392,143,18509);
+INSERT INTO items_applications VALUES (2394,143,18510);
+INSERT INTO items_applications VALUES (2396,143,18511);
+INSERT INTO items_applications VALUES (2398,143,18512);
+INSERT INTO items_applications VALUES (2400,143,18513);
+INSERT INTO items_applications VALUES (2402,143,18514);
+INSERT INTO items_applications VALUES (2404,143,18515);
+INSERT INTO items_applications VALUES (2406,143,18516);
+INSERT INTO items_applications VALUES (2408,143,18517);
+INSERT INTO items_applications VALUES (2410,143,18518);
+INSERT INTO items_applications VALUES (2412,143,18519);
+INSERT INTO items_applications VALUES (2414,143,18520);
+INSERT INTO items_applications VALUES (2416,143,18521);
+INSERT INTO items_applications VALUES (2418,143,18522);
+INSERT INTO items_applications VALUES (2420,143,18523);
+INSERT INTO items_applications VALUES (2422,143,18524);
+INSERT INTO items_applications VALUES (2424,143,18525);
+INSERT INTO items_applications VALUES (2426,143,18526);
+INSERT INTO items_applications VALUES (2428,143,18527);
+INSERT INTO items_applications VALUES (2430,143,18528);
+INSERT INTO items_applications VALUES (2432,143,18529);
+INSERT INTO items_applications VALUES (2434,143,18530);
+INSERT INTO items_applications VALUES (2436,143,18531);
+INSERT INTO items_applications VALUES (2438,143,18532);
+INSERT INTO items_applications VALUES (2440,143,18533);
+INSERT INTO items_applications VALUES (2442,143,18534);
+INSERT INTO items_applications VALUES (2444,143,18535);
+INSERT INTO items_applications VALUES (2446,143,18536);
+INSERT INTO items_applications VALUES (2316,144,18467);
+INSERT INTO items_applications VALUES (2318,144,18468);
+INSERT INTO items_applications VALUES (2320,144,18469);
+INSERT INTO items_applications VALUES (2322,144,18470);
+INSERT INTO items_applications VALUES (2324,144,18471);
+INSERT INTO items_applications VALUES (2326,144,18472);
+INSERT INTO items_applications VALUES (2328,144,18473);
+INSERT INTO items_applications VALUES (2330,144,18474);
+INSERT INTO items_applications VALUES (2337,145,18478);
+INSERT INTO items_applications VALUES (2351,145,18489);
+INSERT INTO items_applications VALUES (2353,145,18490);
+INSERT INTO items_applications VALUES (2355,145,18491);
+INSERT INTO items_applications VALUES (2357,145,18492);
+INSERT INTO items_applications VALUES (2359,145,18493);
+INSERT INTO items_applications VALUES (2361,145,18494);
+INSERT INTO items_applications VALUES (2363,145,18495);
+INSERT INTO items_applications VALUES (2365,145,18496);
+INSERT INTO items_applications VALUES (2367,145,18497);
+INSERT INTO items_applications VALUES (2369,145,18498);
+INSERT INTO items_applications VALUES (2371,145,18499);
+INSERT INTO items_applications VALUES (2373,145,18500);
+INSERT INTO items_applications VALUES (2375,145,18501);
+INSERT INTO items_applications VALUES (2377,145,18502);
+INSERT INTO items_applications VALUES (2379,145,18503);
+INSERT INTO items_applications VALUES (2381,145,18504);
+INSERT INTO items_applications VALUES (2383,145,18505);
+INSERT INTO items_applications VALUES (2385,145,18506);
+INSERT INTO items_applications VALUES (2387,145,18507);
+INSERT INTO items_applications VALUES (2389,145,18508);
+INSERT INTO items_applications VALUES (2391,145,18509);
+INSERT INTO items_applications VALUES (2393,145,18510);
+INSERT INTO items_applications VALUES (2395,145,18511);
+INSERT INTO items_applications VALUES (2397,145,18512);
+INSERT INTO items_applications VALUES (2399,145,18513);
+INSERT INTO items_applications VALUES (2401,145,18514);
+INSERT INTO items_applications VALUES (2403,145,18515);
+INSERT INTO items_applications VALUES (2405,145,18516);
+INSERT INTO items_applications VALUES (2407,145,18517);
+INSERT INTO items_applications VALUES (2409,145,18518);
+INSERT INTO items_applications VALUES (2411,145,18519);
+INSERT INTO items_applications VALUES (2413,145,18520);
+INSERT INTO items_applications VALUES (2415,145,18521);
+INSERT INTO items_applications VALUES (2417,145,18522);
+INSERT INTO items_applications VALUES (2419,145,18523);
+INSERT INTO items_applications VALUES (2421,145,18524);
+INSERT INTO items_applications VALUES (2423,145,18525);
+INSERT INTO items_applications VALUES (2425,145,18526);
+INSERT INTO items_applications VALUES (2427,145,18527);
+INSERT INTO items_applications VALUES (2429,145,18528);
+INSERT INTO items_applications VALUES (2431,145,18529);
+INSERT INTO items_applications VALUES (2433,145,18530);
+INSERT INTO items_applications VALUES (2435,145,18531);
+INSERT INTO items_applications VALUES (2276,146,18435);
+INSERT INTO items_applications VALUES (2313,146,18465);
+INSERT INTO items_applications VALUES (2315,146,18466);
+INSERT INTO items_applications VALUES (2333,146,18475);
+INSERT INTO items_applications VALUES (2335,146,18476);
+INSERT INTO items_applications VALUES (2341,146,18480);
+INSERT INTO items_applications VALUES (2343,146,18481);
+INSERT INTO items_applications VALUES (2345,147,18483);
+INSERT INTO items_applications VALUES (2346,147,18484);
+INSERT INTO items_applications VALUES (2347,147,18485);
+INSERT INTO items_applications VALUES (2348,147,18486);
+INSERT INTO items_applications VALUES (2349,147,18487);
+INSERT INTO items_applications VALUES (2350,147,18488);
+INSERT INTO items_applications VALUES (2278,148,18437);
+INSERT INTO items_applications VALUES (2437,149,18532);
+INSERT INTO items_applications VALUES (2439,149,18533);
+INSERT INTO items_applications VALUES (2441,149,18534);
+INSERT INTO items_applications VALUES (2443,149,18535);
+INSERT INTO items_applications VALUES (2445,149,18536);
+INSERT INTO items_applications VALUES (2281,150,18440);
+INSERT INTO items_applications VALUES (2283,150,18441);
+INSERT INTO items_applications VALUES (2285,150,18442);
+INSERT INTO items_applications VALUES (2287,150,18443);
+INSERT INTO items_applications VALUES (2289,150,18444);
+INSERT INTO items_applications VALUES (2291,150,18445);
+INSERT INTO items_applications VALUES (2279,151,18438);
+INSERT INTO items_applications VALUES (2280,151,18439);
+INSERT INTO items_applications VALUES (2309,151,18462);
+INSERT INTO items_applications VALUES (2310,151,18463);
+INSERT INTO items_applications VALUES (2311,151,18464);
+INSERT INTO items_applications VALUES (2312,151,18465);
+INSERT INTO items_applications VALUES (2314,151,18466);
+INSERT INTO items_applications VALUES (2332,151,18475);
+INSERT INTO items_applications VALUES (2334,151,18476);
+INSERT INTO items_applications VALUES (2340,151,18480);
+INSERT INTO items_applications VALUES (2342,151,18481);
+INSERT INTO items_applications VALUES (2344,151,18482);
+INSERT INTO items_applications VALUES (2282,152,18440);
+INSERT INTO items_applications VALUES (2284,152,18441);
+INSERT INTO items_applications VALUES (2286,152,18442);
+INSERT INTO items_applications VALUES (2288,152,18443);
+INSERT INTO items_applications VALUES (2290,152,18444);
+INSERT INTO items_applications VALUES (2292,152,18445);
+INSERT INTO items_applications VALUES (2317,152,18467);
+INSERT INTO items_applications VALUES (2319,152,18468);
+INSERT INTO items_applications VALUES (2321,152,18469);
+INSERT INTO items_applications VALUES (2323,152,18470);
+INSERT INTO items_applications VALUES (2325,152,18471);
+INSERT INTO items_applications VALUES (2327,152,18472);
+INSERT INTO items_applications VALUES (2329,152,18473);
+INSERT INTO items_applications VALUES (2331,152,18474);
+INSERT INTO items_applications VALUES (2277,153,18436);
+INSERT INTO items_applications VALUES (2300,153,18453);
+INSERT INTO items_applications VALUES (2301,153,18454);
+INSERT INTO items_applications VALUES (2302,153,18455);
+INSERT INTO items_applications VALUES (2303,153,18456);
+INSERT INTO items_applications VALUES (2304,153,18457);
+INSERT INTO items_applications VALUES (2305,153,18458);
+INSERT INTO items_applications VALUES (2306,153,18459);
+INSERT INTO items_applications VALUES (2307,153,18460);
+INSERT INTO items_applications VALUES (2308,153,18461);
+INSERT INTO items_applications VALUES (2293,154,18446);
+INSERT INTO items_applications VALUES (2294,154,18447);
+INSERT INTO items_applications VALUES (2295,154,18448);
+INSERT INTO items_applications VALUES (2296,154,18449);
+INSERT INTO items_applications VALUES (2297,154,18450);
+INSERT INTO items_applications VALUES (2298,154,18451);
+INSERT INTO items_applications VALUES (2299,154,18452);
 
 --
 -- Dumping data for table `actions`
@@ -5002,3 +5366,55 @@ INSERT INTO drules VALUES (2,'Local network','192.168.1.1-255',3600,0,1);
 --
 
 INSERT INTO dchecks VALUES (2,2,9,'system.uname','','10050');
+
+--
+-- Dumping data for table `graphs`
+--
+
+INSERT INTO graphs VALUES (2,'CPU Loads',900,200,0,0.0000,100.0000,0,1,1,0);
+INSERT INTO graphs VALUES (3,'CPU Utilization',900,200,0,0.0000,100.0000,0,1,1,1);
+INSERT INTO graphs VALUES (4,'Network utilization',900,200,0,0.0000,100.0000,0,1,1,0);
+INSERT INTO graphs VALUES (5,'Disk usage',900,200,0,0.0000,100.0000,0,1,1,1);
+
+--
+-- Dumping data for table `graphs_items`
+--
+
+INSERT INTO graphs_items VALUES (2,2,18467,0,0,'990000',1,2,0,5);
+INSERT INTO graphs_items VALUES (3,2,18468,0,0,'009900',1,2,0,5);
+INSERT INTO graphs_items VALUES (4,2,18469,0,0,'999900',1,2,0,5);
+INSERT INTO graphs_items VALUES (5,3,18472,1,0,'990000',1,2,0,5);
+INSERT INTO graphs_items VALUES (6,3,18470,1,0,'009900',1,2,0,5);
+INSERT INTO graphs_items VALUES (7,3,18473,1,0,'999900',1,2,0,5);
+INSERT INTO graphs_items VALUES (8,4,18443,0,0,'000099',1,2,0,5);
+INSERT INTO graphs_items VALUES (9,4,18440,0,0,'009900',1,2,0,5);
+INSERT INTO graphs_items VALUES (10,5,18506,1,0,'990000',1,2,0,5);
+INSERT INTO graphs_items VALUES (11,5,18505,1,0,'009900',1,2,0,5);
+
+--
+-- Dumping data for table `screens`
+--
+
+INSERT INTO screens VALUES (2,'ZABBIX Server',2,3);
+
+--
+-- Dumping data for table `screens_items`
+--
+
+INSERT INTO screens_items VALUES (2,2,2,2,0,0,0,0,2,0,0,0,0,0,'');
+INSERT INTO screens_items VALUES (4,2,0,2,400,100,0,1,0,0,0,0,0,0,'');
+INSERT INTO screens_items VALUES (5,2,0,3,400,100,1,1,0,0,0,0,0,0,'');
+INSERT INTO screens_items VALUES (6,2,0,4,400,100,0,2,0,0,0,0,0,0,'');
+INSERT INTO screens_items VALUES (7,2,0,5,400,100,1,2,0,0,0,0,0,0,'');
+
+--
+-- Dumping data for table `sysmaps`
+--
+
+INSERT INTO sysmaps VALUES (2,'Local network',980,200,0,2,0);
+
+--
+-- Dumping data for table `sysmaps_elements`
+--
+
+INSERT INTO sysmaps_elements VALUES (2,2,10017,0,19,19,19,'ZABBIX Server',NULL,100,100,'');
