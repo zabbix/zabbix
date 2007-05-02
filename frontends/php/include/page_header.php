@@ -35,26 +35,6 @@ COpt::profiling_start("page");
 	if(!isset($page["type"])) $page["type"] = PAGE_TYPE_HTML;
 	if(!isset($page["file"])) $page["file"] = basename($_SERVER['PHP_SELF']);
 
-	/* Authorize user */
-	/*if(!defined('ZBX_PAGE_NO_AUTHERIZATION'))
-	{
-		check_authorisation();
-
-		include_once "include/locales/".$USER_DETAILS["lang"].".inc.php";
-		process_locales();
-	}
-	else
-	{
-		$USER_DETAILS = array(
-			"alias" =>"guest",
-			"userid"=>0,
-			"lang"  =>"en_gb",
-			"type"  =>"0",
-			"node"  =>array(
-				"name"  =>'- unknown -',
-				"nodeid"=>0));
-	}*/
-
 	include_once "include/locales/en_gb.inc.php";
 	process_locales();
 

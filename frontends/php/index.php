@@ -74,11 +74,12 @@
 
 			add_audit(AUDIT_ACTION_LOGIN,AUDIT_RESOURCE_USER,"Correct login [".$name."]");
 			
-			if($row["url"] != '')
+			if(empty($row["url"]))
 			{
-				Redirect($row["url"]);
-				return;
+				$row["url"] = "index.php";
 			}
+			Redirect($row["url"]);
+			return;
 		}
 		else
 		{
