@@ -137,13 +137,17 @@
 					array_push($this->main_node, $name);
 					break; // case
 				case XML_TAG_HOSTS:
+				case XML_TAG_GROUPS:
 				case XML_TAG_ZABBIX_EXPORT:
+				case XML_TAG_APPLICATIONS:
 				case XML_TAG_ITEMS:
 				case XML_TAG_TRIGGERS:
 				case XML_TAG_GRAPHS:
 				/* case XML_TAG_SCREENS:*/
 					$this->sub_node = null;
 					break; // case
+				case XML_TAG_GROUP:
+				case XML_TAG_APPLICATION:
 				default:
 					$this->sub_node = $name;
 					break; // case
@@ -202,6 +206,28 @@
 					array_push($this->data[XML_TAG_HOST]['groups'], $group["groupid"]);
 
 					break; // case
+				case XML_TAG_APPLICATION:
+					if(!isset($this->data[XML_TAG_HOST]['hostid']) || !$this->data[XML_TAG_HOST]['hostid'])
+						break; //case
+
+					if(!isset($this->data[XML_TAG_ITEM]))
+						break; //case
+
+					if(!($application = DBfetch(DBselect('select applicationid from applications'.
+						' where '.DBid2nodeid('applicationid').'='.$ZBX_CURNODEID.
+						' and name='.zbx_dbstr($this->element_data).
+						' and hostid='.$this->data[XML_TAG_HOST]['hostid']))))
+					{
+						$applicationid = add_application($this->element_data, $this->data[XML_TAG_HOST]['hostid']);
+					}
+					else
+					{
+						$applicationid = $application['applicationid'];
+					}
+
+					$this->data[XML_TAG_ITEM]['applications'][] = $applicationid;
+
+					break; // case
 				case XML_TAG_ITEM:
 					if(!isset($this->data[XML_TAG_HOST]['hostid']) || !$this->data[XML_TAG_HOST]['hostid'])
 					{
@@ -235,6 +261,22 @@
 					if(!isset($data['snmpv3_securitylevel']))	$data['snmpv3_securitylevel']	= 0;
 					if(!isset($data['snmpv3_authpassphrase']))	$data['snmpv3_authpassphrase']	= '';
 					if(!isset($data['snmpv3_privpassphrase']))	$data['snmpv3_privpassphrase']	= '';
+					if(!isset($data['valuemap']))			$data['valuemap']		= '';
+					if(!isset($data['applications']))		$data['applications']		= array();
+
+					if(!empty($data['valuemap']))
+					{
+						if( $valuemap = DBfetch(DBselect('select valuemapid from valuemaps '.
+										' where '.DBid2nodeid('valuemapid').'='.$ZBX_CURNODEID.
+										' and name='.zbx_dbstr($data['valuemap']))) )
+						{
+							$data['valuemapid'] = $valuemap['valuemapid'];
+						}
+						else
+						{
+							$data['valuemapid'] = add_valuemap($data['valuemap'],array());
+						}
+					}
 
 					if($item = DBfetch(DBselect('select itemid,valuemapid,templateid from items'.
 						' where key_='.zbx_dbstr($data['key']).
@@ -246,6 +288,9 @@
 							info('Item ['.$data['description'].'] skipped - user rule');
 							break;
 						}
+
+						if( !isset($data['valuemapid']) )
+							$data['valuemapid'] = $item['valuemapid'];
 
 						update_item(
 							$item['itemid'],
@@ -271,9 +316,12 @@
 							$data['formula'],
 							$data['trends'],
 							$data['logtimefmt'],
-							$item['valuemapid'],
+							$data['valuemapid'],
 							$data['delay_flex'],
-							get_applications_by_itemid($item['itemid']),
+							array_unique(array_merge(
+								$data['applications'],
+								get_applications_by_itemid($item['itemid'])
+								)),
 							$item['templateid']);
 					}
 					else
@@ -283,6 +331,9 @@
 							info('Item ['.$data['description'].'] skipped - user rule');
 							break; // case
 						}
+
+						if( !isset($data['valuemapid']) )
+							$data['valuemapid'] = 0;
 
 						add_item(
 							$data['description'],
@@ -307,9 +358,9 @@
 							$data['formula'],
 							$data['trends'],
 							$data['logtimefmt'],
-							0,
+							$data['valuemapid'],
 							$data['delay_flex'],
-							array());
+							$data['applications']);
 					}
 
 					break; // case

@@ -825,7 +825,7 @@ COpt::profiling_stop('prepare table');
 	{
 		$result = array();
 		
-		$db_applications = DBselect("select distinct app.*,app.".$field." as result from applications app, items_applications ia".
+		$db_applications = DBselect("select distinct app.".$field." as result from applications app, items_applications ia".
 			" where app.applicationid=ia.applicationid and ia.itemid=".$itemid);
 		while($db_application = DBfetch($db_applications))
 			array_push($result,$db_application["result"]);
