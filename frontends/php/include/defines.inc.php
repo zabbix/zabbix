@@ -24,6 +24,8 @@
 	define('XML_TAG_HOST',			'host');
 	define('XML_TAG_GROUPS',		'groups');
 	define('XML_TAG_GROUP',			'group');
+	define('XML_TAG_APPLICATIONS',		'applications');
+	define('XML_TAG_APPLICATION',		'application');
 	define('XML_TAG_ITEMS',			'items');
 	define('XML_TAG_ITEM',			'item');
 	define('XML_TAG_TRIGGERS',		'triggers');

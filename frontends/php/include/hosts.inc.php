@@ -681,6 +681,7 @@ require_once "include/items.inc.php";
 		if($templateid == 0){
 			delete_application($applicationid);
 		}
+		return false;
 
 	}
 	function	add_application($name,$hostid,$templateid=0)
