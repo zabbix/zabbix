@@ -64,7 +64,7 @@
 			{
 				foreach($value as $itemid => $item)
 				{
-					if( null == $item ) continue;
+					if( is_null($item) ) continue;
 					$this->ParseValue($name.'['.$itemid.']', $item);
 				}
 				return;
