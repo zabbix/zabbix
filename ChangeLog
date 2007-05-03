@@ -1,5 +1,6 @@
 Changes for 1.3.7:
 
+ - fixed automatic reload of active checks by agent (Alexei)
  - added missing host template linkage in data.sql (Alexei)
  - fixed SQL error under PostgreSQL (Alexei)
  - fixed memory corruption in poller (Alexei)
