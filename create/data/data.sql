@@ -80,6 +80,12 @@ INSERT INTO hosts VALUES (10016,'Template_SNMPv1_Device','',0,'',10050,3,0,'',0,
 INSERT INTO hosts VALUES (10017,'ZABBIX-Server','',1,'127.0.0.1',10050,0,0,'',0,0);
 
 --
+-- Dumping data for table `hosts_templates`
+--
+
+insert into hosts_templates values (1,10017,10001);
+
+--
 -- Dumping data for table `applications`
 --
 
