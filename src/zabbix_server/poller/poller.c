@@ -321,8 +321,6 @@ int get_values(void)
 				continue;
 			}
 			DBget_item_from_db(&item,row2);
-
-			DBfree_result(result2);
 		}
 		else
 		{
@@ -462,6 +460,12 @@ int get_values(void)
 		{
 			zabbix_log( LOG_LEVEL_CRIT, "Unknown response code returned.");
 			assert(0==1);
+		}
+		/* Poller for unreachable hosts */
+		if(poller_type == ZBX_POLLER_TYPE_UNREACHABLE)
+		{
+			/* We cannot freeit earlier because items has references to the structure */
+			DBfree_result(result2);
 		}
 		free_result(&agent);
 		DBcommit();
