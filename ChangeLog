@@ -1,5 +1,6 @@
 Changes for 1.3.7:
 
+ - fixed SQL error under PostgreSQL (Alexei)
  - fixed memory corruption in poller (Alexei)
 
 Changes for 1.3.6:
