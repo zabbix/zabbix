@@ -604,7 +604,6 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 			zbx_setproctitle("poller [sleeping for %d seconds]", sleeptime);
 
 			zbx_sleep( sleeptime );
-			continue;
 		}
 		else
 		{
