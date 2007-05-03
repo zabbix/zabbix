@@ -259,7 +259,7 @@ int get_values(void)
 	/* Poller for unreachable hosts */
 	if(poller_type == ZBX_POLLER_TYPE_UNREACHABLE)
 	{
-		result = DBselect("select h.hostid,i.itemid from hosts h,items i where " ZBX_SQL_MOD(h.hostid,%d) "=%d and i.nextcheck<=%d and i.status in (%d) and i.type not in (%d,%d,%d) and h.status=%d and h.disable_until<=%d and h.errors_from!=0 and h.hostid=i.hostid and i.key_ not in ('%s','%s','%s','%s') and " ZBX_COND_NODEID " group by h.hostid order by i.nextcheck",
+		result = DBselect("select h.hostid,min(i.itemid) from hosts h,items i where " ZBX_SQL_MOD(h.hostid,%d) "=%d and i.nextcheck<=%d and i.status in (%d) and i.type not in (%d,%d,%d) and h.status=%d and h.disable_until<=%d and h.errors_from!=0 and h.hostid=i.hostid and i.key_ not in ('%s','%s','%s','%s') and " ZBX_COND_NODEID " group by h.hostid order by i.nextcheck",
 			CONFIG_UNREACHABLE_POLLER_FORKS,
 			poller_num-1,
 			now,
