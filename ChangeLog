@@ -1,5 +1,6 @@
 Changes for 1.3.7:
 
+ - fixed incorrect displaying of statuses in Monitoring->Triggers (Alexei)
  - fixed processing of integer items 'status' (Alexei)
  - fixed automatic reload of active checks by agent (Alexei)
  - added missing host template linkage in data.sql (Alexei)
