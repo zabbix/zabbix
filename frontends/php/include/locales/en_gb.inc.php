@@ -1179,6 +1179,7 @@
 	'S_COMMENTS'=>				'Comments',
 	'S_ACKNOWLEDGED'=>			'Acknowledged',
 	'S_ACK'=>				'Ack',
+	'S_NEVER'=>				'Never',
 
 //	users.php
 	'S_ZABBIX_USER'=>			'ZABBIX User',

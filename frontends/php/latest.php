@@ -277,7 +277,7 @@ include_once "include/page_header.php";
 		if(!in_array(0,$_REQUEST["applications"]) && $any_app_exist && !isset($show_all_apps)) continue;
 
 		if(isset($db_item["lastclock"]))
-			$lastclock=date(S_DATE_FORMAT_YMDHMS,$db_item["lastclock"]);
+			$lastclock=zbx_date2str(S_DATE_FORMAT_YMDHMS,$db_item["lastclock"]);
 		else
 			$lastclock = new CCol('-', 'center');
 
