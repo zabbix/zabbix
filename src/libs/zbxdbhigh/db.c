@@ -444,8 +444,8 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *re
 				event_last_status,
 				new_value);
 
-		/* The lastest event has the same status, skip of so. */
-		if(event_last_status != new_value)
+		/* New trigger status is NOT equal to previous one, update trigger */
+		if(trigger->value != new_value)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG,"Updating trigger");
 			if(reason==NULL)
@@ -463,6 +463,11 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *re
 					reason,
 					trigger->triggerid);
 			}
+		}
+
+		/* The lastest event has the same status, do not generate new one */
+		if(event_last_status != new_value)
+		{
 			if(	((trigger->value == TRIGGER_VALUE_TRUE) && (new_value == TRIGGER_VALUE_FALSE)) ||
 				((trigger->value == TRIGGER_VALUE_FALSE) && (new_value == TRIGGER_VALUE_TRUE)) ||
 				((event_last_status == TRIGGER_VALUE_FALSE) && (trigger->value == TRIGGER_VALUE_UNKNOWN) && (new_value == TRIGGER_VALUE_TRUE)) ||
