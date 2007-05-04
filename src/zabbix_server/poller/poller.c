@@ -204,7 +204,7 @@ static void update_key_status(zbx_uint64_t hostid,int host_status)
 /* Do not process new value for status, if previous status is the same */
 		update = (item.lastvalue_null==1);
 		update = update || ((item.value_type == ITEM_VALUE_TYPE_FLOAT) &&(cmp_double(item.lastvalue_dbl, (double)host_status) == 1));
-		update = update || ((item.value_type == ITEM_VALUE_TYPE_UINT64) &&(item.lastvalue_uint64 == host_status));
+		update = update || ((item.value_type == ITEM_VALUE_TYPE_UINT64) &&(item.lastvalue_uint64 != host_status));
 
 		if(update)
 		{
