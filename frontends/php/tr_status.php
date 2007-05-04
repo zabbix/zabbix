@@ -349,7 +349,7 @@ include_once "include/page_header.php";
 		else
 			$blink = array(1=>"", 		2=>"");
 		
-		$value = new CSpan($blink[1].trigger_value2str($row["value"].$blink[2]), get_trigger_value_style($row["value"]));
+		$value = new CSpan($blink[1].trigger_value2str($row["value"]).$blink[2], get_trigger_value_style($row["value"]));
 
 		if($noactions=='true')
 		{
