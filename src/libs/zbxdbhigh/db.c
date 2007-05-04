@@ -468,14 +468,23 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *re
 		/* The lastest event has the same status, do not generate new one */
 		if(event_last_status != new_value)
 		{
-			if(	((trigger->value == TRIGGER_VALUE_TRUE) && (new_value == TRIGGER_VALUE_FALSE)) ||
+/*			if(	((trigger->value == TRIGGER_VALUE_TRUE) && (new_value == TRIGGER_VALUE_FALSE)) ||
 				((trigger->value == TRIGGER_VALUE_FALSE) && (new_value == TRIGGER_VALUE_TRUE)) ||
 				((event_last_status == TRIGGER_VALUE_FALSE) && (trigger->value == TRIGGER_VALUE_UNKNOWN) && (new_value == TRIGGER_VALUE_TRUE)) ||
 				((event_last_status == TRIGGER_VALUE_TRUE) && (trigger->value == TRIGGER_VALUE_UNKNOWN) && (new_value == TRIGGER_VALUE_FALSE)) ||
 				((event_prev_status == TRIGGER_VALUE_UNKNOWN) && (event_last_status == TRIGGER_VALUE_UNKNOWN) && (trigger->value == TRIGGER_VALUE_UNKNOWN) && (new_value == TRIGGER_VALUE_TRUE)) ||
 				((event_prev_status == TRIGGER_VALUE_FALSE) && (event_last_status == TRIGGER_VALUE_UNKNOWN) && (trigger->value == TRIGGER_VALUE_UNKNOWN) && (new_value == TRIGGER_VALUE_TRUE)) ||
 				((event_prev_status == TRIGGER_VALUE_TRUE) && (event_last_status == TRIGGER_VALUE_UNKNOWN) && (trigger->value == TRIGGER_VALUE_UNKNOWN) && (new_value == TRIGGER_VALUE_FALSE))
-			)
+			)*/
+
+			/* Generate also UNKNOWN events, We are not interested in prev trigger value here. */
+			if(event_last_status != new_value)
+/*			if(	((event_last_status == TRIGGER_VALUE_FALSE) && (new_value != TRIGGER_VALUE_FALSE)) ||
+				((event_last_status == TRIGGER_VALUE_TRUE) && (new_value != TRIGGER_VALUE_TRUE)) ||
+				((event_prev_status == TRIGGER_VALUE_UNKNOWN) && (event_last_status == TRIGGER_VALUE_UNKNOWN) && (new_value != TRIGGER_VALUE_UNKNOWN)) ||
+				((event_prev_status == TRIGGER_VALUE_FALSE) && (event_last_status == TRIGGER_VALUE_UNKNOWN) &&(new_value == TRIGGER_VALUE_TRUE)) ||
+				((event_prev_status == TRIGGER_VALUE_TRUE) && (event_last_status == TRIGGER_VALUE_UNKNOWN) && (trigger->value == TRIGGER_VALUE_UNKNOWN) && (new_value == TRIGGER_VALUE_FALSE))
+			)*/
 			{
 				/* Preparing event for processing */
 				memset(&event,0,sizeof(DB_EVENT));

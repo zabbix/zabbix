@@ -398,7 +398,7 @@ include_once "include/page_header.php";
 				new CCol(
 					get_severity_description($row["priority"]),
 					get_severity_style($row["priority"])),
-				new CLink(date(S_DATE_FORMAT_YMDHMS,$row["lastchange"]),"tr_events.php?triggerid=".$row["triggerid"],"action"),
+				new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row["lastchange"]),"tr_events.php?triggerid=".$row["triggerid"],"action"),
 				$actions,
 				new CCol($ack,"center"),
 				new CLink(($row["comments"] == "") ? S_ADD : S_SHOW,"tr_comments.php?triggerid=".$row["triggerid"],"action")

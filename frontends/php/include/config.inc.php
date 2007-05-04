@@ -2046,4 +2046,19 @@ else if (document.getElementById)
 		}
 		return $array;
 	}
+
+	/* function:
+	 *      zbx_date2str
+	 *
+	 * description:
+	 *      Convert timestamp to string representation. Retun 'Never' if 0.
+	 *
+	 * author: Alexei Vladishev
+	 */
+	function	zbx_date2str($format, $timestamp)
+	{
+		return ($timestamp==0)?S_NEVER:date($format,$timestamp);
+	}
+		
+
 ?>
