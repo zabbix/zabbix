@@ -2352,7 +2352,7 @@ static int	DBcopy_trigger_to_host(
 				{
 					zabbix_log(LOG_LEVEL_DEBUG, "Missing similar key [" ZBX_FS_UI64 "] for host [" ZBX_FS_UI64 "]",
 							itemid, hostid);
-					result = FALSE;
+					result = FAIL;
 				}
 
 				DBfree_result(db_items);
