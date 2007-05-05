@@ -1,5 +1,6 @@
 Changes for 1.3.7:
 
+ - unknown trigger events won't generate actions (Alexei)
  - fixed host.c, constant FALSE replaces by FAIL (Alexei)
  - fixed generation of events for unknown status of triggers (Alexei)
  - fixed processing of trigger statuses (Alexei)

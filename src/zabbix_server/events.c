@@ -66,11 +66,16 @@ static void	add_trigger_info(DB_EVENT *event)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
+	zbx_uint64_t	triggerid;
+
+	int		event_prev_status, event_last_status;
 
 	if(event->object==EVENT_OBJECT_TRIGGER && event->objectid != 0)
 	{
+		triggerid = event->objectid;
+
 		result = DBselect("select description,priority,comments,url from triggers where triggerid=" ZBX_FS_UI64,
-			event->objectid);
+			triggerid);
 		row = DBfetch(result);
 		event->trigger_description[0]=0;
 		zbx_free(event->trigger_comments);
@@ -84,6 +89,18 @@ static void	add_trigger_info(DB_EVENT *event)
 			event->trigger_url	= strdup(row[3]);
 		}
 		DBfree_result(result);
+
+		get_latest_event_status(triggerid, &event_prev_status, &event_last_status);
+
+		event->skip_actions = 0;
+
+		if(	(event->value == TRIGGER_VALUE_UNKNOWN) ||
+			(event_prev_status == TRIGGER_VALUE_TRUE && event_last_status == TRIGGER_VALUE_UNKNOWN && event->value == TRIGGER_VALUE_TRUE) ||
+			(event_prev_status == TRIGGER_VALUE_FALSE && event_last_status == TRIGGER_VALUE_UNKNOWN && event->value == TRIGGER_VALUE_FALSE)
+		)
+		{
+			event->skip_actions = 1;
+		}
 	}
 }
 
@@ -151,7 +168,10 @@ int	process_event(DB_EVENT *event)
 			event->triggerid, ALERT_STATUS_NOT_SENT);
 	}*/
 
-	process_actions(event);
+	if(event->skip_actions == 0)
+	{
+		process_actions(event);
+	}
 
 	if(event->value == TRIGGER_VALUE_TRUE)
 	{

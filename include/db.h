@@ -169,6 +169,7 @@ DB_EVENT
 	int		clock;
 	int		value;
 	int		acknowledged;
+	int		skip_actions;
 	char		trigger_description[TRIGGER_DESCRIPTION_LEN_MAX];
 	int		trigger_priority;
 	char		*trigger_url;
@@ -481,6 +482,7 @@ void	DBdelete_sysmaps_hosts_by_hostid(zbx_uint64_t hostid);
 int	DBget_graph_item_by_gitemid(int gitemid, DB_GRAPH_ITEM *graph_item);
 int	DBget_graph_by_graphid(int graphid, DB_GRAPH *graph);
 int	DBadd_graph_item_to_linked_hosts(int gitemid,int hostid);
+void	get_latest_event_status(zbx_uint64_t triggerid, int *prev_status, int *latest_status);
 
 
 void	DBdelete_template_elements(
