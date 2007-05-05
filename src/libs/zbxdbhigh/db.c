@@ -293,7 +293,7 @@ int     DBget_function_result(char **result,char *functionid)
  * Comments: Rewrite required to simplify logic ?                             *
  *                                                                            *
  ******************************************************************************/
-static void	get_latest_event_status(zbx_uint64_t triggerid, int *prev_status, int *latest_status)
+void	get_latest_event_status(zbx_uint64_t triggerid, int *prev_status, int *latest_status)
 {
 	char		sql[MAX_STRING_LEN];
 	DB_RESULT	result;
