@@ -48,7 +48,7 @@
 
 char *progname = NULL;
 char title_message[] = "ZABBIX Server (daemon)";
-char usage_message[] = "[-hV] [-c <file>]";
+char usage_message[] = "[-hV] [-c <file>] [-n <nodeid>]";
 
 #ifndef HAVE_GETOPT_LONG
 char *help_message[] = {
