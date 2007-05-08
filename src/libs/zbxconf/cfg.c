@@ -71,7 +71,7 @@ int	parse_cfg_file(const char *cfg_file,struct cfg_line *cfg)
 	{
 		if( NULL == (file = fopen(cfg_file,"r")) )
 		{
-			zbx_error("Cannot open config file [%s] [%s].",cfg_file,strerror(errno));
+			goto lbl_cannot_open;
 		}
 		else
 		{
@@ -157,6 +157,10 @@ int	parse_cfg_file(const char *cfg_file,struct cfg_line *cfg)
 	}
 
 	return	SUCCEED;
+
+lbl_cannot_open:
+	zbx_error("Cannot open config file [%s] [%s].",cfg_file,strerror(errno));
+	exit(1);
 
 lbl_missing_mandatory:
 	zbx_error("Missing mandatory parameter [%s].", cfg[i].parameter);
