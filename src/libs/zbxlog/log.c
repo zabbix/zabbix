@@ -191,6 +191,7 @@ void zabbix_log(int level, const char *fmt, ...)
 		va_end(ap);
 
 		printf("\n");
+		return;
 #else /* TEST */
 	
 	FILE *log_file = NULL;

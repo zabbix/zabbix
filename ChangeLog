@@ -1,5 +1,8 @@
 Changes for 1.3.7:
 
+ - fixed coniguration scripts for mysql/net-snmp/curl (Eugene)
+ - fixed SMS sender (Eugene)
+ - timeout for sending emails and SMS was increased to 40 seconds (Eugene)
  - unknown trigger events won't generate actions (Alexei)
  - fixed host.c, constant FALSE replaces by FAIL (Alexei)
  - fixed generation of events for unknown status of triggers (Alexei)

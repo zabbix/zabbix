@@ -14,13 +14,13 @@ configure="no"
 domake="no"
 doinstall="no"
 config_param=""
-dotest="no"
+dorun="no"
+TEST=""
 cleanwarnings="no"
 docat="yes"
 help="no"
 noparam=0
-#def="--enable-agent --enable-server --with-mysql --prefix=`echo $HOME`/local/zabbix --with-ldap --with-net-snmp"
-def="--enable-agent --enable-server --with-mysql --prefix=`pwd` --with-ldap --with-net-snmp --with-libcurl"
+def="--enable-agent --enable-server --with-mysql --prefix=`pwd` --with-ldap"
 
 for cmd
 do
@@ -37,9 +37,10 @@ do
     make )	domake="yes";		noparam=1;;
     inst )	doinstall="yes";	noparam=1;;
     install )	doinstall="yes";	noparam=1;;
-    test )	dotest="yes";		noparam=1;;
+    run )	dorun="yes";		noparam=1;;
     nocat )	docat="no";		noparam=1;;
     cat )	docat="yes";		noparam=1;;
+    test )	TEST=" -DTEST";;
     def )		config_param="$config_param $def";;
     --enable-* )	config_param="$config_param $cmd";; 
     --with-* )		config_param="$config_param $cmd";;
@@ -82,7 +83,7 @@ fi
 
 if [ "$copy" = "yes" ] || [ $premake = "yes" ] || 
   [ $configure = "yes" ] || [ $domake = "yes" ] || 
-  [ $dotest = "yes" ] || 
+  [ $dorun = "yes" ] || 
   [ "$win2nix" = "yes" ] || [ $doinstall = "yes" ]
 then
   cleanwarnings="yes"
@@ -162,7 +163,7 @@ then
   configure_is_ok=0
   echo "Configuring..."
   echo "Configuring..." >> WARNINGS
-  export CFLAGS="-Wall -DDEBUG"
+  export CFLAGS="-Wall -DDEBUG ${TEST}"
   #export CFLAGS="-Wall -pedantic"
   ./configure $config_param 2>> WARNINGS 
   if [ "x$?" = "x0" ]
@@ -191,10 +192,10 @@ then
   fi
 fi
 
-if [ "x$make_is_ok$dotest" = "x1yes" ] 
+if [ "x$make_is_ok$dorun" = "x1yes" ] 
 then
-  echo "Testing..."
-  echo "Testing..." >> WARNINGS
+  echo "Running..."
+  echo "Running..." >> WARNINGS
   ./src/zabbix_agent/zabbix_agent -h >> WARNINGS
   echo "------------------------" >> WARNINGS
   ./src/zabbix_agent/zabbix_agentd -h >> WARNINGS

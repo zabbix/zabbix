@@ -53,10 +53,6 @@ AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
 
 dnl		AC_MSG_CHECKING([for NET-SNMP libraries])
 
-		_libnetsnmp_libdir="`$_libnetsnmp_config --libdir`"
-
-		SNMP_LDFLAGS="${SNMP_LDFLAGS} ${_libnetsnmp_libdir}"
-
 		_full_libnetsnmp_cflags="`$_libnetsnmp_config --cflags`"
 		for i in $_full_libnetsnmp_cflags; do
 			case $i in
@@ -67,9 +63,16 @@ dnl		AC_MSG_CHECKING([for NET-SNMP libraries])
 			esac
 		done
 
-		if test "x$enable_static" = "xyes"; then
-			_full_libnetsnmp_libs="`$_libnetsnmp_config --libs` -lcrypto"
+		_full_libnetsnmp_libs="`$_libnetsnmp_config --libs` -lcrypto"
+		for i in $_full_libnetsnmp_libs; do
+			case $i in
+				-L*)
+					SNMP_LDFLAGS="${SNMP_LDFLAGS} ${_libnetsnmp_libdir}"
+			;;
+			esac
+		done
 
+		if test "x$enable_static" = "xyes"; then
 			for i in $_full_libnetsnmp_libs; do
 				case $i in
 					-lnetsnmp)

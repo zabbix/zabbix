@@ -603,7 +603,7 @@ int zbx_getopt_long(int argc, char **argv, const char *options,
 }
 
 
-#ifdef TEST
+#ifdef TEST2
 
 /* Compile with -DTEST to make an executable for use in testing
    the above definition of `getopt'.  */

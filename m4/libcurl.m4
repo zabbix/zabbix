@@ -125,20 +125,36 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL library @<:@default=yes@:>
 			esac
 		done
 
-		if test "x$enable_static" != "xyes"; then
-			_full_libcurl_libs="-lcurl"
+		if test "x$enable_static" = "xyes"; then
+			for i in $_full_libcurl_libs; do
+				case $i in
+					-llibcurl)
+				;;
+					-l*)
+						_lib_name=`echo "$i" | cut -b3-`
+						AC_CHECK_LIB($_lib_name , main, , AC_MSG_ERROR([Not found $_lib_name library]))
+						LIBCURL_LIBS="$LIBCURL_LIBS $i"
+
+				;;
+				esac
+			done
 		fi
 
-		for i in $_full_libcurl_libs; do
-			case $i in
-				-l*)
-					_lib_name=`echo "$i" | cut -b3-`
-					AC_CHECK_LIB($_lib_name , main, , AC_MSG_ERROR([Not found $_lib_name library]))
-					LIBCURL_LIBS="$LIBCURL_LIBS $i"
+		_save_curl_libs="${LIBS}"
+		_save_curl_ldflags="${LDFLAGS}"
+		_save_curl_cflags="${CFLAGS}"
+		LIBS="${LIBS} ${LIBCURL_LIBS}"
+		LDFLAGS="${LDFLAGS} ${LIBCURL_LDFLAGS}"
+		CFLAGS="${CFLAGS} ${LIBCURL_CFLAGS}"
 
-			;;
-			esac
-		done
+		AC_CHECK_LIB(libcurl, main, , AC_MSG_ERROR([Not found libcurl library]))
+
+		LIBS="${_save_curl_libs}"
+		LDFLAGS="${_save_curl_ldflags}"
+		CFLAGS="${_save_curl_cflags}"
+		unset _save_curl_libs
+		unset _save_curl_ldflags
+		unset _save_curl_cflags
 
               # This is so silly, but Apple actually has a bug in their
 	      # curl-config script.  Fixed in Tiger, but there are still
