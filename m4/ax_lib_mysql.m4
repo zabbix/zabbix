@@ -84,16 +84,24 @@ dnl            AC_MSG_CHECKING([for MySQL libraries])
 
             MYSQL_CFLAGS="`$MYSQL_CONFIG --cflags`"
 
+            _full_libmysql_libs="`$MYSQL_CONFIG --libs`"
+ 
+            for i in $_full_libmysql_libs; do
+                case $i in
+                -lmysqlclient)
+             ;;
+                   -L*)
+                        MYSQL_LDFLAGS="${MYSQL_LDFLAGS} $i"
+                ;;
+                esac
+            done
+
             if test "x$enable_static" = "xyes"; then
-               _full_libmysql_libs="`$MYSQL_CONFIG --libs`"
  
                for i in $_full_libmysql_libs; do
                    case $i in
-           	   -lmysqlclient)
-           	;;
-                      -L*)
-                           MYSQL_LDFLAGS="${MYSQL_LDFLAGS} $i"
-                   ;;
+           	      -lmysqlclient)
+           	    ;;
                       -l*)
                            _lib_name="`echo "$i" | cut -b3-`"
                            MYSQL_LIBS="${MYSQL_LIBS} ${i}"
