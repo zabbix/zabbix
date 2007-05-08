@@ -2052,7 +2052,7 @@ static int	DBupdate_trigger(
 			{
 				ZBX_STR2UINT64(chd_hostid, chd_host_data[0]);
 
-				replace = zbx_dsprintf(replace, "{%s:", db_chd_hosts[0] /* child host */);
+				replace = zbx_dsprintf(replace, "{%s:", chd_host_data[0] /* child host */);
 
 				new_expression = string_replace(expression, search, replace);
 
