@@ -340,7 +340,7 @@
 			
 			$DB_TYPE = $this->GetConfig('DB_TYPE');
 
-			$cmbType = new CComboBox('type', $DB_TYPE,'submit()');
+			$cmbType = new CComboBox('type', $DB_TYPE);
 			foreach($ZBX_CONFIG['allowed_db'] as $id => $name)
 			{
 				$cmbType->AddItem($id, $name);

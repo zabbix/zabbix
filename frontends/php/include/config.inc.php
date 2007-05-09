@@ -22,7 +22,6 @@ function SDI($msg="SDI") { echo "DEBUG INFO: "; var_export($msg); echo BR; } // 
 function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$msg.'"'.SPACE; var_dump($var); echo BR; } // DEBUG INFO!!!
 function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 
-
 ?>
 <?php
 	require_once 	"include/defines.inc.php";
@@ -858,24 +857,24 @@ else
 		{
 			// arr[idx]   1       2         3             4            5            6
 			if(!ereg('^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$', $preiod, $arr))
-				return -1;
+				return false;
 
 			if($arr[1] > $arr[2]) // check week day
-				return -1;
+				return false;
 			if($arr[3] > 23 || $arr[3] < 0 || $arr[5] > 24 || $arr[5] < 0) // check hour
-				return -1;
+				return false;
 			if($arr[4] > 59 || $arr[4] < 0 || $arr[6] > 59 || $arr[6] < 0) // check min
-				return -1;
+				return false;
 			if(($arr[5]*100 + $arr[6]) > 2400) // check max time 24:00
-				return -1;
+				return false;
 			if(($arr[3] * 100 + $arr[4]) >= ($arr[5] * 100 + $arr[6])) // check time period
-				return -1;
+				return false;
 
 			$out .= sprintf("%d-%d,%02d:%02d-%02d:%02d",$arr[1],$arr[2],$arr[3],$arr[4],$arr[5],$arr[6]).';';
 		}
 		$str = $out;
 //parse_period($str);
-		return 0;
+		return true;
 	}
 
 	function	validate_float($str)
@@ -1089,7 +1088,7 @@ else
 		}
 		if(!is_null($work_period))
 		{
-			if(validate_period($work_period) != 0)
+			if( !validate_period($work_period) )
 			{
 				error(S_ICORRECT_WORK_PERIOD);
 				return NULL;

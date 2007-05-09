@@ -261,7 +261,6 @@
 	"S_NO_PERMISSIONS"=>			"Inga rättigheter!",
 	"S_LATEST_DATA_BIG"=>			"SENASTE DATA",
 	"S_ALL_SMALL"=>				"alla",
-	"S_ALL"=>				"Alla",
 	"S_MINUS_ALL_MINUS"=>			"- alla -",
 	"S_MINUS_OTHER_MINUS"=>			"- övriga -",
 	"S_DESCRIPTION_LARGE"=>			"BESKRIVNING",

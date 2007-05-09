@@ -425,7 +425,6 @@
 	'S_NO_PERMISSIONS'=>			'Sin permisos !',
 	'S_LATEST_DATA_BIG'=>			'ÚLTIMA FECHA',
 	'S_ALL_SMALL'=>				'todo',
-	'S_ALL'=>				'Todo',
 	'S_MINUS_ALL_MINUS'=>			'- todo -',
 	'S_MINUS_OTHER_MINUS'=>			'- otros -',
 	'S_DESCRIPTION_LARGE'=>			'DESCRIPCIÓN',

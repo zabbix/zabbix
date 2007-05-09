@@ -31,7 +31,7 @@
 
 	function	is_hex_color($value)
 	{
-		return eregi('[0-9,A-F]{6}', $value);
+		return eregi('^[0-9,A-F]{6}$', $value);
 	}
 	
 	function	BETWEEN($min,$max,$var=NULL)

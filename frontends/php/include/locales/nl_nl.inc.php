@@ -255,7 +255,6 @@
 	"S_NO_PERMISSIONS"=>				"Geen toegang !",
 	"S_LATEST_DATA_BIG"=>				"LAATSTE DATA",
 	"S_ALL_SMALL"=>						"alle",
-	"S_ALL"=>							"Alle",
 	"S_MINUS_ALL_MINUS"=>				"- alle -",
 	"S_MINUS_OTHER_MINUS"=>				"- andere -",
 	"S_DESCRIPTION_LARGE"=>				"OMSCHRIJVING",

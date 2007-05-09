@@ -65,10 +65,10 @@ include_once "include/page_header.php";
 		"applications"=>array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 /* host */
 		"hostid"=>	array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,		'{config}==0&&{form}=="update"'),
-		"host"=>	array(T_ZBX_STR, O_OPT,	NULL,   NOT_EMPTY,	'{config}==0&&isset({save})'),
+		"host"=>	array(T_ZBX_STR, O_OPT,	NULL,   NOT_EMPTY,	'({config}==0||{config}==3)&&isset({save})'),
 		"dns"=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'{config}==0&&isset({save})'),
 		"useip"=>	array(T_ZBX_STR, O_OPT, NULL,	IN('0,1'),	'{config}==0&&isset({save})'),
-		"ip"=>		array(T_ZBX_STR, O_OPT, NULL,	NULL,		'({useip}==1)'),
+		"ip"=>		array(T_ZBX_IP, O_OPT, NULL,	NULL,		'({useip}==1)'),
 		"port"=>	array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,65535),'{config}==0&&isset({save})'),
 		"status"=>	array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1,3"),	'{config}==0&&isset({save})'),
 
@@ -95,7 +95,7 @@ include_once "include/page_header.php";
 /* application */
 		"applicationid"=>array(T_ZBX_INT,O_OPT,	P_SYS,	DB_ID,		'{config}==4&&{form}=="update"'),
 		"appname"=>	array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'{config}==4&&isset({save})'),
-		"apphostid"=>	array(T_ZBX_INT, O_OPT,  P_SYS,  DB_ID,		'{config}==4&&isset({save})'),
+		"apphostid"=>	array(T_ZBX_INT, O_OPT, NULL,	DB_ID.'{}>0',	'{config}==4&&isset({save})'),
 		"apptemplateid"=>array(T_ZBX_INT,O_OPT,	NULL,	DB_ID,	NULL),
 
 /* actions */
