@@ -32,12 +32,13 @@ CREATE TABLE items_tmp (
 	templateid	bigint DEFAULT '0'	NOT NULL,
 	valuemapid	bigint DEFAULT '0'	NOT NULL,
 	delay_flex	varchar(255)		DEFAULT ''	NOT NULL,
+	params		text			DEFAULT ''	NOT NULL,
 	PRIMARY KEY (itemid)
 );
 CREATE UNIQUE INDEX items_1 on items_tmp (hostid,key_);
 CREATE INDEX items_2 on items_tmp (nextcheck);
 CREATE INDEX items_3 on items_tmp (status);
 
-insert into items_tmp select *,'' from items;
+insert into items_tmp select *,'','' from items;
 drop table items;
 alter table items_tmp rename to items;
