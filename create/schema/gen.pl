@@ -44,7 +44,8 @@ local $output;
 	"t_image"	=>	"longblob",
 	"t_history_log"	=>	"text",
 	"t_history_text"=>	"text",
-	"t_blob"	=>	"blob"
+	"t_blob"	=>	"blob",
+	"t_item_param"	=>	"text"
 );
 
 %c=(	"type"		=>	"code",
@@ -60,7 +61,8 @@ local $output;
 	"t_image"	=>	"ZBX_TYPE_BLOB",
 	"t_history_log"	=>	"ZBX_TYPE_TEXT",
 	"t_history_text"=>	"ZBX_TYPE_TEXT",
-	"t_blob"	=>	"ZBX_TYPE_BLOB"
+	"t_blob"	=>	"ZBX_TYPE_BLOB",
+	"t_item_param"	=>	"ZBX_TYPE_TEXT"
 );
 
 $c{"before"}="
@@ -97,7 +99,8 @@ static	ZBX_TABLE	tables[]={
 	"t_image"	=>	"longblob",
 	"t_history_log"	=>	"text",
 	"t_history_text"=>	"text",
-	"t_blob"	=>	"blob"
+	"t_blob"	=>	"blob",
+	"t_item_param"	=>	"varchar(2048)"
 );
 
 %postgresql=("t_bigint"	=>	"bigint",
@@ -115,7 +118,8 @@ static	ZBX_TABLE	tables[]={
 	"t_history_log"	=>	"varchar(255)",
 	"t_history_text"=>	"text",
 	"t_time"	=>	"integer",
-	"t_blob"	=>	"text"
+	"t_blob"	=>	"text",
+	"t_item_param"	=>	"text"
 );
 
 %sqlite=("t_bigint"	=>	"bigint",
@@ -131,7 +135,8 @@ static	ZBX_TABLE	tables[]={
 	"t_image"	=>	"longblob",
 	"t_history_log"	=>	"text",
 	"t_history_text"=>	"text",
-	"t_blob"	=>	"blob"
+	"t_blob"	=>	"blob",
+	"t_item_param"	=>	"text"
 );
 
 sub newstate
