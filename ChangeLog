@@ -1,6 +1,7 @@
 Changes for 1.3.7:
 
- - increased maximal size of images (Eugene)
+ - fixed processing of '-t' and other params when '-c' is not given (Alexei)
+ - increased max size of images (Eugene)
  - fixed default data for default host 'ZABBIX-Server' (Alexei)
  - fixed processing of uptime/downtime condition (Alexei)
  - fixed processing of uptime/downtime timestamps for DM (Alexei)

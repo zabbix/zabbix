@@ -184,11 +184,6 @@ void	init_config(void)
 	};
 
 
-	if(CONFIG_FILE == NULL)
-	{
-		CONFIG_FILE=strdup("/etc/zabbix/zabbix_server.conf");
-	}
-
 	parse_cfg_file(CONFIG_FILE,cfg);
 
 	if(CONFIG_DBNAME == NULL)
@@ -359,6 +354,11 @@ int main(int argc, char **argv)
 			exit(-1);
 			break;
         }
+
+	if(CONFIG_FILE == NULL)
+	{
+		CONFIG_FILE=strdup("/etc/zabbix/zabbix_server.conf");
+	}
 
 	/* Required for simple checks */
 	init_metrics();
