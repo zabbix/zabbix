@@ -53,6 +53,10 @@ int	parse_cfg_file(const char *cfg_file,struct cfg_line *cfg)
 {
 	FILE	*file;
 
+	static level = 0;
+
+#define ZBX_MAX_INCLUDE_LEVEL 10
+
 	register int
 		i, lineno;
 
@@ -66,6 +70,12 @@ int	parse_cfg_file(const char *cfg_file,struct cfg_line *cfg)
 	int	result = SUCCEED;
 
 	assert(cfg);
+
+	if(++level > ZBX_MAX_INCLUDE_LEVEL)
+	{
+		/* Ignore include files of depth 10 */
+		return result;
+	}
 
 	if(cfg_file)
 	{
@@ -96,6 +106,11 @@ int	parse_cfg_file(const char *cfg_file,struct cfg_line *cfg)
 				zbx_rtrim(value, " \r\n\0");
 
 				zabbix_log(LOG_LEVEL_DEBUG, "cfg: para: [%s] val [%s]", parameter, value);
+
+				if(strcmp(parameter, "Include") == 0)
+				{
+					parse_cfg_file(value, cfg);
+				}
 
 				for(i = 0; value[i] != '\0'; i++)
 				{
