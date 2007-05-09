@@ -696,7 +696,7 @@ void	execute_operations(DB_EVENT *event, DB_ACTION *action)
 				op_host_add(event);
 				break;
 			case	OPERATION_TYPE_HOST_REMOVE:
-				/* TODO */
+				op_host_del(event);
 				break;
 			case	OPERATION_TYPE_GROUP_ADD:
 				op_group_add(event,action,&operation);
