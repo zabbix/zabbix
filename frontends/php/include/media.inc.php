@@ -165,7 +165,7 @@
 
 	function	add_media( $userid, $mediatypeid, $sendto, $severity, $active, $period)
 	{
-		if(validate_period($period) != 0)
+		if( !validate_period($period) )
 		{
 			error("Icorrect time period");
 			return NULL;
@@ -188,7 +188,7 @@
 
 	function	update_media($mediaid, $userid, $mediatypeid, $sendto, $severity, $active, $period)
 	{
-		if(validate_period($period) != 0)
+		if( !validate_period($period) )
 		{
 			error("Icorrect time period");
 			return NULL;

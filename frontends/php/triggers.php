@@ -51,7 +51,7 @@ include_once "include/page_header.php";
 		"status"=>	array(T_ZBX_STR, O_OPT,  NULL,	NULL,NULL),
 
 		"dependences"=>		array(T_ZBX_INT, O_OPT,  NULL,	DB_ID, NULL),
-		"new_dependence"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,'isset({add_dependence})'),
+		"new_dependence"=>	array(T_ZBX_INT, O_OPT,  NULL,	DB_ID.'{}>0','isset({add_dependence})'),
 		"rem_dependence"=>	array(T_ZBX_INT, O_OPT,  NULL,	DB_ID, NULL),
 
 		"g_triggerid"=>	array(T_ZBX_INT, O_OPT,  NULL,	DB_ID, NULL),

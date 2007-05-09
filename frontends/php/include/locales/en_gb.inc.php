@@ -456,7 +456,6 @@
 	'S_NO_PERMISSIONS'=>			'No permissions !',
 	'S_LATEST_DATA_BIG'=>			'LATEST DATA',
 	'S_ALL_SMALL'=>				'all',
-	'S_ALL'=>				'All',
 	'S_MINUS_ALL_MINUS'=>			'- all -',
 	'S_MINUS_OTHER_MINUS'=>			'- other -',
 	'S_DESCRIPTION_LARGE'=>			'DESCRIPTION',

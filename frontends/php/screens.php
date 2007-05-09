@@ -84,28 +84,6 @@ include_once "include/page_header.php";
 	$elementid = get_request('elementid', null);
 	if($elementid <= 0) $elementid = null;
 
-	if(isset($elementid))
-	{
-		if( 0 == $config )
-		{
-			$element = get_screen_by_screenid($elementid);
-		}
-		else
-		{
-			$element = get_slideshow_by_slideshowid($elementid);
-		}
-
-		if( $element ) {
-			$url = "?elementid=".$elementid;
-			if($_REQUEST["fullscreen"]==0) $url .= "&fullscreen=1";
-			$text[] = array(nbsp(" / "),new CLink($element["name"], $url));
-		}
-		else
-		{
-			$elementid = null;
-			update_profile("web.screens.elementid",0);
-		}
-	}
 	$form = new CForm();
 	$form->AddVar("fullscreen",$_REQUEST["fullscreen"]);
 
@@ -157,11 +135,24 @@ include_once "include/page_header.php";
 		{
 			if(!screen_accessiable($elementid, PERM_READ_ONLY))
 				access_deny();
+			$element = get_screen_by_screenid($elementid);
 		}
 		else
 		{
 			if(!slideshow_accessiable($elementid, PERM_READ_ONLY))
 				access_deny();
+			$element = get_slideshow_by_slideshowid($elementid);
+		}
+
+		if( $element ) {
+			$url = "?elementid=".$elementid;
+			if($_REQUEST["fullscreen"]==0) $url .= "&fullscreen=1";
+			$text[] = array(nbsp(" / "),new CLink($element["name"], $url));
+		}
+		else
+		{
+			$elementid = null;
+			update_profile("web.screens.elementid",0);
 		}
 	}
 			

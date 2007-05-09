@@ -211,18 +211,23 @@ include_once "include/page_header.php";
 		}
 		elseif(isset($_REQUEST["delete_selected"])&&isset($_REQUEST['group_userid']))
 		{
+			$result = false;
+
 			$group_userid = get_request('group_userid', array());
 			foreach($group_userid as $userid)
 			{
 				if(!($user_data = get_user_by_userid($userid))) continue;
 
-				$result = delete_user($userid);
-				show_messages($result, S_USER_DELETED, S_CANNOT_DELETE_USER);
-				if($result){
+				if( delete_user($userid) )
+				{
+					$result = true;
 					add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_USER,
 					"User alias [".$user_data["alias"]."] name [".$user_data["name"]."] surname [".
 					$user_data["surname"]."]");
 				}
+			}
+			if($result){
+				show_messages($result, S_USER_DELETED);
 			}
 		}
 		elseif(isset($_REQUEST["delete"])&&isset($_REQUEST["userid"]))
@@ -311,16 +316,20 @@ include_once "include/page_header.php";
 		}
 		elseif(isset($_REQUEST["delete_selected"])&&isset($_REQUEST['group_groupid']))
 		{
+			$result = false;
 			$group_groupid = get_request('group_groupid', array());
 			foreach($group_groupid as $usrgrpid)
 			{
 				if(!($group = get_group_by_usrgrpid($usrgrpid))) continue;
 
-				$result = delete_user_group($usrgrpid);
-				show_messages($result, S_GROUP_DELETED, S_CANNOT_DELETE_GROUP);
-				if($result){
+				if( delete_user_group($usrgrpid) )
+				{
+					$result = true;
 					add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_USER_GROUP,"Group name [".$group["name"]."]");
 				}
+			}
+			if($result){
+				show_messages($result, S_GROUP_DELETED);
 			}
 		}
 		elseif(isset($_REQUEST["delete"]))
