@@ -350,7 +350,7 @@ static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 	DB_DHOST	host;
 	DB_DSERVICE	service;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In update_check(ip:%s, port:%d, status:%s)",
+	zabbix_log(LOG_LEVEL_DEBUG, "In update_service(ip:%s, port:%d, status:%s)",
 		ip,
 		port,
 		(check->status==DOBJECT_STATUS_UP?"up":"down"));
@@ -377,7 +377,7 @@ static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 	if(check->status == DOBJECT_STATUS_UP)
 	{
 		/* Update host status */
-		if((host.status == DOBJECT_STATUS_DOWN)||(host.lastup==0 && host.lastdown==0))
+		if(host.status == DOBJECT_STATUS_DOWN || host.lastup==0)
 		{
 			host.status=DOBJECT_STATUS_UP;
 			host.lastdown=0;
@@ -385,7 +385,7 @@ static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 			update_dhost(&host);
 		}
 		/* Update service status */
-		if((service.status == DOBJECT_STATUS_DOWN)||(service.lastup==0 && service.lastdown==0))
+		if(service.status == DOBJECT_STATUS_DOWN || service.lastup==0)
 		{
 			service.status=DOBJECT_STATUS_UP;
 			service.lastdown=0;
@@ -396,19 +396,19 @@ static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 	/* DOBJECT_STATUS_DOWN */
 	else
 	{
-		if((host.status == DOBJECT_STATUS_UP)||(host.lastup==0 && host.lastdown==0))
+		if(host.status == DOBJECT_STATUS_UP || host.lastdown==0)
 		{
 			host.status=DOBJECT_STATUS_DOWN;
-			host.lastup=now;
-			host.lastdown=0;
+			host.lastdown=now;
+			host.lastup=0;
 			update_dhost(&host);
 		}
 		/* Update service status */
-		if((service.status == DOBJECT_STATUS_UP)||(service.lastup==0 && service.lastdown==0))
+		if(service.status == DOBJECT_STATUS_UP || service.lastdown==0)
 		{
 			service.status=DOBJECT_STATUS_DOWN;
-			service.lastup=now;
-			service.lastdown=0;
+			service.lastdown=now;
+			service.lastup=0;
 			update_dservice(&service);
 		}
 	}
