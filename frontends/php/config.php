@@ -122,7 +122,7 @@ include_once "include/page_header.php";
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_IMAGE,"Image [".$image['name']."] deleted");
 				unset($_REQUEST["form"]);
 			}
-			unset($_REQUEST["imageid"]);
+			unset($image, $_REQUEST["imageid"]);
 		}
 	}
 	elseif(isset($_REQUEST["save"])&&in_array($_REQUEST["config"],array(0,5,7)))

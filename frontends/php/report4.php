@@ -38,13 +38,21 @@ include_once "include/page_header.php";
 	check_fields($fields);
 ?>
 <?php
-	$year		= get_request("year", 		2006);
+	$year		= get_request("year", 		intval(date("Y")));
 	$period		= get_request("period",		"weekly");
 	$media_type	= get_request("media_type",	0);
 ?>
 <?php
-	define("YEAR_LEFT_SHIFT", 5);
-	
+	if( ($min_time = DBfetch(DBselect('select min(clock) as clock from alerts'))) && $min_time['clock'])
+	{
+		$MIN_YEAR = intval(date("Y", $min_time['clock']));
+	}
+
+	if( !isset($MIN_YEAR) )
+	{
+		$MIN_YEAR = intval(date("Y"));
+	}
+		
 	$form = new CForm();
 
 	$form->AddItem(SPACE.S_MEDIA_TYPE.SPACE);
@@ -69,7 +77,7 @@ include_once "include/page_header.php";
 	{
 		$form->AddItem(SPACE.S_YEAR.SPACE);
 		$cmbYear = new CComboBox("year", $year, "submit();");
-		for($y = date("Y")-YEAR_LEFT_SHIFT; $y <= date("Y"); $y++)
+		for($y = $MIN_YEAR; $y <= date("Y"); $y++)
 			$cmbYear->AddItem($y, $y);
 		$form->AddItem($cmbYear);
 	}
@@ -105,7 +113,7 @@ include_once "include/page_header.php";
         switch($period)
 	{
 		case "yearly":
-			$from	= (date("Y") - YEAR_LEFT_SHIFT);
+			$from	= $MIN_YEAR;
 			$to	= date("Y");
 			array_unshift($header, new CCol(S_YEAR,"center"));
 			function get_time($y)	{	return mktime(0,0,0,1,1,$y);		}
