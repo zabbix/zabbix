@@ -283,7 +283,7 @@
 
 		$form->AddRow(S_NEW_CHECK, array(
 			$cmbChkType, SPACE,
-			S_PORTS_SMALL, SPACE, new CTextBox('new_check_ports', $new_check_ports),
+			S_PORTS_SMALL, SPACE, new CNumericBox('new_check_ports', $new_check_ports,5),
 			$external_param,
 			new CButton('add_check', S_ADD)
 		),'new');
