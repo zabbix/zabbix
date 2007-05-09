@@ -77,7 +77,7 @@ INSERT INTO hosts VALUES (10013,'Template_HPUX','Template_HPUX',0,'',10050,3,0,'
 INSERT INTO hosts VALUES (10014,'Template_MacOS_X','Template_MacOS_X',0,'',10050,3,0,'',0,0);
 INSERT INTO hosts VALUES (10015,'Template_Solaris','Template_Solaris',0,'',10050,3,0,'',0,0);
 INSERT INTO hosts VALUES (10016,'Template_SNMPv1_Device','',0,'',10050,3,0,'',0,0);
-INSERT INTO hosts VALUES (10017,'ZABBIX-Server','',1,'127.0.0.1',10050,0,0,'',0,0);
+INSERT INTO hosts VALUES (10017,'ZABBIX Server','',1,'127.0.0.1',10050,1,0,'',0,0);
 
 --
 -- Dumping data for table `hosts_templates`
