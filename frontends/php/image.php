@@ -57,6 +57,8 @@ include_once "include/page_header.php";
 
 	$source = ImageCreateFromString($row["image"]);
 
+	unset($row);
+
 	if($resize == 1)
 	{
 		$src_width	= imagesx($source);
@@ -98,11 +100,12 @@ include_once "include/page_header.php";
 				$th_width, $th_height, 
 				$src_width, $src_height);
 
+			imagedestroy($source);
+
 			$source = $thumb;
 		}
 	}
 	ImageOut($source);
-	ImageDestroy($source);
 ?>
 <?php
 

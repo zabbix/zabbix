@@ -1911,6 +1911,8 @@ else if (document.getElementById)
 			ImageJPEG($image);
 		else
 			ImagePNG($image);
+
+		imagedestroy($image);
 	}
 
 	/* function:

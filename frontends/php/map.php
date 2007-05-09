@@ -95,7 +95,7 @@ include_once "include/page_header.php";
   
 	ImageFilledRectangle($im,0,0,$width,$height,$white);
 
-	if(($db_image = get_image_by_imageid($backgroundid, 2)))
+	if(($db_image = get_image_by_imageid($backgroundid)))
 	{
 		$back = ImageCreateFromString($db_image["image"]);
 		ImageCopy($im,$back,0,0,0,0,imagesx($back),imagesy($back));
@@ -105,6 +105,7 @@ include_once "include/page_header.php";
 		$x=imagesx($im)/2-ImageFontWidth(4)*strlen($name)/2;
 		ImageString($im, 4,$x,1, $name , $darkred);
 	}
+	unset($db_image);
 
 	$str=date("m.d.Y H:i:s",time(NULL));
 	ImageString($im, 0,imagesx($im)-120,imagesy($im)-12,"$str", $gray);
