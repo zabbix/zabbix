@@ -35,11 +35,6 @@
 #	include "zbxplugin.h"
 #endif /* WITH_PLUGINS */
 
-#ifdef _WINDOWS
-	static char	DEFAULT_CONFIG_FILE[]	= "C:\\zabbix_agentd.conf";
-#else /* not _WINDOWS */
-	static char	DEFAULT_CONFIG_FILE[]	= "/etc/zabbix/zabbix_agentd.conf";
-#endif /* _WINDOWS */
 
 #ifdef USE_PID_FILE
 	static char	DEFAULT_PID_FILE[]	= "/tmp/zabbix_agentd.pid";
@@ -105,11 +100,6 @@ void    load_config()
 
 	memset(&result, 0, sizeof(AGENT_RESULT));
 	
-	if(CONFIG_FILE == NULL)
-	{
-		CONFIG_FILE = DEFAULT_CONFIG_FILE;
-	}
-
 	parse_cfg_file(CONFIG_FILE, cfg);
 
 #ifdef USE_PID_FILE

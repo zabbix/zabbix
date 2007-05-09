@@ -92,11 +92,6 @@ void    init_config(void)
 		{0}
 	};
 
-	if(CONFIG_FILE == NULL)
-	{
-		CONFIG_FILE = DEFAULT_CONFIG_FILE;
-	}
-	
 	parse_cfg_file(CONFIG_FILE,cfg);
 }
 	  
@@ -146,6 +141,11 @@ int	main(int argc, char **argv)
 		default:
 			task = ZBX_TASK_SHOW_USAGE;
 			break;
+	}
+
+	if(CONFIG_FILE == NULL)
+	{
+		CONFIG_FILE = DEFAULT_CONFIG_FILE;
 	}
 
 	init_metrics(); /* Must be before init_config() */

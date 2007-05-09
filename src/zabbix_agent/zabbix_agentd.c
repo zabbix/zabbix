@@ -45,6 +45,12 @@
 
 char *progname = NULL;
 
+/* Default config file location */
+#ifdef _WINDOWS
+	static char	DEFAULT_CONFIG_FILE[]	= "C:\\zabbix_agentd.conf";
+#else /* not _WINDOWS */
+	static char	DEFAULT_CONFIG_FILE[]	= "/etc/zabbix/zabbix_agentd.conf";
+#endif /* _WINDOWS */
 
 /* application TITLE */
 
@@ -200,6 +206,11 @@ static zbx_task_t parse_commandline(int argc, char **argv)
 		default:
 			task = ZBX_TASK_SHOW_USAGE;
 			break;
+	}
+
+	if(CONFIG_FILE == NULL)
+	{
+		CONFIG_FILE = DEFAULT_CONFIG_FILE;
 	}
 
 	return task;
