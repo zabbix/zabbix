@@ -1,5 +1,6 @@
 Changes for 1.3.7:
 
+ - fixed processing of uptime/downtime timestamps for DM (Alexei)
  - fixed support of action "Delete host" (Alexei)
  - added column items.params (Alexei)
  - support of Include directive for configuration files (Alexei)
