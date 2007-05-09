@@ -53,7 +53,7 @@ int	parse_cfg_file(const char *cfg_file,struct cfg_line *cfg)
 {
 	FILE	*file;
 
-	static level = 0;
+	static int level = 0;
 
 #define ZBX_MAX_INCLUDE_LEVEL 10
 
