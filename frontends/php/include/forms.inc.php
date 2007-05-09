@@ -3972,7 +3972,7 @@ include_once 'include/discovery.inc.php';
 		if($show_only_tmp)
 		{
 			$frmHost->AddVar("useip",0);
-			$frmHost->AddVar("ip","");
+			$frmHost->AddVar("ip","0.0.0.0");
 			$frmHost->AddVar("dns","");
 		}
 		else
