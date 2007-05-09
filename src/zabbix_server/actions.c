@@ -442,7 +442,7 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 		(event->object == EVENT_OBJECT_DHOST || event->object == EVENT_OBJECT_DSERVICE) &&
 		condition->conditiontype == CONDITION_TYPE_DUPTIME)
 	{
-		zabbix_log( LOG_LEVEL_DEBUG, "CONDITION_TYPE_DUPTIME [%d:%s]",
+		zabbix_log( LOG_LEVEL_DEBUG, "CONDITION_TYPE_DUPTIME [event->value:%d:condition->value:%s]",
 			event->value,
 			condition->value);
 		value_int = atoi(condition->value);
@@ -463,11 +463,11 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 			now = time(NULL);
 			if(condition->operator == CONDITION_OPERATOR_LESS_EQUAL)
 			{
-				if(tmp_int != 0 && (now-value_int)<=value_int)	ret = SUCCEED;
+				if(tmp_int != 0 && (now-tmp_int)<=value_int)	ret = SUCCEED;
 			}
 			else if(condition->operator == CONDITION_OPERATOR_MORE_EQUAL)
 			{
-				if(tmp_int != 0 && (now-value_int)>=value_int)	ret = SUCCEED;
+				if(tmp_int != 0 && (now-tmp_int)>=value_int)	ret = SUCCEED;
 			}
 			else
 			{

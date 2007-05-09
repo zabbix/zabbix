@@ -209,6 +209,19 @@ INSERT INTO applications VALUES (140,10015,'Filesystem',0);
 INSERT INTO applications VALUES (141,10015,'Integrity',0);
 INSERT INTO applications VALUES (142,10015,'Memory',0);
 
+INSERT INTO applications VALUES (143,10017,'Availability',19);
+INSERT INTO applications VALUES (144,10017,'CPU',13);
+INSERT INTO applications VALUES (145,10017,'Filesystem',5);
+INSERT INTO applications VALUES (146,10017,'General',21);
+INSERT INTO applications VALUES (147,10017,'Integrity',23);
+INSERT INTO applications VALUES (148,10017,'Log files',11);
+INSERT INTO applications VALUES (149,10017,'Memory',15);
+INSERT INTO applications VALUES (150,10017,'Network',7);
+INSERT INTO applications VALUES (151,10017,'OS',1);
+INSERT INTO applications VALUES (152,10017,'Performance',17);
+INSERT INTO applications VALUES (153,10017,'Processes',9);
+INSERT INTO applications VALUES (154,10017,'Services',2);
+
 --
 -- Dumping data for table `mappings`
 --
@@ -411,7 +424,7 @@ INSERT INTO items VALUES (10103,0,'','',161,10002,'Free swap space','system.swap
 INSERT INTO items VALUES (10104,0,'','',161,10002,'Size of $1','filesize[c:\\msdos.sys]',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,0,'','');
 INSERT INTO items VALUES (10106,0,'','',161,10002,'Checksum of $1','vfs.file.cksum[c:\\autoexec.bat]',600,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','0','',0,'',0,0,'','');
 INSERT INTO items VALUES (10109,0,'','',161,10002,'Ping to the server (TCP)','agent.ping',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,1,'','');
-INSERT INTO items VALUES (10114,0,'','',161,10002,'Host uptime (in sec)','system.uptime',300,7,365,0,NULL,NULL,NULL,0,3,'','uptime',0,0,NULL,'',0,'','','0','',0,'',0,0,'','');
+INSERT INTO items VALUES (10114,0,'','',161,10002,'Host uptime (in sec)','system.uptime',300,7,365,0,NULL,NULL,NULL,0,0,'','uptime',0,0,NULL,'',0,'','','0','',0,'',0,0,'','');
 INSERT INTO items VALUES (10115,0,'','',161,10002,'Total memory','vm.memory.size[total]',1800,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',0,0,'','');
 INSERT INTO items VALUES (10119,0,'','',161,10002,'Total swap space','system.swap.size[,total]',1800,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',0,0,'','');
 INSERT INTO items VALUES (10137,0,'','',161,10002,'Number of running processes apache','proc_cnt[httpd]',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','0','',0,'',0,0,'','');
@@ -5357,7 +5370,7 @@ INSERT INTO conditions VALUES (7,3,12,2,'Windows');
 
 INSERT INTO operations VALUES (3,2,6,0,10001,'','');
 INSERT INTO operations VALUES (4,2,4,0,2,'','');
-INSERT INTO operations VALUES (5,3,4,0,2,'','');
+INSERT INTO operations VALUES (5,3,4,0,3,'','');
 INSERT INTO operations VALUES (6,3,6,0,10002,'','');
 
 --
