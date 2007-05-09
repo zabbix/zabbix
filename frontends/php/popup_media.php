@@ -90,7 +90,7 @@ function add_media(formname,mediatypeid,sendto,period,active,severity)
 <?php
 	if(isset($_REQUEST['add']))
 	{
-		if(validate_period($_REQUEST['period']) != 0)
+		if( !validate_period($_REQUEST['period']) )
 		{
 			error("Icorrect time period");
 		}

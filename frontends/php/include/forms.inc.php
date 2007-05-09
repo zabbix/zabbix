@@ -863,9 +863,9 @@
 
 		$frmUser->AddRow(S_LANGUAGE, $cmbLang);
 
-		$frmUser->AddRow(S_AUTO_LOGOUT_IN_SEC,	new CTextBox("autologout",$autologout,5));
+		$frmUser->AddRow(S_AUTO_LOGOUT_IN_SEC,	new CNumericBox("autologout",$autologout,4));
 		$frmUser->AddRow(S_URL_AFTER_LOGIN,	new CTextBox("url",$url,50));
-		$frmUser->AddRow(S_SCREEN_REFRESH,	new CTextBox("refresh",$refresh,5));
+		$frmUser->AddRow(S_SCREEN_REFRESH,	new CNumericBox("refresh",$refresh,4));
 	
 		
 		if($profile==0)
@@ -1344,7 +1344,7 @@
 		if($selection_mode)
 		{
 			$cmbType = new CComboBox("with_type",$with_type, "submit()");
-			$cmbType->AddItem(-1, S_ALL);
+			$cmbType->AddItem(-1, S_ALL_SMALL);
 			foreach(array(ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SIMPLE,
 				ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3, ITEM_TYPE_TRAPPER,
 				ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_HTTPTEST) as $it)
@@ -1372,7 +1372,7 @@
 					new CTextBox("with_snmpv3_securityname",$with_snmpv3_securityname,64));
 
 				$cmbSecLevel = new CComboBox("with_snmpv3_securitylevel",$with_snmpv3_securitylevel);
-				$cmbSecLevel->AddItem(-1,S_ALL);
+				$cmbSecLevel->AddItem(-1,S_ALL_SMALL);
 				$cmbSecLevel->AddItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,"NoAuthPriv");
 				$cmbSecLevel->AddItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,"AuthNoPriv");
 				$cmbSecLevel->AddItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,"AuthPriv");
@@ -1387,7 +1387,7 @@
 
 
 			$cmbValType = new CComboBox("with_value_type",$with_value_type,"submit()");
-			$cmbValType->AddItem(-1,	S_ALL);
+			$cmbValType->AddItem(-1,	S_ALL_SMALL);
 			$cmbValType->AddItem(ITEM_VALUE_TYPE_UINT64,	S_NUMERIC_UINT64);
 			$cmbValType->AddItem(ITEM_VALUE_TYPE_FLOAT,	S_NUMERIC_FLOAT);
 			$cmbValType->AddItem(ITEM_VALUE_TYPE_STR, 	S_CHARACTER);
@@ -1413,7 +1413,7 @@
 			$form->AddRow('with '.bold(S_KEEP_TRENDS_IN_DAYS), new CNumericBox("with_trends",$with_trends,8,null,true));
 
 			$cmbStatus = new CComboBox("with_status",$with_status);
-			$cmbStatus->AddItem(-1,S_ALL);
+			$cmbStatus->AddItem(-1,S_ALL_SMALL);
 			foreach(array(ITEM_STATUS_ACTIVE,ITEM_STATUS_DISABLED,ITEM_STATUS_NOTSUPPORTED) as $st)
 				$cmbStatus->AddItem($st,item_status2str($st));
 			$form->AddRow('with '.bold(S_STATUS),$cmbStatus);
@@ -1426,7 +1426,7 @@
 			if( ($with_value_type==ITEM_VALUE_TYPE_FLOAT) || ($with_value_type==ITEM_VALUE_TYPE_UINT64))
 			{
 				$cmbDelta= new CComboBox("with_delta",$with_delta);
-				$cmbDelta->AddItem(-1,S_ALL);
+				$cmbDelta->AddItem(-1,S_ALL_SMALL);
 				$cmbDelta->AddItem(0,S_AS_IS);
 				$cmbDelta->AddItem(1,S_DELTA_SPEED_PER_SECOND);
 				$cmbDelta->AddItem(2,S_DELTA_SIMPLE_CHANGE);
@@ -2414,8 +2414,8 @@
 		$group_gid = get_request('group_gid', array());
 	
 		$frmGraph->AddRow(S_NAME,new CTextBox("name",$name,32));
-		$frmGraph->AddRow(S_WIDTH,new CTextBox("width",$width,5));
-		$frmGraph->AddRow(S_HEIGHT,new CTextBox("height",$height,5));
+		$frmGraph->AddRow(S_WIDTH,new CNumericBox("width",$width,5));
+		$frmGraph->AddRow(S_HEIGHT,new CNumericBox("height",$height,5));
 
 		$cmbGType = new CComboBox("graphtype",$graphtype,'submit()');
 		$cmbGType->AddItem(GRAPH_TYPE_NORMAL,S_NORMAL);
@@ -2709,7 +2709,7 @@
 			new CTextBox("add_newvalue","",10),
 			SPACE,
 			new CButton("add_map",S_ADD)
-			));
+			),'new');
 
 		$frmValmap->AddItemToBottomRow(new CButton('save',S_SAVE));
 		if(isset($_REQUEST["valuemapid"]))
@@ -3431,8 +3431,8 @@ include_once 'include/discovery.inc.php';
 			$frmScr->AddVar("screenid",$_REQUEST["screenid"]);
 		}
 		$frmScr->AddRow(S_NAME, new CTextBox("name",$name,32));
-		$frmScr->AddRow(S_COLUMNS, new CTextBox("hsize",$hsize,5));
-		$frmScr->AddRow(S_ROWS, new CTextBox("vsize",$vsize,5));
+		$frmScr->AddRow(S_COLUMNS, new CNumericBox("hsize",$hsize,3));
+		$frmScr->AddRow(S_ROWS, new CNumericBox("vsize",$vsize,3));
 
 		$frmScr->AddItemToBottomRow(new CButton("save",S_SAVE));
 		if(isset($_REQUEST["screenid"]))
@@ -3594,18 +3594,18 @@ include_once 'include/discovery.inc.php';
 			}
 
 			$form->AddRow(S_PARAMETER,$cmbHosts);
-			$form->AddRow(S_SHOW_LINES, new CTextBox("elements",$elements,2));
+			$form->AddRow(S_SHOW_LINES, new CElementsBox("elements",$elements,2));
 		}
                 elseif($resourcetype == SCREEN_RESOURCE_ACTIONS)
                 {
         // History of actions
-                        $form->AddRow(S_SHOW_LINES, new CTextBox("elements",$elements,2));
+                        $form->AddRow(S_SHOW_LINES, new CElementsBox("elements",$elements,2));
 			$form->AddVar("resourceid",0);
                 }
                 elseif($resourcetype == SCREEN_RESOURCE_EVENTS)
                 {
         // History of events
-                        $form->AddRow(S_SHOW_LINES, new CTextBox("elements",$elements,2));
+                        $form->AddRow(S_SHOW_LINES, new CNumericBox("elements",$elements,2));
                         $form->AddVar("resourceid",0);
                 }
 		elseif(in_array($resourcetype,array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW,SCREEN_RESOURCE_DATA_OVERVIEW)))
@@ -3680,8 +3680,8 @@ include_once 'include/discovery.inc.php';
 
 		if(in_array($resourcetype,array(SCREEN_RESOURCE_GRAPH,SCREEN_RESOURCE_SIMPLE_GRAPH,SCREEN_RESOURCE_CLOCK,SCREEN_RESOURCE_URL)))
 		{
-			$form->AddRow(S_WIDTH,	new CTextBox("width",$width,5));
-			$form->AddRow(S_HEIGHT,	new CTextBox("height",$height,5));
+			$form->AddRow(S_WIDTH,	new CNumericBox("width",$width,5));
+			$form->AddRow(S_HEIGHT,	new CNumericBox("height",$height,5));
 		}
 		else
 		{
@@ -3709,8 +3709,8 @@ include_once 'include/discovery.inc.php';
 		$cmbValign->AddItem(VALIGN_BOTTOM,	S_BOTTOM);
 		$form->AddRow(S_VERTICAL_ALIGN,	$cmbValign);
 
-		$form->AddRow(S_COLUMN_SPAN,	new CTextBox("colspan",$colspan,2));
-		$form->AddRow(S_ROW_SPAN,	new CTextBox("rowspan",$rowspan,2));
+		$form->AddRow(S_COLUMN_SPAN,	new CNumericBox("colspan",$colspan,2));
+		$form->AddRow(S_ROW_SPAN,	new CNumericBox("rowspan",$rowspan,2));
 
 		$form->AddItemToBottomRow(new CButton("save",S_SAVE));
 		if(isset($_REQUEST["screenitemid"]))
@@ -3788,10 +3788,10 @@ include_once 'include/discovery.inc.php';
 		$frmHouseKeep->AddVar("config",get_request("config",0));
 
 		$frmHouseKeep->AddRow(S_DO_NOT_KEEP_ACTIONS_OLDER_THAN,
-			new CTextBox("alert_history",$config["alert_history"],8));
+			new CNumericBox("alert_history",$config["alert_history"],5));
 
 		$frmHouseKeep->AddRow(S_DO_NOT_KEEP_EVENTS_OLDER_THAN,
-			new CTextBox("event_history",$config["event_history"],8));
+			new CNumericBox("event_history",$config["event_history"],5));
 
 		$frmHouseKeep->AddItemToBottomRow(new CButton("save",S_SAVE));
 		$frmHouseKeep->Show();
@@ -3823,7 +3823,7 @@ include_once 'include/discovery.inc.php';
 		$frmHouseKeep->AddVar('config',get_request('config',5));
 		
 		$frmHouseKeep->AddRow(S_REFRESH_UNSUPPORTED_ITEMS,
-			new CTextBox('refresh_unsupported',$config['refresh_unsupported'],8));
+			new CNumericBox('refresh_unsupported',$config['refresh_unsupported'],5));
 
 		$cmbUsrGrp = new CComboBox('alert_usrgrpid', $config['alert_usrgrpid']);
 		$cmbUsrGrp->AddItem(0, S_NONE);
@@ -3966,7 +3966,7 @@ include_once 'include/discovery.inc.php';
 		}
 		$frmHost->AddRow(S_GROUPS,$frm_row);
 
-		$frmHost->AddRow(S_NEW_GROUP,new CTextBox("newgroup",$newgroup));
+		$frmHost->AddRow(S_NEW_GROUP,new CTextBox("newgroup",$newgroup),'new');
 
 // onChange does not work on some browsers: MacOS, KDE browser
 		if($show_only_tmp)
@@ -4321,8 +4321,8 @@ include_once 'include/discovery.inc.php';
 			$frmMap->AddVar("sysmapid",$_REQUEST["sysmapid"]);
 
 		$frmMap->AddRow(S_NAME,new CTextBox("name",$name,32));
-		$frmMap->AddRow(S_WIDTH,new CTextBox("width",$width,5));
-		$frmMap->AddRow(S_HEIGHT,new CTextBox("height",$height,5));
+		$frmMap->AddRow(S_WIDTH,new CNumericBox("width",$width,5));
+		$frmMap->AddRow(S_HEIGHT,new CNumericBox("height",$height,5));
 
 		$cmbImg = new CComboBox("backgroundid",$backgroundid);
 		$cmbImg->AddItem(0,"No image...");
@@ -4552,8 +4552,8 @@ include_once 'include/discovery.inc.php';
 		$frmEl->AddRow(S_ICON_ON,$cmbIconOn);
 		$frmEl->AddRow(S_ICON_UNKNOWN,$cmbIconUnknown);
 
-		$frmEl->AddRow("Coordinate X", new CTextBox("x", $x, 5));
-		$frmEl->AddRow("Coordinate Y", new CTextBox("y", $y, 5));
+		$frmEl->AddRow("Coordinate X", new CNumericBox("x", $x, 5));
+		$frmEl->AddRow("Coordinate Y", new CNumericBox("y", $y, 5));
 		$frmEl->AddRow(S_URL, new CTextBox("url", $url, 64));
 
 		$frmEl->AddItemToBottomRow(new CButton("save",S_SAVE));

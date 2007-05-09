@@ -510,11 +510,17 @@
 					$src_graphitem["yaxisside"],$src_graphitem["calc_fnc"],
 					$src_graphitem["type"],$src_graphitem["periods_cnt"]);
 				if(!$result)
+				{
+					error('Can\'t add key ['.$host_item['key_'].']');
 					return $result;
+				}
 				break;
 			}
 			if($item_exist==0)
+			{
+				error('Missed key ['.$src_item['key_'].']');
 				return FALSE;
+			}
 		}
 		return TRUE;
 	}
