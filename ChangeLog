@@ -1,5 +1,6 @@
 Changes for 1.3.7:
 
+ - added column items.params (Alexei)
  - support of Include directive for configuration files (Alexei)
  - ZABBIX process will exit on config file open error (Alexei)
  - cosmetic changes for server's option '-h' (Alexei) 
