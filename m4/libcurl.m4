@@ -128,7 +128,7 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL library @<:@default=yes@:>
 		if test "x$enable_static" = "xyes"; then
 			for i in $_full_libcurl_libs; do
 				case $i in
-					-llibcurl)
+					-lcurl)
 				;;
 					-l*)
 						_lib_name=`echo "$i" | cut -b3-`
@@ -147,7 +147,7 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL library @<:@default=yes@:>
 		LDFLAGS="${LDFLAGS} ${LIBCURL_LDFLAGS}"
 		CFLAGS="${CFLAGS} ${LIBCURL_CFLAGS}"
 
-		AC_CHECK_LIB(libcurl, main, , AC_MSG_ERROR([Not found libcurl library]))
+		AC_CHECK_LIB(curl, main, , AC_MSG_ERROR([Not found libcurl library]))
 
 		LIBS="${_save_curl_libs}"
 		LDFLAGS="${_save_curl_ldflags}"
