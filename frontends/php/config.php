@@ -36,11 +36,11 @@ include_once "include/page_header.php";
 		"config"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,3,5,6,7"),	NULL),
 
 // other form
-		"alert_history"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),	'({config}==0)&&({save}=="Save")'),
-		"event_history"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),	'({config}==0)&&({save}=="Save")'),
-		"work_period"=>		array(T_ZBX_STR, O_NO,	NULL,	NULL,			'({config}==7)&&({save}=="Save")'),
-		"refresh_unsupported"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),	'({config}==5)&&({save}=="Save")'),
-		"alert_usrgrpid"=>	array(T_ZBX_INT, O_NO,	NULL,	DB_ID,			'({config}==5)&&({save}=="Save")'),
+		"alert_history"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),	'({config}==0)&&isset({save})'),
+		"event_history"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),	'({config}==0)&&isset({save})'),
+		"work_period"=>		array(T_ZBX_STR, O_NO,	NULL,	NULL,			'({config}==7)&&isset({save})'),
+		"refresh_unsupported"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),	'({config}==5)&&isset({save})'),
+		"alert_usrgrpid"=>	array(T_ZBX_INT, O_NO,	NULL,	DB_ID,			'({config}==5)&&isset({save})'),
 
 // image form
 		"imageid"=>		array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,
