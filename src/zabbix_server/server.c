@@ -229,42 +229,17 @@ void	init_config(void)
  *                                                                            *
  ******************************************************************************/
 
-/* #define TEST */
-
 #ifdef TEST
-
-int     send_sms(char *device,char *number,char *message, char *error, int max_error_len);
 
 void test()
 {
-	char error[0xFF];
-
-	error[0] = '\0';
-
 	zabbix_set_log_level(LOG_LEVEL_DEBUG);
 
 	printf("-= Test Started =-\n\n");
 
-	if ( SUCCEED == send_sms(
-		"/dev/ttyS0",
-		<phone>,
-		"test from zabbix",
-		error,
-		(int)sizeof(error)
-		) )
-	{
-		SDI("SUCCEED!!!");
-	}
-	else
-	{
-		SDI("FAIL!!!");
-		SDI2("ERROR: %s", error);
-	}
-		
-		
 	printf("\n-= Test completed =-\n");
-
 }
+
 #endif /* TEST */
 
 /******************************************************************************

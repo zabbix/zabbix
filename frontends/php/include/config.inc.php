@@ -218,20 +218,6 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 
 
 	/* function:
-	 *     zbx_jsstr 
-	 *
-	 * description:
-	 *	convert PHP string variable to string
-	 *	for using in JavaScrip block.
-	 *
-	 * author: Eugene Grigorjev
-	 */
-	function zbx_jsstr($str)
-	{
-		return htmlspecialchars(str_replace("\n", '\n', str_replace("\r", '', $str)));
-	}
-
-	/* function:
 	 *     zbx_jsvalue
 	 *
 	 * description:
@@ -245,7 +231,11 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 		if(!is_array($value)) 
 		{
 			if(is_object($value)) return unpack_object($value);
-			if(is_string($value)) return '\''.str_replace('\'','\\\'',str_replace("\n", '\n', str_replace("\r", '', ($value)))).'\'';
+			if(is_string($value)) return '\''.str_replace('\'','\\\'',			/*  '	=> \'	*/
+								str_replace("\n", '\n', 		/*  LF	=> \n	*/
+									str_replace("\\", "\\\\", 	/*  \	=> \\	*/
+										str_replace("\r", '', 	/*  CR	=> remove */
+											($value))))).'\'';
 			if(is_null($value)) return 'null';
 			return strval($value);
 		}
@@ -899,95 +889,6 @@ else
 			return 0;
 		}
 		else return validate_float($str);
-	}
-
-// Does expression match server:key.function(param) ?
-	function	validate_simple_expression($expression)
-	{
-		global $ZBX_CURNODEID;
-
-//		echo "Validating simple:$expression<br>";
-		if (eregi('^\{([0-9a-zA-Z\_\.[.-.]\$]+)\:([]\[0-9a-zA-Z\_\*\/\.\,\:\(\)\+ [.-.]\$]+)\.([a-z]{3,11})\(([#0-9a-zA-Z\_\/\.\,[:space:]]+)\)\}$', $expression, $arr))
-		{
-			$host=$arr[1];
-			$key=$arr[2];
-			$function=$arr[3];
-			$parameter=$arr[4];
-
-//SDI($host);
-//SDI($key);
-//SDI($function);
-//SDI($parameter);
-
-			$sql="select count(*) as cnt from hosts h,items i where h.host=".zbx_dbstr($host).
-				" and i.key_=".zbx_dbstr($key)." and h.hostid=i.hostid ".
-				" and ".DBid2nodeid('h.hostid').'='.$ZBX_CURNODEID;
-//SDI($sql);
-			$row=DBfetch(DBselect($sql));
-			if($row["cnt"]==0)
-			{
-				error("No such host ($host) or monitored parameter ($key)");
-				return -1;
-			}
-			elseif($row["cnt"]!=1)
-			{
-				error("Too many hosts ($host) with parameter ($key)");
-				return -1;
-			}
-
-			if(	($function!="last")&&
-				($function!="diff")&&
-				($function!="min") &&
-				($function!="max") &&
-				($function!="avg") &&
-				($function!="sum") &&
-				($function!="count") &&
-				($function!="prev")&&
-				($function!="delta")&&
-				($function!="change")&&
-				($function!="abschange")&&
-				($function!="nodata")&&
-				($function!="time")&&
-				($function!="dayofweek")&&
-				($function!="date")&&
-				($function!="now")&&
-				($function!="str")&&
-				($function!="fuzzytime")&&
-				($function!="logseverity")&&
-				($function!="logsource")&&
-				($function!="regexp")
-			)
-			{
-				error("Unknown function [$function]");
-				return -1;
-			}
-
-
-			if(in_array($function,array("last","diff","count",
-						"prev","change","abschange","nodata","time","dayofweek",
-						"date","now","fuzzytime"))
-				&& (validate_float($parameter)!=0) )
-			{
-				error("[$parameter] is not a float");
-				return -1;
-			}
-
-			if(in_array($function,array("min","max","avg","sum",
-						"delta"))
-				&& (validate_ticks($parameter)!=0) )
-			{
-				error("[$parameter] is not a float");
-				return -1;
-			}
-		}
-	# Process macros
-		else if($expression!="{TRIGGER.VALUE}")
-		
-		{
-			error("Expression [$expression] does not match to [server:key.func(param)]");
-			return -1;
-		}
-		return 0;
 	}
 
 	# Show screen cell containing plain text values

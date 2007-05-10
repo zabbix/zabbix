@@ -168,6 +168,97 @@
 			' and host in ('.implode(',',$hosts).')');
 	}
 
+define('ZBX_EREG_SIMPLE_EXPRESSION_FORMAT',
+	'^\{([0-9a-zA-Z\_\.[.-.]\$]+)\:([]\[0-9a-zA-Z\_\*\/\.\,\:\(\)\+ [.-.]\$]+)\.([a-z]{3,11})\(([#0-9a-zA-Z\_\/\.\,[:space:]]+)\)\}$');
+
+define('ZBX_SIMPLE_EXPRESSION_HOST_ID', 1);
+define('ZBX_SIMPLE_EXPRESSION_KEY_ID', 2);
+define('ZBX_SIMPLE_EXPRESSION_FUNCTION_ID', 3);
+define('ZBX_SIMPLE_EXPRESSION_PARAMETER_ID', 4);
+// Does expression match server:key.function(param) ?
+	function	validate_simple_expression($expression)
+	{
+		global $ZBX_CURNODEID;
+
+//		echo "Validating simple:$expression<br>";
+		if (eregi(ZBX_EREG_SIMPLE_EXPRESSION_FORMAT, $expression, $arr))
+		{
+			$host		= &$arr[ZBX_SIMPLE_EXPRESSION_HOST_ID];
+			$key		= &$arr[ZBX_SIMPLE_EXPRESSION_KEY_ID];
+			$function	= &$arr[ZBX_SIMPLE_EXPRESSION_FUNCTION_ID];
+			$parameter	= &$arr[ZBX_SIMPLE_EXPRESSION_PARAMETER_ID];
+
+			$sql="select count(*) as cnt from hosts h,items i where h.host=".zbx_dbstr($host).
+				" and i.key_=".zbx_dbstr($key)." and h.hostid=i.hostid ".
+				" and ".DBid2nodeid('h.hostid').'='.$ZBX_CURNODEID;
+//SDI($sql);
+			$row=DBfetch(DBselect($sql));
+			if($row["cnt"]==0)
+			{
+				error("No such host ($host) or monitored parameter ($key)");
+				return -1;
+			}
+			elseif($row["cnt"]!=1)
+			{
+				error("Too many hosts ($host) with parameter ($key)");
+				return -1;
+			}
+
+			if(	($function!="last")&&
+				($function!="diff")&&
+				($function!="min") &&
+				($function!="max") &&
+				($function!="avg") &&
+				($function!="sum") &&
+				($function!="count") &&
+				($function!="prev")&&
+				($function!="delta")&&
+				($function!="change")&&
+				($function!="abschange")&&
+				($function!="nodata")&&
+				($function!="time")&&
+				($function!="dayofweek")&&
+				($function!="date")&&
+				($function!="now")&&
+				($function!="str")&&
+				($function!="fuzzytime")&&
+				($function!="logseverity")&&
+				($function!="logsource")&&
+				($function!="regexp")
+			)
+			{
+				error("Unknown function [$function]");
+				return -1;
+			}
+
+
+			if(in_array($function,array("last","diff","count",
+						"prev","change","abschange","nodata","time","dayofweek",
+						"date","now","fuzzytime"))
+				&& (validate_float($parameter)!=0) )
+			{
+				error("[$parameter] is not a float");
+				return -1;
+			}
+
+			if(in_array($function,array("min","max","avg","sum",
+						"delta"))
+				&& (validate_ticks($parameter)!=0) )
+			{
+				error("[$parameter] is not a float");
+				return -1;
+			}
+		}
+	# Process macros
+		else if($expression!="{TRIGGER.VALUE}")
+		
+		{
+			error("Expression [$expression] does not match to [server:key.func(param)]");
+			return -1;
+		}
+		return 0;
+	}
+
 	function	validate_expression($expression)
 	{
 //		echo "Validating expression: $expression<br>";
@@ -181,11 +272,6 @@
 			$arr="";
 			if (eregi('^((.)*)[ ]*(\{((.)*)\})[ ]*((.)*)$', $expression, $arr)) 
 			{
-//				for($i=0;$i<20;$i++)
-//				{
-//					if($arr[$i])
-//						echo "  $i: ",$arr[$i],"<br>";
-//				}
 				if(validate_simple_expression($arr[3])!=0)
 				{
 					return -1;
@@ -316,15 +402,21 @@
  
 		add_event($triggerid,TRIGGER_VALUE_UNKNOWN);
  
-		$expression = implode_exp($expression,$triggerid);
-
-		DBexecute("update triggers set expression=".zbx_dbstr($expression)." where triggerid=$triggerid");
-
-		reset_items_nextcheck($triggerid);
-
-		foreach($deps as $val)
+		if( null == ($expression = implode_exp($expression,$triggerid)) )
 		{
-			$result = add_trigger_dependency($triggerid, $val);
+			$result = false;
+		}
+
+		if($result)
+		{
+			DBexecute("update triggers set expression=".zbx_dbstr($expression)." where triggerid=$triggerid");
+
+			reset_items_nextcheck($triggerid);
+
+			foreach($deps as $val)
+			{
+				$result = add_trigger_dependency($triggerid, $val);
+			}
 		}
 
 		$trig_hosts = get_hosts_by_triggerid($triggerid);
@@ -344,15 +436,17 @@
 			$child_hosts = get_hosts_by_templateid($trig_host["hostid"]);
 			while($child_host = DBfetch($child_hosts))
 			{
-				$result = copy_trigger_to_host($triggerid, $child_host["hostid"]);
-				if(!$result){
-					if($templateid == 0)
-					{ // delete main trigger (and recursively childs)
-						delete_trigger($triggerid);
-					}
-					return $result;
-				}
+				if( !($result = copy_trigger_to_host($triggerid, $child_host["hostid"])))
+					break;
 			}
+		}
+
+		if(!$result){
+			if($templateid == 0)
+			{ // delete main trigger (and recursively childs)
+				delete_trigger($triggerid);
+			}
+			return $result;
 		}
 
 		return $triggerid;
@@ -499,7 +593,7 @@
 				{
 					$exp .= "{".$functionid."}";
 				}
-				else if($function_data = DBfetch(DBselect('select h.host,i.key_,f.function,f.parameter,i.itemid,i.value_type'.
+				else if(is_numeric($functionid) && $function_data = DBfetch(DBselect('select h.host,i.key_,f.function,f.parameter,i.itemid,i.value_type'.
 					' from items i,functions f,hosts h'.
 					' where functionid='.$functionid.' and i.itemid=f.itemid and h.hostid=i.hostid')))
 				{
@@ -541,119 +635,44 @@
 	function	implode_exp ($expression, $triggerid)
 	# Translate localhost:procload.last(0)>10 to {12}>10
 	{
-//		echo "Expression:$expression<br>";
-		$exp='';
-		$state="";
-		for($i=0,$max=strlen($expression); $i<$max; $i++)
+		$short_exp = $expression;
+
+		for($pos=0,$max=strlen($expression); $pos<$max; )
 		{
-			if($expression[$i] == '{')
-			{
-				if($state=="")
-				{
-					$host='';
-					$key='';
-					$function='';
-					$parameter='';
-					$state='HOST';
-					continue;
-				}
-			}
-// Processing of macros {TRIGGER.VALUE}
-			if( ($expression[$i] == '}')&&($state=="HOST") )
-			{
-				$exp = $exp."{".$host."}";
-				$state="";
-				continue;
-			}
-			if( ($expression[$i] == '}')&&($state=="") )
-			{
-//				echo "HOST:$host<BR>";
-//				echo "KEY:$key<BR>";
-//				echo "FUNCTION:$function<BR>";
-//				echo "PARAMETER:$parameter<BR>";
-				$state='';
-		
-				$res=DBselect("select i.itemid from items i,hosts h".
-					" where i.key_=".zbx_dbstr($key).
-					" and h.host=".zbx_dbstr($host).
-					" and h.hostid=i.hostid");
-				$row=DBfetch($res);
+			if ( false === ($simple_start = strpos($expression, '{', $pos)) ) break;
+			if ( false === ($simple_end = strpos($expression, '}', $simple_start)) ) break;
+			
+			$pos = $simple_end;
 
-				$itemid=$row["itemid"];
-	
-				$functionid = get_dbid("functions","functionid");
-				$res=DBexecute("insert into functions (functionid,itemid,triggerid,function,parameter)".
-					" values ($functionid,$itemid,$triggerid,".zbx_dbstr($function).",".
-					zbx_dbstr($parameter).")");
-				if(!$res)
-				{
-					return	$res;
-				}
+			$simple_exp = substr($expression, $simple_start, $simple_end - $simple_start + 1);
 
-				$exp=$exp.'{'.$functionid.'}';
+			if (!eregi(ZBX_EREG_SIMPLE_EXPRESSION_FORMAT, $simple_exp, $arr)) continue;
 
-				continue;
-			}
-			if($expression[$i] == '(')
-			{
-				if($state == "FUNCTION")
-				{
-					$state='PARAMETER';
-					continue;
-				}
-			}
-			if($expression[$i] == ')')
-			{
-				if($state == "PARAMETER")
-				{
-					$state='';
-					continue;
-				}
-			}
-			if(($expression[$i] == ':') && ($state == "HOST"))
-			{
-				$state="KEY";
-				continue;
-			}
-			if($expression[$i] == '.')
-			{
-				if($state == "KEY")
-				{
-					$state="FUNCTION";
-					continue;
-				}
-				// Support for '.' in KEY
-				if($state == "FUNCTION")
-				{
-					$state="FUNCTION";
-					$key=$key.".".$function;
-					$function="";
-					continue;
-				}
-			}
-			if($state == "HOST")
-			{
-				$host=$host.$expression[$i];
-				continue;
-			}
-			if($state == "KEY")
-			{
-				$key=$key.$expression[$i];
-				continue;
-			}
-			if($state == "FUNCTION")
-			{
-				$function=$function.$expression[$i];
-				continue;
-			}
-			if($state == "PARAMETER")
-			{
-				$parameter=$parameter.$expression[$i];
-				continue;
-			}
-			$exp=$exp.$expression[$i];
+			$host		= &$arr[ZBX_SIMPLE_EXPRESSION_HOST_ID];
+			$key		= &$arr[ZBX_SIMPLE_EXPRESSION_KEY_ID];
+			$function	= &$arr[ZBX_SIMPLE_EXPRESSION_FUNCTION_ID];
+			$parameter	= &$arr[ZBX_SIMPLE_EXPRESSION_PARAMETER_ID];
+
+			$row=DBfetch(DBselect("select i.itemid from items i,hosts h".
+				" where i.key_=".zbx_dbstr($key).
+				" and h.host=".zbx_dbstr($host).
+				" and h.hostid=i.hostid"));
+
+			$itemid=$row["itemid"];
+
+			unset($row);
+
+			$functionid = get_dbid("functions","functionid");
+			if ( !DBexecute("insert into functions (functionid,itemid,triggerid,function,parameter)".
+				" values ($functionid,$itemid,$triggerid,".zbx_dbstr($function).",".
+				zbx_dbstr($parameter).")"))			return	NULL;
+
+			$short_exp = str_replace($simple_exp, '{'.$functionid.'}', $short_exp);
+
+			unset($simple_exp);
 		}
-		return $exp;
+
+		return $short_exp;
 	}
 
 	function	update_trigger_comments($triggerid,$comments)
@@ -881,7 +900,8 @@
 			return	$result;
 		}
 
-		$expression = implode_exp($expression,$triggerid);
+		$expression = implode_exp($expression,$triggerid); /* errors can be ignored cose function must return NULL */
+
 		add_event($triggerid,TRIGGER_VALUE_UNKNOWN);
 		reset_items_nextcheck($triggerid);
 
