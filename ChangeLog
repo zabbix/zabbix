@@ -1,5 +1,6 @@
 Changes for 1.3.7:
 
+ - revision R5 of ZABBIX Manual (Alexei)
  - fixed processing of '-t' and other params when '-c' is not given (Alexei)
  - increased max size of images (Eugene)
  - fixed default data for default host 'ZABBIX-Server' (Alexei)
