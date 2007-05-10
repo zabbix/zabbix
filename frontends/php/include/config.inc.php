@@ -1054,7 +1054,7 @@ else
 		echo "<TD ALIGN=CENTER>";
 
 		insert_sizeable_graph('chart.php?itemid='.$itemid.
-			url_param($from,false,'form').
+			url_param($from,false,'from').
 			url_param($stime,false,'stime').
 			url_param($period,false,'period'));
 

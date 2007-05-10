@@ -1,5 +1,6 @@
 Changes for 1.3.8:
 
+ - fixed time movement for history (Eugene)
  - added availability to yse ')(' characters in item keys (Eugene)
  - improved management of trigger (Eugene)
 
