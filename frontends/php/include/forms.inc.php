@@ -2244,10 +2244,10 @@
 		$frmTrig->AddRow(S_NAME, new CTextBox("description",$description,90, $limited));
 		$frmTrig->AddRow(S_EXPRESSION, array(
 				new CTextBox("expression",$expression,75, $limited),
-				new CButton('insert',S_INSERT,
+				($limited ? null : new CButton('insert',S_INSERT,
 					"return PopUp('popup_trexpr.php?dstfrm=".$frmTrig->GetName().
 					"&dstfld1=expression&srctbl=expression".
-					"&srcfld1=expression&expression=' + escape(GetSelectedText(this.form.elements['expression'])),700,200);")
+					"&srcfld1=expression&expression=' + escape(GetSelectedText(this.form.elements['expression'])),700,200);"))
 			));
 
 	/* dependences */
@@ -2304,9 +2304,12 @@
 			$frmTrig->AddItemToBottomRow(SPACE);
 			$frmTrig->AddItemToBottomRow(new CButton("clone",S_CLONE));
 			$frmTrig->AddItemToBottomRow(SPACE);
-			$frmTrig->AddItemToBottomRow(new CButtonDelete("Delete trigger?",
-				url_param("form").url_param("groupid").url_param("hostid").
-				url_param("triggerid")));
+			if( !$limited )
+			{
+				$frmTrig->AddItemToBottomRow(new CButtonDelete("Delete trigger?",
+					url_param("form").url_param("groupid").url_param("hostid").
+					url_param("triggerid")));
+			}
 		}
 		$frmTrig->AddItemToBottomRow(SPACE);
 		$frmTrig->AddItemToBottomRow(new CButtonCancel(url_param("groupid").url_param("hostid")));

@@ -259,7 +259,7 @@ if(form)
 
 	if(el)
 	{
-		InsertText(el, '<?php echo $expression; ?>');
+		InsertText(el, <?php echo zbx_jsvalue($expression); ?>);
 		close_window();
 	}
 }

@@ -100,13 +100,13 @@ function add_httpstep(formname,name,timeout,url,posts,required)
 }
 
 <?php
-		echo "add_httpstep('".
-			$_REQUEST['dstfrm']."','".
-			$_REQUEST['name']."','".
-			$_REQUEST['timeout']."','".
-			$_REQUEST['url']."','".
-			$_REQUEST['posts']."','".
-			$_REQUEST['required']."');\n";
+		echo "add_httpstep(".
+			zbx_jsvalue($_REQUEST['dstfrm']).",".
+			zbx_jsvalue($_REQUEST['name']).",".
+			zbx_jsvalue($_REQUEST['timeout']).",".
+			zbx_jsvalue($_REQUEST['url']).",".
+			zbx_jsvalue($_REQUEST['posts']).",".
+			zbx_jsvalue($_REQUEST['required']).");\n";
 ?>
 -->
 </script>
@@ -141,15 +141,15 @@ function update_httpstep(formname,list_name,sid,name,timeout,url,posts,required)
 }
 
 <?php
-		echo "update_httpstep('".
-			$_REQUEST['dstfrm']."','".
-			$_REQUEST['list_name']."','".
-			$_REQUEST['sid']."','".
-			$_REQUEST['name']."',".
-			$_REQUEST['timeout'].",'".
-			$_REQUEST['url']."','".
-			zbx_jsstr($_REQUEST['posts'])."','".
-			$_REQUEST['required']."');\n";
+		echo "update_httpstep(".
+			zbx_jsvalue($_REQUEST['dstfrm']).",".
+			zbx_jsvalue($_REQUEST['list_name']).",".
+			zbx_jsvalue($_REQUEST['sid']).",".
+			zbx_jsvalue($_REQUEST['name']).",".
+			zbx_jsvalue($_REQUEST['timeout']).",".
+			zbx_jsvalue($_REQUEST['url']).",".
+			zbx_jsvalue($_REQUEST['posts']).",".
+			zbx_jsvalue($_REQUEST['required']).");\n";
 ?>
 -->
 </script>

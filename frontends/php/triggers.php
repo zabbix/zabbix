@@ -158,7 +158,8 @@ include_once "include/page_header.php";
 				" from triggers t left join functions f on t.triggerid=f.triggerid ".
 				" left join items i on f.itemid=i.itemid ".
 				" left join hosts h on i.hostid=h.hostid ".
-				" where t.triggerid=".$_REQUEST["triggerid"])
+				" where t.triggerid=".$_REQUEST["triggerid"].
+				" and t.templateid=0")
 			))
 		{
 			$result = delete_trigger($_REQUEST["triggerid"]);
@@ -373,18 +374,24 @@ include_once "include/page_header.php";
 			),
 			S_EXPRESSION, S_SEVERITY, S_STATUS, S_ERROR));
 
-		$sql = "select distinct h.hostid,h.host,t.*".
+/*		$sql = "select distinct h.hostid,h.host,t.*".
 			" from triggers t,hosts h,items i,functions f".
 			" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid".
 			" and ".DBid2nodeid("h.hostid")."=".$ZBX_CURNODEID;
-			
+*/			
+		$sql = 'select distinct h.hostid,h.host,t.*'.
+			' from triggers t left join functions f on t.triggerid=f.triggerid '.
+			' left join items i on f.itemid=i.itemid '.
+			' left join hosts h on h.hostid=i.hostid '.
+			' where '.DBid2nodeid('t.triggerid').'='.$ZBX_CURNODEID;
+
 		if($showdisabled == 0)
-		    $sql .= " and t.status <> ".TRIGGER_STATUS_DISABLED;
+		    $sql .= ' and t.status <> '.TRIGGER_STATUS_DISABLED;
 
-		if($_REQUEST["hostid"] > 0) 
-			$sql .= " and h.hostid=".$_REQUEST["hostid"];
+		if($_REQUEST['hostid'] > 0) 
+			$sql .= ' and h.hostid='.$_REQUEST['hostid'];
 
-		$sql .= " order by h.host,t.description";
+		$sql .= ' order by h.host,t.description';
 
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
@@ -392,14 +399,17 @@ include_once "include/page_header.php";
 			if(!check_right_on_trigger_by_triggerid(null, $row['triggerid'], $accessible_hosts))
 				continue;
 
-			$chkBox =  new CCheckBox(
-                                        "g_triggerid[]",        /* name */
-                                        NULL,                   /* checked */
-                                        NULL,                   /* action */
-                                        $row["triggerid"]);     /* value */
+			if(is_null($row['host'])) $row['host'] = '';
+			if(is_null($row['hostid'])) $row['hostid'] = '0';
 
-			if($row["templateid"] > 0) $chkBox->SetEnabled(false);
-			$description = array('['.$row["triggerid"].']',$chkBox,SPACE);
+
+			$description = array('['.$row["triggerid"].']',
+						 new CCheckBox(
+							"g_triggerid[]",        /* name */
+							NULL,                   /* checked */
+							NULL,                   /* action */
+							$row["triggerid"]),     /* value */
+						SPACE);
 
 			if($row["templateid"])
 			{

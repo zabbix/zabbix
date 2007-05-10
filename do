@@ -16,6 +16,7 @@ doinstall="no"
 config_param=""
 dorun="no"
 TEST=""
+TODO=""
 cleanwarnings="no"
 docat="yes"
 help="no"
@@ -41,6 +42,7 @@ do
     nocat )	docat="no";		noparam=1;;
     cat )	docat="yes";		noparam=1;;
     test )	TEST=" -DTEST";;
+    todo )	TODO=" -DTODO";;
     def )		config_param="$config_param $def";;
     --enable-* )	config_param="$config_param $cmd";; 
     --with-* )		config_param="$config_param $cmd";;
@@ -63,8 +65,10 @@ then
 	echo "   [copy|cpy]               - copy automake files"
 	echo "   [premake|pre]            - make configuration file"
 	echo "   [configure|config|conf]  - configure make files"
+	echo "   [test]                   - configure for testmode"
+	echo "   [todo]                   - configure for TODO mode"
 	echo "   [make]                   - make applications"
-	echo "   [test]                   - test applications"
+	echo "   [run]                   - run applications"
 	echo "   [inst|install]           - install applications"
 	echo
 	echo " Options:"
@@ -163,7 +167,7 @@ then
   configure_is_ok=0
   echo "Configuring..."
   echo "Configuring..." >> WARNINGS
-  export CFLAGS="-Wall -DDEBUG ${TEST}"
+  export CFLAGS="-Wall -DDEBUG ${TODO} ${TEST}"
   #export CFLAGS="-Wall -pedantic"
   ./configure $config_param 2>> WARNINGS 
   if [ "x$?" = "x0" ]

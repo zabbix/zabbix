@@ -1694,14 +1694,6 @@ static char*	DBimplode_exp (
 		zbx_uint64_t	triggerid
 	)
 {
-	typedef enum {
-		EXP_NONE = 0,
-		EXP_HOST,
-		EXP_KEY,
-		EXP_FUNCTION,
-		EXP_PARAMETER
-	} expression_parsing_states;
-
 	DB_RESULT	db_items;
 
 	DB_ROW		item_data;
@@ -1710,7 +1702,6 @@ static char*	DBimplode_exp (
 		functionid,
 		itemid;
 
-	int	state = EXP_NONE;
 	char	*exp = NULL;
 
 	int
@@ -1719,161 +1710,130 @@ static char*	DBimplode_exp (
 		function_len = 0,
 		parameter_len = 0;
 
-	char	tmp_c,
-		*sql = NULL,
+	char	*sql = NULL,
+		*simple_start = NULL,
+		*simple_end = NULL,
+		*pos = NULL,
+		*p = NULL,
 		*host = NULL,
 		*key = NULL,
 		*function = NULL,
 		*parameter = NULL,
 		*str_esc = NULL;
 
-	register char *c;
-
 	/* Translate localhost:procload.last(0)>10 to {12}>10 */
 
-	for ( c = expression; c && *c; c++ )
+	for ( pos = expression; pos && *pos; )
 	{
-		if( '{' == *c && EXP_NONE == state )
+		if( NULL == (simple_start = strchr(pos, '{')) )	break;
+		if( NULL == (simple_end = strchr(simple_start, '}')) )	break;
+
+		host		= NULL;
+		key		= NULL;
+		function	= NULL;
+		parameter	= NULL;
+
+		host_len	= 0;
+		key_len		= 0;
+		function_len	= 0;
+		parameter_len	= 0;
+
+		*simple_start = '\0';
+		exp = zbx_strdcat(exp, pos);
+		*simple_start = '{';
+
+		simple_start++;
+		pos = simple_end+1;
+
+		*simple_end = '\0';
+		do { /* simple try for C */
+			/* determine host */
+			host = simple_start;
+			if( NULL == (p = strchr(host, ':'))) break; /* simpla throw for C */
+			host_len = p - host;
+
+			/* determine parameter */
+			if( NULL == (p = strrchr(p+1, '(')) ) break; /* simpla throw for C */
+			parameter = p+1;
+
+			if( NULL == (p = strrchr(parameter, ')')) ) break; /* simpla throw for C */
+			parameter_len = p - parameter;
+
+			/* determine key and function */
+			p = parameter-1; /* position of '(' character */
+			*p = '\0';
+			do { /* simple try for C */
+				key = host + host_len + 1;
+				if( NULL == (p = strrchr(key, '.'))) break; /* simpla throw for C */
+				key_len = p - key;
+
+				function = p + 1;
+				function_len = parameter - 1 - function;
+
+			} while(0); /* simpla finally for C */
+			*p = '(';
+
+		} while(0);/* simpla finally for C */
+
+		if( host && host_len && key && key_len && function && function_len && parameter && parameter_len )
 		{
-			state 		= EXP_HOST;
+			sql = zbx_strdcat(NULL, "select distinct i.itemid from items i,hosts h where h.hostid=i.hostid ");
+			/* adding host */
+			host[host_len] = '\0';
+			str_esc = DBdyn_escape_string(host);
+			sql = zbx_strdcatf(sql, " and h.host='%s'", str_esc);
+			zbx_free(str_esc);
+			host[host_len] = ':';
 
-			host		= c+1;
-			key		= NULL;
-			function	= NULL;
-			parameter	= NULL;
+			/* adding key */
+			key[key_len] = '\0';
+			str_esc = DBdyn_escape_string(key);
+			sql = zbx_strdcatf(sql, " and i.key_='%s'", str_esc);
+			zbx_free(str_esc);
+			key[key_len] = '.';
 
-			host_len	= 0;
-			key_len		= 0;
-			function_len	= 0;
-			parameter_len	= 0;
-			continue;
-		}
-		if( '}' == *c && EXP_HOST == state )
-		{ /* Processing of macros: {TRIGGER.VALUE} */
-			state = EXP_NONE;
+			db_items = DBselect(sql);
 
-			if( host && host_len )
+			zbx_free(sql);
+
+			if( (item_data = DBfetch(db_items)) )
 			{
-				tmp_c = host[host_len];
-				host[host_len] = '\0';
-				exp = zbx_strdcatf(exp, "{%s}", host);
-				host[host_len] = tmp_c;
-			}
-			host = NULL;
-			continue;
-		}
-		if( '}' == *c && EXP_NONE == state )
-		{
-			if( host && host_len && key && key_len && function && function_len && parameter && parameter_len )
-			{
-				sql = zbx_strdcat(NULL, "select distinct i.itemid from items i,hosts h where h.hostid=i.hostid ");
-				/* adding host */
-				tmp_c = host[host_len];
-				host[host_len] = '\0';
-				str_esc = DBdyn_escape_string(host);
-				sql = zbx_strdcatf(sql, " and h.host='%s'", str_esc);
-				zbx_free(str_esc);
-				host[host_len] = tmp_c;
+				ZBX_STR2UINT64(itemid, item_data[0]);
+				functionid = DBget_maxid("functions","functionid");
 
-				/* adding key */
-				tmp_c = key[key_len];
-				key[key_len] = '\0';
-				str_esc = DBdyn_escape_string(key);
-				sql = zbx_strdcatf(sql, " and i.key_='%s'", str_esc);
+				sql = zbx_dsprintf(NULL, "insert into functions (functionid,itemid,triggerid,function,parameter)"
+						" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",",
+						functionid, itemid, triggerid);
+				/* adding function */
+				function[function_len] = '\0';
+				str_esc = DBdyn_escape_string(function);
+				sql = zbx_strdcatf(sql, "'%s',", str_esc);
 				zbx_free(str_esc);
-				key[key_len] = tmp_c;
+				function[function_len] = '(';
+				/* adding parameter */
+				parameter[parameter_len] = '\0';
+				str_esc = DBdyn_escape_string(parameter);
+				sql = zbx_strdcatf(sql, "'%s')", str_esc);
+				zbx_free(str_esc);
+				parameter[parameter_len] = ')';
 
-				db_items = DBselect(sql);
+				DBexecute(sql);
+
+				exp = zbx_strdcatf(exp, "{" ZBX_FS_UI64 "}", functionid);
 
 				zbx_free(sql);
-
-				if( (item_data = DBfetch(db_items)) )
-				{
-					ZBX_STR2UINT64(itemid, item_data[0]);
-
-					functionid = DBget_maxid("functions","functionid");
-
-					sql = zbx_dsprintf(NULL, "insert into functions (functionid,itemid,triggerid,function,parameter)"
-							" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",",
-							functionid, itemid, triggerid);
-					/* adding function */
-					tmp_c = function[function_len];
-					function[function_len] = '\0';
-					str_esc = DBdyn_escape_string(function);
-					sql = zbx_strdcatf(sql, "'%s',", str_esc);
-					zbx_free(str_esc);
-					function[function_len] = tmp_c;
-					/* adding parameter */
-					tmp_c = parameter[parameter_len];
-					parameter[parameter_len] = '\0';
-					str_esc = DBdyn_escape_string(parameter);
-					sql = zbx_strdcatf(sql, "'%s')", str_esc);
-					zbx_free(str_esc);
-					parameter[parameter_len] = tmp_c;
-
-					DBexecute(sql);
-					
-					exp = zbx_strdcatf(exp, "{" ZBX_FS_UI64 "}", functionid);
-
-					zbx_free(sql);
-				}
-
-				DBfree_result(db_items);
 			}
 
-			continue;
+			DBfree_result(db_items);
 		}
-		if( '(' == *c && EXP_FUNCTION == state )
+		else
 		{
-			state = EXP_PARAMETER;
-
-			parameter = c+1;
-			parameter_len = 0;
-			continue;
+			exp = zbx_strdcatf(exp, "{%s}", simple_start);
 		}
-		if( ')' == *c && EXP_PARAMETER == state)
-		{
-			state = EXP_NONE;
-			continue;
-		}
-		if( ':' == *c && EXP_HOST == state )
-		{
-			state = EXP_KEY;
-
-			key = c+1;
-			key_len = 0;
-			continue;
-		}
-		if( '.' == *c )
-		{
-			if( EXP_KEY == state )
-			{
-				state = EXP_FUNCTION;
-
-				function = c+1;
-				function_len = 0;
-				continue;
-			}
-			/* Support for '.' in KEY */
-			if( EXP_FUNCTION == state )
-			{
-				key_len += function_len + 1;
-
-				function = c+1;
-				function_len = 0;
-				continue;
-			}
-		}
-		switch( state )
-		{
-			case EXP_HOST:		host_len++;				break;
-			case EXP_KEY:		key_len++;				break;
-			case EXP_FUNCTION:	function_len++;				break;
-			case EXP_PARAMETER:	parameter_len++;			break;
-			default:		exp = zbx_strdcatf(exp, "%c", *c);	break;
-
-		}
+		*simple_end = '}';
 	}
+
+	if( pos )  exp = zbx_strdcat(exp, pos);
 
 	return exp;
 }
