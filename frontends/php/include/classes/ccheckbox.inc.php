@@ -66,8 +66,7 @@
 			foreach($this->object_name as $obj_name)
 			{
 				if(empty($obj_name)) continue;
-				$action .= 'visibility_status_changeds(this.checked, \''.$obj_name.'\','.
-					' \''.zbx_jsstr($this->replace_to).'\'); ';
+				$action .= 'visibility_status_changeds(this.checked, '.zbx_jsvalue($obj_name).','.zbx_jsvalue($this->replace_to).');';
 			}
 
 			parent::CCheckBox($name, $value, $action, '1');
@@ -84,8 +83,7 @@
 				foreach($this->object_name as $obj_name)
 				{
 					if(empty($obj_name)) continue;
-					zbx_add_post_js('visibility_status_changeds(false, "'.$obj_name.'", "'.
-						zbx_jsstr($this->replace_to).'");');
+					zbx_add_post_js('visibility_status_changeds(false,'.zbx_jsvalue($obj_name).','.zbx_jsvalue($this->replace_to).');');
 				}
 			}
 
