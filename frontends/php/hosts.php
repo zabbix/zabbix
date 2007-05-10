@@ -68,7 +68,7 @@ include_once "include/page_header.php";
 		"host"=>	array(T_ZBX_STR, O_OPT,	NULL,   NOT_EMPTY,	'({config}==0||{config}==3)&&isset({save})'),
 		"dns"=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'{config}==0&&isset({save})'),
 		"useip"=>	array(T_ZBX_STR, O_OPT, NULL,	IN('0,1'),	'{config}==0&&isset({save})'),
-		"ip"=>		array(T_ZBX_IP, O_OPT, NULL,	NULL,		'{config}==0'),
+		"ip"=>		array(T_ZBX_IP, O_OPT, NULL,	NULL,		'{config}==0&&isset({save})'),
 		"port"=>	array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,65535),'{config}==0&&isset({save})'),
 		"status"=>	array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1,3"),	'{config}==0&&isset({save})'),
 
