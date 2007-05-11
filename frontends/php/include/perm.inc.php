@@ -142,6 +142,7 @@
 		$result = array();
 
 		$userid =& $user_data['userid'];
+		$user_type =& $user_data['type'];
 
 		if(!isset($userid)) fatal_error('Incorrect user data in "get_accessible_hosts_by_user"');
 
@@ -188,7 +189,7 @@ COpt::counter_up('perm');
 					$nodes = get_accessible_nodes_by_user($user_data,
 						PERM_DENY,PERM_MODE_GE,PERM_RES_DATA_ARRAY);
 				}
-				if(!isset($nodes[$host_data['nodeid']]))
+				if( !isset($nodes[$host_data['nodeid']]) || $user_type==USER_TYPE_ZABBIX_USER )
 					$host_data['permission'] = PERM_DENY;
 				else
 					$host_data['permission'] = $nodes[$host_data['nodeid']]['permission'];
@@ -222,6 +223,7 @@ COpt::counter_up('perm');
 
 		$userid =& $user_data['userid'];
 		if(!isset($userid)) fatal_error('Incorrect user data in "get_accessible_groups_by_user"');
+		$user_type =& $user_data['type'];
 
 		switch($perm_res)
 		{
@@ -261,7 +263,7 @@ COpt::counter_up('perm');
 						PERM_DENY,PERM_MODE_GE,PERM_RES_DATA_ARRAY);
 				}
 
-				if(!isset($nodes[$group_data['nodeid']]))
+				if( !isset($nodes[$group_data['nodeid']]) || $user_type==USER_TYPE_ZABBIX_USER )
 					$group_data['permission'] = PERM_DENY;
 				else
 					$group_data['permission'] = $nodes[$group_data['nodeid']]['permission'];
@@ -468,10 +470,10 @@ COpt::counter_up('perm');
 					$node_data = get_accessible_nodes_by_rights($rights,$user_type,
 						PERM_DENY, PERM_MODE_GE, PERM_RES_DATA_ARRAY, $host_data['nodeid']);
 				}
-				if(isset($node_data[$host_data['nodeid']]))
-					$host_data['permission'] = $node_data[$host_data['nodeid']]['permission'];
-				else
+				if( !isset($node_data[$host_data['nodeid']]) || $user_type==USER_TYPE_ZABBIX_USER )
 					$host_data['permission'] = PERM_DENY;
+				else
+					$host_data['permission'] = $node_data[$host_data['nodeid']]['permission'];
 			}
 			
 			if(eval('return ('.$host_data["permission"].' '.perm_mode2comparator($perm_mode).' '.$perm.')? 0 : 1;'))
@@ -538,10 +540,10 @@ COpt::counter_up('perm');
 					$node_data = get_accessible_nodes_by_rights($rights,$user_type,
 						PERM_DENY, PERM_MODE_GE, PERM_RES_DATA_ARRAY, $group_data['nodeid']);
 				}
-				if(isset($node_data[$group_data['nodeid']]))
-					$group_data['permission'] = $node_data[$group_data['nodeid']]['permission'];
-				else
+				if( !isset($node_data[$group_data['nodeid']]) || $user_type==USER_TYPE_ZABBIX_USER )
 					$group_data['permission'] = PERM_DENY;
+				else
+					$group_data['permission'] = $node_data[$group_data['nodeid']]['permission'];
 			}
 					
 			if(eval('return ('.$group_data["permission"].' '.perm_mode2comparator($perm_mode).' '.$perm.')? 0 : 1;'))
@@ -613,7 +615,7 @@ COpt::counter_up('perm');
 					$node_perm[$node_data['nodeid']] = PERM_DENY;
 				}
 			}
-			
+
 			if(isset($node_perm[$node_data['nodeid']]))
 				$node_data['permission'] = $node_perm[$node_data['nodeid']];
 			elseif($node_data['nodeid'] == $ZBX_LOCALNODEID || $user_type == USER_TYPE_SUPER_ADMIN)
