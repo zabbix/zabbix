@@ -88,6 +88,11 @@
 		return	FALSE;
 	}
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	delete_service_link($linkid)
 	{
 		$sql="delete from services_links where linkid=$linkid";

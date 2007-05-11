@@ -247,6 +247,11 @@ require_once "include/items.inc.php";
 		return	$result;
 	}
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	unlink_template($hostid, $templateid, $unlink_mode = true)
 	{
 		if(is_array($templateid)) fatal_error('array not supported for [unlink_template]');
@@ -255,6 +260,11 @@ require_once "include/items.inc.php";
 		DBexecute("delete from hosts_templates where hostid=".$hostid.' and templateid='.$templateid);
 	}
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	delete_template_elements($hostid, $templateid = null, $unlink_mode = false)
 	{
 		delete_template_graphs($hostid, $templateid, $unlink_mode);
@@ -263,6 +273,11 @@ require_once "include/items.inc.php";
 		delete_template_applications($hostid, $templateid, $unlink_mode);
 	}	
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	copy_template_elements($hostid, $templateid = null, $copy_mode = false)
 	{
 		copy_template_applications($hostid, $templateid, $copy_mode);
@@ -272,6 +287,11 @@ require_once "include/items.inc.php";
 	}
 
 # Sync host with linked template
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	sync_host_with_templates($hostid, $templateid = null)
 	{
 		delete_template_elements($hostid, $templateid);		
@@ -299,6 +319,11 @@ require_once "include/items.inc.php";
 
 	# Delete Host
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	delete_host($hostid, $unlink_mode = false)
 	{
 		global $DB_TYPE;
@@ -606,6 +631,11 @@ require_once "include/items.inc.php";
 
 /* APPLICATIONS */
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	db_save_application($name,$hostid,$applicationid=null,$templateid=0)
 	{
 		if(!is_string($name)){
@@ -694,6 +724,11 @@ require_once "include/items.inc.php";
 		return db_save_application($name,$hostid,$applicationid,$templateid);
 	}
 	
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	delete_application($applicationid)
 	{
 		$app = get_application_by_applicationid($applicationid);
@@ -782,6 +817,11 @@ require_once "include/items.inc.php";
 		return DBselect("select * from applications where hostid=$hostid");
 	}
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function        delete_template_applications($hostid, $templateid = null /* array format 'arr[id]=name' */, $unlink_mode = false)
 	{
 		$db_apps = get_applications_by_hostid($hostid);
@@ -820,6 +860,11 @@ require_once "include/items.inc.php";
 		}
 	}
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	copy_template_applications($hostid, $templateid = null /* array format 'arr[id]=name' */, $copy_mode = false)
 	{
 		if(null == $templateid)

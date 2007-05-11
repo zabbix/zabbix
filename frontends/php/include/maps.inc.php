@@ -239,8 +239,13 @@
 			" where selementid=$selementid");
 	}
 
-	# Delete Element from sysmap definition
-
+	/******************************************************************************
+	 *                                                                            *
+	 * Purpose: Delete Element from sysmap definition                             *
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	delete_sysmaps_element($selementid)
 	{
 		$result=DBexecute("delete from sysmaps_links".
@@ -251,6 +256,11 @@
 		return	DBexecute("delete from sysmaps_elements where selementid=$selementid");
 	}
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	delete_sysmaps_elements_with_hostid($hostid)
 	{
 		$db_elements = DBselect("select selementid from sysmaps_elements".
@@ -271,6 +281,12 @@
 		}
 		return TRUE;
 	}
+
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	delete_sysmaps_elements_with_triggerid($triggerid)
 	{
 		$db_elements = DBselect("select selementid from sysmaps_elements".

@@ -169,7 +169,7 @@
 	}
 
 define('ZBX_EREG_SIMPLE_EXPRESSION_FORMAT',
-	'^\{([0-9a-zA-Z\_\.[.-.]\$]+)\:([]\[0-9a-zA-Z\_\*\/\.\,\:\(\)\+ [.-.]\$]+)\.([a-z]{3,11})\(([#0-9a-zA-Z\_\/\.\,[:space:]]+)\)\}$');
+	'^\{([0-9a-zA-Z\_\.[.-.]\$]+)\:([]\[0-9a-zA-Z!\_\*\/\.\,\:\(\)\+ [.-.]\$]+)\.([a-z]{3,11})\(([#0-9a-zA-Z\_\/\.\,[:space:]]+)\)\}$');
 
 define('ZBX_SIMPLE_EXPRESSION_HOST_ID', 1);
 define('ZBX_SIMPLE_EXPRESSION_KEY_ID', 2);
@@ -452,6 +452,11 @@ define('ZBX_SIMPLE_EXPRESSION_PARAMETER_ID', 4);
 		return $triggerid;
 	}
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	get_trigger_dependences_by_triggerid($triggerid)
 	{
 		$result = array();
@@ -463,6 +468,11 @@ define('ZBX_SIMPLE_EXPRESSION_PARAMETER_ID', 4);
 		return $result;
 	}
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	replace_template_dependences($deps, $hostid)
 	{
 		foreach($deps as $id => $val)
@@ -475,6 +485,11 @@ define('ZBX_SIMPLE_EXPRESSION_PARAMETER_ID', 4);
 		return $deps;
 	}
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	copy_trigger_to_host($triggerid, $hostid, $copy_mode = false)
 	{
 		$trigger = get_trigger_by_triggerid($triggerid);
@@ -569,8 +584,14 @@ define('ZBX_SIMPLE_EXPRESSION_PARAMETER_ID', 4);
 		return $newtriggerid;
 	}
 	
-	# Translate {10}>10 to something like localhost:procload.last(0)>10
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Purpose: Translate {10}>10 to something like localhost:procload.last(0)>10 *
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	explode_exp ($expression, $html,$template=false)
 	{
 #		echo "EXPRESSION:",$expression,"<Br>";
@@ -632,6 +653,11 @@ define('ZBX_SIMPLE_EXPRESSION_PARAMETER_ID', 4);
 		return $exp;
 	}
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	implode_exp ($expression, $triggerid)
 	# Translate localhost:procload.last(0)>10 to {12}>10
 	{
@@ -747,6 +773,11 @@ define('ZBX_SIMPLE_EXPRESSION_PARAMETER_ID', 4);
 		}
 	}
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function add_event($triggerid, $value, $time=NULL)
 	{
 		if(is_null($time)) $time = time();
@@ -781,8 +812,13 @@ define('ZBX_SIMPLE_EXPRESSION_PARAMETER_ID', 4);
 		return $result;
 	}
 
-	# Delete Trigger definition
-
+	/******************************************************************************
+	 *                                                                            *
+	 * Purpose: Delete Trigger definition                                         *
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	delete_trigger($triggerid)
 	{
 		// first delete child triggers
@@ -847,6 +883,11 @@ define('ZBX_SIMPLE_EXPRESSION_PARAMETER_ID', 4);
 
 	# Update Trigger definition
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	update_trigger($triggerid,$expression=NULL,$description=NULL,$priority=NULL,$status=NULL,
 		$comments=NULL,$url=NULL,$deps=array(),$templateid=0)
 	{
@@ -964,6 +1005,11 @@ define('ZBX_SIMPLE_EXPRESSION_PARAMETER_ID', 4);
 		return true;
 	}
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	delete_dependencies_by_triggerid($triggerid)
 	{
 		$db_deps = DBselect('select triggerid_up, triggerid_down from trigger_depends'.
@@ -978,6 +1024,11 @@ define('ZBX_SIMPLE_EXPRESSION_PARAMETER_ID', 4);
 		return true;
 	}
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	insert_dependency($triggerid_down,$triggerid_up)
 	{
 		$triggerdepid = get_dbid("trigger_depends","triggerdepid");
@@ -1020,6 +1071,11 @@ define('ZBX_SIMPLE_EXPRESSION_PARAMETER_ID', 4);
 		return	DBexecute('delete from events where objectid='.$triggerid.' and object='.EVENT_OBJECT_TRIGGER);
 	}
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	delete_triggers_by_itemid($itemid)
 	{
 		$result=DBselect("select triggerid from functions where itemid=$itemid");
@@ -1033,8 +1089,13 @@ define('ZBX_SIMPLE_EXPRESSION_PARAMETER_ID', 4);
 		return TRUE;
 	}
 
-	# Delete Service definitions by triggerid
-
+	/******************************************************************************
+	 *                                                                            *
+	 * Purpose: Delete Service definitions by triggerid                           *
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	delete_services_by_triggerid($triggerid)
 	{
 		$result = DBselect("select serviceid from services where triggerid=$triggerid");
@@ -1045,6 +1106,11 @@ define('ZBX_SIMPLE_EXPRESSION_PARAMETER_ID', 4);
 		return	TRUE;
 	}
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	cmp_triggers($triggerid1, $triggerid2)	// compare EXPRESSION !!!
 	{
 		$trig1 = get_trigger_by_triggerid($triggerid1);
@@ -1075,6 +1141,11 @@ define('ZBX_SIMPLE_EXPRESSION_PARAMETER_ID', 4);
 		return strcmp($expr1,$trig2["expression"]);
 	}
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	delete_template_triggers($hostid, $templateid = null /* array format 'arr[id]=name' */, $unlink_mode = false)
 	{
 		$triggers = get_triggers_by_hostid($hostid);
@@ -1111,6 +1182,11 @@ define('ZBX_SIMPLE_EXPRESSION_PARAMETER_ID', 4);
 		return TRUE;
 	}
 	
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	copy_template_triggers($hostid, $templateid = null /* array format 'arr[id]=name' */, $copy_mode = false)
 	{
 		if(null == $templateid)
@@ -1134,6 +1210,11 @@ define('ZBX_SIMPLE_EXPRESSION_PARAMETER_ID', 4);
 		update_template_dependences_for_host($hostid);
 	}
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	update_template_dependences_for_host($hostid)
 	{
 		$db_triggers = get_triggers_by_hostid($hostid);

@@ -130,8 +130,11 @@
 		return 1;
 	}
 
-	# Add Item definition
-
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	add_item(
 		$description,$key,$hostid,$delay,$history,$status,$type,$snmp_community,$snmp_oid,
 		$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,$snmpv3_securityname,
@@ -286,8 +289,11 @@
 		return $result;
 	}
 
-	# Update Item definition
-
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	update_item($itemid,$description,$key,$hostid,$delay,$history,$status,$type,
 		$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,
 		$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,
@@ -443,6 +449,11 @@
 			$item_data['templateid']);
 	}
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	delete_template_items($hostid, $templateid = null /* array format 'arr[id]=name' */, $unlink_mode = false)
 	{
 		$db_items = get_items_by_hostid($hostid);
@@ -512,6 +523,11 @@
 			$copy_mode ? 0 : $db_tmp_item["itemid"]);
 	}
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	copy_template_items($hostid, $templateid = null /* array format 'arr[id]=name' */, $copy_mode = false)
 	{
 		if($templateid == null)
@@ -610,8 +626,11 @@
 		return	FALSE;
 	}
 
-	# Delete Item definition
-
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	delete_item($itemid)
 	{
 		$item = get_item_by_itemid($itemid);
@@ -806,6 +825,11 @@ COpt::profiling_stop('prepare table');
 		return $table;
 	}
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function get_same_applications_for_host($applications, $hostid)
 	{
 		$child_applications = array();
@@ -821,6 +845,11 @@ COpt::profiling_stop('prepare table');
 		return $child_applications;
 	}
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function get_applications_by_itemid($itemid, $field='applicationid')
 	{
 		$result = array();
@@ -833,8 +862,11 @@ COpt::profiling_stop('prepare table');
 		return $result;
 	}
 
-	# Delete from History
-
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	delete_history_by_itemid($itemid, $use_housekeeper=0)
 	{
 		$result = delete_trends_by_itemid($itemid,$use_housekeeper);
@@ -864,8 +896,11 @@ COpt::profiling_stop('prepare table');
 		return TRUE;
 	}
 
-	# Delete from Trends
-
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	delete_trends_by_itemid($itemid, $use_housekeeper=0)
 	{
 		if($use_housekeeper)
