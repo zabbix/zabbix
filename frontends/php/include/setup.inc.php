@@ -171,32 +171,32 @@
 				);
 		}
 
+		function get_test_result(&$result, $test_name, $test_value, $condition, $fail_message)
+		{
+			$result &= $condition;
+			
+			$row = new CRow(array(
+					$test_name,
+					$test_value,
+					$condition ? new CSpan(S_OK,'ok') : new CSpan(S_FAIL,'fail')
+				),
+				!$condition ? 'fail' : null);
+			
+			if(!$condition && isset($fail_message))
+				$row->SetHint($fail_message);
+
+			return $row;
+		}
+
 		function Stage2()
 		{
-			function get_test_result(&$result, $test_name, $test_value, $condition, $fail_message)
-			{
-				$result &= $condition;
-				
-				$row = new CRow(array(
-						$test_name,
-						$test_value,
-						$condition ? new CSpan(S_OK,'ok') : new CSpan(S_FAIL,'fail')
-					),
-					!$condition ? 'fail' : null);
-				
-				if(!$condition && isset($fail_message))
-					$row->SetHint($fail_message);
-
-				return $row;
-			}
-
 			$final_result = true;
 
 			$table = new CTable(null, 'requirements');
 			$table->SetAlign('center');
 			
 			/* Check PHP version */
-			$table->AddRow(get_test_result(
+			$table->AddRow($this->get_test_result(
 				$final_result,
 				'PHP version: ',
 				phpversion(),
@@ -204,7 +204,7 @@
 				'Minimal version of PHP is 4.3.0'));
 
 			$memory_limit = str2mem(ini_get('memory_limit'));
-			$table->AddRow(get_test_result(
+			$table->AddRow($this->get_test_result(
 				$final_result,
 				'PHP Memory limit:',
 				function_exists('memory_get_usage') ? mem2str($memory_limit) : 'unlimited',
@@ -213,7 +213,7 @@
 
 			$memory_limit = str2mem(ini_get('post_max_size'));
 			$table->AddRow(
-				get_test_result(
+				$this->get_test_result(
 					$final_result,
 					'PHP post max size:',
 					mem2str($memory_limit),
@@ -221,7 +221,7 @@
 					'8M is minimum size of PHP post'));
 
 			$table->AddRow(
-				get_test_result(
+				$this->get_test_result(
 					$final_result,
 					'PHP max execution time:',
 					ini_get('max_execution_time').' sec',
@@ -232,7 +232,7 @@
 			global $ZBX_CONFIG;
 
 			$table->AddRow(
-				get_test_result(
+				$this->get_test_result(
 					$final_result,
 					'PHP Databases support: ',
 					implode(BR, $ZBX_CONFIG['allowed_db']),
@@ -253,7 +253,7 @@
 				function_exists('bcsqrt') &&
 				function_exists('bcsub');
 			$table->AddRow(
-				get_test_result(
+				$this->get_test_result(
 					$final_result,
 					'PHP BC math support',
 					$bcmath_fnc_exist ? 'yes' : 'no',
@@ -268,7 +268,7 @@
 				$gd_version = $gd_info['GD Version'];
 			}
 			$table->AddRow(
-				get_test_result(
+				$this->get_test_result(
 					$final_result,
 					'GD Version:',
 					$gd_version,
@@ -288,7 +288,7 @@
 				$no_img_formats = true;
 			}
 			$table->AddRow(
-				get_test_result(
+				$this->get_test_result(
 					$final_result,
 					'Image formats:', 
 					implode(BR, $img_formats),
@@ -299,7 +299,7 @@
 			{
 				$tmezone = ini_get('date.timezone');
 				$table->AddRow(
-					get_test_result(
+					$this->get_test_result(
 						$final_result,
 						'PHP Timezone:', 
 						empty($tmezone) ? 'n/a' : $tmezone,
