@@ -431,8 +431,9 @@
 		{
 			global $_SERVER, $ZBX_CONFIGURATION_FILE;
 
+			show_messages();
 			/* Write the new contents */
-			if($f = fopen($ZBX_CONFIGURATION_FILE, 'w'))
+			if($f = @fopen($ZBX_CONFIGURATION_FILE, 'w'))
 			{
 				if(fwrite($f, $this->GetNewConfigurationFileContent()))
 				{
@@ -440,12 +441,12 @@
 					{
 						if($this->SetConfig('ZBX_CONFIG_FILE_CORRECT', $this->CheckConfigurationFile()))
 						{
-							clear_messages();
 							$this->DISABLE_NEXT_BUTTON = false;
 						}
 					}
 				}
 			}
+			clear_messages(); /* don't show errors */
 			
 			$table = new CTable(null, 'requirements');
 			$table->SetAlign('center');
@@ -642,6 +643,7 @@
 			$old_DB_PASSWORD= $DB_PASSWORD;
 
 			$error = null;
+			$error_msg = null;
 
 			global $ZBX_CONFIGURATION_FILE;
 						
@@ -661,14 +663,14 @@
 					$DB_USER		== $this->GetConfig('DB_USER',				null) &&
 					$DB_PASSWORD		== $this->GetConfig('DB_PASSWORD',			null))
 				{
-					if(!DBconnect($error))
+					if(!DBconnect($error_msg))
 					{
-						$error = 'Can not connect to database';
+						$error_msg = 'Can not connect to database';
 					}
 				}
 				else
 				{
-					$error = 'Incorrect configuration file['.$ZBX_CONFIGURATION_FILE.']';
+					$error_msg = 'Incorrect configuration file['.$ZBX_CONFIGURATION_FILE.']';
 				}
 				DBclose();
 			}
@@ -677,9 +679,9 @@
 				$error = 'Missing configuration file['.$ZBX_CONFIGURATION_FILE.']';
 			}
 			
-			if(isset($error))
+			if(isset($error_msg))
 			{
-				error($error);
+				error($error_msg);
 			}
 
 			/* restore connection */
@@ -694,7 +696,7 @@
 
 			DBconnect($error2);
 
-			return !isset($error);
+			return !isset($error)&&!isset($error_msg);
 		}
 		
 		function EventHandler()

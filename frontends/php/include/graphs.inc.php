@@ -137,8 +137,11 @@
 		return DBselect("select * from graphs where templateid=$templateid");
 	}
 
-	# Add Graph
-
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	add_graph($name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype=GRAPH_TYPE_NORMAL,$templateid=0)
 	{
 		$graphid = get_dbid("graphs","graphid");
@@ -247,8 +250,11 @@
 		return $result;
 	}
 	
-	# Delete Graph
-
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	delete_graph($graphid)
 	{
 		$graph = get_graph_by_graphid($graphid);
@@ -289,6 +295,11 @@
 		return 0;
 	}
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	add_item_to_graph($graphid,$itemid,$color,$drawtype,$sortorder,$yaxisside,$calc_fnc,$type,$periods_cnt)
 	{
 		$gitemid=get_dbid("graphs_items","gitemid");
@@ -377,6 +388,11 @@
 		return $result;
 	}
 	
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	delete_graph_item($gitemid)
 	{
 		
@@ -414,6 +430,11 @@
 		return $result;
 	}
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	delete_template_graphs($hostid, $templateid = null /* array format 'arr[id]=name' */, $unlink_mode = false)
 	{
 		$db_graphs = get_graphs_by_hostid($hostid);
@@ -449,6 +470,11 @@
 		}
 	}
 	
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	copy_template_graphs($hostid, $templateid = null /* array format 'arr[id]=name' */, $copy_mode = false)
 	{
 		if($templateid == null)
@@ -471,6 +497,11 @@
 		}
 	}
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	copy_graph_to_host($graphid, $hostid, $copy_mode = false)
 	{
 		$db_graph = get_graph_by_graphid($graphid);
@@ -490,6 +521,11 @@
 		return $result;
 	}
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	copy_graphitems_for_host($src_graphid,$dist_graphid,$hostid)
 	{
 		$src_graphitems=get_graphitems_by_graphid($src_graphid);

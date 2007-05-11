@@ -31,6 +31,23 @@
 #define	DBadd_application(name, hostid, templateid)	DBdb_save_application(name, hostid, 0, templateid)
 #define DBupdate_application(applicationid, name, hostid, templateid)	DBdb_save_application(name, hostid, applicationid, templateid)
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_applications_by_itemid                                     *
+ *                                                                            *
+ * Purpose: retrive applications by itemid                                    *
+ *                                                                            *
+ * Parameters: itemid - item identificator from database                      *
+ *             applications - result buffer                                   *
+ *             max_applications - size of result buffer in counts             *
+ *                                                                            *
+ * Return value: count of results                                             *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBget_applications_by_itemid(
 		zbx_uint64_t	itemid,
 		zbx_uint64_t	*applications,
@@ -59,6 +76,24 @@ static int	DBget_applications_by_itemid(
 	return i;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_same_applications_for_host                                 *
+ *                                                                            *
+ * Purpose: retrive same applications for specified host                      *
+ *                                                                            *
+ * Parameters:  applications_in - zero terminated list of applicationid's     *
+ *              hostid - host identificator from database                     *
+ *              applications - result buffer                                  *
+ *              max_applications - size of result buffer in count             *
+ *                                                                            *
+ * Return value: count of results                                             *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBget_same_applications_for_host(
 		zbx_uint64_t    *applications_in,
 		zbx_uint64_t	hostid,
@@ -93,6 +128,22 @@ static int	DBget_same_applications_for_host(
 	return j;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBinsert_dependency                                              *
+ *                                                                            *
+ * Purpose: create dependences for triggers                                   *
+ *                                                                            *
+ * Parameters: triggerid_down - down trigger identificator from database      *
+ *             triggerid_up - up trigger identificator from database          *
+ *                                                                            *
+ * Return value: always SUCCEED                                               *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBinsert_dependency(
 		zbx_uint64_t triggerid_down,
 		zbx_uint64_t triggerid_up
@@ -107,6 +158,21 @@ static int	DBinsert_dependency(
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdelete_dependencies_by_triggerid                               *
+ *                                                                            *
+ * Purpose: delete dependences from triggers                                  *
+ *                                                                            *
+ * Parameters: triggerid - trigger identificator from database                *
+ *                                                                            *
+ * Return value: always SUCCEED                                               *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBdelete_dependencies_by_triggerid(
 	zbx_uint64_t triggerid
 	)
@@ -136,6 +202,21 @@ static int	DBdelete_dependencies_by_triggerid(
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdelete_service                                                 *
+ *                                                                            *
+ * Purpose: delete service from database                                      *
+ *                                                                            *
+ * Parameters: serviceid - service identificator from database                *
+ *                                                                            *
+ * Return value: always SUCCEED                                               *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBdelete_service(
 		zbx_uint64_t serviceid
 	)
@@ -146,6 +227,21 @@ static int	DBdelete_service(
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdelete_services_by_triggerid                                   *
+ *                                                                            *
+ * Purpose: delete triggers from service                                      *
+ *                                                                            *
+ * Parameters: triggerid - trigger identificator from database                *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBdelete_services_by_triggerid(
 		zbx_uint64_t triggerid
 	)
@@ -173,16 +269,49 @@ static int	DBdelete_services_by_triggerid(
 	return  result;
 }
 
-static int	delete_sysmaps_element(
-		zbx_uint64_t selementid
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdelete_sysmaps_element                                         *
+ *                                                                            *
+ * Purpose: delete specified map element                                      *
+ *                                                                            *
+ * Parameters: selementid - map element identificator from database           *
+ *                                                                            *
+ * Return value: always SUCCEED                                               *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBdelete_sysmaps_element(
+		zbx_uint64_t	selementid
 	)
 {
-	DBexecute("delete from sysmaps_links where selementid1=" ZBX_FS_UI64 " or selementid2=" ZBX_FS_UI64, selementid, selementid);
+	DBexecute("delete from sysmaps_links"
+		" where selementid1=" ZBX_FS_UI64 " or selementid2=" ZBX_FS_UI64,
+		selementid, selementid);
+
 	DBexecute("delete from sysmaps_elements where selementid=" ZBX_FS_UI64, selementid);
 
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdelete_sysmaps_elements_with_triggerid                         *
+ *                                                                            *
+ * Purpose: delete triggers from map                                          *
+ *                                                                            *
+ * Parameters: triggerid - trigger dientificator from database                *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBdelete_sysmaps_elements_with_triggerid(
 		zbx_uint64_t triggerid
 	)
@@ -202,7 +331,7 @@ static int	DBdelete_sysmaps_elements_with_triggerid(
 	while( (selement_data = DBfetch(db_selements)) )
 	{
 		ZBX_STR2UINT64(selementid, selement_data[0]);
-		if( SUCCEED != (result = delete_sysmaps_element(selementid)) )
+		if( SUCCEED != (result = DBdelete_sysmaps_element(selementid)) )
 			break;
 	}
 
@@ -211,6 +340,21 @@ static int	DBdelete_sysmaps_elements_with_triggerid(
 	return result;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdelete_trigger                                                 *
+ *                                                                            *
+ * Purpose: delete trigger from database                                      *
+ *                                                                            *
+ * Parameters: triggerid - trigger dentificator from database                 *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBdelete_trigger(
 		zbx_uint64_t triggerid
 	)
@@ -280,6 +424,21 @@ static int	DBdelete_trigger(
 	return result;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdelete_triggers_by_itemid                                      *
+ *                                                                            *
+ * Purpose: delete triggers by itemid                                         *
+ *                                                                            *
+ * Parameters: itemid - item identificator from database                      *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBdelete_triggers_by_itemid(
 		zbx_uint64_t itemid
 	)
@@ -308,6 +467,23 @@ static int	DBdelete_triggers_by_itemid(
 	return result;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdelete_trends_by_itemid                                        *
+ *                                                                            *
+ * Purpose: delete item trends                                                *
+ *                                                                            *
+ * Parameters: itemid - item identificator from database                      *
+ *             use_housekeeper - 0 - to delete imidietly                      *
+ *                               1 - delete with housekeeper                  *
+ *                                                                            *
+ * Return value: always SUCCEED                                               *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBdelete_trends_by_itemid(
 		zbx_uint64_t itemid,
 		unsigned char use_housekeeper
@@ -326,6 +502,23 @@ static int	DBdelete_trends_by_itemid(
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdelete_history_by_itemid                                       *
+ *                                                                            *
+ * Purpose: delete item history                                               *
+ *                                                                            *
+ * Parameters: itemid - item identificator from database                      *
+ *             use_housekeeper - 0 - to delete imidietly                      *
+ *                               1 - delete with housekeeper                  *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBdelete_history_by_itemid(
 		zbx_uint64_t itemid,
 		unsigned char use_housekeeper
@@ -361,6 +554,21 @@ static int	DBdelete_history_by_itemid(
 	return result;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBadd_graph                                                      *
+ *                                                                            *
+ * Purpose: add graph                                                         *
+ *                                                                            *
+ * Parameters: new_graphid - return created graph database identificator      *
+ *                                                                            *
+ * Return value: always SUCCEE                                                *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBadd_graph(
 		zbx_uint64_t	*new_graphid,
 		const char	*name,
@@ -409,6 +617,21 @@ static int	DBadd_graph(
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdelete_graph                                                   *
+ *                                                                            *
+ * Purpose: delete graph from database                                        *
+ *                                                                            *
+ * Parameters: graphid - graph identificator from database                    *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBdelete_graph(
 		zbx_uint64_t graphid
 	)
@@ -451,6 +674,21 @@ static int	DBdelete_graph(
 	return result;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdelete_graph_item                                              *
+ *                                                                            *
+ * Purpose: delete graph item from database                                   *
+ *                                                                            *
+ * Parameters: graphid - graph identificator from database                    *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBdelete_graph_item(
 		zbx_uint64_t gitemid
 	)
@@ -517,6 +755,21 @@ static int	DBdelete_graph_item(
 	return result;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdelete_item                                                    *
+ *                                                                            *
+ * Purpose: delete item from database                                         *
+ *                                                                            *
+ * Parameters: itemid - item identificator from database                      *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBdelete_item(
 		zbx_uint64_t itemid
 	)
@@ -566,6 +819,21 @@ static int	DBdelete_item(
 	return result;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdelete_application                                             *
+ *                                                                            *
+ * Purpose: delete application                                                *
+ *                                                                            *
+ * Parameters: applicationid - application identificator from database        *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBdelete_application(
 		zbx_uint64_t applicationid
 	)
@@ -640,7 +908,24 @@ static int	DBdelete_application(
 	return result;
 }
 
-
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdelete_template_graphs                                         *
+ *                                                                            *
+ * Purpose: delete template graphs from host                                  *
+ *                                                                            *
+ * Parameters: hostid - host identificator from database                      *
+ *             templateid - template identificator from database              *
+ *             unlink_mode - 1 - only unlink elements without deletion        *
+ *                           0 - delete elements                              *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static void	DBdelete_template_graphs(
 		zbx_uint64_t hostid,
 		zbx_uint64_t templateid,
@@ -700,6 +985,24 @@ static void	DBdelete_template_graphs(
 	DBfree_result(db_graphs);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdelete_template_triggers                                       *
+ *                                                                            *
+ * Purpose: delete template triggers from host                                *
+ *                                                                            *
+ * Parameters: hostid - host identificator from database                      *
+ *             templateid - template identificator from database              *
+ *             unlink_mode - 1 - only unlink elements without deletion        *
+ *                           0 - delete elements                              *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static void	DBdelete_template_triggers(
 		zbx_uint64_t hostid,
 		zbx_uint64_t templateid,
@@ -763,6 +1066,24 @@ static void	DBdelete_template_triggers(
 	DBfree_result(db_triggers);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdelete_template_items                                          *
+ *                                                                            *
+ * Purpose: delete template items from host                                   *
+ *                                                                            *
+ * Parameters: hostid - host identificator from database                      *
+ *             templateid - template identificator from database              *
+ *             unlink_mode - 1 - only unlink elements without deletion        *
+ *                           0 - delete elements                              *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static void	DBdelete_template_items(
 		zbx_uint64_t hostid,
 		zbx_uint64_t templateid,
@@ -823,6 +1144,24 @@ static void	DBdelete_template_items(
 	DBfree_result(db_items);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdelete_template_applications                                   *
+ *                                                                            *
+ * Purpose: delete application                                                *
+ *                                                                            *
+ * Parameters: hostid - host identificator from database                      *
+ *             templateid - template identificator from database              *
+ *             unlink_mode - 1 - only unlink elements without deletion        *
+ *                           0 - delete elements                              *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static void	DBdelete_template_applications(
 		zbx_uint64_t hostid,
 		zbx_uint64_t templateid,
@@ -884,6 +1223,25 @@ static void	DBdelete_template_applications(
 	DBfree_result(db_applications);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdb_save_application                                            *
+ *                                                                            *
+ * Purpose: add or update application                                         *
+ *                                                                            *
+ * Parameters: name                                                           *
+ *             hostid - host identificator from database                      *
+ *             applicationid - application identificator from database        *
+ *                             0 - for adding                                 *
+ *             templateid - template application identificator from database  *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBdb_save_application(
 		const char	*name,
 		zbx_uint64_t	hostid,
@@ -1010,6 +1368,24 @@ static int	DBdb_save_application(
 	return result;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBcopy_template_applications                                     *
+ *                                                                            *
+ * Purpose: copy applications from template to host                           *
+ *                                                                            *
+ * Parameters: hostid - host identificator from database                      *
+ *             templateid - template identificator from database              *
+ *             copy_mode - 1 - only copy elements without linkage             *
+ *             	           0 - copy and link elements                         *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBcopy_template_applications(
 		zbx_uint64_t hostid,
 		zbx_uint64_t templateid,
@@ -1058,6 +1434,47 @@ static int	DBcopy_template_applications(
 	return result;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBupdate_item                                                    *
+ *                                                                            *
+ * Purpose: udate item                                                        *
+ *                                                                            *
+ * Parameters: itemid - item identificator from database                      *
+ *             description                                                    *
+ *             key                                                            *
+ *             hostid - host identificator from database                      *
+ *             delay                                                          *
+ *             history                                                        *
+ *             status                                                         *
+ *             type                                                           *
+ *             snmp_community                                                 *
+ *             snmp_oid                                                       *
+ *             value_type                                                     *
+ *             trapper_hosts                                                  *
+ *             snmp_port                                                      *
+ *             units                                                          *
+ *             multiplier                                                     *
+ *             delta                                                          *
+ *             snmpv3_securityname                                            *
+ *             snmpv3_securitylevel                                           *
+ *             snmpv3_authpassphrase                                          *
+ *             snmpv3_privpassphrase                                          *
+ *             formula                                                        *
+ *             trends                                                         *
+ *             logtimefmt                                                     *
+ *             valuemapid                                                     *
+ *             delay_flex                                                     *
+ *             apps - zero teminated array of applicationid                   *
+ *             templateid - template item identificator from database         *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBupdate_item(
 		zbx_uint64_t	itemid,
 		const char	*description,
@@ -1276,6 +1693,46 @@ static int	DBupdate_item(
 	return result;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBadd_item                                                       *
+ *                                                                            *
+ * Purpose: add item to database                                              *
+ *                                                                            *
+ * Parameters: description                                                    *
+ *             key                                                            *
+ *             hostid - host identificator from database                      *
+ *             delay                                                          *
+ *             history                                                        *
+ *             status                                                         *
+ *             type                                                           *
+ *             snmp_community                                                 *
+ *             snmp_oid                                                       *
+ *             value_type                                                     *
+ *             trapper_hosts                                                  *
+ *             snmp_port                                                      *
+ *             units                                                          *
+ *             multiplier                                                     *
+ *             delta                                                          *
+ *             snmpv3_securityname                                            *
+ *             snmpv3_securitylevel                                           *
+ *             snmpv3_authpassphrase                                          *
+ *             snmpv3_privpassphrase                                          *
+ *             formula                                                        *
+ *             trends                                                         *
+ *             logtimefmt                                                     *
+ *             valuemapid                                                     *
+ *             delay_flex                                                     *
+ *             apps - zero teminated array of applicationid                   *
+ *             templateid - template item identificator from database         *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBadd_item(
 		const char	*description,
 		const char	*key,
@@ -1495,6 +1952,24 @@ static int	DBadd_item(
 	return result;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBcopy_template_items                                            *
+ *                                                                            *
+ * Purpose: copy template items to host                                       *
+ *                                                                            *
+ * Parameters: hostid - host identificator from database                      *
+ *             templateid - template identificator from database              *
+ *             copy_mode - 1 - only copy elements without linkage             *
+ *             	           0 - copy and link elements                         *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBcopy_template_items(
 		zbx_uint64_t hostid,
 		zbx_uint64_t templateid,
@@ -1584,6 +2059,21 @@ static int	DBcopy_template_items(
 	return result;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBreset_items_nextcheck                                          *
+ *                                                                            *
+ * Purpose: reset next check timestamps for items                             *
+ *                                                                            *
+ * Parameters: triggerid = trigger identificator from database                *
+ *                                                                            *
+ * Return value: always SUCCEED                                               *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBreset_items_nextcheck(
 		zbx_uint64_t	triggerid
 	)
@@ -1609,6 +2099,24 @@ static int	DBreset_items_nextcheck(
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBreplace_template_dependences                                   *
+ *                                                                            *
+ * Purpose: replace trigger dependences by specified host                     *
+ *                                                                            *
+ * Parameters: dependences_in - zero terminated array of dependences          *
+ *             hostid - host identificator from database                      *
+ *             dependences - buffer for result values                         *
+ *             max_dependences - size of result buffer in counts              *
+ *                                                                            *
+ * Return value: count of results                                             *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBreplace_template_dependences(
 		zbx_uint64_t	*dependences_in,
 		zbx_uint64_t	hostid,
@@ -1645,6 +2153,23 @@ static int	DBreplace_template_dependences(
 	return j;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBadd_event                                                      *
+ *                                                                            *
+ * Purpose: add event without actions processing                              *
+ *                                                                            *
+ * Parameters: triggerid - trigger identificator from database                *
+ *             value - event value                                            *
+ *             now - timestamp                                                *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBadd_event(
 		zbx_uint64_t	triggerid,
 		int		value,
@@ -1689,6 +2214,24 @@ static int	DBadd_event(
 	return result;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBimplode_exp                                                    *
+ *                                                                            *
+ * Purpose: implode normal mode expression to short mode                      *
+ *          {hostX:keyY.functionZ(parameterN)}=1 implode to {11}=1            *
+ *                                                                            *
+ * Parameters: expression - null terminated string                            *
+ *             triggerid - trigger identificator from database                *
+ *                                                                            *
+ * Return value: dynamically allocated memory for imploded expression         *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: function dynamically allocate memory, don't forget free them     *
+ *           !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static char*	DBimplode_exp (
 		char		*expression,
 		zbx_uint64_t	triggerid
@@ -1838,6 +2381,23 @@ static char*	DBimplode_exp (
 	return exp;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_trigger_dependences_by_triggerid                           *
+ *                                                                            *
+ * Purpose: retrive trigger dependences                                       *
+ *                                                                            *
+ * Parameters: triggerid - trigger identificator from database                *
+ *             dependences - buffer for result                                *
+ *             max_dependences - size of buffer in counts                     *
+ *                                                                            *
+ * Return value: count of dependences                                         *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBget_trigger_dependences_by_triggerid(
 		zbx_uint64_t	triggerid,
 		zbx_uint64_t	*dependences,
@@ -1865,7 +2425,25 @@ static int	DBget_trigger_dependences_by_triggerid(
 	return i;
 }
 
-static char* explode_exp (char *short_expression)
+/******************************************************************************
+ *                                                                            *
+ * Function: DBexplode_exp                                                    *
+ *                                                                            *
+ * Purpose: explode short trigger expression to normal mode                   *
+ *          {11}=1 explode to {hostX:keyY.functionZ(parameterN)}=1            *
+ *                                                                            *
+ * Parameters: short_expression - null terminated string                      *
+ *                                                                            *
+ * Return value: dynamically allocated memory for exploded expression         *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: function dynamically allocate memory, don't forget free them     *
+ *           !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ *                                                                            *
+ ******************************************************************************/
+static char* DBexplode_exp (char *short_expression)
 {
 	typedef enum {
 		EXP_NONE,
@@ -1947,6 +2525,29 @@ static char* explode_exp (char *short_expression)
 	return exp;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBupdate_trigger                                                 *
+ *                                                                            *
+ * Purpose: update trigger                                                    *
+ *                                                                            *
+ * Parameters: triggerid - trigger identificator from database                *
+ *             expression - new expression (NULL to skip update)              *
+ *             description - new description (NULL to skip update)            *
+ *             priority - new priority (-1 to skip updete)                    *
+ *             status - new status (-1 to skip updete)                        *
+ *             comments - new comments (NULL to skip update)                  *
+ *             url - new url (NULL to skip update)                            *
+ *             dependences - null terminated array with dependences           *
+ *             templateid - template trigger identificator from database      *
+ *                                                                            *
+ * Return value: always SUCCEED                                               *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBupdate_trigger(
 		zbx_uint64_t	triggerid,
 		char		*expression,
@@ -1990,7 +2591,7 @@ static int	DBupdate_trigger(
 
 	if( (trigger_data = DBfetch(db_triggers)) )
 	{
-		if( !expression )	expression = exp_expression = explode_exp(trigger_data[2]);
+		if( !expression )	expression = exp_expression = DBexplode_exp(trigger_data[2]);
 		if( !description )	description = trigger_data[0];
 		if( -1 == priority )	priority = atoi(trigger_data[3]);
 		if( -1 == status )	priority = atoi(trigger_data[4]);
@@ -2099,6 +2700,22 @@ static int	DBupdate_trigger(
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBcmp_triggers                                                   *
+ *                                                                            *
+ * Purpose: compare two triggers                                              *
+ *                                                                            *
+ * Parameters: triggerid1 - first trigger identificator from database         *
+ *             triggerid2 - second trigger identificator from database        *
+ *                                                                            *
+ * Return value: 0 - if triggers coincide                                     *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBcmp_triggers(
 		zbx_uint64_t triggerid1,
 		zbx_uint64_t triggerid2
@@ -2163,6 +2780,24 @@ static int	DBcmp_triggers(
 	return result;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBcopy_trigger_to_host                                           *
+ *                                                                            *
+ * Purpose: copy specified trigger to host                                    *
+ *                                                                            *
+ * Parameters: triggerid - trigger identificator from database                *
+ *             hostid - host identificator from database                      *
+ *             copy_mode - 1 - only copy elements without linkage             *
+ *             	           0 - copy and link elements                         *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBcopy_trigger_to_host(
 		zbx_uint64_t triggerid,
 		zbx_uint64_t hostid,
@@ -2365,6 +3000,21 @@ static int	DBcopy_trigger_to_host(
 	return result;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBupdate_template_dependences_for_host                           *
+ *                                                                            *
+ * Purpose: update trigger dependences for specified host                     *
+ *                                                                            *
+ * Parameters: hostid - host identificator from database                      *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBupdate_template_dependences_for_host(
 		zbx_uint64_t hostid
 	)
@@ -2422,6 +3072,24 @@ static int	DBupdate_template_dependences_for_host(
 	return result;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBcopy_template_triggers                                         *
+ *                                                                            *
+ * Purpose: Copy template triggers to host                                    *
+ *                                                                            *
+ * Parameters: hostid - host identificator from database                      *
+ *             templateid - template identificator from database              *
+ *             copy_mode - 1 - only copy elements without linkage             *
+ *             	           0 - copy and link elements                         *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBcopy_template_triggers(
 		zbx_uint64_t hostid,
 		zbx_uint64_t templateid,
@@ -2475,6 +3143,30 @@ static int	DBcopy_template_triggers(
 	return result;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBadd_item_to_graph                                              *
+ *                                                                            *
+ * Purpose: add item to the graph                                             *
+ *                                                                            *
+ * Parameters: graphid - graph identificator from database                    *
+ *             itemid - item identificator from database                      *
+ *             color - character representation of HEX color 'RRGGBB'         *
+ *             drawtype - type of line                                        *
+ *             sortorder - sort order                                         *
+ *             yaxisside - 0 - use x-axis                                     *
+ *                         1 - use y-axis                                     *
+ *             calc_fnc - type of calculation function                        *
+ *             type - type item (simple, aggregated, ...)                     *
+ *             periods_cnt - count of aggregated periods                      *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBadd_item_to_graph(
 		zbx_uint64_t	graphid,
 		zbx_uint64_t	itemid,
@@ -2627,6 +3319,23 @@ static int	DBadd_item_to_graph(
 	return result;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBcopy_graphitems_for_host                                       *
+ *                                                                            *
+ * Purpose: copy graph elements from one graph to another                     *
+ *                                                                            *
+ * Parameters: src_graphid - source graph identificator from database         *
+ *             dist_graphid - destination graph identificator from database   *
+ *             hostid - host identificator from database                      *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBcopy_graphitems_for_host(
 		zbx_uint64_t	src_graphid,
 		zbx_uint64_t	dist_graphid,
@@ -2696,6 +3405,24 @@ static int	DBcopy_graphitems_for_host(
 	return result;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBcopy_graph_to_host                                             *
+ *                                                                            *
+ * Purpose: copy specified graph to host                                      *
+ *                                                                            *
+ * Parameters: graphid - graph identificator from database                    *
+ *             hostid - host identificator from database                      *
+ *             copy_mode - 1 - only copy elements without linkage             *
+ *             	           0 - copy and link elements                         *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBcopy_graph_to_host(
 		zbx_uint64_t	graphid,
 		zbx_uint64_t	hostid,
@@ -2740,6 +3467,24 @@ static int	DBcopy_graph_to_host(
 	return result;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBcopy_template_graphs                                           *
+ *                                                                            *
+ * Purpose: copy graphs from template to host                                 *
+ *                                                                            *
+ * Parameters: hostid - host identificator from database                      *
+ *             templateid - template identificator from database              *
+ *             copy_mode - 1 - only copy elements without linkage             *
+ *             	           0 - copy and link elements                         *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBcopy_template_graphs(
 		zbx_uint64_t hostid,
 		zbx_uint64_t templateid,
@@ -2790,19 +3535,21 @@ static int	DBcopy_template_graphs(
 	return result;
 }
 
-static int	DBdelete_sysmaps_element(
-		zbx_uint64_t	selementid
-	)
-{
-	DBexecute("delete from sysmaps_links"
-		" where selementid1=" ZBX_FS_UI64 " or selementid2=" ZBX_FS_UI64,
-		selementid, selementid);
-
-	DBexecute("delete from sysmaps_elements where selementid=" ZBX_FS_UI64, selementid);
-
-	return SUCCEED;
-}
-
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdelete_sysmaps_elements_with_hostid                            *
+ *                                                                            *
+ * Purpose: delete hosts from maps                                            *
+ *                                                                            *
+ * Parameters: hostid - host identificator from database                      *
+ *                                                                            *
+ * Return value: always SUCCEED                                               *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 static int	DBdelete_sysmaps_elements_with_hostid(
 		zbx_uint64_t	hostid
 	)
@@ -2829,6 +3576,23 @@ static int	DBdelete_sysmaps_elements_with_hostid(
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdelete_template_elements                                       *
+ *                                                                            *
+ * Purpose: delete template elements from host                                *
+ *                                                                            *
+ * Parameters: hostid - host identificator from database                      *
+ *             templateid - template identificator from database              *
+ *             unlink_mode - 1 - only unlink elements without deletion        *
+ *                           0 - delete elements                              *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 /* public */ void	DBdelete_template_elements(
 		zbx_uint64_t  hostid,
 		zbx_uint64_t templateid,
@@ -2841,6 +3605,24 @@ static int	DBdelete_sysmaps_elements_with_hostid(
 	DBdelete_template_applications(hostid, templateid, unlink_mode);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBcopy_template_elements                                         *
+ *                                                                            *
+ * Purpose: copy elements from specified template                             *
+ *                                                                            *
+ * Parameters: hostid - host identificator from database                      *
+ *             templateid - template identificator from database              *
+ *             copy_mode - 1 - only copy elements without linkage             *
+ *             	           0 - copy and link elements                         *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 /* public */ int	DBcopy_template_elements(
 		zbx_uint64_t hostid,
 		zbx_uint64_t templateid,
@@ -2857,6 +3639,22 @@ static int	DBdelete_sysmaps_elements_with_hostid(
 	return result;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBsync_host_with_template                                        *
+ *                                                                            *
+ * Purpose: synchronize elements from specified template                      *
+ *                                                                            *
+ * Parameters: hostid - host identificator from database                      *
+ *             templateid - template identificator from database              *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 /* public */ int	DBsync_host_with_template(
 		zbx_uint64_t hostid,
 		zbx_uint64_t templateid
@@ -2867,6 +3665,21 @@ static int	DBdelete_sysmaps_elements_with_hostid(
 	return DBcopy_template_elements(hostid, templateid, 0 /* not a copy mode */);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBsync_host_with_templates                                       *
+ *                                                                            *
+ * Purpose: synchronize elements from linked templates                        *
+ *                                                                            *
+ * Parameters: hostid - host identificator from database                      *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 /* public */ int	DBsync_host_with_templates(
 		zbx_uint64_t hostid
 	)
@@ -2896,6 +3709,23 @@ static int	DBdelete_sysmaps_elements_with_hostid(
 
 	return result;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBunlink_template                                                *
+ *                                                                            *
+ * Purpose: unlink template from host without element deletion                *
+ *                                                                            *
+ * Parameters: hostid - host identificator from database                      *
+ *             templateid - template identificator from database              *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 /* public */ void	DBunlink_template(
 		zbx_uint64_t	hostid,
 	       	zbx_uint64_t	templateid
@@ -2908,6 +3738,21 @@ static int	DBdelete_sysmaps_elements_with_hostid(
 }
 
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdelete_host                                                    *
+ *                                                                            *
+ * Purpose: delete host from databases with all elements                      *
+ *                                                                            *
+ * Parameters: hostid - host identificator from database                      *
+ *                                                                            *
+ * Return value: always SUCCEED                                               *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
 /* public */ int	DBdelete_host(
 		zbx_uint64_t hostid
 	)
