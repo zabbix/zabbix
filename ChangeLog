@@ -1,5 +1,6 @@
 Changes for 1.3.8:
 
+ - button "Update" renamed to "Refresh" in data export (Alexei)
  - fixed translation behavior for housekeeper configurations (Eugene)
  - fixed time movement for history (Eugene)
  - added availability to yse ')(' characters in item keys (Eugene)
