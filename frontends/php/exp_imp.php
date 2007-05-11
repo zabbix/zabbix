@@ -240,7 +240,7 @@ include_once "include/page_header.php";
 
 			$form->AddItem(array(
 				new CButton('back', S_BACK),
-				new CButton('preview', S_UPDATE),
+				new CButton('preview', S_REFRESH),
 				new CButton('export', S_EXPORT)
 				));
 			

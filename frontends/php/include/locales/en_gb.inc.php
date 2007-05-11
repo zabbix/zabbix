@@ -153,6 +153,7 @@
 	'S_SKIP'=>				'Skip',
 	'S_EXISTING'=>				'Existing',
 	'S_MISSING'=>				'Missing',
+	'S_REFRESH'=>				'Refresh',
 
 //	admin.php
 	'S_PREVIOUS'=>				'<< Previous',
