@@ -110,6 +110,7 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 			$_REQUEST['message'] = $error;
 			
 			define('ZBX_DISTRIBUTED', false);
+			define('ZBX_PAGE_NO_AUTHERIZATION', true);
 			$show_setup = true;
 		}
 		else
@@ -954,8 +955,14 @@ else
 		return DBfetch($db_events);
 	}
 
-	# Reset nextcheck for related items
 
+	/******************************************************************************
+	 *                                                                            *
+	 * Purpose: Reset nextcheck for related items                                 *
+	 *                                                                            *
+	 * Comments: !!! Don't forget sync code with C !!!                            *
+	 *                                                                            *
+	 ******************************************************************************/
 	function	reset_items_nextcheck($triggerid)
 	{
 		$sql="select itemid from functions where triggerid=$triggerid";
