@@ -649,7 +649,7 @@
 		$frmMsg->AddRow(S_MESSAGE, new CTextArea("message","",80,6));
 
 		$frmMsg->AddItemToBottomRow(new CButton("save",$btn_txt));
-		$frmMsg->AddItemToBottomRow(new CButtonCancel(url_param('"eventid')));
+		$frmMsg->AddItemToBottomRow(new CButtonCancel(url_param('eventid')));
 
 		$frmMsg->Show(false);
 
