@@ -111,6 +111,12 @@ extern	int	CONFIG_MASTER_NODEID;
 #define DSERVICE_VALUE_LEN		255
 #define DSERVICE_VALUE_LEN_MAX		DSERVICE_VALUE_LEN+1
 
+#define HTTPSTEP_STATUS_LEN		255
+#define HTTPSTEP_STATUS_LEN_MAX		HTTPSTEP_STATUS_LEN+1
+
+#define HTTPSTEP_REQUIRED_LEN		255
+#define HTTPSTEP_REQUIRED_LEN_MAX	HTTPSTEP_REQUIRED_LEN+1
+
 #define ZBX_SQL_ITEM_SELECT	"i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.errors_from,i.snmp_port,i.delta,i.prevorgvalue,i.lastclock,i.units,i.multiplier,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula,h.available,i.status,i.trapper_hosts,i.logtimefmt,i.valuemapid,i.delay_flex,h.dns from hosts h, items i"
 
 #define ZBX_MAX_SQL_LEN			65535
@@ -397,7 +403,8 @@ DB_HTTPSTEP
 	char		url[MAX_STRING_LEN];
 	int		timeout;
 	char		posts[MAX_STRING_LEN];
-	char		required[MAX_STRING_LEN];
+	char		required[HTTPSTEP_REQUIRED_LEN_MAX];
+	char		status_codes[HTTPSTEP_STATUS_LEN_MAX];
 };
 
 DB_HTTPSTEPITEM
