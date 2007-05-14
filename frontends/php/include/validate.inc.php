@@ -21,7 +21,6 @@
 <?php
 	function unset_request($key,$requester='unknown')
 	{
-//		SDI("unset [".$requester."]: $key");
 		unset($_REQUEST[$key]);
 	}
 

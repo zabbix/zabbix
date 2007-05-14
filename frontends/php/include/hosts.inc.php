@@ -598,9 +598,6 @@ require_once "include/items.inc.php";
 			}
 		}
 		
-//		SDI("ig:".$_REQUEST["groupid"]);	
-//		SDI("ih:".$_REQUEST["hostid"]);	
-
 		if(in_array("always_select_first_host",$options) && $_REQUEST["hostid"] == 0 && $_REQUEST["groupid"] != 0)
 			$_REQUEST["hostid"] = -1;
 
@@ -608,9 +605,6 @@ require_once "include/items.inc.php";
 
 		$_REQUEST["groupid"]    = $result["groupid"];
 		$_REQUEST["hostid"]     = $result["hostid"];
-
-//		SDI("og:".$_REQUEST["groupid"]);	
-//		SDI("oh:".$_REQUEST["hostid"]);	
 
 		update_profile($host_var,$_REQUEST["hostid"]);
 		update_profile($group_var,$_REQUEST["groupid"]);

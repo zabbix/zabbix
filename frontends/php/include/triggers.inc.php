@@ -191,7 +191,7 @@ define('ZBX_SIMPLE_EXPRESSION_PARAMETER_ID', 4);
 			$sql="select count(*) as cnt from hosts h,items i where h.host=".zbx_dbstr($host).
 				" and i.key_=".zbx_dbstr($key)." and h.hostid=i.hostid ".
 				" and ".DBid2nodeid('h.hostid').'='.$ZBX_CURNODEID;
-//SDI($sql);
+
 			$row=DBfetch(DBselect($sql));
 			if($row["cnt"]==0)
 			{

@@ -802,7 +802,7 @@ else
 		$date = getdate($time);
 		$wday = $date['wday'] == 0 ? 7 : $date['wday'];
 		$curr = $date['hours']*100+$date['minutes'];
-//SDI("find_end: ".date('r',$time));
+
 		if(isset($periods[$wday]))
 		{
 			$next_h = -1;
@@ -1357,13 +1357,11 @@ $result =
 		{
 			$result = array_filter($result, "not_empty");
 		}
-// SDI("Get profile:".$idx." = ".$result);
 		return $result;
 	}
 
 	function	update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN)
 	{
-// SDI("Save profile:".$idx." = ".$value);
 
 		global $USER_DETAILS;
 

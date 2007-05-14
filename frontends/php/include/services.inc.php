@@ -366,9 +366,7 @@ $dt = 0;
 			print('       ut = '.$ut.'      dt = '.$dt);
 			print(BR);
 		}
-SDI('ut = '.$ut);
-SDI('dt = '.$dt);/**/
-
+*/
 		/* calculate times */
 
 		ksort($data); /* sort by time stamp */
@@ -414,7 +412,6 @@ SDI('dt = '.$dt);/**/
 			{
 				$sla_time[$period_type]['ok_time'] 	+= $ts - $prev_time;
 			}
-//SDI($dt_cnt.'/'.$ut_cnt.' - '.$prev_alarm);
 //print_r($val); print(BR);
 			if(isset($val['ut_s'])) $ut_cnt += $val['ut_s'];
 			if(isset($val['ut_e'])) $ut_cnt -= $val['ut_e'];
@@ -425,13 +422,6 @@ SDI('dt = '.$dt);/**/
 
 			$prev_time = $ts;
 		}
-
-/*
-SDI(
-'dt: '.$sla_time['dt']['ok_time'].'/'.$sla_time['dt']['problem_time'].' '.
-'ut: '.$sla_time['ut']['ok_time'].'/'.$sla_time['ut']['problem_time']
-);
-/**/
 
 		$sla_time['problem_time']	= &$sla_time['ut']['problem_time'];
 		$sla_time['ok_time']		= &$sla_time['ut']['ok_time'];
