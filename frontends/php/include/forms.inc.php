@@ -323,12 +323,14 @@
 		$posts = get_request('posts', '');
 		$timeout = get_request('timeout', 15);
 		$required = get_request('required', '');
+		$status_codes = get_request('status_codes', '');
 		
 		$form->AddRow(S_NAME, new CTextBox('name', $name, 50));
 		$form->AddRow(S_URL, new CTextBox('url', $url, 80));
 		$form->AddRow(S_POST, new CTextArea('posts', $posts, 50, 10));
 		$form->AddRow(S_TIMEOUT, new CNumericBox('timeout', $timeout, 5));
 		$form->AddRow(S_REQUIRED, new CTextBox('required', $required, 80));
+		$form->AddRow(S_STATUS_CODES, new CTextBox('status_codes', $status_codes, 80));
 		
 		$form->AddItemToBottomRow(new CButton("save", isset($sid) ? S_SAVE : S_ADD));
 
@@ -419,7 +421,7 @@
 		$form->AddRow(S_VARIABLES, new CTextArea('macros', $macros, 84, 5));
 
 		$tblSteps = new CTableInfo();
-		$tblSteps->SetHeader(array(S_NAME,S_TIMEOUT,S_URL,S_REQUIRED,SPACE));
+		$tblSteps->SetHeader(array(S_NAME,S_TIMEOUT,S_URL,S_REQUIRED,S_STATUS,SPACE));
 		if(count($steps) > 0)
 		{
 			$first = min(array_keys($steps));
@@ -455,6 +457,7 @@
 				url_param($s['url'],false,'url').
 				url_param($s['posts'],false,'posts').
 				url_param($s['required'],false,'required').
+				url_param($s['status_codes'],false,'status_codes').
 				'");');
 			
 			if(strlen($s['url']) > 70)
@@ -472,6 +475,7 @@
 				$s['timeout'].SPACE.S_SEC_SMALL,
 				$url,
 				$s['required'],
+				$s['status_codes'],
 				array($up, isset($up) && isset($down) ? SPACE : null, $down)
 				));
 		}

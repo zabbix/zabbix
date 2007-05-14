@@ -46,6 +46,7 @@ include_once "include/page_header.php";
 		"posts"=>	array(T_ZBX_STR, O_OPT,  null,	null,			'isset({save})'),
 		"timeout"=>	array(T_ZBX_INT, O_OPT,  null,	BETWEEN(0,65535),	'isset({save})'),
 		"required"=>	array(T_ZBX_STR, O_OPT,  null,	null,			'isset({save})'),
+		"status_codes"=>array(T_ZBX_INT_RANGE, O_OPT,  null,	null,		'isset({save})'),
 
 		"add"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		"save"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -78,7 +79,7 @@ function add_var_to_opener_obj(obj,name,value)
 <script language="JavaScript" type="text/javascript">
 <!--
 
-function add_httpstep(formname,name,timeout,url,posts,required)
+function add_httpstep(formname,name,timeout,url,posts,required,status_codes)
 {
         var form = window.opener.document.forms[formname];
 
@@ -93,6 +94,7 @@ function add_httpstep(formname,name,timeout,url,posts,required)
 	add_var_to_opener_obj(form,'new_httpstep[url]',url);
 	add_var_to_opener_obj(form,'new_httpstep[posts]',posts);
 	add_var_to_opener_obj(form,'new_httpstep[required]',required);
+	add_var_to_opener_obj(form,'new_httpstep[status_codes]',status_codes);
 	
 	form.submit();
 	close_window();
@@ -106,7 +108,8 @@ function add_httpstep(formname,name,timeout,url,posts,required)
 			zbx_jsvalue($_REQUEST['timeout']).",".
 			zbx_jsvalue($_REQUEST['url']).",".
 			zbx_jsvalue($_REQUEST['posts']).",".
-			zbx_jsvalue($_REQUEST['required']).");\n";
+			zbx_jsvalue($_REQUEST['required']).",".
+			zbx_jsvalue($_REQUEST['status_codes']).");\n";
 ?>
 -->
 </script>
@@ -118,7 +121,7 @@ function add_httpstep(formname,name,timeout,url,posts,required)
 <script language="JavaScript" type="text/javascript">
 <!--
 
-function update_httpstep(formname,list_name,sid,name,timeout,url,posts,required)
+function update_httpstep(formname,list_name,sid,name,timeout,url,posts,required,status_codes)
 {
         var form = window.opener.document.forms[formname];
 
@@ -133,6 +136,7 @@ function update_httpstep(formname,list_name,sid,name,timeout,url,posts,required)
 	add_var_to_opener_obj(form,list_name + '[' + sid + '][url]',url);
 	add_var_to_opener_obj(form,list_name + '[' + sid + '][posts]',posts);
 	add_var_to_opener_obj(form,list_name + '[' + sid + '][required]',required);
+	add_var_to_opener_obj(form,list_name + '[' + sid + '][status_codes]',status_codes);
 	
 	
 	form.submit();
@@ -149,7 +153,8 @@ function update_httpstep(formname,list_name,sid,name,timeout,url,posts,required)
 			zbx_jsvalue($_REQUEST['timeout']).",".
 			zbx_jsvalue($_REQUEST['url']).",".
 			zbx_jsvalue($_REQUEST['posts']).",".
-			zbx_jsvalue($_REQUEST['required']).");\n";
+			zbx_jsvalue($_REQUEST['required']).",".
+			zbx_jsvalue($_REQUEST['status_codes']).");\n";
 ?>
 -->
 </script>

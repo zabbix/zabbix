@@ -1,5 +1,6 @@
 Changes for 1.3.8:
 
+ - added http status code configuration for web monitoring (Eugene)
  - new column httpstep.status_codes (Alexei)
  - set DENY permission as default for ZABBIX users (Eugene)
  - fixed Error in "Cancel" after ack of a trigger (Eugene)
