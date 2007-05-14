@@ -7,6 +7,7 @@ CREATE TABLE httpstep (
 	timeout		integer		DEFAULT '30'	NOT NULL,
 	posts		text		DEFAULT ''	NOT NULL,
 	required	varchar(255)		DEFAULT ''	NOT NULL,
+	status_codes	varchar(255)		DEFAULT ''	NOT NULL,
 	PRIMARY KEY (httpstepid)
 );
 CREATE INDEX httpstep_httpstep_1 on httpstep (httptestid);
