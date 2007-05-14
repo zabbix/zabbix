@@ -264,12 +264,11 @@ static void	process_step_data(DB_HTTPTEST *httptest, DB_HTTPSTEP *httpstep, S_ZB
  * Comments: SUCCEED or FAIL                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	process_httptest(DB_HTTPTEST *httptest)
+static void	process_httptest(DB_HTTPTEST *httptest)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_HTTPSTEP	httpstep;
-	int		ret = SUCCEED;
 	int		err;
 	int		now;
 	int		lastfailedstep;
@@ -291,52 +290,52 @@ static int	process_httptest(DB_HTTPTEST *httptest)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot init CURL");
 
-		return FAIL;
+		return;
 	}
 	if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_COOKIEFILE, "")))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLOPT_COOKIEFILE [%s]",
 			curl_easy_strerror(err));
-		return FAIL;
+		return;
 	}
 	if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERAGENT, httptest->agent)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLOPT_USERAGENT [%s]",
 			curl_easy_strerror(err));
-		return FAIL;
+		return;
 	}
 	if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_FOLLOWLOCATION, 1)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLOPT_FOLLOWLOCATION [%s]",
 			curl_easy_strerror(err));
-		return FAIL;
+		return;
 	}
 	if(CURLE_OK != (err = curl_easy_setopt(easyhandle,CURLOPT_WRITEFUNCTION ,WRITEFUNCTION2)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Error doing curl_easy_perform [%s]",
 			curl_easy_strerror(err));
-		return FAIL;
+		return;
 	}
 	if(CURLE_OK != (err = curl_easy_setopt(easyhandle,CURLOPT_HEADERFUNCTION ,HEADERFUNCTION2)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Error doing curl_easy_perform [%s]",
 			curl_easy_strerror(err));
-		return FAIL;
+		return;
 	}
 	/* Process self-signed certificates. Do not verify certificate. */
 	if(CURLE_OK != (err = curl_easy_setopt(easyhandle,CURLOPT_SSL_VERIFYPEER , 0)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Error doing curl_easy_perform [%s]",
 			curl_easy_strerror(err));
-		return FAIL;
+		return;
 	}
 
 	lastfailedstep=0;
 	httptest->time = 0;
-	result = DBselect("select httpstepid,httptestid,no,name,url,timeout,posts,required from httpstep where httptestid=" ZBX_FS_UI64 " order by no",
+	result = DBselect("select httpstepid,httptestid,no,name,url,timeout,posts,required,status_codes from httpstep where httptestid=" ZBX_FS_UI64 " order by no",
 		httptest->httptestid);
 	now=time(NULL);
-	while((row=DBfetch(result)))
+	while((row=DBfetch(result)) && 0 == lastfailedstep)
 	{
 		ZBX_STR2UINT64(httpstep.httpstepid, row[0]);
 		ZBX_STR2UINT64(httpstep.httptestid, row[1]);
@@ -346,7 +345,7 @@ static int	process_httptest(DB_HTTPTEST *httptest)
 		httpstep.timeout=atoi(row[5]);
 		strscpy(httpstep.posts,row[6]);
 		strscpy(httpstep.required,row[7]);
-
+		strscpy(httpstep.status_codes,row[8]);
 
 		DBexecute("update httptest set curstep=%d,curstate=%d where httptestid=" ZBX_FS_UI64,
 			httpstep.no,
@@ -367,16 +366,17 @@ static int	process_httptest(DB_HTTPTEST *httptest)
 			{
 				zabbix_log(LOG_LEVEL_ERR, "Cannot set POST vars [%s]",
 					curl_easy_strerror(err));
-				ret = FAIL;
-				break;
+				lastfailedstep = httpstep.no;
 			}
 		}
-		if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_URL, httpstep.url)))
+		if(0 == lastfailedstep)
 		{
-			zabbix_log(LOG_LEVEL_ERR, "Cannot set URL [%s]",
-				curl_easy_strerror(err));
-			ret = FAIL;
-			break;
+			if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_URL, httpstep.url)))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Cannot set URL [%s]",
+					curl_easy_strerror(err));
+				lastfailedstep = httpstep.no;
+			}
 		}
 /*		if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT, httpstep.timeout)))
 		{
@@ -385,52 +385,62 @@ static int	process_httptest(DB_HTTPTEST *httptest)
 			break;
 		}*/
 
-		memset(&page, 0, sizeof(page));
-		if(CURLE_OK != (err = curl_easy_perform(easyhandle)))
+		if(0 == lastfailedstep)
 		{
-			zabbix_log(LOG_LEVEL_ERR, "Error doing curl_easy_perform [%s]",
-				curl_easy_strerror(err));
-			ret = FAIL;
-			break;
+			memset(&page, 0, sizeof(page));
+			if(CURLE_OK != (err = curl_easy_perform(easyhandle)))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Error doing curl_easy_perform [%s]",
+					curl_easy_strerror(err));
+				lastfailedstep = httpstep.no;
+			}
+			else
+			{
+				if(zbx_regexp_match(page.data,httpstep.required,NULL) == NULL)
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "Page didn't match [%s]", httpstep.required);
+					lastfailedstep = httpstep.no;
+				}
+			}
+			free(page.data);
 		}
 
-		if(zbx_regexp_match(page.data,httpstep.required,NULL) == NULL)
+		if(0 == lastfailedstep)
 		{
-zabbix_log(LOG_LEVEL_DEBUG, "Page didn't match [%s]", httpstep.required);
-zabbix_log(LOG_LEVEL_DEBUG, "[%s]", page.data);
-			lastfailedstep = httpstep.no;
+			if(CURLE_OK != (err = curl_easy_getinfo(easyhandle,CURLINFO_RESPONSE_CODE ,&stat.rspcode)))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Error getting CURLINFO_RESPONSE_CODE [%s]",
+					curl_easy_strerror(err));
+				lastfailedstep = httpstep.no;
+			}
+			else if(httpstep.status_codes[0]!='\0' && (int_in_list(httpstep.status_codes,stat.rspcode) == FAIL))
+			{
+				lastfailedstep = httpstep.no;
+			}
 		}
 
-		free(page.data);
-
-
-		if(CURLE_OK != (err = curl_easy_getinfo(easyhandle,CURLINFO_RESPONSE_CODE ,&stat.rspcode)))
+		if(0 == lastfailedstep)
 		{
-			zabbix_log(LOG_LEVEL_ERR, "Error doing curl_easy_perform [%s]",
-				curl_easy_strerror(err));
-			ret = FAIL;
-			break;
-		}
-		if(CURLE_OK != (err = curl_easy_getinfo(easyhandle,CURLINFO_TOTAL_TIME ,&stat.total_time)))
-		{
-			zabbix_log(LOG_LEVEL_ERR, "Error doing curl_easy_perform [%s]",
-				curl_easy_strerror(err));
-			ret = FAIL;
-			break;
-		}
-		if(CURLE_OK != (err = curl_easy_getinfo(easyhandle,CURLINFO_SPEED_DOWNLOAD ,&stat.speed_download)))
-		{
-			zabbix_log(LOG_LEVEL_ERR, "Error doing curl_easy_perform [%s]",
-				curl_easy_strerror(err));
-			ret = FAIL;
-			break;
+			if(CURLE_OK != (err = curl_easy_getinfo(easyhandle,CURLINFO_TOTAL_TIME ,&stat.total_time)))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Error getting CURLINFO_TOTAL_TIME [%s]",
+					curl_easy_strerror(err));
+				lastfailedstep = httpstep.no;
+			}
 		}
 
-		process_step_data(httptest, &httpstep, &stat);
-
+		if(0 == lastfailedstep)
+		{
+			if(CURLE_OK != (err = curl_easy_getinfo(easyhandle,CURLINFO_SPEED_DOWNLOAD ,&stat.speed_download)))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Error getting CURLINFO_SPEED_DOWNLOAD [%s]",
+					curl_easy_strerror(err));
+				lastfailedstep = httpstep.no;
+			}
+		}
 		httptest->time+=stat.total_time;
 
-		if(lastfailedstep > 0)	break;
+		process_step_data(httptest, &httpstep, &stat);
 	}
 	DBfree_result(result);
 
@@ -450,8 +460,6 @@ zabbix_log(LOG_LEVEL_DEBUG, "[%s]", page.data);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End process_httptest(total time:" ZBX_FS_DBL ")",
 		httptest->time);
-
-	return ret;
 }
 
 /******************************************************************************
