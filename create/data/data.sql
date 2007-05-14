@@ -50,6 +50,14 @@ INSERT INTO usrgrp VALUES (4,'Security specialists');
 INSERT INTO usrgrp VALUES (5,'WEB administrators');
 INSERT INTO usrgrp VALUES (6,'Head of IT department');
 INSERT INTO usrgrp VALUES (7,'Zabbix administrators');
+INSERT INTO usrgrp VALUES (8,'Guests');
+
+--
+-- Dumping data for table `users_groups`
+--
+
+INSERT INTO users_groups VALUES (1,1,7);
+INSERT INTO users_groups VALUES (2,2,8);
 
 --
 -- Dumping data for table `rights`
