@@ -28,6 +28,19 @@
 	define('ZBX_VALID_ERROR',	1);
 	define('ZBX_VALID_WARNING',	2);
 
+	function	is_int_range($value)
+	{
+		if( !empty($value) ) foreach(explode(',',$value) as $int_range)
+		{
+			$int_range = explode('-', $int_range);
+			if(count($int_range) > 2) return false;
+			foreach($int_range as $int_val)
+				if( !is_numeric($int_val) )
+					return false;
+		}
+		return true;
+	}
+	
 	function	is_hex_color($value)
 	{
 		return eregi('^[0-9,A-F]{6}$', $value);
@@ -257,6 +270,24 @@
 				foreach(explode('-', $el) as $p)
 					$err |= check_type($field, $flags, $p, T_ZBX_INT);
 			return $err;
+		}
+
+		if($type == T_ZBX_INT_RANGE)
+		{
+			if( !is_int_range($var) )
+			{
+				if($flags&P_SYS)
+				{
+					info("Critical error. Field [".$field."] is not integer range");
+					return ZBX_VALID_ERROR;
+				}
+				else
+				{
+					info("Warning. Field [".$field."] is not integer range");
+					return ZBX_VALID_WARNING;
+				}
+			}
+			return ZBX_VALID_OK;
 		}
 		
 		if(($type == T_ZBX_INT) && !is_numeric($var)) {
