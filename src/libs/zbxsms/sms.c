@@ -73,7 +73,6 @@ static int read_gsm(int fd, const char *expect, char *error, int max_error_len)
 	}
 	/* nul terminate the string and see if we got an OK response */
 	*ebuf = '\0';
-SDI2("BUFFER: [%s]", sbuf);
 
 	if( '\0' == *expect ) /* empty */
 	{
