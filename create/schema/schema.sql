@@ -101,6 +101,7 @@ FIELD		|url		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|timeout	|t_integer	|'30'	|NOT NULL	|ZBX_SYNC
 FIELD		|posts		|t_blob		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|required	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|status_codes	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 INDEX		|httpstep_1	|httptestid
 
 TABLE|httpstepitem|httpstepitemid|ZBX_SYNC
