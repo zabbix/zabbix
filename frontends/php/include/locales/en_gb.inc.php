@@ -100,6 +100,7 @@
 	'S_STATE'=>				'State',
 
 //	httpconf.php
+	'S_STATUS_CODES'=>			'Status codes',
 	'S_WEB'=>				'Web',
 	'S_CONFIGURATION_OF_WEB_MONITORING'=>	'Configuration of Web monitoring',
 	'S_CONFIGURATION_OF_WEB_MONITORING_BIG'=>'CONFIGURATION OF WEB MONITORING',

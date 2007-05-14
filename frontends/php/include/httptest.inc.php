@@ -45,7 +45,7 @@
 		return $status;
 	}
 
-	function	db_save_step($hostid, $applicationid, $httptestid, $testname, $name, $no, $timeout, $url, $posts, $required, $delay, $history, $trends)
+	function	db_save_step($hostid, $applicationid, $httptestid, $testname, $name, $no, $timeout, $url, $posts, $required, $status_codes, $delay, $history, $trends)
 	{
 		if (!eregi('^([0-9a-zA-Z\_\.[.-.]\$ ]+)$', $name)) 
 		{
@@ -59,10 +59,10 @@
 			$httpstepid = get_dbid("httpstep","httpstepid");
 			
 			if (!DBexecute('insert into httpstep'.
-				' (httpstepid, httptestid, name, no, url, timeout, posts, required) '.
+				' (httpstepid, httptestid, name, no, url, timeout, posts, required, status_codes) '.
 				' values ('.$httpstepid.','.$httptestid.','.zbx_dbstr($name).','.$no.','.
 				zbx_dbstr($url).','.$timeout.','.
-				zbx_dbstr($posts).','.zbx_dbstr($required).')'
+				zbx_dbstr($posts).','.zbx_dbstr($required).','.zbx_dbstr($status_codes).')'
 				)) return false;
 		}
 		else
@@ -71,7 +71,7 @@
 
 			if (!DBexecute('update httpstep set '.
 				' name='.zbx_dbstr($name).', no='.$no.', url='.zbx_dbstr($url).', timeout='.$timeout.','.
-				' posts='.zbx_dbstr($posts).', required='.zbx_dbstr($required).
+				' posts='.zbx_dbstr($posts).', required='.zbx_dbstr($required).', status_codes='.zbx_dbstr($status_codes).
 				' where httpstepid='.$httpstepid)) return false;
 		}
 
@@ -207,10 +207,11 @@
 				if(!isset($s['timeout']))	$s['timeout'] = 15;
 				if(!isset($s['url']))       	$s['url'] = '';
 				if(!isset($s['posts']))       	$s['posts'] = '';
-				if(!isset($s['required']))       $s['required'] = '';
+				if(!isset($s['required']))      $s['required'] = '';
+				if(!isset($s['status_codes']))  $s['status_codes'] = '';
 			
 				$result = db_save_step($hostid, $applicationid, $httptestid,
-						$name, $s['name'], $sid, $s['timeout'], $s['url'], $s['posts'], $s['required'],
+						$name, $s['name'], $sid, $s['timeout'], $s['url'], $s['posts'], $s['required'],$s['status_codes'],
 						$delay, $history, $trends);
 				
 				if(!$result) break;
