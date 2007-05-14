@@ -1,6 +1,7 @@
 Changes for 1.3.8:
 
- - setted DENY permission as default for ZABBIX users (Eugene)
+ - new column httpstep.status_codes (Alexei)
+ - set DENY permission as default for ZABBIX users (Eugene)
  - fixed Error in "Cancel" after ack of a trigger (Eugene)
  - fixed index.php looping on db connection failing (Eugene)
  - button "Update" renamed to "Refresh" in data export (Alexei)
