@@ -719,7 +719,7 @@
 
 COpt::profiling_start('prepare data');
 		$result = DBselect('select distinct h.hostid, h.host,i.itemid, i.key_, i.value_type, i.lastvalue, i.units, '.
-			' i.description, t.priority, i.valuemapid, t.value as tr_value'.
+			' i.description, t.priority, i.valuemapid, t.value as tr_value, t.triggerid '.
 			' from hosts h,items i left join  functions f on f.itemid=i.itemid left join triggers t on t.triggerid=f.triggerid '.
 			$group_where.
 			' h.hostid in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, $nodeid).') '.
@@ -739,7 +739,8 @@ COpt::profiling_start('prepare data');
 				'description'	=> $row['description'],
 				'valuemapid'    => $row['valuemapid'],
 				'severity'	=> $row['priority'],
-				'tr_value'	=> $row['tr_value']
+				'tr_value'	=> $row['tr_value'],
+				'triggerid'	=> $row['triggerid']
 				);
 		}
 		if(!isset($hosts))
@@ -766,10 +767,18 @@ COpt::profiling_start('prepare table');
 				unset($it_ov_menu);
 
 				$value = '-';
+				$ack = null;
 				if(isset($ithosts[$hostname]))
 				{
 					if($ithosts[$hostname]['tr_value'] == TRIGGER_VALUE_TRUE)
+					{
 						$css_class = get_severity_style($ithosts[$hostname]['severity']);
+						$ack = get_last_event_by_triggerid($ithosts[$hostname]['triggerid']);
+						if ( 1 == $ack['acknowledged'] )
+							$ack = array(SPACE, new CImg('images/general/tick.png','ack'));
+						else
+							$ack = null;
+					}
 					
 					$value = format_lastvalue($ithosts[$hostname]);
 
@@ -803,7 +812,7 @@ COpt::profiling_start('prepare table');
 				}
 
 				if($value == '-')	$css_class = 'center';
-				$value_col = new CCol($value,$css_class);
+				$value_col = new CCol(array($value,$ack),$css_class);
 
 				if(isset($it_ov_menu))
 				{

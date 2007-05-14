@@ -20,6 +20,7 @@
 ?>
 <?php
 	require_once "maps.inc.php";
+	require_once "acknow.inc.php";
 
 	function	get_severity_style($severity)
 	{
@@ -1288,12 +1289,22 @@ define('ZBX_SIMPLE_EXPRESSION_PARAMETER_ID', 4);
 				$css_class = NULL;
 
 				unset($tr_ov_menu);
+				$ack = null;
 				if(isset($trhosts[$hostname]))
 				{
+					unset($ack_menu);
 					switch($trhosts[$hostname]['value'])
 					{
 						case TRIGGER_VALUE_TRUE:
 							$css_class = get_severity_style($trhosts[$hostname]['priority']);
+							if( ($ack = get_last_event_by_triggerid($trhosts[$hostname]['triggerid'])) )
+								$ack_menu = array(S_ACKNOWLEDGE, 'acknow.php?eventid='.$ack['eventid'], array('tw'=>'_blank'));
+
+							if ( 1 == $ack['acknowledged'] )
+								$ack = new CImg('images/general/tick.png','ack');
+							else
+								$ack = null;
+
 							break;
 						case TRIGGER_VALUE_FALSE:
 							$css_class = 'normal';
@@ -1321,6 +1332,8 @@ define('ZBX_SIMPLE_EXPRESSION_PARAMETER_ID', 4);
 							),
 						array(S_EVENTS, 'tr_events.php?triggerid='.$trhosts[$hostname]['triggerid'], array('tw'=>'_blank'))
 						);
+
+					if(isset($ack_menu)) $tr_ov_menu[] = $ack_menu;
 
 					$db_items = DBselect('select distinct i.itemid, i.description, i.key_, i.value_type '.
 						' from items i, functions f '.
@@ -1370,7 +1383,7 @@ define('ZBX_SIMPLE_EXPRESSION_PARAMETER_ID', 4);
 					unset($item_menu);
 				}
 
-				$status_col = new CCol(SPACE,$css_class);
+				$status_col = new CCol(array(SPACE, $ack),$css_class);
 				if(isset($style))
 				{
 					$status_col->AddOption('style', $style);
