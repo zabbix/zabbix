@@ -6,7 +6,7 @@ CREATE TABLE httptest (
 	nextcheck		integer		DEFAULT '0'	NOT NULL,
 	curstate		integer		DEFAULT '0'	NOT NULL,
 	curstep		integer		DEFAULT '0'	NOT NULL,
-	lastfailedstep		bigint unsigned		DEFAULT '0'	NOT NULL,
+	lastfailedstep		integer	DEFAULT '0'	NOT NULL,
 	delay		integer		DEFAULT '60'	NOT NULL,
 	status		integer		DEFAULT '0'	NOT NULL,
 	macros		blob		DEFAULT ''	NOT NULL,
