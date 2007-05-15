@@ -427,24 +427,24 @@
 			$this->drawSmallRectangle();
 			for($i=1;$i<=5;$i++)
 			{
-				DashedLine($this->im,$this->shiftXleft,$i*$this->sizeY/6+$this->shiftY,$this->sizeX+$this->shiftXleft,$i*$this->sizeY/6+$this->shiftY,$this->GetColor("Gray"));
+				DashedLine($this->im,$this->shiftXleft,$i*($this->sizeY/6)+$this->shiftY,$this->sizeX+$this->shiftXleft,$i*($this->sizeY/6)+$this->shiftY,$this->GetColor("Gray"));
 			}
 		
 			for($i=1;$i<=23;$i++)
 			{
-				DashedLine($this->im,$i*$this->sizeX/24+$this->shiftXleft,$this->shiftY,$i*$this->sizeX/24+$this->shiftXleft,$this->sizeY+$this->shiftY,$this->GetColor("Gray"));
+				DashedLine($this->im,$i*($this->sizeX/24)+$this->shiftXleft,$this->shiftY,$i*($this->sizeX/24)+$this->shiftXleft,$this->sizeY+$this->shiftY,$this->GetColor("Gray"));
 			}
 
 			$old_day=-1;
 			for($i=0;$i<=24;$i++)
 			{
-				ImageStringUp($this->im, 1,$i*$this->sizeX/24+$this->shiftXleft-3, $this->sizeY+$this->shiftY+57, date("      H:i",$this->from_time+$i*$this->period/24) , $this->GetColor("Black No Alpha"));
+				ImageStringUp($this->im, 1,$i*($this->sizeX/24)+$this->shiftXleft-3, $this->sizeY+$this->shiftY+57, date("      H:i",$this->from_time+$i*($this->period/24)) , $this->GetColor("Black No Alpha"));
 
-				$new_day=date("d",$this->from_time+$i*$this->period/24);
+				$new_day=date("d",$this->from_time+$i*($this->period/24));
 				if( ($old_day != $new_day) ||($i==24))
 				{
 					$old_day=$new_day;
-					ImageStringUp($this->im, 1,$i*$this->sizeX/24+$this->shiftXleft-3, $this->sizeY+$this->shiftY+57, date("m.d H:i",$this->from_time+$i*$this->period/24) , $this->GetColor("Dark Red No Alpha"));
+					ImageStringUp($this->im, 1,$i*($this->sizeX/24)+$this->shiftXleft-3, $this->sizeY+$this->shiftY+57, date("m.d H:i",$this->from_time+$i*($this->period/24)) , $this->GetColor("Dark Red No Alpha"));
 
 				}
 			}
@@ -718,14 +718,14 @@
 			$x1 = $from + $this->shiftXleft - 1;
 			$x2 = $to + $this->shiftXleft;
 
-			$y1min = $this->sizeY - ($this->sizeY*($min_from-$minY)/($maxY-$minY)) + $this->shiftY;
-			$y2min = $this->sizeY - ($this->sizeY*($min_to-$minY)/($maxY-$minY)) + $this->shiftY;
+			$y1min = $this->sizeY - ($this->sizeY*(($min_from-$minY)/($maxY-$minY))) + $this->shiftY;
+			$y2min = $this->sizeY - ($this->sizeY*(($min_to-$minY)/($maxY-$minY))) + $this->shiftY;
 
-			$y1max = $this->sizeY - ($this->sizeY*($max_from-$minY)/($maxY-$minY)) + $this->shiftY;
-			$y2max = $this->sizeY - ($this->sizeY*($max_to-$minY)/($maxY-$minY)) + $this->shiftY;
+			$y1max = $this->sizeY - ($this->sizeY*(($max_from-$minY)/($maxY-$minY))) + $this->shiftY;
+			$y2max = $this->sizeY - ($this->sizeY*(($max_to-$minY)/($maxY-$minY))) + $this->shiftY;
 
-			$y1avg = $this->sizeY - ($this->sizeY*($avg_from-$minY)/($maxY-$minY)) + $this->shiftY;
-			$y2avg = $this->sizeY - ($this->sizeY*($avg_to-$minY)/($maxY-$minY)) + $this->shiftY;
+			$y1avg = $this->sizeY - ($this->sizeY*(($avg_from-$minY)/($maxY-$minY))) + $this->shiftY;
+			$y2avg = $this->sizeY - ($this->sizeY*(($avg_to-$minY)/($maxY-$minY))) + $this->shiftY;
 
 			switch($calc_fnc)
 			{
@@ -764,8 +764,8 @@
 
 			}
 
-			$y1_shift	= $this->sizeY - ($this->sizeY*$shift_from/($maxY-$minY)) + $this->shiftY;
-			$y2_shift	= $this->sizeY - ($this->sizeY*$shift_to/($maxY-$minY)) + $this->shiftY;
+			$y1_shift	= $this->sizeY - ($this->sizeY*($shift_from/($maxY-$minY))) + $this->shiftY;
+			$y2_shift	= $this->sizeY - ($this->sizeY*($shift_to/($maxY-$minY))) + $this->shiftY;
 
 			/* draw main line */
 			switch($drawtype)
@@ -1038,6 +1038,7 @@
 						$curr_data->shift_max[$idx] = 0;
 						$curr_data->shift_avg[$idx] = 0;
 					}
+					unset($row);
 				}
 
 				/* calculate missed points */
