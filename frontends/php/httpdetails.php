@@ -96,38 +96,45 @@ include_once "include/page_header.php";
 		$status['msg'] = S_OK_BIG;
 		$status['style'] = 'enabled';
 
-		if($httptest_data['curstate'] > 0)
+		if( HTTPTEST_STATE_BUSY == $httptest_data['curstate'] )
 		{
-			if($httptest_data['curstate'] == ($httpstep_data['no'] + 1))
+			if($httptest_data['curstep'] == ($httpstep_data['no']))
 			{
 				$status['msg'] = S_IN_PROGRESS;
 				$status['style'] = 'unknown';
 				$status['skip'] = true;
 			}
-			elseif($httptest_data['curstate'] < ($httpstep_data['no'] + 1))
+			elseif($httptest_data['curstep'] < ($httpstep_data['no']))
 			{
 				$status['msg'] = S_UNKNOWN;
 				$status['style'] = 'unknown';
 				$status['skip'] = true;
 			}
 		}
-		else
+		else if( HTTPTEST_STATE_IDLE == $httptest_data['curstate'] )
 		{
-			if($httptest_data['lastfailedstep'] > 0)
+			if($httptest_data['lastfailedstep'] != 0)
 			{
-				if($httptest_data['lastfailedstep'] == ($httpstep_data['no'] + 1))
+				if($httptest_data['lastfailedstep'] == ($httpstep_data['no']))
 				{
 					$status['msg'] = S_FAIL.' - '.S_ERROR.': '.$httptest_data['error'];
 					$status['style'] = 'disabled';
-					$status['skip'] = true;
+					//$status['skip'] = true;
 				}
-				else if($httptest_data['lastfailedstep'] < ($httpstep_data['no'] + 1))
+				else if($httptest_data['lastfailedstep'] < ($httpstep_data['no']))
 				{
 					$status['msg'] = S_UNKNOWN;
 					$status['style'] = 'unknown';
 					$status['skip'] = true;
 				}
 			}
+
+		}
+		else
+		{
+			$status['msg'] = S_UNKNOWN;
+			$status['style'] = 'unknown';
+			$status['skip'] = true;
 		}
 
 		$db_items = DBselect('select i.*, hi.type as httpitem_type from items i, httpstepitem hi '.
@@ -166,9 +173,14 @@ include_once "include/page_header.php";
 	$status['msg'] = S_OK_BIG;
 	$status['style'] = 'enabled';
 
-	if($httptest_data['curstate'] > 0)
+	if( HTTPTEST_STATE_BUSY == $httptest_data['curstate'] )
 	{
 		$status['msg'] = S_IN_PROGRESS;
+		$status['style'] = 'unknown';
+	}
+	else if ( HTTPTEST_STATE_UNKNOWN == $httptest_data['curstate'] )
+	{
+		$status['msg'] = S_UNKNOWN;
 		$status['style'] = 'unknown';
 	}
 	else if($httptest_data['lastfailedstep'] > 0)
