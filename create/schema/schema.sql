@@ -83,7 +83,7 @@ FIELD		|lastcheck	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|nextcheck	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|curstate	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|curstep	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|lastfailedstep	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|lastfailedstep	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|delay		|t_integer	|'60'	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|macros		|t_blob		|''	|NOT NULL	|ZBX_SYNC
