@@ -70,6 +70,8 @@ include_once "include/page_header.php";
 
 	$graph->SetHeader($host["host"].":".get_request("name",""));
 
+	unset($host, $denyed_hosts);
+
 	if(isset($_REQUEST["period"]))		$graph->SetPeriod($_REQUEST["period"]);
 	if(isset($_REQUEST["from"]))		$graph->SetFrom($_REQUEST["from"]);
 	if(isset($_REQUEST["stime"]))		$graph->SetSTime($_REQUEST["stime"]);
@@ -84,7 +86,7 @@ include_once "include/page_header.php";
 	$graph->SetYAxisMin(get_request("yaxismin"		,0.00));
 	$graph->SetYAxisMax(get_request("yaxismax"		,100.00));
 
-	foreach($items as $gitem)
+	foreach($items as $id => $gitem)
 	{
 		$graph->AddItem(
 			$gitem["itemid"],
@@ -95,6 +97,8 @@ include_once "include/page_header.php";
 			$gitem["type"],
 			$gitem["periods_cnt"]
 			);
+
+		unset($items[$id]);
 	}
 	$graph->Draw();
 ?>

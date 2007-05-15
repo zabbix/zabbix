@@ -47,6 +47,12 @@
 
 	function	db_save_step($hostid, $applicationid, $httptestid, $testname, $name, $no, $timeout, $url, $posts, $required, $status_codes, $delay, $history, $trends)
 	{
+		if( $no <= 0 )
+		{
+			error('Scenario step number can\'t be less then 1');
+			return false;
+		}
+
 		if (!eregi('^([0-9a-zA-Z\_\.[.-.]\$ ]+)$', $name)) 
 		{
 			error("Scenario step name should contain '0-9a-zA-Z_ .$'- characters only");
@@ -175,7 +181,8 @@
 		{
 			$result = DBexecute('update httptest set '.
 				' applicationid='.$applicationid.', name='.zbx_dbstr($name).', delay='.$delay.','.
-				' status='.$status.', agent='.zbx_dbstr($agent).', macros='.zbx_dbstr($macros).
+				' status='.$status.', agent='.zbx_dbstr($agent).', macros='.zbx_dbstr($macros).','.
+				' error='.zbx_dbstr('').', curstate='.HTTPTEST_STATE_UNKNOWN.
 				' where httptestid='.$httptestid);
 		}
 		else
@@ -190,9 +197,9 @@
 			}
 			
 			$result = DBexecute('insert into httptest'.
-				' (httptestid, applicationid, name, delay, status, agent, macros) '.
+				' (httptestid, applicationid, name, delay, status, agent, macros, curstate) '.
 				' values ('.$httptestid.','.$applicationid.','.zbx_dbstr($name).','.
-				$delay.','.$status.','.zbx_dbstr($agent).','.zbx_dbstr($macros).')'
+				$delay.','.$status.','.zbx_dbstr($agent).','.zbx_dbstr($macros).','.HTTPTEST_STATE_UNKNOWN.')'
 				);
 
 			$test_added = true;
@@ -211,7 +218,7 @@
 				if(!isset($s['status_codes']))  $s['status_codes'] = '';
 			
 				$result = db_save_step($hostid, $applicationid, $httptestid,
-						$name, $s['name'], $sid, $s['timeout'], $s['url'], $s['posts'], $s['required'],$s['status_codes'],
+						$name, $s['name'], $sid+1, $s['timeout'], $s['url'], $s['posts'], $s['required'],$s['status_codes'],
 						$delay, $history, $trends);
 				
 				if(!$result) break;

@@ -1,5 +1,6 @@
 Changes for 1.3.8:
 
+ - finished WEB monitoring (Eugene)
  - changed type of httptest.lastfailedstep to integer (Alexei)
  - added check for a list of status codes for WEB monitoring (Alexei)
  - added acknowledge mangement for overview screen (Eugene)

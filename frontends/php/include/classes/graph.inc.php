@@ -239,7 +239,7 @@
 
 		function ShowTriggers($value)
 		{
-			$this->m_showTriggers = $value == 1 ? 1 : 0;;
+			$this->m_showTriggers = $value == 1 ? 1 : 0;
 		}
 	
 		function AddItem($itemid, $axis=GRAPH_YAXIS_SIDE_RIGHT, $calc_fnc=CALC_FNC_AVG,
@@ -306,6 +306,7 @@
 		{
 // Avoid sizeX==0, to prevent division by zero later
 			if($value <= 0) $value = NULL;
+			if($value > 1300) $value = 1300;
 			if(is_null($value)) $value = 900;
 
 			$this->sizeX = $value;
@@ -1218,7 +1219,7 @@
 
 			$this->fullSizeX = $this->sizeX+$this->shiftXleft+$this->shiftXright+1;
 			$this->fullSizeY = $this->sizeY+$this->shiftY+62+12*($this->num+ (($this->sizeY < 120) ? 0 : count($this->triggers)))+8;
-		
+
 			if(function_exists("ImageColorExactAlpha")&&function_exists("ImageCreateTrueColor")&&@imagecreatetruecolor(1,1))
 				$this->im = ImageCreateTrueColor($this->fullSizeX,$this->fullSizeY);
 			else
@@ -1324,8 +1325,9 @@
 			$str=sprintf("%0.2f",($end_time-$start_time));
 			ImageString($this->im, 0,$this->fullSizeX-120,$this->fullSizeY-12,"Generated in $str sec", $this->GetColor("Gray"));
 
+			unset($this->items, $this->data);
+
 			ImageOut($this->im); 
-			ImageDestroy($this->im); 
 		}
 	}
 ?>

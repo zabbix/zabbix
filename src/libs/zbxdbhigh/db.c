@@ -1422,13 +1422,10 @@ char*	DBdyn_escape_string(const char *str)
 	char *str_esc = NULL;
 
 	int	str_esc_len;
-	
-	assert(str);
 
-	str_esc_len = strlen(str)+1;
-
-	for(i=0; str[i]; i++)
+	for(i=0; str && str[i]; i++)
 	{
+		str_esc_len++;
 		if(	( str[i] == '\'' ) 
 #ifndef	HAVE_ORACLE
 			|| ( str[i] == '\\' )
@@ -1438,6 +1435,7 @@ char*	DBdyn_escape_string(const char *str)
 			str_esc_len++;
 		}
 	}
+	str_esc_len++;
 
 	str_esc = zbx_malloc(str_esc_len);
 

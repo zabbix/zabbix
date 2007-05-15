@@ -198,21 +198,21 @@ include_once "include/page_header.php";
 			else
 				$lastcheck = new CCol('-', 'center');
 
-			if($httptest_data['curstate'] > 0)
+			if( HTTPTEST_STATE_BUSY == $httptest_data['curstate'] )
 			{
-				$step_data = get_httpstep_by_no($httptest_data['httptestid'], $httptest_data['curstate'] - 1);
-				$state = S_IN_CHECK.' "'.$step_data['name'].'" ['.$httptest_data['curstate'].' '.S_OF_SMALL.' '.$step_cout.']';
+				$step_data = get_httpstep_by_no($httptest_data['httptestid'], $httptest_data['curstep']);
+				$state = S_IN_CHECK.' "'.$step_data['name'].'" ['.$httptest_data['curstep'].' '.S_OF_SMALL.' '.$step_cout.']';
 
 				$status['msg'] = S_IN_PROGRESS;
 				$status['style'] = 'unknown';
 			}
-			else
+			else if( HTTPTEST_STATE_IDLE == $httptest_data['curstate'] )
 			{
 				$state = S_IDLE_TILL." ".date(S_DATE_FORMAT_YMDHMS,$httptest_data['nextcheck']);
 
 				if($httptest_data['lastfailedstep'] > 0)
 				{
-					$step_data = get_httpstep_by_no($httptest_data['httptestid'], $httptest_data['lastfailedstep'] - 1);
+					$step_data = get_httpstep_by_no($httptest_data['httptestid'], $httptest_data['lastfailedstep']);
 					$status['msg'] = S_FAILED_ON.' "'.$step_data['name'].'" '.
 						'['.$httptest_data['lastfailedstep'].' '.S_OF_SMALL.' '.$step_cout.'] '.
 						' '.S_ERROR.': '.$httptest_data['error'];
@@ -223,6 +223,12 @@ include_once "include/page_header.php";
 					$status['msg'] = S_OK_BIG;
 					$status['style'] = 'enabled';
 				}
+			}
+			else
+			{
+				$state = S_IDLE_TILL." ".date(S_DATE_FORMAT_YMDHMS,$httptest_data['nextcheck']);
+				$status['msg'] = S_UNKNOWN;
+				$status['style'] = 'unknown';
 			}
 
 			array_push($app_rows, new CRow(array(
