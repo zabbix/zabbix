@@ -21,61 +21,76 @@
 #include "log.h"
 #include "base64.h"
 
-int	comms_create_request(const char *host, const char *key, const char *data, const char *lastlogsize,
-		const char *timestamp, const char *source, const char *severity, char *request, int maxlen)
+/******************************************************************************
+ *                                                                            *
+ * Function: comms_create_request                                             *
+ *                                                                            *
+ * Purpose: dinamical xml request generation                                  *
+ *                                                                            *
+ * Return value: XML request                                                  *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:  required free allocated string with function 'zbx_free'         *
+ *                                                                            *
+ ******************************************************************************/
+char*	comms_create_request(
+	const char		*host,
+	const char		*key,
+	const char		*data,
+	long			*lastlogsize,
+	unsigned long	*timestamp,
+	const char		*source,
+	unsigned short	*severity
+	)
 {
-	int ret = SUCCEED;
-	char host_b64[MAX_STRING_LEN];
-	char key_b64[MAX_STRING_LEN];
+#define ADD_XML_DATA(tag_name, var) \
+	data_b64[0] = '\0'; \
+	str_base64_encode(var, data_b64, (int)strlen(var)); \
+	request = zbx_strdcatf(request, "<" tag_name ">%s</" tag_name ">",	data_b64)
+
 	char data_b64[ZBX_MAX_B64_LEN];
-	char lastlogsize_b64[MAX_STRING_LEN];
-	char timestamp_b64[MAX_STRING_LEN];
-	char source_b64[MAX_STRING_LEN];
-	char severity_b64[MAX_STRING_LEN];
+	char *tmp_str = NULL;
+	char *request = NULL;
+	
+	assert(host);
+	assert(key);
+	assert(data);
 
-	assert(request);
+	/* zabbix_log(LOG_LEVEL_DEBUG, "comms_create_request host [%s] key [%s] data [%s]",host,key,data); */
 
-	memset(request,0,maxlen);
-	memset(host_b64,0,sizeof(host_b64));
-	memset(key_b64,0,sizeof(key_b64));
 	memset(data_b64,0,sizeof(data_b64));
-	memset(lastlogsize_b64,0,sizeof(lastlogsize_b64));
-	memset(timestamp_b64,0,sizeof(timestamp_b64));
-	memset(source_b64,0,sizeof(source_b64));
-	memset(severity_b64,0,sizeof(severity_b64));
 
-	str_base64_encode(host, host_b64, (int)strlen(host));
-	str_base64_encode(key, key_b64, (int)strlen(key));
-	str_base64_encode(data, data_b64, (int)strlen(data));
+	request = zbx_dsprintf(NULL,"%s", "<req>");
 	
-	if(lastlogsize && lastlogsize[0])	str_base64_encode(lastlogsize, lastlogsize_b64, (int)strlen(lastlogsize));
-	if(timestamp && timestamp[0])		str_base64_encode(timestamp, timestamp_b64, (int)strlen(timestamp));
-	if(source && source[0])			str_base64_encode(source, source_b64, (int)strlen(source));
-	if(severity && severity[0])		str_base64_encode(severity, severity_b64, (int)strlen(severity));
-	
-/*	fprintf(stderr, "Data Base64 [%s]\n", data_b64);*/
+	ADD_XML_DATA("host",	host);
+	ADD_XML_DATA("key",		key);
+	ADD_XML_DATA("data",	data);
 
-	if( !lastlogsize || !lastlogsize[0] )
+	if(lastlogsize)
 	{
-		zbx_snprintf(request,maxlen,"<req><host>%s</host><key>%s</key><data>%s</data></req>",host_b64,key_b64,data_b64);
+		tmp_str = zbx_dsprintf(NULL, "%li", *lastlogsize);
+		ADD_XML_DATA("lastlogsize",	tmp_str);
+		zbx_free(tmp_str);
+	}
+
+	if(timestamp)
+	{
+		assert(source);
+		assert(severity);
 		
-	}
-	else
-	{
-		if( !timestamp || !timestamp[0] )
-		{
-			zbx_snprintf(request,maxlen,"<req><host>%s</host><key>%s</key><data>%s</data><lastlogsize>%s</lastlogsize></req>",
-				host_b64,key_b64,data_b64,lastlogsize_b64);
-		}
-		else
-		{
-			zbx_snprintf(request,maxlen,"<req><host>%s</host><key>%s</key><data>%s</data><lastlogsize>%s</lastlogsize><timestamp>%s</timestamp><source>%s</source><severity>%s</severity></req>",
-				host_b64,key_b64,data_b64,lastlogsize_b64,timestamp_b64,source_b64,severity_b64);
-		}
-	}
-/*	fprintf(stderr, "Max [%d] Result [%s][%d]\n", maxlen , request, strlen(request));*/
+		tmp_str = zbx_dsprintf(NULL, "%lu", *timestamp);
+		ADD_XML_DATA("timestamp",	tmp_str);
+		zbx_free(tmp_str);
 
-	return ret;
+		ADD_XML_DATA("source",		source);
+
+		tmp_str = zbx_dsprintf(NULL, "%u", *severity);
+		ADD_XML_DATA("severity",	tmp_str);
+		zbx_free(tmp_str);
+	}
+
+	return zbx_strdcat(request, "</req>");
 }
 
 int	comms_parse_response(char *xml,char *host,char *key, char *data, char *lastlogsize, char *timestamp,

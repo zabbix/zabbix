@@ -327,26 +327,31 @@ static int	send_value(
 		const char		*hostname,
 		const char		*key,
 		const char		*value,
-		const char		*lastlogsize,
-		const char		*timestamp,
+		long			*lastlogsize,
+		unsigned long	*timestamp,
 		const char		*source, 
-		const char		*severity
+		unsigned short	*severity
 	)
 {
 	zbx_sock_t	s;
 
 	char
-		*buf,
-		request[MAX_BUF_LEN];
+		*buf = NULL,
+		*request = NULL;
 
 	int		ret;
 
 	if( SUCCEED == (ret = zbx_tcp_connect(&s, host, port)) )
 	{
-		comms_create_request(hostname, key, value, lastlogsize, timestamp, source, severity,  request, sizeof(request));
+		request = comms_create_request(hostname, key, value, lastlogsize, timestamp, source, severity);
+
 		zabbix_log(LOG_LEVEL_DEBUG, "XML before sending [%s]",request);
 
-		if( SUCCEED == (ret = zbx_tcp_send(&s, request)) )
+		ret = zbx_tcp_send(&s, request);
+
+		zbx_free(request);
+
+		if( SUCCEED == ret )
 		{
 			if( SUCCEED == (ret = zbx_tcp_recv(&s, &buf)) )
 			{
@@ -376,13 +381,14 @@ static int	process_active_checks(char *server, unsigned short port)
 {
 	register int	i, count;
 
-	char	value[MAX_STRING_LEN];
-	char	lastlogsize[MAX_STRING_LEN];
-	int	now, ret = SUCCEED;
+	char	**pvalue;
+	char	*value;
 
-	char	timestamp[MAX_STRING_LEN]; /* ATTENTION! eventlog.c [245] contain reference to timestamp with MAX_STRING_LEN */
-	char	source[MAX_STRING_LEN];
-	char	severity[MAX_STRING_LEN]; /* ATTENTION! eventlog.c [252] contain reference to severity with MAX_STRING_LEN */
+	int		now, ret = SUCCEED;
+
+	unsigned long	timestamp;
+	char			*source;
+	unsigned short	severity;
 
 	char	params[MAX_STRING_LEN];
 	char	*filename;
@@ -396,14 +402,10 @@ static int	process_active_checks(char *server, unsigned short port)
 
 	now = (int)time(NULL);
 
-	for(i=0; NULL != active_metrics[i].key; i++)
+	for(i=0; NULL != active_metrics[i].key && SUCCEED == ret; i++)
 	{
 		if(active_metrics[i].nextcheck > now)			continue;
 		if(active_metrics[i].status != ITEM_STATUS_ACTIVE)	continue;
-
-		timestamp[0]=0;
-		source[0]=0;
-		severity[0]=0;
 
 		/* Special processing for log files */
 		if(strncmp(active_metrics[i].key,"log[",4) == 0)
@@ -424,25 +426,35 @@ static int	process_active_checks(char *server, unsigned short port)
 				}
 
 				count = 0;
-				while(process_log(filename,&active_metrics[i].lastlogsize,value) == 0)
+				while( 0 == process_log(filename, &active_metrics[i].lastlogsize, &value) )
 				{
 					if(!pattern || zbx_regexp_match(value, pattern, NULL) != NULL)
 					{
-						zbx_snprintf(lastlogsize, sizeof(lastlogsize), "%li", active_metrics[i].lastlogsize);
+						ret = send_value(
+									server,
+									port,
+									CONFIG_HOSTNAME,
+									active_metrics[i].key,
+									value,
+									&active_metrics[i].lastlogsize,
+									NULL,
+									NULL,
+									NULL
+								);
 
-						if(send_value(server,port,CONFIG_HOSTNAME,active_metrics[i].key,value,lastlogsize,
-							timestamp,source,severity) == FAIL)
-						{
-							ret = FAIL;
-							break;
-						}
-						if(strcmp(value,"ZBX_NOTSUPPORTED\n")==0)
+						zbx_free(source);
+
+						if( strstr(value,"ZBX_NOTSUPPORTED") )
 						{
 							active_metrics[i].status = ITEM_STATUS_NOTSUPPORTED;
-							zabbix_log( LOG_LEVEL_WARNING, "Active check [%s] is not supported. Disabled.", 
+							zabbix_log( LOG_LEVEL_WARNING, "Active check [%s] is not supported. Disabled.",
 								active_metrics[i].key);
+
+							zbx_free(value);
 							break;
 						}
+
+						zbx_free(value);
 					}
 
 					count++;
@@ -470,64 +482,76 @@ static int	process_active_checks(char *server, unsigned short port)
 				}
 
 				count = 0;
-				while(process_eventlog(filename,&active_metrics[i].lastlogsize, timestamp, source, severity, value) == 0)
+				while( 0 == process_eventlog(filename,&active_metrics[i].lastlogsize, &timestamp, &source, &severity, &value) )
 				{
-					if(!pattern || zbx_regexp_match(value, pattern, NULL) != NULL)
+					if(!pattern || NULL != zbx_regexp_match(value, pattern, NULL) )
 					{
-						zbx_snprintf(lastlogsize, sizeof(lastlogsize), "%li", active_metrics[i].lastlogsize);
 
-						if(send_value(server,port,CONFIG_HOSTNAME,active_metrics[i].key,value,
-								lastlogsize,timestamp,source,severity) == FAIL)
-						{
-							ret = FAIL;
-							break;
-						}
-						if(strcmp(value,"ZBX_NOTSUPPORTED\n")==0)
+						ret = send_value(
+									server,
+									port,
+									CONFIG_HOSTNAME,
+									active_metrics[i].key,
+									value,
+									&active_metrics[i].lastlogsize,
+									&timestamp,
+									source,
+									&severity
+								);
+
+						zbx_free(source);
+
+						if( strstr(value,"ZBX_NOTSUPPORTED") )
 						{
 							active_metrics[i].status = ITEM_STATUS_NOTSUPPORTED;
 							zabbix_log( LOG_LEVEL_WARNING, "Active check [%s] is not supported. Disabled.",
 								active_metrics[i].key);
+
+							zbx_free(value);
 							break;
 						}
+
+						zbx_free(value);
 					}
 					count++;
 					/* Do not flood ZABBIX server if file grows too fast */
 					if(count >= (MAX_LINES_PER_SECOND * active_metrics[i].refresh))	break;
 				}
-			}while(0); /* simple try realization */
+			}while(0); /* simple try realization NOTE: never loop */
 		}
 		else
 		{
-			lastlogsize[0]=0;
 			
 			process(active_metrics[i].key, 0, &result);
-			if(result.type & AR_DOUBLE)
-				 zbx_snprintf(value, sizeof(value), ZBX_FS_DBL, result.dbl);
-			else if(result.type & AR_UINT64)
-                                 zbx_snprintf(value, sizeof(value), ZBX_FS_UI64, result.ui64);
-			else if(result.type & AR_STRING)
-                                 zbx_snprintf(value, sizeof(value), "%s", result.str);
-			else if(result.type & AR_TEXT)
-                                 zbx_snprintf(value, sizeof(value), "%s", result.text);
-			else if(result.type & AR_MESSAGE)
-                                 zbx_snprintf(value, sizeof(value), "%s", result.msg);
+
+			if( NULL == (pvalue = GET_TEXT_RESULT(&result)) )
+				pvalue = GET_MSG_RESULT(&result);
+
+			if(pvalue)
+			{
+				zabbix_log( LOG_LEVEL_DEBUG, "For key [%s] received value [%s]", active_metrics[i].key, *pvalue);
+
+				ret = send_value(
+						server,
+						port,
+						CONFIG_HOSTNAME,
+						active_metrics[i].key,
+						*pvalue,
+						NULL,
+						NULL,
+						NULL,
+						NULL
+					);
+				
+				if( strstr(*pvalue,"ZBX_NOTSUPPORTED") )
+				{
+					active_metrics[i].status = ITEM_STATUS_NOTSUPPORTED;
+					zabbix_log( LOG_LEVEL_WARNING, "Active check [%s] is not supported. Disabled.", active_metrics[i].key);
+				}
+			}
+
 			free_result(&result);
-
-			zabbix_log( LOG_LEVEL_DEBUG, "For key [%s] received value [%s]", active_metrics[i].key, value);
-
-			if(send_value(server,port,CONFIG_HOSTNAME,active_metrics[i].key,value,lastlogsize,timestamp,source,severity) == FAIL)
-			{
-				ret = FAIL;
-				break;
-			}
-
-			if(strcmp(value,"ZBX_NOTSUPPORTED\n")==0)
-			{
-				active_metrics[i].status=ITEM_STATUS_NOTSUPPORTED;
-				zabbix_log( LOG_LEVEL_WARNING, "Active check [%s] is not supported. Disabled.", active_metrics[i].key);
-			}
 		}
-
 		active_metrics[i].nextcheck = (int)time(NULL)+active_metrics[i].refresh;
 	}
 	return ret;

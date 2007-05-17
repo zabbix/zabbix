@@ -20,12 +20,12 @@
 #ifndef ZABBIX_EVENTLOG_H
 #define ZABBIX_EVENTLOG_H
 
-int	process_eventlog(
-		char *source,
-		long *lastlogsize, 
-		char *timestamp, 
-		char *src, 
-		char *severity,
-		char *message);
+int process_eventlog(
+	const char		*source,
+	long			*lastlogsize, 
+	unsigned long	*out_timestamp, 
+	char			**out_source, 
+	unsigned short	*out_severity,
+	char			**out_message);
 
 #endif /* ZABBIX_EVENTLOG_H */

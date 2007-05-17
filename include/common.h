@@ -73,7 +73,7 @@
 #define OFF	0
 
 #define	APPLICATION_NAME	"ZABBIX Agent"
-#define	ZABBIX_REVDATE		"10 May 2007"
+#define	ZABBIX_REVDATE		"17 May 2007"
 #define	ZABBIX_VERSION		"1.3.8"
 
 #if defined(_WINDOWS)
@@ -503,8 +503,17 @@ char* zbx_strdcatf(char *dest, const char *f, ...);
 int	replace_param(const char *cmd, const char *param, char *out, int outlen);
 
 int	xml_get_data(char *xml,char *tag, char *data, int maxlen);
-int	comms_create_request(const char *host, const char *key, const char *data, const char *lastlogsize,
-		const char *timestamp, const char *source, const char *severity, char *request,int maxlen);
+
+char*	comms_create_request(
+	const char		*host,
+	const char		*key,
+	const char		*data,
+	long			*lastlogsize,
+	unsigned long	*timestamp,
+	const char		*source,
+	unsigned short	*severity
+	);
+
 int	comms_parse_response(char *xml,char *host,char *key, char *data, char *lastlogsize, char *timestamp,
 	       char *source, char *severity, int maxlen);
 
