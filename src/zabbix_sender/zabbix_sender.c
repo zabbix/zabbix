@@ -144,7 +144,7 @@ static ZBX_THREAD_ENTRY(send_value, args)
 {
 	ZBX_THREAD_SENDVAL_ARGS *sentdval_args;
 
-	char	tosend[MAX_STRING_LEN];
+	char	*tosend = NULL;
 
 	zbx_sock_t	sock;
 
@@ -155,7 +155,6 @@ static ZBX_THREAD_ENTRY(send_value, args)
 	assert(args);
 
 	sentdval_args = ((ZBX_THREAD_SENDVAL_ARGS *)args);
-
 
 	zabbix_log( LOG_LEVEL_DEBUG, "Send to: '%s:%i' As: '%s' Key: '%s' Value: '%s'", 
 		sentdval_args->server,
@@ -178,12 +177,16 @@ static ZBX_THREAD_ENTRY(send_value, args)
 
 	if( SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, sentdval_args->server, sentdval_args->port)) )
 	{
-		comms_create_request(sentdval_args->hostname, sentdval_args->key, sentdval_args->key_value,
-			NULL, NULL, NULL, NULL, tosend, sizeof(tosend)-1);
+		tosend = comms_create_request(sentdval_args->hostname, sentdval_args->key, sentdval_args->key_value,
+			NULL, NULL, NULL, NULL);
 
 		zabbix_log( LOG_LEVEL_DEBUG, "Send data: '%s'", tosend);
 
-		if( SUCCEED == (tcp_ret = zbx_tcp_send(&sock, tosend)) )
+		tcp_ret = zbx_tcp_send(&sock, tosend);
+
+		zbx_free(tosend);
+
+		if( SUCCEED == tcp_ret )
 		{
 			if( SUCCEED == (tcp_ret = zbx_tcp_recv(&sock, &answer)) )
 			{
@@ -197,6 +200,7 @@ static ZBX_THREAD_ENTRY(send_value, args)
 				}
 			}
 		}
+
 	}
 	zbx_tcp_close(&sock);
 

@@ -1,5 +1,7 @@
 Changes for 1.3.8:
 
+ - fixed active check communication (Eugene)
+ - fixed eventlog (Eugene)
  - same step color for both graphs in Monitoring->WEB (Alexei)
  - support of more flexible trigger function count(period,value) (Alexei)
  - finished WEB monitoring (Eugene)

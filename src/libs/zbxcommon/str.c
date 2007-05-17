@@ -886,6 +886,20 @@ char* zbx_strdcat(char *dest, const char *src)
 	return new_dest;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_strdcat                                                      *
+ *                                                                            *
+ * Purpose: dinamical cating of formated strings                              *
+ *                                                                            *
+ * Return value: new pointer of string                                        *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:  required free allocated string with function 'zbx_free'         *
+ *            zbx_strdcat(NULL,"") must return "", not NULL!                  *
+ *                                                                            *
+ ******************************************************************************/
 char* zbx_strdcatf(char *dest, const char *f, ...)
 {
 	char *string = NULL;
