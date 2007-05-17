@@ -186,6 +186,7 @@ void str_base64_encode(const char *p_str, char *p_b64str, int in_size)
 		}*/
 	};
 	
+	*p_b64str = '\0';
 	return;
 }
 /*------------------------------------------------------------------------

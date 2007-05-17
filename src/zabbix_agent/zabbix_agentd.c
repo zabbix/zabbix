@@ -384,6 +384,61 @@ int	main(int argc, char **argv)
 }
 
 #else /* ZABBIX_TEST */
+/* #	define ENABLE_CHECK_MEMOTY 1 */
+
+#	if defined(ENABLE_CHECK_MEMOTY)
+#		include "crtdbg.h"
+
+#		define REINIT_CHECK_MEMORY(a) \
+			_CrtMemCheckpoint(& ## a ## oldMemState)
+
+#		define INIT_CHECK_MEMORY(a) \
+			char a ## DumpMessage[0xFFFF]; \
+			_CrtMemState  a ## oldMemState, a ## newMemState, a ## diffMemState; \
+			REINIT_CHECK_MEMORY(a)
+
+#		define CHECK_MEMORY(a, fncname, msg) \
+			_CrtMemCheckpoint(& ## a ## newMemState); \
+			if(_CrtMemDifference(& ## a ## diffMemState, & ## a ## oldMemState, & ## a ## newMemState)) \
+			{ \
+				zbx_snprintf(a ## DumpMessage, sizeof(a ## DumpMessage), \
+					"%s\n" \
+					"free:  %10li bytes in %10li blocks\n" \
+					"normal:%10li bytes in %10li blocks\n" \
+					"CRT:   %10li bytes in %10li blocks\n" \
+					"ignore:%10li bytes in %10li blocks\n" \
+					"client:%10li bytes in %10li blocks\n" \
+					"max:   %10li bytes in %10li blocks", \
+					 \
+					fncname ": (" #a ") Memory changed! (" msg ")\n", \
+					 \
+					(long) a ## diffMemState.lSizes[_FREE_BLOCK], \
+					(long) a ## diffMemState.lCounts[_FREE_BLOCK], \
+					 \
+					(long) a ## diffMemState.lSizes[_NORMAL_BLOCK], \
+					(long) a ## diffMemState.lCounts[_NORMAL_BLOCK], \
+					 \
+					(long) a ## diffMemState.lSizes[_CRT_BLOCK], \
+					(long) a ## diffMemState.lCounts[_CRT_BLOCK], \
+					 \
+					(long) a ## diffMemState.lSizes[_IGNORE_BLOCK], \
+					(long) a ## diffMemState.lCounts[_IGNORE_BLOCK], \
+					 \
+					(long) a ## diffMemState.lSizes[_CLIENT_BLOCK], \
+					(long) a ## diffMemState.lCounts[_CLIENT_BLOCK], \
+					 \
+					(long) a ## diffMemState.lSizes[_MAX_BLOCKS], \
+					(long) a ## diffMemState.lCounts[_MAX_BLOCKS]); \
+				 SDI2("%s", a ## DumpMessage); \
+			} \
+			else \
+			{ \
+				SDI("NO leak"); \
+			}
+#	else
+#		define INIT_CHECK_MEMORY(a) ((void)0)
+#		define CHECK_MEMORY(a, fncname, msg) ((void)0)
+#	endif
 
 #if defined(_WINDOWS)
 #	include "messages.h"
@@ -392,6 +447,60 @@ int	main(int argc, char **argv)
 int main()
 {
 #if ON
+	#include "eventlog.h"
+
+	int i = 0;
+	long			lastlogsize = 0;
+	char			*source = NULL;
+	unsigned short	severity;
+	char			*message;
+	char			*request;
+	unsigned long	timestamp = 111;
+
+	char
+		host_dec[MAX_STRING_LEN],
+		key_dec[MAX_STRING_LEN],
+		value_dec[MAX_STRING_LEN],
+		lastlogsize_dec[MAX_STRING_LEN],
+		timestamp_dec[MAX_STRING_LEN],
+		source_dec[MAX_STRING_LEN],
+		severity_dec[MAX_STRING_LEN];
+
+INIT_CHECK_MEMORY(main);
+
+	while(0 == process_eventlog("system",&lastlogsize,&timestamp,&source,&severity,&message))
+	{
+/*	SDI2("lastlogsize:[%li]", lastlogsize);
+	SDI2("timestamp: [%li]", timestamp);
+	SDI2("source:     [%s]", source);
+	SDI2("severity:   [%u]", severity);
+	SDI2("message:    [%s]", message);*/
+
+	request = comms_create_request("real_host", "key.xxx1", message, &lastlogsize, &timestamp, source, &severity);
+//	SDI2("request: [%s]", request);
+
+
+	comms_parse_response(request,host_dec,key_dec,value_dec,lastlogsize_dec,timestamp_dec,source_dec,severity_dec,sizeof(host_dec)-1);
+/*	SDI2("host_dec:         [%s]", host_dec);
+	SDI2("key_dec:          [%s]", key_dec);
+	SDI2("value_dec:        [%s]", value_dec);
+	SDI2("lastlogsize_dec:  [%s]", lastlogsize_dec);
+	SDI2("timestamp_dec:    [%s]", timestamp_dec);
+	SDI2("source_dec:       [%s]", source_dec);
+	SDI2("severity_dec:     [%s]", severity_dec);*/
+SDI(source);
+	if( strcmp(message,value_dec) ) SDI2("ERRROR on: %li", lastlogsize);
+	zbx_free(request);
+	zbx_free(source);
+	zbx_free(message);
+	//if(i++>100) 
+	//	break;
+	}
+
+CHECK_MEMORY(main, "main","end");
+SDI("===========END=============");
+
+#elif OFF
 	AGENT_RESULT    result;
 	
 	init_result(&result);
