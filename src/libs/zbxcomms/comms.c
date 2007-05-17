@@ -313,7 +313,6 @@ int     zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags)
 		/* Write header */
 		if( ZBX_TCP_ERROR == ZBX_TCP_WRITE(s->socket, ZBX_TCP_HEADER, ZBX_TCP_HEADER_LEN))
 		{
-			zbx_tcp_close(s);
 			return	FAIL;
 		}
 
@@ -322,7 +321,6 @@ int     zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags)
 		/* Write data length */
 		if( ZBX_TCP_ERROR == ZBX_TCP_WRITE(s->socket, (char *) &len64, sizeof(len64)) )
 		{
-			zbx_tcp_close(s);
 			return	FAIL;
 		}
 	}
@@ -331,7 +329,6 @@ int     zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags)
 	{
 		if( ZBX_TCP_ERROR == (i = ZBX_TCP_WRITE(s->socket, data+written,strlen(data)-written)) )
 		{
-			zbx_tcp_close(s);
 			return	FAIL;
 		}
 		written += i;
@@ -357,8 +354,6 @@ int     zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags)
  ******************************************************************************/
 void    zbx_tcp_close(zbx_sock_t *s)
 {
-	ZBX_TCP_START();
-
 	zbx_tcp_unaccept(s);
 	
 	zbx_tcp_free(s);
