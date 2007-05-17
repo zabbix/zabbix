@@ -137,6 +137,8 @@ include_once "include/page_header.php";
 			$status['skip'] = true;
 		}
 
+		$item_color = $color[$color['current'] = $color[$color['current']]['next']]['color'];
+
 		$db_items = DBselect('select i.*, hi.type as httpitem_type from items i, httpstepitem hi '.
 			' where hi.itemid=i.itemid and hi.httpstepid='.$httpstep_data['httpstepid']);
 		while($item_data = DBfetch($db_items))
@@ -157,7 +159,7 @@ include_once "include/page_header.php";
 			}
 			$items[$item_data['httpitem_type']][] = array(
 				'itemid' => $item_data['itemid'],
-				'color' => $color[$color['current'] = $color[$color['current']]['next']]['color'],
+				'color' => $item_color,
 				'sortorder' => 'no');
 		}
 
