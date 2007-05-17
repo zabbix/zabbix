@@ -153,34 +153,95 @@ static int evaluate_LOGSEVERITY(char *value, DB_ITEM *item, char *parameter)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int evaluate_COUNT(char *value, DB_ITEM *item, int parameter)
+static int evaluate_COUNT(char *value, DB_ITEM *item, char *parameter)
 {
 	DB_RESULT	result;
 	DB_ROW	row;
+
+	char		period[MAX_STRING_LEN+1];
+	char		cmp[MAX_STRING_LEN+1];
+	char		cmp_esc[MAX_STRING_LEN+1];
 
 	char		table[MAX_STRING_LEN];
 	int		now;
 	int		res = SUCCEED;
 
-	if( (item->value_type != ITEM_VALUE_TYPE_FLOAT) && (item->value_type != ITEM_VALUE_TYPE_UINT64))
+	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_COUNT(param:%s)",
+		parameter);
+
+	if( (item->value_type != ITEM_VALUE_TYPE_FLOAT) && 
+		(item->value_type != ITEM_VALUE_TYPE_UINT64) &&
+		(item->value_type != ITEM_VALUE_TYPE_LOG) &&
+		(item->value_type != ITEM_VALUE_TYPE_STR))
 	{
 		return	FAIL;
 	}
-
-	now=time(NULL);
 
 	if(item->value_type == ITEM_VALUE_TYPE_UINT64)
 	{
 		strscpy(table,"history_uint");
 	}
-	else
+	else if(item->value_type == ITEM_VALUE_TYPE_FLOAT)
 	{
 		strscpy(table,"history");
 	}
-	result = DBselect("select count(value) from %s where clock>%d and itemid=" ZBX_FS_UI64,
-		table,
-		now-parameter,
-		item->itemid);
+	else if(item->value_type == ITEM_VALUE_TYPE_STR)
+	{
+		strscpy(table,"history_str");
+	}
+	else
+	{
+		strscpy(table,"history_log");
+	}
+
+	now=time(NULL);
+
+	if(get_param(parameter, 1, period, MAX_STRING_LEN) != 0)
+	{
+		return FAIL;
+	}
+	if(get_param(parameter, 2, cmp, MAX_STRING_LEN) != 0)
+	{
+		result = DBselect("select count(value) from %s where clock>%d and itemid=" ZBX_FS_UI64,
+			table,
+			now-atoi(period),
+			item->itemid);
+		
+	}
+	else
+	{
+		DBescape_string(cmp, cmp_esc, sizeof(cmp_esc));
+		if(item->value_type == ITEM_VALUE_TYPE_UINT64)
+		{
+			result = DBselect("select count(value) from history_uint where clock>%d and value=" ZBX_FS_UI64 " and itemid=" ZBX_FS_UI64,
+				now-atoi(period),
+				zbx_atoui64(cmp_esc),
+				item->itemid);
+		}
+		else if(item->value_type == ITEM_VALUE_TYPE_FLOAT)
+		{
+			result = DBselect("select count(value) from history where clock>%d and value+0.00001>" ZBX_FS_DBL " and value-0.0001<" ZBX_FS_DBL " and itemid=" ZBX_FS_UI64,
+				now-atoi(period),
+				atof(cmp_esc),
+				atof(cmp_esc),
+				item->itemid);
+		}
+		else if(item->value_type == ITEM_VALUE_TYPE_LOG)
+		{
+			result = DBselect("select count(value) from history_log where clock>%d and value like '%s' and itemid=" ZBX_FS_UI64,
+				now-atoi(period),
+				cmp_esc,
+				item->itemid);
+		}
+		else
+		{
+			result = DBselect("select count(value) from history_str where clock>%d and value like '%s' and itemid=" ZBX_FS_UI64,
+				now-atoi(period),
+				cmp_esc,
+				item->itemid);
+		}
+	}
+
 
 	row = DBfetch(result);
 
@@ -194,6 +255,8 @@ static int evaluate_COUNT(char *value, DB_ITEM *item, int parameter)
 		strcpy(value,row[0]);
 	}
 	DBfree_result(result);
+
+	zabbix_log( LOG_LEVEL_DEBUG, "End evaluate_COUNT");
 
 	return res;
 }
@@ -924,7 +987,7 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 	}
 	else if(strcmp(function,"count")==0)
 	{
-		ret = evaluate_COUNT(value,item,atoi(parameter));
+		ret = evaluate_COUNT(value,item,parameter);
 	}
 	else if(strcmp(function,"delta")==0)
 	{
