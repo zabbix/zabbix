@@ -447,60 +447,6 @@ int	main(int argc, char **argv)
 int main()
 {
 #if ON
-	#include "eventlog.h"
-
-	int i = 0;
-	long			lastlogsize = 0;
-	char			*source = NULL;
-	unsigned short	severity;
-	char			*message;
-	char			*request;
-	unsigned long	timestamp = 111;
-
-	char
-		host_dec[MAX_STRING_LEN],
-		key_dec[MAX_STRING_LEN],
-		value_dec[MAX_STRING_LEN],
-		lastlogsize_dec[MAX_STRING_LEN],
-		timestamp_dec[MAX_STRING_LEN],
-		source_dec[MAX_STRING_LEN],
-		severity_dec[MAX_STRING_LEN];
-
-INIT_CHECK_MEMORY(main);
-
-	while(0 == process_eventlog("system",&lastlogsize,&timestamp,&source,&severity,&message))
-	{
-/*	SDI2("lastlogsize:[%li]", lastlogsize);
-	SDI2("timestamp: [%li]", timestamp);
-	SDI2("source:     [%s]", source);
-	SDI2("severity:   [%u]", severity);
-	SDI2("message:    [%s]", message);*/
-
-	request = comms_create_request("real_host", "key.xxx1", message, &lastlogsize, &timestamp, source, &severity);
-//	SDI2("request: [%s]", request);
-
-
-	comms_parse_response(request,host_dec,key_dec,value_dec,lastlogsize_dec,timestamp_dec,source_dec,severity_dec,sizeof(host_dec)-1);
-/*	SDI2("host_dec:         [%s]", host_dec);
-	SDI2("key_dec:          [%s]", key_dec);
-	SDI2("value_dec:        [%s]", value_dec);
-	SDI2("lastlogsize_dec:  [%s]", lastlogsize_dec);
-	SDI2("timestamp_dec:    [%s]", timestamp_dec);
-	SDI2("source_dec:       [%s]", source_dec);
-	SDI2("severity_dec:     [%s]", severity_dec);*/
-SDI(source);
-	if( strcmp(message,value_dec) ) SDI2("ERRROR on: %li", lastlogsize);
-	zbx_free(request);
-	zbx_free(source);
-	zbx_free(message);
-	//if(i++>100) 
-	//	break;
-	}
-
-CHECK_MEMORY(main, "main","end");
-SDI("===========END=============");
-
-#elif OFF
 	AGENT_RESULT    result;
 	
 	init_result(&result);
