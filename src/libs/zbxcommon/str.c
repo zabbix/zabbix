@@ -262,8 +262,8 @@ void zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_len, co
 
 	if(*offset + max_len >= *alloc_len)
 	{
-		*str = zbx_realloc(*str, (*alloc_len)+128*max_len);
-		*alloc_len += 128*max_len;
+		*str = zbx_realloc(*str, (*alloc_len)+64*max_len);
+		*alloc_len += 64*max_len;
 	}
 
 	*offset += zbx_vsnprintf(*str+*offset, max_len, fmt, args);
