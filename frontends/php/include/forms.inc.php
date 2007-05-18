@@ -3101,17 +3101,19 @@ include_once 'include/discovery.inc.php';
 						$object_srctbl = 'usrgrp';
 						$object_srcfld1 = 'usrgrpid';
 						$object_name = get_group_by_usrgrpid($new_operation['objectid']);
+						$display_name = 'name';
 					}
 					else
 					{
 						$object_srctbl = 'users';
 						$object_srcfld1 = 'userid';
 						$object_name = get_user_by_userid($new_operation['objectid']);
+						$display_name = 'alias';
 					}
 
 					$frmAction->AddVar('new_operation[objectid]', $new_operation['objectid']); 
 
-					if($object_name)	$object_name = $object_name['name'];
+					if($object_name)	$object_name = $object_name[$display_name];
 
 					$cmbObject = new CComboBox('new_operation[object]', $new_operation['object'],'submit()');
 					$cmbObject->AddItem(OPERATION_OBJECT_USER,S_SINGLE_USER);
@@ -3123,7 +3125,7 @@ include_once 'include/discovery.inc.php';
 							new CButton('select_object',S_SELECT,
 								'return PopUp("popup.php?dstfrm='.$frmAction->GetName().
 								'&dstfld1=new_operation%5Bobjectid%5D&dstfld2=object_name'.
-								'&srctbl='.$object_srctbl.'&srcfld1='.$object_srcfld1.'&srcfld2=name'.
+								'&srctbl='.$object_srctbl.'&srcfld1='.$object_srcfld1.'&srcfld2='.$display_name.
 								'",450,450)',
 								'T')
 						)));

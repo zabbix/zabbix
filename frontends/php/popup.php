@@ -533,7 +533,7 @@ include_once "include/page_header.php";
 		$result = DBselect("select * from users where ".DBid2nodeid("userid")."=".$ZBX_CURNODEID." order by name");
 		while($row = DBfetch($result))
 		{
-			$name = new CLink($row["name"],"#","action");
+			$name = new CLink($row["alias"],"#","action");
 			$name->SetAction(
 				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '').
