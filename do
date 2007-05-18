@@ -41,7 +41,7 @@ do
     run )	dorun="yes";		noparam=1;;
     nocat )	docat="no";		noparam=1;;
     cat )	docat="yes";		noparam=1;;
-    test )	TEST=" -DTEST";;
+    test )	TEST=" -DTEST -DZABBIX_TEST";;
     todo )	TODO=" -DTODO";;
     def )		config_param="$config_param $def";;
     --enable-* )	config_param="$config_param $cmd";; 

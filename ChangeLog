@@ -1,5 +1,6 @@
 Changes for 1.3.9:
 
+ - fixed logfiles monitoring (Eugene)
  - fixed WEB monitoring (Eugene)
  - fixed SNMP discovery (Alexei)
  - documented use of -vv for zabbix_sender (Alexei)
