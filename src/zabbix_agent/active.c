@@ -454,8 +454,8 @@ static int	process_active_checks(char *server, unsigned short port)
 							break;
 						}
 
-						zbx_free(value);
 					}
+					zbx_free(value);
 
 					count++;
 					/* Do not flood ZABBIX server if file grows too fast */
@@ -486,7 +486,6 @@ static int	process_active_checks(char *server, unsigned short port)
 				{
 					if(!pattern || NULL != zbx_regexp_match(value, pattern, NULL) )
 					{
-
 						ret = send_value(
 									server,
 									port,
@@ -510,9 +509,9 @@ static int	process_active_checks(char *server, unsigned short port)
 							zbx_free(value);
 							break;
 						}
-
-						zbx_free(value);
 					}
+					zbx_free(value);
+
 					count++;
 					/* Do not flood ZABBIX server if file grows too fast */
 					if(count >= (MAX_LINES_PER_SECOND * active_metrics[i].refresh))	break;
