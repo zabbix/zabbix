@@ -1,5 +1,6 @@
 Changes for 1.3.9:
 
+ - fixed SNMP discovery (Alexei)
  - documented use of -vv for zabbix_sender (Alexei)
 
 Changes for 1.3.8:
