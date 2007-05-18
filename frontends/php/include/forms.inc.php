@@ -3601,12 +3601,12 @@ include_once 'include/discovery.inc.php';
 			}
 
 			$form->AddRow(S_PARAMETER,$cmbHosts);
-			$form->AddRow(S_SHOW_LINES, new CElementsBox("elements",$elements,2));
+			$form->AddRow(S_SHOW_LINES, new CNumericBox("elements",$elements,2));
 		}
                 elseif($resourcetype == SCREEN_RESOURCE_ACTIONS)
                 {
         // History of actions
-                        $form->AddRow(S_SHOW_LINES, new CElementsBox("elements",$elements,2));
+                        $form->AddRow(S_SHOW_LINES, new CNumericBox("elements",$elements,2));
 			$form->AddVar("resourceid",0);
                 }
                 elseif($resourcetype == SCREEN_RESOURCE_EVENTS)
