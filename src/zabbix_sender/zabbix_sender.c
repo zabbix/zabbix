@@ -46,7 +46,7 @@ char *help_message[] = {
 	"  -i --input-file <input_file>         Load values from input file",
 	"                                       Each line of file contains: <zabbix_server> <hostname> <port> <key> <value>",
 	"",
-	"  -v --verbose                         Verbose mode",
+	"  -v --verbose                         Verbose mode, -vv for more details",
 	"",
 	" Other options:",
 	"  -h --help                            Give this help",

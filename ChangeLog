@@ -1,3 +1,7 @@
+Changes for 1.3.9:
+
+ - documented use of -vv for zabbix_sender (Alexei)
+
 Changes for 1.3.8:
 
  - fixed "plain text" and "history of actions" for screens (Eugene)
