@@ -98,18 +98,19 @@ static size_t WRITEFUNCTION2( void *ptr, size_t size, size_t nmemb, void *stream
 	ZBX_LIM_PRINT("WRITEFUNCTION", s, str_dat, 65535);
 	zabbix_log(LOG_LEVEL_WARNING, "In WRITEFUNCTION");
 */
+	size_t r_size = size*nmemb;
 
 	/* First piece of data */
 	if(page.data == NULL)
 	{
-		page.allocated=8096;
+		page.allocated=MAX(8096, r_size);
 		page.offset=0;
 		page.data=malloc(page.allocated);
 	}
 
-	zbx_snprintf_alloc(&page.data, &page.allocated, &page.offset, 8096, ptr);
+	zbx_snprintf_alloc(&page.data, &page.allocated, &page.offset, MAX(8096, r_size), "%s", ptr);
 
-	return size*nmemb;
+	return r_size;
 }
 
 static size_t HEADERFUNCTION2( void *ptr, size_t size, size_t nmemb, void *stream)
@@ -336,7 +337,7 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 	result = DBselect("select httpstepid,httptestid,no,name,url,timeout,posts,required,status_codes from httpstep where httptestid=" ZBX_FS_UI64 " order by no",
 		httptest->httptestid);
 	now=time(NULL);
-	while((row=DBfetch(result)) && 0 == lastfailedstep)
+	while((row=DBfetch(result)) && !err_str)
 	{
 		ZBX_STR2UINT64(httpstep.httpstepid, row[0]);
 		ZBX_STR2UINT64(httpstep.httptestid, row[1]);
@@ -360,7 +361,6 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 		/* zabbix_log(LOG_LEVEL_WARNING, "URL [%s]", httpstep.url); */
 		http_substitute_macros(httptest,httpstep.posts, sizeof(httpstep.posts));
 		/* zabbix_log(LOG_LEVEL_WARNING, "POSTS [%s]", httpstep.posts); */
-
 		if(httpstep.posts[0] != 0)
 		{
 			if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, httpstep.posts)))
@@ -371,7 +371,7 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 				lastfailedstep = httpstep.no;
 			}
 		}
-		if(0 == lastfailedstep)
+		if( !err_str )
 		{
 			if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_URL, httpstep.url)))
 			{
@@ -388,7 +388,7 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 			break;
 		}*/
 
-		if(0 == lastfailedstep)
+		if( !err_str )
 		{
 			memset(&page, 0, sizeof(page));
 			if(CURLE_OK != (err = curl_easy_perform(easyhandle)))
@@ -444,7 +444,6 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 		}
 
 		httptest->time+=stat.total_time;
-
 		process_step_data(httptest, &httpstep, &stat);
 	}
 	DBfree_result(result);
