@@ -401,7 +401,7 @@ include_once "include/page_header.php";
 				elseif($severity==5)     $severity = new CCol(S_DISASTER,"disaster");
 				elseif($severity==6)     $severity = S_AUDIT_SUCCESS;
 				elseif($severity==7)     $severity = S_AUDIT_FAILURE;
-				else                     $severity = $row["priority"];
+				else                     $severity = $row["severity"];
 
 				array_push($new_row,$severity);
 				$row["value"] = trim($row["value"],"\r\n");
