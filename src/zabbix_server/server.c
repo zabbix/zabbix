@@ -576,8 +576,14 @@ int MAIN_ZABBIX_ENTRY(void)
 			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
 			+ CONFIG_NODEWATCHER_FORKS + CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Discoverer]",
+#ifdef HAVE_SNMP
+		init_snmp("zabbix_server");
+		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Discoverer. SNMP:ON]",
 				server_num);
+#else
+		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Discoverer. SNMP:OFF]",
+				server_num);
+#endif
 		main_discoverer_loop(server_num - CONFIG_POLLER_FORKS - CONFIG_TRAPPERD_FORKS -CONFIG_PINGER_FORKS
 				- CONFIG_ALERTER_FORKS - CONFIG_HOUSEKEEPER_FORKS - CONFIG_TIMER_FORKS
 				- CONFIG_UNREACHABLE_POLLER_FORKS - CONFIG_NODEWATCHER_FORKS - CONFIG_HTTPPOLLER_FORKS);
