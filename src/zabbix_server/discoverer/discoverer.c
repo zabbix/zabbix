@@ -494,6 +494,8 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
 				port);
 			break;
 		case SVC_AGENT:
+		case SVC_SNMPv1:
+		case SVC_SNMPv2c:
 			break;
 		default:
 			ret = FAIL;
@@ -523,7 +525,15 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
 
 				item.value_type	= ITEM_VALUE_TYPE_STR;
 
-				item.snmp_community	= check->key_;
+				if(check->type == SVC_SNMPv1)
+				{
+					item.type = ITEM_TYPE_SNMPv1;
+				}
+				else
+				{
+					item.type = ITEM_TYPE_SNMPv2c;
+				}
+
 				item.snmp_oid		= check->key_;
 				item.snmp_community	= check->snmp_community;
 				item.snmp_port		= port;
