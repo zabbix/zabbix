@@ -1,5 +1,7 @@
 Changes for 1.3.9:
 
+ - restored validation for hostname (Eugene)
+ - splitted error message for trigger validation (Eugene)
  - fixed hitory severity (Eugene)
  - fixed user information displayed (Eugene)
  - fixed logfiles monitoring (Eugene)

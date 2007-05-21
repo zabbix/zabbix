@@ -147,6 +147,12 @@ require_once "include/items.inc.php";
 	{
 		global $ZBX_CURNODEID;
 		
+		if( !eregi('^'.ZBX_EREG_HOST_FORMAT.'$', $host) )
+		{
+			error("Hostname should contain '0-9a-zA-Z_. $'- characters only");
+			return false;
+		}
+
 /* Character '-' must be last in the list of symbols, otherwise it won't be accepted */
  		if ( !empty($dns) && !eregi('^([0-9a-zA-Z\_\.\$[.-.]]+)$', $dns)) 
 		{

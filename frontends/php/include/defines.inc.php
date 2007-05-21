@@ -379,6 +379,17 @@
 	define('SPACE',	'&nbsp;');
 	define('RARR',	'&rArr;');
 
+	define('ZBX_EREG_HOST_FORMAT', '([0-9a-zA-Z\_\.[:space:][.-.]\$]+)');
+	define('ZBX_EREG_ITEM_KEY_FORMAT', '([]\[0-9a-zA-Z!\_\*\/\.\,\:\(\)\+ [.-.]\$]+)');
+
+	define('ZBX_EREG_SIMPLE_EXPRESSION_FORMAT',
+		'^\{'.ZBX_EREG_HOST_FORMAT.'\:('.ZBX_EREG_ITEM_KEY_FORMAT.'\.([a-z]{3,11})\(([#0-9a-zA-Z\_\/\.\,[:space:]]+)\)\}$');
+
+	define('ZBX_SIMPLE_EXPRESSION_HOST_ID', 1);
+	define('ZBX_SIMPLE_EXPRESSION_KEY_ID', 2);
+	define('ZBX_SIMPLE_EXPRESSION_FUNCTION_ID', 3);
+	define('ZBX_SIMPLE_EXPRESSION_PARAMETER_ID', 4);
+
 	global $_GET, $_POST, $_COOKIE, $_REQUEST;
 
 /* Support for PHP5. PHP5 does not have $HTTP_..._VARS */

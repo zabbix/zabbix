@@ -19,6 +19,7 @@
 **/
 ?>
 <?php
+
 	function	item_type2str($type)
 	{
 		switch($type)
@@ -146,6 +147,12 @@
 
 		if(($i = array_search(0,$applications)) !== FALSE)
 			unset($applications[$i]);
+
+		if( !eregi('^'.ZBX_EREG_ITEM_KEY_FORMAT.'$', $key) )
+		{
+			error("Key should contain '[]0-9a-zA-Z!_,:()+.*\ $'- characters only");
+			return false;
+		}
 
 		if($delay<1)
 		{

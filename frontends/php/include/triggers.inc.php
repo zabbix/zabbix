@@ -169,17 +169,32 @@
 			' and host in ('.implode(',',$hosts).')');
 	}
 
-define('ZBX_EREG_SIMPLE_EXPRESSION_FORMAT',
-	'^\{([0-9a-zA-Z\_\.[.-.]\$]+)\:([]\[0-9a-zA-Z!\_\*\/\.\,\:\(\)\+ [.-.]\$]+)\.([a-z]{3,11})\(([#0-9a-zA-Z\_\/\.\,[:space:]]+)\)\}$');
-
-define('ZBX_SIMPLE_EXPRESSION_HOST_ID', 1);
-define('ZBX_SIMPLE_EXPRESSION_KEY_ID', 2);
-define('ZBX_SIMPLE_EXPRESSION_FUNCTION_ID', 3);
-define('ZBX_SIMPLE_EXPRESSION_PARAMETER_ID', 4);
 // Does expression match server:key.function(param) ?
 	function	validate_simple_expression($expression)
 	{
 		global $ZBX_CURNODEID;
+
+		$allowed_functions['min']	= 'ticks';
+		$allowed_functions['max']	= 'ticks';
+		$allowed_functions['delta']	= 'ticks';
+		$allowed_functions['avg']	= 'ticks';
+		$allowed_functions['sum']	= 'ticks';
+		$allowed_functions['last']	= 'float';
+		$allowed_functions['diff']	= 'float';
+		$allowed_functions['count']	= 'float';
+		$allowed_functions['prev']	= 'float';
+		$allowed_functions['change']	= 'float';
+		$allowed_functions['abschange']	= 'float';
+		$allowed_functions['nodata']	= 'float';
+		$allowed_functions['time']	= 'float';
+		$allowed_functions['dayofweek']	= 'float';
+		$allowed_functions['date']	= 'float';
+		$allowed_functions['now']	= 'float';
+		$allowed_functions['fuzzytime']	= 'float';
+		$allowed_functions['str']	= true;
+		$allowed_functions['logseverity'] = true;
+		$allowed_functions['logsource']	= true;
+		$allowed_functions['regexp']	= true;
 
 //		echo "Validating simple:$expression<br>";
 		if (eregi(ZBX_EREG_SIMPLE_EXPRESSION_FORMAT, $expression, $arr))
@@ -189,64 +204,54 @@ define('ZBX_SIMPLE_EXPRESSION_PARAMETER_ID', 4);
 			$function	= &$arr[ZBX_SIMPLE_EXPRESSION_FUNCTION_ID];
 			$parameter	= &$arr[ZBX_SIMPLE_EXPRESSION_PARAMETER_ID];
 
-			$sql="select count(*) as cnt from hosts h,items i where h.host=".zbx_dbstr($host).
-				" and i.key_=".zbx_dbstr($key)." and h.hostid=i.hostid ".
-				" and ".DBid2nodeid('h.hostid').'='.$ZBX_CURNODEID;
 
-			$row=DBfetch(DBselect($sql));
+			$row=DBfetch(DBselect('select count(*) as cnt from hosts h where h.host='.zbx_dbstr($host).
+					' and '.DBid2nodeid('h.hostid').'='.$ZBX_CURNODEID
+				));
 			if($row["cnt"]==0)
 			{
-				error("No such host ($host) or monitored parameter ($key)");
+				error('No such host ('.$host.')');
 				return -1;
 			}
 			elseif($row["cnt"]!=1)
 			{
-				error("Too many hosts ($host) with parameter ($key)");
+				error('Too many hosts ('.$host.')');
 				return -1;
 			}
 
-			if(	($function!="last")&&
-				($function!="diff")&&
-				($function!="min") &&
-				($function!="max") &&
-				($function!="avg") &&
-				($function!="sum") &&
-				($function!="count") &&
-				($function!="prev")&&
-				($function!="delta")&&
-				($function!="change")&&
-				($function!="abschange")&&
-				($function!="nodata")&&
-				($function!="time")&&
-				($function!="dayofweek")&&
-				($function!="date")&&
-				($function!="now")&&
-				($function!="str")&&
-				($function!="fuzzytime")&&
-				($function!="logseverity")&&
-				($function!="logsource")&&
-				($function!="regexp")
-			)
+			$row=DBfetch(DBselect('select count(*) as cnt from hosts h,items i where h.host='.zbx_dbstr($host).
+					' and i.key_='.zbx_dbstr($key).' and h.hostid=i.hostid '.
+					' and '.DBid2nodeid('h.hostid').'='.$ZBX_CURNODEID
+				));
+			if($row["cnt"]==0)
 			{
-				error("Unknown function [$function]");
+				error('No such monitored parameter ('.$key.') for host ('.$host.')');
+				return -1;
+			}
+			elseif($row["cnt"]!=1)
+			{
+				error('Too many monitored parameter ('.$key.') for host ('.$host.')');
+				return -1;
+			}
+
+			if( !isset($allowed_functions[$function]) )
+			{
+				error('Unknown function ['.$function.']');
 				return -1;
 			}
 
 
-			if(in_array($function,array("last","diff","count",
-						"prev","change","abschange","nodata","time","dayofweek",
-						"date","now","fuzzytime"))
+			if( 'float' == $allowed_functions[$function]
 				&& (validate_float($parameter)!=0) )
 			{
-				error("[$parameter] is not a float");
+				error('['.$parameter.'] is not a float');
 				return -1;
 			}
 
-			if(in_array($function,array("min","max","avg","sum",
-						"delta"))
+			if( 'ticks' == $allowed_functions[$function]
 				&& (validate_ticks($parameter)!=0) )
 			{
-				error("[$parameter] is not a float");
+				error('['.$parameter.'] is not a float');
 				return -1;
 			}
 		}
@@ -254,7 +259,7 @@ define('ZBX_SIMPLE_EXPRESSION_PARAMETER_ID', 4);
 		else if($expression!="{TRIGGER.VALUE}")
 		
 		{
-			error("Expression [$expression] does not match to [server:key.func(param)]");
+			error('Expression ['.$expression.'] does not match to [server:key.func(param)]');
 			return -1;
 		}
 		return 0;
@@ -292,7 +297,6 @@ define('ZBX_SIMPLE_EXPRESSION_PARAMETER_ID', 4);
 // 	Replace all <float> <sign> <float> <K|M|G> with 0
 //			echo "Expression:$expression<br>";
 			$arr="";
-// The minus sing '-' must be the last one in the list, otherwise it won't work!
 			if (eregi('^((.)*)([0-9\.]+[A-Z]{0,1})[ ]*([\&\|\>\<\=\+\*\/\#[.-.]]{1})[ ]*([0-9\.]+[A-Z]{0,1})((.)*)$', $expression, $arr)) 
 			{
 //				echo "OK<br>";
