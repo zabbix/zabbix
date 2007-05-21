@@ -391,19 +391,13 @@ include_once "include/page_header.php";
 					array_push($new_row,$row["source"]);
 				}
 
-				$severity = $row["severity"];
+				array_push($new_row, 
+						new CCol(
+							get_severity_description($row["severity"]),
+							get_severity_style($row["severity"])
+							)
+					);
 
-				if($severity==0)         $severity = S_NOT_CLASSIFIED;
-				elseif($severity==1)     $severity = new CCol(S_INFORMATION,"information");
-				elseif($severity==2)     $severity = new CCol(S_WARNING,"warrning");
-				elseif($severity==3)     $severity = new CCol(S_AVERAGE,"average");
-				elseif($severity==4)     $severity = new CCol(S_HIGH,"high");
-				elseif($severity==5)     $severity = new CCol(S_DISASTER,"disaster");
-				elseif($severity==6)     $severity = S_AUDIT_SUCCESS;
-				elseif($severity==7)     $severity = S_AUDIT_FAILURE;
-				else                     $severity = $row["priority"];
-
-				array_push($new_row,$severity);
 				$row["value"] = trim($row["value"],"\r\n");
 				array_push($new_row,htmlspecialchars($row["value"]));
 
