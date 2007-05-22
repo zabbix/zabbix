@@ -2209,9 +2209,8 @@
 		{
 			$frmTrig->AddVar("triggerid",$_REQUEST["triggerid"]);
 			$trigger=get_trigger_by_triggerid($_REQUEST["triggerid"]);
-			$description	= htmlspecialchars(stripslashes($trigger["description"]));
 
-			$frmTrig->SetTitle(S_TRIGGER." \"".$description."\"");
+			$frmTrig->SetTitle(S_TRIGGER." \"".htmlspecialchars(stripslashes($trigger["description"]))."\"");
 
 			$limited = $trigger['templateid'] ? 'yes' : null;
 		}
@@ -2225,7 +2224,7 @@
 
 		if((isset($_REQUEST["triggerid"]) && !isset($_REQUEST["form_refresh"]))  || isset($limited))
 		{
-			$description	= htmlspecialchars(stripslashes($trigger["description"]));
+			$description	= stripslashes($trigger["description"]);
 			$expression	= explode_exp($trigger["expression"],0);
 
 			if(!isset($limited) || !isset($_REQUEST["form_refresh"]))
