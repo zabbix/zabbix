@@ -1096,7 +1096,7 @@ zabbix_log( LOG_LEVEL_WARNING, "ALEX");
 			var_len = strlen(MVAR_TRIGGER_STATUS);
 
 			replace_to = zbx_dsprintf(replace_to, "%s",
-					event->value == TRIGGER_VALUE_TRUE ? "OFF" : "ON");
+					event->value == TRIGGER_VALUE_TRUE ? "ON" : "OFF");
 		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) && 
 			strncmp(pr, MVAR_TRIGGER_STATUS_OLD, strlen(MVAR_TRIGGER_STATUS_OLD)) == 0)
@@ -1105,7 +1105,7 @@ zabbix_log( LOG_LEVEL_WARNING, "ALEX");
 			var_len = strlen(MVAR_TRIGGER_STATUS_OLD);
 
 			replace_to = zbx_dsprintf(replace_to, "%s",
-					event->value == TRIGGER_VALUE_TRUE ? "OFF" : "ON");
+					event->value == TRIGGER_VALUE_TRUE ? "ON" : "OFF");
 		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
 			strncmp(pr, MVAR_TRIGGER_ID, strlen(MVAR_TRIGGER_ID)) == 0)
