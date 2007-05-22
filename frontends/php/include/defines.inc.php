@@ -383,7 +383,7 @@
 	define('ZBX_EREG_ITEM_KEY_FORMAT', '([]\[0-9a-zA-Z!\_\*\/\.\,\:\(\)\+ [.-.]\$]+)');
 
 	define('ZBX_EREG_SIMPLE_EXPRESSION_FORMAT',
-		'^\{'.ZBX_EREG_HOST_FORMAT.'\:('.ZBX_EREG_ITEM_KEY_FORMAT.'\.([a-z]{3,11})\(([#0-9a-zA-Z\_\/\.\,[:space:]]+)\)\}$');
+		'^\{'.ZBX_EREG_HOST_FORMAT.'\:'.ZBX_EREG_ITEM_KEY_FORMAT.'\.([a-z]{3,11})\(([#0-9a-zA-Z\_\/\.\,[:space:]]+)\)\}$');
 
 	define('ZBX_SIMPLE_EXPRESSION_HOST_ID', 1);
 	define('ZBX_SIMPLE_EXPRESSION_KEY_ID', 2);
