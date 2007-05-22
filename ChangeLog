@@ -1,5 +1,6 @@
 Changes for 1.3.9:
 
+ - fixed displaying of special chars in trigger description (Alexei)
  - restored validation for hostname (Eugene)
  - splitted error message for trigger validation (Eugene)
  - fixed hitory severity (Eugene)
