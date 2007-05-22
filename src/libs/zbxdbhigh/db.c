@@ -688,11 +688,12 @@ void DBupdate_triggers_status_after_restart(void)
 
 	now=time(NULL);
 
-	result = DBselect("select distinct t.triggerid,t.expression,t.description,t.status,t.priority,t.value,t.url,t.comments from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and i.nextcheck+i.delay<%d and i.key_<>'%s' and h.status not in (%d,%d)",
+	result = DBselect("select distinct t.triggerid,t.expression,t.description,t.status,t.priority,t.value,t.url,t.comments from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and i.nextcheck+i.delay<%d and i.key_<>'%s' and h.status not in (%d,%d) and i.type not in (%d)",
 		now,
 		SERVER_STATUS_KEY,
 		HOST_STATUS_DELETED,
-		HOST_STATUS_TEMPLATE);
+		HOST_STATUS_TEMPLATE,
+		ITEM_TYPE_TRAPPER);
 
 	while((row=DBfetch(result)))
 	{
@@ -705,7 +706,7 @@ void DBupdate_triggers_status_after_restart(void)
 		trigger.url		= row[6];
 		trigger.comments	= row[7];
 
-		result2 = DBselect("select min(i.nextcheck+i.delay) from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and i.nextcheck<>0 and t.triggerid=%d and i.type<>%d",
+		result2 = DBselect("select min(i.nextcheck+i.delay) from hosts h,items i,triggers t,functions f where f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and i.nextcheck<>0 and t.triggerid=" ZBX_FS_UI64 " and i.type not in (%d)",
 			trigger.triggerid,
 			ITEM_TYPE_TRAPPER);
 		row2=DBfetch(result2);
