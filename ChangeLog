@@ -1,5 +1,6 @@
 Changes for 1.3.9:
 
+ - do not update trigger statuses to unknown for trapper items (Alexei)
  - fixed processing of {TRIGGER.VALUE} and {STATUS} (Alexei)
  - fixed displaying of special chars in trigger description (Alexei)
  - restored validation for hostname (Eugene)
