@@ -173,8 +173,9 @@ COpt::counter_up('perm');
 			' left join users_groups ug on ug.usrgrpid=r.groupid and ug.userid='.$userid.
 			' left join nodes n on '.DBid2nodeid('h.hostid').'=n.nodeid '.
 			$where.' group by h.hostid,n.nodeid,n.name,h.host,ug.userid '.
-			' order by n.name,n.nodeid, h.host, permission desc');
+			' order by n.name,n.nodeid, h.host, permission desc, userid desc');
 
+		$processed = array();
 		while($host_data = DBfetch($db_hosts))
 		{
 			$host_data += DBfetch(DBselect('select * from hosts where hostid='.$host_data['hostid']));
@@ -182,8 +183,11 @@ COpt::counter_up('perm');
 			if(is_null($host_data['nodeid'])) $host_data['nodeid'] = id2nodeid($host_data['hostid']);
 
 			/* if no rights defined used node rights */
-			if(is_null($host_data['permission']) || is_null($host_data['userid']))
+			if( (is_null($host_data['permission']) || is_null($host_data['userid'])) )
 			{
+				if( isset($processed[$host_data['hostid']]) )
+					continue;
+
 				if(!isset($nodes))
 				{
 					$nodes = get_accessible_nodes_by_user($user_data,
@@ -195,11 +199,15 @@ COpt::counter_up('perm');
 					$host_data['permission'] = $nodes[$host_data['nodeid']]['permission'];
 			}
 
+			$processed[$host_data['hostid']] = true;
+
 			if(eval('return ('.$host_data["permission"].' '.perm_mode2comparator($perm_mode).' '.$perm.')? 0 : 1;'))
 				continue;
 
 			$result[$host_data['hostid']] = eval('return '.$resdata.';');
 		}
+
+		unset($processed, $host_data, $db_hosts);
 
 		if($perm_res == PERM_RES_STRING_LINE) 
 		{
@@ -250,13 +258,17 @@ COpt::counter_up('perm');
 			$where.' group by n.nodeid, n.name, hg.groupid, hg.name, g.userid, g.userid '.
 			' order by n.name, hg.name, permission desc');
 
+		$processed = array();
 		while($group_data = DBfetch($db_groups))
 		{
 			if(is_null($group_data['nodeid'])) $group_data['nodeid'] = id2nodeid($group_data['groupid']);
 
 			/* deny if no rights defined */
-			if(is_null($group_data['permission']) || is_null($group_data['userid']))
+			if( is_null($group_data['permission']) || is_null($group_data['userid']) )
 			{
+				if(isset($processed[$group_data['groupid']]))
+					continue;
+
 				if(!isset($nodes))
 				{
 					$nodes = get_accessible_nodes_by_user($user_data,
@@ -269,11 +281,15 @@ COpt::counter_up('perm');
 					$group_data['permission'] = $nodes[$group_data['nodeid']]['permission'];
 			}
 
+			$processed[$group_data['permission']] = true;
+
 			if(eval('return ('.$group_data["permission"].' '.perm_mode2comparator($perm_mode).' '.$perm.')? 0 : 1;'))
 				continue;
 
 			$result[$group_data['groupid']] = eval('return '.$resdata.';');
 		}
+
+		unset($processed, $group_data, $db_groups);
 
 		if($perm_res == PERM_RES_STRING_LINE) 
 		{
