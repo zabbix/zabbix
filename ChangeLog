@@ -1,5 +1,7 @@
 Changes for 1.3.9:
 
+ - added ZABBIX Server to a host group (Alexei)
+ - fixed default group for Admin/guest. (Alexei)
  - icmpping will be processed regardless of host availability (Alexei)
  - do not update trigger statuses to unknown for trapper items (Alexei)
  - fixed processing of {TRIGGER.VALUE} and {STATUS} (Alexei)

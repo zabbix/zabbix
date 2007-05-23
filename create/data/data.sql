@@ -55,8 +55,8 @@ INSERT INTO usrgrp VALUES (8,'Guests');
 -- Dumping data for table `users_groups`
 --
 
-INSERT INTO users_groups VALUES (1,1,7);
-INSERT INTO users_groups VALUES (2,2,8);
+INSERT INTO users_groups VALUES (1,7,1);
+INSERT INTO users_groups VALUES (2,8,2);
 
 --
 -- Dumping data for table `rights`
@@ -273,6 +273,7 @@ INSERT INTO hosts_groups VALUES (2,10002,1);
 INSERT INTO hosts_groups VALUES (3,10003,1);
 INSERT INTO hosts_groups VALUES (4,10004,1);
 INSERT INTO hosts_groups VALUES (5,10007,1);
+INSERT INTO hosts_groups VALUES (6,10017,4);
 
 --
 -- Dumping data for table `help_items`
