@@ -65,6 +65,9 @@
 		
 		$auditid	= get_dbid("auditlog","auditid");
 
+		if(strlen($details) > 128)
+			$details = substr($details, 0, 125).'...';
+
 		if(($result = DBexecute("insert into auditlog (auditid,userid,clock,action,resourcetype,details) ".
 			" values ($auditid,".$USER_DETAILS["userid"].",".time().",$action,$resourcetype,".zbx_dbstr($details).")")))
 		{
