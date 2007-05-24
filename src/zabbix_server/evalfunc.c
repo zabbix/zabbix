@@ -757,7 +757,7 @@ static int evaluate_DELTA(char *value,DB_ITEM *item,int parameter, int flag)
 
 	if(flag == ZBX_FLAG_SEC)
 	{
-		result = DBselect("select max(value)-min(value) from %s history where clock>%d and itemid=" ZBX_FS_UI64,
+		result = DBselect("select max(value)-min(value) from %s where clock>%d and itemid=" ZBX_FS_UI64,
 			table,
 			now-parameter,
 			item->itemid);
