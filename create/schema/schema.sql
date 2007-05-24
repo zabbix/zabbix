@@ -420,7 +420,7 @@ TABLE|housekeeper|housekeeperid|0
 FIELD		|housekeeperid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|tablename	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|field		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|value		|t_integer		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|value		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 
 TABLE|images|imageid|ZBX_SYNC
 FIELD		|imageid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
