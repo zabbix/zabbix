@@ -656,11 +656,12 @@ zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
 			var_len = strlen(MVAR_TRIGGER_NAME);
 
 			zabbix_log(LOG_LEVEL_DEBUG, "Before replace_to [%s]", replace_to);
-			replace_to = zbx_dsprintf(replace_to, "%s", event->trigger_description);
-			zabbix_log(LOG_LEVEL_DEBUG, "After replace_to [%s]", replace_to);
 
-			/* Why it was here? */
-/*			substitute_simple_macros(event, action, &replace_to, MACRO_TYPE_TRIGGER_DESCRIPTION);*/
+			replace_to = zbx_dsprintf(replace_to, "%s", event->trigger_description);
+			/* Why it was here? *//* For substituting macros in trigger description :) */
+			substitute_simple_macros(event, action, &replace_to, MACRO_TYPE_TRIGGER_DESCRIPTION);
+
+			zabbix_log(LOG_LEVEL_DEBUG, "After replace_to [%s]", replace_to);
 		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
 			strncmp(pr, MVAR_TRIGGER_COMMENT, strlen(MVAR_TRIGGER_COMMENT)) == 0)
