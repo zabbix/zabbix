@@ -26,6 +26,7 @@
 #include "sysinfo.h"
 #include "zbxconf.h"
 #include "zbxgetopt.h"
+#include "alias.h"
 
 char *progname = NULL;
 char title_message[] = "ZABBIX Agent";
