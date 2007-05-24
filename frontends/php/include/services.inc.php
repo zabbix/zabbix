@@ -31,11 +31,12 @@
 		{
 			return FALSE;
 		}
+		DBExecute('DELETE FROM services_times WHERE serviceid='.$serviceid);
 
-		foreach($service_times as $val)
-		{
-			$result = DBexecute('insert into services_times (serviceid, type, ts_from, ts_to, note)'.
-				' values ('.$serviceid.','.$val['type'].','.$val['from'].','.$val['to'].','.zbx_dbstr($val['note']).')');
+		foreach($service_times as $val){
+			$timeid = get_dbid('services_times','timeid');
+			$result = DBexecute('insert into services_times (timeid, serviceid, type, ts_from, ts_to, note)'.
+				' values ('.$timeid.','.$serviceid.','.$val['type'].','.$val['from'].','.$val['to'].','.zbx_dbstr($val['note']).')');
 
 			if(!$result)
 			{
@@ -53,10 +54,10 @@
 		$result = DBexecute("update services set name=".zbx_dbstr($name).",triggerid=$triggerid,status=0,algorithm=$algorithm,showsla=$showsla,goodsla=$goodsla,sortorder=$sortorder where serviceid=$serviceid");
 
 		DBexecute('delete from services_times where serviceid='.$serviceid);
-		foreach($service_times as $val)
-		{
-			DBexecute('insert into services_times (serviceid, type, ts_from, ts_to, note)'.
-				' values ('.$serviceid.','.$val['type'].','.$val['from'].','.$val['to'].','.zbx_dbstr($val['note']).')');
+		foreach($service_times as $val){
+			$timeid = get_dbid('services_times','timeid');
+			DBexecute('insert into services_times (timeid,serviceid, type, ts_from, ts_to, note)'.
+				' values ('.$timeid.','.$serviceid.','.$val['type'].','.$val['from'].','.$val['to'].','.zbx_dbstr($val['note']).')');
 		}
 
 		return $result;
@@ -513,5 +514,15 @@ $dt = 0;
 			return S_MIN_OF_CHILDS;
 		}
 		return S_UNKNOWN;
+	}
+	
+	function get_service_childs($serviceid,&$childs,$soft=0){
+		$query = 'SELECT sl.servicedownid FROM services_links sl WHERE sl.serviceupid = '.$serviceid.(($soft == 1)?(''):(' AND sl.soft <> 1'));
+		
+		$res =  DBSelect($query);
+		while($row = DBFetch($res)){
+			$childs[] = $row['servicedownid'];
+			get_service_childs($row['servicedownid'],$childs);
+		}
 	}
 ?>
