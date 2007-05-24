@@ -191,10 +191,10 @@
 		$allowed_functions['date']	= 'float';
 		$allowed_functions['now']	= 'float';
 		$allowed_functions['fuzzytime']	= 'float';
-		$allowed_functions['str']	= true;
-		$allowed_functions['logseverity'] = true;
-		$allowed_functions['logsource']	= true;
-		$allowed_functions['regexp']	= true;
+		$allowed_functions['str']		= '';
+		$allowed_functions['logseverity']	= '';
+		$allowed_functions['logsource']		= '';
+		$allowed_functions['regexp']		= '';
 
 //		echo "Validating simple:$expression<br>";
 		if (eregi(ZBX_EREG_SIMPLE_EXPRESSION_FORMAT, $expression, $arr))
@@ -239,7 +239,6 @@
 				error('Unknown function ['.$function.']');
 				return -1;
 			}
-
 
 			if( 'float' == $allowed_functions[$function]
 				&& (validate_float($parameter)!=0) )
