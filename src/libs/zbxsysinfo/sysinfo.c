@@ -69,7 +69,7 @@ void	add_metric(ZBX_METRIC *new)
 				commands[i].test_param=strdup(new->test_param);
 			
 			commands = zbx_realloc(commands,(i+2)*sizeof(ZBX_METRIC));
-			commands[i+1].key=NULL;
+			memset(&commands[i+1], 0, sizeof(ZBX_METRIC));
 			break;
 		}
 	}
@@ -135,7 +135,7 @@ void	add_user_parameter(char *key,char *command)
 	}
 }
 
-void	init_metrics()
+void	init_metrics(void)
 {
 	register int 	i;
 
@@ -162,6 +162,23 @@ void	init_metrics()
 		add_metric(&parameters_simple[i]);
 	}
 #endif /* USE_SIMPLE_METRICS */
+}
+
+void	free_metrics(void)
+{
+	int i = 0;
+
+	if( commands )
+	{
+		for(i=0; NULL == commands[i].key; i++)
+		{
+			zbx_free(commands[i].key);
+			zbx_free(commands[i].main_param);
+			zbx_free(commands[i].test_param);
+		}
+
+		zbx_free(commands);
+	}
 }
 
 void    escape_string(char *from, char *to, int maxlen)

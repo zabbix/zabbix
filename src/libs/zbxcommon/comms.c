@@ -166,7 +166,7 @@ void    *zbx_malloc(size_t size)
 
 	if(ptr) return ptr;
 
-	zabbix_log(LOG_LEVEL_CRIT,"out of memory. requested '%i' bytes.", size);
+	zabbix_log(LOG_LEVEL_CRIT,"zbx_malloc: out of memory. requested '%lu' bytes.", size);
 	exit(FAIL);
 
 	/* Program will never reach this point. */
@@ -191,7 +191,7 @@ void    *zbx_realloc(void *src, size_t size)
 
 	if(ptr) return ptr;
 
-	zabbix_log(LOG_LEVEL_CRIT,"out of memory. requested '%i' bytes.", size);
+	zabbix_log(LOG_LEVEL_CRIT,"zbx_realloc: out of memory. requested '%lu' bytes.", size);
 	exit(FAIL);
 
 	/* Program will never reach this point. */

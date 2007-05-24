@@ -1,5 +1,6 @@
 Changes for 1.3.9:
 
+ - added delta value calculation for UINT64 (Eugene)
  - fixed log messages for auditlog (Eugene)
  - added ZABBIX Server to a host group (Alexei)
  - fixed default group for Admin/guest. (Alexei)

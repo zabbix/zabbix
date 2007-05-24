@@ -57,6 +57,8 @@ static int process_value(zbx_uint64_t itemid, AGENT_RESULT *value)
 	DB_ROW		row;
 	DB_ITEM		item;
 
+	INIT_CHECK_MEMORY();
+
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_value(itemid:" ZBX_FS_UI64 ")",
 		itemid);
 
@@ -86,6 +88,9 @@ static int process_value(zbx_uint64_t itemid, AGENT_RESULT *value)
 	DBfree_result(result);
 
 	zabbix_log( LOG_LEVEL_DEBUG, "End process_value()");
+
+	CHECK_MEMORY("process_value", "end");
+
 	return SUCCEED;
 }
 
@@ -131,6 +136,8 @@ static void	process_test_data(DB_HTTPTEST *httptest, S_ZBX_HTTPSTAT *stat)
 
 	AGENT_RESULT    value;
 
+	INIT_CHECK_MEMORY();
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_test_data(test:%s,time:" ZBX_FS_DBL ",last step:%d)",
 		 httptest->name,
 		stat->test_total_time,
@@ -166,6 +173,8 @@ static void	process_test_data(DB_HTTPTEST *httptest, S_ZBX_HTTPSTAT *stat)
 	
 	DBfree_result(result);
 	zabbix_log(LOG_LEVEL_DEBUG, "End process_test_data()");
+
+	CHECK_MEMORY("process_test_data", "end");
 }
 
 
@@ -176,6 +185,8 @@ static void	process_step_data(DB_HTTPTEST *httptest, DB_HTTPSTEP *httpstep, S_ZB
 	DB_HTTPSTEPITEM	httpstepitem;
 
 	AGENT_RESULT    value;
+
+	INIT_CHECK_MEMORY();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_step_data(step:%s,url:%s,rsp:%d,time:" ZBX_FS_DBL ",speed:" ZBX_FS_DBL ")",
 		httpstep->name,
@@ -220,6 +231,8 @@ static void	process_step_data(DB_HTTPTEST *httptest, DB_HTTPSTEP *httpstep, S_ZB
 	
 	DBfree_result(result);
 	zabbix_log(LOG_LEVEL_DEBUG, "End process_step_data()");
+
+	CHECK_MEMORY("process_step_data", "end");
 
 /*	DB_RESULT	result;
 	DB_ROW	row;
@@ -278,6 +291,8 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 	S_ZBX_HTTPSTAT	stat;
 
 	CURL            *easyhandle = NULL;
+
+	INIT_CHECK_MEMORY();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_httptest(httptestid:" ZBX_FS_UI64 ",name:%s)",
 		httptest->httptestid,
@@ -358,11 +373,12 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 
 		/* Substitute macros */
 		http_substitute_macros(httptest,httpstep.url, sizeof(httpstep.url));
-		/* zabbix_log(LOG_LEVEL_WARNING, "URL [%s]", httpstep.url); */
+
 		http_substitute_macros(httptest,httpstep.posts, sizeof(httpstep.posts));
 		/* zabbix_log(LOG_LEVEL_WARNING, "POSTS [%s]", httpstep.posts); */
 		if(httpstep.posts[0] != 0)
 		{
+			zabbix_log(LOG_LEVEL_DEBUG, "WEBMonitor: use post [%s]", httpstep.posts);
 			if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, httpstep.posts)))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "Cannot set POST vars [%s]",
@@ -373,6 +389,7 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 		}
 		if( !err_str )
 		{
+			zabbix_log(LOG_LEVEL_DEBUG, "WEBMonitor: Go to URL [%s]", httpstep.url);
 			if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_URL, httpstep.url)))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "Cannot set URL [%s]",
@@ -472,6 +489,8 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End process_httptest(total time:" ZBX_FS_DBL ")",
 		httptest->time);
+
+	CHECK_MEMORY("process_httptest", "end");
 }
 
 /******************************************************************************
@@ -496,6 +515,8 @@ void process_httptests(int now)
 
 	DB_HTTPTEST	httptest;
 
+	INIT_CHECK_MEMORY();
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_httptests()");
 
 	result = DBselect("select httptestid,name,applicationid,nextcheck,status,delay,macros,agent from httptest where status=%d and nextcheck<=%d and " ZBX_SQL_MOD(httptestid,%d) "=%d and " ZBX_COND_NODEID,
@@ -519,6 +540,8 @@ void process_httptests(int now)
 	}
 	DBfree_result(result);
 	zabbix_log(LOG_LEVEL_DEBUG, "End process_httptests()");
+
+	CHECK_MEMORY("process_httptests", "end");
 }
 
 #endif /* HAVE_LIBCURL */
