@@ -156,6 +156,9 @@ int ZabbixCreateService(char *path)
 
 	_fullpath(execName, path, MAX_PATH);
 
+	if( NULL == strstr(execName, ".exe") )
+		zbx_strlcat(execName, ".exe", sizeof(execName));
+
 	mgr = OpenSCManager(NULL,NULL,GENERIC_WRITE);
 	if ( NULL == mgr )
 	{

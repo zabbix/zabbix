@@ -34,7 +34,7 @@ static FARPROC GetProcAddressAndLog(HMODULE hModule,LPCSTR procName)
 
 	ptr=GetProcAddress(hModule,procName);
 	if ( NULL == ptr )
-		zbx_error("Unable to resolve symbol '%s'", procName);
+		zabbix_log( LOG_LEVEL_DEBUG, "Unable to resolve symbol '%s'", procName);
 
 	return ptr;
 }
@@ -49,7 +49,7 @@ void import_symbols(void)
 	}
 	else
 	{
-		zbx_error("Unable to get handle to USER32.DLL");
+		zabbix_log( LOG_LEVEL_DEBUG, "Unable to get handle to USER32.DLL");
 	}
 
 	if(NULL != (hModule=GetModuleHandle("KERNEL32.DLL")) )
@@ -59,7 +59,7 @@ void import_symbols(void)
 	}
 	else
 	{
-		zbx_error("Unable to get handle to KERNEL32.DLL");
+		zabbix_log( LOG_LEVEL_DEBUG, "Unable to get handle to KERNEL32.DLL");
 	}
 
 	if(NULL != (hModule=GetModuleHandle("PSAPI.DLL")) )
@@ -68,6 +68,6 @@ void import_symbols(void)
 	}
 	else
 	{
-		zbx_error("Unable to get handle to PSAPI.DLL");
+		zabbix_log( LOG_LEVEL_DEBUG, "Unable to get handle to PSAPI.DLL");
 	}
 }
