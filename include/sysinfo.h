@@ -167,7 +167,8 @@ typedef struct zbx_metric_type
 #define PROCESS_TEST		1
 #define PROCESS_USE_TEST_PARAM	2
 
-void	init_metrics();
+void	init_metrics(void);
+void	free_metrics(void);
 
 int	process(const char *in_command, unsigned flags, AGENT_RESULT *result);
 

@@ -229,7 +229,7 @@ void	init_config(void)
  *                                                                            *
  ******************************************************************************/
 
-#ifdef TEST
+#ifdef ZABBIX_TEST
 
 void test()
 {
@@ -240,7 +240,7 @@ void test()
 	printf("\n-= Test completed =-\n");
 }
 
-#endif /* TEST */
+#endif /* ZABBIX_TEST */
 
 /******************************************************************************
  *                                                                            *
@@ -349,7 +349,7 @@ int main(int argc, char **argv)
 			break;
 	}
 
-#ifdef TEST
+#ifdef ZABBIX_TEST
 	if(CONFIG_LOG_FILE == NULL)
 	{
 		zabbix_open_log(LOG_TYPE_UNDEFINED,CONFIG_LOG_LEVEL,NULL);
@@ -365,7 +365,7 @@ int main(int argc, char **argv)
 
 	zbx_on_exit();
 	return 0;
-#endif /* TEST */
+#endif /* ZABBIX_TEST */
 	
 	return daemon_start(CONFIG_ALLOW_ROOT);
 }
@@ -616,6 +616,8 @@ void	zbx_on_exit()
 	daemon_stop();
 
 #endif /* USE_PID_FILE */
+
+	free_metrics();
 
 	zbx_sleep(2); /* wait for all threads closing */
 	
