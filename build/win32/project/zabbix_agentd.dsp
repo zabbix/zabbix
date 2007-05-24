@@ -4,7 +4,7 @@
 
 # TARGTYPE "Win32 (x86) Console Application" 0x0103
 
-CFG=zabbix_agentd - Win32 TODO AMD64
+CFG=ZABBIX_AGENTD - WIN32 RELEASE
 !MESSAGE This is not a valid makefile. To build this project using NMAKE,
 !MESSAGE use the Export Makefile command and run
 !MESSAGE 
@@ -13,18 +13,14 @@ CFG=zabbix_agentd - Win32 TODO AMD64
 !MESSAGE You can specify a configuration when running NMAKE
 !MESSAGE by defining the macro CFG on the command line. For example:
 !MESSAGE 
-!MESSAGE NMAKE /f "zabbix_agentd.mak" CFG="zabbix_agentd - Win32 TODO AMD64"
+!MESSAGE NMAKE /f "zabbix_agentd.mak" CFG="ZABBIX_AGENTD - WIN32 RELEASE"
 !MESSAGE 
 !MESSAGE Possible choices for configuration are:
 !MESSAGE 
 !MESSAGE "zabbix_agentd - Win32 Release" (based on "Win32 (x86) Console Application")
 !MESSAGE "zabbix_agentd - Win32 Debug" (based on "Win32 (x86) Console Application")
-!MESSAGE "zabbix_agentd - Win32 TODO" (based on "Win32 (x86) Console Application")
-!MESSAGE "zabbix_agentd - Win32 Test" (based on "Win32 (x86) Console Application")
 !MESSAGE "zabbix_agentd - Win32 Debug AMD64" (based on "Win32 (x86) Console Application")
 !MESSAGE "zabbix_agentd - Win32 Release AMD64" (based on "Win32 (x86) Console Application")
-!MESSAGE "zabbix_agentd - Win32 Test AMD64" (based on "Win32 (x86) Console Application")
-!MESSAGE "zabbix_agentd - Win32 TODO AMD64" (based on "Win32 (x86) Console Application")
 !MESSAGE 
 
 # Begin Project
@@ -82,56 +78,6 @@ LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
 # ADD LINK32 ws2_32.lib pdh.lib psapi.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib Wldap32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP BASE Use_MFC 0
-# PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "TODO"
-# PROP BASE Intermediate_Dir "TODO"
-# PROP BASE Ignore_Export_Lib 0
-# PROP BASE Target_Dir ""
-# PROP Use_MFC 0
-# PROP Use_Debug_Libraries 1
-# PROP Output_Dir "TODO"
-# PROP Intermediate_Dir "TODO"
-# PROP Ignore_Export_Lib 0
-# PROP Target_Dir ""
-# ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "../include/" /I "../../../include/" /D "_DEBUG" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /FR /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "TODO" /D "WIN32" /D "_WINDOWS" /D "HAVE_LDAP" /D "HAVE_ASSERT_H" /D "_CONSOLE" /D "_MBCS" /D "ZABBIX_SERVICE" /D "WITH_COMMON_METRICS" /D "WITH_SPECIFIC_METRICS" /D "WITH_SIMPLE_METRICS" /FR /YX /FD /GZ /c
-# ADD BASE RSC /l 0x409 /fo"Debug/zabbixw32.res" /d "_DEBUG"
-# ADD RSC /l 0x409 /d "_DEBUG"
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-LINK32=link.exe
-# ADD BASE LINK32 ws2_32.lib pdh.lib psapi.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 ws2_32.lib pdh.lib psapi.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib Wldap32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP BASE Use_MFC 0
-# PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "Test"
-# PROP BASE Intermediate_Dir "Test"
-# PROP BASE Ignore_Export_Lib 0
-# PROP BASE Target_Dir ""
-# PROP Use_MFC 0
-# PROP Use_Debug_Libraries 1
-# PROP Output_Dir "Test"
-# PROP Intermediate_Dir "Test"
-# PROP Ignore_Export_Lib 0
-# PROP Target_Dir ""
-# ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /FR /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "ZABBIX_TEST" /D "WIN32" /D "_WINDOWS" /D "HAVE_LDAP" /D "HAVE_ASSERT_H" /D "_CONSOLE" /D "_MBCS" /D "ZABBIX_SERVICE" /D "WITH_COMMON_METRICS" /D "WITH_SPECIFIC_METRICS" /D "WITH_SIMPLE_METRICS" /FR /YX /FD /GZ /c
-# ADD BASE RSC /l 0x409 /fo"Debug/zabbixw32.res" /d "_DEBUG"
-# ADD RSC /l 0x409 /d "_DEBUG"
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-LINK32=link.exe
-# ADD BASE LINK32 ws2_32.lib pdh.lib psapi.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 ws2_32.lib pdh.lib psapi.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib Wldap32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Use_MFC 0
@@ -184,70 +130,14 @@ LINK32=link.exe
 # ADD LINK32 ws2_32.lib pdh.lib psapi.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib Wldap32.lib bufferoverflowU.lib /nologo /subsystem:console /machine:I386 /out:"../../../bin/win64/zabbix_agentd.exe" /machine:AMD64
 # SUBTRACT LINK32 /pdb:none
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Use_MFC 0
-# PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "Test_AMD64"
-# PROP BASE Intermediate_Dir "Test_AMD64"
-# PROP BASE Ignore_Export_Lib 0
-# PROP BASE Target_Dir ""
-# PROP Use_MFC 0
-# PROP Use_Debug_Libraries 1
-# PROP Output_Dir "Test_AMD64"
-# PROP Intermediate_Dir "Test_AMD64"
-# PROP Ignore_Export_Lib 0
-# PROP Target_Dir ""
-# ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "ZABBIX_TEST" /D "HAVE_LDAP" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "ZABBIX_SERVICE" /FR /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Od /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "ZABBIX_TEST" /D "_WIN64" /D "_WINDOWS" /D "HAVE_LDAP" /D "HAVE_ASSERT_H" /D "_CONSOLE" /D "_MBCS" /D "ZABBIX_SERVICE" /D "WITH_COMMON_METRICS" /D "WITH_SPECIFIC_METRICS" /D "WITH_SIMPLE_METRICS" /FR /FD /Wp64 /c
-# ADD BASE RSC /l 0x409 /d "_DEBUG"
-# ADD RSC /l 0x409 /d "_DEBUG"
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-LINK32=link.exe
-# ADD BASE LINK32 ws2_32.lib pdh.lib psapi.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib Wldap32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 ws2_32.lib pdh.lib psapi.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib Wldap32.lib bufferoverflowU.lib /nologo /subsystem:console /debug /machine:I386 /machine:AMD64
-# SUBTRACT LINK32 /pdb:none
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
-
-# PROP BASE Use_MFC 0
-# PROP BASE Use_Debug_Libraries 1
-# PROP BASE Output_Dir "TODO_AMD64"
-# PROP BASE Intermediate_Dir "TODO_AMD64"
-# PROP BASE Ignore_Export_Lib 0
-# PROP BASE Target_Dir ""
-# PROP Use_MFC 0
-# PROP Use_Debug_Libraries 1
-# PROP Output_Dir "TODO_AMD64"
-# PROP Intermediate_Dir "TODO_AMD64"
-# PROP Ignore_Export_Lib 0
-# PROP Target_Dir ""
-# ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "TODO" /D "HAVE_LDAP" /D "HAVE_ASSERT_H" /D "WIN32" /D "_CONSOLE" /D "_MBCS" /D "ZABBIX_SERVICE" /FR /YX /FD /GZ /c
-# ADD CPP /nologo /MTd /W3 /Od /I "./" /I "../include/" /I "../../../include/" /I "../../../src/zabbix_agent" /D "_DEBUG" /D "TODO" /D "_WIN64" /D "_WINDOWS" /D "HAVE_LDAP" /D "HAVE_ASSERT_H" /D "_CONSOLE" /D "_MBCS" /D "ZABBIX_SERVICE" /D "WITH_COMMON_METRICS" /D "WITH_SPECIFIC_METRICS" /D "WITH_SIMPLE_METRICS" /FR /FD /Wp64 /c
-# ADD BASE RSC /l 0x409 /d "_DEBUG"
-# ADD RSC /l 0x409 /d "_DEBUG"
-BSC32=bscmake.exe
-# ADD BASE BSC32 /nologo
-# ADD BSC32 /nologo
-LINK32=link.exe
-# ADD BASE LINK32 ws2_32.lib pdh.lib psapi.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib Wldap32.lib /nologo /subsystem:console /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 ws2_32.lib pdh.lib psapi.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib Wldap32.lib bufferoverflowU.lib /nologo /subsystem:console /debug /machine:I386 /machine:AMD64
-# SUBTRACT LINK32 /pdb:none
-
 !ENDIF 
 
 # Begin Target
 
 # Name "zabbix_agentd - Win32 Release"
 # Name "zabbix_agentd - Win32 Debug"
-# Name "zabbix_agentd - Win32 TODO"
-# Name "zabbix_agentd - Win32 Test"
 # Name "zabbix_agentd - Win32 Debug AMD64"
 # Name "zabbix_agentd - Win32 Release AMD64"
-# Name "zabbix_agentd - Win32 Test AMD64"
-# Name "zabbix_agentd - Win32 TODO AMD64"
 # Begin Group "src"
 
 # PROP Default_Filter ""
@@ -273,19 +163,11 @@ SOURCE=..\..\..\src\libs\zbxcommon\gnuregex.c
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug"
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
 
 # ADD CPP /O2
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 !ENDIF 
 
@@ -357,30 +239,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\aix\aix.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -400,30 +264,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\aix\AIX_new.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -443,30 +289,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\aix\cpu.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -486,30 +314,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\aix\diskio.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -529,30 +339,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\aix\diskspace.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -572,30 +364,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\aix\inodes.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -615,30 +389,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\aix\kernel.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -658,30 +414,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\aix\memory.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -701,30 +439,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\aix\net.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -744,30 +464,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\aix\proc.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -787,30 +489,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\aix\sensors.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -830,30 +514,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\aix\swap.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -873,30 +539,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\aix\uptime.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -920,30 +568,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\freebsd\cpu.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -963,30 +593,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\freebsd\diskio.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -1006,30 +618,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\freebsd\diskspace.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -1049,30 +643,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\freebsd\freebsd.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -1092,30 +668,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\freebsd\inodes.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -1135,30 +693,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\freebsd\kernel.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -1178,30 +718,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\freebsd\memory.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -1221,30 +743,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\freebsd\net.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -1264,30 +768,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\freebsd\proc.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -1307,30 +793,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\freebsd\sensors.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -1350,30 +818,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\freebsd\swap.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -1393,30 +843,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\freebsd\uptime.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -1440,30 +872,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\hpux\cpu.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -1483,30 +897,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\hpux\diskio.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -1526,30 +922,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\hpux\diskspace.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -1569,30 +947,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\hpux\hpux.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -1612,30 +972,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\hpux\inodes.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -1655,30 +997,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\hpux\kernel.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -1698,30 +1022,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\hpux\memory.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -1741,30 +1047,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\hpux\net.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -1784,30 +1072,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\hpux\proc.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -1827,30 +1097,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\hpux\sensors.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -1870,30 +1122,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\hpux\swap.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -1913,30 +1147,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\hpux\uptime.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -1960,30 +1176,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\linux\cpu.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -2003,30 +1201,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\linux\diskio.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -2046,30 +1226,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\linux\diskspace.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -2089,30 +1251,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\linux\inodes.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -2132,30 +1276,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\linux\kernel.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -2175,30 +1301,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\linux\linux.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -2218,30 +1326,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\linux\memory.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -2261,30 +1351,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\linux\net.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -2304,30 +1376,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\linux\proc.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -2347,30 +1401,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\linux\sensors.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -2390,30 +1426,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\linux\swap.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -2433,30 +1451,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\linux\uptime.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -2480,30 +1480,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\netbsd\cpu.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -2523,30 +1505,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\netbsd\diskio.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -2566,30 +1530,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\netbsd\diskspace.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -2609,30 +1555,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\netbsd\inodes.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -2652,30 +1580,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\netbsd\kernel.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -2695,30 +1605,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\netbsd\memory.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -2738,30 +1630,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\netbsd\net.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -2781,30 +1655,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\netbsd\netbsd.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -2824,30 +1680,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\netbsd\proc.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -2867,30 +1705,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\netbsd\sensors.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -2910,30 +1730,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\netbsd\swap.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -2953,30 +1755,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\netbsd\uptime.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -3000,30 +1784,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\openbsd\cpu.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -3043,30 +1809,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\openbsd\diskio.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -3086,30 +1834,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\openbsd\diskspace.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -3129,30 +1859,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\openbsd\inodes.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -3172,30 +1884,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\openbsd\kernel.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -3215,30 +1909,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\openbsd\memory.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -3258,30 +1934,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\openbsd\net.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -3301,30 +1959,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\openbsd\openbsd.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -3344,30 +1984,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\openbsd\OpenBSD3.7.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -3387,30 +2009,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\openbsd\proc.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -3430,30 +2034,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\openbsd\sensors.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -3473,30 +2059,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\openbsd\swap.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -3516,30 +2084,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\openbsd\uptime.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -3563,30 +2113,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\osf\cpu.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -3606,30 +2138,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\osf\diskio.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -3649,30 +2163,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\osf\diskspace.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -3692,30 +2188,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\osf\inodes.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -3735,30 +2213,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\osf\kernel.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -3778,30 +2238,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\osf\memory.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -3821,30 +2263,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\osf\net.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -3864,30 +2288,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\osf\osf.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -3907,30 +2313,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\osf\proc.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -3950,30 +2338,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\osf\sensors.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -3993,30 +2363,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\osf\swap.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -4036,30 +2388,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\osf\uptime.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -4083,30 +2417,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\osx\cpu.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -4126,30 +2442,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\osx\diskio.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -4169,30 +2467,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\osx\diskspace.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -4212,30 +2492,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\osx\inodes.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -4255,30 +2517,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\osx\kernel.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -4298,30 +2542,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\osx\memory.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -4341,30 +2567,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\osx\net.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -4384,30 +2592,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\osx\osx.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -4427,30 +2617,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\osx\proc.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -4470,30 +2642,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\osx\sensors.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -4513,30 +2667,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\osx\swap.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -4556,30 +2692,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\osx\uptime.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -4603,30 +2721,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\solaris\cpu.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -4646,30 +2746,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\solaris\diskio.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -4689,30 +2771,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\solaris\diskspace.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -4732,30 +2796,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\solaris\inodes.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -4775,30 +2821,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\solaris\kernel.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -4818,30 +2846,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\solaris\memory.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -4861,30 +2871,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\solaris\net.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -4904,30 +2896,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\solaris\proc.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -4947,30 +2921,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\solaris\sensors.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -4990,30 +2946,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\solaris\solaris.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -5033,30 +2971,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\solaris\SunOS5.9.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -5076,30 +2996,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\solaris\swap.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -5119,30 +3021,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\solaris\uptime.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -5166,30 +3050,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\unknown\cpu.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -5209,30 +3075,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\unknown\diskio.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -5252,30 +3100,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\unknown\diskspace.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -5295,30 +3125,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\unknown\inodes.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -5338,30 +3150,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\unknown\kernel.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -5381,30 +3175,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\unknown\memory.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -5424,30 +3200,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\unknown\net.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -5467,30 +3225,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\unknown\proc.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -5510,30 +3250,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\unknown\sensors.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -5553,30 +3275,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\unknown\swap.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -5596,30 +3300,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\unknown\unknown.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -5639,30 +3325,12 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\unknown\uptime.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -5746,14 +3414,6 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\common\common.c
 
 # PROP Intermediate_Dir "Debug/sysinfo/common/"
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Intermediate_Dir "TODO/sysinfo/common/"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Intermediate_Dir "Test/sysinfo/common/"
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP Intermediate_Dir "Debug_AMD64/sysinfo/common/"
@@ -5761,14 +3421,6 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\common\common.c
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
 
 # PROP Intermediate_Dir "Release_AMD64/sysinfo/common/"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP Intermediate_Dir "Test_AMD64/sysinfo/common/"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
-
-# PROP Intermediate_Dir "TODO_AMD64/sysinfo/common/"
 
 !ENDIF 
 
@@ -5785,14 +3437,6 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\common\common.h
 
 # PROP Intermediate_Dir "Debug/sysinfo/common/"
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Intermediate_Dir "TODO/sysinfo/common/"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Intermediate_Dir "Test/sysinfo/common/"
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP Intermediate_Dir "Debug_AMD64/sysinfo/common/"
@@ -5800,14 +3444,6 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\common\common.h
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
 
 # PROP Intermediate_Dir "Release_AMD64/sysinfo/common/"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP Intermediate_Dir "Test_AMD64/sysinfo/common/"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
-
-# PROP Intermediate_Dir "TODO_AMD64/sysinfo/common/"
 
 !ENDIF 
 
@@ -5824,14 +3460,6 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\common\file.c
 
 # PROP Intermediate_Dir "Debug/sysinfo/common/"
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Intermediate_Dir "TODO/sysinfo/common/"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Intermediate_Dir "Test/sysinfo/common/"
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP Intermediate_Dir "Debug_AMD64/sysinfo/common/"
@@ -5839,14 +3467,6 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\common\file.c
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
 
 # PROP Intermediate_Dir "Release_AMD64/sysinfo/common/"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP Intermediate_Dir "Test_AMD64/sysinfo/common/"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
-
-# PROP Intermediate_Dir "TODO_AMD64/sysinfo/common/"
 
 !ENDIF 
 
@@ -5863,14 +3483,6 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\common\file.h
 
 # PROP Intermediate_Dir "Debug/sysinfo/common/"
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Intermediate_Dir "TODO/sysinfo/common/"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Intermediate_Dir "Test/sysinfo/common/"
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP Intermediate_Dir "Debug_AMD64/sysinfo/common/"
@@ -5878,14 +3490,6 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\common\file.h
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
 
 # PROP Intermediate_Dir "Release_AMD64/sysinfo/common/"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP Intermediate_Dir "Test_AMD64/sysinfo/common/"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
-
-# PROP Intermediate_Dir "TODO_AMD64/sysinfo/common/"
 
 !ENDIF 
 
@@ -5902,14 +3506,6 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\common\http.c
 
 # PROP Intermediate_Dir "Debug/sysinfo/common/"
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Intermediate_Dir "TODO/sysinfo/common/"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Intermediate_Dir "Test/sysinfo/common/"
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP Intermediate_Dir "Debug_AMD64/sysinfo/common/"
@@ -5917,14 +3513,6 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\common\http.c
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
 
 # PROP Intermediate_Dir "Release_AMD64/sysinfo/common/"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP Intermediate_Dir "Test_AMD64/sysinfo/common/"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
-
-# PROP Intermediate_Dir "TODO_AMD64/sysinfo/common/"
 
 !ENDIF 
 
@@ -5941,14 +3529,6 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\common\http.h
 
 # PROP Intermediate_Dir "Debug/sysinfo/common/"
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Intermediate_Dir "TODO/sysinfo/common/"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Intermediate_Dir "Test/sysinfo/common/"
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP Intermediate_Dir "Debug_AMD64/sysinfo/common/"
@@ -5956,14 +3536,6 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\common\http.h
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
 
 # PROP Intermediate_Dir "Release_AMD64/sysinfo/common/"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP Intermediate_Dir "Test_AMD64/sysinfo/common/"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
-
-# PROP Intermediate_Dir "TODO_AMD64/sysinfo/common/"
 
 !ENDIF 
 
@@ -5980,14 +3552,6 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\common\net.c
 
 # PROP Intermediate_Dir "Debug/sysinfo/common/"
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Intermediate_Dir "TODO/sysinfo/common/"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Intermediate_Dir "Test/sysinfo/common/"
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP Intermediate_Dir "Debug_AMD64/sysinfo/common/"
@@ -5995,14 +3559,6 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\common\net.c
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
 
 # PROP Intermediate_Dir "Release_AMD64/sysinfo/common/"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP Intermediate_Dir "Test_AMD64/sysinfo/common/"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
-
-# PROP Intermediate_Dir "TODO_AMD64/sysinfo/common/"
 
 !ENDIF 
 
@@ -6019,14 +3575,6 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\common\net.h
 
 # PROP Intermediate_Dir "Debug/sysinfo/common/"
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Intermediate_Dir "TODO/sysinfo/common/"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Intermediate_Dir "Test/sysinfo/common/"
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP Intermediate_Dir "Debug_AMD64/sysinfo/common/"
@@ -6034,14 +3582,6 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\common\net.h
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
 
 # PROP Intermediate_Dir "Release_AMD64/sysinfo/common/"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP Intermediate_Dir "Test_AMD64/sysinfo/common/"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
-
-# PROP Intermediate_Dir "TODO_AMD64/sysinfo/common/"
 
 !ENDIF 
 
@@ -6058,14 +3598,6 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\common\system.c
 
 # PROP Intermediate_Dir "Debug/sysinfo/common/"
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Intermediate_Dir "TODO/sysinfo/common/"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Intermediate_Dir "Test/sysinfo/common/"
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP Intermediate_Dir "Debug_AMD64/sysinfo/common/"
@@ -6073,14 +3605,6 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\common\system.c
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
 
 # PROP Intermediate_Dir "Release_AMD64/sysinfo/common/"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP Intermediate_Dir "Test_AMD64/sysinfo/common/"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
-
-# PROP Intermediate_Dir "TODO_AMD64/sysinfo/common/"
 
 !ENDIF 
 
@@ -6097,14 +3621,6 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\common\system.h
 
 # PROP Intermediate_Dir "Debug/sysinfo/common/"
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Intermediate_Dir "TODO/sysinfo/common/"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Intermediate_Dir "Test/sysinfo/common/"
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP Intermediate_Dir "Debug_AMD64/sysinfo/common/"
@@ -6112,14 +3628,6 @@ SOURCE=..\..\..\src\libs\zbxsysinfo\common\system.h
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
 
 # PROP Intermediate_Dir "Release_AMD64/sysinfo/common/"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP Intermediate_Dir "Test_AMD64/sysinfo/common/"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
-
-# PROP Intermediate_Dir "TODO_AMD64/sysinfo/common/"
 
 !ENDIF 
 
@@ -6167,20 +3675,12 @@ SOURCE=..\..\..\src\libs\zbxwin32\perfmon.c
 
 # ADD CPP /W4
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # ADD BASE CPP /W4
 # ADD CPP /W4
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 !ENDIF 
 
@@ -6205,32 +3705,12 @@ SOURCE=..\..\..\src\libs\zbxnix\daemon.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -6250,31 +3730,12 @@ SOURCE=..\..\..\src\libs\zbxnix\pid.c
 
 # PROP Exclude_From_Build 1
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP BASE Exclude_From_Build 1
-# PROP Exclude_From_Build 1
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # PROP BASE Exclude_From_Build 1
 # PROP Exclude_From_Build 1
@@ -6322,14 +3783,6 @@ SOURCE=..\..\..\src\libs\zbxcomms\comms.c
 
 # PROP Intermediate_Dir "Debug/zbxcomms"
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# PROP Intermediate_Dir "TODO/zbxcomms"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# PROP Intermediate_Dir "Test/zbxcomms"
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # PROP Intermediate_Dir "Debug_AMD64/zbxcomms"
@@ -6337,14 +3790,6 @@ SOURCE=..\..\..\src\libs\zbxcomms\comms.c
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
 
 # PROP Intermediate_Dir "Release_AMD64/zbxcomms"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# PROP Intermediate_Dir "Test_AMD64/zbxcomms"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
-
-# PROP Intermediate_Dir "TODO_AMD64/zbxcomms"
 
 !ENDIF 
 
@@ -6581,40 +4026,6 @@ BuildCmds= \
    $(BuildCmds)
 # End Custom Build
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# Begin Custom Build - Compiling messages...
-ProjDir=.
-InputPath=.\messages.mc
-InputName=messages
-
-BuildCmds= \
-	mc -s -U -h $(ProjDir) -r $(ProjDir) $(InputName)
-
-"$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-   $(BuildCmds)
-
-"Msg00001.bin" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-   $(BuildCmds)
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# Begin Custom Build - Compiling messages...
-ProjDir=.
-InputPath=.\messages.mc
-InputName=messages
-
-BuildCmds= \
-	mc -s -U -h $(ProjDir) -r $(ProjDir) $(InputName)
-
-"$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-   $(BuildCmds)
-
-"Msg00001.bin" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-   $(BuildCmds)
-# End Custom Build
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # Begin Custom Build - Compiling messages...
@@ -6633,40 +4044,6 @@ BuildCmds= \
 # End Custom Build
 
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Release AMD64"
-
-# Begin Custom Build - Compiling messages...
-ProjDir=.
-InputPath=.\messages.mc
-InputName=messages
-
-BuildCmds= \
-	mc -s -U -h $(ProjDir) -r $(ProjDir) $(InputName)
-
-"$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-   $(BuildCmds)
-
-"Msg00001.bin" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-   $(BuildCmds)
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# Begin Custom Build - Compiling messages...
-ProjDir=.
-InputPath=.\messages.mc
-InputName=messages
-
-BuildCmds= \
-	mc -s -U -h $(ProjDir) -r $(ProjDir) $(InputName)
-
-"$(InputName).h" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-   $(BuildCmds)
-
-"Msg00001.bin" : $(SOURCE) "$(INTDIR)" "$(OUTDIR)"
-   $(BuildCmds)
-# End Custom Build
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
 
 # Begin Custom Build - Compiling messages...
 ProjDir=.
@@ -6704,16 +4081,6 @@ SOURCE=.\resource.rc
 # ADD BASE RSC /l 0x419
 # ADD RSC /l 0x419 /fo"Debug/resource.res"
 
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO"
-
-# ADD BASE RSC /l 0x419
-# ADD RSC /l 0x419 /fo"TODO/resource.res"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test"
-
-# ADD BASE RSC /l 0x419
-# ADD RSC /l 0x419 /fo"Test/resource.res"
-
 !ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Debug AMD64"
 
 # ADD BASE RSC /l 0x419 /fo"Debug/resource.res"
@@ -6723,16 +4090,6 @@ SOURCE=.\resource.rc
 
 # ADD BASE RSC /l 0x419 /fo"Release/resource.res"
 # ADD RSC /l 0x419 /fo"Release/resource.res"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 Test AMD64"
-
-# ADD BASE RSC /l 0x419 /fo"Test/resource.res"
-# ADD RSC /l 0x419 /fo"Test/resource.res"
-
-!ELSEIF  "$(CFG)" == "zabbix_agentd - Win32 TODO AMD64"
-
-# ADD BASE RSC /l 0x419 /fo"TODO/resource.res"
-# ADD RSC /l 0x419 /fo"TODO/resource.res"
 
 !ENDIF 
 
