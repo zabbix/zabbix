@@ -176,6 +176,8 @@ include_once "include/page_header.php";
 		}
 		if($element) $element->Show();
 		
+		$_REQUEST['elementid'] = $elementid;
+
 		if( 2 != $_REQUEST["fullscreen"] )
 			navigation_bar("screens.php",array('config','elementid'));
 	}
