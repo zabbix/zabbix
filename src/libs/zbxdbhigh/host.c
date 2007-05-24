@@ -2907,7 +2907,7 @@ static int	DBcopy_trigger_to_host(
 			/* Loop: functions */
 			db_functions = DBselect("select itemid,function,parameter,functionid from functions "
 						" where triggerid=" ZBX_FS_UI64, triggerid);
-
+/* TODO: out of memory!!! */
 			while( SUCCEED == result && (function_data = DBfetch(db_functions)) )
 			{
 				ZBX_STR2UINT64(itemid, function_data[0]);

@@ -317,6 +317,8 @@ void	zbx_on_exit()
 
 #endif /* USE_PID_FILE */
 
+	free_metrics();
+
 	free_collector_data();
 	alias_list_free();
 
@@ -366,6 +368,7 @@ int	main(int argc, char **argv)
 #endif /* _WINDOWS */
 		case ZBX_TASK_PRINT_SUPPORTED:
 			test_parameters();
+			free_metrics();
 			exit(SUCCEED);
 			break;
 		case ZBX_TASK_TEST_METRIC:
@@ -386,60 +389,6 @@ int	main(int argc, char **argv)
 #else /* ZABBIX_TEST */
 /* #	define ENABLE_CHECK_MEMOTY 1 */
 
-#	if defined(ENABLE_CHECK_MEMOTY)
-#		include "crtdbg.h"
-
-#		define REINIT_CHECK_MEMORY(a) \
-			_CrtMemCheckpoint(& ## a ## oldMemState)
-
-#		define INIT_CHECK_MEMORY(a) \
-			char a ## DumpMessage[0xFFFF]; \
-			_CrtMemState  a ## oldMemState, a ## newMemState, a ## diffMemState; \
-			REINIT_CHECK_MEMORY(a)
-
-#		define CHECK_MEMORY(a, fncname, msg) \
-			_CrtMemCheckpoint(& ## a ## newMemState); \
-			if(_CrtMemDifference(& ## a ## diffMemState, & ## a ## oldMemState, & ## a ## newMemState)) \
-			{ \
-				zbx_snprintf(a ## DumpMessage, sizeof(a ## DumpMessage), \
-					"%s\n" \
-					"free:  %10li bytes in %10li blocks\n" \
-					"normal:%10li bytes in %10li blocks\n" \
-					"CRT:   %10li bytes in %10li blocks\n" \
-					"ignore:%10li bytes in %10li blocks\n" \
-					"client:%10li bytes in %10li blocks\n" \
-					"max:   %10li bytes in %10li blocks", \
-					 \
-					fncname ": (" #a ") Memory changed! (" msg ")\n", \
-					 \
-					(long) a ## diffMemState.lSizes[_FREE_BLOCK], \
-					(long) a ## diffMemState.lCounts[_FREE_BLOCK], \
-					 \
-					(long) a ## diffMemState.lSizes[_NORMAL_BLOCK], \
-					(long) a ## diffMemState.lCounts[_NORMAL_BLOCK], \
-					 \
-					(long) a ## diffMemState.lSizes[_CRT_BLOCK], \
-					(long) a ## diffMemState.lCounts[_CRT_BLOCK], \
-					 \
-					(long) a ## diffMemState.lSizes[_IGNORE_BLOCK], \
-					(long) a ## diffMemState.lCounts[_IGNORE_BLOCK], \
-					 \
-					(long) a ## diffMemState.lSizes[_CLIENT_BLOCK], \
-					(long) a ## diffMemState.lCounts[_CLIENT_BLOCK], \
-					 \
-					(long) a ## diffMemState.lSizes[_MAX_BLOCKS], \
-					(long) a ## diffMemState.lCounts[_MAX_BLOCKS]); \
-				 SDI2("%s", a ## DumpMessage); \
-			} \
-			else \
-			{ \
-				SDI("NO leak"); \
-			}
-#	else
-#		define INIT_CHECK_MEMORY(a) ((void)0)
-#		define CHECK_MEMORY(a, fncname, msg) ((void)0)
-#	endif
-
 #if defined(_WINDOWS)
 #	include "messages.h"
 #endif /* _WINDOWS */
@@ -447,25 +396,6 @@ int	main(int argc, char **argv)
 int main()
 {
 #if ON
-	AGENT_RESULT    result;
-	
-	init_result(&result);
-
-	SET_UI64_RESULT(&result, 123456789123456789);
-	printf("UI: '" ZBX_FS_UI64 "'\n", result.ui64);
-
-	printf("UI_TO_DBL: '" ZBX_FS_DBL "'\n", *GET_DBL_RESULT(&result));
-
-	UNSET_RESULT_EXCLUDING(&result, AR_UINT64);
-	printf("UI_TO_STR: '%s'\n", *GET_STR_RESULT(&result));
-
-	UNSET_RESULT_EXCLUDING(&result, AR_UINT64);
-	printf("UI_TO_TEXT: '%s'\n", *GET_TEXT_RESULT(&result));
-
-	UNSET_RESULT_EXCLUDING(&result, AR_UINT64);
-	printf("UI_TO_UI64: '" ZBX_FS_UI64 "'\n", *GET_UI64_RESULT(&result));
-
-#elif OFF
 	int res, val;
 
 	if(FAIL == zbx_sock_init())

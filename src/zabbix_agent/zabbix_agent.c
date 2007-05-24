@@ -220,9 +220,13 @@ int	main(int argc, char **argv)
   
 	fflush(stdout);
 
+	free_metrics();
+	alias_list_free();
+
 #if !defined(_WINDOWS)
 	alarm(0);
 #endif /* not WONDOWS */
+	zabbix_close_log();
 
 	return SUCCEED;
 }
