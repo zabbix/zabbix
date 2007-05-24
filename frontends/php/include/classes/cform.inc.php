@@ -62,6 +62,8 @@
 
 		function AddVar($name, $value)
 		{
+			if(empty($value))	return $value;
+
 			return $this->AddItem(new CVar($name, $value));
 		}
 	}
