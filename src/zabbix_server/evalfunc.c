@@ -162,7 +162,6 @@ static int evaluate_COUNT(char *value, DB_ITEM *item, char *parameter)
 	char		cmp[MAX_STRING_LEN+1];
 	char		cmp_esc[MAX_STRING_LEN+1];
 
-	char		table[MAX_STRING_LEN];
 	int		now;
 	int		res = SUCCEED;
 
