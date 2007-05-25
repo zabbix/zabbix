@@ -67,6 +67,7 @@ AC_CHECK_LIB(socket, main)
 AC_CHECK_LIB(kstat, main)
 AC_CHECK_LIB(nsl, main)
 AC_CHECK_LIB(resolv, main)
+AC_CHECK_LIB(m, main)
 AC_CHECK_LIB(kvm, main)
 dnl AC_CHECK_LIB(pthread, main)
 
@@ -815,7 +816,7 @@ Configuration:
 
 echo
 echo "***********************************************************"
-echo "*            Now run 'make install'                       *"
+echo "*            Now run '${MAKE} install'                       *"
 echo "*                                                         *"
 echo "*            Thank you for using ZABBIX!                  *"
 echo "*              <http://www.zabbix.com>                    *"
