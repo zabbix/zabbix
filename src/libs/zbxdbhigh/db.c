@@ -298,17 +298,45 @@ void	get_latest_event_status(zbx_uint64_t triggerid, int *prev_status, int *late
 	char		sql[MAX_STRING_LEN];
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	eventid_max=0;
+/*	zbx_uint64_t	eventid_max=0;
 	zbx_uint64_t	eventid_prev_max=0;
-	zbx_uint64_t	tmp;
+	zbx_uint64_t	eventid_tmp;
 	int		value_max;
-	int		value_prev_max;
+	int		value_prev_max;*/
 
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In latest_event()");
+	zabbix_log(LOG_LEVEL_DEBUG,"In get_latest_event_status(triggerid:" ZBX_FS_UI64,
+		triggerid);
 
-	/* The order is correct here. It shouldn't be 'order by clock desc'! */
-	zbx_snprintf(sql,sizeof(sql),"select eventid,value,clock from events where source=%d and object=%d and objectid=" ZBX_FS_UI64 " order by clock",
+	zbx_snprintf(sql,sizeof(sql),"select eventid,value,clock from events where source=%d and object=%d and objectid=" ZBX_FS_UI64 " order by clock desc",
+		EVENT_SOURCE_TRIGGERS,
+		EVENT_OBJECT_TRIGGER,
+		triggerid);
+	result = DBselect(sql,2);
+
+	row=DBfetch(result);
+	if(row && (DBis_null(row[0])!=SUCCEED))
+	{
+		*latest_status = atoi(row[1]);
+		*prev_status = TRIGGER_VALUE_UNKNOWN;
+
+		row=DBfetch(result);
+		if(row && (DBis_null(row[0])!=SUCCEED))
+		{
+			*prev_status = atoi(row[1]);
+		}
+	}
+	else
+	{
+		*latest_status = TRIGGER_VALUE_UNKNOWN;
+		*prev_status = TRIGGER_VALUE_UNKNOWN;
+	}
+	DBfree_result(result);
+
+/* I do not remember exactlywhy it was so complex. Rewritten. */
+
+/*
+	zbx_snprintf(sql,sizeof(sql),"select eventid,value,clock from events where source=%d and object=%d and objectid=" ZBX_FS_UI64 " order by clock desc",
 		EVENT_SOURCE_TRIGGERS,
 		EVENT_OBJECT_TRIGGER,
 		triggerid);
@@ -316,12 +344,14 @@ void	get_latest_event_status(zbx_uint64_t triggerid, int *prev_status, int *late
 
 	while((row=DBfetch(result)))
 	{
-		ZBX_STR2UINT64(tmp, row[0]);
-		if(tmp >= eventid_max)
+		ZBX_STR2UINT64(eventid_tmp, row[0]);
+		zabbix_log(LOG_LEVEL_WARNING,"eventid_tmp " ZBX_FS_UI64, eventid_tmp);
+		if(eventid_tmp >= eventid_max)
 		{
+			zabbix_log(LOG_LEVEL_WARNING,"New max id " ZBX_FS_UI64, eventid_tmp);
 			eventid_prev_max=eventid_max;
 			value_prev_max=value_max;
-			eventid_max=tmp;
+			eventid_max=eventid_tmp;
 			value_max=atoi(row[1]);
 		}
 	}
@@ -343,6 +373,7 @@ void	get_latest_event_status(zbx_uint64_t triggerid, int *prev_status, int *late
 		}
 	}
 	DBfree_result(result);
+*/
 }
 
 /* SUCCEED if latest service alarm has this status */

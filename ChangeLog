@@ -1,5 +1,6 @@
 Changes for 1.4:
 
+ - fixes related to processing of trigger statuses (Alexei)
  - fixed discovery crashes (Eugene)
  - fixed trigger description substitution for messages (Eugene)
  - fixed SQL schema for housekeeper (Eugene)

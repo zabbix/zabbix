@@ -975,7 +975,7 @@
 			$trig_host = DBfetch($trig_hosts);
 			if($trig_host)
 			{
-				$msg .= " from host '".$trig_host["host"]."'";
+				$msg .= " for host '".$trig_host["host"]."'";
 			}
 			info($msg);
 		}

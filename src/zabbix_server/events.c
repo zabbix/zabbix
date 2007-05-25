@@ -91,14 +91,20 @@ static void	add_trigger_info(DB_EVENT *event)
 		DBfree_result(result);
 
 		get_latest_event_status(triggerid, &event_prev_status, &event_last_status);
+		zabbix_log(LOG_LEVEL_DEBUG,"event_prev_status %d event_last_status %d event->value %d",
+			event_prev_status,
+			event_last_status,
+			event->value);
 
 		event->skip_actions = 0;
 
 		if(	(event->value == TRIGGER_VALUE_UNKNOWN) ||
 			(event_prev_status == TRIGGER_VALUE_TRUE && event_last_status == TRIGGER_VALUE_UNKNOWN && event->value == TRIGGER_VALUE_TRUE) ||
-			(event_prev_status == TRIGGER_VALUE_FALSE && event_last_status == TRIGGER_VALUE_UNKNOWN && event->value == TRIGGER_VALUE_FALSE)
+			(event_prev_status == TRIGGER_VALUE_FALSE && event_last_status == TRIGGER_VALUE_UNKNOWN && event->value == TRIGGER_VALUE_FALSE) ||
+			(event_prev_status == TRIGGER_VALUE_UNKNOWN && event_last_status == TRIGGER_VALUE_UNKNOWN && event->value == TRIGGER_VALUE_FALSE)
 		)
 		{
+			zabbix_log(LOG_LEVEL_DEBUG,"Skip actions");
 			event->skip_actions = 1;
 		}
 	}
