@@ -1,5 +1,6 @@
 Changes for 1.4:
 
+ - fixed discovery crashes (Eugene)
  - fixed trigger description substitution for messages (Eugene)
  - fixed SQL schema for housekeeper (Eugene)
  - added delta value calculation for UINT64 (Eugene)
