@@ -169,7 +169,7 @@ typedef enum
 typedef enum
 {
 	EVENT_SOURCE_TRIGGERS = 0,
-	EVENT_SOURCE_DISCOVERY,
+	EVENT_SOURCE_DISCOVERY
 } zbx_event_source_t;
 
 /* Event objects */
@@ -244,7 +244,7 @@ typedef enum
 {
 	ACTION_EVAL_TYPE_AND_OR	= 0,
 	ACTION_EVAL_TYPE_AND,
-	ACTION_EVAL_TYPE_OR,
+	ACTION_EVAL_TYPE_OR
 }	zbx_action_eval_type_t;
 
 /* Condition types */
