@@ -58,6 +58,8 @@ static void add_host_event(char *ip)
 	int		status;
 	zbx_uint64_t	dhostid;
 
+	assert(ip);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In add_host_event(ip:%s)",
 		ip);
 
@@ -107,6 +109,8 @@ static void add_service_event(DB_DSERVICE *service)
 	DB_EVENT	event;
 	int		now;
 
+	assert(service);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In add_service_event()");
 
 	now = time(NULL); 
@@ -145,6 +149,8 @@ static void update_dservice(DB_DSERVICE *service)
 {
 	char	key_esc[MAX_STRING_LEN];
 
+	assert(service);
+
 	DBescape_string(service->key_, key_esc, sizeof(key_esc)-1);
 
 	DBexecute("update dservices set dhostid=" ZBX_FS_UI64 ",type=%d,port=%d,status=%d,lastup=%d,lastdown=%d,key_='%s' where dserviceid=" ZBX_FS_UI64,
@@ -175,6 +181,8 @@ static void update_dservice(DB_DSERVICE *service)
  ******************************************************************************/
 static void update_dhost(DB_DHOST *host)
 {
+	assert(host);
+
 	DBexecute("update dhosts set druleid=" ZBX_FS_UI64 ",ip='%s',status=%d,lastup=%d,lastdown=%d where dhostid=" ZBX_FS_UI64,
 			host->druleid,
 			host->ip,
@@ -205,6 +213,11 @@ static void register_service(DB_DSERVICE *service,DB_DRULE *rule,DB_DCHECK *chec
 	DB_ROW		row;
 	char		value_esc[MAX_STRING_LEN];
 	char		key_esc[MAX_STRING_LEN];
+
+	assert(service);
+	assert(rule);
+	assert(check);
+	assert(ip);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In register_service(ip:%s,port:%d)",
 		ip,
@@ -287,6 +300,10 @@ static void register_host(DB_DHOST *host,DB_DCHECK *check, zbx_uint64_t druleid,
 	DB_RESULT	result;
 	DB_ROW		row;
 
+	assert(host);
+	assert(check);
+	assert(ip);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In register_host(ip:%s)",
 		ip);
 
@@ -349,6 +366,10 @@ static void update_service(DB_DRULE *rule, DB_DCHECK *check, char *ip, int port)
 	int		now;
 	DB_DHOST	host;
 	DB_DSERVICE	service;
+
+	assert(rule);
+	assert(check);
+	assert(ip);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In update_service(ip:%s, port:%d, status:%s)",
 		ip,
@@ -439,6 +460,8 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
 	DB_ITEM		item;
 	struct	sigaction phan;
 
+	assert(check);
+	assert(ip);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In discover_service(ip:%s, port:%d, type:%d)",
 		ip,
@@ -449,47 +472,47 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
 
 	switch(check->type) {
 		case SVC_SSH:
-			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[ssh,%s,%d]",
+			zbx_snprintf(key,sizeof(key),"net.tcp.service[ssh,%s,%d]",
 				ip,
 				port);
 			break;
 		case SVC_LDAP:
-			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[ldap,%s,%d]",
+			zbx_snprintf(key,sizeof(key),"net.tcp.service[ldap,%s,%d]",
 				ip,
 				port);
 			break;
 		case SVC_SMTP:
-			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[smtp,%s,%d]",
+			zbx_snprintf(key,sizeof(key),"net.tcp.service[smtp,%s,%d]",
 				ip,
 				port);
 			break;
 		case SVC_FTP:
-			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[ftp,%s,%d]",
+			zbx_snprintf(key,sizeof(key),"net.tcp.service[ftp,%s,%d]",
 				ip,
 				port);
 			break;
 		case SVC_HTTP:
-			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[http,%s,%d]",
+			zbx_snprintf(key,sizeof(key),"net.tcp.service[http,%s,%d]",
 				ip,
 				port);
 			break;
 		case SVC_POP:
-			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[pop,%s,%d]",
+			zbx_snprintf(key,sizeof(key),"net.tcp.service[pop,%s,%d]",
 				ip,
 				port);
 			break;
 		case SVC_NNTP:
-			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[nntp,%s,%d]",
+			zbx_snprintf(key,sizeof(key),"net.tcp.service[nntp,%s,%d]",
 				ip,
 				port);
 			break;
 		case SVC_IMAP:
-			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[imap,%s,%d]",
+			zbx_snprintf(key,sizeof(key),"net.tcp.service[imap,%s,%d]",
 				ip,
 				port);
 			break;
 		case SVC_TCP:
-			zbx_snprintf(key,sizeof(key)-1,"net.tcp.service[tcp,%s,%d]",
+			zbx_snprintf(key,sizeof(key),"net.tcp.service[tcp,%s,%d]",
 				ip,
 				port);
 			break;
@@ -590,6 +613,7 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
 		}
 		alarm(0);
 	}
+	free_result(&value);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End discover_service()");
 
@@ -606,51 +630,61 @@ static int discover_service(DB_DCHECK *check, char *ip, int port)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
 static void process_check(DB_DRULE *rule, DB_DCHECK *check, char *ip)
 {
-	int	port;
-	char	*s,*c;
-	char	tmp[MAX_STRING_LEN];
-	int	first,last;
+	int	port,
+		first,
+		last;
+
+	char	*curr_range = NULL,
+		*next_range = NULL,
+		*last_port = NULL;
+
+	assert(rule);
+	assert(check);
+	assert(ip);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_check(ip:%s, ports:%s, type:%d)",
 		ip,
 		check->ports,
 		check->type);
 
-	zbx_snprintf(tmp,sizeof(tmp)-1,"%s",
-		check->ports);
-
-	s=(char *)strtok(tmp,",");
-	while(s!=NULL)
-	{
-		c=strchr(s,'-');
-		if(c == NULL)
+	for ( curr_range = check->ports; curr_range; curr_range = next_range )
+	{ /* split by ',' */
+		if ( (next_range = strchr(curr_range, ',')) )
 		{
-			first=atoi(s);
-			last=first;
+			*next_range = '\0';
+		}
+
+		if ( (last_port = strchr(curr_range, '-')) )
+		{ /* split by '-' */
+			*last_port	= '\0';
+			first		= atoi(curr_range);
+			last		= atoi(last_port);
+			*last_port	= '-';
 		}
 		else
 		{
-			c[0] = 0;
-			first=atoi(s);
-			last=atoi(c+1);
-			c[0] = '-';
+			first = last	= atoi(curr_range);
 		}
 
-		for(port=first;port<=last;port++)
+		if ( next_range ) 
+		{
+			*next_range = ',';
+			next_range++;
+		}
+
+		for ( port = first; port <= last; port++)
 		{	
 			check->status = discover_service(check,ip,port);
 			update_service(rule, check, ip, port);
 		}
-		s=(char *)strtok(NULL,"\n");
 	}
-
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End process_check()");
 }
@@ -665,7 +699,7 @@ static void process_check(DB_DRULE *rule, DB_DCHECK *check, char *ip)
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -677,49 +711,61 @@ static void process_rule(DB_DRULE *rule)
 	DB_DCHECK	check;
 
 	char		ip[MAX_STRING_LEN];
-	char		ip1[MAX_STRING_LEN];
-	char		tmp[MAX_STRING_LEN];
 	int		i1,i2,i3,i4,i5;
-	char		*s;
 	int		first, last, i;
+
+	char	*curr_range = NULL,
+		*next_range = NULL;
+
+	assert(rule);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_rule(name:%s,range:%s)",
 		rule->name,
 		rule->iprange);
 
-        strscpy(tmp,rule->iprange);
-        s=(char *)strtok(tmp,",");
-        while(s!=NULL)
-        {
-		if(sscanf(s,"%d.%d.%d.%d-%d",&i1,&i2,&i3,&i4,&i5) == 5)
+	for ( curr_range = rule->iprange; curr_range; curr_range = next_range )
+	{ /* split by ',' */
+		if ( (next_range = strchr(curr_range, ',')) )
 		{
-			zbx_snprintf(ip1,sizeof(ip)-1,"%d.%d.%d",i1,i2,i3);
+			*next_range = '\0';
+		}
+
+		first = last = -1;
+		if ( sscanf(curr_range, "%d.%d.%d.%d-%d", &i1, &i2, &i3, &i4, &i5) == 5 )
+		{
 			first = i4;
 			last = i5;
 		}
-		else if(sscanf(s,"%d.%d.%d.%d",&i1,&i2,&i3,&i4) == 4)
+		else if( sscanf(curr_range, "%d.%d.%d.%d", &i1, &i2, &i3, &i4) == 4 )
 		{
-			zbx_snprintf(ip1,sizeof(ip)-1,"%d.%d.%d",i1,i2,i3);
-			first = i4;
-			last = i4;
+			first = last = i4;
 		}
-		else
+
+		if ( next_range ) 
+		{
+			*next_range = ',';
+			next_range++;
+		}
+
+		if( first < 0 || last < 0 )
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Wrong format of IP range [%s]",
 				rule->iprange);
 			continue;
 		}
 
-		for(i=first;i<=last;i++)
+		for ( i = first; i <= last; i++ )
 		{
-			zbx_snprintf(ip,sizeof(ip)-1,"%s.%d",
-				ip1,
-				i);
+			zbx_snprintf(ip, sizeof(ip), "%d.%d.%d.%d", i1, i2, i3, i);
+
 			zabbix_log(LOG_LEVEL_DEBUG, "IP [%s]", ip);
+
 			result = DBselect("select dcheckid,druleid,type,key_,snmp_community,ports from dchecks where druleid=" ZBX_FS_UI64,
 				rule->druleid);
 			while((row=DBfetch(result)))
 			{
+				memset(&check, 0, sizeof(DB_RESULT));
+
 				ZBX_STR2UINT64(check.dcheckid,row[0]);
 				ZBX_STR2UINT64(check.druleid,row[1]);
 				check.type		= atoi(row[2]);
@@ -730,10 +776,9 @@ static void process_rule(DB_DRULE *rule)
 				process_check(rule, &check, ip);
 			}
 			DBfree_result(result);
+
 			add_host_event(ip);
 		}
-
-		s=(char *)strtok(NULL,",");
 	}
 
 	zabbix_log( LOG_LEVEL_DEBUG, "End process_rule()");
@@ -781,6 +826,8 @@ void main_discoverer_loop(int num)
 			LOCAL_NODE("druleid"));
 		while((row=DBfetch(result)))
 		{
+			memset(&rule, 0, sizeof(DB_DRULE));
+
 			ZBX_STR2UINT64(rule.druleid,row[0]);
 			rule.iprange 		= row[1];
 			rule.delay		= atoi(row[2]);
