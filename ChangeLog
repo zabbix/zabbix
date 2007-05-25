@@ -1,5 +1,6 @@
 Changes for 1.4:
 
+ - some cleanup in update_triggers() (Alexei)
  - fixes related to processing of trigger statuses (Alexei)
  - fixed discovery crashes (Eugene)
  - fixed trigger description substitution for messages (Eugene)
