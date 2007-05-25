@@ -312,7 +312,7 @@ void	get_latest_event_status(zbx_uint64_t triggerid, int *prev_status, int *late
 		EVENT_SOURCE_TRIGGERS,
 		EVENT_OBJECT_TRIGGER,
 		triggerid);
-	result = DBselect(sql,2);
+	result = DBselectN(sql,2);
 
 	row=DBfetch(result);
 	if(row && (DBis_null(row[0])!=SUCCEED))
