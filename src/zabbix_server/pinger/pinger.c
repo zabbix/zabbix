@@ -24,6 +24,7 @@
 #include "../functions.h"
 #include "log.h"
 #include "zlog.h"
+#include "threads.h"
 
 #include "pinger.h"
 
@@ -181,8 +182,8 @@ static int create_host_file(void)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In create_host_file()");
 
-	zbx_snprintf(str,sizeof(str),"/tmp/zabbix_server_%d.pinger",
-		getpid());
+	zbx_snprintf(str,sizeof(str),"/tmp/zabbix_server_%li.pinger",
+		zbx_get_thread_id());
 
 	if(NULL == (f = fopen(str, "w") ))
 	{
@@ -276,8 +277,8 @@ static int do_ping(void)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In do_ping()");
 
-	zbx_snprintf(str,sizeof(str),"cat /tmp/zabbix_server_%d.pinger | %s -e 2>/dev/null",
-		getpid(),
+	zbx_snprintf(str,sizeof(str),"cat /tmp/zabbix_server_%li.pinger | %s -e 2>/dev/null",
+		zbx_get_thread_id(),
 		CONFIG_FPING_LOCATION);
 	
 	f=popen(str,"r");
@@ -396,8 +397,8 @@ void main_pinger_loop(int num)
 
 			ret = do_ping();
 		}
-		zbx_snprintf(str,sizeof(str),"/tmp/zabbix_server_%d.pinger",
-			getpid());
+		zbx_snprintf(str,sizeof(str),"/tmp/zabbix_server_%li.pinger",
+			zbx_get_thread_id());
 		unlink(str);
 	
 /*	zabbix_set_log_level(LOG_LEVEL_WARNING); */
