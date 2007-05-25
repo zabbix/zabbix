@@ -1,5 +1,6 @@
 Changes for 1.4:
 
+ - fixed misc strict compilation issues (Alexei)
  - fixed compilation for solaris (Eugene)
  - some cleanup in update_triggers() (Alexei)
  - fixes related to processing of trigger statuses (Alexei)
