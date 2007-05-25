@@ -185,7 +185,7 @@ void zabbix_log(int level, const char *fmt, ...)
 	
 		t=time(NULL);
 		tm=localtime(&t);
-		printf("%.6d:%.4d%.2d%.2d:%.2d%.2d%.2d ",(int)getpid(),tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday,tm->tm_hour,tm->tm_min,tm->tm_sec);
+		printf("%.6li:%.4d%.2d%.2d:%.2d%.2d%.2d ",zbx_get_thread_id(),tm->tm_year+1900,tm->tm_mon+1,tm->tm_mday,tm->tm_hour,tm->tm_min,tm->tm_sec);
 		va_start(ap,fmt);
 		vprintf(fmt,ap);
 		va_end(ap);
@@ -232,8 +232,8 @@ void zabbix_log(int level, const char *fmt, ...)
 			tm = localtime(&t);
 
 			fprintf(log_file,
-				"%6lu:%.4d%.2d%.2d:%.2d%.2d%.2d ",
-				(unsigned long)zbx_get_thread_id(),
+				"%6li:%.4d%.2d%.2d:%.2d%.2d%.2d ",
+				zbx_get_thread_id(),
 				tm->tm_year+1900,
 				tm->tm_mon+1,
 				tm->tm_mday,
@@ -291,7 +291,7 @@ void zabbix_log(int level, const char *fmt, ...)
 		tm = localtime(&t);
 
 		memset(thread_id, 0, sizeof(thread_id));
-		zbx_snprintf(thread_id, sizeof(thread_id),"[%lu]: ",(unsigned long)zbx_get_thread_id());
+		zbx_snprintf(thread_id, sizeof(thread_id),"[%li]: ",zbx_get_thread_id());
 
 		switch(level)
 		{
