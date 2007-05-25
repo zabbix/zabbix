@@ -274,7 +274,7 @@ void	update_triggers(zbx_uint64_t itemid)
 	zabbix_log( LOG_LEVEL_DEBUG, "In update_triggers [itemid:" ZBX_FS_UI64 "]",
 		itemid);
 
-	result = DBselect("select distinct t.triggerid,t.expression,t.status,t.dep_level,t.priority,t.value,t.description from triggers t,functions f,items i where i.status<>%d and i.itemid=f.itemid and t.status=%d and f.triggerid=t.triggerid and f.itemid=" ZBX_FS_UI64,
+	result = DBselect("select distinct t.triggerid,t.expression,t.description,t.url,t.comments,t.status,t.value,t.priority from triggers t,functions f,items i where i.status<>%d and i.itemid=f.itemid and t.status=%d and f.triggerid=t.triggerid and f.itemid=" ZBX_FS_UI64,
 		ITEM_STATUS_NOTSUPPORTED,
 		TRIGGER_STATUS_ENABLED,
 		itemid);
@@ -283,12 +283,12 @@ void	update_triggers(zbx_uint64_t itemid)
 	{
 		ZBX_STR2UINT64(trigger.triggerid,row[0]);
 		strscpy(trigger.expression,row[1]);
-		strscpy(trigger.description,row[6]);
-		trigger.status		= atoi(row[2]);
-		trigger.priority	= atoi(row[4]);
-		trigger.value		= atoi(row[5]);
-		trigger.url		= row[6];
-		trigger.comments	= row[7];
+		strscpy(trigger.description,row[2]);
+		trigger.url		= row[3];
+		trigger.comments	= row[4];
+		trigger.status		= atoi(row[5]);
+		trigger.value		= atoi(row[6]);
+		trigger.priority	= atoi(row[7]);
 
 		exp = strdup(trigger.expression);
 		if( evaluate_expression(&exp_value, &exp, trigger.value, error, sizeof(error)) != 0 )
