@@ -119,7 +119,11 @@ dnl            AC_MSG_CHECKING([for MySQL libraries])
 		LDFLAGS="${LDFLAGS} ${MYSQL_LDFLAGS}"
 		CFLAGS="${CFLAGS} ${MYSQL_CFLAGS}"
 
-		AC_CHECK_LIB(mysqlclient , main, , AC_MSG_ERROR([Not found mysqlclient library]))
+		AC_CHECK_LIB(mysqlclient , main,[
+			MYSQL_LIBS="-lmysqlclient ${MYSQL_LIBS}"
+			],[
+			AC_MSG_ERROR([Not found mysqlclient library])
+			])
 
 		LIBS="${_save_mysql_libs}"
 		LDFLAGS="${_save_mysql_ldflags}"
@@ -128,12 +132,10 @@ dnl            AC_MSG_CHECKING([for MySQL libraries])
 		unset _save_mysql_ldflags
 		unset _save_mysql_cflags
 
-	    MYSQL_LIBS="-lmysqlclient ${MYSQL_LIBS}"
+		MYSQL_VERSION=`$MYSQL_CONFIG --version`
 
-            MYSQL_VERSION=`$MYSQL_CONFIG --version`
-
-            AC_DEFINE([HAVE_MYSQL], [1],
-                [Define to 1 if MySQL libraries are available])
+		AC_DEFINE([HAVE_MYSQL], [1],
+			[Define to 1 if MySQL libraries are available])
 
             found_mysql="yes"
 dnl            AC_MSG_RESULT([yes])
