@@ -386,12 +386,14 @@ include_once "include/page_header.php";
 				" order by alias");
 			while($db_user=DBfetch($db_users))
 			{
-				$db_sessions = DBselect("select count(*) as count, max(s.lastaccess) as lastaccess".
-					" from sessions s, users u".
-					" where s.userid=".$db_user["userid"]." and s.userid=u.userid and (s.lastaccess+u.autologout)>=".time());
+				$db_sessions = DBselect('select count(*) as count, max(s.lastaccess) as lastaccess'.
+					' from sessions s, users u'.
+					' where s.userid='.$db_user['userid'].' and s.userid=u.userid '.
+					' and ((s.lastaccess+u.autologout)>='.time().
+					' or u.autologout=0)');
 				$db_ses_cnt=DBfetch($db_sessions);
 
-				if($db_ses_cnt["count"]>0 || $db_user["autologout"] == 0)
+				if($db_ses_cnt["count"]>0)
 					$online=new CCol(S_YES.' ('.date('r',$db_ses_cnt['lastaccess']).')',"enabled");
 				else
 					$online=new CCol(S_NO,"disabled");

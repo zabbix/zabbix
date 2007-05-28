@@ -1204,7 +1204,9 @@ $result =
 		$status["users_count"]=$row["cnt"];
 		
 		$status["users_online"]=0;
-		$result=DBselect("select distinct s.userid from sessions s, users u where u.userid=s.userid and (s.lastaccess+u.autologout)>".time());
+		$result=DBselect("select distinct s.userid from sessions s, users u where u.userid=s.userid and u.autologout>0 and (s.lastaccess+u.autologout)>".time());
+		while(DBfetch($result))		$status["users_online"]++;
+		$result=DBselect("select distinct s.userid from sessions s, users u where u.userid=s.userid and u.autologout=0");
 		while(DBfetch($result))		$status["users_online"]++;
 
 		return $status;
