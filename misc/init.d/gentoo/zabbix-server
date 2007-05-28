@@ -1,12 +1,12 @@
 #!/sbin/runscript
 #
-# Zabbix trapperd start/stop script.
+# Zabbix server start/stop script.
 #
 # Written by A.Tophofen
+NAME=zabbix_server
 PATH=/bin:/usr/bin:/sbin:/usr/sbin:/home/zabbix/bin
-DAEMON=/home/zabbix/bin/zabbix_trapperd
-NAME=zabbix_trapperd
-DESC="Zabbix 1.0"
+DAEMON=/home/zabbix/bin/${NAME}
+DESC="Zabbix 1.4"
 PID=/home/zabbix/lock/$NAME.pid
 
 

@@ -3,10 +3,10 @@
 # Zabbix agent start/stop script.
 #
 # Written by A.Tophofen
-PATH=/bin:/usr/bin:/sbin:/usr/sbin:/home/zabbix/bin
-DAEMON=/home/zabbix/bin/zabbix_agentd
 NAME=zabbix_agentd
-DESC="Zabbix 1.0"
+PATH=/bin:/usr/bin:/sbin:/usr/sbin:/home/zabbix/bin
+DAEMON=/home/zabbix/bin/${NAME}
+DESC="Zabbix 1.4"
 PID=/home/zabbix/lock/$NAME.pid
 
 
