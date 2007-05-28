@@ -47,6 +47,8 @@
 
 AC_DEFUN([AX_LIB_MYSQL],
 [
+    MYSQL_CONFIG="no"
+
     AC_ARG_WITH([mysql],
         AC_HELP_STRING([--with-mysql@<:@=ARG@:>@],
             [use MySQL client library @<:@default=no@:>@, optionally specify path to mysql_config]
@@ -79,7 +81,7 @@ AC_DEFUN([AX_LIB_MYSQL],
             AC_PATH_PROG([MYSQL_CONFIG], [mysql_config], [no])
         fi
 
-        if test "$MYSQL_CONFIG" != "no"; then
+        if test -f "$MYSQL_CONFIG"; then
 dnl            AC_MSG_CHECKING([for MySQL libraries])
 
             MYSQL_CFLAGS="`$MYSQL_CONFIG --cflags`"

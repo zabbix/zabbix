@@ -47,6 +47,8 @@
 
 AC_DEFUN([AX_LIB_POSTGRESQL],
 [
+    PG_CONFIG="no"
+
     AC_ARG_WITH([pgsql],
         AC_HELP_STRING([--with-pgsql@<:@=ARG@:>@],
             [use PostgreSQL library @<:@default=no@:>@, optionally specify path to pg_config]
@@ -78,7 +80,7 @@ AC_DEFUN([AX_LIB_POSTGRESQL],
             AC_PATH_PROG([PG_CONFIG], [pg_config], [no])
         fi
 
-        if test "$PG_CONFIG" != "no"; then
+        if test -rf "$PG_CONFIG"; then
             AC_MSG_CHECKING([for PostgreSQL libraries])
 
             POSTGRESQL_CPPFLAGS="-I`$PG_CONFIG --includedir`"

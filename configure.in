@@ -615,7 +615,7 @@ if test "$server" = "yes"; then
 	LDFLAGS="${LDFLAGS} ${JABBER_LDFLAGS}"
 
 	dnl Check for libCurl [default - yes]
-	LIBCURL_CHECK_CONFIG([yes], [7.15.1], [],[])
+	LIBCURL_CHECK_CONFIG(, [7.15.1], [],[])
 	if test "x$want_curl" = "xyes"; then
 		if test "x$found_curl" != "xyes"; then
 			AC_MSG_ERROR([Not found Curl library])
@@ -816,7 +816,7 @@ Configuration:
 
 echo
 echo "***********************************************************"
-echo "*            Now run '${MAKE} install'                       *"
+echo "*            Now run '${am_make} install'                       *"
 echo "*                                                         *"
 echo "*            Thank you for using ZABBIX!                  *"
 echo "*              <http://www.zabbix.com>                    *"

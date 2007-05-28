@@ -56,40 +56,36 @@ AC_DEFUN([LIBCURL_CHECK_CONFIG],
   AH_TEMPLATE([LIBCURL_PROTOCOL_DICT],[Defined if libcurl supports DICT])
   AH_TEMPLATE([LIBCURL_PROTOCOL_TFTP],[Defined if libcurl supports TFTP])
 
+  _libcurl_config="no"
+
   AC_ARG_WITH(libcurl,
      [If you want to use cURL library:
-AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL library @<:@default=yes@:>@, look for the curl library in DIR])],
+AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=yes@:>@, optionally specify path to curl_config])],
         [
         if test "$withval" = "no"; then
             want_curl="no"
-            _libcurl_with="no"
         elif test "$withval" = "yes"; then
             want_curl="yes"
-            _libcurl_with="yes"
         else
             want_curl="yes"
-            _libcurl_with=$withval
+            _libcurl_config=$withval
         fi
         ],
-        [_libcurl_with=ifelse([$1],,[yes],[$1])])
+        [want_curl=ifelse([$1],,[try],[$1])])
 
-  if test "$_libcurl_with" != "no" ; then
+  if test "$want_curl" != "no" ; then
 
      AC_PROG_AWK
 
      _libcurl_version_parse="eval $AWK '{split(\$NF,A,\".\"); X=256*256*A[[1]]+256*A[[2]]+A[[3]]; print X;}'"
 
-     _libcurl_try_link=yes
+     _libcurl_try_link=no
 
-     if test -d "$_libcurl_with" ; then
-        LIBCURL_CPPFLAGS="-I$withval/include"
-        _libcurl_libs="-L$withval/lib"
-        AC_PATH_PROG([_libcurl_config],["$withval/bin/curl-config"])
-     else
-	AC_PATH_PROG([_libcurl_config],[curl-config])
+     if test -z "$_libcurl_config" -o test; then
+         AC_PATH_PROG([_libcurl_config], [curl-config], [no])
      fi
 
-     if test x$_libcurl_config != "x" ; then
+     if test -f $_libcurl_config; then
         AC_CACHE_CHECK([for the version of libcurl],
 	   [libcurl_cv_lib_curl_version],
            [libcurl_cv_lib_curl_version=`$_libcurl_config --version | $AWK '{print $[]2}'`])
@@ -173,8 +169,8 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL library @<:@default=yes@:>
 	   if test $_libcurl_version -ge 461828 ; then
               _libcurl_protocols=`$_libcurl_config --protocols`
            fi
-	else
-           _libcurl_try_link=no
+
+           _libcurl_try_link=yes
 	fi
 
 	unset _libcurl_wanted
@@ -282,7 +278,7 @@ x=CURLOPT_VERBOSE;
      unset _libcurl_libs
   fi
 
-  if test x$_libcurl_with = xno || test x$libcurl_cv_lib_curl_usable != xyes ; then
+  if test x$want_curl = xno || test x$libcurl_cv_lib_curl_usable != xyes ; then
      # This is the IF-NO path
      ifelse([$4],,:,[$4])
   else
@@ -290,5 +286,4 @@ x=CURLOPT_VERBOSE;
      ifelse([$3],,:,[$3])
   fi
 
-  unset _libcurl_with
 ])dnl

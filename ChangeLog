@@ -1,5 +1,6 @@
 Changes for 1.4:
 
+ - improved configuration scripts (Eugene)
  - fixed misc strict compilation issues (Alexei)
  - fixed compilation for solaris (Eugene)
  - some cleanup in update_triggers() (Alexei)
