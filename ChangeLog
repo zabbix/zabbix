@@ -1,5 +1,6 @@
 Changes for 1.4:
 
+ - fixed function diff() for floats (Alexei)
  - improved configuration scripts (Eugene)
  - fixed misc strict compilation issues (Alexei)
  - fixed compilation for solaris (Eugene)
