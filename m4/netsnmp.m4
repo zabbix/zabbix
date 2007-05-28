@@ -19,39 +19,34 @@
 
 AC_DEFUN([LIBNETSNMP_CHECK_CONFIG],
 [
+  _libnetsnmp_config="no"
+
   AC_ARG_WITH(net-snmp,
 [
 What SNMP package do you want to use (please select only one):
 AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
-		[use NET-SNMP package @<:@default=no@:>@, default is to search through a number of common places for the NET-SNMP files.])],[ if test "$withval" = "no"; then
+		[use NET-SNMP package @<:@default=no@:>@, optionally specify path to net-snmp-config])
+	],[ if test "$withval" = "no"; then
             want_netsnmp="no"
-            _libnetsnmp_with="no"
         elif test "$withval" = "yes"; then
             want_netsnmp="yes"
-            _libnetsnmp_with="yes"
         else
             want_netsnmp="yes"
-            _libnetsnmp_with=$withval
+            _libnetsnmp_config=$withval
         fi
-     ],[_libnetsnmp_with=ifelse([$1],,[no],[$1])])
+     ],[want_netsnmp=ifelse([$1],,[no],[$1])])
 
   SNMP_CFLAGS=""
   SNMP_LDFLAGS=""
   SNMP_LIBS=""
 
-  if test "x$_libnetsnmp_with" != x"no"; then
+  if test "x$want_netsnmp" != "xno"; then
 
-        if test -d "$_libnetsnmp_with" ; then
-           SNMP_INCDIR="-I$withval/include"
-           _libnetsnmp_ldflags="-L$_libnetsnmp_with/lib"
-           AC_PATH_PROG([_libnetsnmp_config],["$_libnetsnmp_with/bin/net-snmp-config"])
-        else
-   	   AC_PATH_PROG([_libnetsnmp_config],[net-snmp-config])
+        if test -z "$_libnetsnmp_config" -o test; then
+            AC_PATH_PROG([_libnetsnmp_config], [net-snmp-config], [no])
         fi
 
-	if test "x$_libnetsnmp_config" != "x" ; then
-
-dnl		AC_MSG_CHECKING([for NET-SNMP libraries])
+	if test -f $_libnetsnmp_config; then
 
 		_full_libnetsnmp_cflags="`$_libnetsnmp_config --cflags`"
 		for i in $_full_libnetsnmp_cflags; do
@@ -108,10 +103,8 @@ dnl		AC_MSG_CHECKING([for NET-SNMP libraries])
 		AC_DEFINE(HAVE_SNMP,1,[Define to 1 if SNMP should be enabled.])
 
 		found_netsnmp="yes"
-dnl		AC_MSG_RESULT([yes])
 	else
 		found_netsnmp="no"
-dnl		AC_MSG_RESULT([no])
 	fi
   fi
 
@@ -119,5 +112,4 @@ dnl		AC_MSG_RESULT([no])
   AC_SUBST(SNMP_LDFLAGS)
   AC_SUBST(SNMP_LIBS)
 
-  unset _libnetsnmp_with
 ])dnl
