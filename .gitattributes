@@ -142,8 +142,10 @@ m4/sqlora8.m4 -text
 m4/ucdsnmp.m4 -text
 misc/Makefile.am -text
 misc/clock/clock.fla -text
+misc/init.d/fedora/core5/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_server -text
+misc/init.d/tru64/zabbix_server -text
 /splint -text
 src/libs/zbxcomms/Makefile.am -text
 src/libs/zbxcomms/comms.c -text
