@@ -1110,7 +1110,7 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 					}
 					else
 					{
-						strcpy(value,"2");
+						strcpy(value,"1");
 					}
 					break;
 				case ITEM_VALUE_TYPE_UINT64:
