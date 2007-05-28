@@ -4,7 +4,7 @@
 # init.d/zabbix_agentd
 #
 ### BEGIN INIT INFO
-# Provides:       zabbix_suckerd
+# Provides:       zabbix_server
 # Required-Start: $network $remote_fs $syslog
 # Required-Stop:
 # Default-Start:  3 
@@ -14,8 +14,8 @@
 
 . /etc/rc.status
 rc_reset
-NAME="Zabbix_Suckerd"
-CONFIG_FILE="/etc/zabbix/zabbix_suckerd.conf"
+NAME="Zabbix_Server"
+CONFIG_FILE="/etc/zabbix/zabbix_server.conf"
 
 if [ ! -f ${CONFIG_FILE} ]; then
 		echo -n "${NAME}configuration file ${CONFIG_FILE} does not exist. "
@@ -24,8 +24,8 @@ if [ ! -f ${CONFIG_FILE} ]; then
 		exit 6
 fi
 
-ZABBIX_BIN="/home/zabbix/bin/zabbix_suckerd"
-ZABBIX_PID="/home/zabbix/lock/zabbix_suckerd.pid"
+ZABBIX_BIN="/home/zabbix/bin/zabbix_server"
+ZABBIX_PID="/home/zabbix/lock/zabbix_server.pid"
 
 
 if [ ! -x ${ZABBIX_BIN} ] ; then

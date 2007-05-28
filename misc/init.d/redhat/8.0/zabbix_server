@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # chkconfig: - 55 45
-# description: zabbix_suckerd  
+# description: zabbix_server  
 # probe: false
 
 # Source function library.
@@ -15,7 +15,7 @@
 
 RETVAL=0
 progdir="/usr/local/zabbix/bin/"
-prog="zabbix_suckerd"
+prog="zabbix_server"
 
 start() {
         # Start daemons.

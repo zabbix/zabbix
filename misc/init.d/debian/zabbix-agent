@@ -4,10 +4,10 @@
 #
 # Written by Alexei Vladishev <alexei.vladishev@zabbix.com>.
 
-PATH=/bin:/usr/bin:/sbin:/usr/sbin:/home/zabbix/bin
-DAEMON=/home/zabbix/bin/zabbix_agentd
 NAME=zabbix_agentd
-DESC="Zabbix agent"
+PATH=/bin:/usr/bin:/sbin:/usr/sbin:/home/zabbix/bin
+DAEMON=/home/zabbix/bin/${NAME}
+DESC="Zabbix agent daemon"
 PID=/var/tmp/$NAME.pid
 
 test -f $DAEMON || exit 0
@@ -31,7 +31,7 @@ case "$1" in
 	#	option to the "reload" entry above. If not, "force-reload" is
 	#	just the same as "restart".
 	#
-#	echo -n "Restarting $DESC: zabbix_suckerd"
+#	echo -n "Restarting $DESC: zabbix_agent"
 	$0 stop
 	$0 start
 #	start-stop-daemon --stop --quiet --pidfile \

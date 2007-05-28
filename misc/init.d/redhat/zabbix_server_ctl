@@ -1,8 +1,8 @@
 #!/bin/sh
 #
-# zabbix_suckerd_ctl 
+# zabbix_server_ctl 
 #
-# control script to stop/start/restart zabbix_suckerd
+# control script to stop/start/restart zabbix_server
 # author: charlie collins
 # date: 01.21.2002
 #
@@ -18,10 +18,10 @@
 #	0 - operation completed successfully
 #	1 - 
 #	2 - usage error
-#	3 - zabbix_suckerd could not be started
-#	4 - zabbix_suckerd could not be stopped
-#	5 - zabbix_suckerd could not be started during a restart
-#	6 - zabbix_suckerd could not be restarted during a restart
+#	3 - zabbix_server could not be started
+#	4 - zabbix_server could not be stopped
+#	5 - zabbix_server could not be started during a restart
+#	6 - zabbix_server could not be restarted during a restart
 #
 #
 #
@@ -35,9 +35,9 @@
 # base zabbix dir
 BASEDIR=/opt/zabbix
 # PID file
-PIDFILE=/var/tmp/zabbix_suckerd.pid
+PIDFILE=/var/tmp/zabbix_server.pid
 # binary file
-ZABBIX_SUCKERD=$BASEDIR/bin/zabbix_suckerd
+ZABBIX_SUCKERD=$BASEDIR/bin/zabbix_server
 
 
 # **************
@@ -59,14 +59,14 @@ do
 	if [ -f $PIDFILE  ] && [ -s $PIDFILE ] ; then
 	    PID=`cat $PIDFILE`
 		if [ "x$PID" != "x" ] && kill -0 $PID 2>/dev/null ; then
-	        STATUS="zabbix_suckerd (pid $PID) running"
+	        STATUS="zabbix_server (pid $PID) running"
 	        RUNNING=1			
 	    else
-	        STATUS="zabbix_suckerd (pid $PID?) not running"
+	        STATUS="zabbix_server (pid $PID?) not running"
 	        RUNNING=0			
 	    fi
     else
-	    STATUS="zabbix_suckerd (no pid file) not running"
+	    STATUS="zabbix_server (no pid file) not running"
 	    RUNNING=0		
     fi
 	
@@ -75,13 +75,13 @@ do
     
 	start)
 	if [ $RUNNING -eq 1 ]; then
-	    echo "$0 $ARG: zabbix_suckerd (pid $PID) already running"
+	    echo "$0 $ARG: zabbix_server (pid $PID) already running"
 	    continue
 	fi
 	if $ZABBIX_SUCKERD ; then
-	    echo "$0 $ARG: zabbix_suckerd started"
+	    echo "$0 $ARG: zabbix_server started"
 	else
-	    echo "$0 $ARG: zabbix_suckerd could not be started"
+	    echo "$0 $ARG: zabbix_server could not be started"
 	    ERROR=3
 	fi
 	;;
@@ -93,32 +93,32 @@ do
 	    continue
 	fi
 	if kill $PID ; then
-			echo "$0 $ARG: zabbix_suckerd process(es) stopped"
+			echo "$0 $ARG: zabbix_server process(es) stopped"
 	    else
-	        echo "$0 $ARG: zabbix_suckerd process(es) could not be stopped"
+	        echo "$0 $ARG: zabbix_server process(es) could not be stopped"
 	        ERROR=4
 	    fi
 	;;
     
 	restart)
 	if [ $RUNNING -eq 0 ]; then
-	    echo "$0 $ARG: zabbix_suckerd not running, trying to start"
+	    echo "$0 $ARG: zabbix_server not running, trying to start"
 	    if $ZABBIX_SUCKERD ; then
-		    echo "$0 $ARG: zabbix_suckerd started"
+		    echo "$0 $ARG: zabbix_server started"
 	    else
-		    echo "$0 $ARG: zabbix_suckerd could not be started"
+		    echo "$0 $ARG: zabbix_server could not be started"
 			ERROR=5
 	    fi
 	else
 	    if kill $PID ; then
 		    if $ZABBIX_SUCKERD ; then
-	            echo "$0 $ARG: zabbix_suckerd restarted"
+	            echo "$0 $ARG: zabbix_server restarted"
 			else
-				echo "$0 $ARG: zabbix_suckerd could not be started"
+				echo "$0 $ARG: zabbix_server could not be started"
 				ERROR=3
 			fi
 		else
-		    echo "$0 $ARG: zabbix_suckerd could not be restarted"
+		    echo "$0 $ARG: zabbix_server could not be restarted"
 		    ERROR=6
 		fi	    
     fi		
@@ -129,9 +129,9 @@ do
 	echo "usage: $0 (start|stop|restart|help)"
 	cat <<EOF
 
-start      - start zabbix_suckerd
-stop       - stop zabbix_suckerd
-restart    - restart zabbix_suckerd if running by sending a SIGHUP or start if not running
+start      - start zabbix_server
+stop       - stop zabbix_server
+restart    - restart zabbix_server if running by sending a SIGHUP or start if not running
 help       - this screen
 
 EOF
