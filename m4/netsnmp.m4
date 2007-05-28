@@ -88,7 +88,11 @@ AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
 		LDFLAGS="${LDFLAGS} ${SNMP_LDFLAGS}"
 		CFLAGS="${CFLAGS} ${SNMP_CFLAGS}"
 
-		AC_CHECK_LIB(netsnmp , main, , AC_MSG_ERROR([Not found NET-SNMP library]))
+		AC_CHECK_LIB(netsnmp , main,[
+			SNMP_LIBS="-lnetsnmp ${SNMP_LIBS}"
+			],[
+		       	AC_MSG_ERROR([Not found NET-SNMP library])
+			])
 
 		LIBS="${_save_netsnmp_libs}"
 		LDFLAGS="${_save_netsnmp_ldflags}"
@@ -96,8 +100,6 @@ AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
 		unset _save_netsnmp_libs
 		unset _save_netsnmp_ldflags
 		unset _save_netsnmp_cflags
-
-		SNMP_LIBS="-lnetsnmp ${SNMP_LIBS}"
 
 		AC_DEFINE(HAVE_NETSNMP,1,[Define to 1 if NET-SNMP should be enabled.])
 		AC_DEFINE(HAVE_SNMP,1,[Define to 1 if SNMP should be enabled.])

@@ -128,8 +128,11 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=yes@:>
 				;;
 					-l*)
 						_lib_name=`echo "$i" | cut -b3-`
-						AC_CHECK_LIB($_lib_name , main, , AC_MSG_ERROR([Not found $_lib_name library]))
-						LIBCURL_LIBS="$LIBCURL_LIBS $i"
+						AC_CHECK_LIB($_lib_name , main,[
+								LIBCURL_LIBS="$LIBCURL_LIBS $i"
+							],[
+								AC_MSG_ERROR([Not found $_lib_name library])
+							])
 
 				;;
 				esac
@@ -143,7 +146,11 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=yes@:>
 		LDFLAGS="${LDFLAGS} ${LIBCURL_LDFLAGS}"
 		CFLAGS="${CFLAGS} ${LIBCURL_CFLAGS}"
 
-		AC_CHECK_LIB(curl, main, , AC_MSG_ERROR([Not found libcurl library]))
+		AC_CHECK_LIB(curl, main,[
+				LIBCURL_LIBS="-lcurl $LIBCURL_LIBS"
+			],[
+				AC_MSG_ERROR([Not found libcurl library])
+			])
 
 		LIBS="${_save_curl_libs}"
 		LDFLAGS="${_save_curl_ldflags}"
@@ -175,7 +182,6 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=yes@:>
 
 	unset _libcurl_wanted
      fi
-
      if test $_libcurl_try_link = yes ; then
 
         # we didn't find curl-config, so let's see if the user-supplied
