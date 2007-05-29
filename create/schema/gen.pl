@@ -86,21 +86,21 @@ ZBX_TABLE
 static	ZBX_TABLE	tables[]={
 ";
 
-%oracle=("t_bigint"	=>	"bigint",
+%oracle=("t_bigint"	=>	"number(20)",
 	"before"	=>	"",
 	"after"		=>	"",
 	"type"		=>	"sql",
-	"t_id"		=>	"bigint",
-	"t_integer"	=>	"integer",
-	"t_serial"	=>	"serial",
-	"t_double"	=>	"double",
-	"t_varchar"	=>	"varchar",
-	"t_char"	=>	"char",
-	"t_image"	=>	"longblob",
-	"t_history_log"	=>	"text",
-	"t_history_text"=>	"text",
-	"t_blob"	=>	"blob",
-	"t_item_param"	=>	"varchar(2048)"
+	"t_id"		=>	"number(20)",
+	"t_integer"	=>	"number(10)",
+	"t_serial"	=>	"number(20)",
+	"t_double"	=>	"number(20,4)",
+	"t_varchar"	=>	"varchar2",
+	"t_char"	=>	"varchar2",
+	"t_image"	=>	"blob",
+	"t_history_log"	=>	"varchar2(2048)",
+	"t_history_text"=>	"clob",
+	"t_blob"	=>	"varchar2(2048)",
+	"t_item_param"	=>	"varchar2(2048)"
 );
 
 %postgresql=("t_bigint"	=>	"bigint",
