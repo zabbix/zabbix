@@ -55,7 +55,7 @@ include_once "include/page_header.php";
 //--------------------------------------------------------------------------
 
 $query = 'SELECT distinct s.serviceid, sl.servicedownid, sl_p.serviceupid as serviceupid,
-        s.name caption, s.algorithm, t.description, s.sortorder, sl.linkid
+        s.name caption, s.algorithm, t.triggerid, s.sortorder, sl.linkid
 		FROM services s
 			LEFT JOIN triggers t ON s.triggerid = t.triggerid
 	LEFT JOIN services_links sl ON  s.serviceid = sl.serviceupid and NOT(sl.soft=0)
@@ -82,7 +82,7 @@ $services[0]=$row;
 while($row = DBFetch($result)){
 
 		(empty($row['serviceupid']))?($row['serviceupid']='0'):('');
-		(empty($row['description']))?($row['description']='None'):('');
+		(empty($row['triggerid']))?($row['description']='None'):($row['description']=expand_trigger_description($row['triggerid']));
 		
 
 			if(isset($services[$row['serviceid']])){
