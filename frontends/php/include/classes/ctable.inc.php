@@ -19,51 +19,49 @@
 **/
 ?>
 <?php
-	class CCol extends CTag
-	{
+	class CCol extends CTag{
 /* public */
-		function CCol($item=NULL,$class=NULL)
-		{
+		function CCol($item=NULL,$class=NULL){
 			parent::CTag("td","yes");
 			$this->AddItem($item);
 			$this->SetClass($class);
 		}
-		function SetAlign($value)
-		{
+		
+		function SetAlign($value){
 			return $this->options['align'] = $value;
 		}
-		function SetRowSpan($value)
-		{
+		
+		function SetRowSpan($value){
 			return $this->options['rowspan'] = strval($value);
 		}
-		function SetColSpan($value)
-		{
+		
+		function SetColSpan($value){
 			return $this->options['colspan'] =strval($value);
+		}
+		
+		function SetWidth($value){
+			if(is_string($value))$this->AddOption('width',$value);
 		}
 	}
 	
-	class CRow extends CTag
-	{	
+	class CRow extends CTag{
 /* public */
-		function CRow($item=NULL,$class=NULL)
-		{
+		function CRow($item=NULL,$class=NULL){
 			parent::CTag("tr","yes");
 			$this->AddItem($item);
 			$this->SetClass($class);
 		}
-		function SetAlign($value)
-		{
+		
+		function SetAlign($value){
 			return $this->options['align'] = $value;
 		}
-		function AddItem($item)
-		{
+		
+		function AddItem($item){
 			if(strtolower(get_class($item))=='ccol') {
 				parent::AddItem($item);
 			}
-			elseif(is_array($item))
-			{
-				foreach($item as $el)
-				{
+			elseif(is_array($item)){
+				foreach($item as $el){
                         		if(strtolower(get_class($el))=='ccol') {
                 		        	parent::AddItem($el);
 					} elseif(!is_null($el)) {
@@ -71,15 +69,17 @@
 					}
 				}
 			}
-			elseif(!is_null($item))
-			{
+			elseif(!is_null($item)){
 				parent::AddItem('<td>'.unpack_object($item).'</td>');
 			}
 		}
+		
+		function SetWidth($value){
+			if(is_string($value))$this->AddOption('width',$value);
+		}
 	}
 
-	class CTable extends CTag
-	{
+	class CTable extends CTag{
 /* protected *//*
 		var $oddRowClass;
 		var $evenRowClass;
@@ -91,8 +91,7 @@
 		var $footerClass;
 		var $message;*/
 /* public */
-		function CTable($message=NULL,$class=NULL)
-		{
+		function CTable($message=NULL,$class=NULL){
 			parent::CTag("table","yes");
 			$this->SetClass($class);
 				
@@ -109,29 +108,28 @@
 
 			$this->message = $message;
 		}
-		function SetOddRowClass($value=NULL)
-		{
+		
+		function SetOddRowClass($value=NULL){
 			$this->oddRowClass = $value;
 		}
-		function SetEvenRowClass($value=NULL)
-		{
+		
+		function SetEvenRowClass($value=NULL){
 			$this->evenRowClass = $value;
 		}
-		function SetAlign($value)
-		{
+		
+		function SetAlign($value){
 			return $this->options['align'] = $value;
 		}
-		function SetCellPadding($value)
-		{
+		
+		function SetCellPadding($value){
 			return $this->options['cellpadding'] = strval($value);
 		}
-		function SetCellSpacing($value)
-		{
+		
+		function SetCellSpacing($value){
 			return $this->options['cellspacing'] = strval($value);
 		}
 
-		function PrepareRow($item,$rowClass=NULL)
-		{
+		function PrepareRow($item,$rowClass=NULL){
 			if(is_null($item)) return NULL;
 
 			if(strtolower(get_class($item))=='ccol') {
@@ -144,20 +142,18 @@
 				if(isset($rowClass))
 					$item->SetClass($rowClass);
 			}
-			else
-			{
+			else{
 				$item = new CRow($item,$rowClass);
 			}
-			if(!isset($item->options['class']))
-			{
+			if(!isset($item->options['class'])){
 				$item->SetClass(($this->rownum % 2) ?
                                                 $this->oddRowClass:
                                                 $this->evenRowClass);
 			}/**/
 			return $item->ToString();
 		}
-		function SetHeader($value=NULL,$class=NULL)
-		{
+
+		function SetHeader($value=NULL,$class=NULL){
 			if(is_null($class)) $class = $this->headerClass;
 
 			if(strtolower(get_class($value))=='crow') {
@@ -168,40 +164,37 @@
 			$this->colnum = $value->ItemsCount();
 			$this->header = $value->ToString();
 		}
-		function SetFooter($value=NULL,$class=NULL)
-		{
+
+		function SetFooter($value=NULL,$class=NULL){
 			if(is_null($class)) $class = $this->footerClass;
 
 			$this->footer = $this->PrepareRow($value,$class);;
 		}
-		function AddRow($item,$rowClass=NULL)
-		{
+
+		function AddRow($item,$rowClass=NULL){
 			$item = $this->AddItem($this->PrepareRow($item,$rowClass));
 			++$this->rownum;
 			return $item;
 		}
-		function ShowRow($item,$rowClass=NULL)
-		{
+
+		function ShowRow($item,$rowClass=NULL){
 			echo $this->PrepareRow($item,$rowClass);
 			++$this->rownum;
 		}
 /* protected */
-		function GetNumRows()
-		{
+		function GetNumRows(){
 			return $this->rownum;
 		}
 
-		function StartToString()
-		{
+		function StartToString(){
 			$ret = parent::StartToString();
 			$ret .= $this->header;
 			return $ret;
 		}
-		function EndToString()
-		{
+		
+		function EndToString(){
 			$ret = "";
-			if($this->rownum == 0 && isset($this->message)) 
-			{
+			if($this->rownum == 0 && isset($this->message)) {
 				$ret = $this->PrepareRow(new CCol($this->message,'message'));
 			}
 			$ret .= $this->footer;

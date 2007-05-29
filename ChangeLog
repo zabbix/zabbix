@@ -1,5 +1,6 @@
 Changes for 1.4:
 
+ - changed IT Services interface (Artem)
  - fixed function diff() for floats (Alexei)
  - improved configuration scripts (Eugene)
  - fixed misc strict compilation issues (Alexei)

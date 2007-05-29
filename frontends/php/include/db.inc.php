@@ -414,6 +414,7 @@ COpt::savesqlrequest($query);
 
 		return $result;
 	}
+	
 
 /* string value prepearing */
 if(isset($DB_TYPE) && $DB_TYPE == "ORACLE") {	

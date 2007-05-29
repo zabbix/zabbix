@@ -19,11 +19,9 @@
 **/
 ?>
 <?php
-	class CButton extends CTag
-	{
+	class CButton extends CTag{
 /* public */
-		function CButton($name="button", $caption="", $action=NULL, $accesskey=NULL)
-		{
+		function CButton($name="button", $caption="", $action=NULL, $accesskey=NULL){
 			parent::CTag('input','no');
 			$this->tag_body_start = '';
 			$this->options['type'] = 'submit';
@@ -33,26 +31,29 @@
 			$this->SetAction($action);
 			$this->SetAccessKey($accesskey);
 		}
-		function SetAction($value=null)
-		{
+		
+		function SetAction($value=null){
 			$this->AddAction('onClick', $value);
 		}
-		function SetTitle($value='button title')
-		{
+		
+		function SetTitle($value='button title'){
 			$this->AddOption('title', $value);
 		}
-		function SetAccessKey($value='B')
-		{
+		
+		function SetAccessKey($value='B'){
 			if(isset($value))
 				if(!isset($this->options['title']))
 					$this->SetTitle($this->options['value'].' [Alt+'.$value.']');
 
 			return $this->AddOption('accessKey', $value);
 		}
+		
+		function SetType($type="button"){
+			$this->AddOption('type',$type);
+		}
 	}
 
-	class CButtonCancel extends CButton
-	{
+	class CButtonCancel extends CButton{
 		function CButtonCancel($vars=NULL,$action=NULL){
 			parent::CButton('cancel',S_CANCEL);
 			$this->options['type'] = 'button';

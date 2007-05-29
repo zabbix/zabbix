@@ -1093,6 +1093,9 @@
 	'S_SERVICE_TIMES'=>			'Service times',
 	'S_NEW_SERVICE_TIME'=>			'New service time',
 	'S_NOTE'=>				'Note',
+	'S_SOFT_LINK'=>				'Soft Link',
+	'S_REMOVE'=>				'Remove',
+	'S_DEPENDS_ON'=>			'Depends on',
 
 	'S_SUNDAY'=>				'Sunday',
 	'S_MONDAY'=>				'Monday',
@@ -1153,6 +1156,7 @@
 	'S_LAST_OF'=>				'Last of',
 	'S_SHOW_DISABLED_TRIGGERS'=>		'Show disabled triggers',
 	'S_HIDE_DISABLED_TRIGGERS'=>		'Hide disabled triggers',
+
 
 //	tr_comments.php
 	'S_TRIGGER_COMMENTS'=>			'Trigger comments',
@@ -1302,6 +1306,7 @@
 	'S_LATEST_DATA'=>			'Latest data',
 
 //	Errors
-	'S_INCORRECT_DESCRIPTION'=>		'Incorrect description'
+	'S_INCORRECT_DESCRIPTION'=>		'Incorrect description',
+	'S_CANT_FORMAT_TREE'=>			'Can\'t format Tree'
 	);
 ?>

@@ -19,16 +19,35 @@
 **/
 ?>
 <?php
-	function	add_service($name,$triggerid,$algorithm,$showsla,$goodsla,$sortorder,$service_times=array())
-	{
+	function	add_service($name,$triggerid,$algorithm,$showsla,$goodsla,$sortorder,$service_times=array(),$parentid,$childs){
+	
+		foreach($childs as $id => $child){		//add childs
+			if($parentid == $child['serviceid']){
+				error('Service can\'t be parent and child in onetime.');
+				return FALSE;
+			}
+		}
+		
 		if(is_null($triggerid) || $triggerid==0) $triggerid = 'NULL';
 
 		$serviceid=get_dbid("services","serviceid");
+		
+		remove_service_links($serviceid); //removes all links with current serviceid
+
+		$result =($parentid != 0)?(add_service_link($serviceid,$parentid,0)):(true); //add parent
+		
+		foreach($childs as $id => $child){		//add childs
+			if(!isset($child['soft']) || empty($child['soft'])) $child['soft'] = 0;
+			$result = add_service_link($child['serviceid'],$serviceid,$child['soft']); 
+		}
+		
+		if(!$result){
+			return FALSE;
+		}
 
 		$result=DBexecute("insert into services (serviceid,name,status,triggerid,algorithm,showsla,goodsla,sortorder)".
 			" values ($serviceid,".zbx_dbstr($name).",0,$triggerid,".zbx_dbstr($algorithm).",$showsla,".zbx_dbstr($goodsla).",$sortorder)");
-		if(!$result)
-		{
+		if(!$result){
 			return FALSE;
 		}
 		DBExecute('DELETE FROM services_times WHERE serviceid='.$serviceid);
@@ -47,8 +66,26 @@
 		return $serviceid;
 	}
 
-	function	update_service($serviceid,$name,$triggerid,$algorithm,$showsla,$goodsla,$sortorder,$service_times=array())
-	{
+	function	update_service($serviceid,$name,$triggerid,$algorithm,$showsla,$goodsla,$sortorder,$service_times=array(),$parentid,$childs){
+		foreach($childs as $id => $child){		//add childs
+			if($parentid == $child['serviceid']){
+				error('Service can\'t be parent and child in onetime.');
+				return FALSE;
+			}
+		}
+		remove_service_links($serviceid); //removes all links with current serviceid
+
+		$result =($parentid != 0)?(add_service_link($serviceid,$parentid,0)):(true); //add parent
+		
+		foreach($childs as $id => $child){		//add childs
+			if(empty($child['soft']) || !isset($child['soft'])) $child['soft'] = 0;
+			$result = add_service_link($child['serviceid'],$serviceid,$child['soft']); 
+		}
+		
+		if(!$result){
+			return FALSE;
+		}
+		
 		if(is_null($triggerid) || $triggerid==0) $triggerid = 'NULL';
 
 		$result = DBexecute("update services set name=".zbx_dbstr($name).",triggerid=$triggerid,status=0,algorithm=$algorithm,showsla=$showsla,goodsla=$goodsla,sortorder=$sortorder where serviceid=$serviceid");
@@ -162,16 +199,13 @@
 		return	TRUE;
 	}
 
-	function	add_service_link($servicedownid,$serviceupid,$softlink)
-	{
-		if( ($softlink==0) && (is_service_hardlinked($servicedownid)==true) )
-		{
+	function	add_service_link($servicedownid,$serviceupid,$softlink){
+		if( ($softlink==0) && (is_service_hardlinked($servicedownid)==true) ){
 			error("cannot link hardlinked service.");
 			return	false;
 		}
 
-		if($servicedownid==$serviceupid)
-		{
+		if($servicedownid==$serviceupid){
 			error("cannot link service to itself.");
 			return	false;
 		}
@@ -186,15 +220,13 @@
 
 		return $linkid;
 	}
-	function	update_service_link($linkid,$servicedownid,$serviceupid,$softlink)
-	{
-		if( ($softlink==0) && (is_service_hardlinked($servicedownid)==true) )
-		{
+	
+	function	update_service_link($linkid,$servicedownid,$serviceupid,$softlink){
+		if( ($softlink==0) && (is_service_hardlinked($servicedownid)==true) ){
 			return	false;
 		}
 
-		if($servicedownid==$serviceupid)
-		{
+		if($servicedownid==$serviceupid){
 			error("cannot link service to itself.");
 			return	false;
 		}
@@ -202,9 +234,17 @@
 		$sql="update services_links set servicedownid=$servicedownid, serviceupid=$serviceupid, soft=$softlink where linkid=$linkid";
 		return	dbexecute($sql);
 	}
+	
+	function remove_service_links($serviceid){
+		$query='DELETE 
+				FROM services_links 
+				WHERE serviceupid='.$serviceid.' 
+					OR  (servicedownid='.$serviceid.' 
+					AND soft<>1)';
+		DBExecute($query);
+	}
 
-	function	get_last_service_value($serviceid,$clock)
-	{
+	function	get_last_service_value($serviceid,$clock){
 	       	$sql="select count(*) as cnt,max(clock) as maxx from service_alarms where serviceid=$serviceid and clock<=$clock";
 //		echo " $sql<br>";
 		
@@ -517,12 +557,77 @@ $dt = 0;
 	}
 	
 	function get_service_childs($serviceid,&$childs,$soft=0){
-		$query = 'SELECT sl.servicedownid FROM services_links sl WHERE sl.serviceupid = '.$serviceid.(($soft == 1)?(''):(' AND sl.soft <> 1'));
+		$query = 'SELECT sl.servicedownid '.
+			' FROM services_links sl '.
+			' WHERE sl.serviceupid = '.$serviceid.(($soft == 1)?(''):(' AND sl.soft <> 1'));
 		
 		$res =  DBSelect($query);
 		while($row = DBFetch($res)){
 			$childs[] = $row['servicedownid'];
 			get_service_childs($row['servicedownid'],$childs);
 		}
+	}
+	
+	function createServiceTree(&$services,$id=0,&$temp=array(),$serviceupid=0,$parentid=0, $soft=0, $linkid=''){
+
+	//echo 'IN:  id='.$id.' ,serviceupid='.$serviceupid.' ,paranetid='.$parentid.' ,soft='.$soft.BR;
+		$rows = $services[$id];
+		$rows['algorithm'] = algorithm2str($rows['algorithm']);
+	
+	//---------------------------- if not leaf -----------------------------
+		$rows['parentid'] = $parentid;
+		if($soft == 0){
+			$rows['caption'] = new CLink($rows['caption'],'#',null,'javascript: call_menu(event, '.zbx_jsvalue($rows['serviceid']).','.zbx_jsvalue($rows['caption']).'); return false;');
+				
+			$temp[$rows['serviceid']]=$rows;
+		
+			if(isset($rows['childs'])){
+				foreach($rows['childs'] as $cid => $nodeid){
+					if(!isset($services[$nodeid['id']])){
+						continue;
+					}
+					createServiceTree($services,$nodeid['id'],$temp,$services[$nodeid['id']]['serviceupid'],$rows['serviceid'],$nodeid['soft'], $nodeid['linkid']);
+				}			
+			}
+		} else {
+			$rows['caption'] = '<font style="color: #888888;">'.$rows['caption'].'</font>';
+			$temp[$rows['serviceid'].','.$linkid]=$rows;
+		}
+	return ;
+	}
+	
+	function createShowServiceTree(&$services,$id=0,&$temp=array(),$serviceupid=0,$parentid=0, $soft=0, $linkid=''){
+
+	//echo 'IN:  id='.$id.' ,serviceupid='.$serviceupid.' ,paranetid='.$parentid.' ,soft='.$soft.BR;
+		$rows = $services[$id];
+		
+	
+	//---------------------------- if not leaf -----------------------------
+		$rows['parentid'] = $parentid;
+		$rows['status'] = get_service_status_description($rows["status"]);
+		
+		if($soft == 0){
+
+			$temp[$rows['serviceid']]=$rows;
+		
+			if(isset($rows['childs'])){
+				foreach($rows['childs'] as $cid => $nodeid){
+					if(!isset($services[$nodeid['id']])){
+						continue;
+					}
+					createShowServiceTree($services,$nodeid['id'],$temp,$services[$nodeid['id']]['serviceupid'],$rows['serviceid'],$nodeid['soft'], $nodeid['linkid']);
+				}			
+			}
+		} else {
+			$rows['caption'] = new CSpan($rows['caption']);
+			$rows['caption']->AddOption('style','color: #888888;');
+			$temp[$rows['serviceid'].','.$linkid]=$rows;
+		}
+	return ;
+	}
+	
+	function closeform(){
+		
+		zbx_add_post_js('closeform();');
 	}
 ?>

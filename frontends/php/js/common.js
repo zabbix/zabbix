@@ -16,6 +16,10 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
+var IE = document.all?true:false;
+var OP = window.opera?true:false;
+
+
 function SDI(msg)
 {
 	alert("DEBUG INFO: " + msg);
@@ -128,15 +132,14 @@ function create_var(form_name, var_name, var_val, submit)
 	return false;
 }
 
-function Confirm(msg)
-{
+function Confirm(msg){
 	if(confirm(msg,'title'))
 		return true;
 	else
 		return false;
 }
-function PopUp(url,width,height,form_name)
-{
+
+function PopUp(url,width,height,form_name){
 	if(!width) width = 600;
 	if(!height) height = 450;
 	if(!form_name) form_name = 'zbx_popup';
@@ -152,8 +155,7 @@ function PopUp(url,width,height,form_name)
 	return false;
 }
 
-function CheckAll(form_name, chkMain, shkName)
-{
+function CheckAll(form_name, chkMain, shkName){
 	var frmForm = document.forms[form_name];
 	var value = frmForm.elements[chkMain].checked;
 	for (var i=0; i < frmForm.length; i++)
