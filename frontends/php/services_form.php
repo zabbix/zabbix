@@ -193,7 +193,7 @@ if(isset($_REQUEST['pservices'])){
 		$table->AddRow(array(array($prefix,$description),S_NONE,$trigger));
 //-----
 	if(isset($service)){
-		get_service_childs($service['serviceid'],$childs = array(),1);
+		$childs = get_service_childs($service['serviceid'],1);
 		$childs_str = implode(',',$childs);
 		(!empty($childs_str))?($childs_str.=','):('');
 		
@@ -271,7 +271,7 @@ if(isset($_REQUEST['cservices'])){
 	$table->SetHeader(array(S_SERVICE,S_STATUS_CALCULATION,S_TRIGGER));
 
 	if(isset($service)){
-		get_service_childs($service['serviceid'],$childs = array(),1);
+		$childs = get_service_childs($service['serviceid'],1);
 		$childs_str = implode(',',$childs);
 		(!empty($childs_str))?($childs_str.=','):('');
 	
