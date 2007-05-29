@@ -62,7 +62,7 @@ AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
 		for i in $_full_libnetsnmp_libs; do
 			case $i in
 				-L*)
-					SNMP_LDFLAGS="${SNMP_LDFLAGS} ${_libnetsnmp_libdir}"
+					SNMP_LDFLAGS="${SNMP_LDFLAGS} $i"
 			;;
 			esac
 		done
@@ -74,7 +74,11 @@ AC_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
 				;;
 					-l*)
 						_lib_name="`echo "$i" | cut -b3-`"
-						SNMP_LIBS="$SNMP_LIBS $i"
+						AC_CHECK_LIB($_lib_name , main,[
+								SNMP_LIBS="$SNMP_LIBS $i"
+							],[
+								AC_MSG_ERROR([Not found $_lib_name library])
+							])
 
 				;;
 				esac
