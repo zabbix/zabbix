@@ -105,8 +105,12 @@ dnl            AC_MSG_CHECKING([for MySQL libraries])
            	      -lmysqlclient)
            	    ;;
                       -l*)
-                           _lib_name="`echo "$i" | cut -b3-`"
-                           MYSQL_LIBS="${MYSQL_LIBS} ${i}"
+				_lib_name="`echo "$i" | cut -b3-`"
+				AC_CHECK_LIB($_lib_name , main,[
+						MYSQL_LIBS="$MYSQL_LIBS $i"
+					],[
+						AC_MSG_ERROR([Not found $_lib_name library])
+					])
                    ;;
                    esac
                done
