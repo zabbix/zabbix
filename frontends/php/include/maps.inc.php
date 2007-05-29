@@ -335,43 +335,39 @@
 
 		$el_type =& $db_element["elementtype"];
 
-		if(in_array($el_type,
-			array(
-				SYSMAP_ELEMENT_TYPE_HOST,
-				SYSMAP_ELEMENT_TYPE_HOST_GROUP,
-				SYSMAP_ELEMENT_TYPE_TRIGGER
-				)
-			))
+		$sql = array(
+			SYSMAP_ELEMENT_TYPE_TRIGGER => 'select distinct t.triggerid, t.priority, t.value, t.description, h.host '.
+				'from triggers t, items i, functions f, hosts h where t.triggerid='.$db_element['elementid'].
+				' and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid '.
+				' and h.status='.HOST_STATUS_MONITORED.' and i.status='.ITEM_STATUS_ACTIVE,
+			SYSMAP_ELEMENT_TYPE_HOST_GROUP => 'select distinct t.triggerid, t.priority, t.value,'.
+				' t.description, h.host, g.name as el_name '.
+				' from items i,functions f,triggers t,hosts h,hosts_groups hg,groups g '.
+				' where h.hostid=i.hostid and hg.groupid=g.groupid and g.groupid='.$db_element['elementid'].
+				' and hg.hostid=h.hostid and i.itemid=f.itemid'.
+				' and f.triggerid=t.triggerid and t.status='.TRIGGER_STATUS_ENABLED.
+				' and h.status='.HOST_STATUS_MONITORED.' and i.status='.ITEM_STATUS_ACTIVE,
+			SYSMAP_ELEMENT_TYPE_HOST => 'select distinct t.triggerid, t.priority, t.value,'.
+				' t.description, h.host, h.host as el_name'.
+				' from items i,functions f,triggers t,hosts h where h.hostid=i.hostid'.
+				' and i.hostid='.$db_element['elementid'].' and i.itemid=f.itemid'.
+				' and f.triggerid=t.triggerid and t.status='.TRIGGER_STATUS_ENABLED.
+				' and h.status='.HOST_STATUS_MONITORED.' and i.status='.ITEM_STATUS_ACTIVE
+			);
+		if( isset($sql[$el_type]) )
 		{
-			$sql = array(
-				SYSMAP_ELEMENT_TYPE_TRIGGER => 'select distinct t.triggerid, t.priority, t.value, t.description, h.host '.
-					'from triggers t, items i, functions f, hosts h where t.triggerid='.$db_element['elementid'].
-					' and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid '.
-					' and h.status='.HOST_STATUS_MONITORED.' and i.status='.ITEM_STATUS_ACTIVE.
-					' and t.status='.TRIGGER_STATUS_ENABLED,
-				SYSMAP_ELEMENT_TYPE_HOST_GROUP => 'select distinct t.triggerid, t.priority, t.value,'.
-					' t.description, h.host, g.name as el_name '.
-					' from items i,functions f,triggers t,hosts h,hosts_groups hg,groups g '.
-					' where h.hostid=i.hostid and hg.groupid=g.groupid and g.groupid='.$db_element['elementid'].
-					' and hg.hostid=h.hostid and i.itemid=f.itemid'.
-					' and f.triggerid=t.triggerid and t.status='.TRIGGER_STATUS_ENABLED.
-					' and h.status='.HOST_STATUS_MONITORED.' and i.status='.ITEM_STATUS_ACTIVE,
-				SYSMAP_ELEMENT_TYPE_HOST => 'select distinct t.triggerid, t.priority, t.value,'.
-					' t.description, h.host, h.host as el_name'.
-					' from items i,functions f,triggers t,hosts h where h.hostid=i.hostid'.
-					' and i.hostid='.$db_element['elementid'].' and i.itemid=f.itemid'.
-					' and f.triggerid=t.triggerid and t.status='.TRIGGER_STATUS_ENABLED.
-					' and h.status='.HOST_STATUS_MONITORED.' and i.status='.ITEM_STATUS_ACTIVE
-				);
-
 			$db_triggers = DBselect($sql[$el_type]);
 			$trigger = DBfetch($db_triggers);
 			if($trigger)
 			{
 				if(isset($trigger['el_name']))
+				{
 					$el_name = $trigger['el_name'];
+				}
 				else
+				{
 					$el_name = expand_trigger_description_by_data($trigger);
+				}
 
 				do {
 					$type	=& $trigger['value'];
@@ -397,6 +393,12 @@
 					$tr_info[TRIGGER_VALUE_UNKNOWN]['count']	= 1;
 					$tr_info[TRIGGER_VALUE_UNKNOWN]['priority']	= 0;
 					$tr_info[TRIGGER_VALUE_UNKNOWN]['info']		= S_TEMPLATE_SMALL;
+				}
+				else
+				{
+					$tr_info[TRIGGER_VALUE_FALSE]['count']		= 0;
+					$tr_info[TRIGGER_VALUE_FALSE]['priority']	= 0;
+					$tr_info[TRIGGER_VALUE_FALSE]['info']		= S_OK_BIG;
 				}
 			}
 		}
