@@ -1,7 +1,7 @@
 <?php
 /* 
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2007 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -177,30 +177,6 @@ include_once "include/page_header.php";
 		} else {
 			error('Can\'t format Tree. Check logick structure in service links');
 		}
-		
-		
-		
-		
-		/*$result = DBselect("select distinct s.* from services s left join triggers t on s.triggerid=t.triggerid ".
-				" left join functions f on t.triggerid=f.triggerid left join items i on f.itemid=i.itemid ".
-				" left join services_links sl on s.serviceid=sl.servicedownid ".
-				" where (i.hostid is null or i.hostid not in (".$denyed_hosts.")) ".
-				" and ".DBid2nodeid("s.serviceid")."=".$ZBX_CURNODEID.
-				" and (sl.serviceupid".(!isset($service) ?
-					" is NULL " :
-					"=".$service['serviceid']." or s.serviceid=".$service['serviceid'] ).") ".
-				" order by s.sortorder,s.name");
-
-
-			$table->AddRow(array(
-				$description,
-				get_service_status_description($row["status"]),
-				$reason,
-				$sla,
-				$sla2,
-				new CLink(S_SHOW,"srv_status.php?serviceid=".$row["serviceid"]."&showgraph=1".url_param('path'),"action")
-				));
-		}*/
 	}
 ?>
 <?php
