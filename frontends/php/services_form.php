@@ -1,7 +1,7 @@
 <?php
 /* 
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2007 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
 **/
 ?>
 <?php
-set_time_limit(3);
 
 	include_once "include/config.inc.php";
 	include_once "include/services.inc.php";
@@ -157,7 +156,6 @@ if(isset($_REQUEST['saction'])){
 	}
 }
 //-------------------------------------------- </ACTIONS> --------------------------------------------
-//$_REQUEST['sform'] = 1;
 //----------------------------------------- <PARENT SERVICES LIST> ------------------------------------------
 
 if(isset($_REQUEST['pservices'])){
@@ -355,10 +353,11 @@ if(isset($_REQUEST['sform'])){
 				);
 			$new_service_time['note'] = $_REQUEST["new_service_time"]['note'];
 		}
+		
+		while($new_service_time['to'] && ($new_service_time['to'] <= $new_service_time['from'])) $new_service_time['to'] += 7*24*3600;
 
-		while($new_service_time['to'] <= $new_service_time['from']) $new_service_time['to'] += 7*24*3600;
 
-		if(!in_array($_REQUEST['service_times'], $new_service_time))
+		if($new_service_time['to'] && !in_array($_REQUEST['service_times'], $new_service_time))
 			array_push($_REQUEST['service_times'],$new_service_time);
 	} elseif(isset($_REQUEST["del_service_times"]) && isset($_REQUEST["rem_service_times"])){
 		$_REQUEST["service_times"] = get_request("service_times",array());
@@ -563,36 +562,6 @@ if(isset($_REQUEST['sform'])){
 	$row->AddOption('style',($showsla)?(''):('display: none;'));
 	
 	$frmService->AddRow($row);
-/*
-	$table_sla = new CTable();
-	$table_sla->AddOption('width','100%');
-//	$table_sla->AddOption('border','1');
-	
-	$table_sla->options['cellpadding'] = 0;
-	$table_sla->options['cellspacing'] = 0;
-
-		
-	$row = new CRow(array(
-						new CCol(S_SHOW_SLA,'form_row_l_simple'),
-						new CCol(new CCheckBox("showsla",$showsla,"javascript: display_element('sla_row');",1),'form_row_r_simple')
-						)
-					);
-
-	$table_sla->AddRow($row);
-
-	$row = new CRow(array(
-						new CCol(S_ACCEPTABLE_SLA_IN_PERCENT,'form_row_l_simple'),
-						new CCol(new CTextBox("goodsla",$goodsla,6),'form_row_r_simple')
-						)
-					);
-
-	$row->AddOption('id','sla_row');
-	$row->AddOption('style',($showsla)?(''):('display: none;'));
-	
-	$table_sla->AddRow($row);
-	
-	$frmService->AddRow($table_sla);
-*/
 //------
 
 //times
