@@ -1,7 +1,7 @@
 <?php
 /* 
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2007 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,7 +17,6 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-set_time_limit(3);
 
 include_once "include/config.inc.php";
 include_once "include/services.inc.php";
@@ -26,7 +25,6 @@ $page["title"] = "S_IT_SERVICES";
 $page["file"] = "services.php";
 
 include_once "include/page_header.php";
-//print_r($_COOKIE);
 
 
 //---------------------------------- CHECKS ------------------------------------
