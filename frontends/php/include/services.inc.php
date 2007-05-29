@@ -556,7 +556,9 @@ $dt = 0;
 		return S_UNKNOWN;
 	}
 	
-	function get_service_childs($serviceid,&$childs,$soft=0){
+	function get_service_childs($serviceid,$soft=0){
+		$childs = array();
+
 		$query = 'SELECT sl.servicedownid '.
 			' FROM services_links sl '.
 			' WHERE sl.serviceupid = '.$serviceid.(($soft == 1)?(''):(' AND sl.soft <> 1'));
@@ -564,8 +566,9 @@ $dt = 0;
 		$res =  DBSelect($query);
 		while($row = DBFetch($res)){
 			$childs[] = $row['servicedownid'];
-			get_service_childs($row['servicedownid'],$childs);
+			$childs = array_merge($childs, get_service_childs($row['servicedownid']));
 		}
+		return $childs;
 	}
 	
 	function createServiceTree(&$services,$id=0,&$temp=array(),$serviceupid=0,$parentid=0, $soft=0, $linkid=''){
