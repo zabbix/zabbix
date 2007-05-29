@@ -268,7 +268,7 @@ INSERT INTO groups VALUES (4,'ZABBIX Servers');
 -- Dumping data for table `hosts_groups`
 --
 
-INSERT INTO hosts_groups VALUES (6,10001,1);
+INSERT INTO hosts_groups VALUES (1,10001,1);
 INSERT INTO hosts_groups VALUES (2,10002,1);
 INSERT INTO hosts_groups VALUES (3,10003,1);
 INSERT INTO hosts_groups VALUES (4,10004,1);
