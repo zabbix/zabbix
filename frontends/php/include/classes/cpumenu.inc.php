@@ -61,9 +61,7 @@
 		{
 			if(defined('CPUMENU_INSERTJAVASCRIPT_INSERTED')) return;
 			define('CPUMENU_INSERTJAVASCRIPT_INSERTED', 1);
-?>
-<script language="JavaScript" type="text/javascript" src="js/menu.js"></script>
-<?php
+			echo '<script language="JavaScript" type="text/javascript" src="js/menu.js"></script>';
 		}
 	}
 ?>

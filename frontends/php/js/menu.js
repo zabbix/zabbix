@@ -26,6 +26,7 @@
 // Notes: This script is free. Visit official site for further details.
 //        This script adapted by Eugene Grigorjev for using as popup menu
 //        of ZABBIX software. See http://www.zabbix.com.
+//debugger;
 
 function show_popup_menu(e, content, width)
 {
@@ -163,22 +164,18 @@ function menu_collapse (n_id) {
 
 	// by default collapse all levels
 	var n_tolevel = (n_id ? this.a_index[n_id].n_depth : -1);
-	
-	if(-1 == n_tolevel)
-	{
-		for (n_id = 0; n_id < this.a_index.length; n_id++)
-		{
+	if(-1 == n_tolevel){
+		for (n_id = 0; n_id < this.a_index.length; n_id++){
 			var o_curritem = this.a_index[n_id];
-			if(o_curritem)
-			{
+			if(o_curritem){
 				var e_oelement = document.getElementById(o_curritem.e_oelement.id);
-				document.body.removeChild(e_oelement);
+				if(e_oelement != null){
+					document.body.removeChild(e_oelement);
+				}
 			}
 		}
 		A_MENUS.splice(this.o_root.n_id);
-	}
-	else
-	{
+	} else {
 		// hide all items over the level specified
 		for (n_id = 0; n_id < this.a_index.length; n_id++) {
 			var o_curritem = this.a_index[n_id];
@@ -190,8 +187,7 @@ function menu_collapse (n_id) {
 	}
 
 	// reset current item if mouse has gone out of items
-	if (!n_id)
-		this.o_current = null;
+	if (!n_id) this.o_current = null;
 }
 
 // --------------------------------------------------------------------------------
@@ -226,9 +222,21 @@ function menu_expand (n_id) {
 // --------------------------------------------------------------------------------
 function menu_onclick (n_id) {
 	// don't go anywhere if item has no link defined
-	if(Boolean(this.a_index[n_id].a_config[1]))
-	{
-		this.collapse(0);
+	// lookup new item's object	
+	if(Boolean(this.a_index[n_id].a_config[1])){
+		// lookup new item's object	
+		var o_item = this.a_index[n_id];
+
+		// apply rollout
+		o_item.e_oelement.className = o_item.getstyle(0, 0);
+		o_item.e_ielement.className = o_item.getstyle(1, 0);
+		
+		// update status line	
+		o_item.upstatus(7);
+		
+		this.o_hidetimer = setTimeout('A_MENUS['+ this.n_id +'].collapse();', 100);//o_item.getprop('hide_delay'));
+		//this.collapse();
+		//alert(A_MENUS[this.n_id].a_config[1][1]);
 		return true;
 	}
 	return false;
@@ -283,7 +291,6 @@ function menu_onmouseover (n_id) {
 // called when mouse button is pressed on menu item
 // --------------------------------------------------------------------------------
 function menu_onmousedown (n_id) {
-	
 	// lookup new item's object	
 	var o_item = this.a_index[n_id];
 
@@ -298,6 +305,7 @@ function menu_onmousedown (n_id) {
 
 // --------------------------------------------------------------------------------
 // menu item Class
+
 function menu_item (o_parent, n_order) {
 
 	// store parameters passed to the constructor
@@ -403,7 +411,7 @@ function menu_item (o_parent, n_order) {
 	el.onmousedown = A_MENUS_onmousedown;
 
 	el.innerHTML = '<div  id="e' + o_root.n_id + '_' + this.n_id +'i" class="' + this.getstyle(1, 0) + '">' + this.a_config[0] + '</div>';
-
+//	console.log(el,el.innerHTML);
 	document.body.appendChild(el);
 
 	this.e_ielement = document.getElementById('e' + o_root.n_id + '_' + this.n_id + 'i');
@@ -414,7 +422,7 @@ function menu_item (o_parent, n_order) {
 	// no more initialization if leaf
 	if (this.a_config.length < item_offset)
 		return;
-
+		
 	// node specific methods and properties
 	this.a_children = [];
 
@@ -423,7 +431,7 @@ function menu_item (o_parent, n_order) {
 		new menu_item(this, n_order);
 }
 
-function A_MENUS_onclick(){	return A_MENUS[this.o_root_n_id].onclick(this.this_n_id); }
+function A_MENUS_onclick(){		return A_MENUS[this.o_root_n_id].onclick(this.this_n_id); }
 function A_MENUS_onmouseout(){	return A_MENUS[this.o_root_n_id].onmouseout(this.this_n_id); }
 function A_MENUS_onmouseover(){	return A_MENUS[this.o_root_n_id].onmouseover(this.this_n_id); }
 function A_MENUS_onmousedown(){	return A_MENUS[this.o_root_n_id].onmousedown(this.this_n_id); }

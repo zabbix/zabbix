@@ -67,6 +67,15 @@ frontends/php/images/general/sortdown_off.gif -text svneol=unset#unset
 frontends/php/images/general/sortup.gif -text svneol=unset#unset
 frontends/php/images/general/sortup_off.gif -text svneol=unset#unset
 frontends/php/images/general/tick.png -text
+frontends/php/images/general/tree/I.gif -text
+frontends/php/images/general/tree/L.gif -text
+frontends/php/images/general/tree/O.gif -text
+frontends/php/images/general/tree/T.gif -text
+frontends/php/images/general/tree/X.gif -text
+frontends/php/images/general/tree/Xc.gif -text
+frontends/php/images/general/tree/Y.gif -text
+frontends/php/images/general/tree/Yc.gif -text
+frontends/php/images/general/tree/point.gif -text
 frontends/php/images/general/warning_small.gif -text
 frontends/php/images/general/zabbix.png -text svneol=unset#unset
 frontends/php/images/gradients/blink1.gif -text svneol=unset#unset
@@ -104,6 +113,7 @@ frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
 frontends/php/include/classes/ccolor.inc.php -text
 frontends/php/include/classes/clist.inc.php -text
 frontends/php/include/classes/cpumenu.inc.php -text
+frontends/php/include/classes/ctree.inc.php -text
 frontends/php/include/discovery.inc.php -text
 frontends/php/include/export.inc.php -text
 frontends/php/include/httptest.inc.php -text
@@ -117,7 +127,10 @@ frontends/php/include/page_header.php -text
 frontends/php/include/setup.inc.php -text
 frontends/php/instal.php -text
 frontends/php/js/common.js -text
+frontends/php/js/cookies.js -text
 frontends/php/js/menu.js -text
+frontends/php/js/services.js -text
+frontends/php/js/tree.js -text
 frontends/php/media_types.php -text
 frontends/php/nodes.php -text
 frontends/php/popup_gitem.php -text
@@ -127,6 +140,7 @@ frontends/php/popup_right.php -text
 frontends/php/popup_trexpr.php -text
 frontends/php/popup_users.php -text
 frontends/php/popup_usrgrp.php -text
+frontends/php/services_form.php -text
 frontends/php/setup.php -text
 include/comms.h -text
 include/jabber.h -text
