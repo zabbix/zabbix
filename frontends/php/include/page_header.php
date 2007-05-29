@@ -167,7 +167,9 @@ COpt::profiling_start("page");
 					array("url"=>"screenconf.php"	,"label"=>S_SCREENS		,
 						"sub_pages"=>array("screenedit.php")
 						),
-					array("url"=>"services.php"	,"label"=>S_IT_SERVICES		),
+					array("url"=>"services.php"	,"label"=>S_IT_SERVICES	,
+						"sub_pages"=>array("services_form.php")	
+						),
 					array('url'=>'discoveryconf.php','label'=>S_DISCOVERY		),
 					array("url"=>"exp_imp.php"	,"label"=>S_EXPORT_IMPORT	),
 					array("url"=>"popup.php")

@@ -98,30 +98,24 @@
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--
-	function visibility_status_changeds(value, obj_name, replace_to)
-	{
+	function visibility_status_changeds(value, obj_name, replace_to){
 		var obj = document.getElementsByName(obj_name);
 
 		if(obj.length <= 0) throw "Can't find objects with name [" + obj_name +"]";
 
-		for(i = obj.length-1; i>=0; i--)
-		{
-			if(replace_to && replace_to != "")
-			{
-				if(obj[i].originalObject)
-				{
+		for(i = obj.length-1; i>=0; i--){
+			if(replace_to && replace_to != ""){
+				if(obj[i].originalObject){
 					var old_obj = obj[i].originalObject;
 					old_obj.originalObject = obj[i];
 					obj[i].parentNode.replaceChild(old_obj, obj[i]);
 				}
-				else if(!value)
-				{
+				else if(!value){
 					var new_obj = null;
 					try {
 						new_obj = document.createElement("<a name='" + obj[i].name + "'>");
 					}
-					catch(err)
-					{
+					catch(err){
 						new_obj = document.createElement("a");
 						new_obj.name = obj[i].name;
 					}
@@ -133,13 +127,11 @@
 					new_obj.originalObject = obj[i];
 					obj[i].parentNode.replaceChild(new_obj, obj[i]);
 				}
-				else
-				{
+				else{
 					throw "Missed originalObject for restoring";
 				}
 			}
-			else
-			{
+			else{
 				value = value ? 'visible' : 'hidden';
 				obj[i].style.visibility = value;
 			}
