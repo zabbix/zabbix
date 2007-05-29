@@ -228,7 +228,7 @@ require_once('include/classes/ctree.inc.php');
 	 *
 	 * author: Eugene Grigorjev
 	 */
-	function zbx_jsvalue(&$value)
+	function zbx_jsvalue($value)
 	{
 		if(!is_array($value)) 
 		{
