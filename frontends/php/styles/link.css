@@ -1,0 +1,56 @@
+/* CSS Document */
+
+a.highlight { font-family: Verdana, Arial, sans-serif;	font-size:10px; 	font-weight: bold; }
+a.highlight:link 	{ 	text-decoration: none;		color: #ffffff; }
+a.highlight:visited 	{	text-decoration: none;		color: #ffffff; }
+a.highlight:hover	{	text-decoration: underline;	color: #ffcc00; }
+
+
+
+A.enabled:link		{	color:#00AA00;	text-decoration: none; }
+A.enabled:visited 	{	color:#00AA00;	text-decoration: none; }
+A.enabled:hover 	{	color:#00AA00;	text-decoration: underline; }
+A.enabled:active 	{	color:#00AA00;	text-decoration: underline;}
+
+A.disabled:link		{	color:#AA0000;	text-decoration: none; }
+A.disabled:visited 	{	color:#AA0000;	text-decoration: none; }
+A.disabled:hover 	{	color:#AA0000;	text-decoration: underline; }
+A.disabled:active 	{	color:#AA0000;	text-decoration: underline;}
+
+A.unknown:link		{	color:#AAAAAA;	text-decoration: none; }
+A.unknown:visited 	{	color:#AAAAAA;	text-decoration: none; }
+A.unknown:hover 	{	color:#AAAAAA;	text-decoration: underline; }
+A.unknown:active 	{	color:#AAAAAA;	text-decoration: underline;}
+
+A.off:link	{	color:#00AA00;	text-decoration: none; }
+A.off:visited 	{	color:#00AA00;	text-decoration: none; }
+A.off:hover 	{	color:#00AA00;	text-decoration: underline; }
+A.off:active 	{	color:#00AA00;	text-decoration: underline;}
+
+A.on:link	{	color:#AA0000;	text-decoration: none; }
+A.on:visited 	{	color:#AA0000;	text-decoration: none; }
+A.on:hover 	{	color:#AA0000;	text-decoration: underline; }
+A.on:active 	{	color:#AA0000;	text-decoration: underline;}
+
+A.action:link		{	color:#3C3089;	text-decoration: none; }
+A.action:visited 	{	color:#3C3089;	text-decoration: none; }
+A.action:hover 		{	color:#3C3089;	text-decoration: underline; }
+A.action:active 	{	color:#3C3089;	text-decoration: underline;}
+
+a.small_font
+{
+	color: #000000;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
+}
+
+A.footer
+{
+	color:#CCCCCC;
+}
+
+A 		{font-family:Verdana, Arial, Helvetica, sans-serif;font-size:8pt;}
+A:link 		{color:black; text-decoration: none; }
+A:visited 	{color:black; text-decoration: none; }
+A:hover 	{color:black; text-decoration: underline; }
+A:active 	{color:black; text-decoration: underline;}

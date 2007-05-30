@@ -18,7 +18,7 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-function SDI($msg="SDI") { echo "DEBUG INFO: "; var_export($msg); echo BR; } // DEBUG INFO!!!
+function SDI($msg="SDI") { echo "DEBUG INFO: "; var_dump($msg); echo BR; } // DEBUG INFO!!!
 function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$msg.'"'.SPACE; var_dump($var); echo BR; } // DEBUG INFO!!!
 function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 
@@ -60,7 +60,7 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 	require_once("include/classes/ciframe.inc.php");
 	require_once("include/classes/cpumenu.inc.php");
 	require_once("include/classes/graph.inc.php");
-require_once('include/classes/ctree.inc.php');
+	require_once('include/classes/ctree.inc.php');
 
 // Include Tactical Overview modules
 
@@ -619,9 +619,9 @@ else
 					array_push($message, array(
 						'text'	=> $msg,
 						'color'	=> (!$bool) ? array('R'=>255,'G'=>0,'B'=>0) : array('R'=>34,'G'=>51,'B'=>68),
-						'font'	=> 4));
-					$width = max($width, ImageFontWidth(4) * strlen($msg) + 1);
-					$height += imagefontheight(4) + 1;
+						'font'	=> 2));
+					$width = max($width, ImageFontWidth(2) * strlen($msg) + 1);
+					$height += imagefontheight(2) + 1;
 					break;			
 				case PAGE_TYPE_XML:
 					echo htmlspecialchars($msg)."\n";
@@ -642,6 +642,7 @@ else
 		{
 			if($page["type"] == PAGE_TYPE_IMAGE)
 			{
+				$msg_font = 2;
 				foreach($ZBX_MESSAGES as $msg)
 				{
 					if($msg['type'] == 'error')
@@ -649,17 +650,17 @@ else
 						array_push($message, array(
 							'text'	=> $msg['message'],
 							'color'	=> array('R'=>255,'G'=>55,'B'=>55),
-							'font'	=> 2));
+							'font'	=> $msg_font));
 					}
 					else
 					{
 						array_push($message, array(
 							'text'	=> $msg['message'],
 							'color'	=> array('R'=>155,'G'=>155,'B'=>55),
-							'font'	=> 2));
+							'font'	=> $msg_font));
 					}
-					$width = max($width, ImageFontWidth(2) * strlen($msg['message']) + 1);
-					$height += imagefontheight(2) + 1;
+					$width = max($width, ImageFontWidth($msg_font) * strlen($msg['message']) + 1);
+					$height += imagefontheight($msg_font) + 1;
 				}
 			}
 			elseif($page["type"] == PAGE_TYPE_XML)
@@ -674,7 +675,18 @@ else
 				$lst_error = new CList(null,'messages');
 				foreach($ZBX_MESSAGES as $msg)
 					$lst_error->AddItem($msg['message'], $msg['type']);
-				$lst_error->Show(false);
+//message scroll if needed
+				$msg_show = 6;
+				$msg_font_size = 8;
+				$msg_count = count($ZBX_MESSAGES);
+				
+				if($msg_count > $msg_show) $msg_count = $msg_show;
+					
+				$msg_count = ($msg_count * $msg_font_size *2);
+				$lst_error->AddOption('style','	font-size: '.$msg_font_size.'pt; height: '.$msg_count.';');
+//---
+				$lst_error->Show();
+				
 				unset($lst_error);
 			}
 			$ZBX_MESSAGES = null;
