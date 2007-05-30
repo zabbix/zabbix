@@ -36,7 +36,7 @@ include_once "include/page_header.php";
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		"from"=>	array(T_ZBX_INT, O_OPT,	 null,	'{}>=0', null),
-		"period"=>	array(T_ZBX_INT, O_OPT,	 null,	'{}>=3600', null),
+		"period"=>	array(T_ZBX_INT, O_OPT,	 null,	BETWEEN(ZBX_MIN_PERIOD,ZBX_MAX_PERIOD), null),
 		"dec"=>		array(T_ZBX_INT, O_OPT,	 null,	null, null),
 		"inc"=>		array(T_ZBX_INT, O_OPT,	 null,	null, null),
 		"left"=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
