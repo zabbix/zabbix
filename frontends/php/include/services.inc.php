@@ -571,9 +571,8 @@ $dt = 0;
 		return $childs;
 	}
 	
-	function createServiceTree(&$services,$id=0,&$temp=array(),$serviceupid=0,$parentid=0, $soft=0, $linkid=''){
+	function createServiceTree(&$services,&$temp,$id=0,$serviceupid=0,$parentid=0, $soft=0, $linkid=''){
 
-	//echo 'IN:  id='.$id.' ,serviceupid='.$serviceupid.' ,paranetid='.$parentid.' ,soft='.$soft.BR;
 		$rows = $services[$id];
 		$rows['algorithm'] = algorithm2str($rows['algorithm']);
 	
@@ -589,7 +588,7 @@ $dt = 0;
 					if(!isset($services[$nodeid['id']])){
 						continue;
 					}
-					createServiceTree($services,$nodeid['id'],$temp,$services[$nodeid['id']]['serviceupid'],$rows['serviceid'],$nodeid['soft'], $nodeid['linkid']);
+					createServiceTree($services,$temp,$nodeid['id'],$services[$nodeid['id']]['serviceupid'],$rows['serviceid'],$nodeid['soft'], $nodeid['linkid']);
 				}			
 			}
 		} else {
@@ -599,9 +598,8 @@ $dt = 0;
 	return ;
 	}
 	
-	function createShowServiceTree(&$services,$id=0,&$temp=array(),$serviceupid=0,$parentid=0, $soft=0, $linkid=''){
+	function createShowServiceTree(&$services,&$temp,$id=0,$serviceupid=0,$parentid=0, $soft=0, $linkid=''){
 
-	//echo 'IN:  id='.$id.' ,serviceupid='.$serviceupid.' ,paranetid='.$parentid.' ,soft='.$soft.BR;
 		$rows = $services[$id];
 		
 	
@@ -618,7 +616,7 @@ $dt = 0;
 					if(!isset($services[$nodeid['id']])){
 						continue;
 					}
-					createShowServiceTree($services,$nodeid['id'],$temp,$services[$nodeid['id']]['serviceupid'],$rows['serviceid'],$nodeid['soft'], $nodeid['linkid']);
+					createShowServiceTree($services,$temp,$nodeid['id'],$services[$nodeid['id']]['serviceupid'],$rows['serviceid'],$nodeid['soft'], $nodeid['linkid']);
 				}			
 			}
 		} else {

@@ -160,7 +160,8 @@ include_once "include/page_header.php";
 			$services[$row['serviceid']]['childs'][] = array('id' => $row['servicedownid'], 'soft' => 1, 'linkid' => $row['linkid']);
 		}
 		
-		createShowServiceTree($services,0,$treeServ);	
+		$treeServ = array();
+		createShowServiceTree($services,$treeServ);	//return into $treeServ parametr
 		
 		echo '<script src="js/services.js" type="text/javascript"></script>';
 		

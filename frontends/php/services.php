@@ -97,8 +97,8 @@ while($row = DBFetch($result)){
 		$services[$row['serviceid']]['childs'][] = array('id' => $row['servicedownid'], 'soft' => 1, 'linkid' => $row['linkid']);
 }
 
-
-createServiceTree($services,0,$treeServ);
+$treeServ=array();
+createServiceTree($services,$treeServ); //return into $treeServ parametr
 
 echo '<script src="js/services.js" type="text/javascript"></script>';
 
