@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-	function	bold($str)
+	function bold($str)
 	{
 		if(is_array($str)){
 			foreach($str as $key => $val)
@@ -31,7 +31,7 @@
 		return $str;
 	}
 
-	function	bfirst($str) // mark first symbol of string as bold
+	function bfirst($str) // mark first symbol of string as bold
 	{
 		$res = bold($str[0]);
 		for($i=1,$max=strlen($str); $i<$max; $i++)	$res .= $str[$i];
@@ -39,7 +39,7 @@
 		return $str;	
 	}
 
-	function	nbsp($str)
+	function nbsp($str)
 	{
 		return str_replace(" ",SPACE,$str);;
 	}
