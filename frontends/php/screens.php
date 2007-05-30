@@ -55,7 +55,7 @@ include_once "include/page_header.php";
 		"from"=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	BETWEEN(0,65535*65535),NULL),
 		"left"=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	BETWEEN(0,65535*65535),NULL),
 		"right"=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	BETWEEN(0,65535*65535),NULL),
-		"period"=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	BETWEEN(0,65535*65535),NULL),
+		"period"=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	BETWEEN(ZBX_MIN_PERIOD,ZBX_MAX_PERIOD),NULL),
 		"stime"=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	NULL,NULL),
 		"action"=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	IN("'go'"),NULL),
 		"reset"=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	IN("'reset'"),NULL),
@@ -68,6 +68,7 @@ include_once "include/page_header.php";
 
 	if( 2 != $_REQUEST["fullscreen"] )
 		update_profile('web.screens.config', $_REQUEST['config']);
+
 ?>
 
 <?php
@@ -76,6 +77,12 @@ include_once "include/page_header.php";
 
 	if( 2 != $_REQUEST["fullscreen"] )
 		update_profile("web.screens.elementid",$_REQUEST["elementid"]);
+
+	$_REQUEST["period"] = get_request('period',get_profile('web.screens'.$_REQUEST['elementid'].'.period', ZBX_PERIOD_DEFAULT));
+	if($_REQUEST["period"] >= ZBX_MIN_PERIOD)
+	{
+		update_profile('web.screens'.$_REQUEST['elementid'].'.period',$_REQUEST['period']);
+	}
 ?>
 
 <?php
