@@ -161,7 +161,7 @@ include_once "include/page_header.php";
 		}
 		
 		$treeServ = array();
-		createShowServiceTree($services,0,$treeServ);	//return into $treeServ parametr
+		createShowServiceTree($services,$treeServ);	//return into $treeServ parametr
 		
 		echo '<script src="js/services.js" type="text/javascript"></script>';
 		
