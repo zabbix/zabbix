@@ -1,5 +1,6 @@
 Changes for 1.4.1:
 
+ - fixed XML export (Eugene)
  - improved management of timeline period (Eugene)
  - fixed configure with postgreSQL, thanks to "abi" (Eugene)
  - fixed errors for services.php (Artem)
