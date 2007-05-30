@@ -22,7 +22,7 @@
 	require_once "include/forms.inc.php";
 ?>
 <?php
-	if(isset($_REQUEST['config']) && $_REQUEST['config'] == 0 && isset($_REQUEST['export']) && isset($_REQUEST['hosts']))
+	if(isset($_REQUEST['export']) && isset($_REQUEST['hosts']))
 	{
 		$EXPORT_DATA = true;
         	$page["type"] = PAGE_TYPE_XML;
