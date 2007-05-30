@@ -80,7 +80,7 @@ AC_DEFUN([AX_LIB_POSTGRESQL],
             AC_PATH_PROG([PG_CONFIG], [pg_config], [no])
         fi
 
-        if test -rf "$PG_CONFIG"; then
+        if test -f "$PG_CONFIG"; then
             AC_MSG_CHECKING([for PostgreSQL libraries])
 
             POSTGRESQL_CPPFLAGS="-I`$PG_CONFIG --includedir`"
