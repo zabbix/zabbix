@@ -390,6 +390,10 @@
 	define('ZBX_SIMPLE_EXPRESSION_FUNCTION_ID', 3);
 	define('ZBX_SIMPLE_EXPRESSION_PARAMETER_ID', 4);
 
+	define('ZBX_MIN_PERIOD', 3600);
+	define('ZBX_MAX_PERIOD', 12*31*24*3600);
+	define('ZBX_PERIOD_DEFAULT', ZBX_MIN_PERIOD);
+
 	global $_GET, $_POST, $_COOKIE, $_REQUEST;
 
 /* Support for PHP5. PHP5 does not have $HTTP_..._VARS */
