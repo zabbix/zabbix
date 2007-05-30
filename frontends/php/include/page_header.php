@@ -360,11 +360,16 @@ COpt::compare_files_with_menu($ZBX_MENU);
 
 		$help = new CLink(S_HELP, "http://www.zabbix.com/manual/v1.1/index.php", "small_font");
 		$help->SetTarget('_blank');
-		$page_header_r_col = array($help,
-			($USER_DETAILS["alias"] != "guest") ?
-				array("|", new CLink(S_PROFILE, "profile.php", "small_font")) :
-				null
-			);
+		
+		$page_header_r_col = array($help);
+		if($USER_DETAILS["alias"] != "guest"){
+			$page_header_r_col[] = array("|", 
+						new CLink(S_PROFILE, "profile.php", "small_font"),"|", 
+						new CLink(S_LOGOUT, "index.php?reconnect=1", "small_font"));
+		} else {
+			$page_header_r_col[] = array("|", new CLink(S_LOGIN, "index.php", "small_font"));
+		}
+		
 		$logo = new CLink(new CImg("images/general/zabbix.png","ZABBIX"),"http://www.zabbix.com");
 		$logo->SetTarget('_blank');
 

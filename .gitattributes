@@ -142,6 +142,12 @@ frontends/php/popup_users.php -text
 frontends/php/popup_usrgrp.php -text
 frontends/php/services_form.php -text
 frontends/php/setup.php -text
+frontends/php/styles/form.css -text
+frontends/php/styles/link.css -text
+frontends/php/styles/p.css -text
+frontends/php/styles/popupmenu.css -text
+frontends/php/styles/table.css -text
+frontends/php/styles/ul.css -text
 include/comms.h -text
 include/jabber.h -text
 include/zbxdb.h -text

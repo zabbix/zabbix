@@ -1,5 +1,7 @@
-Changes for 1.4.1:
+Changes for 1.5:
 
+ - added login/logout (Artem)
+ - changed how is showed messages (Artem)
  - fixed compilation under FreeBSD (Eugene)
  - fixed XML export (Eugene)
  - improved management of timeline period (Eugene)
