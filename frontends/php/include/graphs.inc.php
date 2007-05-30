@@ -564,7 +564,7 @@
 	function	navigation_bar_calc()
 	{
 //		$workingperiod = 3600;
-		if(!isset($_REQUEST["period"]))	$_REQUEST["period"]=3600;
+		if(!isset($_REQUEST["period"]))	$_REQUEST["period"]=ZBX_PERIOD_DEFAULT;
 		if(!isset($_REQUEST["from"]))	$_REQUEST["from"]=0;
 		if(!isset($_REQUEST["stime"]))	$_REQUEST["stime"]=null;
 
@@ -581,12 +581,12 @@
 		unset($_REQUEST["left"]);
 		unset($_REQUEST["right"]);
 
-		if($_REQUEST["from"] <= 0)		$_REQUEST["from"]	= 0;
-		if($_REQUEST["period"] <= 3600)		$_REQUEST["period"]	= 3600;
+		if($_REQUEST["from"] <= 0)			$_REQUEST["from"]	= 0;
+		if($_REQUEST["period"] <= ZBX_MIN_PERIOD)	$_REQUEST["period"]	= ZBX_MIN_PERIOD;
 
 		if(isset($_REQUEST["reset"]))
 		{
-			$_REQUEST["period"]	= 3600;
+			$_REQUEST["period"]	= ZBX_PERIOD_DEFAULT;
 			$_REQUEST["from"]	= 0;
 //			$workingperiod		= 3600;
 		}
@@ -608,10 +608,10 @@
 
 		$form->AddItem(S_PERIOD.SPACE);
 
-		$period = get_request('period', 3600);
+		$period = get_request('period',ZBX_PERIOD_DEFAULT);
 
 		if(in_array($period,array(3600,2*3600,4*3600,8*3600,12*3600,24*3600,7*24*3600,31*24*3600,365*24*3600)))
-			$custom_per = 3*3600;
+			$custom_per = ZBX_MIN_PERIOD;
 		else
 			$custom_per = $period;
 
