@@ -482,6 +482,8 @@ require_once "include/items.inc.php";
 
 		if(in_array("monitored_hosts",$options))
 			$with_host_status = " and h.status=".HOST_STATUS_MONITORED;
+		elseif(in_array('real_hosts',$options))
+			$with_host_status = " and h.status<>".HOST_STATUS_TEMPLATE;
 		else
 			$with_host_status = "";
 
