@@ -588,7 +588,9 @@ $dt = 0;
 					if(!isset($services[$nodeid['id']])){
 						continue;
 					}
-					createServiceTree($services,$temp,$nodeid['id'],$services[$nodeid['id']]['serviceupid'],$rows['serviceid'],$nodeid['soft'], $nodeid['linkid']);
+					if(isset($services[$nodeid['id']]['serviceupid'])){
+						createServiceTree($services,$temp,$nodeid['id'],$services[$nodeid['id']]['serviceupid'],$rows['serviceid'],$nodeid['soft'], $nodeid['linkid']);
+					}
 				}			
 			}
 		} else {
@@ -616,7 +618,8 @@ $dt = 0;
 					if(!isset($services[$nodeid['id']])){
 						continue;
 					}
-					createShowServiceTree($services,$temp,$nodeid['id'],$services[$nodeid['id']]['serviceupid'],$rows['serviceid'],$nodeid['soft'], $nodeid['linkid']);
+					if(isset($services[$nodeid['id']]['serviceupid'])){
+						createShowServiceTree($services,$temp,$nodeid['id'],$services[$nodeid['id']]['serviceupid'],$rows['serviceid'],$nodeid['soft'], $nodeid['linkid']);	}
 				}			
 			}
 		} else {
@@ -628,7 +631,20 @@ $dt = 0;
 	}
 	
 	function closeform(){
-		
 		zbx_add_post_js('closeform();');
+	}
+	
+	function del_empty_nodes($services){
+		do{
+			unset($retry);
+			foreach($services as $id => $data){
+				if(isset($data['serviceupid']) && !isset($services[$data['serviceupid']])){
+					unset($services[$id]);
+					$retry = true;
+					//break;
+				}
+			}
+		} while(isset($retry));
+	return $services;
 	}
 ?>
