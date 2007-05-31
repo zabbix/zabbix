@@ -25,6 +25,7 @@
 	
 	$page["title"] = "S_IT_SERVICES";
 	$page["file"] = "services_form.php";
+	$page['scripts'] = array('services.js');
 	define('ZBX_PAGE_NO_MENU', 1);
 
 include_once "include/page_header.php";
@@ -89,8 +90,10 @@ include_once "include/page_header.php";
 	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT);
 
 	if(isset($_REQUEST['serviceid']) && $_REQUEST['serviceid'] > 0){
-		$query = "select s.* from services s LEFT JOIN triggers t on s.triggerid=t.triggerid ".
-			" LEFT JOIN functions f on t.triggerid=f.triggerid LEFT JOIN items i on f.itemid=i.itemid ".
+		$query = "select s.* from services s ".
+			" LEFT JOIN triggers t on s.triggerid=t.triggerid ".
+			" LEFT JOIN functions f on t.triggerid=f.triggerid ".
+			" LEFT JOIN items i on f.itemid=i.itemid ".
 			" where (i.hostid is null or i.hostid not in (".$denyed_hosts.")) ".
 			" and ".DBid2nodeid("s.serviceid")."=".$ZBX_CURNODEID.
 			" and s.serviceid=".$_REQUEST["serviceid"];
@@ -100,7 +103,6 @@ include_once "include/page_header.php";
 		}
 	}
 
-echo '<script type="text/javascript" src="js/services.js"></script>';
 /*-------------------------------------------- ACTIONS --------------------------------------------*/
 if(isset($_REQUEST['saction'])){
 
