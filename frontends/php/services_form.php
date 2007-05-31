@@ -185,7 +185,7 @@ if(isset($_REQUEST['pservices'])){
 		$description->SetAction('javascript: 
 				window.opener.document.forms[0].elements[\'parent_name\'].value = '.zbx_jsvalue(S_ROOT_SMALL).';
 				window.opener.document.forms[0].elements[\'parentname\'].value = '.zbx_jsvalue(S_ROOT_SMALL).'; 
-				window.opener.document.forms[0].elements[\'parentid\'].value = '.zbx_jsvalue(S_ROOT_SMALL).'; 
+				window.opener.document.forms[0].elements[\'parentid\'].value = '.zbx_jsvalue(0).'; 
 				self.close(); return false;');
 		
 		$table->AddRow(array(array($prefix,$description),S_NONE,$trigger));
@@ -661,7 +661,7 @@ if(isset($_REQUEST['sform'])){
 						new CCol(S_TRIGGER,'form_row_l'),
 						new CCol(array(
 									new CTextBox("trigger",$trigger,32,'yes'),
-									new CButton("btn1",S_SELECT,"return PopUp('popup.php?"."dstfrm=".$frmService->GetName()."&dstfld1=triggerid&dstfld2=trigger"."&srctbl=triggers&srcfld1=triggerid&&srcfld2=description');",'T')
+									new CButton("btn1",S_SELECT,"return PopUp('popup.php?"."dstfrm=".$frmService->GetName()."&dstfld1=triggerid&dstfld2=trigger"."&srctbl=triggers&srcfld1=triggerid&srcfld2=description&real_hosts=1');",'T')
 								),'form_row_r')
 							));
 	$row->AddOption('id','trigger_name');
