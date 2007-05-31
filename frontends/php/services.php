@@ -23,6 +23,7 @@ include_once "include/services.inc.php";
 
 $page["title"] = "S_IT_SERVICES";
 $page["file"] = "services.php";
+$page['scripts'] = array('services.js');
 
 include_once "include/page_header.php";
 
@@ -93,9 +94,6 @@ createServiceTree($services,$treeServ); //return into $treeServ parametr
 
 //permission issue
 $treeServ = del_empty_nodes($treeServ);
-
-
-echo '<script src="js/services.js" type="text/javascript"></script>';
 
 $p = new Ctag('p','yes');
 $p->AddOption('align','center');

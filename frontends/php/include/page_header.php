@@ -341,12 +341,27 @@ COpt::profiling_start("page");
 <html>
   <head>
     <title><?php echo $page['title'] ?></title>
-<?php if(defined('ZBX_PAGE_DO_REFRESH') && $USER_DETAILS["refresh"]) { ?>
-    <meta http-equiv="refresh" content="<?php echo $USER_DETAILS["refresh"]; ?>">
-<?php } ?>
+<?php 
+	if(defined('ZBX_PAGE_DO_REFRESH') && $USER_DETAILS["refresh"]) { 
+		echo '<meta http-equiv="refresh" content="'.$USER_DETAILS["refresh"].'">';
+	}
+ ?>
     <link rel="stylesheet" href="css.css">
     <meta name="Author" content="ZABBIX SIA">
     <script type="text/javascript" src="js/common.js"></script>
+<?php
+	if(isset($page['scripts'])){
+		foreach($page['scripts'] as $script){
+			if(file_exists('js/'.$script)){
+				echo '    <script type="text/javascript" src="js/'.$script.'"></script>'."\n";
+			} elseif(file_exists($script)){
+				echo '    <script type="text/javascript" src="'.$script.'"></script>'."\n";
+			} else {
+				echo '<!-- js script "'.$script.'" not found-->'."\n";
+			}
+		}
+	}
+?>
   </head>
 <body onLoad="zbxCallPostScripts();">
 <?php
