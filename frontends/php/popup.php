@@ -117,6 +117,7 @@ include_once "include/page_header.php";
 		"existed_templates"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	null),
 		"only_hostid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 		"monitored_hosts"=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
+		'real_hosts'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
 		'itemtype'=>	array(T_ZBX_INT, O_OPT, null,   null,		null),
 		
 		"select"=>	array(T_ZBX_STR,	O_OPT,	P_SYS|P_ACT,	null,	null)
@@ -136,6 +137,7 @@ include_once "include/page_header.php";
 	$srcfld2	= get_request("srcfld2", null);	// second source table field [can be different from fields of source table]
 	
 	$monitored_hosts = get_request("monitored_hosts", 0);
+	$real_hosts = get_request("real_hosts", 0);
 	$only_hostid	 = get_request("only_hostid", null);
 ?>
 <?php
@@ -158,6 +160,9 @@ include_once "include/page_header.php";
 	if($monitored_hosts)
 		$frmTitle->AddVar('monitored_hosts', 1);
 
+	if($real_hosts)
+		$frmTitle->AddVar('real_hosts', 1);
+
 	$frmTitle->AddVar("dstfrm",	$dstfrm);
 	$frmTitle->AddVar("dstfld1",	$dstfld1);
 	$frmTitle->AddVar("dstfld2",	$dstfld2);
@@ -176,6 +181,9 @@ include_once "include/page_header.php";
 
 	if($monitored_hosts)
 		array_push($validation_param, "monitored_hosts");
+		
+	if($real_hosts)
+		array_push($validation_param, "real_hosts");
 		
 	if(in_array($srctbl,array("triggers","logitems","items")))
 	{
@@ -228,6 +236,7 @@ include_once "include/page_header.php";
 				" and g.groupid=hg.groupid and hg.hostid in (".$accessible_hosts.") ".
 				" and hg.hostid = h.hostid ".
 				($monitored_hosts ? " and h.status=".HOST_STATUS_MONITORED : "").
+				($real_hosts ? " and h.status<>".HOST_STATUS_TEMPLATE : "").
 				" order by name");
 			while($group = DBfetch($db_groups))
 			{
@@ -266,7 +275,8 @@ include_once "include/page_header.php";
 
 			$sql .= DBid2nodeid("h.hostid")."=".$nodeid.
 				" and h.hostid in (".$accessible_hosts.")".
-				($monitored_hosts ? " and h.status=".HOST_STATUS_MONITORED : "");
+				($monitored_hosts ? " and h.status=".HOST_STATUS_MONITORED : "").
+				($real_hosts ? " and h.status<>".HOST_STATUS_TEMPLATE : "");
 
 			$db_hosts = DBselect($sql);
 			while($host = DBfetch($db_hosts))
@@ -308,6 +318,7 @@ include_once "include/page_header.php";
 		$sql .= DBid2nodeid("h.hostid")."=".$nodeid.
 				" and h.hostid in (".$accessible_hosts.") ".
 				($monitored_hosts ? " and h.status=".HOST_STATUS_MONITORED : "").
+				($real_hosts ? " and h.status<>".HOST_STATUS_TEMPLATE : "").
 				" order by h.host,h.hostid";
 
 
@@ -447,6 +458,9 @@ include_once "include/page_header.php";
 		
 		if($monitored_hosts)
 			$form->AddVar('monitored_hosts', 1);
+			
+		if($real_hosts)
+			$form->AddVar('real_hosts', 1);
 
 		$form->AddVar('dstfrm',$dstfrm);
 		$form->AddVar('dstfld1',$dstfld1);
@@ -578,7 +592,8 @@ include_once "include/page_header.php";
 			" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid".
 			" and ".DBid2nodeid("t.triggerid")."=".$nodeid.
 			" and h.hostid not in (".$denyed_hosts.")".
-			($monitored_hosts ? " and h.status=".HOST_STATUS_MONITORED : "");
+			($monitored_hosts ? " and h.status=".HOST_STATUS_MONITORED : "").
+			($real_hosts ? " and h.status<>".HOST_STATUS_TEMPLATE : "");
 
 		if(isset($hostid)) 
 			$sql .= " and h.hostid=$hostid";
@@ -677,6 +692,7 @@ function add_item_variable(s_formname,x_value)
 			(isset($hostid) ? " and ".$hostid."=i.hostid " : "").
 			" and i.hostid in (".$accessible_hosts.")".
 			($monitored_hosts ? " and h.status=".HOST_STATUS_MONITORED : "").
+			($real_hosts ? " and h.status<>".HOST_STATUS_TEMPLATE : "").
 			" order by h.host,i.description, i.key_, i.itemid");
 
 		while($db_item = DBfetch($db_items))
@@ -717,7 +733,8 @@ function add_item_variable(s_formname,x_value)
 		$sql = "select distinct h.host,i.* from hosts h,items i ".
 			" where h.hostid=i.hostid and ".DBid2nodeid("i.itemid")."=".$nodeid.
 			" and h.hostid not in (".$denyed_hosts.")".
-			($monitored_hosts ? " and h.status=".HOST_STATUS_MONITORED : "");
+			($monitored_hosts ? " and h.status=".HOST_STATUS_MONITORED : '').
+			($real_hosts ? " and h.status<>".HOST_STATUS_TEMPLATE : '');
 
 		if(isset($hostid)) 
 			$sql .= " and h.hostid=$hostid";
@@ -758,7 +775,8 @@ function add_item_variable(s_formname,x_value)
 		$sql = "select distinct h.host,a.* from hosts h,applications a ".
 			" where h.hostid=a.hostid and ".DBid2nodeid("a.applicationid")."=".$nodeid.
 			" and h.hostid not in (".$denyed_hosts.")".
-			($monitored_hosts ? " and h.status=".HOST_STATUS_MONITORED : "");
+			($monitored_hosts ? " and h.status=".HOST_STATUS_MONITORED : "").
+			($real_hosts ? " and h.status<>".HOST_STATUS_TEMPLATE : "");
 
 		if(isset($hostid)) 
 			$sql .= " and h.hostid=$hostid";
