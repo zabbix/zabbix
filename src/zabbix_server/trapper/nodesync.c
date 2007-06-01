@@ -133,7 +133,7 @@ static int	process_record(int nodeid, char *record)
 					fieldname);
 				zbx_strlcat(fields_update,tmp,sizeof(fields));
 
-				zbx_snprintf(tmp,sizeof(tmp),"NULL,", value);
+				zbx_snprintf(tmp,sizeof(tmp),"NULL,");
 			}
 			else
 			{

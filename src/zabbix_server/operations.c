@@ -725,12 +725,16 @@ void	op_template_add(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation
 		if(!row || DBis_null(row[0]) == SUCCEED)
 		{
 			hosttemplateid = DBget_maxid("hosts_templates","hosttemplateid");
+			DBexecute("begin;");
+
 			DBexecute("insert into hosts_templates (hosttemplateid,hostid,templateid) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
 				hosttemplateid,
 				hostid,
 				templateid);
 
 			DBsync_host_with_template(hostid, templateid);
+
+			DBexecute("commit;");
 		}
 		DBfree_result(result);
 	}
@@ -786,12 +790,16 @@ void	op_template_del(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation
 
 		if( (row = DBfetch(result)) )
 		{
+			DBexecute("begin;");
+
 			DBdelete_template_elements(hostid, templateid, 0 /* not a unlink mode */);
 
 			DBexecute("delete from hosts_templates where "
 					"hostid=" ZBX_FS_UI64 " and templateid=" ZBX_FS_UI64,
 				hostid,
 				templateid);
+
+			DBexecute("commit;");
 		}
 		DBfree_result(result);
 	}
