@@ -1307,6 +1307,8 @@
 
 //	Errors
 	'S_INCORRECT_DESCRIPTION'=>		'Incorrect description',
-	'S_CANT_FORMAT_TREE'=>			'Can\'t format Tree'
+	'S_CANT_FORMAT_TREE'=>			'Can\'t format Tree',
+	'S_UNSUPPORTED_FILE_FORMAT'=>		'Unsupported file format',
+	'S_UNSUPPORTED_VERSION_OF_IMPORTED_DATA'=>	'Unsupported version of imported data'
 	);
 ?>
