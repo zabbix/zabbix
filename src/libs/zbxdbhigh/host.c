@@ -2941,7 +2941,9 @@ static int	DBcopy_trigger_to_host(
 
 					old_expression = new_expression;
 					new_expression = string_replace(old_expression, search, replace);
+
 					zbx_free(old_expression);
+					zbx_free(replace);
 				}
 				else
 				{

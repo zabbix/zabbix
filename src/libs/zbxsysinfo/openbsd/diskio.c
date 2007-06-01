@@ -224,7 +224,7 @@ DEV_FNCLIST
         if(mode[0] == '\0')
 	{
 		/* default parameter */
-		zbx_snprintf(mode, sizeof(mode), fl[0].mode);
+		zbx_snprintf(mode, sizeof(mode), "%s", fl[0].mode);
 	}
 	
 	for(i=0; fl[i].mode!=0; i++)
@@ -281,7 +281,7 @@ DEV_FNCLIST
         if(mode[0] == '\0')
 	{
 		/* default parameter */
-		zbx_snprintf(mode, sizeof(mode), fl[0].mode);
+		zbx_snprintf(mode, sizeof(mode), "%s", fl[0].mode);
 	}
 	
 	for(i=0; fl[i].mode!=0; i++)
