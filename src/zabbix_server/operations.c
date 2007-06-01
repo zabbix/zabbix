@@ -718,7 +718,7 @@ void	op_template_add(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation
 	{
 		templateid = operation->objectid;
 
-		result = DBselect("select hosttemplateid hostgroupid from hosts_templates where templateid=" ZBX_FS_UI64 " and hostid=" ZBX_FS_UI64,
+		result = DBselect("select hosttemplateid from hosts_templates where templateid=" ZBX_FS_UI64 " and hostid=" ZBX_FS_UI64,
 			templateid,
 			hostid);
 		row = DBfetch(result);
@@ -780,7 +780,7 @@ void	op_template_del(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation
 	{
 		templateid = operation->objectid;
 
-		result = DBselect("select hosttemplateid hostgroupid from hosts_templates where templateid=" ZBX_FS_UI64 " and hostid=" ZBX_FS_UI64,
+		result = DBselect("select hosttemplateid from hosts_templates where templateid=" ZBX_FS_UI64 " and hostid=" ZBX_FS_UI64,
 			templateid,
 			hostid);
 
