@@ -28,6 +28,8 @@
 	define('XML_TAG_APPLICATION',		'application');
 	define('XML_TAG_ITEMS',			'items');
 	define('XML_TAG_ITEM',			'item');
+	define('XML_TAG_TEMPLATES',		'templates');
+	define('XML_TAG_TEMPLATE',		'template');
 	define('XML_TAG_TRIGGERS',		'triggers');
 	define('XML_TAG_TRIGGER',		'trigger');
 	define('XML_TAG_GRAPHS',		'graphs');

@@ -189,6 +189,7 @@
 
 			zbx_xmlwriter_end_element($memory); // XML_TAG_ITEM
 		}
+
 		
 		function export_trigger(&$memory, $triggerid)
 		{
@@ -278,7 +279,7 @@
 			zbx_xmlwriter_end_element($memory); // XML_TAG_GRAPH
 		}
 		
-		function export_host(&$memory, $hostid, $export_items, $export_triggers, $export_graphs)
+		function export_host(&$memory, $hostid, $export_templates, $export_items, $export_triggers, $export_graphs)
 		{
 			global $ZBX_EXPORT_MAP;
 
@@ -311,6 +312,21 @@
 				}
 				zbx_xmlwriter_end_element($memory); // XML_TAG_GROUP
 			}
+			
+			if($export_templates){
+				$query = 'SELECT t.host '.
+					' FROM hosts t, hosts_templates ht'.
+					' WHERE t.hostid=ht.templateid AND ht.hostid='.$hostid;
+							
+				if($db_templates = DBselect($query)){
+					zbx_xmlwriter_start_element ($memory,XML_TAG_TEMPLATES);
+
+					while($template = DBfetch($db_templates)){
+						zbx_xmlwriter_write_element ($memory, XML_TAG_TEMPLATE, $template['host']);
+					}
+				}
+				zbx_xmlwriter_end_element($memory); // XML_TAG_TEMPLATES
+			}
 
 			if($export_items)
 			{
@@ -322,6 +338,8 @@
 				}
 				zbx_xmlwriter_end_element($memory); // XML_TAG_ITEMS
 			}
+			
+			
 			if($export_triggers)
 			{
 				zbx_xmlwriter_start_element ($memory,XML_TAG_TRIGGERS);
@@ -353,7 +371,7 @@
 			return true;
 		}
 
-		function Export(&$hosts, &$items, &$triggers, &$graphs)
+		function Export(&$hosts, &$templates, &$items, &$triggers, &$graphs)
 		{
 			$memory = zbx_xmlwriter_open_memory();
 			zbx_xmlwriter_set_indent($memory, true);
@@ -368,6 +386,7 @@
 					$this->export_host(
 						$memory,
 						$hostid,
+						isset($templates[$hostid]),
 						isset($items[$hostid]),
 						isset($triggers[$hostid]),
 						isset($graphs[$hostid])

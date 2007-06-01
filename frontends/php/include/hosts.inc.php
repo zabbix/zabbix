@@ -915,4 +915,30 @@ require_once "include/items.inc.php";
 
 		return $result;
 	}
+				
+	function	host_status2str($status)
+	{
+		switch($status)
+		{
+			case HOST_STATUS_MONITORED:	$status = S_MONITORED;		break;
+			case HOST_STATUS_NOT_MONITORED:	$status = S_NOT_MONITORED;	break;
+			case HOST_STATUS_TEMPLATE:	$status = S_TEMPLATE;		break;
+			case HOST_STATUS_DELETED:	$status = S_DELETED;		break;
+			default:
+				$status = S_UNKNOWN;		break;
+		}
+		return $status;
+	}
+	
+	function	host_status2style($status)
+	{
+		switch($status)
+		{
+			case HOST_STATUS_MONITORED:	$status = 'off';	break;
+			case HOST_STATUS_NOT_MONITORED:	$status = 'on';		break;
+			default:
+				$status = 'unknown';	break;
+		}
+		return $status;
+	}
 ?>
