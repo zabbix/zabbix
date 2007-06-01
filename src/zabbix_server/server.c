@@ -233,10 +233,31 @@ void	init_config(void)
 
 void test()
 {
+	zbx_uint64_t
+		hosttemplateid	= 0,
+		hostid		= __UINT64_C(10050),
+		templateid	= __UINT64_C(10001);
+
 	zabbix_set_log_level(LOG_LEVEL_DEBUG);
 
 	printf("-= Test Started =-\n\n");
 
+	DBconnect(ZBX_DB_CONNECT_EXIT);
+
+	DBexecute("begin;");
+
+	hosttemplateid = DBget_maxid("hosts_templates","hosttemplateid");
+
+	DBexecute("insert into hosts_templates (hosttemplateid,hostid,templateid) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
+		hosttemplateid,
+		hostid,
+		templateid);
+
+	DBsync_host_with_template(hostid, templateid);
+
+	DBexecute("rollback;");
+
+	DBclose();
 	printf("\n-= Test completed =-\n");
 }
 

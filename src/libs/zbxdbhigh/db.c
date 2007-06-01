@@ -1421,7 +1421,7 @@ void	DBvacuum(void)
 
 void    DBescape_string(const char *str, char *to, int maxlen)
 {  /* NOTE: sync changes with 'DBdyn_escape_string' */
-	register int     i,ptr;
+	register int     i=0, ptr=0;
 #ifdef  HAVE_ORACLE
 #	define ZBX_DB_ESC_CH	'\''
 #else /* not HAVE_ORACLE */
@@ -1430,7 +1430,7 @@ void    DBescape_string(const char *str, char *to, int maxlen)
 	assert(to);
 
 	maxlen--;
-	for(i=0, ptr=0; str && str[i] && ptr < maxlen; i++)
+	for( i=0,ptr=0; str && str[i] && ptr < maxlen; i++)
 	{
 		if( str[i] == '\r' ) continue;
 
@@ -1483,7 +1483,7 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 
 	ZBX_STR2UINT64(item->itemid, row[0]);
 /*	item->itemid=atoi(row[0]); */
-	zbx_snprintf(item->key, ITEM_KEY_LEN, row[1]);
+	zbx_snprintf(item->key, ITEM_KEY_LEN, "%s", row[1]);
 	item->host_name=row[2];
 	item->port=atoi(row[3]);
 	item->delay=atoi(row[4]);

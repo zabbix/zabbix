@@ -395,7 +395,7 @@ int	main(int argc, char **argv)
 
 int main()
 {
-#if ON
+#if OFF
 	int res, val;
 
 	if(FAIL == zbx_sock_init())
