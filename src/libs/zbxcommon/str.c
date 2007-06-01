@@ -298,7 +298,7 @@ char *string_replace(char *str, char *sub_str1, char *sub_str2)
         diff = (long)strlen(sub_str2) - len;
 
         /* allocate new memory */
-        new_str = zbx_malloc((size_t)(strlen(str) + count*diff)*sizeof(char));
+        new_str = zbx_malloc((size_t)(strlen(str) + count*diff + 1)*sizeof(char));
 
         for (q=str,t=new_str,p=str; (p = strstr(p, sub_str1)); )
         {
@@ -310,7 +310,9 @@ char *string_replace(char *str, char *sub_str1, char *sub_str2)
                 --t;
         }
         /* copy the tail of str */
-        while ( (*t++ = *q++) );
+        for( ; *q ; *t++ = *q++ );
+
+	*t = '\0';
 	
         return new_str;
 
