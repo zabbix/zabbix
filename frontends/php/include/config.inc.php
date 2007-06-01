@@ -682,8 +682,8 @@ else
 				
 				if($msg_count > $msg_show) $msg_count = $msg_show;
 					
-				$msg_count = ($msg_count * $msg_font_size *2);
-				$lst_error->AddOption('style','	font-size: '.$msg_font_size.'pt; height: '.$msg_count.';');
+				$msg_count = ($msg_count * $msg_font_size *2) + 2;
+				$lst_error->AddOption('style','font-size: '.$msg_font_size.'pt; height: '.$msg_count.';');
 //---
 				$lst_error->Show();
 				
