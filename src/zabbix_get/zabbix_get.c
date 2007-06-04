@@ -186,8 +186,8 @@ int main(int argc, char **argv)
 	progname = get_programm_name(argv[0]);
 
 	/* Parse the command-line. */
-	while ((ch = zbx_getopt_long(argc, argv, shortopts, longopts, NULL)) != EOF)
-		switch ((char) ch) {
+	while ((ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)) != (char)EOF)
+		switch (ch) {
 			case 'k':
 				key = strdup(zbx_optarg);
 				break;
