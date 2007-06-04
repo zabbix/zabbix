@@ -377,7 +377,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$help->SetTarget('_blank');
 		
 		$page_header_r_col = array($help);
-		if($USER_DETAILS["alias"] != "guest"){
+		if($USER_DETAILS["alias"] != ZBX_GUEST_USER){
 			$page_header_r_col[] = array("|", 
 						new CLink(S_PROFILE, "profile.php", "small_font"),"|", 
 						new CLink(S_LOGOUT, "index.php?reconnect=1", "small_font"));
@@ -443,7 +443,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$sub_menu_table->Show();
 	}
 //------------------------------------- <HISTORY> ---------------------------------------
-	if(isset($page['hist_arg'])){
+	if(isset($page['hist_arg']) && ($USER_DETAILS["alias"] != ZBX_GUEST_USER)){
 		$table = new CTable();
 		$table->SetClass('history');
 		

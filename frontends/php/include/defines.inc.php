@@ -397,6 +397,8 @@
 	define('ZBX_PERIOD_DEFAULT', ZBX_MIN_PERIOD);
 	
 	define('ZBX_HISTORY_COUNT',5);
+	
+	define('ZBX_GUEST_USER','guest');
 
 	global $_GET, $_POST, $_COOKIE, $_REQUEST;
 
