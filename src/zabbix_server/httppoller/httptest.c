@@ -261,6 +261,8 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 		httptest->httptestid,
 		httptest->name);
 
+	now = time(NULL);
+
 	DBexecute("update httptest set lastcheck=%d where httptestid=" ZBX_FS_UI64,
 		now,
 		httptest->httptestid);
