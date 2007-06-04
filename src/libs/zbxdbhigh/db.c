@@ -1454,7 +1454,7 @@ char*	DBdyn_escape_string(const char *str)
 
 	char *str_esc = NULL;
 
-	int	str_esc_len;
+	int	str_esc_len = 0;
 
 	for(i=0; str && str[i]; i++)
 	{
