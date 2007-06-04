@@ -30,7 +30,7 @@ include_once "include/page_header.php";
 
 ?>
 <?php
-	if($USER_DETAILS["alias"]=="guest")
+	if($USER_DETAILS["alias"]==ZBX_GUEST_USER)
 	{
 		access_deny();
 	}

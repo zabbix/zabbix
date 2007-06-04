@@ -151,7 +151,7 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 	else
 	{
 		$USER_DETAILS = array(
-			"alias" =>"guest",
+			"alias" =>ZBX_GUEST_USER,
 			"userid"=>0,
 			"lang"  =>"en_gb",
 			"type"  =>"0",
@@ -1350,7 +1350,7 @@ $result =
 		global $USER_DETAILS;
 
 		$result = $default_value;
-		if($USER_DETAILS["alias"]!="guest")
+		if($USER_DETAILS["alias"]!=ZBX_GUEST_USER)
 		{
 			$db_profiles = DBselect("select * from profiles where userid=".$USER_DETAILS["userid"]." and idx=".zbx_dbstr($idx));
 			$profile=DBfetch($db_profiles);
@@ -1383,7 +1383,7 @@ $result =
 
 		global $USER_DETAILS;
 
-		if($USER_DETAILS["alias"]=="guest")
+		if($USER_DETAILS["alias"]==ZBX_GUEST_USER)
 		{
 			return;
 		}

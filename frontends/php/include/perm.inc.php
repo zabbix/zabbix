@@ -71,7 +71,7 @@
 		
 		if(!$USER_DETAILS)
 		{
-			if(!($USER_DETAILS = DBfetch(DBselect("select u.* from users u where u.alias='guest'".
+			if(!($USER_DETAILS = DBfetch(DBselect("select u.* from users u where u.alias=".zbx_dbstr(ZBX_GUEST_USER).
 				" and ".DBid2nodeid('u.userid')."=$ZBX_LOCALNODEID"))))
 			{
 				$missed_user_guest = true;
@@ -90,7 +90,7 @@
 		else
 		{
 			$USER_DETAILS = array(
-				"alias"	=>"guest",
+				"alias"	=>ZBX_GUEST_USER,
 				"userid"=>0,
 				"lang"	=>"en_gb",
 				"type"	=>"0",
