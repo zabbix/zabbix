@@ -156,9 +156,9 @@
 	function	delete_user($userid)
 	{
 
-		if(DBfetch(DBselect('select * from users where userid='.$userid.' and alias=\'guest\'')))
+		if(DBfetch(DBselect('select * from users where userid='.$userid.' and alias='.zbx_dbstr(ZBX_GUEST_USER))))
 		{
-			error("Cannot delete user 'guest'");
+			error("Cannot delete user '".ZBX_GUEST_USER."'");
 			return	false;
 		}
 
