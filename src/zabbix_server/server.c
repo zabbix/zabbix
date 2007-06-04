@@ -230,13 +230,15 @@ void	init_config(void)
  ******************************************************************************/
 
 #ifdef ZABBIX_TEST
+void    execute_operations(DB_EVENT *event, DB_ACTION *action);
 
 void test()
 {
-	zbx_uint64_t
-		hosttemplateid	= 0,
-		hostid		= __UINT64_C(10050),
-		templateid	= __UINT64_C(10001);
+	DB_EVENT	event;
+	DB_ACTION	action;
+
+        DB_RESULT result;
+        DB_ROW row;
 
 	zabbix_set_log_level(LOG_LEVEL_DEBUG);
 
@@ -244,18 +246,30 @@ void test()
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
 
-	DBexecute("begin;");
+	zabbix_log( LOG_LEVEL_DEBUG, "Processing actions");
 
-	hosttemplateid = DBget_maxid("hosts_templates","hosttemplateid");
+	event.eventid = __UINT64_C(46);
+	event.source = EVENT_SOURCE_DISCOVERY;
+	event.object = EVENT_OBJECT_DHOST;
+	event.objectid = __UINT64_C(2);
+	event.clock = time(NULL);
+	event.value = 0;
+	event.acknowledged = 0;
 
-	DBexecute("insert into hosts_templates (hosttemplateid,hostid,templateid) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
-		hosttemplateid,
-		hostid,
-		templateid);
+	result = DBselect("select actionid,evaltype,status,eventsource from actions where actionid=7 and" ZBX_COND_NODEID, LOCAL_NODE("actionid"));
 
-	DBsync_host_with_template(hostid, templateid);
+	while((row=DBfetch(result)))
+	{
+		ZBX_STR2UINT64(action.actionid, row[0]);
+		action.evaltype         = atoi(row[1]);
+		action.status           = atoi(row[2]);
+		action.eventsource      = atoi(row[3]);
 
-	DBexecute("rollback;");
+		execute_operations(&event, &action);
+
+	}
+	DBfree_result(result);
+	zabbix_log( LOG_LEVEL_DEBUG, "End process_actions()");
 
 	DBclose();
 	printf("\n-= Test completed =-\n");
