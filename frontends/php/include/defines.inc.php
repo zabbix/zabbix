@@ -395,6 +395,8 @@
 	define('ZBX_MIN_PERIOD', 3600);
 	define('ZBX_MAX_PERIOD', 12*31*24*3600);
 	define('ZBX_PERIOD_DEFAULT', ZBX_MIN_PERIOD);
+	
+	define('ZBX_HISTORY_COUNT',5);
 
 	global $_GET, $_POST, $_COOKIE, $_REQUEST;
 
