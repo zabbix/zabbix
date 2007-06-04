@@ -17,6 +17,7 @@ config_param=""
 dorun="no"
 TEST=""
 TODO=""
+ANSI=""
 TEST_MEM=""
 cleanwarnings="no"
 docat="yes"
@@ -44,6 +45,7 @@ do
     cat )	docat="yes";		noparam=1;;
     test )	TEST=" -DTEST -DZABBIX_TEST";;
     todo )	TODO=" -DTODO";;
+    ansi )	ANSI=" -ansi";;
     mem )	TEST_MEM=" -DENABLE_CHECK_MEMOTY";;
     def )		config_param="$config_param $def";;
     --enable-* )	config_param="$config_param $cmd";; 
@@ -170,7 +172,7 @@ then
   configure_is_ok=0
   echo "Configuring..."
   echo "Configuring..." >> WARNINGS
-  export CFLAGS="-Wall -DDEBUG ${TODO} ${TEST} ${TEST_MEM}"
+  export CFLAGS="-Wall -DDEBUG ${ANSI} ${TODO} ${TEST} ${TEST_MEM}"
   #export CFLAGS="-Wall -pedantic"
   ./configure $config_param 2>> WARNINGS 
   if [ "x$?" = "x0" ]

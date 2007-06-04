@@ -273,8 +273,8 @@ static zbx_task_t parse_commandline(int argc, char **argv)
 	char    ch      = '\0';
 
 	/* Parse the command-line. */
-	while ((ch = zbx_getopt_long(argc, argv, shortopts, longopts, NULL)) != EOF)
-		switch ((char) ch) {
+	while ((ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)) != (char)EOF)
+		switch (ch) {
 			case 'c':
 				CONFIG_FILE = strdup(zbx_optarg);
 				break;
