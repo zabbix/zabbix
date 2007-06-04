@@ -350,8 +350,8 @@ COpt::profiling_start("page");
     <meta name="Author" content="ZABBIX SIA">
     <script type="text/javascript" src="js/common.js"></script>
 <?php
-	if(isset($page['scripts'])){
-		foreach($page['scripts'] as $script){
+	if(isset($page['scripts']) && is_array($page['scripts'])){
+		foreach($page['scripts'] as $id => $script){
 			if(file_exists('js/'.$script)){
 				echo '    <script type="text/javascript" src="js/'.$script.'"></script>'."\n";
 			} elseif(file_exists($script)){
@@ -428,10 +428,10 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$table = new CTable();
 		$table->SetCellSpacing(0);
 		$table->SetCellPadding(0);
-		$table->options['style'] = "width: 100%;";
+		$table->AddOption('style','width: 100%;');
 
 		$r_col = new CCol($node_form);
-		$r_col->options['style'] = "text-align: right;";
+		$r_col->AddOption('style','text-align: right;');
 		
 		$table->AddRow(array($menu_table,$r_col));
 		$table->Show();
@@ -440,9 +440,29 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$sub_menu_table->SetCellSpacing(0);
 		$sub_menu_table->SetCellPadding(5);
 		$sub_menu_table->AddRow(new CCol($sub_menu_row));
-	
 		$sub_menu_table->Show();
 	}
+//------------------------------------- <HISTORY> ---------------------------------------
+	if(isset($page['hist_arg'])){
+		$table = new CTable();
+		$table->SetClass('history');
+		
+		$table->SetCellSpacing(0);
+		$table->SetCellPadding(0);
+
+		$history = get_user_history();
+		add_user_history($page);
+
+		$tr = new CRow(new CCol('History:','caption'));
+		$tr->AddItem($history);
+		
+		$table->AddRow($tr);
+		$table->Show();
+	} else {
+		echo BR;
+	}
+//------------------------------------ </HISTORY> ---------------------------------------
+
 	unset($ZBX_MENU);
 		
 	unset($table, $top_page_row, $menu_table, $node_form);

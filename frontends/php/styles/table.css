@@ -730,7 +730,7 @@ table.sub_menu
 	color: #000000;
 	border: 0px solid #000000;
 	width: 100%;
-	margin-bottom: 15px;
+/*	margin-bottom: 1px;*/
 }
 
 table.sub_menu tr
@@ -974,3 +974,31 @@ table.setup_wizard div.text
 	width:	100%;
 	overflow: hidden;
 }
+
+/***************** <HISTORY> *****************/
+table.history{
+	width: 100%;
+	background-color:#DEDEDE;
+}
+
+table.history tr{
+	height: 16px;
+}
+
+table.history td{
+	color:#448;
+	font-family: Verdana, Helvetica, Geneva;
+	font-size:10px;
+	text-align:left;
+}
+
+table.history td.caption{
+	width: 48px;
+	color:#448;
+	font-weight:bold;
+	font-family: Verdana, Helvetica, Geneva;
+	font-size:10px;
+	text-align:left;	
+}
+
+/**************** </HISTORY> *****************/

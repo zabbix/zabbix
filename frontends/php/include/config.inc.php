@@ -1343,8 +1343,10 @@ $result =
 	}
 
 
-	function	get_profile($idx,$default_value=null,$type=PROFILE_TYPE_UNKNOWN)
-	{
+/********** USER PROFILE ***********/
+
+//---------- GET USER VALUE -------------
+	function	get_profile($idx,$default_value=null,$type=PROFILE_TYPE_UNKNOWN){
 		global $USER_DETAILS;
 
 		$result = $default_value;
@@ -1375,6 +1377,7 @@ $result =
 		return $result;
 	}
 
+//----------- ADD/EDIT USERPROFILE -------------
 	function	update_profile($idx,$value,$type=PROFILE_TYPE_UNKNOWN)
 	{
 
@@ -1410,6 +1413,70 @@ $result =
 			DBexecute($sql);
 		}
 	}
+
+/***********************************/
+
+/************ HISTORY **************/
+	function get_user_history(){
+		$history='';
+		$delimiter = new CSpan('&raquo;','delimiter');
+		$delimiter = $delimiter->ToString();
+		for($i = 0; $i < 5; $i++){
+			if($rows = get_profile('web.history.'.$i,false)){
+				$history.= ($i>0)?($delimiter):('');
+				$url = new CLink($rows[0],$rows[1],'history');
+				$history.= SPACE.($url->ToString()).SPACE;
+			}
+		}
+	return $history;
+	}
+
+	function add_user_history($page){
+	
+		$title = explode('[',$page['title']);
+		$title = $title[0];
+
+		if(!(isset($page['hist_arg']) && is_array($page['hist_arg']))){
+			return FALSE;
+		}
+		
+		$url = '';
+		foreach($page['hist_arg'] as $arg){
+			if(isset($_REQUEST[$arg]) && !empty($_REQUEST[$arg])){
+				$url.=((empty($url))?('?'):('&')).$arg.'='.$_REQUEST[$arg];
+			}
+		}
+		$url = $page['file'].$url;
+
+		$curr = 0;
+		$profile = array();
+		for($i = 0; $i < 5; $i++){
+			if($history = get_profile('web.history.'.$i,false)){
+				if($history[0] != $title){
+					$profile[$curr] = $history;
+					$curr++;
+				}
+			}
+		}
+				
+		$history = array($title,$url);
+		
+		if($curr < 5){
+			for($i = 0; $i < $curr; $i++){
+				update_profile('web.history.'.$i,$profile[$i],PROFILE_TYPE_ARRAY);
+			}
+			$result = update_profile('web.history.'.$curr,$history,PROFILE_TYPE_ARRAY);
+		} else {
+			for($i = 1; $i < 5; $i++){
+				update_profile('web.history.'.($i-1),$profile[$i],PROFILE_TYPE_ARRAY);
+			}
+			$result = update_profile('web.history.'.(5-1),$history,PROFILE_TYPE_ARRAY);
+		}
+
+	return $result;
+	}
+
+/***********************************/
 
 	function insert_showhint_javascript()
 	{

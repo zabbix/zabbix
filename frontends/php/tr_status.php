@@ -26,6 +26,7 @@
 
 	$page["file"] = "tr_status.php";
 	$page["title"] = "S_STATUS_OF_TRIGGERS";
+	$page['hist_arg'] = array('groupid','hostid','compact','onlytrue','noactions','sort','select');
 
 ?>
 <?php

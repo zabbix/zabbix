@@ -24,6 +24,7 @@
 
 	$page["title"] = "S_LATEST_ACTIONS";
 	$page["file"] = "actions.php";
+	$page['hist_arg'] = array('prev','next');
 	
 	define('ZBX_PAGE_DO_REFRESH', 1);
 

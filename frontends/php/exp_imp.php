@@ -32,6 +32,7 @@
 	{
 	        $page["title"] = "S_EXPORT_IMPORT";
         	$page["file"] = "exp_imp.php";
+		$page['hist_arg'] = array('config','groupid');
 	}
 
 include_once "include/page_header.php";

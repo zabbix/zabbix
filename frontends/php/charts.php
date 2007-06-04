@@ -25,6 +25,7 @@
 
 	$page["title"] = "S_CUSTOM_GRAPHS";
 	$page["file"] = "charts.php";
+	$page['hist_arg'] = array('hostid','grouid','graphid','period','dec','inc','left','right','stime');
 ?>
 <?php
 	if(isset($_REQUEST["fullscreen"]))
