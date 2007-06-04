@@ -157,6 +157,9 @@ void main_httppoller_loop(int num)
 		{
 			zabbix_log( LOG_LEVEL_DEBUG, "No sleeping" );
 		}
-	}
 
+#ifdef ZABBIX_TEST
+		break;
+#endif /* ZABBIX_TEST */
+	}
 }
