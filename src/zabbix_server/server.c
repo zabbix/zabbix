@@ -230,7 +230,6 @@ void	init_config(void)
  ******************************************************************************/
 
 #ifdef ZABBIX_TEST
-void    execute_operations(DB_EVENT *event, DB_ACTION *action);
 
 void test()
 {
@@ -238,7 +237,8 @@ void test()
 
 	printf("-= Test Started =-\n\n");
 
-	main_discoverer_loop(1);
+	CONFIG_HTTPPOLLER_FORKS = 1;
+	main_httppoller_loop(1);
 
 	printf("\n-= Test completed =-\n");
 }
