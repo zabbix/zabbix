@@ -1421,7 +1421,7 @@ $result =
 		$history='';
 		$delimiter = new CSpan('&raquo;','delimiter');
 		$delimiter = $delimiter->ToString();
-		for($i = 0; $i < 5; $i++){
+		for($i = 0; $i < ZBX_HISTORY_COUNT; $i++){
 			if($rows = get_profile('web.history.'.$i,false)){
 				$history.= ($i>0)?($delimiter):('');
 				$url = new CLink($rows[0],$rows[1],'history');
@@ -1450,7 +1450,7 @@ $result =
 
 		$curr = 0;
 		$profile = array();
-		for($i = 0; $i < 5; $i++){
+		for($i = 0; $i < ZBX_HISTORY_COUNT; $i++){
 			if($history = get_profile('web.history.'.$i,false)){
 				if($history[0] != $title){
 					$profile[$curr] = $history;
@@ -1461,16 +1461,16 @@ $result =
 				
 		$history = array($title,$url);
 		
-		if($curr < 5){
+		if($curr < ZBX_HISTORY_COUNT){
 			for($i = 0; $i < $curr; $i++){
 				update_profile('web.history.'.$i,$profile[$i],PROFILE_TYPE_ARRAY);
 			}
 			$result = update_profile('web.history.'.$curr,$history,PROFILE_TYPE_ARRAY);
 		} else {
-			for($i = 1; $i < 5; $i++){
+			for($i = 1; $i < ZBX_HISTORY_COUNT; $i++){
 				update_profile('web.history.'.($i-1),$profile[$i],PROFILE_TYPE_ARRAY);
 			}
-			$result = update_profile('web.history.'.(5-1),$history,PROFILE_TYPE_ARRAY);
+			$result = update_profile('web.history.'.(ZBX_HISTORY_COUNT-1),$history,PROFILE_TYPE_ARRAY);
 		}
 
 	return $result;
