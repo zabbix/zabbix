@@ -27,6 +27,7 @@
 
 	$page["title"] = "S_USERS";
 	$page["file"] = "users.php";
+	$page['hist_arg'] = array('config');
 
 include_once "include/page_header.php";
 

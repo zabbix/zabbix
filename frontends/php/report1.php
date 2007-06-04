@@ -22,6 +22,7 @@
 	require_once "include/config.inc.php";
 	$page["title"] = "S_STATUS_OF_ZABBIX";
 	$page["file"] = "report1.php";
+	$page['hist_arg'] = array();
 
 include_once "include/page_header.php";
 

@@ -76,6 +76,11 @@ img.bottom	{	vertical-align:text-bottom	}
 	word-spacing:	0px;
 }
 
+.delimiter{
+	font-weight:bold;
+	color:#000;
+}
+
 /**************** HINT BOX *****************/
 
 #hint_box {

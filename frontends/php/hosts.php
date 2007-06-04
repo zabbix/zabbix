@@ -25,6 +25,7 @@
 
 	$page["title"] = "S_HOSTS";
 	$page["file"] = "hosts.php";
+	$page['hist_arg'] = array('groupid','config','hostid');
 
 include_once "include/page_header.php";
 

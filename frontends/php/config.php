@@ -25,6 +25,7 @@
 
 	$page["title"] = "S_CONFIGURATION_OF_ZABBIX";
 	$page["file"] = "config.php";
+	$page['hist_arg'] = array('config');
 
 include_once "include/page_header.php";
 

@@ -24,6 +24,7 @@
 
 	$page["title"] = "S_AUDIT_LOG";
 	$page["file"] = "audit.php";
+	$page['hist_arg'] = array();
 
 	define('ZBX_PAGE_DO_REFRESH', 1);
 

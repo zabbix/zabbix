@@ -24,6 +24,7 @@
 
 	$page["title"]	= "S_TRIGGERS_TOP_100";
 	$page["file"]	= "report5.php";
+	$page['hist_arg'] = array('period');
 	
 include_once "include/page_header.php";
 

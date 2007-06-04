@@ -26,6 +26,7 @@
 
         $page["title"] = "S_STATUS_OF_WEB_MONITORING";
         $page["file"] = "httpmon.php";
+	$page['hist_arg'] = array('open','groupid','hostid');
 	define('ZBX_PAGE_DO_REFRESH', 1);
 
 include_once "include/page_header.php";

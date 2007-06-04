@@ -1046,6 +1046,7 @@
 	'S_ROOT_SMALL'=>			'root',
 	'S_IT_SERVICE'=>			'IT service',
 	'S_IT_SERVICES'=>			'IT services',
+	'S_CONFIGURATION_OF_IT_SERVICES'=>	'Configuration of IT services',
 	'S_SERVICE_UPDATED'=>			'Service updated',
 	'S_CANNOT_UPDATE_SERVICE'=>		'Cannot update service',
 	'S_SERVICE_ADDED'=>			'Service added',

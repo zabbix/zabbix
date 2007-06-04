@@ -25,6 +25,7 @@
 
 	$page["title"] = "S_LATEST_VALUES";
 	$page["file"] = "latest.php";
+	$page['hist_arg'] = array('groupid','hostid','show','select','open','applicationid');
 	define('ZBX_PAGE_DO_REFRESH', 1);
 	
 include_once "include/page_header.php";
