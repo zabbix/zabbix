@@ -21,6 +21,7 @@
 <?php
 	require_once "include/config.inc.php";
 	require_once "include/discovery.inc.php";
+	$page['hist_arg'] = array('druleid');
 
 	$page["file"] = "discovery.php";
 	$page["title"] = "S_STATUS_OF_DISCOVERY";

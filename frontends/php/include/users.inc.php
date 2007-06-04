@@ -134,7 +134,8 @@
 		return $result;
 	}
 
-	# Update User Profile
+
+	# Update User definition
 
 	function	update_user_profile($userid,$passwd, $url,$autologout,$lang,$refresh)
 	{
@@ -187,6 +188,7 @@
 		/* error("No user with id [$userid]"); */
 		return	false;
 	}
+	
 
 /**************************
 	USER GROUPS

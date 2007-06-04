@@ -21,9 +21,10 @@
 include_once "include/config.inc.php";
 include_once "include/services.inc.php";
 
-$page["title"] = "S_IT_SERVICES";
+$page["title"] = "S_CONFIGURATION_OF_IT_SERVICES";
 $page["file"] = "services.php";
 $page['scripts'] = array('services.js');
+$page['hist_arg'] = array();
 
 include_once "include/page_header.php";
 
@@ -94,12 +95,16 @@ createServiceTree($services,$treeServ); //return into $treeServ parametr
 
 //permission issue
 $treeServ = del_empty_nodes($treeServ);
+//----
 
-$p = new Ctag('p','yes');
-$p->AddOption('align','center');
-$p->AddOption('id','message');
-(isset($_REQUEST['msg']))?($p->AddItem('<b>'.$_REQUEST['msg'].'</b>')):('');
-$p->Show();
+if(isset($_REQUEST['msg']) && !empty($_REQUEST['msg'])){
+	$p = new Ctag('p','yes');
+	$p->AddOption('align','center');
+	$p->AddOption('id','message');
+	$p->AddItem('<b>'.$_REQUEST['msg'].'</b>');
+	$p->Show();
+}
+
 
 show_table_header(S_IT_SERVICES_BIG);
 

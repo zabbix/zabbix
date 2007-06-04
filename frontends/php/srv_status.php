@@ -24,7 +24,8 @@
 
 	$page["title"] = "S_IT_SERVICES";
 	$page["file"] = "srv_status.php";
-	$page['scripts'] = 'services.js';
+	$page['scripts'] = array('services.js');
+	$page['hist_arg'] = array();
 
 	define('ZBX_PAGE_DO_REFRESH', 1);
 

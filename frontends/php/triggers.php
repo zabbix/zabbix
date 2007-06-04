@@ -27,6 +27,7 @@
 
 	$page["title"] = "S_CONFIGURATION_OF_TRIGGERS";
 	$page["file"] = "triggers.php";
+	$page['hist_arg'] = array('hostid','groupid');
 
 include_once "include/page_header.php";
 

@@ -25,6 +25,7 @@
 
 	$page["title"] = "S_NETWORK_MAPS";
 	$page["file"] = "sysmaps.php";
+	$page['hist_arg'] = array();
 
 include_once "include/page_header.php";
 

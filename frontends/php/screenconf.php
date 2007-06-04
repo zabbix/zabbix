@@ -25,6 +25,7 @@
 
 	$page["title"] = "S_SCREENS";
 	$page["file"] = "screenconf.php";
+	$page['hist_arg'] = array('config');
 
 include_once "include/page_header.php";
 	

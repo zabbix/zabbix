@@ -25,6 +25,7 @@
 
 	$page["title"]	= "S_CONFIGURATION_OF_DISCOVERY";
 	$page["file"]	= "discoveryconf.php";
+	$page['hist_arg'] = array('');
 
 include_once "include/page_header.php";
 	

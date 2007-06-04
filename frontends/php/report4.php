@@ -23,6 +23,7 @@
 
         $page["title"] = "S_IT_NOTIFICATIONS";
         $page["file"] = "report4.php";
+	$page['hist_arg'] = array('media_type','period','year');
 
 include_once "include/page_header.php";
 

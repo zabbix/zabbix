@@ -25,6 +25,7 @@
 
 	$page["title"] = "S_MEDIA_TYPES";
 	$page["file"] = "media_types.php";
+	$page['hist_arg'] = array('form','mediatypeid');
 
 include_once "include/page_header.php";
 

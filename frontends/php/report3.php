@@ -24,6 +24,7 @@
 
 	$page["title"] = "S_IT_SERVICES_AVAILABILITY_REPORT";
 	$page["file"] = "report3.php";
+	$page['hist_arg'] = array();
 	
 include_once "include/page_header.php";
 
