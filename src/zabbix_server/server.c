@@ -24,6 +24,7 @@
 #include "db.h"
 #include "log.h"
 #include "zlog.h"
+#include "zbxgetopt.h"
 
 #include "functions.h"
 #include "expression.h"
@@ -70,15 +71,40 @@ char *help_message[] = {
 };
 #endif
 
-struct option longopts[] =
+/* COMMAND LINE OPTIONS */
+
+/* long options */
+
+static struct zbx_option longopts[] =
 {
 	{"config",	1,	0,	'c'},
 	{"help",	0,	0,	'h'},
 	{"new-nodeid",	1,	0,	'n'},
 	{"version",	0,	0,	'V'},
+
+#if defined (_WINDOWS)
+
+	{"install",	0,	0,	'i'},
+	{"uninstall",	0,	0,	'd'},
+
+	{"start",	0,	0,	's'},
+	{"stop",	0,	0,	'x'},
+
+#endif /* _WINDOWS */
+
 	{0,0,0,0}
 };
 
+/* short options */
+
+static char	shortopts[] = 
+	"c:n:hV"
+#if defined (_WINDOWS)
+	"idsx"
+#endif /* _WINDOWS */
+	;
+
+/* end of COMMAND LINE OPTIONS*/
 
 pid_t	*threads=NULL;
 
@@ -262,10 +288,10 @@ void test()
  ******************************************************************************/
 int main(int argc, char **argv)
 {
-	int	ch;
+	zbx_task_t	task  = ZBX_TASK_START;
+	char    ch      = '\0';
 
 	int	nodeid;
-	zbx_task_t	task  = ZBX_TASK_START;
 
 #ifdef HAVE_ZZZ
 	DB_RESULT	result;
@@ -308,11 +334,11 @@ int main(int argc, char **argv)
 
 	progname = argv[0];
 
-/* Parse the command-line. */
-	while ((ch = getopt_long(argc, argv, "c:n:hV",longopts,NULL)) != EOF)
-	switch ((char) ch) {
+	/* Parse the command-line. */
+	while ((ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts,NULL)) != (char)EOF)
+	switch (ch) {
 		case 'c':
-			CONFIG_FILE = strdup(optarg);
+			CONFIG_FILE = strdup(zbx_optarg);
 			break;
 		case 'h':
 			help();
@@ -320,7 +346,7 @@ int main(int argc, char **argv)
 			break;
 		case 'n':
 			nodeid=0;
-			if(optarg)	nodeid = atoi(optarg);
+			if(zbx_optarg)	nodeid = atoi(zbx_optarg);
 			task = ZBX_TASK_CHANGE_NODEID;
 			break;
 		case 'V':
