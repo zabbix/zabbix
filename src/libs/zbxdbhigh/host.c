@@ -1517,7 +1517,7 @@ static int	DBupdate_item(
 
 	zbx_uint64_t
 		itemappid,
-		del_itemid,
+		del_itemid = 0,
 		chd_itemidm,
 		chd_hostid,
 		applications[ZBX_MAX_APPLICATIONS];
@@ -1690,6 +1690,9 @@ static int	DBupdate_item(
 		}
 		zbx_free(key_esc);
 	}
+
+	DBfree_result(db_hosts);
+
 	return result;
 }
 
@@ -2211,6 +2214,9 @@ static int	DBadd_event(
 				triggerid, ALERT_STATUS_NOT_SENT);
 		}
 	}
+
+	DBfree_result(db_events);
+
 	return result;
 }
 
@@ -2651,6 +2657,7 @@ static int	DBupdate_trigger(
 			str_esc = DBdyn_escape_string(short_expression);
 			sql = zbx_strdcatf(sql, " expression='%s',", str_esc);
 			zbx_free(str_esc);
+			zbx_free(short_expression);
 
 		}
 		if( description ) {
