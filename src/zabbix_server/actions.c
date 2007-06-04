@@ -717,6 +717,7 @@ void	execute_operations(DB_EVENT *event, DB_ACTION *action)
 		zbx_free(operation.shortdata);
 		zbx_free(operation.longdata);
 	}
+	DBfree_result(result);
 }
 
 
