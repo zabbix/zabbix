@@ -429,7 +429,8 @@ int	DBadd_service_alarm(zbx_uint64_t serviceid,int status,int clock)
 		return SUCCEED;
 	}
 
-	DBexecute("insert into service_alarms(serviceid,clock,value) values(" ZBX_FS_UI64 ",%d,%d)",
+	DBexecute("insert into service_alarms(servicealarmid,serviceid,clock,value) values(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d)",
+		DBget_maxid("service_alarms","servicealarmid"),
 		serviceid,
 		clock,
 		status);
