@@ -380,7 +380,7 @@
 	define('RARR',	'&rArr;');
 
 	define('ZBX_EREG_HOST_FORMAT', '([0-9a-zA-Z\_\.[:space:][.-.]\$]+)');
-	define('ZBX_EREG_ITEM_KEY_FORMAT', '([]\[0-9a-zA-Z!\_\*\/\.\,\:\(\)\+ [.-.]\$%]+)');
+	define('ZBX_EREG_ITEM_KEY_FORMAT', '([]\[\'0-9a-zA-Z!\_\*\/\.\,\:\(\)\+ [.-.]\$%]+)');
 
 	define('ZBX_EREG_SIMPLE_EXPRESSION_FORMAT',
 		'^\{'.ZBX_EREG_HOST_FORMAT.'\:'.ZBX_EREG_ITEM_KEY_FORMAT.'\.([a-z]{3,11})\(([#0-9a-zA-Z\_\/\.\,[:space:]]+)\)\}$');
