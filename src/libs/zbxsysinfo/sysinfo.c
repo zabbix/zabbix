@@ -275,8 +275,8 @@ int parse_command( /* return value: 0 - error; 1 - command without parameters; 2
 	if(param)
 		zbx_strlcpy(param, "", param_max_len);
 	
-	pl = strstr(localstr, "[");
-	pr = strstr(localstr, "]");
+	pl = strchr(localstr, '[');
+	pr = strrchr(localstr, ']');
 
 	if(pl > pr)
 		return 0;
