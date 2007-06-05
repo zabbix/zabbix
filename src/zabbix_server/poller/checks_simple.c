@@ -41,8 +41,8 @@ int	get_value_simple(DB_ITEM *item, AGENT_RESULT *result)
 
 	if(0 == strncmp(item->key,"service.ntp",11))
 	{
-		l=strstr(item->key,"[");
-		r=strstr(item->key,"]");
+		l=strchr(item->key,'[');
+		r=strrchr(item->key,']');
 		if(l==NULL || r==NULL)
 			zbx_snprintf(c,sizeof(c),"net.tcp.service[%s]",
 				item->key);
@@ -67,8 +67,8 @@ int	get_value_simple(DB_ITEM *item, AGENT_RESULT *result)
 	{
 		if(item->useip==1)
 		{
-			l=strstr(item->key,"[");
-			r=strstr(item->key,"]");
+			l=strchr(item->key,'[');
+			r=strrchr(item->key,']');
 			if(l==NULL || r==NULL)
 				zbx_snprintf(c,sizeof(c),"%s",
 					item->key);
