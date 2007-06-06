@@ -4017,11 +4017,11 @@ include_once 'include/discovery.inc.php';
 		$template_table->SetCellPadding(0);
 		$template_table->SetCellSpacing(0);
 
-		foreach($templates as $id => $name)
+		foreach($templates as $id => $temp_name)
 		{
-			$frmHost->AddVar('templates['.$id.']',$name);
+			$frmHost->AddVar('templates['.$id.']',$temp_name);
 			$template_table->AddRow(array(
-					$name,
+					$temp_name,
 					new CButton('unlink['.$id.']',S_UNLINK),
 					isset($original_templates[$id]) ? new CButton('unlink_and_clear['.$id.']',S_UNLINK_AND_CLEAR) : SPACE
 					)
