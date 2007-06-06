@@ -181,7 +181,7 @@
 		$allowed_functions['sum']	= 'ticks';
 		$allowed_functions['last']	= 'float';
 		$allowed_functions['diff']	= 'float';
-		$allowed_functions['count']	= 'float';
+		$allowed_functions['count']	= array('float', '');
 		$allowed_functions['prev']	= 'float';
 		$allowed_functions['change']	= 'float';
 		$allowed_functions['abschange']	= 'float';
@@ -240,18 +240,28 @@
 				return -1;
 			}
 
-			if( 'float' == $allowed_functions[$function]
-				&& (validate_float($parameter)!=0) )
-			{
-				error('['.$parameter.'] is not a float');
-				return -1;
-			}
+			if( !is_array($allowed_functions[$function]) )
+				$allowed_functions[$function] = array($allowed_functions[$function]);
 
-			if( 'ticks' == $allowed_functions[$function]
-				&& (validate_ticks($parameter)!=0) )
+			$parameter = split(',', $parameter, count($allowed_functions[$function]));
+
+			foreach($allowed_functions[$function] as $pid => $params)
 			{
-				error('['.$parameter.'] is not a float');
-				return -1;
+				if(!isset($parameter[$pid])) continue;
+
+				if( 'float' == $params 
+					&& (validate_float($parameter[$pid])!=0) )
+				{
+					error('['.$parameter[$pid].'] is not a float');
+					return -1;
+				}
+
+				if( 'ticks' == $params 
+					&& (validate_ticks($parameter[$pid])!=0) )
+				{
+					error('['.$parameter[$pid].'] is not a float');
+					return -1;
+				}
 			}
 		}
 	# Process macros
