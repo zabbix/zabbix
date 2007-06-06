@@ -1,5 +1,6 @@
 Changes for 1.5:
 
+ - fixed 'count' function for trigger expression (Eugene)
  - added availability to export/import templates for hosts (Artem)
  - added availability of using "['%" character for key (Eugene)
  - added login/logout (Artem)
