@@ -1,7 +1,7 @@
 Changes for 1.4.1:
 
  - fixed 'count' function for trigger expression (Eugene)
- - added availability of using "['%" character for key (Eugene)
+ - added availability of using "[&'%" character for key (Eugene)
  - fixed compilation under FreeBSD (Eugene)
  - fixed XML export (Eugene)
  - improved management of timeline period (Eugene)
