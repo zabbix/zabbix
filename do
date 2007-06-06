@@ -23,7 +23,7 @@ cleanwarnings="no"
 docat="yes"
 help="no"
 noparam=0
-def="--enable-agent --enable-server --with-mysql --prefix=`pwd` --with-ldap"
+def="--enable-agent --enable-server --with-mysql --prefix=`pwd` --with-curl --with-ldap"
 
 for cmd
 do
