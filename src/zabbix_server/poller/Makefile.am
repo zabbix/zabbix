@@ -7,6 +7,7 @@ libzbxpoller_a_SOURCES = \
 	checks_internal.c checks_internal.h \
 	checks_simple.c checks_simple.h \
 	checks_snmp.c checks_snmp.h \
+	checks_db.c checks_db.h \
 	checks_aggregate.c checks_aggregate.h \
 	checks_external.c checks_external.h \
 	poller.c poller.h

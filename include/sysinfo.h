@@ -55,18 +55,21 @@ typedef struct zbx_result_s {
 	(res)->ui64 = (zbx_uint64_t)(val); \
 	}
 
+/* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
 #define SET_STR_RESULT(res, val) \
 	{ \
 	(res)->type |= AR_STRING; \
 	(res)->str = (char*)(val); \
 	} 
 
+/* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
 #define SET_TEXT_RESULT(res, val) \
 	{ \
 	(res)->type |= AR_TEXT; \
 	(res)->text = (char*)(val); \
 	} 
 
+/* NOTE: always allocate new memory for val! DON'T USE STATIC OR STACK MEMORY!!! */
 #define SET_MSG_RESULT(res, val) \
 	{ \
 	(res)->type |= AR_MESSAGE; \

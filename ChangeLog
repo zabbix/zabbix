@@ -1,15 +1,16 @@
 Changes for 1.5:
  
+ - developed database monitoring via ODBC (Eugene)
+ - added availability to export/import templates for hosts (Artem)
  - changed how is showed messages (Artem)
+ - added login/logout (Artem)
 
 Changes for 1.4.1:
 
  - fixed processing of cmdline for proc.num and proc.mem (Alexei)
  - fixed processing of {IPADDRESS} for hosts monitored by DNS name (Alexei)
  - fixed 'count' function for trigger expression (Eugene)
- - added availability to export/import templates for hosts (Artem)
  - added availability of using "[&'%" character for key (Eugene)
- - added login/logout (Artem)
  - fixed compilation under FreeBSD (Eugene)
  - fixed XML export (Eugene)
  - improved management of timeline period (Eugene)

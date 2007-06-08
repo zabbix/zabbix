@@ -301,6 +301,7 @@
 					if(!isset($data['snmpv3_authpassphrase']))	$data['snmpv3_authpassphrase']	= '';
 					if(!isset($data['snmpv3_privpassphrase']))	$data['snmpv3_privpassphrase']	= '';
 					if(!isset($data['valuemap']))			$data['valuemap']		= '';
+					if(!isset($data['params']))			$data['params']			= '';
 					if(!isset($data['applications']))		$data['applications']		= array();
 
 					if(!empty($data['valuemap']))
@@ -357,6 +358,7 @@
 							$data['logtimefmt'],
 							$data['valuemapid'],
 							$data['delay_flex'],
+							$data['params'],
 							array_unique(array_merge(
 								$data['applications'],
 								get_applications_by_itemid($item['itemid'])
@@ -399,6 +401,7 @@
 							$data['logtimefmt'],
 							$data['valuemapid'],
 							$data['delay_flex'],
+							$data['params'],
 							$data['applications']);
 					}
 

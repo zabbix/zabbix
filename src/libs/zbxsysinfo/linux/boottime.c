@@ -76,7 +76,7 @@ static int getPROC2(char *file, char *param, int fieldno, unsigned flags, int ty
 		SET_DBL_RESULT(result, fValue);
 		break;
 	case AR_STRING: default:
-		SET_STR_RESULT(result, buf);
+		SET_STR_RESULT(result, strdup(buf));
 		break;
 	}
 
