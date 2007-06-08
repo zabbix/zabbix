@@ -52,6 +52,7 @@
 				'lastlogsize'		=> '',
 				'logtimefmt'		=> '',
 				'delay_flex'		=> '',
+				'params'		=> '',
 				'trapper_hosts'		=> '',
 				'snmp_community'	=> '',
 				'snmp_oid'		=> '',

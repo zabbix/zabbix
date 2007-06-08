@@ -851,7 +851,7 @@ void DBupdate_host_availability(zbx_uint64_t hostid,int available,int clock, cha
 	return;
 }
 
-int	DBupdate_item_status_to_notsupported(zbx_uint64_t itemid, char *error)
+int	DBupdate_item_status_to_notsupported(zbx_uint64_t itemid, const char *error)
 {
 	char	error_esc[MAX_STRING_LEN];
 
@@ -867,7 +867,7 @@ int	DBupdate_item_status_to_notsupported(zbx_uint64_t itemid, char *error)
 	}
 
 	/* '%s ' to make Oracle happy */
-	DBexecute("update items set status=%d,error='%s ' where itemid=" ZBX_FS_UI64,
+	DBexecute("update items set status=%d,error='%s' where itemid=" ZBX_FS_UI64,
 		ITEM_STATUS_NOTSUPPORTED,
 		error_esc,
 		itemid);
@@ -1565,7 +1565,7 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 				break;
 		}	
 	}
-	s=row[22];
+	s = row[22];
 	if(DBis_null(s)==SUCCEED)
 	{
 		item->lastclock=0;
@@ -1575,22 +1575,21 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 		item->lastclock=atoi(s);
 	}
 
-	item->units=row[23];
-	item->multiplier=atoi(row[24]);
-
-	item->snmpv3_securityname = row[25];
-	item->snmpv3_securitylevel = atoi(row[26]);
-	item->snmpv3_authpassphrase = row[27];
-	item->snmpv3_privpassphrase = row[28];
-	item->formula = row[29];
-	item->host_available=atoi(row[30]);
-	item->status=atoi(row[31]);
-	item->trapper_hosts=row[32];
-	item->logtimefmt=row[33];
+	item->units			= row[23];
+	item->multiplier		= atoi(row[24]);
+	item->snmpv3_securityname	= row[25];
+	item->snmpv3_securitylevel	= atoi(row[26]);
+	item->snmpv3_authpassphrase	= row[27];
+	item->snmpv3_privpassphrase	= row[28];
+	item->formula		= row[29];
+	item->host_available	= atoi(row[30]);
+	item->status		= atoi(row[31]);
+	item->trapper_hosts	= row[32];
+	item->logtimefmt	= row[33];
 	ZBX_STR2UINT64(item->valuemapid, row[34]);
-/*	item->valuemapid=atoi(row[34]); */
-	item->delay_flex=row[35];
-	item->host_dns=row[36];
+	item->delay_flex	= row[35];
+	item->host_dns		= row[36];
+	item->params		= row[37];		/* !!! WHAT about CLOB??? */
 }
 
 /*

@@ -502,6 +502,7 @@ esac],
 AM_CONDITIONAL(AGENT, test x$agent = xyes)
 
 have_db="no"
+have_odbc="no"
 
 if test "$server" = "yes"; then
 
@@ -624,6 +625,53 @@ if test "$server" = "yes"; then
 	CFLAGS="${CFLAGS} ${LIBCURL_CPPFLAGS}"
 	LDFLAGS="${LDFLAGS} ${LIBCURL_LDFLAGS}"
 	LIBS="${LIBS} ${LIBCURL_LIBS}"
+
+	have_odbc="no"
+
+	dnl Checking for iODBC support
+	LIBIODBC_CHECK_CONFIG([no])
+	if test "x$want_iodbc" = "xyes"; then
+		if test "x$found_iodbc" = "xyes"; then
+			have_odbc="iODBC"
+		else
+			AC_MSG_ERROR([Not found iODBC library])
+		fi
+	fi
+
+	dnl Checking for unixODBC support
+	LIBUNIXODBC_CHECK_CONFIG([no])
+	if test "x$want_unixodbc" = "xyes"; then
+		if test "x$have_odbc" != "xno"; then
+			AC_MSG_ERROR([You can configure for only one ODBC griver.])
+		fi
+
+		if test "x$found_unixodbc" = "xyes"; then
+			have_odbc="unixODBC"
+		else
+			AC_MSG_ERROR([Not found unixODBC library])
+		fi
+	fi
+
+	if test x$have_odbc != xno; then
+
+		ODBC_CFLAGS="${IODBC_CFLAGS} ${UNIXODBC_CFLAGS}"
+		ODBC_LDFLAGS="${IODBC_LDFLAGS} ${UNIXODBC_LDFLAGS}"
+		ODBC_LIBS="${IODBC_LIBS} ${UNIXODBC_LIBS}"
+
+		AC_SUBST(ODBC_CFLAGS)
+		AC_SUBST(ODBC_LDFLAGS)
+		AC_SUBST(ODBC_LIBS)
+
+		AC_DEFINE(HAVE_ODBC,1,[Define to 1 if ODBC Driver Manager should be used.])
+
+		CFLAGS="${CFLAGS} ${ODBC_CFLAGS}"
+		LDFLAGS="${LDFLAGS} ${ODBC_LDFLAGS}"
+		LIBS="${LIBS} ${ODBC_LIBS}"
+
+	fi
+
+	AM_CONDITIONAL(WITH_ODBC, test x$have_odbc != xno)
+
 fi
 
 AM_CONDITIONAL(JABBER,  test "x$found_jabber" = "xyes")
@@ -809,10 +857,11 @@ Configuration:
   Linker flags:     ${LDFLAGS}
   Libraries:        ${LIBS}
 
-  Enable server:    ${server}
-  With database:    ${have_db}
+  Enable server:         ${server}
+  With database:         ${have_db}
+  Enable DB monitor via: ${have_odbc}
 
-  Enable agent:     ${agent}"
+  Enable agent:          ${agent}"
 
 echo
 echo "***********************************************************"

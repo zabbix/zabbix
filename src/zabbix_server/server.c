@@ -261,10 +261,55 @@ void test()
 {
 	zabbix_set_log_level(LOG_LEVEL_DEBUG);
 
+	DB_ITEM		item;
+	AGENT_RESULT	result;
+
+	DB_ROW		row;
+	DB_RESULT	db_result;
+
+	
 	printf("-= Test Started =-\n\n");
 
-	CONFIG_HTTPPOLLER_FORKS = 1;
-	main_httppoller_loop(1);
+	DBconnect(ZBX_DB_CONNECT_EXIT);
+
+	db_result = DBselect("select %s where h.hostid=i.hostid and i.hostid=10017", ZBX_SQL_ITEM_SELECT);
+
+	while( (row = DBfetch(db_result)) )
+	{
+		DBget_item_from_db(&item,row);
+		
+		init_result(&result);
+
+		get_value(&item, &result);
+		
+		printf("'%15s'", item.key);
+		if(result.type & AR_DOUBLE)
+		{
+			printf(" [d|" ZBX_FS_DBL "]", result.dbl);
+		}
+		if(result.type & AR_UINT64)
+		{
+			printf(" [u|" ZBX_FS_UI64 "]", result.ui64);
+		}
+		if(result.type & AR_STRING)
+		{
+			printf(" [s|%s]", result.str);
+		}
+		if(result.type & AR_TEXT)
+		{
+			printf(" [t|%s]", result.text);
+		}
+		if(result.type & AR_MESSAGE)
+		{
+			printf(" [m|%s]", result.msg);
+		}
+
+		free_result(&result);
+	}
+
+	DBfree_result(db_result);
+
+	DBclose();
 
 	printf("\n-= Test completed =-\n");
 }
@@ -420,25 +465,35 @@ int MAIN_ZABBIX_ENTRY(void)
 		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,CONFIG_LOG_FILE);
 	}
 
+#ifdef  HAVE_SNMP
+#	define SNMP_FEATURE_STATUS "YES"
+#else
+#	define SNMP_FEATURE_STATUS " NO"
+#endif
+#ifdef  HAVE_LIBCURL
+#	define LIBCURL_FEATURE_STATUS "YES"
+#else
+#	define LIBCURL_FEATURE_STATUS " NO"
+#endif
+#ifdef  HAVE_JABBER
+#	define JABBER_FEATURE_STATUS "YES"
+#else
+#	define JABBER_FEATURE_STATUS " NO"
+#endif
+#ifdef  HAVE_ODBC
+#	define ODBC_FEATURE_STATUS "YES"
+#else
+#	define ODBC_FEATURE_STATUS " NO"
+#endif
+
 /*	zabbix_log( LOG_LEVEL_WARNING, "INFO [%s]", ZBX_SQL_MOD(a,%d)); */
 	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_server. ZABBIX %s.", ZABBIX_VERSION);
 
 	zabbix_log( LOG_LEVEL_WARNING, "**** Enabled features ****");
-#ifdef	HAVE_SNMP
-	zabbix_log( LOG_LEVEL_WARNING, "SNMP monitoring:       YES");
-#else
-	zabbix_log( LOG_LEVEL_WARNING, "SNMP monitoring:        NO");
-#endif
-#ifdef	HAVE_LIBCURL
-	zabbix_log( LOG_LEVEL_WARNING, "WEB monitoring:        YES");
-#else
-	zabbix_log( LOG_LEVEL_WARNING, "WEB monitoring:         NO");
-#endif
-#ifdef	HAVE_JABBER
-	zabbix_log( LOG_LEVEL_WARNING, "Jabber notifications:  YES");
-#else
-	zabbix_log( LOG_LEVEL_WARNING, "Jabber notifications:   NO");
-#endif
+	zabbix_log( LOG_LEVEL_WARNING, "SNMP monitoring:       " SNMP_FEATURE_STATUS	);
+	zabbix_log( LOG_LEVEL_WARNING, "WEB monitoring:        " LIBCURL_FEATURE_STATUS	);
+	zabbix_log( LOG_LEVEL_WARNING, "Jabber notifications:  " JABBER_FEATURE_STATUS	);
+	zabbix_log( LOG_LEVEL_WARNING, "ODBC:                  " ODBC_FEATURE_STATUS	);
 	zabbix_log( LOG_LEVEL_WARNING, "**************************");
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);

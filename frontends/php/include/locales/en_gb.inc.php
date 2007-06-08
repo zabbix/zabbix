@@ -699,6 +699,7 @@
 	'S_SNMPV2_AGENT'=>			'SNMPv2 agent',
 	'S_SNMPV3_AGENT'=>			'SNMPv3 agent',
 	'S_ZABBIX_INTERNAL'=>			'ZABBIX internal',
+	'S_ZABBIX_DATABASE_MONITOR'=>		'Database monitor',
 	'S_ZABBIX_AGGREGATE'=>			'ZABBIX aggregate',
 	'S_EXTERNAL_CHECK'=>			'External check',
 	'S_WEB_MONITORING'=>			'Web monitoring',
@@ -768,6 +769,7 @@
 	'S_ORIGINAL'=>				'Original',
 	'S_NEW_FLEXIBLE_INTERVAL'=>		'New flexible interval',
 	'S_FLEXIBLE_INTERVALS'=>		'Flexible intervals (sec)',
+	'S_PARAMS'=>				'Additional parameters',
 
 //	events.php
 	'S_LATEST_EVENTS'=>			'Latest events',

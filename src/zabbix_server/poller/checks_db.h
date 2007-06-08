@@ -1,4 +1,4 @@
-/* 
+/*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
 **
@@ -17,25 +17,12 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#ifndef ZABBIX_POLLER_H
-#define ZABBIX_POLLER_H
-
-extern	void	signal_handler(int);
-extern  int     server_num;
-
-extern  int     CONFIG_TIMEOUT;
-extern  int     CONFIG_POLLER_FORKS;
-extern  int     CONFIG_UNREACHABLE_POLLER_FORKS;
-extern  int     CONFIG_REFRESH_UNSUPPORTED;
-extern  int     CONFIG_UNAVAILABLE_DELAY;
-extern  int     CONFIG_UNREACHABLE_PERIOD;
-extern  int     CONFIG_UNREACHABLE_DELAY;
-
-void main_poller_loop(int type, int num);
+#ifndef ZABBIX_CHECKS_DB_H
+#define ZABBIX_CHECKS_DB_H 
 
 #include "db.h"
 #include "sysinfo.h"
 
-int	get_value(DB_ITEM *item, AGENT_RESULT *result);
+int	get_value_db(DB_ITEM *item, AGENT_RESULT *result);
 
-#endif
+#endif /* ZABBIX_CHECKS_DB_H */

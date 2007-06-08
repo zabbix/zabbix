@@ -1465,6 +1465,7 @@ static int	DBcopy_template_applications(
  *             logtimefmt                                                     *
  *             valuemapid                                                     *
  *             delay_flex                                                     *
+ *             params                                                         *
  *             apps - zero teminated array of applicationid                   *
  *             templateid - template item identificator from database         *
  *                                                                            *
@@ -1501,6 +1502,7 @@ static int	DBupdate_item(
 		const char      *logtimefmt,
 		zbx_uint64_t	valuemapid,
 		const char      *delay_flex,
+		const char	*params,
 		zbx_uint64_t	*apps,
 		zbx_uint64_t	templateid
 	)
@@ -1533,7 +1535,8 @@ static int	DBupdate_item(
 		*snmpv3_privpassphrase_esc,
 		*formula_esc,
 		*logtimefmt_esc,
-		*delay_flex_esc;
+		*delay_flex_esc,
+		*params_esc;
 
 	int	result = SUCCEED;
 
@@ -1594,7 +1597,7 @@ static int	DBupdate_item(
 					value_type, trapper_hosts, snmp_port, units, multiplier,
 					delta, snmpv3_securityname, snmpv3_securitylevel,
 					snmpv3_authpassphrase, snmpv3_privpassphrase, formula,
-					trends, logtimefmt, valuemapid,delay_flex,
+					trends, logtimefmt, valuemapid,delay_flex,params,
 					applications,
 					itemid)) )
 					break;
@@ -1632,6 +1635,7 @@ static int	DBupdate_item(
 				formula_esc			= DBdyn_escape_string(formula);
 				logtimefmt_esc			= DBdyn_escape_string(logtimefmt);
 				delay_flex_esc			= DBdyn_escape_string(delay_flex);
+				params_esc			= DBdyn_escape_string(params);
 
 				DBexecute(
 					"update items set description='%s',key_='%s',"
@@ -1644,7 +1648,7 @@ static int	DBupdate_item(
 					"snmpv3_authpassphrase='%s',"
 					"snmpv3_privpassphrase='%s',"
 					"formula='%s',trends=%i,logtimefmt='%s',"
-					"valuemapid=" ZBX_FS_UI64 ",delay_flex='%s',"
+					"valuemapid=" ZBX_FS_UI64 ",delay_flex='%s',params='%s',"
 					"templateid=" ZBX_FS_UI64 " where itemid=" ZBX_FS_UI64,
 						description_esc,
 						key_esc,
@@ -1670,6 +1674,7 @@ static int	DBupdate_item(
 						logtimefmt_esc,
 						valuemapid,
 						delay_flex_esc,
+						params_esc,
 						templateid,
 						itemid);
 
@@ -1684,6 +1689,7 @@ static int	DBupdate_item(
 				zbx_free(formula_esc);
 				zbx_free(logtimefmt_esc);
 				zbx_free(delay_flex_esc);
+				zbx_free(params_esc);
 
 				zabbix_log(LOG_LEVEL_DEBUG, "Item '%s:%s' updated", host_data[0], key);
 			}
@@ -1726,6 +1732,7 @@ static int	DBupdate_item(
  *             logtimefmt                                                     *
  *             valuemapid                                                     *
  *             delay_flex                                                     *
+ *             params                                                         *
  *             apps - zero teminated array of applicationid                   *
  *             templateid - template item identificator from database         *
  *                                                                            *
@@ -1761,6 +1768,7 @@ static int	DBadd_item(
 		const char      *logtimefmt,
 		zbx_uint64_t	valuemapid,
 		const char      *delay_flex,
+		const char      *params,
 		zbx_uint64_t	*apps,
 		zbx_uint64_t	templateid
 	)
@@ -1792,7 +1800,8 @@ static int	DBadd_item(
 		*snmpv3_privpassphrase_esc,
 		*formula_esc,
 		*logtimefmt_esc,
-		*delay_flex_esc;
+		*delay_flex_esc,
+		*params_esc;
 
 	int	result = SUCCEED;
 
@@ -1834,7 +1843,7 @@ static int	DBadd_item(
 					value_type, trapper_hosts, snmp_port, units, multiplier,
 					delta, snmpv3_securityname, snmpv3_securitylevel,
 					snmpv3_authpassphrase, snmpv3_privpassphrase, formula,
-					trends, logtimefmt, valuemapid, delay_flex,
+					trends, logtimefmt, valuemapid, delay_flex, params,
 					apps,
 					templateid);
 			}
@@ -1858,12 +1867,13 @@ static int	DBadd_item(
 			formula_esc			= DBdyn_escape_string(formula);
 			logtimefmt_esc			= DBdyn_escape_string(logtimefmt);
 			delay_flex_esc			= DBdyn_escape_string(delay_flex);
+			params_esc			= DBdyn_escape_string(params);
 
 			DBexecute("insert into items"
 				" (itemid,description,key_,hostid,delay,history,nextcheck,status,type,"
 				"snmp_community,snmp_oid,value_type,trapper_hosts,snmp_port,units,multiplier,"
 				"delta,snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,"
-				"snmpv3_privpassphrase,formula,trends,logtimefmt,valuemapid,delay_flex,templateid)"
+				"snmpv3_privpassphrase,formula,trends,logtimefmt,valuemapid,delay_flex,params,templateid)"
 				" values (" ZBX_FS_UI64 ",'%s','%s'," ZBX_FS_UI64 ",%i,%i,0,"
 				" %i,%i,'%s','%s',%i,'%s',%i,'%s',%i,%i,'%s',%i,'%s','%s','%s',%i,'%s'," ZBX_FS_UI64 ","
 				" '%s'," ZBX_FS_UI64 ")",
@@ -1892,6 +1902,7 @@ static int	DBadd_item(
 					logtimefmt_esc,
 					valuemapid,
 					delay_flex_esc,
+					params_esc,
 					templateid);
 
 			zbx_free(description_esc);
@@ -1905,6 +1916,7 @@ static int	DBadd_item(
 			zbx_free(formula_esc);
 			zbx_free(logtimefmt_esc);
 			zbx_free(delay_flex_esc);
+			zbx_free(params_esc);
 
 			for( i=0; 0 < apps[i]; i++)
 			{
@@ -1930,7 +1942,7 @@ static int	DBadd_item(
 					value_type, trapper_hosts, snmp_port, units, multiplier,
 					delta, snmpv3_securityname, snmpv3_securitylevel,
 					snmpv3_authpassphrase, snmpv3_privpassphrase, formula,
-					trends, logtimefmt, valuemapid,delay_flex,
+					trends, logtimefmt, valuemapid,delay_flex,params,
 					applications,
 					itemid)) )
 						break;
@@ -2014,7 +2026,7 @@ static int	DBcopy_template_items(
 		db_elements = DBselect("select itemid,description,key_,delay,history,status,type,snmp_community,"
 					"snmp_oid,value_type,trapper_hosts,snmp_port,units,multiplier,delta,"
 					"snmpv3_securityname,snmpv3_securitylevel,snmpv3_authpassphrase,"
-					"snmpv3_privpassphrase,formula,trends,logtimefmt,valuemapid,delay_flex "
+					"snmpv3_privpassphrase,formula,trends,logtimefmt,valuemapid,delay_flex,params "
 					" from items where hostid=" ZBX_FS_UI64, templateid);
 		
 		while( (element_data = DBfetch(db_elements)) )
@@ -2050,6 +2062,7 @@ static int	DBcopy_template_items(
 							element_data[21],	/* logtimefmt */
 							valuemapid,		/* valuemapid */
 							element_data[23],	/* delay_flex */
+							element_data[24],	/* params */
 							apps,
 							copy_mode ? 0 : elementid))
 				)
