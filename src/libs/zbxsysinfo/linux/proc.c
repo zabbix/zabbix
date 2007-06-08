@@ -48,6 +48,8 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 	int	usr_ok = 0;
 	int	do_task = DO_SUM;
 
+	int	i,n;
+
 	struct	passwd	*usrinfo = NULL;
 	zbx_uint64_t	llvalue = 0;
 
@@ -210,23 +212,28 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 			comm_ok = 0;
 			if(proccomm[0] != '\0')
 			{
-				strscpy(filename,"/proc/");	
+				strscpy(filename,"/proc/");
 				zbx_strlcat(filename,entries->d_name,MAX_STRING_LEN);
 				zbx_strlcat(filename,"/cmdline",MAX_STRING_LEN);
-				
-				if(stat(filename,&buf)!=0)
-					continue;
-				
-				if(NULL == (f2 = fopen(filename,"r") ))
-					continue;
-				
-				if(fgets(line, MAX_STRING_LEN, f2) != NULL)
+
+				if(stat(filename,&buf)!=0)      continue;
+
+				f2=fopen(filename,"r");
+				if(f2==NULL)                    continue;
+
+				memset(line,0,MAX_STRING_LEN);
+				if((n = fread(line, 1, MAX_STRING_LEN, f2)) != 0)
 				{
+					/* Replace all zero delimiters with spaces */
+					for(i=0;i<n-1;i++)
+					{
+						if(line[i]==0)  line[i]=' ';
+					}
 					if(zbx_regexp_match(line,proccomm,NULL) != NULL)
-						comm_ok = 1;
+					comm_ok = 1;
 				}
 
-				zbx_fclose(f2);
+				fclose(f2);
 			} else {
 				comm_ok = 1;
 			}
@@ -332,6 +339,8 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 	int	usr_ok = 0;
 	int	stat_ok = 0;
 	int	comm_ok = 0;
+
+	int	i,n;
 
 	struct	passwd *usrinfo = NULL;
 	long int	lvalue = 0;
@@ -523,21 +532,28 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 		comm_ok = 0;
 		if(proccomm[0] != '\0')
 		{
-			strscpy(filename,"/proc/");	
+			strscpy(filename,"/proc/");
 			zbx_strlcat(filename,entries->d_name,MAX_STRING_LEN);
 			zbx_strlcat(filename,"/cmdline",MAX_STRING_LEN);
-			
-			if(stat(filename,&buf)!=0)
-				continue;
-			
-			if(NULL == (f = fopen(filename,"r") ))
-				continue;
-			
-			if(fgets(line, MAX_STRING_LEN, f) != NULL)
-				if(zbx_regexp_match(line,proccomm,NULL) != NULL)
-					comm_ok = 1;
 
-			zbx_fclose(f);
+			if(stat(filename,&buf)!=0)      continue;
+
+			f=fopen(filename,"r");
+			if(f==NULL)                    continue;
+			
+			memset(line,0,MAX_STRING_LEN);
+			if((n = fread(line, 1, MAX_STRING_LEN, f)) != 0)
+			{
+				/* Replace all zero delimiters with spaces */
+				for(i=0;i<n-1;i++)
+				{
+					if(line[i]==0)  line[i]=' ';
+				}
+				if(zbx_regexp_match(line,proccomm,NULL) != NULL)
+				comm_ok = 1;
+			}
+			fclose(f);
+
 		} else {
 			comm_ok = 1;
 		}
