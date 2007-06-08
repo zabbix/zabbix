@@ -17,25 +17,36 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#ifndef ZABBIX_POLLER_H
-#define ZABBIX_POLLER_H
 
-extern	void	signal_handler(int);
-extern  int     server_num;
+#ifndef ZABBIX_ZODBC_H
+#define ZABBIX_ZODBC_H
 
-extern  int     CONFIG_TIMEOUT;
-extern  int     CONFIG_POLLER_FORKS;
-extern  int     CONFIG_UNREACHABLE_POLLER_FORKS;
-extern  int     CONFIG_REFRESH_UNSUPPORTED;
-extern  int     CONFIG_UNAVAILABLE_DELAY;
-extern  int     CONFIG_UNREACHABLE_PERIOD;
-extern  int     CONFIG_UNREACHABLE_DELAY;
+#include <sql.h>
+#include <sqlext.h>
+#include <sqltypes.h>
 
-void main_poller_loop(int type, int num);
+typedef char**		ZBX_ODBC_ROW;
 
-#include "db.h"
-#include "sysinfo.h"
+typedef struct zbx_odbc_dbh_s
+{
+	SQLHENV		henv;
+	SQLHDBC		hdbc;
+	unsigned short	connected;
+	SQLHSTMT	hstmt;
+	SQLSMALLINT     col_num;
+	ZBX_ODBC_ROW	row_data;
+	SQLINTEGER	*data_len;
+} ZBX_ODBC_DBH;
 
-int	get_value(DB_ITEM *item, AGENT_RESULT *result);
+typedef ZBX_ODBC_DBH*		ZBX_ODBC_RESULT; 
 
-#endif
+int		odbc_DBconnect(ZBX_ODBC_DBH *pdbh, const char *db_name, const char *user, const char *pass);
+void		odbc_DBclose(ZBX_ODBC_DBH *pdbh);
+
+int	odbc_DBexecute(ZBX_ODBC_DBH *pdbh, const char *query);
+ZBX_ODBC_RESULT odbc_DBselect(ZBX_ODBC_DBH *pdbh, const char *query);
+ZBX_ODBC_ROW    odbc_DBfetch(ZBX_ODBC_RESULT pdbh);
+
+char* get_last_odbc_strerror(void);
+
+#endif /* ZABBIX_ZODBC_H */

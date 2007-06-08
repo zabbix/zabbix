@@ -1351,7 +1351,7 @@
 			$cmbType->AddItem(-1, S_ALL_SMALL);
 			foreach(array(ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SIMPLE,
 				ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3, ITEM_TYPE_TRAPPER,
-				ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_HTTPTEST) as $it)
+				ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_HTTPTEST,ITEM_TYPE_DB_MONITOR) as $it)
 					$cmbType->AddItem($it, item_type2str($it));
 			$form->AddRow('with '.bold(S_TYPE), $cmbType);
 		}
@@ -1457,7 +1457,7 @@
 		global  $USER_DETAILS;
 		global  $ZBX_CURNODEID;
 
-		$frmItem = new CFormTable(S_ITEM);
+		$frmItem = new CFormTable(S_ITEM,"items.php","post");
 		$frmItem->SetHelp("web.items.item.php");
 
 		$frmItem->AddVar("config",get_request("config",0));
@@ -1479,6 +1479,10 @@
 		$trapper_hosts	= get_request("trapper_hosts"	,"");
 		$units		= get_request("units"		,'');
 		$valuemapid	= get_request("valuemapid"	,0);
+		$params		= get_request("params"		,"DSN=<database source name>\n".
+								 "user=<user name>\n".
+								 "password=<password>\n".
+								 "sql=<query>");
 		$multiplier	= get_request("multiplier"	,0);
 		$delta		= get_request("delta"		,0);
 		$trends		= get_request("trends"		,365);
@@ -1496,6 +1500,8 @@
 		$add_groupid	= get_request("add_groupid"	,get_request("groupid",0));
 
 		$limited 	= null;
+
+		if("" == $key && $type == ITEM_TYPE_DB_MONITOR) $key = "db.odbc.select[<unique short description>]";
 
 		if(is_null($host)){
 			$host_info = get_host_by_hostid($_REQUEST["hostid"]);
@@ -1528,6 +1534,7 @@
 			$valuemapid	= $item_data["valuemapid"];
 			$multiplier	= $item_data["multiplier"];
 			$hostid		= $item_data["hostid"];
+			$params		= $item_data["params"];
 			
 			$snmpv3_securityname	= $item_data["snmpv3_securityname"];
 			$snmpv3_securitylevel	= $item_data["snmpv3_securitylevel"];
@@ -1614,7 +1621,7 @@
 			$cmbType = new CComboBox("type",$type,"submit()");
 			foreach(array(ITEM_TYPE_ZABBIX,ITEM_TYPE_ZABBIX_ACTIVE,ITEM_TYPE_SIMPLE,
 				ITEM_TYPE_SNMPV1,ITEM_TYPE_SNMPV2C,ITEM_TYPE_SNMPV3,ITEM_TYPE_TRAPPER,
-				ITEM_TYPE_INTERNAL,ITEM_TYPE_AGGREGATE,ITEM_TYPE_EXTERNAL) as $it)
+				ITEM_TYPE_INTERNAL,ITEM_TYPE_AGGREGATE,ITEM_TYPE_EXTERNAL,ITEM_TYPE_DB_MONITOR) as $it)
 					$cmbType->AddItem($it,item_type2str($it));
 			$frmItem->AddRow(S_TYPE, $cmbType);
 		}
@@ -1691,6 +1698,15 @@
 		}
 		
 		$frmItem->AddRow(S_KEY, array(new CTextBox("key",$key,40,$limited), $btnSelect));
+
+		if( ITEM_TYPE_DB_MONITOR == $type )
+		{
+			$frmItem->AddRow(S_PARAMS, new CTextArea("params",$params,60,4));
+		}
+		else
+		{
+			$frmItem->AddVar("params",$params);
+		}
 
 		if(isset($limited))
 		{
@@ -1983,7 +1999,7 @@
 		$cmbType = new CComboBox('type',$type);
 		foreach(array(ITEM_TYPE_ZABBIX,ITEM_TYPE_ZABBIX_ACTIVE,ITEM_TYPE_SIMPLE,ITEM_TYPE_SNMPV1,
 			ITEM_TYPE_SNMPV2C,ITEM_TYPE_SNMPV3,ITEM_TYPE_TRAPPER,ITEM_TYPE_INTERNAL,
-			ITEM_TYPE_AGGREGATE,ITEM_TYPE_AGGREGATE,ITEM_TYPE_EXTERNAL) as $it)
+			ITEM_TYPE_AGGREGATE,ITEM_TYPE_AGGREGATE,ITEM_TYPE_EXTERNAL,ITEM_TYPE_DB_MONITOR) as $it)
 				$cmbType->AddItem($it, item_type2str($it));
 
 		$frmItem->AddRow(array( new CVisibilityBox('type_visible', get_request('type_visible'), 'type', S_ORIGINAL),

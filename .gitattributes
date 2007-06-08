@@ -151,6 +151,7 @@ frontends/php/styles/ul.css -text
 include/comms.h -text
 include/jabber.h -text
 include/zbxdb.h -text
+include/zbxodbc.h -text
 m4/ax_lib_mysql.m4 -text
 m4/ax_lib_postgresql.m4 -text
 m4/ax_lib_sqlite3.m4 -text

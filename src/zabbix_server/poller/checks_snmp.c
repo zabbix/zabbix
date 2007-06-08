@@ -20,7 +20,6 @@
 #include "checks_snmp.h"
 
 #ifdef HAVE_SNMP
-/*int	get_value_snmp(double *result,char *result_str,DB_ITEM *item,char *error, int max_error_len)*/
 int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 {
 
@@ -39,9 +38,6 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 
 	struct variable_list *vars;
 	int status;
-
-	char 	*p;
-	double dbl;
 
 	unsigned char *ip;
 
@@ -325,21 +321,7 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 			{
 				if(item->value_type == ITEM_VALUE_TYPE_FLOAT)
 				{
-					p = malloc(vars->val_len+1);
-					if(p)
-					{
-						memcpy(p, vars->val.string, vars->val_len);
-						p[vars->val_len] = '\0';
-						dbl = strtod(p, NULL);
-
-						SET_DBL_RESULT(value, dbl);
-					}
-					else
-					{
-						zbx_snprintf(error,sizeof(error),"Cannot allocate required memory");
-						zabbix_log( LOG_LEVEL_ERR, "%s", error);
-						SET_MSG_RESULT(value, strdup(error));
-					}
+					SET_DBL_RESULT(value, strtod((char*)vars->val.string,0));
 				}
 				else if(item->value_type != ITEM_VALUE_TYPE_STR)
 				{
@@ -352,30 +334,11 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 				}
 				else
 				{
-					p = malloc(vars->val_len+1);
-					if(p)
-					{
-						memcpy(p, vars->val.string, vars->val_len);
-						p[vars->val_len] = '\0';
-
-						SET_STR_RESULT(value, p);
-					}
-					else
-					{
-						zbx_snprintf(error,sizeof(error),"Cannot allocate required memory");
-						zabbix_log( LOG_LEVEL_ERR, "%s", error);
-						SET_MSG_RESULT(value, strdup(error));
-					}
+					SET_STR_RESULT(value, zbx_dsprintf(NULL, "%s", vars->val.string));
 				}
 			}
 			else if(vars->type == ASN_IPADDRESS)
 			{
-/*				ip = vars->val.string;
-				zbx_snprintf(result_str,sizeof(result_str),"%d.%d.%d.%d",ip[0],ip[1],ip[2],ip[3]);*/
-/*				if(item->type == 0)
-				{
-					ret = NOTSUPPORTED;
-				}*/
 				if(item->value_type != ITEM_VALUE_TYPE_STR)
 				{
 					zbx_snprintf(error,sizeof(error),"Cannot store SNMP string value (ASN_IPADDRESS) in item having numeric type");
@@ -386,24 +349,12 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 				}
 				else
 				{
-					p = malloc(MAX_STRING_LEN);
-					if(p)
-					{
-						ip = vars->val.string;
-						zbx_snprintf(p,MAX_STRING_LEN-1,"%d.%d.%d.%d",
-							ip[0],
-							ip[1],
-							ip[2],
-							ip[3]);
-						SET_STR_RESULT(value, p);
-                                        }
-					else
-					{
-						zbx_snprintf(error,MAX_STRING_LEN-1,"Cannot allocate required memory");
-						zabbix_log( LOG_LEVEL_ERR, "%s",
-							error);
-						SET_MSG_RESULT(value, strdup(error));
-					}
+					ip = vars->val.string;
+					SET_STR_RESULT(value, zbx_dsprintf(NULL, "%d.%d.%d.%d",
+						ip[0],
+						ip[1],
+						ip[2],
+						ip[3]));
 				}
 			}
 			else

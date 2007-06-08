@@ -117,7 +117,7 @@ extern	int	CONFIG_MASTER_NODEID;
 #define HTTPSTEP_REQUIRED_LEN		255
 #define HTTPSTEP_REQUIRED_LEN_MAX	HTTPSTEP_REQUIRED_LEN+1
 
-#define ZBX_SQL_ITEM_SELECT	"i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.errors_from,i.snmp_port,i.delta,i.prevorgvalue,i.lastclock,i.units,i.multiplier,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula,h.available,i.status,i.trapper_hosts,i.logtimefmt,i.valuemapid,i.delay_flex,h.dns from hosts h, items i"
+#define ZBX_SQL_ITEM_SELECT	"i.itemid,i.key_,h.host,h.port,i.delay,i.description,i.nextcheck,i.type,i.snmp_community,i.snmp_oid,h.useip,h.ip,i.history,i.lastvalue,i.prevvalue,i.hostid,h.status,i.value_type,h.errors_from,i.snmp_port,i.delta,i.prevorgvalue,i.lastclock,i.units,i.multiplier,i.snmpv3_securityname,i.snmpv3_securitylevel,i.snmpv3_authpassphrase,i.snmpv3_privpassphrase,i.formula,h.available,i.status,i.trapper_hosts,i.logtimefmt,i.valuemapid,i.delay_flex,h.dns,i.params from hosts h, items i"
 
 #define ZBX_MAX_SQL_LEN			65535
 
@@ -276,6 +276,7 @@ DB_ITEM
 	char	*logtimefmt;
 	zbx_uint64_t	valuemapid;
 	char	*delay_flex;
+	char	*params;
 };
  
 DB_FUNCTION
@@ -446,7 +447,7 @@ zbx_uint64_t	DBget_maxid(char *table, char *field);
 
 int	DBget_function_result(char **result,char *functionid);
 void	DBupdate_host_availability(zbx_uint64_t hostid,int available,int clock,char *error);
-int	DBupdate_item_status_to_notsupported(zbx_uint64_t itemid, char *error);
+int	DBupdate_item_status_to_notsupported(zbx_uint64_t itemid, const char *error);
 int	DBadd_trend(zbx_uint64_t itemid, double value, int clock);
 int	DBadd_history(zbx_uint64_t itemid, double value, int clock);
 int	DBadd_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity);
