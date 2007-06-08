@@ -192,6 +192,7 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
 			return FAIL;
 		}
 	}
+	DBfree_result(result);
 
 	if(num==0)
 	{
