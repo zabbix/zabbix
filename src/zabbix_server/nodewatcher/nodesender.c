@@ -304,7 +304,7 @@ static int send_to_master_and_slave(int nodeid)
 
 	row = DBfetch(result);
 
-	if(DBis_null(row[0]) == SUCCEED)
+	if(row && DBis_null(row[0]) == SUCCEED)
 	{
 		zabbix_log( LOG_LEVEL_DEBUG, "No configuration changes of node %d",
 			nodeid);
