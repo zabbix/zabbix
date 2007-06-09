@@ -1,5 +1,7 @@
 Changes for 1.4.1:
 
+ - fixed linkage of applications in 1.1.x migration scripts (Alexei)
+ - fixed permissiong of Admin in 1.1.x migration scripts (Alexei)
  - fixed bug in processing of host groups permissions (Alexei)
  - minor fix of zabbix_sender command line help (Alexei)
  - fixed pinger to process DNS name instead of host name (Alexei)
