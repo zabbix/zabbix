@@ -281,7 +281,8 @@ COpt::counter_up('perm');
 					$group_data['permission'] = $nodes[$group_data['nodeid']]['permission'];
 			}
 
-			$processed[$group_data['permission']] = true;
+//			$processed[$group_data['permission']] = true;
+			$processed[$group_data['groupid']] = true;
 
 			if(eval('return ('.$group_data["permission"].' '.perm_mode2comparator($perm_mode).' '.$perm.')? 0 : 1;'))
 				continue;
