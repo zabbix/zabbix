@@ -1,5 +1,6 @@
 Changes for 1.4.1:
 
+ - minor fix of zabbix_sender command line help (Alexei)
  - fixed pinger to process DNS name instead of host name (Alexei)
  - fixed possible incorrect memory access in nodewatcher (Alexei)
  - fixed processing of cmdline for proc.num and proc.mem (Alexei)
