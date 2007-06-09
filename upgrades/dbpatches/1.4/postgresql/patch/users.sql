@@ -14,6 +14,6 @@ CREATE TABLE users_tmp (
 CREATE INDEX users_1 on users_tmp (alias);
 
 insert into users_tmp select userid,alias,name,surname,passwd,url,autologout,lang,refresh,1 from users;
-update users_tmp set type=3 where name='Admin';
+update users_tmp set type=3 where alias='Admin';
 drop table users;
 alter table users_tmp rename to users;
