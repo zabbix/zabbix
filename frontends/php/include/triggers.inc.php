@@ -630,7 +630,7 @@
 				}
 				else if(is_numeric($functionid) && $function_data = DBfetch(DBselect('select h.host,i.key_,f.function,f.parameter,i.itemid,i.value_type'.
 					' from items i,functions f,hosts h'.
-					' where functionid='.$functionid.' and i.itemid=f.itemid and h.hostid=i.hostid')))
+					' where f.functionid='.$functionid.' and i.itemid=f.itemid and h.hostid=i.hostid')))
 				{
 					if($template) $function_data["host"] = '{HOSTNAME}';
 						
