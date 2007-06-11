@@ -158,6 +158,8 @@ m4/ax_lib_sqlite3.m4 -text
 m4/jabber.m4 -text
 m4/ldap.m4 -text
 m4/libcurl.m4 -text
+m4/libiodbc.m4 -text
+m4/libunixodbc.m4 -text
 m4/netsnmp.m4 -text
 m4/sqlora8.m4 -text
 m4/ucdsnmp.m4 -text
