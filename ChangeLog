@@ -1,5 +1,6 @@
 Changes for 1.4.1:
 
+ - minor fix of misc/conf/zabbix_server.conf (Alexei)
  - fixed linkage of applications in 1.1.x migration scripts (Alexei)
  - fixed permissiong of Admin in 1.1.x migration scripts (Alexei)
  - fixed bug in processing of host groups permissions (Alexei)
