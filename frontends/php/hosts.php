@@ -693,7 +693,7 @@ include_once "include/page_header.php";
 
 				$db_groups = DBselect('select g.groupid, g.name from groups g left join hosts_groups hg '.
 						' on g.groupid=hg.groupid and hg.hostid='.$row['hostid'].
-						' where hostid is NULL order by name,groupid');
+						' where hostid is NULL order by g.name,g.groupid');
 				while($group_data = DBfetch($db_groups))
 				{
 					$add_to[] = array($group_data['name'], '?'.
@@ -704,7 +704,7 @@ include_once "include/page_header.php";
 
 				$db_groups = DBselect('select g.groupid, g.name from groups g, hosts_groups hg '.
 						' where g.groupid=hg.groupid and hg.hostid='.$row['hostid'].
-						' order by name,groupid');
+						' order by g.name,g.groupid');
 				while($group_data = DBfetch($db_groups))
 				{
 					$delete_from[] = array($group_data['name'], '?'.
