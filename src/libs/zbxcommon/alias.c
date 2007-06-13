@@ -19,7 +19,8 @@
 
 #include "common.h"
 #include "alias.h"
-
+#include "log.h"
+	
 /* Static data */
 
 static ALIAS *aliasList=NULL;
@@ -64,6 +65,7 @@ int	add_alias(const char *name, const char *value)
 				alias->next=aliasList;
 				aliasList=alias;
 
+				zabbix_log( LOG_LEVEL_DEBUG, "Alias added. [%s] -> [%s]", name, value);
 				return SUCCEED;
 			}
 			break;
@@ -85,9 +87,11 @@ int	add_alias(const char *name, const char *value)
 			alias->next = aliasList;
 			aliasList = alias;
 
+			zabbix_log( LOG_LEVEL_DEBUG, "Alias replaced. [%s] -> [%s]", name, value);
 			return SUCCEED;
 		}
 	}
+	zabbix_log( LOG_LEVEL_WARNING, "Alias FAILED. [%s] -> [%s]", name, value);
 	return FAIL;
 }
 
