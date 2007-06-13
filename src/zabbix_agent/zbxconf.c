@@ -82,15 +82,7 @@ void    load_config()
 		{"EnableRemoteCommands",&CONFIG_ENABLE_REMOTE_COMMANDS,	0,TYPE_INT,	PARM_OPT,0,1},
 		{"AllowRoot",		&CONFIG_ALLOW_ROOT,		0,TYPE_INT,	PARM_OPT,0,1},
 		
-/*		{"PerfCounter",		&CONFIG_PERF_COUNTER,		0,	TYPE_STRING,PARM_OPT,0,0}, */
-
 		{"LogUnresolvedSymbols",&CONFIG_LOG_UNRES_SYMB,		0,	TYPE_STRING,PARM_OPT,0,1},
-
-		{"Alias",		0,	&add_alias_from_config,	TYPE_STRING,PARM_OPT,0,0},
-		
-#if defined(WITH_PLUGINS)
-		{"Plugin",		0,	&add_plugin,	TYPE_STRING,PARM_OPT,0,0},
-#endif /* ZABBIX_DAEMON */
 		
 		{0}
 	};
@@ -149,7 +141,16 @@ void    load_user_parameters(void)
 	{
 /*               PARAMETER,		VAR,	FUNC,		TYPE(0i,1s), MANDATORY,MIN,MAX
 */
+		{"Alias",			0,	&add_alias_from_config,	TYPE_STRING,PARM_OPT,0,0},		
 		{"UserParameter",	0,	&add_parameter,	0,	0,	0,	0},
+
+#if defined(_WINDOWS)
+/*		{"PerfCounter",		&CONFIG_PERF_COUNTER,		0,	TYPE_STRING,PARM_OPT,0,0}, */
+#endif /* _WINDOWS */
+
+#if defined(WITH_PLUGINS)
+		{"Plugin",		0,	&add_plugin,	TYPE_STRING,PARM_OPT,0,0},
+#endif /* ZABBIX_DAEMON */
 		{0}
 	};
 	
