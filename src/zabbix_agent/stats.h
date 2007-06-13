@@ -22,6 +22,7 @@
 
 #include "threads.h"
 #include "cpustat.h"
+#include "perfstat.h"
 #include "interfaces.h"
 #include "diskdevices.h"
 
@@ -30,6 +31,7 @@ typedef struct s_collector_data
 	ZBX_CPUS_STAT_DATA	cpus;
 	ZBX_INTERFACES_DATA	interfaces;
 	ZBX_DISKDEVICES_DATA	diskdevices;
+	ZBX_PERF_STAT_DATA	perfs;
 } ZBX_COLLECTOR_DATA;
  
 extern ZBX_COLLECTOR_DATA *collector;

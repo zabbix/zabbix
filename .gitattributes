@@ -193,6 +193,8 @@ src/libs/zbxsysinfo/specsysinfo.h -text
 src/libs/zbxsysinfo/sysinfo.c -text
 src/zabbix_agent/eventlog.c -text
 src/zabbix_agent/eventlog.h -text
+src/zabbix_agent/perfstat.c -text
+src/zabbix_agent/perfstat.h -text
 src/zabbix_server/discoverer/Makefile.am -text
 src/zabbix_server/discoverer/discoverer.c -text
 src/zabbix_server/discoverer/discoverer.h -text
