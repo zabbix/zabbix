@@ -382,12 +382,12 @@ static int	process_active_checks(char *server, unsigned short port)
 	register int	i, count;
 
 	char	**pvalue;
-	char	*value;
 
 	int		now, ret = SUCCEED;
 
 	unsigned long	timestamp;
-	char			*source;
+	char		*source = NULL;
+	char		*value = NULL;
 	unsigned short	severity;
 
 	char	params[MAX_STRING_LEN];
@@ -441,8 +441,6 @@ static int	process_active_checks(char *server, unsigned short port)
 									NULL,
 									NULL
 								);
-
-						zbx_free(source);
 
 						if( strstr(value,"ZBX_NOTSUPPORTED") )
 						{
