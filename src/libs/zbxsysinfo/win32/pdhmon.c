@@ -22,8 +22,34 @@
 #include "sysinfo.h"
 #include "threads.h"
 
+#include "stats.h"
+
 #include "log.h"
 
+int	USER_PERFCOUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	PERF_COUNTERS *perfs = NULL;
+
+	int	ret = SYSINFO_RET_FAIL;
+
+	if(NULL == collector)
+	{
+		SET_MSG_RESULT(result, strdup("Collector is not started!"));
+		return SYSINFO_RET_OK;
+	}
+
+	for(perfs = collector->perfs.pPerfCounterList; perfs; perfs=perfs->next)
+	{
+		if ( 0 == strcmp(perfs->name, param) )
+		{
+			SET_DBL_RESULT(result, perfs->lastValue);
+			ret = SYSINFO_RET_OK;
+			break;
+		}
+	}
+
+	return ret;
+}
 
 int	PERF_MONITOR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {

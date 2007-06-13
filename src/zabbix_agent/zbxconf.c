@@ -24,6 +24,7 @@
 #include "log.h"
 #include "alias.h"
 #include "sysinfo.h"
+#include "perfstat.h"
 
 #if defined(ZABBIX_DAEMON)
 /* use pid file configureation */
@@ -141,11 +142,11 @@ void    load_user_parameters(void)
 	{
 /*               PARAMETER,		VAR,	FUNC,		TYPE(0i,1s), MANDATORY,MIN,MAX
 */
-		{"Alias",			0,	&add_alias_from_config,	TYPE_STRING,PARM_OPT,0,0},		
-		{"UserParameter",	0,	&add_parameter,	0,	0,	0,	0},
+		{"Alias",		0,	&add_alias_from_config,	TYPE_STRING,PARM_OPT,0,0},		
+		{"UserParameter",	0,	&add_parameter,		0,	0,	0,	0},
 
 #if defined(_WINDOWS)
-/*		{"PerfCounter",		&CONFIG_PERF_COUNTER,		0,	TYPE_STRING,PARM_OPT,0,0}, */
+		{"PerfCounter",		0,	&add_perfs_from_config,	TYPE_STRING,PARM_OPT,0,0},
 #endif /* _WINDOWS */
 
 #if defined(WITH_PLUGINS)

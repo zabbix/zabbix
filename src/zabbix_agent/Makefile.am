@@ -23,7 +23,8 @@ zabbix_agent_SOURCES = \
 	cpustat.c cpustat.h \
 	diskdevices.c diskdevices.h \
 	interfaces.c interfaces.h \
-	zbxconf.c zbxconf.h
+	zbxconf.c zbxconf.h \
+	perfstat.c perfstat.h
 
 zabbix_agent_LDADD = $(agents_ldadd)
 
