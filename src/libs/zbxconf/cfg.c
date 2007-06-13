@@ -126,7 +126,7 @@ int	parse_cfg_file(const char *cfg_file,struct cfg_line *cfg)
 					if(strcmp(cfg[i].parameter, parameter))
 						continue;
 
-					/* zbx_error("Accepted configuration parameter: '%s' = '%s'",parameter, value); */
+					zabbix_log(LOG_LEVEL_DEBUG, "Accepted configuration parameter: '%s' = '%s'",parameter, value);
 
 					if(cfg[i].function != 0)
 					{
