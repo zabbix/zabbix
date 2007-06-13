@@ -1520,7 +1520,7 @@ INSERT INTO items VALUES (18224,0,'','',161,10015,'Cached memory','vm.memory.siz
 INSERT INTO items VALUES (18225,0,'','',161,10015,'Free memory','vm.memory.size[free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (18226,0,'','',161,10015,'Shared memory','vm.memory.size[shared]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (18227,0,'','',161,10015,'Total memory','vm.memory.size[total]',1800,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
-INSERT INTO items VALUES (18228,4,'public','1.3.6.1.2.1.5.13.0',161,10016,'icmpInAddrMaskReps','icmpInAddrMaskReps',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
+INSERT INTO items VALUES (18228,1,'public','1.3.6.1.2.1.5.13.0',161,10016,'icmpInAddrMaskReps','icmpInAddrMaskReps',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (18229,1,'public','1.3.6.1.2.1.5.12.0',161,10016,'icmpInAddrMasks','icmpInAddrMasks',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (18230,1,'public','1.3.6.1.2.1.5.3.0',161,10016,'icmpInDestUnreachs','icmpInDestUnreachs',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (18231,1,'public','1.3.6.1.2.1.5.9.0',161,10016,'icmpInEchoReps','icmpInEchoReps',60,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
