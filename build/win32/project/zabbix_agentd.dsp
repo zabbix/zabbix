@@ -3854,6 +3854,14 @@ SOURCE=..\..\..\src\zabbix_agent\logfiles.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\src\zabbix_agent\perfstat.c
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\src\zabbix_agent\perfstat.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\src\zabbix_agent\stats.c
 # End Source File
 # Begin Source File
