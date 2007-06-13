@@ -1,5 +1,6 @@
 Changes for 1.4.1:
 
+ - fixed processing of complex action conditions (Alexei)
  - fixed crash in processing of active checks on agent side (Alexei)
  - minor fix of misc/conf/zabbix_server.conf (Alexei)
  - fixed linkage of applications in 1.1.x migration scripts (Alexei)
