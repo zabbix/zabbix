@@ -566,7 +566,7 @@ static int	check_action_conditions(DB_EVENT *event, DB_ACTION *action)
 	result = DBselect("select conditionid,actionid,conditiontype,operator,value from conditions where actionid=" ZBX_FS_UI64 " order by conditiontype",
 		action->actionid);
 
-	while((row=DBfetch(result)))
+	while((row=DBfetch(result)) && (0 == exit))
 	{
 		num++;
 
@@ -635,7 +635,7 @@ static int	check_action_conditions(DB_EVENT *event, DB_ACTION *action)
 	}
 	DBfree_result(result);
 
-	/* Ifnot conditions defined, return SUCCEED*/ 
+	/* If no conditions defined, return SUCCEED*/ 
 	if(num == 0)	ret = SUCCEED;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "End check_action_conditions (result:%s)",
