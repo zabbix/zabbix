@@ -1,5 +1,6 @@
 Changes for 1.4.1:
 
+ - fixed printing of debug info in delete_history() (Alexei)
  - fixed incorrect type of icmpInAddrMaskReps in SNMPv1 template (Alexei)
  - fixed processing of complex action conditions (Alexei)
  - fixed crash in processing of active checks on agent side (Alexei)
