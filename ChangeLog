@@ -1,5 +1,6 @@
 Changes for 1.4.1:
 
+ - minor fixes for sqlite mutexes (Alexei)
  - added check of memory leaks in zbx_malloc() (Alexei)
  - added "PerfCounter" configuration parameter (Eugene)
  - cleaned code to avoid '... may be used uninitialized in this function' warnings (Alexei)
