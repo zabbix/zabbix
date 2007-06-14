@@ -55,7 +55,7 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 	FILE    *f = NULL, *f2 = NULL;
 
-	zbx_uint64_t	memsize;
+	zbx_uint64_t	memsize = 0;
 	int		first=0;
 	zbx_uint64_t	proccount = 0;
 
