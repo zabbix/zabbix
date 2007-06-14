@@ -513,7 +513,8 @@ static zbx_uint64_t	add_discovered_host(zbx_uint64_t dhostid)
  ******************************************************************************/
 void	op_host_add(DB_EVENT *event)
 {
-	zbx_uint64_t	hostid, dhostid;
+	zbx_uint64_t	hostid;
+	zbx_uint64_t	dhostid = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In op_host_add()");
 

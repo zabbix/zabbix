@@ -609,7 +609,7 @@ static int evaluate_MAX(char *value,DB_ITEM *item,int parameter,int flag)
 	int		res = SUCCEED;
 	int		rows;
 	double		f;
-	double		max;
+	double		max = 0;
 
 	char		*table = NULL;
 	char		table_ui64[] = "history_uint";
@@ -734,7 +734,7 @@ static int evaluate_DELTA(char *value,DB_ITEM *item,int parameter, int flag)
 	int		res = SUCCEED;
 	int		rows;
 	double		f;
-	double		min,max;
+	double		min = 0,max = 0;
 
 	zbx_uint64_t	max_uint64=0,min_uint64=0;
 	zbx_uint64_t	l;
