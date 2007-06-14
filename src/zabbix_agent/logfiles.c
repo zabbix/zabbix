@@ -67,7 +67,7 @@ int   process_log(
 		return 1;
 	}
 
-	*value = zbx_malloc(MAX_BUF_LEN);
+	*value = zbx_malloc(*value, MAX_BUF_LEN);
 	memset(*value, 0, MAX_BUF_LEN);
 
 	if(NULL == fgets(*value, MAX_BUF_LEN-1, f))

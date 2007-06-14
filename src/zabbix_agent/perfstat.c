@@ -68,14 +68,15 @@ static int	add_perf_counter(const char *name, const char *counterPath, int inter
 		/* Add new parameters */
 		if(perfs == NULL)
 		{
-			perfs = (PERF_COUNTERS *)zbx_malloc(sizeof(PERF_COUNTERS));
+			perfs = (PERF_COUNTERS *)zbx_malloc(perfs, sizeof(PERF_COUNTERS));
 			if (NULL != perfs)
 			{
 				memset(perfs,0,sizeof(PERF_COUNTERS));
 				perfs->name		= strdup(name);
 				perfs->counterPath	= strdup(counterPath);
 				perfs->interval		= interval;
-				perfs->rawValueArray	= (PDH_RAW_COUNTER *)zbx_malloc(sizeof(PDH_RAW_COUNTER) * interval);
+				perfs->rawValueArray	= (PDH_RAW_COUNTER *)zbx_malloc(perfs->rawValueArray,
+								sizeof(PDH_RAW_COUNTER) * interval);
 				perfs->CurrentCounter	= 0;
 				perfs->CurrentNum	= 1;
 
@@ -99,7 +100,8 @@ static int	add_perf_counter(const char *name, const char *counterPath, int inter
 			perfs->name		= strdup(name);
 			perfs->counterPath	= strdup(counterPath);
 			perfs->interval		= interval;
-			perfs->rawValueArray	= (PDH_RAW_COUNTER *)zbx_malloc(sizeof(PDH_RAW_COUNTER) * interval);
+			perfs->rawValueArray	= (PDH_RAW_COUNTER *)zbx_malloc(perfs->rawValueArray,
+							sizeof(PDH_RAW_COUNTER) * interval);
 			perfs->CurrentCounter	= 0;
 			perfs->CurrentNum	= 1;
 
