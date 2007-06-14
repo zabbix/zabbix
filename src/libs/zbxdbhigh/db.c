@@ -1003,7 +1003,7 @@ int	DBadd_history_text(zbx_uint64_t itemid, char *value, int clock)
 {
 #ifdef HAVE_ORACLE
 	char		sql[MAX_STRING_LEN];
-	char		*value_esc;
+	char		*value_esc = NULL;
 	int		value_esc_max_len = 0;
 	int		ret = FAIL;
 	zbx_uint64_t	id;
@@ -1016,7 +1016,7 @@ int	DBadd_history_text(zbx_uint64_t itemid, char *value, int clock)
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_history_text()");
 
 	value_esc_max_len = strlen(value)+1024;
-	value_esc = zbx_malloc(value_esc_max_len);
+	value_esc = zbx_malloc(value_esc, value_esc_max_len);
 
 	DBescape_string(value, value_esc, value_esc_max_len-1);
 	value_esc_max_len = strlen(value_esc);
@@ -1088,7 +1088,7 @@ lbl_exit:
 
 #else /* HAVE_ORACLE */
 
-	char		*value_esc;
+	char		*value_esc = NULL;
 	int		value_esc_max_len = 0;
 	int		sql_max_len = 0;
 	zbx_uint64_t	id;
@@ -1096,7 +1096,7 @@ lbl_exit:
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_history_str()");
 
 	value_esc_max_len = strlen(value)+1024;
-	value_esc = zbx_malloc(value_esc_max_len);
+	value_esc = zbx_malloc(value_esc, value_esc_max_len);
 
 	sql_max_len = value_esc_max_len+100;
 
@@ -1360,17 +1360,17 @@ int	DBadd_alert(zbx_uint64_t actionid, zbx_uint64_t userid, zbx_uint64_t trigger
 	now = time(NULL);
 
 	size = strlen(sendto) * 3 / 2 + 1;
-	sendto_esc = zbx_malloc(size);
+	sendto_esc = zbx_malloc(sendto_esc, size);
 	memset(sendto_esc, 0, size);
 	DBescape_string(sendto, sendto_esc, size);
 
 	size = strlen(subject) * 3 / 2 + 1;
-	subject_esc = zbx_malloc(size);
+	subject_esc = zbx_malloc(subject_esc, size);
 	memset(subject_esc, 0, size);
 	DBescape_string(subject,subject_esc,size);
 	
 	size = strlen(message) * 3 / 2 + 1;
-	message_esc = zbx_malloc(size);
+	message_esc = zbx_malloc(message_esc,size);
 	memset(message_esc, 0, size);
 	DBescape_string(message,message_esc,size);
 	
@@ -1471,7 +1471,7 @@ char*	DBdyn_escape_string(const char *str)
 	}
 	str_esc_len++;
 
-	str_esc = zbx_malloc(str_esc_len);
+	str_esc = zbx_malloc(str_esc, str_esc_len);
 
 	DBescape_string(str, str_esc, str_esc_len);
 

@@ -460,7 +460,7 @@ typedef enum
 #define strscpy(x,y) zbx_strlcpy(x,y,sizeof(x))
 #define strnscpy(x,y,n) zbx_strlcpy(x,y,n);
 
-void    *zbx_malloc(size_t size);
+void    *zbx_malloc(void *old, size_t size);
 void    *zbx_realloc(void *src, size_t size);
 
 #define zbx_free(ptr) { if(ptr){ free(ptr); ptr = NULL; } }

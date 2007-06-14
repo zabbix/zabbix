@@ -1271,7 +1271,7 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, char **data)
 						
 						/* function 'evaluate_function2' require 'replace_to' with size 'MAX_STRING_LEN' */
 						zbx_free(replace_to);
-						replace_to = zbx_malloc(MAX_STRING_LEN);
+						replace_to = zbx_malloc(replace_to, MAX_STRING_LEN);
 
 						if(evaluate_function2(replace_to,host,key,function,parameter) != SUCCEED)
 							zbx_snprintf(replace_to, MAX_STRING_LEN, "%s", STR_UNKNOWN_VARIABLE);
