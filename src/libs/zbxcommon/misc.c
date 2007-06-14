@@ -252,7 +252,7 @@ int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char
 int	ip_in_list(char *list, char *ip)
 {
 	char	tmp_ip[MAX_STRING_LEN];
-	char	c;
+	char	c = '\0';
 	int	i1,i2,i3,i4,i5;
 	int	ret = FAIL;
 	char	*start, *end;
@@ -332,7 +332,7 @@ int	int_in_list(char *list, int value)
 	char	*start, *end;
 	int	i1,i2;
 	int	ret = FAIL;
-	char	c;
+	char	c = '\0';
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In int_in_list(list:%s,value:%d)", list, value);
 

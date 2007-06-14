@@ -292,8 +292,10 @@ static int send_to_master_and_slave(int nodeid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		master_nodeid, slave_nodeid;
-	int		master_result, slave_result;
+	int		master_nodeid,
+			slave_nodeid,
+			master_result = FAIL,
+			slave_result = FAIL;
 	zbx_uint64_t	maxlogid;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In send_to_master_and_slave(node:%d)",

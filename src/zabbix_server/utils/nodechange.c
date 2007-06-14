@@ -48,7 +48,8 @@ static int convert_trigger_expression(int old_id, int new_id, char *old_exp, cha
 	int	i;
 	char	id[MAX_STRING_LEN];
 	enum	state_t {NORMAL, ID} state = NORMAL;
-	char	*p, *p_id;
+	char	*p,
+		*p_id = NULL;
 	zbx_uint64_t	tmp;
 
 	p = new_exp;
