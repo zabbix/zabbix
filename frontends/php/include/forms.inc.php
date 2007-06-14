@@ -1732,6 +1732,7 @@
 			$frmItem->AddVar("multiplier",$multiplier);
 		}
 
+		if( !is_numeric($formula)) $formula = 1;
 		if($multiplier == 1)
 		{
 			$frmItem->AddRow(S_CUSTOM_MULTIPLIER, new CTextBox("formula",$formula,40,$limited));
