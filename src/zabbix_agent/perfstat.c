@@ -354,7 +354,6 @@ void	collect_perfstat(ZBX_PERF_STAT_DATA *pperf)
 					);
 
 				cptr->lastValue = statData.mean.doubleValue;
-zabbix_log( LOG_LEVEL_DEBUG, "NEW_VALUE: [%s] (%i of %i) [%lf]", cptr->name, cptr->CurrentCounter, cptr->CurrentNum, cptr->lastValue);
 
 				if(cptr->CurrentNum < cptr->interval)
 					cptr->CurrentNum++;
