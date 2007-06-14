@@ -1193,7 +1193,7 @@ static void	DBdelete_template_applications(
 		{
 			tmp_hostid = 0;
 
-			db_tmp_hosts = DBselect("select applicationid,templateid,name from applications where hostid=" ZBX_FS_UI64, templateid);
+			db_tmp_hosts = DBselect("select hostid from applications where applicationid=" ZBX_FS_UI64, a_templateid);
 
 			if( (tmp_host_data = DBfetch(db_tmp_hosts) ))
 			{

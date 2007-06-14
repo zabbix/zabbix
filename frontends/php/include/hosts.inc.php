@@ -260,7 +260,7 @@ require_once "include/items.inc.php";
 	 ******************************************************************************/
 	function	unlink_template($hostid, $templateid, $unlink_mode = true)
 	{
-		if(is_array($templateid)) fatal_error('array not supported for [unlink_template]');
+		if( !is_numeric($templateid) ) fatal_error('Not supported type for [templateid] in [unlink_template] - ['.$templateid.']');
 
 		delete_template_elements($hostid, $templateid, $unlink_mode);
 		DBexecute("delete from hosts_templates where hostid=".$hostid.' and templateid='.$templateid);
@@ -824,7 +824,7 @@ require_once "include/items.inc.php";
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function        delete_template_applications($hostid, $templateid = null /* array format 'arr[id]=name' */, $unlink_mode = false)
+	function        delete_template_applications($hostid, $templateid = null, $unlink_mode = false)
 	{
 		$db_apps = get_applications_by_hostid($hostid);
 		while($db_app = DBfetch($db_apps))
@@ -834,11 +834,13 @@ require_once "include/items.inc.php";
 
 			if($templateid != null)
 			{
+				if( !is_array($templateid))
+					$templateid = array($templateid);
+
 				unset($skip);
-				$db_tmp_apps =& get_applications_by_hostid($db_app["templateid"]);
-				while($tmp_apps_data = DBfetch($db_tmp_apps))
+				if( ($tmp_app_data = get_application_by_applicationid($db_app["templateid"])) )
 				{
-					if(!isset($templateid[$tmp_app_data["hostid"]]))
+					if( !in_array($tmp_app_data["hostid"], $templateid) )
 					{
 						$skip = true;
 						break;
