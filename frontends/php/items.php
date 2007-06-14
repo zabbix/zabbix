@@ -739,6 +739,7 @@ include_once "include/page_header.php";
 // TABLE
 		$form = new CForm();
 		$form->SetName('items');
+		$form->SetMethod('POST');
 
 		$table  = new CTableInfo();
 		$table->SetHeader(array(
