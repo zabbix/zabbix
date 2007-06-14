@@ -605,7 +605,7 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags)
 			allocated		= ZBX_BUF_LEN;
 
 			s->buf_type		= ZBX_BUF_TYPE_DYN;
-			s->buf_dyn		= zbx_malloc(allocated);
+			s->buf_dyn		= zbx_malloc(s->buf_dyn, allocated);
 
 			memset(s->buf_dyn,0,allocated);
 			memcpy(s->buf_dyn, s->buf_stat, sizeof(s->buf_stat));

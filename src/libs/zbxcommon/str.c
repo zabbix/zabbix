@@ -275,7 +275,7 @@ void zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_len, co
 /* Has to be rewritten to avoi malloc */
 char *string_replace(char *str, char *sub_str1, char *sub_str2)
 {
-        char *new_str;
+        char *new_str = NULL;
         char *p;
         char *q;
         char *r;
@@ -298,7 +298,7 @@ char *string_replace(char *str, char *sub_str1, char *sub_str2)
         diff = (long)strlen(sub_str2) - len;
 
         /* allocate new memory */
-        new_str = zbx_malloc((size_t)(strlen(str) + count*diff + 1)*sizeof(char));
+        new_str = zbx_malloc(new_str, (size_t)(strlen(str) + count*diff + 1)*sizeof(char));
 
         for (q=str,t=new_str,p=str; (p = strstr(p, sub_str1)); )
         {
@@ -798,7 +798,7 @@ char* zbx_dvsprintf(char *dest, const char *f, va_list args)
 
 	while(1) {
 
-		string = zbx_malloc(size);
+		string = zbx_malloc(string, size);
 
 		va_copy(curr, args);
 		n = vsnprintf(string, size, f, curr);
@@ -870,7 +870,7 @@ char* zbx_strdcat(char *dest, const char *src)
 	new_len += (int)strlen(dest);
 	new_len += (int)strlen(src);
 	
-	new_dest = zbx_malloc(new_len + 1);
+	new_dest = zbx_malloc(new_dest, new_len + 1);
 	
 	if(dest)
 	{

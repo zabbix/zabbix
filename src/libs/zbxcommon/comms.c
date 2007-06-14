@@ -150,10 +150,17 @@ int	comms_parse_response(char *xml,char *host,char *key, char *data, char *lastl
 	return ret;
 }
 
-void    *zbx_malloc(size_t size)
+void    *zbx_malloc(void *old, size_t size)
 {
 	register int max_attempts;
 	void *ptr = NULL;
+
+/*	Old pointer must be NULL */
+	if(old != NULL)
+	{
+		zabbix_log(LOG_LEVEL_CRIT,"zbx_malloc: allocating already allocated memory. Giving up to prevent a memory leak.");
+		assert(0);
+	}
 
 /*	zabbix_log(LOG_LEVEL_DEBUG,"In zbx_malloc(size:%d)", size); */
 

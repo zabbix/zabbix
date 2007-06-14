@@ -190,7 +190,7 @@ static int connect_jabber(char *jabber_id, char *password, int use_sasl, char *e
 		
 	zabbix_log(LOG_LEVEL_DEBUG, "JABBER: connecting as %s, pass %s", jabber_id, password);
 
-	if(NULL == jsess) jsess = zbx_malloc(sizeof (jabber_session_t));
+	if(NULL == jsess) jsess = zbx_malloc(jsess, sizeof (jabber_session_t));
 
 	memset (jsess, 0, sizeof (jabber_session_t));
 
