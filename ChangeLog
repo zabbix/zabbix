@@ -1,5 +1,6 @@
 Changes for 1.4.1:
 
+ - fixed NOTSUPPORTED status for 'net.if.*' of Solaris, thanks to 'juampe' (Eugene)
  - minor fixes for sqlite mutexes (Alexei)
  - added check of memory leaks in zbx_malloc() (Alexei)
  - added "PerfCounter" configuration parameter (Eugene)
