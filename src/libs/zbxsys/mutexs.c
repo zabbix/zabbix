@@ -322,7 +322,6 @@ int zbx_mutex_destroy(ZBX_MUTEX *mutex)
 int php_sem_get(PHP_MUTEX* sem_ptr, char* path_name)
 {
 	int	
-		key,
 		max_acquire = 1,
 		count;
 
@@ -356,7 +355,7 @@ int php_sem_get(PHP_MUTEX* sem_ptr, char* path_name)
 
 	semid = semget(sem_key, 3, 0666 | IPC_CREAT);
 	if (semid == -1) {
-		zbx_error("php_sem_get: failed for key 0x%lx: %s", key, strerror(errno));
+		zbx_error("php_sem_get: failed for key 0x%lx: %s", sem_key, strerror(errno));
 		return PHP_MUTEX_ERROR;
 	}
 
@@ -388,7 +387,7 @@ int php_sem_get(PHP_MUTEX* sem_ptr, char* path_name)
 	sop[2].sem_flg = SEM_UNDO;
 	while (semop(semid, sop, 3) == -1) {
 		if (errno != EINTR) {
-			zbx_error("php_sem_get: failed acquiring SYSVSEM_SETVAL for key 0x%lx: %s", key, strerror(errno));
+			zbx_error("php_sem_get: failed acquiring SYSVSEM_SETVAL for key 0x%lx: %s", sem_key, strerror(errno));
 			break;
 		}
 	}
@@ -396,7 +395,7 @@ int php_sem_get(PHP_MUTEX* sem_ptr, char* path_name)
 	/* Get the usage count. */
 	count = semctl(semid, SYSVSEM_USAGE, GETVAL, NULL);
 	if (count == -1) {
-		zbx_error("php_sem_get: failed for key 0x%lx: %s", key, strerror(errno));
+		zbx_error("php_sem_get: failed for key 0x%lx: %s", sem_key, strerror(errno));
 	}
 
 	/* If we are the only user, then take this opportunity to set the max. */
@@ -406,7 +405,7 @@ int php_sem_get(PHP_MUTEX* sem_ptr, char* path_name)
 		union semun semarg;
 		semarg.val = max_acquire;
 		if (semctl(semid, SYSVSEM_SEM, SETVAL, semarg) == -1) {
-			zbx_error("php_sem_get: failed for key 0x%lx: %s", key, strerror(errno));
+			zbx_error("php_sem_get: failed for key 0x%lx: %s", sem_key, strerror(errno));
 		}
 	}
 
@@ -417,7 +416,9 @@ int php_sem_get(PHP_MUTEX* sem_ptr, char* path_name)
 	sop[0].sem_flg = SEM_UNDO;
 	while (semop(semid, sop, 1) == -1) {
 		if (errno != EINTR) {
-			zbx_error("php_sem_get: failed releasing SYSVSEM_SETVAL for key 0x%lx: %s", key, strerror(errno));
+			zbx_error("php_sem_get: failed releasing SYSVSEM_SETVAL for key 0x%lx: %s",
+				sem_key,
+				strerror(errno));
 			break;
 		}
 	}
