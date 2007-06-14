@@ -22,44 +22,42 @@
 
 #if defined (_WINDOWS)
 
-	#include "perfmon.h"
+#	include "perfmon.h"
 
-	struct zbx_perfs
-	{
-	   struct zbx_perfs	*next;
-	   char			*name;
-	   char			*counterPath;
-	   int			interval;
-	   PDH_RAW_COUNTER	*rawValueArray;
-	   HCOUNTER		handle;
-	   double		lastValue;
-	   int			CurrentCounter;
-	   int			CurrentNum;
-	};
+#else /* not _WINDOWS */
 
-	typedef struct zbx_perfs PERF_COUNTERS;
+#	define PDH_RAW_COUNTER	void*
+#	define HCOUNTER		void*
+#	define HQUERY		void*
 
-	typedef struct s_perfs_stat_data
-	{
-		PERF_COUNTERS	*pPerfCounterList;
-		HQUERY		pdh_query;
-	} ZBX_PERF_STAT_DATA;
+#endif /* _WINDOWS */
+
+struct zbx_perfs
+{
+   struct zbx_perfs	*next;
+   char			*name;
+   char			*counterPath;
+   int			interval;
+   PDH_RAW_COUNTER	*rawValueArray;
+   HCOUNTER		handle;
+   double		lastValue;
+   int			CurrentCounter;
+   int			CurrentNum;
+};
+
+typedef struct zbx_perfs PERF_COUNTERS;
+
+typedef struct s_perfs_stat_data
+{
+	PERF_COUNTERS	*pPerfCounterList;
+	HQUERY		pdh_query;
+} ZBX_PERF_STAT_DATA;
+
+int	add_perfs_from_config(char *line);
+void	perfs_list_free(void);
 
 int	init_perf_collector(ZBX_PERF_STAT_DATA *pperf);
 void	collect_perfstat(ZBX_PERF_STAT_DATA *pcpus);
 void	close_perf_collector(ZBX_PERF_STAT_DATA *pcpus);
-
-#else /* not _WINDOWS */
-
-#define PERF_COUNTERS	unsigned char
-
-#define	init_perf_collector(a)
-#define	collect_perfstat(a);
-#define	close_perf_collector(a);
-
-#endif /* _WINDOWS */
-
-int	add_perfs_from_config(char *line);
-void	perfs_list_free(void);
 
 #endif /* ZABBIX_PERFSTAT_H */
