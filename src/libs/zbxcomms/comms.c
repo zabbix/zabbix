@@ -566,6 +566,8 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags)
 
 		/* The rest was already cleared */
 		memset(s->buf_stat,0,ZBX_TCP_HEADER_LEN);
+
+		flags |= ZBX_TCP_READ_UNTIL_CLOSE;
 	}
 	else if( ZBX_TCP_ERROR != nbytes )
 	{
