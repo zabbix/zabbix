@@ -457,7 +457,7 @@ FIELD		|snmpv3_securitylevel|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|snmpv3_authpassphrase|t_varchar(64)|''	|NOT NULL	|ZBX_SYNC
 FIELD		|snmpv3_privpassphrase|t_varchar(64)|''	|NOT NULL	|ZBX_SYNC
 
-FIELD		|formula	|t_varchar(255)	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|formula	|t_varchar(255)	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|error		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 
 FIELD		|lastlogsize	|t_integer	|'0'	|NOT NULL	|0
