@@ -27,6 +27,7 @@
 #include "interfaces.h"
 #include "diskdevices.h"
 #include "cpustat.h"
+#include "perfstat.h"
 #include "log.h"
 #include "cfg.h"
 
@@ -69,14 +70,9 @@ void	init_collector_data(void)
 {
 #if defined (_WINDOWS)
 
-	collector = calloc(1, sizeof(ZBX_COLLECTOR_DATA));
+	collector = zbx_malloc(sizeof(ZBX_COLLECTOR_DATA));
 
-	if(NULL == collector)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "Can't allocate memory for collector.");
-		exit(1);
-
-	}
+	memset(collector, 0, sizeof(ZBX_COLLECTOR_DATA));
 
 #else /* not _WINDOWS */
 
@@ -125,9 +121,7 @@ void	free_collector_data(void)
 
 #if defined (_WINDOWS)
 
-	if(NULL == collector) return;
-
-	free(collector);
+	zbx_free(collector);
 
 #else /* not _WINDOWS */
 
@@ -175,10 +169,12 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 	zabbix_log( LOG_LEVEL_INFORMATION, "zabbix_agentd collector started");
 
 	init_cpu_collector(&(collector->cpus));
+	init_perf_collector(&(collector->perfs));
 
 	while(ZBX_IS_RUNNING)
 	{
 		collect_cpustat(&(collector->cpus));
+		collect_perfstat(&(collector->perfs));
 
 		collect_stats_interfaces(&(collector->interfaces));
 		collect_stats_diskdevices(&(collector->diskdevices));
@@ -186,6 +182,7 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 		zbx_sleep(1);
 	}
 
+	close_perf_collector(&(collector->perfs));
 	close_cpu_collector(&(collector->cpus));
 
 	zabbix_log( LOG_LEVEL_INFORMATION, "zabbix_agentd collector stopped");

@@ -211,6 +211,7 @@ int	SYSTEM_CPU_INTR(const char *cmd, const char *param, unsigned flags, AGENT_RE
 int	NET_TCP_LISTEN(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 
 #if defined(_WINDOWS)
+int	USER_PERFCOUNTER(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	PERF_MONITOR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	SERVICE_STATE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
 int	PROC_INFO(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result);
