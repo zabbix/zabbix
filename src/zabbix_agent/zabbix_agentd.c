@@ -31,6 +31,7 @@
 #include "alias.h"
 
 #include "stats.h"
+#include "perfstat.h"
 #include "active.h"
 #include "listener.h"
 
@@ -321,6 +322,7 @@ void	zbx_on_exit()
 
 	free_collector_data();
 	alias_list_free();
+	perfs_list_free();
 
 	zbx_sleep(2); /* wait for all threads closing */
 	
