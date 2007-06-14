@@ -380,8 +380,7 @@ void	calc_timestamp(char *line,int *timestamp, char *format)
 			*timestamp=t;
 		}
 	}
-	zabbix_log( LOG_LEVEL_DEBUG, "End timestamp [%d]",
-		t);
+
 	zabbix_log( LOG_LEVEL_DEBUG, "End timestamp [%d]",
 		*timestamp);
 }

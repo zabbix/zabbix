@@ -1255,10 +1255,9 @@ static int	DBdb_save_application(
 	DB_ROW		element_data;
 	DB_ROW		host_data;
 
-	zbx_uint64_t
-		applicationid_new,
-		elementid,
-		db_hostid;
+	zbx_uint64_t	applicationid_new = 0,
+			elementid,
+			db_hostid;
 
 	char	*name_esc = NULL;
 
@@ -3241,7 +3240,7 @@ static int	DBadd_item_to_graph(
 					" show_work_period,show_triggers,graphtype from graphs"
 					" where graphid=" ZBX_FS_UI64, graphid);
 
-		if( (graph_data == DBfetch(db_graphs)) )
+		if( (graph_data = DBfetch(db_graphs)) )
 		{
 			db_elements = DBselect("select i.itemid from items i, hosts h, items i2 "
 				" where i2.itemid=" ZBX_FS_UI64 " and i.key=i2.key_ and i.hostid=h.hostid and h.templateid=i2.hostid", itemid);
