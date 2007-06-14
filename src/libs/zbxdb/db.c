@@ -523,7 +523,7 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 
 	if(result->fld_num > 0)
 	{
-		result->values = zbx_malloc(sizeof(char*) * result->fld_num);
+		result->values = zbx_malloc(result->values, sizeof(char*) * result->fld_num);
 		for(i = 0; i < result->fld_num; i++)
 		{
 			 result->values[i] = PQgetvalue(result->pg_result, result->cursor, i);
@@ -632,7 +632,7 @@ DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 	}
 #endif
 #ifdef	HAVE_POSTGRESQL
-	result = zbx_malloc(sizeof(ZBX_PG_DB_RESULT));
+	result = zbx_malloc(NULL, sizeof(ZBX_PG_DB_RESULT));
 	result->pg_result = PQexec(conn,sql);
 	result->values = NULL;
 	result->cursor = 0;
@@ -671,7 +671,7 @@ DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 		php_sem_acquire(&sqlite_access);
 	}
 
-	result = zbx_malloc(sizeof(ZBX_SQ_DB_RESULT));
+	result = zbx_malloc(NULL, sizeof(ZBX_SQ_DB_RESULT));
 	result->curow = 0;
 
 lbl_get_table:
