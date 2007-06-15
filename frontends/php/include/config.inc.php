@@ -1933,7 +1933,7 @@ else if (document.getElementById)
 	{
 		global $_COOKIE;
 
-		setcookie($name, $value, isset($time) ? $time : (time() + 3600));
+		setcookie($name, $value, isset($time) ? $time : (0));
 		$_COOKIE[$name] = $value;
 	}
 	
@@ -1949,7 +1949,7 @@ else if (document.getElementById)
 	{
 		global $_COOKIE;
 		
-		setcookie($name, null, time() - 3600);
+		setcookie($name, null, -1);
 		$_COOKIE[$name] = null;
 	}
 	
@@ -1994,7 +1994,7 @@ else if (document.getElementById)
 	{
 		global $ZBX_PAGE_COOKIES;
 
-		$ZBX_PAGE_COOKIES[] = array($name, $value, isset($time) ? $time : (time() + 3600));
+		$ZBX_PAGE_COOKIES[] = array($name, $value, isset($time) ? $time : (0));
 	}
 
 	function	inarr_isset($keys, $array=null)
