@@ -41,16 +41,16 @@ include_once "include/page_header.php";
 $denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT);
 
 $query = 'SELECT distinct s.serviceid, sl.servicedownid, sl_p.serviceupid as serviceupid,
-		s.name caption, s.algorithm, t.triggerid, s.sortorder, sl.linkid'.
+		s.name as caption, s.algorithm, t.triggerid, s.sortorder, sl.linkid'.
 	' FROM services s '.
 		' LEFT JOIN triggers t ON s.triggerid = t.triggerid '.
 		' LEFT JOIN services_links sl ON  s.serviceid = sl.serviceupid and NOT(sl.soft=0) '.
 		' LEFT JOIN services_links sl_p ON  s.serviceid = sl_p.servicedownid and sl_p.soft=0 '.
-		' LEFT JOIN functions f on t.triggerid=f.triggerid '.
+		' LEFT JOIN functions f ON t.triggerid=f.triggerid '.
 		' LEFT JOIN items i ON f.itemid=i.itemid '.
 	' WHERE (i.hostid is null or i.hostid not in ('.$denyed_hosts.')) '.
 		' AND '.DBid2nodeid("s.serviceid").'='.$ZBX_CURNODEID.
-	' ORDER BY s.sortorder, sl.serviceupid, s.serviceid';
+	' ORDER BY s.sortorder, sl_p.serviceupid, s.serviceid';
 
 $result=DBSelect($query);
 

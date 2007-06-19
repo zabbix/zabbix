@@ -75,7 +75,7 @@ include_once "include/page_header.php";
 				' LEFT JOIN items i ON f.itemid=i.itemid '.
 			' WHERE '.DBid2nodeid("s.serviceid").'='.$ZBX_CURNODEID.
 			' AND (i.hostid is null or i.hostid not in ('.$denyed_hosts.')) '.
-			' ORDER BY s.sortorder, sl.serviceupid, s.serviceid';
+			' ORDER BY s.sortorder, sl_p.serviceupid, s.serviceid';
 		
 		$result=DBSelect($query);
 		
