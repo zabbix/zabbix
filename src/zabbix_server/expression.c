@@ -1384,8 +1384,7 @@ int	substitute_functions(char **exp, char *error, int maxerrlen)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments: example: ({a0:system[procload].last(0)}>1)|                      *
- *                    ({a0:system[procload].max(300)}>3)                      *
+ * Comments: example: ({123}>1)|({MACROS}=1)&({75}>3)                         *
  *                                                                            *
  ******************************************************************************/
 int	evaluate_expression(int *result,char **expression, int trigger_value, char *error, int maxerrlen)

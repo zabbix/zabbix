@@ -20,6 +20,18 @@
 ?>
 <?php
 
+	/*
+	 * Function: item_type2str
+	 *
+	 * Description:
+	 *     Represent integer value of item type as string
+	 *
+	 * Author:
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 * Comments:
+	 *
+	 */
 	function	item_type2str($type)
 	{
 		switch($type)
@@ -40,6 +52,18 @@
 		return $type;
 	}
 
+	/*
+	 * Function: item_value_type2str
+	 *
+	 * Description:
+	 *     Represent integer value of item value type as string
+	 *
+	 * Author:
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 * Comments:
+	 *
+	 */
 	function	item_value_type2str($value_type)
 	{
 		switch($value_type)
@@ -54,6 +78,18 @@
 		return $value_type;
 	}
 
+	/*
+	 * Function: item_value_type2str
+	 *
+	 * Description:
+	 *     Represent integer value of item status as string
+	 *
+	 * Author:
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 * Comments:
+	 *
+	 */
 	function	item_status2str($status)
 	{
 		switch($status)
@@ -67,6 +103,18 @@
 		return $status;
 	}
 	
+	/*
+	 * Function: item_status2style
+	 *
+	 * Description:
+	 *     Represent integer value of item status as CSS style name
+	 *
+	 * Author:
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 * Comments:
+	 *
+	 */
 	function	item_status2style($status)
 	{
 		switch($status)
@@ -150,7 +198,7 @@
 
 		if( !eregi('^'.ZBX_EREG_ITEM_KEY_FORMAT.'$', $key) )
 		{
-			error("Key should contain '[]0-9a-zA-Z!_,:()+.*\ $'- characters only");
+			error("Incorrect key format 'key_name[param1,param2,...]'");
 			return false;
 		}
 
@@ -311,6 +359,12 @@
 		if(($i = array_search(0,$applications)) !== FALSE)
 			unset($applications[$i]);
 
+		if( !eregi('^'.ZBX_EREG_ITEM_KEY_FORMAT.'$', $key) )
+		{
+			error("Incorrect key format 'key_name[param1,param2,...]'");
+			return false;
+		}
+
 		if($delay<1)
 		{
 			error("Delay cannot be less than 1 second");
@@ -396,6 +450,18 @@
 		return $result;
 	}
 
+	/*
+	 * Function: smart_update_item
+	 *
+	 * Description:
+	 *     Update specified fields of item
+	 *
+	 * Author:
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 * Comments:
+	 *
+	 */
 	function	smart_update_item($itemid,$description,$key,$hostid,$delay,$history,$status,$type,
 		$snmp_community,$snmp_oid,$value_type,$trapper_hosts,$snmp_port,$units,$multiplier,$delta,
 		$snmpv3_securityname,$snmpv3_securitylevel,$snmpv3_authpassphrase,$snmpv3_privpassphrase,
@@ -456,12 +522,19 @@
 			$item_data['templateid']);
 	}
 
-	/******************************************************************************
-	 *                                                                            *
-	 * Comments: !!! Don't forget sync code with C !!!                            *
-	 *                                                                            *
-	 ******************************************************************************/
-	function	delete_template_items($hostid, $templateid = null /* array format 'arr[id]=name' */, $unlink_mode = false)
+	/*
+	 * Function: delete_template_items
+	 *
+	 * Description:
+	 *     Delete items from host by templateid
+	 *
+	 * Author:
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 * Comments: !!! Don't forget sync code with C !!!
+	 *
+	 */
+	function	delete_template_items($hostid, $templateid = null, $unlink_mode = false)
 	{
 		$db_items = get_items_by_hostid($hostid);
 		while($db_item = DBfetch($db_items))
@@ -469,18 +542,14 @@
 			if($db_item["templateid"] == 0)
 				continue;
 
-			if($templateid != null)
+			if( !is_null($templateid))
 			{
+				if ( !is_array($templateid) )	$templateid = array($templateid);
+
 				$db_tmp_item = get_item_by_itemid($db_item["templateid"]);
-				if(is_array($templateid))
-				{
-					if(!isset($templateid[$db_tmp_item["hostid"]]))
-						continue;
-				}
-				elseif($db_tmp_item["hostid"] != $templateid)
-				{
+
+				if ( !in_array($db_tmp_item["hostid"], $templateid) )
 					continue;
-				}
 			}
 
 			if($unlink_mode)
@@ -497,6 +566,18 @@
 		}
 	}
 
+	/*
+	 * Function: copy_item_to_host
+	 *
+	 * Description:
+	 *     Copy specified item to the host
+	 *
+	 * Author:
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 * Comments:
+	 *
+	 */
 	function	copy_item_to_host($itemid, $hostid, $copy_mode = false)
 	{
 		$db_tmp_item = get_item_by_itemid($itemid);
@@ -530,21 +611,28 @@
 			$copy_mode ? 0 : $db_tmp_item["itemid"]);
 	}
 
-	/******************************************************************************
-	 *                                                                            *
-	 * Comments: !!! Don't forget sync code with C !!!                            *
-	 *                                                                            *
-	 ******************************************************************************/
-	function	copy_template_items($hostid, $templateid = null /* array format 'arr[id]=name' */, $copy_mode = false)
+	/*
+	 * Function: copy_template_items
+	 *
+	 * Description:
+	 *     Copy items from template to the host
+	 *
+	 * Author:
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 * Comments: !!! Don't forget sync code with C !!!
+	 *
+	 */
+	function	copy_template_items($hostid, $templateid = null, $copy_mode = false)
 	{
 		if($templateid == null)
 		{
-			$templateid = get_templates_by_hostid($hostid);
+			$templateid = array_keys(get_templates_by_hostid($hostid));
 		}
 		
 		if(is_array($templateid))
 		{
-			foreach($templateid as $id => $name)
+			foreach($templateid as $id)
 				copy_template_items($hostid, $id, $copy_mode); // attention recursion
 			return;
 		}
@@ -711,6 +799,18 @@
 		return get_host_by_itemid($itemid);
 	}
 
+	/*
+	 * Function: get_items_data_overview
+	 *
+	 * Description:
+	 *     Retrive overview table object for items
+	 *
+	 * Author:
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 * Comments:
+	 *
+	 */
 	function get_items_data_overview($groupid, $nodeid)
 	{
 		global	$USER_DETAILS;

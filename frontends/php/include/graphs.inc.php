@@ -69,13 +69,13 @@
 		
 	}
 
-	function 	get_graphs_by_hostid($hostid)
+	function 	&get_graphs_by_hostid($hostid)
 	{
 		return DBselect("select distinct g.* from graphs g, graphs_items gi, items i".
 			" where g.graphid=gi.graphid and gi.itemid=i.itemid and i.hostid=$hostid");
 	}
 
-	function	get_realhosts_by_graphid($graphid)
+	function	&get_realhosts_by_graphid($graphid)
 	{
 		$graph = get_graph_by_graphid($graphid);
 		if($graph["templateid"] != 0)
@@ -84,13 +84,13 @@
 		return get_hosts_by_graphid($graphid);
 	}
 
-	function 	get_hosts_by_graphid($graphid)
+	function 	&get_hosts_by_graphid($graphid)
 	{
 		return DBselect("select distinct h.* from graphs_items gi, items i, hosts h".
 			" where h.hostid=i.hostid and gi.itemid=i.itemid and gi.graphid=$graphid");
 	}
 
-	function	get_graphitems_by_graphid($graphid)
+	function	&get_graphitems_by_graphid($graphid)
 	{
 		return DBselect("select * from graphs_items where graphid=$graphid".
 			" order by itemid,drawtype,sortorder,color,yaxisside"); 
@@ -132,7 +132,7 @@
 		return	false;
 	}
 
-	function	get_graphs_by_templateid($templateid)
+	function	&get_graphs_by_templateid($templateid)
 	{
 		return DBselect("select * from graphs where templateid=$templateid");
 	}
@@ -435,7 +435,7 @@
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function	delete_template_graphs($hostid, $templateid = null /* array format 'arr[id]=name' */, $unlink_mode = false)
+	function	delete_template_graphs($hostid, $templateid = null, $unlink_mode = false)
 	{
 		$db_graphs = get_graphs_by_hostid($hostid);
 		while($db_graph = DBfetch($db_graphs))
@@ -443,16 +443,13 @@
 			if($db_graph["templateid"] == 0)
 				continue;
 
-			if($templateid != null)
+			if( !is_null($templateid) )
 			{
-				$hosts = get_hosts_by_graphid($db_graph["templateid"]);
-				$tmp_host = DBfetch($hosts);
-				if(is_array($templateid))
-				{
-					if(!isset($templateid[$tmp_host["hostid"]]))
-						continue;
-				}
-				elseif($tmp_host["hostid"] != $templateid)
+				if( !is_array($templateid) ) $templateid=array($templateid);
+
+				$tmp_host = DBfetch(get_hosts_by_graphid($db_graph["templateid"]));
+
+				if( !in_array($tmp_host["hostid"], $templateid))
 					continue;
 			}
 
@@ -475,16 +472,16 @@
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function	copy_template_graphs($hostid, $templateid = null /* array format 'arr[id]=name' */, $copy_mode = false)
+	function	copy_template_graphs($hostid, $templateid = null, $copy_mode = false)
 	{
 		if($templateid == null)
 		{
-			$templateid = get_templates_by_hostid($hostid);
+			$templateid = array_keys(get_templates_by_hostid($hostid));
 		}
 		
 		if(is_array($templateid))
 		{
-			foreach($templateid as $id => $name)
+			foreach($templateid as $id)
 				copy_template_graphs($hostid, $id, $copy_mode); // attention recursion
 			return;
 		}

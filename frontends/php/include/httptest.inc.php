@@ -389,7 +389,7 @@
 		return DBfetch(DBselect('select * from httptest where httptestid='.$httptestid));
 	}
 
-	function	get_httpsteps_by_httptestid($httptestid)
+	function	&get_httpsteps_by_httptestid($httptestid)
 	{
 		return DBselect('select * from httpstep where httptestid='.$httptestid);
 	}

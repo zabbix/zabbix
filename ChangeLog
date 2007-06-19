@@ -1,5 +1,6 @@
 Changes for 1.4.1:
 
+ - improved trigger expression syntax and validation (Eugene)
  - fixed 'Field [formula] is not double' (Eugene)
  - fixed template aplication synchronization (Eugene)
  - fixed NOTSUPPORTED status for 'net.if.*' of Solaris, thanks to 'juampe' (Eugene)
