@@ -30,6 +30,17 @@
 		return $type;
 	}
 	
+	function	graph_item_drawtypes()
+	{
+		return array(
+				GRAPH_ITEM_DRAWTYPE_LINE,
+				GRAPH_ITEM_DRAWTYPE_FILLED_REGION,
+				GRAPH_ITEM_DRAWTYPE_BOLD_LINE,
+				GRAPH_ITEM_DRAWTYPE_DOT,
+				GRAPH_ITEM_DRAWTYPE_DASHED_LINE
+			    );
+	}
+
         function	graph_item_drawtype2str($drawtype,$type=null)
         {
 		if($type == GRAPH_ITEM_AGGREGATED) return '-';

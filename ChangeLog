@@ -1,5 +1,6 @@
 Changes for 1.4.1:
 
+ - fixed Dashed lines for graphs (Eugene)
  - fixed host and group remembering on graph monitoring screen (Eugene) 
  - improved trigger expression syntax and validation (Eugene)
  - fixed 'Field [formula] is not double' (Eugene)
