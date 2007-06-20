@@ -91,7 +91,7 @@ static char* get_param_value(char* params, const char* param_name)
 			p++;
 			
 			/* allocate result */
-			buf = zbx_malloc(p - r + 1);
+			buf = zbx_malloc(buf, p - r + 1);
 			memmove(buf, r, p - r);
 			buf[p - r] = '\0';
 
@@ -102,7 +102,7 @@ static char* get_param_value(char* params, const char* param_name)
 	if(buf == NULL)
 	{
 		/* allocate result */
-		buf = zbx_malloc(1);
+		buf = zbx_malloc(buf, 1);
 		*buf = '\0';
 	}
 	return buf;
