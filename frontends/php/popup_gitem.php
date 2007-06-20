@@ -42,7 +42,7 @@ include_once "include/page_header.php";
 		"list_name"=>	array(T_ZBX_STR, O_OPT,  P_SYS,	NOT_EMPTY,		'isset({save})&&isset({gid})'),
 		"itemid"=>	array(T_ZBX_INT, O_OPT,  null,	DB_ID.'({}!=0)',	'isset({save})'),
 		"color"=>	array(T_ZBX_CLR, O_OPT,  null,	null,			'isset({save})'),
-		"drawtype"=>	array(T_ZBX_INT, O_OPT,  null,	IN("0,1,2,3"),		'isset({save})'),
+		"drawtype"=>	array(T_ZBX_INT, O_OPT,  null,	IN(graph_item_drawtypes()),'isset({save})'),
 		"sortorder"=>	array(T_ZBX_INT, O_OPT,  null,	BETWEEN(0,65535),	'isset({save})'),
 		"yaxisside"=>	array(T_ZBX_INT, O_OPT,  null,	IN("0,1"),		'isset({save})'),
 		"calc_fnc"=>	array(T_ZBX_INT, O_OPT,	 null,	IN("1,2,4,7"),		'isset({save})'),
