@@ -320,12 +320,16 @@ ZBX_ODBC_RESULT	odbc_DBselect(ZBX_ODBC_DBH *pdbh, const char *query)
 	if (retcode != SQL_SUCCESS && retcode != SQL_SUCCESS_WITH_INFO) goto lbl_err_exit;
 
 	pdbh->col_num  = col_num;
-	pdbh->row_data = zbx_malloc(sizeof(char*) * col_num);
-	pdbh->data_len = zbx_malloc(sizeof(SQLINTEGER) * col_num);
+
+	pdbh->row_data = zbx_malloc(pdbh->row_data, sizeof(char*) * col_num);
+	memset(pdbh->row_data, sizeof(char*) * col_num);
+
+	pdbh->data_len = zbx_malloc(data_len, sizeof(SQLINTEGER) * col_num);
+	memset(pdbh->data_len, sizeof(SQLINTEGER) * col_num);
 
 	for(i=0; i < col_num; i++)
 	{
-		pdbh->row_data[i] = zbx_malloc(MAX_STRING_LEN);
+		pdbh->row_data[i] = zbx_malloc(pdbh->row_data[i], MAX_STRING_LEN);
 		SQLBindCol(pdbh->hstmt, i+1, SQL_C_CHAR, pdbh->row_data[i], MAX_STRING_LEN, &pdbh->data_len[i]);
 	}
 	

@@ -70,7 +70,7 @@ void	init_collector_data(void)
 {
 #if defined (_WINDOWS)
 
-	collector = zbx_malloc(sizeof(ZBX_COLLECTOR_DATA));
+	collector = zbx_malloc(collector, sizeof(ZBX_COLLECTOR_DATA));
 
 	memset(collector, 0, sizeof(ZBX_COLLECTOR_DATA));
 
