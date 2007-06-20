@@ -3446,8 +3446,8 @@ include_once 'include/discovery.inc.php';
 		$frmScr->AddItemToBottomRow(new CButton("save",S_SAVE));
 		if(isset($_REQUEST["screenid"]))
 		{
-			$frmScr->AddItemToBottomRow(SPACE);
-			$frmScr->AddItemToBottomRow(new CButton('clone',S_CLONE));
+			/* $frmScr->AddItemToBottomRow(SPACE);
+			$frmScr->AddItemToBottomRow(new CButton('clone',S_CLONE)); !!! TODO */
 			$frmScr->AddItemToBottomRow(SPACE);
 			$frmScr->AddItemToBottomRow(new CButtonDelete(S_DELETE_SCREEN_Q,
 				url_param("form").url_param("screenid")));
