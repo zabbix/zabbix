@@ -1,5 +1,6 @@
 Changes for 1.4.1:
 
+ - improved configuration files reading (Eugene)
  - fixed Dashed lines for graphs (Eugene)
  - fixed host and group remembering on graph monitoring screen (Eugene) 
  - improved trigger expression syntax and validation (Eugene)
