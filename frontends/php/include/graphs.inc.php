@@ -594,7 +594,7 @@
 
 	function	navigation_bar($url,$ext_saved_request=NULL)
 	{
-		$saved_request = array("graphid","screenid","itemid","action","from","fullscreen");
+		$saved_request = array("screenid","itemid","action","from","fullscreen");
 
 		if(is_array($ext_saved_request))
 			$saved_request = array_merge($saved_request, $ext_saved_request);

@@ -221,7 +221,7 @@ include_once "include/page_header.php";
 
 	if($_REQUEST["graphid"] > 0)
 	{
-		navigation_bar("charts.php");
+		navigation_bar('charts.php',array('groupid','hostid','graphid'));
 	}
 	
 ?>
