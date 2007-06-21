@@ -513,6 +513,7 @@ int	is_uint(char *c);
 void	zbx_rtrim(char *str, const char *charlist);
 void	zbx_ltrim(register char *str, const char *charlist);
 void	lrtrim_spaces(char *c);
+void	compress_signs(char *str);
 void	ltrim_spaces(char *c);
 void	rtrim_spaces(char *c);
 void	delete_reol(char *c);

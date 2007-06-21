@@ -17,6 +17,8 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
+/* #define ZABBIX_TEST */
+
 #include "common.h"
 
 #include "cfg.h"
@@ -257,14 +259,195 @@ void	init_config(void)
 
 #ifdef ZABBIX_TEST
 
+void test_params()
+{
+
+#define ZBX_PARAM struct zbx_param_t
+
+ZBX_PARAM
+{
+        char	*exp;
+        int	num;
+	int	test_num;
+	int	expected_ret;
+	char	*expected_result;
+};
+
+ZBX_PARAM expressions[]=
+{
+		{"1,0",		2,	1,	0,	"1"},
+		{"0",		1,	1,	0,	"0"},
+		{"0",		1,	2,	1,	""},
+		{"\"0\",\"1\"",	2,	2,	0,	"1"},
+		{"\"0\",1\"",	2,	2,	0,	"1\""},
+		{"\"0\"",	1,	1,	0,	"0"},
+		{"\\\"",	1,	1,	0,	"\\\""},
+		{"\"0\",\\\"",	2,	2,	0,	"\\\""},
+		{NULL}
+};
+
+	int result;
+	int i;
+
+	char *exp=NULL;
+	char str[MAX_STRING_LEN];
+
+	printf("-= Test parameters =-\n\n");
+
+	for(i=0;expressions[i].exp!=NULL;i++)
+	{
+		printf("Testing get_patam(%d,\"%s\")\n", expressions[i].test_num, expressions[i].exp);
+
+		exp=zbx_malloc(exp,1024);
+		zbx_snprintf(exp,1024,"%s",expressions[i].exp);
+		str[0]='\0';
+
+		if(num_param(exp) != expressions[i].num)
+		{
+			printf("Wrong num_param(%s) Got %d Expected %d\n", exp, num_param(exp), expressions[i].num);
+		}
+		result = get_param(exp, expressions[i].test_num, str, sizeof(str));
+		if(result != expressions[i].expected_ret)
+		{
+			printf("Wrong result of get_param(%s) Got %d Expected %d\n", exp, result, expressions[i].expected_ret);
+		}
+		else if(strcmp(str, expressions[i].expected_result)!=0)
+		{
+			printf("Wrong result string of get_param(%d,\"%s\") Got [%s] Expected [%s]\n",
+				expressions[i].test_num,
+				exp,
+				str,
+				expressions[i].expected_result);
+		}
+		zbx_free(exp);
+	}
+	exit(-1);
+}
+
+void test_expressions()
+{
+
+#define ZBX_EXP struct zbx_exp_t
+
+ZBX_EXP
+{
+        char	*exp;
+        int	expected_result;
+};
+
+ZBX_EXP expressions[]=
+{
+/* Supported operators /+-*|&#<>= */
+		{"1+2",		3},
+		{"1-2",		-1},
+		{"6/2",		3},
+		{"1",		1},
+		{"0",		0},
+		{"1*1",		1},
+		{"2*1-2",	0},
+		{"-2*1-2",	-4},
+		{"-8*-2-10*3",	-14},
+		{"(1+5)*(1+2)",	18},
+		{"8/2*2",	8},
+		{"8*2/2*2",	16},
+		{NULL}
+};
+
+	int result;
+	int i;
+
+	char *exp=NULL;
+	char error[MAX_STRING_LEN];
+
+	printf("-= Test expressions =-\n\n");
+
+	for(i=0;expressions[i].exp!=NULL;i++)
+	{
+		exp=zbx_malloc(exp,1024);
+		zbx_snprintf(exp,1024,"%s",expressions[i].exp);
+		if(SUCCEED != evaluate_expression(&result,&exp, 0, error, sizeof(error)-1))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Evaluation of expression [%s] failed [%s]",
+				&exp,
+				error);
+		}
+		printf("Testing \"%s\" Expected result %d Got %d Result: %s\n",
+			expressions[i].exp,
+			expressions[i].expected_result,
+			result,
+			(expressions[i].expected_result==result)?"OK":"NOT OK");
+		zbx_free(exp);
+	}
+	exit(-1);
+}
+
+
+void test_compress_signs()
+{
+
+#define ZBX_SIGN struct zbx_sign_t
+
+ZBX_SIGN
+{
+        char	*str;
+        char	*expected;
+};
+
+ZBX_SIGN expressions[]=
+{
+		{"1",		"1"},
+		{"0",		"0"},
+		{"1*1",		"1*1"},
+		{"2*1-2",	"2*1+N2"},
+		{"-2*1-2",	"N2*1+N2"},
+		{"--2--3",	"2+3"},
+		{"-+2+-3",	"N2+N3"},
+		{"++2--3",	"2+3"},
+		{"+-+2",	"N2"},
+		{"+++2",	"2"},
+		{"2/+2",	"2/2"},
+		{"2+2",		"2+2"},
+		{"-2",		"N2"},
+		{"1/-2",	"1/N2"},
+		{"2-3+5",	"2+N3+5"},
+		{"2-3",		"2+N3"},
+		{"+-+123",	"N123"},
+		{NULL}
+};
+
+	int result;
+	int i;
+
+	char *exp=NULL;
+
+	printf("-= Test compress signs =-\n");
+
+	for(i=0;expressions[i].str!=NULL;i++)
+	{
+		exp=zbx_malloc(exp,1024);
+		zbx_snprintf(exp,1024,"%s",expressions[i].str);
+		compress_signs(exp);
+		if(strcmp(expressions[i].expected, exp)!=0)
+		{
+			printf("FAILED \"%s\" Expected result %s Got %s\n",
+			expressions[i].str,
+			expressions[i].expected,
+			exp);
+		}
+		zbx_free(exp);
+	}
+	printf("Passed OK\n");
+}
+
 void test()
 {
 	zabbix_set_log_level(LOG_LEVEL_DEBUG);
 
 	printf("-= Test Started =-\n\n");
 
-	CONFIG_HTTPPOLLER_FORKS = 1;
-	main_httppoller_loop(1);
+/*	test_params();*/
+	test_compress_signs();
+	test_expressions();
 
 	printf("\n-= Test completed =-\n");
 }

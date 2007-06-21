@@ -32,7 +32,8 @@ cd create/schema
 cd -
 #export CFLAGS="-Wall -pedantic"
 
-for db in sqlite3 pgsql mysql; do
+#for db in sqlite3 pgsql mysql; do
+for db in mysql; do
 	./configure --enable-agent --enable-server --with-jabber --with-ldap --with-libcurl --with-$db --with-net-snmp --prefix=`pwd` 2>>WARNINGS >/dev/null
 	echo Cleaning...
 	make clean 2>>WARNINGS >/dev/null

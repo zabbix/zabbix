@@ -1,5 +1,8 @@
 Changes for 1.4.1:
 
+ - support of negative numbers in trigger expressions (Alexei)
+ - more formal logic of execution of trigger expressions (Alexei)
+ - server-side support of quotes in item parameters (num_param, get_param) (Alexei)
  - improved configuration files reading (Eugene)
  - fixed Dashed lines for graphs (Eugene)
  - fixed host and group remembering on graph monitoring screen (Eugene) 
