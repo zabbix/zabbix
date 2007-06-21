@@ -452,14 +452,14 @@ int	send_jabber(char *username, char *passwd, char *sendto, char *message, char 
 			jsess->status = JABBER_ERROR;
 
 			zbx_snprintf(error, max_error_len, "JABBER: Cannot send message [%s]", strerror_from_system(errno));
-			zabbix_log(LOG_LEVEL_WARNING, error);
+			zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 		}
 		iks_delete (x);
 	}
 	else
 	{
 		zbx_snprintf(error, max_error_len, "JABBER: Cannot create message");
-		zabbix_log(LOG_LEVEL_WARNING, error);
+		zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 	}
 
 	return ret;
