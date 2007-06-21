@@ -566,7 +566,14 @@ int	evaluate(int *result, char *exp, char *error, int maxerrlen)
 			error);
 		return	FAIL;
 	}
-	*result=value;
+	if(cmp_double(value,0) == 0)
+	{
+		*result = TRIGGER_VALUE_TRUE;
+	}
+	else
+	{
+		*result = TRIGGER_VALUE_FALSE;
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End evaluate(result:%lf)",
 		value);
