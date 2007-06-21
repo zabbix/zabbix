@@ -59,7 +59,8 @@
 					}
 					break;
 				case "ORACLE":
-					$DB = ocilogon($DB_USER, $DB_PASSWORD, "");
+					$DB = ocilogon($DB_USER, $DB_PASSWORD, $DB_DATABASE);
+//					$DB = ocilogon($DB_USER, $DB_PASSWORD, "");
 					//$DB = ocilogon($DB_USER, $DB_PASSWORD, "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=$DB_SERVER)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=$DB_DATABASE)))");
 					if(!$DB)
 					{
@@ -447,13 +448,15 @@ if(isset($DB_TYPE) && $DB_TYPE == "ORACLE") {
 		switch($DB_TYPE)
 		{
 			case "MYSQL":
-				$odiv = 'div';
+				$result = '('.$id_name.' div 100000000000000)';
+				break;
+			case "ORACLE":
+				$result = 'round('.$id_name.'/100000000000000)';
 				break;
 			default:
-				$odiv = '/';
+				$result = '('.$id_name.'/100000000000000)';
 		}
-
-		return '('.$id_name.' '.$odiv.' 100000000000000)';
+		return $result;
 	}
 
 	function id2nodeid($id_var)
