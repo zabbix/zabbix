@@ -1,5 +1,6 @@
 Changes for 1.4.1:
 
+ - fixed reconnection for jabber notifications (Eugene)
  - fixed incorrect reporting of SMTP error messages (Alexei)
  - filesize[] replaced by vfs.file.size[] in data.sql (Alexei)
  - support of processing of negative data (Alexei)
