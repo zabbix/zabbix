@@ -490,6 +490,12 @@ int	is_double_prefix(char *c)
 
 	for(i=0;c[i]!=0;i++)
 	{
+		/* Negative number? */
+		if(c[i]=='-' && i==0)
+		{
+			continue;
+		}
+
 		if((c[i]>='0')&&(c[i]<='9'))
 		{
 			continue;
@@ -556,6 +562,12 @@ int	is_double(char *c)
 
 	for(len=0; c[i]!=0; i++, len++)
 	{
+		/* Negative number? */
+		if(c[i]=='-' && i==0)
+		{
+			continue;
+		}
+
 		if((c[i]>='0')&&(c[i]<='9'))
 		{
 			continue;
