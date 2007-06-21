@@ -358,103 +358,6 @@ void del_zeroes(char *s)
 	}
 }
 
-
-/******************************************************************************
- *                                                                            *
- * Function: get_param                                                        *
- *                                                                            *
- * Purpose: return parameter by index (num) from parameter list (param)       *
- *                                                                            *
- * Parameters:                                                                *
- * 	param  - parameter list                                               *
- *      num    - requested parameter index                                    *
- *      buf    - pointer of output buffer                                     *
- *      maxlem - size of output buffer                                        *
- *                                                                            *
- * Return value:                                                              *
- *      1 - requested parameter missed                                        *
- *      0 - requested parameter founded (value - 'buf' can be empty string)   *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:  delimeter vor parameters is ','                                 *
- *                                                                            *
- ******************************************************************************/
-int	get_param(const char *param, int num, char *buf, int maxlen)
-{
-	char	tmp[MAX_STRING_LEN];
-	char	*s;
-	int	ret = 1;
-	int	i = 0;
-	int	idx = 0;
-
-	strscpy(tmp,param);
-
-	s = &tmp[0];
-	
-	for(i=0; tmp[i] != '\0'; i++)
-	{
-		if(tmp[i] == ',')
-		{
-			idx++;
-			if(idx == num)
-			{
-				tmp[i]='\0';
-				zbx_strlcpy(buf, s, maxlen);
-				tmp[i]=','; /* restore source string */
-				ret = 0;
-				break;
-				
-			}
-			s = &tmp[i+1];
-		}
-	}
-
-	if(ret != 0)
-	{
-		idx++;
-		if(idx == num)
-		{
-			zbx_strlcpy(buf, s, maxlen);
-			ret = 0;
-		}
-	}
-	
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: num_param                                                        *
- *                                                                            *
- * Purpose: calculate count of parameters from parameter list (param)         *
- *                                                                            *
- * Parameters:                                                                *
- * 	param  - parameter list                                               *
- *                                                                            *
- * Return value: count of parameters                                          *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments:  delimeter vor parameters is ','                                 *
- *                                                                            *
- ******************************************************************************/
-int	num_param(const char *param)
-{
-	int	i;
-	int	ret = 1;
-
-	if(param == NULL) 
-		return 0;
-	
-	for(i=0;param[i]!=0;i++)
-	{
-		if(param[i]==',')	ret++;
-	}
-
-	return ret;
-}
-
 /******************************************************************************
  *                                                                            *
  * Function: delete_reol                                                      *
@@ -545,6 +448,106 @@ void	zbx_ltrim(register char *str, const char *charlist)
 
 	*str = '\0';
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: compress_signs                                                   *
+ *                                                                            *
+ * Purpose: convert all repeating pluses and minuses                          *
+ *                                                                            *
+ * Parameters: c - string to convert                                          *
+ *                                                                            *
+ * Return value: string without minuses                                       *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: -3*--8+5-7*-4+++5 -> N3*8+5+N7*N4+5                              *
+ *                                                                            *
+ ******************************************************************************/
+void	compress_signs(char *str)
+{
+	int	i,j,len;
+	char	cur, next, prev;
+	int	loop = 1;
+
+/*	printf("In compress_signs [%s]\n", str);*/
+
+	/* Compress '--' '+-' '++' '-+' */
+	while(loop == 1)
+	{
+		loop=0;	
+		for(i=0;str[i]!='\0';i++)
+		{
+			cur=str[i];
+			next=str[i+1];
+			if(	(cur=='-' && next=='-') ||
+				(cur=='+' && next=='+'))
+			{
+				str[i]='+';
+				for(j=i+1;str[j]!='\0';j++)	str[j]=str[j+1];
+				loop=1;
+			}
+			if(	(cur=='-' && next=='+') ||
+				(cur=='+' && next=='-'))
+			{
+				str[i]='-';
+				for(j=i+1;str[j]!='\0';j++)	str[j]=str[j+1];
+				loop=1;
+			}
+		}
+	}
+/*	printf("After removing duplicates [%s]\n", str);*/
+
+	/* Remove '-', '+' where needed, Convert -123 to +D123 */
+	for(i=0;str[i]!='\0';i++)
+	{
+		cur=str[i];
+		next=str[i+1];
+		if(cur == '+')
+		{
+			/* Plus is the first sign in the expression */
+			if(i==0)
+			{
+				for(j=i;str[j]!='\0';j++)	str[j]=str[j+1];
+			}
+			else
+			{
+				prev=str[i-1];
+				if(!isdigit(prev) && prev!='.')
+				{
+					for(j=i;str[j]!='\0';j++)	str[j]=str[j+1];
+				}
+			}
+		}
+		else if(cur == '-')
+		{
+			/* Minus is the first sign in the expression */
+			if(i==0)
+			{
+				str[i]='N';
+			}
+			else
+			{
+				prev=str[i-1];
+				if(!isdigit(prev) && prev!='.')
+				{
+					str[i]='N';
+				}
+				else
+				{
+					len=strlen(str);
+					for(j=len;j>i;j--)	str[j]=str[j-1];
+					str[i]='+';
+					str[i+1]='N';
+					str[len+1]='\0';
+					i++;
+				}
+			}
+		}
+	}
+/*	printf("After removing unnecessary + and - [%s]\n", str);*/
+}
+
 
 /******************************************************************************
  *                                                                            *
@@ -920,4 +923,192 @@ char* zbx_strdcatf(char *dest, const char *f, ...)
 	zbx_free(string);
 
 	return result;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: num_param                                                        *
+ *                                                                            *
+ * Purpose: calculate count of parameters from parameter list (param)         *
+ *                                                                            *
+ * Parameters:                                                                *
+ * 	param  - parameter list                                               *
+ *                                                                            *
+ * Return value: count of parameters                                          *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:  delimeter vor parameters is ','                                 *
+ *                                                                            *
+ ******************************************************************************/
+int	num_param(const char *param)
+{
+	int	i;
+	int	ret = 1;
+
+/* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
+	int	state = 0;
+	char	c;
+
+	if(param == NULL) 
+		return 0;
+	
+	for(i=0;param[i]!='\0';i++)
+	{
+		c=param[i];
+		switch(state)
+		{
+			case 0:
+				if(c==',')
+				{
+					ret++;
+				}
+				else if(c=='"')
+				{
+					state=1;
+				}
+				else if(c=='\\' && param[i+1]=='"')
+				{
+					state=2;
+				}
+				else if(c!=' ')
+				{
+					state=2;
+				}
+				break;
+			case 1:
+				if(c=='"')
+				{
+					state=0;
+				}
+				else if(c=='\\' && param[i+1]=='"')
+				{
+					i++;
+					state=2;
+				}
+				break;
+			case 2:
+				if(c==',')
+				{
+					ret++;
+					state=0;
+				}
+				break;
+		}
+	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_param                                                        *
+ *                                                                            *
+ * Purpose: return parameter by index (num) from parameter list (param)       *
+ *                                                                            *
+ * Parameters:                                                                *
+ * 	param  - parameter list                                               *
+ *      num    - requested parameter index                                    *
+ *      buf    - pointer of output buffer                                     *
+ *      maxlem - size of output buffer                                        *
+ *                                                                            *
+ * Return value:                                                              *
+ *      1 - requested parameter missed                                        *
+ *      0 - requested parameter founded (value - 'buf' can be empty string)   *
+ *                                                                            *
+ * Author: Eugene Grigorjev, rewritten by Alexei                              *
+ *                                                                            *
+ * Comments:  delimeter vor parameters is ','                                 *
+ *                                                                            *
+ ******************************************************************************/
+int	get_param(const char *param, int num, char *buf, int maxlen)
+{
+	int	ret = 1;
+	int	i = 0;
+	int	idx = 1;
+	int	buf_i = 0;
+
+	char	test[MAX_STRING_LEN];
+
+/* 0 - init, 1 - inside quoted param, 2 - inside unquoted param */
+	int	state = 0;
+	char	c;
+
+	buf[0]='\0';
+	test[0]='\0';
+
+	for(i=0; param[i] != '\0' && idx<=num && buf_i<maxlen; i++)
+	{
+		if(idx == num)	ret = 0;
+		c=param[i];
+		switch(state)
+		{
+			/* Init state */
+			case 0:
+				if(c==',')
+				{
+					idx++;
+				}
+				else if(c=='"')
+				{
+					state=1;
+				}
+				else if(idx == num)
+				{
+					if(c=='\\' && param[i+1]=='"')
+					{
+						buf[buf_i++]=c;
+						i++;
+						buf[buf_i++]=param[i];
+					}
+					else if(c!=' ')
+					{
+						buf[buf_i++]=c;
+					}
+					state=2;
+				}
+				break;
+			/* Quoted */
+			case 1:
+				if(c=='"')
+				{
+					state=0;
+				}
+				else if(idx == num)
+				{
+					if(c=='\\' && param[i+1]=='"')
+					{
+						i++;
+						buf[buf_i++]=param[i];
+					}
+					else
+					{
+						buf[buf_i++]=c;
+					}
+				}
+				break;
+			/* Unquoted */
+			case 2:
+				if(c==',')
+				{
+					idx++;
+					state=0;
+				}
+				else if(idx == num)
+				{
+					buf[buf_i++]=c;
+				}
+				break;
+		}
+	}
+
+	buf[buf_i]='\0';
+
+	/* Missing first parameter will return OK */
+	if(num == 1)
+	{
+		ret = 0;
+	}
+
+	return ret;
 }
