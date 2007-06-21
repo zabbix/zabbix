@@ -1,5 +1,6 @@
 Changes for 1.4.1:
 
+ - support of processing of negative data (Alexei)
  - support of negative numbers in trigger expressions (Alexei)
  - more formal logic of execution of trigger expressions (Alexei)
  - server-side support of quotes in item parameters (num_param, get_param) (Alexei)
