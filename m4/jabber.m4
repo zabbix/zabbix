@@ -62,6 +62,8 @@ AC_HELP_STRING([--with-jabber@<:@=DIR@:>@],[Include Jabber support @<:@default=n
 
        if test "x$found_iksemel" != "xno" ; then
 
+               AC_CHECK_FUNCS(getaddrinfo)
+
                JABBER_CPPFLAGS=$JABBER_INCDIR
                JABBER_LDFLAGS="$JABBER_LIBDIR $JABBER_LIBS"
 
