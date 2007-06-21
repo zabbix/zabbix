@@ -366,7 +366,7 @@ INSERT INTO items VALUES (10011,0,'','',161,10001,'Processor load5','system.cpu.
 INSERT INTO items VALUES (10012,0,'','',161,10001,'Processor load15','system.cpu.load[,avg15]',20,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','0','',0,'',0,0,'','');
 INSERT INTO items VALUES (10013,0,'','',161,10001,'Number of running processes','proc.num[,,run]',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,0,'','');
 INSERT INTO items VALUES (10014,0,'','',161,10001,'Free swap space','system.swap.size[,free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',0,0,'','');
-INSERT INTO items VALUES (10015,0,'','',161,10001,'Size of $1','filesize[/var/log/syslog]',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,0,'','');
+INSERT INTO items VALUES (10015,0,'','',161,10001,'Size of $1','vfs.file.size[/var/log/syslog]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',0,0,'','');
 INSERT INTO items VALUES (10016,0,'','',161,10001,'Number of users connected','system.users.num',60,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,0,'','');
 INSERT INTO items VALUES (10017,0,'','',161,10001,'Checksum of $1','vfs.file.cksum[/etc/inetd.conf]',600,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,0,'','');
 INSERT INTO items VALUES (10018,0,'','',161,10001,'Checksum of $1','vfs.file.cksum[/vmlinuz]',600,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,0,'','');
@@ -429,7 +429,7 @@ INSERT INTO items VALUES (10100,0,'','',161,10002,'Processor load5','system.cpu.
 INSERT INTO items VALUES (10101,0,'','',161,10002,'Processor load15','system.cpu.load[,avg15]',20,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','0','',0,'',0,0,'','');
 INSERT INTO items VALUES (10102,0,'','',161,10002,'Number of running processes','system[procrunning]',30,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','0','',0,'',0,0,'','');
 INSERT INTO items VALUES (10103,0,'','',161,10002,'Free swap space','system.swap.size[,free]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',0,0,'','');
-INSERT INTO items VALUES (10104,0,'','',161,10002,'Size of $1','filesize[c:\\msdos.sys]',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,0,'','');
+INSERT INTO items VALUES (10104,0,'','',161,10002,'Size of $1','vfs.file.size[c:\\msdos.sys]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',0,0,'','');
 INSERT INTO items VALUES (10106,0,'','',161,10002,'Checksum of $1','vfs.file.cksum[c:\\autoexec.bat]',600,7,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','0','',0,'',0,0,'','');
 INSERT INTO items VALUES (10109,0,'','',161,10002,'Ping to the server (TCP)','agent.ping',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',0,1,'','');
 INSERT INTO items VALUES (10114,0,'','',161,10002,'Host uptime (in sec)','system.uptime',300,7,365,0,NULL,NULL,NULL,0,0,'','uptime',0,0,NULL,'',0,'','','0','',0,'',0,0,'','');
@@ -706,7 +706,7 @@ INSERT INTO items VALUES (17409,0,'public','interfaces.ifTable.ifEntry.ifInOctet
 INSERT INTO items VALUES (17411,0,'public','interfaces.ifTable.ifEntry.ifInOctets.1',161,10002,'Average disk write queue length','perf_counter[\\PhysicalDisk(_Total)\\Avg. Disk Write Queue Length]',30,90,365,0,NULL,NULL,NULL,0,0,'','',0,0,NULL,'',0,'','','1','',0,'',0,0,'','');
 INSERT INTO items VALUES (17412,0,'','',161,10008,'Ping to the server (TCP)','agent.ping',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,1,'','');
 INSERT INTO items VALUES (17413,0,'','',161,10008,'Version of zabbix_agent(d) running','agent.version',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
-INSERT INTO items VALUES (17414,0,'','',161,10008,'Size of $1','filesize[/var/log/syslog]',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
+INSERT INTO items VALUES (17414,0,'','',161,10008,'Size of $1','vfs.file.size[/var/log/syslog]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17415,0,'','',161,10008,'Maximum number of opened files','kernel.maxfiles',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17416,0,'','',161,10008,'Maximum number of processes','kernel.maxproc',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17417,0,'','',161,10008,'Incoming traffic on interface $1','net.if.in[eth0,bytes]',5,7,365,0,NULL,NULL,NULL,0,0,'','Bps',0,1,NULL,'',0,'','','','',0,'',0,0,'','');
@@ -808,7 +808,7 @@ INSERT INTO items VALUES (17512,0,'','',161,10008,'Shared memory','vm.memory.siz
 INSERT INTO items VALUES (17513,0,'','',161,10008,'Total memory','vm.memory.size[total]',1800,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17514,0,'','',161,10009,'Ping to the server (TCP)','agent.ping',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,1,'','');
 INSERT INTO items VALUES (17515,0,'','',161,10009,'Version of zabbix_agent(d) running','agent.version',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
-INSERT INTO items VALUES (17516,0,'','',161,10009,'Size of $1','filesize[/var/log/syslog]',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
+INSERT INTO items VALUES (17516,0,'','',161,10009,'Size of $1','vfs.file.size[/var/log/syslog]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17517,0,'','',161,10009,'Maximum number of opened files','kernel.maxfiles',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17518,0,'','',161,10009,'Maximum number of processes','kernel.maxproc',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17519,0,'','',161,10009,'Incoming traffic on interface $1','net.if.in[eth0,bytes]',5,7,365,0,NULL,NULL,NULL,0,0,'','Bps',0,1,NULL,'',0,'','','','',0,'',0,0,'','');
@@ -910,7 +910,7 @@ INSERT INTO items VALUES (17614,0,'','',161,10009,'Shared memory','vm.memory.siz
 INSERT INTO items VALUES (17615,0,'','',161,10009,'Total memory','vm.memory.size[total]',1800,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17616,0,'','',161,10010,'Ping to the server (TCP)','agent.ping',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,1,'','');
 INSERT INTO items VALUES (17617,0,'','',161,10010,'Version of zabbix_agent(d) running','agent.version',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
-INSERT INTO items VALUES (17618,0,'','',161,10010,'Size of $1','filesize[/var/log/syslog]',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
+INSERT INTO items VALUES (17618,0,'','',161,10010,'Size of $1','vfs.file.size[/var/log/syslog]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17619,0,'','',161,10010,'Maximum number of opened files','kernel.maxfiles',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17620,0,'','',161,10010,'Maximum number of processes','kernel.maxproc',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17621,0,'','',161,10010,'Incoming traffic on interface $1','net.if.in[eth0,bytes]',5,7,365,0,NULL,NULL,NULL,0,0,'','Bps',0,1,NULL,'',0,'','','','',0,'',0,0,'','');
@@ -1012,7 +1012,7 @@ INSERT INTO items VALUES (17716,0,'','',161,10010,'Shared memory','vm.memory.siz
 INSERT INTO items VALUES (17717,0,'','',161,10010,'Total memory','vm.memory.size[total]',1800,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17718,0,'','',161,10011,'Ping to the server (TCP)','agent.ping',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,1,'','');
 INSERT INTO items VALUES (17719,0,'','',161,10011,'Version of zabbix_agent(d) running','agent.version',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
-INSERT INTO items VALUES (17720,0,'','',161,10011,'Size of $1','filesize[/var/log/syslog]',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
+INSERT INTO items VALUES (17720,0,'','',161,10011,'Size of $1','vfs.file.size[/var/log/syslog]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17721,0,'','',161,10011,'Maximum number of opened files','kernel.maxfiles',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17722,0,'','',161,10011,'Maximum number of processes','kernel.maxproc',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17723,0,'','',161,10011,'Incoming traffic on interface $1','net.if.in[eth0,bytes]',5,7,365,0,NULL,NULL,NULL,0,0,'','Bps',0,1,NULL,'',0,'','','','',0,'',0,0,'','');
@@ -1114,7 +1114,7 @@ INSERT INTO items VALUES (17818,0,'','',161,10011,'Shared memory','vm.memory.siz
 INSERT INTO items VALUES (17819,0,'','',161,10011,'Total memory','vm.memory.size[total]',1800,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17820,0,'','',161,10012,'Ping to the server (TCP)','agent.ping',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,1,'','');
 INSERT INTO items VALUES (17821,0,'','',161,10012,'Version of zabbix_agent(d) running','agent.version',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
-INSERT INTO items VALUES (17822,0,'','',161,10012,'Size of $1','filesize[/var/log/syslog]',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
+INSERT INTO items VALUES (17822,0,'','',161,10012,'Size of $1','vfs.file.size[/var/log/syslog]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17823,0,'','',161,10012,'Maximum number of opened files','kernel.maxfiles',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17824,0,'','',161,10012,'Maximum number of processes','kernel.maxproc',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17825,0,'','',161,10012,'Incoming traffic on interface $1','net.if.in[eth0,bytes]',5,7,365,0,NULL,NULL,NULL,0,0,'','Bps',0,1,NULL,'',0,'','','','',0,'',0,0,'','');
@@ -1216,7 +1216,7 @@ INSERT INTO items VALUES (17920,0,'','',161,10012,'Shared memory','vm.memory.siz
 INSERT INTO items VALUES (17921,0,'','',161,10012,'Total memory','vm.memory.size[total]',1800,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17922,0,'','',161,10013,'Ping to the server (TCP)','agent.ping',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,1,'','');
 INSERT INTO items VALUES (17923,0,'','',161,10013,'Version of zabbix_agent(d) running','agent.version',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
-INSERT INTO items VALUES (17924,0,'','',161,10013,'Size of $1','filesize[/var/log/syslog]',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
+INSERT INTO items VALUES (17924,0,'','',161,10013,'Size of $1','vfs.file.size[/var/log/syslog]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17925,0,'','',161,10013,'Maximum number of opened files','kernel.maxfiles',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17926,0,'','',161,10013,'Maximum number of processes','kernel.maxproc',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (17927,0,'','',161,10013,'Incoming traffic on interface $1','net.if.in[eth0,bytes]',5,7,365,0,NULL,NULL,NULL,0,0,'','Bps',0,1,NULL,'',0,'','','','',0,'',0,0,'','');
@@ -1318,7 +1318,7 @@ INSERT INTO items VALUES (18022,0,'','',161,10013,'Shared memory','vm.memory.siz
 INSERT INTO items VALUES (18023,0,'','',161,10013,'Total memory','vm.memory.size[total]',1800,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (18024,0,'','',161,10014,'Ping to the server (TCP)','agent.ping',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,1,'','');
 INSERT INTO items VALUES (18025,0,'','',161,10014,'Version of zabbix_agent(d) running','agent.version',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
-INSERT INTO items VALUES (18026,0,'','',161,10014,'Size of $1','filesize[/var/log/syslog]',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
+INSERT INTO items VALUES (18026,0,'','',161,10014,'Size of $1','vfs.file.size[/var/log/syslog]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (18027,0,'','',161,10014,'Maximum number of opened files','kernel.maxfiles',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (18028,0,'','',161,10014,'Maximum number of processes','kernel.maxproc',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (18029,0,'','',161,10014,'Incoming traffic on interface $1','net.if.in[eth0,bytes]',5,7,365,0,NULL,NULL,NULL,0,0,'','Bps',0,1,NULL,'',0,'','','','',0,'',0,0,'','');
@@ -1420,7 +1420,7 @@ INSERT INTO items VALUES (18124,0,'','',161,10014,'Shared memory','vm.memory.siz
 INSERT INTO items VALUES (18125,0,'','',161,10014,'Total memory','vm.memory.size[total]',1800,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (18126,0,'','',161,10015,'Ping to the server (TCP)','agent.ping',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,1,'','');
 INSERT INTO items VALUES (18127,0,'','',161,10015,'Version of zabbix_agent(d) running','agent.version',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
-INSERT INTO items VALUES (18128,0,'','',161,10015,'Size of $1','filesize[/var/log/syslog]',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
+INSERT INTO items VALUES (18128,0,'','',161,10015,'Size of $1','vfs.file.size[/var/log/syslog]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (18129,0,'','',161,10015,'Maximum number of opened files','kernel.maxfiles',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (18130,0,'','',161,10015,'Maximum number of processes','kernel.maxproc',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (18131,0,'','',161,10015,'Incoming traffic on interface $1','net.if.in[eth0,bytes]',5,7,365,0,NULL,NULL,NULL,0,0,'','Bps',0,1,NULL,'',0,'','','','',0,'',0,0,'','');
@@ -1729,7 +1729,7 @@ INSERT INTO items VALUES (18433,1,'public','1.3.6.1.4.1.9.2.1.1.0',161,10016,'lm
 INSERT INTO items VALUES (18434,1,'public','1.3.6.1.2.1.1.5.0',161,10016,'sysName','sysName',60,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','','',0,'',0,0,'','');
 INSERT INTO items VALUES (18435,0,'','',161,10017,'Ping to the server (TCP)','agent.ping',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10020,1,'','');
 INSERT INTO items VALUES (18436,0,'','',161,10017,'Version of zabbix_agent(d) running','agent.version',1800,7,365,0,NULL,NULL,NULL,0,1,'','',0,0,NULL,'',0,'','','0','',0,'',10059,0,'','');
-INSERT INTO items VALUES (18437,0,'','',161,10017,'Size of $1','filesize[/var/log/syslog]',30,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10015,0,'','');
+INSERT INTO items VALUES (18437,0,'','',161,10017,'Size of $1','vfs.file.size[/var/log/syslog]',30,7,365,0,NULL,NULL,NULL,0,3,'','B',0,0,NULL,'',0,'','','0','',0,'',10015,0,'','');
 INSERT INTO items VALUES (18438,0,'','',161,10017,'Maximum number of opened files','kernel.maxfiles',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10056,0,'','');
 INSERT INTO items VALUES (18439,0,'','',161,10017,'Maximum number of processes','kernel.maxproc',1800,7,365,0,NULL,NULL,NULL,0,3,'','',0,0,NULL,'',0,'','','0','',0,'',10055,0,'','');
 INSERT INTO items VALUES (18440,0,'','',161,10017,'Incoming traffic on interface $1','net.if.in[eth0,bytes]',5,7,365,0,NULL,NULL,NULL,0,0,'','Bps',0,1,NULL,'',0,'','','0','',0,'',10075,0,'','');

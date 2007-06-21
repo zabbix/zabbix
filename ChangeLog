@@ -1,5 +1,6 @@
 Changes for 1.4.1:
 
+ - filesize[] replaced by vfs.file.size[] in data.sql (Alexei)
  - support of processing of negative data (Alexei)
  - support of negative numbers in trigger expressions (Alexei)
  - more formal logic of execution of trigger expressions (Alexei)
