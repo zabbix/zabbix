@@ -87,8 +87,10 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 			maxlogid);
 	}
 
-	zbx_snprintf_alloc(&xml, &allocated, &offset, 128, "Data|%d|%d",
+	zbx_snprintf_alloc(&xml, &allocated, &offset, 128, "Data%c%d%c%d",
+		ZBX_DM_DELIMITER,
 		CONFIG_NODEID,
+		ZBX_DM_DELIMITER,
 		nodeid);
 
 	while((row=DBfetch(result)))
@@ -124,9 +126,11 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 
 			if(row2)
 			{
-				zbx_snprintf_alloc(&xml, &allocated, &offset, 16*1024, "\n%s|%s|%s",
+				zbx_snprintf_alloc(&xml, &allocated, &offset, 16*1024, "\n%s%c%s%c%s",
 					row[0],
+					ZBX_DM_DELIMITER,
 					row[1],
+					ZBX_DM_DELIMITER,
 					row[2]);
 				/* for each field */
 				for(j=0;tables[i].fields[j].name!=0;j++)
@@ -136,15 +140,21 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 					if(DBis_null(row2[j]) == SUCCEED)
 					{
 /*						zabbix_log( LOG_LEVEL_WARNING, "Field name [%s] [%s]",tables[i].fields[j].name,row2[j]);*/
-						zbx_snprintf_alloc(&xml, &allocated, &offset, 16*1024, "|%s|%d|NULL",
+						zbx_snprintf_alloc(&xml, &allocated, &offset, 16*1024, "%c%s%c%d%cNULL",
+							ZBX_DM_DELIMITER,
 							tables[i].fields[j].name,
-							tables[i].fields[j].type);
+							ZBX_DM_DELIMITER,
+							tables[i].fields[j].type,
+							ZBX_DM_DELIMITER);
 					}
 					else
 					{
-						zbx_snprintf_alloc(&xml, &allocated, &offset, 16*1024, "|%s|%d|%s",
+						zbx_snprintf_alloc(&xml, &allocated, &offset, 16*1024, "%c%s%c%d%c%s",
+							ZBX_DM_DELIMITER,
 							tables[i].fields[j].name,
+							ZBX_DM_DELIMITER,
 							tables[i].fields[j].type,
+							ZBX_DM_DELIMITER,
 							row2[j]);
 					}
 				}
