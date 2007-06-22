@@ -14,5 +14,5 @@ CREATE TABLE httptest (
 	time		numeric(16,4)		DEFAULT '0'	NOT NULL,
 	error		varchar(255)		DEFAULT ''	NOT NULL,
 	PRIMARY KEY (httptestid)
-);
+) with OIDS;
 CREATE INDEX httptest_httptest_1 on httptest (httptestid);

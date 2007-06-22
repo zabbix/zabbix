@@ -3,7 +3,7 @@ CREATE TABLE help_items_tmp (
 	key_		varchar(255)		DEFAULT ''	NOT NULL,
 	description	varchar(255)		DEFAULT ''	NOT NULL,
 	PRIMARY KEY (itemtype,key_)
-);
+) with OIDS;
 
 insert into help_items_tmp select * from help_items;
 drop table help_items;

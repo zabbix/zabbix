@@ -7,7 +7,7 @@ CREATE TABLE sysmaps_tmp (
 	label_type	integer		DEFAULT '0'	NOT NULL,
 	label_location	integer		DEFAULT '0'	NOT NULL,
 	PRIMARY KEY (sysmapid)
-);
+) with OIDS;
 CREATE INDEX sysmaps_1 on sysmaps_tmp (name);
 
 insert into sysmaps_tmp select s.sysmapid,s.name,s.width,s.height,i.imageid,s.label_type,s.label_location from sysmaps s,images i where s.background=i.name;

@@ -10,7 +10,7 @@ CREATE TABLE graphs_items_tmp (
 	type		integer		DEFAULT '0'	NOT NULL,
 	periods_cnt	integer		DEFAULT '5'	NOT NULL,
 	PRIMARY KEY (gitemid)
-);
+) with OIDS;
 
 insert into graphs_items_tmp select * from graphs_items;
 drop table graphs_items;

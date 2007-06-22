@@ -4,7 +4,7 @@ CREATE TABLE housekeeper_tmp (
 	field		varchar(64)		DEFAULT ''	NOT NULL,
 	value		bigint		DEFAULT '0'	NOT NULL,
 	PRIMARY KEY (housekeeperid)
-);
+) with OIDS;
 
 insert into housekeeper_tmp select * from housekeeper;
 drop table housekeeper;

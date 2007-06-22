@@ -4,7 +4,7 @@ CREATE TABLE service_alarms_tmp (
 	clock		integer		DEFAULT '0'	NOT NULL,
 	value		integer		DEFAULT '0'	NOT NULL,
 	PRIMARY KEY (servicealarmid)
-);
+) with OIDS;
 CREATE INDEX service_alarms_1 on service_alarms_tmp (serviceid,clock);
 CREATE INDEX service_alarms_2 on service_alarms_tmp (clock);
 

@@ -6,4 +6,4 @@ CREATE TABLE dhosts (
         lastup          integer         DEFAULT '0'     NOT NULL,
         lastdown        integer         DEFAULT '0'     NOT NULL,
         PRIMARY KEY (dhostid)
-);
+) with OIDS;

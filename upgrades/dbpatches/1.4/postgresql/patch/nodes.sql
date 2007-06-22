@@ -13,4 +13,4 @@ CREATE TABLE nodes (
 	nodetype		integer		DEFAULT '0'	NOT NULL,
 	masterid		integer		DEFAULT '0'	NOT NULL,
 	PRIMARY KEY (nodeid)
-);
+) with OIDS;

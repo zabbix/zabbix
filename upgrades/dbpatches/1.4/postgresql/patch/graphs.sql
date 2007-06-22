@@ -11,7 +11,7 @@ CREATE TABLE graphs_tmp (
 	show_triggers		integer		DEFAULT '1'	NOT NULL,
 	graphtype		integer		DEFAULT '0'	NOT NULL,
 	PRIMARY KEY (graphid)
-);
+) with OIDS;
 CREATE INDEX graphs_graphs_1 on graphs_tmp (name);
 
 insert into graphs_tmp select *,0 from graphs;
