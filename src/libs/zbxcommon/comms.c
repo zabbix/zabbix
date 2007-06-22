@@ -150,7 +150,7 @@ int	comms_parse_response(char *xml,char *host,char *key, char *data, char *lastl
 	return ret;
 }
 
-void    *zbx_malloc(void *old, size_t size)
+void    *zbx_malloc2(char *filename, int line, void *old, size_t size)
 {
 	register int max_attempts;
 	void *ptr = NULL;
@@ -158,7 +158,9 @@ void    *zbx_malloc(void *old, size_t size)
 /*	Old pointer must be NULL */
 	if(old != NULL)
 	{
-		zabbix_log(LOG_LEVEL_CRIT,"zbx_malloc: allocating already allocated memory. Giving up to prevent a memory leak.");
+		zabbix_log(LOG_LEVEL_CRIT,"[file:%s,line:%d] zbx_malloc: allocating already allocated memory. Giving up to prevent a memory leak.",
+			filename,
+			line);
 		assert(0);
 	}
 
