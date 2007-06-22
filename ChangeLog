@@ -1,6 +1,7 @@
 Changes for 1.4.1:
 
- - minor Oracle related fixes for frontend (Alexe0
+ - fixed transfer of NULL values between nodes (Alexei)
+ - minor Oracle related fixes for frontend (Alexe)
  - fixed reconnection for jabber notifications (Eugene)
  - fixed incorrect reporting of SMTP error messages (Alexei)
  - filesize[] replaced by vfs.file.size[] in data.sql (Alexei)
