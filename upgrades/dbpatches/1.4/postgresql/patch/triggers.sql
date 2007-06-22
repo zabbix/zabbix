@@ -12,7 +12,7 @@ CREATE TABLE triggers_tmp (
 	error		varchar(128)		DEFAULT ''	NOT NULL,
 	templateid	bigint DEFAULT '0'	NOT NULL,
 	PRIMARY KEY (triggerid)
-);
+) with OIDS;
 CREATE INDEX triggers_1 on triggers_tmp (status);
 CREATE INDEX triggers_2 on triggers_tmp (value);
 

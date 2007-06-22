@@ -6,7 +6,7 @@ CREATE TABLE functions_tmp (
 	function	varchar(12)		DEFAULT ''	NOT NULL,
 	parameter	varchar(255)		DEFAULT '0'	NOT NULL,
 	PRIMARY KEY (functionid)
-);
+) with OIDS;
 CREATE INDEX functions_1 on functions_tmp (triggerid);
 CREATE INDEX functions_2 on functions_tmp (itemid,function,parameter);
 

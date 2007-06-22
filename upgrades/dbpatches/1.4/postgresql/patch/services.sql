@@ -8,7 +8,7 @@ CREATE TABLE services_tmp (
 	goodsla		numeric(5,2)		DEFAULT '99.9'	NOT NULL,
 	sortorder	integer		DEFAULT '0'	NOT NULL,
 	PRIMARY KEY (serviceid)
-);
+) with OIDS;
 
 insert into services_tmp select * from services;
 drop table services;

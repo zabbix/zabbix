@@ -6,7 +6,7 @@ CREATE TABLE config_tmp (
 	work_period		varchar(100)		DEFAULT '1-5,00:00-24:00'	NOT NULL,
 	alert_usrgrpid		bigint DEFAULT '0'	NOT NULL,
 	PRIMARY KEY (configid)
-);
+) with OIDS;
 
 insert into config_tmp select 1,alert_history,alarm_history,refresh_unsupported,work_period,0 from config;
 drop table config;

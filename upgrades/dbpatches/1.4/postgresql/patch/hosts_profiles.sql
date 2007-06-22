@@ -12,7 +12,7 @@ CREATE TABLE hosts_profiles_tmp (
 	location	text		DEFAULT ''	NOT NULL,
 	notes		text		DEFAULT ''	NOT NULL,
 	PRIMARY KEY (hostid)
-);
+) with OIDS;
 
 insert into hosts_profiles_tmp select * from hosts_profiles;
 drop table hosts_profiles;

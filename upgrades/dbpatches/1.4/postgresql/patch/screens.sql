@@ -4,7 +4,7 @@ CREATE TABLE screens_tmp (
 	hsize		integer		DEFAULT '1'	NOT NULL,
 	vsize		integer		DEFAULT '1'	NOT NULL,
 	PRIMARY KEY (screenid)
-);
+) with OIDS;
 
 insert into screens_tmp select * from screens;
 drop table screens;
