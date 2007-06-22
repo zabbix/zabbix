@@ -7,6 +7,6 @@ CREATE TABLE node_configlog (
 	sync_master	integer		DEFAULT '0'	NOT NULL,
 	sync_slave	integer		DEFAULT '0'	NOT NULL,
 	PRIMARY KEY (nodeid,conflogid)
-);
+) with OIDS;
 CREATE INDEX node_configlog_configlog_1 on node_configlog (conflogid);
 CREATE INDEX node_configlog_configlog_2 on node_configlog (nodeid,tablename);

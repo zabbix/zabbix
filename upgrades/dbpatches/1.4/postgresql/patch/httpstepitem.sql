@@ -4,5 +4,5 @@ CREATE TABLE httpstepitem (
 	itemid		bigint DEFAULT '0'	NOT NULL,
 	type		integer		DEFAULT '0'	NOT NULL,
 	PRIMARY KEY (httpstepitemid)
-);
+) with OIDS;
 CREATE UNIQUE INDEX httpstepitem_httpstepitem_1 on httpstepitem (httpstepid,itemid);

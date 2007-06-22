@@ -5,7 +5,7 @@ CREATE TABLE rights_tmp (
 	permission	integer		DEFAULT '0'	NOT NULL,
 	id		bigint,
 	PRIMARY KEY (rightid)
-);
+) with OIDS;
 CREATE INDEX rights_1 on rights_tmp (groupid);
 
 --insert into rights_tmp select rightid,groupid,type::integer,permission,id from rights;

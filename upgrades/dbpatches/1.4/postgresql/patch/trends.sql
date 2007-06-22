@@ -6,7 +6,7 @@ CREATE TABLE trends_tmp (
 	value_avg	numeric(16,4)		DEFAULT '0.0000'	NOT NULL,
 	value_max	numeric(16,4)		DEFAULT '0.0000'	NOT NULL,
 	PRIMARY KEY (itemid,clock)
-);
+) with OIDS;
 
 insert into trends_tmp select * from trends;
 drop table trends;

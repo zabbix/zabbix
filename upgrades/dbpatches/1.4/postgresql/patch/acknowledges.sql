@@ -5,7 +5,7 @@ CREATE TABLE acknowledges_tmp (
 	clock		integer		DEFAULT '0'	NOT NULL,
 	message		varchar(255)		DEFAULT ''	NOT NULL,
 	PRIMARY KEY (acknowledgeid)
-);
+) with OIDS;
 CREATE INDEX acknowledges_1 on acknowledges_tmp (userid);
 CREATE INDEX acknowledges_2 on acknowledges_tmp (eventid);
 CREATE INDEX acknowledges_3 on acknowledges_tmp (clock);

@@ -6,7 +6,7 @@ CREATE TABLE auditlog_tmp (
 	resourcetype	integer		DEFAULT '0'	NOT NULL,
 	details		varchar(128)		DEFAULT '0'	NOT NULL,
 	PRIMARY KEY (auditid)
-);
+) with OIDS;
 CREATE INDEX auditlog_1 on auditlog_tmp (userid,clock);
 CREATE INDEX auditlog_2 on auditlog_tmp (clock);
 

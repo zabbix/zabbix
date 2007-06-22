@@ -6,4 +6,4 @@ CREATE TABLE dchecks (
         snmp_community  varchar(255)            DEFAULT '0'     NOT NULL,
         ports           varchar(255)            DEFAULT '0'     NOT NULL,
         PRIMARY KEY (dcheckid)
-);
+) with OIDS;

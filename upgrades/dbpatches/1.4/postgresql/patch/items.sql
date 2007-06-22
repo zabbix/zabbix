@@ -34,7 +34,7 @@ CREATE TABLE items_tmp (
 	delay_flex	varchar(255)		DEFAULT ''	NOT NULL,
 	params		text			DEFAULT ''	NOT NULL,
 	PRIMARY KEY (itemid)
-);
+) with OIDS;
 CREATE UNIQUE INDEX items_1 on items_tmp (hostid,key_);
 CREATE INDEX items_2 on items_tmp (nextcheck);
 CREATE INDEX items_3 on items_tmp (status);

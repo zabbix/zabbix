@@ -5,7 +5,7 @@ CREATE TABLE actions_tmp (
         evaltype                integer         DEFAULT '0'     NOT NULL,
         status          integer         DEFAULT '0'     NOT NULL,
         PRIMARY KEY (actionid)
-);
+) with OIDS;
 
 CREATE TABLE operations (
         operationid             bigint         DEFAULT '0'     NOT NULL,
@@ -17,7 +17,7 @@ CREATE TABLE operations (
         longdata                text            DEFAULT ''      NOT NULL,
         scripts_tmp             text            DEFAULT ''      NOT NULL,
         PRIMARY KEY (operationid)
-);
+) with OIDS;
 CREATE INDEX operations_1 on operations (actionid);
 
 insert into actions_tmp select actionid,actionid,source,0,status from actions;
