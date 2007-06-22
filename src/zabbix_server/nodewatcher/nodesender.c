@@ -400,7 +400,8 @@ static int process_node(int nodeid)
 
 	send_to_master_and_slave(nodeid);
 
-	result = DBselect("select nodeid from nodes where masterid=%d",
+	result = DBselect("select nodeid from nodes where masterid=%d and nodeid not in (%d)",
+		nodeid,
 		nodeid);
 	while((row=DBfetch(result)))
 	{
