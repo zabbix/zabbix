@@ -276,7 +276,8 @@ include_once "include/page_header.php";
 			$sql .= DBid2nodeid("h.hostid")."=".$nodeid.
 				" and h.hostid in (".$accessible_hosts.")".
 				($monitored_hosts ? " and h.status=".HOST_STATUS_MONITORED : "").
-				($real_hosts ? " and h.status<>".HOST_STATUS_TEMPLATE : "");
+				($real_hosts ? ' and h.status<>'.HOST_STATUS_TEMPLATE : '').
+				' order by host,h.hostid';
 
 			$db_hosts = DBselect($sql);
 			while($host = DBfetch($db_hosts))
