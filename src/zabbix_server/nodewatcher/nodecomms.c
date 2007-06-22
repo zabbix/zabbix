@@ -43,7 +43,7 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int send_to_node(int dest_nodeid, int nodeid, char *data)
+int send_to_node(char *name, int dest_nodeid, int nodeid, char *data)
 {
 	char	ip[MAX_STRING_LEN];
 	int	port;
@@ -55,8 +55,9 @@ int send_to_node(int dest_nodeid, int nodeid, char *data)
 	zbx_sock_t	sock;
 	char		*answer;
 
-	zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Sending data of node %d to node %d datalen %d",
+	zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Sending %s of node %d to node %d datalen %d",
 		CONFIG_NODEID,
+		name,
 		nodeid,
 		dest_nodeid,
 		strlen(data));
