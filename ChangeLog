@@ -1,5 +1,6 @@
 Changes for 1.4.1:
 
+ - added loop protection in selection of slave nodes (Alexei)
  - change delimiter for DM data transfers to 0xFF (Alexei)
  - better reporting of DM data transfers in log file (Alexei)
  - added better error reporting in zbx_malloc() (Alexei)
