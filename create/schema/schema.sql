@@ -441,17 +441,17 @@ FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|delay		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|history	|t_integer	|'90'	|NOT NULL	|ZBX_SYNC
 FIELD		|trends		|t_integer	|'365'	|NOT NULL	|ZBX_SYNC
-FIELD		|nextcheck	|t_time		|'0'	|NOT NULL	|0
-FIELD		|lastvalue	|t_varchar(255)	|	|NULL		|0
-FIELD		|lastclock	|t_time		|	|NULL		|0
-FIELD		|prevvalue	|t_varchar(255)	|	|NULL		|0
+FIELD		|nextcheck	|t_time		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|lastvalue	|t_varchar(255)	|	|NULL		|ZBX_SYNC
+FIELD		|lastclock	|t_time		|	|NULL		|ZBX_SYNC
+FIELD		|prevvalue	|t_varchar(255)	|	|NULL		|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|value_type	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|trapper_hosts	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|units		|t_varchar(10)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|multiplier	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|delta		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|prevorgvalue	|t_varchar(255)	|	|NULL		|0
+FIELD		|prevorgvalue	|t_varchar(255)	|	|NULL		|ZBX_SYNC
 FIELD		|snmpv3_securityname|t_varchar(64)|''	|NOT NULL	|ZBX_SYNC
 FIELD		|snmpv3_securitylevel|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|snmpv3_authpassphrase|t_varchar(64)|''	|NOT NULL	|ZBX_SYNC
