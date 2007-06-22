@@ -64,8 +64,10 @@ static int process_node_history_str(int nodeid, int master_nodeid)
 	data = malloc(allocated);
 	memset(data,0,allocated);
 
-	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "History|%d|%d",
+	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "History%c%d%c%d",
+		ZBX_DM_DELIMITER,
 		CONFIG_NODEID,
+		ZBX_DM_DELIMITER,
 		nodeid);
 
 	zbx_snprintf(sql,sizeof(sql),"select id,itemid,clock,value from history_str_sync where nodeid=%d order by id",
@@ -76,10 +78,13 @@ static int process_node_history_str(int nodeid, int master_nodeid)
 	{
 		ZBX_STR2UINT64(id,row[0])
 		found = 1;
-		zbx_snprintf_alloc(&data, &allocated, &offset, 1024, "\n%d|%s|%s|%s",
-			       ZBX_TABLE_HISTORY_STR,
+		zbx_snprintf_alloc(&data, &allocated, &offset, 1024, "\n%d%c%s%c%s%c%s",
+				ZBX_TABLE_HISTORY_STR,
+				ZBX_DM_DELIMITER,
 				row[1],
+				ZBX_DM_DELIMITER,
 				row[2],
+				ZBX_DM_DELIMITER,
 				row[3]);
 	}
 	if(found == 1)
@@ -145,8 +150,10 @@ static int process_node_history_uint(int nodeid, int master_nodeid)
 	data = malloc(allocated);
 	memset(data,0,allocated);
 
-	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "History|%d|%d",
+	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "History%c%d%c%d",
+		ZBX_DM_DELIMITER,
 		CONFIG_NODEID,
+		ZBX_DM_DELIMITER,
 		nodeid);
 
 	zbx_snprintf(sql,sizeof(sql),"select id,itemid,clock,value from history_uint_sync where nodeid=%d order by id",
@@ -157,10 +164,13 @@ static int process_node_history_uint(int nodeid, int master_nodeid)
 	{
 		ZBX_STR2UINT64(id,row[0])
 		found = 1;
-		zbx_snprintf_alloc(&data, &allocated, &offset, 128, "\n%d|%s|%s|%s",
+		zbx_snprintf_alloc(&data, &allocated, &offset, 128, "\n%d%c%s%c%s%c%s",
 				ZBX_TABLE_HISTORY_UINT,
+				ZBX_DM_DELIMITER,
 				row[1],
+				ZBX_DM_DELIMITER,
 				row[2],
+				ZBX_DM_DELIMITER,
 				row[3]);
 	}
 	if(found == 1)
@@ -230,8 +240,10 @@ static int process_node_history(int nodeid, int master_nodeid)
 	data = malloc(allocated);
 	memset(data,0,allocated);
 
-	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "History|%d|%d",
+	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "History%c%d%c%d",
+		ZBX_DM_DELIMITER,
 		CONFIG_NODEID,
+		ZBX_DM_DELIMITER,
 		nodeid);
 
 	zbx_snprintf(sql,sizeof(sql),"select id,itemid,clock,value from history_sync where nodeid=%d order by id",
@@ -242,10 +254,13 @@ static int process_node_history(int nodeid, int master_nodeid)
 	{
 		ZBX_STR2UINT64(id,row[0])
 		found = 1;
-		zbx_snprintf_alloc(&data, &allocated, &offset, 128, "\n%d|%s|%s|%s",
-			       ZBX_TABLE_HISTORY,
+		zbx_snprintf_alloc(&data, &allocated, &offset, 128, "\n%d%c%s%c%s%c%s",
+				ZBX_TABLE_HISTORY,
+				ZBX_DM_DELIMITER,
 				row[1],
+				ZBX_DM_DELIMITER,
 				row[2],
+				ZBX_DM_DELIMITER,
 				row[3]);
 	}
 	if(found == 1)

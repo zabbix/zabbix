@@ -72,19 +72,19 @@ static int	process_record(int nodeid, char *record)
 
 	memset(&event,0,sizeof(DB_EVENT));
 
-	zbx_get_field(record,tmp,0,'|');
+	zbx_get_field(record,tmp,0,ZBX_DM_DELIMITER);
 	sscanf(tmp,ZBX_FS_UI64,&event.eventid);
-	zbx_get_field(record,tmp,1,'|');
+	zbx_get_field(record,tmp,1,ZBX_DM_DELIMITER);
 	event.source=atoi(tmp);
-	zbx_get_field(record,tmp,2,'|');
+	zbx_get_field(record,tmp,2,ZBX_DM_DELIMITER);
 	event.object=atoi(tmp);
-	zbx_get_field(record,tmp,3,'|');
+	zbx_get_field(record,tmp,3,ZBX_DM_DELIMITER);
 	sscanf(tmp,ZBX_FS_UI64,&event.objectid);
-	zbx_get_field(record,tmp,4,'|');
+	zbx_get_field(record,tmp,4,ZBX_DM_DELIMITER);
 	event.clock=atoi(tmp);
-	zbx_get_field(record,tmp,5,'|');
+	zbx_get_field(record,tmp,5,ZBX_DM_DELIMITER);
 	event.value=atoi(tmp);
-	zbx_get_field(record,tmp,6,'|');
+	zbx_get_field(record,tmp,6,ZBX_DM_DELIMITER);
 	event.acknowledged=atoi(tmp);
 
 	return process_event(&event);
@@ -126,9 +126,9 @@ int	node_events(char *data)
 		if(firstline == 1)
 		{
 /*			zabbix_log( LOG_LEVEL_WARNING, "First line [%s]", s); */
-			zbx_get_field(s,tmp,1,'|');
+			zbx_get_field(s,tmp,1,ZBX_DM_DELIMITER);
 			sender_nodeid=atoi(tmp);
-			zbx_get_field(s,tmp,2,'|');
+			zbx_get_field(s,tmp,2,ZBX_DM_DELIMITER);
 			nodeid=atoi(tmp);
 			firstline=0;
 			zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Received events from node %d for node %d datalen %d",
