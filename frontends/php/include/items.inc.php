@@ -764,15 +764,32 @@
 		return $result;
 	}
 
+	/*
+	 * Function: get_n_param
+	 *
+	 * Description:
+	 *     Return key parameter by index
+	 *
+	 * Author:
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 * Comments: indexes between 1-x
+	 *
+	 */
 	function	get_n_param($key, $num)
 	{
 		$param="";
 
-		$params = preg_split('/[\]\[,]/', $key);
+		$num--;
 
-		if(isset($params[$num]))
+		if( ereg('^'.ZBX_EREG_ITEM_KEY_FORMAT.'$', $key, $arr) )
 		{
-			$param = $params[$num];
+			$params = zbx_get_params($arr[ZBX_KEY_PARAM_ID]);
+
+			if(isset($params[$num]))
+			{
+				$param = $params[$num];
+			}
 		}
 
 		return $param;
