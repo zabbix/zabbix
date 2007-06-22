@@ -4,5 +4,4 @@ CREATE TABLE httptestitem (
 	itemid		bigint DEFAULT '0'	NOT NULL,
 	type		integer		DEFAULT '0'	NOT NULL,
 	PRIMARY KEY (httptestitemid)
-);
-CREATE UNIQUE INDEX httptestitem_httptestitem_1 on httptestitem (httptestid,itemid);
+) with OIDS;

@@ -1,5 +1,6 @@
 Changes for 1.4.1:
 
+ - fixed PostgreSQL upgrade patch (Alexei)
  - added inter-node exchange of item's next/last check/value (Alexei)
  - added loop protection in selection of slave nodes (Alexei)
  - change delimiter for DM data transfers to 0xFF (Alexei)

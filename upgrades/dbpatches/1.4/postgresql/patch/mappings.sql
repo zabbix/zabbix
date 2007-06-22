@@ -4,7 +4,7 @@ CREATE TABLE mappings_tmp (
 	value		varchar(64)		DEFAULT ''	NOT NULL,
 	newvalue	varchar(64)		DEFAULT ''	NOT NULL,
 	PRIMARY KEY (mappingid)
-);
+) with OIDS;
 CREATE INDEX mappings_1 on mappings_tmp (valuemapid);
 
 insert into mappings_tmp select * from mappings;

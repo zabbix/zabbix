@@ -12,7 +12,7 @@ CREATE TABLE sysmaps_elements_tmp (
 	y		integer		DEFAULT '0'	NOT NULL,
 	url		varchar(255)		DEFAULT ''	NOT NULL,
 	PRIMARY KEY (selementid)
-);
+) with OIDS;
 
 insert into sysmaps_elements_tmp select s.selementid,s.sysmapid,s.elementid,s.elementtype,i1.imageid,i2.imageid,i1.imageid,s.label,s.label_location,s.x,s.y,s.url from sysmaps_elements s,images i1,images i2 where s.icon=i1.name and s.icon_on=i2.name;
 drop table sysmaps_elements;

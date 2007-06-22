@@ -9,7 +9,7 @@ CREATE TABLE sysmaps_links_tmp (
 	drawtype_on	integer		DEFAULT '0'	NOT NULL,
 	color_on	varchar(32)		DEFAULT 'Red'	NOT NULL,
 	PRIMARY KEY (linkid)
-);
+) with OIDS;
 
 insert into sysmaps_links_tmp select * from sysmaps_links;
 drop table sysmaps_links;
