@@ -517,9 +517,7 @@ void	zbx_tcp_unaccept(zbx_sock_t *s)
  ******************************************************************************/
 void    zbx_tcp_free(zbx_sock_t *s)
 {
-	if(s->buf_type == ZBX_BUF_TYPE_DYN && s->buf_dyn!=NULL)
-		zbx_free(s->buf_dyn);
-
+	zbx_free(s->buf_dyn);
 }
 
 /******************************************************************************
@@ -549,6 +547,8 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags)
 	zbx_uint64_t	expected_len;
 
 	ZBX_TCP_START();
+
+	zbx_free(s->buf_dyn);
 
 	memset(s->buf_stat, 0, sizeof(s->buf_stat));
 	*data = s->buf_stat;
