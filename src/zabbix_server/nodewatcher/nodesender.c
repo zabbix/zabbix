@@ -165,7 +165,7 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 	}
 	zabbix_log( LOG_LEVEL_DEBUG, "DATA [%s]",
 		xml);
-	if( (found == 1) && send_to_node(dest_nodeid, nodeid, xml) == SUCCEED)
+	if( (found == 1) && send_to_node("configuration changes", dest_nodeid, nodeid, xml) == SUCCEED)
 	{
 		if(node_type == ZBX_NODE_MASTER)
 		{

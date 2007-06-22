@@ -7,6 +7,7 @@ Changes for 1.5:
 
 Changes for 1.4.1:
 
+ - better reporting of DM data transfers in log file (Alexei)
  - added better error reporting in zbx_malloc() (Alexei)
  - fixed transfer of NULL values between nodes (Alexei)
  - minor Oracle related fixes for frontend (Alexe)
