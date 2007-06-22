@@ -149,6 +149,8 @@
 #endif
 #define MAX_BUF_LEN	65000
 
+#define ZBX_DM_DELIMITER	'\255'
+
 /* Item types */
 typedef enum
 {
