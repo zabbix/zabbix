@@ -685,7 +685,7 @@
 			activate_item($db_tmp_item["itemid"]);
 		}
 
-		$result = DBexecute("update items set status=".ITEM_STATUS_ACTIVE.",error='' where itemid=$itemid");
+		$result = DBexecute("update items set status=".ITEM_STATUS_ACTIVE.",error='',nextcheck=0 where itemid=$itemid");
 		return $result;
 	}
 
