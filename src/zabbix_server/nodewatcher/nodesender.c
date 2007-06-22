@@ -136,7 +136,7 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 					if(DBis_null(row2[j]) == SUCCEED)
 					{
 /*						zabbix_log( LOG_LEVEL_WARNING, "Field name [%s] [%s]",tables[i].fields[j].name,row2[j]);*/
-						zbx_snprintf_alloc(&xml, &allocated, &offset, 16*1024, "|%d|%d|NULL",
+						zbx_snprintf_alloc(&xml, &allocated, &offset, 16*1024, "|%s|%d|NULL",
 							tables[i].fields[j].name,
 							tables[i].fields[j].type);
 					}
