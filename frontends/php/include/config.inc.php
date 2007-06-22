@@ -1915,7 +1915,6 @@ else if (document.getElementById)
 	function	get_cookie($name, $default_value=null)
 	{
 		global $_COOKIE;
-
 		if(isset($_COOKIE[$name]))	return $_COOKIE[$name];
 		// else
 		return $default_value;
@@ -1947,10 +1946,7 @@ else if (document.getElementById)
 	 */
 	function	zbx_unsetcookie($name)
 	{
-		global $_COOKIE;
-		
-		setcookie($name, null, -1);
-		$_COOKIE[$name] = null;
+		zbx_setcookie($name, null, -99999);
 	}
 	
 	/* function:

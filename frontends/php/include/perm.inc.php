@@ -49,7 +49,7 @@
 		
 		$sessionid = get_cookie("zbx_sessionid");
 		
-		if(isset($sessionid))
+		if( !is_null($sessionid))
 		{
 			if(!($USER_DETAILS = DBfetch(DBselect("select u.*,s.* from sessions s,users u".
 				" where s.sessionid=".zbx_dbstr($sessionid)." and s.userid=u.userid".
@@ -108,11 +108,8 @@
 
 			if(!isset($_REQUEST['message'])) $_REQUEST['message'] = $message;
 			
-			if($page["file"]!="index.php")
-			{
-				Redirect("index.php?message=".addslashes($_REQUEST['message']));
-				exit;
-			}
+			include('index.php');
+			exit;
 		}
 	}
 
