@@ -84,7 +84,7 @@ static int process_node_history_str(int nodeid, int master_nodeid)
 	}
 	if(found == 1)
 	{
-		if(send_to_node(master_nodeid, nodeid, data) == SUCCEED)
+		if(send_to_node("new history_str", master_nodeid, nodeid, data) == SUCCEED)
 		{
 /*			zabbix_log( LOG_LEVEL_WARNING, "Updating nodes.history_lastid");*/
 			DBexecute("update nodes set history_str_lastid=" ZBX_FS_UI64 " where nodeid=%d",
@@ -165,7 +165,7 @@ static int process_node_history_uint(int nodeid, int master_nodeid)
 	}
 	if(found == 1)
 	{
-		if(send_to_node(master_nodeid, nodeid, data) == SUCCEED)
+		if(send_to_node("new history_uint", master_nodeid, nodeid, data) == SUCCEED)
 		{
 /*			zabbix_log( LOG_LEVEL_WARNING, "Updating nodes.history_lastid"); */
 			DBexecute("update nodes set history_uint_lastid=" ZBX_FS_UI64 " where nodeid=%d",
@@ -252,7 +252,7 @@ static int process_node_history(int nodeid, int master_nodeid)
 	{
 		zabbix_log( LOG_LEVEL_DEBUG, "Sending [%s]",
 			data);
-		if(send_to_node(master_nodeid, nodeid, data) == SUCCEED)
+		if(send_to_node("new history", master_nodeid, nodeid, data) == SUCCEED)
 		{
 /*			zabbix_log( LOG_LEVEL_WARNING, "Updating nodes.history_lastid=" ZBX_FS_UI64, id); */
 			DBexecute("update nodes set history_lastid=" ZBX_FS_UI64 " where nodeid=%d",

@@ -91,7 +91,7 @@ static int process_node(int nodeid, int master_nodeid, zbx_uint64_t event_lastid
 	{
 		zabbix_log( LOG_LEVEL_DEBUG, "Sending [%s]",
 			data);
-		if(send_to_node(master_nodeid, nodeid, data) == SUCCEED)
+		if(send_to_node("new events", master_nodeid, nodeid, data) == SUCCEED)
 		{
 			zabbix_log( LOG_LEVEL_DEBUG, "Updating nodes.event_lastid");
 			DBexecute("update nodes set event_lastid=" ZBX_FS_UI64 " where nodeid=%d",
