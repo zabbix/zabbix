@@ -264,10 +264,7 @@
 	"S_COMPARE"=>						"Vergelijk",
 
 //	Footer
-	"S_ZABBIX_VER"=>					"ZABBIX 1.1",
-	"S_COPYRIGHT_BY"=>					"Auteursrecht 2001-2006 ",
 	"S_CONNECTED_AS"=>					"Verbonden als",
-	"S_SIA_ZABBIX"=>					"SIA Zabbix",
 
 //	graph.php
 	"S_CONFIGURATION_OF_GRAPH"=>		"Configuratie van grafieken",
