@@ -387,6 +387,7 @@
 	/* Character '-' must be last in the list of symbols, otherwise it won't be accepted */
 	define('ZBX_EREG_DNS_FORMAT', '([0-9a-zA-Z\_\.\$[.-.]]+)');
 	define('ZBX_EREG_HOST_FORMAT', ZBX_EREG_INTERNAL_NAMES);
+	define('ZBX_EREG_NODE_FORMAT', ZBX_EREG_INTERNAL_NAMES);
 	define('ZBX_EREG_ITEM_KEY_FORMAT', '('.ZBX_EREG_INTERNAL_NAMES.'(\['.ZBX_EREG_PARAMS.'\]){0,1})');
 	define('ZBX_KEY_ID', 1);
 	define('ZBX_KEY_NAME_ID', 2);

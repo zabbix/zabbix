@@ -50,6 +50,12 @@
 	{
 		global $ZBX_CURNODEID, $ZBX_CURMASTERID;
 
+		if( !eregi('^'.ZBX_EREG_NODE_FORMAT.'$', $name) )
+		{
+			error("Incorrect characters used for Node name");
+			return false;
+		}
+
 		switch($node_type)
 		{
 			case ZBX_NODE_REMOTE:
@@ -97,6 +103,12 @@
 
 	function	update_node($nodeid,$new_nodeid,$name,$timezone,$ip,$port,$slave_history,$slave_trends)
 	{
+		if( !eregi('^'.ZBX_EREG_NODE_FORMAT.'$', $name) )
+		{
+			error("Incorrect characters used for Node name");
+			return false;
+		}
+
 		$result = DBexecute('update nodes set nodeid='.$new_nodeid.',name='.zbx_dbstr($name).','.
 				'timezone='.$timezone.',ip='.zbx_dbstr($ip).',port='.$port.','.
 				'slave_history='.$slave_history.',slave_trends='.$slave_trends.

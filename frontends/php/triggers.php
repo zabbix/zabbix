@@ -403,8 +403,7 @@ include_once "include/page_header.php";
 			if(is_null($row['hostid'])) $row['hostid'] = '0';
 
 
-			$description = array('['.$row["triggerid"].']',
-						 new CCheckBox(
+			$description = array(	new CCheckBox(
 							"g_triggerid[]",        /* name */
 							NULL,                   /* checked */
 							NULL,                   /* action */
