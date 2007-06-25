@@ -26,7 +26,8 @@ automake
 #tar cvzf zabbix.tgz zabbix
 #exit
 echo Configuring...
-export CFLAGS="-Wall -Wuninitialized -O"
+export CFLAGS="-Wall -Wuninitialized -O -DDEBUG"
+#export CFLAGS="-Wall -Wuninitialized -O"
 cd create/schema
 ./gen.pl c >../../include/dbsync.h
 cd -
