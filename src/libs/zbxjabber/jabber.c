@@ -292,10 +292,12 @@ static int on_error (void *user_data, ikspak *pak)
 	return IKS_FILTER_EAT;
 }
 
+#ifdef DEBUG
 static void on_log (jabber_session_p sess, const char *data, size_t size, int is_incoming)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "%s%s [%s]\n", iks_is_secure (sess->prs) ? "Sec" : "", is_incoming ? "RECV" : "SEND", data);
 }
+#endif
 
 /******************************************************************************
  *                                                                            *

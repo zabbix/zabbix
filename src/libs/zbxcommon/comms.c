@@ -158,10 +158,11 @@ void    *zbx_malloc2(char *filename, int line, void *old, size_t size)
 /*	Old pointer must be NULL */
 	if(old != NULL)
 	{
-		zabbix_log(LOG_LEVEL_CRIT,"[file:%s,line:%d] zbx_malloc: allocating already allocated memory. Giving up to prevent a memory leak.",
+		zabbix_log(LOG_LEVEL_CRIT,"[file:%s,line:%d] zbx_malloc: allocating already allocated memory. Please report this to ZABBIX developers.",
 			filename,
 			line);
-		assert(0);
+		/* Exit if defined DEBUG. Ignore otherwise. */
+		zbx_dbg_assert(0);
 	}
 
 /*	zabbix_log(LOG_LEVEL_DEBUG,"In zbx_malloc(size:%d)", size); */
