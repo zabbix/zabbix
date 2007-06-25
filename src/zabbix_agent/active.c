@@ -130,7 +130,7 @@ static void	add_check(char *key, int refresh, long lastlogsize)
 			active_metrics[i].nextcheck = 0;
 		}
 		active_metrics[i].refresh	= refresh;
-		active_metrics[i].lastlogsize	= lastlogsize;
+		/* active_metrics[i].lastlogsize	= lastlogsize; *//* don't update lastlogsize for exsted items */
 		active_metrics[i].status	= ITEM_STATUS_ACTIVE;
 
 		return;
@@ -379,11 +379,11 @@ static int	send_value(
 
 static int	process_active_checks(char *server, unsigned short port)
 {
-	register int	i, count;
+	register int	i, s_count, p_count;
 
 	char	**pvalue;
 
-	int		now, ret = SUCCEED;
+	int		now, send_err = SUCCEED, ret = SUCCEED;
 
 	unsigned long	timestamp;
 	char		*source = NULL;
@@ -402,7 +402,7 @@ static int	process_active_checks(char *server, unsigned short port)
 
 	now = (int)time(NULL);
 
-	for(i=0; NULL != active_metrics[i].key && SUCCEED == ret; i++)
+	for(i=0; NULL != active_metrics[i].key && SUCCEED == send_err; i++)
 	{
 		if(active_metrics[i].nextcheck > now)			continue;
 		if(active_metrics[i].status != ITEM_STATUS_ACTIVE)	continue;
@@ -419,18 +419,21 @@ static int	process_active_checks(char *server, unsigned short port)
 
 				filename = params;
 
-				if( (pattern = strchr(params, ',')) )
+				if( (pattern = strchr(params, ',')) ) /* TODO: rewrite for get_param */
 				{
 					*pattern = '\0';
 					pattern++;
 				}
 
-				count = 0;
-				while( 0 == process_log(filename, &active_metrics[i].lastlogsize, &value) )
+				s_count = 0;
+				p_count = 0;
+				while( SUCCEED == (ret = process_log(filename, &active_metrics[i].lastlogsize, &value)) )
 				{
-					if(!pattern || zbx_regexp_match(value, pattern, NULL) != NULL)
+					if( !value ) /* EOF */	break;
+
+					if( !pattern || NULL != zbx_regexp_match(value, pattern, NULL) )
 					{
-						ret = send_value(
+						send_err = send_value(
 									server,
 									port,
 									CONFIG_HOSTNAME,
@@ -442,23 +445,38 @@ static int	process_active_checks(char *server, unsigned short port)
 									NULL
 								);
 
-						if( strstr(value,"ZBX_NOTSUPPORTED") )
-						{
-							active_metrics[i].status = ITEM_STATUS_NOTSUPPORTED;
-							zabbix_log( LOG_LEVEL_WARNING, "Active check [%s] is not supported. Disabled.",
-								active_metrics[i].key);
-
-							zbx_free(value);
-							break;
-						}
-
+						s_count++;
 					}
+					p_count++;
+
 					zbx_free(value);
 
-					count++;
 					/* Do not flood ZABBIX server if file grows too fast */
-					if(count >= (MAX_LINES_PER_SECOND * active_metrics[i].refresh))	break;
+					if(s_count >= (MAX_LINES_PER_SECOND * active_metrics[i].refresh))	break;
+
+					/* Do not flood local system if file grows too fast */
+					if(p_count >= (4 * MAX_LINES_PER_SECOND * active_metrics[i].refresh))	break;
 				}
+
+				if( FAIL == ret )
+				{
+					active_metrics[i].status = ITEM_STATUS_NOTSUPPORTED;
+					zabbix_log( LOG_LEVEL_WARNING, "Active check [%s] is not supported. Disabled.",
+						active_metrics[i].key);
+
+					send_err = send_value(
+								server,
+								port,
+								CONFIG_HOSTNAME,
+								active_metrics[i].key,
+								"ZBX_NOTSUPPORTED",
+								&active_metrics[i].lastlogsize,
+								NULL,
+								NULL,
+								NULL
+							);
+				}
+
 			}while(0); /* simple try realization */
 		}
 		/* Special processing for eventlog */
@@ -479,12 +497,13 @@ static int	process_active_checks(char *server, unsigned short port)
 					pattern++;
 				}
 
-				count = 0;
-				while( 0 == process_eventlog(filename,&active_metrics[i].lastlogsize, &timestamp, &source, &severity, &value) )
+				s_count = 0;
+				p_count = 0;
+				while( SUCCEED == (ret = process_eventlog(filename,&active_metrics[i].lastlogsize, &timestamp, &source, &severity, &value)) )
 				{
-					if(!pattern || NULL != zbx_regexp_match(value, pattern, NULL) )
+					if( !pattern || NULL != zbx_regexp_match(value, pattern, NULL) )
 					{
-						ret = send_value(
+						send_err = send_value(
 									server,
 									port,
 									CONFIG_HOSTNAME,
@@ -496,23 +515,37 @@ static int	process_active_checks(char *server, unsigned short port)
 									&severity
 								);
 
-						zbx_free(source);
-
-						if( strstr(value,"ZBX_NOTSUPPORTED") )
-						{
-							active_metrics[i].status = ITEM_STATUS_NOTSUPPORTED;
-							zabbix_log( LOG_LEVEL_WARNING, "Active check [%s] is not supported. Disabled.",
-								active_metrics[i].key);
-
-							zbx_free(value);
-							break;
-						}
+						s_count++;
 					}
+					p_count++;
+
+					zbx_free(source);
 					zbx_free(value);
 
-					count++;
 					/* Do not flood ZABBIX server if file grows too fast */
-					if(count >= (MAX_LINES_PER_SECOND * active_metrics[i].refresh))	break;
+					if(s_count >= (MAX_LINES_PER_SECOND * active_metrics[i].refresh))	break;
+
+					/* Do not flood local system if file grows too fast */
+					if(p_count >= (4 * MAX_LINES_PER_SECOND * active_metrics[i].refresh))	break;
+				}
+
+				if( FAIL == ret )
+				{
+					active_metrics[i].status = ITEM_STATUS_NOTSUPPORTED;
+					zabbix_log( LOG_LEVEL_WARNING, "Active check [%s] is not supported. Disabled.",
+						active_metrics[i].key);
+
+					send_err = send_value(
+								server,
+								port,
+								CONFIG_HOSTNAME,
+								active_metrics[i].key,
+								"ZBX_NOTSUPPORTED",
+								&active_metrics[i].lastlogsize,
+								NULL,
+								NULL,
+								NULL
+							);
 				}
 			}while(0); /* simple try realization NOTE: never loop */
 		}
@@ -528,7 +561,7 @@ static int	process_active_checks(char *server, unsigned short port)
 			{
 				zabbix_log( LOG_LEVEL_DEBUG, "For key [%s] received value [%s]", active_metrics[i].key, *pvalue);
 
-				ret = send_value(
+				send_err = send_value(
 						server,
 						port,
 						CONFIG_HOSTNAME,
@@ -540,7 +573,7 @@ static int	process_active_checks(char *server, unsigned short port)
 						NULL
 					);
 				
-				if( strstr(*pvalue,"ZBX_NOTSUPPORTED") )
+				if( 0 == strcmp(*pvalue,"ZBX_NOTSUPPORTED") )
 				{
 					active_metrics[i].status = ITEM_STATUS_NOTSUPPORTED;
 					zabbix_log( LOG_LEVEL_WARNING, "Active check [%s] is not supported. Disabled.", active_metrics[i].key);
