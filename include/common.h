@@ -20,9 +20,15 @@
 #ifndef ZABBIX_COMMON_H
 #define ZABBIX_COMMON_H
 
+#include "sysinc.h"
+
+#include "zbxtypes.h"
+
 #ifdef DEBUG
-#	define SDI(msg)		fprintf(stderr, "%6li:DEBUG INFO: %s\n", zbx_get_thread_id(), msg); fflush(stderr);
-#	define SDI2(msg,p1)	fprintf(stderr, "%6li:DEBUG INFO: " msg "\n", zbx_get_thread_id(), p1); fflush(stderr);
+#	include "threads.h"
+
+#	define SDI(msg)		fprintf(stderr, "%6li:DEBUG INFO: %s\n", zbx_get_thread_id(), msg); fflush(stderr)
+#	define SDI2(msg,p1)	fprintf(stderr, "%6li:DEBUG INFO: " msg "\n", zbx_get_thread_id(), p1); fflush(stderr)
 #	define zbx_dbg_assert(exp)	assert(exp)
 #else
 #	define SDI(msg)			((void)(0))
@@ -73,10 +79,6 @@
 #	define INIT_CHECK_MEMORY() ((void)0)
 #	define CHECK_MEMORY(fncname, msg) ((void)0)
 #endif
-
-#include "sysinc.h"
-
-#include "zbxtypes.h"
 
 #ifndef va_copy
 #	if defined(__va_copy)
