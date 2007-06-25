@@ -20,8 +20,15 @@
 #ifndef ZABBIX_COMMON_H
 #define ZABBIX_COMMON_H
 
-#define SDI(msg)	fprintf(stderr, "%6li:DEBUG INFO: %s\n", zbx_get_thread_id(), msg); fflush(stderr);
-#define SDI2(msg,p1)	fprintf(stderr, "%6li:DEBUG INFO: " msg "\n", zbx_get_thread_id(), p1); fflush(stderr);
+#ifdef DEBUG
+#	define SDI(msg)		fprintf(stderr, "%6li:DEBUG INFO: %s\n", zbx_get_thread_id(), msg); fflush(stderr);
+#	define SDI2(msg,p1)	fprintf(stderr, "%6li:DEBUG INFO: " msg "\n", zbx_get_thread_id(), p1); fflush(stderr);
+#	define zbx_dbg_assert(exp)	assert(exp)
+#else
+#	define SDI(msg)			((void)(0))
+#	define SDI2(msg,p1)		((void)(0))
+#	define zbx_dbg_assert(exp)	((void)(0))
+#endif
 
 #if defined(ENABLE_CHECK_MEMOTY)
 #	include "crtdbg.h"
