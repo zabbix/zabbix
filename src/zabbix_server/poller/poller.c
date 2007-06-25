@@ -252,9 +252,15 @@ int get_values(void)
 	AGENT_RESULT	agent;
 	int	stop=0;
 
+	char		*unreachable_hosts = NULL;
+	char		tmp[MAX_STRING_LEN];
+
 	zabbix_log( LOG_LEVEL_DEBUG, "In get_values()");
 
 	now = time(NULL);
+
+	zbx_snprintf(tmp,sizeof(tmp)-1,ZBX_FS_UI64,0);
+	unreachable_hosts=zbx_strdcat(unreachable_hosts,tmp);
 
 	/* Poller for unreachable hosts */
 	if(poller_type == ZBX_POLLER_TYPE_UNREACHABLE)
@@ -325,6 +331,13 @@ int get_values(void)
 		else
 		{
 			DBget_item_from_db(&item,row);
+			/* Skip unreachable hosts but do not break the loop. */
+			if(uint64_in_list(unreachable_hosts,item.hostid) == SUCCEED)
+			{
+				zabbix_log( LOG_LEVEL_DEBUG, "Host " ZBX_FS_UI64 " is unreachable. Skipping [%s]",
+					item.hostid,item.key);
+				continue;
+			}
 		}
 
 		init_result(&agent);
@@ -454,7 +467,10 @@ int get_values(void)
 				}
 			}
 
-			stop=1;
+			zbx_snprintf(tmp,sizeof(tmp)-1,"," ZBX_FS_UI64,item.hostid);
+			unreachable_hosts=zbx_strdcat(unreachable_hosts,tmp);
+
+/*			stop=1;*/
 		}
 		else
 		{
@@ -470,6 +486,8 @@ int get_values(void)
 		free_result(&agent);
 		DBcommit();
 	}
+
+	zbx_free(unreachable_hosts);
 
 	DBfree_result(result);
 	zabbix_log( LOG_LEVEL_DEBUG, "End get_values()");

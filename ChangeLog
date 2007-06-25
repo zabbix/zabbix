@@ -1,5 +1,7 @@
 Changes for 1.4.1:
 
+ - improved main poller loop (Alexei) 
+ - fixed int_in_list() function (Alexei)
  - fixed and improved log monitoring (Eugene)
  - fixed type of items.valuemapid (Alexei)
  - improved Standalone_Template (Alexei)
