@@ -1,5 +1,7 @@
 Changes for 1.4.1:
 
+ - fixed type of items.valuemapid (Alexei)
+ - improved Standalone_Template (Alexei)
  - fixed PostgreSQL upgrade patch (Alexei)
  - added loop protection in selection of slave nodes (Alexei)
  - change delimiter for DM data transfers to 0xFF (Alexei)
