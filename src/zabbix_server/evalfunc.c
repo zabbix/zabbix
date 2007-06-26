@@ -165,14 +165,14 @@ static int evaluate_COUNT(char *value, DB_ITEM *item, char *parameter)
 	int		now;
 	int		res = SUCCEED;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_COUNT(param:%s)",
-		parameter);
-
 	char		*table = NULL;
 	char		table_ui64[] = "history_uint";
 	char		table_float[] = "history";
 	char		table_log[] = "history_log";
 	char		table_str[] = "history_str";
+
+	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_COUNT(param:%s)",
+		parameter);
 
 
 	switch(item->value_type)
