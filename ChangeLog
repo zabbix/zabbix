@@ -1,5 +1,6 @@
 Changes for 1.4.1:
 
+ - removed duplicate index of table httptest (Alexei)
  - fixes for Oracle and SQLite schemas (Alexei)
  - improved main poller loop (Alexei) 
  - fixed int_in_list() function (Alexei)
