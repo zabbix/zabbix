@@ -88,7 +88,7 @@ FIELD		|delay		|t_integer	|'60'	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|macros		|t_blob		|''	|NOT NULL	|ZBX_SYNC
 FIELD		|agent		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|time		|t_double(16,4)	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|time		|t_double	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|error		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 INDEX		|httptest_1	|httptestid
 
@@ -169,7 +169,7 @@ FIELD		|id		|t_serial		|		|		|ZBX_SYNC
 FIELD		|nodeid		|t_id		|'0'		|NOT NULL	|ZBX_SYNC
 FIELD		|itemid		|t_id		|'0'		|NOT NULL	|ZBX_SYNC
 FIELD		|clock		|t_time		|'0'		|NOT NULL	|ZBX_SYNC
-FIELD		|value		|t_double(16,4)	|'0.0000'	|NOT NULL	|ZBX_SYNC
+FIELD		|value		|t_double	|'0.0000'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|nodeid,id
 
 TABLE|history_uint_sync|id|
@@ -226,7 +226,7 @@ INDEX		|2		|clock
 TABLE|history||0
 FIELD		|itemid		|t_id		|'0'		|NOT NULL	|ZBX_SYNC
 FIELD		|clock		|t_time		|'0'		|NOT NULL	|ZBX_SYNC
-FIELD		|value		|t_double(16,4)	|'0.0000'	|NOT NULL	|ZBX_SYNC
+FIELD		|value		|t_double	|'0.0000'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|itemid,clock
 
 TABLE|history_uint||0
@@ -262,9 +262,9 @@ TABLE|trends|itemid,clock|0
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|num		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|value_min	|t_double(16,4)	|'0.0000'|NOT NULL	|ZBX_SYNC
-FIELD		|value_avg	|t_double(16,4)	|'0.0000'|NOT NULL	|ZBX_SYNC
-FIELD		|value_max	|t_double(16,4)	|'0.0000'|NOT NULL	|ZBX_SYNC
+FIELD		|value_min	|t_double	|'0.0000'|NOT NULL	|ZBX_SYNC
+FIELD		|value_avg	|t_double	|'0.0000'|NOT NULL	|ZBX_SYNC
+FIELD		|value_max	|t_double	|'0.0000'|NOT NULL	|ZBX_SYNC
 
 -- Other tables
 
@@ -345,8 +345,8 @@ FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|width		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|height		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|yaxistype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|yaxismin	|t_double(16,4)	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|yaxismax	|t_double(16,4)	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|yaxismin	|t_double	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|yaxismax	|t_double	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|templateid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|show_work_period|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|show_triggers	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
@@ -552,7 +552,7 @@ FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|algorithm	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|triggerid	|t_id		|	|		|ZBX_SYNC
 FIELD		|showsla	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|goodsla	|t_double(5,2)	|'99.9'	|NOT NULL	|ZBX_SYNC
+FIELD		|goodsla	|t_percentage	|'99.9'	|NOT NULL	|ZBX_SYNC
 FIELD		|sortorder	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 
 TABLE|service_alarms|servicealarmid|0
