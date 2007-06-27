@@ -863,7 +863,7 @@
 	'S_MENU_HOSTS'=>			'HOSTS',
 	'S_MENU_ITEMS'=>			'ITEMS',
 	'S_MENU_AUDIT'=>			'AUDIT',
-	'S_SWITCH'=>				'Switch',
+	'S_SWITCH_NODE'=>			'Switch node',
 
 //	overview.php
 	'S_SELECT_GROUP_DOT_DOT_DOT'=>		'Select group ...',

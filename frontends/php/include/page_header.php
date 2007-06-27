@@ -398,10 +398,10 @@ COpt::compare_files_with_menu($ZBX_MENU);
 			if($lst_nodes->ItemsCount())
 			{
 				$node_form = new CForm();
-				$node_form->AddItem(S_CURRENT_NODE.' ['.$ZBX_CURNODEID.'] ');
+/*				$node_form->AddItem(S_CURRENT_NODE.' ['.$ZBX_CURNODEID.'] ');*/
 				$node_form->AddItem($lst_nodes);
 				unset($lst_nodes);
-				$node_form->AddItem(new CButton('submit',S_SWITCH));
+				$node_form->AddItem(new CButton('submit',S_SWITCH_NODE));
 			}
 		}
 		

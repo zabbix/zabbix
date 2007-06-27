@@ -1,5 +1,6 @@
 Changes for 1.4.1:
 
+ - removed text "Current node [N]" from node selector (Alexei)
  - new release of the Manual (Alexei)
  - removed duplicate index of table httptest (Alexei)
  - fixes for Oracle and SQLite schemas (Alexei)
