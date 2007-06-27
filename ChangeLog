@@ -7,6 +7,7 @@ Changes for 1.5:
 
 Changes for 1.4.1:
 
+ - changed properties of text files in SVN repository (Alexei)
  - removed duplicate index of table httptest (Alexei)
  - fixes for Oracle and SQLite schemas (Alexei)
  - improved main poller loop (Alexei) 
