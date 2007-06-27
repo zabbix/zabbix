@@ -825,7 +825,7 @@
 	'S_MENU_HOSTS'=>			'EQUIPOS',
 	'S_MENU_ITEMS'=>				'ELEMENTO',
 	'S_MENU_AUDIT'=>			'AUDITORÍA',
-	'S_SWITCH'=>				'Switch',
+	'S_SWITCH_NODE'=>			'Switch node',
 
 //	overview.php
 	'S_SELECT_GROUP_DOT_DOT_DOT'=>		'Seleccionar grupo ...',
