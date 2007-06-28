@@ -255,6 +255,7 @@ int get_values(void)
 	DB_ROW	row2;
 
 	int		now;
+	int		delay;
 	int		res;
 	DB_ITEM		item;
 	AGENT_RESULT	agent;
@@ -444,6 +445,15 @@ int get_values(void)
 					now,
 					now+CONFIG_UNREACHABLE_DELAY,
 					item.hostid);
+
+				delay = MIN(4*item.delay, 300);
+				zabbix_log( LOG_LEVEL_WARNING, "Parameter [%s] will be checked after %d seconds on host [%s]",
+					item.key,
+					delay,
+					item.host_name);
+				DBexecute("update items set nextcheck=%d where itemid=" ZBX_FS_UI64,
+					now + delay,
+					item.itemid);
 			}
 			else
 			{
