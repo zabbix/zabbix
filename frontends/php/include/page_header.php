@@ -358,9 +358,11 @@ COpt::profiling_start("page");
 	{
 COpt::compare_files_with_menu($ZBX_MENU);
 
-		$help = new CLink(S_HELP, "http://www.zabbix.com/manual/v1.1/index.php", "small_font");
+		$help = new CLink(S_HELP, "http://www.zabbix.com/manual/v1.4", "small_font");
 		$help->SetTarget('_blank');
-		$page_header_r_col = array($help,
+		$support = new CLink(S_GET_SUPPORT, "http://www.zabbix.com/support.php", "small_font");
+		$support->SetTarget('_blank');
+		$page_header_r_col = array($help, array("|",$support),
 			($USER_DETAILS["alias"] != "guest") ?
 				array("|", new CLink(S_PROFILE, "profile.php", "small_font")) :
 				null
@@ -369,7 +371,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$logo->SetTarget('_blank');
 
 		$top_page_row	= array(new CCol($logo, "page_header_l"), new CCol($page_header_r_col, "page_header_r"));
-		unset($logo, $page_header_r_col, $help);
+		unset($logo, $page_header_r_col, $help, $support);
 
 		$table = new CTable(NULL,"page_header");
 		$table->SetCellSpacing(0);

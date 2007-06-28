@@ -1292,6 +1292,7 @@
 
 	'S_HELP'=>				'Help',
 	'S_PROFILE'=>				'Profile',
+	'S_GET_SUPPORT'=>			'Get support',
 	'S_MONITORING'=>			'Monitoring',
 	'S_INVENTORY'=>				'Inventory',
 	'S_QUEUE'=>				'Queue',
