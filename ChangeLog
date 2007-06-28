@@ -1,5 +1,6 @@
 Changes for 1.4.1:
 
+ - check timeouted item only after 4*delay seconds (Alexei)
  - fixed several issues in housekeeper (Alexei) 
  - changed properties of text files in SVN repository (Alexei)
  - removed text "Current node [N]" from node selector (Alexei)
