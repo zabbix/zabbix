@@ -311,7 +311,6 @@ lbl_exit:
 int	EXECUTE_INT(const char *cmd, const char *command, unsigned flags, AGENT_RESULT *result)
 {
 	int	ret	= SYSINFO_RET_FAIL;
-	double	value	= 0;
 
 	ret = EXECUTE_STR(cmd,command,flags,result);
 

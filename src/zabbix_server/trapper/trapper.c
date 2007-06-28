@@ -176,10 +176,11 @@ void	process_trapper_child(zbx_sock_t *sock)
 {
 	char	*data;
 
-	struct timeval tv;
+/* suseconds_t is not defined under HP-UX */
+/*	struct timeval tv;
 	suseconds_t    msec;
 	gettimeofday(&tv, NULL);
-	msec = tv.tv_usec;
+	msec = tv.tv_usec;*/
 
 /*	alarm(CONFIG_TIMEOUT);*/
 
@@ -192,9 +193,9 @@ void	process_trapper_child(zbx_sock_t *sock)
 	process_trap(sock, data, sizeof(data));
 /*	alarm(0);*/
 
-	gettimeofday(&tv, NULL);
+/*	gettimeofday(&tv, NULL);
 	zabbix_log( LOG_LEVEL_DEBUG, "Trap processed in " ZBX_FS_DBL " seconds",
-		(double)(tv.tv_usec-msec)/1000000 );
+		(double)(tv.tv_usec-msec)/1000000 );*/
 }
 
 void	child_trapper_main(int i, zbx_sock_t *s)
