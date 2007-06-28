@@ -40,6 +40,8 @@
 
 	#define zbx_sleep(sec) Sleep(((DWORD)(sec))*((DWORD)1000))
 
+	#define zbx_thread_kill(h) TerminateThread(h, SUCCEED);
+
 #else /* not _WINDOWS */
 	
 	int	zbx_fork();
@@ -59,6 +61,8 @@
 		return ((unsigned)(status))
 
 	#define zbx_sleep(sec) sleep((sec))
+
+	#define zbx_thread_kill(h) kill(h,SIGTERM);
 
 #endif /* _WINDOWS */
 

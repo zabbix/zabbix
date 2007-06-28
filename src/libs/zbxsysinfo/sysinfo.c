@@ -107,7 +107,6 @@ void	add_user_parameter(char *key,char *command)
 			commands[i].function = &EXECUTE_STR;
 			commands[i].main_param = strdup(command);
 			commands[i].test_param = 0;
-
 			commands = zbx_realloc(commands,(i+2)*sizeof(ZBX_METRIC));
 			commands[i+1].key=NULL;
 

@@ -275,15 +275,16 @@ int MAIN_ZABBIX_ENTRY(void)
 	/* wait for all threads exiting */
 	for(i = 0; i < CONFIG_ZABBIX_FORKS; i++)
 	{
-		zbx_thread_wait(threads[i]);
+		if(threads && threads[i])
+		{
+			zbx_thread_wait(threads[i]);
 
-		zabbix_log( LOG_LEVEL_DEBUG, "%li: thread is terminated", threads[i]);
-		ZBX_DO_EXIT();
+			if(threads)
+				zabbix_log( LOG_LEVEL_DEBUG, "thread [%i] is terminated", i);
+
+			ZBX_DO_EXIT();
+		}
 	}
-
-	free_collector_data();
-
-	zbx_free(threads);
 
 	zbx_on_exit();
 
@@ -293,22 +294,22 @@ int MAIN_ZABBIX_ENTRY(void)
 void	zbx_on_exit()
 {
 
-#if !defined(_WINDOWS)
-	
 	int i = 0;
+
+	ZBX_DO_EXIT();
 
 	if(threads != NULL)
 	{
 		for(i = 0; i<CONFIG_ZABBIX_FORKS ; i++)
 		{
 			if(threads[i]) {
-				kill(threads[i],SIGTERM);
+				zbx_thread_kill(threads[i]);
 				threads[i] = (ZBX_THREAD_HANDLE)NULL;
 			}
 		}
 	}
 	
-#endif /* not _WINDOWS */
+	zbx_free(threads);
 	
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called.");
 
@@ -319,14 +320,14 @@ void	zbx_on_exit()
 #endif /* USE_PID_FILE */
 
 	free_metrics();
-
 	free_collector_data();
 	alias_list_free();
 	perfs_list_free();
 
 	zbx_sleep(2); /* wait for all threads closing */
-	
+
 	zabbix_log(LOG_LEVEL_INFORMATION, "ZABBIX Agent stopped");
+
 	zabbix_close_log();
 
 	exit(SUCCEED);

@@ -219,10 +219,12 @@ int main(int argc, char **argv)
 
 	if(ret == SUCCEED)
 	{
-#if !defined(_WINDOWS)
+
 		signal( SIGINT,  signal_handler );
-		signal( SIGQUIT, signal_handler );
 		signal( SIGTERM, signal_handler );
+
+#if !defined(_WINDOWS)
+		signal( SIGQUIT, signal_handler );
 		signal( SIGALRM, signal_handler );
 
 		alarm(SENDER_TIMEOUT);

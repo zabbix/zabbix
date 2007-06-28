@@ -38,20 +38,20 @@ int ZabbixRemoveService(void);
 int ZabbixStartService(void);
 int ZabbixStopService(void);
 
-#define init_main_process()
+void	init_main_process(void);
 
 /* APPLICATION running status                    */
 /* requred for closing application from service  */
-extern int application_is_runned;
+int application_status;
 
-#define ZBX_APP_STOPPED 1
+#define ZBX_APP_STOPPED 0
 #define ZBX_APP_RUNNED 1
 
 /* ask for running application of closing status */
-#define ZBX_IS_RUNNING (ZBX_APP_RUNNED == application_is_runned)
+#define ZBX_IS_RUNNING (ZBX_APP_RUNNED == application_status)
 
 /* ask for application closing status            */
-#define ZBX_DO_EXIT() (application_is_runned = ZBX_APP_STOPPED)
+#define ZBX_DO_EXIT() zbx_error("[%s] [%li]", __FILE__, __LINE__); application_status = ZBX_APP_STOPPED
 
 #define START_MAIN_ZABBIX_ENTRY(a)	service_start()
 
