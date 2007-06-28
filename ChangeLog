@@ -7,6 +7,7 @@ Changes for 1.5:
 
 Changes for 1.4.1:
 
+ - fixed location of the manual and added link to support (Alexei)
  - check timeouted item only after 4*delay seconds (Alexei)
  - improved UserParameters for Win32 (Eugene)
  - fixed several issues in housekeeper (Alexei) 
