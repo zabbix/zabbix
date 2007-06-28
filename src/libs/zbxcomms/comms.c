@@ -112,14 +112,18 @@ struct hostent	*zbx_gethost(const char *hostname)
 
 	assert(hostname);
 
+zabbix_log( LOG_LEVEL_DEBUG, "gethostbyname"); /* TMP !!! */
 	host = gethostbyname(hostname);
 	if(host)	return host;
 
 	addr = inet_addr(hostname);
 
+zabbix_log( LOG_LEVEL_DEBUG, "gethostbyaddr"); /* TMP !!! */
 	host = gethostbyaddr((char *)&addr, 4, AF_INET);
 
 	if(host)        return host;
+
+zabbix_log( LOG_LEVEL_DEBUG, "FAIL"); /* TMP !!! */
 
 	ZBX_TCP_ERR_START "gethost() failed for address '%s' [%s]", hostname, strerror_from_system(zbx_sock_last_error()) ZBX_TCP_ERR_END;
 
@@ -313,6 +317,7 @@ int     zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags)
 		/* Write header */
 		if( ZBX_TCP_ERROR == ZBX_TCP_WRITE(s->socket, ZBX_TCP_HEADER, ZBX_TCP_HEADER_LEN))
 		{
+			ZBX_TCP_ERR_START "ZBX_TCP_WRITE() failed [%s]", strerror_from_system(zbx_sock_last_error()) ZBX_TCP_ERR_END;
 			return	FAIL;
 		}
 
@@ -321,6 +326,7 @@ int     zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags)
 		/* Write data length */
 		if( ZBX_TCP_ERROR == ZBX_TCP_WRITE(s->socket, (char *) &len64, sizeof(len64)) )
 		{
+			ZBX_TCP_ERR_START "ZBX_TCP_WRITE() failed [%s]", strerror_from_system(zbx_sock_last_error()) ZBX_TCP_ERR_END;
 			return	FAIL;
 		}
 	}
@@ -329,6 +335,7 @@ int     zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags)
 	{
 		if( ZBX_TCP_ERROR == (i = ZBX_TCP_WRITE(s->socket, data+written,strlen(data)-written)) )
 		{
+			ZBX_TCP_ERR_START "ZBX_TCP_WRITE() failed [%s]", strerror_from_system(zbx_sock_last_error()) ZBX_TCP_ERR_END;
 			return	FAIL;
 		}
 		written += i;
@@ -546,6 +553,8 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags)
 	int	allocated, offset;
 	zbx_uint64_t	expected_len;
 
+zabbix_log(LOG_LEVEL_DEBUG, "zbx_tcp_recv_ext"); /* TMP !!! */
+
 	ZBX_TCP_START();
 
 	zbx_free(s->buf_dyn);
@@ -556,12 +565,18 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags)
 	read_bytes = 0;
 	s->buf_type = ZBX_BUF_TYPE_STAT;
 
+zabbix_log(LOG_LEVEL_DEBUG, "ZBX_TCP_READ"); /* TMP !!! */
+
 	left = ZBX_TCP_HEADER_LEN;
 	nbytes = ZBX_TCP_READ(s->socket, s->buf_stat, left);
 
+zabbix_log(LOG_LEVEL_DEBUG, "cmp"); /* TMP !!! */
 	if( ZBX_TCP_HEADER_LEN == nbytes && 0 == strncmp(s->buf_stat, ZBX_TCP_HEADER, ZBX_TCP_HEADER_LEN) )
 	{
+zabbix_log(LOG_LEVEL_DEBUG, "new protocol"); /* TMP !!! */
+
 		left = sizeof(zbx_uint64_t);
+zabbix_log(LOG_LEVEL_DEBUG, "ZBX_TCP_READ - len"); /* TMP !!! */
 		nbytes = ZBX_TCP_READ(s->socket, (void *)&expected_len, left);
 
 		/* The rest was already cleared */
@@ -571,6 +586,7 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags)
 	}
 	else if( ZBX_TCP_ERROR != nbytes )
 	{
+zabbix_log(LOG_LEVEL_DEBUG, "raw protocol"); /* TMP !!! */
 		read_bytes		= nbytes;
 		expected_len	= 16*1024*1024;		
 	}
@@ -583,13 +599,16 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags)
 			if(nbytes < left)	return	SUCCEED;
 		}
 
-
 		left = sizeof(s->buf_stat) - read_bytes - 1;
+
+zabbix_log(LOG_LEVEL_DEBUG, "ZBX_TCP_READ - static"); /* TMP !!! */
 
 		/* fill static buffer */
 		while(	read_bytes < expected_len && left > 0
 			&& ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ( s->socket, s->buf_stat + read_bytes, left)))
 		{
+zabbix_log(LOG_LEVEL_DEBUG, "ZBX_TCP_READ - [%i]", nbytes); /* TMP !!! */
+
 			read_bytes += nbytes;
 
 			if( flags & ZBX_TCP_READ_UNTIL_CLOSE ) {
@@ -612,6 +631,8 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags)
 			memset(s->buf_dyn,0,allocated);
 			memcpy(s->buf_dyn, s->buf_stat, sizeof(s->buf_stat));
 
+zabbix_log(LOG_LEVEL_DEBUG, "ZBX_TCP_READ - dynamic"); /* TMP !!! */
+
 			offset = read_bytes;
 			/* fill dynamic buffer */
 			while( read_bytes < expected_len && ZBX_TCP_ERROR != (nbytes = ZBX_TCP_READ(s->socket, s->buf_stat, sizeof(s->buf_stat)-1)) )
@@ -630,6 +651,7 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags)
 			*data = s->buf_dyn;
 		}
 	}
+zabbix_log(LOG_LEVEL_DEBUG, "zbx_tcp_recv_ext - end"); /* TMP !!! */
 
 	if( ZBX_TCP_ERROR == nbytes )
 	{
@@ -683,7 +705,7 @@ int	zbx_tcp_check_security(
 	{
 		return SUCCEED;
 	}
-
+zabbix_log( LOG_LEVEL_DEBUG, "getpeername"); /* TMP !!! */
 	nlen = sizeof(ZBX_SOCKADDR);
 	if( ZBX_TCP_ERROR == getpeername(s->socket,  (struct sockaddr*)&name, &nlen))
 	{
@@ -700,13 +722,14 @@ int	zbx_tcp_check_security(
 
 		while( NULL != host )
 		{
+zabbix_log( LOG_LEVEL_DEBUG, "zbx_gethost"); /* TMP !!! */
 			/* Allow IP addresses or DNS names for authorization */
 			if( 0 != (hp = zbx_gethost(host)))
 			{
 				sip = inet_ntoa(*((struct in_addr *)hp->h_addr));
 				if( 0 == strcmp(sname, sip))
 				{
-					ZBX_TCP_ERR_START "Connection from [%s] accepted. Allowed servers [%s] ",sname, ip_list ZBX_TCP_ERR_END;
+zabbix_log( LOG_LEVEL_DEBUG, "zbx_tcp_check_security - OK"); /* TMP !!! */
 					return	SUCCEED;
 				}
 			}

@@ -213,6 +213,7 @@ void	perfs_list_free(void)
 		zbx_free(curr->rawValueArray);
 		zbx_free(curr);
 	}
+	statPerfCounterList = NULL;
 }
 
 
