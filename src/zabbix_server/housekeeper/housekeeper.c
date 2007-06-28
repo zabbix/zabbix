@@ -57,7 +57,7 @@ static int housekeeping_process_log()
 
 	while((row=DBfetch(result)))
 	{
-		housekeeper.housekeeperid=atoi(row[0]);
+		ZBX_STR2UINT64(housekeeper.housekeeperid,row[0]);
 		housekeeper.tablename=row[1];
 		housekeeper.field=row[2];
 		ZBX_STR2UINT64(housekeeper.value,row[3]);
@@ -81,7 +81,7 @@ static int housekeeping_process_log()
 #endif
 		if(deleted == 0)
 		{
-			DBexecute("delete from housekeeper where housekeeperid=%d",
+			DBexecute("delete from housekeeper where housekeeperid=" ZBX_FS_UI64,
 				housekeeper.housekeeperid);
 		}
 		else
@@ -208,7 +208,7 @@ static int housekeeping_events(int now)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int delete_history(char *table, int itemid, int keep_history, int now)
+static int delete_history(char *table, zbx_uint64_t itemid, int keep_history, int now)
 {
 	char            sql[MAX_STRING_LEN];
 	DB_RESULT       result;
@@ -236,6 +236,13 @@ static int delete_history(char *table, int itemid, int keep_history, int now)
 
 	min_clock = atoi(row[0]);
 	DBfree_result(result);
+
+/*	zabbix_log( LOG_LEVEL_DEBUG, "Now %d keep_history %d Itemid " ZBX_FS_UI64 " min %d new min %d",
+		now,
+		keep_history,
+		itemid,
+		min_clock,
+		MIN(now-24*3600*keep_history, min_clock+4*3600*CONFIG_HOUSEKEEPING_FREQUENCY));*/
 
 	zbx_snprintf(sql,sizeof(sql)-1,"delete from %s where itemid=" ZBX_FS_UI64 " and clock<%d",
 		table,
