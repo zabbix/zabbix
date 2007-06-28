@@ -121,7 +121,7 @@
 #define OFF	0
 
 #define	APPLICATION_NAME	"ZABBIX Agent"
-#define	ZABBIX_REVDATE		"29 May 2007"
+#define	ZABBIX_REVDATE		"29 June 2007"
 #define	ZABBIX_VERSION		"1.4.1"
 
 #if defined(_WINDOWS)
