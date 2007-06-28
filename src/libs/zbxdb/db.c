@@ -333,8 +333,9 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 	char	*sql = NULL;
 	int	ret = ZBX_DB_OK;
 
-	struct timeval tv;
-	suseconds_t    msec;
+/* suseconds_t is not defined under UP-UX */
+/*	struct timeval tv;
+	suseconds_t    msec;*/
 
 #ifdef	HAVE_POSTGRESQL
 	PGresult	*result;
@@ -343,8 +344,8 @@ int zbx_db_vexecute(const char *fmt, va_list args)
 	char *error=0;
 #endif
 
-	gettimeofday(&tv, NULL);
-	msec = tv.tv_usec;
+/*	gettimeofday(&tv, NULL);
+	msec = tv.tv_usec;*/
 
 	sql = zbx_dvsprintf(sql, fmt, args);
 
@@ -582,8 +583,9 @@ DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 	char	*sql = NULL;
 	DB_RESULT result;
 
-	struct timeval tv;
-	suseconds_t    msec;
+/* suseconds_t is not defined under HP=UX */
+/*	struct timeval tv;
+	suseconds_t    msec;*/
 
 #ifdef	HAVE_ORACLE
 	sqlo_stmt_handle_t sth;
@@ -593,8 +595,8 @@ DB_RESULT zbx_db_vselect(const char *fmt, va_list args)
 	char *error=NULL;
 #endif
 
-	gettimeofday(&tv, NULL);
-	msec = tv.tv_usec;
+/*	gettimeofday(&tv, NULL);
+	msec = tv.tv_usec;*/
 
 	sql = zbx_dvsprintf(sql, fmt, args);
 
