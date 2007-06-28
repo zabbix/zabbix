@@ -232,7 +232,7 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		
 
 #else /* not _WINDOWS */
-	zbx_strlcpy(command, param, sizeof(command));
+	command = zbx_dsprintf(command, param);
 
 	if(0 == (hRead = popen(command,"r")))
 	{
@@ -272,6 +272,8 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		goto lbl_exit;
 	}
 
+	hRead = NULL;
+
 #endif /* _WINDOWS */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Before");
@@ -294,10 +296,10 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 lbl_exit:
 
 #if defined(_WINDOWS)
-	if ( hWrite )	CloseHandle(hWrite);	hWrite = NULL;
-	if ( hRead)	CloseHandle(hRead);	hRead = NULL;
+	if ( hWrite )	{ CloseHandle(hWrite);	hWrite = NULL; }
+	if ( hRead)	{ CloseHandle(hRead);	hRead = NULL; }
 #else /* not _WINDOWS */
-	if ( hRead )	pclose(hRead);	hRead = NULL;
+	if ( hRead )	{ pclose(hRead);	hRead = NULL; }
 #endif /* _WINDOWS */
 
 	zbx_free(command)
