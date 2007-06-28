@@ -178,8 +178,8 @@ int	main(int argc, char **argv)
 
 #if !defined(_WINDOWS)
 	signal( SIGINT,  child_signal_handler);
-	signal( SIGQUIT, child_signal_handler );
 	signal( SIGTERM, child_signal_handler );
+	signal( SIGQUIT, child_signal_handler );
 	signal( SIGALRM, child_signal_handler );
 
 	alarm(CONFIG_TIMEOUT);
