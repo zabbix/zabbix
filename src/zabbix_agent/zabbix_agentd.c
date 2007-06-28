@@ -330,7 +330,7 @@ void	zbx_on_exit()
 
 	zabbix_close_log();
 
-	ExitProcess(SUCCEED);
+	exit(SUCCEED);
 }
 
 #ifndef ZABBIX_TEST
