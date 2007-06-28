@@ -36,5 +36,4 @@ int	add_alias_from_config(char *value);
 void	alias_list_free(void);
 void	alias_expand(const char *orig, char *expanded, int exp_buf_len);
 
-
 #endif /* ZABBIX_ALIAS_H */
