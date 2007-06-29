@@ -6,7 +6,7 @@ CREATE TABLE profiles_tmp (
 	valuetype	integer		DEFAULT 0	NOT NULL,
 	PRIMARY KEY (profileid)
 ) with OIDS;
-CREATE UNIQUE INDEX profiles_1 on profiles_tmp (userid,idx);
+CREATE UNIQUE INDEX profiles_tmp_1 on profiles_tmp (userid,idx);
 
 insert into profiles_tmp select NULL,userid,idx,value,valuetype from profiles;
 drop table profiles;

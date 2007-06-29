@@ -1,5 +1,5 @@
 CREATE TABLE actions_tmp (
-        actionid                bigintd         DEFAULT '0'     NOT NULL,
+        actionid                bigint         DEFAULT '0'     NOT NULL,
         name                    varchar(255)            DEFAULT ''      NOT NULL,
         eventsource             integer         DEFAULT '0'     NOT NULL,
         evaltype                integer         DEFAULT '0'     NOT NULL,
@@ -27,4 +27,4 @@ update operations set longdata=scripts_tmp where operationtype=1;
 alter table operations drop scripts_tmp;
 
 drop table actions;
-alter table actions_tmp rename actions;
+alter table actions_tmp rename to actions;
