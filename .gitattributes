@@ -5,6 +5,7 @@ bin/win32/zabbix_sender.exe -text
 bin/win64/zabbix_agentd.exe -text
 build/win32/project/ZABBIX.dsw -text
 build/win32/project/zabbix_agentd.dsp -text
+build/win32/project/zabbix_get.dsp -text
 build/win32/project/zabbix_sender.dsp -text
 create/data/images/Hub.png -text svneol=unset#unset
 create/data/images/Hub_small.png -text svneol=unset#unset
