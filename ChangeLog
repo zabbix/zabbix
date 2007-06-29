@@ -1,5 +1,6 @@
 Changes for 1.4.1:
 
+ - fixed of PostgreSQL database upgrade schema (Alexei)
  - improved non standard PostgreSQL & MySQL port using (Eugene)
  - fixed compilation of ZABBIX server under HP-UX (Alexei)
  - fixed upgrade of maps without backgrounds (Alexei)
