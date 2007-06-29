@@ -1,5 +1,6 @@
 Changes for 1.4.1:
 
+ - fixed 'service_state[*]' receiving by service name (Eugene)
  - fixed of PostgreSQL database upgrade schema (Alexei)
  - improved non standard PostgreSQL & MySQL port using (Eugene)
  - fixed compilation of ZABBIX server under HP-UX (Alexei)
