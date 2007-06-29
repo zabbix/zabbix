@@ -126,35 +126,44 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	return ret;
 #endif
 #ifdef	HAVE_POSTGRESQL
-/*	conn = PQsetdb(pghost, pgport, pgoptions, pgtty, dbName); */
-/*	conn = PQsetdb(NULL, NULL, NULL, NULL, CONFIG_DBNAME);*/
-	conn = PQsetdbLogin(host, NULL, NULL, NULL, dbname, user, password );
+	char *cport = NULL;
+
+	if( port )	cport = zbx_dsprintf(cport, "%i", port);
+
+	conn = PQsetdbLogin(host, cport, NULL, NULL, dbname, user, password );
+
+	zbx_free(cport);
 
 /* check to see that the backend connection was successfully made */
 	if (PQstatus(conn) != CONNECTION_OK)
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Connection to database '%s' failed.", dbname);
+		zabbix_log(LOG_LEVEL_ERR, "Connection to database '%s' failed: %s", dbname, PQerrorMessage(conn));
 		ret = ZBX_DB_FAIL;
 	}
 
 	return ret;
 #endif
 #ifdef	HAVE_ORACLE
-	char    connect[MAX_STRING_LEN];
+	char    connect = NULL;
 
 	if (SQLO_SUCCESS != sqlo_init(SQLO_OFF, 1, 100))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Failed to init libsqlora8");
 		exit(FAIL);
 	}
-			        /* login */
-	zbx_snprintf(connect, sizeof(connect),"%s/%s@%s", user, password, dbname);
+
+	/* login */ /* TODO: how to use port??? */
+	connect = zbx_dsprintf(connect, "%s/%s@%s", user, password, dbname);
+
 	if (SQLO_SUCCESS != sqlo_connect(&oracle, connect))
 	{
 		printf("Cannot login with %s\n", connect);
 		zabbix_log(LOG_LEVEL_ERR, "Cannot login with %s", connect);
 		exit(FAIL);
 	}
+
+	zbx_free(connect);
+
 	sqlo_autocommit_on(oracle);
 
 	return ret;

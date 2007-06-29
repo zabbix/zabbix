@@ -347,6 +347,7 @@
 			}
 			$table->AddRow(array(S_TYPE, $cmbType));
 			$table->AddRow(array(S_HOST, new CTextBox('server',		$this->GetConfig('DB_SERVER',	'localhost'))));
+			$table->AddRow(array(S_PORT, array(new CNumericBox('port',		$this->GetConfig('DB_PORT',	'0'),5),' 0 - use default port')));
 			$table->AddRow(array(S_NAME, new CTextBox('database',		$this->GetConfig('DB_DATABASE',	'zabbix'))));
 			$table->AddRow(array(S_USER, new CTextBox('user',		$this->GetConfig('DB_USER',	'root'))));
 			$table->AddRow(array(S_PASSWORD, new CPassBox('password',	$this->GetConfig('DB_PASSWORD',	''))));
@@ -409,11 +410,12 @@
 			
 			$table = new CTable(null, 'requirements');
 			$table->SetAlign('center');
-			$table->AddRow(array('Database type',		$allowed_db[$this->GetConfig('DB_TYPE',	'unknown')]));
-			$table->AddRow(array('Database server',		$this->GetConfig('DB_SERVER',	'unknown')));
-			$table->AddRow(array('Database name',		$this->GetConfig('DB_DATABASE',	'unknown')));
-			$table->AddRow(array('Database user',		$this->GetConfig('DB_USER',	'unknown')));
-			$table->AddRow(array('Database password',	$this->GetConfig('DB_PASSWORD',	'unknown')));
+			$table->AddRow(array('Database type:',		$allowed_db[$this->GetConfig('DB_TYPE',	'unknown')]));
+			$table->AddRow(array('Database server:',	$this->GetConfig('DB_SERVER',	'unknown')));
+			$table->AddRow(array('Database port:',		$this->GetConfig('DB_PORT',	'0')));
+			$table->AddRow(array('Database name:',		$this->GetConfig('DB_DATABASE',	'unknown')));
+			$table->AddRow(array('Database user:',		$this->GetConfig('DB_USER',	'unknown')));
+			$table->AddRow(array('Database password:',	$this->GetConfig('DB_PASSWORD',	'unknown')));
 			/* $table->AddRow(array('Distributed monitoring',	$this->GetConfig('distributed', null) ? 'Enabled' : 'Disabled')); */
 			if($this->GetConfig('distributed', null))
 			{
@@ -494,11 +496,12 @@
 
 		function CheckConnection()
 		{
-			global $DB, $DB_TYPE, $DB_SERVER, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
+			global $DB, $DB_TYPE, $DB_SERVER, $DB_PORT, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
 
 			$old_DB		= $DB;
 			$old_DB_TYPE	= $DB_TYPE;
 			$old_DB_SERVER	= $DB_SERVER;
+			$old_DB_PORT	= $DB_PORT;
 			$old_DB_DATABASE= $DB_DATABASE;
 			$old_DB_USER	= $DB_USER;
 			$old_DB_PASSWORD= $DB_PASSWORD;
@@ -507,6 +510,7 @@
 			if(is_null($DB_TYPE))	return false;
 
 			$DB_SERVER	= $this->GetConfig('DB_SERVER',		'localhost');
+			$DB_PORT	= $this->GetConfig('DB_PORT',		'0');
 			$DB_DATABASE	= $this->GetConfig('DB_DATABASE',	'zabbix');
 			$DB_USER	= $this->GetConfig('DB_USER',		'root');
 			$DB_PASSWORD	= $this->GetConfig('DB_PASSWORD',	'');
@@ -531,11 +535,12 @@
 			}
 			
 			/* restore connection */
-			global $DB, $DB_TYPE, $DB_SERVER, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
+			global $DB, $DB_TYPE, $DB_SERVER, $DB_PORT, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
 
 			$DB		= $old_DB;
 			$DB_TYPE	= $old_DB_TYPE;
 			$DB_SERVER	= $old_DB_SERVER;
+			$DB_PORT	= $old_DB_PORT;
 			$DB_DATABASE	= $old_DB_DATABASE;
 			$DB_USER	= $old_DB_USER;
 			$DB_PASSWORD	= $old_DB_PASSWORD;
@@ -633,11 +638,12 @@
 
 		function CheckConfigurationFile()
 		{
-			global $DB, $DB_TYPE, $DB_SERVER, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
+			global $DB, $DB_TYPE, $DB_SERVER, $DB_PORT, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
 
 			$old_DB		= $DB;
 			$old_DB_TYPE	= $DB_TYPE;
 			$old_DB_SERVER	= $DB_SERVER;
+			$old_DB_PORT	= $DB_PORT;
 			$old_DB_DATABASE= $DB_DATABASE;
 			$old_DB_USER	= $DB_USER;
 			$old_DB_PASSWORD= $DB_PASSWORD;
@@ -659,9 +665,11 @@
 					isset($IMAGE_FORMAT_DEFAULT) &&
 					$DB_TYPE		== $this->GetConfig('DB_TYPE',				null) &&
 					$DB_SERVER		== $this->GetConfig('DB_SERVER',			null) &&
+					$DB_PORT		== $this->GetConfig('DB_PORT',				null) &&
 					$DB_DATABASE		== $this->GetConfig('DB_DATABASE',			null) &&
 					$DB_USER		== $this->GetConfig('DB_USER',				null) &&
-					$DB_PASSWORD		== $this->GetConfig('DB_PASSWORD',			null))
+					$DB_PASSWORD		== $this->GetConfig('DB_PASSWORD',			null)
+					)
 				{
 					if(!DBconnect($error_msg))
 					{
@@ -685,11 +693,12 @@
 			}
 
 			/* restore connection */
-			global $DB, $DB_TYPE, $DB_SERVER, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
+			global $DB, $DB_TYPE, $DB_PORT, $DB_SERVER, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
 
 			$DB		= $old_DB;
 			$DB_TYPE	= $old_DB_TYPE;
 			$DB_SERVER	= $old_DB_SERVER;
+			$DB_PORT	= $old_DB_PORT;
 			$DB_DATABASE	= $old_DB_DATABASE;
 			$DB_USER	= $old_DB_USER;
 			$DB_PASSWORD	= $old_DB_PASSWORD;
@@ -725,6 +734,7 @@
 			{
 				$this->SetConfig('DB_TYPE',	get_request('type',	$this->GetConfig('DB_TYPE')));
 				$this->SetConfig('DB_SERVER',	get_request('server',	$this->GetConfig('DB_SERVER',	'localhost')));
+				$this->SetConfig('DB_PORT',	get_request('port',	$this->GetConfig('DB_PORT',	'0')));
 				$this->SetConfig('DB_DATABASE',	get_request('database',	$this->GetConfig('DB_DATABASE',	'zabbix')));
 				$this->SetConfig('DB_USER',	get_request('user',	$this->GetConfig('DB_USER',	'root')));
 				$this->SetConfig('DB_PASSWORD',	get_request('password',	$this->GetConfig('DB_PASSWORD',	'')));
@@ -828,10 +838,11 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-global $DB_TYPE, $DB_SERVER, $DB_DATABASE, $DB_USER, $DB_PASSWORD, $IMAGE_FORMAT_DEFAULT;
+global $DB_TYPE, $DB_SERVER, $DB_PORT, $DB_DATABASE, $DB_USER, $DB_PASSWORD, $IMAGE_FORMAT_DEFAULT;
 
 $DB_TYPE	= "'.$this->GetConfig('DB_TYPE'		,'unknown').'";
 $DB_SERVER	= "'.$this->GetConfig('DB_SERVER'	,'unknown').'";
+$DB_PORT	= "'.$this->GetConfig('DB_PORT'		,'0').'";
 $DB_DATABASE	= "'.$this->GetConfig('DB_DATABASE'	,'unknown').'";
 $DB_USER	= "'.$this->GetConfig('DB_USER'		,'unknown').'";
 $DB_PASSWORD	= "'.$this->GetConfig('DB_PASSWORD'	,'').'";
