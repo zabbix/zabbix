@@ -3993,7 +3993,7 @@ include_once 'include/discovery.inc.php';
 
 		$frmHost->AddRow(S_NEW_GROUP,new CTextBox("newgroup",$newgroup),'new');
 
-// onChange does not work on some browsers: MacOS, KDE browser
+// onchange does not work on some browsers: MacOS, KDE browser
 		if($show_only_tmp)
 		{
 			$frmHost->AddVar("useip",0);

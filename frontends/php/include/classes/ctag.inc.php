@@ -246,7 +246,7 @@
 
 		function OnClick($handle_code)
 		{
-			$this->AddAction('onClick', $handle_code);
+			$this->AddAction('onclick', $handle_code);
 		}
 
 		function AddAction($name, $value)

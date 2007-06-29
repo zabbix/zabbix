@@ -343,11 +343,11 @@ COpt::profiling_start("page");
     <title><?php echo $page['title'] ?></title>
 <?php 
 	if(defined('ZBX_PAGE_DO_REFRESH') && $USER_DETAILS["refresh"]) { 
-		echo '<meta http-equiv="refresh" content="'.$USER_DETAILS["refresh"].'">';
+		echo '<meta http-equiv="refresh" content="'.$USER_DETAILS["refresh"].'" />';
 	}
  ?>
-    <link rel="stylesheet" href="css.css">
-    <meta name="Author" content="ZABBIX SIA">
+    <link rel="stylesheet" href="css.css" />
+    <meta name="Author" content="ZABBIX SIA" />
     <script type="text/javascript" src="js/common.js"></script>
 <?php
 	if(isset($page['scripts']) && is_array($page['scripts'])){
@@ -363,7 +363,7 @@ COpt::profiling_start("page");
 	}
 ?>
   </head>
-<body onLoad="zbxCallPostScripts();">
+<body onload="zbxCallPostScripts();">
 <?php
 	}
 

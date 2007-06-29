@@ -210,11 +210,14 @@ include_once "include/page_header.php";
 
 	if($_REQUEST["graphid"] > 0)
 	{
-		$row = 	"\n<script language=\"JavaScript\">\n".
-			"if(window.innerWidth) width=window.innerWidth; else width=document.body.clientWidth;\n".
-			"document.write(\"<IMG SRC='chart2.php?graphid=".$_REQUEST["graphid"].url_param("stime").url_param("from").
-			"&period=".$effectiveperiod."&width=\"+(width-108)+\"'>\")\n".
-			"</script>";
+		$row = 	"\n".'<script language="javascript" type="text/javascript">
+			<!--
+			if(window.innerWidth) width=window.innerWidth; 
+			else width=document.body.clientWidth;
+			document.write(\'<img src="chart2.php?graphid='.$_REQUEST['graphid'].url_param('stime').url_param('from').
+			'&period='.$effectiveperiod.'&width=\'+(width-108)+\'" />\');
+			-->
+			</script>'."\n";
 		
 		$table->AddRow($row);
 	}
