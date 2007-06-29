@@ -41,7 +41,7 @@
 			if(is_null($value))
 				return $this->options['action'] = $page['file'];
 
-			return parent::AddAction('onClick', $value);
+			return parent::AddAction('onclick', $value);
 		}
 		function SetUrl($value)
 		{

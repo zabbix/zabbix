@@ -135,7 +135,7 @@ function MakeSImgStr($id){
 			case 'L':
 				if($this->tree[$id]['nodetype'] == 2){
 					$img= new CImg('images/general/tree/Yc.gif','y','22','18');
-					$img->AddOption('OnClick','javascript: tree.closeSNodeX('.$id.',this);');
+					$img->AddOption('onclick','javascript: tree.closeSNodeX('.$id.',this);');
 					$img->AddOption('id',$id.'I');
 					$img->SetClass('imgnode');
 					
@@ -146,7 +146,7 @@ function MakeSImgStr($id){
 			case 'T':
 				if($this->tree[$id]['nodetype'] == 2){
 					$img= new CImg('images/general/tree/Xc.gif','x','22','18');
-					$img->AddOption('OnClick','javascript: tree.closeSNodeX('.$id.',this);');
+					$img->AddOption('onclick','javascript: tree.closeSNodeX('.$id.',this);');
 					$img->AddOption('id',$id.'I');
 					$img->SetClass('imgnode');
 				} else {
