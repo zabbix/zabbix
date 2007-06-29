@@ -136,6 +136,9 @@ require_once('include/classes/ctree.inc.php');
 	}
 	else
 	{
+		if(file_exists($ZBX_CONFIGURATION_FILE))
+			include $ZBX_CONFIGURATION_FILE;
+
 		define('ZBX_PAGE_NO_AUTHERIZATION', true);
 		define('ZBX_DISTRIBUTED', false);
 		$show_setup = true;

@@ -143,7 +143,7 @@ char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBUSER			= NULL;
 char	*CONFIG_DBPASSWORD		= NULL;
 char	*CONFIG_DBSOCKET		= NULL;
-int	CONFIG_DBPORT			= 3306;
+int	CONFIG_DBPORT			= 0;
 int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
 
 int	CONFIG_NODEID			= 0;
@@ -415,7 +415,6 @@ ZBX_SIGN expressions[]=
 		{NULL}
 };
 
-	int result;
 	int i;
 
 	char *exp=NULL;
@@ -439,6 +438,29 @@ ZBX_SIGN expressions[]=
 	printf("Passed OK\n");
 }
 
+void test_db_connection(void)
+{
+	DB_RESULT sel_res;
+	DB_ROW row_val;
+
+	DBconnect(ZBX_DB_CONNECT_EXIT);
+
+	sel_res = DBselect("select userid, alias from users where alias='%s'", "guest");
+	row_val = DBfetch(sel_res);
+
+	if( row_val )
+	{
+		fprintf(stderr, "DB result: [%s] [%s]\n", row_val[0], row_val[1]); 
+	}
+	else
+	{
+		fprintf(stderr, "DB FAIL");
+	}
+	DBfree_result(sel_res);
+
+	DBclose();
+}
+
 void test()
 {
 	zabbix_set_log_level(LOG_LEVEL_DEBUG);
@@ -446,8 +468,9 @@ void test()
 	printf("-= Test Started =-\n\n");
 
 /*	test_params();*/
-	test_compress_signs();
-	test_expressions();
+/*	test_compress_signs(); */
+/*	test_expressions(); */
+	test_db_connection();
 
 	printf("\n-= Test completed =-\n");
 }
@@ -464,7 +487,7 @@ void test()
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -475,45 +498,6 @@ int main(int argc, char **argv)
 	char    ch      = '\0';
 
 	int	nodeid;
-
-#ifdef HAVE_ZZZ
-	DB_RESULT	result;
-	DB_ROW		row;
-	const char ** v;
-#endif
-
-
-
-#ifdef HAVE_ZZZ
-	init_config();
-
-	DBconnect();
-	result = DBselect("select NULL from history where itemid=20272222");
-	row=DBfetch(result);
-	if(!row) printf("OK");
-	exit(0);
-	while((row=DBfetch(result)))
-	{
-		printf("[%s]\n",row[0]);
-	}
-	DBfree_result(result);
-	DBclose();
-	return 0;
-#endif
-#ifdef HAVE_ZZZ
-/* */
-	DBconnect();
-	result = DBselect("select itemid,key_,description from items");
-	while ( SQLO_SUCCESS == sqlo_fetch(result, 1))
-	{
-		v = sqlo_values(result, NULL, 1);
-		printf("%s %s %s\n",v[0],v[1],v[2]);
-	}
-	DBfree_result(result);
-	DBclose();
-/* */
-	return 0;
-#endif
 
 	progname = argv[0];
 

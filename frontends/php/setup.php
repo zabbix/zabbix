@@ -21,6 +21,11 @@
 <?php
 	require_once "include/config.inc.php";
 	require_once "include/setup.inc.php";
+/* TMP !!! */
+
+global $DB_SERVER;
+
+/* ******** */
 
         $page["title"] = "S_INSTALLATION";
         $page["file"] = "setup.php";
@@ -38,9 +43,10 @@
 		"trouble"=>	array(T_ZBX_STR, O_OPT,	null,	null,			null),
 
 		"type"=>	array(T_ZBX_STR, O_OPT,	null,	IN('"MYSQL","POSTGRESQL","ORACLE","SQLITE3"'),	null),
-		"server"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		null),
+		"server"=>	array(T_ZBX_STR, O_OPT,	null,	null,			null),
+		"port"=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,65535),	null),
 		"database"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		null),
-		"user"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		null),
+		"user"=>	array(T_ZBX_STR, O_OPT,	null,	null,			null),
 		"password"=>	array(T_ZBX_STR, O_OPT,	null,	null, 			null),
 		
 		"message"=>	array(T_ZBX_STR, O_OPT,	NULL,	NULL,			NULL),
