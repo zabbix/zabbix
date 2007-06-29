@@ -19,15 +19,17 @@
 **/
 ?>
 <?php
-	global $DB, $DB_TYPE, $DB_SERVER, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
+	global $DB, $DB_TYPE, $DB_SERVER, $DB_PORT, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
 
 	function	DBconnect(&$error)
 	{
 		$result = true;
 		
-		global $DB, $DB_TYPE, $DB_SERVER, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
+		global $DB, $DB_TYPE, $DB_SERVER, $DB_PORT, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
 
 		$DB = null;
+
+//SDI('type: '.$DB_TYPE.'; server: '.$DB_SERVER.'; port: '.$DB_PORT.'; db: '.$DB_DATABASE.'; usr: '.$DB_USER.'; pass: '.$DB_PASSWORD);
 
 		if(!isset($DB_TYPE))
 		{
@@ -39,28 +41,39 @@
 			switch($DB_TYPE)
 			{
 				case "MYSQL":
-					$DB = mysql_pconnect($DB_SERVER,$DB_USER,$DB_PASSWORD);
-					if(!mysql_select_db($DB_DATABASE))
+					$mysql_server = $DB_SERVER.( !empty($DB_PORT) ? ':'.$DB_PORT : '');
+
+					if ( !($DB = mysql_pconnect($mysql_server,$DB_USER,$DB_PASSWORD)))
 					{
 						$error = "Error connecting to database [".mysql_error()."]";
 						$result = false;
 					}
 					else
 					{
-						mysql_select_db($DB_DATABASE);
+						if ( !mysql_select_db($DB_DATABASE) )
+						{
+							$error = 'Error database selection ['.mysql_error().']';
+							$result = false;
+						}
 					}
 					break;
 				case "POSTGRESQL":
-					$DB=pg_pconnect("host='$DB_SERVER' dbname='$DB_DATABASE' user='$DB_USER' password='$DB_PASSWORD'");
+					$pg_connection_string = 
+						( !empty($DB_SERVER) ? 'host=\''.$DB_SERVER.'\' ' : '').
+						'dbname=\''.$DB_DATABASE.'\' '.
+						( !empty($DB_USER) ? 'user=\''.$DB_USER.'\' ' : '').
+						( !empty($DB_PASSWORD) ? 'password=\''.$DB_PASSWORD.'\' ' : '').
+						( !empty($DB_PORT) ? 'port='.$DB_PORT : '');
+SDI($pg_connection_string);
+					$DB=pg_pconnect($pg_connection_string);
 					if(!$DB)
 					{
-						$error = "Error connecting to database";
+						$error = 'Error connecting to database';
 						$result = false;
 					}
 					break;
 				case "ORACLE":
 					$DB = ocilogon($DB_USER, $DB_PASSWORD, $DB_DATABASE);
-//					$DB = ocilogon($DB_USER, $DB_PASSWORD, "");
 					//$DB = ocilogon($DB_USER, $DB_PASSWORD, "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=$DB_SERVER)(PORT=1521))(CONNECT_DATA=(SERVICE_NAME=$DB_DATABASE)))");
 					if(!$DB)
 					{
@@ -144,16 +157,19 @@
 					$result = false;
 			}
 		}
+		if( false == $result )
+			$DB = null;
+
 		return $result;
 	}
 
 	function	DBclose()
 	{
-		global $DB, $DB_TYPE, $DB_SERVER, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
+		global $DB, $DB_TYPE, $DB_SERVER, $DB_PORT, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
 
 		$result = false;
 
-		if($DB)
+		if( isset($DB) && !empty($DB) )
 		{
 			switch($DB_TYPE)
 			{
@@ -173,6 +189,7 @@
 			$GLOBALS['DB'],
 			$GLOBALS['DB_TYPE'],
 			$GLOBALS['DB_SERVER'],
+			$GLOBALS['DB_PORT'],
 			$GLOBALS['DB_DATABASE'],
 			$GLOBALS['DB_USER'],
 			$GLOBALS['DB_PASSWORD']
@@ -254,7 +271,7 @@
 COpt::savesqlrequest($query);
 
 		$result = false;
-
+		if( isset($DB) && !empty($DB) )
 		switch($DB_TYPE)
 		{
 			case "MYSQL":
@@ -342,6 +359,7 @@ COpt::savesqlrequest($query);
 
 		$result = false;
 
+		if( isset($DB) && !empty($DB) )
 		switch($DB_TYPE)
 		{
 			case "MYSQL":
@@ -382,10 +400,11 @@ COpt::savesqlrequest($query);
 
 	function	DBfetch(&$cursor)
 	{
-		global $DB_TYPE;
+		global $DB, $DB_TYPE;
 	
 		$result = false;
 		
+		if( isset($DB) && !empty($DB) )
 		switch($DB_TYPE)
 		{
 			case "MYSQL":
