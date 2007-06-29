@@ -337,8 +337,8 @@ COpt::profiling_start("page");
 	if($page["type"] == PAGE_TYPE_HTML)
 	{
 ?>
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <title><?php echo $page['title'] ?></title>
 <?php 
@@ -441,6 +441,8 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$sub_menu_table = new CTable(NULL,'sub_menu');
 		$sub_menu_table->SetCellSpacing(0);
 		$sub_menu_table->SetCellPadding(5);
+		
+		(empty($sub_menu_row))?($sub_menu_row = '&nbsp;'):('');
 		$sub_menu_table->AddRow(new CCol($sub_menu_row));
 		$sub_menu_table->Show();
 	}
