@@ -104,7 +104,7 @@
 			$this->headerClass = NULL;
 			$this->footer = '';
 			$this->footerClass = NULL;
-			$this->colnum = 0;
+			$this->colnum = 1;
 
 			$this->message = $message;
 		}
@@ -168,7 +168,7 @@
 		function SetFooter($value=NULL,$class=NULL){
 			if(is_null($class)) $class = $this->footerClass;
 
-			$this->footer = $this->PrepareRow($value,$class);;
+			$this->footer = $this->PrepareRow($value,$class);
 		}
 
 		function AddRow($item,$rowClass=NULL){
