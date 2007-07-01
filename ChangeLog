@@ -1,3 +1,7 @@
+Changes for 1.4.2:
+
+ - fixed processing of user parameters and remote commands having character '%' (Alexei)
+
 Changes for 1.4.1:
 
  - fixed processing of 'service_state[*]' (Eugene)
