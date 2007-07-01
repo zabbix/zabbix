@@ -232,7 +232,7 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 		
 
 #else /* not _WINDOWS */
-	command = zbx_dsprintf(command, param);
+	command = zbx_dsprintf(command, "%s", param);
 
 	if(0 == (hRead = popen(command,"r")))
 	{
