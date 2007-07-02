@@ -64,7 +64,7 @@
 						( !empty($DB_USER) ? 'user=\''.$DB_USER.'\' ' : '').
 						( !empty($DB_PASSWORD) ? 'password=\''.$DB_PASSWORD.'\' ' : '').
 						( !empty($DB_PORT) ? 'port='.$DB_PORT : '');
-SDI($pg_connection_string);
+
 					$DB=pg_pconnect($pg_connection_string);
 					if(!$DB)
 					{
