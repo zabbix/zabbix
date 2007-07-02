@@ -501,7 +501,7 @@ static int	process_active_checks(char *server, unsigned short port)
 				p_count = 0;
 				while( SUCCEED == (ret = process_eventlog(filename,&active_metrics[i].lastlogsize, &timestamp, &source, &severity, &value)) )
 				{
-					if( !pattern || NULL != zbx_regexp_match(value, pattern, NULL) )
+					if( value  && (!pattern || NULL != zbx_regexp_match(value, pattern, NULL)) )
 					{
 						send_err = send_value(
 									server,
