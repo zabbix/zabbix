@@ -413,7 +413,6 @@ int	process_data(zbx_sock_t *sock,char *server,char *key,char *value,char *lastl
 	DB_RESULT       result;
 	DB_ROW	row;
 	DB_ITEM	item;
-	char	*s;
 
 	char	server_esc[MAX_STRING_LEN];
 	char	key_esc[MAX_STRING_LEN];
@@ -496,44 +495,45 @@ int	process_data(zbx_sock_t *sock,char *server,char *key,char *value,char *lastl
 			zabbix_syslog("Active parameter [%s] is not supported by agent on host [%s]",
 				item.key,
 				item.host_name);
-			DBupdate_item_status_to_notsupported(item.itemid, "Not supported by agent");
-	}
-	
-	s=value;
-	if(	(strncmp(item.key,"log[",4)==0) ||
-		(strncmp(item.key,"eventlog[",9)==0)
-	)
-	{
-		item.lastlogsize=atoi(lastlogsize);
-		item.timestamp=atoi(timestamp);
-
-		calc_timestamp(value,&item.timestamp,item.logtimefmt);
-
-		item.eventlog_severity=atoi(severity);
-		item.eventlog_source=source;
-		zabbix_log(LOG_LEVEL_DEBUG, "Value [%s] Lastlogsize [%s] Timestamp [%s]",
-			value,
-			lastlogsize,
-			timestamp);
-	}
-
-	if(set_result_type(&agent, item.value_type, value) == SUCCEED)
-	{
-		process_new_value(&item,&agent);
-		update_triggers(item.itemid);
+			DBupdate_item_status_to_notsupported(item.itemid, "Not supported by ZABBIX agent");
 	}
 	else
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Type of received value [%s] is not suitable for [%s@%s]",
-			value,
-			item.key,
-			item.host_name);
-		zabbix_syslog("Type of received value [%s] is not suitable for [%s@%s]",
-			value,
-			item.key,
-			item.host_name);
-	}
- 
+		if(	(strncmp(item.key,"log[",4)==0) ||
+			(strncmp(item.key,"eventlog[",9)==0)
+		)
+		{
+			item.lastlogsize=atoi(lastlogsize);
+			item.timestamp=atoi(timestamp);
+
+			calc_timestamp(value,&item.timestamp,item.logtimefmt);
+
+			item.eventlog_severity=atoi(severity);
+			item.eventlog_source=source;
+			zabbix_log(LOG_LEVEL_DEBUG, "Value [%s] Lastlogsize [%s] Timestamp [%s]",
+				value,
+				lastlogsize,
+				timestamp);
+		}
+
+		if(set_result_type(&agent, item.value_type, value) == SUCCEED)
+		{
+			process_new_value(&item,&agent);
+			update_triggers(item.itemid);
+		}
+		else
+		{
+			zabbix_log( LOG_LEVEL_WARNING, "Type of received value [%s] is not suitable for [%s@%s]",
+				value,
+				item.key,
+				item.host_name);
+			zabbix_syslog("Type of received value [%s] is not suitable for [%s@%s]",
+				value,
+				item.key,
+				item.host_name);
+		}
+ 	}
+
 	DBfree_result(result);
 
 	free_result(&agent);

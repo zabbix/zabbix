@@ -397,7 +397,7 @@ int get_values(void)
 				zabbix_syslog("Parameter [%s] is not supported by agent on host [%s]",
 					item.key,
 					item.host_name);
-				DBupdate_item_status_to_notsupported(item.itemid, agent.str);
+				DBupdate_item_status_to_notsupported(item.itemid, agent.msg);
 	/*			if(HOST_STATUS_UNREACHABLE == item.host_status)*/
 				if(HOST_AVAILABLE_TRUE != item.host_available)
 				{
