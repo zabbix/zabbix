@@ -1,5 +1,6 @@
 Changes for 1.4.2:
 
+ - fixed and improved eventlog monitoring (Eugene)
  - improved not supported values processing (Eugene)
  - fixed processing of user parameters and remote commands having character '%' (Alexei)
 
