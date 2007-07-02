@@ -85,9 +85,7 @@
 	** Author: 
 	**     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
 	**/
-
-ini_set("error_reporting", E_ALL);
-
+	
 //	define("USE_PROFILING",1);
 //	define("USE_TIME_PROF",1);
 //	define("USE_MEM_PROF",1);
