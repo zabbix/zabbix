@@ -73,4 +73,7 @@
 
 #define ZBX_STR2UINT64(uint,string) sscanf(string ,ZBX_FS_UI64 ,&uint);
 
+#define ZBX_CONST_STRING(str) ""str
+
+
 #endif

@@ -415,6 +415,19 @@ AC_DEFINE(HAVE_SYSINFO_TOTALRAM,1,[Define to 1 if 'sysinfo.totalram' exist.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
+dnl Check for __VA_ARGS__
+AC_MSG_CHECKING(for __VA_ARGS__)
+AC_TRY_COMPILE(
+[
+int test(const char *fmt, ...) { return 0; }
+],
+[
+#define TEST(fmt, ...) test(""fmt, ##__VA_ARGS__)
+TEST("%s","test");
+],
+AC_DEFINE(HAVE___VA_ARGS__, 1 ,[Define to 1 if __VA_ARGS__ available.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
 dnl Check for sharedram in struct sysinfo
 AC_MSG_CHECKING(for sharedram in struct sysinfo)
 AC_TRY_COMPILE([#include <sys/sysinfo.h>],

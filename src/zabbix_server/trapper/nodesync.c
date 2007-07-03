@@ -212,7 +212,7 @@ static int	process_record(int nodeid, char *record)
 		DBfree_result(result);
 	}
 /*	zabbix_log( LOG_LEVEL_WARNING, "SQL [%s]", sql);*/
-	if(FAIL == DBexecute(sql))
+	if(FAIL == DBexecute("%s",sql))
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Failed [%s]",
 			record);

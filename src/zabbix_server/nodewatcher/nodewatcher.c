@@ -136,7 +136,7 @@ static int calculate_checksums()
 		}
 /*		zabbix_log( LOG_LEVEL_WARNING, "SQL DUMP [%s]", sql); */
 
-		result2 =DBselect(sql);
+		result2 =DBselect("%s",sql);
 
 /*		zabbix_log( LOG_LEVEL_WARNING, "Selected records in %d seconds", time(NULL)-now);*/
 		now = time(NULL);
