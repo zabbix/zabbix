@@ -147,7 +147,72 @@ int	evaluate_simple(double *result,char *exp,char *error,int maxerrlen)
 		return SUCCEED;
 	}
 
-	if((p = strstr(exp,"=")) != NULL)
+	/* Operators with lowest priority come first */
+	/* HIGHEST / * - + < > # = & | LOWEST */
+	if( (p = strchr(exp,'|')) != NULL )
+	{
+		*p=0;
+		strscpy( first, exp);
+		*p='|';
+		p++;
+		strscpy( second, p);
+
+		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
+			zabbix_syslog("%s", error);
+			return FAIL;
+		}
+		if( value1 == 1)
+		{
+			*result=value1;
+			return SUCCEED;
+		}
+		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
+			zabbix_syslog("%s", error);
+			return FAIL;
+		}
+		if( value2 == 1)
+		{
+			*result=value2;
+			return SUCCEED;
+		}
+		*result=0;
+		return SUCCEED;
+	}
+	if( (p = strchr(exp,'&')) != NULL )
+	{
+		*p=0;
+		strscpy( first, exp);
+		*p='|';
+		p++;
+		strscpy( second, p);
+
+		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
+			zabbix_syslog("%s", error);
+			return FAIL;
+		}
+		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
+			zabbix_syslog("%s", error);
+			return FAIL;
+		}
+		if( (value1 == 1) && (value2 == 1) )
+		{
+			*result=1;
+		}
+		else
+		{
+			*result=0;
+		}
+		return SUCCEED;
+	}
+	if((p = strchr(exp,'=')) != NULL)
 	{
 		*p=0;
 		strscpy( first, exp);
@@ -180,7 +245,7 @@ int	evaluate_simple(double *result,char *exp,char *error,int maxerrlen)
 		}
 		return SUCCEED;
 	}
-	if((p = strstr(exp,"#")) != NULL)
+	if((p = strchr(exp,'#')) != NULL)
 	{
 		*p=0;
 		strscpy( first, exp);
@@ -213,7 +278,7 @@ int	evaluate_simple(double *result,char *exp,char *error,int maxerrlen)
 		}
 		return SUCCEED;
 	}
-	if((p = strstr(exp,">")) != NULL)
+	if((p = strchr(exp,'>')) != NULL)
 	{
 		*p=0;
 		strscpy( first, exp);
@@ -242,7 +307,7 @@ int	evaluate_simple(double *result,char *exp,char *error,int maxerrlen)
 		}
 		return SUCCEED;
 	}
-	if((p = strstr(exp,"<")) != NULL)
+	if((p = strchr(exp,'<')) != NULL)
 	{
 		*p=0;
 		strscpy( first, exp);
@@ -276,70 +341,7 @@ int	evaluate_simple(double *result,char *exp,char *error,int maxerrlen)
 		zabbix_log(LOG_LEVEL_DEBUG, "Result [" ZBX_FS_DBL "]",*result );
 		return SUCCEED;
 	}
-	if( (p = strstr(exp,"|")) != NULL )
-	{
-		*p=0;
-		strscpy( first, exp);
-		*p='|';
-		p++;
-		strscpy( second, p);
-
-		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
-			zabbix_syslog("%s", error);
-			return FAIL;
-		}
-		if( value1 == 1)
-		{
-			*result=value1;
-			return SUCCEED;
-		}
-		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
-			zabbix_syslog("%s", error);
-			return FAIL;
-		}
-		if( value2 == 1)
-		{
-			*result=value2;
-			return SUCCEED;
-		}
-		*result=0;
-		return SUCCEED;
-	}
-	if( (p = strstr(exp,"&")) != NULL )
-	{
-		*p=0;
-		strscpy( first, exp);
-		*p='|';
-		p++;
-		strscpy( second, p);
-
-		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
-			zabbix_syslog("%s", error);
-			return FAIL;
-		}
-		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
-			zabbix_syslog("%s", error);
-			return FAIL;
-		}
-		if( (value1 == 1) && (value2 == 1) )
-		{
-			*result=1;
-		}
-		else
-		{
-			*result=0;
-		}
-		return SUCCEED;
-	}
-	if((p = strstr(exp,"+")) != NULL)
+	if((p = strchr(exp,'+')) != NULL)
 	{
 		*p=0;
 		strscpy( first, exp);
@@ -365,7 +367,7 @@ int	evaluate_simple(double *result,char *exp,char *error,int maxerrlen)
 		*result=value1+value2;
 		return SUCCEED;
 	}
-	if((p = strstr(exp,"-")) != NULL)
+	if((p = strchr(exp,'-')) != NULL)
 	{
 		*p=0;
 		strscpy( first, exp);
@@ -391,7 +393,7 @@ int	evaluate_simple(double *result,char *exp,char *error,int maxerrlen)
 		*result=value1-value2;
 		return SUCCEED;
 	}
-	if((p = strstr(exp,"*")) != NULL)
+	if((p = strchr(exp,'*')) != NULL)
 	{
 		*p=0;
 		strscpy( first, exp);
@@ -417,7 +419,7 @@ int	evaluate_simple(double *result,char *exp,char *error,int maxerrlen)
 		*result=value1*value2;
 		return SUCCEED;
 	}
-	if((p = strrchr(exp,'/')) != NULL)
+	if((p = strchr(exp,'/')) != NULL)
 	{
 		*p=0;
 		strscpy( first, exp);
