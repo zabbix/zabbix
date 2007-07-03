@@ -176,7 +176,7 @@ void zabbix_set_log_level(int level)
 	log_level = level;
 }
 
-void zabbix_log(int level, const char *fmt, ...)
+void __zbx_zabbix_log(int level, const char *fmt, ...)
 {
 #ifdef TEST
 	time_t	t;
@@ -243,7 +243,6 @@ void zabbix_log(int level, const char *fmt, ...)
 				);
 
 			va_start(args,fmt);
-
 
 			vfprintf(log_file,fmt, args);
 

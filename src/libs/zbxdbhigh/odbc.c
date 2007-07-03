@@ -29,7 +29,12 @@ char* get_last_odbc_strerror(void)
 	return zbx_last_odbc_strerror;
 }
 
-static void set_last_odbc_strerror(const char *fmt, ...)
+#ifdef HAVE___VA_ARGS__
+#	define set_last_odbc_strerror(fmt, ...) __zbx_set_last_odbc_strerror(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#else
+#	define set_last_odbc_strerror __zbx_set_last_odbc_strerror
+#endif /* HAVE___VA_ARGS__ */
+static void __zbx_set_last_odbc_strerror(const char *fmt, ...)
 {
 	va_list args;
 
@@ -322,10 +327,10 @@ ZBX_ODBC_RESULT	odbc_DBselect(ZBX_ODBC_DBH *pdbh, const char *query)
 	pdbh->col_num  = col_num;
 
 	pdbh->row_data = zbx_malloc(pdbh->row_data, sizeof(char*) * col_num);
-	memset(pdbh->row_data, sizeof(char*) * col_num);
+	memset(pdbh->row_data, 0, sizeof(char*) * col_num);
 
-	pdbh->data_len = zbx_malloc(data_len, sizeof(SQLINTEGER) * col_num);
-	memset(pdbh->data_len, sizeof(SQLINTEGER) * col_num);
+	pdbh->data_len = zbx_malloc(pdbh->data_len, sizeof(SQLINTEGER) * col_num);
+	memset(pdbh->data_len, 0, sizeof(SQLINTEGER) * col_num);
 
 	for(i=0; i < col_num; i++)
 	{
