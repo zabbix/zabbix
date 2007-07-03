@@ -34,6 +34,9 @@
 	define("GRAPH_TYPE_NORMAL",	0);
 	define("GRAPH_TYPE_STACKED",	1);
 	define("GRAPH_STACKED_ALFA",	15);	//0..100
+	
+	define("GRAPH_ZERO_LINE_COLOR_LEFT", 'AAAAAA');
+	define("GRAPH_ZERO_LINE_COLOR_RIGHT", '888888');
 
 	define('ZBX_MAX_TREND_DIFF', 3600);
 	
@@ -1224,13 +1227,16 @@
 					$str = str_pad(convert_units($this->sizeY*$i/6*($maxY-$minY)/$this->sizeY+$minY,$units),10," ", STR_PAD_LEFT);
 					ImageString($this->im, 1, 5, $this->sizeY-$this->sizeY*$i/6-4+$this->shiftY, $str, $this->GetColor("Dark Red No Alpha"));
 				}
-/*				imageline($this->im,
-							$this->shiftXleft,
-							$this->zero[GRAPH_YAXIS_SIDE_LEFT],
-							$this->shiftXleft+$this->sizeX,
-							$this->zero[GRAPH_YAXIS_SIDE_LEFT],
-							$this->GetColor('Red')
-						);//*/
+				if(($this->zero[GRAPH_YAXIS_SIDE_LEFT] != $this->sizeY+$this->shiftY) && 
+					($this->zero[GRAPH_YAXIS_SIDE_LEFT] != $this->shiftY)){
+					imageline($this->im,
+								$this->shiftXleft,
+								$this->zero[GRAPH_YAXIS_SIDE_LEFT],
+								$this->shiftXleft+$this->sizeX,
+								$this->zero[GRAPH_YAXIS_SIDE_LEFT],
+								$this->GetColor(GRAPH_ZERO_LINE_COLOR_LEFT)
+							); //*/
+				}
 			}
 		}
 
@@ -1259,7 +1265,7 @@
 								$this->zero[GRAPH_YAXIS_SIDE_RIGHT],
 								$this->shiftXleft+$this->sizeX,
 								$this->zero[GRAPH_YAXIS_SIDE_RIGHT],
-								$this->GetColor('AAAAAA')
+								$this->GetColor(GRAPH_ZERO_LINE_COLOR_RIGHT)
 							); //*/
 				}
 			}
