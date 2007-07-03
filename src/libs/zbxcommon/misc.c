@@ -138,7 +138,7 @@ double zbx_current_time (void)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_setproctitle(const char *fmt, ...)
+void	__zbx_zbx_setproctitle(const char *fmt, ...)
 {
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 

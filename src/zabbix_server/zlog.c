@@ -49,7 +49,7 @@
  * Comments: do nothing if no zabbix[log] items                               *
  *                                                                            *
  ******************************************************************************/
-void zabbix_syslog(const char *fmt, ...)
+void __zbx_zabbix_syslog(const char *fmt, ...)
 { 
 	va_list		ap;
 	char		value_str[MAX_STRING_LEN];

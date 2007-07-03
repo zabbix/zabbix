@@ -461,6 +461,24 @@ void test_db_connection(void)
 	DBclose();
 }
 
+void test_variable_argument_list(void)
+{
+	char incorrect[] = "incorrect";
+	char format_incorrect[] = "%s";
+	char correct[] = "correct";
+	char format[] = "%s";
+
+	zabbix_log(LOG_LEVEL_CRIT, "%s", "correct");
+	zabbix_log(LOG_LEVEL_CRIT, "%s", correct);
+	zabbix_log(LOG_LEVEL_CRIT, "correct");
+/*
+	zabbix_log(LOG_LEVEL_CRIT, format, "correct");
+	zabbix_log(LOG_LEVEL_CRIT, format, correct);
+	zabbix_log(LOG_LEVEL_CRIT, incorrect);
+	zabbix_log(LOG_LEVEL_CRIT, format_incorrect);
+*/
+}
+
 void test()
 {
 	zabbix_set_log_level(LOG_LEVEL_DEBUG);
@@ -470,7 +488,8 @@ void test()
 /*	test_params();*/
 /*	test_compress_signs(); */
 /*	test_expressions(); */
-	test_db_connection();
+/*	test_db_connection(); */
+	test_variable_argument_list();
 
 	printf("\n-= Test completed =-\n");
 }

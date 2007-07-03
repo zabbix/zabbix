@@ -194,7 +194,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 #endif
 }
 
-int zbx_db_execute(const char *fmt, ...)
+int __zbx_zbx_db_execute(const char *fmt, ...)
 {
 	va_list args;
 	int ret;
@@ -206,7 +206,12 @@ int zbx_db_execute(const char *fmt, ...)
 	return ret;
 }
 
-static DB_RESULT zbx_db_select(const char *fmt, ...)
+#ifdef HAVE___VA_ARGS__
+#	define zbx_db_select(fmt, ...)	__zbx_zbx_db_select(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#else
+#	define zbx_db_select __zbx_zbx_db_select
+#endif /* HAVE___VA_ARGS__ */
+static DB_RESULT __zbx_zbx_db_select(const char *fmt, ...)
 {
 	va_list args;
 	DB_RESULT	result;
