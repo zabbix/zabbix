@@ -76,19 +76,43 @@ void	init_collector_data(void)
 
 #else /* not _WINDOWS */
 
+#define ZBX_MAX_ATTEMPTS 10
+	int	attempts = 0;
+
 	key_t	shm_key;
 	int	shm_id;
 
 	ZBX_GET_SHM_KEY(shm_key);
 
-	shm_id = shmget(shm_key, sizeof(ZBX_COLLECTOR_DATA), IPC_CREAT | 0666);
-
-	if (-1 == shm_id)
+lbl_create:
+	if ( -1 == (shm_id = shmget(shm_key, sizeof(ZBX_COLLECTOR_DATA), IPC_CREAT | IPC_EXCL | 0666 /* 0022 */)) )
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Can't allocate shared memory for collector. [%s]",strerror(errno));
-		exit(1);
-	}
+		if( EEXIST == errno )
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Shared memory already exists for collector, trying to recreate.");
 
+			shm_id = shmget(shm_key, 0 /* get reference */, 0666 /* 0022 */);
+
+			shmctl(shm_id, IPC_RMID, 0);
+			if ( ++attempts > ZBX_MAX_ATTEMPTS )
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "Can't recreate shared memory for collector. [too many attempts]");
+				exit(1);
+			}
+			if ( attempts > (ZBX_MAX_ATTEMPTS / 2) )
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "Wait 1 sec for next attemtion of collector shared memory allocation.");
+				zbx_sleep(1);
+			}
+			goto lbl_create;
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "Can't allocate shared memory for collector. [%s]",strerror(errno));
+			exit(1);
+		}
+	}
+	
 	collector = shmat(shm_id, 0, 0);
 
 	if ((void*)(-1) == collector)
