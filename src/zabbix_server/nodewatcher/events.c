@@ -146,19 +146,19 @@ void main_eventsender()
 
 	master_nodeid = get_master_node(CONFIG_NODEID);
 
-	if(master_nodeid == 0)		return;
-
-	result = DBselect("select nodeid,event_lastid from nodes");
-
-	while((row = DBfetch(result)))
+	if(master_nodeid != 0)
 	{
-		nodeid=atoi(row[0]);
-		ZBX_STR2UINT64(lastid,row[1])
+		result = DBselect("select nodeid,event_lastid from nodes");
 
-		process_node(nodeid, master_nodeid, lastid);
+		while((row = DBfetch(result)))
+		{
+			nodeid=atoi(row[0]);
+			ZBX_STR2UINT64(lastid,row[1])
+
+			process_node(nodeid, master_nodeid, lastid);
+		}
+		DBfree_result(result);
 	}
-
-	DBfree_result(result);
 
 	DBcommit();
 }
