@@ -288,6 +288,10 @@
 	'S_ENABLE_SELECTED_ACTIONS_Q'=>		'Enable selected actions?',
 	'S_DISABLE_SELECTED_ACTIONS_Q'=>	'Disable selected actions?',
 	'S_DELETE_SELECTED_ACTION_Q'=>		'Delete selected action?',
+	'S_LIKE_SMALL'=>			'like',
+	'S_NOT_LIKE_SMALL'=>			'not like',
+	'S_IN_SMALL'=>				'in',
+	'S_NOT_IN_SMALL'=>			'not in',
 
 //	alarms.php
 	'S_ALARMS'=>				'Alarms',
