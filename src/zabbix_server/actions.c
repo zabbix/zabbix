@@ -280,7 +280,14 @@ static int	check_action_condition(DB_EVENT *event, DB_CONDITION *condition)
 			condition->value);
 		if(condition->operator == CONDITION_OPERATOR_IN)
 		{
-			if(check_time_period(condition->value, (time_t)NULL)==1)
+			if(check_time_period(condition->value, (time_t)NULL) == 1)
+			{
+				ret = SUCCEED;
+			}
+		}
+		else if(condition->operator == CONDITION_OPERATOR_NOT_IN)
+		{
+			if(check_time_period(condition->value, (time_t)NULL) == 0)
 			{
 				ret = SUCCEED;
 			}
