@@ -244,6 +244,9 @@ void	zbx_db_begin(void)
 #ifdef	HAVE_MYSQL
 	zbx_db_execute("%s","begin;");
 #endif
+#ifdef	HAVE_POSTGRESQL
+	zbx_db_execute("%s","begin;");
+#endif
 #ifdef	HAVE_SQLITE3
 	sqlite_transaction_started++;
 	
@@ -251,7 +254,7 @@ void	zbx_db_begin(void)
 	{
 		php_sem_acquire(&sqlite_access);
 
-		zbx_db_execute("begin;");
+		zbx_db_execute("%s","begin;");
 	}
 	else
 	{
@@ -278,7 +281,10 @@ void	zbx_db_begin(void)
 void zbx_db_commit(void)
 {
 #ifdef	HAVE_MYSQL
-	zbx_db_execute("commit;");
+	zbx_db_execute("%s","commit;");
+#endif
+#ifdef	HAVE_POSTGRESQL
+	zbx_db_execute("%s","commit;");
 #endif
 #ifdef	HAVE_SQLITE3
 
@@ -289,7 +295,7 @@ void zbx_db_commit(void)
 	
 	if(sqlite_transaction_started == 1)
 	{
-		zbx_db_execute("commit;");
+		zbx_db_execute("%s","commit;");
 
 		sqlite_transaction_started = 0;
 
@@ -317,6 +323,9 @@ void zbx_db_commit(void)
 void zbx_db_rollback(void)
 {
 #ifdef	HAVE_MYSQL
+	zbx_db_execute("rollback;");
+#endif
+#ifdef	HAVE_POSTGRESQL
 	zbx_db_execute("rollback;");
 #endif
 #ifdef	HAVE_SQLITE3
