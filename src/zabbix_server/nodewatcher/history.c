@@ -349,19 +349,19 @@ void main_historysender()
 
 	master_nodeid = get_master_node(CONFIG_NODEID);
 
-	if(master_nodeid == 0)		return;
-
-	result = DBselect("select nodeid from nodes");
-
-	while((row = DBfetch(result)))
+	if(master_nodeid != 0)
 	{
-		nodeid=atoi(row[0]);
-		ZBX_STR2UINT64(lastid,row[1])
+		result = DBselect("select nodeid from nodes");
 
-		process_node(nodeid, master_nodeid);
+		while((row = DBfetch(result)))
+		{
+			nodeid=atoi(row[0]);
+			ZBX_STR2UINT64(lastid,row[1])
+
+			process_node(nodeid, master_nodeid);
+		}
+		DBfree_result(result);
 	}
-
-	DBfree_result(result);
 
 	DBcommit();
 }

@@ -327,7 +327,8 @@ int main_housekeeper_loop()
 
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-		DBbegin();
+/* Transaction is not required here. It causes timeouts under MySQL */
+/*		DBbegin();*/
 
 /*		zbx_setproctitle("housekeeper [removing deleted hosts]");*/
 
@@ -361,7 +362,8 @@ int main_housekeeper_loop()
 
 		zbx_setproctitle("housekeeper [vacuuming database]");
 
-		DBcommit();
+/* Transaction is not required here. It causes timeouts under MySQL */
+/*		DBcommit();*/
 
 		DBvacuum();
 

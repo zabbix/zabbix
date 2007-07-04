@@ -1,5 +1,7 @@
 Changes for 1.4.2:
 
+ - added server-side transactions for PostgreSQL (Alexei)
+ - fixed housekeeper to run as multiple transations (Alexei)
  - added support of NOT IN operator for time periods (Alexei)
  - fixed processing of macro {TRIGGER.VALUE} on 32 bit systems (Alexei)
  - changed priorities of '|' and '&' in trigger expressions (Alexei)
