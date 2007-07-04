@@ -132,15 +132,17 @@ static int	get_value(
 	const char	*host,
 	unsigned short	port,
 	const char	*key,
-	char		*value,
-	int		value_max_len
+	char		**value
 	)
 {
 	zbx_sock_t	s;
 	int	ret;
-	char	
-		*buf,
+	char	*buf,
 		request[1024];
+
+	assert(value);
+
+	*value = NULL;
 
 	if( SUCCEED == (ret = zbx_tcp_connect(&s, host, port)) )
 	{
@@ -150,7 +152,7 @@ static int	get_value(
 			if( SUCCEED == (ret = zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE)) )
 			{
 				zbx_rtrim(buf,"\r\n\0");
-				zbx_snprintf(value, value_max_len, "%s", buf);
+				*value = strdup(buf);
 			}
 		}
 	}
@@ -178,7 +180,7 @@ int main(int argc, char **argv)
 {
 	unsigned short	port	= 10050;
 	int	ret	= SUCCEED;
-	char	value[MAX_STRING_LEN];
+	char	*value	= NULL;
 	char	*host	= NULL;
 	char	*key	= NULL;
 	char	ch;
@@ -230,7 +232,7 @@ int main(int argc, char **argv)
 		alarm(SENDER_TIMEOUT);
 #endif /* not WINDOWS */
 
-		ret = get_value(host, port, key, value, sizeof(value));
+		ret = get_value(host, port, key, &value);
 
 #if !defined(_WINDOWS)
 		alarm(0);
@@ -240,6 +242,8 @@ int main(int argc, char **argv)
 		{
 			printf("%s\n",value);
 		}
+
+		zbx_free(value);
 	}
 
 	zbx_free(host);
