@@ -51,7 +51,7 @@ include_once "include/page_header.php";
 
 	check_fields($fields);
 
-	$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,$ZBX_CURNODEID);
+	$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,$ZBX_CURNODEID);
 
 	if(!($httptest_data = DBfetch(DBselect('select ht.* from httptest ht, applications a '.
 		' where a.hostid in ('.$accessible_hosts.') and a.applicationid=ht.applicationid '.
