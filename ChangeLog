@@ -1,5 +1,6 @@
 Changes for 1.4.2:
 
+ - added availability of using ":," character for key (Eugene)
  - improved zabbix_get for receiving large data (Eugene)
  - fixed shared memory allocation (Eugene)
  - added server-side transactions for PostgreSQL (Alexei)

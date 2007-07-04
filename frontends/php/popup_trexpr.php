@@ -147,48 +147,34 @@ include_once "include/page_header.php";
 
 	if(isset($_REQUEST['expression']))
 	{
-		$pats = array(
-				array(
-					'pat' => '\{([[:print:]]{1,}):([[:print:]]{1,})\.([[:print:]]{1,})\(([[:print:]]{1,})\)\}'.
-						'(['.implode('',array_keys($operators)).'])([[:print:]]{1,})',
-					'idx' => array('host' => 1, 'key' => 2, 'function' => 3, 'param' => 4, 'operator' => 5, 'value'=>6)
-					)
-			);
 
-		foreach($pats as $pat)
+		if( ($res = ereg(
+			'^'.ZBX_EREG_SIMPLE_EXPRESSION_FORMAT.'(['.implode('',array_keys($operators)).'])'.'([[:print:]]{1,})',
+			$_REQUEST['expression'],
+			$expr_res))
+		)
 		{
-			if($res = eregi($pat['pat'],$_REQUEST['expression'],$expr_res))
-			{
-				if(isset($pat['idx']['host']) && isset($pat['idx']['key']))
-				{
-					$itemid = DBfetch(DBselect('select i.itemid from items i, hosts h '.
-							' where i.hostid=h.hostid and h.host='.zbx_dbstr($expr_res[$pat['idx']['host']]).
-							' and i.key_='.zbx_dbstr($expr_res[$pat['idx']['key']])));
+			$itemid = DBfetch(DBselect('select i.itemid from items i, hosts h '.
+					' where i.hostid=h.hostid and h.host='.zbx_dbstr($expr_res[ZBX_SIMPLE_EXPRESSION_HOST_ID]).
+					' and i.key_='.zbx_dbstr($expr_res[ZBX_SIMPLE_EXPRESSION_KEY_ID])));
 
-					$_REQUEST['itemid'] = $itemid['itemid'];
-				}
-				
-				if(isset($pat['idx']['param']))
-				{
-					$_REQUEST['paramtype'] = PARAM_TYPE_SECONDS;
-					$_REQUEST['param'] = $expr_res[$pat['idx']['param']];
-					if($_REQUEST['param'][0] == '#')
-					{
-						$_REQUEST['paramtype'] = PARAM_TYPE_COUNTS;
-						$_REQUEST['param'] = ltrim($_REQUEST['param'],'#');
-					}
-				}
-					
-				$operator = '=';
-				if(isset($pat['idx']['operator'])) $operator = $expr_res[$pat['idx']['operator']];
-				
-				if(isset($pat['idx']['function'])) $_REQUEST['expr_type'] = $expr_res[$pat['idx']['function']].'['.$operator.']';
-					
-				
-				if(isset($pat['idx']['value'])) $_REQUEST['value'] = $expr_res[$pat['idx']['value']];
-				
-				break;
+			$_REQUEST['itemid'] = $itemid['itemid'];
+			
+			$_REQUEST['paramtype'] = PARAM_TYPE_SECONDS;
+			$_REQUEST['param'] = $expr_res[ZBX_SIMPLE_EXPRESSION_FUNCTION_PARAM_ID];
+			if($_REQUEST['param'][0] == '#')
+			{
+				$_REQUEST['paramtype'] = PARAM_TYPE_COUNTS;
+				$_REQUEST['param'] = ltrim($_REQUEST['param'],'#');
 			}
+				
+			$operator = $expr_res[count($expr_res) - 2];
+			
+			$_REQUEST['expr_type'] = $expr_res[ZBX_SIMPLE_EXPRESSION_FUNCTION_NAME_ID].'['.$operator.']';
+				
+			
+			$_REQUEST['value'] = $expr_res[count($expr_res) - 1];
+			
 		}
 	}
 	unset($expr_res);
