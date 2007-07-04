@@ -76,6 +76,10 @@ int zbx_mutex_create_ext(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, unsigned char fo
 	/* NOTE: if(ERROR_ALREADY_EXISTS == GetLastError()) info("Successfully opened existed mutex!"); */
 
 #else /* not _WINDOWS */
+
+#define ZBX_MAX_ATTEMPTS 10
+	int	attempts = 0;
+
 	int	i;
 	key_t	sem_key;
 	union semun semopts;
@@ -110,14 +114,27 @@ lbl_create:
 	}
 	else if(errno == EEXIST)
 	{
-		ZBX_SEM_LIST_ID = semget(sem_key, ZBX_MUTEX_COUNT, 0666 /* 0022 */);
-		semopts.buf = &seminfo;
+		zabbix_log(LOG_LEVEL_DEBUG, "ZABBIX semaphores already exists, trying to recreate.");
+
+		ZBX_SEM_LIST_ID = semget(sem_key, 0 /* get reference */, 0666 /* 0022 */);
 
 		if(forced) {
 			semctl(ZBX_SEM_LIST_ID, 0, IPC_RMID, 0);
+
+			if ( ++attempts > ZBX_MAX_ATTEMPTS )
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "Can't recreate ZABBIX semaphores. [too many attempts]");
+				exit(1);
+			}
+			if ( attempts > (ZBX_MAX_ATTEMPTS / 2) )
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "Wait 1 sec for next attemtion of ZABBIX semaphores creation.");
+				zbx_sleep(1);
+			}
 			goto lbl_create;
 		}
 		
+		semopts.buf = &seminfo;
 		/* wait for initialization */
 		for ( i = 0; i < ZBX_MUTEX_MAX_TRIES; i++)
 		{
