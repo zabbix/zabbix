@@ -1,5 +1,6 @@
 Changes for 1.4.2:
 
+ - fixed shared memory allocation (Eugene)
  - added server-side transactions for PostgreSQL (Alexei)
  - fixed housekeeper to run as multiple transations (Alexei)
  - added support of NOT IN operator for time periods (Alexei)
