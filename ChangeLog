@@ -1,5 +1,6 @@
 Changes for 1.4.2:
 
+ - fixed processing of macro {TRIGGER.VALUE} on 32 bit systems (Alexei)
  - changed priorities of '|' and '&' in trigger expressions (Alexei)
  - fixed no graphs for PostgreSQL (Eugene)
  - fixed and improved eventlog monitoring (Eugene)

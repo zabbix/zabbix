@@ -1141,7 +1141,7 @@ zabbix_log( LOG_LEVEL_WARNING, "ALEX");
 		{
 			var_len = strlen(MVAR_TRIGGER_VALUE);
 
-			replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64,
+			replace_to = zbx_dsprintf(replace_to, "%d",
 				event->value);
 		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
