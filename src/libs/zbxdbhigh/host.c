@@ -2340,7 +2340,7 @@ static char*	DBimplode_exp (
 			zbx_free(str_esc);
 			key[key_len] = '.';
 
-			db_items = DBselect(sql);
+			db_items = DBselect("%s",sql);
 
 			zbx_free(sql);
 
@@ -2365,7 +2365,7 @@ static char*	DBimplode_exp (
 				zbx_free(str_esc);
 				parameter[parameter_len] = ')';
 
-				DBexecute(sql);
+				DBexecute("%s",sql);
 
 				exp = zbx_strdcatf(exp, "{" ZBX_FS_UI64 "}", functionid);
 
@@ -2681,7 +2681,7 @@ static int	DBupdate_trigger(
 
 		sql = zbx_strdcatf(sql, " value=2 where triggerid=" ZBX_FS_UI64,	triggerid);
 
-		DBexecute(sql);
+		DBexecute("%s",sql);
 
 		zbx_free(sql);
 

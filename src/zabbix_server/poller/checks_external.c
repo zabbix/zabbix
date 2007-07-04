@@ -79,17 +79,17 @@ int     get_value_external(DB_ITEM *item, AGENT_RESULT *result)
 	else
 	{
 		zbx_snprintf(error,MAX_STRING_LEN-1,"External check [%s] is not supported", item->key);
-		zabbix_log( LOG_LEVEL_DEBUG, error);
+		zabbix_log( LOG_LEVEL_DEBUG, "%s", error);
 		SET_STR_RESULT(result, strdup(error));
 		return NOTSUPPORTED;
 	}
 
 	zbx_snprintf(cmd, MAX_STRING_LEN-1, "%s/%s %s %s", CONFIG_EXTERNALSCRIPTS, scriptname, item->host_name, params);
-	zabbix_log( LOG_LEVEL_DEBUG, cmd );
+	zabbix_log( LOG_LEVEL_DEBUG, "%s", cmd );
 	if (NULL == (fp = popen(cmd, "r"))) 
 	{
 		zbx_snprintf(error,MAX_STRING_LEN-1,"External check [%s] is not supported, failed execution", item->key);
-		zabbix_log( LOG_LEVEL_DEBUG, error);
+		zabbix_log( LOG_LEVEL_DEBUG, "%s", error);
 		SET_STR_RESULT(result, strdup(error));
 		return NOTSUPPORTED;
 	}

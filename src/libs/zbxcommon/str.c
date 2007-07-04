@@ -135,7 +135,7 @@ int	find_char(char *str,char c)
  ******************************************************************************/
 /* #define ZBX_STDERR_FILE "zbx_errors.log" */
 
-void zbx_error(const char *fmt, ...)
+void __zbx_zbx_error(const char *fmt, ...)
 {
 	va_list args;
 	FILE *f = NULL;
@@ -176,7 +176,7 @@ void zbx_error(const char *fmt, ...)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-int zbx_snprintf(char* str, size_t count, const char *fmt, ...)
+int __zbx_zbx_snprintf(char* str, size_t count, const char *fmt, ...)
 {
 	va_list	args;
 	int	writen_len = 0;
@@ -246,7 +246,7 @@ int zbx_vsnprintf(char* str, size_t count, const char *fmt, va_list args)
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  ******************************************************************************/
-void zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_len, const char *fmt, ...)
+void __zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_len, const char *fmt, ...)
 {
 	va_list	args;
 
@@ -834,7 +834,7 @@ char* zbx_dvsprintf(char *dest, const char *f, va_list args)
  * Comments:  required free allocated string with function 'zbx_free'         *
  *                                                                            *
  ******************************************************************************/
-char* zbx_dsprintf(char *dest, const char *f, ...)
+char* __zbx_zbx_dsprintf(char *dest, const char *f, ...)
 {
 	char	*string = NULL;
 	va_list args;
@@ -905,7 +905,7 @@ char* zbx_strdcat(char *dest, const char *src)
  *            zbx_strdcat(NULL,"") must return "", not NULL!                  *
  *                                                                            *
  ******************************************************************************/
-char* zbx_strdcatf(char *dest, const char *f, ...)
+char* __zbx_zbx_strdcatf(char *dest, const char *f, ...)
 {
 	char *string = NULL;
 	char *result = NULL;

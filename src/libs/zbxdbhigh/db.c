@@ -163,7 +163,7 @@ void DBrollback(void)
  * Execute SQL statement. For non-select statements only.
  * If fails, program terminates.
  */ 
-int DBexecute(const char *fmt, ...)
+int __zbx_DBexecute(const char *fmt, ...)
 {
 	va_list args;
 	int ret = ZBX_DB_DOWN;
@@ -201,7 +201,7 @@ DB_ROW	DBfetch(DB_RESULT result)
  * Execute SQL statement. For select statements only.
  * If fails, program terminates.
  */ 
-DB_RESULT DBselect(const char *fmt, ...)
+DB_RESULT __zbx_DBselect(const char *fmt, ...)
 {
 	va_list args;
 	DB_RESULT result = (DB_RESULT)ZBX_DB_DOWN;

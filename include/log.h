@@ -36,7 +36,14 @@ extern int	CONFIG_LOG_FILE_SIZE;
 
 /* Type - 0 (syslog), 1 - file */
 int zabbix_open_log(int type,int level, const char *filename);
-void zabbix_log(int level, const char *fmt, ...);
+
+#ifdef HAVE___VA_ARGS__
+#	define zabbix_log(level, fmt, ...) __zbx_zabbix_log(level, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#else
+#	define zabbix_log __zbx_zabbix_log
+#endif /* HAVE___VA_ARGS__ */
+void __zbx_zabbix_log(int level, const char *fmt, ...);
+
 void zabbix_close_log(void);
 void zabbix_set_log_level(int level);
 

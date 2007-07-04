@@ -210,7 +210,6 @@ static int housekeeping_events(int now)
  ******************************************************************************/
 static int delete_history(char *table, zbx_uint64_t itemid, int keep_history, int now)
 {
-	char            sql[MAX_STRING_LEN];
 	DB_RESULT       result;
 	DB_ROW          row;
 	int             min_clock;
@@ -221,10 +220,9 @@ static int delete_history(char *table, zbx_uint64_t itemid, int keep_history, in
 		keep_history,
 		now);
 
-	zbx_snprintf(sql,sizeof(sql)-1,"select min(clock) from %s where itemid=" ZBX_FS_UI64,
+	result = DBselect("select min(clock) from %s where itemid=" ZBX_FS_UI64,
 		table,
 		itemid);
-	result = DBselect(sql);
 
 	row=DBfetch(result);
 
@@ -244,13 +242,11 @@ static int delete_history(char *table, zbx_uint64_t itemid, int keep_history, in
 		min_clock,
 		MIN(now-24*3600*keep_history, min_clock+4*3600*CONFIG_HOUSEKEEPING_FREQUENCY));*/
 
-	zbx_snprintf(sql,sizeof(sql)-1,"delete from %s where itemid=" ZBX_FS_UI64 " and clock<%d",
+	return DBexecute("delete from %s where itemid=" ZBX_FS_UI64 " and clock<%d",
 		table,
 		itemid,
 		MIN(now-24*3600*keep_history, min_clock+4*3600*CONFIG_HOUSEKEEPING_FREQUENCY)
 	);
-
-	return DBexecute(sql);
 }
 
 /******************************************************************************
@@ -271,7 +267,6 @@ static int delete_history(char *table, zbx_uint64_t itemid, int keep_history, in
  ******************************************************************************/
 static int housekeeping_history_and_trends(int now)
 {
-        char            sql[MAX_STRING_LEN];
         DB_ITEM         item;
 
         DB_RESULT       result;
@@ -282,8 +277,7 @@ static int housekeeping_history_and_trends(int now)
         zabbix_log( LOG_LEVEL_DEBUG, "In housekeeping_history_and_trends(%d)",
 		now);
 
-        zbx_snprintf(sql,sizeof(sql)-1,"select itemid,history,trends from items");
-        result = DBselect(sql);
+        result = DBselect("select itemid,history,trends from items");
 
         while((row=DBfetch(result)))
         {

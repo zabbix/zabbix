@@ -164,7 +164,7 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
 	zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]",sql);
 	zabbix_log( LOG_LEVEL_DEBUG, "SQL2 [%s]",sql2);
 
-	result = DBselect(sql);
+	result = DBselect("%s",sql);
 	while((row=DBfetch(result)))
 	{
 		valuetype = atoi(row[1]);
@@ -179,7 +179,7 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
 	}
 	DBfree_result(result);
 
-	result = DBselect(sql2);
+	result = DBselect("%s",sql2);
 	while((row=DBfetch(result)))
 	{
 		valuetype = atoi(row[1]);

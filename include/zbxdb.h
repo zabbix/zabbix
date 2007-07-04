@@ -117,7 +117,13 @@ void    zbx_db_close(void);
 void    zbx_db_vacuum(void);
 
 int	zbx_db_vexecute(const char *fmt, va_list args);
-int	zbx_db_execute(const char *fmt, ...);
+
+#ifdef HAVE___VA_ARGS__
+#	define zbx_db_execute(fmt, ...)	__zbx_zbx_db_execute(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#else
+#	define zbx_db_execute __zbx_zbx_db_execute
+#endif /* HAVE___VA_ARGS__ */
+int	__zbx_zbx_db_execute(const char *fmt, ...);
 
 DB_RESULT	zbx_db_vselect(const char *fmt, va_list args);
 DB_RESULT	zbx_db_select_n(char *query, int n);

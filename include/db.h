@@ -431,9 +431,20 @@ void    DBconnect(int flag);
 void    DBclose(void);
 void    DBvacuum(void);
 
-int	DBexecute(const char *fmt, ...);
+#ifdef HAVE___VA_ARGS__
+#	define DBexecute(fmt, ...) __zbx_DBexecute(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#else
+#	define DBexecute __zbx_DBexecute
+#endif /* HAVE___VA_ARGS__ */
+int	__zbx_DBexecute(const char *fmt, ...);
 
-DB_RESULT	DBselect(const char *fmt, ...);
+#ifdef HAVE___VA_ARGS__
+#	define DBselect(fmt, ...) __zbx_DBselect(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#else
+#	define DBselect __zbx_DBselect
+#endif /* HAVE___VA_ARGS__ */
+DB_RESULT	__zbx_DBselect(const char *fmt, ...);
+
 DB_RESULT	DBselectN(char *query, int n);
 DB_ROW		DBfetch(DB_RESULT result);
 zbx_uint64_t	DBinsert_id(int exec_result, const char *table, const char *field);
