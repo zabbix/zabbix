@@ -298,11 +298,12 @@ include_once 'include/discovery.inc.php';
 	{
 		$str_op[CONDITION_OPERATOR_EQUAL] 	= '=';
 		$str_op[CONDITION_OPERATOR_NOT_EQUAL]	= '<>';
-		$str_op[CONDITION_OPERATOR_LIKE]	= 'like';
-		$str_op[CONDITION_OPERATOR_NOT_LIKE]	= 'not like';
-		$str_op[CONDITION_OPERATOR_IN]		= 'in';
+		$str_op[CONDITION_OPERATOR_LIKE]	= S_LIKE_SMALL;
+		$str_op[CONDITION_OPERATOR_NOT_LIKE]	= S_NOT_LIKE_SMALL;
+		$str_op[CONDITION_OPERATOR_IN]		= S_IN_SMALL;
 		$str_op[CONDITION_OPERATOR_MORE_EQUAL]	= '>=';
 		$str_op[CONDITION_OPERATOR_LESS_EQUAL]	= '<=';
+		$str_op[CONDITION_OPERATOR_NOT_IN]	= S_NOT_IN_SMALL;
 
 		if(isset($str_op[$operator]))
 			return $str_op[$operator];
@@ -558,7 +559,8 @@ include_once 'include/discovery.inc.php';
 				CONDITION_OPERATOR_EQUAL
 			);
 		$operators[CONDITION_TYPE_TIME_PERIOD] = array(
-				CONDITION_OPERATOR_IN
+				CONDITION_OPERATOR_IN,
+				CONDITION_OPERATOR_NOT_IN
 			);
 		$operators[CONDITION_TYPE_DHOST_IP] = array(
 				CONDITION_OPERATOR_EQUAL,
