@@ -21,6 +21,7 @@
 <?php
 	require_once "maps.inc.php";
 	require_once "acknow.inc.php";
+	require_once "services.inc.php";
 
 	/*
 	 * Function: INIT_TRIGGER_EXPRESSION_STRUCTURES
