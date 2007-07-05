@@ -47,6 +47,18 @@ require_once "include/items.inc.php";
 		return DBexecute('delete from hosts_groups where hostid='.$hostid.' and groupid='.$groupid);
 	}
 
+	/*
+	 * Function: db_save_group
+	 *
+	 * Description:
+	 *     Add new or update host group
+	 *
+	 * Author:
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 * Comments:
+	 *
+	 */
 	function	db_save_group($name,$groupid=null)
 	{
 		if(!is_string($name)){
@@ -131,7 +143,20 @@ require_once "include/items.inc.php";
 		return $result;
 	}
 
-/* HOST finction */
+	/*
+	 * Function: check_circle_host_link
+	 *
+	 * Description:
+	 *     Check templates linage circeling
+	 *
+	 * Author:
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 * Comments:
+	 *
+	 *     NOTE: templates = array(id => name, id2 => name2, ...)
+	 *
+	 */
 	function 	check_circle_host_link($hostid, $templates)
 	{
 		if(count($templates) == 0)	return false;
@@ -143,20 +168,33 @@ require_once "include/items.inc.php";
 		return false;
 	}
 
+	/*
+	 * Function: db_save_host
+	 *
+	 * Description:
+	 *     Add or update host
+	 *
+	 * Author:
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 * Comments:
+	 *     if hostid is NULL add new host, in other cases update
+	 *
+	 *     NOTE: templates = array(id => name, id2 => name2, ...)
+	 */
 	function	db_save_host($host,$port,$status,$useip,$dns,$ip,$templates,$hostid=null)
 	{
 		global $ZBX_CURNODEID;
 		
 		if( !eregi('^'.ZBX_EREG_HOST_FORMAT.'$', $host) )
 		{
-			error("Hostname should contain '0-9a-zA-Z_. $'- characters only");
+			error("Incorrect characters used for Hostname");
 			return false;
 		}
 
-/* Character '-' must be last in the list of symbols, otherwise it won't be accepted */
- 		if ( !empty($dns) && !eregi('^([0-9a-zA-Z\_\.\$[.-.]]+)$', $dns)) 
+ 		if ( !empty($dns) && !eregi('^'.ZBX_EREG_DNS_FORMAT.'$', $dns)) 
 		{
-			error("DNS should contain '0-9a-zA-Z_.$'- characters only");
+			error("Incorrect characters used for DNS");
 			return false;
 		}
 
@@ -205,6 +243,19 @@ require_once "include/items.inc.php";
 		return $result;
 	}
 
+	/*
+	 * Function: add_host
+	 *
+	 * Description:
+	 *     Add new  host
+	 *
+	 * Author:
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 * Comments:
+	 *
+	 *     NOTE: templates = array(id => name, id2 => name2, ...)
+	 */
 	function	add_host($host,$port,$status,$useip,$dns,$ip,$templates,$newgroup,$groups)
 	{
 		$hostid = db_save_host($host,$port,$status,$useip,$dns,$ip,$templates);
@@ -224,6 +275,19 @@ require_once "include/items.inc.php";
 		return	$hostid;
 	}
 
+	/*
+	 * Function: update_host
+	 *
+	 * Description:
+	 *     Update host
+	 *
+	 * Author:
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 * Comments:
+	 *
+	 *     NOTE: templates = array(id => name, id2 => name2, ...)
+	 */
 	function	update_host($hostid,$host,$port,$status,$useip,$dns,$ip,$templates,$newgroup,$groups)
 	{
 		$old_templates = get_templates_by_hostid($hostid);
@@ -247,17 +311,24 @@ require_once "include/items.inc.php";
 
 		if(count($new_templates) > 0)
 		{
-			sync_host_with_templates($hostid,$new_templates);
+			sync_host_with_templates($hostid,array_keys($new_templates));
 		}
 
 		return	$result;
 	}
 
-	/******************************************************************************
-	 *                                                                            *
-	 * Comments: !!! Don't forget sync code with C !!!                            *
-	 *                                                                            *
-	 ******************************************************************************/
+	/*
+	 * Function: unlink_template
+	 *
+	 * Description:
+	 *     Unlink elements from host by template
+	 *
+	 * Author:
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 * Comments: !!! Don't forget sync code with C !!!
+	 *
+	 */
 	function	unlink_template($hostid, $templateid, $unlink_mode = true)
 	{
 		if( !is_numeric($templateid) ) fatal_error('Not supported type for [templateid] in [unlink_template] - ['.$templateid.']');
@@ -266,11 +337,18 @@ require_once "include/items.inc.php";
 		DBexecute("delete from hosts_templates where hostid=".$hostid.' and templateid='.$templateid);
 	}
 
-	/******************************************************************************
-	 *                                                                            *
-	 * Comments: !!! Don't forget sync code with C !!!                            *
-	 *                                                                            *
-	 ******************************************************************************/
+	/*
+	 * Function: delete_template_elements
+	 *
+	 * Description:
+	 *     Delete all elements from host by template
+	 *
+	 * Author:
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 * Comments: !!! Don't forget sync code with C !!!
+	 *
+	 */
 	function	delete_template_elements($hostid, $templateid = null, $unlink_mode = false)
 	{
 		delete_template_graphs($hostid, $templateid, $unlink_mode);
@@ -279,11 +357,18 @@ require_once "include/items.inc.php";
 		delete_template_applications($hostid, $templateid, $unlink_mode);
 	}	
 
-	/******************************************************************************
-	 *                                                                            *
-	 * Comments: !!! Don't forget sync code with C !!!                            *
-	 *                                                                            *
-	 ******************************************************************************/
+	/*
+	 * Function: copy_template_elements 
+	 *
+	 * Description:
+	 *     Copy all elements from template to host
+	 *
+	 * Author:
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 * Comments: !!! Don't forget sync code with C !!!
+	 *
+	 */
 	function	copy_template_elements($hostid, $templateid = null, $copy_mode = false)
 	{
 		copy_template_applications($hostid, $templateid, $copy_mode);
@@ -292,12 +377,18 @@ require_once "include/items.inc.php";
 		copy_template_graphs($hostid, $templateid, $copy_mode);
 	}
 
-# Sync host with linked template
-	/******************************************************************************
-	 *                                                                            *
-	 * Comments: !!! Don't forget sync code with C !!!                            *
-	 *                                                                            *
-	 ******************************************************************************/
+	/*
+	 * Function: sync_host_with_templates
+	 *
+	 * Description:
+	 *     Synchronize template elements with host
+	 *
+	 * Author:
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 * Comments: !!! Don't forget sync code with C !!!
+	 *
+	 */
 	function	sync_host_with_templates($hostid, $templateid = null)
 	{
 		delete_template_elements($hostid, $templateid);		
@@ -323,13 +414,18 @@ require_once "include/items.inc.php";
 		}
 	}
 
-	# Delete Host
-
-	/******************************************************************************
-	 *                                                                            *
-	 * Comments: !!! Don't forget sync code with C !!!                            *
-	 *                                                                            *
-	 ******************************************************************************/
+	/*
+	 * Function: delete_host
+	 *
+	 * Description:
+	 *     Delete host with all elements and relations
+	 *
+	 * Author:
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 * Comments: !!! Don't forget sync code with C !!!
+	 *
+	 */
 	function	delete_host($hostid, $unlink_mode = false)
 	{
 		global $DB_TYPE;
@@ -451,6 +547,18 @@ require_once "include/items.inc.php";
 		}
 	}
 	
+	/*
+	 * Function: get_templates_by_hostid
+	 *
+	 * Description:
+	 *     Retrive templates for specified host
+	 *
+	 * Author:
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 * Comments:
+	 *
+	 */
 	function	get_templates_by_hostid($hostid)
 	{
 		$resuilt = array();
@@ -464,6 +572,18 @@ require_once "include/items.inc.php";
 		return $resuilt;
 	}
 
+	/*
+	 * Function: get_correct_group_and_host
+	 *
+	 * Description:
+	 *     Retrive correct relations for group and host
+	 *
+	 * Author:
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 * Comments:
+	 *
+	 */
 	function get_correct_group_and_host($a_groupid=null, $a_hostid=null, $perm=PERM_READ_WRITE, $options = array())
 	{
 		if(!is_array($options))
@@ -587,6 +707,19 @@ require_once "include/items.inc.php";
 			);
 	}
 
+	/*
+	 * Function: validate_group_with_host
+	 *
+	 * Description:
+	 *     Check available groups and host by user permission
+	 *     and check current group an host relations
+	 *
+	 * Author:
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 * Comments:
+	 *
+	 */
 	function	validate_group_with_host($perm, $options = array(),$group_var=null,$host_var=null)
 	{
 		if(is_null($group_var)) $group_var = "web.latest.groupid";
@@ -618,6 +751,18 @@ require_once "include/items.inc.php";
 		update_profile($group_var,$_REQUEST["groupid"]);
 	}
 
+	/*
+	 * Function: validate_group
+	 *
+	 * Description:
+	 *     Check available groups by user permisions
+	 *
+	 * Author:
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 * Comments:
+	 *
+	 */
 	function	validate_group($perm, $options = array(),$group_var=null)
 	{
 		if(is_null($group_var)) $group_var = "web.latest.groupid";
@@ -633,11 +778,18 @@ require_once "include/items.inc.php";
 
 /* APPLICATIONS */
 
-	/******************************************************************************
-	 *                                                                            *
-	 * Comments: !!! Don't forget sync code with C !!!                            *
-	 *                                                                            *
-	 ******************************************************************************/
+	/*
+	 * Function: db_save_application
+	 *
+	 * Description:
+	 *     Add or update application
+	 *
+	 * Author:
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 * Comments: !!! Don't forget sync code with C !!!
+	 *       If applicationid is NULL add application, in other cases update
+	 */
 	function	db_save_application($name,$hostid,$applicationid=null,$templateid=0)
 	{
 		if(!is_string($name)){
@@ -716,21 +868,49 @@ require_once "include/items.inc.php";
 		return false;
 
 	}
+
+	/*
+	 * Function: add_application
+	 *
+	 * Description:
+	 *     Add application
+	 *
+	 * Author:
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 */
 	function	add_application($name,$hostid,$templateid=0)
 	{
 		return db_save_application($name,$hostid,null,$templateid);
 	}
 
+	/*
+	 * Function: update_application
+	 *
+	 * Description:
+	 *     Update application
+	 *
+	 * Author:
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 */
 	function	update_application($applicationid,$name,$hostid,$templateid=0)
 	{
 		return db_save_application($name,$hostid,$applicationid,$templateid);
 	}
 	
-	/******************************************************************************
-	 *                                                                            *
-	 * Comments: !!! Don't forget sync code with C !!!                            *
-	 *                                                                            *
-	 ******************************************************************************/
+	/*
+	 * Function: delete_application
+	 *
+	 * Description:
+	 *     Delete application with all linkages
+	 *
+	 * Author:
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 * Comments: !!! Don't forget sync code with C !!!
+	 *
+	 */
 	function	delete_application($applicationid)
 	{
 		$app = get_application_by_applicationid($applicationid);
@@ -816,14 +996,23 @@ require_once "include/items.inc.php";
 
 	function	&get_applications_by_hostid($hostid)
 	{
-		return DBselect("select * from applications where hostid=$hostid");
+		return DBselect('select * from applications where hostid='.$hostid);
 	}
 
-	/******************************************************************************
-	 *                                                                            *
-	 * Comments: !!! Don't forget sync code with C !!!                            *
-	 *                                                                            *
-	 ******************************************************************************/
+	/*
+	 * Function: delete_template_applications
+	 *
+	 * Description:
+	 *     Delete applicatios from host by templates
+	 *
+	 * Author:
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 * Comments: !!! Don't forget sync code with C !!!
+	 *
+	 *           $templateid can be numeric or numeric array
+	 *
+	 */
 	function        delete_template_applications($hostid, $templateid = null, $unlink_mode = false)
 	{
 		$db_apps = get_applications_by_hostid($hostid);
@@ -864,21 +1053,30 @@ require_once "include/items.inc.php";
 		}
 	}
 
-	/******************************************************************************
-	 *                                                                            *
-	 * Comments: !!! Don't forget sync code with C !!!                            *
-	 *                                                                            *
-	 ******************************************************************************/
-	function	copy_template_applications($hostid, $templateid = null /* array format 'arr[id]=name' */, $copy_mode = false)
+	/*
+	 * Function: copy_template_applications
+	 *
+	 * Description:
+	 *     Copy applicatios from templates to host
+	 *
+	 * Author:
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 * Comments: !!! Don't forget sync code with C !!!
+	 *
+	 *           $templateid can be numeric or numeric array
+	 *
+	 */
+	function	copy_template_applications($hostid, $templateid = null, $copy_mode = false)
 	{
 		if(null == $templateid)
 		{
-			$templateid = get_templates_by_hostid($hostid);
+			$templateid = array_keys(get_templates_by_hostid($hostid));
 		}
 		
 		if(is_array($templateid))
 		{
-			foreach($templateid as $id => $name)
+			foreach($templateid as $id)
 				copy_template_applications($hostid, $id, $copy_mode); // attention recursion
 			return;
 		}
@@ -894,6 +1092,19 @@ require_once "include/items.inc.php";
 		}
 	}
 
+	/*
+	 * Function: validate_templates
+	 *
+	 * Description:
+	 *     Check collisions between templates
+	 *
+	 * Author:
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 * Comments: 
+	 *           $templateid_list can be numeric or numeric array
+	 *
+	 */
 	function	validate_templates($templateid_list)
 	{
 		if(is_numeric($templateid_list))return true;

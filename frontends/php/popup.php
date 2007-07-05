@@ -740,7 +740,7 @@ function add_item_variable(s_formname,x_value)
 		if(isset($hostid)) 
 			$sql .= " and h.hostid=$hostid";
 
-		$sql .= " order by h.host";
+		$sql .= " order by h.host, i.description, i.key_, i.itemid";
 			
 		$result = DBselect($sql);
 		while($row = DBfetch($result))

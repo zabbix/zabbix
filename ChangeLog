@@ -1,5 +1,6 @@
 Changes for 1.5:
 
+ - added frontend-side support of quotes and triger expression validation (Eugene)
  - added availability to show negative values in graphs (Artem) 
  - developed database monitoring via ODBC (Eugene)
  - added availability to export/import templates for hosts (Artem)
