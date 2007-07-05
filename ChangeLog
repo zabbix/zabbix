@@ -1,5 +1,6 @@
 Changes for 1.4.2:
 
+ - fixed internal loging system (Eugene)
  - added non-persistent connection for PostgreSQL to avoid problems with unfinished transactions (Alexei)
  - fixed housekeeper to process history_text (Alexei)
  - added availability of using ":," character for key (Eugene)

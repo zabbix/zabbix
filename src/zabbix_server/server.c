@@ -481,7 +481,17 @@ void test_variable_argument_list(void)
 
 void test()
 {
-	zabbix_set_log_level(LOG_LEVEL_DEBUG);
+
+	if(CONFIG_LOG_FILE == NULL)
+	{
+		zabbix_open_log(LOG_TYPE_UNDEFINED,LOG_LEVEL_DEBUG,NULL);
+	}
+	else
+	{
+		zabbix_open_log(LOG_TYPE_FILE,LOG_LEVEL_DEBUG,CONFIG_LOG_FILE);
+	}
+
+	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_server. ZABBIX %s.", ZABBIX_VERSION);
 
 	printf("-= Test Started =-\n\n");
 
@@ -489,7 +499,7 @@ void test()
 /*	test_compress_signs(); */
 /*	test_expressions(); */
 /*	test_db_connection(); */
-	test_variable_argument_list();
+/*	test_variable_argument_list(); */
 
 	printf("\n-= Test completed =-\n");
 }
@@ -565,17 +575,6 @@ int main(int argc, char **argv)
 	}
 
 #ifdef ZABBIX_TEST
-	if(CONFIG_LOG_FILE == NULL)
-	{
-		zabbix_open_log(LOG_TYPE_UNDEFINED,CONFIG_LOG_LEVEL,NULL);
-	}
-	else
-	{
-		zabbix_open_log(LOG_TYPE_FILE,CONFIG_LOG_LEVEL,CONFIG_LOG_FILE);
-	}
-
-	zabbix_log( LOG_LEVEL_WARNING, "Starting zabbix_server. ZABBIX %s.", ZABBIX_VERSION);
-
 	test();
 
 	zbx_on_exit();

@@ -135,8 +135,6 @@ int	daemon_start(int allow_root)
 	chdir("/");
 	umask(0002);
 
-	for(i=0; i<MAXFD; i++)	close(i);
-
 	redirect_std(CONFIG_LOG_FILE);
 
 #ifdef HAVE_SYS_RESOURCE_SETPRIORITY
