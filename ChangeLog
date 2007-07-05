@@ -8,6 +8,7 @@ Changes for 1.5:
 
 Changes for 1.4.2:
 
+ - fixed housekeeper to process history_text (Alexei)
  - improved zabbix_get for receiving large data (Eugene)
  - fixed shared memory allocation (Eugene)
  - added server-side transactions for PostgreSQL (Alexei)
