@@ -28,7 +28,7 @@
 		return $event_data;
 	}
 
-	function 	get_acknowledges_by_eventid($eventid)
+	function 	&get_acknowledges_by_eventid($eventid)
 	{
 		return DBselect("select * from acknowledges where eventid=$eventid");
 	}
