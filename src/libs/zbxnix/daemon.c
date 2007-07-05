@@ -87,7 +87,6 @@ static void	parent_signal_handler(int sig)
 
 int	daemon_start(int allow_root)
 {
-	int     		i;
 	pid_t   		pid;
 	struct passwd		*pwd;
 	struct sigaction	phan;
@@ -134,8 +133,6 @@ int	daemon_start(int allow_root)
 
 	chdir("/");
 	umask(0002);
-
-	for(i=0; i<MAXFD; i++)	close(i);
 
 	redirect_std(CONFIG_LOG_FILE);
 
