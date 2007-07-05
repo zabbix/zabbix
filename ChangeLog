@@ -1,5 +1,6 @@
 Changes for 1.4.2:
 
+ - fixed item multiple cleaning on mass update (Eugene)
  - fixed error 'undefined function delete_service' (Eugene)
  - fixed internal loging system (Eugene)
  - added non-persistent connection for PostgreSQL to avoid problems with unfinished transactions (Alexei)

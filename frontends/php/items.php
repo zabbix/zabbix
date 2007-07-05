@@ -299,7 +299,7 @@ include_once "include/page_header.php";
 		$result = false;
 
 		if(!is_null(get_request("formula",null))) $_REQUEST['multiplier']=1;
-		if(0 == get_request("formula",null)) $_REQUEST['multiplier']=0;
+		if("0" === get_request("formula",null)) $_REQUEST['multiplier']=0;
 
 		$group_itemid = $_REQUEST["group_itemid"];
 		foreach($group_itemid as $id)
