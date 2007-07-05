@@ -76,6 +76,7 @@ void redirect_std(const char *filename)
 	else
 	{
 		zbx_error("Cannot open [%s] [%s]", filename, strerror(errno));
+		exit(FAIL);
 	}
 }
 
