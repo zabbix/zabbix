@@ -87,7 +87,6 @@ static void	parent_signal_handler(int sig)
 
 int	daemon_start(int allow_root)
 {
-	int     		i;
 	pid_t   		pid;
 	struct passwd		*pwd;
 	struct sigaction	phan;
