@@ -683,9 +683,9 @@ if test "$server" = "yes"; then
 
 	fi
 
-	AM_CONDITIONAL(WITH_ODBC, test x$have_odbc != xno)
-
 fi
+
+AM_CONDITIONAL(WITH_ODBC, test x$have_odbc != xno)
 
 AM_CONDITIONAL(JABBER,  test "x$found_jabber" = "xyes")
 
