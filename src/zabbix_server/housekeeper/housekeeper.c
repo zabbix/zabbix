@@ -288,7 +288,7 @@ static int housekeeping_history_and_trends(int now)
                 deleted += delete_history("history", item.itemid, item.history, now);
                 deleted += delete_history("history_uint", item.itemid, item.history, now);
                 deleted += delete_history("history_str", item.itemid, item.history, now);
-                deleted += delete_history("history_str", item.itemid, item.history, now);
+                deleted += delete_history("history_text", item.itemid, item.history, now);
                 deleted += delete_history("history_log", item.itemid, item.history, now);
                 deleted += delete_history("trends", item.itemid, item.trends, now);
         }
