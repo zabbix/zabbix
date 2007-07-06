@@ -614,8 +614,8 @@ if test "$server" = "yes"; then
 	AC_SUBST(DB_LIBS)
 
 	CFLAGS="${CFLAGS} ${DB_CPPFLAGS}"
-	LDFLAGS="${LDFLAGS} ${DB_LDFLAGS}"
-	LIBS="${LIBS} ${DB_LIBS}"
+	SERVER_LDFLAGS="${SERVER_LDFLAGS} ${DB_LDFLAGS}"
+	SERVER_LIBS="${SERVER_LIBS} ${DB_LIBS}"
 	
 	dnl Checking for Jabber libraries
 	JABBER_CHECK_CONFIG()
@@ -625,7 +625,7 @@ if test "$server" = "yes"; then
 		fi
 	fi
 	CFLAGS="${CFLAGS} ${JABBER_CPPFLAGS}"
-	LDFLAGS="${LDFLAGS} ${JABBER_LDFLAGS}"
+	SERVER_LDFLAGS="${SERVER_LDFLAGS} ${JABBER_LDFLAGS}"
 
 	dnl Check for libCurl [default - yes]
 	LIBCURL_CHECK_CONFIG(, [7.15.1], [],[])
@@ -635,36 +635,40 @@ if test "$server" = "yes"; then
 		fi
 	fi
 	CFLAGS="${CFLAGS} ${LIBCURL_CPPFLAGS}"
-	LDFLAGS="${LDFLAGS} ${LIBCURL_LDFLAGS}"
-	LIBS="${LIBS} ${LIBCURL_LIBS}"
+	SERVER_LDFLAGS="${SERVER_LDFLAGS} ${LIBCURL_LDFLAGS}"
+	SERVER_LIBS="${SERVER_LIBS} ${LIBCURL_LIBS}"
+
+	dnl Check for NET-SNMP [by default - skip]
+	LIBNETSNMP_CHECK_CONFIG([no])
+	if test "x$want_netsnmp" = "xyes"; then
+		if test "x$found_netsnmp" != "xyes"; then
+			AC_MSG_ERROR([Invalid NET-SNMP directory - unable to find net-snmp-config])
+		fi
+	fi
+	CFLAGS="${CFLAGS} ${SNMP_CFLAGS}"
+	SERVER_LDFLAGS="${SERVER_LDFLAGS} ${SNMP_LDFLAGS}"
+	SERVER_LIBS="${SERVER_LIBS} ${SNMP_LIBS}"
+
+	dnl Check for UCD-SNMP [by default - skip]
+	LIBSNMP_CHECK_CONFIG([no])
+	if test "x$want_snmp" = "xyes"; then
+		if test "x$found_snmp" != "xyes"; then
+			AC_MSG_ERROR([Invalid UCD-SNMP directory - unable to find ucd-snmp-config.h])
+		fi
+
+		if test  "x$found_netsnmp" = "xyes"; then
+			AC_MSG_ERROR([You can configure for only one SNMP library.])
+		fi
+	fi
+	CFLAGS="${CFLAGS} ${SNMP_CPPFLAGS}"
+	SERVER_LDFLAGS="${SERVER_LDFLAGS} ${SNMP_LDFLAGS}"
+
+	AC_SUBST(SERVER_LDFLAGS)
+	AC_SUBST(SERVER_LIBS)
+
 fi
 
 AM_CONDITIONAL(JABBER,  test "x$found_jabber" = "xyes")
-
-dnl Check for NET-SNMP [by default - skip]
-LIBNETSNMP_CHECK_CONFIG([no])
-if test "x$want_netsnmp" = "xyes"; then
-	if test "x$found_netsnmp" != "xyes"; then
-		AC_MSG_ERROR([Invalid NET-SNMP directory - unable to find net-snmp-config])
-	fi
-fi
-CFLAGS="${CFLAGS} ${SNMP_CFLAGS}"
-LDFLAGS="${LDFLAGS} ${SNMP_LDFLAGS}"
-LIBS="${LIBS} ${SNMP_LIBS}"
-
-dnl Check for UCD-SNMP [by default - skip]
-LIBSNMP_CHECK_CONFIG([no])
-if test "x$want_snmp" = "xyes"; then
-	if test "x$found_snmp" != "xyes"; then
-		AC_MSG_ERROR([Invalid UCD-SNMP directory - unable to find ucd-snmp-config.h])
-	fi
-
-	if test  "x$found_netsnmp" = "xyes"; then
-		AC_MSG_ERROR([You can configure for only one SNMP library.])
-	fi
-fi
-CFLAGS="${CFLAGS} ${SNMP_CPPFLAGS}"
-LDFLAGS="${LDFLAGS} ${SNMP_LDFLAGS}"
 
 dnl Check for libLDAP [by default - skip]
 LIBLDAP_CHECK_CONFIG([no])
@@ -813,19 +817,32 @@ echo "
 
 Configuration:
 
-  Detected OS:      ${host_os}
-  Install path:     ${prefix}
-  Compilation arch: ${ARCH}
+  Detected OS:        ${host_os}
+  Install path:       ${prefix}
+  Compilation arch:   ${ARCH}
 
-  Compiler:         ${CC}
-  Compiler flags:   ${CFLAGS}
-  Linker flags:     ${LDFLAGS}
-  Libraries:        ${LIBS}
+  Compiler:           ${CC}
+  Compiler flags:     ${CFLAGS}
 
-  Enable server:    ${server}
-  With database:    ${have_db}
+  Enable server:      ${server}"
 
-  Enable agent:     ${agent}"
+if test "x$server" != "xno"; then
+
+echo "  With database:      ${have_db}
+  Linker flags:       ${LDFLAGS} ${SERVER_LDFLAGS}
+  Libraries:          ${LIBS} ${SERVER_LIBS}"
+
+fi
+
+echo "
+  Enable agent:       ${agent}"
+
+if test "x$agent" != "xno"; then
+
+echo "  Linker flags:       ${LDFLAGS}
+  Libraries:          ${LIBS}"
+
+fi
 
 echo
 echo "***********************************************************"
