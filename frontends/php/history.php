@@ -64,7 +64,7 @@ include_once "include/page_header.php";
 
 /* actions */
 		"remove_log"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		""=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"reset"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 /* other */
 		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
