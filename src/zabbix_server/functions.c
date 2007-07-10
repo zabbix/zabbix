@@ -560,7 +560,7 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 {
 	int ret = SUCCEED;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In add_history(%s,,%X,%X)",
+	zabbix_log( LOG_LEVEL_DEBUG, "In add_history(key:%s,value_type:%X,type:%X)",
 		item->key,
 		item->value_type,
 		value->type);
