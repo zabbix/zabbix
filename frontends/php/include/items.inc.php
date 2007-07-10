@@ -227,7 +227,8 @@
 		if($type == ITEM_TYPE_AGGREGATE)
 		{
 			/* grpfunc('group','key','itemfunc','numeric param') */
-			if(eregi('^((.)*)(\(\'((.)*)\'\,\'((.)*)\'\,\'((.)*)\'\,\'([0-9]+)\'\))$', $key, $arr))
+//			if(eregi('^((.)*)(\(\'((.)*)\'\,\'((.)*)\'\,\'((.)*)\'\,\'([0-9]+)\'\))$', $key, $arr))
+			if(eregi('^((.)*)(\[\"((.)*)\"\,\"((.)*)\"\,\"((.)*)\"\,\"([0-9]+)\"\])$', $key, $arr))
 			{
 				$g=$arr[1];
 				if(!in_array($g,array("grpmax","grpmin","grpsum","grpavg")))
@@ -251,7 +252,7 @@
 			}
 			else
 			{
-				error("Key does not match grpfunc('group','key','itemfunc','numeric param')");
+				error("Key does not match grpfunc[\"group\",\"key\",\"itemfunc\",\"numeric param\")");
 				return FALSE;
 			}
 		}

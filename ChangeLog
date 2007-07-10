@@ -1,5 +1,6 @@
 Changes for 1.4.2:
 
+ - changed syntax of keys for aggregate items (Alexei)
  - fixed DM configuration exchange in 32-bit environments (Alexei)
  - fixed agent library dependencies (Eugene)
  - fixed reset button for graph (Eugene)
