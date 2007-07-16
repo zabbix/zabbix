@@ -20,7 +20,7 @@
 ?>
 <?php
 	require_once "include/config.inc.php";
-	require_once "include/classes/graph.inc.php";
+	require_once "include/classes/chart.inc.php";
 	
 	$page["file"]	= "chart.php";
 	$page["title"]	= "S_CHART";

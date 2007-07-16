@@ -21,7 +21,7 @@
 <?php
 	require_once "include/config.inc.php";
 	require_once "include/graphs.inc.php";
-	require_once "include/classes/chart.inc.php";
+	require_once "include/classes/pie.inc.php";
 	
 	$page["file"]	= "chart3.php";
 	$page["title"]	= "S_CHART";
@@ -40,11 +40,9 @@ include_once "include/page_header.php";
 		"name"=>	array(T_ZBX_STR, O_OPT,	NULL,		null,			null),
 		"width"=>	array(T_ZBX_INT, O_OPT,	NULL,		BETWEEN(0,65535),	null),
 		"height"=>	array(T_ZBX_INT, O_OPT,	NULL,		BETWEEN(0,65535),	null),
-		"yaxistype"=>	array(T_ZBX_INT, O_OPT,	NULL,		IN("0,1"),		null),
-		"graphtype"=>	array(T_ZBX_INT, O_OPT,	NULL,		IN("0,1"),		null),
-		"yaxismin"=>	array(T_ZBX_DBL, O_OPT,	NULL,		BETWEEN(-65535,65535),	null),
-		"yaxismax"=>	array(T_ZBX_DBL, O_OPT,	NULL,		null,	null),
-		"yaxismax"=>	array(T_ZBX_DBL, O_OPT,	NULL,		null,	null),
+		"graphtype"=>	array(T_ZBX_INT, O_OPT,	NULL,		IN("2,3"),		null),
+		"graph3d"=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	IN('0,1'),		null),
+		"legend"=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	IN('0,1'),		null),
 		"items"=>	array(T_ZBX_STR, O_OPT,	NULL,		null,			null)
 	);
 
@@ -66,10 +64,16 @@ include_once "include/page_header.php";
 		}
 	}
 
-	$graph = new Chart(get_request("graphtype"	,GRAPH_TYPE_NORMAL));
+	$graph = new Pie(get_request("graphtype"	,GRAPH_TYPE_NORMAL));
 
 	$graph->SetHeader($host["host"].":".get_request("name",""));
-
+	
+	$graph3d = get_request('graph3d',0);
+	$legend = get_request('legend',0);
+	
+	if($graph3d == 1) $graph->SwitchPie3D();
+	$graph->SwitchLegend($legend);
+	
 	unset($host, $denyed_hosts);
 
 	if(isset($_REQUEST["period"]))		$graph->SetPeriod($_REQUEST["period"]);
@@ -77,23 +81,16 @@ include_once "include/page_header.php";
 	if(isset($_REQUEST["stime"]))		$graph->SetSTime($_REQUEST["stime"]);
 	if(isset($_REQUEST["border"]))		$graph->SetBorder(0);
 
-	$graph->SetWidth(get_request("width",		900));
-	$graph->SetHeight(get_request("height",		200));
-
-	$graph->ShowWorkPeriod(get_request("showworkperiod"	,1));
-	$graph->ShowTriggers(get_request("showtriggers"		,1));
-	$graph->SetYAxisType(get_request("yaxistype"		,GRAPH_YAXIS_TYPE_CALCULATED));
-	$graph->SetYAxisMin(get_request("yaxismin"		,0.00));
-	$graph->SetYAxisMax(get_request("yaxismax"		,100.00));
-
+	$graph->SetWidth(get_request("width",		400));
+	$graph->SetHeight(get_request("height",		300));
+	
 	foreach($items as $id => $gitem)
 	{
+//		SDI($gitem);
 		$graph->AddItem(
 			$gitem["itemid"],
-			$gitem["yaxisside"],
 			$gitem["calc_fnc"],
 			$gitem["color"],
-			$gitem["drawtype"],
 			$gitem["type"],
 			$gitem["periods_cnt"]
 			);
