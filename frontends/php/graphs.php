@@ -23,10 +23,14 @@
 	require_once "include/hosts.inc.php";
 	require_once "include/graphs.inc.php";
 	require_once "include/forms.inc.php";
+	require_once "include/classes/chart.inc.php";
+	require_once "include/classes/pie.inc.php";
+	
 
 	$page["title"] = "S_CONFIGURATION_OF_GRAPHS";
 	$page["file"] = "graphs.php";
 	$page['hist_arg'] = array();
+	$page['scripts'] = array('graphs.js');
 
 include_once "include/page_header.php";
 
@@ -44,10 +48,13 @@ include_once "include/page_header.php";
 		"name"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,		'isset({save})'),
 		"width"=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
 		"height"=>	array(T_ZBX_INT, O_OPT,	 NULL,	BETWEEN(0,65535),	'isset({save})'),
-		"yaxistype"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0,1"),		'isset({save})'),
-		"graphtype"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0,1"),		'isset({save})'),
-		"yaxismin"=>	array(T_ZBX_DBL, O_OPT,	 NULL,	null,	'isset({save})'),
-		"yaxismax"=>	array(T_ZBX_DBL, O_OPT,	 NULL,	null,	'isset({save})'),
+		"yaxistype"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0,1"),		'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
+		"graphtype"=>	array(T_ZBX_INT, O_OPT,	 NULL,	IN("0,1,2,3"),		'isset({save})'),
+		
+		"yaxismin"=>	array(T_ZBX_DBL, O_OPT,	 NULL,	null,	'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
+		"yaxismax"=>	array(T_ZBX_DBL, O_OPT,	 NULL,	null,	'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
+		"graph3d"=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	IN('0,1'),		null),
+		"legend"=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	IN('0,1'),		null),
 		
 		"items"=>		array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
 		"new_graph_item"=>	array(T_ZBX_STR, O_OPT,  NULL,	null,		null),
@@ -82,12 +89,16 @@ include_once "include/page_header.php";
 		'web.last.conf.groupid', 'web.last.conf.hostid');
 ?>
 <?php
+
 	$_REQUEST['items'] = get_request('items', array());
 	$_REQUEST['group_gid'] = get_request('group_gid', array());
+	$_REQUEST['graph3d'] = get_request('graph3d', 0);
+	$_REQUEST['legend'] = get_request('legend', 0);
 	
 	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, $ZBX_CURNODEID);
 	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
 
+// ---- <ACTIONS> ----
 	if(isset($_REQUEST["clone"]) && isset($_REQUEST["graphid"]))
 	{
 		unset($_REQUEST["graphid"]);
@@ -98,7 +109,7 @@ include_once "include/page_header.php";
 		$items = get_request('items', array());
 		foreach($items as $gitem)
 		{
-			$host = DBfetch(DBselect('select h.* from hosts h,items i where h.hostid=i.hostid and i.itemid='.$gitem['itemid']));
+			$host = DBfetch(DBselect('SELECT h.* FROM hosts h,items i WHERE h.hostid=i.hostid AND i.itemid='.$gitem['itemid']));
 			if(in_array($host['hostid'], explode(',',$denyed_hosts)))
 			{
 				access_deny();
@@ -110,15 +121,21 @@ include_once "include/page_header.php";
 		}
 		else
 		{
+			isset($_REQUEST["yaxistype"])?(''):($_REQUEST["yaxistype"]=0);
+			isset($_REQUEST["yaxismin"])?(''):($_REQUEST["yaxismin"]=0);
+			isset($_REQUEST["yaxismax"])?(''):($_REQUEST["yaxismax"]=0);
+			
 			$showworkperiod	= isset($_REQUEST["showworkperiod"]) ? 1 : 0;
 			$showtriggers	= isset($_REQUEST["showtriggers"]) ? 1 : 0;
 
 			if(isset($_REQUEST["graphid"]))
 			{
+
 				$result = update_graph_with_items($_REQUEST["graphid"],
 					$_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],
 					$_REQUEST["yaxistype"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"],
-					$showworkperiod,$showtriggers,$_REQUEST["graphtype"],$items);
+					$showworkperiod,$showtriggers,$_REQUEST["graphtype"],
+					$_REQUEST["legend"],$_REQUEST["graph3d"],$items);
 
 				if($result)
 				{
@@ -130,9 +147,11 @@ include_once "include/page_header.php";
 			}
 			else
 			{
+
 				$result = add_graph_with_items($_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],
 					$_REQUEST["yaxistype"],$_REQUEST["yaxismin"],$_REQUEST["yaxismax"],
-					$showworkperiod,$showtriggers,$_REQUEST["graphtype"],$items);
+					$showworkperiod,$showtriggers,$_REQUEST["graphtype"],
+					$_REQUEST["legend"],$_REQUEST["graph3d"],$items);
 
 				if($result)
 				{
@@ -183,9 +202,9 @@ include_once "include/page_header.php";
 			else
 			{ /* groups */
 				$hosts_ids = array();
-				$db_hosts = DBselect('select distinct h.hostid from hosts h, hosts_groups hg'.
-					' where h.hostid=hg.hostid and hg.groupid in ('.implode(',',$_REQUEST['copy_targetid']).')'.
-					' and h.hostid in ('.$availiable_hosts.")"
+				$db_hosts = DBselect('SELECT distinct h.hostid FROM hosts h, hosts_groups hg'.
+					' WHERE h.hostid=hg.hostid AND hg.groupid in ('.implode(',',$_REQUEST['copy_targetid']).')'.
+					' AND h.hostid in ('.$availiable_hosts.")"
 					);
 				while($db_host = DBfetch($db_hosts))
 				{
@@ -247,6 +266,7 @@ include_once "include/page_header.php";
 			if($_REQUEST['items'][$_REQUEST['move_down']]['sortorder'] < 1000)
 				$_REQUEST['items'][$_REQUEST['move_down']]['sortorder']++;
 	}
+// ----</ACTIONS>----
 ?>
 <?php
 	$form = new CForm();
@@ -264,11 +284,18 @@ include_once "include/page_header.php";
 		insert_graph_form();
 		echo BR;
 		$table = new CTable(NULL,"graph");
-		$table->AddRow(new CImg('chart3.php?period=3600&from=0'.url_param('items').
-			url_param('name').url_param('width').url_param('height').url_param('yaxistype').
-			url_param('yaxismin').url_param('yaxismax').url_param('show_work_period').
-			url_param('show_triggers').url_param('graphtype')));
-		$table->Show();
+		if(($_REQUEST['graphtype'] == GRAPH_TYPE_PIE) || ($_REQUEST['graphtype'] == GRAPH_TYPE_EXPLODED)){
+			$table->AddRow(new CImg('chart7.php?period=3600&from=0'.url_param('items').
+				url_param('name').url_param('legend').url_param('graph3d').url_param('width').url_param('height').url_param('graphtype')));
+			$table->Show();
+		}
+		else {
+			$table->AddRow(new CImg('chart3.php?period=3600&from=0'.url_param('items').
+				url_param('name').url_param('width').url_param('height').url_param('yaxistype').
+				url_param('yaxismin').url_param('yaxismax').url_param('show_work_period').
+				url_param('show_triggers').url_param('graphtype')));
+			$table->Show();
+		}
 	} else {
 /* Table HEADER */
 		if(isset($_REQUEST["graphid"])&&($_REQUEST["graphid"]==0))
@@ -283,31 +310,37 @@ include_once "include/page_header.php";
 
 		$cmbGroup->AddItem(0,S_ALL_SMALL);
 
-		$result=DBselect("select distinct g.groupid,g.name from groups g, hosts_groups hg, hosts h, items i ".
-			" where h.hostid in (".$availiable_hosts.") ".
-			" and hg.groupid=g.groupid ".
-			" and h.hostid=i.hostid and hg.hostid=h.hostid ".
-			" order by g.name");
-		while($row=DBfetch($result))
-		{
+		$result=DBselect('SELECT distinct g.groupid,g.name '.
+			' FROM groups g, hosts_groups hg, hosts h, items i '.
+			' WHERE h.hostid IN ('.$availiable_hosts.') '.
+				' AND hg.groupid=g.groupid '.
+				' AND h.hostid=i.hostid AND hg.hostid=h.hostid '.
+			' ORDER BY g.name');
+
+		while($row=DBfetch($result)){
 			$cmbGroup->AddItem($row["groupid"],$row["name"]);
 		}
 		$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
 		
 		if($_REQUEST["groupid"] > 0)
 		{
-			$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where ".
-				" h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid".
-				" and h.hostid in (".$availiable_hosts.") ".
-				" group by h.hostid,h.host order by h.host";
+			$sql='SELECT h.hostid,h.host FROM hosts h,items i,hosts_groups hg '.
+				'WHERE h.hostid=i.hostid '.
+					' AND hg.groupid='.$_REQUEST["groupid"].
+					' AND hg.hostid=h.hostid '.
+					' AND h.hostid in ('.$availiable_hosts.') '.
+				' GROUP BY h.hostid,h.host '.
+				' ORDER BY h.host';
 		}
 		else
 		{
 			$cmbHosts->AddItem(0,S_ALL_SMALL);
-			$sql="select h.hostid,h.host from hosts h,items i where ".
-				" h.hostid=i.hostid".
-				" and h.hostid in (".$availiable_hosts.") ".
-				" group by h.hostid,h.host order by h.host";
+			$sql='SELECT h.hostid,h.host '.
+				' FROM hosts h,items i '.
+				' WHERE h.hostid=i.hostid'.
+					' AND h.hostid IN ('.$availiable_hosts.') '.
+				' GROUP BY h.hostid,h.host '.
+				' ORDER BY h.host';
 		}
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
@@ -334,21 +367,21 @@ include_once "include/page_header.php";
 
 		if($_REQUEST["hostid"] > 0)
 		{
-			$result = DBselect("select distinct g.* from graphs g left join graphs_items gi on g.graphid=gi.graphid ".
+			$result = DBselect("SELECT distinct g.* FROM graphs g left join graphs_items gi on g.graphid=gi.graphid ".
 				" left join items i on gi.itemid=i.itemid ".
-				" where i.hostid=".$_REQUEST["hostid"].
-				" and i.hostid not in (".$denyed_hosts.") ".
-				" and ".DBid2nodeid("g.graphid")."=".$ZBX_CURNODEID.
-				" and i.hostid is not NULL ".
-				" order by g.name");
+				" WHERE i.hostid=".$_REQUEST["hostid"].
+				" AND i.hostid not in (".$denyed_hosts.") ".
+				" AND ".DBid2nodeid("g.graphid")."=".$ZBX_CURNODEID.
+				" AND i.hostid is not NULL ".
+				" ORDER BY g.name");
 		}
 		else
 		{
-			$result = DBselect("select distinct g.* from graphs g left join graphs_items gi on g.graphid=gi.graphid ".
+			$result = DBselect("SELECT distinct g.* FROM graphs g left join graphs_items gi on g.graphid=gi.graphid ".
 				" left join items i on gi.itemid=i.itemid ".
-				" where ".DBid2nodeid("g.graphid")."=".$ZBX_CURNODEID.
-				" and ( i.hostid not in (".$denyed_hosts.")  OR i.hostid is NULL )".
-				" order by g.name");
+				" WHERE ".DBid2nodeid("g.graphid")."=".$ZBX_CURNODEID.
+				" AND ( i.hostid not in (".$denyed_hosts.")  OR i.hostid is NULL )".
+				" ORDER BY g.name");
 		}
 		while($row=DBfetch($result))
 		{
@@ -398,10 +431,20 @@ include_once "include/page_header.php";
 			$chkBox = new CCheckBox("group_graphid[]",NULL,NULL,$row["graphid"]);
 			if($row["templateid"] > 0) $chkBox->SetEnabled(false);
 
-			if($row["graphtype"] == GRAPH_TYPE_STACKED)
-				$graphtype = S_STACKED;
-			else
-				$graphtype = S_NORMAL;
+			switch($row["graphtype"]){
+				case  GRAPH_TYPE_STACKED:
+					$graphtype = S_STACKED;
+					break;
+				case  GRAPH_TYPE_PIE:
+					$graphtype = S_PIE;
+					break;
+				case  GRAPH_TYPE_EXPLODED:
+					$graphtype = S_EXPLODED;
+					break;
+				default:
+					$graphtype = S_NORMAL;
+					break;
+			}
 
 			$table->AddRow(array(
 				$host_list,

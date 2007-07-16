@@ -21,11 +21,17 @@
 <?php
 	function	graph_item_type2str($type,$count=null)
 	{
-		switch($type)
-		{
-			case GRAPH_ITEM_AGGREGATED:	$type = S_AGGREGATED.(isset($count) ? '('.$count.')' : '');	break;
+		switch($type){
+			case GRAPH_ITEM_SUM:	
+				$type = S_GRAPH_SUM;
+				break;				
+			case GRAPH_ITEM_AGGREGATED:	
+				$type = S_AGGREGATED.(isset($count) ? '('.$count.')' : '');	
+				break;
 			case GRAPH_ITEM_SIMPLE:
-			default:			$type = S_SIMPLE;	break;
+			default:			
+				$type = S_SIMPLE;	
+				break;
 		}
 		return $type;
 	}
@@ -66,6 +72,7 @@
 			case CALC_FNC_ALL:      $calc_fnc = S_ALL_SMALL;        break;
 			case CALC_FNC_MIN:      $calc_fnc = S_MIN_SMALL;        break;
 			case CALC_FNC_MAX:      $calc_fnc = S_MAX_SMALL;        break;
+			case CALC_FNC_LST:		$calc_fnc = S_LST_SMALL;		break;
 			case CALC_FNC_AVG:
 			default:		$calc_fnc = S_AVG_SMALL;        break;
 		}
@@ -74,19 +81,19 @@
 	
 	function 	get_graph_by_gitemid($gitemid)
 	{
-		$db_graphs = DBselect("select distinct g.* from graphs g, graphs_items gi".
-			" where g.graphid=gi.graphid and gi.gitemid=$gitemid");
+		$db_graphs = DBselect("SELECT distinct g.* FROM graphs g, graphs_items gi".
+			" WHERE g.graphid=gi.graphid and gi.gitemid=$gitemid");
 		return DBfetch($db_graphs);
 		
 	}
 
-	function 	&get_graphs_by_hostid($hostid)
+	function 	get_graphs_by_hostid($hostid)
 	{
-		return DBselect("select distinct g.* from graphs g, graphs_items gi, items i".
-			" where g.graphid=gi.graphid and gi.itemid=i.itemid and i.hostid=$hostid");
+		return DBselect("SELECT distinct g.* FROM graphs g, graphs_items gi, items i".
+			" WHERE g.graphid=gi.graphid and gi.itemid=i.itemid and i.hostid=$hostid");
 	}
 
-	function	&get_realhosts_by_graphid($graphid)
+	function	get_realhosts_by_graphid($graphid)
 	{
 		$graph = get_graph_by_graphid($graphid);
 		if($graph["templateid"] != 0)
@@ -95,21 +102,21 @@
 		return get_hosts_by_graphid($graphid);
 	}
 
-	function 	&get_hosts_by_graphid($graphid)
+	function 	get_hosts_by_graphid($graphid)
 	{
-		return DBselect("select distinct h.* from graphs_items gi, items i, hosts h".
-			" where h.hostid=i.hostid and gi.itemid=i.itemid and gi.graphid=$graphid");
+		return DBselect("SELECT distinct h.* FROM graphs_items gi, items i, hosts h".
+			" WHERE h.hostid=i.hostid and gi.itemid=i.itemid and gi.graphid=$graphid");
 	}
 
-	function	&get_graphitems_by_graphid($graphid)
+	function	get_graphitems_by_graphid($graphid)
 	{
-		return DBselect("select * from graphs_items where graphid=$graphid".
+		return DBselect("SELECT * FROM graphs_items WHERE graphid=$graphid".
 			" order by itemid,drawtype,sortorder,color,yaxisside"); 
 	}
 
 	function	get_graphitem_by_gitemid($gitemid)
 	{
-		$result=DBselect("select * from graphs_items where gitemid=$gitemid");
+		$result=DBselect("SELECT * FROM graphs_items WHERE gitemid=$gitemid");
 		$row=DBfetch($result);
 		if($row)
 		{
@@ -121,7 +128,7 @@
 
 	function	get_graphitem_by_itemid($itemid)
 	{
-		$result = DBfetch(DBselect('select * from graphs_items where itemid='.$itemid));
+		$result = DBfetch(DBselect('SELECT * FROM graphs_items WHERE itemid='.$itemid));
 		$row=DBfetch($result);
 		if($row)
 		{
@@ -133,7 +140,7 @@
 	function	get_graph_by_graphid($graphid)
 	{
 
-		$result=DBselect("select * from graphs where graphid=$graphid");
+		$result=DBselect("SELECT * FROM graphs WHERE graphid=$graphid");
 		$row=DBfetch($result);
 		if($row)
 		{
@@ -143,9 +150,9 @@
 		return	false;
 	}
 
-	function	&get_graphs_by_templateid($templateid)
+	function	get_graphs_by_templateid($templateid)
 	{
-		return DBselect("select * from graphs where templateid=$templateid");
+		return DBselect("SELECT * FROM graphs WHERE templateid=$templateid");
 	}
 
 	/******************************************************************************
@@ -153,14 +160,14 @@
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function	add_graph($name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype=GRAPH_TYPE_NORMAL,$templateid=0)
+	function	add_graph($name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype,$legend,$graph3d,$templateid=0)
 	{
 		$graphid = get_dbid("graphs","graphid");
 
 		$result=DBexecute("insert into graphs".
-			" (graphid,name,width,height,yaxistype,yaxismin,yaxismax,templateid,show_work_period,show_triggers,graphtype)".
+			" (graphid,name,width,height,yaxistype,yaxismin,yaxismax,templateid,show_work_period,show_triggers,graphtype,show_legend,show_3d)".
 			" values ($graphid,".zbx_dbstr($name).",$width,$height,$yaxistype,$yaxismin,".
-			" $yaxismax,$templateid,$showworkperiod,$showtriggers,$graphtype)");
+			" $yaxismax,$templateid,$showworkperiod,$showtriggers,$graphtype,$legend,$graph3d)");
 		if($result)
 		{
 			info("Graph '$name' added");
@@ -169,9 +176,9 @@
 		return $result;
 	}
 
-	function	add_graph_with_items($name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype=GRAPH_TYPE_NORMAL,$items=array(),$templateid=0)
+	function	add_graph_with_items($name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype,$legend,$graph3d,$items=array(),$templateid)
 	{
-		if($result = add_graph($name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype,$templateid))
+		if($result = add_graph($name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype,$legend,$graph3d,$templateid))
 		{
 			foreach($items as $gitem)
 			{
@@ -197,29 +204,29 @@
 	
 	# Update Graph
 
-	function	update_graph($graphid,$name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype=GRAPH_TYPE_NORMAL,$templateid=0)
+	function	update_graph($graphid,$name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype,$legend,$graph3d,$templateid=0)
 	{
 		$g_graph = get_graph_by_graphid($graphid);
 
 		$graphs = get_graphs_by_templateid($graphid);
-		while($graph = DBfetch($graphs))
-		{
-			$result = update_graph($graph["graphid"],$name,$width,
-				$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype,$graphid);
+		while($graph = DBfetch($graphs)){
+			$result = update_graph($graph["graphid"],$name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype,$legend,$graph3d,$graphid);
 			if(!$result)
 				return $result;
 		}
 
-		$result = DBexecute("update graphs set name=".zbx_dbstr($name).",width=$width,height=$height,".
-			"yaxistype=$yaxistype,yaxismin=$yaxismin,yaxismax=$yaxismax,templateid=$templateid,".
-			"show_work_period=$showworkperiod,show_triggers=$showtriggers,graphtype=$graphtype ".
-			"where graphid=$graphid");
-		if($result)
-		{
-			if($g_graph['graphtype'] != $graphtype && $graphtype == GRAPH_TYPE_STACKED)
-			{
-				$result = DBexecute('update graphs_items set calc_fnc='.CALC_FNC_AVG.',drawtype=1,type='.GRAPH_ITEM_SIMPLE.
-					' where graphid='.$graphid);
+		$result = DBexecute(
+				'UPDATE graphs '.
+				'SET name='.zbx_dbstr($name).',width='.$width.',height='.$height.
+					',yaxistype='.$yaxistype.',yaxismin='.$yaxismin.',yaxismax='.$yaxismax.',templateid='.$templateid.
+					',show_work_period='.$showworkperiod.',show_triggers='.$showtriggers.',graphtype='.$graphtype.
+					',show_legend='.$legend.',show_3d='.$graph3d.
+				' WHERE graphid='.$graphid);
+
+		if($result){
+			if($g_graph['graphtype'] != $graphtype && $graphtype == GRAPH_TYPE_STACKED){
+				$result = DBexecute('UPDATE graphs_items SET calc_fnc='.CALC_FNC_AVG.',drawtype=1,type='.GRAPH_ITEM_SIMPLE.
+					' WHERE graphid='.$graphid);
 			}
 
 			info("Graph '".$g_graph["name"]."' updated");
@@ -227,21 +234,19 @@
 		return $result;
 	}
 	
-	function	update_graph_with_items($graphid,$name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype=GRAPH_TYPE_NORMAL,$items=array(),$templateid=0)
+	function	update_graph_with_items($graphid,$name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,$showtriggers,$graphtype,$legend,$graph3d,$items=array(),$templateid=0)
 	{
 		$result = update_graph($graphid,$name,$width,$height,$yaxistype,$yaxismin,$yaxismax,$showworkperiod,
-						$showtriggers,$graphtype,$templateid);
+						$showtriggers,$graphtype,$legend,$graph3d,$templateid);
 
-		if($result)
-		{
-			$db_graphs_items = DBselect('select gitemid from graphs_items where graphid='.$graphid);
-			while($gitem_data = DBfetch($db_graphs_items))
-			{
+		if($result){
+			$db_graphs_items = DBselect('SELECT gitemid FROM graphs_items WHERE graphid='.$graphid);
+
+			while($gitem_data = DBfetch($db_graphs_items)){
 				delete_graph_item($gitem_data['gitemid']);
 			}
 
-			foreach($items as $gitem)
-			{
+			foreach($items as $gitem){
 				if(!add_item_to_graph(
 					$graphid,
 					$gitem['itemid'],
@@ -261,6 +266,7 @@
 		return $result;
 	}
 	
+	
 	/******************************************************************************
 	 *                                                                            *
 	 * Comments: !!! Don't forget sync code with C !!!                            *
@@ -279,11 +285,11 @@
 		}
 
 		// delete graph
-		$result=DBexecute("delete from graphs_items where graphid=$graphid");
+		$result=DBexecute("delete FROM graphs_items WHERE graphid=$graphid");
 		if(!$result)
 			return	$result;
 
-		$result = DBexecute("delete from graphs where graphid=$graphid");
+		$result = DBexecute("delete FROM graphs WHERE graphid=$graphid");
 		if($result)
 		{	
 			info("Graph '".$graph["name"]."' deleted");
@@ -325,7 +331,7 @@
 		if($gitemid && $host["status"]==HOST_STATUS_TEMPLATE)
 		{// add to child graphs
 			$item_num = DBfetch(DBselect(
-				'select count(*) as num from graphs_items where graphid='.$graphid
+				'SELECT count(*) as num FROM graphs_items WHERE graphid='.$graphid
 			));
 
 			if($item_num['num'] == 1)
@@ -342,8 +348,8 @@
 						$result = $new_graphid;
 						break;
 					}
-					$db_items = DBselect("select itemid from items".
-						" where key_=".zbx_dbstr($item["key_"]).
+					$db_items = DBselect("SELECT itemid FROM items".
+						" WHERE key_=".zbx_dbstr($item["key_"]).
 						" and hostid=".$chd_host["hostid"]);
 					$db_item = DBfetch($db_items);
 					if(!$db_item)
@@ -367,8 +373,8 @@
 				{
 			!		$chd_hosts = get_hosts_by_graphid($child["graphid"]);
 					$chd_host = DBfetch($chd_hosts);
-					$db_items = DBselect("select itemid from items".
-						" where key_=".zbx_dbstr($item["key_"]).
+					$db_items = DBselect("SELECT itemid FROM items".
+						" WHERE key_=".zbx_dbstr($item["key_"]).
 						" and hostid=".$chd_host["hostid"]);
 					$db_item = DBfetch($db_items);
 					if(!$db_item)
@@ -426,11 +432,11 @@
 			}
 		}
 
-		$result = DBexecute("delete from graphs_items where gitemid=$gitemid");
+		$result = DBexecute("delete FROM graphs_items WHERE gitemid=$gitemid");
 		if($result)
 		{
 			$item = get_item_by_itemid($gitem["itemid"]);
-			info("Item '".$item["description"]."' deleted from graph '".$graph["name"]."'");
+			info("Item '".$item["description"]."' deleted FROM graph '".$graph["name"]."'");
 
 			$graph_items = get_graphitems_by_graphid($graph["graphid"]);
 			if($graph["templateid"]>0 && !DBfetch($graph_items))
@@ -446,7 +452,7 @@
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function	delete_template_graphs($hostid, $templateid = null, $unlink_mode = false)
+	function	delete_template_graphs($hostid, $templateid = null /* array format 'arr[id]=name' */, $unlink_mode = false)
 	{
 		$db_graphs = get_graphs_by_hostid($hostid);
 		while($db_graph = DBfetch($db_graphs))
@@ -454,19 +460,22 @@
 			if($db_graph["templateid"] == 0)
 				continue;
 
-			if( !is_null($templateid) )
+			if($templateid != null)
 			{
-				if( !is_array($templateid) ) $templateid=array($templateid);
-
-				$tmp_host = DBfetch(get_hosts_by_graphid($db_graph["templateid"]));
-
-				if( !in_array($tmp_host["hostid"], $templateid))
+				$hosts = get_hosts_by_graphid($db_graph["templateid"]);
+				$tmp_host = DBfetch($hosts);
+				if(is_array($templateid))
+				{
+					if(!isset($templateid[$tmp_host["hostid"]]))
+						continue;
+				}
+				elseif($tmp_host["hostid"] != $templateid)
 					continue;
 			}
 
 			if($unlink_mode)
 			{
-				if(DBexecute("update graphs set templateid=0 where graphid=".$db_graph["graphid"]))
+				if(DBexecute("update graphs set templateid=0 WHERE graphid=".$db_graph["graphid"]))
 				{
 					info("Graph '".$db_graph["name"]."' unlinked");
 				}	
@@ -483,16 +492,16 @@
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function	copy_template_graphs($hostid, $templateid = null, $copy_mode = false)
+	function	copy_template_graphs($hostid, $templateid = null /* array format 'arr[id]=name' */, $copy_mode = false)
 	{
 		if($templateid == null)
 		{
-			$templateid = array_keys(get_templates_by_hostid($hostid));
+			$templateid = get_templates_by_hostid($hostid);
 		}
 		
 		if(is_array($templateid))
 		{
-			foreach($templateid as $id)
+			foreach($templateid as $id => $name)
 				copy_template_graphs($hostid, $id, $copy_mode); // attention recursion
 			return;
 		}

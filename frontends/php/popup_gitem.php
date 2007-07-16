@@ -38,25 +38,26 @@ include_once "include/page_header.php";
 	$fields=array(
 		"dstfrm"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,		null),
 
-		"gid"=>		array(T_ZBX_INT, O_OPT,  P_SYS,	BETWEEN(0,65535),	null),
-		"list_name"=>	array(T_ZBX_STR, O_OPT,  P_SYS,	NOT_EMPTY,		'isset({save})&&isset({gid})'),
-		"itemid"=>	array(T_ZBX_INT, O_OPT,  null,	DB_ID.'({}!=0)',	'isset({save})'),
-		"color"=>	array(T_ZBX_CLR, O_OPT,  null,	null,			'isset({save})'),
-		"drawtype"=>	array(T_ZBX_INT, O_OPT,  null,	IN(graph_item_drawtypes()),'isset({save})'),
-		"sortorder"=>	array(T_ZBX_INT, O_OPT,  null,	BETWEEN(0,65535),	'isset({save})'),
-		"yaxisside"=>	array(T_ZBX_INT, O_OPT,  null,	IN("0,1"),		'isset({save})'),
-		"calc_fnc"=>	array(T_ZBX_INT, O_OPT,	 null,	IN("1,2,4,7"),		'isset({save})'),
-		"type"=>	array(T_ZBX_INT, O_OPT,	 null,	IN("0,1"),		'isset({save})'),
+		"graphid"=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			null),
+		"gid"=>			array(T_ZBX_INT, O_OPT,  P_SYS,	BETWEEN(0,65535),	null),
+		"graphtype"=>	array(T_ZBX_INT, O_OPT,	 null,	IN("0,1,2,3"),		'isset({save})'),
+		"list_name"=>	array(T_ZBX_STR, O_OPT,  P_SYS,	NOT_EMPTY,			'isset({save})&&isset({gid})'),
+		"itemid"=>		array(T_ZBX_INT, O_OPT,  null,	DB_ID.'({}!=0)',	'isset({save})'),
+		"color"=>		array(T_ZBX_CLR, O_OPT,  null,	null,				'isset({save})'),
+		"drawtype"=>	array(T_ZBX_INT, O_OPT,  null,	IN(graph_item_drawtypes()),'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
+		"sortorder"=>	array(T_ZBX_INT, O_OPT,  null,	BETWEEN(0,65535),	'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
+		"yaxisside"=>	array(T_ZBX_INT, O_OPT,  null,	IN("0,1"),			'isset({save})&&(({graphtype} == 0) || ({graphtype} == 1))'),
+		"calc_fnc"=>	array(T_ZBX_INT, O_OPT,	 null,	IN("1,2,4,7,9"),	'isset({save})'),
+		"type"=>		array(T_ZBX_INT, O_OPT,	 null,	IN("0,1,2"),		'isset({save})'),
 		"periods_cnt"=>	array(T_ZBX_INT, O_OPT,	 null,	BETWEEN(0,360),		'isset({save})'),
-		"graphtype"=>	array(T_ZBX_INT, O_OPT,	 null,	IN("0,1"),		'isset({save})'),
 
 		"only_hostid"=>	array(T_ZBX_INT, O_OPT,  null,	DB_ID,			null),
 		"monitored_hosts"=>array(T_ZBX_INT, O_OPT,  null,	IN("0,1"),	null),
 /* actions */
-		"add"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		"save"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"add"=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 /* other */
-		"form"=>	array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
+		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 		"form_refresh"=>array(T_ZBX_STR, O_OPT, null,	null,	null)
 	);
 
@@ -125,12 +126,34 @@ function update_graph_item(formname,list_name,gid,itemid,color,drawtype,sortorde
 -->
 </script>
 <?php
+	$_REQUEST['drawtype'] = get_request('drawtype',0);
+	$_REQUEST['yaxisside'] = get_request('yaxisside',0);
+	$_REQUEST['sortorder'] = get_request('sortorder',0);
+	$graphid = get_request('graphid',false);
+
+	if(($_REQUEST['type'] == GRAPH_ITEM_SUM) && ($graphid !== false)){
+		$sql = 'SELECT COUNT(itemid) as items'.
+				' FROM graphs_items '.
+				' WHERE type='.GRAPH_ITEM_SUM.
+					' AND graphid='.$graphid.
+					' AND itemid<>'.$_REQUEST['itemid'];
+		$res = DBselect($sql);
+		while($rows = DBfetch($res)){
+			if(isset($rows['items']) && ($rows['items'] > 0)){
+				show_messages(false, null, S_ANOTHER_ITEM_SUM);
+				if(isset($_REQUEST['save'])) unset($_REQUEST['save']);
+				$_REQUEST['type'] = GRAPH_ITEM_SIMPLE;
+			}
+		}
+	}
+	
 	if(isset($_REQUEST['save']) && !isset($_REQUEST['gid']))
 	{
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--
 <?php
+		
 		echo "add_graph_item('".
 			$_REQUEST['dstfrm']."','".
 			$_REQUEST['itemid']."','".
@@ -152,6 +175,7 @@ function update_graph_item(formname,list_name,gid,itemid,color,drawtype,sortorde
 <script language="JavaScript" type="text/javascript">
 <!--
 <?php
+				
 		echo "update_graph_item('".
 			$_REQUEST['dstfrm']."','".
 			$_REQUEST['list_name']."','".
