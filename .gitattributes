@@ -35,6 +35,8 @@ frontends/php/audio/trigger_on_average.wav -text
 frontends/php/audio/trigger_on_disaster.wav -text
 frontends/php/audio/trigger_on_high.wav -text
 frontends/php/audio/trigger_on_warning.wav -text
+frontends/php/chart6.php -text
+frontends/php/chart7.php -text
 frontends/php/images/flash/zbxclock.swf -text svneol=unset#unset
 frontends/php/images/general/closed.gif -text svneol=unset#unset
 frontends/php/images/general/error_small.gif -text
@@ -91,8 +93,11 @@ frontends/php/images/sysmaps/old/Printer.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Router.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
+frontends/php/include/classes/chart.inc.php -text
+frontends/php/include/classes/pie.inc.php -text
 frontends/php/js/common.js -text
 frontends/php/js/cookies.js -text
+frontends/php/js/graphs.js -text
 frontends/php/js/menu.js -text
 frontends/php/js/services.js -text
 frontends/php/js/tree.js -text

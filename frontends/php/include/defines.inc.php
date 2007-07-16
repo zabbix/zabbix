@@ -298,6 +298,7 @@
 	define('CALC_FNC_AVG', 2);
 	define('CALC_FNC_MAX', 4);
 	define('CALC_FNC_ALL', 7);
+	define('CALC_FNC_LST', 9);
 
 	
 	define('SERVICE_TIME_TYPE_UPTIME', 0);
