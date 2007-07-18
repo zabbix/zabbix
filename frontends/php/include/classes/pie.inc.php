@@ -180,7 +180,7 @@ function selectData(){
 	}
 	
 	if(isset($graph_sum)) $this->sum = $graph_sum;
-	$this->shiftlegendright += $strvaluelenght * 6;
+	$this->shiftlegendright += $strvaluelenght * 7;
 }
 
 

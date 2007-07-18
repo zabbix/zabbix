@@ -2524,7 +2524,7 @@
 						url_param($graphtype, false, 'graphtype').
 						url_param($gitem, false).
 						url_param($gid,false,'gid').
-						url_param($_REQUEST['graphid'],false,'graphid').
+						url_param(get_request('graphid',0),false,'graphid').
 						'",550,400,"graph_item_form");');
 
 				if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
