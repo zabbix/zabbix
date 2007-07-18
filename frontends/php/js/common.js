@@ -16,8 +16,8 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-var IE = document.all?true:false;
 var OP = window.opera?true:false;
+var IE = ((!OP) && (document.all))?true:false;
 
 
 function SDI(msg)

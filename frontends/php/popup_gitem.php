@@ -131,7 +131,8 @@ function update_graph_item(formname,list_name,gid,itemid,color,drawtype,sortorde
 	$_REQUEST['sortorder'] = get_request('sortorder',0);
 	$graphid = get_request('graphid',false);
 
-	if(($_REQUEST['type'] == GRAPH_ITEM_SUM) && ($graphid !== false)){
+
+	if(isset($_REQUEST['type']) && ($_REQUEST['type'] == GRAPH_ITEM_SUM) && ($graphid !== false)){
 		$sql = 'SELECT COUNT(itemid) as items'.
 				' FROM graphs_items '.
 				' WHERE type='.GRAPH_ITEM_SUM.
