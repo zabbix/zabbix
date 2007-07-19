@@ -881,9 +881,14 @@ int	DBadd_trend(zbx_uint64_t itemid, double value, int clock)
 	DB_ROW		row;
 	int	hour;
 	int	num;
-	double	value_min, value_avg, value_max;	
+	double	value_min, value_avg, value_max;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_trend()");
+
+	if(CONFIG_DBSYNCER_FORKS >0)
+	{
+		return DCadd_trend(itemid, value, clock);
+	}
 
 	hour=clock-clock%3600;
 
@@ -933,10 +938,17 @@ int	DBadd_history(zbx_uint64_t itemid, double value, int clock)
 {
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_history()");
 
-	DBexecute("insert into history (clock,itemid,value) values (%d," ZBX_FS_UI64 "," ZBX_FS_DBL ")",
-		clock,
-		itemid,
-		value);
+	if(CONFIG_DBSYNCER_FORKS > 0)
+	{
+		DCadd_history(itemid, value, clock);
+	}
+	else
+	{
+		DBexecute("insert into history (clock,itemid,value) values (%d," ZBX_FS_UI64 "," ZBX_FS_DBL ")",
+			clock,
+			itemid,
+			value);
+	}
 
 	DBadd_trend(itemid, value, clock);
 
@@ -956,10 +968,17 @@ int	DBadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
 {
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_history_uint()");
 
-	DBexecute("insert into history_uint (clock,itemid,value) values (%d," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
-		clock,
-		itemid,
-		value);
+	if(CONFIG_DBSYNCER_FORKS > 0)
+	{
+		DCadd_history_uint(itemid, value, clock);
+	}
+	else
+	{
+		DBexecute("insert into history_uint (clock,itemid,value) values (%d," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
+			clock,
+			itemid,
+			value);
+	}
 
 	DBadd_trend(itemid, (double)value, clock);
 
@@ -981,11 +1000,18 @@ int	DBadd_history_str(zbx_uint64_t itemid, char *value, int clock)
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_history_str()");
 
-	DBescape_string(value,value_esc,MAX_STRING_LEN);
-	DBexecute("insert into history_str (clock,itemid,value) values (%d," ZBX_FS_UI64 ",'%s')",
-		clock,
-		itemid,
-		value_esc);
+	if(CONFIG_DBSYNCER_FORKS > 0)
+	{
+		DCadd_history_str(itemid, value, clock);
+	}
+	else
+	{
+		DBescape_string(value,value_esc,MAX_STRING_LEN);
+		DBexecute("insert into history_str (clock,itemid,value) values (%d," ZBX_FS_UI64 ",'%s')",
+			clock,
+			itemid,
+			value_esc);
+	}
 
 	if(CONFIG_MASTER_NODEID>0)
 	{

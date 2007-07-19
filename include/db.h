@@ -35,6 +35,7 @@ extern	char	*CONFIG_DBSOCKET;
 extern	int	CONFIG_DBPORT;
 extern	int	CONFIG_NODEID;
 extern	int	CONFIG_MASTER_NODEID;
+extern	int	CONFIG_DBSYNCER_FORKS;
 
 #define	ZBX_DB_CONNECT_NORMAL	0
 #define	ZBX_DB_CONNECT_EXIT	1
@@ -71,6 +72,8 @@ extern	int	CONFIG_MASTER_NODEID;
 #define	MAX_ITEM_IP_LEN		15
 #define	MAX_ITEM_SNMP_COMMUNITY_LEN	64
 #define	MAX_ITEM_SNMP_OID_LEN	255
+
+#define	MAX_HISTORY_STR_LEN	255
 
 /* Trigger related defines */
 #define TRIGGER_DESCRIPTION_LEN		255
@@ -459,12 +462,6 @@ zbx_uint64_t	DBget_maxid(char *table, char *field);
 int	DBget_function_result(char **result,char *functionid);
 void	DBupdate_host_availability(zbx_uint64_t hostid,int available,int clock,char *error);
 int	DBupdate_item_status_to_notsupported(zbx_uint64_t itemid, const char *error);
-int	DBadd_trend(zbx_uint64_t itemid, double value, int clock);
-int	DBadd_history(zbx_uint64_t itemid, double value, int clock);
-int	DBadd_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity);
-int	DBadd_history_str(zbx_uint64_t itemid, char *value, int clock);
-int	DBadd_history_text(zbx_uint64_t itemid, char *value, int clock);
-int	DBadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock);
 int	DBadd_service_alarm(zbx_uint64_t serviceid,int status,int clock);
 int	DBadd_alert(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t userid, zbx_uint64_t mediatypeid, char *sendto, char *subject, char *message);
 void	DBupdate_triggers_status_after_restart(void);
@@ -524,5 +521,13 @@ int	DBsync_host_with_templates(
 int	DBdelete_host(
 		zbx_uint64_t hostid
 	);
+
+/* History related functions */
+int	DBadd_trend(zbx_uint64_t itemid, double value, int clock);
+int	DBadd_history(zbx_uint64_t itemid, double value, int clock);
+int	DBadd_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity);
+int	DBadd_history_str(zbx_uint64_t itemid, char *value, int clock);
+int	DBadd_history_text(zbx_uint64_t itemid, char *value, int clock);
+int	DBadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock);
 
 #endif

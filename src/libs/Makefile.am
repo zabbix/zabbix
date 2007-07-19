@@ -1,6 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 DIST_SUBDIRS = \
+	zbxdbcache \
 	zbxdbhigh \
 	zbxdb \
 	zbxemail \
@@ -19,6 +20,7 @@ DIST_SUBDIRS = \
 if SERVER
 SERVER_SUBDIRS = \
 	zbxdb \
+	zbxdbcache \
 	zbxdbhigh \
 	zbxemail \
 	zbxsms
