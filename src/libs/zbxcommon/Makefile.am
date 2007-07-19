@@ -8,6 +8,7 @@ libzbxcommon_a_SOURCES = \
 	xml.c \
 	comms.c \
 	str.c \
+	time.c \
 	zbxgetopt.c \
 	alias.c
 
