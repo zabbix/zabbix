@@ -19,57 +19,54 @@
 
 #include "common.h"
 
-#include "db.h"
-#include "log.h"
-#include "zlog.h"
-
-#include "dbcache.h"
-#include "dbsyncer.h"
+#include <sys/time.h>
+#include <time.h>
 
 /******************************************************************************
  *                                                                            *
- * Function: main_dbsyncer_loop                                               *
+ * Function: time_diff                                                        *
  *                                                                            *
- * Purpose: periodically syncronises data in memory cache with database       *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              * 
+ * Purpose: calculate time difference in seconds                              *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments: never returns                                                    *
+ * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int main_dbsyncer_loop()
+double time_diff(struct timeval *from, struct timeval *to)
 {
-	int	now;
-	struct timeval from;
-	struct timeval to;
+	double msec;
+	double diff;
 
-	zbx_setproctitle("connecting to the database");
-
-	DBconnect(ZBX_DB_CONNECT_NORMAL);
-
-	for(;;)
+	/* from<=to */
+	if( (from->tv_sec < to->tv_sec) || (from->tv_sec == to->tv_sec && from->tv_usec <= to->tv_usec))
 	{
-		now  = time(NULL);
+		msec = (double)(to->tv_usec-from->tv_usec)/1000000;
 
-		zabbix_log( LOG_LEVEL_WARNING, "Syncing ...");
-
-
-		gettimeofday(&from, NULL);
-
-		DCsync();
-
-		gettimeofday(&to, NULL);
-		zabbix_log( LOG_LEVEL_WARNING, "Spent " ZBX_FS_DBL " sec",
-			time_diff(&from,&to));
-
-		zbx_setproctitle("sender [sleeping for %d seconds]",
-			CONFIG_DBSYNCER_FREQUENCY);
-
-		sleep(CONFIG_DBSYNCER_FREQUENCY);
+		if(msec >= 0)
+		{
+			diff = to->tv_sec - from->tv_sec + msec;
+		}
+		else
+		{
+			diff = to->tv_sec - from->tv_sec - (msec + 1);
+		}
 	}
-	DBclose();
+	/* from>to */
+	else
+	{
+		msec = (double)(from->tv_usec-to->tv_usec)/1000000;
+
+		if(msec >= 0)
+		{
+			diff = from->tv_sec - to->tv_sec + msec;
+		}
+		else
+		{
+			diff = from->tv_sec - to->tv_sec - (msec + 1);
+		}
+		diff = 0.0 - diff;
+	}
+
+	return diff;
 }

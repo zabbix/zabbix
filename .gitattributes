@@ -117,6 +117,7 @@ misc/init.d/freebsd/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_server -text
 misc/init.d/tru64/zabbix_server -text
 /splint -text
+src/libs/zbxcommon/time.c -text
 src/libs/zbxdbcache/Makefile.am -text
 src/libs/zbxdbcache/dbcache.c -text
 src/zabbix_server/dbsyncer/Makefile.am -text
