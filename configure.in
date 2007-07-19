@@ -713,7 +713,7 @@ if test "$server" = "yes"; then
 
 fi
 
-AM_CONDITIONAL(JABBER,  test "x$found_jabber" = "xyes")
+AM_CONDITIONAL(JABBER,  test "x$found_jabber" = "xno")
 AM_CONDITIONAL(WITH_ODBC, test "x$have_odbc" != "xno")
 
 dnl Check for libLDAP [by default - skip]
@@ -818,6 +818,7 @@ AC_OUTPUT([
 	src/libs/zbxlog/Makefile
 	src/libs/zbxcrypto/Makefile
 	src/libs/zbxconf/Makefile
+	src/libs/zbxdbcache/Makefile
 	src/libs/zbxdbhigh/Makefile
 	src/libs/zbxemail/Makefile
 	src/libs/zbxsysinfo/Makefile
@@ -846,6 +847,7 @@ AC_OUTPUT([
 	src/zabbix_sender/Makefile
 	src/zabbix_server/Makefile
 	src/zabbix_server/alerter/Makefile
+	src/zabbix_server/dbsyncer/Makefile
 	src/zabbix_server/discoverer/Makefile
 	src/zabbix_server/housekeeper/Makefile
 	src/zabbix_server/httppoller/Makefile

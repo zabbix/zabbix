@@ -1,5 +1,6 @@
 Changes for 1.5:
 
+ - basic support of database caching (Alexei)
  - added pie graphs (Artem)
  - added new columns graphs.show_legend, graphs.show_3d (Alexei)
  - added frontend-side support of quotes and triger expression validation (Eugene)
