@@ -107,6 +107,7 @@ frontends/php/styles/p.css -text
 frontends/php/styles/popupmenu.css -text
 frontends/php/styles/table.css -text
 frontends/php/styles/ul.css -text
+include/dbcache.h -text
 include/zbxodbc.h -text
 m4/libiodbc.m4 -text
 m4/libunixodbc.m4 -text
@@ -116,3 +117,8 @@ misc/init.d/freebsd/zabbix_agentd -text
 misc/init.d/freebsd/zabbix_server -text
 misc/init.d/tru64/zabbix_server -text
 /splint -text
+src/libs/zbxdbcache/Makefile.am -text
+src/libs/zbxdbcache/dbcache.c -text
+src/zabbix_server/dbsyncer/Makefile.am -text
+src/zabbix_server/dbsyncer/dbsyncer.c -text
+src/zabbix_server/dbsyncer/dbsyncer.h -text
