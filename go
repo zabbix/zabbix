@@ -26,14 +26,14 @@ automake
 #exit
 echo Configuring...
 #export CFLAGS="-Wall -Wuninitialized -O -DDEBUG"
-export CFLAGS="-Wall -Wuninitialized -O"
+export CFLAGS="-Wall -Wuninitialized -O -g"
 cd create/schema
 ./gen.pl c >../../include/dbsync.h
 cd -
 #export CFLAGS="-Wall -pedantic"
 #for db in sqlite3 pgsql mysql; do
 for db in mysql; do
-	./configure --enable-agent --enable-server --with-$db --prefix=`pwd` 2>>WARNINGS >/dev/null
+	./configure --enable-agent --with-net-snmp --with-libcurl --with-ldap --enable-server --with-$db --prefix=`pwd` 2>>WARNINGS >/dev/null
 	echo Cleaning...
 	make clean 2>>WARNINGS >/dev/null
 	echo Making...

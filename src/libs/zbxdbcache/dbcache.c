@@ -111,16 +111,37 @@ void	DCsync()
 	for(i=0;i<cache->pool.trends_count;i++)
 	{
 		trend = &cache->pool.trends[i];
-		zabbix_log(LOG_LEVEL_DEBUG,"History " ZBX_FS_UI64,
+		zabbix_log(LOG_LEVEL_DEBUG,"Trend " ZBX_FS_UI64,
 			trend->itemid);
+		if(trend->operation == ZBX_TREND_OP_INSERT)
+		{
+			DBexecute("insert into trends (clock,itemid,num,value_min,value_avg,value_max) values (%d," ZBX_FS_UI64 ",%d," ZBX_FS_DBL "," ZBX_FS_DBL "," ZBX_FS_DBL ")",
+				trend->clock,
+				trend->itemid,
+				trend->num,
+				trend->value_min,
+				trend->value_avg,
+				trend->value_max);
+		}
+		else if(trend->operation == ZBX_TREND_OP_UPDATE)
+		{
+			DBexecute("update trends set num=%d, value_min=" ZBX_FS_DBL ", value_avg=" ZBX_FS_DBL ", value_max=" ZBX_FS_DBL " where itemid=" ZBX_FS_UI64 " and clock=%d",
+				trend->num,
+				trend->value_min,
+				trend->value_avg,
+				trend->value_max,
+				trend->itemid,
+				trend->clock);
+		}
 	}
 
 	DBcommit();
 
 	cache->pool.history_count=0;
+	cache->pool.trends_count=0;
 	UNLOCK_CACHE;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"End of DCshow()");
+	zabbix_log(LOG_LEVEL_DEBUG,"End of DCsync()");
 }
 
 void	DCshow()
@@ -184,8 +205,9 @@ static ZBX_DC_ITEM	*get_item(zbx_uint64_t itemid)
 int	DCadd_trend(zbx_uint64_t itemid, double value, int clock)
 {
 	int 		hour;
-	ZBX_DC_TREND	*trend = NULL;
-	ZBX_DC_ITEM		*item = NULL;
+	ZBX_DC_TREND	*trend = NULL,
+			*trend_tmp = NULL;
+	ZBX_DC_ITEM	*item = NULL;
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		trend_found=0;
@@ -203,9 +225,21 @@ int	DCadd_trend(zbx_uint64_t itemid, double value, int clock)
 	{
 		trend_found=1;
 	}
-	else
+	else if(trend->clock !=0)
 	{
 //		add_trend2pool(trend);
+		trend_tmp=&cache->pool.trends[cache->pool.trends_count];
+		cache->pool.trends_count++;
+
+		trend_tmp->operation	= trend->operation;
+		trend_tmp->itemid	= trend->itemid;
+		trend_tmp->clock	= trend->clock;
+		trend_tmp->num		= trend->num;
+		trend_tmp->value_min	= trend->value_min;
+		trend_tmp->value_max	= trend->value_max;
+		trend_tmp->value_avg	= trend->value_avg;
+
+		trend->clock = 0;
 	}
 
 	/* Not found with the same clock */
@@ -213,11 +247,13 @@ int	DCadd_trend(zbx_uint64_t itemid, double value, int clock)
 	{
 	zabbix_log(LOG_LEVEL_DEBUG,"Not found");
 		/* Add new, do not look at the database */
-		trend->clock	= hour;
-		trend->num	= 1;
-		trend->value_min= value;
-		trend->value_max= value;
-		trend->value_avg= value;
+		trend->operation	= ZBX_TREND_OP_INSERT;
+		trend->itemid		= itemid;
+		trend->clock		= hour;
+		trend->num		= 1;
+		trend->value_min	= value;
+		trend->value_max	= value;
+		trend->value_avg	= value;
 
 		/* Try to find in the database */
 		result = DBselect("select num,value_min,value_avg,value_max from trends where itemid=" ZBX_FS_UI64 " and clock=%d",
@@ -228,14 +264,16 @@ int	DCadd_trend(zbx_uint64_t itemid, double value, int clock)
 
 		if(row)
 		{
-			trend->clock=hour;
-			trend->num=atoi(row[0]);
-			trend->value_min=atof(row[1]);
-			trend->value_avg=atof(row[2]);
-			trend->value_max=atof(row[3]);
+			trend->operation	= ZBX_TREND_OP_UPDATE;
+			trend->itemid		= itemid;
+			trend->clock		= hour;
+			trend->num		= atoi(row[0]);
+			trend->value_min	= atof(row[1]);
+			trend->value_avg	= atof(row[2]);
+			trend->value_max	= atof(row[3]);
 			if(value<trend->value_min)	trend->value_min=value;
 			if(value>trend->value_max)	trend->value_max=value;
-			trend->value_avg=(trend->num*trend->value_avg+value)/(trend->num+1);
+			trend->value_avg	= (trend->num*trend->value_avg+value)/(trend->num+1);
 			trend->num++;
 		}
 		DBfree_result(result);
@@ -406,14 +444,17 @@ lbl_create:
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-
 void	free_database_cache(void)
 {
 
 	key_t	shm_key;
 	int	shm_id;
 
+	zabbix_log(LOG_LEVEL_WARNING,"In free_database_cache()");
+
 	if(NULL == cache) return;
+
+	DCsync_all();
 
 	LOCK_CACHE;
 	
@@ -434,4 +475,80 @@ void	free_database_cache(void)
 	UNLOCK_CACHE;
 
 	zbx_mutex_destroy(&cache_lock);
+
+	zabbix_log(LOG_LEVEL_WARNING,"End of free_database_cache()");
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCsync_all                                                       *
+ *                                                                            *
+ * Purpose: writes updates and new data from pool and cache data to database  *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	DCsync_all()
+{
+	int	i;
+
+	ZBX_DC_ITEM	*item;
+	ZBX_DC_TREND	*trend;
+
+	zabbix_log(LOG_LEVEL_WARNING,"In DCsync_all(items %d pool:trends %d pool:history:%d)",
+		cache->items_count,
+		cache->pool.trends_count,
+		cache->pool.history_count);
+
+	DCsync();
+
+	LOCK_CACHE;
+	DBbegin();
+
+	zabbix_log(LOG_LEVEL_WARNING,"In items_count %d",
+		cache->items_count);
+
+	for(i=0;i<cache->items_count;i++)
+	{
+		item = &cache->items[i];
+		trend = &item->trend;
+
+		zabbix_log(LOG_LEVEL_DEBUG,"Trend " ZBX_FS_UI64,
+			trend->itemid);
+
+		if(trend->clock == 0)	continue;
+
+		if(trend->operation == ZBX_TREND_OP_INSERT)
+		{
+			DBexecute("insert into trends (clock,itemid,num,value_min,value_avg,value_max) values (%d," ZBX_FS_UI64 ",%d," ZBX_FS_DBL "," ZBX_FS_DBL "," ZBX_FS_DBL ")",
+				trend->clock,
+				trend->itemid,
+				trend->num,
+				trend->value_min,
+				trend->value_avg,
+				trend->value_max);
+		}
+		else if(trend->operation == ZBX_TREND_OP_UPDATE)
+		{
+			DBexecute("update trends set num=%d, value_min=" ZBX_FS_DBL ", value_avg=" ZBX_FS_DBL ", value_max=" ZBX_FS_DBL " where itemid=" ZBX_FS_UI64 " and clock=%d",
+				trend->num,
+				trend->value_min,
+				trend->value_avg,
+				trend->value_max,
+				trend->itemid,
+				trend->clock);
+		}
+	}
+
+	DBcommit();
+
+	UNLOCK_CACHE;
+
+	zabbix_log(LOG_LEVEL_WARNING,"End of DCsync_all()");
 }
