@@ -31,6 +31,9 @@
 #define	ZBX_TREND_SIZE		100000
 #define	ZBX_ITEMS_SIZE		10000
 
+#define	ZBX_TREND_OP_UPDATE	0
+#define	ZBX_TREND_OP_INSERT	1
+
 extern char *CONFIG_FILE;
 
 ZBX_DC_HISTORY
@@ -48,6 +51,7 @@ ZBX_DC_HISTORY
 
 ZBX_DC_TREND
 {
+	int		operation;
 	zbx_uint64_t	itemid;
 	int		clock;
 	int		num;
@@ -82,6 +86,8 @@ int	DCadd_history(zbx_uint64_t itemid, double value, int clock);
 int	DCadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock);
 int	DCadd_history_str(zbx_uint64_t itemid, char *value, int clock);
 void	DCshow(void);
+void	DCsync(void);
+void	DCsync_all(void);
 void	init_database_cache(void);
 void	free_database_cache(void);
 

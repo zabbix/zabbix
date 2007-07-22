@@ -1,5 +1,6 @@
 Changes for 1.5:
 
+ - support of database cache for history and trends (Alexei)
  - basic support of database caching (Alexei)
  - added pie graphs (Artem)
  - added new columns graphs.show_legend, graphs.show_3d (Alexei)
