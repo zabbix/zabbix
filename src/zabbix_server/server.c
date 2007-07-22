@@ -675,8 +675,9 @@ int MAIN_ZABBIX_ENTRY(void)
 	DBclose();
 
 /* To make sure that we can connect to the database before forking new processes */
-	DBconnect(ZBX_DB_CONNECT_EXIT);
-	DBclose();
+/*	DBconnect(ZBX_DB_CONNECT_EXIT);*/
+/* Do not close database. It is required for database cache */
+/*	DBclose();*/
 
 /*#define CALC_TREND*/
 
@@ -862,17 +863,21 @@ void	zbx_on_exit()
 	free_metrics();
 
 	zbx_sleep(2); /* wait for all threads closing */
+
+	DBconnect(ZBX_DB_CONNECT_EXIT);
 	
-	zabbix_log(LOG_LEVEL_INFORMATION, "ZABBIX Server stopped");
 	if(CONFIG_DBSYNCER_FORKS!=0)
 	{
 		free_database_cache();
 	}
+	DBclose();
 	zabbix_close_log();
 	
 #ifdef  HAVE_SQLITE3
 	php_sem_remove(&sqlite_access);
 #endif /* HAVE_SQLITE3 */
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "ZABBIX Server stopped");
 
 	exit(SUCCEED);
 }
