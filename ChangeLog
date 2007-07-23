@@ -1,5 +1,6 @@
 Changes for 1.5:
 
+ - fixed permissions for logfile (Eugene)
  - support of database cache for history and trends (Alexei)
  - basic support of database caching (Alexei)
  - added pie graphs (Artem)
