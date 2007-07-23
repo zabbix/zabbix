@@ -36,6 +36,7 @@
 #include "actions.h"
 #include "events.h"
 #include "threads.h"
+#include "dbcache.h"
 
 void	DBclose(void)
 {

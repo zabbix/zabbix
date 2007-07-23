@@ -64,7 +64,7 @@ void redirect_std(const char *filename)
 		open_flags |= O_CREAT | O_APPEND;
 	}
 
-	if ( -1 != (fd = open(out_file, open_flags)) )
+	if ( -1 != (fd = open(out_file, open_flags, 0666)) )
 	{
 		if(-1 == dup2(fd, fileno(stderr)))
 			zbx_error("Cannot redirect stderr to [%s]", filename);
