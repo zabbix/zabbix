@@ -120,10 +120,17 @@ if(isset($_REQUEST['saction'])){
 		$service_times = get_request('service_times',array());
 		$childs = get_request('childs',array());
 
-		$triggerid = isset($_REQUEST["linktrigger"]) ? $_REQUEST["triggerid"] : null;
+		if(isset($_REQUEST["linktrigger"])){
+			$triggerid = $_REQUEST["triggerid"];
+			$status = get_trigger_priority($triggerid);
+		}
+		else {
+			$triggerid = null;
+			$status = 0;
+		}
 		if(isset($service["serviceid"])){
 			$result = update_service($service["serviceid"],
-				$_REQUEST["name"],$triggerid,$_REQUEST["algorithm"],
+				$_REQUEST["name"],$triggerid,$status,$_REQUEST["algorithm"],
 				$_REQUEST["showsla"],$_REQUEST["goodsla"],$_REQUEST["sortorder"],
 				$service_times,$_REQUEST['parentid'],$childs);
 				
@@ -133,7 +140,7 @@ if(isset($_REQUEST['saction'])){
 			
 		} else {
 			$result = add_service(
-				$_REQUEST["name"],$triggerid,$_REQUEST["algorithm"],
+				$_REQUEST["name"],$triggerid,$status,$_REQUEST["algorithm"],
 				$_REQUEST["showsla"],$_REQUEST["goodsla"],$_REQUEST["sortorder"],
 				$service_times,$_REQUEST['parentid'],$childs);
 			show_messages($result, S_SERVICE_ADDED, S_CANNOT_ADD_SERVICE);
