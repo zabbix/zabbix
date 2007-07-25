@@ -243,8 +243,11 @@ include_once "include/page_header.php";
 
 			$result=DBselect("select triggerid from triggers t where t.triggerid=".zbx_dbstr($triggerid));
 			if(!($row = DBfetch($result))) continue;
-			if($result = update_trigger_status($row["triggerid"],0))
-			{
+			if($result = update_trigger_status($row['triggerid'],0)){
+				
+				$status = get_trigger_priority($row['triggerid']);
+				update_services($triggerid, $status); // updating status to all services by the dependency
+				
 				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER,
 					S_TRIGGER." [".$triggerid."] [".expand_trigger_description($triggerid)."] ".S_ENABLED);
 			}
@@ -255,16 +258,16 @@ include_once "include/page_header.php";
 			show_messages($result2, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
 		}
 	}
-	elseif(isset($_REQUEST["group_disable"])&&isset($_REQUEST["g_triggerid"]))
-	{
-		foreach($_REQUEST["g_triggerid"] as $triggerid)
-		{
+	elseif(isset($_REQUEST["group_disable"])&&isset($_REQUEST["g_triggerid"])){
+		foreach($_REQUEST["g_triggerid"] as $triggerid){
 			if(!check_right_on_trigger_by_triggerid(null, $triggerid, $accessible_hosts)) continue;
 
 			$result=DBselect("select triggerid from triggers t where t.triggerid=".zbx_dbstr($triggerid));
 			if(!($row = DBfetch($result))) continue;
-			if($result = update_trigger_status($row["triggerid"],1));
-			{
+			if($result = update_trigger_status($row["triggerid"],1));{
+			
+				update_services($triggerid, 0); // updating status to all services by the dependency
+				
 				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER,
 					S_TRIGGER." [".$triggerid."] [".expand_trigger_description($triggerid)."] ".S_DISABLED);
 			}

@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2007 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -260,6 +260,28 @@
 			return $str_val[$value];
 
 		return S_UNKNOWN;
+	}
+
+	/*
+	 * Function: get_trigger_priority
+	 *
+	 * Description: 
+	 *     retrive triggers priority
+	 *     
+	 * Author: 
+	 *     Artem Suahrev
+	 *
+	 * Comments:
+	 *
+	 */
+	
+	function get_trigger_priority($triggerid){
+		$sql = 'SELECT priority FROM triggers WHERE triggerid='.$triggerid;
+		$res = DBselect($sql);
+		while($rows = DBfetch($res)){
+			$status = $rows['priority'];
+		}
+	return $status;
 	}
 
 	/*
