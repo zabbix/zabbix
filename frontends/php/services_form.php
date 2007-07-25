@@ -25,6 +25,7 @@
 	
 	$page["title"] = "S_IT_SERVICES";
 	$page["file"] = "services_form.php";
+	$page['scripts'] = array('services.js');
 	define('ZBX_PAGE_NO_MENU', 1);
 
 include_once "include/page_header.php";
@@ -89,8 +90,10 @@ include_once "include/page_header.php";
 	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT);
 
 	if(isset($_REQUEST['serviceid']) && $_REQUEST['serviceid'] > 0){
-		$query = "select s.* from services s LEFT JOIN triggers t on s.triggerid=t.triggerid ".
-			" LEFT JOIN functions f on t.triggerid=f.triggerid LEFT JOIN items i on f.itemid=i.itemid ".
+		$query = "select s.* from services s ".
+			" LEFT JOIN triggers t on s.triggerid=t.triggerid ".
+			" LEFT JOIN functions f on t.triggerid=f.triggerid ".
+			" LEFT JOIN items i on f.itemid=i.itemid ".
 			" where (i.hostid is null or i.hostid not in (".$denyed_hosts.")) ".
 			" and ".DBid2nodeid("s.serviceid")."=".$ZBX_CURNODEID.
 			" and s.serviceid=".$_REQUEST["serviceid"];
@@ -100,7 +103,6 @@ include_once "include/page_header.php";
 		}
 	}
 
-echo '<script type="text/javascript" src="js/services.js"></script>';
 /*-------------------------------------------- ACTIONS --------------------------------------------*/
 if(isset($_REQUEST['saction'])){
 
@@ -118,10 +120,17 @@ if(isset($_REQUEST['saction'])){
 		$service_times = get_request('service_times',array());
 		$childs = get_request('childs',array());
 
-		$triggerid = isset($_REQUEST["linktrigger"]) ? $_REQUEST["triggerid"] : null;
+		if(isset($_REQUEST["linktrigger"])){
+			$triggerid = $_REQUEST["triggerid"];
+			$status = get_trigger_priority($triggerid);
+		}
+		else {
+			$triggerid = null;
+			$status = 0;
+		}
 		if(isset($service["serviceid"])){
 			$result = update_service($service["serviceid"],
-				$_REQUEST["name"],$triggerid,$_REQUEST["algorithm"],
+				$_REQUEST["name"],$triggerid,$status,$_REQUEST["algorithm"],
 				$_REQUEST["showsla"],$_REQUEST["goodsla"],$_REQUEST["sortorder"],
 				$service_times,$_REQUEST['parentid'],$childs);
 				
@@ -131,7 +140,7 @@ if(isset($_REQUEST['saction'])){
 			
 		} else {
 			$result = add_service(
-				$_REQUEST["name"],$triggerid,$_REQUEST["algorithm"],
+				$_REQUEST["name"],$triggerid,$status,$_REQUEST["algorithm"],
 				$_REQUEST["showsla"],$_REQUEST["goodsla"],$_REQUEST["sortorder"],
 				$service_times,$_REQUEST['parentid'],$childs);
 			show_messages($result, S_SERVICE_ADDED, S_CANNOT_ADD_SERVICE);
