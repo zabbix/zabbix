@@ -36,6 +36,23 @@ extern	int	CONFIG_DBPORT;
 extern	int	CONFIG_NODEID;
 extern	int	CONFIG_MASTER_NODEID;
 
+typedef enum {
+	GRAPH_TYPE_NORMAL = 0,
+	GRAPH_TYPE_STACKED = 1
+} zbx_graph_types;
+
+typedef enum {
+	CALC_FNC_MIN = 1,
+	CALC_FNC_AVG = 2,
+	CALC_FNC_MAX = 4,
+	CALC_FNC_ALL = 7
+} zbx_graph_item_calc_function;
+
+typedef enum {
+	GRAPH_ITEM_SIMPLE = 0,
+	GRAPH_ITEM_AGGREGATED = 1
+} zbx_graph_item_type;
+
 #define	ZBX_DB_CONNECT_NORMAL	0
 #define	ZBX_DB_CONNECT_EXIT	1
 
