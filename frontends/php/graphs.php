@@ -373,7 +373,7 @@ include_once "include/page_header.php";
 				" AND i.hostid not in (".$denyed_hosts.") ".
 				" AND ".DBid2nodeid("g.graphid")."=".$ZBX_CURNODEID.
 				" AND i.hostid is not NULL ".
-				" ORDER BY g.name");
+				" ORDER BY g.name, g.graphid");
 		}
 		else
 		{
@@ -381,7 +381,7 @@ include_once "include/page_header.php";
 				" left join items i on gi.itemid=i.itemid ".
 				" WHERE ".DBid2nodeid("g.graphid")."=".$ZBX_CURNODEID.
 				" AND ( i.hostid not in (".$denyed_hosts.")  OR i.hostid is NULL )".
-				" ORDER BY g.name");
+				" ORDER BY g.name, g.graphid");
 		}
 		while($row=DBfetch($result))
 		{

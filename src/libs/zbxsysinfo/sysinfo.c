@@ -169,7 +169,7 @@ void	free_metrics(void)
 
 	if( commands )
 	{
-		for(i=0; NULL == commands[i].key; i++)
+		for(i=0; NULL != commands[i].key; i++)
 		{
 			zbx_free(commands[i].key);
 			zbx_free(commands[i].main_param);
