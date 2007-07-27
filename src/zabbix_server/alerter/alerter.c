@@ -203,6 +203,8 @@ int main_alerter_loop()
 
 		while((row=DBfetch(result)))
 		{
+			res = FAIL;
+
 			ZBX_STR2UINT64(alert.alertid,row[0]);
 			alert.mediatypeid=atoi(row[1]);
 			alert.sendto=row[2];
@@ -230,7 +232,7 @@ int main_alerter_loop()
 			/* Hardcoded value */
 			/* SMS requires 15s for sending */
 			alarm(40);
-			res=execute_action(&alert,&mediatype,error,sizeof(error));
+			res = execute_action(&alert,&mediatype,error,sizeof(error));
 			alarm(0);
 
 			if(res==SUCCEED)
