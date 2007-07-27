@@ -318,8 +318,10 @@ static void on_log (jabber_session_p sess, const char *data, size_t size, int is
 static int connect_jabber(const char *jabber_id, const char *password, int use_sasl, int port, char *error, int len)
 {
 	char *buf = NULL;
+
+	int iks_error = IKS_OK;
 		
-	zabbix_log(LOG_LEVEL_DEBUG, "JABBER: connecting as %s, pass %s", jabber_id, password);
+	zabbix_log(LOG_LEVEL_DEBUG, "JABBER: connecting as %s", jabber_id);
 
 	if(NULL == jsess)
 	{
@@ -371,7 +373,7 @@ static int connect_jabber(const char *jabber_id, const char *password, int use_s
 		IKS_RULE_ID, "auth",
 		IKS_RULE_DONE);
 
-	switch (iks_connect_with(jsess->prs, jsess->acc->server, port, jsess->acc->server, &zbx_iks_transport) ) {
+	switch (iks_error = iks_connect_with(jsess->prs, jsess->acc->server, port, jsess->acc->server, &zbx_iks_transport) ) {
 		case IKS_OK:
 			break;
 		case IKS_NET_NODNS:
@@ -381,12 +383,12 @@ static int connect_jabber(const char *jabber_id, const char *password, int use_s
 			zbx_snprintf(error, len, "connection failed");
 			goto lbl_fail;
 		default:
-			zbx_snprintf(error, len, "connection io error");
+			zbx_snprintf(error, len, "connection error [%i][%i]", iks_error, errno);
 			goto lbl_fail;
 	}
 
 	while (jsess->status != JABBER_READY) {
-		switch (iks_recv (jsess->prs, 5)) {
+		switch (iks_error = iks_recv (jsess->prs, 5)) {
 			case IKS_OK:
 			case IKS_HOOK:
 				break;
@@ -394,7 +396,7 @@ static int connect_jabber(const char *jabber_id, const char *password, int use_s
 				zbx_snprintf(error, len, "tls handshake failed");
 				goto lbl_fail;
 			default:
-				zbx_snprintf(error, len, "receiving io error");
+				zbx_snprintf(error, len, "receiving error [%i][%i]", iks_error, errno);
 				goto lbl_fail;
 		}
 	}
@@ -426,6 +428,7 @@ int	send_jabber(char *username, char *passwd, char *sendto, char *message, char 
 {
 	iks *x = NULL;
 	int ret = FAIL;
+	int iks_error = IKS_OK;
 
 	assert(error);
 
@@ -444,7 +447,8 @@ int	send_jabber(char *username, char *passwd, char *sendto, char *message, char 
 	zabbix_log( LOG_LEVEL_DEBUG, "JABBER: sending");
 	if( (x = iks_make_msg(IKS_TYPE_NONE, sendto, message)) )
 	{
-		if ( IKS_OK == iks_send (jsess->prs, x) )
+		iks_insert_attrib(x, "from", username);
+		if ( IKS_OK == (iks_error = iks_send (jsess->prs, x)) )
 		{
 			zabbix_log( LOG_LEVEL_DEBUG, "JABBER: message sent");
 			ret = SUCCEED;
@@ -453,7 +457,7 @@ int	send_jabber(char *username, char *passwd, char *sendto, char *message, char 
 		{
 			jsess->status = JABBER_ERROR;
 
-			zbx_snprintf(error, max_error_len, "JABBER: Cannot send message [%s]", strerror_from_system(errno));
+			zbx_snprintf(error, max_error_len, "JABBER: Cannot send message [%i][%s]", iks_error, strerror_from_system(errno));
 			zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 		}
 		iks_delete (x);
