@@ -636,7 +636,9 @@ $dt = 0;
 	function createServiceTree(&$services,&$temp,$id=0,$serviceupid=0,$parentid=0, $soft=0, $linkid=''){
 
 		$rows = $services[$id];
-		$rows['algorithm'] = algorithm2str($rows['algorithm']);
+		if(($rows['serviceid'] > 0) && ($rows['caption'] != 'root')){
+			$rows['algorithm'] = algorithm2str($rows['algorithm']);
+		}
 	
 	//---------------------------- if not leaf -----------------------------
 		$rows['parentid'] = $parentid;
@@ -669,7 +671,9 @@ $dt = 0;
 	
 	//---------------------------- if not leaf -----------------------------
 		$rows['parentid'] = $parentid;
-		$rows['status'] = get_service_status_description($rows["status"]);
+		if(($rows['serviceid']  > 0) && ($rows['caption'] != 'root')){
+			$rows['status'] = get_service_status_description($rows["status"]);
+		}
 		
 		if($soft == 0){
 
