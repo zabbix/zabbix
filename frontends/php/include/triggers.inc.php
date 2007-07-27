@@ -276,10 +276,13 @@
 	 */
 	
 	function get_trigger_priority($triggerid){
-		$sql = 'SELECT priority FROM triggers WHERE triggerid='.$triggerid;
-		$res = DBselect($sql);
-		while($rows = DBfetch($res)){
+		$sql = 'SELECT count(*) as count, priority FROM triggers WHERE triggerid='.$triggerid.' GROUP BY priority';
+		$rows = DBfetch(DBselect($sql));
+		if($rows && !is_null($rows['count']) && !is_null($rows['priority']) && ($rows['count'] > 0)){
 			$status = $rows['priority'];
+		}
+		else{
+			$status = 0;
 		}
 	return $status;
 	}

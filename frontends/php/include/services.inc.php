@@ -51,6 +51,8 @@
 		if(!$result){
 			return FALSE;
 		}
+		
+		$status = get_service_status($serviceid,$algorithm,$triggerid);
 		update_services($triggerid, $status); // updating status to all services by the dependency
 		
 		DBExecute('DELETE FROM services_times WHERE serviceid='.$serviceid);
@@ -96,7 +98,8 @@
 								',triggerid='.$triggerid.', status='.$status.', algorithm='.$algorithm.', '.
 								' showsla='.$showsla.', goodsla='.$goodsla.', sortorder='.$sortorder.
 							' WHERE serviceid='.$serviceid);
-							
+
+		$status = get_service_status($serviceid,$algorithm,$triggerid);
 		update_services($triggerid, $status); // updating status to all services by the dependency
 
 		DBexecute('DELETE FROM services_times WHERE serviceid='.$serviceid);
@@ -135,6 +138,55 @@
 			return	TRUE;
 		}
 		return	FALSE;
+	}
+	
+	/*
+	 * Function: get_service_status
+	 *
+	 * Description: 
+	 *     retrive true status
+	 *     
+	 * Author: 
+	 *     Artem Suahrev
+	 *
+	 * Comments:
+	 *
+	 */
+	
+	function get_service_status($serviceid,$algorithm,$triggerid=null,$status=0){
+		
+		if(!$status && is_numeric($triggerid)){
+			$status = get_trigger_priority($triggerid);/* Do nothing */
+		}
+		
+		if((SERVICE_ALGORITHM_MAX == $algorithm) || (SERVICE_ALGORITHM_MIN == $algorithm)){
+			if(SERVICE_ALGORITHM_MAX == $algorithm){
+			
+				$result = DBselect('SELECT count(*) as count,max(status) as status'.
+									' FROM services s,services_links l '.
+									' WHERE l.serviceupid='.$serviceid.
+										' AND s.serviceid=l.servicedownid'
+									);
+			}
+			/* MIN otherwise */
+			else{
+				$result = DBselect('SELECT count(*) as count,min(status) as status'.
+									' FROM services s,services_links l '.
+									' WHERE l.serviceupid='.$serviceid.
+										' AND s.serviceid=l.servicedownid'
+									);
+			}
+			
+			$rows = DBfetch($result);
+	
+			if($rows && !is_null($rows['count']) && !is_null($rows['status'])){
+				if($rows['count'] > 0){
+					$status=$rows['status'];
+				}
+			}
+		}
+		
+	return $status;
 	}
 
 	/******************************************************************************
@@ -675,7 +727,11 @@ $dt = 0;
  ******************************************************************************/
 function update_services_rec($serviceid){
 
-	$result = DBselect("SELECT l.serviceupid,s.algorithm FROM services_links l,services s WHERE s.serviceid=l.serviceupid AND l.servicedownid=".$serviceid);
+	$result = DBselect('SELECT l.serviceupid,s.algorithm '.
+						' FROM services_links l,services s '.
+						' WHERE s.serviceid=l.serviceupid '.
+							' AND l.servicedownid='.$serviceid
+						);
 	$status=0;
 
 	while($rows=DBfetch($result)){
@@ -687,30 +743,7 @@ function update_services_rec($serviceid){
 		}
 		else if((SERVICE_ALGORITHM_MAX == $algorithm) || (SERVICE_ALGORITHM_MIN == $algorithm)){
 
-			if(SERVICE_ALGORITHM_MAX == $algorithm){
-			
-				$result2 = DBselect('SELECT count(*) as count,max(status) as status'.
-									' FROM services s,services_links l '.
-									' WHERE l.serviceupid='.$serviceupid.
-										' AND s.serviceid=l.servicedownid'
-									);
-			}
-			/* MIN otherwise */
-			else{
-				$result2 = DBselect('SELECT count(*) as count,min(status) as status'.
-									' FROM services s,services_links l '.
-									' WHERE l.serviceupid='.$serviceupid.
-										' AND s.serviceid=l.servicedownid'
-									);
-			}
-			
-			$rows2=DBfetch($result2);
-			
-			if($rows2 && !is_null($rows2['count']) && !is_null($rows2['status'])){
-				if($row2['count'] > 0){
-					$status=$rows2['status'];
-				}
-			}
+			$status = get_service_status($serviceupid,$algorithm);
 
 			$now=time();
 			
@@ -797,7 +830,7 @@ function add_service_alarm($serviceid,$status,$clock){
 		return true;
 	}
 
-	DBexecute('INSERT INTO service_alarms(servicealarmid,serviceid,clock,value) VALUES('.get_dbid('service_alarms','servicealarmid').','.$serviceid.','.$clock.','.$status);
+	DBexecute('INSERT INTO service_alarms (servicealarmid,serviceid,clock,value) VALUES ('.get_dbid('service_alarms','servicealarmid').','.$serviceid.','.$clock.','.$status.')');
 	
 	return true;
 }
