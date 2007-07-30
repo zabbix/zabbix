@@ -380,6 +380,7 @@
 	define('SPACE',	'&nbsp;');
 	define('RARR',	'&rArr;');
 
+	define('ZBX_EREG_SPACES', '([[:space:]]+){0,1}');
 	define('ZBX_EREG_INTERNAL_NAMES', '([0-9a-zA-Z_.[:space:][.-.]$]+)');
 	define('ZBX_EREG_KEY_NAME', '([0-9a-zA-Z_.,[.:.][:space:][.-.]$]+)');
 	define('ZBX_EREG_PARAMS', '([[:print:]]+){0,1}');

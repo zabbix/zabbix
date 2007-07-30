@@ -1,5 +1,6 @@
 Changes for 1.4.2:
 
+ - added availability of using spaces for trigger expressions (Eugene)
  - improved inheritance of template graphs (Eugene)
  - fixed permissions for logfile (Eugene)
  - changed syntax of keys for external checks (Alexei)
