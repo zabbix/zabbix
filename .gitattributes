@@ -101,6 +101,7 @@ frontends/php/js/graphs.js -text
 frontends/php/js/menu.js -text
 frontends/php/js/services.js -text
 frontends/php/js/tree.js -text
+frontends/php/styles/div.css -text
 frontends/php/styles/form.css -text
 frontends/php/styles/link.css -text
 frontends/php/styles/p.css -text

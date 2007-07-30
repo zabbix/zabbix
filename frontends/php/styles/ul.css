@@ -5,9 +5,14 @@ ul
 	padding-left: 1em;
 }
 
+
+ul.itservices{
+	margin: 0px;
+	margin-left: 5px;
+}
+
 ul.messages
 {
-	overflow:auto;
 	vertical-align: top;
 	border: 1px dashed #000000;
 	background-color: #FFFFFF;
@@ -16,18 +21,18 @@ ul.messages
 
 ul.messages li
 {
-	font-size: 8pt;
 	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 8pt;
 }
 
 ul.messages li.info
 {
 	color:#000000;
-	list-style: url('../images/general/warning_small.gif') inside;
+	list-style: url('images/general/warning_small.gif') inside;
 }
 
 ul.messages li.error
 {
 	color:#AA0000;
-	list-style: url('../images/general/error_small.gif') inside;
+	list-style: url('images/general/error_small.gif') inside;
 }

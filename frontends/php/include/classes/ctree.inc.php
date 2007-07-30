@@ -97,7 +97,7 @@ function MakeSHTMLRow($id){
 	$table->AddOption('width','200');
 	
 	$tr = $this->MakeSImgStr($id);
-
+	
 	$td = new CCol($this->tree[$id]['caption']);
 	$td->SetAlign('left');
 
@@ -108,13 +108,11 @@ function MakeSHTMLRow($id){
 	$tr = new CRow();
 	$tr->AddItem($table);
 	$tr->AddOption('id',$id);
-//	$tr->AddOption('ntype',$this->tree[$id]['childs']);
 	$tr->AddOption('style',($this->tree[$id]['parentid'] != '0')?('display: none;'):(''));
+	$tr->AddOption('valign','top');
 
 	foreach($this->fields as $key => $value){
-//		$tr->AddItem('&nbsp;&nbsp;');
 		$td = new CCol($this->tree[$id][$value]);
-//		$td->SetAlign('left');
 		$tr->AddItem($td);
 	}
 return $tr;
@@ -123,6 +121,8 @@ return $tr;
 function MakeSImgStr($id){
 	$tr = new CRow();
 	$tr->AddOption('height',18);
+//	$tr->AddOption('valign','top');
+	
 	$count=(isset($this->tree[$id]['nodeimg']))?(strlen($this->tree[$id]['nodeimg'])):(0);
 	for($i=0; $i<$count; $i++){
 		switch($this->tree[$id]['nodeimg'][$i]){
@@ -135,7 +135,7 @@ function MakeSImgStr($id){
 			case 'L':
 				if($this->tree[$id]['nodetype'] == 2){
 					$img= new CImg('images/general/tree/Yc.gif','y','22','18');
-					$img->AddOption('onclick','javascript: tree.closeSNodeX('.$id.',this);');
+					$img->AddOption('OnClick','javascript: tree.closeSNodeX('.$id.',this);');
 					$img->AddOption('id',$id.'I');
 					$img->SetClass('imgnode');
 					
@@ -146,7 +146,7 @@ function MakeSImgStr($id){
 			case 'T':
 				if($this->tree[$id]['nodetype'] == 2){
 					$img= new CImg('images/general/tree/Xc.gif','x','22','18');
-					$img->AddOption('onclick','javascript: tree.closeSNodeX('.$id.',this);');
+					$img->AddOption('OnClick','javascript: tree.closeSNodeX('.$id.',this);');
 					$img->AddOption('id',$id.'I');
 					$img->SetClass('imgnode');
 				} else {
