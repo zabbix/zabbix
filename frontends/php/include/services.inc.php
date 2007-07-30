@@ -19,7 +19,7 @@
 **/
 ?>
 <?php
-	function	add_service($name,$triggerid,$status,$algorithm,$showsla,$goodsla,$sortorder,$service_times=array(),$parentid,$childs){
+	function	add_service($name,$triggerid,$algorithm,$showsla,$goodsla,$sortorder,$service_times=array(),$parentid,$childs){
 	
 		foreach($childs as $id => $child){		//add childs
 			if($parentid == $child['serviceid']){
@@ -46,14 +46,11 @@
 		}
 
 		$result=DBexecute('INSERT INTO services (serviceid,name,status,triggerid,algorithm,showsla,goodsla,sortorder)'.
-							' VALUES ('.$serviceid.','.zbx_dbstr($name).','.$status.' ,'.$triggerid.' ,'.zbx_dbstr($algorithm).
+							' VALUES ('.$serviceid.','.zbx_dbstr($name).',0 ,'.$triggerid.' ,'.zbx_dbstr($algorithm).
 								' ,'.$showsla.','.zbx_dbstr($goodsla).','.$sortorder.')');
-		if(!$result){
-			return FALSE;
-		}
-		
-		$status = get_service_status($serviceid,$algorithm,$triggerid);
-		update_services($triggerid, $status); // updating status to all services by the dependency
+		if(!$result) return FALSE;
+
+		update_services_status_all(); // updating status to all services by the dependency
 		
 		DBExecute('DELETE FROM services_times WHERE serviceid='.$serviceid);
 
@@ -71,7 +68,7 @@
 		return $serviceid;
 	}
 
-	function	update_service($serviceid,$name,$triggerid,$status,$algorithm,$showsla,$goodsla,$sortorder,$service_times=array(),$parentid,$childs){
+	function	update_service($serviceid,$name,$triggerid,$algorithm,$showsla,$goodsla,$sortorder,$service_times=array(),$parentid,$childs){
 		foreach($childs as $id => $child){		//add childs
 			if($parentid == $child['serviceid']){
 				error('Service can\'t be parent and child in onetime.');
@@ -87,20 +84,17 @@
 			$result = add_service_link($child['serviceid'],$serviceid,$child['soft']); 
 		}
 		
-		if(!$result){
-			return FALSE;
-		}
+		if(!$result) return FALSE;
 		
 		if(is_null($triggerid) || $triggerid==0) $triggerid = 'NULL';
 
 		$result = DBexecute('UPDATE services '.
 							' SET name='.zbx_dbstr($name).
-								',triggerid='.$triggerid.', status='.$status.', algorithm='.$algorithm.', '.
+								',triggerid='.$triggerid.', status=0, algorithm='.$algorithm.', '.
 								' showsla='.$showsla.', goodsla='.$goodsla.', sortorder='.$sortorder.
 							' WHERE serviceid='.$serviceid);
 
-		$status = get_service_status($serviceid,$algorithm,$triggerid);
-		update_services($triggerid, $status); // updating status to all services by the dependency
+		update_services_status_all(); // updating status to all services by the dependency
 
 		DBexecute('DELETE FROM services_times WHERE serviceid='.$serviceid);
 		foreach($service_times as $val){
@@ -200,17 +194,53 @@
 		return DBexecute($sql);
 	}
 
-	function	delete_service($serviceid)
-	{
+	function	delete_service($serviceid){
 		$sql="DELETE FROM services_links WHERE servicedownid=$serviceid OR serviceupid=$serviceid";
-		$result=DBexecute($sql);
-		if(!$result)
-		{
-			return	$result;
-		}
+		if(!$result=DBexecute($sql)) return	$result;
 
 		$sql="DELETE FROM services WHERE serviceid=$serviceid";
-		return DBexecute($sql);
+		if(!$result=DBexecute($sql)) return	$result;		
+
+		update_services_status_all();
+		
+		return $result;
+	}
+	
+	/*
+	 * Function: clear_parents_from_trigger
+	 *
+	 * Description: 
+	 *     removes any links between trigger and service if service is not leaf (treenode)
+	 *     
+	 * Author: 
+	 *     Artem Suahrev
+	 *
+	 * Comments:
+	 *
+	 */
+	
+	function	clear_parents_from_trigger($serviceid=0){
+		if($serviceid != 0){
+			$sql='UPDATE services as s '.
+					' SET s.triggerid = null '.
+					' WHERE s.serviceid = '.$serviceid;
+			DBexecute($sql);
+		return;
+		}
+
+		$sql = 'SELECT s.serviceid '.
+					' FROM services as s, services_links as sl '.
+					' WHERE s.serviceid = sl.serviceupid '.
+					  ' AND NOT(s.triggerid IS NULL) '.
+					' GROUP BY s.serviceid;';
+		$res = DBselect($sql);
+
+		while($rows = DBfetch($res)){
+			$sql='UPDATE services as s '.
+					' SET s.triggerid = null '.
+					' WHERE s.serviceid = '.$rows['serviceid'];
+			DBexecute($sql);
+		}
 	}
 
 	# Return TRUE if triggerid is a reason why the service is not OK
@@ -547,26 +577,26 @@ $dt = 0;
 
 	function	get_service_status_description($status)
 	{
-		$desc="<font color=\"#00AA00\">OK</a>";
+		$desc='<font color="#00AA00">OK</a>';
 		if($status==5)
 		{
-			$desc="<font color=\"#FF0000\">Disaster</a>";
+			$desc='<div class="disaster">Disaster</div>';
 		}
 		elseif($status==4)
 		{
-			$desc="<font color=\"#FF8888\">Serious".SPACE."problem</a>";
+			$desc='<div class="high">Serious'.SPACE.'problem</div> ';
 		}
 		elseif($status==3)
 		{
-			$desc="<font color=\"#AA0000\">Average".SPACE."problem</a>";
+			$desc='<div class="average">Average'.SPACE.'problem</div> ';
 		}
 		elseif($status==2)
 		{
-			$desc="<font color=\"#AA5555\">Minor".SPACE."problem</a>";
+			$desc='<div class="warning">Minor'.SPACE.'problem</div> ';
 		}
 		elseif($status==1)
 		{
-			$desc="<font color=\"#00AA00\">OK</a>";
+			$desc='<font color="#00AA00">OK</font>';
 		}
 		return $desc;
 	}
@@ -736,7 +766,6 @@ function update_services_rec($serviceid){
 						' WHERE s.serviceid=l.serviceupid '.
 							' AND l.servicedownid='.$serviceid
 						);
-	$status=0;
 
 	while($rows=DBfetch($result)){
 		$serviceupid = $rows['serviceupid'];
@@ -772,7 +801,8 @@ function update_services_rec($serviceid){
  *                                                                            *
  * Function: update_services                                                  *
  *                                                                            *
- * Purpose: re-calculate and updates status of the service and its childs     *
+ * Purpose: re-calculate and updates status of the service and its childs 	  *
+ * on trigger priority change     											  *
  *                                                                            *
  * Parameters: serviceid - item to update services for                        *
  *             status - new status of the service                             *
@@ -786,7 +816,7 @@ function update_services_rec($serviceid){
  ******************************************************************************/
 function update_services($triggerid, $status){
 	DBexecute('UPDATE services SET status='.$status.' WHERE triggerid='.$triggerid);
-
+	
 	$result = DBselect('SELECT serviceid FROM services WHERE triggerid='.$triggerid);
 
 	while(($rows=DBfetch($result))){
@@ -794,6 +824,39 @@ function update_services($triggerid, $status){
 	}
 }
 
+/*
+ * Function: update_services_status_all
+ *
+ * Description: 
+ *     Cleaning parent nodes from triggers, updating ALL services status.
+ *     
+ * Author: 
+ *     Artem Suahrev
+ *
+ * Comments:
+ *
+ */
+	 
+function update_services_status_all(){
+
+	clear_parents_from_trigger();
+
+	$result = DBselect('SELECT sl.servicedownid as serviceid,s.algorithm,s.triggerid  '.
+						' FROM services_links as sl, services as s '.
+						' WHERE s.serviceid = sl.servicedownid '.
+						' GROUP BY sl.servicedownid');
+
+	while($rows=DBfetch($result)){
+		$status = get_service_status($rows['serviceid'],$rows['algorithm'],$rows['triggerid']);
+		DBexecute('UPDATE services SET status = '.$status.' WHERE serviceid='.$rows['serviceid']);
+	}	
+
+	$result = DBselect('SELECT sl.servicedownid as serviceid FROM services_links as sl GROUP BY sl.serviceupid');
+
+	while($rows=DBfetch($result)){
+		update_services_rec($rows['serviceid']);
+	}
+}
 /******************************************************************************
  *                                                                            *
  * Comments: !!! Don't forget sync code with C !!!                            *
