@@ -1,5 +1,6 @@
 Changes for 1.4.2:
 
+ - fixed "Reset" button for Web screens (Eugene)
  - fixed graph items limitation for IE6 (Eugene)
  - added availability of using spaces for trigger expressions (Eugene)
  - improved inheritance of template graphs (Eugene)
