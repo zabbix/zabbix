@@ -287,6 +287,7 @@
 	'S_CREATE_ACTION'=>			'Create Action',
 	'S_ENABLE_SELECTED_ACTIONS_Q'=>		'Enable selected actions?',
 	'S_DISABLE_SELECTED_ACTIONS_Q'=>	'Disable selected actions?',
+	'S_DELETE_SELECTED_ACTIONS_Q'=>		'Delete selected actions?',
 	'S_DELETE_SELECTED_ACTION_Q'=>		'Delete selected action?',
 	'S_LIKE_SMALL'=>			'like',
 	'S_NOT_LIKE_SMALL'=>			'not like',

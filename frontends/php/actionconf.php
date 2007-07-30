@@ -398,7 +398,7 @@ include_once "include/page_header.php";
 			SPACE,
 			new CButtonQMessage('group_disable',S_DISABLE_SELECTED,S_DISABLE_SELECTED_ACTIONS_Q),
 			SPACE,
-			new CButtonQMessage('group_delete',S_DELETE_SELECTED,S_DELETE_SELECTED_APPLICATIONS_Q)
+			new CButtonQMessage('group_delete',S_DELETE_SELECTED,S_DELETE_SELECTED_ACTIONS_Q)
 		)));
 
 		$form->AddItem($tblActions);
