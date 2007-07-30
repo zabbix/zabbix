@@ -640,7 +640,7 @@
 		/* Replace all calculations and numbers with '$ZBX_TR_EXPR_REPLACE_TO' */
 		$expt_number = '('.$ZBX_TR_EXPR_REPLACE_TO.'|'.ZBX_EREG_NUMBER.')';
 		$expt_term = '((\('.$expt_number.'\))|('.$expt_number.'))';
-		$expr_format = '(('.$expt_term.ZBX_EREG_SIGN.$expt_term.')|(\('.$expt_term.'\)))';
+		$expr_format = '(('.$expt_term.ZBX_EREG_SPACES.ZBX_EREG_SIGN.ZBX_EREG_SPACES.$expt_term.')|(\('.$expt_term.'\)))';
 		$expr_full_format = '((\('.$expr_format.'\))|('.$expr_format.'))';
 
 		while($res = ereg($expr_full_format.'([[:print:]]*)$', $expr, $arr))
