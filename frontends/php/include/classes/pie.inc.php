@@ -94,7 +94,6 @@ function selectData(){
 		$from_time	= $this->from_time;
 		$to_time	= $this->to_time;
 		
-//		$calc_field = 'round('.$x.'*(mod(clock+'.$z.','.$p.'))/('.$p.'),0)'; /* required for 'group by' support of Oracle */
 		$sql_arr = array();
 				
 		if(($this->period / $this->sizeX) <= (ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL)){
@@ -253,7 +252,6 @@ function calcExplodedCenter($anglestart,$angleend,$x,$y,$count){
 
 	$y+= round($count * sin(deg2rad($anglemid)));
 	$x+= round($count * cos(deg2rad($anglemid)));
-//		SDI($x.' xy '.$y);
 
 return array($x,$y);		
 }
@@ -522,9 +520,7 @@ function Draw(){
 	$this->sizeX = min($this->sizeX,$this->sizeY);
 	$this->sizeY = min($this->sizeX,$this->sizeY);
 	
-//	SDI($this->graphheight3d);
 	$this->calc3dhight($this->sizeY);
-//	SDI($this->graphheight3d);
 	
 	$this->exploderad = (int) $this->sizeX / 100;
 	$this->exploderad3d = (int) $this->sizeX / 60;
@@ -573,10 +569,7 @@ function Draw(){
 				$values[$item] = abs($data->lst);
 				break;
 		}
-//		$this->sum += $values[$item];
 	}
-//	$this->SwitchPie3D();
-//	$this->SwitchPieExploded();
 	
 	switch($this->type){
 		case GRAPH_TYPE_EXPLODED:

@@ -17,13 +17,14 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/ 
 // JavaScript Document
-
 var cookie ={
+cookies: new Array(),
+
 init: function () {
 	var allCookies = document.cookie.split('; ');
 	for (var i=0;i<allCookies.length;i++) {
 		var cookiePair = allCookies[i].split('=');
-		this[cookiePair[0]] = cookiePair[1];
+		this.cookies[cookiePair[0]] = cookiePair[1];
 	}
 },
 
@@ -37,28 +38,37 @@ create: function (name,value,days) {
 	}
 	
 	document.cookie = name+"="+value+expires+"; path=/";
-	this[name] = value;
+	this.cookies[name] = value;
 },
 
 read : function(name){
-	if(typeof(this[name]) != 'undefined'){
-		return this[name];
+	if(typeof(this.cookies[name]) != 'undefined'){
+		return this.cookies[name];
 	} else {
 		var nameEQ = name + "=";
 		var ca = document.cookie.split(';');
 		for(var i=0;i < ca.length;i++) {
 			var c = ca[i];
 			while (c.charAt(0)==' ') c = c.substring(1,c.length);
-			if(c.indexOf(nameEQ) == 0)	return this[name] = c.substring(nameEQ.length,c.length);
+			if(c.indexOf(nameEQ) == 0)	return this.cookies[name] = c.substring(nameEQ.length,c.length);
 		}
 	}
 	return null;
 },
 
+printall: function() {
+	var allCookies = document.cookie.split('; ');
+	for (var i=0;i<allCookies.length;i++) {
+		var cookiePair = allCookies[i].split('=');
+		
+		alert("[" + cookiePair[0] + "] is " + cookiePair[1]); // assumes print is already defined
+	}
+},
+
 erase: function (name) {
 	this.create(name,'',-1);
-	this[name] = undefined;
+	this.cookies[name] = undefined;
+}
 }
 
-}
 cookie.init();
