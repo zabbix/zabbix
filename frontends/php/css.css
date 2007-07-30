@@ -1,4 +1,5 @@
 /* CSS Document */
+@import "styles/div.css";
 @import "styles/link.css";
 @import "styles/table.css";
 @import "styles/form.css";
