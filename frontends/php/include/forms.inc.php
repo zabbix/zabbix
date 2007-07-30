@@ -2356,7 +2356,7 @@
 	{
 		global  $_REQUEST;
 
-		$frmGraph = new CFormTable(S_GRAPH);
+		$frmGraph = new CFormTable(S_GRAPH,null,'post');
 		$frmGraph->SetName('frm_graph');
 		$frmGraph->SetHelp("web.graphs.graph.php");
 		$frmGraph->SetMethod('post');
