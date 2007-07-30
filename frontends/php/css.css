@@ -1102,6 +1102,33 @@ A.action:active 	{	color:#3C3089;	text-decoration: underline;}
 .unknown_trigger{	background-color: #BCBCBC;	}
 .normal		{	background-color: #AADDAA;	}
 
+div.disaster{
+	background-color: #FF0000;
+	width: 100%;
+	height: 100%;
+	margin-right: 5px;
+}
+div.high{
+	background-color: #FF8888;
+	width: 100%;
+	height: 100%;
+	margin-right: 5px;
+}
+
+div.average{
+	background-color: #DDAAAA;
+	width: 100%;
+	height: 100%;
+	margin-right: 5px;
+}
+div.warning{
+	background-color: #EFEFCC;
+	width: 100%;
+	height: 100%;
+	margin-right: 5px;
+}
+
+
 a.small_font
 {
 	color: #000000;
@@ -1309,10 +1336,14 @@ ul
 }
 /********** END OF DISCOVERY STATUS *********/
 
-.center
-{
+.center{
 	width: 100%;
 	text-align: center;
+}
+
+ul.itservices{
+	margin: 0px;
+	margin-left: 5px;
 }
 
 ul.messages
