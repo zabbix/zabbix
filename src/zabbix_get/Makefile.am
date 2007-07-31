@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_PROGRAMS = zabbix_get
+sbin_PROGRAMS = zabbix_get
 
 zabbix_get_SOURCES = zabbix_get.c
 
