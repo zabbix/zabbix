@@ -1,5 +1,6 @@
 Changes for 1.4.2:
 
+ - fixed definition of serial columns to allow use of older MySQL (Alexei)
  - decreased required version of libcurl (Eugene)
  - added timeout handler for http monitoring (Eugene)
  - more informative report for confiuration script (Eugene)
