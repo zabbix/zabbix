@@ -14,7 +14,7 @@ SUBDIRS = \
 	utils \
 	watchdog
 
-bin_PROGRAMS = zabbix_server
+sbin_PROGRAMS = zabbix_server
 
 zabbix_server_SOURCES = \
 	evalfunc.c evalfunc.h \

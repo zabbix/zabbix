@@ -13,7 +13,7 @@ agents_ldadd = \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a
 
-bin_PROGRAMS = \
+sbin_PROGRAMS = \
 	zabbix_agent \
 	zabbix_agentd
 
