@@ -38,7 +38,9 @@ local $output;
 	"t_id"		=>	"bigint unsigned",
 	"t_integer"	=>	"integer",
 	"t_time"	=>	"integer",
-	"t_serial"	=>	"serial",
+# It does not work for MySQL 3.x and <4.x (4.11?)
+#	"t_serial"	=>	"serial",
+	"t_serial"	=>	"bigint unsigned not null auto_increment unique",
 	"t_double"	=>	"double(16,4)",
 	"t_percentage"	=>	"double(5,2)",
 	"t_varchar"	=>	"varchar",
