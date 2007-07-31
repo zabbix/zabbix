@@ -119,9 +119,10 @@ void	update_functions(DB_ITEM *item)
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments: recursive function                                               *
+ *           !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-void	update_services_rec(zbx_uint64_t serviceid)
+/* void	update_services_rec(zbx_uint64_t serviceid)
 {
 	int	status;
 	zbx_uint64_t	serviceupid;
@@ -129,9 +130,7 @@ void	update_services_rec(zbx_uint64_t serviceid)
 	time_t	now;
 
 	DB_RESULT result;
-	DB_RESULT result2;
 	DB_ROW	row;
-	DB_ROW	row2;
 
 	result = DBselect("select l.serviceupid,s.algorithm from services_links l,services s where s.serviceid=l.serviceupid and l.servicedownid=" ZBX_FS_UI64,
 		serviceid);
@@ -142,43 +141,12 @@ void	update_services_rec(zbx_uint64_t serviceid)
 		algorithm=atoi(row[1]);
 		if(SERVICE_ALGORITHM_NONE == algorithm)
 		{
-/* Do nothing */
 		}
 		else if((SERVICE_ALGORITHM_MAX == algorithm)
 			||
 			(SERVICE_ALGORITHM_MIN == algorithm))
 		{
-			/* Why it was so complex ?
-			result2 = DBselect("select status from services s,services_links l where l.serviceupid=%d and s.serviceid=l.servicedownid",serviceupid);
-			for(j=0;j<DBnum_rows(result2);j++)
-			{
-				if(atoi(DBget_field(result2,j,0))>status)
-				{
-					status=atoi(DBget_field(result2,j,0));
-				}
-			}
-			DBfree_result(result2);*/
-
-			if(SERVICE_ALGORITHM_MAX == algorithm)
-			{
-				result2 = DBselect("select count(*),max(status) from services s,services_links l where l.serviceupid=" ZBX_FS_UI64 " and s.serviceid=l.servicedownid",
-					serviceupid);
-			}
-			/* MIN otherwise */
-			else
-			{
-				result2 = DBselect("select count(*),min(status) from services s,services_links l where l.serviceupid=" ZBX_FS_UI64 " and s.serviceid=l.servicedownid",
-					serviceupid);
-			}
-			row2=DBfetch(result2);
-			if(row2 && DBis_null(row2[0]) != SUCCEED && DBis_null(row2[1]) != SUCCEED)
-			{
-				if(atoi(row2[0])!=0)
-				{
-					status=atoi(row2[1]);
-				}
-			}
-			DBfree_result(result2);
+			status = DBget_service_status(serviceupid, algorithm, 0);
 
 			now=time(NULL);
 			DBadd_service_alarm(serviceupid,status,now);
@@ -206,6 +174,7 @@ void	update_services_rec(zbx_uint64_t serviceid)
 	}
 	DBfree_result(result);
 }
+*/
 
 /******************************************************************************
  *                                                                            *
@@ -240,7 +209,7 @@ void	update_services(zbx_uint64_t triggerid, int status)
 	while((row=DBfetch(result)))
 	{
 		ZBX_STR2UINT64(serviceid,row[0]);
-		update_services_rec(serviceid);
+		DBupdate_services_rec(serviceid);
 	}
 
 	DBfree_result(result);
