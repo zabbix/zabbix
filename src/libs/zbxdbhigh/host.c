@@ -204,6 +204,243 @@ static int	DBdelete_dependencies_by_triggerid(
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBclear_parents_from_trigger                                     *
+ *                                                                            *
+ * Purpose: removes any links between trigger and service if service          *
+ *          is not leaf (treenode)                                            *
+ *                                                                            *
+ * Parameters: serviceid - id of service                                      *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBclear_parents_from_trigger(
+		zbx_uint64_t serviceid
+	)
+{
+	DB_RESULT res;
+	DB_ROW rows;
+
+	if( serviceid != 0 )
+	{
+		DBexecute("UPDATE services as s "
+				" SET s.triggerid = null "
+				" WHERE s.serviceid = " ZBX_FS_UI64, serviceid);
+	}
+	else
+	{
+
+		res = DBselect("SELECT s.serviceid "
+					" FROM services as s, services_links as sl "
+					" WHERE s.serviceid = sl.serviceupid "
+					" AND NOT(s.triggerid IS NULL) "
+					" GROUP BY s.serviceid");
+		while( (rows = DBfetch(res)) )
+		{
+			ZBX_STR2UINT64(serviceid, rows[0]);
+
+			DBexecute("UPDATE services as s "
+					" SET s.triggerid = null "
+					" WHERE s.serviceid = " ZBX_FS_UI64, serviceid);
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_service_status                                             *
+ *                                                                            *
+ * Purpose: retrive true status                                               *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBget_service_status(
+		zbx_uint64_t	serviceid,
+		int		algorithm,
+		zbx_uint64_t	triggerid
+	)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	int status = 0;
+
+	if( 0 != triggerid )
+	{
+		result = DBselect("select priority from triggers where trigerid=" ZBX_FS_UI64, triggerid);
+		if( (row = DBfetch(result)) )
+		{
+			status = atoi(row[0]);
+		}
+		DBfree_result(result);
+	}
+
+	if((SERVICE_ALGORITHM_MAX == algorithm) || (SERVICE_ALGORITHM_MIN == algorithm))
+	{
+		if(SERVICE_ALGORITHM_MAX == algorithm)
+		{
+			result = DBselect("select count(*),max(status) from services s,services_links l "
+					"where l.serviceupid=" ZBX_FS_UI64 " and s.serviceid=l.servicedownid",
+					serviceid);
+		}
+		/* MIN otherwise */
+		else
+		{
+			result = DBselect("select count(*),min(status) from services s,services_links l "
+					"where l.serviceupid=" ZBX_FS_UI64 " and s.serviceid=l.servicedownid",
+					serviceid);
+		}
+		row=DBfetch(result);
+		if(row && DBis_null(row[0]) != SUCCEED && DBis_null(row[1]) != SUCCEED)
+		{
+			if(atoi(row[0])!=0)
+			{
+				status = atoi(row[1]);
+			}
+		}
+		DBfree_result(result);
+	}
+	return status;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBupdate_services_rec                                            *
+ *                                                                            *
+ * Purpose: re-calculate and updates status of the service and its childs     *
+ *                                                                            *
+ * Parameters: serviceid - item to update services for                        *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: recursive function                                               *
+ *           !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
+void	DBupdate_services_rec(
+		zbx_uint64_t serviceid
+	)
+{
+	int	status;
+	zbx_uint64_t	serviceupid;
+	int	algorithm;
+	time_t	now;
+
+	DB_RESULT result;
+	DB_ROW	row;
+
+	result = DBselect("select l.serviceupid,s.algorithm from services_links l,services s where s.serviceid=l.serviceupid and l.servicedownid=" ZBX_FS_UI64,
+		serviceid);
+	status=0;
+	while((row=DBfetch(result)))
+	{
+		ZBX_STR2UINT64(serviceupid,row[0]);
+		algorithm=atoi(row[1]);
+		if(SERVICE_ALGORITHM_NONE == algorithm)
+		{
+/* Do nothing */
+		}
+		else if((SERVICE_ALGORITHM_MAX == algorithm)
+			||
+			(SERVICE_ALGORITHM_MIN == algorithm))
+		{
+			status = DBget_service_status(serviceupid, algorithm, 0);
+
+			now=time(NULL);
+			DBadd_service_alarm(serviceupid,status,now);
+			DBexecute("update services set status=%d where serviceid=" ZBX_FS_UI64,
+				status,
+				serviceupid);
+		}
+		else
+		{
+			zabbix_log( LOG_LEVEL_ERR, "Unknown calculation algorithm of service status [%d]",
+				algorithm);
+			zabbix_syslog("Unknown calculation algorithm of service status [%d]",
+				algorithm);
+		}
+	}
+	DBfree_result(result);
+
+	result = DBselect("select serviceupid from services_links where servicedownid=" ZBX_FS_UI64,
+		serviceid);
+
+	while((row=DBfetch(result)))
+	{
+		ZBX_STR2UINT64(serviceupid,row[0]);
+		DBupdate_services_rec(serviceupid);
+	}
+	DBfree_result(result);
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBupdate_services_status_all                                     *
+ *                                                                            *
+ * Purpose: Cleaning parent nodes from triggers, updating ALL services status.*
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
+static void DBupdate_services_status_all(void)
+{
+	DB_RESULT result;
+	DB_ROW rows;
+
+	zbx_uint64_t
+		serviceid = 0,
+		triggerid = 0;
+
+
+	DBclear_parents_from_trigger(0);
+
+	result = DBselect("SELECT sl.servicedownid as serviceid,s.algorithm,s.triggerid "
+						" FROM services_links as sl, services as s "
+						" WHERE s.serviceid = sl.servicedownid "
+						" GROUP BY sl.servicedownid");
+	while( (rows = DBfetch(result)) )
+	{
+		ZBX_STR2UINT64(serviceid, rows[0]);
+		ZBX_STR2UINT64(triggerid, rows[2]);
+
+		DBexecute("UPDATE services SET status=%i WHERE serviceid=" ZBX_FS_UI64,
+			DBget_service_status(serviceid, atoi(rows[1]), triggerid),
+			serviceid);
+	}
+	DBfree_result(result);
+
+	result = DBselect("SELECT sl.servicedownid as serviceid FROM services_links as sl GROUP BY sl.serviceupid");
+
+	while( (rows = DBfetch(result)) )
+	{
+		ZBX_STR2UINT64(serviceid, rows[0]);
+		DBupdate_services_rec(serviceid);
+	}
+	DBfree_result(result);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBdelete_service                                                 *
  *                                                                            *
  * Purpose: delete service from database                                      *
@@ -223,6 +460,8 @@ static int	DBdelete_service(
 {
 	DBexecute("delete from services_links where servicedownid=" ZBX_FS_UI64 " or serviceupid=" ZBX_FS_UI64, serviceid, serviceid);
 	DBexecute("delete from services where serviceid=" ZBX_FS_UI64, serviceid);
+
+	DBupdate_services_status_all();
 	
 	return SUCCEED;
 }

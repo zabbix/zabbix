@@ -540,5 +540,7 @@ int	DBsync_host_with_templates(
 int	DBdelete_host(
 		zbx_uint64_t hostid
 	);
-
+void	DBupdate_services_rec(
+		zbx_uint64_t serviceid
+	);
 #endif
