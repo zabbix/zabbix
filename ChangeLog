@@ -13,6 +13,7 @@ Changes for 1.5:
 
 Changes for 1.4.2:
 
+ - decreased required version of libcurl (Eugene)
  - added timeout handler for http monitoring (Eugene)
  - more informative report for confiuration script (Eugene)
  - changed installation directory to '$sbin' (Eudene)
