@@ -23,7 +23,12 @@ cleanwarnings="no"
 docat="yes"
 help="no"
 noparam=0
-def="--enable-agent --enable-server --with-mysql --prefix=`pwd` --with-libcurl --with-ldap"
+database="mysql"
+max="--prefix=`pwd` --enable-agent --enable-server --with-${database} --with-libcurl --with-ldap --with-net-snmp --with-jabber=/usr"
+def="--prefix=`pwd` --enable-agent --enable-server --with-${database} --with-libcurl --with-ldap"
+min="--prefix=`pwd` --enable-agent --enable-server --with-${database} --with-libcurl=no"
+server="--prefix=`pwd` --enable-server --with-${database}"
+agent="--prefix=`pwd` --enable-agent"
 
 for cmd
 do
@@ -48,6 +53,10 @@ do
     ansi )	ANSI=" -ansi";;
     mem )	TEST_MEM=" -DENABLE_CHECK_MEMOTY";;
     def )		config_param="$config_param $def";;
+    max )		config_param="$config_param $max";;
+    min )		config_param="$config_param $min";;
+    agent )		config_param="$config_param $agent";;
+    server )		config_param="$config_param $server";;
     --enable-* )	config_param="$config_param $cmd";; 
     --with-* )		config_param="$config_param $cmd";;
     --prefix=* )	config_param="$config_param $cmd";;
@@ -72,17 +81,23 @@ then
 	echo "   [make]                   - make applications"
 	echo "   [run]                    - run applications"
 	echo "   [inst|install]           - install applications"
+	echo "   [cat]                    - cat WARRNING file at the end (defaut - ON)"
+	echo "   [nocat]                  - do not cat WARRNING file"
 	echo
 	echo " Options:"
 	echo "   [todo]           - configure for TODO mode"
 	echo "   [mem]            - configure for memory leak testing"
 	echo "   [test]           - enable configuration test mode"
 	echo "   [ansi]           - enable compilation with ANSI mode"
-	echo "   [def]            - default configuration \"$def\""
-	echo "   [cat]            - cat WARRNING file at the end (defaut - ON)"
-	echo "   [nocat]          - do not cat WARRNING file"
 	echo "   [--enable-*]     - option for configuration"
 	echo "   [--with-*]       - option for configuration"
+	echo
+	echo " Configuration scopes:"
+	echo "   [max]            - maximal configuration \"$max\""
+	echo "   [def]            - default configuration \"$def\""
+	echo "   [min]            - minimal configuration \"$min\""
+	echo "   [agent]          - only agent configuration \"$agent\""
+	echo "   [server]         - only server configuration \"$server\""
         echo
         echo "Examples:"
         echo "  $0 conf def make test        - compyle, test, and sow report"
