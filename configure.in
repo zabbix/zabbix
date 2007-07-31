@@ -62,11 +62,11 @@ dnl Why I had -lsnmp before ???
 dnl AC_CHECK_LIB(snmp, main, LIBS="-lsnmp $LIBS")
 dnl Required for AIX when -lsnmp is used
 dnl AC_CHECK_LIB(isode, main)
-AC_CHECK_LIB(socket, main)
+AC_SEARCH_LIBS(socket, socket)
 #Solaris SNMP requires this
-AC_CHECK_LIB(kstat, main)
-AC_CHECK_LIB(nsl, main)
-AC_CHECK_LIB(resolv, main)
+AC_SEARCH_LIBS(kstat_open, kstat)
+AC_SEARCH_LIBS(gethostbyname, nsl)
+AC_SEARCH_LIBS(res_init, resolv)
 AC_CHECK_LIB(m, main)
 AC_CHECK_LIB(kvm, main)
 dnl AC_CHECK_LIB(pthread, main)
@@ -515,6 +515,9 @@ esac],
 AM_CONDITIONAL(AGENT, test x$agent = xyes)
 
 have_db="no"
+have_web_monitoring="no"
+have_jabber="no"
+have_snmp="no"
 
 if test "$server" = "yes"; then
 
@@ -622,6 +625,8 @@ if test "$server" = "yes"; then
 	if test "x$want_jabber" = "xyes"; then
 		if test "x$found_jabber" != "xyes"; then
 			AC_MSG_ERROR([Not found Jabber library])
+		else
+			have_jabber="yes"
 		fi
 	fi
 	CFLAGS="${CFLAGS} ${JABBER_CPPFLAGS}"
@@ -634,6 +639,10 @@ if test "$server" = "yes"; then
 			AC_MSG_ERROR([Not found Curl library])
 		fi
 	fi
+	if test "x$found_curl" = "xyes"; then
+		have_web_monitoring="cURL"
+	fi
+
 	CFLAGS="${CFLAGS} ${LIBCURL_CPPFLAGS}"
 	SERVER_LDFLAGS="${SERVER_LDFLAGS} ${LIBCURL_LDFLAGS}"
 	SERVER_LIBS="${SERVER_LIBS} ${LIBCURL_LIBS}"
@@ -643,6 +652,8 @@ if test "$server" = "yes"; then
 	if test "x$want_netsnmp" = "xyes"; then
 		if test "x$found_netsnmp" != "xyes"; then
 			AC_MSG_ERROR([Invalid NET-SNMP directory - unable to find net-snmp-config])
+		else
+			have_snmp="net-snmp"
 		fi
 	fi
 	CFLAGS="${CFLAGS} ${SNMP_CFLAGS}"
@@ -654,6 +665,8 @@ if test "$server" = "yes"; then
 	if test "x$want_snmp" = "xyes"; then
 		if test "x$found_snmp" != "xyes"; then
 			AC_MSG_ERROR([Invalid UCD-SNMP directory - unable to find ucd-snmp-config.h])
+		else
+			have_snmp="ucd-snmp"
 		fi
 
 		if test  "x$found_netsnmp" = "xyes"; then
@@ -670,11 +683,12 @@ fi
 
 AM_CONDITIONAL(JABBER,  test "x$found_jabber" = "xyes")
 
+found_ldap="no"
 dnl Check for libLDAP [by default - skip]
 LIBLDAP_CHECK_CONFIG([no])
 if test "x$want_ldap" = "xyes"; then
 	if test "x$found_ldap" != "xyes"; then
-		AC_MSG_ERROR([Invalid LDAP directory - unable to find ldap.h])
+		AC_MSG_ERROR([Invalid LDAP directory - unable to find ldap.h "${found_ldap}"])
 	fi
 fi
 CFLAGS="${CFLAGS} ${LDAP_CPPFLAGS}"
@@ -829,6 +843,9 @@ Configuration:
 if test "x$server" != "xno"; then
 
 echo "  With database:      ${have_db}
+  WEB Monitoring via: ${have_web_monitoring}
+  Native Jabber:      ${have_jabber}
+  SNMP:               ${have_snmp}
   Linker flags:       ${LDFLAGS} ${SERVER_LDFLAGS}
   Libraries:          ${LIBS} ${SERVER_LIBS}"
 
@@ -843,6 +860,9 @@ echo "  Linker flags:       ${LDFLAGS}
   Libraries:          ${LIBS}"
 
 fi
+
+echo "
+  LDAP support:       ${found_ldap}"
 
 echo
 echo "***********************************************************"

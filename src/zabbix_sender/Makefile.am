@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-bin_PROGRAMS = zabbix_sender
+sbin_PROGRAMS = zabbix_sender
 
 zabbix_sender_SOURCES = zabbix_sender.c
 
