@@ -325,6 +325,9 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 	now=time(NULL);
 	while((row=DBfetch(result)) && !err_str)
 	{
+		/* NOTE: do not use break or return for this block!
+		 *       process_step_data calling required!
+		 */
 		ZBX_STR2UINT64(httpstep.httpstepid, row[0]);
 		ZBX_STR2UINT64(httpstep.httptestid, row[1]);
 		httpstep.no=atoi(row[2]);
@@ -369,12 +372,26 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 				lastfailedstep = httpstep.no;
 			}
 		}
-/*		if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT, httpstep.timeout)))
+		if( !err_str )
 		{
-			zabbix_log(LOG_LEVEL_ERR, "Cannot set URL [%s]", curl_easy_strerror(err));
-			ret = FAIL;
-			break;
-		}*/
+			if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT, httpstep.timeout)))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Cannot set TIMEOUT [%s]",
+					curl_easy_strerror(err));
+				err_str = strdup(curl_easy_strerror(err));
+				lastfailedstep = httpstep.no;
+			}
+		}
+		if( !err_str )
+		{
+			if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_CONNECTTIMEOUT, httpstep.timeout)))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Cannot set CONNECTTIMEOUT [%s]",
+					curl_easy_strerror(err));
+				err_str = strdup(curl_easy_strerror(err));
+				lastfailedstep = httpstep.no;
+			}
+		}
 
 		if( !err_str )
 		{
