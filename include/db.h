@@ -538,7 +538,9 @@ int	DBsync_host_with_templates(
 int	DBdelete_host(
 		zbx_uint64_t hostid
 	);
-
+void	DBupdate_services_rec(
+		zbx_uint64_t serviceid
+	);
 /* History related functions */
 int	DBadd_trend(zbx_uint64_t itemid, double value, int clock);
 int	DBadd_history(zbx_uint64_t itemid, double value, int clock);
