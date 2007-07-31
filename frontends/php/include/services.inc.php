@@ -188,12 +188,6 @@
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function	delete_service_link($linkid)
-	{
-		$sql="DELETE FROM services_links WHERE linkid=$linkid";
-		return DBexecute($sql);
-	}
-
 	function	delete_service($serviceid){
 		$sql="DELETE FROM services_links WHERE servicedownid=$serviceid OR serviceupid=$serviceid";
 		if(!$result=DBexecute($sql)) return	$result;
@@ -833,7 +827,7 @@ function update_services($triggerid, $status){
  * Author: 
  *     Artem Suahrev
  *
- * Comments:
+ * Comments: !!! Don't forget sync code with C !!!
  *
  */
 	 

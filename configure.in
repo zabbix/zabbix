@@ -66,7 +66,7 @@ AC_SEARCH_LIBS(socket, socket)
 #Solaris SNMP requires this
 AC_SEARCH_LIBS(kstat_open, kstat)
 AC_SEARCH_LIBS(gethostbyname, nsl)
-AC_SEARCH_LIBS(res_init, resolv)
+AC_SEARCH_LIBS(__res_query, resolv bind socket)
 AC_CHECK_LIB(m, main)
 AC_CHECK_LIB(kvm, main)
 dnl AC_CHECK_LIB(pthread, main)
@@ -726,7 +726,7 @@ if test "$server" = "yes"; then
 
 fi
 
-AM_CONDITIONAL(JABBER,  test "x$found_jabber" = "xno")
+AM_CONDITIONAL(JABBER,  test "x$found_jabber" = "xyes")
 AM_CONDITIONAL(WITH_ODBC, test "x$have_odbc" != "xno")
 
 found_ldap="no"
@@ -911,7 +911,7 @@ echo "  Linker flags:          ${LDFLAGS}
 fi
 
 echo "
-  LDAP support:       ${found_ldap}"
+  LDAP support:          ${found_ldap}"
 
 echo
 echo "***********************************************************"
