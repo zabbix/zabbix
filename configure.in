@@ -633,7 +633,7 @@ if test "$server" = "yes"; then
 	SERVER_LDFLAGS="${SERVER_LDFLAGS} ${JABBER_LDFLAGS}"
 
 	dnl Check for libCurl [default - yes]
-	LIBCURL_CHECK_CONFIG(, [7.15.1], [],[])
+	LIBCURL_CHECK_CONFIG(, [7.13.1], [],[])
 	if test "x$want_curl" = "xyes"; then
 		if test "x$found_curl" != "xyes"; then
 			AC_MSG_ERROR([Not found Curl library])
