@@ -66,7 +66,7 @@ int	VFS_DEV_WRITE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 		zbx_snprintf(mode, sizeof(mode), "avg1");
 	}
 
-	if(NULL == collector)
+	if ( !DISKDEV_COLLECTOR_STARTED(collector) )
 	{
 		SET_MSG_RESULT(result, strdup("Collector is not started!"));
 		return SYSINFO_RET_OK;
@@ -142,7 +142,7 @@ int	VFS_DEV_READ(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 		zbx_snprintf(mode, sizeof(mode), "avg1");
 	}
 
-	if(NULL == collector)
+	if ( !DISKDEV_COLLECTOR_STARTED(collector) )
 	{
 		SET_MSG_RESULT(result, strdup("Collector is not started!"));
 		return SYSINFO_RET_OK;

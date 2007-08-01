@@ -78,7 +78,7 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		zbx_snprintf(mode, sizeof(mode), "avg1");
 	}
 	
-	if(NULL == collector)
+	if ( !CPU_COLLECTOR_STARTED(collector) )
 	{
 		SET_MSG_RESULT(result, strdup("Collector is not started!"));
 		return SYSINFO_RET_OK;
@@ -159,7 +159,7 @@ int	SYSTEM_CPU_LOAD(const char *cmd, const char *param, unsigned flags, AGENT_RE
 		return SYSINFO_RET_FAIL;
 	}
 
-	if(NULL == collector)
+	if ( !CPU_COLLECTOR_STARTED(collector) )
 	{
 		SET_MSG_RESULT(result, strdup("Collector is not started!"));
 		return SYSINFO_RET_OK;
