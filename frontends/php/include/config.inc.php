@@ -1342,7 +1342,7 @@ $result =
 
 	function	empty2null($var)
 	{
-		return empty($var) ? null : $var;
+		return ($var == "") ? null : $var;
 	}
 
 
