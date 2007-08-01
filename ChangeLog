@@ -1,5 +1,6 @@
 Changes for 1.4.2:
 
+ - fixed filtering of items by status (Eugene)
  - fixed collector for WinXX (Eugene)
  - fixed definition of serial columns to allow use of older MySQL (Alexei)
  - decreased required version of libcurl (Eugene)
