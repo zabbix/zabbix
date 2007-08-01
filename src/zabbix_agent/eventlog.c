@@ -76,7 +76,7 @@ static int    zbx_open_eventlog(
 
 	return SUCCEED;
 }
-
+#include "afxres.h"
 /* close event logger */
 static long	zbx_close_eventlog(HANDLE eventlog_handle)
 {

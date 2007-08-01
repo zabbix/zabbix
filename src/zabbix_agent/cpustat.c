@@ -370,7 +370,7 @@ void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 		j,
 		n;
 
-	if(!pcpus->queue_counter) return;
+	if(!pcpus->pdh_query) return;
 
 	if ((status = PdhCollectQueryData(pcpus->pdh_query)) != ERROR_SUCCESS)
 	{
