@@ -141,7 +141,7 @@
 	 *     retrive true status
 	 *     
 	 * Author: 
-	 *     Artem Suahrev
+	 *     Artem Suharev
 	 *
 	 * Comments:
 	 *
@@ -207,7 +207,7 @@
 	 *     removes any links between trigger and service if service is not leaf (treenode)
 	 *     
 	 * Author: 
-	 *     Artem Suahrev
+	 *     Artem Suharev
 	 *
 	 * Comments:
 	 *
@@ -825,7 +825,7 @@ function update_services($triggerid, $status){
  *     Cleaning parent nodes from triggers, updating ALL services status.
  *     
  * Author: 
- *     Artem Suahrev
+ *     Artem Suharev
  *
  * Comments: !!! Don't forget sync code with C !!!
  *
@@ -835,10 +835,7 @@ function update_services_status_all(){
 
 	clear_parents_from_trigger();
 
-	$result = DBselect('SELECT sl.servicedownid as serviceid,s.algorithm,s.triggerid  '.
-						' FROM services_links as sl, services as s '.
-						' WHERE s.serviceid = sl.servicedownid '.
-						' GROUP BY sl.servicedownid');
+	$result = DBselect('SELECT s.serviceid,s.algorithm,s.triggerid FROM services as s ');
 
 	while($rows=DBfetch($result)){
 		$status = get_service_status($rows['serviceid'],$rows['algorithm'],$rows['triggerid']);

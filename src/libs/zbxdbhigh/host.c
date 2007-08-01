@@ -278,7 +278,7 @@ static int	DBget_service_status(
 
 	if( 0 != triggerid )
 	{
-		result = DBselect("select priority from triggers where trigerid=" ZBX_FS_UI64, triggerid);
+		result = DBselect("select priority from triggers where trigerid=" ZBX_FS_UI64 " and status=0 ", triggerid);
 		if( (row = DBfetch(result)) )
 		{
 			status = atoi(row[0]);
@@ -414,10 +414,8 @@ static void DBupdate_services_status_all(void)
 
 	DBclear_parents_from_trigger(0);
 
-	result = DBselect("SELECT sl.servicedownid as serviceid,s.algorithm,s.triggerid "
-						" FROM services_links as sl, services as s "
-						" WHERE s.serviceid = sl.servicedownid "
-						" GROUP BY sl.servicedownid");
+	result = DBselect("SELECT s.serviceid,s.algorithm,s.triggerid FROM services as s");
+
 	while( (rows = DBfetch(result)) )
 	{
 		ZBX_STR2UINT64(serviceid, rows[0]);
