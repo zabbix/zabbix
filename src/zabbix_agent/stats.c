@@ -192,16 +192,19 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 {
 	zabbix_log( LOG_LEVEL_INFORMATION, "zabbix_agentd collector started");
 
-	init_cpu_collector(&(collector->cpus));
-	init_perf_collector(&(collector->perfs));
+	if ( init_cpu_collector(&(collector->cpus)) )
+		close_cpu_collector(&(collector->cpus));
+
+	if( init_perf_collector(&(collector->perfs)) )
+		close_perf_collector(&(collector->perfs));
 
 	while(ZBX_IS_RUNNING)
 	{
 		collect_cpustat(&(collector->cpus));
 		collect_perfstat(&(collector->perfs));
 
-		collect_stats_interfaces(&(collector->interfaces));
-		collect_stats_diskdevices(&(collector->diskdevices));
+		collect_stats_interfaces(&(collector->interfaces)); /* TODO */
+		collect_stats_diskdevices(&(collector->diskdevices)); /* TODO */
 
 		zbx_sleep(1);
 	}

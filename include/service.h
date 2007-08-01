@@ -51,7 +51,7 @@ int application_status;
 #define ZBX_IS_RUNNING (ZBX_APP_RUNNED == application_status)
 
 /* ask for application closing status            */
-#define ZBX_DO_EXIT() zbx_error("[%s] [%li]", __FILE__, __LINE__); application_status = ZBX_APP_STOPPED
+#define ZBX_DO_EXIT() application_status = ZBX_APP_STOPPED
 
 #define START_MAIN_ZABBIX_ENTRY(a)	service_start()
 

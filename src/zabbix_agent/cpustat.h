@@ -57,6 +57,8 @@
 
 	} ZBX_CPUS_STAT_DATA;
 
+#	define CPU_COLLECTOR_STARTED(collector)	((collector) && (collector)->cpus.pdh_query)
+
 #else /* not _WINDOWS */
 
 	#define MAX_CPU_HISTORY 900 /* 15 min in seconds */
@@ -86,6 +88,7 @@
 
 	} ZBX_CPUS_STAT_DATA;
 
+#	define CPU_COLLECTOR_STARTED(pcpus)	(1)
 #endif /* _WINDOWS */
 
 

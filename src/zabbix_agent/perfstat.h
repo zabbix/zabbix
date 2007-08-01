@@ -24,6 +24,8 @@
 
 #	include "perfmon.h"
 
+#	define PERF_COLLECTOR_STARTED(collector)	((collector) && (collector)->perfs.pdh_query)
+
 #else /* not _WINDOWS */
 
 #	define PDH_RAW_COUNTER	void*

@@ -32,7 +32,7 @@ int	USER_PERFCOUNTER(const char *cmd, const char *param, unsigned flags, AGENT_R
 
 	int	ret = SYSINFO_RET_FAIL;
 
-	if(NULL == collector)
+	if ( !PERF_COLLECTOR_STARTED(collector) )
 	{
 		SET_MSG_RESULT(result, strdup("Collector is not started!"));
 		return SYSINFO_RET_OK;
