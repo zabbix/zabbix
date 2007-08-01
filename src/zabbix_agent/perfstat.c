@@ -244,6 +244,7 @@ int	init_perf_collector(ZBX_PERF_STAT_DATA *pperf)
 
 	PERF_COUNTERS	*cptr = NULL;
 	PDH_STATUS	status;
+	int		is_empty = 1;
 
 	memset(pperf, 0, sizeof(ZBX_PERF_STAT_DATA));
 
@@ -268,6 +269,15 @@ int	init_perf_collector(ZBX_PERF_STAT_DATA *pperf)
 
 			zabbix_log( LOG_LEVEL_ERR, "Unable to add performance counter \"%s\" to query: %s", cptr->counterPath, strerror_from_module(status,"PDH.DLL"));
 		}
+		else
+		{
+			is_empty = 0;
+		}
+	}
+
+	if ( is_empty )
+	{
+		close_perf_collector(pperf);
 	}
 
 #endif /* _WINDOWS */
