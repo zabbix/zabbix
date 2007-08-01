@@ -266,18 +266,19 @@
 	 * Function: get_trigger_priority
 	 *
 	 * Description: 
-	 *     retrive triggers priority
+	 *     retrive trigger's priority
 	 *     
 	 * Author: 
-	 *     Artem Suahrev
+	 *     Artem Suharev
 	 *
 	 * Comments:
 	 *
 	 */
 	
 	function get_trigger_priority($triggerid){
-		$sql = 'SELECT count(*) as count, priority FROM triggers WHERE triggerid='.$triggerid.' GROUP BY priority';
+		$sql = 'SELECT count(*) as count, priority FROM triggers WHERE triggerid='.$triggerid.' AND status=0 GROUP BY priority';
 		$rows = DBfetch(DBselect($sql));
+
 		if($rows && !is_null($rows['count']) && !is_null($rows['priority']) && ($rows['count'] > 0)){
 			$status = $rows['priority'];
 		}
