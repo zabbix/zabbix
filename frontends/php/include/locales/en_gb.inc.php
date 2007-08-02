@@ -522,6 +522,7 @@
 	'S_ANOTHER_ITEM_SUM'=>			'Cannot add onemore item with type "Graph sum"',
 	'S_ID'=>				'Id',
 	'S_NO_GRAPHS_DEFINED'=>			'No graphs defined',
+	'S_NO_GRAPH_DEFINED'=>			'No graph defined',
 	'S_DELETE_GRAPH_Q'=>			'Delete graph?',
 	'S_YAXIS_TYPE'=>			'Y axis type',
 	'S_YAXIS_MIN_VALUE'=>			'Y axis MIN value',
@@ -678,6 +679,7 @@
 
 //	items.php
 	'S_NO_ITEMS_DEFINED'=>			'No items defined',
+	'S_NO_ITEM_DEFINED'=>			'No item defined',
 	'S_HISTORY_CLEANED'=>			'History cleaned',
 	'S_CLEAN_HISTORY_SELECTED_ITEMS'=>	'Clean history selected items',
 	'S_CLEAN_HISTORY'=>			'Clean history',
@@ -1062,6 +1064,7 @@
 	'S_IT_SERVICES'=>			'IT services',
 	'S_CONFIGURATION_OF_IT_SERVICES'=>	'Configuration of IT services',
 	'S_SERVICE_UPDATED'=>			'Service updated',
+	'S_NO_IT_SERVICE_DEFINED'=>		'No IT service defined',
 	'S_CANNOT_UPDATE_SERVICE'=>		'Cannot update service',
 	'S_SERVICE_ADDED'=>			'Service added',
 	'S_CANNOT_ADD_SERVICE'=>		'Cannot add service',
@@ -1132,6 +1135,7 @@
 //	triggers.php
 	'S_NO_TRIGGER'=>			'No trigger',
 	'S_NO_TRIGGERS_DEFINED'=>		'No triggers defined',
+	'S_NO_TRIGGER_DEFINED'=>		'No trigger defined',
 	'S_CONFIGURATION_OF_TRIGGERS'=>		'Configuration of triggers',
 	'S_CONFIGURATION_OF_TRIGGERS_BIG'=>	'CONFIGURATION OF TRIGGERS',
 	'S_DEPENDENCY_ADDED'=>			'Dependency added',

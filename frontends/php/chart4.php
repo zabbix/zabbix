@@ -40,6 +40,11 @@ include_once "include/page_header.php";
 <?php
 	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
 
+	if(! (DBfetch(DBselect('select distinct  t.triggerid from triggers t where t.triggerid='.$_REQUEST['triggerid']))) )
+	{
+		fatal_error(S_NO_TRIGGER_DEFINED);
+	}
+
 	if(! ($db_data = DBfetch(DBselect('select distinct  t.triggerid,t.description,h.host,h.hostid '.
 			' from hosts h, items i, functions f, triggers t'.
 			' where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid='.$_REQUEST["triggerid"].

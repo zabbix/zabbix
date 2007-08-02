@@ -102,7 +102,7 @@ include_once 'include/page_header.php';
 	$availiable_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST, null, null, $ZBX_CURNODEID);
 	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
 
-	if($_REQUEST['graphid'] > 0)
+	if($_REQUEST['graphid'] > 0 && DBfetch(DBselect('select distinct graphid from graphs where graphid='.$_REQUEST['graphid'])))
 	{
 		if(! ($row = DBfetch(DBselect(' SELECT distinct h.host, g.name '.
 					' FROM hosts h, items i, graphs_items gi, graphs g '.
@@ -123,6 +123,7 @@ include_once 'include/page_header.php';
 	}
 	else
 	{
+		$_REQUEST['graphid'] = 0;
 		array_push($h1, S_SELECT_GRAPH_TO_DISPLAY);
 	}
 
