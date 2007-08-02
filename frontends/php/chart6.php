@@ -47,6 +47,12 @@ include_once "include/page_header.php";
 	check_fields($fields);
 ?>
 <?php
+	if(! (DBfetch(DBselect('select graphid from graphs where graphid='.$_REQUEST['graphid']))) )
+	{
+		show_error_message(S_NO_GRAPH_DEFINED);
+
+	}
+
 	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_MODE_LT);
 	
 	if( !($db_data = DBfetch(DBselect(

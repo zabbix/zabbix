@@ -283,7 +283,7 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 	function fatal_error($msg)
 	{
 		include_once "include/page_header.php";
-		error($msg);
+		show_error_message($msg);
 		include_once "include/page_footer.php";
 	}
 	
