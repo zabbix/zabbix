@@ -506,6 +506,8 @@
 				return $result;
 		}
 
+		DBexecute('delete from screens_items where resourceid='.$graphid.' and resourcetype='.SCREEN_RESOURCE_GRAPH);
+
 		/* delete graph */
 		if ( ($result = DBexecute('delete from graphs_items where graphid='.$graphid)) )
 		if ( ($result = DBexecute('delete from graphs where graphid='.$graphid)) )

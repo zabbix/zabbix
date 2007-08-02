@@ -408,8 +408,7 @@ require_once "include/items.inc.php";
 			$row2=DBfetch($result2);
 			if($row2["count"]==0)
 			{
-				$sql="delete from groups where groupid=".$row["groupid"];
-				DBexecute($sql);
+				delete_host_group($row["groupid"]);
 			}
 		}
 	}

@@ -1056,6 +1056,8 @@ static int	DBdelete_graph(
 
 		if( SUCCEED == result )
 		{ /* delete graph */
+			DBexecute("delete from screens_items where resourceid=" ZBX_FS_UI64 " and resourcetype=%i", graphid, SCREEN_RESOURCE_GRAPH);
+
 			DBexecute("delete from graphs_items where graphid=" ZBX_FS_UI64, graphid);
 			DBexecute("delete from graphs where graphid=" ZBX_FS_UI64, graphid);
 
@@ -1549,6 +1551,9 @@ static int	DBdelete_item(
 		if( SUCCEED == (result = DBdelete_triggers_by_itemid(itemid)) )
 		if( SUCCEED == (result = DBdelete_history_by_itemid(itemid, 1 /* use housekeeper */)) )
 		{
+			DBexecute("delete from screens_items where resourceid=" ZBX_FS_UI64 " and resourcetype in (%i,%i)",
+					itemid, SCREEN_RESOURCE_PLAIN_TEXT, SCREEN_RESOURCE_SIMPLE_GRAPH);
+
 			DBexecute("delete from graphs_items where itemid=" ZBX_FS_UI64, itemid);
 			DBexecute("delete from items_applications where itemid=" ZBX_FS_UI64, itemid);
 			DBexecute("delete from items where itemid=" ZBX_FS_UI64, itemid);

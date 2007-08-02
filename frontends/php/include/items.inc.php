@@ -753,6 +753,12 @@
 		$result = delete_history_by_itemid($itemid, 1 /* use housekeeper */);
 		if(!$result)	return	$result;
 
+		DBexecute('delete from screens_items where resourceid='.$itemid.' and resourcetype in ('.
+					(implode(',',array(
+						SCREEN_RESOURCE_SIMPLE_GRAPH,
+						SCREEN_RESOURCE_PLAIN_TEXT)
+						)
+					).')');
 
 		$result = DBexecute("delete from items_applications where itemid=$itemid");
 		if(!$result)	return	$result;

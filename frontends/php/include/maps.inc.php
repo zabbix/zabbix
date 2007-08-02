@@ -50,7 +50,8 @@
 						$result &= sysmap_accessiable($se_data['elementid'], PERM_READ_ONLY);
 						break;
 					case SYSMAP_ELEMENT_TYPE_TRIGGER:
-						if(!DBfetch(DBselect("select distinct t.*".
+						if( DBfetch(DBselect('select triggerid from triggers where triggerid='.$se_data['elementid'])) &&
+						    !DBfetch(DBselect("select distinct t.*".
 							" from triggers t,items i,functions f".
 							" where f.itemid=i.itemid and t.triggerid=f.triggerid".
 							" and i.hostid not in (".$denyed_hosts.") and t.triggerid=".$se_data['elementid'])))
@@ -58,9 +59,10 @@
 							$result = false;
 						}
 						break;
-					case SYSMAP_ELEMENT_TYPE_HOST:
-						if(in_array($se_data['elementid'],
-							get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT)))
+					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
+						if( DBfetch(DBselect('select groupid from groups where groupid='.$se_data['elementid'])) &&
+						    in_array($se_data['elementid'],
+							get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT, PERM_RES_IDS_ARRAY)))
 						{
 							$result = false;
 						}

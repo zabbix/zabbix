@@ -40,6 +40,11 @@ include_once "include/page_header.php";
 	check_fields($fields);
 ?>
 <?php
+        if(! (DBfetch(DBselect('select serviceid from services where serviceid='.$_REQUEST["serviceid"]))) )
+        {
+                unset($_REQUEST["serviceid"]);
+        }
+
 	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT);
 
 	if(isset($_REQUEST["serviceid"]) && $_REQUEST["serviceid"] > 0){

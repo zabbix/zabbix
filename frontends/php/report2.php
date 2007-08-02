@@ -85,6 +85,11 @@ include_once "include/page_header.php";
 
 ?>
 <?php
+	if(isset($_REQUEST['triggerid']) && !DBfetch(DBselect('select triggerid from triggers where triggerid='.$_REQUEST['triggerid'])))
+	{
+		unset($_REQUEST['triggerid']);
+	}
+
 	if(isset($_REQUEST["triggerid"]))
 	{
 		if(!check_right_on_trigger_by_triggerid(PERM_READ_ONLY, $_REQUEST['triggerid']))

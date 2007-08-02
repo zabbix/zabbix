@@ -44,6 +44,12 @@ include_once "include/page_header.php";
 	check_fields($fields);
 ?>
 <?php
+	if(! (DBfetch(DBselect('select itemid from items where itemid='.$_REQUEST['itemid']))) )
+	{
+		show_error_message(S_NO_ITEM_DEFINED);
+
+	}
+
 	if(! ($db_data = DBfetch(DBselect("select i.itemid from items i ".
 		" where i.hostid in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY).") ".
 		" and i.itemid=".$_REQUEST["itemid"]))))
