@@ -95,11 +95,13 @@ frontends/php/images/sysmaps/old/Server.png -text svneol=unset#unset
 frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
 frontends/php/include/classes/chart.inc.php -text
 frontends/php/include/classes/pie.inc.php -text
+frontends/php/include/js.inc.php -text
 frontends/php/js/common.js -text
 frontends/php/js/cookies.js -text
 frontends/php/js/graphs.js -text
 frontends/php/js/menu.js -text
 frontends/php/js/services.js -text
+frontends/php/js/showhint.js -text
 frontends/php/js/tree.js -text
 frontends/php/styles/div.css -text
 frontends/php/styles/form.css -text
