@@ -217,8 +217,11 @@ function resizeiframe(id){
 	id = id || 'iframe';
 	var iframe = document.getElementById(id);
 	var indoc = (IE)?iframe.contentWindow.document:iframe.contentDocument;
-//	alert(typeof(indoc));
 	if(typeof(indoc) == 'undefined') return;
-	var height = parseInt(indoc.getElementsByTagName('body')[0].clientHeight);
+	var height = parseInt(indoc.getElementsByTagName('body')[0].scrollHeight);
+	var height2 = parseInt(indoc.getElementsByTagName('body')[0].offsetHeight);
+	if(height2 > height){
+		height = height2;
+	}
 	iframe.style.height = (height)+'px';
 }
