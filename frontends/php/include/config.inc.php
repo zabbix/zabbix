@@ -1373,11 +1373,6 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 	return $result;
 	}
 
-/***********************************/
-
-	function insert_showhint_javascript()
-	{
-		if(defined('SHOW_HINT_SCRIPT_INSERTTED')) return;
 
 /* Use ImageSetStyle+ImageLIne instead of bugged ImageDashedLine */
 	if(function_exists("imagesetstyle"))
@@ -1804,6 +1799,4 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 	{
 		return ($timestamp==0)?S_NEVER:date($format,$timestamp);
 	}
-		
-
 ?>

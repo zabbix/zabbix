@@ -22,7 +22,7 @@ var IE = ((!OP) && (document.all))?true:false;
 
 function SDI(msg)
 {
-	alert("DEBUG INFO: " + msg);
+	alert("DEBUG INFO: \n\r" + msg);
 }
 
 function close_window()
@@ -211,4 +211,14 @@ function insert_sizeable_graph(url)
 	if(width) url += "&amp;width=" + (width - 108);
 
 	document.write("<IMG SRC=\"" + url + "\">");
+}
+
+function resizeiframe(id){
+	id = id || 'iframe';
+	var iframe = document.getElementById(id);
+	var indoc = (IE)?iframe.contentWindow.document:iframe.contentDocument;
+//	alert(typeof(indoc));
+	if(typeof(indoc) == 'undefined') return;
+	var height = parseInt(indoc.getElementsByTagName('body')[0].clientHeight);
+	iframe.style.height = (height)+'px';
 }
