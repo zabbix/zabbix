@@ -74,6 +74,7 @@ require_once('include/classes/ctree.inc.php');
 	require_once 	"include/db.inc.php";
 	require_once 	"include/perm.inc.php";
 	require_once 	"include/audit.inc.php";
+	require_once 	"include/js.inc.php";
 
 // Include Validation
 
@@ -221,59 +222,6 @@ require_once('include/classes/ctree.inc.php');
 		include_once "include/page_footer.php";
 	}
 
-
-	/* function:
-	 *     zbx_jsvalue
-	 *
-	 * description:
-	 *	convert PHP variable to string version
-	 *      of JavaScrip style 
-	 *
-	 * author: Eugene Grigorjev
-	 */
-	function zbx_jsvalue($value)
-	{
-		if(!is_array($value)) 
-		{
-			if(is_object($value)) return unpack_object($value);
-			if(is_string($value)) return '\''.str_replace('\'','\\\'',			/*  '	=> \'	*/
-								str_replace("\n", '\n', 		/*  LF	=> \n	*/
-									str_replace("\\", "\\\\", 	/*  \	=> \\	*/
-										str_replace("\r", '', 	/*  CR	=> remove */
-											($value))))).'\'';
-			if(is_null($value)) return 'null';
-			return strval($value);
-		}
-
-		if(count($value) == 0) return '[]';
-
-		foreach($value as $id => $v)
-		{
-			if(!isset($is_object) && is_string($id)) $is_object = true;
-
-			$value[$id] = (isset($is_object) ? '\''.$id.'\' : ' : '').zbx_jsvalue($v);
-		}
-
-		if(isset($is_object))
-			return '{'.implode(',',$value).'}';
-		else
-			return '['.implode(',',$value).']';
-	}
-
-	/* function:
-	 *     zbx_add_post_js
-	 *
-	 * description:
-	 *	add JavaScript for calling after page loaging.
-	 *
-	 * author: Eugene Grigorjev
-	 */
-	function zbx_add_post_js($script)
-	{
-		global $ZBX_PAGE_POST_JS;
-
-		$ZBX_PAGE_POST_JS[] = $script;
-	}
 
 	function zbx_stripslashes($value){
 		if(is_array($value)){
@@ -539,24 +487,6 @@ require_once('include/classes/ctree.inc.php');
 		return "$s $u$units";
 	}
 
-	function	play_sound($filename)
-	{
-?>
-<SCRIPT TYPE="text/javascript">
-<!-- 
-if (navigator.appName == "Microsoft Internet Explorer")
-{
-	document.writeln('<BGSOUND SRC="<?php echo $filename; ?>" LOOP=0/>');
-}
-else
-{
-	document.writeln('<EMBED SRC="<?php echo $filename; ?>" AUTOSTART=TRUE WIDTH=0 HEIGHT=0 LOOP=0/>');
-	document.writeln('<NOEMBED><BGSOUND SRC="<?php echo $filename; ?>" LOOP=0/></NOEMBED>');
-}
-// -->
-</SCRIPT>
-<?php
-	}
 
 //	The hash has form <md5sum of triggerid>,<sum of priorities>
 	function	calc_trigger_hash()
@@ -1042,16 +972,6 @@ else
 		$table->Show();
 	}
 
-	function	insert_sizeable_graph($url)
-	{
-?>
-<script language="JavaScript" type="text/javascript">
-<!--
-	insert_sizeable_graph(<?php echo zbx_jsvalue($url); ?>);
--->
-</script>
-<?php
-	}
 	# Show History Graph
 
 	function	show_history($itemid,$from,$stime,$period)
@@ -1075,32 +995,6 @@ else
 		echo "</center>";
 	}
 
-	function	get_dynamic_chart($img_src,$width=0)
-	{
-		if(is_int($width) && $width > 0) $img_src.= url_param($width, false, 'width');
-$result = 
-"<script language=\"JavaScript\" type=\"text/javascript\">
-<!--
-	var width = \"".((!(is_int($width) && $width > 0)) ? $width : '')."\";
-	var img_src = \"".$img_src."\";
-
-	if(width!=\"\")
-	{
-		var scr_width = 0;
-		if(document.body.clientWidth)
-			scr_width = document.body.clientWidth;
-		else 
-			scr_width = document.width;
-
-		width = \"&width=\" + (scr_width - 100 + parseInt(width));
-	}
-
-	document.write(\"<IMG ALT=\\\"chart\\\" SRC=\\\"\" + img_src + width + \"\\\"/>\");
-
--->
-</script>";
-		return $result;
-	}
 
 	function	get_status()
 	{
@@ -1402,135 +1296,6 @@ $result =
 		}
 	}
 
-	function insert_showhint_javascript()
-	{
-		if(defined('SHOW_HINT_SCRIPT_INSERTTED')) return;
-
-		define('SHOW_HINT_SCRIPT_INSERTTED', 1);
-?>
-<script language="JavaScript" type="text/javascript">
-<!--
-
-function GetPos(obj)
-{
-	var left = obj.offsetLeft;
-	var top  = obj.offsetTop;;
-	while (obj = obj.offsetParent)
-	{
-		left	+= obj.offsetLeft
-		top	+= obj.offsetTop
-	}
-	return [left,top];
-}
-
-var hint_box = null;
-
-function hide_hint()
-{
-	if(!hint_box) return;
-
-	hint_box.style.visibility="hidden"
-	hint_box.style.left	= "-" + ((hint_box.style.width) ? hint_box.style.width : 100) + "px";
-}
-
-function show_hint(obj, e, hint_text)
-{
-	show_hint_ext(obj, e, hint_text, "", "");
-}
-
-function show_hint_ext(obj, e, hint_text, width, class_name)
-{
-	if(!hint_box) return;
-
-	var cursor = get_cursor_position(e);
-	
-	if(class_name != "")
-	{
-		hint_text = "<span class=" + class_name + ">" + hint_text + "</"+"span>";
-	}
-
-	hint_box.innerHTML = hint_text;
-	hint_box.style.width = width;
-
-	var pos = GetPos(obj);
-
-	hint_box.x	= pos[0];
-	hint_box.y	= pos[1];
-
-	hint_box.style.left	= cursor.x + 10 + "px";
-	//hint_box.style.left	= hint_box.x + obj.offsetWidth + 10 + "px";
-	hint_box.style.top	= hint_box.y + obj.offsetHeight + "px";
-
-	hint_box.style.visibility = "visible";
-	obj.onmouseout	= hide_hint;
-}
-
-function update_hint(obj, e)
-{
-	if(!hint_box) return;
-
-	var cursor = get_cursor_position(e);
-
-	var pos = GetPos(obj);
-
-	hint_box.style.left     = cursor.x + 10 + "px";
-	hint_box.style.top      = hint_box.y + obj.offsetHeight + "px";
-}
-
-function create_hint_box()
-{
-	if(hint_box) return;
-
-	hint_box = document.createElement("div");
-	hint_box.setAttribute("id", "hint_box");
-	document.body.appendChild(hint_box);
-
-	hide_hint();
-}
-
-if (window.addEventListener)
-{
-	window.addEventListener("load", create_hint_box, false);
-}
-else if (window.attachEvent)
-{
-	window.attachEvent("onload", create_hint_box);
-}
-else if (document.getElementById)
-{
-	window.onload	= create_hint_box;
-}
-//-->
-</script>
-<?php
-	}
-
-	function Redirect($url,$timeout=null)
-	{
-		zbx_flush_post_cookies();
-?>
-<script language="JavaScript" type="text/javascript">
-<!--
-<?php		if( is_numeric($timeout) ) { ?>
-	setTimeout('window.location=\'<?php echo $url; ?>\'', <?php echo ($timeout*1000); ?>);
-<?php 		} else { ?>
-	window.location = '<?php echo $url; ?>';
-<?php		} ?>
-//-->
-</script>
-<?php
-	}
-
-	function	SetFocus($frm_name, $fld_name)
-	{
-?>
-<script language="JavaScript" type="text/javascript">
-<!--
-	document.forms["<?php echo $frm_name; ?>"].elements["<?php echo $fld_name; ?>"].focus();
-//-->
-</script>
-<?php
-	}
 
 /* Use ImageSetStyle+ImageLIne instead of bugged ImageDashedLine */
 	if(function_exists("imagesetstyle"))
@@ -1774,17 +1539,6 @@ else if (document.getElementById)
 			return $row["newvalue"]." "."($value)";
 		}
 		return $value;
-	}
-
-	function	Alert($msg)
-	{
-?>
-<script language=\"JavaScript\" type=\"text/javascript\">
-<!--
-	alert('<? echo $msg; ?>');
-//-->
-</script>
-<?php
 	}
 
 	function natksort(&$array) {
