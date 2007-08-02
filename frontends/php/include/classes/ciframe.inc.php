@@ -22,7 +22,7 @@
 	class CIFrame extends CTag
 	{
 /* public */
-		function CIFrame($src=NULL,$width="100%",$height="100%",$scrolling="no")
+		function CIFrame($src=NULL,$width="100%",$height="100%",$scrolling="no",$id='iframe')
 		{
 			parent::CTag("iframe","yes");
 
@@ -35,6 +35,7 @@
 			$this->SetWidth($width);
 			$this->SetHeight($height);
 			$this->SetScrolling($scrolling);
+			$this->AddOption('id',$id);
 		}
 		function SetSrc($value=NULL)
 		{
