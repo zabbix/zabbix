@@ -170,11 +170,6 @@ include_once "include/page_header.php";
 		S_LAST_CHECK,S_LAST_VALUE,S_CHANGE,S_HISTORY));
 	$table->ShowStart();
 
-	if($_REQUEST["select"] != "")
-		$compare_description = " and i.description like ".zbx_dbstr("%".$_REQUEST["select"]."%");
-	else
-		$compare_description = "";
-
 	if($_REQUEST["hostid"] > 0)
 		$compare_host = " and h.hostid=".$_REQUEST["hostid"];
 	else
@@ -189,13 +184,17 @@ include_once "include/page_header.php";
 	{
 		$db_items = DBselect("select distinct i.* from items i,items_applications ia".
 			" where ia.applicationid=".$db_app["applicationid"]." and i.itemid=ia.itemid".
-			" and i.status=".ITEM_STATUS_ACTIVE.$compare_description.
-			" order by i.description");
+			" and i.status=".ITEM_STATUS_ACTIVE.
+			" order by i.description, i.itemid");
 
 		$app_rows = array();
 		$item_cnt = 0;
 		while($db_item = DBfetch($db_items))
 		{
+			$description = item_description($db_item["description"],$db_item["key_"]);
+
+			if( '' != $_REQUEST["select"] && !stristr($description, $_REQUEST["select"]) ) continue;
+
 			++$item_cnt;
 			if(!in_array($db_app["applicationid"],$_REQUEST["applications"]) && !isset($show_all_apps)) continue;
 
@@ -234,7 +233,7 @@ include_once "include/page_header.php";
 
 			array_push($app_rows, new CRow(array(
 				$_REQUEST["hostid"] > 0 ? NULL : SPACE,
-				str_repeat(SPACE,6).item_description($db_item["description"],$db_item["key_"]),
+				str_repeat(SPACE,6).$description,
 				$lastclock,
 				new CCol($lastvalue, $lastvalue=='-' ? 'center' : null),
 				$change,
@@ -268,12 +267,16 @@ include_once "include/page_header.php";
 	}
 	$db_items = DBselect("select h.host,h.hostid,i.* from hosts h, items i LEFT JOIN items_applications ia ON ia.itemid=i.itemid".
 		" where ia.itemid is NULL and h.hostid=i.hostid and h.status=".HOST_STATUS_MONITORED." and i.status=".ITEM_STATUS_ACTIVE.
-		$compare_description.$compare_host.' and h.hostid in ('.$availiable_hosts.") order by i.description,h.host");
+		$compare_host.' and h.hostid in ('.$availiable_hosts.") order by i.description,h.host,i.itemid");
 
 	$app_rows = array();
 	$item_cnt = 0;
 	while($db_item = DBfetch($db_items))
 	{
+		$description = item_description($db_item["description"],$db_item["key_"]);
+
+		if( '' != $_REQUEST["select"] && !stristr($description, $_REQUEST["select"]) ) continue;
+
 		++$item_cnt;
 		if(!in_array(0,$_REQUEST["applications"]) && $any_app_exist && !isset($show_all_apps)) continue;
 
@@ -314,7 +317,7 @@ include_once "include/page_header.php";
 
 		array_push($app_rows, new CRow(array(
 			$_REQUEST["hostid"] > 0 ? NULL : $db_item["host"],
-			str_repeat(SPACE, ($any_app_exist ? 6 : 0)).item_description($db_item["description"],$db_item["key_"]),
+			str_repeat(SPACE, ($any_app_exist ? 6 : 0)).$description,
 			$lastclock,
 			new CCol($lastvalue, $lastvalue == '-' ? 'center' : null),
 			$change,
