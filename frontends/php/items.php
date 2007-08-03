@@ -177,7 +177,6 @@ include_once "include/page_header.php";
 	{
 		update_profile('external_filter', 0);
 		unset($_REQUEST['external_filter']);
-		Alert('OK');
 	}
 	if(isset($_REQUEST['del_delay_flex']) && isset($_REQUEST['rem_delay_flex']))
 	{
