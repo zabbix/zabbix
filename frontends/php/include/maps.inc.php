@@ -23,6 +23,61 @@
 	require_once "include/hosts.inc.php";
 	require_once "include/triggers.inc.php";
 
+        /*
+         * Function: map_link_drawtypes
+         *
+         * Description:
+         *     Return available drawing types for links
+         *
+         * Author:
+         *     Eugene Grigorjev 
+         *
+         */
+	function	map_link_drawtypes()
+	{
+		return array(
+				MAP_LINK_DRAWTYPE_LINE,
+				MAP_LINK_DRAWTYPE_BOLD_LINE,
+				(function_exists('imagesetstyle') ? MAP_LINK_DRAWTYPE_DOT : null),
+				MAP_LINK_DRAWTYPE_DASHED_LINE
+			    );
+	}
+
+        /*
+         * Function: map_link_drawtype2str
+         *
+         * Description:
+         *     Represent integer value of links drawing type into the string
+         *
+         * Author:
+         *     Eugene Grigorjev 
+         *
+         */
+        function	map_link_drawtype2str($drawtype)
+        {
+		switch($drawtype)
+		{
+			case MAP_LINK_DRAWTYPE_LINE:		$drawtype = "Line";		break;
+			case MAP_LINK_DRAWTYPE_BOLD_LINE:	$drawtype = "Bold line";	break;
+			case MAP_LINK_DRAWTYPE_DOT:		$drawtype = "Dot";		break;
+			case MAP_LINK_DRAWTYPE_DASHED_LINE:	$drawtype = "Dashed line";	break;
+			default: $drawtype = S_UNKNOWN;		break;
+		}
+		return $drawtype;
+        }
+
+        /*
+         * Function: sysmap_accessiable
+         *
+         * Description:
+         *     Check permission for map
+         *
+	 * Return: true on success
+
+         * Author:
+         *     Eugene Grigorjev 
+         *
+         */
 	function	sysmap_accessiable($sysmapid,$perm)
 	{
 		global $USER_DETAILS;
@@ -181,6 +236,16 @@
 		return	DBexecute("delete from sysmaps_links where linkid=$linkid");
 	}
 
+        /*
+         * Function: check_circle_elements_link
+         *
+         * Description:
+         *     Check circeling of maps
+         *
+         * Author:
+         *     Eugene Grigorjev 
+         *
+         */
 	function	check_circle_elements_link($sysmapid,$elementid,$elementtype)
 	{
 		if($elementtype!=SYSMAP_ELEMENT_TYPE_MAP)	return FALSE;
@@ -326,6 +391,16 @@
 		return imagecreatefromstring($image['image']);
 	}
 
+        /*
+         * Function: get_info_by_selementid
+         *
+         * Description:
+         *     Retrive information for map element
+         *
+         * Author:
+         *     Eugene Grigorjev 
+         *
+         */
 	function	get_info_by_selementid($selementid)
 	{
 		global $colors;
@@ -480,6 +555,16 @@
 		return $out;
 	}
 
+        /*
+         * Function: get_action_map_by_sysmapid
+         *
+         * Description:
+         *     Retrive action for map element
+         *
+         * Author:
+         *     Eugene Grigorjev 
+         *
+         */
 	function get_action_map_by_sysmapid($sysmapid)
 	{
 		$action_map = new CMap("links$sysmapid");
@@ -555,7 +640,7 @@
 
 	function	MyDrawLine($image,$x1,$y1,$x2,$y2,$color,$drawtype)
 	{
-		if($drawtype == GRAPH_DRAW_TYPE_BOLDLINE)
+		if($drawtype == MAP_LINK_DRAWTYPE_BOLD_LINE)
 		{
 			ImageLine($image,$x1,$y1,$x2,$y2,$color);
 			if(($x1-$x2) < ($y1-$y2))
@@ -568,11 +653,14 @@
 			}
 			ImageLine($image,$x1,$y1,$x2,$y2,$color);
 		}
-		else if($drawtype == GRAPH_DRAW_TYPE_DASHEDLINE)
+		else if($drawtype == MAP_LINK_DRAWTYPE_DASHED_LINE)
 		{
 			if(function_exists("imagesetstyle"))
 			{ /* Use ImageSetStyle+ImageLIne instead of bugged ImageDashedLine */
-				$style = array($color, $color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT);
+				$style = array(
+					$color, $color, $color, $color,
+					IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT
+					);
 				ImageSetStyle($image, $style);
 				ImageLine($image,$x1,$y1,$x2,$y2,IMG_COLOR_STYLED);
 			}
@@ -580,6 +668,12 @@
 			{
 				ImageDashedLine($image,$x1,$y1,$x2,$y2,$color);
 			}
+		}
+		else if ( $drawtype == MAP_LINK_DRAWTYPE_DOT && function_exists("imagesetstyle"))
+		{
+			$style = array($color,IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT);
+			ImageSetStyle($image, $style);
+			ImageLine($image,$x1,$y1,$x2,$y2,IMG_COLOR_STYLED);
 		}
 		else
 		{
