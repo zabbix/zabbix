@@ -572,10 +572,6 @@ include_once "include/page_header.php";
 				$where_case[] = 'ia.applicationid=a.applicationid';
 				$where_case[] = 'a.name like '.zbx_dbstr('%'.$_REQUEST['with_application'].'%');
 			}
-			if(isset($_REQUEST['with_description']))
-			{
-				$where_case[] = 'i.description like '.zbx_dbstr('%'.$_REQUEST['with_description'].'%');
-			}
 			if(isset($_REQUEST['with_type']) && $_REQUEST['with_type'] != -1)
 			{
 				$where_case[] = 'i.type='.$_REQUEST['with_type'];
@@ -756,6 +752,10 @@ include_once "include/page_header.php";
 		while($db_item = DBfetch($db_items))
 		{
 			$description = array();
+
+			$item_description = item_description($db_item["description"],$db_item["key_"]);
+
+			if( $_REQUEST['external_filter'] && isset($_REQUEST['with_description']) && !stristr($item_description, $_REQUEST['with_description']) ) continue;
 
 			if($db_item["templateid"])
 			{

@@ -1,5 +1,6 @@
 Changes for 1.4.2:
 
+ - improved item and trigger filtering (Eugene)
  - added dotted drowing type for links of map (Eugene)
  - fixed links drowing type of map (Eugene)
  - fixed items,graphs,hostgroups deletion (Eugene)

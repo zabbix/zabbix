@@ -291,15 +291,6 @@ include_once "include/page_header.php";
 		default:		$sort="order by t.priority desc, t.description";
 	}
 
-	if(isset($_REQUEST["btnSelect"])&&($_REQUEST["btnSelect"]=="Inverse select"))
-	{
-		$select_cond="not like '%$txt_select%'";
-	}
-	else
-	{
-		$select_cond="like '%$txt_select%'";
-	}
-
 	$cond="";
 	if($_REQUEST["hostid"] > 0)	$cond=" and h.hostid=".$_REQUEST["hostid"]." ";
 
@@ -308,7 +299,7 @@ include_once "include/page_header.php";
 	$result = DBselect("select distinct t.triggerid,t.status,t.description,t.expression,t.priority,".
 		" t.lastchange,t.comments,t.url,t.value,h.host from triggers t,hosts h,items i,functions f".
 		" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.status=".TRIGGER_STATUS_ENABLED.
-		" and t.description $select_cond and i.status=".ITEM_STATUS_ACTIVE.
+		" and i.status=".ITEM_STATUS_ACTIVE.
 		" and ".DBid2nodeid("t.triggerid")."=".$ZBX_CURNODEID.
 		" and h.hostid not in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT).") ". 
 		" and h.status=".HOST_STATUS_MONITORED." $cond $sort");
@@ -327,8 +318,9 @@ include_once "include/page_header.php";
 
 		$elements=array();
 
-
 		$description = expand_trigger_description($row["triggerid"]);
+
+		if(isset($_REQUEST["btnSelect"]) && '' != $txt_select && ((stristr($description, $txt_select)) == ($_REQUEST["btnSelect"]=="Inverse select"))) continue;
 
 		if($row["url"] != "")
 		{
