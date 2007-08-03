@@ -2624,7 +2624,7 @@
 			if($graphtype == GRAPH_TYPE_NORMAL)
 			{
 				$cmbType = new CComboBox("drawtype",$drawtype);
-				for($i=0; $i < 5; ++$i)
+				foreach( graph_item_drawtypes() as $i )
 				{
 					$cmbType->AddItem($i,graph_item_drawtype2str($i));
 				}
@@ -4653,9 +4653,9 @@ include_once 'include/discovery.inc.php';
 
 		$cmbType_off = new CComboBox("drawtype_off",$drawtype_off);
 		$cmbType_on = new CComboBox("drawtype_on",$drawtype_on);
-		for($i=0; $i < 5; ++$i)
+		foreach(map_link_drawtypes() as $i)
 		{
-			$value = graph_item_drawtype2str($i);
+			$value = map_link_drawtype2str($i);
 			$cmbType_off->AddItem($i, $value);
 			$cmbType_on->AddItem($i, $value);
 		}

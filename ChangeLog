@@ -1,5 +1,7 @@
 Changes for 1.4.2:
 
+ - added dotted drowing type for links of map (Eugene)
+ - fixed links drowing type of map (Eugene)
  - fixed items,graphs,hostgroups deletion (Eugene)
  - fixed permisions for maps (Eugene)
  - fixed filtering of items by status (Eugene)
