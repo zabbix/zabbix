@@ -40,7 +40,7 @@ include_once "include/page_header.php";
 	check_fields($fields);
 ?>
 <?php
-        if(! (DBfetch(DBselect('select serviceid from services where serviceid='.$_REQUEST["serviceid"]))) )
+        if( isset($_REQUEST["serviceid"]) && $_REQUEST["serviceid"] > 0 && ! (DBfetch(DBselect('select serviceid from services where serviceid='.$_REQUEST["serviceid"]))) )
         {
                 unset($_REQUEST["serviceid"]);
         }
