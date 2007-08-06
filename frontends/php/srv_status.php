@@ -149,7 +149,7 @@ include_once "include/page_header.php";
 					$color="00AA00";
 				}
 				
-				$row['sla2'] = sprintf("<font color=\"00AA00\">%.2f%%</font><b>/</b><font color=\"%s\">%.2f%%</font>",
+				$row['sla2'] = sprintf("<font color=\"#00AA00\">%.2f%%</font><b>/</b><font color=\"#%s\">%.2f%%</font>",
 					$row["goodsla"], $color,$stat["ok"]);
 			} else {
 				$row['sla']= "-";
