@@ -278,7 +278,7 @@ static int	DBget_service_status(
 
 	if( 0 != triggerid )
 	{
-		result = DBselect("select priority from triggers where trigerid=" ZBX_FS_UI64 " and status=0 ", triggerid);
+		result = DBselect("select priority from triggers where trigerid=" ZBX_FS_UI64 " and status=0 and value=%d", triggerid, TRIGGER_VALUE_TRUE);
 		if( (row = DBfetch(result)) )
 		{
 			status = atoi(row[0]);
