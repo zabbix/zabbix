@@ -558,6 +558,11 @@ int	DBdelete_host(
 void	DBupdate_services_rec(
 		zbx_uint64_t serviceid
 	);
+void	DBupdate_services(
+		zbx_uint64_t triggerid,
+		int status
+	);
+
 /* History related functions */
 int	DBadd_trend(zbx_uint64_t itemid, double value, int clock);
 int	DBadd_history(zbx_uint64_t itemid, double value, int clock);
