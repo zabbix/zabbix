@@ -193,7 +193,10 @@
 		if(!$result=DBexecute($sql)) return	$result;
 
 		$sql="DELETE FROM services WHERE serviceid=$serviceid";
-		if(!$result=DBexecute($sql)) return	$result;		
+		if(!$result=DBexecute($sql)) return	$result;
+
+		$sql="DELETE FROM service_alarms WHERE serviceid=$serviceid";
+		if(!$result=DBexecute($sql)) return	$result;
 
 		update_services_status_all();
 		
@@ -771,10 +774,8 @@ function update_services_rec($serviceid){
 		else if((SERVICE_ALGORITHM_MAX == $algorithm) || (SERVICE_ALGORITHM_MIN == $algorithm)){
 
 			$status = get_service_status($serviceupid,$algorithm);
-
-			$now=time();
 			
-			add_service_alarm($serviceupid,$status,$now);
+			add_service_alarm($serviceupid,$status,time());
 			DBexecute('UPDATE services SET status='.$status.' WHERE serviceid='.$serviceupid);
 		}
 		else{
@@ -811,9 +812,12 @@ function update_services_rec($serviceid){
 function update_services($triggerid, $status){
 	DBexecute('UPDATE services SET status='.$status.' WHERE triggerid='.$triggerid);
 	
-	$result = DBselect('SELECT serviceid FROM services WHERE triggerid='.$triggerid);
+	$result = DBselect('SELECT serviceid,algorithm FROM services WHERE triggerid='.$triggerid);
 
 	while(($rows=DBfetch($result))){
+		$status = get_service_status($rows['serviceid'],$rows['algorithm']);
+		add_service_alarm($rows['serviceid'],$status,time());
+
 		update_services_rec($rows['serviceid']);
 	}
 }
@@ -835,19 +839,27 @@ function update_services_status_all(){
 
 	clear_parents_from_trigger();
 
-	$result = DBselect('SELECT s.serviceid,s.algorithm,s.triggerid FROM services as s ');
+	$result = DBselect('SELECT s.serviceid,s.algorithm,s.triggerid '.
+						' FROM services as s '.
+						' WHERE s.serviceid NOT IN (select distinct sl.serviceupid from services_links as sl)');
 
 	while($rows=DBfetch($result)){
 		$status = get_service_status($rows['serviceid'],$rows['algorithm'],$rows['triggerid']);
 		DBexecute('UPDATE services SET status = '.$status.' WHERE serviceid='.$rows['serviceid']);
+		
+		add_service_alarm($rows['serviceid'],$status,time());
 	}	
 
-	$result = DBselect('SELECT sl.servicedownid as serviceid FROM services_links as sl GROUP BY sl.serviceupid');
+	$result = DBselect('SELECT MAX(sl.servicedownid) as serviceid, sl.serviceupid '.
+						' FROM services_links AS sl '.
+						' WHERE sl.servicedownid NOT IN (select distinct sl.serviceupid from services_links as sl) '.
+						' GROUP BY sl.serviceupid');
 
 	while($rows=DBfetch($result)){
 		update_services_rec($rows['serviceid']);
 	}
 }
+
 /******************************************************************************
  *                                                                            *
  * Comments: !!! Don't forget sync code with C !!!                            *
