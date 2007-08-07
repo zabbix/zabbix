@@ -181,11 +181,11 @@ int	process_event(DB_EVENT *event)
 
 	if(event->value == TRIGGER_VALUE_TRUE)
 	{
-		update_services(event->objectid, event->trigger_priority);
+		DBupdate_services(event->objectid, event->trigger_priority);
 	}
 	else
 	{
-		update_services(event->objectid, 0);
+		DBupdate_services(event->objectid, 0);
 	}
 
 	free_trigger_info(event);

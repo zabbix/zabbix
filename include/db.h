@@ -560,4 +560,8 @@ int	DBdelete_host(
 void	DBupdate_services_rec(
 		zbx_uint64_t serviceid
 	);
+void	DBupdate_services(
+		zbx_uint64_t triggerid,
+		int status
+	);
 #endif

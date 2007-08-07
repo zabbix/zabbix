@@ -25,7 +25,6 @@
 #include "db.h"
 #include "sysinfo.h"
 
-void	update_services(zbx_uint64_t triggerid, int status);
 void    update_triggers (zbx_uint64_t itemid);
 void	update_functions(DB_ITEM *item);
 int	process_data(zbx_sock_t *sock,char *server,char *key, char *value,char *lastlogsize,char *timestamp,

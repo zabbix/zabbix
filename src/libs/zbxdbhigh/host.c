@@ -337,7 +337,6 @@ void	DBupdate_services_rec(
 	int	status;
 	zbx_uint64_t	serviceupid;
 	int	algorithm;
-	time_t	now;
 
 	DB_RESULT result;
 	DB_ROW	row;
@@ -359,8 +358,7 @@ void	DBupdate_services_rec(
 		{
 			status = DBget_service_status(serviceupid, algorithm, 0);
 
-			now=time(NULL);
-			DBadd_service_alarm(serviceupid,status,now);
+			DBadd_service_alarm(serviceupid,status,time(NULL));
 			DBexecute("update services set status=%d where serviceid=" ZBX_FS_UI64,
 				status,
 				serviceupid);
@@ -411,23 +409,33 @@ static void DBupdate_services_status_all(void)
 		serviceid = 0,
 		triggerid = 0;
 
+	int	status = 0;
 
 	DBclear_parents_from_trigger(0);
 
-	result = DBselect("SELECT s.serviceid,s.algorithm,s.triggerid FROM services as s");
+	result = DBselect("SELECT s.serviceid,s.algorithm,s.triggerid "
+			" FROM services AS s "
+			" WHERE s.serviceid NOT IN (SELECT DISTINCT sl.serviceupid FROM services_links AS sl)");
 
 	while( (rows = DBfetch(result)) )
 	{
 		ZBX_STR2UINT64(serviceid, rows[0]);
 		ZBX_STR2UINT64(triggerid, rows[2]);
 
+		status = DBget_service_status(serviceid, atoi(rows[1]), triggerid);
+
 		DBexecute("UPDATE services SET status=%i WHERE serviceid=" ZBX_FS_UI64,
-			DBget_service_status(serviceid, atoi(rows[1]), triggerid),
+			status,
 			serviceid);
+
+		DBadd_service_alarm(serviceid, status, time(NULL));
 	}
 	DBfree_result(result);
 
-	result = DBselect("SELECT sl.servicedownid as serviceid FROM services_links as sl GROUP BY sl.serviceupid");
+	result = DBselect("SELECT MAX(sl.servicedownid) as serviceid, sl.serviceupid "
+			" FROM services_links AS sl "
+			" WHERE sl.servicedownid NOT IN (select distinct sl.serviceupid from services_links as sl) "
+			" GROUP BY sl.serviceupid");
 
 	while( (rows = DBfetch(result)) )
 	{
@@ -435,6 +443,59 @@ static void DBupdate_services_status_all(void)
 		DBupdate_services_rec(serviceid);
 	}
 	DBfree_result(result);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBupdate_services                                                *
+ *                                                                            *
+ * Purpose: re-calculate and updates status of the service and its childs     *
+ *                                                                            *
+ * Parameters: serviceid - item to update services for                        *
+ *             status - new status of the service                             *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
+void	DBupdate_services(
+		zbx_uint64_t triggerid,
+		int status
+	)
+{
+	DB_ROW	row;
+	zbx_uint64_t	serviceid;
+
+	DB_RESULT result;
+
+	DBexecute("update services set status=%d where triggerid=" ZBX_FS_UI64,
+		status,
+		triggerid);
+
+	result = DBselect("select serviceid,algorithm from services where triggerid=" ZBX_FS_UI64,
+		triggerid);
+
+	while((row=DBfetch(result)))
+	{
+		ZBX_STR2UINT64(serviceid,row[0]);
+
+		DBadd_service_alarm(
+			serviceid,
+			DBget_service_status(
+				serviceid,
+				atoi(row[1]),
+				0),
+			time(NULL)
+			);
+
+		DBupdate_services_rec(serviceid);
+	}
+
+	DBfree_result(result);
+	return;
 }
 
 /******************************************************************************
@@ -456,6 +517,7 @@ static int	DBdelete_service(
 		zbx_uint64_t serviceid
 	)
 {
+	DBexecute("DELETE FROM service_alarms WHERE serviceid=" ZBX_FS_UI64, serviceid);
 	DBexecute("delete from services_links where servicedownid=" ZBX_FS_UI64 " or serviceupid=" ZBX_FS_UI64, serviceid, serviceid);
 	DBexecute("delete from services where serviceid=" ZBX_FS_UI64, serviceid);
 
