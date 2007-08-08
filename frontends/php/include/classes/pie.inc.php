@@ -98,9 +98,9 @@ function selectData(){
 				
 		if(($this->period / $this->sizeX) <= (ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL)){
 			array_push($sql_arr,
-				'SELECT h.itemid, max(i.lastvalue) as lst, '.
+				'SELECT h.itemid, '.
 					' avg(h.value) AS avg,min(h.value) AS min, '.
-					' max(h.value) AS max,max(h.clock) AS clock '.
+					' max(h.value) AS max,max(h.clock) AS clock, max(i.lastvalue) as lst '.
 				' FROM history AS h LEFT JOIN items AS i ON h.itemid = i.itemid'.
 				' WHERE h.itemid='.$this->items[$i]['itemid'].
 					' AND h.clock>='.$from_time.
@@ -108,9 +108,9 @@ function selectData(){
 				' GROUP BY h.itemid'
 				,
 
-				'SELECT hu.itemid, max(i.lastvalue) as lst, '.
+				'SELECT hu.itemid, '.
 					' avg(hu.value) AS avg,min(hu.value) AS min,'.
-					' max(hu.value) AS max,max(hu.clock) AS clock'.
+					' max(hu.value) AS max,max(hu.clock) AS clock, max(i.lastvalue) as lst'.
 				' FROM history_uint AS hu LEFT JOIN items AS i ON hu.itemid = i.itemid'.
 				' WHERE hu.itemid='.$this->items[$i]['itemid'].
 					' AND hu.clock>='.$from_time.
@@ -120,9 +120,9 @@ function selectData(){
 		}
 		else{
 			array_push($sql_arr,
-				'SELECT t.itemid, max(i.lastvalue) as lst, '.
+				'SELECT t.itemid, '.
 					' avg(t.value_avg) AS avg,min(t.value_min) AS min,'.
-					' max(t.value_max) AS max,max(t.clock) AS clock'.
+					' max(t.value_max) AS max,max(t.clock) AS clock, max(i.lastvalue) as lst'.
 				' FROM trends AS t LEFT JOIN items AS i ON t.itemid = i.itemid'.
 				' WHERE t.itemid='.$this->items[$i]['itemid'].
 					' AND t.clock>='.$from_time.
@@ -384,10 +384,9 @@ function drawElementPie($values){
 	$anglestart = 0;
 	$angleend = 0;
 	foreach($values as $item => $value){
-		$angleend += (int)(360 * $value/$sum);
+		$angleend += (int)(360 * $value/$sum)+1;
 		$angleend = ($angleend > 360)?(360):($angleend);
 		if(($angleend - $anglestart) < 1) continue;
-		$angleend++;
 		
 		if($this->type == GRAPH_TYPE_EXPLODED){
 			list($x,$y) = $this->calcExplodedCenter($anglestart,$angleend,$xc,$yc,count($values));
@@ -440,10 +439,9 @@ function drawElementPie3D($values){
 	$angleend = 0;
 	foreach($values as $item => $value){
 		
-		$angleend += (int)(360 * $value/$sum);
+		$angleend += (int)(360 * $value/$sum)+1;
 		$angleend = ($angleend > 360)?(360):($angleend);
 		if(($angleend - $anglestart) < 1) continue;
-		$angleend++;
 		
 		if($this->type == GRAPH_TYPE_3D_EXPLODED){
 			list($x,$y) = $this->calcExplodedCenter($anglestart,$angleend,$xc,$yc,count($values));
@@ -458,12 +456,11 @@ function drawElementPie3D($values){
 		$anglestart = 0;
 		$angleend = 0;
 		foreach($values as $item => $value){
-			$angleend += (int)(360 * $value/$sum);
+			$angleend += (int)(360 * $value/$sum)+1;
 			$angleend = ($angleend > 360)?(360):($angleend);
 			
 			if(($angleend - $anglestart) < 1) continue;
 			elseif($this->sum == 0) continue;
-			$angleend++;
 			
 			if($this->type == GRAPH_TYPE_3D_EXPLODED){
 				list($x,$y) = $this->calcExplodedCenter($anglestart,$angleend,$xc,$yc,count($values));
@@ -478,10 +475,10 @@ function drawElementPie3D($values){
 	$angleend = 0;
 	foreach($values as $item => $value){
 		
-		$angleend += (int)(360 * $value/$sum) +1;
+		$angleend += (int)(360 * $value/$sum)+1;
 		$angleend = ($angleend > 360)?(360):($angleend);
 		if(($angleend - $anglestart) < 1) continue;
-		
+
 		if($this->type == GRAPH_TYPE_3D_EXPLODED){
 			list($x,$y) = $this->calcExplodedCenter($anglestart,$angleend,$xc,$yc,count($values));
 		}
