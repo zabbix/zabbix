@@ -331,7 +331,7 @@
 
 					$graphtype = GRAPH_TYPE_NORMAL;
 			
-					$sql = 'SELECT DISTINCT `graphtype` FROM `graphs` WHERE `graphid`='.$resourceid;
+					$sql = 'SELECT DISTINCT graphtype FROM graphs WHERE graphid='.$resourceid;
 					$res = DBselect($sql);
 					
 					while($rows = DBfetch($res)){
