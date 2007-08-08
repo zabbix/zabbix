@@ -218,14 +218,14 @@
 	
 	function	clear_parents_from_trigger($serviceid=0){
 		if($serviceid != 0){
-			$sql='UPDATE services as s '.
-					' SET s.triggerid = null '.
-					' WHERE s.serviceid = '.$serviceid;
+			$sql='UPDATE services '.
+					' SET triggerid = null '.
+					' WHERE serviceid = '.$serviceid;
 			DBexecute($sql);
 		return;
 		}
 
-		$sql = 'SELECT s.serviceid '.
+		$sql = 'SELECT max(s.serviceid) as serviceid '.
 					' FROM services as s, services_links as sl '.
 					' WHERE s.serviceid = sl.serviceupid '.
 					  ' AND NOT(s.triggerid IS NULL) '.
@@ -233,9 +233,9 @@
 		$res = DBselect($sql);
 
 		while($rows = DBfetch($res)){
-			$sql='UPDATE services as s '.
-					' SET s.triggerid = null '.
-					' WHERE s.serviceid = '.$rows['serviceid'];
+			$sql='UPDATE services '.
+					' SET triggerid = null '.
+					' WHERE serviceid = '.$rows['serviceid'];
 			DBexecute($sql);
 		}
 	}
