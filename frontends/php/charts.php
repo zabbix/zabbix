@@ -234,7 +234,7 @@ include_once 'include/page_header.php';
 	if($_REQUEST['graphid'] > 0){
 		$graphtype = GRAPH_TYPE_NORMAL;
 
-		$sql = 'SELECT DISTINCT `graphtype` FROM `graphs` WHERE `graphid`='.$_REQUEST['graphid'];
+		$sql = 'SELECT DISTINCT graphtype FROM graphs WHERE graphid='.$_REQUEST['graphid'];
 		$res = DBselect($sql);
 		
 		while($rows = DBfetch($res)){
