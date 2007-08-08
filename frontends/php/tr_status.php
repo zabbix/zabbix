@@ -294,7 +294,7 @@ include_once "include/page_header.php";
 	$cond="";
 	if($_REQUEST["hostid"] > 0)	$cond=" and h.hostid=".$_REQUEST["hostid"]." ";
 
-	if($onlytrue=='true')		$cond .= " and t.value=1 ";
+	if($onlytrue=='true')		$cond .= ' and ((t.value=1) OR (('.time().' - lastchange)<'.TRIGGER_BLINK_PERIOD.')) ';
 
 	$result = DBselect("select distinct t.triggerid,t.status,t.description,t.expression,t.priority,".
 		" t.lastchange,t.comments,t.url,t.value,h.host from triggers t,hosts h,items i,functions f".
@@ -336,7 +336,7 @@ include_once "include/page_header.php";
 				"</FONT>");
 		}
 
-		if((time(NULL)-$row["lastchange"])<300)
+		if((time(NULL)-$row["lastchange"])<TRIGGER_BLINK_PERIOD)
 			$blink = array(1=>"<blink>",	2=>"</blink>");
 		else
 			$blink = array(1=>"", 		2=>"");
