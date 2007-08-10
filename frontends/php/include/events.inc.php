@@ -34,6 +34,8 @@
 		global $ZBX_CURNODEID;
 		global $USER_DETAILS;
 		
+		$show_unknown = get_profile('web.events.show_unknown',0);
+		
 		if(is_null($nodeid)) $nodeid = $ZBX_CURNODEID;
 			
 		$sql_from = $sql_cond = "";
@@ -48,32 +50,34 @@
 			$sql_cond = " and h.hostid=hg.hostid and hg.groupid=".$groupid;
 		}
 
-		$result = DBselect("select distinct t.triggerid,t.priority,t.description,h.host,e.clock,e.value ".
-			" from events e, triggers t, functions f, items i, hosts h ".$sql_from.
-			" where ".DBid2nodeid("t.triggerid")."=".$nodeid.
-			' and e.objectid=t.triggerid and e.object='.EVENT_OBJECT_TRIGGER.' and t.triggerid=f.triggerid and f.itemid=i.itemid '.
-			" and i.hostid=h.hostid ".$sql_cond." and h.status=".HOST_STATUS_MONITORED.
-			" order by e.clock desc,h.host,t.priority,t.description,t.triggerid ",
-			10*($start+$num)
+		if($show_unknown == 0){
+			$sql_cond.= ' AND e.value<>2 ';
+		}
+	
+		$result = DBselect('SELECT DISTINCT t.triggerid,t.priority,t.description,h.host,e.clock,e.value '.
+			' FROM events e, triggers t, functions f, items i, hosts h '.$sql_from.
+			' WHERE '.DBid2nodeid('t.triggerid').'='.$nodeid.
+				' AND e.objectid=t.triggerid and e.object='.EVENT_OBJECT_TRIGGER.
+				' AND t.triggerid=f.triggerid and f.itemid=i.itemid '.
+				' AND i.hostid=h.hostid '.$sql_cond.' and h.status='.HOST_STATUS_MONITORED.
+			' ORDER BY e.clock DESC,h.host,t.priority,t.description,t.triggerid ',10*($start+$num)
 			);
        
 		$table = new CTableInfo(S_NO_EVENTS_FOUND); 
 		$table->SetHeader(array(S_TIME, $hostid == 0 ? S_HOST : null, S_DESCRIPTION, S_VALUE, S_SEVERITY));
-		$col=0;
 		
 		$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
-		 
+		
+		$col=0;
 		$skip = $start;
-		while(($row=DBfetch($result))&&($col<$num))
-		{
-			if(!check_right_on_trigger_by_triggerid(null, $row['triggerid'], $accessible_hosts)) continue;
 
-			if($skip > 0) 
-			{
+		while(($row=DBfetch($result)) && ($col<$num)){
+			
+			if($skip > 0){
 				$skip--;
 				continue;
 			}
-
+			
 			if($row["value"] == 0)
 			{
 				$value=new CCol(S_OFF,"off");
@@ -85,15 +89,15 @@
 			else
 			{
 				$value=new CCol(S_UNKNOWN_BIG,"unknown");
-			}
-
+			}	
+			if(($show_unknown == 0) && (!event_initial_time($row,$show_unknown))) continue;
+				
 			$table->AddRow(array(
 				date("Y.M.d H:i:s",$row["clock"]),
 				$hostid == 0 ? $row['host'] : null,
 				new CLink(expand_trigger_description_by_data($row),"tr_events.php?triggerid=".$row["triggerid"],"action"),
 				$value,
 				new CCol(get_severity_description($row["priority"]), get_severity_style($row["priority"]))));
-
 			$col++;
 		}
 		return $table;
@@ -169,4 +173,35 @@
 		}
 		return $table;
 	}
+	
+function event_initial_time($row,$show_unknown=0){
+	$sql_cond=($show_unknown == 0)?' AND value<>2 ':'';
+
+	$events = array();
+	$res = DBselect('SELECT MAX(clock) as clock, value '.
+					' FROM events '.
+					' WHERE objectid='.$row['triggerid'].$sql_cond.
+						' AND clock < '.$row['clock'].
+					' GROUP BY value '.
+					' ORDER BY clock DESC');
+					
+	while($rows = DBfetch($res)){
+		$events[] = $rows;
+	}
+	if(!empty($events) && ($events[0]['value'] == $row['value'])){
+
+		$clock = (count($events) > 1)?($events[1]['clock']):(0);
+		$res = DBselect('SELECT MIN(clock) as clock, value '.
+						' FROM events as e '.
+						' WHERE clock > '.$clock.$sql_cond.
+							' AND objectid='.$row['triggerid'].
+							' AND clock < '.$row['clock'].
+						' GROUP BY value');
+		while($rows = DBfetch($res)){
+			$rclock = $rows['clock'];
+		}
+		if($rclock != $row['clock']) return false;
+	}
+	return true;
+}
 ?>
