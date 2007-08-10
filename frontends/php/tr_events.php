@@ -34,19 +34,27 @@ include_once "include/page_header.php";
 	$fields=array(
 		"triggerid"=>		array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
 		"limit"=>		array(T_ZBX_STR, O_OPT,	null,	IN('"100","NO"'),	null),
+		"show_unknown"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	null),
 
 	/* actions */
 		"save"=>		array(T_ZBX_STR,O_OPT,	P_ACT|P_SYS, null,	null),
 		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null)
 	);
+	
 	check_fields($fields);
 	
+//	$show_unknown = get_profile('web.events.show_unknown',0);
+	$show_unknown = get_request('show_unknown',get_profile('web.events.show_unknown',0));
+	update_profile('web.events.show_unknown',$show_unknown);
+		
 	if(!check_right_on_trigger_by_triggerid(PERM_READ_ONLY, $_REQUEST["triggerid"]))
 		access_deny();
 
-	$trigger_data = DBfetch(DBselect('select h.host, t.* from hosts h, items i, functions f, triggers t '.
-	                        ' where i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid='.$_REQUEST["triggerid"].
-				" and h.hostid=i.hostid and ".DBid2nodeid("t.triggerid")."=".$ZBX_CURNODEID));
+	$trigger_data = DBfetch(DBselect('SELECT h.host, t.* '.
+									' FROM hosts h, items i, functions f, triggers t '.
+	                        		' WHERE i.itemid=f.itemid AND f.triggerid=t.triggerid '.
+										' AND t.triggerid='.$_REQUEST["triggerid"].
+										' AND h.hostid=i.hostid AND '.DBid2nodeid("t.triggerid").'='.$ZBX_CURNODEID));
 ?>
 <?php
 	$_REQUEST["limit"] = get_request("limit","NO");
@@ -55,28 +63,55 @@ include_once "include/page_header.php";
 	$description	= expand_trigger_description_by_data($trigger_data);
 
 	$form = new CForm();
+	$form->AddOption('name','events_menu');
+	
 	$form->AddVar("triggerid",$_REQUEST["triggerid"]);
+
+	$chkbox = new CCheckBox('sh_unknown',
+					(($show_unknown == 0)?'no':'yes'),
+					'create_var("events_menu", "show_unknown", '.(($show_unknown == 0)?'1':'0').', true)'
+					);
+	$form->AddItem(array(S_SHOW_UNKNOWN, SPACE, $chkbox,SPACE, SPACE));
+
 	$cmbLimit = new CComboBox("limit",$_REQUEST["limit"],"submit()");
 	$cmbLimit->AddItem('NO',S_SHOW_ALL);
 	$cmbLimit->AddItem("100",S_SHOW_ONLY_LAST_100);
 	$form->AddItem($cmbLimit);
 
-	show_table_header(S_ALARMS_BIG.": \"".$description."\"".BR."$expression", $form);
+
+	show_table_header(S_EVENTS_BIG.': "'.$description.'"'.BR.$expression, $form);
 ?>
 <?php
-	$result=DBselect('select * from events where objectid='.$_REQUEST['triggerid'].
-		' and object='.EVENT_OBJECT_TRIGGER.' order by clock desc',
-		$_REQUEST["limit"]);
+	$sql_cond = '';
+	if($show_unknown == 0){
+		$sql_cond = ' AND value<>2 ';
+	}
+	
+	$result=DBselect('SELECT * FROM events WHERE objectid='.$_REQUEST['triggerid'].
+						' AND object='.EVENT_OBJECT_TRIGGER.
+						$sql_cond.
+					' ORDER BY clock DESC',$_REQUEST['limit']);
 
 	$table = new CTableInfo();
 	$table->SetHeader(array(S_TIME,S_STATUS,S_ACKNOWLEDGED,S_DURATION,S_SUM,"%"));
 	$table->ShowStart();
 
+	$rows = array();
+	$count = 0;
+	while($row=DBfetch($result)){
+		if(!empty($rows) && $rows[$count]['value'] != $row['value']){
+			$count++;
+		}
+		$rows[$count] = $row;
+	}
+
 	$truesum=0;
 	$falsesum=0;
 	$dissum=0;
 	$clock=time();
-	while($row=DBfetch($result))
+	
+//	while($row=DBfetch($result))
+	foreach($rows as $id => $row)
 	{
 		$lclock=$clock;
 		$clock=$row["clock"];
