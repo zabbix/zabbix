@@ -42,21 +42,24 @@ include_once "include/page_header.php";
 	define('PAGE_SIZE',	100);
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"source"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN($allowed_sources),	NULL),
-		"groupid"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
-		"hostid"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
-		"start"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(0,65535)."({}%".PAGE_SIZE."==0)",	NULL),
-		"next"=>		array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
-		"prev"=>		array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL)
+		"source"=>			array(T_ZBX_INT, O_OPT,	P_SYS,	IN($allowed_sources),	NULL),
+		"show_unknown"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	NULL),
+		"groupid"=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
+		"hostid"=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,	NULL),
+		"start"=>			array(T_ZBX_INT, O_OPT,	P_SYS,	BETWEEN(0,65535)."({}%".PAGE_SIZE."==0)",	NULL),
+		"next"=>			array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL),
+		"prev"=>			array(T_ZBX_STR, O_OPT,	P_SYS,	NULL,			NULL)
 	);
 
 	$_REQUEST['source'] = get_request('source', get_profile('web.events.source', 0));
-
+	
 	check_fields($fields);
 
 	$source = get_request('source', EVENT_SOURCE_TRIGGERS);
+	$show_unknown = get_request('show_unknown',get_profile('web.events.show_unknown',0));
 
 	update_profile('web.events.source',$source);
+	update_profile('web.events.show_unknown',$show_unknown);
 
 ?>
 <?php
@@ -75,8 +78,17 @@ include_once "include/page_header.php";
 	$source = get_request('source', EVENT_SOURCE_TRIGGERS);
 
 	$r_form = new CForm();
+	$r_form->AddOption('name','events_menu');
 	if($allow_discovery)
 	{
+		if($source == EVENT_SOURCE_TRIGGERS){
+			$chkbox = new CCheckBox('sh_unknown',
+								(($show_unknown == 0)?'no':'yes'),
+								'create_var("events_menu", "show_unknown", '.(($show_unknown == 0)?'1':'0').', true)'
+								);
+			$r_form->AddItem(array(S_SHOW_UNKNOWN, SPACE, $chkbox, SPACE, SPACE));
+		}
+		
 		$cmbSource = new CComboBox('source', $source, 'submit()');
 		$cmbSource->AddItem(EVENT_SOURCE_TRIGGERS, S_TRIGGER);
 		$cmbSource->AddItem(EVENT_SOURCE_DISCOVERY, S_DISCOVERY);
@@ -104,42 +116,50 @@ include_once "include/page_header.php";
 		
 		$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST, null, null, $ZBX_CURNODEID);
 
-		$result=DBselect("select distinct g.groupid,g.name from groups g, hosts_groups hg, hosts h, items i ".
-			" where h.hostid in (".$availiable_hosts.") ".
-			" and hg.groupid=g.groupid and h.status=".HOST_STATUS_MONITORED.
-			" and h.hostid=i.hostid and hg.hostid=h.hostid ".
-			" order by g.name");
+		$result=DBselect('SELECT DISTINCT g.groupid,g.name '.
+			' FROM groups g, hosts_groups hg, hosts h, items i '.
+			' WHERE h.hostid in ('.$availiable_hosts.') '.
+				' AND hg.groupid=g.groupid AND h.status='.HOST_STATUS_MONITORED.
+				' AND h.hostid=i.hostid AND hg.hostid=h.hostid '.
+			' ORDER BY g.name');
+
 		while($row=DBfetch($result))
 		{
-			$cmbGroup->AddItem($row["groupid"],$row["name"]);
+			$cmbGroup->AddItem($row['groupid'],$row['name']);
 		}
 		$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
 		
 		$cmbHosts->AddItem(0,S_ALL_SMALL);
-		if($_REQUEST["groupid"] > 0)
+		if($_REQUEST['groupid'] > 0)
 		{
-			$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED.
-				" and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid".
-				" and h.hostid in (".$availiable_hosts.") ".
-				" group by h.hostid,h.host order by h.host";
+			$sql='SELECT h.hostid,h.host '.
+				' FROM hosts h,items i,hosts_groups hg '.
+				' WHERE h.status='.HOST_STATUS_MONITORED.
+					' AND h.hostid=i.hostid AND hg.groupid='.$_REQUEST['groupid'].
+					' AND hg.hostid=h.hostid AND h.hostid in ('.$availiable_hosts.') '.
+				' GROUP BY h.hostid,h.host '.
+				' ORDER BY h.host';
 		}
 		else
 		{
-			$sql="select h.hostid,h.host from hosts h,items i where h.status=".HOST_STATUS_MONITORED.
-				" and h.hostid=i.hostid".
-				" and h.hostid in (".$availiable_hosts.") ".
-				" group by h.hostid,h.host order by h.host";
+			$sql='SELECT h.hostid,h.host '.
+				' FROM hosts h,items i '.
+				' WHERE h.status='.HOST_STATUS_MONITORED.
+					' AND h.hostid=i.hostid'.
+					' AND h.hostid in ('.$availiable_hosts.') '.
+				' GROUP BY h.hostid,h.host '.
+				' ORDER BY h.host';
 		}
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
-			$cmbHosts->AddItem($row["hostid"],$row["host"]);
+			$cmbHosts->AddItem($row['hostid'],$row['host']);
 		}
 
 		$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
 	}
 	
-	$r_form->AddVar("start",$_REQUEST["start"]);
+	$r_form->AddVar('start',$_REQUEST['start']);
 
 	$btnPrev = new CButton("prev","<< Prev ".PAGE_SIZE);
 	if($_REQUEST["start"] <= 0)
