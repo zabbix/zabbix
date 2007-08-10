@@ -4137,7 +4137,7 @@ static int	DBcopy_graph_to_host(
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Skipped coping of graph '%s' to host " ZBX_FS_UI64, chd_graph_data[0], hostid);
+		zabbix_log(LOG_LEVEL_DEBUG, "Skipped coping of graph '%s' to host " ZBX_FS_UI64, db_graph_data[0], hostid);
 		result = FAIL;
 	}
 
