@@ -79,7 +79,7 @@ static int	process_record(int nodeid, char *record)
 	DB_RESULT	result;
 	DB_ROW		row;
 
-/*	zabbix_log( LOG_LEVEL_WARNING, "In process_record [%s]", record);*/
+	zabbix_log( LOG_LEVEL_DEBUG, "In process_record [%s]", record);
 
 	zbx_get_field(record,tablename,0,ZBX_DM_DELIMITER);
 	zbx_get_field(record,tmp,1,ZBX_DM_DELIMITER);
@@ -104,13 +104,11 @@ static int	process_record(int nodeid, char *record)
 	}
 	if(op==NODE_CONFIGLOG_OP_DELETE)
 	{
-		zbx_snprintf(tmp,sizeof(tmp),"delete from %s where %s=" ZBX_FS_UI64 " and nodeid=%d",
+		zbx_snprintf(sql,sizeof(sql),"delete from %s where %s=" ZBX_FS_UI64,
 			tablename,
 			key,
-			recid,
-			nodeid);
-		zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]",
-			sql);
+			recid);
+		DBexecute("%s", sql);
 		return SUCCEED;
 	}
 
