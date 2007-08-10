@@ -97,7 +97,18 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 	{
 		found = 1;
 
-/*		zabbix_log( LOG_LEVEL_WARNING, "Fetched [%s,%s,%s]",row[0],row[1],row[2]);*/
+		zabbix_log( LOG_LEVEL_DEBUG, "Fetched [%s,%s,%s]",row[0],row[1],row[2]);
+		/* Special (simpler) processing for operation DELETE */
+		if(atoi(row[2]) == NODE_CONFIGLOG_OP_DELETE)
+		{
+			zbx_snprintf_alloc(&xml, &allocated, &offset, 16*1024, "\n%s%c%s%c%s",
+				row[0],
+				ZBX_DM_DELIMITER,
+				row[1],
+				ZBX_DM_DELIMITER,
+				row[2]);
+				continue;
+		}
 		for(i=0;tables[i].table!=0;i++)
 		{
 			if(strcmp(tables[i].table, row[0])==0)	break;
@@ -120,7 +131,6 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 				row[0],
 				tables[i].recid,
 				row[1]);
-/*			zabbix_log( LOG_LEVEL_WARNING,"select %s from %s where %s=%s",fields, row[0], tables[i].recid,row[1]);*/
  
 			row2=DBfetch(result2);
 
@@ -161,9 +171,19 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 			}
 			else
 			{
-				zabbix_log( LOG_LEVEL_WARNING, "Cannot select %s from table [%s]",
-					tables[i].fields[j],
-					row[0]);
+				/* We assume that the record was just deleted, so we change operation to DELETE */
+				zabbix_log( LOG_LEVEL_DEBUG, "Cannot select %s from table %s where %s=%s",
+					fields,
+					row[0],
+					tables[i].recid,
+					row[1]);
+
+				zbx_snprintf_alloc(&xml, &allocated, &offset, 16*1024, "\n%s%c%s%c%d",
+					row[0],
+					ZBX_DM_DELIMITER,
+					row[1],
+					ZBX_DM_DELIMITER,
+					NODE_CONFIGLOG_OP_DELETE);
 			}
 			DBfree_result(result2);
 		}
