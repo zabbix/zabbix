@@ -218,7 +218,7 @@ static int compare_checksums()
 		NODE_CKSUM_TYPE_OLD);
 	while((row=DBfetch(result)))
 	{
-/*		zabbix_log( LOG_LEVEL_WARNING, "Adding record to node_configlog");*/
+		zabbix_log( LOG_LEVEL_DEBUG, "Adding record to node_configlog NODE_CONFIGLOG_OP_UPDATE");
 		DBexecute("insert into node_configlog (conflogid,nodeid,tablename,recordid,operation)" \
 				"values (" ZBX_FS_UI64 ",%s,'%s',%s,%d)",
 /*				DBget_nextid("node_configlog","conflogid"),*/
@@ -239,7 +239,7 @@ static int compare_checksums()
 
 	while((row=DBfetch(result)))
 	{
-/*		zabbix_log( LOG_LEVEL_WARNING, "Adding record to node_configlog"); */
+		zabbix_log( LOG_LEVEL_DEBUG, "Adding record to node_configlog NODE_CONFIGLOG_OP_ADD");
 		DBexecute("insert into node_configlog (conflogid,nodeid,tablename,recordid,operation)" \
 			"values (" ZBX_FS_UI64 ",%s,'%s',%s,%d)",
 /*			DBget_nextid("node_configlog","conflogid"),*/
@@ -260,7 +260,7 @@ static int compare_checksums()
 
 	while((row=DBfetch(result)))
 	{
-/*		zabbix_log( LOG_LEVEL_WARNING, "Adding record to node_configlog");*/
+		zabbix_log( LOG_LEVEL_DEBUG, "Adding record to node_configlog NODE_CONFIGLOG_OP_DELETE");
 		DBexecute("insert into node_configlog (conflogid,nodeid,tablename,recordid,operation)" \
 				"values (" ZBX_FS_UI64 ",%s,'%s',%s,%d)",
 /*				DBget_nextid("node_configlog","conflogid"),*/
