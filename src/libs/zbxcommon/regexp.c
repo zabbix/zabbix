@@ -23,7 +23,7 @@
 #	include "gnuregex.h"
 #endif /* _WINDOWS */
 
-char	*zbx_regexp_match(const char *string, const char *pattern, int *len)
+static	char	*zbx_regexp(const char *string, const char *pattern, int *len, int flags)
 { 
 	char	*c = NULL;
 
@@ -49,3 +49,12 @@ char	*zbx_regexp_match(const char *string, const char *pattern, int *len)
 	return	c;
 }
 
+char	*zbx_regexp_match(const char *string, const char *pattern, int *len)
+{
+	return zbx_regexp(string, pattern, len, REG_EXTENDED | REG_NEWLINE);
+}
+ 
+char	*zbx_iregexp_match(const char *string, const char *pattern, int *len)
+{
+	return zbx_regexp(string, pattern, len, REG_EXTENDED | REG_ICASE | REG_NEWLINE);
+}
