@@ -1,5 +1,6 @@
 Changes for 1.4.2:
 
+ - fixed upgrade script to correctly process host-template linkage (Alexei)
  - fixed synchronisation of delete operation between nodes (Alexei)
  - fixed problem with libresolv under Solaris 8 (Alexei)
  - improved SMS sender (Eugene)
