@@ -1195,6 +1195,24 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 			ret = FAIL;
 		}
 	}
+	else if(strcmp(function,"iregexp")==0)
+	{
+		if( (item->value_type==ITEM_VALUE_TYPE_STR) || (item->value_type==ITEM_VALUE_TYPE_LOG))
+		{
+			if(zbx_iregexp_match(item->lastvalue_str, parameter, &len) != NULL)
+			{
+				strcpy(value,"1");
+			}
+			else
+			{
+				strcpy(value,"0");
+			}
+		}
+		else
+		{
+			ret = FAIL;
+		}
+	}
 	else if(strcmp(function,"now")==0)
 	{
 		now=time(NULL);

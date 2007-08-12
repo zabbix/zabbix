@@ -613,6 +613,8 @@ int 	parse_command(const char *command, char *cmd, int cmd_max_len, char *param,
 
 /* Regular expressions */
 char    *zbx_regexp_match(const char *string, const char *pattern, int *len);
+/* Non case sensitive */
+char    *zbx_iregexp_match(const char *string, const char *pattern, int *len);
 
 /* Misc functions */
 int	cmp_double(double a,double b);
