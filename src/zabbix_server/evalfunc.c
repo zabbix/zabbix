@@ -159,6 +159,7 @@ static int evaluate_COUNT(char *value, DB_ITEM *item, char *parameter)
 	DB_ROW	row;
 
 	char		period[MAX_STRING_LEN+1];
+	char		op[MAX_STRING_LEN+1];
 	char		cmp[MAX_STRING_LEN+1];
 	char		cmp_esc[MAX_STRING_LEN+1];
 
@@ -201,19 +202,96 @@ static int evaluate_COUNT(char *value, DB_ITEM *item, char *parameter)
 	}
 	else
 	{
+		if(get_param(parameter, 3, op, MAX_STRING_LEN) != 0)
+		{
+			strscpy(op,"eq");
+		}
 		DBescape_string(cmp, cmp_esc, sizeof(cmp_esc));
-		if(item->value_type == ITEM_VALUE_TYPE_UINT64)
+		/* ITEM_VALUE_TYPE_UINT64 */
+		if( (item->value_type == ITEM_VALUE_TYPE_UINT64) && (strcmp(op,"eq") == 0))
 		{
 			result = DBselect("select count(value) from history_uint where clock>%d and value=" ZBX_FS_UI64 " and itemid=" ZBX_FS_UI64,
 				now-atoi(period),
 				zbx_atoui64(cmp_esc),
 				item->itemid);
 		}
-		else if(item->value_type == ITEM_VALUE_TYPE_FLOAT)
+		else if( (item->value_type == ITEM_VALUE_TYPE_UINT64) && (strcmp(op,"ne") == 0))
+		{
+			result = DBselect("select count(value) from history_uint where clock>%d and value<>" ZBX_FS_UI64 " and itemid=" ZBX_FS_UI64,
+				now-atoi(period),
+				zbx_atoui64(cmp_esc),
+				item->itemid);
+		}
+		else if( (item->value_type == ITEM_VALUE_TYPE_UINT64) && (strcmp(op,"gt") == 0))
+		{
+			result = DBselect("select count(value) from history_uint where clock>%d and value>" ZBX_FS_UI64 " and itemid=" ZBX_FS_UI64,
+				now-atoi(period),
+				zbx_atoui64(cmp_esc),
+				item->itemid);
+		}
+		else if( (item->value_type == ITEM_VALUE_TYPE_UINT64) && (strcmp(op,"lt") == 0))
+		{
+			result = DBselect("select count(value) from history_uint where clock>%d and value<" ZBX_FS_UI64 " and itemid=" ZBX_FS_UI64,
+				now-atoi(period),
+				zbx_atoui64(cmp_esc),
+				item->itemid);
+		}
+		else if( (item->value_type == ITEM_VALUE_TYPE_UINT64) && (strcmp(op,"ge") == 0))
+		{
+			result = DBselect("select count(value) from history_uint where clock>%d and value>=" ZBX_FS_UI64 " and itemid=" ZBX_FS_UI64,
+				now-atoi(period),
+				zbx_atoui64(cmp_esc),
+				item->itemid);
+		}
+		else if( (item->value_type == ITEM_VALUE_TYPE_UINT64) && (strcmp(op,"le") == 0))
+		{
+			result = DBselect("select count(value) from history_uint where clock>%d and value<=" ZBX_FS_UI64 " and itemid=" ZBX_FS_UI64,
+				now-atoi(period),
+				zbx_atoui64(cmp_esc),
+				item->itemid);
+		}
+		/* ITEM_VALUE_TYPE_FLOAT */
+		else if( (item->value_type == ITEM_VALUE_TYPE_FLOAT) && (strcmp(op,"eq") == 0))
 		{
 			result = DBselect("select count(value) from history where clock>%d and value+0.00001>" ZBX_FS_DBL " and value-0.0001<" ZBX_FS_DBL " and itemid=" ZBX_FS_UI64,
 				now-atoi(period),
 				atof(cmp_esc),
+				atof(cmp_esc),
+				item->itemid);
+		}
+		else if( (item->value_type == ITEM_VALUE_TYPE_FLOAT) && (strcmp(op,"ne") == 0))
+		{
+			result = DBselect("select count(value) from history where clock>%d and ((value+0.00001<" ZBX_FS_DBL ") or (value-0.0001>" ZBX_FS_DBL ")) and itemid=" ZBX_FS_UI64,
+				now-atoi(period),
+				atof(cmp_esc),
+				atof(cmp_esc),
+				item->itemid);
+		}
+		else if( (item->value_type == ITEM_VALUE_TYPE_FLOAT) && (strcmp(op,"gt") == 0))
+		{
+			result = DBselect("select count(value) from history where clock>%d and value>" ZBX_FS_DBL " and itemid=" ZBX_FS_UI64,
+				now-atoi(period),
+				atof(cmp_esc),
+				item->itemid);
+		}
+		else if( (item->value_type == ITEM_VALUE_TYPE_FLOAT) && (strcmp(op,"ge") == 0))
+		{
+			result = DBselect("select count(value) from history where clock>=%d and value>" ZBX_FS_DBL " and itemid=" ZBX_FS_UI64,
+				now-atoi(period),
+				atof(cmp_esc),
+				item->itemid);
+		}
+		else if( (item->value_type == ITEM_VALUE_TYPE_FLOAT) && (strcmp(op,"lt") == 0))
+		{
+			result = DBselect("select count(value) from history where clock>%d and value<" ZBX_FS_DBL " and itemid=" ZBX_FS_UI64,
+				now-atoi(period),
+				atof(cmp_esc),
+				item->itemid);
+		}
+		else if( (item->value_type == ITEM_VALUE_TYPE_FLOAT) && (strcmp(op,"le") == 0))
+		{
+			result = DBselect("select count(value) from history where clock>%d and value<=" ZBX_FS_DBL " and itemid=" ZBX_FS_UI64,
+				now-atoi(period),
 				atof(cmp_esc),
 				item->itemid);
 		}
