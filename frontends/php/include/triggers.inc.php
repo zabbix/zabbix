@@ -74,7 +74,7 @@
 				ITEM_VALUE_TYPE_TEXT
 				),
 			);
-		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['count']	= array('args' => array( 0 => array('type' => 'sec','mandat' => true), 1 => array('type' => 'str') ),
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['count']	= array('args' => array( 0 => array('type' => 'sec','mandat' => true), 1 => array('type' => 'str'), 1=>array('type' => 'str') ),
 			'item_types' => array(
 				ITEM_VALUE_TYPE_FLOAT,
 				ITEM_VALUE_TYPE_UINT64,
