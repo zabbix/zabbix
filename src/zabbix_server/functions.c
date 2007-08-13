@@ -465,7 +465,7 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 				/* Save delta */
 				if( ITEM_VALUE_TYPE_FLOAT == item->value_type )
 				{
-					if(GET_DBL_RESULT(value) && (item->prevorgvalue_null == 0) && (item->prevorgvalue_dbl <= value->dbl))
+					if(GET_DBL_RESULT(value) && (item->prevorgvalue_null == 0) && (item->prevorgvalue_dbl <= value->dbl) && (now != item->lastclock))
 					{
 						DBadd_history(
 							item->itemid,
@@ -475,7 +475,7 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 				}
 				else if( ITEM_VALUE_TYPE_UINT64 == item->value_type )
 				{
-					if(GET_UI64_RESULT(value) && (item->prevorgvalue_null == 0) && (item->prevorgvalue_uint64 <= value->ui64))
+					if(GET_UI64_RESULT(value) && (item->prevorgvalue_null == 0) && (item->prevorgvalue_uint64 <= value->ui64) && (now != item->lastclock))
 					{
 						DBadd_history_uint(
 							item->itemid,
