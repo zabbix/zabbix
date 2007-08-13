@@ -209,7 +209,7 @@ if(isset($_REQUEST['pservices'])){
 					' AND '.DBin_node('s.serviceid').
 					' AND s.serviceid NOT IN ('.$childs_str.$service['serviceid'].') order by s.sortorder,s.name';
 	} else {
-		$query = 'SELECT DISTINCT s.* '
+		$query = 'SELECT DISTINCT s.* '.
 			' FROM services s '.
 				' LEFT JOIN triggers t ON s.triggerid=t.triggerid '.
 				' LEFT JOIN functions f ON t.triggerid=f.triggerid '.
