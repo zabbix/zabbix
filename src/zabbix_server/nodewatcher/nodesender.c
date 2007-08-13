@@ -54,7 +54,7 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 	DB_ROW		row;
 	DB_ROW		row2;
 
-	char	*xml;
+	char	*xml = NULL;
 	char	fields[MAX_STRING_LEN];
 	int	offset=0;
 	int	allocated=1024;
@@ -63,7 +63,7 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 
 	int	i,j;
 
-	xml=malloc(allocated);
+	xml=zbx_malloc(xml, allocated);
 
 	memset(xml,0,allocated);
 
@@ -212,7 +212,7 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 	}
 
 	DBfree_result(result);
-	free(xml);
+	zbx_free(xml);
 	/* Commit */
 
 	return SUCCEED;

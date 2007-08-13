@@ -49,7 +49,7 @@
 static int calculate_checksums()
 {
 
-	char	*sql;
+	char	*sql = NULL;
 	int	sql_allocated, sql_offset;
 
 	int	i = 0;
@@ -73,7 +73,7 @@ static int calculate_checksums()
 	{
 		sql_allocated=64*1024;
 		sql_offset=0;
-		sql=malloc(sql_allocated);
+		sql=zbx_malloc(sql, sql_allocated);
 
 		now  = time(NULL);
 		nodeid = atoi(row[0]);
@@ -156,7 +156,7 @@ static int calculate_checksums()
 			i++;
 		}
 		DBfree_result(result2);
-		free(sql);
+		zbx_free(sql);
 	}
 	DBfree_result(result);
 
