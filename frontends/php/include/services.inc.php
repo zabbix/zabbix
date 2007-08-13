@@ -107,15 +107,13 @@
 	}
 	
 	function	add_host_to_services($hostid, $serviceid){
-		global $ZBX_CURNODEID;
-
 		$result = DBselect('SELECT distinct h.host,t.triggerid,t.description '.
 							' FROM triggers t,hosts h,items i,functions f '.
 							' WHERE h.hostid='.$hostid.
 								' AND h.hostid=i.hostid '.
 								' AND i.itemid=f.itemid '.
 								' AND f.triggerid=t.triggerid '.
-								' AND '.DBid2nodeid('t.triggerid').'='.$ZBX_CURNODEID
+								' AND '.DBin_node('t.triggerid', get_current_nodeid(false))
 							);
 							
 		while($row=DBfetch($result)){

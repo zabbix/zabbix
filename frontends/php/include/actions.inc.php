@@ -28,8 +28,8 @@ include_once 'include/discovery.inc.php';
 
 		$result = false;
 
-		if(DBselect("select actionid from actions where actionid=".$actionid.
-			" and ".DBid2nodeid('actionid')." in (".get_accessible_nodes_by_user($USER_DETAILS,$perm).")"))
+		if ( DBselect('select actionid from actions where actionid='.$actionid.
+			' and '.DBin_node('actionid')) )
 		{
 			$result = true;
 			
@@ -603,14 +603,14 @@ include_once 'include/discovery.inc.php';
 
 	function validate_condition($conditiontype, $value)
 	{
-		global $USER_DETAILS, $ZBX_CURNODEID;
+		global $USER_DETAILS;
 
 		switch($conditiontype)
 		{
 			case CONDITION_TYPE_HOST_GROUP:
 				if(!in_array($value,
 					get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,null,
-						PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+						PERM_RES_IDS_ARRAY)))
 				{
 					error(S_INCORRECT_GROUP);
 					return false;
@@ -627,7 +627,7 @@ include_once 'include/discovery.inc.php';
 			case CONDITION_TYPE_HOST:
 				if(!in_array($value,
 					get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,
-						PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+						PERM_RES_IDS_ARRAY)))
 				{
 					error(S_INCORRECT_HOST);
 					return false;
@@ -684,7 +684,7 @@ include_once 'include/discovery.inc.php';
 
 	function	validate_operation($operation)
 	{
-		global $USER_DETAILS, $ZBX_CURNODEID;
+		global $USER_DETAILS;
 
 		switch($operation['operationtype'])
 		{
@@ -719,7 +719,7 @@ include_once 'include/discovery.inc.php';
 			case OPERATION_TYPE_GROUP_REMOVE:
 				if(!in_array($operation['objectid'],
 					get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,null,
-						PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+						PERM_RES_IDS_ARRAY)))
 				{
 					error(S_INCORRECT_GROUP);
 					return false;
@@ -729,7 +729,7 @@ include_once 'include/discovery.inc.php';
 			case OPERATION_TYPE_TEMPLATE_REMOVE:
 				if(!in_array($operation['objectid'],
 					get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,
-						PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+						PERM_RES_IDS_ARRAY)))
 				{
 					error(S_INCORRECT_HOST);
 					return false;
@@ -782,12 +782,21 @@ include_once 'include/discovery.inc.php';
 				"a.error from alerts a,media_type mt,functions f,items i ".
 				" where mt.mediatypeid=a.mediatypeid and a.triggerid=f.triggerid and f.itemid=i.itemid ".
 				" and i.hostid not in (".$denyed_hosts.")".
+				' and '.DBin_node('a.alertid').
 				" order by a.clock".
 				" desc",
 			10*$start+$num);
 
 		$table = new CTableInfo(S_NO_ACTIONS_FOUND);
-		$table->SetHeader(array(S_TIME, S_TYPE, S_STATUS, S_RECIPIENTS, S_MESSAGE, S_ERROR));
+		$table->SetHeader(array(
+				is_show_subnodes() ? S_NODES : null,
+				S_TIME,
+				S_TYPE,
+				S_STATUS,
+				S_RECIPIENTS,
+				S_MESSAGE,
+				S_ERROR
+				));
 		$col=0;
 		$skip=$start;
 		while(($row=DBfetch($result))&&($col<$num))
@@ -821,6 +830,7 @@ include_once 'include/discovery.inc.php';
 				$error=new CSpan($row["error"],"on");
 			}
 			$table->AddRow(array(
+				get_node_name_by_elid($row['alertid']),
 				new CCol($time, 'top'),
 				new CCol($row["description"], 'top'),
 				new CCol($status, 'top'),

@@ -184,8 +184,6 @@ require_once "include/items.inc.php";
 	 */
 	function	db_save_host($host,$port,$status,$useip,$dns,$ip,$templates,$hostid=null)
 	{
-		global $ZBX_CURNODEID;
-		
 		if( !eregi('^'.ZBX_EREG_HOST_FORMAT.'$', $host) )
 		{
 			error("Incorrect characters used for Hostname");
@@ -201,7 +199,7 @@ require_once "include/items.inc.php";
 
 		if(DBfetch(DBselect(
 			"select * from hosts where host=".zbx_dbstr($host).
-				' and '.DBid2nodeid('hostid').'='.$ZBX_CURNODEID.
+				' and '.DBin_node('hostid', get_current_nodeid(false)).
 				(isset($hostid) ? ' and hostid<>'.$hostid : '')
 			)))
 		{
@@ -591,7 +589,6 @@ require_once "include/items.inc.php";
 		}
 
 		global $USER_DETAILS;
-		global $ZBX_CURNODEID;
 		
 		$first_hostid_in_group = 0;
 
@@ -628,7 +625,7 @@ require_once "include/items.inc.php";
 
 			if($groupid > 0)
 			{
-				if($only_current_node) $with_node = " and ".DBid2nodeid('g.groupid')."=".$ZBX_CURNODEID." ";
+				$with_node = " and ".DBin_node('g.groupid', get_current_nodeid(!$only_current_node));
 				
 				if(!DBfetch(DBselect("select distinct g.groupid from groups g, hosts_groups hg, hosts h".$item_table.
 					" where hg.groupid=g.groupid and h.hostid=hg.hostid and h.hostid in (".$accessed_hosts.") ".
@@ -653,7 +650,7 @@ require_once "include/items.inc.php";
 
 				if($groupid != 0)
 				{
-					if($only_current_node) $with_node = " and ".DBid2nodeid('hg.hostid')."=".$ZBX_CURNODEID." ";
+					$with_node = " and ".DBin_node('hg.hostid', get_current_nodeid(!$only_current_node));
 					
 					if(!DBfetch(DBselect("select hg.hostid from hosts_groups hg".
 						" where hg.groupid=".$groupid." and hg.hostid=".$hostid.$with_node)))
@@ -664,7 +661,7 @@ require_once "include/items.inc.php";
 					$witth_group = " and hg.hostid=h.hostid and hg.groupid=".$groupid;
 				}
 
-				if($only_current_node) $with_node = " and ".DBid2nodeid('h.hostid')."=".$ZBX_CURNODEID." ";
+				$with_node = " and ".DBin_node('h.hostid',get_current_nodeid(!$only_current_node));
 				
 				if($db_host = DBfetch(DBselect("select distinct h.hostid,h.host from hosts h ".$item_table.$group_table.
 					" where h.hostid in (".$accessed_hosts.") "
@@ -678,8 +675,6 @@ require_once "include/items.inc.php";
 
 				if($hostid > 0)
 				{
-					if($only_current_node) $with_node = " and ".DBid2nodeid('h.hostid')."=".$ZBX_CURNODEID." ";
-					
 					if(!DBfetch(DBselect("select distinct h.hostid from hosts h".$item_table.
 						" where h.hostid=".$hostid.$with_host_status.$with_items.$with_node.
 						" and h.hostid in (".$accessed_hosts.") ")))

@@ -99,7 +99,7 @@ include_once 'include/page_header.php';
 <?php
 	$h1 = array(S_GRAPHS_BIG.SPACE."/".SPACE);
 	
-	$availiable_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST, null, null, $ZBX_CURNODEID);
+	$availiable_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
 	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
 
 	if($_REQUEST['graphid'] > 0 && DBfetch(DBselect('select distinct graphid from graphs where graphid='.$_REQUEST['graphid'])))
@@ -112,7 +112,7 @@ include_once 'include/page_header.php';
 						' AND i.itemid=gi.itemid '.
 						' AND gi.graphid=g.graphid'.
 						' AND h.hostid NOT IN ('.$denyed_hosts.') '.
-						' AND '.DBid2nodeid('g.graphid').'='.$ZBX_CURNODEID.
+						' AND '.DBin_node('g.graphid').
 					' ORDER BY h.host, g.name'
 				))))
 		{
@@ -147,8 +147,12 @@ include_once 'include/page_header.php';
 					' AND hg.hostid=h.hostid '.
 					' AND i.itemid=gi.itemid '.
 				' ORDER BY g.name');
-	while($row=DBfetch($result)){
-		$cmbGroup->AddItem($row['groupid'],$row['name']);
+	while($row=DBfetch($result))
+	{
+		$cmbGroup->AddItem(
+				$row['groupid'],
+				get_node_name_by_elid($row['groupid']).$row["name"]
+				);
 	}
 	$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
 	
@@ -175,8 +179,12 @@ include_once 'include/page_header.php';
 			' ORDER BY h.host';
 	}
 	$result=DBselect($sql);
-	while($row=DBfetch($result)){
-		$cmbHosts->AddItem($row['hostid'],$row['host']);
+	while($row=DBfetch($result))
+	{
+		$cmbHosts->AddItem(
+				$row['hostid'],
+				get_node_name_by_elid($row['hostid']).$row['host']
+				);
 	}
 
 	$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
@@ -189,7 +197,7 @@ include_once 'include/page_header.php';
 			' WHERE i.itemid=gi.itemid '.
 				' AND g.graphid=gi.graphid '.
 				' AND i.hostid='.$_REQUEST['hostid'].
-				' AND '.DBid2nodeid('g.graphid').'='.$ZBX_CURNODEID.
+				' AND '.DBin_node('g.graphid').
 				' AND i.hostid NOT IN ('.$denyed_hosts.') '.
 			' ORDER BY g.name';
 	}
@@ -202,7 +210,7 @@ include_once 'include/page_header.php';
 				' AND hg.groupid='.$_REQUEST['groupid'].
 				' AND i.hostid=h.hostid '.
 				' AND h.status='.HOST_STATUS_MONITORED.
-				' AND '.DBid2nodeid('g.graphid').'='.$ZBX_CURNODEID.
+				' AND '.DBin_node('g.graphid').
 				' AND h.hostid NOT IN ('.$denyed_hosts.') '.
 			' ORDER BY g.name';
 	}
@@ -213,7 +221,7 @@ include_once 'include/page_header.php';
 				' AND g.graphid=gi.graphid '.
 				' AND i.hostid=h.hostid '.
 				' AND h.status='.HOST_STATUS_MONITORED.
-				' AND '.DBid2nodeid('g.graphid').'='.$ZBX_CURNODEID.
+				' AND '.DBin_node('g.graphid').
 				' AND h.hostid NOT IN ('.$denyed_hosts.') '.
 			' ORDER BY g.name';
 	}
@@ -221,7 +229,10 @@ include_once 'include/page_header.php';
 	$result = DBselect($sql);
 	while($row=DBfetch($result))
 	{
-		$cmbGraph->AddItem($row['graphid'],$row['name']);
+		$cmbGraph->AddItem(
+				$row['graphid'],
+				get_node_name_by_elid($row['graphid']).$row['name']
+				);
 	}
 	
 	$r_form->AddItem(array(SPACE.S_GRAPH.SPACE,$cmbGraph));
