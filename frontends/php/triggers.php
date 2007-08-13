@@ -94,7 +94,7 @@ include_once "include/page_header.php";
 <?php
 	update_profile("web.triggers.showdisabled",$showdisabled);
 
-	$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE, null, null, $ZBX_CURNODEID);
+	$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE, null, null, get_current_nodeid());
 
 /* FORM ACTIONS */
 	if(isset($_REQUEST["clone"]) && isset($_REQUEST["triggerid"]))
@@ -378,16 +378,11 @@ include_once "include/page_header.php";
 			),
 			S_EXPRESSION, S_SEVERITY, S_STATUS, S_ERROR));
 
-/*		$sql = "select distinct h.hostid,h.host,t.*".
-			" from triggers t,hosts h,items i,functions f".
-			" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid".
-			" and ".DBid2nodeid("h.hostid")."=".$ZBX_CURNODEID;
-*/			
 		$sql = 'select distinct h.hostid,h.host,t.*'.
 			' from triggers t left join functions f on t.triggerid=f.triggerid '.
 			' left join items i on f.itemid=i.itemid '.
 			' left join hosts h on h.hostid=i.hostid '.
-			' where '.DBid2nodeid('t.triggerid').'='.$ZBX_CURNODEID;
+			' where '.DBin_node('t.triggerid');
 
 		if($showdisabled == 0)
 		    $sql .= ' and t.status <> '.TRIGGER_STATUS_DISABLED;

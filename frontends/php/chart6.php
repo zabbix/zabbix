@@ -62,8 +62,6 @@ include_once "include/page_header.php";
 						' LEFT JOIN items i ON gi.itemid=i.itemid '.
 						' LEFT JOIN hosts h ON i.hostid=h.hostid '.
 					' WHERE g.graphid='.$_REQUEST["graphid"].
-						/* " AND '.DBid2nodeid("g.graphid").'='.$ZBX_CURNODEID. */ /* NOTE: the chart can display any accesiable graph! */
-						' AND ( h.hostid NOT IN('.$denyed_hosts.') '.
 						' OR h.hostid IS NULL) '))))
 	{
 		access_deny();
