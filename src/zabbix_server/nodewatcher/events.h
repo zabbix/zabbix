@@ -20,6 +20,8 @@
 #ifndef ZABBIX_NODEWATCHER_EVENTS_H
 #define ZABBIX_NODEWATCHER_EVENTS_H
 
+extern	int	CONFIG_NODE_NOEVENTS;
+
 void main_eventsender();
 
 #endif

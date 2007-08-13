@@ -48,7 +48,7 @@ static int process_node_history_str(int nodeid, int master_nodeid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		*data;
+	char		*data = NULL;
 	char		sql[MAX_STRING_LEN];
 	int		found = 0;
 	int		offset = 0;
@@ -61,7 +61,7 @@ static int process_node_history_str(int nodeid, int master_nodeid)
 		master_nodeid);
 	/* Begin work */
 
-	data = malloc(allocated);
+	data = zbx_malloc(data, allocated);
 	memset(data,0,allocated);
 
 	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "History%c%d%c%d",
@@ -89,7 +89,9 @@ static int process_node_history_str(int nodeid, int master_nodeid)
 	}
 	if(found == 1)
 	{
-		if(send_to_node("new history_str", master_nodeid, nodeid, data) == SUCCEED)
+		/* Do not send history for current node if CONFIG_NODE_NOHISTORY is set */
+		if( ((CONFIG_NODE_NOHISTORY !=0) && (CONFIG_NODEID == nodeid)) ||
+			send_to_node("new history_str", master_nodeid, nodeid, data) == SUCCEED)
 		{
 /*			zabbix_log( LOG_LEVEL_WARNING, "Updating nodes.history_lastid");*/
 			DBexecute("update nodes set history_str_lastid=" ZBX_FS_UI64 " where nodeid=%d",
@@ -105,7 +107,7 @@ static int process_node_history_str(int nodeid, int master_nodeid)
 		}
 	}
 	DBfree_result(result);
-	free(data);
+	zbx_free(data);
 
 	return SUCCEED;
 }
@@ -130,7 +132,7 @@ static int process_node_history_uint(int nodeid, int master_nodeid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		*data;
+	char		*data=  NULL;
 	char		sql[MAX_STRING_LEN];
 	int		found = 0;
 	int		offset = 0;
@@ -147,7 +149,7 @@ static int process_node_history_uint(int nodeid, int master_nodeid)
 
 	start = time(NULL);
 
-	data = malloc(allocated);
+	data = zbx_malloc(data, allocated);
 	memset(data,0,allocated);
 
 	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "History%c%d%c%d",
@@ -175,7 +177,9 @@ static int process_node_history_uint(int nodeid, int master_nodeid)
 	}
 	if(found == 1)
 	{
-		if(send_to_node("new history_uint", master_nodeid, nodeid, data) == SUCCEED)
+		/* Do not send history for current node if CONFIG_NODE_NOHISTORY is set */
+		if( ((CONFIG_NODE_NOHISTORY !=0) && (CONFIG_NODEID == nodeid)) ||
+			send_to_node("new history_uint", master_nodeid, nodeid, data) == SUCCEED)
 		{
 /*			zabbix_log( LOG_LEVEL_WARNING, "Updating nodes.history_lastid"); */
 			DBexecute("update nodes set history_uint_lastid=" ZBX_FS_UI64 " where nodeid=%d",
@@ -191,7 +195,7 @@ static int process_node_history_uint(int nodeid, int master_nodeid)
 		}
 	}
 	DBfree_result(result);
-	free(data);
+	zbx_free(data);
 
 	end = time(NULL);
 
@@ -221,7 +225,7 @@ static int process_node_history(int nodeid, int master_nodeid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		*data;
+	char		*data = NULL;
 	char		sql[MAX_STRING_LEN];
 	int		found = 0;
 	int		offset = 0;
@@ -237,7 +241,7 @@ static int process_node_history(int nodeid, int master_nodeid)
 	/* Begin work */
 	start = time(NULL);
 
-	data = malloc(allocated);
+	data = zbx_malloc(data, allocated);
 	memset(data,0,allocated);
 
 	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "History%c%d%c%d",
@@ -267,7 +271,9 @@ static int process_node_history(int nodeid, int master_nodeid)
 	{
 		zabbix_log( LOG_LEVEL_DEBUG, "Sending [%s]",
 			data);
-		if(send_to_node("new history", master_nodeid, nodeid, data) == SUCCEED)
+		/* Do not send history for current node if CONFIG_NODE_NOHISTORY is set */
+		if( ((CONFIG_NODE_NOHISTORY !=0) && (CONFIG_NODEID == nodeid)) ||
+			send_to_node("new history", master_nodeid, nodeid, data) == SUCCEED)
 		{
 /*			zabbix_log( LOG_LEVEL_WARNING, "Updating nodes.history_lastid=" ZBX_FS_UI64, id); */
 			DBexecute("update nodes set history_lastid=" ZBX_FS_UI64 " where nodeid=%d",
@@ -283,7 +289,7 @@ static int process_node_history(int nodeid, int master_nodeid)
 		}
 	}
 	DBfree_result(result);
-	free(data);
+	zbx_free(data);
 
 	end = time(NULL);
 
