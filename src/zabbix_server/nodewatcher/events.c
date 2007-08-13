@@ -51,7 +51,7 @@ static int process_node(int nodeid, int master_nodeid, zbx_uint64_t event_lastid
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		*data;
+	char		*data = NULL;
 	int		found = 0;
 
 	int		offset = 0;
@@ -64,7 +64,7 @@ static int process_node(int nodeid, int master_nodeid, zbx_uint64_t event_lastid
 		event_lastid);
 	/* Begin work */
 
-	data = malloc(allocated);
+	data = zbx_malloc(data, allocated);
 	memset(data,0,allocated);
 
 	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "Events%c%d%c%d",
@@ -99,7 +99,9 @@ static int process_node(int nodeid, int master_nodeid, zbx_uint64_t event_lastid
 	{
 		zabbix_log( LOG_LEVEL_DEBUG, "Sending [%s]",
 			data);
-		if(send_to_node("new events", master_nodeid, nodeid, data) == SUCCEED)
+		/* Do not send events for current node if CONFIG_NODE_NOEVENTS is set */
+		if( ((CONFIG_NODE_NOEVENTS !=0) && (CONFIG_NODEID == nodeid)) ||
+			send_to_node("new events", master_nodeid, nodeid, data) == SUCCEED)
 		{
 			zabbix_log( LOG_LEVEL_DEBUG, "Updating nodes.event_lastid");
 			DBexecute("update nodes set event_lastid=" ZBX_FS_UI64 " where nodeid=%d",
@@ -112,7 +114,7 @@ static int process_node(int nodeid, int master_nodeid, zbx_uint64_t event_lastid
 		}
 	}
 	DBfree_result(result);
-	free(data);
+	zbx_free(data);
 
 	return SUCCEED;
 }

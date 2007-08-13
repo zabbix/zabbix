@@ -148,6 +148,8 @@ int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
 
 int	CONFIG_NODEID			= 0;
 int	CONFIG_MASTER_NODEID		= 0;
+int	CONFIG_NODE_NOEVENTS		= 0;
+int	CONFIG_NODE_NOHISTORY		= 0;
 
 /* Global variable to control if we should write warnings to log[] */
 int	CONFIG_ENABLE_LOG		= 1;
@@ -208,6 +210,8 @@ void	init_config(void)
 		{"DBSocket",&CONFIG_DBSOCKET,0,TYPE_STRING,PARM_OPT,0,0},
 		{"DBPort",&CONFIG_DBPORT,0,TYPE_INT,PARM_OPT,1024,65535},
 		{"NodeID",&CONFIG_NODEID,0,TYPE_INT,PARM_OPT,0,65535},
+		{"NodeNoEvents",&CONFIG_NODE_NOEVENTS,0,TYPE_INT,PARM_OPT,0,1},
+		{"NodeNoHistory",&CONFIG_NODE_NOHISTORY,0,TYPE_INT,PARM_OPT,0,1},
 		{0}
 	};
 
