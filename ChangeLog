@@ -1,5 +1,6 @@
 Changes for 1.4.2:
 
+ - fixed division by zero in ZABBIX server (Alexei)
  - support of parameters NodeNoEvents and NodeNoHistory (Alexei)
  - developed data monitoring of multiple nodes (Eugene)
  - support of new parameter for count(period,value,operator) (Alexei)
