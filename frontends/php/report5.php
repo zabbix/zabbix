@@ -53,7 +53,13 @@ include_once "include/page_header.php";
 ?>
 <?php
 	$table = new CTableInfo();
-	$table->setHeader(array(S_HOST,S_TRIGGER,S_SEVERITY,S_NUMBER_OF_STATUS_CHANGES));
+	$table->setHeader(array(
+			is_show_subnodes() ? S_NODE : null,
+			S_HOST,
+			S_TRIGGER,
+			S_SEVERITY,
+			S_NUMBER_OF_STATUS_CHANGES
+			));
 
 	switch($_REQUEST["period"])
 	{
@@ -70,7 +76,7 @@ include_once "include/page_header.php";
 		" from hosts h, triggers t, functions f, items i, events e where ".
 		" h.hostid = i.hostid and i.itemid = f.itemid and t.triggerid=f.triggerid and ".
 		' t.triggerid=e.objectid and e.object='.EVENT_OBJECT_TRIGGER.' and e.clock>'.(time()-$time_dif).
-		" and h.hostid in (".$accessible_hosts.") and ".DBid2nodeid("t.triggerid")."=".$ZBX_CURNODEID.
+		' and h.hostid in ('.$accessible_hosts.') and '.DBin_node('t.triggerid').
 		" group by h.host,t.triggerid,t.description,t.priority ".
 		" order by count desc, h.host, t.description, t.triggerid", 100);
 
@@ -80,6 +86,7 @@ include_once "include/page_header.php";
 			continue;
 
             	$table->addRow(array(
+			get_node_name_by_elid($row['triggerid']),
 			$row["host"],
 			expand_trigger_description_by_data($row),
 			new CCol(get_severity_description($row["priority"]),get_severity_style($row["priority"])),

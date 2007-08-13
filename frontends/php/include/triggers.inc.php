@@ -401,7 +401,7 @@
 	 */
 	function	&get_hosts_by_expression($expression)
 	{
-		global $ZBX_CURNODEID, $ZBX_TR_EXPR_ALLOWED_MACROS, $ZBX_TR_EXPR_REPLACE_TO;
+		global $ZBX_TR_EXPR_ALLOWED_MACROS, $ZBX_TR_EXPR_REPLACE_TO;
 
 		$expr = $expression;
 
@@ -424,7 +424,7 @@
 
 		if(count($hosts) == 0) $hosts = array('0');
 
-		return DBselect('select distinct * from hosts where '.DBid2nodeid('hostid').'='.$ZBX_CURNODEID.
+		return DBselect('select distinct * from hosts where '.DBin_node('hostid', get_current_nodeid(false)).
 			' and host in ('.implode(',',$hosts).')');
 	}
 
@@ -530,7 +530,7 @@
 	 */
 	function	validate_expression($expression)
 	{
-		global $ZBX_CURNODEID, $ZBX_TR_EXPR_ALLOWED_MACROS, $ZBX_TR_EXPR_REPLACE_TO, $ZBX_TR_EXPR_ALLOWED_FUNCTIONS;
+		global $ZBX_TR_EXPR_ALLOWED_MACROS, $ZBX_TR_EXPR_REPLACE_TO, $ZBX_TR_EXPR_ALLOWED_FUNCTIONS;
 
 		if( empty($expression) )
 		{
@@ -557,7 +557,7 @@
 				
 				/* Check host */
 				$row=DBfetch(DBselect('select count(*) as cnt,min(status) as status,min(hostid) as hostid from hosts h where h.host='.zbx_dbstr($host).
-						' and '.DBid2nodeid('h.hostid').'='.$ZBX_CURNODEID
+						' and '.DBin_node('h.hostid', get_current_nodeid(false))
 					));
 				if($row['cnt']==0)
 				{
@@ -575,7 +575,7 @@
 				/* Check key */
 				if ( !($item = DBfetch(DBselect('select i.itemid,i.value_type from hosts h,items i where h.host='.zbx_dbstr($host).
 						' and i.key_='.zbx_dbstr($key).' and h.hostid=i.hostid '.
-						' and '.DBid2nodeid('h.hostid').'='.$ZBX_CURNODEID
+						' and '.DBin_node('h.hostid', get_current_nodeid(false))
 					))) )
 				{
 					error('No such monitored parameter ('.$key.') for host ('.$host.')');
@@ -1580,7 +1580,7 @@
 	 * Comments: !!! Don't forget sync code with C !!!
 	 *
 	 */
-	function	get_triggers_overview($groupid, $nodeid)
+	function	get_triggers_overview($groupid)
 	{
 		global $USER_DETAILS;
 
@@ -1595,13 +1595,15 @@
 		$result=DBselect('select distinct t.triggerid,t.description,t.value,t.priority,t.lastchange,h.hostid,h.host'.
 			' from hosts h,items i,triggers t, functions f '.$group_where.
 			' h.status='.HOST_STATUS_MONITORED.' and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid'.
-			' and h.hostid in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, $nodeid).') '.
+			' and h.hostid in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, get_current_nodeid()).') '.
 			' and t.status='.TRIGGER_STATUS_ENABLED.' and i.status='.ITEM_STATUS_ACTIVE.
 			' order by t.description');
 		unset($triggers);
 		unset($hosts);
 		while($row = DBfetch($result))
 		{
+			$row['host'] = get_node_name_by_elid($row['hostid']).$row['host'];
+
 			$hosts[$row['host']] = $row['host'];
 			$triggers[$row['description']][$row['host']] = array(
 				'hostid'	=> $row['hostid'], 

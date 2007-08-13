@@ -48,7 +48,6 @@ include_once "include/page_header.php";
 	if( !($service = DBfetch(DBselect("select s.* from services s left join triggers t on s.triggerid=t.triggerid ".
 		" left join functions f on t.triggerid=f.triggerid left join items i on f.itemid=i.itemid ".
 		" where (i.hostid is NULL or i.hostid not in (".$denyed_hosts.")) ".
-		/* " and ".DBid2nodeid("s.serviceid")."=".$ZBX_CURNODEID. */ /* NOTE: allow displaying all accessiables services */
 		" and s.serviceid=".$_REQUEST["serviceid"]
 		))))
 	{

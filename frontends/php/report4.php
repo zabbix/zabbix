@@ -58,7 +58,7 @@ include_once "include/page_header.php";
 	$form->AddItem(SPACE.S_MEDIA_TYPE.SPACE);
 	$cmbMedia = new CComboBox("media_type", $media_type, "submit();");
 	$cmbMedia->AddItem(0,S_ALL_SMALL);
-        $db_medias = DBselect("select * from media_type where ".DBid2nodeid("mediatypeid")."=".$ZBX_CURNODEID." order by description");
+        $db_medias = DBselect('select * from media_type where '.DBin_node('mediatypeid').' order by description');
 	while($media_data = DBfetch($db_medias))
 	{
 		$cmbMedia->AddItem($media_data["mediatypeid"], $media_data["description"]);
@@ -93,7 +93,7 @@ include_once "include/page_header.php";
         $table = new CTableInfo();
 
 	$header = array();
-	$db_users = DBselect("select * from users where ".DBid2nodeid("userid")."=".$ZBX_CURNODEID." order by alias,userid");
+	$db_users = DBselect('select * from users where '.DBin_node('userid').' order by alias,userid');
 	while($user_data = DBfetch($db_users))
 	{
 		array_push($header, new CImg("vtext.php?text=".$user_data["alias"]));
@@ -102,7 +102,7 @@ include_once "include/page_header.php";
 
 	$media_types = array();
 
-	$db_media_types = DBselect("select * from media_type where ".DBid2nodeid("mediatypeid")."=".$ZBX_CURNODEID.
+	$db_media_types = DBselect('select * from media_type where '.DBin_node('mediatypeid').
 		($media_type > 0 ? " and mediatypeid=".$media_type : "" ).
 		" order by description,mediatypeid");
 	while($media_type_data = DBfetch($db_media_types))

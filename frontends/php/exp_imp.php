@@ -83,7 +83,7 @@ include_once "include/page_header.php";
 	{
 		validate_group(PERM_READ_ONLY);
 	
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID);
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,PERM_RES_IDS_ARRAY,get_current_nodeid());
 
 		$hosts		= get_request('hosts', array());
 		$items		= get_request('items', array());

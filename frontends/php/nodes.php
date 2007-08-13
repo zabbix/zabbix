@@ -56,12 +56,14 @@ include_once "include/page_header.php";
 
 	check_fields($fields);
 	
-	$accessible_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST);
+	$accessible_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST,null,PERM_RES_IDS_ARRAY, get_current_nodeid(true));
 
-	if(!in_array($ZBX_CURNODEID, explode(',',$accessible_nodes)))
+	if ( 0 == count($accessible_nodes) )
 	{
 		access_deny();
 	}
+
+	$accessible_nodes = implode(',', $accessible_nodes);
 ?>
 <?php
 	if(isset($_REQUEST['save']))
@@ -118,9 +120,11 @@ include_once "include/page_header.php";
 		$table=new CTableInfo(S_NO_NODES_DEFINED);
 		$table->SetHeader(array(S_ID,S_NAME,S_TYPE,S_TIME_ZONE,S_IP.':'.S_PORT));
 
-		$db_nodes = DBselect('select * from nodes where nodeid in ('.
-			get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST).') '.
-			' order by nodetype desc, masterid, name ');
+		$db_nodes = DBselect(
+				'select * from nodes '.
+				' where nodeid in ('.$accessible_nodes.') '.
+				' order by nodetype desc, masterid, name '
+				);
 		while($row=DBfetch($db_nodes))
 		{
 

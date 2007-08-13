@@ -182,6 +182,8 @@
 	'S_NODE_DELETED'=>			'Node deleted',
 	'S_CANNOT_DELETE_NODE'=>		'Cannot delete node',
 	'S_CURRENT_NODE'=>			'Current node',
+	'S_CURRENT_NODE_ONLY'=>			'Current node only',
+	'S_WITH_SUBNODES'=>			'With subnodes',
 	
 //	acknow.php
 	'S_ACKNOWLEDGES'=>			'Acknowledges',

@@ -84,7 +84,7 @@ include_once "include/page_header.php";
 	$_REQUEST['items'] = get_request('items', array());
 	$_REQUEST['group_gid'] = get_request('group_gid', array());
 	
-	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, $ZBX_CURNODEID);
+	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, get_current_nodeid());
 	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT);
 
 	if(isset($_REQUEST["clone"]) && isset($_REQUEST["graphid"]))
@@ -337,7 +337,7 @@ include_once "include/page_header.php";
 				" left join items i on gi.itemid=i.itemid ".
 				" where i.hostid=".$_REQUEST["hostid"].
 				" and i.hostid not in (".$denyed_hosts.") ".
-				" and ".DBid2nodeid("g.graphid")."=".$ZBX_CURNODEID.
+				' and '.DBin_node('g.graphid').
 				" and i.hostid is not NULL ".
 				" order by g.name, g.graphid");
 		}
@@ -345,7 +345,7 @@ include_once "include/page_header.php";
 		{
 			$result = DBselect("select distinct g.* from graphs g left join graphs_items gi on g.graphid=gi.graphid ".
 				" left join items i on gi.itemid=i.itemid ".
-				" where ".DBid2nodeid("g.graphid")."=".$ZBX_CURNODEID.
+				' while '.DBin_node('g.graphid').
 				" and ( i.hostid not in (".$denyed_hosts.")  OR i.hostid is NULL )".
 				" order by g.name, g.graphid");
 		}

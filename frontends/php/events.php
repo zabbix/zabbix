@@ -114,7 +114,7 @@ include_once "include/page_header.php";
 
 		$cmbGroup->AddItem(0,S_ALL_SMALL);
 		
-		$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST, null, null, $ZBX_CURNODEID);
+		$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_LIST, null, null, get_current_nodeid());
 
 		$result=DBselect('SELECT DISTINCT g.groupid,g.name '.
 			' FROM groups g, hosts_groups hg, hosts h, items i '.
@@ -125,7 +125,10 @@ include_once "include/page_header.php";
 
 		while($row=DBfetch($result))
 		{
-			$cmbGroup->AddItem($row['groupid'],$row['name']);
+			$cmbGroup->AddItem(
+					$row['groupid'],
+					get_node_name_by_elid($row['groupid']).$row['name']
+					);
 		}
 		$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
 		
@@ -153,7 +156,10 @@ include_once "include/page_header.php";
 		$result=DBselect($sql);
 		while($row=DBfetch($result))
 		{
-			$cmbHosts->AddItem($row['hostid'],$row['host']);
+			$cmbHosts->AddItem(
+					$row['hostid'],
+					get_node_name_by_elid($row['hostid']).$row['host']
+					);
 		}
 
 		$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));

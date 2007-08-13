@@ -29,15 +29,12 @@
 		}
 	}
 
-	function	get_history_of_triggers_events($start,$num, $groupid=0, $hostid=0, $nodeid=null)
+	function	get_history_of_triggers_events($start,$num, $groupid=0, $hostid=0)
 	{
-		global $ZBX_CURNODEID;
 		global $USER_DETAILS;
 		
 		$show_unknown = get_profile('web.events.show_unknown',0);
 		
-		if(is_null($nodeid)) $nodeid = $ZBX_CURNODEID;
-			
 		$sql_from = $sql_cond = "";
 		
 		if($hostid > 0)
@@ -56,7 +53,7 @@
 	
 		$result = DBselect('SELECT DISTINCT t.triggerid,t.priority,t.description,h.host,e.clock,e.value '.
 			' FROM events e, triggers t, functions f, items i, hosts h '.$sql_from.
-			' WHERE '.DBid2nodeid('t.triggerid').'='.$nodeid.
+			' WHERE '.DBin_node('t.triggerid').
 				' AND e.objectid=t.triggerid and e.object='.EVENT_OBJECT_TRIGGER.
 				' AND t.triggerid=f.triggerid and f.itemid=i.itemid '.
 				' AND i.hostid=h.hostid '.$sql_cond.' and h.status='.HOST_STATUS_MONITORED.
@@ -64,7 +61,14 @@
 			);
        
 		$table = new CTableInfo(S_NO_EVENTS_FOUND); 
-		$table->SetHeader(array(S_TIME, $hostid == 0 ? S_HOST : null, S_DESCRIPTION, S_VALUE, S_SEVERITY));
+		$table->SetHeader(array(
+				S_TIME,
+				is_show_subnodes() ? S_NODE : null,
+				$hostid == 0 ? S_HOST : null,
+				S_DESCRIPTION,
+				S_VALUE,
+				S_SEVERITY
+				));
 		
 		$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 		
@@ -94,8 +98,12 @@
 				
 			$table->AddRow(array(
 				date("Y.M.d H:i:s",$row["clock"]),
+				get_node_name_by_elid($row['triggerid']),
 				$hostid == 0 ? $row['host'] : null,
-				new CLink(expand_trigger_description_by_data($row),"tr_events.php?triggerid=".$row["triggerid"],"action"),
+				new CLink(
+					expand_trigger_description_by_data($row),
+					"tr_events.php?triggerid=".$row["triggerid"],"action"
+					),
 				$value,
 				new CCol(get_severity_description($row["priority"]), get_severity_style($row["priority"]))));
 			$col++;
@@ -103,13 +111,8 @@
 		return $table;
 	}
 
-	function	get_history_of_discovery_events($start,$num,$nodeid=null)
+	function	get_history_of_discovery_events($start,$num)
 	{
-		global $ZBX_CURNODEID;
-		global $USER_DETAILS;
-		
-		if(is_null($nodeid)) $nodeid = $ZBX_CURNODEID;
-			
 		$db_events = DBselect('select distinct e.source,e.object,e.objectid,e.clock,e.value from events e'.
 			' where e.source='.EVENT_SOURCE_DISCOVERY.' order by e.clock desc',
 			10*($start+$num)
@@ -119,8 +122,6 @@
 		$table->SetHeader(array(S_TIME, S_IP, S_DESCRIPTION, S_STATUS));
 		$col=0;
 		
-		$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
-		 
 		$skip = $start;
 		while(($event_data = DBfetch($db_events))&&($col<$num))
 		{

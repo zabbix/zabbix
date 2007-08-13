@@ -28,8 +28,8 @@
 
 		$result = false;
 
-		if(DBselect("select screenid from screens where screenid=".$screenid.
-			" and ".DBid2nodeid('screenid')." in (".get_accessible_nodes_by_user($USER_DETAILS,$perm).")"))
+		if(DBselect('select screenid from screens where screenid='.$screenid.
+			' and '.DBin_node('screenid', get_current_nodeid($perm))))
 		{
 			$result = true;
 			
@@ -391,14 +391,12 @@
 				}
 				elseif( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_TRIGGERS_OVERVIEW) )
 				{
-					global $ZBX_CURNODEID;
-					$item = array(get_triggers_overview($resourceid, $ZBX_CURNODEID));
+					$item = array(get_triggers_overview($resourceid));
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
 				elseif( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_DATA_OVERVIEW) )
 				{
-					global $ZBX_CURNODEID;
-					$item = array(get_items_data_overview($resourceid, $ZBX_CURNODEID));
+					$item = array(get_items_data_overview($resourceid));
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
 				elseif( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_URL) )
@@ -446,12 +444,10 @@
 
 	function	slideshow_accessiable($slideshowid, $perm)
 	{
-		global $USER_DETAILS;
-
 		$result = false;
 
-		if(DBselect("select slideshowid from slideshows where slideshowid=".$slideshowid.
-			" and ".DBid2nodeid('slideshowid')." in (".get_accessible_nodes_by_user($USER_DETAILS,$perm).")"))
+		if(DBselect('select slideshowid from slideshows where slideshowid='.$slideshowid.
+			' and '.DBin_node('slideshowid', get_current_nodeid($perm))))
 		{
 			$result = true;
 			$db_slides = DBselect('select distinct screenid from slides where slideshowid='.$slideshowid);

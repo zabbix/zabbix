@@ -48,13 +48,13 @@
 		$USER_DETAILS = NULL;
 		
 		$sessionid = get_cookie("zbx_sessionid");
-		
+
 		if( !is_null($sessionid))
 		{
 			if(!($USER_DETAILS = DBfetch(DBselect("select u.*,s.* from sessions s,users u".
 				" where s.sessionid=".zbx_dbstr($sessionid)." and s.userid=u.userid".
 				" and ((s.lastaccess+u.autologout>".time().") or (u.autologout=0))".
-				" and ".DBid2nodeid('u.userid')." = ".$ZBX_LOCALNODEID))))
+				" and ".DBin_node('u.userid', $ZBX_LOCALNODEID)))))
 			{
 				zbx_unsetcookie('zbx_sessionid');
 				DBexecute("delete from sessions where sessionid=".zbx_dbstr($sessionid));
@@ -72,7 +72,7 @@
 		if(!$USER_DETAILS)
 		{
 			if(!($USER_DETAILS = DBfetch(DBselect("select u.* from users u where u.alias='guest'".
-				" and ".DBid2nodeid('u.userid')."=$ZBX_LOCALNODEID"))))
+				" and ".DBin_node('u.userid', $ZBX_LOCALNODEID)))))
 			{
 				$missed_user_guest = true;
 			}
@@ -154,8 +154,7 @@ COpt::counter_up('perm');
 
 		$where = array();
 
-		if(is_array($nodeid))	array_push($where, DBid2nodeid('h.hostid').' in ('.implode(',', $nodeid).') ');
-		elseif(isset($nodeid))	array_push($where, DBid2nodeid('h.hostid').' in ('.$nodeid.') ');
+		if ( !is_null($nodeid) )	array_push($where, DBin_node('h.hostid', $nodeid));
 	
 		if(is_array($hostid))	array_push($where, ' h.hostid in ('.implode(',', $hostid).') ');
 		elseif(isset($hostid))	array_push($where, ' h.hostid in ('.$hostid.') ');
@@ -241,8 +240,7 @@ COpt::counter_up('perm');
 
 		$where = array();
 
-		if(is_array($nodeid))	array_push($where, DBid2nodeid('hg.groupid').' in ('.implode(',', $nodeid).') ');
-		elseif(isset($nodeid))	array_push($where, DBid2nodeid('hg.groupid').' in ('.$nodeid.') ');
+		if ( !is_null($nodeid) )	array_push($where, DBin_node('hg.groupid', $nodeid));
 	
 		if(count($where)) 	$where = ' where '.implode(' and ',$where);
 		else			$where = '';
@@ -428,8 +426,7 @@ COpt::counter_up('perm');
 
 		$where = array();
 
-		if(is_array($nodeid))	array_push($where, DBid2nodeid('h.hostid').' in ('.implode(',', $nodeid).') ');
-		elseif(isset($nodeid))	array_push($where, DBid2nodeid('h.hostid').' in ('.$nodeid.') ');
+		if ( !is_null($nodeid) )	array_push($where, DBin_node('h.hostid', $nodeid));
 	
 		if(count($where)) 	$where = ' where '.implode(' and ',$where);
 		else			$where = '';
@@ -522,8 +519,7 @@ COpt::counter_up('perm');
 
 		$where = array();
 
-		if(is_array($nodeid))	array_push($where, DBid2nodeid('g.groupid').' in ('.implode(',', $nodeid).') ');
-		elseif(isset($nodeid))	array_push($where, DBid2nodeid('g.groupid').' in ('.$nodeid.') ');
+		if ( !is_null($nodeid) )	array_push($where, DBin_node('g.groupid', $nodeid));
 	
 		if(count($where)) 	$where = ' where '.implode(' and ',$where);
 		else			$where = '';

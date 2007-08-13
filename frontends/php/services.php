@@ -49,7 +49,7 @@ $query = 'SELECT distinct s.serviceid, sl.servicedownid, sl_p.serviceupid as ser
 		' LEFT JOIN functions f ON t.triggerid=f.triggerid '.
 		' LEFT JOIN items i ON f.itemid=i.itemid '.
 	' WHERE (i.hostid is null or i.hostid not in ('.$denyed_hosts.')) '.
-		' AND '.DBid2nodeid("s.serviceid").'='.$ZBX_CURNODEID.
+		' AND '.DBin_node('s.serviceid').
 	' ORDER BY s.sortorder, sl_p.serviceupid, s.serviceid';
 
 $result=DBSelect($query);

@@ -382,7 +382,7 @@ include_once "include/page_header.php";
 				S_NAME,S_SURNAME,S_USER_TYPE,S_GROUPS,S_IS_ONLINE_Q));
 		
 			$db_users=DBselect("select userid,alias,name,surname,type,autologout ".
-				" from users where ".DBid2nodeid('userid')."=".$ZBX_CURNODEID.
+				' from users where '.DBin_node('userid').
 				" order by alias");
 			while($db_user=DBfetch($db_users))
 			{
@@ -444,7 +444,7 @@ include_once "include/page_header.php";
 				S_MEMBERS));
 		
 			$result=DBselect("select usrgrpid,name from usrgrp".
-					" where ".DBid2nodeid('usrgrpid')."=".$ZBX_CURNODEID.
+					' where '.DBin_node('usrgrpid').
 					" order by name");
 			while($row=DBfetch($result))
 			{

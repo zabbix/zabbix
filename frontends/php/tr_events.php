@@ -51,10 +51,10 @@ include_once "include/page_header.php";
 		access_deny();
 
 	$trigger_data = DBfetch(DBselect('SELECT h.host, t.* '.
-									' FROM hosts h, items i, functions f, triggers t '.
-	                        		' WHERE i.itemid=f.itemid AND f.triggerid=t.triggerid '.
-										' AND t.triggerid='.$_REQUEST["triggerid"].
-										' AND h.hostid=i.hostid AND '.DBid2nodeid("t.triggerid").'='.$ZBX_CURNODEID));
+						' FROM hosts h, items i, functions f, triggers t '.
+	                        	' WHERE i.itemid=f.itemid AND f.triggerid=t.triggerid '.
+						' AND t.triggerid='.$_REQUEST["triggerid"].
+						' AND h.hostid=i.hostid AND '.DBin_node('t.triggerid')));
 ?>
 <?php
 	$_REQUEST["limit"] = get_request("limit","NO");
