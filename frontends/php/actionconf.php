@@ -107,9 +107,9 @@ include_once "include/page_header.php";
 	}
 	elseif(isset($_REQUEST['save']))
 	{
-		global $USER_DETAILS, $ZBX_CURNODEID;
+		global $USER_DETAILS;
 
-		if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+		if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 			access_deny();
 
 		$conditions = get_request('conditions', array());
@@ -146,9 +146,9 @@ include_once "include/page_header.php";
 	}
 	elseif(inarr_isset(array('delete','actionid')))
 	{
-		global $USER_DETAILS, $ZBX_CURNODEID;
+		global $USER_DETAILS;
 
-		if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+		if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 			access_deny();
 
 		$action_data = DBfetch(DBselect('select name from actions where actionid='.$_REQUEST['actionid']));
@@ -229,13 +229,13 @@ include_once "include/page_header.php";
 /* GROUP ACTIONS */
 	elseif(isset($_REQUEST['group_enable'])&&isset($_REQUEST['g_actionid']))
 	{
-		global $USER_DETAILS, $ZBX_CURNODEID;
+		global $USER_DETAILS;
 
-		if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+		if(count($nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 			access_deny();
 
 		$result=DBselect('select distinct actionid from actions'.
-				' where '.DBid2nodeid('actionid').'='.$ZBX_CURNODEID.
+				' where '.DBin_node('actionid',$nodes).
 				' and actionid in ('.implode(',',$_REQUEST['g_actionid']).') '
 				);
 		
@@ -254,13 +254,13 @@ include_once "include/page_header.php";
 	}
 	elseif(isset($_REQUEST['group_disable'])&&isset($_REQUEST['g_actionid']))
 	{
-		global $USER_DETAILS, $ZBX_CURNODEID;
+		global $USER_DETAILS;
 
-		if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+		if(count($nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 			access_deny();
 
 		$result=DBselect('select distinct actionid from actions'.
-				' where '.DBid2nodeid('actionid').'='.$ZBX_CURNODEID.
+				' where '.DBin_node('actionid',$nodes).
 				' and actionid in ('.implode(',',$_REQUEST['g_actionid']).') '
 				);
 		$actionids = array();
@@ -278,13 +278,13 @@ include_once "include/page_header.php";
 	}
 	elseif(isset($_REQUEST['group_delete'])&&isset($_REQUEST['g_actionid']))
 	{
-		global $USER_DETAILS, $ZBX_CURNODEID;
+		global $USER_DETAILS;
 
-		if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+		if(count($nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 			access_deny();
 
 		$result=DBselect('select distinct actionid from actions'.
-				' where '.DBid2nodeid('actionid').'='.$ZBX_CURNODEID.
+				' where '.DBin_node('actionid',$nodes).
 				' and actionid in ('.implode(',',$_REQUEST['g_actionid']).') '
 				);
 		$actionids = array();
@@ -340,7 +340,7 @@ include_once "include/page_header.php";
 			S_STATUS));
 
 		$db_actions = DBselect('select * from actions where eventsource='.$_REQUEST['eventsource'].
-			' and '.DBid2nodeid('actionid').'='.$ZBX_CURNODEID.' order by name,actionid');
+			' and '.DBin_node('actionid').' order by name,actionid');
 		while($action_data = DBfetch($db_actions))
 		{
 			if(!action_accessiable($action_data['actionid'], PERM_READ_WRITE)) continue;

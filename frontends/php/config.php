@@ -96,7 +96,7 @@ include_once "include/page_header.php";
 			} else {
 	/* ADD */
 				if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,
-						PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+						PERM_RES_IDS_ARRAY,get_current_nodeid())))
 				{
 					access_deny();
 				}
@@ -129,7 +129,7 @@ include_once "include/page_header.php";
 	elseif(isset($_REQUEST["save"])&&in_array($_REQUEST["config"],array(0,5,7)))
 	{
 
-		if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+		if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 			access_deny();
 
 /* OTHER ACTIONS */
@@ -211,7 +211,7 @@ include_once "include/page_header.php";
 			else
 			{
 				if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,
-					PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+					PERM_RES_IDS_ARRAY,get_current_nodeid())))
 				{
 					access_deny();
 				}
@@ -233,7 +233,7 @@ include_once "include/page_header.php";
 		{
 			$result = false;
 
-			if(($map_data = DBfetch(DBselect("select * from valuemaps where ".DBid2nodeid("valuemapid")."=".$ZBX_CURNODEID.
+			if(($map_data = DBfetch(DBselect('select * from valuemaps where '.DBin_node('valuemapid').
 				" and valuemapid=".$_REQUEST["valuemapid"]))))
 			{
 				$result = delete_valuemap($_REQUEST["valuemapid"]);
@@ -303,9 +303,9 @@ include_once "include/page_header.php";
 			$table=new CTableInfo(S_NO_IMAGES_DEFINED);
 			$table->setHeader(array(S_NAME,S_TYPE,S_IMAGE));
 	
-			$result=DBselect("select imageid,imagetype,name from images".
-					" where ".DBid2nodeid("imageid")."=".$ZBX_CURNODEID.
-					" order by name");
+			$result=DBselect('select imageid,imagetype,name from images'.
+					' where '.DBin_node('imageid').
+					' order by name');
 			while($row=DBfetch($result))
 			{
 				if($row["imagetype"]==1)	$imagetype=S_ICON;
@@ -338,7 +338,7 @@ include_once "include/page_header.php";
 			$table = new CTableInfo();
 			$table->SetHeader(array(S_NAME, S_VALUE_MAP));
 
-			$db_valuemaps = DBselect("select * from valuemaps where ".DBid2nodeid("valuemapid")."=".$ZBX_CURNODEID);
+			$db_valuemaps = DBselect('select * from valuemaps where '.DBin_node('valuemapid'));
 			while($db_valuemap = DBfetch($db_valuemaps))
 			{
 				$mappings_row = array();

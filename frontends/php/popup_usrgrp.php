@@ -96,7 +96,7 @@ if(form)
 			S_NAME)
 		));
 
-	$result = DBselect("select * from usrgrp where ".DBid2nodeid('usrgrpid')."=$ZBX_CURNODEID order by name");
+	$result = DBselect('select * from usrgrp where '.DBin_node('usrgrpid').' order by name');
 	while($row = DBfetch($result))
 	{
 		$table->AddRow(array(
