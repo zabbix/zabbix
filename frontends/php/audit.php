@@ -57,7 +57,7 @@ include_once "include/page_header.php";
 
 	$result = DBselect("select u.alias,a.clock,a.action,a.resourcetype,a.details from auditlog a, users u".
 		" where u.userid=a.userid ".
-		' and '.Bin_node('u.userid', get_current_nodeid(null, PERM_READ_ONLY))).
+		' and '.DBin_node('u.userid', get_current_nodeid(null, PERM_READ_ONLY)).
 		" order by clock desc",
 		$limit);
 
