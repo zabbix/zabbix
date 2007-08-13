@@ -49,7 +49,7 @@ include_once "include/page_header.php";
 			' from hosts h, items i, functions f, events e, triggers t'.
 			' where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and e.eventid='.$_REQUEST["eventid"].
 			' and i.hostid not in ('.$denyed_hosts.') and e.objectid=t.triggerid and e.object='.EVENT_OBJECT_TRIGGER.
-			' and '.DBid2nodeid('e.eventid').'='.$ZBX_CURNODEID
+			' and '.DBin_node('e.eventid')
 			))))
 	{
 		access_deny();

@@ -176,41 +176,124 @@ require_once('include/classes/ctree.inc.php');
 	function	init_nodes()
 	{
 		/* Init CURRENT NODE ID */
-		global $USER_DETAILS;
-		global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID;
-		global $ZBX_CURNODEID, $ZBX_CURMASTERID;
+		global	$_REQUEST,
+			$USER_DETAILS,
+			$ZBX_LOCALNODEID, $ZBX_LOCMASTERID,
+			$ZBX_CURRENT_NODEID, $ZBX_CURRENT_SUBNODES, $ZBX_CURMASTERID,
+			$ZBX_NODES,
+			$ZBX_WITH_SUBNODES;
+
+		$ZBX_CURRENT_SUBNODES = array();
+		$ZBX_NODES = array();
 
 		if(!defined('ZBX_PAGE_NO_AUTHERIZATION') && ZBX_DISTRIBUTED)
 		{
-			$ZBX_CURNODEID = get_cookie('zbx_current_nodeid', $ZBX_LOCALNODEID); // Selected node
+			$ZBX_CURRENT_NODEID = get_cookie('zbx_current_nodeid', $ZBX_LOCALNODEID); // Selected node
+			$ZBX_WITH_SUBNODES = get_cookie('zbx_with_subnodes', false); // Show elements from subnodes
+
 			if(isset($_REQUEST['switch_node']))
 			{
 				if($node_data = DBfetch(DBselect("select * from nodes where nodeid=".$_REQUEST['switch_node'])))
 				{
-					$ZBX_CURNODEID = $_REQUEST['switch_node'];
+					$ZBX_CURRENT_NODEID = $_REQUEST['switch_node'];
 				}
 				unset($node_data);
 			}
 
-			if($node_data = DBfetch(DBselect("select * from nodes where nodeid=".$ZBX_CURNODEID)))
+			if(isset($_REQUEST['show_subnodes']))
+			{
+				$ZBX_WITH_SUBNODES = !empty($_REQUEST['show_subnodes']);
+			}
+
+			if($node_data = DBfetch(DBselect("select * from nodes where nodeid=".$ZBX_CURRENT_NODEID)))
 			{
 				$ZBX_CURMASTERID = $node_data['masterid'];
 			}
 			
-			if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST,null,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)) <= 0)
+			$ZBX_NODES = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST, null, PERM_RES_DATA_ARRAY);
+
+			if ( !isset($ZBX_NODES[$ZBX_CURRENT_NODEID]) )
 			{
 				$denyed_page_requested = true;
-				$ZBX_CURNODEID = $ZBX_LOCALNODEID;
+				$ZBX_CURRENT_NODEID = $ZBX_LOCALNODEID;
 				$ZBX_CURMASTERID = $ZBX_LOCMASTERID;
 			}
+
+			foreach ( $ZBX_NODES as $nodeid => $node_data )
+			{
+				for ( 	$curr_node = &$node_data;
+					$curr_node['masterid'] != 0 &&
+					$curr_node['masterid'] != $ZBX_CURRENT_NODEID;
+					$curr_node = &$ZBX_NODES[$curr_node['masterid']]
+				);
+
+				if ( $curr_node['masterid'] == $ZBX_CURRENT_NODEID )
+				{
+					$ZBX_CURRENT_SUBNODES[$nodeid] = $nodeid;
+				}
+			}
 			
-			zbx_set_post_cookie('zbx_current_nodeid',$ZBX_CURNODEID);
+			zbx_set_post_cookie('zbx_current_nodeid',$ZBX_CURRENT_NODEID);
+			zbx_set_post_cookie('zbx_with_subnodes',$ZBX_WITH_SUBNODES);
 		}
 		else
 		{
-			$ZBX_CURNODEID = $ZBX_LOCALNODEID;
+			$ZBX_CURRENT_NODEID = $ZBX_LOCALNODEID;
 			$ZBX_CURMASTERID = $ZBX_LOCMASTERID;
+			$ZBX_WITH_SUBNODES = false;
 		}
+
+		$ZBX_CURRENT_SUBNODES[$ZBX_CURRENT_NODEID] = $ZBX_CURRENT_NODEID;
+
+		if ( count($ZBX_CURRENT_SUBNODES) < 2 && !defined('ZBX_DISABLE_SUBNODES') )
+			define('ZBX_DISABLE_SUBNODES', 1);
+	}
+
+	function	get_current_nodeid( $forse_with_subnodes = null, $perm = null )
+	{
+		global	$ZBX_CURRENT_NODEID, $ZBX_CURRENT_SUBNODES, $ZBX_WITH_SUBNODES;
+
+		if ( !isset($ZBX_CURRENT_NODEID) )	init_nodes();
+
+		$result = ( is_show_subnodes($forse_with_subnodes) ? $ZBX_CURRENT_SUBNODES : $ZBX_CURRENT_NODEID );
+
+		if ( !is_null($perm) )
+		{
+			global $USER_DETAILS;
+
+			$result = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_ONLY, null, null, $result);
+		}
+
+		return $result;
+	}
+
+	function	get_node_name_by_elid($id_val, $forse_with_subnodes = null)
+	{
+		global $ZBX_NODES;
+
+		if ( ! is_show_subnodes($forse_with_subnodes) )
+			return null;
+
+		$nodeid = id2nodeid($id_val);
+
+		if ( !isset($ZBX_NODES[$nodeid]) )
+			return null;
+
+		return '['.$ZBX_NODES[$nodeid]['name'].'] ';
+	}
+
+	function	is_show_subnodes($forse_with_subnodes = null)
+	{
+		global	$ZBX_WITH_SUBNODES;
+
+		if ( is_null($forse_with_subnodes) )
+		{
+			if ( defined('ZBX_DISABLE_SUBNODES') )
+				$forse_with_subnodes = false;
+			else
+				$forse_with_subnodes = $ZBX_WITH_SUBNODES;
+		}
+		return $forse_with_subnodes;
 	}
 
 	function	access_deny()
@@ -912,8 +995,6 @@ require_once('include/classes/ctree.inc.php');
 
 	function	update_config($event_history,$alert_history,$refresh_unsupported,$work_period,$alert_usrgrpid)
 	{
-		global $ZBX_CURNODEID;
-
 		$update = array();
 
 		if(!is_null($event_history))
@@ -953,8 +1034,7 @@ require_once('include/classes/ctree.inc.php');
 		}
 
 		return	DBexecute('update config set '.implode(',',$update).
-			' where '.DBid2nodeid('configid')."=".$ZBX_CURNODEID);
-
+			' where '.DBin_node('configid', get_current_nodeid(false)));
 	}
 
 	function	&get_table_header($col1, $col2=SPACE)

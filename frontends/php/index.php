@@ -62,7 +62,7 @@
 
 		$row = DBfetch(DBselect("select u.userid,u.alias,u.name,u.surname,u.url,u.refresh from users u where".
 			" u.alias=".zbx_dbstr($name)." and u.passwd=".zbx_dbstr($password).
-			" and ".DBid2nodeid('u.userid')."=".$ZBX_LOCALNODEID));
+			' and '.DBin_node('u.userid', $ZBX_LOCALNODEID)));
 
 		if($row)
 		{

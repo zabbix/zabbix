@@ -78,7 +78,7 @@ include_once "include/page_header.php";
 
 	$showdisabled = get_request("showdisabled", 0);
 	
-	$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,$ZBX_CURNODEID);
+	$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,get_current_nodeid());
 
 	if(isset($_REQUEST['hostid']) && !in_array($_REQUEST['hostid'], explode(',',$accessible_hosts)))
 	{
@@ -341,7 +341,7 @@ include_once "include/page_header.php";
 	show_table_header(S_CONFIGURATION_OF_WEB_MONITORING_BIG, $form);
 	echo BR;
 
-	$db_hosts=DBselect("select hostid from hosts where ".DBid2nodeid("hostid")."=".$ZBX_CURNODEID);
+	$db_hosts=DBselect('select hostid from hosts where '.DBin_node('hostid'));
 	if(isset($_REQUEST["form"])&&isset($_REQUEST["hostid"])&&DBfetch($db_hosts))
 	{
 // FORM

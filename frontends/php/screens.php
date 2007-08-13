@@ -106,26 +106,40 @@ include_once "include/page_header.php";
 
 	if( 0 == $config )
 	{
-		$result = DBselect("select screenid as elementid,name from screens where ".DBid2nodeid("screenid")."=".$ZBX_CURNODEID." order by name");
+		$result = DBselect('select screenid as elementid,name '.
+				' from screens '.
+				' where '.DBin_node('screenid').
+				' order by name'
+				);
 		while($row=DBfetch($result))
 		{
 			if(!screen_accessiable($row["elementid"], PERM_READ_ONLY))
 				continue;
 
-			$cmbElements->AddItem($row["elementid"],$row["name"]);
+			$cmbElements->AddItem(
+					$row['elementid'],
+					get_node_name_by_elid($row['elementid']).$row["name"]
+					);
 			if($elementid == $row["elementid"]) $element_correct = 1;
 			if(!isset($first_element)) $first_element = $row["elementid"];
 		}
 	}
 	else
 	{
-		$result = DBselect("select slideshowid as elementid,name from slideshows where ".DBid2nodeid("slideshowid")."=".$ZBX_CURNODEID." order by name");
+		$result = DBselect('select slideshowid as elementid,name '.
+				' from slideshows '.
+				' where '.DBin_node('slideshowid').
+				' order by name'
+				);
 		while($row=DBfetch($result))
 		{
 			if(!slideshow_accessiable($row["elementid"], PERM_READ_ONLY))
 				continue;
 
-			$cmbElements->AddItem($row["elementid"],$row["name"]);
+			$cmbElements->AddItem(
+					$row['elementid'],
+					get_node_name_by_elid($row['elementid']).$row['name']
+					);
 			if($elementid == $row["elementid"]) $element_correct = 1;
 			if(!isset($first_element)) $first_element = $row["elementid"];
 		}

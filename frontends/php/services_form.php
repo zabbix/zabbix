@@ -95,7 +95,7 @@ include_once "include/page_header.php";
 			" LEFT JOIN functions f on t.triggerid=f.triggerid ".
 			" LEFT JOIN items i on f.itemid=i.itemid ".
 			" where (i.hostid is null or i.hostid not in (".$denyed_hosts.")) ".
-			" and ".DBid2nodeid("s.serviceid")."=".$ZBX_CURNODEID.
+			' and '.DBin_node('s.serviceid').
 			" and s.serviceid=".$_REQUEST["serviceid"];
 			
 		if( !($service = DBFetch(DBSelect($query))) ){
@@ -146,7 +146,7 @@ if(isset($_REQUEST['saction'])){
 		add_audit_if($result,$audit_acrion,AUDIT_RESOURCE_IT_SERVICE,' Name ['.$_REQUEST["name"].'] id ['.$serviceid.']');
 			
 	} elseif(isset($_REQUEST["add_server"])){
-		if(!($host_data = DBfetch(DBselect('select h.* from hosts h where '.DBid2nodeid('h.hostid').'='.$ZBX_CURNODEID.' and h.hostid not in ('.$denyed_hosts.') and h.hostid='.$_REQUEST["serverid"])))){
+		if(!($host_data = DBfetch(DBselect('select h.* from hosts h where '.DBin_node('h.hostid').' and h.hostid not in ('.$denyed_hosts.') and h.hostid='.$_REQUEST["serverid"])))){
 			access_deny();
 		}
 		
@@ -199,27 +199,27 @@ if(isset($_REQUEST['pservices'])){
 		$childs_str = implode(',',$childs);
 		(!empty($childs_str))?($childs_str.=','):('');
 		
-		$query = 'SELECT DISTINCT s.* 
-				FROM services s 
-					LEFT JOIN triggers t ON s.triggerid=t.triggerid 
-					LEFT JOIN functions f ON t.triggerid=f.triggerid 
-					LEFT JOIN items i ON f.itemid=i.itemid 
-					LEFT JOIN services_links sl ON s.serviceid=sl.servicedownid 
-				WHERE (i.hostid IS null OR i.hostid NOT IN ('.$denyed_hosts.')) 
-					AND '.DBid2nodeid('s.serviceid').'='.$ZBX_CURNODEID.'
-					AND s.serviceid NOT IN ('.$childs_str.$service['serviceid'].') order by s.sortorder,s.name';
+		$query = 'SELECT DISTINCT s.* '.
+				' FROM services s '.
+					' LEFT JOIN triggers t ON s.triggerid=t.triggerid '.
+					' LEFT JOIN functions f ON t.triggerid=f.triggerid '.
+					' LEFT JOIN items i ON f.itemid=i.itemid '.
+					' LEFT JOIN services_links sl ON s.serviceid=sl.servicedownid '.
+				' WHERE (i.hostid IS null OR i.hostid NOT IN ('.$denyed_hosts.')) '.
+					' AND '.DBin_node('s.serviceid').
+					' AND s.serviceid NOT IN ('.$childs_str.$service['serviceid'].') order by s.sortorder,s.name';
 	} else {
-		$query = 'SELECT DISTINCT s.* 
-			FROM services s 
-				LEFT JOIN triggers t ON s.triggerid=t.triggerid 
-				LEFT JOIN functions f ON t.triggerid=f.triggerid 
-				LEFT JOIN items i ON f.itemid=i.itemid 
-				LEFT JOIN services_links sl ON s.serviceid=sl.servicedownid 
-			WHERE (i.hostid IS null 
-					OR i.hostid NOT IN ('.$denyed_hosts.')
-					) 
-				AND '.DBid2nodeid('s.serviceid').'='.$ZBX_CURNODEID.' 
-			ORDER BY s.sortorder,s.name';
+		$query = 'SELECT DISTINCT s.* '
+			' FROM services s '.
+				' LEFT JOIN triggers t ON s.triggerid=t.triggerid '.
+				' LEFT JOIN functions f ON t.triggerid=f.triggerid '.
+				' LEFT JOIN items i ON f.itemid=i.itemid '.
+				' LEFT JOIN services_links sl ON s.serviceid=sl.servicedownid '.
+			' WHERE (i.hostid IS null '.
+					' OR i.hostid NOT IN ('.$denyed_hosts.') '.
+					' ) '.
+				' AND '.DBin_node('s.serviceid').
+			' ORDER BY s.sortorder,s.name';
 	}	
 	
 	$db_services = DBselect($query);
@@ -277,27 +277,27 @@ if(isset($_REQUEST['cservices'])){
 		$childs_str = implode(',',$childs);
 		(!empty($childs_str))?($childs_str.=','):('');
 	
-		$query = 'SELECT DISTINCT s.* 
-				FROM services s 
-					LEFT JOIN triggers t ON s.triggerid=t.triggerid 
-					LEFT JOIN functions f ON t.triggerid=f.triggerid 
-					LEFT JOIN items i on f.itemid=i.itemid 
-					LEFT JOIN services_links sl on s.serviceid=sl.servicedownid 
-				WHERE (i.hostid is null or i.hostid not in ('.$denyed_hosts.')) 
-				AND '.DBid2nodeid('s.serviceid').'='.$ZBX_CURNODEID.' 
-				AND s.serviceid NOT IN ('.$childs_str.$service['serviceid'].') 
-				ORDER BY s.sortorder,s.name';
+		$query = 'SELECT DISTINCT s.* '.
+				' FROM services s '.
+					' LEFT JOIN triggers t ON s.triggerid=t.triggerid '.
+					' LEFT JOIN functions f ON t.triggerid=f.triggerid '.
+					' LEFT JOIN items i on f.itemid=i.itemid '.
+					' LEFT JOIN services_links sl on s.serviceid=sl.servicedownid '.
+				' WHERE (i.hostid is null or i.hostid not in ('.$denyed_hosts.')) '.
+				' AND '.DBin_node('s.serviceid').
+				' AND s.serviceid NOT IN ('.$childs_str.$service['serviceid'].') '.
+				' ORDER BY s.sortorder,s.name';
 		
 	} else {
-		$query = 'SELECT DISTINCT s.* 
-				FROM services s 
-					LEFT JOIN triggers t ON s.triggerid=t.triggerid 
-					LEFT JOIN functions f ON t.triggerid=f.triggerid 
-					LEFT JOIN items i on f.itemid=i.itemid 
-					LEFT JOIN services_links sl on s.serviceid=sl.servicedownid 
-				WHERE (i.hostid is null or i.hostid not in ('.$denyed_hosts.')) 
-				AND '.DBid2nodeid('s.serviceid').'='.$ZBX_CURNODEID.' 
-				ORDER BY s.sortorder,s.name';
+		$query = 'SELECT DISTINCT s.* '.
+				' FROM services s '.
+					' LEFT JOIN triggers t ON s.triggerid=t.triggerid '.
+					' LEFT JOIN functions f ON t.triggerid=f.triggerid '.
+					' LEFT JOIN items i on f.itemid=i.itemid '.
+					' LEFT JOIN services_links sl on s.serviceid=sl.servicedownid '.
+				' WHERE (i.hostid is null or i.hostid not in ('.$denyed_hosts.')) '.
+				' AND '.DBin_node('s.serviceid').
+				' ORDER BY s.sortorder,s.name';
 	}
 	
 	$db_services = DBselect($query);
@@ -419,17 +419,17 @@ if(isset($_REQUEST['sform'])){
 			$parentname = 'root';
 		}
 		
-		$query = 'SELECT DISTINCT s.*, sl.soft
-				FROM services s1, services s2, services_links sl, services s 
-					LEFT JOIN triggers t ON s.triggerid=t.triggerid 
-					LEFT JOIN functions f ON t.triggerid=f.triggerid 
-					LEFT JOIN items i ON f.itemid=i.itemid 
-				WHERE (i.hostid is null or i.hostid not in ('.$denyed_hosts.')) 
-					AND '.DBid2nodeid('s.serviceid').'='.$ZBX_CURNODEID.' 
-					AND sl.serviceupid=s1.serviceid 
-					AND sl.servicedownid=s2.serviceid 
-					AND sl.serviceupid='.$service['serviceid'].'
-					AND s.serviceid=sl.servicedownid';
+		$query = 'SELECT DISTINCT s.*, sl.soft '.
+				' FROM services s1, services s2, services_links sl, services s '.
+					' LEFT JOIN triggers t ON s.triggerid=t.triggerid '.
+					' LEFT JOIN functions f ON t.triggerid=f.triggerid '.
+					' LEFT JOIN items i ON f.itemid=i.itemid '.
+				' WHERE (i.hostid is null or i.hostid not in ('.$denyed_hosts.')) '.
+					' AND '.DBin_node('s.serviceid').
+					' AND sl.serviceupid=s1.serviceid '.
+					' AND sl.servicedownid=s2.serviceid '.
+					' AND sl.serviceupid='.$service['serviceid'].
+					' AND s.serviceid=sl.servicedownid';
 					
 		$db_services = DBselect($query);
 				
@@ -697,32 +697,6 @@ if(isset($_REQUEST['sform'])){
 	$frmService->Show();
 }
 //---------------------------------------------  </FORM>  --------------------------------------------
-?>
-<?php
-/*
-	if(isset($service["serviceid"]))
-	{
-		echo BR;
-
-		$frmDetails = new CFormTable(S_ADD_SERVER_DETAILS);
-		$frmDetails->SetHelp("web.services.server.php");
-		$frmDetails->AddVar("serviceid",$service["serviceid"]);
-		$frmDetails->AddVar("path",$path);
-		 
-		$cmbServers = new CComboBox("serverid");
-		$result=DBselect("select hostid,host from hosts where ".DBid2nodeid("hostid")."=".$ZBX_CURNODEID.
-			" and hostid not in (".$denyed_hosts.") ".
-			" order by host");
-		while($row=DBfetch($result))
-		{
-			$cmbServers->AddItem($row["hostid"],$row["host"]);
-		}
-		$frmDetails->AddRow(S_SERVER,$cmbServers);
-
-		$frmDetails->AddItemToBottomRow(new CButton("add_server","Add server"));
-		$frmDetails->Show();
-	}
-*/
 ?>
 <?php
 

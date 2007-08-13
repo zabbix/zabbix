@@ -73,7 +73,7 @@ include_once "include/page_header.php";
 		" and ((h.status=".HOST_STATUS_MONITORED." and h.available != ".HOST_AVAILABLE_FALSE.") ".
 		" or (h.status=".HOST_STATUS_MONITORED." and h.available=".HOST_AVAILABLE_FALSE." and h.disable_until<=$now)) ".
 		" and i.hostid=h.hostid and i.nextcheck<$now and i.key_ not in ('status','icmpping','icmppingsec','zabbix[log]') ".
-		" and h.hostid in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,$ZBX_CURNODEID).")".
+		" and h.hostid in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,get_current_nodeid()).")".
 		" order by i.nextcheck,h.host,i.description,i.key_");
 
 	$table = new CTableInfo(S_THE_QUEUE_IS_EMPTY);
@@ -114,13 +114,19 @@ include_once "include/page_header.php";
 	}
 	else
 	{
-		$table->SetHeader(array(S_NEXT_CHECK,S_HOST,S_DESCRIPTION));
+		$table->SetHeader(array(
+				S_NEXT_CHECK,
+				is_show_subnodes() ? S_NODE : null,
+				S_HOST,
+				S_DESCRIPTION
+				));
 		while($row=DBfetch($result))
 		{
 			$table->AddRow(array(
 				date("m.d.Y H:i:s",
-				$row["nextcheck"]),
-				$row["host"],
+					$row["nextcheck"]),
+				get_node_name_by_elid($row['hostid']),
+				$row['host'],
 				item_description($row["description"],$row["key_"])
 				));
 		}

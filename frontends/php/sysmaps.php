@@ -74,7 +74,7 @@ include_once "include/page_header.php";
 			add_audit_if($result,AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP,'Name ['.$_REQUEST['name'].']');
 			show_messages($result,"Network map updated","Cannot update network map");
 		} else {
-			if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+			if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 				access_deny();
 
 			$result=add_sysmap($_REQUEST["name"],$_REQUEST["width"],$_REQUEST["height"],
@@ -115,7 +115,7 @@ include_once "include/page_header.php";
 		$table->SetHeader(array(S_NAME,S_WIDTH,S_HEIGHT,S_MAP));
 
 		$result = DBselect("select sysmapid,name,width,height from sysmaps ".
-			" where ".DBid2nodeid("sysmapid")."=".$ZBX_CURNODEID." order by name");
+			' where '.DBin_node('sysmapid').' order by name');
 		while($row=DBfetch($result))
 		{
 			if(!sysmap_accessiable($row["sysmapid"],PERM_READ_WRITE)) continue;

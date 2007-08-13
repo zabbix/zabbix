@@ -136,7 +136,7 @@ include_once "include/page_header.php";
 
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
 	
-	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST, null, null, $ZBX_CURNODEID);
+	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
 
 	$result=DBselect("select distinct g.groupid,g.name from groups g, hosts_groups hg, hosts h, items i, functions f, triggers t ".
 		" where h.hostid in (".$availiable_hosts.") ".
@@ -146,7 +146,10 @@ include_once "include/page_header.php";
 		" order by g.name");
 	while($row=DBfetch($result))
 	{
-		$cmbGroup->AddItem($row["groupid"],$row["name"]);
+		$cmbGroup->AddItem(
+				$row['groupid'],
+				get_node_name_by_elid($row['groupid']).$row['name']
+				);
 		unset($row);
 	}
 	$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
@@ -172,7 +175,10 @@ include_once "include/page_header.php";
 	$result=DBselect($sql);
 	while($row=DBfetch($result))
 	{
-		$cmbHosts->AddItem($row["hostid"],$row["host"]);
+		$cmbHosts->AddItem(
+				$row['hostid'],
+				get_node_name_by_elid($row['hostid']).$row['host']
+				);
 	}
 
 	$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
@@ -248,6 +254,7 @@ include_once "include/page_header.php";
 	$header=array();
 
 	$headers_array = array(
+		is_show_subnodes() ? array('simple_label'=>S_NODE) : null,
 		$_REQUEST['hostid'] > 0 ? null : 
 		array('select_label'=>S_HOST_BIG	, 'simple_label'=>S_HOST,		'sort'=>'host'),
 		array('select_label'=>S_NAME_BIG	, 'simple_label'=>S_NAME,		'sort'=>'description'),
@@ -300,7 +307,7 @@ include_once "include/page_header.php";
 		" t.lastchange,t.comments,t.url,t.value,h.host from triggers t,hosts h,items i,functions f".
 		" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.status=".TRIGGER_STATUS_ENABLED.
 		" and i.status=".ITEM_STATUS_ACTIVE.
-		" and ".DBid2nodeid("t.triggerid")."=".$ZBX_CURNODEID.
+		' and '.DBin_node('t.triggerid').
 		" and h.hostid not in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT).") ". 
 		" and h.status=".HOST_STATUS_MONITORED." $cond $sort");
 
@@ -384,6 +391,7 @@ include_once "include/page_header.php";
 		}
 
 		$table->AddRow(array(
+				get_node_name_by_elid($row['triggerid']),
 				$_REQUEST['hostid'] > 0 ? null : $row['host'],
 				$description,
 				$value,

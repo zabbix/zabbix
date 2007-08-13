@@ -52,7 +52,7 @@ include_once "include/page_header.php";
 		if( !($service = DBfetch(DBselect("select s.* from services s left join triggers t on s.triggerid=t.triggerid ".
 			" left join functions f on t.triggerid=f.triggerid left join items i on f.itemid=i.itemid ".
 			" where (i.hostid is null or i.hostid not in (".$denyed_hosts.")) ".
-			" and ".DBid2nodeid("s.serviceid")."=".$ZBX_CURNODEID.
+			' and '.DBin_node('s.serviceid').
 			" and s.serviceid=".$_REQUEST["serviceid"]
 			))))
 		{
@@ -78,7 +78,7 @@ include_once "include/page_header.php";
 				' LEFT JOIN services_links sl_p ON  s.serviceid = sl_p.servicedownid and sl_p.soft=0 '.
 				' LEFT JOIN functions f ON t.triggerid=f.triggerid '.
 				' LEFT JOIN items i ON f.itemid=i.itemid '.
-			' WHERE '.DBid2nodeid("s.serviceid").'='.$ZBX_CURNODEID.
+			' WHERE '.DBin_node('s.serviceid').
 			' AND (i.hostid is null or i.hostid not in ('.$denyed_hosts.')) '.
 			' ORDER BY s.sortorder, sl_p.serviceupid, s.serviceid';
 		
@@ -119,7 +119,7 @@ include_once "include/page_header.php";
 				$row['reason'] = new CList(null,"itservices");
 				$result2=DBselect("select s.triggerid,s.serviceid from services s, triggers t ".
 					" where s.status>0 and s.triggerid is not NULL and t.triggerid=s.triggerid ".
-					" and ".DBid2nodeid("s.serviceid")."=".$ZBX_CURNODEID.
+					' and '.DBin_node('s.serviceid').
 					" order by s.status desc,t.description");
 					
 				while($row2=DBfetch($result2)){

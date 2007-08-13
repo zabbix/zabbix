@@ -28,14 +28,12 @@
 		
 		function CTriggersInfo($style = STYLE_HORISONTAL)
 		{
-			global $ZBX_CURNODEID;
-
 			$this->style = null;
 
 			parent::CTable(NULL,"triggers_info");
 			$this->SetOrientation($style);
 			$this->show_header = true;
-			$this->nodeid = $ZBX_CURNODEID;
+			$this->nodeid = get_current_nodeid();
 		}
 
 		function SetOrientation($value)

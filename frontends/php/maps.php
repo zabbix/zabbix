@@ -49,9 +49,9 @@ include_once "include/page_header.php";
 
 	$all_maps = array();
 	
-	$result = DBselect("select sysmapid,name from sysmaps ".
-		" where ".DBid2nodeid("sysmapid")."=".$ZBX_CURNODEID.
-		" order by name");
+	$result = DBselect('select sysmapid,name from sysmaps '.
+		' where '.DBin_node('sysmapid').
+		' order by name');
 	while($row=DBfetch($result))
 	{
 		if(!sysmap_accessiable($row["sysmapid"],PERM_READ_ONLY))
@@ -60,7 +60,9 @@ include_once "include/page_header.php";
 		if(!isset($all_maps[0]))
 			$all_maps[0] = $row['sysmapid'];
 
-		$all_maps[$row['sysmapid']] = $row['name'];
+		$all_maps[$row['sysmapid']] = 
+			get_node_name_by_elid($row['sysmapid']).
+			$row['name'];
 	}
 
 	if(isset($_REQUEST["sysmapid"]) && (!isset($all_maps[$_REQUEST["sysmapid"]]) || $_REQUEST["sysmapid"] == 0))

@@ -91,8 +91,8 @@ include_once "include/page_header.php";
 	$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit();");
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
 
-	$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,$ZBX_CURNODEID);
-	$accessible_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST, null, null, $ZBX_CURNODEID);
+	$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,get_current_nodeid());
+	$accessible_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
 
 	$result=DBselect('select distinct g.groupid,g.name from groups g, hosts_groups hg, hosts h, '.
 		' applications a, httptest ht where g.groupid in ('.$accessible_groups.') '.
@@ -102,7 +102,10 @@ include_once "include/page_header.php";
 		" order by g.name");
 	while($row=DBfetch($result))
 	{
-		$cmbGroup->AddItem($row["groupid"],$row["name"]);
+		$cmbGroup->AddItem(
+			$row['groupid'],
+			get_node_name_by_elid($row['groupid']).$row['name']
+			);
 	}
 	$form->AddItem(S_GROUP.SPACE);
 	$form->AddItem($cmbGroup);
@@ -130,7 +133,10 @@ include_once "include/page_header.php";
 	$result=DBselect($sql);
 	while($row=DBfetch($result))
 	{
-		$cmbHosts->AddItem($row["hostid"],$row["host"]);
+		$cmbHosts->AddItem(
+			$row['hostid'],
+			get_node_name_by_elid($row['hostid']).$row['host']
+			);
 	}
 
 	$form->AddItem(SPACE.S_HOST.SPACE);
@@ -154,6 +160,7 @@ include_once "include/page_header.php";
 
 	$table  = new CTableInfo();
 	$table->SetHeader(array(
+		is_show_subnodes() ? S_NODE : null,
 		$_REQUEST["hostid"] ==0 ? S_HOST : NULL,
 		array($link, SPACE, S_NAME),
 		S_NUMBER_OF_STEPS,
@@ -232,6 +239,7 @@ include_once "include/page_header.php";
 			}
 
 			array_push($app_rows, new CRow(array(
+				is_show_subnodes() ? SPACE : null,
 				$_REQUEST["hostid"] > 0 ? NULL : SPACE,
 				array(str_repeat(SPACE,6), $name),
 				$step_cout,
@@ -258,7 +266,11 @@ include_once "include/page_header.php";
 
 			$col->SetColSpan(6);
 
-			$table->AddRow(array($_REQUEST["hostid"] > 0 ? NULL : $db_app["host"], $col));
+			$table->AddRow(array(
+					get_node_name_by_elid($db_app['applicationid']),
+					$_REQUEST["hostid"] > 0 ? NULL : $db_app["host"],
+					$col
+				));
 
 			$any_app_exist = true;
 		

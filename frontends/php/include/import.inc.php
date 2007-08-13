@@ -25,7 +25,7 @@
 	{
 		function CZabbixXMLImport()
 		{
-			global $USER_DETAILS, $ZBX_CURNODEID;
+			global $USER_DETAILS;
 
 			$this->main_node= null;
 			$this->sub_node	= null;
@@ -36,7 +36,7 @@
 			$this->graph	= array('exist' => 0, 'missed' => 0);
 			
 			$this->accessible_groups = get_accessible_groups_by_user($USER_DETAILS,
-				PERM_READ_WRITE, null, PERM_RES_IDS_ARRAY, $ZBX_CURNODEID);
+				PERM_READ_WRITE, null, PERM_RES_IDS_ARRAY, get_current_nodeid());
 		}
 		
 		function CharacterData($parser, $data) 
@@ -69,8 +69,6 @@
 				return false;
 			}
 			
-			global $ZBX_CURNODEID;
-
 			$data = &$this->data[$name];
 			
 			foreach($attrs as $id => $val)
@@ -87,7 +85,7 @@
 					
 					if($host_data = DBfetch(DBselect('select hostid from hosts'.
 						' where host='.zbx_dbstr($data['name']).
-						' and '.DBid2nodeid('hostid').'='.$ZBX_CURNODEID)))
+						' and '.DBin_node('hostid',get_current_nodeid(false)))))
 					{ /* exist */
 						if($this->host['exist']==1) /* skip */
 						{
@@ -162,7 +160,6 @@
 			}
 
 			global $USER_DETAILS;
-			global $ZBX_CURNODEID;
 			
 			$data = &$this->data[$name];
 
@@ -190,7 +187,7 @@
 						break; //case
 
 					if(!($group = DBfetch(DBselect('select groupid, name from groups'.
-						' where '.DBid2nodeid('groupid').'='.$ZBX_CURNODEID.
+						' where '.DBin_node('groupid',get_current_nodeid(false)).
 						' and name='.zbx_dbstr($this->element_data)))))
 					{
 						error('Missed group ['.$this->element_data.']');
@@ -214,7 +211,7 @@
 						break; //case
 
 					if(!($application = DBfetch(DBselect('select applicationid from applications'.
-						' where '.DBid2nodeid('applicationid').'='.$ZBX_CURNODEID.
+						' where '.DBin_node('applicationid',get_current_nodeid(false)).
 						' and name='.zbx_dbstr($this->element_data).
 						' and hostid='.$this->data[XML_TAG_HOST]['hostid']))))
 					{
@@ -267,7 +264,7 @@
 					if(!empty($data['valuemap']))
 					{
 						if( $valuemap = DBfetch(DBselect('select valuemapid from valuemaps '.
-										' where '.DBid2nodeid('valuemapid').'='.$ZBX_CURNODEID.
+										' where '.DBin_node('valuemapid', get_current_nodeid(false)).
 										' and name='.zbx_dbstr($data['valuemap']))) )
 						{
 							$data['valuemapid'] = $valuemap['valuemapid'];
@@ -281,7 +278,7 @@
 					if($item = DBfetch(DBselect('select itemid,valuemapid,templateid from items'.
 						' where key_='.zbx_dbstr($data['key']).
 						' and hostid='.$this->data[XML_TAG_HOST]['hostid'].' and '.
-						DBid2nodeid('itemid').'='.$ZBX_CURNODEID)))
+						DBin_node('itemid', get_current_nodeid(false)))))
 					{ /* exist */
 						if($this->item['exist']==1) /* skip */
 						{

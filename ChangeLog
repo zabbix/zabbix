@@ -1,5 +1,6 @@
 Changes for 1.4.2:
 
+ - developed data monitoring of multiple nodes (Eugene)
  - support of new parameter for count(period,value,operator) (Alexei)
  - new trigger function iregexp(), non case-sensitive regexp (Alexei) 
  - fixed upgrade script to correctly process host-template linkage (Alexei)

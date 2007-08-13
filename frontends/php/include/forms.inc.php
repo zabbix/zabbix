@@ -28,6 +28,8 @@
 
 	function	insert_slideshow_form()
 	{
+		global $_REQUEST;
+
 		$form = new CFormTable(S_SLIDESHOW, null, 'post');
 		$form->SetHelp('config_advanced.php');
 		
@@ -159,6 +161,8 @@
 
 	function	insert_drule_form()
 	{
+		global $_REQUEST;
+
 		$frm_title = S_DISCOVERY_RULE;
 			
 		if(isset($_REQUEST['druleid']))
@@ -341,6 +345,8 @@
 	
 	function	insert_httptest_form()
 	{
+		global $_REQUEST;
+
 		$form = new CFormTable(S_SCENARIO, null, 'post');
 		$form->SetHelp("web.webmon.httpconf.php");
 		
@@ -532,7 +538,9 @@
 	
 	function	insert_node_form()
 	{
-		global $ZBX_CURNODEID, $ZBX_CURMASTERID;
+		global $_REQUEST;
+
+		global $ZBX_CURMASTERID;
 		
 		$frm_title = S_NODE;
 			
@@ -576,7 +584,7 @@
 			$slave_trends	= get_request('slave_trends',365);
 			$node_type	= get_request('node_type', ZBX_NODE_REMOTE);
 
-			$masterid	= get_request('masterid', $ZBX_CURNODEID);
+			$masterid	= get_request('masterid', get_current_nodeid(false));
 		}
 
 		$master_node = DBfetch(DBselect('select name from nodes where nodeid='.$masterid));
@@ -665,6 +673,8 @@
 	# Insert form for User
 	function	insert_user_form($userid,$profile=0)
 	{
+		global $_REQUEST;
+
 		$frm_title = S_USER;
 		if(isset($userid))
 		{
@@ -938,7 +948,6 @@
 	function	insert_usergroups_form()
 	{
 		global  $_REQUEST;
-		global  $ZBX_CURNODEID;
 
 		$frm_title = S_USER_GROUP;
 		if(isset($_REQUEST["usrgrpid"]))
@@ -1173,7 +1182,7 @@
 
 	function	insert_item_selection_form()
 	{
-		global  $ZBX_CURNODEID;
+		global $_REQUEST;
 
 		if(isset($_REQUEST['form_refresh']) && isset($_REQUEST['select']))
 		{
@@ -1455,7 +1464,6 @@
 	{
 		global  $_REQUEST;
 		global  $USER_DETAILS;
-		global  $ZBX_CURNODEID;
 
 		$frmItem = new CFormTable(S_ITEM);
 		$frmItem->SetHelp("web.items.item.php");
@@ -1810,9 +1818,12 @@
 			{
 				$cmbMap = new CComboBox("valuemapid",$valuemapid);
 				$cmbMap->AddItem(0,S_AS_IS);
-				$db_valuemaps = DBselect("select * from valuemaps where ".DBid2nodeid("valuemapid")."=".$ZBX_CURNODEID);
+				$db_valuemaps = DBselect('select * from valuemaps where '.DBin_node('valuemapid'));
 				while($db_valuemap = DBfetch($db_valuemaps))
-					$cmbMap->AddItem($db_valuemap["valuemapid"],$db_valuemap["name"]);
+					$cmbMap->AddItem(
+						$db_valuemap["valuemapid"],
+						get_node_name_by_elid($db_valuemap["valuemapid"]).$db_valuemap["name"]
+						);
 			}
 			
 			$link = new CLink("throw map","config.php?config=6","action");
@@ -1880,11 +1891,14 @@
 	        $cmbGroups = new CComboBox("add_groupid",$add_groupid);		
 
 	        $groups=DBselect("select distinct groupid,name from groups ".
-			"where groupid in (".get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,$ZBX_CURNODEID).") ".
+			"where groupid in (".get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,get_current_nodeid()).") ".
 			" order by name");
 	        while($group=DBfetch($groups))
 	        {
-			$cmbGroups->AddItem($group["groupid"],$group["name"]);
+			$cmbGroups->AddItem(
+					$group["groupid"],
+					get_node_name_by_elid($group["groupid"]).$group["name"]
+					);
 	        }
 		$frmItem->AddRow(S_GROUP,$cmbGroups);
 
@@ -1906,7 +1920,6 @@
 	{
 		global  $_REQUEST;
 		global  $USER_DETAILS;
-		global  $ZBX_CURNODEID;
 
 		$frmItem = new CFormTable(S_ITEM,null,'post');
 		$frmItem->SetHelp("web.items.item.php");
@@ -2070,9 +2083,12 @@
 		
 		$cmbMap = new CComboBox('valuemapid',$valuemapid);
 		$cmbMap->AddItem(0,S_AS_IS);
-		$db_valuemaps = DBselect("select * from valuemaps where ".DBid2nodeid("valuemapid")."=".$ZBX_CURNODEID);
+		$db_valuemaps = DBselect('select * from valuemaps where '.DBin_node('valuemapid'));
 		while($db_valuemap = DBfetch($db_valuemaps))
-			$cmbMap->AddItem($db_valuemap["valuemapid"],$db_valuemap["name"]);
+			$cmbMap->AddItem(
+					$db_valuemap["valuemapid"],
+					get_node_name_by_elid($db_valuemap["valuemapid"]).$db_valuemap["name"]
+					);
 		
 		$link = new CLink("throw map","config.php?config=6","action");
 		$link->AddOption("target","_blank");
@@ -2193,6 +2209,8 @@
 	# Insert form for Trigger
 	function	insert_trigger_form()
 	{
+		global $_REQUEST;
+
 		$frmTrig = new CFormTable(S_TRIGGER,"triggers.php");
 		$frmTrig->SetHelp("config_triggers.php");
 
@@ -2534,6 +2552,8 @@
 
 	function	insert_graphitem_form()
 	{
+		global $_REQUEST;
+
 		$frmGItem = new CFormTable(S_NEW_ITEM_FOR_THE_GRAPH);
 		$frmGItem->SetName('graph_item');
 		$frmGItem->SetHelp("web.graph.item.php");
@@ -2653,6 +2673,8 @@
 
 	function	insert_value_mapping_form()
 	{
+		global $_REQUEST;
+
 		$frmValmap = new CFormTable(S_VALUE_MAP);
 		$frmValmap->SetHelp("web.mapping.php");
 		$frmValmap->AddVar("config",get_request("config",6));
@@ -2739,7 +2761,6 @@
 include_once 'include/discovery.inc.php';
 
 		global  $_REQUEST;
-		global  $ZBX_CURNODEID;
 
 		$uid=null;
 
@@ -3276,6 +3297,8 @@ include_once 'include/discovery.inc.php';
 
 	function	insert_media_type_form()
 	{
+		global $_REQUEST;
+
 		$type		= get_request("type",0);
 		$description	= get_request("description","");
 		$smtp_server	= get_request("smtp_server","localhost");
@@ -3351,6 +3374,8 @@ include_once 'include/discovery.inc.php';
 
 	function	insert_image_form()
 	{
+		global $_REQUEST;
+
 		$frmImages = new CFormTable(S_IMAGE,"config.php","post","multipart/form-data");
 		$frmImages->SetHelp("web.config.images.php");
 		$frmImages->AddVar("config",get_request("config",3));
@@ -3737,7 +3762,6 @@ include_once 'include/discovery.inc.php';
 	{	/* NOTE: only NEW media is acessed */
 
 		global $_REQUEST;
-		global $ZBX_CURNODEID;
 
 		$severity	= get_request("severity",array(0,1,2,3,4,5));
 		$sendto		= get_request("sendto","");
@@ -3752,10 +3776,13 @@ include_once 'include/discovery.inc.php';
 
 		$cmbType = new CComboBox("mediatypeid",$mediatypeid);
 		$types=DBselect("select mediatypeid,description from media_type".
-				" where ".DBid2nodeid("mediatypeid")."=".$ZBX_CURNODEID." order by type");
+				' where '.DBin_node('mediatypeid').' order by type');
 		while($type=DBfetch($types))
 		{
-			$cmbType->AddItem($type["mediatypeid"],$type["description"]);
+			$cmbType->AddItem(
+					$type["mediatypeid"],
+					get_node_name_by_elid($type["mediatypeid"]).$type["description"]
+					);
 		}
 		$frmMedia->AddRow(S_TYPE,$cmbType);
 
@@ -3823,8 +3850,6 @@ include_once 'include/discovery.inc.php';
 
 	function	insert_other_parameters_form()
 	{
-		global $ZBX_CURNODEID;
-
 		$config=select_config();
 		
 		$frmHouseKeep = new CFormTable(S_OTHER_PARAMETERS,'config.php');
@@ -3837,10 +3862,13 @@ include_once 'include/discovery.inc.php';
 		$cmbUsrGrp = new CComboBox('alert_usrgrpid', $config['alert_usrgrpid']);
 		$cmbUsrGrp->AddItem(0, S_NONE);
 		$result=DBselect('select usrgrpid,name from usrgrp'.
-				' where '.DBid2nodeid('usrgrpid').'='.$ZBX_CURNODEID.
+				' where '.DBin_node('usrgrpid').
 				' order by name');
 		while($row=DBfetch($result))
-			$cmbUsrGrp->AddItem($row['usrgrpid'], $row['name']);
+			$cmbUsrGrp->AddItem(
+					$row['usrgrpid'],
+					get_node_name_by_elid($row['usrgrpid']).$row['name']
+					);
 		$frmHouseKeep->AddRow(S_USER_GROUP_FOR_DATABASE_DOWN_MESSAGE,$cmbUsrGrp);
 
 		$frmHouseKeep->AddItemToBottomRow(new CButton('save',S_SAVE));
@@ -3849,7 +3877,6 @@ include_once 'include/discovery.inc.php';
 
 	function	insert_host_form($show_only_tmp=0)
 	{
-		global $ZBX_CURNODEID;
 		global $USER_DETAILS;
 		global $_REQUEST;
 
@@ -3908,7 +3935,7 @@ include_once 'include/discovery.inc.php';
 // add groups
 			$db_groups=DBselect("select distinct groupid from hosts_groups where hostid=".$_REQUEST["hostid"].
 				" and groupid in (".
-				get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST,null,null,$ZBX_CURNODEID).
+				get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST,null,null,get_current_nodeid()).
 				") ");
 			while($db_group=DBfetch($db_groups)){
 				if(in_array($db_group["groupid"],$groups)) continue;
@@ -3958,7 +3985,7 @@ include_once 'include/discovery.inc.php';
 		
 		$db_groups=DBselect("select distinct groupid,name from groups ".
 			" where groupid in (".
-			get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST,null,null,$ZBX_CURNODEID).
+			get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST,null,null,get_current_nodeid()).
 			") order by name");
 		while($db_group=DBfetch($db_groups))
 		{
@@ -3969,7 +3996,7 @@ include_once 'include/discovery.inc.php';
 						null,
 						$db_group["groupid"]
 						),
-					$db_group["name"]
+					get_node_name_by_elid($db_group["groupid"]).$db_group["name"]
 				),
 				BR);
 		}
@@ -4111,7 +4138,6 @@ include_once 'include/discovery.inc.php';
 	{
 		global  $_REQUEST;
 		global	$USER_DETAILS;
-		global	$ZBX_CURNODEID;
 
 		$hosts = get_request("hosts",array());
 		$frm_title = S_HOST_GROUP;
@@ -4151,11 +4177,14 @@ include_once 'include/discovery.inc.php';
 		$cmbHosts = new CListBox("hosts[]",$hosts,10);
 		$db_hosts=DBselect("select distinct hostid,host from hosts".
 			" where status<>".HOST_STATUS_DELETED.
-			" and hostid in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,$ZBX_CURNODEID).")".
+			" and hostid in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,get_current_nodeid()).")".
 			" order by host");
 		while($db_host=DBfetch($db_hosts))
 		{
-			$cmbHosts->AddItem($db_host["hostid"],$db_host["host"]);
+			$cmbHosts->AddItem(
+					$db_host["hostid"],
+					get_node_name_by_elid($db_host["hostid"]).$db_host["host"]
+					);
 		}
 		$frmHostG->AddRow(S_HOSTS,$cmbHosts);
 
@@ -4179,6 +4208,8 @@ include_once 'include/discovery.inc.php';
 	# Insert host profile ReadOnly form
 	function	insert_host_profile_form()
 	{
+		global $_REQUEST;
+
 		$frmHostP = new CFormTable(S_HOST_PROFILE);
 		$frmHostP->SetHelp("web.host_profile.php");
 
@@ -4293,7 +4324,6 @@ include_once 'include/discovery.inc.php';
 	function insert_map_form()
 	{
 		global $_REQUEST;
-		global $ZBX_CURNODEID;
 
 		$frm_title = "New system map";
 
@@ -4335,10 +4365,13 @@ include_once 'include/discovery.inc.php';
 
 		$cmbImg = new CComboBox("backgroundid",$backgroundid);
 		$cmbImg->AddItem(0,"No image...");
-		$result=DBselect("select * from images where imagetype=2 and ".DBid2nodeid("imageid")."=".$ZBX_CURNODEID." order by name");
+		$result=DBselect('select * from images where imagetype=2 and '.DBin_node('imageid').' order by name');
 		while($row=DBfetch($result))
 		{
-			$cmbImg->AddItem($row["imageid"],$row["name"]);
+			$cmbImg->AddItem(
+					$row["imageid"],
+					get_node_name_by_elid($row["imageid"]).$row["name"]
+					);
 		}
 		$frmMap->AddRow(S_BACKGROUND_IMAGE,$cmbImg);
 
@@ -4374,7 +4407,6 @@ include_once 'include/discovery.inc.php';
 
 	function insert_map_element_form()
 	{
-		global $ZBX_CURNODEID;
 		global $USER_DETAILS;
 
 		$frmEl = new CFormTable("New map element","sysmap.php");
@@ -4550,9 +4582,11 @@ include_once 'include/discovery.inc.php';
 		$cmbIconOff	= new CComboBox("iconid_off",$iconid_off);
 		$cmbIconOn	= new CComboBox("iconid_on",$iconid_on);
 		$cmbIconUnknown	= new CComboBox("iconid_unknown",$iconid_unknown);
-		$result = DBselect("select * from images where imagetype=1 and ".DBid2nodeid("imageid")."=".$ZBX_CURNODEID." order by name");
+		$result = DBselect('select * from images where imagetype=1 and '.DBin_node('imageid').' order by name');
 		while($row=DBfetch($result))
 		{
+			$row["name"] = get_node_name_by_elid($row["imageid"]).$row["name"];
+
 			$cmbIconOff->AddItem($row["imageid"],$row["name"]);
 			$cmbIconOn->AddItem($row["imageid"],$row["name"]);
 			$cmbIconUnknown->AddItem($row["imageid"],$row["name"]);
@@ -4580,6 +4614,8 @@ include_once 'include/discovery.inc.php';
 
 	function insert_map_link_form()
 	{
+		global $_REQUEST;
+
 		$frmCnct = new CFormTable("New connector","sysmap.php");
 		$frmCnct->SetHelp("web.sysmap.connector.php");
 		$frmCnct->AddVar("sysmapid",$_REQUEST["sysmapid"]);

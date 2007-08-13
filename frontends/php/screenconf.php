@@ -95,7 +95,7 @@ include_once "include/page_header.php";
 				$audit_action = AUDIT_ACTION_UPDATE;
 				show_messages($result, S_SCREEN_UPDATED, S_CANNOT_UPDATE_SCREEN);
 			} else {
-				if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+				if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 					access_deny();
 
 				$result=add_screen($_REQUEST["name"],$_REQUEST["hsize"],$_REQUEST["vsize"]);
@@ -246,7 +246,7 @@ include_once "include/page_header.php";
 			$table = new CTableInfo(S_NO_SCREENS_DEFINED);
 			$table->SetHeader(array(S_NAME,S_DIMENSION_COLS_ROWS,S_SCREEN));
 
-			$result=DBselect("select screenid,name,hsize,vsize from screens where ".DBid2nodeid("screenid")."=".$ZBX_CURNODEID.
+			$result=DBselect('select screenid,name,hsize,vsize from screens where '.DBin_node('screenid').
 					" order by name");
 			while($row=DBfetch($result))
 			{
@@ -277,7 +277,7 @@ include_once "include/page_header.php";
 
 			$db_slides = DBselect('select s.slideshowid, s.name, s.delay, count(*) as cnt '.
 				' from slideshows s left join slides sl on sl.slideshowid=s.slideshowid '.
-				' where '.DBid2nodeid('s.slideshowid').'='.$ZBX_CURNODEID.
+				' where '.DBin_node('s.slideshowid').
 				' group by s.slideshowid,s.name,s.delay '.
 				' order by s.name,s.slideshowid');
 			while($slide_data = DBfetch($db_slides))

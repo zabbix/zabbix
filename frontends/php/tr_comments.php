@@ -55,7 +55,7 @@ include_once "include/page_header.php";
 	if(! ($db_data = DBfetch(DBselect('select * from items i, functions f '.
 	                        ' where i.itemid=f.itemid and f.triggerid='.$_REQUEST["triggerid"].
 				" and i.hostid not in (".$denyed_hosts.")".
-				" and ".DBid2nodeid("f.triggerid")."=".$ZBX_CURNODEID
+				' and '.DBin_node('f.triggerid')
 				))))
 	{
 		access_deny();

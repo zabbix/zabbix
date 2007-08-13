@@ -101,8 +101,8 @@ include_once "include/page_header.php";
 
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
 	
-	$availiable_groups= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST, null, null, $ZBX_CURNODEID);
-	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST, null, null, $ZBX_CURNODEID);
+	$availiable_groups= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
+	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
 
 	$result=DBselect("select distinct g.groupid,g.name from groups g, hosts_groups hg, hosts h, items i ".
 		" where g.groupid in (".$availiable_groups.") ".
@@ -111,13 +111,16 @@ include_once "include/page_header.php";
 		" order by g.name");
 	while($row=DBfetch($result))
 	{
-		$cmbGroup->AddItem($row["groupid"],$row["name"]);
+		$cmbGroup->AddItem(
+				$row['groupid'],
+				get_node_name_by_elid($row['groupid']).$row['name']
+				);
 	}
 	$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
 	
 	if($_REQUEST["groupid"] > 0)
 	{
-		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED.
+		$sql="select distinct h.hostid,h.host from hosts h,items i,hosts_groups hg where h.status=".HOST_STATUS_MONITORED.
 			" and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid".
 			" and i.status=".ITEM_STATUS_ACTIVE.
 			" and h.hostid in (".$availiable_hosts.") ".
@@ -126,7 +129,7 @@ include_once "include/page_header.php";
 	else
 	{
 		$cmbHosts->AddItem(0,S_ALL_SMALL);
-		$sql="select h.hostid,h.host from hosts h,items i where h.status=".HOST_STATUS_MONITORED.
+		$sql="select distinct h.hostid,h.host from hosts h,items i where h.status=".HOST_STATUS_MONITORED.
 			" and i.status=".ITEM_STATUS_ACTIVE." and h.hostid=i.hostid".
 			" and h.hostid in (".$availiable_hosts.") ".
 			" group by h.hostid,h.host order by h.host";
@@ -134,7 +137,10 @@ include_once "include/page_header.php";
 	$result=DBselect($sql);
 	while($row=DBfetch($result))
 	{
-		$cmbHosts->AddItem($row["hostid"],$row["host"]);
+		$cmbHosts->AddItem(
+				$row['hostid'],
+				get_node_name_by_elid($row['hostid']).$row["host"]
+				);
 	}
 
 	$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
@@ -164,6 +170,7 @@ include_once "include/page_header.php";
 
 	$table=new CTableInfo();
 	$table->SetHeader(array(
+		is_show_subnodes() ? S_NODE : null,
 		$_REQUEST["hostid"] ==0 ? S_HOST : NULL,
 		($link->ToString()).SPACE.S_DESCRIPTION,
 		S_LAST_CHECK,S_LAST_VALUE,S_CHANGE,S_HISTORY));
@@ -229,8 +236,8 @@ include_once "include/page_header.php";
 			{
 				$actions=new CLink(S_HISTORY,"history.php?action=showvalues&period=3600&itemid=".$db_item["itemid"],"action");
 			}
-
 			array_push($app_rows, new CRow(array(
+				is_show_subnodes() ? SPACE : null,
 				$_REQUEST["hostid"] > 0 ? NULL : SPACE,
 				str_repeat(SPACE,6).$description,
 				$lastclock,
@@ -256,7 +263,11 @@ include_once "include/page_header.php";
 				SPACE."(".$item_cnt.SPACE.S_ITEMS.")"));
 			$col->SetColSpan(5);
 
-			$table->ShowRow(array($_REQUEST["hostid"] > 0 ? NULL : $db_app["host"], $col));
+			$table->ShowRow(array(
+					get_node_name_by_elid($db_app['hostid']),
+					$_REQUEST["hostid"] > 0 ? NULL : $db_app["host"],
+					$col
+					));
 
 			$any_app_exist = true;
 		
@@ -315,6 +326,7 @@ include_once "include/page_header.php";
 		}
 
 		array_push($app_rows, new CRow(array(
+			is_show_subnodes() ? SPACE : null,
 			$_REQUEST["hostid"] > 0 ? NULL : $db_item["host"],
 			str_repeat(SPACE, ($any_app_exist ? 6 : 0)).$description,
 			$lastclock,
@@ -343,7 +355,11 @@ include_once "include/page_header.php";
 				SPACE."(".$item_cnt.SPACE.S_ITEMS.")"));
 			$col->SetColSpan(5);
 
-			$table->ShowRow(array($_REQUEST["hostid"] > 0 ? NULL : SPACE, $col));
+			$table->ShowRow(array(
+						is_show_subnodes() ? SPACE : null,
+						$_REQUEST["hostid"] > 0 ? NULL : SPACE,
+						$col
+					));
 		}	
 		foreach($app_rows as $row)
 			$table->ShowRow($row);
