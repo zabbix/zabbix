@@ -147,7 +147,7 @@ include_once "include/page_header.php";
 
 	$to_save_request = null;
 
-	if( !isset($_REQUEST['plaintext']) && !$_REQUEST['fullscreen'] )
+	if( !isset($_REQUEST['plaintext']) && !isset($_REQUEST['fullscreen']) )
 	{
 		if($item_type == ITEM_VALUE_TYPE_LOG)
 		{
