@@ -26,7 +26,7 @@
 	$page["file"]	= "history.php";
 	$page["title"]	= "S_HISTORY";
 
-	if(isset($_REQUEST["plaintext"]))
+	if(isset($_REQUEST['plaintext']) || isset($_REQUEST['fullscreen']))
 	{
 		define('ZBX_PAGE_NO_MENU', 1);
 	}
@@ -69,7 +69,8 @@ include_once "include/page_header.php";
 /* other */
 		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 		"form_copy_to"=>	array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	null,	null,	null)
+		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	null,	null,	null),
+		"fullscreen"=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,	null)
 	);
 
 	check_fields($fields);
@@ -144,10 +145,10 @@ include_once "include/page_header.php";
 
 	unset($item_data);
 
-	if(!isset($_REQUEST["plaintext"]))
-	{
-		$to_save_request = null;
+	$to_save_request = null;
 
+	if( !isset($_REQUEST['plaintext']) && !$_REQUEST['fullscreen'] )
+	{
 		if($item_type == ITEM_VALUE_TYPE_LOG)
 		{
 			$l_header = new CForm();
@@ -284,7 +285,9 @@ include_once "include/page_header.php";
 				$r_header = null;
 			}
 
-				if($l_header || $r_header)
+			if( ($l_header || $r_header) &&
+				!isset($_REQUEST['fullscreen'])
+				)
 					show_table_header($l_header,$r_header);
 		}
 		else
