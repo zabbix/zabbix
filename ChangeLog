@@ -1,5 +1,6 @@
 Changes for 1.4.2:
 
+ - added missing index on items_applications.itemid (Alexei)
  - fixed processing of SNMP octet strings (Alexei)
  - fixed division by zero in ZABBIX server (Alexei)
  - support of parameters NodeNoEvents and NodeNoHistory (Alexei)
