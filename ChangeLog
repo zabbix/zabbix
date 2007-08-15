@@ -1,5 +1,6 @@
 Changes for 1.4.2:
 
+ - fixed displaying of text data (EOL) in screens (Alexei)
  - added missing { and } when displaying trigger expressions (Alexei)
  - fixed processing of negative SNMP integers (Alexei)
  - fixed processing of MM in format of log timestamps (Alexei)

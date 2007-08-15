@@ -948,7 +948,7 @@ require_once('include/classes/ctree.inc.php');
 					}
 					/* do not use break */
 				case ITEM_VALUE_TYPE_STR:	
-					$value = nbsp(htmlspecialchars($row["value"]));
+					$value = nl2br(nbsp(htmlspecialchars($row["value"])));
 					break;
 				
 				default:
