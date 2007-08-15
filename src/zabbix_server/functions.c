@@ -224,13 +224,14 @@ void	calc_timestamp(char *line,int *timestamp, char *format)
 		dd,
 		MM);
 
-	if(hh!=0&&mm!=0&&ss!=0&&yyyy!=0&&dd!=0&&MM!=0)
+	/* Seconds can be ignored. No ssc here. */
+	if(hhc!=0&&mmc!=0&&yyyyc!=0&&ddc!=0&&MMc!=0)
 	{
 		tm.tm_sec=ss;
 		tm.tm_min=mm;
 		tm.tm_hour=hh;
 		tm.tm_mday=dd;
-		tm.tm_mon=MM;
+		tm.tm_mon=MM-1;
 		tm.tm_year=yyyy-1900;
 
 		t=mktime(&tm);
