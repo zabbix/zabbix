@@ -1,5 +1,6 @@
 Changes for 1.4.2:
 
+ - fixed processing of triggers on delta items. Thanks to Palmertree. (Alexei)
  - updated German translation. Thanks to Beam. (Alexei)
  - changed help string for parameter '-s' of zabbix_sender (Alexei)
  - fixed displaying of text data (EOL) in screens (Alexei)
