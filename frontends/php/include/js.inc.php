@@ -81,7 +81,7 @@ function	get_dynamic_chart($img_src,$width=0){
 			width = "&width=" + (scr_width - 100 + parseInt(width));
 		}
 		
-		document.write(\'<img alt="chart" src=" + img_src + width + " />\');
+		document.write(\'<img alt="chart" src="\'+img_src + width +\'" />\');
 		-->
 		</script>';
 return $result;
