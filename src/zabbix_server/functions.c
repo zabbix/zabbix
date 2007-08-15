@@ -561,7 +561,7 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
+static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 {
 	char	value_esc[MAX_STRING_LEN];
 
@@ -591,13 +591,30 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 			{
 				if((item->prevorgvalue_null == 0) && (item->prevorgvalue_dbl <= value->dbl) )
 				{
-					DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue='" ZBX_FS_DBL "',"
-					"lastvalue='" ZBX_FS_DBL "',lastclock=%d where itemid=" ZBX_FS_UI64,
-						calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
-						value->dbl,
-						(value->dbl - item->prevorgvalue_dbl)/(now-item->lastclock),
-						(int)now,
-						item->itemid);
+					/* In order to continue normal processing, we assume difference 1 second
+					   Otherwise function update_functions and update_triggers won't work correctly*/
+					if(now != item->lastclock)
+					{
+						DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue='" ZBX_FS_DBL "',"
+						"lastvalue='" ZBX_FS_DBL "',lastclock=%d where itemid=" ZBX_FS_UI64,
+							calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
+							value->dbl,
+							(value->dbl - item->prevorgvalue_dbl)/(now-item->lastclock),
+							(int)now,
+							item->itemid);
+						value->dbl = (value->dbl - item->prevorgvalue_dbl)/(now-item->lastclock);
+					}
+					else
+					{
+						DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue='" ZBX_FS_DBL "',"
+						"lastvalue='" ZBX_FS_DBL "',lastclock=%d where itemid=" ZBX_FS_UI64,
+							calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
+							value->dbl,
+							value->dbl - item->prevorgvalue_dbl,
+							(int)now,
+							item->itemid);
+						value->dbl = (value->dbl - item->prevorgvalue_dbl);
+					}
 				}
 				else
 				{
@@ -615,13 +632,28 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 			{
 				if((item->prevorgvalue_null == 0) && (item->prevorgvalue_uint64 <= value->ui64) )
 				{
-					DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue='" ZBX_FS_UI64 "',"
-					"lastvalue='" ZBX_FS_DBL "',lastclock=%d where itemid=" ZBX_FS_UI64,
-						calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
-						value->ui64,
-						((double)(value->ui64 - item->prevorgvalue_uint64))/(now-item->lastclock),
-						(int)now,
-						item->itemid);
+					if(now != item->lastclock)
+					{
+						DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue='" ZBX_FS_UI64 "',"
+						"lastvalue='" ZBX_FS_DBL "',lastclock=%d where itemid=" ZBX_FS_UI64,
+							calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
+							value->ui64,
+							((double)(value->ui64 - item->prevorgvalue_uint64))/(now-item->lastclock),
+							(int)now,
+							item->itemid);
+						value->dbl = ((double)(value->ui64 - item->prevorgvalue_uint64))/(now-item->lastclock);
+					}
+					else
+					{
+						DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue='" ZBX_FS_UI64 "',"
+						"lastvalue='" ZBX_FS_DBL "',lastclock=%d where itemid=" ZBX_FS_UI64,
+							calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
+							value->ui64,
+							(double)(value->ui64 - item->prevorgvalue_uint64),
+							(int)now,
+							item->itemid);
+						value->dbl = (double)(value->ui64 - item->prevorgvalue_uint64);
+					}
 				}
 				else
 				{
@@ -650,6 +682,7 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 						(value->dbl - item->prevorgvalue_dbl),
 						(int)now,
 						item->itemid);
+					value->dbl = (double)(value->dbl - item->prevorgvalue_dbl);
 				}
 				else
 				{
@@ -674,6 +707,7 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 						(value->ui64 - item->prevorgvalue_uint64),
 						(int)now,
 						item->itemid);
+					value->ui64 = value->ui64 - item->prevorgvalue_uint64;
 				}
 				else
 				{
@@ -716,8 +750,6 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 	item->lastclock = now;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "End update_item()");
-
-	return SUCCEED;
 }
 
 /******************************************************************************
@@ -772,6 +804,5 @@ void	process_new_value(DB_ITEM *item, AGENT_RESULT *value)
 
 	add_history(item, value, now);
 	update_item(item, value, now);
-
 	update_functions( item );
 }
