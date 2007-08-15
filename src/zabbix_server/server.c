@@ -17,7 +17,7 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-/* #define ZABBIX_TEST */
+/*#define ZABBIX_TEST*/
 
 #include "common.h"
 
@@ -48,6 +48,10 @@
 #include "utils/nodechange.h"
 
 #define       LISTENQ 1024
+
+#ifdef ZABBIX_TEST
+#include <time.h>
+#endif
 
 char *progname = NULL;
 char title_message[] = "ZABBIX Server (daemon)";
@@ -390,7 +394,6 @@ void test_compress_signs()
 {
 
 #define ZBX_SIGN struct zbx_sign_t
-
 ZBX_SIGN
 {
         char	*str;
@@ -492,6 +495,52 @@ void test_templates()
 	DBclose();
 }
 
+void test_calc_timestamp()
+{
+#define ZBX_TEST_TIME struct zbx_test_time_t
+ZBX_TEST_TIME
+{
+        char	*line;
+        char	*format;
+        char	*expected;
+};
+
+ZBX_TEST_TIME expressions[]=
+{
+		{"2006/11/10 10:20:56 Long file record....",	"yyyy MM dd hh mm ss",	"2006/11/10 10:20:56"},
+		{"2007/01/02 11:22:33 Long file record....",	"yyyy MM dd hh mm ss",	"2007/01/02 11:22:33"},
+		{"2007/12/01 11:22:00 Long file record....",	"yyyy MM dd hh mm ss",	"2007/12/01 11:22:00"},
+		{"2000/01/01 00:00:00 Long file record....",	"yyyy MM dd hh mm ss",	"2000/01/01 00:00:00"},
+		{"2000/01/01 00:00:00 Long file record....",	"yyyy MM dd hh mm",	"2000/01/01 00:00:00"},
+		{NULL}
+};
+	int	i;
+	int	t;
+	time_t	time;
+	char	str_time[MAX_STRING_LEN];
+	struct	tm *local_time = NULL;
+
+	printf("-= Test calc_timestamp =-\n");
+
+	for(i=0;expressions[i].line!=NULL;i++)
+	{
+		calc_timestamp(expressions[i].line,&t, expressions[i].format);
+		time = (time_t)t;
+		local_time = localtime(&time);
+		strftime( str_time, MAX_STRING_LEN, "%Y/%m/%d %H:%M:%S", local_time );
+		printf("format [%s] expected [%s] got [%s]\n",
+			expressions[i].format,
+			expressions[i].expected,
+			str_time);
+		if(strcmp(expressions[i].expected, str_time)!=0)
+		{
+			printf("FAILED!\n");
+			exit(-1);
+		}
+	}
+	printf("Passed OK\n");
+}
+
 void test()
 {
 
@@ -513,7 +562,8 @@ void test()
 /*	test_expressions(); */
 /*	test_db_connection(); */
 /*	test_variable_argument_list(); */
-	test_templates();
+/*	test_templates();*/
+	test_calc_timestamp();
 
 	printf("\n-= Test completed =-\n");
 }
