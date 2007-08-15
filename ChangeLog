@@ -1,5 +1,6 @@
 Changes for 1.4.2:
 
+ - updated German translation. Thanks to Beam. (Alexei)
  - changed help string for parameter '-s' of zabbix_sender (Alexei)
  - fixed displaying of text data (EOL) in screens (Alexei)
  - added missing { and } when displaying trigger expressions (Alexei)
