@@ -38,7 +38,7 @@ char *help_message[] = {
 	"",
 	"  -z --zabbix-server <Server>          Hostname or IP address of ZABBIX Server",
 	"  -p --port <Server port>              Specify port number of server trapper running on the server. Default is 10051",
-	"  -s --host <Hostname>                 Specify host name",
+	"  -s --host <Hostname>                 Specify host name. Host IP address and DNS name will not work.",
 	"",
 	"  -k --key <Key>                       Specify metric name (key) we want to send",
 	"  -o --value <Key value>               Specify value of the key",
