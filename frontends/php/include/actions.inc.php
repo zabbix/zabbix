@@ -749,7 +749,7 @@ include_once 'include/discovery.inc.php';
 		{
 			$cmd = trim($cmd, "\x00..\x1F");
 			if(!ereg("^([0-9a-zA-Z\_\.[.-.]]{1,})(:|#)[[:print:]]*$",$cmd,$cmd_items)){
-				error("incorrect command: '$cmd'");
+				error("Incorrect command: '$cmd'");
 				return FALSE;
 			}
 			if($cmd_items[2] == "#")
