@@ -1,5 +1,6 @@
 Changes for 1.4.2:
 
+ - fixed processing of negative SNMP integers (Alexei)
  - fixed processing of MM in format of log timestamps (Alexei)
  - added missing index on items_applications.itemid (Alexei)
  - fixed processing of SNMP octet strings (Alexei)
