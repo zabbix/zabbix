@@ -17,6 +17,7 @@ CREATE TABLE items_applications_tmp (
 	PRIMARY KEY (itemappid)
 ) with OIDS;
 CREATE INDEX items_applications_1 on items_applications_tmp (applicationid,itemid);
+CREATE INDEX items_applications_2 on items_applications_tmp (itemid);
 
 insert into items_applications_tmp select * from items_applications;
 drop table items_applications;
