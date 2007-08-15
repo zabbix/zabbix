@@ -960,7 +960,7 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 					}
 					/* do not use break */
 				case ITEM_VALUE_TYPE_STR:	
-					$value = nbsp(htmlspecialchars($row["value"]));
+					$value = nl2br(nbsp(htmlspecialchars($row["value"])));
 					break;
 				
 				default:
