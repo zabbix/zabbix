@@ -309,7 +309,15 @@ int	get_value_snmp(DB_ITEM *item, AGENT_RESULT *value)
 #endif
 			)
 			{
-				SET_UI64_RESULT(value, (zbx_uint64_t)*vars->val.integer);
+				/* Negative integer values are converted to double */
+				if(*vars->val.integer<0)
+				{
+					SET_DBL_RESULT(value, (double)*vars->val.integer);
+				}
+				else
+				{
+					SET_UI64_RESULT(value, (zbx_uint64_t)*vars->val.integer);
+				}
 			}
 #ifdef OPAQUE_SPECIAL_TYPES
 			else if(vars->type == ASN_FLOAT)
