@@ -474,6 +474,7 @@ FIELD		|itemappid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|applicationid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|applicationid,itemid
+INDEX		|2		|itemid
 
 TABLE|mappings|mappingid|ZBX_SYNC
 FIELD		|mappingid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
