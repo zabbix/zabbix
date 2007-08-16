@@ -79,16 +79,17 @@ include_once "include/page_header.php";
 
 	$r_form = new CForm();
 	$r_form->AddOption('name','events_menu');
+
+	if($source == EVENT_SOURCE_TRIGGERS){
+		$chkbox = new CCheckBox('sh_unknown',
+							(($show_unknown == 0)?'no':'yes'),
+							'create_var("events_menu", "show_unknown", '.(($show_unknown == 0)?'1':'0').', true)'
+							);
+		$r_form->AddItem(array(S_SHOW_UNKNOWN, SPACE, $chkbox, SPACE, SPACE));
+	}
+	
 	if($allow_discovery)
 	{
-		if($source == EVENT_SOURCE_TRIGGERS){
-			$chkbox = new CCheckBox('sh_unknown',
-								(($show_unknown == 0)?'no':'yes'),
-								'create_var("events_menu", "show_unknown", '.(($show_unknown == 0)?'1':'0').', true)'
-								);
-			$r_form->AddItem(array(S_SHOW_UNKNOWN, SPACE, $chkbox, SPACE, SPACE));
-		}
-		
 		$cmbSource = new CComboBox('source', $source, 'submit()');
 		$cmbSource->AddItem(EVENT_SOURCE_TRIGGERS, S_TRIGGER);
 		$cmbSource->AddItem(EVENT_SOURCE_DISCOVERY, S_DISCOVERY);
