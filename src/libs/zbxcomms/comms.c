@@ -102,7 +102,38 @@ static void __zbx_zbx_set_tcp_strerror(const char *fmt, ...)
 
 	va_end(args);
 }
- 
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_gethost_by_ip                                                *
+ *                                                                            *
+ * Purpose: retrive 'hostent' by IP address                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: hostent or NULL - an error occured                           *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+struct hostent	*zbx_gethost_by_ip(const char *ip)
+{
+	struct in_addr	addr;
+	struct hostent*	host;
+
+	assert(ip);
+
+	if(inet_aton(ip, &addr) != 0)
+	{
+		host = gethostbyaddr((char *)&addr, sizeof(addr), AF_INET);
+		if(host)	return host;
+	}
+
+	return (struct hostent*) NULL;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_gethost                                                      *
