@@ -61,9 +61,10 @@
 
 #else /* not _WINDOWS */
 
+	#define MAX_CPU	16
 	#define MAX_CPU_HISTORY 900 /* 15 min in seconds */
 
-	typedef struct s_cpus_stat_data
+	typedef struct s_single_cpu_stat_data
 	{
 		/* private */
 		int	clock[MAX_CPU_HISTORY];
@@ -86,9 +87,16 @@
 		double	nice5;
 		double	nice15;
 
+	} ZBX_SINGLE_CPU_STAT_DATA;
+
+	typedef struct s_cpus_stat_data
+	{
+		ZBX_SINGLE_CPU_STAT_DATA cpu[MAX_CPU];
+		int	count;
+
 	} ZBX_CPUS_STAT_DATA;
 
-#	define CPU_COLLECTOR_STARTED(pcpus)	(1)
+#	define CPU_COLLECTOR_STARTED(pcpus)	(collector)
 #endif /* _WINDOWS */
 
 
