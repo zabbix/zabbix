@@ -49,6 +49,7 @@ ZBX_METRIC	parameters_specific[]=
 	{"system.cpu.intr",     0,              SYSTEM_CPU_INTR,        0,      0},
 	{"system.cpu.util",	CF_USEUPARAM,	SYSTEM_CPU_UTIL,	0,	"all,user,avg1"},
 	{"system.cpu.load",	CF_USEUPARAM,	SYSTEM_CPU_LOAD,	0,	"all,avg1"},
+	{"system.cpu.num",	CF_USEUPARAM,	SYSTEM_CPU_NUM,		0,	"online"},
 
 	{"system.swap.size",	CF_USEUPARAM,	SYSTEM_SWAP_SIZE,	0,	"all,free"},
 	{"system.swap.in",      CF_USEUPARAM,   SYSTEM_SWAP_IN,         0,      "all"},

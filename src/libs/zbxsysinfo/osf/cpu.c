@@ -21,6 +21,11 @@
 
 #include "sysinfo.h"
 
+int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	return SYSINFO_RET_FAIL;
+}
+
 static int	SYSTEM_CPU_IDLE1(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	return EXECUTE_INT(cmd, "iostat 1 2 | tail -n 1 | awk '{printf(\"%s\",$(NF))}'", flags, result);
