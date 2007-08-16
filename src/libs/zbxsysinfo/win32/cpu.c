@@ -22,6 +22,11 @@
 #include "sysinfo.h"
 #include "stats.h"
 
+int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	return SYSINFO_RET_FAIL;
+}
+
 int     OLD_CPU(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 	/* SKIP REALIZATION */

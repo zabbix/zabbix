@@ -21,6 +21,11 @@
 
 #include "sysinfo.h"
 
+int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+{
+	return SYSINFO_RET_FAIL;
+}
+
 static int get_cpu_data(unsigned long long *idle,
                         unsigned long long *user,
                         unsigned long long *nice,
