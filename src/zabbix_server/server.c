@@ -486,6 +486,18 @@ void test_variable_argument_list(void)
 */
 }
 
+void test_zbx_gethost(void)
+{
+        struct hostent* host;
+
+	char hostname[]="194.8.11.69";
+/*	char hostname[]="gobbo.caves.lv";*/
+
+	host = zbx_gethost_by_ip(hostname);
+
+	printf("Host1 [%s]\n", host->h_name);
+}
+
 void test_templates()
 {
 	DBconnect(ZBX_DB_CONNECT_EXIT);
@@ -563,7 +575,8 @@ void test()
 /*	test_db_connection(); */
 /*	test_variable_argument_list(); */
 /*	test_templates();*/
-	test_calc_timestamp();
+/*	test_calc_timestamp();*/
+	test_zbx_gethost();
 
 	printf("\n-= Test completed =-\n");
 }

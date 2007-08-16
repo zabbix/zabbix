@@ -57,6 +57,7 @@ char*	zbx_tcp_strerror(void);
 int	zbx_tcp_error(void);
 
 struct hostent	*zbx_gethost(const char *hostname);
+struct hostent  *zbx_gethost_by_ip(const char *ip);
 
 void	zbx_tcp_init(zbx_sock_t *s, ZBX_SOCKET o);
 int     zbx_tcp_connect(zbx_sock_t *s, const char *ip, unsigned short port);
