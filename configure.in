@@ -115,6 +115,15 @@ else
 	AC_MSG_RESULT(no)
 fi
 
+dnl Check for /proc/cpuinfo filesystem
+AC_MSG_CHECKING(for file /proc/cpuinfo)
+if test -r /proc/cpuinfo; then
+	AC_MSG_RESULT(yes)
+	AC_DEFINE(HAVE_PROC_CPUINFO,1,[Define to 1 if file '/proc/cpuinfo' should be used.])
+else
+	AC_MSG_RESULT(no)
+fi
+
 dnl Check for file /proc/1/status
 AC_MSG_CHECKING(for file /proc/1/status)
 if test -r /proc/1/status; then

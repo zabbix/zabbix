@@ -23,7 +23,7 @@ cleanwarnings="no"
 docat="yes"
 help="no"
 noparam=0
-database="pgsql"
+database="mysql"
 max="--prefix=`pwd` --enable-agent --enable-server --with-${database} --with-libcurl --with-ldap --with-net-snmp --with-jabber=/usr --with-unixodbc"
 def="--prefix=`pwd` --enable-agent --enable-server --with-${database} --with-libcurl --with-ldap"
 min="--prefix=`pwd` --enable-agent --enable-server --with-${database} --with-libcurl=no"

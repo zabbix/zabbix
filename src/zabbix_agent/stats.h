@@ -26,6 +26,13 @@
 #include "interfaces.h"
 #include "diskdevices.h"
 
+/* NOTE:
+ *   Mandatory static structure,
+ *   don't use dinamic allocation
+ *   for structure elements.
+ *   Cause data for collector allocated once
+ *   in init_collector_data.
+ */
 typedef struct s_collector_data
 {
 	ZBX_CPUS_STAT_DATA	cpus;
