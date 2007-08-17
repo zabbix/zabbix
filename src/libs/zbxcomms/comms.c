@@ -363,8 +363,6 @@ int     zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags)
 		}
 
 		len64 = (zbx_uint64_t)strlen(data);
-SDI2("NEW_SEND.r: [" ZBX_FS_UI64 "]" , len64); // TMP!!!
-SDI2("NEW_SEND.c: [" ZBX_FS_UI64 "]" , zbx_htole_uint64(len64)); // TMP!!!
 		len64 = zbx_htole_uint64(len64);
 
 		/* Write data length */
@@ -616,8 +614,6 @@ int	zbx_tcp_recv_ext(zbx_sock_t *s, char **data, unsigned char flags)
 
 		left = sizeof(zbx_uint64_t);
 		nbytes = ZBX_TCP_READ(s->socket, (void *)&expected_len, left);
-SDI2("NEW_RECV.c: [" ZBX_FS_UI64 "]", expected_len); // TMP!!!
-SDI2("NEW_RECV.r: [" ZBX_FS_UI64 "]", zbx_htole_uint64(expected_len)); // TMP!!!
 		expected_len = zbx_letoh_uint64(expected_len);
 
 		/* The rest was already cleared */
