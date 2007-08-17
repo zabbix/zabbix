@@ -1,5 +1,6 @@
 Changes for 1.4.2:
 
+ - ignore trigger FALSE state if it depends on another trigger (Alexei)
  - added new templates: Template_Cisco_PIX_525,
    Template_Dell_PowerConnect_6248, Template_APC_Battery,
    Template_HP_InsightManager, Template_Dell_OpenManage, Template_Cisco_PIX,
