@@ -183,6 +183,22 @@ void    *zbx_malloc2(char *filename, int line, void *old, size_t size)
 	return ptr;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_realloc                                                      *
+ *                                                                            *
+ * Purpose: changes the size of the memory block pointed to by src            *
+ *          to size bytes.                                                    *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: returns a pointer to the newly allocated memory              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
 void    *zbx_realloc(void *src, size_t size)
 {
 	register int max_attempts;
@@ -208,4 +224,79 @@ void    *zbx_realloc(void *src, size_t size)
 	return ptr;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_htole_uint64                                                 *
+ *                                                                            *
+ * Purpose: convert unsigned integer 64 bit                                   *
+ *          from host byte order                                              *
+ *          to little-endian byte order format                                *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: unsigned integer 64 bit in little-endian byte order format   *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	zbx_htole_uint64(
+		zbx_uint64_t	data
+	)
+{
+	unsigned char buf[8];
 
+	buf[0] = (unsigned char) (data);	data >>= 8;
+	buf[1] = (unsigned char) (data);	data >>= 8;
+	buf[2] = (unsigned char) (data);	data >>= 8;
+	buf[3] = (unsigned char) (data);	data >>= 8;
+	buf[4] = (unsigned char) (data);	data >>= 8;
+	buf[5] = (unsigned char) (data);	data >>= 8;
+	buf[6] = (unsigned char) (data);	data >>= 8;
+	buf[7] = (unsigned char) (data);
+
+	memcpy(&data, buf, sizeof(buf));
+
+	return  data;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_letoh_uint64                                                 *
+ *                                                                            *
+ * Purpose: convert unsigned integer 64 bit                                   *
+ *          from little-endian byte order format                              *
+ *          to host byte order                                                *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: unsigned integer 64 bit in host byte order                   *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	zbx_letoh_uint64(
+		zbx_uint64_t	data
+	)
+{
+	unsigned char buf[8];
+
+	memset(buf, 0, sizeof(buf));
+	memcpy(buf, &data, sizeof(buf));
+
+	data = 0;
+
+	data  = (zbx_uint64_t) buf[7];		data <<= 8;
+	data |= (zbx_uint64_t) buf[6];		data <<= 8;
+	data |= (zbx_uint64_t) buf[5];		data <<= 8;
+	data |= (zbx_uint64_t) buf[4];		data <<= 8;
+	data |= (zbx_uint64_t) buf[3];		data <<= 8;
+	data |= (zbx_uint64_t) buf[2];		data <<= 8;
+	data |= (zbx_uint64_t) buf[1];		data <<= 8;
+	data |= (zbx_uint64_t) buf[0];
+
+	return	data;
+}
