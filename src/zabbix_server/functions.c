@@ -602,7 +602,7 @@ static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 							(value->dbl - item->prevorgvalue_dbl)/(now-item->lastclock),
 							(int)now,
 							item->itemid);
-						value->dbl = (value->dbl - item->prevorgvalue_dbl)/(now-item->lastclock);
+						SET_DBL_RESULT(value, (double)(value->dbl - item->prevorgvalue_dbl)/(now-item->lastclock));
 					}
 					else
 					{
@@ -613,7 +613,7 @@ static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 							value->dbl - item->prevorgvalue_dbl,
 							(int)now,
 							item->itemid);
-						value->dbl = (value->dbl - item->prevorgvalue_dbl);
+						SET_DBL_RESULT(value, (double)(value->dbl - item->prevorgvalue_dbl));
 					}
 				}
 				else
@@ -635,13 +635,13 @@ static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 					if(now != item->lastclock)
 					{
 						DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue='" ZBX_FS_UI64 "',"
-						"lastvalue='" ZBX_FS_DBL "',lastclock=%d where itemid=" ZBX_FS_UI64,
+						"lastvalue='" ZBX_FS_UI64 "',lastclock=%d where itemid=" ZBX_FS_UI64,
 							calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
 							value->ui64,
-							((double)(value->ui64 - item->prevorgvalue_uint64))/(now-item->lastclock),
+							((zbx_uint64_t)(value->ui64 - item->prevorgvalue_uint64))/(now-item->lastclock),
 							(int)now,
 							item->itemid);
-						value->dbl = ((double)(value->ui64 - item->prevorgvalue_uint64))/(now-item->lastclock);
+						SET_UI64_RESULT(value, (zbx_uint64_t)(value->ui64 - item->prevorgvalue_uint64)/(now-item->lastclock));
 					}
 					else
 					{
@@ -652,7 +652,7 @@ static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 							(double)(value->ui64 - item->prevorgvalue_uint64),
 							(int)now,
 							item->itemid);
-						value->dbl = (double)(value->ui64 - item->prevorgvalue_uint64);
+						SET_UI64_RESULT(value, (zbx_uint64_t)(value->ui64 - item->prevorgvalue_uint64));
 					}
 				}
 				else
@@ -682,7 +682,7 @@ static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 						(value->dbl - item->prevorgvalue_dbl),
 						(int)now,
 						item->itemid);
-					value->dbl = (double)(value->dbl - item->prevorgvalue_dbl);
+					SET_DBL_RESULT(value, (double)(value->dbl - item->prevorgvalue_dbl));
 				}
 				else
 				{
@@ -707,7 +707,7 @@ static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 						(value->ui64 - item->prevorgvalue_uint64),
 						(int)now,
 						item->itemid);
-					value->ui64 = value->ui64 - item->prevorgvalue_uint64;
+					SET_UI64_RESULT(value, (zbx_uint64_t)(value->ui64 - item->prevorgvalue_uint64));
 				}
 				else
 				{
