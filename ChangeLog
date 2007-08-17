@@ -1,5 +1,9 @@
 Changes for 1.4.2:
 
+ - added new templates: Template_Cisco_PIX_525,
+   Template_Dell_PowerConnect_6248, Template_APC_Battery,
+   Template_HP_InsightManager, Template_Dell_OpenManage, Template_Cisco_PIX,
+   Template_Dell_PowerEdge (Alexei)
  - improved per cpu 'system.cpu.util[]' for linux/solaris (Eugene)
  - added support of 'system.cpu.num' (Eugene)
  - added automatic resolution of DNS names for auto-discovery (Alexei)
