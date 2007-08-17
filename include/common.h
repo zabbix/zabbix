@@ -630,5 +630,12 @@ int	ip_in_list(char *list, char *ip);
 
 int MAIN_ZABBIX_ENTRY(void);
 
+zbx_uint64_t	zbx_letoh_uint64(
+		zbx_uint64_t	data
+	);
+
+zbx_uint64_t	zbx_htole_uint64(
+		zbx_uint64_t	data
+	);
 
 #endif

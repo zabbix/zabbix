@@ -1,5 +1,6 @@
 Changes for 1.4.2:
 
+ - fixed communication between systems with different byte orders (Eugene)
  - fixed frontend to accept trigger function time() (Alexei)
  - ignore trigger FALSE state if it depends on another trigger (Alexei)
  - added new templates: Template_Cisco_PIX_525,
