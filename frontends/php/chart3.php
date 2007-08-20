@@ -33,7 +33,7 @@ include_once "include/page_header.php";
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"period"=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	BETWEEN(3600,12*31*24*3600),	null),
+		"period"=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	BETWEEN(ZBX_MIN_PERIOD,ZBX_MAX_PERIOD),	null),
 		"from"=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	null,			null),
 		"stime"=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	null,			null),
 		"border"=>	array(T_ZBX_INT, O_OPT,	P_NZERO,	IN('0,1'),		null),
@@ -59,7 +59,10 @@ include_once "include/page_header.php";
 
 	foreach($items as $gitem)
 	{
-		$host = DBfetch(DBselect('select h.* from hosts h,items i where h.hostid=i.hostid and i.itemid='.$gitem['itemid']));
+		if( !($host = DBfetch(DBselect('select h.* from hosts h,items i where h.hostid=i.hostid and i.itemid='.$gitem['itemid']))) )
+		{
+			fatal_error(S_NO_ITEM_DEFINED);
+		}
 		if(in_array($host['hostid'], $denyed_hosts))
 		{
 			access_deny();

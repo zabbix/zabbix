@@ -182,6 +182,8 @@
 	'S_NODE_DELETED'=>			'Node deleted',
 	'S_CANNOT_DELETE_NODE'=>		'Cannot delete node',
 	'S_CURRENT_NODE'=>			'Current node',
+	'S_CURRENT_NODE_ONLY'=>			'Current node only',
+	'S_WITH_SUBNODES'=>			'With subnodes',
 	
 //	acknow.php
 	'S_ACKNOWLEDGES'=>			'Acknowledges',
@@ -287,7 +289,12 @@
 	'S_CREATE_ACTION'=>			'Create Action',
 	'S_ENABLE_SELECTED_ACTIONS_Q'=>		'Enable selected actions?',
 	'S_DISABLE_SELECTED_ACTIONS_Q'=>	'Disable selected actions?',
+	'S_DELETE_SELECTED_ACTIONS_Q'=>		'Delete selected actions?',
 	'S_DELETE_SELECTED_ACTION_Q'=>		'Delete selected action?',
+	'S_LIKE_SMALL'=>			'like',
+	'S_NOT_LIKE_SMALL'=>			'not like',
+	'S_IN_SMALL'=>				'in',
+	'S_NOT_IN_SMALL'=>			'not in',
 
 //	alarms.php
 	'S_ALARMS'=>				'Alarms',
@@ -467,7 +474,7 @@
 	'S_COMPARE'=>				'Compare',
 
 //	Footer
-	'S_ZABBIX_VER'=>			'ZABBIX 1.4',
+	'S_ZABBIX_VER'=>			'ZABBIX 1.4.2',
 	'S_COPYRIGHT_BY'=>			'Copyright 2001-2007 by ',
 	'S_CONNECTED_AS'=>			'Connected as',
 	'S_SIA_ZABBIX'=>			'SIA Zabbix',
@@ -513,6 +520,7 @@
 	'S_CANNOT_ADD_GRAPH'=>			'Cannot add graph',
 	'S_ID'=>				'Id',
 	'S_NO_GRAPHS_DEFINED'=>			'No graphs defined',
+	'S_NO_GRAPH_DEFINED'=>			'No graph defined',
 	'S_DELETE_GRAPH_Q'=>			'Delete graph?',
 	'S_YAXIS_TYPE'=>			'Y axis type',
 	'S_YAXIS_MIN_VALUE'=>			'Y axis MIN value',
@@ -537,6 +545,7 @@
 	'S_TIMESTAMP'=>				'Timestamp',
 	'S_LOCAL'=>				'Local',
 	'S_SOURCE'=>				'Source',
+	'S_SHOW_UNKNOWN'=>			'Show unknown',
 
 	'S_SHOW_SELECTED'=>			'Show selected',
 	'S_HIDE_SELECTED'=>			'Hide selectede',
@@ -666,6 +675,7 @@
 
 //	items.php
 	'S_NO_ITEMS_DEFINED'=>			'No items defined',
+	'S_NO_ITEM_DEFINED'=>			'No item defined',
 	'S_HISTORY_CLEANED'=>			'History cleaned',
 	'S_CLEAN_HISTORY_SELECTED_ITEMS'=>	'Clean history selected items',
 	'S_CLEAN_HISTORY'=>			'Clean history',
@@ -863,7 +873,7 @@
 	'S_MENU_HOSTS'=>			'HOSTS',
 	'S_MENU_ITEMS'=>			'ITEMS',
 	'S_MENU_AUDIT'=>			'AUDIT',
-	'S_SWITCH'=>				'Switch',
+	'S_SWITCH_NODE'=>			'Switch node',
 
 //	overview.php
 	'S_SELECT_GROUP_DOT_DOT_DOT'=>		'Select group ...',
@@ -1047,6 +1057,7 @@
 	'S_IT_SERVICE'=>			'IT service',
 	'S_IT_SERVICES'=>			'IT services',
 	'S_SERVICE_UPDATED'=>			'Service updated',
+	'S_NO_IT_SERVICE_DEFINED'=>		'No IT service defined',
 	'S_CANNOT_UPDATE_SERVICE'=>		'Cannot update service',
 	'S_SERVICE_ADDED'=>			'Service added',
 	'S_CANNOT_ADD_SERVICE'=>		'Cannot add service',
@@ -1117,6 +1128,7 @@
 //	triggers.php
 	'S_NO_TRIGGER'=>			'No trigger',
 	'S_NO_TRIGGERS_DEFINED'=>		'No triggers defined',
+	'S_NO_TRIGGER_DEFINED'=>		'No trigger defined',
 	'S_CONFIGURATION_OF_TRIGGERS'=>		'Configuration of triggers',
 	'S_CONFIGURATION_OF_TRIGGERS_BIG'=>	'CONFIGURATION OF TRIGGERS',
 	'S_DEPENDENCY_ADDED'=>			'Dependency added',
@@ -1292,6 +1304,7 @@
 
 	'S_HELP'=>				'Help',
 	'S_PROFILE'=>				'Profile',
+	'S_GET_SUPPORT'=>			'Get support',
 	'S_MONITORING'=>			'Monitoring',
 	'S_INVENTORY'=>				'Inventory',
 	'S_QUEUE'=>				'Queue',

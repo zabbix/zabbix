@@ -34,7 +34,7 @@ include_once "include/page_header.php";
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		"graphid"=>		array(T_ZBX_INT, O_MAND,	P_SYS,	DB_ID,		null),
-		"period"=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	BETWEEN(3600,12*31*24*3600),	null),
+		"period"=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	BETWEEN(ZBX_MIN_PERIOD,ZBX_MAX_PERIOD),	null),
 		"from"=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	null,		null),
 		"stime"=>		array(T_ZBX_STR, O_OPT,		P_SYS,		null,		null),
 		"border"=>		array(T_ZBX_INT, O_OPT,		P_NZERO,	IN('0,1'),	null),
@@ -45,12 +45,17 @@ include_once "include/page_header.php";
 	check_fields($fields);
 ?>
 <?php
+	if(! (DBfetch(DBselect('select graphid from graphs where graphid='.$_REQUEST['graphid']))) )
+	{
+		show_error_message(S_NO_GRAPH_DEFINED);
+
+	}
+
 	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_MODE_LT);
 	
 	if( !($db_data = DBfetch(DBselect("select g.*,h.host,h.hostid from graphs g left join graphs_items gi on g.graphid=gi.graphid ".
 		" left join items i on gi.itemid=i.itemid left join hosts h on i.hostid=h.hostid ".
 		" where g.graphid=".$_REQUEST["graphid"].
-		/* " and ".DBid2nodeid("g.graphid")."=".$ZBX_CURNODEID. */ /* NOTE: the chart can display any accesiable graph! */
 		" and ( h.hostid not in (".$denyed_hosts.") OR h.hostid is NULL) "))))
 	{
 		access_deny();

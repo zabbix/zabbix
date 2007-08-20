@@ -36,30 +36,21 @@ include_once "include/page_header.php";
 
 	check_fields($fields);
 
-//----------------------------------------------------------------------
-
-	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT);
-
-	if(isset($_REQUEST['serviceid']) && $_REQUEST['serviceid'] > 0){
-		$query = "SELECT s.*,sl.linkid FROM services s LEFT JOIN triggers t on s.triggerid=t.triggerid ".
-			" LEFT JOIN functions f on t.triggerid=f.triggerid LEFT JOIN items i on f.itemid=i.itemid ".
-			" where (i.hostid is null or i.hostid not in (".$denyed_hosts.")) ".
-			" and ".DBid2nodeid("s.serviceid")."=".$ZBX_CURNODEID.
-			" and s.serviceid=".$_REQUEST["serviceid"];
-		if( !($service = DBFetch(DBSelect($query))) ){
-			access_deny();
-		}
-	}
 //--------------------------------------------------------------------------
 
+$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT);
+
 $query = 'SELECT distinct s.serviceid, sl.servicedownid, sl_p.serviceupid as serviceupid,
-        s.name caption, s.algorithm, t.triggerid, s.sortorder, sl.linkid
-		FROM services s
-			LEFT JOIN triggers t ON s.triggerid = t.triggerid
-	LEFT JOIN services_links sl ON  s.serviceid = sl.serviceupid and NOT(sl.soft=0)
-	LEFT JOIN services_links sl_p ON  s.serviceid = sl_p.servicedownid and sl_p.soft=0
-	WHERE '.DBid2nodeid("s.serviceid").'='.$ZBX_CURNODEID.'
-	ORDER BY s.sortorder, sl.serviceupid, s.serviceid';
+		s.name as caption, s.algorithm, t.triggerid, s.sortorder, sl.linkid'.
+	' FROM services s '.
+		' LEFT JOIN triggers t ON s.triggerid = t.triggerid '.
+		' LEFT JOIN services_links sl ON  s.serviceid = sl.serviceupid and NOT(sl.soft=0) '.
+		' LEFT JOIN services_links sl_p ON  s.serviceid = sl_p.servicedownid and sl_p.soft=0 '.
+		' LEFT JOIN functions f ON t.triggerid=f.triggerid '.
+		' LEFT JOIN items i ON f.itemid=i.itemid '.
+	' WHERE (i.hostid is null or i.hostid not in ('.$denyed_hosts.')) '.
+		' AND '.DBin_node('s.serviceid').
+	' ORDER BY s.sortorder, sl_p.serviceupid, s.serviceid';
 
 $result=DBSelect($query);
 
@@ -97,8 +88,12 @@ while($row = DBFetch($result)){
 		$services[$row['serviceid']]['childs'][] = array('id' => $row['servicedownid'], 'soft' => 1, 'linkid' => $row['linkid']);
 }
 
+$treeServ=array();
+createServiceTree($services,$treeServ); //return into $treeServ parametr
 
-createServiceTree($services,0,$treeServ);
+//permission issue
+$treeServ = del_empty_nodes($treeServ);
+
 
 echo '<script src="js/services.js" type="text/javascript"></script>';
 

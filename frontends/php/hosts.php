@@ -30,7 +30,7 @@ include_once "include/page_header.php";
 
 	$_REQUEST["config"] = get_request("config",get_profile("web.hosts.config",0));
 	
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID);
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,PERM_RES_IDS_ARRAY,get_current_nodeid());
 	if(isset($_REQUEST["hostid"]) && $_REQUEST["hostid"] > 0 && !in_array($_REQUEST["hostid"], $available_hosts)) 
 	{
 		access_deny();
@@ -46,7 +46,7 @@ include_once "include/page_header.php";
 	if(isset($_REQUEST["groupid"]) && $_REQUEST["groupid"] > 0)
 	{
 		if(!in_array($_REQUEST["groupid"], get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,null,
-			PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+			PERM_RES_IDS_ARRAY,get_current_nodeid())))
 		{
 			access_deny();
 		}
@@ -171,7 +171,7 @@ include_once "include/page_header.php";
 		}
 		else
 		{
-			if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+			if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 				access_deny();
 
 		}
@@ -259,7 +259,7 @@ include_once "include/page_header.php";
 /* group operations */
 			$result = 0;
 			$hosts = get_request("hosts",array());
-			$db_hosts=DBselect("select hostid from hosts where ".DBid2nodeid("hostid")."=".$ZBX_CURNODEID);
+			$db_hosts=DBselect('select hostid from hosts where '.DBin_node('hostid'));
 			while($db_host=DBfetch($db_hosts))
 			{
 				$host=get_host_by_hostid($db_host["hostid"]);
@@ -282,7 +282,7 @@ include_once "include/page_header.php";
 		global $USER_DETAILS;
 
 		if(!in_array($_REQUEST['add_to_group'], get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,null,
-			PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+			PERM_RES_IDS_ARRAY,get_current_nodeid())))
 		{
 			access_deny();
 		}
@@ -298,7 +298,7 @@ include_once "include/page_header.php";
 		global $USER_DETAILS;
 
 		if(!in_array($_REQUEST['delete_from_group'], get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,null,
-			PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+			PERM_RES_IDS_ARRAY,get_current_nodeid())))
 		{
 			access_deny();
 		}
@@ -315,7 +315,7 @@ include_once "include/page_header.php";
 		$status = isset($_REQUEST["activate"]) ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
 		$hosts = get_request("hosts",array());
 
-		$db_hosts=DBselect("select hostid from hosts where ".DBid2nodeid("hostid")."=".$ZBX_CURNODEID);
+		$db_hosts=DBselect('select hostid from hosts where '.DBin_node('hostid'));
 		while($db_host=DBfetch($db_hosts))
 		{
 			if(!in_array($db_host["hostid"],$hosts)) continue;
@@ -363,7 +363,7 @@ include_once "include/page_header.php";
 			$msg_fail	= S_CANNOT_UPDATE_GROUP;
 			$groupid = $_REQUEST["groupid"];
 		} else {
-			if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+			if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 				access_deny();
 
 			$groupid = add_host_group($_REQUEST["gname"], $hosts);
@@ -402,7 +402,7 @@ include_once "include/page_header.php";
 			$result = 0;
 			$groups = get_request("groups",array());
 
-			$db_groups=DBselect("select groupid, name from groups where ".DBid2nodeid("groupid")."=".$ZBX_CURNODEID);
+			$db_groups=DBselect('select groupid, name from groups where '.DBin_node('groupid'));
 			while($db_group=DBfetch($db_groups))
 			{
 				if(!in_array($db_group["groupid"],$groups)) continue;
@@ -428,7 +428,7 @@ include_once "include/page_header.php";
 
 		$db_hosts=DBselect("select h.hostid, hg.groupid from hosts_groups hg, hosts h".
 			" where h.hostid=hg.hostid and h.status<>".HOST_STATUS_DELETED.
-			" and ".DBid2nodeid("h.hostid")."=".$ZBX_CURNODEID);
+			' and '.DBin_node('h.hostid'));
 		while($db_host=DBfetch($db_hosts))
 		{
 			if(!in_array($db_host["groupid"],$groups)) continue;
@@ -491,7 +491,7 @@ include_once "include/page_header.php";
 			$applications = get_request("applications",array());
 
 			$db_applications = DBselect("select applicationid, name, hostid from applications ".
-				"where ".DBid2nodeid("applicationid")."=".$ZBX_CURNODEID);
+				'where '.DBin_node('applicationid'));
 
 			while($db_app = DBfetch($db_applications))
 			{
@@ -509,7 +509,7 @@ include_once "include/page_header.php";
 		unset($_REQUEST["delete"]);
 	}
 	
-	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,$ZBX_CURNODEID); /* update available_hosts after ACTIONS */
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,get_current_nodeid()); /* update available_hosts after ACTIONS */
 ?>
 <?php
 	$frmForm = new CForm();
@@ -693,7 +693,7 @@ include_once "include/page_header.php";
 
 				$db_groups = DBselect('select g.groupid, g.name from groups g left join hosts_groups hg '.
 						' on g.groupid=hg.groupid and hg.hostid='.$row['hostid'].
-						' where hostid is NULL order by name,groupid');
+						' where hostid is NULL order by g.name,g.groupid');
 				while($group_data = DBfetch($db_groups))
 				{
 					$add_to[] = array($group_data['name'], '?'.
@@ -704,7 +704,7 @@ include_once "include/page_header.php";
 
 				$db_groups = DBselect('select g.groupid, g.name from groups g, hosts_groups hg '.
 						' where g.groupid=hg.groupid and hg.hostid='.$row['hostid'].
-						' order by name,groupid');
+						' order by g.name,g.groupid');
 				while($group_data = DBfetch($db_groups))
 				{
 					$delete_from[] = array($group_data['name'], '?'.
@@ -782,7 +782,7 @@ include_once "include/page_header.php";
 					S_NAME),
 				S_MEMBERS));
 
-			$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,$ZBX_CURNODEID);
+			$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,get_current_nodeid());
 
 			$db_groups=DBselect("select groupid,name from groups".
 					" where groupid in (".$available_groups.")".

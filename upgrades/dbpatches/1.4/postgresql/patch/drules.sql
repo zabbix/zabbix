@@ -6,4 +6,4 @@ CREATE TABLE drules (
         nextcheck       integer         DEFAULT '0'     NOT NULL,
         status          integer         DEFAULT '0'     NOT NULL,
         PRIMARY KEY (druleid)
-);
+) with OIDS;

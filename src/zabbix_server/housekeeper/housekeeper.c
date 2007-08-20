@@ -57,7 +57,7 @@ static int housekeeping_process_log()
 
 	while((row=DBfetch(result)))
 	{
-		housekeeper.housekeeperid=atoi(row[0]);
+		ZBX_STR2UINT64(housekeeper.housekeeperid,row[0]);
 		housekeeper.tablename=row[1];
 		housekeeper.field=row[2];
 		ZBX_STR2UINT64(housekeeper.value,row[3]);
@@ -81,7 +81,7 @@ static int housekeeping_process_log()
 #endif
 		if(deleted == 0)
 		{
-			DBexecute("delete from housekeeper where housekeeperid=%d",
+			DBexecute("delete from housekeeper where housekeeperid=" ZBX_FS_UI64,
 				housekeeper.housekeeperid);
 		}
 		else
@@ -208,23 +208,21 @@ static int housekeeping_events(int now)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int delete_history(char *table, int itemid, int keep_history, int now)
+static int delete_history(char *table, zbx_uint64_t itemid, int keep_history, int now)
 {
-	char            sql[MAX_STRING_LEN];
 	DB_RESULT       result;
 	DB_ROW          row;
 	int             min_clock;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In delete_history(%s," ZBX_FS_UI64 ",%d,%d)",
+	zabbix_log( LOG_LEVEL_DEBUG, "In delete_history(%s," ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d)",
 		table,
 		itemid,
 		keep_history,
 		now);
 
-	zbx_snprintf(sql,sizeof(sql)-1,"select min(clock) from %s where itemid=" ZBX_FS_UI64,
+	result = DBselect("select min(clock) from %s where itemid=" ZBX_FS_UI64,
 		table,
 		itemid);
-	result = DBselect(sql);
 
 	row=DBfetch(result);
 
@@ -237,13 +235,18 @@ static int delete_history(char *table, int itemid, int keep_history, int now)
 	min_clock = atoi(row[0]);
 	DBfree_result(result);
 
-	zbx_snprintf(sql,sizeof(sql)-1,"delete from %s where itemid=" ZBX_FS_UI64 " and clock<%d",
+/*	zabbix_log( LOG_LEVEL_DEBUG, "Now %d keep_history %d Itemid " ZBX_FS_UI64 " min %d new min %d",
+		now,
+		keep_history,
+		itemid,
+		min_clock,
+		MIN(now-24*3600*keep_history, min_clock+4*3600*CONFIG_HOUSEKEEPING_FREQUENCY));*/
+
+	return DBexecute("delete from %s where itemid=" ZBX_FS_UI64 " and clock<%d",
 		table,
 		itemid,
 		MIN(now-24*3600*keep_history, min_clock+4*3600*CONFIG_HOUSEKEEPING_FREQUENCY)
 	);
-
-	return DBexecute(sql);
 }
 
 /******************************************************************************
@@ -264,7 +267,6 @@ static int delete_history(char *table, int itemid, int keep_history, int now)
  ******************************************************************************/
 static int housekeeping_history_and_trends(int now)
 {
-        char            sql[MAX_STRING_LEN];
         DB_ITEM         item;
 
         DB_RESULT       result;
@@ -275,8 +277,7 @@ static int housekeeping_history_and_trends(int now)
         zabbix_log( LOG_LEVEL_DEBUG, "In housekeeping_history_and_trends(%d)",
 		now);
 
-        zbx_snprintf(sql,sizeof(sql)-1,"select itemid,history,trends from items");
-        result = DBselect(sql);
+        result = DBselect("select itemid,history,trends from items");
 
         while((row=DBfetch(result)))
         {
@@ -287,7 +288,7 @@ static int housekeeping_history_and_trends(int now)
                 deleted += delete_history("history", item.itemid, item.history, now);
                 deleted += delete_history("history_uint", item.itemid, item.history, now);
                 deleted += delete_history("history_str", item.itemid, item.history, now);
-                deleted += delete_history("history_str", item.itemid, item.history, now);
+                deleted += delete_history("history_text", item.itemid, item.history, now);
                 deleted += delete_history("history_log", item.itemid, item.history, now);
                 deleted += delete_history("trends", item.itemid, item.trends, now);
         }
@@ -320,7 +321,8 @@ int main_housekeeper_loop()
 
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-		DBbegin();
+/* Transaction is not required here. It causes timeouts under MySQL */
+/*		DBbegin();*/
 
 /*		zbx_setproctitle("housekeeper [removing deleted hosts]");*/
 
@@ -354,7 +356,8 @@ int main_housekeeper_loop()
 
 		zbx_setproctitle("housekeeper [vacuuming database]");
 
-		DBcommit();
+/* Transaction is not required here. It causes timeouts under MySQL */
+/*		DBcommit();*/
 
 		DBvacuum();
 

@@ -26,11 +26,11 @@ typedef enum {
 } zbx_tcp_errors;
 
 
-#if defined(SOCKET)
+#if defined(SOCKET) || defined(_WINDOWS)
 	typedef SOCKET ZBX_SOCKET;
-#else /* not SOCKET */
+#else /* not SOCKET && not _WINDOWS*/
 	typedef int ZBX_SOCKET;
-#endif /* SOCKET */
+#endif /* SOCKET || _WINDOWS */
 
 typedef struct sockaddr_in ZBX_SOCKADDR;
 
@@ -57,6 +57,10 @@ char*	zbx_tcp_strerror(void);
 int	zbx_tcp_error(void);
 
 struct hostent	*zbx_gethost(const char *hostname);
+
+#if !defined(_WINDOWS)
+struct hostent  *zbx_gethost_by_ip(const char *ip);
+#endif /* WINDOWS */
 
 void	zbx_tcp_init(zbx_sock_t *s, ZBX_SOCKET o);
 int     zbx_tcp_connect(zbx_sock_t *s, const char *ip, unsigned short port);

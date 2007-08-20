@@ -38,7 +38,7 @@ char *help_message[] = {
 	"",
 	"  -z --zabbix-server <Server>          Hostname or IP address of ZABBIX Server",
 	"  -p --port <Server port>              Specify port number of server trapper running on the server. Default is 10051",
-	"  -s --host <Hostname>                 Specify hostname or IP address of a host",
+	"  -s --host <Hostname>                 Specify host name. Host IP address and DNS name will not work.",
 	"",
 	"  -k --key <Key>                       Specify metric name (key) we want to send",
 	"  -o --value <Key value>               Specify value of the key",
@@ -165,10 +165,9 @@ static ZBX_THREAD_ENTRY(send_value, args)
 		);
 
 #if !defined(_WINDOWS)
-
 	signal( SIGINT,  send_signal_handler );
-	signal( SIGQUIT, send_signal_handler );
 	signal( SIGTERM, send_signal_handler );
+	signal( SIGQUIT, send_signal_handler );
 	signal( SIGALRM, send_signal_handler );
 
 	alarm(SENDER_TIMEOUT);
@@ -273,8 +272,8 @@ static zbx_task_t parse_commandline(int argc, char **argv)
 	char    ch      = '\0';
 
 	/* Parse the command-line. */
-	while ((ch = zbx_getopt_long(argc, argv, shortopts, longopts, NULL)) != EOF)
-		switch ((char) ch) {
+	while ((ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)) != (char)EOF)
+		switch (ch) {
 			case 'c':
 				CONFIG_FILE = strdup(zbx_optarg);
 				break;

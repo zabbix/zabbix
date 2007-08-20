@@ -22,12 +22,6 @@
 	require_once "include/items.inc.php";
 	require_once "include/hosts.inc.php";
 
-	define("GRAPH_DRAW_TYPE_LINE",0);
-	define("GRAPH_DRAW_TYPE_FILL",1);
-	define("GRAPH_DRAW_TYPE_BOLDLINE",2);
-	define("GRAPH_DRAW_TYPE_DOT",3);
-	define("GRAPH_DRAW_TYPE_DASHEDLINE",4);
-
 	define("GRAPH_YAXIS_TYPE_CALCULATED",0);
 	define("GRAPH_YAXIS_TYPE_FIXED",1);
 
@@ -246,7 +240,7 @@
 					$color=null, $drawtype=null, $type=null, $periods_cnt=null)
 		{
 			if($this->type == GRAPH_TYPE_STACKED /* stacked graph */)
-				$drawtype = GRAPH_DRAW_TYPE_FILL;
+				$drawtype = GRAPH_ITEM_DRAWTYPE_FILLED_REGION;
 
 			$this->items[$this->num] = get_item_by_itemid($itemid);
 			$this->items[$this->num]["description"]=item_description($this->items[$this->num]["description"],$this->items[$this->num]["key_"]);
@@ -254,7 +248,7 @@
 
 			$this->items[$this->num]["host"] = $host["host"];
 			$this->items[$this->num]["color"] = is_null($color) ? "Dark Green" : $color;
-			$this->items[$this->num]["drawtype"] = is_null($drawtype) ? GRAPH_DRAW_TYPE_LINE : $drawtype;
+			$this->items[$this->num]["drawtype"] = is_null($drawtype) ? GRAPH_ITEM_DRAWTYPE_LINE : $drawtype;
 			$this->items[$this->num]["axisside"] = is_null($axis) ? GRAPH_YAXIS_SIDE_RIGHT : $axis;
 			$this->items[$this->num]["calc_fnc"] = is_null($calc_fnc) ? CALC_FNC_AVG : $calc_fnc;
 			$this->items[$this->num]["calc_type"] = is_null($type) ? GRAPH_ITEM_SIMPLE : $type;
@@ -770,13 +764,13 @@
 			/* draw main line */
 			switch($drawtype)
 			{
-				case GRAPH_DRAW_TYPE_BOLDLINE:
+				case GRAPH_ITEM_DRAWTYPE_BOLD_LINE:
 					ImageLine($this->im,$x1,$y1+1,$x2,$y2+1,$avg_color);
 					// break; /* don't use break, must be drawed line also */
-				case GRAPH_DRAW_TYPE_LINE:
+				case GRAPH_ITEM_DRAWTYPE_LINE:
 					ImageLine($this->im,$x1,$y1,$x2,$y2,$avg_color);
 					break;
-				case GRAPH_DRAW_TYPE_FILL:
+				case GRAPH_ITEM_DRAWTYPE_FILLED_REGION:
 					$a[0] = $x1;		$a[1] = $y1;
 					$a[2] = $x1;		$a[3] = $y1_shift;
 					$a[4] = $x2;		$a[5] = $y2_shift;
@@ -784,9 +778,21 @@
 
 					ImageFilledPolygon($this->im,$a,4,$avg_color);
 					break;
-				case GRAPH_DRAW_TYPE_DOT:
+				case GRAPH_ITEM_DRAWTYPE_DOT:
 					ImageFilledRectangle($this->im,$x1-1,$y1-1,$x1+1,$y1+1,$avg_color);
 					ImageFilledRectangle($this->im,$x2-1,$y2-1,$x2+1,$y2+1,$avg_color);
+					break;
+				case GRAPH_ITEM_DRAWTYPE_DASHED_LINE:
+					if( function_exists('imagesetstyle') )
+					{ /* Use ImageSetStyle+ImageLIne instead of bugged ImageDashedLine */
+						$style = array($avg_color, $avg_color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT);
+						ImageSetStyle($this->im, $style);
+						ImageLine($this->im,$x1,$y1,$x2,$y2,IMG_COLOR_STYLED);
+					}
+					else
+					{
+						ImageDashedLine($this->im,$x1,$y1,$x2,$y2,$avg_color);
+					}
 					break;
 			}
 		}
@@ -1252,7 +1258,7 @@
 
 				if($this->items[$item]["calc_type"] == GRAPH_ITEM_AGGREGATED)
 				{
-					$drawtype	= GRAPH_DRAW_TYPE_LINE;
+					$drawtype	= GRAPH_ITEM_DRAWTYPE_LINE;
 
 					$max_color	= $this->GetColor("HistoryMax");
 					$avg_color	= $this->GetColor("HistoryAvg");

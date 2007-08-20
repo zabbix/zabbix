@@ -72,37 +72,37 @@ static int	process_record(int nodeid, char *record)
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_record [%s]",
 		record);
 
-	zbx_get_field(record,tmp,0,'|');
+	zbx_get_field(record,tmp,0,ZBX_DM_DELIMITER);
 	table=atoi(tmp);
 	if(table == ZBX_TABLE_HISTORY)
 	{
-		zbx_get_field(record,tmp,1,'|');
+		zbx_get_field(record,tmp,1,ZBX_DM_DELIMITER);
 		sscanf(tmp,ZBX_FS_UI64,&itemid);
-		zbx_get_field(record,tmp,2,'|');
+		zbx_get_field(record,tmp,2,ZBX_DM_DELIMITER);
 		timestamp=atoi(tmp);
-		zbx_get_field(record,tmp,3,'|');
+		zbx_get_field(record,tmp,3,ZBX_DM_DELIMITER);
 		value=atof(tmp);
 
 		res =  DBadd_history(itemid, value, timestamp);
 	}
 	else if(table == ZBX_TABLE_HISTORY_UINT)
 	{
-		zbx_get_field(record,tmp,1,'|');
+		zbx_get_field(record,tmp,1,ZBX_DM_DELIMITER);
 		sscanf(tmp,ZBX_FS_UI64,&itemid);
-		zbx_get_field(record,tmp,2,'|');
+		zbx_get_field(record,tmp,2,ZBX_DM_DELIMITER);
 		timestamp=atoi(tmp);
-		zbx_get_field(record,tmp,3,'|');
+		zbx_get_field(record,tmp,3,ZBX_DM_DELIMITER);
 		sscanf(tmp,ZBX_FS_UI64,&value_uint);
 
 		res =  DBadd_history_uint(itemid, value_uint, timestamp);
 	}
 	else if(table == ZBX_TABLE_HISTORY_STR)
 	{
-		zbx_get_field(record,tmp,1,'|');
+		zbx_get_field(record,tmp,1,ZBX_DM_DELIMITER);
 		sscanf(tmp,ZBX_FS_UI64,&itemid);
-		zbx_get_field(record,tmp,2,'|');
+		zbx_get_field(record,tmp,2,ZBX_DM_DELIMITER);
 		timestamp=atoi(tmp);
-		zbx_get_field(record,tmp,3,'|');
+		zbx_get_field(record,tmp,3,ZBX_DM_DELIMITER);
 
 		res =  DBadd_history_str(itemid, tmp, timestamp);
 	}
@@ -149,9 +149,9 @@ int	node_history(char *data)
 		{
 			zabbix_log( LOG_LEVEL_DEBUG, "First line [%s]",
 				s);
-			zbx_get_field(s,tmp,1,'|');
+			zbx_get_field(s,tmp,1,ZBX_DM_DELIMITER);
 			sender_nodeid=atoi(tmp);
-			zbx_get_field(s,tmp,2,'|');
+			zbx_get_field(s,tmp,2,ZBX_DM_DELIMITER);
 			nodeid=atoi(tmp);
 			firstline=0;
 			zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Received history from node %d for node %d datalen %d",

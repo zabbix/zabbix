@@ -38,7 +38,6 @@ int	SERVICE_STATE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 
 	SERVICE_STATUS status;
 
-
 	if(num_param(param) > 1)
 	{
 		return SYSINFO_RET_FAIL;
@@ -58,7 +57,7 @@ int	SERVICE_STATE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 		return SYSINFO_RET_FAIL;
 	}
 
-	service = OpenService(mgr,service_name,SERVICE_QUERY_STATUS);
+	service = OpenService(mgr,name,SERVICE_QUERY_STATUS);
 
 	if(NULL == service && 0 != GetServiceKeyName(mgr, name, service_name, &max_len_name))
 	{

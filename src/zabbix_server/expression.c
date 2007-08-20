@@ -130,14 +130,26 @@ int	evaluate_simple(double *result,char *exp,char *error,int maxerrlen)
 /* Remove left and right spaces */
 	lrtrim_spaces(exp);
 
-	if( is_double_prefix(exp) == SUCCEED )
+/* Compress repeating - and +. Add prefix N to negative numebrs. */
+	compress_signs(exp);
+
+	/* We should process negative prefix, i.e. N123 == -123 */
+	if( exp[0]=='N' && is_double_prefix(exp+1) == SUCCEED )
+	{
+/* str2double support prefixes */
+		*result=-str2double(exp+1);
+		return SUCCEED;
+	}
+	else if( exp[0]!='N' && is_double_prefix(exp) == SUCCEED )
 	{
 /* str2double support prefixes */
 		*result=str2double(exp);
 		return SUCCEED;
 	}
 
-	if( (p = strstr(exp,"|")) != NULL )
+	/* Operators with lowest priority come first */
+	/* HIGHEST / * - + < > # = & | LOWEST */
+	if( (p = strchr(exp,'|')) != NULL )
 	{
 		*p=0;
 		strscpy( first, exp);
@@ -170,7 +182,7 @@ int	evaluate_simple(double *result,char *exp,char *error,int maxerrlen)
 		*result=0;
 		return SUCCEED;
 	}
-	if( (p = strstr(exp,"&")) != NULL )
+	if( (p = strchr(exp,'&')) != NULL )
 	{
 		*p=0;
 		strscpy( first, exp);
@@ -200,7 +212,73 @@ int	evaluate_simple(double *result,char *exp,char *error,int maxerrlen)
 		}
 		return SUCCEED;
 	}
-	if( (p = strstr(exp,">")) != NULL )
+	if((p = strchr(exp,'=')) != NULL)
+	{
+		*p=0;
+		strscpy( first, exp);
+		*p='|';
+		p++;
+		strscpy( second, p);
+		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s",
+				error);
+			zabbix_syslog("%s",
+				error);
+			return FAIL;
+		}
+		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s",
+				error);
+			zabbix_syslog("%s",
+				error);
+			return FAIL;
+		}
+		if( cmp_double(value1,value2) ==0 )
+		{
+			*result=1;
+		}
+		else
+		{
+			*result=0;
+		}
+		return SUCCEED;
+	}
+	if((p = strchr(exp,'#')) != NULL)
+	{
+		*p=0;
+		strscpy( first, exp);
+		*p='|';
+		p++;
+		strscpy( second, p);
+		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s",
+				error);
+			zabbix_syslog("%s",
+				error);
+			return FAIL;
+		}
+		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s",
+				error);
+			zabbix_syslog("%s",
+				error);
+			return FAIL;
+		}
+		if( cmp_double(value1,value2) != 0 )
+		{
+			*result=1;
+		}
+		else
+		{
+			*result=0;
+		}
+		return SUCCEED;
+	}
+	if((p = strchr(exp,'>')) != NULL)
 	{
 		*p=0;
 		strscpy( first, exp);
@@ -229,7 +307,7 @@ int	evaluate_simple(double *result,char *exp,char *error,int maxerrlen)
 		}
 		return SUCCEED;
 	}
-	if( (p = strstr(exp,"<")) != NULL )
+	if((p = strchr(exp,'<')) != NULL)
 	{
 		*p=0;
 		strscpy( first, exp);
@@ -263,7 +341,59 @@ int	evaluate_simple(double *result,char *exp,char *error,int maxerrlen)
 		zabbix_log(LOG_LEVEL_DEBUG, "Result [" ZBX_FS_DBL "]",*result );
 		return SUCCEED;
 	}
-	if( (p = strstr(exp,"*")) != NULL )
+	if((p = strchr(exp,'+')) != NULL)
+	{
+		*p=0;
+		strscpy( first, exp);
+		*p='|';
+		p++;
+		strscpy( second, p);
+		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s",
+				error);
+			zabbix_syslog("%s",
+				error);
+			return FAIL;
+		}
+		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s",
+				error);
+			zabbix_syslog("%s",
+				error);
+			return FAIL;
+		}
+		*result=value1+value2;
+		return SUCCEED;
+	}
+	if((p = strchr(exp,'-')) != NULL)
+	{
+		*p=0;
+		strscpy( first, exp);
+		*p='|';
+		p++;
+		strscpy( second, p);
+		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s",
+				error);
+			zabbix_syslog("%s",
+				error);
+			return FAIL;
+		}
+		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "%s",
+				error);
+			zabbix_syslog("%s",
+				error);
+			return FAIL;
+		}
+		*result=value1-value2;
+		return SUCCEED;
+	}
+	if((p = strchr(exp,'*')) != NULL)
 	{
 		*p=0;
 		strscpy( first, exp);
@@ -289,7 +419,7 @@ int	evaluate_simple(double *result,char *exp,char *error,int maxerrlen)
 		*result=value1*value2;
 		return SUCCEED;
 	}
-	if( (p = strstr(exp,"/")) != NULL )
+	if((p = strchr(exp,'/')) != NULL)
 	{
 		*p=0;
 		strscpy( first, exp);
@@ -326,124 +456,6 @@ int	evaluate_simple(double *result,char *exp,char *error,int maxerrlen)
 		else
 		{
 			*result=value1/value2;
-		}
-		return SUCCEED;
-	}
-	if( (p = strstr(exp,"+")) != NULL )
-	{
-		*p=0;
-		strscpy( first, exp);
-		*p='|';
-		p++;
-		strscpy( second, p);
-		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s",
-				error);
-			zabbix_syslog("%s",
-				error);
-			return FAIL;
-		}
-		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s",
-				error);
-			zabbix_syslog("%s",
-				error);
-			return FAIL;
-		}
-		*result=value1+value2;
-		return SUCCEED;
-	}
-	if( (p = strstr(exp,"-")) != NULL )
-	{
-		*p=0;
-		strscpy( first, exp);
-		*p='|';
-		p++;
-		strscpy( second, p);
-		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s",
-				error);
-			zabbix_syslog("%s",
-				error);
-			return FAIL;
-		}
-		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s",
-				error);
-			zabbix_syslog("%s",
-				error);
-			return FAIL;
-		}
-		*result=value1-value2;
-		return SUCCEED;
-	}
-	if( (p = strstr(exp,"=")) != NULL )
-	{
-		*p=0;
-		strscpy( first, exp);
-		*p='|';
-		p++;
-		strscpy( second, p);
-		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s",
-				error);
-			zabbix_syslog("%s",
-				error);
-			return FAIL;
-		}
-		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s",
-				error);
-			zabbix_syslog("%s",
-				error);
-			return FAIL;
-		}
-		if( cmp_double(value1,value2) ==0 )
-		{
-			*result=1;
-		}
-		else
-		{
-			*result=0;
-		}
-		return SUCCEED;
-	}
-	if( (p = strstr(exp,"#")) != NULL )
-	{
-		*p=0;
-		strscpy( first, exp);
-		*p='|';
-		p++;
-		strscpy( second, p);
-		if( evaluate_simple(&value1,first,error,maxerrlen) == FAIL )
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s",
-				error);
-			zabbix_syslog("%s",
-				error);
-			return FAIL;
-		}
-		if( evaluate_simple(&value2,second,error,maxerrlen) == FAIL )
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "%s",
-				error);
-			zabbix_syslog("%s",
-				error);
-			return FAIL;
-		}
-		if( cmp_double(value1,value2) != 0 )
-		{
-			*result=1;
-		}
-		else
-		{
-			*result=0;
 		}
 		return SUCCEED;
 	}
@@ -556,7 +568,14 @@ int	evaluate(int *result, char *exp, char *error, int maxerrlen)
 			error);
 		return	FAIL;
 	}
-	*result=value;
+	if(cmp_double(value,0) == 0)
+	{
+		*result = TRIGGER_VALUE_FALSE;
+	}
+	else
+	{
+		*result = TRIGGER_VALUE_TRUE;
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End evaluate(result:%lf)",
 		value);
@@ -1045,7 +1064,7 @@ zabbix_log( LOG_LEVEL_WARNING, "ALEX");
 			var_len = strlen(MVAR_IPADDRESS);
 
 			result = DBselect("select distinct h.ip from triggers t, functions f,items i, hosts h"
-				" where t.triggerid=" ZBX_FS_UI64 " and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and h.useip=1",
+				" where t.triggerid=" ZBX_FS_UI64 " and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid",
 				event->objectid);
 
 			row = DBfetch(result);
@@ -1122,7 +1141,7 @@ zabbix_log( LOG_LEVEL_WARNING, "ALEX");
 		{
 			var_len = strlen(MVAR_TRIGGER_VALUE);
 
-			replace_to = zbx_dsprintf(replace_to, ZBX_FS_UI64,
+			replace_to = zbx_dsprintf(replace_to, "%d",
 				event->value);
 		}
 		else if(macro_type & (MACRO_TYPE_MESSAGE_SUBJECT | MACRO_TYPE_MESSAGE_BODY) &&
@@ -1271,7 +1290,7 @@ void	substitute_macros(DB_EVENT *event, DB_ACTION *action, char **data)
 						
 						/* function 'evaluate_function2' require 'replace_to' with size 'MAX_STRING_LEN' */
 						zbx_free(replace_to);
-						replace_to = zbx_malloc(MAX_STRING_LEN);
+						replace_to = zbx_malloc(replace_to, MAX_STRING_LEN);
 
 						if(evaluate_function2(replace_to,host,key,function,parameter) != SUCCEED)
 							zbx_snprintf(replace_to, MAX_STRING_LEN, "%s", STR_UNKNOWN_VARIABLE);
@@ -1384,8 +1403,7 @@ int	substitute_functions(char **exp, char *error, int maxerrlen)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
- * Comments: example: ({a0:system[procload].last(0)}>1)|                      *
- *                    ({a0:system[procload].max(300)}>3)                      *
+ * Comments: example: ({123}>1)|({MACROS}=1)&({75}>3)                         *
  *                                                                            *
  ******************************************************************************/
 int	evaluate_expression(int *result,char **expression, int trigger_value, char *error, int maxerrlen)

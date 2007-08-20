@@ -23,38 +23,38 @@
 #	include "gnuregex.h"
 #endif /* _WINDOWS */
 
-char	*zbx_regexp_match(const char *string, const char *pattern, int *len)
+static	char	*zbx_regexp(const char *string, const char *pattern, int *len, int flags)
 { 
 	char	*c = NULL;
-
-	int	status;
 
 	regex_t	re;
 	regmatch_t match;
 
 	if(len) *len = 0;
 
-
-	if (regcomp(&re, pattern, REG_EXTENDED | /* REG_ICASE | */ REG_NEWLINE) != 0)
+	if( string && string[0] )
 	{
-		return(NULL);
+		if ( 0 == regcomp(&re, pattern, REG_EXTENDED | /* REG_ICASE | */ REG_NEWLINE) )
+		{
+			if( 0 == regexec(&re, string, (size_t) 1, &match, 0) )
+			{ /* Matched */
+				c=(char *)string+match.rm_so;
+				if(len) *len = match.rm_eo - match.rm_so;
+			
+			}
+
+			regfree(&re);
+		}
 	}
-
-
-	status = regexec(&re, string, (size_t) 1, &match, 0);
-
-	/* Not matched */
-	if (status != 0)
-	{
-		regfree(&re);
-		return(NULL);
-	}
-
-	c=(char *)string+match.rm_so;
-	if(len) *len = match.rm_eo - match.rm_so;
-	
-	regfree(&re);
-
 	return	c;
 }
 
+char	*zbx_regexp_match(const char *string, const char *pattern, int *len)
+{
+	return zbx_regexp(string, pattern, len, REG_EXTENDED | REG_NEWLINE);
+}
+ 
+char	*zbx_iregexp_match(const char *string, const char *pattern, int *len)
+{
+	return zbx_regexp(string, pattern, len, REG_EXTENDED | REG_ICASE | REG_NEWLINE);
+}

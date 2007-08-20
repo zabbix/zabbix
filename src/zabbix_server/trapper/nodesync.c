@@ -79,12 +79,12 @@ static int	process_record(int nodeid, char *record)
 	DB_RESULT	result;
 	DB_ROW		row;
 
-/*	zabbix_log( LOG_LEVEL_WARNING, "In process_record [%s]", record);*/
+	zabbix_log( LOG_LEVEL_DEBUG, "In process_record [%s]", record);
 
-	zbx_get_field(record,tablename,0,'|');
-	zbx_get_field(record,tmp,1,'|');
+	zbx_get_field(record,tablename,0,ZBX_DM_DELIMITER);
+	zbx_get_field(record,tmp,1,ZBX_DM_DELIMITER);
 	sscanf(tmp,ZBX_FS_UI64,&recid);
-	zbx_get_field(record,tmp,2,'|');
+	zbx_get_field(record,tmp,2,ZBX_DM_DELIMITER);
 	op=atoi(tmp);
 
 	for(i=0;tables[i].table!=0;i++)
@@ -104,13 +104,11 @@ static int	process_record(int nodeid, char *record)
 	}
 	if(op==NODE_CONFIGLOG_OP_DELETE)
 	{
-		zbx_snprintf(tmp,sizeof(tmp),"delete from %s where %s=" ZBX_FS_UI64 " and nodeid=%d",
+		zbx_snprintf(sql,sizeof(sql),"delete from %s where %s=" ZBX_FS_UI64,
 			tablename,
 			key,
-			recid,
-			nodeid);
-		zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]",
-			sql);
+			recid);
+		DBexecute("%s", sql);
 		return SUCCEED;
 	}
 
@@ -118,13 +116,13 @@ static int	process_record(int nodeid, char *record)
 	fields[0]=0;
 	fields_update[0]=0;
 	values[0]=0;
-	while(zbx_get_field(record,fieldname,i++,'|')==SUCCEED)
+	while(zbx_get_field(record,fieldname,i++,ZBX_DM_DELIMITER)==SUCCEED)
 	{
 		tmp[0]=0;
-		zbx_get_field(record,tmp,i++,'|');
+		zbx_get_field(record,tmp,i++,ZBX_DM_DELIMITER);
 		valuetype=atoi(tmp);
 		value[0]=0;
-		zbx_get_field(record,value,i++,'|');
+		zbx_get_field(record,value,i++,ZBX_DM_DELIMITER);
 		if(op==NODE_CONFIGLOG_OP_UPDATE || op==NODE_CONFIGLOG_OP_ADD)
 		{
 			if(strcmp(value,"NULL")==0)
@@ -133,7 +131,7 @@ static int	process_record(int nodeid, char *record)
 					fieldname);
 				zbx_strlcat(fields_update,tmp,sizeof(fields));
 
-				zbx_snprintf(tmp,sizeof(tmp),"NULL,", value);
+				zbx_snprintf(tmp,sizeof(tmp),"NULL,");
 			}
 			else
 			{
@@ -212,7 +210,7 @@ static int	process_record(int nodeid, char *record)
 		DBfree_result(result);
 	}
 /*	zabbix_log( LOG_LEVEL_WARNING, "SQL [%s]", sql);*/
-	if(FAIL == DBexecute(sql))
+	if(FAIL == DBexecute("%s",sql))
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Failed [%s]",
 			record);
@@ -258,9 +256,9 @@ int	node_sync(char *data)
 		if(firstline == 1)
 		{
 /*			zabbix_log( LOG_LEVEL_WARNING, "First line [%s]", s); */
-			zbx_get_field(s,tmp,1,'|');
+			zbx_get_field(s,tmp,1,ZBX_DM_DELIMITER);
 			sender_nodeid=atoi(tmp);
-			zbx_get_field(s,tmp,2,'|');
+			zbx_get_field(s,tmp,2,ZBX_DM_DELIMITER);
 			nodeid=atoi(tmp);
 			firstline=0;
 			zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Received data from node %d for node %d datalen %d",

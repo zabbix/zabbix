@@ -23,7 +23,7 @@
 static	int	evaluate_one(double *result, int *num, char *grpfunc, char const *value_str, int valuetype)
 {
 	int	ret = SUCCEED;
-	double	value;
+	double	value = 0;
 
 	if(valuetype == ITEM_VALUE_TYPE_FLOAT)
 	{
@@ -164,7 +164,7 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
 	zabbix_log( LOG_LEVEL_DEBUG, "SQL [%s]",sql);
 	zabbix_log( LOG_LEVEL_DEBUG, "SQL2 [%s]",sql2);
 
-	result = DBselect(sql);
+	result = DBselect("%s",sql);
 	while((row=DBfetch(result)))
 	{
 		valuetype = atoi(row[1]);
@@ -179,7 +179,7 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
 	}
 	DBfree_result(result);
 
-	result = DBselect(sql2);
+	result = DBselect("%s",sql2);
 	while((row=DBfetch(result)))
 	{
 		valuetype = atoi(row[1]);
@@ -192,6 +192,7 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
 			return FAIL;
 		}
 	}
+	DBfree_result(result);
 
 	if(num==0)
 	{
@@ -251,28 +252,28 @@ int	get_value_aggregate(DB_ITEM *item, AGENT_RESULT *result)
 	init_result(result);
 
 	strscpy(key, item->key);
-	if((p=strstr(key,"(")) != NULL)
+	if((p=strchr(key,'[')) != NULL)
 	{
 		*p=0;
 		strscpy(function_grp,key);
-		*p='(';
+		*p='[';
 		p++;
 	}
 	else	ret = NOTSUPPORTED;
 
 	if(ret == SUCCEED)
 	{
-		if((p2=strstr(p,"'")) != NULL)
+		if((p2=strchr(p,'"')) != NULL)
 		{
 			p2++;
 		}
 		else	ret = NOTSUPPORTED;
 
-		if((ret == SUCCEED) && (p=strstr(p2,"'")) != NULL)
+		if((ret == SUCCEED) && (p=strchr(p2,'"')) != NULL)
 		{
 			*p=0;
 			strscpy(group,p2);
-			*p='\'';
+			*p='"';
 			p++;
 		}
 		else	ret = NOTSUPPORTED;
@@ -282,17 +283,17 @@ int	get_value_aggregate(DB_ITEM *item, AGENT_RESULT *result)
 
 	if(ret == SUCCEED)
 	{
-		if((p2=strstr(p,"'")) != NULL)
+		if((p2=strchr(p,'"')) != NULL)
 		{
 			p2++;
 		}
 		else	ret = NOTSUPPORTED;
 
-		if((ret == SUCCEED) && (p=strstr(p2,"'")) != NULL)
+		if((ret == SUCCEED) && (p=strchr(p2,'"')) != NULL)
 		{
 			*p=0;
 			strscpy(itemkey,p2);
-			*p='\'';
+			*p='"';
 			p++;
 		}
 		else	ret = NOTSUPPORTED;
@@ -302,17 +303,17 @@ int	get_value_aggregate(DB_ITEM *item, AGENT_RESULT *result)
 
 	if(ret == SUCCEED)
 	{
-		if((p2=strstr(p,"'")) != NULL)
+		if((p2=strchr(p,'"')) != NULL)
 		{
 			p2++;
 		}
 		else	ret = NOTSUPPORTED;
 
-		if((ret == SUCCEED) && (p=strstr(p2,"'")) != NULL)
+		if((ret == SUCCEED) && (p=strchr(p2,'"')) != NULL)
 		{
 			*p=0;
 			strscpy(function_item,p2);
-			*p='\'';
+			*p='"';
 			p++;
 		}
 		else	ret = NOTSUPPORTED;
@@ -322,18 +323,17 @@ int	get_value_aggregate(DB_ITEM *item, AGENT_RESULT *result)
 
 	if(ret == SUCCEED)
 	{
-		if((p2=strstr(p,"'")) != NULL)
+		if((p2=strchr(p,'"')) != NULL)
 		{
 			p2++;
-			zabbix_log( LOG_LEVEL_DEBUG, "p2[%s]",p2);
 		}
 		else	ret = NOTSUPPORTED;
 
-		if((ret == SUCCEED) && (p=strstr(p2,"'")) != NULL)
+		if((ret == SUCCEED) && (p=strchr(p2,'"')) != NULL)
 		{
 			*p=0;
 			strscpy(parameter,p2);
-			*p='\'';
+			*p='"';
 			p++;
 		}
 		else	ret = NOTSUPPORTED;

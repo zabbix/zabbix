@@ -19,7 +19,8 @@
 
 #include "common.h"
 #include "alias.h"
-
+#include "log.h"
+	
 /* Static data */
 
 static ALIAS *aliasList=NULL;
@@ -47,47 +48,51 @@ int	add_alias_from_config(char *line)
 
 int	add_alias(const char *name, const char *value)
 {
-	ALIAS *alias;
+	ALIAS *alias = NULL;
+
+	assert(name);
+	assert(value);
 
 	for(alias = aliasList; ; alias=alias->next)
 	{
 		/* Add new parameters */
-		if(alias == NULL)
+		if ( NULL == alias )
 		{
-			alias = (ALIAS *)malloc(sizeof(ALIAS));
-			if (NULL != alias)
-			{
-				memset(alias,0,sizeof(ALIAS));
-				zbx_strlcpy(alias->name, name, MAX_ALIAS_NAME-1);
-				alias->value = (char *)malloc(strlen(value)+1);
-				strcpy(alias->value,value);
-				alias->next=aliasList;
-				aliasList=alias;
+			alias = (ALIAS *)zbx_malloc(alias, sizeof(ALIAS));
+			memset(alias,0,sizeof(ALIAS));
 
-				return SUCCEED;
-			}
-			break;
+			zbx_strlcpy(alias->name, name, MAX_ALIAS_NAME-1);
+
+			alias->value = strdup(value);
+
+			alias->next=aliasList;
+
+			aliasList=alias;
+
+			zabbix_log( LOG_LEVEL_DEBUG, "Alias added. [%s] -> [%s]", name, value);
+			return SUCCEED;
 		}
 
 		/* Replace existing parameters */
 		if (strcmp(alias->name, name) == 0)
 		{
-			if(alias->value)
-				free(alias->value);
+			zbx_free(alias->value);
 
 			memset(alias, 0, sizeof(ALIAS));
 			
 			zbx_strlcpy(alias->name, name, MAX_ALIAS_NAME-1);
-			
-			alias->value = (char *)malloc(strlen(value)+1);
-			strcpy(alias->value, value);
+
+			alias->value = strdup(value);
 
 			alias->next = aliasList;
+
 			aliasList = alias;
 
+			zabbix_log( LOG_LEVEL_DEBUG, "Alias replaced. [%s] -> [%s]", name, value);
 			return SUCCEED;
 		}
 	}
+	zabbix_log( LOG_LEVEL_WARNING, "Alias FAILED. [%s] -> [%s]", name, value);
 	return FAIL;
 }
 
@@ -101,9 +106,10 @@ void	alias_list_free(void)
 	{
 		curr = next;
 		next = curr->next;
-		free(curr->value);
-		free(curr);
+		zbx_free(curr->value);
+		zbx_free(curr);
 	}
+	aliasList = NULL;
 }
 
 /*

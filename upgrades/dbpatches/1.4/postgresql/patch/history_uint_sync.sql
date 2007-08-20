@@ -5,5 +5,5 @@ CREATE TABLE history_uint_sync (
 	clock		integer		DEFAULT '0'	NOT NULL,
 	value		bigint DEFAULT '0'	NOT NULL,
 	PRIMARY KEY (id)
-);
+) with OIDS;
 CREATE INDEX history_uint_sync_1 on history_uint_sync (nodeid,id);

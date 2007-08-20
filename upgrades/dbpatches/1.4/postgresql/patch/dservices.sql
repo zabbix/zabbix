@@ -9,4 +9,4 @@ CREATE TABLE dservices (
         lastup          integer         DEFAULT '0'     NOT NULL,
         lastdown        integer         DEFAULT '0'     NOT NULL,
         PRIMARY KEY (dserviceid)
-);
+) with OIDS;

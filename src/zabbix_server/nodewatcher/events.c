@@ -51,7 +51,7 @@ static int process_node(int nodeid, int master_nodeid, zbx_uint64_t event_lastid
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		*data;
+	char		*data = NULL;
 	int		found = 0;
 
 	int		offset = 0;
@@ -64,11 +64,13 @@ static int process_node(int nodeid, int master_nodeid, zbx_uint64_t event_lastid
 		event_lastid);
 	/* Begin work */
 
-	data = malloc(allocated);
+	data = zbx_malloc(data, allocated);
 	memset(data,0,allocated);
 
-	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "Events|%d|%d",
+	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "Events%c%d%c%d",
+		ZBX_DM_DELIMITER,
 		CONFIG_NODEID,
+		ZBX_DM_DELIMITER,
 		nodeid);
 
 	result = DBselect("select eventid,source,object,objectid,clock,value,acknowledged from events where eventid>" ZBX_FS_UI64 " and " ZBX_COND_NODEID " order by eventid",
@@ -78,20 +80,28 @@ static int process_node(int nodeid, int master_nodeid, zbx_uint64_t event_lastid
 	{
 		ZBX_STR2UINT64(eventid,row[0])
 		found = 1;
-		zbx_snprintf_alloc(&data, &allocated, &offset, 1024, "\n%s|%s|%s|%s|%s|%s|%s",
+		zbx_snprintf_alloc(&data, &allocated, &offset, 1024, "\n%s%c%s%c%s%c%s%c%s%c%s%c%s",
 				row[0],
+				ZBX_DM_DELIMITER,
 				row[1],
+				ZBX_DM_DELIMITER,
 				row[2],
+				ZBX_DM_DELIMITER,
 				row[3],
+				ZBX_DM_DELIMITER,
 				row[4],
+				ZBX_DM_DELIMITER,
 				row[5],
+				ZBX_DM_DELIMITER,
 				row[6]);
 	}
 	if(found == 1)
 	{
 		zabbix_log( LOG_LEVEL_DEBUG, "Sending [%s]",
 			data);
-		if(send_to_node(master_nodeid, nodeid, data) == SUCCEED)
+		/* Do not send events for current node if CONFIG_NODE_NOEVENTS is set */
+		if( ((CONFIG_NODE_NOEVENTS !=0) && (CONFIG_NODEID == nodeid)) ||
+			send_to_node("new events", master_nodeid, nodeid, data) == SUCCEED)
 		{
 			zabbix_log( LOG_LEVEL_DEBUG, "Updating nodes.event_lastid");
 			DBexecute("update nodes set event_lastid=" ZBX_FS_UI64 " where nodeid=%d",
@@ -104,7 +114,7 @@ static int process_node(int nodeid, int master_nodeid, zbx_uint64_t event_lastid
 		}
 	}
 	DBfree_result(result);
-	free(data);
+	zbx_free(data);
 
 	return SUCCEED;
 }
@@ -138,19 +148,19 @@ void main_eventsender()
 
 	master_nodeid = get_master_node(CONFIG_NODEID);
 
-	if(master_nodeid == 0)		return;
-
-	result = DBselect("select nodeid,event_lastid from nodes");
-
-	while((row = DBfetch(result)))
+	if(master_nodeid != 0)
 	{
-		nodeid=atoi(row[0]);
-		ZBX_STR2UINT64(lastid,row[1])
+		result = DBselect("select nodeid,event_lastid from nodes");
 
-		process_node(nodeid, master_nodeid, lastid);
+		while((row = DBfetch(result)))
+		{
+			nodeid=atoi(row[0]);
+			ZBX_STR2UINT64(lastid,row[1])
+
+			process_node(nodeid, master_nodeid, lastid);
+		}
+		DBfree_result(result);
 	}
-
-	DBfree_result(result);
 
 	DBcommit();
 }

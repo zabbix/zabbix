@@ -33,7 +33,7 @@ include_once "include/page_header.php";
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		"itemid"=>		array(T_ZBX_INT, O_MAND,P_SYS,	DB_ID,		null),
-		"period"=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(3600,365*24*3600),	null),
+		"period"=>		array(T_ZBX_INT, O_OPT,	null,	BETWEEN(ZBX_MIN_PERIOD,ZBX_MAX_PERIOD),	null),
 		"from"=>		array(T_ZBX_INT, O_OPT,	null,	'{}>=0',	null),
 		"width"=>		array(T_ZBX_INT, O_OPT,	null,	'{}>0',		null),
 		"height"=>		array(T_ZBX_INT, O_OPT,	null,	'{}>0',		null),
@@ -44,6 +44,12 @@ include_once "include/page_header.php";
 	check_fields($fields);
 ?>
 <?php
+	if(! (DBfetch(DBselect('select itemid from items where itemid='.$_REQUEST['itemid']))) )
+	{
+		show_error_message(S_NO_ITEM_DEFINED);
+
+	}
+
 	if(! ($db_data = DBfetch(DBselect("select i.itemid from items i ".
 		" where i.hostid in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY).") ".
 		" and i.itemid=".$_REQUEST["itemid"]))))

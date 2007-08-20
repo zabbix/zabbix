@@ -25,7 +25,7 @@
 
 	global $USER_DETAILS;
 	global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID;
-	global $ZBX_CURNODEID, $ZBX_CURMASTERID;
+	global $ZBX_CURMASTERID;
 	global $page;
 
 COpt::profiling_start("page");
@@ -63,7 +63,7 @@ COpt::profiling_start("page");
 			
 			if(defined('ZBX_DISTRIBUTED'))
 			{
-				if($curr_node_data = DBfetch(DBselect('select * from nodes where nodeid='.$ZBX_CURNODEID)))
+				if($curr_node_data = DBfetch(DBselect('select * from nodes where nodeid='.get_current_nodeid(false))))
 					$page['title'] .= ' ('.$curr_node_data['name'].')';
 			}
 			if(defined('ZBX_PAGE_DO_REFRESH') && $USER_DETAILS["refresh"])
@@ -115,7 +115,7 @@ COpt::profiling_start("page");
 						),
 					array("url"=>"screens.php"	,"label"=>S_SCREENS	),
 					array("url"=>"discovery.php"	,"label"=>S_DISCOVERY	, "user_type"=>USER_TYPE_ZABBIX_ADMIN),
-					array("url"=>"srv_status.php"	,"label"=>S_IT_SERVICES	,
+					array("url"=>"srv_status.php"	,"label"=>S_IT_SERVICES	, 'forse_disable_subnodes' => true,
 						"sub_pages"=>array("report3.php","chart_sla.php","chart5.php")
 						),
 					array("url"=>"vtext.php"),
@@ -145,6 +145,7 @@ COpt::profiling_start("page");
 				"user_type"		=> USER_TYPE_ZABBIX_ADMIN,
 				"node_perm"		=> PERM_READ_LIST,
 				"default_page_id"	=> 0,
+				"forse_disable_subnodes"=> true,
 				"pages"=>array(
 					array("url"=>"config.php"	,"label"=>S_GENERAL		,
 						"sub_pages"=>array("image.php")
@@ -180,6 +181,7 @@ COpt::profiling_start("page");
 				"user_type"		=> USER_TYPE_SUPER_ADMIN,
 				"node_perm"		=> PERM_READ_WRITE,
 				"default_page_id"	=> 1,
+				"forse_disable_subnodes"=> true,
 				"pages"=>array(
 					ZBX_DISTRIBUTED ? array("url"=>"nodes.php"	,"label"=>S_NODES) : null ,
 					array("url"=>"users.php"	,"label"=>S_USERS		,
@@ -196,6 +198,7 @@ COpt::profiling_start("page");
 		"login"=>array(
 				"label"			=> S_LOGIN,
 				"default_page_id"	=> 0,
+				"forse_disable_subnodes"=> true,
 				"pages"=>array(
 					array("url"=>"index.php",
 						"sub_pages"=>array("profile.php")
@@ -221,9 +224,9 @@ COpt::profiling_start("page");
 
 			if(isset($sub['node_perm']))
 			{
-				if(!in_array($ZBX_CURNODEID,get_accessible_nodes_by_user(
+				if ( 0 == count(get_accessible_nodes_by_user(
 					$USER_DETAILS,$sub['node_perm'],null,
-					PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+					PERM_RES_IDS_ARRAY,get_current_nodeid(false))))
 						$deny = true;
 			}
 
@@ -251,9 +254,9 @@ COpt::profiling_start("page");
 
 				if(isset($sub_pages['node_perm']))
 				{
-					if(!in_array($ZBX_CURNODEID,get_accessible_nodes_by_user(
+					if ( 0 == count(get_accessible_nodes_by_user(
 						$USER_DETAILS,$sub_pages['node_perm'],null,
-						PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+						PERM_RES_IDS_ARRAY,get_current_nodeid(false))))
 					{
 						unset($sub['pages'][$id]);
 						continue;
@@ -283,6 +286,14 @@ COpt::profiling_start("page");
 					$page_exist = true;
 					$sub['pages'][$id]['active'] = true; /* mark as active */
 				}					
+			}
+
+			if (	isset($page_exist) &&
+				( isset($sub['forse_disable_subnodes']) || isset($sub_pages['forse_disable_subnodes']) ) &&
+				!defined('ZBX_DISABLE_SUBNODES')
+			)
+			{
+					define('ZBX_DISABLE_SUBNODES', 1);
 			}
 		}
 
@@ -358,9 +369,11 @@ COpt::profiling_start("page");
 	{
 COpt::compare_files_with_menu($ZBX_MENU);
 
-		$help = new CLink(S_HELP, "http://www.zabbix.com/manual/v1.1/index.php", "small_font");
+		$help = new CLink(S_HELP, "http://www.zabbix.com/manual/v1.4", "small_font");
 		$help->SetTarget('_blank');
-		$page_header_r_col = array($help,
+		$support = new CLink(S_GET_SUPPORT, "http://www.zabbix.com/support.php", "small_font");
+		$support->SetTarget('_blank');
+		$page_header_r_col = array($help, array("|",$support),
 			($USER_DETAILS["alias"] != "guest") ?
 				array("|", new CLink(S_PROFILE, "profile.php", "small_font")) :
 				null
@@ -369,7 +382,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$logo->SetTarget('_blank');
 
 		$top_page_row	= array(new CCol($logo, "page_header_l"), new CCol($page_header_r_col, "page_header_r"));
-		unset($logo, $page_header_r_col, $help);
+		unset($logo, $page_header_r_col, $help, $support);
 
 		$table = new CTable(NULL,"page_header");
 		$table->SetCellSpacing(0);
@@ -386,22 +399,37 @@ COpt::compare_files_with_menu($ZBX_MENU);
 
 		if(ZBX_DISTRIBUTED)
 		{
-			$lst_nodes = new CComboBox('switch_node', $ZBX_CURNODEID);
-			$db_nodes = DBselect('select * from nodes where nodeid in ('.
-				get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST).') '.
-				' order by name ');
+			$lst_nodes = new CComboBox('switch_node', get_current_nodeid(false));
+			$db_nodes = DBselect(
+					'select * from nodes '.
+					' where nodeid in ('.
+					get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST).
+					') '.
+					' order by name '
+					);
 			while($node_data = DBfetch($db_nodes))
 			{
 				$lst_nodes->AddItem($node_data['nodeid'],$node_data['name']);
 			}
 
-			if($lst_nodes->ItemsCount())
+			if( $lst_nodes->ItemsCount() > 1 )
 			{
 				$node_form = new CForm();
-				$node_form->AddItem(S_CURRENT_NODE.' ['.$ZBX_CURNODEID.'] ');
-				$node_form->AddItem($lst_nodes);
+				$node_form->AddItem(array(S_CURRENT_NODE,$lst_nodes));
 				unset($lst_nodes);
-				$node_form->AddItem(new CButton('submit',S_SWITCH));
+
+				if ( !defined('ZBX_DISABLE_SUBNODES') )
+				{
+					global $ZBX_WITH_SUBNODES;
+
+					$cmd_show_subnodes = new CComboBox('show_subnodes', !empty($ZBX_WITH_SUBNODES) ? 1 : 0);
+					$cmd_show_subnodes->AddItem(0, S_CURRENT_NODE_ONLY);
+					$cmd_show_subnodes->AddItem(1, S_WITH_SUBNODES);
+
+					$node_form->AddItem(array(SPACE, S_SHOW, $cmd_show_subnodes));
+				}
+
+				$node_form->AddItem(new CButton('submit',S_SWITCH_NODE));
 			}
 		}
 		

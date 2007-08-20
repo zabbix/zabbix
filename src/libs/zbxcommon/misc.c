@@ -138,7 +138,7 @@ double zbx_current_time (void)
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_setproctitle(const char *fmt, ...)
+void	__zbx_zbx_setproctitle(const char *fmt, ...)
 {
 #ifdef HAVE_FUNCTION_SETPROCTITLE
 
@@ -252,10 +252,10 @@ int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char
 int	ip_in_list(char *list, char *ip)
 {
 	char	tmp_ip[MAX_STRING_LEN];
-	char	c;
+	char	c = '\0';
 	int	i1,i2,i3,i4,i5;
 	int	ret = FAIL;
-	char	*start, *end;
+	char	*start = NULL, *end = NULL;
 
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In ip_in_list(list:%s,ip:%s)",
@@ -306,6 +306,11 @@ int	ip_in_list(char *list, char *ip)
 		}
 	}
 
+	if(end != NULL)
+	{
+		end[0]=c;
+	}
+
 	zabbix_log( LOG_LEVEL_DEBUG, "End ip_in_list(ret:%s)", ret == SUCCEED?"SUCCEED":"FAIL");
 
 	return ret;
@@ -329,10 +334,10 @@ int	ip_in_list(char *list, char *ip)
  ******************************************************************************/
 int	int_in_list(char *list, int value)
 {
-	char	*start, *end;
+	char	*start = NULL, *end = NULL;
 	int	i1,i2;
 	int	ret = FAIL;
-	char	c;
+	char	c = '\0';
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In int_in_list(list:%s,value:%d)", list, value);
 
@@ -372,6 +377,11 @@ int	int_in_list(char *list, int value)
 		{
 			break;
 		}
+	}
+
+	if(end != NULL)
+	{
+		end[0]=c;
 	}
 
 	zabbix_log( LOG_LEVEL_DEBUG, "End int_in_list(ret:%s)", ret == SUCCEED?"SUCCEED":"FAIL");
@@ -490,6 +500,12 @@ int	is_double_prefix(char *c)
 
 	for(i=0;c[i]!=0;i++)
 	{
+		/* Negative number? */
+		if(c[i]=='-' && i==0)
+		{
+			continue;
+		}
+
 		if((c[i]>='0')&&(c[i]<='9'))
 		{
 			continue;
@@ -556,6 +572,12 @@ int	is_double(char *c)
 
 	for(len=0; c[i]!=0; i++, len++)
 	{
+		/* Negative number? */
+		if(c[i]=='-' && i==0)
+		{
+			continue;
+		}
+
 		if((c[i]>='0')&&(c[i]<='9'))
 		{
 			continue;
@@ -628,3 +650,76 @@ int	is_uint(char *c)
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: uint64_in_list                                                   *
+ *                                                                            *
+ * Purpose: check if uin64 integer matches a list of integers                 *
+ *                                                                            *
+ * Parameters: list -  integers [i1-i2,i3,i4,i5-i6] (10-25,45,67-699          *
+ *             value-  value                                                  *
+ *                                                                            *
+ * Return value: FAIL - out of period, SUCCEED - within the list              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	uint64_in_list(char *list, zbx_uint64_t value)
+{
+	char		*start = NULL, *end = NULL;
+	zbx_uint64_t	i1,i2,tmp_uint64;
+	int		ret = FAIL;
+	char		c = '\0';
+
+	zabbix_log( LOG_LEVEL_DEBUG, "In int_in_list(list:%s,value:" ZBX_FS_UI64 ")", list, value);
+
+	for(start = list; start[0] != '\0';)
+	{
+		end=strchr(start, ',');
+
+		if(end != NULL)
+		{	
+			c=end[0];
+			end[0]='\0';
+		}
+		
+		if(sscanf(start,ZBX_FS_UI64 "-" ZBX_FS_UI64,&i1,&i2) == 2)
+		{
+			if(value>=i1 && value<=i2)
+			{
+				ret = SUCCEED;
+				break;
+			}
+		}
+		else
+		{
+			ZBX_STR2UINT64(tmp_uint64,start);
+			if(tmp_uint64 == value)
+			{
+				ret = SUCCEED;
+				break;
+			}
+		}
+
+		if(end != NULL)
+		{
+			end[0]=c;
+			start=end+1;
+		}
+		else
+		{
+			break;
+		}
+	}
+
+	if(end != NULL)
+	{
+		end[0]=c;
+	}
+
+	zabbix_log( LOG_LEVEL_DEBUG, "End int_in_list(ret:%s)", ret == SUCCEED?"SUCCEED":"FAIL");
+
+	return ret;
+}

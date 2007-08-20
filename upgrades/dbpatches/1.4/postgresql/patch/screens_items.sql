@@ -15,7 +15,7 @@ CREATE TABLE screens_items_tmp (
 	style		integer		DEFAULT '0'	NOT NULL,
 	url		varchar(255)		DEFAULT ''	NOT NULL,
 	PRIMARY KEY (screenitemid)
-);
+) with OIDS;
 
 insert into screens_items_tmp select NULL,screenid,resourcetype,resourceid,width,height,x,y,colspan,rowspan,elements,valign,halign,style,url from screens_items;
 drop table screens_items;
@@ -38,7 +38,7 @@ CREATE TABLE screens_items_tmp (
 	style		integer		DEFAULT '0'	NOT NULL,
 	url		varchar(255)		DEFAULT ''	NOT NULL,
 	PRIMARY KEY (screenitemid)
-);
+) with OIDS;
 
 insert into screens_items_tmp select * from screens_items;
 drop table screens_items;

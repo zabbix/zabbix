@@ -4,7 +4,7 @@ CREATE TABLE images_tmp (
 	name		varchar(64)		DEFAULT '0'	NOT NULL,
 	image		bytea	DEFAULT ''	NOT NULL,
 	PRIMARY KEY (imageid)
-);
+) with OIDS;
 CREATE INDEX images_1 on images_tmp (imagetype,name);
 
 insert into images_tmp select * from images;

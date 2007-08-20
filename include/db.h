@@ -35,6 +35,41 @@ extern	char	*CONFIG_DBSOCKET;
 extern	int	CONFIG_DBPORT;
 extern	int	CONFIG_NODEID;
 extern	int	CONFIG_MASTER_NODEID;
+extern	int	CONFIG_NODE_NOHISTORY;
+
+typedef enum {
+	GRAPH_TYPE_NORMAL = 0,
+	GRAPH_TYPE_STACKED = 1
+} zbx_graph_types;
+
+typedef enum {
+	SCREEN_RESOURCE_GRAPH = 0,
+	SCREEN_RESOURCE_SIMPLE_GRAPH,
+	SCREEN_RESOURCE_MAP,
+	SCREEN_RESOURCE_PLAIN_TEXT,
+	SCREEN_RESOURCE_HOSTS_INFO,
+	SCREEN_RESOURCE_TRIGGERS_INFO,
+	SCREEN_RESOURCE_SERVER_INFO,
+	SCREEN_RESOURCE_CLOCK,
+	SCREEN_RESOURCE_SCREEN,
+	SCREEN_RESOURCE_TRIGGERS_OVERVIEW,
+	SCREEN_RESOURCE_DATA_OVERVIEW,
+	SCREEN_RESOURCE_URL,
+	SCREEN_RESOURCE_ACTIONS,
+	SCREEN_RESOURCE_EVENTS
+} zbx_screen_resources;
+
+typedef enum {
+	CALC_FNC_MIN = 1,
+	CALC_FNC_AVG = 2,
+	CALC_FNC_MAX = 4,
+	CALC_FNC_ALL = 7
+} zbx_graph_item_calc_function;
+
+typedef enum {
+	GRAPH_ITEM_SIMPLE = 0,
+	GRAPH_ITEM_AGGREGATED = 1
+} zbx_graph_item_type;
 
 #define	ZBX_DB_CONNECT_NORMAL	0
 #define	ZBX_DB_CONNECT_EXIT	1
@@ -431,9 +466,20 @@ void    DBconnect(int flag);
 void    DBclose(void);
 void    DBvacuum(void);
 
-int	DBexecute(const char *fmt, ...);
+#ifdef HAVE___VA_ARGS__
+#	define DBexecute(fmt, ...) __zbx_DBexecute(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#else
+#	define DBexecute __zbx_DBexecute
+#endif /* HAVE___VA_ARGS__ */
+int	__zbx_DBexecute(const char *fmt, ...);
 
-DB_RESULT	DBselect(const char *fmt, ...);
+#ifdef HAVE___VA_ARGS__
+#	define DBselect(fmt, ...) __zbx_DBselect(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#else
+#	define DBselect __zbx_DBselect
+#endif /* HAVE___VA_ARGS__ */
+DB_RESULT	__zbx_DBselect(const char *fmt, ...);
+
 DB_RESULT	DBselectN(char *query, int n);
 DB_ROW		DBfetch(DB_RESULT result);
 zbx_uint64_t	DBinsert_id(int exec_result, const char *table, const char *field);
@@ -512,5 +558,11 @@ int	DBsync_host_with_templates(
 int	DBdelete_host(
 		zbx_uint64_t hostid
 	);
-
+void	DBupdate_services_rec(
+		zbx_uint64_t serviceid
+	);
+void	DBupdate_services(
+		zbx_uint64_t triggerid,
+		int status
+	);
 #endif

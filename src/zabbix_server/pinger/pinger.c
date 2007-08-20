@@ -124,7 +124,7 @@ static int process_value(char *key, char *host, AGENT_RESULT *value)
 	}
 	else
 	{
-		result = DBselect("select %s where h.status=%d and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type=%d and" ZBX_COND_NODEID,
+		result = DBselect("select %s where h.status=%d and h.hostid=i.hostid and h.dns='%s' and i.key_='%s' and i.status=%d and i.type=%d and" ZBX_COND_NODEID,
 			ZBX_SQL_ITEM_SELECT,
 			HOST_STATUS_MONITORED,
 			host,
@@ -220,7 +220,7 @@ static int create_host_file(void)
 	DBfree_result(result);
 
 	/* Select hosts monitored by hostname */
-	result = DBselect("select distinct h.host from hosts h,items i where "  ZBX_SQL_MOD(h.hostid,%d) "=%d and i.hostid=h.hostid and h.status=%d and (i.key_='%s' or i.key_='%s') and i.type=%d and i.status=%d and h.useip=0 and" ZBX_COND_NODEID,
+	result = DBselect("select distinct h.dns from hosts h,items i where "  ZBX_SQL_MOD(h.hostid,%d) "=%d and i.hostid=h.hostid and h.status=%d and (i.key_='%s' or i.key_='%s') and i.type=%d and i.status=%d and h.useip=0 and" ZBX_COND_NODEID,
 		CONFIG_PINGER_FORKS,
 		pinger_num-1,
 		HOST_STATUS_MONITORED,
@@ -232,13 +232,13 @@ static int create_host_file(void)
 
 	while((row=DBfetch(result)))
 	{
-		strscpy(host.host,row[0]);
+		strscpy(host.dns,row[0]);
 
 		fprintf(f,"%s\n",
-			host.host);
+			host.dns);
 
-		zabbix_log( LOG_LEVEL_DEBUG, "HOSTNAME [%s]",
-			host.host);
+		zabbix_log( LOG_LEVEL_DEBUG, "DNS name [%s]",
+			host.dns);
 	}
 	DBfree_result(result);
 

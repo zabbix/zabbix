@@ -41,12 +41,15 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>
                if test -f /usr/local/openldap/include/ldap.h; then
                        LDAP_INCDIR=/usr/local/openldap/include/
                        LDAP_LIBDIR=/usr/local/openldap/lib/
+		       found_ldap="yes"
                elif test -f /usr/include/ldap.h; then
                        LDAP_INCDIR=/usr/include
                        LDAP_LIBDIR=/usr/lib
+		       found_ldap="yes"
                elif test -f /usr/local/include/ldap.h; then
                        LDAP_INCDIR=/usr/local/include
                        LDAP_LIBDIR=/usr/local/lib
+		       found_ldap="yes"
                else
                        found_ldap="no"
                        AC_MSG_RESULT(no)
@@ -55,6 +58,7 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>
                if test -f $_libldap_with/include/ldap.h; then
                        LDAP_INCDIR=$_libldap_with/include
                        LDAP_LIBDIR=$_libldap_with/lib
+		       found_ldap="yes"
                else
                        found_ldap="no"
                        AC_MSG_RESULT(no)
@@ -72,6 +76,7 @@ AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>
 
                found_ldap="yes"
                AC_DEFINE(HAVE_LDAP,1,[Define to 1 if LDAP should be enabled.])
+	       AC_DEFINE(LDAP_DEPRECATED, 1, [Define to 1 if LDAP depricated functions is used.])
                AC_MSG_RESULT(yes)
 
                if test "x$enable_static" = "xyes"; then

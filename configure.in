@@ -20,7 +20,7 @@ dnl
 dnl Process this file with autoconf to produce a configure script.
 
 AC_INIT(src/zabbix_server/server.c)
-AM_INIT_AUTOMAKE([zabbix],[1.4])
+AM_INIT_AUTOMAKE([zabbix],[1.4.2])
 
 AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
 
@@ -62,11 +62,13 @@ dnl Why I had -lsnmp before ???
 dnl AC_CHECK_LIB(snmp, main, LIBS="-lsnmp $LIBS")
 dnl Required for AIX when -lsnmp is used
 dnl AC_CHECK_LIB(isode, main)
-AC_CHECK_LIB(socket, main)
+AC_SEARCH_LIBS(socket, socket)
 #Solaris SNMP requires this
-AC_CHECK_LIB(kstat, main)
-AC_CHECK_LIB(nsl, main)
-AC_CHECK_LIB(resolv, main)
+AC_SEARCH_LIBS(kstat_open, kstat)
+AC_SEARCH_LIBS(gethostbyname, nsl)
+AC_SEARCH_LIBS(__res_query, resolv bind socket)
+#Solaris 8 requires this. It does not have symbol __res_query.
+AC_SEARCH_LIBS(res_query, resolv bind socket)
 AC_CHECK_LIB(m, main)
 AC_CHECK_LIB(kvm, main)
 dnl AC_CHECK_LIB(pthread, main)
@@ -109,6 +111,15 @@ AC_MSG_CHECKING(for file /proc/stat)
 if test -r /proc/stat; then
 	AC_MSG_RESULT(yes)
 	AC_DEFINE(HAVE_PROC_STAT,1,[Define to 1 if file '/proc/stat' should be used.])
+else
+	AC_MSG_RESULT(no)
+fi
+
+dnl Check for /proc/cpuinfo filesystem
+AC_MSG_CHECKING(for file /proc/cpuinfo)
+if test -r /proc/cpuinfo; then
+	AC_MSG_RESULT(yes)
+	AC_DEFINE(HAVE_PROC_CPUINFO,1,[Define to 1 if file '/proc/cpuinfo' should be used.])
 else
 	AC_MSG_RESULT(no)
 fi
@@ -415,6 +426,19 @@ AC_DEFINE(HAVE_SYSINFO_TOTALRAM,1,[Define to 1 if 'sysinfo.totalram' exist.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
+dnl Check for __VA_ARGS__
+AC_MSG_CHECKING(for __VA_ARGS__)
+AC_TRY_COMPILE(
+[
+int test(const char *fmt, ...) { return 0; }
+],
+[
+#define TEST(fmt, ...) test(""fmt, ##__VA_ARGS__)
+TEST("%s","test");
+],
+AC_DEFINE(HAVE___VA_ARGS__, 1 ,[Define to 1 if __VA_ARGS__ available.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
 dnl Check for sharedram in struct sysinfo
 AC_MSG_CHECKING(for sharedram in struct sysinfo)
 AC_TRY_COMPILE([#include <sys/sysinfo.h>],
@@ -502,6 +526,9 @@ esac],
 AM_CONDITIONAL(AGENT, test x$agent = xyes)
 
 have_db="no"
+have_web_monitoring="no"
+have_jabber="no"
+have_snmp="no"
 
 if test "$server" = "yes"; then
 
@@ -601,63 +628,78 @@ if test "$server" = "yes"; then
 	AC_SUBST(DB_LIBS)
 
 	CFLAGS="${CFLAGS} ${DB_CPPFLAGS}"
-	LDFLAGS="${LDFLAGS} ${DB_LDFLAGS}"
-	LIBS="${LIBS} ${DB_LIBS}"
+	SERVER_LDFLAGS="${SERVER_LDFLAGS} ${DB_LDFLAGS}"
+	SERVER_LIBS="${SERVER_LIBS} ${DB_LIBS}"
 	
 	dnl Checking for Jabber libraries
 	JABBER_CHECK_CONFIG()
 	if test "x$want_jabber" = "xyes"; then
 		if test "x$found_jabber" != "xyes"; then
 			AC_MSG_ERROR([Not found Jabber library])
+		else
+			have_jabber="yes"
 		fi
 	fi
 	CFLAGS="${CFLAGS} ${JABBER_CPPFLAGS}"
-	LDFLAGS="${LDFLAGS} ${JABBER_LDFLAGS}"
+	SERVER_LDFLAGS="${SERVER_LDFLAGS} ${JABBER_LDFLAGS}"
 
 	dnl Check for libCurl [default - yes]
-	LIBCURL_CHECK_CONFIG(, [7.15.1], [],[])
+	LIBCURL_CHECK_CONFIG(, [7.13.1], [],[])
 	if test "x$want_curl" = "xyes"; then
 		if test "x$found_curl" != "xyes"; then
 			AC_MSG_ERROR([Not found Curl library])
 		fi
 	fi
+	if test "x$found_curl" = "xyes"; then
+		have_web_monitoring="cURL"
+	fi
+
 	CFLAGS="${CFLAGS} ${LIBCURL_CPPFLAGS}"
-	LDFLAGS="${LDFLAGS} ${LIBCURL_LDFLAGS}"
-	LIBS="${LIBS} ${LIBCURL_LIBS}"
+	SERVER_LDFLAGS="${SERVER_LDFLAGS} ${LIBCURL_LDFLAGS}"
+	SERVER_LIBS="${SERVER_LIBS} ${LIBCURL_LIBS}"
+
+	dnl Check for NET-SNMP [by default - skip]
+	LIBNETSNMP_CHECK_CONFIG([no])
+	if test "x$want_netsnmp" = "xyes"; then
+		if test "x$found_netsnmp" != "xyes"; then
+			AC_MSG_ERROR([Invalid NET-SNMP directory - unable to find net-snmp-config])
+		else
+			have_snmp="net-snmp"
+		fi
+	fi
+	CFLAGS="${CFLAGS} ${SNMP_CFLAGS}"
+	SERVER_LDFLAGS="${SERVER_LDFLAGS} ${SNMP_LDFLAGS}"
+	SERVER_LIBS="${SERVER_LIBS} ${SNMP_LIBS}"
+
+	dnl Check for UCD-SNMP [by default - skip]
+	LIBSNMP_CHECK_CONFIG([no])
+	if test "x$want_snmp" = "xyes"; then
+		if test "x$found_snmp" != "xyes"; then
+			AC_MSG_ERROR([Invalid UCD-SNMP directory - unable to find ucd-snmp-config.h])
+		else
+			have_snmp="ucd-snmp"
+		fi
+
+		if test  "x$found_netsnmp" = "xyes"; then
+			AC_MSG_ERROR([You can configure for only one SNMP library.])
+		fi
+	fi
+	CFLAGS="${CFLAGS} ${SNMP_CPPFLAGS}"
+	SERVER_LDFLAGS="${SERVER_LDFLAGS} ${SNMP_LDFLAGS}"
+
+	AC_SUBST(SERVER_LDFLAGS)
+	AC_SUBST(SERVER_LIBS)
+
 fi
 
 AM_CONDITIONAL(JABBER,  test "x$found_jabber" = "xyes")
 
-dnl Check for NET-SNMP [by default - skip]
-LIBNETSNMP_CHECK_CONFIG([no])
-if test "x$want_netsnmp" = "xyes"; then
-	if test "x$found_netsnmp" != "xyes"; then
-		AC_MSG_ERROR([Invalid NET-SNMP directory - unable to find net-snmp-config])
-	fi
-fi
-CFLAGS="${CFLAGS} ${SNMP_CFLAGS}"
-LDFLAGS="${LDFLAGS} ${SNMP_LDFLAGS}"
-LIBS="${LIBS} ${SNMP_LIBS}"
-
-dnl Check for UCD-SNMP [by default - skip]
-LIBSNMP_CHECK_CONFIG([no])
-if test "x$want_snmp" = "xyes"; then
-	if test "x$found_snmp" != "xyes"; then
-		AC_MSG_ERROR([Invalid UCD-SNMP directory - unable to find ucd-snmp-config.h])
-	fi
-
-	if test  "x$found_netsnmp" = "xyes"; then
-		AC_MSG_ERROR([You can configure for only one SNMP library.])
-	fi
-fi
-CFLAGS="${CFLAGS} ${SNMP_CPPFLAGS}"
-LDFLAGS="${LDFLAGS} ${SNMP_LDFLAGS}"
-
+found_ldap="no"
 dnl Check for libLDAP [by default - skip]
 LIBLDAP_CHECK_CONFIG([no])
 if test "x$want_ldap" = "xyes"; then
 	if test "x$found_ldap" != "xyes"; then
-		AC_MSG_ERROR([Invalid LDAP directory - unable to find ldap.h])
+		AC_MSG_ERROR([Invalid LDAP directory - unable to find ldap.h "${found_ldap}"])
 	fi
 fi
 CFLAGS="${CFLAGS} ${LDAP_CPPFLAGS}"
@@ -800,19 +842,38 @@ echo "
 
 Configuration:
 
-  Detected OS:      ${host_os}
-  Install path:     ${prefix}
-  Compilation arch: ${ARCH}
+  Detected OS:        ${host_os}
+  Install path:       ${prefix}
+  Compilation arch:   ${ARCH}
 
-  Compiler:         ${CC}
-  Compiler flags:   ${CFLAGS}
-  Linker flags:     ${LDFLAGS}
-  Libraries:        ${LIBS}
+  Compiler:           ${CC}
+  Compiler flags:     ${CFLAGS}
 
-  Enable server:    ${server}
-  With database:    ${have_db}
+  Enable server:      ${server}"
 
-  Enable agent:     ${agent}"
+if test "x$server" != "xno"; then
+
+echo "  With database:      ${have_db}
+  WEB Monitoring via: ${have_web_monitoring}
+  Native Jabber:      ${have_jabber}
+  SNMP:               ${have_snmp}
+  Linker flags:       ${LDFLAGS} ${SERVER_LDFLAGS}
+  Libraries:          ${LIBS} ${SERVER_LIBS}"
+
+fi
+
+echo "
+  Enable agent:       ${agent}"
+
+if test "x$agent" != "xno"; then
+
+echo "  Linker flags:       ${LDFLAGS}
+  Libraries:          ${LIBS}"
+
+fi
+
+echo "
+  LDAP support:       ${found_ldap}"
 
 echo
 echo "***********************************************************"

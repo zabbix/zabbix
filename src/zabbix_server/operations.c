@@ -33,6 +33,7 @@
 #include <time.h>
 
 #include "common.h"
+#include "comms.h"
 #include "db.h"
 #include "log.h"
 #include "zlog.h"
@@ -460,6 +461,8 @@ static zbx_uint64_t	add_discovered_host(zbx_uint64_t dhostid)
 	DB_ROW		row2;
 	zbx_uint64_t	hostid = 0;
 	char		*ip;
+        struct hostent* host;
+	char		host_esc[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In add_discovered_host(dhostid:" ZBX_FS_UI64 ")",
 		dhostid);
@@ -470,6 +473,20 @@ static zbx_uint64_t	add_discovered_host(zbx_uint64_t dhostid)
 	if(row && DBis_null(row[0]) != SUCCEED)
 	{
 		ip=row[0];
+
+		alarm(CONFIG_TIMEOUT);
+		host = zbx_gethost_by_ip(ip);
+		alarm(0);
+
+		if(host != NULL)
+		{
+			DBescape_string(host->h_name, host_esc, sizeof(host_esc));
+		}
+		else
+		{
+			host_esc[0]='\0';
+		}
+
 		result2 = DBselect("select hostid from hosts where ip='%s' and " ZBX_COND_NODEID,
 			ip,
 			LOCAL_NODE("hostid"));
@@ -477,14 +494,33 @@ static zbx_uint64_t	add_discovered_host(zbx_uint64_t dhostid)
 		if(!row2 || DBis_null(row2[0]) == SUCCEED)
 		{
 			hostid = DBget_maxid("hosts","hostid");
-			DBexecute("insert into hosts (hostid,host,useip,ip) values (" ZBX_FS_UI64 ",'%s',1,'%s')",
-				hostid,
-				ip,
-				ip);
+			/* Use host name if exists, IP otherwise */
+			if(host_esc[0] != '\0')
+			{
+				DBexecute("insert into hosts (hostid,host,useip,ip,dns) values (" ZBX_FS_UI64 ",'%s',1,'%s','%s')",
+					hostid,
+					host_esc,
+					ip,
+					host_esc);
+			}
+			else
+			{
+				DBexecute("insert into hosts (hostid,host,useip,ip,dns) values (" ZBX_FS_UI64 ",'%s',1,'%s','%s')",
+					hostid,
+					ip,
+					ip,
+					host_esc);
+			}
 		}
 		else
 		{
-			 ZBX_STR2UINT64(hostid, row2[0]);
+			ZBX_STR2UINT64(hostid, row2[0]);
+			if(host_esc[0] != '\0')
+			{
+				DBexecute("update hosts set dns='%s' where hostid=" ZBX_FS_UI64,
+					host_esc,
+					hostid);
+			}
 		}
 		DBfree_result(result2);
 	}
@@ -513,7 +549,8 @@ static zbx_uint64_t	add_discovered_host(zbx_uint64_t dhostid)
  ******************************************************************************/
 void	op_host_add(DB_EVENT *event)
 {
-	zbx_uint64_t	hostid, dhostid;
+	zbx_uint64_t	hostid;
+	zbx_uint64_t	dhostid = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In op_host_add()");
 
@@ -718,19 +755,23 @@ void	op_template_add(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation
 	{
 		templateid = operation->objectid;
 
-		result = DBselect("select hosttemplateid hostgroupid from hosts_templates where templateid=" ZBX_FS_UI64 " and hostid=" ZBX_FS_UI64,
+		result = DBselect("select hosttemplateid from hosts_templates where templateid=" ZBX_FS_UI64 " and hostid=" ZBX_FS_UI64,
 			templateid,
 			hostid);
 		row = DBfetch(result);
 		if(!row || DBis_null(row[0]) == SUCCEED)
 		{
 			hosttemplateid = DBget_maxid("hosts_templates","hosttemplateid");
+			DBexecute("begin;");
+
 			DBexecute("insert into hosts_templates (hosttemplateid,hostid,templateid) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
 				hosttemplateid,
 				hostid,
 				templateid);
 
 			DBsync_host_with_template(hostid, templateid);
+
+			DBexecute("commit;");
 		}
 		DBfree_result(result);
 	}
@@ -780,18 +821,22 @@ void	op_template_del(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation
 	{
 		templateid = operation->objectid;
 
-		result = DBselect("select hosttemplateid hostgroupid from hosts_templates where templateid=" ZBX_FS_UI64 " and hostid=" ZBX_FS_UI64,
+		result = DBselect("select hosttemplateid from hosts_templates where templateid=" ZBX_FS_UI64 " and hostid=" ZBX_FS_UI64,
 			templateid,
 			hostid);
 
 		if( (row = DBfetch(result)) )
 		{
+			DBexecute("begin;");
+
 			DBdelete_template_elements(hostid, templateid, 0 /* not a unlink mode */);
 
 			DBexecute("delete from hosts_templates where "
 					"hostid=" ZBX_FS_UI64 " and templateid=" ZBX_FS_UI64,
 				hostid,
 				templateid);
+
+			DBexecute("commit;");
 		}
 		DBfree_result(result);
 	}

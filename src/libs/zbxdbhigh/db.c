@@ -163,7 +163,7 @@ void DBrollback(void)
  * Execute SQL statement. For non-select statements only.
  * If fails, program terminates.
  */ 
-int DBexecute(const char *fmt, ...)
+int __zbx_DBexecute(const char *fmt, ...)
 {
 	va_list args;
 	int ret = ZBX_DB_DOWN;
@@ -201,7 +201,7 @@ DB_ROW	DBfetch(DB_RESULT result)
  * Execute SQL statement. For select statements only.
  * If fails, program terminates.
  */ 
-DB_RESULT DBselect(const char *fmt, ...)
+DB_RESULT __zbx_DBselect(const char *fmt, ...)
 {
 	va_list args;
 	DB_RESULT result = (DB_RESULT)ZBX_DB_DOWN;
@@ -429,7 +429,8 @@ int	DBadd_service_alarm(zbx_uint64_t serviceid,int status,int clock)
 		return SUCCEED;
 	}
 
-	DBexecute("insert into service_alarms(serviceid,clock,value) values(" ZBX_FS_UI64 ",%d,%d)",
+	DBexecute("insert into service_alarms(servicealarmid,serviceid,clock,value) values(" ZBX_FS_UI64 "," ZBX_FS_UI64 ",%d,%d)",
+		DBget_maxid("service_alarms","servicealarmid"),
 		serviceid,
 		clock,
 		status);
@@ -939,7 +940,7 @@ int	DBadd_history(zbx_uint64_t itemid, double value, int clock)
 
 	DBadd_trend(itemid, value, clock);
 
-	if(CONFIG_MASTER_NODEID>0)
+	if((CONFIG_NODE_NOHISTORY == 0) && (CONFIG_MASTER_NODEID>0))
 	{
 		DBexecute("insert into history_sync (nodeid,clock,itemid,value) values (%d,%d," ZBX_FS_UI64 "," ZBX_FS_DBL ")",
 			get_nodeid_by_id(itemid),
@@ -962,7 +963,7 @@ int	DBadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
 
 	DBadd_trend(itemid, (double)value, clock);
 
-	if(CONFIG_MASTER_NODEID>0)
+	if((CONFIG_NODE_NOHISTORY == 0) && (CONFIG_MASTER_NODEID>0))
 	{
 		DBexecute("insert into history_uint_sync (nodeid,clock,itemid,value) values (%d,%d," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
 			get_nodeid_by_id(itemid),
@@ -986,7 +987,7 @@ int	DBadd_history_str(zbx_uint64_t itemid, char *value, int clock)
 		itemid,
 		value_esc);
 
-	if(CONFIG_MASTER_NODEID>0)
+	if((CONFIG_NODE_NOHISTORY == 0) && (CONFIG_MASTER_NODEID>0))
 	{
 		DBexecute("insert into history_str_sync (nodeid,clock,itemid,value) values (%d,%d," ZBX_FS_UI64 ",'%s')",
 			get_nodeid_by_id(itemid),
@@ -1002,7 +1003,7 @@ int	DBadd_history_text(zbx_uint64_t itemid, char *value, int clock)
 {
 #ifdef HAVE_ORACLE
 	char		sql[MAX_STRING_LEN];
-	char		*value_esc;
+	char		*value_esc = NULL;
 	int		value_esc_max_len = 0;
 	int		ret = FAIL;
 	zbx_uint64_t	id;
@@ -1015,7 +1016,7 @@ int	DBadd_history_text(zbx_uint64_t itemid, char *value, int clock)
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_history_text()");
 
 	value_esc_max_len = strlen(value)+1024;
-	value_esc = zbx_malloc(value_esc_max_len);
+	value_esc = zbx_malloc(value_esc, value_esc_max_len);
 
 	DBescape_string(value, value_esc, value_esc_max_len-1);
 	value_esc_max_len = strlen(value_esc);
@@ -1087,7 +1088,7 @@ lbl_exit:
 
 #else /* HAVE_ORACLE */
 
-	char		*value_esc;
+	char		*value_esc = NULL;
 	int		value_esc_max_len = 0;
 	int		sql_max_len = 0;
 	zbx_uint64_t	id;
@@ -1095,7 +1096,7 @@ lbl_exit:
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_history_str()");
 
 	value_esc_max_len = strlen(value)+1024;
-	value_esc = zbx_malloc(value_esc_max_len);
+	value_esc = zbx_malloc(value_esc, value_esc_max_len);
 
 	sql_max_len = value_esc_max_len+100;
 
@@ -1359,17 +1360,17 @@ int	DBadd_alert(zbx_uint64_t actionid, zbx_uint64_t userid, zbx_uint64_t trigger
 	now = time(NULL);
 
 	size = strlen(sendto) * 3 / 2 + 1;
-	sendto_esc = zbx_malloc(size);
+	sendto_esc = zbx_malloc(sendto_esc, size);
 	memset(sendto_esc, 0, size);
 	DBescape_string(sendto, sendto_esc, size);
 
 	size = strlen(subject) * 3 / 2 + 1;
-	subject_esc = zbx_malloc(size);
+	subject_esc = zbx_malloc(subject_esc, size);
 	memset(subject_esc, 0, size);
 	DBescape_string(subject,subject_esc,size);
 	
 	size = strlen(message) * 3 / 2 + 1;
-	message_esc = zbx_malloc(size);
+	message_esc = zbx_malloc(message_esc,size);
 	memset(message_esc, 0, size);
 	DBescape_string(message,message_esc,size);
 	
@@ -1421,7 +1422,7 @@ void	DBvacuum(void)
 
 void    DBescape_string(const char *str, char *to, int maxlen)
 {  /* NOTE: sync changes with 'DBdyn_escape_string' */
-	register int     i,ptr;
+	register int     i=0, ptr=0;
 #ifdef  HAVE_ORACLE
 #	define ZBX_DB_ESC_CH	'\''
 #else /* not HAVE_ORACLE */
@@ -1430,7 +1431,7 @@ void    DBescape_string(const char *str, char *to, int maxlen)
 	assert(to);
 
 	maxlen--;
-	for(i=0, ptr=0; str && str[i] && ptr < maxlen; i++)
+	for( i=0,ptr=0; str && str[i] && ptr < maxlen; i++)
 	{
 		if( str[i] == '\r' ) continue;
 
@@ -1454,7 +1455,7 @@ char*	DBdyn_escape_string(const char *str)
 
 	char *str_esc = NULL;
 
-	int	str_esc_len;
+	int	str_esc_len = 0;
 
 	for(i=0; str && str[i]; i++)
 	{
@@ -1470,7 +1471,7 @@ char*	DBdyn_escape_string(const char *str)
 	}
 	str_esc_len++;
 
-	str_esc = zbx_malloc(str_esc_len);
+	str_esc = zbx_malloc(str_esc, str_esc_len);
 
 	DBescape_string(str, str_esc, str_esc_len);
 
@@ -1483,7 +1484,7 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 
 	ZBX_STR2UINT64(item->itemid, row[0]);
 /*	item->itemid=atoi(row[0]); */
-	zbx_snprintf(item->key, ITEM_KEY_LEN, row[1]);
+	zbx_snprintf(item->key, ITEM_KEY_LEN, "%s", row[1]);
 	item->host_name=row[2];
 	item->port=atoi(row[3]);
 	item->delay=atoi(row[4]);

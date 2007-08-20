@@ -56,22 +56,24 @@ int     get_value_external(DB_ITEM *item, AGENT_RESULT *result)
 	init_result(result);
 
 	strscpy(key, item->key);
-	if((p2=strstr(key,"(")) != NULL)
+	if((p2=strchr(key,'[')) != NULL)
 	{
 		*p2=0;
 		strscpy(scriptname,key);
-		*p2='(';
+		zabbix_log( LOG_LEVEL_DEBUG, "scriptname [%s]",scriptname);
+		*p2='[';
 		p2++;
 	}
 	else    ret = NOTSUPPORTED;
 
 	if(ret == SUCCEED)
 	{
-		if((ret == SUCCEED) && (p=strstr(p2,")")) != NULL)
+		if((ret == SUCCEED) && (p=strchr(p2,']')) != NULL)
 		{
 			*p=0;
 			strscpy(params,p2);
-			*p=')';
+			zabbix_log( LOG_LEVEL_DEBUG, "params [%s]",params);
+			*p=']';
 			p++;
 		}
 		else    ret = NOTSUPPORTED;
@@ -79,36 +81,49 @@ int     get_value_external(DB_ITEM *item, AGENT_RESULT *result)
 	else
 	{
 		zbx_snprintf(error,MAX_STRING_LEN-1,"External check [%s] is not supported", item->key);
-		zabbix_log( LOG_LEVEL_DEBUG, error);
+		zabbix_log( LOG_LEVEL_DEBUG, "%s", error);
 		SET_STR_RESULT(result, strdup(error));
 		return NOTSUPPORTED;
 	}
 
 	zbx_snprintf(cmd, MAX_STRING_LEN-1, "%s/%s %s %s", CONFIG_EXTERNALSCRIPTS, scriptname, item->host_name, params);
-	zabbix_log( LOG_LEVEL_DEBUG, cmd );
+	zabbix_log( LOG_LEVEL_DEBUG, "%s", cmd );
 	if (NULL == (fp = popen(cmd, "r"))) 
 	{
 		zbx_snprintf(error,MAX_STRING_LEN-1,"External check [%s] is not supported, failed execution", item->key);
-		zabbix_log( LOG_LEVEL_DEBUG, error);
+		zabbix_log( LOG_LEVEL_DEBUG, "%s", error);
 		SET_STR_RESULT(result, strdup(error));
 		return NOTSUPPORTED;
 	}
 
 	/* we only care about the first line */
-	fgets(msg, sizeof(msg)-1, fp);
-	for (i = 0; i < MAX_STRING_LEN && msg[i] != 0; ++i) 
+	memset(msg,0,sizeof(msg));
+	if(NULL != fgets(msg, sizeof(msg)-1, fp))
 	{
-		if (msg[i] == '\n') 
+		for (i = 0; i < MAX_STRING_LEN && msg[i] != 0; ++i) 
 		{
-			msg[i] = 0;
-			break;
+			if (msg[i] == '\n') 
+			{
+				msg[i] = 0;
+				break;
+			}
 		}
-	}
+		zabbix_log( LOG_LEVEL_DEBUG, "Result [%s]", msg);
 
-	set_result_type(result,item->value_type,strdup(msg));
+		set_result_type(result,item->value_type,strdup(msg));
+	}
+	else
+	{
+		zbx_snprintf(error,MAX_STRING_LEN-1,"Script %s/%s returned nothing.",
+			CONFIG_EXTERNALSCRIPTS,
+			scriptname);
+		zabbix_log( LOG_LEVEL_WARNING, "%s", error);
+		SET_STR_RESULT(result, strdup(error));
+		ret = NOTSUPPORTED;
+	}
 
 	/* cleanup */
 	pclose(fp);
 
-	return SUCCEED;
+	return ret;
 }

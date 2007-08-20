@@ -57,6 +57,9 @@ int	parse_cfg_file(const char *cfg_file,struct cfg_line *cfg)
 
 #define ZBX_MAX_INCLUDE_LEVEL 10
 
+#define ZBX_CFG_LTRIM_CHARS "\t "
+#define ZBX_CFG_RTRIM_CHARS ZBX_CFG_LTRIM_CHARS "\r\n\0"
+
 	register int
 		i, lineno;
 
@@ -87,6 +90,8 @@ int	parse_cfg_file(const char *cfg_file,struct cfg_line *cfg)
 		{
 			for(lineno = 1; fgets(line,MAX_STRING_LEN,file) != NULL; lineno++)
 			{
+				zbx_ltrim(line, ZBX_CFG_LTRIM_CHARS);
+
 				if(line[0]=='#')	continue;
 				if(strlen(line) < 3)	continue;
 
@@ -103,7 +108,10 @@ int	parse_cfg_file(const char *cfg_file,struct cfg_line *cfg)
 				*value = '\0';
 				value++;
 
-				zbx_rtrim(value, " \r\n\0");
+				zbx_rtrim(parameter, ZBX_CFG_RTRIM_CHARS);
+
+				zbx_ltrim(value, ZBX_CFG_LTRIM_CHARS);
+				zbx_rtrim(value, ZBX_CFG_RTRIM_CHARS);
 
 				zabbix_log(LOG_LEVEL_DEBUG, "cfg: para: [%s] val [%s]", parameter, value);
 
@@ -121,12 +129,13 @@ int	parse_cfg_file(const char *cfg_file,struct cfg_line *cfg)
 					}
 				}
 
+
 				for(i = 0; cfg[i].parameter != 0; i++)
 				{
 					if(strcmp(cfg[i].parameter, parameter))
 						continue;
 
-					/* zbx_error("Accepted configuration parameter: '%s' = '%s'",parameter, value); */
+					zabbix_log(LOG_LEVEL_DEBUG, "Accepted configuration parameter: '%s' = '%s'",parameter, value);
 
 					if(cfg[i].function != 0)
 					{

@@ -13,7 +13,7 @@ SUBDIRS = \
 	watchdog \
 	utils
 
-bin_PROGRAMS = zabbix_server
+sbin_PROGRAMS = zabbix_server
 
 zabbix_server_SOURCES = \
 	evalfunc.c evalfunc.h \
@@ -56,6 +56,10 @@ zabbix_server_LDADD = \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
-	$(JABBER_LDADD)
+	$(JABBER_LDADD) \
+	@SERVER_LIBS@
+
+zabbix_server_LDFLAGS = \
+	@SERVER_LDFLAGS@
 
 zabbix_server_CFLAGS = -DZABBIX_DAEMON

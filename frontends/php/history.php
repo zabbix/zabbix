@@ -26,7 +26,7 @@
 	$page["file"]	= "history.php";
 	$page["title"]	= "S_HISTORY";
 
-	if(isset($_REQUEST["plaintext"]))
+	if(isset($_REQUEST['plaintext']) || isset($_REQUEST['fullscreen']))
 	{
 		define('ZBX_PAGE_NO_MENU', 1);
 	}
@@ -44,7 +44,7 @@ include_once "include/page_header.php";
 		"itemid"=>	array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,	null),
 		
 		"from"=>	array(T_ZBX_INT, O_OPT,	 null,	'{}>=0', null),
-		"period"=>	array(T_ZBX_INT, O_OPT,	 null,	'{}>=3600', null),
+		"period"=>	array(T_ZBX_INT, O_OPT,	 null,	BETWEEN(ZBX_MIN_PERIOD,ZBX_MAX_PERIOD), null),
 		"dec"=>		array(T_ZBX_INT, O_OPT,	 null,	null, null),
 		"inc"=>		array(T_ZBX_INT, O_OPT,	 null,	null, null),
 		"left"=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
@@ -64,12 +64,13 @@ include_once "include/page_header.php";
 
 /* actions */
 		"remove_log"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-		""=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
+		"reset"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 /* other */
 		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
 		"form_copy_to"=>	array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	null,	null,	null)
+		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	null,	null,	null),
+		"fullscreen"=>		array(T_ZBX_STR, O_OPT,	P_SYS,	null,	null)
 	);
 
 	check_fields($fields);
@@ -103,7 +104,7 @@ include_once "include/page_header.php";
 
 	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT);
 
-	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,$ZBX_CURNODEID);
+	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,get_current_nodeid());
 	
 	if((DBfetch(DBselect("select h.host,i.hostid,i.description,i.key_ from items i,hosts h ".
 		" where i.itemid in (".(is_array($_REQUEST["itemid"]) ? implode(',', $_REQUEST["itemid"]) : $_REQUEST["itemid"]).") ".
@@ -129,8 +130,8 @@ include_once "include/page_header.php";
 	
 		if($_REQUEST["action"]=="showgraph")
 		{
-			$_REQUEST["period"] = get_request("period",get_profile("web.item[".$_REQUEST["itemid"]."].graph.period", 3600));
-			if($_REQUEST["period"] >= 3600)
+			$_REQUEST["period"] = get_request("period",get_profile("web.item[".$_REQUEST["itemid"]."].graph.period", ZBX_PERIOD_DEFAULT));
+			if($_REQUEST["period"] >= ZBX_MIN_PERIOD)
 			{
 				update_profile("web.item[".$_REQUEST["itemid"]."].graph.period",$_REQUEST["period"]);
 			}
@@ -144,10 +145,10 @@ include_once "include/page_header.php";
 
 	unset($item_data);
 
-	if(!isset($_REQUEST["plaintext"]))
-	{
-		$to_save_request = null;
+	$to_save_request = null;
 
+	if( !isset($_REQUEST['plaintext']) && !isset($_REQUEST['fullscreen']) )
+	{
 		if($item_type == ITEM_VALUE_TYPE_LOG)
 		{
 			$l_header = new CForm();
@@ -284,7 +285,9 @@ include_once "include/page_header.php";
 				$r_header = null;
 			}
 
-				if($l_header || $r_header)
+			if( ($l_header || $r_header) &&
+				!isset($_REQUEST['fullscreen'])
+				)
 					show_table_header($l_header,$r_header);
 		}
 		else

@@ -10,7 +10,7 @@ CREATE TABLE media_type_tmp (
 	username	varchar(255)		DEFAULT ''	NOT NULL,
 	passwd		varchar(255)		DEFAULT ''	NOT NULL,
 	PRIMARY KEY (mediatypeid)
-);
+) with OIDS;
 
 insert into media_type_tmp select mediatypeid,type,description,smtp_server,smtp_helo,smtp_email,exec_path,gsm_modem,'','' from media_type;
 drop table media_type;

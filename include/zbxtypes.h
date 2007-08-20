@@ -46,9 +46,13 @@
 
 #else /* _WINDOWS */
 
-#ifndef __UINT64_C
-#	define __UINT64_C	UINT64_C
-#endif /* __UINT64_C under AIX, Solaris*/
+#	ifndef __UINT64_C
+#		ifdef UINT64_C
+#			define __UINT64_C(c) (UINT64_C(c))
+#		else
+#			define __UINT64_C(c) (c ## ULL)
+#		endif
+#	endif
 
 #	define zbx_uint64_t uint64_t
 #	if __WORDSIZE == 64
@@ -68,5 +72,8 @@
 #endif
 
 #define ZBX_STR2UINT64(uint,string) sscanf(string ,ZBX_FS_UI64 ,&uint);
+
+#define ZBX_CONST_STRING(str) ""str
+
 
 #endif

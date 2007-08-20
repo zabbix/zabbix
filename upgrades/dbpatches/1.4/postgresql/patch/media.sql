@@ -7,7 +7,7 @@ CREATE TABLE media_tmp (
 	severity	integer		DEFAULT '63'	NOT NULL,
 	period		varchar(100)		DEFAULT '1-7,00:00-23:59'	NOT NULL,
 	PRIMARY KEY (mediaid)
-);
+) with OIDS;
 CREATE INDEX media_1 on media_tmp (userid);
 CREATE INDEX media_2 on media_tmp (mediatypeid);
 

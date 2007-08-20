@@ -28,8 +28,8 @@ include_once 'include/discovery.inc.php';
 
 		$result = false;
 
-		if(DBselect("select actionid from actions where actionid=".$actionid.
-			" and ".DBid2nodeid('actionid')." in (".get_accessible_nodes_by_user($USER_DETAILS,$perm).")"))
+		if ( DBselect('select actionid from actions where actionid='.$actionid.
+			' and '.DBin_node('actionid')) )
 		{
 			$result = true;
 			
@@ -298,11 +298,12 @@ include_once 'include/discovery.inc.php';
 	{
 		$str_op[CONDITION_OPERATOR_EQUAL] 	= '=';
 		$str_op[CONDITION_OPERATOR_NOT_EQUAL]	= '<>';
-		$str_op[CONDITION_OPERATOR_LIKE]	= 'like';
-		$str_op[CONDITION_OPERATOR_NOT_LIKE]	= 'not like';
-		$str_op[CONDITION_OPERATOR_IN]		= 'in';
+		$str_op[CONDITION_OPERATOR_LIKE]	= S_LIKE_SMALL;
+		$str_op[CONDITION_OPERATOR_NOT_LIKE]	= S_NOT_LIKE_SMALL;
+		$str_op[CONDITION_OPERATOR_IN]		= S_IN_SMALL;
 		$str_op[CONDITION_OPERATOR_MORE_EQUAL]	= '>=';
 		$str_op[CONDITION_OPERATOR_LESS_EQUAL]	= '<=';
+		$str_op[CONDITION_OPERATOR_NOT_IN]	= S_NOT_IN_SMALL;
 
 		if(isset($str_op[$operator]))
 			return $str_op[$operator];
@@ -558,7 +559,8 @@ include_once 'include/discovery.inc.php';
 				CONDITION_OPERATOR_EQUAL
 			);
 		$operators[CONDITION_TYPE_TIME_PERIOD] = array(
-				CONDITION_OPERATOR_IN
+				CONDITION_OPERATOR_IN,
+				CONDITION_OPERATOR_NOT_IN
 			);
 		$operators[CONDITION_TYPE_DHOST_IP] = array(
 				CONDITION_OPERATOR_EQUAL,
@@ -601,14 +603,14 @@ include_once 'include/discovery.inc.php';
 
 	function validate_condition($conditiontype, $value)
 	{
-		global $USER_DETAILS, $ZBX_CURNODEID;
+		global $USER_DETAILS;
 
 		switch($conditiontype)
 		{
 			case CONDITION_TYPE_HOST_GROUP:
 				if(!in_array($value,
 					get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,null,
-						PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+						PERM_RES_IDS_ARRAY)))
 				{
 					error(S_INCORRECT_GROUP);
 					return false;
@@ -625,7 +627,7 @@ include_once 'include/discovery.inc.php';
 			case CONDITION_TYPE_HOST:
 				if(!in_array($value,
 					get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,
-						PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+						PERM_RES_IDS_ARRAY)))
 				{
 					error(S_INCORRECT_HOST);
 					return false;
@@ -682,7 +684,7 @@ include_once 'include/discovery.inc.php';
 
 	function	validate_operation($operation)
 	{
-		global $USER_DETAILS, $ZBX_CURNODEID;
+		global $USER_DETAILS;
 
 		switch($operation['operationtype'])
 		{
@@ -717,7 +719,7 @@ include_once 'include/discovery.inc.php';
 			case OPERATION_TYPE_GROUP_REMOVE:
 				if(!in_array($operation['objectid'],
 					get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,null,
-						PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+						PERM_RES_IDS_ARRAY)))
 				{
 					error(S_INCORRECT_GROUP);
 					return false;
@@ -727,7 +729,7 @@ include_once 'include/discovery.inc.php';
 			case OPERATION_TYPE_TEMPLATE_REMOVE:
 				if(!in_array($operation['objectid'],
 					get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,
-						PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)))
+						PERM_RES_IDS_ARRAY)))
 				{
 					error(S_INCORRECT_HOST);
 					return false;
@@ -746,11 +748,11 @@ include_once 'include/discovery.inc.php';
 		foreach($cmd_list as $cmd)
 		{
 			$cmd = trim($cmd, "\x00..\x1F");
-			if(!ereg("^([0-9a-zA-Z\_\.[.-.]]{1,})(:|#)[[:print:]]*$",$cmd,$cmd_items)){
-				error("incorrect command: '$cmd'");
+			if(!ereg("^(({HOSTNAME})|([0-9a-zA-Z\_\.[.-.]]{1,}))(:|#)[[:print:]]*$",$cmd,$cmd_items)){
+				error("Incorrect command: '$cmd'");
 				return FALSE;
 			}
-			if($cmd_items[2] == "#")
+			if($cmd_items[4] == "#")
 			{ // group
 				if(!DBfetch(DBselect("select groupid from groups where name=".zbx_dbstr($cmd_items[1]))))
 				{
@@ -758,9 +760,10 @@ include_once 'include/discovery.inc.php';
 					return FALSE;
 				}
 			}
-			elseif($cmd_items[2] == ":")
+			elseif($cmd_items[4] == ":")
 			{ // host
-				if(!DBfetch(DBselect("select hostid from hosts where host=".zbx_dbstr($cmd_items[1]))))
+				if( $cmd_items[1] != '{HOSTNAME}' && 
+					!DBfetch(DBselect("select hostid from hosts where host=".zbx_dbstr($cmd_items[1]))) )
 				{
 					error("Unknown host name '".$cmd_items[1]."' in command '".$cmd."'");
 					return FALSE;
@@ -780,12 +783,21 @@ include_once 'include/discovery.inc.php';
 				"a.error from alerts a,media_type mt,functions f,items i ".
 				" where mt.mediatypeid=a.mediatypeid and a.triggerid=f.triggerid and f.itemid=i.itemid ".
 				" and i.hostid not in (".$denyed_hosts.")".
+				' and '.DBin_node('a.alertid').
 				" order by a.clock".
 				" desc",
 			10*$start+$num);
 
 		$table = new CTableInfo(S_NO_ACTIONS_FOUND);
-		$table->SetHeader(array(S_TIME, S_TYPE, S_STATUS, S_RECIPIENTS, S_MESSAGE, S_ERROR));
+		$table->SetHeader(array(
+				is_show_subnodes() ? S_NODES : null,
+				S_TIME,
+				S_TYPE,
+				S_STATUS,
+				S_RECIPIENTS,
+				S_MESSAGE,
+				S_ERROR
+				));
 		$col=0;
 		$skip=$start;
 		while(($row=DBfetch($result))&&($col<$num))
@@ -819,6 +831,7 @@ include_once 'include/discovery.inc.php';
 				$error=new CSpan($row["error"],"on");
 			}
 			$table->AddRow(array(
+				get_node_name_by_elid($row['alertid']),
 				new CCol($time, 'top'),
 				new CCol($row["description"], 'top'),
 				new CCol($status, 'top'),

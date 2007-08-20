@@ -247,14 +247,21 @@ int get_values(void)
 	DB_ROW	row2;
 
 	int		now;
+	int		delay;
 	int		res;
 	DB_ITEM		item;
 	AGENT_RESULT	agent;
 	int	stop=0;
 
+	char		*unreachable_hosts = NULL;
+	char		tmp[MAX_STRING_LEN];
+
 	zabbix_log( LOG_LEVEL_DEBUG, "In get_values()");
 
 	now = time(NULL);
+
+	zbx_snprintf(tmp,sizeof(tmp)-1,ZBX_FS_UI64,0);
+	unreachable_hosts=zbx_strdcat(unreachable_hosts,tmp);
 
 	/* Poller for unreachable hosts */
 	if(poller_type == ZBX_POLLER_TYPE_UNREACHABLE)
@@ -325,6 +332,13 @@ int get_values(void)
 		else
 		{
 			DBget_item_from_db(&item,row);
+			/* Skip unreachable hosts but do not break the loop. */
+			if(uint64_in_list(unreachable_hosts,item.hostid) == SUCCEED)
+			{
+				zabbix_log( LOG_LEVEL_DEBUG, "Host " ZBX_FS_UI64 " is unreachable. Skipping [%s]",
+					item.hostid,item.key);
+				continue;
+			}
 		}
 
 		init_result(&agent);
@@ -383,7 +397,7 @@ int get_values(void)
 				zabbix_syslog("Parameter [%s] is not supported by agent on host [%s]",
 					item.key,
 					item.host_name);
-				DBupdate_item_status_to_notsupported(item.itemid, agent.str);
+				DBupdate_item_status_to_notsupported(item.itemid, agent.msg);
 	/*			if(HOST_STATUS_UNREACHABLE == item.host_status)*/
 				if(HOST_AVAILABLE_TRUE != item.host_available)
 				{
@@ -418,6 +432,15 @@ int get_values(void)
 					now,
 					now+CONFIG_UNREACHABLE_DELAY,
 					item.hostid);
+
+				delay = MIN(4*item.delay, 300);
+				zabbix_log( LOG_LEVEL_WARNING, "Parameter [%s] will be checked after %d seconds on host [%s]",
+					item.key,
+					delay,
+					item.host_name);
+				DBexecute("update items set nextcheck=%d where itemid=" ZBX_FS_UI64,
+					now + delay,
+					item.itemid);
 			}
 			else
 			{
@@ -454,7 +477,10 @@ int get_values(void)
 				}
 			}
 
-			stop=1;
+			zbx_snprintf(tmp,sizeof(tmp)-1,"," ZBX_FS_UI64,item.hostid);
+			unreachable_hosts=zbx_strdcat(unreachable_hosts,tmp);
+
+/*			stop=1;*/
 		}
 		else
 		{
@@ -470,6 +496,8 @@ int get_values(void)
 		free_result(&agent);
 		DBcommit();
 	}
+
+	zbx_free(unreachable_hosts);
 
 	DBfree_result(result);
 	zabbix_log( LOG_LEVEL_DEBUG, "End get_values()");

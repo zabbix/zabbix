@@ -155,46 +155,41 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	STARTUPINFO si = {0};
 	PROCESS_INFORMATION pi = {0};
 	SECURITY_ATTRIBUTES sa;
-	HANDLE hOutput;
-	char szTempPath[MAX_PATH],szTempFile[MAX_PATH];
+	HANDLE hWrite=NULL, hRead=NULL;
 
 #else /* not _WINDOWS */
 
-	FILE	*f;
+	FILE	*hRead = NULL;
 
 #endif /* _WINDOWS */
 
-	char	cmd_result[MAX_STRING_LEN];
-	char	command[MAX_STRING_LEN];
-	int	i,len;
+	int	ret = SYSINFO_RET_FAIL;
+
+	char	stat_buf[128];
+	char	*cmd_result=NULL;
+	char	*command=NULL;
+	int	len;
 
         assert(result);
 
         init_result(result);
-	
-	memset(cmd_result, 0, MAX_STRING_LEN);
+
+	cmd_result = zbx_dsprintf(cmd_result,"");
+	memset(stat_buf, 0, sizeof(stat_buf));
 
 #if defined(_WINDOWS)
 
-	/* Create temporary file to hold process output */
-	GetTempPath( MAX_PATH-1,	szTempPath);
-	GetTempFileName( szTempPath, "zbx", 0, szTempFile);
+	/* Set the bInheritHandle flag so pipe handles are inherited */
+	sa.nLength = sizeof(SECURITY_ATTRIBUTES); 
+	sa.bInheritHandle = TRUE; 
+	sa.lpSecurityDescriptor = NULL; 
 
-	sa.nLength		= sizeof(SECURITY_ATTRIBUTES);
-	sa.lpSecurityDescriptor	= NULL;
-	sa.bInheritHandle	= TRUE;
-
-	if(INVALID_HANDLE_VALUE == (hOutput = CreateFile(
-		szTempFile,
-		GENERIC_READ | GENERIC_WRITE,
-		0,
-		&sa,
-		CREATE_ALWAYS,
-		FILE_ATTRIBUTE_TEMPORARY,
-		NULL)))
+	/* Create a pipe for the child process's STDOUT */
+	if (! CreatePipe(&hRead, &hWrite, &sa, sizeof(cmd_result))) 
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Unable to create temporary file: '%s' [%s]", szTempFile, strerror_from_system(GetLastError()));
-		return SYSINFO_RET_FAIL;
+		zabbix_log(LOG_LEVEL_DEBUG, "Unable to create pipe [%s]", strerror_from_system(GetLastError()));
+		ret = SYSINFO_RET_FAIL;
+		goto lbl_exit;
 	}
 
 	/* Fill in process startup info structure */
@@ -202,116 +197,131 @@ int	EXECUTE_STR(const char *cmd, const char *param, unsigned flags, AGENT_RESULT
 	si.cb		= sizeof(STARTUPINFO);
 	si.dwFlags	= STARTF_USESTDHANDLES;
 	si.hStdInput	= GetStdHandle(STD_INPUT_HANDLE);
-	si.hStdOutput	= hOutput;
-	si.hStdError	= GetStdHandle(STD_ERROR_HANDLE);
+	si.hStdOutput	= hWrite;
+	si.hStdError	= hWrite;
 
-	zbx_snprintf(command, sizeof(command), "cmd /C \"%s\"", param);
+	command = zbx_dsprintf(command, "cmd /C \"%s\"", param);
 
 	/* Create new process */
 	if (!CreateProcess(NULL,command,NULL,NULL,TRUE,0,NULL,NULL,&si,&pi))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Unable to create process: '%s' [%s]", command, strerror_from_system(GetLastError()));
 
-		/* Remove temporary file */
-		CloseHandle(hOutput);
-		DeleteFile(szTempFile);
-
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto lbl_exit;
 	}
-
-	/* Wait for process termination and close all handles */
-	WaitForSingleObject(pi.hProcess,INFINITE);
-	CloseHandle(pi.hThread);
-	CloseHandle(pi.hProcess);
-
-	/* Rewind temporary file for reading */
-	SetFilePointer(hOutput,0,NULL,FILE_BEGIN);
+	CloseHandle(hWrite);	hWrite = NULL;
 
 	/* Read process output */
-	ReadFile(hOutput, cmd_result, MAX_STRING_LEN-1, &len, NULL);
+	while( ReadFile(hRead, stat_buf, sizeof(stat_buf)-1, &len, NULL) && len > 0 )
+	{
+		cmd_result = zbx_strdcat(cmd_result, stat_buf);
+		memset(stat_buf, 0, sizeof(stat_buf));
+	}
 
-	cmd_result[len] = '\0';
-	
-	/* Remove temporary file */
-	CloseHandle(hOutput);
-	DeleteFile(szTempFile);
+	/* Don't wait child process exiting. */
+	/* WaitForSingleObject( pi.hProcess, INFINITE ); */
+
+	/* Terminate child process */
+	/* TerminateProcess(pi.hProcess, 0); */
+
+	CloseHandle(pi.hProcess);
+	CloseHandle(pi.hThread);
+
+	CloseHandle(hRead);	hRead = NULL;
+		
 
 #else /* not _WINDOWS */
-	zbx_strlcpy(command, param, sizeof(command));
+	command = zbx_dsprintf(command, "%s", param);
 
-	if(0 == (f = popen(command,"r")))
+	if(0 == (hRead = popen(command,"r")))
 	{
 		switch (errno)
 		{
-			case	EINTR:
-				return SYSINFO_RET_TIMEOUT;
-			default:
-				return SYSINFO_RET_FAIL;
+			case	EINTR:	ret = SYSINFO_RET_TIMEOUT;
+			default:	ret = SYSINFO_RET_FAIL;
 		}
+		goto lbl_exit;
 	}
 
-	len = fread(cmd_result, 1, sizeof(cmd_result)-1, f);
+	;
+	/* Read process output */
+	while( (len = fread(stat_buf, 1, sizeof(stat_buf)-1, hRead)) > 0 )
+	{
+		cmd_result = zbx_strdcat(cmd_result, stat_buf);
+		memset(stat_buf, 0, sizeof(stat_buf));
+	}
 
-	if(0 != ferror(f))
+	if(0 != ferror(hRead))
 	{
 		switch (errno)
 		{
-			case	EINTR:
-				pclose(f);
-				return SYSINFO_RET_TIMEOUT;
-			default:
-				pclose(f);
-				return SYSINFO_RET_FAIL;
+			case	EINTR:	ret = SYSINFO_RET_TIMEOUT;
+			default:	ret = SYSINFO_RET_FAIL;
 		}
+		goto lbl_exit;
 	}
 
-	cmd_result[len] = '\0';
-
-	if(pclose(f) == -1)
+	if(pclose(hRead) == -1)
 	{
 		switch (errno)
 		{
-			case	EINTR:
-				return SYSINFO_RET_TIMEOUT;
-			default:
-				return SYSINFO_RET_FAIL;
+			case	EINTR:	ret = SYSINFO_RET_TIMEOUT;
+			default:	ret = SYSINFO_RET_FAIL;
 		}
+		goto lbl_exit;
 	}
+
+	hRead = NULL;
 
 #endif /* _WINDOWS */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "Before");
 
-        for(i=(int)strlen(cmd_result); i>0 && (cmd_result[i] == '\n' || cmd_result[i] == '\r' || cmd_result[i] == '\0'); cmd_result[i--] = '\0');
+	zbx_rtrim(cmd_result,"\n\r\0");
 
 	/* We got EOL only */
 	if(cmd_result[0] == '\0')
 	{
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto lbl_exit;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Run remote command [%s] Result [%d] [%s]", command, strlen(cmd_result), cmd_result);
+	zabbix_log(LOG_LEVEL_DEBUG, "Run remote command [%s] Result [%d] [%.20s]...", command, strlen(cmd_result), cmd_result);
 
 	SET_TEXT_RESULT(result, strdup(cmd_result));
 
-	return	SYSINFO_RET_OK;
+	ret = SYSINFO_RET_OK;
 
+lbl_exit:
+
+#if defined(_WINDOWS)
+	if ( hWrite )	{ CloseHandle(hWrite);	hWrite = NULL; }
+	if ( hRead)	{ CloseHandle(hRead);	hRead = NULL; }
+#else /* not _WINDOWS */
+	if ( hRead )	{ pclose(hRead);	hRead = NULL; }
+#endif /* _WINDOWS */
+
+	zbx_free(command)
+	zbx_free(cmd_result);
+
+	return ret;
 }
 
 int	EXECUTE_INT(const char *cmd, const char *command, unsigned flags, AGENT_RESULT *result)
 {
 	int	ret	= SYSINFO_RET_FAIL;
-	double	value	= 0;
 
 	ret = EXECUTE_STR(cmd,command,flags,result);
 
 	if(SYSINFO_RET_OK == ret)
 	{
-		sscanf(result->text, "%lf", &value);
-
-		UNSET_TEXT_RESULT(result);
-
-		SET_DBL_RESULT(result, value);
+		if( NULL == GET_DBL_RESULT(result) )
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Remote command [%s] result is not double", command);
+			ret = SYSINFO_RET_FAIL;
+		}
+		UNSET_RESULT_EXCLUDING(result, AR_DOUBLE);
 	}
 
 	return ret;

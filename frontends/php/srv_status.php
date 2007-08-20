@@ -40,6 +40,11 @@ include_once "include/page_header.php";
 	check_fields($fields);
 ?>
 <?php
+        if( isset($_REQUEST["serviceid"]) && $_REQUEST["serviceid"] > 0 && ! (DBfetch(DBselect('select serviceid from services where serviceid='.$_REQUEST["serviceid"]))) )
+        {
+                unset($_REQUEST["serviceid"]);
+        }
+
 	$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT);
 
 	if(isset($_REQUEST["serviceid"]) && $_REQUEST["serviceid"] > 0){
@@ -47,7 +52,7 @@ include_once "include/page_header.php";
 		if( !($service = DBfetch(DBselect("select s.* from services s left join triggers t on s.triggerid=t.triggerid ".
 			" left join functions f on t.triggerid=f.triggerid left join items i on f.itemid=i.itemid ".
 			" where (i.hostid is null or i.hostid not in (".$denyed_hosts.")) ".
-			" and ".DBid2nodeid("s.serviceid")."=".$ZBX_CURNODEID.
+			' and '.DBin_node('s.serviceid').
 			" and s.serviceid=".$_REQUEST["serviceid"]
 			))))
 		{
@@ -66,13 +71,16 @@ include_once "include/page_header.php";
 	} else {
 	
 		$query = 'SELECT DISTINCT s.serviceid, sl.servicedownid, sl_p.serviceupid as serviceupid, s.triggerid, '.
-			' s.name as caption, s.algorithm, t.description, s.sortorder, sl.linkid, s.showsla, s.goodsla, s.status '.
-				' FROM services s '.
-					' LEFT JOIN triggers t ON s.triggerid = t.triggerid '.
-					' LEFT JOIN services_links sl ON  s.serviceid = sl.serviceupid and NOT(sl.soft=0) '.
-					' LEFT JOIN services_links sl_p ON  s.serviceid = sl_p.servicedownid and sl_p.soft=0 '.
-			' WHERE '.DBid2nodeid("s.serviceid").'='.$ZBX_CURNODEID.
-			' ORDER BY s.sortorder, sl.serviceupid, s.serviceid';
+				' s.name as caption, s.algorithm, t.description, s.sortorder, sl.linkid, s.showsla, s.goodsla, s.status '.
+			' FROM services s '.
+				' LEFT JOIN triggers t ON s.triggerid = t.triggerid '.
+				' LEFT JOIN services_links sl ON  s.serviceid = sl.serviceupid and NOT(sl.soft=0) '.
+				' LEFT JOIN services_links sl_p ON  s.serviceid = sl_p.servicedownid and sl_p.soft=0 '.
+				' LEFT JOIN functions f ON t.triggerid=f.triggerid '.
+				' LEFT JOIN items i ON f.itemid=i.itemid '.
+			' WHERE '.DBin_node('s.serviceid').
+			' AND (i.hostid is null or i.hostid not in ('.$denyed_hosts.')) '.
+			' ORDER BY s.sortorder, sl_p.serviceupid, s.serviceid';
 		
 		$result=DBSelect($query);
 		
@@ -111,7 +119,7 @@ include_once "include/page_header.php";
 				$row['reason'] = new CList(null,"itservices");
 				$result2=DBselect("select s.triggerid,s.serviceid from services s, triggers t ".
 					" where s.status>0 and s.triggerid is not NULL and t.triggerid=s.triggerid ".
-					" and ".DBid2nodeid("s.serviceid")."=".$ZBX_CURNODEID.
+					' and '.DBin_node('s.serviceid').
 					" order by s.status desc,t.description");
 					
 				while($row2=DBfetch($result2)){
@@ -160,7 +168,11 @@ include_once "include/page_header.php";
 			$services[$row['serviceid']]['childs'][] = array('id' => $row['servicedownid'], 'soft' => 1, 'linkid' => $row['linkid']);
 		}
 		
-		createShowServiceTree($services,0,$treeServ);	
+		$treeServ = array();
+		createShowServiceTree($services,$treeServ);	//return into $treeServ parametr
+		
+		//permission issue
+		$treeServ = del_empty_nodes($treeServ);
 		
 		echo '<script src="js/services.js" type="text/javascript"></script>';
 		

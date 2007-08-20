@@ -205,7 +205,7 @@ include_once "include/page_header.php";
 			S_CHECKS,
 			S_STATUS));
 
-		$db_rules = DBselect('select * from drules where '.DBid2nodeid('druleid').'='.$ZBX_CURNODEID.
+		$db_rules = DBselect('select * from drules where '.DBin_node('druleid').
 			' order by name, druleid');
 		while($rule_data = DBfetch($db_rules))
 		{

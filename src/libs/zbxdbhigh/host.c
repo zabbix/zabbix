@@ -204,6 +204,302 @@ static int	DBdelete_dependencies_by_triggerid(
 
 /******************************************************************************
  *                                                                            *
+ * Function: DBclear_parents_from_trigger                                     *
+ *                                                                            *
+ * Purpose: removes any links between trigger and service if service          *
+ *          is not leaf (treenode)                                            *
+ *                                                                            *
+ * Parameters: serviceid - id of service                                      *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBclear_parents_from_trigger(
+		zbx_uint64_t serviceid
+	)
+{
+	DB_RESULT res;
+	DB_ROW rows;
+
+	if( serviceid != 0 )
+	{
+		DBexecute("UPDATE services as s "
+				" SET s.triggerid = null "
+				" WHERE s.serviceid = " ZBX_FS_UI64, serviceid);
+	}
+	else
+	{
+
+		res = DBselect("SELECT s.serviceid "
+					" FROM services as s, services_links as sl "
+					" WHERE s.serviceid = sl.serviceupid "
+					" AND NOT(s.triggerid IS NULL) "
+					" GROUP BY s.serviceid");
+		while( (rows = DBfetch(res)) )
+		{
+			ZBX_STR2UINT64(serviceid, rows[0]);
+
+			DBexecute("UPDATE services as s "
+					" SET s.triggerid = null "
+					" WHERE s.serviceid = " ZBX_FS_UI64, serviceid);
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_service_status                                             *
+ *                                                                            *
+ * Purpose: retrive true status                                               *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBget_service_status(
+		zbx_uint64_t	serviceid,
+		int		algorithm,
+		zbx_uint64_t	triggerid
+	)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	int status = 0;
+
+	if( 0 != triggerid )
+	{
+		result = DBselect("select priority from triggers where trigerid=" ZBX_FS_UI64 " and status=0 and value=%d", triggerid, TRIGGER_VALUE_TRUE);
+		if( (row = DBfetch(result)) )
+		{
+			status = atoi(row[0]);
+		}
+		DBfree_result(result);
+	}
+
+	if((SERVICE_ALGORITHM_MAX == algorithm) || (SERVICE_ALGORITHM_MIN == algorithm))
+	{
+		if(SERVICE_ALGORITHM_MAX == algorithm)
+		{
+			result = DBselect("select count(*),max(status) from services s,services_links l "
+					"where l.serviceupid=" ZBX_FS_UI64 " and s.serviceid=l.servicedownid",
+					serviceid);
+		}
+		/* MIN otherwise */
+		else
+		{
+			result = DBselect("select count(*),min(status) from services s,services_links l "
+					"where l.serviceupid=" ZBX_FS_UI64 " and s.serviceid=l.servicedownid",
+					serviceid);
+		}
+		row=DBfetch(result);
+		if(row && DBis_null(row[0]) != SUCCEED && DBis_null(row[1]) != SUCCEED)
+		{
+			if(atoi(row[0])!=0)
+			{
+				status = atoi(row[1]);
+			}
+		}
+		DBfree_result(result);
+	}
+	return status;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBupdate_services_rec                                            *
+ *                                                                            *
+ * Purpose: re-calculate and updates status of the service and its childs     *
+ *                                                                            *
+ * Parameters: serviceid - item to update services for                        *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: recursive function                                               *
+ *           !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
+void	DBupdate_services_rec(
+		zbx_uint64_t serviceid
+	)
+{
+	int	status;
+	zbx_uint64_t	serviceupid;
+	int	algorithm;
+
+	DB_RESULT result;
+	DB_ROW	row;
+
+	result = DBselect("select l.serviceupid,s.algorithm from services_links l,services s where s.serviceid=l.serviceupid and l.servicedownid=" ZBX_FS_UI64,
+		serviceid);
+	status=0;
+	while((row=DBfetch(result)))
+	{
+		ZBX_STR2UINT64(serviceupid,row[0]);
+		algorithm=atoi(row[1]);
+		if(SERVICE_ALGORITHM_NONE == algorithm)
+		{
+/* Do nothing */
+		}
+		else if((SERVICE_ALGORITHM_MAX == algorithm)
+			||
+			(SERVICE_ALGORITHM_MIN == algorithm))
+		{
+			status = DBget_service_status(serviceupid, algorithm, 0);
+
+			DBadd_service_alarm(serviceupid,status,time(NULL));
+			DBexecute("update services set status=%d where serviceid=" ZBX_FS_UI64,
+				status,
+				serviceupid);
+		}
+		else
+		{
+			zabbix_log( LOG_LEVEL_ERR, "Unknown calculation algorithm of service status [%d]",
+				algorithm);
+			zabbix_syslog("Unknown calculation algorithm of service status [%d]",
+				algorithm);
+		}
+	}
+	DBfree_result(result);
+
+	result = DBselect("select serviceupid from services_links where servicedownid=" ZBX_FS_UI64,
+		serviceid);
+
+	while((row=DBfetch(result)))
+	{
+		ZBX_STR2UINT64(serviceupid,row[0]);
+		DBupdate_services_rec(serviceupid);
+	}
+	DBfree_result(result);
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBupdate_services_status_all                                     *
+ *                                                                            *
+ * Purpose: Cleaning parent nodes from triggers, updating ALL services status.*
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
+static void DBupdate_services_status_all(void)
+{
+	DB_RESULT result;
+	DB_ROW rows;
+
+	zbx_uint64_t
+		serviceid = 0,
+		triggerid = 0;
+
+	int	status = 0;
+
+	DBclear_parents_from_trigger(0);
+
+	result = DBselect("SELECT s.serviceid,s.algorithm,s.triggerid "
+			" FROM services AS s "
+			" WHERE s.serviceid NOT IN (SELECT DISTINCT sl.serviceupid FROM services_links AS sl)");
+
+	while( (rows = DBfetch(result)) )
+	{
+		ZBX_STR2UINT64(serviceid, rows[0]);
+		ZBX_STR2UINT64(triggerid, rows[2]);
+
+		status = DBget_service_status(serviceid, atoi(rows[1]), triggerid);
+
+		DBexecute("UPDATE services SET status=%i WHERE serviceid=" ZBX_FS_UI64,
+			status,
+			serviceid);
+
+		DBadd_service_alarm(serviceid, status, time(NULL));
+	}
+	DBfree_result(result);
+
+	result = DBselect("SELECT MAX(sl.servicedownid) as serviceid, sl.serviceupid "
+			" FROM services_links AS sl "
+			" WHERE sl.servicedownid NOT IN (select distinct sl.serviceupid from services_links as sl) "
+			" GROUP BY sl.serviceupid");
+
+	while( (rows = DBfetch(result)) )
+	{
+		ZBX_STR2UINT64(serviceid, rows[0]);
+		DBupdate_services_rec(serviceid);
+	}
+	DBfree_result(result);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBupdate_services                                                *
+ *                                                                            *
+ * Purpose: re-calculate and updates status of the service and its childs     *
+ *                                                                            *
+ * Parameters: serviceid - item to update services for                        *
+ *             status - new status of the service                             *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
+void	DBupdate_services(
+		zbx_uint64_t triggerid,
+		int status
+	)
+{
+	DB_ROW	row;
+	zbx_uint64_t	serviceid;
+
+	DB_RESULT result;
+
+	DBexecute("update services set status=%d where triggerid=" ZBX_FS_UI64,
+		status,
+		triggerid);
+
+	result = DBselect("select serviceid,algorithm from services where triggerid=" ZBX_FS_UI64,
+		triggerid);
+
+	while((row=DBfetch(result)))
+	{
+		ZBX_STR2UINT64(serviceid,row[0]);
+
+		DBadd_service_alarm(
+			serviceid,
+			DBget_service_status(
+				serviceid,
+				atoi(row[1]),
+				0),
+			time(NULL)
+			);
+
+		DBupdate_services_rec(serviceid);
+	}
+
+	DBfree_result(result);
+	return;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBdelete_service                                                 *
  *                                                                            *
  * Purpose: delete service from database                                      *
@@ -221,8 +517,11 @@ static int	DBdelete_service(
 		zbx_uint64_t serviceid
 	)
 {
+	DBexecute("DELETE FROM service_alarms WHERE serviceid=" ZBX_FS_UI64, serviceid);
 	DBexecute("delete from services_links where servicedownid=" ZBX_FS_UI64 " or serviceupid=" ZBX_FS_UI64, serviceid, serviceid);
 	DBexecute("delete from services where serviceid=" ZBX_FS_UI64, serviceid);
+
+	DBupdate_services_status_all();
 	
 	return SUCCEED;
 }
@@ -556,13 +855,528 @@ static int	DBdelete_history_by_itemid(
 
 /******************************************************************************
  *                                                                            *
+ * Type: ZBX_GRAPH_ITEMS                                                      *
+ *                                                                            *
+ * Purpose: represent graph item data                                         *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ ******************************************************************************/
+typedef struct {
+	zbx_uint64_t	itemid;
+	char		*color;
+	int		drawtype;
+	int		sortorder;
+	int		yaxisside;
+	int		calc_fnc;
+	int		type;
+	int		periods_cnt;
+} ZBX_GRAPH_ITEMS;
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_free_gitems                                                  *
+ *                                                                            *
+ * Purpose: free allocated memory by DBget_same_graphitems_for_host           *
+ *                                                                            *
+ * Parameters: gitems - zero terminated array of graph items                  *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ ******************************************************************************/
+#define zbx_free_gitems(gitems) __zbx_free_gitems(&gitems)
+
+static void	__zbx_free_gitems(
+		ZBX_GRAPH_ITEMS **gitems
+	)
+{
+	if ( !*gitems )	return;
+
+	int i = 0;
+
+	for ( i=0; (*gitems)[i].itemid != 0; i++ )
+		zbx_free((*gitems)[i].color);
+
+	zbx_free(*gitems)
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBcmp_graphitems                                                 *
+ *                                                                            *
+ * Purpose: Compare two graph items                                           *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBcmp_graphitems(
+		ZBX_GRAPH_ITEMS *gitem1,
+		ZBX_GRAPH_ITEMS	*gitem2
+	)
+{
+	DB_RESULT	db_items;
+	DB_ROW		db_item_data;
+
+	if(gitem1->drawtype	!= gitem2->drawtype)	return 1;
+	if(gitem1->sortorder	!= gitem2->sortorder)	return 2;
+	if(strcmp(gitem1->color, gitem2->color))	return 3;
+	if(gitem1->yaxisside	!= gitem2->yaxisside)	return 4;
+
+	db_items = DBselect("select distinct i2.itemid from items i1, items i2 "
+			" where i1.itemid=" ZBX_FS_UI64 " and i2.itemid=" ZBX_FS_UI64
+			" and i1.key_=i2.key_ ", gitem1->itemid, gitem2->itemid);
+
+	db_item_data = DBfetch(db_items);
+
+	DBfree_result(db_items);
+	if ( !db_item_data )				return 5;
+	return 0;
+}
+/******************************************************************************
+ *                                                                            *
+ * Function: DBget_same_graphitems_for_host                                   *
+ *                                                                            *
+ * Purpose: Replace items for specified host                                  *
+ *                                                                            *
+ * Parameters: gitems - zero terminated array of graph items                  *
+ *             dest_hostid - destination host id                              *
+ *                                                                            *
+ * Return value: always SUCCEED                                               *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
+static ZBX_GRAPH_ITEMS* DBget_same_graphitems_for_host(
+		ZBX_GRAPH_ITEMS	*gitems,
+		zbx_uint64_t	dest_hostid
+	)
+{
+	DB_RESULT db_items;
+	DB_ROW db_item_data;
+
+	ZBX_GRAPH_ITEMS *new_gitems = NULL;
+
+	int i = 0,
+	    new_gi = 0;
+
+	new_gitems = zbx_malloc(new_gitems, sizeof(ZBX_GRAPH_ITEMS));
+	new_gitems[0].itemid = 0;
+
+	for ( i=0; gitems[i].itemid != 0; i++ )
+	{
+		db_items = DBselect("select new.itemid from items new, items dest "
+				" where dest.itemid=" ZBX_FS_UI64
+				" and new.key_=dest.key_ and new.hostid=" ZBX_FS_UI64,
+				gitems[i].itemid, dest_hostid);
+
+		if ( (db_item_data = DBfetch(db_items)) )
+		{
+			ZBX_STR2UINT64(new_gitems[new_gi].itemid, db_item_data[0]);
+
+			new_gitems[new_gi].color	= strdup(gitems[i].color);
+			new_gitems[new_gi].drawtype	= gitems[i].drawtype;
+			new_gitems[new_gi].sortorder	= gitems[i].sortorder;
+			new_gitems[new_gi].yaxisside	= gitems[i].yaxisside;
+			new_gitems[new_gi].calc_fnc	= gitems[i].calc_fnc;
+			new_gitems[new_gi].type		= gitems[i].type;
+			new_gitems[new_gi].periods_cnt	= gitems[i].periods_cnt;
+
+			new_gitems = zbx_realloc(new_gitems, (new_gi+2)*sizeof(ZBX_GRAPH_ITEMS));
+			new_gitems[new_gi+1].itemid = 0;
+
+			new_gi++;
+		}
+
+		DBfree_result(db_items);
+
+		if ( !db_item_data )
+		{
+			zbx_free_gitems(new_gitems);
+			break;
+		}
+
+	}
+
+	return new_gitems;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBadd_item_to_graph                                              *
+ *                                                                            *
+ * Purpose: add item to the graph                                             *
+ *                                                                            *
+ * Parameters: graphid - graph identificator from database                    *
+ *             itemid - item identificator from database                      *
+ *             color - character representation of HEX color 'RRGGBB'         *
+ *             drawtype - type of line                                        *
+ *             sortorder - sort order                                         *
+ *             yaxisside - 0 - use x-axis                                     *
+ *                         1 - use y-axis                                     *
+ *             calc_fnc - type of calculation function                        *
+ *             type - type item (simple, aggregated, ...)                     *
+ *             periods_cnt - count of aggregated periods                      *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBadd_item_to_graph(
+		zbx_uint64_t	graphid,
+		zbx_uint64_t	itemid,
+		const char	*color,
+		int		drawtype,
+		int		sortorder,
+		int		yaxisside,
+		int		calc_fnc,
+		int		type,
+		int		periods_cnt
+	)
+{
+	zbx_uint64_t
+		gitemid;
+
+	char	*color_esc = NULL;
+
+	int	result = SUCCEED;
+
+	gitemid = DBget_maxid("graphs_items","gitemid");
+
+	color_esc = DBdyn_escape_string(color);
+
+	DBexecute("insert into graphs_items"
+		" (gitemid,graphid,itemid,color,drawtype,sortorder,yaxisside,calc_fnc,type,periods_cnt)"
+		" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s',%i,%i,%i,%i,%i,%i)",
+				gitemid,
+				graphid,
+				itemid,
+				color_esc,
+				drawtype,
+				sortorder,
+				yaxisside,
+				calc_fnc,
+				type,
+				periods_cnt
+			);
+
+	zbx_free(color_esc);
+
+	return result;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdelete_graph                                                   *
+ *                                                                            *
+ * Purpose: delete graph from database                                        *
+ *                                                                            *
+ * Parameters: graphid - graph identificator from database                    *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBdelete_graph(
+		zbx_uint64_t graphid
+	)
+{
+	DB_RESULT	db_graphs;
+	DB_RESULT	db_elements;
+
+	DB_ROW		graph_data;
+	DB_ROW		element_data;
+
+	int result = SUCCEED;
+
+	db_graphs = DBselect("select name from graphs where graphid=" ZBX_FS_UI64, graphid);
+
+	if( (graph_data = DBfetch(db_graphs)) )
+	{
+		/* first delete child graphs */
+		db_elements = DBselect("select graphid from graphs where templateid=" ZBX_FS_UI64, graphid);
+
+		while( (element_data = DBfetch(db_elements)) )
+		{ /* recursion */
+			ZBX_STR2UINT64(graphid, element_data[0]);
+			if( SUCCEED != (result = DBdelete_graph(graphid)) )
+				return result;
+		}
+
+		DBfree_result(db_elements);
+
+		if( SUCCEED == result )
+		{ /* delete graph */
+			DBexecute("delete from screens_items where resourceid=" ZBX_FS_UI64 " and resourcetype=%i", graphid, SCREEN_RESOURCE_GRAPH);
+
+			DBexecute("delete from graphs_items where graphid=" ZBX_FS_UI64, graphid);
+			DBexecute("delete from graphs where graphid=" ZBX_FS_UI64, graphid);
+
+			zabbix_log( LOG_LEVEL_DEBUG, "Graph '%s' deleted", graph_data[0]);
+		}
+	}
+
+	DBfree_result(db_graphs);
+
+	return result;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBupdate_graph                                                   *
+ *                                                                            *
+ * Purpose: Update graph without items and recursion for template             *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: always SUCCEED                                               *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBupdate_graph(
+		zbx_uint64_t	graphid,
+		char 		*name,
+		int		width,
+		int		height,
+		int		yaxistype,
+		int		yaxismin,
+		int		yaxismax,
+		int		show_work_period,
+		int		show_triggers,
+		int		graphtype,
+		zbx_uint64_t	templateid
+	)
+{
+	DB_RESULT db_graphs;
+	DB_ROW db_graph_data;
+
+	char	*name_esc = NULL;
+	int	old_graphtype = 0;
+
+	db_graphs = DBselect("select graphtype from graphs where graphid=" ZBX_FS_UI64, graphid);
+	if ( (db_graph_data = DBfetch(db_graphs)) )
+	{
+		old_graphtype = atoi(db_graph_data[0]);
+	}
+	DBfree_result(db_graphs);
+
+	name_esc = DBdyn_escape_string(name);
+
+	DBexecute("update graphs set name='%s',width=%i,height=%i,"
+		"yaxistype=%i,yaxismin=%i,yaxismax=%i,templateid=" ZBX_FS_UI64 ","
+		"show_work_period=%i,show_triggers=%i,graphtype=%i"
+		" where graphid=" ZBX_FS_UI64,
+		name,width,height,yaxistype,yaxismin,yaxismax,templateid,show_work_period,show_triggers,graphtype,
+		graphid);
+
+	zbx_free(name_esc);
+
+	if( old_graphtype != graphtype && graphtype == GRAPH_TYPE_STACKED)
+	{
+		DBexecute("update graphs_items set calc_fnc=%i,drawtype=1,type=%i "
+			" where graphid=" ZBX_FS_UI64,
+			CALC_FNC_AVG, GRAPH_ITEM_SIMPLE, graphid);
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBupdate_graph_with_items                                        *
+ *                                                                            *
+ * Purpose: Update graph with items and recursion for template                *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBupdate_graph_with_items(
+		zbx_uint64_t	graphid,
+		char		*name,
+		int		width,
+		int		height,
+		int		yaxistype,
+		int		yaxismin,
+		int		yaxismax,
+		int		show_work_period,
+		int		show_triggers,
+		int		graphtype,
+		ZBX_GRAPH_ITEMS	*gitems,
+		zbx_uint64_t	templateid
+	)
+{
+	DB_RESULT	db_hosts;
+	DB_ROW		db_host_data;
+
+	DB_RESULT	db_item_hosts;
+	DB_ROW		db_item_data;
+
+	DB_RESULT	chd_graphs;
+	DB_ROW		chd_graph_data;
+
+	zbx_uint64_t	curr_hostid = 0;
+	int		curr_host_status = 0;
+
+	zbx_uint64_t
+		new_hostid = 0,
+		chd_graphid = 0,
+		chd_hostid = 0;
+
+	char		*itemids = NULL;
+
+	ZBX_GRAPH_ITEMS	*new_gitems = NULL;
+
+	int	i = 0;
+	int	result = SUCCEED;
+
+	if ( !gitems )
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Missed items for graph '%s'", name);
+		return FAIL;
+	}
+
+	/* check items for template graph */
+	db_hosts = DBselect("select distinct h.hostid, h.status from hosts h, items i, graphs_items gi "
+			" where h.hostid=i.hostid and i.itemid=gi.itemid and gi.graphid=" ZBX_FS_UI64, graphid);
+	if ( (db_host_data = DBfetch(db_hosts)) )
+	{
+		ZBX_STR2UINT64(curr_hostid, db_host_data[0]);
+
+		curr_host_status = atoi(db_host_data[1]);
+	}
+	DBfree_result(db_hosts);
+
+	if ( curr_host_status == HOST_STATUS_TEMPLATE )
+	{
+		itemids = zbx_dsprintf(itemids, "0");
+		for ( i = 0; gitems[i].itemid != 0; i++ )
+		{
+			itemids = zbx_strdcatf(itemids, "," ZBX_FS_UI64, gitems[i].itemid);
+		}
+
+		db_item_hosts = DBselect("select distinct hostid from items where itemid in (%s)", itemids);
+
+		zbx_free(itemids);
+
+		new_hostid = 0;
+
+		while( (db_item_data = DBfetch(db_item_hosts)) )
+		{
+			if ( new_hostid )
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "Can not use multiple host items for template graph '%s'", name);
+				result = FAIL;
+				break;
+			}
+
+			ZBX_STR2UINT64(new_hostid, db_item_data[0]);
+		}
+
+		DBfree_result(db_item_hosts);
+
+		if ( SUCCEED == result && curr_hostid != new_hostid )
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "You must use items only from host " ZBX_FS_UI64 " for template graph '%s'", curr_hostid, name);
+			result = FAIL;
+		}
+
+		if ( SUCCEED != result )
+		{
+			return result;
+		}
+	}
+
+	/* firstly update child graphs */
+	chd_graphs = DBselect("select g.graphid from graphs g where g.templateid=" ZBX_FS_UI64, graphid);
+	while ( (chd_graph_data = DBfetch(chd_graphs)) )
+	{
+		chd_hostid = 0;
+		ZBX_STR2UINT64(chd_graphid, chd_graph_data[0]);
+
+		db_hosts = DBselect("select distinct i.hostid from items i, graphs_items gi "
+				" i.itemid=gi.itemid and gi.graphid=" ZBX_FS_UI64, chd_graphid);
+		if ( (db_host_data = DBfetch(db_hosts)) )
+		{
+			ZBX_STR2UINT64(chd_hostid, db_host_data[0]);
+		}
+		DBfree_result(db_hosts);
+
+		if ( ! (new_gitems = DBget_same_graphitems_for_host(gitems, chd_hostid)) )
+		{ /* skip host with missed items */
+			zabbix_log(LOG_LEVEL_DEBUG, "Can not update graph '%s' for host " ZBX_FS_UI64, name, chd_hostid);
+			result = FAIL;
+		}
+		else
+		{
+			result = DBupdate_graph_with_items(chd_graphid, name, width, height,
+				yaxistype, yaxismin, yaxismax,
+				show_work_period, show_triggers, graphtype, new_gitems, graphid);
+
+			zbx_free_gitems(new_gitems);
+		}
+
+		if ( SUCCEED != result )
+		{
+			return result;
+		}
+	}
+	DBfree_result(chd_graphs);
+
+	DBexecute("delete from graphs_items where graphid=" ZBX_FS_UI64, graphid);
+
+	for ( i=0; gitems[i].itemid != 0; i++ )
+	{
+		if ( SUCCEED != (result = DBadd_item_to_graph(
+				graphid,
+				gitems[i].itemid,
+				gitems[i].color,
+				gitems[i].drawtype,
+				gitems[i].sortorder,
+				gitems[i].yaxisside,
+				gitems[i].calc_fnc,
+				gitems[i].type,
+				gitems[i].periods_cnt)) )
+		{
+			return result;
+		}
+	}
+
+	if ( SUCCEED == (result = DBupdate_graph(graphid,name,width,height,yaxistype,yaxismin,yaxismax,show_work_period,
+					show_triggers,graphtype,templateid)) )
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Graph '%s' updated for hosts " ZBX_FS_UI64, name, curr_hostid);
+	}
+
+	return result;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DBadd_graph                                                      *
  *                                                                            *
  * Purpose: add graph                                                         *
  *                                                                            *
  * Parameters: new_graphid - return created graph database identificator      *
  *                                                                            *
- * Return value: always SUCCEE                                                *
+ * Return value: always SUCCEED                                               *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -610,7 +1424,6 @@ static int	DBadd_graph(
 				templateid);
 	zbx_free(name_esc);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Graph '%s' added", name);
 	if( new_graphid )
 		*new_graphid = graphid;
 
@@ -619,138 +1432,132 @@ static int	DBadd_graph(
 
 /******************************************************************************
  *                                                                            *
- * Function: DBdelete_graph                                                   *
+ * Function: DBadd_graph_with_items                                           *
  *                                                                            *
- * Purpose: delete graph from database                                        *
+ * Purpose: Add graph with items and recursion for templates                  *
  *                                                                            *
- * Parameters: graphid - graph identificator from database                    *
+ * Parameters: new_graphid - return created graph database identificator      *
  *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
+ * Return value: always SUCCEED                                               *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
  * Comments: !!! Don't forget sync code with PHP !!!                          *
  *                                                                            *
  ******************************************************************************/
-static int	DBdelete_graph(
-		zbx_uint64_t graphid
+static int	DBcopy_graph_to_host(
+		zbx_uint64_t	graphid,
+		zbx_uint64_t	hostid,
+		unsigned char copy_mode
+	);
+static int	DBadd_graph_with_items(
+		zbx_uint64_t	*new_graphid,
+		const char	*name,
+		int		width,
+		int		height,
+		int		yaxistype,
+		int		yaxismin,
+		int		yaxismax,
+		int		show_work_period,
+		int		show_triggers,
+		int		graphtype,
+		ZBX_GRAPH_ITEMS *gitems,
+		zbx_uint64_t	templateid
 	)
 {
-	DB_RESULT	db_graphs;
-	DB_RESULT	db_elements;
+	DB_RESULT	db_item_hosts;
+	DB_ROW		db_item_host;
 
-	DB_ROW		graph_data;
-	DB_ROW		element_data;
+	DB_RESULT	db_chd_hosts;
+	DB_ROW		chd_host_data;
+	
+	zbx_uint64_t	chd_hostid = 0;
 
-	int result = SUCCEED;
+	char *itemids = NULL;
 
-	db_graphs = DBselect("select name from graphs where graphid=" ZBX_FS_UI64, graphid);
+	int 	i = 0,
+		new_host_count = 0,
+		new_host_is_template = 0;
 
-	if( (graph_data = DBfetch(db_graphs)) )
+	int result = FAIL;
+
+	if ( !gitems )
 	{
-		/* first delete child graphs */
-		db_elements = DBselect("select graphid from graphs where templateid=" ZBX_FS_UI64, graphid);
-
-		while( (element_data = DBfetch(db_elements)) )
-		{ /* recursion */
-			ZBX_STR2UINT64(graphid, element_data[0]);
-			if( SUCCEED != (result = DBdelete_graph(graphid)) )
-				break;
-		}
-
-		DBfree_result(db_elements);
-
-		if( SUCCEED == result )
-		{ /* delete graph */
-			DBexecute("delete from graphs_items where graphid=" ZBX_FS_UI64, graphid);
-			DBexecute("delete from graphs where graphid=" ZBX_FS_UI64, graphid);
-
-			zabbix_log( LOG_LEVEL_DEBUG, "Graph '%s' deleted", graph_data[0]);
-		}
+		zabbix_log(LOG_LEVEL_DEBUG, "Missed items for graph '%s'", name);
+		return result;
 	}
 
-	DBfree_result(db_graphs);
+	/* check items for template graph */
+	itemids = zbx_dsprintf(itemids, "0");
+	for ( i=0; gitems[i].itemid != 0; i++ )
+		itemids = zbx_strdcatf(itemids, "," ZBX_FS_UI64, gitems[i].itemid);
 
-	return result;
-}
+	db_item_hosts = DBselect("select distinct h.hostid,h.host,h.status "
+			" from items i, hosts h where h.hostid=i.hostid and i.itemid in (%s)", itemids);
 
-/******************************************************************************
- *                                                                            *
- * Function: DBdelete_graph_item                                              *
- *                                                                            *
- * Purpose: delete graph item from database                                   *
- *                                                                            *
- * Parameters: graphid - graph identificator from database                    *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
- *                                                                            *
- ******************************************************************************/
-static int	DBdelete_graph_item(
-		zbx_uint64_t gitemid
-	)
-{
-	DB_RESULT	db_graphs;
-	DB_RESULT	db_chd_gitems;
+	zbx_free(itemids);
 
-	DB_ROW		graph_data;
-	DB_ROW		chd_gitem_data;
-
-	zbx_uint64_t
-		graphid,
-		templateid,
-		chd_gitemid;
-
-	int	result = FAIL;
-
-	db_graphs = DBselect("select g.graphid,g.name,g.templateid from graphs g,graphs_ietms gi "
-			" gi.gitemid=" ZBX_FS_UI64 " and gi.graphid=g.graphid ");
-
-	if( (graph_data = DBfetch(db_graphs)) )
+	new_host_count = 0;
+	new_host_is_template = 0;
+	while( (db_item_host = DBfetch(db_item_hosts)) )
 	{
-		ZBX_STR2UINT64(graphid, graph_data[0]);
-		ZBX_STR2UINT64(templateid, graph_data[2]);
+		new_host_count++;
+		if ( HOST_STATUS_TEMPLATE == atoi(db_item_host[2]) )
+			new_host_is_template = 1;
+	}
+	DBfree_result(db_item_hosts);
 
-		db_chd_gitems = DBselect("select distinct cgi.gitemid from graphs cg,graphs_items cgi,graphs_items tgi,items ci,items ti "
-				" where tgi.gitemid=" ZBX_FS_UI64 " and cg.templateid=tgi.graphid and cgi.graphid=cg.graphid and "
-				" cgi.drawtype=tgi.drawtype and cgi.sortorder=tgi.sortorder and cgi.color=tgi.color "
-				" and cgi.yaxisside=tgi.yaxisside and cgi.itemid=ci.itemid and tgi.itemid=ti.itemid and ci.key_=ti.key_");
+	if ( new_host_is_template && new_host_count > 1 )
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Graph '%s' with template host can not contain items from other hosts.", name);
+		return result;
+	}
 
-		while( (chd_gitem_data = DBfetch(db_chd_gitems)) )
+
+	if ( SUCCEED == (result = DBadd_graph(new_graphid, name,width,height,yaxistype,yaxismin,yaxismax,show_work_period,show_triggers,graphtype,templateid)) )
+	{
+		for ( i=0; gitems[i].itemid != 0; i++ )
 		{
-			ZBX_STR2UINT64(chd_gitemid, chd_gitem_data[0]);
-
-			/* recursion */
-			if( SUCCEED != (result = DBdelete_graph_item(chd_gitemid)) )
-				break;
-		}
-
-		DBfree_result(db_chd_gitems);
-
-		if( SUCCEED == result )
-		{  /* delete graph items */
-			DBexecute("delete from graphs_items where gitemid=" ZBX_FS_UI64, gitemid);
-
-			zabbix_log(LOG_LEVEL_DEBUG,"Graphitem with ID [" ZBX_FS_UI64 "] deleted from graph '%s'", gitemid, graph_data[1]);
-
-			db_chd_gitems = DBselect("select count(*) from graphs_items where graphid=" ZBX_FS_UI64, graphid);
-
-			if( (chd_gitem_data = DBfetch(db_chd_gitems)) )
+			if ( SUCCEED != (result = DBadd_item_to_graph(
+				*new_graphid,
+				gitems[i].itemid,
+				gitems[i].color,
+				gitems[i].drawtype,
+				gitems[i].sortorder,
+				gitems[i].yaxisside,
+				gitems[i].calc_fnc,
+				gitems[i].type,
+				gitems[i].periods_cnt)) )
 			{
-				if( templateid > 0 && 0 == atoi(chd_gitem_data[0]))
-				{ /* delete empty child graphs */
-					return DBdelete_graph(graphid);
-				}
+				break;
 			}
-
-			DBfree_result(db_chd_gitems);
 		}
 	}
 
-	DBfree_result(db_graphs);
+	if ( SUCCEED == result )
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Graph '%s' added", name);
+
+		/* add graphs for child hosts */
+		db_chd_hosts = DBselect("select distinct ht.hostid "
+				" from hosts_templates ht, items i, graphs_items gi "
+				" where ht.templateid=i.hostid and i.itemid=gi.itemid and gi.graphid=" ZBX_FS_UI64, *new_graphid);
+
+		while( (chd_host_data = DBfetch(db_chd_hosts)) )
+		{
+			ZBX_STR2UINT64(chd_hostid, chd_host_data[0]);
+
+			DBcopy_graph_to_host(*new_graphid, chd_hostid, 0);
+		}
+
+		DBfree_result(db_chd_hosts);
+	}
+
+	if ( SUCCEED != result && *new_graphid )
+	{
+		DBdelete_graph(*new_graphid);
+		*new_graphid = 0;
+	}
 
 	return result;
 }
@@ -806,6 +1613,9 @@ static int	DBdelete_item(
 		if( SUCCEED == (result = DBdelete_triggers_by_itemid(itemid)) )
 		if( SUCCEED == (result = DBdelete_history_by_itemid(itemid, 1 /* use housekeeper */)) )
 		{
+			DBexecute("delete from screens_items where resourceid=" ZBX_FS_UI64 " and resourcetype in (%i,%i)",
+					itemid, SCREEN_RESOURCE_PLAIN_TEXT, SCREEN_RESOURCE_SIMPLE_GRAPH);
+
 			DBexecute("delete from graphs_items where itemid=" ZBX_FS_UI64, itemid);
 			DBexecute("delete from items_applications where itemid=" ZBX_FS_UI64, itemid);
 			DBexecute("delete from items where itemid=" ZBX_FS_UI64, itemid);
@@ -1193,7 +2003,7 @@ static void	DBdelete_template_applications(
 		{
 			tmp_hostid = 0;
 
-			db_tmp_hosts = DBselect("select applicationid,templateid,name from applications where hostid=" ZBX_FS_UI64, templateid);
+			db_tmp_hosts = DBselect("select hostid from applications where applicationid=" ZBX_FS_UI64, a_templateid);
 
 			if( (tmp_host_data = DBfetch(db_tmp_hosts) ))
 			{
@@ -1255,10 +2065,9 @@ static int	DBdb_save_application(
 	DB_ROW		element_data;
 	DB_ROW		host_data;
 
-	zbx_uint64_t
-		applicationid_new,
-		elementid,
-		db_hostid;
+	zbx_uint64_t	applicationid_new = 0,
+			elementid,
+			db_hostid;
 
 	char	*name_esc = NULL;
 
@@ -1517,7 +2326,7 @@ static int	DBupdate_item(
 
 	zbx_uint64_t
 		itemappid,
-		del_itemid,
+		del_itemid = 0,
 		chd_itemidm,
 		chd_hostid,
 		applications[ZBX_MAX_APPLICATIONS];
@@ -1690,6 +2499,9 @@ static int	DBupdate_item(
 		}
 		zbx_free(key_esc);
 	}
+
+	DBfree_result(db_hosts);
+
 	return result;
 }
 
@@ -2211,6 +3023,9 @@ static int	DBadd_event(
 				triggerid, ALERT_STATUS_NOT_SENT);
 		}
 	}
+
+	DBfree_result(db_events);
+
 	return result;
 }
 
@@ -2335,7 +3150,7 @@ static char*	DBimplode_exp (
 			zbx_free(str_esc);
 			key[key_len] = '.';
 
-			db_items = DBselect(sql);
+			db_items = DBselect("%s",sql);
 
 			zbx_free(sql);
 
@@ -2360,7 +3175,7 @@ static char*	DBimplode_exp (
 				zbx_free(str_esc);
 				parameter[parameter_len] = ')';
 
-				DBexecute(sql);
+				DBexecute("%s",sql);
 
 				exp = zbx_strdcatf(exp, "{" ZBX_FS_UI64 "}", functionid);
 
@@ -2651,6 +3466,7 @@ static int	DBupdate_trigger(
 			str_esc = DBdyn_escape_string(short_expression);
 			sql = zbx_strdcatf(sql, " expression='%s',", str_esc);
 			zbx_free(str_esc);
+			zbx_free(short_expression);
 
 		}
 		if( description ) {
@@ -2675,7 +3491,7 @@ static int	DBupdate_trigger(
 
 		sql = zbx_strdcatf(sql, " value=2 where triggerid=" ZBX_FS_UI64,	triggerid);
 
-		DBexecute(sql);
+		DBexecute("%s",sql);
 
 		zbx_free(sql);
 
@@ -2941,7 +3757,9 @@ static int	DBcopy_trigger_to_host(
 
 					old_expression = new_expression;
 					new_expression = string_replace(old_expression, search, replace);
+
 					zbx_free(old_expression);
+					zbx_free(replace);
 				}
 				else
 				{
@@ -3145,268 +3963,6 @@ static int	DBcopy_template_triggers(
 
 /******************************************************************************
  *                                                                            *
- * Function: DBadd_item_to_graph                                              *
- *                                                                            *
- * Purpose: add item to the graph                                             *
- *                                                                            *
- * Parameters: graphid - graph identificator from database                    *
- *             itemid - item identificator from database                      *
- *             color - character representation of HEX color 'RRGGBB'         *
- *             drawtype - type of line                                        *
- *             sortorder - sort order                                         *
- *             yaxisside - 0 - use x-axis                                     *
- *                         1 - use y-axis                                     *
- *             calc_fnc - type of calculation function                        *
- *             type - type item (simple, aggregated, ...)                     *
- *             periods_cnt - count of aggregated periods                      *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
- *                                                                            *
- ******************************************************************************/
-static int	DBadd_item_to_graph(
-		zbx_uint64_t	graphid,
-		zbx_uint64_t	itemid,
-		const char	*color,
-		int		drawtype,
-		int		sortorder,
-		int		yaxisside,
-		int		calc_fnc,
-		int		type,
-		int		periods_cnt
-	)
-{
-	DB_RESULT	db_elements;
-	DB_RESULT	db_graphs;
-
-	DB_ROW		element_data;
-	DB_ROW		graph_data;
-
-	zbx_uint64_t
-		new_graphid,
-		new_itemid,
-		gitemid;
-
-	char	*color_esc = NULL;
-
-	int	item_num,
-		result = SUCCEED;
-
-	gitemid = DBget_maxid("graphs_items","gitemid");
-
-	color_esc = DBdyn_escape_string(color);
-
-	DBexecute("insert into graphs_items"
-		" (gitemid,graphid,itemid,color,drawtype,sortorder,yaxisside,calc_fnc,type,periods_cnt)"
-		" values (" ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s',%i,%i,%i,%i,%i,%i)",
-				gitemid,
-				graphid,
-				itemid,
-				color_esc,
-				drawtype,
-				sortorder,
-				yaxisside,
-				calc_fnc,
-				type,
-				periods_cnt
-			);
-
-	zbx_free(color_esc);
-
-	/* add to child graphs */
-		
-	db_elements = DBselect("select count(*) as num from graphs_items where graphid=" ZBX_FS_UI64, graphid);
-	if( (element_data = DBfetch(db_elements)) )
-	{
-		item_num = atoi(element_data[0]);
-	}
-	DBfree_result(db_elements);
-
-	if( 1 == item_num )
-	{ /* create graphs for childs with item */
-
-		db_graphs = DBselect("select name,width,height,yaxistype,yaxismin,yaxismax,"
-					" show_work_period,show_triggers,graphtype from graphs"
-					" where graphid=" ZBX_FS_UI64, graphid);
-
-		if( (graph_data == DBfetch(db_graphs)) )
-		{
-			db_elements = DBselect("select i.itemid from items i, hosts h, items i2 "
-				" where i2.itemid=" ZBX_FS_UI64 " and i.key=i2.key_ and i.hostid=h.hostid and h.templateid=i2.hostid", itemid);
-
-			while( (element_data = DBfetch(db_elements)) )
-			{
-				ZBX_STR2UINT64(new_itemid, element_data[0]);
-
-				if( SUCCEED == (result = DBadd_graph(
-						&new_graphid,		/* [out] graphid */
-						graph_data[0],		/* name */
-						atoi(graph_data[1]),	/* width */
-						atoi(graph_data[2]),	/* height */
-						atoi(graph_data[3]),	/* yaxistype */
-						atoi(graph_data[4]),	/* yaxismin */
-						atoi(graph_data[5]),	/* yaxismax */
-						atoi(graph_data[6]),	/* show_work_period */
-						atoi(graph_data[7]),	/* show_triggers */
-						atoi(graph_data[8]),	/* graphtype */
-						graphid)) )		/* templateid */
-				{
-					/* recursion */
-					result = DBadd_item_to_graph(
-							new_graphid,
-							new_itemid,
-							color,
-							drawtype,
-							sortorder,
-							yaxisside,
-							calc_fnc,
-							type,
-							periods_cnt);
-				}
-					/* recursion */
-
-				if( SUCCEED != result )
-					break;
-			}
-
-			DBfree_result(db_elements);
-		}
-		DBfree_result(db_graphs);
-	}
-	else
-	{ /* copy items to childs */
-		db_elements = DBselect("select g.graphid,i.itemid from graphs g, items i, graphs_items gi, items i2 "
-					" where g.templateid=" ZBX_FS_UI64 " and gi.graphid=g.graphid "
-					" and gi.itemid=i.itemid and i.key_=i2.key_ and i2.itemid=" ZBX_FS_UI64,
-					graphid, itemid);
-
-		while( (element_data = DBfetch(db_elements)) )
-		{
-			ZBX_STR2UINT64(new_graphid, element_data[0]);
-			ZBX_STR2UINT64(new_itemid, element_data[1]);
-
-			/* recursion */
-			if( SUCCEED != (result = DBadd_item_to_graph(
-					new_graphid,
-					new_itemid,
-					color,
-					drawtype,
-					sortorder,
-					yaxisside,
-					calc_fnc,
-					type,
-					periods_cnt)) )
-				break;
-		}
-
-		DBfree_result(db_elements);
-
-	}
-
-	if( SUCCEED == result)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Added graph item with ID [" ZBX_FS_UI64 "]", gitemid);
-		/* result = gitemid; // skip fo C version */
-	}
-	else
-	{
-		DBdelete_graph_item(gitemid);
-	}
-
-	return result;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DBcopy_graphitems_for_host                                       *
- *                                                                            *
- * Purpose: copy graph elements from one graph to another                     *
- *                                                                            *
- * Parameters: src_graphid - source graph identificator from database         *
- *             dist_graphid - destination graph identificator from database   *
- *             hostid - host identificator from database                      *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
- *                                                                            *
- ******************************************************************************/
-static int	DBcopy_graphitems_for_host(
-		zbx_uint64_t	src_graphid,
-		zbx_uint64_t	dist_graphid,
-		zbx_uint64_t	hostid
-	)
-{
-	DB_RESULT	db_src_graphitems;
-	DB_RESULT	db_items;
-
-	DB_ROW		src_graphitem_data;
-	DB_ROW		item_data;
-
-	zbx_uint64_t
-		itemid;
-
-	char	*key_esc = NULL;
-
-	int	result = SUCCEED;
-
-
-	db_src_graphitems = DBselect("select i.key_,gi.color,gi.drawtype,gi.sortorder,gi.sortorder,"
-					"gi.yaxisside,gi.calc_fnc,gi.type,gi.periods_cnt "
-					" from graphs_items gi,items i where gi.graphid=" ZBX_FS_UI64
-					" and gi.itemid=i.itemid "
-					" order by gi.drawtype,gi.sortorder,gi.color,gi.yaxisside,i.key_",
-					src_graphid);
-
-	while( (src_graphitem_data = DBfetch(db_src_graphitems)) )
-	{
-		key_esc = DBdyn_escape_string(src_graphitem_data[0]);
-
-		db_items = DBselect("select itemid from items where hostid=" ZBX_FS_UI64 " and key_='%s'", hostid, key_esc);
-
-		zbx_free(key_esc);
-
-		if( (item_data = DBfetch(db_items)) )
-		{
-			ZBX_STR2UINT64(itemid, item_data[0]);
-
-			result = DBadd_item_to_graph(
-				dist_graphid,
-				itemid,
-				src_graphitem_data[1],
-				atoi(src_graphitem_data[2]),
-				atoi(src_graphitem_data[3]),
-				atoi(src_graphitem_data[4]),
-				atoi(src_graphitem_data[5]),
-				atoi(src_graphitem_data[6]),
-				atoi(src_graphitem_data[7]));
-		}
-		else
-		{
-			result = FAIL;
-
-			zabbix_log(LOG_LEVEL_DEBUG, "Not found item with key '%s' for host [" ZBX_FS_UI64 "]",
-					src_graphitem_data[0], hostid);
-		}
-
-		DBfree_result(db_items);
-
-		if( SUCCEED != result )
-			break;
-	}
-
-	DBfree_result(db_src_graphitems);
-
-	return result;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: DBcopy_graph_to_host                                             *
  *                                                                            *
  * Purpose: copy specified graph to host                                      *
@@ -3429,39 +3985,163 @@ static int	DBcopy_graph_to_host(
 		unsigned char copy_mode
 	)
 {
+	DB_RESULT	db_items;
+	DB_ROW		db_item_data;
+
 	DB_RESULT	db_graphs;
+	DB_ROW		db_graph_data;
 
-	DB_ROW		graph_data;
+	DB_RESULT	chd_graphs;
+	DB_ROW		chd_graph_data;
 
-	zbx_uint64_t
-		new_graphid = 0;
+	ZBX_GRAPH_ITEMS chd_gitem;
+	ZBX_GRAPH_ITEMS *gitems = NULL;
+	ZBX_GRAPH_ITEMS *new_gitems = NULL;
+
+	zbx_uint64_t	chd_graphid = 0;
+	zbx_uint64_t	chd_templateid = 0;
+
+	int	gitems_count = 0,
+		i = 0,
+		gitem_equal = 0,
+		equal = 0;
 
 	int	result = SUCCEED;
 
-	db_graphs = DBselect("select name,width,height,yaxistype,yaxismin,yaxismax,show_work_period,show_triggers,graphtype "
-			" from graphs where graphid=" ZBX_FS_UI64, graphid);
-	if( (graph_data = DBfetch(db_graphs)) )
-	{
-		if( SUCCEED == (result = DBadd_graph(
-				&new_graphid,		/* [out] graphid */
-				graph_data[0],		/* name */
-				atoi(graph_data[1]),	/* width */
-				atoi(graph_data[2]),	/* height */
-				atoi(graph_data[3]),	/* yaxistype */
-				atoi(graph_data[4]),	/* yaxismin */
-				atoi(graph_data[5]),	/* yaxismax */
-				atoi(graph_data[6]),	/* show_work_period */
-				atoi(graph_data[7]),	/* show_triggers */
-				atoi(graph_data[8]),	/* graphtype */
-				copy_mode ? 0 : graphid)) )
-			result = DBcopy_graphitems_for_host(graphid, new_graphid, hostid);
+	result = FAIL;
 
-		if( SUCCEED != result && 0 < new_graphid)
-		{
-			DBdelete_graph(new_graphid);
+	gitems = (ZBX_GRAPH_ITEMS*)zbx_malloc((void*)gitems, sizeof(ZBX_GRAPH_ITEMS));
+	gitems[0].itemid = 0;
+	gitems_count = 0;
+
+	db_items = DBselect("select gi.itemid,gi.color,gi.drawtype,gi.sortorder,gi.yaxisside,gi.calc_fnc,gi.type,gi.periods_cnt "
+			"from graphs_items gi where gi.graphid=" ZBX_FS_UI64, graphid);
+	while ( (db_item_data = DBfetch(db_items)) )
+	{
+		ZBX_STR2UINT64(gitems[gitems_count].itemid, db_item_data[0]);
+
+		gitems[gitems_count].color	= strdup(db_item_data[1]);
+		gitems[gitems_count].drawtype	= atoi(db_item_data[2]);
+		gitems[gitems_count].sortorder	= atoi(db_item_data[3]);
+		gitems[gitems_count].yaxisside	= atoi(db_item_data[4]);
+		gitems[gitems_count].calc_fnc	= atoi(db_item_data[5]);
+		gitems[gitems_count].type	= atoi(db_item_data[6]);
+		gitems[gitems_count].periods_cnt= atoi(db_item_data[7]);
+
+		gitems = zbx_realloc(gitems, (gitems_count+2)*sizeof(ZBX_GRAPH_ITEMS));
+		gitems[gitems_count+1].itemid = 0;
+
+		gitems_count++;
+	}
+	DBfree_result(db_items);
+
+	db_graphs = DBselect("select name,width,height,yaxistype,yaxismin,yaxismax,show_work_period,"
+			"show_triggers,graphtype from graphs where graphid=" ZBX_FS_UI64, graphid);
+
+	db_graph_data = DBfetch(db_graphs);
+
+	if ( (new_gitems = DBget_same_graphitems_for_host(gitems, hostid)) )
+	{
+		chd_graphid = 0;
+		chd_graphs = DBselect("select distinct g.graphid,g.name,g.width,g.height,g.yaxistype,g.yaxismin,g.yaxismax,g.show_work_period,"
+				"g.show_triggers,g.graphtype,g.templateid from graphs g, graphs_items gi, items i "
+				" where g.graphid=gi.graphid and gi.itemid=i.itemid and i.hostid=" ZBX_FS_UI64, hostid);
+		while( !chd_graphid && (chd_graph_data = DBfetch(chd_graphs)))
+		{ /* compare graphs */
+			ZBX_STR2UINT64(chd_graphid, chd_graph_data[0]);
+			ZBX_STR2UINT64(chd_templateid, chd_graph_data[10]);
+
+			if ( chd_templateid != 0 ) continue;
+
+			equal = 0;
+			db_items = DBselect("select gi.itemid,gi.color,gi.drawtype,gi.sortorder,"
+					"gi.yaxisside,gi.calc_fnc,gi.type,gi.periods_cnt "
+					" from graphs_items gi where gi.graphid=" ZBX_FS_UI64, graphid);
+			while( (db_item_data = DBfetch(db_items)) )
+			{
+				ZBX_STR2UINT64(chd_gitem.itemid, db_item_data[0]);
+
+				chd_gitem.color		= db_item_data[1]; /* NOTE: copy refernce only */
+				chd_gitem.drawtype	= atoi(db_item_data[2]);
+				chd_gitem.sortorder	= atoi(db_item_data[3]);
+				chd_gitem.yaxisside	= atoi(db_item_data[4]);
+				chd_gitem.calc_fnc	= atoi(db_item_data[5]);
+				chd_gitem.type		= atoi(db_item_data[6]);
+				chd_gitem.periods_cnt	= atoi(db_item_data[7]);
+
+				gitem_equal = 0;
+				for ( i = 0; new_gitems[i].itemid != 0; i++ )
+				{
+					if(DBcmp_graphitems(&new_gitems[i], &chd_gitem))	continue;
+
+					gitem_equal = 1;
+					break;
+				}
+
+				if ( !gitem_equal )
+				{
+					equal = 0;
+					break;
+				}
+
+				/* founded equal graph item */
+				equal++;
+			}
+
+			DBfree_result(db_items);
+
+			if ( equal && gitems_count == equal )
+			{ /* founded equal graph */
+				break;
+			}
+
+			chd_graphid = 0;
 		}
+
+		DBfree_result(chd_graphs);
+
+		if ( chd_graphid )
+		{
+			result = DBupdate_graph_with_items(
+				chd_graphid,
+				db_graph_data[0],		/* name */
+				atoi(db_graph_data[1]),	/* width */
+				atoi(db_graph_data[2]),	/* height */
+				atoi(db_graph_data[3]),	/* yaxistype */
+				atoi(db_graph_data[4]),	/* yaxismin */
+				atoi(db_graph_data[5]),	/* yaxismax */
+				atoi(db_graph_data[6]),	/* show_work_period */
+				atoi(db_graph_data[7]),	/* show_triggers */
+				atoi(db_graph_data[8]),	/* graphtype */
+				new_gitems,
+				copy_mode ? 0 : graphid);
+		}
+		else
+		{
+			result = DBadd_graph_with_items(
+				&chd_graphid,
+				db_graph_data[0],	/* name */
+				atoi(db_graph_data[1]),	/* width */
+				atoi(db_graph_data[2]),	/* height */
+				atoi(db_graph_data[3]),	/* yaxistype */
+				atoi(db_graph_data[4]),	/* yaxismin */
+				atoi(db_graph_data[5]),	/* yaxismax */
+				atoi(db_graph_data[6]),	/* show_work_period */
+				atoi(db_graph_data[7]),	/* show_triggers */
+				atoi(db_graph_data[8]),	/* graphtype */
+				new_gitems,
+				copy_mode ? 0 : graphid);
+		}
+
+		zbx_free_gitems(new_gitems);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Skipped coping of graph '%s' to host " ZBX_FS_UI64, db_graph_data[0], hostid);
+		result = FAIL;
 	}
 
+	zbx_free_gitems(gitems);
 	DBfree_result(db_graphs);
 
 	return result;

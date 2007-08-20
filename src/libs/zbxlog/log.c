@@ -50,19 +50,33 @@ static HANDLE system_log_handle = INVALID_HANDLE_VALUE;
 
 void redirect_std(const char *filename)
 {
-	close(0);	close(1);	close(2);
+	int fd;
+	const char default_file[] = "/dev/null";
+	const char *out_file = default_file;
+	int open_flags = O_WRONLY;
 
-	open("/dev/null", O_RDONLY);    /* stdin */
+	close(fileno(stdin));
+	open(default_file, O_RDONLY);    /* stdin, normally fd==0 */
 
-	if(!filename || !*filename)
+	if( filename && *filename)
 	{
-		open("/dev/null", O_RDWR);      /* stdout */
-		open("/dev/null", O_RDWR);      /* stderr */
+		out_file = filename;
+		open_flags |= O_CREAT | O_APPEND;
+	}
+
+	if ( -1 != (fd = open(out_file, open_flags, 0666)) )
+	{
+		if(-1 == dup2(fd, fileno(stderr)))
+			zbx_error("Cannot redirect stderr to [%s]", filename);
+
+		if(-1 == dup2(fd, fileno(stdout)))
+			zbx_error("Cannot redirect stdout to [%s]", filename);
+		close(fd);
 	}
 	else
 	{
-		fopen(filename, "a+");   /* stdout */
-		fopen(filename, "a+");   /* stderr */
+		zbx_error("Cannot open [%s] [%s]", filename, strerror(errno));
+		exit(FAIL);
 	}
 }
 
@@ -71,7 +85,6 @@ void redirect_std(const char *filename)
 int zabbix_open_log(int type, int level, const char *filename)
 {
 	FILE *log_file = NULL;
-
 
 	log_level = level;
 
@@ -106,19 +119,19 @@ int zabbix_open_log(int type, int level, const char *filename)
 		if(strlen(filename) >= MAX_STRING_LEN)
 		{
 			zbx_error("To large path for logfile.");
-			return	FAIL;
+			exit(FAIL);
 		}
 
 		if(ZBX_MUTEX_ERROR == zbx_mutex_create_force(&log_file_access, ZBX_MUTEX_LOG))
 		{
 			zbx_error("Unable to create mutex for log file");
-			return	FAIL;
+			exit(FAIL);
 		}
-		
+
 		if(NULL == (log_file = fopen(filename,"a+")))
 		{
 			zbx_error("Unable to open log file [%s] [%s]", filename, strerror(errno));
-			return	FAIL;
+			exit(FAIL);
 		}
 
 		log_type = LOG_TYPE_FILE;
@@ -176,7 +189,7 @@ void zabbix_set_log_level(int level)
 	log_level = level;
 }
 
-void zabbix_log(int level, const char *fmt, ...)
+void __zbx_zabbix_log(int level, const char *fmt, ...)
 {
 #ifdef TEST
 	time_t	t;
@@ -243,7 +256,6 @@ void zabbix_log(int level, const char *fmt, ...)
 				);
 
 			va_start(args,fmt);
-
 
 			vfprintf(log_file,fmt, args);
 

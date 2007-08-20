@@ -98,7 +98,7 @@ void    init_config(void)
 	  
 int	main(int argc, char **argv)
 {
-	int             ch;
+	char		ch = '\0';
 	int		task = ZBX_TASK_START;
 	char		*TEST_METRIC = NULL;
 	zbx_sock_t	s_in;
@@ -115,8 +115,8 @@ int	main(int argc, char **argv)
 	progname = argv[0];
 
 /* Parse the command-line. */
-	while ((ch = zbx_getopt_long(argc, argv, "c:hVpt:", longopts, NULL)) != EOF)
-		switch ((char) ch) {
+	while ((ch = (char)zbx_getopt_long(argc, argv, "c:hVpt:", longopts, NULL)) != (char)EOF)
+		switch (ch) {
 		case 'c':
 			CONFIG_FILE = strdup(zbx_optarg);
 			break;
@@ -178,8 +178,8 @@ int	main(int argc, char **argv)
 
 #if !defined(_WINDOWS)
 	signal( SIGINT,  child_signal_handler);
-	signal( SIGQUIT, child_signal_handler );
 	signal( SIGTERM, child_signal_handler );
+	signal( SIGQUIT, child_signal_handler );
 	signal( SIGALRM, child_signal_handler );
 
 	alarm(CONFIG_TIMEOUT);

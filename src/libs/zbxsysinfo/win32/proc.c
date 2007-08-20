@@ -371,7 +371,7 @@ int	    PROC_INFO(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	if(attr[0] == '\0')
 	{
 		/* default parameter */
-		zbx_snprintf(attr, sizeof(attr), attrList[0]);
+		zbx_snprintf(attr, sizeof(attr), "%s", attrList[0]);
 	}
 
 	if(get_param(param, 3, type, sizeof(type)) != 0)
@@ -382,7 +382,7 @@ int	    PROC_INFO(const char *cmd, const char *param, unsigned flags, AGENT_RESU
 	if(type[0] == '\0')
 	{
 		/* default parameter */
-		zbx_snprintf(type, sizeof(type), typeList[2]);
+		zbx_snprintf(type, sizeof(type), "%s", typeList[2]);
 	}
 
 	/* Get attribute code from string */

@@ -13,7 +13,7 @@ CREATE TABLE alerts_tmp (
 	error		varchar(128)		DEFAULT ''	NOT NULL,
 	nextcheck	integer	DEFAULT '0'	NOT NULL,
 	PRIMARY KEY (alertid)
-);
+) with OIDS;
 CREATE INDEX alerts_1 on alerts_tmp (actionid);
 CREATE INDEX alerts_2 on alerts_tmp (clock);
 CREATE INDEX alerts_3 on alerts_tmp (triggerid);

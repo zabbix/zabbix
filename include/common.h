@@ -20,8 +20,21 @@
 #ifndef ZABBIX_COMMON_H
 #define ZABBIX_COMMON_H
 
-#define SDI(msg)	fprintf(stderr, "%6li:DEBUG INFO: %s\n", zbx_get_thread_id(), msg); fflush(stderr);
-#define SDI2(msg,p1)	fprintf(stderr, "%6li:DEBUG INFO: " msg "\n", zbx_get_thread_id(), p1); fflush(stderr);
+#include "sysinc.h"
+
+#include "zbxtypes.h"
+
+#ifdef DEBUG
+#	include "threads.h"
+
+#	define SDI(msg)		fprintf(stderr, "%6li:DEBUG INFO: %s\n", zbx_get_thread_id(), msg); fflush(stderr)
+#	define SDI2(msg,p1)	fprintf(stderr, "%6li:DEBUG INFO: " msg "\n", zbx_get_thread_id(), p1); fflush(stderr)
+#	define zbx_dbg_assert(exp)	assert(exp)
+#else
+#	define SDI(msg)			((void)(0))
+#	define SDI2(msg,p1)		((void)(0))
+#	define zbx_dbg_assert(exp)	((void)(0))
+#endif
 
 #if defined(ENABLE_CHECK_MEMOTY)
 #	include "crtdbg.h"
@@ -67,10 +80,6 @@
 #	define CHECK_MEMORY(fncname, msg) ((void)0)
 #endif
 
-#include "sysinc.h"
-
-#include "zbxtypes.h"
-
 #ifndef va_copy
 #	if defined(__va_copy)
 #		define va_copy(d, s) __va_copy(d, s)
@@ -112,8 +121,8 @@
 #define OFF	0
 
 #define	APPLICATION_NAME	"ZABBIX Agent"
-#define	ZABBIX_REVDATE		"29 May 2007"
-#define	ZABBIX_VERSION		"1.4"
+#define	ZABBIX_REVDATE		"20 August 2007"
+#define	ZABBIX_VERSION		"1.4.2"
 
 #if defined(_WINDOWS)
 /*#	pragma warning (disable: 4100)*/
@@ -148,6 +157,8 @@
 	#define MAX_STRING_LEN	2048
 #endif
 #define MAX_BUF_LEN	65000
+
+#define ZBX_DM_DELIMITER	'\255'
 
 /* Item types */
 typedef enum
@@ -274,7 +285,8 @@ typedef enum
 	CONDITION_OPERATOR_NOT_LIKE,
 	CONDITION_OPERATOR_IN,
 	CONDITION_OPERATOR_MORE_EQUAL,
-	CONDITION_OPERATOR_LESS_EQUAL
+	CONDITION_OPERATOR_LESS_EQUAL,
+	CONDITION_OPERATOR_NOT_IN
 } zbx_condition_op_t;
 
 typedef enum
@@ -460,7 +472,9 @@ typedef enum
 #define strscpy(x,y) zbx_strlcpy(x,y,sizeof(x))
 #define strnscpy(x,y,n) zbx_strlcpy(x,y,n);
 
-void    *zbx_malloc(size_t size);
+#define	zbx_malloc(old, size) zbx_malloc2(__FILE__,__LINE__,old , size)
+
+void    *zbx_malloc2(char *filename, int line, void *old, size_t size);
 void    *zbx_realloc(void *src, size_t size);
 
 #define zbx_free(ptr) { if(ptr){ free(ptr); ptr = NULL; } }
@@ -513,6 +527,7 @@ int	is_uint(char *c);
 void	zbx_rtrim(char *str, const char *charlist);
 void	zbx_ltrim(register char *str, const char *charlist);
 void	lrtrim_spaces(char *c);
+void	compress_signs(char *str);
 void	ltrim_spaces(char *c);
 void	rtrim_spaces(char *c);
 void	delete_reol(char *c);
@@ -520,24 +535,62 @@ int	get_param(const char *param, int num, char *buf, int maxlen);
 int	num_param(const char *param);
 int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char *delay_flex, time_t now);
 int	check_time_period(const char *period, time_t now);
-void	zbx_setproctitle(const char *fmt, ...);
+
+#ifdef HAVE___VA_ARGS__
+#	define zbx_setproctitle(fmt, ...) __zbx_zbx_setproctitle(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#else
+#	define zbx_setproctitle __zbx_zbx_setproctitle
+#endif /* HAVE___VA_ARGS__ */
+void	__zbx_zbx_setproctitle(const char *fmt, ...);
 
 #define ZBX_JAN_1970_IN_SEC   2208988800.0        /* 1970 - 1900 in seconds */
 double	zbx_time(void);
 double	zbx_current_time (void);
 
-void	zbx_error(const char *fmt, ...);
-int	zbx_snprintf(char* str, size_t count, const char *fmt, ...);
+#ifdef HAVE___VA_ARGS__
+#	define zbx_error(fmt, ...) __zbx_zbx_error(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#else
+#	define zbx_error __zbx_zbx_error
+#endif /* HAVE___VA_ARGS__ */
+void	__zbx_zbx_error(const char *fmt, ...);
+
+#ifdef HAVE___VA_ARGS__
+#	define zbx_snprintf(str, count, fmt, ...) __zbx_zbx_snprintf(str, count, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#else
+#	define zbx_snprintf __zbx_zbx_snprintf
+#endif /* HAVE___VA_ARGS__ */
+int	__zbx_zbx_snprintf(char* str, size_t count, const char *fmt, ...);
+
 int	zbx_vsnprintf(char* str, size_t count, const char *fmt, va_list args);
-void	zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_len, const char *fmt, ...);
+
+#ifdef HAVE___VA_ARGS__
+#	define zbx_snprintf_alloc(str, alloc_len, offset, max_len, fmt, ...) \
+       		__zbx_zbx_snprintf_alloc(str, alloc_len, offset, max_len, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#else
+#	define zbx_snprintf_alloc __zbx_zbx_snprintf_alloc
+#endif /* HAVE___VA_ARGS__ */
+void	__zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_len, const char *fmt, ...);
 
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz);
 size_t	zbx_strlcat(char *dst, const char *src, size_t siz);
 
 char* zbx_dvsprintf(char *dest, const char *f, va_list args);
-char* zbx_dsprintf(char *dest, const char *f, ...);
+
+#ifdef HAVE___VA_ARGS__
+#	define zbx_dsprintf(dest, fmt, ...) __zbx_zbx_dsprintf(dest, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#else
+#	define zbx_dsprintf __zbx_zbx_dsprintf
+#endif /* HAVE___VA_ARGS__ */
+char* __zbx_zbx_dsprintf(char *dest, const char *f, ...);
+
 char* zbx_strdcat(char *dest, const char *src);
-char* zbx_strdcatf(char *dest, const char *f, ...);
+
+#ifdef HAVE___VA_ARGS__
+#	define zbx_strdcatf(dest, fmt, ...) __zbx_zbx_strdcatf(dest, ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#else
+#	define zbx_strdcatf __zbx_zbx_strdcatf
+#endif /* HAVE___VA_ARGS__ */
+char* __zbx_zbx_strdcatf(char *dest, const char *f, ...);
 
 int	replace_param(const char *cmd, const char *param, char *out, int outlen);
 
@@ -560,6 +613,8 @@ int 	parse_command(const char *command, char *cmd, int cmd_max_len, char *param,
 
 /* Regular expressions */
 char    *zbx_regexp_match(const char *string, const char *pattern, int *len);
+/* Non case sensitive */
+char    *zbx_iregexp_match(const char *string, const char *pattern, int *len);
 
 /* Misc functions */
 int	cmp_double(double a,double b);
@@ -570,9 +625,17 @@ void	zbx_on_exit();
 int	get_nodeid_by_id(zbx_uint64_t id);
 
 int	int_in_list(char *list, int value);
+int	uint64_in_list(char *list, zbx_uint64_t value);
 int	ip_in_list(char *list, char *ip);
 
 int MAIN_ZABBIX_ENTRY(void);
 
+zbx_uint64_t	zbx_letoh_uint64(
+		zbx_uint64_t	data
+	);
+
+zbx_uint64_t	zbx_htole_uint64(
+		zbx_uint64_t	data
+	);
 
 #endif

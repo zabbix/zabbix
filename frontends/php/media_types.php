@@ -133,9 +133,9 @@ include_once "include/page_header.php";
 		$table=new CTableInfo(S_NO_MEDIA_TYPES_DEFINED);
 		$table->setHeader(array(S_TYPE,S_DESCRIPTION,S_DETAILS));
 
-		$result=DBselect("select * from media_type ".
-			" where ".DBid2nodeid('mediatypeid')."=".$ZBX_CURNODEID.
-			" order by type, description");
+		$result=DBselect('select * from media_type '.
+			' where '.DBin_node('mediatypeid').
+			' order by type, description');
 		while($row=DBfetch($result))
 		{
 			switch($row['type'])

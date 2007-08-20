@@ -27,13 +27,17 @@
 #define MAX_INSERT_STRS 64
 #define MAX_MSG_LENGTH 1024
 
+#define EVENTLOG_REG_PATH "SYSTEM\\CurrentControlSet\\Services\\EventLog"
+
 /* open event logger and return number of records */
-static long    zbx_open_eventlog(
+static int    zbx_open_eventlog(
 	const char	*source,
 	HANDLE	*eventlog_handle,
 	long	*pNumRecords,
 	long	*pLatestRecord)
 {
+	char	reg_path[MAX_PATH];
+	HKEY	hk = NULL;
 
 	assert(eventlog_handle);
 	assert(pNumRecords);
@@ -42,16 +46,37 @@ static long    zbx_open_eventlog(
 	*eventlog_handle = 0;
 	*pNumRecords = 0;
 
-	*eventlog_handle = OpenEventLog(NULL, source);              /* open log file */
+	if( !source || !*source )
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Can't open eventlog with empty name");
+		return FAIL;
+	}
 
-	if (!*eventlog_handle)	return GetLastError();
+	/* Get path to eventlog */
+	zbx_snprintf(reg_path, sizeof(reg_path), EVENTLOG_REG_PATH "\\%s", source);
+
+	if ( ERROR_SUCCESS != RegOpenKeyEx(HKEY_LOCAL_MACHINE, reg_path, 0, KEY_READ, &hk) )
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Missed eventlog '%s'", source);
+		return FAIL;
+	}
+	
+	RegCloseKey(hk);
+
+
+	if ( !(*eventlog_handle = OpenEventLog(NULL, source)))	/* open log file */
+	{
+		
+		zabbix_log(LOG_LEVEL_INFORMATION, "Can't open eventlog '%s' [%s]", source, strerror_from_system(GetLastError()));
+		return FAIL;
+	}
 
 	GetNumberOfEventLogRecords(*eventlog_handle,(unsigned long*)pNumRecords); /* get number of records */
 	GetOldestEventLogRecord(*eventlog_handle,(unsigned long*)pLatestRecord);
 
-	return(0);
+	return SUCCEED;
 }
-
+#include "afxres.h"
 /* close event logger */
 static long	zbx_close_eventlog(HANDLE eventlog_handle)
 {
@@ -98,7 +123,7 @@ static long    zbx_get_eventlog_message(
 
 	if (!eventlog_handle)        return(0);
 
-	if(!ReadEventLog(eventlog_handle,                       /* event-log handle */
+	if(!ReadEventLog(eventlog_handle,               /* event-log handle */
 		EVENTLOG_SEEK_READ |                    /* read forward */
 		EVENTLOG_FORWARDS_READ,                 /* sequential read */
 		which,                                  /* which record to read 1 is first */
@@ -119,11 +144,21 @@ static long    zbx_get_eventlog_message(
 
 	err = FAIL;
 
+	/* prepare the array of insert strings for FormatMessage - the
+	insert strings are in the log entry. */
+	for (
+		i = 0,	pCh = (char *)((LPBYTE)pELR + pELR->StringOffset);
+		i < pELR->NumStrings && i < MAX_INSERT_STRS; 
+		i++,	pCh += strlen(pCh) + 1) /* point to next string */
+	{
+		aInsertStrs[i] = pCh;
+	}
+
 	if( source && *source )
 	{
 		/* Get path to message dll */
 		zbx_snprintf(stat_buf, sizeof(stat_buf),
-			"SYSTEM\\CurrentControlSet\\Services\\EventLog\\%s\\%s",
+			EVENTLOG_REG_PATH "\\%s\\%s",
 			source,
 			*out_source
 			);
@@ -165,16 +200,6 @@ static long    zbx_get_eventlog_message(
 				hLib = LoadLibraryEx(MsgDll, NULL, LOAD_LIBRARY_AS_DATAFILE);
 				if(hLib)
 				{
-					/* prepare the array of insert strings for FormatMessage - the
-					insert strings are in the log entry. */
-					for (
-						i = 0,	pCh = (char *)((LPBYTE)pELR + pELR->StringOffset);
-						i < pELR->NumStrings && i < MAX_INSERT_STRS; 
-						i++,	pCh += strlen(pCh) + 1) /* point to next string */
-					{
-						aInsertStrs[i] = pCh;
-					}
-
 					/* Format the message from the message DLL with the insert strings */
 					FormatMessage(
 						FORMAT_MESSAGE_FROM_HMODULE |
@@ -204,17 +229,14 @@ static long    zbx_get_eventlog_message(
 		}
 	}
 
+
 	if(SUCCEED != err)
 	{
-		for (
-			i = 0,	pCh = (char *)((LPBYTE)pELR + pELR->StringOffset);
-			i < pELR->NumStrings && i < MAX_INSERT_STRS; 
-			i++,	pCh += strlen(pCh) + 1) /* point to next string */
+		*out_message = zbx_strdcatf(*out_message, "EventID [%lu]", pELR->EventID);
+		for ( i = 0; i < pELR->NumStrings && i < MAX_INSERT_STRS; i++ )
 		{
-			if( 0 == i )
-				*out_message = zbx_strdcat(*out_message, pCh);
-			else
-				*out_message = zbx_strdcatf(*out_message, ",%s", pCh);
+			if ( aInsertStrs[i] )
+				*out_message = zbx_strdcatf(*out_message, ",%s", aInsertStrs[i]);
 		}
 	}
 	return 0;
@@ -254,7 +276,7 @@ int process_eventlog(
 
 #if defined(_WINDOWS)
 
-	if (source && source[0] && 0 == zbx_open_eventlog(source,&eventlog_handle,&LastID /* number */, &FirstID /* oldest */))
+	if (source && source[0] && SUCCEED == zbx_open_eventlog(source,&eventlog_handle,&LastID /* number */, &FirstID /* oldest */))
 	{
 		LastID += FirstID; 
 
@@ -263,7 +285,7 @@ int process_eventlog(
 		else if((*lastlogsize) >= FirstID)
 			FirstID = (*lastlogsize)+1;
 		
-		for (i = FirstID; i < LastID && ret == FAIL; i++)
+		for (i = FirstID; i < LastID; i++)
 		{
 			if( 0 == zbx_get_eventlog_message(
 				source,
@@ -284,11 +306,12 @@ int process_eventlog(
 				}
 
 				*lastlogsize = i;
-
-				ret = SUCCEED;
+				break;
 			}
 		}
 		zbx_close_eventlog(eventlog_handle);
+
+		ret = SUCCEED;
 	}
 
 #endif /* _WINDOWS */

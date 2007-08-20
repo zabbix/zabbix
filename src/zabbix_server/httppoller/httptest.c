@@ -96,13 +96,6 @@ static int process_value(zbx_uint64_t itemid, AGENT_RESULT *value)
 
 static size_t WRITEFUNCTION2( void *ptr, size_t size, size_t nmemb, void *stream)
 {
-/*	size_t s = size*nmemb + 1;
-	char *str_dat = calloc(1, s);
-
-	zbx_snprintf(str_dat,s,ptr);
-	ZBX_LIM_PRINT("WRITEFUNCTION", s, str_dat, 65535);
-	zabbix_log(LOG_LEVEL_WARNING, "In WRITEFUNCTION");
-*/
 	size_t r_size = size*nmemb;
 
 	/* First piece of data */
@@ -153,22 +146,22 @@ static void	process_test_data(DB_HTTPTEST *httptest, S_ZBX_HTTPSTAT *stat)
 		ZBX_STR2UINT64(httptestitem.itemid, row[2]);
 		httptestitem.type=atoi(row[3]);
 
+		init_result(&value);
+
 		switch (httptestitem.type) {
 			case ZBX_HTTPITEM_TYPE_TIME:
-				init_result(&value);
 				SET_DBL_RESULT(&value, stat->test_total_time);
 				process_value(httptestitem.itemid,&value);
-				free_result(&value);
 				break;
 			case ZBX_HTTPITEM_TYPE_LASTSTEP:
-				init_result(&value);
 				SET_UI64_RESULT(&value, stat->test_last_step);
 				process_value(httptestitem.itemid,&value);
-				free_result(&value);
 				break;
 			default:
 				break;
 		}
+
+		free_result(&value);
 	}
 	
 	DBfree_result(result);
@@ -205,62 +198,32 @@ static void	process_step_data(DB_HTTPTEST *httptest, DB_HTTPSTEP *httpstep, S_ZB
 		ZBX_STR2UINT64(httpstepitem.itemid, row[2]);
 		httpstepitem.type=atoi(row[3]);
 
+		init_result(&value);
+
 		switch (httpstepitem.type) {
 			case ZBX_HTTPITEM_TYPE_RSPCODE:
-				init_result(&value);
 				SET_UI64_RESULT(&value, stat->rspcode);
 				process_value(httpstepitem.itemid,&value);
-				free_result(&value);
 				break;
 			case ZBX_HTTPITEM_TYPE_TIME:
-				init_result(&value);
 				SET_DBL_RESULT(&value, stat->total_time);
 				process_value(httpstepitem.itemid,&value);
-				free_result(&value);
 				break;
 			case ZBX_HTTPITEM_TYPE_SPEED:
-				init_result(&value);
 				SET_DBL_RESULT(&value, stat->speed_download);
 				process_value(httpstepitem.itemid,&value);
-				free_result(&value);
 				break;
 			default:
 				break;
 		}
+
+		free_result(&value);
 	}
 	
 	DBfree_result(result);
 	zabbix_log(LOG_LEVEL_DEBUG, "End process_step_data()");
 
 	CHECK_MEMORY("process_step_data", "end");
-
-/*	DB_RESULT	result;
-	DB_ROW	row;
-	char	server_esc[MAX_STRING_LEN];
-	char	key_esc[MAX_STRING_LEN];
-
-	zabbix_log(LOG_LEVEL_WARNING, "In process_httptest(httptestid:" ZBX_FS_UI64 ")", stat->httptestid);
-
-	DBescape_string(server, server_esc, MAX_STRING_LEN);
-	DBescape_string(key, key_esc, MAX_STRING_LEN);
-
-	result = DBselect("select %s where h.status=%d and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status=%d and i.type in (%d,%d) and" ZBX_COND_NODEID, ZBX_SQL_ITEM_SELECT, HOST_STATUS_MONITORED, server_esc, key_esc, ITEM_STATUS_ACTIVE, ITEM_TYPE_TRAPPER, ITEM_TYPE_ZABBIX_ACTIVE, LOCAL_NODE("h.hostid"));
-
-	row=DBfetch(result);
-	DBget_item_from_db(&item,row);
-
-	if(set_result_type(&agent, item.value_type, value) == SUCCEED)
-	{
-		process_new_value(&item,&agent);
-		update_triggers(item.itemid);
-	}
-	else
-	{
-		zabbix_log( LOG_LEVEL_WARNING, "Type of received value [%s] is not suitable for [%s@%s]", value, item.key, item.host );
-		zabbix_syslog("Type of received value [%s] is not suitable for [%s@%s]", value, item.key, item.host );
-	}
- 
-	DBfree_result(result);*/
 }
 
 /******************************************************************************
@@ -298,6 +261,8 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 		httptest->httptestid,
 		httptest->name);
 
+	now = time(NULL);
+
 	DBexecute("update httptest set lastcheck=%d where httptestid=" ZBX_FS_UI64,
 		now,
 		httptest->httptestid);
@@ -313,37 +278,43 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLOPT_COOKIEFILE [%s]",
 			curl_easy_strerror(err));
+		(void)curl_easy_cleanup(easyhandle);
 		return;
 	}
 	if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERAGENT, httptest->agent)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLOPT_USERAGENT [%s]",
 			curl_easy_strerror(err));
+		(void)curl_easy_cleanup(easyhandle);
 		return;
 	}
 	if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_FOLLOWLOCATION, 1)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLOPT_FOLLOWLOCATION [%s]",
 			curl_easy_strerror(err));
+		(void)curl_easy_cleanup(easyhandle);
 		return;
 	}
 	if(CURLE_OK != (err = curl_easy_setopt(easyhandle,CURLOPT_WRITEFUNCTION ,WRITEFUNCTION2)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Error doing curl_easy_perform [%s]",
+		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLOPT_WRITEFUNCTION [%s]",
 			curl_easy_strerror(err));
+		(void)curl_easy_cleanup(easyhandle);
 		return;
 	}
 	if(CURLE_OK != (err = curl_easy_setopt(easyhandle,CURLOPT_HEADERFUNCTION ,HEADERFUNCTION2)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Error doing curl_easy_perform [%s]",
+		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLOPT_WRITEFUNCTION [%s]",
 			curl_easy_strerror(err));
+		(void)curl_easy_cleanup(easyhandle);
 		return;
 	}
 	/* Process self-signed certificates. Do not verify certificate. */
 	if(CURLE_OK != (err = curl_easy_setopt(easyhandle,CURLOPT_SSL_VERIFYPEER , 0)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Error doing curl_easy_perform [%s]",
+		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLOPT_SSL_VERIFYPEER [%s]",
 			curl_easy_strerror(err));
+		(void)curl_easy_cleanup(easyhandle);
 		return;
 	}
 
@@ -354,6 +325,9 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 	now=time(NULL);
 	while((row=DBfetch(result)) && !err_str)
 	{
+		/* NOTE: do not use break or return for this block!
+		 *       process_step_data calling required!
+		 */
 		ZBX_STR2UINT64(httpstep.httpstepid, row[0]);
 		ZBX_STR2UINT64(httpstep.httptestid, row[1]);
 		httpstep.no=atoi(row[2]);
@@ -398,12 +372,26 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 				lastfailedstep = httpstep.no;
 			}
 		}
-/*		if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT, httpstep.timeout)))
+		if( !err_str )
 		{
-			zabbix_log(LOG_LEVEL_ERR, "Cannot set URL [%s]", curl_easy_strerror(err));
-			ret = FAIL;
-			break;
-		}*/
+			if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT, httpstep.timeout)))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Cannot set TIMEOUT [%s]",
+					curl_easy_strerror(err));
+				err_str = strdup(curl_easy_strerror(err));
+				lastfailedstep = httpstep.no;
+			}
+		}
+		if( !err_str )
+		{
+			if(CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_CONNECTTIMEOUT, httpstep.timeout)))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "Cannot set CONNECTTIMEOUT [%s]",
+					curl_easy_strerror(err));
+				err_str = strdup(curl_easy_strerror(err));
+				lastfailedstep = httpstep.no;
+			}
+		}
 
 		if( !err_str )
 		{
@@ -417,7 +405,7 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 			}
 			else
 			{
-				if(zbx_regexp_match(page.data,httpstep.required,NULL) == NULL)
+				if(httpstep.required[0]!='\0' && zbx_regexp_match(page.data,httpstep.required,NULL) == NULL)
 				{
 					zabbix_log(LOG_LEVEL_DEBUG, "Page didn't match [%s]", httpstep.required);
 					err_str = strdup("Page didn't match");

@@ -75,7 +75,7 @@ include_once "include/page_header.php";
 	
 	$result=DBselect("select distinct g.groupid,g.name from groups g, hosts_groups hg, hosts h, items i".$from.
 		" where g.groupid in (".
-			get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST, null, null, $ZBX_CURNODEID).
+			get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid()).
 		") ".
 		" and hg.groupid=g.groupid and h.status=".HOST_STATUS_MONITORED.
 		" and h.hostid=i.hostid and hg.hostid=h.hostid and i.status=".ITEM_STATUS_ACTIVE.
@@ -83,7 +83,10 @@ include_once "include/page_header.php";
 		" order by g.name");
 	while($row=DBfetch($result))
 	{
-		$cmbGroup->AddItem($row["groupid"],$row["name"]);
+		$cmbGroup->AddItem(
+				$row["groupid"],
+				get_node_name_by_elid($row["groupid"]).$row["name"]
+				);
 	}
 	
 	$form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
@@ -129,7 +132,7 @@ include_once "include/page_header.php";
 	if($_REQUEST["type"]==SHOW_DATA)
 	{
 COpt::profiling_start("get_items_data_overview");
-		$table = get_items_data_overview($_REQUEST["groupid"],$ZBX_CURNODEID);
+		$table = get_items_data_overview($_REQUEST["groupid"]);
 COpt::profiling_stop("get_items_data_overview");
 		$table->Show();
 		unset($table);
@@ -137,7 +140,7 @@ COpt::profiling_stop("get_items_data_overview");
 	elseif($_REQUEST["type"]==SHOW_TRIGGERS)
 	{
 COpt::profiling_start("get_triggers_overview");
-		$table = get_triggers_overview($_REQUEST["groupid"], $ZBX_CURNODEID);
+		$table = get_triggers_overview($_REQUEST["groupid"]);
 COpt::profiling_stop("get_triggers_overview");
 		$table->Show();
 		unset($table);

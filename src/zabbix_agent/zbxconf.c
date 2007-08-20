@@ -24,6 +24,7 @@
 #include "log.h"
 #include "alias.h"
 #include "sysinfo.h"
+#include "perfstat.h"
 
 #if defined(ZABBIX_DAEMON)
 /* use pid file configureation */
@@ -79,18 +80,9 @@ void    load_config()
 
 		{"StartAgents",		&CONFIG_ZABBIX_FORKS,		0,TYPE_INT,	PARM_OPT,	1,16},
 		{"RefreshActiveChecks",	&CONFIG_REFRESH_ACTIVE_CHECKS,	0,TYPE_INT,	PARM_OPT,60,3600},
-		{"EnableRemoteCommands",&CONFIG_ENABLE_REMOTE_COMMANDS,	0,TYPE_INT,	PARM_OPT,0,1},
 		{"AllowRoot",		&CONFIG_ALLOW_ROOT,		0,TYPE_INT,	PARM_OPT,0,1},
 		
-/*		{"PerfCounter",		&CONFIG_PERF_COUNTER,		0,	TYPE_STRING,PARM_OPT,0,0}, */
-
 		{"LogUnresolvedSymbols",&CONFIG_LOG_UNRES_SYMB,		0,	TYPE_STRING,PARM_OPT,0,1},
-
-		{"Alias",		0,	&add_alias_from_config,	TYPE_STRING,PARM_OPT,0,0},
-		
-#if defined(WITH_PLUGINS)
-		{"Plugin",		0,	&add_plugin,	TYPE_STRING,PARM_OPT,0,0},
-#endif /* ZABBIX_DAEMON */
 		
 		{0}
 	};
@@ -149,7 +141,18 @@ void    load_user_parameters(void)
 	{
 /*               PARAMETER,		VAR,	FUNC,		TYPE(0i,1s), MANDATORY,MIN,MAX
 */
-		{"UserParameter",	0,	&add_parameter,	0,	0,	0,	0},
+		{"EnableRemoteCommands",&CONFIG_ENABLE_REMOTE_COMMANDS,	0,TYPE_INT,	PARM_OPT,0,1},
+
+		{"Alias",		0,	&add_alias_from_config,	TYPE_STRING,PARM_OPT,0,0},		
+		{"UserParameter",	0,	&add_parameter,		0,	0,	0,	0},
+
+#if defined(_WINDOWS)
+		{"PerfCounter",		0,	&add_perfs_from_config,	TYPE_STRING,PARM_OPT,0,0},
+#endif /* _WINDOWS */
+
+#if defined(WITH_PLUGINS)
+		{"Plugin",		0,	&add_plugin,	TYPE_STRING,PARM_OPT,0,0},
+#endif /* ZABBIX_DAEMON */
 		{0}
 	};
 	

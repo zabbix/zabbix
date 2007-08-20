@@ -55,7 +55,7 @@ include_once "include/page_header.php";
 		"from"=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	BETWEEN(0,65535*65535),NULL),
 		"left"=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	BETWEEN(0,65535*65535),NULL),
 		"right"=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	BETWEEN(0,65535*65535),NULL),
-		"period"=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	BETWEEN(0,65535*65535),NULL),
+		"period"=>		array(T_ZBX_INT, O_OPT,  P_SYS, 	BETWEEN(ZBX_MIN_PERIOD,ZBX_MAX_PERIOD),NULL),
 		"stime"=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	NULL,NULL),
 		"action"=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	IN("'go'"),NULL),
 		"reset"=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	IN("'reset'"),NULL),
@@ -68,6 +68,7 @@ include_once "include/page_header.php";
 
 	if( 2 != $_REQUEST["fullscreen"] )
 		update_profile('web.screens.config', $_REQUEST['config']);
+
 ?>
 
 <?php
@@ -76,6 +77,12 @@ include_once "include/page_header.php";
 
 	if( 2 != $_REQUEST["fullscreen"] )
 		update_profile("web.screens.elementid",$_REQUEST["elementid"]);
+
+	$_REQUEST["period"] = get_request('period',get_profile('web.screens'.$_REQUEST['elementid'].'.period', ZBX_PERIOD_DEFAULT));
+	if($_REQUEST["period"] >= ZBX_MIN_PERIOD)
+	{
+		update_profile('web.screens'.$_REQUEST['elementid'].'.period',$_REQUEST['period']);
+	}
 ?>
 
 <?php
@@ -99,26 +106,40 @@ include_once "include/page_header.php";
 
 	if( 0 == $config )
 	{
-		$result = DBselect("select screenid as elementid,name from screens where ".DBid2nodeid("screenid")."=".$ZBX_CURNODEID." order by name");
+		$result = DBselect('select screenid as elementid,name '.
+				' from screens '.
+				' where '.DBin_node('screenid').
+				' order by name'
+				);
 		while($row=DBfetch($result))
 		{
 			if(!screen_accessiable($row["elementid"], PERM_READ_ONLY))
 				continue;
 
-			$cmbElements->AddItem($row["elementid"],$row["name"]);
+			$cmbElements->AddItem(
+					$row['elementid'],
+					get_node_name_by_elid($row['elementid']).$row["name"]
+					);
 			if($elementid == $row["elementid"]) $element_correct = 1;
 			if(!isset($first_element)) $first_element = $row["elementid"];
 		}
 	}
 	else
 	{
-		$result = DBselect("select slideshowid as elementid,name from slideshows where ".DBid2nodeid("slideshowid")."=".$ZBX_CURNODEID." order by name");
+		$result = DBselect('select slideshowid as elementid,name '.
+				' from slideshows '.
+				' where '.DBin_node('slideshowid').
+				' order by name'
+				);
 		while($row=DBfetch($result))
 		{
 			if(!slideshow_accessiable($row["elementid"], PERM_READ_ONLY))
 				continue;
 
-			$cmbElements->AddItem($row["elementid"],$row["name"]);
+			$cmbElements->AddItem(
+					$row['elementid'],
+					get_node_name_by_elid($row['elementid']).$row['name']
+					);
 			if($elementid == $row["elementid"]) $element_correct = 1;
 			if(!isset($first_element)) $first_element = $row["elementid"];
 		}

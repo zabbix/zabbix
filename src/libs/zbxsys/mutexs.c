@@ -76,6 +76,10 @@ int zbx_mutex_create_ext(ZBX_MUTEX *mutex, ZBX_MUTEX_NAME name, unsigned char fo
 	/* NOTE: if(ERROR_ALREADY_EXISTS == GetLastError()) info("Successfully opened existed mutex!"); */
 
 #else /* not _WINDOWS */
+
+#define ZBX_MAX_ATTEMPTS 10
+	int	attempts = 0;
+
 	int	i;
 	key_t	sem_key;
 	union semun semopts;
@@ -110,14 +114,27 @@ lbl_create:
 	}
 	else if(errno == EEXIST)
 	{
-		ZBX_SEM_LIST_ID = semget(sem_key, ZBX_MUTEX_COUNT, 0666 /* 0022 */);
-		semopts.buf = &seminfo;
+		zabbix_log(LOG_LEVEL_DEBUG, "ZABBIX semaphores already exists, trying to recreate.");
+
+		ZBX_SEM_LIST_ID = semget(sem_key, 0 /* get reference */, 0666 /* 0022 */);
 
 		if(forced) {
 			semctl(ZBX_SEM_LIST_ID, 0, IPC_RMID, 0);
+
+			if ( ++attempts > ZBX_MAX_ATTEMPTS )
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "Can't recreate ZABBIX semaphores. [too many attempts]");
+				exit(1);
+			}
+			if ( attempts > (ZBX_MAX_ATTEMPTS / 2) )
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "Wait 1 sec for next attemtion of ZABBIX semaphores creation.");
+				zbx_sleep(1);
+			}
 			goto lbl_create;
 		}
 		
+		semopts.buf = &seminfo;
 		/* wait for initialization */
 		for ( i = 0; i < ZBX_MUTEX_MAX_TRIES; i++)
 		{
@@ -322,7 +339,6 @@ int zbx_mutex_destroy(ZBX_MUTEX *mutex)
 int php_sem_get(PHP_MUTEX* sem_ptr, char* path_name)
 {
 	int	
-		key,
 		max_acquire = 1,
 		count;
 
@@ -356,7 +372,7 @@ int php_sem_get(PHP_MUTEX* sem_ptr, char* path_name)
 
 	semid = semget(sem_key, 3, 0666 | IPC_CREAT);
 	if (semid == -1) {
-		zbx_error("php_sem_get: failed for key 0x%lx: %s", key, strerror(errno));
+		zbx_error("php_sem_get: failed for key 0x%lx: %s", sem_key, strerror(errno));
 		return PHP_MUTEX_ERROR;
 	}
 
@@ -388,7 +404,7 @@ int php_sem_get(PHP_MUTEX* sem_ptr, char* path_name)
 	sop[2].sem_flg = SEM_UNDO;
 	while (semop(semid, sop, 3) == -1) {
 		if (errno != EINTR) {
-			zbx_error("php_sem_get: failed acquiring SYSVSEM_SETVAL for key 0x%lx: %s", key, strerror(errno));
+			zbx_error("php_sem_get: failed acquiring SYSVSEM_SETVAL for key 0x%lx: %s", sem_key, strerror(errno));
 			break;
 		}
 	}
@@ -396,7 +412,7 @@ int php_sem_get(PHP_MUTEX* sem_ptr, char* path_name)
 	/* Get the usage count. */
 	count = semctl(semid, SYSVSEM_USAGE, GETVAL, NULL);
 	if (count == -1) {
-		zbx_error("php_sem_get: failed for key 0x%lx: %s", key, strerror(errno));
+		zbx_error("php_sem_get: failed for key 0x%lx: %s", sem_key, strerror(errno));
 	}
 
 	/* If we are the only user, then take this opportunity to set the max. */
@@ -406,7 +422,7 @@ int php_sem_get(PHP_MUTEX* sem_ptr, char* path_name)
 		union semun semarg;
 		semarg.val = max_acquire;
 		if (semctl(semid, SYSVSEM_SEM, SETVAL, semarg) == -1) {
-			zbx_error("php_sem_get: failed for key 0x%lx: %s", key, strerror(errno));
+			zbx_error("php_sem_get: failed for key 0x%lx: %s", sem_key, strerror(errno));
 		}
 	}
 
@@ -417,7 +433,9 @@ int php_sem_get(PHP_MUTEX* sem_ptr, char* path_name)
 	sop[0].sem_flg = SEM_UNDO;
 	while (semop(semid, sop, 1) == -1) {
 		if (errno != EINTR) {
-			zbx_error("php_sem_get: failed releasing SYSVSEM_SETVAL for key 0x%lx: %s", key, strerror(errno));
+			zbx_error("php_sem_get: failed releasing SYSVSEM_SETVAL for key 0x%lx: %s",
+				sem_key,
+				strerror(errno));
 			break;
 		}
 	}

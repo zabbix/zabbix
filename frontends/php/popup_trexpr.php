@@ -40,6 +40,33 @@ include_once "include/page_header.php";
 		'=' => '=',
 		'#' => 'NOT');
 
+	$metrics = array(
+		PARAM_TYPE_SECONDS => S_SECONDS,
+		PARAM_TYPE_COUNTS => S_COUNT);
+
+	$param1_sec_count = array(
+			array(
+				'C' => S_LAST_OF.' T',	/* caption */
+				'T' => T_ZBX_INT,	/* type */
+				'M' => $metrics		/* metrcis */
+			     ));
+	
+	$param1_str = array(
+			array(
+				'C' => 'T',		/* caption */
+				'T' => T_ZBX_STR,
+			     ));
+
+	$param2_sec_val = array(
+			array(
+				'C' => S_LAST_OF.' T',	/* caption */
+				'T' => T_ZBX_INT,
+			     ),
+			array(
+				'C' => 'V',		/* caption */
+				'T' => T_ZBX_STR,
+			     ));
+
 	$functions = array(
 		'abschange'	=> array(
 			'description'	=> 'Absolute difference between last and previous value {OP} N',
@@ -48,21 +75,21 @@ include_once "include/page_header.php";
 		'avg'		=> array(
 			'description'	=> 'Average value for period of T times {OP} N',
 			'operators'	=> $operators,
-			'T'             => T_ZBX_INT
+			'params'	=> $param1_sec_count
 			),
 		'delta'		=> array(
 			'description'	=> 'Difference between MAX and MIN value of T times {OP} N',
 			'operators'	=> $operators,
-			'T'             => T_ZBX_INT
+			'params'	=> $param1_sec_count
 			),
 		'change'	=> array(
 			'description'	=> 'Difference between last and previous value of T times {OP} N.',
 			'operators'	=> $operators
 			),
 		'count'		=> array(
-			'description'	=> 'Number of successfully retrieved values for period of time T {OP} N.',
+			'description'	=> 'Number of successfully retrieved values V for period of time T {OP} N.',
 			'operators'     => $operators,
-			'T'             => T_ZBX_INT
+			'params'	=> $param2_sec_val
 			),
 		'diff'		=> array(
 			'description'	=> 'N {OP} X, where X is 1 - if last and previous values differs, 0 - otherwise.',
@@ -75,12 +102,12 @@ include_once "include/page_header.php";
 		'max'		=> array(
 			'description'	=> 'Maximal value for period of time T {OP} N.',
 			'operators'     => $operators,
-			'T'             => T_ZBX_INT
+			'params'	=> $param1_sec_count
 			),
 		'min'		=> array(
 			'description'	=> 'Minimal value for period of time T {OP} N.',
 			'operators'     => $operators,
-			'T'             => T_ZBX_INT
+			'params'	=> $param1_sec_count
 			),
 		'prev'		=> array(
 			'description'	=> 'Previous value {OP} N.',
@@ -89,12 +116,12 @@ include_once "include/page_header.php";
 		'str'		=> array(
 			'description'	=> 'Find string T last value. N {OP} X, where X is 1 - if found, 0 - otherwise',
 			'operators'     => $limited_operators,
-			'T'		=> T_ZBX_STR
+			'params'	=> $param1_str
 			),
 		'sum'		=> array(
 			'description'	=> 'Sum of values for period of time T {OP} N',
 			'operators'     => $operators,
-			'T'             => T_ZBX_INT
+			'params'	=> $param1_sec_count
 			)
 		
 	);
@@ -102,8 +129,8 @@ include_once "include/page_header.php";
 		
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"dstfrm"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	NULL),
-		"dstfld1"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	NULL),
+		"dstfrm"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	null),
+		"dstfld1"=>	array(T_ZBX_STR, O_MAND,P_SYS,	NOT_EMPTY,	null),
 		
 		"expression"=>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 
@@ -113,55 +140,41 @@ include_once "include/page_header.php";
 		"paramtype"=>	array(T_ZBX_INT, O_OPT, null,	IN(PARAM_TYPE_SECONDS.','.PARAM_TYPE_COUNTS),	'isset({insert})'),
 		"value"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,					'isset({insert})'),
 
-		"insert"=>	array(T_ZBX_STR,	O_OPT,	P_SYS|P_ACT,	NULL,	NULL)
+		"insert"=>	array(T_ZBX_STR,	O_OPT,	P_SYS|P_ACT,	null,	null)
 	);
 
 	check_fields($fields);
 
 	if(isset($_REQUEST['expression']))
 	{
-		$pats = array(
-				array(
-					'pat' => '\{([[:print:]]{1,}):([[:print:]]{1,})\.([[:print:]]{1,})\(([[:print:]]{1,})\)\}'.
-						'(['.implode('',array_keys($operators)).'])([[:print:]]{1,})',
-					'idx' => array('host' => 1, 'key' => 2, 'function' => 3, 'param' => 4, 'operator' => 5, 'value'=>6)
-					)
-			);
 
-		foreach($pats as $pat)
+		if( ($res = ereg(
+			'^'.ZBX_EREG_SIMPLE_EXPRESSION_FORMAT.'(['.implode('',array_keys($operators)).'])'.'([[:print:]]{1,})',
+			$_REQUEST['expression'],
+			$expr_res))
+		)
 		{
-			if($res = eregi($pat['pat'],$_REQUEST['expression'],$expr_res))
-			{
-				if(isset($pat['idx']['host']) && isset($pat['idx']['key']))
-				{
-					$itemid = DBfetch(DBselect('select i.itemid from items i, hosts h '.
-							' where i.hostid=h.hostid and h.host='.zbx_dbstr($expr_res[$pat['idx']['host']]).
-							' and i.key_='.zbx_dbstr($expr_res[$pat['idx']['key']])));
+			$itemid = DBfetch(DBselect('select i.itemid from items i, hosts h '.
+					' where i.hostid=h.hostid and h.host='.zbx_dbstr($expr_res[ZBX_SIMPLE_EXPRESSION_HOST_ID]).
+					' and i.key_='.zbx_dbstr($expr_res[ZBX_SIMPLE_EXPRESSION_KEY_ID])));
 
-					$_REQUEST['itemid'] = $itemid['itemid'];
-				}
-				
-				if(isset($pat['idx']['param']))
-				{
-					$_REQUEST['paramtype'] = PARAM_TYPE_SECONDS;
-					$_REQUEST['param'] = $expr_res[$pat['idx']['param']];
-					if($pat['idx']['param'][0] == '#')
-					{
-						$_REQUEST['paramtype'] = PARAM_TYPE_COUNTS;
-						$_REQUEST['param'] = ltrim('#', $expr_res[$pat['idx']['param']]);
-					}
-				}
-					
-				$operator = '=';
-				if(isset($pat['idx']['operator'])) $operator = $expr_res[$pat['idx']['operator']];
-				
-				if(isset($pat['idx']['function'])) $_REQUEST['expr_type'] = $expr_res[$pat['idx']['function']].'['.$operator.']';
-					
-				
-				if(isset($pat['idx']['value'])) $_REQUEST['value'] = $expr_res[$pat['idx']['value']];
-				
-				break;
+			$_REQUEST['itemid'] = $itemid['itemid'];
+			
+			$_REQUEST['paramtype'] = PARAM_TYPE_SECONDS;
+			$_REQUEST['param'] = $expr_res[ZBX_SIMPLE_EXPRESSION_FUNCTION_PARAM_ID];
+			if($_REQUEST['param'][0] == '#')
+			{
+				$_REQUEST['paramtype'] = PARAM_TYPE_COUNTS;
+				$_REQUEST['param'] = ltrim($_REQUEST['param'],'#');
 			}
+				
+			$operator = $expr_res[count($expr_res) - 2];
+			
+			$_REQUEST['expr_type'] = $expr_res[ZBX_SIMPLE_EXPRESSION_FUNCTION_NAME_ID].'['.$operator.']';
+				
+			
+			$_REQUEST['value'] = $expr_res[count($expr_res) - 1];
+			
 		}
 	}
 	unset($expr_res);
@@ -204,7 +217,19 @@ include_once "include/page_header.php";
 	$param		= get_request('param',	0);
 	$paramtype	= get_request('paramtype',	PARAM_TYPE_SECONDS);
 	$value		= get_request('value',		0);
-	
+
+	if( !is_array($param) )
+	{
+		if( isset($functions[$function]['params']) )
+		{
+			$param = split(',', $param, count($functions[$function]['params']));
+		}
+		else
+		{
+			$param = array($param);
+		}
+	}
+
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--
@@ -244,7 +269,7 @@ function InsertText(obj, value)
 			$item_data['key_'],
 			$function,
 			$paramtype == PARAM_TYPE_COUNTS ? '#' : '',
-			$param,
+			rtrim(implode(',', $param),','),
 			$operator,
 			$value);
 
@@ -294,23 +319,44 @@ if(form)
 	}
 	$form->AddRow(S_FUNCTION, $cmbFnc);
 
-	if(isset($functions[$function]['T']))
+	if(isset($functions[$function]['params']))
 	{
-		if($functions[$function]['T'] == T_ZBX_INT)
+		foreach($functions[$function]['params'] as $pid => $pf )
 		{
-			$cmbParamType = new CComboBox('paramtype', $paramtype);
-			$cmbParamType->AddItem(PARAM_TYPE_SECONDS, S_SECONDS);
-			$cmbParamType->AddItem(PARAM_TYPE_COUNTS, S_COUNTS);
-			
-			$form->AddRow(S_LAST_OF.' T', array(
-				new CNumericBox('param', $param, 10),
-				$cmbParamType
-				)); 
-		}
-		else
-		{
-			$form->AddRow('T', new CTextBox('param', $param, 30));
-			$form->AddVar('paramtype', PARAM_TYPE_SECONDS);
+			$pv = (isset($param[$pid])) ? $param[$pid] : null;
+
+			if($pf['T'] == T_ZBX_INT)
+			{
+				if( 0 == $pid) 
+				{
+					if( isset($pf['M']) && is_array($pf['M']))
+					{
+						$cmbParamType = new CComboBox('paramtype', $paramtype);
+						foreach( $pf['M'] as $mid => $caption )
+						{
+							$cmbParamType->AddItem($mid, $caption);
+						}
+					} else {
+						$form->AddVar('paramtype', PARAM_TYPE_SECONDS);
+						$cmbParamType = S_SECONDS;
+					}
+				}
+				else
+				{
+					$cmbParamType = null;
+				}
+					
+				
+				$form->AddRow(S_LAST_OF.' ', array(
+					new CNumericBox('param['.$pid.']', $pv, 10),
+					$cmbParamType
+					)); 
+			}
+			else
+			{
+				$form->AddRow($pf['C'], new CTextBox('param['.$pid.']', $pv, 30));
+				$form->AddVar('paramtype', PARAM_TYPE_SECONDS);
+			}
 		}
 	}
 	else

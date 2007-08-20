@@ -29,6 +29,7 @@ close(INFO);				# Close the file
 local $output;
 
 %mysql=(
+	"database"	=>	"mysql",
 	"type"		=>	"sql",
 	"before"	=>	"",
 	"after"		=>	"",
@@ -37,8 +38,11 @@ local $output;
 	"t_id"		=>	"bigint unsigned",
 	"t_integer"	=>	"integer",
 	"t_time"	=>	"integer",
-	"t_serial"	=>	"serial",
-	"t_double"	=>	"double",
+# It does not work for MySQL 3.x and <4.x (4.11?)
+#	"t_serial"	=>	"serial",
+	"t_serial"	=>	"bigint unsigned not null auto_increment unique",
+	"t_double"	=>	"double(16,4)",
+	"t_percentage"	=>	"double(5,2)",
 	"t_varchar"	=>	"varchar",
 	"t_char"	=>	"char",
 	"t_image"	=>	"longblob",
@@ -49,6 +53,7 @@ local $output;
 );
 
 %c=(	"type"		=>	"code",
+	"database"	=>	"",
 	"after"		=>	"\t{0}\n};\n",
 	"t_bigint"	=>	"ZBX_TYPE_UINT",
 	"t_id"		=>	"ZBX_TYPE_ID",
@@ -56,6 +61,7 @@ local $output;
 	"t_time"	=>	"ZBX_TYPE_INT",
 	"t_serial"	=>	"ZBX_TYPE_UINT",
 	"t_double"	=>	"ZBX_TYPE_FLOAT",
+	"t_percentage"	=>	"ZBX_TYPE_FLOAT",
 	"t_varchar"	=>	"ZBX_TYPE_CHAR",
 	"t_char"	=>	"ZBX_TYPE_CHAR",
 	"t_image"	=>	"ZBX_TYPE_BLOB",
@@ -87,13 +93,16 @@ static	ZBX_TABLE	tables[]={
 ";
 
 %oracle=("t_bigint"	=>	"number(20)",
+	"database"	=>	"oracle",
 	"before"	=>	"",
 	"after"		=>	"",
 	"type"		=>	"sql",
 	"t_id"		=>	"number(20)",
 	"t_integer"	=>	"number(10)",
+	"t_time"	=>	"number(10)",
 	"t_serial"	=>	"number(20)",
 	"t_double"	=>	"number(20,4)",
+	"t_percentage"	=>	"number(5,2)",
 	"t_varchar"	=>	"varchar2",
 	"t_char"	=>	"varchar2",
 	"t_image"	=>	"blob",
@@ -104,6 +113,7 @@ static	ZBX_TABLE	tables[]={
 );
 
 %postgresql=("t_bigint"	=>	"bigint",
+	"database"	=>	"postgresql",
 	"before"	=>	"",
 	"after"		=>	"",
 	"type"		=>	"sql",
@@ -111,7 +121,8 @@ static	ZBX_TABLE	tables[]={
 	"t_id"		=>	"bigint",
 	"t_integer"	=>	"integer",
 	"t_serial"	=>	"serial",
-	"t_double"	=>	"numeric",
+	"t_double"	=>	"numeric(16,4)",
+	"t_percentage"	=>	"numeric(5,2)",
 	"t_varchar"	=>	"varchar",
 	"t_char"	=>	"char",
 	"t_image"	=>	"bytea",
@@ -123,13 +134,16 @@ static	ZBX_TABLE	tables[]={
 );
 
 %sqlite=("t_bigint"	=>	"bigint",
+	"database"	=>	"sqlite",
 	"before"	=>	"",
 	"after"		=>	"",
 	"type"		=>	"sql",
 	"t_id"		=>	"bigint",
 	"t_integer"	=>	"integer",
+	"t_time"	=>	"integer",
 	"t_serial"	=>	"serial",
-	"t_double"	=>	"double",
+	"t_double"	=>	"double(16,4)",
+	"t_percentage"	=>	"double(5,2)",
 	"t_varchar"	=>	"varchar",
 	"t_char"	=>	"char",
 	"t_image"	=>	"longblob",
@@ -219,6 +233,12 @@ sub process_field
 		s/$type_short/$a/g;
 		$type_2=$_;
 		if($default ne "")	{ $default="DEFAULT $default"; }
+		# Special processing for Oracle "default 'ZZZ' not null" -> "default 'ZZZ'. NULL=='' in Oracle!"
+		if(($output{"database"} eq "oracle") && (0==index($type_2,"varchar2")))
+		{
+		#	$default="DEFAULT NULL";
+			$null="";
+		}
 		print "\t$name\t\t$type_2\t\t$default\t$null";
 	}
 }

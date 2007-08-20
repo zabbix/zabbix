@@ -29,6 +29,8 @@
 static int ZabbixRemoveEventSource(void);
 static int ZabbixInstallEventSource(char *path);
 
+#define uninit() { zbx_on_exit(); }
+
 /*
  * Static data
  */
@@ -36,7 +38,20 @@ static int ZabbixInstallEventSource(char *path);
 static	SERVICE_STATUS		serviceStatus;
 static	SERVICE_STATUS_HANDLE	serviceHandle;
 
-int application_is_runned = ZBX_APP_RUNNED;
+int application_status = ZBX_APP_RUNNED;
+
+static void	parent_signal_handler(int sig)
+{
+	switch(sig)
+	{
+	case SIGINT:
+	case SIGTERM:
+		zabbix_log( LOG_LEVEL_INFORMATION, "Got signal. Exiting ...");
+		uninit();
+		ExitProcess( FAIL );
+		break;
+	}
+}
 
 /*
  * ZABBIX service control handler
@@ -406,4 +421,10 @@ static int ZabbixRemoveEventSource(void)
 	}
 
 	return SUCCEED;
+}
+
+void	init_main_process(void)
+{
+	signal( SIGINT,  parent_signal_handler);
+	signal( SIGTERM, parent_signal_handler );
 }

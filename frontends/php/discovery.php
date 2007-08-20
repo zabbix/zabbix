@@ -44,9 +44,12 @@ include_once "include/page_header.php";
 
 	$cmbDRules = new CComboBox('druleid',$druleid,'submit()');
 	$cmbDRules->AddItem(0,S_ALL_SMALL);
-	$db_drules = DBselect('select distinct * from drules where '.DBid2nodeid('druleid').'='.$ZBX_CURNODEID." order by name");
+	$db_drules = DBselect('select distinct * from drules where '.DBin_node('druleid').' order by name');
 	while($drule_data = DBfetch($db_drules))
-		$cmbDRules->AddItem($drule_data['druleid'],$drule_data['name']);
+		$cmbDRules->AddItem(
+				$drule_data['druleid'],
+				get_node_name_by_elid($drule_data['druleid']).$drule_data['name']
+				);
 	$r_form->AddItem(array(S_DISCOVERY_RULE.SPACE,$cmbDRules));
 
 	show_table_header(S_STATUS_OF_DISCOVERY_BIG, $r_form);
@@ -70,7 +73,7 @@ include_once "include/page_header.php";
 			$time = 'lastdown';
 		}
 
-		$discovery_info[$drule_data['ip']] = array('class' => $class, 'time' => $drule_data[$time]);
+		$discovery_info[$drule_data['ip']] = array('class' => $class, 'time' => $drule_data[$time], 'druleid' => $drule_data['druleid']);
 
 		$db_dservices = DBselect('select * from dservices where dhostid='.$drule_data['dhostid'].' order by status,type,port');
 		while($dservice_data = DBfetch($db_dservices))
@@ -98,6 +101,7 @@ include_once "include/page_header.php";
 	ksort($services);
 
 	$header = array(
+		is_show_subnodes() ? S_NODE : null,
 		new CCol(S_HOST, 'center'),
 		new CCol(S_UPTIME.'/'.BR.S_DOWNTIME,'center')
 		);
@@ -113,6 +117,7 @@ include_once "include/page_header.php";
 	foreach($discovery_info as $ip => $h_data)
 	{
 		$table_row = array(
+			get_node_name_by_elid($h_data['druleid']),
 			new CSpan($ip, $h_data['class']),
 			new CSpan(convert_units(time() - $h_data['time'], 'uptime'), $h_data['class'])
 			);

@@ -70,9 +70,9 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 
 	if(NULL == (hp = zbx_gethost(smtp_server)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Cannot get IP for mailserver [%s]",smtp_server);
-		zabbix_syslog("Cannot get IP for mailserver [%s]",smtp_server);
 		zbx_snprintf(error,max_error_len,"Cannot get IP for mailserver [%s]",smtp_server);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s",error);
+		zabbix_syslog("%s",error);
 		return FAIL;
 	}
 
@@ -82,9 +82,9 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	s=socket(AF_INET,SOCK_STREAM,0);
 	if(s == -1)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Cannot create socket [%s]", strerror(errno));
-		zabbix_syslog("Cannot create socket [%s]", strerror(errno));
 		zbx_snprintf(error,max_error_len,"Cannot create socket [%s]",strerror(errno));
+		zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
+		zabbix_syslog("%s", error);
 		return FAIL;
 	}
 	
@@ -94,9 +94,9 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 
 	if( connect(s,(struct sockaddr *)&servaddr_in,sizeof(struct sockaddr_in)) == -1 )
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Cannot connect to SMTP server [%s] Error [%s]",smtp_server, strerror(errno));
-		zabbix_syslog("Cannot connect to SMTP server [%s] Error [%s]",smtp_server, strerror(errno));
 		zbx_snprintf(error,max_error_len,"Cannot connect to SMTP server [%s] [%s]", smtp_server, strerror(errno));
+		zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
+		zabbix_syslog("%s",error);
 		close(s);
 		return FAIL;
 	}
@@ -105,17 +105,17 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	i=read(s,c,MAX_STRING_LEN);
 	if(i == -1)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Error receiving initial string from SMTP server [%m]");
-		zabbix_syslog("Error receiving initial string from SMTP server [%s]", strerror(errno));
 		zbx_snprintf(error,max_error_len,"Error receiving initial string from SMTP server [%s]", strerror(errno));
+		zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
+		zabbix_syslog("%s", error);
 		close(s);
 		return FAIL;
 	}
 	if(strncmp(OK_220,c,strlen(OK_220)) != 0)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "No welcome message 220* from SMTP server [%s]", c);
-		zabbix_syslog("No welcome message 220* from SMTP server [%s]", c);
 		zbx_snprintf(error,max_error_len,"No welcome message 220* from SMTP server [%s]", c);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
+		zabbix_syslog("%s", error);
 		close(s);
 		return FAIL;
 	}
@@ -127,9 +127,9 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 		e=write(s,c,strlen(c)); 
 		if(e == -1)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Error sending HELO to mailserver [%s]", strerror(errno));
-			zabbix_syslog("Error sending HELO to mailserver [%s]", strerror(errno));
 			zbx_snprintf(error,max_error_len,"Error sending HELO to mailserver [%s]", strerror(errno));
+			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
+			zabbix_syslog("%s", error);
 			close(s);
 			return FAIL;
 		}
@@ -138,17 +138,17 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 		i=read(s,c,MAX_STRING_LEN);
 		if(i == -1)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Error receiving answer on HELO request [%s]", strerror(errno));
-			zabbix_syslog("Error receiving answer on HELO request [%s]", strerror(errno));
 			zbx_snprintf(error,max_error_len,"Error receiving answer on HELO request [%s]", strerror(errno));
+			zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
+			zabbix_syslog("%s", error);
 			close(s);
 			return FAIL;
 		}
 		if(strncmp(OK_250,c,strlen(OK_250)) != 0)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "Wrong answer on HELO [%s]",c);
-			zabbix_syslog("Wrong answer on HELO [%s]",c);
 			zbx_snprintf(error,max_error_len,"Wrong answer on HELO [%s]", c);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s",error);
+			zabbix_syslog("%s",error);
 			close(s);
 			return FAIL;
 		}
@@ -161,9 +161,9 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	e=write(s,c,strlen(c)); 
 	if(e == -1)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Error sending MAIL FROM to mailserver [%s]", strerror(errno));
-		zabbix_syslog("Error sending MAIL FROM to mailserver [%s]", strerror(errno));
 		zbx_snprintf(error,max_error_len,"Error sending MAIL FROM to mailserver [%s]", strerror(errno));
+		zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
+		zabbix_syslog("%s", error);
 		close(s);
 		return FAIL;
 	}
@@ -172,17 +172,17 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	i=read(s,c,MAX_STRING_LEN);
 	if(i == -1)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Error receiving answer on MAIL FROM request [%s]", strerror(errno));
-		zabbix_syslog("Error receiving answer on MAIL FROM request [%s]", strerror(errno));
 		zbx_snprintf(error,max_error_len,"Error receiving answer on MAIL FROM request [%s]", strerror(errno));
+		zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
+		zabbix_syslog("%s", error);
 		close(s);
 		return FAIL;
 	}
 	if(strncmp(OK_250,c,strlen(OK_250)) != 0)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Wrong answer on MAIL FROM [%s]", c);
-		zabbix_syslog("Wrong answer on MAIL FROM [%s]", c);
 		zbx_snprintf(error,max_error_len,"Wrong answer on MAIL FROM [%s]", c);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
+		zabbix_syslog("%s", error);
 		close(s);
 		return FAIL;
 	}
@@ -192,9 +192,9 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	e=write(s,c,strlen(c)); 
 	if(e == -1)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Error sending RCPT TO to mailserver [%s]", strerror(errno));
-		zabbix_syslog("Error sending RCPT TO to mailserver [%s]", strerror(errno) );
 		zbx_snprintf(error,max_error_len,"Error sending RCPT TO to mailserver [%s]", strerror(errno));
+		zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
+		zabbix_syslog("%s", error);
 		close(s);
 		return FAIL;
 	}
@@ -202,18 +202,18 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	i=read(s,c,MAX_STRING_LEN);
 	if(i == -1)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Error receiving answer on RCPT TO request [%s]", strerror(errno));
-		zabbix_syslog("Error receiving answer on RCPT TO request [%s]", strerror(errno));
 		zbx_snprintf(error,max_error_len,"Error receiving answer on RCPT TO request [%s]", strerror(errno));
+		zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
+		zabbix_syslog("%s", error);
 		close(s);
 		return FAIL;
 	}
 	/* May return 251 as well: User not local; will forward to <forward-path>. See RFC825 */
 	if( strncmp(OK_250,c,strlen(OK_250)) != 0 && strncmp(OK_251,c,strlen(OK_251)) != 0)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Wrong answer on RCPT TO [%s]", c);
-		zabbix_syslog("Wrong answer on RCPT TO [%s]", c);
 		zbx_snprintf(error,max_error_len,"Wrong answer on RCPT TO [%s]", c);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
+		zabbix_syslog("%s", error);
 		close(s);
 		return FAIL;
 	}
@@ -223,9 +223,9 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	e=write(s,c,strlen(c)); 
 	if(e == -1)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Error sending DATA to mailserver [%s]", strerror(errno));
-		zabbix_syslog("Error sending DATA to mailserver [%s]", strerror(errno));
 		zbx_snprintf(error,max_error_len,"Error sending DATA to mailserver [%s]", strerror(errno));
+		zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
+		zabbix_syslog("%s", error);
 		close(s);
 		return FAIL;
 	}
@@ -233,20 +233,28 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	i=read(s,c,MAX_STRING_LEN);
 	if(i == -1)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Error receivng answer on DATA request [%s]", strerror(errno));
-		zabbix_syslog("Error receivng answer on DATA request [%s]", strerror(errno));
 		zbx_snprintf(error,max_error_len,"Error receivng answer on DATA request [%s]", strerror(errno));
+		zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
+		zabbix_syslog("%s", error);
 		close(s);
 		return FAIL;
 	}
 	if(strncmp(OK_354,c,strlen(OK_354)) != 0)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Wrong answer on DATA [%s]", c);
-		zabbix_syslog("Wrong answer on DATA [%s]", c);
 		zbx_snprintf(error,max_error_len,"Wrong answer on DATA [%s]", c);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
+		zabbix_syslog("%s", error);
 		close(s);
 		return FAIL;
 	}
+
+	cp = string_replace(mailsubject, "\r\n", "\n");
+	mailsubject = string_replace(cp, "\n", "\r\n");
+	zbx_free(cp);
+
+	cp = string_replace(mailbody, "\r\n", "\n");
+	mailbody = string_replace(cp, "\n", "\r\n");
+	zbx_free(cp);
 
 	memset(c,0,MAX_STRING_LEN);
 	time(&email_time);
@@ -255,11 +263,13 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	cp = zbx_dsprintf(cp,"From:<%s>\r\nTo:<%s>\r\nDate: %s\r\nSubject: %s\r\n\r\n%s",smtp_email,mailto,str_time,mailsubject, mailbody);
 	e=write(s,cp,strlen(cp)); 
 	zbx_free(cp);
+	zbx_free(mailsubject);
+	zbx_free(mailbody);
 	if(e == -1)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Error sending mail subject and body to mailserver [%s]", strerror(errno));
-		zabbix_syslog("Error sending mail subject and body to mailserver [%s]", strerror(errno));
 		zbx_snprintf(error,max_error_len,"Error sending mail subject and body to mailserver [%s]", strerror(errno));
+		zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
+		zabbix_syslog("%s", error);
 		close(s);
 		return FAIL;
 	}
@@ -269,9 +279,9 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	e=write(s,c,strlen(c)); 
 	if(e == -1)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Error sending . to mailserver [%s]", strerror(errno));
-		zabbix_syslog("Error sending . to mailserver [%s]", strerror(errno));
 		zbx_snprintf(error,max_error_len,"Error sending . to mailserver [%s]", strerror(errno));
+		zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
+		zabbix_syslog("%s",error);
 		close(s);
 		return FAIL;
 	}
@@ -287,9 +297,9 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	}
 	if(strncmp(OK_250,c,strlen(OK_250)) != 0)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Wrong answer on end of data [%s]", c);
-		zabbix_syslog("Wrong answer on end of data [%s]", c);
 		zbx_snprintf(error,max_error_len,"Wrong answer on end of data [%s]", c);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
+		zabbix_syslog("%s",error);
 		close(s);
 		return FAIL;
 	}
@@ -299,9 +309,9 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	e=write(s,c,strlen(c)); 
 	if(e == -1)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Error sending QUIT to mailserver [%s]", strerror(errno));
-		zabbix_syslog("Error sending QUIT to mailserver [%s]", strerror(errno));
 		zbx_snprintf(error,max_error_len,"Error sending QUIT to mailserver [%s]", strerror(errno));
+		zabbix_log(LOG_LEVEL_DEBUG, "%s", error);
+		zabbix_syslog("%s",error);
 		close(s);
 		return FAIL;
 	}

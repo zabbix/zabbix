@@ -22,7 +22,7 @@
 	require_once "include/forms.inc.php";
 ?>
 <?php
-	if(isset($_REQUEST['config']) && $_REQUEST['config'] == 0 && isset($_REQUEST['export']) && isset($_REQUEST['hosts']))
+	if(isset($_REQUEST['export']) && isset($_REQUEST['hosts']))
 	{
 		$EXPORT_DATA = true;
         	$page["type"] = PAGE_TYPE_XML;
@@ -83,7 +83,7 @@ include_once "include/page_header.php";
 	{
 		validate_group(PERM_READ_ONLY);
 	
-		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID);
+		$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,PERM_RES_IDS_ARRAY,get_current_nodeid());
 
 		$hosts		= get_request('hosts', array());
 		$items		= get_request('items', array());

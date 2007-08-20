@@ -49,7 +49,7 @@
 static int calculate_checksums()
 {
 
-	char	*sql;
+	char	*sql = NULL;
 	int	sql_allocated, sql_offset;
 
 	int	i = 0;
@@ -73,7 +73,7 @@ static int calculate_checksums()
 	{
 		sql_allocated=64*1024;
 		sql_offset=0;
-		sql=malloc(sql_allocated);
+		sql=zbx_malloc(sql, sql_allocated);
 
 		now  = time(NULL);
 		nodeid = atoi(row[0]);
@@ -136,7 +136,7 @@ static int calculate_checksums()
 		}
 /*		zabbix_log( LOG_LEVEL_WARNING, "SQL DUMP [%s]", sql); */
 
-		result2 =DBselect(sql);
+		result2 =DBselect("%s",sql);
 
 /*		zabbix_log( LOG_LEVEL_WARNING, "Selected records in %d seconds", time(NULL)-now);*/
 		now = time(NULL);
@@ -156,7 +156,7 @@ static int calculate_checksums()
 			i++;
 		}
 		DBfree_result(result2);
-		free(sql);
+		zbx_free(sql);
 	}
 	DBfree_result(result);
 
@@ -218,7 +218,7 @@ static int compare_checksums()
 		NODE_CKSUM_TYPE_OLD);
 	while((row=DBfetch(result)))
 	{
-/*		zabbix_log( LOG_LEVEL_WARNING, "Adding record to node_configlog");*/
+		zabbix_log( LOG_LEVEL_DEBUG, "Adding record to node_configlog NODE_CONFIGLOG_OP_UPDATE");
 		DBexecute("insert into node_configlog (conflogid,nodeid,tablename,recordid,operation)" \
 				"values (" ZBX_FS_UI64 ",%s,'%s',%s,%d)",
 /*				DBget_nextid("node_configlog","conflogid"),*/
@@ -239,7 +239,7 @@ static int compare_checksums()
 
 	while((row=DBfetch(result)))
 	{
-/*		zabbix_log( LOG_LEVEL_WARNING, "Adding record to node_configlog"); */
+		zabbix_log( LOG_LEVEL_DEBUG, "Adding record to node_configlog NODE_CONFIGLOG_OP_ADD");
 		DBexecute("insert into node_configlog (conflogid,nodeid,tablename,recordid,operation)" \
 			"values (" ZBX_FS_UI64 ",%s,'%s',%s,%d)",
 /*			DBget_nextid("node_configlog","conflogid"),*/
@@ -260,7 +260,7 @@ static int compare_checksums()
 
 	while((row=DBfetch(result)))
 	{
-/*		zabbix_log( LOG_LEVEL_WARNING, "Adding record to node_configlog");*/
+		zabbix_log( LOG_LEVEL_DEBUG, "Adding record to node_configlog NODE_CONFIGLOG_OP_DELETE");
 		DBexecute("insert into node_configlog (conflogid,nodeid,tablename,recordid,operation)" \
 				"values (" ZBX_FS_UI64 ",%s,'%s',%s,%d)",
 /*				DBget_nextid("node_configlog","conflogid"),*/

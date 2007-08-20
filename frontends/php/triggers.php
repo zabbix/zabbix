@@ -27,6 +27,7 @@
 
 	$page["title"] = "S_CONFIGURATION_OF_TRIGGERS";
 	$page["file"] = "triggers.php";
+	$page['hist_arg'] = array('hostid','groupid');
 
 include_once "include/page_header.php";
 
@@ -93,7 +94,7 @@ include_once "include/page_header.php";
 <?php
 	update_profile("web.triggers.showdisabled",$showdisabled);
 
-	$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE, null, null, $ZBX_CURNODEID);
+	$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE, null, null, get_current_nodeid());
 
 /* FORM ACTIONS */
 	if(isset($_REQUEST["clone"]) && isset($_REQUEST["triggerid"]))
@@ -242,8 +243,11 @@ include_once "include/page_header.php";
 
 			$result=DBselect("select triggerid from triggers t where t.triggerid=".zbx_dbstr($triggerid));
 			if(!($row = DBfetch($result))) continue;
-			if($result = update_trigger_status($row["triggerid"],0))
-			{
+			if($result = update_trigger_status($row['triggerid'],0)){
+				
+				$status = get_trigger_priority($row['triggerid']);
+				update_services($triggerid, $status); // updating status to all services by the dependency
+				
 				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER,
 					S_TRIGGER." [".$triggerid."] [".expand_trigger_description($triggerid)."] ".S_ENABLED);
 			}
@@ -254,16 +258,16 @@ include_once "include/page_header.php";
 			show_messages($result2, S_STATUS_UPDATED, S_CANNOT_UPDATE_STATUS);
 		}
 	}
-	elseif(isset($_REQUEST["group_disable"])&&isset($_REQUEST["g_triggerid"]))
-	{
-		foreach($_REQUEST["g_triggerid"] as $triggerid)
-		{
+	elseif(isset($_REQUEST["group_disable"])&&isset($_REQUEST["g_triggerid"])){
+		foreach($_REQUEST["g_triggerid"] as $triggerid){
 			if(!check_right_on_trigger_by_triggerid(null, $triggerid, $accessible_hosts)) continue;
 
 			$result=DBselect("select triggerid from triggers t where t.triggerid=".zbx_dbstr($triggerid));
 			if(!($row = DBfetch($result))) continue;
-			if($result = update_trigger_status($row["triggerid"],1));
-			{
+			if($result = update_trigger_status($row["triggerid"],1));{
+			
+				update_services($triggerid, 0); // updating status to all services by the dependency
+				
 				add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_TRIGGER,
 					S_TRIGGER." [".$triggerid."] [".expand_trigger_description($triggerid)."] ".S_DISABLED);
 			}
@@ -374,16 +378,11 @@ include_once "include/page_header.php";
 			),
 			S_EXPRESSION, S_SEVERITY, S_STATUS, S_ERROR));
 
-/*		$sql = "select distinct h.hostid,h.host,t.*".
-			" from triggers t,hosts h,items i,functions f".
-			" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid".
-			" and ".DBid2nodeid("h.hostid")."=".$ZBX_CURNODEID;
-*/			
 		$sql = 'select distinct h.hostid,h.host,t.*'.
 			' from triggers t left join functions f on t.triggerid=f.triggerid '.
 			' left join items i on f.itemid=i.itemid '.
 			' left join hosts h on h.hostid=i.hostid '.
-			' where '.DBid2nodeid('t.triggerid').'='.$ZBX_CURNODEID;
+			' where '.DBin_node('t.triggerid');
 
 		if($showdisabled == 0)
 		    $sql .= ' and t.status <> '.TRIGGER_STATUS_DISABLED;
@@ -403,8 +402,7 @@ include_once "include/page_header.php";
 			if(is_null($row['hostid'])) $row['hostid'] = '0';
 
 
-			$description = array('['.$row["triggerid"].']',
-						 new CCheckBox(
+			$description = array(	new CCheckBox(
 							"g_triggerid[]",        /* name */
 							NULL,                   /* checked */
 							NULL,                   /* action */

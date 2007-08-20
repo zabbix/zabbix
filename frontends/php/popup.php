@@ -117,6 +117,7 @@ include_once "include/page_header.php";
 		"existed_templates"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	null),
 		"only_hostid"=>	array(T_ZBX_INT, O_OPT,	null,	DB_ID,		null),
 		"monitored_hosts"=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
+		'real_hosts'=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),	null),
 		'itemtype'=>	array(T_ZBX_INT, O_OPT, null,   null,		null),
 		
 		"select"=>	array(T_ZBX_STR,	O_OPT,	P_SYS|P_ACT,	null,	null)
@@ -136,6 +137,7 @@ include_once "include/page_header.php";
 	$srcfld2	= get_request("srcfld2", null);	// second source table field [can be different from fields of source table]
 	
 	$monitored_hosts = get_request("monitored_hosts", 0);
+	$real_hosts = get_request("real_hosts", 0);
 	$only_hostid	 = get_request("only_hostid", null);
 ?>
 <?php
@@ -158,6 +160,9 @@ include_once "include/page_header.php";
 	if($monitored_hosts)
 		$frmTitle->AddVar('monitored_hosts', 1);
 
+	if($real_hosts)
+		$frmTitle->AddVar('real_hosts', 1);
+
 	$frmTitle->AddVar("dstfrm",	$dstfrm);
 	$frmTitle->AddVar("dstfld1",	$dstfld1);
 	$frmTitle->AddVar("dstfld2",	$dstfld2);
@@ -177,6 +182,9 @@ include_once "include/page_header.php";
 	if($monitored_hosts)
 		array_push($validation_param, "monitored_hosts");
 		
+	if($real_hosts)
+		array_push($validation_param, "real_hosts");
+		
 	if(in_array($srctbl,array("triggers","logitems","items")))
 	{
 		array_push($validation_param, "always_select_first_host");
@@ -187,10 +195,10 @@ include_once "include/page_header.php";
 		validate_group(PERM_READ_LIST,$validation_param);
 	}
 
-	$accessible_nodes	= get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST);
+	$accessible_nodes	= get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST,null,null,get_current_nodeid(true));
 	$denyed_hosts		= get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,PERM_MODE_LT);
 	$accessible_hosts	= get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
-	$nodeid			= $ZBX_CURNODEID;
+	$nodeid			= get_current_nodeid();
 
 	if(isset($only_hostid))
 	{
@@ -203,7 +211,7 @@ include_once "include/page_header.php";
 		{
 			if(ZBX_DISTRIBUTED)
 			{
-				$nodeid = get_request("nodeid", $ZBX_CURNODEID);
+				$nodeid = get_request("nodeid", $nodeid);
 				$cmbNode = new CComboBox("nodeid", $nodeid, "submit()");
 				$db_nodes = DBselect("select * from nodes where nodeid in (".$accessible_nodes.")");
 				while($node_data = DBfetch($db_nodes))
@@ -214,7 +222,7 @@ include_once "include/page_header.php";
 				$frmTitle->AddItem(array(SPACE,S_NODE,SPACE,$cmbNode));
 			}
 		}	
-		if(!isset($ok)) $nodeid = $ZBX_CURNODEID;
+		if(!isset($ok)) $nodeid = get_current_nodeid();
 		unset($ok);
 		
 		if(in_array($srctbl,array('hosts','templates','triggers','logitems','items','applications','host_templates')))
@@ -224,10 +232,11 @@ include_once "include/page_header.php";
 			$cmbGroups = new CComboBox("groupid",$groupid,"submit()");
 			$cmbGroups->AddItem(0,S_ALL_SMALL);
 			$db_groups = DBselect("select distinct g.groupid,g.name from groups g, hosts_groups hg, hosts h ".
-				" where ".DBid2nodeid("g.groupid")."=".$nodeid.
+				' where '.DBin_node('g.groupid', $nodeid).
 				" and g.groupid=hg.groupid and hg.hostid in (".$accessible_hosts.") ".
 				" and hg.hostid = h.hostid ".
 				($monitored_hosts ? " and h.status=".HOST_STATUS_MONITORED : "").
+				($real_hosts ? " and h.status<>".HOST_STATUS_TEMPLATE : "").
 				" order by name");
 			while($group = DBfetch($db_groups))
 			{
@@ -264,9 +273,11 @@ include_once "include/page_header.php";
 				$cmbHosts->AddItem(0,S_ALL_SMALL);
 			}
 
-			$sql .= DBid2nodeid("h.hostid")."=".$nodeid.
+			$sql .= DBin_node('h.hostid', $nodeid).
 				" and h.hostid in (".$accessible_hosts.")".
-				($monitored_hosts ? " and h.status=".HOST_STATUS_MONITORED : "");
+				($monitored_hosts ? " and h.status=".HOST_STATUS_MONITORED : "").
+				($real_hosts ? ' and h.status<>'.HOST_STATUS_TEMPLATE : '').
+				' order by host,h.hostid';
 
 			$db_hosts = DBselect($sql);
 			while($host = DBfetch($db_hosts))
@@ -305,9 +316,10 @@ include_once "include/page_header.php";
 		else
 			$sql .= " where ";
 
-		$sql .= DBid2nodeid("h.hostid")."=".$nodeid.
+		$sql .= DBin_node('h.hostid', $nodeid).
 				" and h.hostid in (".$accessible_hosts.") ".
 				($monitored_hosts ? " and h.status=".HOST_STATUS_MONITORED : "").
+				($real_hosts ? " and h.status<>".HOST_STATUS_TEMPLATE : "").
 				" order by h.host,h.hostid";
 
 
@@ -421,7 +433,7 @@ include_once "include/page_header.php";
 		else
 			$sql .= " where ";
 
-		$sql .= DBid2nodeid("h.hostid")."=".$nodeid.
+		$sql .= DBin_node('h.hostid', $nodeid).
 				" and h.hostid in (".$accessible_hosts.") ".
 				" and h.status=".HOST_STATUS_TEMPLATE.
 				" order by h.host,h.hostid";
@@ -447,6 +459,9 @@ include_once "include/page_header.php";
 		
 		if($monitored_hosts)
 			$form->AddVar('monitored_hosts', 1);
+			
+		if($real_hosts)
+			$form->AddVar('real_hosts', 1);
 
 		$form->AddVar('dstfrm',$dstfrm);
 		$form->AddVar('dstfld1',$dstfld1);
@@ -464,7 +479,7 @@ include_once "include/page_header.php";
 		$table->SetHeader(array(S_NAME));
 
 		$db_groups = DBselect("select distinct groupid,name from groups ".
-			" where ".DBid2nodeid("groupid")."=".$nodeid.
+			' where '.DBin_node('groupid', $nodeid).
 			" and groupid in (".$accessible_groups.") ".
 			" order by name");
 		while($row = DBfetch($db_groups))
@@ -491,7 +506,7 @@ include_once "include/page_header.php";
 		else
 			$sql .= ' where ';
 
-		$sql .= DBid2nodeid('h.hostid').'='.$nodeid.' and status='.HOST_STATUS_TEMPLATE.
+		$sql .= DBin_node('h.hostid',$nodeid).' and status='.HOST_STATUS_TEMPLATE.
 				' and h.hostid in ('.$accessible_hosts.') '.
 				' order by h.host,h.hostid';
 		$db_hosts = DBselect($sql);
@@ -512,10 +527,14 @@ include_once "include/page_header.php";
 		$table = new CTableInfo(S_NO_GROUPS_DEFINED);
 		$table->SetHeader(array(S_NAME));
 
-		$result = DBselect("select * from usrgrp where ".DBid2nodeid("usrgrpid")."=".$ZBX_CURNODEID." order by name");
+		$result = DBselect('select * from usrgrp where '.DBin_node('usrgrpid').' order by name');
 		while($row = DBfetch($result))
 		{
-			$name = new CLink($row["name"],"#","action");
+			$name = new CLink(
+					get_node_name_by_elid($row['usrgrpid']).$row['name'],
+					'#',
+					'action'
+					);
 			$name->SetAction(
 				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '').
@@ -530,10 +549,14 @@ include_once "include/page_header.php";
 		$table = new CTableInfo(S_NO_USERS_DEFINED);
 		$table->SetHeader(array(S_NAME));
 
-		$result = DBselect("select * from users where ".DBid2nodeid("userid")."=".$ZBX_CURNODEID." order by name");
+		$result = DBselect('select * from users where '.DBin_node('userid').' order by name');
 		while($row = DBfetch($result))
 		{
-			$name = new CLink($row["alias"],"#","action");
+			$name = new CLink(
+					get_node_name_by_elid($row['userid']).$row['alias'],
+					'#',
+					'action'
+					);
 			$name->SetAction(
 				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
 				(isset($srcfld2) ? get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]) : '').
@@ -576,9 +599,10 @@ include_once "include/page_header.php";
 		$sql = "select h.host,t.triggerid,t.description,t.priority,t.status,count(d.triggerid_up) as dep_count ".
 			" from hosts h,items i,functions f, triggers t left join trigger_depends d on d.triggerid_down=t.triggerid ".
 			" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid".
-			" and ".DBid2nodeid("t.triggerid")."=".$nodeid.
+			' and '.DBin_node('t.triggerid', $nodeid).
 			" and h.hostid not in (".$denyed_hosts.")".
-			($monitored_hosts ? " and h.status=".HOST_STATUS_MONITORED : "");
+			($monitored_hosts ? " and h.status=".HOST_STATUS_MONITORED : "").
+			($real_hosts ? " and h.status<>".HOST_STATUS_TEMPLATE : "");
 
 		if(isset($hostid)) 
 			$sql .= " and h.hostid=$hostid";
@@ -673,10 +697,11 @@ function add_item_variable(s_formname,x_value)
 
 		$db_items = DBselect("select distinct h.host,i.* from items i,hosts h".
 			" where i.value_type=".ITEM_VALUE_TYPE_LOG." and h.hostid=i.hostid".
-			" and ".DBid2nodeid("i.itemid")."=".$nodeid.
+			' and '.DBin_node('i.itemid', $nodeid).
 			(isset($hostid) ? " and ".$hostid."=i.hostid " : "").
 			" and i.hostid in (".$accessible_hosts.")".
 			($monitored_hosts ? " and h.status=".HOST_STATUS_MONITORED : "").
+			($real_hosts ? " and h.status<>".HOST_STATUS_TEMPLATE : "").
 			" order by h.host,i.description, i.key_, i.itemid");
 
 		while($db_item = DBfetch($db_items))
@@ -715,14 +740,15 @@ function add_item_variable(s_formname,x_value)
 			));
 
 		$sql = "select distinct h.host,i.* from hosts h,items i ".
-			" where h.hostid=i.hostid and ".DBid2nodeid("i.itemid")."=".$nodeid.
+			' where h.hostid=i.hostid and '.DBin_node('i.itemid', $nodeid).
 			" and h.hostid not in (".$denyed_hosts.")".
-			($monitored_hosts ? " and h.status=".HOST_STATUS_MONITORED : "");
+			($monitored_hosts ? " and h.status=".HOST_STATUS_MONITORED : '').
+			($real_hosts ? " and h.status<>".HOST_STATUS_TEMPLATE : '');
 
 		if(isset($hostid)) 
 			$sql .= " and h.hostid=$hostid";
 
-		$sql .= " order by h.host";
+		$sql .= " order by h.host, i.description, i.key_, i.itemid";
 			
 		$result = DBselect($sql);
 		while($row = DBfetch($result))
@@ -756,9 +782,10 @@ function add_item_variable(s_formname,x_value)
 			S_NAME));
 
 		$sql = "select distinct h.host,a.* from hosts h,applications a ".
-			" where h.hostid=a.hostid and ".DBid2nodeid("a.applicationid")."=".$nodeid.
+			' where h.hostid=a.hostid and '.DBin_node('a.applicationid', $nodeid).
 			" and h.hostid not in (".$denyed_hosts.")".
-			($monitored_hosts ? " and h.status=".HOST_STATUS_MONITORED : "");
+			($monitored_hosts ? " and h.status=".HOST_STATUS_MONITORED : "").
+			($real_hosts ? " and h.status<>".HOST_STATUS_TEMPLATE : "");
 
 		if(isset($hostid)) 
 			$sql .= " and h.hostid=$hostid";
@@ -807,7 +834,7 @@ function add_item_variable(s_formname,x_value)
 		$table = new CTableInfo(S_NO_NODES_DEFINED);
 		$table->SetHeader(S_NAME);
 
-		$result = DBselect('select screenid,name from screens where '.DBid2nodeid('screenid').'='.$nodeid.' order by name');
+		$result = DBselect('select screenid,name from screens where '.DBin_node('screenid',$nodeid).' order by name');
 		while($row=DBfetch($result))
 		{
 			if(!screen_accessiable($row["screenid"], PERM_READ_ONLY))

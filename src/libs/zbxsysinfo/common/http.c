@@ -50,7 +50,7 @@ static int	get_http_page(char *host, char *param, unsigned short port, char *buf
 			{
 				zbx_rtrim(buf, "\n\r\0");
 
-				zbx_snprintf(buffer, max_buf_len, buf);
+				zbx_snprintf(buffer, max_buf_len, "%s", buf);
 			}
 		}
 	}

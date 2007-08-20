@@ -27,6 +27,7 @@
 #include "interfaces.h"
 #include "diskdevices.h"
 #include "cpustat.h"
+#include "perfstat.h"
 #include "log.h"
 #include "cfg.h"
 
@@ -69,30 +70,49 @@ void	init_collector_data(void)
 {
 #if defined (_WINDOWS)
 
-	collector = calloc(1, sizeof(ZBX_COLLECTOR_DATA));
+	collector = zbx_malloc(collector, sizeof(ZBX_COLLECTOR_DATA));
 
-	if(NULL == collector)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "Can't allocate memory for collector.");
-		exit(1);
-
-	}
+	memset(collector, 0, sizeof(ZBX_COLLECTOR_DATA));
 
 #else /* not _WINDOWS */
+
+#define ZBX_MAX_ATTEMPTS 10
+	int	attempts = 0;
 
 	key_t	shm_key;
 	int	shm_id;
 
 	ZBX_GET_SHM_KEY(shm_key);
 
-	shm_id = shmget(shm_key, sizeof(ZBX_COLLECTOR_DATA), IPC_CREAT | 0666);
-
-	if (-1 == shm_id)
+lbl_create:
+	if ( -1 == (shm_id = shmget(shm_key, sizeof(ZBX_COLLECTOR_DATA), IPC_CREAT | IPC_EXCL | 0666 /* 0022 */)) )
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Can't allocate shared memory for collector. [%s]",strerror(errno));
-		exit(1);
-	}
+		if( EEXIST == errno )
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "Shared memory already exists for collector, trying to recreate.");
 
+			shm_id = shmget(shm_key, 0 /* get reference */, 0666 /* 0022 */);
+
+			shmctl(shm_id, IPC_RMID, 0);
+			if ( ++attempts > ZBX_MAX_ATTEMPTS )
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "Can't recreate shared memory for collector. [too many attempts]");
+				exit(1);
+			}
+			if ( attempts > (ZBX_MAX_ATTEMPTS / 2) )
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "Wait 1 sec for next attemtion of collector shared memory allocation.");
+				zbx_sleep(1);
+			}
+			goto lbl_create;
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "Can't allocate shared memory for collector. [%s]",strerror(errno));
+			exit(1);
+		}
+	}
+	
 	collector = shmat(shm_id, 0, 0);
 
 	if ((void*)(-1) == collector)
@@ -125,9 +145,7 @@ void	free_collector_data(void)
 
 #if defined (_WINDOWS)
 
-	if(NULL == collector) return;
-
-	free(collector);
+	zbx_free(collector);
 
 #else /* not _WINDOWS */
 
@@ -174,18 +192,24 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 {
 	zabbix_log( LOG_LEVEL_INFORMATION, "zabbix_agentd collector started");
 
-	init_cpu_collector(&(collector->cpus));
+	if ( init_cpu_collector(&(collector->cpus)) )
+		close_cpu_collector(&(collector->cpus));
+
+	if( init_perf_collector(&(collector->perfs)) )
+		close_perf_collector(&(collector->perfs));
 
 	while(ZBX_IS_RUNNING)
 	{
 		collect_cpustat(&(collector->cpus));
+		collect_perfstat(&(collector->perfs));
 
-		collect_stats_interfaces(&(collector->interfaces));
-		collect_stats_diskdevices(&(collector->diskdevices));
+		collect_stats_interfaces(&(collector->interfaces)); /* TODO */
+		collect_stats_diskdevices(&(collector->diskdevices)); /* TODO */
 
 		zbx_sleep(1);
 	}
 
+	close_perf_collector(&(collector->perfs));
 	close_cpu_collector(&(collector->cpus));
 
 	zabbix_log( LOG_LEVEL_INFORMATION, "zabbix_agentd collector stopped");

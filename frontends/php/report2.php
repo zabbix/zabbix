@@ -48,7 +48,7 @@ include_once "include/page_header.php";
 
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
 	
-	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, $ZBX_CURNODEID);
+	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, get_current_nodeid());
 
 	$result=DBselect("select distinct g.groupid,g.name from groups g, hosts_groups hg, hosts h, items i ".
 		" where h.hostid in (".$availiable_hosts.") ".
@@ -57,7 +57,10 @@ include_once "include/page_header.php";
 		" order by g.name");
 	while($row=DBfetch($result))
 	{
-		$cmbGroup->AddItem($row["groupid"],$row["name"]);
+		$cmbGroup->AddItem(
+				$row['groupid'],
+				get_node_name_by_elid($row['groupid']).$row['name']
+				);
 	}
 	$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
 	
@@ -77,7 +80,10 @@ include_once "include/page_header.php";
 	$result=DBselect($sql);
 	while($row=DBfetch($result))
 	{
-		$cmbHosts->AddItem($row["hostid"],$row["host"]);
+		$cmbHosts->AddItem(
+				$row['hostid'],
+				get_node_name_by_elid($row['hostid']).$row['host']
+				);
 	}
 
 	$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
@@ -85,12 +91,21 @@ include_once "include/page_header.php";
 
 ?>
 <?php
+	if( isset($_REQUEST['triggerid']) &&
+		!($trigger_data = DBfetch(DBselect('select distinct t.*, h.host from triggers t, functions f, items i, hosts h '.
+					' where t.triggerid='.$_REQUEST['triggerid'].
+					' and t.triggerid=f.triggerid and f.itemid=i.itemid and i.hostid=h.hostid ' 
+					))) )
+	{
+		unset($_REQUEST['triggerid']);
+	}
+
 	if(isset($_REQUEST["triggerid"]))
 	{
 		if(!check_right_on_trigger_by_triggerid(PERM_READ_ONLY, $_REQUEST['triggerid']))
 			access_deny();
 		
-		show_table_header(array(new CLink($row["host"],"?hostid=".$row["hostid"])," : \"",expand_trigger_description_by_data($row),"\""));
+		show_table_header(array(new CLink($row["host"],"?hostid=".$row["hostid"])," : \"",expand_trigger_description_by_data($trigger_data),"\""));
 
 		$table = new CTableInfo(null,"graph");
 		$table->AddRow(new CImg("chart4.php?triggerid=".$_REQUEST["triggerid"]));
@@ -105,14 +120,14 @@ include_once "include/page_header.php";
 			" from triggers t,hosts h,items i,functions f ".
 			" where f.itemid=i.itemid and h.hostid=i.hostid and t.status=".TRIGGER_STATUS_ENABLED.
 			" and t.triggerid=f.triggerid and h.hostid=".$_REQUEST["hostid"]." and h.status=".HOST_STATUS_MONITORED.
-			" and ".DBid2nodeid("t.triggerid")."=".$ZBX_CURNODEID.
+			' and '.DBin_node('t.triggerid').
 			" and i.status=".ITEM_STATUS_ACTIVE.
 			" order by h.host, t.description");
 
 		$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 	
 		$table = new CTableInfo();
-		$table->setHeader(array(S_NAME,S_TRUE,S_FALSE,S_UNKNOWN,S_GRAPH));
+		$table->setHeader(array(is_show_subnodes() ? S_NODE : null, S_NAME,S_TRUE,S_FALSE,S_UNKNOWN,S_GRAPH));
 		while($row=DBfetch($result))
 		{
 			if(!check_right_on_trigger_by_triggerid(null, $row['triggerid'], $accessible_hosts))
@@ -126,6 +141,7 @@ include_once "include/page_header.php";
 			$actions= new CLink(S_SHOW,"report2.php?hostid=".$_REQUEST["hostid"]."&triggerid=".$row["triggerid"],"action");
 
 			$table->addRow(array(
+				get_node_name_by_elid($row['hostid']),
 				new CLink(
 					expand_trigger_description_by_data($row),
 					"events.php?triggerid=".$row["triggerid"],"action"),

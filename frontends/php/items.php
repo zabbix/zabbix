@@ -159,7 +159,7 @@ include_once "include/page_header.php";
 
 	$showdisabled = get_request("showdisabled", 0);
 	
-	$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,$ZBX_CURNODEID);
+	$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,get_current_nodeid());
 
 	if(isset($_REQUEST['hostid']) && !in_array($_REQUEST['hostid'], explode(',',$accessible_hosts)))
 	{
@@ -177,7 +177,6 @@ include_once "include/page_header.php";
 	{
 		update_profile('external_filter', 0);
 		unset($_REQUEST['external_filter']);
-		Alert('OK');
 	}
 	if(isset($_REQUEST['del_delay_flex']) && isset($_REQUEST['rem_delay_flex']))
 	{
@@ -299,7 +298,7 @@ include_once "include/page_header.php";
 		$result = false;
 
 		if(!is_null(get_request("formula",null))) $_REQUEST['multiplier']=1;
-		if(0 == get_request("formula",null)) $_REQUEST['multiplier']=0;
+		if("0" === get_request("formula",null)) $_REQUEST['multiplier']=0;
 
 		$group_itemid = $_REQUEST["group_itemid"];
 		foreach($group_itemid as $id)
@@ -573,10 +572,6 @@ include_once "include/page_header.php";
 				$where_case[] = 'ia.applicationid=a.applicationid';
 				$where_case[] = 'a.name like '.zbx_dbstr('%'.$_REQUEST['with_application'].'%');
 			}
-			if(isset($_REQUEST['with_description']))
-			{
-				$where_case[] = 'i.description like '.zbx_dbstr('%'.$_REQUEST['with_description'].'%');
-			}
 			if(isset($_REQUEST['with_type']) && $_REQUEST['with_type'] != -1)
 			{
 				$where_case[] = 'i.type='.$_REQUEST['with_type'];
@@ -735,6 +730,7 @@ include_once "include/page_header.php";
 // TABLE
 		$form = new CForm();
 		$form->SetName('items');
+		$form->SetMethod('POST');
 
 		$table  = new CTableInfo();
 		$table->SetHeader(array(
@@ -756,6 +752,10 @@ include_once "include/page_header.php";
 		while($db_item = DBfetch($db_items))
 		{
 			$description = array();
+
+			$item_description = item_description($db_item["description"],$db_item["key_"]);
+
+			if( $_REQUEST['external_filter'] && isset($_REQUEST['with_description']) && !stristr($item_description, $_REQUEST['with_description']) ) continue;
 
 			if($db_item["templateid"])
 			{

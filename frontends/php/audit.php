@@ -53,8 +53,11 @@ include_once "include/page_header.php";
 	$limit = $start+$PAGE_SIZE;
 ?>
 <?php
+	global $USER_DETAILS;
+
 	$result = DBselect("select u.alias,a.clock,a.action,a.resourcetype,a.details from auditlog a, users u".
-		" where u.userid=a.userid and ".DBid2nodeid("u.userid")."=".$ZBX_CURNODEID.
+		" where u.userid=a.userid ".
+		' and '.DBin_node('u.userid', get_current_nodeid(null, PERM_READ_ONLY)).
 		" order by clock desc",
 		$limit);
 

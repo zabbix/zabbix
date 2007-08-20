@@ -108,147 +108,6 @@ void	update_functions(DB_ITEM *item)
 
 /******************************************************************************
  *                                                                            *
- * Function: update_services_rec                                              *
- *                                                                            *
- * Purpose: re-calculate and updates status of the service and its childs     *
- *                                                                            *
- * Parameters: serviceid - item to update services for                        *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments: recursive function                                               *
- *                                                                            *
- ******************************************************************************/
-void	update_services_rec(zbx_uint64_t serviceid)
-{
-	int	status;
-	zbx_uint64_t	serviceupid;
-	int	algorithm;
-	time_t	now;
-
-	DB_RESULT result;
-	DB_RESULT result2;
-	DB_ROW	row;
-	DB_ROW	row2;
-
-	result = DBselect("select l.serviceupid,s.algorithm from services_links l,services s where s.serviceid=l.serviceupid and l.servicedownid=" ZBX_FS_UI64,
-		serviceid);
-	status=0;
-	while((row=DBfetch(result)))
-	{
-		ZBX_STR2UINT64(serviceupid,row[0]);
-		algorithm=atoi(row[1]);
-		if(SERVICE_ALGORITHM_NONE == algorithm)
-		{
-/* Do nothing */
-		}
-		else if((SERVICE_ALGORITHM_MAX == algorithm)
-			||
-			(SERVICE_ALGORITHM_MIN == algorithm))
-		{
-			/* Why it was so complex ?
-			result2 = DBselect("select status from services s,services_links l where l.serviceupid=%d and s.serviceid=l.servicedownid",serviceupid);
-			for(j=0;j<DBnum_rows(result2);j++)
-			{
-				if(atoi(DBget_field(result2,j,0))>status)
-				{
-					status=atoi(DBget_field(result2,j,0));
-				}
-			}
-			DBfree_result(result2);*/
-
-			if(SERVICE_ALGORITHM_MAX == algorithm)
-			{
-				result2 = DBselect("select count(*),max(status) from services s,services_links l where l.serviceupid=" ZBX_FS_UI64 " and s.serviceid=l.servicedownid",
-					serviceupid);
-			}
-			/* MIN otherwise */
-			else
-			{
-				result2 = DBselect("select count(*),min(status) from services s,services_links l where l.serviceupid=" ZBX_FS_UI64 " and s.serviceid=l.servicedownid",
-					serviceupid);
-			}
-			row2=DBfetch(result2);
-			if(row2 && DBis_null(row2[0]) != SUCCEED && DBis_null(row2[1]) != SUCCEED)
-			{
-				if(atoi(row2[0])!=0)
-				{
-					status=atoi(row2[1]);
-				}
-			}
-			DBfree_result(result2);
-
-			now=time(NULL);
-			DBadd_service_alarm(serviceupid,status,now);
-			DBexecute("update services set status=%d where serviceid=" ZBX_FS_UI64,
-				status,
-				serviceupid);
-		}
-		else
-		{
-			zabbix_log( LOG_LEVEL_ERR, "Unknown calculation algorithm of service status [%d]",
-				algorithm);
-			zabbix_syslog("Unknown calculation algorithm of service status [%d]",
-				algorithm);
-		}
-	}
-	DBfree_result(result);
-
-	result = DBselect("select serviceupid from services_links where servicedownid=" ZBX_FS_UI64,
-		serviceid);
-
-	while((row=DBfetch(result)))
-	{
-		ZBX_STR2UINT64(serviceupid,row[0]);
-		update_services_rec(serviceupid);
-	}
-	DBfree_result(result);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: update_services                                                  *
- *                                                                            *
- * Purpose: re-calculate and updates status of the service and its childs     *
- *                                                                            *
- * Parameters: serviceid - item to update services for                        *
- *             status - new status of the service                             *
- *                                                                            *
- * Return value:                                                              *
- *                                                                            *
- * Author: Alexei Vladishev                                                   *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-void	update_services(zbx_uint64_t triggerid, int status)
-{
-	DB_ROW	row;
-	zbx_uint64_t	serviceid;
-
-	DB_RESULT result;
-
-	DBexecute("update services set status=%d where triggerid=" ZBX_FS_UI64,
-		status,
-		triggerid);
-
-	result = DBselect("select serviceid from services where triggerid=" ZBX_FS_UI64,
-		triggerid);
-
-	while((row=DBfetch(result)))
-	{
-		ZBX_STR2UINT64(serviceid,row[0]);
-		update_services_rec(serviceid);
-	}
-
-	DBfree_result(result);
-	return;
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: update_triggers                                                  *
  *                                                                            *
  * Purpose: re-calculate and updates values of triggers related to the item   *
@@ -365,13 +224,14 @@ void	calc_timestamp(char *line,int *timestamp, char *format)
 		dd,
 		MM);
 
-	if(hh!=0&&mm!=0&&ss!=0&&yyyy!=0&&dd!=0&&MM!=0)
+	/* Seconds can be ignored. No ssc here. */
+	if(hhc!=0&&mmc!=0&&yyyyc!=0&&ddc!=0&&MMc!=0)
 	{
 		tm.tm_sec=ss;
 		tm.tm_min=mm;
 		tm.tm_hour=hh;
 		tm.tm_mday=dd;
-		tm.tm_mon=MM;
+		tm.tm_mon=MM-1;
 		tm.tm_year=yyyy-1900;
 
 		t=mktime(&tm);
@@ -380,8 +240,7 @@ void	calc_timestamp(char *line,int *timestamp, char *format)
 			*timestamp=t;
 		}
 	}
-	zabbix_log( LOG_LEVEL_DEBUG, "End timestamp [%d]",
-		t);
+
 	zabbix_log( LOG_LEVEL_DEBUG, "End timestamp [%d]",
 		*timestamp);
 }
@@ -414,7 +273,6 @@ int	process_data(zbx_sock_t *sock,char *server,char *key,char *value,char *lastl
 	DB_RESULT       result;
 	DB_ROW	row;
 	DB_ITEM	item;
-	char	*s;
 
 	char	server_esc[MAX_STRING_LEN];
 	char	key_esc[MAX_STRING_LEN];
@@ -497,44 +355,45 @@ int	process_data(zbx_sock_t *sock,char *server,char *key,char *value,char *lastl
 			zabbix_syslog("Active parameter [%s] is not supported by agent on host [%s]",
 				item.key,
 				item.host_name);
-			DBupdate_item_status_to_notsupported(item.itemid, "Not supported by agent");
-	}
-	
-	s=value;
-	if(	(strncmp(item.key,"log[",4)==0) ||
-		(strncmp(item.key,"eventlog[",9)==0)
-	)
-	{
-		item.lastlogsize=atoi(lastlogsize);
-		item.timestamp=atoi(timestamp);
-
-		calc_timestamp(value,&item.timestamp,item.logtimefmt);
-
-		item.eventlog_severity=atoi(severity);
-		item.eventlog_source=source;
-		zabbix_log(LOG_LEVEL_DEBUG, "Value [%s] Lastlogsize [%s] Timestamp [%s]",
-			value,
-			lastlogsize,
-			timestamp);
-	}
-
-	if(set_result_type(&agent, item.value_type, value) == SUCCEED)
-	{
-		process_new_value(&item,&agent);
-		update_triggers(item.itemid);
+			DBupdate_item_status_to_notsupported(item.itemid, "Not supported by ZABBIX agent");
 	}
 	else
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "Type of received value [%s] is not suitable for [%s@%s]",
-			value,
-			item.key,
-			item.host_name);
-		zabbix_syslog("Type of received value [%s] is not suitable for [%s@%s]",
-			value,
-			item.key,
-			item.host_name);
-	}
- 
+		if(	(strncmp(item.key,"log[",4)==0) ||
+			(strncmp(item.key,"eventlog[",9)==0)
+		)
+		{
+			item.lastlogsize=atoi(lastlogsize);
+			item.timestamp=atoi(timestamp);
+
+			calc_timestamp(value,&item.timestamp,item.logtimefmt);
+
+			item.eventlog_severity=atoi(severity);
+			item.eventlog_source=source;
+			zabbix_log(LOG_LEVEL_DEBUG, "Value [%s] Lastlogsize [%s] Timestamp [%s]",
+				value,
+				lastlogsize,
+				timestamp);
+		}
+
+		if(set_result_type(&agent, item.value_type, value) == SUCCEED)
+		{
+			process_new_value(&item,&agent);
+			update_triggers(item.itemid);
+		}
+		else
+		{
+			zabbix_log( LOG_LEVEL_WARNING, "Type of received value [%s] is not suitable for [%s@%s]",
+				value,
+				item.key,
+				item.host_name);
+			zabbix_syslog("Type of received value [%s] is not suitable for [%s@%s]",
+				value,
+				item.key,
+				item.host_name);
+		}
+ 	}
+
 	DBfree_result(result);
 
 	free_result(&agent);
@@ -561,7 +420,7 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 {
 	int ret = SUCCEED;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In add_history(%s,,%X,%X)",
+	zabbix_log( LOG_LEVEL_DEBUG, "In add_history(key:%s,value_type:%X,type:%X)",
 		item->key,
 		item->value_type,
 		value->type);
@@ -607,7 +466,7 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 				/* Save delta */
 				if( ITEM_VALUE_TYPE_FLOAT == item->value_type )
 				{
-					if(GET_DBL_RESULT(value) && (item->prevorgvalue_null == 0) && (item->prevorgvalue_dbl <= value->dbl))
+					if(GET_DBL_RESULT(value) && (item->prevorgvalue_null == 0) && (item->prevorgvalue_dbl <= value->dbl) && (now != item->lastclock))
 					{
 						DBadd_history(
 							item->itemid,
@@ -617,7 +476,7 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 				}
 				else if( ITEM_VALUE_TYPE_UINT64 == item->value_type )
 				{
-					if(GET_UI64_RESULT(value) && (item->prevorgvalue_null == 0) && (item->prevorgvalue_uint64 <= value->ui64))
+					if(GET_UI64_RESULT(value) && (item->prevorgvalue_null == 0) && (item->prevorgvalue_uint64 <= value->ui64) && (now != item->lastclock))
 					{
 						DBadd_history_uint(
 							item->itemid,
@@ -702,7 +561,7 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
+static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 {
 	char	value_esc[MAX_STRING_LEN];
 
@@ -732,13 +591,30 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 			{
 				if((item->prevorgvalue_null == 0) && (item->prevorgvalue_dbl <= value->dbl) )
 				{
-					DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue='" ZBX_FS_DBL "',"
-					"lastvalue='" ZBX_FS_DBL "',lastclock=%d where itemid=" ZBX_FS_UI64,
-						calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
-						value->dbl,
-						(value->dbl - item->prevorgvalue_dbl)/(now-item->lastclock),
-						(int)now,
-						item->itemid);
+					/* In order to continue normal processing, we assume difference 1 second
+					   Otherwise function update_functions and update_triggers won't work correctly*/
+					if(now != item->lastclock)
+					{
+						DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue='" ZBX_FS_DBL "',"
+						"lastvalue='" ZBX_FS_DBL "',lastclock=%d where itemid=" ZBX_FS_UI64,
+							calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
+							value->dbl,
+							(value->dbl - item->prevorgvalue_dbl)/(now-item->lastclock),
+							(int)now,
+							item->itemid);
+						SET_DBL_RESULT(value, (double)(value->dbl - item->prevorgvalue_dbl)/(now-item->lastclock));
+					}
+					else
+					{
+						DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue='" ZBX_FS_DBL "',"
+						"lastvalue='" ZBX_FS_DBL "',lastclock=%d where itemid=" ZBX_FS_UI64,
+							calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
+							value->dbl,
+							value->dbl - item->prevorgvalue_dbl,
+							(int)now,
+							item->itemid);
+						SET_DBL_RESULT(value, (double)(value->dbl - item->prevorgvalue_dbl));
+					}
 				}
 				else
 				{
@@ -756,13 +632,28 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 			{
 				if((item->prevorgvalue_null == 0) && (item->prevorgvalue_uint64 <= value->ui64) )
 				{
-					DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue='" ZBX_FS_UI64 "',"
-					"lastvalue='" ZBX_FS_DBL "',lastclock=%d where itemid=" ZBX_FS_UI64,
-						calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
-						value->ui64,
-						((double)(value->ui64 - item->prevorgvalue_uint64))/(now-item->lastclock),
-						(int)now,
-						item->itemid);
+					if(now != item->lastclock)
+					{
+						DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue='" ZBX_FS_UI64 "',"
+						"lastvalue='" ZBX_FS_UI64 "',lastclock=%d where itemid=" ZBX_FS_UI64,
+							calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
+							value->ui64,
+							((zbx_uint64_t)(value->ui64 - item->prevorgvalue_uint64))/(now-item->lastclock),
+							(int)now,
+							item->itemid);
+						SET_UI64_RESULT(value, (zbx_uint64_t)(value->ui64 - item->prevorgvalue_uint64)/(now-item->lastclock));
+					}
+					else
+					{
+						DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,prevorgvalue='" ZBX_FS_UI64 "',"
+						"lastvalue='" ZBX_FS_DBL "',lastclock=%d where itemid=" ZBX_FS_UI64,
+							calculate_item_nextcheck(item->itemid, item->type, item->delay,item->delay_flex,now),
+							value->ui64,
+							(double)(value->ui64 - item->prevorgvalue_uint64),
+							(int)now,
+							item->itemid);
+						SET_UI64_RESULT(value, (zbx_uint64_t)(value->ui64 - item->prevorgvalue_uint64));
+					}
 				}
 				else
 				{
@@ -791,6 +682,7 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 						(value->dbl - item->prevorgvalue_dbl),
 						(int)now,
 						item->itemid);
+					SET_DBL_RESULT(value, (double)(value->dbl - item->prevorgvalue_dbl));
 				}
 				else
 				{
@@ -815,6 +707,7 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 						(value->ui64 - item->prevorgvalue_uint64),
 						(int)now,
 						item->itemid);
+					SET_UI64_RESULT(value, (zbx_uint64_t)(value->ui64 - item->prevorgvalue_uint64));
 				}
 				else
 				{
@@ -857,8 +750,6 @@ static int	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 	item->lastclock = now;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "End update_item()");
-
-	return SUCCEED;
 }
 
 /******************************************************************************
@@ -913,6 +804,5 @@ void	process_new_value(DB_ITEM *item, AGENT_RESULT *value)
 
 	add_history(item, value, now);
 	update_item(item, value, now);
-
 	update_functions( item );
 }

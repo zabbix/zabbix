@@ -74,6 +74,7 @@ require_once('include/classes/ctree.inc.php');
 	require_once 	"include/db.inc.php";
 	require_once 	"include/perm.inc.php";
 	require_once 	"include/audit.inc.php";
+	require_once 	"include/js.inc.php";
 
 // Include Validation
 
@@ -136,6 +137,9 @@ require_once('include/classes/ctree.inc.php');
 	}
 	else
 	{
+		if(file_exists($ZBX_CONFIGURATION_FILE))
+			include $ZBX_CONFIGURATION_FILE;
+
 		define('ZBX_PAGE_NO_AUTHERIZATION', true);
 		define('ZBX_DISTRIBUTED', false);
 		$show_setup = true;
@@ -172,41 +176,124 @@ require_once('include/classes/ctree.inc.php');
 	function	init_nodes()
 	{
 		/* Init CURRENT NODE ID */
-		global $USER_DETAILS;
-		global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID;
-		global $ZBX_CURNODEID, $ZBX_CURMASTERID;
+		global	$_REQUEST,
+			$USER_DETAILS,
+			$ZBX_LOCALNODEID, $ZBX_LOCMASTERID,
+			$ZBX_CURRENT_NODEID, $ZBX_CURRENT_SUBNODES, $ZBX_CURMASTERID,
+			$ZBX_NODES,
+			$ZBX_WITH_SUBNODES;
+
+		$ZBX_CURRENT_SUBNODES = array();
+		$ZBX_NODES = array();
 
 		if(!defined('ZBX_PAGE_NO_AUTHERIZATION') && ZBX_DISTRIBUTED)
 		{
-			$ZBX_CURNODEID = get_cookie('zbx_current_nodeid', $ZBX_LOCALNODEID); // Selected node
+			$ZBX_CURRENT_NODEID = get_cookie('zbx_current_nodeid', $ZBX_LOCALNODEID); // Selected node
+			$ZBX_WITH_SUBNODES = get_cookie('zbx_with_subnodes', false); // Show elements from subnodes
+
 			if(isset($_REQUEST['switch_node']))
 			{
 				if($node_data = DBfetch(DBselect("select * from nodes where nodeid=".$_REQUEST['switch_node'])))
 				{
-					$ZBX_CURNODEID = $_REQUEST['switch_node'];
+					$ZBX_CURRENT_NODEID = $_REQUEST['switch_node'];
 				}
 				unset($node_data);
 			}
 
-			if($node_data = DBfetch(DBselect("select * from nodes where nodeid=".$ZBX_CURNODEID)))
+			if(isset($_REQUEST['show_subnodes']))
+			{
+				$ZBX_WITH_SUBNODES = !empty($_REQUEST['show_subnodes']);
+			}
+
+			if($node_data = DBfetch(DBselect("select * from nodes where nodeid=".$ZBX_CURRENT_NODEID)))
 			{
 				$ZBX_CURMASTERID = $node_data['masterid'];
 			}
 			
-			if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST,null,PERM_RES_IDS_ARRAY,$ZBX_CURNODEID)) <= 0)
+			$ZBX_NODES = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_LIST, null, PERM_RES_DATA_ARRAY);
+
+			if ( !isset($ZBX_NODES[$ZBX_CURRENT_NODEID]) )
 			{
 				$denyed_page_requested = true;
-				$ZBX_CURNODEID = $ZBX_LOCALNODEID;
+				$ZBX_CURRENT_NODEID = $ZBX_LOCALNODEID;
 				$ZBX_CURMASTERID = $ZBX_LOCMASTERID;
 			}
+
+			foreach ( $ZBX_NODES as $nodeid => $node_data )
+			{
+				for ( 	$curr_node = &$node_data;
+					$curr_node['masterid'] != 0 &&
+					$curr_node['masterid'] != $ZBX_CURRENT_NODEID;
+					$curr_node = &$ZBX_NODES[$curr_node['masterid']]
+				);
+
+				if ( $curr_node['masterid'] == $ZBX_CURRENT_NODEID )
+				{
+					$ZBX_CURRENT_SUBNODES[$nodeid] = $nodeid;
+				}
+			}
 			
-			zbx_set_post_cookie('zbx_current_nodeid',$ZBX_CURNODEID);
+			zbx_set_post_cookie('zbx_current_nodeid',$ZBX_CURRENT_NODEID);
+			zbx_set_post_cookie('zbx_with_subnodes',$ZBX_WITH_SUBNODES);
 		}
 		else
 		{
-			$ZBX_CURNODEID = $ZBX_LOCALNODEID;
+			$ZBX_CURRENT_NODEID = $ZBX_LOCALNODEID;
 			$ZBX_CURMASTERID = $ZBX_LOCMASTERID;
+			$ZBX_WITH_SUBNODES = false;
 		}
+
+		$ZBX_CURRENT_SUBNODES[$ZBX_CURRENT_NODEID] = $ZBX_CURRENT_NODEID;
+
+		if ( count($ZBX_CURRENT_SUBNODES) < 2 && !defined('ZBX_DISABLE_SUBNODES') )
+			define('ZBX_DISABLE_SUBNODES', 1);
+	}
+
+	function	get_current_nodeid( $forse_with_subnodes = null, $perm = null )
+	{
+		global	$ZBX_CURRENT_NODEID, $ZBX_CURRENT_SUBNODES, $ZBX_WITH_SUBNODES;
+
+		if ( !isset($ZBX_CURRENT_NODEID) )	init_nodes();
+
+		$result = ( is_show_subnodes($forse_with_subnodes) ? $ZBX_CURRENT_SUBNODES : $ZBX_CURRENT_NODEID );
+
+		if ( !is_null($perm) )
+		{
+			global $USER_DETAILS;
+
+			$result = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_ONLY, null, null, $result);
+		}
+
+		return $result;
+	}
+
+	function	get_node_name_by_elid($id_val, $forse_with_subnodes = null)
+	{
+		global $ZBX_NODES;
+
+		if ( ! is_show_subnodes($forse_with_subnodes) )
+			return null;
+
+		$nodeid = id2nodeid($id_val);
+
+		if ( !isset($ZBX_NODES[$nodeid]) )
+			return null;
+
+		return '['.$ZBX_NODES[$nodeid]['name'].'] ';
+	}
+
+	function	is_show_subnodes($forse_with_subnodes = null)
+	{
+		global	$ZBX_WITH_SUBNODES;
+
+		if ( is_null($forse_with_subnodes) )
+		{
+			if ( defined('ZBX_DISABLE_SUBNODES') )
+				$forse_with_subnodes = false;
+			else
+				$forse_with_subnodes = $ZBX_WITH_SUBNODES;
+		}
+		return $forse_with_subnodes;
 	}
 
 	function	access_deny()
@@ -218,59 +305,6 @@ require_once('include/classes/ctree.inc.php');
 		include_once "include/page_footer.php";
 	}
 
-
-	/* function:
-	 *     zbx_jsvalue
-	 *
-	 * description:
-	 *	convert PHP variable to string version
-	 *      of JavaScrip style 
-	 *
-	 * author: Eugene Grigorjev
-	 */
-	function zbx_jsvalue($value)
-	{
-		if(!is_array($value)) 
-		{
-			if(is_object($value)) return unpack_object($value);
-			if(is_string($value)) return '\''.str_replace('\'','\\\'',			/*  '	=> \'	*/
-								str_replace("\n", '\n', 		/*  LF	=> \n	*/
-									str_replace("\\", "\\\\", 	/*  \	=> \\	*/
-										str_replace("\r", '', 	/*  CR	=> remove */
-											($value))))).'\'';
-			if(is_null($value)) return 'null';
-			return strval($value);
-		}
-
-		if(count($value) == 0) return '[]';
-
-		foreach($value as $id => $v)
-		{
-			if(!isset($is_object) && is_string($id)) $is_object = true;
-
-			$value[$id] = (isset($is_object) ? '\''.$id.'\' : ' : '').zbx_jsvalue($v);
-		}
-
-		if(isset($is_object))
-			return '{'.implode(',',$value).'}';
-		else
-			return '['.implode(',',$value).']';
-	}
-
-	/* function:
-	 *     zbx_add_post_js
-	 *
-	 * description:
-	 *	add JavaScript for calling after page loaging.
-	 *
-	 * author: Eugene Grigorjev
-	 */
-	function zbx_add_post_js($script)
-	{
-		global $ZBX_PAGE_POST_JS;
-
-		$ZBX_PAGE_POST_JS[] = $script;
-	}
 
 	function zbx_stripslashes($value){
 		if(is_array($value)){
@@ -332,7 +366,7 @@ require_once('include/classes/ctree.inc.php');
 	function fatal_error($msg)
 	{
 		include_once "include/page_header.php";
-		error($msg);
+		show_error_message($msg);
 		include_once "include/page_footer.php";
 	}
 	
@@ -536,24 +570,6 @@ require_once('include/classes/ctree.inc.php');
 		return "$s $u$units";
 	}
 
-	function	play_sound($filename)
-	{
-?>
-<SCRIPT TYPE="text/javascript">
-<!-- 
-if (navigator.appName == "Microsoft Internet Explorer")
-{
-	document.writeln('<BGSOUND SRC="<?php echo $filename; ?>" LOOP=0/>');
-}
-else
-{
-	document.writeln('<EMBED SRC="<?php echo $filename; ?>" AUTOSTART=TRUE WIDTH=0 HEIGHT=0 LOOP=0/>');
-	document.writeln('<NOEMBED><BGSOUND SRC="<?php echo $filename; ?>" LOOP=0/></NOEMBED>');
-}
-// -->
-</SCRIPT>
-<?php
-	}
 
 //	The hash has form <md5sum of triggerid>,<sum of priorities>
 	function	calc_trigger_hash()
@@ -932,7 +948,7 @@ else
 					}
 					/* do not use break */
 				case ITEM_VALUE_TYPE_STR:	
-					$value = nbsp(htmlspecialchars($row["value"]));
+					$value = nl2br(nbsp(htmlspecialchars($row["value"])));
 					break;
 				
 				default:
@@ -979,8 +995,6 @@ else
 
 	function	update_config($event_history,$alert_history,$refresh_unsupported,$work_period,$alert_usrgrpid)
 	{
-		global $ZBX_CURNODEID;
-
 		$update = array();
 
 		if(!is_null($event_history))
@@ -1020,8 +1034,7 @@ else
 		}
 
 		return	DBexecute('update config set '.implode(',',$update).
-			' where '.DBid2nodeid('configid')."=".$ZBX_CURNODEID);
-
+			' where '.DBin_node('configid', get_current_nodeid(false)));
 	}
 
 	function	&get_table_header($col1, $col2=SPACE)
@@ -1039,16 +1052,6 @@ else
 		$table->Show();
 	}
 
-	function	insert_sizeable_graph($url)
-	{
-?>
-<script language="JavaScript" type="text/javascript">
-<!--
-	insert_sizeable_graph(<?php echo zbx_jsvalue($url); ?>);
--->
-</script>
-<?php
-	}
 	# Show History Graph
 
 	function	show_history($itemid,$from,$stime,$period)
@@ -1072,32 +1075,6 @@ else
 		echo "</center>";
 	}
 
-	function	get_dynamic_chart($img_src,$width=0)
-	{
-		if(is_int($width) && $width > 0) $img_src.= url_param($width, false, 'width');
-$result = 
-"<script language=\"JavaScript\" type=\"text/javascript\">
-<!--
-	var width = \"".((!(is_int($width) && $width > 0)) ? $width : '')."\";
-	var img_src = \"".$img_src."\";
-
-	if(width!=\"\")
-	{
-		var scr_width = 0;
-		if(document.body.clientWidth)
-			scr_width = document.body.clientWidth;
-		else 
-			scr_width = document.width;
-
-		width = \"&width=\" + (scr_width - 100 + parseInt(width));
-	}
-
-	document.write(\"<IMG ALT=\\\"chart\\\" SRC=\\\"\" + img_src + width + \"\\\"/>\");
-
--->
-</script>";
-		return $result;
-	}
 
 	function	get_status()
 	{
@@ -1327,7 +1304,7 @@ $result =
 
 	function	empty2null($var)
 	{
-		return empty($var) ? null : $var;
+		return ($var == "") ? null : $var;
 	}
 
 
@@ -1399,135 +1376,6 @@ $result =
 		}
 	}
 
-	function insert_showhint_javascript()
-	{
-		if(defined('SHOW_HINT_SCRIPT_INSERTTED')) return;
-
-		define('SHOW_HINT_SCRIPT_INSERTTED', 1);
-?>
-<script language="JavaScript" type="text/javascript">
-<!--
-
-function GetPos(obj)
-{
-	var left = obj.offsetLeft;
-	var top  = obj.offsetTop;;
-	while (obj = obj.offsetParent)
-	{
-		left	+= obj.offsetLeft
-		top	+= obj.offsetTop
-	}
-	return [left,top];
-}
-
-var hint_box = null;
-
-function hide_hint()
-{
-	if(!hint_box) return;
-
-	hint_box.style.visibility="hidden"
-	hint_box.style.left	= "-" + ((hint_box.style.width) ? hint_box.style.width : 100) + "px";
-}
-
-function show_hint(obj, e, hint_text)
-{
-	show_hint_ext(obj, e, hint_text, "", "");
-}
-
-function show_hint_ext(obj, e, hint_text, width, class_name)
-{
-	if(!hint_box) return;
-
-	var cursor = get_cursor_position(e);
-	
-	if(class_name != "")
-	{
-		hint_text = "<span class=" + class_name + ">" + hint_text + "</"+"span>";
-	}
-
-	hint_box.innerHTML = hint_text;
-	hint_box.style.width = width;
-
-	var pos = GetPos(obj);
-
-	hint_box.x	= pos[0];
-	hint_box.y	= pos[1];
-
-	hint_box.style.left	= cursor.x + 10 + "px";
-	//hint_box.style.left	= hint_box.x + obj.offsetWidth + 10 + "px";
-	hint_box.style.top	= hint_box.y + obj.offsetHeight + "px";
-
-	hint_box.style.visibility = "visible";
-	obj.onmouseout	= hide_hint;
-}
-
-function update_hint(obj, e)
-{
-	if(!hint_box) return;
-
-	var cursor = get_cursor_position(e);
-
-	var pos = GetPos(obj);
-
-	hint_box.style.left     = cursor.x + 10 + "px";
-	hint_box.style.top      = hint_box.y + obj.offsetHeight + "px";
-}
-
-function create_hint_box()
-{
-	if(hint_box) return;
-
-	hint_box = document.createElement("div");
-	hint_box.setAttribute("id", "hint_box");
-	document.body.appendChild(hint_box);
-
-	hide_hint();
-}
-
-if (window.addEventListener)
-{
-	window.addEventListener("load", create_hint_box, false);
-}
-else if (window.attachEvent)
-{
-	window.attachEvent("onload", create_hint_box);
-}
-else if (document.getElementById)
-{
-	window.onload	= create_hint_box;
-}
-//-->
-</script>
-<?php
-	}
-
-	function Redirect($url,$timeout=null)
-	{
-		zbx_flush_post_cookies();
-?>
-<script language="JavaScript" type="text/javascript">
-<!--
-<?php		if( is_numeric($timeout) ) { ?>
-	setTimeout('window.location=\'<?php echo $url; ?>\'', <?php echo ($timeout*1000); ?>);
-<?php 		} else { ?>
-	window.location = '<?php echo $url; ?>';
-<?php		} ?>
-//-->
-</script>
-<?php
-	}
-
-	function	SetFocus($frm_name, $fld_name)
-	{
-?>
-<script language="JavaScript" type="text/javascript">
-<!--
-	document.forms["<?php echo $frm_name; ?>"].elements["<?php echo $fld_name; ?>"].focus();
-//-->
-</script>
-<?php
-	}
 
 /* Use ImageSetStyle+ImageLIne instead of bugged ImageDashedLine */
 	if(function_exists("imagesetstyle"))
@@ -1773,17 +1621,6 @@ else if (document.getElementById)
 		return $value;
 	}
 
-	function	Alert($msg)
-	{
-?>
-<script language=\"JavaScript\" type=\"text/javascript\">
-<!--
-	alert('<? echo $msg; ?>');
-//-->
-</script>
-<?php
-	}
-
 	function natksort(&$array) {
 		$keys = array_keys($array);
 		natcasesort($keys);
@@ -1836,7 +1673,6 @@ else if (document.getElementById)
 	function	get_cookie($name, $default_value=null)
 	{
 		global $_COOKIE;
-
 		if(isset($_COOKIE[$name]))	return $_COOKIE[$name];
 		// else
 		return $default_value;
@@ -1854,7 +1690,7 @@ else if (document.getElementById)
 	{
 		global $_COOKIE;
 
-		setcookie($name, $value, isset($time) ? $time : (time() + 3600));
+		setcookie($name, $value, isset($time) ? $time : (0));
 		$_COOKIE[$name] = $value;
 	}
 	
@@ -1868,10 +1704,7 @@ else if (document.getElementById)
 	 */
 	function	zbx_unsetcookie($name)
 	{
-		global $_COOKIE;
-		
-		setcookie($name, null, time() - 3600);
-		$_COOKIE[$name] = null;
+		zbx_setcookie($name, null, -99999);
 	}
 	
 	/* function:
@@ -1915,7 +1748,7 @@ else if (document.getElementById)
 	{
 		global $ZBX_PAGE_COOKIES;
 
-		$ZBX_PAGE_COOKIES[] = array($name, $value, isset($time) ? $time : (time() + 3600));
+		$ZBX_PAGE_COOKIES[] = array($name, $value, isset($time) ? $time : (0));
 	}
 
 	function	inarr_isset($keys, $array=null)

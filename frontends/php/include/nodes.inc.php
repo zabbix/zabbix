@@ -22,11 +22,11 @@
 <?php
 	function	detect_node_type($node_data)
 	{
-		global $ZBX_CURNODEID, $ZBX_CURMASTERID;
+		global $ZBX_CURMASTERID;
 
-		if($node_data['nodeid'] == $ZBX_CURNODEID)    		$node_type = ZBX_NODE_LOCAL;
-		else if($node_data['nodeid'] == $ZBX_CURMASTERID)	$node_type = ZBX_NODE_MASTER;
-		else if($node_data['masterid'] == $ZBX_CURNODEID)	$node_type = ZBX_NODE_REMOTE;
+		if($node_data['nodeid'] == get_current_nodeid(false))		$node_type = ZBX_NODE_LOCAL;
+		else if($node_data['nodeid'] == $ZBX_CURMASTERID)		$node_type = ZBX_NODE_MASTER;
+		else if($node_data['masterid'] == get_current_nodeid(false))	$node_type = ZBX_NODE_REMOTE;
 		else $node_type = -1;
 
 		return $node_type;
@@ -48,12 +48,18 @@
 
 	function	add_node($new_nodeid,$name,$timezone,$ip,$port,$slave_history,$slave_trends,$node_type)
 	{
-		global $ZBX_CURNODEID, $ZBX_CURMASTERID;
+		global $ZBX_CURMASTERID;
+
+		if( !eregi('^'.ZBX_EREG_NODE_FORMAT.'$', $name) )
+		{
+			error("Incorrect characters used for Node name");
+			return false;
+		}
 
 		switch($node_type)
 		{
 			case ZBX_NODE_REMOTE:
-				$masterid = $ZBX_CURNODEID;
+				$masterid = get_current_nodeid(false);
 				$nodetype = 0;
 				break;
 			case ZBX_NODE_MASTER:
@@ -88,7 +94,7 @@
 
 		if($result && $node_type == ZBX_NODE_MASTER)
 		{
-			DBexecute('update nodes set masterid='.$new_nodeid.' where nodeid='.$ZBX_CURNODEID);
+			DBexecute('update nodes set masterid='.$new_nodeid.' where nodeid='.get_current_nodeid(false));
 			$ZBX_CURMASTERID = $new_nodeid; /* applay Master node for this script */
 		}
 
@@ -97,6 +103,12 @@
 
 	function	update_node($nodeid,$new_nodeid,$name,$timezone,$ip,$port,$slave_history,$slave_trends)
 	{
+		if( !eregi('^'.ZBX_EREG_NODE_FORMAT.'$', $name) )
+		{
+			error("Incorrect characters used for Node name");
+			return false;
+		}
+
 		$result = DBexecute('update nodes set nodeid='.$new_nodeid.',name='.zbx_dbstr($name).','.
 				'timezone='.$timezone.',ip='.zbx_dbstr($ip).',port='.$port.','.
 				'slave_history='.$slave_history.',slave_trends='.$slave_trends.

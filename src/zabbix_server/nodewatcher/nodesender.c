@@ -54,7 +54,7 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 	DB_ROW		row;
 	DB_ROW		row2;
 
-	char	*xml;
+	char	*xml = NULL;
 	char	fields[MAX_STRING_LEN];
 	int	offset=0;
 	int	allocated=1024;
@@ -63,7 +63,7 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 
 	int	i,j;
 
-	xml=malloc(allocated);
+	xml=zbx_malloc(xml, allocated);
 
 	memset(xml,0,allocated);
 
@@ -76,26 +76,39 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 	/* Begin work */
 	if(node_type == ZBX_NODE_MASTER)
 	{
-		result=DBselect("select tablename,recordid,operation from node_configlog where nodeid=" ZBX_FS_UI64  " and sync_master=0 and conflogid<=" ZBX_FS_UI64 " order by tablename,operation",
+		result=DBselect("select tablename,recordid,operation from node_configlog where nodeid=%d and sync_master=0 and conflogid<=" ZBX_FS_UI64 " order by tablename,operation",
 			nodeid,
 			maxlogid);
 	}
 	else
 	{
-		result=DBselect("select tablename,recordid,operation from node_configlog where nodeid=" ZBX_FS_UI64 " and sync_slave=0 and conflogid<=" ZBX_FS_UI64 " order by tablename,operation",
+		result=DBselect("select tablename,recordid,operation from node_configlog where nodeid=%d and sync_slave=0 and conflogid<=" ZBX_FS_UI64 " order by tablename,operation",
 			nodeid,
 			maxlogid);
 	}
 
-	zbx_snprintf_alloc(&xml, &allocated, &offset, 128, "Data|%d|%d",
+	zbx_snprintf_alloc(&xml, &allocated, &offset, 128, "Data%c%d%c%d",
+		ZBX_DM_DELIMITER,
 		CONFIG_NODEID,
+		ZBX_DM_DELIMITER,
 		nodeid);
 
 	while((row=DBfetch(result)))
 	{
 		found = 1;
 
-/*		zabbix_log( LOG_LEVEL_WARNING, "Fetched [%s,%s,%s]",row[0],row[1],row[2]);*/
+		zabbix_log( LOG_LEVEL_DEBUG, "Fetched [%s,%s,%s]",row[0],row[1],row[2]);
+		/* Special (simpler) processing for operation DELETE */
+		if(atoi(row[2]) == NODE_CONFIGLOG_OP_DELETE)
+		{
+			zbx_snprintf_alloc(&xml, &allocated, &offset, 16*1024, "\n%s%c%s%c%s",
+				row[0],
+				ZBX_DM_DELIMITER,
+				row[1],
+				ZBX_DM_DELIMITER,
+				row[2]);
+				continue;
+		}
 		for(i=0;tables[i].table!=0;i++)
 		{
 			if(strcmp(tables[i].table, row[0])==0)	break;
@@ -118,15 +131,16 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 				row[0],
 				tables[i].recid,
 				row[1]);
-/*			zabbix_log( LOG_LEVEL_WARNING,"select %s from %s where %s=%s",fields, row[0], tables[i].recid,row[1]);*/
  
 			row2=DBfetch(result2);
 
 			if(row2)
 			{
-				zbx_snprintf_alloc(&xml, &allocated, &offset, 16*1024, "\n%s|%s|%s",
+				zbx_snprintf_alloc(&xml, &allocated, &offset, 16*1024, "\n%s%c%s%c%s",
 					row[0],
+					ZBX_DM_DELIMITER,
 					row[1],
+					ZBX_DM_DELIMITER,
 					row[2]);
 				/* for each field */
 				for(j=0;tables[i].fields[j].name!=0;j++)
@@ -136,24 +150,40 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 					if(DBis_null(row2[j]) == SUCCEED)
 					{
 /*						zabbix_log( LOG_LEVEL_WARNING, "Field name [%s] [%s]",tables[i].fields[j].name,row2[j]);*/
-						zbx_snprintf_alloc(&xml, &allocated, &offset, 16*1024, "|%d|%d|NULL",
+						zbx_snprintf_alloc(&xml, &allocated, &offset, 16*1024, "%c%s%c%d%cNULL",
+							ZBX_DM_DELIMITER,
 							tables[i].fields[j].name,
-							tables[i].fields[j].type);
+							ZBX_DM_DELIMITER,
+							tables[i].fields[j].type,
+							ZBX_DM_DELIMITER);
 					}
 					else
 					{
-						zbx_snprintf_alloc(&xml, &allocated, &offset, 16*1024, "|%s|%d|%s",
+						zbx_snprintf_alloc(&xml, &allocated, &offset, 16*1024, "%c%s%c%d%c%s",
+							ZBX_DM_DELIMITER,
 							tables[i].fields[j].name,
+							ZBX_DM_DELIMITER,
 							tables[i].fields[j].type,
+							ZBX_DM_DELIMITER,
 							row2[j]);
 					}
 				}
 			}
 			else
 			{
-				zabbix_log( LOG_LEVEL_WARNING, "Cannot select %s from table [%s]",
-					tables[i].fields[j],
-					row[0]);
+				/* We assume that the record was just deleted, so we change operation to DELETE */
+				zabbix_log( LOG_LEVEL_DEBUG, "Cannot select %s from table %s where %s=%s",
+					fields,
+					row[0],
+					tables[i].recid,
+					row[1]);
+
+				zbx_snprintf_alloc(&xml, &allocated, &offset, 16*1024, "\n%s%c%s%c%d",
+					row[0],
+					ZBX_DM_DELIMITER,
+					row[1],
+					ZBX_DM_DELIMITER,
+					NODE_CONFIGLOG_OP_DELETE);
 			}
 			DBfree_result(result2);
 		}
@@ -165,7 +195,7 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 	}
 	zabbix_log( LOG_LEVEL_DEBUG, "DATA [%s]",
 		xml);
-	if( (found == 1) && send_to_node(dest_nodeid, nodeid, xml) == SUCCEED)
+	if( (found == 1) && send_to_node("configuration changes", dest_nodeid, nodeid, xml) == SUCCEED)
 	{
 		if(node_type == ZBX_NODE_MASTER)
 		{
@@ -182,7 +212,7 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 	}
 
 	DBfree_result(result);
-	free(xml);
+	zbx_free(xml);
 	/* Commit */
 
 	return SUCCEED;
@@ -292,8 +322,10 @@ static int send_to_master_and_slave(int nodeid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		master_nodeid, slave_nodeid;
-	int		master_result, slave_result;
+	int		master_nodeid,
+			slave_nodeid,
+			master_result = FAIL,
+			slave_result = FAIL;
 	zbx_uint64_t	maxlogid;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In send_to_master_and_slave(node:%d)",
@@ -304,7 +336,7 @@ static int send_to_master_and_slave(int nodeid)
 
 	row = DBfetch(result);
 
-	if(DBis_null(row[0]) == SUCCEED)
+	if(row && DBis_null(row[0]) == SUCCEED)
 	{
 		zabbix_log( LOG_LEVEL_DEBUG, "No configuration changes of node %d",
 			nodeid);
@@ -388,7 +420,8 @@ static int process_node(int nodeid)
 
 	send_to_master_and_slave(nodeid);
 
-	result = DBselect("select nodeid from nodes where masterid=%d",
+	result = DBselect("select nodeid from nodes where masterid=%d and nodeid not in (%d)",
+		nodeid,
 		nodeid);
 	while((row=DBfetch(result)))
 	{
