@@ -659,7 +659,7 @@
 
 		while($res = ereg($expr_full_format.'([[:print:]]*)$', $expr, $arr))
 		{
-			$expr = substr($expr, 0, strpos($expr, $arr[1])).$ZBX_TR_EXPR_REPLACE_TO.$arr[54];
+			$expr = substr($expr, 0, strpos($expr, $arr[1])).$ZBX_TR_EXPR_REPLACE_TO.$arr[58];
 		}
 
 		if ( $ZBX_TR_EXPR_REPLACE_TO != $expr )
