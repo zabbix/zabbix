@@ -553,6 +553,46 @@ ZBX_TEST_TIME expressions[]=
 	printf("Passed OK\n");
 }
 
+void	test_email()
+{
+	char str_error[0xFF];
+
+	if ( FAIL == send_email(
+			"test.com",
+			"test.com",
+			"test@test.com",
+			"test@test.com",
+			"This is a TEST message",
+			"Big message\r\n"
+			" 1 Line\n"
+			" 2 line\r\n"
+			" 3 Line\n"
+			" 4 Line\n"
+			" 5 Line\n"
+			" 6 Line\n"
+			" 7 Line\n"
+			" 8 Line\n"
+			" 9 Line\n"
+			" 10 Line\n\n\n"
+			" 11 Line\n"
+			" 12 Line\n"
+			" 13 Line\n"
+			" 14 Line\n"
+			" 15 Line\n"
+			" 16 Line\n"
+			" 17 Line\n\n\n"
+			" 18 Line\n",
+			str_error,
+			sizeof(str_error)
+			
+		  ) )
+		printf("ERROR: %s\n", str_error);
+	else
+		printf("OK\n");
+
+
+}
+
 void test()
 {
 
@@ -576,7 +616,8 @@ void test()
 /*	test_variable_argument_list(); */
 /*	test_templates();*/
 /*	test_calc_timestamp();*/
-	test_zbx_gethost();
+/*	test_zbx_gethost();*/
+	test_email();
 
 	printf("\n-= Test completed =-\n");
 }

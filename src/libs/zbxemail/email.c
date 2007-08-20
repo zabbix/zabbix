@@ -248,6 +248,14 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 		return FAIL;
 	}
 
+	cp = string_replace(mailsubject, "\r\n", "\n");
+	mailsubject = string_replace(cp, "\n", "\r\n");
+	zbx_free(cp);
+
+	cp = string_replace(mailbody, "\r\n", "\n");
+	mailbody = string_replace(cp, "\n", "\r\n");
+	zbx_free(cp);
+
 	memset(c,0,MAX_STRING_LEN);
 	time(&email_time);
 	local_time = localtime(&email_time);
@@ -255,6 +263,8 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 	cp = zbx_dsprintf(cp,"From:<%s>\r\nTo:<%s>\r\nDate: %s\r\nSubject: %s\r\n\r\n%s",smtp_email,mailto,str_time,mailsubject, mailbody);
 	e=write(s,cp,strlen(cp)); 
 	zbx_free(cp);
+	zbx_free(mailsubject);
+	zbx_free(mailbody);
 	if(e == -1)
 	{
 		zbx_snprintf(error,max_error_len,"Error sending mail subject and body to mailserver [%s]", strerror(errno));
