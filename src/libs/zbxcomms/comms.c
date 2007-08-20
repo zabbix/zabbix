@@ -103,6 +103,7 @@ static void __zbx_zbx_set_tcp_strerror(const char *fmt, ...)
 	va_end(args);
 }
 
+#if !defined(_WINDOWS)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_gethost_by_ip                                                *
@@ -133,6 +134,7 @@ struct hostent	*zbx_gethost_by_ip(const char *ip)
 
 	return (struct hostent*) NULL;
 }
+#endif /* WINDOWS */
 
 /******************************************************************************
  *                                                                            *
