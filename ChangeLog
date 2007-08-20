@@ -1,5 +1,6 @@
 Changes for 1.4.2:
 
+ - fixed validation of trigger expression (Eugene)
  - fixed '{HOSTNAME}' macros using for actions (Eugene)
  - fixed e-mail sending to the pedantic qmail (Eugene)
  - fixed communication between systems with different byte orders (Eugene)
