@@ -24,7 +24,40 @@
 
 int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	return SYSINFO_RET_FAIL;
+	SYSTEM_INFO	sysInfo;
+
+	char	mode[128];
+	
+        assert(result);
+
+        init_result(result);
+	
+        if(num_param(param) > 1)
+        {
+                return SYSINFO_RET_FAIL;
+        }
+
+        if(get_param(param, 1, mode, sizeof(mode)) != 0)
+        {
+                mode[0] = '\0';
+        }
+        if(mode[0] == '\0')
+	{
+		/* default parameter */
+		zbx_snprintf(mode, sizeof(mode), "online");
+	}
+
+	if(0 != strncmp(mode, "online", sizeof(mode)))
+	{
+		return SYSINFO_RET_FAIL;
+	}
+
+	GetSystemInfo(&sysInfo);
+
+
+	SET_UI64_RESULT(result, sysInfo.dwNumberOfProcessors);
+	
+	return SYSINFO_RET_OK;
 }
 
 int     OLD_CPU(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
