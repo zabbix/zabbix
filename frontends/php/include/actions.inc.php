@@ -748,11 +748,11 @@ include_once 'include/discovery.inc.php';
 		foreach($cmd_list as $cmd)
 		{
 			$cmd = trim($cmd, "\x00..\x1F");
-			if(!ereg("^([0-9a-zA-Z\_\.[.-.]]{1,})(:|#)[[:print:]]*$",$cmd,$cmd_items)){
+			if(!ereg("^(({HOSTNAME})|([0-9a-zA-Z\_\.[.-.]]{1,}))(:|#)[[:print:]]*$",$cmd,$cmd_items)){
 				error("Incorrect command: '$cmd'");
 				return FALSE;
 			}
-			if($cmd_items[2] == "#")
+			if($cmd_items[4] == "#")
 			{ // group
 				if(!DBfetch(DBselect("select groupid from groups where name=".zbx_dbstr($cmd_items[1]))))
 				{
@@ -760,9 +760,10 @@ include_once 'include/discovery.inc.php';
 					return FALSE;
 				}
 			}
-			elseif($cmd_items[2] == ":")
+			elseif($cmd_items[4] == ":")
 			{ // host
-				if(!DBfetch(DBselect("select hostid from hosts where host=".zbx_dbstr($cmd_items[1]))))
+				if( $cmd_items[1] != '{HOSTNAME}' && 
+					!DBfetch(DBselect("select hostid from hosts where host=".zbx_dbstr($cmd_items[1]))) )
 				{
 					error("Unknown host name '".$cmd_items[1]."' in command '".$cmd."'");
 					return FALSE;
