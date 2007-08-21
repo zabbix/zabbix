@@ -345,7 +345,7 @@ include_once "include/page_header.php";
 		{
 			$result = DBselect("select distinct g.* from graphs g left join graphs_items gi on g.graphid=gi.graphid ".
 				" left join items i on gi.itemid=i.itemid ".
-				' while '.DBin_node('g.graphid').
+				' where '.DBin_node('g.graphid').
 				" and ( i.hostid not in (".$denyed_hosts.")  OR i.hostid is NULL )".
 				" order by g.name, g.graphid");
 		}
