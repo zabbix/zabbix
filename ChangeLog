@@ -1,3 +1,7 @@
+Changes for 1.4.3:
+
+ - fixed SQL problem in Configuration->Graphs, all graphs selected (Alexei)
+
 Changes for 1.4.2:
 
  - fixed validation of trigger expression (Eugene)
