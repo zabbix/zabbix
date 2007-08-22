@@ -45,7 +45,7 @@ include_once "include/page_header.php";
 		fatal_error(S_NO_TRIGGER_DEFINED);
 	}
 
-	if(! ($db_data = DBfetch(DBselect('select distinct  t.triggerid,t.description,h.host,h.hostid '.
+	if(! ($db_data = DBfetch(DBselect('select distinct  t.triggerid,t.description,t.expression,h.host,h.hostid '.
 			' from hosts h, items i, functions f, triggers t'.
 			' where h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid and t.triggerid='.$_REQUEST["triggerid"].
 			' and i.hostid not in ('.$denyed_hosts.') '

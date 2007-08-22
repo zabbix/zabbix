@@ -413,19 +413,19 @@
 		$el_type =& $db_element["elementtype"];
 
 		$sql = array(
-			SYSMAP_ELEMENT_TYPE_TRIGGER => 'select distinct t.triggerid, t.priority, t.value, t.description, h.host '.
+			SYSMAP_ELEMENT_TYPE_TRIGGER => 'select distinct t.triggerid, t.priority, t.value, t.description, t.expression, h.host '.
 				'from triggers t, items i, functions f, hosts h where t.triggerid='.$db_element['elementid'].
 				' and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid '.
 				' and h.status='.HOST_STATUS_MONITORED.' and i.status='.ITEM_STATUS_ACTIVE,
 			SYSMAP_ELEMENT_TYPE_HOST_GROUP => 'select distinct t.triggerid, t.priority, t.value,'.
-				' t.description, h.host, g.name as el_name '.
+				' t.description, t.expression, h.host, g.name as el_name '.
 				' from items i,functions f,triggers t,hosts h,hosts_groups hg,groups g '.
 				' where h.hostid=i.hostid and hg.groupid=g.groupid and g.groupid='.$db_element['elementid'].
 				' and hg.hostid=h.hostid and i.itemid=f.itemid'.
 				' and f.triggerid=t.triggerid and t.status='.TRIGGER_STATUS_ENABLED.
 				' and h.status='.HOST_STATUS_MONITORED.' and i.status='.ITEM_STATUS_ACTIVE,
 			SYSMAP_ELEMENT_TYPE_HOST => 'select distinct t.triggerid, t.priority, t.value,'.
-				' t.description, h.host, h.host as el_name'.
+				' t.description, t.expression, h.host, h.host as el_name'.
 				' from items i,functions f,triggers t,hosts h where h.hostid=i.hostid'.
 				' and i.hostid='.$db_element['elementid'].' and i.itemid=f.itemid'.
 				' and f.triggerid=t.triggerid and t.status='.TRIGGER_STATUS_ENABLED.
