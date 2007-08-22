@@ -71,7 +71,7 @@ include_once "include/page_header.php";
 	} else {
 	
 		$query = 'SELECT DISTINCT s.serviceid, sl.servicedownid, sl_p.serviceupid as serviceupid, s.triggerid, '.
-				' s.name as caption, s.algorithm, t.description, s.sortorder, sl.linkid, s.showsla, s.goodsla, s.status '.
+				' s.name as caption, s.algorithm, t.description, t.expression, s.sortorder, sl.linkid, s.showsla, s.goodsla, s.status '.
 			' FROM services s '.
 				' LEFT JOIN triggers t ON s.triggerid = t.triggerid '.
 				' LEFT JOIN services_links sl ON  s.serviceid = sl.serviceupid and NOT(sl.soft=0) '.

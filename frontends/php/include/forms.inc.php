@@ -2253,7 +2253,7 @@
 				$comments	= $trigger["comments"];
 				$url		= $trigger["url"];
 
-				$trigs=DBselect("select t.triggerid,t.description from triggers t,trigger_depends d".
+				$trigs=DBselect("select t.triggerid,t.description,t.expression from triggers t,trigger_depends d".
 					" where t.triggerid=d.triggerid_up and d.triggerid_down=".$_REQUEST["triggerid"]);
 				while($trig=DBfetch($trigs))
 				{

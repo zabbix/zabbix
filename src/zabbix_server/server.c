@@ -507,6 +507,7 @@ void test_templates()
 	DBclose();
 }
 
+/*
 void test_calc_timestamp()
 {
 #define ZBX_TEST_TIME struct zbx_test_time_t
@@ -552,7 +553,8 @@ ZBX_TEST_TIME expressions[]=
 	}
 	printf("Passed OK\n");
 }
-
+*/
+/*
 void	test_email()
 {
 	char str_error[0xFF];
@@ -592,6 +594,50 @@ void	test_email()
 
 
 }
+*/
+
+/*
+void test_extract_numbers(void)
+{
+	char simple_expression[] = "{44444444}>0&{4444}<=12K&(123*12K>999)|({444}&{4}>(12314-3213))";
+
+	char	**numbers;
+	int	count, i;
+
+	printf("PARSE: %s\n", simple_expression);
+
+	numbers = extract_numbers(simple_expression, &count);
+
+	printf("FOUNDED: %i numbers\n", count);
+
+	for ( i = 0; i < count; i++ )
+	{
+		printf("%i: %s\n", i, numbers[i]);
+	}
+
+	zbx_free_numbers(&numbers, count);
+}
+*/
+/*
+void test_trigger_description()
+{
+	char *data = NULL;
+
+	DBconnect(ZBX_DB_CONNECT_EXIT);
+
+	data = strdup("!!!test $0 $1 $2 $3 $5 $6 $7 $8 $9 $10 $11");
+
+	printf("Descriptioni (before): [%s]\n", data); 
+
+	expand_trigger_description_simple(&data, 100000000012896);
+
+	printf("Description  (after) : [%s]\n", data); 
+
+	zbx_free(data);
+	
+	DBclose();
+}
+*/
 
 void test()
 {
@@ -617,7 +663,9 @@ void test()
 /*	test_templates();*/
 /*	test_calc_timestamp();*/
 /*	test_zbx_gethost();*/
-	test_email();
+/*	test_email(); */
+/*	test_extract_numbers(); */
+/*	test_trigger_description(); */
 
 	printf("\n-= Test completed =-\n");
 }

@@ -107,7 +107,7 @@
 	}
 	
 	function	add_host_to_services($hostid, $serviceid){
-		$result = DBselect('SELECT distinct h.host,t.triggerid,t.description '.
+		$result = DBselect('SELECT distinct h.host,t.triggerid,t.description,t.expression '.
 							' FROM triggers t,hosts h,items i,functions f '.
 							' WHERE h.hostid='.$hostid.
 								' AND h.hostid=i.hostid '.

@@ -51,7 +51,7 @@
 			$sql_cond.= ' AND e.value<>2 ';
 		}
 	
-		$result = DBselect('SELECT DISTINCT t.triggerid,t.priority,t.description,h.host,e.clock,e.value '.
+		$result = DBselect('SELECT DISTINCT t.triggerid,t.priority,t.description,t.expression,h.host,e.clock,e.value '.
 			' FROM events e, triggers t, functions f, items i, hosts h '.$sql_from.
 			' WHERE '.DBin_node('t.triggerid').
 				' AND e.objectid=t.triggerid and e.object='.EVENT_OBJECT_TRIGGER.
