@@ -1025,13 +1025,83 @@
 		return	DBexecute("update triggers set status=$status where triggerid=$triggerid");
 	}
 
-	# "Processor load on {HOSTNAME} is 5" to "Processor load on www.sf.net is 5"
+	/*
+	 * Function: extract_numbers
+	 *
+	 * Description: 
+	 *     Extract from string numbers with prefixes (A-Z)
+	 *     
+	 * Author: 
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 * Comments: !!! Don't forget sync code with C !!!
+	 *
+	 */
+	function	extract_numbers($str)
+	{
+		$numbers = array();
+		while ( ereg(ZBX_EREG_NUMBER.'([[:print:]]*)', $str, $arr) ) {
+			$numbers[] = $arr[1];
+			$str = $arr[2];
+		}
+		return $numbers;
+	}
+
+	/*
+	 * Function: expand_trigger_description_constants
+	 *
+	 * Description: 
+	 *     substitute simple macros in data string with real values
+	 *     
+	 * Author: 
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 * Comments: !!! Don't forget sync code with C !!!
+	 *           replcae $1-9 macros
+	 *
+	 */
+	function	expand_trigger_description_constants($description, $row)
+	{
+		if($row && isset($row['expression']))
+		{
+			$numbers = extract_numbers(ereg_replace('(\{[0-9]+\})', 'function', $row['expression']));
+			$description = $row["description"];
+
+			for ( $i = 0; $i < 9; $i++ )
+			{
+				$description = 
+					str_replace(
+						'$'.($i+1),
+						isset($numbers[$i]) ? 
+							$numbers[$i] : 
+							'', 
+						$description
+						);
+			}
+		}
+
+		return $description;
+	}
+	/*
+	 * Function: expand_trigger_description_by_data
+	 *
+	 * Description: 
+	 *     substitute simple macros in data string with real values
+	 *     
+	 * Author: 
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 * Comments: !!! Don't forget sync code with C !!!
+	 *
+	 */
 	function	expand_trigger_description_by_data($row)
 	{
 		if($row)
 		{
+			$description = expand_trigger_description_constants($row['description'], $row);
+
 			if(is_null($row["host"])) $row["host"] = "{HOSTNAME}";
-			$description = str_replace("{HOSTNAME}", $row["host"],$row["description"]);
+			$description = str_replace("{HOSTNAME}", $row["host"],$description);
 		}
 		else
 		{
@@ -1044,7 +1114,7 @@
 	{
 		return expand_trigger_description_by_data(
 			DBfetch(
-				DBselect("select distinct t.description,h.host".
+				DBselect("select distinct t.description,h.host,t.expression".
 					" from triggers t left join functions f on t.triggerid=f.triggerid ".
 					" left join items i on f.itemid=i.itemid ".
 					" left join hosts h on i.hostid=h.hostid ".
@@ -1593,7 +1663,7 @@
 			$group_where = ' where';
 		}
 
-		$result=DBselect('select distinct t.triggerid,t.description,t.value,t.priority,t.lastchange,h.hostid,h.host'.
+		$result=DBselect('select distinct t.triggerid,t.description,t.expression,t.value,t.priority,t.lastchange,h.hostid,h.host'.
 			' from hosts h,items i,triggers t, functions f '.$group_where.
 			' h.status='.HOST_STATUS_MONITORED.' and h.hostid=i.hostid and i.itemid=f.itemid and f.triggerid=t.triggerid'.
 			' and h.hostid in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, null, null, get_current_nodeid()).') '.
@@ -1604,6 +1674,7 @@
 		while($row = DBfetch($result))
 		{
 			$row['host'] = get_node_name_by_elid($row['hostid']).$row['host'];
+			$row['description'] = expand_trigger_description_constants($row['description'], $row);
 
 			$hosts[$row['host']] = $row['host'];
 			$triggers[$row['description']][$row['host']] = array(

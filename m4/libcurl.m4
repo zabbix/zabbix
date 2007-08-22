@@ -191,10 +191,12 @@ AC_HELP_STRING([--with-libcurl@<:@=DIR@:>@],[use cURL package @<:@default=yes@:>
         AC_CACHE_CHECK([whether libcurl is usable],
            [libcurl_cv_lib_curl_usable],
            [
-           _libcurl_save_cppflags=$CPPFLAGS
-           CPPFLAGS="$LIBCURL_CPPFLAGS $CPPFLAGS"
-           _libcurl_save_libs=$LIBS
-           LIBS="$LIBCURL_LIBS $LIBS"
+		_save_curl_libs="${LIBS}"
+		_save_curl_ldflags="${LDFLAGS}"
+		_save_curl_cflags="${CFLAGS}"
+		LIBS="${LIBS} ${LIBCURL_LIBS}"
+		LDFLAGS="${LDFLAGS} ${LIBCURL_LDFLAGS}"
+		CFLAGS="${CFLAGS} ${LIBCURL_CFLAGS}"
 
            AC_LINK_IFELSE(AC_LANG_PROGRAM([#include <curl/curl.h>],[
 /* Try and use a few common options to force a failure if we are
@@ -209,10 +211,12 @@ x=CURLOPT_STDERR;
 x=CURLOPT_VERBOSE;
 ]),libcurl_cv_lib_curl_usable=yes,libcurl_cv_lib_curl_usable=no)
 
-           CPPFLAGS=$_libcurl_save_cppflags
-           LIBS=$_libcurl_save_libs
-           unset _libcurl_save_cppflags
-           unset _libcurl_save_libs
+		LIBS="${_save_curl_libs}"
+		LDFLAGS="${_save_curl_ldflags}"
+		CFLAGS="${_save_curl_cflags}"
+		unset _save_curl_libs
+		unset _save_curl_ldflags
+		unset _save_curl_cflags
            ])
 
         if test $libcurl_cv_lib_curl_usable = yes ; then
@@ -220,19 +224,23 @@ x=CURLOPT_VERBOSE;
 	   # Does curl_free() exist in this version of libcurl?
 	   # If not, fake it with free()
 
-           _libcurl_save_cppflags=$CPPFLAGS
-           CPPFLAGS="$CPPFLAGS $LIBCURL_CPPFLAGS"
-           _libcurl_save_libs=$LIBS
-           LIBS="$LIBS $LIBCURL_LIBS"
+		_save_curl_libs="${LIBS}"
+		_save_curl_ldflags="${LDFLAGS}"
+		_save_curl_cflags="${CFLAGS}"
+		LIBS="${LIBS} ${LIBCURL_LIBS}"
+		LDFLAGS="${LDFLAGS} ${LIBCURL_LDFLAGS}"
+		CFLAGS="${CFLAGS} ${LIBCURL_CFLAGS}"
 
            AC_CHECK_FUNC(curl_free,,
   	      AC_DEFINE(curl_free,free,
 		[Define curl_free() as free() if our version of curl lacks curl_free.]))
 
-           CPPFLAGS=$_libcurl_save_cppflags
-           LIBS=$_libcurl_save_libs
-           unset _libcurl_save_cppflags
-           unset _libcurl_save_libs
+		LIBS="${_save_curl_libs}"
+		LDFLAGS="${_save_curl_ldflags}"
+		CFLAGS="${_save_curl_cflags}"
+		unset _save_curl_libs
+		unset _save_curl_ldflags
+		unset _save_curl_cflags
 
            AC_DEFINE(HAVE_LIBCURL,1,
              [Define to 1 if you have a functional curl library.])
