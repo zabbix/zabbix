@@ -204,8 +204,6 @@ void    *zbx_realloc(void *src, size_t size)
 	register int max_attempts;
 	void *ptr = NULL;
 
-	assert(src);
-
 /*	zabbix_log(LOG_LEVEL_DEBUG,"In zbx_realloc(size:%d)", size); */
 
 	for(
