@@ -74,7 +74,7 @@
 				ITEM_VALUE_TYPE_TEXT
 				),
 			);
-		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['count']	= array('args' => array( 0 => array('type' => 'sec','mandat' => true), 1 => array('type' => 'str'), 1=>array('type' => 'str') ),
+		$ZBX_TR_EXPR_ALLOWED_FUNCTIONS['count']	= array('args' => array( 0 => array('type' => 'sec','mandat' => true), 1 => array('type' => 'str') ),
 			'item_types' => array(
 				ITEM_VALUE_TYPE_FLOAT,
 				ITEM_VALUE_TYPE_UINT64,
@@ -1967,4 +1967,38 @@
 		return $ret;
 	}
 
+	function construct_expression($itemid,$expressions){
+		$expression='';
+
+		$item = get_item_by_itemid($itemid);
+		$host = get_host_by_itemid($itemid);
+		
+		$prefix = $host['host'].':'.$item['key_'].'.';
+
+		foreach($expressions as $id => $expr){
+			$eq = (($expr['type'] == REGEXP_INCLUDE)?'#':'=').'0';
+			
+			if(!preg_match("/^iregexp|regexp\(.*\)/iUm",$expr['value'])){
+				error('Incorrect trigger expression. ['.$expr['value'].']');
+				return false;
+			}
+			$expr['value'] = preg_replace('/\s+(\&|\|){1,2}\s+/U','$1',$expr['value']);
+			
+			$expr['value'] = eregi_replace('(regexp|iregexp)(\(.*\))(&|\|){1,2}','\\1\\2\\3',$expr['value']);
+
+			$expr['value'] = preg_replace('/(regexp|iregexp)(\(.*\))/iUu','{$1$2}'.$eq,$expr['value']);
+			
+			$patern = array('/iregexp\((.*)\)/iUu','/regexp\((.*)\)/iUu','/regiexp\((.*)\)/iUu');
+			$replacement = array('regiexp(\\1)',($prefix."regexp(\\1)"),($prefix."iregexp(\\1)"));
+			
+			$expr['value'] = preg_replace($patern,$replacement,$expr['value']);
+			$expressions[$id] = $expr;
+		}
+		
+		foreach($expressions as $id => $expr){
+			$expression .= (!empty($expression))?' & ':'';
+			$expression .= '('.$expr['value'].')';
+		}
+	return $expression;
+	}
 ?>

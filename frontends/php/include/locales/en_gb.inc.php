@@ -635,6 +635,7 @@
 	'S_AVAILABILITY'=>			'Availability',
 	'S_AVAILABLE'=>				'Available',
 	'S_NOT_AVAILABLE'=>			'Not available',
+
 //	Host profiles
 	'S_HOST_PROFILE'=>			'Host profile',
 	'S_DEVICE_TYPE'=>			'Device type',
@@ -855,6 +856,7 @@
 	'S_CANCEL'=>				'Cancel',
 
 //	Menu
+	'S_MENU'=>					'Menu',
 	'S_MENU_LATEST_VALUES'=>		'LATEST VALUES',
 	'S_MENU_TRIGGERS'=>			'TRIGGERS',
 	'S_MENU_QUEUE'=>			'QUEUE',
@@ -1169,6 +1171,10 @@
 	'S_SHOW_DISABLED_TRIGGERS'=>		'Show disabled triggers',
 	'S_HIDE_DISABLED_TRIGGERS'=>		'Hide disabled triggers',
 
+//	tr_logform.php
+	'S_EXCLUDE'=>				'Exclude',
+	'S_INCLUDE'=>				'Include',
+	'S_POSITION'=>				'Position',
 
 //	tr_comments.php
 	'S_TRIGGER_COMMENTS'=>			'Trigger comments',

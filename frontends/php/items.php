@@ -157,6 +157,8 @@ include_once "include/page_header.php";
 	
 	check_fields($fields);
 
+	echo '<script type="text/javascript" src="js/items.js"></script>';
+	
 	$showdisabled = get_request("showdisabled", 0);
 	
 	$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,get_current_nodeid());
@@ -738,6 +740,7 @@ include_once "include/page_header.php";
 			array(	new CCheckBox("all_items",null,
 					"CheckAll('".$form->GetName()."','all_items');"),
 				S_DESCRIPTION),
+			S_MENU,
 			S_KEY,nbsp(S_UPDATE_INTERVAL),
 			S_HISTORY,S_TRENDS,S_TYPE,S_STATUS,
 			$show_applications ? S_APPLICATIONS : null,
@@ -745,6 +748,11 @@ include_once "include/page_header.php";
 
 		$from_tables['i'] = 'items i'; /* NOTE: must be added as last element to use left join */
 
+/*		SDI('select distinct th.host as template_host,th.hostid as template_hostid, h.host, i.* '.
+			' from '.implode(',', $from_tables).
+			' left join items ti on i.templateid=ti.itemid left join hosts th on ti.hostid=th.hostid '.
+			' where '.implode(' and ', $where_case).' order by h.host,i.description,i.key_,i.itemid');
+*/
 		$db_items = DBselect('select distinct th.host as template_host,th.hostid as template_hostid, h.host, i.* '.
 			' from '.implode(',', $from_tables).
 			' left join items ti on i.templateid=ti.itemid left join hosts th on ti.hostid=th.hostid '.
@@ -788,12 +796,46 @@ include_once "include/page_header.php";
 			}
 
 			$applications = $show_applications ? implode(', ', get_applications_by_itemid($db_item["itemid"], 'name')) : null;
+			
+			if(preg_match("/^log\[.*\].*$/",$db_item["key_"])){
+				$res = DBselect('SELECT DISTINCT t.description, t.triggerid'.
+					' FROM functions as f, triggers as t, items as i '.
+					' WHERE f.itemid='.$db_item["itemid"].
+					  ' AND i.itemid=f.itemid AND t.triggerid = f.triggerid '.
+					  ' AND i.value_type=2 AND i.key_ LIKE ("log[%") '.
+					' GROUP BY t.triggerid;');
+
+				$triggers_flag = false;
+				$triggers=",Array('Edit Trigger',null,null,{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']}\n";
+
+				while($trigger=DBfetch($res)){
+					$item_count = DBfetch(DBselect('SELECT count(DISTINCT f.itemid) as items FROM functions as f WHERE f.triggerid='.$trigger['triggerid']));
+					if($item_count['items'] > 1) continue;
+					
+					$triggers .= ',["'.$trigger['description']."\",\"javascript: openWinCentered('tr_logform.php?sform=1&itemid=".$db_item["itemid"]."&triggerid=".$trigger['triggerid']."','TriggerLog',760,540,'titlebar=no, resizable=yes, scrollbars=yes');\"]";
+					$triggers_flag = true;
+				}
+				if($triggers_flag){
+					$triggers=rtrim($triggers,',').')';
+				}
+				else{
+					$triggers='';
+				}
+				
+				$menuicon = new CImg('images/general/menuicon.gif','menu',21,18);
+				$menuicon->AddOption('onclick','javascript: call_menu(event, '.zbx_jsvalue($db_item["itemid"]).','.zbx_jsvalue(item_description($db_item["description"],$db_item["key_"])).$triggers.'); return false;');
+				$menuicon->AddOption('onmouseover','javascript: this.style.cursor = "pointer";');
+			} 
+			else {
+				$menuicon = new CImg('images/general/tree/O.gif','zero',21,18);
+			}
 
 			$chkBox = new CCheckBox("group_itemid[]",null,null,$db_item["itemid"]);
 			//if($db_item["templateid"] > 0) $chkBox->SetEnabled(false);
 			$table->AddRow(array(
 				$show_host ? $db_item['host'] : null,
 				array($chkBox, $description),
+				$menuicon,
 				$db_item["key_"],
 				$db_item["delay"],
 				$db_item["history"],
@@ -832,6 +874,9 @@ include_once "include/page_header.php";
 		echo BR;
 		insert_item_form();
 	}
+
+$jsmenu = new CPUMenu(null,170);
+$jsmenu->InsertJavaScript();
 ?>
 <?php
 
