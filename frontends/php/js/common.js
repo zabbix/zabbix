@@ -226,7 +226,7 @@ function insert_sizeable_graph(url)
 
 	if(width) url += "&amp;width=" + (width - 108);
 
-	document.write("<IMG SRC=\"" + url + "\">");
+	document.write('<img src="'+url+'" alt="graph">');
 }
 
 function openWinCentered(loc, winname, iwidth, iheight, params){
