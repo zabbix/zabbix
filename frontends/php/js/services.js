@@ -146,11 +146,13 @@ function remove_element(elmnt,tag){
 
 function display_element(name){
 	var elmnt = document.getElementById(name);
-	if(typeof(elmnt) == 'undefined'){
+	if(!isset(elmnt)){
 		return;
-	}else if(elmnt.offsetWidth == 0){
-		elmnt.style.display = (!IE || OP)?("table-row"):('block');
-	}else {
+	}
+	else if((elmnt.offsetWidth == 0) || (elmnt.style.display == 'none')){
+		elmnt.style.display = IE?'block':'table-row';
+	}
+	else {
 		elmnt.style.display = 'none';
 	}
 }
