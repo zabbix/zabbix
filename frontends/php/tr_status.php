@@ -302,7 +302,7 @@ include_once "include/page_header.php";
 	if($_REQUEST["hostid"] > 0)	$cond=" and h.hostid=".$_REQUEST["hostid"]." ";
 
 	if($onlytrue=='true')		$cond .= ' and ((t.value=1) OR (('.time().' - lastchange)<'.TRIGGER_BLINK_PERIOD.')) ';
-
+		
 	$result = DBselect("select distinct t.triggerid,t.status,t.description,t.expression,t.priority,".
 		" t.lastchange,t.comments,t.url,t.value,h.host from triggers t,hosts h,items i,functions f".
 		" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.status=".TRIGGER_STATUS_ENABLED.
@@ -338,9 +338,9 @@ include_once "include/page_header.php";
 		{
 			$description = array(
 				$description, BR, 
-				"<FONT COLOR=\"#000000\" SIZE=-2>", 
+				'<font color="#000000" size="-2">', 
 				explode_exp($row["expression"],1), 
-				"</FONT>");
+				'</font>');
 		}
 
 		if((time(NULL)-$row["lastchange"])<TRIGGER_BLINK_PERIOD)

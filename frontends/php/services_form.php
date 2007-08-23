@@ -155,7 +155,7 @@ if(isset($_REQUEST['saction'])){
 		show_messages($result, S_TRIGGER_ADDED, S_CANNOT_ADD_TRIGGER);
 	}
 	if($result){
-		closeform();
+		zbx_add_post_js('closeform("services.php");');
 		include_once "include/page_footer.php";
 	}
 }
@@ -402,14 +402,14 @@ if(isset($_REQUEST['sform'])){
 			array_push($service_times, $stime);
 		}
 //links
-		$query = 'SELECT DISTINCT 
-					sl.linkid, sl.soft, sl.serviceupid, sl.servicedownid, 
-					s1.name as serviceupname, s2.name as servicedownname 
-				FROM services s1, services s2, services_links sl 
-				WHERE sl.serviceupid=s1.serviceid 
-					AND sl.servicedownid=s2.serviceid 
-					AND NOT(sl.soft=1)
-					AND sl.servicedownid='.$service['serviceid'];
+		$query = 'SELECT DISTINCT '.
+					' sl.linkid, sl.soft, sl.serviceupid, sl.servicedownid, '.
+					' s1.name as serviceupname, s2.name as servicedownname '.
+				' FROM services s1, services s2, services_links sl '.
+				' WHERE sl.serviceupid=s1.serviceid '.
+					' AND sl.servicedownid=s2.serviceid '.
+					' AND NOT(sl.soft=1) '.
+					' AND sl.servicedownid='.$service['serviceid'];
 
 		if($link=DBFetch(DBSelect($query))){
 			$parentid = $link["serviceupid"];
@@ -480,7 +480,7 @@ if(isset($_REQUEST['sform'])){
 
 	$cb = new CButton('select_parent',S_CHANGE);
 	$cb->SetType('button');
-	$cb->SetAction("javascript: openWinCentered('services_form.php?pservices=1".url_param('serviceid')."','ZBX_Services_List',720,420,'toolbar=0, menubar=0, resizable=0');");
+	$cb->SetAction("javascript: openWinCentered('services_form.php?pservices=1".url_param('serviceid')."','ZBX_Services_List',740,420,'scrollbars=1, toolbar=0, menubar=0, resizable=1, dialog=0');");
 
 	$frmService->AddRow('Parent Service',array($ctb,$cb));
 //----------							
@@ -534,7 +534,7 @@ if(isset($_REQUEST['sform'])){
 
 	$cb = new CButton('add_child_service',S_ADD);
 	$cb->SetType('button');
-	$cb->SetAction("javascript: openWinCentered('services_form.php?cservices=1".url_param('serviceid')."','ZBX_Services_List',620,520,'toolbar=0, menubar=0, resizable=0');");
+	$cb->SetAction("javascript: openWinCentered('services_form.php?cservices=1".url_param('serviceid')."','ZBX_Services_List',640,520,'scrollbars=1, toolbar=0, menubar=0, resizable=0');");
 	
 	$cb2 = new CButton('del_child_service',S_REMOVE);
 	$cb2->SetType('button');
