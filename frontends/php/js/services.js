@@ -4,29 +4,18 @@ function call_menu(evnt,id,name){
 		show_popup_menu(evnt,
 					[
 						[name,null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],
-						['Add Service',"javascript: openWinCentered('services_form.php?sform=1&parentid="+id+"&parentname="+name+"','ServiceForm',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=yes');", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],
-						['Edit Service',"javascript: openWinCentered('services_form.php?sform=1&serviceid="+id+"','ServiceForm',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=yes');",null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],
-						['Delete Service',"javascript: if(Confirm('Delete selected services?')){ openWinCentered('services_form.php?saction=1&delete=1&serviceid="+id+"','ServiceForm',400,300,'titlebar=no, resizable=yes, scrollbars=yes, dialog=yes');}",null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]
+						['Add Service',"javascript: openWinCentered('services_form.php?sform=1&parentid="+id+"&parentname="+name+"','ServiceForm',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],
+						['Edit Service',"javascript: openWinCentered('services_form.php?sform=1&serviceid="+id+"','ServiceForm',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');",null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],
+						['Delete Service',"javascript: if(Confirm('Delete selected services?')){ openWinCentered('services_form.php?saction=1&delete=1&serviceid="+id+"','ServiceForm',400,300,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');}",null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]
 					],120);
 	} else {
 		show_popup_menu(evnt,
 					[
 						[name,null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],
-						['Add Service',"javascript: openWinCentered('services_form.php?sform=1&parentid="+id+"&parentname="+name+"','ServiceForm',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=yes');", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]
+						['Add Service',"javascript: openWinCentered('services_form.php?sform=1&parentid="+id+"&parentname="+name+"','ServiceForm',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}]
 					],120);
 	}
 return false;
-}
-
-function openWinCentered(loc, winname, iwidth, iheight, params){
-		tp=Math.ceil((screen.height-iheight)/2);
-		lf=Math.ceil((screen.width-iwidth)/2);
-		if (params.length > 0){
-			params = ', ' + params;
-		}
-
-	var WinObjReferer = window.open(loc,winname,"width="+iwidth+",height="+iheight+",top="+tp+",left="+lf+params);
-	WinObjReferer.focus();
 }
 
 function services_showsla(sla){
@@ -44,7 +33,11 @@ try{
 function add_child_service(name,serviceid,trigger,triggerid){
 //	alert(name+','+serviceid+','+trigger+','+triggerid);
 	var tr = document.createElement('tr');
-	tr.setAttribute('class','even_row');
+	document.getElementById('service_childs').firstChild.appendChild(tr);
+
+	var classattr = (IE)?'className':'class';
+	
+	tr.setAttribute(classattr,'even_row');
 	
 	var td = document.createElement('td');
 	
@@ -66,7 +59,7 @@ function add_child_service(name,serviceid,trigger,triggerid){
 
 	var url = document.createElement('a');
 	url.setAttribute('href','services_form.php?sform=1&serviceid='+serviceid);
-	url.setAttribute('class','action');
+	url.setAttribute(classattr,'action');
 	url.appendChild(document.createTextNode(name));
 
 	var input = document.createElement('input');
@@ -98,8 +91,6 @@ function add_child_service(name,serviceid,trigger,triggerid){
 	td.appendChild(document.createTextNode(trigger));
 	td.appendChild(input);
 	tr.appendChild(td);
-	
-	document.getElementById('service_childs').firstChild.appendChild(tr);
 }
 
 function check_childs(form_name, chkMain, chkName){
@@ -164,7 +155,7 @@ function display_element(name){
 	}
 }
 
-function closeform(){
+function closeform(page){
 	var msg="";
 	try{
 		msg = (IE)?(document.getElementsByTagName('p')[0].innerText):(document.getElementsByTagName('p')[0].textContent);
