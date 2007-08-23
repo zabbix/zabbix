@@ -720,11 +720,7 @@ $dt = 0;
 		}
 	return ;
 	}
-	
-	function closeform(){
-		zbx_add_post_js('closeform();');
-	}
-	
+		
 	function del_empty_nodes($services){
 		do{
 			unset($retry);

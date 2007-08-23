@@ -147,32 +147,34 @@ COpt::profiling_start("page");
 				"default_page_id"	=> 0,
 				"forse_disable_subnodes"=> true,
 				"pages"=>array(
-					array("url"=>"config.php"	,"label"=>S_GENERAL		,
+					array("url"=>"config.php"	,"label"=>S_GENERAL,
 						"sub_pages"=>array("image.php")
 						),
-					array("url"=>"httpconf.php"	,"label"=>S_WEB			,
+					array("url"=>"httpconf.php"	,"label"=>S_WEB,
 						"sub_pages"=>array("popup_httpstep.php")
 						),
-					array("url"=>"hosts.php"	,"label"=>S_HOSTS		),
-					array("url"=>"items.php"	,"label"=>S_ITEMS		),
-					array("url"=>"triggers.php"	,"label"=>S_TRIGGERS		,
+					array("url"=>"hosts.php"	,"label"=>S_HOSTS),
+					array("url"=>"items.php"	,"label"=>S_ITEMS,
+						"sub_pages"=>array("tr_logform.php")		
+						),
+					array("url"=>"triggers.php"	,"label"=>S_TRIGGERS,
 						"sub_pages"=>array("popup_trexpr.php")
 						),
-					array("url"=>"actionconf.php"	,"label"=>S_ACTIONS		),
-					array("url"=>"sysmaps.php"	,"label"=>S_MAPS		,
+					array("url"=>"actionconf.php"	,"label"=>S_ACTIONS),
+					array("url"=>"sysmaps.php"	,"label"=>S_MAPS,
 						"sub_pages"=>array("sysmap.php")
 						),
-					array("url"=>"graphs.php"	,"label"=>S_GRAPHS		,
+					array("url"=>"graphs.php"	,"label"=>S_GRAPHS,
 						"sub_pages"=>array("popup_gitem.php")
 						),
-					array("url"=>"screenconf.php"	,"label"=>S_SCREENS		,
+					array("url"=>"screenconf.php"	,"label"=>S_SCREENS,
 						"sub_pages"=>array("screenedit.php")
 						),
-					array("url"=>"services.php"	,"label"=>S_IT_SERVICES	,
+					array("url"=>"services.php"	,"label"=>S_IT_SERVICES,
 						"sub_pages"=>array("services_form.php")	
 						),
-					array('url'=>'discoveryconf.php','label'=>S_DISCOVERY		),
-					array("url"=>"exp_imp.php"	,"label"=>S_EXPORT_IMPORT	),
+					array('url'=>'discoveryconf.php','label'=>S_DISCOVERY),
+					array("url"=>"exp_imp.php"	,"label"=>S_EXPORT_IMPORT),
 					array("url"=>"popup.php")
 					)
 				),

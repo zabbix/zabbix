@@ -16,9 +16,25 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-var IE = document.all?true:false;
 var OP = window.opera?true:false;
+var IE = ((!OP) && (document.all))?true:false;
 
+if (!Array.prototype.forEach)
+{
+  Array.prototype.forEach = function(fun /*, thisp*/)
+  {
+    var len = this.length;
+    if (typeof fun != "function")
+      throw new TypeError();
+
+    var thisp = arguments[1];
+    for (var i = 0; i < len; i++)
+    {
+      if (i in this)
+        fun.call(thisp, this[i], i, this);
+    }
+  };
+}
 
 function SDI(msg)
 {
@@ -211,4 +227,32 @@ function insert_sizeable_graph(url)
 	if(width) url += "&amp;width=" + (width - 108);
 
 	document.write("<IMG SRC=\"" + url + "\">");
+}
+
+function openWinCentered(loc, winname, iwidth, iheight, params){
+		tp=Math.ceil((screen.height-iheight)/2);
+		lf=Math.ceil((screen.width-iwidth)/2);
+		if (params.length > 0){
+			params = ', ' + params;
+		}
+
+	var WinObjReferer = window.open(loc,winname,"width="+iwidth+",height="+iheight+",top="+tp+",left="+lf+params);
+	WinObjReferer.focus();
+}
+
+function isset(obj){
+	return (typeof(obj) != 'undefined');
+}
+
+function empty(obj){
+	if(isset(obj) && obj) return true;
+	return false;
+}
+
+function is_number(obj){
+	return (typeof(obj) == 'number');
+}
+
+function is_string(obj){
+	return (typeof(obj) == 'string');
 }
