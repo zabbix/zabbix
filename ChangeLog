@@ -1,5 +1,6 @@
 Changes for 1.4.3:
 
+ - fixed compilation of ZABBIX agent under Mac OS/X (Alexei)
  - fixed memory leak when processing non-existant trapper item (Alexei)
  - fixed unefficient SQL in browsing of events (Alexei)
  - fixed iregexp() (Alexei)
