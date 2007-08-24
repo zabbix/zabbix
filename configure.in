@@ -435,6 +435,7 @@ int test(const char *fmt, ...) { return 0; }
 [
 #define TEST(fmt, ...) test(""fmt, ##__VA_ARGS__)
 TEST("%s","test");
+TEST("test");
 ],
 AC_DEFINE(HAVE___VA_ARGS__, 1 ,[Define to 1 if __VA_ARGS__ available.])
 AC_MSG_RESULT(yes),
