@@ -46,7 +46,7 @@ int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
         if(get_param(param, 1, cpuname, sizeof(cpuname)) != 0)
         {
-                cpuname[0] == '\0'
+                cpuname[0] = '\0';
         }
 
 	if(cpuname[0] == '\0')
