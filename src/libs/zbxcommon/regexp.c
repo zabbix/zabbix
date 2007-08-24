@@ -34,7 +34,7 @@ static	char	*zbx_regexp(const char *string, const char *pattern, int *len, int f
 
 	if( string && string[0] )
 	{
-		if ( 0 == regcomp(&re, pattern, REG_EXTENDED | /* REG_ICASE | */ REG_NEWLINE) )
+		if ( 0 == regcomp(&re, pattern, flags) )
 		{
 			if( 0 == regexec(&re, string, (size_t) 1, &match, 0) )
 			{ /* Matched */
