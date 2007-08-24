@@ -546,6 +546,7 @@
 	'S_LOCAL'=>				'Local',
 	'S_SOURCE'=>				'Source',
 	'S_SHOW_UNKNOWN'=>			'Show unknown',
+	'S_HIDE_UNKNOWN'=>			'Hide unknown',
 
 	'S_SHOW_SELECTED'=>			'Show selected',
 	'S_HIDE_SELECTED'=>			'Hide selectede',
