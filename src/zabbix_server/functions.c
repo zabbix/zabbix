@@ -302,7 +302,7 @@ int	process_data(zbx_sock_t *sock,char *server,char *key,char *value,char *lastl
 
 	if(!row)
 	{
-
+		DBfree_result(result);
 		return FAIL;
 /*
 		zabbix_log( LOG_LEVEL_DEBUG, "Before checking autoregistration for [%s]",
