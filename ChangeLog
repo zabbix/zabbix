@@ -1,5 +1,6 @@
 Changes for 1.4.3:
 
+ - fixed unefficient SQL in browsing of events (Alexei)
  - fixed iregexp() (Alexei)
  - fixed detection of __VA_ARGS__ (Eugene)
  - added numeric parameters support for trigger description "$1 $2 .. $9" (Eugene)

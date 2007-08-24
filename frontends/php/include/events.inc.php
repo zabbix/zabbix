@@ -183,6 +183,7 @@ function event_initial_time($row,$show_unknown=0){
 					' FROM events '.
 					' WHERE objectid='.$row['triggerid'].$sql_cond.
 						' AND clock < '.$row['clock'].
+						' AND object='.EVENT_OBJECT_TRIGGER.
 					' GROUP BY value '.
 					' ORDER BY clock DESC');
 					
@@ -195,6 +196,7 @@ function event_initial_time($row,$show_unknown=0){
 		$res = DBselect('SELECT MIN(clock) as clock, value '.
 						' FROM events as e '.
 						' WHERE clock > '.$clock.$sql_cond.
+							' AND object='.EVENT_OBJECT_TRIGGER.
 							' AND objectid='.$row['triggerid'].
 							' AND clock < '.$row['clock'].
 						' GROUP BY value');
