@@ -82,6 +82,7 @@
 		define('ZBX_PAGE_NO_MENU', 1);
 	
 include_once "include/page_header.php";
+echo '<script type="text/javascript" src="js/blink.js"></script>';
 	
 ?>
 <?php
@@ -344,9 +345,9 @@ include_once "include/page_header.php";
 		}
 
 		if((time(NULL)-$row["lastchange"])<TRIGGER_BLINK_PERIOD)
-			$blink = array(1=>"<blink>",	2=>"</blink>");
+			$blink = array(1=>'<a name="blink">',	2=>'</a>');
 		else
-			$blink = array(1=>"", 		2=>"");
+			$blink = array(1=>'', 		2=>'');
 		
 		$value = new CSpan($blink[1].trigger_value2str($row["value"]).$blink[2], get_trigger_value_style($row["value"]));
 
@@ -405,6 +406,7 @@ include_once "include/page_header.php";
 				));
 		unset($row,$description, $actions);
 	}
+	zbx_add_post_js('blink.init();');
 	$table->Show(false);
 
 	show_table_header(S_TOTAL.": ".$table->GetNumRows());
