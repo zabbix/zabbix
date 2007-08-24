@@ -43,7 +43,6 @@ include_once "include/page_header.php";
 	
 	check_fields($fields);
 	
-//	$show_unknown = get_profile('web.events.show_unknown',0);
 	$show_unknown = get_request('show_unknown',get_profile('web.events.show_unknown',0));
 	update_profile('web.events.show_unknown',$show_unknown);
 		
