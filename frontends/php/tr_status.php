@@ -94,6 +94,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 		"noactions"=>	array(T_ZBX_STR, O_OPT,  null,	IN('"true","false"'), null),
 		"compact"=>	array(T_ZBX_STR, O_OPT,  null,	IN('"true","false"'), null),
 		"onlytrue"=>	array(T_ZBX_STR, O_OPT,  null,	IN('"true","false"'), null),
+		"show_unknown"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	null),
 		"select"=>	array(T_ZBX_STR, O_OPT,  null,	IN('"true","false"'), null),
 		"txt_select"=>	array(T_ZBX_STR, O_OPT,  null,	null, null),
 		"fullscreen"=>	array(T_ZBX_STR, O_OPT,  null,	null, null),
@@ -102,9 +103,11 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 
 	check_fields($fields);
 
-	$_REQUEST["onlytrue"] = get_request("onlytrue", get_profile("web.tr_status.onlytrue", 'true'));
-	$_REQUEST["noactions"] = get_request("noactions", get_profile("web.tr_status.noactions", 'true'));
-	$_REQUEST["compact"] = get_request("compact", get_profile("web.tr_status.compact", 'true'));
+	$_REQUEST["onlytrue"]		=	get_request("onlytrue", get_profile("web.tr_status.onlytrue", 'true'));
+	$_REQUEST["noactions"]		=	get_request("noactions", get_profile("web.tr_status.noactions", 'true'));
+	$_REQUEST["compact"]		=	get_request("compact", get_profile("web.tr_status.compact", 'true'));
+	$_REQUEST['show_unknown']	=	get_request('show_unknown',get_profile('web.tr_status.show_unknown',0));
+
 
 	validate_group_with_host(PERM_READ_ONLY,array("allow_all_hosts","always_select_first_host","monitored_hosts","with_monitored_items"),
 		"web.tr_status.groupid","web.tr_status.hostid");
@@ -112,6 +115,8 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 	update_profile("web.tr_status.onlytrue",$_REQUEST["onlytrue"]);
 	update_profile("web.tr_status.noactions",$_REQUEST["noactions"]);
 	update_profile("web.tr_status.compact",$_REQUEST["compact"]);
+	update_profile('web.tr_status.show_unknown',$_REQUEST['show_unknown']);
+	
 ?>
 <?php
 	if(isset($audio))
@@ -120,18 +125,19 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 	}
 ?>                                                                                                             
 <?php
-	$sort		= get_request('sort',		'priority');
-	$noactions	= get_request('noactions',	'true');
-	$compact	= get_request('compact',	'true');
-	$onlytrue	= get_request('onlytrue',	'true');
-	$select		= get_request('select',		'false');
-	$txt_select	= get_request('txt_select',	"");
+	$sort		 = get_request('sort',		'priority');
+	$noactions	 = get_request('noactions',	'true');
+	$compact	 = get_request('compact',	'true');
+	$onlytrue	 = get_request('onlytrue',	'true');
+	$show_unknown= get_request('show_unknown',0);
+	$select		 = get_request('select',		'false');
+	$txt_select	 = get_request('txt_select',	"");
 	if($select == 'false') $txt_select = '';
 
 ?>
 <?php
 	$r_form = new CForm();
-
+	
 	$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit()");
 	$cmbHosts = new CComboBox("hostid",$_REQUEST["hostid"],"submit()");
 
@@ -185,6 +191,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 	$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
 	$r_form->AddVar("compact",$compact);
 	$r_form->AddVar("onlytrue",$onlytrue);
+	$r_form->AddVar('show_unknown',$show_unknown);
 	$r_form->AddVar("noactions",$noactions);
 	$r_form->AddVar("select",$select);
 	$r_form->AddVar("txt_select",$txt_select);
@@ -195,8 +202,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 		new CLink(SPACE.S_STATUS_OF_TRIGGERS_BIG.SPACE.date("[H:i:s]",time()),"tr_status.php?onlytrue=$onlytrue&noactions=$noactions".
 			"&compact=$compact&sort=$sort".(!isset($_REQUEST["fullscreen"]) ? '&fullscreen=1' : '')),
 		$r_form);
-?>
-<?php
+	
 	if(!isset($_REQUEST["fullscreen"]))
 	{
 		$left_col = array();
@@ -204,20 +210,25 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 			"tr_status.php?onlytrue=".($onlytrue != 'true' ? 'true' : 'false').
 			"&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select&sort=$sort"
 			), ']'.SPACE);
+			
+		array_push($left_col, '[', new CLink($show_unknown!=1?S_SHOW_UNKNOWN:S_HIDE_UNKNOWN,
+			"tr_status.php?show_unknown=".($show_unknown!=1?'1':'0').
+			"&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&select=$select&txt_select=$txt_select&sort=$sort"
+			), ']'.SPACE);
 		
 		array_push($left_col, '[', new CLink($noactions != 'true' ? S_HIDE_ACTIONS : S_SHOW_ACTIONS,
 			"tr_status.php?noactions=".($noactions != 'true' ? 'true' : 'false').
-			"&onlytrue=$onlytrue&compact=$compact&select=$select&txt_select=$txt_select&sort=$sort"
+			"&onlytrue=$onlytrue&show_unknown=$show_unknown&compact=$compact&select=$select&txt_select=$txt_select&sort=$sort"
 			), ']'.SPACE);
 
 		array_push($left_col, '[', new CLink($compact != 'true' ? S_HIDE_DETAILS: S_SHOW_DETAILS,
 			"tr_status.php?compact=".($compact != 'true' ? 'true' : 'false').
-			"&onlytrue=$onlytrue&noactions=$noactions&select=$select&txt_select=$txt_select&sort=$sort"
+			"&onlytrue=$onlytrue&show_unknown=$show_unknown&noactions=$noactions&select=$select&txt_select=$txt_select&sort=$sort"
 			), ']'.SPACE);
 		
 		array_push($left_col, '[', new CLink($select != 'true' ? S_SELECT : S_HIDE_SELECT,
 			"tr_status.php?select=".($select != 'true' ? 'true' : 'false').
-			"&onlytrue=$onlytrue&noactions=$noactions&compact=$compact&txt_select=$txt_select&sort=$sort"
+			"&onlytrue=$onlytrue&show_unknown=$show_unknown&noactions=$noactions&compact=$compact&txt_select=$txt_select&sort=$sort"
 			), ']');
 			
 		if($select=='true')
@@ -296,21 +307,23 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 		case "description":	$sort="order by t.description";				break;
 		case "priority":	$sort="order by t.priority desc, t.description";	break;
 		case "lastchange":	$sort="order by t.lastchange desc, t.priority";		break;
-		default:		$sort="order by t.priority desc, t.description";
+		default:			$sort="order by t.priority desc, t.description";
 	}
 
-	$cond="";
-	if($_REQUEST["hostid"] > 0)	$cond=" and h.hostid=".$_REQUEST["hostid"]." ";
+	$cond=($_REQUEST['hostid'] > 0)?' AND h.hostid='.$_REQUEST['hostid'].' ':'';
 
-	if($onlytrue=='true')		$cond .= ' and ((t.value=1) OR (('.time().' - lastchange)<'.TRIGGER_BLINK_PERIOD.')) ';
+	$cond .=($onlytrue=='true')?' AND ((t.value=1) OR (('.time().' - lastchange)<'.TRIGGER_BLINK_PERIOD.')) ':'';
+	
+	$cond.=($show_unknown == 0)?' AND t.value<>2 ':'';
 
-	$result = DBselect("select distinct t.triggerid,t.status,t.description,t.expression,t.priority,".
-		" t.lastchange,t.comments,t.url,t.value,h.host from triggers t,hosts h,items i,functions f".
-		" where f.itemid=i.itemid and h.hostid=i.hostid and t.triggerid=f.triggerid and t.status=".TRIGGER_STATUS_ENABLED.
-		" and i.status=".ITEM_STATUS_ACTIVE.
-		' and '.DBin_node('t.triggerid').
-		" and h.hostid not in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT).") ". 
-		" and h.status=".HOST_STATUS_MONITORED." $cond $sort");
+	$result = DBselect('SELECT DISTINCT t.triggerid,t.status,t.description, '.
+							' t.expression,t.priority,t.lastchange,t.comments,t.url,t.value,h.host '.
+					' FROM triggers t,hosts h,items i,functions f '.
+					' WHERE f.itemid=i.itemid AND h.hostid=i.hostid '.
+						' AND t.triggerid=f.triggerid AND t.status='.TRIGGER_STATUS_ENABLED.
+						' AND i.status='.ITEM_STATUS_ACTIVE.' AND '.DBin_node('t.triggerid').
+						' AND h.hostid not in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT).') '. 
+						' AND h.status='.HOST_STATUS_MONITORED.' '.$cond.' '.$sort);
 
 	while($row=DBfetch($result))
 	{
