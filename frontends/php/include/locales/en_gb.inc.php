@@ -474,7 +474,7 @@
 	'S_COMPARE'=>				'Compare',
 
 //	Footer
-	'S_ZABBIX_VER'=>			'ZABBIX 1.4.2',
+	'S_ZABBIX_VER'=>			'ZABBIX 1.4.3',
 	'S_COPYRIGHT_BY'=>			'Copyright 2001-2007 by ',
 	'S_CONNECTED_AS'=>			'Connected as',
 	'S_SIA_ZABBIX'=>			'SIA Zabbix',
@@ -1025,9 +1025,9 @@
 
 	'S_STYLE'=>				'Style',
 	'S_VERTICAL'=>				'Vertical',
-	'S_HORISONTAL'=>			'Horisontal',
+	'S_HORISONTAL'=>			'Horizontal',
 
-	'S_HORISONTAL_ALIGN'=>			'Horisontal align',
+	'S_HORISONTAL_ALIGN'=>			'Horizontal align',
 	'S_LEFT'=>				'Left',
 	'S_CENTER'=>				'Center',
 	'S_RIGHT'=>				'Right',
