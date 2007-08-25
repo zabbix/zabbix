@@ -1027,9 +1027,9 @@
 
 	'S_STYLE'=>				'Style',
 	'S_VERTICAL'=>				'Vertical',
-	'S_HORISONTAL'=>			'Horisontal',
+	'S_HORISONTAL'=>			'Horizontal',
 
-	'S_HORISONTAL_ALIGN'=>			'Horisontal align',
+	'S_HORISONTAL_ALIGN'=>			'Horizontal align',
 	'S_LEFT'=>				'Left',
 	'S_CENTER'=>				'Center',
 	'S_RIGHT'=>				'Right',

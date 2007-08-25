@@ -297,7 +297,7 @@ INSERT INTO `hosts_groups` VALUES (12,10024,1);
 --
 
 
-insert into help_items values (3,'icmpping','Checks if server accessible by ICMP ping	0 - ICMP ping fails 1 - ICMP ping successful	One of zabbix_server processes performs ICMP pings once per PingerFrequency seconds.');
+insert into help_items values (3,'icmpping','Checks if server is accessible by ICMP ping	0 - ICMP ping fails 1 - ICMP ping successful	One of zabbix_server processes performs ICMP pings once per PingerFrequency seconds.');
 insert into help_items values (3,'icmppingsec','Return ICMP ping response time	Number of seconds Example: 0.02');
 insert into help_items values (3,'ftp&lt;,port&gt;','Checks if FTP server is running and accepting connections	0 - FTP server is down 1 - FTP server is running');
 insert into help_items values (3,'http&lt;,port&gt;','Checks if HTTP (WEB) server is running and accepting connections	0 - HTTP server is down 1 - HTTP server is running');
@@ -324,11 +324,11 @@ insert into help_items values (5,'zabbix[queue]','Number of items in the queue')
 insert into help_items values (5,'zabbix[trends]','Number of values stored in table TRENDS');
 insert into help_items values (5,'zabbix[triggers]','Number of triggers in ZABBIX database');
 
-insert into help_items values (8,'grpfunc(&lt;Group&gt;,&lt;Key&gt;,&lt;func&gt;,&lt;param&gt;)','Aggregate checks does not require any agent running on a host being monitored. ZABBIX server collects aggregate information by doing direct database queries. See ZABBIX Manual.');
+insert into help_items values (8,'grpfunc(&lt;Group&gt;,&lt;Key&gt;,&lt;func&gt;,&lt;param&gt;)','Aggregate checks do not require any agent running on a host being monitored. ZABBIX server collects aggregate information by doing direct database queries. See ZABBIX Manual.');
 
 insert into help_items values(0,'agent.ping','Check the agent usability. Always return 1. Can be used as a TCP ping.');
 insert into help_items values(0,'agent.version','Version of zabbix_agent(d) running on monitored host. String value. Example of returned value: 1.1');
-insert into help_items values(0,'kernel.maxfiles','Maximum number of opened file supported by OS.');
+insert into help_items values(0,'kernel.maxfiles','Maximum number of opened files supported by OS.');
 insert into help_items values(0,'kernel.maxproc','Maximum number of processes supported by OS.');
 insert into help_items values(0,'net.if.collisions[if]','Out-of-window collision. Collisions count.');
 insert into help_items values(0,'net.if.in[if &lt;,mode&gt;]','Network interfice input statistic. Integer value. If mode is missing bytes is used.');
