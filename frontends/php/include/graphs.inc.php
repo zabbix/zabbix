@@ -206,9 +206,9 @@
 
 		foreach($gitems as $gitem)
 		{
-			if ( !($db_item = DBfetch(DBselect('select new.itemid from items new, items dest '.
+			if ( !($db_item = DBfetch(DBselect('select src.itemid from items src, items dest '.
 					       ' where dest.itemid='.$gitem['itemid'].
-					       ' and new.key_=dest.key_ and new.hostid='.$dest_hostid))) )
+					       ' and src.key_=dest.key_ and src.hostid='.$dest_hostid))) )
 			{
 
 				$item = get_item_by_itemid($gitem['itemid']);
