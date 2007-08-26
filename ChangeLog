@@ -1,5 +1,6 @@
 Changes for 1.4.3:
 
+ - [ZBX-11] fixed Free BSD 4.x 64 bit-related issues (Alexei)
  - [ZBX-10] added Russian translation. Thanks to Hiddenman. (Alexei)
  - fixed PostgreSQL error in synchronization of graphs (Alexei)
  - minor grammar fixes (Alexei)

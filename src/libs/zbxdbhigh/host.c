@@ -890,9 +890,9 @@ static void	__zbx_free_gitems(
 		ZBX_GRAPH_ITEMS **gitems
 	)
 {
-	if ( !*gitems )	return;
-
 	int i = 0;
+
+	if ( !*gitems )	return;
 
 	for ( i=0; (*gitems)[i].itemid != 0; i++ )
 		zbx_free((*gitems)[i].color);
