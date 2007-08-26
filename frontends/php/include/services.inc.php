@@ -363,7 +363,7 @@
 		)
 	{
 			/* calculate period FROM '-1 week' to know period name for  $period_start */
-			for($curr = ($period_start - (7*24*36000)); $curr<=$period_end; $curr += 6*3600)
+			for($curr = ($period_start - (7*24*3600)); $curr<=$period_end; $curr += 6*3600)
 			{
 				$curr_date = getdate($curr);
 				$from_date = getdate($ts_from);
