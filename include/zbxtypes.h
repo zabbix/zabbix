@@ -59,7 +59,11 @@
 #		define ZBX_FS_UI64 "%lu"
 #		define ZBX_OFFSET 10000000000000000UL
 #	else /* __WORDSIZE == 64 */
-#		define ZBX_FS_UI64 "%llu"
+#		ifdef HAVE_LONG_LONG_QU
+#			define ZBX_FS_UI64 "%qu"
+#		else
+#			define ZBX_FS_UI64 "%llu"
+#		endif
 #		define ZBX_OFFSET 10000000000000000ULL
 #	endif /* __WORDSIZE == 64 */
 
