@@ -1,5 +1,6 @@
 Changes for 1.4.3:
 
+ - [ZBX-10] added Russian translation. Thanks to Hiddenman. (Alexei)
  - fixed PostgreSQL error in synchronization of graphs (Alexei)
  - minor grammar fixes (Alexei)
  - fixed compilation of ZABBIX agent under Mac OS/X (Alexei)
