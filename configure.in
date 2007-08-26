@@ -86,6 +86,26 @@ AC_DEFINE(HAVE_SEMUN, 1 ,[Define to 1 if union 'semun' exist.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
+dnl Check for %ql format (FreeBSD 4.x)
+dnl FreeBSD 4.x, it does not support %llu
+AC_MSG_CHECKING(for long long format)
+AC_RUN_IFELSE(
+[
+#include <sys/types.h>
+int main()
+{
+        uint64_t i;
+
+        sscanf("200000000010020" ,"%qu" ,&i);
+
+        if(i == 200000000010020) return 0;
+        else    return -1;
+}
+],
+AC_DEFINE(HAVE_LONG_LONG_QU, 1 ,[Define to 1 if format '%qu' exists.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
 dnl Check for socklen_t
 AC_MSG_CHECKING(for socklen_t)
 AC_TRY_COMPILE([
@@ -430,10 +450,11 @@ dnl Check for __VA_ARGS__
 AC_MSG_CHECKING(for __VA_ARGS__)
 AC_TRY_COMPILE(
 [
+#define ZBX_CONST_STRING(str)   str
 int test(const char *fmt, ...) { return 0; }
 ],
 [
-#define TEST(fmt, ...) test(""fmt, ##__VA_ARGS__)
+#define TEST(fmt, ...) test(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
 TEST("%s","test");
 TEST("test");
 ],
