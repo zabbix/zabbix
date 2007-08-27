@@ -39,7 +39,7 @@
 			$this->tableclass = 'formtable';
 
 			if( null == $method ){
-				$method = 'get';
+				$method = 'post';
 			}
 
 			if( null == $form_variable ){
