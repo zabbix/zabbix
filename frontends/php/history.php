@@ -402,7 +402,8 @@ include_once "include/page_header.php";
 					);
 
 				$row["value"] = trim($row["value"],"\r\n");
-				array_push($new_row,htmlspecialchars($row["value"]));
+//				array_push($new_row,htmlspecialchars($row["value"]));
+				array_push($new_row,htmlspecialchars(encode_log($row["value"])));
 
 				if(!isset($_REQUEST["plaintext"]))
 				{

@@ -4,6 +4,7 @@ Changes for 1.4.j:
 
 Changes for 1.4.3:
 
+ - support of encoding of log files to displayed encoding (Alexei)
  - [ZBX-12] fixed calculations in ZABBIX availability report (Alexei)
  - [ZBX-11] fixed Free BSD 4.x 64 bit-related issues (Alexei)
  - [ZBX-10] added Russian translation. Thanks to Hiddenman. (Alexei)
