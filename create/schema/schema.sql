@@ -614,7 +614,7 @@ INDEX		|1		|name
 
 TABLE|triggers|triggerid|ZBX_SYNC
 FIELD		|triggerid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|expression	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|expression	|t_varchar(1023)|''	|NOT NULL	|ZBX_SYNC
 FIELD		|description	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC

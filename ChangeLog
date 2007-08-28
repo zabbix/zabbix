@@ -1,3 +1,7 @@
+Changes for 1.4.j:
+
+ - increased size of triggers.expression to 1023 (Alexei)
+
 Changes for 1.4.3:
 
  - [ZBX-12] fixed calculations in ZABBIX availability report (Alexei)
