@@ -74,6 +74,9 @@ include_once "include/page_header.php";
 		" or (h.status=".HOST_STATUS_MONITORED." and h.available=".HOST_AVAILABLE_FALSE." and h.disable_until<=$now)) ".
 		" and i.hostid=h.hostid and i.nextcheck<$now and i.key_ not in ('status','icmpping','icmppingsec','zabbix[log]') ".
 		" and h.hostid in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,get_current_nodeid()).")".
+//		" and h.hostid in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,$ZBX_LOCALNODEID).")".
+//		" and ".DBin_node('h.hostid', $ZBX_LOCALNODEID).
+		" and ".DBin_node('h.hostid', get_current_nodeid()).
 		" order by i.nextcheck,h.host,i.description,i.key_");
 
 	$table = new CTableInfo(S_THE_QUEUE_IS_EMPTY);
