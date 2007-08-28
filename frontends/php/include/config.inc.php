@@ -1802,6 +1802,17 @@ require_once('include/classes/ctree.inc.php');
 	{
 		return ($timestamp==0)?S_NEVER:date($format,$timestamp);
 	}
-		
 
+	function	encode_log($data)
+	{
+		if(defined('ZBX_LOG_ENCODING_DEFAULT') && function_exists('mb_convert_encoding'))
+		{
+			$new=mb_convert_encoding($data, S_HTML_CHARSET, ZBX_LOG_ENCODING_DEFAULT);
+		}
+		else
+		{
+			$new = $data;
+		}
+		return $new;
+	}
 ?>
