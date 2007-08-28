@@ -80,26 +80,6 @@ include_once "include/page_header.php";
 	$r_form = new CForm();
 	$r_form->AddOption('name','events_menu');
 
-	if($source == EVENT_SOURCE_TRIGGERS){
-		$chkbox = new CCheckBox('sh_unknown',
-							(($show_unknown == 0)?'no':'yes'),
-							'create_var("events_menu", "show_unknown", '.(($show_unknown == 0)?'1':'0').', true)'
-							);
-		$r_form->AddItem(array(S_SHOW_UNKNOWN, SPACE, $chkbox, SPACE, SPACE));
-	}
-	
-	if($allow_discovery)
-	{
-		$cmbSource = new CComboBox('source', $source, 'submit()');
-		$cmbSource->AddItem(EVENT_SOURCE_TRIGGERS, S_TRIGGER);
-		$cmbSource->AddItem(EVENT_SOURCE_DISCOVERY, S_DISCOVERY);
-		$r_form->AddItem(array(S_SOURCE, SPACE, $cmbSource));
-	}
-	show_table_header(S_HISTORY_OF_EVENTS_BIG,$r_form);
-	echo BR;
-
-	$r_form = new CForm();
-
 	if($source == EVENT_SOURCE_DISCOVERY)
 	{
 		$table = get_history_of_discovery_events($_REQUEST["start"], PAGE_SIZE);
@@ -166,6 +146,18 @@ include_once "include/page_header.php";
 		$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
 	}
 	
+	if($allow_discovery)
+	{
+		$cmbSource = new CComboBox('source', $source, 'submit()');
+		$cmbSource->AddItem(EVENT_SOURCE_TRIGGERS, S_TRIGGER);
+		$cmbSource->AddItem(EVENT_SOURCE_DISCOVERY, S_DISCOVERY);
+		$r_form->AddItem(array(S_SOURCE, SPACE, $cmbSource));
+	}
+	show_table_header(S_HISTORY_OF_EVENTS_BIG.SPACE.date("[H:i:s]",time()),$r_form);
+//	echo BR;
+
+	$r_form = new CForm();
+
 	$r_form->AddVar('start',$_REQUEST['start']);
 
 	$btnPrev = new CButton("prev","<< Prev ".PAGE_SIZE);
@@ -178,7 +170,20 @@ include_once "include/page_header.php";
 		$btnNext->SetEnabled('no');
 	$r_form->AddItem($btnNext);
 	
-	show_table_header(S_EVENTS_BIG,$r_form);
+	$l_form = new CForm();
+	
+	if($source == EVENT_SOURCE_TRIGGERS){
+		$link = array('[', 
+			new CLink($show_unknown!=1?S_SHOW_UNKNOWN:S_HIDE_UNKNOWN,
+				"events.php?show_unknown=".($show_unknown!=1?'1':'0')
+			), 
+			']'.SPACE
+		);
+		
+		$l_form->AddItem(array($link, SPACE, SPACE));
+	}
+	
+	show_table_header($l_form,$r_form);
 
         $table->Show();
 ?>
