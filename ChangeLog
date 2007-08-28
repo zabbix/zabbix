@@ -1,5 +1,6 @@
 Changes for 1.4.3:
 
+ - [ZBX-24] fixed Queue to show status of current node only (Alexei)
  - support of encoding of log files to displayed encoding (Alexei)
  - [ZBX-12] fixed calculations in ZABBIX availability report (Alexei)
  - [ZBX-11] fixed Free BSD 4.x 64 bit-related issues (Alexei)
