@@ -1,5 +1,6 @@
 Changes for 1.4.3:
 
+ - fixed SQL statement in SLA processing. Thanks to Aron Ujvari. (Alexei)
  - updated Spanish translation. Thanks to Ignacio Martin. (Alexei) 
  - [ZBX-24] fixed Queue to show status of current node only (Alexei)
  - support of encoding of log files to displayed encoding (Alexei)
