@@ -155,7 +155,7 @@ include_once "include/page_header.php";
 		$result = false;
 		
 		if($trigger_data = DBfetch(
-			DBselect("select distinct t.description,t.expression,h.host".
+			DBselect("select distinct t.triggerid,t.description,t.expression,h.host".
 				" from triggers t left join functions f on t.triggerid=f.triggerid ".
 				" left join items i on f.itemid=i.itemid ".
 				" left join hosts h on i.hostid=h.hostid ".
