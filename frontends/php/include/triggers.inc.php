@@ -1102,6 +1102,16 @@
 
 			if(is_null($row["host"])) $row["host"] = "{HOSTNAME}";
 			$description = str_replace("{HOSTNAME}", $row["host"],$description);
+
+			if(strstr($description,"{ITEM.LASTVALUE}"))
+			{
+				$row2=DBfetch(DBselect('select i.lastvalue from items i, triggers t, functions f '.
+					' where i.itemid=f.itemid and f.triggerid=t.triggerid and '.
+					' t.triggerid='.$row["triggerid"]));
+
+				if(is_null($row2["lastvalue"])) $row["lastvalue"] = "{ITEM.LASTVALUE}";
+				$description = str_replace("{ITEM.LASTVALUE}", $row2["lastvalue"],$description);
+			}
 		}
 		else
 		{
@@ -1114,7 +1124,7 @@
 	{
 		return expand_trigger_description_by_data(
 			DBfetch(
-				DBselect("select distinct t.description,h.host,t.expression".
+				DBselect("select distinct t.description,h.host,t.expression,t.triggerid ".
 					" from triggers t left join functions f on t.triggerid=f.triggerid ".
 					" left join items i on f.itemid=i.itemid ".
 					" left join hosts h on i.hostid=h.hostid ".

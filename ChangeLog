@@ -4,6 +4,7 @@ Changes for 1.4.j:
 
 Changes for 1.4.3:
 
+ - support of macro {ITEM.LASTVALUE} for notifications and trigger names (Alexei)
  - fixed SQL statement in SLA processing. Thanks to Aron Ujvari. (Alexei)
  - updated Spanish translation. Thanks to Ignacio Martin. (Alexei) 
  - [ZBX-24] fixed Queue to show status of current node only (Alexei)
