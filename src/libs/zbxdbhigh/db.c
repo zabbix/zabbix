@@ -1127,7 +1127,9 @@ int	DBadd_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp
 	DBescape_string(value,value_esc,MAX_STRING_LEN);
 	DBescape_string(source,source_esc,MAX_STRING_LEN);
 	id = DBget_maxid("history_log", "id");
-	DBexecute("insert into history_log (id,clock,itemid,timestamp,value,source,severity) values (" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",%d,'%s','%s',%d)",
+/* Japan specific cchange */
+/*	DBexecute("insert into history_log (id,clock,itemid,timestamp,value,source,severity) values (" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",%d,'%s','%s',%d)",*/
+	DBexecute("insert into history_log (id,clock,itemid,timestamp,value,source,severity) values (" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",%d,cast(_sjis'%s' as char character set utf8),'%s',%d)",
 		id,
 		clock,
 		itemid,

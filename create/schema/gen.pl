@@ -47,7 +47,7 @@ local $output;
 	"t_char"	=>	"char",
 	"t_image"	=>	"longblob",
 	"t_history_log"	=>	"text",
-	"t_history_text"=>	"text",
+	"t_history_text"=>	"text character set utf8",
 	"t_blob"	=>	"blob",
 	"t_item_param"	=>	"text"
 );

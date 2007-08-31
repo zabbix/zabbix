@@ -432,9 +432,6 @@
 	define('ZBX_MAX_PERIOD', 12*31*24*3600);
 	define('ZBX_PERIOD_DEFAULT', ZBX_MIN_PERIOD);
 
-/* Define if your logs are in non-standard format */
-/*	define('ZBX_LOG_ENCODING_DEFAULT', 'Shift_JIS');*/
-
 	global $_GET, $_POST, $_COOKIE, $_REQUEST;
 
 /* Support for PHP5. PHP5 does not have $HTTP_..._VARS */
