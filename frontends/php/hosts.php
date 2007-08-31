@@ -143,7 +143,7 @@ include_once "include/page_header.php";
 			$host=($row["useip"]==1)?$row["ip"]:$row["dns"];
 			$f=popen(ZBX_AGENT_CONTROL_SCRIPT." $host ".$_REQUEST["command"],'r');
 			$data=fread($f,1024);
-			show_messages(TRUE, "Command was executed. $data", S_FAIL);
+			show_messages(TRUE, S_COMMAND_WAS_EXECUTED, S_FAIL);
 		}
 		
 	}

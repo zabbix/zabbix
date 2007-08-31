@@ -636,6 +636,7 @@
 	'S_AVAILABILITY'=>			'Availability',
 	'S_AVAILABLE'=>				'Available',
 	'S_NOT_AVAILABLE'=>			'Not available',
+	'S_COMMAND_WAS_EXECUTED'=>		'Command was executed',
 
 //	Host profiles
 	'S_HOST_PROFILE'=>			'Host profile',
