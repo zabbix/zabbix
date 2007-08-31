@@ -432,6 +432,8 @@
 	define('ZBX_MAX_PERIOD', 12*31*24*3600);
 	define('ZBX_PERIOD_DEFAULT', ZBX_MIN_PERIOD);
 
+	define('ZBX_AGENT_CONTROL_SCRIPT', "/home/zabbix/agent.sh");
+
 	global $_GET, $_POST, $_COOKIE, $_REQUEST;
 
 /* Support for PHP5. PHP5 does not have $HTTP_..._VARS */

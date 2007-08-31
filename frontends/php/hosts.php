@@ -63,6 +63,8 @@ include_once "include/page_header.php";
 		"hosts"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 		"groups"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 		"applications"=>array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
+/* agent control */
+		"command"=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({hostid})'),
 /* host */
 		"hostid"=>	array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,		'{config}==0&&{form}=="update"'),
 		"host"=>	array(T_ZBX_STR, O_OPT,	NULL,   NOT_EMPTY,	'({config}==0||{config}==3)&&isset({save})'),
@@ -131,7 +133,24 @@ include_once "include/page_header.php";
 ?>
 <?php
 
+	echo $_REQUEST["hostid"],"<br>";
+	echo $_REQUEST["command"],"<br>";
+
 /************ ACTIONS FOR HOSTS ****************/
+/* AGENT CONTROL */
+	if(isset($_REQUEST["command"]) && isset($_REQUEST["hostid"]) && defined('ZBX_AGENT_CONTROL_SCRIPT'))
+	{
+		$row=DBfetch(DBselect('select dns,ip,useip from hosts where hostid='.$_REQUEST["hostid"]));
+
+		if($row)
+		{
+			$host=($row["useip"]==1)?$row["ip"]:$row["dns"];
+			$f=popen(ZBX_AGENT_CONTROL_SCRIPT." $host ".$_REQUEST["command"],'r');
+			$data=fread($f,1024);
+			show_messages(TRUE, "Command was executed. $data", S_FAIL);
+		}
+		
+	}
 /* UNLINK HOST */
 	if(($_REQUEST["config"]==0 || $_REQUEST["config"]==3) && (isset($_REQUEST["unlink"]) || isset($_REQUEST["unlink_and_clear"])))
 	{
@@ -728,6 +747,15 @@ include_once "include/page_header.php";
 					$popup_menu_actions[] = array_merge(array(S_DELETE_FROM_GROUP, null, null, 
 						array('outer' => 'pum_o_submenu', 'inner'=>array('pum_i_submenu'))), $delete_from);
 				}
+
+				$popup_menu_actions = array_merge(
+					$popup_menu_actions,
+					array(
+					array("Agent control", null, null, array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))),
+					array("Start", 'hosts.php?command=start&hostid='.$row['hostid'], array('tw'=>'_blank')),
+					array("Stop", 'hosts.php?command=stop&hostid='.$row['hostid'], array('tw'=>'_blank')),
+					array("Restart", 'hosts.php?command=restart&hostid='.$row['hostid'], array('tw'=>'_blank'))
+				));
 
 				$mnuActions = new CPUMenu($popup_menu_actions);
 
