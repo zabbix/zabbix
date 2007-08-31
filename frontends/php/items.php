@@ -748,11 +748,6 @@ include_once "include/page_header.php";
 
 		$from_tables['i'] = 'items i'; /* NOTE: must be added as last element to use left join */
 
-/*		SDI('select distinct th.host as template_host,th.hostid as template_hostid, h.host, i.* '.
-			' from '.implode(',', $from_tables).
-			' left join items ti on i.templateid=ti.itemid left join hosts th on ti.hostid=th.hostid '.
-			' where '.implode(' and ', $where_case).' order by h.host,i.description,i.key_,i.itemid');
-*/
 		$db_items = DBselect('select distinct th.host as template_host,th.hostid as template_hostid, h.host, i.* '.
 			' from '.implode(',', $from_tables).
 			' left join items ti on i.templateid=ti.itemid left join hosts th on ti.hostid=th.hostid '.
@@ -803,7 +798,7 @@ include_once "include/page_header.php";
 					' WHERE f.itemid='.$db_item["itemid"].
 					  ' AND i.itemid=f.itemid AND t.triggerid = f.triggerid '.
 					  ' AND i.value_type=2 AND i.key_ LIKE ("log[%") '.
-					' GROUP BY t.triggerid;');
+					' GROUP BY t.triggerid');
 
 				$triggers_flag = false;
 				$triggers=",Array('Edit Trigger',null,null,{'outer' : 'pum_o_submenu','inner' : ['pum_i_submenu']}\n";

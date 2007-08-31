@@ -1202,6 +1202,7 @@
 	'S_LAST_CHANGE'=>			'Last change',
 	'S_COMMENTS'=>				'Comments',
 	'S_ACKNOWLEDGED'=>			'Acknowledged',
+	'S_NOT_ACKNOWLEDGED'=>			'Not Acknowledged',
 	'S_ACK'=>				'Ack',
 	'S_NEVER'=>				'Never',
 

@@ -312,7 +312,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 
 	$cond=($_REQUEST['hostid'] > 0)?' AND h.hostid='.$_REQUEST['hostid'].' ':'';
 
-	$cond .=($onlytrue=='true')?' AND ((t.value=1) OR (('.time().' - lastchange)<'.TRIGGER_BLINK_PERIOD.')) ':'';
+	$cond .=($onlytrue=='true')?' AND ((t.value=1) OR (('.time().' - t.lastchange)<'.TRIGGER_BLINK_PERIOD.')) ':'';
 	
 	$cond.=($show_unknown == 0)?' AND t.value<>2 ':'';
 
@@ -350,11 +350,11 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 
 		if($compact != 'true')
 		{
-			$description = array(
-				$description, BR, 
-				"<FONT COLOR=\"#000000\" SIZE=-2>", 
-				explode_exp($row["expression"],1), 
-				"</FONT>");
+			$font = new CTag('font','yes');
+			$font->AddOption('color','#000');
+			$font->AddOption('size','-2');
+			$font->AddItem(explode_exp($row["expression"],1));
+			$description = array($description, BR, $font);
 		}
 
 		if((time(NULL)-$row["lastchange"])<TRIGGER_BLINK_PERIOD)
@@ -375,48 +375,62 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 				);
 		}
 
-		$ack = "-";
-		if($row["value"] == 1)
-		{
-			if($event = get_last_event_by_triggerid($row["triggerid"]))
-			{
-				if($event["acknowledged"] == 1)
-				{
-					$acks_cnt = DBfetch(DBselect("select count(*) as cnt from acknowledges where eventid=".$event["eventid"]));
-					$ack=array(
-						new CSpan(S_YES,"off"),
-						SPACE."(".$acks_cnt['cnt'].SPACE,
-						new CLink(S_SHOW,
-							"acknow.php?eventid=".$event["eventid"],"action"),
-						")"
-						);
-				}
-				else
-				{
-					$ack=array(
-						new CSpan(S_NO,"on"),
-						SPACE."(",
-						new CLink(S_ACK,
-							"acknow.php?eventid=".$event["eventid"],"action"),
-						")"
-						);
-				}
+		$ack = '-';
+		$head_event = 0;
+		
+		if(TRIGGER_SHOW_UNDEFINED_ACK ||($row['value'] != 2)){
+			if($event = get_last_event_by_triggerid($row['triggerid'])){
+					$ack=($event['acknowledged'] != 1)?(new CLink(S_NOT_ACKNOWLEDGED,'acknow.php?eventid='.$event['eventid'],'on')):('-');
 			}
 		}
-
-		$table->AddRow(array(
-				get_node_name_by_elid($row['triggerid']),
-				$_REQUEST['hostid'] > 0 ? null : $row['host'],
-				$description,
-				$value,
-				new CCol(
-					get_severity_description($row["priority"]),
-					get_severity_style($row["priority"])),
-				new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row["lastchange"]),"tr_events.php?triggerid=".$row["triggerid"],"action"),
-				$actions,
-				new CCol($ack,"center"),
-				new CLink(($row["comments"] == "") ? S_ADD : S_SHOW,"tr_comments.php?triggerid=".$row["triggerid"],"action")
-				));
+		
+		if($event["acknowledged"] != 1){
+			$table->AddRow(array(
+					get_node_name_by_elid($row['triggerid']),
+					$_REQUEST['hostid'] > 0 ? null : $row['host'],
+					$description,
+					$value,
+					new CCol(
+						get_severity_description($row["priority"]),
+						get_severity_style($row["priority"])),
+					new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row["lastchange"]),"tr_events.php?triggerid=".$row["triggerid"],"action"),
+					$actions,
+					new CCol($ack,"center"),
+					new CLink(($row["comments"] == "") ? S_ADD : S_SHOW,"tr_comments.php?triggerid=".$row["triggerid"],"action")
+					));
+			$head_event = 1;
+		}		
+		
+		if(TRIGGER_FALSE_TIME_ACK > 0){
+			$res_notack = get_notacknowledged($row['triggerid']);
+			while($row_notack=DBfetch($res_notack)){
+				if($event['eventid'] == $row_notack['eventid']) continue;
+				
+				if($head_event == 1){
+					$font = new CTag('font','yes');
+					$font->AddOption('color','#808080');
+					$font->AddItem('&nbsp;-&nbsp;'.$description);
+					$description = $font->ToString();
+				}
+				$head_event++;
+				$value = new CSpan(trigger_value2str($row_notack['value']), get_trigger_value_style($row_notack['value']));
+				$ack= new CLink(S_NOT_ACKNOWLEDGED,'acknow.php?eventid='.$row_notack['eventid'],'on');
+							
+				$table->AddRow(array(
+						get_node_name_by_elid($row['triggerid']),
+						$_REQUEST['hostid'] > 0 ? null : $row['host'],
+						$description,
+						$value,
+						new CCol(
+							get_severity_description($row["priority"]),
+							get_severity_style($row["priority"])),
+						new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_notack['clock']),"tr_events.php?triggerid=".$row["triggerid"],"action"),
+						$actions,
+						new CCol($ack,"center"),
+						new CLink(($row["comments"] == "") ? S_ADD : S_SHOW,"tr_comments.php?triggerid=".$row["triggerid"],"action")
+						));
+			}
+		}
 		unset($row,$description, $actions);
 	}
 	zbx_add_post_js('blink.init();');

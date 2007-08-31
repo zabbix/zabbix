@@ -2011,4 +2011,15 @@
 		}
 	return $expression;
 	}
+	
+	function get_notacknowledged($triggerid){
+		$cond=(TRIGGER_SHOW_UNDEFINED_ACK)?' OR (e.value=2 AND (('.time().'-e.clock)<'.TRIGGER_FALSE_TIME_ACK.'))':'';
+		
+		$sql = 'SELECT DISTINCT e.eventid, e.value, e.clock '.
+				' FROM events e '.
+				' WHERE e.object=0 AND e.objectid='.$triggerid.
+					'  AND (e.acknowledged=0 AND (e.value=1 OR (e.value=0 AND (('.time().'-e.clock)<'.TRIGGER_FALSE_TIME_ACK.'))'.$cond.'))'.
+				'ORDER BY e.eventid DESC';
+	return DBselect($sql);
+	}
 ?>

@@ -797,6 +797,6 @@
 	"S_GENERAL"=>				"一般設定",
 	"S_AUDIT"=>				"変更履歴",
 	"S_LOGIN"=>				"ログイン",
-	"S_LATEST_DATA"=>			"最新データ",
+	"S_LATEST_DATA"=>			"最新データ"
 	);
 ?>
