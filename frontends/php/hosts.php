@@ -132,10 +132,6 @@ include_once "include/page_header.php";
 	update_profile("web.hosts.config",$_REQUEST["config"]);
 ?>
 <?php
-
-	echo $_REQUEST["hostid"],"<br>";
-	echo $_REQUEST["command"],"<br>";
-
 /************ ACTIONS FOR HOSTS ****************/
 /* AGENT CONTROL */
 	if(isset($_REQUEST["command"]) && isset($_REQUEST["hostid"]) && defined('ZBX_AGENT_CONTROL_SCRIPT'))
