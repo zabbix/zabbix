@@ -847,14 +847,14 @@ zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
 			var_len = strlen(MVAR_PROFILE_DEVICETYPE);
 
 			result = DBselect("select distinct p.devicetype from triggers t, functions f,items i, hosts h, hosts_profiles p"
-				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
+				" where t.triggerid=" ZBX_FS_UI64 " and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
 				event->objectid);
 
 			row = DBfetch(result);
 
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
-				zabbix_log( LOG_LEVEL_DEBUG, "No PROFILE.DEVECETYPE in substitute_simple_macros. Triggerid [%d]",
+				zabbix_log( LOG_LEVEL_DEBUG, "No PROFILE.DEVECETYPE in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
 					event->objectid);
 
 				replace_to = zbx_dsprintf(replace_to, "%s",
@@ -873,14 +873,14 @@ zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
 			var_len = strlen(MVAR_PROFILE_NAME);
 
 			result = DBselect("select distinct p.name from triggers t, functions f,items i, hosts h, hosts_profiles p"
-				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
+				" where t.triggerid=" ZBX_FS_UI64 " and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
 				event->objectid);
 
 			row = DBfetch(result);
 
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
-				zabbix_log( LOG_LEVEL_DEBUG, "No PROFILE.NAME in substitute_simple_macros. Triggerid [%d]",
+				zabbix_log( LOG_LEVEL_DEBUG, "No PROFILE.NAME in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
 					event->objectid);
 
 				replace_to = zbx_dsprintf(replace_to, "%s",
@@ -899,14 +899,14 @@ zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
 			var_len = strlen(MVAR_PROFILE_OS);
 
 			result = DBselect("select distinct p.os from triggers t, functions f,items i, hosts h, hosts_profiles p"
-				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
+				" where t.triggerid=" ZBX_FS_UI64 " and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
 				event->objectid);
 
 			row = DBfetch(result);
 
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
-				zabbix_log( LOG_LEVEL_DEBUG, "No PROFILE.OS in substitute_simple_macros. Triggerid [%d]",
+				zabbix_log( LOG_LEVEL_DEBUG, "No PROFILE.OS in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
 					event->objectid);
 
 				replace_to = zbx_dsprintf(replace_to, "%s",
@@ -925,14 +925,14 @@ zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
 			var_len = strlen(MVAR_PROFILE_SERIALNO);
 
 			result = DBselect("select distinct p.serialno from triggers t, functions f,items i, hosts h, hosts_profiles p"
-				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
+				" where t.triggerid=" ZBX_FS_UI64 " and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
 				event->objectid);
 
 			row = DBfetch(result);
 
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
-				zabbix_log( LOG_LEVEL_DEBUG, "No PROFILE.SERIALNO in substitute_simple_macros. Triggerid [%d]",
+				zabbix_log( LOG_LEVEL_DEBUG, "No PROFILE.SERIALNO in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
 					event->objectid);
 
 				replace_to = zbx_dsprintf(replace_to, "%s",
@@ -951,14 +951,14 @@ zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
 			var_len = strlen(MVAR_PROFILE_TAG);
 
 			result = DBselect("select distinct p.tag from triggers t, functions f,items i, hosts h, hosts_profiles p"
-				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
+				" where t.triggerid=" ZBX_FS_UI64 " and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
 				event->objectid);
 
 			row = DBfetch(result);
 
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
-				zabbix_log( LOG_LEVEL_DEBUG, "No PROFILE.TAG in substitute_simple_macros. Triggerid [%d]",
+				zabbix_log( LOG_LEVEL_DEBUG, "No PROFILE.TAG in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
 					event->objectid);
 
 				replace_to = zbx_dsprintf(replace_to, "%s",
@@ -977,14 +977,14 @@ zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
 			var_len = strlen(MVAR_PROFILE_MACADDRESS);
 
 			result = DBselect("select distinct p.macaddress from triggers t, functions f,items i, hosts h, hosts_profiles p"
-				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
+				" where t.triggerid=" ZBX_FS_UI64 " and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
 				event->objectid);
 
 			row = DBfetch(result);
 
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
-				zabbix_log( LOG_LEVEL_DEBUG, "No PROFILE.MACADDRESS in substitute_simple_macros. Triggerid [%d]",
+				zabbix_log( LOG_LEVEL_DEBUG, "No PROFILE.MACADDRESS in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
 					event->objectid);
 
 				replace_to = zbx_dsprintf(replace_to, "%s",
@@ -1003,14 +1003,14 @@ zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
 			var_len = strlen(MVAR_PROFILE_HARDWARE);
 
 			result = DBselect("select distinct p.hardware from triggers t, functions f,items i, hosts h, hosts_profiles p"
-				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
+				" where t.triggerid=" ZBX_FS_UI64 " and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
 				event->objectid);
 
 			row = DBfetch(result);
 
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
-				zabbix_log( LOG_LEVEL_DEBUG, "No PROFILE.HARDWARE in substitute_simple_macros. Triggerid [%d]", 
+				zabbix_log( LOG_LEVEL_DEBUG, "No PROFILE.HARDWARE in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]", 
 					event->objectid);
 
 				replace_to = zbx_dsprintf(replace_to, "%s",
@@ -1029,14 +1029,14 @@ zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
 			var_len = strlen(MVAR_PROFILE_SOFTWARE);
 
 			result = DBselect("select distinct p.software from triggers t, functions f,items i, hosts h, hosts_profiles p"
-				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
+				" where t.triggerid=" ZBX_FS_UI64 " and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
 				event->objectid);
 
 			row = DBfetch(result);
 
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
-				zabbix_log( LOG_LEVEL_DEBUG, "No PROFILE.SOFTWARE in substitute_simple_macros. Triggerid [%d]",
+				zabbix_log( LOG_LEVEL_DEBUG, "No PROFILE.SOFTWARE in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
 					event->objectid);
 
 				replace_to = zbx_dsprintf(replace_to, "%s",
@@ -1055,14 +1055,14 @@ zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
 			var_len = strlen(MVAR_PROFILE_CONTACT);
 
 			result = DBselect("select distinct p.contact from triggers t, functions f,items i, hosts h, hosts_profiles p"
-				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
+				" where t.triggerid=" ZBX_FS_UI64 " and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
 				event->objectid);
 
 			row = DBfetch(result);
 
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
-				zabbix_log( LOG_LEVEL_DEBUG, "No PROFILE.CONTACT in substitute_simple_macros. Triggerid [%d]",
+				zabbix_log( LOG_LEVEL_DEBUG, "No PROFILE.CONTACT in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
 					event->objectid);
 
 				replace_to = zbx_dsprintf(replace_to, "%s",
@@ -1081,14 +1081,14 @@ zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
 			var_len = strlen(MVAR_PROFILE_LOCATION);
 
 			result = DBselect("select distinct p.location from triggers t, functions f,items i, hosts h, hosts_profiles p"
-				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
+				" where t.triggerid=" ZBX_FS_UI64 " and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
 				event->objectid);
 
 			row = DBfetch(result);
 
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
-				zabbix_log( LOG_LEVEL_DEBUG, "No PROFILE.LOCATION in substitute_simple_macros. Triggerid [%d]",
+				zabbix_log( LOG_LEVEL_DEBUG, "No PROFILE.LOCATION in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
 					event->objectid);
 
 				replace_to = zbx_dsprintf(replace_to, "%s",
@@ -1107,14 +1107,14 @@ zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
 			var_len = strlen(MVAR_PROFILE_NOTES);
 
 			result = DBselect("select distinct p.notes from triggers t, functions f,items i, hosts h, hosts_profiles p"
-				" where t.triggerid=%d and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
+				" where t.triggerid=" ZBX_FS_UI64 " and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid and p.hostid=h.hostid", 
 				event->objectid);
 
 			row = DBfetch(result);
 
 			if(!row || DBis_null(row[0])==SUCCEED)
 			{
-				zabbix_log( LOG_LEVEL_DEBUG, "No PROFILE.NOTES in substitute_simple_macros. Triggerid [%d]",
+				zabbix_log( LOG_LEVEL_DEBUG, "No PROFILE.NOTES in substitute_simple_macros. Triggerid [" ZBX_FS_UI64 "]",
 					event->objectid);
 
 				replace_to = zbx_dsprintf(replace_to, "%s",
