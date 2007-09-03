@@ -947,9 +947,11 @@ static int evaluate_NODATA(char *value,DB_ITEM	*item,int parameter)
 	int		now;
 	int		res = SUCCEED;
 
+	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_NODATA()");
+
 	now = time(NULL);
 
-	if(item->lastclock + parameter > now)
+	if((CONFIG_SERVER_STARTUP_TIME + parameter > now) || (item->lastclock + parameter > now))
 	{
 		strcpy(value,"0");
 	}
@@ -957,6 +959,8 @@ static int evaluate_NODATA(char *value,DB_ITEM	*item,int parameter)
 	{
 		strcpy(value,"1");
 	}
+
+	zabbix_log( LOG_LEVEL_DEBUG, "End of evaluate_NODATA()");
 
 	return res;
 }
