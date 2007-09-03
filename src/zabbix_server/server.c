@@ -17,7 +17,7 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#define ZABBIX_TEST
+/*#define ZABBIX_TEST*/
 
 #include "common.h"
 
