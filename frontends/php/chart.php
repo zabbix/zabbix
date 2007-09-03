@@ -57,7 +57,7 @@ include_once "include/page_header.php";
 		access_deny();
 	}
 
-	$graph = new Graph();
+	$graph = new Chart();
 	
 	if(isset($_REQUEST["period"]))		$graph->SetPeriod($_REQUEST["period"]);
 	if(isset($_REQUEST["from"]))		$graph->SetFrom($_REQUEST["from"]);
