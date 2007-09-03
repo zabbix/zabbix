@@ -161,6 +161,9 @@ int	CONFIG_ENABLE_LOG		= 1;
 /* From table config */
 int	CONFIG_REFRESH_UNSUPPORTED	= 0;
 
+/* Zabbix server sturtup time */
+int     CONFIG_SERVER_STARTUP_TIME      = 0;
+
 /******************************************************************************
  *                                                                            *
  * Function: init_config                                                      *
@@ -218,6 +221,8 @@ void	init_config(void)
 		{"NodeNoHistory",&CONFIG_NODE_NOHISTORY,0,TYPE_INT,PARM_OPT,0,1},
 		{0}
 	};
+
+	CONFIG_SERVER_STARTUP_TIME = time(NULL);
 
 
 	parse_cfg_file(CONFIG_FILE,cfg);
