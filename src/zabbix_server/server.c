@@ -17,7 +17,7 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-/*#define ZABBIX_TEST*/
+#define ZABBIX_TEST
 
 #include "common.h"
 
@@ -513,9 +513,9 @@ void test_calc_timestamp()
 #define ZBX_TEST_TIME struct zbx_test_time_t
 ZBX_TEST_TIME
 {
-        char	*line;
-        char	*format;
-        char	*expected;
+	char	*line;
+	char	*format;
+	char	*expected;
 };
 
 ZBX_TEST_TIME expressions[]=
@@ -639,6 +639,51 @@ void test_trigger_description()
 }
 */
 
+void test_ip_in_list()
+{
+#define ZBX_TEST_IP struct zbx_test_ip_t
+ZBX_TEST_IP
+{
+	char	*list;
+	char	*ip;
+	int	result;
+};
+
+ZBX_TEST_IP expressions[]=
+{
+		{"10.0.0.1-255",					"10.0.0.30",		SUCCEED},
+		{"192.168.0.1-255,192.168.1.1-255",			"192.168.2.201",	FAIL},
+		{"172.16.0.0,172.16.0.1,172.16.0.2-200,172.16.0.201",	"172.16.0.201",		SUCCEED},
+		{"172.31.255.1-255",					"172.31.255.43",	SUCCEED},
+		{"86.57.15.94",						"86.57.15.95",		FAIL},
+		{"86.57.15.94",						"86.57.15.94",		SUCCEED},
+		{NULL}
+};
+	int	i;
+	int	result;
+	char    list[MAX_STRING_LEN];
+
+	printf("-= Test ip_in_list =-\n");
+
+	for(i=0;expressions[i].list!=NULL;i++)
+	{
+		strcpy(list, expressions[i].list);
+		result = ip_in_list(list, expressions[i].ip);
+			
+		printf("list [%s] ip [%s] expected [%d] got [%d]\n",
+			expressions[i].list,
+			expressions[i].ip,
+			expressions[i].result,
+			result);
+		if(expressions[i].result!=result)
+		{
+			printf("FAILED!\n");
+			exit(-1);
+		}
+	}
+	printf("Passed OK\n");
+}
+
 void test()
 {
 
@@ -666,6 +711,7 @@ void test()
 /*	test_email(); */
 /*	test_extract_numbers(); */
 /*	test_trigger_description(); */
+	test_ip_in_list();
 
 	printf("\n-= Test completed =-\n");
 }

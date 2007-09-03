@@ -6,6 +6,7 @@ Changes for 1.4.j:
 
 Changes for 1.4.3:
 
+ - [ZBX-32] fixed incorrect processing of IP ranges in ip_in_list (Sasha)
  - [ZBX-35] fixed processing of PROFILE related macros (Alexei)
  - support of macro {ITEM.LASTVALUE} for notifications and trigger names (Alexei)
  - fixed SQL statement in SLA processing. Thanks to Aron Ujvari. (Alexei)
