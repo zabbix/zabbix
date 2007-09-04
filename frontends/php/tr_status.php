@@ -23,6 +23,7 @@
 	require_once "include/hosts.inc.php";
 	require_once "include/acknow.inc.php";
 	require_once "include/triggers.inc.php";
+	require_once "include/events.inc.php";
 
 	$page["file"] = "tr_status.php";
 	$page["title"] = "S_STATUS_OF_TRIGGERS";
@@ -133,7 +134,8 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 	$select		 = get_request('select',		'false');
 	$txt_select	 = get_request('txt_select',	"");
 	if($select == 'false') $txt_select = '';
-
+	
+	$unknown=($show_unknown == 0)?TRIGGER_VALUE_UNKNOWN:'';
 ?>
 <?php
 	$r_form = new CForm();
@@ -312,10 +314,8 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 
 	$cond=($_REQUEST['hostid'] > 0)?' AND h.hostid='.$_REQUEST['hostid'].' ':'';
 
-	$cond .=($onlytrue=='true')?' AND ((t.value=1) OR (('.time().' - t.lastchange)<'.TRIGGER_BLINK_PERIOD.')) ':'';
+	$cond.=($onlytrue=='true')?' AND ((t.value=1) OR (('.time().' - t.lastchange)<'.TRIGGER_BLINK_PERIOD.')) ':'';
 	
-	$cond.=($show_unknown == 0)?' AND t.value<>2 ':'';
-
 	$result = DBselect('SELECT DISTINCT t.triggerid,t.status,t.description, '.
 							' t.expression,t.priority,t.lastchange,t.comments,t.url,t.value,h.host '.
 					' FROM triggers t,hosts h,items i,functions f '.
@@ -378,13 +378,12 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 		$ack = '-';
 		$head_event = 0;
 		
-		if(TRIGGER_SHOW_UNDEFINED_ACK ||($row['value'] != 2)){
-			if($event = get_last_event_by_triggerid($row['triggerid'])){
-					$ack=($event['acknowledged'] != 1)?(new CLink(S_NOT_ACKNOWLEDGED,'acknow.php?eventid='.$event['eventid'],'on')):('-');
-			}
+		$event = get_last_event_by_triggerid($row['triggerid']);
+		if(TRIGGER_SHOW_UNDEFINED_ACK || ($row['value'] != TRIGGER_VALUE_UNKNOWN)){
+				$ack=($event['acknowledged'] != 1)?(new CLink(S_NOT_ACKNOWLEDGED,'acknow.php?eventid='.$event['eventid'],'on')):('-');
 		}
 		
-		if($event["acknowledged"] != 1){
+		if(($event["acknowledged"] != 1) && ($unknown != $row['value'])){
 			$table->AddRow(array(
 					get_node_name_by_elid($row['triggerid']),
 					$_REQUEST['hostid'] > 0 ? null : $row['host'],
@@ -402,10 +401,16 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 		}		
 		
 		if(TRIGGER_FALSE_TIME_ACK > 0){
-			$res_notack = get_notacknowledged($row['triggerid']);
+			$res_notack = get_notacknowledged($row['triggerid'],$show_unknown);
 			while($row_notack=DBfetch($res_notack)){
 				if($event['eventid'] == $row_notack['eventid']) continue;
-				
+				if(($show_unknown == 0) && (!event_initial_time($row_notack,$show_unknown))) continue;
+
+				if($head_event < 1){
+					$value = new CSpan($blink[1].trigger_value2str($row_notack['value']).$blink[2], get_trigger_value_style($row_notack['value']));
+				} else {
+					$value = new CSpan(trigger_value2str($row_notack['value']), get_trigger_value_style($row_notack['value']));	
+				}
 				if($head_event == 1){
 					$font = new CTag('font','yes');
 					$font->AddOption('color','#808080');
@@ -413,7 +418,6 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 					$description = $font->ToString();
 				}
 				$head_event++;
-				$value = new CSpan(trigger_value2str($row_notack['value']), get_trigger_value_style($row_notack['value']));
 				$ack= new CLink(S_NOT_ACKNOWLEDGED,'acknow.php?eventid='.$row_notack['eventid'],'on');
 							
 				$table->AddRow(array(
