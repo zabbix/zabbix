@@ -64,7 +64,7 @@ include_once "include/page_header.php";
 		"groups"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 		"applications"=>array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 /* agent control */
-		"command"=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({hostid})'),
+		"command"=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	NULL),
 /* host */
 		"hostid"=>	array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,		'{config}==0&&{form}=="update"'),
 		"host"=>	array(T_ZBX_STR, O_OPT,	NULL,   NOT_EMPTY,	'({config}==0||{config}==3)&&isset({save})'),
