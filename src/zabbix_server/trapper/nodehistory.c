@@ -69,6 +69,10 @@ static int	process_record(int nodeid, char *record)
 	zbx_uint64_t	value_uint;
 	int		res = FAIL;
 
+	char    value_esc[MAX_STRING_LEN];
+
+
+
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_record [%s]",
 		record);
 
@@ -84,6 +88,12 @@ static int	process_record(int nodeid, char *record)
 		value=atof(tmp);
 
 		res =  DBadd_history(itemid, value, timestamp);
+
+		DBexecute("update items set lastvalue='" ZBX_FS_DBL "', lastclock=%d where itemid=" ZBX_FS_UI64,
+			value,
+			timestamp,
+			itemid);
+
 	}
 	else if(table == ZBX_TABLE_HISTORY_UINT)
 	{
@@ -95,6 +105,11 @@ static int	process_record(int nodeid, char *record)
 		sscanf(tmp,ZBX_FS_UI64,&value_uint);
 
 		res =  DBadd_history_uint(itemid, value_uint, timestamp);
+
+		DBexecute("update items set lastvalue='" ZBX_FS_UI64 "', lastclock=%d where itemid=" ZBX_FS_UI64,
+			value_uint,
+			timestamp,
+			itemid);
 	}
 	else if(table == ZBX_TABLE_HISTORY_STR)
 	{
@@ -105,6 +120,13 @@ static int	process_record(int nodeid, char *record)
 		zbx_get_field(record,tmp,3,ZBX_DM_DELIMITER);
 
 		res =  DBadd_history_str(itemid, tmp, timestamp);
+
+		DBescape_string(tmp,value_esc,MAX_STRING_LEN);
+
+		DBexecute("update items set lastvalue='%s', lastclock=%d where itemid=" ZBX_FS_UI64,
+			tmp,
+			timestamp,
+			itemid);
 	}
 
 	return res;
