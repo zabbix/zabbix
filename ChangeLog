@@ -1,5 +1,6 @@
 Changes for 1.4.j:
 
+ - [NTT-16] added synchronisation of last value and timestamp for DM (Alexei)
  - [NTT-6] added support of encoding parameter for log[] and eventlog[] (Alexei)
  - [NTT-7] fixed displaying of Japanese in the Latest Data (Alexei)
  - [NTT-2] fixed maintenance of hosts (Alexei)
