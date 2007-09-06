@@ -1,5 +1,6 @@
 Changes for 1.4.j:
 
+ - [NTT-7] fixed displaying of Japanese in the Latest Data (Alexei)
  - [NTT-2] fixed maintenance of hosts (Alexei)
  - added support of remote agent control (Alexei)
  - support of storage of log files in UTF8 encoding (Alexei)
