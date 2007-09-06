@@ -314,8 +314,6 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 
 	$cond=($_REQUEST['hostid'] > 0)?' AND h.hostid='.$_REQUEST['hostid'].' ':'';
 
-	$cond.=($onlytrue=='true')?' AND ((t.value=1) OR (('.time().' - t.lastchange)<'.TRIGGER_BLINK_PERIOD.')) ':'';
-	
 	$result = DBselect('SELECT DISTINCT t.triggerid,t.status,t.description, '.
 							' t.expression,t.priority,t.lastchange,t.comments,t.url,t.value,h.host '.
 					' FROM triggers t,hosts h,items i,functions f '.
@@ -329,6 +327,15 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 	{
 // Check for dependencies
 
+		if(!$eventid = first_initial_eventid($row,$show_unknown)) continue;
+	
+		$res_n = DBSelect('SELECT DISTINCT e.eventid, e.clock as lastchange, e.acknowledged, e.value '.
+							' FROM events e'.
+							' WHERE e.eventid='.$eventid.
+							' LIMIT 1');
+		$row_n = DBfetch($res_n);
+		$row = array_merge($row,$row_n);
+		
 		$deps = DBfetch(DBselect("select count(*) as cnt from trigger_depends d, triggers t ".
 			" where d.triggerid_down=".$row["triggerid"]." and d.triggerid_up=t.triggerid and t.value=1"));
 
@@ -354,7 +361,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 			$font->AddOption('color','#000');
 			$font->AddOption('size','-2');
 			$font->AddItem(explode_exp($row["expression"],1));
-			$description = array($description, BR, $font);
+			$description = array($description,BR, $font);
 		}
 
 		if((time(NULL)-$row["lastchange"])<TRIGGER_BLINK_PERIOD)
@@ -376,14 +383,15 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 		}
 
 		$ack = '-';
-		$head_event = 0;
-		
-		$event = get_last_event_by_triggerid($row['triggerid']);
+		$header_event = 0;
+				
 		if(TRIGGER_SHOW_UNDEFINED_ACK || ($row['value'] != TRIGGER_VALUE_UNKNOWN)){
-				$ack=($event['acknowledged'] != 1)?(new CLink(S_NOT_ACKNOWLEDGED,'acknow.php?eventid='.$event['eventid'],'on')):('-');
+				$ack=($row['acknowledged'] != 1)?(new CLink(S_NOT_ACKNOWLEDGED,'acknow.php?eventid='.$row['eventid'],'on')):('-');
 		}
-		
-		if(($event["acknowledged"] != 1) && ($unknown != $row['value'])){
+
+		if(($onlytrue=='true') && (($row['value'] != TRIGGER_VALUE_TRUE) && ((time() - $row['lastchange']) > TRIGGER_BLINK_PERIOD))){
+		}
+		else{
 			$table->AddRow(array(
 					get_node_name_by_elid($row['triggerid']),
 					$_REQUEST['hostid'] > 0 ? null : $row['host'],
@@ -397,29 +405,41 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 					new CCol($ack,"center"),
 					new CLink(($row["comments"] == "") ? S_ADD : S_SHOW,"tr_comments.php?triggerid=".$row["triggerid"],"action")
 					));
-			$head_event = 1;
-		}		
+			$header_event = 1;
+		}
 		
-		if(TRIGGER_FALSE_TIME_ACK > 0){
-			$res_notack = get_notacknowledged($row['triggerid'],$show_unknown);
-			while($row_notack=DBfetch($res_notack)){
-				if($event['eventid'] == $row_notack['eventid']) continue;
-				if(($show_unknown == 0) && (!event_initial_time($row_notack,$show_unknown))) continue;
+		if($compact != 'true')
+		{
+			$font = new CTag('font','yes');
+			$font->AddOption('color','#000');
+			$font->AddOption('size','-2');
+			$font->AddItem(explode_exp($row["expression"],1));
+			$description = array($description, $font);
+		}
 
-				if($head_event < 1){
-					$value = new CSpan($blink[1].trigger_value2str($row_notack['value']).$blink[2], get_trigger_value_style($row_notack['value']));
-				} else {
+		if(TRIGGER_FALSE_TIME_ACK > 0){
+
+			$res_notack = get_notacknowledged($row['triggerid'],$show_unknown,$onlytrue);
+			while($row_notack=DBfetch($res_notack)){
+				if($row['eventid'] == $row_notack['eventid']) continue;
+				if(($show_unknown == 0) && (!event_initial_time($row_notack,$show_unknown))) continue;
+				
+				if($header_event < 1){
+					$value = new CSpan($blink[1].trigger_value2str($row_notack["value"]).$blink[2], get_trigger_value_style($row_notack["value"]));
+				}
+				else{
 					$value = new CSpan(trigger_value2str($row_notack['value']), get_trigger_value_style($row_notack['value']));	
 				}
-				if($head_event == 1){
+				
+				if($header_event == 1){
 					$font = new CTag('font','yes');
 					$font->AddOption('color','#808080');
-					$font->AddItem('&nbsp;-&nbsp;'.$description);
-					$description = $font->ToString();
+					$font->AddItem(array('&nbsp;-&nbsp;',$description));
+					$description = $font->ToString();					
 				}
-				$head_event++;
+				$header_event++;
+				
 				$ack= new CLink(S_NOT_ACKNOWLEDGED,'acknow.php?eventid='.$row_notack['eventid'],'on');
-							
 				$table->AddRow(array(
 						get_node_name_by_elid($row['triggerid']),
 						$_REQUEST['hostid'] > 0 ? null : $row['host'],
@@ -435,6 +455,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 						));
 			}
 		}
+
 		unset($row,$description, $actions);
 	}
 	zbx_add_post_js('blink.init();');
