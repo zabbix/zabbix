@@ -1,5 +1,6 @@
 Changes for 1.4.3:
 
+ - [NTT-16] added synchronisation of last value and timestamp for DM (Alexei)
  - [ZBX-1] fixed wrong status of function "nodata" after server restart (Sasha)
  - [ZBX-33] fixed problem in table names in data.sql for PostgreSQL (Sasha)
  - [ZBX-32] fixed incorrect processing of IP ranges in ip_in_list (Sasha)
