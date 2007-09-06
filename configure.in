@@ -554,7 +554,6 @@ AC_ARG_ENABLE(ipv6,[  --enable-ipv6         Turn on support of IPv6],
   *) AC_MSG_ERROR([bad value ${enableval} for --enable-ipv6]) ;;
 esac],
 [ipv6=no])
-AM_CONDITIONAL(SERVER, test x$ipv6 = xyes)
 
 have_db="no"
 have_web_monitoring="no"
