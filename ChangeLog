@@ -1,3 +1,7 @@
+Changes for 1.4.ipv6:
+
+  - support of --enable-ipv6 for configure.in (Alexei)
+
 Changes for 1.4.3:
 
  - [ZBX-12] fixed calculations in ZABBIX availability report (Alexei)
