@@ -230,13 +230,14 @@ include_once "include/page_header.php";
 	{
 		global $USER_DETAILS;
 
-		if(count($nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))
+		if(!count($nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,null,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 			access_deny();
-
-		$result=DBselect('select distinct actionid from actions'.
+		
+		$query = 'select distinct actionid from actions'.
 				' where '.DBin_node('actionid',$nodes).
-				' and actionid in ('.implode(',',$_REQUEST['g_actionid']).') '
-				);
+				' and actionid in ('.implode(',',$_REQUEST['g_actionid']).') ';
+				
+		$result=DBselect($query);
 		
 		$actionids = array();
 		while($row=DBfetch($result))
@@ -255,13 +256,15 @@ include_once "include/page_header.php";
 	{
 		global $USER_DETAILS;
 
-		if(count($nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))
+		if(!count($nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,null,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 			access_deny();
 
-		$result=DBselect('select distinct actionid from actions'.
+		$query = 'select distinct actionid from actions'.
 				' where '.DBin_node('actionid',$nodes).
-				' and actionid in ('.implode(',',$_REQUEST['g_actionid']).') '
-				);
+				' and actionid in ('.implode(',',$_REQUEST['g_actionid']).') ';
+
+		$result=DBselect($query);
+
 		$actionids = array();
 		while($row=DBfetch($result))
 		{
@@ -279,7 +282,7 @@ include_once "include/page_header.php";
 	{
 		global $USER_DETAILS;
 
-		if(count($nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))
+		if(!count($nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,null,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 			access_deny();
 
 		$result=DBselect('select distinct actionid from actions'.
