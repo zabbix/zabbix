@@ -420,6 +420,8 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 {
 	int ret = SUCCEED;
 
+	char	encoding[MAX_STRING_LEN];
+
 	zabbix_log( LOG_LEVEL_DEBUG, "In add_history(key:%s,value_type:%X,type:%X)",
 		item->key,
 		item->value_type,
@@ -522,8 +524,16 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 		}
 		else if(item->value_type==ITEM_VALUE_TYPE_LOG)
 		{
+			
 			if(GET_STR_RESULT(value))
-				DBadd_history_log(item->itemid,value->str,now,item->timestamp,item->eventlog_source,item->eventlog_severity);
+			{
+				encoding[0]='\0';
+				get_key_param(item->key, 3, encoding, MAX_STRING_LEN);
+				zabbix_log(LOG_LEVEL_DEBUG, "Key: %s Encoding: [%s]",
+						item->key,
+						encoding);
+				DBadd_history_log(item->itemid,value->str,now,item->timestamp,item->eventlog_source,item->eventlog_severity, encoding);
+			}
 			DBexecute("update items set lastlogsize=%d where itemid=" ZBX_FS_UI64,
 				item->lastlogsize,
 				item->itemid);

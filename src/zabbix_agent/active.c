@@ -414,7 +414,7 @@ static int	process_active_checks(char *server, unsigned short port)
 				if(parse_command(active_metrics[i].key, NULL, 0, params, MAX_STRING_LEN) != 2)
 					break;
 				
-				if(num_param(params) > 2)
+				if(num_param(params) > 3)
 					break;
 
 				filename = params;
@@ -424,6 +424,8 @@ static int	process_active_checks(char *server, unsigned short port)
 					*pattern = '\0';
 					pattern++;
 				}
+				/* Not very nice. Has to be rewritten to use get_param */
+				if(pattern!=NULL && pattern[0]==',')	pattern[0]='\0';
 
 				s_count = 0;
 				p_count = 0;

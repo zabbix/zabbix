@@ -1116,7 +1116,7 @@ lbl_exit:
 }
 
 
-int	DBadd_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp,char *source, int severity)
+int	DBadd_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp,char *source, int severity, char *encoding)
 {
 	char		value_esc[MAX_STRING_LEN];
 	char		source_esc[MAX_STRING_LEN];
@@ -1127,9 +1127,26 @@ int	DBadd_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp
 	DBescape_string(value,value_esc,MAX_STRING_LEN);
 	DBescape_string(source,source_esc,MAX_STRING_LEN);
 	id = DBget_maxid("history_log", "id");
+
+	if(encoding!=NULL && (strcmp(encoding,"sjis")==0 || strcmp(encoding,"ujis")==0))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG,"Encoding %s", encoding);
 /* Japan specific cchange */
 /*	DBexecute("insert into history_log (id,clock,itemid,timestamp,value,source,severity) values (" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",%d,'%s','%s',%d)",*/
-	DBexecute("insert into history_log (id,clock,itemid,timestamp,value,source,severity) values (" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",%d,cast(_sjis'%s' as char character set utf8),'%s',%d)",
+	DBexecute("insert into history_log (id,clock,itemid,timestamp,value,source,severity) values (" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",%d,cast(_%s'%s' as char character set utf8),'%s',%d)",
+		id,
+		clock,
+		itemid,
+		timestamp,
+		encoding,
+		value_esc,
+		source_esc,
+		severity);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG,"No encoding %s", encoding);
+		DBexecute("insert into history_log (id,clock,itemid,timestamp,value,source,severity) values (" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",%d,'%s','%s',%d)",
 		id,
 		clock,
 		itemid,
@@ -1137,6 +1154,7 @@ int	DBadd_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp
 		value_esc,
 		source_esc,
 		severity);
+	}
 
 	return SUCCEED;
 }

@@ -1112,3 +1112,41 @@ int	get_param(const char *param, int num, char *buf, int maxlen)
 
 	return ret;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_key_param                                                    *
+ *                                                                            *
+ * Purpose: return parameter by index (num) from parameter list (param)       *
+ *                                                                            *
+ * Parameters:                                                                *
+ * 	param  - item key                                                     *
+ *      num    - requested parameter index                                    *
+ *      buf    - pointer of output buffer                                     *
+ *      maxlem - size of output buffer                                        *
+ *                                                                            *
+ * Return value:                                                              *
+ *      1 - requested parameter missed                                        *
+ *      0 - requested parameter founded (value - 'buf' can be empty string)   *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:  delimeter vor parameters is ','                                 *
+ *                                                                            *
+ ******************************************************************************/
+int	get_key_param(char *key_param, int num, char *buf, int maxlen)
+{
+	int	ret = 1;
+	char	*c1, *c2;
+
+	c1 = strchr(key_param, '[');
+	c2 = strrchr(key_param, ']');
+	if(c1!=NULL && c2!=NULL && c2>c1)
+	{
+		c2[0]='\0';
+		ret = get_param(c1+1, num, buf, maxlen);
+		c2[0]=']';
+	}
+
+	return ret;
+}
