@@ -22,7 +22,7 @@
 	class CForm extends CTag
 	{
 /* public */
-		function CForm($action=NULL, $method='get', $enctype=NULL)
+		function CForm($action=NULL, $method='post', $enctype=NULL)
 		{
 			parent::CTag("form","yes");
 			$this->SetMethod($method);
