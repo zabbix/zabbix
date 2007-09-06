@@ -303,7 +303,7 @@ include_once "include/page_header.php";
 ?>
 <?php
 	$r_form = new CForm();
-
+	$r_form->SetMethod('get');
 	$r_form->AddItem(array('[', 
 		new CLink($showdisabled ? S_HIDE_DISABLED_TRIGGERS : S_SHOW_DISABLED_TRIGGERS,
 			'triggers.php?showdisabled='.($showdisabled ? 0 : 1),'action'),
@@ -367,6 +367,7 @@ include_once "include/page_header.php";
 /* TABLE */
 		$form = new CForm('triggers.php');
 		$form->SetName('triggers');
+		$form->SetMethod('post');
 		$form->AddVar('hostid',$_REQUEST["hostid"]);
 
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
