@@ -70,12 +70,29 @@
 	{
 		return 'ereg(\'^([0-9a-zA-Z\_\.[.-.]\$ ]+)$\',{'.$var.'})&&';
 	}
-
-	function	validate_ip($str,&$arr)
+	function	validate_ipv4($str,&$arr)
 	{
 		if( !ereg('^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$', $str, $arr) )	return false;
 		for($i=1; $i<=4; $i++)	if( !is_numeric($arr[$i]) || $arr[$i] > 255 || $arr[$i] < 0 )	return false;
 		return true;
+	}
+	function	validate_ipv6($str,&$arr)
+	{
+		if( !ereg('^(([0-9a-fA-F]{1,4}:){7})([0-9a-fA-F]{1,4})$', $str, $arr) )	return false;
+		return true;
+	}
+
+	function	validate_ip($str,&$arr)
+	{
+		if(!defined('ZBX_HAVE_IPV6'))
+		{
+			return validate_ipv4($str,&$arr);
+		}
+		else
+		{
+			return validate_ipv6($str,&$arr);
+		}
+		return false;
 	}
 
 	function	validate_ip_range($str)

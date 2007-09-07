@@ -4014,7 +4014,14 @@ include_once 'include/discovery.inc.php';
 		else
 		{
 			$frmHost->AddRow(S_DNS_NAME,new CTextBox("dns",$dns,"40"));
-			$frmHost->AddRow(S_IP_ADDRESS,new CTextBox("ip",$ip,"15"));
+			if(defined('ZBX_HAVE_IPV6'))
+			{
+				$frmHost->AddRow(S_IP_ADDRESS,new CTextBox("ip",$ip,"39"));
+			}
+			else
+			{
+				$frmHost->AddRow(S_IP_ADDRESS,new CTextBox("ip",$ip,"15"));
+			}
 
 			$cmbConnectBy = new CComboBox('useip', $useip);
 			$cmbConnectBy->AddItem(0, S_DNS_NAME);
