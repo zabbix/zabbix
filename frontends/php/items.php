@@ -793,11 +793,11 @@ include_once "include/page_header.php";
 			$applications = $show_applications ? implode(', ', get_applications_by_itemid($db_item["itemid"], 'name')) : null;
 			
 			if(preg_match("/^log\[.*\].*$/",$db_item["key_"])){
-				$res = DBselect('SELECT DISTINCT t.description, t.triggerid'.
+				$res = DBselect('SELECT MAX(t.description) as description, t.triggerid'.
 					' FROM functions as f, triggers as t, items as i '.
 					' WHERE f.itemid='.$db_item["itemid"].
 					  ' AND i.itemid=f.itemid AND t.triggerid = f.triggerid '.
-					  ' AND i.value_type=2 AND i.key_ LIKE ("log[%") '.
+					  ' AND i.value_type=2 AND i.key_ LIKE \'log[%\' '.
 					' GROUP BY t.triggerid');
 
 				$triggers_flag = false;
