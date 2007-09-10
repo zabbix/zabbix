@@ -1238,6 +1238,8 @@ ul
 	font-family: sans-serif, Tahoma, Verdana, Geneva, Arial, Helvetica;
 	font-size: 12px;
 	text-decoration: none;
+	overflow:hidden;
+	text-overflow:ellipsis;
 	background-color: #ECECFF;
 	border: black 1px solid;
 	margin: 0px;
@@ -1247,8 +1249,10 @@ ul
 	background-color: #FDFDFF;
 }
 .pum_i_item {
+	white-space:nowrap;
+	-o-text-overflow:ellipsis;
+	overflow:hidden;
 	margin: 3px 0px 0px 8px;
-
 }
 
 /* menu menu item with submenu */

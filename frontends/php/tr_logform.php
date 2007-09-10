@@ -78,9 +78,9 @@ if(isset($_REQUEST['save_trigger'])){
 	
 	$expression = construct_expression($_REQUEST['itemid'],get_request('expressions',array()));
 	if($expression){
-		//SDI($expression);
+
 		if(!check_right_on_trigger_by_expression(PERM_READ_WRITE, $expression)) access_deny();
-	
+
 		$now=time();
 		if(isset($_REQUEST["status"]))	{ $status=1; }
 		else{ $status=0; }
@@ -319,7 +319,7 @@ if(isset($_REQUEST['sform'])){
 		$status = get_request('status',0);
 	}
 	
-	$frmTRLog->AddRow(S_DESCRIPTION,new CTextBox('description',$description));
+	$frmTRLog->AddRow(S_DESCRIPTION,new CTextBox('description',$description,80));
 
 	$item = '';
 	$db_items = DBselect('SELECT DISTINCT * FROM items WHERE itemid='.$itemid);
@@ -332,7 +332,7 @@ if(isset($_REQUEST['sform'])){
 		$item .= item_description($db_item['description'],$db_item['key_']);
 	}
 	
-	$ctb = new CTextBox('item',$item,50);
+	$ctb = new CTextBox('item',$item,80);
 	$ctb->AddOption('id','item');
 	$ctb->AddOption('disabled','disabled');
 	
@@ -373,6 +373,7 @@ if(isset($_REQUEST['sform'])){
 	$maxid=0;
 
 	if(isset($_REQUEST['triggerid']) && !isset($_REQUEST['save_trigger']) && !validate_expression(construct_expression($itemid,$expressions)) && !isset($_REQUEST['form_refresh'])){
+		unset($expressions);
 		$expressions[0]['value'] = $expr_incase;
 		$expressions[0]['type'] = 0;
 	}
