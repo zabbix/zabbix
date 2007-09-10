@@ -251,9 +251,8 @@ int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char
  ******************************************************************************/
 int	ip_in_list(char *list, char *ip)
 {
-	char	tmp_ip[MAX_STRING_LEN];
 	char	c = '\0';
-	int	i1,i2,i3,i4,i5;
+	int	i1,i2,i3,i4,i5,j1,j2,j3,j4;
 	int	ret = FAIL;
 	char	*start = NULL, *end = NULL;
 
@@ -262,33 +261,30 @@ int	ip_in_list(char *list, char *ip)
 		list,
 		ip);
 
+	if(sscanf(ip,"%d.%d.%d.%d",&j1,&j2,&j3,&j4) != 4)
+		return FAIL;
+
 	for(start = list; start[0] != '\0';)
 	{
 		end=strchr(start, ',');
 
 		if(end != NULL)
-		{	
+		{
 			c=end[0];
 			end[0]='\0';
 		}
 
 		if(sscanf(start,"%d.%d.%d.%d-%d",&i1,&i2,&i3,&i4,&i5) == 5)
 		{
-			zbx_snprintf(tmp_ip,sizeof(tmp_ip)-1,"%d.%d.%d.%d",i1,i2,i3,i4);
-			if(strcmp(ip,tmp_ip)>=0)
+			if(i1==j1 && i2==j2 && i3==j3 && j4>=i4 && j4<=i5)
 			{
-				zbx_snprintf(tmp_ip,sizeof(tmp_ip)-1,"%d.%d.%d.%d",i1,i2,i3,i5);
-				if(strcmp(ip,tmp_ip)<=0)
-				{
-					ret = SUCCEED;
-					break;
-				}
+				ret = SUCCEED;
+				break;
 			}
 		}
 		else if(sscanf(start,"%d.%d.%d.%d",&i1,&i2,&i3,&i4) == 4)
 		{
-			zbx_snprintf(tmp_ip,sizeof(tmp_ip)-1,"%d.%d.%d.%d",i1,i2,i3,i4);
-			if(strcmp(ip,tmp_ip) == 0)
+			if(i1==j1 && i2==j2 && i3==j3 && j4==i4)
 			{
 				ret = SUCCEED;
 				break;

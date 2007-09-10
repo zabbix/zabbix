@@ -8,6 +8,7 @@ Changes for 1.4.ipv6:
 
 Changes for 1.4.3:
 
+ - [ZBX-32] fixed incorrect processing of IP ranges in ip_in_list (Sasha)
  - [ZBX-12] fixed calculations in ZABBIX availability report (Alexei)
  - [ZBX-11] fixed Free BSD 4.x 64 bit-related issues (Alexei)
  - [ZBX-10] added Russian translation. Thanks to Hiddenman. (Alexei)
