@@ -16,9 +16,9 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-
+/*
 #define ZABBIX_TEST
-
+*/
 #include "common.h"
 
 #include "cfg.h"
@@ -711,12 +711,21 @@ ZBX_TEST_IP
 
 ZBX_TEST_IP expressions[]=
 {
-		{"10.0.0.1-255",					"10.0.0.30",		SUCCEED},
+		{"10.0.0.1-29",						"10.0.0.30",		FAIL},
 		{"192.168.0.1-255,192.168.1.1-255",			"192.168.2.201",	FAIL},
-		{"172.16.0.0,172.16.0.1,172.16.0.2-200,172.16.0.201",	"172.16.0.201",		SUCCEED},
-		{"172.31.255.1-255",					"172.31.255.43",	SUCCEED},
+		{"172.16.0.0,172.16.0.1,172.16.0.2,172.16.0.44-250",	"172.16.0.201",		SUCCEED},
+		{"172.31.255.43-55",					"172.31.255.47",	SUCCEED},
 		{"86.57.15.94",						"86.57.15.95",		FAIL},
 		{"86.57.15.94",						"86.57.15.94",		SUCCEED},
+#if defined(HAVE_IPV6)
+		{"2312:333::32-64,12fc::1-fffc",			"12fc::ffff",		FAIL},
+		{"2312:333::32-64,12fc::1-fffc",			"2312:333::44",		SUCCEED},
+		{"::a:b:a,::a:b:b,::a:b:c-e",				"::a:b:f",		FAIL},
+		{"192.168.200.1,::a:b:a,::a:b:b,::a:b:c-e,10.0.0.2",	"::a:b:d",		SUCCEED},
+		{"192.168.200.1,::a:b:a,::a:b:b,::a:b:c-e,10.0.0.2",	"10.0.0.2",		SUCCEED},
+		{"192.168.200.1,::a:b:a,::a:b:b,::a:b:c-,10.0.0.2",	"::a:b:d",		FAIL},
+		{"a:b:c::-f",						"a:b:c::3",		SUCCEED},
+#endif /*HAVE_IPV6*/
 		{NULL}
 };
 	int	i;
@@ -730,11 +739,11 @@ ZBX_TEST_IP expressions[]=
 		strcpy(list, expressions[i].list);
 		result = ip_in_list(list, expressions[i].ip);
 			
-		printf("list [%s] ip [%s] expected [%d] got [%d]\n",
+		printf("list [%50s] ip [%20s] expected [%7s] got [%7s]\n",
 			expressions[i].list,
 			expressions[i].ip,
-			expressions[i].result,
-			result);
+			expressions[i].result == SUCCEED ? "SUCCEED" : "FAIL",
+			result == SUCCEED ? "SUCCEED" : "FAIL");
 		if(expressions[i].result!=result)
 		{
 			printf("FAILED!\n");
@@ -771,7 +780,7 @@ void test()
 /*	test_email(); */
 /*	test_extract_numbers(); */
 /*	test_trigger_description(); */
-	test_zbx_tcp_connect( );
+/*	test_zbx_tcp_connect( );*/
 	test_ip_in_list();
 
 	printf("\n-= Test completed =-\n");
