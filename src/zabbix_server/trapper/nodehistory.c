@@ -124,7 +124,7 @@ static int	process_record(int nodeid, char *record)
 		DBescape_string(tmp,value_esc,MAX_STRING_LEN);
 
 		DBexecute("update items set lastvalue='%s', lastclock=%d where itemid=" ZBX_FS_UI64,
-			tmp,
+			value_esc,
 			timestamp,
 			itemid);
 	}
