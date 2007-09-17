@@ -32,6 +32,7 @@ typedef enum {
 	typedef int ZBX_SOCKET;
 #endif /* SOCKET || _WINDOWS */
 
+
 typedef struct sockaddr_in ZBX_SOCKADDR;
 
 typedef enum
@@ -59,7 +60,7 @@ int	zbx_tcp_error(void);
 struct hostent	*zbx_gethost(const char *hostname);
 
 #if !defined(_WINDOWS)
-struct hostent  *zbx_gethost_by_ip(const char *ip);
+void zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen);
 #endif /* WINDOWS */
 
 void	zbx_tcp_init(zbx_sock_t *s, ZBX_SOCKET o);

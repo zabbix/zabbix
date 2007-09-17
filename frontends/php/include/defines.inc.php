@@ -437,6 +437,8 @@
 /* Define if your logs are in non-standard format */
 /*	define('ZBX_LOG_ENCODING_DEFAULT', 'Shift_JIS');*/
 
+	define('ZBX_HAVE_IPV6', 1);
+
 	global $_GET, $_POST, $_COOKIE, $_REQUEST;
 
 /* Support for PHP5. PHP5 does not have $HTTP_..._VARS */
