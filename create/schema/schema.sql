@@ -53,7 +53,7 @@ FIELD		|ports		|t_varchar(255)	|'0'	|NOT NULL	|ZBX_SYNC
 TABLE|dhosts|dhostid|ZBX_SYNC
 FIELD		|dhostid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|druleid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|ip		|t_varchar(15)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|ip		|t_varchar(39)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastup		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|lastdown	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
@@ -122,7 +122,7 @@ TABLE|nodes|nodeid|
 FIELD		|nodeid		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|name		|t_varchar(64)	|'0'	|NOT NULL	|0
 FIELD		|timezone	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|ip		|t_varchar(15)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|ip		|t_varchar(39)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|port		|t_integer	|'10051'|NOT NULL	|ZBX_SYNC
 FIELD		|slave_history	|t_integer	|'30'	|NOT NULL	|ZBX_SYNC
 FIELD		|slave_trends	|t_integer	|'365'	|NOT NULL	|ZBX_SYNC
@@ -381,7 +381,7 @@ FIELD		|hostid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|host		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|dns		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|useip		|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
-FIELD		|ip		|t_varchar(15)	|'127.0.0.1'|NOT NULL	|ZBX_SYNC
+FIELD		|ip		|t_varchar(39)	|'127.0.0.1'|NOT NULL	|ZBX_SYNC
 FIELD		|port		|t_integer	|'10050'|NOT NULL	|ZBX_SYNC
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|disable_until	|t_integer	|'0'	|NOT NULL	|0
