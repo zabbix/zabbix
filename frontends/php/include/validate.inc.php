@@ -70,15 +70,41 @@
 	{
 		return 'ereg(\'^([0-9a-zA-Z\_\.[.-.]\$ ]+)$\',{'.$var.'})&&';
 	}
-
-	function	validate_ip($str,&$arr)
+	function	validate_ipv4($str,&$arr)
 	{
 		if( !ereg('^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})$', $str, $arr) )	return false;
 		for($i=1; $i<=4; $i++)	if( !is_numeric($arr[$i]) || $arr[$i] > 255 || $arr[$i] < 0 )	return false;
 		return true;
 	}
+	function	validate_ipv6($str,&$arr)
+	{
+		$pattern1 = '([A-Fa-f0-9]{1,4}:){7}[A-Fa-f0-9]{1,4}';
+		$pattern2 = ':(:[A-Fa-f0-9]{1,4}){1,7}';
+		$pattern3 = '[A-Fa-f0-9]{1,4}::([A-Fa-f0-9]{1,4}:){0,5}[A-Fa-f0-9]{1,4}';
+		$pattern4 = '([A-Fa-f0-9]{1,4}:){2}:([A-Fa-f0-9]{1,4}:){0,4}[A-Fa-f0-9]{1,4}';
+		$pattern5 = '([A-Fa-f0-9]{1,4}:){3}:([A-Fa-f0-9]{1,4}:){0,3}[A-Fa-f0-9]{1,4}';
+		$pattern6 = '([A-Fa-f0-9]{1,4}:){4}:([A-Fa-f0-9]{1,4}:){0,2}[A-Fa-f0-9]{1,4}';
+		$pattern7 = '([A-Fa-f0-9]{1,4}:){5}:([A-Fa-f0-9]{1,4}:){0,1}[A-Fa-f0-9]{1,4}';
+		$pattern8 = '([A-Fa-f0-9]{1,4}:){6}:[A-Fa-f0-9]{1,4}';
 
-	function	validate_ip_range($str)
+		$full = "/^($pattern1)$|^($pattern2)$|^($pattern3)$|^($pattern4)$|^($pattern5)$|^($pattern6)$|^($pattern7)$|^($pattern8)$/";
+
+		if( !ereg($full, $str, $arr) )	return false;
+		return true;
+	}
+
+	function	validate_ip($str,&$arr)
+	{
+		if(validate_ipv4($str,&$arr))
+			return true;
+		if(defined('ZBX_HAVE_IPV6'))
+		{
+			return validate_ipv6($str,&$arr);
+		}
+		return false;
+	}
+
+/*	function	validate_ip_range($str)
 	{
 		foreach(explode(',',$str) as $ip_range)
 		{
@@ -100,7 +126,64 @@
 		}
 		return true;
 	}
+*/
+	function	validate_ip_range($str)
+	{
+		foreach(explode(',',$str) as $ip_range)
+		{
+			$parts = explode('-', $ip_range);
+			$parts_count = count($parts);
+			if($parts_count > 2) return false;
 
+			if(validate_ipv4($parts[0], $arr))
+			{
+				$ip_parts = explode('.', $parts[0]);
+
+				if( $parts_count == 2 )
+				{
+					if( !ereg('^[0-9]{1,3}$', $parts[1]) ) return false;
+
+					sscanf($ip_parts[3], "%d", $from_value);
+					sscanf($parts[1], "%d", $to_value);
+					if($to_value > 255 || $from_value > $to_value) return false;
+				}
+			}
+			else if( defined('ZBX_HAVE_IPV6') && validate_ipv6($parts[0], $arr) )
+			{
+				$ip_parts = explode(':', $parts[0]);
+				$ip_parts_count = count($ip_parts);
+
+				if( $parts_count == 2 )
+				{
+					if( !ereg('^[A-Fa-f0-9]{1,4}$', $parts[1]) ) return false;
+
+					sscanf($ip_parts[$ip_parts_count - 1], "%x", $from_value);
+					sscanf($parts[1], "%x", $to_value);
+					if($from_value > $to_value) return false;
+				}
+			}
+			else
+			{
+				return false;
+			}
+
+		}
+		return true;
+	}
+
+/*	function	validate_ip_range($str)
+	{
+		if(defined('ZBX_HAVE_IPV6'))
+		{
+			return validate_ipv4_ipv6_range($str);
+		}
+		else
+		{
+			return validate_ipv4_range($str);
+		}
+		return false;
+	}
+*/
 	function	validate_port_list($str)
 	{
 		foreach(explode(',',$str) as $port_range)

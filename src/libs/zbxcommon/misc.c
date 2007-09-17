@@ -233,6 +233,203 @@ int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char
 	return i;
 }
 
+#if defined(HAVE_IPV6)
+/******************************************************************************
+ *                                                                            *
+ * Function: expand_ipv6                                                      *
+ *                                                                            *
+ * Purpose: convert short ipv6 addresses to expanded type                     *
+ *                                                                            *
+ * Parameters: ip - IPv6 IPs [12fc::2]                                        *
+ *             buf - result value [12fc:0000:0000:0000:0000:0000:0000:0002]   *
+ *                                                                            *
+ * Return value: FAIL - invlid IP address, SUCCEED - conversion OK            *
+ *                                                                            *
+ * Author: Alksander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	expand_ipv6(const char *ip, char *str, size_t str_len )
+{
+	unsigned int	i[8]; /* x:x:x:x:x:x:x:x */
+	char		buf[5], *ptr;
+	int		c, dc, pos = 0, j, len, ip_len, ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In expand_ipv6(ip:%s)", ip);
+
+	c = 0; /* colons count */
+	for(ptr = strchr(ip, ':'); ptr != NULL; ptr = strchr(ptr + 1, ':'))
+	{
+		c ++;
+	}
+
+	if(c < 2 || c > 7)
+	{
+		goto out;
+	}
+
+	ip_len = strlen(ip);
+	if((ip[0] == ':' && ip[1] != ':') || (ip[ip_len - 1] == ':' && ip[ip_len - 2] != ':'))
+	{
+		goto out;
+	}
+
+	memset(i, 0x00, sizeof(i));
+
+	dc  = 0; /* double colon flag */
+	len = 0;
+	for(j = 0; j<ip_len; j++)
+	{
+		if((ip[j] >= '0' && ip[j] <= '9') || (ip[j] >= 'A' && ip[j] <= 'F') || (ip[j] >= 'a' && ip[j] <= 'f'))
+		{
+			if(len > 3)
+			{
+				goto out;
+			}
+			buf[len ++] = ip[j];
+		}
+		else if(ip[j] != ':')
+		{
+			goto out;
+		}
+
+		if(ip[j] == ':' || ip[j + 1] == '\0')
+		{
+			if(len)
+			{
+				buf[len] = 0x00;
+				sscanf(buf, "%x", &i[pos]);
+				pos ++;
+				len = 0;
+			}
+
+			if(ip[j + 1] == ':')
+			{
+				if(dc == 0)
+				{
+					dc = 1;
+					pos = ( 8 - c ) + pos + (j == 0 ? 1 : 0);
+				}
+				else
+				{
+					goto out;
+				}
+			}
+		}
+	}
+	zbx_snprintf(str, str_len, "%04x:%04x:%04x:%04x:%04x:%04x:%04x:%04x", i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7]);
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End expand_ipv6(ip:%s,str:%s,ret:%s)", ip, str, ret == SUCCEED ? "SUCCEED" : "FAIL");
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: ip_in_list_ipv6                                                  *
+ *                                                                            *
+ * Purpose: check if ip matches range of ip addresses                         *
+ *                                                                            *
+ * Parameters: list -  IPs [12fc::2-55,::45]                                  *
+ *                                                                            *
+ * Return value: FAIL - out of range, SUCCEED - within the range              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	ip_in_list_ipv6(char *list, char *ip)
+{
+	char	*start, *comma = NULL, *dash = NULL, buffer[MAX_STRING_LEN];
+	int	i[8], j[9], ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In ip_in_list(list:%s,ip:%s)", list, ip);
+
+	if(FAIL == expand_ipv6(ip, buffer, sizeof(buffer)))
+	{
+		goto out;
+	}
+
+	if(sscanf(buffer, "%x:%x:%x:%x:%x:%x:%x:%x", &i[0], &i[1], &i[2], &i[3], &i[4], &i[5], &i[6], &i[7]) != 8)
+	{
+		goto out;
+	}
+
+	for(start = list; start[0] != '\0';)
+	{
+
+		if(NULL != (comma = strchr(start, ',')))
+		{
+			comma[0] = '\0';
+		}
+
+		if(NULL != (dash = strchr(start, '-')))
+		{
+			dash[0] = '\0';
+			if(sscanf(dash + 1, "%x", &j[8]) != 1)
+			{
+				goto next;
+			}
+		}
+
+		if(FAIL == expand_ipv6(start, buffer, sizeof(buffer)))
+		{
+			goto next;
+		}
+
+		if(sscanf(buffer, "%x:%x:%x:%x:%x:%x:%x:%x", &j[0], &j[1], &j[2], &j[3], &j[4], &j[5], &j[6], &j[7]) != 8)
+		{
+			goto next;
+		}
+
+		if(dash == NULL)
+		{
+			j[8] = j[7];
+		}
+
+		if(i[0] == j[0] && i[1] == j[1] && i[2] == j[2] && i[3] == j[3] && 
+		   i[4] == j[4] && i[5] == j[5] && i[6] == j[6] && 
+		   i[7] >= j[7] && i[7] <= j[8])
+		{
+			ret = SUCCEED;
+			break;
+		}
+next:
+		if(dash != NULL)
+		{
+			dash[0] = '-';
+			dash = NULL;
+		}
+
+		if(comma != NULL)
+		{
+			comma[0] = ',';
+			start = comma + 1;
+			comma = NULL;
+		}
+		else
+		{
+			break;
+		}
+	}
+out:
+	if(dash != NULL)
+	{
+		dash[0] = '-';
+	}
+
+	if(comma != NULL)
+	{
+		comma[0] = ',';
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End ip_in_list(ret:%s)", ret == SUCCEED ? "SUCCEED" : "FAIL");
+	return ret;
+}
+#endif /*HAVE_IPV6*/
 /******************************************************************************
  *                                                                            *
  * Function: ip_in_list                                                       *
@@ -240,7 +437,6 @@ int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char
  * Purpose: check if ip matches range of ip addresses                         *
  *                                                                            *
  * Parameters: list -  IPs [192.168.1.1-244,192.168.1.250]                    *
- *             value-  value                                                  *
  *                                                                            *
  * Return value: FAIL - out of range, SUCCEED - within the range              *
  *                                                                            *
@@ -252,49 +448,63 @@ int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char
 int	ip_in_list(char *list, char *ip)
 {
 	char	c = '\0';
-	int	i1,i2,i3,i4,i5,j1,j2,j3,j4;
+	int	i[4], j[5];
 	int	ret = FAIL;
-	char	*start = NULL, *end = NULL;
+	char	*start = NULL, *comma = NULL, *dash = NULL;
 
+	zabbix_log( LOG_LEVEL_DEBUG, "In ip_in_list(list:%s,ip:%s)", list, ip);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In ip_in_list(list:%s,ip:%s)",
-		list,
-		ip);
-
-	if(sscanf(ip,"%d.%d.%d.%d",&j1,&j2,&j3,&j4) != 4)
-		return FAIL;
+	if(sscanf(ip, "%d.%d.%d.%d", &i[0], &i[1], &i[2], &i[3]) != 4)
+	{
+#if defined(HAVE_IPV6)
+		ret = ip_in_list_ipv6(list, ip);
+#endif /*HAVE_IPV6*/
+		goto out;
+	}
 
 	for(start = list; start[0] != '\0';)
 	{
-		end=strchr(start, ',');
-
-		if(end != NULL)
+		if(NULL != (comma = strchr(start, ',')))
 		{
-			c=end[0];
-			end[0]='\0';
+			comma[0] = '\0';
 		}
 
-		if(sscanf(start,"%d.%d.%d.%d-%d",&i1,&i2,&i3,&i4,&i5) == 5)
+		if(NULL != (dash = strchr(start, '-')))
 		{
-			if(i1==j1 && i2==j2 && i3==j3 && j4>=i4 && j4<=i5)
+			dash[0] = '\0';
+			if(sscanf(dash + 1, "%d", &j[4]) != 1)
 			{
-				ret = SUCCEED;
-				break;
-			}
-		}
-		else if(sscanf(start,"%d.%d.%d.%d",&i1,&i2,&i3,&i4) == 4)
-		{
-			if(i1==j1 && i2==j2 && i3==j3 && j4==i4)
-			{
-				ret = SUCCEED;
-				break;
+				goto next;
 			}
 		}
 
-		if(end != NULL)
+		if(sscanf(start, "%d.%d.%d.%d", &j[0], &j[1], &j[2], &j[3]) != 4)
 		{
-			end[0]=c;
-			start=end+1;
+			goto next;
+		}
+
+		if(dash == NULL)
+		{
+			j[4] = j[3];
+		}
+
+		if(i[0] == j[0] && i[1] == j[1] && i[2] == j[2] && i[3] >= j[3] && i[3] <= j[4])
+		{
+			ret = SUCCEED;
+			break;
+		}
+next:
+		if(dash != NULL)
+		{
+			dash[0] = '-';
+			dash = NULL;
+		}
+
+		if(comma != NULL)
+		{
+			comma[0] = ',';
+			start = comma + 1;
+			comma = NULL;
 		}
 		else
 		{
@@ -302,16 +512,20 @@ int	ip_in_list(char *list, char *ip)
 		}
 	}
 
-	if(end != NULL)
+out:
+	if(dash != NULL)
 	{
-		end[0]=c;
+		dash[0] = '-';
 	}
 
-	zabbix_log( LOG_LEVEL_DEBUG, "End ip_in_list(ret:%s)", ret == SUCCEED?"SUCCEED":"FAIL");
+	if(comma != NULL)
+	{
+		comma[0] = ',';
+	}
 
+	zabbix_log( LOG_LEVEL_DEBUG, "End ip_in_list(ret:%s)", ret == SUCCEED ? "SUCCEED" : "FAIL");
 	return ret;
 }
-
 /******************************************************************************
  *                                                                            *
  * Function: int_in_list                                                      *

@@ -422,12 +422,14 @@
 	define('ZBX_EXPRESSION_MACRO_ID', 13);
 	define('ZBX_EXPRESSION_RIGHT_ID', 14);
 
+/* Define if your logs are in non-standard format */
+/*	define('ZBX_LOG_ENCODING_DEFAULT', 'Shift_JIS');*/
+
 	define('ZBX_MIN_PERIOD', 3600);
 	define('ZBX_MAX_PERIOD', 12*31*24*3600);
 	define('ZBX_PERIOD_DEFAULT', ZBX_MIN_PERIOD);
 
-/* Define if your logs are in non-standard format */
-/*	define('ZBX_LOG_ENCODING_DEFAULT', 'Shift_JIS');*/
+	define('ZBX_HAVE_IPV6', 1);
 
 	global $_GET, $_POST, $_COOKIE, $_REQUEST;
 

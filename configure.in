@@ -547,10 +547,24 @@ esac],
 [agent=no])
 AM_CONDITIONAL(AGENT, test x$agent = xyes)
 
+AC_ARG_ENABLE(ipv6,[  --enable-ipv6         Turn on support of IPv6],
+[case "${enableval}" in
+  yes) ipv6=yes ;;
+  no)  ipv6=no ;;
+  *) AC_MSG_ERROR([bad value ${enableval} for --enable-ipv6]) ;;
+esac],
+[ipv6=no])
+
 have_db="no"
 have_web_monitoring="no"
 have_jabber="no"
 have_snmp="no"
+have_ipv6="no"
+
+if test "$ipv6" = "yes"; then
+	AC_DEFINE(HAVE_IPV6,1,[Define to 1 if IPv6 should be enabled.])
+	have_ipv6="yes"
+fi
 
 if test "$server" = "yes"; then
 
@@ -879,6 +893,7 @@ echo "  With database:      ${have_db}
   WEB Monitoring via: ${have_web_monitoring}
   Native Jabber:      ${have_jabber}
   SNMP:               ${have_snmp}
+  IPv6:               ${have_ipv6}
   Linker flags:       ${LDFLAGS} ${SERVER_LDFLAGS}
   Libraries:          ${LIBS} ${SERVER_LIBS}"
 

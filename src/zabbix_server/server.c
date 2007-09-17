@@ -16,9 +16,9 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-
-/*#define ZABBIX_TEST*/
-
+/*
+#define ZABBIX_TEST
+*/
 #include "common.h"
 
 #include "cfg.h"
@@ -493,14 +493,13 @@ void test_variable_argument_list(void)
 
 void test_zbx_gethost(void)
 {
-        struct hostent* host;
+/*        struct hostent* host;
 
 	char hostname[]="194.8.11.69";
-/*	char hostname[]="gobbo.caves.lv";*/
 
 	host = zbx_gethost_by_ip(hostname);
 
-	printf("Host1 [%s]\n", host->h_name);
+	printf("Host1 [%s]\n", host->h_name);*/
 }
 
 void test_templates()
@@ -559,16 +558,17 @@ ZBX_TEST_TIME expressions[]=
 	printf("Passed OK\n");
 }
 */
-/*
+
 void	test_email()
 {
-	char str_error[0xFF];
+	char str_error[MAX_STRING_LEN];
 
+	alarm(5);
 	if ( FAIL == send_email(
-			"test.com",
-			"test.com",
-			"test@test.com",
-			"test@test.com",
+			"mail.apollo.lv",
+			"zabbix.com",
+			"sasha@zabbix.com",
+			"aleksander.vladishev@zabbix.com",
 			"This is a TEST message",
 			"Big message\r\n"
 			" 1 Line\n"
@@ -596,10 +596,10 @@ void	test_email()
 		printf("ERROR: %s\n", str_error);
 	else
 		printf("OK\n");
-
+	alarm(0);
 
 }
-*/
+
 
 /*
 void test_extract_numbers(void)
@@ -644,6 +644,66 @@ void test_trigger_description()
 }
 */
 
+void test_zbx_tcp_connect(void)
+{
+#define ZBX_TEST_TCP_CONNECT struct zbx_test_tcp_connect_t
+ZBX_TEST_TCP_CONNECT
+{
+        char           *hostname;
+        unsigned short  port;
+};
+
+ZBX_TEST_TCP_CONNECT expressions[]=
+{
+	{"127.0.0.1",   80},
+	{"support.zabbix.com",	8080},/*81.198.122.245*/
+	{"www.iscentrs.lv",	80},/*81.198.60.94*/
+	{"81.171.84.52",	80},
+	{"64.233.183.103",	80},/*nf-in-f103.google.com*/
+	{"::1",   80},
+	{"::1",   22},
+	{"12fc::5",	80},
+	{"192.168.3.5",	80},
+	{NULL}
+};
+
+	int		i;
+	zbx_sock_t	s;
+	char		host[MAXDNAME];
+	char		ip_list[] = "81.171.84.52,nf-in-f103.google.com,ip6-localhost,localhost";
+
+	for(i = 0; expressions[i].hostname != NULL; i ++)
+	{
+		zbx_gethost_by_ip(expressions[i].hostname, host, sizeof(host));
+		printf("[%25s]:%-5d %-30s ", expressions[i].hostname, expressions[i].port, host);
+
+		alarm(5);
+		switch(zbx_tcp_connect(&s, expressions[i].hostname, expressions[i].port)) 
+		{
+			case SUCCEED : 
+				printf("Succeed");
+
+				if(FAIL == zbx_tcp_check_security(&s, ip_list, 0))
+				{
+					printf(" \n%s", zbx_tcp_strerror());
+				}
+				zbx_tcp_close(&s);
+				break;
+			case FAIL    : 
+				printf("Fail %s\n", zbx_tcp_strerror());
+				break;
+		}
+		alarm(0);
+		printf("\n");
+	}
+}
+/*
+static void test_child_signal_handler(int sig)
+{
+	printf( "sdfsdfsdfsf" );
+}
+*/
+
 void test_ip_in_list()
 {
 #define ZBX_TEST_IP struct zbx_test_ip_t
@@ -656,12 +716,21 @@ ZBX_TEST_IP
 
 ZBX_TEST_IP expressions[]=
 {
-		{"10.0.0.1-255",					"10.0.0.30",		SUCCEED},
+		{"10.0.0.1-29",						"10.0.0.30",		FAIL},
 		{"192.168.0.1-255,192.168.1.1-255",			"192.168.2.201",	FAIL},
-		{"172.16.0.0,172.16.0.1,172.16.0.2-200,172.16.0.201",	"172.16.0.201",		SUCCEED},
-		{"172.31.255.1-255",					"172.31.255.43",	SUCCEED},
+		{"172.16.0.0,172.16.0.1,172.16.0.2,172.16.0.44-250",	"172.16.0.201",		SUCCEED},
+		{"172.31.255.43-55",					"172.31.255.47",	SUCCEED},
 		{"86.57.15.94",						"86.57.15.95",		FAIL},
 		{"86.57.15.94",						"86.57.15.94",		SUCCEED},
+#if defined(HAVE_IPV6)
+		{"2312:333::32-64,12fc::1-fffc",			"12fc::ffff",		FAIL},
+		{"2312:333::32-64,12fc::1-fffc",			"2312:333::44",		SUCCEED},
+		{"::a:b:a,::a:b:b,::a:b:c-e",				"::a:b:f",		FAIL},
+		{"192.168.200.1,::a:b:a,::a:b:b,::a:b:c-e,10.0.0.2",	"::a:b:d",		SUCCEED},
+		{"192.168.200.1,::a:b:a,::a:b:b,::a:b:c-e,10.0.0.2",	"10.0.0.2",		SUCCEED},
+		{"192.168.200.1,::a:b:a,::a:b:b,::a:b:c-,10.0.0.2",	"::a:b:d",		FAIL},
+		{"a:b:c::-f",						"a:b:c::3",		SUCCEED},
+#endif /*HAVE_IPV6*/
 		{NULL}
 };
 	int	i;
@@ -675,11 +744,11 @@ ZBX_TEST_IP expressions[]=
 		strcpy(list, expressions[i].list);
 		result = ip_in_list(list, expressions[i].ip);
 			
-		printf("list [%s] ip [%s] expected [%d] got [%d]\n",
+		printf("list [%50s] ip [%20s] expected [%7s] got [%7s]\n",
 			expressions[i].list,
 			expressions[i].ip,
-			expressions[i].result,
-			result);
+			expressions[i].result == SUCCEED ? "SUCCEED" : "FAIL",
+			result == SUCCEED ? "SUCCEED" : "FAIL");
 		if(expressions[i].result!=result)
 		{
 			printf("FAILED!\n");
@@ -716,6 +785,7 @@ void test()
 /*	test_email(); */
 /*	test_extract_numbers(); */
 /*	test_trigger_description(); */
+/*	test_zbx_tcp_connect( );*/
 	test_ip_in_list();
 
 	printf("\n-= Test completed =-\n");
@@ -792,6 +862,18 @@ int main(int argc, char **argv)
 	}
 
 #ifdef ZABBIX_TEST
+/*	struct sigaction  phan;
+
+	phan.sa_handler = test_child_signal_handler;
+	sigemptyset(&phan.sa_mask);
+	phan.sa_flags = 0;
+
+	sigaction(SIGINT,       &phan, NULL);
+	sigaction(SIGQUIT,      &phan, NULL);
+	sigaction(SIGTERM,      &phan, NULL);
+	sigaction(SIGPIPE,      &phan, NULL);
+	sigaction(SIGCHLD,      &phan, NULL);
+*/
 	test();
 
 	zbx_on_exit();
@@ -841,6 +923,12 @@ int MAIN_ZABBIX_ENTRY(void)
 #else
 	zabbix_log( LOG_LEVEL_WARNING, "Jabber notifications:   NO");
 #endif
+#ifdef	HAVE_IPV6
+	zabbix_log( LOG_LEVEL_WARNING, "IPv6 support:          YES");
+#else
+	zabbix_log( LOG_LEVEL_WARNING, "IPv6 support:           NO");
+#endif
+
 	zabbix_log( LOG_LEVEL_WARNING, "**************************");
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);

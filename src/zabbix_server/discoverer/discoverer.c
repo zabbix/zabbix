@@ -710,12 +710,13 @@ static void process_rule(DB_DRULE *rule)
 	DB_ROW		row;
 	DB_DCHECK	check;
 
-	char		ip[MAX_STRING_LEN];
-	int		i1,i2,i3,i4,i5;
-	int		first, last, i;
+	char		ip[MAX_STRING_LEN], prefix[MAX_STRING_LEN];
+	unsigned int	j[9], i;
+	int		first, last, ipv6;
 
 	char	*curr_range = NULL,
-		*next_range = NULL;
+		*next_range = NULL,
+		*dash = NULL, *colon;
 
 	assert(rule);
 
@@ -725,26 +726,78 @@ static void process_rule(DB_DRULE *rule)
 
 	for ( curr_range = rule->iprange; curr_range; curr_range = next_range )
 	{ /* split by ',' */
-		if ( (next_range = strchr(curr_range, ',')) )
+		if ( NULL != (next_range = strchr(curr_range, ',')) )
 		{
-			*next_range = '\0';
+			next_range[0] = '\0';
+		}
+
+		if ( NULL != (dash = strchr(curr_range, '-')) )
+		{
+			dash[0] = '\0';
 		}
 
 		first = last = -1;
-		if ( sscanf(curr_range, "%d.%d.%d.%d-%d", &i1, &i2, &i3, &i4, &i5) == 5 )
+#if defined(HAVE_IPV6)
+		if ( SUCCEED == expand_ipv6(curr_range, ip, sizeof(ip)) )
 		{
-			first = i4;
-			last = i5;
+			ipv6 = 1;
+			if( sscanf(ip, "%x:%x:%x:%x:%x:%x:%x:%x", &j[0], &j[1], &j[2], &j[3], &j[4], &j[5], &j[6], &j[7]) == 8 )
+			{
+				first = j[7];
+
+				zbx_strlcpy( prefix, curr_range, sizeof(prefix) );
+				if( NULL != (colon = strrchr(prefix, ':')) )
+				{
+					( colon + 1 )[0] = '\0';
+				}
+			}
+
+			if( dash != NULL )
+			{
+				if( sscanf(dash + 1, "%x", &j[8]) == 1 )
+				{
+					last = j[8];
+				}
+			}
+			else
+			{
+				last = first;
+			}
 		}
-		else if( sscanf(curr_range, "%d.%d.%d.%d", &i1, &i2, &i3, &i4) == 4 )
+		else
 		{
-			first = last = i4;
+#endif /* HAVE_IPV6 */
+			ipv6  = 0;
+			if( sscanf(curr_range, "%d.%d.%d.%d", &j[0], &j[1], &j[2], &j[3]) == 4 )
+			{
+				first = j[3];
+			}
+
+			if( dash != NULL )
+			{
+				if( sscanf(dash + 1, "%d", &j[4]) == 1 )
+				{
+					last = j[4];
+				}
+			}
+			else
+			{
+				last = first;
+			}
+#if defined(HAVE_IPV6)
+		}
+#endif /* HAVE_IPV6 */
+
+		if( dash )
+		{
+			dash[0] = '-';
+			dash = NULL;
 		}
 
 		if ( next_range ) 
 		{
-			*next_range = ',';
-			next_range++;
+			next_range[0] = ',';
+			next_range ++;
 		}
 
 		if( first < 0 || last < 0 )
@@ -756,9 +809,13 @@ static void process_rule(DB_DRULE *rule)
 
 		for ( i = first; i <= last; i++ )
 		{
-			zbx_snprintf(ip, sizeof(ip), "%d.%d.%d.%d", i1, i2, i3, i);
+			switch( ipv6 )
+			{
+				case 0 : zbx_snprintf(ip, sizeof(ip), "%d.%d.%d.%d", j[0], j[1], j[2], i); break;
+				case 1 : zbx_snprintf(ip, sizeof(ip), "%s%x", prefix, i); break;
+			}
 
-			zabbix_log(LOG_LEVEL_DEBUG, "IP [%s]", ip);
+			zabbix_log(LOG_LEVEL_DEBUG, "Discovery: process_rule() [first %d] [last %d] [IP %s]", prefix, first, last, ip);
 
 			result = DBselect("select dcheckid,druleid,type,key_,snmp_community,ports from dchecks where druleid=" ZBX_FS_UI64,
 				rule->druleid);

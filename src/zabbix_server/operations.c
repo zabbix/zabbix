@@ -461,8 +461,7 @@ static zbx_uint64_t	add_discovered_host(zbx_uint64_t dhostid)
 	DB_ROW		row2;
 	zbx_uint64_t	hostid = 0;
 	char		*ip;
-        struct hostent* host;
-	char		host_esc[MAX_STRING_LEN];
+	char		host[MAXDNAME], host_esc[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In add_discovered_host(dhostid:" ZBX_FS_UI64 ")",
 		dhostid);
@@ -475,17 +474,10 @@ static zbx_uint64_t	add_discovered_host(zbx_uint64_t dhostid)
 		ip=row[0];
 
 		alarm(CONFIG_TIMEOUT);
-		host = zbx_gethost_by_ip(ip);
+		zbx_gethost_by_ip(ip, host, sizeof(host));
 		alarm(0);
 
-		if(host != NULL)
-		{
-			DBescape_string(host->h_name, host_esc, sizeof(host_esc));
-		}
-		else
-		{
-			host_esc[0]='\0';
-		}
+		DBescape_string(host, host_esc, sizeof(host_esc));
 
 		result2 = DBselect("select hostid from hosts where ip='%s' and " ZBX_COND_NODEID,
 			ip,
@@ -494,23 +486,11 @@ static zbx_uint64_t	add_discovered_host(zbx_uint64_t dhostid)
 		if(!row2 || DBis_null(row2[0]) == SUCCEED)
 		{
 			hostid = DBget_maxid("hosts","hostid");
-			/* Use host name if exists, IP otherwise */
-			if(host_esc[0] != '\0')
-			{
-				DBexecute("insert into hosts (hostid,host,useip,ip,dns) values (" ZBX_FS_UI64 ",'%s',1,'%s','%s')",
-					hostid,
-					host_esc,
-					ip,
-					host_esc);
-			}
-			else
-			{
-				DBexecute("insert into hosts (hostid,host,useip,ip,dns) values (" ZBX_FS_UI64 ",'%s',1,'%s','%s')",
-					hostid,
-					ip,
-					ip,
-					host_esc);
-			}
+			DBexecute("insert into hosts (hostid,host,useip,ip,dns) values (" ZBX_FS_UI64 ",'%s',1,'%s','%s')",
+				hostid,
+				(host[0] != '\0' ? host_esc : ip), /* Use host name if exists, IP otherwise */
+				ip,
+				host_esc);
 		}
 		else
 		{
