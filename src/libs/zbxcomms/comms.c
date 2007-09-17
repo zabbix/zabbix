@@ -112,28 +112,59 @@ static void __zbx_zbx_set_tcp_strerror(const char *fmt, ...)
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value: hostent or NULL - an error occured                           *
+ * Return value:                                                              *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-struct hostent	*zbx_gethost_by_ip(const char *ip)
+
+#if defined(HAVE_IPV6)
+void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
+{
+	struct	addrinfo hints, *ai = NULL;
+	
+	assert(ip);
+
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family = PF_UNSPEC;
+	if(0 != getaddrinfo(ip, NULL, &hints, &ai))
+	{
+		host[0] = '\0';
+		goto out;
+	}
+	if(0 != getnameinfo(ai->ai_addr, ai->ai_addrlen, host, hostlen, NULL, 0, NI_NAMEREQD))
+	{
+		host[0] = '\0';
+		goto out;
+	}
+out:
+	freeaddrinfo(ai);
+}
+#else
+void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
 {
 	struct in_addr	addr;
-	struct hostent*	host;
+	struct hostent  *hst;
 
 	assert(ip);
 
-	if(inet_aton(ip, &addr) != 0)
+	if(inet_aton(ip, &addr) == 0)
 	{
-		host = gethostbyaddr((char *)&addr, sizeof(addr), AF_INET);
-		if(host)	return host;
+		host[0] = '\0';
+		return;
 	}
 
-	return (struct hostent*) NULL;
+	if(NULL == (hst = gethostbyaddr((char *)&addr, sizeof(addr), AF_INET)))
+	{
+		host[0] = '\0';
+		return;
+	}
+
+	zbx_strlcpy(host, hst->h_name, hostlen);
 }
+#endif /*HAVE_IPV6*/
 #endif /* WINDOWS */
 
 /******************************************************************************
@@ -232,7 +263,7 @@ static int	zbx_tcp_start(void)
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value:                                                              * 
+ * Return value:                                                              *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
@@ -254,7 +285,7 @@ static void	zbx_tcp_clean(zbx_sock_t *s)
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value:                                                              * 
+ * Return value:                                                              *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -275,7 +306,7 @@ void	zbx_tcp_init(zbx_sock_t *s, ZBX_SOCKET o)
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value: sockfd - open socket                                         * 
+ * Return value: sockfd - open socket                                         *
  *               FAIL - an error occured                                      *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -283,9 +314,48 @@ void	zbx_tcp_init(zbx_sock_t *s, ZBX_SOCKET o)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int     zbx_tcp_connect(zbx_sock_t *s, const char *ip, unsigned short port)
+#if defined(HAVE_IPV6)
+int	zbx_tcp_connect(zbx_sock_t *s, const char *ip, unsigned short port)
 {
-	ZBX_SOCKADDR	myaddr_in;
+	int	ret=SUCCEED;
+	struct	addrinfo *ai, hints;
+	char	service[MAX_STRING_LEN];
+
+	ZBX_TCP_START();
+
+	zbx_tcp_clean(s);
+
+	zbx_snprintf(service, sizeof(service), "%d", port);
+	memset(&hints, 0x00, sizeof(struct addrinfo));
+	hints.ai_flags = AI_ADDRCONFIG;
+	hints.ai_socktype = SOCK_STREAM;
+
+	if( 0 != getaddrinfo (ip, service, &hints, &ai)) {
+		zbx_set_tcp_strerror("Cannot resolve [%s]", ip);
+		ret=FAIL;
+		goto out;
+	}
+
+	if( ZBX_SOCK_ERROR == (s->socket = socket (ai->ai_family, ai->ai_socktype, ai->ai_protocol)))
+	{
+		zbx_set_tcp_strerror("Cannot create socket [%s]:%d [%s]", ip, port ,strerror_from_system(zbx_sock_last_error()));
+		ret=FAIL;
+		goto out;
+	}
+
+	if( ZBX_TCP_ERROR == connect(s->socket, ai->ai_addr, ai->ai_addrlen)) {
+		zbx_set_tcp_strerror("*** Cannot connect to [%s]:%d [%s]", ip, port, strerror_from_system(zbx_sock_last_error()));
+		zbx_tcp_close(s);
+		ret=FAIL;
+		goto out;
+	}
+out:
+	freeaddrinfo (ai);
+	return ret;
+}
+#else
+int	zbx_tcp_connect(zbx_sock_t *s, const char *ip, unsigned short port)
+{
 	ZBX_SOCKADDR	servaddr_in;
 
 	struct	hostent *hp;
@@ -299,7 +369,6 @@ int     zbx_tcp_connect(zbx_sock_t *s, const char *ip, unsigned short port)
 		zbx_set_tcp_strerror("Cannot resolve [%s]", ip);
 		return	FAIL;
 	}
-
 	servaddr_in.sin_family		= AF_INET;
 	servaddr_in.sin_addr.s_addr	= ((struct in_addr *)(hp->h_addr))->s_addr;
 	servaddr_in.sin_port		= htons(port);
@@ -310,10 +379,6 @@ int     zbx_tcp_connect(zbx_sock_t *s, const char *ip, unsigned short port)
 		return	FAIL;
 	}
 
-	myaddr_in.sin_family		= AF_INET;
-	myaddr_in.sin_port			= 0;
-	myaddr_in.sin_addr.s_addr	= INADDR_ANY;
-
 	if( ZBX_TCP_ERROR == connect(s->socket,(struct sockaddr *)&servaddr_in,sizeof(ZBX_SOCKADDR)) )
 	{
 		zbx_set_tcp_strerror("Cannot connect to [%s:%d] [%s]", ip, port, strerror_from_system(zbx_sock_last_error()));
@@ -323,7 +388,7 @@ int     zbx_tcp_connect(zbx_sock_t *s, const char *ip, unsigned short port)
 
 	return SUCCEED;
 }
-
+#endif /*HAVE_IPV6*/
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tcp_send                                                     *
@@ -332,7 +397,7 @@ int     zbx_tcp_connect(zbx_sock_t *s, const char *ip, unsigned short port)
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value: SUCCEED - success                                            * 
+ * Return value: SUCCEED - success                                            *
  *               FAIL - an error occured                                      *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
@@ -420,7 +485,7 @@ void    zbx_tcp_close(zbx_sock_t *s)
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value: SUCCEED - success                                            * 
+ * Return value: SUCCEED - success                                            *
  *               FAIL - an error occured                                      *
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
@@ -434,17 +499,35 @@ int zbx_tcp_listen(
 	unsigned short	listen_port
 	)
 {
-	ZBX_SOCKADDR serv_addr;
-	int	on;
+#if defined(HAVE_IPV6)
+	struct		addrinfo hints, *ai = NULL;
+	char		port[MAX_STRING_LEN];
+#else
+	ZBX_SOCKADDR	serv_addr;
+#endif /*HAVE_IPV6*/
+	int		on, res = FAIL, e;
 
 	ZBX_TCP_START();
 
 	zbx_tcp_clean(s);
 
-	if( ZBX_SOCK_ERROR == (s->socket = socket(AF_INET,SOCK_STREAM,0)) )
+#if defined(HAVE_IPV6)
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_flags = AI_PASSIVE | AI_ADDRCONFIG;
+	hints.ai_socktype = SOCK_STREAM;
+	zbx_snprintf(port, sizeof(port), "%d", listen_port);
+	if(0 != (e = getaddrinfo(listen_ip, port, &hints, &ai)))
 	{
-		zbx_set_tcp_strerror("Cannot create socket [%s:%u] [%s]", listen_ip, listen_port ,strerror_from_system(zbx_sock_last_error()));
-		return	FAIL;
+		zbx_set_tcp_strerror("Cannot getaddrinfo [%s:%u] [%s]", listen_ip, listen_port, gai_strerror(e));
+		goto out;
+	}
+	if(ZBX_SOCK_ERROR == (s->socket = socket(ai->ai_family, ai->ai_socktype,0)))
+#else
+	if(ZBX_SOCK_ERROR == (s->socket = socket(AF_INET,SOCK_STREAM,0)))
+#endif /*HAVE_IPV6*/
+	{
+		zbx_set_tcp_strerror("Cannot create socket [%s:%u] [%s]", listen_ip, listen_port, strerror_from_system(zbx_sock_last_error()));
+		goto out;
 	}
 
 	/* Enable address reuse */
@@ -457,29 +540,38 @@ int zbx_tcp_listen(
 	}
 
 	/* Create socket	Fill in local address structure */
+#if defined(HAVE_IPV6)
+	if( -1 == bind(s->socket, ai->ai_addr, ai->ai_addrlen))
+#else
 	memset(&serv_addr, 0, sizeof(ZBX_SOCKADDR));
 
 	serv_addr.sin_family		= AF_INET;
 	serv_addr.sin_addr.s_addr	= listen_ip ? inet_addr(listen_ip) : htonl(INADDR_ANY);
-	serv_addr.sin_port			= htons((unsigned short)listen_port);
+	serv_addr.sin_port		= htons((unsigned short)listen_port);
 
 	/* Bind socket */
 	if (ZBX_SOCK_ERROR == bind(s->socket,(struct sockaddr *)&serv_addr,sizeof(ZBX_SOCKADDR)) )
+#endif /*HAVE_IPV6*/
 	{
 		zbx_set_tcp_strerror("Cannot bind to port %u for server %s. Error [%s]. Another zabbix_agentd already running ?",
 				listen_port,
 				listen_ip ? listen_ip : "[ANY]",
 				strerror_from_system(zbx_sock_last_error()));
 
-		return	FAIL;
+		goto out;
 	}
 
 	if( ZBX_SOCK_ERROR == listen(s->socket, SOMAXCONN) )
 	{
 		zbx_set_tcp_strerror("Listen failed. [%s]", strerror_from_system(zbx_sock_last_error()));
-		return	FAIL;
+		goto out;
 	}
-	return SUCCEED;
+	res = SUCCEED;
+out:
+#if defined(HAVE_IPV6)
+	freeaddrinfo (ai);
+#endif /*HAVE_IPV6*/
+	return res;
 }
 
 /******************************************************************************
@@ -578,7 +670,7 @@ void    zbx_tcp_free(zbx_sock_t *s)
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
- * Return value: SUCCEED - success                                            * 
+ * Return value: SUCCEED - success                                            *
  *               FAIL - an error occured                                      *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
@@ -722,16 +814,21 @@ int	zbx_tcp_check_security(
 	int allow_if_empty
 	)
 {
-	ZBX_SOCKADDR name;
+#if defined(HAVE_IPV6)
+	struct		sockaddr_storage name;
+	struct		addrinfo hints, *ai = NULL;
+#else
+	ZBX_SOCKADDR	name;
+	struct		hostent *hp;
+	char		*sip;
+#endif
 	socklen_t	nlen;
 
-	struct  hostent *hp;
-
-	char
-		tmp[MAX_STRING_LEN], 
+	char	tmp[MAX_STRING_LEN], 
 		sname[MAX_STRING_LEN],
-		*sip, 
-		*host;
+		*start = NULL,
+		*end = NULL,
+		c = '\0';
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In check_security()");
 
@@ -739,7 +836,11 @@ int	zbx_tcp_check_security(
 	{
 		return SUCCEED;
 	}
+#if defined(HAVE_IPV6)
+	nlen = sizeof(struct sockaddr_storage);
+#else
 	nlen = sizeof(ZBX_SOCKADDR);
+#endif /*HAVE_IPV6*/
 	if( ZBX_TCP_ERROR == getpeername(s->socket,  (struct sockaddr*)&name, &nlen))
 	{
 		zbx_set_tcp_strerror("Connection rejected. Getpeername failed [%s]", strerror_from_system(zbx_sock_last_error()));
@@ -747,27 +848,86 @@ int	zbx_tcp_check_security(
 	}
 	else
 	{
+#if !defined(HAVE_IPV6)
 		strcpy(sname, inet_ntoa(name.sin_addr));
-
+#endif /*HAVE_IPV6*/
 		strscpy(tmp,ip_list);
 
-		host = (char *)strtok(tmp,",");
-
-		while( NULL != host )
+		for(start = tmp; start[0] != '\0';)
 		{
+			end = strchr(start, ',');
+
+			if(end != NULL)
+			{
+				c = end[0];
+				end[0] = '\0';
+			}
+
 			/* Allow IP addresses or DNS names for authorization */
-			if( 0 != (hp = zbx_gethost(host)))
+#if defined(HAVE_IPV6)
+			memset(&hints, 0, sizeof(hints));
+			hints.ai_family = PF_UNSPEC;
+			if(0 == getaddrinfo(start, NULL, &hints, &ai))
+			{
+				if(ai->ai_family == name.ss_family)
+				{
+					switch(ai->ai_family)
+					{
+						case AF_INET  :
+							if(((struct sockaddr_in*)&name)->sin_addr.s_addr == ((struct sockaddr_in*)ai->ai_addr)->sin_addr.s_addr)
+							{
+								freeaddrinfo(ai);
+								return SUCCEED;
+							}
+						case AF_INET6 :
+							if(0 == memcmp(((struct sockaddr_in6*)&name)->sin6_addr.s6_addr,
+									((struct sockaddr_in6*)ai->ai_addr)->sin6_addr.s6_addr,
+									sizeof(struct in6_addr)))
+							{
+								freeaddrinfo(ai);
+								return SUCCEED;
+							}
+					}
+				}
+			}
+			freeaddrinfo(ai);
+#else
+			if( 0 != (hp = zbx_gethost(start)))
 			{
 				sip = inet_ntoa(*((struct in_addr *)hp->h_addr));
 				if( 0 == strcmp(sname, sip))
 				{
-					return	SUCCEED;
+					return SUCCEED;
 				}
 			}
-			host = (char *)strtok(NULL,",");
+#endif /*HAVE_IPV6*/
+			if(end != NULL)
+			{
+				end[0] = c;
+				start = end + 1;
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		if(end != NULL)
+		{
+			end[0] = c;
 		}
 	}
+#if defined(HAVE_IPV6)
+	if(0 == getnameinfo((struct sockaddr*)&name, sizeof(name), sname, sizeof(sname), NULL, 0, NI_NUMERICHOST))
+	{
+		zbx_set_tcp_strerror("Connection from [%s] rejected. Allowed server is [%s] ",sname, ip_list);
+	}
+	else
+	{
+		zbx_set_tcp_strerror("Connection rejected. Allowed server is [%s] ", ip_list);
+	}
+#else
 	zbx_set_tcp_strerror("Connection from [%s] rejected. Allowed server is [%s] ",sname, ip_list);
+#endif /*HAVE_IPV6*/
 	return	FAIL;
 }
-
