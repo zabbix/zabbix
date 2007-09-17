@@ -918,6 +918,12 @@ int MAIN_ZABBIX_ENTRY(void)
 #else
 	zabbix_log( LOG_LEVEL_WARNING, "Jabber notifications:   NO");
 #endif
+#ifdef	HAVE_IPV6
+	zabbix_log( LOG_LEVEL_WARNING, "IPv6 support:          YES");
+#else
+	zabbix_log( LOG_LEVEL_WARNING, "IPv6 support:           NO");
+#endif
+
 	zabbix_log( LOG_LEVEL_WARNING, "**************************");
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
