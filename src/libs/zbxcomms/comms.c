@@ -502,10 +502,11 @@ int zbx_tcp_listen(
 #if defined(HAVE_IPV6)
 	struct		addrinfo hints, *ai = NULL;
 	char		port[MAX_STRING_LEN];
+	int             e;
 #else
 	ZBX_SOCKADDR	serv_addr;
 #endif /*HAVE_IPV6*/
-	int		on, res = FAIL, e;
+	int		on, res = FAIL;
 
 	ZBX_TCP_START();
 

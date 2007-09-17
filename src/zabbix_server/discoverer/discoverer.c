@@ -716,7 +716,10 @@ static void process_rule(DB_DRULE *rule)
 
 	char	*curr_range = NULL,
 		*next_range = NULL,
-		*dash = NULL, *colon;
+		*dash = NULL;
+#if defined(HAVE_IPV6)
+	char	*colon;
+#endif
 
 	assert(rule);
 

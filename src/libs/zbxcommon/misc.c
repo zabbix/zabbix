@@ -447,7 +447,6 @@ out:
  ******************************************************************************/
 int	ip_in_list(char *list, char *ip)
 {
-	char	c = '\0';
 	int	i[4], j[5];
 	int	ret = FAIL;
 	char	*start = NULL, *comma = NULL, *dash = NULL;
