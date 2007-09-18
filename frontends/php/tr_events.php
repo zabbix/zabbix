@@ -181,7 +181,7 @@ include_once "include/page_header.php";
 		}
   
 		$ack = "-";
-		if($row["value"] == 1 && $row["acknowledged"] == 1)
+		if($row["acknowledged"] == 1)
 		{
 			$db_acks = get_acknowledges_by_eventid($row["eventid"]);
 			$rows=0;

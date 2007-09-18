@@ -314,21 +314,23 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 
 	$cond=($_REQUEST['hostid'] > 0)?' AND h.hostid='.$_REQUEST['hostid'].' ':'';
 
-	$result = DBselect('SELECT DISTINCT t.triggerid,t.status,t.description, '.
+	$sql = 'SELECT DISTINCT t.triggerid,t.status,t.description, '.
 							' t.expression,t.priority,t.lastchange,t.comments,t.url,t.value,h.host '.
 					' FROM triggers t,hosts h,items i,functions f '.
 					' WHERE f.itemid=i.itemid AND h.hostid=i.hostid '.
 						' AND t.triggerid=f.triggerid AND t.status='.TRIGGER_STATUS_ENABLED.
 						' AND i.status='.ITEM_STATUS_ACTIVE.' AND '.DBin_node('t.triggerid').
 						' AND h.hostid not in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT).') '. 
-						' AND h.status='.HOST_STATUS_MONITORED.' '.$cond.' '.$sort);
+						' AND h.status='.HOST_STATUS_MONITORED.' '.$cond.' '.$sort;
+
+	$result = DBselect($sql);
 
 	while($row=DBfetch($result))
 	{
 // Check for dependencies
 
 		if(!$eventid = first_initial_eventid($row,$show_unknown)) continue;
-	
+
 		$res_n = DBSelect('SELECT DISTINCT e.eventid, e.clock as lastchange, e.acknowledged, e.value '.
 							' FROM events e'.
 							' WHERE e.eventid='.$eventid.
@@ -388,10 +390,10 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 		if(TRIGGER_SHOW_UNDEFINED_ACK || ($row['value'] != TRIGGER_VALUE_UNKNOWN)){
 				$ack=($row['acknowledged'] != 1)?(new CLink(S_NOT_ACKNOWLEDGED,'acknow.php?eventid='.$row['eventid'],'on')):('-');
 		}
-
+//		if(!not_ack_event($eventid)) continue;
 		if(($onlytrue=='true') && (($row['value'] != TRIGGER_VALUE_TRUE) && ((time() - $row['lastchange']) > TRIGGER_BLINK_PERIOD))){
 		}
-		else{
+		else if(not_ack_event($eventid)){
 			$table->AddRow(array(
 					get_node_name_by_elid($row['triggerid']),
 					$_REQUEST['hostid'] > 0 ? null : $row['host'],
@@ -421,6 +423,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 
 			$res_notack = get_notacknowledged($row['triggerid'],$show_unknown,$onlytrue);
 			while($row_notack=DBfetch($res_notack)){
+
 				if($row['eventid'] == $row_notack['eventid']) continue;
 				if(($show_unknown == 0) && (!event_initial_time($row_notack,$show_unknown))) continue;
 				

@@ -202,6 +202,7 @@ function first_initial_eventid($row,$show_unknown=0){
 	$sql_cond=($show_unknown == 0)?' AND value<>2 ':'';
 	
 	$events = array();
+
 	$sql = 'SELECT MAX(eventid) as eventid,MAX(clock) as clock, value '.
 					' FROM events as e '.
 					' WHERE objectid='.$row['triggerid'].
@@ -261,6 +262,16 @@ function first_initial_eventid($row,$show_unknown=0){
 		$rows = DBfetch($res);
 		return $rows['eventid'];
 	}
+return false;
+}
+
+function not_ack_event($eventid){
+	$sql = 'SELECT COUNT(*) as events '.
+			' FROM events '.
+			' WHERE eventid='.$eventid.
+			  ' AND acknowledged=0';
+	$row = DBfetch(DbSelect($sql));
+	if($row['events'] == 1) return true;
 return false;
 }
 ?>
