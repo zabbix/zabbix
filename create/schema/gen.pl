@@ -46,8 +46,8 @@ local $output;
 	"t_varchar"	=>	"varchar",
 	"t_char"	=>	"char",
 	"t_image"	=>	"longblob",
-	"t_history_log"	=>	"text",
-	"t_history_text"=>	"text character set utf8",
+	"t_history_log"	=>	"text character set utf8",
+	"t_history_text"=>	"text",
 	"t_blob"	=>	"blob",
 	"t_item_param"	=>	"text"
 );
