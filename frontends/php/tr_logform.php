@@ -300,7 +300,7 @@ if(isset($_REQUEST['sform'])){
 		$expression = preg_replace($functionid,$functions,$expression);
 		$expr_incase = $expression;
 
-		$expression = explode(" & ",$expression);
+		$expression = explode(" | ",$expression);
 
 		foreach($expression as $id => $expr){
 			$expr = preg_replace("/^\((.*)\)$/u","$1",$expr);

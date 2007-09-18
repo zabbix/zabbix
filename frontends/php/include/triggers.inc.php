@@ -2006,7 +2006,7 @@
 		}
 		
 		foreach($expressions as $id => $expr){
-			$expression .= (!empty($expression))?' & ':'';
+			$expression .= (!empty($expression))?' | ':'';
 			$expression .= '('.$expr['value'].')';
 		}
 	return $expression;
