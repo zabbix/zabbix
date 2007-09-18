@@ -1,5 +1,6 @@
 Changes for 1.4.j:
 
+ - support ot two additional encodings (cp932, eucjpms) for log file monitoring (Alexei)
  - added synchronisation of last value and timestamp for DM (Alexei)
  - added support of encoding parameter for log[] and eventlog[] (Alexei)
  - fixed displaying of Japanese in the Latest Data (Alexei)

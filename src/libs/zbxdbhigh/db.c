@@ -1128,7 +1128,12 @@ int	DBadd_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp
 	DBescape_string(source,source_esc,MAX_STRING_LEN);
 	id = DBget_maxid("history_log", "id");
 
-	if(encoding!=NULL && (strcmp(encoding,"sjis")==0 || strcmp(encoding,"ujis")==0))
+	if(encoding!=NULL && (
+		strcmp(encoding,"sjis")==0 ||
+		strcmp(encoding,"cp932")==0 ||
+		strcmp(encoding,"ujis")==0 ||
+		strcmp(encoding,"eucjpms")==0
+		))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG,"Encoding %s", encoding);
 /* Japan specific cchange */
