@@ -54,6 +54,7 @@ include_once "include/page_header.php";
 	{
 		access_deny();
 	}
+
 	unset($denyed_hosts);
 
 	if(isset($_REQUEST["save"]))
@@ -73,7 +74,7 @@ include_once "include/page_header.php";
 	}
 	else if(isset($_REQUEST["cancel"]))
 	{
-		Redirect('tr_status.php?hostid='.$db_data['hostid']);
+		Redirect('tr_status.php?hostid='.get_profile('web.tr_status.hostid',0));
 		exit;
 	}
 ?>
