@@ -1,5 +1,6 @@
 Changes for 1.4.3:
 
+ - [DEV-19] Add support of IPv6 for windows agent (Sasha)
  - [DEV-23] Autodiscovery for IPv6 (Sasha)
  - [DEV-17] Add support of IPv6 to standard library (comms.c) (Sasha)
  - [DEV-21] extended size of IP fields to accept IPv6 style IPs (Alexei)

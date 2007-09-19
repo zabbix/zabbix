@@ -45,6 +45,10 @@ typedef enum
 
 typedef struct zbx_sock
 {
+#if defined(HAVE_IPV6)
+	ZBX_SOCKET	sockets[FD_SETSIZE];
+	int		num_socks;
+#endif /* HAVE_IPV6 */
 	ZBX_SOCKET	socket;
 	ZBX_SOCKET	socket2;
 	char		buf_stat[ZBX_STAT_BUF_LEN];
