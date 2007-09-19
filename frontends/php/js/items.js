@@ -50,7 +50,7 @@ catch(e){
 }
 //	alert(expr.value+' : '+expr.value.length);
 
-	var regexp = /^iregexp|regexp\(.*\)/igm;
+	var regexp = /(iregexp\(.*\))|(regexp\(.*\))/img;
 	if(!regexp.test(expr.value.toString())){
 		if(!confirm("Posibly wrong Regular Expression:\n["+expr.value+"]\n\nAdd expression anyway?")) return false;
 	}

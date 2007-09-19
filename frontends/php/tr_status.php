@@ -109,7 +109,6 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 	$_REQUEST["compact"]		=	get_request("compact", get_profile("web.tr_status.compact", 'true'));
 	$_REQUEST['show_unknown']	=	get_request('show_unknown',get_profile('web.tr_status.show_unknown',0));
 
-
 	validate_group_with_host(PERM_READ_ONLY,array("allow_all_hosts","always_select_first_host","monitored_hosts","with_monitored_items"),
 		"web.tr_status.groupid","web.tr_status.hostid");
 

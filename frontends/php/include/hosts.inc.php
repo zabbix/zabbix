@@ -721,7 +721,7 @@ require_once "include/items.inc.php";
 
 		$_REQUEST["groupid"]    = get_request("groupid", -1 );
 		$_REQUEST["hostid"]     = get_request("hostid", get_profile($host_var,0));
-		
+
 		if($_REQUEST["groupid"] == -1)
 		{
 			$_REQUEST["groupid"] = get_profile($group_var,0);
@@ -732,7 +732,7 @@ require_once "include/items.inc.php";
 					$_REQUEST["groupid"] = 0;
 			}
 		}
-		
+
 		if(in_array("always_select_first_host",$options) && $_REQUEST["hostid"] == 0 && $_REQUEST["groupid"] != 0)
 			$_REQUEST["hostid"] = -1;
 

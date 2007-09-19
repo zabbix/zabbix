@@ -540,7 +540,7 @@
 		
 		$expr = $expression;
 		$h_status = array();
-
+		
 		/* Replace all {server:key.function(param)} and {MACRO} with '$ZBX_TR_EXPR_REPLACE_TO' */
 		while(ereg(ZBX_EREG_EXPRESSION_TOKEN_FORMAT, $expr, $arr))
 		{
@@ -555,7 +555,7 @@
 				$key		= &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID + ZBX_SIMPLE_EXPRESSION_KEY_ID];
 				$function	= &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID + ZBX_SIMPLE_EXPRESSION_FUNCTION_NAME_ID];
 				$parameter	= &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID + ZBX_SIMPLE_EXPRESSION_FUNCTION_PARAM_ID];
-				
+
 				/* Check host */
 				$row=DBfetch(DBselect('select count(*) as cnt,min(status) as status,min(hostid) as hostid from hosts h where h.host='.zbx_dbstr($host).
 						' and '.DBin_node('h.hostid', get_current_nodeid(false))
@@ -664,7 +664,7 @@
 
 		if ( $ZBX_TR_EXPR_REPLACE_TO != $expr )
 		{
-			error('Incorrect trigger expression. ['.str_replace($ZBX_TR_EXPR_REPLACE_TO, ' ... ', $expr).']');
+			error('Incorrect trigger expression! ['.str_replace($ZBX_TR_EXPR_REPLACE_TO, ' ... ', $expr).']');
 			return false;
 		}
 
@@ -1977,41 +1977,6 @@
 		return $ret;
 	}
 
-	function construct_expression($itemid,$expressions){
-		$expression='';
-
-		$item = get_item_by_itemid($itemid);
-		$host = get_host_by_itemid($itemid);
-		
-		$prefix = $host['host'].':'.$item['key_'].'.';
-
-		foreach($expressions as $id => $expr){
-			$eq = (($expr['type'] == REGEXP_INCLUDE)?'#':'=').'0';
-			
-			if(!preg_match("/^iregexp|regexp\(.*\)/iUm",$expr['value'])){
-				error('Incorrect trigger expression. ['.$expr['value'].']');
-				return false;
-			}
-			$expr['value'] = preg_replace('/\s+(\&|\|){1,2}\s+/U','$1',$expr['value']);
-			
-			$expr['value'] = eregi_replace('(regexp|iregexp)(\(.*\))(&|\|){1,2}','\\1\\2\\3',$expr['value']);
-
-			$expr['value'] = preg_replace('/(regexp|iregexp)(\(.*\))/iUu','{$1$2}'.$eq,$expr['value']);
-			
-			$patern = array('/iregexp\((.*)\)/iUu','/regexp\((.*)\)/iUu','/regiexp\((.*)\)/iUu');
-			$replacement = array('regiexp(\\1)',($prefix."regexp(\\1)"),($prefix."iregexp(\\1)"));
-			
-			$expr['value'] = preg_replace($patern,$replacement,$expr['value']);
-			$expressions[$id] = $expr;
-		}
-		
-		foreach($expressions as $id => $expr){
-			$expression .= (!empty($expression))?' | ':'';
-			$expression .= '('.$expr['value'].')';
-		}
-	return $expression;
-	}
-	
 	function get_notacknowledged($triggerid,$show_unknown=0,$onlytrue='false'){
 	
 		$cond=(TRIGGER_SHOW_UNDEFINED_ACK)?' OR (e.value=2 AND (('.time().'-e.clock)<'.TRIGGER_FALSE_TIME_ACK.'))':'';
@@ -2026,5 +1991,64 @@
 				' ORDER BY e.eventid DESC';
 
 	return DBselect($sql);
+	}
+	
+	function construct_expression($itemid,$expressions){
+		$complite_expr='';
+
+		
+		$item = get_item_by_itemid($itemid);
+		$host = get_host_by_itemid($itemid);
+		
+		$prefix = $host['host'].':'.$item['key_'].'.';
+
+		if(empty($expressions)){
+			error('Expression can\'t be empty');
+		}
+		$functions = array('regexp'=>1,'iregexp'=>1);
+			
+		$ZBX_EREG_EXPESSION_FUNC_FORMAT = '^([[:print:]]*)([&|]{1})(([a-zA-Z_.$]{6,7})(\\(([[:print:]]+){0,1}\\)))([[:print:]]*)$';
+
+		$expr_array = array();
+
+		foreach($expressions as $id => $expression){
+			if(!empty($complite_expr)) $complite_expr.=' | ';
+	
+			$eq = (($expression['type'] == REGEXP_INCLUDE)?'#':'=').'0';
+			$expr = '&'.$expression['value'];
+			$expr = preg_replace('/\s+(\&|\|){1,2}\s+/U','$1',$expr);
+			
+			$expr_array = array();
+			$sub_expr_count=0;
+			$sub_expr = '';
+
+			while(eregi($ZBX_EREG_EXPESSION_FUNC_FORMAT, $expr, $arr)){
+				$arr[4] = strtolower($arr[4]);
+
+				if(!isset($functions[$arr[4]])){
+					error('Incorrect function is used. ['.$expression['value'].']');
+					return false;
+				}
+
+				$expr_array[$sub_expr_count]['eq'] = trim($arr[2]);
+				$expr_array[$sub_expr_count]['regexp'] = strtolower($arr[4]).$arr[5];
+
+				$sub_expr_count++;
+				$expr = $arr[1];
+			}
+			
+			if(empty($expr_array)){
+				error('Incorrect trigger expression. ['.$expression['value'].']');
+				return false;
+			}
+			
+			$expr_array[$sub_expr_count-1]['eq'] = '';
+			
+			foreach($expr_array as $id => $expr){
+				$sub_expr = $expr['eq'].'{'.$prefix.$expr['regexp'].'}'.$eq.$sub_expr;
+			}
+			$complite_expr.= '('.$sub_expr.')';
+		}
+	return $complite_expr;
 	}
 ?>
