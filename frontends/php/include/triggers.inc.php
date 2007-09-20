@@ -2014,7 +2014,7 @@
 		foreach($expressions as $id => $expression){
 			if(!empty($complite_expr)) $complite_expr.=' | ';
 	
-			$eq = (($expression['type'] == REGEXP_INCLUDE)?'#':'=').'0';
+			$eq_global = (($expression['type'] == REGEXP_INCLUDE)?'#':'=').'0';
 			$expr = '&'.$expression['value'];
 			$expr = preg_replace('/\s+(\&|\|){1,2}\s+/U','$1',$expr);
 			
@@ -2045,9 +2045,9 @@
 			$expr_array[$sub_expr_count-1]['eq'] = '';
 			
 			foreach($expr_array as $id => $expr){
-				$sub_expr = $expr['eq'].'{'.$prefix.$expr['regexp'].'}'.$eq.$sub_expr;
+				$sub_expr = $expr['eq'].'{'.$prefix.$expr['regexp'].'}'.$sub_expr;
 			}
-			$complite_expr.= '('.$sub_expr.')';
+			$complite_expr.= '(('.$sub_expr.')'.$eq_global.')';
 		}
 	return $complite_expr;
 	}
