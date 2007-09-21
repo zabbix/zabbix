@@ -95,11 +95,11 @@
 
 	function	validate_ip($str,&$arr)
 	{
-		if(validate_ipv4($str,&$arr))
+		if(validate_ipv4($str,$arr))
 			return true;
 		if(defined('ZBX_HAVE_IPV6'))
 		{
-			return validate_ipv6($str,&$arr);
+			return validate_ipv6($str,$arr);
 		}
 		return false;
 	}
