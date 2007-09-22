@@ -103,7 +103,11 @@ int	getPROC(char *file, int lineno, int fieldno, unsigned flags, AGENT_RESULT *r
 
 	for(i=1; i<=lineno; i++)
 	{	
-		fgets(c,MAX_STRING_LEN,f);
+		if(NULL == fgets(c,MAX_STRING_LEN,f))
+		{
+			zbx_fclose(f);
+			return	SYSINFO_RET_FAIL;
+		}
 	}
 
 	t=(char *)strtok(c," ");

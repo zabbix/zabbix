@@ -56,7 +56,11 @@ static int	get_sensor(const char *name, unsigned flags, AGENT_RESULT *result)
 			{
 				continue;
 			}
-			fgets(line,MAX_STRING_LEN,f);
+			if(NULL == fgets(line,MAX_STRING_LEN,f))
+			{
+				zbx_fclose(f);
+				continue;
+			}
 			zbx_fclose(f);
 
 			if(sscanf(line,"%lf\t%lf\t%lf\n",&d1, &d2, &d3) == 3)
