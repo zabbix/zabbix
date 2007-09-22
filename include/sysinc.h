@@ -288,7 +288,9 @@
 
 #ifdef HAVE_GETOPT_H
 #	ifdef HAVE_GETOPT_LONG
-#		define _GNU_SOURCE
+#		if !defined(_GNU_SOURCE)
+#			define _GNU_SOURCE
+#		endif
 #		include <getopt.h>
 #	endif
 #endif
