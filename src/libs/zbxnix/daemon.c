@@ -131,7 +131,11 @@ int	daemon_start(int allow_root)
 		exit( 0 );		
 	}				
 
-	chdir("/");
+	/* This is to eliminate warning: ignoring return value of chdir */
+	if(-1 == chdir("/"))
+	{
+		assert(0);
+	}
 	umask(0002);
 
 	redirect_std(CONFIG_LOG_FILE);

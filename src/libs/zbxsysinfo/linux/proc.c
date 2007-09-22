@@ -160,7 +160,10 @@ int     PROC_MEMORY(const char *cmd, const char *param, unsigned flags, AGENT_RE
 
 			if(procname[0] != 0)
 			{
-				fgets(line,MAX_STRING_LEN,f);
+				if(NULL == fgets(line,MAX_STRING_LEN,f))
+				{
+					continue;
+				}
 				if(sscanf(line,"%s\t%s\n",name1,name2)==2)
 				{
 					if(strcmp(name1,"Name:") == 0)
@@ -449,7 +452,10 @@ int	    PROC_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESUL
 		proc_ok = 0;
                 if(procname[0] != 0)
                 {
-                    fgets(line,MAX_STRING_LEN,f);
+                    if(NULL == fgets(line,MAX_STRING_LEN,f))
+			{
+				continue;
+			}
                     if(sscanf(line,"%s\t%s\n",name1,name2)==2)
                     {
                         if(strcmp(name1,"Name:") == 0)
