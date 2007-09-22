@@ -11,6 +11,7 @@ Changes for 1.4.j:
 
 Changes for 1.4.3:
 
+ - [ZBX-69] eliminated compilation warnings "_GNU_SOURCE redefined" (Alexei)
  - [ZBX-1] fixed wrong status of function "nodata" after server restart (Sasha)
  - [ZBX-33] fixed problem in table names in data.sql for PostgreSQL (Sasha)
  - [ZBX-32] fixed incorrect processing of IP ranges in ip_in_list (Sasha)
