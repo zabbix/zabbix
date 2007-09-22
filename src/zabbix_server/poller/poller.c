@@ -312,6 +312,10 @@ int get_values(void)
 	/* Do not stop when select is made by poller for unreachable hosts */
 	while((row=DBfetch(result))&&(stop==0 || poller_type == ZBX_POLLER_TYPE_UNREACHABLE))
 	{
+		/* This code is just to avoid compilation warining about use of uninitialized result2 */
+		result2 = result;
+		/* */
+
 		/* Poller for unreachable hosts */
 		if(poller_type == ZBX_POLLER_TYPE_UNREACHABLE)
 		{
