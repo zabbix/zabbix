@@ -628,7 +628,9 @@ int	get_nodeid_by_id(zbx_uint64_t id);
 int	int_in_list(char *list, int value);
 int	uint64_in_list(char *list, zbx_uint64_t value);
 int	ip_in_list(char *list, char *ip);
-
+#ifdef HAVE_IPV6
+int	expand_ipv6(const char *ip, char *str, size_t str_len );
+#endif /* HAVE_IPV6 */
 /* Time related functions */
 double	time_diff(struct timeval *from, struct timeval *to);
 
