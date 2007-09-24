@@ -1278,16 +1278,21 @@
 		$trig_hosts	= get_hosts_by_triggerid($triggerid);
 		$trig_host	= DBfetch($trig_hosts);
 
-		if(is_null($expression))
-		{
+		$event_to_unknown = false;		
+
+		if(is_null($expression)){
 			/* Restore expression */
 			$expression = explode_exp($trigger["expression"],0);
+		} 
+		else if($expression != explode_exp($trigger["expression"],0)){
+			$event_to_unknown = true;
 		}
-
+		
 		if ( !validate_expression($expression) )
 			return false;
 
 		$exp_hosts 	= get_hosts_by_expression($expression);
+		
 		if( $exp_hosts )
 		{
 			$chd_hosts	= get_hosts_by_templateid($trig_host["hostid"]);
@@ -1295,6 +1300,7 @@
 			if(DBfetch($chd_hosts))
 			{
 				$exp_host = DBfetch($exp_hosts);
+
 				$db_chd_triggers = get_triggers_by_templateid($triggerid);
 				while($db_chd_trigger = DBfetch($db_chd_triggers))
 				{
@@ -1305,6 +1311,7 @@
 						"{".$exp_host["host"].":",
 						"{".$chd_trig_host["host"].":",
 						$expression);
+
 				// recursion
 					update_trigger(
 						$db_chd_trigger["triggerid"],
@@ -1328,7 +1335,7 @@
 
 		$expression = implode_exp($expression,$triggerid); /* errors can be ignored cose function must return NULL */
 
-		add_event($triggerid,TRIGGER_VALUE_UNKNOWN);
+		if($event_to_unknown) add_event($triggerid,TRIGGER_VALUE_UNKNOWN);
 		reset_items_nextcheck($triggerid);
 
 		$sql="update triggers set";
