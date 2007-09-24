@@ -1,5 +1,6 @@
 Changes for 1.4.3:
 
+ - [ZBX-71] added separation of "other" by node and host in "latest data" (Artem)
  - [ZBX-70] fixed even more compilation warnings (Alexei)
  - [ZBX-69] eliminated compilation warnings "_GNU_SOURCE redefined" (Alexei)
  - [DEV-19] Add support of IPv6 for windows agent (Sasha)
