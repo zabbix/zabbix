@@ -1,5 +1,16 @@
 Changes for 1.4.j:
 
+ - fixed appeared error in Latest Data (Artem)
+ - fixed problem with equivalence in expressions in Trigger Log Form (Artem)
+ - fixed problem with displaying triggers which had been Acknowledged (Artem)
+ - changed logical symbol between Expressions (Artem)
+ - fixed adding specific symbols to Trigger expression in Trigger Log Form (Artem)
+ - added Trigger Log Form (Artem)
+ - fixed problem of displaying long Trigger description in js menu (Artem)
+ - added JS menu for opening Trigger Log Form in Configuration->items (Artem)
+ - fixed error apeared in Monitoring->Events (Artem)
+ - fixed displaying "Array" instead of trigger description (Artem)
+ - fixed redirection after acknowledge form (Artem) 
  - support ot two additional encodings (cp932, eucjpms) for log file monitoring (Alexei)
  - added synchronisation of last value and timestamp for DM (Alexei)
  - added support of encoding parameter for log[] and eventlog[] (Alexei)
@@ -11,6 +22,8 @@ Changes for 1.4.j:
 
 Changes for 1.4.3:
 
+ - fixed setting trigger status to unknown on trigger update, now only if expression is changed (Artem)
+ - fixed problem with Enabling/Disabling actions (Artem)
  - [ZBX-70] fixed even more compilation warnings (Alexei)
  - [ZBX-69] eliminated compilation warnings "_GNU_SOURCE redefined" (Alexei)
  - [ZBX-1] fixed wrong status of function "nodata" after server restart (Sasha)
