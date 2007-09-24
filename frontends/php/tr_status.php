@@ -406,6 +406,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 					new CCol($ack,"center"),
 					new CLink(($row["comments"] == "") ? S_ADD : S_SHOW,"tr_comments.php?triggerid=".$row["triggerid"],"action")
 					));
+			$description = expand_trigger_description($row["triggerid"]);
 			$header_event = 1;
 		}
 		
