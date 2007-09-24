@@ -22,6 +22,7 @@ Changes for 1.4.j:
 
 Changes for 1.4.3:
 
+ - added separation of "other" by node and host in "latest data" (Artem)
  - fixed setting trigger status to unknown on trigger update, now only if expression is changed (Artem)
  - fixed problem with Enabling/Disabling actions (Artem)
  - [ZBX-70] fixed even more compilation warnings (Alexei)
