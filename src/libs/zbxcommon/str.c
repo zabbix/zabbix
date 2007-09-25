@@ -1112,3 +1112,180 @@ int	get_param(const char *param, int num, char *buf, int maxlen)
 
 	return ret;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_num2hex                                                      *
+ *                                                                            *
+ * Purpose: convert parameter c (0-15) to hexadecimal value ('0'-'f')         *
+ *                                                                            *
+ * Parameters:                                                                *
+ * 	c - number 0-15                                                       *
+ *                                                                            *
+ * Return value:                                                              *
+ *      '0'-'f'                                                               *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+char	zbx_num2hex(u_char c)
+{
+	if(c >= 10)
+		return c + 0x57; /* a-f */
+	else
+		return c + 0x30; /* 0-9 */
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_hex2num                                                      *
+ *                                                                            *
+ * Purpose: convert hexit c ('0'-'9''a'-'f') to number (0-15)                 *
+ *                                                                            *
+ * Parameters:                                                                *
+ * 	c - char ('0'-'9''a'-'f')                                             *
+ *                                                                            *
+ * Return value:                                                              *
+ *      0-15                                                                  *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+u_char	zbx_hex2num(char c)
+{
+	if(c >= 'a')
+		return c - 0x57; /* a-f */
+	else
+		return c - 0x30; /* 0-9 */
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_binary2hex                                                   *
+ *                                                                            *
+ * Purpose: convert binary buffer input to hexadecimal string                 *
+ *                                                                            *
+ * Parameters:                                                                *
+ * 	input - binary data                                                   *
+ *	ilen - binaru data length                                             *
+ *	output - pointer to output buffer                                     *
+ *	olen - output buffer length                                           *
+ 	*                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_binary2hex(const u_char *input, size_t ilen, char **output, size_t *olen)
+{
+	const u_char	*i = (const u_char *)input;
+	char		*o;
+	size_t		len = (ilen * 2) + 1;
+
+	assert(input);
+	assert(output);
+	assert(*output);
+	assert(olen);
+
+	if(*olen < len)
+	{
+		*olen = 2*len;
+		*output = zbx_realloc(*output, *olen);
+	}
+	o = *output;
+
+	while(i - input < ilen) {
+		*o++ = zbx_num2hex( (*i >> 4) & 0xf );
+		*o++ = zbx_num2hex( *i & 0xf );
+		i++;
+	}
+	*o = '\0';
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_hex2binary                                                   *
+ *                                                                            *
+ * Purpose: convert hexadecimal string to binary buffer                       *
+ *                                                                            *
+ * Parameters:                                                                *
+ * 	io - hexadecimal string                                               *
+ *                                                                            *
+ * Return value:                                                              *
+ *	size of buffer                                                        *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_hex2binary(char *io)
+{
+	const char	*i = io;
+	u_char		*o = (u_char *)io, c;
+	size_t		len = 0;
+
+	assert(io);
+
+	while(*i != '\0') {
+		c = zbx_hex2num( *i++ ) << 4;
+		c += zbx_hex2num( *i++ );
+		*o++ = c;
+		len++;
+	}
+	*o = '\0';
+
+	return len;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_get_next_field                                               *
+ *                                                                            *
+ * Purpose: return current field of characted separated string                *
+ *                                                                            *
+ * Parameters:                                                                *
+ *	line - null terminated, characret separated string                    *
+ *	output - output buffer (current field)                                *
+ *	olen - allocated output buffer size                                   *
+ *	separator - fields separator                                          *
+ *                                                                            *
+ * Return value: pointer to the next field                                    *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_get_next_field(const char *line, char **output, size_t *olen, char separator)
+{
+	char	*ret;
+	size_t	flen;
+
+	ret = strchr(line, separator);
+	if(ret)
+	{
+		flen = ret-line;
+		ret++;
+	}
+	else
+	{
+		flen = strlen(line);
+	}
+
+	if(*olen < flen)
+	{
+		*olen = 2*flen;
+		*output = zbx_realloc(*output, *olen);
+	}
+	memcpy(*output, line, flen);
+	(*output)[flen] = '\0';
+
+	return ret;
+}
