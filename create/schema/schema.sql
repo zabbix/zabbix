@@ -425,7 +425,7 @@ TABLE|images|imageid|ZBX_SYNC
 FIELD		|imageid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|imagetype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|name		|t_varchar(64)	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|image		|t_image	|''	|NOT NULL	|0
+FIELD		|image		|t_image	|''	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|imagetype,name
 
 TABLE|items|itemid|ZBX_SYNC

@@ -536,6 +536,9 @@ int	get_key_param(char *key_param, int num, char *buf, int maxlen);
 int	num_param(const char *param);
 int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char *delay_flex, time_t now);
 int	check_time_period(const char *period, time_t now);
+void	zbx_binary2hex(const u_char *input, size_t ilen, char **output, size_t *olen);
+int     zbx_hex2binary(char *io);
+char    *zbx_get_next_field(const char *line, char **output, size_t *olen, char separator);
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_setproctitle(fmt, ...) __zbx_zbx_setproctitle(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
