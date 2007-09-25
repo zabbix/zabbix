@@ -109,8 +109,16 @@ static int calculate_checksums()
 				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, "coalesce(%s,'1234567890'),",
 					tables[i].fields[j].name);
 #else
-				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, "coalesce(%s,'1234567890')||",
-					tables[i].fields[j].name);
+				if(tables[i].fields[j].type == ZBX_TYPE_BLOB) /* postgresql is not work: coalesce(blob,'1234567890')||coalesce(varchar,'1234567890') */
+				{
+					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, "md5(coalesce(%s,'1234567890'))||",
+						tables[i].fields[j].name);
+				}
+				else
+				{
+					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, "coalesce(%s,'1234567890')||",
+						tables[i].fields[j].name);
+				}
 #endif
 				j++;
 			}
@@ -134,7 +142,7 @@ static int calculate_checksums()
 					(zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid+__UINT64_C(99999999999999));
 
 		}
-/*		zabbix_log( LOG_LEVEL_WARNING, "SQL DUMP [%s]", sql); */
+/*		zabbix_log( LOG_LEVEL_WARNING, "SQL DUMP [%s]", sql);*/
 
 		result2 =DBselect("%s",sql);
 
@@ -320,7 +328,6 @@ int main_nodewatcher_loop()
 
 			lastrun = start;
 		}
-
 		/* Send new events to master node */
 		main_eventsender();
 

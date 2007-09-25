@@ -51,10 +51,11 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 {
 	DB_RESULT	result;
 	DB_RESULT	result2;
+	DB_RESULT	result3;
 	DB_ROW		row;
 	DB_ROW		row2;
 
-	char	*xml = NULL;
+	char	*xml = NULL, *hex = NULL;
 	char	fields[MAX_STRING_LEN];
 	int	offset=0;
 	int	allocated=1024;
@@ -62,10 +63,13 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 	int	found=0;
 
 	int	i,j;
+	size_t	hex_allocated=1024, rowlen;
 
 	xml=zbx_malloc(xml, allocated);
+	hex=zbx_malloc(hex, hex_allocated);
 
 	memset(xml,0,allocated);
+
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In send_config_data(nodeid:%d,dest_node:%d,maxlogid:" ZBX_FS_UI64 ",type:%d)",
 		nodeid,
@@ -123,6 +127,10 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 			{
 				zbx_strlcat(fields,tables[i].fields[j].name,sizeof(fields));
 				zbx_strlcat(fields,",",sizeof(fields));
+
+				zbx_strlcat(fields,"length(",sizeof(fields));
+				zbx_strlcat(fields,tables[i].fields[j].name,sizeof(fields));
+				zbx_strlcat(fields,"),",sizeof(fields));
 			}
 			if(fields[0]!=0)	fields[strlen(fields)-1]=0;
 
@@ -147,9 +155,9 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 				{
 					if( (tables[i].fields[j].flags & ZBX_SYNC) ==0)	continue;
 					/* Fieldname, type, value */
-					if(DBis_null(row2[j]) == SUCCEED)
+					if(DBis_null(row2[j*2]) == SUCCEED)
 					{
-/*						zabbix_log( LOG_LEVEL_WARNING, "Field name [%s] [%s]",tables[i].fields[j].name,row2[j]);*/
+/*						zabbix_log( LOG_LEVEL_WARNING, "Field name [%s] [%s]",tables[i].fields[j].name,row2[j*2]);*/
 						zbx_snprintf_alloc(&xml, &allocated, &offset, 16*1024, "%c%s%c%d%cNULL",
 							ZBX_DM_DELIMITER,
 							tables[i].fields[j].name,
@@ -159,13 +167,32 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 					}
 					else
 					{
-						zbx_snprintf_alloc(&xml, &allocated, &offset, 16*1024, "%c%s%c%d%c%s",
-							ZBX_DM_DELIMITER,
-							tables[i].fields[j].name,
-							ZBX_DM_DELIMITER,
-							tables[i].fields[j].type,
-							ZBX_DM_DELIMITER,
-							row2[j]);
+						if(tables[i].fields[j].type == ZBX_TYPE_INT ||
+						   tables[i].fields[j].type == ZBX_TYPE_UINT ||
+						   tables[i].fields[j].type == ZBX_TYPE_ID ||
+						   tables[i].fields[j].type == ZBX_TYPE_FLOAT)
+						{
+							zbx_snprintf_alloc(&xml, &allocated, &offset, 16*1024, "%c%s%c%d%c%s",
+								ZBX_DM_DELIMITER,
+								tables[i].fields[j].name,
+								ZBX_DM_DELIMITER,
+								tables[i].fields[j].type,
+								ZBX_DM_DELIMITER,
+								row2[j*2]);
+						}
+						else
+						{
+							rowlen = atoi(row2[j*2+1]);
+							zbx_binary2hex((u_char *)row2[j*2], rowlen, &hex, &hex_allocated);
+							zbx_snprintf_alloc(&xml, &allocated, &offset, 16*1024, "%c%s%c%d%c%s",
+								ZBX_DM_DELIMITER,
+								tables[i].fields[j].name,
+								ZBX_DM_DELIMITER,
+								tables[i].fields[j].type,
+								ZBX_DM_DELIMITER,
+								hex);
+/*zabbix_log( LOG_LEVEL_WARNING, "----- DATA [fieldname:%s] [length:%d]", tables[i].fields[j].name, rowlen);*/
+						}
 					}
 				}
 			}
@@ -213,6 +240,7 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 
 	DBfree_result(result);
 	zbx_free(xml);
+	zbx_free(hex);
 	/* Commit */
 
 	return SUCCEED;
