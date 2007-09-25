@@ -558,7 +558,7 @@ ZBX_TEST_TIME expressions[]=
 	printf("Passed OK\n");
 }
 */
-
+/*
 void	test_email()
 {
 	char str_error[MAX_STRING_LEN];
@@ -599,7 +599,7 @@ void	test_email()
 	alarm(0);
 
 }
-
+*/
 
 /*
 void test_extract_numbers(void)
@@ -758,6 +758,86 @@ ZBX_TEST_IP expressions[]=
 	printf("Passed OK\n");
 }
 
+void test_binary2hex()
+{
+#define ZBX_TEST_HEX struct zbx_test_hex_t
+ZBX_TEST_HEX
+{
+	char	*bin;
+	char	*hex;
+};
+
+ZBX_TEST_HEX expressions[]=
+{
+	{"a", "61"},
+	{"abcd", "61626364"},
+	{"abcdefghijk^^^", "6162636465666768696a6b5e5e5e"},
+	{"abcdefghijk***", "6162636465666768696a6b2a2a2a"},
+	{"\xffwabcdefghijkTUVabcdefghijk", "ff776162636465666768696a6b5455566162636465666768696a6b"},
+	{NULL}
+};
+	size_t	len, ilen;
+	int	i;
+	char	*buffer = NULL, tmp[MAX_STRING_LEN];
+
+	printf("-= Test binary_to_hex =-\n");
+
+	len = 1024;
+	buffer = zbx_malloc(buffer, len);
+	for(i = 0; expressions[i].bin != NULL; i++)
+	{
+		ilen = strlen(expressions[i].bin);
+		zbx_binary2hex((u_char *)expressions[i].bin, ilen, &buffer, &len);
+		printf("bin [%s] hex [%s] got [%s] [%s]\n",
+			expressions[i].bin,
+			expressions[i].hex,
+			buffer,
+			(strcmp(expressions[i].hex, buffer) == 0 ? "SUCCEED" : "FAIL"));
+		if(strcmp(expressions[i].hex, buffer) != 0)
+		{
+			printf("FAILED!\n");
+			exit(-1);
+		}
+
+		strcpy(tmp, expressions[i].hex);
+		zbx_hex2binary(tmp);
+		printf("hex [%s] bin [%s] got [%s] [%s]\n",
+			expressions[i].hex,
+			expressions[i].bin,
+			tmp,
+			(strcmp(expressions[i].bin, tmp) == 0 ? "SUCCEED" : "FAIL"));
+		if(strcmp(expressions[i].bin, tmp) != 0)
+		{
+			printf("FAILED!\n");
+			exit(-1);
+		}
+	}
+	printf("Passed OK\n");
+}
+
+void test_zbx_get_next_field()
+{
+	char	input[] = {"?11111.;?222222222222222222.;?333333333333.;?4444444444444444."};
+	char	*ptr, *buffer = NULL;
+	size_t	len;
+
+	printf("-= Test binary_to_hex =-\n");
+
+	len = 1;
+	buffer = zbx_malloc(buffer, len);
+	ptr = input;
+
+
+	ptr = zbx_get_next_field( ptr, &buffer, &len, ';');
+printf("test_zbx_get_next_field() (1) [input:%s] [buffer:%s]\n", ptr, buffer);
+	ptr = zbx_get_next_field( ptr, &buffer, &len, ';');
+printf("test_zbx_get_next_field() (2) [input:%s] [buffer:%s]\n", ptr, buffer);
+	ptr = zbx_get_next_field( ptr, &buffer, &len, ';');
+printf("test_zbx_get_next_field() (3) [input:%s] [buffer:%s]\n", ptr, buffer);
+	ptr = zbx_get_next_field( ptr, &buffer, &len, ';');
+printf("test_zbx_get_next_field() (4) [input:%s] [buffer:%s]\n", ptr, buffer);
+}
+
 void test()
 {
 
@@ -786,7 +866,9 @@ void test()
 /*	test_extract_numbers(); */
 /*	test_trigger_description(); */
 /*	test_zbx_tcp_connect( );*/
-	test_ip_in_list();
+/*	test_ip_in_list(); */
+/*	test_binary2hex();*/
+	test_zbx_get_next_field();
 
 	printf("\n-= Test completed =-\n");
 }
