@@ -790,7 +790,8 @@
 			array_push($saved_request,$ext_saved_request);
 
 		$form = new CForm($url);
-
+		$form->SetMethod('get');	
+		
 		$form->AddItem(S_PERIOD.SPACE);
 
 		$period = get_request('period',ZBX_PERIOD_DEFAULT);
