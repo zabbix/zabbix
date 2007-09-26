@@ -790,7 +790,7 @@
 			array_push($saved_request,$ext_saved_request);
 
 		$form = new CForm($url);
-		$form->SetMethod('get');
+		$form->SetMethod('get');	
 		
 		$form->AddItem(S_PERIOD.SPACE);
 
