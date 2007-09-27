@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2007 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -175,6 +175,14 @@
 		return $table;
 	}
 	
+/* function:
+ *     event_initial_time
+ *
+ * description:
+ *     returs 'true' if event is initial, otherwise false; 
+ *
+ * author: Aly
+ */
 function event_initial_time($row,$show_unknown=0){
 	$sql_cond=($show_unknown == 0)?' AND value<>2 ':'';
 
@@ -191,19 +199,7 @@ function event_initial_time($row,$show_unknown=0){
 		$events[] = $rows;
 	}
 	if(!empty($events) && ($events[0]['value'] == $row['value'])){
-
-		$clock = (count($events) > 1)?($events[1]['clock']):(0);
-		$res = DBselect('SELECT MIN(clock) as clock, value '.
-						' FROM events as e '.
-						' WHERE clock > '.$clock.$sql_cond.
-							' AND object='.EVENT_OBJECT_TRIGGER.
-							' AND objectid='.$row['triggerid'].
-							' AND clock < '.$row['clock'].
-						' GROUP BY value');
-		while($rows = DBfetch($res)){
-			$rclock = $rows['clock'];
-		}
-		if($rclock != $row['clock']) return false;
+		return false;
 	}
 	return true;
 }
