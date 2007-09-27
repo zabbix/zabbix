@@ -157,7 +157,8 @@ include_once "include/page_header.php";
 //	echo BR;
 
 	$r_form = new CForm();
-
+	$r_form->SetMethod('get');
+	
 	$r_form->AddVar('start',$_REQUEST['start']);
 
 	$btnPrev = new CButton("prev","<< Prev ".PAGE_SIZE);

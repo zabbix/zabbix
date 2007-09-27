@@ -147,7 +147,8 @@ include_once "include/page_header.php";
 	show_table_header(S_LATEST_DATA_BIG,$r_form);
 
 	$r_form = new CForm();
-
+	$r_form->SetMethod('get');
+	
 	$r_form->AddVar("hostid",$_REQUEST["hostid"]);
 	$r_form->AddVar("groupid",$_REQUEST["groupid"]);
 

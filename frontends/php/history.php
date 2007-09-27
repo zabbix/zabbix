@@ -192,6 +192,8 @@ include_once "include/page_header.php";
 		}
 
 		$form = new CForm();
+		$form->SetMethod('get');
+		
 		$form->AddVar("itemid",$_REQUEST["itemid"]);
 
 		if($_REQUEST["action"]!="showlatest")
@@ -254,6 +256,8 @@ include_once "include/page_header.php";
 				$mark_color = get_request("mark_color",0);
 
 				$r_header = new CForm();
+				$r_header->SetMethod('get');
+				
 				$r_header->AddVar("action",$_REQUEST["action"]);
 				$r_header->AddVar("from",$_REQUEST["from"]);
 				$r_header->AddVar("period",$_REQUEST["period"]);
