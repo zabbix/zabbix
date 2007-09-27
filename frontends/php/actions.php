@@ -63,6 +63,8 @@ include_once "include/page_header.php";
         $table = get_history_of_actions($_REQUEST["start"], PAGE_SIZE);
 	
 	$form = new CForm();
+	$form->SetMethod('get');
+	
 	$form->AddVar("start",$_REQUEST["start"]);
 
 	$btnPrev = new CButton("prev","<< Prev ".PAGE_SIZE);
