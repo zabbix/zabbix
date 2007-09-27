@@ -1,5 +1,6 @@
 Changes for 1.4.3:
 
+ - [ZBX-75] fixed problem with occured warning in events (Artem)
  - [ZBX-68] fixed iframe resize on refresh in Screens (Artem)
  - [ZBX-65] fixed sideeffect on massupdate items, 'application' entries are cleaned from all affected items" (Artem)
  - fixed setting trigger status to unknown on trigger update, now only if expression is changed (Artem)
