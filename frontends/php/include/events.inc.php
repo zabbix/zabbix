@@ -176,6 +176,14 @@
 	}
 
 
+/* function:
+ *     event_initial_time
+ *
+ * description:
+ *     returs 'true' if event is initial, otherwise false; 
+ *
+ * author: Aly
+ */
 function event_initial_time($row,$show_unknown=0){
 	$sql_cond=($show_unknown == 0)?' AND value<>2 ':'';
 
