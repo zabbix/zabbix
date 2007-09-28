@@ -74,13 +74,16 @@ static int	process_record(int nodeid, char *record)
 	DB_ROW		row;
 	char		*r, *buffer = NULL, *tmp = NULL, *fields_update = NULL, *fields = NULL, *values = NULL;
 	int		buffer_allocated = 16*1024;
-	int		tmp_allocated = 16*1024, tmp_offset = 0;
+	int		tmp_allocated = 16*1024, tmp_offset;
 	int		fields_update_allocated = 16*1024, fields_update_offset = 0;
 	int		fields_allocated = 4*1024, fields_offset = 0;
 	int		values_allocated = 16*1024, values_offset = 0;
 #if defined(HAVE_POSTGRESQL)
 	int		len;
 #endif /* HAVE_POSTGRESQL */
+
+	int		table_acknowledges = 0;
+	zbx_uint64_t	eventid = 0;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_record [%s]", record);
 
@@ -93,6 +96,11 @@ static int	process_record(int nodeid, char *record)
 
 	r = zbx_get_next_field(r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER);
 	strcpy(tablename, buffer);
+
+	if(0==strcmp(tablename, "acknowledges"))
+	{
+		table_acknowledges = 1;
+	}
 
 	r = zbx_get_next_field(r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER);
 	sscanf(buffer, ZBX_FS_UI64,&recid);
@@ -117,6 +125,7 @@ static int	process_record(int nodeid, char *record)
 	}
 	if(op==NODE_CONFIGLOG_OP_DELETE)
 	{
+		tmp_offset = 0;
 		zbx_snprintf_alloc(&tmp, &tmp_allocated, &tmp_offset, 16*1024, "delete from %s where %s=" ZBX_FS_UI64,
 			tablename,
 			key,
@@ -151,6 +160,19 @@ static int	process_record(int nodeid, char *record)
 						buffer);
 					zbx_snprintf_alloc(&values, &values_allocated, &values_offset, 16*1024, "%s,",
 						buffer);
+
+					if(table_acknowledges && 0 == strcmp(fieldname, "eventid"))
+					{
+						sscanf(buffer, ZBX_FS_UI64, &eventid);
+
+						tmp_offset = 0;
+						zbx_snprintf_alloc(&tmp, &tmp_allocated, &tmp_offset, 16*1024, "update events set acknowledged=1 where eventid=" ZBX_FS_UI64, eventid);
+						if(FAIL == DBexecute("%s",tmp))
+						{
+							zabbix_log(LOG_LEVEL_WARNING, "Failed [%s]",
+								tmp);
+						}
+					}
 				}
 				else if(valuetype == ZBX_TYPE_BLOB)
 				{
@@ -207,6 +229,7 @@ static int	process_record(int nodeid, char *record)
 
 	if(op==NODE_CONFIGLOG_OP_UPDATE)
 	{
+		tmp_offset = 0;
 		zbx_snprintf_alloc(&tmp, &tmp_allocated, &tmp_offset, 16*1024, "update %s set %s where %s=" ZBX_FS_UI64,
 			tablename,
 			fields_update,
@@ -223,6 +246,7 @@ static int	process_record(int nodeid, char *record)
 		row = DBfetch(result);
 		if(row)
 		{
+			tmp_offset = 0;
 			zbx_snprintf_alloc(&tmp, &tmp_allocated, &tmp_offset, 16*1024, "update %s set %s where %s=" ZBX_FS_UI64,
 				tablename,
 				fields_update,
@@ -231,6 +255,7 @@ static int	process_record(int nodeid, char *record)
 		}
 		else
 		{
+			tmp_offset = 0;
 			zbx_snprintf_alloc(&tmp, &tmp_allocated, &tmp_offset, 16*1024, "insert into %s (%s) values(%s)",
 				tablename,
 				fields,

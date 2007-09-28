@@ -1,5 +1,6 @@
 Changes for 1.4.j:
 
+ - fixed acknowledgements synchronization (Sasha)
  - fixed appeared error in Latest Data (Artem)
  - fixed problem with equivalence in expressions in Trigger Log Form (Artem)
  - fixed problem with displaying triggers which had been Acknowledged (Artem)
