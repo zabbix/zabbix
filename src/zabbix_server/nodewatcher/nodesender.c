@@ -51,7 +51,6 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 {
 	DB_RESULT	result;
 	DB_RESULT	result2;
-	DB_RESULT	result3;
 	DB_ROW		row;
 	DB_ROW		row2;
 
