@@ -61,8 +61,7 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 
 	int	found=0;
 
-	int	i,j;
-	size_t	hex_allocated=1024, rowlen;
+	int	i, j, hex_allocated=1024, rowlen;
 
 	xml=zbx_malloc(xml, allocated);
 	hex=zbx_malloc(hex, hex_allocated);
@@ -190,7 +189,6 @@ static int send_config_data(int nodeid, int dest_nodeid, zbx_uint64_t maxlogid, 
 								tables[i].fields[j].type,
 								ZBX_DM_DELIMITER,
 								hex);
-/*zabbix_log( LOG_LEVEL_WARNING, "----- DATA [fieldname:%s] [length:%d]", tables[i].fields[j].name, rowlen);*/
 						}
 					}
 				}
