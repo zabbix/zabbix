@@ -781,7 +781,7 @@ ZBX_TEST_HEX expressions[]=
 	{"\xffwabcdefghijkTUVabcdefghijk", "ff776162636465666768696a6b5455566162636465666768696a6b"},
 	{NULL}
 };
-	size_t	len, ilen;
+	int	len, ilen;
 	int	i;
 	char	*buffer = NULL, tmp[MAX_STRING_LEN];
 
@@ -824,7 +824,7 @@ void test_zbx_get_next_field()
 {
 	char	input[] = {"?11111.;?222222222222222222.;?333333333333.;?4444444444444444."};
 	char	*ptr, *buffer = NULL;
-	size_t	len;
+	int	len;
 
 	printf("-= Test binary_to_hex =-\n");
 
@@ -873,7 +873,7 @@ void test()
 /*	test_zbx_tcp_connect( );*/
 /*	test_ip_in_list(); */
 /*	test_binary2hex();*/
-	test_zbx_get_next_field();
+/*	test_zbx_get_next_field();*/
 
 	printf("\n-= Test completed =-\n");
 }

@@ -36,6 +36,7 @@
 
 #ifdef	HAVE_POSTGRESQL
 	PGconn	*conn = NULL;
+	int     ZBX_PG_BYTEAOID = 0;
 #endif
 
 #ifdef	HAVE_ORACLE
@@ -126,7 +127,9 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	return ret;
 #endif
 #ifdef	HAVE_POSTGRESQL
-	char *cport = NULL;
+	char		*cport = NULL;
+	DB_RESULT	result;
+	DB_ROW		row;
 
 	if( port )	cport = zbx_dsprintf(cport, "%i", port);
 
@@ -140,6 +143,14 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		zabbix_log(LOG_LEVEL_ERR, "Connection to database '%s' failed: %s", dbname, PQerrorMessage(conn));
 		ret = ZBX_DB_FAIL;
 	}
+
+	result = DBselect("select oid from pg_type where typname = 'bytea'" );
+	row = DBfetch(result);
+	if(row)
+	{
+		ZBX_PG_BYTEAOID = atoi(row[0]);
+	}
+	DBfree_result(result);
 
 	return ret;
 #endif
@@ -479,7 +490,7 @@ int	zbx_db_is_null(char *field)
 	int ret = FAIL;
 
 	if(field == NULL)	ret = SUCCEED;
-#ifdef	HAVE_ORACLE
+#ifdef HAVE_ORACLE
 	else if(field[0] == 0)	ret = SUCCEED;
 #endif
 	return ret;
@@ -550,7 +561,16 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 		result->values = zbx_malloc(result->values, sizeof(char*) * result->fld_num);
 		for(i = 0; i < result->fld_num; i++)
 		{
-			 result->values[i] = PQgetvalue(result->pg_result, result->cursor, i);
+			if(PQgetisnull(result->pg_result, result->cursor, i))
+			{
+				result->values[i] = NULL;
+			}
+			else
+			{
+				result->values[i] = PQgetvalue(result->pg_result, result->cursor, i);
+				if(PQftype(result->pg_result,i) == ZBX_PG_BYTEAOID) /* binary data type BYTEAOID */
+					zbx_pg_unescape_bytea((u_char *)result->values[i]);
+			}
 		}
 	}
 

@@ -101,6 +101,7 @@ void	SQ_DBfree_result(DB_RESULT result);
 		DB_ROW		values;
 	} ZBX_PG_DB_RESULT;
 
+extern	int	ZBX_PG_BYTEAOID;
 void	PG_DBfree_result(DB_RESULT result);
 
 #endif
