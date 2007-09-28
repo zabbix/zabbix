@@ -262,8 +262,8 @@ void __zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_l
 
 	if(*offset + max_len >= *alloc_len)
 	{
-		*str = zbx_realloc(*str, (*alloc_len)+64*max_len);
-		*alloc_len += 64*max_len;
+		*str = zbx_realloc(*str, (*alloc_len)+2*max_len);
+		*alloc_len += 2*max_len;
 	}
 
 	*offset += zbx_vsnprintf(*str+*offset, max_len, fmt, args);
@@ -1182,11 +1182,11 @@ u_char	zbx_hex2num(char c)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	zbx_binary2hex(const u_char *input, size_t ilen, char **output, size_t *olen)
+void	zbx_binary2hex(const u_char *input, int ilen, char **output, int *olen)
 {
-	const u_char	*i = (const u_char *)input;
+	const u_char	*i = input;
 	char		*o;
-	size_t		len = (ilen * 2) + 1;
+	int		len = (ilen * 2) + 1;
 
 	assert(input);
 	assert(output);
@@ -1195,7 +1195,7 @@ void	zbx_binary2hex(const u_char *input, size_t ilen, char **output, size_t *ole
 
 	if(*olen < len)
 	{
-		*olen = 2*len;
+		*olen = len;
 		*output = zbx_realloc(*output, *olen);
 	}
 	o = *output;
@@ -1229,7 +1229,7 @@ int	zbx_hex2binary(char *io)
 {
 	const char	*i = io;
 	u_char		*o = (u_char *)io, c;
-	size_t		len = 0;
+	int		len = 0;
 
 	assert(io);
 
@@ -1244,6 +1244,148 @@ int	zbx_hex2binary(char *io)
 	return len;
 }
 
+#ifdef HAVE_POSTGRESQL
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_pg_escape_bytea                                              *
+ *                                                                            *
+ * Purpose: converts from binary string to the null terminated escaped string *
+ *                                                                            *
+ * Transormations:                                                            *
+ *	'\0' [0x00] -> \\ooo (ooo is an octal number)                         *
+ *	'\'' [0x37] -> \'                                                     *
+ *	'\\' [0x5c] -> \\\\                                                   *
+ *	<= 0x1f || >= 0x7f -> \\ooo                                           *
+ *                                                                            *
+ * Parameters:                                                                *
+ *	input - null terminated hexadecimal string                            *
+ *	output - pointer to buffer                                            *
+ *	olen - length of returned buffer                                      *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_pg_escape_bytea(const u_char *input, int ilen, char **output, int *olen)
+{
+	const u_char	*i;
+	char		*o;
+	int		len;
+
+	assert(input);
+	assert(output);
+	assert(*output);
+	assert(olen);
+
+	len = 1; /* '\0' */
+	i = input;
+	while(i - input < ilen)
+	{
+		if(*i == '\0' || *i <= 0x1f || *i >= 0x7f)
+			len += 5;
+		else if(*i == '\'')
+			len += 2;
+		else if(*i == '\\')
+			len += 4;
+		else
+			len++;
+		i++;
+	}
+
+	if(*olen < len)
+	{
+		*olen = len;
+		*output = zbx_realloc(*output, *olen);
+	}
+	o = *output;
+	i = input;
+
+	while(i - input < ilen) {
+		if(*i == '\0' || *i <= 0x1f || *i >= 0x7f)
+		{
+			*o++ = '\\';
+			*o++ = '\\';
+			*o++ = ((*i >> 6) & 0x7) + 0x30;
+			*o++ = ((*i >> 3) & 0x7) + 0x30;
+			*o++ = (*i & 0x7) + 0x30;
+		}
+		else if (*i == '\'')
+		{
+			*o++ = '\\';
+			*o++ = '\'';
+		}
+		else if (*i == '\\')
+		{
+			*o++ = '\\';
+			*o++ = '\\';
+			*o++ = '\\';
+			*o++ = '\\';
+		}
+		else
+			*o++ = *i;
+		i++;
+	}
+	*o = '\0';
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_pg_unescape_bytea                                            *
+ *                                                                            *
+ * Purpose: converts the null terminated string into binary buffer            *
+ *                                                                            *
+ * Transormations:                                                            *
+ *	\ooo == a byte whose value = ooo (ooo is an octal number)             *
+ *	\x   == x (x is any character)                                        *
+ *                                                                            *
+ * Parameters:                                                                *
+ *	io - null terminated string                                           *
+ *                                                                            *
+ * Return value: length of the binary buffer                                  *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_pg_unescape_bytea(u_char *io)
+{
+	const u_char	*i = io;
+	u_char		*o = io;
+
+	assert(io);
+
+	while(*i != '\0') {
+		switch(*i)
+		{
+			case '\\':
+				i++;
+				if(*i == '\\')
+				{
+					*o++ = *i++;
+				}
+				else
+				{
+					if(*i >= 0x30 && *i <= 0x39 && *(i + 1) >= 0x30 && *(i + 1) <= 0x39 && *(i + 2) >= 0x30 && *(i + 2) <= 0x39)
+					{
+						*o = (*i++ - 0x30) << 6;
+						*o += (*i++ - 0x30) << 3;
+						*o++ += *i++ - 0x30;
+					}
+				}
+				break;
+
+			default:
+				*o++ = *i++;
+		}
+	}
+
+	return o - io;
+}
+#endif
 /******************************************************************************
  *                                                                            *
  * Function: zbx_get_next_field                                               *
@@ -1263,10 +1405,10 @@ int	zbx_hex2binary(char *io)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_get_next_field(const char *line, char **output, size_t *olen, char separator)
+char	*zbx_get_next_field(const char *line, char **output, int *olen, char separator)
 {
 	char	*ret;
-	size_t	flen;
+	int	flen;
 
 	ret = strchr(line, separator);
 	if(ret)
@@ -1281,7 +1423,7 @@ char	*zbx_get_next_field(const char *line, char **output, size_t *olen, char sep
 
 	if(*olen < flen)
 	{
-		*olen = 2*flen;
+		*olen = flen;
 		*output = zbx_realloc(*output, *olen);
 	}
 	memcpy(*output, line, flen);
