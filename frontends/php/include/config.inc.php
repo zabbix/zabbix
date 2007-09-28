@@ -600,7 +600,7 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 
 	function	select_config()
 	{
-		$row=DBfetch(DBselect("select * from config"));
+		$row=DBfetch(DBselect("select * from config where ".DBin_node("configid", get_current_nodeid(false))));
 		if($row)
 		{
 			return	$row;
