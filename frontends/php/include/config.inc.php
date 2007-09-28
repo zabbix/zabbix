@@ -600,7 +600,7 @@ require_once('include/classes/ctree.inc.php');
 
 	function	select_config()
 	{
-		$row=DBfetch(DBselect("select * from config"));
+		$row=DBfetch(DBselect("select * from config where ".DBin_node("configid", get_current_nodeid(false))));
 		if($row)
 		{
 			return	$row;
