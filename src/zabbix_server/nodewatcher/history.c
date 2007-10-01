@@ -93,17 +93,13 @@ static int process_node_history_str(int nodeid, int master_nodeid)
 		if( ((CONFIG_NODE_NOHISTORY !=0) && (CONFIG_NODEID == nodeid)) ||
 			send_to_node("new history_str", master_nodeid, nodeid, data) == SUCCEED)
 		{
-/*			zabbix_log( LOG_LEVEL_WARNING, "Updating nodes.history_lastid");*/
-			DBexecute("update nodes set history_str_lastid=" ZBX_FS_UI64 " where nodeid=%d",
-				id,
-				nodeid);
 			DBexecute("delete from history_str_sync where nodeid=%d and id<=" ZBX_FS_UI64,
 				nodeid,
 				id);
 		}
 		else
 		{
-			zabbix_log( LOG_LEVEL_DEBUG, "Not updating nodes.history_str_lastid");
+			zabbix_log( LOG_LEVEL_DEBUG, "process_node_history_str() FAIL");
 		}
 	}
 	DBfree_result(result);
@@ -181,17 +177,13 @@ static int process_node_history_uint(int nodeid, int master_nodeid)
 		if( ((CONFIG_NODE_NOHISTORY !=0) && (CONFIG_NODEID == nodeid)) ||
 			send_to_node("new history_uint", master_nodeid, nodeid, data) == SUCCEED)
 		{
-/*			zabbix_log( LOG_LEVEL_WARNING, "Updating nodes.history_lastid"); */
-			DBexecute("update nodes set history_uint_lastid=" ZBX_FS_UI64 " where nodeid=%d",
-				id,
-				nodeid);
 			DBexecute("delete from history_uint_sync where nodeid=%d and id<=" ZBX_FS_UI64,
 				nodeid,
 				id);
 		}
 		else
 		{
-			zabbix_log( LOG_LEVEL_DEBUG, "Not updating nodes.history_uint_lastid");
+			zabbix_log( LOG_LEVEL_DEBUG, "process_node_history_uint() FAIL");
 		}
 	}
 	DBfree_result(result);
@@ -275,17 +267,13 @@ static int process_node_history(int nodeid, int master_nodeid)
 		if( ((CONFIG_NODE_NOHISTORY !=0) && (CONFIG_NODEID == nodeid)) ||
 			send_to_node("new history", master_nodeid, nodeid, data) == SUCCEED)
 		{
-/*			zabbix_log( LOG_LEVEL_WARNING, "Updating nodes.history_lastid=" ZBX_FS_UI64, id); */
-			DBexecute("update nodes set history_lastid=" ZBX_FS_UI64 " where nodeid=%d",
-				id,
-				nodeid);
 			DBexecute("delete from history_sync where nodeid=%d and id<=" ZBX_FS_UI64,
 				nodeid,
 				id);
 		}
 		else
 		{
-			zabbix_log( LOG_LEVEL_DEBUG, "Not updating nodes.history_lastid");
+			zabbix_log( LOG_LEVEL_DEBUG, "process_node_history() FAIL");
 		}
 	}
 	DBfree_result(result);
@@ -345,7 +333,6 @@ void main_historysender()
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	lastid;
 	int		nodeid;
 	int		master_nodeid;
 
@@ -362,8 +349,6 @@ void main_historysender()
 		while((row = DBfetch(result)))
 		{
 			nodeid=atoi(row[0]);
-			ZBX_STR2UINT64(lastid,row[1])
-
 			process_node(nodeid, master_nodeid);
 		}
 		DBfree_result(result);
