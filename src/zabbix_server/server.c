@@ -655,8 +655,7 @@ ZBX_TEST_TCP_CONNECT
 
 ZBX_TEST_TCP_CONNECT expressions[]=
 {
-	{"127.0.0.1",   80},
-	{"support.zabbix.com",	8080},/*81.198.122.245*/
+	{"127.0.00.1",   80},
 	{"www.iscentrs.lv",	80},/*81.198.60.94*/
 	{"81.171.84.52",	80},
 	{"64.233.183.103",	80},/*nf-in-f103.google.com*/
@@ -670,7 +669,7 @@ ZBX_TEST_TCP_CONNECT expressions[]=
 	int		i;
 	zbx_sock_t	s;
 	char		host[MAXDNAME];
-	char		ip_list[] = "81.171.84.52,nf-in-f103.google.com,ip6-localhost,localhost";
+	char		ip_list[] = "81.171.84.52,nf-in-f103.google.com,127.000.0.1";
 
 	for(i = 0; expressions[i].hostname != NULL; i ++)
 	{
@@ -865,7 +864,7 @@ void test()
 /*	test_email(); */
 /*	test_extract_numbers(); */
 /*	test_trigger_description(); */
-/*	test_zbx_tcp_connect( );*/
+	test_zbx_tcp_connect( );
 /*	test_ip_in_list(); */
 /*	test_binary2hex();*/
 /*	test_zbx_get_next_field();*/
