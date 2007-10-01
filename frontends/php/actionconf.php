@@ -307,6 +307,8 @@ include_once "include/page_header.php";
 <?php
 /* header */
 	$form = new CForm();
+	$form->SetMethod('get');
+	
 	$form->AddVar('eventsource', $_REQUEST['eventsource']);
 	$form->AddItem(new CButton('form',S_CREATE_ACTION));
 	show_table_header(S_CONFIGURATION_OF_ACTIONS_BIG, $form);
@@ -320,7 +322,8 @@ include_once "include/page_header.php";
 	else
 	{
 		$form = new CForm();
-
+		$form->SetMethod('get');
+		
 		$cmbSource = new CComboBox('eventsource',$_REQUEST['eventsource'],'submit()');
 		$cmbSource->AddItem(EVENT_SOURCE_TRIGGERS,S_TRIGGERS);
 		$cmbSource->AddItem(EVENT_SOURCE_DISCOVERY,S_DISCOVERY);

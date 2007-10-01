@@ -40,6 +40,7 @@ include_once "include/page_header.php";
 	$_REQUEST["period"] = get_request("period", "day");
 
 	$form = new CForm();
+	$form->SetMethod('get');
 	
 	$cmbPeriod = new CComboBox("period",$_REQUEST["period"],"submit()");
 	$cmbPeriod->AddItem("day",S_DAY);

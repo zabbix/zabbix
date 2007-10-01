@@ -133,6 +133,8 @@ include_once "include/page_header.php";
 	}
 
 	$form = new CForm();
+	$form->SetMethod('get');
+	
 	$cmbConfig = new CComboBox('config', $config, 'submit()');
 	$cmbConfig->AddItem(0, S_EXPORT);
 	$cmbConfig->AddItem(1, S_IMPORT);

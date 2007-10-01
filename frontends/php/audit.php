@@ -84,6 +84,8 @@ include_once "include/page_header.php";
 	}
 
 	$form = new CForm();
+	$form->SetMethod('get');
+	
 	$form->AddVar("start",$start);
 
 	$btnPrev = new CButton("prev","<< Prev ".$PAGE_SIZE);

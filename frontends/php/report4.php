@@ -54,6 +54,7 @@ include_once "include/page_header.php";
 	}
 		
 	$form = new CForm();
+	$form->SetMethod('get');
 
 	$form->AddItem(SPACE.S_MEDIA_TYPE.SPACE);
 	$cmbMedia = new CComboBox("media_type", $media_type, "submit();");

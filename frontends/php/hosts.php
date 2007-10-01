@@ -528,7 +528,8 @@ include_once "include/page_header.php";
 ?>
 <?php
 	$frmForm = new CForm();
-
+	$frmForm->SetMethod('get');
+	
 	$cmbConf = new CComboBox("config",$_REQUEST["config"],"submit()");
 	$cmbConf->AddItem(0,S_HOSTS);
 	$cmbConf->AddItem(3,S_TEMPLATES);
@@ -598,6 +599,8 @@ include_once "include/page_header.php";
 			}
 
 			$frmForm = new CForm();
+			$frmForm->SetMethod('get');
+
 			$frmForm->AddVar("config",$_REQUEST["config"]);
 			$frmForm->AddItem(S_GROUP.SPACE);
 			$frmForm->AddItem($cmbGroups);
@@ -608,6 +611,7 @@ include_once "include/page_header.php";
 			if(isset($_REQUEST["groupid"]) && $_REQUEST["groupid"]==0) unset($_REQUEST["groupid"]);
 
 			$form = new CForm();
+			
 			$form->SetName('hosts');
 			$form->AddVar("config",get_request("config",0));
 
@@ -794,6 +798,8 @@ include_once "include/page_header.php";
 			show_table_header(S_HOST_GROUPS_BIG);
 
 			$form = new CForm('hosts.php');
+			$form->SetMethod('get');
+			
 			$form->SetName('groups');
 			$form->AddVar("config",get_request("config",0));
 
@@ -896,7 +902,8 @@ include_once "include/page_header.php";
 		} else {
 	// Table HEADER
 			$form = new CForm();
-
+			$form->SetMethod('get');
+			
 			$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit();");
 			$cmbGroup->AddItem(0,S_ALL_SMALL);
 

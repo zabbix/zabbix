@@ -349,7 +349,8 @@ include_once "include/page_header.php";
 ?>
 <?php
 	$frmForm = new CForm();
-
+	$frmForm->SetMethod('get');
+	
 	$cmbConf = new CComboBox("config",$_REQUEST["config"],"submit()");
 	$cmbConf->AddItem(0,S_USERS);
 	$cmbConf->AddItem(1,S_USER_GROUPS);

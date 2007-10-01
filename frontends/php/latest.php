@@ -93,6 +93,7 @@ include_once "include/page_header.php";
 ?>
 <?php
 	$r_form = new CForm();
+	$r_form->SetMethod('get');
 
 	$r_form->AddVar("select",$_REQUEST["select"]);
 

@@ -138,6 +138,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 ?>
 <?php
 	$r_form = new CForm();
+	$r_form->SetMethod('get');
 	
 	$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit()");
 	$cmbHosts = new CComboBox("hostid",$_REQUEST["hostid"],"submit()");
@@ -235,6 +236,8 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 		if($select=='true')
 		{
 			$form = new CForm();
+			$form->SetMethod('get');
+			
 			$form->AddItem(new CTextBox("txt_select",$txt_select,15));
 			$form->AddItem(new CButton("btnSelect", "Select"));
 			$form->AddItem(new CButton("btnSelect", "Inverse select"));

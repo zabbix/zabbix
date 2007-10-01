@@ -92,6 +92,8 @@ include_once "include/page_header.php";
 	if($elementid <= 0) $elementid = null;
 
 	$form = new CForm();
+	$form->SetMethod('get');
+	
 	$form->AddVar("fullscreen",$_REQUEST["fullscreen"]);
 
 	$cmbConfig = new CComboBox('config', $config, 'submit()');

@@ -63,6 +63,7 @@ include_once "include/page_header.php";
 ?>
 <?php
 	$form = new CForm();
+	$form->SetMethod('get');
 	$form->AddVar("serviceid", $_REQUEST["serviceid"]);
 
 	$cmbPeriod = new CComboBox("period", $period, "submit();");

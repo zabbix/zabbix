@@ -99,6 +99,8 @@ include_once "include/page_header.php";
 ?>
 <?php
 	$form = new CForm();
+	$form->SetMethod('get');
+	
 	$form->AddItem(new CButton("form",S_CREATE_MAP));
 	show_table_header(S_CONFIGURATION_OF_NETWORK_MAPS, $form);
 	echo BR;
