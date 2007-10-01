@@ -88,6 +88,7 @@ include_once "include/page_header.php";
 <?php
 // Table HEADER
 	$form = new CForm();
+	$form->SetMethod('get');
 	
 	$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit();");
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
@@ -147,6 +148,8 @@ include_once "include/page_header.php";
 
 // TABLE
 	$form = new CForm();
+	$form->SetMethod('get');
+	
 	$form->SetName('scenarios');
 	$form->AddVar('hostid',$_REQUEST["hostid"]);
 
