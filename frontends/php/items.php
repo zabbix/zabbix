@@ -512,6 +512,7 @@ include_once "include/page_header.php";
 <?php
 
 	$form = new CForm();
+	$form->SetMethod('get');
 	$form->SetName('hdrform');
 
 	$form->AddVar("hostid",$_REQUEST["hostid"]);
@@ -533,7 +534,8 @@ include_once "include/page_header.php";
 		echo BR;
 // Table HEADER
 		$form = new CForm();
-
+		$form->SetMethod('get');
+		
 		$where_case = array();
 		$from_tables['h'] = 'hosts h';
 		$where_case[] = 'i.hostid=h.hostid';
@@ -730,7 +732,6 @@ include_once "include/page_header.php";
 // TABLE
 		$form = new CForm();
 		$form->SetName('items');
-		$form->SetMethod('POST');
 
 		$table  = new CTableInfo();
 		$table->SetHeader(array(

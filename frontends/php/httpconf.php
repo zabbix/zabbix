@@ -333,7 +333,8 @@ include_once "include/page_header.php";
 	$_REQUEST['steps'] = array_merge(get_request('steps',array())); /* reinitialize keys */
 
 	$form = new CForm();
-
+	$form->SetMethod('get');
+	
 	$form->AddVar("hostid",$_REQUEST["hostid"]);
 
 	$form->AddItem(new CButton("form",S_CREATE_SCENARIO));
@@ -350,6 +351,7 @@ include_once "include/page_header.php";
 
 // Table HEADER
 		$form = new CForm();
+		$form->SetMethod('get');
 		
 		$form->AddItem(array('[', 
 			new CLink($showdisabled ? S_HIDE_DISABLED_SCENARIOS: S_SHOW_DISABLED_SCENARIOS,

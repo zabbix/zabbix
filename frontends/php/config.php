@@ -252,6 +252,7 @@ include_once "include/page_header.php";
 <?php
 
 	$form = new CForm("config.php");
+	$form->SetMethod('get');
 	$cmbConfig = new CCombobox("config",$_REQUEST["config"],"submit()");
 	$cmbConfig->AddItem(0,S_HOUSEKEEPER);
 //	$cmbConfig->AddItem(2,S_ESCALATION_RULES);

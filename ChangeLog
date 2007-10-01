@@ -1,5 +1,6 @@
 Changes for 1.4.3:
 
+ - [ZBX-88] Chenged method to "get" in all forms which affects display info (Artem)
  - [ZBX-57] Problem in zbx_tcp_check_security 127.0.0.1 != 127.0.00.1 (Sasha)
  - [ZBX-80] Master node does not display configuration of slave nodes (Sasha)
  - [ZBX-67] Under DM, Synchronizing binary data between nodes for PostgresSQL (Sasha)

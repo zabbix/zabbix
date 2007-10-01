@@ -78,6 +78,8 @@ include_once "include/page_header.php";
 	$source = get_request('source', EVENT_SOURCE_TRIGGERS);
 
 	$r_form = new CForm();
+	$r_form->SetMethod('get');
+	
 	$r_form->AddOption('name','events_menu');
 
 	if($source == EVENT_SOURCE_DISCOVERY)
@@ -172,6 +174,7 @@ include_once "include/page_header.php";
 	$r_form->AddItem($btnNext);
 	
 	$l_form = new CForm();
+	$l_form->SetMethod('get');
 	
 	if($source == EVENT_SOURCE_TRIGGERS){
 		$link = array('[', 

@@ -249,6 +249,8 @@ include_once "include/page_header.php";
 ?>
 <?php
 	$form = new CForm();
+	$form->SetMethod('get');
+	
 	$form->AddItem(new CButton("form",S_CREATE_GRAPH));
 
 	show_table_header(S_CONFIGURATION_OF_GRAPHS_BIG,$form);
@@ -276,7 +278,8 @@ include_once "include/page_header.php";
 		}
 
 		$r_form = new CForm();
-
+		$r_form->SetMethod('get');
+		
 		$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit()");
 		$cmbHosts = new CComboBox("hostid",$_REQUEST["hostid"],"submit()");
 

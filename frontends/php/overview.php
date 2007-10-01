@@ -60,6 +60,8 @@ include_once "include/page_header.php";
 ?>
 <?php
 	$form = new CForm();
+	$form->SetMethod('get');
+	
 	$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit()");
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
 	

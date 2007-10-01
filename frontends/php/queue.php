@@ -43,6 +43,8 @@ include_once "include/page_header.php";
 	$_REQUEST["show"] = get_request("show", 0);
 
 	$form = new CForm();
+	$form->SetMethod('get');
+	
 	$cmbMode = new CComboBox("show", $_REQUEST["show"], "submit();");
 	$cmbMode->AddItem(0, S_OVERVIEW);
 	$cmbMode->AddItem(1, S_DETAILS);

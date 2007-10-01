@@ -39,7 +39,8 @@ include_once "include/page_header.php";
 ?>
 <?php
 	$r_form = new CForm();
-
+	$r_form->SetMethod('get');
+	
 	$druleid = get_request('druleid', 0);
 
 	$cmbDRules = new CComboBox('druleid',$druleid,'submit()');

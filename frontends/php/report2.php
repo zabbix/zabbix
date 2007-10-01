@@ -42,6 +42,7 @@ include_once "include/page_header.php";
 ?>
 <?php
 	$r_form = new CForm();
+	$r_form->SetMethod('get');
 
 	$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit()");
 	$cmbHosts = new CComboBox("hostid",$_REQUEST["hostid"],"submit()");
