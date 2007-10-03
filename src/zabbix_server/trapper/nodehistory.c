@@ -61,73 +61,86 @@
  ******************************************************************************/
 static int	process_record(int nodeid, char *record)
 {
-	char	tmp[MAX_STRING_LEN];
-	int		table;
-	zbx_uint64_t	itemid;
-	int		timestamp;
+	char		*tmp = NULL, value_esc[MAX_STRING_LEN], source[MAX_STRING_LEN], *r;
+	int		tmp_allocated = 1024, table;
+	zbx_uint64_t	id, itemid, value_uint;
+	int		clock, timestamp, severity;
 	double		value;
-	zbx_uint64_t	value_uint;
 	int		res = FAIL;
-
-	char    value_esc[MAX_STRING_LEN];
-
-
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_record [%s]",
 		record);
 
-	zbx_get_field(record,tmp,0,ZBX_DM_DELIMITER);
-	table=atoi(tmp);
+	tmp = zbx_malloc(tmp, tmp_allocated);
+
+	r = record;
+	r = zbx_get_next_field(r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER);
+	table = atoi(tmp);
+
+	r = zbx_get_next_field(r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER);
+	ZBX_STR2UINT64(itemid, tmp);
+
+	r = zbx_get_next_field(r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER);
+	clock = atoi(tmp);
+
 	if(table == ZBX_TABLE_HISTORY)
 	{
-		zbx_get_field(record,tmp,1,ZBX_DM_DELIMITER);
-		sscanf(tmp,ZBX_FS_UI64,&itemid);
-		zbx_get_field(record,tmp,2,ZBX_DM_DELIMITER);
-		timestamp=atoi(tmp);
-		zbx_get_field(record,tmp,3,ZBX_DM_DELIMITER);
-		value=atof(tmp);
+		r = zbx_get_next_field(r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER);
+		value = atof(tmp);
 
-		res =  DBadd_history(itemid, value, timestamp);
+		res = DBadd_history(itemid, value, clock);
 
 		DBexecute("update items set lastvalue='" ZBX_FS_DBL "', lastclock=%d where itemid=" ZBX_FS_UI64,
 			value,
-			timestamp,
+			clock,
 			itemid);
 
 	}
 	else if(table == ZBX_TABLE_HISTORY_UINT)
 	{
-		zbx_get_field(record,tmp,1,ZBX_DM_DELIMITER);
-		sscanf(tmp,ZBX_FS_UI64,&itemid);
-		zbx_get_field(record,tmp,2,ZBX_DM_DELIMITER);
-		timestamp=atoi(tmp);
-		zbx_get_field(record,tmp,3,ZBX_DM_DELIMITER);
-		sscanf(tmp,ZBX_FS_UI64,&value_uint);
+		r = zbx_get_next_field(r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER);
+		ZBX_STR2UINT64(value_uint, tmp);
 
-		res =  DBadd_history_uint(itemid, value_uint, timestamp);
+		res = DBadd_history_uint(itemid, value_uint, clock);
 
 		DBexecute("update items set lastvalue='" ZBX_FS_UI64 "', lastclock=%d where itemid=" ZBX_FS_UI64,
 			value_uint,
-			timestamp,
+			clock,
 			itemid);
 	}
 	else if(table == ZBX_TABLE_HISTORY_STR)
 	{
-		zbx_get_field(record,tmp,1,ZBX_DM_DELIMITER);
-		sscanf(tmp,ZBX_FS_UI64,&itemid);
-		zbx_get_field(record,tmp,2,ZBX_DM_DELIMITER);
-		timestamp=atoi(tmp);
-		zbx_get_field(record,tmp,3,ZBX_DM_DELIMITER);
+		r = zbx_get_next_field(r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER);
 
-		res =  DBadd_history_str(itemid, tmp, timestamp);
+		res = DBadd_history_str(itemid, tmp, clock);
 
-		DBescape_string(tmp,value_esc,MAX_STRING_LEN);
+		DBescape_string(tmp, value_esc, MAX_STRING_LEN);
 
 		DBexecute("update items set lastvalue='%s', lastclock=%d where itemid=" ZBX_FS_UI64,
 			value_esc,
-			timestamp,
+			clock,
 			itemid);
 	}
+	else if(table == ZBX_TABLE_HISTORY_LOG)
+	{
+		r = zbx_get_next_field(r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER);
+		ZBX_STR2UINT64(id, tmp);
+
+		r = zbx_get_next_field(r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER);
+		timestamp = atoi(tmp);
+
+		r = zbx_get_next_field(r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER);
+		strcpy(source, tmp);
+
+		r = zbx_get_next_field(r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER);
+		severity = atoi(tmp);
+
+		r = zbx_get_next_field(r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER);
+		zbx_hex2binary(tmp);
+
+		res = DBadd_history_log(id, itemid, tmp, clock, timestamp, source, severity);
+	}
+	zbx_free(tmp);
 
 	return res;
 }
@@ -150,31 +163,37 @@ static int	process_record(int nodeid, char *record)
  ******************************************************************************/
 int	node_history(char *data)
 {
-	char	*s;
+	char	*start, *newline = NULL, *tmp = NULL;
+	int	tmp_allocated = 128;
 	int	firstline=1;
 	int	nodeid=0;
 	int	sender_nodeid=0;
-	char	tmp[MAX_STRING_LEN];
 	int	datalen;
 
 	datalen=strlen(data);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In node_history(len:%d)",
-		datalen);
+	zabbix_log( LOG_LEVEL_DEBUG, "In node_history(len:%d)", datalen);
 
 	DBbegin();
 
-       	s=(char *)strtok(data,"\n");
-	while(s!=NULL)
+	tmp = zbx_malloc(tmp, tmp_allocated);
+
+	for(start = data; *start != '\0';)
 	{
+		if(NULL != (newline = strchr(start, '\n')))
+		{
+			*newline = '\0';
+		}
+
 		if(firstline == 1)
 		{
-			zabbix_log( LOG_LEVEL_DEBUG, "First line [%s]",
-				s);
-			zbx_get_field(s,tmp,1,ZBX_DM_DELIMITER);
+			zabbix_log( LOG_LEVEL_DEBUG, "In node_history() process header [%s]", start);
+			start = zbx_get_next_field(start, &tmp, &tmp_allocated, ZBX_DM_DELIMITER); /* History */
+			start = zbx_get_next_field(start, &tmp, &tmp_allocated, ZBX_DM_DELIMITER);
 			sender_nodeid=atoi(tmp);
-			zbx_get_field(s,tmp,2,ZBX_DM_DELIMITER);
+			start = zbx_get_next_field(start, &tmp, &tmp_allocated, ZBX_DM_DELIMITER);
 			nodeid=atoi(tmp);
+
 			firstline=0;
 			zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Received history from node %d for node %d datalen %d",
 					CONFIG_NODEID,
@@ -184,12 +203,22 @@ int	node_history(char *data)
 		}
 		else
 		{
-/*			zabbix_log( LOG_LEVEL_WARNING, "Got line [%s]", s);*/
-			process_record(nodeid, s);
+			process_record(nodeid, start);
 		}
 
-       		s=(char *)strtok(NULL,"\n");
+		if(newline != NULL)
+		{
+			*newline = '\n';
+			start = newline + 1;
+			newline = NULL;
+		}
+		else
+		{
+			break;
+		}
 	}
+	zbx_free(tmp);
+
 	DBcommit();
 
 	return SUCCEED;

@@ -30,6 +30,122 @@
 
 /******************************************************************************
  *                                                                            *
+ * Function: process_node_history_log                                         *
+ *                                                                            *
+ * Purpose: process new history_log data                                      *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: SUCCESS - processed succesfully                              * 
+ *               FAIL - an error occured                                      *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int process_node_history_log(int nodeid, int master_nodeid)
+{
+	const char	*ids_table_name = {"history_log"};
+	const char	*ids_field_name = {"sync_lastid"};
+	DB_RESULT	result;
+	DB_ROW		row;
+	char		sql[MAX_STRING_LEN];
+	int		ids_found = 0, found = 0;
+	int		offset = 0;
+	char		*data = NULL, *hex = NULL;
+	int		allocated = 1024*1024, hex_allocated = 1024;
+	zbx_uint64_t	sync_lastid = 0, id, len;
+
+	zabbix_log( LOG_LEVEL_DEBUG, "In process_node_history_log(nodeid:%d, master_nodeid:%d)",
+		nodeid,
+		master_nodeid);
+
+	/* Do not send history for current node if CONFIG_NODE_NOHISTORY is set */
+	if((CONFIG_NODE_NOHISTORY != 0) && (CONFIG_NODEID == nodeid))
+		return SUCCEED;
+
+
+	data = zbx_malloc(data, allocated);
+	hex = zbx_malloc(hex, hex_allocated);
+
+	result = DBselect("select nextid from ids where nodeid=%d and table_name='%s' and field_name='%s'",
+				nodeid,
+				ids_table_name,
+				ids_field_name);
+
+	if((row=DBfetch(result)))
+	{
+		ZBX_STR2UINT64(sync_lastid,row[0])
+		ids_found = 1;
+	}
+	DBfree_result(result);
+
+	zbx_snprintf_alloc(&data, &allocated, &offset, 64, "History%c%d%c%d",
+		ZBX_DM_DELIMITER,
+		CONFIG_NODEID,
+		ZBX_DM_DELIMITER,
+		nodeid);
+
+	zbx_snprintf(sql,sizeof(sql),"select id,itemid,clock,timestamp,source,severity,value,length(value) from history_log where id>"ZBX_FS_UI64" and "ZBX_COND_NODEID" order by id",
+		sync_lastid,
+		ZBX_NODE("id", nodeid));
+
+	result = DBselectN(sql, 10000);
+	while((row=DBfetch(result)))
+	{
+		ZBX_STR2UINT64(id,row[0])
+		found = 1;
+
+		len = atoi(row[7]);
+		zbx_binary2hex((u_char *)row[6], len, &hex, &hex_allocated);
+
+		zbx_snprintf_alloc(&data, &allocated, &offset, len * 2 + 256, "\n%d%c%s%c%s%c%s%c%s%c%s%c%s%c%s",
+				ZBX_TABLE_HISTORY_LOG, ZBX_DM_DELIMITER,
+				row[1], ZBX_DM_DELIMITER,	/* itemid */
+				row[2], ZBX_DM_DELIMITER,	/* clock */
+				row[0], ZBX_DM_DELIMITER,	/* id */
+				row[3], ZBX_DM_DELIMITER,	/* timestamp */
+				row[4], ZBX_DM_DELIMITER,	/* source */
+				row[5], ZBX_DM_DELIMITER,	/* severity */
+				hex);				/* value */
+	}
+	if(found == 1)
+	{
+		if(send_to_node("new history_log", master_nodeid, nodeid, data) == SUCCEED)
+		{
+			if(ids_found == 1)
+			{
+				DBexecute("update ids set nextid="ZBX_FS_UI64" where nodeid=%d and table_name='%s' and field_name='%s'",
+					id,
+					nodeid,
+					ids_table_name,
+					ids_field_name);
+			}
+			else
+			{
+				DBexecute("insert into ids (nodeid,table_name,field_name,nextid) values (%d,'%s','%s',"ZBX_FS_UI64")",
+					nodeid,
+					ids_table_name,
+					ids_field_name,
+					id);
+			}
+		}
+		else
+		{
+			zabbix_log( LOG_LEVEL_DEBUG, "process_node_history_log() FAIL");
+		}
+	}
+	DBfree_result(result);
+
+	zbx_free(data);
+	zbx_free(hex);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: process_node_history_str                                         *
  *                                                                            *
  * Purpose: process new history_str data                                      *
@@ -312,6 +428,7 @@ static void process_node(int nodeid, int master_nodeid)
 	process_node_history(nodeid, master_nodeid);
 	process_node_history_uint(nodeid, master_nodeid);
 	process_node_history_str(nodeid, master_nodeid);
+	process_node_history_log(nodeid, master_nodeid);
 }
 
 /******************************************************************************
@@ -342,9 +459,9 @@ void main_historysender()
 
 	master_nodeid = get_master_node(CONFIG_NODEID);
 
-	if(master_nodeid != 0)
+	if(master_nodeid)
 	{
-		result = DBselect("select nodeid from nodes");
+		result = DBselect("select nodeid from nodes where nodeid<>%d", master_nodeid);
 
 		while((row = DBfetch(result)))
 		{
