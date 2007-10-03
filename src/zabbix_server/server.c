@@ -16,9 +16,9 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-/*
-#define ZABBIX_TEST
-*/
+
+/*#define ZABBIX_TEST*/
+
 #include "common.h"
 
 #include "cfg.h"
@@ -837,6 +837,20 @@ printf("test_zbx_get_next_field() (3) [input:%s] [buffer:%s]\n", ptr, buffer);
 printf("test_zbx_get_next_field() (4) [input:%s] [buffer:%s]\n", ptr, buffer);
 }
 
+void test_regexp()
+{
+	int len;
+
+	if(zbx_regexp_match("A  B C A", "(B+.*C+)|(C+.*B+)", &len) != NULL)
+	{
+		printf("Matched\n");
+	}
+	else
+	{
+		printf("Not matched\n");
+	}
+}
+
 void test()
 {
 
@@ -864,10 +878,11 @@ void test()
 /*	test_email(); */
 /*	test_extract_numbers(); */
 /*	test_trigger_description(); */
-	test_zbx_tcp_connect( );
+/*	test_zbx_tcp_connect( );*/
 /*	test_ip_in_list(); */
 /*	test_binary2hex();*/
 /*	test_zbx_get_next_field();*/
+	test_regexp();
 
 	printf("\n-= Test completed =-\n");
 }
