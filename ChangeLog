@@ -1,5 +1,6 @@
 Changes for 1.4.3:
 
+ - [ZBX-90] fixed displaying of last line of a log file in the Latest Data and Overview (Alexei)
  - [DEV-42] Synchronisation of log files (Sasha)
  - [ZBX-89] Unused fields:history_lastid, ..str_lastid & ..uint_lastid (Sasha)
  - [ZBX-88] Chenged method to "get" in all forms which affects display info (Artem)

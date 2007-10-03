@@ -1073,11 +1073,30 @@ COpt::profiling_stop('prepare table');
 			{
 				$lastvalue="...";
 			}
+			else if($db_item["value_type"] == ITEM_VALUE_TYPE_LOG)
+			{
+				$row=DBfetch(DBselect("select max(id) as max from history_log where itemid=".$db_item["itemid"]));
+				if($row)
+				{
+					$row2=DBfetch(DBselect("select value from history_log where id=".$row["max"]));
+					$lastvalue=nbsp(htmlspecialchars(substr($row2["value"],0,20)));
+					if(strlen($db_item["lastvalue"]) > 20)
+						$lastvalue .= " ...";
+				}
+				else
+				{
+					$lastvalue="-";
+				}
+			}
+			else if($db_item["value_type"] == ITEM_VALUE_TYPE_STR)
+			{
+					$lastvalue=nbsp(htmlspecialchars(substr($db_item["lastvalue"],0,20)));
+					if(strlen($db_item["lastvalue"]) > 20)
+						$lastvalue .= " ...";
+			}
 			else
 			{
-				$lastvalue=nbsp(htmlspecialchars(substr($db_item["lastvalue"],0,20)));
-				if(strlen($db_item["lastvalue"]) > 20)
-					$lastvalue .= " ...";
+				$lastvalue="Unknown value type";
 			}
 			if($db_item["valuemapid"] > 0);
 				$lastvalue = replace_value_by_map($lastvalue, $db_item["valuemapid"]);
