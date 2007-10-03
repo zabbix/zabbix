@@ -128,9 +128,8 @@ FIELD		|slave_history	|t_integer	|'30'	|NOT NULL	|ZBX_SYNC
 FIELD		|slave_trends	|t_integer	|'365'	|NOT NULL	|ZBX_SYNC
 FIELD		|event_lastid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|history_lastid	|t_bigint	|'0'	|NOT NULL	|0
-FIELD		|history_str_lastid	|t_bigint	|'0'	|NOT NULL	|0
-FIELD		|history_uint_lastid	|t_bigint	|'0'	|NOT NULL	|0
-FIELD		|history_log_lastid	|t_bigint	|'0'	|NOT NULL	|0
+FIELD		|history_str_lastid|t_bigint	|'0'	|NOT NULL	|0
+FIELD		|history_uint_lastid|t_bigint	|'0'	|NOT NULL	|0
 FIELD		|nodetype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|masterid	|t_integer	|'0'	|NOT NULL	|0
 
