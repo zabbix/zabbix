@@ -567,7 +567,7 @@ void	DBupdate_services(
 /* History related functions */
 int	DBadd_trend(zbx_uint64_t itemid, double value, int clock);
 int	DBadd_history(zbx_uint64_t itemid, double value, int clock);
-int	DBadd_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity);
+int	DBadd_history_log(zbx_uint64_t id, zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity);
 int	DBadd_history_str(zbx_uint64_t itemid, char *value, int clock);
 int	DBadd_history_text(zbx_uint64_t itemid, char *value, int clock);
 int	DBadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock);

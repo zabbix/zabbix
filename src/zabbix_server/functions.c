@@ -523,7 +523,7 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 		else if(item->value_type==ITEM_VALUE_TYPE_LOG)
 		{
 			if(GET_STR_RESULT(value))
-				DBadd_history_log(item->itemid,value->str,now,item->timestamp,item->eventlog_source,item->eventlog_severity);
+				DBadd_history_log(0, item->itemid,value->str,now,item->timestamp,item->eventlog_source,item->eventlog_severity);
 			DBexecute("update items set lastlogsize=%d where itemid=" ZBX_FS_UI64,
 				item->lastlogsize,
 				item->itemid);
