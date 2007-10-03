@@ -1059,7 +1059,23 @@ COpt::profiling_stop('prepare table');
 	
 	function	format_lastvalue($db_item)
 	{
-		if(isset($db_item["lastvalue"]))
+		if($db_item["value_type"] == ITEM_VALUE_TYPE_LOG)
+		{
+			$row=DBfetch(DBselect("select max(id) as max from history_log where itemid=".$db_item["itemid"]));
+
+			if($row && !is_null($row['max']))
+			{
+				$row2=DBfetch(DBselect("select value from history_log where id=".$row["max"]));
+				$lastvalue=nbsp(htmlspecialchars(substr($row2["value"],0,20)));
+				if(strlen($db_item["lastvalue"]) > 20)
+					$lastvalue .= " ...";
+			}
+			else
+			{
+				$lastvalue="-";
+			}
+		}
+		else if(isset($db_item["lastvalue"]))
 		{
 			if($db_item["value_type"] == ITEM_VALUE_TYPE_FLOAT)
 			{
@@ -1072,21 +1088,6 @@ COpt::profiling_stop('prepare table');
 			else if($db_item["value_type"] == ITEM_VALUE_TYPE_TEXT)
 			{
 				$lastvalue="...";
-			}
-			else if($db_item["value_type"] == ITEM_VALUE_TYPE_LOG)
-			{
-				$row=DBfetch(DBselect("select max(id) as max from history_log where itemid=".$db_item["itemid"]));
-				if($row)
-				{
-					$row2=DBfetch(DBselect("select value from history_log where id=".$row["max"]));
-					$lastvalue=nbsp(htmlspecialchars(substr($row2["value"],0,20)));
-					if(strlen($db_item["lastvalue"]) > 20)
-						$lastvalue .= " ...";
-				}
-				else
-				{
-					$lastvalue="-";
-				}
 			}
 			else if($db_item["value_type"] == ITEM_VALUE_TYPE_STR)
 			{
