@@ -297,7 +297,7 @@ static int	process_record(int nodeid, char *record)
 int	node_sync(char *data)
 {
 	char	*start, *newline = NULL, *tmp = NULL;
-	int	allocated = 1024;
+	int	tmp_allocated = 128;
 	int	firstline=1;
 	int	nodeid=0;
 	int	sender_nodeid=0;
@@ -305,12 +305,11 @@ int	node_sync(char *data)
 
 	datalen=strlen(data);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In node_sync(len:%d)",
-		datalen);
+	zabbix_log( LOG_LEVEL_DEBUG, "In node_sync(len:%d)", datalen);
 
 	DBbegin();
 
-	tmp = zbx_malloc(tmp, allocated);
+	tmp = zbx_malloc(tmp, tmp_allocated);
 
 	for(start = data; *start != '\0';)
 	{
@@ -321,11 +320,11 @@ int	node_sync(char *data)
 
 		if(firstline == 1)
 		{
-/*			zabbix_log( LOG_LEVEL_WARNING, "First line [%s]", s); */
-			start = zbx_get_next_field(start, &tmp, &allocated, ZBX_DM_DELIMITER); /* Data */
-			start = zbx_get_next_field(start, &tmp, &allocated, ZBX_DM_DELIMITER);
+/*			zabbix_log( LOG_LEVEL_DEBUG, "First line [%s]", start);*/ 
+			start = zbx_get_next_field(start, &tmp, &tmp_allocated, ZBX_DM_DELIMITER); /* Data */
+			start = zbx_get_next_field(start, &tmp, &tmp_allocated, ZBX_DM_DELIMITER);
 			sender_nodeid=atoi(tmp);
-			start = zbx_get_next_field(start, &tmp, &allocated, ZBX_DM_DELIMITER);
+			start = zbx_get_next_field(start, &tmp, &tmp_allocated, ZBX_DM_DELIMITER);
 			nodeid=atoi(tmp);
 
 			firstline=0;
@@ -337,7 +336,7 @@ int	node_sync(char *data)
 		}
 		else
 		{
-/*			zabbix_log( LOG_LEVEL_WARNING, "Got line [%s]", s);*/
+/*			zabbix_log( LOG_LEVEL_DEBUG, "Got line [%s]", start);*/
 			process_record(nodeid, start);
 		}
 

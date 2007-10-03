@@ -532,7 +532,7 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 				zabbix_log(LOG_LEVEL_DEBUG, "Key: %s Encoding: [%s]",
 						item->key,
 						encoding);
-				DBadd_history_log(item->itemid,value->str,now,item->timestamp,item->eventlog_source,item->eventlog_severity, encoding);
+				DBadd_history_log(0, item->itemid,value->str,now,item->timestamp,item->eventlog_source,item->eventlog_severity, encoding);
 			}
 			DBexecute("update items set lastlogsize=%d where itemid=" ZBX_FS_UI64,
 				item->lastlogsize,

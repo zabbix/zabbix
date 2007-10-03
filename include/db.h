@@ -495,7 +495,7 @@ void	DBupdate_host_availability(zbx_uint64_t hostid,int available,int clock,char
 int	DBupdate_item_status_to_notsupported(zbx_uint64_t itemid, char *error);
 int	DBadd_trend(zbx_uint64_t itemid, double value, int clock);
 int	DBadd_history(zbx_uint64_t itemid, double value, int clock);
-int	DBadd_history_log(zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity, char *encoding);
+int	DBadd_history_log(zbx_uint64_t id, zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity, char *encoding);
 int	DBadd_history_str(zbx_uint64_t itemid, char *value, int clock);
 int	DBadd_history_text(zbx_uint64_t itemid, char *value, int clock);
 int	DBadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock);
