@@ -36,6 +36,7 @@
 #include "actions.h"
 #include "events.h"
 #include "threads.h"
+#include "dbsync.h"
 
 void	DBclose(void)
 {
@@ -1665,9 +1666,22 @@ zbx_uint64_t DBget_maxid(char *table, char *field)
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	ret1,ret2;
-	int		found  = FAIL;
+	zbx_uint64_t	min, max;
+	int		found  = FAIL, i, sync = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_maxid(%s,%s)",table,field);
+
+	for(i = 0; tables[i].table != 0; i++)
+	{
+		if(strcmp(tables[i].table, table) == 0)
+		{
+			if(tables[i].flags & ZBX_SYNC)
+			{
+				sync = 1;
+			}
+			break;
+		}
+	}
 
 	do
 	{
@@ -1679,18 +1693,33 @@ zbx_uint64_t DBget_maxid(char *table, char *field)
 		if(!row || DBis_null(row[0])==SUCCEED || !*row[0])
 		{
 			DBfree_result(result);
-			result = DBselect("select max(%s) from %s where " ZBX_COND_NODEID,
+
+			if(sync == 1)
+			{
+				min = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)CONFIG_NODEID+(zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)CONFIG_NODEID;
+				max = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)CONFIG_NODEID+(zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)CONFIG_NODEID+(zbx_uint64_t)99999999999;
+			}
+			else
+			{
+				min = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)CONFIG_NODEID;
+				max = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)CONFIG_NODEID+(zbx_uint64_t)99999999999999;
+			}
+
+			result = DBselect("select max(%s) from %s where %s>="ZBX_FS_UI64" and %s<="ZBX_FS_UI64,
 				field,
 				table,
-				LOCAL_NODE(field));
+				field,
+				min,
+				field,
+				max);
 			row = DBfetch(result);
 			if(!row || DBis_null(row[0])==SUCCEED || !*row[0])
 			{
-				DBexecute("insert into ids (nodeid,table_name,field_name,nextid) values (%d,'%s','%s'," ZBX_FS_UI64 ")",
+				DBexecute("insert into ids (nodeid,table_name,field_name,nextid) values (%d,'%s','%s',"ZBX_FS_UI64")",
 					CONFIG_NODEID,
 					table,
 					field,
-					CONFIG_NODEID*(zbx_uint64_t)__UINT64_C(100000000000000)+1);
+					min);
 			}
 			else
 			{

@@ -546,11 +546,15 @@ if(isset($DB_TYPE) && $DB_TYPE == "ORACLE") {
 
 			if(!$row || is_null($row["nextid"]))
 			{
-				$row=DBfetch(DBselect("select max($field) as id from $table where ".DBin_node($field, $nodeid)));
+				global $ZBX_LOCALNODEID;
+
+				$min=bcadd(bcmul($nodeid,"100000000000000"),bcmul($ZBX_LOCALNODEID,"100000000000"));
+				$max=bcadd(bcadd(bcmul($nodeid,"100000000000000"),bcmul($ZBX_LOCALNODEID,"100000000000")),"99999999999");
+				$row=DBfetch(DBselect("select max($field) as id from $table where $field>=$min and $field<=$max"));
 				if(!$row || is_null($row["id"]))
 				{
 					DBexecute("insert into ids (nodeid,table_name,field_name,nextid) ".
-						" values ($nodeid,'$table','$field',".bcadd(bcmul($nodeid,"100000000000000"),1).")");
+						" values ($nodeid,'$table','$field',$min)");
 				}
 				else
 				{
