@@ -1105,12 +1105,23 @@
 
 			if(strstr($description,"{ITEM.LASTVALUE}"))
 			{
-				$row2=DBfetch(DBselect('select i.lastvalue from items i, triggers t, functions f '.
+				$row2=DBfetch(DBselect('select i.lastvalue,i.itemid,i.value_type from items i, triggers t, functions f '.
 					' where i.itemid=f.itemid and f.triggerid=t.triggerid and '.
 					' t.triggerid='.$row["triggerid"]));
 
-				if(is_null($row2["lastvalue"])) $row["lastvalue"] = "{ITEM.LASTVALUE}";
-				$description = str_replace("{ITEM.LASTVALUE}", $row2["lastvalue"],$description);
+				if($row2["value_type"]!=ITEM_VALUE_TYPE_LOG)
+				{
+					$description = str_replace("{ITEM.LASTVALUE}", $row2["lastvalue"],$description);
+				}
+				else
+				{
+					$row3=DBfetch(DBselect("select max(clock) as max from history_log where itemid=".$row2["itemid"]));
+					if($row3)
+					{
+						$row4=DBfetch(DBselect("select value from history_log where itemid=".$row2["itemid"]." and clock=".$row3["max"]));
+						$description = str_replace("{ITEM.LASTVALUE}", $row4["value"],$description);
+					}
+				}
 			}
 		}
 		else

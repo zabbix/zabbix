@@ -1,5 +1,6 @@
 Changes for 1.4.j:
 
+ - added support of log files for {ITEM.LASTVALUE} (Alexei)
  - fixed acknowledgements synchronization (Sasha)
  - fixed appeared error in Latest Data (Artem)
  - fixed problem with equivalence in expressions in Trigger Log Form (Artem)
