@@ -154,6 +154,47 @@
 			" order by itemid,drawtype,sortorder,color,yaxisside"); 
 	}
 
+	/*
+	 * Function: get_min_itemclock_by_graphid
+	 *
+	 * Description:
+	 *     Return the time of the 1st apearance of items included in graph in trends
+	 *
+	 * Author:
+	 *     Artem Suharev
+	 *
+	 */	
+	function get_min_itemclock_by_graphid($graphid){
+		$row = DBfetch(DBselect('SELECT MIN(t.clock) as clock '.
+						' FROM graphs_items gi, trends t '.
+						' WHERE gi.graphid='.$graphid.
+						  ' AND t.itemid = gi.itemid')); 
+						  
+		if(!empty($row) && $row) 
+			return  $row['clock'];
+	return 0;
+	}
+
+	/*
+	 * Function: get_min_itemclock_by_itemid
+	 *
+	 * Description:
+	 *     Return the time of the 1st apearance of item in trends
+	 *
+	 * Author:
+	 *     Artem Suharev
+	 *
+	 */	
+	function	get_min_itemclock_by_itemid($itemid){
+		$row = DBfetch(DBselect('SELECT MIN(t.clock) as clock '.
+						' FROM trends t '.
+						' WHERE t.itemid='.$itemid)); 
+						  
+		if(!empty($row) && $row) 
+			return  $row['clock'];
+	return 0;
+	}
+
 	function	get_graphitem_by_gitemid($gitemid)
 	{
 		$result=DBselect("SELECT * FROM graphs_items WHERE gitemid=$gitemid");

@@ -1,7 +1,7 @@
 <?php
 /* 
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2007 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 	$page['title'] = 'S_CUSTOM_GRAPHS';
 	$page['file'] = 'charts.php';
 	$page['hist_arg'] = array('hostid','grouid','graphid','period','dec','inc','left','right','stime');
+	$page['scripts'] = array('prototype.js','url.js','gmenu.js','scrollbar.js','sbinit.js');
 ?>
 <?php
 	if(isset($_REQUEST['fullscreen']))
@@ -258,8 +259,8 @@ include_once 'include/page_header.php';
 				<!--
 				if(window.innerWidth) width=window.innerWidth; 
 				else width=document.body.clientWidth;
-				document.write(\'<img src="chart6.php?graphid='.$_REQUEST['graphid'].url_param('stime').url_param('from').
-				'&period='.$effectiveperiod.'" />\');
+				document.write(\'<img id="graph" src="chart6.php?graphid='.$_REQUEST['graphid'].url_param('stime').url_param('from').
+				'&period='.$effectiveperiod.'" /><br /><br />\');
 				-->
 				</script>'."\n";			
 		}
@@ -268,8 +269,8 @@ include_once 'include/page_header.php';
 				<!--
 				if(window.innerWidth) width=window.innerWidth; 
 				else width=document.body.clientWidth;
-				document.write(\'<img src="chart2.php?graphid='.$_REQUEST['graphid'].url_param('stime').url_param('from').
-				'&period='.$effectiveperiod.'&width=\'+(width-108)+\'" />\');
+				document.write(\'<img id="graph" src="chart2.php?graphid='.$_REQUEST['graphid'].url_param('stime').url_param('from').
+				'&period='.$effectiveperiod.'&width=\'+(width-108)+\'" /><br /><br />\');
 				-->
 				</script>'."\n";			
 		}
@@ -280,7 +281,18 @@ include_once 'include/page_header.php';
 
 	if($_REQUEST['graphid'] > 0)
 	{
-		navigation_bar('charts.php',array('groupid','hostid','graphid'));
+		$stime = get_min_itemclock_by_graphid($_REQUEST['graphid']);
+		$bstime = time()-$effectiveperiod;
+		if(isset($_REQUEST['stime'])){
+			$bstime = $_REQUEST['stime'];
+			$bstime = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
+		}
+		
+		$script = 	'scrollinit(0,0,0,'.$effectiveperiod.','.$stime.',0,'.$bstime.');
+					showgraphmenu("graph");';
+						
+		zbx_add_post_js($script);
+//		navigation_bar('charts.php',array('groupid','hostid','graphid'));
 	}
 	
 ?>

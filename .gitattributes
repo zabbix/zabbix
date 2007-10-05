@@ -38,6 +38,19 @@ frontends/php/audio/trigger_on_warning.wav -text
 frontends/php/chart6.php -text
 frontends/php/chart7.php -text
 frontends/php/images/flash/zbxclock.swf -text svneol=unset#unset
+frontends/php/images/general/bar/arrow_down.gif -text
+frontends/php/images/general/bar/arrow_l.gif -text
+frontends/php/images/general/bar/arrow_r.gif -text
+frontends/php/images/general/bar/arrow_sm.gif -text
+frontends/php/images/general/bar/arrow_up.gif -text
+frontends/php/images/general/bar/bar_bg.gif -text
+frontends/php/images/general/bar/bar_left.gif -text
+frontends/php/images/general/bar/bar_middle.gif -text
+frontends/php/images/general/bar/bar_right.gif -text
+frontends/php/images/general/bar/bg.gif -text
+frontends/php/images/general/bar/cal.gif -text
+frontends/php/images/general/bar/left.gif -text
+frontends/php/images/general/bar/right.gif -text
 frontends/php/images/general/closed.gif -text svneol=unset#unset
 frontends/php/images/general/error_small.gif -text
 frontends/php/images/general/help.gif -text svneol=unset#unset
@@ -99,13 +112,20 @@ frontends/php/include/js.inc.php -text
 frontends/php/js/blink.js -text
 frontends/php/js/common.js -text
 frontends/php/js/cookies.js -text
+frontends/php/js/gmenu.js -text
 frontends/php/js/graphs.js -text
 frontends/php/js/menu.js -text
+frontends/php/js/prototype.js -text
+frontends/php/js/sbinit.js -text
+frontends/php/js/scrollbar.js -text
 frontends/php/js/services.js -text
 frontends/php/js/showhint.js -text
 frontends/php/js/tree.js -text
+frontends/php/js/url.js -text
+frontends/php/styles/bar.css -text
 frontends/php/styles/div.css -text
 frontends/php/styles/form.css -text
+frontends/php/styles/gmenu.css -text
 frontends/php/styles/link.css -text
 frontends/php/styles/p.css -text
 frontends/php/styles/popupmenu.css -text

@@ -25,7 +25,8 @@
 
 	$page["file"]	= "history.php";
 	$page["title"]	= "S_HISTORY";
-
+	$page['scripts'] = array('prototype.js','url.js','gmenu.js','scrollbar.js','sbinit.js');
+	
 	if(isset($_REQUEST['plaintext']) || isset($_REQUEST['fullscreen']))
 	{
 		define('ZBX_PAGE_NO_MENU', 1);
@@ -512,9 +513,22 @@ COpt::profiling_stop("history");
 
 	if(!isset($_REQUEST["plaintext"]))
 	{
-		if(in_array($_REQUEST["action"],array("showvalues","showgraph")))
-		{
-			navigation_bar("history.php",$to_save_request);
+		if(in_array($_REQUEST["action"],array("showvalues","showgraph"))){
+			
+			$stime = get_min_itemclock_by_itemid($_REQUEST["itemid"]);
+			$bstime = time()-$effectiveperiod;
+			
+			if(isset($_REQUEST['stime'])){
+				$bstime = $_REQUEST['stime'];
+				$bstime = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
+			}
+			
+ 			$script = 	'scrollinit(0,0,0,'.$effectiveperiod.','.$stime.',0,'.$bstime.');
+						showgraphmenu("graph");';
+							
+			zbx_add_post_js($script); 
+
+	//		navigation_bar("history.php",$to_save_request);
 		}
 	}
 ?>

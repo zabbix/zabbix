@@ -35,6 +35,7 @@
 				$name="image";
 
 			$this->AddOption('border',0);
+			$this->AddOption('alt',$name);
 			$this->SetName($name);
 			$this->SetAltText($name);
 			$this->SetSrc($src);
