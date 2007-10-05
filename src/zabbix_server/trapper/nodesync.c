@@ -83,7 +83,6 @@ static int	process_record(int nodeid, char *record)
 #endif /* HAVE_POSTGRESQL */
 
 	int		table_acknowledges = 0;
-	zbx_uint64_t	eventid = 0;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_record [%s]", record);
 
@@ -163,15 +162,8 @@ static int	process_record(int nodeid, char *record)
 
 					if(table_acknowledges && 0 == strcmp(fieldname, "eventid"))
 					{
-						sscanf(buffer, ZBX_FS_UI64, &eventid);
-
-						tmp_offset = 0;
-						zbx_snprintf_alloc(&tmp, &tmp_allocated, &tmp_offset, 16*1024, "update events set acknowledged=1 where eventid=" ZBX_FS_UI64, eventid);
-						if(FAIL == DBexecute("%s",tmp))
-						{
-							zabbix_log(LOG_LEVEL_WARNING, "Failed [%s]",
-								tmp);
-						}
+						DBexecute("update events set acknowledged=1 where eventid=%s",
+								buffer);
 					}
 				}
 				else if(valuetype == ZBX_TYPE_BLOB)

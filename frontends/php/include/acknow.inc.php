@@ -39,7 +39,8 @@
 		if(!$result)
 			return $result;
 
-		$acknowledgeid = get_dbid("acknowledges","acknowledgeid");
+		$nodeid = id2nodeid($eventid);
+		$acknowledgeid = get_dbid("acknowledges","acknowledgeid",$nodeid);
 
 		$result =  DBexecute("insert into acknowledges (acknowledgeid,userid,eventid,clock,message)".
 			" values ($acknowledgeid,$userid,$eventid,".time().",".zbx_dbstr($message).")");

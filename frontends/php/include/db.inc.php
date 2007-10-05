@@ -532,9 +532,10 @@ if(isset($DB_TYPE) && $DB_TYPE == "ORACLE") {
 		return in_array(id2nodeid($id_var), $nodes);
 	}
 
-	function	get_dbid($table,$field)
+	function	get_dbid( $table, $field, $nodeid = NULL )
 	{
-		$nodeid = get_current_nodeid(false);
+		if ( is_null($nodeid) )
+			$nodeid = get_current_nodeid(false);
 
 		$found = false;
 		do
