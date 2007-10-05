@@ -1,7 +1,7 @@
 <?php
 /*
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2007 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1071,20 +1071,24 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 		$till=date(S_DATE_FORMAT_YMDHMS,time(NULL)-$from*3600);   
 		show_table_header("TILL $till (".($period/3600)." HOURs)");
 
-		echo "<center>";
-		echo "<TABLE BORDER=0 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-		echo "<TR BGCOLOR=#DDDDDD>";
-		echo "<TD ALIGN=CENTER>";
-
-		insert_sizeable_graph('chart.php?itemid='.$itemid.
-			url_param($from,false,'from').
-			url_param($stime,false,'stime').
-			url_param($period,false,'period'));
-
-		echo "</TD>";
-		echo "</TR>";
-		echo "</TABLE>";
-		echo "</center>";
+		$td = new CCol(get_js_sizeable_graph('chart.php?itemid='.$itemid.
+				url_param($from,false,'from').
+				url_param($stime,false,'stime').
+				url_param($period,false,'period')));
+		$td->AddOption('align','center');
+		
+		$tr = new CRow($td);
+		$tr->AddOption('bgcolor','$dddddd');
+		
+		$table = new CTable();
+		$table->AddOption('width','100%');
+		$table->AddOption('bgcolor','#cccccc');
+		$table->AddOption('cellspacing','1');
+		$table->AddOption('cellpadding','3');
+		
+		$table->AddRow($tr);
+		
+		$table->Show();
 	}
 
 
@@ -1483,143 +1487,6 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 		DashedLine($image, $x2,$y1,$x1,$y1,$color);
 	}
 
-
-	function time_navigator($resource="graphid",$id)
-	{
-	echo "<TABLE BORDER=0 align=center COLS=2 WIDTH=100% BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=1>";
-	echo "<TR BGCOLOR=#FFFFFF>";
-	echo "<TD ALIGN=LEFT>";
-
-	echo "<div align=left>";
-	echo "<b>".S_PERIOD.":</b>".SPACE;
-
-	$hour=3600;
-		
-		$a=array(S_1H=>3600,S_2H=>2*3600,S_4H=>4*3600,S_8H=>8*3600,S_12H=>12*3600,
-			S_24H=>24*3600,S_WEEK_SMALL=>7*24*3600,S_MONTH_SMALL=>31*24*3600,S_YEAR_SMALL=>365*24*3600);
-		foreach($a as $label=>$sec)
-		{
-			echo "[";
-			if($_REQUEST["period"]>$sec)
-			{
-				$tmp=$_REQUEST["period"]-$sec;
-				echo("<A HREF=\"charts.php?period=$tmp".url_param($resource).url_param("stime").url_param("from").url_param("keep").url_param("fullscreen")."\">-</A>");
-			}
-			else
-			{
-				echo "-";
-			}
-
-			echo("<A HREF=\"charts.php?period=$sec".url_param($resource).url_param("stime").url_param("from").url_param("keep").url_param("fullscreen")."\">");
-			echo($label."</A>");
-
-			$tmp=$_REQUEST["period"]+$sec;
-			echo("<A HREF=\"charts.php?period=$tmp".url_param($resource).url_param("stime").url_param("from").url_param("keep").url_param("fullscreen")."\">+</A>");
-
-			echo "]".SPACE;
-		}
-
-		echo("</div>");
-
-	echo "</TD>";
-	echo "<TD BGCOLOR=#FFFFFF WIDTH=15% ALIGN=RIGHT>";
-	echo "<b>".nbsp(S_KEEP_PERIOD).":</b>".SPACE;
-		if($_REQUEST["keep"] == 1)
-		{
-			echo("[<A HREF=\"charts.php?keep=0".url_param($resource).url_param("from").url_param("period").url_param("fullscreen")."\">".S_ON_C."</a>]");
-		}
-		else
-		{
-			echo("[<A HREF=\"charts.php?keep=1".url_param($resource).url_param("from").url_param("period").url_param("fullscreen")."\">".S_OFF_C."</a>]");
-		}
-	echo "</TD>";
-	echo "</TR>";
-	echo "<TR BGCOLOR=#FFFFFF>";
-	echo "<TD>";
-	if(isset($_REQUEST["stime"]))
-	{
-		echo "<div align=left>" ;
-		echo "<b>".S_MOVE.":</b>".SPACE;
-
-		$day=24;
-// $a already defined
-//		$a=array("1h"=>1,"2h"=>2,"4h"=>4,"8h"=>8,"12h"=>12,
-//			"24h"=>24,"week"=>7*24,"month"=>31*24,"year"=>365*24);
-		foreach($a as $label=>$hours)
-		{
-			echo "[";
-
-			$stime=$_REQUEST["stime"];
-			$tmp=mktime(substr($stime,8,2),substr($stime,10,2),0,substr($stime,4,2),substr($stime,6,2),substr($stime,0,4));
-			$tmp=$tmp-3600*$hours;
-			$tmp=date("YmdHi",$tmp);
-			echo("<A HREF=\"charts.php?stime=$tmp".url_param($resource).url_param("period").url_param("keep").url_param("fullscreen")."\">-</A>");
-
-			echo($label);
-
-			$stime=$_REQUEST["stime"];
-			$tmp=mktime(substr($stime,8,2),substr($stime,10,2),0,substr($stime,4,2),substr($stime,6,2),substr($stime,0,4));
-			$tmp=$tmp+3600*$hours;
-			$tmp=date("YmdHi",$tmp);
-			echo("<A HREF=\"charts.php?stime=$tmp".url_param($resource).url_param("period").url_param("keep").url_param("fullscreen")."\">+</A>");
-
-			echo "]".SPACE;
-		}
-		echo("</div>");
-	}
-	else
-	{
-		echo "<div align=left>";
-		echo "<b>".S_MOVE.":</b>".SPACE;
-
-		$day=24;
-// $a already defined
-//		$a=array("1h"=>1,"2h"=>2,"4h"=>4,"8h"=>8,"12h"=>12,
-//			"24h"=>24,"week"=>7*24,"month"=>31*24,"year"=>365*24);
-		foreach($a as $label=>$hours)
-		{
-			echo "[";
-			$tmp=$_REQUEST["from"]+$hours;
-			echo("<A HREF=\"charts.php?from=$tmp".url_param($resource).url_param("period").url_param("keep").url_param("fullscreen")."\">-</A>");
-
-			echo($label);
-
-			if($_REQUEST["from"]>=$hours)
-			{
-				$tmp=$_REQUEST["from"]-$hours;
-				echo("<A HREF=\"charts.php?from=$tmp".url_param($resource).url_param("period").url_param("keep").url_param("fullscreen")."\">+</A>");
-			}
-			else
-			{
-				echo "+";
-			}
-
-			echo "]".SPACE;
-		}
-		echo("</div>");
-	}
-	echo "</TD>";
-	echo "<TD BGCOLOR=#FFFFFF WIDTH=15% ALIGN=RIGHT>";
-//		echo("<div align=left>");
-		echo "<form method=\"put\" action=\"charts.php\">";
-		echo "<input name=\"graphid\" type=\"hidden\" value=\"".$_REQUEST[$resource]."\" size=12>";
-		echo "<input name=\"period\" type=\"hidden\" value=\"".(9*3600)."\" size=12>";
-		if(isset($_REQUEST["stime"]))
-		{
-			echo "<input name=\"stime\" class=\"biginput\" value=\"".$_REQUEST["stime"]."\" size=12>";
-		}
-		else
-		{
-			echo "<input name=\"stime\" class=\"biginput\" value=\"yyyymmddhhmm\" size=12>";
-		}
-		echo SPACE;
-		echo "<input class=\"button\" type=\"submit\" name=\"action\" value=\"go\">";
-		echo "</form>";
-//		echo("</div>");
-	echo "</TD>";
-	echo "</TR>";
-	echo "</TABLE>";
-	}
 
 	function	add_mapping_to_valuemap($valuemapid, $mappings)
 	{

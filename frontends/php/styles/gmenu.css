@@ -1,0 +1,384 @@
+@charset "utf-8";
+/* CSS Document */
+img{
+	border: 0px;
+}
+
+img#gmenu_day_up{
+	position:absolute;
+	text-align:center;
+	top: 10px;
+	left: 28px;
+}
+img#gmenu_day_up:hover{
+	cursor:pointer;
+}
+
+img#gmenu_month_up{
+	position:absolute;
+	text-align:center;
+	top: 10px;
+	left: 100px;
+}
+img#gmenu_month_up:hover{
+	cursor:pointer;
+}
+
+
+img#gmenu_year_up{
+	position:absolute;
+	text-align:center;
+	top: 10px;
+	left: 152px;
+}
+img#gmenu_year_up:hover{
+	cursor:pointer;
+}
+
+
+img#gmenu_day_down{
+	position:absolute;
+	text-align:center;
+	top: 23px;
+	left: 28px;
+}
+
+img#gmenu_day_down:hover{
+	cursor:pointer;
+}
+
+img#gmenu_month_down{
+	position:absolute;
+	text-align:center;
+	top: 23px;
+	left: 100px;
+}
+img#gmenu_month_down:hover{
+	cursor:pointer;
+}
+
+img#gmenu_year_down{
+	position:absolute;
+	text-align:center;
+	top: 23px;
+	left: 152px;
+}
+img#gmenu_year_down:hover{
+	cursor:pointer;
+}
+
+img#gmenu_hour_up{
+	position:absolute;
+	text-align:center;
+	top: 10px;
+	left: 196px;
+}
+img#gmenu_hour_up:hover{
+	cursor:pointer;
+}
+
+img#gmenu_minute_up{
+	position:absolute;
+	text-align:center;
+	top: 10px;
+	left: 230px;
+}
+img#gmenu_minute_up:hover{
+	cursor:pointer;
+}
+
+img#gmenu_hour_down{
+	position:absolute;
+	text-align:center;
+	top: 23px;
+	left: 196px;
+}
+img#gmenu_hour_down:hover{
+	cursor:pointer;
+}
+
+img#gmenu_minute_down{
+	position:absolute;
+	text-align:center;
+	top: 23px;
+	left: 230px;
+}
+img#gmenu_minute_down:hover{
+	cursor:pointer;
+}
+
+img#gmenu_period_v_up{
+	position:absolute;
+	text-align:center;
+	top: 10px;
+	left: 82px;
+}
+img#gmenu_period_v_up:hover{
+	cursor:pointer;
+}
+
+img#gmenu_period_t_up{
+	position:absolute;
+	text-align:center;
+	top: 10px;
+	left: 154px;
+}
+img#gmenu_period_t_up:hover{
+	cursor:pointer;
+}
+
+img#gmenu_period_v_down{
+	position:absolute;
+	text-align:center;
+	top: 23px;
+	left: 82px;
+}
+img#gmenu_period_v_down:hover{
+	cursor:pointer;
+}
+
+img#gmenu_period_t_down{
+	position:absolute;
+	text-align:center;
+	top: 23px;
+	left: 154px;
+}
+img#gmenu_period_t_down:hover{
+	cursor:pointer;
+}
+
+a#gmenu_load:link{
+	position:absolute;
+	border:#666666 1px solid;
+	background-color:#FFFFFF;
+	text-align:center;
+	text-decoration:none;
+	color:#333333;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size: 9px;
+	font-weight:bold;
+	top: 50px;
+	left: 175px;
+	width: 72px;
+}
+
+a#gmenu_load:visited{
+	position:absolute;
+	border:#666666 1px solid;
+	background-color:#FFFFFF;
+	text-align:center;
+	text-decoration:none;
+	color:#333333;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight:bold;
+	top: 50px;
+	left: 175px;
+	width: 72px;
+}
+
+a#gmenu_load:hover{
+	position:absolute;
+	border:#666666 1px solid;
+	background-color:#CFCFCF;
+	text-align:center;
+	text-decoration:none;
+	color:#333333;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight:bold;
+	top: 50px;
+	left: 175px;
+	width: 72px;
+}
+
+a#gmenu_load:active{
+	position:absolute;
+	border:#666666 1px solid;
+	background-color:#FFFFFF;
+	text-align:center;
+	text-decoration:none;
+	color:#333333;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight:bold;
+	top: 50px;
+	left: 175px;
+	width: 72px;
+}
+
+a#gmenu_hide:link{
+	position:absolute;
+	border:#666666 1px solid;
+	background-color:#FFFFFF;
+	text-align:center;
+	text-decoration:none;
+	color:#333333;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight:bold;
+	top: 72px;
+	left: 175px;
+	width: 72px;
+}
+
+a#gmenu_hide:visited{
+	position:absolute;
+	border:#666666 1px solid;
+	background-color:#FFFFFF;
+	text-align:center;
+	text-decoration:none;
+	color:#333333;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight:bold;
+	top: 72px;
+	left: 175px;
+	width: 72px;
+}
+
+a#gmenu_hide:hover{
+	position:absolute;
+	border:#666666 1px solid;
+	background-color:#CFCFCF;
+	text-align:center;
+	text-decoration:none;
+	color:#333333;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight:bold;
+	top: 72px;
+	left: 175px;
+	width: 72px;
+}
+
+a#gmenu_hide:active{
+	position:absolute;
+	border:#666666 1px solid;
+	background-color:#FFFFFF;
+	text-align:center;
+	text-decoration:none;
+	color:#333333;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight:bold;
+	top: 72px;
+	left: 175px;
+	width: 72px;
+}
+
+div#gmenu{
+	position:absolute;
+	background-color:#EFEFFF;
+	border:#3333FF 1px solid;
+	width: 254px;
+	height: 94px;
+}
+
+
+div#gmenu_bsdate{
+	position: absolute;
+	border:1px #888888 dashed;
+	top: 3px;
+	left: 4px;
+	height: 38px;
+	width: 244px;
+}
+
+div#gmenu_period{
+	position: absolute;
+	border:1px #888888 dashed;
+	top: 50px;
+	left: 4px;
+	height: 38px;
+	width: 166px;
+}
+
+span#gmenu_day{
+	position:absolute;
+	text-align:center;;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	border:#666666 1px solid;
+	top: 10px;
+	left: 6px;
+	width: 20px;
+}
+
+span#gmenu_month{
+	position:absolute;
+	text-align:center;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	border:#666666 1px solid;
+	top: 10px;
+	left: 38px;
+	width: 60px;
+}
+
+span#gmenu_year{
+	position:absolute;
+	text-align:center;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	border:#666666 1px solid;
+	top: 10px;
+	left: 110px;
+	width: 40px;
+}
+
+span#gmenu_hour{
+	position:absolute;
+	text-align:center;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	border:#666666 1px solid;
+	top: 10px;
+	left: 174px;
+	width: 20px;
+}
+
+span#gmenu_minute{
+	position:absolute;
+	text-align:center;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	border:#666666 1px solid;
+	top: 10px;
+	left: 208px;
+	width: 20px;
+}
+
+span#gmenu_period_desc{
+	position:absolute;
+	text-align:left;
+	font-weight:bold;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size: 13px;
+	color:#3F3F3F;
+	top: 10px;
+	left: 6px;
+	width: 48px;
+}
+
+span#gmenu_period_value{
+	position:absolute;
+	text-align:center;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	border:#666666 1px solid;
+	top: 10px;
+	left: 60px;
+	width: 20px;
+}
+
+span#gmenu_period_type{
+	position:absolute;
+	text-align:center;
+	font-family:Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	border:#666666 1px solid;
+	top: 10px;
+	left: 100px;
+	width: 52px;
+}

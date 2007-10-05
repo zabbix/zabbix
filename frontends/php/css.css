@@ -6,7 +6,8 @@
 @import "styles/ul.css";
 @import "styles/p.css";
 @import "styles/popupmenu.css";
-
+@import "styles/bar.css";
+@import "styles/gmenu.css";
 
 body{
         background-color:#e5e5e5;

@@ -1,5 +1,6 @@
 Changes for 1.5:
 
+ - [DEV-1] added new graph bar (Artem)
  - support of database cache for history and trends (Alexei)
  - basic support of database caching (Alexei)
  - added pie graphs (Artem)

@@ -19,6 +19,28 @@
 var OP = window.opera?true:false;
 var IE = ((!OP) && (document.all))?true:false;
 
+function isset(obj){
+	return (typeof(obj) != 'undefined');
+}
+
+function empty(obj){
+	if(is_null(obj) || !obj) return true;
+	return false;
+}
+
+function is_null(obj){
+	if(obj==null) return true;
+return false;
+}
+
+function is_number(obj){
+	return (typeof(obj) == 'number');
+}
+
+function is_string(obj){
+	return (typeof(obj) == 'string');
+}
+
 if (!Array.prototype.forEach)
 {
   Array.prototype.forEach = function(fun /*, thisp*/)
@@ -226,7 +248,7 @@ function insert_sizeable_graph(url)
 
 	if(width) url += "&amp;width=" + (width - 108);
 
-	document.write('<img src="'+url+'" alt="graph">');
+	document.write('<img id="graph" src="'+url+'" alt="graph"><br /><br />');
 }
 
 function resizeiframe(id){
@@ -236,10 +258,16 @@ function resizeiframe(id){
 	if(typeof(indoc) == 'undefined') return;
 	var height = parseInt(indoc.getElementsByTagName('body')[0].scrollHeight);
 	var height2 = parseInt(indoc.getElementsByTagName('body')[0].offsetHeight);
+	
 	if(height2 > height){
 		height = height2;
 	}
+
 	iframe.style.height = (height)+'px';
+	
+	if(!is_null($('scroll')) && showgraphmenu){
+		showgraphmenu('iframe');
+	}
 }
 
 function openWinCentered(loc, winname, iwidth, iheight, params){
@@ -253,19 +281,15 @@ function openWinCentered(loc, winname, iwidth, iheight, params){
 	WinObjReferer.focus();
 }
 
-function isset(obj){
-	return (typeof(obj) != 'undefined');
-}
-
-function empty(obj){
-	if(isset(obj) && obj) return true;
-	return false;
-}
-
-function is_number(obj){
-	return (typeof(obj) == 'number');
-}
-
-function is_string(obj){
-	return (typeof(obj) == 'string');
+function getPosition(obj){
+	var pos = {top: 0, left: 0};
+	if (obj.offsetParent) {
+		pos.left = obj.offsetLeft;
+		pos.top = obj.offsetTop;
+		while (obj = obj.offsetParent) {
+			pos.left += obj.offsetLeft;
+			pos.top += obj.offsetTop;
+		}
+	}
+return pos;
 }

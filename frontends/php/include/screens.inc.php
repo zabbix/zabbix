@@ -199,8 +199,10 @@
 		
 		if(!isset($step))
 		{
-			return new CIFrame('screens.php?config=1&fullscreen=2&elementid='.$slideshowid.'&step='.$curr_step.
+			$iframe = new CIFrame('screens.php?config=1&fullscreen=2&elementid='.$slideshowid.'&step='.$curr_step.
 					'&period='.$effectiveperiod.url_param('stime').url_param('from'));
+					
+			return $iframe;
 		}
 
 		$slide_data = DBfetch(DBselect('select sl.screenid,sl.delay,ss.delay as ss_delay from slides sl,slideshows ss '.
@@ -259,6 +261,7 @@
 		$table = new CTable(
 			new CLink("No rows in screen ".$row["name"],"screenconf.php?config=0&form=update&screenid=".$screenid),
 			($editmode == 0 || $editmode == 2) ? "screen_view" : "screen_edit");
+		$table->AddOption('id','iframe');
 	
 		for($r=0;$r<$row["vsize"];$r++)
 		{
@@ -271,7 +274,7 @@
 				$iresult=DBSelect("select * from screens_items".
 					" where screenid=$screenid and x=$c and y=$r");
 
-				$irow		= DBfetch($iresult);
+				$irow = DBfetch($iresult);
 				if($irow)
 				{
 					$screenitemid	= $irow["screenitemid"];

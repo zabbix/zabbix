@@ -53,13 +53,15 @@ function zbx_add_post_js($script)
 	$ZBX_PAGE_POST_JS[] = $script;
 }
 
-function	insert_sizeable_graph($url){
 
-	echo '<script language="JavaScript" type="text/javascript">
-		  <!--
-				insert_sizeable_graph('.zbx_jsvalue($url).');
-		  -->
-		  </script>';
+function	get_js_sizeable_graph($url){
+return '
+	<script language="JavaScript" type="text/javascript">
+	<!--
+		insert_sizeable_graph('.zbx_jsvalue($url).');
+	-->
+	</script>
+	';
 }
 
 
