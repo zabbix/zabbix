@@ -539,17 +539,13 @@ if(isset($DB_TYPE) && $DB_TYPE == "ORACLE") {
 		$found = false;
 		do
 		{
-			$row = DBfetch(DBselect('select nextid from ids '.
-						' where nodeid='.$nodeid.
-						' and table_name=\''.$table.'\' '.
-						' and field_name=\''.$field.'\''));
+			global $ZBX_LOCALNODEID;
 
-			if(!$row || is_null($row["nextid"]))
+			$min=bcadd(bcmul($nodeid,"100000000000000"),bcmul($ZBX_LOCALNODEID,"100000000000"));
+			$max=bcadd(bcadd(bcmul($nodeid,"100000000000000"),bcmul($ZBX_LOCALNODEID,"100000000000")),"99999999999");
+			$row = DBfetch(DBselect("select nextid from ids where nodeid=$nodeid and table_name='$table' and field_name='$field'"));
+			if(!$row)
 			{
-				global $ZBX_LOCALNODEID;
-
-				$min=bcadd(bcmul($nodeid,"100000000000000"),bcmul($ZBX_LOCALNODEID,"100000000000"));
-				$max=bcadd(bcadd(bcmul($nodeid,"100000000000000"),bcmul($ZBX_LOCALNODEID,"100000000000")),"99999999999");
 				$row=DBfetch(DBselect("select max($field) as id from $table where $field>=$min and $field<=$max"));
 				if(!$row || is_null($row["id"]))
 				{
@@ -558,6 +554,13 @@ if(isset($DB_TYPE) && $DB_TYPE == "ORACLE") {
 				}
 				else
 				{
+					/*
+					$ret1 = $row["id"];
+					if($ret1 >= $max) {
+						"Maximum number of id's was exceeded"
+					}
+					*/
+
 					DBexecute("insert into ids (nodeid,table_name,field_name,nextid) values ($nodeid,'$table','$field',".$row["id"].")");
 				}
 				continue;
@@ -565,6 +568,10 @@ if(isset($DB_TYPE) && $DB_TYPE == "ORACLE") {
 			else
 			{
 				$ret1 = $row["nextid"];
+				if(($ret1 < $min) || ($ret1 >= $max)) {
+					DBexecute("delete from ids where nodeid=$nodeid and table_name='$table' and field_name='$field'");
+					continue;
+				}
 	
 				DBexecute("update ids set nextid=nextid+1 where nodeid=$nodeid and table_name='$table' and field_name='$field'");
 	
