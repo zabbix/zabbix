@@ -1658,6 +1658,17 @@ zbx_uint64_t DBget_maxid(char *table, char *field)
 		}
 	}
 
+	if(sync == 1)
+	{
+		min = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)CONFIG_NODEID+(zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)CONFIG_NODEID;
+		max = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)CONFIG_NODEID+(zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)CONFIG_NODEID+(zbx_uint64_t)99999999999;
+	}
+	else
+	{
+		min = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)CONFIG_NODEID;
+		max = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)CONFIG_NODEID+(zbx_uint64_t)99999999999999;
+	}
+
 	do
 	{
 		result = DBselect("select nextid from ids where nodeid=%d and table_name='%s' and field_name='%s'",
@@ -1665,20 +1676,9 @@ zbx_uint64_t DBget_maxid(char *table, char *field)
 			table,
 			field);
 		row = DBfetch(result);
-		if(!row || DBis_null(row[0])==SUCCEED || !*row[0])
+		if(!row)
 		{
 			DBfree_result(result);
-
-			if(sync == 1)
-			{
-				min = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)CONFIG_NODEID+(zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)CONFIG_NODEID;
-				max = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)CONFIG_NODEID+(zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)CONFIG_NODEID+(zbx_uint64_t)99999999999;
-			}
-			else
-			{
-				min = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)CONFIG_NODEID;
-				max = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)CONFIG_NODEID+(zbx_uint64_t)99999999999999;
-			}
 
 			result = DBselect("select max(%s) from %s where %s>="ZBX_FS_UI64" and %s<="ZBX_FS_UI64,
 				field,
@@ -1698,6 +1698,12 @@ zbx_uint64_t DBget_maxid(char *table, char *field)
 			}
 			else
 			{
+				ZBX_STR2UINT64(ret1, row[0]);
+				if(ret1 >= max) {
+					zabbix_log(LOG_LEVEL_CRIT, "DBget_maxid: Maximum number of id's was exceeded [table:%s, field:%s, id:"ZBX_FS_UI64"]", table, field, ret1);
+					exit(FAIL);
+				}
+
 				DBexecute("insert into ids ( nodeid,table_name,field_name,nextid) values (%d,'%s','%s',%s)",
 					CONFIG_NODEID,
 					table,
@@ -1711,6 +1717,14 @@ zbx_uint64_t DBget_maxid(char *table, char *field)
 		{
 			ZBX_STR2UINT64(ret1, row[0]);
 			DBfree_result(result);
+
+			if((ret1 < min) || (ret1 >= max)) {
+				DBexecute("delete from ids where nodeid=%d and table_name='%s' and field_name='%s'",
+					CONFIG_NODEID,
+					table,
+					field);
+				continue;
+			}
 
 			DBexecute("update ids set nextid=nextid+1 where nodeid=%d and table_name='%s' and field_name='%s'",
 				CONFIG_NODEID,
