@@ -1,7 +1,7 @@
 <?php
 /* 
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2007 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 	$page["title"] = "S_CUSTOM_SCREENS";
 	$page["file"] = "screens.php";
 	$page['hist_arg'] = array('config','elementid');
+	$page['scripts'] = array('prototype.js','url.js','gmenu.js','scrollbar.js','sbinit.js'); //do not change order!!!
 
 	$_REQUEST["fullscreen"] = get_request("fullscreen", 0);
 
@@ -197,16 +198,34 @@ include_once "include/page_header.php";
 		else
 		{
 			$element = get_slideshow($elementid, get_request('step', null), $effectiveperiod);
-			zbx_add_post_js('if(typeof(parent) != "undefined") parent.resizeiframe("iframe");
+			zbx_add_post_js('if(isset(parent)) parent.resizeiframe("iframe");
 							else resizeiframe("iframe");
 							');
 		}
-		if($element) $element->Show();
+		if($element){
+			$element->Show();
+		}
 		
 		$_REQUEST['elementid'] = $elementid;
 
-		if( 2 != $_REQUEST["fullscreen"] )
-			navigation_bar("screens.php",array('config','elementid'));
+		if( 2 != $_REQUEST["fullscreen"] ){
+		
+			$stime = time() - (31536000); // 1year
+			$bstime = time()-$effectiveperiod;
+			
+			if(isset($_REQUEST['stime'])){
+				$bstime = $_REQUEST['stime'];
+				$bstime = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
+			}
+			
+ 			$script = 	'scrollinit(0,0,0,'.$effectiveperiod.','.$stime.',0,'.$bstime.');
+						 showgraphmenu("iframe");';
+							
+			zbx_add_post_js($script); 
+			$img = new CImg('images/general/tree/O.gif','space','20','20');
+			$img->Show();
+//			navigation_bar("screens.php",array('config','elementid'));
+		}
 	}
 	else
 	{
