@@ -786,6 +786,7 @@ include_once "include/page_header.php";
 						"CheckAll('".$form->GetName()."','all_groups');"),
 					SPACE,
 					S_NAME),
+				" # ",
 				S_MEMBERS));
 
 			$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,get_current_nodeid());
@@ -802,11 +803,13 @@ include_once "include/page_header.php";
 					" and h.status not in (".HOST_STATUS_DELETED.") order by host");
 
 				$hosts = array();
+				$count = 0;
 				while($db_host=DBfetch($db_hosts)){
 					$style = $db_host["status"]==HOST_STATUS_MONITORED ? NULL: ( 
 						$db_host["status"]==HOST_STATUS_TEMPLATE ? "unknown" :
 						"on");
 					array_push($hosts,unpack_object(new CSpan($db_host["host"],$style)));
+					$count++;
 				}
 
 				$table->AddRow(array(
@@ -818,6 +821,7 @@ include_once "include/page_header.php";
 							"hosts.php?form=update&groupid=".$db_group["groupid"].
 							url_param("config"),'action')
 					),
+					$count,
 					implode(', ',$hosts)
 					));
 			}
