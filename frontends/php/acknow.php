@@ -33,12 +33,13 @@ include_once "include/page_header.php";
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"eventid"=>		array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		NULL),
-		"message"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'isset({save})'),
+		"eventid"=>			array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		NULL),
+		"message"=>			array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'isset({save})||isset({saveandreturn})'),
 
 	/* actions */
-		"save"=>		array(T_ZBX_STR,O_OPT,	P_ACT|P_SYS, NULL,	NULL),
-		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null)
+		"saveandreturn" =>	array(T_ZBX_STR,O_OPT,	P_ACT|P_SYS, NULL,	NULL),
+		"save"=>			array(T_ZBX_STR,O_OPT,	P_ACT|P_SYS, NULL,	NULL),
+		"cancel"=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null)
 	);
 	check_fields($fields);
 ?>
@@ -71,9 +72,26 @@ include_once "include/page_header.php";
 				' ['.$_REQUEST["message"].']');
 		}
 	}
+	else if(isset($_REQUEST["saveandreturn"]))
+	{
+		$result = add_acknowledge_coment(
+			$db_data["eventid"],
+			$USER_DETAILS["userid"],
+			$_REQUEST["message"]);
+
+		if($result)
+		{
+			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_TRIGGER, S_ACKNOWLEDGE_ADDED.
+				' ['.expand_trigger_description_by_data($db_data).']'.
+				' ['.$_REQUEST["message"].']');
+		}
+		
+		Redirect('tr_status.php?hostid='.get_profile('web.tr_status.hostid',0));
+		exit;
+	}
 	else if(isset($_REQUEST["cancel"]))
 	{
-		Redirect('tr_status.php?hostid='.$db_data['hostid']);
+		Redirect('tr_status.php?hostid='.get_profile('web.tr_status.hostid',0));
 		exit;
 	}
 ?>
