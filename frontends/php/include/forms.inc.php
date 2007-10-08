@@ -647,11 +647,13 @@
 		{
 			$title = S_ACKNOWLEDGE_ALARM_BY;
 			$btn_txt = S_ACKNOWLEDGE;
+			$btn_txt2 = S_ACKNOWLEDGE.' '.S_AND_SYMB.' '.S_RETURN;
 		}
 		else
 		{
 			$title = S_ADD_COMMENT_BY;
 			$btn_txt = S_SAVE;
+			$btn_txt2 = S_SAVE.' '.S_AND_SYMB.' '.S_RETURN;
 		}
 
 		$frmMsg= new CFormTable($title." \"".$USER_DETAILS["alias"]."\"");
@@ -660,6 +662,7 @@
 
 		$frmMsg->AddRow(S_MESSAGE, new CTextArea("message","",80,6));
 
+		$frmMsg->AddItemToBottomRow(new CButton("saveandreturn",$btn_txt2));
 		$frmMsg->AddItemToBottomRow(new CButton("save",$btn_txt));
 		$frmMsg->AddItemToBottomRow(new CButtonCancel(url_param('eventid')));
 
