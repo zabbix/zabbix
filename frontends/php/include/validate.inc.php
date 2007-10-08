@@ -124,12 +124,15 @@
 	{
 		foreach($fields as $f => $checks)
 		{
+/*
 			// If an unset variable used in expression, return FALSE
 			if(strstr($expression,'{'.$f.'}')&&!isset($_REQUEST[$f]))
 			{
+//SDI("Variable [$f] is not set. $expression is FALSE");
 //info("Variable [$f] is not set. $expression is FALSE");
-				return FALSE;
+//				return FALSE;
 			}
+//*/
 //echo $f,":",$expression,"<br>";
 			$expression = str_replace('{'.$f.'}','$_REQUEST["'.$f.'"]',$expression);
 //$debug .= $f." = ".$_REQUEST[$f].BR;
@@ -140,6 +143,7 @@
 		$ret = eval($exec);
 //echo $debug;
 //echo "$field - result: ".$ret." exec: $exec".BR.BR;
+//SDI("$field - result: ".$ret." exec: $exec");
 		return $ret;
 	}
 
@@ -147,7 +151,7 @@
 	{
 		global $_REQUEST;
 
-//echo "$field - expression: ".$expression.BR;
+//SDI("$field - expression: ".$expression);
 
 		if(strstr($expression,"{}") && !isset($_REQUEST[$field]))
 			return FALSE;
@@ -165,7 +169,7 @@
 			}	
 			return TRUE;
 		}
-		
+//SDI("$field - expression: ".$expression);
 		return calc_exp2($fields,$field,$expression);
 	}
 

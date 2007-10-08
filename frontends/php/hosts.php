@@ -66,13 +66,13 @@ include_once "include/page_header.php";
 /* agent control */
 		"command"=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	NULL),
 /* host */
-		"hostid"=>	array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,		'{config}==0&&{form}=="update"'),
-		"host"=>	array(T_ZBX_STR, O_OPT,	NULL,   NOT_EMPTY,	'({config}==0||{config}==3)&&isset({save})'),
-		"dns"=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'{config}==0&&isset({save})'),
-		"useip"=>	array(T_ZBX_STR, O_OPT, NULL,	IN('0,1'),	'{config}==0&&isset({save})'),
-		"ip"=>		array(T_ZBX_IP, O_OPT, NULL,	NULL,		'{config}==0&&isset({save})'),
-		"port"=>	array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,65535),'{config}==0&&isset({save})'),
-		"status"=>	array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1,3"),	'{config}==0&&isset({save})'),
+		"hostid"=>	array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,		'(isset({config})&&({config}==0))&&(isset({form})&&({form}=="update"))'),
+		"host"=>	array(T_ZBX_STR, O_OPT,	NULL,   NOT_EMPTY,	'isset({config})&&({config}==0||{config}==3)&&isset({save})'),
+		"dns"=>		array(T_ZBX_STR, O_OPT,	NULL,	NULL,		'(isset({config})&&({config}==0))&&isset({save})'),
+		"useip"=>	array(T_ZBX_STR, O_OPT, NULL,	IN('0,1'),	'(isset({config})&&({config}==0))&&isset({save})'),
+		"ip"=>		array(T_ZBX_IP, O_OPT, NULL,	NULL,		'(isset({config})&&({config}==0))&&isset({save})'),
+		"port"=>	array(T_ZBX_INT, O_OPT,	NULL,	BETWEEN(0,65535),'(isset({config})&&({config}==0))&&isset({save})'),
+		"status"=>	array(T_ZBX_INT, O_OPT,	NULL,	IN("0,1,3"),	'(isset({config})&&({config}==0))&&isset({save})'),
 
 		"newgroup"=>		array(T_ZBX_STR, O_OPT, NULL,   NULL,	NULL),
 		"templates"=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	NULL),
@@ -91,13 +91,13 @@ include_once "include/page_header.php";
 		"location"=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
 		"notes"=>	array(T_ZBX_STR, O_OPT, NULL,   NULL,	'isset({useprofile})'),
 /* group */
-		"groupid"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'{config}==1&&{form}=="update"'),
-		"gname"=>	array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'{config}==1&&isset({save})'),
+		"groupid"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'(isset({config})&&({config}==1))&&(isset({form})&&({form}=="update"))'),
+		"gname"=>	array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'(isset({config})&&({config}==1))&&isset({save})'),
 
 /* application */
-		"applicationid"=>array(T_ZBX_INT,O_OPT,	P_SYS,	DB_ID,		'{config}==4&&{form}=="update"'),
-		"appname"=>	array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'{config}==4&&isset({save})'),
-		"apphostid"=>	array(T_ZBX_INT, O_OPT, NULL,	DB_ID.'{}>0',	'{config}==4&&isset({save})'),
+		"applicationid"=>array(T_ZBX_INT,O_OPT,	P_SYS,	DB_ID,		'(isset({config})&&({config}==4))&&(isset({form})&&({form}=="update"))'),
+		"appname"=>	array(T_ZBX_STR, O_NO,	NULL,	NOT_EMPTY,	'(isset({config})&&({config}==4))&&isset({save})'),
+		"apphostid"=>	array(T_ZBX_INT, O_OPT, NULL,	DB_ID.'{}>0',	'(isset({config})&&({config}==4))&&isset({save})'),
 		"apptemplateid"=>array(T_ZBX_INT,O_OPT,	NULL,	DB_ID,	NULL),
 
 /* actions */
