@@ -54,8 +54,7 @@ include_once "include/page_header.php";
 		"filter_task"=>	array(T_ZBX_STR, O_OPT,	 null,	
 			IN(FILTER_TAST_SHOW.','.FILTER_TAST_HIDE.','.FILTER_TAST_MARK.','.FILTER_TAST_INVERT_MARK), null),
 		"filter"=>	array(T_ZBX_STR, O_OPT,	 null,	null, null),
-		"mark_color"=>	array(T_ZBX_STR, O_OPT,	 null,	
-			IN(MARK_COLOR_RED.','.MARK_COLOR_GREEN.','.MARK_COLOR_BLUE), null),
+		"mark_color"=>	array(T_ZBX_STR, O_OPT,	 null,	IN(MARK_COLOR_RED.','.MARK_COLOR_GREEN.','.MARK_COLOR_BLUE), null),
 		
 		"cmbloglist"=>	array(T_ZBX_INT, O_OPT,	 null,	DB_ID, null),
 

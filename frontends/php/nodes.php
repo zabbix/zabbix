@@ -34,7 +34,7 @@ include_once "include/page_header.php";
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 
 // media form
-		"nodeid"=>		array(T_ZBX_INT, O_NO,	null,	DB_ID,			'{form}=="update"'),
+		"nodeid"=>		array(T_ZBX_INT, O_NO,	null,	DB_ID,			'(isset({form})&&({form}=="update"))'),
 		
 		"new_nodeid"=>		array(T_ZBX_INT, O_OPT,	null,	DB_ID,			'isset({save})'),
 		"name"=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,		'isset({save})'),

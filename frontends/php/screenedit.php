@@ -35,7 +35,7 @@ include_once "include/page_header.php";
 	$fields=array(
 		"screenid"=>	array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
 		
-		"screenitemid"=>array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			'{form}=="update"&&(!isset({x})||!isset({y}))'),
+		"screenitemid"=>array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))&&(!isset({x})||!isset({y}))'),
 		"resourcetype"=>	array(T_ZBX_INT, O_OPT,  null,  
 					BETWEEN(SCREEN_RESOURCE_GRAPH,SCREEN_RESOURCE_EVENTS),	'isset({save})'),
 		"resourceid"=>	array(T_ZBX_INT, O_OPT,  null,  DB_ID,			'isset({save})'),
@@ -51,8 +51,8 @@ include_once "include/page_header.php";
 		"style"=>	array(T_ZBX_INT, O_OPT,  null,  
 					BETWEEN(STYLE_HORISONTAL,STYLE_VERTICAL),	'isset({save})'),
 		"url"=>		array(T_ZBX_STR, O_OPT,  null,  null,			'isset({save})'),
-		"x"=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,100),		'isset({save})&&{form}!="update"'),
-		"y"=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,100),		'isset({save})&&{form}!="update"'),
+		"x"=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,100),		'isset({save})&&(isset({form})&&({form}!="update"))'),
+		"y"=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,100),		'isset({save})&&(isset({form})&&({form}!="update"))'),
 
 		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),

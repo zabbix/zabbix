@@ -1,5 +1,6 @@
 Changes for 1.4.3:
 
+ - [DEV-50] Improved incoming parameters exception validation (Artem)
  - [ZBX-76] Display number of members in host groups (Alexei)
  - [ZBX-92] Distributed monitoring: overwriting new information (Sasha)
  - [ZBX-90] fixed displaying of last line of a log file in the Latest Data and Overview (Alexei)

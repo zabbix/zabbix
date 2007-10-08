@@ -38,8 +38,8 @@ include_once "include/page_header.php";
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		"password1"=>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})&&{form}!="update"&&isset({change_password})'),
-		"password2"=>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})&&{form}!="update"&&isset({change_password})'),
+		"password1"=>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})&&isset({form})&&({form}!="update")&&isset({change_password})'),
+		"password2"=>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})&&isset({form})&&({form}!="update")&&isset({change_password})'),
 		"lang"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})'),
 		"autologout"=>  array(T_ZBX_INT, O_OPT, null,   BETWEEN(0,3600),'isset({save})'),
 		"url"=>		array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
