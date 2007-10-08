@@ -14,6 +14,7 @@ Changes for 1.5:
 
 Changes for 1.4.3:
 
+ - [DEV-50] Improved incoming parameters exception validation (Artem)
  - [ZBX-76] Display number of members in host groups (Alexei)
  - [ZBX-92] Distributed monitoring: overwriting new information (Sasha)
  - [DEV-42] Synchronisation of log files (Sasha)
