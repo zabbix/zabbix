@@ -188,6 +188,7 @@
 //	acknow.php
 	'S_ACKNOWLEDGES'=>			'Acknowledges',
 	'S_ACKNOWLEDGE'=>			'Acknowledge',
+	'S_RETURN'=>				'Return',
 	'S_ACKNOWLEDGE_ALARM_BY'=>		'Acknowledge alarm by',
 	'S_ADD_COMMENT_BY'=>			'Add comment by',
 	'S_COMMENT_ADDED'=>			'Comment added',
@@ -283,6 +284,7 @@
 	'S_AND_OR_BIG'=>			'AND / OR',
 	'S_AND_BIG'=>				'AND',
 	'S_AND'=>				'and',
+	'S_AND_SYMB'=>			'&',
 	'S_OR_BIG'=>				'OR',
 	'S_OR'=>				'or',
 	'S_TYPE_OF_CALCULATION'=>		'Type of calculation',
