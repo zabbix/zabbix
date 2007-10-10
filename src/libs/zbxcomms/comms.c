@@ -537,7 +537,7 @@ int zbx_tcp_listen(
 		/* This is to immediately use the address even if it is in TIME_WAIT state */
 		/* http://www-128.ibm.com/developerworks/linux/library/l-sockpit/index.html */
 		on = 1;
-		if(setsockopt(s->sockets[s->num_socks], SOL_SOCKET, SO_REUSEADDR | SO_ACCEPTCONN, (void *)&on, sizeof(on)) == ZBX_TCP_ERROR)
+		if(setsockopt(s->sockets[s->num_socks], SOL_SOCKET, SO_REUSEADDR, (void *)&on, sizeof(on)) == ZBX_TCP_ERROR)
 		{
 			zbx_set_tcp_strerror("setsockopt() failed with error %d: %s", zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
 		}
@@ -590,7 +590,7 @@ int zbx_tcp_listen(
 	/* This is to immediately use the address even if it is in TIME_WAIT state */
 	/* http://www-128.ibm.com/developerworks/linux/library/l-sockpit/index.html */
 	on = 1;
-	if( -1 == setsockopt(s->socket, SOL_SOCKET, SO_REUSEADDR | SO_ACCEPTCONN, (void *)&on, sizeof(on) ))
+	if( -1 == setsockopt(s->socket, SOL_SOCKET, SO_REUSEADDR, (void *)&on, sizeof(on) ))
 	{
 		zbx_set_tcp_strerror("Cannot setsockopt SO_REUSEADDR [%s]", strerror_from_system(zbx_sock_last_error()));
 	}
