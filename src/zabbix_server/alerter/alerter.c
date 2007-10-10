@@ -63,7 +63,6 @@ int execute_action(DB_ALERT *alert,DB_MEDIATYPE *mediatype, char *error, int max
 		(char *)&env_mediatypeid, (char *)&env_status,
 		(char *)0 };
 
-
 	zabbix_log( LOG_LEVEL_DEBUG, "In execute_action(%s)",
 		mediatype->smtp_server);
 
@@ -190,7 +189,6 @@ int main_alerter_loop()
 
 	for(;;)
 	{
-
 		zbx_setproctitle("connecting to the database");
 
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
@@ -230,8 +228,9 @@ int main_alerter_loop()
 			sigaction(SIGALRM, &phan, NULL);
 
 			/* Hardcoded value */
-			/* SMS requires 15s for sending */
+			/* SMS uses its own timeouts */
 			alarm(40);
+			*error = '\0';
 			res = execute_action(&alert,&mediatype,error,sizeof(error));
 			alarm(0);
 
@@ -239,9 +238,8 @@ int main_alerter_loop()
 			{
 				zabbix_log( LOG_LEVEL_DEBUG, "Alert ID [" ZBX_FS_UI64 "] was sent successfully",
 					alert.alertid);
-				DBexecute("update alerts set status=%d where status=%d and alertid=" ZBX_FS_UI64,
+				DBexecute("update alerts set status=%d,error='' where alertid=" ZBX_FS_UI64,
 					ALERT_STATUS_SENT,
-					ALERT_STATUS_NOT_SENT,
 					alert.alertid);
 			}
 			else

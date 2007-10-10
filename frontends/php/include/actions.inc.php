@@ -794,6 +794,7 @@ include_once 'include/discovery.inc.php';
 				S_TIME,
 				S_TYPE,
 				S_STATUS,
+				S_RETRIES_LEFT,
 				S_RECIPIENTS,
 				S_MESSAGE,
 				S_ERROR
@@ -809,13 +810,15 @@ include_once 'include/discovery.inc.php';
 			}
 			$time=date("Y.M.d H:i:s",$row["clock"]);
 
-			if($row["status"] == 1)
+			if($row["status"] == ALERT_STATUS_SENT)
 			{
 				$status=new CSpan(S_SENT,"off");
+				$retries=new CSpan(SPACE,"off");
 			}
 			else
 			{
 				$status=new CSpan(S_NOT_SENT,"on");
+				$retries=new CSpan(3 - $row["retries"],"on");
 			}
 			$sendto=htmlspecialchars($row["sendto"]);
 
@@ -835,6 +838,7 @@ include_once 'include/discovery.inc.php';
 				new CCol($time, 'top'),
 				new CCol($row["description"], 'top'),
 				new CCol($status, 'top'),
+				new CCol($retries, 'top'),
 				new CCol($sendto, 'top'),
 				new CCol($message, 'top'),
 				new CCol($error, 'top')));

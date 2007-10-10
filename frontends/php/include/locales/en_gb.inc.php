@@ -297,6 +297,7 @@
 	'S_NOT_LIKE_SMALL'=>			'not like',
 	'S_IN_SMALL'=>				'in',
 	'S_NOT_IN_SMALL'=>			'not in',
+	'S_RETRIES_LEFT'=>			'Retries left',
 
 //	alarms.php
 	'S_ALARMS'=>				'Alarms',
