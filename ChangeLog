@@ -1,5 +1,6 @@
 Changes for 1.4.3:
 
+ - [ZBX-19] fixed SMS sending (Sasha)
  - [DEV-46] added "save&return" button in acknowledgement (Artem)
  - [DEV-50] Improved incoming parameters exception validation (Artem)
  - [ZBX-76] Display number of members in host groups (Alexei)
