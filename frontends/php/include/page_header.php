@@ -401,7 +401,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 
 		if(ZBX_DISTRIBUTED)
 		{
-			$lst_nodes = new CComboBox('switch_node', get_current_nodeid(false));
+			$lst_nodes = new CComboBox('switch_node', get_current_nodeid(false), "submit()");
 			$db_nodes = DBselect(
 					'select * from nodes '.
 					' where nodeid in ('.
@@ -424,14 +424,15 @@ COpt::compare_files_with_menu($ZBX_MENU);
 				{
 					global $ZBX_WITH_SUBNODES;
 
-					$cmd_show_subnodes = new CComboBox('show_subnodes', !empty($ZBX_WITH_SUBNODES) ? 1 : 0);
+					$cmd_show_subnodes = new CComboBox('show_subnodes', !empty($ZBX_WITH_SUBNODES) ? 1 : 0, "submit()");
 					$cmd_show_subnodes->AddItem(0, S_CURRENT_NODE_ONLY);
 					$cmd_show_subnodes->AddItem(1, S_WITH_SUBNODES);
 
 					$node_form->AddItem(array(SPACE, S_SHOW, $cmd_show_subnodes));
 				}
 
-				$node_form->AddItem(new CButton('submit',S_SWITCH_NODE));
+// No need for the button anymore
+//				$node_form->AddItem(new CButton('submit',S_SWITCH_NODE));
 			}
 		}
 		
