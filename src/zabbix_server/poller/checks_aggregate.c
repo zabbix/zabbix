@@ -281,7 +281,10 @@ int	get_value_aggregate(DB_ITEM *item, AGENT_RESULT *result)
 		else	ret = NOTSUPPORTED;
 	}
 
-	if(*p != ',')	ret = NOTSUPPORTED;
+	if(ret == SUCCEED)
+	{
+		if(*p != ',')	ret = NOTSUPPORTED;
+	}
 
 	if(ret == SUCCEED)
 	{
@@ -301,7 +304,10 @@ int	get_value_aggregate(DB_ITEM *item, AGENT_RESULT *result)
 		else	ret = NOTSUPPORTED;
 	}
 
-	if(*p != ',')	ret = NOTSUPPORTED;
+	if(ret == SUCCEED)
+	{
+		if(*p != ',')	ret = NOTSUPPORTED;
+	}
 
 	if(ret == SUCCEED)
 	{
@@ -321,7 +327,10 @@ int	get_value_aggregate(DB_ITEM *item, AGENT_RESULT *result)
 		else	ret = NOTSUPPORTED;
 	}
 
-	if(*p != ',')	ret = NOTSUPPORTED;
+	if(ret == SUCCEED)
+	{
+		if(*p != ',')	ret = NOTSUPPORTED;
+	}
 
 	if(ret == SUCCEED)
 	{
