@@ -8,6 +8,6 @@ CREATE TABLE rights_tmp (
 ) ENGINE=InnoDB;
 CREATE INDEX rights_1 on rights_tmp (groupid);
 
---insert into rights_tmp select * from rights;
+-- insert into rights_tmp select * from rights;
 drop table rights;
 alter table rights_tmp rename rights;
