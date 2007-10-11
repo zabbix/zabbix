@@ -33,7 +33,7 @@ include_once "include/page_header.php";
 	$fields=array(
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 
-		"config"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,3,5,6,7"),	NULL),
+		"config"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,3,5,6,7,8"),	NULL),
 
 // other form
 		"alert_history"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),		'isset({config})&&({config}==0)&&isset({save})'),
@@ -60,6 +60,9 @@ include_once "include/page_header.php";
 		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
+/* acknowledges */
+		'ack_enable'=>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN("0,1"),	'isset({config})&&({config}==8)&&isset({save})'),
+		'ack_expire'=> array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1,65535),	'isset({config})&&({config}==8)&&isset({save})'),
 /* other */
 		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
@@ -122,6 +125,34 @@ include_once "include/page_header.php";
 			unset($image, $_REQUEST["imageid"]);
 		}
 	}
+	elseif(isset($_REQUEST["save"]) && ($_REQUEST["config"]==8)){
+		if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))
+			access_deny();
+
+/* OTHER ACTIONS */
+		$result=update_config(
+			get_request('event_history'),
+			get_request('alert_history'),
+			get_request('refresh_unsupported'),
+			get_request('work_period'),
+			get_request('alert_usrgrpid'),
+			get_request('ack_enable'),
+			get_request('ack_expire')
+			);
+
+		show_messages($result, S_CONFIGURATION_UPDATED, S_CONFIGURATION_WAS_NOT_UPDATED);
+
+		if($result)
+		{
+			$msg = array();
+			if(!is_null($val = get_request('ack_enable')))
+				$msg[] = S_EVENT_ACKNOWLEDGES.' ['.($val?(S_DISABLED):(S_ENABLED)).']';
+			if(!is_null($val = get_request('ack_expire')))
+				$msg[] = S_EVENT_EXPIRATION_TIME.SPACE.'('.S_DAYS.')'.' ['.$val.']';
+
+			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,implode('; ',$msg));
+		}		
+	}
 	elseif(isset($_REQUEST["save"])&&in_array($_REQUEST["config"],array(0,5,7)))
 	{
 
@@ -134,7 +165,10 @@ include_once "include/page_header.php";
 			get_request('alert_history'),
 			get_request('refresh_unsupported'),
 			get_request('work_period'),
-			get_request('alert_usrgrpid'));
+			get_request('alert_usrgrpid'),
+			get_request('ack_enable'),
+			get_request('ack_expire')
+			);
 
 		show_messages($result, S_CONFIGURATION_UPDATED, S_CONFIGURATION_WAS_NOT_UPDATED);
 		if($result)
@@ -257,6 +291,7 @@ include_once "include/page_header.php";
 //	$cmbConfig->AddItem(4,S_AUTOREGISTRATION);
 	$cmbConfig->AddItem(6,S_VALUE_MAPPING);
 	$cmbConfig->AddItem(7,S_WORKING_TIME);
+	$cmbConfig->AddItem(8,S_ACKNOWLEDGES);
 	$cmbConfig->AddItem(5,S_OTHER);
 	$form->AddItem($cmbConfig);
 	switch($_REQUEST["config"])
@@ -286,6 +321,10 @@ include_once "include/page_header.php";
 	elseif($_REQUEST["config"]==7)
 	{
 		insert_work_period_form();
+	}
+	elseif($_REQUEST["config"]==8)
+	{
+		insert_event_ack_form();
 	}
 	elseif($_REQUEST["config"]==3)
 	{

@@ -1,5 +1,6 @@
 Changes for 1.4.j:
 
+ - added new design of Status of Triggers (Artem)
  - added support of selection of events and bulk acknowledge of events (Artem)
  - added support of log files for {ITEM.LASTVALUE} (Alexei)
  - fixed acknowledgements synchronization (Sasha)

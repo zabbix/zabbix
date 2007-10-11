@@ -673,7 +673,7 @@
 
 
 	function	add_trigger(
-		$expression, $description, $priority, $status,
+		$expression, $description, $type, $priority, $status,
 		$comments, $url, $deps=array(), $templateid=0)
 	{
 		if( !validate_expression($expression) )
@@ -682,8 +682,8 @@
 		$triggerid=get_dbid("triggers","triggerid");
 
 		$result=DBexecute("insert into triggers".
-			"  (triggerid,description,priority,status,comments,url,value,error,templateid)".
-			" values ($triggerid,".zbx_dbstr($description).",$priority,$status,".zbx_dbstr($comments).",".
+			"  (triggerid,description,type,priority,status,comments,url,value,error,templateid)".
+			" values ($triggerid,".zbx_dbstr($description).",$type,$priority,$status,".zbx_dbstr($comments).",".
 			"".zbx_dbstr($url).",2,'Trigger just added. No status update so far.',$templateid)");
 		if(!$result)
 		{
@@ -810,9 +810,9 @@
 		$newtriggerid=get_dbid("triggers","triggerid");
 
 		$result = DBexecute("insert into triggers".
-			" (triggerid,description,priority,status,comments,url,value,expression,templateid)".
-			" values ($newtriggerid,".zbx_dbstr($trigger["description"]).",".$trigger["priority"].",".
-			$trigger["status"].",".zbx_dbstr($trigger["comments"]).",".
+			" (triggerid,description,type,priority,status,comments,url,value,expression,templateid)".
+			" values ($newtriggerid,".zbx_dbstr($trigger['description']).','.$trigger['type'].','.$trigger['priority'].','.
+			$trigger['status'].','.zbx_dbstr($trigger['comments']).','.
 			zbx_dbstr($trigger["url"]).",2,'{???:???}',".
 			($copy_mode ? 0 : $triggerid).")");
 
@@ -1282,7 +1282,7 @@
 	 * Comments: !!! Don't forget sync code with C !!!                            *
 	 *                                                                            *
 	 ******************************************************************************/
-	function	update_trigger($triggerid,$expression=NULL,$description=NULL,$priority=NULL,$status=NULL,
+	function	update_trigger($triggerid,$expression=NULL,$description=NULL,$type=NULL,$priority=NULL,$status=NULL,
 		$comments=NULL,$url=NULL,$deps=array(),$templateid=0)
 	{
 		$trigger	= get_trigger_by_triggerid($triggerid);
@@ -1328,6 +1328,7 @@
 						$db_chd_trigger["triggerid"],
 						$newexpression,
 						$description,
+						$type,
 						$priority,
 						NULL,		// status
 						$comments,
@@ -1352,6 +1353,7 @@
 		$sql="update triggers set";
 		if(!is_null($expression))	$sql .= " expression=".zbx_dbstr($expression).",";
 		if(!is_null($description))	$sql .= " description=".zbx_dbstr($description).",";
+		if(!is_null($type))			$sql .= " type=$type,";
 		if(!is_null($priority))		$sql .= " priority=$priority,";
 		if(!is_null($status))		$sql .= " status=$status,";
 		if(!is_null($comments))		$sql .= " comments=".zbx_dbstr($comments).",";

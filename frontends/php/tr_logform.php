@@ -45,6 +45,7 @@ include_once "include/page_header.php";
 		'hostid'=>			array(T_ZBX_INT, O_OPT,  P_SYS,		DB_ID,	null),
 		'triggerid'=>		array(T_ZBX_INT, O_OPT,  P_SYS,		DB_ID,	null),
 		
+		'type'=>		array(T_ZBX_INT, O_OPT,  NULL, 		IN('0,1'),	null),
 		'priority'=>		array(T_ZBX_INT, O_OPT,  NULL, 		IN('0,1,2,3,4,5'),	'isset({save_trigger})'),
 		'expressions'=>		array(T_ZBX_STR, O_OPT,	 NULL,		NOT_EMPTY,	'isset({save_trigger})'),
 		'expr_type'=>		array(T_ZBX_INT, O_OPT,  NULL, 		IN('0,1'),	null),
@@ -82,22 +83,25 @@ if(isset($_REQUEST['save_trigger'])){
 		if(!check_right_on_trigger_by_expression(PERM_READ_WRITE, $expression)) access_deny();
 
 		$now=time();
-		if(isset($_REQUEST["status"]))	{ $status=1; }
-		else{ $status=0; }
+		if(isset($_REQUEST['status']))	{ $status=TRIGGER_STATUS_DISABLED; }
+		else{ $status=TRIGGER_STATUS_ENABLED; }
+		
+		if(isset($_REQUEST['type']))	{ $type=TRIGGER_MULT_EVENT_ENABLED; }
+		else{ $type=TRIGGER_MULT_EVENT_DISABLED; }
 	
-		$deps = get_request("dependences",array());
+		$deps = get_request('dependences',array());
 	
-		if(isset($_REQUEST["triggerid"]))
+		if(isset($_REQUEST['triggerid']))
 		{
-			$trigger_data = get_trigger_by_triggerid($_REQUEST["triggerid"]);
+			$trigger_data = get_trigger_by_triggerid($_REQUEST['triggerid']);
 			if($trigger_data['templateid'])
 			{
-				$_REQUEST["description"] = $trigger_data["description"];
-				$expression = explode_exp($trigger_data["expression"],0);
+				$_REQUEST['description'] = $trigger_data['description'];
+				$expression = explode_exp($trigger_data['expression'],0);
 			}
 	
 			$result=update_trigger($_REQUEST["triggerid"],
-				$expression,$_REQUEST["description"],
+				$expression,$_REQUEST["description"],$type,
 				$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"],
 				$deps, $trigger_data['templateid']);
 	
@@ -106,7 +110,7 @@ if(isset($_REQUEST['save_trigger'])){
 	
 			show_messages($result, S_TRIGGER_UPDATED, S_CANNOT_UPDATE_TRIGGER);
 		} else {
-			$triggerid=add_trigger($expression,$_REQUEST["description"],
+			$triggerid=add_trigger($expression,$_REQUEST["description"],$type,
 				$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"],
 				$deps);
 	
@@ -132,7 +136,6 @@ if(isset($_REQUEST['sitems'])){
 //	$res = DBselect('SELECT * FROM items WHERE key_ like "%log[%]%"');
 
 	$form = new CForm();
-	$form->SetMethod('POST');
 	$form->SetAction('tr_logform.php?sitems=1');
 	
 	$where_case = array();
@@ -277,7 +280,7 @@ if(isset($_REQUEST['sform'])){
 		$frmTRLog->AddVar('form_refresh',get_request('form_refresh',1));
 		
 		$sql = 'SELECT DISTINCT f.functionid, f.function, f.parameter, t.expression, '.
-								' t.description, t.priority, t.comments, t.url, t.status'. 
+								' t.description, t.priority, t.comments, t.url, t.status, t.type'. 
 					' FROM functions as f, triggers as t, items as i '.
 					' WHERE t.triggerid='.$_REQUEST['triggerid'].
 						' AND i.itemid=f.itemid AND f.triggerid = t.triggerid '.
@@ -288,6 +291,7 @@ if(isset($_REQUEST['sform'])){
 		while($rows = DBfetch($res)){
 			$description = $rows['description'];
 			$expression = $rows['expression'];
+			$type = $rows['type'];
 			$priority = $rows['priority'];
 			$comments = $rows['comments'];
 			$url = $rows['url'];
@@ -317,6 +321,7 @@ if(isset($_REQUEST['sform'])){
 	else{
 		$description = get_request('description','');
 		$expressions = get_request('expressions',array());
+		$type = get_request('type',0);
 		$priority = get_request('priority',0);
 		$comments = get_request('comments','');
 		$url = get_request('url','');
@@ -406,6 +411,7 @@ if(isset($_REQUEST['sform'])){
 
 	$frmTRLog->AddRow(SPACE,$table);
 	
+//	$frmTRLog->AddRow(S_MULTIPLE_EVENTS,new CCheckBox('type', (($type == TRIGGER_MULT_EVENT_ENABLED)?'yes':'no'), null,1));
 	
 	$sev_select = new CComboBox('priority',null);
 		$sev_select->AddItem(TRIGGER_SEVERITY_NOT_CLASSIFIED,S_NOT_CLASSIFIED,(($priority == TRIGGER_SEVERITY_NOT_CLASSIFIED)?'on':'off'));
