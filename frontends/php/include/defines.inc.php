@@ -196,12 +196,25 @@
 	define('SERVICE_ALGORITHM_NONE',0);
 	define('SERVICE_ALGORITHM_MAX',1);
 	define('SERVICE_ALGORITHM_MIN',2);
+	
+	define('TRIGGER_MULT_EVENT_DISABLED',0);
+	define('TRIGGER_MULT_EVENT_ENABLED',1);
+	
+	define('TRIGGER_STATUS_ENABLED',0);
+	define('TRIGGER_STATUS_DISABLED',1);
+	define('TRIGGER_STATUS_UNKNOWN',2);
+	
+	define('TRIGGERS_OPTION_DISABLED',		0);	// reserved
+	define('TRIGGERS_OPTION_ONLYTRUE',		1);	// use 0 to disable
+	define('TRIGGERS_OPTION_ALL',			2);	// use 0 to disable
+	define('TRIGGERS_OPTION_NOFALSEFORB',	3);	// use 0 to disable
 
 	define('TRIGGER_VALUE_FALSE',0);
 	define('TRIGGER_VALUE_TRUE',1);
 	define('TRIGGER_VALUE_UNKNOWN',2);
-	
-	define('TRIGGER_BLINK_PERIOD',1800);
+
+	define('TRIGGER_FALSE_PERIOD', 			1800);	
+	define('TRIGGER_BLINK_PERIOD',			1800);
 
 	define('TRIGGER_SEVERITY_NOT_CLASSIFIED',	0);
 	define('TRIGGER_SEVERITY_INFORMATION',		1);
@@ -210,9 +223,6 @@
 	define('TRIGGER_SEVERITY_HIGH',			4);
 	define('TRIGGER_SEVERITY_DISASTER',		5);
 	
-	define('TRIGGER_SHOW_UNDEFINED_ACK',	0);
-	define('TRIGGER_FALSE_TIME_ACK', 		1800);
-
 	define('ALERT_STATUS_NOT_SENT',0);
 	define('ALERT_STATUS_SENT',1);
 
@@ -236,10 +246,6 @@
 	define('ACTION_EVAL_TYPE_AND_OR',0);
 	define('ACTION_EVAL_TYPE_AND',1);
 	define('ACTION_EVAL_TYPE_OR',2);
-
-	define('TRIGGER_STATUS_ENABLED',0);
-	define('TRIGGER_STATUS_DISABLED',1);
-	define('TRIGGER_STATUS_UNKNOWN',2);
 
 	define('OPERATION_OBJECT_USER',		0);
 	define('OPERATION_OBJECT_GROUP',	1);
@@ -354,12 +360,22 @@
 	define('HTTPSTEP_ITEM_TYPE_IN',		2);
 	define('HTTPSTEP_ITEM_TYPE_LASTSTEP',	3);
 
+	define('EVENT_ACK_DISABLED','0');
+	define('EVENT_ACK_ENABLED','1');
+
 	define('EVENT_SOURCE_TRIGGERS',		0);
 	define('EVENT_SOURCE_DISCOVERY',	1);
 
 	define('EVENT_OBJECT_TRIGGER',		0);
 	define('EVENT_OBJECT_DHOST',		1);
 	define('EVENT_OBJECT_DSERVICE',		2);
+	
+	define('EVENTS_OPTION_DISABLED',		0);		//	reserved
+	define('EVENTS_OPTION_NOEVENT',			1);		//	use 0 to disable
+	define('EVENTS_OPTION_ALL',				2);		//	use 0 to disable
+	define('EVENTS_OPTION_NOT_ACK',			3);		//	use 0 to disable
+	define('EVENTS_OPTION_ONLYTRUE_NOTACK',	4);		//	use 0 to disable
+	define('EVENTS_OPTION_NOFALSEFORB',		5);		//  reserved for TRIGGERS_OPTION_NOFALSEFORB, to disable set TRIGGERS_OPTION_NOFALSEFORB to 0
 
 	define('DOBJECT_STATUS_UP',	0);
 	define('DOBJECT_STATUS_DOWN',	1);

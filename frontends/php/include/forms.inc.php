@@ -637,13 +637,16 @@
 		$frmNode->Show();
 	}
 	
-	function	insert_new_message_form()
+	function insert_new_message_form($events,$bulk)
 	{
 		global $USER_DETAILS;
 		global $_REQUEST;
-
-		$db_acks = get_acknowledges_by_eventid($_REQUEST["eventid"]);
-		if(!DBfetch($db_acks))
+	
+		if($bulk){
+			$title = S_ACKNOWLEDGE_ALARM_BY;
+			$btn_txt2 = S_ACKNOWLEDGE.' '.S_AND_SYMB.' '.S_RETURN;			
+		}
+		else if(!DBfetch(get_acknowledges_by_eventid(get_request('eventid',0))))
 		{
 			$title = S_ACKNOWLEDGE_ALARM_BY;
 			$btn_txt = S_ACKNOWLEDGE;
@@ -658,17 +661,22 @@
 
 		$frmMsg= new CFormTable($title." \"".$USER_DETAILS["alias"]."\"");
 		$frmMsg->SetHelp("manual.php");
-		$frmMsg->AddVar("eventid",get_request("eventid",0));
+
+		if($bulk) $frmMsg->AddVar('bulkacknowledge',1);
+		
+		foreach($events as $id => $eventid){
+			$frmMsg->AddVar('events['.$eventid.']',$eventid);
+		}
 
 		$frmMsg->AddRow(S_MESSAGE, new CTextArea("message","",80,6));
 
 		$frmMsg->AddItemToBottomRow(new CButton("saveandreturn",$btn_txt2));
-		$frmMsg->AddItemToBottomRow(new CButton("save",$btn_txt));
+		(isset($btn_txt))?($frmMsg->AddItemToBottomRow(new CButton("save",$btn_txt))):('');
 		$frmMsg->AddItemToBottomRow(new CButtonCancel(url_param('eventid')));
 
 		$frmMsg->Show(false);
 
-		SetFocus($frmMsg->GetName(),"message");
+		SetFocus($frmMsg->GetName(),'message');
 
 		$frmMsg->Destroy();
 	}
@@ -2239,6 +2247,7 @@
 
 		$expression	= get_request("expression"	,"");
 		$description	= get_request("description"	,"");
+		$type = get_request('type', 0);
 		$priority	= get_request("priority"	,0);
 		$status		= get_request("status"		,0);
 		$comments	= get_request("comments"	,"");
@@ -2251,6 +2260,7 @@
 
 			if(!isset($limited) || !isset($_REQUEST["form_refresh"]))
 			{
+				$type = $trigger['type'];
 				$priority	= $trigger["priority"];
 				$status		= $trigger["status"];
 				$comments	= $trigger["comments"];
@@ -2310,7 +2320,11 @@
 			new CButton("add_dependence",S_ADD)
 			),'new');
 			
-	/* end new dwpendence */
+		$type_select = new CComboBox('type');
+		$type_select->Additem(TRIGGER_MULT_EVENT_DISABLED,S_NORMAL,(($type == TRIGGER_MULT_EVENT_ENABLED)?'no':'yes'));
+		$type_select->Additem(TRIGGER_MULT_EVENT_ENABLED,S_NORMAL.SPACE.'+'.SPACE.S_MULTIPLE_TRUE_EVENTS,(($type == TRIGGER_MULT_EVENT_ENABLED)?'yes':'no'));
+	/* end new dependence */
+		$frmTrig->AddRow(S_EVENT_GENERATION,$type_select);
 
 		$cmbPrior = new CComboBox("priority",$priority);
 		for($i = 0; $i <= 5; $i++)
@@ -3849,6 +3863,28 @@ include_once 'include/discovery.inc.php';
 
 		$frmHouseKeep->AddItemToBottomRow(new CButton("save",S_SAVE));
 		$frmHouseKeep->Show();
+	}
+
+	function	insert_event_ack_form()
+	{
+		$config=select_config();
+		
+		$frmEventAck = new CFormTable(S_ACKNOWLEDGES,"config.php");
+//		$frmEventAck->SetHelp("web.config.workperiod.php");
+		$frmEventAck->AddVar("config",get_request("config",8));
+
+		$exp_select = new CComboBox('ack_enable');
+
+		$exp_select->AddItem(EVENT_ACK_ENABLED,S_ENABLED,$config['ack_enable']?'yes':'no');
+		$exp_select->AddItem(EVENT_ACK_DISABLED,S_DISABLED,$config['ack_enable']?'no':'yes');
+
+		$frmEventAck->AddRow(S_EVENT_ACKNOWLEDGES,$exp_select);
+			
+		$frmEventAck->AddRow(S_EVENT_EXPIRATION_TIME.SPACE.'('.S_DAYS.')',
+			new CTextBox('ack_expire',$config['ack_expire'],5));
+
+		$frmEventAck->AddItemToBottomRow(new CButton("save",S_SAVE));
+		$frmEventAck->Show();
 	}
 
 	function	insert_other_parameters_form()

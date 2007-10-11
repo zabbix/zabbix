@@ -1,5 +1,6 @@
 Changes for 1.4.j:
 
+ - added support of selection of events and bulk acknowledge of events (Artem)
  - added support of log files for {ITEM.LASTVALUE} (Alexei)
  - fixed acknowledgements synchronization (Sasha)
  - fixed appeared error in Latest Data (Artem)
