@@ -1,5 +1,7 @@
 Changes for 1.5:
 
+ - [DEV-45] added new design of Status of Triggers (Artem)
+ - [DEV-47] added support of selection of events and bulk acknowledge of events (Artem)
  - [DEV-1] added new graph bar (Artem)
  - support of database cache for history and trends (Alexei)
  - basic support of database caching (Alexei)
