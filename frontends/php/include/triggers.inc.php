@@ -1984,4 +1984,57 @@
 		return $ret;
 	}
 
+	/*
+	 * Function: trigger_depenent_rec
+	 *
+	 * Description: 
+	 *     check if trigger depends on other triggers having status TRUE
+	 *     
+	 * Author: 
+	 *     Alexei Vladishev
+	 *
+	 * Comments: Recursive function
+	 *
+	 */
+	function	trigger_dependent_rec($triggerid,&$level)
+	{
+		$ret = FALSE;
+	
+		$level++;
+
+		/* Check for recursive loop */
+		if($level > 32)	return $ret;
+
+		$result = DBselect("select t.triggerid, t.value from trigger_depends d,triggers t where d.triggerid_down=$triggerid and d.triggerid_up=t.triggerid");
+		while($row = DBfetch($result))
+		{
+                	$triggerid_tmp = $row["triggerid"];
+                	$value_tmp = $row["value"];
+			if(TRIGGER_VALUE_TRUE == $value_tmp || trigger_dependent_rec($triggerid_tmp, $level))
+			{
+				$ret = TRUE;
+				break;
+			}
+		}
+
+		return $ret;
+	}
+
+	/*
+	 * Function: trigger_depenent 
+	 *
+	 * Description: 
+	 *     check if trigger depends on other triggers having status TRUE
+	 *     
+	 * Author: 
+	 *     Alexei Vladishev
+	 *
+	 * Comments:
+	 *
+	 */
+	function	trigger_dependent($triggerid)
+	{
+		$level = 0;
+		return trigger_dependent_rec($triggerid, $level);
+	}
 ?>

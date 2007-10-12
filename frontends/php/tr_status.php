@@ -332,13 +332,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 	{
 // Check for dependencies
 
-		$deps = DBfetch(DBselect("select count(*) as cnt from trigger_depends d, triggers t ".
-			" where d.triggerid_down=".$row["triggerid"]." and d.triggerid_up=t.triggerid and t.value=1"));
-
-		if($deps["cnt"]>0)
-		{
-			continue;
-		}
+		if(trigger_dependent($row["triggerid"]))	continue;
 
 		$elements=array();
 

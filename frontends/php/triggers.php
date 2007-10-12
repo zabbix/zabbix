@@ -434,9 +434,9 @@ include_once "include/page_header.php";
 			$deps = get_trigger_dependences_by_triggerid($row["triggerid"]);
 			if(count($deps) > 0)
 			{
-				$description[] = BR.BR."<strong>".S_DEPENDS_ON."</strong>".SPACE.BR;
+				$description[] = BR.BR."<strong>".S_DEPENDS_ON.":</strong>".SPACE.BR;
 				foreach($deps as $val)
-					$description[] = '['.$val.']'.expand_trigger_description($val).BR;
+					$description[] = expand_trigger_description($val).BR;
 
 				$description[] = BR;
 			}
