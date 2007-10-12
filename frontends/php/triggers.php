@@ -44,6 +44,7 @@ include_once "include/page_header.php";
 		"copy_type"	=>array(T_ZBX_INT, O_OPT,	 P_SYS,	IN("0,1"),'isset({copy})'),
 		"copy_mode"	=>array(T_ZBX_INT, O_OPT,	 P_SYS,	IN("0"),NULL),
 
+		'type'=>	array(T_ZBX_INT, O_OPT,  NULL, 		IN('0,1'),	'isset({save})'),
 		"description"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,'isset({save})'),
 		"expression"=>	array(T_ZBX_STR, O_OPT,  NULL,	NOT_EMPTY,'isset({save})'),
 		"priority"=>	array(T_ZBX_INT, O_OPT,  NULL,  IN("0,1,2,3,4,5"),'isset({save})'),
@@ -109,8 +110,10 @@ include_once "include/page_header.php";
 			access_deny();
 
 		$now=time();
-		if(isset($_REQUEST["status"]))	{ $status=1; }
-		else			{ $status=0; }
+		if(isset($_REQUEST['status']))	{ $status=TRIGGER_STATUS_DISABLED; }
+		else{ $status=TRIGGER_STATUS_ENABLED; }
+
+		$type = $_REQUEST['type'];
 
 		$deps = get_request("dependences",array());
 
@@ -124,7 +127,7 @@ include_once "include/page_header.php";
 			}
 
 			$result=update_trigger($_REQUEST["triggerid"],
-				$_REQUEST["expression"],$_REQUEST["description"],
+				$_REQUEST["expression"],$_REQUEST["description"],$type,
 				$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"],
 				$deps, $trigger_data['templateid']);
 
@@ -133,7 +136,7 @@ include_once "include/page_header.php";
 
 			show_messages($result, S_TRIGGER_UPDATED, S_CANNOT_UPDATE_TRIGGER);
 		} else {
-			$triggerid=add_trigger($_REQUEST["expression"],$_REQUEST["description"],
+			$triggerid=add_trigger($_REQUEST["expression"],$_REQUEST["description"],$type,
 				$_REQUEST["priority"],$status,$_REQUEST["comments"],$_REQUEST["url"],
 				$deps);
 
@@ -358,12 +361,13 @@ include_once "include/page_header.php";
 /* FORM */
 		echo BR;
 		insert_trigger_form();
-	} else if(isset($_REQUEST["form_copy_to"]) && isset($_REQUEST["g_triggerid"]))
+	} 
+	else if(isset($_REQUEST["form_copy_to"]) && isset($_REQUEST["g_triggerid"]))
 	{
 		echo BR;
 		insert_copy_elements_to_forms("g_triggerid");
-	} else
-	{
+	} 
+	else{
 /* TABLE */
 		$form = new CForm('triggers.php');
 		$form->SetName('triggers');

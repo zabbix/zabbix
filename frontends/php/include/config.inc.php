@@ -1005,7 +1005,7 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 
 	# Update configuration
 
-	function	update_config($event_history,$alert_history,$refresh_unsupported,$work_period,$alert_usrgrpid)
+	function	update_config($event_history,$alert_history,$refresh_unsupported,$work_period,$alert_usrgrpid,$ack_enable,$ack_expire)
 	{
 		$update = array();
 
@@ -1038,6 +1038,14 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 				return NULL;
 			}
 			$update[] = 'alert_usrgrpid='.$alert_usrgrpid;
+		}
+		if(!is_null($ack_enable))
+		{
+			$update[] = 'ack_enable='.$ack_enable;
+		}
+		if(!is_null($ack_expire))
+		{
+			$update[] = 'ack_expire='.$ack_expire;
 		}
 		if(count($update) == 0)
 		{
