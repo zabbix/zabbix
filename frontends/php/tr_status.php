@@ -145,6 +145,10 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 		$show_events = EVENTS_OPTION_NOFALSEFORB;
 	}
 
+	if(!$config['ack_enable'] && (($show_triggers != TRIGGERS_OPTION_ONLYTRUE) || ($show_events != TRIGGERS_OPTION_ALL))){
+		$show_triggers = TRIGGERS_OPTION_ONLYTRUE;
+	}
+	
 	if(!$config['ack_enable'] && (($show_events != EVENTS_OPTION_NOEVENT) || ($show_events != EVENTS_OPTION_ALL))){
 		$show_events = EVENTS_OPTION_NOEVENT;
 	}
@@ -238,7 +242,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 		if(TRIGGERS_OPTION_ALL){
 			$tr_select->Additem(TRIGGERS_OPTION_ALL,S_SHOW_ALL,(TRIGGERS_OPTION_ALL==$show_triggers)?'yes':'no');
 		}
-		if(TRIGGERS_OPTION_NOFALSEFORB){
+		if(TRIGGERS_OPTION_NOFALSEFORB && $config['ack_enable']){
 			$tr_select->Additem(TRIGGERS_OPTION_NOFALSEFORB,S_SHOW_NOFALSEFORB,(TRIGGERS_OPTION_NOFALSEFORB==$show_triggers)?'yes':'no');
 		}
 		
