@@ -372,7 +372,7 @@
 //	config.php
 	'S_EVENT_ACKNOWLEDGES'=>		'Event acknowledges',
 	'S_DAYS'=>						'Days',
-	'S_EVENT_EXPIRATION_TIME'=>			'Event expiration time',
+	'S_SHOW_EVENTS_NOT_OLDER'=>			'Show events not older',
 	'S_CANNNOT_UPDATE_VALUE_MAP'=>		'Cannot update value map',
 	'S_VALUE_MAP_ADDED'=>			'Value map added',
 	'S_CANNNOT_ADD_VALUE_MAP'=>		'Cannot add value map',

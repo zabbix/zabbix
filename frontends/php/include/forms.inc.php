@@ -3880,7 +3880,7 @@ include_once 'include/discovery.inc.php';
 
 		$frmEventAck->AddRow(S_EVENT_ACKNOWLEDGES,$exp_select);
 			
-		$frmEventAck->AddRow(S_EVENT_EXPIRATION_TIME.SPACE.'('.S_DAYS.')',
+		$frmEventAck->AddRow(S_SHOW_EVENTS_NOT_OLDER.SPACE.'('.S_DAYS.')',
 			new CTextBox('ack_expire',$config['ack_expire'],5));
 
 		$frmEventAck->AddItemToBottomRow(new CButton("save",S_SAVE));

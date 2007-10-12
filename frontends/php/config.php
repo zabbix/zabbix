@@ -148,7 +148,7 @@ include_once "include/page_header.php";
 			if(!is_null($val = get_request('ack_enable')))
 				$msg[] = S_EVENT_ACKNOWLEDGES.' ['.($val?(S_DISABLED):(S_ENABLED)).']';
 			if(!is_null($val = get_request('ack_expire')))
-				$msg[] = S_EVENT_EXPIRATION_TIME.SPACE.'('.S_DAYS.')'.' ['.$val.']';
+				$msg[] = S_SHOW_EVENTS_NOT_OLDER.SPACE.'('.S_DAYS.')'.' ['.$val.']';
 
 			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,implode('; ',$msg));
 		}		

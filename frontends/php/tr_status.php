@@ -247,13 +247,13 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 			$ev_select->Additem(EVENTS_OPTION_NOEVENT,S_HIDE_ALL,(EVENTS_OPTION_NOEVENT==$show_events)?'yes':'no');
 		}
 		if(EVENTS_OPTION_ALL){
-			$ev_select->Additem(EVENTS_OPTION_ALL,S_SHOW_ALL,(EVENTS_OPTION_ALL==$show_events)?'yes':'no');
+			$ev_select->Additem(EVENTS_OPTION_ALL,S_SHOW_ALL.SPACE.'('.$config['ack_expire'].SPACE.(($config['ack_expire']>1)?S_DAYS:S_DAY).')',(EVENTS_OPTION_ALL==$show_events)?'yes':'no');
 		}
 		if(EVENTS_OPTION_NOT_ACK && $config['ack_enable']){
-			$ev_select->Additem(EVENTS_OPTION_NOT_ACK,S_SHOW_UNACKNOWLEDGED,(EVENTS_OPTION_NOT_ACK==$show_events)?'yes':'no');
+			$ev_select->Additem(EVENTS_OPTION_NOT_ACK,S_SHOW_UNACKNOWLEDGED.SPACE.'('.$config['ack_expire'].SPACE.(($config['ack_expire']>1)?S_DAYS:S_DAY).')',(EVENTS_OPTION_NOT_ACK==$show_events)?'yes':'no');
 		}
 		if(EVENTS_OPTION_ONLYTRUE_NOTACK && $config['ack_enable']){
-			$ev_select->Additem(EVENTS_OPTION_ONLYTRUE_NOTACK,S_SHOW_TRUE_UNACKNOWLEDGED,(EVENTS_OPTION_ONLYTRUE_NOTACK==$show_events)?'yes':'no');
+			$ev_select->Additem(EVENTS_OPTION_ONLYTRUE_NOTACK,S_SHOW_TRUE_UNACKNOWLEDGED.SPACE.'('.$config['ack_expire'].SPACE.(($config['ack_expire']>1)?S_DAYS:S_DAY).')',(EVENTS_OPTION_ONLYTRUE_NOTACK==$show_events)?'yes':'no');
 		}
 //------- JP -------
 		if($show_triggers==TRIGGERS_OPTION_NOFALSEFORB){
