@@ -26,6 +26,7 @@ Changes for 1.4.j:
 
 Changes for 1.4.3:
 
+ - [ZBX-30,ZBX-47] better dependencies (Alexei)
  - [ZBX-48] fixed server crash if incorrect syntax of aggregate items is used (Alexei)
  - [ZBX-95] fixed patch.sql to work with buggy PHPMyAdmin (Alexei)
  - [ZBX-59] removed button "Switch Node" (Alexei)

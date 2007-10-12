@@ -441,6 +441,97 @@ int	DBadd_service_alarm(zbx_uint64_t serviceid,int status,int clock)
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: trigger_dependent_rec                                            *
+ *                                                                            *
+ * Purpose: check if status depends on triggers having status TRUE            *
+ *                                                                            *
+ * Parameters: triggerid - trigger ID                                         *
+ *                                                                            *
+ * Return value: SUCCEED - it does depend, FAIL - otherwise                   *
+ *                                                                            *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: Recursive function!                                              *
+ *                                                                            *
+ ******************************************************************************/
+static int	trigger_dependent_rec(zbx_uint64_t triggerid, int *level)
+{
+	int	ret = FAIL;
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	zbx_uint64_t	triggerid_tmp;
+	int		value_tmp;
+
+	zabbix_log( LOG_LEVEL_DEBUG, "In trigger_dependent_rec(triggerid:" ZBX_FS_UI64 ",level:%d)",
+		triggerid,
+		*level);
+
+	(*level)++;
+
+	if(*level > 32)
+	{
+		zabbix_log( LOG_LEVEL_CRIT, "Recursive trigger dependency detected! Please fix. Triggerid:" ZBX_FS_UI64,
+			triggerid);
+		return ret;
+	}
+
+	result = DBselect("select t.triggerid, t.value from trigger_depends d,triggers t where d.triggerid_down=" ZBX_FS_UI64 " and d.triggerid_up=t.triggerid",
+		triggerid);
+	while((row=DBfetch(result)))
+	{
+		ZBX_STR2UINT64(triggerid_tmp, row[0]);
+		value_tmp = atoi(row[1]);
+		if(TRIGGER_VALUE_TRUE == value_tmp || trigger_dependent_rec(triggerid_tmp, level) == SUCCEED)
+		{
+			zabbix_log( LOG_LEVEL_DEBUG, "This trigger depends on " ZBX_FS_UI64 ". Will not apply actions",
+				triggerid_tmp);
+			ret = SUCCEED;
+			break;
+		}
+	}
+	DBfree_result(result);
+
+	zabbix_log( LOG_LEVEL_DEBUG, "End of trigger_dependent_rec(ret:%s)",
+		SUCCEED==ret?"SUCCEED":"FAIL");
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: trigger_dependent                                                *
+ *                                                                            *
+ * Purpose: check if status depends on triggers having status TRUE            *
+ *                                                                            *
+ * Parameters: triggerid - trigger ID                                         *
+ *                                                                            *
+ * Return value: SUCCEED - it does depend, FAIL - not such triggers           *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	trigger_dependent(zbx_uint64_t triggerid)
+{
+	int	ret;
+	int	level = 0;
+
+	zabbix_log( LOG_LEVEL_DEBUG, "In trigger_dependent(triggerid:" ZBX_FS_UI64 ")",
+		triggerid);
+
+	ret =  trigger_dependent_rec(triggerid, &level);
+
+	zabbix_log( LOG_LEVEL_DEBUG, "End of trigger_dependent(ret:%s)",
+		SUCCEED==ret?"SUCCEED":"FAIL");
+
+	return ret;
+}
+
 int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *reason)
 {
 	int	ret = SUCCEED;
@@ -466,10 +557,11 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *re
 			reason);
 	}
 
-	/* New trigger value differs from current one */
-	if(trigger->value != new_value)
-	{
 
+	/* New trigger value differs from current one AND ...*/
+	/* ... Do not update status if there are dependencies with status TRUE*/
+	if(trigger->value != new_value && trigger_dependent(trigger->triggerid) == FAIL)
+	{
 		get_latest_event_status(trigger->triggerid, &event_prev_status, &event_last_status);
 
 		zabbix_log(LOG_LEVEL_DEBUG,"tr value [%d] event_prev_value [%d] event_last_status [%d] new_value [%d]",
@@ -537,16 +629,30 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *re
 				}
 				else
 				{
+					ret = FAIL;
 					zabbix_log(LOG_LEVEL_WARNING,"Event processed not OK");
 				}
 			}
+			else
+			{
+				ret = FAIL;
+			}
 		}
 		else
+		{
+			ret = FAIL;
+		}
+
+		if( FAIL == ret)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG,"Event not added for triggerid [" ZBX_FS_UI64 "]",
 				trigger->triggerid);
 			ret = FAIL;
 		}
+	}
+	else
+	{
+		ret = FAIL;
 	}
 	zabbix_log(LOG_LEVEL_DEBUG,"End update_trigger_value()");
 	return ret;
