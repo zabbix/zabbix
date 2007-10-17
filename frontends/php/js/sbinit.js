@@ -74,14 +74,13 @@ function graphsubmit(){
 
 	scrl.style.display = 'none';
 	var uri = new url(location.href);
-	
+
 	uri.setArgument('stime', SCROLL_BAR.getsTime());
 	uri.setArgument('period', SCROLL_BAR.getPeriod());
 	location.href = uri.getUrl();
 }
 
 function gmenuload(){
-	
 	var date = datetoarray(G_MENU.bstime);
 	
 	var stime = ''+date[2]+date[1]+date[0]+date[3]+date[4];
