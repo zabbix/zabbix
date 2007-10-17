@@ -34,7 +34,7 @@ include_once "include/page_header.php";
 //		VAR							TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		'eventid'=>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'!isset({events})&&!isset({cancel})'),
-		'events'=>			array(T_ZBX_INT, O_OPT,	null,	DB_ID,		'!isset({eventid})&&!isset({cancel})'),
+		'events'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'!isset({eventid})&&!isset({cancel})'),
 		'message'=>			array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'isset({save})||isset({saveandreturn})'),
 
 	/* actions */
