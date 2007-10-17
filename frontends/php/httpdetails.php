@@ -24,8 +24,11 @@
 	require_once "include/httptest.inc.php";
 	require_once "include/forms.inc.php";
 
-        $page["title"] = "S_DETAILS_OF_SCENARIO";
-        $page["file"] = "httpdetails.php";
+	$page["title"] = "S_DETAILS_OF_SCENARIO";
+	$page["file"] = "httpdetails.php";
+	$page['hist_arg'] = array('hostid','grouid','graphid','period','stime');
+	$page['scripts'] = array('prototype.js','url.js','gmenu.js','scrollbar.js','sbinit.js');
+	
 	define('ZBX_PAGE_DO_REFRESH', 1);
 
 include_once "include/page_header.php";
@@ -207,7 +210,8 @@ include_once "include/page_header.php";
 
 	show_table_header(S_HISTORY.' "'.bold($httptest_data['name']).'"');
 	$form = new CTableInfo();
-
+	$form->AddOption('id','graph');
+	
 	$form->AddRow(array(bold(S_SPEED) , new CCol(
 		get_dynamic_chart('chart3.php?'.url_param('period').url_param('from').
 			url_param($httptest_data['name'], false,'name').
@@ -225,8 +229,26 @@ include_once "include/page_header.php";
 		,'center')));
 
 	$form->Show();
+	echo BR.BR;
+	
 
-	navigation_bar("#", array('httptestid'));
+	$period = get_request('period',3600);
+//SDI(get_min_itemclock_by_itemid($items[HTTPSTEP_ITEM_TYPE_IN][0]['itemid']));
+	$mstime = min(get_min_itemclock_by_itemid($items[HTTPSTEP_ITEM_TYPE_IN][0]['itemid']),get_min_itemclock_by_itemid($items[HTTPSTEP_ITEM_TYPE_TIME][0]['itemid']));
+	$stime = ($mstime)?$mstime:0;
+	$bstime = time()-$period;
+	
+	if(isset($_REQUEST['stime'])){
+		$bstime = $_REQUEST['stime'];
+		$bstime = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
+	}
+	
+	$script = 	'scrollinit(0,0,0,'.$period.','.$stime.',0,'.$bstime.');
+				showgraphmenu("graph");';
+					
+	zbx_add_post_js($script); 
+
+//	navigation_bar("#", array('httptestid'));
 ?>
 <?php
 

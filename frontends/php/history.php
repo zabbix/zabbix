@@ -25,8 +25,9 @@
 
 	$page["file"]	= "history.php";
 	$page["title"]	= "S_HISTORY";
+	$page['hist_arg'] = array('hostid','grouid','graphid','period','dec','inc','left','right','stime');
 	$page['scripts'] = array('prototype.js','url.js','gmenu.js','scrollbar.js','sbinit.js');
-	
+		
 	if(isset($_REQUEST['plaintext']) || isset($_REQUEST['fullscreen']))
 	{
 		define('ZBX_PAGE_NO_MENU', 1);
