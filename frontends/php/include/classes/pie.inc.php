@@ -307,15 +307,15 @@ function drawLegend(){
 		$proc = ($datavalue * 100)/ $this->sum;
 		
 		if(isset($data) && isset($datavalue)){
-			$strvalue = sprintf("Value: %0.4f (%0.2f%s)",$datavalue,$proc,'%');
-			$str = sprintf("%s: %s [%s] ",
+			$strvalue = sprintf(S_VALUE.': '.((round($datavalue)!=$datavalue)?'%0.4f':'%s').' ('.((round($proc)!=$proc)?'%0.2f':'%s')."%s)",$datavalue,$proc,'%');
+			$str = sprintf('%s: %s [%s] ',
 					str_pad($this->items[$i]['host'],$max_host_len,' '),
 					str_pad($this->items[$i]['description'],$max_desc_len,' '),
 					$fnc_name);
 		}
 		else{
-			$strvalue = sprintf("Value: no data");
-			$str=sprintf("%s: %s [ no data ]",
+			$strvalue = sprintf(S_VALUE.': '.S_NO_DATA_SMALL);
+			$str=sprintf('%s: %s [ '.S_NO_DATA_SMALL.' ]',
 				str_pad($this->items[$i]['host'],$max_host_len,' '),
 				str_pad($this->items[$i]['description'],$max_desc_len,' '));
 		}
