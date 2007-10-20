@@ -20,7 +20,7 @@
 #ifndef ZABBIX_NODESENDER_H
 #define ZABBIX_NODESENDER_H
 
-void main_nodesender();
+void main_nodesender(int nodeid, int *synked_slave, int *synked_master);
 int get_master_node(int nodeid);
 
 #endif
