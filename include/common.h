@@ -159,6 +159,7 @@
 #define MAX_BUF_LEN	65000
 
 #define ZBX_DM_DELIMITER	'\255'
+#define ZBX_CKSUM_DELIMITER	','
 
 /* Item types */
 typedef enum
@@ -408,6 +409,10 @@ typedef enum
 #define	NODE_CKSUM_TYPE_OLD	0
 #define	NODE_CKSUM_TYPE_NEW	1
 
+/* Synced node */
+#define NODE_SYNC_SLAVE		0
+#define NODE_SYNC_MASTER	1
+
 /* Types of operation in config log */
 #define	NODE_CONFIGLOG_OP_UPDATE	0
 #define	NODE_CONFIGLOG_OP_ADD		1
@@ -438,7 +443,8 @@ typedef enum
 } zbx_httpitem_type_t;
 
 /* Flags */
-#define	ZBX_SYNC	1
+#define	ZBX_SYNC	0x01
+#define ZBX_NOTNULL	0x02
 
 /* Types of nodes */
 #define	ZBX_NODE_TYPE_REMOTE	0
@@ -544,6 +550,11 @@ void	zbx_pg_escape_bytea(const u_char *input, int ilen, char **output, int *olen
 int	zbx_pg_unescape_bytea(u_char *io);
 #endif
 char    *zbx_get_next_field(const char *line, char **output, int *olen, char separator);
+int	str_in_list(char *list, const char *value, const char delimiter);
+
+int	lock_sync_node(int nodeid);
+int	calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id);
+int	update_checksums(int nodeid, int synked_slave, int synked_master, const char *tablename, const zbx_uint64_t id, char *fields);
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_setproctitle(fmt, ...) __zbx_zbx_setproctitle(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
@@ -646,5 +657,4 @@ zbx_uint64_t	zbx_letoh_uint64(
 zbx_uint64_t	zbx_htole_uint64(
 		zbx_uint64_t	data
 	);
-
 #endif

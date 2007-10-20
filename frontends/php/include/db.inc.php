@@ -503,7 +503,6 @@ if(isset($DB_TYPE) && $DB_TYPE == "ORACLE") {
 		{
 			fatal_error('Incorrect type of "nodes" for "DBin_node". Passed ['.gettype($nodes).']');
 		}
-
 		return (' '.DBid2nodeid($id_name).' in ('.$nodes.') ');
 	}
 

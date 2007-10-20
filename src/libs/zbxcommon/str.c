@@ -1469,3 +1469,41 @@ char	*zbx_get_next_field(const char *line, char **output, int *olen, char separa
 
 	return ret;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: str_in_list                                                      *
+ *                                                                            *
+ * Purpose: check if string matches a list of demilited strings               *
+ *                                                                            *
+ * Parameters: list     - strings a,b,ccc,ddd                                 *
+ *             value    - value                                               *
+ *             delimiter- delimiter                                           *
+ *                                                                            *
+ * Return value: FAIL - out of period, SUCCEED - within the period            *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	str_in_list(char *list, const char *value, const char delimiter)
+{
+	char	*start, *end;
+	int	ret = FAIL;
+
+	for (start = list; *start != '\0' && ret == FAIL;) {
+		if (NULL != (end = strchr(start, delimiter)))
+			*end = '\0';
+		
+		if (0 == strcmp(start, value))
+			ret = SUCCEED;
+
+		if (end != NULL) {
+			*end = delimiter;
+			start = end + 1;
+		} else
+			break;
+	}
+	return ret;
+}

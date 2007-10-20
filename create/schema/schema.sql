@@ -121,42 +121,30 @@ UNIQUE		|httptestitem_1	|httptestid,itemid
 TABLE|nodes|nodeid|
 FIELD		|nodeid		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|name		|t_varchar(64)	|'0'	|NOT NULL	|0
-FIELD		|timezone	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|ip		|t_varchar(15)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|port		|t_integer	|'10051'|NOT NULL	|ZBX_SYNC
-FIELD		|slave_history	|t_integer	|'30'	|NOT NULL	|ZBX_SYNC
-FIELD		|slave_trends	|t_integer	|'365'	|NOT NULL	|ZBX_SYNC
+FIELD		|timezone	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|ip		|t_varchar(15)	|''	|NOT NULL	|0
+FIELD		|port		|t_integer	|'10051'|NOT NULL	|0
+FIELD		|slave_history	|t_integer	|'30'	|NOT NULL	|0
+FIELD		|slave_trends	|t_integer	|'365'	|NOT NULL	|0
 FIELD		|event_lastid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|history_lastid	|t_bigint	|'0'	|NOT NULL	|0
 FIELD		|history_str_lastid|t_bigint	|'0'	|NOT NULL	|0
 FIELD		|history_uint_lastid|t_bigint	|'0'	|NOT NULL	|0
-FIELD		|nodetype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|nodetype	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|masterid	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|sync		|t_integer	|'0'	|NOT NULL	|0
 
-TABLE|node_cksum|cksumid|0
-FIELD		|cksumid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|nodeid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|tablename	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|fieldname	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|recordid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|cksumtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|cksum		|t_char(32)	|''	|NOT NULL	|ZBX_SYNC
-INDEX		|cksum_1	|nodeid,tablename,fieldname,recordid,cksumtype
-
-TABLE|node_configlog|nodeid,conflogid|0
-FIELD		|conflogid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|nodeid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|tablename	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|recordid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|operation	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|sync_master	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|sync_slave	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-INDEX		|configlog_1	|conflogid
-INDEX		|configlog_2	|nodeid,tablename
-
+TABLE|node_cksum||0
+FIELD		|nodeid		|t_id		|'0'	|NOT NULL	|0
+FIELD		|tablename	|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|recordid	|t_id		|'0'	|NOT NULL	|0
+FIELD		|cksumtype	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|cksum		|t_cksum_text	|''	|NOT NULL	|0
+FIELD		|sync		|t_char(128)	|''	|NOT NULL	|0
+INDEX		|cksum_1	|nodeid,tablename,recordid,cksumtype
 
 TABLE|history_str_sync|id|
-FIELD		|id		|t_serial		|	|		|ZBX_SYNC
+FIELD		|id		|t_serial	|	|		|ZBX_SYNC
 FIELD		|nodeid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_SYNC
@@ -164,19 +152,19 @@ FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|nodeid,id
 
 TABLE|history_sync|id|
-FIELD		|id		|t_serial		|		|		|ZBX_SYNC
-FIELD		|nodeid		|t_id		|'0'		|NOT NULL	|ZBX_SYNC
-FIELD		|itemid		|t_id		|'0'		|NOT NULL	|ZBX_SYNC
-FIELD		|clock		|t_time		|'0'		|NOT NULL	|ZBX_SYNC
-FIELD		|value		|t_double	|'0.0000'	|NOT NULL	|ZBX_SYNC
-INDEX		|1		|nodeid,id
-
-TABLE|history_uint_sync|id|
-FIELD		|id		|t_serial		|	|		|ZBX_SYNC
+FIELD		|id		|t_serial	|	|		|ZBX_SYNC
 FIELD		|nodeid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|value		|t_bigint		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|value		|t_double	|'0.0000'|NOT NULL	|ZBX_SYNC
+INDEX		|1		|nodeid,id
+
+TABLE|history_uint_sync|id|
+FIELD		|id		|t_serial	|	|		|ZBX_SYNC
+FIELD		|nodeid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|value		|t_bigint	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|nodeid,id
 
 TABLE|services_times|timeid|ZBX_SYNC
