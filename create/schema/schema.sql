@@ -315,6 +315,8 @@ FIELD		|event_history	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|refresh_unsupported|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|work_period	|t_varchar(100)	|'1-5,00:00-24:00'	|NOT NULL	|ZBX_SYNC
 FIELD		|alert_usrgrpid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|ack_enable	|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
+FIELD		|ack_expire	|t_integer	|'7'	|NOT NULL	|ZBX_SYNC
 
 TABLE|functions|functionid|ZBX_SYNC
 FIELD		|functionid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
