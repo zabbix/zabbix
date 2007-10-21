@@ -74,7 +74,7 @@ static void	add_trigger_info(DB_EVENT *event)
 	{
 		triggerid = event->objectid;
 
-		result = DBselect("select description,priority,comments,url from triggers where triggerid=" ZBX_FS_UI64,
+		result = DBselect("select description,priority,comments,url,type from triggers where triggerid=" ZBX_FS_UI64,
 			triggerid);
 		row = DBfetch(result);
 		event->trigger_description[0]=0;
@@ -87,6 +87,7 @@ static void	add_trigger_info(DB_EVENT *event)
 			event->trigger_priority = atoi(row[1]);
 			event->trigger_comments	= strdup(row[2]);
 			event->trigger_url	= strdup(row[3]);
+			event->trigger_type	= atoi(row[4]);
 		}
 		DBfree_result(result);
 
@@ -98,14 +99,28 @@ static void	add_trigger_info(DB_EVENT *event)
 
 		event->skip_actions = 0;
 
-		if(	(event->value == TRIGGER_VALUE_UNKNOWN) ||
-			(event_prev_status == TRIGGER_VALUE_TRUE && event_last_status == TRIGGER_VALUE_UNKNOWN && event->value == TRIGGER_VALUE_TRUE) ||
-			(event_prev_status == TRIGGER_VALUE_FALSE && event_last_status == TRIGGER_VALUE_UNKNOWN && event->value == TRIGGER_VALUE_FALSE) ||
-			(event_prev_status == TRIGGER_VALUE_UNKNOWN && event_last_status == TRIGGER_VALUE_UNKNOWN && event->value == TRIGGER_VALUE_FALSE)
-		)
+		switch(event->trigger_type)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG,"Skip actions");
-			event->skip_actions = 1;
+		case	TRIGGER_TYPE_NORMAL:
+			if(	(event->value == TRIGGER_VALUE_UNKNOWN) ||
+				(event_prev_status == TRIGGER_VALUE_TRUE && event_last_status == TRIGGER_VALUE_UNKNOWN && event->value == TRIGGER_VALUE_TRUE) ||
+				(event_prev_status == TRIGGER_VALUE_FALSE && event_last_status == TRIGGER_VALUE_UNKNOWN && event->value == TRIGGER_VALUE_FALSE) ||
+				(event_prev_status == TRIGGER_VALUE_UNKNOWN && event_last_status == TRIGGER_VALUE_UNKNOWN && event->value == TRIGGER_VALUE_FALSE)
+			)
+			{
+				zabbix_log(LOG_LEVEL_DEBUG,"Skip actions");
+				event->skip_actions = 1;
+			}
+		case	TRIGGER_TYPE_MULTIPLE_TRUE:
+			if(	(event->value == TRIGGER_VALUE_UNKNOWN) ||
+/*				(event_prev_status == TRIGGER_VALUE_TRUE && event_last_status == TRIGGER_VALUE_UNKNOWN && event->value == TRIGGER_VALUE_TRUE) ||*/
+				(event_prev_status == TRIGGER_VALUE_FALSE && event_last_status == TRIGGER_VALUE_UNKNOWN && event->value == TRIGGER_VALUE_FALSE) ||
+				(event_prev_status == TRIGGER_VALUE_UNKNOWN && event_last_status == TRIGGER_VALUE_UNKNOWN && event->value == TRIGGER_VALUE_FALSE)
+			)
+			{
+				zabbix_log(LOG_LEVEL_DEBUG,"Skip actions");
+				event->skip_actions = 1;
+			}
 		}
 	}
 }

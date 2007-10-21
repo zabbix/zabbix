@@ -3371,6 +3371,7 @@ static int	DBupdate_trigger(
 		int		status,
 		const char	*comments,
 		const char	*url,
+		int		type,
 		zbx_uint64_t	*dependences,
 		zbx_uint64_t	templateid
 	)
@@ -3399,7 +3400,7 @@ static int	DBupdate_trigger(
 
 	int	i = 0;
 
-	db_triggers = DBselect("select distinct t.description,h.host,t.expression,t.priority,t.status,t.comments,t.url "
+	db_triggers = DBselect("select distinct t.description,h.host,t.expression,t.priority,t.status,t.comments,t.url,t.type "
 		       " from triggers t,functions f,items i,hosts h "
 		       " where t.triggerid=" ZBX_FS_UI64 " and f.triggerid=t.triggerid "
 		       " and i.itemid=f.itemid and i.hostid=h.hostid", triggerid);
@@ -3412,6 +3413,7 @@ static int	DBupdate_trigger(
 		if( -1 == status )	priority = atoi(trigger_data[4]);
 		if( !comments )		comments = trigger_data[5];
 		if( !url )		url = trigger_data[6];
+		if( -1 == type )	type = atoi(trigger_data[7]);
 
 		search = zbx_dsprintf(search, "{%s:", trigger_data[1] /* template host */);
 
@@ -3445,6 +3447,7 @@ static int	DBupdate_trigger(
 					-1,           /* status */
 					comments,
 					url,
+					type,
 					new_dependences,
 					triggerid);
 
@@ -3488,6 +3491,8 @@ static int	DBupdate_trigger(
 			zbx_free(str_esc);
 		}
 		if( templateid )	sql = zbx_strdcatf(sql, " templateid=" ZBX_FS_UI64 ",", templateid);
+
+		if( type >= 0 )		sql = zbx_strdcatf(sql, " type=%i,", type);
 
 		sql = zbx_strdcatf(sql, " value=2 where triggerid=" ZBX_FS_UI64,	triggerid);
 
@@ -3658,7 +3663,7 @@ static int	DBcopy_trigger_to_host(
 
 	int	result = SUCCEED;
 
-	db_triggers = DBselect("select description,priority,status,comments,url,expression from triggers where triggerid=" ZBX_FS_UI64, triggerid);
+	db_triggers = DBselect("select description,priority,status,comments,url,expression,type from triggers where triggerid=" ZBX_FS_UI64, triggerid);
 
 	if( (trigger_data = DBfetch(db_triggers)) )
 	{
@@ -3685,6 +3690,7 @@ static int	DBcopy_trigger_to_host(
 				-1,			/* status */
 				trigger_data[3],	/* comments */
 				trigger_data[4],	/* url */
+				atoi(trigger_data[6]),	/* type */
 				new_dependences,
 				copy_mode ? 0 : triggerid);
 
@@ -3704,14 +3710,15 @@ static int	DBcopy_trigger_to_host(
 			url_esc = DBdyn_escape_string(trigger_data[4]);
 
 			DBexecute("insert into triggers"
-				" (triggerid,description,priority,status,comments,url,value,expression,templateid)"
-				" values (" ZBX_FS_UI64 ",'%s',%i,%i,'%s','%s',2,'{???:???}'," ZBX_FS_UI64 ")",
+				" (triggerid,description,priority,status,comments,url,type,value,expression,templateid)"
+				" values (" ZBX_FS_UI64 ",'%s',%i,%i,'%s','%s',%i,2,'{???:???}'," ZBX_FS_UI64 ")",
 					new_triggerid,
 					description_esc,	/* description */
 					atoi(trigger_data[1]),	/* priority */
 					atoi(trigger_data[2]),	/* status */
 					comments_esc,		/* comments */
 					url_esc,		/* url */
+					atoi(trigger_data[6]),	/* type */
 					copy_mode ? 0 : triggerid);
 
 			zbx_free(url_esc);
@@ -3875,6 +3882,7 @@ static int	DBupdate_template_dependences_for_host(
 				/* status */             -1,
 				/* comments */           NULL,
 				/* url */                NULL,
+				/* type */               -1,
 				new_dependences,
 				triggerid)) )
 					break;

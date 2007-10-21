@@ -613,6 +613,7 @@ FIELD		|dep_level	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|comments	|t_blob		|	|		|ZBX_SYNC
 FIELD		|error		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|templateid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|status
 INDEX		|2		|value
 

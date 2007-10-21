@@ -334,6 +334,13 @@ typedef enum
 	ITEM_STATUS_NOTAVAILABLE
 } zbx_item_status_t;
 
+/* Trigger types */
+typedef enum
+{
+	TRIGGER_TYPE_NORMAL = 0,
+	TRIGGER_TYPE_MULTIPLE_TRUE
+} zbx_trigger_type_t;
+
 /* HTTP Tests statuses */
 #define HTTPTEST_STATUS_MONITORED	0
 #define HTTPTEST_STATUS_NOT_MONITORED	1
