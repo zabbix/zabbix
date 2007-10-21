@@ -348,6 +348,9 @@
 	define('ZBX_NODE_LOCAL',	1);
 	define('ZBX_NODE_MASTER',	2);
 
+	define('ZBX_FLAG_TRIGGER',	0);
+	define('ZBX_FLAG_EVENT',	1);
+
 	define('HTTPTEST_STATUS_ACTIVE',	0);
 	define('HTTPTEST_STATUS_DISABLED',	1);
 

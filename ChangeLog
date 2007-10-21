@@ -1,5 +1,6 @@
 Changes for 1.4.j:
 
+ - [DEV-43] support of new macros {ITEM.VALUE}, {ITEM.VALUE1}, etc (Alexei)
  - added new design of Status of Triggers (Artem)
  - added support of selection of events and bulk acknowledge of events (Artem)
  - added support of log files for {ITEM.LASTVALUE} (Alexei)

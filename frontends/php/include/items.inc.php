@@ -1106,4 +1106,72 @@ COpt::profiling_stop('prepare table');
 		}
 		return $lastvalue;
 	}
+
+	/*
+	 * Function: item_get_history
+	 *
+	 * Description:
+	 *     Get value from history
+	 *
+	 * Peremeters:
+	 *     itemid - item ID
+	 *     index  - 0 - last value, 1 - prev value, 2 - prev prev, and so on
+	 *     if index=0, clock is used
+	 *
+	 * Author:
+	 *     Alexei Vladishev
+	 *
+	 * Comments:
+	 *
+	 */
+	function	item_get_history($db_item,$index = 1, $clock = 0)
+	{
+		$value = NULL;
+
+		switch($db_item["value_type"])
+		{
+		case	ITEM_VALUE_TYPE_FLOAT:
+			$table = "history";
+			break;
+		case	ITEM_VALUE_TYPE_UINT64:
+			$table = "history_uint";
+			break;
+		case	ITEM_VALUE_TYPE_TEXT:
+			$table = "history_text";
+			break;
+		case	ITEM_VALUE_TYPE_STR:
+			$table = "history_str";
+			break;
+		case	ITEM_VALUE_TYPE_LOG:
+		default:
+			$table = "history_log";
+			break;
+		}
+		if($index == 0)
+		{
+			$sql="select value from $table where itemid=".$db_item["itemid"]." and clock<=$clock order by clock desc";
+			$result = DBselect($sql, 1);
+			$row = DBfetch(DBselect($sql, 1));
+			if($row)
+			{
+				$value = $row["value"];
+			}
+		}
+		else
+		{
+			$sql="select value from $table where itemid=".$db_item["itemid"]." order by clock desc";
+			$result = DBselect($sql, $index);
+			$num=1;
+			while($row = DBfetch($result))
+			{
+				if($num == $index)
+				{
+					$value = $row["value"];
+					break;
+				}
+				$num++;
+			}
+		}
+		return $value;
+	}
 ?>

@@ -101,7 +101,7 @@
 				get_node_name_by_elid($row['triggerid']),
 				$hostid == 0 ? $row['host'] : null,
 				new CLink(
-					expand_trigger_description_by_data($row),
+					expand_trigger_description_by_data($row, ZBX_FLAG_EVENT),
 					"tr_events.php?triggerid=".$row["triggerid"],"action"
 					),
 				$value,
