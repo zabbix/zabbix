@@ -1094,7 +1094,7 @@
 	 * Comments: !!! Don't forget sync code with C !!!
 	 *
 	 */
-	function	expand_trigger_description_by_data($row)
+	function	expand_trigger_description_by_data($row, $flag = ZBX_FLAG_TRIGGER)
 	{
 		if($row)
 		{
@@ -1109,8 +1109,109 @@
 					' where i.itemid=f.itemid and f.triggerid=t.triggerid and '.
 					' t.triggerid='.$row["triggerid"]));
 
-				if(is_null($row2["lastvalue"])) $row["lastvalue"] = "{ITEM.LASTVALUE}";
-				$description = str_replace("{ITEM.LASTVALUE}", $row2["lastvalue"],$description);
+				if($row2["value_type"]!=ITEM_VALUE_TYPE_LOG)
+				{
+					$description = str_replace("{ITEM.LASTVALUE}", $row2["lastvalue"],$description);
+				}
+				else
+				{
+					$row3=DBfetch(DBselect("select max(clock) as max from history_log where itemid=".$row2["itemid"]));
+					if($row3 && !is_null($row3["max"]))
+					{
+						$row4=DBfetch(DBselect("select value from history_log where itemid=".$row2["itemid"]." and clock=".$row3["max"]));
+						$description = str_replace("{ITEM.LASTVALUE}", $row4["value"],$description);
+					}
+				}
+			}
+			if(strstr($description,'{ITEM.VALUE}'))
+			{
+				$value=($flag==ZBX_FLAG_TRIGGER)?
+						trigger_get_func_value($row["expression"],ZBX_FLAG_TRIGGER,1,1):
+						trigger_get_func_value($row["expression"],ZBX_FLAG_EVENT,1,$row['clock']);
+				$description = str_replace("{ITEM.VALUE}",
+						$value,
+						$description);
+			}
+			if(strstr($description,'{ITEM.VALUE1}'))
+			{
+				$value=($flag==ZBX_FLAG_TRIGGER)?
+						trigger_get_func_value($row["expression"],ZBX_FLAG_TRIGGER,1,1):
+						trigger_get_func_value($row["expression"],ZBX_FLAG_EVENT,1,$row['clock']);
+				$description = str_replace("{ITEM.VALUE1}",
+						$value,
+						$description);
+			}
+			if(strstr($description,'{ITEM.VALUE2}'))
+			{
+				$value=($flag==ZBX_FLAG_TRIGGER)?
+						trigger_get_func_value($row["expression"],ZBX_FLAG_TRIGGER,2,1):
+						trigger_get_func_value($row["expression"],ZBX_FLAG_EVENT,2,$row['clock']);
+				$description = str_replace("{ITEM.VALUE2}",
+						$value,
+						$description);
+			}
+			if(strstr($description,'{ITEM.VALUE3}'))
+			{
+				$value=($flag==ZBX_FLAG_TRIGGER)?
+						trigger_get_func_value($row["expression"],ZBX_FLAG_TRIGGER,3,1):
+						trigger_get_func_value($row["expression"],ZBX_FLAG_EVENT,3,$row['clock']);
+				$description = str_replace("{ITEM.VALUE3}",
+						$value,
+						$description);
+			}
+			if(strstr($description,'{ITEM.VALUE4}'))
+			{
+				$value=($flag==ZBX_FLAG_TRIGGER)?
+						trigger_get_func_value($row["expression"],ZBX_FLAG_TRIGGER,4,1):
+						trigger_get_func_value($row["expression"],ZBX_FLAG_EVENT,4,$row['clock']);
+				$description = str_replace("{ITEM.VALUE4}",
+						$value,
+						$description);
+			}
+			if(strstr($description,'{ITEM.VALUE5}'))
+			{
+				$value=($flag==ZBX_FLAG_TRIGGER)?
+						trigger_get_func_value($row["expression"],ZBX_FLAG_TRIGGER,5,1):
+						trigger_get_func_value($row["expression"],ZBX_FLAG_EVENT,5,$row['clock']);
+				$description = str_replace("{ITEM.VALUE5}",
+						$value,
+						$description);
+			}
+			if(strstr($description,'{ITEM.VALUE6}'))
+			{
+				$value=($flag==ZBX_FLAG_TRIGGER)?
+						trigger_get_func_value($row["expression"],ZBX_FLAG_TRIGGER,6,1):
+						trigger_get_func_value($row["expression"],ZBX_FLAG_EVENT,6,$row['clock']);
+				$description = str_replace("{ITEM.VALUE6}",
+						$value,
+						$description);
+			}
+			if(strstr($description,'{ITEM.VALUE7}'))
+			{
+				$value=($flag==ZBX_FLAG_TRIGGER)?
+						trigger_get_func_value($row["expression"],ZBX_FLAG_TRIGGER,7,1):
+						trigger_get_func_value($row["expression"],ZBX_FLAG_EVENT,7,$row['clock']);
+				$description = str_replace("{ITEM.VALUE7}",
+						$value,
+						$description);
+			}
+			if(strstr($description,'{ITEM.VALUE8}'))
+			{
+				$value=($flag==ZBX_FLAG_TRIGGER)?
+						trigger_get_func_value($row["expression"],ZBX_FLAG_TRIGGER,8,1):
+						trigger_get_func_value($row["expression"],ZBX_FLAG_EVENT,8,$row['clock']);
+				$description = str_replace("{ITEM.VALUE8}",
+						$value,
+						$description);
+			}
+			if(strstr($description,'{ITEM.VALUE9}'))
+			{
+				$value=($flag==ZBX_FLAG_TRIGGER)?
+						trigger_get_func_value($row["expression"],ZBX_FLAG_TRIGGER,9,1):
+						trigger_get_func_value($row["expression"],ZBX_FLAG_EVENT,9,$row['clock']);
+				$description = str_replace("{ITEM.VALUE9}",
+						$value,
+						$description);
 			}
 		}
 		else
@@ -2036,5 +2137,72 @@
 	{
 		$level = 0;
 		return trigger_dependent_rec($triggerid, $level);
+	}
+
+	/*
+	 * Function: trigger_get_N_functionid 
+	 *
+	 * Description: 
+	 *     get functionid of Nth function of trigger expression
+	 *     
+	 * Author: 
+	 *     Alexei Vladishev
+	 *
+	 * Comments:
+	 *
+	 */
+	function	trigger_get_N_functionid($expression, $function)
+	{
+		$result = NULL;
+
+		$arr=split('[\{\}]',$expression);
+		$num=1;
+		foreach($arr as $id)
+		{
+			if(is_numeric($id))
+			{
+				if($num == $function)
+				{
+					$result = $id;
+					break;
+				}
+				$num++;
+			}
+		}
+		return $result;
+	}
+
+	/*
+	 * Function: trigger_get_func_value 
+	 *
+	 * Description: 
+	 *     get historical value of Nth function of trigger expression
+	 *     flag:  ZBX_FLAG_EVENT - get value by clock, ZBX_FLAG_TRIGGR - get value by index
+	 *     ZBX_FLAG_TRIGGER, param: 0 - last value, 1 - prev, 2 - prev prev, etc     
+	 *     ZBX_FLAG_EVENT, param: event timestamp
+	 *     
+	 * Author: 
+	 *     Alexei Vladishev
+	 *
+	 * Comments:
+	 *
+	 */
+	function	trigger_get_func_value($expression, $flag, $function, $param)
+	{
+		$result = NULL;
+
+		$functionid=trigger_get_N_functionid($expression,$function);
+		if(isset($functionid))
+		{
+			$row=DBfetch(DBselect('select i.* from items i, functions f '.
+				' where i.itemid=f.itemid and f.functionid='.$functionid));
+			if($row)
+			{
+				$result=($flag == ZBX_FLAG_TRIGGER)?
+					item_get_history($row, $param):
+					item_get_history($row, 0, $param);
+			}
+		}
+		return $result;
 	}
 ?>
