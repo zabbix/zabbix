@@ -327,7 +327,9 @@ int lock_sync_node(int nodeid)
 	DB_ROW		row;
 	int		sync;
 	int		res = FAIL;
+	int		retry = 0;
 
+retry_lock:
 	if (DBexecute("update nodes set sync=sync+1 where nodeid=%d",
 		nodeid) >= ZBX_DB_OK) {
 
@@ -341,6 +343,9 @@ int lock_sync_node(int nodeid)
 					NODE_CKSUM_TYPE_NEW) >= ZBX_DB_OK) {
 					res = SUCCEED;
 				}
+			} else if (retry++ < 3) {
+				sleep(5);
+				goto retry_lock;
 			}
 		}
 		DBfree_result(result);
