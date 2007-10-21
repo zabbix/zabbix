@@ -218,6 +218,7 @@ DB_EVENT
 	int		trigger_priority;
 	char		*trigger_url;
 	char		*trigger_comments;
+	int		trigger_type;
 };
 
 DB_HOST
@@ -365,6 +366,7 @@ DB_TRIGGER
 	int	value;
 /*	int	prevvalue; */
 	int	priority;
+	int	type;
 };
 
 DB_ACTION
