@@ -20,6 +20,10 @@
 #ifndef ZABBIX_NODEWATCHER_H
 #define ZABBIX_NODEWATCHER_H
 
+#include "mutexs.h"
+
+extern	ZBX_MUTEX node_sync_access;
+
 int main_nodewatcher_loop();
 
 #endif
