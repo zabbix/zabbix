@@ -559,7 +559,8 @@ int	zbx_pg_unescape_bytea(u_char *io);
 char    *zbx_get_next_field(const char *line, char **output, int *olen, char separator);
 int	str_in_list(char *list, const char *value, const char delimiter);
 
-int	lock_sync_node(int nodeid);
+void	node_sync_lock(int nodeid);
+void	node_sync_unlock(int nodeid);
 int	calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id);
 int	update_checksums(int nodeid, int synked_slave, int synked_master, const char *tablename, const zbx_uint64_t id, char *fields);
 

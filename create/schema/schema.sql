@@ -132,7 +132,6 @@ FIELD		|history_str_lastid|t_bigint	|'0'	|NOT NULL	|0
 FIELD		|history_uint_lastid|t_bigint	|'0'	|NOT NULL	|0
 FIELD		|nodetype	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|masterid	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|sync		|t_integer	|'0'	|NOT NULL	|0
 
 TABLE|node_cksum||0
 FIELD		|nodeid		|t_id		|'0'	|NOT NULL	|0

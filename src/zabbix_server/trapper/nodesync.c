@@ -301,13 +301,12 @@ int	node_sync(char *data)
 	int	sender_nodeid=0;
 	int	sender_nodetype=0;
 	int	datalen;
-	int	res = SUCCEED, lock_res = FAIL;
+	int	res = SUCCEED;
 
 	datalen=strlen(data);
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In node_sync(len:%d)", datalen);
 
-/*	DBbegin();*/
 
 	tmp = zbx_malloc(tmp, tmp_allocated);
 
@@ -326,18 +325,22 @@ int	node_sync(char *data)
 			start = zbx_get_next_field(start, &tmp, &tmp_allocated, ZBX_DM_DELIMITER);
 			nodeid=atoi(tmp);
 
+			node_sync_lock(nodeid);
+
+			zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Received data from %s node %d for node %d datalen %d",
+				CONFIG_NODEID,
+				sender_nodetype == NODE_SYNC_SLAVE ? "slave" : "master",
+				sender_nodeid,
+				nodeid,
+				datalen);
+
+/*			DBbegin();*/
+
+			DBexecute("delete from node_cksum where nodeid=%d and cksumtype=%d",
+				nodeid,
+				NODE_CKSUM_TYPE_NEW);
+
 			firstline=0;
-
-			if (SUCCEED == (res = lock_res = lock_sync_node(nodeid))) {
-				zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Received data from %s node %d for node %d datalen %d",
-					CONFIG_NODEID,
-					sender_nodetype == NODE_SYNC_SLAVE ? "slave" : "master",
-					sender_nodeid,
-					nodeid,
-					datalen);
-			} else
-				res = FAIL;
-
 		} else {
 			/*zabbix_log( LOG_LEVEL_DEBUG, "Got line [%s]", start);*/
 			res = process_record(nodeid, start, sender_nodetype);
@@ -351,12 +354,13 @@ int	node_sync(char *data)
 	}
 	zbx_free(tmp);
 
-	if (lock_res == SUCCEED)
-		DBexecute("update nodes set sync=0 where nodeid=%d", nodeid);
+	if (0 == firstline) {
+	/*	DBcommit();*/
+		node_sync_unlock(nodeid);
+	}
 /*	else
-		zabbix_log(LOG_LEVEL_CRIT, "<----- [LOCKED]");*/
+		zabbix_log(LOG_LEVEL_CRIT, "<----- Node %d LOCKED", nodeid);*/
 
-/*	DBcommit();*/
 
 	return res;
 }

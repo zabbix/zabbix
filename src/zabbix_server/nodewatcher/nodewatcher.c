@@ -308,7 +308,7 @@ int update_checksums(int nodeid, int synked_slave, int synked_master, const char
 
 /******************************************************************************
  *                                                                            *
- * Function: lock_node                                                        *
+ * Function: node_sync_lock                                                   *
  *                                                                            *
  * Purpose:                                                                   *
  *                                                                            *
@@ -321,36 +321,29 @@ int update_checksums(int nodeid, int synked_slave, int synked_master, const char
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int lock_sync_node(int nodeid)
+void node_sync_lock(int nodeid)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		sync;
-	int		res = FAIL;
-	int		retry = 0;
+	zbx_mutex_lock(&node_sync_access);
+}
 
-retry_lock:
-	if (DBexecute("update nodes set sync=sync+1 where nodeid=%d",
-		nodeid) >= ZBX_DB_OK) {
-
-		result = DBselect("select sync from nodes where nodeid=%d",
-			nodeid);
-		if (NULL != (row=DBfetch(result))) {
-			sync = atoi(row[0]);
-			if (sync == 1 || sync > 25) {
-				if (DBexecute("delete from node_cksum where nodeid=%d and cksumtype=%d",
-					nodeid,
-					NODE_CKSUM_TYPE_NEW) >= ZBX_DB_OK) {
-					res = SUCCEED;
-				}
-			} else if (retry++ < 3) {
-				sleep(5);
-				goto retry_lock;
-			}
-		}
-		DBfree_result(result);
-	}
-	return res;
+/******************************************************************************
+ *                                                                            *
+ * Function: node_sync_unlock                                                 *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:                                                              * 
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void node_sync_unlock(int nodeid)
+{
+	zbx_mutex_unlock(&node_sync_access);
 }
 
 /******************************************************************************
@@ -375,30 +368,32 @@ void process_nodes()
 	int		nodeid, synked_slave, synked_master;
 /*	int		now = time(NULL);*/
 
-/*	DBbegin();*/
 
 	/* Select all nodes */
 	result = DBselect("select nodeid from nodes");
 	while (NULL != (row=DBfetch(result))) {
 		nodeid = atoi(row[0]);
 
-		if (FAIL == lock_sync_node(nodeid))
-			continue;
+		node_sync_lock(nodeid);
 
-		if (FAIL == calculate_checksums(nodeid, NULL, 0))
-			continue;
+/*		DBbegin();*/
 
-		/* Send configuration changes to required nodes */
-		main_nodesender(nodeid, &synked_slave, &synked_master);
-		if (synked_slave == SUCCEED || synked_master == SUCCEED)
-			update_checksums(nodeid, synked_slave, synked_master, NULL, 0, NULL);
+		DBexecute("delete from node_cksum where nodeid=%d and cksumtype=%d",
+			nodeid,
+			NODE_CKSUM_TYPE_NEW);
 
-		DBexecute("update nodes set sync=0 where nodeid=%d",
-			nodeid);
+		if (SUCCEED == calculate_checksums(nodeid, NULL, 0)) {
+			/* Send configuration changes to required nodes */
+			main_nodesender(nodeid, &synked_slave, &synked_master);
+			if (synked_slave == SUCCEED || synked_master == SUCCEED)
+				update_checksums(nodeid, synked_slave, synked_master, NULL, 0, NULL);
+		}
+
+/*		DBcommit();*/
+
+		node_sync_unlock(nodeid);
 	}
 	DBfree_result(result);
-
-/*	DBcommit();*/
 
 /*	zabbix_log(LOG_LEVEL_CRIT, "----- process_nodes [Selected records in %d seconds]", time(NULL)-now);*/
 }
