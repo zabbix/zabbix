@@ -28,6 +28,7 @@
 #include "log.h"
 #include "zlog.h"
 #include "zbxgetopt.h"
+#include "mutexs.h"
 
 #include "functions.h"
 #include "expression.h"
@@ -167,6 +168,9 @@ int	CONFIG_REFRESH_UNSUPPORTED	= 0;
 
 /* Zabbix server sturtup time */
 int     CONFIG_SERVER_STARTUP_TIME      = 0;
+
+/* Mutex for node syncs */
+ZBX_MUTEX	node_sync_access;
 
 /******************************************************************************
  *                                                                            *
@@ -1065,6 +1069,11 @@ int MAIN_ZABBIX_ENTRY(void)
 /* Do not close database. It is required for database cache */
 /*	DBclose();*/
 
+	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&node_sync_access, ZBX_MUTEX_NODE_SYNC)) {
+		zbx_error("Unable to create mutex for node syncs");
+		exit(FAIL);
+	}
+
 /*#define CALC_TREND*/
 
 #ifdef CALC_TREND
@@ -1257,6 +1266,7 @@ void	zbx_on_exit()
 		free_database_cache();
 	}
 	DBclose();
+	zbx_mutex_destroy(&node_sync_access);
 	zabbix_close_log();
 	
 #ifdef  HAVE_SQLITE3
