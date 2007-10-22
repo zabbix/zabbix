@@ -1,5 +1,6 @@
 Changes for 1.4.j:
 
+ - [DEV-49] Support of encoding for monitoring of Windows event logs (Sasha)
  - [DEV-44] more flexible generation of trigger events (Alexei)
  - [DEV-43] support of new macros {ITEM.VALUE}, {ITEM.VALUE1}, etc (Alexei)
  - added new design of Status of Triggers (Artem)

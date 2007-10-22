@@ -393,6 +393,7 @@ static int	process_active_checks(char *server, unsigned short port)
 	char	params[MAX_STRING_LEN];
 	char	*filename;
 	char	*pattern;
+	char	*encoding;
 
 	AGENT_RESULT	result;
 
@@ -424,8 +425,12 @@ static int	process_active_checks(char *server, unsigned short port)
 					*pattern = '\0';
 					pattern++;
 				}
+
 				/* Not very nice. Has to be rewritten to use get_param */
-				if(pattern!=NULL && pattern[0]==',')	pattern[0]='\0';
+				if (NULL != pattern && NULL != (encoding = strchr(pattern, ','))) {
+					*encoding = '\0';
+					encoding++;
+				}
 
 				s_count = 0;
 				p_count = 0;
@@ -488,23 +493,27 @@ static int	process_active_checks(char *server, unsigned short port)
 				if(parse_command(active_metrics[i].key, NULL, 0, params, MAX_STRING_LEN) != 2)
 					break;
 				
-				if(num_param(params) > 2)
+				if(num_param(params) > 3)
 					break;
 
 				filename = params;
 
-				if( (pattern = strchr(params, ',')) )
-				{
+				if (NULL != (pattern = strchr(params, ','))) {
 					*pattern = '\0';
 					pattern++;
 				}
 
+				if (NULL != pattern && NULL != (encoding = strchr(pattern, ','))) {
+					*encoding = '\0';
+					encoding++;
+				}
+
 				s_count = 0;
 				p_count = 0;
-				while( SUCCEED == (ret = process_eventlog(filename,&active_metrics[i].lastlogsize, &timestamp, &source, &severity, &value)) )
+				while (SUCCEED == (ret = process_eventlog(filename, &active_metrics[i].lastlogsize,
+					&timestamp, &source, &severity, &value)))
 				{
-					if( value  && (!pattern || NULL != zbx_regexp_match(value, pattern, NULL)) )
-					{
+					if (value && (!pattern || NULL != zbx_regexp_match(value, pattern, NULL))) {
 						send_err = send_value(
 									server,
 									port,
