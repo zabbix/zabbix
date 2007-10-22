@@ -34,6 +34,7 @@
 #include "nodehistory.h"
 #include "trapper.h"
 #include "active.h"
+#include "nodecommand.h"
 
 #include "daemon.h"
 
@@ -47,6 +48,8 @@ static int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 	char	timestamp[MAX_STRING_LEN];
 	char	source[MAX_STRING_LEN];
 	char	severity[MAX_STRING_LEN];
+	char	error[MAX_STRING_LEN];
+	char	*result = NULL;
 
 	int	ret=SUCCEED;
 
@@ -73,6 +76,19 @@ static int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 /* Process information sent by zabbix_sender */
 	else
 	{
+		/* Command? */
+		if(strncmp(s,"Command",7))
+		{
+			if(SUCCEED == node_process_command(s, &result))
+			{
+				if( zbx_tcp_send_ext(sock,result,ZBX_TCP_READ_UNTIL_CLOSE) != SUCCEED)
+				{
+					zabbix_log( LOG_LEVEL_WARNING, "Error sending result to node");
+					zabbix_syslog("Trapper: error sending result to node");
+				}
+				zbx_free(result);
+			}
+		}
 		/* Node data exchange? */
 		if(strncmp(s,"Data",4) == 0)
 		{
