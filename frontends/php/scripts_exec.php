@@ -22,6 +22,7 @@
 	include_once "include/config.inc.php";
 	require_once "include/hosts.inc.php";
 	require_once "include/scripts.inc.php";
+	require_once "include/forms.inc.php";
 
 	$page['title'] = "S_SCRIPTS";
 	$page['file'] = 'scripts_exec.php';
@@ -49,16 +50,22 @@ if(isset($_REQUEST['execute'])){
 			$hosts_read_write = explode(',',get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,get_current_nodeid()));			
 		
 			if(in_array($_REQUEST['hostid'],$hosts_read_write)){
-SDI('WRITE: '.$_REQUEST['scriptid'].' : '.$_REQUEST['hostid']);
-				$result = execute_script($_REQUEST['scriptid'],$_REQUEST['hostid']);
+//SDI('WRITE: '.$_REQUEST['scriptid'].' : '.$_REQUEST['hostid']);
+//				$result = execute_script($_REQUEST['scriptid'],$_REQUEST['hostid']);
+//				insert_command_result_form($result["flag"],$result["message"]);
+				insert_command_result_form($_REQUEST['scriptid'],$_REQUEST['hostid']);
+/*				echo nl2br(htmlspecialchars($result));*/
 			}
 		}
 		else{
 			$hosts_read_only  = explode(',',get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,get_current_nodeid()));
 			
 			if(in_array($_REQUEST['hostid'],$hosts_read_only)){
-SDI('READ: '.$_REQUEST['scriptid'].' : '.$_REQUEST['hostid']);
-				$result = execute_script($_REQUEST['scriptid'],$_REQUEST['hostid']);
+//SDI('READ: '.$_REQUEST['scriptid'].' : '.$_REQUEST['hostid']);
+//				$result = execute_script($_REQUEST['scriptid'],$_REQUEST['hostid']);
+//				insert_command_result_form($result["flag"],$result["message"]);
+				insert_command_result_form($_REQUEST['scriptid'],$_REQUEST['hostid']);
+/*				echo nl2br(htmlspecialchars($result));*/
 			}
 		}
 	}

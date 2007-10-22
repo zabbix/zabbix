@@ -77,11 +77,12 @@ static int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 	else
 	{
 		/* Command? */
-		if(strncmp(s,"Command",7))
+		if(strncmp(s,"Command",7) == 0)
 		{
 			if(SUCCEED == node_process_command(s, &result))
 			{
-				if( zbx_tcp_send_ext(sock,result,ZBX_TCP_READ_UNTIL_CLOSE) != SUCCEED)
+/*				if( zbx_tcp_send_ext(sock,result,ZBX_TCP_READ_UNTIL_CLOSE) != SUCCEED)*/
+				if( zbx_tcp_send_raw(sock,result) != SUCCEED)
 				{
 					zabbix_log( LOG_LEVEL_WARNING, "Error sending result to node");
 					zabbix_syslog("Trapper: error sending result to node");

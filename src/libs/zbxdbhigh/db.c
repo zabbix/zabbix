@@ -540,9 +540,6 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *re
 	int		event_prev_status;
 	int		update_status;
 
-	if(trigger->triggerid == 100100000000002)
-		zabbix_set_log_level(LOG_LEVEL_DEBUG);
-
 	if(reason==NULL)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG,"In update_trigger_value(triggerid:" ZBX_FS_UI64 ",old:%d,new:%d,%d)",
@@ -651,7 +648,6 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *re
 		ret = FAIL;
 	}
 	zabbix_log(LOG_LEVEL_DEBUG,"End update_trigger_value()");
-	zabbix_set_log_level(LOG_LEVEL_WARNING);
 	return ret;
 }
 

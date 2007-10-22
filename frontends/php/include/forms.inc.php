@@ -4782,4 +4782,17 @@ include_once 'include/discovery.inc.php';
 		
 		$frmCnct->Show();
 	}
+
+	function insert_command_result_form($scriptid,$hostid)
+	{
+		$result = execute_script($scriptid,$hostid);
+
+		$script_info = DBfetch(DBselect("select name from scripts where scriptid=$scriptid"));
+
+		$frmResult = new CFormTable(S_COMMENTS." ".$script_info["name"]);
+		$frmResult->AddRow(S_COMMENTS,new CTextArea("message",$result["message"],100,25));
+		$frmResult->AddItemToBottomRow(new CButtonCancel(null,'close_window();'));
+
+		$frmResult->Show();
+	}
 ?>
