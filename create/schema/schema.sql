@@ -129,7 +129,6 @@ FIELD		|slave_trends	|t_integer	|'365'	|NOT NULL	|0
 FIELD		|event_lastid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|nodetype	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|masterid	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|sync		|t_integer	|'0'	|NOT NULL	|0
 
 TABLE|node_cksum||0
 FIELD		|nodeid		|t_id		|'0'	|NOT NULL	|0
