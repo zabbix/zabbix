@@ -1,5 +1,6 @@
 Changes for 1.4.j:
 
+ - [DEV-48] added scripts form,scripts list, script call menu (Artem)
  - [DEV-49] Support of encoding for monitoring of Windows event logs (Sasha)
  - [DEV-44] more flexible generation of trigger events (Alexei)
  - [DEV-43] support of new macros {ITEM.VALUE}, {ITEM.VALUE1}, etc (Alexei)

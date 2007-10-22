@@ -1283,6 +1283,27 @@
 	'S_DELETE_SELECTED_USERS_Q'=>		'Delete selected users?',
 	'S_NO_ACCESSIBLE_RESOURCES'=>		'No accessibles resources',
 
+//scripts.php
+	'S_SCRIPTS'=>				'Scripts',
+	'S_SCRIPT'=>				'Script',
+	'S_COMMAND'=>				'Command',
+	'S_PERMISSIONS_SMALL'=>		'permissions',
+	'S_REQUIRED_HOST'=>			'Required host',
+	'S_READ'=>					'Read',
+	'S_WRITE'=>					'Write',
+	'S_NO_SCRIPTS_DEFINED'=>	'No scripts defined',
+	'S_HOST_ACCESS'=>			'Host access',
+	'S_DELETE_SELECTED_SCRIPTS_Q'=> 'Delete selected scripts?',
+	'S_ADD_SCRIPT'=>			'Add script',
+	'S_SCRIPT_ADDED'=>			'Script added',
+	'S_CANNOT_ADD_SCRIPT'=>		'Cannot add script',
+	'S_SCRIPT_UPDATED'=>		'Script updated',
+	'S_CANNOT_UPDATE_SCRIPT'=>	'Cannot update script',
+	'S_SCRIPT_DELETED'=>		'Script deleted',
+	'S_CANNOT_DELETE_SCRIPT'=>	'Cannot delete script',
+	'S_TOOLS'=>					'Tools',
+
+
 //	audit.php
 	'S_AUDIT_LOG'=>				'Audit log',
 	'S_AUDIT_LOG_BIG'=>			'AUDIT LOG',
@@ -1296,6 +1317,7 @@
 	'S_MEDIA_TYPE'=>			'Media type',
 	'S_GRAPH_ELEMENT'=>			'Graph element',
 	'S_UNKNOWN_RESOURCE'=>			'Unknown resource',
+	'S_ALREADY_EXISTS_SMALL'=>		'alredy exists',
 
 //	profile.php
 	'S_USER_PROFILE_BIG'=>			'USER PROFILE',

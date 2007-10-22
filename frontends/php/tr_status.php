@@ -24,6 +24,7 @@
 	require_once "include/acknow.inc.php";
 	require_once "include/triggers.inc.php";
 	require_once "include/events.inc.php";
+	require_once "include/scripts.inc.php";
 
 	$page["file"] = "tr_status.php";
 	$page["title"] = "S_STATUS_OF_TRIGGERS";
@@ -84,6 +85,7 @@
 	
 include_once "include/page_header.php";
 echo '<script type="text/javascript" src="js/blink.js"></script>';
+echo '<script type="text/javascript" src="js/items.js"></script>';
 	
 ?>
 <?php
@@ -163,6 +165,8 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
 	
 	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
+	
+	$scripts_by_hosts = get_accessible_scripts_by_hosts(explode(',',$availiable_hosts));
 
 	$result=DBselect("select distinct g.groupid,g.name from groups g, hosts_groups hg, hosts h, items i, functions f, triggers t ".
 		" where h.hostid in (".$availiable_hosts.") ".
@@ -389,7 +393,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 	}
 
 	$sql = 'SELECT DISTINCT t.triggerid,t.status,t.description, '.
-							' t.expression,t.priority,t.lastchange,t.comments,t.url,t.value,h.host '.
+							' t.expression,t.priority,t.lastchange,t.comments,t.url,t.value,h.host, h.hostid '.
 					' FROM triggers t,hosts h,items i,functions f '.
 					' WHERE f.itemid=i.itemid AND h.hostid=i.hostid '.
 						' AND t.triggerid=f.triggerid AND t.status='.TRIGGER_STATUS_ENABLED.
@@ -480,10 +484,25 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 		}
 
 		$ack=SPACE;
+		
+		
+		$host = null;
+		if($_REQUEST['hostid'] < 1){
+			$menus = '';
+			foreach($scripts_by_hosts[$row['hostid']] as $id => $script){
+				$menus.= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$row['hostid']."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+			}
+			$menus = trim($menus,',');
+			if(!empty($menus)) $menus="show_popup_menu(event,[[".zbx_jsvalue(S_TOOLS).",null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],".$menus."],180);";
+			
+			$host = new CSpan($row['host']);
+			$host->AddOption('onclick','javascript: '.$menus);
+			$host->AddOption('onmouseover',"javascript: this.style.cursor = 'pointer';");
+		}
 
 		$table->AddRow(array(
 				get_node_name_by_elid($row['triggerid']),
-				$_REQUEST['hostid'] > 0 ? null : $row['host'],
+				$host,
 				SPACE,
 				$description,
 				$value,
@@ -560,12 +579,10 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 					)));
 
 	$m_form->Show();
-//	$table->Show(false);
-
-//	show_table_header(S_TOTAL.": ".$table->GetNumRows());
+	
+	$jsmenu = new CPUMenu(null,170);
+	$jsmenu->InsertJavaScript();
 ?>
 <?php
-
 include_once "include/page_footer.php";
-
 ?>

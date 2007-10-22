@@ -19,14 +19,14 @@ function previousObject(p) {
 return p; 
 } 
 
-function call_menu(evnt,id,name,triggers){
+function call_menu(evnt,id,name,menu_options){
 	
-	if(typeof(triggers) != 'undefined'){
+	if(isset(menu_options)){
 		show_popup_menu(evnt,
 					[
 						[name,null,null,{'outer' : ['pum_oheader'],'inner' : ['pum_iheader']}],
 						['Create Lot Trigger',"javascript: openWinCentered('tr_logform.php?sform=1&itemid="+id+"','TriggerLog',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],
-						triggers
+						menu_options
 					],240);
 	} else {
 		show_popup_menu(evnt,

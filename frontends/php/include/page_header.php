@@ -191,6 +191,9 @@ COpt::profiling_start("page");
 							"popup_usrgrp.php","popup_right.php","popup_users.php")
 						),
 					array("url"=>"media_types.php"	,"label"=>S_MEDIA_TYPES		),
+					array("url"=>"scripts.php"	,"label"=>S_SCRIPTS,
+						"sub_pages"=> array("scripts_exec.php")	
+						),
 					array("url"=>"audit.php"	,"label"=>S_AUDIT		),
 					array("url"=>"report4.php"	,"label"=>S_NOTIFICATIONS	),
 					array("url"=>"instal.php"	,"label"=>S_INSTALLATION	,

@@ -19,6 +19,23 @@
 var OP = window.opera?true:false;
 var IE = ((!OP) && (document.all))?true:false;
 
+function isset(obj){
+	return (typeof(obj) != 'undefined');
+}
+
+function empty(obj){
+	if(isset(obj) && obj) return true;
+	return false;
+}
+
+function is_number(obj){
+	return (typeof(obj) == 'number');
+}
+
+function is_string(obj){
+	return (typeof(obj) == 'string');
+}
+
 if (!Array.prototype.forEach)
 {
   Array.prototype.forEach = function(fun /*, thisp*/)
@@ -240,19 +257,4 @@ function openWinCentered(loc, winname, iwidth, iheight, params){
 	WinObjReferer.focus();
 }
 
-function isset(obj){
-	return (typeof(obj) != 'undefined');
-}
-
-function empty(obj){
-	if(isset(obj) && obj) return true;
-	return false;
-}
-
-function is_number(obj){
-	return (typeof(obj) == 'number');
-}
-
-function is_string(obj){
-	return (typeof(obj) == 'string');
-}
+//						['Create Lot Trigger',"javascript: openWinCentered('tr_logform.php?sform=1&itemid="+id+"','TriggerLog',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],
