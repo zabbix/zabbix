@@ -109,6 +109,7 @@ frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
 frontends/php/include/classes/chart.inc.php -text
 frontends/php/include/classes/pie.inc.php -text
 frontends/php/include/js.inc.php -text
+frontends/php/include/scripts.inc.php -text
 frontends/php/js/blink.js -text
 frontends/php/js/common.js -text
 frontends/php/js/cookies.js -text
@@ -122,6 +123,8 @@ frontends/php/js/services.js -text
 frontends/php/js/showhint.js -text
 frontends/php/js/tree.js -text
 frontends/php/js/url.js -text
+frontends/php/scripts.php -text
+frontends/php/scripts_exec.php -text
 frontends/php/styles/bar.css -text
 frontends/php/styles/div.css -text
 frontends/php/styles/form.css -text
