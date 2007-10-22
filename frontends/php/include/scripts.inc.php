@@ -40,7 +40,40 @@ return $result;
 }
 
 function execute_script($scriptid,$hostid){
+	$res = array();
+	$res["flag"]=1;
+
+	$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+	if(!$socket)
+	{
+		$res["flag"] = 1;
+	}
+	if($res)
+	{
+		$res = socket_connect($socket, '127.0.0.1', 10051);
+	}
+	if($res)
+	{
+		$send = "Command\255$scriptid\255$hostid\n";
+		socket_write($socket,$send);
+	}
+	if($res)
+	{
+		$res = socket_read($socket,65535);
+	}
+	if($res)
+	{
+		list($flag,$msg)=split("\255",$res);
+		$message["flag"]=$flag;
+		$message["message"]=$msg;
+	}
+	else
+	{
+		$message = socket_strerror(socket_last_error());
+	}
+return $message;
 }
+
 
 function get_accessible_scripts_by_hosts($hosts){
 	global $USER_DETAILS;
