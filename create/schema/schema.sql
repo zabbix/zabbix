@@ -512,6 +512,12 @@ FIELD		|permission	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|id		|t_id		|	|		|ZBX_SYNC
 INDEX		|1		|groupid
 
+TABLE|scripts|scriptid|ZBX_SYNC
+FIELD		|scriptid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|command	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|host_access	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+
 TABLE|screens|screenid|ZBX_SYNC
 FIELD		|screenid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|name		|t_varchar(255)	|'Screen'|NOT NULL	|ZBX_SYNC
