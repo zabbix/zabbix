@@ -85,7 +85,6 @@
 	
 include_once "include/page_header.php";
 echo '<script type="text/javascript" src="js/blink.js"></script>';
-echo '<script type="text/javascript" src="js/items.js"></script>';
 	
 ?>
 <?php
