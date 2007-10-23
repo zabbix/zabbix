@@ -85,7 +85,11 @@ function get_accessible_scripts_by_hosts($hosts){
 	$hosts_read_only  = explode(',',get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,get_current_nodeid()));
 	$hosts_read_write = explode(',',get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,get_current_nodeid()));
 
-	$scripts_by_host = array();
+// initialize array 
+	foreach($hosts as $id => $hostid){
+		$scripts_by_host[$hostid] = array();
+	}
+//-----
 	
 	$sql = 'SELECT * FROM scripts '.
 			' WHERE '.DBin_node('scriptid').
