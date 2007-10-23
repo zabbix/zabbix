@@ -98,7 +98,7 @@ static int	process_record(int nodeid, char *record, int sender_nodetype)
 	}
 
 	r = zbx_get_next_field(r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER);
-	sscanf(buffer, ZBX_FS_UI64,&recid);
+	ZBX_STR2UINT64(recid, buffer);
 
 	r = zbx_get_next_field(r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER);
 	op = atoi(buffer);

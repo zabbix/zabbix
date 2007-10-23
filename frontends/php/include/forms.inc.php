@@ -4789,8 +4789,8 @@ include_once 'include/discovery.inc.php';
 
 		$script_info = DBfetch(DBselect("select name from scripts where scriptid=$scriptid"));
 
-		$frmResult = new CFormTable(S_COMMENTS." ".$script_info["name"]);
-		$frmResult->AddRow(S_COMMENTS,new CTextArea("message",$result["message"],100,25));
+		$frmResult = new CFormTable($script_info["name"].': '.script_make_command($scriptid,$hostid));
+		$frmResult->AddRow(S_RESULT,new CTextArea("message",$result["message"],100,25));
 		$frmResult->AddItemToBottomRow(new CButtonCancel(null,'close_window();'));
 
 		$frmResult->Show();

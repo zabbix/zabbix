@@ -507,7 +507,11 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 				SPACE,
 				$description,
 				$value,
-				SPACE,
+				new CCol(
+					get_severity_description($row["priority"]),
+					get_severity_style($row["priority"])
+					),
+//				SPACE,
 				new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row["lastchange"]),"tr_events.php?triggerid=".$row["triggerid"],"action"),
 				$actions,
 				($config['ack_enable'])?SPACE:NULL,

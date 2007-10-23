@@ -61,7 +61,6 @@ int	node_process_command(const char *data, char **result)
 	char		*tmp = NULL;
 	int		tmp_allocated = 64, result_allocated = 4*1024;
 	int		datalen;
-	zbx_uint64_t	scriptid, hostid;
 	int		nodeid, result_offset = 0;
 
 	zbx_sock_t	sock;
@@ -79,33 +78,17 @@ int	node_process_command(const char *data, char **result)
 	zabbix_log( LOG_LEVEL_DEBUG, "In node_process_command(datalen:%d)", data, datalen);
 
 	r = data;
-	r = zbx_get_next_field(r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER); /* Command */
+	r = zbx_get_next_field(r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER); /* Constant 'Command' */
+	r = zbx_get_next_field(r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER); /* NodeID */
+	nodeid = atoi(tmp);
 	r = zbx_get_next_field(r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER);
-	sscanf(tmp,ZBX_FS_UI64,&scriptid);
-	r = zbx_get_next_field(r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER);
-	sscanf(tmp,ZBX_FS_UI64,&hostid);
+	strscpy(command, tmp);
 
-	zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Received command for host "ZBX_FS_UI64,
+	zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Received command for nodeid "ZBX_FS_UI64,
 					CONFIG_NODEID,
-					hostid);
+					nodeid);
 
-	nodeid = get_nodeid_by_id(hostid);
 	if (nodeid == CONFIG_NODEID) {
-		dbresult = DBselect("select command from scripts where scriptid="ZBX_FS_UI64,
-			scriptid);
-
-		if (NULL == (dbrow = DBfetch(dbresult))) {
-			DBfree_result(dbresult);
-			zbx_snprintf(*result, result_allocated, "1%cNODE %d: Script ["ZBX_FS_UI64"] is unknown",
-				ZBX_DM_DELIMITER,
-				CONFIG_NODEID,
-				scriptid);
-			goto exit;
-		}
-
-		zbx_strlcpy(command, dbrow[0], sizeof(command));
-		DBfree_result(dbresult);
-
 		if(0 == (f = popen(command, "r"))) {
 			zbx_snprintf(*result, result_allocated, "1%cNODE %d: Cannot execute [%s] error:%s",
 				ZBX_DM_DELIMITER,
@@ -125,10 +108,10 @@ int	node_process_command(const char *data, char **result)
 
 		pclose(f);
 	} else {
-		zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Sending command for host "ZBX_FS_UI64
+		zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Sending command for nodeid "ZBX_FS_UI64
 			" to node %d",
 			CONFIG_NODEID,
-			hostid,
+			nodeid,
 			nodeid);
 
 		dbresult = DBselect("select ip, port from nodes where nodeid=%d",
