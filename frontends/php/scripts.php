@@ -51,7 +51,6 @@ include_once "include/page_header.php";
 		'form_refresh'=>		array(T_ZBX_INT, O_OPT,	 NULL,			NULL,		null),
 	);
 	
-
 check_fields($fields);
 
 if(isset($_REQUEST['action'])){
@@ -59,9 +58,8 @@ if(isset($_REQUEST['action'])){
 	if(isset($_REQUEST['save'])){
 
 		$cond = (isset($_REQUEST['scriptid']))?(' AND scriptid<>'.$_REQUEST['scriptid']):('');
-		
 		$scripts = DBfetch(DBselect('SELECT count(scriptid) as cnt FROM scripts WHERE name='.zbx_dbstr($_REQUEST['name']).$cond,1));
-		
+
 		if($scripts && $scripts['cnt']>0){
 			error(S_SCRIPT.SPACE.'['.htmlspecialchars($_REQUEST['name']).']'.SPACE.S_ALREADY_EXISTS_SMALL);	
 			show_messages(null,S_ERROR,S_CANNOT_ADD_SCRIPT);
@@ -121,6 +119,7 @@ if(isset($_REQUEST['action'])){
 if(isset($_REQUEST['form'])){
 
 	$frmScr = new CFormTable(S_SCRIPT,'scripts.php','POST',null,'form');
+	$frmScr->AddOption('id','scripts');
 	
 	if(isset($_REQUEST['scriptid'])) $frmScr->AddVar('scriptid',$_REQUEST['scriptid']);
 	
@@ -147,7 +146,7 @@ if(isset($_REQUEST['form'])){
 		
 	$frmScr->AddRow(S_REQUIRED_HOST.SPACE.S_PERMISSIONS_SMALL,$select_acc);
 
-	$frmScr->AddItemToBottomRow(new CButton('save',S_SAVE,'javascript: document.forms[0].action += \'?action=1\';'));
+	$frmScr->AddItemToBottomRow(new CButton('save',S_SAVE,"javascript: document.getElementById('scripts').action+='?action=1'; "));
 	$frmScr->AddItemToBottomRow(SPACE);
 
 	$frmScr->AddItemToBottomRow(new CButtonCancel());
