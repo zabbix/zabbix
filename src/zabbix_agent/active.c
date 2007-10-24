@@ -391,9 +391,8 @@ static int	process_active_checks(char *server, unsigned short port)
 	unsigned short	severity;
 
 	char	params[MAX_STRING_LEN];
-	char	*filename;
-	char	*pattern;
-	char	*encoding;
+	char	filename[MAX_STRING_LEN];
+	char	pattern[MAX_STRING_LEN];
 
 	AGENT_RESULT	result;
 
@@ -418,19 +417,11 @@ static int	process_active_checks(char *server, unsigned short port)
 				if(num_param(params) > 3)
 					break;
 
-				filename = params;
+			        if(get_param(params, 1, filename, sizeof(filename)) != 0)
+					break;
 
-				if( (pattern = strchr(params, ',')) ) /* TODO: rewrite for get_param */
-				{
-					*pattern = '\0';
-					pattern++;
-				}
-
-				/* Not very nice. Has to be rewritten to use get_param */
-				if (NULL != pattern && NULL != (encoding = strchr(pattern, ','))) {
-					*encoding = '\0';
-					encoding++;
-				}
+			        if(get_param(params, 2, pattern, sizeof(pattern)) != 0)
+					break;
 
 				s_count = 0;
 				p_count = 0;
@@ -496,17 +487,11 @@ static int	process_active_checks(char *server, unsigned short port)
 				if(num_param(params) > 3)
 					break;
 
-				filename = params;
+			        if(get_param(params, 1, filename, sizeof(filename)) != 0)
+					break;
 
-				if (NULL != (pattern = strchr(params, ','))) {
-					*pattern = '\0';
-					pattern++;
-				}
-
-				if (NULL != pattern && NULL != (encoding = strchr(pattern, ','))) {
-					*encoding = '\0';
-					encoding++;
-				}
+			        if(get_param(params, 2, pattern, sizeof(pattern)) != 0)
+					break;
 
 				s_count = 0;
 				p_count = 0;
