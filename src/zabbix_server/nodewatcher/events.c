@@ -28,9 +28,6 @@
 #include "nodesender.h"
 #include "events.h"
 
-#define	ZBX_NODE_MASTER	0
-#define	ZBX_NODE_SLAVE	1
-
 /******************************************************************************
  *                                                                            *
  * Function: process_node                                                     *
@@ -146,7 +143,7 @@ void main_eventsender()
 
 	DBbegin();
 
-	master_nodeid = get_master_node(CONFIG_NODEID);
+	master_nodeid = CONFIG_MASTER_NODEID;
 
 	if(master_nodeid != 0)
 	{

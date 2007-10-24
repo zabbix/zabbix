@@ -20,6 +20,16 @@
 #ifndef ZABBIX_NODECOMMS_H
 #define ZABBIX_NODECOMMS_H
 
-int send_to_node(char *name,int dest_nodeid, int nodeid, char *data);
+#include "comms.h"
+
+#define	ZBX_NODE_MASTER	0
+#define	ZBX_NODE_SLAVE	1
+
+int	send_to_node(char *name,int dest_nodeid, int nodeid, char *data);
+
+int	connect_to_node(int nodeid, zbx_sock_t *sock);
+int	send_data_to_node(int nodeid, zbx_sock_t *sock, const char *data);
+int	recv_data_from_node(int nodeid, zbx_sock_t *sock, char **data);
+void	disconnect_node(zbx_sock_t *sock);
 
 #endif

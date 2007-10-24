@@ -29,6 +29,8 @@
 #include "../functions.h"
 #include "../expression.h"
 
+#include "../nodewatcher/nodecomms.h"
+#include "../nodewatcher/nodewatcher.h"
 #include "nodesync.h"
 #include "nodeevents.h"
 #include "nodehistory.h"
@@ -41,17 +43,17 @@
 static int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 {
 	char	*line,*host;
-	char	*server,*key,*value_string;
+	char	*server,*key,*value_string, *data;
 	char	copy[MAX_STRING_LEN];
 	char	host_dec[MAX_STRING_LEN],key_dec[MAX_STRING_LEN],value_dec[MAX_STRING_LEN];
 	char	lastlogsize[MAX_STRING_LEN];
 	char	timestamp[MAX_STRING_LEN];
 	char	source[MAX_STRING_LEN];
 	char	severity[MAX_STRING_LEN];
-	char	error[MAX_STRING_LEN];
-	char	*result = NULL;
+	int	sender_nodeid, nodeid;
+	char	*result = NULL, *answer;
 
-	int	ret=SUCCEED;
+	int	ret=SUCCEED, res;
 
 	zbx_rtrim(s, " \r\n\0");
 
@@ -93,15 +95,28 @@ static int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 		/* Node data exchange? */
 		if(strncmp(s,"Data",4) == 0)
 		{
+			node_sync_lock(0);
+
 /*			zabbix_log( LOG_LEVEL_WARNING, "Node data received [len:%d]", strlen(s)); */
-			if(node_sync(s) == SUCCEED)
-			{
-				if( zbx_tcp_send_raw(sock,"OK") != SUCCEED)
-				{
-					zabbix_log( LOG_LEVEL_WARNING, "Error sending confirmation to node");
-					zabbix_syslog("Trapper: error sending confirmation to node");
+			res = node_sync(s, &sender_nodeid, &nodeid);
+			if (nodeid == CONFIG_NODEID || FAIL == res)
+				send_data_to_node(sender_nodeid, sock, SUCCEED == res ? "OK" : "FAIL");
+
+			if (nodeid != CONFIG_NODEID && SUCCEED == res) {
+				res = calculate_checksums(nodeid, NULL, 0);
+				if (SUCCEED == res && NULL != (data = get_config_data(nodeid, ZBX_NODE_SLAVE))) {
+					if (SUCCEED == res)
+						res = send_data_to_node(sender_nodeid, sock, data);
+					if (SUCCEED == res)
+						res = recv_data_from_node(sender_nodeid, sock, &answer);
+					if (SUCCEED == res && 0 == strcmp(answer, "OK"))
+						res = update_checksums(nodeid, ZBX_NODE_SLAVE, SUCCEED, NULL, 0, NULL);
+					zbx_free(data);
 				}
 			}
+
+			node_sync_unlock(0);
+
 			return ret;
 		}
 		/* Slave node events? */
