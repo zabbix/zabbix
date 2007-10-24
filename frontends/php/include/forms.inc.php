@@ -4792,7 +4792,12 @@ include_once 'include/discovery.inc.php';
 		$script_info = DBfetch(DBselect("select name from scripts where scriptid=$scriptid"));
 
 		$frmResult = new CFormTable($script_info["name"].': '.script_make_command($scriptid,$hostid));
-		$frmResult->AddRow(S_RESULT,new CTextArea("message",$result["message"],100,25));
+		$message = $result["message"];
+		if($result["flag"] != 0) {
+			error($message);
+			$message = "";
+		}
+		$frmResult->AddRow(S_RESULT,new CTextArea("message",$message,100,25,'yes'));
 		$frmResult->AddItemToBottomRow(new CButtonCancel(null,'close_window();'));
 
 		$frmResult->Show();
