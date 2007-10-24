@@ -39,9 +39,32 @@ function update_script($scriptid,$name,$command,$access){
 return $result;
 }
 
+function script_make_command($scriptid,$hostid)
+{
+	$host_db = DBfetch(DBselect("select dns,useip,ip from hosts where hostid=$hostid"));
+	$script_db = DBfetch(DBselect("select command from scripts where scriptid=$scriptid"));
+	if($host_db && $script_db)
+	{
+		$command = $script_db["command"];
+		$command = str_replace("{HOST.DNS}", $host_db["dns"],$command);
+		$command = str_replace("{IPADDRESS}", $host_db["ip"],$command);
+		$command = ($host_db["useip"]==0)?
+				str_replace("{HOST.CONN}", $host_db["dns"],$command):
+				str_replace("{HOST.CONN}", $host_db["ip"],$command);
+	}
+	else
+	{
+		$command = FALSE;
+	}
+	return $command;
+}
+
 function execute_script($scriptid,$hostid){
 	$res = array();
 	$res["flag"]=1;
+
+	$command = script_make_command($scriptid,$hostid);
+	$nodeid = id2nodeid($hostid);
 
 	$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 	if(!$socket)
@@ -54,7 +77,7 @@ function execute_script($scriptid,$hostid){
 	}
 	if($res)
 	{
-		$send = "Command\255$scriptid\255$hostid\n";
+		$send = "Command\255$nodeid\255$command\n";
 		socket_write($socket,$send);
 	}
 	if($res)
