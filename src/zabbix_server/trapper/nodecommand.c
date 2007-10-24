@@ -39,18 +39,189 @@
 #include "log.h"
 #include "zlog.h"
 
+#define MVAR_HOST_NAME			"{HOSTNAME}"
+#define MVAR_IPADDRESS			"{IPADDRESS}"
+#define MVAR_HOST_CONN			"{HOST.CONN}"
+
+
 /******************************************************************************
  *                                                                            *
- * Function: node_events                                                      *
+ * Function: execute_script                                                   *
  *                                                                            *
- * Purpose: process new events received from a salve node                     *
+ * Purpose: executing command                                                 *
  *                                                                            *
  * Parameters:                                                                *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
  *                FAIL - an error occured                                     *
  *                                                                            *
- * Author: Alexei Vladishev                                                   *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	execute_script(const char *command, char **result, int *result_allocated)
+{
+	int		result_offset = 0;
+	char		buffer[MAX_STRING_LEN];
+	FILE		*f;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In execute_script(command:%s)", command);
+
+	if(0 != (f = popen(command, "r"))) {
+		zbx_snprintf_alloc(result, result_allocated, &result_offset, 8, "%d%c",
+			SUCCEED,
+			ZBX_DM_DELIMITER);
+
+		while (NULL != fgets(buffer, sizeof(buffer)-1, f)) {
+			zbx_snprintf_alloc(result, result_allocated, &result_offset, sizeof(buffer),
+				"%s",
+				buffer);
+		}
+		(*result)[result_offset] = '\0';
+
+		pclose(f);
+	} else {
+		zbx_snprintf_alloc(result, result_allocated, &result_offset, 128,
+			"%d%cNODE %d: Cannot execute [%s] error:%s",
+			FAIL,
+			ZBX_DM_DELIMITER,
+			CONFIG_NODEID,
+			command,
+			strerror(errno));
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: send_script                                                      *
+ *                                                                            *
+ * Purpose: sending command to slave node                                     *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occured                                     *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+void	send_script(int nodeid, const char *data, char **result, int *result_allocated)
+{
+	DB_RESULT	dbresult;
+	DB_ROW		dbrow;
+	int		result_offset = 0;
+	zbx_sock_t	sock;
+	char		*answer;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In send_script(nodeid:%d)", nodeid);
+
+	dbresult = DBselect("select ip,port from nodes where nodeid=%d",
+		nodeid);
+
+	if (NULL != (dbrow = DBfetch(dbresult))) {
+		if (SUCCEED == zbx_tcp_connect(&sock, dbrow[0], atoi(dbrow[1]))) {
+			if (FAIL == zbx_tcp_send(&sock, data)) {
+				zbx_snprintf_alloc(result, result_allocated, &result_offset, 128,
+					"%d%cNODE %d: Error while sending data to Node [%d] error: %s",
+					FAIL,
+					ZBX_DM_DELIMITER,
+					CONFIG_NODEID,
+					nodeid,
+					zbx_tcp_strerror());
+				goto exit_sock;
+			}
+
+			if (SUCCEED == zbx_tcp_recv(&sock, &answer/*, ZBX_TCP_READ_UNTIL_CLOSE*/)) {
+				zbx_snprintf_alloc(result, result_allocated, &result_offset, strlen(answer)+1,
+				"%s",
+				answer);
+			} else {
+				
+				zbx_snprintf_alloc(result, result_allocated, &result_offset, 128,
+					"%d%cNODE %d: Error while receiving answer from Node [%d] error: %s",
+					FAIL,
+					ZBX_DM_DELIMITER,
+					CONFIG_NODEID,
+					nodeid,
+					zbx_tcp_strerror());
+				goto exit_sock;
+			}
+exit_sock:
+			zbx_tcp_close(&sock);
+		} else {
+			zbx_snprintf_alloc(result, result_allocated, &result_offset, 128,
+				"%d%cNODE %d: Unable to connect to Node [%d] error: %s",
+				FAIL,
+				ZBX_DM_DELIMITER,
+				CONFIG_NODEID,
+				nodeid,
+				zbx_tcp_strerror());
+		}
+	} else {
+		zbx_snprintf_alloc(result, result_allocated, &result_offset, 128,
+			"%d%cNODE %d: Node [%d] is unknown",
+			FAIL,
+			ZBX_DM_DELIMITER,
+			CONFIG_NODEID,
+			nodeid);
+	}
+	DBfree_result(dbresult);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_next_point_to_node                                           *
+ *                                                                            *
+ * Purpose: find next point to slave node                                     *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occured                                     *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	get_next_point_to_node(int current_nodeid, int slave_nodeid, int *nodeid)
+{
+	DB_RESULT	dbresult;
+	DB_ROW		dbrow;
+	int		id, res = FAIL;
+
+	dbresult = DBselect("select nodeid from nodes where masterid=%d",
+		current_nodeid);
+
+	while (NULL != (dbrow = DBfetch(dbresult))) {
+		id = atoi(dbrow[0]);
+		if (id == slave_nodeid || SUCCEED == get_next_point_to_node(id, slave_nodeid, NULL)) {
+			if (NULL != nodeid)
+				*nodeid = id;
+			res = SUCCEED;
+			break;
+		}
+	}
+	DBfree_result(dbresult);
+
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: node_process_command                                             *
+ *                                                                            *
+ * Purpose: process command received from a master node or php                *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occured                                     *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -59,110 +230,47 @@ int	node_process_command(const char *data, char **result)
 {
 	const char	*r;
 	char		*tmp = NULL;
-	int		tmp_allocated = 64, result_allocated = 4*1024;
+	int		tmp_allocated = 64, result_allocated = 1024;
 	int		datalen;
-	int		nodeid, result_offset = 0;
-
-	zbx_sock_t	sock;
-	char		ip[MAX_STRING_LEN], command[MAX_STRING_LEN];
-	char		buffer[MAX_STRING_LEN];
-	int		port;
-	DB_RESULT	dbresult;
-	DB_ROW		dbrow;
-	FILE		*f;
+	int		nodeid, next_nodeid;
+	int		result_offset = 0;
 
 	*result = zbx_malloc(*result, result_allocated);
 	tmp = zbx_malloc(tmp, tmp_allocated);
 	datalen = strlen(data);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In node_process_command(datalen:%d)", data, datalen);
+	zabbix_log(LOG_LEVEL_DEBUG, "In node_process_command(datalen:%d)",
+		datalen);
 
 	r = data;
 	r = zbx_get_next_field(r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER); /* Constant 'Command' */
 	r = zbx_get_next_field(r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER); /* NodeID */
 	nodeid = atoi(tmp);
 	r = zbx_get_next_field(r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER);
-	strscpy(command, tmp);
-
-	zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Received command for nodeid "ZBX_FS_UI64,
-					CONFIG_NODEID,
-					nodeid);
 
 	if (nodeid == CONFIG_NODEID) {
-		if(0 == (f = popen(command, "r"))) {
-			zbx_snprintf(*result, result_allocated, "1%cNODE %d: Cannot execute [%s] error:%s",
-				ZBX_DM_DELIMITER,
-				CONFIG_NODEID,
-				command,
-				strerror(errno));
-			goto exit;
-		}
-
-		zbx_snprintf_alloc(result, &result_allocated, &result_offset, sizeof(buffer), "0%c",
-			ZBX_DM_DELIMITER);
-
-		while (NULL != fgets(buffer, sizeof(buffer)-1, f)) {
-			zbx_snprintf_alloc(result, &result_allocated, &result_offset, sizeof(buffer), "%s",
-				buffer);
-		}
-
-		pclose(f);
-	} else {
-		zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Sending command for nodeid "ZBX_FS_UI64
-			" to node %d",
+		zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Received command \"%s\"",
 			CONFIG_NODEID,
+			tmp);
+
+		execute_script(tmp, result, &result_allocated);
+	} else if (SUCCEED == get_next_point_to_node(CONFIG_NODEID, nodeid, &next_nodeid)) {
+		zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Sending command \"%s\" for nodeid %d"
+			"to node %d",
+			CONFIG_NODEID,
+			tmp,
 			nodeid,
+			next_nodeid);
+
+		send_script(next_nodeid, data, result, &result_allocated);
+	} else {
+		zbx_snprintf_alloc(result, &result_allocated, &result_offset, 128,
+			"%d%cNODE %d: Node [%d] is unknown",
+			FAIL,
+			ZBX_DM_DELIMITER,
+			CONFIG_NODEID,
 			nodeid);
-
-		dbresult = DBselect("select ip, port from nodes where nodeid=%d",
-			nodeid);
-
-		if (NULL == (dbrow = DBfetch(dbresult))) {
-			DBfree_result(dbresult);
-			zbx_snprintf(*result, result_allocated, "1%cNODE %d: Node [%d] is unknown",
-				ZBX_DM_DELIMITER,
-				CONFIG_NODEID,
-				nodeid);
-			goto exit;
-		}
-
-		zbx_strlcpy(ip, dbrow[0], sizeof(ip));
-		port = atoi(dbrow[1]);
-
-		DBfree_result(dbresult);
-
-		if (FAIL == zbx_tcp_connect(&sock, ip, port)) {
-			zbx_snprintf(*result, result_allocated, "1%cNODE %d: Unable to connect to Node [%d] error: %s",
-				ZBX_DM_DELIMITER,
-				CONFIG_NODEID,
-				nodeid,
-				zbx_tcp_strerror());
-			goto exit_sock;
-		}
-
-		if (FAIL == zbx_tcp_send(&sock, data)) {
-			zbx_snprintf(*result, result_allocated, "1%cNODE %d: Error while sending data to Node [%d] error: %s",
-				ZBX_DM_DELIMITER,
-				CONFIG_NODEID,
-				nodeid,
-				zbx_tcp_strerror());
-			zbx_tcp_close(&sock);
-			goto exit_sock;
-		}
-
-		if (FAIL == zbx_tcp_recv_ext(&sock, result, ZBX_TCP_READ_UNTIL_CLOSE)) {
-			zbx_snprintf(*result, result_allocated, "1%cNODE %d: Error while receiving answer from Node [%d] error: %s",
-				ZBX_DM_DELIMITER,
-				CONFIG_NODEID,
-				nodeid,
-				zbx_tcp_strerror());
-			zbx_tcp_close(&sock);
-			goto exit_sock;
-		}
-exit_sock:
-		zbx_tcp_close(&sock);
 	}
-exit:
 	zbx_free(tmp);
 
 	return SUCCEED;
