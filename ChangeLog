@@ -18,6 +18,7 @@ Changes for 1.5:
 
 Changes for 1.4.3:
 
+ - [DEV-48] Support of Ping and Traceroute in Status of Triggers screen
  - [DEV-43] support of new macros {ITEM.VALUE}, {ITEM.VALUE1}, etc (Alexei)
  - [ZBX-102] Distributed monitoring: overwriting information (Sasha)
  - [ZBX-30,ZBX-47] better dependencies (Alexei)
