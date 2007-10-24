@@ -1483,6 +1483,8 @@
 		if(isset($_REQUEST["groupid"]))
 
 		$frmItem->AddVar("hostid",$_REQUEST["hostid"]);
+		$frmItem->AddVar('applications_visible',1);
+
 
 		$description	= get_request("description"	,"");
 		$key		= get_request("key"		,"");
