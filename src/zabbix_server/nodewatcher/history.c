@@ -470,7 +470,7 @@ void main_historysender()
 
 	DBbegin();
 
-	master_nodeid = get_master_node(CONFIG_NODEID);
+	master_nodeid = CONFIG_MASTER_NODEID;
 
 	if(master_nodeid)
 	{

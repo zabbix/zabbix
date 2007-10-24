@@ -43,6 +43,8 @@
 
 #include "dbsync.h"
 #include "nodesync.h"
+#include "../nodewatcher/nodewatcher.h"
+#include "../nodewatcher/nodecomms.h"
 
 /******************************************************************************
  *                                                                            *
@@ -81,7 +83,7 @@ static int	process_record(int nodeid, char *record, int sender_nodetype)
 #if defined(HAVE_POSTGRESQL)
 	int		len;
 #endif /* HAVE_POSTGRESQL */
-	int		table_acknowledges = 0, synked_slave, synked_master;
+	int		table_acknowledges = 0;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_record [%s]", record);
 
@@ -252,10 +254,8 @@ static int	process_record(int nodeid, char *record, int sender_nodetype)
 	}
 	DBexecute("%s",tmp);
 
-	synked_slave = sender_nodetype == NODE_SYNC_SLAVE ? SUCCEED : FAIL;
-	synked_master = sender_nodetype == NODE_SYNC_MASTER ? SUCCEED : FAIL;
 	if (FAIL == calculate_checksums(nodeid, tablename, recid) ||
-		FAIL == update_checksums(nodeid, synked_slave, synked_master, tablename, recid, fields) ) {
+		FAIL == update_checksums(nodeid, sender_nodetype, SUCCEED, tablename, recid, fields) ) {
 		res = FAIL;
 		goto out;
 	}
@@ -292,13 +292,11 @@ out:
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	node_sync(char *data)
+int	node_sync(char *data, int *sender_nodeid, int *nodeid)
 {
 	char	*start, *newline, *tmp = NULL;
 	int	tmp_allocated = 128;
 	int	firstline=1;
-	int	nodeid=0;
-	int	sender_nodeid=0;
 	int	sender_nodetype=0;
 	int	datalen;
 	int	res = SUCCEED;
@@ -317,34 +315,32 @@ int	node_sync(char *data)
 			*newline = '\0';
 
 		if (firstline == 1) {
-			/*zabbix_log( LOG_LEVEL_DEBUG, "First line [%s]", start);*/
 			start = zbx_get_next_field(start, &tmp, &tmp_allocated, ZBX_DM_DELIMITER); /* Data */
 			start = zbx_get_next_field(start, &tmp, &tmp_allocated, ZBX_DM_DELIMITER);
-			sender_nodeid=atoi(tmp);
-			sender_nodetype = sender_nodeid == CONFIG_MASTER_NODEID ? NODE_SYNC_MASTER : NODE_SYNC_SLAVE;
+			*sender_nodeid=atoi(tmp);
+			sender_nodetype = *sender_nodeid == CONFIG_MASTER_NODEID ? ZBX_NODE_MASTER : ZBX_NODE_SLAVE;
 			start = zbx_get_next_field(start, &tmp, &tmp_allocated, ZBX_DM_DELIMITER);
-			nodeid=atoi(tmp);
+			*nodeid=atoi(tmp);
 
-			node_sync_lock(nodeid);
+			if (0 != *sender_nodeid && 0 != *nodeid) {
+				zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Received data from %s node %d for node %d datalen %d",
+					CONFIG_NODEID,
+					sender_nodetype == ZBX_NODE_SLAVE ? "slave" : "master",
+					*sender_nodeid,
+					*nodeid,
+					datalen);
 
-			zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Received data from %s node %d for node %d datalen %d",
-				CONFIG_NODEID,
-				sender_nodetype == NODE_SYNC_SLAVE ? "slave" : "master",
-				sender_nodeid,
-				nodeid,
-				datalen);
+/*				DBbegin();*/
 
-/*			DBbegin();*/
+				DBexecute("delete from node_cksum where nodeid=%d and cksumtype=%d",
+					*nodeid,
+					NODE_CKSUM_TYPE_NEW);
 
-			DBexecute("delete from node_cksum where nodeid=%d and cksumtype=%d",
-				nodeid,
-				NODE_CKSUM_TYPE_NEW);
-
-			firstline=0;
-		} else {
-			/*zabbix_log( LOG_LEVEL_DEBUG, "Got line [%s]", start);*/
-			res = process_record(nodeid, start, sender_nodetype);
-		}
+				firstline=0;
+			} else
+				res = FAIL;
+		} else
+			res = process_record(*nodeid, start, sender_nodetype);
 
 		if (newline != NULL) {
 			*newline = '\n';
@@ -353,14 +349,6 @@ int	node_sync(char *data)
 			break;
 	}
 	zbx_free(tmp);
-
-	if (0 == firstline) {
-	/*	DBcommit();*/
-		node_sync_unlock(nodeid);
-	}
-/*	else
-		zabbix_log(LOG_LEVEL_CRIT, "<----- Node %d LOCKED", nodeid);*/
-
 
 	return res;
 }

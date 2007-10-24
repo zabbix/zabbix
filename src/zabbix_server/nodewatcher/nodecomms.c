@@ -117,3 +117,65 @@ int send_to_node(char *name, int dest_nodeid, int nodeid, char *data)
 
 	return ret;
 }
+
+int	connect_to_node(int nodeid, zbx_sock_t *sock)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	unsigned short	port;
+	int		res = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In connect_to_node(nodeid:%d)", nodeid);
+
+	result = DBselect("select ip,port from nodes where nodeid=%d",
+		nodeid);
+
+	if (NULL != (row = DBfetch(result))) {
+		port = (unsigned short)atoi(row[1]);
+
+		if (SUCCEED == zbx_tcp_connect(sock, row[0], port))
+			res = SUCCEED;
+		else
+			zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Unable to connect to Node [%d] error: %s",
+				CONFIG_NODEID,
+				nodeid,
+				zbx_tcp_strerror());
+	} else
+		zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Node [%d] is unknown",
+			CONFIG_NODEID,
+			nodeid);
+	DBfree_result(result);
+
+	return res;
+}
+
+int	send_data_to_node(int nodeid, zbx_sock_t *sock, const char *data)
+{
+	int	res;
+
+	if (FAIL == (res = zbx_tcp_send_ext(sock, data, ZBX_TCP_NEW_PROTOCOL)))
+		zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Error while sending data to Node [%d] error: %s",
+			CONFIG_NODEID,
+			nodeid,
+			zbx_tcp_strerror());
+
+	return res;
+}
+
+int	recv_data_from_node(int nodeid, zbx_sock_t *sock, char **data)
+{
+	int	res;
+
+	if (FAIL == (res = zbx_tcp_recv_ext(sock, data, 0)))
+		zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Error while receiving answer from Node [%d] error: %s",
+			CONFIG_NODEID,
+			nodeid,
+			zbx_tcp_strerror());
+
+	return res;
+}
+
+void	disconnect_node(zbx_sock_t *sock)
+{
+	zbx_tcp_close(sock);
+}

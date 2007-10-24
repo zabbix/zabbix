@@ -416,10 +416,6 @@ typedef enum
 #define	NODE_CKSUM_TYPE_OLD	0
 #define	NODE_CKSUM_TYPE_NEW	1
 
-/* Synced node */
-#define NODE_SYNC_SLAVE		0
-#define NODE_SYNC_MASTER	1
-
 /* Types of operation in config log */
 #define	NODE_CONFIGLOG_OP_UPDATE	0
 #define	NODE_CONFIGLOG_OP_ADD		1
@@ -558,11 +554,6 @@ int	zbx_pg_unescape_bytea(u_char *io);
 #endif
 char    *zbx_get_next_field(const char *line, char **output, int *olen, char separator);
 int	str_in_list(char *list, const char *value, const char delimiter);
-
-void	node_sync_lock(int nodeid);
-void	node_sync_unlock(int nodeid);
-int	calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id);
-int	update_checksums(int nodeid, int synked_slave, int synked_master, const char *tablename, const zbx_uint64_t id, char *fields);
 
 #ifdef HAVE___VA_ARGS__
 #	define zbx_setproctitle(fmt, ...) __zbx_zbx_setproctitle(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)

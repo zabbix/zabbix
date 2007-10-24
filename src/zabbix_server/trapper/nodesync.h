@@ -23,6 +23,6 @@
 
 extern	int	CONFIG_NODEID;
 
-int	node_sync(char *data);
+int	node_sync(char *data, int *sender_nodeid, int *nodeid);
 
 #endif
