@@ -34,6 +34,7 @@
 #include "nodehistory.h"
 #include "trapper.h"
 #include "active.h"
+#include "nodecommand.h"
 
 #include "daemon.h"
 
@@ -47,6 +48,8 @@ static int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 	char	timestamp[MAX_STRING_LEN];
 	char	source[MAX_STRING_LEN];
 	char	severity[MAX_STRING_LEN];
+	char	error[MAX_STRING_LEN];
+	char	*result = NULL;
 
 	int	ret=SUCCEED;
 

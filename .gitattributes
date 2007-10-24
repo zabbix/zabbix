@@ -150,3 +150,5 @@ src/libs/zbxdbcache/dbcache.c -text
 src/zabbix_server/dbsyncer/Makefile.am -text
 src/zabbix_server/dbsyncer/dbsyncer.c -text
 src/zabbix_server/dbsyncer/dbsyncer.h -text
+src/zabbix_server/trapper/nodecommand.c -text
+src/zabbix_server/trapper/nodecommand.h -text
