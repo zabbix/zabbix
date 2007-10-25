@@ -229,7 +229,7 @@
 		if(is_null($effectiveperiod)) 
 			$effectiveperiod = 3600;
 
-		$result=DBselect("select name,hsize,vsize from screens where screenid=$screenid");
+		$result=DBselect('SELECT name,hsize,vsize FROM screens WHERE screenid='.$screenid);
 		$row=DBfetch($result);
 		if(!$row) return new CTableInfo(S_NO_SCREENS_DEFINED);
 
@@ -343,16 +343,15 @@
 					
 					if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
 						$item = new CLink(
-							new CImg("chart6.php?graphid=$resourceid&width=$width&height=$height"."&period=$effectiveperiod".url_param("stime").url_param("from")),
+							new CImg("chart6.php?graphid=$resourceid&width=$width&height=$height"."&period=$effectiveperiod".url_param("stime")),
 							$action
 							);
 					}
 					else {
 						$item = new CLink(
-							new CImg("chart2.php?graphid=$resourceid&width=$width&height=$height"."&period=$effectiveperiod".url_param("stime").url_param("from")),
+							new CImg("chart2.php?graphid=$resourceid&width=$width&height=$height"."&period=$effectiveperiod".url_param("stime")),
 							$action
 							);
-						
 					}
 				}
 				elseif( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_SIMPLE_GRAPH) )
@@ -363,7 +362,7 @@
 
 					$item = new CLink(
 						new CImg("chart.php?itemid=$resourceid&width=$width&height=$height".
-							"&period=$effectiveperiod".url_param("stime").url_param("from")),
+							"&period=$effectiveperiod".url_param("stime")),
 						$action
 						);
 				}

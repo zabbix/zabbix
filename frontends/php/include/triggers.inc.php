@@ -1105,13 +1105,15 @@
 
 			if(strstr($description,"{ITEM.LASTVALUE}"))
 			{
-				$row2=DBfetch(DBselect('select i.lastvalue from items i, triggers t, functions f '.
-					' where i.itemid=f.itemid and f.triggerid=t.triggerid and '.
-					' t.triggerid='.$row["triggerid"]));
+				$row2=DBfetch(DBselect('SELECT i.lastvalue, i.value_type, i.itemid '.
+										' FROM items i, triggers t, functions f '.
+										' WHERE i.itemid=f.itemid '.
+											' AND f.triggerid=t.triggerid '.
+											' AND t.triggerid='.$row['triggerid']));
 
-				if($row2["value_type"]!=ITEM_VALUE_TYPE_LOG)
+				if($row2['value_type']!=ITEM_VALUE_TYPE_LOG)
 				{
-					$description = str_replace("{ITEM.LASTVALUE}", $row2["lastvalue"],$description);
+					$description = str_replace('{ITEM.LASTVALUE}', $row2['lastvalue'],$description);
 				}
 				else
 				{

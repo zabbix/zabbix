@@ -1004,6 +1004,7 @@
 	'S_RIGHTS_OF_RESOURCES'=>		'User rights',
 	'S_NO_RESOURCES_DEFINED'=>		'No resources defined',
 	'S_SIMPLE_GRAPH'=>			'Simple graph',
+	'S_SIMPLE_GRAPH_BIG'=>			'SIMPLE GRAPH',
 	'S_GRAPH_NAME'=>			'Graph name',
 	'S_WIDTH'=>				'Width',
 	'S_HEIGHT'=>				'Height',
@@ -1022,9 +1023,10 @@
 	'S_NEW_SLIDE'=>				'New slide',
 
 //	screenedit.php
-	'S_MAP'=>				'Map',
+	'S_MAP'=>					'Map',
 	'S_AS_PLAIN_TEXT'=>			'As plain text',
 	'S_PLAIN_TEXT'=>			'Plain text',
+	'S_PLAIN_TEXT_BIG'=>		'PLAINT TEXT',
 	'S_COLUMN_SPAN'=>			'Column span',
 	'S_ROW_SPAN'=>				'Row span',
 	'S_SHOW_LINES'=>			'Show lines',
