@@ -30,7 +30,7 @@
 #include "../expression.h"
 
 #include "../nodewatcher/nodecomms.h"
-#include "../nodewatcher/nodewatcher.h"
+#include "../nodewatcher/nodesender.h"
 #include "nodesync.h"
 #include "nodeevents.h"
 #include "nodehistory.h"
@@ -99,10 +99,9 @@ static int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 
 /*			zabbix_log( LOG_LEVEL_WARNING, "Node data received [len:%d]", strlen(s)); */
 			res = node_sync(s, &sender_nodeid, &nodeid);
-			if (nodeid == CONFIG_NODEID || FAIL == res)
-				send_data_to_node(sender_nodeid, sock, SUCCEED == res ? "OK" : "FAIL");
-
-			if (nodeid != CONFIG_NODEID && SUCCEED == res) {
+			if (FAIL == res)
+				send_data_to_node(sender_nodeid, sock, "FAIL");
+			else {
 				res = calculate_checksums(nodeid, NULL, 0);
 				if (SUCCEED == res && NULL != (data = get_config_data(nodeid, ZBX_NODE_SLAVE))) {
 					if (SUCCEED == res)

@@ -22,9 +22,6 @@
 
 #include "comms.h"
 
-#define	ZBX_NODE_MASTER	0
-#define	ZBX_NODE_SLAVE	1
-
 int	send_to_node(char *name,int dest_nodeid, int nodeid, char *data);
 
 int	connect_to_node(int nodeid, zbx_sock_t *sock);
