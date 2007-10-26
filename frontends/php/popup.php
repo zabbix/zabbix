@@ -24,6 +24,7 @@
 	require_once "include/triggers.inc.php";
 	require_once "include/items.inc.php";
 	require_once "include/users.inc.php";
+	require_once "include/nodes.inc.php";
 	require_once "include/js.inc.php";
 
 	$srctbl		= get_request("srctbl",  '');	// source table name
@@ -99,6 +100,10 @@
 			$page["title"] = "S_OVERVIEW_BIG";
 			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
 			break;
+		case 'host_group_scr':
+			$page["title"] = "S_HOST_GROUPS_BIG";
+			$min_user_type = USER_TYPE_ZABBIX_ADMIN;
+			break;
 		case 'nodes':
 			if(ZBX_DISTRIBUTED)
 			{
@@ -115,7 +120,7 @@
 	$page["file"] = "popup.php";
 	
 	define('ZBX_PAGE_NO_MENU', 1);
-	
+
 include_once "include/page_header.php";
 
 	if(isset($error))
@@ -243,7 +248,7 @@ include_once "include/page_header.php";
 	{
 		if(in_array($srctbl,array('hosts','host_group','triggers','logitems','items',
 									'applications','screens','graphs','simple_graph',
-									'sysmaps','plain_text','screens2','overview')))
+									'sysmaps','plain_text','screens2','overview','host_group_scr')))
 		{
 			if(ZBX_DISTRIBUTED)
 			{
@@ -337,6 +342,7 @@ include_once "include/page_header.php";
 			$frmTitle->AddItem(array(SPACE,$btnEmpty));
 		}
 	}
+
 	show_table_header($page["title"], $frmTitle);
 ?>
 <?php
@@ -1111,6 +1117,48 @@ include_once "include/page_header.php";
 			$table->AddRow($name);
 		}
 
+		$table->Show();
+	}
+	else if($srctbl == 'host_group_scr'){
+		$accessible_groups	= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY);
+
+		$table = new CTableInfo(S_NO_GROUPS_DEFINED);
+		$table->SetHeader(array(S_NAME));
+
+		$db_groups = DBselect('SELECT DISTINCT n.name as node_name,g.groupid,g.name,n.nodeid '.
+						' FROM hosts_groups hg, groups g '.
+							' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('g.groupid').
+						' WHERE g.groupid IN ('.$accessible_groups.') '.
+							' AND '.DBin_node('g.groupid',$nodeid).
+						' ORDER BY n.nodeid,g.name');
+		
+		$all = false;
+		
+		while($row = DBfetch($db_groups))
+		{
+			$row['node_name'] = isset($row['node_name'])?'('.$row['node_name'].') ':'';
+			
+			if(!$all){
+				$name = new CLink(bold(S_MINUS_ALL_GROUPS_MINUS),'#','action');
+				$name->SetAction(
+					get_window_opener($dstfrm, $dstfld1, create_id_by_nodeid(0,$nodeid)).
+					get_window_opener($dstfrm, $dstfld2, $row['node_name'].S_MINUS_ALL_GROUPS_MINUS).
+					' return close_window();');
+				
+				$table->AddRow($name);
+				$all = true;
+			}
+
+			$name = new CLink($row['name'],'#','action');			
+			$row['name'] = $row['node_name'].$row['name'];
+			
+			$name->SetAction(
+				get_window_opener($dstfrm, $dstfld1, $row[$srcfld1]).
+				get_window_opener($dstfrm, $dstfld2, $row[$srcfld2]).
+				' return close_window();');
+
+			$table->AddRow($name);
+		}
 		$table->Show();
 	}
 ?>

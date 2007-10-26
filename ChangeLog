@@ -1,5 +1,6 @@
 Changes for 1.5:
 
+ - [DEV-57] added better "hosts info" selection in screens (Artem)
  - [DEV-56] added better item selection in screens (Artem)
  - [DEV-48] added scripts form,scripts list, script call menu (Artem)
  - [DEV-44] more flexible generation of trigger events (Alexei)

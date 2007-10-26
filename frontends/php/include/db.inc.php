@@ -593,4 +593,18 @@ if(isset($DB_TYPE) && $DB_TYPE == "ORACLE") {
 
 		return $ret2;
 	}
+	
+	function create_id_by_nodeid($id,$nodeid=0){
+			
+		global $ZBX_LOCALNODEID;
+		$nodeid = ($nodeid == 0)?get_current_nodeid(false):$nodeid;
+		
+		$id=remove_nodes_from_id($id);
+		$id=bcadd($id,bcadd(bcmul($nodeid,'100000000000000'),bcmul($ZBX_LOCALNODEID,'100000000000')));
+	return $id;
+	}
+	
+	function remove_nodes_from_id($id){
+		return bcmod($id,'100000000000');
+	}
 ?>
