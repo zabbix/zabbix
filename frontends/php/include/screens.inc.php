@@ -386,7 +386,7 @@
 				}
 				elseif( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_HOSTS_INFO) )
 				{
-					$item = array(new CHostsInfo($style));
+					$item = array(new CHostsInfo($resourceid, $style));
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
 				elseif( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_TRIGGERS_INFO) )
