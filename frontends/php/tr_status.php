@@ -221,8 +221,8 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 	if(isset($_REQUEST['fullscreen'])) $r_form->AddVar("fullscreen",1);
 
 	show_table_header(
-		new CLink(SPACE.S_STATUS_OF_TRIGGERS_BIG.SPACE.date("[H:i:s]",time()),'tr_status.php?show_triggers=$show_triggers'.
-			'&show_events=$show_events&noactions=$noactions&compact=$compact&sort=$sort'.
+		new CLink(SPACE.S_STATUS_OF_TRIGGERS_BIG.SPACE.date("[H:i:s]",time()),"tr_status.php?show_triggers=$show_triggers".
+			"&show_events=$show_events&noactions=$noactions&compact=$compact&sort=$sort".
 			(!isset($_REQUEST["fullscreen"]) ? '&fullscreen=1' : '')),
 		$r_form);
 	
