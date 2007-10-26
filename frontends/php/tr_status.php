@@ -297,7 +297,6 @@ include_once "include/page_header.php";
 			$form->AddItem(new CButton("btnSelect", "Select"));
 			$form->AddItem(new CButton("btnSelect", "Inverse select"));
 			$form->AddVar("compact",$compact);
-			$form->AddVar("onlytrue",$onlytrue);
 			$form->AddVar("noactions",$noactions);
 			$form->AddVar("select",$select);
 			array_push($left_col,BR,$form);
