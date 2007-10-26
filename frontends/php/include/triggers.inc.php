@@ -1447,13 +1447,14 @@
 		if(!is_null($priority))		$sql .= " priority=$priority,";
 		if(!is_null($status))		$sql .= " status=$status,";
 		if(!is_null($comments))		$sql .= " comments=".zbx_dbstr($comments).",";
-		if(!is_null($url))		$sql .= " url=".zbx_dbstr($url).",";
+		if(!is_null($url))			$sql .= " url=".zbx_dbstr($url).",";
 		if(!is_null($templateid))	$sql .= " templateid=$templateid,";
 		$sql .= " value=2 where triggerid=$triggerid";
 
 		$result = DBexecute($sql);
 
 		delete_dependencies_by_triggerid($triggerid);
+
 		foreach($deps as $val)
 		{
 			$result=add_trigger_dependency($triggerid, $val);

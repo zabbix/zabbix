@@ -162,7 +162,7 @@
 			global $USER_DETAILS;
 			
 			$data = &$this->data[$name];
-
+			
 			switch($name)
 			{
 				case XML_TAG_HOST:
@@ -364,6 +364,7 @@
 				case XML_TAG_TRIGGER:
 					if(!isset($data['expression']))		$data['expression']	= '';
 					if(!isset($data['description']))	$data['description']	= '';
+					if(!isset($data['type']))			$data['type']	= 0;
 					if(!isset($data['priority']))		$data['priority']	= 0;
 					if(!isset($data['status']))		$data['status']		= 0;
 					if(!isset($data['comments']))		$data['comments']	= '';
@@ -404,6 +405,7 @@
 								$trigger['triggerid'],
 								$data['expression'],
 								$data['description'],
+								$data['type'],
 								$data['priority'],
 								$data['status'],
 								$data['comments'],
