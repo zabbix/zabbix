@@ -1,5 +1,6 @@
 Changes for 1.4.3:
 
+ - [ZBX-107] do not display log related items in the queue (Alexei)
  - [DEV-43] support of new macros {ITEM.VALUE}, {ITEM.VALUE1}, etc (Alexei)
  - [ZBX-30,ZBX-47] better dependencies (Alexei)
  - [ZBX-48] fixed server crash if incorrect syntax of aggregate items is used (Alexei)
