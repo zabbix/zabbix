@@ -66,6 +66,7 @@
 			'attribures'	=> array(),
 			'elements'	=> array(
 				'description'		=> '',
+				'type'				=> '',
 				'expression'		=> '',
 				'url'			=> '',
 				'status'		=> '',
@@ -214,6 +215,7 @@
 			{
 				if(empty($data[$db_name])) continue;
 				if(empty($xml_name)) $xml_name = $db_name;
+				
 				zbx_xmlwriter_write_element ($memory, $xml_name, $data[$db_name]);
 			}
 			zbx_xmlwriter_end_element($memory); // XML_TAG_TRIGGER
