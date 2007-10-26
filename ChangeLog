@@ -1,5 +1,6 @@
 Changes for 1.5:
 
+ - [DEV-48] Support of Ping and Traceroute in Status of Triggers screen
  - [DEV-57] added better "hosts info" selection in screens (Artem)
  - [DEV-56] added better item selection in screens (Artem)
  - [DEV-48] added scripts form,scripts list, script call menu (Artem)
@@ -20,7 +21,7 @@ Changes for 1.5:
 
 Changes for 1.4.3:
 
- - [DEV-48] Support of Ping and Traceroute in Status of Triggers screen
+ - [ZBX-107] do not display log related items in the queue (Alexei)
  - [DEV-43] support of new macros {ITEM.VALUE}, {ITEM.VALUE1}, etc (Alexei)
  - [ZBX-102] Distributed monitoring: overwriting information (Sasha)
  - [ZBX-30,ZBX-47] better dependencies (Alexei)
