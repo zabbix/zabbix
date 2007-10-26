@@ -43,8 +43,7 @@
 
 #include "dbsync.h"
 #include "nodesync.h"
-#include "../nodewatcher/nodewatcher.h"
-#include "../nodewatcher/nodecomms.h"
+#include "../nodewatcher/nodesender.h"
 
 /******************************************************************************
  *                                                                            *
@@ -83,7 +82,6 @@ static int	process_record(int nodeid, char *record, int sender_nodetype)
 #if defined(HAVE_POSTGRESQL)
 	int		len;
 #endif /* HAVE_POSTGRESQL */
-	int		table_acknowledges = 0;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_record [%s]", record);
 
