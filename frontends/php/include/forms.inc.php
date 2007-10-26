@@ -3844,8 +3844,46 @@ include_once 'include/discovery.inc.php';
 			
 			$form->AddRow(S_PARAMETER,array($textfield,SPACE,$selectbtn));
 		}
-		else // SCREEN_RESOURCE_HOSTS_INFO,  SCREEN_RESOURCE_TRIGGERS_INFO,  SCREEN_RESOURCE_CLOCK
-		{
+		else if($resourcetype == SCREEN_RESOURCE_HOSTS_INFO){  
+// HOTS info
+			$caption = '';
+			$id=0;
+			
+			if(remove_nodes_from_id($resourceid) > 0){
+				$result=DBselect('SELECT DISTINCT n.name as node_name,g.groupid,g.name '.
+						' FROM hosts_groups hg, groups g '.
+							' LEFT JOIN nodes n ON n.nodeid='.DBid2nodeid('g.groupid').
+						' WHERE g.groupid in ('.get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY).')'.
+							' AND g.groupid='.$resourceid);
+
+				while($row=DBfetch($result)){					
+					$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
+					$caption = $row['node_name'].$row['name'];
+					$id = $resourceid;
+				}
+			}
+			else if(remove_nodes_from_id($resourceid)==0){
+				$result=DBselect('SELECT DISTINCT n.name as node_name '.
+						' FROM nodes n '.
+						' WHERE n.nodeid='.id2nodeid($resourceid));
+
+				while($row=DBfetch($result)){					
+					$row['node_name'] = isset($row['node_name']) ? '('.$row['node_name'].') ' : '';
+					$caption = $row['node_name'].S_MINUS_ALL_GROUPS_MINUS;
+					$id = $resourceid;
+				}
+			}
+
+			$form->AddVar('resourceid',$id);
+			
+			$textfield = new Ctextbox('caption',$caption,60,'yes');
+			$selectbtn = new Cbutton('select',S_SELECT,"javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=resourceid&dstfld2=caption&srctbl=host_group_scr&srcfld1=groupid&srcfld2=name',480,450);");
+			$selectbtn->AddOption('onmouseover','javascript: this.style.cursor = "pointer";');
+			
+			$form->AddRow(S_GROUP,array($textfield,SPACE,$selectbtn));
+		}
+		else{
+// SCREEN_RESOURCE_TRIGGERS_INFO,  SCREEN_RESOURCE_CLOCK
 			$form->AddVar("resourceid",0);
 		}
 
