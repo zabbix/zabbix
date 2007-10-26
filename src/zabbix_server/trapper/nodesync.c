@@ -43,8 +43,7 @@
 
 #include "dbsync.h"
 #include "nodesync.h"
-#include "../nodewatcher/nodewatcher.h"
-#include "../nodewatcher/nodecomms.h"
+#include "../nodewatcher/nodesender.h"
 
 /******************************************************************************
  *                                                                            *

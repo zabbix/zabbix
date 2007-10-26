@@ -20,8 +20,6 @@
 #ifndef ZABBIX_NODEWATCHER_HISTORY_H
 #define ZABBIX_NODEWATCHER_HISTORY_H
 
-extern  int     CONFIG_NODE_NOHISTORY;
-
 void main_historysender();
 
 #endif

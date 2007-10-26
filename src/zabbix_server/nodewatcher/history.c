@@ -24,9 +24,10 @@
 #include "log.h"
 #include "zlog.h"
 
+#include "history.h"
+#include "nodewatcher.h"
 #include "nodecomms.h"
 #include "nodesender.h"
-#include "history.h"
 
 /******************************************************************************
  *                                                                            *
@@ -51,11 +52,12 @@ static int process_node_history_log(int nodeid, int master_nodeid)
 	DB_RESULT	result;
 	DB_ROW		row;
 	char		sql[MAX_STRING_LEN];
-	int		ids_found = 0, found = 0;
-	int		offset = 0;
+	int		ids_found = 0, found = 0, len;
 	char		*data = NULL, *hex = NULL;
-	int		allocated = 1024*1024, hex_allocated = 1024;
-	zbx_uint64_t	sync_lastid = 0, id, len;
+	int		data_allocated = 1024*1024, data_offset = 0;
+	int		hex_allocated = 1024;
+	zbx_uint64_t	sync_lastid = 0, id;
+	int		start = time(NULL);
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_node_history_log(nodeid:%d, master_nodeid:%d)",
 		nodeid,
@@ -66,7 +68,7 @@ static int process_node_history_log(int nodeid, int master_nodeid)
 		return SUCCEED;
 
 
-	data = zbx_malloc(data, allocated);
+	data = zbx_malloc(data, data_allocated);
 	hex = zbx_malloc(hex, hex_allocated);
 
 	result = DBselect("select nextid from ids where nodeid=%d and table_name='%s' and field_name='%s'",
@@ -74,44 +76,42 @@ static int process_node_history_log(int nodeid, int master_nodeid)
 				ids_table_name,
 				ids_field_name);
 
-	if((row=DBfetch(result)))
-	{
+	if ((row = DBfetch(result))) {
 		ZBX_STR2UINT64(sync_lastid,row[0])
 		ids_found = 1;
 	}
 	DBfree_result(result);
 
-	zbx_snprintf_alloc(&data, &allocated, &offset, 64, "History%c%d%c%d",
+	zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 64, "History%c%d%c%d",
 		ZBX_DM_DELIMITER,
 		CONFIG_NODEID,
 		ZBX_DM_DELIMITER,
 		nodeid);
 
-	zbx_snprintf(sql,sizeof(sql),"select id,itemid,clock,timestamp,source,severity,value,length(value) from history_log where id>"ZBX_FS_UI64" and "ZBX_COND_NODEID" order by id",
+	zbx_snprintf(sql,sizeof(sql),"select id,itemid,clock,timestamp,source,severity,value,length(value) "
+		"from history_log where id>"ZBX_FS_UI64" and "ZBX_COND_NODEID" order by id",
 		sync_lastid,
 		ZBX_NODE("id", nodeid));
 
 	result = DBselectN(sql, 10000);
-	while((row=DBfetch(result)))
-	{
+	while ((row = DBfetch(result))) {
 		ZBX_STR2UINT64(id,row[0])
-		found = 1;
 
 		len = atoi(row[7]);
-		zbx_binary2hex((u_char *)row[6], len, &hex, &hex_allocated);
+		len = zbx_binary2hex((u_char *)row[6], len, &hex, &hex_allocated);
 
-		zbx_snprintf_alloc(&data, &allocated, &offset, len * 2 + 256, "\n%d%c%s%c%s%c%s%c%s%c%s%c%s%c%s",
-				ZBX_TABLE_HISTORY_LOG, ZBX_DM_DELIMITER,
-				row[1], ZBX_DM_DELIMITER,	/* itemid */
-				row[2], ZBX_DM_DELIMITER,	/* clock */
-				row[0], ZBX_DM_DELIMITER,	/* id */
-				row[3], ZBX_DM_DELIMITER,	/* timestamp */
-				row[4], ZBX_DM_DELIMITER,	/* source */
-				row[5], ZBX_DM_DELIMITER,	/* severity */
-				hex);				/* value */
+		zbx_snprintf_alloc(&data, &data_allocated, &data_offset, len + 256, "\n%d%c%s%c%s%c%s%c%s%c%s%c%s%c%s",
+			ZBX_TABLE_HISTORY_LOG, ZBX_DM_DELIMITER,
+			row[1], ZBX_DM_DELIMITER,	/* itemid */
+			row[2], ZBX_DM_DELIMITER,	/* clock */
+			row[0], ZBX_DM_DELIMITER,	/* id */
+			row[3], ZBX_DM_DELIMITER,	/* timestamp */
+			row[4], ZBX_DM_DELIMITER,	/* source */
+			row[5], ZBX_DM_DELIMITER,	/* severity */
+			hex);				/* value */
+		found = 1;
 	}
-	if(found == 1)
-	{
+	if (found == 1) {
 		if(send_to_node("new history_log", master_nodeid, nodeid, data) == SUCCEED)
 		{
 			if(ids_found == 1)
@@ -132,14 +132,14 @@ static int process_node_history_log(int nodeid, int master_nodeid)
 			}
 		}
 		else
-		{
 			zabbix_log( LOG_LEVEL_DEBUG, "process_node_history_log() FAIL");
-		}
 	}
 	DBfree_result(result);
-
 	zbx_free(data);
 	zbx_free(hex);
+
+	zabbix_log( LOG_LEVEL_DEBUG, "Spent %d seconds in process_node_history_log",
+		time(NULL)-start);
 
 	return SUCCEED;
 }
@@ -164,12 +164,12 @@ static int process_node_history_str(int nodeid, int master_nodeid)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		*data = NULL;
+	char		*data = NULL, *hex = NULL;
 	char		sql[MAX_STRING_LEN];
-	int		found = 0;
-	int		offset = 0;
-	int		allocated = 1024*1024;
-
+	int		found = 0, len;
+	int		data_allocated = 1024*1024, data_offset = 0;;
+	int		hex_allocated = 512;
+	int		start = time(NULL);
 	zbx_uint64_t	id;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_node_history_str(nodeid:%d, master_nodeid:%d",
@@ -177,36 +177,35 @@ static int process_node_history_str(int nodeid, int master_nodeid)
 		master_nodeid);
 	/* Begin work */
 
-	data = zbx_malloc(data, allocated);
-	memset(data,0,allocated);
+	data = zbx_malloc(data, data_allocated);
+	hex = zbx_malloc(hex, hex_allocated);
 
-	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "History%c%d%c%d",
+	zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "History%c%d%c%d",
 		ZBX_DM_DELIMITER,
 		CONFIG_NODEID,
 		ZBX_DM_DELIMITER,
 		nodeid);
 
-	zbx_snprintf(sql,sizeof(sql),"select id,itemid,clock,value from history_str_sync where nodeid=%d order by id",
+	zbx_snprintf(sql,sizeof(sql),"select id,itemid,clock,value from history_str_sync "
+		"where nodeid=%d order by id",
 		nodeid);
 
 	result = DBselectN(sql, 10000);
-	while((row=DBfetch(result)))
-	{
+	while ((row = DBfetch(result))) {
 		ZBX_STR2UINT64(id,row[0])
+
+		len = strlen(row[3]);
+		len = zbx_binary2hex((u_char *)row[3], len, &hex, &hex_allocated);
+		zbx_snprintf_alloc(&data, &data_allocated, &data_offset, len + 128, "\n%d%c%s%c%s%c%s",
+				ZBX_TABLE_HISTORY_STR, ZBX_DM_DELIMITER,
+				row[1], ZBX_DM_DELIMITER,
+				row[2], ZBX_DM_DELIMITER,
+				hex);
 		found = 1;
-		zbx_snprintf_alloc(&data, &allocated, &offset, 1024, "\n%d%c%s%c%s%c%s",
-				ZBX_TABLE_HISTORY_STR,
-				ZBX_DM_DELIMITER,
-				row[1],
-				ZBX_DM_DELIMITER,
-				row[2],
-				ZBX_DM_DELIMITER,
-				row[3]);
 	}
-	if(found == 1)
-	{
+	if (found == 1) {
 		/* Do not send history for current node if CONFIG_NODE_NOHISTORY is set */
-		if( ((CONFIG_NODE_NOHISTORY !=0) && (CONFIG_NODEID == nodeid)) ||
+		if (((CONFIG_NODE_NOHISTORY !=0) && (CONFIG_NODEID == nodeid)) ||
 			send_to_node("new history_str", master_nodeid, nodeid, data) == SUCCEED)
 		{
 /*			zabbix_log( LOG_LEVEL_WARNING, "Updating nodes.history_lastid");*/
@@ -218,12 +217,14 @@ static int process_node_history_str(int nodeid, int master_nodeid)
 				id);
 		}
 		else
-		{
 			zabbix_log( LOG_LEVEL_DEBUG, "Not updating nodes.history_str_lastid");
-		}
 	}
 	DBfree_result(result);
 	zbx_free(data);
+	zbx_free(hex);
+
+	zabbix_log( LOG_LEVEL_DEBUG, "Spent %d seconds in process_node_history_str",
+		time(NULL)-start);
 
 	return SUCCEED;
 }
@@ -251,24 +252,17 @@ static int process_node_history_uint(int nodeid, int master_nodeid)
 	char		*data=  NULL;
 	char		sql[MAX_STRING_LEN];
 	int		found = 0;
-	int		offset = 0;
-	int		allocated = 1024*1024;
-
-	int start, end;
-
+	int		data_allocated = 1024*1024, data_offset = 0;
+	int		start = time(NULL);
 	zbx_uint64_t	id;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_node_history_uint(nodeid:%d, master_nodeid:%d)",
 		nodeid,
 		master_nodeid);
 	/* Begin work */
+	data = zbx_malloc(data, data_allocated);
 
-	start = time(NULL);
-
-	data = zbx_malloc(data, allocated);
-	memset(data,0,allocated);
-
-	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "History%c%d%c%d",
+	zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "History%c%d%c%d",
 		ZBX_DM_DELIMITER,
 		CONFIG_NODEID,
 		ZBX_DM_DELIMITER,
@@ -282,7 +276,7 @@ static int process_node_history_uint(int nodeid, int master_nodeid)
 	{
 		ZBX_STR2UINT64(id,row[0])
 		found = 1;
-		zbx_snprintf_alloc(&data, &allocated, &offset, 128, "\n%d%c%s%c%s%c%s",
+		zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "\n%d%c%s%c%s%c%s",
 				ZBX_TABLE_HISTORY_UINT,
 				ZBX_DM_DELIMITER,
 				row[1],
@@ -304,19 +298,14 @@ static int process_node_history_uint(int nodeid, int master_nodeid)
 			DBexecute("delete from history_uint_sync where nodeid=%d and id<=" ZBX_FS_UI64,
 				nodeid,
 				id);
-		}
-		else
-		{
+		} else
 			zabbix_log( LOG_LEVEL_DEBUG, "Not updating nodes.history_uint_lastid");
-		}
 	}
 	DBfree_result(result);
 	zbx_free(data);
 
-	end = time(NULL);
-
 	zabbix_log( LOG_LEVEL_DEBUG, "Spent %d seconds in process_node_history_uint",
-		end-start);
+		time(NULL)-start);
 
 	return SUCCEED;
 }
@@ -344,23 +333,18 @@ static int process_node_history(int nodeid, int master_nodeid)
 	char		*data = NULL;
 	char		sql[MAX_STRING_LEN];
 	int		found = 0;
-	int		offset = 0;
-	int		allocated = 1024*1024;
-
-	int		start, end;
-
+	int		data_allocated = 512*1024, data_offset = 0;
+	int		start = time(NULL);
 	zbx_uint64_t	id;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In process_node_history(nodeid:%d, master_nodeid:%d",
+	zabbix_log(LOG_LEVEL_DEBUG, "In process_node_history(nodeid:%d, master_nodeid:%d",
 		nodeid,
 		master_nodeid);
+
 	/* Begin work */
-	start = time(NULL);
+	data = zbx_malloc(data, data_allocated);
 
-	data = zbx_malloc(data, allocated);
-	memset(data,0,allocated);
-
-	zbx_snprintf_alloc(&data, &allocated, &offset, 128, "History%c%d%c%d",
+	zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "History%c%d%c%d",
 		ZBX_DM_DELIMITER,
 		CONFIG_NODEID,
 		ZBX_DM_DELIMITER,
@@ -370,21 +354,19 @@ static int process_node_history(int nodeid, int master_nodeid)
 		nodeid);
 
 	result = DBselectN(sql, 10000);
-	while((row=DBfetch(result)))
-	{
+	while ((row = DBfetch(result))) {
 		ZBX_STR2UINT64(id,row[0])
 		found = 1;
-		zbx_snprintf_alloc(&data, &allocated, &offset, 128, "\n%d%c%s%c%s%c%s",
-				ZBX_TABLE_HISTORY,
-				ZBX_DM_DELIMITER,
-				row[1],
-				ZBX_DM_DELIMITER,
-				row[2],
-				ZBX_DM_DELIMITER,
-				row[3]);
+		zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "\n%d%c%s%c%s%c%s",
+			ZBX_TABLE_HISTORY,
+			ZBX_DM_DELIMITER,
+			row[1],
+			ZBX_DM_DELIMITER,
+			row[2],
+			ZBX_DM_DELIMITER,
+			row[3]);
 	}
-	if(found == 1)
-	{
+	if (found == 1) {
 		zabbix_log( LOG_LEVEL_DEBUG, "Sending [%s]",
 			data);
 		/* Do not send history for current node if CONFIG_NODE_NOHISTORY is set */
@@ -398,19 +380,14 @@ static int process_node_history(int nodeid, int master_nodeid)
 			DBexecute("delete from history_sync where nodeid=%d and id<=" ZBX_FS_UI64,
 				nodeid,
 				id);
-		}
-		else
-		{
+		} else
 			zabbix_log( LOG_LEVEL_DEBUG, "Not updating nodes.history_lastid");
-		}
 	}
 	DBfree_result(result);
 	zbx_free(data);
 
-	end = time(NULL);
-
 	zabbix_log( LOG_LEVEL_DEBUG, "Spent %d seconds in process_node_history",
-		end-start);
+		time(NULL)-start);
 
 	return SUCCEED;
 }
@@ -462,29 +439,25 @@ void main_historysender()
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	zbx_uint64_t	lastid;
-	int		nodeid;
-	int		master_nodeid;
+	int		master_nodeid, nodeid;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In main_historysender()");
 
 	DBbegin();
 
 	master_nodeid = CONFIG_MASTER_NODEID;
+	if (0 == master_nodeid)
+		return;
 
-	if(master_nodeid)
-	{
-		result = DBselect("select nodeid from nodes where nodeid<>%d", master_nodeid);
+	result = DBselect("select nodeid from nodes");
+	while ((row = DBfetch(result))) {
+		nodeid = atoi(row[0]);
+		if (SUCCEED == is_master_node(CONFIG_NODEID, nodeid))
+			continue;
 
-		while((row = DBfetch(result)))
-		{
-			nodeid=atoi(row[0]);
-			ZBX_STR2UINT64(lastid,row[1])
-
-			process_node(nodeid, master_nodeid);
-		}
-		DBfree_result(result);
+		process_node(nodeid, master_nodeid);
 	}
+	DBfree_result(result);
 
 	DBcommit();
 }

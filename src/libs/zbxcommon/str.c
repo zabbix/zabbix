@@ -1220,7 +1220,7 @@ u_char	zbx_hex2num(char c)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	zbx_binary2hex(const u_char *input, int ilen, char **output, int *olen)
+int	zbx_binary2hex(const u_char *input, int ilen, char **output, int *olen)
 {
 	const u_char	*i = input;
 	char		*o;
@@ -1231,19 +1231,20 @@ void	zbx_binary2hex(const u_char *input, int ilen, char **output, int *olen)
 	assert(*output);
 	assert(olen);
 
-	if(*olen < len)
-	{
+	if (*olen < len) {
 		*olen = len;
 		*output = zbx_realloc(*output, *olen);
 	}
 	o = *output;
 
-	while(i - input < ilen) {
+	while (i - input < ilen) {
 		*o++ = zbx_num2hex( (*i >> 4) & 0xf );
 		*o++ = zbx_num2hex( *i & 0xf );
 		i++;
 	}
 	*o = '\0';
+
+	return len - 1;
 }
 
 /******************************************************************************
