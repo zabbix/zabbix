@@ -2087,22 +2087,6 @@
 		}
 		return $ret;
 	}
-
-	function get_notacknowledged($triggerid,$show_unknown=0,$onlytrue='false'){
-	
-		$cond=(TRIGGER_SHOW_UNDEFINED_ACK)?' OR (e.value=2 AND (('.time().'-e.clock)<'.TRIGGER_FALSE_TIME_ACK.'))':'';
-
-		$cond2=($show_unknown == 0)?(' AND e.value<>2 '):('');
-		$cond2.=($onlytrue=='true')?' AND ((value=1) OR (('.time().' - clock)<'.TRIGGER_BLINK_PERIOD.')) ':'';	
-		
-		$sql = 'SELECT DISTINCT e.eventid, e.value, e.clock, e.objectid as triggerid '.
-				' FROM events e '.
-				' WHERE e.object=0 AND e.objectid='.$triggerid.
-					'  AND (e.acknowledged=0 AND (e.value=1 OR (e.value=0 AND (('.time().'-e.clock)<'.TRIGGER_FALSE_TIME_ACK.'))'.$cond.')) '.$cond2.
-				' ORDER BY e.eventid DESC';
-
-	return DBselect($sql);
-	}
 	
 	function construct_expression($itemid,$expressions){
 		$complite_expr='';
