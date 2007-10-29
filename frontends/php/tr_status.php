@@ -517,21 +517,6 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 				new CLink(($row["comments"] == "") ? S_ADD : S_SHOW,"tr_comments.php?triggerid=".$row["triggerid"],"action")
 				));
 
-		$description = expand_trigger_description($row['triggerid']);
-	
-		if($compact != 'true'){
-			$font = new CTag('font','yes');
-			$font->AddOption('color','#000');
-			$font->AddOption('size','-2');
-			$font->AddItem(explode_exp($row["expression"],1));
-			$description = array($description, $font);
-		}
-
-		$font = new CTag('font','yes');
-		$font->AddOption('color','#808080');
-		$font->AddItem(array('&nbsp;-&nbsp;',$description));
-		$description = $font->ToString();
-		
 		$res_events = DBSelect($event_sql);
 		while($row_event=DBfetch($res_events)){
 
@@ -553,6 +538,23 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 					$ack= new CLink(S_NOT_ACKNOWLEDGED,'acknow.php?eventid='.$row_event['eventid'],'on');
 				}
 			}
+
+			$description = expand_trigger_description_by_data(
+					array_merge($row, array("clock"=>$row_event["clock"])),
+					ZBX_FLAG_EVENT);
+	
+			if($compact != 'true'){
+				$font = new CTag('font','yes');
+				$font->AddOption('color','#000');
+				$font->AddOption('size','-2');
+				$font->AddItem(explode_exp($row["expression"],1));
+				$description = array($description, $font);
+			}
+
+			$font = new CTag('font','yes');
+			$font->AddOption('color','#808080');
+			$font->AddItem(array('&nbsp;-&nbsp;',$description));
+			$description = $font->ToString();
 			
 			$table->AddRow(array(
 					get_node_name_by_elid($row['triggerid']),
