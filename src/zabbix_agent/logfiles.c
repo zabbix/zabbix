@@ -93,9 +93,9 @@ int   process_log(
 				}
 				else
 				{
-					*lastlogsize += (long)strlen(*value);
-				}
-
+					*lastlogsize = ftell(f);
+					zbx_rtrim(*value, "\r\n");
+                		}
 				ret = SUCCEED;
 			}
 			zbx_fclose(f);
