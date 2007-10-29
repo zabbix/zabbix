@@ -472,6 +472,7 @@
 					add_trigger(
 						$data['expression'],
 						$data['description'],
+						$data['type'],
 						$data['priority'],
 						$data['status'],
 						$data['comments'],
