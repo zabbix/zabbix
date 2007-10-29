@@ -246,6 +246,21 @@ function insert_sizeable_graph(url)
 	document.write('<img src="'+url+'" alt="graph">');
 }
 
+function resizeiframe(id){
+	id = id || 'iframe';
+	var iframe = document.getElementById(id);
+	var indoc = (IE)?iframe.contentWindow.document:iframe.contentDocument;
+	if(!isset(indoc)) return;
+	var height = parseInt(indoc.getElementsByTagName('body')[0].scrollHeight);
+	var height2 = parseInt(indoc.getElementsByTagName('body')[0].offsetHeight);
+	
+	if(height2 < height){
+		height = height2;
+	}
+
+	iframe.style.height = (height)+'px';
+}
+
 function openWinCentered(loc, winname, iwidth, iheight, params){
 		tp=Math.ceil((screen.height-iheight)/2);
 		lf=Math.ceil((screen.width-iwidth)/2);

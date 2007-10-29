@@ -196,6 +196,9 @@ include_once "include/page_header.php";
 		else
 		{
 			$element = get_slideshow($elementid, get_request('step', null), $effectiveperiod);
+			zbx_add_post_js('if(isset(parent)) parent.resizeiframe("iframe");
+							else resizeiframe("iframe");
+							');
 		}
 		if($element) $element->Show();
 		
