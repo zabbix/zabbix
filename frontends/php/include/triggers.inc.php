@@ -2276,7 +2276,7 @@
 					' ORDER by e.eventid DESC';
 		$res_events = DBSelect($sql,1);
 		if(!$e_row=DBfetch($res_events)){
-			continue;
+			return false;
 		}
 		else{
 			$row = array_merge($row,$e_row);
@@ -2291,7 +2291,7 @@
 	
 			$res_events = DBSelect($sql,1);
 			if(!$e_row=DBfetch($res_events)){
-				continue;
+				return false;
 			}
 			else{
 				$row = array_merge($row,$e_row);
