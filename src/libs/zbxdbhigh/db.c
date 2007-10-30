@@ -1128,7 +1128,7 @@ int	DBadd_history_text(zbx_uint64_t itemid, char *value, int clock)
 		goto lbl_exit;
 	}
 
-	id = DBget_maxid("history_log", "id");
+	id = DBget_maxid("history_text", "id");
 	zbx_snprintf(sql, sizeof(sql), "insert into history_text (id,clock,itemid,value)"
 		" values (" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ", EMPTY_CLOB()) returning value into :1",
 		id,
@@ -1238,27 +1238,29 @@ int	DBadd_history_log(zbx_uint64_t id, zbx_uint64_t itemid, char *value, int clo
 		zabbix_log(LOG_LEVEL_DEBUG,"Encoding %s", encoding);
 /* Japan specific cchange */
 /*	DBexecute("insert into history_log (id,clock,itemid,timestamp,value,source,severity) values (" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",%d,'%s','%s',%d)",*/
-	DBexecute("insert into history_log (id,clock,itemid,timestamp,value,source,severity) values (" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",%d,cast(_%s'%s' as char character set utf8),'%s',%d)",
-		id,
-		clock,
-		itemid,
-		timestamp,
-		encoding,
-		value_esc,
-		source_esc,
-		severity);
+		DBexecute("insert into history_log (id,clock,itemid,timestamp,value,source,severity) "
+			"values ("ZBX_FS_UI64",%d,"ZBX_FS_UI64",%d,cast(_%s'%s' as char character set utf8),'%s',%d)",
+			id,
+			clock,
+			itemid,
+			timestamp,
+			encoding,
+			value_esc,
+			source_esc,
+			severity);
 	}
 	else
 	{
 		zabbix_log(LOG_LEVEL_DEBUG,"No encoding %s", encoding);
-		DBexecute("insert into history_log (id,clock,itemid,timestamp,value,source,severity) values (" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",%d,'%s','%s',%d)",
-		id,
-		clock,
-		itemid,
-		timestamp,
-		value_esc,
-		source_esc,
-		severity);
+		DBexecute("insert into history_log (id,clock,itemid,timestamp,value,source,severity) "
+			"values ("ZBX_FS_UI64",%d,"ZBX_FS_UI64",%d,'%s','%s',%d)",
+			id,
+			clock,
+			itemid,
+			timestamp,
+			value_esc,
+			source_esc,
+			severity);
 	}
 
 	return SUCCEED;
@@ -1785,12 +1787,12 @@ zbx_uint64_t DBget_maxid(char *table, char *field)
 	if(sync == 1)
 	{
 		min = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)CONFIG_NODEID+(zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)CONFIG_NODEID;
-		max = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)CONFIG_NODEID+(zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)CONFIG_NODEID+(zbx_uint64_t)99999999999;
+		max = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)CONFIG_NODEID+(zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)CONFIG_NODEID+(zbx_uint64_t)__UINT64_C(99999999999);
 	}
 	else
 	{
 		min = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)CONFIG_NODEID;
-		max = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)CONFIG_NODEID+(zbx_uint64_t)99999999999999;
+		max = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)CONFIG_NODEID+(zbx_uint64_t)__UINT64_C(99999999999999);
 	}
 
 	do
