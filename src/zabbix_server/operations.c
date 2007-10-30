@@ -461,7 +461,7 @@ static zbx_uint64_t	add_discovered_host(zbx_uint64_t dhostid)
 	DB_ROW		row2;
 	zbx_uint64_t	hostid = 0;
 	char		*ip;
-	char		host[MAXDNAME], host_esc[MAX_STRING_LEN];
+	char		host[MAX_STRING_LEN], host_esc[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In add_discovered_host(dhostid:" ZBX_FS_UI64 ")",
 		dhostid);
