@@ -668,7 +668,7 @@ ZBX_TEST_TCP_CONNECT expressions[]=
 
 	int		i;
 	zbx_sock_t	s;
-	char		host[MAXDNAME];
+	char		host[MAX_STRING_LEN];
 	char		ip_list[] = "81.171.84.52,nf-in-f103.google.com,127.000.0.1";
 
 	for(i = 0; expressions[i].hostname != NULL; i ++)
