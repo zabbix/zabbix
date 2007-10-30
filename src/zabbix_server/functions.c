@@ -425,20 +425,20 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 		item->value_type,
 		value->type);
 
-	if(value->type & AR_UINT64)
-		zabbix_log( LOG_LEVEL_DEBUG, "In add_history(%d,UINT64:" ZBX_FS_UI64 ")",
+	if (value->type & AR_UINT64)
+		zabbix_log( LOG_LEVEL_DEBUG, "In add_history(itemid:"ZBX_FS_UI64",UINT64:"ZBX_FS_UI64")",
 			item->itemid,
 			value->ui64);
-	if(value->type & AR_STRING)
-		zabbix_log( LOG_LEVEL_DEBUG, "In add_history(%d,STRING:%s)",
+	if (value->type & AR_STRING)
+		zabbix_log( LOG_LEVEL_DEBUG, "In add_history(itemid:"ZBX_FS_UI64",STRING:%s)",
 			item->itemid,
 			value->str);
-	if(value->type & AR_DOUBLE)
-		zabbix_log( LOG_LEVEL_DEBUG, "In add_history(%d,DOUBLE:" ZBX_FS_DBL ")",
+	if (value->type & AR_DOUBLE)
+		zabbix_log( LOG_LEVEL_DEBUG, "In add_history(itemid:"ZBX_FS_UI64",DOUBLE:"ZBX_FS_DBL")",
 			item->itemid,
 			value->dbl);
-	if(value->type & AR_TEXT)
-		zabbix_log( LOG_LEVEL_DEBUG, "In add_history(%d,TEXT:[%s])",
+	if (value->type & AR_TEXT)
+		zabbix_log( LOG_LEVEL_DEBUG, "In add_history(itemid:"ZBX_FS_UI64",TEXT:[%s])",
 			item->itemid,
 			value->text);
 

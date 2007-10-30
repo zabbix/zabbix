@@ -73,17 +73,23 @@ static int	process_record(int nodeid, char *record)
 	memset(&event,0,sizeof(DB_EVENT));
 
 	zbx_get_field(record,tmp,0,ZBX_DM_DELIMITER);
-	sscanf(tmp,ZBX_FS_UI64,&event.eventid);
+	ZBX_STR2UINT64(event.eventid, tmp);
+
 	zbx_get_field(record,tmp,1,ZBX_DM_DELIMITER);
 	event.source=atoi(tmp);
+
 	zbx_get_field(record,tmp,2,ZBX_DM_DELIMITER);
 	event.object=atoi(tmp);
+
 	zbx_get_field(record,tmp,3,ZBX_DM_DELIMITER);
-	sscanf(tmp,ZBX_FS_UI64,&event.objectid);
+	ZBX_STR2UINT64(event.objectid, tmp);
+
 	zbx_get_field(record,tmp,4,ZBX_DM_DELIMITER);
 	event.clock=atoi(tmp);
+
 	zbx_get_field(record,tmp,5,ZBX_DM_DELIMITER);
 	event.value=atoi(tmp);
+
 	zbx_get_field(record,tmp,6,ZBX_DM_DELIMITER);
 	event.acknowledged=atoi(tmp);
 
