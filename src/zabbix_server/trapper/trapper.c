@@ -104,13 +104,12 @@ static int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 			else {
 				res = calculate_checksums(nodeid, NULL, 0);
 				if (SUCCEED == res && NULL != (data = get_config_data(nodeid, ZBX_NODE_SLAVE))) {
-					if (SUCCEED == res)
-						res = send_data_to_node(sender_nodeid, sock, data);
+					res = send_data_to_node(sender_nodeid, sock, data);
+					zbx_free(data);
 					if (SUCCEED == res)
 						res = recv_data_from_node(sender_nodeid, sock, &answer);
 					if (SUCCEED == res && 0 == strcmp(answer, "OK"))
 						res = update_checksums(nodeid, ZBX_NODE_SLAVE, SUCCEED, NULL, 0, NULL);
-					zbx_free(data);
 				}
 			}
 
