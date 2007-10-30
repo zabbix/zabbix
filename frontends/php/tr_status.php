@@ -131,7 +131,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 	}
 ?>                                                                                                             
 <?php
-	$sort			= get_request('sort',		'priority');
+	$sort			= get_request('sort',		'lastchange');
 	$noactions		= get_request('noactions',	'true');
 	$compact	 	= get_request('compact',	'true');
 	$show_triggers	= get_request('show_triggers',	TRIGGERS_OPTION_ONLYTRUE);
@@ -368,11 +368,20 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 
 	switch($sort)
 	{
-		case 'host':		$sort=' order by h.host';	if($_REQUEST['hostid'] <= 0)	break; /* else 'description' */
-		case 'description':	$sort=' order by t.description';				break;
-		case 'priority':	$sort=' order by t.priority desc, t.description';	break;
-		case 'lastchange':	$sort=' order by t.lastchange desc, t.priority';		break;
-		default:			$sort=' order by t.priority desc, t.description';
+		case 'host':		
+			$sort=' order by h.host';
+			if($_REQUEST['hostid'] <= 0)	break; /* else 'description' */
+		case 'description':	
+			$sort=' order by t.description';
+			break;
+		case 'priority':	
+			$sort=' order by t.priority DESC, t.description';
+			break;
+		case 'lastchange':	
+			$sort=' order by t.lastchange DESC, t.priority';
+			break;
+		default:
+			$sort=' order by t.lastchange DESC, t.priority';
 	}
 
 	$cond = ($_REQUEST['hostid'] > 0)?' AND h.hostid='.$_REQUEST['hostid'].' ':'';
