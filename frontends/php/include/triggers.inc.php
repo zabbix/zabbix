@@ -2267,4 +2267,36 @@
 		}
 		return $result;
 	}
+	
+	function get_row_for_nofalseforb($row,$cond){
+		$sql = 'SELECT e.eventid, e.value, e.clock as lastchange, e.clock'.
+				' FROM events e, triggers t '.
+				' WHERE e.object=0 AND e.objectid='.$row['triggerid'].
+					' AND t.triggerid=e.objectid '.$cond.
+					' ORDER by e.eventid DESC';
+		$res_events = DBSelect($sql,1);
+		if(!$e_row=DBfetch($res_events)){
+			continue;
+		}
+		else{
+			$row = array_merge($row,$e_row);
+		}
+
+		if(!event_initial_time($row)){
+			if(!$eventid = first_initial_eventid($row,0)) continue;
+
+			$sql = 'SELECT e.eventid, e.value, e.clock as lastchange'.
+					' FROM events e '.
+					' WHERE e.object=0 AND e.eventid='.$eventid;
+	
+			$res_events = DBSelect($sql,1);
+			if(!$e_row=DBfetch($res_events)){
+				continue;
+			}
+			else{
+				$row = array_merge($row,$e_row);
+			}
+		}
+	return $row;
+	}
 ?>

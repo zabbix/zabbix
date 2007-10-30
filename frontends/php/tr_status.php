@@ -434,22 +434,10 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 					' AND t.triggerid=e.objectid '.$cond.
 				' ORDER BY e.eventid DESC';
 
-		if($show_triggers == TRIGGERS_OPTION_NOFALSEFORB){
-//		if(!$eventid = first_initial_eventid($row,$show_unknown)) continue;
 
-			$sql = 'SELECT e.eventid, e.value, e.clock as lastchange'.
-					' FROM events e, triggers t '.
-					' WHERE e.object=0 AND e.objectid='.$row['triggerid'].
-						' AND t.triggerid=e.objectid '.$cond.
-						' ORDER by e.eventid DESC';
-	
-			$res_events = DBSelect($sql,1);
-			if(!$e_row=DBfetch($res_events)){
-				continue;
-			}
-			else{
-				$row = array_merge($row,$e_row);
-			}
+		if(($show_triggers == TRIGGERS_OPTION_NOFALSEFORB) && ($row['value']!=TRIGGER_VALUE_TRUE)){
+			
+			$row = get_row_for_nofalseforb($row,$cond);
 		}
 
 		$elements=array();
@@ -523,18 +511,12 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 				new CLink(($row["comments"] == "") ? S_ADD : S_SHOW,"tr_comments.php?triggerid=".$row["triggerid"],"action")
 				));
 
-		$prev_event_value = '';
-		
 		$res_events = DBSelect($event_sql);
 		while($row_event=DBfetch($res_events)){
 
-//			if($row['eventid'] == $row_event['eventid']) continue;
-//			if(($show_unknown == 0) && (!event_initial_time($row_event,$show_unknown))) continue;
-			if(($show_events == EVENTS_OPTION_NOFALSEFORB) && 
-				($prev_event_value == $row_event['value']) && 
-				($row_event['value'] == TRIGGER_VALUE_FALSE)
-				)	continue;
-			$prev_event_value = $row_event['value'];
+			if(($show_events == EVENTS_OPTION_NOFALSEFORB) && ($row_event['value'] == TRIGGER_VALUE_FALSE)){
+				if(!event_initial_time($row_event)) continue;
+			}
 			
 			$value = new CSpan(trigger_value2str($row_event['value']), get_trigger_value_style($row_event['value']));	
 
