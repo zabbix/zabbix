@@ -434,7 +434,7 @@ include_once "include/page_header.php";
 
 		if(($show_triggers == TRIGGERS_OPTION_NOFALSEFORB) && ($row['value']!=TRIGGER_VALUE_TRUE)){
 			
-			$row = get_row_for_nofalseforb($row,$cond);
+			if(!$row = get_row_for_nofalseforb($row,$cond)) continue;
 		}
 
 		$elements=array();
