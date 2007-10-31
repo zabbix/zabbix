@@ -26,7 +26,7 @@
 	$page["file"]	= "history.php";
 	$page["title"]	= "S_HISTORY";
 	$page['hist_arg'] = array('hostid','grouid','graphid','period','dec','inc','left','right','stime');
-	$page['scripts'] = array('prototype.js','url.js','gmenu.js','scrollbar.js','sbinit.js');
+	$page['scripts'] = array('prototype.js','url.js','gmenu.js','scrollbar.js','sbox.js','sbinit.js');
 		
 	if(isset($_REQUEST['plaintext']) || isset($_REQUEST['fullscreen']))
 	{
@@ -350,7 +350,7 @@ include_once "include/page_header.php";
 			}
 			else
 			{
-				echo "<PRE>\n";
+				echo "<pre>\n";
 			}
 
 			while($row=DBfetch($result))
@@ -438,7 +438,7 @@ include_once "include/page_header.php";
 			if(!isset($_REQUEST["plaintext"]))
 				$table->ShowEnd();	// to solve memory leak we call 'Show' method by steps
 			else
-				echo "</PRE>";
+				echo "</pre>";
 		}
 		else
 		{
@@ -464,7 +464,7 @@ include_once "include/page_header.php";
 			}
 			else
 			{
-				echo "<PRE>\n";
+				echo "<pre>\n";
 			}
 
 COpt::profiling_start("history");
@@ -524,7 +524,8 @@ COpt::profiling_stop("history");
 			}
 			
  			$script = 	'scrollinit(0,0,0,'.$effectiveperiod.','.$stime.',0,'.$bstime.');
-						showgraphmenu("graph");';
+						showgraphmenu("graph");
+						graph_zoom_init('.$bstime.','.$effectiveperiod.',ZBX_G_WIDTH, 200);';
 							
 			zbx_add_post_js($script); 
 

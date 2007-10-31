@@ -217,7 +217,7 @@ include_once "include/page_header.php";
 			url_param($httptest_data['name'], false,'name').
 			url_param(150, false,'height').
 			url_param($items[HTTPSTEP_ITEM_TYPE_IN], false, 'items').
-			url_param(GRAPH_TYPE_STACKED, false, 'graphtype'),'-100')
+			url_param(GRAPH_TYPE_STACKED, false, 'graphtype'),'-128')
 		, 'center')));
 
 	$form->AddRow(array(bold(S_RESPONSE_TIME) , new CCol(
@@ -225,7 +225,7 @@ include_once "include/page_header.php";
 			url_param($httptest_data['name'], false,'name').
 			url_param(150, false,'height').
 			url_param($items[HTTPSTEP_ITEM_TYPE_TIME], false, 'items').
-			url_param(GRAPH_TYPE_STACKED, false, 'graphtype'),'-100')
+			url_param(GRAPH_TYPE_STACKED, false, 'graphtype'),'-128')
 		,'center')));
 
 	$form->Show();
@@ -244,7 +244,8 @@ include_once "include/page_header.php";
 	}
 	
 	$script = 	'scrollinit(0,0,0,'.$period.','.$stime.',0,'.$bstime.');
-				showgraphmenu("graph");';
+				showgraphmenu("graph");
+				//graph_zoom_init('.$bstime.','.$period.',ZBX_G_WIDTH, 150);';
 					
 	zbx_add_post_js($script); 
 

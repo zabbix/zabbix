@@ -55,9 +55,19 @@ function zbx_add_post_js($script)
 
 
 function	get_js_sizeable_graph($url){
+
 return '
 	<script language="JavaScript" type="text/javascript">
 	<!--
+		var ZBX_GZ_shiftT = 17;
+		var ZBX_GZ_shiftL = 10;
+
+		var ZBX_G_WIDTH;
+		if(window.innerWidth) ZBX_G_WIDTH=window.innerWidth; 
+		else ZBX_G_WIDTH=document.body.clientWidth;
+		
+		ZBX_G_WIDTH-= 80;
+
 		insert_sizeable_graph('.zbx_jsvalue($url).');
 	-->
 	</script>
@@ -73,14 +83,22 @@ function	get_dynamic_chart($img_src,$width=0){
 		var width = "'.((!(is_int($width) && $width > 0)) ? $width : '').'";
 		var img_src = "'.$img_src.'";
 		
+		var ZBX_GZ_shiftT = 17;
+		var ZBX_GZ_shiftL = 10;
+
+		var ZBX_G_WIDTH;
+	
 		if(width!=""){
-			var scr_width = 0;
-			if(document.body.clientWidth)
-				scr_width = document.body.clientWidth;
-			else 
-				scr_width = document.width;
-		
-			width = "&width=" + (scr_width - 100 + parseInt(width));
+			if(window.innerWidth) ZBX_G_WIDTH=window.innerWidth; 
+			else ZBX_G_WIDTH=document.body.clientWidth;
+			
+			ZBX_G_WIDTH-= 80;
+	
+			ZBX_G_WIDTH+= parseInt(width);
+			width = "&width=" + ZBX_G_WIDTH;
+		}
+		else{
+			ZBX_G_WIDTH = '.$width.';
 		}
 		
 		document.write(\'<img alt="chart" src="\'+img_src + width +\'" />\');
