@@ -415,7 +415,7 @@
 			$table->AddRow(array('Database port:',		$this->GetConfig('DB_PORT',	'0')));
 			$table->AddRow(array('Database name:',		$this->GetConfig('DB_DATABASE',	'unknown')));
 			$table->AddRow(array('Database user:',		$this->GetConfig('DB_USER',	'unknown')));
-			$table->AddRow(array('Database password:',	$this->GetConfig('DB_PASSWORD',	'unknown')));
+			$table->AddRow(array('Database password:',	ereg_replace('.','*',$this->GetConfig('DB_PASSWORD',	'unknown'))));
 			/* $table->AddRow(array('Distributed monitoring',	$this->GetConfig('distributed', null) ? 'Enabled' : 'Disabled')); */
 			if($this->GetConfig('distributed', null))
 			{
