@@ -26,7 +26,7 @@
 	$page['title'] = 'S_CUSTOM_GRAPHS';
 	$page['file'] = 'charts.php';
 	$page['hist_arg'] = array('hostid','grouid','graphid','period','dec','inc','left','right','stime');
-	$page['scripts'] = array('prototype.js','url.js','gmenu.js','scrollbar.js','sbinit.js');
+	$page['scripts'] = array('prototype.js','url.js','gmenu.js','scrollbar.js','sbox.js','sbinit.js');
 ?>
 <?php
 	if(isset($_REQUEST['fullscreen']))
@@ -57,7 +57,7 @@ include_once 'include/page_header.php';
 		'stime'=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	NULL,NULL),
 		'action'=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	IN("'go'"),NULL),
 		'reset'=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	IN("'reset'"),NULL),
-		'fullscreen'=>		array(T_ZBX_INT, O_OPT,	P_SYS,		IN("1"),		NULL)
+		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,		IN("1"),		NULL)
 	);
 
 	check_fields($fields);
@@ -246,33 +246,62 @@ include_once 'include/page_header.php';
 
 	if($_REQUEST['graphid'] > 0){
 		$graphtype = GRAPH_TYPE_NORMAL;
+		$yaxis = 0;
 
-		$sql = 'SELECT DISTINCT graphtype FROM graphs WHERE graphid='.$_REQUEST['graphid'];
-		$res = DBselect($sql);
-		
-		while($rows = DBfetch($res)){
-			$graphtype = $rows['graphtype'];
+// ZOOM featers
+		$sql = 'SELECT MAX(g.graphtype) as graphtype, MIN(gi.yaxisside) as yaxissidel, MAX(gi.yaxisside) as yaxissider, MAX(g.height) as height'.
+				' FROM graphs g, graphs_items gi '.
+				' WHERE g.graphid='.$_REQUEST['graphid'].
+					' AND gi.graphid=.g.graphid ';
+
+		$res = Dbselect($sql);
+		while($graph=DBfetch($res)){
+			$graphtype = $graph['graphtype'];
+			$graph_height = $graph['height'];
+			$yaxis = $graph['yaxissider'];
+			$yaxis = ($graph['yaxissidel'] == $yaxis)?($yaxis):(2);
 		}
+		if($yaxis == 2){
+			$shiftXleft = 60;
+			$shiftXright = 60;
+		}
+		else if($yaxis == 0){
+			$shiftXleft = 60;
+			$shiftXright = 20;
+		}
+		else{
+			$shiftXleft = 10;
+			$shiftXright = 60;
+		}
+//-------------
 
 		if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
 			$row = 	"\n".'<script language="javascript" type="text/javascript">
 				<!--
-				if(window.innerWidth) width=window.innerWidth; 
-				else width=document.body.clientWidth;
-				document.write(\'<img id="graph" src="chart6.php?graphid='.$_REQUEST['graphid'].url_param('stime').url_param('from').
-				'&period='.$effectiveperiod.'" /><br /><br />\');
+				var ZBX_G_WIDTH;
+				if(window.innerWidth) ZBX_G_WIDTH=window.innerWidth; 
+				else ZBX_G_WIDTH=document.body.clientWidth;
+				
+				ZBX_G_WIDTH-='.($shiftXleft+$shiftXright+10).';
+				document.write(\'<img id="graph" src="chart6.php?graphid='.$_REQUEST['graphid'].url_param('stime').
+				'&period='.$effectiveperiod.'&width=\'+ZBX_G_WIDTH+\'" /><br /><br />\');
 				-->
-				</script>'."\n";			
+				</script>'."\n";
 		}
 		else{
 			$row = 	"\n".'<script language="javascript" type="text/javascript">
 				<!--
-				if(window.innerWidth) width=window.innerWidth; 
-				else width=document.body.clientWidth;
-				document.write(\'<img id="graph" src="chart2.php?graphid='.$_REQUEST['graphid'].url_param('stime').url_param('from').
-				'&period='.$effectiveperiod.'&width=\'+(width-108)+\'" /><br /><br />\');
+				var ZBX_GZ_shiftT = 17;
+				var ZBX_GZ_shiftL = '.$shiftXleft.';
+				
+				var ZBX_G_WIDTH;
+				if(window.innerWidth) ZBX_G_WIDTH=window.innerWidth; 
+				else ZBX_G_WIDTH=document.body.clientWidth;
+				ZBX_G_WIDTH-='.($shiftXleft+$shiftXright+10).';
+				document.write(\'<img id="graph" src="chart2.php?graphid='.$_REQUEST['graphid'].url_param('stime').
+				'&period='.$effectiveperiod.'&width=\'+ZBX_G_WIDTH+\'" /><br /><br />\');
 				-->
-				</script>'."\n";			
+				</script>'."\n";
 		}
 		
 		$table->AddRow($row);
@@ -281,6 +310,7 @@ include_once 'include/page_header.php';
 
 	if($_REQUEST['graphid'] > 0)
 	{
+// NAV BAR
 		$stime = get_min_itemclock_by_graphid($_REQUEST['graphid']);
 		$bstime = time()-$effectiveperiod;
 		if(isset($_REQUEST['stime'])){
@@ -289,10 +319,13 @@ include_once 'include/page_header.php';
 		}
 		
 		$script = 	'scrollinit(0,0,0,'.$effectiveperiod.','.$stime.',0,'.$bstime.');
-					showgraphmenu("graph");';
+					showgraphmenu("graph");
+					graph_zoom_init('.$bstime.','.$effectiveperiod.',ZBX_G_WIDTH,'.$graph_height.');
+					';
 						
 		zbx_add_post_js($script);
 //		navigation_bar('charts.php',array('groupid','hostid','graphid'));
+//-------------
 	}
 	
 ?>
@@ -301,3 +334,4 @@ include_once 'include/page_header.php';
 include_once 'include/page_footer.php';
 
 ?>
+

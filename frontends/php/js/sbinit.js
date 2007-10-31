@@ -74,13 +74,14 @@ function graphsubmit(){
 
 	scrl.style.display = 'none';
 	var uri = new url(location.href);
-
+	
 	uri.setArgument('stime', SCROLL_BAR.getsTime());
 	uri.setArgument('period', SCROLL_BAR.getPeriod());
 	location.href = uri.getUrl();
 }
 
 function gmenuload(){
+	
 	var date = datetoarray(G_MENU.bstime);
 	
 	var stime = ''+date[2]+date[1]+date[0]+date[3]+date[4];
@@ -89,6 +90,64 @@ function gmenuload(){
 	uri.setArgument('stime', stime);
 	uri.setArgument('period', G_MENU.period);
 	
+	location.href = uri.getUrl();
+}
+
+function graph_zoom_init(stime,period,width,height){
+	sbox_init(stime,period);
+
+	var igraph = $("graph");
+	var posxy = getPosition(igraph);
+	
+	create_box_on_obj(igraph.parentNode);
+	
+	var boxongraph = $("box_on");
+	
+	boxongraph.style.top = (posxy.top+ZBX_GZ_shiftT)+'px';
+	boxongraph.style.left = (posxy.left+ZBX_GZ_shiftL)+'px';
+
+	S_BOX.obj.width = width;
+	S_BOX.obj.height = height;
+
+	boxongraph.style.height = S_BOX.obj.height+'px';
+	boxongraph.style.width = S_BOX.obj.width+'px';
+	
+	posxy = getPosition(boxongraph);	
+	
+	S_BOX.obj.left = parseInt(posxy.left);
+	S_BOX.obj.top = parseInt(posxy.top); 
+	
+	S_BOX.dom_obj = boxongraph;
+	
+	if(OP){
+		boxongraph.addEventListener('mousedown',S_BOX.mousedown.bindAsEventListener(S_BOX),false);
+		boxongraph.onmousemove = S_BOX.mousemove.bind(S_BOX);
+		document.addEventListener('mouseup',S_BOX.mouseup.bindAsEventListener(S_BOX),true);
+	}
+	else if(!IE){
+		boxongraph.addEventListener('mousedown',S_BOX.mousedown.bindAsEventListener(S_BOX),false);
+		boxongraph.onmousemove = S_BOX.mousemove.bind(S_BOX);
+		document.addEventListener('mouseup',S_BOX.mouseup.bindAsEventListener(S_BOX),true);
+	}
+	else{
+		igraph.attachEvent('onmousedown',S_BOX.mousedown.bindAsEventListener(S_BOX));
+		igraph.onmousemove = S_BOX.mousemove.bind(S_BOX);
+		document.attachEvent('onmouseup',S_BOX.mouseup.bindAsEventListener(S_BOX));
+	}
+	
+	S_BOX.sboxload = sboxload;
+}
+
+function sboxload(){
+	var date = datetoarray(parseInt(S_BOX.stime));
+	
+	var stime = ''+date[2]+date[1]+date[0]+date[3]+date[4];
+
+	var uri = new url(location.href);
+
+	uri.setArgument('stime', stime);
+	uri.setArgument('period', S_BOX.period);
+
 	location.href = uri.getUrl();
 }
 

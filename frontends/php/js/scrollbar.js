@@ -63,7 +63,12 @@ function scrollinit(x,y,w,period,stime,timel,bar_stime){
 	$('scroll_right').onclick = SCROLL_BAR.scrollmoveright.bind(SCROLL_BAR);
 
 	$('scroll_bar').onmousedown = SCROLL_BAR.mousedown.bind(SCROLL_BAR);
-	document.onmouseup = SCROLL_BAR.mouseup.bind(SCROLL_BAR);
+	if(IE){
+		document.attachEvent('onmouseup',SCROLL_BAR.mouseup.bindAsEventListener(SCROLL_BAR));
+	}
+	else{
+		document.addEventListener('mouseup',SCROLL_BAR.mouseup.bindAsEventListener(SCROLL_BAR),true);
+	}
 	
 //	cal.onselect = SCROLL_BAR.movebarbydate.bind(SCROLL_BAR);
 }
