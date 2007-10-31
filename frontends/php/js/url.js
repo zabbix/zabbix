@@ -57,8 +57,7 @@ initialize: function(url){
 	this.path=this.file;
 	if(this.query.length>0) this.file+='?'+this.query;
 	if(this.reference.length>0) this.file+='#'+this.reference;
-	
-	this.getArguments();
+	if(this.query.length > 0)	this.getArguments();
 },
 
 getArguments: function(){

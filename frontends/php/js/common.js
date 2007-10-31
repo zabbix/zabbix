@@ -237,18 +237,10 @@ function ScaleChartToParenElement(obj_name)
 	}
 }
 
-function insert_sizeable_graph(url)
-{
-	var width;
+function insert_sizeable_graph(url){
+	if(isset(ZBX_G_WIDTH)) url += "&amp;width="+ZBX_G_WIDTH;
 
-	if(document.body.clientWidth)
-		width = document.body.clientWidth;
-	else if(document.width)
-		width = document.width;
-
-	if(width) url += "&amp;width=" + (width - 108);
-
-	document.write('<img id="graph" src="'+url+'" alt="graph"><br /><br />');
+	document.write('<img id="graph" src="'+url+'" alt="graph" /><br /><br />');
 }
 
 function resizeiframe(id){
@@ -283,7 +275,7 @@ function openWinCentered(loc, winname, iwidth, iheight, params){
 
 function getPosition(obj){
 	var pos = {top: 0, left: 0};
-	if (obj.offsetParent) {
+	if (isset(obj.offsetParent)) {
 		pos.left = obj.offsetLeft;
 		pos.top = obj.offsetTop;
 		while (obj = obj.offsetParent) {
@@ -292,4 +284,19 @@ function getPosition(obj){
 		}
 	}
 return pos;
+}
+
+function cancelEvent(event){
+	event = event || window.event;
+
+//SDI(event);
+	if(IE){
+		event.cancelBubble = true;
+		event.returnValue = false;
+	}
+	else{
+		event.stopPropagation();
+		event.preventDefault();
+	}
+return false;
 }
