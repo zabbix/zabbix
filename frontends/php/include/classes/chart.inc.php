@@ -710,6 +710,8 @@ class Chart extends Graph{
 					' from trends where itemid='.$this->items[$i]['itemid'].' and clock>='.$from_time.
 					' and clock<='.$to_time.' group by itemid,'.$calc_field
 					);
+					
+				$this->items[$i]['delay'] = max(($this->items[$i]['delay']*ZBX_GRAPH_MAX_DELAY),ZBX_MAX_TREND_DIFF)/ZBX_GRAPH_MAX_DELAY + 1;
 			}
 
 			$curr_data = &$this->data[$this->items[$i]["itemid"]][$type];
