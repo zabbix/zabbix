@@ -19,6 +19,7 @@
 **/
 ?>
 <?php
+
 	class CHostsInfo extends CTable
 	{
 		//var $style;

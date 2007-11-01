@@ -16,8 +16,9 @@ div#selection_box{
 	overflow:hidden;
 }
 
-div#box_on{
+div.box_on{
 	position: absolute;
+/*	background-color:#FF0000;*/
 	z-index:2;
 }
 
