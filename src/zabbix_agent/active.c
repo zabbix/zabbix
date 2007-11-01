@@ -411,26 +411,25 @@ static int	process_active_checks(char *server, unsigned short port)
 		if(strncmp(active_metrics[i].key,"log[",4) == 0)
 		{
 			do{ /* simple try realization */
-				if(parse_command(active_metrics[i].key, NULL, 0, params, MAX_STRING_LEN) != 2)
+				if (parse_command(active_metrics[i].key, NULL, 0, params, MAX_STRING_LEN) != 2)
 					break;
 				
-				if(num_param(params) > 3)
+				if (num_param(params) > 3)
 					break;
 
-			        if(get_param(params, 1, filename, sizeof(filename)) != 0)
+				if (get_param(params, 1, filename, sizeof(filename)) != 0)
 					break;
 
-			        if(get_param(params, 2, pattern, sizeof(pattern)) != 0)
-					break;
+				if (get_param(params, 2, pattern, sizeof(pattern)) != 0)
+					*pattern = '\0';
 
 				s_count = 0;
 				p_count = 0;
-				while( SUCCEED == (ret = process_log(filename, &active_metrics[i].lastlogsize, &value)) )
-				{
-					if( !value ) /* EOF */	break;
+				while (SUCCEED == (ret = process_log(filename, &active_metrics[i].lastlogsize, &value))) {
+					if (!value) /* EOF */
+						break;
 
-					if( !pattern || NULL != zbx_regexp_match(value, pattern, NULL) )
-					{
+					if ('\0' == *pattern || NULL != zbx_regexp_match(value, pattern, NULL)) {
 						send_err = send_value(
 									server,
 									port,
@@ -481,24 +480,24 @@ static int	process_active_checks(char *server, unsigned short port)
 		else if(strncmp(active_metrics[i].key,"eventlog[",9) == 0)
 		{
 			do{ /* simple try realization */
-				if(parse_command(active_metrics[i].key, NULL, 0, params, MAX_STRING_LEN) != 2)
+				if (parse_command(active_metrics[i].key, NULL, 0, params, MAX_STRING_LEN) != 2)
 					break;
 				
-				if(num_param(params) > 3)
+				if (num_param(params) > 3)
 					break;
 
-			        if(get_param(params, 1, filename, sizeof(filename)) != 0)
+				if (get_param(params, 1, filename, sizeof(filename)) != 0)
 					break;
 
-			        if(get_param(params, 2, pattern, sizeof(pattern)) != 0)
-					break;
+				if (get_param(params, 2, pattern, sizeof(pattern)) != 0)
+					*pattern = '\0';
 
 				s_count = 0;
 				p_count = 0;
 				while (SUCCEED == (ret = process_eventlog(filename, &active_metrics[i].lastlogsize,
 					&timestamp, &source, &severity, &value)))
 				{
-					if (value && (!pattern || NULL != zbx_regexp_match(value, pattern, NULL))) {
+					if (value && ('\0' == *pattern || NULL != zbx_regexp_match(value, pattern, NULL))) {
 						send_err = send_value(
 									server,
 									port,
