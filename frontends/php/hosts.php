@@ -381,11 +381,11 @@ include_once "include/page_header.php";
 			if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))
 				access_deny();
 
-			$groupid = add_host_group($_REQUEST["gname"], $hosts);
+			$groupid	= add_host_group($_REQUEST["gname"], $hosts);
 			$action 	= AUDIT_ACTION_ADD;
 			$msg_ok		= S_GROUP_ADDED;
 			$msg_fail	= S_CANNOT_ADD_GROUP;
-			$result = $groupid;
+			$result		= $groupid;
 		}
 		show_messages($result, $msg_ok, $msg_fail);
 		if($result){
@@ -712,7 +712,7 @@ include_once "include/page_header.php";
 
 				$db_groups = DBselect('select g.groupid, g.name from groups g left join hosts_groups hg '.
 						' on g.groupid=hg.groupid and hg.hostid='.$row['hostid'].
-						' where hostid is NULL order by g.name,g.groupid');
+						' where '.DBin_node('g.groupid').' AND hg.hostid is NULL order by g.name,g.groupid');
 				while($group_data = DBfetch($db_groups))
 				{
 					$add_to[] = array($group_data['name'], '?'.

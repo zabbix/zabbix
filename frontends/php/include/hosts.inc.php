@@ -67,9 +67,9 @@ require_once "include/items.inc.php";
 		}
 	
 		if($groupid==null)
-			$result = DBselect("select * from groups where name=".zbx_dbstr($name));
+			$result = DBselect("select * from groups where ".DBin_node('groupid')." AND name=".zbx_dbstr($name));
 		else
-			$result = DBselect("select * from groups where name=".zbx_dbstr($name).
+			$result = DBselect("select * from groups where ".DBin_node('groupid')." AND name=".zbx_dbstr($name).
 				" and groupid<>$groupid");
 		
 		if(DBfetch($result))
