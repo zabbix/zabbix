@@ -54,13 +54,14 @@ function zbx_add_post_js($script)
 }
 
 
-function	get_js_sizeable_graph($url){
+function	get_js_sizeable_graph($dom_graph_id,$url){
 
 return '
 	<script language="JavaScript" type="text/javascript">
 	<!--
-		var ZBX_GZ_shiftT = 17;
-		var ZBX_GZ_shiftL = 10;
+		A_SBOX["'.$dom_graph_id.'"] = new Object;
+		A_SBOX["'.$dom_graph_id.'"].shiftT = 17;
+		A_SBOX["'.$dom_graph_id.'"].shiftL = 10;
 
 		var ZBX_G_WIDTH;
 		if(window.innerWidth) ZBX_G_WIDTH=window.innerWidth; 
@@ -68,14 +69,14 @@ return '
 		
 		ZBX_G_WIDTH-= 80;
 
-		insert_sizeable_graph('.zbx_jsvalue($url).');
+		insert_sizeable_graph('.zbx_jsvalue($dom_graph_id).','.zbx_jsvalue($url).');
 	-->
 	</script>
 	';
 }
 
 
-function	get_dynamic_chart($img_src,$width=0){
+function	get_dynamic_chart($dom_graph_id,$img_src,$width=0){
 	if(is_int($width) && $width > 0) $img_src.= url_param($width, false, 'width');
 	$result = '
 		<script language="JavaScript" type="text/javascript">
@@ -83,8 +84,9 @@ function	get_dynamic_chart($img_src,$width=0){
 		var width = "'.((!(is_int($width) && $width > 0)) ? $width : '').'";
 		var img_src = "'.$img_src.'";
 		
-		var ZBX_GZ_shiftT = 17;
-		var ZBX_GZ_shiftL = 10;
+		A_SBOX["'.$dom_graph_id.'"] = new Object;
+		A_SBOX["'.$dom_graph_id.'"].shiftT = 17;
+		A_SBOX["'.$dom_graph_id.'"].shiftL = 10;
 
 		var ZBX_G_WIDTH;
 	
@@ -101,7 +103,7 @@ function	get_dynamic_chart($img_src,$width=0){
 			ZBX_G_WIDTH = '.$width.';
 		}
 		
-		document.write(\'<img alt="chart" src="\'+img_src + width +\'" />\');
+		document.write(\'<img src="\'+img_src + width +\'" alt="chart" id="'.$dom_graph_id.'" />\');
 		-->
 		</script>';
 return $result;
@@ -185,5 +187,9 @@ function insert_js_function($fnct_name){
 		default:
 			break;
 	}
+}
+
+function insert_js($script){
+print('<script type="text/javascript">'."\n".$script."\n".'</script>');
 }
 ?>

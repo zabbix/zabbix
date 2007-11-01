@@ -20,21 +20,26 @@
 */
 <!--
 
-var S_BOX;		//selection box obj reference
+var A_SBOX = new Array();		//selection box obj reference
 
 function sbox_init(stime, period){
+	
 	period = period || 3600;
+	if(period < 3600) period = 3600;
 	
 	var dt = new Date;
-	stime = stime || (parseInt(dt.getTime()/1000 - (period*3)));
+	stime = stime || (parseInt(dt.getTime()/1000 - period));
 
-	S_BOX = new sbox(parseInt(stime),parseInt(period));
+	var s_box = new sbox(parseInt(stime),parseInt(period));
+return s_box;
 }
 
 
 var sbox = Class.create();
 
 sbox.prototype = {
+sbox_id:			'',				// id to create references in array to self
+
 mouse_event:		'',				// json object wheres defined needed event params
 start_event:		'',				// copy of mouse_event when box created
 
@@ -51,6 +56,9 @@ px2time:			'',				// seconds in 1px
 
 
 initialize: function(stime, period){
+	
+	this.sbox_id = A_SBOX.length || 0;
+	
 	this.mouse_event = new Object;
 	this.start_event = new Object;
 	this.obj = new Object;
@@ -78,6 +86,7 @@ sboxload: function(){			// bind any func to this
 mousedown: function(e){
 	e = e || window.event;
 	cancelEvent(e);
+
 	if(this.mouse_event.mousedown == false){
 		
 		this.optimize_event(e);
@@ -141,11 +150,11 @@ create_box: function(){
 		this.box.height = height;
 	
 		if(!IE){
-			this.dom_box.addEventListener('mousemove',S_BOX.mousemove.bindAsEventListener(S_BOX),true);
+			this.dom_box.addEventListener('mousemove',A_SBOX[this.sbox_id].sbox.mousemove.bindAsEventListener(A_SBOX[this.sbox_id].sbox),true);
 		}
 		else{
 //			this.dom_box.attachEvent('onmousemove',S_BOX.mousemove.bindAsEventListener(S_BOX));
-			this.dom_box.onmousemove = S_BOX.mousemove.bind(S_BOX);
+			this.dom_box.onmousemove = A_SBOX[this.sbox_id].sbox.mousemove.bind(A_SBOX[this.sbox_id].sbox);
 		}
 	
 		this.start_event.top = this.mouse_event.top;
@@ -265,5 +274,8 @@ function create_box_on_obj(obj_ref){
 	var div = document.createElement('div');
 	obj_ref.appendChild(div);
 	
-	div.setAttribute('id','box_on');
+	div = $(div);
+	div.addClassName('box_on');
+	
+return div;
 }

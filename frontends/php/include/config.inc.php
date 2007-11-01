@@ -1079,7 +1079,7 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 		$till=date(S_DATE_FORMAT_YMDHMS,time(NULL)-$from*3600);   
 		show_table_header("TILL $till (".($period/3600)." HOURs)");
 
-		$td = new CCol(get_js_sizeable_graph('chart.php?itemid='.$itemid.
+		$td = new CCol(get_js_sizeable_graph('graph','chart.php?itemid='.$itemid.
 				url_param($from,false,'from').
 				url_param($stime,false,'stime').
 				url_param($period,false,'period')));

@@ -331,27 +331,67 @@
 					if($editmode == 0)
 						$action = "charts.php?graphid=$resourceid".url_param("period").
                                                         url_param("inc").url_param("dec");
-
+														
+					$graphid = null;						
 					$graphtype = GRAPH_TYPE_NORMAL;
-			
-					$sql = 'SELECT DISTINCT graphtype FROM graphs WHERE graphid='.$resourceid;
-					$res = DBselect($sql);
+					$yaxis = 0;
 					
-					while($rows = DBfetch($res)){
-						$graphtype = $rows['graphtype'];
+// GRAPH & ZOOM featers
+					$sql = 'SELECT MAX(g.graphid) as graphid, MAX(g.graphtype) as graphtype, MIN(gi.yaxisside) as yaxissidel, MAX(gi.yaxisside) as yaxissider'.
+							' FROM graphs g, graphs_items gi '.
+							' WHERE g.graphid='.$resourceid.
+								' AND gi.graphid=.g.graphid ';
+			
+					$res = Dbselect($sql);
+					while($graph=DBfetch($res)){
+						$graphid = $graph['graphid'];
+						$graphtype = $graph['graphtype'];
+						$yaxis = $graph['yaxissider'];
+						$yaxis = ($graph['yaxissidel'] == $yaxis)?($yaxis):(2);
 					}
+					if($yaxis == 2){
+						$shiftXleft = 60;
+						$shiftXright = 60;
+					}
+					else if($yaxis == 0){
+						$shiftXleft = 60;
+						$shiftXright = 20;
+					}
+					else{
+						$shiftXleft = 10;
+						$shiftXright = 60;
+					}
+//-------------
 					
 					if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
+					
 						$item = new CLink(
 							new CImg("chart6.php?graphid=$resourceid&width=$width&height=$height"."&period=$effectiveperiod".url_param("stime")),
 							$action
 							);
 					}
 					else {
-						$item = new CLink(
-							new CImg("chart2.php?graphid=$resourceid&width=$width&height=$height"."&period=$effectiveperiod".url_param("stime")),
-							$action
-							);
+					
+						$dom_graph_id = 'graph_'.$screenitemid.'_'.$resourceid;
+						$g_img = new CImg("chart2.php?graphid=$resourceid&width=$width&height=$height"."&period=$effectiveperiod".url_param("stime"));
+						$g_img->AddOPtion('id',$dom_graph_id);
+
+						$item = new CLink($g_img,$action);
+						if(!is_null($graphid)){
+							insert_js('	A_SBOX["'.$dom_graph_id.'"] = new Object;'.
+										'A_SBOX["'.$dom_graph_id.'"].shiftT = 17;'.
+										'A_SBOX["'.$dom_graph_id.'"].shiftL = '.$shiftXleft.';'
+									);
+									
+							if(isset($_REQUEST['stime'])){
+								$stime = $_REQUEST['stime'];
+								$stime = mktime(substr($stime,8,2),substr($stime,10,2),0,substr($stime,4,2),substr($stime,6,2),substr($stime,0,4));
+							}
+							else{
+								$stime = 'null';
+							}
+							zbx_add_post_js('graph_zoom_init("'.$dom_graph_id.'",'.$stime.','.$effectiveperiod.','.$width.','.$height.');');
+						}
 					}
 				}
 				elseif( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_SIMPLE_GRAPH) )

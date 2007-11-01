@@ -93,61 +93,70 @@ function gmenuload(){
 	location.href = uri.getUrl();
 }
 
-function graph_zoom_init(stime,period,width,height){
-	sbox_init(stime,period);
+function graph_zoom_init(graph_id,stime,period,width,height){
+	if(!isset(graph_id) || empty(graph_id)) return;
+	
+	A_SBOX[graph_id].sbox = sbox_init(stime,period);
+	A_SBOX[graph_id].sbox.sbox_id = graph_id;
 
-	var igraph = $("graph");
+	var igraph = $(graph_id);
 	var posxy = getPosition(igraph);
 	
-	create_box_on_obj(igraph.parentNode);
+	var boxongraph = create_box_on_obj(igraph.parentNode);
 	
-	var boxongraph = $("box_on");
+	boxongraph.style.top = (posxy.top+A_SBOX[graph_id].shiftT)+'px';
+	boxongraph.style.left = (posxy.left+A_SBOX[graph_id].shiftL)+'px';
 	
-	boxongraph.style.top = (posxy.top+ZBX_GZ_shiftT)+'px';
-	boxongraph.style.left = (posxy.left+ZBX_GZ_shiftL)+'px';
+	width = width || 900;
+	height = height || 200;
+	
+	if(empty(width)) width = 900;
+	if(empty(height)) height = 900;
+	
+	A_SBOX[graph_id].sbox.obj.width = width;
+	A_SBOX[graph_id].sbox.obj.height = height;
 
-	S_BOX.obj.width = width;
-	S_BOX.obj.height = height;
-
-	boxongraph.style.height = S_BOX.obj.height+'px';
-	boxongraph.style.width = S_BOX.obj.width+'px';
+	boxongraph.style.height = A_SBOX[graph_id].sbox.obj.height+'px';
+	boxongraph.style.width = A_SBOX[graph_id].sbox.obj.width+'px';
 	
 	posxy = getPosition(boxongraph);	
 	
-	S_BOX.obj.left = parseInt(posxy.left);
-	S_BOX.obj.top = parseInt(posxy.top); 
+	A_SBOX[graph_id].sbox.obj.left = parseInt(posxy.left);
+	A_SBOX[graph_id].sbox.obj.top = parseInt(posxy.top); 
 	
-	S_BOX.dom_obj = boxongraph;
-	
+	A_SBOX[graph_id].sbox.dom_obj = boxongraph;
+
 	if(OP){
-		boxongraph.addEventListener('mousedown',S_BOX.mousedown.bindAsEventListener(S_BOX),false);
-		boxongraph.onmousemove = S_BOX.mousemove.bind(S_BOX);
-		document.addEventListener('mouseup',S_BOX.mouseup.bindAsEventListener(S_BOX),true);
+		boxongraph.addEventListener('mousedown',A_SBOX[graph_id].sbox.mousedown.bindAsEventListener(A_SBOX[graph_id].sbox),false);
+		boxongraph.onmousemove = A_SBOX[graph_id].sbox.mousemove.bind(A_SBOX[graph_id].sbox);
+		document.addEventListener('mouseup',A_SBOX[graph_id].sbox.mouseup.bindAsEventListener(A_SBOX[graph_id].sbox),true);
 	}
 	else if(!IE){
-		boxongraph.addEventListener('mousedown',S_BOX.mousedown.bindAsEventListener(S_BOX),false);
-		boxongraph.onmousemove = S_BOX.mousemove.bind(S_BOX);
-		document.addEventListener('mouseup',S_BOX.mouseup.bindAsEventListener(S_BOX),true);
+		boxongraph.addEventListener('mousedown',A_SBOX[graph_id].sbox.mousedown.bindAsEventListener(A_SBOX[graph_id].sbox),false);
+		boxongraph.onmousemove = A_SBOX[graph_id].sbox.mousemove.bind(A_SBOX[graph_id].sbox);
+		document.addEventListener('mouseup',A_SBOX[graph_id].sbox.mouseup.bindAsEventListener(A_SBOX[graph_id].sbox),true);
 	}
 	else{
-		igraph.attachEvent('onmousedown',S_BOX.mousedown.bindAsEventListener(S_BOX));
-		igraph.onmousemove = S_BOX.mousemove.bind(S_BOX);
-		document.attachEvent('onmouseup',S_BOX.mouseup.bindAsEventListener(S_BOX));
+//		boxongraph.attachEvent('onmousedown',A_SBOX[graph_id].sbox.mousedown.bindAsEventListener(A_SBOX[graph_id].sbox));
+		igraph.attachEvent('onmousedown',A_SBOX[graph_id].sbox.mousedown.bindAsEventListener(A_SBOX[graph_id].sbox));
+//		boxongraph.attachEvent('onmousemove',A_SBOX[graph_id].sbox.mousemove.bindAsEventListener(A_SBOX[graph_id].sbox));
+		igraph.onmousemove = A_SBOX[graph_id].sbox.mousemove.bind(A_SBOX[graph_id].sbox);
+		document.attachEvent('onmouseup',A_SBOX[graph_id].sbox.mouseup.bindAsEventListener(A_SBOX[graph_id].sbox));
 	}
 	
-	S_BOX.sboxload = sboxload;
+	A_SBOX[graph_id].sbox.sboxload = sboxload;
 }
 
 function sboxload(){
-	var date = datetoarray(parseInt(S_BOX.stime));
-	
+	var date = datetoarray(parseInt(this.stime));	// this becomes related to the object who ones that function!!
+//SDI(this.sbox_id);
 	var stime = ''+date[2]+date[1]+date[0]+date[3]+date[4];
 
 	var uri = new url(location.href);
-
+	
 	uri.setArgument('stime', stime);
-	uri.setArgument('period', S_BOX.period);
-
+	uri.setArgument('period', this.period);
+	
 	location.href = uri.getUrl();
 }
 

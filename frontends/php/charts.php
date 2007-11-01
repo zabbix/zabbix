@@ -275,6 +275,8 @@ include_once 'include/page_header.php';
 		}
 //-------------
 
+		$dom_graph_id = 'graph';
+		
 		if(($graphtype == GRAPH_TYPE_PIE) || ($graphtype == GRAPH_TYPE_EXPLODED)){
 			$row = 	"\n".'<script language="javascript" type="text/javascript">
 				<!--
@@ -283,7 +285,7 @@ include_once 'include/page_header.php';
 				else ZBX_G_WIDTH=document.body.clientWidth;
 				
 				ZBX_G_WIDTH-='.($shiftXleft+$shiftXright+10).';
-				document.write(\'<img id="graph" src="chart6.php?graphid='.$_REQUEST['graphid'].url_param('stime').
+				document.write(\'<img id="'.$dom_graph_id.'" src="chart6.php?graphid='.$_REQUEST['graphid'].url_param('stime').
 				'&period='.$effectiveperiod.'&width=\'+ZBX_G_WIDTH+\'" /><br /><br />\');
 				-->
 				</script>'."\n";
@@ -291,14 +293,15 @@ include_once 'include/page_header.php';
 		else{
 			$row = 	"\n".'<script language="javascript" type="text/javascript">
 				<!--
-				var ZBX_GZ_shiftT = 17;
-				var ZBX_GZ_shiftL = '.$shiftXleft.';
+				A_SBOX["'.$dom_graph_id.'"] = new Object;
+				A_SBOX["'.$dom_graph_id.'"].shiftT = 17;
+				A_SBOX["'.$dom_graph_id.'"].shiftL = '.$shiftXleft.';
 				
 				var ZBX_G_WIDTH;
 				if(window.innerWidth) ZBX_G_WIDTH=window.innerWidth; 
 				else ZBX_G_WIDTH=document.body.clientWidth;
 				ZBX_G_WIDTH-='.($shiftXleft+$shiftXright+10).';
-				document.write(\'<img id="graph" src="chart2.php?graphid='.$_REQUEST['graphid'].url_param('stime').
+				document.write(\'<img id="'.$dom_graph_id.'" src="chart2.php?graphid='.$_REQUEST['graphid'].url_param('stime').
 				'&period='.$effectiveperiod.'&width=\'+ZBX_G_WIDTH+\'" /><br /><br />\');
 				-->
 				</script>'."\n";
@@ -320,7 +323,7 @@ include_once 'include/page_header.php';
 		
 		$script = 	'scrollinit(0,0,0,'.$effectiveperiod.','.$stime.',0,'.$bstime.');
 					showgraphmenu("graph");
-					graph_zoom_init('.$bstime.','.$effectiveperiod.',ZBX_G_WIDTH,'.$graph_height.');
+					graph_zoom_init("'.$dom_graph_id.'",'.$bstime.','.$effectiveperiod.',ZBX_G_WIDTH,'.$graph_height.');
 					';
 						
 		zbx_add_post_js($script);
