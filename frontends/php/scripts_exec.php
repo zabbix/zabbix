@@ -26,9 +26,9 @@
 
 	$page['title'] = "S_SCRIPTS";
 	$page['file'] = 'scripts_exec.php';
-	
+
 	define('ZBX_PAGE_NO_MENU', 1);
-	
+
 include_once "include/page_header.php";
 
 //---------------------------------- CHECKS ------------------------------------
@@ -38,17 +38,16 @@ include_once "include/page_header.php";
 	$fields=array(
 		'hostid'=>				array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,	'isset({execute})'),
 		'scriptid'=>			array(T_ZBX_INT, O_OPT, P_SYS,			DB_ID,	'isset({execute})'),
-		'execute'=>				array(T_ZBX_INT, O_OPT,  P_ACT, 		IN('0,1'),	null),		
+		'execute'=>				array(T_ZBX_INT, O_OPT,  P_ACT, 		IN('0,1'),	null),
 	);
-	
 
 check_fields($fields);
 
 if(isset($_REQUEST['execute'])){
 	if($script = get_script_by_scriptid($_REQUEST['scriptid'])){
 		if($script['host_access'] == SCRIPT_HOST_ACCESS_WRITE){
-			$hosts_read_write = explode(',',get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,get_current_nodeid()));			
-		
+			$hosts_read_write = explode(',',get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,null,$_REQUEST['hostid']));
+
 			if(in_array($_REQUEST['hostid'],$hosts_read_write)){
 //SDI('WRITE: '.$_REQUEST['scriptid'].' : '.$_REQUEST['hostid']);
 //				$result = execute_script($_REQUEST['scriptid'],$_REQUEST['hostid']);
@@ -56,10 +55,9 @@ if(isset($_REQUEST['execute'])){
 				insert_command_result_form($_REQUEST['scriptid'],$_REQUEST['hostid']);
 /*				echo nl2br(htmlspecialchars($result));*/
 			}
-		}
-		else{
-			$hosts_read_only  = explode(',',get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,get_current_nodeid()));
-			
+		} else {
+			$hosts_read_only  = explode(',',get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,null,$_REQUEST['hostid']));
+
 			if(in_array($_REQUEST['hostid'],$hosts_read_only)){
 //SDI('READ: '.$_REQUEST['scriptid'].' : '.$_REQUEST['hostid']);
 //				$result = execute_script($_REQUEST['scriptid'],$_REQUEST['hostid']);
