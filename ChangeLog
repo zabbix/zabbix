@@ -22,6 +22,8 @@ Changes for 1.5:
 
 Changes for 1.4.3:
 
+ - [DEV-75] Empty command result window
+ - [DEV-74] Scripts of all nodes are displayed
  - [ZBX-131] fixed viewing password on install in plain text (Artem)
  - [ZBX-81] fix for item delay calculation problem in graphs (Artem)
  - [ZBX-107] do not display log related items in the queue (Alexei)
