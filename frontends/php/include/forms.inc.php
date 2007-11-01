@@ -4798,7 +4798,7 @@ include_once 'include/discovery.inc.php';
 			$message = "";
 		}
 		$frmResult->AddRow(S_RESULT,new CTextArea("message",$message,100,25,'yes'));
-		$frmResult->AddItemToBottomRow(new CButtonCancel(null,'close_window();'));
+		$frmResult->AddItemToBottomRow(new CButton('close',S_CLOSE,'close_window();'));
 
 		$frmResult->Show();
 	}

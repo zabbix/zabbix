@@ -1303,6 +1303,7 @@
 	'S_CANNOT_DELETE_SCRIPT'=>		'Cannot delete script',
 	'S_TOOLS'=>				'Tools',
 	'S_RESULT'=>				'Result',
+	'S_CLOSE'=>				'Close',
 
 
 //	audit.php

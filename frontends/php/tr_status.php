@@ -491,8 +491,11 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 		if($_REQUEST['hostid'] < 1){
 			$menus = '';
 
+			$host_nodeid = id2nodeid($row['hostid']);
 			foreach($scripts_by_hosts[$row['hostid']] as $id => $script){
-				$menus.= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$row['hostid']."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
+				$script_nodeid = id2nodeid($script['scriptid']);
+				if( $host_nodeid == $script_nodeid )
+					$menus.= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$row['hostid']."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 			}
 
 			$menus = trim($menus,',');

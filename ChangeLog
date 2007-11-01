@@ -30,6 +30,8 @@ Changes for 1.4.j:
 
 Changes for 1.4.3:
 
+ - [DEV-75] Empty command result window
+ - [DEV-74] Scripts of all nodes are displayed
  - [ZBX-107] do not display log related items in the queue (Alexei)
  - [DEV-48] Support of Ping and Traceroute in Status of Triggers screen
  - [ZBX-102] Distributed monitoring: overwriting information (Sasha)
