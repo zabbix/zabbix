@@ -587,7 +587,7 @@ require_once "include/items.inc.php";
 		{
 			fatal_error("Incorrest options for get_correct_group_and_host");
 		}
-
+		
 		global $USER_DETAILS;
 		
 		$first_hostid_in_group = 0;
@@ -605,15 +605,19 @@ require_once "include/items.inc.php";
 
 		if(in_array("with_monitored_items",$options)){
 			$item_table = ",items i";	$with_items = " and h.hostid=i.hostid and i.status=".ITEM_STATUS_ACTIVE;
-		}elseif(in_array("with_items",$options)){
+		}else if(in_array("with_items",$options)){
 			$item_table = ",items i";	$with_items = " and h.hostid=i.hostid";
 		} else {
-			$item_table = "";		$with_items = "";
+			$item_table = "";
+			$with_items = "";
 		}
 
 		$with_node = "";
 
-		$accessed_hosts = get_accessible_hosts_by_user($USER_DETAILS,$perm);
+		$accessed_hosts = get_accessible_hosts_by_user($USER_DETAILS,$perm,null,null,get_current_nodeid(!$only_current_node));
+
+//SDI(get_current_nodeid(!$only_current_node));
+//SDI($accessed_hosts);
 
 		if(is_null($a_groupid))
 		{
@@ -626,7 +630,7 @@ require_once "include/items.inc.php";
 			if($groupid > 0)
 			{
 				$with_node = " and ".DBin_node('g.groupid', get_current_nodeid(!$only_current_node));
-				
+
 				if(!DBfetch(DBselect("select distinct g.groupid from groups g, hosts_groups hg, hosts h".$item_table.
 					" where hg.groupid=g.groupid and h.hostid=hg.hostid and h.hostid in (".$accessed_hosts.") ".
 					" and g.groupid=".$groupid.$with_host_status.$with_items.$with_node)))
@@ -636,6 +640,7 @@ require_once "include/items.inc.php";
 			}
 
 		}
+
 		if(is_null($a_hostid))
 		{
 			$hostid = 0;
@@ -662,7 +667,8 @@ require_once "include/items.inc.php";
 				}
 
 				$with_node = " and ".DBin_node('h.hostid',get_current_nodeid(!$only_current_node));
-				
+//SDI('C: '.$a_groupid.' : '.$a_hostid);
+
 				if($db_host = DBfetch(DBselect("select distinct h.hostid,h.host from hosts h ".$item_table.$group_table.
 					" where h.hostid in (".$accessed_hosts.") "
 					.$with_host_status.$with_items.$witth_group.$with_node.
@@ -682,14 +688,13 @@ require_once "include/items.inc.php";
 							$hostid = 0;
 					}
 				}
-
 				if(($hostid < 0) || ($hostid == 0 && $always_select_first_host == 1)) /* incorrect host */
 				{
 					$hostid = $first_hostid_in_group;
 				}
 			}
 		}
-
+		
 		$group_correct	= ($groupid == $a_groupid) ? 1 : 0;
 		$host_correct	= ($hostid == $a_hostid) ? 1 : 0;
 		return array(
@@ -721,10 +726,12 @@ require_once "include/items.inc.php";
 
 		$_REQUEST["groupid"]    = get_request("groupid", -1 );
 		$_REQUEST["hostid"]     = get_request("hostid", get_profile($host_var,0));
-		
+
 		if($_REQUEST["groupid"] == -1)
 		{
 			$_REQUEST["groupid"] = get_profile($group_var,0);
+			
+			if(!in_node($_REQUEST["groupid"])) $_REQUEST["groupid"] = 0;
 
 			if ($_REQUEST["hostid"] > 0 && !DBfetch(DBselect('select groupid from hosts_groups '.
 				' where hostid='.$_REQUEST["hostid"].' and groupid='.$_REQUEST["groupid"])))
@@ -732,7 +739,7 @@ require_once "include/items.inc.php";
 					$_REQUEST["groupid"] = 0;
 			}
 		}
-		
+
 		if(in_array("always_select_first_host",$options) && $_REQUEST["hostid"] == 0 && $_REQUEST["groupid"] != 0)
 			$_REQUEST["hostid"] = -1;
 
@@ -740,7 +747,7 @@ require_once "include/items.inc.php";
 
 		$_REQUEST["groupid"]    = $result["groupid"];
 		$_REQUEST["hostid"]     = $result["hostid"];
-
+		
 		update_profile($host_var,$_REQUEST["hostid"]);
 		update_profile($group_var,$_REQUEST["groupid"]);
 	}
@@ -760,11 +767,11 @@ require_once "include/items.inc.php";
 	function	validate_group($perm, $options = array(),$group_var=null)
 	{
 		if(is_null($group_var)) $group_var = "web.latest.groupid";
-
 		$_REQUEST["groupid"]    = get_request("groupid",get_profile($group_var,0));
 
+		if(!in_node($_REQUEST["groupid"])) $_REQUEST["groupid"] = 0;
+		
 		$result = get_correct_group_and_host($_REQUEST["groupid"],null,$perm,$options);
-
 		$_REQUEST["groupid"]    = $result["groupid"];
 
 		update_profile($group_var,$_REQUEST["groupid"]);

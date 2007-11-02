@@ -1,7 +1,7 @@
 <?php
 /* 
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2007 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -123,7 +123,7 @@ include_once "include/page_header.php";
 	check_fields($fields);
 
 	if($_REQUEST["config"]==4)
-		validate_group_with_host(PERM_READ_WRITE,array("always_select_first_host"),'web.last.conf.groupid', 'web.last.conf.hostid');
+		validate_group_with_host(PERM_READ_WRITE,array("always_select_first_host","only_current_node"),'web.last.conf.groupid', 'web.last.conf.hostid');
 	elseif($_REQUEST["config"]==0 || $_REQUEST["config"]==3)
 		validate_group(PERM_READ_WRITE,array(),'web.last.conf.groupid');
 

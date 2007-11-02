@@ -676,11 +676,12 @@
 		$expression, $description, $priority, $status,
 		$comments, $url, $deps=array(), $templateid=0)
 	{
+		
 		if( !validate_expression($expression) )
 			return false;
 
 		$triggerid=get_dbid("triggers","triggerid");
-
+		
 		$result=DBexecute("insert into triggers".
 			"  (triggerid,description,priority,status,comments,url,value,error,templateid)".
 			" values ($triggerid,".zbx_dbstr($description).",$priority,$status,".zbx_dbstr($comments).",".
@@ -711,6 +712,7 @@
 
 		$trig_hosts = get_hosts_by_triggerid($triggerid);
 		$trig_host = DBfetch($trig_hosts);
+		
 		if($result)
 		{
 			$msg = "Added trigger '".$description."'";
@@ -979,10 +981,15 @@
 				$function	= &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID + ZBX_SIMPLE_EXPRESSION_FUNCTION_NAME_ID];
 				$parameter	= &$arr[ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID + ZBX_SIMPLE_EXPRESSION_FUNCTION_PARAM_ID];
 
-				$item = DBfetch(DBselect('select i.itemid from items i,hosts h'.
+				$item_res = DBselect('select i.itemid from items i,hosts h'.
 					' where i.key_='.zbx_dbstr($key).
 					' and h.host='.zbx_dbstr($host).
-					' and h.hostid=i.hostid'));
+					' and h.hostid=i.hostid');
+
+				while(($item = DBfetch($item_res)) && (!in_node($item['itemid']))){
+				}
+				
+				if(!$item) return null;
 
 				$item = $item["itemid"];
 

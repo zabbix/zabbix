@@ -108,9 +108,10 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 	$_REQUEST["compact"]		=	get_request("compact", get_profile("web.tr_status.compact", 'true'));
 	$_REQUEST['show_unknown']	=	get_request('show_unknown',get_profile('web.tr_status.show_unknown',0));
 
-
-	validate_group_with_host(PERM_READ_ONLY,array("allow_all_hosts","always_select_first_host","monitored_hosts","with_monitored_items"),
-		"web.tr_status.groupid","web.tr_status.hostid");
+	$options = array("allow_all_hosts","always_select_first_host","monitored_hosts","with_monitored_items");
+	if(!$ZBX_WITH_SUBNODES)	array_push($options,"only_current_node");
+	
+	validate_group_with_host(PERM_READ_ONLY,$options,"web.tr_status.groupid","web.tr_status.hostid");
 
 	update_profile("web.tr_status.onlytrue",$_REQUEST["onlytrue"]);
 	update_profile("web.tr_status.noactions",$_REQUEST["noactions"]);
@@ -138,7 +139,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 <?php
 	$r_form = new CForm();
 	$r_form->SetMethod('get');
-	
+
 	$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit()");
 	$cmbHosts = new CComboBox("hostid",$_REQUEST["hostid"],"submit()");
 
@@ -148,9 +149,9 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 
 	$result=DBselect("select distinct g.groupid,g.name from groups g, hosts_groups hg, hosts h, items i, functions f, triggers t ".
 		" where h.hostid in (".$availiable_hosts.") ".
-		" and hg.groupid=g.groupid and h.status=".HOST_STATUS_MONITORED.
-		" and h.hostid=i.hostid and hg.hostid=h.hostid and i.status=".ITEM_STATUS_ACTIVE.
-		" and i.itemid=f.itemid and t.triggerid=f.triggerid and t.status=".TRIGGER_STATUS_ENABLED.
+		" AND hg.groupid=g.groupid AND h.status=".HOST_STATUS_MONITORED.
+		" AND h.hostid=i.hostid AND hg.hostid=h.hostid AND i.status=".ITEM_STATUS_ACTIVE.
+		" AND i.itemid=f.itemid AND t.triggerid=f.triggerid AND t.status=".TRIGGER_STATUS_ENABLED.
 		" order by g.name");
 	while($row=DBfetch($result))
 	{
@@ -162,45 +163,62 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 	}
 	$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
 	
-	if($_REQUEST["groupid"] > 0)
-	{
-		$sql="select h.hostid,h.host from hosts h,items i,hosts_groups hg, functions f, triggers t where h.status=".HOST_STATUS_MONITORED.
-			" and h.hostid=i.hostid and hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid".
-			" and i.status=".ITEM_STATUS_ACTIVE.
-			" and i.itemid=f.itemid and t.triggerid=f.triggerid and t.status=".TRIGGER_STATUS_ENABLED.
-			" and h.hostid in (".$availiable_hosts.") ".
-			" group by h.hostid,h.host order by h.host";
+	if($_REQUEST["groupid"] > 0){
+	
+		$sql='SELECT h.hostid,h.host '.
+			' FROM hosts h,items i,hosts_groups hg, functions f, triggers t '.
+			' WHERE h.status='.HOST_STATUS_MONITORED.
+				' AND h.hostid=i.hostid '.
+				' AND hg.groupid='.$_REQUEST["groupid"].
+				' AND hg.hostid=h.hostid'.
+				' AND i.status='.ITEM_STATUS_ACTIVE.
+				' AND i.itemid=f.itemid '.
+				' AND t.triggerid=f.triggerid '.
+				' AND t.status='.TRIGGER_STATUS_ENABLED.
+				' AND h.hostid in ('.$availiable_hosts.') '.
+			' GROUP BY h.hostid,h.host '.
+			' ORDER BY h.host';
 	}
-	else
-	{
+	else{
+	
 		$cmbHosts->AddItem(0,S_ALL_SMALL);
-		$sql="select h.hostid,h.host from hosts h,items i, functions f, triggers t where h.status=".HOST_STATUS_MONITORED.
-			" and i.status=".ITEM_STATUS_ACTIVE." and h.hostid=i.hostid".
-			" and i.itemid=f.itemid and t.triggerid=f.triggerid and t.status=".TRIGGER_STATUS_ENABLED.
-			" and h.hostid in (".$availiable_hosts.") ".
-			" group by h.hostid,h.host order by h.host";
+		$sql='SELECT h.hostid,h.host '.
+			' FROM hosts h,items i, functions f, triggers t '.
+			' WHERE h.status='.HOST_STATUS_MONITORED.
+				' AND i.status='.ITEM_STATUS_ACTIVE.
+				' AND h.hostid=i.hostid'.
+				' AND i.itemid=f.itemid '.
+				' AND t.triggerid=f.triggerid '.
+				' AND t.status='.TRIGGER_STATUS_ENABLED.
+				' AND h.hostid in ('.$availiable_hosts.') '.
+			' GROUP BY h.hostid,h.host '.
+			' ORDER BY h.host';
 	}
+	
 	$result=DBselect($sql);
+	$flag = false;
 	while($row=DBfetch($result))
 	{
+		$flag |= $_REQUEST['hostid'] == $row['hostid'];
 		$cmbHosts->AddItem(
 				$row['hostid'],
 				get_node_name_by_elid($row['hostid']).$row['host']
 				);
 	}
+	if(!$flag) $_REQUEST['hostid'] = 0;
 
 	$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
-	$r_form->AddVar("compact",$compact);
-	$r_form->AddVar("onlytrue",$onlytrue);
+	$r_form->AddVar('compact',$compact);
+	$r_form->AddVar('onlytrue',$onlytrue);
 	$r_form->AddVar('show_unknown',$show_unknown);
-	$r_form->AddVar("noactions",$noactions);
-	$r_form->AddVar("select",$select);
-	$r_form->AddVar("txt_select",$txt_select);
-	$r_form->AddVar("sort",$sort);
-	if(isset($_REQUEST['fullscreen'])) $r_form->AddVar("fullscreen",1);
+	$r_form->AddVar('noactions',$noactions);
+	$r_form->AddVar('select',$select);
+	$r_form->AddVar('txt_select',$txt_select);
+	$r_form->AddVar('sort',$sort);
+	if(isset($_REQUEST['fullscreen'])) $r_form->AddVar('fullscreen',1);
 
 	show_table_header(
-		new CLink(SPACE.S_STATUS_OF_TRIGGERS_BIG.SPACE.date("[H:i:s]",time()),"tr_status.php?onlytrue=$onlytrue&noactions=$noactions".
+		new CLink(SPACE.S_STATUS_OF_TRIGGERS_BIG.SPACE.date('[H:i:s]',time()),"tr_status.php?onlytrue=$onlytrue&noactions=$noactions".
 			"&compact=$compact&sort=$sort".(!isset($_REQUEST["fullscreen"]) ? '&fullscreen=1' : '')),
 		$r_form);
 	

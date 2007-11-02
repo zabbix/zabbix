@@ -46,8 +46,11 @@ include_once "include/page_header.php";
 	);
 
 	check_fields($fields);
+	
+	$options = array("allow_all_hosts","always_select_first_host","monitored_hosts","with_monitored_items");
+	if(!$ZBX_WITH_SUBNODES)	array_push($options,"only_current_node");
 
-	validate_group_with_host(PERM_READ_ONLY,array("allow_all_hosts","always_select_first_host","monitored_hosts","with_monitored_items"));
+	validate_group_with_host(PERM_READ_ONLY,$options);
 ?>
 <?php
 

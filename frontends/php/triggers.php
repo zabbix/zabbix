@@ -1,7 +1,7 @@
 <?php
 /* 
 ** ZABBIX
-** Copyright (C) 2000-2005 SIA Zabbix
+** Copyright (C) 2000-2007 SIA Zabbix
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -88,7 +88,7 @@ include_once "include/page_header.php";
 
 	$showdisabled = get_request("showdisabled", 0);
 
-	validate_group_with_host(PERM_READ_WRITE,array("allow_all_hosts","always_select_first_host","with_items"),
+	validate_group_with_host(PERM_READ_WRITE,array("allow_all_hosts","always_select_first_host","with_items","only_current_node"),
 		'web.last.conf.groupid', 'web.last.conf.hostid');
 ?>
 <?php

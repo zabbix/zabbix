@@ -122,7 +122,6 @@ include_once "include/page_header.php";
 
 	$r_form = new CForm();
 	$r_form->SetMethod('get');
-
 	if(isset($_REQUEST['fullscreen']))
 		$r_form->AddVar('fullscreen', 1);
 
