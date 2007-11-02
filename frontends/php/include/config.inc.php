@@ -254,9 +254,8 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 		global	$ZBX_CURRENT_NODEID, $ZBX_CURRENT_SUBNODES, $ZBX_WITH_SUBNODES;
 
 		if ( !isset($ZBX_CURRENT_NODEID) )	init_nodes();
-
 		$result = ( is_show_subnodes($forse_with_subnodes) ? $ZBX_CURRENT_SUBNODES : $ZBX_CURRENT_NODEID );
-
+		
 		if ( !is_null($perm) )
 		{
 			global $USER_DETAILS;
