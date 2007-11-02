@@ -593,6 +593,7 @@
 	'S_NO_APPLICATIONS_DEFINED'=>		'No applications defined',
 
 	'S_HOSTS'=>				'Hosts',
+	'S_ALL_HOSTS_BIG'=>		'ALL HOSTS',
 	'S_ITEMS'=>				'Items',
 	'S_ITEMS_BIG'=>				'ITEMS',
 	'S_TRIGGERS'=>				'Triggers',
