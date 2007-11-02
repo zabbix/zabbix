@@ -1,8 +1,10 @@
 Changes for 1.5:
 
  - [DEV-62] added availability to select all hosts in "Availability report" (Artem)
+ - [DEV-75] Empty command result window (Sasha)
+ - [DEV-74] Scripts of all nodes are displayed (Sasha)
  - [DEV-54] added zoom for graphs (Artem)
- - [DEV-48] Support of Ping and Traceroute in Status of Triggers screen
+ - [DEV-48] Support of Ping and Traceroute in Status of Triggers screen (Sasha)
  - [DEV-57] added better "hosts info" selection in screens (Artem)
  - [DEV-56] added better item selection in screens (Artem)
  - [DEV-48] added scripts form,scripts list, script call menu (Artem)
@@ -23,8 +25,7 @@ Changes for 1.5:
 
 Changes for 1.4.3:
 
- - [DEV-75] Empty command result window
- - [DEV-74] Scripts of all nodes are displayed
+ - [ZBX-134] fixes for hostid/groupid validation on Node switch (Artem)
  - [ZBX-131] fixed viewing password on install in plain text (Artem)
  - [ZBX-81] fix for item delay calculation problem in graphs (Artem)
  - [ZBX-107] do not display log related items in the queue (Alexei)
