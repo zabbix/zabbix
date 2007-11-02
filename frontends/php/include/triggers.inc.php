@@ -1125,6 +1125,7 @@
 					}
 				}
 			}
+
 			if(strstr($description,'{ITEM.VALUE}'))
 			{
 				$value=($flag==ZBX_FLAG_TRIGGER)?
