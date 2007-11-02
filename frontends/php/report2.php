@@ -38,7 +38,11 @@ include_once "include/page_header.php";
 
 	check_fields($fields);
 
-	validate_group_with_host(PERM_READ_LIST,array("always_select_first_host","monitored_hosts","with_items"));
+//	validate_group_with_host(PERM_READ_LIST,array("always_select_first_host","monitored_hosts","with_items"));
+	$options = array("allow_all_hosts","always_select_first_host","monitored_hosts","with_items");
+	if(!$ZBX_WITH_SUBNODES)	array_push($options,"only_current_node");
+	
+	validate_group_with_host(PERM_READ_LIST,$options);
 ?>
 <?php
 	$r_form = new CForm();
