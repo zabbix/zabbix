@@ -162,14 +162,16 @@ COpt::counter_up('perm');
 		if(count($where)) 	$where = ' where '.implode(' and ',$where);
 		else			$where = '';
 	
-		$db_hosts = DBselect('select distinct n.nodeid,n.name as node_name,h.hostid,h.host, min(r.permission) as permission,ug.userid '.
+		$sql = 'select distinct n.nodeid,n.name as node_name,h.hostid,h.host, min(r.permission) as permission,ug.userid '.
 			' from hosts h left join hosts_groups hg on hg.hostid=h.hostid '.
 			' left join groups g on g.groupid=hg.groupid '.
 			' left join rights r on r.id=g.groupid and r.type='.RESOURCE_TYPE_GROUP.
 			' left join users_groups ug on ug.usrgrpid=r.groupid and ug.userid='.$userid.
 			' left join nodes n on '.DBid2nodeid('h.hostid').'=n.nodeid '.
 			$where.' group by h.hostid,n.nodeid,n.name,h.host,ug.userid '.
-			' order by n.name,n.nodeid, h.host, permission desc, userid desc');
+			' order by n.name,n.nodeid, h.host, permission desc, userid desc';
+
+		$db_hosts = DBselect($sql);
 
 		$processed = array();
 		while($host_data = DBfetch($db_hosts))
