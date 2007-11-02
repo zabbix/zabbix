@@ -475,6 +475,27 @@ include_once "include/page_header.php";
 			$font->AddItem(explode_exp($row["expression"],1));
 			$description = array($description,BR, $font);
 		}
+// dependency		
+		$dependency = false;
+		$dep_table = new CTableInfo();
+		$dep_table->AddOption('style', 'width: 200px;');
+	
+		$sql_dep = 'SELECT * FROM trigger_depends WHERE triggerid_down='.$row['triggerid'];
+		$dep_res = DBselect($sql_dep);
+		while($dep_row = Dbfetch($dep_res)){
+			$dep_table->AddRow(SPACE.'-'.SPACE.expand_trigger_description($dep_row['triggerid_up']));
+			$dependency = true;
+		}
+		
+		if($dependency){
+			$img = new Cimg('images/general/trigg_dep.gif','DEP',12,12);
+			$img->AddOption('style','vertical-align: middle; border: 0px;');
+			$img->SetHint($dep_table);
+			
+			$description = array($img,SPACE,$description);
+		}
+		unset($img, $dep_table, $dependency);		
+//------------------------
 
 		if((time(NULL)-$row["lastchange"])<TRIGGER_BLINK_PERIOD)
 			$blink = array(1=>'<a name="blink">',	2=>'</a>');

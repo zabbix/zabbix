@@ -1,5 +1,6 @@
 Changes for 1.5:
 
+ - [DEV-53] added different style for dependent triggers in "Status of triggers" (Artem)
  - [DEV-62] added availability to select all hosts in "Availability report" (Artem)
  - [DEV-75] Empty command result window (Sasha)
  - [DEV-74] Scripts of all nodes are displayed (Sasha)

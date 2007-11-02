@@ -178,7 +178,8 @@ resizebox: function(){
 			this.moveleft(width);
 		}
 
-		this.dom_period_span.innerHTML = this.FormatStampbyDHM(this.calcperiod());
+		this.period = this.calcperiod();
+		this.dom_period_span.innerHTML = this.FormatStampbyDHM(this.period)+((this.period<3600)?' [min 1h]':'');
 	}
 },
 
