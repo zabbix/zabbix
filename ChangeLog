@@ -1,5 +1,6 @@
 Changes for 1.5:
 
+ - [DEV-62] added availability to select all hosts in "Availability report" (Artem)
  - [DEV-54] added zoom for graphs (Artem)
  - [DEV-48] Support of Ping and Traceroute in Status of Triggers screen
  - [DEV-57] added better "hosts info" selection in screens (Artem)
