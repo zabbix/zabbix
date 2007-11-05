@@ -450,12 +450,12 @@
 				}
 				elseif( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_TRIGGERS_OVERVIEW) )
 				{
-					$item = array(get_triggers_overview($resourceid));
+					$item = array(get_triggers_overview($resourceid,$style));
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
 				elseif( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_DATA_OVERVIEW) )
 				{
-					$item = array(get_items_data_overview($resourceid));
+					$item = array(get_items_data_overview($resourceid,$style));
 					if($editmode == 1)	array_push($item,new CLink(S_CHANGE,$action));
 				}
 				elseif( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_URL) )
@@ -597,6 +597,5 @@
 			DBexecute('delete from slides where slideshowid='.$slideshowid)
 		);
 	}
-
 
 ?>
