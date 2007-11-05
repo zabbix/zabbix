@@ -903,6 +903,7 @@
 	'S_SELECT_GROUP_DOT_DOT_DOT'=>		'Select group ...',
 	'S_OVERVIEW'=>				'Overview',
 	'S_OVERVIEW_BIG'=>			'OVERVIEW',
+	'S_HOSTS_LOCATION'=>		'Hosts location',
 	'S_EXCL'=>				'!',
 	'S_DATA'=>				'Data',
 	'S_SHOW_GRAPH_OF_ITEM'=>		'Show graph of item',
@@ -1048,17 +1049,17 @@
 	'S_SERVER_TIME'=>			'Server time',
 	'S_LOCAL_TIME'=>			'Local time',
 
-	'S_STYLE'=>				'Style',
+	'S_STYLE'=>					'Style',
 	'S_VERTICAL'=>				'Vertical',
 	'S_HORISONTAL'=>			'Horizontal',
 
 	'S_HORISONTAL_ALIGN'=>			'Horizontal align',
-	'S_LEFT'=>				'Left',
+	'S_LEFT'=>					'Left',
 	'S_CENTER'=>				'Center',
-	'S_RIGHT'=>				'Right',
+	'S_RIGHT'=>					'Right',
 
 	'S_VERTICAL_ALIGN'=>			'Vertical align',
-	'S_TOP'=>				'Top',
+	'S_TOP'=>					'Top',
 	'S_MIDDLE'=>				'Middle',
 	'S_BOTTOM'=>				'Bottom',
 

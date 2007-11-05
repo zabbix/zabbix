@@ -840,10 +840,12 @@
 	 * Comments:
 	 *
 	 */
-	function get_items_data_overview($groupid)
+	function get_items_data_overview($groupid,$view_style=null)
 	{
 		global	$USER_DETAILS;
 
+		if(is_null($view_style)) $view_style = get_profile('web.overview.view.style',STYLE_TOP);
+		
 		$table = new CTableInfo(S_NO_ITEMS_DEFINED);
 
 		if($groupid > 0)
@@ -888,87 +890,113 @@ COpt::profiling_start('prepare data');
 		sort($hosts);
 COpt::profiling_stop('prepare data');
 COpt::profiling_start('prepare table');
-		$header=array(new CCol(S_ITEMS,'center'));
-		foreach($hosts as $hostname)
-		{
-			$header=array_merge($header,array(new CImg('vtext.php?text='.$hostname)));
-		}
-		$table->SetHeader($header,'vertical_header');
-		$curr_rime = time();
-		foreach($items as $descr => $ithosts)
-		{
-			$table_row = array(nbsp($descr));
+
+		if($view_style == STYLE_TOP){
+			$header=array(new CCol(S_ITEMS,'center'));
 			foreach($hosts as $hostname)
 			{
-				$css_class = NULL;
-				unset($it_ov_menu);
-
-				$value = '-';
-				$ack = null;
-				if(isset($ithosts[$hostname]))
-				{
-					if($ithosts[$hostname]['tr_value'] == TRIGGER_VALUE_TRUE)
-					{
-						$css_class = get_severity_style($ithosts[$hostname]['severity']);
-						$ack = get_last_event_by_triggerid($ithosts[$hostname]['triggerid']);
-						if ( 1 == $ack['acknowledged'] )
-							$ack = array(SPACE, new CImg('images/general/tick.png','ack'));
-						else
-							$ack = null;
-					}
-					
-					$value = format_lastvalue($ithosts[$hostname]);
-
-					$it_ov_menu = array(
-						array(S_VALUES,	null, null, 
-							array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))),
-						array(S_500_LATEST_VALUES, 'history.php?action=showlatest&itemid='.$ithosts[$hostname]['itemid'],
-							array('tw'=>'_blank'))
-						);
-
-					switch($ithosts[$hostname]['value_type'])
-					{
-						case ITEM_VALUE_TYPE_UINT64:
-						case ITEM_VALUE_TYPE_FLOAT:
-							$it_ov_menu = array_merge(array(
-								/* name, url, (target [tw], statusbar [sb]), css, submenu */
-								array(S_GRAPHS, null,  null, 
-									array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))
-									),
-								array(S_LAST_HOUR_GRAPH, 'history.php?period=3600&action=showgraph&itemid='.
-									$ithosts[$hostname]['itemid'], array('tw'=>'_blank')),
-								array(S_LAST_WEEK_GRAPH, 'history.php?period=604800&action=showgraph&itemid='.
-									$ithosts[$hostname]['itemid'], array('tw'=>'_blank')),
-								array(S_LAST_MONTH_GRAPH, 'history.php?period=2678400&action=showgraph&itemid='.
-									$ithosts[$hostname]['itemid'], array('tw'=>'_blank'))
-								), $it_ov_menu);
-							break;
-						default:
-							break;
-					}
-				}
-
-				if($value == '-')	$css_class = 'center';
-				$value_col = new CCol(array($value,$ack),$css_class);
-
-				if(isset($it_ov_menu))
-				{
-					$it_ov_menu  = new CPUMenu($it_ov_menu,170);
-					$value_col->OnClick($it_ov_menu->GetOnActionJS());
-					$value_col->AddOption('style', 'cursor: pointer;');
-					$value_col->AddAction('onmouseover',
-						'this.old_border=this.style.border; this.style.border=\'1px dotted #0C0CF0\'');
-					$value_col->AddAction('onmouseout', 'this.style.border=this.old_border;');
-					unset($it_ov_menu);
-				}
-
-				array_push($table_row,$value_col);
+				$header=array_merge($header,array(new CImg('vtext.php?text='.$hostname)));
 			}
-			$table->AddRow($table_row);
+			$table->SetHeader($header,'vertical_header');
+			$curr_rime = time();
+			foreach($items as $descr => $ithosts)
+			{
+				$table_row = array(nbsp($descr));
+				foreach($hosts as $hostname){
+					$table_row = get_item_data_overview_cells($table_row,$ithosts,$hostname);
+				}
+				$table->AddRow($table_row);
+			}
+		}
+		else{
+			$header=array(new CCol(S_ITEMS,'center'));
+			foreach($items as $descr => $ithosts)
+			{
+				$header=array_merge($header,array(new CImg('vtext.php?text='.$descr)));
+			}
+			$table->SetHeader($header,'vertical_header');
+			$curr_rime = time();
+			
+			foreach($hosts as $hostname)
+			{
+				$table_row = array(nbsp($hostname));
+				foreach($items as $descr => $ithosts)
+				{
+					$table_row = get_item_data_overview_cells($table_row,$ithosts,$hostname);
+				}
+				$table->AddRow($table_row);
+			}
 		}
 COpt::profiling_stop('prepare table');
 
 		return $table;
+	}
+	
+	function get_item_data_overview_cells(&$table_row,&$ithosts,$hostname){
+		$css_class = NULL;
+		unset($it_ov_menu);
+
+		$value = '-';
+		$ack = null;
+		if(isset($ithosts[$hostname]))
+		{
+			if($ithosts[$hostname]['tr_value'] == TRIGGER_VALUE_TRUE)
+			{
+				$css_class = get_severity_style($ithosts[$hostname]['severity']);
+				$ack = get_last_event_by_triggerid($ithosts[$hostname]['triggerid']);
+				if ( 1 == $ack['acknowledged'] )
+					$ack = array(SPACE, new CImg('images/general/tick.png','ack'));
+				else
+					$ack = null;
+			}
+			
+			$value = format_lastvalue($ithosts[$hostname]);
+
+			$it_ov_menu = array(
+				array(S_VALUES,	null, null, 
+					array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))),
+				array(S_500_LATEST_VALUES, 'history.php?action=showlatest&itemid='.$ithosts[$hostname]['itemid'],
+					array('tw'=>'_blank'))
+				);
+
+			switch($ithosts[$hostname]['value_type'])
+			{
+				case ITEM_VALUE_TYPE_UINT64:
+				case ITEM_VALUE_TYPE_FLOAT:
+					$it_ov_menu = array_merge(array(
+						/* name, url, (target [tw], statusbar [sb]), css, submenu */
+						array(S_GRAPHS, null,  null, 
+							array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))
+							),
+						array(S_LAST_HOUR_GRAPH, 'history.php?period=3600&action=showgraph&itemid='.
+							$ithosts[$hostname]['itemid'], array('tw'=>'_blank')),
+						array(S_LAST_WEEK_GRAPH, 'history.php?period=604800&action=showgraph&itemid='.
+							$ithosts[$hostname]['itemid'], array('tw'=>'_blank')),
+						array(S_LAST_MONTH_GRAPH, 'history.php?period=2678400&action=showgraph&itemid='.
+							$ithosts[$hostname]['itemid'], array('tw'=>'_blank'))
+						), $it_ov_menu);
+					break;
+				default:
+					break;
+			}
+		}
+
+		if($value == '-')	$css_class = 'center';
+		$value_col = new CCol(array($value,$ack),$css_class);
+
+		if(isset($it_ov_menu))
+		{
+			$it_ov_menu  = new CPUMenu($it_ov_menu,170);
+			$value_col->OnClick($it_ov_menu->GetOnActionJS());
+			$value_col->AddOption('style', 'cursor: pointer;');
+			$value_col->AddAction('onmouseover',
+				'this.old_border=this.style.border; this.style.border=\'1px dotted #0C0CF0\'');
+			$value_col->AddAction('onmouseout', 'this.style.border=this.old_border;');
+			unset($it_ov_menu);
+		}
+
+		array_push($table_row,$value_col);
+	return $table_row;
 	}
 
 	/******************************************************************************

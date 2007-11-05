@@ -293,6 +293,10 @@
 	define('STYLE_HORISONTAL',	0);
 	define('STYLE_VERTICAL',	1);
 
+/* view style [OVERVIEW]*/
+	define('STYLE_LEFT', 0);
+	define('STYLE_TOP', 1);
+
 /* time module tipe */
         define('TIME_TYPE_LOCAL',	0);
         define('TIME_TYPE_SERVER',	1);

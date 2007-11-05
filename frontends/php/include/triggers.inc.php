@@ -1782,10 +1782,12 @@
 	 * Comments: !!! Don't forget sync code with C !!!
 	 *
 	 */
-	function	get_triggers_overview($groupid)
+	function	get_triggers_overview($groupid,$view_style=null)
 	{
 		global $USER_DETAILS;
 
+		if(is_null($view_style)) $view_style = get_profile('web.overview.view.style',STYLE_TOP);
+		
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
 		if($groupid > 0)
 		{
@@ -1820,135 +1822,159 @@
 			return $table;
 		}
 		sort($hosts);
-
-		$header=array(new CCol(S_TRIGGERS,'center'));
-		foreach($hosts as $hostname)
-		{
-			$header=array_merge($header,array(new CImg('vtext.php?text='.$hostname)));
-		}
-		$table->SetHeader($header,'vertical_header');
-
-		foreach($triggers as $descr => $trhosts)
-		{
-			$table_row = array(nbsp($descr));
+		if($view_style == STYLE_TOP){
+			$header=array(new CCol(S_TRIGGERS,'center'));
 			foreach($hosts as $hostname)
 			{
-				$css_class = NULL;
-
-				unset($tr_ov_menu);
-				$ack = null;
-				if(isset($trhosts[$hostname]))
-				{
-					unset($ack_menu);
-					switch($trhosts[$hostname]['value'])
-					{
-						case TRIGGER_VALUE_TRUE:
-							$css_class = get_severity_style($trhosts[$hostname]['priority']);
-							if( ($ack = get_last_event_by_triggerid($trhosts[$hostname]['triggerid'])) )
-								$ack_menu = array(S_ACKNOWLEDGE, 'acknow.php?eventid='.$ack['eventid'], array('tw'=>'_blank'));
-
-							if ( 1 == $ack['acknowledged'] )
-								$ack = new CImg('images/general/tick.png','ack');
-							else
-								$ack = null;
-
-							break;
-						case TRIGGER_VALUE_FALSE:
-							$css_class = 'normal';
-							break;
-						default:
-							$css_class = 'unknown_trigger';
-					}
-
-					$style = 'cursor: pointer; ';
-
-					if((time(NULL)-$trhosts[$hostname]['lastchange'])<300)
-						$style .= 'background-image: url(images/gradients/blink1.gif); '.
-							'background-position: top left; '.
-							'background-repeat: repeate;';
-					elseif((time(NULL)-$trhosts[$hostname]['lastchange'])<900)
-						$style .= 'background-image: url(images/gradients/blink2.gif); '.
-							'background-position: top left; '.
-							'background-repeat: repeate;';
-
-					unset($item_menu);
-					$tr_ov_menu = array(
-						/* name, url, (target [tw], statusbar [sb]), css, submenu */
-						array(S_TRIGGER, null,  null, 
-							array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))
-							),
-						array(S_EVENTS, 'tr_events.php?triggerid='.$trhosts[$hostname]['triggerid'], array('tw'=>'_blank'))
-						);
-
-					if(isset($ack_menu)) $tr_ov_menu[] = $ack_menu;
-
-					$db_items = DBselect('select distinct i.itemid, i.description, i.key_, i.value_type '.
-						' from items i, functions f '.
-						' where f.itemid=i.itemid and f.triggerid='.$trhosts[$hostname]['triggerid']);
-
-					while($item_data = DBfetch($db_items))
-					{
-						$description = item_description($item_data['description'], $item_data['key_']);
-						switch($item_data['value_type'])
-						{
-							case ITEM_VALUE_TYPE_UINT64:
-							case ITEM_VALUE_TYPE_FLOAT:
-								$action = 'showgraph';
-								$status_bar = S_SHOW_GRAPH_OF_ITEM.' \''.$description.'\'';
-								break;
-							case ITEM_VALUE_TYPE_LOG:
-							case ITEM_VALUE_TYPE_STR:
-							case ITEM_VALUE_TYPE_TEXT:
-							default:
-								$action = 'showlatest';
-								$status_bar = S_SHOW_VALUES_OF_ITEM.' \''.$description.'\'';
-								break;
-						}
-						
-						if(strlen($description) > 25) $description = substr($description,0,22).'...';
-
-						$item_menu[$action][] = array(
-							$description,
-							'history.php?action='.$action.'&itemid='.$item_data['itemid'].'&period=3600',
-							 array('tw'=>'_blank', 'sb'=>$status_bar));
-					}
-					if(isset($item_menu['showgraph']))
-					{
-						$tr_ov_menu[] = array(S_GRAPHS,	null, null,
-							array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))
-							);
-						$tr_ov_menu = array_merge($tr_ov_menu, $item_menu['showgraph']);
-					}
-					if(isset($item_menu['showlatest']))
-					{
-						$tr_ov_menu[] = array(S_VALUES,	null, null, 
-							array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))
-							);
-						$tr_ov_menu = array_merge($tr_ov_menu, $item_menu['showlatest']);
-					}
-
-					unset($item_menu);
-				}
-
-				$status_col = new CCol(array(SPACE, $ack),$css_class);
-				if(isset($style))
-				{
-					$status_col->AddOption('style', $style);
-				}
-
-				if(isset($tr_ov_menu))
-				{
-					$tr_ov_menu  = new CPUMenu($tr_ov_menu,170);
-					$status_col->OnClick($tr_ov_menu->GetOnActionJS());
-					$status_col->AddAction('onmouseover',
-						'this.old_border=this.style.border; this.style.border=\'1px dotted #0C0CF0\'');
-					$status_col->AddAction('onmouseout', 'this.style.border=this.old_border;');
-				}
-				array_push($table_row,$status_col);
+				$header=array_merge($header,array(new CImg('vtext.php?text='.$hostname)));
 			}
-			$table->AddRow($table_row);
+			$table->SetHeader($header,'vertical_header');
+
+			foreach($triggers as $descr => $trhosts)
+			{
+				$table_row = array(nbsp($descr));
+				foreach($hosts as $hostname)
+				{
+					$table_row=get_trigger_overview_cells($table_row,$trhosts,$hostname);
+				}
+				$table->AddRow($table_row);
+			}
+		}
+		else{
+			$header=array(new CCol(S_TRIGGERS,'center'));
+			foreach($triggers as $descr => $trhosts)
+			{
+				$header=array_merge($header,array(new CImg('vtext.php?text='.$descr)));
+			}
+			$table->SetHeader($header,'vertical_header');
+
+			foreach($hosts as $hostname){
+			
+				$table_row = array(nbsp($hostname));
+				
+				foreach($triggers as $descr => $trhosts){
+					$table_row=get_trigger_overview_cells($table_row,$trhosts,$hostname);
+				}
+				$table->AddRow($table_row);
+			}
 		}
 		return $table;
+	}
+
+	function get_trigger_overview_cells(&$table_row,&$trhosts,&$hostname){
+		$css_class = NULL;
+
+		unset($tr_ov_menu);
+		$ack = null;
+		if(isset($trhosts[$hostname]))
+		{
+			unset($ack_menu);
+			switch($trhosts[$hostname]['value'])
+			{
+				case TRIGGER_VALUE_TRUE:
+					$css_class = get_severity_style($trhosts[$hostname]['priority']);
+					if( ($ack = get_last_event_by_triggerid($trhosts[$hostname]['triggerid'])) )
+						$ack_menu = array(S_ACKNOWLEDGE, 'acknow.php?eventid='.$ack['eventid'], array('tw'=>'_blank'));
+
+					if ( 1 == $ack['acknowledged'] )
+						$ack = new CImg('images/general/tick.png','ack');
+					else
+						$ack = null;
+
+					break;
+				case TRIGGER_VALUE_FALSE:
+					$css_class = 'normal';
+					break;
+				default:
+					$css_class = 'unknown_trigger';
+			}
+
+			$style = 'cursor: pointer; ';
+
+			if((time(NULL)-$trhosts[$hostname]['lastchange'])<300)
+				$style .= 'background-image: url(images/gradients/blink1.gif); '.
+					'background-position: top left; '.
+					'background-repeat: repeate;';
+			elseif((time(NULL)-$trhosts[$hostname]['lastchange'])<900)
+				$style .= 'background-image: url(images/gradients/blink2.gif); '.
+					'background-position: top left; '.
+					'background-repeat: repeate;';
+
+			unset($item_menu);
+			$tr_ov_menu = array(
+				/* name, url, (target [tw], statusbar [sb]), css, submenu */
+				array(S_TRIGGER, null,  null, 
+					array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))
+					),
+				array(S_EVENTS, 'tr_events.php?triggerid='.$trhosts[$hostname]['triggerid'], array('tw'=>'_blank'))
+				);
+
+			if(isset($ack_menu)) $tr_ov_menu[] = $ack_menu;
+
+			$db_items = DBselect('select distinct i.itemid, i.description, i.key_, i.value_type '.
+				' from items i, functions f '.
+				' where f.itemid=i.itemid and f.triggerid='.$trhosts[$hostname]['triggerid']);
+
+			while($item_data = DBfetch($db_items))
+			{
+				$description = item_description($item_data['description'], $item_data['key_']);
+				switch($item_data['value_type'])
+				{
+					case ITEM_VALUE_TYPE_UINT64:
+					case ITEM_VALUE_TYPE_FLOAT:
+						$action = 'showgraph';
+						$status_bar = S_SHOW_GRAPH_OF_ITEM.' \''.$description.'\'';
+						break;
+					case ITEM_VALUE_TYPE_LOG:
+					case ITEM_VALUE_TYPE_STR:
+					case ITEM_VALUE_TYPE_TEXT:
+					default:
+						$action = 'showlatest';
+						$status_bar = S_SHOW_VALUES_OF_ITEM.' \''.$description.'\'';
+						break;
+				}
+				
+				if(strlen($description) > 25) $description = substr($description,0,22).'...';
+
+				$item_menu[$action][] = array(
+					$description,
+					'history.php?action='.$action.'&itemid='.$item_data['itemid'].'&period=3600',
+					 array('tw'=>'_blank', 'sb'=>$status_bar));
+			}
+			if(isset($item_menu['showgraph']))
+			{
+				$tr_ov_menu[] = array(S_GRAPHS,	null, null,
+					array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))
+					);
+				$tr_ov_menu = array_merge($tr_ov_menu, $item_menu['showgraph']);
+			}
+			if(isset($item_menu['showlatest']))
+			{
+				$tr_ov_menu[] = array(S_VALUES,	null, null, 
+					array('outer'=> array('pum_oheader'), 'inner'=>array('pum_iheader'))
+					);
+				$tr_ov_menu = array_merge($tr_ov_menu, $item_menu['showlatest']);
+			}
+
+			unset($item_menu);
+		}
+
+		$status_col = new CCol(array(SPACE, $ack),$css_class);
+		if(isset($style))
+		{
+			$status_col->AddOption('style', $style);
+		}
+
+		if(isset($tr_ov_menu))
+		{
+			$tr_ov_menu  = new CPUMenu($tr_ov_menu,170);
+			$status_col->OnClick($tr_ov_menu->GetOnActionJS());
+			$status_col->AddAction('onmouseover',
+				'this.old_border=this.style.border; this.style.border=\'1px dotted #0C0CF0\'');
+			$status_col->AddAction('onmouseout', 'this.style.border=this.old_border;');
+		}
+		array_push($table_row,$status_col);	
+	return $table_row;
 	}
 
 	function	get_function_by_functionid($functionid)

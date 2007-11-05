@@ -3894,7 +3894,14 @@ include_once 'include/discovery.inc.php';
 			$cmbStyle->AddItem(STYLE_VERTICAL,	S_VERTICAL);
 			$form->AddRow(S_STYLE,	$cmbStyle);
 		}
-		elseif($resourcetype == SCREEN_RESOURCE_CLOCK)
+		else if(in_array($resourcetype,array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW,SCREEN_RESOURCE_DATA_OVERVIEW)))
+		{
+			$cmbStyle = new CComboBox('style', $style);
+			$cmbStyle->AddItem(STYLE_TOP,	S_TOP);
+			$cmbStyle->AddItem(STYLE_LEFT,	S_LEFT);
+			$form->AddRow(S_HOSTS_LOCATION,	$cmbStyle);
+		}
+		else if($resourcetype == SCREEN_RESOURCE_CLOCK)
 		{
 			$cmbStyle = new CComboBox("style", $style);
 			$cmbStyle->AddItem(TIME_TYPE_LOCAL,	S_LOCAL_TIME);
