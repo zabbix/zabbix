@@ -68,7 +68,7 @@
 			$this->items = array();
 			if(isset($items))
 			{
-				$this->AddItems($items);
+				$this->AddItem($items);
 			}
 		}
 		
