@@ -23,14 +23,7 @@
 #include "db.h"
 
 extern	int	CONFIG_SENDER_FREQUENCY;
-extern	char	*CONFIG_DBHOST;
-extern	char	*CONFIG_DBNAME;
-extern	char	*CONFIG_DBUSER;
-extern	char	*CONFIG_DBPASSWORD;
-extern	char	*CONFIG_DBSOCKET;
 extern	char	*CONFIG_ALERT_SCRIPTS_PATH;
-
-extern	int	CONFIG_NODEID;
 
 extern	void	signal_handler( int sig );
 

@@ -20,7 +20,6 @@
 #ifndef ZABBIX_DISCOVERER_H
 #define ZABBIX_DISCOVERER_H
 
-extern	int	CONFIG_NODEID;
 extern	int	CONFIG_DISCOVERER_FORKS;
 
 void main_discoverer_loop(int num);
