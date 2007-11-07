@@ -21,8 +21,6 @@
 #ifndef ZABBIX_NODEEVENTS_H
 #define ZABBIX_NODEEVENTS_H
 
-extern	int	CONFIG_NODEID;
-
 int	node_events(char *data);
 
 #endif

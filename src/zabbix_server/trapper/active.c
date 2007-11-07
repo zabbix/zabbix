@@ -68,12 +68,25 @@ int	send_list_of_active_checks(zbx_sock_t *sock, const char *host)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In send_list_of_active_checks()");
 
-	result = DBselect("select i.key_,i.delay,i.lastlogsize from items i,hosts h where i.hostid=h.hostid and h.status=%d and i.status=%d and i.type=%d and h.host='%s' and" ZBX_COND_NODEID,
-		HOST_STATUS_MONITORED,
-		ITEM_STATUS_ACTIVE,
-		ITEM_TYPE_ZABBIX_ACTIVE,
-		host,
-		LOCAL_NODE("h.hostid"));
+	if (0 != CONFIG_REFRESH_UNSUPPORTED) {
+		result = DBselect("select i.key_,i.delay,i.lastlogsize from items i,hosts h "
+			"where i.hostid=h.hostid and h.status=%d and i.type=%d and h.host='%s' "
+			"and (i.status=%d or (i.status=%d and i.nextcheck<=%d)) and"ZBX_COND_NODEID,
+			HOST_STATUS_MONITORED,
+			ITEM_TYPE_ZABBIX_ACTIVE,
+			host,
+			ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED, time(NULL),
+			LOCAL_NODE("h.hostid"));
+	} else {
+		result = DBselect("select i.key_,i.delay,i.lastlogsize from items i,hosts h "
+			"where i.hostid=h.hostid and h.status=%d and i.type=%d and h.host='%s' "
+			"and i.status=%d and"ZBX_COND_NODEID,
+			HOST_STATUS_MONITORED,
+			ITEM_TYPE_ZABBIX_ACTIVE,
+			host,
+			ITEM_STATUS_ACTIVE,
+			LOCAL_NODE("h.hostid"));
+	}
 
 	while((row=DBfetch(result)))
 	{
