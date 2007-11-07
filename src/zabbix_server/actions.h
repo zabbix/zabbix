@@ -24,8 +24,6 @@
 #include "common.h"
 #include "db.h"
 
-extern	int	CONFIG_NODEID;
-
 void    process_actions(DB_EVENT *event);
 
 #endif

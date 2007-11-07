@@ -21,8 +21,6 @@
 #ifndef ZABBIX_NODECOMMAND_H
 #define ZABBIX_NODECOMMAND_H
 
-extern	int	CONFIG_NODEID;
-
 int	node_process_command(const char *data, char **result);
 
 #endif

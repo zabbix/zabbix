@@ -23,7 +23,6 @@
 extern	void	signal_handler(int);
 extern  int     server_num;
 
-extern	int	CONFIG_NODEID;
 extern  int     CONFIG_HTTPPOLLER_FORKS;
 
 void main_httppoller_loop(int num);
