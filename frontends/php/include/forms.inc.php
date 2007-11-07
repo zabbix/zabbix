@@ -3897,8 +3897,8 @@ include_once 'include/discovery.inc.php';
 		else if(in_array($resourcetype,array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW,SCREEN_RESOURCE_DATA_OVERVIEW)))
 		{
 			$cmbStyle = new CComboBox('style', $style);
-			$cmbStyle->AddItem(STYLE_TOP,	S_TOP);
 			$cmbStyle->AddItem(STYLE_LEFT,	S_LEFT);
+			$cmbStyle->AddItem(STYLE_TOP,	S_TOP);
 			$form->AddRow(S_HOSTS_LOCATION,	$cmbStyle);
 		}
 		else if($resourcetype == SCREEN_RESOURCE_CLOCK)
