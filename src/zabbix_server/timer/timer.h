@@ -20,8 +20,6 @@
 #ifndef ZABBIX_TIMER_H
 #define ZABBIX_TIMER_H
 
-extern	int	CONFIG_NODEID;
-
 void main_timer_loop();
 
 #endif
