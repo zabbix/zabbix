@@ -200,7 +200,7 @@
 		if(!isset($step))
 		{
 			$iframe = new CIFrame('screens.php?config=1&fullscreen=2&elementid='.$slideshowid.'&step='.$curr_step.
-					'&period='.$effectiveperiod.url_param('stime').url_param('from'));
+					'&period='.$effectiveperiod.url_param('stime').url_param('from'),'99%');
 					
 			return $iframe;
 		}
@@ -329,8 +329,7 @@
 				elseif( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_GRAPH) )
 				{
 					if($editmode == 0)
-						$action = "charts.php?graphid=$resourceid".url_param("period").
-                                                        url_param("inc").url_param("dec");
+						$action = "charts.php?graphid=$resourceid".url_param("period").url_param("stime");
 														
 					$graphid = null;						
 					$graphtype = GRAPH_TYPE_NORMAL;
