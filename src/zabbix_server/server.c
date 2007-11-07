@@ -1031,12 +1031,9 @@ int MAIN_ZABBIX_ENTRY(void)
 
 	result = DBselect("select refresh_unsupported from config where " ZBX_COND_NODEID,
 		LOCAL_NODE("configid"));
-	row = DBfetch(result);
 
-	if( (row != NULL) && DBis_null(row[0]) != SUCCEED)
-	{
+	if (NULL != (row = DBfetch(result)) && DBis_null(row[0]) != SUCCEED)
 		CONFIG_REFRESH_UNSUPPORTED = atoi(row[0]);
-	}
 	DBfree_result(result);
 
 	result = DBselect("select masterid from nodes where nodeid=%d",

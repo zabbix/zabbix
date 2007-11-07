@@ -961,6 +961,7 @@ void DBupdate_host_availability(zbx_uint64_t hostid,int available,int clock, cha
 int	DBupdate_item_status_to_notsupported(zbx_uint64_t itemid, char *error)
 {
 	char	error_esc[MAX_STRING_LEN];
+	int	now;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBupdate_item_status_to_notsupported()");
 
@@ -973,9 +974,12 @@ int	DBupdate_item_status_to_notsupported(zbx_uint64_t itemid, char *error)
 		strscpy(error_esc,"");
 	}
 
+	now = time(NULL);
+
 	/* '%s ' to make Oracle happy */
-	DBexecute("update items set status=%d,error='%s ' where itemid=" ZBX_FS_UI64,
+	DBexecute("update items set status=%d,nextcheck=%d,error='%s ' where itemid=" ZBX_FS_UI64,
 		ITEM_STATUS_NOTSUPPORTED,
+		CONFIG_REFRESH_UNSUPPORTED+now,
 		error_esc,
 		itemid);
 

@@ -36,6 +36,7 @@ extern	int	CONFIG_DBPORT;
 extern	int	CONFIG_NODEID;
 extern	int	CONFIG_MASTER_NODEID;
 extern	int	CONFIG_NODE_NOHISTORY;
+extern  int     CONFIG_REFRESH_UNSUPPORTED;
 
 typedef enum {
 	GRAPH_TYPE_NORMAL = 0,

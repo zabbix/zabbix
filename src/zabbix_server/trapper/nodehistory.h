@@ -21,8 +21,6 @@
 #ifndef ZABBIX_NODEHISTORY_H
 #define ZABBIX_NODEHISTORY_H
 
-extern	int	CONFIG_NODEID;
-
 int	node_history(char *data);
 
 #endif

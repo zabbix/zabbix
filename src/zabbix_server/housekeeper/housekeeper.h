@@ -22,11 +22,6 @@
 
 extern	int	CONFIG_DISABLE_HOUSEKEEPING;
 extern	int	CONFIG_HOUSEKEEPING_FREQUENCY;
-extern	char	*CONFIG_DBHOST;
-extern	char	*CONFIG_DBNAME;
-extern	char	*CONFIG_DBUSER;
-extern	char	*CONFIG_DBPASSWORD;
-extern	char	*CONFIG_DBSOCKET;
 extern	char	*CONFIG_FPING_LOCATION;
 
 int main_housekeeper_loop();

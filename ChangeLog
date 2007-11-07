@@ -1,8 +1,11 @@
 Changes for 1.4.3:
 
+ - [ZBX-130] Refresh unsupported active checks (Sasha)
  - [ZBX-134] fixes for hostid/groupid validation on Node switch (Artem)
  - [ZBX-131] fixed viewing password on install in plain text (Artem)
  - [ZBX-81] fix for item delay calculation problem in graphs (Artem)
+ - [DEV-75] Empty command result window (Sasha)
+ - [DEV-74] Scripts of all nodes are displayed (Sasha)
  - [ZBX-107] do not display log related items in the queue (Alexei)
  - [DEV-43] support of new macros {ITEM.VALUE}, {ITEM.VALUE1}, etc (Alexei)
  - [ZBX-30,ZBX-47] better dependencies (Alexei)
