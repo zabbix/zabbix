@@ -17,9 +17,6 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 // JavaScript Document
-var OP = window.opera?true:false;
-var IE = ((!OP) && (document.all))?true:false;
-
 
 var tree ={
 init : function(){
@@ -62,7 +59,7 @@ ChangeNodeStatus : function(id){
 		}
 		cookie.create(tree_name,cookie_str);
 	} catch(e){
-		IE?(alert(e.description)):(alert(e));
+//		IE?(alert(e.description)):(alert(e));
 	}
 },
 
