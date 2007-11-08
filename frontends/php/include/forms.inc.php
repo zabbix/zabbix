@@ -885,6 +885,7 @@
 		$cmbLang->AddItem("sp_sp",S_SPANISH_SP);
 		$cmbLang->AddItem("sv_se",S_SWEDISH_SE);
 		$cmbLang->AddItem("ja_jp",S_JAPANESE_JP);
+		$cmbLang->AddItem("hu_hu",S_HUNGARY_HU);
 
 		$frmUser->AddRow(S_LANGUAGE, $cmbLang);
 
