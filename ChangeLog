@@ -1,5 +1,6 @@
 Changes for 1.4.3:
 
+ - [ZBX-116] fixed typo in data.sql, "interfice" (Alexei)
  - [ZBX-130] Refresh unsupported active checks (Sasha)
  - [ZBX-134] fixes for hostid/groupid validation on Node switch (Artem)
  - [ZBX-131] fixed viewing password on install in plain text (Artem)
