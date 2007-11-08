@@ -31,7 +31,8 @@ Changes for 1.4.j:
 
 Changes for 1.4.3:
 
- = [ZBX-130] Refresh unsupported active checks (Sasha)
+ - [ZBX-118] fixed show_popup_menu display problem (Sasha)
+ - [ZBX-130] Refresh unsupported active checks (Sasha)
  - [DEV-75] Empty command result window
  - [DEV-74] Scripts of all nodes are displayed
  - [ZBX-107] do not display log related items in the queue (Alexei)

@@ -252,7 +252,7 @@
 		function AddAction($name, $value)
 		{
 			if(!empty($value))
-				$this->options[$name] = htmlentities(str_replace(array("\r", "\n"), '', strval($value)),ENT_COMPAT); 
+				$this->options[$name] = htmlentities(str_replace(array("\r", "\n"), '', strval($value)),ENT_COMPAT,S_HTML_CHARSET); 
 		}
 
 		function AddOption($name, $value)
