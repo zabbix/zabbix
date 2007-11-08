@@ -110,6 +110,7 @@ frontends/php/images/sysmaps/old/Workstation.png -text svneol=unset#unset
 frontends/php/include/classes/chart.inc.php -text
 frontends/php/include/classes/pie.inc.php -text
 frontends/php/include/js.inc.php -text
+frontends/php/include/locales/hu_hu.inc.php -text
 frontends/php/include/scripts.inc.php -text
 frontends/php/js/blink.js -text
 frontends/php/js/common.js -text
