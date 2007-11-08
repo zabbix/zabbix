@@ -1112,7 +1112,7 @@
 
 			if(strstr($description,"{ITEM.LASTVALUE}"))
 			{
-				$row2=DBfetch(DBselect('select i.lastvalue from items i, triggers t, functions f '.
+				$row2=DBfetch(DBselect('select i.lastvalue,i.itemid,i.value_type from items i, triggers t, functions f '.
 					' where i.itemid=f.itemid and f.triggerid=t.triggerid and '.
 					' t.triggerid='.$row["triggerid"]));
 

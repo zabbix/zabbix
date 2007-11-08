@@ -190,19 +190,25 @@ global $page;
 	<script type="text/javascript"> 
 			var treenode = new Array(0);
 			var tree_name = "tree_'.$this->getUserAlias().'_'.$page["file"].'";
+			var nodeid_list = new Array();
 			';
-			
+	$js_node_list = '';	
+	
 	foreach($this->tree as $id => $rows){
 		$parentid = $rows['parentid'];
 		$this->tree[$parentid]['nodelist'].=$id.'.';
 	}
-	
+	$count=0;
 	foreach($this->tree as $id => $rows){
 		if($rows['nodetype'] == '2'){
-			$js .= 'treenode['.$id.'] = { status: \'close\',  nodelist : \''.$rows['nodelist'].'\', parentid : \''.$rows['parentid'].'\'};';
+			$js_node_list.='nodeid_list['.$count.'] = '.$id.';';
+			$count++;
+
+			$js .= 'treenode["'.$id.'"] = { status: \'close\',  nodelist : \''.$rows['nodelist'].'\', parentid : \''.$rows['parentid'].'\'};';
 		}
 	}
-return $js.'window.onload = function(){tree.init()};
+	
+return $js."\n".$js_node_list."\n".' window.onload = function(){tree.init()};
 </script>';
 }
 

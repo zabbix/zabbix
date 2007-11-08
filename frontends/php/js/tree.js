@@ -53,16 +53,16 @@ ChangeNodeStatus : function(id){
 			treenode[id].status = 'close';
 		}
 		var cookie_str='';
-		for(var i = 1; i < treenode.length; i++){
-			if(typeof(treenode[i]) != 'undefined'){
-				if(treenode[i].status == 'open'){
-					cookie_str+=i+'.';
+		for(var i = 1; i < nodeid_list.length; i++){
+			if(typeof(treenode[nodeid_list[i]]) != 'undefined'){
+				if(treenode[nodeid_list[i]].status == 'open'){
+					cookie_str+=nodeid_list[i]+'.';
 				}
 			}
 		}
 		cookie.create(tree_name,cookie_str);
 	} catch(e){
-		IE?(alert(e.description)):(alert(e));
+//		IE?(alert(e.description)):(alert(e));
 	}
 },
 
