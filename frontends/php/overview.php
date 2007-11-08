@@ -140,7 +140,7 @@ if(isset($_REQUEST["select"])&&($_REQUEST["select"]!=""))
 	if($_REQUEST["type"]==SHOW_DATA)
 	{
 COpt::profiling_start("get_items_data_overview");
-		$table = get_items_data_overview($_REQUEST["groupid"]);
+		$table = get_items_data_overview($_REQUEST["groupid"],$_REQUEST['view_style']);
 COpt::profiling_stop("get_items_data_overview");
 		$table->Show();
 		unset($table);
@@ -148,7 +148,7 @@ COpt::profiling_stop("get_items_data_overview");
 	elseif($_REQUEST["type"]==SHOW_TRIGGERS)
 	{
 COpt::profiling_start("get_triggers_overview");
-		$table = get_triggers_overview($_REQUEST["groupid"]);
+		$table = get_triggers_overview($_REQUEST["groupid"],$_REQUEST['view_style']);
 COpt::profiling_stop("get_triggers_overview");
 		$table->Show();
 		unset($table);
