@@ -909,7 +909,7 @@ COpt::profiling_start('prepare table');
 			}
 		}
 		else{
-			$header=array(new CCol(S_ITEMS,'center'));
+			$header=array(new CCol(S_HOSTS,'center'));
 			foreach($items as $descr => $ithosts)
 			{
 				$header=array_merge($header,array(new CImg('vtext.php?text='.$descr)));

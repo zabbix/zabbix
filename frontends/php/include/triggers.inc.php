@@ -1841,7 +1841,7 @@
 			}
 		}
 		else{
-			$header=array(new CCol(S_TRIGGERS,'center'));
+			$header=array(new CCol(S_HOSTS,'center'));
 			foreach($triggers as $descr => $trhosts)
 			{
 				$header=array_merge($header,array(new CImg('vtext.php?text='.$descr)));
