@@ -1336,6 +1336,7 @@
 	'S_JAPANESE_JP'=>			'Japanese (JP)',
 	'S_CHINESE_CN'=>			'Chinese (CN)',
 	'S_DUTCH_NL'=>				'Dutch (NL)',
+	'S_HUNGARY_HU'=>			'Hungary (HU)',
 
 //	index.php
 	'S_ZABBIX_BIG'=>			'ZABBIX',

@@ -31,6 +31,7 @@ Changes for 1.4.j:
 
 Changes for 1.4.3:
 
+ - [ZBX-122] Hungarian translate
  - [ZBX-118] fixed show_popup_menu display problem (Sasha)
  - [ZBX-130] Refresh unsupported active checks (Sasha)
  - [DEV-75] Empty command result window
