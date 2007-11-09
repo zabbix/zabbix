@@ -1,5 +1,6 @@
 Changes for 1.4.3:
 
+ - [ZBX-109] added support of vm.memory.size[pfree] Linux, FreeBSD & Win agents (Sasha)
  - [ZBX-122] Hungarian translate
  - [ZBX-118] fixed show_popup_menu display problem (Sasha)
  - [ZBX-116] fixed typo in data.sql, "interfice" (Alexei)
