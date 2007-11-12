@@ -16,16 +16,22 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-var OP = window.opera?true:false;
-var IE = ((!OP) && (document.all))?true:false;
+var agt = navigator.userAgent.toLowerCase();
+var OP = (agt.indexOf("opera") != -1) && window.opera;
+var IE = (agt.indexOf("msie") != -1) && document.all && !OP;
+var SF = (agt.indexOf("safari") != -1)	;
 
 function isset(obj){
 	return (typeof(obj) != 'undefined');
 }
 
 function empty(obj){
-	if(is_null(obj) || !obj) return true;
-	return false;
+	if(is_null(obj)) return true;
+	if(obj == false) return true;
+	if((obj == 0) || (obj == '0')) return true;
+	if(is_string(obj) && (obj == '')) return true;
+	if(is_array(obj) && (obj.length == 0)) return true;
+return false;
 }
 
 function is_null(obj){

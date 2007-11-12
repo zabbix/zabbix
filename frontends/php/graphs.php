@@ -288,12 +288,12 @@ include_once "include/page_header.php";
 		echo BR;
 		$table = new CTable(NULL,"graph");
 		if(($_REQUEST['graphtype'] == GRAPH_TYPE_PIE) || ($_REQUEST['graphtype'] == GRAPH_TYPE_EXPLODED)){
-			$table->AddRow(new CImg('chart7.php?period=3600&from=0'.url_param('items').
+			$table->AddRow(new CImg('chart7.php?period=3600'.url_param('items').
 				url_param('name').url_param('legend').url_param('graph3d').url_param('width').url_param('height').url_param('graphtype')));
 			$table->Show();
 		}
 		else {
-			$table->AddRow(new CImg('chart3.php?period=3600&from=0'.url_param('items').
+			$table->AddRow(new CImg('chart3.php?period=3600'.url_param('items').
 				url_param('name').url_param('width').url_param('height').url_param('yaxistype').
 				url_param('yaxismin').url_param('yaxismax').url_param('show_work_period').
 				url_param('show_triggers').url_param('graphtype')));

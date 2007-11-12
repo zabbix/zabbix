@@ -90,21 +90,21 @@ function gmenuinit(top,left,period,bar_stime){
 		}
 	}
 	
-	if(!IE){
-		G_MENU.gm_gmenu.addEventListener('mouseover',gm_gm_msover,true);
-		
-		G_MENU.gm_gmenu.addEventListener('mouseout',gm_gm_msout,false);
-		
-		$('gmenu_load').addEventListener('click',G_MENU.ongmload.bindAsEventListener(G_MENU),false);
-		$('gmenu_hide').addEventListener('click',G_MENU.gmenuhide.bindAsEventListener(G_MENU),false);
-	}
-	else{
+	if(IE){
 		G_MENU.gm_gmenu.attachEvent('onmouseover',gm_gm_msover);		
 		
 		G_MENU.gm_gmenu.attachEvent('onmouseout',gm_gm_msout);
 		
 		$('gmenu_load').attachEvent('onclick',G_MENU.ongmload.bindAsEventListener(G_MENU));
 		$('gmenu_hide').attachEvent('onclick',G_MENU.gmenuhide.bindAsEventListener(G_MENU));
+	}
+	else{
+		G_MENU.gm_gmenu.addEventListener('mouseover',gm_gm_msover,true);
+		
+		G_MENU.gm_gmenu.addEventListener('mouseout',gm_gm_msout,false);
+		
+		$('gmenu_load').addEventListener('click',G_MENU.ongmload.bindAsEventListener(G_MENU),false);
+		$('gmenu_hide').addEventListener('click',G_MENU.gmenuhide.bindAsEventListener(G_MENU),false);
 	}
 
 
