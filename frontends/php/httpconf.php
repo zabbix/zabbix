@@ -76,7 +76,8 @@ include_once "include/page_header.php";
 	$_REQUEST["showdisabled"] = get_request("showdisabled", get_profile("web.httpconf.showdisabled", 0));
 	
 	check_fields($fields);
-
+	validate_sort_and_sortorder();
+	
 	$showdisabled = get_request("showdisabled", 0);
 	
 	$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,get_current_nodeid());
@@ -430,24 +431,27 @@ include_once "include/page_header.php";
 		$table->setHeader(array(
 			array(	$link, SPACE, new CCheckBox("all_httptests",null,
 					"CheckAll('".$form->GetName()."','all_httptests');"),
-				S_NAME),
+				make_sorting_link(S_NAME,'wt.name')),
 			S_NUMBER_OF_STEPS,
 			S_UPDATE_INTERVAL,
-			S_STATUS));
+			make_sorting_link(S_STATUS,'wt.status')));
 
 	$any_app_exist = false;
 
-	$db_applications = DBselect('select distinct h.host,h.hostid,a.* from applications a,hosts h '.
-		' where a.hostid=h.hostid and h.hostid='.$_REQUEST['hostid'].
-		' order by a.name,a.applicationid,h.host');
+	$db_applications = DBselect('SELECT DISTINCT h.host,h.hostid,a.* '.
+					' FROM applications a,hosts h '.
+					' WHERE a.hostid=h.hostid '.
+						' AND h.hostid='.$_REQUEST['hostid'].
+					' order by a.name,a.applicationid,h.host');
 	while($db_app = DBfetch($db_applications))
 	{
-		$db_httptests = DBselect('select wt.*,a.name as application,h.host,h.hostid from httptest wt '.
-			' left join applications a on wt.applicationid=a.applicationid '.
-			' left join hosts h on h.hostid=a.hostid'.
-			' where a.applicationid='.$db_app["applicationid"].
-			($showdisabled == 0 ? " and wt.status <> 1" : "").
-			' order by h.host,wt.name');
+		$db_httptests = DBselect('SELECT wt.*,a.name as application,h.host,h.hostid '.
+					' FROM httptest wt '.
+						' LEFT JOIN applications a ON wt.applicationid=a.applicationid '.
+						' LEFT JOIN hosts h ON h.hostid=a.hostid'.
+					' WHERE a.applicationid='.$db_app["applicationid"].
+						($showdisabled == 0 ? " and wt.status <> 1" : "").
+					order_by('wt.status,wt.name'));
 
 		$app_rows = array();
 		$httptest_cnt = 0;

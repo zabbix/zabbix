@@ -84,7 +84,8 @@ include_once "include/page_header.php";
 	);
 
 	check_fields($fields);
-
+	validate_sort_and_sortorder();
+	
 	validate_group_with_host(PERM_READ_WRITE,array("allow_all_hosts","always_select_first_host","only_current_node"),
 		'web.last.conf.groupid', 'web.last.conf.hostid');
 ?>
@@ -363,28 +364,33 @@ include_once "include/page_header.php";
 		$table = new CTableInfo(S_NO_GRAPHS_DEFINED);
 		$table->SetHeader(array(
 			$_REQUEST["hostid"] != 0 ? NULL : S_HOSTS,
-			array(	new CCheckBox("all_graphs",NULL,
-					"CheckAll('".$form->GetName()."','all_graphs');"),
-				S_NAME),
-			S_WIDTH,S_HEIGHT,S_GRAPH_TYPE));
+			array(	new CCheckBox("all_graphs",NULL,"CheckAll('".$form->GetName()."','all_graphs');"),
+				make_sorting_link(S_NAME,'g.name')),
+			make_sorting_link(S_WIDTH,'g.width'),
+			make_sorting_link(S_HEIGHT,'g.height'),
+			make_sorting_link(S_GRAPH_TYPE,'g.graphtype')));
 
 		if($_REQUEST["hostid"] > 0)
 		{
-			$result = DBselect("SELECT distinct g.* FROM graphs g left join graphs_items gi on g.graphid=gi.graphid ".
-				" left join items i on gi.itemid=i.itemid ".
-				" WHERE i.hostid=".$_REQUEST["hostid"].
-				" AND i.hostid not in (".$denyed_hosts.") ".
-				' and '.DBin_node('g.graphid').
-				" AND i.hostid is not NULL ".
-				" ORDER BY g.name, g.graphid");
+			$result = DBselect('SELECT DISTINCT g.* '.
+						' FROM graphs g '.
+							' LEFT JOIN graphs_items gi ON g.graphid=gi.graphid '.
+							' LEFT JOIN items i ON gi.itemid=i.itemid '.
+						' WHERE i.hostid='.$_REQUEST['hostid'].
+							' AND i.hostid NOT IN ('.$denyed_hosts.') '.
+							' AND '.DBin_node('g.graphid').
+							' AND i.hostid is not NULL '.
+						order_by('g.name,g.width,g.height,g.graphtype','g.graphid'));
 		}
 		else
 		{
-			$result = DBselect("SELECT distinct g.* FROM graphs g left join graphs_items gi on g.graphid=gi.graphid ".
-				" left join items i on gi.itemid=i.itemid ".
-				' where '.DBin_node('g.graphid').
-				" AND ( i.hostid not in (".$denyed_hosts.")  OR i.hostid is NULL )".
-				" ORDER BY g.name, g.graphid");
+			$result = DBselect('SELECT DISTINCT g.* '.
+						' FROM graphs g '.
+							' LEFT JOIN graphs_items gi ON g.graphid=gi.graphid '.
+							' LEFT JOIN items i ON gi.itemid=i.itemid '.
+						' WHERE '.DBin_node('g.graphid').
+							' AND ( i.hostid not in ('.$denyed_hosts.')  OR i.hostid is NULL )'.
+						order_by('g.name,g.width,g.height,g.graphtype','g.graphid'));
 		}
 		while($row=DBfetch($result))
 		{
