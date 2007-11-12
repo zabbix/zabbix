@@ -29,7 +29,7 @@
 	$page["file"] = "tr_status.php";
 	$page["title"] = "S_STATUS_OF_TRIGGERS";
 	$page['scripts'] = array('blink.js');
-	$page['hist_arg'] = array('groupid','hostid','compact','onlytrue','noactions','sort','select');
+	$page['hist_arg'] = array('groupid','hostid','compact','onlytrue','noactions','select');
 
 ?>
 <?php
@@ -93,7 +93,6 @@ include_once "include/page_header.php";
 	$fields=array(
 		"groupid"=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null),
 		"hostid"=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null),
-		"sort"=>	array(T_ZBX_STR, O_OPT,  null,	IN('"host","priority","description","lastchange"'), null),
 		"noactions"=>	array(T_ZBX_STR, O_OPT,  null,	IN('"true","false"'), null),
 		"compact"=>	array(T_ZBX_STR, O_OPT,  null,	IN('"true","false"'), null),
 		
@@ -106,6 +105,7 @@ include_once "include/page_header.php";
 	);
 
 	check_fields($fields);
+	validate_sort_and_sortorder();
 
 	$_REQUEST['show_triggers']	=	get_request('show_triggers', get_profile('web.tr_status.show_triggers', TRIGGERS_OPTION_ONLYTRUE));
 	$_REQUEST['show_events']	=	get_request('show_events',get_profile('web.tr_status.show_events', EVENTS_OPTION_NOEVENT));
@@ -134,7 +134,7 @@ include_once "include/page_header.php";
 	}
 ?>                                                                                                             
 <?php
-	$sort			= get_request('sort',		'priority');
+	
 	$noactions		= get_request('noactions',	'true');
 	$compact	 	= get_request('compact',	'true');
 	$show_triggers	= get_request('show_triggers',	TRIGGERS_OPTION_ONLYTRUE);
@@ -233,12 +233,11 @@ include_once "include/page_header.php";
 	$r_form->AddVar('noactions',$noactions);
 	$r_form->AddVar('select',$select);
 	$r_form->AddVar('txt_select',$txt_select);
-	$r_form->AddVar('sort',$sort);
 	if(isset($_REQUEST['fullscreen'])) $r_form->AddVar('fullscreen',1);
 
 	show_table_header(
 		new CLink(SPACE.S_STATUS_OF_TRIGGERS_BIG.SPACE.date("[H:i:s]",time()),"tr_status.php?show_triggers=$show_triggers".
-			"&show_events=$show_events&noactions=$noactions&compact=$compact&sort=$sort".
+			"&show_events=$show_events&noactions=$noactions&compact=$compact".
 			(!isset($_REQUEST["fullscreen"]) ? '&fullscreen=1' : '')),
 		$r_form);
 	
@@ -294,17 +293,17 @@ include_once "include/page_header.php";
 			
 		array_push($left_col, '[', new CLink($noactions != 'true' ? S_HIDE_ACTIONS : S_SHOW_ACTIONS,
 			"tr_status.php?noactions=".($noactions != 'true' ? 'true' : 'false').
-			"&show_triggers=$show_triggers&show_events=$show_events&compact=$compact&select=$select&txt_select=$txt_select&sort=$sort"
+			"&show_triggers=$show_triggers&show_events=$show_events&compact=$compact&select=$select&txt_select=$txt_select"
 			), ']'.SPACE);
 
 		array_push($left_col, '[', new CLink($compact != 'true' ? S_HIDE_DETAILS: S_SHOW_DETAILS,
 			"tr_status.php?compact=".($compact != 'true' ? 'true' : 'false').
-			"&show_triggers=$show_triggers&show_events=$show_events&noactions=$noactions&select=$select&txt_select=$txt_select&sort=$sort"
+			"&show_triggers=$show_triggers&show_events=$show_events&noactions=$noactions&select=$select&txt_select=$txt_select"
 			), ']'.SPACE);
 		
 		array_push($left_col, '[', new CLink($select != 'true' ? S_SELECT : S_HIDE_SELECT,
 			"tr_status.php?select=".($select != 'true' ? 'true' : 'false').
-			"&show_triggers=$show_triggers&show_events=$show_events&noactions=$noactions&compact=$compact&txt_select=$txt_select&sort=$sort"
+			"&show_triggers=$show_triggers&show_events=$show_events&noactions=$noactions&compact=$compact&txt_select=$txt_select"
 			), ']');
 			
 		if($select=='true')
@@ -343,54 +342,23 @@ include_once "include/page_header.php";
 	$m_form->SetName('tr_status');
 	
 	$table  = new CTableInfo();
+	$table->ShowStart();
+	
 	$header=array();
 
-	$headers_array = array(
-		is_show_subnodes() ? array('simple_label'=>S_NODE) : null,
-		$_REQUEST['hostid'] > 0 ? null : 
-		array('select_label'=>S_HOST_BIG	, 'simple_label'=>S_HOST,		'sort'=>'host'),
-		array('simple_label'=> new CCheckBox("all_events",false, "CheckAll('".$m_form->GetName()."','all_events','events');")),
-		array('select_label'=>S_NAME_BIG	, 'simple_label'=>S_NAME,		'sort'=>'description'),
-		array('simple_label'=>S_STATUS),
-		array('select_label'=>S_SEVERITY_BIG	, 'simple_label'=>S_SEVERITY,		'sort'=>'priority'),
-		array('select_label'=>S_LAST_CHANGE_BIG	, 'simple_label'=>S_LAST_CHANGE,	'sort'=>'lastchange'),
-		array('simple_label'=>($noactions!='true') ? S_ACTIONS : NULL),
-		array('simple_label'=>($config['ack_enable'])? S_ACKNOWLEDGED : NULL),
-		array('simple_label'=>S_COMMENTS)
-		);
-
-	$select_vars = (isset($sort) && $sort=="description") ? "&select=$select&txt_select=$txt_select" : "";
-	foreach($headers_array as $el)
-	{
-		if(isset($el['sort']) && $sort == $el['sort'])
-		{
-			$descr = $el['select_label'];
-		}
-		else if(isset($el['sort']))
-		{
-			$descr = new CLink($el['simple_label'],"tr_status.php?sort=".$el['sort'].
-				"&show_triggers=$show_triggers&show_events=$show_events&compact=$compact&select=$select&txt_select=$txt_select");
-		}
-		else
-		{
-			$descr = $el['simple_label'];
-		}
-		array_push($header,$descr);
-		unset($el);
-	}
-
-	$table->SetHeader($header);
-	unset($header);
-
-	switch($sort)
-	{
-		case 'host':		$sort=' order by h.host';	if($_REQUEST['hostid'] <= 0)	break; /* else 'description' */
-		case 'description':	$sort=' order by t.description';				break;
-		case 'priority':	$sort=' order by t.priority desc, t.description';	break;
-		case 'lastchange':	$sort=' order by t.lastchange desc, t.priority';		break;
-		default:			$sort=' order by t.priority desc, t.description';
-	}
-
+	$table->SetHeader(array(
+		is_show_subnodes() ? make_sorting_link(S_NODE,'h.hostid') : null,
+		$_REQUEST["hostid"] >0 ? null : make_sorting_link(S_HOST,'h.host'),
+		new CCheckBox("all_events",false, "CheckAll('".$m_form->GetName()."','all_events','events');"),
+		make_sorting_link(S_NAME,'t.description'),
+		S_STATUS,
+		make_sorting_link(S_SEVERITY,'t.priority'),
+		make_sorting_link(S_LAST_CHANGE,'t.lastchange'),
+		($noactions!='true')?S_ACTIONS:NULL,
+		($config['ack_enable'])? S_ACKNOWLEDGED : NULL,
+		S_COMMENTS
+		));
+		
 	$cond = ($_REQUEST['hostid'] > 0)?' AND h.hostid='.$_REQUEST['hostid'].' ':'';
 	
 	switch($show_triggers){
@@ -398,7 +366,6 @@ include_once "include/page_header.php";
 			$cond.='';
 			break;
 		case TRIGGERS_OPTION_NOFALSEFORB:
-//			$cond.=' AND ((t.value='.TRIGGER_VALUE_TRUE.') OR ((t.value='.TRIGGER_VALUE_FALSE.') AND t.type='.TRIGGER_MULT_EVENT_DISABLED.'))';
 			$cond.='';
 			break;
 		case TRIGGERS_OPTION_ONLYTRUE:
@@ -414,7 +381,8 @@ include_once "include/page_header.php";
 						' AND t.triggerid=f.triggerid AND t.status='.TRIGGER_STATUS_ENABLED.
 						' AND i.status='.ITEM_STATUS_ACTIVE.' AND '.DBin_node('t.triggerid').
 						' AND h.hostid not in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT).') '. 
-						' AND h.status='.HOST_STATUS_MONITORED.' '.$cond.' '.$sort;
+						' AND h.status='.HOST_STATUS_MONITORED.' '.$cond.
+						order_by('h.host,h.hostid,t.description,t.priority,t.lastchange');
 
 	$result = DBselect($sql);
 

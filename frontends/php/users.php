@@ -114,7 +114,7 @@ include_once "include/page_header.php";
 
 
 	check_fields($fields);
-
+	validate_sort_and_sortorder();
 ?>
 <?php
 	if($_REQUEST["config"]==0)
@@ -379,13 +379,18 @@ include_once "include/page_header.php";
 			$table->setHeader(array(
 				 array(  new CCheckBox("all_users",NULL,
                                         "CheckAll('".$form->GetName()."','all_users');"),
-					S_ALIAS
+					make_sorting_link(S_ALIAS,'u.alias')
 				),
-				S_NAME,S_SURNAME,S_USER_TYPE,S_GROUPS,S_IS_ONLINE_Q));
+				make_sorting_link(S_NAME,'u.name'),
+				make_sorting_link(S_SURNAME,'u.surname'),
+				make_sorting_link(S_USER_TYPE,'u.type'),
+				S_GROUPS,
+				S_IS_ONLINE_Q));
 		
-			$db_users=DBselect("select userid,alias,name,surname,type,autologout ".
-				' from users where '.DBin_node('userid').
-				" order by alias");
+			$db_users=DBselect('SELECT u.userid,u.alias,u.name,u.surname,u.type,u.autologout '.
+							' FROM users u'.
+							' WHERE '.DBin_node('u.userid').
+							order_by('u.alias,u.name,u.surname,u.type','u.userid'));
 			while($db_user=DBfetch($db_users))
 			{
 				$db_sessions = DBselect('select count(*) as count, max(s.lastaccess) as lastaccess'.
@@ -442,19 +447,22 @@ include_once "include/page_header.php";
 			$table->setHeader(array(
 				 array(  new CCheckBox("all_groups",NULL,
                                         "CheckAll('".$form->GetName()."','all_groups');"),
-					S_NAME),
+					make_sorting_link(S_NAME,'ug.name')),
 				S_MEMBERS));
 		
-			$result=DBselect("select usrgrpid,name from usrgrp".
-					' where '.DBin_node('usrgrpid').
-					" order by name");
+			$result=DBselect('SELECT ug.usrgrpid, ug.name '.
+							' FROM usrgrp ug'.
+							' WHERE '.DBin_node('ug.usrgrpid').
+							order_by('ug.name'));
 			while($row=DBfetch($result))
 			{
 				$users = array();
 
-				$db_users=DBselect("select distinct u.alias,u.userid from users u,users_groups ug ".
-					"where u.userid=ug.userid and ug.usrgrpid=".$row["usrgrpid"].
-					" order by alias");
+				$db_users=DBselect('SELECT DISTINCT u.alias,u.userid '.
+								' FROM users u,users_groups ug '.
+								' WHERE u.userid=ug.userid '.
+									' AND ug.usrgrpid='.$row['usrgrpid'].
+								' ORDER BY u.alias');
 
 				while($db_user=DBfetch($db_users))	$users[$db_user['userid']] = $db_user["alias"];
 

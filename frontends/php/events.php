@@ -55,7 +55,8 @@ include_once "include/page_header.php";
 	$_REQUEST['source'] = get_request('source', get_profile('web.events.source', 0));
 	
 	check_fields($fields);
-
+	validate_sort_and_sortorder();
+	
 	$source = get_request('source', EVENT_SOURCE_TRIGGERS);
 	$show_unknown = get_request('show_unknown',get_profile('web.events.show_unknown',0));
 
@@ -190,7 +191,7 @@ include_once "include/page_header.php";
 	
 	show_table_header($l_form,$r_form);
 
-        $table->Show();
+	$table->Show();
 ?>
 <?php
 

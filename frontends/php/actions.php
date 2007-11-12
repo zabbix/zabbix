@@ -43,6 +43,7 @@ include_once "include/page_header.php";
 	);
 
 	check_fields($fields);
+	validate_sort_and_sortorder();
 ?>
 <?php
 	

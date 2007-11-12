@@ -47,6 +47,7 @@ include_once "include/page_header.php";
 	);
 
 	check_fields($fields);
+	validate_sort_and_sortorder();
 	
 	$options = array("allow_all_hosts","always_select_first_host","monitored_hosts","with_monitored_items");
 	if(!$ZBX_WITH_SUBNODES)	array_push($options,"only_current_node");
@@ -176,25 +177,34 @@ include_once "include/page_header.php";
 
 	$table=new CTableInfo();
 	$table->SetHeader(array(
-		is_show_subnodes() ? S_NODE : null,
-		$_REQUEST["hostid"] ==0 ? S_HOST : NULL,
-		($link->ToString()).SPACE.S_DESCRIPTION,
-		S_LAST_CHECK,S_LAST_VALUE,S_CHANGE,S_HISTORY));
+		is_show_subnodes() ? make_sorting_link(S_NODE,'h.hostid') : null,
+		$_REQUEST["hostid"] ==0 ? make_sorting_link(S_HOST,'h.host') : NULL,
+		array($link,SPACE,make_sorting_link(S_DESCRIPTION,'i.description')),
+		make_sorting_link(S_LAST_CHECK,'i.lastclock'),
+		S_LAST_VALUE,
+		S_CHANGE,
+		S_HISTORY));
 	$table->ShowStart();
 
 	$compare_host = ($_REQUEST["hostid"] > 0)?(' and h.hostid='.$_REQUEST['hostid']):'';
 
 	$any_app_exist = false;
 		
-	$db_applications = DBselect("select distinct h.host,h.hostid,a.* from applications a,hosts h ".
-		" where a.hostid=h.hostid".$compare_host.' and h.hostid in ('.$availiable_hosts.')'.
-		" and h.status=".HOST_STATUS_MONITORED." order by a.name,a.applicationid,h.host");
+	$db_applications = DBselect('SELECT DISTINCT h.host,h.hostid,a.* '.
+					' FROM applications a,hosts h '.
+					' WHERE a.hostid=h.hostid'.$compare_host.
+						' AND h.hostid IN ('.$availiable_hosts.')'.
+						' AND h.status='.HOST_STATUS_MONITORED.
+					order_by('h.host,h.hostid','a.name,a.applicationid'));
+					
 	while($db_app = DBfetch($db_applications))
 	{		
-		$db_items = DBselect("select distinct i.* from items i,items_applications ia".
-			" where ia.applicationid=".$db_app["applicationid"]." and i.itemid=ia.itemid".
-			" and i.status=".ITEM_STATUS_ACTIVE.
-			" order by i.description, i.itemid");
+		$db_items = DBselect('SELECT DISTINCT i.* '.
+					' FROM items i,items_applications ia'.
+					' WHERE ia.applicationid='.$db_app['applicationid'].
+						' AND i.itemid=ia.itemid'.
+						' AND i.status='.ITEM_STATUS_ACTIVE.
+					order_by('i.description,i.itemid,i.lastclock'));
 
 		$app_rows = array();
 		$item_cnt = 0;

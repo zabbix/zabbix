@@ -71,6 +71,9 @@
 	define('IMAGE_FORMAT_PNG',         	'PNG');
 	define('IMAGE_FORMAT_JPEG',         	'JPEG');
 	define('IMAGE_FORMAT_TEXT',         	'JPEG');
+	
+	define('ZBX_SORT_UP',			'ASC');
+	define('ZBX_SORT_DOWN',			'DESC');
 //	END OF MISC PARAMETERS
 
 	define('AUDIT_ACTION_ADD',		0);

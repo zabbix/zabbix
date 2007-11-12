@@ -778,27 +778,30 @@ include_once 'include/discovery.inc.php';
 		global $USER_DETAILS;
 		
 		$denyed_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_ONLY, PERM_MODE_LT);
-		
-		$result=DBselect("select distinct a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,".
-				"a.error from alerts a,media_type mt,functions f,items i ".
-				" where mt.mediatypeid=a.mediatypeid and a.triggerid=f.triggerid and f.itemid=i.itemid ".
-				" and i.hostid not in (".$denyed_hosts.")".
-				' and '.DBin_node('a.alertid').
-				" order by a.clock".
-				" desc",
-			10*$start+$num);
 
 		$table = new CTableInfo(S_NO_ACTIONS_FOUND);
 		$table->SetHeader(array(
-				is_show_subnodes() ? S_NODES : null,
-				S_TIME,
-				S_TYPE,
-				S_STATUS,
-				S_RETRIES_LEFT,
-				S_RECIPIENTS,
+				is_show_subnodes() ? make_sorting_link(S_NODES,'a.alertid') : null,
+				make_sorting_link(S_TIME,'a.clock'),
+				make_sorting_link(S_TYPE,'mt.description'),
+				make_sorting_link(S_STATUS,'a.status'),
+				make_sorting_link(S_RETRIES_LEFT,'a.retries'),
+				make_sorting_link(S_RECIPIENTS,'a.sendto'),
 				S_MESSAGE,
 				S_ERROR
 				));
+				
+		
+		$result=DBselect('SELECT DISTINCT a.alertid,a.clock,mt.description,a.sendto,a.subject,a.message,a.status,a.retries,a.error '.
+				' FROM alerts a,media_type mt,functions f,items i '.
+				' WHERE mt.mediatypeid=a.mediatypeid '.
+					' and a.triggerid=f.triggerid '.
+					' and f.itemid=i.itemid '.
+					' and i.hostid not in ('.$denyed_hosts.')'.
+					' and '.DBin_node('a.alertid').
+				order_by('a.clock,a.alertid,mt.description,a.sendto,a.status,a.retries'),
+			10*$start+$num);
+			
 		$col=0;
 		$skip=$start;
 		while(($row=DBfetch($result))&&($col<$num))

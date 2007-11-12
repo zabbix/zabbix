@@ -82,7 +82,8 @@ include_once "include/page_header.php";
 	$_REQUEST["showdisabled"] = get_request("showdisabled", get_profile("web.triggers.showdisabled", 0));
 	
 	check_fields($fields);
-
+	validate_sort_and_sortorder();
+	
 	if(isset($_REQUEST["triggerid"]))
 		if(!check_right_on_trigger_by_triggerid(PERM_READ_WRITE, $_REQUEST["triggerid"]))
 			access_deny();
@@ -376,26 +377,30 @@ include_once "include/page_header.php";
 
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
 		$table->setHeader(array(
-			$_REQUEST["hostid"] > 0 ? NULL : S_HOST,
+			$_REQUEST["hostid"] > 0 ? NULL : make_sorting_link(S_HOST,'h.host'),
 			array(	new CCheckBox("all_triggers",NULL,
 					"CheckAll('".$form->GetName()."','all_triggers');")
-				,S_NAME
+				,make_sorting_link(S_NAME,'t.description'),
 			),
-			S_EXPRESSION, S_SEVERITY, S_STATUS, S_ERROR));
+			S_EXPRESSION, 
+			make_sorting_link(S_SEVERITY,'t.priority'), 
+			make_sorting_link(S_STATUS,'t.status'), 
+			S_ERROR));
 
-		$sql = 'select distinct h.hostid,h.host,t.*'.
-			' from triggers t left join functions f on t.triggerid=f.triggerid '.
-			' left join items i on f.itemid=i.itemid '.
-			' left join hosts h on h.hostid=i.hostid '.
-			' where '.DBin_node('t.triggerid');
+		$sql = 'SELECT DISTINCT h.hostid,h.host,t.*'.
+			' FROM triggers t '.
+				' LEFT JOIN functions f ON t.triggerid=f.triggerid '.
+				' LEFT JOIN items i ON f.itemid=i.itemid '.
+				' LEFT JOIN hosts h ON h.hostid=i.hostid '.
+			' WHERE '.DBin_node('t.triggerid');
 
 		if($showdisabled == 0)
-		    $sql .= ' and t.status <> '.TRIGGER_STATUS_DISABLED;
+		    $sql .= ' AND t.status <> '.TRIGGER_STATUS_DISABLED;
 
 		if($_REQUEST['hostid'] > 0) 
-			$sql .= ' and h.hostid='.$_REQUEST['hostid'];
+			$sql .= ' AND h.hostid='.$_REQUEST['hostid'];
 
-		$sql .= ' order by h.host,t.description';
+		$sql .= order_by('h.host,t.description,t.priority,t.status');
 
 		$result=DBselect($sql);
 		while($row=DBfetch($result))

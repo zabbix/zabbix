@@ -539,7 +539,9 @@
 	$system_fields=array(
 		"sessionid"=>		array(T_ZBX_STR, O_OPT,	 P_SYS,	HEX(),NULL),
 		"switch_node"=>		array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,NULL),
-		"triggers_hash"=>	array(T_ZBX_STR, O_OPT,	 P_SYS,	NOT_EMPTY,NULL)
+		"triggers_hash"=>	array(T_ZBX_STR, O_OPT,	 P_SYS,	NOT_EMPTY,NULL),
+		'sort'=>			array(T_ZBX_STR, O_OPT,	 P_SYS,	NULL,NULL),
+		'sortorder'=>		array(T_ZBX_STR, O_OPT,	 P_SYS,	NULL,NULL)
 	);
 
 	function	invalid_url()

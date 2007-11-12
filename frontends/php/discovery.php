@@ -17,8 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-?>
-<?php
+
 	require_once "include/config.inc.php";
 	require_once "include/discovery.inc.php";
 	$page['hist_arg'] = array('druleid');
@@ -28,17 +27,15 @@
 
 include_once "include/page_header.php";
 
-?>
-<?php
+
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
 		"druleid"=>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null),
 	);
 
 	check_fields($fields);
+	validate_sort_and_sortorder();
 
-?>
-<?php
 	$r_form = new CForm();
 	$r_form->SetMethod('get');
 	
@@ -55,11 +52,11 @@ include_once "include/page_header.php";
 	$r_form->AddItem(array(S_DISCOVERY_RULE.SPACE,$cmbDRules));
 
 	show_table_header(S_STATUS_OF_DISCOVERY_BIG, $r_form);
-?>
-<?php
-	$db_dhosts = DBselect('select * from dhosts'.
-		($druleid > 0 ? ' where druleid='.$druleid : '').
-		' order by status,ip'
+
+	$db_dhosts = DBselect('SELECT d.* '.
+					' FROM dhosts d'.
+					($druleid > 0 ? ' WHERE d.druleid='.$druleid : '').
+					order_by('d.dhostid','d.status,d.ip')
 	);
 
 	$services = array();
@@ -77,7 +74,9 @@ include_once "include/page_header.php";
 
 		$discovery_info[$drule_data['ip']] = array('class' => $class, 'time' => $drule_data[$time], 'druleid' => $drule_data['druleid']);
 
-		$db_dservices = DBselect('select * from dservices where dhostid='.$drule_data['dhostid'].' order by status,type,port');
+		$db_dservices = DBselect('SELECT * FROM dservices '.
+								' WHERE dhostid='.$drule_data['dhostid'].
+								' order by status,type,port');
 		while($dservice_data = DBfetch($db_dservices))
 		{
 			$class = 'active';
@@ -103,8 +102,8 @@ include_once "include/page_header.php";
 	ksort($services);
 
 	$header = array(
-		is_show_subnodes() ? S_NODE : null,
-		new CCol(S_HOST, 'center'),
+		is_show_subnodes() ? new CCol(S_NODE, 'center') : null,
+		new CCol(make_sorting_link(S_HOST,'d.dhostid'), 'center'),
 		new CCol(S_UPTIME.'/'.BR.S_DOWNTIME,'center')
 		);
 

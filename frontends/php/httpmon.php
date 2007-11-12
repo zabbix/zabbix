@@ -46,6 +46,7 @@ include_once "include/page_header.php";
 	);
 
 	check_fields($fields);
+	validate_sort_and_sortorder();
 
 	validate_group_with_host(PERM_READ_ONLY,array("allow_all_hosts","always_select_first_host","monitored_hosts"));
 ?>
@@ -164,9 +165,9 @@ include_once "include/page_header.php";
 
 	$table  = new CTableInfo();
 	$table->SetHeader(array(
-		is_show_subnodes() ? S_NODE : null,
-		$_REQUEST["hostid"] ==0 ? S_HOST : NULL,
-		array($link, SPACE, S_NAME),
+		is_show_subnodes() ? make_sorting_link(S_NODE,'h.hostid') : null,
+		$_REQUEST["hostid"] ==0 ? make_sorting_link(S_HOST,'h.host') : NULL,
+		array($link, SPACE, make_sorting_link(S_NAME,'wt.name')),
 		S_NUMBER_OF_STEPS,
 		S_STATE,
 		S_LAST_CHECK,
@@ -178,17 +179,19 @@ include_once "include/page_header.php";
 		$compare_host = " and h.hostid=".$_REQUEST["hostid"];
 	else
 		$compare_host = " and h.hostid in (".$accessible_hosts.") ";
-
-	$db_applications = DBselect('select distinct h.host,h.hostid,a.* from applications a,hosts h '.
-		' where a.hostid=h.hostid '.$compare_host.
-		' order by a.name,a.applicationid,h.host');
+		
+	$db_applications = DBselect('SELECT DISTINCT h.host,h.hostid,a.* '.
+							' FROM applications a,hosts h '.
+							' WHERE a.hostid=h.hostid '.$compare_host.
+							order_by('a.applicationid,h.host,h.hostid','a.name')
+		);
 	while($db_app = DBfetch($db_applications))
 	{
 		$db_httptests = DBselect('select wt.*,a.name as application,h.host,h.hostid from httptest wt '.
 			' left join applications a on wt.applicationid=a.applicationid '.
 			' left join hosts h on h.hostid=a.hostid'.
 			' where a.applicationid='.$db_app["applicationid"].' and wt.status <> 1'.
-			' order by h.host,wt.name');
+			order_by('wt.name','h.host'));
 
 		$app_rows = array();
 		$httptest_cnt = 0;

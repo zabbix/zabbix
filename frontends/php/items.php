@@ -158,7 +158,8 @@ include_once "include/page_header.php";
 	$_REQUEST["showdisabled"] = get_request("showdisabled", get_profile("web.items.showdisabled", 0));
 	
 	check_fields($fields);
-
+	validate_sort_and_sortorder();
+	
 	$showdisabled = get_request("showdisabled", 0);
 	
 	$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,get_current_nodeid());
@@ -739,23 +740,30 @@ include_once "include/page_header.php";
 
 		$table  = new CTableInfo();
 		$table->SetHeader(array(
-			$show_host ? S_HOST : null,
+			$show_host ? make_sorting_link(S_HOST,'h.host') : null,
 			array(	new CCheckBox("all_items",null,
 					"CheckAll('".$form->GetName()."','all_items');"),
-				S_DESCRIPTION),
-			S_KEY,nbsp(S_UPDATE_INTERVAL),
-			S_HISTORY,S_TRENDS,S_TYPE,S_STATUS,
+				make_sorting_link(S_DESCRIPTION,'i.description')),
+			make_sorting_link(S_KEY,'i.key_'),
+			make_sorting_link(nbsp(S_UPDATE_INTERVAL),'i.delay'),
+			make_sorting_link(S_HISTORY,'i.history'),
+			make_sorting_link(S_TRENDS,'i.trends'),
+			make_sorting_link(S_TYPE,'i.type'),
+			make_sorting_link(S_STATUS,'i.status'),
 			$show_applications ? S_APPLICATIONS : null,
 			S_ERROR));
 
 		$from_tables['i'] = 'items i'; /* NOTE: must be added as last element to use left join */
 
-		$db_items = DBselect('select distinct th.host as template_host,th.hostid as template_hostid, h.host, i.* '.
-			' from '.implode(',', $from_tables).
-			' left join items ti on i.templateid=ti.itemid left join hosts th on ti.hostid=th.hostid '.
-			' where '.implode(' and ', $where_case).' order by h.host,i.description,i.key_,i.itemid');
-		while($db_item = DBfetch($db_items))
-		{
+		$db_items = DBselect('SELECT DISTINCT th.host as template_host,th.hostid as template_hostid, h.host, i.* '.
+						' FROM '.implode(',', $from_tables).
+							' LEFT JOIN items ti ON i.templateid=ti.itemid '.
+							' LEFT JOIN hosts th ON ti.hostid=th.hostid '.
+						' WHERE '.implode(' and ', $where_case).
+						order_by('h.host,i.description,i.key_,i.delay,i.history,i.trends,i.type,i.status','i.itemid'));
+						
+		while($db_item = DBfetch($db_items)){
+		
 			$description = array();
 
 			$item_description = item_description($db_item["description"],$db_item["key_"]);

@@ -53,6 +53,7 @@ include_once "include/page_header.php";
 
 	);
 	check_fields($fields);
+	validate_sort_and_sortorder();
 	
 	if(isset($_REQUEST["sysmapid"]))
 	{
@@ -115,10 +116,18 @@ include_once "include/page_header.php";
 	{
 		show_table_header(S_MAPS_BIG);
 		$table = new CTableInfo(S_NO_MAPS_DEFINED);
-		$table->SetHeader(array(S_NAME,S_WIDTH,S_HEIGHT,S_MAP));
+		$table->SetHeader(array(
+			make_sorting_link(S_NAME,'sm.name'),
+			make_sorting_link(S_WIDTH,'sm.width'),
+			make_sorting_link(S_HEIGHT,'sm.height'),
+			S_MAP
+			));
 
-		$result = DBselect("select sysmapid,name,width,height from sysmaps ".
-			' where '.DBin_node('sysmapid').' order by name');
+		$result = DBselect('SELECT sm.sysmapid,sm.name,sm.width,sm.height '.
+						' FROM sysmaps sm'.
+						' WHERE '.DBin_node('sm.sysmapid').
+						order_by('sm.name,sm.width,sm.height','sm.sysmapid'));
+						
 		while($row=DBfetch($result))
 		{
 			if(!sysmap_accessiable($row["sysmapid"],PERM_READ_WRITE)) continue;
