@@ -149,12 +149,12 @@ create_box: function(){
 		this.dom_box.style.height = height+'px';
 		this.box.height = height;
 	
-		if(!IE){
-			this.dom_box.addEventListener('mousemove',A_SBOX[this.sbox_id].sbox.mousemove.bindAsEventListener(A_SBOX[this.sbox_id].sbox),true);
-		}
-		else{
+		if(IE){
 //			this.dom_box.attachEvent('onmousemove',S_BOX.mousemove.bindAsEventListener(S_BOX));
 			this.dom_box.onmousemove = A_SBOX[this.sbox_id].sbox.mousemove.bind(A_SBOX[this.sbox_id].sbox);
+		}
+		else{
+			this.dom_box.addEventListener('mousemove',A_SBOX[this.sbox_id].sbox.mousemove.bindAsEventListener(A_SBOX[this.sbox_id].sbox),true);
 		}
 	
 		this.start_event.top = this.mouse_event.top;

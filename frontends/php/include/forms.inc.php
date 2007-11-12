@@ -2599,11 +2599,11 @@
 				array(
 					$items_table,
 					new CButton('add_item',S_ADD,
-						'return PopUp("popup_gitem.php?dstfrm='.$frmGraph->GetName().
+						"return PopUp('popup_gitem.php?dstfrm=".$frmGraph->GetName().
 						url_param($only_hostid, false, 'only_hostid').
 						url_param($monitored_hosts, false, 'monitored_hosts').
 						url_param($graphtype, false, 'graphtype').
-						'",550,400,"graph_item_form");'),
+						"',550,400,'graph_item_form');"),
 					$dedlete_button
 				));
 		unset($items_table, $dedlete_button);
