@@ -51,24 +51,27 @@
 			$sql_cond.= ' AND e.value<>2 ';
 		}
 	
-		$result = DBselect('SELECT DISTINCT t.triggerid,t.priority,t.description,t.expression,h.host,e.clock,e.value '.
+
+       
+		$table = new CTableInfo(S_NO_EVENTS_FOUND); 
+		$table->SetHeader(array(
+				make_sorting_link(S_TIME,'e.clock'),
+				is_show_subnodes() ? make_sorting_link(S_NODE,'h.hostid') : null,
+				$hostid == 0 ? make_sorting_link(S_HOST,'h.host') : null,
+				make_sorting_link(S_DESCRIPTION,'t.description'),
+				make_sorting_link(S_VALUE,'e.value'),
+				make_sorting_link(S_SEVERITY,'t.priority')
+				));
+				
+		$result = DBselect('SELECT DISTINCT t.triggerid,t.priority,t.description,t.expression,h.host,h.hostid,e.clock,e.value '.
 			' FROM events e, triggers t, functions f, items i, hosts h '.$sql_from.
 			' WHERE '.DBin_node('t.triggerid').
 				' AND e.objectid=t.triggerid and e.object='.EVENT_OBJECT_TRIGGER.
 				' AND t.triggerid=f.triggerid and f.itemid=i.itemid '.
 				' AND i.hostid=h.hostid '.$sql_cond.' and h.status='.HOST_STATUS_MONITORED.
-			' ORDER BY e.clock DESC,h.host,t.priority,t.description,t.triggerid ',10*($start+$num)
+			order_by('e.clock,h.host,h.hostid,t.priority,t.description,e.value','t.triggerid')
+			,10*($start+$num)
 			);
-       
-		$table = new CTableInfo(S_NO_EVENTS_FOUND); 
-		$table->SetHeader(array(
-				S_TIME,
-				is_show_subnodes() ? S_NODE : null,
-				$hostid == 0 ? S_HOST : null,
-				S_DESCRIPTION,
-				S_VALUE,
-				S_SEVERITY
-				));
 		
 		$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 		

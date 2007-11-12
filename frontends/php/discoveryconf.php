@@ -70,6 +70,8 @@ include_once "include/page_header.php";
 	);
 
 	check_fields($fields);
+	validate_sort_and_sortorder();
+	
 	$_REQUEST['dchecks'] = get_request('dchecks', array());
 	
 ?>
@@ -201,15 +203,18 @@ include_once "include/page_header.php";
 		$tblDiscovery = new CTableInfo(S_NO_DISCOVERY_RULES_DEFINED);
 		$tblDiscovery->SetHeader(array(
 			array(	new CCheckBox('all_drules',null,"CheckAll('".$form->GetName()."','all_drules');"),
-				S_NAME
+				make_sorting_link(S_NAME,'d.name')
 			),
-			S_IP_RANGE,
-			S_DELAY,
+			make_sorting_link(S_IP_RANGE,'d.iprange'),
+			make_sorting_link(S_DELAY,'d.delay'),
 			S_CHECKS,
 			S_STATUS));
 
-		$db_rules = DBselect('select * from drules where '.DBin_node('druleid').
-			' order by name, druleid');
+		$db_rules = DBselect('SELECT d.* '.
+						' FROM drules d'.
+						' WHERE '.DBin_node('druleid').
+						order_by('d.name,d.iprange,d.delay','d.druleid'));
+						
 		while($rule_data = DBfetch($db_rules))
 		{
 			$cheks = array();

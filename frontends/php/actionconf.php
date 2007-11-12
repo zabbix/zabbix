@@ -82,6 +82,7 @@ include_once "include/page_header.php";
 	);
 
 	check_fields($fields);
+	validate_sort_and_sortorder();
 	
 	if(isset($_REQUEST['actionid']) && !action_accessiable($_REQUEST['actionid'], PERM_READ_WRITE))
 	{
@@ -339,14 +340,18 @@ include_once "include/page_header.php";
 		$tblActions = new CTableInfo(S_NO_ACTIONS_DEFINED);
 		$tblActions->SetHeader(array(
 			array(	new CCheckBox('all_items',null,'CheckAll("'.$form->GetName().'","all_items");'),
-				S_NAME
+				make_sorting_link(S_NAME,'a.name')
 			),
 			S_CONDITIONS,
 			S_OPERATIONS,
-			S_STATUS));
+			make_sorting_link(S_STATUS,'a.status')
+			));
 
-		$db_actions = DBselect('select * from actions where eventsource='.$_REQUEST['eventsource'].
-			' and '.DBin_node('actionid').' order by name,actionid');
+		$db_actions = DBselect('SELECT a.* '.
+							' FROM actions a'.
+							' WHERE a.eventsource='.$_REQUEST['eventsource'].
+								' AND '.DBin_node('actionid').
+							order_by('a.name,a.status','a.actionid'));
 		while($action_data = DBfetch($db_actions))
 		{
 			if(!action_accessiable($action_data['actionid'], PERM_READ_WRITE)) continue;

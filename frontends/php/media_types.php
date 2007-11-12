@@ -66,6 +66,7 @@ include_once "include/page_header.php";
 	);
 	
 	check_fields($fields);
+	validate_sort_and_sortorder();
 ?>
 <?php
 
@@ -134,11 +135,16 @@ include_once "include/page_header.php";
 	else
 	{
 		$table=new CTableInfo(S_NO_MEDIA_TYPES_DEFINED);
-		$table->setHeader(array(S_TYPE,S_DESCRIPTION,S_DETAILS));
+		$table->setHeader(array(
+			make_sorting_link(S_TYPE,'mt.type'),
+			make_sorting_link(S_DESCRIPTION,'mt.description'),
+			S_DETAILS
+		));
 
-		$result=DBselect('select * from media_type '.
-			' where '.DBin_node('mediatypeid').
-			' order by type, description');
+		$result=DBselect('SELECT mt.* '.
+					' FROM media_type mt'.
+					' WHERE '.DBin_node('mt.mediatypeid').
+					order_by('mt.type,mt.description'));
 		while($row=DBfetch($result))
 		{
 			switch($row['type'])

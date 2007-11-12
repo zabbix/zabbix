@@ -55,6 +55,7 @@ include_once "include/page_header.php";
 	);
 
 	check_fields($fields);
+	validate_sort_and_sortorder();
 	
 	$accessible_nodes = get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_LIST,null,PERM_RES_IDS_ARRAY, get_current_nodeid(true));
 
@@ -118,12 +119,18 @@ include_once "include/page_header.php";
 		show_table_header(S_NODES_BIG,$form);
 
 		$table=new CTableInfo(S_NO_NODES_DEFINED);
-		$table->SetHeader(array(S_ID,S_NAME,S_TYPE,S_TIME_ZONE,S_IP.':'.S_PORT));
+		$table->SetHeader(array(
+			make_sorting_link(S_ID,'n.nodeid'),
+			make_sorting_link(S_NAME,'n.name'),
+			make_sorting_link(S_TYPE,'n.nodetype'),
+			make_sorting_link(S_TIME_ZONE,'n.timezone'),
+			make_sorting_link(S_IP.':'.S_PORT,'n.ip')
+		));
 
-		$db_nodes = DBselect(
-				'select * from nodes '.
-				' where nodeid in ('.$accessible_nodes.') '.
-				' order by nodetype desc, masterid, name '
+		$db_nodes = DBselect('SELECT n.* '.
+						' FROM nodes n'.
+						' WHERE n.nodeid in ('.$accessible_nodes.') '.
+						order_by('n.nodeid,n.name,n.nodetype,n.timezone,n.ip','n.masterid')
 				);
 		while($row=DBfetch($db_nodes))
 		{

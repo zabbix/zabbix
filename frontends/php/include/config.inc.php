@@ -1766,4 +1766,91 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 		}
 		return $new;
 	}
+
+	
+	/* function:
+	 *      validate_sort_and_sortorder
+	 *
+	 * description:
+	 *      Checking,setting and saving sort params
+	 *
+	 * author: Aly
+	 */
+	function validate_sort_and_sortorder(){
+		global $page;
+		
+		$_REQUEST['sort'] = get_request('sort',get_profile('web.'.$page["file"].'.sort',NULL));
+		$_REQUEST['sortorder'] = get_request('sortorder',get_profile('web.'.$page["file"].'.sortorder',ZBX_SORT_UP));
+		
+		if(!is_null($_REQUEST['sort'])){
+			$_REQUEST['sort'] = eregi_replace('[^a-z\.\_]','',$_REQUEST['sort']);
+			update_profile('web.'.$page["file"].'.sort',		$_REQUEST['sort']);
+		}
+
+		if(!in_array($_REQUEST['sortorder'],array(ZBX_SORT_DOWN,ZBX_SORT_UP)))
+			$_REQUEST['sortorder'] = ZBX_SORT_UP;
+
+		update_profile('web.'.$page["file"].'.sortorder',	$_REQUEST['sortorder']);
+	}
+
+	/* function:
+	 *      make_sorting_link
+	 *
+	 * description:
+	 *      Creates links for sorting in table header
+	 *
+	 * author: Aly
+	 */
+	function make_sorting_link($obj,$tabfield,$url=''){
+		global $page;
+		
+		$sortorder = ($_REQUEST['sortorder'] == ZBX_SORT_UP)?ZBX_SORT_DOWN:ZBX_SORT_UP;
+		
+		if(empty($url)){
+			$url='?';
+			$url_params = explode('&',$_SERVER['QUERY_STRING']);
+			foreach($url_params as $id => $param){
+				if(empty($param)) continue;
+				
+				list($name,$value) = explode('=',$param);
+				if(empty($name) || ($name == 'sort') || (($name == 'sortorder'))) continue;
+				$url.=$param.'&';
+			}
+		}
+		else{
+			$url.='&';
+		}
+		
+		$link = new CLink($obj,$url.'sort='.$tabfield.'&sortorder='.$sortorder);
+		
+		if($tabfield == $_REQUEST['sort']){
+			if($sortorder == ZBX_SORT_UP){
+				$img = new CImg('images/general/sort_downw.gif','down',10,10);
+			}
+			else{
+				$img = new CImg('images/general/sort_upw.gif','up',10,10);
+			}
+			
+			$img->AddOption('style','line-height: 18px; vertical-align: middle;');
+			$link = array($link,SPACE,$img);
+		}		
+		
+	return $link;
+	}
+	
+	function order_by($def,$allways=''){
+		global $page;
+	
+		if(!empty($allways)) $allways = ','.$allways;
+		$sortable = explode(',',$def);
+		
+		$tabfield = get_request('sort',get_profile('web.'.$page["file"].'.sort',null));
+		
+		if(is_null($tabfield)) return ' ORDER BY '.$def.$allways;
+		if(!in_array($tabfield,$sortable)) return ' ORDER BY '.$def.$allways;
+
+		$sortorder = get_request('sortorder',get_profile('web.'.$page["file"].'.sortorder',ZBX_SORT_UP));
+
+	return ' ORDER BY '.$tabfield.' '.$sortorder.$allways;
+	}
 ?>

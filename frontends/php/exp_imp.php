@@ -63,7 +63,8 @@ include_once "include/page_header.php";
 	);
 
 	check_fields($fields);
-
+	validate_sort_and_sortorder();
+	
 	$preview = isset($_REQUEST['preview']) ? true : false;
 	$config = get_request('config', 0);
 	$update = get_request('update', null);
@@ -293,11 +294,11 @@ include_once "include/page_header.php";
 			$table = new CTableInfo(S_NO_HOSTS_DEFINED);
 			$table->SetHeader(array(
 				array(	new CCheckBox("all_hosts",true, "CheckAll('".$form->GetName()."','all_hosts','hosts');"),
-					S_NAME),
-				S_DNS,
-				S_IP,
-				S_PORT,
-				S_STATUS,
+					make_sorting_link(S_NAME,'h.host')),
+				make_sorting_link(S_DNS,'h.dns'),
+				make_sorting_link(S_IP,'h.ip'),
+				make_sorting_link(S_PORT,'h.port'),
+				make_sorting_link(S_STATUS,'h.status'),
 				array(	new CCheckBox("all_templates",true, "CheckAll('".$form->GetName()."','all_templates','templates');"),
 					S_TEMPLATES),
 				array(	new CCheckBox("all_items",true, "CheckAll('".$form->GetName()."','all_items','items');"),
@@ -312,14 +313,19 @@ include_once "include/page_header.php";
 				*/
 				));
 		
-			$sql = "select h.* from";
-			if(isset($_REQUEST["groupid"]))
-			{
-				$sql .= " hosts h,hosts_groups hg where";
-				$sql .= " hg.groupid=".$_REQUEST["groupid"]." and hg.hostid=h.hostid and";
-			} else  $sql .= " hosts h where";
-			$sql .=	" h.hostid in (".$available_hosts.") ".
-				" order by h.host";
+			$sql = 'SELECT h.* '.
+					' FROM ';
+			if(isset($_REQUEST["groupid"])){
+				$sql .= ' hosts h,hosts_groups hg ';
+				$sql .= ' WHERE hg.groupid='.$_REQUEST['groupid'].
+							' AND hg.hostid=h.hostid '.
+							' AND';
+			} 
+			else  $sql .= ' hosts h '.
+						' WHERE';
+			
+			$sql .=	' h.hostid in ('.$available_hosts.') '.
+					order_by('h.host,h.dns,h.ip,h.port,h.status');
 
 			$result=DBselect($sql);
 		
