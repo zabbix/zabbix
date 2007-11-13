@@ -408,7 +408,6 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 						' AND i.status='.ITEM_STATUS_ACTIVE.' AND '.DBin_node('t.triggerid').
 						' AND h.hostid not in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT).') '. 
 						' AND h.status='.HOST_STATUS_MONITORED.' '.$cond.' '.$sort;
-
 	$result = DBselect($sql);
 
 	while($row=DBfetch($result)){
@@ -443,9 +442,8 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 					' AND t.triggerid=e.objectid '.$cond.
 				' ORDER BY e.eventid DESC';
 
-
-		if(($show_triggers == TRIGGERS_OPTION_NOFALSEFORB) && ($row['value']!=TRIGGER_VALUE_TRUE)){
-			
+//		if(($show_triggers == TRIGGERS_OPTION_NOFALSEFORB) && ($row['value']!=TRIGGER_VALUE_TRUE)){
+		if($show_triggers == TRIGGERS_OPTION_NOFALSEFORB){
 			if(!$row = get_row_for_nofalseforb($row,$cond)) continue;
 		}
 

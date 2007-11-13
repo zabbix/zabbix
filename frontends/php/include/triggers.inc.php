@@ -2274,6 +2274,7 @@
 				' WHERE e.object=0 AND e.objectid='.$row['triggerid'].
 					' AND t.triggerid=e.objectid '.$cond.
 					' ORDER by e.eventid DESC';
+
 		$res_events = DBSelect($sql,1);
 		if(!$e_row=DBfetch($res_events)){
 			return false;
@@ -2282,12 +2283,14 @@
 			$row = array_merge($row,$e_row);
 		}
 
-		if(!event_initial_time($row)){
-			if(!$eventid = first_initial_eventid($row,0)) continue;
+		if(($row['value']!=TRIGGER_VALUE_TRUE) && (!event_initial_time($row))){
+			if(!$eventid = first_initial_eventid($row,0)) return false;
 
 			$sql = 'SELECT e.eventid, e.value, e.clock as lastchange'.
 					' FROM events e '.
-					' WHERE e.object=0 AND e.eventid='.$eventid;
+					' WHERE e.object=0 '.
+					' AND e.eventid='.$eventid.
+					' AND e.acknowledged=0';
 	
 			$res_events = DBSelect($sql,1);
 			if(!$e_row=DBfetch($res_events)){
