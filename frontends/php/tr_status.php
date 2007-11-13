@@ -549,7 +549,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 			$description = expand_trigger_description_by_data(
 					array_merge($row, array("clock"=>$row_event["clock"])),
 					ZBX_FLAG_EVENT);
-	
+
 			if($compact != 'true'){
 				$font = new CTag('font','yes');
 				$font->AddOption('color','#000');
@@ -562,10 +562,10 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 			$font->AddOption('color','#808080');
 			$font->AddItem(array('&nbsp;-&nbsp;',$description));
 			$description = $font->ToString();
-			
+
 			$table->AddRow(array(
 					get_node_name_by_elid($row['triggerid']),
-					$_REQUEST['hostid'] > 0 ? null : $row['host'],
+					$host,
 					($row_event['acknowledged'] == 1)?(SPACE):(new CCheckBox('events['.$row_event['eventid'].']', 'no',NULL,$row_event['eventid'])),
 					$description,
 					$value,
