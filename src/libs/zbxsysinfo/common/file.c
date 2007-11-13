@@ -42,7 +42,7 @@ int	VFS_FILE_SIZE(const char *cmd, const char *param, unsigned flags, AGENT_RESU
         {
                 return SYSINFO_RET_FAIL;
         }
-	
+
 	if(stat(filename,&buf) == 0)
 	{
 		SET_UI64_RESULT(result, buf.st_size);
