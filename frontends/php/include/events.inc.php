@@ -51,8 +51,7 @@
 			$sql_cond.= ' AND e.value<>2 ';
 		}
 	
-
-       
+      
 		$table = new CTableInfo(S_NO_EVENTS_FOUND); 
 		$table->SetHeader(array(
 				make_sorting_link(S_TIME,'e.clock'),
@@ -63,7 +62,8 @@
 				make_sorting_link(S_SEVERITY,'t.priority')
 				));
 				
-		$result = DBselect('SELECT DISTINCT t.triggerid,t.priority,t.description,t.expression,h.host,h.hostid,e.clock,e.value '.
+		$result = DBselect('SELECT DISTINCT t.triggerid,t.priority,t.description, '.
+					't.expression,h.host,h.hostid,e.clock,e.value,t.type '.
 			' FROM events e, triggers t, functions f, items i, hosts h '.$sql_from.
 			' WHERE '.DBin_node('t.triggerid').
 				' AND e.objectid=t.triggerid and e.object='.EVENT_OBJECT_TRIGGER.
@@ -200,6 +200,13 @@ function event_initial_time($row,$show_unknown=0){
 					
 	while($rows = DBfetch($res)){
 		$events[] = $rows;
+	}
+	if(!empty($events) && 
+		($events[0]['value'] == $row['value']) && 
+		($row['type'] == TRIGGER_MULT_EVENT_ENABLED) && 	
+		($row['value'] == TRIGGER_VALUE_TRUE))
+	{
+		return true;
 	}
 	if(!empty($events) && ($events[0]['value'] == $row['value'])){
 		return false;
