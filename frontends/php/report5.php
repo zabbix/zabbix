@@ -73,7 +73,7 @@ include_once "include/page_header.php";
 
 	$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 	
-        $result=DBselect("select h.host, t.triggerid, t.description, t.description, t.priority, count(distinct e.eventid) as count ".
+        $result=DBselect("select h.host, t.triggerid, t.description, t.description, t.priority, t.expression, count(distinct e.eventid) as count ".
 		" from hosts h, triggers t, functions f, items i, events e where ".
 		" h.hostid = i.hostid and i.itemid = f.itemid and t.triggerid=f.triggerid and ".
 		' t.triggerid=e.objectid and e.object='.EVENT_OBJECT_TRIGGER.' and e.clock>'.(time()-$time_dif).
