@@ -42,7 +42,9 @@ static int	get_http_page(char *host, char *param, unsigned short port, char *buf
 
 	if( SUCCEED == (ret = zbx_tcp_connect(&s, host, port)) )
 	{
-		zbx_snprintf(request, sizeof(request), "GET /%s HTTP/1.1\nHost: %s\nConnection: close\n\n", param, host);
+		zbx_snprintf(request, sizeof(request), "GET /%s HTTP/1.1\r\nHost: %s\r\nConnection: close\r\n\r\n",
+			param,
+			host);
 
 		if( SUCCEED == (ret = zbx_tcp_send_raw(&s, request)) )
 		{
