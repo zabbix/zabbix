@@ -1058,7 +1058,7 @@ COpt::profiling_stop('prepare table');
 	{
 		if($db_item["value_type"] == ITEM_VALUE_TYPE_LOG)
 		{
-			$row=DBfetch(DBselect("select value from history_log where itemid=".$db_item["itemid"]." order by id desc", 1));
+			$row=DBfetch(DBselect("select value from history_log where itemid=".$db_item["itemid"]." order by clock desc", 1));
 			if($row)
 			{
 				$lastvalue=/*nbsp(htmlspecialchars(*/$row["value"]/*))*/;
