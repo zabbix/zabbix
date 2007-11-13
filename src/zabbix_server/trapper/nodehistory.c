@@ -191,7 +191,7 @@ error:
 int	node_history(char *data)
 {
 	char	*r, *newline = NULL, *tmp = NULL;
-	int	tmp_allocated = 1024;
+	int	tmp_allocated = 4096;
 	int	firstline=1;
 	int	nodeid=0;
 	int	sender_nodeid=0;
