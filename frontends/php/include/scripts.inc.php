@@ -74,14 +74,19 @@ function execute_script($scriptid,$hostid){
 	if($res)
 	{
 		global $ZBX_LOCALNODEID;
-
 		$res = false;
-
-		$sql = "SELECT ip,port FROM nodes WHERE nodeid=$ZBX_LOCALNODEID";
-		$node = DBselect($sql);
-		if($row = DBfetch($node))
+		if($nodeid == 0)
 		{
-			$res = socket_connect($socket, $row['ip'], $row['port']);
+			$res = socket_connect($socket, '127.0.0.1', 10051);
+		}
+		else
+		{
+			$sql = "SELECT ip,port FROM nodes WHERE nodeid=$ZBX_LOCALNODEID";
+			$node = DBselect($sql);
+			if($row = DBfetch($node))
+			{
+				$res = socket_connect($socket, $row['ip'], $row['port']);
+			}
 		}
 	}
 	if($res)
@@ -101,7 +106,8 @@ function execute_script($scriptid,$hostid){
 	}
 	else
 	{
-		$message = socket_strerror(socket_last_error());
+		$message["flag"]=-1;
+		$message["message"] = socket_strerror(socket_last_error());
 	}
 return $message;
 }
