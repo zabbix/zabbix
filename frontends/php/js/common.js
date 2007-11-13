@@ -47,6 +47,13 @@ function is_string(obj){
 	return (typeof(obj) == 'string');
 }
 
+function is_array(obj) {
+   if (obj.constructor.toString().indexOf("Array") == -1)
+      return false;
+   else
+      return true;
+}
+
 if (!Array.prototype.forEach)
 {
   Array.prototype.forEach = function(fun /*, thisp*/)
