@@ -98,7 +98,14 @@ include_once "include/page_header.php";
 	$rows = array();
 	$count = 0;
 	while($row=DBfetch($result)){
-		if(!empty($rows) && $rows[$count]['value'] != $row['value']){
+		if(!empty($rows) && ($rows[$count]['value'] != $row['value'])){
+			$count++;
+		}
+		else if(!empty($rows) && 
+				($rows[$count]['value'] == $row['value']) && 
+				($trigger_data['type'] == TRIGGER_MULT_EVENT_ENABLED) && 
+				($row['value'] == TRIGGER_VALUE_TRUE)
+				){
 			$count++;
 		}
 		$rows[$count] = $row;
@@ -142,17 +149,17 @@ include_once "include/page_header.php";
  
 		if($leng>60*60*24)
 		{
-			$leng= round(($leng/(60*60*24))*10)/10;
+			$leng= round(($leng/86400)*10)/10;
 			$leng="$leng days";
 		}
 		elseif ($leng>60*60)
 		{
-			$leng= round(($leng/(60*60))*10)/10;
+			$leng= round(($leng/3600)*10)/10;
 			$leng="$leng hours"; 
 		}
 		elseif ($leng>60)
 		{
-			$leng= round(($leng/(60))*10)/10;
+			$leng= round(($leng/60)*10)/10;
 			$leng="$leng mins";
 		}
 		else
@@ -160,19 +167,19 @@ include_once "include/page_header.php";
 			$leng="$leng secs";
 		}
 
-		if($sum>60*60*24)
+		if($sum>86400)
 		{
-			$sum= round(($sum/(60*60*24))*10)/10;
+			$sum= round(($sum/86400)*10)/10;
 			$sum="$sum days";
 		}
 		elseif ($sum>60*60)
 		{
-			$sum= round(($sum/(60*60))*10)/10;
+			$sum= round(($sum/3600)*10)/10;
 			$sum="$sum hours"; 
 		}
 		elseif ($sum>60)
 		{
-			$sum= round(($sum/(60))*10)/10;
+			$sum= round(($sum/60)*10)/10;
 			$sum="$sum mins";
 		}
 		else

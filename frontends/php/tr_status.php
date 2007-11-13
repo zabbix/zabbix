@@ -400,8 +400,8 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 			break;
 	}
 
-	$sql = 'SELECT DISTINCT t.triggerid,t.status,t.description, '.
-							' t.expression,t.priority,t.lastchange,t.comments,t.url,t.value,h.host, h.hostid '.
+	$sql = 'SELECT DISTINCT t.triggerid,t.status,t.description, t.expression,t.priority, '.
+							' t.lastchange,t.comments,t.url,t.value,h.host,h.hostid,t.type '.
 					' FROM triggers t,hosts h,items i,functions f '.
 					' WHERE f.itemid=i.itemid AND h.hostid=i.hostid '.
 						' AND t.triggerid=f.triggerid AND t.status='.TRIGGER_STATUS_ENABLED.
