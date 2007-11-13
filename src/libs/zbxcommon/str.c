@@ -260,10 +260,9 @@ void __zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_l
 
 	va_start(args, fmt);
 
-	if(*offset + max_len >= *alloc_len)
-	{
-		*str = zbx_realloc(*str, (*alloc_len)+2*max_len);
-		*alloc_len += 2*max_len;
+	if (*offset + max_len >= *alloc_len) {
+		*alloc_len += 2 * max_len;
+		*str = zbx_realloc(*str, *alloc_len);
 	}
 
 	*offset += zbx_vsnprintf(*str+*offset, max_len, fmt, args);
@@ -1228,20 +1227,19 @@ void	zbx_binary2hex(const u_char *input, int ilen, char **output, int *olen)
 int	zbx_hex2binary(char *io)
 {
 	const char	*i = io;
-	u_char		*o = (u_char *)io, c;
-	int		len = 0;
+	char		*o = io;
+	u_char		c;
 
 	assert(io);
 
 	while(*i != '\0') {
 		c = zbx_hex2num( *i++ ) << 4;
 		c += zbx_hex2num( *i++ );
-		*o++ = c;
-		len++;
+		*o++ = (char)c;
 	}
 	*o = '\0';
 
-	return len;
+	return o - io;
 }
 
 #ifdef HAVE_POSTGRESQL
@@ -1411,19 +1409,14 @@ char	*zbx_get_next_field(const char *line, char **output, int *olen, char separa
 	int	flen;
 
 	ret = strchr(line, separator);
-	if(ret)
-	{
+	if (ret) {
 		flen = ret-line;
 		ret++;
-	}
-	else
-	{
+	} else
 		flen = strlen(line);
-	}
 
-	if(*olen < flen)
-	{
-		*olen = flen;
+	if (*olen < flen + 1) {
+		*olen = flen * 2;
 		*output = zbx_realloc(*output, *olen);
 	}
 	memcpy(*output, line, flen);
