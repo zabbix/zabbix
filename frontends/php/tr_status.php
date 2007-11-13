@@ -383,7 +383,6 @@ include_once "include/page_header.php";
 						' AND h.hostid not in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT).') '. 
 						' AND h.status='.HOST_STATUS_MONITORED.' '.$cond.
 						order_by('h.host,h.hostid,t.description,t.priority,t.lastchange');
-
 	$result = DBselect($sql);
 
 	while($row=DBfetch($result)){
@@ -418,9 +417,8 @@ include_once "include/page_header.php";
 					' AND t.triggerid=e.objectid '.$cond.
 				' ORDER BY e.eventid DESC';
 
-
-		if(($show_triggers == TRIGGERS_OPTION_NOFALSEFORB) && ($row['value']!=TRIGGER_VALUE_TRUE)){
-			
+//		if(($show_triggers == TRIGGERS_OPTION_NOFALSEFORB) && ($row['value']!=TRIGGER_VALUE_TRUE)){
+		if($show_triggers == TRIGGERS_OPTION_NOFALSEFORB){
 			if(!$row = get_row_for_nofalseforb($row,$cond)) continue;
 		}
 
