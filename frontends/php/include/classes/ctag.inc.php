@@ -36,7 +36,7 @@
 
 		if(is_object($item))
 		{
-			$res = $item->ToString();
+			$res = $item->ToString(false);
 		}
 		elseif(is_array($item))
 		{

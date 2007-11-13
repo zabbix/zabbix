@@ -146,7 +146,6 @@
 										),
 										$class);
 			}
-			
 			array_push($this->center_items, $item1);
 		}
 		
