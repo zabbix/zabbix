@@ -4067,7 +4067,7 @@ include_once 'include/discovery.inc.php';
 //		$frmEventAck->SetHelp("web.config.workperiod.php");
 		$frmEventAck->AddVar("config",get_request("config",8));
 
-		$exp_SELECT = new CComboBox('ack_enable');
+		$exp_select = new CComboBox('ack_enable');
 
 		$exp_select->AddItem(EVENT_ACK_ENABLED,S_ENABLED,$config['ack_enable']?'yes':'no');
 		$exp_select->AddItem(EVENT_ACK_DISABLED,S_DISABLED,$config['ack_enable']?'no':'yes');
