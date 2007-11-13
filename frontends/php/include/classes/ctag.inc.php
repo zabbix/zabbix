@@ -83,8 +83,8 @@
 
 		function Destroy()
 		{
-### TODO Problem under PHP 5.0  "Fatal error: Cannot re-assign $this in ..."
-#			$this = null;
+// TODO Problem under PHP 5.0  "Fatal error: Cannot re-assign $this in ..."
+//			$this = null;
 			$this->CleanItems();
 		}
 
