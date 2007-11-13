@@ -436,7 +436,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 				break;
 		}
 		
-		$event_sql = 'SELECT DISTINCT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged '.
+		$event_sql = 'SELECT DISTINCT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged, t.type '.
 				' FROM events e, triggers t '.
 				' WHERE e.object=0 AND e.objectid='.$row['triggerid'].
 					' AND t.triggerid=e.objectid '.$cond.
