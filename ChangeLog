@@ -1,5 +1,6 @@
 Changes for 1.4.3:
 
+ - [ZBX-160] fixed web.page.get to send \r\n instead of \n (Alexei)
  - [ZBX-149] fixed incorrect processing of vm.memory.size key in FreeBSD (Sasha)
  - [ZBX-109] added support of vm.memory.size[pfree] Linux, FreeBSD & Win agents (Sasha)
  - [ZBX-122] Hungarian translate
