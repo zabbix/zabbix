@@ -154,7 +154,7 @@ static int	VFS_FS_PFREE(const char *cmd, char *param, unsigned flags, AGENT_RESU
         return SYSINFO_RET_OK;
 }
 
-static int	VFS_FS_PUSED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
+static int	VFS_FS_PUSED(const char *cmd, char *param, unsigned flags, AGENT_RESULT *result)
 {
 /*        char    mountPoint[MAX_STRING_LEN];*/
         zbx_uint64_t  tot_val = 0;
@@ -168,10 +168,10 @@ static int	VFS_FS_PUSED(const char *cmd, const char *param, unsigned flags, AGEN
                 return SYSINFO_RET_FAIL;
 
         if(get_param(param, 1, mountPoint, MAX_STRING_LEN) != 0)
-                return SYSINFO_RET_FAIL;
+                return SYSINFO_RET_FAIL;*/
 
-        if(get_fs_size_stat(mountPoint, &tot_val, NULL, &usg_val) != SYSINFO_RET_OK)
-                return  SYSINFO_RET_FAIL;*/
+        if(get_fs_size_stat(param, &tot_val, NULL, &usg_val) != SYSINFO_RET_OK)
+                return  SYSINFO_RET_FAIL;
 
 	SET_DBL_RESULT(result, (100.0 * (double)usg_val) / (double)tot_val);
 
