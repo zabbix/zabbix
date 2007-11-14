@@ -97,14 +97,14 @@ include_once "include/page_header.php";
 
 		$cmbGroup->AddItem(0,S_ALL_SMALL);
 		
+	        $availiable_groups= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
 		$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS, PERM_READ_LIST, null, null, get_current_nodeid());
 
-		$result=DBselect('SELECT DISTINCT g.groupid,g.name '.
-			' FROM groups g, hosts_groups hg, hosts h, items i '.
-			' WHERE h.hostid in ('.$availiable_hosts.') '.
-				' AND hg.groupid=g.groupid AND h.status='.HOST_STATUS_MONITORED.
-				' AND h.hostid=i.hostid AND hg.hostid=h.hostid '.
-			' ORDER BY g.name');
+	        $result=DBselect("select distinct g.groupid,g.name from groups g, hosts_groups hg, hosts h, items i ".
+	                " where g.groupid in (".$availiable_groups.") ".
+	                " and hg.groupid=g.groupid and h.status=".HOST_STATUS_MONITORED.
+	                " and h.hostid=i.hostid and hg.hostid=h.hostid and i.status=".ITEM_STATUS_ACTIVE.
+	                " order by g.name");
 
 		while($row=DBfetch($result))
 		{

@@ -36,6 +36,9 @@
 		$show_unknown = get_profile('web.events.show_unknown',0);
 		
 		$sql_from = $sql_cond = "";
+
+	        $availiable_groups= get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
+	        $availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
 		
 		if($hostid > 0)
 		{
@@ -46,9 +49,14 @@
 			$sql_from = ", hosts_groups hg ";
 			$sql_cond = " and h.hostid=hg.hostid and hg.groupid=".$groupid;
 		}
+		else
+		{
+			$sql_from = ", hosts_groups hg ";
+			$sql_cond = " and h.hostid in (".$availiable_hosts.") ";
+		}
 
 		if($show_unknown == 0){
-			$sql_cond.= ' AND e.value<>2 ';
+			$sql_cond.= ' AND e.value<>'.TRIGGER_VALUE_UNKNOWN.' ';
 		}
 	
 		$result = DBselect('SELECT DISTINCT t.triggerid,t.priority,t.description,t.expression,h.host,e.clock,e.value '.
