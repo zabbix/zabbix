@@ -31,22 +31,21 @@ include_once "include/page_header.php";
 
 ?>
 <?php
-//		VAR							TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+//		VAR				TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'eventid'=>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'!isset({events})&&!isset({cancel})'),
-		'events'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'!isset({eventid})&&!isset({cancel})'),
-		'message'=>			array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'isset({save})||isset({saveandreturn})'),
-
+		'eventid'=>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'!isset({events})&&!isset({cancel})'),
+		'events'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'!isset({eventid})&&!isset({cancel})'),
+		'message'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'isset({save})||isset({saveandreturn})'),
 	/* actions */
-		'bulkacknowledge'=> array(T_ZBX_STR,O_OPT,	P_ACT|P_SYS, NULL,	NULL),
-		"saveandreturn" =>	array(T_ZBX_STR,O_OPT,	P_ACT|P_SYS, NULL,	NULL),
-		"save"=>			array(T_ZBX_STR,O_OPT,	P_ACT|P_SYS, NULL,	NULL),
-		"cancel"=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null)
+		'bulkacknowledge'=>	array(T_ZBX_STR, O_OPT,	P_ACT|P_SYS, NULL, NULL),
+		'saveandreturn' =>	array(T_ZBX_STR, O_OPT,	P_ACT|P_SYS, NULL, NULL),
+		'save'=>		array(T_ZBX_STR, O_OPT,	P_ACT|P_SYS, NULL, NULL),
+		'cancel'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL)
 	);
 	check_fields($fields);
 	
 	$bulk = isset($_REQUEST['bulkacknowledge']);
-	
+
 	if(isset($_REQUEST['eventid'])){
 		$events[$_REQUEST['eventid']] = $_REQUEST['eventid'];
 	}
@@ -80,7 +79,7 @@ include_once "include/page_header.php";
 	if($db_data['cnt'] != count($events)){
 		access_deny();
 	}
-	
+
 	$db_data = DBfetch(DBselect('SELECT DISTINCT  e.*,t.triggerid,t.expression,t.description,t.expression,h.host,h.hostid '.
 		' FROM hosts h, items i, functions f, events e, triggers t'.
 		' WHERE h.hostid=i.hostid '.
@@ -114,7 +113,7 @@ include_once "include/page_header.php";
 	{
 		$result = true;
 		$_REQUEST['message'] .= ($bulk)?("\n\r".S_SYS_BULK_ACKNOWLEDGE):('');
-		
+
 		foreach($events as $id => $eventid){
 			$result &= add_acknowledge_coment(
 						$eventid,
@@ -127,7 +126,7 @@ include_once "include/page_header.php";
 				' ['.($bulk)?(' BULK ACKNOWLEDGE '):(expand_trigger_description_by_data($db_data)).']'.
 				' ['.$_REQUEST['message'].']');
 		}
-		
+
 		Redirect('tr_status.php?hostid='.get_profile('web.tr_status.hostid',0));
 		exit;
 	}
@@ -153,7 +152,7 @@ include_once "include/page_header.php";
 				new CCol($db_user["alias"],"user"),
 				new CCol(date("d-m-Y h:i:s A",$db_ack["clock"]),"time")),
 				"title");
-	
+
 			$msgCol = new CCol(nl2br($db_ack["message"]));
 			$msgCol->SetColspan(2);
 			$table->AddRow($msgCol,"msg");
@@ -164,7 +163,7 @@ include_once "include/page_header.php";
 			echo BR;
 		}
 	}
-	
+
 	insert_new_message_form($events,$bulk);
 ?>
 

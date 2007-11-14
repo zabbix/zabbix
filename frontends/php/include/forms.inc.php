@@ -641,7 +641,7 @@
 	{
 		global $USER_DETAILS;
 		global $_REQUEST;
-	
+
 		if($bulk){
 			$title = S_ACKNOWLEDGE_ALARM_BY;
 			$btn_txt2 = S_ACKNOWLEDGE.' '.S_AND_SYMB.' '.S_RETURN;			

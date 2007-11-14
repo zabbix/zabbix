@@ -35,6 +35,7 @@
 
 /* Functions: pow(), round() */
 #include <math.h>
+#include <iconv.h>
 
 #include "common.h"
 #include "db.h"
@@ -42,6 +43,65 @@
 #include "zlog.h"
 
 #include "active.h"
+
+/******************************************************************************
+ *                                                                            *
+ * Function: check_encode                                                     *
+ *                                                                            *
+ * Purpose: convert encoding.                                                 *
+ *                                                                            *
+ * Parameters:                                                                * 
+ *                                                                            *
+ * Return value:                                                              * 
+ *                                                                            *
+ * Author:                                                                    *
+ *                                                                            *
+ * Comments:                                                                  * 
+ *                                                                            *
+ ******************************************************************************/
+void check_encode(const char *key, char *s)
+{
+	char	s2[MAX_STRING_LEN];
+	char	params[MAX_STRING_LEN];
+	char	encoding[MAX_STRING_LEN];
+	size_t	ss;
+	size_t	ss2;
+	char	*ps;
+	char	*ps2;
+	iconv_t	ic;
+
+	if (strncmp(key,"log[",4) != 0 && strncmp(key,"eventlog[",9) != 0)
+		return;
+
+	if (parse_command(key, NULL, 0, params, sizeof(params)) != 2)
+		return;
+			
+	if (num_param(params) < 3)
+		return;
+
+	if (get_param(params, 3, encoding, sizeof(encoding)) != 0)
+		return;
+
+	if (strcmp(encoding, "sjis") != 0 &&
+		strcmp(encoding, "cp932") != 0 &&
+		strcmp(encoding, "ujis") != 0 &&
+		strcmp(encoding, "eucjpms") != 0 &&
+		strcmp(encoding, "eucjp-ms") != 0 )
+		return;
+
+	ic = iconv_open(encoding, "utf8");
+	if (ic == (iconv_t)(-1))
+		return;
+
+	ss = strlen(s);
+	ss2 = MAX_STRING_LEN;
+	ps = s;
+	ps2 = s2;
+	if (iconv(ic, &ps, &ss, &ps2, &ss2) != (size_t)(-1))
+		zbx_strlcpy(s, s2, MAX_STRING_LEN - ss2 + 1);
+
+	iconv_close(ic);
+}
 
 /******************************************************************************
  *                                                                            *
@@ -94,6 +154,8 @@ int	send_list_of_active_checks(zbx_sock_t *sock, const char *host)
 			row[0],
 			row[1],
 			row[2]);
+		check_encode(row[0], s);
+
 		zabbix_log( LOG_LEVEL_DEBUG, "Sending [%s]",
 			s);
 
