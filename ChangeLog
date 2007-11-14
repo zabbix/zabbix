@@ -32,6 +32,7 @@ Changes for 1.4.j:
 
 Changes for 1.4.3:
 
+ - [ZBX-114] fixed permissions for history of events (Alexei)
  - [ZBX-91] added Portuguese translation (Alexei)
  - [ZBX-166] accept SSL peer certificate even if domain name does not match CN (Alexei)
  - [ZBX-154] fixed processing of comma in zbx.fs.size[] (Alexei)
