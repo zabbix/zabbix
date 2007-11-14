@@ -881,6 +881,7 @@
 		$cmbLang->AddItem("de_de",S_GERMAN_DE);
 		$cmbLang->AddItem("it_it",S_ITALIAN_IT);
 		$cmbLang->AddItem("lv_lv",S_LATVIAN_LV);
+		$cmbLang->AddItem("pt_br",S_PORTUGUESE_PT);
 		$cmbLang->AddItem("ru_ru",S_RUSSIAN_RU);
 		$cmbLang->AddItem("sp_sp",S_SPANISH_SP);
 		$cmbLang->AddItem("sv_se",S_SWEDISH_SE);
