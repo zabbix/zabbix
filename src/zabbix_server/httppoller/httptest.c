@@ -318,6 +318,15 @@ static void	process_httptest(DB_HTTPTEST *httptest)
 		return;
 	}
 
+	/* Process certs whose hostnames do not match the queried hostname. */
+	if(CURLE_OK != (err = curl_easy_setopt(easyhandle,CURLOPT_SSL_VERIFYHOST , 0)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLOPT_SSL_VERIFYHOST [%s]",
+		curl_easy_strerror(err));
+		(void)curl_easy_cleanup(easyhandle);
+		return;
+	}
+
 	lastfailedstep=0;
 	httptest->time = 0;
 	result = DBselect("select httpstepid,httptestid,no,name,url,timeout,posts,required,status_codes from httpstep where httptestid=" ZBX_FS_UI64 " order by no",
