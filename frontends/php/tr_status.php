@@ -428,7 +428,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 				$cond.=' AND (('.time().'-e.clock)<'.$ack_expire.') AND e.acknowledged=0 AND e.value='.TRIGGER_VALUE_TRUE;
 				break;
 			case EVENTS_OPTION_NOFALSEFORB:
-				$cond.=' AND e.acknowledged=0 AND ((e.value='.TRIGGER_VALUE_TRUE.') OR ((e.value='.TRIGGER_VALUE_FALSE.') AND t.type='.TRIGGER_MULT_EVENT_DISABLED.'))';
+				$cond.=' AND (('.time().'-e.clock)<(86400*9)) AND e.acknowledged=0 AND ((e.value='.TRIGGER_VALUE_TRUE.') OR ((e.value='.TRIGGER_VALUE_FALSE.') AND t.type='.TRIGGER_MULT_EVENT_DISABLED.'))';
 				break;
 			case EVENTS_OPTION_NOEVENT:
 			default:
@@ -453,8 +453,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 
 		if(isset($_REQUEST["btnSelect"]) && '' != $txt_select && ((stristr($description, $txt_select)) == ($_REQUEST["btnSelect"]=="Inverse select"))) continue;
 
-		if($row["url"] != "")
-		{
+		if($row["url"] != ""){
 			$description = new CLink($description, $row["url"]);
 		}
 
@@ -466,6 +465,9 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 			$font->AddItem(explode_exp($row["expression"],1));
 			$description = array($description,BR, $font);
 		}
+
+		$description = new CCol($description);
+		$description->AddOption('style','white-space: normal; width: 50%;');
 
 		if((time(NULL)-$row["lastchange"])<TRIGGER_BLINK_PERIOD)
 			$blink = array(1=>'<a name="blink">',	2=>'</a>');
@@ -561,6 +563,9 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 			$font->AddItem(array('&nbsp;-&nbsp;',$description));
 			$description = $font->ToString();
 
+			$description = new CCol($description);
+			$description->AddOption('style','white-space: normal;');
+			
 			$table->AddRow(array(
 					get_node_name_by_elid($row['triggerid']),
 					$host,
