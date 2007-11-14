@@ -1,5 +1,6 @@
 Changes for 1.4.3:
 
+ - [ZBX-168] pass DNS or IP address instead of host name to external scripts (Alexei)
  - [ZBX-108] fixed change() and abschange() for negative integer values (Alexei)
  - [ZBX-114] fixed permissions for history of events (Alexei)
  - [ZBX-91] added Portuguese translation (Alexei)
