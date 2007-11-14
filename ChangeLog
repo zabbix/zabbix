@@ -1,5 +1,6 @@
 Changes for 1.4.3:
 
+ - [ZBX-166] accept SSL peer certificate even if domain name does not match CN (Alexei)
  - [ZBX-154] fixed processing of comma in zbx.fs.size[] (Alexei)
  - [ZBX-110] all phrases "slideshow" replaced by "slide show" (Alexei)
  - [ZBX-160] fixed web.page.get to send \r\n instead of \n (Alexei)
