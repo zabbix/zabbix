@@ -1129,8 +1129,17 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 					del_zeroes(value);
 					break;
 				case ITEM_VALUE_TYPE_UINT64:
-					zbx_snprintf(value,MAX_STRING_LEN,ZBX_FS_UI64,
-						labs(item->lastvalue_uint64-item->prevvalue_uint64));
+					/* To avoid overflow */
+					if(item->lastvalue_uint64>=item->prevvalue_uint64)
+					{
+						zbx_snprintf(value,MAX_STRING_LEN,ZBX_FS_UI64,
+							labs(item->lastvalue_uint64-item->prevvalue_uint64));
+					}
+					else
+					{
+						zbx_snprintf(value,MAX_STRING_LEN,"-" ZBX_FS_UI64,
+							labs(item->prevvalue_uint64 - item->lastvalue_uint64));
+					}
 					break;
 				default:
 					if(strcmp(item->lastvalue_str, item->prevvalue_str) == 0)
@@ -1160,8 +1169,17 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 					del_zeroes(value);
 					break;
 				case ITEM_VALUE_TYPE_UINT64:
-					zbx_snprintf(value,MAX_STRING_LEN,ZBX_FS_UI64,
-						item->lastvalue_uint64-item->prevvalue_uint64);
+					/* To avoid overflow */
+					if(item->lastvalue_uint64>=item->prevvalue_uint64)
+					{
+						zbx_snprintf(value,MAX_STRING_LEN,ZBX_FS_UI64,
+							item->lastvalue_uint64-item->prevvalue_uint64);
+					}
+					else
+					{
+						zbx_snprintf(value,MAX_STRING_LEN,"-" ZBX_FS_UI64,
+							item->prevvalue_uint64 - item->lastvalue_uint64);
+					}
 					break;
 				default:
 					if(strcmp(item->lastvalue_str, item->prevvalue_str) == 0)
