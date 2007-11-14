@@ -428,7 +428,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 				$cond.=' AND (('.time().'-e.clock)<'.$ack_expire.') AND e.acknowledged=0 AND e.value='.TRIGGER_VALUE_TRUE;
 				break;
 			case EVENTS_OPTION_NOFALSEFORB:
-				$cond.=' AND (('.time().'-e.clock)<(86400*9)) AND e.acknowledged=0 AND ((e.value='.TRIGGER_VALUE_TRUE.') OR ((e.value='.TRIGGER_VALUE_FALSE.') AND t.type='.TRIGGER_MULT_EVENT_DISABLED.'))';
+				$cond.=' AND e.acknowledged=0 AND ((e.value='.TRIGGER_VALUE_TRUE.') OR ((e.value='.TRIGGER_VALUE_FALSE.') AND t.type='.TRIGGER_MULT_EVENT_DISABLED.'))';
 				break;
 			case EVENTS_OPTION_NOEVENT:
 			default:
