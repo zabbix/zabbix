@@ -1,5 +1,6 @@
 Changes for 1.4.3:
 
+ - [ZBX-108] fixed change() and abschange() for negative integer values (Alexei)
  - [ZBX-114] fixed permissions for history of events (Alexei)
  - [ZBX-91] added Portuguese translation (Alexei)
  - [ZBX-166] accept SSL peer certificate even if domain name does not match CN (Alexei)
