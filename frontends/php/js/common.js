@@ -16,16 +16,27 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
-var OP = window.opera?true:false;
-var IE = ((!OP) && (document.all))?true:false;
+var agt = navigator.userAgent.toLowerCase();
+var OP = (agt.indexOf("opera") != -1) && window.opera;
+var IE = (agt.indexOf("msie") != -1) && document.all && !OP;
+var SF = (agt.indexOf("safari") != -1)	;
 
 function isset(obj){
 	return (typeof(obj) != 'undefined');
 }
 
 function empty(obj){
-	if(isset(obj) && obj) return true;
-	return false;
+	if(is_null(obj)) return true;
+	if(obj == false) return true;
+	if((obj == 0) || (obj == '0')) return true;
+	if(is_string(obj) && (obj == '')) return true;
+	if(is_array(obj) && (obj.length == 0)) return true;
+return false;
+}
+
+function is_null(obj){
+	if(obj==null) return true;
+return false;
 }
 
 function is_number(obj){
@@ -34,6 +45,13 @@ function is_number(obj){
 
 function is_string(obj){
 	return (typeof(obj) == 'string');
+}
+
+function is_array(obj) {
+   if (obj.constructor.toString().indexOf("Array") == -1)
+      return false;
+   else
+      return true;
 }
 
 if (!Array.prototype.forEach)
@@ -272,4 +290,17 @@ function openWinCentered(loc, winname, iwidth, iheight, params){
 	WinObjReferer.focus();
 }
 
-//						['Create Lot Trigger',"javascript: openWinCentered('tr_logform.php?sform=1&itemid="+id+"','TriggerLog',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],
+function cancelEvent(event){
+	event = event || window.event;
+
+//SDI(event);
+	if(IE){
+		event.cancelBubble = true;
+		event.returnValue = false;
+	}
+	else{
+		event.stopPropagation();
+		event.preventDefault();
+	}
+return false;
+}

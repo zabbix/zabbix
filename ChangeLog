@@ -1,5 +1,6 @@
 Changes for 1.4.j:
 
+ - Added script menu to host icons in Maps (Artem)
  - The last charactor in last value is unreadable
  - [DEV-48] added scripts form,scripts list, script call menu (Artem)
  - [DEV-49] Support of encoding for monitoring of Windows event logs (Sasha)
