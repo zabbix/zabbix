@@ -21,7 +21,7 @@
 <?php
 	require_once "include/config.inc.php";
 	require_once "include/maps.inc.php";
-
+	
 	$page["title"] = "S_MAP";
 	$page["file"] = "map.php";
 	$page["type"] = PAGE_TYPE_IMAGE;
