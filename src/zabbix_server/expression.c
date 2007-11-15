@@ -788,6 +788,8 @@ void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char **data, i
 		*str_out = NULL,
 		*replace_to = NULL;
 
+	char	tmp[MAX_STRING_LEN];
+
 	int	var_len;
 
 	time_t  now;
@@ -1186,7 +1188,8 @@ zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
 		{
 			var_len = strlen(MVAR_ITEM_LASTVALUE);
 
-			result = DBselect("select distinct i.lastvalue from triggers t, functions f,items i, hosts h"
+			result = DBselect("select distinct i.lastvalue,i.units,i.value_type"
+				" from triggers t, functions f,items i, hosts h"
 				" where t.triggerid=" ZBX_FS_UI64 " and f.triggerid=t.triggerid and f.itemid=i.itemid and h.hostid=i.hostid",
 				event->objectid);
 
@@ -1202,8 +1205,12 @@ zabbix_log(LOG_LEVEL_DEBUG, "str_out1 [%s] pl [%s]", str_out, pl);
 			}
 			else
 			{
+				strscpy(tmp, row[0]);
+
+				add_value_suffix(tmp, sizeof(tmp), row[1], atoi(row[2]));
+
 				replace_to = zbx_dsprintf(replace_to, "%s",
-					row[0]);
+					tmp);
 			}
 
 			DBfree_result(result);

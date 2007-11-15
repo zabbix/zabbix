@@ -399,8 +399,9 @@ require_once('include/classes/ctree.inc.php');
 	{
 		list($usec, $sec) = explode(" ",microtime()); 
 		return ((float)$usec + (float)$sec); 
-	} 
+	}
 
+	/* Do not forget to sync it with add_value_suffix in evalfunc.c! */ 
 	function	convert_units($value,$units)
 	{
 // Special processing for unix timestamps

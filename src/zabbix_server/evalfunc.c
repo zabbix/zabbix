@@ -1381,6 +1381,230 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 
 /******************************************************************************
  *                                                                            *
+ * Function: add_value_suffix_uptime                                          *
+ *                                                                            *
+ * Purpose: Peocess suffix 'uptime'                                           *
+ *                                                                            *
+ * Parameters: value - value for adjusting                                    *
+ *             max_len - max len of the value                                 *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	add_value_suffix_uptime(char *value, int max_len)
+{
+	double	value_double;
+	double	days, hours, min;
+
+	zabbix_log( LOG_LEVEL_DEBUG, "In add_value_suffix_uptime(%s)",
+		value);
+
+	value_double = atof(value);
+
+	if(value_double <0)	return;
+
+	days=floor(value_double/(24*3600));
+	if(cmp_double(days,0) != 0)
+	{
+		value_double=value_double-days*(24*3600);
+	}
+	hours=floor(value_double/(3600));
+	if(cmp_double(hours,0) != 0)
+	{
+		value_double=value_double-hours*3600;
+	}
+	min=floor(value_double/(60));
+	if( cmp_double(min,0) !=0)
+	{
+		value_double=value_double-min*(60);
+	}
+	if(cmp_double(days,0) == 0)
+	{
+		zbx_snprintf(value, max_len, "%02d:%02d:%02d",
+			(int)hours,
+			(int)min,
+			(int)value_double);
+	}
+	else
+	{
+		zbx_snprintf(value, max_len, "%d days, %02d:%02d:%02d",
+			(int)days,
+			(int)hours,
+			(int)min,
+			(int)value_double);
+	}
+	zabbix_log( LOG_LEVEL_DEBUG, "End of add_value_suffix_uptime(%s)",
+		value);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: add_value_suffix_s                                               *
+ *                                                                            *
+ * Purpose: Peocess suffix 's'                                                *
+ *                                                                            *
+ * Parameters: value - value for adjusting                                    *
+ *             max_len - max len of the value                                 *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	add_value_suffix_s(char *value, int max_len)
+{
+	double	value_double;
+	double	t;
+	char	tmp[MAX_STRING_LEN];
+
+	zabbix_log( LOG_LEVEL_DEBUG, "In add_value_suffix_s(%s)",
+		value);
+
+	value_double = atof(value);
+	if(value_double <0)	return;
+
+	value[0]='\0';
+
+	t=floor(value_double/(365*24*3600));
+	if(cmp_double(t,0) != 0)
+	{
+		zbx_snprintf(tmp, sizeof(tmp), "%dy", (int)t);
+		zbx_strlcat(value, tmp, max_len);
+		value_double = value_double-t*(365*24*3600);
+	}
+
+	t=floor(value_double/(30*24*3600));
+	if(cmp_double(t,0) != 0)
+	{
+		zbx_snprintf(tmp, sizeof(tmp), "%dm", (int)t);
+		zbx_strlcat(value, tmp, max_len);
+		value_double = value_double-t*(30*24*3600);
+	}
+
+	t=floor(value_double/(24*3600));
+	if(cmp_double(t,0) != 0)
+	{
+		zbx_snprintf(tmp, sizeof(tmp), "%dd", (int)t);
+		zbx_strlcat(value, tmp, max_len);
+		value_double = value_double-t*(24*3600);
+	}
+
+	t=floor(value_double/(3600));
+	if(cmp_double(t,0) != 0)
+	{
+		zbx_snprintf(tmp, sizeof(tmp), "%dh", (int)t);
+		zbx_strlcat(value, tmp, max_len);
+		value_double = value_double-t*(3600);
+	}
+
+	t=floor(value_double/(60));
+	if(cmp_double(t,0) != 0)
+	{
+		zbx_snprintf(tmp, sizeof(tmp), "%dm", (int)t);
+		zbx_strlcat(value, tmp, max_len);
+		value_double = value_double-t*(60);
+	}
+
+	zbx_snprintf(tmp, sizeof(tmp), "%02.2f", value_double);
+	zbx_rtrim(tmp,"0");
+	zbx_rtrim(tmp,".");
+	zbx_strlcat(tmp, "s", sizeof(tmp));
+	zbx_strlcat(value, tmp, max_len);
+
+	zabbix_log( LOG_LEVEL_DEBUG, "End of add_value_suffix_s(%s)",
+		value);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: add_value_suffix_normsl                                          *
+ *                                                                            *
+ * Purpose: Peocess normal values and add K,M,G,T                             *
+ *                                                                            *
+ * Parameters: value - value for adjusting                                    *
+ *             max_len - max len of the value                                 *
+ *             units - units (bps, b,B, etc)                                  *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	add_value_suffix_normal(char *value, int max_len, char *units)
+{
+	double	base = 1024;
+	char	kmgt[MAX_STRING_LEN];
+
+	zbx_uint64_t	value_uint64;
+	double		value_double;
+
+	zabbix_log( LOG_LEVEL_DEBUG, "In add_value_normal(value:%s,units:%s)",
+		value,
+		units);
+
+	value_uint64 = labs(zbx_atoui64(value));
+
+	/* SPecial processing for bits */
+	if(strcmp(units,"b") == 0 || strcmp(units,"bps") == 0)
+	{
+		base = 1000;
+	}
+
+	if(value_uint64 < base)
+	{
+		strscpy(kmgt,"");
+		value_double = (double)value_uint64;
+	}
+	else if(value_uint64 < base*base)
+	{
+		strscpy(kmgt,"K");
+		value_double = (double)value_uint64/base;
+	}
+	else if(value_uint64 < base*base*base)
+	{
+		strscpy(kmgt,"M");
+		value_double = (double)(value_uint64/(base*base));
+	}
+	else if(value_uint64 < base*base*base*base)
+	{
+		strscpy(kmgt,"G");
+		value_double = (double)value_uint64/(base*base*base);
+	}
+	else
+	{
+		strscpy(kmgt,"T");
+		value_double = (double)value_uint64/(base*base*base*base);
+	}
+
+	if(cmp_double((int)(value_double+0.5), value_double) == 0)
+	{
+		zbx_snprintf(value, MAX_STRING_LEN, ZBX_FS_DBL_EXT(0) " %s%s",
+			value_double,
+			kmgt,
+			units);
+	}
+	else
+	{
+		zbx_snprintf(value, MAX_STRING_LEN, ZBX_FS_DBL_EXT(2) " %s%s",
+			value_double,
+			kmgt,
+			units);
+	}
+
+	zabbix_log( LOG_LEVEL_DEBUG, "End of add_value_normal(value:%s)",
+		value);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: add_value_suffix                                                 *
  *                                                                            *
  * Purpose: Add suffix for value                                              *
@@ -1391,78 +1615,89 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
  * Return value: SUCCEED - suffix added succesfully, value contains new value *
  *               FAIL - adding failed, value contains old value               *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
+ * Author: Alexei Vladishev                                                   *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	add_value_suffix(char *value, DB_ITEM *item)
+
+/* Do not forget to keep it in sync wiht convert_units in config.inc.php */
+int	add_value_suffix(char *value, int max_len, char *units, int value_type)
 {
-	double	value_double;
-	double	value_double_abs;
+	int	ret = FAIL;
 
-	char	suffix[MAX_STRING_LEN];
+        struct  tm *local_time = NULL;
+	time_t	time;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In add_value_suffix() Value [%s]",
-		value);
-	
-	/* Add suffix: 1000000 -> 1 MB */
-	if(!(
-		(ITEM_VALUE_TYPE_FLOAT == item->value_type) &&
-		(strlen(item->units)>0))
-	)	return FAIL;
-		
-	value_double=atof(value);
-	/* Custom multiplier? */
-/*
-	if(item->multiplier == 1)
-	{
-		value_double=value_double*atof(item->formula);
-	}*/
+	char	tmp[MAX_STRING_LEN];
 
-	value_double_abs=abs(value_double);
-
-	if(value_double_abs<1024)
-	{
-		strscpy(suffix,"");
-	}
-	else if(value_double_abs<1024*1024)
-	{
-		strscpy(suffix,"K");
-		value_double=value_double/1024;
-	}
-	else if(value_double_abs<1024*1024*1024)
-	{
-		strscpy(suffix,"M");
-		value_double=value_double/(1024*1024);
-	}
-	else
-	{
-		strscpy(suffix,"G");
-		value_double=value_double/(1024*1024*1024);
-	}
-/*		if(cmp_double((double)round(value_double), value_double) == 0) */
-	if(cmp_double((int)(value_double+0.5), value_double) == 0)
-	{
-		zbx_snprintf(value, MAX_STRING_LEN, ZBX_FS_DBL_EXT(0) " %s%s",
-			value_double,
-			suffix,
-			item->units);
-	}
-	else
-	{
-		zbx_snprintf(value, MAX_STRING_LEN, ZBX_FS_DBL_EXT(2) " %s%s",
-			value_double,
-			suffix,
-			item->units);
-	}
-	
-	zabbix_log(LOG_LEVEL_DEBUG, "Value [%s] [" ZBX_FS_DBL "] Suffix [%s] Units [%s]",
+	zabbix_log( LOG_LEVEL_DEBUG, "In add_value_suffix(value:%s,units:%s)",
 		value,
-		value_double,
-		suffix,
-		item->units);
-	return SUCCEED;
+		units);
+
+	switch(value_type)
+	{
+	case	ITEM_VALUE_TYPE_FLOAT:
+		if(strcmp(units,"s") == 0)
+		{
+			add_value_suffix_s(value, max_len);
+			ret = SUCCEED;
+		}
+		else if(strcmp(units,"uptime") == 0)
+		{
+			add_value_suffix_uptime(value, max_len);
+			ret = SUCCEED;
+		}
+		else if(strlen(units) != 0)
+		{
+			add_value_suffix_normal(value, max_len, units);
+			ret = SUCCEED;
+		}
+		else
+		{
+			/* Do nothing if units not set */
+		}
+		break;
+
+	case	ITEM_VALUE_TYPE_UINT64:
+		if(strcmp(units,"s") == 0)
+		{
+			add_value_suffix_s(value, max_len);
+			ret = SUCCEED;
+		}
+		else if(strcmp(units,"unixtime") == 0)
+		{
+			time = (time_t)zbx_atoui64(value);
+			local_time = localtime(&time);
+			strftime(tmp, MAX_STRING_LEN, "%Y.%m.%d %H:%M:%S",
+				local_time);
+			zbx_strlcpy(value, tmp, max_len);
+			ret = SUCCEED;
+		}
+		else if(strcmp(units,"uptime") == 0)
+                {
+			add_value_suffix_uptime(value, max_len);
+			ret = SUCCEED;
+		}
+		else if(strlen(units) != 0)
+		{
+			add_value_suffix_normal(value, max_len, units);
+			ret = SUCCEED;
+		}
+		else
+		{
+			/* Do nothing if units not set */
+		}
+		break;
+	default:
+		ret = FAIL;
+		break;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of add_value_suffix(%s)",
+		value);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -1573,7 +1808,7 @@ int evaluate_function2(char *value,char *host,char *key,char *function,char *par
 
 	if(replace_value_by_map(value, item.valuemapid) != SUCCEED)
 	{
-		add_value_suffix(value, &item);
+		add_value_suffix(value, MAX_STRING_LEN, item.units, item.value_type);
 	}
 
 /* Cannot call DBfree_result until evaluate_FUNC */

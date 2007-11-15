@@ -1,5 +1,6 @@
 Changes for 1.4.3:
 
+ - [ZBX-164] added support of units for values used in notifications (Alexei)
  - [ZBX-168] pass DNS or IP address instead of host name to external scripts (Alexei)
  - [ZBX-108] fixed change() and abschange() for negative integer values (Alexei)
  - [ZBX-114] fixed permissions for history of events (Alexei)
