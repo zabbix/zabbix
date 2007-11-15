@@ -47,10 +47,11 @@
 				1 => array('title' => '2. Licence Agreement'		, 'fnc' => 'Stage1' ),
 				2 => array('title' => '3. Check of pre-requisites'	, 'fnc' => 'Stage2' ),
 				3 => array('title' => '4. Configure DB connection'	, 'fnc' => 'Stage3' ),
+				4 => array('title' => '5. ZABBIX server details'	, 'fnc' => 'Stage4' ),
 				//4 => array('title' => '5. Distributed monitoring'	, 'fnc' => 'Stage4' ),
-				4 => array('title' => '5. Pre-Installation Summary'	, 'fnc' => 'Stage5' ),
-				5 => array('title' => '6. Install'			, 'fnc' => 'Stage6' ),
-				6 => array('title' => '7. Finish'			, 'fnc' => 'Stage7' )
+				5 => array('title' => '6. Pre-Installation Summary'	, 'fnc' => 'Stage5' ),
+				6 => array('title' => '7. Install'			, 'fnc' => 'Stage6' ),
+				7 => array('title' => '8. Finish'			, 'fnc' => 'Stage7' )
 				);
 			
 			$this->EventHandler();
@@ -333,7 +334,7 @@
 
 		function Stage3()
 		{
-			global $ZBX_CONFIG, $_REQUEST;
+			global $ZBX_CONFIG;
 
 			$table = new CTable();
 			$table->SetAlign('center');
@@ -363,6 +364,23 @@
 				!$this->DISABLE_NEXT_BUTTON ? new CSpan(S_OK,'ok') :  new CSpan(S_FAIL, 'fail'),
 				BR,
 				new  CButton('retry', 'Test connection')
+				);
+		}
+
+		function Stage4()
+		{
+			global $ZBX_CONFIG;
+
+			$table = new CTable();
+			$table->SetAlign('center');
+			
+			$table->AddRow(array(S_HOST, new CTextBox('zbx_server',		$this->GetConfig('ZBX_SERVER',		'localhost'))));
+			$table->AddRow(array(S_PORT, new CNumericBox('zbx_server_port',	$this->GetConfig('ZBX_SERVER_PORT',	'10051'),5)));
+
+			return array(
+				'Please enter host name or host IP address', BR,
+				'and port number of ZABBIX server', BR, BR,
+				$table,
 				);
 		}
 		/*
@@ -422,10 +440,16 @@
 				$table->AddRow(array('Node name',	$this->GetConfig('nodename',	'unknown')));
 				$table->AddRow(array('Node GUID',	$this->GetConfig('nodeid',	'unknown')));
 			}
+
+			$table1 = new CTable(null, 'requirements');
+			$table1->SetAlign('center');
+			$table1->AddRow(array('ZABBIX server:',		$this->GetConfig('ZBX_SERVER',		'unknown')));
+			$table1->AddRow(array('ZABBIX server port:',	$this->GetConfig('ZBX_SERVER_PORT',	'unknown')));
 			return array(
 				'Please check configuration parameters.', BR,
 				'If all correct press "Next" button, or "Previous" button to change configuration parameters.', BR, BR,
-				$table
+				$table, BR,
+				$table1
 				);
 		}
 
@@ -638,15 +662,17 @@
 
 		function CheckConfigurationFile()
 		{
-			global $DB, $DB_TYPE, $DB_SERVER, $DB_PORT, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
+			global $DB, $DB_TYPE, $DB_SERVER, $DB_PORT, $DB_DATABASE, $DB_USER, $DB_PASSWORD, $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-			$old_DB		= $DB;
-			$old_DB_TYPE	= $DB_TYPE;
-			$old_DB_SERVER	= $DB_SERVER;
-			$old_DB_PORT	= $DB_PORT;
-			$old_DB_DATABASE= $DB_DATABASE;
-			$old_DB_USER	= $DB_USER;
-			$old_DB_PASSWORD= $DB_PASSWORD;
+			$old_DB			= $DB;
+			$old_DB_TYPE		= $DB_TYPE;
+			$old_DB_SERVER		= $DB_SERVER;
+			$old_DB_PORT		= $DB_PORT;
+			$old_DB_DATABASE	= $DB_DATABASE;
+			$old_DB_USER		= $DB_USER;
+			$old_DB_PASSWORD	= $DB_PASSWORD;
+			$old_ZBX_SERVER		= $ZBX_SERVER;
+			$old_ZBX_SERVER_PORT	= $ZBX_SERVER_PORT;
 
 			$error = null;
 			$error_msg = null;
@@ -662,6 +688,8 @@
 					isset($DB_DATABASE) && 
 					isset($DB_USER) && 
 					isset($DB_PASSWORD) &&
+					isset($ZBX_SERVER) &&
+					isset($ZBX_SERVER_PORT) &&
 					isset($IMAGE_FORMAT_DEFAULT) &&
 					$DB_TYPE		== $this->GetConfig('DB_TYPE',				null) &&
 					$DB_SERVER		== $this->GetConfig('DB_SERVER',			null) &&
@@ -693,7 +721,7 @@
 			}
 
 			/* restore connection */
-			global $DB, $DB_TYPE, $DB_PORT, $DB_SERVER, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
+			global $DB, $DB_TYPE, $DB_PORT, $DB_SERVER, $DB_DATABASE, $DB_USER, $DB_PASSWORD, $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 			$DB		= $old_DB;
 			$DB_TYPE	= $old_DB_TYPE;
@@ -702,6 +730,8 @@
 			$DB_DATABASE	= $old_DB_DATABASE;
 			$DB_USER	= $old_DB_USER;
 			$DB_PASSWORD	= $old_DB_PASSWORD;
+			$ZBX_SERVER	= $old_ZBX_SERVER;
+			$ZBX_SERVER_PORT= $old_ZBX_SERVER_PORT;
 
 			DBconnect($error2);
 
@@ -746,6 +776,12 @@
 				}
 				if(isset($_REQUEST['next'][$this->GetStep()]))		$this->DoNext();
 			}
+			if($this->GetStep() == 4)
+			{
+				$this->SetConfig('ZBX_SERVER',		get_request('zbx_server',	$this->GetConfig('ZBX_SERVER',		'localhost')));
+				$this->SetConfig('ZBX_SERVER_PORT',	get_request('zbx_server_port',	$this->GetConfig('ZBX_SERVER_PORT',	'10051')));
+				if(isset($_REQUEST['next'][$this->GetStep()]))		$this->DoNext();
+			}
 
 			/*
 			if($this->GetStep() == 4)
@@ -773,12 +809,12 @@
 			}
 			*/
 
-			if($this->GetStep() == 4 && isset($_REQUEST['next'][$this->GetStep()]))
+			if($this->GetStep() == 5 && isset($_REQUEST['next'][$this->GetStep()]))
 			{
 				$this->DoNext();
 			}
 
-			if($this->GetStep() == 5)
+			if($this->GetStep() == 6)
 			{
 				$this->SetConfig('ZBX_CONFIG_FILE_CORRECT', $this->CheckConfigurationFile());
 				
@@ -838,14 +874,17 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-global $DB_TYPE, $DB_SERVER, $DB_PORT, $DB_DATABASE, $DB_USER, $DB_PASSWORD, $IMAGE_FORMAT_DEFAULT;
+global $DB_TYPE, $DB_SERVER, $DB_PORT, $DB_DATABASE, $DB_USER, $DB_PASSWORD, $IMAGE_FORMAT_DEFAULT, $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-$DB_TYPE	= "'.$this->GetConfig('DB_TYPE'		,'unknown').'";
-$DB_SERVER	= "'.$this->GetConfig('DB_SERVER'	,'unknown').'";
-$DB_PORT	= "'.$this->GetConfig('DB_PORT'		,'0').'";
-$DB_DATABASE	= "'.$this->GetConfig('DB_DATABASE'	,'unknown').'";
-$DB_USER	= "'.$this->GetConfig('DB_USER'		,'unknown').'";
-$DB_PASSWORD	= "'.$this->GetConfig('DB_PASSWORD'	,'').'";
+$DB_TYPE		= "'.$this->GetConfig('DB_TYPE'		,'unknown').'";
+$DB_SERVER		= "'.$this->GetConfig('DB_SERVER'	,'unknown').'";
+$DB_PORT		= "'.$this->GetConfig('DB_PORT'		,'0').'";
+$DB_DATABASE		= "'.$this->GetConfig('DB_DATABASE'	,'unknown').'";
+$DB_USER		= "'.$this->GetConfig('DB_USER'		,'unknown').'";
+$DB_PASSWORD		= "'.$this->GetConfig('DB_PASSWORD'	,'').'";
+$ZBX_SERVER		= "'.$this->GetConfig('ZBX_SERVER'	,'').'";
+$ZBX_SERVER_PORT	= "'.$this->GetConfig('ZBX_SERVER_PORT'	,'0').'";
+
 
 $IMAGE_FORMAT_DEFAULT	= IMAGE_FORMAT_PNG;
 ?>';
