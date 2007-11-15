@@ -66,37 +66,25 @@ function execute_script($scriptid,$hostid){
 	$command = script_make_command($scriptid,$hostid);
 	$nodeid = id2nodeid($hostid);
 
-	$socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+	$socket = @socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+
 	if(!$socket)
 	{
 		$res["flag"] = 1;
 	}
 	if($res)
 	{
-		global $ZBX_LOCALNODEID;
-		$res = false;
-		if($nodeid == 0)
-		{
-			$res = socket_connect($socket, '127.0.0.1', 10051);
-		}
-		else
-		{
-			$sql = "SELECT ip,port FROM nodes WHERE nodeid=$ZBX_LOCALNODEID";
-			$node = DBselect($sql);
-			if($row = DBfetch($node))
-			{
-				$res = socket_connect($socket, $row['ip'], $row['port']);
-			}
-		}
+		global $ZBX_SERVER, $ZBX_SERVER_PORT;
+		$res = @socket_connect($socket, $ZBX_SERVER, $ZBX_SERVER_PORT);
 	}
 	if($res)
 	{
 		$send = "Command\255$nodeid\255$command\n";
-		socket_write($socket,$send);
+		@socket_write($socket,$send);
 	}
 	if($res)
 	{
-		$res = socket_read($socket,65535);
+		$res = @socket_read($socket,65535);
 	}
 	if($res)
 	{
@@ -104,10 +92,14 @@ function execute_script($scriptid,$hostid){
 		$message["flag"]=$flag;
 		$message["message"]=$msg;
 	}
+	if($res)
+	{
+		@socket_close($socket);
+	}
 	else
 	{
 		$message["flag"]=-1;
-		$message["message"] = socket_strerror(socket_last_error());
+		$message["message"] = S_CONNECT_TO_SERVER_ERROR.' ['.$ZBX_SERVER.':'.$ZBX_SERVER_PORT.'] ['.socket_strerror(socket_last_error()).']';
 	}
 return $message;
 }
