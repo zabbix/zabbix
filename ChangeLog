@@ -1,5 +1,6 @@
 Changes for 1.4.3:
 
+ - [ZBX-106] support of 16 processors for system.cpu.util[], other fixes (Alexei)
  - [ZBX-133] added more debug information on semaphore related errors (Alexei)
  - [ZBX-164] added support of units for values used in notifications (Alexei)
  - [ZBX-168] pass DNS or IP address instead of host name to external scripts (Alexei)

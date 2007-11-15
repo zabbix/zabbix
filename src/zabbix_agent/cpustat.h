@@ -41,7 +41,7 @@
 
 	typedef struct s_cpus_stat_data
 	{
-		ZBX_SINGLE_CPU_STAT_DATA cpu[MAX_CPU];
+		ZBX_SINGLE_CPU_STAT_DATA cpu[MAX_CPU+1];
 		int	count;
 
 		double	load1;
@@ -91,7 +91,7 @@
 
 	typedef struct s_cpus_stat_data
 	{
-		ZBX_SINGLE_CPU_STAT_DATA cpu[MAX_CPU];
+		ZBX_SINGLE_CPU_STAT_DATA cpu[MAX_CPU+1];
 		int	count;
 
 	} ZBX_CPUS_STAT_DATA;
