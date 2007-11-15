@@ -400,8 +400,9 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 	{
 		list($usec, $sec) = explode(" ",microtime()); 
 		return ((float)$usec + (float)$sec); 
-	} 
+	}
 
+	/* Do not forget to sync it with add_value_suffix in evalfunc.c! */ 
 	function	convert_units($value,$units)
 	{
 // Special processing for unix timestamps
