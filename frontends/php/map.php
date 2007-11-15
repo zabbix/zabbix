@@ -103,7 +103,7 @@ include_once "include/page_header.php";
 	else
 	{
 		$x=imagesx($im)/2-ImageFontWidth(4)*strlen($name)/2;
-		ImageString($im, 4,$x,1, $name , $darkred);
+		ImageStringTTF($im, 4,$x,1, $name , $darkred);
 	}
 	unset($db_image);
 
@@ -248,7 +248,7 @@ include_once "include/page_header.php";
 				$x_label-2, $y_label,
 				$x_label+ImageFontWidth(2)*strlen($label_line), $y_label+ImageFontHeight(2),
 				$white);
-			ImageString($im, 2, $x_label, $y_label, $label_line,$label_color);
+			ImageStringTTF($im, 2, $x_label, $y_label, $label_line,$label_color);
 		}
 
 		if($info_line!="")
@@ -257,7 +257,7 @@ include_once "include/page_header.php";
 				$x_info-2, $y_info,
 				$x_info+ImageFontWidth(2)*strlen($info_line), $y_info+ImageFontHeight(2),
 				$white);
-			ImageString($im, 2, $x_info, $y_info, $info_line,$color);
+			ImageStringTTF($im, 2, $x_info, $y_info, $info_line,$color);
 		}
 	}
 

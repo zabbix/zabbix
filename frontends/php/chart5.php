@@ -88,7 +88,7 @@ include_once "include/page_header.php";
 
 	$str=$service["name"]." (year ".date("Y").")";
 	$x=imagesx($im)/2-ImageFontWidth(4)*strlen($str)/2;
-	ImageString($im, 4,$x,1, $str , $darkred);
+	ImageStringTTF($im, 4,$x,1, $str , $darkred);
 
 	$now = time(NULL);
 	$to_time=$now;

@@ -408,7 +408,7 @@
 				$fontnum = 4;
 			}
 			$x=$this->fullSizeX/2-ImageFontWidth($fontnum)*strlen($str)/2;
-			ImageString($this->im, $fontnum,$x,1, $str , $this->GetColor("Dark Red No Alpha"));
+			ImageStringTTF($this->im, $fontnum,$x,1, $str , $this->GetColor("Dark Red No Alpha"));
 		}
 
 		function setHeader($header)
@@ -644,7 +644,7 @@
 				ImageFilledRectangle($this->im,$this->shiftXleft,$this->sizeY+$this->shiftY+62+12*$i,$this->shiftXleft+5,$this->sizeY+$this->shiftY+5+62+12*$i,$color);
 				ImageRectangle($this->im,$this->shiftXleft,$this->sizeY+$this->shiftY+62+12*$i,$this->shiftXleft+5,$this->sizeY+$this->shiftY+5+62+12*$i,$this->GetColor("Black No Alpha"));
 
-				ImageString($this->im, 2,
+				ImageStringTTF($this->im, 2,
 					$this->shiftXleft+9,
 					$this->sizeY+$this->shiftY+(62-5)+12*$i,
 					$str,
@@ -669,7 +669,7 @@
 					6,
 					$this->GetColor("Black No Alpha"));
 
-				ImageString(
+				ImageStringTTF(
 					$this->im, 
 					2,
 					$this->shiftXleft+9,

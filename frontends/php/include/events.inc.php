@@ -196,13 +196,13 @@ function event_initial_time($row,$show_unknown=0){
 	$sql_cond=($show_unknown == 0)?' AND value<>2 ':'';
 
 	$events = array();
-	$res = DBselect('SELECT MAX(clock) as clock, value '.
-					' FROM events '.
-					' WHERE objectid='.$row['triggerid'].$sql_cond.
-						' AND clock < '.$row['clock'].
-						' AND object='.EVENT_OBJECT_TRIGGER.
-					' GROUP BY value '.
-					' ORDER BY clock DESC');
+	$res = DBselect('SELECT MAX(e.clock) as clock, e.value '.
+					' FROM events e'.
+					' WHERE e.objectid='.$row['triggerid'].$sql_cond.
+						' AND e.clock < '.$row['clock'].
+						' AND e.object='.EVENT_OBJECT_TRIGGER.
+					' GROUP BY e.value '.
+					' ORDER BY e.clock DESC');
 					
 	while($rows = DBfetch($res)){
 		$events[] = $rows;

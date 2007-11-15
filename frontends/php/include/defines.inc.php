@@ -418,7 +418,9 @@
 	
 	define('ZBX_EREG_SPACES', '([[:space:]]+){0,1}');
 	define('ZBX_EREG_INTERNAL_NAMES', '([0-9a-zA-Z_.[:space:][.-.]$]+)');
+	define('ZBX_EREG_INTERNAL_NAMES_MB', '([0-9a-zA-Z_.[:space:][.\-.]$]+)');
 	define('ZBX_EREG_KEY_NAME', '([0-9a-zA-Z_.,[.:.][:space:][.-.]$]+)');
+	define('ZBX_EREG_KEY_NAME_MB', '([0-9a-zA-Z_.,[.:.][:space:][.\-.]$]+)');
 	define('ZBX_EREG_PARAMS', '([[:print:]]+){0,1}');
 	define('ZBX_EREG_SIGN', '([&|><=+*/#[.-.]])');
 	define('ZBX_EREG_NUMBER', '([[.-.]+]*[0-9]+[.]{0,1}[0-9]*[A-Z]{0,1})');
@@ -426,14 +428,17 @@
 	/* Character '-' must be last in the list of symbols, otherwise it won't be accepted */
 	define('ZBX_EREG_DNS_FORMAT', '([0-9a-zA-Z\_\.\$[.-.]]+)');
 	define('ZBX_EREG_HOST_FORMAT', ZBX_EREG_INTERNAL_NAMES);
+	define('ZBX_EREG_HOST_FORMAT_MB', ZBX_EREG_INTERNAL_NAMES_MB);
 	define('ZBX_EREG_NODE_FORMAT', ZBX_EREG_INTERNAL_NAMES);
 	define('ZBX_EREG_ITEM_KEY_FORMAT', '('.ZBX_EREG_KEY_NAME.'(\['.ZBX_EREG_PARAMS.'\]){0,1})');
+	define('ZBX_EREG_ITEM_KEY_FORMAT_MB', '('.ZBX_EREG_KEY_NAME_MB.'(\['.ZBX_EREG_PARAMS.'\]){0,1})');
 	define('ZBX_KEY_ID', 1);
 	define('ZBX_KEY_NAME_ID', 2);
 	define('ZBX_KEY_PARAM_ID', 4);
 	define('ZBX_EREG_FUNCTION_FORMAT', '('.ZBX_EREG_INTERNAL_NAMES.'(\('.ZBX_EREG_PARAMS.'\)))');
 
 	define('ZBX_EREG_SIMPLE_EXPRESSION_FORMAT','(\{'.ZBX_EREG_HOST_FORMAT.'\:'.ZBX_EREG_ITEM_KEY_FORMAT.'\.'.ZBX_EREG_FUNCTION_FORMAT.'\})');
+	define('ZBX_EREG_SIMPLE_EXPRESSION_FORMAT_MB','(\{'.ZBX_EREG_HOST_FORMAT_MB.'\:'.ZBX_EREG_ITEM_KEY_FORMAT.'\.'.ZBX_EREG_FUNCTION_FORMAT.'\})');
 	define('ZBX_EREG_MACRO_NAME_FORMAT', '(\{[A-Z\.]+\})');
 
 	define('ZBX_SIMPLE_EXPRESSION_HOST_ID', 2);
@@ -445,6 +450,7 @@
 	define('ZBX_SIMPLE_EXPRESSION_FUNCTION_PARAM_ID', 10);
 
 	define('ZBX_EREG_EXPRESSION_TOKEN_FORMAT', '^([[:print:]]*)('.ZBX_EREG_SIMPLE_EXPRESSION_FORMAT.'|'.ZBX_EREG_MACRO_NAME_FORMAT.')([[:print:]]*)$');
+	define('ZBX_EREG_EXPRESSION_TOKEN_FORMAT_MB', '^([[:print:]]*)('.ZBX_EREG_SIMPLE_EXPRESSION_FORMAT_MB.'|'.ZBX_EREG_MACRO_NAME_FORMAT.')([[:print:]]*)$');
 
 	define('ZBX_EXPRESSION_LEFT_ID', 1);
 	define('ZBX_EXPRESSION_SIMPLE_EXPRESSION_ID', 2);

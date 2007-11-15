@@ -409,7 +409,7 @@
 		$hosts = array();
 
 		/* Replace all {server:key.function(param)} and {MACRO} with '$ZBX_TR_EXPR_REPLACE_TO' */
-		while(ereg(ZBX_EREG_EXPRESSION_TOKEN_FORMAT, $expr, $arr))
+		while(mb_ereg(ZBX_EREG_EXPRESSION_TOKEN_FORMAT_MB, $expr, $arr))
 		{
 			if ( $arr[ZBX_EXPRESSION_MACRO_ID] && !isset($ZBX_TR_EXPR_ALLOWED_MACROS[$arr[ZBX_EXPRESSION_MACRO_ID]]) )
 			{
@@ -516,6 +516,71 @@
 
 		return $params;
 	}
+	/*
+	 * Function: zbx_get_params2
+	 *
+	 * Description: 
+	 *     parse list of quoted parameters
+	 *     
+	 * Author: 
+	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
+	 *
+	 * Comments:
+	 *     Double quotes used only.
+	 *
+	 */
+	function zbx_get_params2($string)
+	{
+		$params = array();
+		$quoted = false;
+		$quoted2 = false;
+
+		for( $param_s = $i = 0, $len = strlen($string); $i < $len; $i++)
+		{
+			switch ( $string[$i] )
+			{
+				case '[':
+					if(!$quoted && !$quoted2){
+						$quoted2 = true;
+					}
+					break;
+				case ']':
+					if(!$quoted && $quoted2){
+						$quoted2 = false;
+					}
+					break;
+				case '"':
+					if(!$quoted2){
+						$quoted = !$quoted;
+					}
+					break;
+				case ',':
+					if ( !$quoted )
+					{
+						$params[] = zbx_unquote_param(substr($string, $param_s, $i - $param_s));
+						$param_s = $i+1;
+					}
+					break;
+				case '\\':
+					if ( $quoted && $i+1 < $len && ($string[$i+1] == '\\' || $string[$i+1] == '"'))
+						$i++;
+					break;
+			}
+		}
+
+		if( $quoted )
+		{
+			error('Incorrect usage of quotes. ['.$string.']');
+			return null;
+		}
+
+		if( $i > $param_s )
+		{
+			$params[] = zbx_unquote_param(substr($string, $param_s, $i - $param_s));
+		}
+
+		return $params;
+	}
 
 	/*
 	 * Function: validate_expression 
@@ -542,7 +607,7 @@
 		$h_status = array();
 		
 		/* Replace all {server:key.function(param)} and {MACRO} with '$ZBX_TR_EXPR_REPLACE_TO' */
-		while(ereg(ZBX_EREG_EXPRESSION_TOKEN_FORMAT, $expr, $arr))
+		while(mb_ereg(ZBX_EREG_EXPRESSION_TOKEN_FORMAT_MB, $expr, $arr))
 		{
 			if ( $arr[ZBX_EXPRESSION_MACRO_ID] && !isset($ZBX_TR_EXPR_ALLOWED_MACROS[$arr[ZBX_EXPRESSION_MACRO_ID]]) )
 			{
@@ -605,7 +670,7 @@
 
 				if( !is_null($fnc_valid['args']) )
 				{
-					$parameter = zbx_get_params($parameter);
+					$parameter = zbx_get_params2($parameter);
 
 					if( !is_array($fnc_valid['args']) )
 						$fnc_valid['args'] = array($fnc_valid['args']);
@@ -964,7 +1029,7 @@
 
 		/* Replace all {server:key.function(param)} and {MACRO} with '$ZBX_TR_EXPR_REPLACE_TO' */
 		/* build short expression {12}>10 */
-		while(ereg(ZBX_EREG_EXPRESSION_TOKEN_FORMAT, $expr, $arr))
+		while(mb_ereg(ZBX_EREG_EXPRESSION_TOKEN_FORMAT_MB, $expr, $arr))
 		{
 			if ( $arr[ZBX_EXPRESSION_MACRO_ID] && !isset($ZBX_TR_EXPR_ALLOWED_MACROS[$arr[ZBX_EXPRESSION_MACRO_ID]]) )
 			{
@@ -2105,11 +2170,34 @@
 		$ZBX_EREG_EXPESSION_FUNC_FORMAT = '^([[:print:]]*)([&|]{1})(([a-zA-Z_.$]{6,7})(\\(([[:print:]]+){0,1}\\)))([[:print:]]*)$';
 
 		$expr_array = array();
+		
+		$cexpor = 0;
+		$startpos = -1;
 
 		foreach($expressions as $id => $expression){
-			if(!empty($complite_expr)) $complite_expr.=' | ';
-	
-			$eq_global = (($expression['type'] == REGEXP_INCLUDE)?'#':'=').'0';
+
+			$pastcexpor = $cexpor;
+			if($expression['type'] == REGEXP_INCLUDE){
+				if(!empty($complite_expr)) {
+					$complite_expr.=' | ';
+				}
+				if($cexpor == 0){
+					 $startpos = strlen($complite_expr);
+				}
+				$cexpor++;
+				$eq_global = '#0';
+			}else{
+				if(($cexpor > 1) & ($startpos >= 0)){
+					$head = substr($complite_expr, 0, $startpos);
+					$tail = substr($complite_expr, $startpos);
+					$complite_expr = $head.'('.$tail.')';
+				}
+				$cexpor = 0;
+				$eq_global = '=0';
+				if(!empty($complite_expr)) {
+					$complite_expr.=' & ';
+				}
+			}
 			$expr = '&'.$expression['value'];
 			$expr = preg_replace('/\s+(\&|\|){1,2}\s+/U','$1',$expr);
 			
@@ -2117,7 +2205,9 @@
 			$sub_expr_count=0;
 			$sub_expr = '';
 
-			while(eregi($ZBX_EREG_EXPESSION_FUNC_FORMAT, $expr, $arr)){
+			$multi = preg_match("/.+(\&|\|).+/", $expr);
+
+			while(mb_eregi($ZBX_EREG_EXPESSION_FUNC_FORMAT, $expr, $arr)){
 				$arr[4] = strtolower($arr[4]);
 
 				if(!isset($functions[$arr[4]])){
@@ -2138,11 +2228,30 @@
 			}
 			
 			$expr_array[$sub_expr_count-1]['eq'] = '';
-			
+	
+			$sub_eq = '';	
+			if($multi > 0){
+				$sub_eq = $eq_global;
+			}	
 			foreach($expr_array as $id => $expr){
-				$sub_expr = $expr['eq'].'{'.$prefix.$expr['regexp'].'}'.$sub_expr;
+				if($multi > 0){
+				$sub_expr = $expr['eq'].'({'.$prefix.$expr['regexp'].'})'.$sub_eq.$sub_expr;
+				}else{
+				$sub_expr = $expr['eq'].'{'.$prefix.$expr['regexp'].'}'.$sub_eq.$sub_expr;
+				}
 			}
-			$complite_expr.= '(('.$sub_expr.')'.$eq_global.')';
+
+			if($multi > 0){
+				$complite_expr.= '('.$sub_expr.')';
+			}else{
+				$complite_expr.= '(('.$sub_expr.')'.$eq_global.')';
+			}
+		}
+
+		if(($cexpor > 1) & ($startpos >= 0)){
+			$head = substr($complite_expr, 0, $startpos);
+			$tail = substr($complite_expr, $startpos);
+			$complite_expr = $head.'('.$tail.')';
 		}
 	return $complite_expr;
 	}

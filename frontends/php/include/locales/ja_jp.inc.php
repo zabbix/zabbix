@@ -413,6 +413,7 @@
 	"S_USE_MULTIPLIER"=>			"乗数を使用",
 	"S_SELECT_HOST_DOT_DOT_DOT"=>		"選択",
 	"S_LOG_TIME_FORMAT"=>			"ログの時間形式",
+	'S_KEYWORD'=>		     		'キーワード',	
 
 //	latestalarms.php
 	"S_LATEST_EVENTS"=>			"最新イベント",

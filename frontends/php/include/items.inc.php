@@ -196,7 +196,7 @@
 		if(($i = array_search(0,$applications)) !== FALSE)
 			unset($applications[$i]);
 
-		if( !eregi('^'.ZBX_EREG_ITEM_KEY_FORMAT.'$', $key) )
+		if( !mb_eregi('^'.ZBX_EREG_ITEM_KEY_FORMAT_MB.'$', $key) )
 		{
 			error("Incorrect key format 'key_name[param1,param2,...]'");
 			return false;
@@ -360,7 +360,7 @@
 		if(($i = array_search(0,$applications)) !== FALSE)
 			unset($applications[$i]);
 
-		if( !eregi('^'.ZBX_EREG_ITEM_KEY_FORMAT.'$', $key) )
+		if( !mb_eregi('^'.ZBX_EREG_ITEM_KEY_FORMAT_MB.'$', $key) )
 		{
 			error("Incorrect key format 'key_name[param1,param2,...]'");
 			return false;
@@ -789,9 +789,9 @@
 
 		$num--;
 
-		if( ereg('^'.ZBX_EREG_ITEM_KEY_FORMAT.'$', $key, $arr) )
+		if( mb_ereg('^'.ZBX_EREG_ITEM_KEY_FORMAT.'$', $key, $arr) )
 		{
-			$params = zbx_get_params($arr[ZBX_KEY_PARAM_ID]);
+			$params = zbx_get_params2($arr[ZBX_KEY_PARAM_ID]);
 
 			if(isset($params[$num]))
 			{
@@ -1053,6 +1053,7 @@ COpt::profiling_stop('prepare table');
 		}
 		return	DBexecute("delete from trends where itemid=$itemid");
 	}
+
 	
 	function	format_lastvalue($db_item)
 	{
@@ -1088,7 +1089,7 @@ COpt::profiling_stop('prepare table');
 			}
 			else if($db_item["value_type"] == ITEM_VALUE_TYPE_STR)
 			{
-					$lastvalue=nbsp(htmlspecialchars(substr($db_item["lastvalue"],0,20)));
+					$lastvalue=nbsp(htmlspecialchars(mb_substr($db_item["lastvalue"],0,20)));
 					if(strlen($db_item["lastvalue"]) > 20)
 						$lastvalue .= " ...";
 			}

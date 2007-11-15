@@ -148,7 +148,7 @@ include_once "include/page_header.php";
 	if(isset($_REQUEST['expression']))
 	{
 
-		if( ($res = ereg(
+		if( ($res = mb_ereg(
 			'^'.ZBX_EREG_SIMPLE_EXPRESSION_FORMAT.'(['.implode('',array_keys($operators)).'])'.'([[:print:]]{1,})',
 			$_REQUEST['expression'],
 			$expr_res))

@@ -789,6 +789,7 @@
 	'S_ORIGINAL'=>				'Original',
 	'S_NEW_FLEXIBLE_INTERVAL'=>		'New flexible interval',
 	'S_FLEXIBLE_INTERVALS'=>		'Flexible intervals (sec)',
+	'S_KEYWORD'=>		     		'Keyword',	
 
 //	events.php
 	'S_LATEST_EVENTS'=>			'Latest events',

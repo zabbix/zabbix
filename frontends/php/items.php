@@ -27,6 +27,13 @@
         $page["title"] = "S_CONFIGURATION_OF_ITEMS";
         $page["file"] = "items.php";
 
+	$logtype['log']=0;
+	$logtype['eventlog']=1;
+	$logtype['snmptraps']=2;
+	$dbkey[0]='log[%';
+	$dbkey[1]='eventlog[%';
+	$dbkey[2]='snmptraps';
+
 include_once "include/page_header.php";
 ?>
 <?php
@@ -793,12 +800,14 @@ include_once "include/page_header.php";
 
 			$applications = $show_applications ? implode(', ', get_applications_by_itemid($db_item["itemid"], 'name')) : null;
 			
-			if(preg_match("/^log\[.*\].*$/",$db_item["key_"])){
+			if(preg_match("/^(log\[.*\]|eventlog\[.*\]|snmptraps).*$/",$db_item["key_"],$matchkeys)){
+				preg_match("/(log|eventlog|snmptraps)/", $matchkeys[0], $matchkey);
+				$ltype=$logtype[$matchkey[1]];
 				$res = DBselect('SELECT MAX(t.description) as description, t.triggerid'.
 					' FROM functions as f, triggers as t, items as i '.
 					' WHERE f.itemid='.$db_item["itemid"].
 					  ' AND i.itemid=f.itemid AND t.triggerid = f.triggerid '.
-					  ' AND i.value_type=2 AND i.key_ LIKE \'log[%\' '.
+					  ' AND i.value_type=2 AND i.key_ LIKE \''.$dbkey[$ltype].'\' '.
 					' GROUP BY t.triggerid');
 
 				$triggers_flag = false;
@@ -808,7 +817,7 @@ include_once "include/page_header.php";
 					$item_count = DBfetch(DBselect('SELECT count(DISTINCT f.itemid) as items FROM functions as f WHERE f.triggerid='.$trigger['triggerid']));
 					if($item_count['items'] > 1) continue;
 					
-					$triggers .= ',["'.$trigger['description']."\",\"javascript: openWinCentered('tr_logform.php?sform=1&itemid=".$db_item["itemid"]."&triggerid=".$trigger['triggerid']."','TriggerLog',760,540,'titlebar=no, resizable=yes, scrollbars=yes');\"]";
+					$triggers .= ',["'.$trigger['description']."\",\"javascript: openWinCentered('tr_logform.php?sform=1&itemid=".$db_item["itemid"]."&triggerid=".$trigger['triggerid']."&ltype=".$ltype."','TriggerLog',760,540,'titlebar=no, resizable=yes, scrollbars=yes');\"]";
 					$triggers_flag = true;
 				}
 				if($triggers_flag){
@@ -817,9 +826,8 @@ include_once "include/page_header.php";
 				else{
 					$triggers='';
 				}
-				
 				$menuicon = new CImg('images/general/menuicon.gif','menu',21,18);
-				$menuicon->AddOption('onclick','javascript: call_menu(event, '.zbx_jsvalue($db_item["itemid"]).','.zbx_jsvalue(item_description($db_item["description"],$db_item["key_"])).$triggers.'); return false;');
+				$menuicon->AddOption('onclick','javascript: call_menu(event, '.zbx_jsvalue($db_item["itemid"]).','.zbx_jsvalue(item_description($db_item["description"],$db_item["key_"])).','.$ltype.$triggers.'); return false;');
 				$menuicon->AddOption('onmouseover','javascript: this.style.cursor = "pointer";');
 			} 
 			else {

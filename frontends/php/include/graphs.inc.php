@@ -871,4 +871,27 @@
 
 		return;
 	}
+
+	function ImageStringTTF($image, $font, $x, $y, $string, $color)
+	{
+		$fontSize = 6;
+		$ttf = "/usr/share/fonts/ja/TrueType/kochi-gothic-subst.ttf";
+
+		switch ($font)
+		{
+			case 0: $fontSize = 6; break;
+			case 1: $fontSize = 7; break;
+			case 2: $fontSize = 9; break;
+			case 3: $fontSize = 10; break;
+			case 4: $fontSize = 11; break;
+			case 5: $fontSize = 12; break;
+			default: $fontSize = 6; break;
+		}
+
+		$ar = imagettfbbox($fontSize, 0, $ttf, $string);
+		ImageTTFText($image, $fontSize, 0, $x, $y + abs($ar[1] - $ar[7]), $color, $ttf, $string);
+
+		return 0;
+	}
+
 ?>
