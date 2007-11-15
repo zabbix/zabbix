@@ -90,6 +90,7 @@ require_once('include/classes/ctree.inc.php');
 	set_error_handler('zbx_err_handler');
 
 	global $_COOKIE, $ZBX_LOCALNODEID, $ZBX_LOCMASTERID, $ZBX_CONFIGURATION_FILE, $DB_TYPE, $DB_SERVER, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
+	global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 	$ZBX_LOCALNODEID = 0;
 	$ZBX_LOCMASTERID = 0;

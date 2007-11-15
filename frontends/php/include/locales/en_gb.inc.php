@@ -1304,6 +1304,7 @@
 	'S_TOOLS'=>				'Tools',
 	'S_RESULT'=>				'Result',
 	'S_CLOSE'=>				'Close',
+	'S_CONNECT_TO_SERVER_ERROR'=>		'Cannot connect to ZABBIX server',
 
 
 //	audit.php
