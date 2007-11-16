@@ -198,12 +198,12 @@ function event_initial_time($row,$show_unknown=0){
 	$sql_cond=($show_unknown == 0)?' AND value<>2 ':'';
 
 	$events = array();
-	$res = DBselect('SELECT MAX(clock) as clock, value '.
-					' FROM events '.
-					' WHERE objectid='.$row['triggerid'].$sql_cond.
-						' AND clock < '.$row['clock'].
-						' AND object='.EVENT_OBJECT_TRIGGER.
-					' GROUP BY value '.
+	$res = DBselect('SELECT MAX(eclock) as clock, e.value '.
+					' FROM events e'.
+					' WHERE e.objectid='.$row['triggerid'].$sql_cond.
+						' AND e.clock < '.$row['clock'].
+						' AND e.object='.EVENT_OBJECT_TRIGGER.
+					' GROUP BY e.value '.
 					' ORDER BY clock DESC');
 					
 	while($rows = DBfetch($res)){
@@ -220,5 +220,73 @@ function event_initial_time($row,$show_unknown=0){
 		return false;
 	}
 	return true;
+}
+
+
+function first_initial_eventid($row,$show_unknown=0){
+	$sql_cond=($show_unknown == 0)?' AND value<>2 ':'';
+	
+	$events = array();
+
+	$sql = 'SELECT MAX(eventid) as eventid,MAX(clock) as clock, value '.
+					' FROM events as e '.
+					' WHERE objectid='.$row['triggerid'].
+						' AND clock < '.$row['lastchange'].$sql_cond.
+						' AND object='.EVENT_OBJECT_TRIGGER.
+					' GROUP BY value '.
+					' ORDER BY clock DESC';
+	$res = DBselect($sql);
+
+	while($rows = DBfetch($res)){
+		$events[] = $rows;
+	}
+
+	if(empty($events)){
+		$sql = 'SELECT eventid,clock '.
+				' FROM events as e '.
+				' WHERE objectid='.$row['triggerid'].$sql_cond.
+					' AND object='.EVENT_OBJECT_TRIGGER.
+				' ORDER BY clock ASC';
+		$res = DBselect($sql,1);
+		
+		while($rows = DBfetch($res)) return $rows['eventid'];
+	}
+	else if(!empty($events) && ($events[0]['value'] != $row['value'])){
+		$clock = $events[0]['clock'];
+		$sql = 'SELECT eventid,clock '.
+				' FROM events as e '.
+				' WHERE clock > '.$clock.
+					' AND objectid='.$row['triggerid'].$sql_cond.
+					' AND object='.EVENT_OBJECT_TRIGGER.
+				' ORDER BY clock ASC';
+				
+		$res = DBselect($sql,1);
+		
+		while($rows = DBfetch($res)){
+			return $rows['eventid'];
+		}
+		
+		$row['lastchange'] = $clock;
+		$row['value'] = $events[0]['value'];
+		return first_initial_eventid($row,$show_unknown=0);
+	}
+	else if(!empty($events) && ($events[0]['value'] == $row['value'])){
+
+		$clock = (count($events) > 1)?($events[1]['clock']):(0);
+
+		$sql = 'SELECT eventid,clock '.
+				' FROM events as e '.
+				' WHERE clock > '.$clock.
+					' AND objectid='.$row['triggerid'].$sql_cond.
+					' AND object='.EVENT_OBJECT_TRIGGER.
+					' AND value='.$row['value'].
+				' ORDER BY clock ASC';
+
+		$res = DBselect($sql,1);
+		
+		$rows = DBfetch($res);
+		return $rows['eventid'];
+	}
+return false;
 }
 ?>
