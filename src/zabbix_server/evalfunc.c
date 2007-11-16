@@ -1778,6 +1778,9 @@ int evaluate_function2(char *value,char *host,char *key,char *function,char *par
 	DB_RESULT result;
 	DB_ROW	row;
 
+	char	host_esc[MAX_STRING_LEN];
+	char	key_esc[MAX_STRING_LEN];
+
 	int	res;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In evaluate_function2(%s,%s,%s,%s)",
@@ -1786,10 +1789,13 @@ int evaluate_function2(char *value,char *host,char *key,char *function,char *par
 		function,
 		parameter);
 
+	DBescape_string(host, host_esc, MAX_STRING_LEN);
+	DBescape_string(key, key_esc, MAX_STRING_LEN);
+
 	result = DBselect("select %s where h.host='%s' and h.hostid=i.hostid and i.key_='%s' and" ZBX_COND_NODEID,
 		ZBX_SQL_ITEM_SELECT,
-		host,
-		key,
+		host_esc,
+		key_esc,
 		LOCAL_NODE("h.hostid"));
 
 	row = DBfetch(result);
