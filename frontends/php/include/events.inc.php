@@ -202,7 +202,7 @@ function event_initial_time($row,$show_unknown=0){
 						' AND e.clock < '.$row['clock'].
 						' AND e.object='.EVENT_OBJECT_TRIGGER.
 					' GROUP BY e.value '.
-					' ORDER BY e.clock DESC');
+					' ORDER BY clock DESC');
 					
 	while($rows = DBfetch($res)){
 		$events[] = $rows;
