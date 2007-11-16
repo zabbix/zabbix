@@ -467,7 +467,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 		}
 
 		$description = new CCol($description);
-		$description->AddOption('style','white-space: normal; width: 50%;');
+		$description->AddOption('style','white-space: normal; width: 75%;');
 
 		if((time(NULL)-$row["lastchange"])<TRIGGER_BLINK_PERIOD)
 			$blink = array(1=>'<a name="blink">',	2=>'</a>');
