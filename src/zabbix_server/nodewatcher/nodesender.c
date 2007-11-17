@@ -65,17 +65,23 @@ int calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id
 		if (NULL != tablename && 0 != strcmp(tablename, tables[t].table))
 			continue;
 
-		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 #ifdef	HAVE_MYSQL
+		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
 			"%s select %d,'%s',%s,%d,concat_ws(',',",
-#else
-			"%s select %d,'%s',%s,%d,",
-#endif
 			sql_offset > 0 ? "union all" : "insert into node_cksum (nodeid,tablename,recordid,cksumtype,cksum)",
 			nodeid,
 			tables[t].table,
 			tables[t].recid,
 			NODE_CKSUM_TYPE_NEW);
+#else
+		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
+			"%s select %d,'%s',%s,%d,",
+			sql_offset > 0 ? "union all" : "insert into node_cksum (nodeid,tablename,recordid,cksumtype,cksum)",
+			nodeid,
+			tables[t].table,
+			tables[t].recid,
+			NODE_CKSUM_TYPE_NEW);
+#endif
 
 		for (f = 0; tables[t].fields[f].name != 0; f ++) {
 			if ((tables[t].fields[f].flags & ZBX_SYNC) == 0)
@@ -112,13 +118,15 @@ int calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id
 					break;
 				}
 			}
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 16,
 #ifdef	HAVE_MYSQL
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 16,
 				","
-#else
-				"||','||"
-#endif
 				);
+#else
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 16,
+				"||','||"
+				);
+#endif
 		}
 
 		/* remove last delimiter */
