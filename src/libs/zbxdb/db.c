@@ -155,7 +155,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	return ret;
 #endif
 #ifdef	HAVE_ORACLE
-	char    connect = NULL;
+	char	*connect = NULL;
 
 	if (SQLO_SUCCESS != sqlo_init(SQLO_OFF, 1, 100))
 	{
@@ -793,7 +793,7 @@ zbx_uint64_t	zbx_db_insert_id(int exec_result, const char *table, const char *fi
 
 	zbx_snprintf(sql, sizeof(sql), "select %s_%s.currval from dual", table, field);
 
-	result=DBselect(sql);
+	result=DBselect("%s", sql);
 	
 	row = DBfetch(result);
 
