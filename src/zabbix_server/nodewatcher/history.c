@@ -167,7 +167,7 @@ static int process_node_history_str(int nodeid, int master_nodeid)
 	char		*data = NULL, *hex = NULL;
 	char		sql[MAX_STRING_LEN];
 	int		found = 0, len;
-	int		data_allocated = 1024*1024, data_offset = 0;;
+	int		data_allocated = 1024*1024, data_offset = 0;
 	int		hex_allocated = 512;
 	int		start = time(NULL);
 	zbx_uint64_t	id;
