@@ -1,5 +1,6 @@
 Changes for 1.4.3:
 
+ - [ZBX-100] fixed Oracle compilation errors (Alexei)
  - [ZBX-159] added support of vm.memory.size[available] under Linux (Alexei)
  - [ZBX-172] fixed incorrect SQL caused by character ' in item key (Alexei)
  - [ZBX-106] support of 16 processors for system.cpu.util[], other fixes (Alexei)

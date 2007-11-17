@@ -87,15 +87,19 @@ static int calculate_checksums()
 			/* Do not sync some of tables */
 			if( (tables[i].flags & ZBX_SYNC) ==0)	continue;
 
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 4096,
 #ifdef	HAVE_MYSQL
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 4096,
 					"union all select '%s','%s',%s,md5(concat(",
-#else
-					"union all select '%s','%s',%s,md5(",
-#endif
 					tables[i].table,
 					tables[i].recid,
 					tables[i].recid);
+#else
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 4096,
+					"union all select '%s','%s',%s,md5(",
+					tables[i].table,
+					tables[i].recid,
+					tables[i].recid);
+#endif
 
 			j=0;
 			while(tables[i].fields[j].name != 0)
@@ -129,18 +133,23 @@ static int calculate_checksums()
 #endif
 
 			/* select table,recid,md5(fields) from table union all ... */
-			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 4096,
 #ifdef	HAVE_MYSQL
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 4096,
 					")) from %s where %s>=" ZBX_FS_UI64 " and %s<=" ZBX_FS_UI64 "\n",
-#else
-					") from %s where %s>=" ZBX_FS_UI64 " and %s<=" ZBX_FS_UI64 "\n",
-#endif
 					tables[i].table,
 					tables[i].recid,
 					(zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid,
 					tables[i].recid,
 					(zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid+__UINT64_C(99999999999999));
-
+#else
+			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 4096,
+					") from %s where %s>=" ZBX_FS_UI64 " and %s<=" ZBX_FS_UI64 "\n",
+					tables[i].table,
+					tables[i].recid,
+					(zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid,
+					tables[i].recid,
+					(zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid+__UINT64_C(99999999999999));
+#endif
 		}
 /*		zabbix_log( LOG_LEVEL_WARNING, "SQL DUMP [%s]", sql);*/
 
