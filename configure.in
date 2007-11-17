@@ -678,6 +678,7 @@ if test "$server" = "yes"; then
 	fi
 	CFLAGS="${CFLAGS} ${JABBER_CPPFLAGS}"
 	SERVER_LDFLAGS="${SERVER_LDFLAGS} ${JABBER_LDFLAGS}"
+	SERVER_LIBS="${SERVER_LIBS} ${JABBER_LIBS}"
 
 	dnl Check for libCurl [default - yes]
 	LIBCURL_CHECK_CONFIG(, [7.13.1], [],[])

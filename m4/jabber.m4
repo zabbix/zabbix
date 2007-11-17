@@ -41,6 +41,7 @@ AC_HELP_STRING([--with-jabber@<:@=DIR@:>@],[Include Jabber support @<:@default=n
 			[
 			 JABBER_INCDIR=$IKSEMEL_CPPFLAGS
 			 JABBER_LIBDIR=$IKSEMEL_LIBS
+			 JABBER_LIBS="-liksemel"
 			],[
 			 found_iksemel="no"
 			 found_jabber="no"
@@ -51,7 +52,7 @@ AC_HELP_STRING([--with-jabber@<:@=DIR@:>@],[Include Jabber support @<:@default=n
                if test -f $_libiksemel_with/include/iksemel.h; then
                        JABBER_INCDIR=-I$_libiksemel_with/include
                        JABBER_LIBDIR=-L$_libiksemel_with/lib
-                       JABBER_LIBS=-liksemel
+                       JABBER_LIBS="-liksemel"
 		       AC_MSG_RESULT(yes)
                else
                        found_iksemel="no"
@@ -65,7 +66,24 @@ AC_HELP_STRING([--with-jabber@<:@=DIR@:>@],[Include Jabber support @<:@default=n
                AC_CHECK_FUNCS(getaddrinfo)
 
                JABBER_CPPFLAGS=$JABBER_INCDIR
-               JABBER_LDFLAGS="$JABBER_LIBDIR $JABBER_LIBS"
+               JABBER_LDFLAGS="$JABBER_LIBDIR"
+
+		if test "x$enable_static" = "xyes"; then
+			for i in -liksemel -lgnutls -ltasn1 -lgcrypt -lgpg-error; do
+				case $i in
+					-liksemel)
+				;;
+					-l*)
+						_lib_name=`echo "$i" | cut -b3-`
+						AC_CHECK_LIB($_lib_name , main,[
+							JABBER_LIBS="$JABBER_LIBS $i"
+						],[
+							AC_MSG_ERROR([Not found $_lib_name library])
+						])
+				;;
+				esac
+			done
+		fi
 
                found_iksemel="yes"
                found_jabber="yes"
@@ -76,6 +94,7 @@ AC_HELP_STRING([--with-jabber@<:@=DIR@:>@],[Include Jabber support @<:@default=n
 
   AC_SUBST(JABBER_CPPFLAGS)
   AC_SUBST(JABBER_LDFLAGS)
+  AC_SUBST(JABBER_LIBS)
 
   unset _libiksemel_with
 ])dnl
