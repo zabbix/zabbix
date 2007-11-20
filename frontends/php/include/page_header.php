@@ -102,7 +102,7 @@ COpt::profiling_start("page");
 						),
 					array("url"=>"tr_status.php"	,"label"=>S_TRIGGERS	,
 						"sub_pages"=>array("tr_events.php","acknow.php","tr_comments.php",
-								"chart4.php")
+								"chart4.php","scripts_exec.php")
 						),
 					array("url"=>"queue.php"	,"label"=>S_QUEUE	),
 					array("url"=>"events.php"	,"label"=>S_EVENTS	),
@@ -191,9 +191,7 @@ COpt::profiling_start("page");
 							"popup_usrgrp.php","popup_right.php","popup_users.php")
 						),
 					array("url"=>"media_types.php"	,"label"=>S_MEDIA_TYPES		),
-					array("url"=>"scripts.php"	,"label"=>S_SCRIPTS,
-						"sub_pages"=> array("scripts_exec.php")	
-						),
+					array("url"=>"scripts.php"	,"label"=>S_SCRIPTS),
 					array("url"=>"audit.php"	,"label"=>S_AUDIT		),
 					array("url"=>"report4.php"	,"label"=>S_NOTIFICATIONS	),
 					array("url"=>"instal.php"	,"label"=>S_INSTALLATION	,
