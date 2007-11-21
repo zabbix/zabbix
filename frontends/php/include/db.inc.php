@@ -460,6 +460,18 @@ if(isset($DB_TYPE) && $DB_TYPE == "ORACLE") {
 		}
 	}
 
+	function zbx_sql_mod($x,$y){
+		global $DB_TYPE;
+
+		switch($DB_TYPE)
+		{
+			case "SQLITE3":
+				return ' ('.$x.' %% '.$y.')';
+			default:
+				return ' MOD('.$x.','.$y.')';
+		}
+	}
+
 	function DBid2nodeid($id_name)
 	{
 		global $DB_TYPE;
