@@ -149,7 +149,7 @@ include_once "include/page_header.php";
 		$show_events = EVENTS_OPTION_NOFALSEFORB;
 	}
 
-	if(!$config['ack_enable'] && (($show_events != EVENTS_OPTION_NOEVENT) || ($show_events != EVENTS_OPTION_ALL))){
+	if(!$config['event_ack_enable'] && (($show_events != EVENTS_OPTION_NOEVENT) || ($show_events != EVENTS_OPTION_ALL))){
 		$show_events = EVENTS_OPTION_NOEVENT;
 	}
 ?>
@@ -260,7 +260,7 @@ include_once "include/page_header.php";
 		if(TRIGGERS_OPTION_ALL){
 			$tr_select->Additem(TRIGGERS_OPTION_ALL,S_SHOW_ALL,(TRIGGERS_OPTION_ALL==$show_triggers)?'yes':'no');
 		}
-		if(TRIGGERS_OPTION_NOFALSEFORB){
+		if(TRIGGERS_OPTION_NOFALSEFORB && $config['event_ack_enable']){
 			$tr_select->Additem(TRIGGERS_OPTION_NOFALSEFORB,S_SHOW_NOFALSEFORB,(TRIGGERS_OPTION_NOFALSEFORB==$show_triggers)?'yes':'no');
 		}
 		
@@ -269,13 +269,13 @@ include_once "include/page_header.php";
 			$ev_select->Additem(EVENTS_OPTION_NOEVENT,S_HIDE_ALL,(EVENTS_OPTION_NOEVENT==$show_events)?'yes':'no');
 		}
 		if(EVENTS_OPTION_ALL){
-			$ev_select->Additem(EVENTS_OPTION_ALL,S_SHOW_ALL.SPACE.'('.$config['ack_expire'].SPACE.(($config['ack_expire']>1)?S_DAYS:S_DAY).')',(EVENTS_OPTION_ALL==$show_events)?'yes':'no');
+			$ev_select->Additem(EVENTS_OPTION_ALL,S_SHOW_ALL.SPACE.'('.$config['event_expire'].SPACE.(($config['event_expire']>1)?S_DAYS:S_DAY).')',(EVENTS_OPTION_ALL==$show_events)?'yes':'no');
 		}
-		if(EVENTS_OPTION_NOT_ACK && $config['ack_enable']){
-			$ev_select->Additem(EVENTS_OPTION_NOT_ACK,S_SHOW_UNACKNOWLEDGED.SPACE.'('.$config['ack_expire'].SPACE.(($config['ack_expire']>1)?S_DAYS:S_DAY).')',(EVENTS_OPTION_NOT_ACK==$show_events)?'yes':'no');
+		if(EVENTS_OPTION_NOT_ACK && $config['event_ack_enable']){
+			$ev_select->Additem(EVENTS_OPTION_NOT_ACK,S_SHOW_UNACKNOWLEDGED.SPACE.'('.$config['event_expire'].SPACE.(($config['event_expire']>1)?S_DAYS:S_DAY).')',(EVENTS_OPTION_NOT_ACK==$show_events)?'yes':'no');
 		}
-		if(EVENTS_OPTION_ONLYTRUE_NOTACK && $config['ack_enable']){
-			$ev_select->Additem(EVENTS_OPTION_ONLYTRUE_NOTACK,S_SHOW_TRUE_UNACKNOWLEDGED.SPACE.'('.$config['ack_expire'].SPACE.(($config['ack_expire']>1)?S_DAYS:S_DAY).')',(EVENTS_OPTION_ONLYTRUE_NOTACK==$show_events)?'yes':'no');
+		if(EVENTS_OPTION_ONLYTRUE_NOTACK && $config['event_ack_enable']){
+			$ev_select->Additem(EVENTS_OPTION_ONLYTRUE_NOTACK,S_SHOW_TRUE_UNACKNOWLEDGED.SPACE.'('.$config['event_expire'].SPACE.(($config['event_expire']>1)?S_DAYS:S_DAY).')',(EVENTS_OPTION_ONLYTRUE_NOTACK==$show_events)?'yes':'no');
 		}
 //------- JP -------
 		if($show_triggers==TRIGGERS_OPTION_NOFALSEFORB){
@@ -349,13 +349,13 @@ include_once "include/page_header.php";
 	$table->SetHeader(array(
 		is_show_subnodes() ? make_sorting_link(S_NODE,'h.hostid') : null,
 		$_REQUEST["hostid"] >0 ? null : make_sorting_link(S_HOST,'h.host'),
-		($config['ack_enable'])?(new CCheckBox("all_events",false, "CheckAll('".$m_form->GetName()."','all_events','events');")): NULL,
+		($config['event_ack_enable'])?(new CCheckBox("all_events",false, "CheckAll('".$m_form->GetName()."','all_events','events');")): NULL,
 		make_sorting_link(S_NAME,'t.description'),
 		S_STATUS,
 		make_sorting_link(S_SEVERITY,'t.priority'),
 		make_sorting_link(S_LAST_CHANGE,'t.lastchange'),
 		($noactions!='true')?S_ACTIONS:NULL,
-		($config['ack_enable'])? S_ACKNOWLEDGED : NULL,
+		($config['event_ack_enable'])? S_ACKNOWLEDGED : NULL,
 		S_COMMENTS
 		));
 		
@@ -392,16 +392,16 @@ include_once "include/page_header.php";
 		if(trigger_dependent($row["triggerid"]))	continue;
 
 		$cond = '';
-		$ack_expire = ($config['ack_expire']*86400); // days
+		$event_expire = ($config['event_expire']*86400); // days
 		switch($show_events){
 			case EVENTS_OPTION_ALL:
-				$cond.=' AND (('.time().'-e.clock)<'.$ack_expire.')';
+				$cond.=' AND (('.time().'-e.clock)<'.$event_expire.')';
 				break;
 			case EVENTS_OPTION_NOT_ACK:
-				$cond.=' AND (('.time().'-e.clock)<'.$ack_expire.') AND e.acknowledged=0 ';
+				$cond.=' AND (('.time().'-e.clock)<'.$event_expire.') AND e.acknowledged=0 ';
 				break;
 			case EVENTS_OPTION_ONLYTRUE_NOTACK:
-				$cond.=' AND (('.time().'-e.clock)<'.$ack_expire.') AND e.acknowledged=0 AND e.value='.TRIGGER_VALUE_TRUE;
+				$cond.=' AND (('.time().'-e.clock)<'.$event_expire.') AND e.acknowledged=0 AND e.value='.TRIGGER_VALUE_TRUE;
 				break;
 			case EVENTS_OPTION_NOFALSEFORB:
 //				$cond.=' AND (('.time().'-e.clock)<'.(86400*16).') AND e.acknowledged=0 AND ((e.value='.TRIGGER_VALUE_TRUE.') OR ((e.value='.TRIGGER_VALUE_FALSE.') AND t.type='.TRIGGER_MULT_EVENT_DISABLED.'))';
@@ -479,10 +479,7 @@ include_once "include/page_header.php";
 			$actions=array(
 				new CLink(S_CHANGE,'triggers.php?form=update&triggerid='.$row["triggerid"].url_param('hostid'),"action"));
 		}
-
-		$ack='-';
-		
-		
+	
 		$host = null;
 		if($_REQUEST['hostid'] < 1){
 			$menus = '';
@@ -505,7 +502,7 @@ include_once "include/page_header.php";
 		$table->AddRow(array(
 				get_node_name_by_elid($row['triggerid']),
 				$host,
-				($config['ack_enable'])?SPACE:NULL,
+				($config['event_ack_enable'])?SPACE:NULL,
 				$description,
 				$value,
 				new CCol(
@@ -515,10 +512,11 @@ include_once "include/page_header.php";
 //				SPACE,
 				new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row["lastchange"]),"tr_events.php?triggerid=".$row["triggerid"],"action"),
 				$actions,
-				($config['ack_enable'])?$ack:NULL,
+				($config['event_ack_enable'])?SPACE:NULL,
 				new CLink(($row["comments"] == "") ? S_ADD : S_SHOW,"tr_comments.php?triggerid=".$row["triggerid"],"action")
 				));
 
+		$event_limit=0;
 		$res_events = DBSelect($event_sql);
 		while($row_event=DBfetch($res_events)){
 
@@ -528,7 +526,7 @@ include_once "include/page_header.php";
 			
 			$value = new CSpan(trigger_value2str($row_event['value']), get_trigger_value_style($row_event['value']));	
 
-			if($config['ack_enable']){
+			if($config['event_ack_enable']){
 				if($row_event['acknowledged'] == 1)
 				{
 					$acks_cnt = DBfetch(DBselect('SELECT COUNT(*) as cnt FROM acknowledges WHERE eventid='.$row_event['eventid']));
@@ -562,7 +560,7 @@ include_once "include/page_header.php";
 			$table->AddRow(array(
 					get_node_name_by_elid($row['triggerid']),
 					$host,
-					($config['ack_enable'])?(($row_event['acknowledged'] == 1)?(SPACE):(new CCheckBox('events['.$row_event['eventid'].']', 'no',NULL,$row_event['eventid']))):NULL,
+					($config['event_ack_enable'])?(($row_event['acknowledged'] == 1)?(SPACE):(new CCheckBox('events['.$row_event['eventid'].']', 'no',NULL,$row_event['eventid']))):NULL,
 					$description,
 					$value,
 					new CCol(
@@ -571,9 +569,11 @@ include_once "include/page_header.php";
 						),
 					new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),"tr_events.php?triggerid=".$row["triggerid"],"action"),
 					$actions,
-					($config['ack_enable'])?(new CCol($ack,"center")):NULL,
+					($config['event_ack_enable'])?(new CCol($ack,"center")):NULL,
 					new CLink(($row["comments"] == "") ? S_ADD : S_SHOW,"tr_comments.php?triggerid=".$row["triggerid"],"action")
 					));
+			$event_limit++;
+			if($event_limit >= $config['event_show_max']) break;
 		}
 
 		unset($row,$description, $actions);
@@ -584,7 +584,7 @@ include_once "include/page_header.php";
 	$m_form->Additem(get_table_header(array(S_TOTAL.": ",
 							$table->GetNumRows(),
 							SPACE.SPACE.SPACE,
-							($config['ack_enable'])?(new CButton('bulkacknowledge',S_BULK_ACKNOWLEDGE,'javascript: submit();')):(SPACE)
+							($config['event_ack_enable'])?(new CButton('bulkacknowledge',S_BULK_ACKNOWLEDGE,'javascript: submit();')):(SPACE)
 					)));
 
 	$m_form->Show();
