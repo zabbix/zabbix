@@ -1,5 +1,6 @@
 Changes for 1.5:
 
+ - performance improvement of processing events in frontend (Artem)
  - [DEV-66] added sorting to screens (Artem)
  - The last character for last value is unreadable (Sasha)
  - [DEV-60] added availability of setting hosts view style in overview (Artem)
