@@ -80,16 +80,7 @@
 				' ORDER BY e.eventid DESC';
 
 		$result = DBselect($sql,10*($start+$num));
-/*/----------------
-		$result = DBselect('SELECT DISTINCT t.triggerid,t.priority,t.description,t.expression,h.host,e.clock,e.value,t.type '.
-			' FROM events e, triggers t, functions f, items i, hosts h '.$sql_from.
-			' WHERE '.DBin_node('t.triggerid').
-				' AND e.objectid=t.triggerid and e.object='.EVENT_OBJECT_TRIGGER.
-				' AND t.triggerid=f.triggerid and f.itemid=i.itemid '.
-				' AND i.hostid=h.hostid '.$sql_cond.' and h.status='.HOST_STATUS_MONITORED.
-			' ORDER BY e.clock DESC,h.host,t.priority,t.description,t.triggerid ',10*($start+$num)
-			);
-//*/      
+     
 		$table = new CTableInfo(S_NO_EVENTS_FOUND); 
 		$table->SetHeader(array(
 				S_TIME,

@@ -146,11 +146,11 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 		$show_events = EVENTS_OPTION_NOFALSEFORB;
 	}
 
-	if(!$config['ack_enable'] && (($show_triggers != TRIGGERS_OPTION_ONLYTRUE) || ($show_events != TRIGGERS_OPTION_ALL))){
+	if(!$config['event_ack_enable'] && (($show_triggers != TRIGGERS_OPTION_ONLYTRUE) || ($show_events != TRIGGERS_OPTION_ALL))){
 		$show_triggers = TRIGGERS_OPTION_ONLYTRUE;
 	}
 	
-	if(!$config['ack_enable'] && (($show_events != EVENTS_OPTION_NOEVENT) || ($show_events != EVENTS_OPTION_ALL))){
+	if(!$config['event_ack_enable'] && (($show_events != EVENTS_OPTION_NOEVENT) || ($show_events != EVENTS_OPTION_ALL))){
 		$show_events = EVENTS_OPTION_NOEVENT;
 	}
 ?>
@@ -245,7 +245,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 		if(TRIGGERS_OPTION_ALL){
 			$tr_select->Additem(TRIGGERS_OPTION_ALL,S_SHOW_ALL,(TRIGGERS_OPTION_ALL==$show_triggers)?'yes':'no');
 		}
-		if(TRIGGERS_OPTION_NOFALSEFORB && $config['ack_enable']){
+		if(TRIGGERS_OPTION_NOFALSEFORB && $config['event_ack_enable']){
 			$tr_select->Additem(TRIGGERS_OPTION_NOFALSEFORB,S_SHOW_NOFALSEFORB,(TRIGGERS_OPTION_NOFALSEFORB==$show_triggers)?'yes':'no');
 		}
 		
@@ -254,13 +254,13 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 			$ev_select->Additem(EVENTS_OPTION_NOEVENT,S_HIDE_ALL,(EVENTS_OPTION_NOEVENT==$show_events)?'yes':'no');
 		}
 		if(EVENTS_OPTION_ALL){
-			$ev_select->Additem(EVENTS_OPTION_ALL,S_SHOW_ALL.SPACE.'('.$config['ack_expire'].SPACE.(($config['ack_expire']>1)?S_DAYS:S_DAY).')',(EVENTS_OPTION_ALL==$show_events)?'yes':'no');
+			$ev_select->Additem(EVENTS_OPTION_ALL,S_SHOW_ALL.SPACE.'('.$config['event_expire'].SPACE.(($config['event_expire']>1)?S_DAYS:S_DAY).')',(EVENTS_OPTION_ALL==$show_events)?'yes':'no');
 		}
-		if(EVENTS_OPTION_NOT_ACK && $config['ack_enable']){
-			$ev_select->Additem(EVENTS_OPTION_NOT_ACK,S_SHOW_UNACKNOWLEDGED.SPACE.'('.$config['ack_expire'].SPACE.(($config['ack_expire']>1)?S_DAYS:S_DAY).')',(EVENTS_OPTION_NOT_ACK==$show_events)?'yes':'no');
+		if(EVENTS_OPTION_NOT_ACK && $config['event_ack_enable']){
+			$ev_select->Additem(EVENTS_OPTION_NOT_ACK,S_SHOW_UNACKNOWLEDGED.SPACE.'('.$config['event_expire'].SPACE.(($config['event_expire']>1)?S_DAYS:S_DAY).')',(EVENTS_OPTION_NOT_ACK==$show_events)?'yes':'no');
 		}
-		if(EVENTS_OPTION_ONLYTRUE_NOTACK && $config['ack_enable']){
-			$ev_select->Additem(EVENTS_OPTION_ONLYTRUE_NOTACK,S_SHOW_TRUE_UNACKNOWLEDGED.SPACE.'('.$config['ack_expire'].SPACE.(($config['ack_expire']>1)?S_DAYS:S_DAY).')',(EVENTS_OPTION_ONLYTRUE_NOTACK==$show_events)?'yes':'no');
+		if(EVENTS_OPTION_ONLYTRUE_NOTACK && $config['event_ack_enable']){
+			$ev_select->Additem(EVENTS_OPTION_ONLYTRUE_NOTACK,S_SHOW_TRUE_UNACKNOWLEDGED.SPACE.'('.$config['event_expire'].SPACE.(($config['event_expire']>1)?S_DAYS:S_DAY).')',(EVENTS_OPTION_ONLYTRUE_NOTACK==$show_events)?'yes':'no');
 		}
 //------- JP -------
 		if($show_triggers==TRIGGERS_OPTION_NOFALSEFORB){
@@ -333,13 +333,13 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 		is_show_subnodes() ? array('simple_label'=>S_NODE) : null,
 		$_REQUEST['hostid'] > 0 ? null : 
 		array('select_label'=>S_HOST_BIG	, 'simple_label'=>S_HOST,		'sort'=>'host'),
-		array('simple_label'=>($config['ack_enable'])?(new CCheckBox("all_events",false, "CheckAll('".$m_form->GetName()."','all_events','events');")):NULL),
+		array('simple_label'=>($config['event_ack_enable'])?(new CCheckBox("all_events",false, "CheckAll('".$m_form->GetName()."','all_events','events');")):NULL),
 		array('select_label'=>S_NAME_BIG	, 'simple_label'=>S_NAME,		'sort'=>'description'),
 		array('simple_label'=>S_STATUS),
 		array('select_label'=>S_SEVERITY_BIG	, 'simple_label'=>S_SEVERITY,		'sort'=>'priority'),
 		array('select_label'=>S_LAST_CHANGE_BIG	, 'simple_label'=>S_LAST_CHANGE,	'sort'=>'lastchange'),
 		array('simple_label'=>($noactions!='true') ? S_ACTIONS : NULL),
-		array('simple_label'=>($config['ack_enable'])? S_ACKNOWLEDGED : NULL),
+		array('simple_label'=>($config['event_ack_enable'])? S_ACKNOWLEDGED : NULL),
 		array('simple_label'=>S_COMMENTS)
 		);
 
@@ -417,16 +417,16 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 		if(trigger_dependent($row["triggerid"]))	continue;
 
 		$cond = '';
-		$ack_expire = ($config['ack_expire']*86400); // days
+		$event_expire = ($config['event_expire']*86400); // days
 		switch($show_events){
 			case EVENTS_OPTION_ALL:
-				$cond.=' AND (('.time().'-e.clock)<'.$ack_expire.')';
+				$cond.=' AND (('.time().'-e.clock)<'.$event_expire.')';
 				break;
 			case EVENTS_OPTION_NOT_ACK:
-				$cond.=' AND (('.time().'-e.clock)<'.$ack_expire.') AND e.acknowledged=0 ';
+				$cond.=' AND (('.time().'-e.clock)<'.$event_expire.') AND e.acknowledged=0 ';
 				break;
 			case EVENTS_OPTION_ONLYTRUE_NOTACK:
-				$cond.=' AND (('.time().'-e.clock)<'.$ack_expire.') AND e.acknowledged=0 AND e.value='.TRIGGER_VALUE_TRUE;
+				$cond.=' AND (('.time().'-e.clock)<'.$event_expire.') AND e.acknowledged=0 AND e.value='.TRIGGER_VALUE_TRUE;
 				break;
 			case EVENTS_OPTION_NOFALSEFORB:
 //				$cond.=' AND (('.time().'-e.clock)<'.(86400*16).') AND e.acknowledged=0 AND ((e.value='.TRIGGER_VALUE_TRUE.') OR ((e.value='.TRIGGER_VALUE_FALSE.') AND t.type='.TRIGGER_MULT_EVENT_DISABLED.'))';
@@ -511,7 +511,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 		$table->AddRow(array(
 				get_node_name_by_elid($row['triggerid']),
 				$host,
-				($config['ack_enable'])?SPACE:NULL,
+				($config['event_ack_enable'])?SPACE:NULL,
 				$description,
 				$value,
 				new CCol(
@@ -521,10 +521,11 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 //				SPACE,
 				new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row["lastchange"]),"tr_events.php?triggerid=".$row["triggerid"],"action"),
 				$actions,
-				($config['ack_enable'])?SPACE:NULL,
+				($config['event_ack_enable'])?SPACE:NULL,
 				new CLink(($row["comments"] == "") ? S_ADD : S_SHOW,"tr_comments.php?triggerid=".$row["triggerid"],"action")
 				));
 
+		$event_limit=0;
 		$res_events = DBSelect($event_sql);
 		while($row_event=DBfetch($res_events)){
 
@@ -534,7 +535,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 			
 			$value = new CSpan(trigger_value2str($row_event['value']), get_trigger_value_style($row_event['value']));	
 
-			if($config['ack_enable']){
+			if($config['event_ack_enable']){
 				if($row_event['acknowledged'] == 1)
 				{
 					$acks_cnt = DBfetch(DBselect('SELECT COUNT(*) as cnt FROM acknowledges WHERE eventid='.$row_event['eventid']));
@@ -571,7 +572,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 			$table->AddRow(array(
 					get_node_name_by_elid($row['triggerid']),
 					$host,
-					($config['ack_enable'])?(($row_event['acknowledged'] == 1)?(SPACE):(new CCheckBox('events['.$row_event['eventid'].']', 'no',NULL,$row_event['eventid']))):NULL,
+					($config['event_ack_enable'])?(($row_event['acknowledged'] == 1)?(SPACE):(new CCheckBox('events['.$row_event['eventid'].']', 'no',NULL,$row_event['eventid']))):NULL,
 					$description,
 					$value,
 					new CCol(
@@ -580,9 +581,11 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 						),
 					new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),"tr_events.php?triggerid=".$row["triggerid"],"action"),
 					$actions,
-					($config['ack_enable'])?(new CCol($ack,"center")):NULL,
+					($config['event_ack_enable'])?(new CCol($ack,"center")):NULL,
 					new CLink(($row["comments"] == "") ? S_ADD : S_SHOW,"tr_comments.php?triggerid=".$row["triggerid"],"action")
 					));
+			$event_limit++;
+			if($event_limit >= $config['event_show_max']) break;
 		}
 
 		unset($row,$description, $actions);
@@ -593,7 +596,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 	$m_form->Additem(get_table_header(array(S_TOTAL.": ",
 							$table->GetNumRows(),
 							SPACE.SPACE.SPACE,
-							($config['ack_enable'])?(new CButton('bulkacknowledge',S_BULK_ACKNOWLEDGE,'javascript: submit();')):(SPACE)
+							($config['event_ack_enable'])?(new CButton('bulkacknowledge',S_BULK_ACKNOWLEDGE,'javascript: submit();')):(SPACE)
 					)));
 
 	$m_form->Show();

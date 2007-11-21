@@ -3873,19 +3873,22 @@ include_once 'include/discovery.inc.php';
 	{
 		$config=select_config();
 		
-		$frmEventAck = new CFormTable(S_ACKNOWLEDGES,"config.php");
+		$frmEventAck = new CFormTable(S_EVENTS,"config.php");
 //		$frmEventAck->SetHelp("web.config.workperiod.php");
 		$frmEventAck->AddVar("config",get_request("config",8));
 
-		$exp_select = new CComboBox('ack_enable');
+		$exp_select = new CComboBox('event_ack_enable');
 
-		$exp_select->AddItem(EVENT_ACK_ENABLED,S_ENABLED,$config['ack_enable']?'yes':'no');
-		$exp_select->AddItem(EVENT_ACK_DISABLED,S_DISABLED,$config['ack_enable']?'no':'yes');
+		$exp_select->AddItem(EVENT_ACK_ENABLED,S_ENABLED,$config['event_ack_enable']?'yes':'no');
+		$exp_select->AddItem(EVENT_ACK_DISABLED,S_DISABLED,$config['event_ack_enable']?'no':'yes');
 
 		$frmEventAck->AddRow(S_EVENT_ACKNOWLEDGES,$exp_select);
 			
 		$frmEventAck->AddRow(S_SHOW_EVENTS_NOT_OLDER.SPACE.'('.S_DAYS.')',
-			new CTextBox('ack_expire',$config['ack_expire'],5));
+			new CTextBox('event_expire',$config['event_expire'],5));
+
+		$frmEventAck->AddRow(S_MAX_COUNT_OF_EVENTS,
+			new CTextBox('event_show_max',$config['event_show_max'],5));
 
 		$frmEventAck->AddItemToBottomRow(new CButton("save",S_SAVE));
 		$frmEventAck->Show();

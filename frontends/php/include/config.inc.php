@@ -995,7 +995,7 @@ require_once('include/classes/ctree.inc.php');
 
 	# Update configuration
 
-	function	update_config($event_history,$alert_history,$refresh_unsupported,$work_period,$alert_usrgrpid,$ack_enable,$ack_expire)
+	function	update_config($event_history,$alert_history,$refresh_unsupported,$work_period,$alert_usrgrpid,$event_ack_enable,$event_expire,$event_show_max)
 	{
 		$update = array();
 
@@ -1029,13 +1029,17 @@ require_once('include/classes/ctree.inc.php');
 			}
 			$update[] = 'alert_usrgrpid='.$alert_usrgrpid;
 		}
-		if(!is_null($ack_enable))
+		if(!is_null($event_ack_enable))
 		{
-			$update[] = 'ack_enable='.$ack_enable;
+			$update[] = 'event_ack_enable='.$event_ack_enable;
 		}
-		if(!is_null($ack_expire))
+		if(!is_null($event_expire))
 		{
-			$update[] = 'ack_expire='.$ack_expire;
+			$update[] = 'event_expire='.$event_expire;
+		}
+		if(!is_null($event_show_max))
+		{
+			$update[] = 'event_show_max='.$event_show_max;
 		}
 		if(count($update) == 0)
 		{
