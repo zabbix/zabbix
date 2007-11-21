@@ -332,7 +332,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 	
 	$table  = new CTableInfo();
 	$header=array();
-
+/*
 	$headers_array = array(
 		is_show_subnodes() ? array('simple_label'=>S_NODE) : null,
 		$_REQUEST['hostid'] > 0 ? null : 
@@ -345,6 +345,19 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 		array('simple_label'=>($noactions!='true') ? S_ACTIONS : NULL),
 		array('simple_label'=>($config['event_ack_enable'])? S_ACKNOWLEDGED : NULL),
 		array('simple_label'=>S_COMMENTS)
+		);
+//*/
+	$headers_array = array(
+		array('select_label'=>S_SEVERITY_BIG	, 'simple_label'=>S_SEVERITY,		'sort'=>'priority'),
+		array('simple_label'=>S_STATUS),
+		array('select_label'=>S_LAST_CHANGE_BIG	, 'simple_label'=>S_LAST_CHANGE,	'sort'=>'lastchange'),
+		is_show_subnodes() ? array('simple_label'=>S_NODE) : null,
+		($_REQUEST['hostid'] > 0)?null:array('select_label'=>S_HOST_BIG	, 'simple_label'=>S_HOST,		'sort'=>'host'),
+		array('select_label'=>S_NAME_BIG	, 'simple_label'=>S_NAME,		'sort'=>'description'),
+		array('simple_label'=>($config['event_ack_enable'])?(new CCheckBox("all_events",false, "CheckAll('".$m_form->GetName()."','all_events','events');")):NULL),
+		array('simple_label'=>($config['event_ack_enable'])? S_ACKNOWLEDGED : NULL),
+		array('simple_label'=>S_COMMENTS),
+		array('simple_label'=>($noactions!='true')?S_ACTIONS:NULL)
 		);
 
 	$select_vars = (isset($sort) && $sort=="description") ? "&select=$select&txt_select=$txt_select" : "";
@@ -512,20 +525,19 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 		}
 
 		$table->AddRow(array(
-				get_node_name_by_elid($row['triggerid']),
-				$host,
-				($config['event_ack_enable'])?SPACE:NULL,
-				$description,
-				$value,
 				new CCol(
 					get_severity_description($row["priority"]),
 					get_severity_style($row["priority"])
 					),
-//				SPACE,
+				$value,
 				new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row["lastchange"]),"tr_events.php?triggerid=".$row["triggerid"],"action"),
-				$actions,
+				get_node_name_by_elid($row['triggerid']),
+				$host,
+				$description,
 				($config['event_ack_enable'])?SPACE:NULL,
-				new CLink(($row["comments"] == "") ? S_ADD : S_SHOW,"tr_comments.php?triggerid=".$row["triggerid"],"action")
+				($config['event_ack_enable'])?SPACE:NULL,
+				new CLink(($row["comments"] == "") ? S_ADD : S_SHOW,"tr_comments.php?triggerid=".$row["triggerid"],"action"),
+				$actions
 				));
 
 		$event_limit=0;
@@ -573,19 +585,19 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 			$description->AddOption('style','white-space: normal;');
 			
 			$table->AddRow(array(
-					get_node_name_by_elid($row['triggerid']),
-					$host,
-					($config['event_ack_enable'])?(($row_event['acknowledged'] == 1)?(SPACE):(new CCheckBox('events['.$row_event['eventid'].']', 'no',NULL,$row_event['eventid']))):NULL,
-					$description,
-					$value,
 					new CCol(
 						get_severity_description($row["priority"]),
 						get_severity_style($row["priority"])
 						),
+					$value,
 					new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),"tr_events.php?triggerid=".$row["triggerid"],"action"),
-					$actions,
+					get_node_name_by_elid($row['triggerid']),
+					$host,
+					$description,
+					($config['event_ack_enable'])?(($row_event['acknowledged'] == 1)?(SPACE):(new CCheckBox('events['.$row_event['eventid'].']', 'no',NULL,$row_event['eventid']))):NULL,
 					($config['event_ack_enable'])?(new CCol($ack,"center")):NULL,
-					new CLink(($row["comments"] == "") ? S_ADD : S_SHOW,"tr_comments.php?triggerid=".$row["triggerid"],"action")
+					new CLink(($row["comments"] == "") ? S_ADD : S_SHOW,"tr_comments.php?triggerid=".$row["triggerid"],"action"),
+					$actions
 					));
 			$event_limit++;
 			if($event_limit >= $config['event_show_max']) break;
