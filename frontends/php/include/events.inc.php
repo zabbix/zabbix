@@ -56,7 +56,9 @@
 		}
 
 //---
+		$triggers = array();
 		$trigger_list = '';
+		
 		$sql = 'SELECT DISTINCT t.triggerid,t.priority,t.description,t.expression,h.host,t.type '.
 			' FROM triggers t, functions f, items i, hosts h '.$sql_from.
 			' WHERE '.DBin_node('t.triggerid').
@@ -81,22 +83,24 @@
 				S_VALUE,
 				S_SEVERITY
 				));
-		
-		$sql = 'SELECT e.eventid, e.objectid as triggerid,e.clock,e.value '.
-				' FROM events e '.
-				' WHERE '.zbx_sql_mod('e.object',1000).'='.EVENT_OBJECT_TRIGGER.
-				  ' AND e.objectid IN '.$trigger_list.
-				  $sql_cond.
-				  order_by('e.eventid');
 
-		$result = DBselect($sql,10*($start+$num));
-		
+		if(!empty($triggers)){
+			$sql = 'SELECT e.eventid, e.objectid as triggerid,e.clock,e.value '.
+					' FROM events e '.
+					' WHERE '.zbx_sql_mod('e.object',1000).'='.EVENT_OBJECT_TRIGGER.
+					  ' AND e.objectid IN '.$trigger_list.
+					  $sql_cond.
+					  order_by('e.eventid');
+	
+			$result = DBselect($sql,10*($start+$num));
+		}
+				
 		$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 		
 		$col=0;
 		$skip = $start;
 
-		while(($row=DBfetch($result)) && ($col<$num)){
+		while(!empty($triggers) && ($col<$num) && ($row=DBfetch($result))){
 			
 			if($skip > 0){
 				if(($show_unknown == 0) && ($row['value'] == TRIGGER_VALUE_UNKNOWN)) continue;
