@@ -2400,7 +2400,7 @@
 		if(($row['value']!=TRIGGER_VALUE_TRUE) && (!event_initial_time($row))){
 			if(!$eventid = first_initial_eventid($row,0)) return false;
 
-			$sql = 'SELECT e.eventid, e.value, e.clock as lastchange'.
+			$sql = 'SELECT e.eventid, e.value'.
 					' FROM events e '.
 					' WHERE e.eventid='.$eventid.
 					' AND e.acknowledged=0';

@@ -145,6 +145,10 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 	if(TRIGGERS_OPTION_NOFALSEFORB && ($show_triggers == TRIGGERS_OPTION_NOFALSEFORB)){
 		$show_events = EVENTS_OPTION_NOFALSEFORB;
 	}
+	
+	if(($show_events == EVENTS_OPTION_NOFALSEFORB) && ($show_triggers != TRIGGERS_OPTION_NOFALSEFORB)){
+		$show_events = EVENTS_OPTION_NOEVENT;
+	}
 
 	if(!$config['event_ack_enable'] && (($show_triggers != TRIGGERS_OPTION_ONLYTRUE) || ($show_events != TRIGGERS_OPTION_ALL))){
 		$show_triggers = TRIGGERS_OPTION_ONLYTRUE;
@@ -429,7 +433,6 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 				$cond.=' AND (('.time().'-e.clock)<'.$event_expire.') AND e.acknowledged=0 AND e.value='.TRIGGER_VALUE_TRUE;
 				break;
 			case EVENTS_OPTION_NOFALSEFORB:
-//				$cond.=' AND (('.time().'-e.clock)<'.(86400*16).') AND e.acknowledged=0 AND ((e.value='.TRIGGER_VALUE_TRUE.') OR ((e.value='.TRIGGER_VALUE_FALSE.') AND t.type='.TRIGGER_MULT_EVENT_DISABLED.'))';
 				$cond.=' AND e.acknowledged=0 AND ((e.value='.TRIGGER_VALUE_TRUE.') OR ((e.value='.TRIGGER_VALUE_FALSE.') AND t.type='.TRIGGER_MULT_EVENT_DISABLED.'))';
 				break;
 			case EVENTS_OPTION_NOEVENT:
