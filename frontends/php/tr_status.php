@@ -349,7 +349,7 @@ include_once "include/page_header.php";
 	$table->SetHeader(array(
 		is_show_subnodes() ? make_sorting_link(S_NODE,'h.hostid') : null,
 		$_REQUEST["hostid"] >0 ? null : make_sorting_link(S_HOST,'h.host'),
-		new CCheckBox("all_events",false, "CheckAll('".$m_form->GetName()."','all_events','events');"),
+		($config['ack_enable'])?(new CCheckBox("all_events",false, "CheckAll('".$m_form->GetName()."','all_events','events');")): NULL,
 		make_sorting_link(S_NAME,'t.description'),
 		S_STATUS,
 		make_sorting_link(S_SEVERITY,'t.priority'),
@@ -383,6 +383,7 @@ include_once "include/page_header.php";
 						' AND h.hostid not in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT).') '. 
 						' AND h.status='.HOST_STATUS_MONITORED.' '.$cond.
 						order_by('h.host,h.hostid,t.description,t.priority,t.lastchange');
+
 	$result = DBselect($sql);
 
 	while($row=DBfetch($result)){
@@ -403,6 +404,7 @@ include_once "include/page_header.php";
 				$cond.=' AND (('.time().'-e.clock)<'.$ack_expire.') AND e.acknowledged=0 AND e.value='.TRIGGER_VALUE_TRUE;
 				break;
 			case EVENTS_OPTION_NOFALSEFORB:
+//				$cond.=' AND (('.time().'-e.clock)<'.(86400*16).') AND e.acknowledged=0 AND ((e.value='.TRIGGER_VALUE_TRUE.') OR ((e.value='.TRIGGER_VALUE_FALSE.') AND t.type='.TRIGGER_MULT_EVENT_DISABLED.'))';
 				$cond.=' AND e.acknowledged=0 AND ((e.value='.TRIGGER_VALUE_TRUE.') OR ((e.value='.TRIGGER_VALUE_FALSE.') AND t.type='.TRIGGER_MULT_EVENT_DISABLED.'))';
 				break;
 			case EVENTS_OPTION_NOEVENT:
@@ -503,7 +505,7 @@ include_once "include/page_header.php";
 		$table->AddRow(array(
 				get_node_name_by_elid($row['triggerid']),
 				$host,
-				SPACE,
+				($config['ack_enable'])?SPACE:NULL,
 				$description,
 				$value,
 				new CCol(
@@ -560,7 +562,7 @@ include_once "include/page_header.php";
 			$table->AddRow(array(
 					get_node_name_by_elid($row['triggerid']),
 					$host,
-					($row_event['acknowledged'] == 1)?(SPACE):(new CCheckBox('events['.$row_event['eventid'].']', 'no',NULL,$row_event['eventid'])),
+					($config['ack_enable'])?(($row_event['acknowledged'] == 1)?(SPACE):(new CCheckBox('events['.$row_event['eventid'].']', 'no',NULL,$row_event['eventid']))):NULL,
 					$description,
 					$value,
 					new CCol(
