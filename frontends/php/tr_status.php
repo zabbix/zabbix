@@ -333,7 +333,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 		is_show_subnodes() ? array('simple_label'=>S_NODE) : null,
 		$_REQUEST['hostid'] > 0 ? null : 
 		array('select_label'=>S_HOST_BIG	, 'simple_label'=>S_HOST,		'sort'=>'host'),
-		array('simple_label'=> new CCheckBox("all_events",false, "CheckAll('".$m_form->GetName()."','all_events','events');")),
+		array('simple_label'=>($config['ack_enable'])?(new CCheckBox("all_events",false, "CheckAll('".$m_form->GetName()."','all_events','events');")):NULL),
 		array('select_label'=>S_NAME_BIG	, 'simple_label'=>S_NAME,		'sort'=>'description'),
 		array('simple_label'=>S_STATUS),
 		array('select_label'=>S_SEVERITY_BIG	, 'simple_label'=>S_SEVERITY,		'sort'=>'priority'),
@@ -408,6 +408,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 						' AND i.status='.ITEM_STATUS_ACTIVE.' AND '.DBin_node('t.triggerid').
 						' AND h.hostid not in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT).') '. 
 						' AND h.status='.HOST_STATUS_MONITORED.' '.$cond.' '.$sort;
+
 	$result = DBselect($sql);
 
 	while($row=DBfetch($result)){
@@ -428,6 +429,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 				$cond.=' AND (('.time().'-e.clock)<'.$ack_expire.') AND e.acknowledged=0 AND e.value='.TRIGGER_VALUE_TRUE;
 				break;
 			case EVENTS_OPTION_NOFALSEFORB:
+//				$cond.=' AND (('.time().'-e.clock)<'.(86400*16).') AND e.acknowledged=0 AND ((e.value='.TRIGGER_VALUE_TRUE.') OR ((e.value='.TRIGGER_VALUE_FALSE.') AND t.type='.TRIGGER_MULT_EVENT_DISABLED.'))';
 				$cond.=' AND e.acknowledged=0 AND ((e.value='.TRIGGER_VALUE_TRUE.') OR ((e.value='.TRIGGER_VALUE_FALSE.') AND t.type='.TRIGGER_MULT_EVENT_DISABLED.'))';
 				break;
 			case EVENTS_OPTION_NOEVENT:
@@ -467,7 +469,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 		}
 
 		$description = new CCol($description);
-		$description->AddOption('style','white-space: normal; width: 75%;');
+		$description->AddOption('style','white-space: normal; width: 90%;');
 
 		if((time(NULL)-$row["lastchange"])<TRIGGER_BLINK_PERIOD)
 			$blink = array(1=>'<a name="blink">',	2=>'</a>');
@@ -509,7 +511,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 		$table->AddRow(array(
 				get_node_name_by_elid($row['triggerid']),
 				$host,
-				SPACE,
+				($config['ack_enable'])?SPACE:NULL,
 				$description,
 				$value,
 				new CCol(
@@ -569,7 +571,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 			$table->AddRow(array(
 					get_node_name_by_elid($row['triggerid']),
 					$host,
-					($row_event['acknowledged'] == 1)?(SPACE):(new CCheckBox('events['.$row_event['eventid'].']', 'no',NULL,$row_event['eventid'])),
+					($config['ack_enable'])?(($row_event['acknowledged'] == 1)?(SPACE):(new CCheckBox('events['.$row_event['eventid'].']', 'no',NULL,$row_event['eventid']))):NULL,
 					$description,
 					$value,
 					new CCol(

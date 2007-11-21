@@ -55,10 +55,32 @@
 			$sql_cond = " and h.hostid in (".$availiable_hosts.") ";
 		}
 
-		if($show_unknown == 0){
-			$sql_cond.= ' AND e.value<>'.TRIGGER_VALUE_UNKNOWN.' ';
+//---
+		$trigger_list = '';
+		$sql = 'SELECT DISTINCT t.triggerid,t.priority,t.description,t.expression,h.host,t.type '.
+			' FROM triggers t, functions f, items i, hosts h '.$sql_from.
+			' WHERE '.DBin_node('t.triggerid').
+				' AND t.triggerid=f.triggerid and f.itemid=i.itemid '.
+				' AND i.hostid=h.hostid '.$sql_cond.' and h.status='.HOST_STATUS_MONITORED;
+							
+		$rez = DBselect($sql);
+		while($rowz = DBfetch($rez)){
+			$triggers[$rowz['triggerid']] = $rowz;
+			$trigger_list.=$rowz['triggerid'].',';
 		}
-	
+
+		$trigger_list = '('.trim($trigger_list,',').')';
+		$sql_cond=($show_unknown == 0)?(' AND e.value<>'.TRIGGER_VALUE_UNKNOWN.' '):('');
+		
+		$sql = 'SELECT e.eventid, e.objectid as triggerid,e.clock,e.value '.
+				' FROM events e '.
+				' WHERE '.zbx_sql_mod('e.object',1000).'='.EVENT_OBJECT_TRIGGER.
+				  ' AND e.objectid IN '.$trigger_list.
+				  $sql_cond.
+				' ORDER BY e.eventid DESC';
+
+		$result = DBselect($sql,10*($start+$num));
+/*/----------------
 		$result = DBselect('SELECT DISTINCT t.triggerid,t.priority,t.description,t.expression,h.host,e.clock,e.value,t.type '.
 			' FROM events e, triggers t, functions f, items i, hosts h '.$sql_from.
 			' WHERE '.DBin_node('t.triggerid').
@@ -67,7 +89,7 @@
 				' AND i.hostid=h.hostid '.$sql_cond.' and h.status='.HOST_STATUS_MONITORED.
 			' ORDER BY e.clock DESC,h.host,t.priority,t.description,t.triggerid ',10*($start+$num)
 			);
-       
+//*/      
 		$table = new CTableInfo(S_NO_EVENTS_FOUND); 
 		$table->SetHeader(array(
 				S_TIME,
@@ -86,10 +108,11 @@
 		while(($row=DBfetch($result)) && ($col<$num)){
 			
 			if($skip > 0){
+				if(($show_unknown == 0) && ($row['value'] == TRIGGER_VALUE_UNKNOWN)) continue;
 				$skip--;
 				continue;
 			}
-			
+		
 			if($row["value"] == 0)
 			{
 				$value=new CCol(S_OFF,"off");
@@ -101,9 +124,11 @@
 			else
 			{
 				$value=new CCol(S_UNKNOWN_BIG,"unknown");
-			}	
+			}
+
+			$row = array_merge($triggers[$row['triggerid']],$row);
 			if(($show_unknown == 0) && (!event_initial_time($row,$show_unknown))) continue;
-				
+
 			$table->AddRow(array(
 				date("Y.M.d H:i:s",$row["clock"]),
 				get_node_name_by_elid($row['triggerid']),
@@ -193,20 +218,8 @@
  * author: Aly
  */
 function event_initial_time($row,$show_unknown=0){
-	$sql_cond=($show_unknown == 0)?' AND value<>2 ':'';
-
-	$events = array();
-	$res = DBselect('SELECT MAX(e.clock) as clock, e.value '.
-					' FROM events e'.
-					' WHERE e.objectid='.$row['triggerid'].$sql_cond.
-						' AND e.clock < '.$row['clock'].
-						' AND e.object='.EVENT_OBJECT_TRIGGER.
-					' GROUP BY e.value '.
-					' ORDER BY clock DESC');
-					
-	while($rows = DBfetch($res)){
-		$events[] = $rows;
-	}
+	$events = get_latest_events($row,$show_unknown);
+	
 	if(!empty($events) && 
 		($events[0]['value'] == $row['value']) && 
 		($row['type'] == TRIGGER_MULT_EVENT_ENABLED) && 	
@@ -220,69 +233,63 @@ function event_initial_time($row,$show_unknown=0){
 	return true;
 }
 
+/* function:
+ *     first_initial_eventid
+ *
+ * description:
+ *     return first initial eventid
+ *
+ * author: Aly
+ */
 
 function first_initial_eventid($row,$show_unknown=0){
-	$sql_cond=($show_unknown == 0)?' AND value<>2 ':'';
 	
-	$events = array();
+	$events = get_latest_events($row,$show_unknown);
 
-	$sql = 'SELECT MAX(eventid) as eventid,MAX(clock) as clock, value '.
-					' FROM events as e '.
-					' WHERE objectid='.$row['triggerid'].
-						' AND clock < '.$row['lastchange'].$sql_cond.
-						' AND object='.EVENT_OBJECT_TRIGGER.
-					' GROUP BY value '.
-					' ORDER BY clock DESC';
-	$res = DBselect($sql);
-
-	while($rows = DBfetch($res)){
-		$events[] = $rows;
-	}
-
+	$sql_cond=($show_unknown == 0)?' AND e.value<>2 ':'';
+	
 	if(empty($events)){
-		$sql = 'SELECT eventid,clock '.
-				' FROM events as e '.
-				' WHERE objectid='.$row['triggerid'].$sql_cond.
-					' AND object='.EVENT_OBJECT_TRIGGER.
-				' ORDER BY clock ASC';
+		$sql = 'SELECT e.eventid '.
+				' FROM events e '.
+				' WHERE e.objectid='.$row['triggerid'].$sql_cond.
+					' AND e.object='.EVENT_OBJECT_TRIGGER.
+				' ORDER BY e.eventid';
 		$res = DBselect($sql,1);
 		
-		while($rows = DBfetch($res)) return $rows['eventid'];
+		if($rows = DBfetch($res)) return $rows['eventid'];
 	}
 	else if(!empty($events) && ($events[0]['value'] != $row['value'])){
-		$clock = $events[0]['clock'];
-		$sql = 'SELECT eventid,clock '.
-				' FROM events as e '.
-				' WHERE clock > '.$clock.
-					' AND objectid='.$row['triggerid'].$sql_cond.
-					' AND object='.EVENT_OBJECT_TRIGGER.
-				' ORDER BY clock ASC';
+		$eventid = $events[0]['eventid'];
+		$sql = 'SELECT e.eventid '.
+				' FROM events e '.
+				' WHERE e.eventid > '.$eventid.
+					' AND e.objectid='.$row['triggerid'].$sql_cond.
+					' AND e.object='.EVENT_OBJECT_TRIGGER.
+				' ORDER BY e.eventid';
 				
 		$res = DBselect($sql,1);
 		
-		while($rows = DBfetch($res)){
+		if($rows = DBfetch($res)){
 			return $rows['eventid'];
 		}
 		
-		$row['lastchange'] = $clock;
+		$row['eventid'] = $eventid;
 		$row['value'] = $events[0]['value'];
 		return first_initial_eventid($row,$show_unknown=0);
 	}
 	else if(!empty($events) && ($events[0]['value'] == $row['value'])){
+		$eventid = (count($events) > 1)?($events[1]['eventid']):(0);
 
-		$clock = (count($events) > 1)?($events[1]['clock']):(0);
-
-		$sql = 'SELECT eventid,clock '.
-				' FROM events as e '.
-				' WHERE clock > '.$clock.
-					' AND objectid='.$row['triggerid'].$sql_cond.
-					' AND object='.EVENT_OBJECT_TRIGGER.
-					' AND value='.$row['value'].
-				' ORDER BY clock ASC';
-
+		$sql = 'SELECT e.eventid,e.clock '.
+				' FROM events e '.
+				' WHERE e.eventid > '.$eventid.
+					' AND e.objectid='.$row['triggerid'].
+					' AND e.object='.EVENT_OBJECT_TRIGGER.
+					' AND e.value='.$row['value'].
+				' ORDER BY e.eventid';
 		$res = DBselect($sql,1);
-		
 		$rows = DBfetch($res);
+
 		return $rows['eventid'];
 	}
 return false;
@@ -296,5 +303,55 @@ function not_ack_event($eventid){
 	$row = DBfetch(DbSelect($sql));
 	if($row['events'] == 1) return true;
 return false;
+}
+
+function get_latest_events($row,$show_unknown=0){
+
+	$eventz = array();
+	$events = array();
+
+// SQL's are optimized that's why it's splited that way	
+// func MOD is used on object for forcing MySQL use different Index!!!
+
+/*******************************************/
+// Check for optimization after changing!  */
+/*******************************************/
+
+	$sql = 'SELECT e.eventid, e.value '.
+			' FROM events e '.
+			' WHERE e.objectid='.$row['triggerid'].
+				' AND e.eventid < '.$row['eventid'].
+				' AND '.zbx_sql_mod('e.object',1000).'='.EVENT_OBJECT_TRIGGER.   
+				' AND e.value='.TRIGGER_VALUE_FALSE.
+			' ORDER BY e.eventid DESC';
+	if($rez = DBfetch(DBselect($sql,1))) $eventz[] = $rez['eventid'];
+	
+	$sql = 'SELECT e.eventid, e.value '.
+			' FROM events e'.
+			' WHERE e.objectid='.$row['triggerid'].
+				' AND e.eventid < '.$row['eventid'].
+				' AND '.zbx_sql_mod('e.object',1000).'='.EVENT_OBJECT_TRIGGER.
+				' AND e.value='.TRIGGER_VALUE_TRUE.
+			' ORDER BY e.eventid DESC';
+	if($rez = DBfetch(DBselect($sql,1))) $eventz[] = $rez['eventid'];
+
+	if($show_unknown != 0){
+		$sql = 'SELECT e.eventid, e.value '.
+				' FROM events e'.
+				' WHERE e.objectid='.$row['triggerid'].
+					' AND e.eventid < '.$row['eventid'].
+					' AND '.zbx_sql_mod('e.object',1000).'='.EVENT_OBJECT_TRIGGER.
+					' AND e.value='.TRIGGER_VALUE_UNKNOWN.
+				' ORDER BY e.eventid DESC';
+		if($rez = DBfetch(DBselect($sql,1))) $eventz[] = $rez['eventid'];
+	}
+
+/*******************************************/
+
+	arsort($eventz);
+	foreach($eventz as $key => $value){
+		$events[] = array('eventid'=>$value,'value'=>$key);
+	}
+return $events;
 }
 ?>

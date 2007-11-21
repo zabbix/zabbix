@@ -2378,11 +2378,16 @@
 	}
 	
 	function get_row_for_nofalseforb($row,$cond){
-		$sql = 'SELECT e.eventid, e.value, e.clock as lastchange, e.clock'.
-				' FROM events e, triggers t '.
-				' WHERE e.object=0 AND e.objectid='.$row['triggerid'].
+
+		$sql = 'SELECT e.eventid, e.value '.
+//				' FROM events e LEFT JOIN triggers t ON e.objectid=t.triggerid AND e.object='.EVENT_OBJECT_TRIGGER.
+//				' WHERE '.zbx_sql_mod('e.object',1000).'='.EVENT_OBJECT_TRIGGER.
+				' FROM events e '.
+					' INNER JOIN triggers t ON e.objectid=t.triggerid '.
+						' AND '.zbx_sql_mod('e.object',1000).'='.EVENT_OBJECT_TRIGGER.
+				' WHERE e.objectid='.$row['triggerid'].
 					' AND t.triggerid=e.objectid '.$cond.
-					' ORDER by e.eventid DESC';
+				' ORDER by e.eventid DESC';
 
 		$res_events = DBSelect($sql,1);
 		if(!$e_row=DBfetch($res_events)){
@@ -2397,10 +2402,9 @@
 
 			$sql = 'SELECT e.eventid, e.value, e.clock as lastchange'.
 					' FROM events e '.
-					' WHERE e.object=0 '.
-					' AND e.eventid='.$eventid.
+					' WHERE e.eventid='.$eventid.
 					' AND e.acknowledged=0';
-	
+
 			$res_events = DBSelect($sql,1);
 			if(!$e_row=DBfetch($res_events)){
 				return false;
