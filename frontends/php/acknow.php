@@ -38,7 +38,7 @@ include_once "include/page_header.php";
 		'eventid'=>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,				'!isset({events})&&!isset({cancel})'),
 		'events'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,				'!isset({eventid})&&!isset({cancel})'),
 		'message'=>		array(T_ZBX_STR, O_OPT,	NULL,	$bulk ? NULL : NOT_EMPTY,	'isset({save})||isset({saveandreturn})'),
-	/* actions NOT_EMPTY*/
+	/* actions */
 		'bulkacknowledge'=>	array(T_ZBX_STR, O_OPT,	P_ACT|P_SYS, NULL, NULL),
 		'saveandreturn' =>	array(T_ZBX_STR, O_OPT,	P_ACT|P_SYS, NULL, NULL),
 		'save'=>		array(T_ZBX_STR, O_OPT,	P_ACT|P_SYS, NULL, NULL),
