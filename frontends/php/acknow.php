@@ -31,20 +31,20 @@ include_once "include/page_header.php";
 
 ?>
 <?php
+	$bulk = isset($_REQUEST['bulkacknowledge']);
+
 //		VAR				TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'eventid'=>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'!isset({events})&&!isset({cancel})'),
-		'events'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'!isset({eventid})&&!isset({cancel})'),
-		'message'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'isset({save})||isset({saveandreturn})'),
-	/* actions */
+		'eventid'=>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,				'!isset({events})&&!isset({cancel})'),
+		'events'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,				'!isset({eventid})&&!isset({cancel})'),
+		'message'=>		array(T_ZBX_STR, O_OPT,	NULL,	$bulk ? NULL : NOT_EMPTY,	'isset({save})||isset({saveandreturn})'),
+	/* actions NOT_EMPTY*/
 		'bulkacknowledge'=>	array(T_ZBX_STR, O_OPT,	P_ACT|P_SYS, NULL, NULL),
 		'saveandreturn' =>	array(T_ZBX_STR, O_OPT,	P_ACT|P_SYS, NULL, NULL),
 		'save'=>		array(T_ZBX_STR, O_OPT,	P_ACT|P_SYS, NULL, NULL),
 		'cancel'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, NULL, NULL)
 	);
 	check_fields($fields);
-	
-	$bulk = isset($_REQUEST['bulkacknowledge']);
 
 	if(isset($_REQUEST['eventid'])){
 		$events[$_REQUEST['eventid']] = $_REQUEST['eventid'];
@@ -112,7 +112,9 @@ include_once "include/page_header.php";
 	else if(isset($_REQUEST["saveandreturn"]))
 	{
 		$result = true;
-		$_REQUEST['message'] .= ($bulk)?("\n\r".S_SYS_BULK_ACKNOWLEDGE):('');
+		if($bulk) {
+			$_REQUEST['message'] .= ($_REQUEST['message'] != ''? "\n\r" : '').S_SYS_BULK_ACKNOWLEDGE;
+		}
 
 		foreach($events as $id => $eventid){
 			$result &= add_acknowledge_coment(
