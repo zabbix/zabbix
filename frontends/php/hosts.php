@@ -523,6 +523,39 @@ include_once "include/page_header.php";
 		}
 		unset($_REQUEST["delete"]);
 	}
+	elseif(($_REQUEST["config"]==4) &&(isset($_REQUEST["activate"])||isset($_REQUEST["disable"]))){
+/* group operations */
+		$result = true;
+		$applications = get_request("applications",array());
+
+		foreach($applications as $id => $appid){
+	
+			$sql = 'SELECT ia.itemid,i.hostid,i.key_'.
+					' FROM items_applications ia '.
+					  ' LEFT JOIN items i ON ia.itemid=i.itemid '.
+					' WHERE ia.applicationid='.$appid.
+					  ' AND i.hostid='.$_REQUEST['hostid'].
+					  ' AND '.DBin_node('ia.applicationid');
+
+			$res_items = DBselect($sql);
+			while($item=DBfetch($res_items)){
+
+					if(isset($_REQUEST["activate"])){
+						if($result&=activate_item($item['itemid'])){
+							$host = get_host_by_hostid($item['hostid']);
+							add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,S_ITEM.' ['.$item['key_'].'] ['.$id.'] '.S_HOST.' ['.$host['host'].'] '.S_ITEMS_ACTIVATED);
+						}
+					}
+					else{
+						if($result&=disable_item($item['itemid'])){
+							$host = get_host_by_hostid($item['hostid']);
+							add_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_ITEM,S_ITEM." [".$item["key_"]."] [".$id."] ".S_HOST." [".$host['host']."] ".S_ITEMS_DISABLED);
+						}
+					}
+			}
+		}
+		(isset($_REQUEST["activate"]))?show_messages($result, S_ITEMS_ACTIVATED, null):show_messages($result, S_ITEMS_DISABLED, null);
+	}
 	
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,get_current_nodeid()); /* update available_hosts after ACTIONS */
 ?>

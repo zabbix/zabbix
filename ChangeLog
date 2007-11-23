@@ -34,6 +34,7 @@ Changes for 1.4.j:
 
 Changes for 1.4.3:
 
+ - [ZBX-181] fixed Activate/Disable items from applications (Artem)
  - [ZBX-176] fixed static compilation of Jabber support (Alexei)
  - [ZBX-100] fixed Oracle compilation errors (Alexei)
  - [ZBX-159] added support of vm.memory.size[available] under Linux (Alexei)
