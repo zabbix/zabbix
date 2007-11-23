@@ -679,12 +679,11 @@
 
 	# Activate Item
 
-	function	activate_item($itemid)
-	{
+	function	activate_item($itemid){
 		 // first update status for child items
 		$db_tmp_items = DBselect("select itemid, hostid from items where templateid=$itemid");
-		while($db_tmp_item = DBfetch($db_tmp_items))
-		{
+		$rez = DBfetch($db_tmp_items);
+		while($db_tmp_item = DBfetch($db_tmp_items)){
 		// recursion
 			activate_item($db_tmp_item["itemid"]);
 		}
