@@ -115,6 +115,7 @@ static char	shortopts[] =
 
 pid_t	*threads=NULL;
 
+int	CONFIG_NO_UNKOWN_EVENTS		= 1;
 int	CONFIG_ALERTER_FORKS		= 1;
 int	CONFIG_DISCOVERER_FORKS		= 1;
 int	CONFIG_HOUSEKEEPER_FORKS	= 1;

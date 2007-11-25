@@ -558,6 +558,12 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *re
 			reason);
 	}
 
+	if(CONFIG_NO_UNKOWN_EVENTS == 1 && new_value == TRIGGER_VALUE_UNKNOWN)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "Skip unknown status of a trigger");
+		return ret;
+	}
+
 	switch(trigger->type)
 	{
 		case TRIGGER_TYPE_MULTIPLE_TRUE:

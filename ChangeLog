@@ -1,5 +1,6 @@
 Changes for 1.4.j:
 
+ - do not generate unknown events (Alexei)
  - bulk acknowledge with empty comment (Sasha)
  - increased length of trigger description if Status of Triggers (Alexei)
  - Added script menu to host icons in Maps (Artem)
