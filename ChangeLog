@@ -35,6 +35,7 @@ Changes for 1.4.j:
 
 Changes for 1.4.3:
 
+ - [ZBX-34] fixed transaction related conflict in DBget_maxid (Sasha)
  - [ZBX-181] fixed Activate/Disable items from applications (Artem)
  - [ZBX-176] fixed static compilation of Jabber support (Alexei)
  - [ZBX-100] fixed Oracle compilation errors (Alexei)

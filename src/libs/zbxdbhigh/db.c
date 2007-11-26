@@ -1772,19 +1772,21 @@ zbx_uint64_t DBget_nextid(char *table, char *field)
 }
 */
 
-zbx_uint64_t DBget_maxid(char *table, char *field)
+zbx_uint64_t DBget_maxid(char *tablename, char *fieldname)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	ret1,ret2;
 	zbx_uint64_t	min, max;
-	int		found  = FAIL, i, sync = 0;
+	int		found  = FAIL, i, sync = 0, dbres;
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_maxid(%s,%s)",table,field);
+	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_maxid(%s,%s)",
+		tablename,
+		fieldname);
 
 	for(i = 0; tables[i].table != 0; i++)
 	{
-		if(strcmp(tables[i].table, table) == 0)
+		if(strcmp(tables[i].table, tablename) == 0)
 		{
 			if(tables[i].flags & ZBX_SYNC)
 			{
@@ -1794,98 +1796,86 @@ zbx_uint64_t DBget_maxid(char *table, char *field)
 		}
 	}
 
-	if(sync == 1)
-	{
+	if(sync == 1) {
 		min = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)CONFIG_NODEID+(zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)CONFIG_NODEID;
 		max = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)CONFIG_NODEID+(zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)CONFIG_NODEID+(zbx_uint64_t)__UINT64_C(99999999999);
-	}
-	else
-	{
+	} else {
 		min = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)CONFIG_NODEID;
 		max = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)CONFIG_NODEID+(zbx_uint64_t)__UINT64_C(99999999999999);
 	}
 
-	do
-	{
+	do {
 		result = DBselect("select nextid from ids where nodeid=%d and table_name='%s' and field_name='%s'",
 			CONFIG_NODEID,
-			table,
-			field);
+			tablename,
+			fieldname);
+
 		row = DBfetch(result);
-		if(!row)
-		{
+		if (NULL == row) {
 			DBfree_result(result);
 
-			result = DBselect("select max(%s) from %s where %s>="ZBX_FS_UI64" and %s<="ZBX_FS_UI64,
-				field,
-				table,
-				field,
+			result = DBselect("select max(%3$s) from %4$s where %3$s>="ZBX_FS_UI64" and %3$s<="ZBX_FS_UI64,
 				min,
-				field,
-				max);
+				max,
+				fieldname,
+				tablename);
 			row = DBfetch(result);
-			if(!row || DBis_null(row[0])==SUCCEED || !*row[0])
-			{
-				DBexecute("insert into ids (nodeid,table_name,field_name,nextid) values (%d,'%s','%s',"ZBX_FS_UI64")",
-					CONFIG_NODEID,
-					table,
-					field,
-					min);
-			}
-			else
-			{
+			if(!row || SUCCEED == DBis_null(row[0]) || !*row[0])
+				ret1 = min;
+			else {
 				ZBX_STR2UINT64(ret1, row[0]);
 				if(ret1 >= max) {
-					zabbix_log(LOG_LEVEL_CRIT, "DBget_maxid: Maximum number of id's was exceeded [table:%s, field:%s, id:"ZBX_FS_UI64"]", table, field, ret1);
+					zabbix_log(LOG_LEVEL_CRIT, "DBget_maxid: Maximum number of id's was exceeded [table:%s, field:%s, id:"ZBX_FS_UI64"]", tablename, fieldname, ret1);
 					exit(FAIL);
 				}
-
-				DBexecute("insert into ids ( nodeid,table_name,field_name,nextid) values (%d,'%s','%s',%s)",
-					CONFIG_NODEID,
-					table,
-					field,
-					row[0]);
 			}
 			DBfree_result(result);
+
+			dbres = DBexecute("insert into ids (nodeid,table_name,field_name,nextid) values (%d,'%s','%s',"ZBX_FS_UI64")",
+				CONFIG_NODEID,
+				tablename,
+				fieldname,
+				ret1);
+
+			if (dbres < ZBX_DB_OK) {
+				/* reshenie problemi nevidimosti novoj zapisi, sozdannoj v parallel'noj tranzakcii */
+				DBexecute("update ids set nextid=nextid+1 where nodeid=%d and table_name='%s' and field_name='%s'",
+					CONFIG_NODEID,
+					tablename,
+					fieldname);
+			}
 			continue;
-		}
-		else
-		{
+		} else {
 			ZBX_STR2UINT64(ret1, row[0]);
 			DBfree_result(result);
 
 			if((ret1 < min) || (ret1 >= max)) {
 				DBexecute("delete from ids where nodeid=%d and table_name='%s' and field_name='%s'",
 					CONFIG_NODEID,
-					table,
-					field);
+					tablename,
+					fieldname);
 				continue;
 			}
 
 			DBexecute("update ids set nextid=nextid+1 where nodeid=%d and table_name='%s' and field_name='%s'",
 				CONFIG_NODEID,
-				table,
-				field);
+				tablename,
+				fieldname);
 
 			result = DBselect("select nextid from ids where nodeid=%d and table_name='%s' and field_name='%s'",
 				CONFIG_NODEID,
-				table,
-				field);
+				tablename,
+				fieldname);
 			row = DBfetch(result);
-			if(!row || DBis_null(row[0])==SUCCEED)
-			{
+			if (!row || DBis_null(row[0])==SUCCEED) {
 				/* Should never be here */
 				DBfree_result(result);
 				continue;
-			}
-			else
-			{
+			} else {
 				ZBX_STR2UINT64(ret2, row[0]);
 				DBfree_result(result);
-				if(ret1+1 == ret2)
-				{
+				if (ret1 + 1 == ret2)
 					found = SUCCEED;
-				}
 			}
 		}
 	}
