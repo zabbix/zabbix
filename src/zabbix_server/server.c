@@ -566,9 +566,9 @@ void	test_email()
 	alarm(5);
 	if ( FAIL == send_email(
 			"mail.apollo.lv",
-			"zabbix.com",
-			"sasha@zabbix.com",
-			"aleksander.vladishev@zabbix.com",
+			"",
+			"",
+			"",
 			"This is a TEST message",
 			"Big message\r\n"
 			" 1 Line\n"
