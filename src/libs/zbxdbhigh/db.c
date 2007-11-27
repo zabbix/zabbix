@@ -310,7 +310,7 @@ void	get_latest_event_status(zbx_uint64_t triggerid, int *prev_status, int *late
 		triggerid);
 
 	/* Object and objectid are used for efficient sort by the same index as in wehere condition */
-	zbx_snprintf(sql,sizeof(sql),"select eventid,value,clock,object,objectid from events where source=%d and object=%d and objectid=" ZBX_FS_UI64 " order by object desc,objectid desc,clock desc",
+	zbx_snprintf(sql,sizeof(sql),"select eventid,value,clock,object,objectid from events where source=%d and object=%d and objectid=" ZBX_FS_UI64 " order by object desc,objectid desc,eventid desc",
 	/* The SQL is inefficient */
 /*	zbx_snprintf(sql,sizeof(sql),"select eventid,value,clock from events where source=%d and object=%d and objectid=" ZBX_FS_UI64 " order by clock desc",*/
 		EVENT_SOURCE_TRIGGERS,
