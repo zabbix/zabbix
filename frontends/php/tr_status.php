@@ -332,21 +332,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 	
 	$table  = new CTableInfo();
 	$header=array();
-/*
-	$headers_array = array(
-		is_show_subnodes() ? array('simple_label'=>S_NODE) : null,
-		$_REQUEST['hostid'] > 0 ? null : 
-		array('select_label'=>S_HOST_BIG	, 'simple_label'=>S_HOST,		'sort'=>'host'),
-		array('simple_label'=>($config['event_ack_enable'])?(new CCheckBox("all_events",false, "CheckAll('".$m_form->GetName()."','all_events','events');")):NULL),
-		array('select_label'=>S_NAME_BIG	, 'simple_label'=>S_NAME,		'sort'=>'description'),
-		array('simple_label'=>S_STATUS),
-		array('select_label'=>S_SEVERITY_BIG	, 'simple_label'=>S_SEVERITY,		'sort'=>'priority'),
-		array('select_label'=>S_LAST_CHANGE_BIG	, 'simple_label'=>S_LAST_CHANGE,	'sort'=>'lastchange'),
-		array('simple_label'=>($noactions!='true') ? S_ACTIONS : NULL),
-		array('simple_label'=>($config['event_ack_enable'])? S_ACKNOWLEDGED : NULL),
-		array('simple_label'=>S_COMMENTS)
-		);
-//*/
+
 	$headers_array = array(
 		array('select_label'=>S_SEVERITY_BIG	, 'simple_label'=>S_SEVERITY,		'sort'=>'priority'),
 		array('simple_label'=>S_STATUS),
@@ -425,11 +411,9 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 						' AND i.status='.ITEM_STATUS_ACTIVE.' AND '.DBin_node('t.triggerid').
 						' AND h.hostid not in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT).') '. 
 						' AND h.status='.HOST_STATUS_MONITORED.' '.$cond.' '.$sort;
-
 	$result = DBselect($sql);
 
 	while($row=DBfetch($result)){
-	
 // Check for dependencies
 		if(trigger_dependent($row["triggerid"]))	continue;
 
@@ -453,18 +437,18 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 				$cond.=' AND 1=2 ';
 				break;
 		}
-		
-		$event_sql = 'SELECT DISTINCT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged, t.type '.
-				' FROM events e, triggers t '.
-				' WHERE e.object=0 AND e.objectid='.$row['triggerid'].
-					' AND t.triggerid=e.objectid '.$cond.
-				' ORDER BY e.eventid DESC';
 
-//		if(($show_triggers == TRIGGERS_OPTION_NOFALSEFORB) && ($row['value']!=TRIGGER_VALUE_TRUE)){
+		$event_sql = 'SELECT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged, t.type '.
+					' FROM events e, triggers t '.
+					' WHERE e.object=0 AND e.objectid='.$row['triggerid'].
+						' AND t.triggerid=e.objectid '.$cond.
+					' ORDER by e.object DESC, e.objectid DESC, e.eventid DESC';
+
 		if($show_triggers == TRIGGERS_OPTION_NOFALSEFORB){
-			if(!$row = get_row_for_nofalseforb($row,$cond)) continue;
+			if(!$row = get_row_for_nofalseforb($row,$event_sql)){
+				continue;
+			}
 		}
-
 		$elements=array();
 
 		$description = expand_trigger_description($row['triggerid']);
@@ -524,7 +508,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 			$host->AddOption('onmouseover',"javascript: this.style.cursor = 'pointer';");
 		}
 
-		$table->AddRow(array(
+			$table->AddRow(array(
 				new CCol(
 					get_severity_description($row["priority"]),
 					get_severity_style($row["priority"])
@@ -541,13 +525,15 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 				));
 
 		$event_limit=0;
-		$res_events = DBSelect($event_sql);
-		while($row_event=DBfetch($res_events)){
+		$res_events = DBSelect($event_sql,$config['event_show_max']*100);
 
+		while($row_event=DBfetch($res_events)){
 			if(($show_events == EVENTS_OPTION_NOFALSEFORB) && ($row_event['value'] == TRIGGER_VALUE_FALSE)){
-				if(!event_initial_time($row_event)) continue;
+				if(!event_initial_time($row_event)){
+					continue;
+				}
 			}
-			
+
 			$value = new CSpan(trigger_value2str($row_event['value']), get_trigger_value_style($row_event['value']));	
 
 			if($config['event_ack_enable']){
@@ -602,9 +588,9 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 			$event_limit++;
 			if($event_limit >= $config['event_show_max']) break;
 		}
-
 		unset($row,$description, $actions);
 	}
+
 	zbx_add_post_js('blink.init();');
 	$m_form->AddItem($table);
 
@@ -613,7 +599,6 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 							SPACE.SPACE.SPACE,
 							($config['event_ack_enable'])?(new CButton('bulkacknowledge',S_BULK_ACKNOWLEDGE,'javascript: submit();')):(SPACE)
 					)));
-
 	$m_form->Show();
 	
 	$jsmenu = new CPUMenu(null,170);
