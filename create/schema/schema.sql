@@ -206,7 +206,7 @@ FIELD		|objectid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|value		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|acknowledged	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-INDEX		|1		|object,objectid,clock
+INDEX		|1		|object,objectid,eventid
 INDEX		|2		|clock
 
 TABLE|history||0
