@@ -1,5 +1,6 @@
 Changes for 1.4.3:
 
+ - [ZBX-183] fixed compilation problem with undefined res_query() (Alexei)
  - [ZBX-34] fixed transaction related conflict in DBget_maxid (Sasha)
  - [ZBX-181] fixed Activate/Disable items from applications (Artem)
  - [ZBX-176] fixed static compilation of Jabber support (Alexei)
