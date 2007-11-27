@@ -73,6 +73,29 @@ AC_CHECK_LIB(m, main)
 AC_CHECK_LIB(kvm, main)
 dnl AC_CHECK_LIB(pthread, main)
 
+dnl Check for function res_query
+AC_MSG_CHECKING(for function res_query)
+AC_TRY_COMPILE(
+[
+#include <resolv.h>
+#if !defined(C_IN)
+#       define C_IN     ns_c_in
+#endif /* C_IN */
+
+#if !defined(T_SOA)
+#       define T_SOA    ns_t_soa
+#endif /* T_SOA */
+],
+[
+	char zone[1024];
+	char respbuf[1024];
+	res_query(zone, C_IN, T_SOA, (unsigned char *)respbuf, sizeof(respbuf));
+],
+AC_DEFINE(HAVE_RES_QUERY, 1 ,[Define to 1 if function 'res_query' exist.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+
 dnl Check for union semun
 AC_MSG_CHECKING(for union semun)
 AC_TRY_COMPILE(
