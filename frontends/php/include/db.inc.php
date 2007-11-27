@@ -268,7 +268,7 @@
 	{
 		global $DB, $DB_TYPE;
 
-COpt::savesqlrequest($query);
+//COpt::savesqlrequest($query);
 
 		$result = false;
 		if( isset($DB) && !empty($DB) )
@@ -355,7 +355,7 @@ COpt::savesqlrequest($query);
 	{
 		global $DB,$DB_TYPE;
 
-COpt::savesqlrequest($query);
+//COpt::savesqlrequest($query);
 
 		$result = false;
 

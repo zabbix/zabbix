@@ -224,6 +224,7 @@ function event_initial_time($row,$show_unknown=0){
 	if(!empty($events) && ($events[0]['value'] == $row['value'])){
 		return false;
 	}
+
 	return true;
 }
 
@@ -247,7 +248,8 @@ function first_initial_eventid($row,$show_unknown=0){
 				' FROM events e '.
 				' WHERE e.objectid='.$row['triggerid'].$sql_cond.
 					' AND e.object='.EVENT_OBJECT_TRIGGER.
-				' ORDER BY e.eventid';
+				' ORDER BY e.object, e.objectid, e.eventid';
+//				' ORDER BY e.eventid';
 		$res = DBselect($sql,1);
 		
 		if($rows = DBfetch($res)) return $rows['eventid'];
@@ -259,8 +261,8 @@ function first_initial_eventid($row,$show_unknown=0){
 				' WHERE e.eventid > '.$eventid.
 					' AND e.objectid='.$row['triggerid'].$sql_cond.
 					' AND e.object='.EVENT_OBJECT_TRIGGER.
-				' ORDER BY e.eventid';
-				
+				' ORDER BY e.object, e.objectid, e.eventid';
+//				' ORDER BY e.eventid';
 		$res = DBselect($sql,1);
 		
 		if($rows = DBfetch($res)){
@@ -280,7 +282,8 @@ function first_initial_eventid($row,$show_unknown=0){
 					' AND e.objectid='.$row['triggerid'].
 					' AND e.object='.EVENT_OBJECT_TRIGGER.
 					' AND e.value='.$row['value'].
-				' ORDER BY e.eventid';
+				' ORDER BY e.object, e.objectid, e.eventid';
+//				' ORDER BY e.eventid';
 		$res = DBselect($sql,1);
 		$rows = DBfetch($res);
 
@@ -305,18 +308,25 @@ function get_latest_events($row,$show_unknown=0){
 			' FROM events e '.
 			' WHERE e.objectid='.$row['triggerid'].
 				' AND e.eventid < '.$row['eventid'].
-				' AND '.zbx_sql_mod('e.object',1000).'='.EVENT_OBJECT_TRIGGER.   
+				' AND e.object='.EVENT_OBJECT_TRIGGER.
+//				' AND '.zbx_sql_mod('e.object',1000).'='.EVENT_OBJECT_TRIGGER.   
 				' AND e.value='.TRIGGER_VALUE_FALSE.
-			' ORDER BY e.eventid DESC';
+			' ORDER BY e.object DESC, e.objectid DESC, e.eventid DESC';
+//			' ORDER BY e.eventid DESC';
+
+
 	if($rez = DBfetch(DBselect($sql,1))) $eventz[] = $rez['eventid'];
 	
 	$sql = 'SELECT e.eventid, e.value '.
 			' FROM events e'.
 			' WHERE e.objectid='.$row['triggerid'].
 				' AND e.eventid < '.$row['eventid'].
-				' AND '.zbx_sql_mod('e.object',1000).'='.EVENT_OBJECT_TRIGGER.
+				' AND e.object='.EVENT_OBJECT_TRIGGER.
+//				' AND '.zbx_sql_mod('e.object',1000).'='.EVENT_OBJECT_TRIGGER.   
 				' AND e.value='.TRIGGER_VALUE_TRUE.
-			' ORDER BY e.eventid DESC';
+			' ORDER BY e.object DESC, e.objectid DESC, e.eventid DESC';
+//			' ORDER BY e.eventid DESC';
+
 	if($rez = DBfetch(DBselect($sql,1))) $eventz[] = $rez['eventid'];
 
 	if($show_unknown != 0){
@@ -324,9 +334,11 @@ function get_latest_events($row,$show_unknown=0){
 				' FROM events e'.
 				' WHERE e.objectid='.$row['triggerid'].
 					' AND e.eventid < '.$row['eventid'].
-					' AND '.zbx_sql_mod('e.object',1000).'='.EVENT_OBJECT_TRIGGER.
+					' AND e.object='.EVENT_OBJECT_TRIGGER.
+//					' AND '.zbx_sql_mod('e.object',1000).'='.EVENT_OBJECT_TRIGGER.   
 					' AND e.value='.TRIGGER_VALUE_UNKNOWN.
-				' ORDER BY e.eventid DESC';
+				' ORDER BY e.object DESC, e.objectid DESC, e.eventid DESC';
+//				' ORDER BY e.eventid DESC';
 		if($rez = DBfetch(DBselect($sql,1))) $eventz[] = $rez['eventid'];
 	}
 
