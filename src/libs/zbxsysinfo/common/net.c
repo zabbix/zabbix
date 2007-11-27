@@ -187,6 +187,8 @@ int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 {
 #if !defined(_WINDOWS)
 
+#ifdef HAVE_RES_QUERY
+
 #if !defined(PACKETSZ)
 #	define PACKETSZ 512
 #endif /* PACKETSZ */
@@ -256,6 +258,8 @@ int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 
 	return SYSINFO_RET_OK;
 #else
+	return SYSINFO_RET_FAIL;
+#endif /* not HAVE_RES_QUERY */
 	return SYSINFO_RET_FAIL;
 #endif /* not WINDOWS */
 }
