@@ -387,11 +387,9 @@ include_once "include/page_header.php";
 						' AND h.hostid not in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT).') '. 
 						' AND h.status='.HOST_STATUS_MONITORED.' '.$cond.
 						order_by('h.host,h.hostid,t.description,t.priority,t.lastchange');
-
 	$result = DBselect($sql);
 
 	while($row=DBfetch($result)){
-	
 // Check for dependencies
 		if(trigger_dependent($row["triggerid"]))	continue;
 
@@ -415,18 +413,18 @@ include_once "include/page_header.php";
 				$cond.=' AND 1=2 ';
 				break;
 		}
-		
-		$event_sql = 'SELECT DISTINCT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged, t.type '.
-				' FROM events e, triggers t '.
-				' WHERE e.object=0 AND e.objectid='.$row['triggerid'].
-					' AND t.triggerid=e.objectid '.$cond.
-				' ORDER BY e.eventid DESC';
 
-//		if(($show_triggers == TRIGGERS_OPTION_NOFALSEFORB) && ($row['value']!=TRIGGER_VALUE_TRUE)){
+		$event_sql = 'SELECT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged, t.type '.
+					' FROM events e, triggers t '.
+					' WHERE e.object=0 AND e.objectid='.$row['triggerid'].
+						' AND t.triggerid=e.objectid '.$cond.
+					' ORDER by e.object DESC, e.objectid DESC, e.eventid DESC';
+
 		if($show_triggers == TRIGGERS_OPTION_NOFALSEFORB){
-			if(!$row = get_row_for_nofalseforb($row,$cond)) continue;
+			if(!$row = get_row_for_nofalseforb($row,$event_sql)){
+				continue;
+			}
 		}
-
 		$elements=array();
 
 		$description = expand_trigger_description($row['triggerid']);
@@ -502,7 +500,7 @@ include_once "include/page_header.php";
 			$host->AddOption('onmouseover',"javascript: this.style.cursor = 'pointer';");
 		}
 
-		$table->AddRow(array(
+			$table->AddRow(array(
 				get_node_name_by_elid($row['triggerid']),
 				$host,
 				($config['event_ack_enable'])?SPACE:NULL,
@@ -520,13 +518,15 @@ include_once "include/page_header.php";
 				));
 
 		$event_limit=0;
-		$res_events = DBSelect($event_sql);
-		while($row_event=DBfetch($res_events)){
+		$res_events = DBSelect($event_sql,$config['event_show_max']*100);
 
+		while($row_event=DBfetch($res_events)){
 			if(($show_events == EVENTS_OPTION_NOFALSEFORB) && ($row_event['value'] == TRIGGER_VALUE_FALSE)){
-				if(!event_initial_time($row_event)) continue;
+				if(!event_initial_time($row_event)){
+					continue;
+				}
 			}
-			
+
 			$value = new CSpan(trigger_value2str($row_event['value']), get_trigger_value_style($row_event['value']));	
 
 			if($config['event_ack_enable']){
@@ -578,9 +578,9 @@ include_once "include/page_header.php";
 			$event_limit++;
 			if($event_limit >= $config['event_show_max']) break;
 		}
-
 		unset($row,$description, $actions);
 	}
+
 	zbx_add_post_js('blink.init();');
 	$m_form->AddItem($table);
 
@@ -589,7 +589,6 @@ include_once "include/page_header.php";
 							SPACE.SPACE.SPACE,
 							($config['event_ack_enable'])?(new CButton('bulkacknowledge',S_BULK_ACKNOWLEDGE,'javascript: submit();')):(SPACE)
 					)));
-
 	$m_form->Show();
 	
 	$jsmenu = new CPUMenu(null,170);
