@@ -90,20 +90,40 @@ int	daemon_start(int allow_root)
 	pid_t   		pid;
 	struct passwd		*pwd;
 	struct sigaction	phan;
+	char			user[7] = "zabbix";
 
 	/* running as root ?*/
 	if((0 == allow_root) && (0 == getuid() || 0 == getgid()))
 	{
-		pwd = getpwnam("zabbix");
+		pwd = getpwnam(user);
 		if (NULL == pwd)
 		{
-			zbx_error("User zabbix does not exist.");
+			zbx_error("User %s does not exist.",
+				user);
 			zbx_error("Cannot run as root !");
 			exit(FAIL);
 		}
-		if( (setgid(pwd->pw_gid) ==-1) || (setuid(pwd->pw_uid) == -1) )
+		if(setgid(pwd->pw_gid) ==-1)
 		{
-			zbx_error("Cannot setgid or setuid to zabbix [%s].", strerror(errno));
+			zbx_error("Cannot setgid to %s [%s].",
+				user,
+				strerror(errno));
+			exit(FAIL);
+		}
+#ifdef HAVE_FUNCTION_SETEUID
+		if(initgroups(user, pwd->pw_gid) == -1) 
+		{
+			zbx_error("Cannot initgroups to %s [%s].",
+				user,
+				strerror(errno));
+			exit(FAIL);
+		}
+#endif /* HAVE_FUNCTION_INITGROUPS */
+		if(setuid(pwd->pw_uid) == -1)
+		{
+			zbx_error("Cannot setuid to %s [%s].",
+				user,
+				strerror(errno));
 			exit(FAIL);
 		}
 
