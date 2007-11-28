@@ -50,7 +50,7 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   nlist.h net/if.h kvm.h linux/kernel.h ldap.h getopt.h procinfo.h sys/dk.h \
   sys/resource.h pthread.h windows.h process.h conio.h sys/wait.h regex.h \
   stdarg.h winsock2.h pdh.h psapi.h sys/sem.h sys/ipc.h sys/shm.h Winldap.h \
-  sys/timeb.h Winber.h lber.h ws2tcpip.h inttypes.h sys/file.h)
+  sys/timeb.h Winber.h lber.h ws2tcpip.h inttypes.h sys/file.h grp.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -427,6 +427,21 @@ AC_TRY_COMPILE(
         sysctl(mib,2,&maxproc,&len,0,0);
 ],
 AC_DEFINE(HAVE_FUNCTION_SYSCTL_KERN_MAXPROC,1,[Define to 1 if 'KERN_MAXPROC' exist.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+dnl Check for function initgroups()
+AC_MSG_CHECKING(for function initgroups())
+AC_TRY_LINK(
+[
+	#include <sys/types.h>
+	#include <grp.h>
+],
+[
+	char *user="zabbix";
+	initgroups(user, 0);
+],
+AC_DEFINE(HAVE_FUNCTION_INITGROUPS,1,[Define to 1 if function 'initgroups' exists.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 

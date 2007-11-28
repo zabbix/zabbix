@@ -73,6 +73,10 @@
 #	include <ctype.h>
 #endif
 
+#ifdef HAVE_GRP_H
+#	include <grp.h>
+#endif
+
 #ifdef HAVE_SYS_TYPES_H
 #	include <sys/types.h>
 #endif
