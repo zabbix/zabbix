@@ -35,6 +35,8 @@ Changes for 1.4.j:
 
 Changes for 1.4.3:
 
+ - [ZBX-149] fixed incorrect processing of vm.memory.size key in FreeBSD (Sasha)
+ - [ZBX-109] added support of vm.memory.size[pfree] Linux, FreeBSD & Win agents (Sasha)
  - [ZBX-183] fixed compilation problem with undefined res_query() (Alexei)
  - [ZBX-34] fixed transaction related conflict in DBget_maxid (Sasha)
  - [ZBX-181] fixed Activate/Disable items from applications (Artem)
