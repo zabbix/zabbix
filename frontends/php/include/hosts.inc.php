@@ -493,7 +493,7 @@ require_once "include/items.inc.php";
 		return  false;
 	}
 
-	function	get_host_by_itemid($itemid)
+	function get_host_by_itemid($itemid)
 	{
 		$sql="select h.* from hosts h, items i where i.hostid=h.hostid and i.itemid=$itemid";
 		$result=DBselect($sql);

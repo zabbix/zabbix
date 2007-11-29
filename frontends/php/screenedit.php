@@ -26,6 +26,7 @@
 
 	$page["title"] = "S_CONFIGURATION_OF_SCREENS";
 	$page["file"] = "screenedit.php";
+	$page['hist_arg'] = array('screenid');
 
 include_once "include/page_header.php";
 	
@@ -36,24 +37,21 @@ include_once "include/page_header.php";
 	$fields=array(
 		"screenid"=>	array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
 		
-		"screenitemid"=>array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))&&(!isset({x})||!isset({y}))'),
-		"resourcetype"=>	array(T_ZBX_INT, O_OPT,  null,  
-					BETWEEN(SCREEN_RESOURCE_GRAPH,SCREEN_RESOURCE_EVENTS),	'isset({save})'),
+		"screenitemid"=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,			'(isset({form})&&({form}=="update"))&&(!isset({x})||!isset({y}))'),
+		"resourcetype"=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(SCREEN_RESOURCE_GRAPH,SCREEN_RESOURCE_EVENTS),	'isset({save})'),
 		"resourceid"=>	array(T_ZBX_INT, O_OPT,  null,  DB_ID,			'isset({save})'),
-		"width"=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	null),
-		"height"=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	null),
-		"colspan"=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,100),		null),
-		"rowspan"=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,100),		null),
+		"width"=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	null),
+		"height"=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,65535),	null),
+		"colspan"=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,100),		null),
+		"rowspan"=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(0,100),		null),
 		"elements"=>	array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,65535),	null),
-		"valign"=>	array(T_ZBX_INT, O_OPT,  null,  
-					BETWEEN(VALIGN_MIDDLE,VALIGN_BOTTOM),		null),
-		"halign"=>	array(T_ZBX_INT, O_OPT,  null,  
-					BETWEEN(HALIGN_CENTER,HALIGN_RIGHT),		null),
-		"style"=>	array(T_ZBX_INT, O_OPT,  null,  
-					BETWEEN(STYLE_HORISONTAL,STYLE_VERTICAL),	'isset({save})'),
-		"url"=>		array(T_ZBX_STR, O_OPT,  null,  null,			'isset({save})'),
-		"x"=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,100),		'isset({save})&&(isset({form})&&({form}!="update"))'),
-		"y"=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,100),		'isset({save})&&(isset({form})&&({form}!="update"))'),
+		"valign"=>		array(T_ZBX_INT, O_OPT,  null,	BETWEEN(VALIGN_MIDDLE,VALIGN_BOTTOM),		null),
+		"halign"=>		array(T_ZBX_INT, O_OPT,  null,	BETWEEN(HALIGN_CENTER,HALIGN_RIGHT),		null),
+		"style"=>		array(T_ZBX_INT, O_OPT,  null,  BETWEEN(STYLE_HORISONTAL,STYLE_VERTICAL),	'isset({save})'),
+		"url"=>			array(T_ZBX_STR, O_OPT,  null,  null,			'isset({save})'),
+		"dynamic"=>		array(T_ZBX_INT, O_OPT,  null,  null,			null),
+		"x"=>			array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,100),		'isset({save})&&(isset({form})&&({form}!="update"))'),
+		"y"=>			array(T_ZBX_INT, O_OPT,  null,  BETWEEN(1,100),		'isset({save})&&(isset({form})&&({form}!="update"))'),
 
 		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
 		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
@@ -63,6 +61,7 @@ include_once "include/page_header.php";
 	);
 
 	check_fields($fields);
+	$_REQUEST['dynmic'] = get_request('dynamic',SCREEN_SIMPLE_ITEM);
 ?>
 <?php
 	show_table_header(S_CONFIGURATION_OF_SCREEN_BIG);
@@ -85,7 +84,7 @@ include_once "include/page_header.php";
 					$_REQUEST["resourcetype"],$_REQUEST["resourceid"],$_REQUEST["width"],
 					$_REQUEST["height"],$_REQUEST["colspan"],$_REQUEST["rowspan"],
 					$_REQUEST["elements"],$_REQUEST["valign"],
-					$_REQUEST["halign"],$_REQUEST["style"],$_REQUEST["url"]);
+					$_REQUEST["halign"],$_REQUEST["style"],$_REQUEST["url"],$_REQUEST['dynmic']);
 
 				show_messages($result, S_ITEM_UPDATED, S_CANNOT_UPDATE_ITEM);
 			}
@@ -96,7 +95,7 @@ include_once "include/page_header.php";
 					$_REQUEST["x"],$_REQUEST["y"],$_REQUEST["resourceid"],
 					$_REQUEST["width"],$_REQUEST["height"],$_REQUEST["colspan"],
 					$_REQUEST["rowspan"],$_REQUEST["elements"],$_REQUEST["valign"],
-					$_REQUEST["halign"],$_REQUEST["style"],$_REQUEST["url"]);
+					$_REQUEST["halign"],$_REQUEST["style"],$_REQUEST["url"],$_REQUEST['dynmic']);
 
 				show_messages($result, S_ITEM_ADDED, S_CANNOT_ADD_ITEM);
 			}
@@ -106,7 +105,8 @@ include_once "include/page_header.php";
 						"[".$_REQUEST["x"].",".$_REQUEST["y"]."]"));
 				unset($_REQUEST["form"]);
 			}
-		} elseif(isset($_REQUEST["delete"])) {
+		} 
+		elseif(isset($_REQUEST["delete"])) {
 			$result=delete_screen_item($_REQUEST["screenitemid"]);
 			show_messages($result, S_ITEM_DELETED, S_CANNOT_DELETE_ITEM);
 			unset($_REQUEST["x"]);
