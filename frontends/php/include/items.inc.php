@@ -724,6 +724,52 @@
 		error("No item with itemid=[$itemid]");
 		return	FALSE;
 	}
+	
+/*
+ * Function: get_same_items_for_host
+ *
+ * Description:
+ *		Replace items for specified host
+ *
+ * Author:
+ *		Aly 
+ *
+ * Comments: 
+ *		$error= true : rise Error if item doesn't exists(error generated), false: special processing (NO error generated)
+ */
+	function get_same_item_for_host($item,$dest_hostid, $error=true){
+	
+		if(!is_array($item)){
+			$itemid = $item;
+		}
+		else if(isset($item['itemid'])){
+			$itemid = $item['itemid'];
+		}
+		
+		if(isset($itemid)){
+			$sql = 'SELECT src.itemid '.
+							' FROM items src, items dest '.
+							' WHERE dest.itemid='.zbx_dbstr($itemid).
+								' AND src.key_=dest.key_ '.
+								' AND src.hostid='.$dest_hostid;
+								
+			$db_item = DBfetch(DBselect($sql));
+			if (!$db_item && $error){
+				$item = get_item_by_itemid($db_item['itemid']);
+				$host = get_host_by_hostid($dest_hostid);
+				error('Missed key "'.$item['key_'].'" for host "'.$host['host'].'"');
+			}
+			else{
+				if(is_array($item)){
+					return get_item_by_itemid($db_item['itemid']);
+				}
+				else{
+					return $db_item['itemid'];
+				}
+			}
+		}
+	return false;	
+	}
 
 	/******************************************************************************
 	 *                                                                            *

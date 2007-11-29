@@ -3576,27 +3576,28 @@ include_once 'include/discovery.inc.php';
 		$frmScr->Show();	
 	}
 
-	function&	get_screen_item_form(){
+	function get_screen_item_form(){
 	
 		global $USER_DETAILS;
 
 		$form = new CFormTable(S_SCREEN_CELL_CONFIGURATION,'screenedit.php#form');
 		$form->SetHelp('web.screenedit.cell.php');
 
-		if(isset($_REQUEST["screenitemid"]))
-		{
-			$iresult=DBSelect("select * FROM screens_items".
-				" WHERE screenid=".$_REQUEST["screenid"].
-				" AND screenitemid=".$_REQUEST["screenitemid"]);
+		if(isset($_REQUEST["screenitemid"])){
+			$iresult=DBSelect('SELECT * FROM screens_items'.
+							' WHERE screenid='.$_REQUEST['screenid'].
+								' AND screenitemid='.$_REQUEST['screenitemid']
+							);
 
 			$form->AddVar("screenitemid",$_REQUEST["screenitemid"]);
-		} else {
+		} 
+		else{
 			$form->AddVar("x",$_REQUEST["x"]);
 			$form->AddVar("y",$_REQUEST["y"]);
 		}
 
-		if(isset($_REQUEST["screenitemid"]) && !isset($_REQUEST["form_refresh"]))
-		{
+		if(isset($_REQUEST["screenitemid"]) && !isset($_REQUEST["form_refresh"])){
+		
 			$irow = DBfetch($iresult);
 			$resourcetype	= $irow["resourcetype"];
 			$resourceid	= $irow["resourceid"];
@@ -3609,9 +3610,9 @@ include_once 'include/discovery.inc.php';
 			$halign		= $irow["halign"];
 			$style		= $irow["style"];
 			$url		= $irow["url"];
+			$dynamic	= $irow['dynamic'];
 		}
-		else
-		{
+		else{
 			$resourcetype	= get_request("resourcetype",	0);
 			$resourceid	= get_request("resourceid",	0);
 			$width		= get_request("width",		500);
@@ -3623,6 +3624,7 @@ include_once 'include/discovery.inc.php';
 			$halign		= get_request("halign",		HALIGN_DEFAULT);
 			$style		= get_request("style",		0);
 			$url		= get_request("url",		"");
+			$dynamic	= get_request("dynamic",	SCREEN_SIMPLE_ITEM);
 		}
 
 		$form->AddVar("screenid",$_REQUEST["screenid"]);
@@ -3958,9 +3960,13 @@ include_once 'include/discovery.inc.php';
 		$form->AddRow(S_COLUMN_SPAN,	new CNumericBox("colspan",$colspan,2));
 		$form->AddRow(S_ROW_SPAN,	new CNumericBox("rowspan",$rowspan,2));
 
+// dynamic AddOn
+		if(in_array($resourcetype,array(SCREEN_RESOURCE_GRAPH,SCREEN_RESOURCE_SIMPLE_GRAPH,SCREEN_RESOURCE_PLAIN_TEXT))){
+			$form->AddRow(S_DYNAMIC_ITEM,	new CCheckBox("dynamic",$dynamic,null,1));
+		}
+
 		$form->AddItemToBottomRow(new CButton("save",S_SAVE));
-		if(isset($_REQUEST["screenitemid"]))
-		{
+		if(isset($_REQUEST["screenitemid"])){
 			$form->AddItemToBottomRow(SPACE);
 			$form->AddItemToBottomRow(new CButtonDelete(null,
 				url_param("form").url_param("screenid").url_param("screenitemid")));

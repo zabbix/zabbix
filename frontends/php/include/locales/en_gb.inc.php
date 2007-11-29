@@ -497,6 +497,7 @@
 	'S_ITEM_ADDED'=>			'Item added',
 	'S_ITEM_UPDATED'=>			'Item updated',
 	'S_ITEMS_UPDATED'=>			'Items updated',
+	'S_ITEM_NOT_EXISTS'=>		'Item not exists',
 	'S_SORT_ORDER_UPDATED'=>		'Sort order updated',
 	'S_CANNOT_UPDATE_SORT_ORDER'=>		'Cannot update sort order',
 	'S_DISPLAYED_PARAMETERS_BIG'=>		'DISPLAYED PARAMETERS',
@@ -1018,6 +1019,7 @@
 	'S_HEIGHT'=>				'Height',
 	'S_CREATE_SCREEN'=>			'Create Screen',
 	'S_EDIT'=>				'Edit',
+	'S_DYNAMIC_ITEM'=>		'Dynamic item',
 	'S_DIMENSION_COLS_ROWS'=>		'Dimension (cols x rows)',
 
 	'S_SLIDESHOWS'=>			'Slide shows',

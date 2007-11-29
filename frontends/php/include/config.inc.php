@@ -922,61 +922,6 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 		else return validate_float($str);
 	}
 
-	# Show screen cell containing plain text values
-	function&	get_screen_plaintext($itemid,$elements)
-	{
-		global $DB_TYPE;
-
-		$item=get_item_by_itemid($itemid);
-		switch($item["value_type"])
-		{
-			case ITEM_VALUE_TYPE_FLOAT:	$history_table = "history";		break;
-			case ITEM_VALUE_TYPE_UINT64:	$history_table = "history_uint";	break;
-			case ITEM_VALUE_TYPE_TEXT:	$history_table = "history_text";	break;
-			default:			$history_table = "history_str";		break;
-		}
-
-		$sql="select h.clock,h.value,i.valuemapid from ".$history_table." h, items i where".
-			" h.itemid=i.itemid and i.itemid=$itemid order by clock desc";
-
-                $result=DBselect($sql,$elements);
-
-		$table = new CTableInfo();
-		$table->SetHeader(array(S_TIMESTAMP,item_description($item["description"],$item["key_"])));
-		while($row=DBfetch($result))
-		{
-			switch($item["value_type"])
-			{
-				case ITEM_VALUE_TYPE_TEXT:	
-					if($DB_TYPE == "ORACLE")
-					{
-						if(isset($row["value"]))
-						{
-							$row["value"] = $row["value"]->load();
-						}
-						else
-						{
-							$row["value"] = "";
-						}
-					}
-					/* do not use break */
-				case ITEM_VALUE_TYPE_STR:	
-					$value = nl2br(nbsp(htmlspecialchars($row["value"])));
-					break;
-				
-				default:
-					$value = $row["value"];
-					break;
-			}
-
-			if($row["valuemapid"] > 0)
-				$value = replace_value_by_map($value, $row["valuemapid"]);
-
-			$table->AddRow(array(date(S_DATE_FORMAT_YMDHMS,$row["clock"]),	$value));
-		}
-		return $table;
-	}
-
 	# Add event
 
 	function	get_event_by_eventid($eventid)
