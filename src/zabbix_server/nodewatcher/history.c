@@ -296,7 +296,7 @@ static void process_history_tables(int master_nodeid, int nodeid)
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_history_tables()");
 
 	for (t = 0; tables[t].table != 0; t++) {
-		if (tables[t].flags & (/*ZBX_HISTORY | */ZBX_HISTORY_SYNC/* | ZBX_HISTORY_TRENDS*/))
+		if (tables[t].flags & (ZBX_HISTORY | ZBX_HISTORY_SYNC | ZBX_HISTORY_TRENDS))
 			process_history_table_data(&tables[t], master_nodeid, nodeid);
 	}
 

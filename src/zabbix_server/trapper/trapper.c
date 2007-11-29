@@ -32,7 +32,6 @@
 #include "../nodewatcher/nodecomms.h"
 #include "../nodewatcher/nodesender.h"
 #include "nodesync.h"
-#include "nodeevents.h"
 #include "nodehistory.h"
 #include "trapper.h"
 #include "active.h"
