@@ -65,12 +65,12 @@
 			if(isset($_REQUEST[$var])&&$_REQUEST[$var]==$value)
 				$selected = "selected";
 		}
-		return "<option value=\"$value\" $selected>$label";
+		return '<option value="'.$value.'" '.$selected.'>'.$label;
 	}
 
 	function form_input($name, $value, $size)
 	{
-		return "<input class=\"biginput\" name=\"$name\" size=$size value=\"$value\">";
+		return '<input class="'.biginput.'" name="'.$name.'" size="'.$size.'" value="'.$value.'">';
 	}
 
 	function form_textarea($name, $value, $cols, $rows)
@@ -92,7 +92,7 @@
 		}
 	}
 
-	function	prepare_url(&$var, $varname)
+	function prepare_url(&$var, $varname=null)
 	{
 		$result = "";
 

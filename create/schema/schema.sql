@@ -537,6 +537,7 @@ FIELD		|valign		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|halign		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|style		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|dynamic	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 
 TABLE|services|serviceid|ZBX_SYNC
 FIELD		|serviceid	|t_id		|'0'	|NOT NULL	|0

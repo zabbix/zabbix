@@ -19,16 +19,16 @@
 **/
 ?>
 <?php
-        /*
-         * Function: graph_item_type2str
-         *
-         * Description:
-         *     Represent integer value of graph item type into the string
-         *
-         * Author:
-         *     Eugene Grigorjev 
-         *
-         */
+/*
+ * Function: graph_item_type2str
+ *
+ * Description:
+ *     Represent integer value of graph item type into the string
+ *
+ * Author:
+ *     Eugene Grigorjev 
+ *
+ */
 	function	graph_item_type2str($type,$count=null)
 	{
 		switch($type){
@@ -46,16 +46,16 @@
 		return $type;
 	}
 	
-        /*
-         * Function: graph_item_drawtypes
-         *
-         * Description:
-         *     Return available drawing types for graph item
-         *
-         * Author:
-         *     Eugene Grigorjev 
-         *
-         */
+/*
+ * Function: graph_item_drawtypes
+ *
+ * Description:
+ *     Return available drawing types for graph item
+ *
+ * Author:
+ *     Eugene Grigorjev 
+ *
+ */
 	function	graph_item_drawtypes()
 	{
 		return array(
@@ -67,42 +67,42 @@
 			    );
 	}
 
-        /*
-         * Function: graph_item_drawtype2str
-         *
-         * Description:
-         *     Represent integer value of graph item drawing type into the string
-         *
-         * Author:
-         *     Eugene Grigorjev 
-         *
-         */
-        function	graph_item_drawtype2str($drawtype,$type=null)
-        {
-		if($type == GRAPH_ITEM_AGGREGATED) return '-';
+/*
+ * Function: graph_item_drawtype2str
+ *
+ * Description:
+ *     Represent integer value of graph item drawing type into the string
+ *
+ * Author:
+ *     Eugene Grigorjev 
+ *
+ */
+	function	graph_item_drawtype2str($drawtype,$type=null)
+	{
+	if($type == GRAPH_ITEM_AGGREGATED) return '-';
 
-		switch($drawtype)
-		{
-			case GRAPH_ITEM_DRAWTYPE_LINE:		$drawtype = "Line";		break;
-			case GRAPH_ITEM_DRAWTYPE_FILLED_REGION:	$drawtype = "Filled region";	break;
-			case GRAPH_ITEM_DRAWTYPE_BOLD_LINE:	$drawtype = "Bold line";	break;
-			case GRAPH_ITEM_DRAWTYPE_DOT:		$drawtype = "Dot";		break;
-			case GRAPH_ITEM_DRAWTYPE_DASHED_LINE:	$drawtype = "Dashed line";	break;
-			default: $drawtype = S_UNKNOWN;		break;
-		}
-		return $drawtype;
-        }
+	switch($drawtype)
+	{
+		case GRAPH_ITEM_DRAWTYPE_LINE:		$drawtype = "Line";		break;
+		case GRAPH_ITEM_DRAWTYPE_FILLED_REGION:	$drawtype = "Filled region";	break;
+		case GRAPH_ITEM_DRAWTYPE_BOLD_LINE:	$drawtype = "Bold line";	break;
+		case GRAPH_ITEM_DRAWTYPE_DOT:		$drawtype = "Dot";		break;
+		case GRAPH_ITEM_DRAWTYPE_DASHED_LINE:	$drawtype = "Dashed line";	break;
+		default: $drawtype = S_UNKNOWN;		break;
+	}
+	return $drawtype;
+	}
 
-        /*
-         * Function: graph_item_calc_fnc2str
-         *
-         * Description:
-         *     Represent integer value of calculation function into the string
-         *
-         * Author:
-         *     Eugene Grigorjev 
-         *
-         */
+/*
+ * Function: graph_item_calc_fnc2str
+ *
+ * Description:
+ *     Represent integer value of calculation function into the string
+ *
+ * Author:
+ *     Eugene Grigorjev 
+ *
+ */
 	function	graph_item_calc_fnc2str($calc_fnc, $type=null)
 	{
 		if($type == GRAPH_ITEM_AGGREGATED) return '-';
@@ -161,7 +161,7 @@
 	 *     Return the time of the 1st apearance of items included in graph in trends
 	 *
 	 * Author:
-	 *     Artem Suharev
+	 *     Aly
 	 *
 	 */	
 	function get_min_itemclock_by_graphid($graphid){
@@ -182,7 +182,7 @@
 	 *     Return the time of the 1st apearance of item in trends
 	 *
 	 * Author:
-	 *     Artem Suharev
+	 *     Aly
 	 *
 	 */	
 	function	get_min_itemclock_by_itemid($itemid){
@@ -236,36 +236,44 @@
 		return DBselect("SELECT * FROM graphs WHERE templateid=$templateid");
 	}
 
-        /*
-         * Function: get_same_graphitems_for_host
-         *
-         * Description:
-         *     Replace items for specified host
-         *
-         * Author:
-         *     Eugene Grigorjev 
-         *
-         * Comments: !!! Don't forget sync code with C !!!
-         *
-         */
-	function	get_same_graphitems_for_host($gitems, $dest_hostid)
+/*
+ * Function: get_same_graphitems_for_host
+ *
+ * Description:
+ *     Replace items for specified host
+ *
+ * Author:
+ *     Eugene Grigorjev 
+ *
+ * Comments: !!! Don't forget sync code with C !!!
+ * Only PHP:
+ *		$error= true : rise Error if item doesn't exists(error generated), false: special processing (NO error generated)
+ */
+	function	get_same_graphitems_for_host($gitems, $dest_hostid, $error=true)
 	{
 		$result = array();
 
 		foreach($gitems as $gitem)
 		{
-			if ( !($db_item = DBfetch(DBselect('select src.itemid from items src, items dest '.
-					       ' where dest.itemid='.$gitem['itemid'].
-					       ' and src.key_=dest.key_ and src.hostid='.$dest_hostid))) )
-			{
-
+			$sql = 'SELECT src.itemid '.
+							' FROM items src, items dest '.
+							' WHERE dest.itemid='.zbx_dbstr($gitem['itemid']).
+								' AND src.key_=dest.key_ '.
+								' AND src.hostid='.$dest_hostid;
+			$db_item = DBfetch(DBselect($sql));
+			if (!$db_item && $error){
 				$item = get_item_by_itemid($gitem['itemid']);
 				$host = get_host_by_hostid($dest_hostid);
 				error('Missed key "'.$item['key_'].'" for host "'.$host['host'].'"');
 				return false;
 			}
-
-			$gitem['itemid'] = $db_item['itemid'];
+			else if(!$db_item){
+				continue;
+//				$gitem['itemid'] = 0;
+			}
+			else{
+				$gitem['itemid'] = $db_item['itemid'];
+			}
 
 			$result[] = $gitem;
 		}
@@ -921,5 +929,83 @@
 			$form);
 
 		return;
+	}
+	
+	/*
+	 * Function: 
+	 *		make_array_from_gitems
+	 *
+	 * Description:
+	 *     Creates array with items params for preapare_url function
+	 *
+	 * Author:
+	 *     Aly
+	 *
+	 * Comments
+	 *	
+	 */	
+	function make_url_from_gitems($gitems){
+
+		$gurl=array();
+		$ifields = array(
+						'itemid'	=> 1,
+						'drawtype'	=> 1,
+						'sortorder'	=> 1,
+						'color'		=> 1,
+						'yaxisside'	=> 1,
+						'calc_fnc'	=> 1,
+						'type'		=> 1,
+						'periods_cnt'=>1
+					);
+
+		foreach($gitems as $gitem){
+			foreach($gitem as $name => $value){
+				if(isset($ifields[$name])){
+					$gurl['items['.$gitem['itemid'].']['.$name.']']=$value;
+				}
+			}
+		}
+		
+	return prepare_url($gurl);
+	}
+	
+	/*
+	 * Function: 
+	 *		make_array_from_graphid
+	 *
+	 * Description:
+	 *     Creates array with graph params for preapare_url function
+	 *
+	 * Author:
+	 *     Aly
+	 *
+	 * Comments
+	 *	$full= false: for screens(WITHOUT width && height), true=all params
+	 */	
+	function make_url_from_graphid($graphid,$full=false){
+
+		$gurl=array();
+		if($full){
+			$gparams = array();
+		}
+		else{
+			$gparams = array(
+						'height'=> 1,
+						'width'	=> 1
+					);
+		}
+		
+		$graph=get_graph_by_graphid($graphid);
+		if($graph){
+			foreach($graph as $name => $value){
+				if(!is_numeric($name) && !isset($gparams[$name])) $gurl[$name]=$value;
+			}
+		}
+
+		$url = prepare_url($gurl);
+		if(!empty($url)){
+			$url=((($gurl['graphtype']==GRAPH_TYPE_PIE) || ($gurl['graphtype']==GRAPH_TYPE_EXPLODED))?'chart7.php?':'chart3.php?').trim($url,'&');
+		}
+	return $url;
 	}
 ?>

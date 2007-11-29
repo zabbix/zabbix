@@ -51,7 +51,10 @@ include_once "include/page_header.php";
 	$fields=array(
 		"config"=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1"),	null), // 0 - screens, 1 - slides
 
-		"elementid"=>		array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,NULL),
+		"groupid"=>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null),
+		"hostid"=>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null),
+
+		"elementid"=>	array(T_ZBX_INT, O_OPT,	P_SYS|P_NZERO,	DB_ID,NULL),
 		"step"=>		array(T_ZBX_INT, O_OPT,  P_SYS,		BETWEEN(0,65535),NULL),
 		"dec"=>			array(T_ZBX_INT, O_OPT,  P_SYS, 	BETWEEN(0,65535*65535),NULL),
 		"inc"=>			array(T_ZBX_INT, O_OPT,  P_SYS, 	BETWEEN(0,65535*65535),NULL),
@@ -62,7 +65,7 @@ include_once "include/page_header.php";
 		"stime"=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	NULL,NULL),
 		"action"=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	IN("'go'"),NULL),
 		"reset"=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	IN("'reset'"),NULL),
-		"fullscreen"=>		array(T_ZBX_INT, O_OPT,	P_SYS,		IN("0,1,2"),		NULL)
+		"fullscreen"=>	array(T_ZBX_INT, O_OPT,	P_SYS,		IN("0,1,2"),		NULL)
 	);
 
 	check_fields($fields);
@@ -89,6 +92,7 @@ include_once "include/page_header.php";
 ?>
 
 <?php
+
 	$text = array(S_SCREENS_BIG);
 
 	$elementid = get_request('elementid', null);
@@ -109,15 +113,13 @@ include_once "include/page_header.php";
 	unset($screen_correct);
 	unset($first_screen);
 
-	if( 0 == $config )
-	{
+	if( 0 == $config ){
 		$result = DBselect('select screenid as elementid,name '.
 				' from screens '.
 				' where '.DBin_node('screenid').
 				' order by name'
 				);
-		while($row=DBfetch($result))
-		{
+		while($row=DBfetch($result)){
 			if(!screen_accessiable($row["elementid"], PERM_READ_ONLY))
 				continue;
 
@@ -129,15 +131,13 @@ include_once "include/page_header.php";
 			if(!isset($first_element)) $first_element = $row["elementid"];
 		}
 	}
-	else
-	{
+	else{
 		$result = DBselect('select slideshowid as elementid,name '.
 				' from slideshows '.
 				' where '.DBin_node('slideshowid').
 				' order by name'
 				);
-		while($row=DBfetch($result))
-		{
+		while($row=DBfetch($result)){
 			if(!slideshow_accessiable($row["elementid"], PERM_READ_ONLY))
 				continue;
 
@@ -150,58 +150,126 @@ include_once "include/page_header.php";
 		}
 	}
 
-	if(!isset($element_correct) && isset($first_element))
-	{
+	if(!isset($element_correct) && isset($first_element)){
 		$elementid = $first_element;
 	}
 
-	if(isset($elementid))
-	{
-		if( 0 == $config )
-		{
+	if(isset($elementid)){
+		if(0 == $config){
 			if(!screen_accessiable($elementid, PERM_READ_ONLY))
 				access_deny();
 			$element = get_screen_by_screenid($elementid);
 		}
-		else
-		{
+		else{
 			if(!slideshow_accessiable($elementid, PERM_READ_ONLY))
 				access_deny();
 			$element = get_slideshow_by_slideshowid($elementid);
 		}
 
-		if( $element ) {
+		if( $element ){
 			$url = "?elementid=".$elementid;
 			if($_REQUEST["fullscreen"]==0) $url .= "&fullscreen=1";
 			$text[] = array(nbsp(" / "),new CLink($element["name"], $url));
 		}
-		else
-		{
+		else{
 			$elementid = null;
 			update_profile("web.screens.elementid",0);
 		}
 	}
-			
+
 	if($cmbElements->ItemsCount() > 0)
 		$form->AddItem($cmbElements);
 
-	if( 2 != $_REQUEST["fullscreen"] )
+	if((2 != $_REQUEST["fullscreen"]) && (0 == $config) && (check_dynamic_items($elementid))){
+		if(!isset($_REQUEST["hostid"])){
+			$_REQUEST["groupid"] = $_REQUEST["hostid"] = 0;
+		}
+		
+		$options = array("allow_all_hosts","monitored_hosts","with_items");//, "always_select_first_host");
+		if(!$ZBX_WITH_SUBNODES)	array_push($options,"only_current_node");
+		
+		validate_group_with_host(PERM_READ_ONLY,$options);
+		
+		$availiable_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
+		$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
+		
+		$r_form = new CForm();
+		$r_form->SetMethod('get');
+		if(isset($_REQUEST['fullscreen']))	$r_form->AddVar('fullscreen', $_REQUEST['fullscreen']);
+		if(isset($_REQUEST['period']))	$r_form->AddVar('period', $_REQUEST['period']);
+		if(isset($_REQUEST['stime']))	$r_form->AddVar('stime', $_REQUEST['stime']);
+			
+		$cmbGroup = new CComboBox('groupid',$_REQUEST['groupid'],'submit()');
+		$cmbHosts = new CComboBox('hostid',$_REQUEST['hostid'],'submit()');
+	
+		$cmbGroup->AddItem(0,S_ALL_SMALL);
+		$cmbHosts->AddItem(0,S_DEFAULT);
+		
+
+		$result=DBselect('SELECT DISTINCT g.groupid, g.name '.
+					' FROM groups g, hosts_groups hg, hosts h, items i, graphs_items gi '.
+					' WHERE g.groupid in ('.$availiable_groups.') '.
+						' AND hg.groupid=g.groupid '.
+						' AND h.status='.HOST_STATUS_MONITORED.
+						' AND h.hostid=i.hostid '.
+						' AND hg.hostid=h.hostid '.
+					' ORDER BY g.name');
+		while($row=DBfetch($result)){
+			$cmbGroup->AddItem(
+					$row['groupid'],
+					get_node_name_by_elid($row['groupid']).$row["name"]
+					);
+		}
+		
+		$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
+		
+		if($_REQUEST['groupid'] > 0){
+			$sql = ' SELECT distinct h.hostid,h.host '.
+				' FROM hosts h,items i,hosts_groups hg, graphs_items gi '.
+				' WHERE h.status='.HOST_STATUS_MONITORED.
+					' AND h.hostid=i.hostid '.
+					' AND hg.groupid='.$_REQUEST['groupid'].
+					' AND hg.hostid=h.hostid '.
+					' AND h.hostid IN ('.$availiable_hosts.') '.
+				' ORDER BY h.host';
+		}
+		else{
+			$sql = 'SELECT distinct h.hostid,h.host '.
+				' FROM hosts h,items i, graphs_items gi '.
+				' WHERE h.status='.HOST_STATUS_MONITORED.
+					' AND i.status='.ITEM_STATUS_ACTIVE.
+					' AND h.hostid=i.hostid'.
+					' AND h.hostid IN ('.$availiable_hosts.') '.
+				' ORDER BY h.host';
+		}
+//SDI($sql);
+		$result=DBselect($sql);
+		while($row=DBfetch($result))
+		{
+			$cmbHosts->AddItem(
+					$row['hostid'],
+					get_node_name_by_elid($row['hostid']).$row['host']
+					);
+		}
+	
+		$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));	
 		show_table_header($text,$form);
+		show_table_header(null,$r_form);
+	}
+	else if(2 != $_REQUEST["fullscreen"]){
+		show_table_header($text,$form);
+	}
 ?>
 <?php
-	if(isset($elementid))
-	{
+	if(isset($elementid)){
 		$effectiveperiod = navigation_bar_calc();
-		if( 0 == $config )
-		{
+		if( 0 == $config ){
 			$element = get_screen($elementid, 0, $effectiveperiod);
 		}
-		else
-		{
+		else{
 			$element = get_slideshow($elementid, get_request('step', null), $effectiveperiod);
 			zbx_add_post_js('if(isset(parent)) parent.resizeiframe("iframe");
-							else resizeiframe("iframe");
-							');
+							else resizeiframe("iframe");'."\n");
 		}
 		if($element){
 			$element->Show();
@@ -211,7 +279,7 @@ include_once "include/page_header.php";
 
 		if( 2 != $_REQUEST["fullscreen"] ){
 		
-			$stime = time() - (31536000); // 1year
+			$stime = time() - (31536000); // ~1year
 			$bstime = time()-$effectiveperiod;
 			
 			if(isset($_REQUEST['stime'])){
@@ -225,6 +293,7 @@ include_once "include/page_header.php";
 			zbx_add_post_js($script); 
 			$img = new CImg('images/general/tree/O.gif','space','20','20');
 			$img->Show();
+			echo BR;
 //			navigation_bar("screens.php",array('config','elementid'));
 		}
 	}
