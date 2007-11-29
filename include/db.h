@@ -26,6 +26,7 @@
 
 #include "common.h"
 #include "zbxdb.h"
+#include "dbsync.h"
 
 extern	char	*CONFIG_DBHOST;
 extern	char	*CONFIG_DBNAME;
@@ -495,6 +496,7 @@ void		DBbegin();
 void		DBcommit();
 void		DBrollback();
 
+const ZBX_TABLE	*DBget_table(const char *tablename);
 zbx_uint64_t	DBget_maxid(char *table, char *field);
 
 int	DBget_function_result(char **result,char *functionid);

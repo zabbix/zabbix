@@ -41,7 +41,6 @@
 #include "log.h"
 #include "zlog.h"
 
-#include "dbsync.h"
 #include "nodesync.h"
 #include "../nodewatcher/nodesender.h"
 
@@ -61,7 +60,7 @@
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	process_record(int nodeid, char *record, int sender_nodetype)
+static int	process_record(int nodeid, const char *record, int sender_nodetype)
 {
 	char		tablename[MAX_STRING_LEN];
 	char		fieldname[MAX_STRING_LEN];
@@ -73,7 +72,8 @@ static int	process_record(int nodeid, char *record, int sender_nodetype)
 	char		*key=NULL;
 	DB_RESULT	result;
 	DB_ROW		row;
-	char		*r, *buffer = NULL, *tmp = NULL, *fields_update = NULL, *fields = NULL, *values = NULL;
+	const char	*r;
+	char		*buffer = NULL, *tmp = NULL, *fields_update = NULL, *fields = NULL, *values = NULL;
 	int		buffer_allocated = 16*1024;
 	int		tmp_allocated = 16*1024, tmp_offset = 0;
 	int		fields_update_allocated = 16*1024, fields_update_offset = 0;
@@ -89,13 +89,13 @@ static int	process_record(int nodeid, char *record, int sender_nodetype)
 	buffer = zbx_malloc(buffer, buffer_allocated);
 	tmp = zbx_malloc(tmp, tmp_allocated);
 
-	r = zbx_get_next_field(r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER);
+	zbx_get_next_field(&r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER);
 	strcpy(tablename, buffer);
 
-	r = zbx_get_next_field(r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER);
+	zbx_get_next_field(&r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER);
 	ZBX_STR2UINT64(recid, buffer);
 
-	r = zbx_get_next_field(r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER);
+	zbx_get_next_field(&r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER);
 	op = atoi(buffer);
 
 	for(i=0;tables[i].table!=0;i++)
@@ -133,13 +133,13 @@ static int	process_record(int nodeid, char *record, int sender_nodetype)
 
 	while(r != NULL)
 	{
-		r = zbx_get_next_field(r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER);
+		zbx_get_next_field(&r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER);
 		strcpy(fieldname, buffer);
 
-		r = zbx_get_next_field(r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER);
+		zbx_get_next_field(&r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER);
 		valuetype=atoi(buffer);
 
-		r = zbx_get_next_field(r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER);
+		zbx_get_next_field(&r, &buffer, &buffer_allocated, ZBX_DM_DELIMITER);
 		if(op==NODE_CONFIGLOG_OP_UPDATE)
 		{
 			if(strcmp(buffer, "NULL") == 0)
@@ -278,32 +278,32 @@ out:
  ******************************************************************************/
 int	node_sync(char *data, int *sender_nodeid, int *nodeid)
 {
-	char	*start, *newline, *tmp = NULL;
-	int	tmp_allocated = 128;
-	int	firstline=1;
-	int	sender_nodetype=0;
-	int	datalen;
-	int	res = SUCCEED;
+	const char	*r;
+	char		*newline, *tmp = NULL;
+	int		tmp_allocated = 128;
+	int		firstline=1;
+	int		sender_nodetype=0;
+	int		datalen;
+	int		res = SUCCEED;
 
 	datalen=strlen(data);
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In node_sync(len:%d)", datalen);
 
-
 	tmp = zbx_malloc(tmp, tmp_allocated);
 
 /*zabbix_log(LOG_LEVEL_CRIT, "<----- [%s]", data);*/
 
-	for (start = data; *start != '\0' && res == SUCCEED;) {
-		if (NULL != (newline = strchr(start, '\n')))
+	for (r = data; *r != '\0' && res == SUCCEED;) {
+		if (NULL != (newline = strchr(r, '\n')))
 			*newline = '\0';
 
 		if (firstline == 1) {
-			start = zbx_get_next_field(start, &tmp, &tmp_allocated, ZBX_DM_DELIMITER); /* Data */
-			start = zbx_get_next_field(start, &tmp, &tmp_allocated, ZBX_DM_DELIMITER);
+			zbx_get_next_field(&r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER); /* Data */
+			zbx_get_next_field(&r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER);
 			*sender_nodeid=atoi(tmp);
 			sender_nodetype = *sender_nodeid == CONFIG_MASTER_NODEID ? ZBX_NODE_MASTER : ZBX_NODE_SLAVE;
-			start = zbx_get_next_field(start, &tmp, &tmp_allocated, ZBX_DM_DELIMITER);
+			zbx_get_next_field(&r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER);
 			*nodeid=atoi(tmp);
 
 			if (0 != *sender_nodeid && 0 != *nodeid) {
@@ -324,11 +324,11 @@ int	node_sync(char *data, int *sender_nodeid, int *nodeid)
 			} else
 				res = FAIL;
 		} else
-			res = process_record(*nodeid, start, sender_nodetype);
+			res = process_record(*nodeid, r, sender_nodetype);
 
 		if (newline != NULL) {
 			*newline = '\n';
-			start = newline + 1;
+			r = newline + 1;
 		} else
 			break;
 	}

@@ -55,7 +55,7 @@ local $output;
 
 %c=(	"type"		=>	"code",
 	"database"	=>	"",
-	"after"		=>	"\t{0}\n};\n",
+	"after"		=>	"\t{0}\n};\n\n#endif\n",
 	"t_bigint"	=>	"ZBX_TYPE_UINT",
 	"t_id"		=>	"ZBX_TYPE_ID",
 	"t_integer"	=>	"ZBX_TYPE_INT",
@@ -73,7 +73,9 @@ local $output;
 	"t_cksum_text"	=>	"ZBX_TYPE_TEXT"  
 );
 
-$c{"before"}="
+$c{"before"}="#ifndef ZABBIX_DBSYNC_H
+#define ZABBIX_DBSYNC_H
+
 #define ZBX_FIELD struct zbx_field_type
 ZBX_FIELD
 {
@@ -225,22 +227,14 @@ sub process_field
 	{
 		$type=$output{$type_short};
 #{"linkid",      ZBX_TYPE_INT,   ZBX_SYNC},
-		if(($null eq "NOT NULL") && ($flags eq "ZBX_SYNC"))
-		{
-			$flags="ZBX_SYNC | ZBX_NOTNULL"
+		if ($null eq "NOT NULL") {
+			if ($flags ne "0") {
+				$flags="ZBX_NOTNULL | ".$flags;
+			} else {
+				$flags="ZBX_NOTNULL";
+			}
 		}
-		elsif(($null eq "NOT NULL") && ($flags ne "ZBX_SYNC"))
-		{
-			$flags="ZBX_NOTNULL"
-		}
-		elsif(($null ne "NOT NULL") && ($flags eq "ZBX_SYNC"))
-		{
-			$flags="ZBX_SYNC"
-		}
-		else
-		{
-			$flags="0";
-		}
+			
 		print "\t\t{\"${name}\",\t$type,\t${flags}}";
 	}
 	else
