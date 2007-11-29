@@ -261,7 +261,8 @@ void __zbx_zbx_snprintf_alloc(char **str, int *alloc_len, int *offset, int max_l
 	va_start(args, fmt);
 
 	if (*offset + max_len >= *alloc_len) {
-		*alloc_len += 2 * max_len;
+		while (*offset + max_len >= *alloc_len)
+			*alloc_len *= 2;
 		*str = zbx_realloc(*str, *alloc_len);
 	}
 
@@ -1404,26 +1405,28 @@ int	zbx_pg_unescape_bytea(u_char *io)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_get_next_field(const char *line, char **output, int *olen, char separator)
+int	zbx_get_next_field(const char **line, char **output, int *olen, char separator)
 {
 	char	*ret;
 	int	flen;
 
-	ret = strchr(line, separator);
+	ret = strchr(*line, separator);
 	if (ret) {
-		flen = ret-line;
+		flen = ret-*line;
 		ret++;
 	} else
-		flen = strlen(line);
+		flen = strlen(*line);
 
 	if (*olen < flen + 1) {
 		*olen = flen * 2;
 		*output = zbx_realloc(*output, *olen);
 	}
-	memcpy(*output, line, flen);
+	memcpy(*output, *line, flen);
 	(*output)[flen] = '\0';
 
-	return ret;
+	*line = ret;
+
+	return flen;
 }
 
 /******************************************************************************

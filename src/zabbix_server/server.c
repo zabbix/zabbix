@@ -823,29 +823,6 @@ ZBX_TEST_HEX expressions[]=
 	printf("Passed OK\n");
 }
 
-void test_zbx_get_next_field()
-{
-	char	input[] = {"?11111.;?222222222222222222.;?333333333333.;?4444444444444444."};
-	char	*ptr, *buffer = NULL;
-	int	len;
-
-	printf("-= Test binary_to_hex =-\n");
-
-	len = 1;
-	buffer = zbx_malloc(buffer, len);
-	ptr = input;
-
-
-	ptr = zbx_get_next_field( ptr, &buffer, &len, ';');
-printf("test_zbx_get_next_field() (1) [input:%s] [buffer:%s]\n", ptr, buffer);
-	ptr = zbx_get_next_field( ptr, &buffer, &len, ';');
-printf("test_zbx_get_next_field() (2) [input:%s] [buffer:%s]\n", ptr, buffer);
-	ptr = zbx_get_next_field( ptr, &buffer, &len, ';');
-printf("test_zbx_get_next_field() (3) [input:%s] [buffer:%s]\n", ptr, buffer);
-	ptr = zbx_get_next_field( ptr, &buffer, &len, ';');
-printf("test_zbx_get_next_field() (4) [input:%s] [buffer:%s]\n", ptr, buffer);
-}
-
 void test()
 {
 
@@ -873,10 +850,9 @@ void test()
 /*	test_email(); */
 /*	test_extract_numbers(); */
 /*	test_trigger_description(); */
-	test_zbx_tcp_connect( );
+/*	test_zbx_tcp_connect( );*/
 /*	test_ip_in_list(); */
 /*	test_binary2hex();*/
-/*	test_zbx_get_next_field();*/
 
 	printf("\n-= Test completed =-\n");
 }

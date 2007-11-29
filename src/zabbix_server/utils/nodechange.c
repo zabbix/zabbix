@@ -24,8 +24,6 @@
 #include "log.h"
 #include "zlog.h"
 
-#include "dbsync.h"
-
 /******************************************************************************
  *                                                                            *
  * Function: convert_trigger_expression                                       *

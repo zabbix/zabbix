@@ -126,7 +126,6 @@ FIELD		|ip		|t_varchar(39)	|''	|NOT NULL	|0
 FIELD		|port		|t_integer	|'10051'|NOT NULL	|0
 FIELD		|slave_history	|t_integer	|'30'	|NOT NULL	|0
 FIELD		|slave_trends	|t_integer	|'365'	|NOT NULL	|0
-FIELD		|event_lastid	|t_id		|'0'	|NOT NULL	|0
 FIELD		|nodetype	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|masterid	|t_integer	|'0'	|NOT NULL	|0
 
@@ -139,30 +138,6 @@ FIELD		|cksum		|t_cksum_text	|''	|NOT NULL	|0
 FIELD		|sync		|t_char(128)	|''	|NOT NULL	|0
 INDEX		|cksum_1	|nodeid,tablename,recordid,cksumtype
 
-TABLE|history_str_sync|id|
-FIELD		|id		|t_serial	|	|		|ZBX_SYNC
-FIELD		|nodeid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-INDEX		|1		|nodeid,id
-
-TABLE|history_sync|id|
-FIELD		|id		|t_serial	|	|		|ZBX_SYNC
-FIELD		|nodeid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|value		|t_double	|'0.0000'|NOT NULL	|ZBX_SYNC
-INDEX		|1		|nodeid,id
-
-TABLE|history_uint_sync|id|
-FIELD		|id		|t_serial	|	|		|ZBX_SYNC
-FIELD		|nodeid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|value		|t_bigint	|'0'	|NOT NULL	|ZBX_SYNC
-INDEX		|1		|nodeid,id
-
 TABLE|services_times|timeid|ZBX_SYNC
 FIELD		|timeid		|t_id		|'0'	|NOT NULL	|0
 FIELD		|serviceid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
@@ -174,20 +149,20 @@ INDEX		|times_1	|serviceid,type,ts_from,ts_to
 
 -- History tables
 
-TABLE|alerts|alertid|ZBX_SYNC
+TABLE|alerts|alertid|ZBX_HISTORY
 FIELD		|alertid	|t_id		|'0'	|NOT NULL	|0
-FIELD		|actionid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|triggerid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|userid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|mediatypeid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|sendto		|t_varchar(100)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|subject	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|message	|t_blob		|''	|NOT NULL	|ZBX_SYNC
-FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|retries	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|error		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|nextcheck	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|actionid	|t_id		|'0'	|NOT NULL	|0
+FIELD		|triggerid	|t_id		|'0'	|NOT NULL	|0
+FIELD		|userid		|t_id		|'0'	|NOT NULL	|0
+FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
+FIELD		|mediatypeid	|t_id		|'0'	|NOT NULL	|0
+FIELD		|sendto		|t_varchar(100)	|''	|NOT NULL	|0
+FIELD		|subject	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|message	|t_blob		|''	|NOT NULL	|0
+FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|retries	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|error		|t_varchar(128)	|''	|NOT NULL	|0
+FIELD		|nextcheck	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|actionid
 INDEX		|2		|clock
 INDEX		|3		|triggerid
@@ -195,71 +170,121 @@ INDEX		|4		|status,retries
 INDEX		|5		|mediatypeid
 INDEX		|6		|userid
 
-TABLE|events|eventid|0
-FIELD		|eventid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|source		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|object		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|objectid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|value		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|acknowledged	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+TABLE|history||0
+FIELD		|itemid		|t_id		|'0'	|NOT NULL	|0
+FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
+FIELD		|value		|t_double	|'0.0000'|NOT NULL	|0
+INDEX		|1		|itemid,clock
+
+TABLE|history_sync|id|ZBX_HISTORY_SYNC
+FIELD		|id		|t_serial	|	|		|0
+FIELD		|nodeid		|t_id		|'0'	|NOT NULL	|0
+FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_HISTORY_SYNC
+FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_HISTORY_SYNC
+FIELD		|value		|t_double	|'0.0000'|NOT NULL	|ZBX_HISTORY_SYNC
+INDEX		|1		|nodeid,id
+
+TABLE|history_uint||0
+FIELD		|itemid		|t_id		|'0'	|NOT NULL	|0
+FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
+FIELD		|value		|t_bigint	|'0'	|NOT NULL	|0
+INDEX		|1		|itemid,clock
+
+TABLE|history_uint_sync|id|ZBX_HISTORY_SYNC
+FIELD		|id		|t_serial	|	|		|0
+FIELD		|nodeid		|t_id		|'0'	|NOT NULL	|0
+FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_HISTORY_SYNC
+FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_HISTORY_SYNC
+FIELD		|value		|t_bigint	|'0'	|NOT NULL	|ZBX_HISTORY_SYNC
+INDEX		|1		|nodeid,id
+
+TABLE|history_str||0
+FIELD		|itemid		|t_id		|'0'	|NOT NULL	|0
+FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
+FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
+INDEX		|1		|itemid,clock
+
+TABLE|history_str_sync|id|ZBX_HISTORY_SYNC
+FIELD		|id		|t_serial	|	|		|0
+FIELD		|nodeid		|t_id		|'0'	|NOT NULL	|0
+FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_HISTORY_SYNC
+FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_HISTORY_SYNC
+FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|ZBX_HISTORY_SYNC
+INDEX		|1		|nodeid,id
+
+TABLE|history_log|id|ZBX_HISTORY
+FIELD		|id		|t_id		|'0'	|NOT NULL	|0
+FIELD		|itemid		|t_id		|'0'	|NOT NULL	|0
+FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
+FIELD		|timestamp	|t_time		|'0'	|NOT NULL	|0
+FIELD		|source		|t_varchar(64)	|''	|NOT NULL	|0
+FIELD		|severity	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|value		|t_history_log	|''	|NOT NULL	|0
+INDEX		|1		|itemid,clock
+
+TABLE|history_text|id|ZBX_HISTORY
+FIELD		|id		|t_id		|'0'	|NOT NULL	|0
+FIELD		|itemid		|t_id		|'0'	|NOT NULL	|0
+FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
+FIELD		|value		|t_history_text	|''	|NOT NULL	|0
+INDEX		|1		|itemid,clock
+
+TABLE|events|eventid|ZBX_HISTORY
+FIELD		|eventid	|t_id		|'0'	|NOT NULL	|0
+FIELD		|source		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|object		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|objectid	|t_id		|'0'	|NOT NULL	|0
+FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
+FIELD		|value		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|acknowledged	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|object,objectid,eventid
 INDEX		|2		|clock
 
-TABLE|history||0
-FIELD		|itemid		|t_id		|'0'		|NOT NULL	|ZBX_SYNC
-FIELD		|clock		|t_time		|'0'		|NOT NULL	|ZBX_SYNC
-FIELD		|value		|t_double	|'0.0000'	|NOT NULL	|ZBX_SYNC
-INDEX		|1		|itemid,clock
+TABLE|trends|itemid,clock|ZBX_HISTORY_TRENDS
+FIELD		|itemid		|t_id		|'0'	|NOT NULL	|0
+FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
+FIELD		|num		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|value_min	|t_double	|'0.0000'|NOT NULL	|0
+FIELD		|value_avg	|t_double	|'0.0000'|NOT NULL	|0
+FIELD		|value_max	|t_double	|'0.0000'|NOT NULL	|0
 
-TABLE|history_uint||0
-FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|value		|t_bigint		|'0'	|NOT NULL	|ZBX_SYNC
-INDEX		|1		|itemid,clock
+TABLE|trends_uint|itemid,clock|ZBX_HISTORY_TRENDS
+FIELD		|itemid		|t_id		|'0'	|NOT NULL	|0
+FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
+FIELD		|num		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|value_min	|t_bigint	|'0'	|NOT NULL	|0
+FIELD		|value_avg	|t_bigint	|'0'	|NOT NULL	|0
+FIELD		|value_max	|t_bigint	|'0'	|NOT NULL	|0
 
-TABLE|history_str||0
-FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-INDEX		|1		|itemid,clock
-
-TABLE|history_log|id|0
-FIELD		|id		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|timestamp	|t_time		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|source		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|severity	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|value		|t_history_log	|''	|NOT NULL	|ZBX_SYNC
-INDEX		|1		|itemid,clock
-
-TABLE|history_text|id|0
-FIELD		|id		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|value		|t_history_text	|''	|NOT NULL	|ZBX_SYNC
-INDEX		|1		|itemid,clock
-
-TABLE|trends|itemid,clock|0
-FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|num		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|value_min	|t_double	|'0.0000'|NOT NULL	|ZBX_SYNC
-FIELD		|value_avg	|t_double	|'0.0000'|NOT NULL	|ZBX_SYNC
-FIELD		|value_max	|t_double	|'0.0000'|NOT NULL	|ZBX_SYNC
-
--- Other tables
-
-TABLE|acknowledges|acknowledgeid|ZBX_SYNC
+TABLE|acknowledges|acknowledgeid|ZBX_HISTORY
 FIELD		|acknowledgeid	|t_id		|'0'	|NOT NULL	|0
-FIELD		|userid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|eventid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|message	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|userid		|t_id		|'0'	|NOT NULL	|0
+FIELD		|eventid	|t_id		|'0'	|NOT NULL	|0
+FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
+FIELD		|message	|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|userid
 INDEX		|2		|eventid
 INDEX		|3		|clock
+
+TABLE|auditlog|auditid|ZBX_HISTORY
+FIELD		|auditid	|t_id		|'0'	|NOT NULL	|0
+FIELD		|userid		|t_id		|'0'	|NOT NULL	|0
+FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
+FIELD		|action		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|resourcetype	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|details	|t_varchar(128)	|'0'	|NOT NULL	|0
+INDEX		|1		|userid,clock
+INDEX		|2		|clock
+
+TABLE|service_alarms|servicealarmid|ZBX_HISTORY
+FIELD		|servicealarmid	|t_id		|'0'	|NOT NULL	|0
+FIELD		|serviceid	|t_id		|'0'	|NOT NULL	|0
+FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
+FIELD		|value		|t_integer	|'0'	|NOT NULL	|0
+INDEX		|1		|serviceid,clock
+INDEX		|2		|clock
+
+-- Other tables
 
 TABLE|actions|actionid|ZBX_SYNC
 FIELD		|actionid	|t_id		|'0'	|NOT NULL	|0
@@ -285,16 +310,6 @@ FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|templateid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|templateid
 UNIQUE		|2		|hostid,name
-
-TABLE|auditlog|auditid|0
-FIELD		|auditid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|userid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|action		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|resourcetype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|details	|t_varchar(128)	|'0'	|NOT NULL	|ZBX_SYNC
-INDEX		|1		|userid,clock
-INDEX		|2		|clock
 
 TABLE|conditions|conditionid|ZBX_SYNC
 FIELD		|conditionid	|t_id		|'0'	|NOT NULL	|0
@@ -548,14 +563,6 @@ FIELD		|triggerid	|t_id		|	|		|ZBX_SYNC
 FIELD		|showsla	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|goodsla	|t_percentage	|'99.9'	|NOT NULL	|ZBX_SYNC
 FIELD		|sortorder	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-
-TABLE|service_alarms|servicealarmid|0
-FIELD		|servicealarmid	|t_id		|'0'	|NOT NULL	|0
-FIELD		|serviceid	|t_id		|'0'	|NOT NULL	|0
-FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
-FIELD		|value		|t_integer	|'0'	|NOT NULL	|0
-INDEX		|1		|serviceid,clock
-INDEX		|2		|clock
 
 TABLE|services_links|linkid|ZBX_SYNC
 FIELD		|linkid		|t_id		|'0'	|NOT NULL	|0

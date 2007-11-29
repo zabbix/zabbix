@@ -243,10 +243,10 @@ int	node_process_command(const char *data, char **result)
 		datalen);
 
 	r = data;
-	r = zbx_get_next_field(r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER); /* Constant 'Command' */
-	r = zbx_get_next_field(r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER); /* NodeID */
+	zbx_get_next_field(&r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER); /* Constant 'Command' */
+	zbx_get_next_field(&r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER); /* NodeID */
 	nodeid = atoi(tmp);
-	r = zbx_get_next_field(r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER);
+	zbx_get_next_field(&r, &tmp, &tmp_allocated, ZBX_DM_DELIMITER);
 
 	if (nodeid == CONFIG_NODEID) {
 		zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Received command \"%s\"",
