@@ -221,7 +221,7 @@ void	process_history_table_data(ZBX_TABLE *table, int master_nodeid, int nodeid)
 			lastid,
 			ZBX_NODE(table->recid, nodeid));
 	}
-zabbix_log(LOG_LEVEL_CRIT, "-----> SQL:\n%s\n", tmp );
+
 	result = DBselectN(tmp, 10000);
 	while (NULL != (row = DBfetch(result))) {
 		if (table->flags & ZBX_HISTORY_SYNC) {
@@ -257,7 +257,7 @@ zabbix_log(LOG_LEVEL_CRIT, "-----> SQL:\n%s\n", tmp );
 	DBfree_result(result);
 
 	data[data_offset] = '\0';
-zabbix_log(LOG_LEVEL_CRIT, "-----> DATA:\n%s\n", data );
+/*zabbix_log(LOG_LEVEL_CRIT, "-----> DATA:\n%s\n", data );*/
 
 	if (1 == data_found && SUCCEED == send_to_node(table->table, master_nodeid, nodeid, data)) {
 		if (table->flags & ZBX_HISTORY_SYNC) {
