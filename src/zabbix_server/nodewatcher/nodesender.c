@@ -23,7 +23,6 @@
 #include "db.h"
 #include "log.h"
 #include "zlog.h"
-#include "dbsync.h"
 
 #include "nodesender.h"
 #include "nodewatcher.h"

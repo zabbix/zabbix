@@ -54,16 +54,16 @@ static int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 	char	*result = NULL, *answer;
 
 	int	ret=SUCCEED, res;
+	size_t	datalen;
 
 	zbx_rtrim(s, " \r\n\0");
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Trapper got [%s] len %d",
+	datalen = strlen(s);
+	zabbix_log( LOG_LEVEL_DEBUG, "Trapper got [%s] len %zd",
 		s,
-		strlen(s));
-
+		datalen);
 /* Request for list of active checks */
-	if(strncmp(s,"ZBX_GET_ACTIVE_CHECKS", strlen("ZBX_GET_ACTIVE_CHECKS")) == 0)
-	{
+	if (strncmp(s,"ZBX_GET_ACTIVE_CHECKS", 21) == 0) {
 		line=strtok(s,"\n");
 		host=strtok(NULL,"\n");
 		if(host == NULL)
@@ -74,10 +74,15 @@ static int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 		{
 			ret = send_list_of_active_checks(sock, host);
 		}
-	}
+/* Request for last ids */
+	} else if (strncmp(s,"ZBX_GET_HISTORY_LAST_ID", 23) == 0) {
+		send_history_last_id(sock, s);
+		return ret;
+	} else if (strncmp(s,"ZBX_GET_TRENDS_LAST_ID", 22) == 0) {
+		send_trends_last_id(sock, s);
+		return ret;
 /* Process information sent by zabbix_sender */
-	else
-	{
+	} else {
 		/* Command? */
 		if(strncmp(s,"Command",7) == 0)
 		{
@@ -117,29 +122,13 @@ static int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 
 			return ret;
 		}
-		/* Slave node events? */
-		if(strncmp(s,"Events",6) == 0)
-		{
-/*			zabbix_log( LOG_LEVEL_WARNING, "Slave node events received [len:%d]", strlen(s)); */
-			if(node_events(s) == SUCCEED)
-			{
-				if( zbx_tcp_send_raw(sock,"OK") != SUCCEED)
-				{
-					zabbix_log( LOG_LEVEL_WARNING, "Error sending confirmation to node");
-					zabbix_syslog("Trapper: error sending confirmation to node");
-				}
-			}
-			return ret;
-		}
 		/* Slave node history ? */
 		if(strncmp(s,"History",7) == 0)
 		{
 /*			zabbix_log( LOG_LEVEL_WARNING, "Slave node history received [len:%d]", strlen(s)); */
-			if(node_history(s) == SUCCEED)
-			{
-				if( zbx_tcp_send_raw(sock,"OK") != SUCCEED)
-				{
-					zabbix_log( LOG_LEVEL_WARNING, "Error sending confirmation to node]");
+			if (node_history(s, datalen) == SUCCEED) {
+				if (zbx_tcp_send_raw(sock,"OK") != SUCCEED) {
+					zabbix_log( LOG_LEVEL_WARNING, "Error sending confirmation to node");
 					zabbix_syslog("Trapper: error sending confirmation to node");
 				}
 			}

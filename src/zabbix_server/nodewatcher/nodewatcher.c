@@ -25,7 +25,6 @@
 
 #include "nodewatcher.h"
 #include "nodesender.h"
-#include "events.h"
 #include "history.h"
 
 /******************************************************************************
@@ -101,8 +100,6 @@ int main_nodewatcher_loop()
 
 			lastrun = start;
 		}
-		/* Send new events to master node */
-		main_eventsender();
 
 		/* Send new history data to master node */
 		main_historysender();

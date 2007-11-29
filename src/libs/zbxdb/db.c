@@ -107,6 +107,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 			ret = ZBX_DB_FAIL;
 		}
 #endif /* HAVE_MYSQL_AUTOCOMMIT */
+		DBexecute("SET CHARACTER SET utf8");
 	}
 
 	if(ZBX_DB_FAIL  == ret)

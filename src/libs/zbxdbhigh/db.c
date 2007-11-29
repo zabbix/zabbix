@@ -37,7 +37,6 @@
 #include "events.h"
 #include "threads.h"
 #include "dbcache.h"
-#include "dbsync.h"
 
 void	DBclose(void)
 {
@@ -1112,9 +1111,10 @@ int	DBadd_history_str(zbx_uint64_t itemid, char *value, int clock)
 	{
 		DCadd_history_str(itemid, value, clock);
 	}
-	else
-	{
-		DBescape_string(value,value_esc,MAX_STRING_LEN);
+
+	DBescape_string(value,value_esc,MAX_STRING_LEN);
+
+	if(CONFIG_DBSYNCER_FORKS == 0) {
 		DBexecute("insert into history_str (clock,itemid,value) values (%d," ZBX_FS_UI64 ",'%s')",
 			clock,
 			itemid,
@@ -1768,31 +1768,32 @@ zbx_uint64_t DBget_nextid(char *table, char *field)
 }
 */
 
+const ZBX_TABLE *DBget_table(const char *tablename)
+{
+	int	t;
+
+	for (t = 0; tables[t].table != 0; t++ )
+		if (0 == strcmp(tables[t].table, tablename))
+			return &tables[t];
+	return NULL;
+}
+
 zbx_uint64_t DBget_maxid(char *tablename, char *fieldname)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
 	zbx_uint64_t	ret1,ret2;
 	zbx_uint64_t	min, max;
-	int		found  = FAIL, i, sync = 0, dbres;
+	int		found  = FAIL, dbres;
+	const ZBX_TABLE	*table;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_maxid(%s,%s)",
 		tablename,
 		fieldname);
 
-	for(i = 0; tables[i].table != 0; i++)
-	{
-		if(strcmp(tables[i].table, tablename) == 0)
-		{
-			if(tables[i].flags & ZBX_SYNC)
-			{
-				sync = 1;
-			}
-			break;
-		}
-	}
+	table = DBget_table(tablename);
 
-	if(sync == 1) {
+	if (table->flags & ZBX_SYNC) {
 		min = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)CONFIG_NODEID+(zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)CONFIG_NODEID;
 		max = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)CONFIG_NODEID+(zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)CONFIG_NODEID+(zbx_uint64_t)__UINT64_C(99999999999);
 	} else {
@@ -1806,8 +1807,7 @@ zbx_uint64_t DBget_maxid(char *tablename, char *fieldname)
 			tablename,
 			fieldname);
 
-		row = DBfetch(result);
-		if (NULL == row) {
+		if(NULL == (row = DBfetch(result))) {
 			DBfree_result(result);
 
 			result = DBselect("select max(%3$s) from %4$s where %3$s>="ZBX_FS_UI64" and %3$s<="ZBX_FS_UI64,
@@ -1815,8 +1815,8 @@ zbx_uint64_t DBget_maxid(char *tablename, char *fieldname)
 				max,
 				fieldname,
 				tablename);
-			row = DBfetch(result);
-			if(!row || SUCCEED == DBis_null(row[0]) || !*row[0])
+
+			if(NULL == (row = DBfetch(result)) || SUCCEED == DBis_null(row[0]) || !*row[0])
 				ret1 = min;
 			else {
 				ZBX_STR2UINT64(ret1, row[0]);
@@ -1840,6 +1840,12 @@ zbx_uint64_t DBget_maxid(char *tablename, char *fieldname)
 					tablename,
 					fieldname);
 			}
+
+			DBexecute("insert into ids (nodeid,table_name,field_name,nextid) values (%d,'%s','%s',"ZBX_FS_UI64")",
+				CONFIG_NODEID,
+				tablename,
+				fieldname,
+				ret1);
 			continue;
 		} else {
 			ZBX_STR2UINT64(ret1, row[0]);

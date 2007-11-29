@@ -446,8 +446,11 @@ typedef enum
 } zbx_httpitem_type_t;
 
 /* Flags */
-#define	ZBX_SYNC	0x01
-#define ZBX_NOTNULL	0x02
+#define	ZBX_SYNC		0x01
+#define ZBX_NOTNULL		0x02
+#define ZBX_HISTORY		0x04
+#define ZBX_HISTORY_SYNC	0x08
+#define ZBX_HISTORY_TRENDS	0x10
 
 /* Types of nodes */
 #define	ZBX_NODE_TYPE_REMOTE	0
@@ -490,7 +493,8 @@ void    *zbx_realloc(void *src, size_t size);
 	
 #define zbx_fclose(f) { if(f){ fclose(f); f = NULL; } }
 
-#define ZBX_COND_NODEID " %s>=100000000000000*%d and %s<=(100000000000000*%d+99999999999999) "
+/*#define ZBX_COND_NODEID " %s>=100000000000000*%d and %s<=(100000000000000*%d+99999999999999) "*/
+#define ZBX_COND_NODEID " %s>=%d00000000000000 and %s<=%d99999999999999 "
 #define LOCAL_NODE(fieldid) fieldid, CONFIG_NODEID, fieldid, CONFIG_NODEID
 #define ZBX_NODE(fieldid,nodeid) fieldid, nodeid, fieldid, nodeid
 
@@ -551,7 +555,7 @@ void	zbx_hex2octal(const char *input, char **output, int *olen);
 void	zbx_pg_escape_bytea(const u_char *input, int ilen, char **output, int *olen);
 int	zbx_pg_unescape_bytea(u_char *io);
 #endif
-char    *zbx_get_next_field(const char *line, char **output, int *olen, char separator);
+int	zbx_get_next_field(const char **line, char **output, int *olen, char separator);
 int	str_in_list(char *list, const char *value, const char delimiter);
 
 #ifdef HAVE___VA_ARGS__
