@@ -113,36 +113,6 @@ function check_childs(form_name, chkMain, chkName){
 	}
 }
 
-function remove_childs(form_name,rmvbyname,tag){
-	tag = tag.toUpperCase();
-	var frmForm = document.forms[form_name];
-	for (var i=0; i < frmForm.length; i++){
-		if(frmForm.elements[i].type != 'checkbox') continue;
-		if(frmForm.elements[i].disabled == true) continue;
-		if(frmForm.elements[i].checked != true) continue;
-		
-		var splt = frmForm.elements[i].name.split('[');
-		var name = splt[0];
-		var serviceid = splt[1];
-
-		if(rmvbyname && rmvbyname != name) continue;
-		if(frmForm.elements[i].name != rmvbyname+'['+serviceid+'[serviceid]') continue;
-
-		remove_element(frmForm.elements[i],tag);
-		i--;
-	}
-}
-
-function remove_element(elmnt,tag){
-	if(elmnt.nodeName == tag){
-		elmnt.parentNode.removeChild(elmnt);
-	} else if(elmnt.nodeType == 9){
-		return;
-	} else {
-		remove_element(elmnt.parentNode,tag);
-	}
-}
-
 
 function display_element(name){
 	var elmnt = document.getElementById(name);

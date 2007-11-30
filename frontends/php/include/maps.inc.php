@@ -203,50 +203,94 @@
 		return $sysmapid;
 	}
 
-	function	add_link($sysmapid,$selementid1,$selementid2,$triggerid,$drawtype_off,$color_off,$drawtype_on,$color_on)
-	{
-		if($triggerid == 0)	$triggerid = 'NULL';
-
+	function	add_link($sysmapid,$selementid1,$selementid2,$triggers,$drawtype_off,$color_off){
 		$linkid=get_dbid("sysmaps_links","linkid");
+		
+		$result=TRUE;
+		foreach($triggers as $id => $trigger){
+			$result&=add_link_trigger($linkid,$trigger['triggerid'],$trigger['drawtype'],$trigger['color']);
+		}
+		
+		if(!$result){
+			delete_link_trigger($linkid);
+		}
 
-		$result=DBexecute("insert into sysmaps_links".
-			" (linkid,sysmapid,selementid1,selementid2,triggerid,drawtype_off,".
-			"color_off,drawtype_on,color_on)".
-			" values ($linkid,$sysmapid,$selementid1,$selementid2,$triggerid,$drawtype_off,".
-			zbx_dbstr($color_off).",$drawtype_on,".zbx_dbstr($color_on).")");
+		$result&=DBexecute("insert into sysmaps_links".
+			" (linkid,sysmapid,selementid1,selementid2,drawtype_off,color_off)".
+			" values ($linkid,$sysmapid,$selementid1,$selementid2,$drawtype_off,".zbx_dbstr($color_off).")");
 
 		if(!$result)
 			return $result;
 
-		return $linkid;
+	return $linkid;
 	}
 
-	function	update_link($linkid,$sysmapid,$selementid1,$selementid2,$triggerid,$drawtype_off,$color_off,$drawtype_on,$color_on)
-	{
-		if($triggerid == 0)	$triggerid = 'NULL';
-
-		return	DBexecute("update sysmaps_links set ".
-			"sysmapid=$sysmapid,selementid1=$selementid1,selementid2=$selementid2,".
-			"triggerid=$triggerid,drawtype_off=$drawtype_off,color_off=".zbx_dbstr($color_off).",".
-			"drawtype_on=$drawtype_on,color_on=".zbx_dbstr($color_on).
-			" where linkid=$linkid");
+	function	update_link($linkid,$sysmapid,$selementid1,$selementid2,$triggers,$drawtype_off,$color_off){
+		
+		$result=TRUE;
+		foreach($triggers as $id => $trigger){
+			$result&=update_link_trigger($linkid,$trigger['triggerid'],$trigger['drawtype'],$trigger['color']);
+		}
+		
+		if(!$result){
+			delete_link_trigger($linkid);
+		}
+		
+		$result&=DBexecute('UPDATE sysmaps_links SET '.
+							" sysmapid=$sysmapid,selementid1=$selementid1,selementid2=$selementid2,".
+							" drawtype_off=$drawtype_off,color_off=".zbx_dbstr($color_off).
+						" WHERE linkid=$linkid");
+	return	$result;
 	}
 
-	function	delete_link($linkid)
-	{
-		return	DBexecute("delete from sysmaps_links where linkid=$linkid");
+	function	delete_link($linkid){
+		$result = delete_all_link_triggers($linkid);
+		$result&= DBexecute("delete from sysmaps_links where linkid=$linkid");
+	return	$result;
 	}
 
-        /*
-         * Function: check_circle_elements_link
-         *
-         * Description:
-         *     Check circeling of maps
-         *
-         * Author:
-         *     Eugene Grigorjev 
-         *
-         */
+	function get_link_triggers($linkid){
+		$triggers = array();
+
+		$sql = "SELECT * FROM sysmaps_link_triggers WHERE linkid=$linkid";
+		$res = DBselect($sql);
+		
+		while($rows = DBfetch($res)){
+			$triggers[] = $rows;
+		}
+	return $triggers;
+	}
+
+	function add_link_trigger($linkid,$triggerid,$drawtype,$color){
+		$sql = 'INSERT INTO sysmaps_link_triggers (linkid,triggerid,drawtype,color) '.
+					" VALUES ('$linkid','$triggerid','$drawtype',".zbx_dbstr($color).")";
+	return DBexecute($sql);
+	}
+
+	function update_link_trigger($linkid,$triggerid,$drawtype,$color){
+		$result = delete_link_trigger($linkid,$triggerid);
+		$result&= add_link_trigger($linkid,$triggerid,$drawtype,$color);
+	return $result;
+	}
+	
+	function delete_link_trigger($linkid,$triggerid){
+	return DBexecute("DELETE FROM sysmaps_link_triggers WHERE linkid=$linkid AND triggerid=$triggerid");
+	}
+	
+	function delete_all_link_triggers($linkid){
+	return DBexecute("DELETE FROM sysmaps_link_triggers WHERE linkid=$linkid");
+	}
+
+/*
+ * Function: check_circle_elements_link
+ *
+ * Description:
+ *     Check circeling of maps
+ *
+ * Author:
+ *     Eugene Grigorjev 
+ *
+ */
 	function	check_circle_elements_link($sysmapid,$elementid,$elementtype)
 	{
 		if($elementtype!=SYSMAP_ELEMENT_TYPE_MAP)	return FALSE;
