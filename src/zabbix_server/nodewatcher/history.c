@@ -163,6 +163,8 @@ void	process_history_table_data(ZBX_TABLE *table, int master_nodeid, int nodeid)
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_history_table_data()");
 
+	DBbegin();
+
 	if ((table->flags & ZBX_HISTORY) && FAIL == get_history_lastid(master_nodeid, nodeid, table, &lastid))
 		return;
 	if ((table->flags & ZBX_HISTORY_TRENDS) && FAIL == get_trends_lastid(master_nodeid, nodeid, table, &lastid, &lastclock))
@@ -257,7 +259,6 @@ void	process_history_table_data(ZBX_TABLE *table, int master_nodeid, int nodeid)
 	DBfree_result(result);
 
 	data[data_offset] = '\0';
-/*zabbix_log(LOG_LEVEL_CRIT, "-----> DATA:\n%s\n", data );*/
 
 	if (1 == data_found && SUCCEED == send_to_node(table->table, master_nodeid, nodeid, data)) {
 		if (table->flags & ZBX_HISTORY_SYNC) {
@@ -268,6 +269,8 @@ void	process_history_table_data(ZBX_TABLE *table, int master_nodeid, int nodeid)
 				lastid);
 		}
 	}
+
+	DBcommit();
 
 	zbx_free(tmp);
 	zbx_free(data);

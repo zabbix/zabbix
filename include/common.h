@@ -429,13 +429,6 @@ typedef enum
 #define	ZBX_TYPE_UINT	5
 #define	ZBX_TYPE_ID	6
 
-/* Flags for node history exchange */
-#define	ZBX_TABLE_HISTORY	0
-#define	ZBX_TABLE_HISTORY_UINT	1
-#define	ZBX_TABLE_HISTORY_STR	2
-#define	ZBX_TABLE_HISTORY_LOG	3
-#define	ZBX_TABLE_HISTORY_TEXT	4
-
 /* HTTP item types */
 typedef enum
 {
