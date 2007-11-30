@@ -70,18 +70,20 @@
 			$trigger_list.=$rowz['triggerid'].',';
 		}
 
-		$trigger_list = '('.trim($trigger_list,',').')';
-		$sql_cond=($show_unknown == 0)?(' AND e.value<>'.TRIGGER_VALUE_UNKNOWN.' '):('');
-		
-		$sql = 'SELECT e.eventid, e.objectid as triggerid,e.clock,e.value '.
-				' FROM events e '.
-				' WHERE '.zbx_sql_mod('e.object',1000).'='.EVENT_OBJECT_TRIGGER.
-				  ' AND e.objectid IN '.$trigger_list.
-				  $sql_cond.
-				' ORDER BY e.eventid DESC';
-
-		$result = DBselect($sql,10*($start+$num));
-       
+		if(!empty($triggers)){
+			$trigger_list = '('.trim($trigger_list,',').')';
+			$sql_cond=($show_unknown == 0)?(' AND e.value<>'.TRIGGER_VALUE_UNKNOWN.' '):('');
+			
+			$sql = 'SELECT e.eventid, e.objectid as triggerid,e.clock,e.value '.
+					' FROM events e '.
+					' WHERE '.zbx_sql_mod('e.object',1000).'='.EVENT_OBJECT_TRIGGER.
+					  ' AND e.objectid IN '.$trigger_list.
+					  $sql_cond.
+					' ORDER BY e.eventid DESC';
+	
+			$result = DBselect($sql,10*($start+$num));
+		}
+		       
 		$table = new CTableInfo(S_NO_EVENTS_FOUND); 
 		$table->SetHeader(array(
 				S_TIME,
@@ -97,7 +99,7 @@
 		$col=0;
 		$skip = $start;
 
-		while(($row=DBfetch($result)) && ($col<$num)){
+		while(!empty($triggers) && ($col<$num) && ($row=DBfetch($result))){
 			
 			if($skip > 0){
 				if(($show_unknown == 0) && ($row['value'] == TRIGGER_VALUE_UNKNOWN)) continue;
