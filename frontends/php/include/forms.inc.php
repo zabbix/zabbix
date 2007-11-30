@@ -4870,116 +4870,151 @@ include_once 'include/discovery.inc.php';
 		$frmCnct->SetHelp("web.sysmap.connector.php");
 		$frmCnct->AddVar("sysmapid",$_REQUEST["sysmapid"]);
 
-		if(isset($_REQUEST["linkid"]))
-		{
+		if(isset($_REQUEST["linkid"]) && !isset($_REQUEST["form_refresh"])){
 			$frmCnct->AddVar("linkid",$_REQUEST["linkid"]);
-			$db_links = DBselect("SELECT * FROM sysmaps_links WHERE linkid=".$_REQUEST["linkid"]);
+			
+			$db_links = DBselect('SELECT * FROM sysmaps_links WHERE linkid='.$_REQUEST["linkid"]);
 			$db_link = DBfetch($db_links);
-		}
+			
 
-		if(isset($_REQUEST["linkid"]) && !isset($_REQUEST["form_refresh"]))
-		{
 			$selementid1	= $db_link["selementid1"];
 			$selementid2	= $db_link["selementid2"];
-			$triggerid	= $db_link["triggerid"];
+			$triggers		= array();
 			$drawtype_off	= $db_link["drawtype_off"];
-			$drawtype_on	= $db_link["drawtype_on"];
-			$color_off	= $db_link["color_off"];
-			$color_on	= $db_link["color_on"];
+			$color_off		= $db_link["color_off"];
 
-			if(is_null($triggerid)) $triggerid = 0;
+			$res = DBselect('SELECT * FROM sysmaps_link_triggers WHERE linkid='.$_REQUEST["linkid"]);
+			while($rows=DBfetch($res)){
+				$triggers[] = $rows;
+			}
 		}
-		else
-		{
+		else{
+			if(isset($_REQUEST['linkid'])) $frmCnct->AddVar("linkid",$_REQUEST["linkid"]);
 			$selementid1	= get_request("selementid1",	0);
 			$selementid2	= get_request("selementid2",	0);
-			$triggerid	= get_request("triggerid",	0);
+			$triggers		= get_request("triggers",	array());
 			$drawtype_off	= get_request("drawtype_off",	0);
-			$drawtype_on	= get_request("drawtype_on",	0);
-			$color_off	= get_request("color_off",	0);
-			$color_on	= get_request("color_on",	0);
+			$color_off		= get_request("color_off",	0);
 		}
 
 /* START comboboxes preparations */
 		$cmbElements1 = new CComboBox("selementid1",$selementid1);
 		$cmbElements2 = new CComboBox("selementid2",$selementid2);
-		$db_selements = DBselect("SELECT selementid,label,elementid,elementtype FROM sysmaps_elements".
-			" WHERE sysmapid=".$_REQUEST["sysmapid"]);
-		while($db_selement = DBfetch($db_selements))
-		{
+		
+		$db_selements = DBselect('SELECT selementid,label,elementid,elementtype '.
+							' FROM sysmaps_elements '.
+							' WHERE sysmapid='.$_REQUEST["sysmapid"]);
+		while($db_selement = DBfetch($db_selements)){
+		
 			$label = $db_selement["label"];
-			if($db_selement["elementtype"] == SYSMAP_ELEMENT_TYPE_HOST)
-			{
+			if($db_selement["elementtype"] == SYSMAP_ELEMENT_TYPE_HOST){
 				$db_host = get_host_by_hostid($db_selement["elementid"]);
 				$label .= ":".$db_host["host"];
 			}
-			elseif($db_selement["elementtype"] == SYSMAP_ELEMENT_TYPE_MAP)
-			{
+			else if($db_selement["elementtype"] == SYSMAP_ELEMENT_TYPE_MAP){
 				$db_map = get_sysmap_by_sysmapid($db_selement["elementid"]);
 				$label .= ":".$db_map["name"];
 			}
-			elseif($db_selement["elementtype"] == SYSMAP_ELEMENT_TYPE_TRIGGER)
-			{
-				if($db_selement["elementid"]>0)
-				{
+			else if($db_selement["elementtype"] == SYSMAP_ELEMENT_TYPE_TRIGGER){
+				if($db_selement["elementid"]>0){
 					$label .= ":".expand_trigger_description($db_selement["elementid"]);
 				}
 			}
-			elseif($db_selement["elementtype"] == SYSMAP_ELEMENT_TYPE_HOST_GROUP)
-			{
-				if($db_selement["elementid"]>0)
-				{
+			else if($db_selement["elementtype"] == SYSMAP_ELEMENT_TYPE_HOST_GROUP){
+				if($db_selement["elementid"]>0){
 					$db_group = DBfetch(DBselect('SELECT name FROM groups WHERE groupid='.$db_selement["elementid"]));
 					$label .= ":".$db_group['name'];
 				}
 			}
+			
 			$cmbElements1->AddItem($db_selement["selementid"],$label);
 			$cmbElements2->AddItem($db_selement["selementid"],$label);
 		}
 
 		$cmbType_off = new CComboBox("drawtype_off",$drawtype_off);
-		$cmbType_on = new CComboBox("drawtype_on",$drawtype_on);
-		foreach(map_link_drawtypes() as $i)
-		{
+
+		foreach(map_link_drawtypes() as $i){
 			$value = map_link_drawtype2str($i);
 			$cmbType_off->AddItem($i, $value);
-			$cmbType_on->AddItem($i, $value);
-		}
-
-		
+		}		
 		$cmbColor_off = new CComboBox("color_off",$color_off);
-		$cmbColor_on = new CComboBox("color_on",$color_on);
+
 		foreach(array('Black','Blue','Cyan','Dark Blue','Dark Green',
 			'Dark Red','Dark Yellow','Green','Red','White','Yellow') as $value)
 		{
 			$cmbColor_off->AddItem($value, $value);
-			$cmbColor_on->AddItem($value, $value);
 		}
 /* END preparation */
 
 		$frmCnct->AddRow("Element 1",$cmbElements1);
 		$frmCnct->AddRow("Element 2",$cmbElements2);
 
-		$frmCnct->AddVar('triggerid',$triggerid);
-
-		if($triggerid > 0)
-			$trigger = expand_trigger_description($triggerid);
-		else
-			$trigger = "";
-
-		$txtTrigger = new CTextBox('trigger',$trigger,60,'yes');
-
-		$btnSelect = new CButton('btn1',S_SELECT,
-			"return PopUp('popup.php?dstfrm=".$frmCnct->GetName().
-			"&dstfld1=triggerid&dstfld2=trigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description');",
+//trigger links
+		foreach($triggers as $id => $trigger){
+			if(isset($trigger['triggerid']))
+				$triggers[$id]['description'] = expand_trigger_description($trigger['triggerid']);
+		}
+		
+		$table = new CTable();
+		
+		$table->SetClass('tableinfo');
+		$table->oddRowClass = 'even_row';
+		$table->evenRowClass = 'even_row';
+		$table->options['cellpadding'] = 3;
+		$table->options['cellspacing'] = 1;
+		$table->headerClass = 'header';
+		$table->footerClass = 'footer';
+		
+		$table->SetHeader(array(
+			new CCheckBox("all_triggers",null,"CheckAll('".$frmCnct->GetName()."','all_triggers','triggers');"),
+			S_TRIGGERS,
+			S_TYPE,
+			S_COLOR));
+	
+		$table->AddOption('id','link_triggers');
+	
+		foreach($triggers as $id => $trigger){
+			if(!isset($trigger['triggerid'])) continue;
+			
+			$colorbox = new CSpan(SPACE.SPACE.SPACE);
+			$colorbox->AddOption('style','text-decoration: none; outline-color: black; outline-style: solid; outline-width: 1px; background-color:'.$trigger['color'].';');
+		
+			$table->AddRow(array(
+					array(
+						new CCheckBox('triggers['.$trigger['triggerid'].'][triggerid]',null,null,$trigger['triggerid']),
+						new CVar('triggers['.$trigger['triggerid'].'][triggerid]', $trigger['triggerid'])
+						),
+					array(
+						new CLink($trigger['description'],"javascript: openWinCentered('popup_link_tr.php?form=1&dstfrm=".$frmCnct->GetName()."&triggerid=".$trigger['triggerid'].url_param('linkid')."','ZBX_Link_Indicator',560,180,'scrollbars=1, toolbar=0, menubar=0, resizable=0');"),
+						new CVar('triggers['.$trigger['triggerid'].'][description]', $trigger['description'])
+						),
+					array(
+						map_link_drawtype2str($trigger['drawtype']),
+						new CVar('triggers['.$trigger['triggerid'].'][drawtype]', $trigger['drawtype'])
+						),
+					array(
+						$colorbox,
+						new CVar('triggers['.$trigger['triggerid'].'][color]', $trigger['color'])
+						)
+					));
+		}
+	
+		$btnAdd = new CButton('btn1',S_ADD,
+			"javascript: openWinCentered('popup_link_tr.php?form=1&dstfrm=".$frmCnct->GetName().url_param('linkid')."','ZBX_Link_Indicator',560,180,'scrollbars=1, toolbar=0, menubar=0, resizable=0');",
 			'T');
-		$frmCnct->AddRow("Link status indicator",array($txtTrigger, $btnSelect));
+		$btnRemove = new CButton('btn1',
+			S_REMOVE,
+			"javascript: remove_childs('".$frmCnct->GetName()."','triggers','tr');",
+			'T');
 
-		$frmCnct->AddRow("Type (OFF)",$cmbType_off);
-		$frmCnct->AddRow("Color (OFF)",$cmbColor_off);
+		$btnAdd->SetType('button');
+		
+		$frmCnct->AddRow(S_LINK_STATUS_INDICATORS,array($table, BR, $btnAdd, $btnRemove));
 
-		$frmCnct->AddRow("Type (ON)",$cmbType_on);
-		$frmCnct->AddRow("Color (ON)",$cmbColor_on);
+//----------
+
+		$frmCnct->AddRow(S_TYPE.' ('.S_OFF.')',$cmbType_off);
+		$frmCnct->AddRow(S_COLOR.' ('.S_OFF.')',$cmbColor_off);
 
 		$frmCnct->AddItemToBottomRow(new CButton("save_link",S_SAVE));
 		if(isset($_REQUEST["linkid"]))

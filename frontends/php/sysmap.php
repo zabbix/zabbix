@@ -50,11 +50,9 @@ include_once "include/page_header.php";
 		"linkid"=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,NULL),
 		"selementid1"=>	array(T_ZBX_INT, O_OPT,  NULL, DB_ID.'{}!={selementid2}','isset({save_link})'),
 		"selementid2"=> array(T_ZBX_INT, O_OPT,  NULL, DB_ID.'{}!={selementid1}','isset({save_link})'),
-		"triggerid"=>	array(T_ZBX_INT, O_OPT,  NULL, DB_ID,'isset({save_link})'),
+		"triggers"=>	array(T_ZBX_STR, O_OPT,  NULL, null,'isset({save_link})'),
 		"drawtype_off"=>array(T_ZBX_INT, O_OPT,  NULL, IN("0,1,2,3,4"),'isset({save_link})'),
-		"drawtype_on"=>	array(T_ZBX_INT, O_OPT,  NULL, IN("0,1,2,3,4"),'isset({save_link})'),
 		"color_off"=>	array(T_ZBX_STR, O_OPT,  NULL, NOT_EMPTY,'isset({save_link})'),
-		"color_on"=>	array(T_ZBX_STR, O_OPT,  NULL, NOT_EMPTY,'isset({save_link})'),
 
 /* actions */
 		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -75,10 +73,9 @@ include_once "include/page_header.php";
 	$sysmap = DBfetch(DBselect("select * from sysmaps where sysmapid=".$_REQUEST["sysmapid"]));
 ?>
 <?php
-	if(isset($_REQUEST["save"]))
-	{
-		if(isset($_REQUEST["selementid"]))
-		{ // update element
+	if(isset($_REQUEST["save"])){
+
+		if(isset($_REQUEST["selementid"])){ // update element
 			$result=update_sysmap_element($_REQUEST["selementid"],
 				$_REQUEST["sysmapid"],$_REQUEST["elementid"],$_REQUEST["elementtype"],
 				$_REQUEST["label"],$_REQUEST["x"],$_REQUEST["y"],
@@ -88,8 +85,8 @@ include_once "include/page_header.php";
 			
 			show_messages($result,"Element updated","Cannot update element");
 		}
-		else
-		{ // add element
+		else{ // add element
+		
 			$result=add_element_to_sysmap($_REQUEST["sysmapid"],$_REQUEST["elementid"],
 				$_REQUEST["elementtype"],$_REQUEST["label"],$_REQUEST["x"],$_REQUEST["y"],
 				$_REQUEST["iconid_off"],$_REQUEST["iconid_unknown"],$_REQUEST["iconid_on"],
@@ -101,23 +98,19 @@ include_once "include/page_header.php";
 		add_audit_if($result,AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP,'Name ['.$sysmap['name'].'] Element ['.$selementid.'] updated ');
 		if($result)	unset($_REQUEST["form"]);
 	}
-	if(isset($_REQUEST["save_link"]))
-	{
-		if(isset($_REQUEST["linkid"]))
-		{ // update link
+	
+	if(isset($_REQUEST["save_link"])){
+		if(isset($_REQUEST["linkid"])){ // update link
 			$result=update_link($_REQUEST["linkid"],
 				$_REQUEST["sysmapid"],$_REQUEST["selementid1"],$_REQUEST["selementid2"],
-				$_REQUEST["triggerid"],	$_REQUEST["drawtype_off"],$_REQUEST["color_off"],
-				$_REQUEST["drawtype_on"],$_REQUEST["color_on"]);
+				get_request("triggers",array()), $_REQUEST["drawtype_off"],$_REQUEST["color_off"]);
 			$linkid = $_REQUEST["linkid"];
 
 			show_messages($result,"Link updated","Cannot update link");
 		}
-		else
-		{ // add link
+		else{ // add link
 			$result=add_link($_REQUEST["sysmapid"],$_REQUEST["selementid1"],$_REQUEST["selementid2"],
-				$_REQUEST["triggerid"],	$_REQUEST["drawtype_off"],$_REQUEST["color_off"],
-				$_REQUEST["drawtype_on"],$_REQUEST["color_on"]);
+				get_request("triggers",array()),	$_REQUEST["drawtype_off"],$_REQUEST["color_off"]);
 			$linkid = $result;
 
 			show_messages($result,"Link added","Cannot add link");
@@ -125,10 +118,9 @@ include_once "include/page_header.php";
 		add_audit_if($result,AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP,'Name ['.$sysmap['name'].'] Link ['.$linkid.'] updated ');
 		if($result)	unset($_REQUEST["form"]);
 	}
-	elseif(isset($_REQUEST["delete"]))
-	{
-		if(isset($_REQUEST["linkid"]))
-		{
+	elseif(isset($_REQUEST["delete"])){
+		
+		if(isset($_REQUEST["linkid"])){
 			$result=delete_link($_REQUEST["linkid"]);
 			show_messages($result,"Link deleted","Cannot delete link");
 			add_audit_if($result,AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP,
@@ -165,7 +157,7 @@ include_once "include/page_header.php";
 		echo BR;
 		insert_map_element_form();
 	}
-	elseif(isset($_REQUEST["form"]) && ($_REQUEST["form"]=="add_link" || 
+	else if(isset($_REQUEST["form"]) && ($_REQUEST["form"]=="add_link" || 
 		($_REQUEST["form"]=="update" && isset($_REQUEST["linkid"]))))
 	{
 		$row = DBfetch(DBselect("select count(*) as count from sysmaps_elements where sysmapid=".$_REQUEST["sysmapid"]));
@@ -180,8 +172,7 @@ include_once "include/page_header.php";
 			info("No elements in this map");
 		}
 	}
-	else
-	{
+	else{
 		show_table_header("DISPLAYED ELEMENTS", new CButton("form","Add element",
 			"return Redirect('".$page["file"]."?form=add_element".url_param("sysmapid")."');"));
 
@@ -224,10 +215,9 @@ include_once "include/page_header.php";
 		$table->SetHeader(array(S_LINK,S_ELEMENT_1,S_ELEMENT_2,S_LINK_STATUS_INDICATOR));
 
 		$i = 1;
-		$result=DBselect("select linkid,selementid1,selementid2,triggerid from sysmaps_links".
+		$result=DBselect("select linkid,selementid1,selementid2 from sysmaps_links".
 			" where sysmapid=".$_REQUEST["sysmapid"]." order by linkid");
-		while($row=DBfetch($result))
-		{
+		while($row=DBfetch($result)){
 	/* prepare label 1 */
 			$result1=DBselect("select label from sysmaps_elements".
 				" where selementid=".$row["selementid1"]);
@@ -239,11 +229,21 @@ include_once "include/page_header.php";
 				" where selementid=".$row["selementid2"]);
 			$row1=DBfetch($result1);
 			$label2=$row1["label"];
-
+			
 	/* prepare description */
-			if(isset($row["triggerid"]))
-				$description=expand_trigger_description($row["triggerid"]);
-			else
+	
+			$triggers = get_link_triggers($row['linkid']);
+			$description='';
+
+			foreach($triggers as $id => $trigger){
+				if(isset($trigger['triggerid'])){
+					if(!empty($description)) $description.=BR;
+					$triggers[$id]['description'] = expand_trigger_description($trigger['triggerid']);
+				}
+				$description.= $triggers[$id]['description'];
+			}
+			
+			if(empty($description))
 				$description="-";
 
 	/* draw row */

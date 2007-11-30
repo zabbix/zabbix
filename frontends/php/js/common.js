@@ -220,60 +220,7 @@ function CheckAll(form_name, chkMain, shkName){
 	}
 }
 
-function GetSelectedText(obj)
-{
-	if (navigator.appName == "Microsoft Internet Explorer")
-	{
-		obj.focus();
-		return document.selection.createRange().text;
-	}
-	else (obj.selectionStart)
-	{
-		if(obj.selectionStart != obj.selectionEnd) {
-			var s = obj.selectionStart;
-			var e = obj.selectionEnd;
-			return obj.value.substring(s, e);
-		}
-	}
-	return obj.value;
-}
 
-function ScaleChartToParenElement(obj_name)
-{
-	var obj = document.getElementsByName(obj_name);
-
-	if(obj.length <= 0) throw "Can't find objects with name [" + obj_name +"]";
-
-	for(i = obj.length-1; i>=0; i--)
-	{
-		obj[i].src += "&width=" + (obj[i].parentNode.offsetWidth - obj[i].parentNode.offsetLeft - 10);
-	}
-}
-
-function insert_sizeable_graph(graph_id,url){
-	if(isset(ZBX_G_WIDTH)) url += "&amp;width="+ZBX_G_WIDTH;
-
-	document.write('<img id="'+graph_id+'" src="'+url+'" alt="graph" /><br /><br />');
-}
-
-function resizeiframe(id){
-	id = id || 'iframe';
-	var iframe = document.getElementById(id);
-	var indoc = (IE)?iframe.contentWindow.document:iframe.contentDocument;
-	if(typeof(indoc) == 'undefined') return;
-	var height = parseInt(indoc.getElementsByTagName('body')[0].scrollHeight);
-	var height2 = parseInt(indoc.getElementsByTagName('body')[0].offsetHeight);
-	
-	if(height2 > height){
-		height = height2;
-	}
-
-	iframe.style.height = (height)+'px';
-	
-	if(!is_null($('scroll')) && showgraphmenu){
-		showgraphmenu('iframe');
-	}
-}
 
 function openWinCentered(loc, winname, iwidth, iheight, params){
 		tp=Math.ceil((screen.height-iheight)/2);
@@ -312,4 +259,94 @@ function cancelEvent(event){
 		event.preventDefault();
 	}
 return false;
+}
+
+
+/************************************************************************************/
+/*										 Pages stuff								*/
+/************************************************************************************/
+
+function GetSelectedText(obj)
+{
+	if (navigator.appName == "Microsoft Internet Explorer")
+	{
+		obj.focus();
+		return document.selection.createRange().text;
+	}
+	else (obj.selectionStart)
+	{
+		if(obj.selectionStart != obj.selectionEnd) {
+			var s = obj.selectionStart;
+			var e = obj.selectionEnd;
+			return obj.value.substring(s, e);
+		}
+	}
+	return obj.value;
+}
+
+function ScaleChartToParenElement(obj_name)
+{
+	var obj = document.getElementsByName(obj_name);
+
+	if(obj.length <= 0) throw "Can't find objects with name [" + obj_name +"]";
+
+	for(i = obj.length-1; i>=0; i--)
+	{
+		obj[i].src += "&width=" + (obj[i].parentNode.offsetWidth - obj[i].parentNode.offsetLeft - 10);
+	}
+}
+
+function insert_sizeable_graph(graph_id,url){
+	if(isset(ZBX_G_WIDTH)) url += "&amp;width="+ZBX_G_WIDTH;
+
+	document.write('<img id="'+graph_id+'" src="'+url+'" alt="graph" /><br /><br />');
+}
+
+function remove_childs(form_name,rmvbyname,tag){
+	tag = tag.toUpperCase();
+	var frmForm = document.forms[form_name];
+	for (var i=0; i < frmForm.length; i++){
+		if(frmForm.elements[i].type != 'checkbox') continue;
+		if(frmForm.elements[i].disabled == true) continue;
+		if(frmForm.elements[i].checked != true) continue;
+		
+		var splt = frmForm.elements[i].name.split('[');
+		var name = splt[0];
+		var serviceid = splt[1];
+
+		if(rmvbyname && rmvbyname != name) continue;
+//		if(frmForm.elements[i].name != rmvbyname+'['+serviceid+'[serviceid]') continue;
+
+		remove_element(frmForm.elements[i],tag);
+		i--;
+	}
+}
+
+function remove_element(elmnt,tag){
+	if(elmnt.nodeName == tag){
+		elmnt.parentNode.removeChild(elmnt);
+	} else if(elmnt.nodeType == 9){
+		return;
+	} else {
+		remove_element(elmnt.parentNode,tag);
+	}
+}
+
+function resizeiframe(id){
+	id = id || 'iframe';
+	var iframe = document.getElementById(id);
+	var indoc = (IE)?iframe.contentWindow.document:iframe.contentDocument;
+	if(typeof(indoc) == 'undefined') return;
+	var height = parseInt(indoc.getElementsByTagName('body')[0].scrollHeight);
+	var height2 = parseInt(indoc.getElementsByTagName('body')[0].offsetHeight);
+	
+	if(height2 > height){
+		height = height2;
+	}
+
+	iframe.style.height = (height)+'px';
+	
+	if(!is_null($('scroll')) && showgraphmenu){
+		showgraphmenu('iframe');
+	}
 }

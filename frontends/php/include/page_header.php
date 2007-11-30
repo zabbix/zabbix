@@ -162,7 +162,7 @@ COpt::profiling_start("page");
 						),
 					array("url"=>"actionconf.php"	,"label"=>S_ACTIONS),
 					array("url"=>"sysmaps.php"	,"label"=>S_MAPS,
-						"sub_pages"=>array("sysmap.php")
+						"sub_pages"=>array("sysmap.php","popup_link_tr.php")
 						),
 					array("url"=>"graphs.php"	,"label"=>S_GRAPHS,
 						"sub_pages"=>array("popup_gitem.php")
