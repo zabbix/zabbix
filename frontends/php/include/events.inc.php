@@ -57,11 +57,12 @@
 	
 //---
 		$trigger_list = '';
-		$sql = 'SELECT DISTINCT t.triggerid,t.priority,t.description,t.expression,h.host,t.type '.
+		$sql = 'SELECT DISTINCT t.triggerid,t.priority,t.description,t.expression,h.host '.
 			' FROM triggers t, functions f, items i, hosts h '.$sql_from.
 			' WHERE '.DBin_node('t.triggerid').
 				' AND t.triggerid=f.triggerid and f.itemid=i.itemid '.
-				' AND i.hostid=h.hostid '.$sql_cond.' and h.status='.HOST_STATUS_MONITORED;
+				' AND i.hostid=h.hostid '.$sql_cond.
+				' AND h.status='.HOST_STATUS_MONITORED;
 							
 		$rez = DBselect($sql);
 		while($rowz = DBfetch($rez)){
