@@ -1,5 +1,6 @@
 Changes for 1.5:
 
+ - [DEV-52] added "Unlimited number of link styles for maps" (Artem)
  - [DEV-86] DM: Synchronizing all history data with master node (Sasha)
  - bulk acknowledge with empty comment (Sasha)
  - performance improvement of processing events in frontend (Artem)

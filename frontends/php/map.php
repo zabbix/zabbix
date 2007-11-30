@@ -139,16 +139,23 @@ include_once "include/page_header.php";
 		$drawtype = $link["drawtype_off"];
 		$color = $colors[$link["color_off"]];
 
-		if(!is_null($link["triggerid"]))
-		{
-			$trigger=get_trigger_by_triggerid($link["triggerid"]);
-//			if($trigger["value"] == TRIGGER_VALUE_TRUE)
-			if($trigger["status"] == TRIGGER_STATUS_ENABLED && $trigger["value"] == TRIGGER_VALUE_TRUE)
-			{
-				$drawtype = $link["drawtype_on"];
-				$color = $colors[$link["color_on"]];
+		$triggers = get_link_triggers($link['linkid']);
+		
+		
+		if(!empty($triggers)){
+			$max_severity=0;
+			foreach($triggers as $id => $link_trigger){
+				$triggers[$id]=array_merge($link_trigger,get_trigger_by_triggerid($link_trigger["triggerid"]));
+				if($triggers[$id]["status"] == TRIGGER_STATUS_ENABLED && $triggers[$id]["value"] == TRIGGER_VALUE_TRUE){
+					if(($triggers[$id]['severity'] >= $max_severity)){
+						$drawtype = $triggers[$id]["drawtype"];
+						$color = $colors[$triggers[$id]['color']];
+						$max_severity=$triggers[$id]['severity'];
+					}
+				}
 			}
 		}
+
 		MyDrawLine($im,$x1,$y1,$x2,$y2,$color,$drawtype);
 	}
 
