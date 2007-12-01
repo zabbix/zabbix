@@ -110,7 +110,7 @@ int	daemon_start(int allow_root)
 				strerror(errno));
 			exit(FAIL);
 		}
-#ifdef HAVE_FUNCTION_SETEUID
+#ifdef HAVE_FUNCTION_INITGROUPS
 		if(initgroups(user, pwd->pw_gid) == -1) 
 		{
 			zbx_error("Cannot initgroups to %s [%s].",
