@@ -582,11 +582,15 @@ FIELD		|linkid		|t_id		|'0'	|NOT NULL	|0
 FIELD		|sysmapid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|selementid1	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|selementid2	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|drawtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|color		|t_varchar(32)	|'Black'|NOT NULL	|ZBX_SYNC
+
+TABLE|sysmaps_link_triggers|linkid|ZBX_SYNC
+FIELD		|linkid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|triggerid	|t_id		|	|		|ZBX_SYNC
-FIELD		|drawtype_off	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|color_off	|t_varchar(32)	|'Black'|NOT NULL	|ZBX_SYNC
-FIELD		|drawtype_on	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|color_on	|t_varchar(32)	|'Red'	|NOT NULL	|ZBX_SYNC
+FIELD		|drawtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|color		|t_varchar(32)	|'Black'|NOT NULL	|ZBX_SYNC
+INDEX		|1		|linkid
 
 TABLE|sysmaps_elements|selementid|ZBX_SYNC
 FIELD		|selementid	|t_id		|'0'	|NOT NULL	|0
