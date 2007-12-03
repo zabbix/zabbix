@@ -60,8 +60,7 @@ function script_make_command($scriptid,$hostid)
 }
 
 function execute_script($scriptid,$hostid){
-	$res = array();
-	$res["flag"]=1;
+	$res = 1;
 
 	$command = script_make_command($scriptid,$hostid);
 	$nodeid = id2nodeid($hostid);
@@ -70,7 +69,7 @@ function execute_script($scriptid,$hostid){
 
 	if(!$socket)
 	{
-		$res["flag"] = 1;
+		$res = 0;
 	}
 	if($res)
 	{
@@ -92,14 +91,14 @@ function execute_script($scriptid,$hostid){
 		$message["flag"]=$flag;
 		$message["message"]=$msg;
 	}
-	if($res)
-	{
-		@socket_close($socket);
-	}
 	else
 	{
 		$message["flag"]=-1;
 		$message["message"] = S_CONNECT_TO_SERVER_ERROR.' ['.$ZBX_SERVER.':'.$ZBX_SERVER_PORT.'] ['.socket_strerror(socket_last_error()).']';
+	}
+	if($socket)
+	{
+		@socket_close($socket);
 	}
 return $message;
 }

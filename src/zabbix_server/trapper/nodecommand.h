@@ -21,6 +21,6 @@
 #ifndef ZABBIX_NODECOMMAND_H
 #define ZABBIX_NODECOMMAND_H
 
-int	node_process_command(const char *data, char **result);
+int	node_process_command(zbx_sock_t *sock, const char *data);
 
 #endif
