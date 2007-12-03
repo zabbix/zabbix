@@ -51,8 +51,8 @@ include_once "include/page_header.php";
 		"selementid1"=>	array(T_ZBX_INT, O_OPT,  NULL, DB_ID.'{}!={selementid2}','isset({save_link})'),
 		"selementid2"=> array(T_ZBX_INT, O_OPT,  NULL, DB_ID.'{}!={selementid1}','isset({save_link})'),
 		"triggers"=>	array(T_ZBX_STR, O_OPT,  NULL, null,'isset({save_link})'),
-		"drawtype_off"=>array(T_ZBX_INT, O_OPT,  NULL, IN("0,1,2,3,4"),'isset({save_link})'),
-		"color_off"=>	array(T_ZBX_STR, O_OPT,  NULL, NOT_EMPTY,'isset({save_link})'),
+		"drawtype"=>array(T_ZBX_INT, O_OPT,  NULL, IN("0,1,2,3,4"),'isset({save_link})'),
+		"color"=>	array(T_ZBX_STR, O_OPT,  NULL, NOT_EMPTY,'isset({save_link})'),
 
 /* actions */
 		"save"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
@@ -103,14 +103,14 @@ include_once "include/page_header.php";
 		if(isset($_REQUEST["linkid"])){ // update link
 			$result=update_link($_REQUEST["linkid"],
 				$_REQUEST["sysmapid"],$_REQUEST["selementid1"],$_REQUEST["selementid2"],
-				get_request("triggers",array()), $_REQUEST["drawtype_off"],$_REQUEST["color_off"]);
+				get_request("triggers",array()), $_REQUEST["drawtype"],$_REQUEST["color"]);
 			$linkid = $_REQUEST["linkid"];
 
 			show_messages($result,"Link updated","Cannot update link");
 		}
 		else{ // add link
 			$result=add_link($_REQUEST["sysmapid"],$_REQUEST["selementid1"],$_REQUEST["selementid2"],
-				get_request("triggers",array()),	$_REQUEST["drawtype_off"],$_REQUEST["color_off"]);
+				get_request("triggers",array()),	$_REQUEST["drawtype"],$_REQUEST["color"]);
 			$linkid = $result;
 
 			show_messages($result,"Link added","Cannot add link");
@@ -139,8 +139,7 @@ include_once "include/page_header.php";
 			add_audit_if($result,AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_MAP,
 				'Name ['.$sysmap['name'].'] Element ['.$_REQUEST["selementid"].'] deleteed ');
 
-			if($result)
-			{
+			if($result){
 				unset($_REQUEST["selementid"]);
 				unset($_REQUEST["form"]);
 			}

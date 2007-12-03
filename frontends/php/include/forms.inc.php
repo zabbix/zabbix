@@ -4880,8 +4880,8 @@ include_once 'include/discovery.inc.php';
 			$selementid1	= $db_link["selementid1"];
 			$selementid2	= $db_link["selementid2"];
 			$triggers		= array();
-			$drawtype_off	= $db_link["drawtype_off"];
-			$color_off		= $db_link["color_off"];
+			$drawtype		= $db_link["drawtype"];
+			$color			= $db_link["color"];
 
 			$res = DBselect('SELECT * FROM sysmaps_link_triggers WHERE linkid='.$_REQUEST["linkid"]);
 			while($rows=DBfetch($res)){
@@ -4893,8 +4893,8 @@ include_once 'include/discovery.inc.php';
 			$selementid1	= get_request("selementid1",	0);
 			$selementid2	= get_request("selementid2",	0);
 			$triggers		= get_request("triggers",	array());
-			$drawtype_off	= get_request("drawtype_off",	0);
-			$color_off		= get_request("color_off",	0);
+			$drawtype		= get_request("drawtype",	0);
+			$color			= get_request("color",	0);
 		}
 
 /* START comboboxes preparations */
@@ -4931,18 +4931,18 @@ include_once 'include/discovery.inc.php';
 			$cmbElements2->AddItem($db_selement["selementid"],$label);
 		}
 
-		$cmbType_off = new CComboBox("drawtype_off",$drawtype_off);
+		$cmbType = new CComboBox("drawtype",$drawtype);
 
 		foreach(map_link_drawtypes() as $i){
 			$value = map_link_drawtype2str($i);
-			$cmbType_off->AddItem($i, $value);
+			$cmbType->AddItem($i, $value);
 		}		
-		$cmbColor_off = new CComboBox("color_off",$color_off);
+		$cmbColor = new CComboBox("color",$color);
 
 		foreach(array('Black','Blue','Cyan','Dark Blue','Dark Green',
 			'Dark Red','Dark Yellow','Green','Red','White','Yellow') as $value)
 		{
-			$cmbColor_off->AddItem($value, $value);
+			$cmbColor->AddItem($value, $value);
 		}
 /* END preparation */
 
@@ -5013,8 +5013,8 @@ include_once 'include/discovery.inc.php';
 
 //----------
 
-		$frmCnct->AddRow(S_TYPE.' ('.S_OFF.')',$cmbType_off);
-		$frmCnct->AddRow(S_COLOR.' ('.S_OFF.')',$cmbColor_off);
+		$frmCnct->AddRow(S_TYPE.' ('.S_OFF.')',$cmbType);
+		$frmCnct->AddRow(S_COLOR.' ('.S_OFF.')',$cmbColor);
 
 		$frmCnct->AddItemToBottomRow(new CButton("save_link",S_SAVE));
 		if(isset($_REQUEST["linkid"]))

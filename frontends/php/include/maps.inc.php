@@ -203,7 +203,7 @@
 		return $sysmapid;
 	}
 
-	function	add_link($sysmapid,$selementid1,$selementid2,$triggers,$drawtype_off,$color_off){
+	function	add_link($sysmapid,$selementid1,$selementid2,$triggers,$drawtype,$color){
 		$linkid=get_dbid("sysmaps_links","linkid");
 		
 		$result=TRUE;
@@ -216,8 +216,8 @@
 		}
 
 		$result&=DBexecute("insert into sysmaps_links".
-			" (linkid,sysmapid,selementid1,selementid2,drawtype_off,color_off)".
-			" values ($linkid,$sysmapid,$selementid1,$selementid2,$drawtype_off,".zbx_dbstr($color_off).")");
+			" (linkid,sysmapid,selementid1,selementid2,drawtype,color)".
+			" values ($linkid,$sysmapid,$selementid1,$selementid2,$drawtype,".zbx_dbstr($color).")");
 
 		if(!$result)
 			return $result;
@@ -225,7 +225,7 @@
 	return $linkid;
 	}
 
-	function	update_link($linkid,$sysmapid,$selementid1,$selementid2,$triggers,$drawtype_off,$color_off){
+	function	update_link($linkid,$sysmapid,$selementid1,$selementid2,$triggers,$drawtype,$color){
 		
 		$result=TRUE;
 		foreach($triggers as $id => $trigger){
@@ -238,7 +238,7 @@
 		
 		$result&=DBexecute('UPDATE sysmaps_links SET '.
 							" sysmapid=$sysmapid,selementid1=$selementid1,selementid2=$selementid2,".
-							" drawtype_off=$drawtype_off,color_off=".zbx_dbstr($color_off).
+							" drawtype=$drawtype,color=".zbx_dbstr($color).
 						" WHERE linkid=$linkid");
 	return	$result;
 	}
