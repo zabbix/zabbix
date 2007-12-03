@@ -226,16 +226,16 @@ int	get_next_point_to_node(int current_nodeid, int slave_nodeid, int *nodeid)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	node_process_command(const char *data, char **result)
+int	node_process_command(zbx_sock_t *sock, const char *data)
 {
 	const char	*r;
-	char		*tmp = NULL;
+	char		*tmp = NULL, *result = NULL;
 	int		tmp_allocated = 64, result_allocated = 1024;
 	int		datalen;
 	int		nodeid, next_nodeid;
 	int		result_offset = 0;
 
-	*result = zbx_malloc(*result, result_allocated);
+	result = zbx_malloc(result, result_allocated);
 	tmp = zbx_malloc(tmp, tmp_allocated);
 	datalen = strlen(data);
 
@@ -253,25 +253,32 @@ int	node_process_command(const char *data, char **result)
 			CONFIG_NODEID,
 			tmp);
 
-		execute_script(tmp, result, &result_allocated);
+		execute_script(tmp, &result, &result_allocated);
 	} else if (SUCCEED == get_next_point_to_node(CONFIG_NODEID, nodeid, &next_nodeid)) {
-		zabbix_log( LOG_LEVEL_WARNING, "NODE %d: Sending command \"%s\" for nodeid %d"
+		zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Sending command \"%s\" for nodeid %d"
 			"to node %d",
 			CONFIG_NODEID,
 			tmp,
 			nodeid,
 			next_nodeid);
 
-		send_script(next_nodeid, data, result, &result_allocated);
+		send_script(next_nodeid, data, &result, &result_allocated);
 	} else {
-		zbx_snprintf_alloc(result, &result_allocated, &result_offset, 128,
+		zbx_snprintf_alloc(&result, &result_allocated, &result_offset, 128,
 			"%d%cNODE %d: Node [%d] is unknown",
 			FAIL,
 			ZBX_DM_DELIMITER,
 			CONFIG_NODEID,
 			nodeid);
 	}
+
+	if (zbx_tcp_send_raw(sock, result) != SUCCEED) {
+		zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Error sending result of command to node %d",
+			CONFIG_NODEID,
+			nodeid);
+	}
 	zbx_free(tmp);
+	zbx_free(result);
 
 	return SUCCEED;
 }
