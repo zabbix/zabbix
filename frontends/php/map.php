@@ -136,8 +136,8 @@ include_once "include/page_header.php";
 		list($x1, $y1) = get_icon_center_by_selementid($link["selementid1"]);
 		list($x2, $y2) = get_icon_center_by_selementid($link["selementid2"]);
 
-		$drawtype = $link["drawtype_off"];
-		$color = $colors[$link["color_off"]];
+		$drawtype = $link["drawtype"];
+		$color = $colors[$link["color"]];
 
 		$triggers = get_link_triggers($link['linkid']);
 		
@@ -147,15 +147,14 @@ include_once "include/page_header.php";
 			foreach($triggers as $id => $link_trigger){
 				$triggers[$id]=array_merge($link_trigger,get_trigger_by_triggerid($link_trigger["triggerid"]));
 				if($triggers[$id]["status"] == TRIGGER_STATUS_ENABLED && $triggers[$id]["value"] == TRIGGER_VALUE_TRUE){
-					if(($triggers[$id]['severity'] >= $max_severity)){
-						$drawtype = $triggers[$id]["drawtype"];
+					if($triggers[$id]['severity'] >= $max_severity){
+						$drawtype = $triggers[$id]['drawtype'];
 						$color = $colors[$triggers[$id]['color']];
 						$max_severity=$triggers[$id]['severity'];
 					}
 				}
 			}
 		}
-
 		MyDrawLine($im,$x1,$y1,$x2,$y2,$color,$drawtype);
 	}
 
