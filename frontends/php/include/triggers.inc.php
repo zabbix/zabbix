@@ -2395,7 +2395,7 @@
 			$sql = 'SELECT e.eventid, e.value'.
 					' FROM events e '.
 					' WHERE e.eventid='.$eventid.
-					' AND e.acknowledged=0';
+						' AND e.acknowledged=0';
 
 			$res_events = DBSelect($sql,1);
 			if(!$e_row=DBfetch($res_events)){

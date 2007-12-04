@@ -448,6 +448,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 			if(!$row = get_row_for_nofalseforb($row,$event_sql)){
 				continue;
 			}
+//SDI($row);
 		}
 		$elements=array();
 
@@ -526,9 +527,10 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 
 		$event_limit=0;
 		$res_events = DBSelect($event_sql,$config['event_show_max']*100);
-
 		while($row_event=DBfetch($res_events)){
 			if(($show_events == EVENTS_OPTION_NOFALSEFORB) && ($row_event['value'] == TRIGGER_VALUE_FALSE)){
+			
+//SDI(array($row_event['triggerid'],$row_event['eventid'],event_initial_time($row_event)));
 				if(!event_initial_time($row_event)){
 					continue;
 				}
