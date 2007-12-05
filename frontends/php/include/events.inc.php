@@ -309,25 +309,19 @@ function get_latest_events($row,$show_unknown=0){
 			' WHERE e.objectid='.$row['triggerid'].
 				' AND e.eventid < '.$row['eventid'].
 				' AND e.object='.EVENT_OBJECT_TRIGGER.
-//				' AND '.zbx_sql_mod('e.object',1000).'='.EVENT_OBJECT_TRIGGER.   
 				' AND e.value='.TRIGGER_VALUE_FALSE.
 			' ORDER BY e.object DESC, e.objectid DESC, e.eventid DESC';
-//			' ORDER BY e.eventid DESC';
-
-
-	if($rez = DBfetch(DBselect($sql,1))) $eventz[] = $rez['eventid'];
+	if($rez = DBfetch(DBselect($sql,1))) $eventz[$rez['value']] = $rez['eventid'];
 	
 	$sql = 'SELECT e.eventid, e.value '.
 			' FROM events e'.
 			' WHERE e.objectid='.$row['triggerid'].
 				' AND e.eventid < '.$row['eventid'].
 				' AND e.object='.EVENT_OBJECT_TRIGGER.
-//				' AND '.zbx_sql_mod('e.object',1000).'='.EVENT_OBJECT_TRIGGER.   
 				' AND e.value='.TRIGGER_VALUE_TRUE.
 			' ORDER BY e.object DESC, e.objectid DESC, e.eventid DESC';
-//			' ORDER BY e.eventid DESC';
 
-	if($rez = DBfetch(DBselect($sql,1))) $eventz[] = $rez['eventid'];
+	if($rez = DBfetch(DBselect($sql,1))) $eventz[$rez['value']] = $rez['eventid'];
 
 	if($show_unknown != 0){
 		$sql = 'SELECT e.eventid, e.value '.
@@ -335,11 +329,9 @@ function get_latest_events($row,$show_unknown=0){
 				' WHERE e.objectid='.$row['triggerid'].
 					' AND e.eventid < '.$row['eventid'].
 					' AND e.object='.EVENT_OBJECT_TRIGGER.
-//					' AND '.zbx_sql_mod('e.object',1000).'='.EVENT_OBJECT_TRIGGER.   
 					' AND e.value='.TRIGGER_VALUE_UNKNOWN.
 				' ORDER BY e.object DESC, e.objectid DESC, e.eventid DESC';
-//				' ORDER BY e.eventid DESC';
-		if($rez = DBfetch(DBselect($sql,1))) $eventz[] = $rez['eventid'];
+		if($rez = DBfetch(DBselect($sql,1))) $eventz[$rez['value']] = $rez['eventid'];
 	}
 
 /*******************************************/
