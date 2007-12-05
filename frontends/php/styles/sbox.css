@@ -7,7 +7,6 @@ div#selection_box{
 	filter:alpha(opacity=40);
 	-moz-opacity:.40;
 	opacity:.40;
-	
 	background-color:#0000FF;
 	border:1px black solid;
 	width: 1px;
@@ -29,4 +28,5 @@ span#period_span{
 	position: absolute; 
 	top: 2px; 
 	right: 4px;
+	text-decoration:none;
 }

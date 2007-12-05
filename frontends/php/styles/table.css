@@ -63,8 +63,6 @@ table.page_footer
 	border-left-style: solid;
 	border-right-style: solid;
 	border-bottom-style: solid;
-	padding-right: 5px;
-	padding-left: 5px;
 	margin-top: 15px;
 	width: 100%;
 }
@@ -550,8 +548,7 @@ table.tableinfo tr td.inactive			{	background-color: #FF8888;	border: 1px #FF888
 table.tableinfo tr:hover td.inactive		{	background-color: #FA8388;	border: 1px #FA8388 solid; }
 /****** HEADER *********/
 
-table.header
-{
+table.header{
 	width: 100%;
 	color: #FFFFFF;
 	background: #5C7099 url('../images/gradients/table_head2.gif') repeat-x top left;
@@ -563,22 +560,21 @@ table.header
 	border-right-style: solid;
 	border-bottom-style: solid;
 	vertical-align: middle;
-	padding-right: 5px;
-	padding-left: 5px;
 }
-table.header tr td.header_l
-{
-        font-family:verdana, arial, helvetica, sans-serif;
-        font-size:10px;
+
+table.header tr td.header_l{
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-size:10px;
 	text-align: left;
 	height: 24px;
+	padding-left: 5px;
 }
-table.header tr td.header_r
-{
-        font-family:verdana, arial, helvetica, sans-serif;
-        font-size:10px;
+table.header tr td.header_r{
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-size:10px;
 	text-align: right;
 	height: 24px;
+	padding-right: 5px;
 }
 
 table.header a

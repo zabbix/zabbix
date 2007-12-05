@@ -31,10 +31,7 @@ function scrollinit(x,y,w,period,stime,timel,bar_stime){
 	}
 	w = w | 0;
 	if(w == 0){ 
-		var w = parseInt(document.body.scrollWidth) - 36;
-		var w2 = parseInt(document.body.offsetWidth) - 36;
-
-		w = (w2 > w)?w2:w;
+		w=get_bodywidth() - 36;
 	}
 	scrollcreate(x,y,w);
 	
@@ -484,7 +481,7 @@ deselectall: function(){
 	if(IE){
 		document.selection.empty();
 	}
-	else{	
+	else if(!KQ){
 		var sel = window.getSelection();
 		sel.removeAllRanges();
 	}	

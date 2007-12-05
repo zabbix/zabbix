@@ -19,7 +19,16 @@
 var agt = navigator.userAgent.toLowerCase();
 var OP = (agt.indexOf("opera") != -1) && window.opera;
 var IE = (agt.indexOf("msie") != -1) && document.all && !OP;
-var SF = (agt.indexOf("safari") != -1)	;
+var SF = (agt.indexOf("safari") != -1);
+var KQ = (agt.indexOf("khtml") != -1) && (!SF);
+
+function checkBrowser(){
+	if(OP) SDI('Opera');
+	if(IE) SDI('IE');
+	if(SF) SDI('Safari');
+	if(KQ) SDI('Konqueror');
+return 0;
+}
 
 function isset(obj){
 	return (typeof(obj) != 'undefined');
@@ -266,15 +275,12 @@ return false;
 /*										 Pages stuff								*/
 /************************************************************************************/
 
-function GetSelectedText(obj)
-{
-	if (navigator.appName == "Microsoft Internet Explorer")
-	{
+function GetSelectedText(obj){
+	if(IE){
 		obj.focus();
 		return document.selection.createRange().text;
 	}
-	else (obj.selectionStart)
-	{
+	else if(obj.selectionStart){
 		if(obj.selectionStart != obj.selectionEnd) {
 			var s = obj.selectionStart;
 			var e = obj.selectionEnd;
@@ -349,4 +355,18 @@ function resizeiframe(id){
 	if(!is_null($('scroll')) && showgraphmenu){
 		showgraphmenu('iframe');
 	}
+}
+
+function get_bodywidth(){
+	var w = parseInt(document.body.scrollWidth);
+	var w2 = parseInt(document.body.offsetWidth);
+
+	if(KQ){
+		w = (w2 < w)?w2:w;
+		w-=16;
+	}
+	else{
+		w = (w2 > w)?w2:w;
+	}
+return w;
 }

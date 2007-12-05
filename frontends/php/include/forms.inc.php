@@ -2223,9 +2223,12 @@
 	}
 
 
-	function	insert_login_form()
-	{
-		$frmLogin = new CFormTable('Login','index.php',"post","multipart/form-data");
+	function	insert_login_form(){\
+// author: 	Aly
+// description:
+//			konqueror bug #138024; adding usless param(login=1) to the form's action path to avoid bug!!
+
+		$frmLogin = new CFormTable('Login','index.php?login=1',"post","multipart/form-data");
 		$frmLogin->SetHelp('web.index.login');
 		$frmLogin->AddRow('Login name', new CTextBox('name'));
 		$frmLogin->AddRow('Password', new CPassBox('password'));
