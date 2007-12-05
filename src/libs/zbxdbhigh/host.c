@@ -568,6 +568,29 @@ static int	DBdelete_services_by_triggerid(
 	return  result;
 }
 
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdelete_link  				                      *
+ *                                                                            *
+ * Purpose: delete sysmap links from sysmap element                           *
+ *                                                                            *
+ * Parameters: linkid - link idientificator from database        	      *
+ *                                                                            *
+ * Return value: always return SUCCEED 				              *
+ *                                                                            *
+ * Author: Aly			                                              *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBdelete_link(zbx_uint64_t linkid){		
+
+	DBexecute("DELETE FROM sysmaps_links WHERE linkid=" ZBX_FS_UI64 ,linkid);
+	DBexecute("DELETE FROM sysmaps_link_triggers WHERE linkid=" ZBX_FS_UI64 ,linkid);
+return	SUCCEED;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: DBdelete_sysmaps_element                                         *
@@ -647,28 +670,6 @@ static int	DBdelete_sysmaps_elements_with_triggerid(
 	DBfree_result(db_selements);
 
 	return result;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DBdelete_link  				                      *
- *                                                                            *
- * Purpose: delete sysmap links from sysmap element                           *
- *                                                                            *
- * Parameters: linkid - link idientificator from database        	      *
- *                                                                            *
- * Return value: always return SUCCEED 				              *
- *                                                                            *
- * Author: Aly			                                              *
- *                                                                            *
- * Comments: !!! Don't forget sync code with PHP !!!                          *
- *                                                                            *
- ******************************************************************************/
-static int	DBdelete_link(zbx_uint64_t linkid){		
-
-	DBexecute("DELETE FROM sysmaps_links WHERE linkid=" ZBX_FS_UI64 ,linkid);
-	DBexecute("DELETE FROM sysmaps_link_triggers WHERE linkid=" ZBX_FS_UI64 ,linkid);
-return	SUCCEED;
 }
 
 /******************************************************************************
