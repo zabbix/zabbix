@@ -585,7 +585,7 @@ FIELD		|selementid2	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|drawtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|color		|t_varchar(32)	|'Black'|NOT NULL	|ZBX_SYNC
 
-TABLE|sysmaps_link_triggers|linkid|ZBX_SYNC
+TABLE|sysmaps_link_triggers|linkid,triggerid|ZBX_SYNC
 FIELD		|linkid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|triggerid	|t_id		|	|		|ZBX_SYNC
 FIELD		|drawtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC

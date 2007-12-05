@@ -6,6 +6,7 @@ div#selection_box{
 	
 	filter:alpha(opacity=40);
 	-moz-opacity:.40;
+	-khtml-opacity: 0.4;
 	opacity:.40;
 	background-color:#0000FF;
 	border:1px black solid;
