@@ -2223,7 +2223,7 @@
 	}
 
 
-	function	insert_login_form(){\
+	function	insert_login_form(){
 // author: 	Aly
 // description:
 //			konqueror bug #138024; adding usless param(login=1) to the form's action path to avoid bug!!
