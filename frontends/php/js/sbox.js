@@ -252,7 +252,7 @@ deselectall: function(){
 	if(IE){
 		document.selection.empty();
 	}
-	else{	
+	else if(!KQ){	
 		var sel = window.getSelection();
 		sel.removeAllRanges();
 	}	

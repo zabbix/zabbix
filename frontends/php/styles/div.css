@@ -25,3 +25,15 @@ div.warning{
 	height: 100%;
 	margin-right: 5px;
 }
+
+span.footer_sign{
+	padding-right: 5px;
+	padding-left: 5px;
+}
+
+span.divider{	
+	color: #000000;	
+	font-family: Verdana, Arial, sans-serif; 
+	font-size: 10px; 
+	font-weight: normal;
+}
