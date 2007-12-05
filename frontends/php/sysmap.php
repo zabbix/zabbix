@@ -50,7 +50,7 @@ include_once "include/page_header.php";
 		"linkid"=>	array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID,NULL),
 		"selementid1"=>	array(T_ZBX_INT, O_OPT,  NULL, DB_ID.'{}!={selementid2}','isset({save_link})'),
 		"selementid2"=> array(T_ZBX_INT, O_OPT,  NULL, DB_ID.'{}!={selementid1}','isset({save_link})'),
-		"triggers"=>	array(T_ZBX_STR, O_OPT,  NULL, null,'isset({save_link})'),
+		"triggers"=>	array(T_ZBX_STR, O_OPT,  NULL, null,null),
 		"drawtype"=>array(T_ZBX_INT, O_OPT,  NULL, IN("0,1,2,3,4"),'isset({save_link})'),
 		"color"=>	array(T_ZBX_STR, O_OPT,  NULL, NOT_EMPTY,'isset({save_link})'),
 

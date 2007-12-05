@@ -54,18 +54,16 @@
          *     Eugene Grigorjev 
          *
          */
-        function	map_link_drawtype2str($drawtype)
-        {
-		switch($drawtype)
-		{
+	function	map_link_drawtype2str($drawtype){
+		switch($drawtype){
 			case MAP_LINK_DRAWTYPE_LINE:		$drawtype = "Line";		break;
 			case MAP_LINK_DRAWTYPE_BOLD_LINE:	$drawtype = "Bold line";	break;
 			case MAP_LINK_DRAWTYPE_DOT:		$drawtype = "Dot";		break;
 			case MAP_LINK_DRAWTYPE_DASHED_LINE:	$drawtype = "Dashed line";	break;
 			default: $drawtype = S_UNKNOWN;		break;
 		}
-		return $drawtype;
-        }
+	return $drawtype;
+	}
 
         /*
          * Function: sysmap_accessiable
@@ -79,7 +77,7 @@
          *     Eugene Grigorjev 
          *
          */
-	function	sysmap_accessiable($sysmapid,$perm)
+	function sysmap_accessiable($sysmapid,$perm)
 	{
 		global $USER_DETAILS;
 
@@ -135,18 +133,16 @@
 		return $result;
 	}
 
-	function	get_sysmap_by_sysmapid($sysmapid)
-	{
+	function get_sysmap_by_sysmapid($sysmapid){
 		$row = DBfetch(DBselect("select * from sysmaps where sysmapid=".$sysmapid));
-		if($row)
-		{
+		if($row){
 			return	$row;
 		}
 		error("No system map with sysmapid=[".$sysmapid."]");
 		return false;
 	}
 
-	function	get_sysmaps_element_by_selementid($selementid){
+	function get_sysmaps_element_by_selementid($selementid){
 		$sql="select * from sysmaps_elements where selementid=$selementid"; 
 		$result=DBselect($sql);
 		$row=DBfetch($result);
@@ -161,7 +157,7 @@
 
 // Add System Map
 
-	function	add_sysmap($name,$width,$height,$backgroundid,$label_type,$label_location)
+	function add_sysmap($name,$width,$height,$backgroundid,$label_type,$label_location)
 	{
 		$sysmapid=get_dbid("sysmaps","sysmapid");
 
@@ -177,7 +173,7 @@
 
 // Update System Map
 
-	function	update_sysmap($sysmapid,$name,$width,$height,$backgroundid,$label_type,$label_location)
+	function update_sysmap($sysmapid,$name,$width,$height,$backgroundid,$label_type,$label_location)
 	{
 		return	DBexecute("update sysmaps set name=".zbx_dbstr($name).",width=$width,height=$height,".
 			"backgroundid=".$backgroundid.",label_type=$label_type,".
@@ -186,7 +182,7 @@
 
 // Delete System Map
 
-	function	delete_sysmap( $sysmapid ){
+	function delete_sysmap( $sysmapid ){
 		$result = delete_sysmaps_elements_with_sysmapid($sysmapid);
 		if(!$result)	return	$result;
 
