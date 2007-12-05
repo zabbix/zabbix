@@ -1344,8 +1344,8 @@
 		if(!$result)	return	$result;
 
 		DBexecute("delete from alerts where triggerid=$triggerid");
-
-		DBexecute("update sysmaps_links set triggerid=NULL where triggerid=$triggerid");
+		
+		DBexecute("DELETE sysmaps_link_triggers WHERE triggerid=$triggerid");
 		
 	// disable actions
 		$db_actions = DBselect("select distinct actionid from conditions ".

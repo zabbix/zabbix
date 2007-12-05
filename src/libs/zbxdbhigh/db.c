@@ -733,10 +733,8 @@ void  DBdelete_trigger(zbx_uint64_t triggerid)
 
 	DBdelete_services_by_triggerid(triggerid);
 
-	DBexecute("update sysmaps_links set triggerid=NULL where triggerid=" ZBX_FS_UI64,
-		triggerid);
-	DBexecute("delete from triggers where triggerid=" ZBX_FS_UI64,
-		triggerid);
+	DBexecute("delete sysmaps_link_triggers where triggerid=" ZBX_FS_UI64,triggerid);
+	DBexecute("delete from triggers where triggerid=" ZBX_FS_UI64,triggerid);
 }
 
 void  DBdelete_triggers_by_itemid(zbx_uint64_t itemid)
@@ -777,35 +775,6 @@ void DBdelete_history_by_itemid(zbx_uint64_t itemid)
 		itemid);
 	DBexecute("delete from history_str where itemid=" ZBX_FS_UI64,
 		itemid);
-}
-
-void DBdelete_sysmaps_links_by_shostid(zbx_uint64_t shostid)
-{
-	DBexecute("delete from sysmaps_links where shostid1=" ZBX_FS_UI64 " or shostid2=" ZBX_FS_UI64,
-		shostid, shostid);
-}
-
-void DBdelete_sysmaps_hosts_by_hostid(zbx_uint64_t hostid)
-{
-	zbx_uint64_t	shostid;
-	DB_RESULT	result;
-	DB_ROW		row;
-
-	zabbix_log(LOG_LEVEL_DEBUG,"In DBdelete_sysmaps_hosts(" ZBX_FS_UI64 ")",
-		hostid);
-	result = DBselect("select shostid from sysmaps_elements where elementid=" ZBX_FS_UI64,
-		hostid);
-
-	while((row=DBfetch(result)))
-	{
-		ZBX_STR2UINT64(shostid, row[0]);
-/*		shostid=atoi(row[0]);*/
-		DBdelete_sysmaps_links_by_shostid(shostid);
-	}
-	DBfree_result(result);
-
-	DBexecute("delete from sysmaps_elements where elementid=" ZBX_FS_UI64,
-		hostid);
 }
 
 void DBupdate_triggers_status_after_restart(void)
@@ -1531,7 +1500,7 @@ void	DBvacuum(void)
 {
 #ifdef	HAVE_POSTGRESQL
 	char *table_for_housekeeping[]={"services", "services_links", "graphs_items", "graphs", "sysmaps_links",
-			"sysmaps_elements", "sysmaps", "config", "groups", "hosts_groups", "alerts",
+			"sysmaps_elements", "sysmaps_link_triggers","sysmaps", "config", "groups", "hosts_groups", "alerts",
 			"actions", "events", "functions", "history", "history_str", "hosts", "trends",
 			"items", "media", "media_type", "triggers", "trigger_depends", "users",
 			"sessions", "rights", "service_alarms", "profiles", "screens", "screens_items",

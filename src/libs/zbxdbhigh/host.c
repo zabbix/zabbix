@@ -576,7 +576,7 @@ static int	DBdelete_services_by_triggerid(
  *                                                                            *
  * Parameters: selementid - map element identificator from database           *
  *                                                                            *
- * Return value: always SUCCEED                                               *
+ * Return value: always return SUCCEED 				              *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -587,9 +587,19 @@ static int	DBdelete_sysmaps_element(
 		zbx_uint64_t	selementid
 	)
 {
-	DBexecute("delete from sysmaps_links"
+	DB_RESULT	db_links;
+	DB_ROW		link;
+	zbx_uint64_t 	linkid;
+
+	db_links = DBselect("select linkid from sysmaps_links where "
 		" where selementid1=" ZBX_FS_UI64 " or selementid2=" ZBX_FS_UI64,
 		selementid, selementid);
+	while(link = DBfetch(db_links)){
+		ZBX_STR2UINT64(linkid, link[0]);
+		DBdelete_link(linkid);
+	}
+
+        DBfree_result(db_links);
 
 	DBexecute("delete from sysmaps_elements where selementid=" ZBX_FS_UI64, selementid);
 
@@ -637,6 +647,28 @@ static int	DBdelete_sysmaps_elements_with_triggerid(
 	DBfree_result(db_selements);
 
 	return result;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdelete_link  				                      *
+ *                                                                            *
+ * Purpose: delete sysmap links from sysmap element                           *
+ *                                                                            *
+ * Parameters: linkid - link idientificator from database        	      *
+ *                                                                            *
+ * Return value: always return SUCCEED 				              *
+ *                                                                            *
+ * Author: Aly			                                              *
+ *                                                                            *
+ * Comments: !!! Don't forget sync code with PHP !!!                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	DBdelete_link(zbx_uint64_t linkid){		
+
+	DBexecute("DELETE FROM sysmaps_links WHERE linkid=" ZBX_FS_UI64 ,linkid);
+	DBexecute("DELETE FROM sysmaps_link_triggers WHERE linkid=" ZBX_FS_UI64 ,linkid);
+return	SUCCEED;
 }
 
 /******************************************************************************
@@ -697,7 +729,7 @@ static int	DBdelete_trigger(
 			DBexecute("delete from events where objectid=" ZBX_FS_UI64 " and object=%i", triggerid, EVENT_OBJECT_TRIGGER);
 			DBexecute("delete from alerts where triggerid=" ZBX_FS_UI64, triggerid);
 
-			DBexecute("update sysmaps_links set triggerid=NULL where triggerid=" ZBX_FS_UI64, triggerid);
+			DBexecute("delete from sysmaps_link_triggers where triggerid=" ZBX_FS_UI64, triggerid);
 
 			/* disable actions */
 			db_elements = DBselect("select distinct actionid from conditions "
