@@ -412,6 +412,7 @@ include_once 'include/page_header.php';
 	{
 // NAV BAR
 		$stime = get_min_itemclock_by_graphid($_REQUEST['graphid']);
+		$stime = (is_null($stime))?0:$stime;
 		$bstime = time()-$effectiveperiod;
 		if(isset($_REQUEST['stime'])){
 			$bstime = $_REQUEST['stime'];
