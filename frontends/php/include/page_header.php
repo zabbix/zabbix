@@ -361,6 +361,7 @@ COpt::profiling_start("page");
 	}
  ?>
     <link rel="stylesheet" href="css.css" />
+    <link rel="shortcut icon" href="images/general/zabbix.ico">
     <meta name="Author" content="ZABBIX SIA" />
     <script type="text/javascript" src="js/common.js"></script>
 <?php
