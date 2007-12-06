@@ -358,6 +358,7 @@ COpt::profiling_start("page");
     <meta http-equiv="refresh" content="<?php echo $USER_DETAILS["refresh"]; ?>">
 <?php } ?>
     <link rel="stylesheet" href="css.css">
+    <link rel="shortcut icon" href="images/general/zabbix.ico">
     <meta name="Author" content="ZABBIX SIA">
     <script type="text/javascript" src="js/common.js"></script>
   </head>
