@@ -617,7 +617,7 @@ static int	DBdelete_sysmaps_element(
 	db_links = DBselect("select linkid from sysmaps_links where "
 		" where selementid1=" ZBX_FS_UI64 " or selementid2=" ZBX_FS_UI64,
 		selementid, selementid);
-	while(link = DBfetch(db_links)){
+	while( (link = DBfetch(db_links)) ){
 		ZBX_STR2UINT64(linkid, link[0]);
 		DBdelete_link(linkid);
 	}
