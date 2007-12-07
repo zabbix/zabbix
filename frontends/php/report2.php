@@ -117,7 +117,6 @@ show_report2_header($config,$available_hosts);
 				
 			else
 				show_table_header(S_ALL_HOSTS_BIG);
-				
 			$result = DBselect('SELECT DISTINCT h.hostid,h.host,t.triggerid,t.expression,t.description,t.value '.
 				' FROM triggers t,hosts h,items i,functions f '.
 				' WHERE f.itemid=i.itemid '.
@@ -136,8 +135,7 @@ show_report2_header($config,$available_hosts);
 		$table = new CTableInfo();
 		$table->setHeader(array(is_show_subnodes() ? S_NODE : null,($_REQUEST['hostid'] == 0)?S_HOST:NULL, S_NAME,S_TRUE,S_FALSE,S_UNKNOWN,S_GRAPH));
 		while($row=DBfetch($result)){
-			if(!check_right_on_trigger_by_triggerid(null, $row['triggerid'], $accessible_hosts))
-				continue;
+			if(!check_right_on_trigger_by_triggerid(null, $row['triggerid'], $accessible_hosts)) continue;
 
 			$availability = calculate_availability($row['triggerid'],0,0);
 
