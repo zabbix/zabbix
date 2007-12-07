@@ -34,12 +34,12 @@ function show_report2_header($config,$available_hosts){
 	$cmbGroup = new CComboBox('groupid',$_REQUEST['groupid'],'submit()');
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
 	
-	$status_filter = ' AND h.status='.HOST_STATUS_MONITORED.' AND i.status='.ITEM_STATUS_ACTIVE;
+	$status_filter = ' AND h.status='.HOST_STATUS_MONITORED;
 	if($config==1)
 		$status_filter = ' AND h.status='.HOST_STATUS_TEMPLATE;
 
 	$sql = 'SELECT DISTINCT g.groupid,g.name '.
-					' FROM groups g,hosts_groups hg,hosts h, items i'.
+					' FROM groups g,hosts_groups hg,hosts h'.
 					' WHERE h.hostid in ('.$available_hosts.') '.
 						' AND g.groupid=hg.groupid '.
 						' AND h.hostid=hg.hostid'.$status_filter.
@@ -84,6 +84,7 @@ function show_report2_header($config,$available_hosts){
 				$sql_cond.
 			' GROUP BY h.hostid,h.host '.
 			' ORDER BY h.host';
+
 		if(0 == $config){
 			$cmbHosts->AddItem(0,S_ALL_SMALL);
 		}
@@ -135,6 +136,7 @@ function show_report2_header($config,$available_hosts){
 					' AND i.status='.ITEM_STATUS_ACTIVE.
 				' ORDER BY t.description';
 		}
+
 		$result=DBselect($sql);
 
 		while($row=DBfetch($result)){
