@@ -960,6 +960,8 @@
 	'S_SHOW'=>				'Show',
 	'S_TRUE'=>				'True',
 	'S_FALSE'=>				'False',
+	'S_BY_HOST'=>			'By host',
+	'S_BY_TRIGGER_TEMPLATE'=> 'By trigger template',
 
 //	report3.php
 	'S_IT_SERVICES_AVAILABILITY_REPORT'=>	'IT services availability report',

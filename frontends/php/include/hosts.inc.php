@@ -570,6 +570,52 @@ require_once "include/items.inc.php";
 	}
 
 	/*
+	 * Function: validate_group_with_templates
+	 *
+	 * Description:
+	 *     Check available groups and host(template) by user permission
+	 *     and check current group an host(template) relations
+	 *
+	 * Author:
+	 *     Aly
+	 *
+	 * Comments:
+	 *
+	 */
+	function	validate_group_with_templates($perm, $options = array(),$group_var=null,$host_var=null)
+	{
+		if(is_null($group_var)) $group_var = "web.latest.groupid";
+		if(is_null($host_var))	$host_var = "web.latest.hostid";
+
+		$_REQUEST["groupid"]    = get_request("groupid", -1 );
+		$_REQUEST["hostid"]     = get_request("hostid", get_profile($host_var,0));
+
+		if($_REQUEST["groupid"] == -1)
+		{
+			$_REQUEST["groupid"] = get_profile($group_var,0);
+			
+			if(!in_node($_REQUEST["groupid"])) $_REQUEST["groupid"] = 0;
+
+			if ($_REQUEST["hostid"] > 0 && !DBfetch(DBselect('select groupid from hosts_groups '.
+				' where hostid='.$_REQUEST["hostid"].' and groupid='.$_REQUEST["groupid"])))
+			{
+					$_REQUEST["groupid"] = 0;
+			}
+		}
+
+		if(in_array("always_select_first_host",$options) && $_REQUEST["hostid"] == 0 && $_REQUEST["groupid"] != 0)
+			$_REQUEST["hostid"] = -1;
+
+		$result = get_correct_group_and_host($_REQUEST["groupid"],$_REQUEST["hostid"], $perm, $options);
+
+		$_REQUEST["groupid"]    = $result["groupid"];
+		$_REQUEST["hostid"]     = $result["hostid"];
+		
+		update_profile($host_var,$_REQUEST["hostid"]);
+		update_profile($group_var,$_REQUEST["groupid"]);
+	}
+
+	/*
 	 * Function: get_correct_group_and_host
 	 *
 	 * Description:
@@ -600,6 +646,8 @@ require_once "include/items.inc.php";
 			$with_host_status = " and h.status=".HOST_STATUS_MONITORED;
 		elseif(in_array('real_hosts',$options))
 			$with_host_status = " and h.status<>".HOST_STATUS_TEMPLATE;
+		elseif(in_array('templated_hosts',$options))
+			$with_host_status = " and h.status=".HOST_STATUS_TEMPLATE;
 		else
 			$with_host_status = "";
 
@@ -631,9 +679,12 @@ require_once "include/items.inc.php";
 			{
 				$with_node = " and ".DBin_node('g.groupid', get_current_nodeid(!$only_current_node));
 
-				if(!DBfetch(DBselect("select distinct g.groupid from groups g, hosts_groups hg, hosts h".$item_table.
-					" where hg.groupid=g.groupid and h.hostid=hg.hostid and h.hostid in (".$accessed_hosts.") ".
-					" and g.groupid=".$groupid.$with_host_status.$with_items.$with_node)))
+				if(!DBfetch(DBselect('SELECT DISTINCT g.groupid '.
+								' FROM groups g, hosts_groups hg, hosts h'.$item_table.
+								' WHERE hg.groupid=g.groupid '.
+									' AND h.hostid=hg.hostid '.
+									' AND h.hostid in ('.$accessed_hosts.') '.
+									' AND g.groupid='.$groupid.$with_host_status.$with_items.$with_node)))
 				{
 					$groupid = 0;
 				}

@@ -441,8 +441,7 @@ include_once "include/page_header.php";
 
 			//add dependences
 			$deps = get_trigger_dependences_by_triggerid($row["triggerid"]);
-			if(count($deps) > 0)
-			{
+			if(count($deps) > 0){
 				$description[] = BR.BR."<strong>".S_DEPENDS_ON.":</strong>".SPACE.BR;
 				foreach($deps as $val)
 					$description[] = expand_trigger_description($val).BR;
@@ -456,24 +455,21 @@ include_once "include/page_header.php";
 			elseif($row["priority"]==3)	$priority=new CCol(S_AVERAGE,"average");
 			elseif($row["priority"]==4)	$priority=new CCol(S_HIGH,"high");
 			elseif($row["priority"]==5)	$priority=new CCol(S_DISASTER,"disaster");
-			else				$priority=$row["priority"];
+			else $priority=$row["priority"];
 
-			if($row["status"] == TRIGGER_STATUS_DISABLED)
-			{
+			if($row["status"] == TRIGGER_STATUS_DISABLED){
 				$status= new CLink(S_DISABLED,
 					"triggers.php?group_enable=1&g_triggerid%5B%5D=".$row["triggerid"].
 						"&hostid=".$row["hostid"],
 					'disabled');
 			}
-			else if($row["status"] == TRIGGER_STATUS_UNKNOWN)
-			{
+			else if($row["status"] == TRIGGER_STATUS_UNKNOWN){
 				$status= new CLink(S_UNKNOWN,
 					"triggers.php?group_disable=1&g_triggerid%5B%5D=".$row["triggerid"].
 						"&hostid=".$row["hostid"],
 					'unknown');
 			}
-			else if($row["status"] == TRIGGER_STATUS_ENABLED)
-			{
+			else if($row["status"] == TRIGGER_STATUS_ENABLED){
 				$status= new CLink(S_ENABLED,
 					"triggers.php?group_disable=1&g_triggerid%5B%5D=".$row["triggerid"].
 						"&hostid=".$row["hostid"],
