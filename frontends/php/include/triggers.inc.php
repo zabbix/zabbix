@@ -313,7 +313,7 @@
 	 * Comments:
 	 *
 	 */
-	function        get_realhosts_by_triggerid($triggerid)
+	function get_realhosts_by_triggerid($triggerid)
 	{
 		$trigger = get_trigger_by_triggerid($triggerid);
 		if($trigger['templateid'] > 0)
@@ -322,7 +322,7 @@
 		return get_hosts_by_triggerid($triggerid);
 	}
 
-	function	get_trigger_by_triggerid($triggerid)
+	function get_trigger_by_triggerid($triggerid)
 	{
 		$sql="select * from triggers where triggerid=$triggerid";
 		$result=DBselect($sql);
@@ -335,13 +335,13 @@
 		return FALSE;
 	}
 
-	function	&get_hosts_by_triggerid($triggerid)
+	function get_hosts_by_triggerid($triggerid)
 	{
 		return DBselect('select distinct h.* from hosts h, functions f, items i'.
 			' where i.itemid=f.itemid and h.hostid=i.hostid and f.triggerid='.$triggerid);
 	}
 
-	function	&get_functions_by_triggerid($triggerid)
+	function get_functions_by_triggerid($triggerid)
 	{
 		return DBselect('select * from functions where triggerid='.$triggerid);
 	}
@@ -358,7 +358,7 @@
 	 * Comments:
 	 *
 	 */
-	function	&get_triggers_by_hostid($hostid, $show_mixed = "yes")
+	function get_triggers_by_hostid($hostid, $show_mixed = "yes")
 	{
 		$db_triggers = DBselect("select distinct t.* from triggers t, functions f, items i".
 			" where i.hostid=$hostid and f.itemid=i.itemid and f.triggerid=t.triggerid");
@@ -383,7 +383,7 @@
 		return DBselect($sql);
 	}
 
-	function	&get_triggers_by_templateid($triggerid)
+	function get_triggers_by_templateid($triggerid)
 	{
 		return DBselect('select * from triggers where templateid='.$triggerid);
 	}
@@ -400,7 +400,7 @@
 	 * Comments:
 	 *
 	 */
-	function	&get_hosts_by_expression($expression)
+	function get_hosts_by_expression($expression)
 	{
 		global $ZBX_TR_EXPR_ALLOWED_MACROS, $ZBX_TR_EXPR_REPLACE_TO;
 

@@ -44,8 +44,7 @@ include_once "include/page_header.php";
 	if(count($available_hosts) == 0) $available_hosts = array(-1);
 	$available_hosts = implode(',', $available_hosts);
 
-	if(isset($_REQUEST["groupid"]) && $_REQUEST["groupid"] > 0)
-	{
+	if(isset($_REQUEST["groupid"]) && $_REQUEST["groupid"] > 0){
 		if(!in_array($_REQUEST["groupid"], get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,null,
 			PERM_RES_IDS_ARRAY,get_current_nodeid())))
 		{
@@ -278,8 +277,7 @@ include_once "include/page_header.php";
 		unset($_REQUEST["delete"]);
 	}
 /* ACTIVATE / DISABLE HOSTS */
-	elseif(($_REQUEST["config"]==0 || $_REQUEST["config"]==3) && 
-		(inarr_isset(array('add_to_group','hostid'))))
+	elseif(($_REQUEST["config"]==0 || $_REQUEST["config"]==3) && (inarr_isset(array('add_to_group','hostid'))))
 	{
 		global $USER_DETAILS;
 
@@ -294,8 +292,7 @@ include_once "include/page_header.php";
 			S_HOST_UPDATED,
 			S_CANNOT_UPDATE_HOST);
 	}
-	elseif(($_REQUEST["config"]==0 || $_REQUEST["config"]==3) && 
-		(inarr_isset(array('delete_from_group','hostid'))))
+	elseif(($_REQUEST["config"]==0 || $_REQUEST["config"]==3) && (inarr_isset(array('delete_from_group','hostid'))))
 	{
 		global $USER_DETAILS;
 
@@ -310,8 +307,7 @@ include_once "include/page_header.php";
 			show_messages(true, S_HOST_UPDATED);
 		}
 	}
-	elseif(($_REQUEST["config"]==0 || $_REQUEST["config"]==3) && 
-		(isset($_REQUEST["activate"])||isset($_REQUEST["disable"])))
+	elseif(($_REQUEST["config"]==0 || $_REQUEST["config"]==3) && (isset($_REQUEST["activate"])||isset($_REQUEST["disable"])))
 	{
 		$result = 0;
 		$status = isset($_REQUEST["activate"]) ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
@@ -332,8 +328,7 @@ include_once "include/page_header.php";
 		unset($_REQUEST["activate"]);
 	}
 
-	elseif(($_REQUEST["config"]==0 || $_REQUEST["config"]==3) && isset($_REQUEST["chstatus"])
-		&& isset($_REQUEST["hostid"]))
+	elseif(($_REQUEST["config"]==0 || $_REQUEST["config"]==3) && isset($_REQUEST["chstatus"]) && isset($_REQUEST["hostid"]))
 	{
 		$host=get_host_by_hostid($_REQUEST["hostid"]);
 		$result=update_host_status($_REQUEST["hostid"],$_REQUEST["chstatus"]);
@@ -603,6 +598,7 @@ include_once "include/page_header.php";
 				
 			$cmbGroups = new CComboBox("groupid",get_request("groupid",0),"submit()");
 			$cmbGroups->AddItem(0,S_ALL_SMALL);
+
 			$result=DBselect("select distinct g.groupid,g.name from groups g,hosts_groups hg,hosts h".
 					" where h.hostid in (".$available_hosts.") ".
 					" and g.groupid=hg.groupid and h.hostid=hg.hostid".$status_filter.
