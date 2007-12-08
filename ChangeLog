@@ -1,6 +1,7 @@
 Changes for 1.4.3:
 
- - [ZBX-189] fixed super-user permissions of user commands (Alexei)
+ - [ZBX-152] fixed inefficient check of user permissions (Alexei)
+ - [ZBX-189, CVE-2007-6210] fixed super-user permissions of user commands (Alexei)
  - [ZBX-183] fixed compilation problem with undefined res_query() (Alexei)
  - [ZBX-34] fixed transaction related conflict in DBget_maxid (Sasha)
  - [ZBX-181] fixed Activate/Disable items from applications (Artem)
