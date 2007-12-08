@@ -174,7 +174,8 @@ COpt::counter_up('perm');
 		$processed = array();
 		while($host_data = DBfetch($db_hosts))
 		{
-			$host_data += DBfetch(DBselect('select * from hosts where hostid='.$host_data['hostid']));
+//			It seems that host details are not required by the logic
+//			$host_data += DBfetch(DBselect('select * from hosts where hostid='.$host_data['hostid']));
 
 			if(is_null($host_data['nodeid'])) $host_data['nodeid'] = id2nodeid($host_data['hostid']);
 

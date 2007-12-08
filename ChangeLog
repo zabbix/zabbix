@@ -35,7 +35,8 @@ Changes for 1.4.j:
 
 Changes for 1.4.3:
 
- - [ZBX-189] fixed super-user permissions of user commands (Alexei)
+ - [ZBX-152] fixed inefficient check of user permissions (Alexei)
+ - [ZBX-189, CVE-2007-6210] fixed super-user permissions of user commands (Alexei)
  - [ZBX-149] fixed incorrect processing of vm.memory.size key in FreeBSD (Sasha)
  - [ZBX-109] added support of vm.memory.size[pfree] Linux, FreeBSD & Win agents (Sasha)
  - [ZBX-183] fixed compilation problem with undefined res_query() (Alexei)
