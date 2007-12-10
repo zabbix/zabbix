@@ -48,7 +48,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="./,../include/,../../../include/"
-				PreprocessorDefinitions="_WINDOWS;HAVE_LDAP;HAVE_ASSERT_H;WIN32;NDEBUG;_CONSOLE"
+				PreprocessorDefinitions="_WINDOWS;HAVE_LDAP;HAVE_ASSERT_H;WIN32;NDEBUG;_CONSOLE;HAVE_IPV6"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"

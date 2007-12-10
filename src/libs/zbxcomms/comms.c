@@ -697,8 +697,10 @@ int	zbx_tcp_accept(zbx_sock_t *s)
 	   to wait for a connection request or a datagram to arrive. */
 
 	for(i = 0; i < s->num_socks; i++) {
+#if !defined(_WINDOWS)
 		if(s->sockets[i] > n)
-			n = s->sockets[i];
+			n = s->sockets[i] + 1;
+#endif
 		if(FD_ISSET(s->sockets[i], &sock_set))
 			break;
 	}
@@ -706,7 +708,7 @@ int	zbx_tcp_accept(zbx_sock_t *s)
 	if(i == s->num_socks) {
 		for (i = 0; i < s->num_socks; i++)
 			FD_SET(s->sockets[i], &sock_set);
-		if(select(n + 1, &sock_set, 0, 0, 0) == ZBX_TCP_ERROR) {
+		if(select(n, &sock_set, 0, 0, 0) == ZBX_TCP_ERROR) {
 			zbx_set_tcp_strerror("select() failed with error %d: %s", zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
 			return	FAIL;
 		}
