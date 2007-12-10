@@ -169,13 +169,9 @@ static ZBX_THREAD_ENTRY(send_value, args)
 	signal( SIGTERM, send_signal_handler );
 	signal( SIGQUIT, send_signal_handler );
 	signal( SIGALRM, send_signal_handler );
-
-	alarm(SENDER_TIMEOUT);
-
-	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, sentdval_args->server, sentdval_args->port))) {
-#else
-	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, sentdval_args->server, sentdval_args->port, SENDER_TIMEOUT, SENDER_TIMEOUT))) {
 #endif /* NOT _WINDOWS */
+	
+	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, sentdval_args->server, sentdval_args->port, SENDER_TIMEOUT))) {
 		tosend = comms_create_request(sentdval_args->hostname, sentdval_args->key, sentdval_args->key_value,
 			NULL, NULL, NULL, NULL);
 
@@ -207,10 +203,6 @@ static ZBX_THREAD_ENTRY(send_value, args)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Send value error: %s", zbx_tcp_strerror());
 	}
-
-#if !defined(_WINDOWS)
-	alarm(0);
-#endif /* NOT _WINDOWS */
 
 	zbx_tread_exit(ret);
 }

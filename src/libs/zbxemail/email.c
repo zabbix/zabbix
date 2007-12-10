@@ -62,7 +62,7 @@ int	send_email(char *smtp_server,char *smtp_helo,char *smtp_email,char *mailto,c
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In send_email[smtp_server:%s]", smtp_server);
 
-	if(FAIL == zbx_tcp_connect(&s, smtp_server, 25))
+	if(FAIL == zbx_tcp_connect(&s, smtp_server, 25, 0))
 	{
 		zbx_snprintf(error,max_error_len,"Cannot connect to SMTP server [%s] [%s]", smtp_server, zbx_tcp_strerror());
 		zabbix_log(LOG_LEVEL_DEBUG, "%s", error);

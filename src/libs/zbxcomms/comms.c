@@ -165,7 +165,7 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
 	zbx_strlcpy(host, hst->h_name, hostlen);
 }
 #endif /*HAVE_IPV6*/
-#endif /* WINDOWS */
+#endif /* _WINDOWS */
 
 /******************************************************************************
  *                                                                            *
@@ -317,19 +317,13 @@ void	zbx_tcp_init(zbx_sock_t *s, ZBX_SOCKET o)
 #if defined(HAVE_IPV6)
 int	zbx_tcp_connect(zbx_sock_t *s,
 	const char	*ip, 
-	unsigned short	port
-#if defined(WINDOWS)
-	, int		rcv_timeo,
-	int		snd_timeo
-#endif
+	unsigned short	port,
+	int		timeout
 	)
 {
 	int	ret=SUCCEED;
 	struct	addrinfo *ai, hints;
 	char	service[MAX_STRING_LEN];
-#if defined(WINDOWS)
-	int		timeo;
-#endif
 
 	ZBX_TCP_START();
 
@@ -352,15 +346,19 @@ int	zbx_tcp_connect(zbx_sock_t *s,
 		goto out;
 	}
 
-#if defined(WINDOWS)
-	timeo = rcv_timeo * 1000;
-	if (setsockopt(s->sockets[s->num_socks], SOL_SOCKET, SO_RCVTIMEO, &timeo, sizeof(timeo)) == ZBX_TCP_ERROR)
-		zbx_set_tcp_strerror("setsockopt() failed with error %d: %s", zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()))
+	if (0 != timeout) {
+		s->timeout = timeout;
+#if defined(_WINDOWS)
+		timeout *= 1000;
+		if (setsockopt(s->socket, SOL_SOCKET, SO_RCVTIMEO, (const char *)&timeout, sizeof(timeout)) == ZBX_TCP_ERROR)
+			zbx_set_tcp_strerror("setsockopt() failed with error %d: %s", zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
 
-	timeo = snd_timeo * 1000;
-	if (setsockopt(s->sockets[s->num_socks], SOL_SOCKET, SO_SNDTIMEO, &timeo, sizeof(timeo)) == ZBX_TCP_ERROR)
-		zbx_set_tcp_strerror("setsockopt() failed with error %d: %s", zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()))
+		if (setsockopt(s->socket, SOL_SOCKET, SO_SNDTIMEO, (const char *)&timeout, sizeof(timeout)) == ZBX_TCP_ERROR)
+			zbx_set_tcp_strerror("setsockopt() failed with error %d: %s", zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
+#else
+		alarm(timeout);
 #endif
+	}
 
 	if (ZBX_TCP_ERROR == connect(s->socket, ai->ai_addr, ai->ai_addrlen)) {
 		zbx_set_tcp_strerror("*** Cannot connect to [%s]:%d [%s]", ip, port, strerror_from_system(zbx_sock_last_error()));
@@ -375,18 +373,12 @@ out:
 #else
 int	zbx_tcp_connect(zbx_sock_t *s,
 	const char	*ip,
-	unsigned short	port
-#if defined(WINDOWS)
-	, int		rcv_timeo,
-	int		snd_timeo
-#endif
+	unsigned short	port,
+	int		timeout
 	)
 {
 	ZBX_SOCKADDR	servaddr_in;
 	struct	hostent *hp;
-#if defined(WINDOWS)
-	int		timeo;
-#endif
 
 	ZBX_TCP_START();
 
@@ -406,15 +398,19 @@ int	zbx_tcp_connect(zbx_sock_t *s,
 		return	FAIL;
 	}
 
-#if defined(WINDOWS)
-	timeo = rcv_timeo * 1000;
-	if (setsockopt(s->sockets[s->num_socks], SOL_SOCKET, SO_RCVTIMEO, &timeo, sizeof(timeo)) == ZBX_TCP_ERROR)
-		zbx_set_tcp_strerror("setsockopt() failed with error %d: %s", zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()))
+	if (0 != timeout) {
+		s->timeout = timeout;
+#if defined(_WINDOWS)
+		timeout *= 1000;
+		if (setsockopt(s->socket, SOL_SOCKET, SO_RCVTIMEO, (const char *)&timeout, sizeof(timeout)) == ZBX_TCP_ERROR)
+			zbx_set_tcp_strerror("setsockopt() failed with error %d: %s", zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
 
-	timeo = snd_timeo * 1000;
-	if (setsockopt(s->sockets[s->num_socks], SOL_SOCKET, SO_SNDTIMEO, &timeo, sizeof(timeo)) == ZBX_TCP_ERROR)
-		zbx_set_tcp_strerror("setsockopt() failed with error %d: %s", zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()))
+		if (setsockopt(s->socket, SOL_SOCKET, SO_SNDTIMEO, (const char *)&timeout, sizeof(timeout)) == ZBX_TCP_ERROR)
+			zbx_set_tcp_strerror("setsockopt() failed with error %d: %s", zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
+#else
+		alarm(timeout);
 #endif
+	}
 
 	if (ZBX_TCP_ERROR == connect(s->socket,(struct sockaddr *)&servaddr_in,sizeof(ZBX_SOCKADDR))) {
 		zbx_set_tcp_strerror("Cannot connect to [%s:%d] [%s]", ip, port, strerror_from_system(zbx_sock_last_error()));
@@ -478,7 +474,7 @@ int	zbx_tcp_send_ext(zbx_sock_t *s, const char *data, unsigned char flags)
 
 	while(written < (ssize_t)strlen(data))
 	{
-		if( ZBX_TCP_ERROR == (i = ZBX_TCP_WRITE(s->socket, data+written,strlen(data)-written)) )
+		if( ZBX_TCP_ERROR == (i = ZBX_TCP_WRITE(s->socket, data+written,(int)(strlen(data)-written))) )
 		{
 			zbx_set_tcp_strerror("ZBX_TCP_WRITE() failed [%s]", strerror_from_system(zbx_sock_last_error()));
 			return	FAIL;
@@ -510,6 +506,10 @@ void	zbx_tcp_close(zbx_sock_t *s)
 	
 	zbx_tcp_free(s);
 
+#if !defined(_WINDOWS)
+	if (0 != s->timeout)
+		alarm(0);
+#endif
 	zbx_sock_close(s->socket);
 }
 

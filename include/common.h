@@ -126,6 +126,7 @@
 
 #if defined(_WINDOWS)
 /*#	pragma warning (disable: 4100)*/
+#	pragma warning (disable: 4996) /* warning C4996: <function> was declared deprecated */
 #endif /* _WINDOWS */
 
 #ifndef HAVE_GETOPT_LONG
