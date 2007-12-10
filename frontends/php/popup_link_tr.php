@@ -139,13 +139,6 @@ else if(isset($_REQUEST['form'])){
 		$cmbType->AddItem($i, $value);
 	}
 	
-	$cmbColor = new CComboBox("color",$color);
-	
-	foreach(array('Black','Blue','Cyan','Dark Blue','Dark Green',
-		'Dark Red','Dark Yellow','Green','Red','White','Yellow') as $value){
-		$cmbColor->AddItem($value, $value);
-	}
-	
 	$btnSelect = new CButton('btn1',S_SELECT,
 				"return PopUp('popup.php?dstfrm=".$frmCnct->GetName().
 				"&dstfld1=triggerid&dstfld2=trigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description');",
@@ -161,7 +154,7 @@ else if(isset($_REQUEST['form'])){
 						));
 	
 	$frmCnct->AddRow(S_TYPE.' ('.S_ON.')',$cmbType);
-	$frmCnct->AddRow(S_COLOR.' ('.S_ON.')',$cmbColor);
+	$frmCnct->AddRow(S_COLOR.' ('.S_ON.')', new CColor('color',$color));
 	
 	$frmCnct->AddItemToBottomRow(new CButton("save",(isset($_REQUEST['triggerid']))?S_SAVE:S_ADD));
 	$frmCnct->AddItemToBottomRow(SPACE);
