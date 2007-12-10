@@ -110,17 +110,14 @@ include_once "include/page_header.php";
 	$str=date("m.d.Y H:i:s",time(NULL));
 	ImageString($im, 0,imagesx($im)-120,imagesy($im)-12,"$str", $gray);
 
-	if(!isset($_REQUEST["noedit"]))
-	{
+	if(!isset($_REQUEST["noedit"])){
 		$grid = 50;
 
-		for($x=$grid;$x<$width;$x+=$grid)
-		{
+		for($x=$grid;$x<$width;$x+=$grid){
 			MyDrawLine($im,$x,0,$x,$height,$black,GRAPH_DRAW_TYPE_DASHEDLINE);
 			ImageString($im, 2, $x+2,2, $x , $black);
 		}
-		for($y=$grid;$y<$height;$y+=$grid)
-		{
+		for($y=$grid;$y<$height;$y+=$grid){
 			MyDrawLine($im,0,$y,$width,$y,$black,GRAPH_DRAW_TYPE_DASHEDLINE);
 			ImageString($im, 2, 2,$y+2, $y , $black);
 		}
@@ -137,7 +134,7 @@ include_once "include/page_header.php";
 		list($x2, $y2) = get_icon_center_by_selementid($link["selementid2"]);
 
 		$drawtype = $link["drawtype"];
-		$color = $colors[$link["color"]];
+		$color = convertColor($im,$link["color"]);
 
 		$triggers = get_link_triggers($link['linkid']);
 		
@@ -149,7 +146,7 @@ include_once "include/page_header.php";
 				if($triggers[$id]["status"] == TRIGGER_STATUS_ENABLED && $triggers[$id]["value"] == TRIGGER_VALUE_TRUE){
 					if($triggers[$id]['severity'] >= $max_severity){
 						$drawtype = $triggers[$id]['drawtype'];
-						$color = $colors[$triggers[$id]['color']];
+						$color = convertColor($im,$triggers[$id]['color']);
 						$max_severity=$triggers[$id]['severity'];
 					}
 				}

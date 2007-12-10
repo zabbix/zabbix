@@ -754,4 +754,17 @@
 			ImageLine($image,$x1,$y1,$x2,$y2,$color);
 		}
 	}
+	
+	function convertColor($im,$color){
+	
+		$RGB = array(
+			hexdec('0x'.substr($color, 0,2)),
+			hexdec('0x'.substr($color, 2,2)),
+			hexdec('0x'.substr($color, 4,2))
+			);
+		
+		
+	return ImageColorAllocate($im,$RGB[0],$RGB[1],$RGB[2]);
+	}
+
 ?>
