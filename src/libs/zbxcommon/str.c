@@ -535,7 +535,7 @@ void	compress_signs(char *str)
 				}
 				else
 				{
-					len=strlen(str);
+					len = (int)strlen(str);
 					for(j=len;j>i;j--)	str[j]=str[j-1];
 					str[i]='+';
 					str[i+1]='N';
@@ -1241,7 +1241,7 @@ int	zbx_hex2binary(char *io)
 	}
 	*o = '\0';
 
-	return o - io;
+	return (int)(o - io);
 }
 
 #ifdef HAVE_POSTGRESQL
@@ -1412,10 +1412,10 @@ int	zbx_get_next_field(const char **line, char **output, int *olen, char separat
 
 	ret = strchr(*line, separator);
 	if (ret) {
-		flen = ret-*line;
+		flen = (int)(ret - *line);
 		ret++;
 	} else
-		flen = strlen(*line);
+		flen = (int)strlen(*line);
 
 	if (*olen < flen + 1) {
 		*olen = flen * 2;

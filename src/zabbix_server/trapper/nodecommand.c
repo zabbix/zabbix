@@ -122,7 +122,7 @@ void	send_script(int nodeid, const char *data, char **result, int *result_alloca
 		nodeid);
 
 	if (NULL != (dbrow = DBfetch(dbresult))) {
-		if (SUCCEED == zbx_tcp_connect(&sock, dbrow[0], atoi(dbrow[1]))) {
+		if (SUCCEED == zbx_tcp_connect(&sock, dbrow[0], atoi(dbrow[1]), 0)) {
 			if (FAIL == zbx_tcp_send(&sock, data)) {
 				zbx_snprintf_alloc(result, result_allocated, &result_offset, 128,
 					"%d%cNODE %d: Error while sending data to Node [%d] error: %s",
