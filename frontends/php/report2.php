@@ -87,10 +87,15 @@ show_report2_header($config,$available_hosts);
 	}
 	else if(isset($_REQUEST['hostid'])){
 		if(0 == $config){
-			$sql_cond = ' AND h.status='.HOST_STATUS_MONITORED;
+			if($_REQUEST['hostid'] > 0)	
+				$sql_cond = ' AND h.hostid='.$_REQUEST['hostid'];
+			else
+				$sql_cond = '';
 		}
 		else{
-			$sql_cond = ' AND h.status='.HOST_STATUS_TEMPLATE;
+			$sql_cond = ' AND h.hostid=ht.hostid ';
+			if($_REQUEST['hostid'] > 0)	$sql_cond.=' AND ht.templateid='.$_REQUEST['hostid'];
+			
 			if(isset($_REQUEST['tpl_triggerid']) && ($_REQUEST['tpl_triggerid'] > 0))
 				$sql_cond.= ' AND t.triggerid='.$_REQUEST['tpl_triggerid'];
 		}
@@ -100,25 +105,25 @@ show_report2_header($config,$available_hosts);
 			show_table_header($row['host']);
 	
 			$result = DBselect('SELECT DISTINCT h.hostid,h.host,t.triggerid,t.expression,t.description,t.value '.
-				' FROM triggers t,hosts h,items i,functions f '.
+				' FROM triggers t,hosts h,items i,functions f, hosts_templates ht '.
 				' WHERE f.itemid=i.itemid '.
 					' AND h.hostid=i.hostid '.
 					' AND t.status='.TRIGGER_STATUS_ENABLED.
 					' AND t.triggerid=f.triggerid '.
-					' AND h.hostid='.$_REQUEST['hostid'].
 					' AND '.DBin_node('t.triggerid').
 					' AND i.status='.ITEM_STATUS_ACTIVE.
+					' AND h.status='.HOST_STATUS_MONITORED.
 					$sql_cond.
 				' ORDER BY h.host, t.description');
 		}
 		else{
 			if(isset($_REQUEST['tpl_triggerid']) && ($_REQUEST['tpl_triggerid'] > 0))
 				show_table_header(expand_trigger_description($_REQUEST['tpl_triggerid']));
-				
 			else
 				show_table_header(S_ALL_HOSTS_BIG);
+				
 			$result = DBselect('SELECT DISTINCT h.hostid,h.host,t.triggerid,t.expression,t.description,t.value '.
-				' FROM triggers t,hosts h,items i,functions f '.
+				' FROM triggers t,hosts h,items i,functions f, hosts_templates ht '.
 				' WHERE f.itemid=i.itemid '.
 					' AND h.hostid=i.hostid '.
 					' AND t.status='.TRIGGER_STATUS_ENABLED.
@@ -126,6 +131,7 @@ show_report2_header($config,$available_hosts);
 					' AND h.hostid in ('.$available_hosts.')'.
 					' AND '.DBin_node('t.triggerid').
 					' AND i.status='.ITEM_STATUS_ACTIVE.
+					' AND h.status='.HOST_STATUS_MONITORED.
 					$sql_cond.
 				' ORDER BY h.host, t.description');
 		}
@@ -133,7 +139,7 @@ show_report2_header($config,$available_hosts);
 		$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 
 		$table = new CTableInfo();
-		$table->setHeader(array(is_show_subnodes() ? S_NODE : null,($_REQUEST['hostid'] == 0)?S_HOST:NULL, S_NAME,S_TRUE,S_FALSE,S_UNKNOWN,S_GRAPH));
+		$table->setHeader(array(is_show_subnodes() ? S_NODE : null,(($_REQUEST['hostid'] == 0) || (1 == $config))?S_HOST:NULL, S_NAME,S_TRUE,S_FALSE,S_UNKNOWN,S_GRAPH));
 		while($row=DBfetch($result)){
 			if(!check_right_on_trigger_by_triggerid(null, $row['triggerid'], $accessible_hosts)) continue;
 
@@ -146,7 +152,7 @@ show_report2_header($config,$available_hosts);
 
 			$table->addRow(array(
 				get_node_name_by_elid($row['hostid']),
-				($_REQUEST['hostid'] == 0)?$row['host']:NULL,
+				(($_REQUEST['hostid'] == 0) || (1 == $config))?$row['host']:NULL,
 				new CLink(
 					expand_trigger_description_by_data($row),
 					'events.php?triggerid='.$row['triggerid'],'action'),
