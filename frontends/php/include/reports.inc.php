@@ -93,7 +93,7 @@ function show_report2_header($config,$available_hosts){
 		}
 		
 	}
-	
+
 	$result=DBselect($sql);
 	while($row=DBfetch($result)){
 		if(0 == $config){
@@ -112,25 +112,27 @@ function show_report2_header($config,$available_hosts){
 		$r_form->AddItem(array(SPACE.S_TEMPLATE.SPACE,$cmbTpls));
 		if($_REQUEST['hostid'] > 0){	
 			$sql = 'SELECT DISTINCT t.triggerid,t.description '.
-				' FROM triggers t,hosts h,items i,functions f '.
+				' FROM triggers t,hosts h,items i,functions f,hosts_templates ht '.
 				' WHERE f.itemid=i.itemid '.
 					' AND h.hostid=i.hostid '.
+					' AND h.hostid=ht.hostid '.
 					' AND t.status='.TRIGGER_STATUS_ENABLED.
 					' AND t.triggerid=f.triggerid '.
-					' AND h.hostid='.$_REQUEST['hostid'].
-					' AND h.status='.HOST_STATUS_TEMPLATE.
+					' AND ht.templateid='.$_REQUEST['hostid'].
+					' AND h.status='.HOST_STATUS_MONITORED.
 					' AND '.DBin_node('t.triggerid').
 					' AND i.status='.ITEM_STATUS_ACTIVE.
 				' ORDER BY t.description';
 		}
 		else{
 			$sql = 'SELECT DISTINCT t.triggerid,t.description '.
-				' FROM triggers t,hosts h,items i,functions f '.
+				' FROM triggers t,hosts h,items i,functions f,hosts_templates ht '.
 				' WHERE f.itemid=i.itemid '.
 					' AND h.hostid=i.hostid '.
+					' AND h.hostid=ht.hostid '.
 					' AND t.status='.TRIGGER_STATUS_ENABLED.
 					' AND t.triggerid=f.triggerid '.
-					' AND h.status='.HOST_STATUS_TEMPLATE.
+					' AND h.status='.HOST_STATUS_MONITORED.
 					' AND h.hostid in ('.$available_hosts.')'.
 					' AND '.DBin_node('t.triggerid').
 					' AND i.status='.ITEM_STATUS_ACTIVE.
