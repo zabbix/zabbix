@@ -190,8 +190,7 @@ int	check_ntp(char *host, unsigned short port, int *value_int)
 
 	*value_int = 0;
 
-	if( SUCCEED == (ret = zbx_tcp_connect(&s, host, port)) )
-	{
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, host, port, 0))) {
 		make_packet(&data);
 
 		pack_ntp((unsigned char*)packet, sizeof(packet), &data);
@@ -201,7 +200,7 @@ int	check_ntp(char *host, unsigned short port, int *value_int)
 			if( SUCCEED == (ret = zbx_tcp_recv(&s, &buf)) )
 			{
 			
-				unpack_ntp(&data, (unsigned char *)buf, strlen(buf));
+				unpack_ntp(&data, (unsigned char *)buf, (int)strlen(buf));
 
 #if OFF 
 			/* local time */	*value_int = time(NULL);

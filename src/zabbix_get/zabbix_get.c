@@ -144,8 +144,7 @@ static int	get_value(
 
 	*value = NULL;
 
-	if( SUCCEED == (ret = zbx_tcp_connect(&s, host, port)) )
-	{
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, host, port, SENDER_TIMEOUT))) {
 		zbx_snprintf(request, sizeof(request),"%s\n",key);
 		if( SUCCEED == (ret = zbx_tcp_send(&s, request)) )
 		{
@@ -227,15 +226,9 @@ int main(int argc, char **argv)
 		signal( SIGTERM, signal_handler );
 		signal( SIGQUIT, signal_handler );
 		signal( SIGALRM, signal_handler );
-
-		alarm(SENDER_TIMEOUT);
 #endif /* not WINDOWS */
 
 		ret = get_value(host, port, key, &value);
-
-#if !defined(_WINDOWS)
-		alarm(0);
-#endif /* not WINDOWS */
 
 		if(ret == SUCCEED)
 		{

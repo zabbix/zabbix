@@ -118,9 +118,7 @@ static int	check_ssh(const char *host, unsigned short port, int *value_int)
 	assert(value_int);
 
 	*value_int = 0;
-
-	if( SUCCEED == (ret = zbx_tcp_connect(&s, host, port)) )
-	{
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, host, port, 0))) {
 		if( SUCCEED == (ret = zbx_tcp_recv(&s, &recv_buf)) )
 		{
 			if ( 0 == strncmp(recv_buf, "SSH", 3) )

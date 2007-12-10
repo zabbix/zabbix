@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1257"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="zabbix_sender"
 	ProjectGUID="{0DA34C05-B7CA-4915-8D8B-B2DB8F4D0478}"
 	>
@@ -48,7 +48,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				AdditionalIncludeDirectories="./,../include/,../../../include/"
-				PreprocessorDefinitions="_WINDOWS;HAVE_LDAP;HAVE_ASSERT_H;WIN32;NDEBUG;_CONSOLE"
+				PreprocessorDefinitions="_WINDOWS;HAVE_LDAP;HAVE_ASSERT_H;WIN32;NDEBUG;_CONSOLE;HAVE_IPV6"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
@@ -80,6 +80,99 @@
 				ProgramDatabaseFile=".\Release/zabbix_sender.pdb"
 				SubSystem="1"
 				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+				SuppressStartupBanner="true"
+				OutputFile=".\Release/zabbix_sender.bsc"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release|x64"
+			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			ConfigurationType="1"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TargetEnvironment="3"
+				TypeLibraryName=".\Release/zabbix_sender.tlb"
+				HeaderFileName=""
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="2"
+				InlineFunctionExpansion="1"
+				AdditionalIncludeDirectories="./,../include/,../../../include/"
+				PreprocessorDefinitions="_WINDOWS;HAVE_LDAP;HAVE_ASSERT_H;WIN32;NDEBUG;_CONSOLE"
+				StringPooling="true"
+				RuntimeLibrary="0"
+				EnableFunctionLevelLinking="true"
+				PrecompiledHeaderFile=".\Release/zabbix_sender.pch"
+				AssemblerListingLocation=".\Release/"
+				ObjectFile=".\Release/"
+				ProgramDataBaseFileName=".\Release/"
+				BrowseInformation="1"
+				WarningLevel="3"
+				SuppressStartupBanner="true"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="NDEBUG"
+				Culture="1049"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="ws2_32.lib odbc32.lib odbccp32.lib"
+				OutputFile="../../../bin/win32/zabbix_sender.exe"
+				LinkIncremental="1"
+				SuppressStartupBanner="true"
+				ProgramDatabaseFile=".\Release/zabbix_sender.pdb"
+				SubSystem="1"
+				TargetMachine="17"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -187,99 +280,6 @@
 				Name="VCBscMakeTool"
 				SuppressStartupBanner="true"
 				OutputFile=".\Debug/zabbix_sender.bsc"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
-		<Configuration
-			Name="Release|x64"
-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
-			ConfigurationType="1"
-			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
-			UseOfMFC="0"
-			ATLMinimizesCRunTimeLibraryUsage="false"
-			CharacterSet="2"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				TargetEnvironment="3"
-				TypeLibraryName=".\Release/zabbix_sender.tlb"
-				HeaderFileName=""
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="2"
-				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="./,../include/,../../../include/"
-				PreprocessorDefinitions="_WINDOWS;HAVE_LDAP;HAVE_ASSERT_H;WIN32;NDEBUG;_CONSOLE"
-				StringPooling="true"
-				RuntimeLibrary="0"
-				EnableFunctionLevelLinking="true"
-				PrecompiledHeaderFile=".\Release/zabbix_sender.pch"
-				AssemblerListingLocation=".\Release/"
-				ObjectFile=".\Release/"
-				ProgramDataBaseFileName=".\Release/"
-				BrowseInformation="1"
-				WarningLevel="3"
-				SuppressStartupBanner="true"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
-				Culture="1049"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib odbc32.lib odbccp32.lib"
-				OutputFile="../../../bin/win32/zabbix_sender.exe"
-				LinkIncremental="1"
-				SuppressStartupBanner="true"
-				ProgramDatabaseFile=".\Release/zabbix_sender.pdb"
-				SubSystem="1"
-				TargetMachine="17"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-				SuppressStartupBanner="true"
-				OutputFile=".\Release/zabbix_sender.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
@@ -594,7 +594,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Debug|Win32"
+					Name="Release|x64"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -603,7 +603,7 @@
 					/>
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Release|x64"
+					Name="Debug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
@@ -658,7 +658,7 @@
 							/>
 						</FileConfiguration>
 						<FileConfiguration
-							Name="Debug|Win32"
+							Name="Release|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -667,7 +667,7 @@
 							/>
 						</FileConfiguration>
 						<FileConfiguration
-							Name="Release|x64"
+							Name="Debug|Win32"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -718,17 +718,6 @@
 							/>
 						</FileConfiguration>
 						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AdditionalIncludeDirectories=""
-								PreprocessorDefinitions=""
-								ObjectFile=".\Debug/zbxthreads/"
-								ProgramDataBaseFileName="Debug/zbxthreads/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
 							Name="Release|x64"
 							>
 							<Tool
@@ -737,6 +726,17 @@
 								PreprocessorDefinitions=""
 								ObjectFile=".\Release/zbxthreads/"
 								ProgramDataBaseFileName="Release/zbxthreads/"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories=""
+								PreprocessorDefinitions=""
+								ObjectFile=".\Debug/zbxthreads/"
+								ProgramDataBaseFileName="Debug/zbxthreads/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -792,17 +792,6 @@
 							/>
 						</FileConfiguration>
 						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AdditionalIncludeDirectories=""
-								PreprocessorDefinitions=""
-								ObjectFile=".\Debug/zbxlog/"
-								ProgramDataBaseFileName="Debug/zbxlog/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
 							Name="Release|x64"
 							>
 							<Tool
@@ -811,6 +800,17 @@
 								PreprocessorDefinitions=""
 								ObjectFile=".\Release/zbxlog/"
 								ProgramDataBaseFileName="Release/zbxlog/"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories=""
+								PreprocessorDefinitions=""
+								ObjectFile=".\Debug/zbxlog/"
+								ProgramDataBaseFileName="Debug/zbxlog/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -866,17 +866,6 @@
 							/>
 						</FileConfiguration>
 						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AdditionalIncludeDirectories=""
-								PreprocessorDefinitions=""
-								ObjectFile=".\Debug/zbxconf/"
-								ProgramDataBaseFileName="Debug/zbxconf/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
 							Name="Release|x64"
 							>
 							<Tool
@@ -885,6 +874,17 @@
 								PreprocessorDefinitions=""
 								ObjectFile=".\Release/zbxconf/"
 								ProgramDataBaseFileName="Release/zbxconf/"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories=""
+								PreprocessorDefinitions=""
+								ObjectFile=".\Debug/zbxconf/"
+								ProgramDataBaseFileName="Debug/zbxconf/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -940,17 +940,6 @@
 							/>
 						</FileConfiguration>
 						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AdditionalIncludeDirectories=""
-								PreprocessorDefinitions=""
-								ObjectFile=".\Debug/zbxcomms/"
-								ProgramDataBaseFileName="Debug/zbxcomms/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
 							Name="Release|x64"
 							>
 							<Tool
@@ -959,6 +948,17 @@
 								PreprocessorDefinitions=""
 								ObjectFile=".\Release/zbxcomms/"
 								ProgramDataBaseFileName="Release/zbxcomms/"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories=""
+								PreprocessorDefinitions=""
+								ObjectFile=".\Debug/zbxcomms/"
+								ProgramDataBaseFileName="Debug/zbxcomms/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -1014,17 +1014,6 @@
 							/>
 						</FileConfiguration>
 						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AdditionalIncludeDirectories=""
-								PreprocessorDefinitions=""
-								ObjectFile=".\Debug/zbxcommon/"
-								ProgramDataBaseFileName="Debug/zbxcommon/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
 							Name="Release|x64"
 							>
 							<Tool
@@ -1033,6 +1022,17 @@
 								PreprocessorDefinitions=""
 								ObjectFile=".\Release/zbxcommon/"
 								ProgramDataBaseFileName="Release/zbxcommon/"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories=""
+								PreprocessorDefinitions=""
+								ObjectFile=".\Debug/zbxcommon/"
+								ProgramDataBaseFileName="Debug/zbxcommon/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -1084,17 +1084,6 @@
 							/>
 						</FileConfiguration>
 						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AdditionalIncludeDirectories=""
-								PreprocessorDefinitions=""
-								ObjectFile=".\Debug/zbxcommon/"
-								ProgramDataBaseFileName="Debug/zbxcommon/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
 							Name="Release|x64"
 							>
 							<Tool
@@ -1103,6 +1092,17 @@
 								PreprocessorDefinitions=""
 								ObjectFile=".\Release/zbxcommon/"
 								ProgramDataBaseFileName="Release/zbxcommon/"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories=""
+								PreprocessorDefinitions=""
+								ObjectFile=".\Debug/zbxcommon/"
+								ProgramDataBaseFileName="Debug/zbxcommon/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -1154,17 +1154,6 @@
 							/>
 						</FileConfiguration>
 						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AdditionalIncludeDirectories=""
-								PreprocessorDefinitions=""
-								ObjectFile=".\Debug/zbxcommon/"
-								ProgramDataBaseFileName="Debug/zbxcommon/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
 							Name="Release|x64"
 							>
 							<Tool
@@ -1173,6 +1162,17 @@
 								PreprocessorDefinitions=""
 								ObjectFile=".\Release/zbxcommon/"
 								ProgramDataBaseFileName="Release/zbxcommon/"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories=""
+								PreprocessorDefinitions=""
+								ObjectFile=".\Debug/zbxcommon/"
+								ProgramDataBaseFileName="Debug/zbxcommon/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -1224,17 +1224,6 @@
 							/>
 						</FileConfiguration>
 						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AdditionalIncludeDirectories=""
-								PreprocessorDefinitions=""
-								ObjectFile=".\Debug/zbxcommon/"
-								ProgramDataBaseFileName="Debug/zbxcommon/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
 							Name="Release|x64"
 							>
 							<Tool
@@ -1243,6 +1232,17 @@
 								PreprocessorDefinitions=""
 								ObjectFile=".\Release/zbxcommon/"
 								ProgramDataBaseFileName="Release/zbxcommon/"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories=""
+								PreprocessorDefinitions=""
+								ObjectFile=".\Debug/zbxcommon/"
+								ProgramDataBaseFileName="Debug/zbxcommon/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -1294,17 +1294,6 @@
 							/>
 						</FileConfiguration>
 						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AdditionalIncludeDirectories=""
-								PreprocessorDefinitions=""
-								ObjectFile=".\Debug/zbxcommon/"
-								ProgramDataBaseFileName="Debug/zbxcommon/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
 							Name="Release|x64"
 							>
 							<Tool
@@ -1313,6 +1302,17 @@
 								PreprocessorDefinitions=""
 								ObjectFile=".\Release/zbxcommon/"
 								ProgramDataBaseFileName="Release/zbxcommon/"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories=""
+								PreprocessorDefinitions=""
+								ObjectFile=".\Debug/zbxcommon/"
+								ProgramDataBaseFileName="Debug/zbxcommon/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -1364,17 +1364,6 @@
 							/>
 						</FileConfiguration>
 						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AdditionalIncludeDirectories=""
-								PreprocessorDefinitions=""
-								ObjectFile=".\Debug/zbxcommon/"
-								ProgramDataBaseFileName="Debug/zbxcommon/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
 							Name="Release|x64"
 							>
 							<Tool
@@ -1383,6 +1372,17 @@
 								PreprocessorDefinitions=""
 								ObjectFile=".\Release/zbxcommon/"
 								ProgramDataBaseFileName="Release/zbxcommon/"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories=""
+								PreprocessorDefinitions=""
+								ObjectFile=".\Debug/zbxcommon/"
+								ProgramDataBaseFileName="Debug/zbxcommon/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -1434,17 +1434,6 @@
 							/>
 						</FileConfiguration>
 						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AdditionalIncludeDirectories=""
-								PreprocessorDefinitions=""
-								ObjectFile=".\Debug/zbxcommon/"
-								ProgramDataBaseFileName="Debug/zbxcommon/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
 							Name="Release|x64"
 							>
 							<Tool
@@ -1453,6 +1442,17 @@
 								PreprocessorDefinitions=""
 								ObjectFile=".\Release/zbxcommon/"
 								ProgramDataBaseFileName="Release/zbxcommon/"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories=""
+								PreprocessorDefinitions=""
+								ObjectFile=".\Debug/zbxcommon/"
+								ProgramDataBaseFileName="Debug/zbxcommon/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -1504,17 +1504,6 @@
 							/>
 						</FileConfiguration>
 						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								AdditionalIncludeDirectories=""
-								PreprocessorDefinitions=""
-								ObjectFile=".\Debug/zbxcommon/"
-								ProgramDataBaseFileName="Debug/zbxcommon/"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
 							Name="Release|x64"
 							>
 							<Tool
@@ -1523,6 +1512,17 @@
 								PreprocessorDefinitions=""
 								ObjectFile=".\Release/zbxcommon/"
 								ProgramDataBaseFileName="Release/zbxcommon/"
+							/>
+						</FileConfiguration>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCLCompilerTool"
+								AdditionalIncludeDirectories=""
+								PreprocessorDefinitions=""
+								ObjectFile=".\Debug/zbxcommon/"
+								ProgramDataBaseFileName="Debug/zbxcommon/"
 							/>
 						</FileConfiguration>
 						<FileConfiguration
@@ -1576,7 +1576,7 @@
 							/>
 						</FileConfiguration>
 						<FileConfiguration
-							Name="Debug|Win32"
+							Name="Release|x64"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
@@ -1585,7 +1585,7 @@
 							/>
 						</FileConfiguration>
 						<FileConfiguration
-							Name="Release|x64"
+							Name="Debug|Win32"
 							>
 							<Tool
 								Name="VCCLCompilerTool"
