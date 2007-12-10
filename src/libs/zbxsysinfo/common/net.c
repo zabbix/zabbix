@@ -47,8 +47,7 @@ int	tcp_expect(
 
 	*value_int = 0;
 
-	if( SUCCEED == (ret = zbx_tcp_connect(&s, host, port)) )
-	{
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, host, port, 0))) {
 		if( NULL == request )
 		{
 			*value_int = 1;
@@ -186,7 +185,6 @@ int	CHECK_PORT(const char *cmd, const char *param, unsigned flags, AGENT_RESULT 
 int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
 #if !defined(_WINDOWS)
-
 #ifdef HAVE_RES_QUERY
 
 #if !defined(PACKETSZ)
@@ -260,6 +258,8 @@ int	CHECK_DNS(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *
 #else
 	return SYSINFO_RET_FAIL;
 #endif /* not HAVE_RES_QUERY */
+	return SYSINFO_RET_FAIL;
+#else
 	return SYSINFO_RET_FAIL;
 #endif /* not WINDOWS */
 }

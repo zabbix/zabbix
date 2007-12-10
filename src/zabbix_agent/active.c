@@ -270,10 +270,7 @@ static int	get_active_checks(
 
 	zabbix_log( LOG_LEVEL_DEBUG, "get_active_checks('%s',%u)", host, port);
 
-
-	if( SUCCEED == (ret = zbx_tcp_connect(&s, host, port)) )
-	{
-
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, host, port, CONFIG_TIMEOUT))) {
 		zbx_snprintf(packet, sizeof(packet), "%s\n%s\n","ZBX_GET_ACTIVE_CHECKS", CONFIG_HOSTNAME);
 		zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", packet);
 
@@ -334,15 +331,11 @@ static int	send_value(
 	)
 {
 	zbx_sock_t	s;
-
-	char
-		*buf = NULL,
-		*request = NULL;
-
+	char		*buf = NULL,
+			*request = NULL;
 	int		ret;
 
-	if( SUCCEED == (ret = zbx_tcp_connect(&s, host, port)) )
-	{
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, host, port, CONFIG_TIMEOUT))) {
 		request = comms_create_request(hostname, key, value, lastlogsize, timestamp, source, severity);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "XML before sending [%s]",request);
