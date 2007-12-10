@@ -208,9 +208,10 @@ else if (document.getElementById)
 			$lbl = new CColorCell('lbl_'.$name, $value, 'show_color_picker(\''.$name.'\')');
 
 			$txt = new CTextBox($name,$value,7);
+			$txt->AddOption('maxlength', 6);
 			$txt->AddOption('id', $name);
 			$txt->AddAction('onchange', 'set_color_by_name(\''.$name.'\',this.value)');
-			$txt->AddOption('style', 'margin: 0px');
+			$txt->AddOption('style', 'margin-top: 0px; margin-bottom: 0px');
 			$this->AddItem(array($txt, $lbl));
 			
 			insert_show_color_picker_javascript();

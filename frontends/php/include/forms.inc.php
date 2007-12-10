@@ -4940,13 +4940,7 @@ include_once 'include/discovery.inc.php';
 			$value = map_link_drawtype2str($i);
 			$cmbType->AddItem($i, $value);
 		}		
-		$cmbColor = new CComboBox("color",$color);
 
-		foreach(array('Black','Blue','Cyan','Dark Blue','Dark Green',
-			'Dark Red','Dark Yellow','Green','Red','White','Yellow') as $value)
-		{
-			$cmbColor->AddItem($value, $value);
-		}
 /* END preparation */
 
 		$frmCnct->AddRow("Element 1",$cmbElements1);
@@ -4980,7 +4974,7 @@ include_once 'include/discovery.inc.php';
 			if(!isset($trigger['triggerid'])) continue;
 			
 			$colorbox = new CSpan(SPACE.SPACE.SPACE);
-			$colorbox->AddOption('style','text-decoration: none; outline-color: black; outline-style: solid; outline-width: 1px; background-color:'.$trigger['color'].';');
+			$colorbox->AddOption('style','text-decoration: none; outline-color: black; outline-style: solid; outline-width: 1px; background-color: #'.$trigger['color'].';');
 		
 			$table->AddRow(array(
 					array(
@@ -4988,7 +4982,7 @@ include_once 'include/discovery.inc.php';
 						new CVar('triggers['.$trigger['triggerid'].'][triggerid]', $trigger['triggerid'])
 						),
 					array(
-						new CLink($trigger['description'],"javascript: openWinCentered('popup_link_tr.php?form=1&dstfrm=".$frmCnct->GetName()."&triggerid=".$trigger['triggerid'].url_param('linkid')."','ZBX_Link_Indicator',560,180,'scrollbars=1, toolbar=0, menubar=0, resizable=0');"),
+						new CLink($trigger['description'],"javascript: openWinCentered('popup_link_tr.php?form=1&dstfrm=".$frmCnct->GetName()."&triggerid=".$trigger['triggerid'].url_param('linkid')."','ZBX_Link_Indicator',560,260,'scrollbars=1, toolbar=0, menubar=0, resizable=0');"),
 						new CVar('triggers['.$trigger['triggerid'].'][description]', $trigger['description'])
 						),
 					array(
@@ -5017,7 +5011,7 @@ include_once 'include/discovery.inc.php';
 //----------
 
 		$frmCnct->AddRow(S_TYPE.' ('.S_OFF.')',$cmbType);
-		$frmCnct->AddRow(S_COLOR.' ('.S_OFF.')',$cmbColor);
+		$frmCnct->AddRow(S_COLOR.' ('.S_OFF.')',new CColor('color',$color));
 
 		$frmCnct->AddItemToBottomRow(new CButton("save_link",S_SAVE));
 		if(isset($_REQUEST["linkid"]))
