@@ -341,6 +341,8 @@ static int	send_value(
 
 	int		ret;
 
+	alarm(CONFIG_TIMEOUT);
+
 	if( SUCCEED == (ret = zbx_tcp_connect(&s, host, port)) )
 	{
 		request = comms_create_request(hostname, key, value, lastlogsize, timestamp, source, severity);
@@ -369,6 +371,8 @@ static int	send_value(
 		}
 	}
 	zbx_tcp_close(&s);
+
+	alarm(0);
 
 	if( FAIL == ret )
 	{

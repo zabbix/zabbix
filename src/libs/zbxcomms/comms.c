@@ -315,11 +315,21 @@ void	zbx_tcp_init(zbx_sock_t *s, ZBX_SOCKET o)
  *                                                                            *
  ******************************************************************************/
 #if defined(HAVE_IPV6)
-int	zbx_tcp_connect(zbx_sock_t *s, const char *ip, unsigned short port)
+int	zbx_tcp_connect(zbx_sock_t *s,
+	const char	*ip, 
+	unsigned short	port
+#if defined(WINDOWS)
+	, int		rcv_timeo,
+	int		snd_timeo
+#endif
+	)
 {
 	int	ret=SUCCEED;
 	struct	addrinfo *ai, hints;
 	char	service[MAX_STRING_LEN];
+#if defined(WINDOWS)
+	int		timeo;
+#endif
 
 	ZBX_TCP_START();
 
@@ -330,20 +340,29 @@ int	zbx_tcp_connect(zbx_sock_t *s, const char *ip, unsigned short port)
 	hints.ai_family = PF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 
-	if( 0 != getaddrinfo (ip, service, &hints, &ai)) {
+	if (0 != getaddrinfo (ip, service, &hints, &ai)) {
 		zbx_set_tcp_strerror("Cannot resolve [%s]", ip);
 		ret=FAIL;
 		goto out;
 	}
 
-	if( ZBX_SOCK_ERROR == (s->socket = socket (ai->ai_family, ai->ai_socktype, ai->ai_protocol)))
-	{
+	if (ZBX_SOCK_ERROR == (s->socket = socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol))) {
 		zbx_set_tcp_strerror("Cannot create socket [%s]:%d [%s]", ip, port ,strerror_from_system(zbx_sock_last_error()));
 		ret=FAIL;
 		goto out;
 	}
 
-	if( ZBX_TCP_ERROR == connect(s->socket, ai->ai_addr, ai->ai_addrlen)) {
+#if defined(WINDOWS)
+	timeo = rcv_timeo * 1000;
+	if (setsockopt(s->sockets[s->num_socks], SOL_SOCKET, SO_RCVTIMEO, &timeo, sizeof(timeo)) == ZBX_TCP_ERROR)
+		zbx_set_tcp_strerror("setsockopt() failed with error %d: %s", zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()))
+
+	timeo = snd_timeo * 1000;
+	if (setsockopt(s->sockets[s->num_socks], SOL_SOCKET, SO_SNDTIMEO, &timeo, sizeof(timeo)) == ZBX_TCP_ERROR)
+		zbx_set_tcp_strerror("setsockopt() failed with error %d: %s", zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()))
+#endif
+
+	if (ZBX_TCP_ERROR == connect(s->socket, ai->ai_addr, ai->ai_addrlen)) {
 		zbx_set_tcp_strerror("*** Cannot connect to [%s]:%d [%s]", ip, port, strerror_from_system(zbx_sock_last_error()));
 		zbx_tcp_close(s);
 		ret=FAIL;
@@ -354,33 +373,50 @@ out:
 	return ret;
 }
 #else
-int	zbx_tcp_connect(zbx_sock_t *s, const char *ip, unsigned short port)
+int	zbx_tcp_connect(zbx_sock_t *s,
+	const char	*ip,
+	unsigned short	port
+#if defined(WINDOWS)
+	, int		rcv_timeo,
+	int		snd_timeo
+#endif
+	)
 {
 	ZBX_SOCKADDR	servaddr_in;
-
 	struct	hostent *hp;
+#if defined(WINDOWS)
+	int		timeo;
+#endif
 
 	ZBX_TCP_START();
 
 	zbx_tcp_clean(s);
 
-	if(NULL == (hp = zbx_gethost(ip)))
-	{
+	if (NULL == (hp = zbx_gethost(ip))) {
 		zbx_set_tcp_strerror("Cannot resolve [%s]", ip);
 		return	FAIL;
 	}
+
 	servaddr_in.sin_family		= AF_INET;
 	servaddr_in.sin_addr.s_addr	= ((struct in_addr *)(hp->h_addr))->s_addr;
 	servaddr_in.sin_port		= htons(port);
 
-	if( ZBX_SOCK_ERROR == (s->socket = socket(AF_INET,SOCK_STREAM,0)) )
-	{
+	if (ZBX_SOCK_ERROR == (s->socket = socket(AF_INET,SOCK_STREAM,0))) {
 		zbx_set_tcp_strerror("Cannot create socket [%s:%d] [%s]", ip, port ,strerror_from_system(zbx_sock_last_error()));
 		return	FAIL;
 	}
 
-	if( ZBX_TCP_ERROR == connect(s->socket,(struct sockaddr *)&servaddr_in,sizeof(ZBX_SOCKADDR)) )
-	{
+#if defined(WINDOWS)
+	timeo = rcv_timeo * 1000;
+	if (setsockopt(s->sockets[s->num_socks], SOL_SOCKET, SO_RCVTIMEO, &timeo, sizeof(timeo)) == ZBX_TCP_ERROR)
+		zbx_set_tcp_strerror("setsockopt() failed with error %d: %s", zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()))
+
+	timeo = snd_timeo * 1000;
+	if (setsockopt(s->sockets[s->num_socks], SOL_SOCKET, SO_SNDTIMEO, &timeo, sizeof(timeo)) == ZBX_TCP_ERROR)
+		zbx_set_tcp_strerror("setsockopt() failed with error %d: %s", zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()))
+#endif
+
+	if (ZBX_TCP_ERROR == connect(s->socket,(struct sockaddr *)&servaddr_in,sizeof(ZBX_SOCKADDR))) {
 		zbx_set_tcp_strerror("Cannot connect to [%s:%d] [%s]", ip, port, strerror_from_system(zbx_sock_last_error()));
 		zbx_tcp_close(s);
 		return	FAIL;

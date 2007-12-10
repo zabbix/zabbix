@@ -68,7 +68,11 @@ void zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen);
 #endif /* WINDOWS */
 
 void	zbx_tcp_init(zbx_sock_t *s, ZBX_SOCKET o);
+#if !defined(_WINDOWS)
 int     zbx_tcp_connect(zbx_sock_t *s, const char *ip, unsigned short port);
+#else
+int     zbx_tcp_connect(zbx_sock_t *s, const char *ip, unsigned short port, int rcv_timeo, int snd_timeo);
+#endif /* WINDOWS */
 
 #define ZBX_TCP_NEW_PROTOCOL	0x01
 
