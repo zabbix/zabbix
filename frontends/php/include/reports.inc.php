@@ -107,38 +107,36 @@ function show_report2_header($config,$available_hosts){
 	
 	if(0 == $config){
 		$r_form->AddItem(array(SPACE.S_HOST.SPACE,$cmbHosts));
+		show_table_header(S_AVAILABILITY_REPORT_BIG, $r_form);
 	}
 	else{
 		$r_form->AddItem(array(SPACE.S_TEMPLATE.SPACE,$cmbTpls));
-		if($_REQUEST['hostid'] > 0){	
+		if($_REQUEST['hostid'] > 0){
 			$sql = 'SELECT DISTINCT t.triggerid,t.description '.
-				' FROM triggers t,hosts h,items i,functions f,hosts_templates ht '.
+				' FROM triggers t,hosts h,items i,functions f '.
 				' WHERE f.itemid=i.itemid '.
 					' AND h.hostid=i.hostid '.
-					' AND h.hostid=ht.hostid '.
 					' AND t.status='.TRIGGER_STATUS_ENABLED.
 					' AND t.triggerid=f.triggerid '.
-					' AND ht.templateid='.$_REQUEST['hostid'].
-					' AND h.status='.HOST_STATUS_MONITORED.
+					' AND h.hostid='.$_REQUEST['hostid'].
+					' AND h.status='.HOST_STATUS_TEMPLATE.
 					' AND '.DBin_node('t.triggerid').
 					' AND i.status='.ITEM_STATUS_ACTIVE.
 				' ORDER BY t.description';
 		}
 		else{
 			$sql = 'SELECT DISTINCT t.triggerid,t.description '.
-				' FROM triggers t,hosts h,items i,functions f,hosts_templates ht '.
+				' FROM triggers t,hosts h,items i,functions f '.
 				' WHERE f.itemid=i.itemid '.
 					' AND h.hostid=i.hostid '.
-					' AND h.hostid=ht.hostid '.
 					' AND t.status='.TRIGGER_STATUS_ENABLED.
 					' AND t.triggerid=f.triggerid '.
-					' AND h.status='.HOST_STATUS_MONITORED.
+					' AND h.status='.HOST_STATUS_TEMPLATE.
 					' AND h.hostid in ('.$available_hosts.')'.
 					' AND '.DBin_node('t.triggerid').
 					' AND i.status='.ITEM_STATUS_ACTIVE.
 				' ORDER BY t.description';
 		}
-
 		$result=DBselect($sql);
 
 		while($row=DBfetch($result)){
@@ -147,9 +145,15 @@ function show_report2_header($config,$available_hosts){
 					get_node_name_by_elid($row['triggerid']).expand_trigger_description($row['triggerid'])
 					);
 		}
-	
-		$r_form->AddItem(array(BR.S_TRIGGER.SPACE,$cmbTrigs));
+		$rr_form = new CForm();
+		$rr_form->SetMethod('get');
+		$rr_form->AddVar('config',$config);
+		$rr_form->AddVar('groupid',$_REQUEST['groupid']);
+		$rr_form->AddVar('hostid',$_REQUEST['hostid']);
+		
+		$rr_form->AddItem(array(S_TRIGGER.SPACE,$cmbTrigs));
+		show_table_header(S_AVAILABILITY_REPORT_BIG, array($r_form,$rr_form));
 	}
-		show_table_header(S_AVAILABILITY_REPORT_BIG, $r_form);
+
 }
 ?>
