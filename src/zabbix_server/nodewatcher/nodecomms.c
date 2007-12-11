@@ -77,7 +77,7 @@ int send_to_node(char *name, int dest_nodeid, int nodeid, char *data)
 	port=atoi(row[1]);
 	DBfree_result(result);
 
-	if( FAIL == zbx_tcp_connect(&sock, ip, port))
+	if( FAIL == zbx_tcp_connect(&sock, ip, port, 0))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Unable to connect to Node [%d] error: %s", dest_nodeid, zbx_tcp_strerror());
 		return  FAIL;

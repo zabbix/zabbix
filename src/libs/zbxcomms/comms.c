@@ -283,9 +283,12 @@ void	zbx_tcp_init(zbx_sock_t *s, ZBX_SOCKET o)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int     zbx_tcp_connect(zbx_sock_t *s, const char *ip, unsigned short port)
+int	zbx_tcp_connect(zbx_sock_t *s,
+	const char      *ip,
+	unsigned short  port,
+	int             timeout
+	)
 {
-	ZBX_SOCKADDR	myaddr_in;
 	ZBX_SOCKADDR	servaddr_in;
 
 	struct	hostent *hp;
@@ -310,9 +313,20 @@ int     zbx_tcp_connect(zbx_sock_t *s, const char *ip, unsigned short port)
 		return	FAIL;
 	}
 
-	myaddr_in.sin_family		= AF_INET;
-	myaddr_in.sin_port			= 0;
-	myaddr_in.sin_addr.s_addr	= INADDR_ANY;
+	if (0 != timeout) {
+		s->timeout = timeout;
+#if defined(_WINDOWS)
+		timeout *= 1000;
+		if (setsockopt(s->socket, SOL_SOCKET, SO_RCVTIMEO, (const char *)&timeout, sizeof(timeout)) == ZBX_TCP_ERROR)
+			zbx_set_tcp_strerror("setsockopt() failed with error %d: %s", zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
+
+		if (setsockopt(s->socket, SOL_SOCKET, SO_SNDTIMEO, (const char *)&timeout, sizeof(timeout)) == ZBX_TCP_ERROR)
+			zbx_set_tcp_strerror("setsockopt() failed with error %d: %s", zbx_sock_last_error(), strerror_from_system(zbx_sock_last_error()));
+#else
+		alarm(timeout);
+#endif
+	}
+
 
 	if( ZBX_TCP_ERROR == connect(s->socket,(struct sockaddr *)&servaddr_in,sizeof(ZBX_SOCKADDR)) )
 	{
@@ -408,6 +422,11 @@ void    zbx_tcp_close(zbx_sock_t *s)
 	zbx_tcp_unaccept(s);
 	
 	zbx_tcp_free(s);
+
+#if !defined(_WINDOWS)
+	if (0 != s->timeout)
+		alarm(0);
+#endif
 
 	zbx_sock_close(s->socket);
 }

@@ -51,6 +51,7 @@ typedef struct zbx_sock
 	zbx_buf_type_t	buf_type;
 	unsigned char accepted;
 	char		*error;
+	int		timeout;
 } zbx_sock_t;
 
 char*	zbx_tcp_strerror(void);
@@ -63,7 +64,7 @@ struct hostent  *zbx_gethost_by_ip(const char *ip);
 #endif /* WINDOWS */
 
 void	zbx_tcp_init(zbx_sock_t *s, ZBX_SOCKET o);
-int     zbx_tcp_connect(zbx_sock_t *s, const char *ip, unsigned short port);
+int     zbx_tcp_connect(zbx_sock_t *s, const char *ip, unsigned short port, int timeout);
 
 #define ZBX_TCP_NEW_PROTOCOL	0x01
 
