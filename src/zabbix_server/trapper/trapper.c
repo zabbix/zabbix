@@ -50,7 +50,7 @@ static int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 	char	source[MAX_STRING_LEN];
 	char	severity[MAX_STRING_LEN];
 	int	sender_nodeid, nodeid;
-	char	*result = NULL, *answer;
+	char	*answer;
 
 	int	ret=SUCCEED, res;
 	size_t	datalen;

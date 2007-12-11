@@ -173,66 +173,59 @@ static void	add_check(char *key, int refresh, long lastlogsize)
  *           <key>:<refresh time>:<last log size>                             *
  *                                                                            *
  ******************************************************************************/
-
 static int	parse_list_of_checks(char *str)
 {
-	char 
-		*p = NULL, 
-		*pstrend = NULL, 
-		*key = NULL, 
-		*refresh = NULL, 
-		*lastlogsize = NULL;
+	char	*p, *pstrend, *refresh, *lastlogsize;
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In parse_list_of_checks('%s')", str);
+	zabbix_log(LOG_LEVEL_DEBUG, "In parse_list_of_checks() [%s]",
+		str);
 
 	disable_all_metrics();
 
-	while(str)
-	{
-		pstrend = strchr(str,'\n');
-		if(pstrend) *pstrend = '\0'; /* prepare line */
+	while (NULL != str) {
+		if (NULL != (pstrend = strchr(str,'\n')))
+			*pstrend = '\0'; /* prepare line */
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Parsed [%s]", str);
 
-		if(strcmp(str, "ZBX_EOF") == 0)	break;
+		if (0 == strcmp(str, "ZBX_EOF"))
+			break;
+
+		refresh = NULL; 
+		lastlogsize = NULL;
 
 		/* parse string from end of line */
 		/* line format "key:refresh:lastlogsize" */
 
+		p = (NULL != pstrend) ? pstrend : str + strlen(str);
+
 		/* Lastlogsize */
-		for(p = str + strlen(str); p != str; p--)
-		{
-			if(*p == ':')
-			{
+		for (; p != str; p--) {
+			if (*p == ':') {
 				*p = '\0';
 
-				lastlogsize = p+1;
+				lastlogsize = p + 1;
 				break;
 			}
 		}
 
 		/* Refresh */
-		for(; p != str; p--)
-		{
-			if(*p == ':')
-			{
+		for (; p != str; p--) {
+			if (*p == ':') {
 				*p = '\0';
 
-				refresh = p+1;
+				refresh = p + 1;
 				break;
 			}
 		}
 
-		key = str;
+		if (str && refresh && lastlogsize)
+			add_check(str, atoi(refresh), atoi(lastlogsize));
 
-		if(key && refresh && lastlogsize)
-		{
-			add_check(key, atoi(refresh), atoi(lastlogsize));
-		}
+		if (pstrend == NULL)
+			break;
 
-		if(pstrend == NULL) break;
-
-		str = pstrend+1;
+		str = pstrend + 1;
 	}
 	return SUCCEED;
 }
