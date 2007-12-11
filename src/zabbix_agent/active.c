@@ -591,6 +591,9 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 {
 	ZBX_THREAD_ACTIVECHK_ARGS activechk_args;
 
+#if defined(ZABBIX_DAEMON)
+	struct	sigaction phan;
+#endif /* ZABBIX_DAEMON */
 	int	sleeptime, nextcheck;
 	int	nextrefresh;
 	char	*p = NULL;
@@ -611,6 +614,13 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 	refresh_metrics(activechk_args.host, activechk_args.port);
 	nextrefresh = (int)time(NULL) + CONFIG_REFRESH_ACTIVE_CHECKS;
+
+#if defined(ZABBIX_DAEMON)
+	phan.sa_handler = child_signal_handler;
+	sigemptyset(&phan.sa_mask);
+	phan.sa_flags = 0;
+	sigaction(SIGALRM, &phan, NULL);
+#endif /* ZABBIX_DAEMON */
 
 	while(ZBX_IS_RUNNING)
 	{
