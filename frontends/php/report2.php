@@ -68,7 +68,8 @@ show_report2_header($config,$available_hosts);
 					' WHERE t.triggerid='.$_REQUEST['triggerid'].
 						' AND t.triggerid=f.triggerid '.
 						' AND f.itemid=i.itemid '.
-						' AND i.hostid=h.hostid ' 
+						' AND i.hostid=h.hostid '.
+						' AND h.hostid in ('.$available_hosts.') '
 					))) )
 	{
 		unset($_REQUEST['triggerid']);
@@ -97,7 +98,7 @@ show_report2_header($config,$available_hosts);
 			if($_REQUEST['hostid'] > 0)	$sql_cond.=' AND ht.templateid='.$_REQUEST['hostid'];
 			
 			if(isset($_REQUEST['tpl_triggerid']) && ($_REQUEST['tpl_triggerid'] > 0))
-				$sql_cond.= ' AND t.triggerid='.$_REQUEST['tpl_triggerid'];
+				$sql_cond.= ' AND t.templateid='.$_REQUEST['tpl_triggerid'];
 		}
 		
 		if($_REQUEST['hostid'] > 0){
@@ -108,6 +109,7 @@ show_report2_header($config,$available_hosts);
 				' FROM triggers t,hosts h,items i,functions f, hosts_templates ht '.
 				' WHERE f.itemid=i.itemid '.
 					' AND h.hostid=i.hostid '.
+					' AND h.hostid in ('.$available_hosts.') '.
 					' AND t.status='.TRIGGER_STATUS_ENABLED.
 					' AND t.triggerid=f.triggerid '.
 					' AND '.DBin_node('t.triggerid').
