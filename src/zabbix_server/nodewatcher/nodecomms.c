@@ -133,7 +133,7 @@ int	connect_to_node(int nodeid, zbx_sock_t *sock)
 	if (NULL != (row = DBfetch(result))) {
 		port = (unsigned short)atoi(row[1]);
 
-		if (SUCCEED == zbx_tcp_connect(sock, row[0], port))
+		if (SUCCEED == zbx_tcp_connect(sock, row[0], port, 0))
 			res = SUCCEED;
 		else
 			zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Unable to connect to Node [%d] error: %s",
