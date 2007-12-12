@@ -127,13 +127,12 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 #ifdef _WINDOWS
 
 	PDH_STATUS	status;
-	int	i;
-
-	char counter_path[MAX_COUNTER_PATH];
-
-	pcpus->count = zbx_get_cpu_num();
+	int		i;
+	char		counter_path[MAX_COUNTER_PATH];
 
 	memset(pcpus, 0, sizeof(ZBX_CPUS_STAT_DATA));
+
+	pcpus->count = zbx_get_cpu_num();
 
 	if (PdhOpenQuery(NULL,0,&pcpus->pdh_query)!=ERROR_SUCCESS)
 	{
@@ -176,7 +175,6 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	{
 		PdhGetRawCounterValue(pcpus->cpu[i].usage_couter, NULL, &pcpus->cpu[i].usage_old);
 	}
-
 
 	zbx_snprintf(counter_path, sizeof(counter_path), "\\%s\\%s", GetCounterName(PCI_SYSTEM), GetCounterName(PCI_PROCESSOR_QUEUE_LENGTH));
 

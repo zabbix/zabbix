@@ -34,7 +34,8 @@ char *GetCounterName(DWORD index)
 	DWORD		dwSize;
 
 	/* NOTE: The buffer size should be large enough to contain MAX_COMPUTERNAME_LENGTH + 1 characters.*/
-	char		hostname[MAX_COMPUTERNAME_LENGTH +1 + 2]; /* +2 for '\\' symbols */
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In GetCounterName() [index:%u]", index);
 
 	counterName = PerfCounterList;
 	while(counterName!=NULL)
@@ -46,20 +47,16 @@ char *GetCounterName(DWORD index)
 	if (counterName == NULL)
 	{
 		counterName = (PERFCOUNTER *)malloc(sizeof(PERFCOUNTER));
+		if (NULL == counterName) {
+			zabbix_log(LOG_LEVEL_ERR, "GetCounterName failed: Insufficient memory available for malloc");
+			return "UnknownPerformanceCounter";
+		}
 		memset(counterName, 0, sizeof(PERFCOUNTER));
 		counterName->pdhIndex = index;
 		counterName->next = PerfCounterList;
 
-		hostname[0] = hostname[1] = '\\';
-		dwSize = sizeof(hostname) - 2;
-		if( 0 == GetComputerName(hostname + 2, &dwSize) )
-		{
-			zabbix_log(LOG_LEVEL_ERR, "GetComputerName failed: %s", strerror_from_system(GetLastError()));
-			return "UnknownPerformanceCounter";
-		}
-
 		dwSize = sizeof(counterName->name);
-		if(PdhLookupPerfNameByIndex(hostname, index, counterName->name, &dwSize) == ERROR_SUCCESS)
+		if(PdhLookupPerfNameByIndex(NULL, index, counterName->name, &dwSize) == ERROR_SUCCESS)
 		{
 			PerfCounterList = counterName;
 		} 
@@ -71,5 +68,5 @@ char *GetCounterName(DWORD index)
 		}
 	}
 
-	return (char *)&counterName->name;
+	return counterName->name;
 }
