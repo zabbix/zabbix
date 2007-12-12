@@ -120,7 +120,7 @@ function add_media(formname,mediatypeid,sendto,period,active,severity)
 	}
 ?>
 <?php
-	echo BR;
+	echo SBR;
 
 	insert_media_form();
 

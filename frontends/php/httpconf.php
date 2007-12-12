@@ -342,7 +342,7 @@ include_once "include/page_header.php";
 	$form->AddItem(new CButton("form",S_CREATE_SCENARIO));
 
 	show_table_header(S_CONFIGURATION_OF_WEB_MONITORING_BIG, $form);
-	echo BR;
+	echo SBR;
 
 	$db_hosts=DBselect('select hostid from hosts where '.DBin_node('hostid'));
 	if(isset($_REQUEST["form"])&&isset($_REQUEST["hostid"])&&DBfetch($db_hosts))

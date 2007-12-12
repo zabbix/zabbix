@@ -68,7 +68,7 @@ include_once "include/page_header.php";
 
 	check_fields($fields);
 	validate_sort_and_sortorder();
-
+	
 	$config = $_REQUEST['config'] = get_request('config', 0);
 
 	update_profile('web.screenconf.config', $_REQUEST['config']);
@@ -234,7 +234,7 @@ include_once "include/page_header.php";
 	$form->AddItem(new CButton("form", 0 == $config ? S_CREATE_SCREEN : S_SLIDESHOW));
 
 	show_table_header(0 == $config ? S_CONFIGURATION_OF_SCREENS_BIG : S_CONFIGURATION_OF_SLIDESHOWS_BIG, $form);
-	echo BR;
+	echo SBR;
 
 	if( 0 == $config )
 	{

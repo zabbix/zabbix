@@ -138,10 +138,10 @@ include_once "include/page_header.php";
 	}
 ?>
 <?php
-	$msg=($bulk)?(' BULK ACKNOWLEDGE '):('"'.expand_trigger_description_by_data($db_data).'"'.BR.explode_exp($db_data["expression"],1));
-	show_table_header(S_ALARM_ACKNOWLEDGES_BIG." : ".$msg);
+	$msg=($bulk)?(' BULK ACKNOWLEDGE '):(array('"'.expand_trigger_description_by_data($db_data).'"',BR(),explode_exp($db_data["expression"],1)));
+	show_table_header(array(S_ALARM_ACKNOWLEDGES_BIG,' : ',$msg));
 
-	echo BR;
+	echo SBR;
 	if(!$bulk){
 		$table = new CTable(NULL,"ack_msgs");
 		$table->SetAlign("center");
@@ -162,7 +162,7 @@ include_once "include/page_header.php";
 /**/
 		if($table->GetNumRows() > 0){
 			$table->Show();
-			echo BR;
+			echo SBR;
 		}
 	}
 	

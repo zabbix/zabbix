@@ -127,7 +127,7 @@ include_once "include/page_header.php";
 		$main_header = $item_data["host"].": ".item_description($item_data["description"],$item_data["key_"]);
 		
 		if(isset($_REQUEST["plaintext"]))
-			echo $main_header.BR;
+			echo $main_header.SBR;
 	
 		if($_REQUEST["action"]=="showgraph")
 		{
@@ -239,8 +239,10 @@ include_once "include/page_header.php";
 			$till = time(null) - $_REQUEST["from"] * 3600;
 			$hours=$effectiveperiod / 3600;
 
-			$l_header = "Showing history of ".$effectiveperiod." seconds($hours h)".BR.
-				"[from: ".date("Y.M.d H:i:s",$time)."] [till: ".date("Y.M.d H:i:s",$till)."]";
+			$l_header = array('Showing history of '.$effectiveperiod.' seconds('.$hours.' h)',
+								BR(),
+								'[from: '.date('Y.M.d H:i:s',$time).'] [till: '.date('Y.M.d H:i:s',$till).']'
+							);
 		}
 		else
 		{
@@ -460,7 +462,7 @@ include_once "include/page_header.php";
 			{
 				$table = new CTableInfo();
 				$table->SetHeader(array(S_TIMESTAMP, S_VALUE));
-
+				$table->AddOption('id','graph');
 				$table->ShowStart(); // to solve memory leak we call 'Show' method by steps
 			}
 			else
@@ -504,10 +506,13 @@ COpt::profiling_start("history");
 					echo "\t".$row["clock"]."\t".$row["value"]."\n";
 				}
 			}
-			if(!isset($_REQUEST["plaintext"]))
+			if(!isset($_REQUEST["plaintext"])){
 				$table->ShowEnd();	// to solve memory leak we call 'Show' method by steps
-			else
+				echo SBR;
+			}
+			else{
 				echo "</pre>";
+			}
 COpt::profiling_stop("history");
 		}
 	}
@@ -517,6 +522,7 @@ COpt::profiling_stop("history");
 		if(in_array($_REQUEST["action"],array("showvalues","showgraph"))){
 			
 			$stime = get_min_itemclock_by_itemid($_REQUEST["itemid"]);
+			$stime = (is_null($stime))?0:$stime;
 			$bstime = time()-$effectiveperiod;
 			
 			if(isset($_REQUEST['stime'])){
@@ -525,8 +531,9 @@ COpt::profiling_stop("history");
 			}
 			
  			$script = 	'scrollinit(0,0,0,'.$effectiveperiod.','.$stime.',0,'.$bstime.');
-						showgraphmenu("graph");
-						graph_zoom_init("'.$dom_graph_id.'",'.$bstime.','.$effectiveperiod.',ZBX_G_WIDTH, 200);';
+						showgraphmenu("graph");';
+			if(isset($dom_graph_id))
+						$script.='graph_zoom_init("'.$dom_graph_id.'",'.$bstime.','.$effectiveperiod.',ZBX_G_WIDTH, 200);';
 							
 			zbx_add_post_js($script); 
 

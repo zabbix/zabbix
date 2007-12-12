@@ -62,15 +62,17 @@
 			}
 			elseif(is_array($item)){
 				foreach($item as $el){
-                        		if(strtolower(get_class($el))=='ccol') {
-                		        	parent::AddItem($el);
+                    if(strtolower(get_class($el))=='ccol') {
+                		parent::AddItem($el);
 					} elseif(!is_null($el)) {
-						parent::AddItem('<td>'.unpack_object($el).'</td>');
+//						parent::AddItem('<td>'.unpack_object($el).'</td>');
+						parent::AddItem(new CCol($el));
 					}
 				}
 			}
 			elseif(!is_null($item)){
-				parent::AddItem('<td>'.unpack_object($item).'</td>');
+//				parent::AddItem('<td>'.unpack_object($item).'</td>');
+				parent::AddItem(new CCol($item));
 			}
 		}
 		
@@ -150,7 +152,8 @@
                                                 $this->oddRowClass:
                                                 $this->evenRowClass);
 			}/**/
-			return $item->ToString();
+			return $item;
+//			return $item->ToString();
 		}
 
 		function SetHeader($value=NULL,$class=NULL){
@@ -169,6 +172,7 @@
 			if(is_null($class)) $class = $this->footerClass;
 
 			$this->footer = $this->PrepareRow($value,$class);
+			$this->footer = $this->footer->ToString();
 		}
 
 		function AddRow($item,$rowClass=NULL){
@@ -178,7 +182,7 @@
 		}
 
 		function ShowRow($item,$rowClass=NULL){
-			echo $this->PrepareRow($item,$rowClass);
+			echo $this->PrepareRow($item,$rowClass)->ToString();
 			++$this->rownum;
 		}
 /* protected */
@@ -196,6 +200,7 @@
 			$ret = "";
 			if($this->rownum == 0 && isset($this->message)) {
 				$ret = $this->PrepareRow(new CCol($this->message,'message'));
+				$ret = $ret->ToString();
 			}
 			$ret .= $this->footer;
 			$ret .= parent::EndToString();

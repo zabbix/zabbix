@@ -72,7 +72,7 @@ include_once "include/page_header.php";
 <?php
 	if(isset($_REQUEST["hostid"]))
 	{
-		echo BR;
+		echo SBR;
 		insert_host_profile_form();
 	}
 	else

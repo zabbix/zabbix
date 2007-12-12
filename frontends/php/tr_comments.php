@@ -84,7 +84,7 @@ include_once "include/page_header.php";
 ?>
 <?php
 	show_table_header(S_TRIGGER_COMMENTS_BIG);
-	echo BR;
+	echo SBR;
 	insert_trigger_comment_form($_REQUEST["triggerid"]);
 ?>
 <?php

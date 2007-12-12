@@ -130,7 +130,7 @@
 				
 				$list->AddItem($data['title'], $style);
 			}
-			return $list->ToString();
+			return $list;
 		}
 
 		function GetState()
@@ -142,11 +142,11 @@
 		function Stage0()
 		{
 
-			return new CTag('div', 'yes', 'Welcome to the ZABBIX frontend installation wizard.'.BR.BR.
-				'This installation wizard will guide you through the installation of ZABBIX frontend'.BR.BR.
+			return new CTag('div', 'yes', array('Welcome to the ZABBIX frontend installation wizard.',BR(),BR(),
+				'This installation wizard will guide you through the installation of ZABBIX frontend',BR(),BR(),
 				'Click to "Next" button to proceed to the next screen. If you want to change something '.
-				'on a previous screen, click "Previous" button'.BR.BR.
-				'You may cancel installation at any time by clicking "Cancel" button', 'text');
+				'on a previous screen, click "Previous" button',BR(),BR(),
+				'You may cancel installation at any time by clicking "Cancel" button'), 'text');
 		}
 
 		function Stage1()
@@ -157,10 +157,10 @@
 							
 			return array(
 				new CTag('div', 'yes', (file_exists($LICENCE_FILE) ? 
-					nl2br(nbsp(htmlspecialchars(file_get_contents($LICENCE_FILE)))) : 
+					new CScript(nl2br(nbsp(htmlspecialchars(file_get_contents($LICENCE_FILE))))) : 
 					'Missing licence file. See GPL licence.')
 				, 'licence'),
-				BR,
+				BR(),
 				new CTag('div', 'yes',
 					array(
 						new CCheckBox(
@@ -236,7 +236,7 @@
 				$this->get_test_result(
 					$final_result,
 					'PHP Databases support: ',
-					implode(BR, $ZBX_CONFIG['allowed_db']),
+					new CScript(implode(SBR, $ZBX_CONFIG['allowed_db'])),
 					!isset($ZBX_CONFIG['allowed_db']['no']),
 					'Required any databases support [MySQL or PostgreSQL or Oracle]'));
 
@@ -292,7 +292,7 @@
 				$this->get_test_result(
 					$final_result,
 					'Image formats:', 
-					implode(BR, $img_formats),
+					$img_formats,
 					!isset($no_img_formats),
 					'Required images genetarion support [PNG]'));	
 			
@@ -329,7 +329,7 @@
 				$final_result = new CSpan(S_OK,'ok');
 			}
 			
-			return array($table, BR, $final_result);
+			return array($table, BR(), $final_result);
 		}
 
 		function Stage3()
@@ -354,15 +354,15 @@
 			$table->AddRow(array(S_PASSWORD, new CPassBox('password',	$this->GetConfig('DB_PASSWORD',	''))));
 
 			return array(
-				'Please create database manually.', BR,
+				'Please create database manually.', BR(),
 				'And set the configuration parameters of connection to this database.',
-				BR,BR,
+				BR(),BR(),
 				'And press "Test connection" button.',
-				BR,BR,
+				BR(),BR(),
 				$table,
-				BR,
+				BR(),
 				!$this->DISABLE_NEXT_BUTTON ? new CSpan(S_OK,'ok') :  new CSpan(S_FAIL, 'fail'),
-				BR,
+				BR(),
 				new  CButton('retry', 'Test connection')
 				);
 		}
@@ -378,8 +378,8 @@
 			$table->AddRow(array(S_PORT, new CNumericBox('zbx_server_port',	$this->GetConfig('ZBX_SERVER_PORT',	'10051'),5)));
 
 			return array(
-				'Please enter host name or host IP address', BR,
-				'and port number of ZABBIX server', BR, BR,
+				'Please enter host name or host IP address', BR(),
+				'and port number of ZABBIX server', BR(), BR(),
 				$table,
 				);
 		}
@@ -446,9 +446,9 @@
 			$table1->AddRow(array('ZABBIX server:',		$this->GetConfig('ZBX_SERVER',		'unknown')));
 			$table1->AddRow(array('ZABBIX server port:',	$this->GetConfig('ZBX_SERVER_PORT',	'unknown')));
 			return array(
-				'Please check configuration parameters.', BR,
-				'If all correct press "Next" button, or "Previous" button to change configuration parameters.', BR, BR,
-				$table, BR,
+				'Please check configuration parameters.', BR(),
+				'If all correct press "Next" button, or "Previous" button to change configuration parameters.', BR(), BR(),
+				$table, BR(),
 				$table1
 				);
 		}
@@ -495,15 +495,15 @@
 			*/
 
 			return array(
-				$table, BR,
-				$this->DISABLE_NEXT_BUTTON ? array(new CButton('retry', S_RETRY), BR,BR) : null,
+				$table, BR(),
+				$this->DISABLE_NEXT_BUTTON ? array(new CButton('retry', S_RETRY), BR(),BR()) : null,
 				!$this->GetConfig('ZBX_CONFIG_FILE_CORRECT', false) ? 
-					array('Please install configuration file manualy.',BR,BR,
+					array('Please install configuration file manualy.',BR(),BR(),
 						'By pressing "Save configuration file" button download configuration file ',
-						'and place them into the ',BR,
-						'"'.$ZBX_CONFIGURATION_FILE.'"',BR,BR,
+						'and place them into the ',BR(),
+						'"'.$ZBX_CONFIGURATION_FILE.'"',BR(),BR(),
 						new CButton('save_config',"Save configuration file"),
-						BR,BR
+						BR(),BR()
 						)
 					: null,
 				'Press the '.($this->DISABLE_NEXT_BUTTON ? '"Retry"' : '"Next"').' button'
@@ -513,7 +513,7 @@
 		function Stage7()
 		{
 			return array(
-				'Congratulation with succesfull instalation of ZABBIX frontend.',BR,BR,
+				'Congratulation with succesfull instalation of ZABBIX frontend.',BR(),BR(),
 				'Press "Finish" button to complete installation'
 				);
 		}

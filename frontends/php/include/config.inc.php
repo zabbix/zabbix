@@ -18,9 +18,9 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-function SDI($msg="SDI") { echo "DEBUG INFO: "; var_dump($msg); echo BR; } // DEBUG INFO!!!
-function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$msg.'"'.SPACE; var_dump($var); echo BR; } // DEBUG INFO!!!
-function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
+function SDI($msg="SDI") { echo "DEBUG INFO: "; var_dump($msg); echo SBR; } // DEBUG INFO!!!
+function VDP($var, $msg=null) { echo "DEBUG DUMP: "; if(isset($msg)) echo '"'.$msg.'"'.SPACE; var_dump($var); echo SBR; } // DEBUG INFO!!!
+function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 ?>
 <?php
@@ -61,6 +61,7 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 	require_once("include/classes/cpumenu.inc.php");
 	require_once("include/classes/graph.inc.php");
 	require_once('include/classes/ctree.inc.php');
+	require_once('include/classes/cscript.inc.php');
 
 // Include Tactical Overview modules
 
@@ -1357,14 +1358,15 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 
 /************ HISTORY **************/
 	function get_user_history(){
-		$history='';
+		$history=array();
 		$delimiter = new CSpan('&raquo;','delimiter');
-		$delimiter = $delimiter->ToString();
 		for($i = 0; $i < ZBX_HISTORY_COUNT; $i++){
 			if($rows = get_profile('web.history.'.$i,false)){
-				$history.= ($i>0)?($delimiter):('');
+				if($i>0){
+					array_push($history,$delimiter);
+				}
 				$url = new CLink($rows[0],$rows[1],'history');
-				$history.= SPACE.($url->ToString()).SPACE;
+				array_push($history,array(SPACE,$url,SPACE));
 			}
 		}
 	return $history;

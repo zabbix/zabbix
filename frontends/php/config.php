@@ -312,7 +312,7 @@ include_once "include/page_header.php";
 		break;
 	}
 	show_table_header(S_CONFIGURATION_OF_ZABBIX_BIG, $form);
-	echo BR;
+	echo SBR;
 ?>
 
 <?php
@@ -392,7 +392,7 @@ include_once "include/page_header.php";
 						$db_map["value"],
 						SPACE.RARR.SPACE,
 						$db_map["newvalue"],
-						BR);
+						BR());
 				}
 				$table->AddRow(array(
 					new CLink($db_valuemap["name"],"config.php?form=update&".

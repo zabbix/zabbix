@@ -886,10 +886,15 @@
 	 ******************************************************************************/
 	function	explode_exp ($expression, $html,$template=false)
 	{
-#		echo "EXPRESSION:",$expression,"<Br>";
+//		echo "EXPRESSION:",$expression,"<Br>";
 
 		$functionid='';
-		$exp='';
+		if(0 == $html){
+			$exp='';
+		}
+		else{
+			$exp=array();
+		}
 		$state='';
 		for($i=0,$max=strlen($expression); $i<$max; $i++)
 		{
@@ -902,44 +907,52 @@
 			if($expression[$i] == '}')
 			{
 				$state='';
-				if($functionid=="TRIGGER.VALUE")
-				{
-					$exp .= "{".$functionid."}";
+				if($functionid=="TRIGGER.VALUE"){
+					if(0 == $html) $exp.='{'.$functionid.'}';
+					else array_push($exp,'{'.$functionid.'}');
 				}
-				else if(is_numeric($functionid) && $function_data = DBfetch(DBselect('select h.host,i.key_,f.function,f.parameter,i.itemid,i.value_type'.
-					' from items i,functions f,hosts h'.
-					' where f.functionid='.$functionid.' and i.itemid=f.itemid and h.hostid=i.hostid')))
+				else if(is_numeric($functionid) && 
+					$function_data = DBfetch(DBselect('select h.host,i.key_,f.function,f.parameter,i.itemid,i.value_type'.
+													' from items i,functions f,hosts h'.
+													' where f.functionid='.$functionid.
+														' and i.itemid=f.itemid '.
+														' and h.hostid=i.hostid'
+					)))
 				{
 					if($template) $function_data["host"] = '{HOSTNAME}';
 						
-					if($html == 0)
-					{
-						$exp .= "{".$function_data["host"].":".$function_data["key_"].".".
-							$function_data["function"]."(".$function_data["parameter"].")}";
+					if($html == 0){
+						$exp.='{'.$function_data['host'].':'.$function_data['key_'].'.'.$function_data['function'].'('.$function_data['parameter'].')}';
 					}
-					else
-					{
-						$link = new CLink($function_data["host"].":".$function_data["key_"],
-							'history.php?action='.( $function_data["value_type"] ==0 ? 'showvalues' : 'showgraph').
+					else{
+						$link = new CLink($function_data['host'].':'.$function_data['key_'],
+							'history.php?action='.( $function_data['value_type'] ==0 ? 'showvalues' : 'showgraph').
 							'&itemid='.$function_data['itemid']);
 					
-						$exp .= '{'.$link->ToString().'.'.bold($function_data["function"].'(').$function_data["parameter"].bold(')').'}';
+						array_push($exp,array('{',$link,'.',bold($function_data['function'].'('),$function_data['parameter'],bold(')'),'}'));
 					}
 				}
-				else
-				{
-					if($html == 1)	$exp .= "<FONT COLOR=\"#AA0000\">";
-					$exp .= "*ERROR*";
-					if($html == 1)	$exp .= "</FONT>";
+				else{
+					if(1 == $html){
+						$font = new CTag('font','yes');
+						$font->AddOption('color','#AA0000');
+						$font->AddItem('*ERROR*');
+						array_push($exp,$font);
+					}
+					else{
+						$exp.= '*ERROR*';
+					}
+
 				}
 				continue;
 			}
-			if($state == "FUNCTIONID")
-			{
+			if($state == "FUNCTIONID"){
 				$functionid=$functionid.$expression[$i];
 				continue;
 			}
-			$exp=$exp.$expression[$i];
+			
+			if(1 == $html) array_push($exp,$expression[$i]);
+			else $exp.=$expression[$i];
 		}
 #		echo "EXP:",$exp,"<Br>";
 		return $exp;
@@ -1501,7 +1514,6 @@
 			$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS, $permission, null, PERM_RES_IDS_ARRAY);
 		}
 		if(!is_array($accessible_hosts)) $accessible_hosts = explode(',', $accessible_hosts);
-
                 $db_hosts = get_hosts_by_expression($expression);
 		while($host_data = DBfetch($db_hosts))
 		{

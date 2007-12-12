@@ -314,7 +314,7 @@ include_once "include/page_header.php";
 	$form->AddVar('eventsource', $_REQUEST['eventsource']);
 	$form->AddItem(new CButton('form',S_CREATE_ACTION));
 	show_table_header(S_CONFIGURATION_OF_ACTIONS_BIG, $form);
-	echo BR;
+	echo SBR;
 
 	if(isset($_REQUEST['form']))
 	{
@@ -356,23 +356,23 @@ include_once "include/page_header.php";
 		{
 			if(!action_accessiable($action_data['actionid'], PERM_READ_WRITE)) continue;
 
-			$conditions='';
+			$conditions=array();
 			$db_conditions = DBselect('select * from conditions where actionid='.$action_data['actionid'].
 				' order by conditiontype,conditionid');
 			while($condition_data = DBfetch($db_conditions))
 			{
-				$conditions .= get_condition_desc(
+				array_push($conditions, array(get_condition_desc(
 							$condition_data['conditiontype'],
 							$condition_data['operator'],
-							$condition_data['value']).BR;
+							$condition_data['value']),BR()));
 			}
 			unset($db_conditions, $condition_data);
 
-			$operations='';
+			$operations=array();
 			$db_operations = DBselect('select * from operations where actionid='.$action_data['actionid'].
 				' order by operationtype,operationid');
 			while($operation_data = DBfetch($db_operations))
-				$operations .= get_operation_desc(SHORT_DESCRITION, $operation_data).BR;
+				array_push($operations,array(get_operation_desc(SHORT_DESCRITION, $operation_data),BR()));
 				
 			if($action_data['status'] == ACTION_STATUS_DISABLED)
 			{

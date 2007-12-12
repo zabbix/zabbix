@@ -500,7 +500,7 @@
 				elseif( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_URL) )
 				{
 					$item = array(new CIFrame($url,$width,$height,"auto"));
-					if($editmode == 1)	array_push($item,BR,new CLink(S_CHANGE,$action));
+					if($editmode == 1)	array_push($item,BR(),new CLink(S_CHANGE,$action));
 				}
 				elseif( ($screenitemid!=0) && ($resourcetype==SCREEN_RESOURCE_ACTIONS) )
 				{
@@ -515,7 +515,7 @@
 				else
 				{
 					$item = array(SPACE);
-					if($editmode == 1)	array_push($item,BR,new CLink(S_CHANGE,$action));
+					if($editmode == 1)	array_push($item,BR(),new CLink(S_CHANGE,$action));
 				}
 
 				$str_halign = "def";

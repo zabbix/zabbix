@@ -25,7 +25,8 @@
 
 	$page["title"] = "S_CONFIGURATION_OF_NETWORK_MAPS";
 	$page["file"] = "sysmap.php";
-
+	$page['hist_arg'] = array('sysmapid');
+	
 include_once "include/page_header.php";
 
 ?>
@@ -148,12 +149,12 @@ include_once "include/page_header.php";
 ?>
 
 <?php
-	echo BR;
+	echo SBR;
 	if(isset($_REQUEST["form"]) && ($_REQUEST["form"]=="add_element" ||
 		($_REQUEST["form"]=="update" && isset($_REQUEST["selementid"]))))
 	{
 		show_table_header("DISPLAYED ELEMENTS");
-		echo BR;
+		echo SBR;
 		insert_map_element_form();
 	}
 	else if(isset($_REQUEST["form"]) && ($_REQUEST["form"]=="add_link" || 
@@ -163,7 +164,7 @@ include_once "include/page_header.php";
 		if($row["count"]>1)
 		{
 			show_table_header("CONNECTORS");
-			echo BR;
+			echo SBR;
 			insert_map_link_form();
 		}
 		else
@@ -205,7 +206,7 @@ include_once "include/page_header.php";
 		}
 		$table->show();
 
-		echo BR;
+		echo SBR;
 		show_table_header("CONNECTORS", new CButton("form","Create connection",
 			"return Redirect('".$page["file"]."?form=add_link".
 			url_param("sysmapid")."');"));
@@ -232,18 +233,18 @@ include_once "include/page_header.php";
 	/* prepare description */
 	
 			$triggers = get_link_triggers($row['linkid']);
-			$description='';
+			$description=array();
 
 			foreach($triggers as $id => $trigger){
 				if(isset($trigger['triggerid'])){
-					if(!empty($description)) $description.=BR;
+					if(!empty($description)) $description[]=BR();
 					$triggers[$id]['description'] = expand_trigger_description($trigger['triggerid']);
 				}
-				$description.= $triggers[$id]['description'];
+				$description[]= $triggers[$id]['description'];
 			}
 			
 			if(empty($description))
-				$description="-";
+				$description='-';
 
 	/* draw row */
 			$table->addRow(array(
@@ -259,7 +260,7 @@ include_once "include/page_header.php";
 		$table->Show();
 	}
 
-	echo BR;
+	echo SBR;
 	$map=get_sysmap_by_sysmapid($_REQUEST["sysmapid"]);
 	show_table_header($map["name"]);
 

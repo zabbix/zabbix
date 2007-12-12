@@ -479,7 +479,7 @@
 		if(!isset($data[$period_end])) $data[$period_end] = array();
 
 /*
-		print('From: '.date('l d M Y H:i',$period_start).' To: '.date('l d M Y H:i',$period_end).BR);
+		print('From: '.date('l d M Y H:i',$period_start).' To: '.date('l d M Y H:i',$period_end).SBR);
 $ut = 0;
 $dt = 0;
 		foreach($data as $ts => $val)
@@ -492,7 +492,7 @@ $dt = 0;
 			if(isset($val['dt_e'])) {print(' dt_e-'.$val['dt_e']); $dt-=$val['dt_e'];}
 			if(isset($val['alarm'])) {print(' alarm is '.$val['alarm']); }
 			print('       ut = '.$ut.'      dt = '.$dt);
-			print(BR);
+			print(SBR);
 		}
 */
 		/* calculate times */
@@ -508,7 +508,7 @@ $dt = 0;
 		$prev_alarm = $data[$period_start]['alarm'];
 		$prev_time  = $period_start;
 
-//print_r($data[$period_start]); print(BR);
+//print_r($data[$period_start]); print(SBR);
 
 		if(isset($data[$period_start]['ut_s'])) $ut_cnt += $data[$period_start]['ut_s'];
 		if(isset($data[$period_start]['ut_e'])) $ut_cnt -= $data[$period_start]['ut_e'];
@@ -540,7 +540,7 @@ $dt = 0;
 			{
 				$sla_time[$period_type]['ok_time'] 	+= $ts - $prev_time;
 			}
-//print_r($val); print(BR);
+//print_r($val); print(SBR);
 			if(isset($val['ut_s'])) $ut_cnt += $val['ut_s'];
 			if(isset($val['ut_e'])) $ut_cnt -= $val['ut_e'];
 			if(isset($val['dt_s'])) $dt_cnt += $val['dt_s'];
