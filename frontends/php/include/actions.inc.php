@@ -449,11 +449,11 @@ include_once 'include/discovery.inc.php';
 				switch($data['operationtype'])
 				{
 					case OPERATION_TYPE_MESSAGE:
-						$result = bold(S_SUBJECT).': '.$data['shortdata']."\n";
-						$result .= bold(S_MESSAGE).":\n".$data['longdata'];
+						$result = bold(S_SUBJECT)->ToString().': '.$data['shortdata']."\n";
+						$result .= bold(S_MESSAGE)->ToString().":\n".$data['longdata'];
 						break;
 					case OPERATION_TYPE_COMMAND:
-						$result = bold(S_REMOTE_COMMANDS).":\n".$data['longdata'];
+						$result = bold(S_REMOTE_COMMANDS)->ToString().":\n".$data['longdata'];
 						break;
 					default: break;
 				}

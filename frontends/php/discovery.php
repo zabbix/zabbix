@@ -104,7 +104,7 @@ include_once "include/page_header.php";
 	$header = array(
 		is_show_subnodes() ? new CCol(S_NODE, 'center') : null,
 		new CCol(make_sorting_link(S_HOST,'d.dhostid'), 'center'),
-		new CCol(S_UPTIME.'/'.BR.S_DOWNTIME,'center')
+		new CCol(array(S_UPTIME.'/',BR(),S_DOWNTIME),'center')
 		);
 
 	foreach($services as $name => $foo)

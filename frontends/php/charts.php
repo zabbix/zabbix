@@ -404,7 +404,7 @@ include_once 'include/page_header.php';
 				</script>'."\n";
 		}
 		
-		$table->AddRow($row);
+		$table->AddRow(new CScript($row));
 	}
 	$table->Show();
 

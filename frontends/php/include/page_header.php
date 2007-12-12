@@ -494,7 +494,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$table->AddRow($tr);
 		$table->Show();
 	} elseif(($page["type"] == PAGE_TYPE_HTML) && !defined('ZBX_PAGE_NO_MENU')) {
-		echo BR;
+		echo SBR;
 	}
 //------------------------------------ </HISTORY> ---------------------------------------
 

@@ -56,7 +56,7 @@ function zbx_add_post_js($script)
 
 function	get_js_sizeable_graph($dom_graph_id,$url){
 
-return '
+return new CScript('
 	<script language="JavaScript" type="text/javascript">
 	<!--
 		A_SBOX["'.$dom_graph_id.'"] = new Object;
@@ -71,14 +71,13 @@ return '
 
 		insert_sizeable_graph('.zbx_jsvalue($dom_graph_id).','.zbx_jsvalue($url).');
 	-->
-	</script>
-	';
+	</script>');
 }
 
 
 function	get_dynamic_chart($dom_graph_id,$img_src,$width=0){
 	if(is_int($width) && $width > 0) $img_src.= url_param($width, false, 'width');
-	$result = '
+	$result = new CScript('
 		<script language="JavaScript" type="text/javascript">
 		<!--
 		var width = "'.((!(is_int($width) && $width > 0)) ? $width : '').'";
@@ -105,7 +104,7 @@ function	get_dynamic_chart($dom_graph_id,$img_src,$width=0){
 		
 		document.write(\'<img src="\'+img_src + width +\'" alt="chart" id="'.$dom_graph_id.'" />\');
 		-->
-		</script>';
+		</script>');
 return $result;
 }
 

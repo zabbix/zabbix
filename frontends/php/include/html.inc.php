@@ -19,16 +19,21 @@
 **/
 ?>
 <?php
-	function bold($str)
-	{
+	function bold($str){
 		if(is_array($str)){
 			foreach($str as $key => $val)
-				if(is_string($val))
-					 $str[$key] = "<b>$val</b>";
-		} elseif(is_string($str)) {
-			$str = "<b>$str</b>";
+				if(is_string($val)){
+					$b = new CTag('strong','yes');
+					$b->AddItem($val);
+					$str[$key] = $b;
+				}
+		} 
+		else if(is_string($str)) {
+			$b = new CTag('strong','yes');
+			$b->AddItem($str);
+			$str = $b;
 		}
-		return $str;
+	return $str;
 	}
 
 	function bfirst($str) // mark first symbol of string as bold
@@ -110,38 +115,28 @@
 		return $result;
 	}
 
-	function url_param($parameter,$request=true,$name=null)
-	{
-		$result = "";
-
-		
-		if(!is_array($parameter))
-		{
-			if(!isset($name))
-			{
+	function url_param($parameter,$request=true,$name=null){
+		$result = '';
+		if(!is_array($parameter)){
+			if(!isset($name)){
 				if(!$request)
 					fatal_error('not request variable require url name [url_param]');
-
+					
 				$name = $parameter;
 			}
 		}
 		
-		if($request)
-		{
-			global $_REQUEST;
-			
+		if($request){
 			$var =& $_REQUEST[$parameter];
 		}
-		else
-		{
+		else{
 			$var =& $parameter;
 		}
 		
-		if(isset($var))
-		{
+		if(isset($var)){
 			$result = prepare_url($var,$name);
 		}
-		return $result;
+	return $result;
 	}
 
 	function table_begin($class="tableinfo")
@@ -206,5 +201,9 @@
 		echo "</TD>";
 		echo "</TR>";
 		echo "</TABLE>";
+	}
+	
+	function BR(){
+		return new CTag('br','no');
 	}
 ?>

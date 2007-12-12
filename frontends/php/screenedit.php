@@ -73,7 +73,7 @@ include_once "include/page_header.php";
 
 		$screen = get_screen_by_screenid($_REQUEST["screenid"]);
 
-		echo BR;
+		echo SBR;
 		if(isset($_REQUEST["save"]))
 		{
 			if(!isset($_REQUEST["elements"]))	$_REQUEST["elements"]=0;

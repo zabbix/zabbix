@@ -78,7 +78,7 @@ include_once "include/page_header.php";
 	$form->AddItem($cmbLimit);
 
 
-	show_table_header(S_EVENTS_BIG.': "'.$description.'"'.BR.$expression, $form);
+	show_table_header(array(S_EVENTS_BIG.': "'.$description.'"',BR(),$expression), $form);
 ?>
 <?php
 	$sql_cond = '';

@@ -130,7 +130,7 @@ include_once "include/page_header.php";
 	
 	insert_showhint_javascript();
 
-	echo BR;
+	echo SBR;
 	$ZBX_SETUP_WIZARD->Show();
 
 	global $_POST;

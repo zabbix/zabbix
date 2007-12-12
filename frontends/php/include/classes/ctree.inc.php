@@ -238,7 +238,6 @@ function CheckTree(){
 		$this->tree[$parentid]['childnodes'][] = $id;
 
 		$this->tree[$id]['nodelist'] = '';
-//		echo $id.BR;
 	}
 	
 return true;

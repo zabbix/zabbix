@@ -164,7 +164,7 @@ function update_httpstep(formname,list_name,sid,name,timeout,url,posts,required,
 	{
 ?>
 <?php
-	echo BR;
+	echo SBR;
 
 	insert_httpstep_form();
 

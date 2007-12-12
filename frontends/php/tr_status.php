@@ -321,7 +321,7 @@ include_once "include/page_header.php";
 			$form->AddVar("compact",$compact);
 			$form->AddVar("noactions",$noactions);
 			$form->AddVar("select",$select);
-			array_push($left_col,BR,$form);
+			array_push($left_col,BR(),$form);
 		}
 		show_table_header($left_col);
 	}
@@ -392,7 +392,6 @@ include_once "include/page_header.php";
 	while($row=DBfetch($result)){
 // Check for dependencies
 		if(trigger_dependent($row["triggerid"]))	continue;
-
 		$cond = '';
 		$event_expire = ($config['event_expire']*86400); // days
 		switch($show_events){
@@ -442,7 +441,7 @@ include_once "include/page_header.php";
 			$font->AddOption('color','#000');
 			$font->AddOption('size','-2');
 			$font->AddItem(explode_exp($row["expression"],1));
-			$description = array($description,BR, $font);
+			$description = array($description,BR(), $font);
 		}
 // dependency		
 		$dependency = false;
@@ -558,7 +557,8 @@ include_once "include/page_header.php";
 			$font = new CTag('font','yes');
 			$font->AddOption('color','#808080');
 			$font->AddItem(array('&nbsp;-&nbsp;',$description));
-			$description = $font->ToString();
+//			$description = $font->ToString();
+			$description = $font;
 
 			$table->AddRow(array(
 					get_node_name_by_elid($row['triggerid']),

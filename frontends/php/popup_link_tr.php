@@ -107,7 +107,7 @@ if(isset($_REQUEST['save']) && isset($_REQUEST['triggerid']) && isset($_REQUEST[
 	</script>';
 }
 else if(isset($_REQUEST['form'])){
-	echo BR;
+	echo SBR;
 	$frmCnct = new CFormTable("New connector","popup_link_tr.php");
 	$frmCnct->SetHelp("web.sysmap.connector.php");
 

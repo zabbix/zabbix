@@ -218,14 +218,14 @@
 //*/
 //echo $f,":",$expression,"<br>";
 			$expression = str_replace('{'.$f.'}','$_REQUEST["'.$f.'"]',$expression);
-//$debug .= $f." = ".$_REQUEST[$f].BR;
+//$debug .= $f." = ".$_REQUEST[$f].SBR;
 		}
 		$expression = trim($expression,"& ");
 		$exec = "return (".$expression.") ? 1 : 0;";
 
 		$ret = eval($exec);
 //echo $debug;
-//echo "$field - result: ".$ret." exec: $exec".BR.BR;
+//echo "$field - result: ".$ret." exec: $exec".SBR.SBR;
 //SDI("$field - result: ".$ret." exec: $exec");
 		return $ret;
 	}
@@ -414,6 +414,11 @@
 				info("Warning. Field [".$field."] is not string");
 				return ZBX_VALID_WARNING;
 			}
+		}
+		
+		if($type == T_ZBX_STR){
+//			XSS
+//			$var=str_replace('<','&lt;',$var);
 		}
 
 		if(($type == T_ZBX_CLR) && !is_hex_color($var)) {
