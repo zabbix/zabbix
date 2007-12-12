@@ -578,7 +578,7 @@ include_once "include/page_header.php";
 		$frmForm->AddItem($btn);
 	}
 	show_table_header(S_CONFIGURATION_OF_HOSTS_GROUPS_AND_TEMPLATES, $frmForm);
-	echo BR;
+	echo SBR;
 ?>
 
 <?php
@@ -850,7 +850,7 @@ include_once "include/page_header.php";
 					$style = $db_host["status"]==HOST_STATUS_MONITORED ? NULL: ( 
 						$db_host["status"]==HOST_STATUS_TEMPLATE ? "unknown" :
 						"on");
-					array_push($hosts,unpack_object(new CSpan($db_host["host"],$style)));
+					array_push($hosts,empty($hosts)?'':',',new CSpan($db_host["host"],$style));
 					$count++;
 				}
 
@@ -864,7 +864,8 @@ include_once "include/page_header.php";
 							url_param("config"),'action')
 					),
 					$count,
-					implode(', ',$hosts)
+					$hosts
+//					implode(', ',$hosts)
 					));
 			}
 			$table->SetFooter(new CCol(array(

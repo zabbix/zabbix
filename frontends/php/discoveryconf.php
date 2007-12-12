@@ -186,7 +186,7 @@ include_once "include/page_header.php";
 	
 	$form->AddItem(new CButton('form', S_CREATE_RULE));
 	show_table_header(S_CONFIGURATION_OF_DISCOVERY_BIG, $form);
-	echo BR;
+	echo SBR;
 
 	if(isset($_REQUEST["form"]))
 	{

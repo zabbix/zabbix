@@ -665,13 +665,15 @@ include_once "include/page_header.php";
 			if($row['dep_count'] > 0)
 			{
 				$description = array(
-					$description,BR.BR.
-					"<strong>".S_DEPENDS_ON."</strong>".BR);
+					$description,
+					BR(),BR(),
+					bold(S_DEPENDS_ON),
+					BR());
 
 				$deps = get_trigger_dependences_by_triggerid($row["triggerid"]);
 				
 				foreach($deps as $val)
-					$description[] = expand_trigger_description($val).BR;
+					$description[] = array(expand_trigger_description($val),BR());
 			}
 
 			if($row["status"] == TRIGGER_STATUS_DISABLED)

@@ -198,7 +198,7 @@ function update_graph_item(formname,list_name,gid,itemid,color,drawtype,sortorde
 	{
 ?>
 <?php
-	echo BR;
+	echo SBR;
 
 	insert_graphitem_form();
 

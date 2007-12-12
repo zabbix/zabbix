@@ -129,7 +129,7 @@ include_once "include/page_header.php";
 <?php
 	if(isset($_REQUEST["form"]))
 	{
-		echo BR;
+		echo SBR;
 		insert_media_type_form();
 	}
 	else

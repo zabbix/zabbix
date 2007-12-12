@@ -146,7 +146,7 @@ include_once "include/page_header.php";
 	$form->AddItem($cmbConfig);
 
 	show_table_header($title, $form);
-	echo BR;
+	echo SBR;
 
 	if($config == 1)
 	{

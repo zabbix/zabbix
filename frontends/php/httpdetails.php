@@ -69,8 +69,10 @@ include_once "include/page_header.php";
 ?>
 <?php
 	$lnkCancel = new CLink(S_CANCEL,'httpmon.php'.url_param('groupid').url_param('hostid'));
-	show_table_header(S_DETAILS_OF_SCENARIO_BIG.' "'.bold($httptest_data['name']).'" - '.
-		date(S_DATE_FORMAT_YMDHMS,$httptest_data['lastcheck']),$lnkCancel);
+	show_table_header(array(S_DETAILS_OF_SCENARIO_BIG.' "',
+						bold($httptest_data['name']),
+						'" - '.date(S_DATE_FORMAT_YMDHMS,$httptest_data['lastcheck']),$lnkCancel)
+					);
 
 // TABLE
 	$table  = new CTableInfo();
@@ -206,9 +208,12 @@ include_once "include/page_header.php";
 
 	$table->Show();
 
-	echo BR;
+	echo SBR;
 
-	show_table_header(S_HISTORY.' "'.bold($httptest_data['name']).'"');
+	show_table_header(array(S_HISTORY.' "',
+						bold($httptest_data['name']),
+						'"')
+					);
 	$form = new CTableInfo();
 	$form->AddOption('id','graph');
 	
@@ -229,7 +234,7 @@ include_once "include/page_header.php";
 		,'center')));
 
 	$form->Show();
-	echo BR.BR;
+	echo SBR.SBR;
 	
 
 	$period = get_request('period',3600);

@@ -423,7 +423,8 @@
 	define('DHOST_STATUS_ACTIVE',		0);
 	define('DHOST_STATUS_DISABLED',		1);
 	
-	define('BR',	"<br/>\n");
+//	define('BR',	"<br/>\n");
+	define('SBR',	"<br/>\n");
 	define('SPACE',	'&nbsp;');
 	define('RARR',	'&rArr;');
 

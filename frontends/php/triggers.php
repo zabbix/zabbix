@@ -360,12 +360,12 @@ include_once "include/page_header.php";
 	if(isset($_REQUEST["form"]))
 	{
 /* FORM */
-		echo BR;
+		echo SBR;
 		insert_trigger_form();
 	} 
 	else if(isset($_REQUEST["form_copy_to"]) && isset($_REQUEST["g_triggerid"]))
 	{
-		echo BR;
+		echo SBR;
 		insert_copy_elements_to_forms("g_triggerid");
 	} 
 	else{
@@ -442,11 +442,11 @@ include_once "include/page_header.php";
 			//add dependences
 			$deps = get_trigger_dependences_by_triggerid($row["triggerid"]);
 			if(count($deps) > 0){
-				$description[] = BR.BR."<strong>".S_DEPENDS_ON.":</strong>".SPACE.BR;
+				$description[] = array(BR(),BR(),bold(S_DEPENDS_ON.':'),SPACE,BR());
 				foreach($deps as $val)
-					$description[] = expand_trigger_description($val).BR;
+					$description[] = array(expand_trigger_description($val),BR());
 
-				$description[] = BR;
+				$description[] = BR();
 			}
 	
 			if($row["priority"]==0)		$priority=S_NOT_CLASSIFIED;

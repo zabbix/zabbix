@@ -293,7 +293,7 @@ include_once "include/page_header.php";
 			zbx_add_post_js($script); 
 			$img = new CImg('images/general/tree/O.gif','space','20','20');
 			$img->Show();
-			echo BR;
+			echo SBR;
 //			navigation_bar("screens.php",array('config','elementid'));
 		}
 	}

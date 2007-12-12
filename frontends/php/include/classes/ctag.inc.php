@@ -90,17 +90,22 @@
 
 		function CleanItems()		{	$this->items = array();				}
 		function ItemsCount()		{	return count($this->items);			}
+		
 		function AddItem($value)
 		{
-			if(is_array($value))
-			{
-				foreach($value as $item)
-				{
-					array_push($this->items,unpack_object($item));
+			if(is_object($value)){
+				array_push($this->items,unpack_object($value));
+			}
+			else if(is_string($value)){
+				array_push($this->items,str_replace(array('<','>','"'),array('&lt;','&gt;','&quot;'),$value));
+//				array_push($this->items,htmlspecialchars($value));
+			}
+			else if(is_array($value)){
+				foreach($value as $item){
+					$this->AddItem($item);			 // Attention, recursion !!!
 				}
 			}
-			elseif(!is_null($value))
-			{
+			else if(!is_null($value)){
 				array_push($this->items,unpack_object($value));
 			}
 		}

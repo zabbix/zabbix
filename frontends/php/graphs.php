@@ -276,7 +276,7 @@ include_once "include/page_header.php";
 	$form->AddItem(new CButton("form",S_CREATE_GRAPH));
 
 	show_table_header(S_CONFIGURATION_OF_GRAPHS_BIG,$form);
-	echo BR;
+	echo SBR;
 
 	if(isset($_REQUEST["form_copy_to"]) && isset($_REQUEST["group_graphid"]))
 	{
@@ -285,7 +285,7 @@ include_once "include/page_header.php";
 	else if(isset($_REQUEST["form"]))
 	{
 		insert_graph_form();
-		echo BR;
+		echo SBR;
 		$table = new CTable(NULL,"graph");
 		if(($_REQUEST['graphtype'] == GRAPH_TYPE_PIE) || ($_REQUEST['graphtype'] == GRAPH_TYPE_EXPLODED)){
 			$table->AddRow(new CImg('chart7.php?period=3600'.url_param('items').

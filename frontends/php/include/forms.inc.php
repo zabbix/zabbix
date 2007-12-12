@@ -136,7 +136,7 @@
 						'&dstfld1=screen_name&srcfld1=name'.
 						'&dstfld2=new_step%5Bscreenid%5D&srcfld2=screenid");'),
 					S_DELAY,
-					new CNumericBox('new_step[delay]', $new_step['delay'], 5), BR,
+					new CNumericBox('new_step[delay]', $new_step['delay'], 5), BR(),
 					new CButton('add_step', isset($new_step['sid']) ? S_SAVE : S_ADD),
 					new CButton('cancel_step', S_CANCEL)
 
@@ -234,7 +234,7 @@
 				new CCheckBox('selected_checks[]',null,null,$id), SPACE,
 				discovery_check_type2str($data['type']), SPACE,
 				'('.$data['ports'].')'.SPACE.$external_param,
-				BR
+				BR()
 			);
 		}
 
@@ -273,12 +273,12 @@
 		{
 			case SVC_SNMPv1:
 			case SVC_SNMPv2:
-				$external_param = array_merge($external_param, array(BR, S_SNMP_COMMUNITY, SPACE, new CTextBox('new_check_snmp_community', $new_check_snmp_community)));
-				$external_param = array_merge($external_param, array(BR, S_SNMP_OID, new CTextBox('new_check_key', $new_check_key), BR));
+				$external_param = array_merge($external_param, array(BR(), S_SNMP_COMMUNITY, SPACE, new CTextBox('new_check_snmp_community', $new_check_snmp_community)));
+				$external_param = array_merge($external_param, array(BR(), S_SNMP_OID, new CTextBox('new_check_key', $new_check_key), BR()));
 				break;
 			case SVC_AGENT:	
 				$form->AddVar('new_check_snmp_community', '');
-				$external_param = array_merge($external_param, array(BR, S_KEY, new CTextBox('new_check_key', $new_check_key), BR));
+				$external_param = array_merge($external_param, array(BR(), S_KEY, new CTextBox('new_check_key', $new_check_key), BR()));
 				break;
 			default:
 				$form->AddVar('new_check_snmp_community', '');
@@ -488,7 +488,7 @@
 		$form->AddVar('steps', $steps);
 
 		$form->AddRow(S_STEPS, array(
-			(count($steps) > 0) ? array ($tblSteps, BR) : null ,
+			(count($steps) > 0) ? array ($tblSteps, BR()) : null ,
 			new CButton('add_step',S_ADD,
 				'return PopUp("popup_httpstep.php?dstfrm='.$form->GetName().'");'),
 			(count($steps) > 0) ? new CButton('del_sel_step',S_DELETE_SELECTED) : null
@@ -832,7 +832,7 @@
 			$frmUser->AddRow(S_GROUPS, 
 				array(
 					$lstGroups, 
-					BR, 
+					BR(), 
 					new CButton('add_group',S_ADD,
 						'return PopUp("popup_usrgrp.php?dstfrm='.$frmUser->GetName().
 						'&list_name=user_groups_to_del[]&var_name=user_groups",450, 450);'),
@@ -1043,7 +1043,7 @@
 		$frmUserG->AddRow(S_USERS, 
 			array(
 				$lstUsers, 
-				BR, 
+				BR(), 
 				new CButton('add_user',S_ADD,
 					"return PopUp('popup_users.php?dstfrm=".$frmUserG->GetName().
 					"&list_name=group_users_to_del[]&var_name=group_users',450,450);"),
@@ -1327,7 +1327,7 @@
 
 		if(ZBX_DISTRIBUTED && $selection_mode)
 		{
-			$form->AddRow('from '.bold(S_NODE).' like', array(
+			$form->AddRow(array('from ',bold(S_NODE),' like'), array(
 				new CTextBox('with_node',$with_node,32),
 				new CButton("btn_node",S_SELECT,"return PopUp('popup.php?dstfrm=".$form->GetName().
 					"&dstfld1=with_node&srctbl=nodes&srcfld1=name',450,450);",
@@ -1337,7 +1337,7 @@
 
 		if($selection_mode)
 		{
-			$form->AddRow('from '.bold(S_HOST_GROUP).' like', array(
+			$form->AddRow(array('from ',bold(S_HOST_GROUP),' like'), array(
 				new CTextBox('with_group',$with_group,32),
 				new CButton("btn_group",S_SELECT,"return PopUp('popup.php?dstfrm=".$form->GetName().
 					"&dstfld1=with_group&srctbl=host_group&srcfld1=name',450,450);",
@@ -1345,7 +1345,7 @@
 			));
 		}
 
-		$form->AddRow('from '.bold(S_HOST).' like',array(
+		$form->AddRow(array('from ',bold(S_HOST),' like'),array(
 			new CTextBox('with_host',$with_host,32),
 			new CButton("btn_host",S_SELECT,
 				"return PopUp('popup.php?dstfrm=".$form->GetName().
@@ -1355,7 +1355,7 @@
 
 		if($selection_mode)
 		{
-			$form->AddRow('from '.bold(S_APPLICATION).' like',array(
+			$form->AddRow(array('from ',bold(S_APPLICATION),' like'),array(
 				new CTextBox('with_application', $with_application, 32),
 				new CButton('btn_app',S_SELECT,
 					'return PopUp("popup.php?dstfrm='.$form->GetName().
@@ -1365,7 +1365,7 @@
 				));
 		}
 
-		$form->AddRow('with '.bold(S_DESCRIPTION).' like', new CTextBox("with_description",$with_description,40));
+		$form->AddRow(array('with ',bold(S_DESCRIPTION),' like'), new CTextBox("with_description",$with_description,40));
 
 		if($selection_mode)
 		{
@@ -1375,26 +1375,26 @@
 				ITEM_TYPE_SNMPV1, ITEM_TYPE_SNMPV2C, ITEM_TYPE_SNMPV3, ITEM_TYPE_TRAPPER,
 				ITEM_TYPE_INTERNAL, ITEM_TYPE_AGGREGATE, ITEM_TYPE_HTTPTEST,ITEM_TYPE_DB_MONITOR) as $it)
 					$cmbType->AddItem($it, item_type2str($it));
-			$form->AddRow('with '.bold(S_TYPE), $cmbType);
+			$form->AddRow(array('with ',bold(S_TYPE)), $cmbType);
 		}
 
-		$form->AddRow('with '.bold(S_KEY).' like', array(new CTextBox("with_key",$with_key,40)));
+		$form->AddRow(array('with ',bold(S_KEY),' like'), array(new CTextBox("with_key",$with_key,40)));
 
 		if($selection_mode)
 		{
 			if(($with_type==ITEM_TYPE_SNMPV1)||($with_type==ITEM_TYPE_SNMPV2C)||$with_type==ITEM_TYPE_SNMPV3)
 			{ 
-				$form->AddRow('with '.bold(S_SNMP_COMMUNITY).' like',
+				$form->AddRow(array('with ',bold(S_SNMP_COMMUNITY),' like'),
 					new CTextBox("with_snmp_community",$with_snmp_community,16));
-				$form->AddRow('with '.bold(S_SNMP_OID).' like',
+				$form->AddRow(array('with ',bold(S_SNMP_OID),' like'),
 					new CTextBox("with_snmp_oid",$with_snmp_oid,40));
-				$form->AddRow('with '.bold(S_SNMP_PORT).' like',
+				$form->AddRow(array('with ',bold(S_SNMP_PORT),' like'),
 					new CNumericBox("with_snmp_port",$with_snmp_port,5,null,true));
 			}
 
 			if($with_type==ITEM_TYPE_SNMPV3)
 			{
-				$form->AddRow('with '.bold(S_SNMPV3_SECURITY_NAME).' like',
+				$form->AddRow(array('with ',bold(S_SNMPV3_SECURITY_NAME),' like'),
 					new CTextBox("with_snmpv3_securityname",$with_snmpv3_securityname,64));
 
 				$cmbSecLevel = new CComboBox("with_snmpv3_securitylevel",$with_snmpv3_securitylevel);
@@ -1402,12 +1402,12 @@
 				$cmbSecLevel->AddItem(ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV,"NoAuthPriv");
 				$cmbSecLevel->AddItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,"AuthNoPriv");
 				$cmbSecLevel->AddItem(ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV,"AuthPriv");
-				$form->AddRow('with '.bold(S_SNMPV3_SECURITY_LEVEL), $cmbSecLevel);
+				$form->AddRow(array('with ',bold(S_SNMPV3_SECURITY_LEVEL)), $cmbSecLevel);
 
-				$form->AddRow('with '.bold(S_SNMPV3_AUTH_PASSPHRASE).' like',
+				$form->AddRow(array('with ',bold(S_SNMPV3_AUTH_PASSPHRASE),' like'),
 					new CTextBox("with_snmpv3_authpassphrase",$with_snmpv3_authpassphrase,64));
 
-				$form->AddRow('with '.bold(S_SNMPV3_PRIV_PASSPHRASE).' like',
+				$form->AddRow(array('with ',bold(S_SNMPV3_PRIV_PASSPHRASE),' like'),
 					new CTextBox("with_snmpv3_privpassphrase",$with_snmpv3_privpassphrase,64));
 			}
 
@@ -1419,34 +1419,34 @@
 			$cmbValType->AddItem(ITEM_VALUE_TYPE_STR, 	S_CHARACTER);
 			$cmbValType->AddItem(ITEM_VALUE_TYPE_LOG, 	S_LOG);
 			$cmbValType->AddItem(ITEM_VALUE_TYPE_TEXT,	S_TEXT);
-			$form->AddRow('with '.bold(S_TYPE_OF_INFORMATION),$cmbValType);
+			$form->AddRow(array('with ',bold(S_TYPE_OF_INFORMATION)),$cmbValType);
 			
 			if( ($with_value_type==ITEM_VALUE_TYPE_FLOAT) || ($with_value_type==ITEM_VALUE_TYPE_UINT64))
 			{
-				$form->AddRow('with '.bold(S_UNITS), new CTextBox("with_units",$with_units,40));
-				$form->AddRow('with '.bold(S_CUSTOM_MULTIPLIER).' like', new CTextBox("with_formula",$with_formula,40));
+				$form->AddRow(array('with ',bold(S_UNITS)), new CTextBox("with_units",$with_units,40));
+				$form->AddRow(array('with ',bold(S_CUSTOM_MULTIPLIER),' like'), new CTextBox("with_formula",$with_formula,40));
 			}
 
 			if($with_type != ITEM_TYPE_TRAPPER && $with_type != ITEM_TYPE_HTTPTEST)
 			{
-				$form->AddRow('with '.bold(S_UPDATE_INTERVAL_IN_SEC),
+				$form->AddRow(array('with ',bold(S_UPDATE_INTERVAL_IN_SEC)),
 					new CNumericBox("with_delay",$with_delay,5,null,true));
 			}
 
-			$form->AddRow('with '.bold(S_KEEP_HISTORY_IN_DAYS),
+			$form->AddRow(array('with ',bold(S_KEEP_HISTORY_IN_DAYS)),
 				new CNumericBox("with_history",$with_history,8,null,true));
 
-			$form->AddRow('with '.bold(S_KEEP_TRENDS_IN_DAYS), new CNumericBox("with_trends",$with_trends,8,null,true));
+			$form->AddRow(array('with ',bold(S_KEEP_TRENDS_IN_DAYS)), new CNumericBox("with_trends",$with_trends,8,null,true));
 
 			$cmbStatus = new CComboBox("with_status",$with_status);
 			$cmbStatus->AddItem(-1,S_ALL_SMALL);
 			foreach(array(ITEM_STATUS_ACTIVE,ITEM_STATUS_DISABLED,ITEM_STATUS_NOTSUPPORTED) as $st)
 				$cmbStatus->AddItem($st,item_status2str($st));
-			$form->AddRow('with '.bold(S_STATUS),$cmbStatus);
+			$form->AddRow(array('with ',bold(S_STATUS)),$cmbStatus);
 
 			if($with_value_type==ITEM_VALUE_TYPE_LOG)
 			{
-				$form->AddRow('with '.bold(S_LOG_TIME_FORMAT), new CTextBox("with_logtimefmt",$with_logtimefmt,16));
+				$form->AddRow(array('with ',bold(S_LOG_TIME_FORMAT)), new CTextBox("with_logtimefmt",$with_logtimefmt,16));
 			}
 
 			if( ($with_value_type==ITEM_VALUE_TYPE_FLOAT) || ($with_value_type==ITEM_VALUE_TYPE_UINT64))
@@ -1456,12 +1456,12 @@
 				$cmbDelta->AddItem(0,S_AS_IS);
 				$cmbDelta->AddItem(1,S_DELTA_SPEED_PER_SECOND);
 				$cmbDelta->AddItem(2,S_DELTA_SIMPLE_CHANGE);
-				$form->AddRow('with '.bold(S_STORE_VALUE),$cmbDelta);
+				$form->AddRow(array('with ',bold(S_STORE_VALUE)),$cmbDelta);
 			}
 			
 			if($with_type==ITEM_TYPE_TRAPPER)
 			{
-				$form->AddRow('with '.bold(S_ALLOWED_HOSTS).' like', new CTextBox("with_trapper_hosts",$with_trapper_hosts,40));
+				$form->AddRow(array('with ',bold(S_ALLOWED_HOSTS),' like'), new CTextBox("with_trapper_hosts",$with_trapper_hosts,40));
 			}
 		}
 
@@ -1608,7 +1608,7 @@
 							" sec at ",
 							$val["period"]
 					),
-					BR);
+					BR());
 				$frmItem->AddVar("delay_flex[".$i."][delay]", $val['delay']);
 				$frmItem->AddVar("delay_flex[".$i."][period]", $val['period']);
 				$i++;
@@ -1789,7 +1789,7 @@
 					S_DELAY, SPACE,
 					new CNumericBox("new_delay_flex[delay]","50",5), 
 					S_PERIOD, SPACE,
-					new CTextBox("new_delay_flex[period]","1-7,00:00-23:59",27), BR,
+					new CTextBox("new_delay_flex[period]","1-7,00:00-23:59",27), BR(),
 					new CButton("add_delay_flex",S_ADD)
 				),'new');
 		}
@@ -2008,7 +2008,7 @@
 						" sec at ",
 						$val["period"]
 				),
-				BR);
+				BR());
 			$frmItem->AddVar("delay_flex[".$i."][delay]", $val['delay']);
 			$frmItem->AddVar("delay_flex[".$i."][period]", $val['period']);
 			$i++;
@@ -2084,7 +2084,7 @@
 				S_DELAY, SPACE,
 				new CNumericBox("new_delay_flex[delay]","50",5), 
 				S_PERIOD, SPACE,
-				new CTextBox("new_delay_flex[period]","1-7,00:00-23:59",27), BR,
+				new CTextBox("new_delay_flex[period]","1-7,00:00-23:59",27), BR(),
 				new CButton("add_delay_flex",S_ADD)
 			));
 		$new_delay_flex_el->AddOption('name', 'new_delay_flex_el');
@@ -2203,7 +2203,7 @@
 					$target['target_id']),
 				SPACE,
 				$target['target_name'],
-				BR
+				BR()
 				));
 		}
 
@@ -2315,7 +2315,7 @@
 					new CCheckBox("rem_dependence[]", 'no', null, strval($val)),
 					expand_trigger_description($val)
 				),
-				BR);
+				BR());
 			$frmTrig->AddVar("dependences[]",strval($val));
 		}
 
@@ -2339,7 +2339,7 @@
 				'T');
 		
 		$frmTrig->AddRow("New dependency",array($txtCondVal, 
-			$btnSelect, BR,
+			$btnSelect, BR(),
 			new CButton("add_dependence",S_ADD)
 			),'new');
 			
@@ -2818,7 +2818,7 @@
 					new CCheckBox("rem_value[]", 'no', null, $i),
 					$value["value"].SPACE.RARR.SPACE.$value["newvalue"]
 				),
-				BR);
+				BR());
 			$frmValmap->AddVar("valuemap[$i][value]",$value["value"]);
 			$frmValmap->AddVar("valuemap[$i][newvalue]",$value["newvalue"]);
 			$i++;
@@ -3146,7 +3146,7 @@ include_once 'include/discovery.inc.php';
 
 			$frmAction->AddRow(S_NEW_CONDITION, array(
 				$rowCondition,
-				BR,
+				BR(),
 				new CButton('add_condition',S_ADD),
 				new CButton('cancel_new_condition',S_CANCEL)),
 				'new');
@@ -4021,7 +4021,7 @@ include_once 'include/discovery.inc.php';
 						$i),		/* value */
 					get_severity_description($i)
 				),
-				BR);
+				BR());
 		}
 		$frmMedia->AddRow(S_USE_IF_SEVERITY,$frm_row);
 
@@ -4244,7 +4244,7 @@ include_once 'include/discovery.inc.php';
 						),
 					get_node_name_by_elid($db_group["groupid"]).$db_group["name"]
 				),
-				BR);
+				BR());
 		}
 		$frmHost->AddRow(S_GROUPS,$frm_row);
 
@@ -5006,7 +5006,7 @@ include_once 'include/discovery.inc.php';
 
 		$btnAdd->SetType('button');
 		
-		$frmCnct->AddRow(S_LINK_STATUS_INDICATORS,array($table, BR, $btnAdd, $btnRemove));
+		$frmCnct->AddRow(S_LINK_STATUS_INDICATORS,array($table, BR(), $btnAdd, $btnRemove));
 
 //----------
 

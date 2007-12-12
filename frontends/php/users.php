@@ -360,7 +360,7 @@ include_once "include/page_header.php";
 	$frmForm->AddItem(SPACE."|".SPACE);
 	$frmForm->AddItem($btnNew = new CButton("form",($_REQUEST["config"] == 0) ? S_CREATE_USER : S_CREATE_GROUP));
 	show_table_header(S_CONFIGURATION_OF_USERS_AND_USER_GROUPS, $frmForm);
-	echo BR; 
+	echo SBR; 
 ?>
 <?php
 	if($_REQUEST["config"]==0)
@@ -409,7 +409,7 @@ include_once "include/page_header.php";
 				$db_groups = DBselect("select g.name from usrgrp g, users_groups ug".
 					" where g.usrgrpid=ug.usrgrpid and ug.userid=".$db_user['userid']);
 				while($db_group = DBfetch($db_groups))
-					array_push($user_groups,$db_group['name']);
+					array_push($user_groups,empty($user_groups)?'':BR(),$db_group['name']);
 					
 		
 				$table->addRow(array(
@@ -422,7 +422,7 @@ include_once "include/page_header.php";
 					$db_user["name"],
 					$db_user["surname"],
 					user_type2str($db_user['type']),
-					implode(BR,$user_groups),
+					$user_groups,
 					$online
 					));
 			}

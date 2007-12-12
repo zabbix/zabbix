@@ -293,7 +293,7 @@ if(form)
 <?php
 	}
 
-	echo BR;
+	echo SBR;
 
 	$form = new CFormTable(S_CONDITION);
 	$form->SetHelp('config_triggers.php');
