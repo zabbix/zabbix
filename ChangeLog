@@ -1,5 +1,6 @@
 Changes for 1.4.3:
 
+ - [ZBX-219] fixed server crash in processing of discovery (Sasha)
  - [ZBX-218] fixed problem "Unable to add performance counter" on start of win agent(Sasha)
  - [ZBX-192] fixed active checks stops after connection loss (Sasha)
  - [ZBX-152] fixed inefficient check of user permissions (Alexei)
