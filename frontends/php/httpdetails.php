@@ -71,7 +71,7 @@ include_once "include/page_header.php";
 	$lnkCancel = new CLink(S_CANCEL,'httpmon.php'.url_param('groupid').url_param('hostid'));
 	show_table_header(array(S_DETAILS_OF_SCENARIO_BIG.' "',
 						bold($httptest_data['name']),
-						'" - '.date(S_DATE_FORMAT_YMDHMS,$httptest_data['lastcheck']),$lnkCancel)
+						'" - '.date(S_DATE_FORMAT_YMDHMS,$httptest_data['lastcheck'])),$lnkCancel
 					);
 
 // TABLE
