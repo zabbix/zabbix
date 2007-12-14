@@ -1859,11 +1859,11 @@
 					if((time(NULL)-$trhosts[$hostname]['lastchange'])<300)
 						$style .= 'background-image: url(images/gradients/blink1.gif); '.
 							'background-position: top left; '.
-							'background-repeat: repeate;';
+							'background-repeat: repeat;';
 					elseif((time(NULL)-$trhosts[$hostname]['lastchange'])<900)
 						$style .= 'background-image: url(images/gradients/blink2.gif); '.
 							'background-position: top left; '.
-							'background-repeat: repeate;';
+							'background-repeat: repeat;';
 
 					unset($item_menu);
 					$tr_ov_menu = array(
