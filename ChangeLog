@@ -34,6 +34,11 @@ Changes for 1.4.j:
  - support of storage of log files in UTF8 encoding (Alexei)
  - increased size of triggers.expression to 1023 (Alexei)
 
+Changes for 1.4.4:
+
+ - [ZBX-220] fixed agent crash in case of timeout during first connect (Sasha)
+ - [ZBX-219] fixed server crash in processing of discovery (Sasha)
+
 Changes for 1.4.3:
 
  - [ZBX-218] fixed problem "Unable to add performance counter" on start of win agent(Sasha)
