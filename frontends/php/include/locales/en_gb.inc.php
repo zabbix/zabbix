@@ -218,6 +218,8 @@
 	'S_TRIGGER_SEVERITY'=>			'Trigger severity',
 	'S_TRIGGER_VALUE'=>			'Trigger value',
 	'S_TIME_PERIOD'=>			'Time period',
+	'S_MAX_VALUE_SMALL'=>		'max value',
+	'S_MIN_VALUE_SMALL'=>		'min value',
 	'S_TRIGGER_DESCRIPTION'=>		'Trigger description',
 	'S_CONDITIONS'=>			'Conditions',
 	'S_CONDITION'=>				'Condition',
@@ -554,6 +556,10 @@
 	'S_REQUIRED_ITEMS_FOR_GRAPH'=>		'Required items for graph',
 
 //	history.php
+	'S_SECONDS_SMALL'=>				'seconds',
+	'S_TILL_SMALL'=>				'till',
+	'S_SELECT_ROWS_WITH_VALUE_LIKE'=>'Select rows with value like',
+	'S_SHOWING_HISTORY_OF'=>		'Showing history of',
 	'S_LAST_HOUR_GRAPH'=>			'Last hour graph',
 	'S_LAST_WEEK_GRAPH'=>			'Last week graph',
 	'S_LAST_MONTH_GRAPH'=>			'Last month graph',

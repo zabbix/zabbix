@@ -163,7 +163,7 @@ initialize: function(stime,timel,period,bar_stime){ // where to put bar on start
 		
 		this.changed = 0; // we need to reset this attribute, becouse generaly we may already performe a movement.
 	} catch(e){
-		alert("Needed params haven't been initialized properly");
+		alert("ERROR: ScrollBar initialization failed!");
 		return false;
 	}
 },
@@ -190,7 +190,7 @@ onchange: function(){			//  executed every time the bar period or bar time is ch
 
 arrowmouseover: function(){
 	this.arrowmovetoX(this.arrowX);
-	var arrowflag = false;
+/*	var arrowflag = false;
 	if(this.barX > 12){
 		this.arrowleft.setStyle({display: 'inline'});
 		arrowflag = true;
@@ -201,6 +201,9 @@ arrowmouseover: function(){
 		arrowflag = true;
 	}
 	if(!arrowflag) this.arrowright.setStyle({display: 'inline'});
+*/	
+	this.arrowleft.setStyle({display: 'inline'});
+	this.arrowright.setStyle({display: 'inline'});
 	
 	this.scrollmsover = 1;
 	
@@ -355,6 +358,20 @@ mousemove: function(e){
 },
 //-------------------------------
 
+//--- scrollmoves
+scrollmoveleft: function(){
+	this.barmousedown();
+	this.movescroll(this.barX-1);
+	this.onbarchange();	
+},
+scrollmoveright: function(){
+	this.barmousedown();
+	this.movescroll(this.barX+1);
+	this.onbarchange();	
+},
+//-------------------------------
+
+
 /*-----------------------------------------------------------------------
 ------------------------------ FUNC IN USE ------------------------------
 -----------------------------------------------------------------------*/
@@ -503,15 +520,6 @@ period2bar: function(period){
 	this.barW = this.checkbarW(barW);
 	
 	this.barchangeW(this.barW);	
-},
-//-------------------------------
-
-//--- scrollmoves
-scrollmoveleft: function(){
-	this.movescroll(this.barX-1);
-},
-scrollmoveright: function(){
-	this.movescroll(this.barX+1);
 },
 //-------------------------------
 

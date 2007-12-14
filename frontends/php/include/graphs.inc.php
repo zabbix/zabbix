@@ -805,42 +805,23 @@
 		return $result;
 	}
 
-	function	navigation_bar_calc()
-	{
-//		$workingperiod = 3600;
+	function navigation_bar_calc(){
 		if(!isset($_REQUEST["period"]))	$_REQUEST["period"]=ZBX_PERIOD_DEFAULT;
 		if(!isset($_REQUEST["from"]))	$_REQUEST["from"]=0;
 		if(!isset($_REQUEST["stime"]))	$_REQUEST["stime"]=null;
-
-//		if(isset($_REQUEST["inc"]))		$workingperiod= $_REQUEST["period"]+$_REQUEST["inc"];
-//		if(isset($_REQUEST["dec"]))		$workingperiod= $workingperiod-$_REQUEST["dec"];
-		if(isset($_REQUEST["inc"]))	$_REQUEST["period"] += $_REQUEST["inc"];
-		if(isset($_REQUEST["dec"]))	$_REQUEST["period"] -= $_REQUEST["dec"];
-
-		if(isset($_REQUEST["left"]))	$_REQUEST["from"] += $_REQUEST["left"];
-		if(isset($_REQUEST["right"]))	$_REQUEST["from"] -= $_REQUEST["right"];
-
-		//unset($_REQUEST["inc"]);
-		//unset($_REQUEST["dec"]);
-		unset($_REQUEST["left"]);
-		unset($_REQUEST["right"]);
-
-		if($_REQUEST["from"] <= 0)			$_REQUEST["from"]	= 0;
-		if($_REQUEST["period"] <= ZBX_MIN_PERIOD)	$_REQUEST["period"]	= ZBX_MIN_PERIOD;
-
-		if(isset($_REQUEST["reset"]))
-		{
-			$_REQUEST["period"]	= ZBX_PERIOD_DEFAULT;
-			$_REQUEST["from"]	= 0;
-//			$workingperiod		= 3600;
+		
+		if($_REQUEST['period']<ZBX_MIN_PERIOD){
+			show_message(S_WARNING.'. '.S_TIME_PERIOD.SPACE.S_MIN_VALUE_SMALL.': '.ZBX_MIN_PERIOD.' ('.(int)(ZBX_MIN_PERIOD/3600).'h)');
+			$_REQUEST['period'] = ZBX_MIN_PERIOD;
 		}
-
-		return $_REQUEST["period"];
-//		return $workingperiod;
+		else if($_REQUEST['period'] > ZBX_MAX_PERIOD){
+			show_message(S_WARNING.'. '.S_TIME_PERIOD.SPACE.S_MAX_VALUE_SMALL.': '.ZBX_MAX_PERIOD.' ('.(int)(ZBX_MAX_PERIOD/86400).'d)');
+			$_REQUEST['period'] = ZBX_MAX_PERIOD;
+		}
+	return $_REQUEST["period"];
 	}
 
-	function	navigation_bar($url,$ext_saved_request=NULL)
-	{
+	function navigation_bar($url,$ext_saved_request=NULL){
 		$saved_request = array("screenid","itemid","action","from","fullscreen");
 
 		if(is_array($ext_saved_request))
