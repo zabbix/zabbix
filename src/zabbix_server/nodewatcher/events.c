@@ -70,27 +70,22 @@ static int process_node(int nodeid, int master_nodeid, zbx_uint64_t event_lastid
 		ZBX_DM_DELIMITER,
 		nodeid);
 
-	result = DBselect("select eventid,source,object,objectid,clock,value,acknowledged from events where eventid>" ZBX_FS_UI64 " and " ZBX_COND_NODEID " order by eventid",
+	result = DBselect("select eventid,source,object,objectid,clock,ms,value,acknowledged from events where eventid>" ZBX_FS_UI64 " and " ZBX_COND_NODEID " order by eventid",
 		event_lastid,
 		ZBX_NODE("eventid", nodeid));
 	while((row=DBfetch(result)))
 	{
 		ZBX_STR2UINT64(eventid,row[0])
 		found = 1;
-		zbx_snprintf_alloc(&data, &allocated, &offset, 1024, "\n%s%c%s%c%s%c%s%c%s%c%s%c%s",
-				row[0],
-				ZBX_DM_DELIMITER,
-				row[1],
-				ZBX_DM_DELIMITER,
-				row[2],
-				ZBX_DM_DELIMITER,
-				row[3],
-				ZBX_DM_DELIMITER,
-				row[4],
-				ZBX_DM_DELIMITER,
-				row[5],
-				ZBX_DM_DELIMITER,
-				row[6]);
+		zbx_snprintf_alloc(&data, &allocated, &offset, 1024, "\n%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s",
+				row[0], ZBX_DM_DELIMITER,	/* eventid */
+				row[1], ZBX_DM_DELIMITER,	/* source */
+				row[2], ZBX_DM_DELIMITER,	/* object */
+				row[3], ZBX_DM_DELIMITER,	/* objectid */
+				row[4], ZBX_DM_DELIMITER,	/* clock */
+				row[5], ZBX_DM_DELIMITER,	/* ms */
+				row[6], ZBX_DM_DELIMITER,	/* value */
+				row[7]);			/* acknowledged */
 	}
 	if(found == 1)
 	{

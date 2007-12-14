@@ -84,7 +84,7 @@ static int is_ip(char *ip)
 
 /******************************************************************************
  *                                                                            *
- * Function: process_new_value                                                *
+ * Function: process_value                                                    *
  *                                                                            *
  * Purpose: process new item value                                            *
  *                                                                            *
@@ -105,6 +105,7 @@ static int process_value(char *key, char *host, AGENT_RESULT *value)
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_ITEM		item;
+	struct timeb    tp;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_value(%s@%s)",
 		key,
@@ -144,8 +145,9 @@ static int process_value(char *key, char *host, AGENT_RESULT *value)
 	DBget_item_from_db(&item,row);
 
 	DBbegin();
-	process_new_value(&item,value);
-	update_triggers(item.itemid);
+	ftime(&tp);
+	process_new_value(&item, value, tp.time, tp.millitm);
+	update_triggers(item.itemid, tp.time, tp.millitm);
 	DBcommit();
  
 	DBfree_result(result);

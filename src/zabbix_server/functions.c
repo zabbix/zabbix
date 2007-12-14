@@ -121,7 +121,7 @@ void	update_functions(DB_ITEM *item)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-void	update_triggers(zbx_uint64_t itemid)
+void	update_triggers(zbx_uint64_t itemid, int clock, int ms)
 {
 	char	*exp;
 	char	error[MAX_STRING_LEN];
@@ -163,7 +163,7 @@ void	update_triggers(zbx_uint64_t itemid)
 		}
 		else
 		{
-			DBupdate_trigger_value(&trigger, exp_value, time(NULL), NULL);
+			DBupdate_trigger_value(&trigger, exp_value, clock, ms, NULL);
 		}
 		zbx_free(exp);
 	}
@@ -275,8 +275,10 @@ int	process_data(zbx_sock_t *sock,char *server,char *key,char *value,char *lastl
 	DB_ROW	row;
 	DB_ITEM	item;
 
-	char	server_esc[MAX_STRING_LEN];
-	char	key_esc[MAX_STRING_LEN];
+	char		server_esc[MAX_STRING_LEN];
+	char		key_esc[MAX_STRING_LEN];
+
+	struct timeb	tp;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_data([%s],[%s],[%s],[%s])",
 		server,
@@ -379,8 +381,9 @@ int	process_data(zbx_sock_t *sock,char *server,char *key,char *value,char *lastl
 
 		if(set_result_type(&agent, item.value_type, value) == SUCCEED)
 		{
-			process_new_value(&item,&agent);
-			update_triggers(item.itemid);
+			ftime(&tp);
+			process_new_value(&item, &agent, tp.time, tp.millitm);
+			update_triggers(item.itemid, tp.time, tp.millitm);
 		}
 		else
 		{
@@ -417,7 +420,7 @@ int	process_data(zbx_sock_t *sock,char *server,char *key,char *value,char *lastl
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
+static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now, int ms)
 {
 	int ret = SUCCEED;
 
@@ -455,12 +458,12 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 				if(item->value_type==ITEM_VALUE_TYPE_UINT64)
 				{
 					if(GET_UI64_RESULT(value))
-						DBadd_history_uint(item->itemid,value->ui64,now);
+						DBadd_history_uint(item->itemid,value->ui64,now, ms);
 				}
 				else if(item->value_type==ITEM_VALUE_TYPE_FLOAT)
 				{
 					if(GET_DBL_RESULT(value))
-						DBadd_history(item->itemid,value->dbl,now);
+						DBadd_history(item->itemid,value->dbl,now, ms);
 				}
 			}
 			/* Delta as speed of change */
@@ -474,7 +477,7 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 						DBadd_history(
 							item->itemid,
 							(value->dbl - item->prevorgvalue_dbl)/(now-item->lastclock),
-							now);
+							now, ms);
 					}
 				}
 				else if( ITEM_VALUE_TYPE_UINT64 == item->value_type )
@@ -484,7 +487,7 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 						DBadd_history_uint(
 							item->itemid,
 							(zbx_uint64_t)(value->ui64 - item->prevorgvalue_uint64)/(now-item->lastclock),
-							now);
+							now, ms);
 					}
 				}
 			}
@@ -496,14 +499,14 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 				{
 					if(GET_DBL_RESULT(value) && (item->prevorgvalue_null == 0) && (item->prevorgvalue_dbl <= value->dbl) )
 					{
-						DBadd_history(item->itemid, (value->dbl - item->prevorgvalue_dbl), now);
+						DBadd_history(item->itemid, (value->dbl - item->prevorgvalue_dbl), now, ms);
 					}
 				}
 				else if(item->value_type==ITEM_VALUE_TYPE_UINT64)
 				{
 					if(GET_UI64_RESULT(value) && (item->prevorgvalue_null == 0) && (item->prevorgvalue_uint64 <= value->ui64) )
 					{
-						DBadd_history_uint(item->itemid, value->ui64 - item->prevorgvalue_uint64, now);
+						DBadd_history_uint(item->itemid, value->ui64 - item->prevorgvalue_uint64, now, ms);
 					}
 				}
 			}
@@ -521,7 +524,7 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 		else if(item->value_type==ITEM_VALUE_TYPE_STR)
 		{
 			if(GET_STR_RESULT(value))
-				DBadd_history_str(item->itemid,value->str,now);
+				DBadd_history_str(item->itemid,value->str, now, ms);
 		}
 		else if(item->value_type==ITEM_VALUE_TYPE_LOG)
 		{
@@ -533,7 +536,7 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 				zabbix_log(LOG_LEVEL_DEBUG, "Key: %s Encoding: [%s]",
 						item->key,
 						encoding);
-				DBadd_history_log(0, item->itemid,value->str,now,item->timestamp,item->eventlog_source,item->eventlog_severity, encoding);
+				DBadd_history_log(0, item->itemid,value->str,now,ms,item->timestamp,item->eventlog_source,item->eventlog_severity, encoding);
 			}
 			DBexecute("update items set lastlogsize=%d where itemid=" ZBX_FS_UI64,
 				item->lastlogsize,
@@ -542,7 +545,7 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 		else if(item->value_type==ITEM_VALUE_TYPE_TEXT)
 		{
 			if(GET_TEXT_RESULT(value))
-				DBadd_history_text(item->itemid,value->text,now);
+				DBadd_history_text(item->itemid, value->text, now, ms);
 		}
 		else
 		{
@@ -777,14 +780,10 @@ static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
  * Comments: for trapper poller process                                       *
  *                                                                            *
  ******************************************************************************/
-void	process_new_value(DB_ITEM *item, AGENT_RESULT *value)
+void	process_new_value(DB_ITEM *item, AGENT_RESULT *value, int clock, int ms)
 {
-	time_t 	now;
-
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_new_value(%s)",
 		item->key);
-
-	now = time(NULL);
 
 	if( ITEM_MULTIPLIER_USE == item->multiplier )
 	{
@@ -813,7 +812,7 @@ void	process_new_value(DB_ITEM *item, AGENT_RESULT *value)
 		}
 	}
 
-	add_history(item, value, now);
-	update_item(item, value, now);
+	add_history(item, value, clock, ms);
+	update_item(item, value, clock);
 	update_functions( item );
 }

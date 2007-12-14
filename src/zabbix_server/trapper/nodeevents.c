@@ -88,9 +88,12 @@ static int	process_record(int nodeid, char *record)
 	event.clock=atoi(tmp);
 
 	zbx_get_field(record,tmp,5,ZBX_DM_DELIMITER);
-	event.value=atoi(tmp);
+	event.ms=atoi(tmp);
 
 	zbx_get_field(record,tmp,6,ZBX_DM_DELIMITER);
+	event.value=atoi(tmp);
+
+	zbx_get_field(record,tmp,7,ZBX_DM_DELIMITER);
 	event.acknowledged=atoi(tmp);
 
 	return process_event(&event);

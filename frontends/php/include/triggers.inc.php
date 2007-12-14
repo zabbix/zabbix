@@ -1192,7 +1192,7 @@
 			{
 				$value=($flag==ZBX_FLAG_TRIGGER)?
 						trigger_get_func_value($row["expression"],ZBX_FLAG_TRIGGER,1,1):
-						trigger_get_func_value($row["expression"],ZBX_FLAG_EVENT,1,$row['clock']);
+						trigger_get_func_value($row["expression"],ZBX_FLAG_EVENT,1,$row['clock'],$row['ms']);
 				$description = str_replace("{ITEM.VALUE}",
 						$value,
 						$description);
@@ -1201,7 +1201,7 @@
 			{
 				$value=($flag==ZBX_FLAG_TRIGGER)?
 						trigger_get_func_value($row["expression"],ZBX_FLAG_TRIGGER,1,1):
-						trigger_get_func_value($row["expression"],ZBX_FLAG_EVENT,1,$row['clock']);
+						trigger_get_func_value($row["expression"],ZBX_FLAG_EVENT,1,$row['clock'],$row['ms']);
 				$description = str_replace("{ITEM.VALUE1}",
 						$value,
 						$description);
@@ -1210,7 +1210,7 @@
 			{
 				$value=($flag==ZBX_FLAG_TRIGGER)?
 						trigger_get_func_value($row["expression"],ZBX_FLAG_TRIGGER,2,1):
-						trigger_get_func_value($row["expression"],ZBX_FLAG_EVENT,2,$row['clock']);
+						trigger_get_func_value($row["expression"],ZBX_FLAG_EVENT,2,$row['clock'],$row['ms']);
 				$description = str_replace("{ITEM.VALUE2}",
 						$value,
 						$description);
@@ -1219,7 +1219,7 @@
 			{
 				$value=($flag==ZBX_FLAG_TRIGGER)?
 						trigger_get_func_value($row["expression"],ZBX_FLAG_TRIGGER,3,1):
-						trigger_get_func_value($row["expression"],ZBX_FLAG_EVENT,3,$row['clock']);
+						trigger_get_func_value($row["expression"],ZBX_FLAG_EVENT,3,$row['clock'],$row['ms']);
 				$description = str_replace("{ITEM.VALUE3}",
 						$value,
 						$description);
@@ -1228,7 +1228,7 @@
 			{
 				$value=($flag==ZBX_FLAG_TRIGGER)?
 						trigger_get_func_value($row["expression"],ZBX_FLAG_TRIGGER,4,1):
-						trigger_get_func_value($row["expression"],ZBX_FLAG_EVENT,4,$row['clock']);
+						trigger_get_func_value($row["expression"],ZBX_FLAG_EVENT,4,$row['clock'],$row['ms']);
 				$description = str_replace("{ITEM.VALUE4}",
 						$value,
 						$description);
@@ -1237,7 +1237,7 @@
 			{
 				$value=($flag==ZBX_FLAG_TRIGGER)?
 						trigger_get_func_value($row["expression"],ZBX_FLAG_TRIGGER,5,1):
-						trigger_get_func_value($row["expression"],ZBX_FLAG_EVENT,5,$row['clock']);
+						trigger_get_func_value($row["expression"],ZBX_FLAG_EVENT,5,$row['clock'],$row['ms']);
 				$description = str_replace("{ITEM.VALUE5}",
 						$value,
 						$description);
@@ -1246,7 +1246,7 @@
 			{
 				$value=($flag==ZBX_FLAG_TRIGGER)?
 						trigger_get_func_value($row["expression"],ZBX_FLAG_TRIGGER,6,1):
-						trigger_get_func_value($row["expression"],ZBX_FLAG_EVENT,6,$row['clock']);
+						trigger_get_func_value($row["expression"],ZBX_FLAG_EVENT,6,$row['clock'],$row['ms']);
 				$description = str_replace("{ITEM.VALUE6}",
 						$value,
 						$description);
@@ -1255,7 +1255,7 @@
 			{
 				$value=($flag==ZBX_FLAG_TRIGGER)?
 						trigger_get_func_value($row["expression"],ZBX_FLAG_TRIGGER,7,1):
-						trigger_get_func_value($row["expression"],ZBX_FLAG_EVENT,7,$row['clock']);
+						trigger_get_func_value($row["expression"],ZBX_FLAG_EVENT,7,$row['clock'],$row['ms']);
 				$description = str_replace("{ITEM.VALUE7}",
 						$value,
 						$description);
@@ -1264,7 +1264,7 @@
 			{
 				$value=($flag==ZBX_FLAG_TRIGGER)?
 						trigger_get_func_value($row["expression"],ZBX_FLAG_TRIGGER,8,1):
-						trigger_get_func_value($row["expression"],ZBX_FLAG_EVENT,8,$row['clock']);
+						trigger_get_func_value($row["expression"],ZBX_FLAG_EVENT,8,$row['clock'],$row['ms']);
 				$description = str_replace("{ITEM.VALUE8}",
 						$value,
 						$description);
@@ -1273,7 +1273,7 @@
 			{
 				$value=($flag==ZBX_FLAG_TRIGGER)?
 						trigger_get_func_value($row["expression"],ZBX_FLAG_TRIGGER,9,1):
-						trigger_get_func_value($row["expression"],ZBX_FLAG_EVENT,9,$row['clock']);
+						trigger_get_func_value($row["expression"],ZBX_FLAG_EVENT,9,$row['clock'],$row['ms']);
 				$description = str_replace("{ITEM.VALUE9}",
 						$value,
 						$description);
@@ -2358,7 +2358,7 @@
 	 * Comments:
 	 *
 	 */
-	function	trigger_get_func_value($expression, $flag, $function, $param)
+	function	trigger_get_func_value($expression, $flag, $function, $param, $ms = 0)
 	{
 		$result = NULL;
 
@@ -2371,7 +2371,7 @@
 			{
 				$result=($flag == ZBX_FLAG_TRIGGER)?
 					item_get_history($row, $param):
-					item_get_history($row, 0, $param);
+					item_get_history($row, 0, $param, $ms);
 			}
 		}
 		return $result;

@@ -54,7 +54,7 @@ static void add_host_event(char *ip)
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_EVENT	event;
-	int		now;
+	struct timeb    tp;
 	int		status;
 	zbx_uint64_t	dhostid;
 
@@ -68,17 +68,18 @@ static void add_host_event(char *ip)
 	row=DBfetch(result);
 	if(row && DBis_null(row[0])!=SUCCEED)
 	{
-		now = time(NULL); 
 		status = atoi(row[0]);
 		ZBX_STR2UINT64(dhostid, row[1]);
 
 		memset(&event,0,sizeof(DB_EVENT));
 
+		ftime(&tp);
 		event.eventid		= 0;
 		event.source		= EVENT_SOURCE_DISCOVERY;
 		event.object		= EVENT_OBJECT_DHOST;
 		event.objectid		= dhostid;
-		event.clock 		= now;
+		event.clock 		= tp.time;
+		event.ms		= tp.millitm;
 		event.value 		= status;
 		event.acknowledged 	= 0;
 
@@ -107,21 +108,21 @@ static void add_host_event(char *ip)
 static void add_service_event(DB_DSERVICE *service)
 {
 	DB_EVENT	event;
-	int		now;
+	struct timeb    tp;
 
 	assert(service);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In add_service_event()");
 
-	now = time(NULL); 
-
 	memset(&event,0,sizeof(DB_EVENT));
 
+	ftime(&tp);
 	event.eventid		= 0;
 	event.source		= EVENT_SOURCE_DISCOVERY;
 	event.object		= EVENT_OBJECT_DSERVICE;
 	event.objectid		= service->dserviceid;
-	event.clock 		= now;
+	event.clock 		= tp.time;
+	event.ms		= tp.millitm;
 	event.value 		= service->status;
 	event.acknowledged 	= 0;
 

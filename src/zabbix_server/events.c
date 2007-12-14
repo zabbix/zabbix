@@ -174,12 +174,13 @@ int	process_event(DB_EVENT *event)
 	{
 		event->eventid = DBget_maxid("events","eventid");
 	}
-	DBexecute("insert into events(eventid,source,object,objectid,clock,value) values(" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 ",%d,%d)",
+	DBexecute("insert into events(eventid,source,object,objectid,clock,ms,value) values ("ZBX_FS_UI64",%d,%d,"ZBX_FS_UI64",%d,%d,%d)",
 		event->eventid,
 		event->source,
 		event->object,
 		event->objectid,
 		event->clock,
+		event->ms,
 		event->value);
 
 	/* Cancel currently active alerts */

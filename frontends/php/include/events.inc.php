@@ -75,7 +75,7 @@
 			$trigger_list = '('.trim($trigger_list,',').')';
 			$sql_cond=($show_unknown == 0)?(' AND e.value<>'.TRIGGER_VALUE_UNKNOWN.' '):('');
 	
-			$sql = 'SELECT e.eventid, e.objectid as triggerid,e.clock,e.value '.
+			$sql = 'SELECT e.eventid, e.objectid as triggerid,e.clock,e.value,e.ms '.
 					' FROM events e '.
 					' WHERE '.zbx_sql_mod('e.object',1000).'='.EVENT_OBJECT_TRIGGER.
 					  ' AND e.objectid IN '.$trigger_list.

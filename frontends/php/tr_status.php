@@ -438,7 +438,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 				break;
 		}
 
-		$event_sql = 'SELECT e.eventid, e.value, e.clock, e.objectid as triggerid, e.acknowledged, t.type '.
+		$event_sql = 'SELECT e.eventid, e.value, e.clock, e.ms, e.objectid as triggerid, e.acknowledged, t.type '.
 					' FROM events e, triggers t '.
 					' WHERE e.object=0 AND e.objectid='.$row['triggerid'].
 						' AND t.triggerid=e.objectid '.$cond.
@@ -550,7 +550,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 			}
 
 			$description = expand_trigger_description_by_data(
-					array_merge($row, array("clock"=>$row_event["clock"])),
+					array_merge($row, array("clock"=>$row_event["clock"]), array("ms"=>$row_event["ms"])),
 					ZBX_FLAG_EVENT);
 
 			if($compact != 'true'){

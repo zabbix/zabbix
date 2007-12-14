@@ -2973,7 +2973,6 @@ static int	DBreplace_template_dependences(
  *                                                                            *
  * Parameters: triggerid - trigger identificator from database                *
  *             value - event value                                            *
- *             now - timestamp                                                *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *                                                                            *
@@ -2984,20 +2983,14 @@ static int	DBreplace_template_dependences(
  ******************************************************************************/
 static int	DBadd_event(
 		zbx_uint64_t	triggerid,
-		int		value,
-		time_t		now
+		int		value
 		)
 {
 	DB_RESULT	db_events;
-
 	DB_ROW		event_data;
-
-	zbx_uint64_t
-		eventid;
-
-	int	result = FAIL;
-
-	if( !now )	now = time(NULL);
+	zbx_uint64_t	eventid;
+	int		result = FAIL;
+	struct timeb	tp;
 
 	db_events = DBselect("select value,clock from events where objectid=" ZBX_FS_UI64 " and object=%i "
 		" order by clock desc", triggerid, EVENT_OBJECT_TRIGGER);
@@ -3010,11 +3003,12 @@ static int	DBadd_event(
 
 	if( SUCCEED == result )
 	{
+		ftime(&tp);
 		eventid = DBget_maxid("events","eventid");
 
-		DBexecute("insert into events(eventid,source,object,objectid,clock,value) "
-				" values(" ZBX_FS_UI64 ",%i,%i," ZBX_FS_UI64 ",%lu,%i)",
-				eventid, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid, now, value);
+		DBexecute("insert into events(eventid,source,object,objectid,clock,ms,value) "
+				" values("ZBX_FS_UI64",%i,%i,"ZBX_FS_UI64",%lu,%d,%i)",
+				eventid, EVENT_SOURCE_TRIGGERS, EVENT_OBJECT_TRIGGER, triggerid, tp.time, tp.millitm, value);
 
 		if(value == TRIGGER_VALUE_FALSE || value == TRIGGER_VALUE_TRUE)
 		{
@@ -3502,7 +3496,7 @@ static int	DBupdate_trigger(
 
 		DBreset_items_nextcheck(triggerid);
 
-		DBadd_event(triggerid,TRIGGER_VALUE_UNKNOWN,0);
+		DBadd_event(triggerid,TRIGGER_VALUE_UNKNOWN);
 
 		DBdelete_dependencies_by_triggerid(triggerid);
 

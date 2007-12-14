@@ -535,7 +535,7 @@ static int	trigger_dependent(zbx_uint64_t triggerid)
 	return ret;
 }
 
-int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *reason)
+int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, int ms, char *reason)
 {
 	int	ret = SUCCEED;
 	DB_EVENT	event;
@@ -626,6 +626,7 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *re
 			event.object = EVENT_OBJECT_TRIGGER;
 			event.objectid = trigger->triggerid;
 			event.clock = now;
+			event.ms = ms;
 			event.value = new_value;
 			event.acknowledged = 0;
 
@@ -660,7 +661,7 @@ int	DBupdate_trigger_value(DB_TRIGGER *trigger, int new_value, int now, char *re
 	return ret;
 }
 
-void update_triggers_status_to_unknown(zbx_uint64_t hostid,int clock,char *reason)
+void update_triggers_status_to_unknown(zbx_uint64_t hostid,int clock,int ms,char *reason)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -684,7 +685,7 @@ void update_triggers_status_to_unknown(zbx_uint64_t hostid,int clock,char *reaso
 		trigger.value		= atoi(row[5]);
 		trigger.url		= row[6];
 		trigger.comments	= row[7];
-		DBupdate_trigger_value(&trigger,TRIGGER_VALUE_UNKNOWN,clock,reason);
+		DBupdate_trigger_value(&trigger,TRIGGER_VALUE_UNKNOWN,clock,ms,reason);
 	}
 
 	DBfree_result(result);
@@ -861,7 +862,7 @@ void DBupdate_triggers_status_after_restart(void)
 		lastchange=atoi(row2[0]);
 		DBfree_result(result2);
 
-		DBupdate_trigger_value(&trigger,TRIGGER_VALUE_UNKNOWN,lastchange,"ZABBIX was down.");
+		DBupdate_trigger_value(&trigger,TRIGGER_VALUE_UNKNOWN,lastchange,0,"ZABBIX was down.");
 	}
 
 	DBfree_result(result);
@@ -870,7 +871,7 @@ void DBupdate_triggers_status_after_restart(void)
 	return; 
 }
 
-void DBupdate_host_availability(zbx_uint64_t hostid,int available,int clock, char *error)
+void DBupdate_host_availability(zbx_uint64_t hostid,int available,int clock, int ms, char *error)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -954,7 +955,7 @@ void DBupdate_host_availability(zbx_uint64_t hostid,int available,int clock, cha
 		return;
 	}
 
-	update_triggers_status_to_unknown(hostid,clock,"Host is unavailable.");
+	update_triggers_status_to_unknown(hostid,clock,ms,"Host is unavailable.");
 	zabbix_log(LOG_LEVEL_DEBUG,"End of update_host_availability()");
 
 	return;
@@ -1042,22 +1043,25 @@ int	DBadd_trend(zbx_uint64_t itemid, double value, int clock)
 	return SUCCEED;
 }
 
-int	DBadd_history(zbx_uint64_t itemid, double value, int clock)
+int	DBadd_history(zbx_uint64_t itemid, double value, int clock, int ms)
 {
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_history()");
 
-	DBexecute("insert into history (clock,itemid,value) values (%d," ZBX_FS_UI64 "," ZBX_FS_DBL ")",
+	DBexecute("insert into history (clock,ms,itemid,value) "
+		"values (%d,%d,"ZBX_FS_UI64","ZBX_FS_DBL")",
 		clock,
+		ms,
 		itemid,
 		value);
 
 	DBadd_trend(itemid, value, clock);
 
-	if((CONFIG_NODE_NOHISTORY == 0) && (CONFIG_MASTER_NODEID>0))
-	{
-		DBexecute("insert into history_sync (nodeid,clock,itemid,value) values (%d,%d," ZBX_FS_UI64 "," ZBX_FS_DBL ")",
+	if (CONFIG_NODE_NOHISTORY == 0 && CONFIG_MASTER_NODEID > 0) {
+		DBexecute("insert into history_sync (nodeid,clock,ms,itemid,value) "
+			"values (%d,%d,%d,"ZBX_FS_UI64","ZBX_FS_DBL")",
 			get_nodeid_by_id(itemid),
 			clock,
+			ms,
 			itemid,
 			value);
 	}
@@ -1065,22 +1069,25 @@ int	DBadd_history(zbx_uint64_t itemid, double value, int clock)
 	return SUCCEED;
 }
 
-int	DBadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
+int	DBadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock, int ms)
 {
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_history_uint()");
 
-	DBexecute("insert into history_uint (clock,itemid,value) values (%d," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
+	DBexecute("insert into history_uint (clock,ms,itemid,value) "
+		"values (%d,%d,"ZBX_FS_UI64","ZBX_FS_UI64")",
 		clock,
+		ms,
 		itemid,
 		value);
 
 	DBadd_trend(itemid, (double)value, clock);
 
-	if((CONFIG_NODE_NOHISTORY == 0) && (CONFIG_MASTER_NODEID>0))
-	{
-		DBexecute("insert into history_uint_sync (nodeid,clock,itemid,value) values (%d,%d," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
+	if (CONFIG_NODE_NOHISTORY == 0 && CONFIG_MASTER_NODEID > 0) {
+		DBexecute("insert into history_uint_sync (nodeid,clock,ms,itemid,value) "
+			"values (%d,%d,%d,"ZBX_FS_UI64","ZBX_FS_UI64")",
 			get_nodeid_by_id(itemid),
 			clock,
+			ms,
 			itemid,
 			value);
 	}
@@ -1088,23 +1095,26 @@ int	DBadd_history_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
 	return SUCCEED;
 }
 
-int	DBadd_history_str(zbx_uint64_t itemid, char *value, int clock)
+int	DBadd_history_str(zbx_uint64_t itemid, char *value, int clock, int ms)
 {
 	char	value_esc[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In add_history_str()");
 
 	DBescape_string(value,value_esc,MAX_STRING_LEN);
-	DBexecute("insert into history_str (clock,itemid,value) values (%d," ZBX_FS_UI64 ",'%s')",
+	DBexecute("insert into history_str (clock,ms,itemid,value) "
+		"values (%d,%d," ZBX_FS_UI64 ",'%s')",
 		clock,
+		ms,
 		itemid,
 		value_esc);
 
-	if((CONFIG_NODE_NOHISTORY == 0) && (CONFIG_MASTER_NODEID>0))
-	{
-		DBexecute("insert into history_str_sync (nodeid,clock,itemid,value) values (%d,%d," ZBX_FS_UI64 ",'%s')",
+	if (CONFIG_NODE_NOHISTORY == 0 && CONFIG_MASTER_NODEID > 0) {
+		DBexecute("insert into history_str_sync (nodeid,clock,ms,itemid,value) "
+			"values (%d,%d,%d,"ZBX_FS_UI64",'%s')",
 			get_nodeid_by_id(itemid),
 			clock,
+			ms,
 			itemid,
 			value_esc);
 	}
@@ -1112,7 +1122,7 @@ int	DBadd_history_str(zbx_uint64_t itemid, char *value, int clock)
 	return SUCCEED;
 }
 
-int	DBadd_history_text(zbx_uint64_t itemid, char *value, int clock)
+int	DBadd_history_text(zbx_uint64_t itemid, char *value, int clock, int ms)
 {
 #ifdef HAVE_ORACLE
 	char		sql[MAX_STRING_LEN];
@@ -1142,10 +1152,11 @@ int	DBadd_history_text(zbx_uint64_t itemid, char *value, int clock)
 	}
 
 	id = DBget_maxid("history_text", "id");
-	zbx_snprintf(sql, sizeof(sql), "insert into history_text (id,clock,itemid,value)"
-		" values (" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ", EMPTY_CLOB()) returning value into :1",
+	zbx_snprintf(sql, sizeof(sql), "insert into history_text (id,clock,ms,itemid,value)"
+		" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 ", EMPTY_CLOB()) returning value into :1",
 		id,
 		clock,
+		ms,
 		itemid);
 
 	zabbix_log(LOG_LEVEL_DEBUG,"Query:%s", sql);
@@ -1200,7 +1211,6 @@ lbl_exit:
 	return ret;
 
 #else /* HAVE_ORACLE */
-
 	char		*value_esc = NULL;
 	int		value_esc_max_len = 0;
 	int		sql_max_len = 0;
@@ -1215,21 +1225,21 @@ lbl_exit:
 
 	DBescape_string(value,value_esc,value_esc_max_len);
 	id = DBget_maxid("history_text", "id");
-	DBexecute("insert into history_text (id,clock,itemid,value) values (" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",'%s')",
+	DBexecute("insert into history_text (id,clock,ms,itemid,value) "
+		"values ("ZBX_FS_UI64",%d,%d,"ZBX_FS_UI64",'%s')",
 		id,
 		clock,
+		ms,
 		itemid,
 		value_esc);
 
 	zbx_free(value_esc);
 
 	return SUCCEED;
-
 #endif
 }
 
-
-int	DBadd_history_log(zbx_uint64_t id, zbx_uint64_t itemid, char *value, int clock, int timestamp,char *source, int severity, char *encoding)
+int	DBadd_history_log(zbx_uint64_t id, zbx_uint64_t itemid, char *value, int clock, int ms, int timestamp,char *source, int severity, char *encoding)
 {
 	char		value_esc[MAX_STRING_LEN];
 	char		source_esc[MAX_STRING_LEN];
@@ -1251,24 +1261,24 @@ int	DBadd_history_log(zbx_uint64_t id, zbx_uint64_t itemid, char *value, int clo
 		zabbix_log(LOG_LEVEL_DEBUG,"Encoding %s", encoding);
 /* Japan specific cchange */
 /*	DBexecute("insert into history_log (id,clock,itemid,timestamp,value,source,severity) values (" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",%d,'%s','%s',%d)",*/
-		DBexecute("insert into history_log (id,clock,itemid,timestamp,value,source,severity) "
-			"values ("ZBX_FS_UI64",%d,"ZBX_FS_UI64",%d,cast(_%s'%s' as char character set utf8),'%s',%d)",
+		DBexecute("insert into history_log (id,clock,ms,itemid,timestamp,value,source,severity) "
+			"values ("ZBX_FS_UI64",%d,%d,"ZBX_FS_UI64",%d,cast(_%s'%s' as char character set utf8),'%s',%d)",
 			id,
 			clock,
+			ms,
 			itemid,
 			timestamp,
 			encoding,
 			value_esc,
 			source_esc,
 			severity);
-	}
-	else
-	{
+	} else {
 		zabbix_log(LOG_LEVEL_DEBUG,"No encoding %s", encoding);
-		DBexecute("insert into history_log (id,clock,itemid,timestamp,value,source,severity) "
-			"values ("ZBX_FS_UI64",%d,"ZBX_FS_UI64",%d,'%s','%s',%d)",
+		DBexecute("insert into history_log (id,clock,ms,itemid,timestamp,value,source,severity) "
+			"values ("ZBX_FS_UI64",%d,%d,"ZBX_FS_UI64",%d,'%s','%s',%d)",
 			id,
 			clock,
+			ms,
 			itemid,
 			timestamp,
 			value_esc,

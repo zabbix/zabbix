@@ -45,16 +45,16 @@
  ******************************************************************************/
 void main_timer_loop()
 {
-	int	now;
+/*	int	now;*/
 
 /*	int	itemid,functionid;
 	char	*function;
 	char	*parameter;*/
 
-	DB_ITEM	item;
-
+	DB_ITEM		item;
 	DB_RESULT	result;
-	DB_ROW	row;
+	DB_ROW		row;
+	struct timeb    tp;
 
 	for(;;)
 	{
@@ -62,8 +62,8 @@ void main_timer_loop()
 
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-		now=time(NULL);
-/*
+/*		now=time(NULL);
+
 #ifdef HAVE_POSTGRESQL
 		zbx_snprintf(sql,sizeof(sql),"select distinct f.itemid,f.functionid,f.parameter from functions f, items i,hosts h where h.hostid=i.hostid and h.status=%d and i.itemid=f.itemid and f.function in ('nodata','date','dayofweek','time','now') and i.lastclock+f.parameter::text::integer<=%d and i.status=%d", HOST_STATUS_MONITORED, now, ITEM_STATUS_ACTIVE);
 #else
@@ -82,8 +82,9 @@ void main_timer_loop()
 			DBget_item_from_db(&item,row);
 
 			DBbegin();
+			ftime(&tp);
 			update_functions(&item);
-			update_triggers(item.itemid);
+			update_triggers(item.itemid, tp.time, tp.millitm);
 			DBcommit();
 		}
 

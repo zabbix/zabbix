@@ -56,7 +56,8 @@ void __zbx_zabbix_syslog(const char *fmt, ...)
 
 	DB_ITEM		item;
 	DB_RESULT	result;
-	DB_ROW	row;
+	DB_ROW		row;
+	struct timeb    tp;
 
 	AGENT_RESULT	agent;
 
@@ -82,10 +83,12 @@ void __zbx_zabbix_syslog(const char *fmt, ...)
 
 		init_result(&agent);
 		SET_STR_RESULT(&agent, strdup(value_str));
-		process_new_value(&item,&agent);
+
+		ftime(&tp);
+		process_new_value(&item, &agent, tp.time, tp.millitm);
 		free_result(&agent);
 
-		update_triggers(item.itemid);
+		update_triggers(item.itemid, tp.time, tp.millitm);
 	}
 
 	DBfree_result(result);

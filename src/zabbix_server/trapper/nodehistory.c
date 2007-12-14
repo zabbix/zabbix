@@ -63,7 +63,7 @@ static int	process_record(int sender_nodeid, int nodeid, char *record, char **tm
 {
 	char		value_esc[MAX_STRING_LEN], source[MAX_STRING_LEN], *r;
 	zbx_uint64_t	id, itemid, value_uint;
-	int		table, clock, timestamp, severity;
+	int		table, clock, ms, timestamp, severity;
 	double		value_dbl;
 	int		res = FAIL;
 
@@ -93,12 +93,18 @@ static int	process_record(int sender_nodeid, int nodeid, char *record, char **tm
 		goto error;
 
 	r = zbx_get_next_field(r, tmp, tmp_allocated, ZBX_DM_DELIMITER);
+	ms = atoi(*tmp);
+
+	if (NULL == r)
+		goto error;
+
+	r = zbx_get_next_field(r, tmp, tmp_allocated, ZBX_DM_DELIMITER);
 
 	switch (table) {
 	case ZBX_TABLE_HISTORY		:
 		value_dbl = atof(*tmp);
 
-		res = DBadd_history(itemid, value_dbl, clock);
+		res = DBadd_history(itemid, value_dbl, clock, ms);
 
 		DBexecute("update items set lastvalue='"ZBX_FS_DBL"',lastclock=%d "
 			"where itemid="ZBX_FS_UI64,
@@ -109,7 +115,7 @@ static int	process_record(int sender_nodeid, int nodeid, char *record, char **tm
 	case ZBX_TABLE_HISTORY_UINT	:
 		ZBX_STR2UINT64(value_uint, *tmp);
 
-		res = DBadd_history_uint(itemid, value_uint, clock);
+		res = DBadd_history_uint(itemid, value_uint, clock, ms);
 
 		DBexecute("update items set lastvalue='"ZBX_FS_UI64"',lastclock=%d "
 			"where itemid="ZBX_FS_UI64,
@@ -120,7 +126,7 @@ static int	process_record(int sender_nodeid, int nodeid, char *record, char **tm
 	case ZBX_TABLE_HISTORY_STR	:
 		zbx_hex2binary(*tmp);
 
-		res = DBadd_history_str(itemid, *tmp, clock);
+		res = DBadd_history_str(itemid, *tmp, clock, ms);
 
 		DBescape_string(*tmp, value_esc, MAX_STRING_LEN);
 
@@ -157,7 +163,7 @@ static int	process_record(int sender_nodeid, int nodeid, char *record, char **tm
 		r = zbx_get_next_field(r, tmp, tmp_allocated, ZBX_DM_DELIMITER);
 		zbx_hex2binary(*tmp);
 
-		res = DBadd_history_log(id, itemid, *tmp, clock, timestamp, source, severity, NULL);
+		res = DBadd_history_log(id, itemid, *tmp, clock, ms, timestamp, source, severity, NULL);
 		break;
 	}
 

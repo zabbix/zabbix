@@ -88,7 +88,7 @@ static int process_node_history_log(int nodeid, int master_nodeid)
 		ZBX_DM_DELIMITER,
 		nodeid);
 
-	zbx_snprintf(sql,sizeof(sql),"select id,itemid,clock,timestamp,source,severity,value,length(value) "
+	zbx_snprintf(sql,sizeof(sql),"select id,itemid,clock,ms,timestamp,source,severity,value,length(value) "
 		"from history_log where id>"ZBX_FS_UI64" and "ZBX_COND_NODEID" order by id",
 		sync_lastid,
 		ZBX_NODE("id", nodeid));
@@ -97,17 +97,18 @@ static int process_node_history_log(int nodeid, int master_nodeid)
 	while ((row = DBfetch(result))) {
 		ZBX_STR2UINT64(id,row[0])
 
-		len = atoi(row[7]);
-		len = zbx_binary2hex((u_char *)row[6], len, &hex, &hex_allocated);
+		len = atoi(row[8]);
+		len = zbx_binary2hex((u_char *)row[7], len, &hex, &hex_allocated);
 
-		zbx_snprintf_alloc(&data, &data_allocated, &data_offset, len + 256, "\n%d%c%s%c%s%c%s%c%s%c%s%c%s%c%s",
+		zbx_snprintf_alloc(&data, &data_allocated, &data_offset, len + 256, "\n%d%c%s%c%s%c%s%c%s%c%s%c%s%c%s%c%s",
 			ZBX_TABLE_HISTORY_LOG, ZBX_DM_DELIMITER,
 			row[1], ZBX_DM_DELIMITER,	/* itemid */
 			row[2], ZBX_DM_DELIMITER,	/* clock */
+			row[3], ZBX_DM_DELIMITER,	/* ms */
 			row[0], ZBX_DM_DELIMITER,	/* id */
-			row[3], ZBX_DM_DELIMITER,	/* timestamp */
-			row[4], ZBX_DM_DELIMITER,	/* source */
-			row[5], ZBX_DM_DELIMITER,	/* severity */
+			row[4], ZBX_DM_DELIMITER,	/* timestamp */
+			row[5], ZBX_DM_DELIMITER,	/* source */
+			row[6], ZBX_DM_DELIMITER,	/* severity */
 			hex);				/* value */
 		found = 1;
 	}
@@ -186,7 +187,7 @@ static int process_node_history_str(int nodeid, int master_nodeid)
 		ZBX_DM_DELIMITER,
 		nodeid);
 
-	zbx_snprintf(sql,sizeof(sql),"select id,itemid,clock,value from history_str_sync "
+	zbx_snprintf(sql,sizeof(sql),"select id,itemid,clock,ms,value from history_str_sync "
 		"where nodeid=%d order by id",
 		nodeid);
 
@@ -194,12 +195,13 @@ static int process_node_history_str(int nodeid, int master_nodeid)
 	while ((row = DBfetch(result))) {
 		ZBX_STR2UINT64(id,row[0])
 
-		len = strlen(row[3]);
-		len = zbx_binary2hex((u_char *)row[3], len, &hex, &hex_allocated);
-		zbx_snprintf_alloc(&data, &data_allocated, &data_offset, len + 128, "\n%d%c%s%c%s%c%s",
+		len = strlen(row[4]);
+		len = zbx_binary2hex((u_char *)row[4], len, &hex, &hex_allocated);
+		zbx_snprintf_alloc(&data, &data_allocated, &data_offset, len + 128, "\n%d%c%s%c%s%c%s%c%s",
 				ZBX_TABLE_HISTORY_STR, ZBX_DM_DELIMITER,
-				row[1], ZBX_DM_DELIMITER,
-				row[2], ZBX_DM_DELIMITER,
+				row[1], ZBX_DM_DELIMITER,	/* itemid */
+				row[2], ZBX_DM_DELIMITER,	/* clock */
+				row[3], ZBX_DM_DELIMITER,	/* ms */
 				hex);
 		found = 1;
 	}
@@ -268,7 +270,7 @@ static int process_node_history_uint(int nodeid, int master_nodeid)
 		ZBX_DM_DELIMITER,
 		nodeid);
 
-	zbx_snprintf(sql,sizeof(sql),"select id,itemid,clock,value from history_uint_sync where nodeid=%d order by id",
+	zbx_snprintf(sql,sizeof(sql),"select id,itemid,clock,ms,value from history_uint_sync where nodeid=%d order by id",
 		nodeid);
 
 	result = DBselectN(sql, 10000);
@@ -276,14 +278,12 @@ static int process_node_history_uint(int nodeid, int master_nodeid)
 	{
 		ZBX_STR2UINT64(id,row[0])
 		found = 1;
-		zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "\n%d%c%s%c%s%c%s",
-				ZBX_TABLE_HISTORY_UINT,
-				ZBX_DM_DELIMITER,
-				row[1],
-				ZBX_DM_DELIMITER,
-				row[2],
-				ZBX_DM_DELIMITER,
-				row[3]);
+		zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "\n%d%c%s%c%s%c%s%c%s",
+				ZBX_TABLE_HISTORY_UINT, ZBX_DM_DELIMITER,
+				row[1], ZBX_DM_DELIMITER,	/* itemid */
+				row[2], ZBX_DM_DELIMITER,	/* clock */
+				row[3], ZBX_DM_DELIMITER,	/* ms */
+				row[4]);
 	}
 	if(found == 1)
 	{
@@ -350,21 +350,19 @@ static int process_node_history(int nodeid, int master_nodeid)
 		ZBX_DM_DELIMITER,
 		nodeid);
 
-	zbx_snprintf(sql,sizeof(sql),"select id,itemid,clock,value from history_sync where nodeid=%d order by id",
+	zbx_snprintf(sql,sizeof(sql),"select id,itemid,clock,ms,value from history_sync where nodeid=%d order by id",
 		nodeid);
 
 	result = DBselectN(sql, 10000);
 	while ((row = DBfetch(result))) {
 		ZBX_STR2UINT64(id,row[0])
 		found = 1;
-		zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "\n%d%c%s%c%s%c%s",
-			ZBX_TABLE_HISTORY,
-			ZBX_DM_DELIMITER,
-			row[1],
-			ZBX_DM_DELIMITER,
-			row[2],
-			ZBX_DM_DELIMITER,
-			row[3]);
+		zbx_snprintf_alloc(&data, &data_allocated, &data_offset, 128, "\n%d%c%s%c%s%c%s%c%s",
+			ZBX_TABLE_HISTORY, ZBX_DM_DELIMITER,
+			row[1], ZBX_DM_DELIMITER,	/* itemid */
+			row[2], ZBX_DM_DELIMITER,	/* clock */
+			row[3], ZBX_DM_DELIMITER,	/* ms */
+			row[4]);
 	}
 	if (found == 1) {
 		zabbix_log( LOG_LEVEL_DEBUG, "Sending [%s]",

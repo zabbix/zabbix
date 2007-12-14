@@ -56,6 +56,7 @@ static int process_value(zbx_uint64_t itemid, AGENT_RESULT *value)
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_ITEM		item;
+	struct timeb    tp;
 
 	INIT_CHECK_MEMORY();
 
@@ -81,8 +82,9 @@ static int process_value(zbx_uint64_t itemid, AGENT_RESULT *value)
 	DBget_item_from_db(&item,row);
 
 	DBbegin();
-	process_new_value(&item,value);
-	update_triggers(item.itemid);
+	ftime(&tp);
+	process_new_value(&item, value, tp.time, tp.millitm);
+	update_triggers(item.itemid, tp.time, tp.millitm);
 	DBcommit();
  
 	DBfree_result(result);

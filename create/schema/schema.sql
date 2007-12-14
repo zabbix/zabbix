@@ -147,6 +147,7 @@ FIELD		|id		|t_serial	|	|		|ZBX_SYNC
 FIELD		|nodeid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|ms		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|nodeid,id
 
@@ -155,6 +156,7 @@ FIELD		|id		|t_serial	|	|		|ZBX_SYNC
 FIELD		|nodeid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|ms		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|value		|t_double	|'0.0000'|NOT NULL	|ZBX_SYNC
 INDEX		|1		|nodeid,id
 
@@ -163,6 +165,7 @@ FIELD		|id		|t_serial	|	|		|ZBX_SYNC
 FIELD		|nodeid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|ms		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|value		|t_bigint	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|nodeid,id
 
@@ -204,26 +207,30 @@ FIELD		|source		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|object		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|objectid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|ms		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|value		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|acknowledged	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|object,objectid,eventid
 INDEX		|2		|clock
 
 TABLE|history||0
-FIELD		|itemid		|t_id		|'0'		|NOT NULL	|ZBX_SYNC
-FIELD		|clock		|t_time		|'0'		|NOT NULL	|ZBX_SYNC
-FIELD		|value		|t_double	|'0.0000'	|NOT NULL	|ZBX_SYNC
+FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|ms		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|value		|t_double	|'0.0000'|NOT NULL	|ZBX_SYNC
 INDEX		|1		|itemid,clock
 
 TABLE|history_uint||0
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|value		|t_bigint		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|ms		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|value		|t_bigint	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|itemid,clock
 
 TABLE|history_str||0
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|ms		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|itemid,clock
 
@@ -231,6 +238,7 @@ TABLE|history_log|id|0
 FIELD		|id		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|ms		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|timestamp	|t_time		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|source		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|severity	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
@@ -241,6 +249,7 @@ TABLE|history_text|id|0
 FIELD		|id		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|ms		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|value		|t_history_text	|''	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|itemid,clock
 

@@ -1123,7 +1123,7 @@ COpt::profiling_stop('prepare table');
 	 * Comments:
 	 *
 	 */
-	function	item_get_history($db_item,$index = 1, $clock = 0)
+	function	item_get_history($db_item, $index = 1, $clock = 0, $ms = 0)
 	{
 		$value = NULL;
 
@@ -1148,7 +1148,7 @@ COpt::profiling_stop('prepare table');
 		}
 		if($index == 0)
 		{
-			$sql="select value from $table where itemid=".$db_item["itemid"]." and clock<=$clock order by clock desc";
+			$sql="select value from $table where itemid=".$db_item["itemid"]." and clock<=$clock and ms=$ms order by clock desc, ms desc";
 			$result = DBselect($sql, 1);
 			$row = DBfetch(DBselect($sql, 1));
 			if($row)
@@ -1158,7 +1158,7 @@ COpt::profiling_stop('prepare table');
 		}
 		else
 		{
-			$sql="select value from $table where itemid=".$db_item["itemid"]." order by clock desc";
+			$sql="select value from $table where itemid=".$db_item["itemid"]." order by clock desc, ms desc";
 			$result = DBselect($sql, $index);
 			$num=1;
 			while($row = DBfetch($result))
