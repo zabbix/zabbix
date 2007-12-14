@@ -46,7 +46,7 @@ include_once "include/page_header.php";
 		"itemid"=>	array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,	null),
 		
 		"from"=>	array(T_ZBX_INT, O_OPT,	 null,	'{}>=0', null),
-		"period"=>	array(T_ZBX_INT, O_OPT,	 null,	BETWEEN(ZBX_MIN_PERIOD,ZBX_MAX_PERIOD), null),
+		"period"=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
 		"dec"=>		array(T_ZBX_INT, O_OPT,	 null,	null, null),
 		"inc"=>		array(T_ZBX_INT, O_OPT,	 null,	null, null),
 		"left"=>	array(T_ZBX_INT, O_OPT,	 null,	null, null),
@@ -239,9 +239,9 @@ include_once "include/page_header.php";
 			$till = time(null) - $_REQUEST["from"] * 3600;
 			$hours=$effectiveperiod / 3600;
 
-			$l_header = array('Showing history of '.$effectiveperiod.' seconds('.$hours.' h)',
+			$l_header = array(S_SHOWING_HISTORY_OF.SPACE.$effectiveperiod.SPACE.S_SECONDS_SMALL.'('.$hours.' h)',
 								BR(),
-								'[from: '.date('Y.M.d H:i:s',$time).'] [till: '.date('Y.M.d H:i:s',$till).']'
+								'['.S_FROM_SMALL.': '.date('Y.M.d H:i:s',$time).'] ['.S_TILL_SMALL.': '.date('Y.M.d H:i:s',$till).']'
 							);
 		}
 		else
@@ -274,7 +274,7 @@ include_once "include/page_header.php";
 				$cmbFTask->AddItem(FILTER_TAST_INVERT_MARK,S_MARK_OTHERS);
 
 				$r_header->AddItem(array(
-					"Select rows with value like",SPACE,
+					S_SELECT_ROWS_WITH_VALUE_LIKE,SPACE,
 					new CTextBox("filter",$filter,25),
 					$cmbFTask,SPACE));
 
@@ -300,7 +300,9 @@ include_once "include/page_header.php";
 		}
 		else
 		{
-			echo $l_header."\n";
+			$txt = new CTag('p','yes',$l_header);
+			$txt->Show();
+			echo "\n";
 		}
 
 		$cond_clock = "";

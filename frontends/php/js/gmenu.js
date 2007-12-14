@@ -151,6 +151,8 @@ minute: 00,				//minutes
 
 timestamp: 0,			//selected date in unix timestamp
 
+period_min: 3600,		// Minimal period value (seconds)
+
 period: 0,				//period in seconds
 bstime: 0,				//graph starttime in seconds
 
@@ -167,6 +169,7 @@ gm_day: null,			//html obj
 gm_month: null,			//html obj
 gm_year: null,			//html obj
 
+visible: 0,				//GMenu style state
 
 monthname: new Array('January','February','March','April','May','June','July','August','September','October','November','December'), // months
 
@@ -228,25 +231,36 @@ gmenuhide: function(e){
 		_PE_GM = null;
 	}
 	this.gm_gmenu.hide();
+	this.visible = 0;
 },
 
 gmenushow: function(period, bstime){
-	if(isset(period) && isset(bstime)){
-		this.initialize(period, bstime);
-		
-		this.syncBSDateByBSTime();
-		this.calcPeriodAndTypeByUnix(period);
-		this.setBSDate();
-		this.setPeriod();
-		this.setPeriodType();
+	if(this.visible == 1){
+		this.gmenuhide();
 	}
-	
-	this.gm_gmenu.show();
+	else{
+		if(isset(period) && isset(bstime)){
+			this.initialize(period, bstime);
+			
+			this.syncBSDateByBSTime();
+			this.calcPeriodAndTypeByUnix(period);
+			this.setBSDate();
+			this.setPeriod();
+			this.setPeriodType();
+		}
+		
+		this.gm_gmenu.show();
+		this.visible = 1;
+	}
 },
 
 minuteup: function(){
-	if((this.bstime+60+this.period)>=parseInt(this.dt.getTime()/1000)){  // max date is date when script has been loaded
-		return;
+	var minuteinsec = 60;
+	if((this.bstime+minuteinsec+this.period)>=parseInt(this.dt.getTime()/1000)){  // max date is date when script has been loaded
+		if((this.period - 3600) < this.period_min) return;
+		this.period-=3600;
+		this.calcPeriodAndTypeByUnix(this.period)
+//		return;
 	}
 
 	this.minute++;
@@ -261,11 +275,23 @@ minuteup: function(){
 	
 	this.syncBSTime();
 	this.setBSDate();
+	
+	this.setPeriod();
+	this.setPeriodType();
 },
 
 hourup: function(){
-	if((this.bstime+3601+this.period)>=parseInt(this.dt.getTime()/1000)){  // max date is date when script has been loaded
-		return;
+	var hourinsec = 3600;
+	if((this.bstime+hourinsec+1+this.period)>=parseInt(this.dt.getTime()/1000)){  // max date is date when script has been loaded
+		if((this.period - hourinsec) < this.period_min){ 
+			if(((this.dt.getTime()/1000) - (this.bstime+hourinsec)) < this.period_min) return;
+			this.period = ((this.dt.getTime()/1000) - (this.bstime+hourinsec));
+		}
+		else{
+			this.period-=hourinsec;
+		}
+		this.calcPeriodAndTypeByUnix(this.period);
+//		return;
 	}
 
 	this.hour++;
@@ -280,11 +306,24 @@ hourup: function(){
 	
 	this.syncBSTime();
 	this.setBSDate();
+
+	this.setPeriod();
+	this.setPeriodType();
 },
 
 dayup: function(){
-	if((this.bstime+86400+this.period)>=parseInt(this.dt.getTime()/1000)){  // max date is date when script has been loaded
-		return;
+	var dayinsec = 86400;
+	if((this.bstime+dayinsec+this.period)>=parseInt(this.dt.getTime()/1000)){  // max date is date when script has been loaded
+
+		if((this.period - dayinsec) < this.period_min){ 
+			if(((this.dt.getTime()/1000) - (this.bstime+dayinsec)) < this.period_min) return;
+			this.period = ((this.dt.getTime()/1000) - (this.bstime+dayinsec));
+		}
+		else{
+			this.period-=dayinsec;
+		}
+		this.calcPeriodAndTypeByUnix(this.period);
+//		return;
 	}
 
 	this.day++;
@@ -299,12 +338,24 @@ dayup: function(){
 	
 	this.syncBSTime();
 	this.setBSDate();
+	
+	this.setPeriod();
+	this.setPeriodType();
 },
 
 monthup: function(){
 	var monthinsec = (86400*this.daysInMonth(this.month,this.year));
 	if((this.bstime+monthinsec+this.period)>=parseInt(this.dt.getTime()/1000)){  // max date is date when script has been loaded
-		return;
+
+		if((this.period - monthinsec) < this.period_min){ 
+			if(((this.dt.getTime()/1000) - (this.bstime+monthinsec)) < this.period_min) return;
+			this.period = ((this.dt.getTime()/1000) - (this.bstime+monthinsec));
+		}
+		else{
+			this.period-=monthinsec;
+		}
+		this.calcPeriodAndTypeByUnix(this.period);
+//		return;
 	}
 
 	var monthlastday = (this.day == this.daysInMonth(this.month,this.year));
@@ -327,20 +378,31 @@ monthup: function(){
 	this.syncBSTime();
 	this.period = this.calcPeriod();
 	this.setBSDate();
+	
+
+	this.setPeriod();
+	this.setPeriodType();
 },
 
 yearup: function(){
 	
-	var inc = this.calcPeriodIncByYear(1);
+	var yearinsec = this.calcPeriodIncByYear(1);
 
-	if((this.bstime+inc+this.period) >= parseInt(this.dt.getTime()/1000)){  // max date is date when script has been loaded
-		return ;
+	if((this.bstime+yearinsec+this.period) >= parseInt(this.dt.getTime()/1000)){  // max date is date when script has been loaded
+
+		if((this.period - yearinsec) < this.period_min) return;
+		this.period-=yearinsec;
+		this.calcPeriodAndTypeByUnix(this.period)
+//		return;
 	}
 
 	this.year++;
 	this.syncBSTime();
 	this.period = this.calcPeriod();
 	this.setBSDate();
+	
+	this.setPeriod();
+	this.setPeriodType();
 },
 
 minutedown: function(){
@@ -429,6 +491,9 @@ pvalueup: function(){
 	if(period){
 		this.period = period;
 		this.setPeriod();
+		
+		this.syncBSDateByBSTime();
+		this.setBSDate();
 		return;
 	}
 	this.period_value--;
@@ -450,6 +515,10 @@ ptypeup: function(){
 		
 		this.setPeriod();
 		this.setPeriodType();
+		
+		this.syncBSDateByBSTime();
+		this.setBSDate();
+
 		return;
 	}
 
@@ -459,6 +528,7 @@ ptypeup: function(){
 
 pvaluedown: function(){
 	if(this.period_value < 2){
+		this.ptypedown();
 		return;
 	}
 	this.period_value--;
@@ -516,7 +586,9 @@ calcPeriod: function(){
 	}
 
 	if((this.bstime + inc) > parseInt(this.dt.getTime()/1000)){ 
-		return false;
+		this.bstime = parseInt(this.dt.getTime()/1000) - inc;
+		this.cdt.setTime(this.bstime*1000);
+//		return false;
 	}
 	
 return inc;
@@ -629,7 +701,7 @@ calcPeriodAndTypeByUnix: function(time){
 			this.period_type = 0;
 		}
 		else{
-			this.period = 3600;
+			this.period = this.period_min;
 		}		
 	return;
 	}
@@ -664,7 +736,7 @@ calcPeriodAndTypeByUnix: function(time){
 		this.period = hours * 3600;	
 	}
 	else{
-		this.period = 3600*3;
+		this.period = this.period_min;
 	}
 },
 

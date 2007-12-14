@@ -44,13 +44,13 @@ function showgraphmenu(obj_id){
 //	G_MENU.gmenumouseout = function(){G_MENU.gmenuhide(); }
 	
 	var gmshow = function(){
-			if(SCROLL_BAR.changed == 1){
-				G_MENU.gmenushow(SCROLL_BAR.period,SCROLL_BAR.getsTimeInUnix());
-			}
-			else{
-				G_MENU.gmenushow();
-			}
+		if(SCROLL_BAR.changed == 1){
+			G_MENU.gmenushow(SCROLL_BAR.period,SCROLL_BAR.getsTimeInUnix());
 		}
+		else{
+			G_MENU.gmenushow();
+		}
+	}
 	if(IE){
 		$('scroll_calendar').attachEvent('onclick',gmshow);
 	}
@@ -105,7 +105,7 @@ function graph_zoom_init(graph_id,stime,period,width,height){
 	var boxongraph = create_box_on_obj(igraph.parentNode);
 	
 	boxongraph.style.top = (posxy.top+A_SBOX[graph_id].shiftT)+'px';
-	boxongraph.style.left = (posxy.left+A_SBOX[graph_id].shiftL)+'px';
+	boxongraph.style.left = (posxy.left+A_SBOX[graph_id].shiftL-1)+'px';
 	
 	width = width || 900;
 	height = height || 200;
@@ -113,7 +113,7 @@ function graph_zoom_init(graph_id,stime,period,width,height){
 	if(empty(width)) width = 900;
 	if(empty(height)) height = 900;
 	
-	A_SBOX[graph_id].sbox.obj.width = width;
+	A_SBOX[graph_id].sbox.obj.width = width-1;
 	A_SBOX[graph_id].sbox.obj.height = height;
 
 	boxongraph.style.height = A_SBOX[graph_id].sbox.obj.height+'px';

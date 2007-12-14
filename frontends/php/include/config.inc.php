@@ -646,11 +646,11 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 					break;			
 				case PAGE_TYPE_HTML:
 				default:
-					echo "<p align=center>";
-					echo "<font color='".((!$bool) ? "#AA0000" : "#223344")."'>";
-					echo "<b>[".htmlspecialchars($msg)."]</b>";
-					echo "</font>";
-					echo "</p>";
+					$p = new CTag('p','yes');
+					$p->AddOption('align','center');
+					$p->AddOption('style','color: '.((!$bool)?'#AA0000;':'#223344;'));
+					$p->AddItem(bold('['.$msg.']'));
+					$p->Show();
 					break;
 			}
 		}
@@ -1028,7 +1028,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	function	show_history($itemid,$from,$stime,$period)
 	{
 		$till=date(S_DATE_FORMAT_YMDHMS,time(NULL)-$from*3600);   
-		show_table_header("TILL $till (".($period/3600)." HOURs)");
+		show_table_header(S_TILL.SPACE.$till.' ('.($period/3600).' HOURs)');
 
 		$td = new CCol(get_js_sizeable_graph('graph','chart.php?itemid='.$itemid.
 				url_param($from,false,'from').
@@ -1037,7 +1037,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		$td->AddOption('align','center');
 		
 		$tr = new CRow($td);
-		$tr->AddOption('bgcolor','$dddddd');
+		$tr->AddOption('bgcolor','#dddddd');
 		
 		$table = new CTable();
 		$table->AddOption('width','100%');
@@ -1051,17 +1051,14 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	}
 
 
-	function	get_status()
-	{
+	function	get_status(){
 		global $DB_TYPE;
 		$status = array();
 // server
-		if( (exec("ps -ef|grep zabbix_server|grep -v grep|wc -l")>0) || (exec("ps -ax|grep zabbix_server|grep -v grep|wc -l")>0) )
-		{
+		if( (exec('ps -ef|grep zabbix_server|grep -v grep|wc -l')>0) || (exec('ps -ax|grep zabbix_server|grep -v grep|wc -l')>0) ){
 			$status["zabbix_server"] = S_YES;
 		}
-		else
-		{
+		else{
 			$status["zabbix_server"] = S_NO;
 		}
 
