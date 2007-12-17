@@ -35,6 +35,7 @@ include_once 'include/page_header.php';
 	$fields=array(
 		'config'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		NULL),
 		'groupid'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,			NULL),
+		'hostgroupid'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,			NULL),
 		'hostid'=>			array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,			NULL),
 		'tpl_triggerid'=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,			NULL),
 		
@@ -95,6 +96,8 @@ show_report2_header($config,$available_hosts);
 		}
 		else{
 			$sql_cond = ' AND h.hostid=ht.hostid ';
+			$sql_cond.=(isset($_REQUEST['hostgroupid']) && ($_REQUEST['hostgroupid']>0))?' AND g.groupid ='.$_REQUEST['hostgroupid']:'';
+			
 			if($_REQUEST['hostid'] > 0)	$sql_cond.=' AND ht.templateid='.$_REQUEST['hostid'];
 			
 			if(isset($_REQUEST['tpl_triggerid']) && ($_REQUEST['tpl_triggerid'] > 0))
@@ -104,39 +107,28 @@ show_report2_header($config,$available_hosts);
 		if($_REQUEST['hostid'] > 0){
 			$row	= DBfetch(DBselect('SELECT host FROM hosts WHERE hostid='.$_REQUEST['hostid']));
 			show_table_header($row['host']);
-	
-			$result = DBselect('SELECT DISTINCT h.hostid,h.host,t.triggerid,t.expression,t.description,t.value '.
-				' FROM triggers t,hosts h,items i,functions f, hosts_templates ht '.
-				' WHERE f.itemid=i.itemid '.
-					' AND h.hostid=i.hostid '.
-					' AND h.hostid in ('.$available_hosts.') '.
-					' AND t.status='.TRIGGER_STATUS_ENABLED.
-					' AND t.triggerid=f.triggerid '.
-					' AND '.DBin_node('t.triggerid').
-					' AND i.status='.ITEM_STATUS_ACTIVE.
-					' AND h.status='.HOST_STATUS_MONITORED.
-					$sql_cond.
-				' ORDER BY h.host, t.description');
 		}
 		else{
 			if(isset($_REQUEST['tpl_triggerid']) && ($_REQUEST['tpl_triggerid'] > 0))
 				show_table_header(expand_trigger_description($_REQUEST['tpl_triggerid']));
 			else
-				show_table_header(S_ALL_HOSTS_BIG);
-				
-			$result = DBselect('SELECT DISTINCT h.hostid,h.host,t.triggerid,t.expression,t.description,t.value '.
-				' FROM triggers t,hosts h,items i,functions f, hosts_templates ht '.
-				' WHERE f.itemid=i.itemid '.
-					' AND h.hostid=i.hostid '.
-					' AND t.status='.TRIGGER_STATUS_ENABLED.
-					' AND t.triggerid=f.triggerid '.
-					' AND h.hostid in ('.$available_hosts.')'.
-					' AND '.DBin_node('t.triggerid').
-					' AND i.status='.ITEM_STATUS_ACTIVE.
-					' AND h.status='.HOST_STATUS_MONITORED.
-					$sql_cond.
-				' ORDER BY h.host, t.description');
+				show_table_header(S_ALL_HOSTS_BIG);				
 		}
+		$result = DBselect('SELECT DISTINCT h.hostid,h.host,t.triggerid,t.expression,t.description,t.value '.
+			' FROM triggers t,hosts h,items i,functions f, hosts_templates ht, groups g, hosts_groups hg '.
+			' WHERE f.itemid=i.itemid '.
+				' AND hg.hostid=h.hostid'.
+				' AND g.groupid=hg.groupid '.
+				' AND h.hostid=i.hostid '.
+				' AND h.hostid in ('.$available_hosts.')'.
+				' AND t.status='.TRIGGER_STATUS_ENABLED.
+				' AND t.triggerid=f.triggerid '.
+				' AND '.DBin_node('t.triggerid').
+				' AND i.status='.ITEM_STATUS_ACTIVE.
+				' AND h.status='.HOST_STATUS_MONITORED.
+				$sql_cond.
+			' ORDER BY h.host, t.description');
+
 		
 		$accessible_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY);
 
