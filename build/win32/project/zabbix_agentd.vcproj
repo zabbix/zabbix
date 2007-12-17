@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1257"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="zabbix_agentd"
 	ProjectGUID="{7AF2898C-0CB8-4084-B814-88C2825D228B}"
 	>
@@ -18,8 +18,8 @@
 	<Configurations>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory=".\Release"
-			IntermediateDirectory=".\Release"
+			OutputDirectory="$(PlatformName)\$(ConfigurationName)\zabbix_agentd"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)\zabbix_agentd"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
@@ -52,10 +52,10 @@
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
-				PrecompiledHeaderFile=".\Release/zabbix_agentd.pch"
-				AssemblerListingLocation=".\Release/"
-				ObjectFile=".\Release/"
-				ProgramDataBaseFileName=".\Release/"
+				PrecompiledHeaderFile="$(IntDir)\zabbix_agentd.pch"
+				AssemblerListingLocation="$(IntDir)\"
+				ObjectFile="$(IntDir)\"
+				ProgramDataBaseFileName="$(IntDir)\"
 				BrowseInformation="1"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
@@ -77,7 +77,7 @@
 				OutputFile="../../../bin/win32/zabbix_agentd.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				ProgramDatabaseFile=".\Release/zabbix_agentd.pdb"
+				ProgramDatabaseFile="$(IntDir)\zabbix_agentd.pdb"
 				SubSystem="1"
 				TargetMachine="1"
 			/>
@@ -93,7 +93,7 @@
 			<Tool
 				Name="VCBscMakeTool"
 				SuppressStartupBanner="true"
-				OutputFile=".\Release/zabbix_agentd.bsc"
+				OutputFile="$(IntDir)\zabbix_agentd.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
@@ -485,8 +485,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release AMD64|x64"
-			OutputDirectory="$(PlatformName)\$(ConfigurationName)"
-			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)"
+			OutputDirectory="$(PlatformName)\$(ConfigurationName)\zabbix_agentd"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)\zabbix_agentd"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
@@ -521,12 +521,12 @@
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
-				PrecompiledHeaderFile=".\Release_AMD64/zabbix_agentd.pch"
-				AssemblerListingLocation=".\Release_AMD64/"
-				ObjectFile=".\Release_AMD64/"
-				ProgramDataBaseFileName=".\Release_AMD64/"
+				PrecompiledHeaderFile="$(IntDir)\zabbix_agentd.pch"
+				AssemblerListingLocation="$(IntDir)\"
+				ObjectFile="$(IntDir)\"
+				ProgramDataBaseFileName="$(IntDir)\"
 				BrowseInformation="2"
-				BrowseInformationFile=".\Release_AMD64/"
+				BrowseInformationFile="$(IntDir)\"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
 			/>
@@ -548,7 +548,7 @@
 				OutputFile="../../../bin/win64/zabbix_agentd.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				ProgramDatabaseFile=".\Release_AMD64/zabbix_agentd.pdb"
+				ProgramDatabaseFile="$(IntDir)\zabbix_agentd.pdb"
 				SubSystem="1"
 				TargetMachine="17"
 			/>
@@ -564,7 +564,7 @@
 			<Tool
 				Name="VCBscMakeTool"
 				SuppressStartupBanner="true"
-				OutputFile=".\Release_AMD64/zabbix_agentd.bsc"
+				OutputFile="$(IntDir)\zabbix_agentd.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
