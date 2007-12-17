@@ -53,7 +53,7 @@ include_once 'include/page_header.php';
 		'stime'=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	NULL,NULL),
 		'action'=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	IN("'go'"),NULL),
 		'reset'=>		array(T_ZBX_STR, O_OPT,  P_SYS, 	IN("'reset'"),NULL),
-		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,		IN("1"),		NULL)
+		'fullscreen'=>	array(T_ZBX_INT, O_OPT,	P_SYS,		IN("1"),NULL)
 	);
 
 	check_fields($fields);
