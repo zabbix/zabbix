@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1257"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="zabbix_sender"
 	ProjectGUID="{0DA34C05-B7CA-4915-8D8B-B2DB8F4D0478}"
 	>
@@ -18,8 +18,8 @@
 	<Configurations>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory=".\Release"
-			IntermediateDirectory=".\Release"
+			OutputDirectory="$(PlatformName)\$(ConfigurationName)\zabbix_sender"
+			IntermediateDirectory="$(PlatformName)\$(ConfigurationName)\zabbix_sender"
 			ConfigurationType="1"
 			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC60.vsprops"
 			UseOfMFC="0"
@@ -52,10 +52,10 @@
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
-				PrecompiledHeaderFile=".\Release/zabbix_sender.pch"
-				AssemblerListingLocation=".\Release/"
-				ObjectFile=".\Release/"
-				ProgramDataBaseFileName=".\Release/"
+				PrecompiledHeaderFile="$(IntDir)\zabbix_sender.pch"
+				AssemblerListingLocation="$(IntDir)\"
+				ObjectFile="$(IntDir)\"
+				ProgramDataBaseFileName="$(IntDir)\"
 				BrowseInformation="1"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
@@ -77,7 +77,7 @@
 				OutputFile="../../../bin/win32/zabbix_sender.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				ProgramDatabaseFile=".\Release/zabbix_sender.pdb"
+				ProgramDatabaseFile="$(IntDir)\zabbix_sender.pdb"
 				SubSystem="1"
 				TargetMachine="1"
 			/>
@@ -93,7 +93,7 @@
 			<Tool
 				Name="VCBscMakeTool"
 				SuppressStartupBanner="true"
-				OutputFile=".\Release/zabbix_sender.bsc"
+				OutputFile="$(IntDir)\zabbix_sender.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
@@ -558,7 +558,7 @@
 			<Tool
 				Name="VCBscMakeTool"
 				SuppressStartupBanner="true"
-				OutputFile=".\Release/zabbix_sender.bsc"
+				OutputFile="$(IntDir)\zabbix_sender.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
