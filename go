@@ -39,9 +39,9 @@ for db in mysql; do
 	echo Cleaning...
 	make clean 2>>WARNINGS >/dev/null
 	echo Making...
-	make 2>>WARNINGS >/dev/null
+	make -j2 2>>WARNINGS >/dev/null
 	echo Installing...
-	make install 2>>WARNINGS >/dev/null
+	make -j2 install 2>>WARNINGS >/dev/null
 done
 
 echo
