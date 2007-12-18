@@ -225,38 +225,42 @@ COpt::profiling_start("page");
 					$deny = true;
 			}
 
-			if(isset($sub['node_perm']))
-			{
+			if(isset($sub['node_perm'])){
 				if ( 0 == count(get_accessible_nodes_by_user(
-					$USER_DETAILS,$sub['node_perm'],null,
-					PERM_RES_IDS_ARRAY,get_current_nodeid(false))))
-						$deny = true;
+									$USER_DETAILS,
+									$sub['node_perm'],
+									null,
+									PERM_RES_IDS_ARRAY,
+									get_current_nodeid(false))))
+				{
+					$deny = true;
+				}
 			}
 
-			if($label=='login')
-			{
-				unset($deny);
+			if($label=='login'){
+				$deny = true;				
+/*				if(isset($USER_DETAILS['sessionid']))
+					$sub['label'] = S_LOGOUT;
+				else
+					unset($deny);
+*/
 			}
 		}
 
 // End of main menu permissions checking
 
 		unset($menu_url);
-		foreach($sub['pages'] as $id => $sub_pages)
-		{
-			if(!defined('ZBX_PAGE_NO_AUTHERIZATION'))
-			{
-				if(isset($sub_pages['user_type']))
-				{
-					if($USER_DETAILS['type'] < $sub_pages['user_type'])
-					{
+		foreach($sub['pages'] as $id => $sub_pages){
+
+			if(!defined('ZBX_PAGE_NO_AUTHERIZATION')){
+				if(isset($sub_pages['user_type'])){
+					if($USER_DETAILS['type'] < $sub_pages['user_type']){
 						unset($sub['pages'][$id]);
 						continue;
 					}
 				}
 
-				if(isset($sub_pages['node_perm']))
-				{
+				if(isset($sub_pages['node_perm'])){
 					if ( 0 == count(get_accessible_nodes_by_user(
 						$USER_DETAILS,$sub_pages['node_perm'],null,
 						PERM_RES_IDS_ARRAY,get_current_nodeid(false))))
@@ -269,21 +273,17 @@ COpt::profiling_start("page");
 
 			if(isset($page_exist)) continue; 
 				
-			if($page['file'] == $sub_pages['url'])
-			{
-				if(isset($sub_pages['label']))
-				{
+			if($page['file'] == $sub_pages['url']){
+				if(isset($sub_pages['label'])){
 					$menu_url = $sub_pages['url'];
 				}
+				
 				$page_exist = true;
 				$sub['pages'][$id]['active'] = true; /* mark as active */
 			}
-			else if(isset($sub_pages['sub_pages']))
-			{
-				if(in_array($page['file'], $sub_pages['sub_pages']))
-				{
-					if(isset($sub_pages['label']))
-					{
+			else if(isset($sub_pages['sub_pages'])){
+				if(in_array($page['file'], $sub_pages['sub_pages'])){
+					if(isset($sub_pages['label'])){
 						$menu_url = $sub_pages['url'];
 					}
 					$page_exist = true;
@@ -293,27 +293,23 @@ COpt::profiling_start("page");
 
 			if (	isset($page_exist) &&
 				( isset($sub['forse_disable_subnodes']) || isset($sub_pages['forse_disable_subnodes']) ) &&
-				!defined('ZBX_DISABLE_SUBNODES')
-			)
+				!defined('ZBX_DISABLE_SUBNODES'))
 			{
 					define('ZBX_DISABLE_SUBNODES', 1);
 			}
 		}
 
-		if(isset($menu_url)) /* active menu */
-		{
+		if(isset($menu_url)){ /* active menu */
 			$class = "active";
 
 			update_profile('web.menu.'.$label.'.last', $menu_url);
 
-			if(isset($deny))
-			{
+			if(isset($deny)){
 				$denyed_page_requested = true;
 				continue;
 			}
 
-			foreach($sub['pages'] as $sub_pages)
-			{
+			foreach($sub['pages'] as $sub_pages){
 				if(!isset($sub_pages['label'])) continue;
 
 				$label = new CLink($sub_pages['label'], $sub_pages['url'],'highlight');
@@ -325,8 +321,7 @@ COpt::profiling_start("page");
 					);
 			}
 		}
-		else
-		{
+		else{
 			if(isset($deny)) continue;
 
 			$class = "horizontal_menu_n";
@@ -341,8 +336,7 @@ COpt::profiling_start("page");
 		unset($menu_url, $class);
 	}
 
-	if((!isset($page_exist) && $page['type']!=PAGE_TYPE_XML))
-	{
+	if((!isset($page_exist) && $page['type']!=PAGE_TYPE_XML)){
 		$denyed_page_requested = true;
 	}
 
