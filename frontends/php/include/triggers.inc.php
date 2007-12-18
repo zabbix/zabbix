@@ -1155,6 +1155,20 @@
 						$value,
 						$description);
 			}
+/*
+			for($i=1; $i<10; $i++){
+				if(strstr($description,"{ITEM.VALUE$i}"))
+				{
+					$value=($flag==ZBX_FLAG_TRIGGER)?
+							trigger_get_func_value($row["expression"],ZBX_FLAG_TRIGGER,$i,1):
+							trigger_get_func_value($row["expression"],ZBX_FLAG_EVENT,$i,$row['clock']);
+					$description = str_replace("{ITEM.VALUE$i}",
+							$value,
+							$description);
+				}
+
+			}
+//*/
 			if(strstr($description,'{ITEM.VALUE1}'))
 			{
 				$value=($flag==ZBX_FLAG_TRIGGER)?
@@ -1260,7 +1274,7 @@
 	function	expand_trigger_description($triggerid)
 	{
 		$description=expand_trigger_description_simple($triggerid);
-		$description=stripslashes(htmlspecialchars($description));
+		$description=htmlspecialchars($description);
 
 		return $description;
 	}
