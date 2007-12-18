@@ -1,5 +1,7 @@
 Changes for 1.5:
 
+ - [DEV-89] improved trigger tables view (Artem)
+ - [DEV-88] removed duplicated entry "Login" (Artem)
  - [DEV-87] fixed problem with unlinking templates (Sasha)
  - [DEV-52] added "Unlimited number of link styles for maps" (Artem)
  - [DEV-86] DM: Synchronizing all history data with master node (Sasha)
