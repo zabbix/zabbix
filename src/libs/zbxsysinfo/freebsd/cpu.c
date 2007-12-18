@@ -24,7 +24,26 @@
 
 int	SYSTEM_CPU_NUM(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	return SYSINFO_RET_FAIL;
+#ifdef HAVE_FUNCTION_SYSCTL_HW_NCPU
+	size_t len;
+	int mib[2], ncpu;
+
+	assert(result);
+
+	init_result(result);
+
+	mib[0]=CTL_HW;
+	mib[1]=HW_NCPU;
+
+	len = sizeof(ncpu);
+	if (0 != sysctl(mib, 2, &ncpu, &len, 0, 0))
+		return SYSINFO_RET_FAIL;
+
+	SET_UI64_RESULT(result, ncpu);
+	return SYSINFO_RET_OK;
+#else
+ 	return SYSINFO_RET_FAIL;
+#endif
 }
 
 int	SYSTEM_CPU_UTIL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)

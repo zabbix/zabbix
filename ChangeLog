@@ -31,6 +31,10 @@ Changes for 1.5:
  - changed how is showed messages (Artem)
  - added login/logout (Artem)
 
+Changes for 1.4.5:
+
+ - [ZBX-7] added support of system.cpu.num[] for FreeBSD agents (Sasha)
+
 Changes for 1.4.4:
 
  - [ZBX-220] fixed agent crash in case of timeout during first connect (Sasha)
