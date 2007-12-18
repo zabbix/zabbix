@@ -377,14 +377,15 @@ include_once "include/page_header.php";
 
 		$table = new CTableInfo(S_NO_TRIGGERS_DEFINED);
 		$table->setHeader(array(
+			make_sorting_link(S_SEVERITY,'t.priority'), 
+			make_sorting_link(S_STATUS,'t.status'), 
+
 			$_REQUEST["hostid"] > 0 ? NULL : make_sorting_link(S_HOST,'h.host'),
 			array(	new CCheckBox("all_triggers",NULL,
 					"CheckAll('".$form->GetName()."','all_triggers');")
 				,make_sorting_link(S_NAME,'t.description'),
 			),
 			S_EXPRESSION, 
-			make_sorting_link(S_SEVERITY,'t.priority'), 
-			make_sorting_link(S_STATUS,'t.status'), 
 			S_ERROR));
 
 		$sql = 'SELECT DISTINCT h.hostid,h.host,t.*'.
@@ -481,11 +482,11 @@ include_once "include/page_header.php";
 			if($row["error"]=="")		$row["error"]=SPACE;
 
 			$table->addRow(array(
+				$priority,
+				$status,
 				$_REQUEST["hostid"] > 0 ? NULL : $row["host"],
 				$description,
 				explode_exp($row["expression"],1),
-				$priority,
-				$status,
 				$row["error"]
 			));
 		}

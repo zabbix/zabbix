@@ -351,13 +351,13 @@ include_once "include/page_header.php";
 	$header=array();
 
 	$table->SetHeader(array(
+		($config['event_ack_enable'])?(new CCheckBox("all_events",false, "CheckAll('".$m_form->GetName()."','all_events','events');")): NULL,
+		make_sorting_link(S_SEVERITY,'t.priority'),
+		S_STATUS,
+		make_sorting_link(S_LAST_CHANGE,'t.lastchange'),
 		is_show_subnodes() ? make_sorting_link(S_NODE,'h.hostid') : null,
 		$_REQUEST["hostid"] >0 ? null : make_sorting_link(S_HOST,'h.host'),
-		($config['event_ack_enable'])?(new CCheckBox("all_events",false, "CheckAll('".$m_form->GetName()."','all_events','events');")): NULL,
 		make_sorting_link(S_NAME,'t.description'),
-		S_STATUS,
-		make_sorting_link(S_SEVERITY,'t.priority'),
-		make_sorting_link(S_LAST_CHANGE,'t.lastchange'),
 		($noactions!='true')?S_ACTIONS:NULL,
 		($config['event_ack_enable'])? S_ACKNOWLEDGED : NULL,
 		S_COMMENTS
@@ -500,17 +500,16 @@ include_once "include/page_header.php";
 		}
 
 			$table->AddRow(array(
-				get_node_name_by_elid($row['triggerid']),
-				$host,
 				($config['event_ack_enable'])?SPACE:NULL,
-				$description,
-				$value,
 				new CCol(
 					get_severity_description($row["priority"]),
 					get_severity_style($row["priority"])
 					),
-//				SPACE,
-				new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row["lastchange"]),"tr_events.php?triggerid=".$row["triggerid"],"action"),
+				$value,
+				new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row["lastchange"]),"tr_events.php?triggerid=".$row["triggerid"],"action"),								
+				get_node_name_by_elid($row['triggerid']),
+				$host,
+				$description,
 				$actions,
 				($config['event_ack_enable'])?SPACE:NULL,
 				new CLink(($row["comments"] == "") ? S_ADD : S_SHOW,"tr_comments.php?triggerid=".$row["triggerid"],"action")
@@ -557,20 +556,22 @@ include_once "include/page_header.php";
 			$font = new CTag('font','yes');
 			$font->AddOption('color','#808080');
 			$font->AddItem(array('&nbsp;-&nbsp;',$description));
-//			$description = $font->ToString();
 			$description = $font;
+		
+			$description = new CCol($description);
+			$description->AddOption('style','white-space: normal; width: 90%;');
 
 			$table->AddRow(array(
-					get_node_name_by_elid($row['triggerid']),
-					$host,
 					($config['event_ack_enable'])?(($row_event['acknowledged'] == 1)?(SPACE):(new CCheckBox('events['.$row_event['eventid'].']', 'no',NULL,$row_event['eventid']))):NULL,
-					$description,
-					$value,
 					new CCol(
 						get_severity_description($row["priority"]),
 						get_severity_style($row["priority"])
 						),
-					new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),"tr_events.php?triggerid=".$row["triggerid"],"action"),
+					$value,
+					new CLink(zbx_date2str(S_DATE_FORMAT_YMDHMS,$row_event['clock']),"tr_events.php?triggerid=".$row["triggerid"],"action"),					
+					get_node_name_by_elid($row['triggerid']),
+					$host,
+					$description,
 					$actions,
 					($config['event_ack_enable'])?(new CCol($ack,"center")):NULL,
 					new CLink(($row["comments"] == "") ? S_ADD : S_SHOW,"tr_comments.php?triggerid=".$row["triggerid"],"action")
