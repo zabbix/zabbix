@@ -2387,7 +2387,7 @@
 		$frmComent = new CFormTable(S_COMMENTS." for ".$trigger['host']." : \"".expand_trigger_description_by_data($trigger)."\"");
 		$frmComent->SetHelp("web.tr_comments.comments.php");
 		$frmComent->AddVar("triggerid",$triggerid);
-		$frmComent->AddRow(S_COMMENTS,new CTextArea("comments",stripslashes($trigger["comments"]),100,25));
+		$frmComent->AddRow(S_COMMENTS,new CTextArea("comments",$trigger["comments"],100,25));
 		$frmComent->AddItemToBottomRow(new CButton("save",S_SAVE));
 		$frmComent->AddItemToBottomRow(new CButtonCancel('&triggerid='.$triggerid));
 
