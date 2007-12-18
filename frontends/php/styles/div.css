@@ -37,3 +37,19 @@ span.divider{
 	font-size: 10px; 
 	font-weight: normal;
 }
+
+/********** REQUIREMENTS TABLE *************/
+span.ok{
+	color:		#00AA00;
+	font-weight:	bold;
+}
+span.fail{
+	color:		#AA0000;
+	font-weight:	bold;
+}
+span.green{
+	color:		#00AA00;
+}
+span.red{
+	color:		#AA0000;
+}

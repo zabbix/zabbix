@@ -111,7 +111,7 @@ include_once "include/page_header.php";
 			if(isset($row["triggerid"]) && !empty($row["triggerid"])){
 
 				$url = new CLink(expand_trigger_description($row['triggerid']),'tr_events.php?triggerid='.$row['triggerid']);
-				$row['caption'] = $row['caption'].SPACE.'['.$url->ToString().']';
+				$row['caption'] = array($row['caption'].' [',$url,']');
 
 			}
 			
@@ -144,13 +144,12 @@ include_once "include/page_header.php";
 				$stat = calculate_service_availability($row["serviceid"],$period_start,$period_end);
 
 				if($row["goodsla"] > $stat["ok"]){
-					$color="AA0000";
+					$sla_style='red';
 				} else {
-					$color="00AA00";
+					$sla_style='green';
 				}
 				
-				$row['sla2'] = sprintf("<font color=\"#00AA00\">%.2f%%</font><b>/</b><font color=\"#%s\">%.2f%%</font>",
-					$row["goodsla"], $color,$stat["ok"]);
+				$row['sla2'] = array(new CSpan(round($row["goodsla"],3),'green'),'/', new CSpan(round($stat["ok"],3),$sla_style));
 			} else {
 				$row['sla']= "-";
 				$row['sla2']= "-";
@@ -176,12 +175,12 @@ include_once "include/page_header.php";
 		//permission issue
 		$treeServ = del_empty_nodes($treeServ);
 		
-		$tree = new CTree($treeServ,array('caption' => '<b>'.S_SERVICE.'</b>',
-						'status' => '<b>'.S_STATUS.'</b>', 
-						'reason' => '<b>'.S_REASON.'</b>',
-						'sla' => '<b>'.S_SLA_LAST_7_DAYS.'</b>',
-						'sla2' => '<b>'.nbsp(S_PLANNED_CURRENT_SLA).'</b>',
-						'graph' => '<b>'.S_GRAPH.'</b>'));
+		$tree = new CTree($treeServ,array('caption' => bold(S_SERVICE),
+						'status' => bold(S_STATUS), 
+						'reason' => bold(S_REASON),
+						'sla' => bold(S_SLA_LAST_7_DAYS),
+						'sla2' => bold(nbsp(S_PLANNED_CURRENT_SLA)),
+						'graph' => bold(S_GRAPH)));
 		
 		if($tree){
 			echo $tree->CreateJS();

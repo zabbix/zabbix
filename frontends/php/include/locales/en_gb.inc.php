@@ -1093,6 +1093,9 @@
 	'S_DELETE_SLIDESHOW_Q'=>		'Delete slideshow?',
 
 //	services.php
+	'S_AVERAGE_PROBLEM'=>		'Average problem',
+	'S_SERIOUS_PROBLEM'=>		'Serious problem',
+	'S_MINOR_PROBLEM'=>			'Minor problem',
 	'S_ROOT_SMALL'=>			'root',
 	'S_IT_SERVICE'=>			'IT service',
 	'S_IT_SERVICES'=>			'IT services',
