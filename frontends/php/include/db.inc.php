@@ -437,15 +437,26 @@ COpt::savesqlrequest($query);
 	
 
 /* string value prepearing */
-if(isset($DB_TYPE) && $DB_TYPE == "ORACLE") {	
+if(isset($DB_TYPE) && $DB_TYPE == "ORACLE") {
 	function	zbx_dbstr($var)	{
 		return "'".ereg_replace('\'','\'\'',$var)."'";	
 	}
-} else {			
+}
+else if(isset($DB_TYPE) && $DB_TYPE == "MYSQL") {
+	function	zbx_dbstr($var)	{
+		return "'".mysql_real_escape_string($var)."'";
+	}
+}
+else if(isset($DB_TYPE) && $DB_TYPE == "POSTGRESQL") {
+	function	zbx_dbstr($var)	{
+		return "'".pg_escape_string($var)."'";
+	}
+}
+else {			
 	function	zbx_dbstr($var)	{
 		return "'".addslashes($var)."'";
 	}
-}
+} 
 
 	function	zbx_dbconcat($params)
 	{

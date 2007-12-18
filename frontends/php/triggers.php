@@ -426,7 +426,7 @@ include_once "include/page_header.php";
 				$description[] = ':';
 			}
 
-			$description[] = new CLink(addslashes(expand_trigger_description($row["triggerid"])),
+			$description[] = new CLink(expand_trigger_description($row["triggerid"]),
 				"triggers.php?form=update&triggerid=".$row["triggerid"].
 					"&hostid=".$row["hostid"], 'action');
 
