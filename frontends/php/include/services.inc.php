@@ -570,30 +570,25 @@ $dt = 0;
 		return $sla_time;
 	}
 
-	function	get_service_status_description($status)
-	{
-		$desc='<font color="#00AA00">OK</a>';
+	function	get_service_status_description($status){
+		$desc=new CSpan(S_OK_BIG,'green');
 		if($status==5)
 		{
-			$desc='<div class="disaster">Disaster</div>';
+			$desc=new CTag('div','yes',S_DISASTER,'disaster');
 		}
-		elseif($status==4)
-		{
-			$desc='<div class="high">Serious'.SPACE.'problem</div> ';
+		else if($status==4){
+			$desc=new CTag('div','yes',S_SERIOUS_PROBLEM,'high');
 		}
-		elseif($status==3)
-		{
-			$desc='<div class="average">Average'.SPACE.'problem</div> ';
+		else if($status==3){
+			$desc=new CTag('div','yes',S_AVERAGE_PROBLEM,'average');
 		}
-		elseif($status==2)
-		{
-			$desc='<div class="warning">Minor'.SPACE.'problem</div> ';
+		else if($status==2){
+			$desc=new CTag('div','yes',S_MINOR_PROBLEM,'warning');
 		}
-		elseif($status==1)
-		{
-			$desc='<font color="#00AA00">OK</font>';
+		else if($status==1){
+			$desc=new CSpan(S_OK_BIG,'green');
 		}
-		return $desc;
+	return $desc;
 	}
 
 	function	get_num_of_service_childs($serviceid)

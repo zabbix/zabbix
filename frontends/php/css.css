@@ -22,15 +22,6 @@ body{
 }
 
 
-/********** REQUIREMENTS TABLE *************/
-span.ok{
-	color:		green;
-	font-weight:	bold;
-}
-span.fail{
-	color:		red;
-	font-weight:	bold;
-}
 
 /**************** OTHERS ****************/
 .top		{	vertical-align: top; }
