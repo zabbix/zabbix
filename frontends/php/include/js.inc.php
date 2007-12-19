@@ -112,7 +112,7 @@ function insert_showhint_javascript(){
 	if(defined('SHOW_HINT_SCRIPT_INSERTTED')) return;
 	define('SHOW_HINT_SCRIPT_INSERTTED', 1);
 	
-	echo '<script type"text/javascript" src="js/showhint.js"></script>';	
+	echo '<script type="text/javascript" src="js/showhint.js"></script>';	
 }
 
 function Redirect($url,$timeout=null){
