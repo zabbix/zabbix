@@ -809,15 +809,23 @@
 		if(!isset($_REQUEST["period"]))	$_REQUEST["period"]=ZBX_PERIOD_DEFAULT;
 		if(!isset($_REQUEST["from"]))	$_REQUEST["from"]=0;
 		if(!isset($_REQUEST["stime"]))	$_REQUEST["stime"]=null;
-		
+
 		if($_REQUEST['period']<ZBX_MIN_PERIOD){
 			show_message(S_WARNING.'. '.S_TIME_PERIOD.SPACE.S_MIN_VALUE_SMALL.': '.ZBX_MIN_PERIOD.' ('.(int)(ZBX_MIN_PERIOD/3600).'h)');
 			$_REQUEST['period'] = ZBX_MIN_PERIOD;
+			
 		}
 		else if($_REQUEST['period'] > ZBX_MAX_PERIOD){
 			show_message(S_WARNING.'. '.S_TIME_PERIOD.SPACE.S_MAX_VALUE_SMALL.': '.ZBX_MAX_PERIOD.' ('.(int)(ZBX_MAX_PERIOD/86400).'d)');
-			$_REQUEST['period'] = ZBX_MAX_PERIOD;
+			$_REQUEST['period'] = ZBX_MAX_PERIOD;			
 		}
+
+		if(isset($_REQUEST["stime"])){
+			$bstime = $_REQUEST['stime'];
+			$time = mktime(substr($bstime,8,2),substr($bstime,10,2),0,substr($bstime,4,2),substr($bstime,6,2),substr($bstime,0,4));
+			if(($time+$_REQUEST['period']) > time()) unset($_REQUEST['stime']);
+		}
+		
 	return $_REQUEST["period"];
 	}
 
