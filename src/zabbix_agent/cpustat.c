@@ -274,8 +274,13 @@ static int	get_cpustat(
 	
 	struct	pst_dynamic stats;
 	struct pst_processor psp;
-	
-    #else /* not HAVE_SYS_PSTAT_H */
+
+    #elif defined(HAVE_SYS_SYSCTL_H) /* HAVE_SYS_SYSCTL_H */
+
+	static long cp_time[5];
+	size_t nlen = sizeof(cp_time);
+ 	
+    #else /* not HAVE_SYS_SYSCTL_H */
 
 	return 1;
 	
@@ -334,8 +339,20 @@ static int	get_cpustat(
 		return 1;
 	}
 
-	
-    #endif /* HAVE_SYS_PSTAT_H */
+    #elif defined(HAVE_SYS_SYSCTL_H) /* HAVE_SYS_SYSCTL_H */
+
+	if (sysctlbyname("kern.cp_time", &cp_time, &nlen, NULL, 0) == -1)
+		return 1;
+
+	if (nlen != sizeof(cp_time))
+		return 1;
+
+	*cpu_user = (zbx_uint64_t)cp_time[0];
+	*cpu_nice = (zbx_uint64_t)cp_time[1];
+	*cpu_system = (zbx_uint64_t)cp_time[2];
+	*cpu_idle = (zbx_uint64_t)cp_time[4];
+ 	
+    #endif /* HAVE_SYS_SYSCTL_H */
 	return 0;
 }
 
