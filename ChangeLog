@@ -35,8 +35,10 @@ Changes for 1.5:
  - added login/logout (Artem)
 
 Changes for 1.4.5:
+
+ - [ZBX-7] added support of system.cpu.util[] for FreeBSD agents, thanks to 'brick' (Sasha)
  - [ZBX-222] fixed problem with slashes (Artem)
- - [ZBX-7] added support of system.cpu.num[] for FreeBSD agents (Sasha)
+ - [ZBX-210] added support of system.cpu.num[] for FreeBSD agents, thanks to 'freak' (Sasha)
 
 Changes for 1.4.4:
 
