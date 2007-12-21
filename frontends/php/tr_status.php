@@ -465,12 +465,15 @@ include_once "include/page_header.php";
 		unset($img, $dep_table, $dependency);		
 //------------------------
 
-		if((time(NULL)-$row["lastchange"])<TRIGGER_BLINK_PERIOD)
-			$blink = array(1=>'<a name="blink">',	2=>'</a>');
-		else
-			$blink = array(1=>'', 		2=>'');
+		if((time(NULL)-$row["lastchange"])<TRIGGER_BLINK_PERIOD){
+			$tr_status = new CLink(trigger_value2str($row["value"]));
+			$tr_status->AddOption('name','blink');
+		}
+		else{
+			$tr_status = trigger_value2str($row["value"]);
+		}
 		
-		$value = new CSpan($blink[1].trigger_value2str($row["value"]).$blink[2], get_trigger_value_style($row["value"]));
+		$value = new CSpan($tr_status, get_trigger_value_style($row["value"]));
 
 		if($noactions=='true'){
 			$actions=NULL;
