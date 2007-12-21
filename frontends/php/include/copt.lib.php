@@ -109,7 +109,7 @@ if(defined('USE_PROFILING')){
 	class COpt{
 		/* protected static $starttime[]=array(); */
 
-		/* protected */ static function getmicrotime() { 
+		/* protected  static */  function getmicrotime() { 
 			if(defined('USE_TIME_PROF')) {
 				list($usec, $sec) = explode(' ',microtime());	
 				return ((float)$usec + (float)$sec); 
@@ -120,7 +120,7 @@ if(defined('USE_PROFILING')){
 		}
 
 
-		/* public */ static function showmemoryusage($descr=null){
+		/* public static */ function showmemoryusage($descr=null){
 			if(defined('USE_MEM_PROF')) {
 				$memory_usage = COpt::getmemoryusage();
 				$memory_usage = $memory_usage.'b | '.($memory_usage>>10).'K | '.($memory_usage>>20).'M';
@@ -128,7 +128,7 @@ if(defined('USE_PROFILING')){
 			}
 		}
 
-		/* protected */ static function getmemoryusage() {
+		/* protected static */ function getmemoryusage() {
 			if(defined('USE_MEM_PROF')) {
 				return memory_get_usage('memory_limit');
 			} else {
@@ -136,7 +136,7 @@ if(defined('USE_PROFILING')){
 			}
 		}
 
-		/* public */ static function counter_up($type=NULL){
+		/* public static */ function counter_up($type=NULL){
 			if(defined('USE_COUNTER_PROF')){
 				global $perf_counter;
 				global $starttime;
@@ -150,7 +150,7 @@ if(defined('USE_PROFILING')){
 			}
 		}
 		
-		/* public */ static function profiling_start($type=NULL){
+		/* public static */ function profiling_start($type=NULL){
 			global $starttime;
 			global $memorystamp;
 			global $sqlmark;
@@ -175,7 +175,7 @@ if(defined('USE_PROFILING')){
 			}
 		}
 
-		/* public */ static function savesqlrequest($sql){
+		/* public static */ function savesqlrequest($sql){
 			if(defined('USE_SQLREQUEST_PROF')){
 				global $sqlrequests;
 				if(defined('SHOW_SQLREQUEST_DETAILS')){
@@ -187,7 +187,7 @@ if(defined('USE_PROFILING')){
 			}
 		}
 
-		/* public */ static function profiling_stop($type=NULL){
+		/* public static */ function profiling_stop($type=NULL){
 			global $starttime;
 			global $memorystamp;
 			global $sqlrequests;
@@ -245,11 +245,11 @@ if(defined('USE_PROFILING')){
 		}
 
 
-		/* public */ static function set_memory_limit($limit='8M'){
+		/* public static */ function set_memory_limit($limit='8M'){
 			ini_set('memory_limit',$limit);
 		}
 
-		/* public */ static function compare_files_with_menu($menu=null){
+		/* public static */ function compare_files_with_menu($menu=null){
 			if(defined('USE_MENU_PROF')){
 			
 				$files_list = glob('*.php');

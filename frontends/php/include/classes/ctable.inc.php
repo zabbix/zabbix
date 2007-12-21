@@ -182,7 +182,11 @@
 		}
 
 		function ShowRow($item,$rowClass=NULL){
-			echo $this->PrepareRow($item,$rowClass)->ToString();
+			// needed for PHP4
+			$tempobj = $this->PrepareRow($item,$rowClass);
+			echo $tempobj->ToString();
+			unset($tempobj);
+			//---------------
 			++$this->rownum;
 		}
 /* protected */
