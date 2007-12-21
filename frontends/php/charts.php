@@ -345,7 +345,7 @@ include_once 'include/page_header.php';
 		$sql = 'SELECT MAX(g.graphtype) as graphtype, MIN(gi.yaxisside) as yaxissidel, MAX(gi.yaxisside) as yaxissider, MAX(g.height) as height'.
 				' FROM graphs g, graphs_items gi '.
 				' WHERE g.graphid='.$_REQUEST['graphid'].
-					' AND gi.graphid=.g.graphid ';
+					' AND gi.graphid=g.graphid ';
 
 		$res = Dbselect($sql);
 		while($graph=DBfetch($res)){
