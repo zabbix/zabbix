@@ -1007,26 +1007,63 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		return	DBexecute('update config set '.implode(',',$update).
 			' where '.DBin_node('configid', get_current_nodeid(false)));
 	}
+	
+/* Function: 
+ *	hide_form_items()
+ *
+ * Desc:
+ *	Searches items/objects for Form tags like "<input"/Form classes like CForm, and makes it empty
+ * 
+ * Author: 
+ *	Aly
+ */
+	function hide_form_items(&$obj){
+		if(is_array($obj)){
+			foreach($obj as $id => $item){
+				hide_form_items($obj[$id]);			// Attention recursion;
+			}
+		}
+		else if(is_object($obj)){
+			if(in_array(strtolower(get_class($obj)),array('cform','ccheckbox','cselect','cbutton','cbuttonqmessage','cbuttondelete','cbuttoncancel'))){
+				$obj=SPACE;
+			}
+			if(isset($obj->items) && !empty($obj->items)){
+				foreach($obj->items as $id => $item){
+					hide_form_items($obj->items[$id]); 		// Recursion
+				}
+			}
+		}
+		else{
+			foreach(array('<form','<input','<select') as $item){
+				if(strpos($obj,$item) !== FALSE) $obj = SPACE;
+			}
+		}
+	}
 
-	function	&get_table_header($col1, $col2=SPACE)
-	{
+	function get_table_header($col1, $col2=SPACE){
+		if(isset($_REQUEST['print'])){
+			hide_form_items($col1);
+			hide_form_items($col2);
+		//if empty header than do not show it
+			if(($col1 == SPACE) && ($col2 == SPACE)) return new CScript('');
+		}
+		
 		$table = new CTable(NULL,"header");
 		$table->SetCellSpacing(0);
 		$table->SetCellPadding(1);
 		$table->AddRow(array(new CCol($col1,"header_l"), new CCol($col2,"header_r")));
-		return $table;
+	return $table;
 	}
 
 	function	show_table_header($col1, $col2=SPACE)
 	{
-		$table =& get_table_header($col1, $col2);
+		$table = get_table_header($col1, $col2);
 		$table->Show();
 	}
 
 	# Show History Graph
 
-	function	show_history($itemid,$from,$stime,$period)
-	{
+	function	show_history($itemid,$from,$stime,$period){
 		$till=date(S_DATE_FORMAT_YMDHMS,time(NULL)-$from*3600);   
 		show_table_header(S_TILL.SPACE.$till.' ('.($period/3600).' HOURs)');
 

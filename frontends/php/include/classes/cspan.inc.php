@@ -35,4 +35,21 @@
 			$this->tag_body_end = "";
 		}
 	}
+
+	class CDiv extends CTag
+	{
+/* public */
+		function CDiv($items=NULL,$class=NULL)
+		{
+			parent::CTag("div","yes");
+			$this->SetClass($class);
+			$this->AddItem($items);
+			$this->tag_body_start = "";
+
+			$this->tag_start= "";
+			$this->tag_end = "";
+			$this->tag_body_start = "";
+			$this->tag_body_end = "";
+		}
+	}
 ?>
