@@ -118,7 +118,7 @@ function show_report2_header($config,$available_hosts){
 		if(isset($_REQUEST['tpl_triggerid']) && ($_REQUEST['tpl_triggerid'] > 0))
 			$sql_cond.= ' AND t.templateid='.$_REQUEST['tpl_triggerid'];
 
-		$result = DBselect('SELECT DISTINCT g.groupid,g.name '.
+		$result = DBselect('SELECT DISTINCT g.groupid,g.name,h.host,t.description '.
 			' FROM triggers t,hosts h,items i,functions f, hosts_templates ht, groups g, hosts_groups hg '.
 			' WHERE f.itemid=i.itemid '.
 				' AND h.hostid=i.hostid '.
