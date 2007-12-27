@@ -149,6 +149,7 @@
 	'S_EXPORT_BIG'=>			'EXPORT',
 	'S_PREVIEW'=>				'Preview',
 	'S_BACK'=>					'Back',
+	'S_BACK_BIG'=>					'BACK',
 	'S_NO_DATA_FOR_EXPORT'=>		'No data for export',
 	'S_NO_DATA_SMALL'=>			'no data',
 	'S_RULES'=>					'Rules',
@@ -1396,6 +1397,7 @@
 	'S_AUDIT'=>				'Audit',
 	'S_LOGIN'=>				'Login',
 	'S_LOGOUT'=>				'Logout',
+	'S_PRINT'=>					'Print',
 	'S_LATEST_DATA'=>			'Latest data',
 
 //	Errors

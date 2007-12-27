@@ -12,7 +12,7 @@
 
 body{
         background-color:#e5e5e5;
-        margin: 0px 0px 0px 0px;
+        margin: 0px;
         padding: 0px;
         color:black;
         font-family:verdana, arial, helvetica, sans-serif;
@@ -20,8 +20,28 @@ body{
 	text-decoration: none;
        line-height:16px;
 }
+/**************** MEDIA *****************/
+@media print {
+	div.printless{
+		visibility: hidden;
+		display: none;
+	}
+	div.printonly{
+		display: block;
+		visibility:visible;
+	}
+}
 
-
+@media screen {
+	div.printless{
+		visibility:visible;
+		display:block;
+	}
+	div.printonly{
+		visibility: hidden;
+		display:none;
+	}
+}
 
 /**************** OTHERS ****************/
 .top		{	vertical-align: top; }

@@ -1,5 +1,6 @@
 Changes for 1.5:
 
+ - [DEV-91] added printable view for pages (Artem)
  - [DEV-89] improved trigger tables view (Artem)
  - [DEV-88] removed duplicated entry "Login" (Artem)
  - [DEV-87] fixed problem with unlinking templates (Sasha)

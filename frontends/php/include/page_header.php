@@ -378,6 +378,19 @@ COpt::profiling_start("page");
 
 	define ('PAGE_HEADER_LOADED', 1);
 
+	if(isset($_REQUEST['print'])){
+		define('ZBX_PAGE_NO_MENU', 1);
+		$req = substr($_SERVER['REQUEST_URI'],0,strpos($_SERVER['REQUEST_URI'],'print')-1);
+		
+		$link = new CLink(bold('&laquo;'.S_BACK_BIG), $req, 'small_font');
+		$link->AddOption('style','padding-left: 10px;');
+		
+		$printview = new CDiv($link,'printless');
+		$printview->AddOption('style','border: 1px #333 dotted;');
+		$printview->Show();
+		
+	}
+
 	if(!defined('ZBX_PAGE_NO_MENU'))
 	{
 COpt::compare_files_with_menu($ZBX_MENU);
@@ -386,8 +399,9 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$help->SetTarget('_blank');
 		$support = new CLink(S_GET_SUPPORT, "http://www.zabbix.com/support.php", "small_font");
 		$support->SetTarget('_blank');
+		$printview = new CLink(S_PRINT, $_SERVER['REQUEST_URI'].(empty($_GET)?'?':'&').'print=1', 'small_font');
 		
-		$page_header_r_col = array($help,array("|", $support));
+		$page_header_r_col = array($help,'|', $support,'|',$printview);
 		if($USER_DETAILS["alias"] != ZBX_GUEST_USER){
 			$page_header_r_col[] = array("|", 
 						new CLink(S_PROFILE, "profile.php", "small_font"),"|", 

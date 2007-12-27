@@ -796,6 +796,7 @@ include_once "include/page_header.php";
 				$show_only_tmp ? SPACE : NULL,
 				$show_only_tmp ? new CButtonQMessage('delete_and_clear',S_DELETE_SELECTED_WITH_LINKED_ELEMENTS,S_DELETE_SELECTED_HOSTS_Q) : NULL
 				);
+
 			$table->SetFooter(new CCol($footerButtons));
 
 			$form->AddItem($table);

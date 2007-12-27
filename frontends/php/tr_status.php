@@ -585,15 +585,17 @@ include_once "include/page_header.php";
 		unset($row,$description, $actions);
 	}
 
-	zbx_add_post_js('blink.init();');
-	$m_form->AddItem($table);
-
-	$m_form->Additem(get_table_header(array(S_TOTAL.": ",
+	$table->SetFooter(new CCol(array(S_TOTAL.": ",
 							$table->GetNumRows(),
 							SPACE.SPACE.SPACE,
 							($config['event_ack_enable'])?(new CButton('bulkacknowledge',S_BULK_ACKNOWLEDGE,'javascript: submit();')):(SPACE)
 					)));
+					
+	$m_form->AddItem($table);
 	$m_form->Show();
+	unset($table);
+	
+	zbx_add_post_js('blink.init();');	
 	
 	$jsmenu = new CPUMenu(null,170);
 	$jsmenu->InsertJavaScript();
