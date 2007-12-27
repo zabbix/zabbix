@@ -287,7 +287,7 @@ include_once "include/page_header.php";
 				$cmbGroups->SetValue(0);
 			}
 			
-			$header =& get_table_header(S_HOSTS_BIG, array(S_GROUP.SPACE, $cmbGroups));
+			$header = get_table_header(S_HOSTS_BIG, array(S_GROUP.SPACE, $cmbGroups));
 
 			$form->AddItem($header);
 
