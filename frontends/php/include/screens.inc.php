@@ -338,7 +338,7 @@
 					$sql = 'SELECT MAX(g.graphid) as graphid, MAX(g.graphtype) as graphtype, MIN(gi.yaxisside) as yaxissidel, MAX(gi.yaxisside) as yaxissider'.
 							' FROM graphs g, graphs_items gi '.
 							' WHERE g.graphid='.$resourceid.
-								' AND gi.graphid=.g.graphid ';
+								' AND gi.graphid=g.graphid ';
 			
 					$res = Dbselect($sql);
 					while($graph=DBfetch($res)){
