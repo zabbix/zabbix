@@ -48,6 +48,7 @@
 /* public */
 		function CRow($item=NULL,$class=NULL){
 			parent::CTag("tr","yes");
+
 			$this->AddItem($item);
 			$this->SetClass($class);
 		}
@@ -65,13 +66,11 @@
                     if(strtolower(get_class($el))=='ccol') {
                 		parent::AddItem($el);
 					} elseif(!is_null($el)) {
-//						parent::AddItem('<td>'.unpack_object($el).'</td>');
 						parent::AddItem(new CCol($el));
 					}
 				}
 			}
 			elseif(!is_null($item)){
-//				parent::AddItem('<td>'.unpack_object($item).'</td>');
 				parent::AddItem(new CCol($item));
 			}
 		}
@@ -157,6 +156,7 @@
 		}
 
 		function SetHeader($value=NULL,$class=NULL){
+			if(isset($_REQUEST['print'])) hide_form_items($value);
 			if(is_null($class)) $class = $this->headerClass;
 
 			if(strtolower(get_class($value))=='crow') {
@@ -169,6 +169,7 @@
 		}
 
 		function SetFooter($value=NULL,$class=NULL){
+			if(isset($_REQUEST['print'])) hide_form_items($value);
 			if(is_null($class)) $class = $this->footerClass;
 
 			$this->footer = $this->PrepareRow($value,$class);
