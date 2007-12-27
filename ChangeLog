@@ -1,5 +1,6 @@
 Changes for 1.4.j:
 
+ - added support of encoding parameter for regexp[] and iregexp[]. Integrated patch (Sasha)
  - speed improvement for Triggers when use "{ITEM.VALUE}" macro (Sasha)
  - improved support of macros {ITEM.VALUE} (Sasha)
  - do not generate unknown events (Alexei)

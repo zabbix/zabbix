@@ -23,6 +23,7 @@
 #include "zlog.h"
 
 #include "evalfunc.h"
+#include "iconv.h"
 
 /******************************************************************************
  *                                                                            *
@@ -965,6 +966,22 @@ static int evaluate_NODATA(char *value,DB_ITEM	*item,int parameter)
 	return res;
 }
 
+void convertj(char *inputstr, char *outputstr, size_t outputlength, const char *fromcode, const char *tocode)
+{
+	iconv_t cd;
+	size_t inputlength, resultlength;
+
+	inputlength = strlen(inputstr);
+	cd = iconv_open(tocode, fromcode);
+
+	resultlength = iconv(cd, &inputstr, &inputlength, &outputstr, &outputlength);
+	if (resultlength == -1) {
+		//printf("%d - %s\n", resultlength, strerror(errno));
+		//exit (-1);
+	}
+	iconv_close(cd);
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: evaluate_function                                                *
@@ -995,6 +1012,9 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 
 	int	day;
 	int	len;
+
+	char    encoding[MAX_STRING_LEN];
+	char    lastvalue_str[MAX_STRING_LEN];
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In evaluate_function(%s)",
 		function);
@@ -1281,7 +1301,23 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 	{
 		if( (item->value_type==ITEM_VALUE_TYPE_STR) || (item->value_type==ITEM_VALUE_TYPE_LOG))
 		{
-			if(zbx_regexp_match(item->lastvalue_str, parameter, &len) != NULL)
+			encoding[0]='\0';
+			get_key_param(item->key, 3, encoding, sizeof(encoding));
+
+			if(strcmp(encoding,"cp932")==0){
+				convertj(item->lastvalue_str, lastvalue_str, sizeof(lastvalue_str), "CP932", "UTF-8");
+			}else if(strcmp(encoding,"ujis")==0){
+				convertj(item->lastvalue_str, lastvalue_str, sizeof(lastvalue_str), "UJIS", "UTF-8");
+			}else if(strcmp(encoding,"sjis")==0){
+				convertj(item->lastvalue_str, lastvalue_str, sizeof(lastvalue_str), "SHIFT-JIS", "UTF-8");
+			}else if(strcmp(encoding,"eucjpms")==0){
+				convertj(item->lastvalue_str, lastvalue_str, sizeof(lastvalue_str), "EUC-JP-MS", "UTF-8");
+			}else{  
+				strcpy(lastvalue_str,item->lastvalue_str);
+			} 
+
+			//if(zbx_regexp_match(item->lastvalue_str, parameter, &len) != NULL)
+			if(zbx_regexp_match(lastvalue_str, parameter, &len) != NULL)
 			{
 				strcpy(value,"1");
 			}
@@ -1299,7 +1335,23 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 	{
 		if( (item->value_type==ITEM_VALUE_TYPE_STR) || (item->value_type==ITEM_VALUE_TYPE_LOG))
 		{
-			if(zbx_iregexp_match(item->lastvalue_str, parameter, &len) != NULL)
+			encoding[0]='\0';
+			get_key_param(item->key, 3, encoding, sizeof(encoding));
+
+			if(strcmp(encoding,"cp932")==0){
+				convertj(item->lastvalue_str, lastvalue_str, sizeof(lastvalue_str), "CP932", "UTF-8");
+			}else if(strcmp(encoding,"ujis")==0){
+				convertj(item->lastvalue_str, lastvalue_str, sizeof(lastvalue_str), "UJIS", "UTF-8");
+			}else if(strcmp(encoding,"sjis")==0){
+				convertj(item->lastvalue_str, lastvalue_str, sizeof(lastvalue_str), "SHIFT-JIS", "UTF-8");
+			}else if(strcmp(encoding,"eucjpms")==0){
+				convertj(item->lastvalue_str, lastvalue_str, sizeof(lastvalue_str), "EUC-JP-MS", "UTF-8");
+			}else{  
+				strcpy(lastvalue_str,item->lastvalue_str);
+			} 
+
+			//if(zbx_iregexp_match(item->lastvalue_str, parameter, &len) != NULL)
+			if(zbx_iregexp_match(lastvalue_str, parameter, &len) != NULL)
 			{
 				strcpy(value,"1");
 			}
