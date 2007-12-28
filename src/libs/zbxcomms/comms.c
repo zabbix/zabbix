@@ -788,7 +788,7 @@ void	zbx_tcp_unaccept(zbx_sock_t *s)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tcp_close                                                    *
+ * Function: zbx_tcp_free                                                     *
  *                                                                            *
  * Purpose: close open socket                                                 *
  *                                                                            *
