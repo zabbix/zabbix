@@ -100,7 +100,6 @@ int	send_list_of_active_checks(zbx_sock_t *sock, const char *host)
 		if( zbx_tcp_send_raw(sock,s) != SUCCEED )
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Error while sending list of active checks");
-			zbx_tcp_close(sock);
 			return  FAIL;
 		}
 	}
@@ -114,7 +113,6 @@ int	send_list_of_active_checks(zbx_sock_t *sock, const char *host)
 	if( zbx_tcp_send_raw(sock,s) != SUCCEED )
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "Error while sending list of active checks");
-		zbx_tcp_close(sock);
 		return  FAIL;
 	}
 
