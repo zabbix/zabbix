@@ -84,7 +84,9 @@
 				'show_triggers'		=> '',
 				'graphtype'		=> '',
 				'yaxismin'		=> '',
-				'yaxismax'		=> '')
+				'yaxismax'		=> '',
+				'show_legend'	=> '',
+				'show_3d'		=> '')
 			),
 		XML_TAG_GRAPH_ELEMENT => array(
 			'attribures'	=> array(
@@ -168,7 +170,7 @@
 			}
 			foreach($map['elements'] as $db_name => $xml_name)
 			{
-				if(empty($data[$db_name])) continue;
+				if(!isset($data[$db_name])) continue;
 				if(empty($xml_name)) $xml_name = $db_name;
 				zbx_xmlwriter_write_element ($memory, $xml_name, $data[$db_name]);
 			}
@@ -213,7 +215,7 @@
 			}
 			foreach($map['elements'] as $db_name => $xml_name)
 			{
-				if(empty($data[$db_name])) continue;
+				if(!isset($data[$db_name])) continue;
 				if(empty($xml_name)) $xml_name = $db_name;
 				
 				zbx_xmlwriter_write_element ($memory, $xml_name, $data[$db_name]);
@@ -242,7 +244,7 @@
 			}
 			foreach($map['elements'] as $db_name => $xml_name)
 			{
-				if(empty($data[$db_name])) continue;
+				if(!isset($data[$db_name])) continue;
 				if(empty($xml_name)) $xml_name = $db_name;
 				zbx_xmlwriter_write_element ($memory, $xml_name, $data[$db_name]);
 			}
@@ -267,7 +269,7 @@
 			}
 			foreach($map['elements'] as $db_name => $xml_name)
 			{
-				if(empty($data[$db_name])) continue;
+				if(!isset($data[$db_name])) continue;
 				if(empty($xml_name)) $xml_name = $db_name;
 				zbx_xmlwriter_write_element ($memory, $xml_name, $data[$db_name]);
 			}
@@ -300,7 +302,7 @@
 			}
 			foreach($map['elements'] as $db_name => $xml_name)
 			{
-				if(empty($data[$db_name])) continue;
+				if(!isset($data[$db_name])) continue;
 				if(empty($xml_name)) $xml_name = $db_name;
 				zbx_xmlwriter_write_element ($memory, $xml_name, $data[$db_name]);
 			}
