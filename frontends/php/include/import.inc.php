@@ -35,7 +35,7 @@
 			$this->item	= array('exist' => 0, 'missed' => 0);
 			$this->trigger	= array('exist' => 0, 'missed' => 0);
 			$this->graph	= array('exist' => 0, 'missed' => 0);
-			
+
 			$this->accessible_groups = get_accessible_groups_by_user($USER_DETAILS,
 				PERM_READ_WRITE, null, PERM_RES_IDS_ARRAY, get_current_nodeid());
 
@@ -117,7 +117,8 @@
 							break; // case
 						}
 						
-						if( count($this->accessible_nodes) > 0 ){
+//						if( count($this->accessible_nodes) > 0 ){
+						if(!in_array(get_current_nodeid(),$this->accessible_nodes)){
 							error('Host ['.$data['name'].'] skipped - Access deny.');
 							break; // case
 						}
@@ -492,6 +493,8 @@
 					if(!isset($data['graphtype']))		$data['graphtype']		= 0;
 					if(!isset($data['yaxismin']))		$data['yaxismin']		= 0;
 					if(!isset($data['yaxismax']))		$data['yaxismax']		= 0;
+					if(!isset($data['show_legend']))	$data['show_legend']	= 0;
+					if(!isset($data['show_3d']))		$data['show_3d']		= 0;
 					if(!isset($data['items']))		$data['items']			= array();
 
 					if(!isset($this->data[XML_TAG_HOST]['hostid']) || !$this->data[XML_TAG_HOST]['hostid'])
@@ -536,8 +539,9 @@
 								$data['show_work_period'],
 								$data['show_triggers'],
 								$data['graphtype'],
+								$data['show_legend'],
+								$data['show_3d'],
 								$graph['templateid']);
-
 							DBexecute('delete from graphs_items where graphid='.$data['graphid']);
 						}
 						else
@@ -563,7 +567,10 @@
 							$data['yaxismax'],
 							$data['show_work_period'],
 							$data['show_triggers'],
-							$data['graphtype']);
+							$data['graphtype'],
+							$data['show_legend'],
+							$data['show_3d']
+							);
 					}
 
 					foreach($data['items'] as $item)

@@ -314,12 +314,6 @@ COpt::counter_up('perm');
 
 		$result= array();
 
-		switch($perm_res)
-		{
-			case PERM_RES_DATA_ARRAY:	$resdata = '$node_data'; break;
-			default:			$resdata = '$node_data["nodeid"]'; break;
-		}
-
 COpt::counter_up('perm_nodes['.$userid.','.$perm.','.$perm_mode.','.$perm_res.','.$nodeid.']');
 COpt::counter_up('perm');
 
@@ -377,19 +371,16 @@ COpt::counter_up('perm');
 			}
 
 			/* special processing for PERM_READ_LIST*/
-			if(PERM_DENY == $node_data['permission'] && PERM_READ_LIST == $perm)
-			{
+			if(PERM_DENY == $node_data['permission'] && PERM_READ_LIST == $perm){
 				$groups = get_accessible_groups_by_user($user_data,
 					$perm, PERM_MODE_GE,PERM_RES_DATA_ARRAY,$node_data['nodeid']);
 				if(count($groups) == 0)  continue;
 			}
-			else
-			{
+			else{
 				if(eval('return ('.$node_data["permission"].' '.perm_mode2comparator($perm_mode).' '.$perm.')? 0 : 1;'))
 					continue;
 			}
-
-			$result[$node_data["nodeid"]] = eval('return '.$resdata.';');
+			$result[$node_data["nodeid"]]= ($perm_res == PERM_RES_DATA_ARRAY)?$node_data:$node_data["nodeid"];
 		}
 
 		if($perm_res == PERM_RES_STRING_LINE) 
