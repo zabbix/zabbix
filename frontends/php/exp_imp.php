@@ -207,7 +207,7 @@ include_once "include/page_header.php";
 				$el_table = new CTableInfo(S_ONLY_HOST_INFO);
 				$sqls = array(
 					S_TEMPLATE	=> !isset($templates[$host['hostid']]) ? null : 
-								' SELECT ht.hostid, h.host as info, count(distinct ht.hosttemplateid) as cnt '.
+								' SELECT MIN(ht.hostid) as hostid, h.host as info, count(distinct ht.hosttemplateid) as cnt '.
 								' FROM hosts h, hosts_templates ht '.
 								' WHERE ht.templateid = h.hostid '.
 								' GROUP BY h.host',
@@ -215,15 +215,17 @@ include_once "include/page_header.php";
 								' select hostid, description as info, 1 as cnt from items'.
 								' where hostid='.$host['hostid'],
 					S_TRIGGER	=> !isset($triggers[$host['hostid']]) ? null :
-								'select i.hostid, t.description as info, count(distinct i.hostid) as cnt'.
-								' from functions f, items i, triggers t'.
-								' where t.triggerid=f.triggerid and f.itemid=i.itemid'.
-								' group by f.triggerid, i.hostid, t.description',
+								'SELECT i.hostid, t.description as info, count(distinct i.hostid) as cnt, f.triggerid '.
+								' FROM functions f, items i, triggers t'.
+								' WHERE t.triggerid=f.triggerid'.
+									' AND f.itemid=i.itemid'.
+								' GROUP BY f.triggerid, i.hostid, t.description',
 					S_GRAPH		=> !isset($graphs[$host['hostid']]) ? null :
-								'select g.name as info, i.hostid, count(distinct i.hostid) as cnt'.
-								' from graphs_items gi, items i, graphs g '.
-								' where g.graphid=gi.graphid and gi.itemid=i.itemid'.
-								' group by gi.graphid, i.hostid'
+								'SELECT MIN(g.name) as info, i.hostid, count(distinct i.hostid) as cnt, gi.graphid'.
+								' FROM graphs_items gi, items i, graphs g '.
+								' WHERE g.graphid=gi.graphid '.
+									' AND gi.itemid=i.itemid'.
+								' GROUP BY gi.graphid, i.hostid'
 
 					);
 				foreach($sqls as $el_type => $sql)
