@@ -153,7 +153,7 @@ int	send_data_to_node(int nodeid, zbx_sock_t *sock, const char *data)
 {
 	int	res;
 
-	if (FAIL == (res = zbx_tcp_send_ext(sock, data, ZBX_TCP_NEW_PROTOCOL)))
+	if (FAIL == (res = zbx_tcp_send(sock, data)))
 		zabbix_log(LOG_LEVEL_WARNING, "NODE %d: Error while sending data to Node [%d] error: %s",
 			CONFIG_NODEID,
 			nodeid,
