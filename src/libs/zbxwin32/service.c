@@ -163,11 +163,13 @@ int ZabbixCreateService(char *path)
 {
 #define MAX_CMD_LEN MAX_PATH*2
 
-	SC_HANDLE mgr,service;
-	char	execName[MAX_PATH];
-	char	configFile[MAX_PATH];
-	char	cmdLine[MAX_CMD_LEN];
-	int	ret = SUCCEED;
+	SC_HANDLE		mgr,service;
+	SERVICE_DESCRIPTION	sd;
+	LPTSTR			szDesc = TEXT("Provides system monitoring");
+	char			execName[MAX_PATH];
+	char			configFile[MAX_PATH];
+	char			cmdLine[MAX_CMD_LEN];
+	int			ret = SUCCEED;
 
 	_fullpath(execName, path, MAX_PATH);
 
@@ -206,20 +208,26 @@ int ZabbixCreateService(char *path)
 
 		if (ERROR_SERVICE_EXISTS == code)
 		{
-			zbx_error("ERROR: Service named '" ZABBIX_SERVICE_NAME "' already exist");
+			zbx_error("ERROR: Service named '%s' already exist", ZABBIX_SERVICE_NAME);
 		}
 		else
 		{
-			zbx_error("ERROR: Cannot create service [%s]",strerror_from_system(code));
+			zbx_error("ERROR: Cannot create service named '%s' [%s]", ZABBIX_SERVICE_NAME, strerror_from_system(code));
 		}
 		ret = FAIL;
 	}
 	else
 	{
-		zbx_error(ZABBIX_SERVICE_NAME " service created successfully.");
+		zbx_error("Service \"%s\" installed successfully.", ZABBIX_SERVICE_NAME);
+		CloseServiceHandle(service);
+    
+		/* Updates the service description */
+		service = OpenService(mgr, ZABBIX_SERVICE_NAME, SERVICE_CHANGE_CONFIG);
+		sd.lpDescription = szDesc;
+		if (0 == ChangeServiceConfig2(service, SERVICE_CONFIG_DESCRIPTION, &sd))
+			zbx_error("Service description update failed. %x", GetLastError());
 		CloseServiceHandle(service);
 	}
-
 	CloseServiceHandle(mgr);
 
 	if(ret != SUCCEED)
@@ -250,18 +258,18 @@ int ZabbixRemoveService(void)
 	service=OpenService(mgr,ZABBIX_SERVICE_NAME,DELETE);
 	if (service==NULL)
 	{
-		zbx_error("ERROR: Cannot open service named '" ZABBIX_SERVICE_NAME "' [%s]", strerror_from_system(GetLastError()));
+		zbx_error("ERROR: Cannot open service named '%s' [%s]", ZABBIX_SERVICE_NAME, strerror_from_system(GetLastError()));
 		ret = FAIL;
 	}
 	else
 	{
 		if (DeleteService(service))
 		{
-			zbx_error(ZABBIX_EVENT_SOURCE " service deleted successfully");
+			zbx_error("Service \"%s\" uninstalled successfully", ZABBIX_SERVICE_NAME);
 		}
 		else
 		{
-			zbx_error("ERROR: Cannot remove service named '" ZABBIX_SERVICE_NAME "' [%s]", strerror_from_system(GetLastError()));
+			zbx_error("ERROR: Cannot remove service named '%s' [%s]", ZABBIX_SERVICE_NAME, strerror_from_system(GetLastError()));
 			ret = FAIL;
 		}
 
@@ -300,18 +308,18 @@ int ZabbixStartService(void)
 
 	if (service==NULL)
 	{
-		zbx_error("ERROR: Cannot open service named '" ZABBIX_SERVICE_NAME "' [%s]", strerror_from_system(GetLastError()));
+		zbx_error("ERROR: Cannot open service named '%s' [%s]", ZABBIX_SERVICE_NAME, strerror_from_system(GetLastError()));
 		ret = FAIL;
 	}
 	else
 	{
 		if (StartService(service,0,NULL))
 		{
-			zbx_error(ZABBIX_SERVICE_NAME " service started successfully.");
+			zbx_error("Service \"%s\" started successfully.", ZABBIX_SERVICE_NAME);
 		}
 		else
 		{
-			zbx_error("ERROR: Cannot start service named '" ZABBIX_SERVICE_NAME "' [%s]", strerror_from_system(GetLastError()));
+			zbx_error("ERROR: Cannot start service named '%s' [%s]", ZABBIX_SERVICE_NAME, strerror_from_system(GetLastError()));
 			ret = FAIL;
 		}
 
@@ -342,7 +350,7 @@ int ZabbixStopService(void)
 	service=OpenService(mgr,ZABBIX_SERVICE_NAME,SERVICE_STOP);
 	if (service==NULL)
 	{
-		zbx_error("ERROR: Cannot open service named '" ZABBIX_SERVICE_NAME "' [%s]", strerror_from_system(GetLastError()));
+		zbx_error("ERROR: Cannot open service named '%s' [%s]", ZABBIX_SERVICE_NAME, strerror_from_system(GetLastError()));
 		ret = FAIL;
 	}
 	else
@@ -351,11 +359,11 @@ int ZabbixStopService(void)
 
 		if (ControlService(service,SERVICE_CONTROL_STOP,&status))
 		{
-			zbx_error(ZABBIX_SERVICE_NAME " service stopped successfully.");
+			zbx_error("Service \"%s\" stopped successfully.", ZABBIX_SERVICE_NAME);
 		}
 		else
 		{
-			zbx_error("ERROR: Cannot stop service named '" ZABBIX_SERVICE_NAME "' [%s]", strerror_from_system(GetLastError()));
+			zbx_error("ERROR: Cannot stop service named '%s' [%s]", ZABBIX_SERVICE_NAME, strerror_from_system(GetLastError()));
 			ret = FAIL;
 		}
 
@@ -372,14 +380,17 @@ int ZabbixStopService(void)
  */
 static int ZabbixInstallEventSource(char *path)
 {
-   HKEY		hKey;
-   DWORD	dwTypes = EVENTLOG_ERROR_TYPE | EVENTLOG_WARNING_TYPE | EVENTLOG_INFORMATION_TYPE;
-   char		execName[MAX_PATH];
+	HKEY	hKey;
+	DWORD	dwTypes = EVENTLOG_ERROR_TYPE | EVENTLOG_WARNING_TYPE | EVENTLOG_INFORMATION_TYPE;
+	char	execName[MAX_PATH];
+	char	regkey[MAX_STRING_LEN];
 
 	_fullpath(execName, path, MAX_PATH);
 
+	zbx_snprintf(regkey, sizeof(regkey), "System\\CurrentControlSet\\Services\\EventLog\\System\\%s", ZABBIX_EVENT_SOURCE);
+
 	if (ERROR_SUCCESS != RegCreateKeyEx(HKEY_LOCAL_MACHINE,
-		"System\\CurrentControlSet\\Services\\EventLog\\System\\" ZABBIX_EVENT_SOURCE,
+		regkey,
 		0,
 		NULL,
 		REG_OPTION_NON_VOLATILE,
@@ -396,7 +407,7 @@ static int ZabbixInstallEventSource(char *path)
 	RegSetValueEx(hKey,"EventMessageFile",0,REG_EXPAND_SZ,(BYTE *)execName,(DWORD)strlen(execName)+1);
 
 	RegCloseKey(hKey);
-	zbx_error("Event source \"" ZABBIX_EVENT_SOURCE "\" installed successfully.");
+	zbx_error("Event source \"%s\" installed successfully.", ZABBIX_EVENT_SOURCE);
 
 	return SUCCEED;
 }
@@ -408,15 +419,17 @@ static int ZabbixInstallEventSource(char *path)
 
 static int ZabbixRemoveEventSource(void)
 {
+	char	regkey[MAX_STRING_LEN];
 
-	if (ERROR_SUCCESS == RegDeleteKey(HKEY_LOCAL_MACHINE,
-		"System\\CurrentControlSet\\Services\\EventLog\\System\\" ZABBIX_EVENT_SOURCE))
+	zbx_snprintf(regkey, sizeof(regkey), "System\\CurrentControlSet\\Services\\EventLog\\System\\%s", ZABBIX_EVENT_SOURCE);
+
+	if (ERROR_SUCCESS == RegDeleteKey(HKEY_LOCAL_MACHINE, regkey))
 	{
-		zbx_error("Event source \"" ZABBIX_EVENT_SOURCE "\" uninstalled successfully.");
+		zbx_error("Event source \"%s\" uninstalled successfully.", ZABBIX_EVENT_SOURCE);
 	}
 	else
 	{
-		zbx_error("Unable to uninstall event source \"" ZABBIX_EVENT_SOURCE "\": [%s]", strerror_from_system(GetLastError()));
+		zbx_error("Unable to uninstall event source \"%s\": [%s]", ZABBIX_EVENT_SOURCE, strerror_from_system(GetLastError()));
 		return FAIL;
 	}
 
