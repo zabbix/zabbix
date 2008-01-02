@@ -125,6 +125,11 @@
 #define	ZABBIX_VERSION		"1.4.j"
 
 #if defined(_WINDOWS)
+extern char ZABBIX_SERVICE_NAME[64];
+extern char ZABBIX_EVENT_SOURCE[64];
+#endif /* _WINDOWS */
+
+#if defined(_WINDOWS)
 /*#	pragma warning (disable: 4100)*/
 #	pragma warning (disable: 4996) /* warning C4996: <function> was declared deprecated */
 #endif /* _WINDOWS */
@@ -525,6 +530,16 @@ typedef enum
 	ZBX_TASK_STOP_SERVICE,
 	ZBX_TASK_CHANGE_NODEID
 } zbx_task_t;
+
+#define ZBX_TASK_FLAG_MULTIPLE_AGENTS 0x01
+
+#define ZBX_TASK_EX struct zbx_task_ex
+ZBX_TASK_EX
+{
+	zbx_task_t	task;
+	int		flags;
+};
+
 
 char *string_replace(char *str, char *sub_str1, char *sub_str2);
 
