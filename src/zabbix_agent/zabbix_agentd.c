@@ -75,7 +75,7 @@ char title_message[] = APPLICATION_NAME
 char usage_message[] = 
 	"[-Vhp]"
 #if defined(_WINDOWS)
-	" [-idsx]"
+	" [-idsx] [-m]"
 #endif /* _WINDOWS */
 	" [-c <file>] [-t <metric>]";
 
@@ -88,11 +88,11 @@ char usage_message[] =
 char *help_message[] = {
 	"Options:",
 	"",
-	"  -c --config <file>  Specify configuration file",
-	"  -h --help           give this help",
-	"  -V --version        display version number",
-	"  -p --print          print supported metrics and exit",
-	"  -t --test <metric>  test specified metric and exit",
+	"  -c --config <file>    Specify configuration file",
+	"  -h --help             give this help",
+	"  -V --version          display version number",
+	"  -p --print            print supported metrics and exit",
+	"  -t --test <metric>    test specified metric and exit",
 /*	"  -u --usage <metric> test specified metric and exit",	*/ /* !!! TODO - print metric usage !!! */
 
 #if defined (_WINDOWS)
@@ -100,11 +100,13 @@ char *help_message[] = {
 	"",
 	"Functions:",
 	"",
-	"  -i --install        install ZABIX agent as service",
-	"  -d --uninstall      uninstall ZABIX agent from service",
-	
-	"  -s --start          start ZABIX agent service",
-	"  -x --stop           stop ZABIX agent service",
+	"  -i --install          install ZABBIX agent as service",
+	"  -d --uninstall        uninstall ZABBIX agent from service",
+
+	"  -s --start            start ZABBIX agent service",
+	"  -x --stop             stop ZABBIX agent service",
+
+	"  -m --multiple-agents  service name will include hostname",
 
 #endif /* _WINDOWS */
 
@@ -121,19 +123,21 @@ char *help_message[] = {
 
 static struct zbx_option longopts[] =
 {
-	{"config",	1,	0,	'c'},
-	{"help",	0,	0,	'h'},
-	{"version",	0,	0,	'V'},
-	{"print",	0,	0,	'p'},
-	{"test",	1,	0,	't'},
+	{"config",		1,	0,	'c'},
+	{"help",		0,	0,	'h'},
+	{"version",		0,	0,	'V'},
+	{"print",		0,	0,	'p'},
+	{"test",		1,	0,	't'},
 
 #if defined (_WINDOWS)
 
-	{"install",	0,	0,	'i'},
-	{"uninstall",	0,	0,	'd'},
+	{"install",		0,	0,	'i'},
+	{"uninstall",		0,	0,	'd'},
 
-	{"start",	0,	0,	's'},
-	{"stop",	0,	0,	'x'},
+	{"start",		0,	0,	's'},
+	{"stop",		0,	0,	'x'},
+
+	{"multiple-agents",	0,	0,	'm'},
 
 #endif /* _WINDOWS */
 
@@ -145,7 +149,7 @@ static struct zbx_option longopts[] =
 static char	shortopts[] = 
 	"c:hVpt:"
 #if defined (_WINDOWS)
-	"idsx"
+	"idsxm"
 #endif /* _WINDOWS */
 	;
 
@@ -157,11 +161,12 @@ static char	*TEST_METRIC = NULL;
 
 static ZBX_THREAD_HANDLE	*threads = NULL;
 
-static zbx_task_t parse_commandline(int argc, char **argv)
+static void parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 {
-	zbx_task_t	task	= ZBX_TASK_START;
 	char	ch	= '\0';
 
+	t->task = ZBX_TASK_START;
+	
 	/* Parse the command-line. */
 	while ((ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)) != (char)EOF)
 		switch (ch) {
@@ -177,44 +182,42 @@ static zbx_task_t parse_commandline(int argc, char **argv)
 			exit(-1);
 			break;
 		case 'p':
-			if(task == ZBX_TASK_START)
-				task = ZBX_TASK_PRINT_SUPPORTED;
+			if(t->task == ZBX_TASK_START)
+				t->task = ZBX_TASK_PRINT_SUPPORTED;
 			break;
 		case 't':
-			if(task == ZBX_TASK_START) 
+			if(t->task == ZBX_TASK_START) 
 			{
-				task = ZBX_TASK_TEST_METRIC;
+				t->task = ZBX_TASK_TEST_METRIC;
 				TEST_METRIC = strdup(zbx_optarg);
 			}
 			break;
-
 #if defined (_WINDOWS)
 		case 'i':
-			task = ZBX_TASK_INSTALL_SERVICE;
+			t->task = ZBX_TASK_INSTALL_SERVICE;
 			break;
 		case 'd':
-			task = ZBX_TASK_UNINSTALL_SERVICE;
+			t->task = ZBX_TASK_UNINSTALL_SERVICE;
 			break;
 		case 's':
-			task = ZBX_TASK_START_SERVICE;
+			t->task = ZBX_TASK_START_SERVICE;
 			break;
 		case 'x':
-			task = ZBX_TASK_STOP_SERVICE;
+			t->task = ZBX_TASK_STOP_SERVICE;
 			break;
-
+		case 'm':
+			t->flags = ZBX_TASK_FLAG_MULTIPLE_AGENTS;
+			break;
 #endif /* _WINDOWS */
-
 		default:
-			task = ZBX_TASK_SHOW_USAGE;
+			t->task = ZBX_TASK_SHOW_USAGE;
 			break;
-	}
+		}
 
 	if(CONFIG_FILE == NULL)
 	{
 		CONFIG_FILE = DEFAULT_CONFIG_FILE;
 	}
-
-	return task;
 }
 
 int MAIN_ZABBIX_ENTRY(void)
@@ -337,24 +340,32 @@ void	zbx_on_exit()
 
 int	main(int argc, char **argv)
 {
-	int task = ZBX_TASK_START;
+	ZBX_TASK_EX	t;
+
+	memset(&t, 0, sizeof(t));
+	t.task = ZBX_TASK_START;
 
 	progname = get_programm_name(argv[0]);
 
-	task = parse_commandline(argc, argv);
+	parse_commandline(argc, argv, &t);
 
 	import_symbols();
 
 	init_metrics(); /* Must be before load_config().  load_config - use metrics!!! */
 
-	if( ZBX_TASK_START == task )
+	if (ZBX_TASK_START == t.task || ZBX_TASK_INSTALL_SERVICE == t.task || ZBX_TASK_UNINSTALL_SERVICE == t.task || ZBX_TASK_START_SERVICE == t.task || ZBX_TASK_STOP_SERVICE == t.task)
 		load_config();
+
+#if defined (_WINDOWS)
+	if (t.flags & ZBX_TASK_FLAG_MULTIPLE_AGENTS) {
+		zbx_snprintf(ZABBIX_SERVICE_NAME, sizeof(ZABBIX_SERVICE_NAME), "%s [%s]", APPLICATION_NAME, CONFIG_HOSTNAME);
+		zbx_snprintf(ZABBIX_EVENT_SOURCE, sizeof(ZABBIX_EVENT_SOURCE), "%s [%s]", APPLICATION_NAME, CONFIG_HOSTNAME);
+	}
+#endif /* _WINDOWS */
 
 	load_user_parameters();
 
-	switch(task)
-	{
-
+	switch (t.task) {
 #if defined (_WINDOWS)
 		case ZBX_TASK_INSTALL_SERVICE:
 			exit(ZabbixCreateService(argv[0]));

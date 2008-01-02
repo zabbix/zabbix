@@ -28,9 +28,6 @@
 
 extern ZBX_THREAD_HANDLE	*threads;
 
-#define ZABBIX_SERVICE_NAME   APPLICATION_NAME
-#define ZABBIX_EVENT_SOURCE   APPLICATION_NAME
-
 void service_start(void);
 
 int ZabbixCreateService(char *execName);

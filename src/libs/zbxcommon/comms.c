@@ -21,6 +21,11 @@
 #include "log.h"
 #include "base64.h"
 
+#if defined (_WINDOWS)
+char ZABBIX_SERVICE_NAME[64] = {APPLICATION_NAME};
+char ZABBIX_EVENT_SOURCE[64] = {APPLICATION_NAME};
+#endif /* _WINDOWS */
+
 /******************************************************************************
  *                                                                            *
  * Function: comms_create_request                                             *
