@@ -1,5 +1,6 @@
 Changes for 1.4.5:
 
+ - [ZBX-243] speed improvement for windows agent for eventlog[] processing (sasha)
  - [DEV-92] added supprt of multiple windows agents, service description (Sasha)
  - [ZBX-7] added support of system.cpu.util[] for FreeBSD agents, thanks to 'brick' (Sasha)
  - [ZBX-222] fixed problem with slashes (Artem)
