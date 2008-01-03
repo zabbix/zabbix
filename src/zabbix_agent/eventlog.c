@@ -32,9 +32,9 @@
 /* open event logger and return number of records */
 static int    zbx_open_eventlog(
 	const char	*source,
-	HANDLE	*eventlog_handle,
-	long	*pNumRecords,
-	long	*pLatestRecord)
+	HANDLE		*eventlog_handle,
+	long		*pNumRecords,
+	long		*pLatestRecord)
 {
 	char	reg_path[MAX_PATH];
 	HKEY	hk = NULL;
@@ -87,29 +87,28 @@ static long	zbx_close_eventlog(HANDLE eventlog_handle)
 
 /* get Nth error from event log. 1 is the first. */
 static long    zbx_get_eventlog_message(
-		const char		*source,
-		HANDLE			eventlog_handle,
-		long			which,
-		char			**out_source,
-		char			**out_message,
-		unsigned short	*out_severity,
-		unsigned long	*out_timestamp
-		)
+	const char	*source,
+	HANDLE		eventlog_handle,
+	long		which,
+	char		**out_source,
+	char		**out_message,
+	unsigned short	*out_severity,
+	unsigned long	*out_timestamp)
 {
-    EVENTLOGRECORD  *pELR = NULL;
-    BYTE            bBuffer[1024];                      /* hold the event log record raw data */
-    DWORD           dwRead, dwNeeded;
-    char            stat_buf[MAX_PATH];
-    char            MsgDll[MAX_PATH];                   /* the name of the message DLL */
-    HKEY            hk = NULL;
-    DWORD           Data;
-    DWORD           Type;
-    HINSTANCE       hLib = NULL;                        /* handle to the messagetable DLL */
-    char            *pCh = NULL, *pFile = NULL, *pNextFile = NULL;
-    char            *aInsertStrs[MAX_INSERT_STRS];      /* array of pointers to insert */
-    long            i;
-    LPTSTR          msgBuf = NULL;                       /* hold text of the error message that we */
-    long            err = 0;
+	EVENTLOGRECORD	*pELR = NULL;
+	BYTE		bBuffer[1024];			/* hold the event log record raw data */
+	DWORD		dwRead, dwNeeded;
+	char		stat_buf[MAX_PATH];
+	char		MsgDll[MAX_PATH];		/* the name of the message DLL */
+	HKEY		hk = NULL;
+	DWORD		Data;
+	DWORD		Type;
+	HINSTANCE	hLib = NULL;			/* handle to the messagetable DLL */
+	char		*pCh = NULL, *pFile = NULL, *pNextFile = NULL;
+	char		*aInsertStrs[MAX_INSERT_STRS];	/* array of pointers to insert */
+	long		i;
+	LPTSTR		msgBuf = NULL;			/* hold text of the error message that we */
+	long		err = 0;
 
 	assert(out_source);
 	assert(out_message);
@@ -245,12 +244,12 @@ static long    zbx_get_eventlog_message(
 #endif /* _WINDOWS */
 
 int process_eventlog(
-	const char		*source,
-	long			*lastlogsize, 
+	const char	*source,
+	long		*lastlogsize, 
 	unsigned long	*out_timestamp, 
-	char			**out_source, 
+	char		**out_source, 
 	unsigned short	*out_severity,
-	char			**out_message)
+	char		**out_message)
 {
 	int		ret = FAIL;
 	
