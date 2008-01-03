@@ -480,9 +480,11 @@ static int	process_active_checks(char *server, unsigned short port)
 
 				s_count = 0;
 				p_count = 0;
-				while( SUCCEED == (ret = process_eventlog(filename,&active_metrics[i].lastlogsize, &timestamp, &source, &severity, &value)) )
-				{
-					if (value && ('\0' == *pattern || NULL != zbx_regexp_match(value, pattern, NULL))) {
+				while (SUCCEED == (ret = process_eventlog(filename,&active_metrics[i].lastlogsize, &timestamp, &source, &severity, &value))) {
+					if (!value) /* EOF */
+						break;
+
+					if (!pattern || NULL != zbx_regexp_match(value, pattern, NULL)) {
 						send_err = send_value(
 									server,
 									port,
@@ -618,7 +620,6 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 	while(ZBX_IS_RUNNING)
 	{
-
 		zbx_setproctitle("processing active checks");
 
 		if(process_active_checks(activechk_args.host, activechk_args.port) == FAIL)
