@@ -37,6 +37,7 @@ Changes for 1.4.j:
  - increased size of triggers.expression to 1023 (Alexei)
 
 Changes for 1.4.5:
+ - [ZBX-243] speed improvement for windows agent for eventlog[] processing (sasha)
  - [DEV-92] added supprt of multiple windows agents, service description (Sasha)
 
 Changes for 1.4.4:
