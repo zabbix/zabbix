@@ -251,21 +251,20 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 			define('ZBX_DISABLE_SUBNODES', 1);
 	}
 
-	function	get_current_nodeid( $forse_with_subnodes = null, $perm = null )
-	{
+	function	get_current_nodeid( $forse_with_subnodes = null, $perm = null ){
 		global	$ZBX_CURRENT_NODEID, $ZBX_CURRENT_SUBNODES, $ZBX_WITH_SUBNODES;
 
-		if ( !isset($ZBX_CURRENT_NODEID) )	init_nodes();
+		if(!isset($ZBX_CURRENT_NODEID))
+			init_nodes();
+
 		$result = ( is_show_subnodes($forse_with_subnodes) ? $ZBX_CURRENT_SUBNODES : $ZBX_CURRENT_NODEID );
 		
-		if ( !is_null($perm) )
-		{
+		if(!is_null($perm)){
 			global $USER_DETAILS;
-
 			$result = get_accessible_nodes_by_user($USER_DETAILS, PERM_READ_ONLY, null, null, $result);
 		}
 
-		return $result;
+	return $result;
 	}
 
 	function	get_node_name_by_elid($id_val, $forse_with_subnodes = null)
@@ -700,8 +699,8 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 				
 				if($msg_count > $msg_show) $msg_count = $msg_show;
 					
-				$msg_count = ($msg_count * $msg_font_size *2) + 2;
-				$lst_error->AddOption('style','font-size: '.$msg_font_size.'pt; height: '.$msg_count.';');
+				$msg_count = ($msg_count * $msg_font_size *4) + 2;
+				$lst_error->AddOption('style','font-size: '.$msg_font_size.'pt; height: '.$msg_count.'px;');
 //---
 				$lst_error->Show();
 				
@@ -1608,9 +1607,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	 *
 	 * author: Eugene Grigorjev
 	 */
-	function	get_cookie($name, $default_value=null)
-	{
-		global $_COOKIE;
+	function	get_cookie($name, $default_value=null){
 		if(isset($_COOKIE[$name]))	return $_COOKIE[$name];
 		// else
 		return $default_value;
@@ -1624,10 +1621,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	 *
 	 * author: Eugene Grigorjev
 	 */
-	function	zbx_setcookie($name, $value, $time=null)
-	{
-		global $_COOKIE;
-
+	function	zbx_setcookie($name, $value, $time=null){
 		setcookie($name, $value, isset($time) ? $time : (0));
 		$_COOKIE[$name] = $value;
 	}
@@ -1653,14 +1647,11 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	 *
 	 * author: Eugene Grigorjev
 	 */
-	function	zbx_flush_post_cookies($unset=false)
-	{
+	function	zbx_flush_post_cookies($unset=false){
 		global $ZBX_PAGE_COOKIES;
 
-		if(isset($ZBX_PAGE_COOKIES))
-		{
-			foreach($ZBX_PAGE_COOKIES as $cookie)
-			{
+		if(isset($ZBX_PAGE_COOKIES)){
+			foreach($ZBX_PAGE_COOKIES as $cookie){
 				if($unset)
 					zbx_unsetcookie($cookie[0]);
 				else

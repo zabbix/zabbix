@@ -69,8 +69,7 @@
 			}
 		}
 		
-		if(!$USER_DETAILS)
-		{
+		if(!$USER_DETAILS){
 			if(!($USER_DETAILS = DBfetch(DBselect("select u.* from users u where u.alias=".zbx_dbstr(ZBX_GUEST_USER).
 				" and ".DBin_node('u.userid', $ZBX_LOCALNODEID)))))
 			{
@@ -78,8 +77,7 @@
 			}
 		}
 
-		if($USER_DETAILS)
-		{
+		if($USER_DETAILS){
 			$USER_DETAILS['node'] = DBfetch(DBselect('select * from nodes where nodeid='.id2nodeid($USER_DETAILS['userid'])));
 			if(empty($USER_DETAILS['node']))
 			{
@@ -87,8 +85,7 @@
 				$USER_DETAILS['node']['nodeid'] = $ZBX_LOCALNODEID;
 			}
 		}
-		else
-		{
+		else{
 			$USER_DETAILS = array(
 				"alias"	=>ZBX_GUEST_USER,
 				"userid"=>0,
