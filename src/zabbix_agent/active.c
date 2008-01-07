@@ -408,7 +408,7 @@ static void	process_active_checks(char *server, unsigned short port)
 				s_count = 0;
 				p_count = 0;
 				lastlogsize = active_metrics[i].lastlogsize;
-				while (SUCCEED == send_err && SUCCEED == (ret = process_log(filename, &lastlogsize, &value))) {
+				while (SUCCEED == (ret = process_log(filename, &lastlogsize, &value))) {
 					if (!value) /* EOF */
 						break;
 
@@ -425,6 +425,7 @@ static void	process_active_checks(char *server, unsigned short port)
 									NULL)))
 						{
 							active_metrics[i].lastlogsize = lastlogsize;
+							break;
 						}
 
 						s_count++;
@@ -480,7 +481,7 @@ static void	process_active_checks(char *server, unsigned short port)
 				s_count = 0;
 				p_count = 0;
 				lastlogsize = active_metrics[i].lastlogsize;
-				while (SUCCEED == send_err && SUCCEED == (ret = process_eventlog(filename, &lastlogsize,
+				while (SUCCEED == (ret = process_eventlog(filename, &lastlogsize,
 					&timestamp, &source, &severity, &value)))
 				{
 					if (!value) /* EOF */
@@ -499,6 +500,7 @@ static void	process_active_checks(char *server, unsigned short port)
 									&severity)))
 						{
 							active_metrics[i].lastlogsize = lastlogsize;
+							break;
 						}
 
 						s_count++;
