@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1257"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="zabbix_agentd"
 	ProjectGUID="{7AF2898C-0CB8-4084-B814-88C2825D228B}"
 	>
@@ -610,7 +610,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="./,../include/,../../../include/,../../../src/zabbix_agent"
-				PreprocessorDefinitions="_DEBUG;DEBUG;WIN32;_WINDOWS;HAVE_LDAP;HAVE_ASSERT_H;_CONSOLE;ZABBIX_SERVICE;WITH_COMMON_METRICS;WITH_SPECIFIC_METRICS;WITH_SIMPLE_METRICS"
+				PreprocessorDefinitions="_DEBUG;DEBUG;WIN32;_WINDOWS;HAVE_LDAP;HAVE_ASSERT_H;_CONSOLE;ZABBIX_SERVICE;WITH_COMMON_METRICS;WITH_SPECIFIC_METRICS;WITH_SIMPLE_METRICS;HAVE_IPV6"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -637,11 +637,11 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="ws2_32.lib pdh.lib psapi.lib odbc32.lib odbccp32.lib Wldap32.lib"
-				OutputFile=".\Debug/zabbix_agentd.exe"
+				OutputFile="../../../bin/win32/zabbix_agentd.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\Debug/zabbix_agentd.pdb"
+				ProgramDatabaseFile="../../../bin/win32/zabbix_agentd.pdb"
 				SubSystem="1"
 				TargetMachine="1"
 			/>
