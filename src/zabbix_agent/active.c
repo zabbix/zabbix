@@ -425,7 +425,6 @@ static void	process_active_checks(char *server, unsigned short port)
 									NULL)))
 						{
 							active_metrics[i].lastlogsize = lastlogsize;
-							break;
 						}
 
 						s_count++;
@@ -433,6 +432,11 @@ static void	process_active_checks(char *server, unsigned short port)
 					p_count++;
 
 					zbx_free(value);
+
+					if (SUCCEED == send_err)
+						active_metrics[i].lastlogsize = lastlogsize;
+					else
+						lastlogsize = active_metrics[i].lastlogsize;
 
 					/* Do not flood ZABBIX server if file grows too fast */
 					if(s_count >= (MAX_LINES_PER_SECOND * active_metrics[i].refresh))	break;
@@ -500,7 +504,6 @@ static void	process_active_checks(char *server, unsigned short port)
 									&severity)))
 						{
 							active_metrics[i].lastlogsize = lastlogsize;
-							break;
 						}
 
 						s_count++;
@@ -509,6 +512,11 @@ static void	process_active_checks(char *server, unsigned short port)
 
 					zbx_free(source);
 					zbx_free(value);
+
+					if (SUCCEED == send_err)
+						active_metrics[i].lastlogsize = lastlogsize;
+					else
+						lastlogsize = active_metrics[i].lastlogsize;
 
 					/* Do not flood ZABBIX server if file grows too fast */
 					if(s_count >= (MAX_LINES_PER_SECOND * active_metrics[i].refresh))	break;
