@@ -42,7 +42,6 @@
 			error("Insufficient permissions");
 			return 0;
 		}
-
 		if(DBfetch(DBselect("select * from users where alias=".zbx_dbstr($alias)." and ".DBin_node('userid', get_current_nodeid(false)))))
 		{
 			error('User "'.$alias.'" already exists');

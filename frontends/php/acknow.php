@@ -26,7 +26,8 @@
 
 	$page["title"]	= "S_ACKNOWLEDGES";
 	$page["file"]	= "acknow.php";
-
+	$page['hist_arg'] = array('eventid');
+	
 include_once "include/page_header.php";
 
 ?>
@@ -35,8 +36,8 @@ include_once "include/page_header.php";
 
 //		VAR				TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		'eventid'=>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,				'!isset({events})&&!isset({cancel})'),
-		'events'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,				'!isset({eventid})&&!isset({cancel})'),
+		'eventid'=>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,				null),
+		'events'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,				null),
 		'message'=>		array(T_ZBX_STR, O_OPT,	NULL,	$bulk ? NULL : NOT_EMPTY,	'isset({save})||isset({saveandreturn})'),
 	/* actions */
 		'bulkacknowledge'=> array(T_ZBX_STR,O_OPT,	P_ACT|P_SYS, NULL,	NULL),
@@ -45,6 +46,11 @@ include_once "include/page_header.php";
 		"cancel"=>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null)
 	);
 	check_fields($fields);
+	
+	if(!isset($_REQUEST['events']) && !isset($_REQUEST['eventid'])){
+		show_message(S_NO_EVENTS_TO_ACKNOWLEDGE);
+		include_once("include/page_footer.php");
+	}
 	
 	if(isset($_REQUEST['eventid'])){
 		$events[$_REQUEST['eventid']] = $_REQUEST['eventid'];
