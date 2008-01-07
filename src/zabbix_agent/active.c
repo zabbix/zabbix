@@ -276,8 +276,8 @@ static int	get_active_checks(
 				parse_list_of_checks(buf);
 			}
 		}
+		zbx_tcp_close(&s);
 	}
-	zbx_tcp_close(&s);
 
 	if( FAIL == ret )
 	{
@@ -351,34 +351,30 @@ static int	send_value(
 				{
 					zabbix_log( LOG_LEVEL_DEBUG, "NOT OK [%s:%s] [%s]", host, key, buf);
 				}
-			}
-		}
-	}
-	zbx_tcp_close(&s);
+			} else
+				zabbix_log(LOG_LEVEL_DEBUG, "Send value error: [recv] %s", zbx_tcp_strerror());
+		} else
+			zabbix_log(LOG_LEVEL_DEBUG, "Send value error: [send] %s", zbx_tcp_strerror());
+		zbx_tcp_close(&s);
+	} else
+		zabbix_log(LOG_LEVEL_DEBUG, "Send value error: [connect] %s", zbx_tcp_strerror());
 
-	if( FAIL == ret )
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Send value error: %s", zbx_tcp_strerror());
-	}
 	return ret;
 }
 
-static int	process_active_checks(char *server, unsigned short port)
+static void	process_active_checks(char *server, unsigned short port)
 {
 	register int	i, s_count, p_count;
-
-	char	**pvalue;
-
-	int		now, send_err = SUCCEED, ret = SUCCEED;
-
+	char		**pvalue;
+	int		now, send_err = SUCCEED, ret;
 	unsigned long	timestamp;
 	char		*source = NULL;
 	char		*value = NULL;
 	unsigned short	severity;
-
-	char	params[MAX_STRING_LEN];
-	char	filename[MAX_STRING_LEN];
-	char	pattern[MAX_STRING_LEN];
+	long		lastlogsize;
+	char		params[MAX_STRING_LEN];
+	char		filename[MAX_STRING_LEN];
+	char		pattern[MAX_STRING_LEN];
 
 	AGENT_RESULT	result;
 
@@ -411,22 +407,25 @@ static int	process_active_checks(char *server, unsigned short port)
 
 				s_count = 0;
 				p_count = 0;
-				while (SUCCEED == (ret = process_log(filename, &active_metrics[i].lastlogsize, &value))) {
+				lastlogsize = active_metrics[i].lastlogsize;
+				while (SUCCEED == send_err && SUCCEED == (ret = process_log(filename, &lastlogsize, &value))) {
 					if (!value) /* EOF */
 						break;
 
 					if ('\0' == *pattern || NULL != zbx_regexp_match(value, pattern, NULL)) {
-						send_err = send_value(
+						if (SUCCEED == (send_err = send_value(
 									server,
 									port,
 									CONFIG_HOSTNAME,
 									active_metrics[i].key,
 									value,
-									&active_metrics[i].lastlogsize,
+									&lastlogsize,
 									NULL,
 									NULL,
-									NULL
-								);
+									NULL)))
+						{
+							active_metrics[i].lastlogsize = lastlogsize;
+						}
 
 						s_count++;
 					}
@@ -480,22 +479,27 @@ static int	process_active_checks(char *server, unsigned short port)
 
 				s_count = 0;
 				p_count = 0;
-				while (SUCCEED == (ret = process_eventlog(filename,&active_metrics[i].lastlogsize, &timestamp, &source, &severity, &value))) {
+				lastlogsize = active_metrics[i].lastlogsize;
+				while (SUCCEED == send_err && SUCCEED == (ret = process_eventlog(filename, &lastlogsize,
+					&timestamp, &source, &severity, &value)))
+				{
 					if (!value) /* EOF */
 						break;
 
 					if (!pattern || NULL != zbx_regexp_match(value, pattern, NULL)) {
-						send_err = send_value(
+						if (SUCCEED == (send_err = send_value(
 									server,
 									port,
 									CONFIG_HOSTNAME,
 									active_metrics[i].key,
 									value,
-									&active_metrics[i].lastlogsize,
+									&lastlogsize,
 									&timestamp,
 									source,
-									&severity
-								);
+									&severity)))
+						{
+							active_metrics[i].lastlogsize = lastlogsize;
+						}
 
 						s_count++;
 					}
@@ -566,7 +570,6 @@ static int	process_active_checks(char *server, unsigned short port)
 		}
 		active_metrics[i].nextcheck = (int)time(NULL)+active_metrics[i].refresh;
 	}
-	return ret;
 }
 
 static void	refresh_metrics(char *server, unsigned short port)
@@ -622,26 +625,17 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	{
 		zbx_setproctitle("processing active checks");
 
-		if(process_active_checks(activechk_args.host, activechk_args.port) == FAIL)
-		{
-			zbx_sleep(60);
-			continue;
-		}
+		process_active_checks(activechk_args.host, activechk_args.port);
 
 		nextcheck = get_min_nextcheck();
-		if(FAIL == nextcheck)
-		{
+		if (FAIL == nextcheck)
 			sleeptime = 60;
-		}
-		else
-		{
+		else {
 			sleeptime = nextcheck - (int)time(NULL);
-
 			sleeptime = MAX(sleeptime, 0);
 		}
 
-		if(sleeptime > 0)
-		{
+		if (sleeptime > 0) {
 			sleeptime = MIN(sleeptime, 60);
 
 			zabbix_log(LOG_LEVEL_DEBUG, "Sleeping for %d seconds", sleeptime );
@@ -649,11 +643,8 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 			zbx_setproctitle("poller [sleeping for %d seconds]", sleeptime);
 
 			zbx_sleep( sleeptime );
-		}
-		else
-		{
+		} else
 			zabbix_log(LOG_LEVEL_DEBUG, "No sleeping" );
-		}
 
 		if(time(NULL) >= nextrefresh)
 		{
