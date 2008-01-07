@@ -393,6 +393,9 @@ int	main(int argc, char **argv)
 			usage();
 			exit(FAIL);
 			break;
+		default:
+			/* do nothing */
+			break;
 	}
 
 	START_MAIN_ZABBIX_ENTRY(CONFIG_ALLOW_ROOT);
