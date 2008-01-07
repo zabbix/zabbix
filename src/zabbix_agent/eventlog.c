@@ -43,6 +43,9 @@ static int    zbx_open_eventlog(
 	assert(pNumRecords);
 	assert(pLatestRecord);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In zbx_open_eventlog() [source:%s]",
+		source);
+
 	*eventlog_handle = 0;
 	*pNumRecords = 0;
 
@@ -62,7 +65,6 @@ static int    zbx_open_eventlog(
 	}
 	
 	RegCloseKey(hk);
-
 
 	if ( !(*eventlog_handle = OpenEventLog(NULL, source)))	/* open log file */
 	{
@@ -114,6 +116,10 @@ static long    zbx_get_eventlog_message(
 	assert(out_message);
 	assert(out_severity);
 	assert(out_timestamp);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In zbx_get_eventlog_message() [source:%s] [which:%ld]",
+		source,
+		which);
 
 	*out_source		= NULL;
 	*out_message	= NULL;
@@ -238,8 +244,8 @@ static long    zbx_get_eventlog_message(
 				*out_message = zbx_strdcatf(*out_message, ",%s", aInsertStrs[i]);
 		}
 	}
-	return 0;
 
+	return 0;
 } 
 #endif /* _WINDOWS */
 
