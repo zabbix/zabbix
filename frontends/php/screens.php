@@ -175,8 +175,8 @@ include_once "include/page_header.php";
 
 	if($cmbElements->ItemsCount() > 0)
 		$form->AddItem($cmbElements);
-
-	if((2 != $_REQUEST["fullscreen"]) && (0 == $config) && (check_dynamic_items($elementid))){
+		
+	if((2 != $_REQUEST["fullscreen"]) && (0 == $config) && (!empty($elementid)) && (check_dynamic_items($elementid))){
 		if(!isset($_REQUEST["hostid"])){
 			$_REQUEST["groupid"] = $_REQUEST["hostid"] = 0;
 		}
