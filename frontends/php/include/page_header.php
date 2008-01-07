@@ -348,7 +348,7 @@ COpt::profiling_start("page");
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-    <title><?php echo $page['title'] ?></title>
+    <title><?php echo $page['title']; ?></title>
 <?php 
 	if(defined('ZBX_PAGE_DO_REFRESH') && $USER_DETAILS["refresh"]) { 
 		echo '<meta http-equiv="refresh" content="'.$USER_DETAILS["refresh"].'" />';

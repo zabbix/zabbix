@@ -11,8 +11,8 @@ ul.itservices{
 	margin-left: 5px;
 }
 
-ul.messages
-{
+ul.messages{
+	overflow:auto;
 	vertical-align: top;
 	border: 1px dashed #000000;
 	background-color: #FFFFFF;

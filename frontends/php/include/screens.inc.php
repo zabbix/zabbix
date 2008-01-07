@@ -211,7 +211,7 @@
 			$slide_data['delay'] = $slide_data['ss_delay'];
 		}
 
-		Redirect('screens.php?config=1&fullscreen=2&elementid='.$slideshowid.'&step='.($curr_step + 1).
+		simple_js_redirect('screens.php?config=1&fullscreen=2&elementid='.$slideshowid.'&step='.($curr_step + 1).
 				'&period='.$effectiveperiod.url_param('stime').url_param('from'),
 				$slide_data['delay']);
 

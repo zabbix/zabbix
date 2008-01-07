@@ -188,6 +188,7 @@
 	'S_WITH_SUBNODES'=>			'With subnodes',
 	
 //	acknow.php
+	'S_NO_EVENTS_TO_ACKNOWLEDGE'=>	'No events to acknowledge',
 	'S_ACKNOWLEDGES'=>				'Acknowledges',
 	'S_ACKNOWLEDGE'=>				'Acknowledge',
 	'S_RETURN'=>					'Return',

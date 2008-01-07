@@ -115,9 +115,20 @@ function insert_showhint_javascript(){
 	echo '<script type="text/javascript" src="js/showhint.js"></script>';	
 }
 
-function Redirect($url,$timeout=null){
+function redirect($url,$timeout=null){
 	zbx_flush_post_cookies();
 
+	echo '<script language="JavaScript" type="text/javascript">';
+	if( is_numeric($timeout) ) { 
+		echo 'setTimeout(\'window.location="'.$url.'"\','.($timeout*1000).')';
+	} 
+	else {
+		echo 'window.location = "'.$url.'";';
+	}
+	echo '</script>';
+}
+
+function simple_js_redirect($url,$timeout=null){
 	echo '<script language="JavaScript" type="text/javascript">';
 	if( is_numeric($timeout) ) { 
 		echo 'setTimeout(\'window.location="'.$url.'"\','.($timeout*1000).')';
