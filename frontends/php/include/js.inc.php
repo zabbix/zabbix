@@ -107,6 +107,18 @@ function Redirect($url,$timeout=null){
 	echo '</script>';
 }
 
+function simple_js_redirect($url,$timeout=null){
+	echo '<script language="JavaScript" type="text/javascript">';
+	if( is_numeric($timeout) ) { 
+		echo 'setTimeout(\'window.location="'.$url.'"\','.($timeout*1000).')';
+	} 
+	else {
+		echo 'window.location = "'.$url.'";';
+	}
+	echo '</script>';
+}
+
+
 function	play_sound($filename){
 
 	echo '<script language="javascript" type="text/javascript">

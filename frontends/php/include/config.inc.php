@@ -1670,9 +1670,7 @@ require_once('include/classes/ctree.inc.php');
 	 *
 	 * author: Eugene Grigorjev
 	 */
-	function	get_cookie($name, $default_value=null)
-	{
-		global $_COOKIE;
+	function	get_cookie($name, $default_value=null){
 		if(isset($_COOKIE[$name]))	return $_COOKIE[$name];
 		// else
 		return $default_value;
@@ -1686,10 +1684,7 @@ require_once('include/classes/ctree.inc.php');
 	 *
 	 * author: Eugene Grigorjev
 	 */
-	function	zbx_setcookie($name, $value, $time=null)
-	{
-		global $_COOKIE;
-
+	function	zbx_setcookie($name, $value, $time=null){
 		setcookie($name, $value, isset($time) ? $time : (0));
 		$_COOKIE[$name] = $value;
 	}
