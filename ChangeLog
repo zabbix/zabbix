@@ -1,5 +1,6 @@
 Changes for 1.1:
 
+ - fixed problem "Unable to add performance counter" on start of win agent (Sahsa)
  - timeout for sending emails and SMS was increased to 20 seconds (Alexei)
  - fixed text history storing for Oracle (Eugene)
  - fixes in Oracle schema (Alexei)

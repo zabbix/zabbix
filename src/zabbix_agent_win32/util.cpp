@@ -446,10 +446,9 @@ CHECK_MEMORY(main,"GetPdhErrorText","end2");
 char *GetCounterName(DWORD index)
 {
 	PERFCOUNTER	*counterName;
-	DWORD	dwSize;
-	char hostname[MAX_COMPUTERNAME_LENGTH+3];
+	DWORD		dwSize;
 
-	counterName=perfCounterList;
+	counterName = PerfCounterList;
 	while(counterName!=NULL)
 	{
 		if (counterName->pdhIndex == index)
@@ -459,22 +458,19 @@ char *GetCounterName(DWORD index)
 	if (counterName == NULL)
 	{
 		counterName = (PERFCOUNTER *)malloc(sizeof(PERFCOUNTER));
+		if (NULL == counterName) {
+			WriteLog(MSG_LOOKUP_FAILED,EVENTLOG_ERROR_TYPE,
+				"s", "GetCounterName failed: Insufficient memory available for malloc");
+			return "UnknownPerformanceCounter";
+		}
 		memset(counterName, 0, sizeof(PERFCOUNTER));
 		counterName->pdhIndex = index;
-		counterName->next = perfCounterList;
+		counterName->next = PerfCounterList;
 
-		sprintf(hostname, "\\\\");
-		dwSize = MAX_COMPUTERNAME_LENGTH+1;
-		if(GetComputerName((char *) &hostname + 2, &dwSize)==0)
+		dwSize = sizeof(counterName->name);
+		if(PdhLookupPerfNameByIndex(NULL, index, counterName->name, &dwSize) == ERROR_SUCCESS)
 		{
-			WriteLog(MSG_GET_COMPUTER_NAME_FAILED,EVENTLOG_ERROR_TYPE,
-				"s",GetSystemErrorText(GetLastError()));
-		}
-
-		dwSize = MAX_COUNTER_NAME;
-		if (PdhLookupPerfNameByIndex((char *)&hostname, index, (char *)&counterName->name, &dwSize)==ERROR_SUCCESS)
-		{
-			perfCounterList = counterName;
+			PerfCounterList = counterName;
 		} 
 		else 
 		{
@@ -485,7 +481,7 @@ char *GetCounterName(DWORD index)
 		}
 	}
 
-	return (char *)&counterName->name;
+	return counterName->name;
 }
 
 void FreeCounterList(void)
