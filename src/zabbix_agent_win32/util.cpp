@@ -448,7 +448,7 @@ char *GetCounterName(DWORD index)
 	PERFCOUNTER	*counterName;
 	DWORD		dwSize;
 
-	counterName = PerfCounterList;
+	counterName = perfCounterList;
 	while(counterName!=NULL)
 	{
 		if (counterName->pdhIndex == index)
@@ -465,12 +465,12 @@ char *GetCounterName(DWORD index)
 		}
 		memset(counterName, 0, sizeof(PERFCOUNTER));
 		counterName->pdhIndex = index;
-		counterName->next = PerfCounterList;
+		counterName->next = perfCounterList;
 
 		dwSize = sizeof(counterName->name);
 		if(PdhLookupPerfNameByIndex(NULL, index, counterName->name, &dwSize) == ERROR_SUCCESS)
 		{
-			PerfCounterList = counterName;
+			perfCounterList = counterName;
 		} 
 		else 
 		{

@@ -24,6 +24,7 @@
 
 #if defined(WIN32)
 #	pragma warning (disable: 4100)
+#       pragma warning (disable: 4996) /* warning C4996: <function> was declared deprecated */
 
 #	define zbx_uint64_t __int64
 #	define ZBX_FS_UI64 "%llu"
