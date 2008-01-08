@@ -65,10 +65,8 @@
 		$prior_dif = $new[0]-$old[0];
 
 		krsort($files_apdx);
-		foreach($files_apdx as $priority => $apdx)
-		{
-			if(round($prior_dif / pow(100, $priority)) != 0)
-			{
+		foreach($files_apdx as $priority => $apdx){
+			if(round($prior_dif / pow(100, $priority)) != 0){
 				$audio = 'audio/trigger_'.$status.'_'.$apdx.'.wav';
 				break;
 			}
@@ -113,7 +111,7 @@ include_once "include/page_header.php";
 	$_REQUEST['noactions']		=	get_request('noactions', get_profile('web.tr_status.noactions', 'true'));
 	$_REQUEST['compact']		=	get_request('compact', get_profile('web.tr_status.compact', 'true'));
 
-	$options = array("allow_all_hosts","always_select_first_host","monitored_hosts","with_monitored_items");
+	$options = array("allow_all_hosts","monitored_hosts","with_monitored_items");//,"always_select_first_host");
 	if(!$ZBX_WITH_SUBNODES)	array_push($options,"only_current_node");
 	
 	validate_group_with_host(PERM_READ_ONLY,$options,"web.tr_status.groupid","web.tr_status.hostid");
@@ -128,8 +126,7 @@ include_once "include/page_header.php";
 	
 ?>
 <?php
-	if(isset($audio))
-	{
+	if(isset($audio)){
 		play_sound($audio);
 	}
 ?>                                                                                                             
@@ -165,19 +162,25 @@ include_once "include/page_header.php";
 	$cmbHosts = new CComboBox('hostid',$_REQUEST['hostid'],'submit()');
 
 	$cmbGroup->AddItem(0,S_ALL_SMALL);
+	$cmbHosts->AddItem(0,S_ALL_SMALL);
 	
-	$availiable_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
-	
-	$scripts_by_hosts = get_accessible_scripts_by_hosts(explode(',',$availiable_hosts));
+	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_LIST, null, null, get_current_nodeid());
+	$scripts_by_hosts = get_accessible_scripts_by_hosts(explode(',',$available_hosts));
 
-	$result=DBselect("select distinct g.groupid,g.name from groups g, hosts_groups hg, hosts h, items i, functions f, triggers t ".
-		" where h.hostid in (".$availiable_hosts.") ".
-		" AND hg.groupid=g.groupid AND h.status=".HOST_STATUS_MONITORED.
-		" AND h.hostid=i.hostid AND hg.hostid=h.hostid AND i.status=".ITEM_STATUS_ACTIVE.
-		" AND i.itemid=f.itemid AND t.triggerid=f.triggerid AND t.status=".TRIGGER_STATUS_ENABLED.
-		" order by g.name");
-	while($row=DBfetch($result))
-	{
+	$result=DBselect('SELECT DISTINCT g.groupid,g.name '.
+					' FROM groups g, hosts_groups hg, hosts h, items i, functions f, triggers t '.
+					' WHERE h.hostid in ('.$available_hosts.') '.
+						' AND hg.groupid=g.groupid '.
+						' AND h.status='.HOST_STATUS_MONITORED.
+						' AND h.hostid=i.hostid '.
+						' AND hg.hostid=h.hostid '.
+						' AND i.status='.ITEM_STATUS_ACTIVE.
+						' AND i.itemid=f.itemid '.
+						' AND t.triggerid=f.triggerid '.
+						' AND t.status='.TRIGGER_STATUS_ENABLED.
+					' ORDER BY g.name');
+										
+	while($row=DBfetch($result)){
 		$cmbGroup->AddItem(
 				$row['groupid'],
 				get_node_name_by_elid($row['groupid']).$row['name']
@@ -187,8 +190,7 @@ include_once "include/page_header.php";
 	$r_form->AddItem(array(S_GROUP.SPACE,$cmbGroup));
 	
 	if($_REQUEST["groupid"] > 0){
-	
-		$sql='SELECT h.hostid,h.host '.
+		$sql='SELECT DISTINCT h.hostid,h.host '.
 			' FROM hosts h,items i,hosts_groups hg, functions f, triggers t '.
 			' WHERE h.status='.HOST_STATUS_MONITORED.
 				' AND h.hostid=i.hostid '.
@@ -198,14 +200,11 @@ include_once "include/page_header.php";
 				' AND i.itemid=f.itemid '.
 				' AND t.triggerid=f.triggerid '.
 				' AND t.status='.TRIGGER_STATUS_ENABLED.
-				' AND h.hostid in ('.$availiable_hosts.') '.
-			' GROUP BY h.hostid,h.host '.
+				' AND h.hostid in ('.$available_hosts.') '.
 			' ORDER BY h.host';
 	}
 	else{
-	
-		$cmbHosts->AddItem(0,S_ALL_SMALL);
-		$sql='SELECT h.hostid,h.host '.
+		$sql='SELECT DISTINCT h.hostid,h.host '.
 			' FROM hosts h,items i, functions f, triggers t '.
 			' WHERE h.status='.HOST_STATUS_MONITORED.
 				' AND i.status='.ITEM_STATUS_ACTIVE.
@@ -213,15 +212,13 @@ include_once "include/page_header.php";
 				' AND i.itemid=f.itemid '.
 				' AND t.triggerid=f.triggerid '.
 				' AND t.status='.TRIGGER_STATUS_ENABLED.
-				' AND h.hostid in ('.$availiable_hosts.') '.
-			' GROUP BY h.hostid,h.host '.
+				' AND h.hostid in ('.$available_hosts.') '.
 			' ORDER BY h.host';
 	}
 	
 	$result=DBselect($sql);
 	$flag = false;
-	while($row=DBfetch($result))
-	{
+	while($row=DBfetch($result)){
 		$flag |= $_REQUEST['hostid'] == $row['hostid'];
 		$cmbHosts->AddItem(
 				$row['hostid'],
@@ -245,8 +242,7 @@ include_once "include/page_header.php";
 			(!isset($_REQUEST["fullscreen"]) ? '&fullscreen=1' : '')),
 		$r_form);
 	
-	if(!isset($_REQUEST["fullscreen"]))
-	{
+	if(!isset($_REQUEST["fullscreen"])){
 		$left_col = array();
 		
 		$tr_form = new CForm('tr_status.php');
@@ -310,8 +306,8 @@ include_once "include/page_header.php";
 			"&show_triggers=$show_triggers&show_events=$show_events&noactions=$noactions&compact=$compact&txt_select=$txt_select"
 			), ']');
 			
-		if($select=='true')
-		{
+		if($select=='true'){
+		
 			$form = new CForm();
 			$form->SetMethod('get');
 			
@@ -326,20 +322,17 @@ include_once "include/page_header.php";
 		show_table_header($left_col);
 	}
 
-  	if(isset($_REQUEST["fullscreen"]))
-	{
+  	if(isset($_REQUEST["fullscreen"])){
 		$triggerInfo = new CTriggersInfo();
 		$triggerInfo->HideHeader();
 		$triggerInfo->Show();
 	}
 
-	if(isset($_REQUEST["fullscreen"]))
-	{
-		$fullscreen="&fullscreen=1";
+	if(isset($_REQUEST["fullscreen"])){
+		$fullscreen='&fullscreen=1';
 	}
-	else
-	{
-		$fullscreen="";
+	else{
+		$fullscreen='';
 	}
 	
 	$m_form = new CForm('acknow.php');
@@ -363,7 +356,8 @@ include_once "include/page_header.php";
 		S_COMMENTS
 		));
 		
-	$cond = ($_REQUEST['hostid'] > 0)?' AND h.hostid='.$_REQUEST['hostid'].' ':'';
+	$cond =($_REQUEST['hostid'] > 0)?' AND h.hostid='.$_REQUEST['hostid'].' ':'';
+	$cond.=($_REQUEST['groupid']> 0)?' AND hg.groupid ='.$_REQUEST['groupid']:'';
 	
 	switch($show_triggers){
 		case TRIGGERS_OPTION_ALL:
@@ -380,11 +374,12 @@ include_once "include/page_header.php";
 
 	$sql = 'SELECT DISTINCT t.triggerid,t.status,t.description, t.expression,t.priority, '.
 							' t.lastchange,t.comments,t.url,t.value,h.host,h.hostid,t.type '.
-					' FROM triggers t,hosts h,items i,functions f '.
+					' FROM triggers t,hosts h,items i,functions f, hosts_groups hg '.
 					' WHERE f.itemid=i.itemid AND h.hostid=i.hostid '.
+						' AND hg.hostid=h.hostid '.
 						' AND t.triggerid=f.triggerid AND t.status='.TRIGGER_STATUS_ENABLED.
 						' AND i.status='.ITEM_STATUS_ACTIVE.' AND '.DBin_node('t.triggerid').
-						' AND h.hostid not in ('.get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT).') '. 
+						' AND h.hostid in ('.$available_hosts.') '.
 						' AND h.status='.HOST_STATUS_MONITORED.' '.$cond.
 						order_by('h.host,h.hostid,t.description,t.priority,t.lastchange');
 	$result = DBselect($sql);
