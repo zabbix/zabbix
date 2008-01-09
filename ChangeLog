@@ -1,5 +1,6 @@
 Changes for 1.4.5:
 
+ - [ZBX-250] speed improvement for Triggers when use "{ITEM.VALUE}" macro (Sasha)
  - [ZBX-246] fixed header error in Monitoring->slideshows (Artem)
  - [ZBX-243] speed improvement for windows agent for eventlog[] processing (sasha)
  - [DEV-92] added supprt of multiple windows agents, service description (Sasha)

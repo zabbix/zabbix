@@ -33,8 +33,6 @@ char *GetCounterName(DWORD index)
 	PERFCOUNTER	*counterName;
 	DWORD		dwSize;
 
-	/* NOTE: The buffer size should be large enough to contain MAX_COMPUTERNAME_LENGTH + 1 characters.*/
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In GetCounterName() [index:%u]", index);
 
 	counterName = PerfCounterList;
