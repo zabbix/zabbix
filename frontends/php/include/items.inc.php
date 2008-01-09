@@ -1192,8 +1192,7 @@ COpt::profiling_stop('prepare table');
 	 *
 	 * Peremeters:
 	 *     itemid - item ID
-	 *     index  - 0 - last value, 1 - prev value, 2 - prev prev, and so on
-	 *     if index=0, clock is used
+	 *     last  - 0 - last value (clock is used), 1 - last value
 	 *
 	 * Author:
 	 *     Alexei Vladishev
@@ -1201,7 +1200,7 @@ COpt::profiling_stop('prepare table');
 	 * Comments:
 	 *
 	 */
-	function	item_get_history($db_item,$index = 1, $clock = 0)
+	function	item_get_history($db_item, $last = 1, $clock = 0)
 	{
 		$value = NULL;
 
@@ -1224,29 +1223,24 @@ COpt::profiling_stop('prepare table');
 			$table = "history_log";
 			break;
 		}
-		if($index == 0)
+		if ($last == 0)
 		{
-			$sql="select value from $table where itemid=".$db_item["itemid"]." and clock<=$clock order by clock desc";
-			$result = DBselect($sql, 1);
+			$sql = "select value from $table where itemid=".$db_item["itemid"]." and clock=$clock";
 			$row = DBfetch(DBselect($sql, 1));
 			if($row)
-			{
 				$value = $row["value"];
-			}
 		}
 		else
 		{
-			$sql="select value from $table where itemid=".$db_item["itemid"]." order by clock desc";
-			$result = DBselect($sql, $index);
-			$num=1;
-			while($row = DBfetch($result))
+			$sql = "select max(clock) as clock from $table where itemid=".$db_item["itemid"];
+			$row = DBfetch(DBselect($sql));
+			if ($row && !is_null($row["clock"]))
 			{
-				if($num == $index)
-				{
+				$clock = $row["clock"];
+				$sql = "select value from $table where itemid=".$db_item["itemid"]." and clock=$clock";
+				$row = DBfetch(DBselect($sql, 1));
+				if($row)
 					$value = $row["value"];
-					break;
-				}
-				$num++;
 			}
 		}
 		return $value;
