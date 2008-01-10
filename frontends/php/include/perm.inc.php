@@ -101,8 +101,6 @@
 			if(isset($incorrect_session))		$message = "Session was ended, please relogin!";
 			else if(isset($missed_user_guest))	$message = "Database corrupted, missed default user 'guest'";
 			
-			global $_REQUEST;
-
 			if(!isset($_REQUEST['message'])) $_REQUEST['message'] = $message;
 			
 			include('index.php');
