@@ -19,19 +19,19 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/setup.inc.php";
+require_once "include/config.inc.php";
+require_once "include/setup.inc.php";
 /* TMP !!! */
 
 global $DB_SERVER;
 
 /* ******** */
 
-        $page["title"] = "S_INSTALLATION";
-        $page["file"] = "setup.php";
+$page["title"] = "S_INSTALLATION";
+$page["file"] = "setup.php";
 
-	if(!defined("PAGE_HEADER_LOADED"))
-		define('ZBX_PAGE_NO_MENU', 1);
+if(!defined("PAGE_HEADER_LOADED"))
+	define('ZBX_PAGE_NO_MENU', 1);
 
 ?>
 <?php
@@ -76,7 +76,7 @@ global $DB_SERVER;
 	if(isset($_REQUEST['cancel']) || isset($_REQUEST['finish']))
 	{
 		zbx_unsetcookie('ZBX_CONFIG');
-		Redirect('index.php');
+		redirect('index.php');
 		exit;
 	}
 	
@@ -133,7 +133,6 @@ include_once "include/page_header.php";
 	echo SBR;
 	$ZBX_SETUP_WIZARD->Show();
 
-	global $_POST;
 	unset($_POST);
 ?>
 <?php
