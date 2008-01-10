@@ -52,7 +52,8 @@
 		unset($sessionid);
 
 		Redirect("index.php");
-		return;
+		die();
+//		return;
 	}
 
 	if(isset($_REQUEST["enter"])&&($_REQUEST["enter"]=="Enter"))
@@ -60,12 +61,13 @@
 		$name = get_request("name","");
 		$password = md5(get_request("password",""));
 
-		$row = DBfetch(DBselect("select u.userid,u.alias,u.name,u.surname,u.url,u.refresh from users u where".
-			" u.alias=".zbx_dbstr($name)." and u.passwd=".zbx_dbstr($password).
-			' and '.DBin_node('u.userid', $ZBX_LOCALNODEID)));
+		$row = DBfetch(DBselect('SELECT u.userid,u.alias,u.name,u.surname,u.url,u.refresh '.
+						' FROM users u '.
+ 						' WHERE u.alias='.zbx_dbstr($name).
+							' AND u.passwd='.zbx_dbstr($password).
+							' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID)));
 
-		if($row)
-		{
+		if($row){
 			$sessionid = md5(time().$password.$name.rand(0,10000000));
 			zbx_setcookie('zbx_sessionid',$sessionid);
 			
@@ -74,12 +76,16 @@
 
 			add_audit(AUDIT_ACTION_LOGIN,AUDIT_RESOURCE_USER,"Correct login [".$name."]");
 			
-			if(empty($row["url"]))
-			{
-				$row["url"] = "index.php";
+			if(empty($row["url"])){
+				global $USER_DETAILS;
+				$USER_DETAILS["alias"] = $row['alias'];
+				$USER_DETAILS['userid'] = $row['userid'];
+				$row["url"] = get_profile('web.menu.view.last','index.php');
+				unset($USER_DETAILS);
 			}
 			Redirect($row["url"]);
-			return;
+			die();
+//			return;
 		}
 		else
 		{

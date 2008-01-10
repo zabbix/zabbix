@@ -75,6 +75,7 @@ frontends/php/images/general/tree/Y.gif -text
 frontends/php/images/general/tree/Yc.gif -text
 frontends/php/images/general/tree/point.gif -text
 frontends/php/images/general/trigg_dep.gif -text
+frontends/php/images/general/warning16r.gif -text
 frontends/php/images/general/warning_small.gif -text
 frontends/php/images/general/zabbix.ico -text
 frontends/php/images/general/zabbix.png -text svneol=unset#unset
@@ -145,6 +146,7 @@ frontends/php/styles/popupmenu.css -text
 frontends/php/styles/sbox.css -text
 frontends/php/styles/table.css -text
 frontends/php/styles/ul.css -text
+frontends/php/warning.php -text
 include/dbcache.h -text
 include/zbxodbc.h -text
 m4/libiodbc.m4 -text

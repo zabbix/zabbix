@@ -11,14 +11,14 @@
 @import "styles/sbox.css";
 
 body{
-        background-color:#e5e5e5;
-        margin: 0px;
-        padding: 0px;
-        color:black;
-        font-family:verdana, arial, helvetica, sans-serif;
-        font-size:10px;
+	background-color:#e5e5e5;
+	margin: 0px;
+	padding: 0px;
+	color:black;
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-size:10px;
 	text-decoration: none;
-       line-height:16px;
+	line-height:16px;
 }
 /**************** MEDIA *****************/
 @media print {

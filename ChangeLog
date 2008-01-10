@@ -1,5 +1,6 @@
 Changes for 1.5:
 
+ - [DEV-94] added processing of the "database down" event (Artem)
  - [DEV-93] added availability to select all hosts in specified group in "Monitoring" section (Artem)
  - [DEV-91] added printable view for pages (Artem)
  - [DEV-89] improved trigger tables view (Artem)

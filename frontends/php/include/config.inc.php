@@ -90,7 +90,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 	set_error_handler('zbx_err_handler');
 
-	global $_COOKIE, $ZBX_LOCALNODEID, $ZBX_LOCMASTERID, $ZBX_CONFIGURATION_FILE, $DB_TYPE, $DB_SERVER, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
+	global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID, $ZBX_CONFIGURATION_FILE, $DB_TYPE, $DB_SERVER, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
 	global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 	$ZBX_LOCALNODEID = 0;
@@ -102,43 +102,36 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 	unset($show_setup);
 
-	if(file_exists($ZBX_CONFIGURATION_FILE) && !isset($_COOKIE['ZBX_CONFIG']))
-	{
+	if(file_exists($ZBX_CONFIGURATION_FILE) && !isset($_COOKIE['ZBX_CONFIG'])){
 		include $ZBX_CONFIGURATION_FILE;
 
 		$error = '';
-		if(!DBconnect($error))
-		{
-			global	$_REQUEST;
-
+		if(!DBconnect($error)){
 			$_REQUEST['message'] = $error;
-			
+
 			define('ZBX_DISTRIBUTED', false);
 			define('ZBX_PAGE_NO_AUTHERIZATION', true);
-			$show_setup = true;
+			
+			$show_warning = true;
 		}
-		else
-		{
+		else{
 			global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID;
 
 			/* Init LOCAL NODE ID */
-			if($local_node_data = DBfetch(DBselect('select * from nodes where nodetype=1 order by nodeid')))
-			{
+			if($local_node_data = DBfetch(DBselect('select * from nodes where nodetype=1 order by nodeid'))){
 				$ZBX_LOCALNODEID = $local_node_data['nodeid'];
 				$ZBX_LOCMASTERID = $local_node_data['masterid'];
 
 				define('ZBX_DISTRIBUTED', true);
 			}
-			else
-			{
+			else{
 				define('ZBX_DISTRIBUTED', false);
 			}
 			unset($local_node_data);
 		}
 		unset($error);
 	}
-	else
-	{
+	else{
 		if(file_exists($ZBX_CONFIGURATION_FILE))
 			include $ZBX_CONFIGURATION_FILE;
 
@@ -147,15 +140,13 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		$show_setup = true;
 	}
 
-	if(!defined('ZBX_PAGE_NO_AUTHERIZATION'))
-	{
+	if(!defined('ZBX_PAGE_NO_AUTHERIZATION')){
 		check_authorisation();
 
 		include_once "include/locales/".$USER_DETAILS["lang"].".inc.php";
 		process_locales();
 	}
-	else
-	{
+	else{
 		$USER_DETAILS = array(
 			"alias" =>ZBX_GUEST_USER,
 			"userid"=>0,
@@ -166,20 +157,20 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 				"nodeid"=>0));
 	}
 
-	if(isset($show_setup))
-	{
+	if(isset($show_setup)){
 		unset($show_setup);
 		include_once "setup.php";
 	}
-
+	else if(isset($show_warning)){
+		unset($show_warning);
+		include_once "warning.php";
+	}
 
 	/********** END INITIALIZATION ************/
 
-	function	init_nodes()
-	{
+	function	init_nodes(){
 		/* Init CURRENT NODE ID */
-		global	$_REQUEST,
-			$USER_DETAILS,
+		global	$USER_DETAILS,
 			$ZBX_LOCALNODEID, $ZBX_LOCMASTERID,
 			$ZBX_CURRENT_NODEID, $ZBX_CURRENT_SUBNODES, $ZBX_CURMASTERID,
 			$ZBX_NODES,
@@ -318,15 +309,13 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	}
 
 	function get_request($name, $def=NULL){
-		global  $_REQUEST;
 		if(isset($_REQUEST[$name]))
 			return $_REQUEST[$name];
 		else
 			return $def;
 	}
 
-	function info($msg)
-	{
+	function info($msg){
 		global $ZBX_MESSAGES;
 
 		if(is_null($ZBX_MESSAGES))
@@ -335,8 +324,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		array_push($ZBX_MESSAGES, array('type' => 'info', 'message' => $msg));
 	}
 
-	function error($msg)
-	{
+	function error($msg){
 		global $ZBX_MESSAGES;
 
 		if(is_null($ZBX_MESSAGES))
@@ -345,37 +333,33 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		array_push($ZBX_MESSAGES, array('type' => 'error', 'message' => $msg));
 	}
 
-	function clear_messages()
-	{
+	function clear_messages(){
 		global $ZBX_MESSAGES;
 
 		$ZBX_MESSAGES = null;
 	}
 
-	function &asort_by_key(&$array, $key)
-	{
+	function asort_by_key(&$array, $key){
 		if(!is_array($array)) {
 			error('Incorrect type of asort_by_key');
 			return array();
 		}
+		
 		$key = htmlspecialchars($key);
 		uasort($array, create_function('$a,$b', 'return $a[\''.$key.'\'] - $b[\''.$key.'\'];'));
 		return $array;
 	}
 
-	function fatal_error($msg)
-	{
+	function fatal_error($msg){
 		include_once "include/page_header.php";
 		show_error_message($msg);
 		include_once "include/page_footer.php";
 	}
 	
-	function str2mem($val)
-	{
+	function str2mem($val){
 		$val = trim($val);
 		$last = strtolower($val{strlen($val)-1});
-		switch($last)
-		{
+		switch($last){
 			// The 'G' modifier is available since PHP 5.1.0
 			case 'g':
 				$val *= 1024;

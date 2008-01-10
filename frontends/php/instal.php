@@ -19,11 +19,11 @@
 **/
 ?>
 <?php
-	require_once "include/config.inc.php";
-	require_once "include/forms.inc.php";
+require_once "include/config.inc.php";
+require_once "include/forms.inc.php";
 
-        $page["title"] = "S_INSTALLATION";
-        $page["file"] = "instal.php";
+$page["title"] = "S_INSTALLATION";
+$page["file"] = "instal.php";
 
 include_once "include/page_header.php";
 include_once "setup.php";
