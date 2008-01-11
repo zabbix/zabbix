@@ -223,11 +223,11 @@ require_once('include/classes/ctree.inc.php');
 			{
 				for ( 	$curr_node = &$node_data;
 					$curr_node['masterid'] != 0 &&
-					$curr_node['masterid'] != $ZBX_CURRENT_NODEID;
+					(bccomp($curr_node['masterid'] , $ZBX_CURRENT_NODEID) != 0);
 					$curr_node = &$ZBX_NODES[$curr_node['masterid']]
 				);
 
-				if ( $curr_node['masterid'] == $ZBX_CURRENT_NODEID )
+				if (bccomp($curr_node['masterid'],$ZBX_CURRENT_NODEID) == 0 )
 				{
 					$ZBX_CURRENT_SUBNODES[$nodeid] = $nodeid;
 				}
@@ -303,7 +303,6 @@ require_once('include/classes/ctree.inc.php');
 
 		include_once "include/page_footer.php";
 	}
-
 
 	function zbx_stripslashes($value){
 		if(is_array($value)){

@@ -695,8 +695,8 @@ require_once "include/items.inc.php";
 			}
 		}
 		
-		$group_correct	= ($groupid == $a_groupid) ? 1 : 0;
-		$host_correct	= ($hostid == $a_hostid) ? 1 : 0;
+		$group_correct	= (bccomp($groupid ,$a_groupid)==0) ? 1 : 0;
+		$host_correct	= (bccomp($hostid ,$a_hostid)==0) ? 1 : 0;
 		return array(
 			"groupid"	=> $groupid,
 			"group_correct"	=> $group_correct,
@@ -822,7 +822,7 @@ require_once "include/items.inc.php";
 
 		$host = get_host_by_hostid($hostid);
 		
-		if($applicationid==null)
+		if(is_null($applicationid))
 		{
 			$applicationid_new = get_dbid("applications","applicationid");
 			if($result = DBexecute("insert into applications (applicationid,name,hostid,templateid)".
@@ -839,7 +839,7 @@ require_once "include/items.inc.php";
 
 		if(!$result)	return $result;
 
-		if($applicationid==null)
+		if(is_null($applicationid))
 		{// create application for childs
 			$applicationid = $applicationid_new;
 

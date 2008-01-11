@@ -590,7 +590,7 @@ else {
 			else
 			{
 				$ret1 = $row["nextid"];
-				if(($ret1 < $min) || ($ret1 >= $max)) {
+				if((bccomp($ret1,$min) < 0) || !(bccomp($ret1,$max) < 0)) {
 					DBexecute("delete from ids where nodeid=$nodeid and table_name='$table' and field_name='$field'");
 					continue;
 				}

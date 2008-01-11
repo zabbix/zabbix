@@ -1,8 +1,9 @@
 Changes for 1.4.5:
 
+ - [ZBX-253] fixes problem in frontend with long int values (Artem)
  - [ZBX-250] speed improvement for Triggers when use "{ITEM.VALUE}" macro (Sasha)
  - [ZBX-246] fixed header error in Monitoring->slideshows (Artem)
- - [ZBX-243] speed improvement for windows agent for eventlog[] processing (sasha)
+ - [ZBX-243] speed improvement for windows agent for eventlog[] processing (Sasha)
  - [DEV-92] added supprt of multiple windows agents, service description (Sasha)
  - [ZBX-7] added support of system.cpu.util[] for FreeBSD agents, thanks to 'brick' (Sasha)
  - [ZBX-222] fixed problem with slashes (Artem)

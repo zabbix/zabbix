@@ -199,7 +199,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 	$flag = false;
 	while($row=DBfetch($result))
 	{
-		$flag |= $_REQUEST['hostid'] == $row['hostid'];
+		$flag |= (bccomp($_REQUEST['hostid'] , $row['hostid']) == 0);
 		$cmbHosts->AddItem(
 				$row['hostid'],
 				get_node_name_by_elid($row['hostid']).$row['host']

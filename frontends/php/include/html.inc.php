@@ -41,36 +41,11 @@
 
 	function	nbsp($str)
 	{
-		return str_replace(" ",SPACE,$str);;
-	}
-
-	function form_select($var, $value, $label)
-	{
-		global $_REQUEST;
-
-		$selected = "";
-		if(!is_null($var))
-		{
-			if(isset($_REQUEST[$var])&&$_REQUEST[$var]==$value)
-				$selected = "selected";
-		}
-		return "<option value=\"$value\" $selected>$label";
-	}
-
-	function form_input($name, $value, $size)
-	{
-		return "<input class=\"biginput\" name=\"$name\" size=$size value=\"$value\">";
-	}
-
-	function form_textarea($name, $value, $cols, $rows)
-	{
-		return "<textarea name=\"$name\" cols=\"$cols\" ROWS=\"$rows\" wrap=\"soft\">$value</TEXTAREA>";
+		return str_replace(" ",SPACE,$str);
 	}
 
 	function url1_param($parameter)
 	{
-		global $_REQUEST;
-	
 		if(isset($_REQUEST[$parameter]))
 		{
 			return "$parameter=".$_REQUEST[$parameter];
@@ -131,69 +106,5 @@
 			$result = prepare_url($var,$name);
 		}
 		return $result;
-	}
-
-	function table_begin($class="tableinfo")
-	{
-		echo "<table class=\"$class\" border=0 width=\"100%\" bgcolor='#AAAAAA' cellspacing=1 cellpadding=3>";
-		echo "\n";
-	}
-
-	function table_header($elements)
-	{
-		echo "<tr bgcolor='#CCCCCC'>";
-		while(list($num,$element)=each($elements))
-		{
-			echo "<td><b>".$element."</b></td>";
-		}
-		echo "</tr>";
-		echo "\n";
-	}
-
-	function table_row($elements, $rownum)
-	{
-		if($rownum%2 == 1)	{ echo "<TR BGCOLOR=\"#DDDDDD\">"; }
-		else			{ echo "<TR BGCOLOR=\"#EEEEEE\">"; }
-
-		while(list($num,$element)=each($elements))
-		{
-			if(is_array($element)&&isset($element["hide"])&&($element["hide"]==1))	continue;
-			if(is_array($element))
-			{
-				if(isset($element["class"]))
-					echo "<td class=\"".$element["class"]."\">".$element["value"]."</td>";
-				else
-					echo "<td>".$element["value"]."</td>";
-			}
-			else
-			{
-				echo "<td>".$element."</td>";
-			}
-		}
-		echo "</tr>";
-		echo "\n";
-	}
-
-
-	function table_end()
-	{
-		echo "</table>";
-		echo "\n";
-	}
-
-	function table_td($text,$attr)
-	{
-		echo "<td $attr>$text</td>";
-	}
-
-	function table_nodata($text="...")
-	{
-		echo "<TABLE BORDER=0 align=center WIDTH=\"100%\" BGCOLOR=\"#CCCCCC\" cellspacing=1 cellpadding=3>";
-		echo "<TR BGCOLOR=\"#DDDDDD\">";
-		echo "<TD ALIGN=CENTER>";
-		echo $text;
-		echo "</TD>";
-		echo "</TR>";
-		echo "</TABLE>";
 	}
 ?>

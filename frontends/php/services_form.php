@@ -207,7 +207,8 @@ if(isset($_REQUEST['pservices'])){
 					' LEFT JOIN services_links sl ON s.serviceid=sl.servicedownid '.
 				' WHERE (i.hostid IS null OR i.hostid NOT IN ('.$denyed_hosts.')) '.
 					' AND '.DBin_node('s.serviceid').
-					' AND s.serviceid NOT IN ('.$childs_str.$service['serviceid'].') order by s.sortorder,s.name';
+					' AND s.serviceid NOT IN ('.$childs_str.$service['serviceid'].') '.
+				' ORDER BY s.sortorder,s.name';
 	} else {
 		$query = 'SELECT DISTINCT s.* '.
 			' FROM services s '.
@@ -284,8 +285,8 @@ if(isset($_REQUEST['cservices'])){
 					' LEFT JOIN items i on f.itemid=i.itemid '.
 					' LEFT JOIN services_links sl on s.serviceid=sl.servicedownid '.
 				' WHERE (i.hostid is null or i.hostid not in ('.$denyed_hosts.')) '.
-				' AND '.DBin_node('s.serviceid').
-				' AND s.serviceid NOT IN ('.$childs_str.$service['serviceid'].') '.
+					' AND '.DBin_node('s.serviceid').
+					' AND s.serviceid NOT IN ('.$childs_str.$service['serviceid'].') '.
 				' ORDER BY s.sortorder,s.name';
 		
 	} else {
@@ -296,7 +297,7 @@ if(isset($_REQUEST['cservices'])){
 					' LEFT JOIN items i on f.itemid=i.itemid '.
 					' LEFT JOIN services_links sl on s.serviceid=sl.servicedownid '.
 				' WHERE (i.hostid is null or i.hostid not in ('.$denyed_hosts.')) '.
-				' AND '.DBin_node('s.serviceid').
+					' AND '.DBin_node('s.serviceid').
 				' ORDER BY s.sortorder,s.name';
 	}
 	

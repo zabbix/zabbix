@@ -356,7 +356,7 @@ COpt::counter_up('perm');
 					$do_break = true;
 
 					if(is_array($nodeid) && !in_array($node_data['nodeid'],$nodeid))	continue;
-					else if(isset($nodeid) and $node_data['nodeid'] != $nodeid)		continue;
+					else if(isset($nodeid) and (bccomp($node_data['nodeid'] ,$nodeid) != 0))		continue;
 				}
 				else
 				{
@@ -373,7 +373,7 @@ COpt::counter_up('perm');
 					$node_data['permission'] = PERM_READ_WRITE;
 				else
 					$node_data['permission'] = 
-						($node_data['nodeid'] == $ZBX_LOCALNODEID) ? PERM_READ_WRITE : PERM_DENY;
+						(bccomp($node_data['nodeid'] ,$ZBX_LOCALNODEID)==0) ? PERM_READ_WRITE : PERM_DENY;
 			}
 
 			/* special processing for PERM_READ_LIST*/
@@ -621,7 +621,7 @@ COpt::counter_up('perm');
 					$do_break = true;
 
 					if(is_array($nodeid) && !in_array($node_data['nodeid'],$nodeid))	continue;
-					else if(isset($nodeid) and $node_data['nodeid'] != $nodeid)		continue;
+					else if(isset($nodeid) and (bccomp($node_data['nodeid'] ,$nodeid) != 0))		continue;
 				}
 				else
 				{
@@ -631,7 +631,7 @@ COpt::counter_up('perm');
 
 			if(isset($node_perm[$node_data['nodeid']]))
 				$node_data['permission'] = $node_perm[$node_data['nodeid']];
-			elseif($node_data['nodeid'] == $ZBX_LOCALNODEID || $user_type == USER_TYPE_SUPER_ADMIN)
+			elseif((bccomp($node_data['nodeid'], $ZBX_LOCALNODEID)==0) || $user_type == USER_TYPE_SUPER_ADMIN)
 			/* for local node or superuser default permission is READ_WRITE */
 					$node_data['permission'] = PERM_READ_WRITE;
 

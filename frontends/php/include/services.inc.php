@@ -22,7 +22,7 @@
 	function	add_service($name,$triggerid,$algorithm,$showsla,$goodsla,$sortorder,$service_times=array(),$parentid,$childs){
 	
 		foreach($childs as $id => $child){		//add childs
-			if($parentid == $child['serviceid']){
+			if((bccomp($parentid , $child['serviceid'])==0)){
 				error('Service can\'t be parent and child in onetime.');
 				return FALSE;
 			}
@@ -70,7 +70,7 @@
 
 	function	update_service($serviceid,$name,$triggerid,$algorithm,$showsla,$goodsla,$sortorder,$service_times=array(),$parentid,$childs){
 		foreach($childs as $id => $child){		//add childs
-			if($parentid == $child['serviceid']){
+			if((bccomp($parentid , $child['serviceid'])==0)){
 				error('Service can\'t be parent and child in onetime.');
 				return FALSE;
 			}
@@ -247,7 +247,7 @@
 		{
 			return	FALSE;
 		}
-		if($serviceid==$serviceid2)
+		if((bccomp($serviceid, $serviceid2)==0))
 		{
 			if($service["status"]>0)
 			{
@@ -293,7 +293,7 @@
 			return	false;
 		}
 
-		if($servicedownid==$serviceupid){
+		if((bccomp($servicedownid, $serviceupid)==0)){
 			error("cannot link service to itself.");
 			return	false;
 		}
@@ -314,7 +314,7 @@
 			return	false;
 		}
 
-		if($servicedownid==$serviceupid){
+		if((bccomp($servicedownid, $serviceupid)==0)){
 			error("cannot link service to itself.");
 			return	false;
 		}
@@ -745,7 +745,7 @@ $dt = 0;
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alexei Vladishev   (PHP ver. by Artem Suharev)                     *
+ * Author: Alexei Vladishev   (PHP ver. by Aly)                     *
  *                                                                            *
  * Comments: recursive function   !!! Don't forget sync code with C !!!       *
  *                                                                            *
@@ -798,7 +798,7 @@ function update_services_rec($serviceid){
  *                                                                            *
  * Return value:                                                              *
  *                                                                            *
- * Author: Alexei Vladishev   (PHP ver. by Artem Suharev)                     *
+ * Author: Alexei Vladishev   (PHP ver. by Aly)                     *
  *                                                                            *
  * Comments: !!! Don't forget sync code with C !!!                            *
  *                                                                            *
@@ -823,7 +823,7 @@ function update_services($triggerid, $status){
  *     Cleaning parent nodes from triggers, updating ALL services status.
  *     
  * Author: 
- *     Artem Suharev
+ *     Aly
  *
  * Comments: !!! Don't forget sync code with C !!!
  *

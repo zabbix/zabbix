@@ -64,7 +64,7 @@
 				$result = DBexecute('insert into users_groups (id,usrgrpid,userid)'.
 					'values('.$users_groups_id.','.$groupid.','.$userid.')');
 
-				if($result == false) break;
+				if(!$result) break;
 			}
 			if($result)
 			{
@@ -77,7 +77,7 @@
 						zbx_dbstr($media_data['sendto']).','.$media_data['active'].','.$media_data['severity'].','.
 						zbx_dbstr($media_data['period']).')');
 
-					if($result == false) break;
+					if(!$result) break;
 				}
 			}
 		}
@@ -110,7 +110,7 @@
 				$result = DBexecute('insert into users_groups (id,usrgrpid,userid)'.
 					'values('.$users_groups_id.','.$groupid.','.$userid.')');
 
-				if($result == false) break;
+				if(!$result) break;
 			}
 			if($result)
 			{
@@ -123,7 +123,7 @@
 						zbx_dbstr($media_data['sendto']).','.$media_data['active'].','.$media_data['severity'].','.
 						zbx_dbstr($media_data['period']).')');
 
-					if($result == false) break;
+					if(!$result) break;
 				}
 			}
 		}
@@ -137,7 +137,7 @@
 	{
 		global $USER_DETAILS;
 
-		if($userid!=$USER_DETAILS["userid"])
+		if((bccomp($userid,$USER_DETAILS["userid"]) != 0))
 		{
 			access_deny();
 		}

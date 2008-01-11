@@ -202,7 +202,7 @@ include_once "include/page_header.php";
 
 	if(isset($only_hostid))
 	{
-		if(!isset($_REQUEST["hostid"]) || $_REQUEST["hostid"]!=$only_hostid) access_deny();
+		if(!isset($_REQUEST["hostid"]) || (bccomp($_REQUEST["hostid"], $only_hostid) != 0)) access_deny();
 		$hostid = $only_hostid;
 	}
 	else
@@ -217,7 +217,7 @@ include_once "include/page_header.php";
 				while($node_data = DBfetch($db_nodes))
 				{
 					$cmbNode->AddItem($node_data['nodeid'], $node_data['name']);
-					if($nodeid == $node_data['nodeid']) $ok = true;
+					if((bccomp($nodeid , $node_data['nodeid']) == 0)) $ok = true;
 				}
 				$frmTitle->AddItem(array(SPACE,S_NODE,SPACE,$cmbNode));
 			}
@@ -241,7 +241,7 @@ include_once "include/page_header.php";
 			while($group = DBfetch($db_groups))
 			{
 				$cmbGroups->AddItem($group["groupid"],$group["name"]);
-				if($groupid == $group["groupid"]) $ok = true;
+				if((bccomp($groupid , $group["groupid"]) == 0)) $ok = true;
 			}
 			$frmTitle->AddItem(array(S_GROUP,SPACE,$cmbGroups));
 			update_profile("web.popup.groupid",$groupid);
@@ -283,7 +283,7 @@ include_once "include/page_header.php";
 			while($host = DBfetch($db_hosts))
 			{
 				$cmbHosts->AddItem($host["hostid"],$host["host"]);
-				if($hostid == $host["hostid"]) $ok = true;
+				if(bccomp($hostid , $host["hostid"]) == 0) $ok = true;
 			}
 			$frmTitle->AddItem(array(SPACE,S_HOST,SPACE,$cmbHosts));
 			update_profile("web.popup.hostid",$hostid);

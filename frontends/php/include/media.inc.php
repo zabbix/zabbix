@@ -120,7 +120,7 @@
 	{
 		$ret = 0;
 
-		$sql="select * from media_type where description=".zbx_dbstr($description)." and mediatypeid!=$mediatypeid";
+		$sql="select * from media_type where description=".zbx_dbstr($description)." and mediatypeid<>$mediatypeid";
 		$result=DBexecute($sql);
 		if(DBfetch($result))
 		{

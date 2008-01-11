@@ -608,7 +608,7 @@ include_once "include/page_header.php";
 			while($row=DBfetch($result))
 			{
 				$cmbGroups->AddItem($row["groupid"],$row["name"]);
-				if($row["groupid"] == $_REQUEST["groupid"]) $correct_host = 1;
+				if((bccomp($row["groupid"], $_REQUEST["groupid"]) == 0)) $correct_host = 1;
 			}
 			if(!isset($correct_host))
 			{

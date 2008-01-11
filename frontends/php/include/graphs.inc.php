@@ -414,7 +414,7 @@
 				$new_hostid = $db_item['hostid'];
 			}
 
-			if ( $host['hostid'] != $new_hostid )
+			if ( (bccomp($host['hostid'] ,$new_hostid ) != 0))
 			{
 				error('You must use items only from host "'.$host['host'].'" for template graph "'.$name.'"');
 				return $result;

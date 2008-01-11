@@ -682,7 +682,7 @@
 		if(isset($userid))
 		{
 			global $USER_DETAILS;
-/*			if($userid == $USER_DETAILS['userid']) $profile = 1;*/
+/*			if(bccomp($userid,$USER_DETAILS['userid'])==0) $profile = 1;*/
 
 			$user=get_user_by_userid($userid);
 			$frm_title = S_USER." \"".$user["alias"]."\"";
@@ -800,7 +800,7 @@
 
 			$frmUser->AddVar('user_groups',$user_groups);
 
-			if(isset($userid) && ($USER_DETAILS['userid'] == $userid))
+			if(isset($userid) && (bccomp($USER_DETAILS['userid'], $userid)==0))
 			{
 				$frmUser->AddVar('user_type',$user_type);
 			}

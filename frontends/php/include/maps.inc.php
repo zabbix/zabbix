@@ -250,7 +250,7 @@
 	{
 		if($elementtype!=SYSMAP_ELEMENT_TYPE_MAP)	return FALSE;
 
-		if($sysmapid == $elementid)	return TRUE;
+		if(bccomp($sysmapid ,$elementid)==0)	return TRUE;
 
 		$db_elements = DBselect("select elementid, elementtype from sysmaps_elements".
 			" where sysmapid=$elementid");
