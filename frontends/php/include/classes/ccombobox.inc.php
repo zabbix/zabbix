@@ -85,11 +85,9 @@
 		function AddItem($value, $caption='', $selected=NULL, $enabled='yes')
 		{
 //			if($enabled=='no') return;	/* disable item method 1 */
-
-			if(is_null($selected))
-			{
+			if(is_null($selected)){
 				$selected = 'no';
-				if($value == $this->value || (is_array($this->value) && in_array($value, $this->value)))
+				if((strcmp($value,$this->value) == 0) || (is_array($this->value) && in_array($value, $this->value)))
 					$selected = 'yes';
 			}
 
@@ -185,7 +183,7 @@
 		{
 			if(is_null($selected))
 			{
-				if($value == $this->value || (is_array($this->value) && in_array($value, $this->value)))
+				if((strcmp($value,$this->value) == 0) || (is_array($this->value) && in_array($value, $this->value)))
 					$this->value_exist = 1;
 			}
 

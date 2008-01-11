@@ -115,7 +115,7 @@ include_once "include/page_header.php";
 
 			}
 			
-			if($row["status"]==0 || (isset($service) && $service["serviceid"] == $row["serviceid"])){
+			if($row["status"]==0 || (isset($service) && (bccomp($service["serviceid"] , $row["serviceid"]) == 0))){
 				$row['reason']="-";
 			} else {
 				$row['reason'] = new CList(null,"itservices");

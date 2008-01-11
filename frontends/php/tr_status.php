@@ -219,7 +219,7 @@ include_once "include/page_header.php";
 	$result=DBselect($sql);
 	$flag = false;
 	while($row=DBfetch($result)){
-		$flag |= $_REQUEST['hostid'] == $row['hostid'];
+		$flag |= (bccomp($_REQUEST['hostid'] , $row['hostid']) == 0);
 		$cmbHosts->AddItem(
 				$row['hostid'],
 				get_node_name_by_elid($row['hostid']).$row['host']
@@ -485,7 +485,7 @@ include_once "include/page_header.php";
 			$host_nodeid = id2nodeid($row['hostid']);
 			foreach($scripts_by_hosts[$row['hostid']] as $id => $script){
 				$script_nodeid = id2nodeid($script['scriptid']);
-				if( $host_nodeid == $script_nodeid )
+				if( (bccomp($host_nodeid ,$script_nodeid ) == 0))
 					$menus.= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$row['hostid']."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 			}
 

@@ -325,7 +325,7 @@ include_once "include/page_header.php";
 	{
 		foreach($_REQUEST['steps'] as $s2id => $s2)
 		{
-			if($s1['name'] == $s2['name'] && $s1id != $s2id)
+			if((strcmp($s1['name'],$s2['name'])==0) && $s1id != $s2id)
 			{
 				$_REQUEST['steps'][$s1id] = $_REQUEST['steps'][$s2id];
 				unset($_REQUEST['steps'][$s2id]);
@@ -399,7 +399,7 @@ include_once "include/page_header.php";
 			$cmbHosts->AddItem($row["hostid"],$row["host"]);
 
 			if($_REQUEST["hostid"]!=0){
-				if($_REQUEST["hostid"]==$row["hostid"])
+				if((bccomp($_REQUEST["hostid"], $row["hostid"])==0))
 					$correct_hostid = 'ok';
 			}
 			if($first_hostid <= 0)

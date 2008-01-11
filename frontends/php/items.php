@@ -706,7 +706,7 @@ include_once "include/page_header.php";
 				$cmbHosts->AddItem($row["hostid"],$row["host"]);
 
 				if($_REQUEST["hostid"]!=0){
-					if($_REQUEST["hostid"]==$row["hostid"])
+					if(bccomp($_REQUEST["hostid"], $row["hostid"]) == 0)
 						$correct_hostid = 'ok';
 				}
 				if($first_hostid <= 0)
