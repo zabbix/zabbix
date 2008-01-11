@@ -162,7 +162,7 @@
 	}
 
 	function check_screen_recursion($mother_screenid, $child_screenid){
-			if($mother_screenid == $child_screenid)	return TRUE;
+			if((bccomp($mother_screenid , $child_screenid)==0))	return TRUE;
 
 			$db_scr_items = DBselect("select resourceid from screens_items where".
 				" screenid=$child_screenid and resourcetype=".SCREEN_RESOURCE_SCREEN);
@@ -321,7 +321,7 @@
 					$item = get_screen_item_form();
 				}
 				elseif($editmode == 1 && isset($_REQUEST["form"]) &&
-					isset($_REQUEST["screenitemid"]) && $_REQUEST["screenitemid"]==$screenitemid)
+					isset($_REQUEST["screenitemid"]) && (bccomp($_REQUEST["screenitemid"], $screenitemid)==0))
 				{ // click on element
 					$item = get_screen_item_form();
 				}

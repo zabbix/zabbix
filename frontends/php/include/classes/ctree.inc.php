@@ -220,7 +220,7 @@ function GetImg($id,$img){
 	$childs = $this->tree[$this->tree[$id]['parentid']]['childnodes'];
 	$childs_last = count($this->tree[$this->tree[$id]['parentid']]['childnodes'])-1;
 	
-	if(isset($childs[$childs_last]) && ($childs[$childs_last] != $id)){
+	if(isset($childs[$childs_last]) && (strcmp($childs[$childs_last],$id) != 0)){
 		$ch='T';
 	}
 	$img.=$ch;

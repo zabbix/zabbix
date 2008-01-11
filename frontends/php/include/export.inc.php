@@ -353,7 +353,7 @@
 					' where f.itemid=i.itemid group by f.triggerid, i.hostid');
 				while($trigger = DBfetch($db_triggers))
 				{
-					if($trigger['hostid'] != $hostid || $trigger['cnt']!=1) continue;
+					if((bccomp($trigger['hostid'] , $hostid) != 0) || $trigger['cnt']!=1) continue;
 					$this->export_trigger($memory, $trigger['triggerid']);
 				}
 				zbx_xmlwriter_end_element($memory); // XML_TAG_TRIGGERS
@@ -366,7 +366,7 @@
 					' where gi.itemid=i.itemid group by gi.graphid, i.hostid');
 				while($graph = DBfetch($db_graphs))
 				{
-					if($graph['hostid'] != $hostid || $graph['cnt']!=1) continue;
+					if((bccomp($graph['hostid'] , $hostid) != 0) || $graph['cnt']!=1) continue;
 					$this->export_graph($memory, $graph['graphid']);
 				}
 				zbx_xmlwriter_end_element($memory); // XML_TAG_GRAPHS

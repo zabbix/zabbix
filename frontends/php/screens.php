@@ -123,7 +123,7 @@ include_once "include/page_header.php";
 					$row['elementid'],
 					get_node_name_by_elid($row['elementid']).$row["name"]
 					);
-			if($elementid == $row["elementid"]) $element_correct = 1;
+			if((bccomp($elementid , $row["elementid"]) == 0)) $element_correct = 1;
 			if(!isset($first_element)) $first_element = $row["elementid"];
 		}
 	}
@@ -141,7 +141,7 @@ include_once "include/page_header.php";
 					$row['elementid'],
 					get_node_name_by_elid($row['elementid']).$row['name']
 					);
-			if($elementid == $row["elementid"]) $element_correct = 1;
+			if((bccomp($elementid , $row["elementid"]) == 0)) $element_correct = 1;
 			if(!isset($first_element)) $first_element = $row["elementid"];
 		}
 	}
