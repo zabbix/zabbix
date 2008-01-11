@@ -235,7 +235,7 @@ include_once "include/page_header.php";
 					$db_els = DBselect($sql);
 					while($el = DBfetch($db_els))
 					{
-						if($el['cnt'] != 1 || $el['hostid'] != $host['hostid']) continue;
+						if($el['cnt'] != 1 || (bccomp($el['hostid'] , $host['hostid']) != 0)) continue;
 						$el_table->AddRow(array($el_type, $el['info']));
 					}
 				}
@@ -281,7 +281,7 @@ include_once "include/page_header.php";
 			while($row=DBfetch($result))
 			{
 				$cmbGroups->AddItem($row["groupid"],$row["name"]);
-				if($row["groupid"] == $_REQUEST["groupid"]) $correct_host = 1;
+				if((bccomp($row["groupid"] , $_REQUEST["groupid"])==0)) $correct_host = 1;
 			}
 			if(!isset($correct_host))
 			{
@@ -376,7 +376,7 @@ include_once "include/page_header.php";
 				$trigger_cnt = 0;
 				$db_triggers = DBselect('select f.triggerid, i.hostid, count(distinct i.hostid) as cnt from functions f, items i '.
 					' where f.itemid=i.itemid group by f.triggerid, i.hostid');
-				while($db_tr = DBfetch($db_triggers)) if($db_tr['cnt'] == 1 && $db_tr['hostid'] == $row['hostid']) $trigger_cnt++;
+				while($db_tr = DBfetch($db_triggers)) if($db_tr['cnt'] == 1 && (bccomp($db_tr['hostid'] , $row['hostid'])==0)) $trigger_cnt++;
 				if($trigger_cnt > 0)
 				{
 					$trigger_cnt = array(new CCheckBox('triggers['.$row['hostid'].']',
@@ -394,7 +394,7 @@ include_once "include/page_header.php";
 				$db_graphs = DBselect('select gi.graphid, i.hostid, count(distinct i.hostid) as cnt'.
 					' from graphs_items gi, items i '.
 					' where gi.itemid=i.itemid group by gi.graphid, i.hostid');
-				while($db_tr = DBfetch($db_graphs)) if($db_tr['cnt'] == 1 && $db_tr['hostid'] == $row['hostid']) $graph_cnt++;
+				while($db_tr = DBfetch($db_graphs)) if($db_tr['cnt'] == 1 && (bccomp($db_tr['hostid'] , $row['hostid'])==0)) $graph_cnt++;
 				if($graph_cnt > 0)
 				{
 					$graph_cnt = array(new CCheckBox('graphs['.$row['hostid'].']',

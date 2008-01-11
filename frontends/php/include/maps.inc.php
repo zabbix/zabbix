@@ -295,7 +295,7 @@
 	function check_circle_elements_link($sysmapid,$elementid,$elementtype){
 		if($elementtype!=SYSMAP_ELEMENT_TYPE_MAP)	return FALSE;
 
-		if($sysmapid == $elementid)	return TRUE;
+		if(bccomp($sysmapid ,$elementid)==0)	return TRUE;
 
 		$db_elements = DBselect("select elementid, elementtype from sysmaps_elements".
 			" where sysmapid=$elementid");
@@ -678,7 +678,7 @@
 				$host_nodeid = id2nodeid($db_element["elementid"]);
 				foreach($scripts_by_hosts[$db_element["elementid"]] as $id => $script){
 					$script_nodeid = id2nodeid($script['scriptid']);
-					if( $host_nodeid == $script_nodeid )
+					if( (bccomp($host_nodeid ,$script_nodeid ) == 0))
 						$menus.= "['".$script['name']."',\"javascript: openWinCentered('scripts_exec.php?execute=1&hostid=".$db_element["elementid"]."&scriptid=".$script['scriptid']."','".S_TOOLS."',760,540,'titlebar=no, resizable=yes, scrollbars=yes, dialog=no');\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";
 				}
 				$menus.= "['".S_STATUS_OF_TRIGGERS."',\"javascript: Redirect('".$url."')\", null,{'outer' : ['pum_o_item'],'inner' : ['pum_i_item']}],";

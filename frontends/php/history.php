@@ -88,7 +88,7 @@ include_once "include/page_header.php";
 		if(isset($_REQUEST["remove_log"]) && isset($_REQUEST["cmbloglist"]))
 		{
 			foreach($_REQUEST["itemid"] as $id => $itemid)
-				if($itemid == $_REQUEST["cmbloglist"])
+				if((bccomp($itemid , $_REQUEST["cmbloglist"])==0))
 					unset($_REQUEST["itemid"][$id]);
 		}
 
