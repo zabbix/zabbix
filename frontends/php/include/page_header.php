@@ -402,14 +402,15 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$printview = new CLink(S_PRINT, $_SERVER['REQUEST_URI'].(empty($_GET)?'?':'&').'print=1', 'small_font');
 		
 		$page_header_r_col = array($help,'|', $support,'|',$printview);
-		if($USER_DETAILS["alias"] != ZBX_GUEST_USER){
+
+		if($USER_DETAILS["alias"]!=ZBX_GUEST_USER){
 			$page_header_r_col[] = array("|", 
 						new CLink(S_PROFILE, "profile.php", "small_font"),"|", 
 						new CLink(S_LOGOUT, "index.php?reconnect=1", "small_font"));
 		} else {
-			$page_header_r_col[] = array("|", new CLink(S_LOGIN, "index.php", "small_font"));
+			$page_header_r_col[] = array("|", new CLink(S_LOGIN, "index.php?reconnect=1", "small_font"));
 		}
-		
+
 		$logo = new CLink(new CImg("images/general/zabbix.png","ZABBIX"),"http://www.zabbix.com");
 		$logo->SetTarget('_blank');
 

@@ -795,7 +795,11 @@
 		}
 		else
 		{
-			$frmUser->AddRow(S_PASSWORD,	new CButton("change_password", S_CHANGE_PASSWORD));
+			$passwd_but = new CButton("change_password", S_CHANGE_PASSWORD);
+			if($alias == ZBX_GUEST_USER){
+				$passwd_but->AddOption('disabled','disabled');
+			}	
+			$frmUser->AddRow(S_PASSWORD, $passwd_but);
 		}
 
 		if($profile==0)
@@ -890,11 +894,17 @@
 		$frmUser->AddRow(S_URL_AFTER_LOGIN,	new CTextBox("url",$url,50));
 		$frmUser->AddRow(S_SCREEN_REFRESH,	new CNumericBox("refresh",$refresh,4));
 
-		$cmbStat = new CComboBox('status',$status);
-		$cmbStat->AddItem(USER_STATUS_ENABLED,S_ENABLED);
-		$cmbStat->AddItem(USER_STATUS_DISABLED,S_DISABLED);
-
-		$frmUser->AddRow(S_STATUS, $cmbStat);
+		if((bccomp($USER_DETAILS['userid'],$userid) == 0)){
+			$frmUser->AddVar('status',USER_STATUS_ENABLED);
+			$frmUser->AddRow(S_STATUS, new CSpan(S_ENABLED,'green'));
+		}
+		else{
+			$cmbStat = new CComboBox('status',$status);		
+			$cmbStat->AddItem(USER_STATUS_ENABLED,S_ENABLED);
+			$cmbStat->AddItem(USER_STATUS_DISABLED,S_DISABLED);
+			
+			$frmUser->AddRow(S_STATUS, $cmbStat);
+		}
 		
 		if($profile==0)
 		{
