@@ -1,7 +1,6 @@
 Changes for 1.4.j:
 
  - added support of encoding parameter for regexp[] and iregexp[]. Integrated patch (Sasha)
- - speed improvement for Triggers when use "{ITEM.VALUE}" macro (Sasha)
  - improved support of macros {ITEM.VALUE} (Sasha)
  - do not generate unknown events (Alexei)
  - bulk acknowledge with empty comment (Sasha)
@@ -37,7 +36,11 @@ Changes for 1.4.j:
  - increased size of triggers.expression to 1023 (Alexei)
 
 Changes for 1.4.5:
- - [ZBX-243] speed improvement for windows agent for eventlog[] processing (sasha)
+
+ - [ZBX-263] fixed problem with saving of lastlogsize for log[] and eventlog[] items when history is set to 0 (Sasha)
+ - [ZBX-250] speed improvement for Triggers when use "{ITEM.VALUE}" macro (Sasha)
+ - [ZBX-250] 100% CPU on server side after connection loss (Sasha)
+ - [ZBX-243] speed improvement for windows agent for eventlog[] processing (Sasha)
  - [DEV-92] added supprt of multiple windows agents, service description (Sasha)
 
 Changes for 1.4.4:
