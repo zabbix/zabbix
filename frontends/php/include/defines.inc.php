@@ -81,6 +81,8 @@
 	define('AUDIT_ACTION_DELETE',		2);
 	define('AUDIT_ACTION_LOGIN',		3);
 	define('AUDIT_ACTION_LOGOUT',		4);
+	define('AUDIT_ACTION_ENABLE',		5);
+	define('AUDIT_ACTION_DISABLE',		6);
 
 	define('AUDIT_RESOURCE_USER',		0);
 //	define('AUDIT_RESOURCE_ZABBIX',		1);
@@ -335,6 +337,9 @@
 	define('USER_TYPE_ZABBIX_USER',		1);
 	define('USER_TYPE_ZABBIX_ADMIN',	2);
 	define('USER_TYPE_SUPER_ADMIN',		3);
+
+	define('USER_STATUS_DISABLED', 1);	
+	define('USER_STATUS_ENABLED', 0);
 
 	define('PERM_MAX',		3);
 	define('PERM_READ_WRITE',	3);

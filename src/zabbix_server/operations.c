@@ -128,12 +128,19 @@ void	op_notify_user(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation)
 
 	if(operation->object == OPERATION_OBJECT_USER)
 	{
-		send_to_user_medias(event, operation, operation->objectid);
+		result = DBselect("SELECT count(u.userid) as user_cnt FROM users u WHERE u.userid= " ZBX_FS_UI64 " and status=%d",
+			operation->objectid, USER_STATUS_ACTIVE);
+		row = DBfetch(result);
+		if(row && DBis_null(row[0])!=SUCCEED)
+		{
+			send_to_user_medias(event, operation, operation->objectid);
+		}
+		DBfree_result(result);
 	}
 	else if(operation->object == OPERATION_OBJECT_GROUP)
 	{
-		result = DBselect("select u.userid from users u, users_groups ug where ug.usrgrpid=" ZBX_FS_UI64 " and ug.userid=u.userid",
-			operation->objectid);
+		result = DBselect("select u.userid from users u, users_groups ug where ug.usrgrpid=" ZBX_FS_UI64 " and ug.userid=u.userid and u.status=%d",
+			operation->objectid,USER_STATUS_ACTIVE);
 		while((row=DBfetch(result)))
 		{
 			ZBX_STR2UINT64(userid, row[0]);
