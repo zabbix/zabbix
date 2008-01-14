@@ -50,10 +50,12 @@
 
 		$userid = get_dbid("users","userid");
 
-		$result =  DBexecute('insert into users (userid,name,surname,alias,passwd,url,autologout,lang,refresh,type,status)'.
+		$result =  DBexecute('insert into users (userid,name,surname,alias,passwd,url,autologout,lang,refresh,type)'.
 			' values ('.$userid.','.zbx_dbstr($name).','.zbx_dbstr($surname).','.zbx_dbstr($alias).','.
-			zbx_dbstr(md5($passwd)).','.zbx_dbstr($url).','.$autologout.','.zbx_dbstr($lang).','.$refresh.','.$user_type.','.$status.')');
-
+			zbx_dbstr(md5($passwd)).','.zbx_dbstr($url).','.$autologout.','.zbx_dbstr($lang).','.$refresh.','.$user_type.')');
+		
+		$result &= change_user_status($userid,$status);
+		
 		if($result)
 		{
 			DBexecute('delete from users_groups where userid='.$userid);
@@ -98,8 +100,10 @@
 		$result = DBexecute("update users set name=".zbx_dbstr($name).",surname=".zbx_dbstr($surname).","."alias=".zbx_dbstr($alias).
 				(isset($passwd) ? (',passwd='.zbx_dbstr(md5($passwd))) : '').
 				",url=".zbx_dbstr($url).","."autologout=$autologout,lang=".zbx_dbstr($lang).",refresh=$refresh,".
-				"type=$user_type,status=$status".
+				"type=$user_type".
 			" where userid=$userid");
+			
+		$result &= change_user_status($userid,$status);
 
 		if($result)
 		{
@@ -150,15 +154,12 @@
 
 	# Delete User definition
 
-	function	delete_user($userid)
-	{
-
-		if(DBfetch(DBselect('select * from users where userid='.$userid.' and alias='.zbx_dbstr(ZBX_GUEST_USER))))
-		{
-			error("Cannot delete user '".ZBX_GUEST_USER."'");
+	function	delete_user($userid){
+		if(DBfetch(DBselect('select * from users where userid='.$userid.' and alias='.zbx_dbstr(ZBX_GUEST_USER)))){
+			error(S_CANNOT_DELETE_USER.SPACE."'".ZBX_GUEST_USER."'");
 			return	false;
 		}
-
+		
 		DBexecute('delete from operations where object='.OPERATION_OBJECT_USER.' and objectid='.$userid);
 
 		$result = DBexecute('delete from media where userid='.$userid);
@@ -187,12 +188,10 @@
 	function change_user_status($userid,$status){
 		global $USER_DETAILS;
 		$res = false;
-		if(bccomp($USER_DETAILS['userid'],$userid) != 0){
-			if(DBfetch(DBselect('select * from users where userid='.$userid.' and alias='.zbx_dbstr(ZBX_GUEST_USER)))){
-				error("Cannot disable user '".ZBX_GUEST_USER."'");
-				return $res;
-			}
-			
+		if((bccomp($USER_DETAILS['userid'],$userid) == 0) && ($status==USER_STATUS_DISABLED)){
+			show_error_message(S_USER_CANNOT_DISABLE_ITSELF);
+		}
+		else{
 			$res = DBexecute('UPDATE users SET status='.$status.' WHERE userid='.zbx_dbstr($userid));
 		}
 	return $res;

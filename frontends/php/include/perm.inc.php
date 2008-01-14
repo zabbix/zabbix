@@ -71,8 +71,10 @@
 		}
 		
 		if(!$USER_DETAILS){
-			if(!($USER_DETAILS = DBfetch(DBselect("select u.* from users u where u.alias=".zbx_dbstr(ZBX_GUEST_USER).
-				" and ".DBin_node('u.userid', $ZBX_LOCALNODEID)))))
+			if(!($USER_DETAILS = DBfetch(DBselect('SELECT u.* FROM users u '.
+							' WHERE u.alias='.zbx_dbstr(ZBX_GUEST_USER).
+								' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID).
+								' AND status='.USER_STATUS_ENABLED))))
 			{
 				$missed_user_guest = true;
 			}
@@ -100,9 +102,14 @@
 		if(isset($incorrect_session) || isset($missed_user_guest))
 		{
 			if(isset($incorrect_session))		$message = "Session was ended, please relogin!";
-			else if(isset($missed_user_guest))	$message = "Database corrupted, missed default user 'guest'";
+			else if(isset($missed_user_guest)){
+				$row = DBfetch(DBselect('SELECT count(u.userid) as user_cnt FROM users u'));
+				if(!$row || $row['user_cnt'] == 0){
+					$message = "Table users is empty. Possible database corruption.";
+				}
+			}
 			
-			if(!isset($_REQUEST['message'])) $_REQUEST['message'] = $message;
+			if(!isset($_REQUEST['message']) && isset($message)) $_REQUEST['message'] = $message;
 			
 			include('index.php');
 			exit;

@@ -492,8 +492,9 @@
 
 //	Footer
 	'S_ZABBIX_VER'=>			'ZABBIX 1.5',
-	'S_COPYRIGHT_BY'=>			'Copyright 2001-2007 by ',
+	'S_COPYRIGHT_BY'=>			'Copyright 2001-2008 by ',
 	'S_CONNECTED_AS'=>			'Connected as',
+	'S_NOT_CONNECTED'=>			'Not connected',
 	'S_SIA_ZABBIX'=>			'SIA Zabbix',
 
 //	graph.php
@@ -1268,6 +1269,7 @@
 	'S_CANNOT_ADD_USER_BOTH_PASSWORDS_MUST'=>'Cannot add user. Both passwords must be equal.',
 	'S_USER_DELETED'=>			'User deleted',
 	'S_CANNOT_DELETE_USER'=>		'Cannot delete user',
+	'S_FOR_GUEST_PASSWORD_MUST_BE_EMPTY'=>	'For guest, password must be empty',
 	'S_PERMISSION_DELETED'=>		'Permission deleted',
 	'S_CANNOT_DELETE_PERMISSION'=>		'Cannot delete permission',
 	'S_PERMISSION_ADDED'=>			'Permission added',
@@ -1282,6 +1284,7 @@
 	'S_CANNOT_UPDATE_GROUP'=>		'Cannot update group',
 	'S_GROUP_DELETED'=>			'Group deleted',
 	'S_CANNOT_DELETE_GROUP'=>		'Cannot delete group',
+	'S_USER_CANNOT_DISABLE_ITSELF'=>	'User cannot disable itself',
 	'S_CONFIGURATION_OF_USERS_AND_USER_GROUPS'=>'CONFIGURATION OF USERS AND USER GROUPS',
 	'S_USER_GROUPS_BIG'=>			'USER GROUPS',
 	'S_USERS_BIG'=>				'USERS',
