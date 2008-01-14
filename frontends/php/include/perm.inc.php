@@ -42,7 +42,6 @@
 		global	$page;
 		global	$PHP_AUTH_USER,$PHP_AUTH_PW;
 		global	$USER_DETAILS;
-		global	$_REQUEST;
 		global	$ZBX_LOCALNODEID;
 
 		$USER_DETAILS = NULL;
@@ -51,10 +50,12 @@
 
 		if( !is_null($sessionid))
 		{
-			if(!($USER_DETAILS = DBfetch(DBselect("select u.*,s.* from sessions s,users u".
-				" where s.sessionid=".zbx_dbstr($sessionid)." and s.userid=u.userid".
-				" and ((s.lastaccess+u.autologout>".time().") or (u.autologout=0))".
-				" and ".DBin_node('u.userid', $ZBX_LOCALNODEID)))))
+			if(!($USER_DETAILS = DBfetch(DBselect('SELECT u.*,s.* FROM sessions s,users u'.
+					' WHERE s.sessionid='.zbx_dbstr($sessionid).
+						' AND s.userid=u.userid'.
+						' AND ((s.lastaccess+u.autologout>'.time().') OR (u.autologout=0))'.
+						' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID).
+						' AND status='.USER_STATUS_ENABLED))))
 			{
 				zbx_unsetcookie('zbx_sessionid');
 				DBexecute("delete from sessions where sessionid=".zbx_dbstr($sessionid));

@@ -33,7 +33,7 @@
 
 	# Add User definition
 
-	function	add_user($name,$surname,$alias,$passwd,$url,$autologout,$lang,$refresh,$user_type,$user_groups,$user_medias)
+	function	add_user($name,$surname,$alias,$passwd,$url,$autologout,$lang,$refresh,$user_type,$status,$user_groups,$user_medias)
 	{
 		global $USER_DETAILS;
 
@@ -50,9 +50,9 @@
 
 		$userid = get_dbid("users","userid");
 
-		$result =  DBexecute('insert into users (userid,name,surname,alias,passwd,url,autologout,lang,refresh,type)'.
+		$result =  DBexecute('insert into users (userid,name,surname,alias,passwd,url,autologout,lang,refresh,type,status)'.
 			' values ('.$userid.','.zbx_dbstr($name).','.zbx_dbstr($surname).','.zbx_dbstr($alias).','.
-			zbx_dbstr(md5($passwd)).','.zbx_dbstr($url).','.$autologout.','.zbx_dbstr($lang).','.$refresh.','.$user_type.')');
+			zbx_dbstr(md5($passwd)).','.zbx_dbstr($url).','.$autologout.','.zbx_dbstr($lang).','.$refresh.','.$user_type.','.$status.')');
 
 		if($result)
 		{
@@ -86,7 +86,7 @@
 
 	# Update User definition
 
-	function	update_user($userid,$name,$surname,$alias,$passwd, $url,$autologout,$lang,$refresh,$user_type,$user_groups,$user_medias)
+	function	update_user($userid,$name,$surname,$alias,$passwd, $url,$autologout,$lang,$refresh,$user_type,$status,$user_groups,$user_medias)
 	{
 		if(DBfetch(DBselect("select * from users where alias=".zbx_dbstr($alias).
 			" and userid<>$userid and ".DBin_node('userid', get_current_nodeid(false)))))
@@ -96,9 +96,10 @@
 		}
 
 		$result = DBexecute("update users set name=".zbx_dbstr($name).",surname=".zbx_dbstr($surname).","."alias=".zbx_dbstr($alias).
-			(isset($passwd) ? (',passwd='.zbx_dbstr(md5($passwd))) : '').
-			",url=".zbx_dbstr($url).","."autologout=$autologout,lang=".zbx_dbstr($lang).",refresh=$refresh,".
-			"type=$user_type where userid=$userid");
+				(isset($passwd) ? (',passwd='.zbx_dbstr(md5($passwd))) : '').
+				",url=".zbx_dbstr($url).","."autologout=$autologout,lang=".zbx_dbstr($lang).",refresh=$refresh,".
+				"type=$user_type,status=$status".
+			" where userid=$userid");
 
 		if($result)
 		{
@@ -175,16 +176,28 @@
 	}
 
 
-	function	get_user_by_userid($userid)
-	{
-		if($row = DBfetch(DBselect("select * from users where userid=$userid")))
-		{
+	function	get_user_by_userid($userid){
+		if($row = DBfetch(DBselect('select * from users where userid='.zbx_dbstr($userid)))){
 			return	$row;
 		}
 		/* error("No user with id [$userid]"); */
 		return	false;
 	}
 	
+	function change_user_status($userid,$status){
+		global $USER_DETAILS;
+		$res = false;
+		if(bccomp($USER_DETAILS['userid'],$userid) != 0){
+			if(DBfetch(DBselect('select * from users where userid='.$userid.' and alias='.zbx_dbstr(ZBX_GUEST_USER)))){
+				error("Cannot disable user '".ZBX_GUEST_USER."'");
+				return $res;
+			}
+			
+			$res = DBexecute('UPDATE users SET status='.$status.' WHERE userid='.zbx_dbstr($userid));
+		}
+	return $res;
+	}
+		
 
 /**************************
 	USER GROUPS
