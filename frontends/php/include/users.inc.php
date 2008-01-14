@@ -155,9 +155,14 @@
 	# Delete User definition
 
 	function	delete_user($userid){
+		global $USER_DETAILS;
 		if(DBfetch(DBselect('select * from users where userid='.$userid.' and alias='.zbx_dbstr(ZBX_GUEST_USER)))){
 			error(S_CANNOT_DELETE_USER.SPACE."'".ZBX_GUEST_USER."'");
 			return	false;
+		}
+		if(bccomp($USER_DETAILS['userid'],$userid) == 0){
+			error(S_USER_CANNOT_DELETE_ITSELF);
+			return false;
 		}
 		
 		DBexecute('delete from operations where object='.OPERATION_OBJECT_USER.' and objectid='.$userid);
@@ -189,7 +194,7 @@
 		global $USER_DETAILS;
 		$res = false;
 		if((bccomp($USER_DETAILS['userid'],$userid) == 0) && ($status==USER_STATUS_DISABLED)){
-			show_error_message(S_USER_CANNOT_DISABLE_ITSELF);
+			error(S_USER_CANNOT_DISABLE_ITSELF);
 		}
 		else{
 			$res = DBexecute('UPDATE users SET status='.$status.' WHERE userid='.zbx_dbstr($userid));
