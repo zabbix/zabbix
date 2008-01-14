@@ -128,10 +128,10 @@ void	op_notify_user(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation)
 
 	if(operation->object == OPERATION_OBJECT_USER)
 	{
-		result = DBselect("SELECT count(u.userid) as user_cnt FROM users u WHERE u.userid= " ZBX_FS_UI64 " and status=%d",
+		result = DBselect("SELECT count(u.userid) as user_cnt FROM users u WHERE u.userid= " ZBX_FS_UI64 " and u.status=%d",
 			operation->objectid, USER_STATUS_ACTIVE);
 		row = DBfetch(result);
-		if(row && DBis_null(row[0])!=SUCCEED)
+		if(row && (DBis_null(row[0])!=SUCCEED) && (atoi(row[0])>0))
 		{
 			send_to_user_medias(event, operation, operation->objectid);
 		}
