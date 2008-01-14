@@ -960,8 +960,12 @@
 		if(isset($userid) && $profile == 0)
 		{
 			$frmUser->AddItemToBottomRow(SPACE);
-			$frmUser->AddItemToBottomRow(new CButtonDelete("Delete selected user?",
-				url_param("form").url_param("config").url_param("userid")));
+			$delete_b = new CButtonDelete("Delete selected user?",url_param("form").url_param("config").url_param("userid"));
+			if($USER_DETAILS['userid'] == $userid){
+				$delete_b->AddOption('disabled','disabled');
+			}	
+
+			$frmUser->AddItemToBottomRow($delete_b);
 		}
 		$frmUser->AddItemToBottomRow(SPACE);
 		$frmUser->AddItemToBottomRow(new CButtonCancel(url_param("config")));

@@ -1285,6 +1285,7 @@
 	'S_GROUP_DELETED'=>			'Group deleted',
 	'S_CANNOT_DELETE_GROUP'=>		'Cannot delete group',
 	'S_USER_CANNOT_DISABLE_ITSELF'=>	'User cannot disable itself',
+	'S_USER_CANNOT_DELETE_ITSELF'=>		'User cannot delete itself',
 	'S_CONFIGURATION_OF_USERS_AND_USER_GROUPS'=>'CONFIGURATION OF USERS AND USER GROUPS',
 	'S_USER_GROUPS_BIG'=>			'USER GROUPS',
 	'S_USERS_BIG'=>				'USERS',
