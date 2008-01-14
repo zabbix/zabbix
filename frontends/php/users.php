@@ -63,6 +63,7 @@ include_once "include/page_header.php";
 		"autologout"=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,3600),'(isset({config})&&({config}==0))&&isset({save})'),
 		"url"=>		array(T_ZBX_STR, O_OPT,	null,	null,		'(isset({config})&&({config}==0))&&isset({save})'),
 		"refresh"=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,3600),'(isset({config})&&({config}==0))&&isset({save})'),
+		"set_status"=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'), null),
 		"status"=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),'(isset({config})&&({config}==0))&&isset({save})'),
 
 		"right"=>	array(T_ZBX_STR, O_NO,	null,	NOT_EMPTY,
@@ -157,12 +158,16 @@ include_once "include/page_header.php";
 			{
 				show_error_message(S_ONLY_FOR_GUEST_ALLOWED_EMPTY_PASSWORD);
 			}
-			elseif($_REQUEST["password1"]!=$_REQUEST["password2"]){
+			else if($_REQUEST["password1"]!=$_REQUEST["password2"]){
 				if(isset($_REQUEST["userid"]))
 					show_error_message(S_CANNOT_UPDATE_USER_BOTH_PASSWORDS);
 				else
 					show_error_message(S_CANNOT_ADD_USER_BOTH_PASSWORDS_MUST);
-			} else {
+			}
+			else if(isset($_REQUEST["password1"]) && $_REQUEST["password1"] != "" && $_REQUEST["alias"]==ZBX_GUEST_USER){
+				show_error_message(S_FOR_GUEST_PASSWORD_MUST_BE_EMPTY);
+			}
+			else {
 				if(isset($_REQUEST["userid"])){
 					$action = AUDIT_ACTION_UPDATE;
 					$result=update_user($_REQUEST["userid"],
@@ -246,16 +251,16 @@ include_once "include/page_header.php";
 				unset($_REQUEST["form"]);
 			}
 		}
-		elseif(isset($_REQUEST["status"])&&isset($_REQUEST["userid"]))
+		elseif(isset($_REQUEST["set_status"])&&isset($_REQUEST["userid"]))
 		{
 			$user=get_user_by_userid($_REQUEST["userid"]);
-			$result=change_user_status($_REQUEST["userid"],$_REQUEST['status']);
+			$result=change_user_status($_REQUEST["userid"],$_REQUEST['set_status']);
 			
-			$status_msg1 = ($_REQUEST['status'] == USER_STATUS_ENABLED)?S_ENABLED:S_DISABLED;
-			$status_msg2 = ($_REQUEST['status'] == USER_STATUS_ENABLED)?S_ENABLE:S_DISABLE;
+			$status_msg1 = ($_REQUEST['set_status'] == USER_STATUS_ENABLED)?S_ENABLED:S_DISABLED;
+			$status_msg2 = ($_REQUEST['set_status'] == USER_STATUS_ENABLED)?S_ENABLE:S_DISABLE;
 			show_messages($result, S_USER.SPACE.$status_msg1, S_CANNOT.SPACE.$status_msg2.SPACE.S_USER);
 			if($result){
-				$audit_action = ($_REQUEST['status'] == USER_STATUS_ENABLED)?AUDIT_ACTION_ENABLE:AUDIT_ACTION_DISABLE;
+				$audit_action = ($_REQUEST['set_status'] == USER_STATUS_ENABLED)?AUDIT_ACTION_ENABLE:AUDIT_ACTION_DISABLE;
 				add_audit($audit_action,AUDIT_RESOURCE_USER,
 					"User alias [".$user["alias"]."] name [".$user["name"]."] surname [".
 					$user["surname"]."]");
@@ -436,7 +441,7 @@ include_once "include/page_header.php";
 				if((bccomp($USER_DETAILS['userid'],$db_user['userid']) != 0)){
 					$status = new CLink($status,
 								'users.php?form=update'.
-								'&status='.((int)(!$db_user['status'])).
+								'&set_status='.((int)(!$db_user['status'])).
 								'&userid='.$db_user["userid"].
 								url_param("config"),
 								($db_user['status'] == USER_STATUS_ENABLED)?'enabled':'disabled');
