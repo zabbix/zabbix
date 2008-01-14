@@ -524,9 +524,6 @@ static int	add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
 		{
 			if(GET_STR_RESULT(value))
 				DBadd_history_log(0, item->itemid,value->str,now,item->timestamp,item->eventlog_source,item->eventlog_severity);
-			DBexecute("update items set lastlogsize=%d where itemid=" ZBX_FS_UI64,
-				item->lastlogsize,
-				item->itemid);
 		}
 		else if(item->value_type==ITEM_VALUE_TYPE_TEXT)
 		{
@@ -576,11 +573,20 @@ static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 			DBescape_string(value->str, value_esc, sizeof(value_esc));
 		}
 
-		DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='%s',lastclock=%d where itemid=" ZBX_FS_UI64,
-			calculate_item_nextcheck(item->itemid, item->type, item->delay, item->delay_flex, now),
-			value_esc,
-			(int)now,
-			item->itemid);
+		if (item->value_type == ITEM_VALUE_TYPE_LOG) {
+			DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='%s',lastclock=%d,lastlogsize=%d where itemid=" ZBX_FS_UI64,
+				calculate_item_nextcheck(item->itemid, item->type, item->delay, item->delay_flex, now),
+				value_esc,
+				(int)now,
+				item->lastlogsize,
+				item->itemid);
+		} else {
+			DBexecute("update items set nextcheck=%d,prevvalue=lastvalue,lastvalue='%s',lastclock=%d where itemid=" ZBX_FS_UI64,
+				calculate_item_nextcheck(item->itemid, item->type, item->delay, item->delay_flex, now),
+				value_esc,
+				(int)now,
+				item->itemid);
+		}
 	}
 	/* Logic for delta as speed of change */
 	else if(item->delta == ITEM_STORE_SPEED_PER_SECOND)
