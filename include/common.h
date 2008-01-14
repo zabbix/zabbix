@@ -347,6 +347,13 @@ typedef enum
 	TRIGGER_TYPE_MULTIPLE_TRUE
 } zbx_trigger_type_t;
 
+/* User statuses */
+typedef enum
+{
+       USER_STATUS_ACTIVE = 0,
+       USER_STATUS_DISABLED
+} zbx_user_status_type_t;
+
 /* HTTP Tests statuses */
 #define HTTPTEST_STATUS_MONITORED	0
 #define HTTPTEST_STATUS_NOT_MONITORED	1

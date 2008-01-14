@@ -652,6 +652,7 @@ FIELD		|autologout	|t_integer	|'900'	|NOT NULL	|ZBX_SYNC
 FIELD		|lang		|t_varchar(5)	|'en_gb'|NOT NULL	|ZBX_SYNC
 FIELD		|refresh	|t_integer	|'30'	|NOT NULL	|ZBX_SYNC
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|alias
 
 TABLE|usrgrp|usrgrpid|ZBX_SYNC

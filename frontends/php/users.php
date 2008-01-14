@@ -63,6 +63,7 @@ include_once "include/page_header.php";
 		"autologout"=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,3600),'(isset({config})&&({config}==0))&&isset({save})'),
 		"url"=>		array(T_ZBX_STR, O_OPT,	null,	null,		'(isset({config})&&({config}==0))&&isset({save})'),
 		"refresh"=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,3600),'(isset({config})&&({config}==0))&&isset({save})'),
+		"status"=>	array(T_ZBX_INT, O_OPT,	null,	IN('0,1'),'(isset({config})&&({config}==0))&&isset({save})'),
 
 		"right"=>	array(T_ZBX_STR, O_NO,	null,	NOT_EMPTY,
 					'(isset({register})&&({register}=="add permission"))&&isset({userid})'),
@@ -167,7 +168,7 @@ include_once "include/page_header.php";
 					$result=update_user($_REQUEST["userid"],
 						$_REQUEST["name"],$_REQUEST["surname"],$_REQUEST["alias"],
 						$_REQUEST["password1"],$_REQUEST["url"],$_REQUEST["autologout"],
-						$_REQUEST["lang"],$_REQUEST["refresh"],$_REQUEST["user_type"],
+						$_REQUEST["lang"],$_REQUEST["refresh"],$_REQUEST["user_type"],$_REQUEST['status'],
 						$user_groups, $user_medias);
 
 					show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
@@ -176,7 +177,7 @@ include_once "include/page_header.php";
 					$result=add_user(
 						$_REQUEST["name"],$_REQUEST["surname"],$_REQUEST["alias"],
 						$_REQUEST["password1"],$_REQUEST["url"],$_REQUEST["autologout"],
-						$_REQUEST["lang"],$_REQUEST["refresh"],$_REQUEST["user_type"],
+						$_REQUEST["lang"],$_REQUEST["refresh"],$_REQUEST["user_type"],$_REQUEST['status'],
 						$user_groups, $user_medias);
 
 					show_messages($result, S_USER_ADDED, S_CANNOT_ADD_USER);
@@ -244,6 +245,24 @@ include_once "include/page_header.php";
 				unset($_REQUEST["userid"]);
 				unset($_REQUEST["form"]);
 			}
+		}
+		elseif(isset($_REQUEST["status"])&&isset($_REQUEST["userid"]))
+		{
+			$user=get_user_by_userid($_REQUEST["userid"]);
+			$result=change_user_status($_REQUEST["userid"],$_REQUEST['status']);
+			
+			$status_msg1 = ($_REQUEST['status'] == USER_STATUS_ENABLED)?S_ENABLED:S_DISABLED;
+			$status_msg2 = ($_REQUEST['status'] == USER_STATUS_ENABLED)?S_ENABLE:S_DISABLE;
+			show_messages($result, S_USER.SPACE.$status_msg1, S_CANNOT.SPACE.$status_msg2.SPACE.S_USER);
+			if($result){
+				$audit_action = ($_REQUEST['status'] == USER_STATUS_ENABLED)?AUDIT_ACTION_ENABLE:AUDIT_ACTION_DISABLE;
+				add_audit($audit_action,AUDIT_RESOURCE_USER,
+					"User alias [".$user["alias"]."] name [".$user["name"]."] surname [".
+					$user["surname"]."]");
+
+				unset($_REQUEST["userid"]);
+			}
+			unset($_REQUEST['form']);
 		}
 	}
 	else /* config == 1 */
@@ -377,17 +396,19 @@ include_once "include/page_header.php";
 			show_table_header(S_USERS_BIG);
 			$table=new CTableInfo(S_NO_USERS_DEFINED);
 			$table->setHeader(array(
-				 array(  new CCheckBox("all_users",NULL,
-                                        "CheckAll('".$form->GetName()."','all_users');"),
+				array(new CCheckBox("all_users",NULL,
+                                        "CheckAll('".$form->GetName()."','all_users','group_userid');"),
 					make_sorting_link(S_ALIAS,'u.alias')
 				),
 				make_sorting_link(S_NAME,'u.name'),
 				make_sorting_link(S_SURNAME,'u.surname'),
 				make_sorting_link(S_USER_TYPE,'u.type'),
 				S_GROUPS,
-				S_IS_ONLINE_Q));
+				S_IS_ONLINE_Q,
+				S_STATUS
+				));
 		
-			$db_users=DBselect('SELECT u.userid,u.alias,u.name,u.surname,u.type,u.autologout '.
+			$db_users=DBselect('SELECT u.userid,u.alias,u.name,u.surname,u.type,u.autologout,u.status '.
 							' FROM users u'.
 							' WHERE '.DBin_node('u.userid').
 							order_by('u.alias,u.name,u.surname,u.type','u.userid'));
@@ -410,11 +431,23 @@ include_once "include/page_header.php";
 					" where g.usrgrpid=ug.usrgrpid and ug.userid=".$db_user['userid']);
 				while($db_group = DBfetch($db_groups))
 					array_push($user_groups,empty($user_groups)?'':BR(),$db_group['name']);
-					
+				
+				$status = ($db_user['status'] == USER_STATUS_ENABLED)?S_ENABLED:S_DISABLED;
+				if((bccomp($USER_DETAILS['userid'],$db_user['userid']) != 0)){
+					$status = new CLink($status,
+								'users.php?form=update'.
+								'&status='.((int)(!$db_user['status'])).
+								'&userid='.$db_user["userid"].
+								url_param("config"),
+								($db_user['status'] == USER_STATUS_ENABLED)?'enabled':'disabled');
+				}
+				else{
+					$status = new CSpan($status,($db_user['status'] == USER_STATUS_ENABLED)?'green':'red');
+				}
 		
 				$table->addRow(array(
 					array(
-						new CCheckBox("group_userid[]",NULL,NULL,$db_user["userid"]),
+						new CCheckBox("group_userid[".$db_user["userid"]."]",NULL,NULL,$db_user["userid"]),
 						new CLink($db_user["alias"],
 							"users.php?form=update".url_param("config").
 							"&userid=".$db_user["userid"]."#form", 'action')
@@ -423,7 +456,8 @@ include_once "include/page_header.php";
 					$db_user["surname"],
 					user_type2str($db_user['type']),
 					$user_groups,
-					$online
+					$online,
+					$status
 					));
 			}
 			$table->SetFooter(new CCol(new CButtonQMessage('delete_selected',S_DELETE_SELECTED,S_DELETE_SELECTED_USERS_Q)));

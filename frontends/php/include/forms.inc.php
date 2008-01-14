@@ -682,13 +682,9 @@
 	}
 
 	# Insert form for User
-	function	insert_user_form($userid,$profile=0)
-	{
-		global $_REQUEST;
-
+	function	insert_user_form($userid,$profile=0){
 		$frm_title = S_USER;
-		if(isset($userid))
-		{
+		if(isset($userid)){
 			global $USER_DETAILS;
 /*			if(bccomp($userid,$USER_DETAILS['userid'])==0) $profile = 1;*/
 
@@ -696,8 +692,7 @@
 			$frm_title = S_USER." \"".$user["alias"]."\"";
 		}
 
-		if(isset($userid) && (!isset($_REQUEST["form_refresh"]) || isset($_REQUEST["register"])))
-		{
+		if(isset($userid) && (!isset($_REQUEST["form_refresh"]) || isset($_REQUEST["register"]))){
 			$alias		= $user["alias"];
 			$name		= $user["name"];
 			$surname	= $user["surname"];
@@ -708,6 +703,7 @@
 			$autologout	= $user["autologout"];
 			$lang		= $user["lang"];
 			$refresh	= $user["refresh"];
+			$status		= $user["status"];
 			$user_type	= $user["type"];
 
 			$user_groups	= array();
@@ -716,8 +712,7 @@
 			$db_user_groups = DBselect('SELECT g.* FROM usrgrp g, users_groups ug'.
 				' WHERE ug.usrgrpid=g.usrgrpid AND ug.userid='.$userid);
 
-			while($db_group = DBfetch($db_user_groups))
-			{
+			while($db_group = DBfetch($db_user_groups)){
 				$user_groups[$db_group['usrgrpid']] = $db_group['name'];
 			}
 
@@ -746,9 +741,10 @@
 			$password1 	= get_request("password1", null);
 			$password2 	= get_request("password2", null);
 			$url 		= get_request("url","");
-			$autologout	= get_request("autologout","900");
+			$autologout	= get_request("autologout",900);
 			$lang		= get_request("lang","en_gb");
-			$refresh	= get_request("refresh","30");
+			$refresh	= get_request("refresh",30);
+			$status		= get_request('status',0);
 			$user_type	= get_request("user_type",USER_TYPE_ZABBIX_USER);;
 			$user_groups	= get_request("user_groups",array());
 			$change_password = get_request("change_password", null);
@@ -893,7 +889,12 @@
 		$frmUser->AddRow(S_AUTO_LOGOUT_IN_SEC,	new CNumericBox("autologout",$autologout,4));
 		$frmUser->AddRow(S_URL_AFTER_LOGIN,	new CTextBox("url",$url,50));
 		$frmUser->AddRow(S_SCREEN_REFRESH,	new CNumericBox("refresh",$refresh,4));
-	
+
+		$cmbStat = new CComboBox('status',$status);
+		$cmbStat->AddItem(USER_STATUS_ENABLED,S_ENABLED);
+		$cmbStat->AddItem(USER_STATUS_DISABLED,S_DISABLED);
+
+		$frmUser->AddRow(S_STATUS, $cmbStat);
 		
 		if($profile==0)
 		{
