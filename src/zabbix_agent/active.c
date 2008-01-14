@@ -413,7 +413,7 @@ static void	process_active_checks(char *server, unsigned short port)
 						break;
 
 					if ('\0' == *pattern || NULL != zbx_regexp_match(value, pattern, NULL)) {
-						if (SUCCEED == (send_err = send_value(
+						send_err = send_value(
 									server,
 									port,
 									CONFIG_HOSTNAME,
@@ -422,11 +422,8 @@ static void	process_active_checks(char *server, unsigned short port)
 									&lastlogsize,
 									NULL,
 									NULL,
-									NULL)))
-						{
-							active_metrics[i].lastlogsize = lastlogsize;
-						}
-
+									NULL
+								);
 						s_count++;
 					}
 					p_count++;
@@ -492,7 +489,7 @@ static void	process_active_checks(char *server, unsigned short port)
 						break;
 
 					if (!pattern || NULL != zbx_regexp_match(value, pattern, NULL)) {
-						if (SUCCEED == (send_err = send_value(
+						send_err = send_value(
 									server,
 									port,
 									CONFIG_HOSTNAME,
@@ -501,11 +498,8 @@ static void	process_active_checks(char *server, unsigned short port)
 									&lastlogsize,
 									&timestamp,
 									source,
-									&severity)))
-						{
-							active_metrics[i].lastlogsize = lastlogsize;
-						}
-
+									&severity
+								);
 						s_count++;
 					}
 					p_count++;
