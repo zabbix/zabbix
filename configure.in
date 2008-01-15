@@ -370,6 +370,7 @@ dnl Check for function sysctl (KERN_BOOTTIME)
 AC_MSG_CHECKING(for function sysctl (KERN_BOOTTIME))
 AC_TRY_COMPILE(
 [
+	#include <sys/param.h>
 	#include <sys/types.h>
 	#include <sys/sysctl.h>
 	#include <unistd.h>
@@ -377,14 +378,15 @@ AC_TRY_COMPILE(
 	#include <sys/time.h>
 ],
 [
-	struct timeval uptime;
-        int     mib[2],len;
-        int     now;
+	size_t		len;
+	struct timeval	uptime;
+        int		mib[2];
 
-        mib[0]=CTL_KERN;
-        mib[1]=KERN_BOOTTIME;
-        len=sizeof(uptime);
-        sysctl(mib,2,&uptime,&len,0,0);
+        mib[0] = CTL_KERN;
+        mib[1] = KERN_BOOTTIME;
+
+        len = sizeof(uptime);
+        sysctl(mib, 2, &uptime, &len, 0, 0);
 ],
 AC_DEFINE(HAVE_FUNCTION_SYSCTL_KERN_BOOTTIME,1,[Define to 1 if 'KERN_BOOTTIME' exist.])
 AC_MSG_RESULT(yes),
@@ -394,20 +396,35 @@ dnl Check for function sysctl (HW_NCPU)
 AC_MSG_CHECKING(for function sysctl (HW_NCPU))
 AC_TRY_COMPILE(
 [
+	#include <sys/param.h>
 	#include <sys/types.h>
 	#include <sys/sysctl.h>
 ],
 [
-	int ncpu;
-	int mib[2], len;
-	int now;
+	size_t	len;
+	int	mib[2], ncpu;
 
-	mib[0]=CTL_HW;
-	mib[1]=HW_NCPU;
-	len=sizeof(ncpu);
-	sysctl(mib,2,&ncpu,&len,0,0);
+	mib[0] = CTL_HW;
+	mib[1] = HW_NCPU;
+
+	len = sizeof(ncpu);
+	sysctl(mib, 2, &ncpu, &len, 0, 0);
 ],
 AC_DEFINE(HAVE_FUNCTION_SYSCTL_HW_NCPU,1,[Define to 1 if 'HW_NCPU' exist.])
+AC_MSG_RESULT(yes),
+AC_MSG_RESULT(no))
+
+dnl Check for function sysctlbyname()
+AC_MSG_CHECKING(for function sysctlbyname())
+AC_TRY_COMPILE(
+[
+	#include <sys/types.h>
+	#include <sys/sysctl.h>
+],
+[
+	sysctlbyname("", 0, 0, 0, 0);
+],
+AC_DEFINE(HAVE_FUNCTION_SYSCTLBYNAME,1,[Define to 1 if 'sysctlbyname' exist.])
 AC_MSG_RESULT(yes),
 AC_MSG_RESULT(no))
 
@@ -415,17 +432,19 @@ dnl Check for function sysctl (KERN_MAXFILES)
 AC_MSG_CHECKING(for function sysctl (KERN_MAXFILES))
 AC_TRY_COMPILE(
 [
+	#include <sys/param.h>
 	#include <sys/types.h>
 	#include <sys/sysctl.h>
 ],
 [
-        int     mib[2],len;
-        int     maxfiles;
+	size_t	len;
+        int	mib[2], maxfiles;
 
-        mib[0]=CTL_KERN;
-        mib[1]=KERN_MAXFILES;
-        len=sizeof(maxfiles);
-        sysctl(mib,2,&maxfiles,&len,0,0);
+        mib[0] = CTL_KERN;
+        mib[1] = KERN_MAXFILES;
+
+        len = sizeof(maxfiles);
+        sysctl(mib, 2, &maxfiles, &len, 0, 0);
 ],
 AC_DEFINE(HAVE_FUNCTION_SYSCTL_KERN_MAXFILES,1,[Define to 1 if 'KERN_MAXFILES' exist.])
 AC_MSG_RESULT(yes),
@@ -435,17 +454,19 @@ dnl Check for function sysctl (KENR_MAXPROC)
 AC_MSG_CHECKING(for function sysctl (KERN_MAXPROC))
 AC_TRY_COMPILE(
 [
+	#include <sys/param.h>
 	#include <sys/types.h>
 	#include <sys/sysctl.h>
 ],
 [
-        int     mib[2],len;
-        int     maxproc;
+	size_t	len;
+	int	mib[2], maxproc;
 
-        mib[0]=CTL_KERN;
-        mib[1]=KERN_MAXPROC;
-        len=sizeof(maxproc);
-        sysctl(mib,2,&maxproc,&len,0,0);
+        mib[0] = CTL_KERN;
+        mib[1] = KERN_MAXPROC;
+
+        len = sizeof(maxproc);
+        sysctl(mib, 2, &maxproc, &len, 0, 0);
 ],
 AC_DEFINE(HAVE_FUNCTION_SYSCTL_KERN_MAXPROC,1,[Define to 1 if 'KERN_MAXPROC' exist.])
 AC_MSG_RESULT(yes),
@@ -459,7 +480,7 @@ AC_TRY_LINK(
 	#include <grp.h>
 ],
 [
-	char *user="zabbix";
+	char	*user = "zabbix";
 	initgroups(user, 0);
 ],
 AC_DEFINE(HAVE_FUNCTION_INITGROUPS,1,[Define to 1 if function 'initgroups' exists.])
