@@ -40,6 +40,8 @@ Changes for 1.5:
  - added login/logout (Artem)
 
 Changes for 1.4.5:
+
+ - [ZBX-268] added support of proc.num[], proc.mem[] & system.cpu.num[] for OpenBSD agents (Sasha)
  - [ZBX-263] fixed problem with saving of lastlogsize for log[] and eventlog[] items when history is set to 0 (Sasha)
  - [ZBX-253] fixes problem in frontend with long int values (Artem)
  - [ZBX-250] speed improvement for Triggers when use "{ITEM.VALUE}" macro (Sasha)
