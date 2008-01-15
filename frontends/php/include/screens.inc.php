@@ -126,7 +126,7 @@
 			$screenitemid=get_dbid("screens_items","screenitemid");
 			$result=DBexecute('INSERT INTO screens_items '.
 								'(screenitemid,resourcetype,screenid,x,y,resourceid,width,height,'.
-								' colspan,rowspan,elements,valign,halign,style,url) '.
+								' colspan,rowspan,elements,valign,halign,style,url,dynamic) '.
 							' VALUES '.
 								"($screenitemid,$resourcetype,$screenid,$x,$y,$resourceid,$width,$height,$colspan,".
 								"$rowspan,$elements,$valign,$halign,$style,".zbx_dbstr($url).",$dynamic)");
@@ -335,7 +335,8 @@
 					$yaxis = 0;
 					
 // GRAPH & ZOOM features
-					$sql = 'SELECT MAX(g.graphid) as graphid, MAX(g.graphtype) as graphtype, MIN(gi.yaxisside) as yaxissidel, MAX(gi.yaxisside) as yaxissider'.
+					$sql = 'SELECT MAX(g.graphid) as graphid, MAX(g.graphtype) as graphtype, MIN(gi.yaxisside) as yaxissidel, MAX(gi.yaxisside) as yaxissider,'.
+								' MAX(g.show_legend) as legend, MAX(g.show_3d) as show3d '.
 							' FROM graphs g, graphs_items gi '.
 							' WHERE g.graphid='.$resourceid.
 								' AND gi.graphid=g.graphid ';
@@ -346,6 +347,9 @@
 						$graphtype = $graph['graphtype'];
 						$yaxis = $graph['yaxissider'];
 						$yaxis = ($graph['yaxissidel'] == $yaxis)?($yaxis):(2);
+						
+						$legend = $graph['legend'];
+						$graph3d = $graph['show3d'];
 					}
 					if($yaxis == 2){
 						$shiftXleft = 60;
@@ -383,7 +387,12 @@
 						}
 					
 						$item = new CLink(
-							new CImg($url."&width=$width&height=$height"."&period=$effectiveperiod".url_param("stime")),
+							new CImg($url.'&width='.$width.
+											'&height='.$height.
+											'&period='.$effectiveperiod.
+											url_param('stime').
+											'&legend='.$legend.
+											'&graph3d='.$graph3d),
 							$action
 							);
 					}
