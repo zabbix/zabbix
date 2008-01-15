@@ -23,28 +23,30 @@
 
 int	SYSTEM_UPTIME(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
-	int	mib[2];
-        size_t	len;
+#ifdef HAVE_FUNCTION_SYSCTL_KERN_BOOTTIME
+	size_t		len;
+	int		mib[2], now;
 	struct timeval	uptime;
-	int	now;
-	int	ret = SYSINFO_RET_FAIL;
 
 	assert(result);
+
 	init_result(result);
 
-	mib[0]=CTL_KERN;
-	mib[1]=KERN_BOOTTIME;
+	mib[0] = CTL_KERN;
+	mib[1] = KERN_BOOTTIME;
 
-	len=sizeof(uptime);
+	len = sizeof(struct timeval);
 
-	if(sysctl(mib,2,&uptime,(size_t *)&len,NULL,0) == 0)
-	{
-		now=time(NULL);
+	if (-1 == sysctl(mib, 2, &uptime, &len, NULL, 0))
+		return SYSINFO_RET_FAIL;
 
-		SET_UI64_RESULT(result, now - uptime.tv_sec);
+	now = time(NULL);
 
-		ret = SYSINFO_RET_OK;
-	}
-	return ret;
+	SET_UI64_RESULT(result, now - uptime.tv_sec);
+
+	return SYSINFO_RET_OK;
+#else
+	return SYSINFO_RET_FAIL;
+#endif /* HAVE_FUNCTION_SYSCTL_KERN_BOOTTIME */
 }
 

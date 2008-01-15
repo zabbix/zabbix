@@ -273,20 +273,34 @@ dnl Check for vmtotal in sys/vmmeter.h
 AC_MSG_CHECKING(for vmtotal in struct sys/vmmeter.h)
 AC_TRY_COMPILE(
 [
-#include <stdlib.h>
+#ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
+#endif /* HAVE_SYS_TYPES_H */
+
+#ifdef HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif /* HAVE_SYS_PARAM_H */ 
+
 #include <sys/sysctl.h>
+
+#ifdef HAVE_VM_VM_PARAM_H
 #include <vm/vm_param.h>
+#endif /* HAVE_VM_VM_PARAM_H */
+
+#ifdef HAVE_SYS_VMMETER_H
 #include <sys/vmmeter.h>
+#endif /* HAVE_SYS_VMMETER_H */
 ],
-[	int mib[2],len;
-	struct vmtotal v;
+[
+	size_t		len;
+	int		mib[2];
+	struct vmtotal	v;
 
-	len=sizeof(struct vmtotal);
-	mib[0]=CTL_VM;
-	mib[1]=VM_METER;
+	len = sizeof(struct vmtotal);
+	mib[0] = CTL_VM;
+	mib[1] = VM_METER;
 
-	sysctl(mib,2,&v,&len,NULL,0);
+	sysctl(mib, 2, &v, &len, NULL, 0);
 ],
 AC_DEFINE(HAVE_SYS_VMMETER_VMTOTAL,1,[Define to 1 if struct 'vmtotal' exist .])
 AC_MSG_RESULT(yes),
@@ -370,12 +384,18 @@ dnl Check for function sysctl (KERN_BOOTTIME)
 AC_MSG_CHECKING(for function sysctl (KERN_BOOTTIME))
 AC_TRY_COMPILE(
 [
-	#include <sys/param.h>
-	#include <sys/types.h>
-	#include <sys/sysctl.h>
-	#include <unistd.h>
-	#include <time.h>
-	#include <sys/time.h>
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif /* HAVE_SYS_TYPES_H */
+
+#ifdef HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif /* HAVE_SYS_PARAM_H */ 
+
+#include <sys/sysctl.h>
+#include <unistd.h>
+#include <time.h>
+#include <sys/time.h>
 ],
 [
 	size_t		len;
@@ -396,9 +416,15 @@ dnl Check for function sysctl (HW_NCPU)
 AC_MSG_CHECKING(for function sysctl (HW_NCPU))
 AC_TRY_COMPILE(
 [
-	#include <sys/param.h>
-	#include <sys/types.h>
-	#include <sys/sysctl.h>
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif /* HAVE_SYS_TYPES_H */
+
+#ifdef HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif /* HAVE_SYS_PARAM_H */ 
+
+#include <sys/sysctl.h>
 ],
 [
 	size_t	len;
@@ -416,10 +442,13 @@ AC_MSG_RESULT(no))
 
 dnl Check for function sysctlbyname()
 AC_MSG_CHECKING(for function sysctlbyname())
-AC_TRY_COMPILE(
+AC_TRY_LINK(
 [
-	#include <sys/types.h>
-	#include <sys/sysctl.h>
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif /* HAVE_SYS_TYPES_H */
+
+#include <sys/sysctl.h>
 ],
 [
 	sysctlbyname("", 0, 0, 0, 0);
@@ -432,9 +461,15 @@ dnl Check for function sysctl (KERN_MAXFILES)
 AC_MSG_CHECKING(for function sysctl (KERN_MAXFILES))
 AC_TRY_COMPILE(
 [
-	#include <sys/param.h>
-	#include <sys/types.h>
-	#include <sys/sysctl.h>
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif /* HAVE_SYS_TYPES_H */
+
+#ifdef HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif /* HAVE_SYS_PARAM_H */ 
+
+#include <sys/sysctl.h>
 ],
 [
 	size_t	len;
@@ -454,9 +489,15 @@ dnl Check for function sysctl (KENR_MAXPROC)
 AC_MSG_CHECKING(for function sysctl (KERN_MAXPROC))
 AC_TRY_COMPILE(
 [
-	#include <sys/param.h>
-	#include <sys/types.h>
-	#include <sys/sysctl.h>
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h>
+#endif /* HAVE_SYS_TYPES_H */
+
+#ifdef HAVE_SYS_PARAM_H
+#include <sys/param.h>
+#endif /* HAVE_SYS_PARAM_H */ 
+
+#include <sys/sysctl.h>
 ],
 [
 	size_t	len;
