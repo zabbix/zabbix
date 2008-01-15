@@ -339,8 +339,8 @@ static int	get_cpustat(
 		return 1;
 	}
 
-    #elif defined(HAVE_SYS_SYSCTL_H) /* HAVE_SYS_SYSCTL_H */
-
+    #elif defined(HAVE_FUNCTION_SYSCTLBYNAME)
+	
 	if (sysctlbyname("kern.cp_time", &cp_time, &nlen, NULL, 0) == -1)
 		return 1;
 
@@ -352,7 +352,7 @@ static int	get_cpustat(
 	*cpu_system = (zbx_uint64_t)cp_time[2];
 	*cpu_idle = (zbx_uint64_t)cp_time[4];
  	
-    #endif /* HAVE_SYS_SYSCTL_H */
+    #endif /* HAVE_FUNCTION_SYSCTLBYNAME */
 	return 0;
 }
 
