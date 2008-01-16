@@ -225,7 +225,7 @@ include_once "include/page_header.php";
 		if(!isset($_REQUEST["dependences"]))
 			$_REQUEST["dependences"] = array();
 
-		if(!in_array($_REQUEST["new_dependence"], $_REQUEST["dependences"]))
+		if(!uint_in_array($_REQUEST["new_dependence"], $_REQUEST["dependences"]))
 			array_push($_REQUEST["dependences"], $_REQUEST["new_dependence"]);
 	}
 	elseif(isset($_REQUEST["del_dependence"])&&isset($_REQUEST["rem_dependence"]))
@@ -233,7 +233,7 @@ include_once "include/page_header.php";
 		if(isset($_REQUEST["dependences"])){
 			foreach($_REQUEST["dependences"]as $key => $val)
 			{
-				if(!in_array($val, $_REQUEST["rem_dependence"]))	continue;
+				if(!uint_in_array($val, $_REQUEST["rem_dependence"]))	continue;
 				unset($_REQUEST["dependences"][$key]);
 			}
 		}

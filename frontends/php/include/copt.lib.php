@@ -268,13 +268,13 @@ if(defined('USE_PROFILING')){
 							if($sub_pages['url'] == $file){
 								array_push($list, $menu_path);
 							}
-							if(!in_array($sub_pages['url'], $files_list))
+							if(!str_in_array($sub_pages['url'], $files_list))
 								$result['error'][$sub_pages['url']] = array($menu_path);
 	
 							if(isset($sub_pages['sub_pages'])) foreach($sub_pages['sub_pages'] as $page){
 								$menu_path = $sub['label'].'->'.$sub_pages['label'].'->sub_pages';
 								
-								if(!in_array($page, $files_list))
+								if(!str_in_array($page, $files_list))
 									$result['error'][$page] = array($menu_path);
 	
 								if($page != $file) continue;

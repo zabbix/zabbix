@@ -100,7 +100,7 @@
 							info('Host ['.$data['name'].'] skipped - user rule');
 							break; // case
 						}
-						if(!in_array($host_data['hostid'], $this->accessible_hosts)){
+						if(!uint_in_array($host_data['hostid'], $this->accessible_hosts)){
 							error('Host ['.$data['name'].'] skipped - Access deny.');
 							break; // case
 						}
@@ -118,7 +118,7 @@
 						}
 						
 //						if( count($this->accessible_nodes) > 0 ){
-						if(!in_array(get_current_nodeid(),$this->accessible_nodes)){
+						if(!uint_in_array(get_current_nodeid(),$this->accessible_nodes)){
 							error('Host ['.$data['name'].'] skipped - Access deny.');
 							break; // case
 						}
@@ -213,7 +213,7 @@
 						break; // case
 					}
 					
-					if(!in_array($group["groupid"], $this->accessible_groups))
+					if(!uint_in_array($group["groupid"], $this->accessible_groups))
 					{
 						error('Group ['.$this->element_data.'] skipped - Access deny.');
 						break; // case
@@ -257,7 +257,7 @@
 						break; // case
 					}
 					
-					if(!in_array($template["hostid"], $this->accessible_hosts))
+					if(!uint_in_array($template["hostid"], $this->accessible_hosts))
 					{
 						error('Template ['.$this->element_data.'] skipped - Access deny.');
 						break; // case

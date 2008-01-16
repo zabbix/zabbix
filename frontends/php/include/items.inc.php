@@ -232,7 +232,7 @@
 			if(eregi('^((.)*)(\[\"((.)*)\"\,\"((.)*)\"\,\"((.)*)\"\,\"([0-9]+)\"\])$', $key, $arr))
 			{
 				$g=$arr[1];
-				if(!in_array($g,array("grpmax","grpmin","grpsum","grpavg")))
+				if(!str_in_array($g,array("grpmax","grpmin","grpsum","grpavg")))
 				{
 					error("Group function [$g] is not one of [grpmax,grpmin,grpsum,grpavg]");
 					return FALSE;
@@ -243,7 +243,7 @@
 				$g=$arr[6];
 				// Item function
 				$g=$arr[8];
-				if(!in_array($g,array("last", "min", "max", "avg", "sum","count")))
+				if(!str_in_array($g,array("last", "min", "max", "avg", "sum","count")))
 				{
 					error("Item function [$g] is not one of [last, min, max, avg, sum,count]");
 					return FALSE;
@@ -553,7 +553,7 @@
 
 				$db_tmp_item = get_item_by_itemid($db_item["templateid"]);
 
-				if ( !in_array($db_tmp_item["hostid"], $templateid) )
+				if ( !uint_in_array($db_tmp_item["hostid"], $templateid) )
 					continue;
 			}
 

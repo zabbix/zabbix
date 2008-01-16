@@ -129,12 +129,12 @@ function get_accessible_scripts_by_hosts($hosts){
 	while($script = DBfetch($res)){
 		foreach($hosts as $id => $hostid){
 			if($script['host_access'] == SCRIPT_HOST_ACCESS_WRITE){
-				if(in_array($hostid,$hosts_read_write)){
+				if(uint_in_array($hostid,$hosts_read_write)){
 					$scripts_by_host[$hostid][] = $script;
 				}
 			}
 			else{
-				if(in_array($hostid,$hosts_read_only)){
+				if(uint_in_array($hostid,$hosts_read_only)){
 					$scripts_by_host[$hostid][] = $script;
 				}
 			}

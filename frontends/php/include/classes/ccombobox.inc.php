@@ -87,7 +87,7 @@
 //			if($enabled=='no') return;	/* disable item method 1 */
 			if(is_null($selected)){
 				$selected = 'no';
-				if((strcmp($value,$this->value) == 0) || (is_array($this->value) && in_array($value, $this->value)))
+				if((strcmp($value,$this->value) == 0) || (is_array($this->value) && str_in_array($value, $this->value)))
 					$selected = 'yes';
 			}
 
@@ -183,7 +183,7 @@
 		{
 			if(is_null($selected))
 			{
-				if((strcmp($value,$this->value) == 0) || (is_array($this->value) && in_array($value, $this->value)))
+				if((strcmp($value,$this->value) == 0) || (is_array($this->value) && str_in_array($value, $this->value)))
 					$this->value_exist = 1;
 			}
 

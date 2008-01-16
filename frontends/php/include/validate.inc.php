@@ -60,7 +60,7 @@
 	{
 		if(is_array($array)) $array = implode(',', $array);
 
-		return "in_array({".$var."},array(".$array."))&&";
+		return "str_in_array({".$var."},array(".$array."))&&";
 	}
 	function	HEX($var=NULL)
 	{
@@ -222,7 +222,6 @@
 		}
 		$expression = trim($expression,"& ");
 		$exec = "return (".$expression.") ? 1 : 0;";
-
 		$ret = eval($exec);
 //echo $debug;
 //echo "$field - result: ".$ret." exec: $exec".SBR.SBR;
@@ -232,8 +231,6 @@
 
 	function	calc_exp($fields,$field,$expression)
 	{
-		global $_REQUEST;
-
 //SDI("$field - expression: ".$expression);
 
 		if(strstr($expression,"{}") && !isset($_REQUEST[$field]))

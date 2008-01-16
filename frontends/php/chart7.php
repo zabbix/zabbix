@@ -61,7 +61,7 @@ include_once "include/page_header.php";
 		{
 			fatal_error(S_NO_ITEM_DEFINED);
 		}
-		if(in_array($host['hostid'], $denyed_hosts))
+		if(uint_in_array($host['hostid'], $denyed_hosts))
 		{
 			access_deny();
 		}
