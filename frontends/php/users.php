@@ -419,11 +419,12 @@ include_once "include/page_header.php";
 							order_by('u.alias,u.name,u.surname,u.type','u.userid'));
 			while($db_user=DBfetch($db_users))
 			{
-				$db_sessions = DBselect('select count(*) as count, max(s.lastaccess) as lastaccess'.
-					' from sessions s, users u'.
-					' where s.userid='.$db_user['userid'].' and s.userid=u.userid '.
-					' and ((s.lastaccess+u.autologout)>='.time().
-					' or u.autologout=0)');
+				$db_sessions = DBselect('SELECT count(*) as count, max(s.lastaccess) as lastaccess'.
+						' FROM sessions s, users u'.
+						' WHERE s.userid='.$db_user['userid'].
+							' AND s.userid=u.userid '.
+							' AND ((s.lastaccess+u.autologout)>='.time().' OR u.autologout=0)');
+//Log Out 10min
 				$db_ses_cnt=DBfetch($db_sessions);
 
 				if($db_ses_cnt["count"]>0)

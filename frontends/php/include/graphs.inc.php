@@ -654,7 +654,7 @@
 
 				$tmp_host = DBfetch(get_hosts_by_graphid($db_graph['templateid']));
 
-				if( !in_array($tmp_host['hostid'], $templateid))
+				if( !uint_in_array($tmp_host['hostid'], $templateid))
 					continue;
 			}
 
@@ -844,7 +844,7 @@
 
 		$period = get_request('period',ZBX_PERIOD_DEFAULT);
 
-		if(in_array($period,array(3600,2*3600,4*3600,8*3600,12*3600,24*3600,7*24*3600,31*24*3600,365*24*3600)))
+		if(uint_in_array($period,array(3600,2*3600,4*3600,8*3600,12*3600,24*3600,7*24*3600,31*24*3600,365*24*3600)))
 			$custom_per = ZBX_MIN_PERIOD;
 		else
 			$custom_per = $period;

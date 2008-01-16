@@ -296,6 +296,27 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		include_once "include/page_footer.php";
 	}
 
+	function uint_in_array($needle,$haystack){
+		foreach($haystack as $id => $value)
+			if(bccomp($needle,$value) == 0) return true;
+	return false;
+	}
+
+	function str_in_array($needle,$haystack,$strict=false){
+		if(is_array($needle)){
+			return in_array($needle,$haystack,$strict);
+		}
+		else if($strict){
+			foreach($haystack as $id => $value) 
+				if($needle === $value) return true;
+		}
+		else{
+			foreach($haystack as $id => $value)
+				if(strcmp($needle,$value) == 0) return true;
+		}
+	return false;
+	}
+
 	function zbx_stripslashes($value){
 		if(is_array($value)){
 			foreach($value as $id => $data)
@@ -346,7 +367,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		
 		$key = htmlspecialchars($key);
 		uasort($array, create_function('$a,$b', 'return $a[\''.$key.'\'] - $b[\''.$key.'\'];'));
-		return $array;
+	return $array;
 	}
 
 	function fatal_error($msg){
@@ -1006,7 +1027,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 			}
 		}
 		else if(is_object($obj)){
-			if(in_array(strtolower(get_class($obj)),array('cform','ccheckbox','cselect','cbutton','cbuttonqmessage','cbuttondelete','cbuttoncancel'))){
+			if(str_in_array(strtolower(get_class($obj)),array('cform','ccheckbox','cselect','cbutton','cbuttonqmessage','cbuttondelete','cbuttoncancel'))){
 				$obj=SPACE;
 			}
 			if(isset($obj->items) && !empty($obj->items)){
@@ -1748,7 +1769,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 			update_profile('web.'.$page["file"].'.sort',		$_REQUEST['sort']);
 		}
 
-		if(!in_array($_REQUEST['sortorder'],array(ZBX_SORT_DOWN,ZBX_SORT_UP)))
+		if(!str_in_array($_REQUEST['sortorder'],array(ZBX_SORT_DOWN,ZBX_SORT_UP)))
 			$_REQUEST['sortorder'] = ZBX_SORT_UP;
 
 		update_profile('web.'.$page["file"].'.sortorder',	$_REQUEST['sortorder']);
@@ -1808,7 +1829,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		$tabfield = get_request('sort',get_profile('web.'.$page["file"].'.sort',null));
 		
 		if(is_null($tabfield)) return ' ORDER BY '.$def.$allways;
-		if(!in_array($tabfield,$sortable)) return ' ORDER BY '.$def.$allways;
+		if(!str_in_array($tabfield,$sortable)) return ' ORDER BY '.$def.$allways;
 
 		$sortorder = get_request('sortorder',get_profile('web.'.$page["file"].'.sortorder',ZBX_SORT_UP));
 

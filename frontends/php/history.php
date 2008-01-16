@@ -209,7 +209,7 @@ include_once "include/page_header.php";
 		
 		$cmbAction = new CComboBox("action",$_REQUEST["action"],"submit()");
 
-		if(in_array($item_type,array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64)))
+		if(str_in_array($item_type,array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64)))
 		{
 			$cmbAction->AddItem("showgraph",S_GRAPH_OF_SPECIFIED_PERIOD);
 		}
@@ -278,7 +278,7 @@ include_once "include/page_header.php";
 					new CTextBox("filter",$filter,25),
 					$cmbFTask,SPACE));
 
-				if(in_array($filter_task,array(FILTER_TAST_MARK,FILTER_TAST_INVERT_MARK)))
+				if(str_in_array($filter_task,array(FILTER_TAST_MARK,FILTER_TAST_INVERT_MARK)))
 				{
 					$cmbColor = new CComboBox("mark_color",$mark_color);
 					$cmbColor->AddItem(MARK_COLOR_RED,S_AS_RED);
@@ -490,7 +490,7 @@ COpt::profiling_start("history");
 					$value = $row["value"]; 
 
 				$new_row = array(date("Y.M.d H:i:s",$row["clock"]));
-				if(in_array($item_type,array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64)))
+				if(str_in_array($item_type,array(ITEM_VALUE_TYPE_FLOAT,ITEM_VALUE_TYPE_UINT64)))
 				{
 					array_push($new_row,$value);
 				}
@@ -521,7 +521,7 @@ COpt::profiling_stop("history");
 
 	if(!isset($_REQUEST["plaintext"]))
 	{
-		if(in_array($_REQUEST["action"],array("showvalues","showgraph"))){
+		if(str_in_array($_REQUEST["action"],array("showvalues","showgraph"))){
 			
 			$stime = get_min_itemclock_by_itemid($_REQUEST["itemid"]);
 			$stime = (is_null($stime))?0:$stime;

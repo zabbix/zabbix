@@ -593,7 +593,7 @@
 				$fnc_valid = &$ZBX_TR_EXPR_ALLOWED_FUNCTIONS[$function];
 
 				if ( is_array($fnc_valid['item_types']) &&
-					!in_array($item['value_type'], $fnc_valid['item_types']))
+					!uint_in_array($item['value_type'], $fnc_valid['item_types']))
 				{
 					$allowed_types = array();
 					foreach($fnc_valid['item_types'] as $type)
@@ -1531,7 +1531,7 @@
                 $db_hosts = get_hosts_by_expression($expression);
 		while($host_data = DBfetch($db_hosts))
 		{
-			if(!in_array($host_data['hostid'], $accessible_hosts)) return false;
+			if(!uint_in_array($host_data['hostid'], $accessible_hosts)) return false;
 		}
 
 		return true;
@@ -1707,7 +1707,7 @@
                                 $db_tmp_hosts = get_hosts_by_triggerid($trigger["templateid"]);
 				$tmp_host = DBfetch($db_tmp_hosts);
 
-				if( !in_array($tmp_host["hostid"], $templateid) )
+				if( !uint_in_array($tmp_host["hostid"], $templateid) )
 					continue;
                         }
 

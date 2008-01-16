@@ -150,7 +150,7 @@ include_once "include/page_header.php";
 
 			$httpstep_data['item_data'][$item_data['httpitem_type']] = $item_data;
 
-			if (!in_array($item_data['httpitem_type'], array(HTTPSTEP_ITEM_TYPE_IN, HTTPSTEP_ITEM_TYPE_TIME))) continue;
+			if (!str_in_array($item_data['httpitem_type'], array(HTTPSTEP_ITEM_TYPE_IN, HTTPSTEP_ITEM_TYPE_TIME))) continue;
 	
 			if(isset($total_data[$item_data['httpitem_type']]))
 			{

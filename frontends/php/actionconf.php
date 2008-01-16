@@ -171,7 +171,7 @@ include_once "include/page_header.php";
 		if( validate_condition($new_condition['type'],$new_condition['value']) )
 		{
 			$_REQUEST['conditions'] = get_request('conditions',array());
-			if(!in_array($new_condition,$_REQUEST['conditions']))
+			if(!str_in_array($new_condition,$_REQUEST['conditions']))
 				array_push($_REQUEST['conditions'],$new_condition);
 
 			unset($_REQUEST['new_condition']);
@@ -196,7 +196,7 @@ include_once "include/page_header.php";
 
 			if(!isset($new_operation['id']))
 			{
-				if(!in_array($new_operation,$_REQUEST['operations']))
+				if(!str_in_array($new_operation,$_REQUEST['operations']))
 					array_push($_REQUEST['operations'],$new_operation);
 			}
 			else

@@ -95,7 +95,7 @@
 				switch($se_data['elementtype'])
 				{
 					case SYSMAP_ELEMENT_TYPE_HOST:
-						if(in_array($se_data['elementid'],explode(',',$denyed_hosts)))
+						if(uint_in_array($se_data['elementid'],explode(',',$denyed_hosts)))
 						{
 							$result = false;
 						}
@@ -115,7 +115,7 @@
 						break;
 					case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
 						if( DBfetch(DBselect('select groupid from groups where groupid='.$se_data['elementid'])) &&
-						    in_array($se_data['elementid'],
+						    uint_in_array($se_data['elementid'],
 							get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY, PERM_MODE_LT, PERM_RES_IDS_ARRAY)))
 						{
 							$result = false;
