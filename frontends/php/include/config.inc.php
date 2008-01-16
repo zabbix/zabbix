@@ -304,6 +304,27 @@ require_once('include/classes/ctree.inc.php');
 		include_once "include/page_footer.php";
 	}
 
+	function uint_in_array($needle,$haystack){
+		foreach($haystack as $id => $value)
+			if(bccomp($needle,$value) == 0) return true;
+	return false;
+	}
+
+	function str_in_array($needle,$haystack,$strict=false){
+		if(is_array($needle)){
+			return in_array($needle,$haystack,$strict);
+		}
+		else if($strict){
+			foreach($haystack as $id => $value) 
+				if($needle === $value) return true;
+		}
+		else{
+			foreach($haystack as $id => $value)
+				if(strcmp($needle,$value) == 0) return true;
+		}
+	return false;
+	}
+
 	function zbx_stripslashes($value){
 		if(is_array($value)){
 			foreach($value as $id => $data)
@@ -350,7 +371,7 @@ require_once('include/classes/ctree.inc.php');
 		$ZBX_MESSAGES = null;
 	}
 
-	function &asort_by_key(&$array, $key)
+	function asort_by_key(&$array, $key)
 	{
 		if(!is_array($array)) {
 			error('Incorrect type of asort_by_key');
@@ -358,7 +379,7 @@ require_once('include/classes/ctree.inc.php');
 		}
 		$key = htmlspecialchars($key);
 		uasort($array, create_function('$a,$b', 'return $a[\''.$key.'\'] - $b[\''.$key.'\'];'));
-		return $array;
+	return $array;
 	}
 
 	function fatal_error($msg)

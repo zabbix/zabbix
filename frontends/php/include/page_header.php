@@ -279,7 +279,7 @@ COpt::profiling_start("page");
 			}
 			else if(isset($sub_pages['sub_pages']))
 			{
-				if(in_array($page['file'], $sub_pages['sub_pages']))
+				if(str_in_array($page['file'], $sub_pages['sub_pages']))
 				{
 					if(isset($sub_pages['label']))
 					{

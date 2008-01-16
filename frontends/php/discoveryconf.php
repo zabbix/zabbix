@@ -81,7 +81,7 @@ include_once "include/page_header.php";
 			'key'=> $_REQUEST['new_check_key'],
 			'snmp_community'=> $_REQUEST['new_check_snmp_community']
 			);
-		if( !in_array($new_dcheck, $_REQUEST['dchecks']))
+		if( !str_in_array($new_dcheck, $_REQUEST['dchecks']))
 			$_REQUEST['dchecks'][] = $new_dcheck;
 	}
 	else if(inarr_isset(array('delete_ckecks', 'selected_checks')))

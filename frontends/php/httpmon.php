@@ -58,7 +58,7 @@ include_once "include/page_header.php";
 			$_REQUEST["applications"] = array();
 			$show_all_apps = 1;
 		}
-		elseif(!in_array($_REQUEST["applicationid"],$_REQUEST["applications"]))
+		elseif(!uint_in_array($_REQUEST["applicationid"],$_REQUEST["applications"]))
 		{
 			array_push($_REQUEST["applications"],$_REQUEST["applicationid"]);
 		}
@@ -194,7 +194,7 @@ include_once "include/page_header.php";
 		while($httptest_data = DBfetch($db_httptests))
 		{
 			++$httptest_cnt;
-			if(!in_array($db_app["applicationid"],$_REQUEST["applications"]) && !isset($show_all_apps)) continue;
+			if(!uint_in_array($db_app["applicationid"],$_REQUEST["applications"]) && !isset($show_all_apps)) continue;
 
 			$name = array();
 
@@ -253,7 +253,7 @@ include_once "include/page_header.php";
 		}
 		if($httptest_cnt > 0)
 		{
-			if(in_array($db_app["applicationid"],$_REQUEST["applications"]) || isset($show_all_apps))
+			if(uint_in_array($db_app["applicationid"],$_REQUEST["applications"]) || isset($show_all_apps))
 				$link = new CLink(new CImg("images/general/opened.gif"),
 					"?close=1&applicationid=".$db_app["applicationid"].
 					url_param("groupid").url_param("hostid").url_param("applications").

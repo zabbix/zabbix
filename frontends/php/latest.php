@@ -68,7 +68,7 @@ include_once "include/page_header.php";
 			$_REQUEST["applications"] = array();
 			$show_all_apps = 1;
 		}
-		elseif(!in_array($_REQUEST["applicationid"],$_REQUEST["applications"]))
+		elseif(!uint_in_array($_REQUEST["applicationid"],$_REQUEST["applications"]))
 		{
 			array_push($_REQUEST["applications"],$_REQUEST["applicationid"]);
 		}
@@ -204,7 +204,7 @@ include_once "include/page_header.php";
 			if( '' != $_REQUEST["select"] && !stristr($description, $_REQUEST["select"]) ) continue;
 
 			++$item_cnt;
-			if(!in_array($db_app["applicationid"],$_REQUEST["applications"]) && !isset($show_all_apps)) continue;
+			if(!uint_in_array($db_app["applicationid"],$_REQUEST["applications"]) && !isset($show_all_apps)) continue;
 
 			if(isset($db_item["lastclock"]))
 				$lastclock=date(S_DATE_FORMAT_YMDHMS,$db_item["lastclock"]);
@@ -250,7 +250,7 @@ include_once "include/page_header.php";
 		}
 		if($item_cnt > 0)
 		{
-			if(in_array($db_app["applicationid"],$_REQUEST["applications"]) || isset($show_all_apps))
+			if(uint_in_array($db_app["applicationid"],$_REQUEST["applications"]) || isset($show_all_apps))
 				$link = new CLink(new CImg("images/general/opened.gif"),
 					"?close=1&applicationid=".$db_app["applicationid"].
 					url_param("groupid").url_param("hostid").url_param("applications").
@@ -315,7 +315,7 @@ include_once "include/page_header.php";
 			if( '' != $_REQUEST["select"] && !stristr($description, $_REQUEST["select"]) ) continue;
 	
 			++$item_cnt;
-			if(!in_array(0,$_REQUEST["applications"]) && $any_app_exist && !isset($show_all_apps)) continue;
+			if(!uint_in_array(0,$_REQUEST["applications"]) && $any_app_exist && !isset($show_all_apps)) continue;
 	
 			if(isset($db_item["lastclock"]))
 				$lastclock=zbx_date2str(S_DATE_FORMAT_YMDHMS,$db_item["lastclock"]);
@@ -366,7 +366,7 @@ include_once "include/page_header.php";
 		{
 			if($any_app_exist)
 			{
-				if(in_array(0,$_REQUEST["applications"]) || isset($show_all_apps))
+				if(uint_in_array(0,$_REQUEST["applications"]) || isset($show_all_apps))
 					$link = new CLink(new CImg("images/general/opened.gif"),
 						"?close=1&applicationid=0".
 						url_param("groupid").url_param("hostid").url_param("applications").

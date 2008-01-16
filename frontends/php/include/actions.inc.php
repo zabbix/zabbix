@@ -44,13 +44,13 @@ include_once 'include/discovery.inc.php';
 				switch($ac_data['conditiontype'])
 				{
 					case CONDITION_TYPE_HOST_GROUP:
-						if(in_array($ac_data['value'],explode(',',$denyed_groups)))
+						if(uint_in_array($ac_data['value'],explode(',',$denyed_groups)))
 						{
 							$result = false;
 						}
 						break;
 					case CONDITION_TYPE_HOST:
-						if(in_array($ac_data['value'],explode(',',$denyed_hosts)))
+						if(uint_in_array($ac_data['value'],explode(',',$denyed_hosts)))
 						{
 							$result = false;
 						}
@@ -86,14 +86,14 @@ include_once 'include/discovery.inc.php';
 			switch($ac_data['type'])
 			{
 				case CONDITION_TYPE_HOST_GROUP:
-					if(in_array($ac_data['value'],explode(',',$denyed_groups)))
+					if(uint_in_array($ac_data['value'],explode(',',$denyed_groups)))
 					{
 						error(S_INCORRECT_GROUP);
 						$result = false;
 					}
 					break;
 				case CONDITION_TYPE_HOST:
-					if(in_array($ac_data['value'],explode(',',$denyed_hosts)))
+					if(uint_in_array($ac_data['value'],explode(',',$denyed_hosts)))
 					{
 						error(S_INCORRECT_HOST);
 						$result = false;
@@ -608,7 +608,7 @@ include_once 'include/discovery.inc.php';
 		switch($conditiontype)
 		{
 			case CONDITION_TYPE_HOST_GROUP:
-				if(!in_array($value,
+				if(!uint_in_array($value,
 					get_accessible_groups_by_user($USER_DETAILS,PERM_READ_ONLY,null,
 						PERM_RES_IDS_ARRAY)))
 				{
@@ -625,7 +625,7 @@ include_once 'include/discovery.inc.php';
 				}
 				break;
 			case CONDITION_TYPE_HOST:
-				if(!in_array($value,
+				if(!uint_in_array($value,
 					get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,
 						PERM_RES_IDS_ARRAY)))
 				{
@@ -717,7 +717,7 @@ include_once 'include/discovery.inc.php';
 				break;
 			case OPERATION_TYPE_GROUP_ADD:
 			case OPERATION_TYPE_GROUP_REMOVE:
-				if(!in_array($operation['objectid'],
+				if(!uint_in_array($operation['objectid'],
 					get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,null,
 						PERM_RES_IDS_ARRAY)))
 				{
@@ -727,7 +727,7 @@ include_once 'include/discovery.inc.php';
 				break;
 			case OPERATION_TYPE_TEMPLATE_ADD:
 			case OPERATION_TYPE_TEMPLATE_REMOVE:
-				if(!in_array($operation['objectid'],
+				if(!uint_in_array($operation['objectid'],
 					get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,
 						PERM_RES_IDS_ARRAY)))
 				{

@@ -355,7 +355,7 @@ COpt::counter_up('perm');
 
 					$do_break = true;
 
-					if(is_array($nodeid) && !in_array($node_data['nodeid'],$nodeid))	continue;
+					if(is_array($nodeid) && !uint_in_array($node_data['nodeid'],$nodeid))	continue;
 					else if(isset($nodeid) and (bccomp($node_data['nodeid'] ,$nodeid) != 0))		continue;
 				}
 				else
@@ -620,7 +620,7 @@ COpt::counter_up('perm');
 
 					$do_break = true;
 
-					if(is_array($nodeid) && !in_array($node_data['nodeid'],$nodeid))	continue;
+					if(is_array($nodeid) && !uint_in_array($node_data['nodeid'],$nodeid))	continue;
 					else if(isset($nodeid) and (bccomp($node_data['nodeid'] ,$nodeid) != 0))		continue;
 				}
 				else

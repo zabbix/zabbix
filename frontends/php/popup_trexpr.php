@@ -203,13 +203,13 @@ include_once "include/page_header.php";
 		$function = $expr_res[1];
 		$operator = $expr_res[2];
 
-		if(!in_array($function, array_keys($functions)))	unset($function);
+		if(!str_in_array($function, array_keys($functions)))	unset($function);
 	}
 	unset($expr_res);
 
 	if(!isset($function))	$function = 'last';
 		
-	if(!in_array($operator, array_keys($functions[$function]['operators'])))	unset($operator);
+	if(!str_in_array($operator, array_keys($functions[$function]['operators'])))	unset($operator);
 	if(!isset($operator))	$operator = '=';
 	
 	$expr_type = $function.'['.$operator.']';

@@ -551,7 +551,7 @@ else {
 			fatal_error('Incorrect type of "nodes" for "in_node". Passed ['.gettype($nodes).']');
 		}
 
-		return in_array(id2nodeid($id_var), $nodes);
+		return uint_in_array(id2nodeid($id_var), $nodes);
 	}
 
 	function	get_dbid($table,$field)

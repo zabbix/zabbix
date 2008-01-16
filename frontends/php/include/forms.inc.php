@@ -2174,7 +2174,7 @@
 		{
 			array_push($target_list,array(
 				new CCheckBox('copy_targetid[]',
-					in_array($target['target_id'], $copy_targetid), 
+					uint_in_array($target['target_id'], $copy_targetid), 
 					null, 
 					$target['target_id']),
 				SPACE,
@@ -2264,7 +2264,7 @@
 					" where t.triggerid=d.triggerid_up and d.triggerid_down=".$_REQUEST["triggerid"]);
 				while($trig=DBfetch($trigs))
 				{
-					if(in_array($trig["triggerid"],$dependences))	continue;
+					if(uint_in_array($trig["triggerid"],$dependences))	continue;
 					array_push($dependences,$trig["triggerid"]);
 				}
 			}
@@ -2801,7 +2801,7 @@ include_once 'include/discovery.inc.php';
 					'operator' =>		$condition_data['operator'],
 					'value' =>		$condition_data['value']);
 
-				if(in_array($condition_data, $conditions)) continue;
+				if(str_in_array($condition_data, $conditions)) continue;
 				array_push($conditions, $condition_data);
 			}
 			unset($condition_data, $db_conditions);
@@ -2819,7 +2819,7 @@ include_once 'include/discovery.inc.php';
 					'shortdata'	=> $operation_data['shortdata'],
 					'longdata'	=> $operation_data['longdata']);
 
-				if(in_array($operation_data, $operations)) continue;
+				if(str_in_array($operation_data, $operations)) continue;
 				array_push($operations, $operation_data);
 			}
 			unset($db_operations, $operation_data);
@@ -2843,7 +2843,7 @@ include_once 'include/discovery.inc.php';
 		if( !isset($new_condition['operator']))	$new_condition['operator']	= CONDITION_OPERATOR_LIKE;
 		if( !isset($new_condition['value']) )	$new_condition['value']		= '';
 
-		if( !in_array($new_condition['type'], $allowed_conditions) )
+		if( !str_in_array($new_condition['type'], $allowed_conditions) )
 			$new_condition['type'] = $allowed_conditions[0];
 
 		/* init new_operation variable */
@@ -2877,7 +2877,7 @@ include_once 'include/discovery.inc.php';
 			if( !isset($val['operator']) )	$val['operator'] = 0;
 			if( !isset($val['value']) )	$val['value'] = 0;
 
-			if( !in_array($val["type"], $allowed_conditions) ) continue;
+			if( !str_in_array($val["type"], $allowed_conditions) ) continue;
 
 			$label = chr(ord('A') + $i);
 			$cond_el->AddRow(array('('.$label.')',array(
@@ -3068,7 +3068,7 @@ include_once 'include/discovery.inc.php';
 		$oper_el = new CTable(S_NO_OPERATIONS_DEFINED);
 		foreach($operations as $id => $val)
 		{
-			if( !in_array($val['operationtype'], $allowed_operations) )	continue;
+			if( !str_in_array($val['operationtype'], $allowed_operations) )	continue;
 
 			$oper_details = new CSpan(get_operation_desc(SHORT_DESCRITION, $val));
 			$oper_details->SetHint(nl2br(get_operation_desc(LONG_DESCRITION, $val)));
@@ -3649,7 +3649,7 @@ include_once 'include/discovery.inc.php';
                         $form->AddRow(S_SHOW_LINES, new CNumericBox("elements",$elements,2));
                         $form->AddVar("resourceid",0);
                 }
-		elseif(in_array($resourcetype,array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW,SCREEN_RESOURCE_DATA_OVERVIEW)))
+		elseif(str_in_array($resourcetype,array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW,SCREEN_RESOURCE_DATA_OVERVIEW)))
 		{
 	// Overiews
 			$cmbGroup = new CComboBox("resourceid",$resourceid);
@@ -3691,7 +3691,7 @@ include_once 'include/discovery.inc.php';
 			$form->AddVar("resourceid",0);
 		}
 
-		if(in_array($resourcetype,array(SCREEN_RESOURCE_HOSTS_INFO,SCREEN_RESOURCE_TRIGGERS_INFO)))
+		if(str_in_array($resourcetype,array(SCREEN_RESOURCE_HOSTS_INFO,SCREEN_RESOURCE_TRIGGERS_INFO)))
 		{
 			$cmbStyle = new CComboBox("style", $style);
 			$cmbStyle->AddItem(STYLE_HORISONTAL,	S_HORISONTAL);
@@ -3710,7 +3710,7 @@ include_once 'include/discovery.inc.php';
 			$form->AddVar("style",	0);
 		}
 
-		if(in_array($resourcetype,array(SCREEN_RESOURCE_URL)))
+		if(str_in_array($resourcetype,array(SCREEN_RESOURCE_URL)))
 		{
 			$form->AddRow(S_URL, new CTextBox("url",$url,60));
 		}
@@ -3719,7 +3719,7 @@ include_once 'include/discovery.inc.php';
 			$form->AddVar("url",	"");
 		}
 
-		if(in_array($resourcetype,array(SCREEN_RESOURCE_GRAPH,SCREEN_RESOURCE_SIMPLE_GRAPH,SCREEN_RESOURCE_CLOCK,SCREEN_RESOURCE_URL)))
+		if(str_in_array($resourcetype,array(SCREEN_RESOURCE_GRAPH,SCREEN_RESOURCE_SIMPLE_GRAPH,SCREEN_RESOURCE_CLOCK,SCREEN_RESOURCE_URL)))
 		{
 			$form->AddRow(S_WIDTH,	new CNumericBox("width",$width,5));
 			$form->AddRow(S_HEIGHT,	new CNumericBox("height",$height,5));
@@ -3730,7 +3730,7 @@ include_once 'include/discovery.inc.php';
 			$form->AddVar("height",	0);
 		}
 
-		if(in_array($resourcetype,array(SCREEN_RESOURCE_GRAPH,SCREEN_RESOURCE_SIMPLE_GRAPH,SCREEN_RESOURCE_MAP,
+		if(str_in_array($resourcetype,array(SCREEN_RESOURCE_GRAPH,SCREEN_RESOURCE_SIMPLE_GRAPH,SCREEN_RESOURCE_MAP,
 			SCREEN_RESOURCE_CLOCK,SCREEN_RESOURCE_URL)))
 		{
 			$cmbHalign = new CComboBox("halign",$halign);
@@ -3802,7 +3802,7 @@ include_once 'include/discovery.inc.php';
 				array(
 					new CCheckBox(
 						"severity[]",
-						in_array($i,$severity)?'yes':'no', 
+						str_in_array($i,$severity)?'yes':'no', 
 						null,		/* action */
 						$i),		/* value */
 					get_severity_description($i)
@@ -3945,7 +3945,7 @@ include_once 'include/discovery.inc.php';
 				get_accessible_groups_by_user($USER_DETAILS,PERM_READ_LIST,null,null,get_current_nodeid()).
 				") ");
 			while($db_group=DBfetch($db_groups)){
-				if(in_array($db_group["groupid"],$groups)) continue;
+				if(uint_in_array($db_group["groupid"],$groups)) continue;
 				array_push($groups, $db_group["groupid"]);
 			}
 // read profile
@@ -3999,7 +3999,7 @@ include_once 'include/discovery.inc.php';
 			array_push($frm_row,
 				array(
 					new CCheckBox("groups[]",
-						in_array($db_group["groupid"],$groups) ? 'yes' : 'no', 
+						uint_in_array($db_group["groupid"],$groups) ? 'yes' : 'no', 
 						null,
 						$db_group["groupid"]
 						),
@@ -4170,7 +4170,7 @@ include_once 'include/discovery.inc.php';
 				" order by host");
 			while($db_host=DBfetch($db_hosts))
 			{
-				if(in_array($db_host["hostid"],$hosts)) continue;
+				if(uint_in_array($db_host["hostid"],$hosts)) continue;
 				array_push($hosts, $db_host["hostid"]);
 			}
 		}

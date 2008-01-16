@@ -94,7 +94,7 @@ echo '<script type="text/javascript" src="js/blink.js"></script>';
 		"noactions"=>	array(T_ZBX_STR, O_OPT,  null,	IN('"true","false"'), null),
 		"compact"=>	array(T_ZBX_STR, O_OPT,  null,	IN('"true","false"'), null),
 		"onlytrue"=>	array(T_ZBX_STR, O_OPT,  null,	IN('"true","false"'), null),
-		"show_unknown"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN(array(0,1)),	null),
+		"show_unknown"=>	array(T_ZBX_INT, O_OPT,	null,	IN(array(0,1)),	null),
 		"select"=>	array(T_ZBX_STR, O_OPT,  null,	IN('"true","false"'), null),
 		"txt_select"=>	array(T_ZBX_STR, O_OPT,  null,	null, null),
 		"fullscreen"=>	array(T_ZBX_STR, O_OPT,  null,	null, null),

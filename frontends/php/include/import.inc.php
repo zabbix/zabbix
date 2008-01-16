@@ -194,7 +194,7 @@
 						break; // case
 					}
 					
-					if(!in_array($group["groupid"], $this->accessible_groups))
+					if(!uint_in_array($group["groupid"], $this->accessible_groups))
 					{
 						error('Group ['.$this->element_data.'] skipped - Access deny.');
 						break; // case

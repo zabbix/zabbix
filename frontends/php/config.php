@@ -122,7 +122,7 @@ include_once "include/page_header.php";
 			unset($image, $_REQUEST["imageid"]);
 		}
 	}
-	elseif(isset($_REQUEST["save"])&&in_array($_REQUEST["config"],array(0,5,7)))
+	elseif(isset($_REQUEST["save"])&&uint_in_array($_REQUEST["config"],array(0,5,7)))
 	{
 
 		if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))

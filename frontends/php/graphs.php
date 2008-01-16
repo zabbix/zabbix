@@ -98,7 +98,7 @@ include_once "include/page_header.php";
 		foreach($items as $gitem)
 		{
 			$host = DBfetch(DBselect('select h.* from hosts h,items i where h.hostid=i.hostid and i.itemid='.$gitem['itemid']));
-			if(in_array($host['hostid'], explode(',',$denyed_hosts)))
+			if(uint_in_array($host['hostid'], explode(',',$denyed_hosts)))
 			{
 				access_deny();
 			}
