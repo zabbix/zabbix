@@ -160,6 +160,8 @@ misc/init.d/tru64/zabbix_server -text
 src/libs/zbxcommon/time.c -text
 src/libs/zbxdbcache/Makefile.am -text
 src/libs/zbxdbcache/dbcache.c -text
+src/libs/zbxsysinfo/freebsd/boottime.c -text
+src/libs/zbxsysinfo/openbsd/boottime.c -text
 src/zabbix_server/dbsyncer/Makefile.am -text
 src/zabbix_server/dbsyncer/dbsyncer.c -text
 src/zabbix_server/dbsyncer/dbsyncer.h -text
