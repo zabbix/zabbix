@@ -32,11 +32,11 @@ include_once "include/page_header.php";
 	$_REQUEST["config"] = get_request("config",get_profile("web.hosts.config",0));
 	
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,PERM_RES_IDS_ARRAY,get_current_nodeid());
-	if(isset($_REQUEST["hostid"]) && $_REQUEST["hostid"] > 0 && !in_array($_REQUEST["hostid"], $available_hosts)) 
+	if(isset($_REQUEST["hostid"]) && $_REQUEST["hostid"] > 0 && !uint_in_array($_REQUEST["hostid"], $available_hosts)) 
 	{
 		access_deny();
 	}
-	if(isset($_REQUEST["apphostid"]) && $_REQUEST["apphostid"] > 0 && !in_array($_REQUEST["apphostid"], $available_hosts)) 
+	if(isset($_REQUEST["apphostid"]) && $_REQUEST["apphostid"] > 0 && !uint_in_array($_REQUEST["apphostid"], $available_hosts)) 
 	{
 		access_deny();
 	}
@@ -45,7 +45,7 @@ include_once "include/page_header.php";
 	$available_hosts = implode(',', $available_hosts);
 
 	if(isset($_REQUEST["groupid"]) && $_REQUEST["groupid"] > 0){
-		if(!in_array($_REQUEST["groupid"], get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,null,
+		if(!uint_in_array($_REQUEST["groupid"], get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,null,
 			PERM_RES_IDS_ARRAY,get_current_nodeid())))
 		{
 			access_deny();
@@ -265,7 +265,7 @@ include_once "include/page_header.php";
 			{
 				$host=get_host_by_hostid($db_host["hostid"]);
 
-				if(!in_array($db_host["hostid"],$hosts)) continue;
+				if(!uint_in_array($db_host["hostid"],$hosts)) continue;
 				if(!delete_host($db_host["hostid"], $unlink_mode))	continue;
 				$result = 1;
 
@@ -281,7 +281,7 @@ include_once "include/page_header.php";
 	{
 		global $USER_DETAILS;
 
-		if(!in_array($_REQUEST['add_to_group'], get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,null,
+		if(!uint_in_array($_REQUEST['add_to_group'], get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,null,
 			PERM_RES_IDS_ARRAY,get_current_nodeid())))
 		{
 			access_deny();
@@ -296,7 +296,7 @@ include_once "include/page_header.php";
 	{
 		global $USER_DETAILS;
 
-		if(!in_array($_REQUEST['delete_from_group'], get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,null,
+		if(!uint_in_array($_REQUEST['delete_from_group'], get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,null,
 			PERM_RES_IDS_ARRAY,get_current_nodeid())))
 		{
 			access_deny();
@@ -316,7 +316,7 @@ include_once "include/page_header.php";
 		$db_hosts=DBselect('select hostid from hosts where '.DBin_node('hostid'));
 		while($db_host=DBfetch($db_hosts))
 		{
-			if(!in_array($db_host["hostid"],$hosts)) continue;
+			if(!uint_in_array($db_host["hostid"],$hosts)) continue;
 			$host=get_host_by_hostid($db_host["hostid"]);
 			$res=update_host_status($db_host["hostid"],$status);
 
@@ -402,7 +402,7 @@ include_once "include/page_header.php";
 			$db_groups=DBselect('select groupid, name from groups where '.DBin_node('groupid'));
 			while($db_group=DBfetch($db_groups))
 			{
-				if(!in_array($db_group["groupid"],$groups)) continue;
+				if(!uint_in_array($db_group["groupid"],$groups)) continue;
 			
 				if(!($group = get_hostgroup_by_groupid($db_group["groupid"]))) continue;
 
@@ -428,7 +428,7 @@ include_once "include/page_header.php";
 			' and '.DBin_node('h.hostid'));
 		while($db_host=DBfetch($db_hosts))
 		{
-			if(!in_array($db_host["groupid"],$groups)) continue;
+			if(!uint_in_array($db_host["groupid"],$groups)) continue;
 			$host=get_host_by_hostid($db_host["hostid"]);
 			if(!update_host_status($db_host["hostid"],$status))	continue;
 
@@ -492,7 +492,7 @@ include_once "include/page_header.php";
 
 			while($db_app = DBfetch($db_applications))
 			{
-				if(!in_array($db_app["applicationid"],$applications))	continue;
+				if(!uint_in_array($db_app["applicationid"],$applications))	continue;
 				if(!delete_application($db_app["applicationid"]))	continue;
 				$result = 1;
 
