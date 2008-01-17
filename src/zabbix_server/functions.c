@@ -68,6 +68,7 @@ void	update_functions(DB_ITEM *item)
 		function.parameter=row[1];
 		ZBX_STR2UINT64(function.itemid,row[2]);
 /*		function.itemid=atoi(row[2]); */
+/*		It is not required to check lastvalue for NULL here */
 		lastvalue=row[3];
 
 		zabbix_log( LOG_LEVEL_DEBUG, "ItemId:" ZBX_FS_UI64 " Evaluating %s(%s)",
@@ -85,7 +86,7 @@ void	update_functions(DB_ITEM *item)
 		if (ret == SUCCEED)
 		{
 			/* Update only if lastvalue differs from new one */
-			if( (lastvalue == NULL) || (strcmp(lastvalue,value) != 0))
+			if( DBis_null(lastvalue)==SUCCEED || (strcmp(lastvalue,value) != 0))
 			{
 				DBescape_string(value,value_esc,MAX_STRING_LEN);
 				DBexecute("update functions set lastvalue='%s' where itemid=" ZBX_FS_UI64 " and function='%s' and parameter='%s'",
