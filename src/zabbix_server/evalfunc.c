@@ -1262,7 +1262,7 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 	{
 		if( (item->value_type==ITEM_VALUE_TYPE_STR) || (item->value_type==ITEM_VALUE_TYPE_LOG))
 		{
-			if(strstr(item->lastvalue_str, parameter) == NULL)
+			if(item->lastvalue_null==0 && strstr(item->lastvalue_str, parameter) == NULL)
 			{
 				strcpy(value,"0");
 			}
@@ -1281,13 +1281,13 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 	{
 		if( (item->value_type==ITEM_VALUE_TYPE_STR) || (item->value_type==ITEM_VALUE_TYPE_LOG))
 		{
-			if(zbx_regexp_match(item->lastvalue_str, parameter, &len) != NULL)
+			if(item->lastvalue_null==0 && zbx_regexp_match(item->lastvalue_str, parameter, &len) == NULL)
 			{
-				strcpy(value,"1");
+				strcpy(value,"0");
 			}
 			else
 			{
-				strcpy(value,"0");
+				strcpy(value,"1");
 			}
 		}
 		else
@@ -1299,13 +1299,13 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 	{
 		if( (item->value_type==ITEM_VALUE_TYPE_STR) || (item->value_type==ITEM_VALUE_TYPE_LOG))
 		{
-			if(zbx_iregexp_match(item->lastvalue_str, parameter, &len) != NULL)
+			if(item->lastvalue_null==0 && zbx_iregexp_match(item->lastvalue_str, parameter, &len) == NULL)
 			{
-				strcpy(value,"1");
+				strcpy(value,"0");
 			}
 			else
 			{
-				strcpy(value,"0");
+				strcpy(value,"1");
 			}
 		}
 		else
