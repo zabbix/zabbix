@@ -37,6 +37,7 @@ Changes for 1.4.j:
 
 Changes for 1.4.5:
 
+ - [ZBX-277] fixed possible server crash when evaluating functions str(), regexp() and iregexp() (Alexei)
  - [ZBX-271] added support of system.boottime[] for OpenBSD & FreeBSD agents (Sasha)
  - [ZBX-268] added support of proc.num[], proc.mem[] & system.cpu.num[] for OpenBSD agents (Sasha)
  - [ZBX-263] fixed problem with saving of lastlogsize for log[] and eventlog[] items when history is set to 0 (Sasha)

@@ -1322,13 +1322,13 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 	{
 		if( (item->value_type==ITEM_VALUE_TYPE_STR) || (item->value_type==ITEM_VALUE_TYPE_LOG))
 		{
-			if(strstr(item->lastvalue_str, parameter) == NULL)
+			if(item->lastvalue_null==0 && strstr(item->lastvalue_str, parameter) != NULL)
 			{
-				strcpy(value,"0");
+				strcpy(value,"1");
 			}
 			else
 			{
-				strcpy(value,"1");
+				strcpy(value,"0");
 			}
 
 		}
@@ -1341,16 +1341,23 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 	{
 		if( (item->value_type==ITEM_VALUE_TYPE_STR) || (item->value_type==ITEM_VALUE_TYPE_LOG))
 		{
-			encoding[0]='\0';
-			get_key_param(item->key, 3, encoding, sizeof(encoding));
-
-			if (FAIL == convertj(item->lastvalue_str, lastvalue_str, sizeof(lastvalue_str), encoding))
-				zbx_strlcpy(lastvalue_str, item->lastvalue_str, sizeof(lastvalue_str));
-
-			//if(zbx_regexp_match(item->lastvalue_str, parameter, &len) != NULL)
-			if(zbx_regexp_match(lastvalue_str, parameter, &len) != NULL)
+			if(item->lastvalue_null==0)
 			{
-				strcpy(value,"1");
+				encoding[0]='\0';
+				get_key_param(item->key, 3, encoding, sizeof(encoding));
+
+				if (FAIL == convertj(item->lastvalue_str, lastvalue_str, sizeof(lastvalue_str), encoding))
+					zbx_strlcpy(lastvalue_str, item->lastvalue_str, sizeof(lastvalue_str));
+
+				//if(zbx_regexp_match(item->lastvalue_str, parameter, &len) != NULL)
+				if(zbx_regexp_match(lastvalue_str, parameter, &len) != NULL)
+				{
+					strcpy(value,"1");
+				}
+				else
+				{
+					strcpy(value,"0");
+				}
 			}
 			else
 			{
@@ -1366,16 +1373,23 @@ int evaluate_function(char *value,DB_ITEM *item,char *function,char *parameter)
 	{
 		if( (item->value_type==ITEM_VALUE_TYPE_STR) || (item->value_type==ITEM_VALUE_TYPE_LOG))
 		{
-			encoding[0]='\0';
-			get_key_param(item->key, 3, encoding, sizeof(encoding));
-
-			if (FAIL == convertj(item->lastvalue_str, lastvalue_str, sizeof(lastvalue_str), encoding))
-				zbx_strlcpy(lastvalue_str, item->lastvalue_str, sizeof(lastvalue_str));
-
-			//if(zbx_iregexp_match(item->lastvalue_str, parameter, &len) != NULL)
-			if(zbx_iregexp_match(lastvalue_str, parameter, &len) != NULL)
+			if(item->lastvalue_null==0)
 			{
-				strcpy(value,"1");
+				encoding[0]='\0';
+				get_key_param(item->key, 3, encoding, sizeof(encoding));
+
+				if (FAIL == convertj(item->lastvalue_str, lastvalue_str, sizeof(lastvalue_str), encoding))
+					zbx_strlcpy(lastvalue_str, item->lastvalue_str, sizeof(lastvalue_str));
+
+				//if(zbx_iregexp_match(item->lastvalue_str, parameter, &len) != NULL)
+				if(zbx_iregexp_match(lastvalue_str, parameter, &len) != NULL)
+				{
+					strcpy(value,"1");
+				}
+				else
+				{
+					strcpy(value,"0");
+				}
 			}
 			else
 			{
