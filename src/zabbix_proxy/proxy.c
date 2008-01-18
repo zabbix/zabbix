@@ -16,6 +16,9 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
+/*
+#define	ZABBIX_TEST
+*/
 
 #include "common.h"
 
@@ -27,6 +30,10 @@
 #include "zlog.h"
 #include "zbxgetopt.h"
 #include "mutexs.h"
+
+#ifdef ZABBIX_TEST
+#include "zbxjson.h"
+#endif
 
 #include "functions.h"
 #include "expression.h"
@@ -248,6 +255,44 @@ void	init_config(void)
 #endif
 }
 
+#ifdef ZABBIX_TEST
+int	test()
+{
+printf("test()\n");
+
+	struct zbx_json	j;
+	zbx_uint64_t	id = 100100000000001;
+	int		i;
+	int		s = time(NULL);
+	zbx_uint64_t	useip = 1, port = 10050;
+
+	zbx_json_init(&j, 128*1024);
+
+	zbx_json_addstring(&j, "type", "ZBX_PROXY_CONFIG");
+	zbx_json_addarray(&j, "hosts");
+		
+	for (i = 0; i < 1000000; i++) {
+		zbx_json_addobject(&j, NULL);
+		zbx_json_adduint64(&j, "hostid", &id);
+		zbx_json_addstring(&j, "host", "zbxw01");
+		zbx_json_addstring(&j, "dns", NULL);
+		zbx_json_adduint64(&j, "useip", &useip);
+		zbx_json_addstring(&j, "ip", "127.0.0.1");
+		zbx_json_adduint64(&j, "port", &port);
+		zbx_json_return(&j);
+
+		id++;
+	}
+printf("[sizeof:%4d] [size:%4d] [offset:%4d] [status:%d] [time:%d]\n", j.buffer_allocated, j.buffer_size, j.buffer_offset, j.status, time(NULL) - s);
+/*fprintf(stderr, j.buffer);*/
+
+	zbx_json_free(&j);
+}
+#endif
+
+
+
+
 /******************************************************************************
  *                                                                            *
  * Function: main                                                             *
@@ -307,6 +352,25 @@ int main(int argc, char **argv)
 		init_database_cache();
 	}
 
+#ifdef ZABBIX_TEST
+/*	struct sigaction  phan;
+
+	phan.sa_handler = test_child_signal_handler;
+	sigemptyset(&phan.sa_mask);
+	phan.sa_flags = 0;
+
+	sigaction(SIGINT,       &phan, NULL);
+	sigaction(SIGQUIT,      &phan, NULL);
+	sigaction(SIGTERM,      &phan, NULL);
+	sigaction(SIGPIPE,      &phan, NULL);
+	sigaction(SIGCHLD,      &phan, NULL);
+*/
+	test();
+
+	zbx_on_exit();
+	return 0;
+#endif /* ZABBIX_TEST */
+	
 	return daemon_start(CONFIG_ALLOW_ROOT);
 }
 
