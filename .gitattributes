@@ -148,6 +148,7 @@ frontends/php/styles/table.css -text
 frontends/php/styles/ul.css -text
 frontends/php/warning.php -text
 include/dbcache.h -text
+include/zbxjson.h -text
 include/zbxodbc.h -text
 m4/libiodbc.m4 -text
 m4/libunixodbc.m4 -text
@@ -160,6 +161,8 @@ misc/init.d/tru64/zabbix_server -text
 src/libs/zbxcommon/time.c -text
 src/libs/zbxdbcache/Makefile.am -text
 src/libs/zbxdbcache/dbcache.c -text
+src/libs/zbxjson/Makefile.am -text
+src/libs/zbxjson/json.c -text
 src/libs/zbxsysinfo/freebsd/boottime.c -text
 src/libs/zbxsysinfo/openbsd/boottime.c -text
 src/zabbix_proxy/Makefile.am -text

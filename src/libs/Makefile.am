@@ -15,13 +15,15 @@ DIST_SUBDIRS = \
 	zbxsysinfo \
 	zbxplugin \
 	zbxsys \
-	zbxjabber
+	zbxjabber \
+	zbxjson
 
 if PROXY
 PROXY_SUBDIRS = \
 	zbxdb \
 	zbxdbcache \
-	zbxdbhigh
+	zbxdbhigh \
+	zbxjson
 endif
 
 if SERVER
