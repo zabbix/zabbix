@@ -659,6 +659,15 @@ esac],
 [server=no])
 AM_CONDITIONAL(SERVER, test x$server = xyes)
 
+AC_ARG_ENABLE(proxy,[  --enable-proxy          Turn on build of proxy server],
+[case "${enableval}" in
+  yes) proxy=yes ;;
+  no)  proxy=no ;;
+  *) AC_MSG_ERROR([bad value ${enableval} for --enable-proxy]) ;;
+esac],
+[proxy=no])
+AM_CONDITIONAL(PROXY, test x$proxy = xyes)
+
 AC_ARG_ENABLE(agent,[  --enable-agent          Turn on build of agent],
 [case "${enableval}" in
   yes) agent=yes ;;
@@ -668,7 +677,7 @@ esac],
 [agent=no])
 AM_CONDITIONAL(AGENT, test x$agent = xyes)
 
-AC_ARG_ENABLE(ipv6,[  --enable-ipv6         Turn on support of IPv6],
+AC_ARG_ENABLE(ipv6,[  --enable-ipv6           Turn on support of IPv6],
 [case "${enableval}" in
   yes) ipv6=yes ;;
   no)  ipv6=no ;;
@@ -688,7 +697,7 @@ if test "$ipv6" = "yes"; then
 	have_ipv6="yes"
 fi
 
-if test "$server" = "yes"; then
+if test "$server" = "yes" || test "$proxy" = "yes"; then
 
 	dnl Checking for Oracle support
 	LIBSQLORA8_CHECK_CONFIG()
@@ -789,6 +798,9 @@ if test "$server" = "yes"; then
 	SERVER_LDFLAGS="${SERVER_LDFLAGS} ${DB_LDFLAGS}"
 	SERVER_LIBS="${SERVER_LIBS} ${DB_LIBS}"
 	
+	PROXY_LDFLAGS="${PROXY_LDFLAGS} ${DB_LDFLAGS}"
+	PROXY_LIBS="${PROXY_LIBS} ${DB_LIBS}"
+	
 	dnl Checking for Jabber libraries
 	JABBER_CHECK_CONFIG()
 	if test "x$want_jabber" = "xyes"; then
@@ -801,6 +813,9 @@ if test "$server" = "yes"; then
 	CFLAGS="${CFLAGS} ${JABBER_CPPFLAGS}"
 	SERVER_LDFLAGS="${SERVER_LDFLAGS} ${JABBER_LDFLAGS}"
 	SERVER_LIBS="${SERVER_LIBS} ${JABBER_LIBS}"
+
+	PROXY_LDFLAGS="${PROXY_LDFLAGS}"
+	PROXY_LIBS="${PROXY_LIBS}"
 
 	dnl Check for libCurl [default - yes]
 	LIBCURL_CHECK_CONFIG(, [7.13.1], [],[])
@@ -816,6 +831,9 @@ if test "$server" = "yes"; then
 	CFLAGS="${CFLAGS} ${LIBCURL_CPPFLAGS}"
 	SERVER_LDFLAGS="${SERVER_LDFLAGS} ${LIBCURL_LDFLAGS}"
 	SERVER_LIBS="${SERVER_LIBS} ${LIBCURL_LIBS}"
+
+	PROXY_LDFLAGS="${PROXY_LDFLAGS} ${LIBCURL_LDFLAGS}"
+	PROXY_LIBS="${PROXY_LIBS} ${LIBCURL_LIBS}"
 
 	have_odbc="no"
 
@@ -859,6 +877,9 @@ if test "$server" = "yes"; then
 		SERVER_LDFLAGS="${SERVER_LDFLAGS} ${ODBC_LDFLAGS}"
 		SERVER_LIBS="${SERVER_LIBS} ${ODBC_LIBS}"
 
+		PROXY_LDFLAGS="${PROXY_LDFLAGS} ${ODBC_LDFLAGS}"
+		PROXY_LIBS="${PROXY_LIBS} ${ODBC_LIBS}"
+
 	fi
 
 	dnl Check for NET-SNMP [by default - skip]
@@ -873,6 +894,9 @@ if test "$server" = "yes"; then
 	CFLAGS="${CFLAGS} ${SNMP_CFLAGS}"
 	SERVER_LDFLAGS="${SERVER_LDFLAGS} ${SNMP_LDFLAGS}"
 	SERVER_LIBS="${SERVER_LIBS} ${SNMP_LIBS}"
+
+	PROXY_LDFLAGS="${PROXY_LDFLAGS} ${SNMP_LDFLAGS}"
+	PROXY_LIBS="${PROXY_LIBS} ${SNMP_LIBS}"
 
 	dnl Check for UCD-SNMP [by default - skip]
 	LIBSNMP_CHECK_CONFIG([no])
@@ -890,8 +914,13 @@ if test "$server" = "yes"; then
 	CFLAGS="${CFLAGS} ${SNMP_CPPFLAGS}"
 	SERVER_LDFLAGS="${SERVER_LDFLAGS} ${SNMP_LDFLAGS}"
 
+	PROXY_LDFLAGS="${PROXY_LDFLAGS} ${SNMP_LDFLAGS}"
+
 	AC_SUBST(SERVER_LDFLAGS)
 	AC_SUBST(SERVER_LIBS)
+
+	AC_SUBST(PROXY_LDFLAGS)
+	AC_SUBST(PROXY_LIBS)
 
 fi
 
@@ -1041,6 +1070,15 @@ AC_OUTPUT([
 	src/zabbix_server/trapper/Makefile
 	src/zabbix_server/utils/Makefile
 	src/zabbix_server/watchdog/Makefile
+	src/zabbix_proxy/Makefile
+	src/zabbix_proxy/dbsyncer/Makefile
+	src/zabbix_proxy/discoverer/Makefile
+	src/zabbix_proxy/housekeeper/Makefile
+	src/zabbix_proxy/httppoller/Makefile
+	src/zabbix_proxy/nodewatcher/Makefile
+	src/zabbix_proxy/pinger/Makefile
+	src/zabbix_proxy/poller/Makefile
+	src/zabbix_proxy/trapper/Makefile
 	upgrades/Makefile
 	])
 
@@ -1059,13 +1097,25 @@ Configuration:
 
 if test "x$server" != "xno"; then
 
-echo "  With database:      ${have_db}
-  WEB Monitoring via: ${have_web_monitoring}
-  Native Jabber:      ${have_jabber}
-  SNMP:               ${have_snmp}
-  IPv6:               ${have_ipv6}
-  Linker flags:       ${LDFLAGS} ${SERVER_LDFLAGS}
-  Libraries:          ${LIBS} ${SERVER_LIBS}"
+echo "  With database:         ${have_db}
+  WEB Monitoring via:    ${have_web_monitoring}
+  Native Jabber:         ${have_jabber}
+  SNMP:                  ${have_snmp}
+  Linker flags:          ${LDFLAGS} ${SERVER_LDFLAGS}
+  Libraries:             ${LIBS} ${SERVER_LIBS}"
+
+fi
+
+echo "
+  Enable proxy:          ${proxy}"
+
+if test "x$proxy" != "xno"; then
+
+echo "  With database:         ${have_db}
+  WEB Monitoring via:    ${have_web_monitoring}
+  SNMP:                  ${have_snmp}
+  Linker flags:          ${LDFLAGS} ${PROXY_LDFLAGS}
+  Libraries:             ${LIBS} ${PROXY_LIBS}"
 
 fi
 
@@ -1080,7 +1130,8 @@ echo "  Linker flags:          ${LDFLAGS}
 fi
 
 echo "
-  LDAP support:          ${found_ldap}"
+  LDAP support:          ${found_ldap}
+  IPv6 support:          ${have_ipv6}"
 
 echo
 echo "***********************************************************"

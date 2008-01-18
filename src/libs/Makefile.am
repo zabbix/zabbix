@@ -17,6 +17,13 @@ DIST_SUBDIRS = \
 	zbxsys \
 	zbxjabber
 
+if PROXY
+PROXY_SUBDIRS = \
+	zbxdb \
+	zbxdbcache \
+	zbxdbhigh
+endif
+
 if SERVER
 SERVER_SUBDIRS = \
 	zbxdb \
@@ -41,6 +48,7 @@ SUBDIRS = \
 	zbxsys \
 	zbxcomms \
 	$(JABBER_SUBDIRS) \
+	$(PROXY_SUBDIRS) \
 	$(SERVER_SUBDIRS)
 
 EXTRA_DIST = zbxwin32
