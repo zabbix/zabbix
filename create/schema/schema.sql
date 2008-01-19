@@ -378,8 +378,15 @@ FIELD		|itemtype	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|description	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
 
+TABLE|proxies|proxyid|ZBX_SYNC
+FIELD		|proxyid	|t_id		|'0'	|NOT NULL	|0
+FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|lastaccess	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+INDEX		|1		|name
+
 TABLE|hosts|hostid|ZBX_SYNC
 FIELD		|hostid		|t_id		|'0'	|NOT NULL	|0
+FIELD		|proxyid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|host		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|dns		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|useip		|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
@@ -392,6 +399,7 @@ FIELD		|available	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|errors_from	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|host
 INDEX		|2		|status
+INDEX		|3		|proxyid
 
 TABLE|hosts_groups|hostgroupid|ZBX_SYNC
 FIELD		|hostgroupid	|t_id		|'0'	|NOT NULL	|0
