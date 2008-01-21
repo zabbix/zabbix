@@ -683,6 +683,8 @@
 
 	# Insert form for User
 	function	insert_user_form($userid,$profile=0){
+		global $ZBX_LOCALES;
+		
 		$frm_title = S_USER;
 		if(isset($userid)){
 			global $USER_DETAILS;
@@ -874,20 +876,10 @@
 		}
 
 		$cmbLang = new CComboBox('lang',$lang);
-		$cmbLang->AddItem("en_gb",S_ENGLISH_GB);
-		$cmbLang->AddItem("cn_zh",S_CHINESE_CN);
-		$cmbLang->AddItem("nl_nl",S_DUTCH_NL);
-		$cmbLang->AddItem("fr_fr",S_FRENCH_FR);
-		$cmbLang->AddItem("de_de",S_GERMAN_DE);
-		$cmbLang->AddItem("hu_hu",S_HUNGARY_HU);
-		$cmbLang->AddItem("it_it",S_ITALIAN_IT);
-		$cmbLang->AddItem("ja_jp",S_JAPANESE_JP);
-		$cmbLang->AddItem("lv_lv",S_LATVIAN_LV);
-		$cmbLang->AddItem("pt_br",S_PORTUGUESE_PT);
-		$cmbLang->AddItem("ru_ru",S_RUSSIAN_RU);
-		$cmbLang->AddItem("sp_sp",S_SPANISH_SP);
-		$cmbLang->AddItem("sv_se",S_SWEDISH_SE);
-
+		foreach($ZBX_LOCALES as $loc_id => $loc_name){
+			$cmbLang->AddItem($loc_id,$loc_name);
+		}
+		
 		$frmUser->AddRow(S_LANGUAGE, $cmbLang);
 
 		$frmUser->AddRow(S_AUTO_LOGOUT_IN_SEC,	new CNumericBox("autologout",$autologout,4));

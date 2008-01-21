@@ -62,11 +62,11 @@
 		$password = md5(get_request("password",""));
 
 		$row = DBfetch(DBselect('SELECT u.userid,u.alias,u.name,u.surname,u.url,u.refresh '.
-						' FROM users u '.
+						' FROM users u, users_groups ug, usrgrp g '.
  						' WHERE u.alias='.zbx_dbstr($name).
 							' AND u.passwd='.zbx_dbstr($password).
 							' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID).
-							' AND status='.USER_STATUS_ENABLED));
+							' AND u.status='.USER_STATUS_ENABLED));
 
 		if($row){
 			$sessionid = md5(time().$password.$name.rand(0,10000000));

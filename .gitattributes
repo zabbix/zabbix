@@ -133,6 +133,7 @@ frontends/php/js/services.js -text
 frontends/php/js/showhint.js -text
 frontends/php/js/tree.js -text
 frontends/php/js/url.js -text
+frontends/php/locales.php -text
 frontends/php/popup_link_tr.php -text
 frontends/php/scripts.php -text
 frontends/php/scripts_exec.php -text
