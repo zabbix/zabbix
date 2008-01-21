@@ -42,9 +42,9 @@
 		vs
 		ctype_digit($foo);
 
-	5)in_array
+	5)_in_array
 		$keys = array("apples", "oranges", "mangoes", "tomatoes", "pickles");
-		if (in_array('mangoes', $keys)) { ... }
+		if (_in_array('mangoes', $keys)) { ... }
 		vs
 		$keys = array("apples" => 1, "oranges" => 1, "mangoes" => 1, "tomatoes" => 1, "pickles" => 1);
 		if (isset($keys['mangoes'])) { ... }

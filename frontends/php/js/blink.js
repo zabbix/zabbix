@@ -16,6 +16,6 @@ var blink = {
 		for(var id=0; id<this.blinkobjs.length; id++){
 			this.blinkobjs[id].style.visibility = 'visible'
 		}
-		setTimeout('blink.hide()',750);
+		setTimeout('blink.hide()',1000);
 	}
 }

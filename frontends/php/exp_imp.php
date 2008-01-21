@@ -22,16 +22,14 @@
 	require_once "include/forms.inc.php";
 ?>
 <?php
-	if(isset($_REQUEST['export']) && isset($_REQUEST['hosts']))
-	{
+	if(isset($_REQUEST['export']) && isset($_REQUEST['hosts'])){
 		$EXPORT_DATA = true;
-        	$page["type"] = PAGE_TYPE_XML;
-        	$page["file"] = "zabbix_export.xml";
+		$page["type"] = PAGE_TYPE_XML;
+		$page["file"] = "zabbix_export.xml";
 	}
-	else
-	{
-	        $page["title"] = "S_EXPORT_IMPORT";
-        	$page["file"] = "exp_imp.php";
+	else{
+		$page["title"] = "S_EXPORT_IMPORT";
+		$page["file"] = "exp_imp.php";
 		$page['hist_arg'] = array('config','groupid');
 	}
 

@@ -25,7 +25,7 @@
 
 	'S_DATE_FORMAT_YMDHMS'=>		'd M H:i:s',
 	'S_DATE_FORMAT_YMD'=>			'd M Y',
-	'S_HTML_CHARSET'=>			'iso-8859-1',
+	'S_HTML_CHARSET'=>				'UTF-8',
 
 	'S_ACTIVATE_SELECTED'=>			'Activate selected',
 	'S_DISABLE_SELECTED'=>			'Disable selected',
@@ -991,7 +991,18 @@
 	'S_MONTHLY'=>				'Monthly',
 	'S_YEARLY'=>				'Yearly',
 
-//      report4.php
+//	locales.php
+	'S_DO_NOT_ADD'=>			'Do not add',
+	'S_LEAVE_EMPTY'=>			'Leave empty',
+	'S_FILL_WITH_DEFAULT_VALUE'=>			'Fill with default value',
+	'S_CREATE'=>				'Create',
+	'S_NEW_SMALL'=>				'new',
+	'S_FILE_SMALL'=>			'file',
+	'S_LOCALES'=>				'Locales',
+	'S_LOCALE_SMALL'=>			'locale',
+	'S_DOWNLOAD'=>				'Download',
+
+//  report4.php
 	'S_NOTIFICATIONS'=>			'Notifications',
 	'S_NOTIFICATIONS_BIG'=>			'NOTIFICATIONS',
 	'S_IT_NOTIFICATIONS'=>			'Notification report',

@@ -25,7 +25,7 @@
 
 	$page['title'] = "S_SCRIPTS";
 	$page['file'] = 'scripts.php';
-
+	$page['hist_arg'] = array('scriptid','form');
 	
 include_once "include/page_header.php";
 
@@ -47,10 +47,10 @@ include_once "include/page_header.php";
 		'command'=>				array(T_ZBX_STR, O_OPT,  NULL,			NOT_EMPTY,	'isset({save})'),
 		'access'=>				array(T_ZBX_INT, O_OPT,  NULL,			IN('0,1'),	'isset({save})'),
 		
-		'form'=>				array(T_ZBX_STR, O_OPT,  NULL,		  	IN('0,1'),	null),
+		'form'=>				array(T_ZBX_STR, O_OPT,  NULL,		  	NULL,		null),
 		'form_refresh'=>		array(T_ZBX_INT, O_OPT,	 NULL,			NULL,		null),
 	);
-	
+
 check_fields($fields);
 
 if(isset($_REQUEST['action'])){
@@ -117,7 +117,10 @@ if(isset($_REQUEST['action'])){
 }
 
 if(isset($_REQUEST['form'])){
-
+	
+	show_table_header(S_SCRIPTS);
+	echo SBR;
+	
 	$frmScr = new CFormTable(S_SCRIPT,'scripts.php','POST',null,'form');
 	$frmScr->AddOption('id','scripts');
 	

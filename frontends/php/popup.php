@@ -727,7 +727,7 @@ include_once "include/page_header.php";
 		while($db_item = DBfetch($db_items))
 		{
 			$description = new CLink(item_description($db_item["description"],$db_item["key_"]),"#","action");
-			$description->SetAction("return add_item_variable('".$dstfrm."',".$db_item["itemid"].");");
+			$description->SetAction("return add_item_variable('".$dstfrm."','".$db_item["itemid"]."');");
 
 			switch($db_item["status"]){
 				case 0: $status=new CCol(S_ACTIVE,"enabled");		break;

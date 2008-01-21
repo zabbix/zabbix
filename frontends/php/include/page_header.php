@@ -37,7 +37,7 @@ COpt::profiling_start("page");
 
 	include_once "include/locales/en_gb.inc.php";
 	process_locales();
-
+	set_zbx_locales();
 	/* Init CURRENT NODE ID */
 	init_nodes();
 	
@@ -55,7 +55,10 @@ COpt::profiling_start("page");
 			break;
 		case PAGE_TYPE_HTML:
 		default:
-			header('Content-Type: text/html; charset='.S_HTML_CHARSET);
+			if(!isset($page['encoding'])) 
+				header('Content-Type: text/html; charset='.S_HTML_CHARSET);
+			else 
+				header('Content-Type: text/html; charset='.$page['encoding']);
 
 			if(isset($page['title']) && defined($page['title']))	$page['title'] = constant($page['title']);
 			
@@ -194,6 +197,7 @@ COpt::profiling_start("page");
 					array("url"=>"scripts.php"	,"label"=>S_SCRIPTS),
 					array("url"=>"audit.php"	,"label"=>S_AUDIT		),
 					array("url"=>"report4.php"	,"label"=>S_NOTIFICATIONS	),
+					array("url"=>"locales.php"	,"label"=>S_LOCALES	),
 					array("url"=>"instal.php"	,"label"=>S_INSTALLATION	,
 						"sub_pages"=>array("setup.php","warning.php"))
 					)
