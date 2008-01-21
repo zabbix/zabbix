@@ -116,7 +116,7 @@ function add_right(formname,type,id,permission,name)
 			$db_resource['name'] = $db_resource['node_name'].':'.$db_resource['name'];
 
 		$name = new CLink($db_resource['name'],'#','action');
-		$name->SetAction("return add_right('".$dstfrm."',".$type.",".$db_resource['id'].",".$permission.",'".$db_resource['name']."');");
+		$name->SetAction("return add_right('".$dstfrm."','".$type."','".$db_resource['id']."','".$permission."','".$db_resource['name']."');");
 
 		$table->AddRow(array($name));
 	}

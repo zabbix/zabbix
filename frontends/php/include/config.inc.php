@@ -92,6 +92,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 	global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID, $ZBX_CONFIGURATION_FILE, $DB_TYPE, $DB_SERVER, $DB_DATABASE, $DB_USER, $DB_PASSWORD;
 	global $ZBX_SERVER, $ZBX_SERVER_PORT;
+	global $ZBX_LOCALES;
 
 	$ZBX_LOCALNODEID = 0;
 	$ZBX_LOCMASTERID = 0;
@@ -295,7 +296,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 		include_once "include/page_footer.php";
 	}
-
+	
 	function uint_in_array($needle,$haystack){
 		foreach($haystack as $id => $value)
 			if(bccomp($needle,$value) == 0) return true;
@@ -1139,8 +1140,15 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		$row=DBfetch(DBselect("select count(alertid) as cnt from alerts"));
 		$status["alerts_count"]=$row["cnt"];
 // triggers
-		$sql = "select count(t.triggerid) as cnt from triggers t, functions f, items i, hosts h".
-			" where t.triggerid=f.triggerid and f.itemid=i.itemid and i.status=0 and i.hostid=h.hostid and h.status=".HOST_STATUS_MONITORED;
+//		$sql = 'SELECT COUNT(DISTINCT t.triggerid) as cnt '.
+		$sql = 'SELECT COUNT(t.triggerid) as cnt '.
+				' FROM triggers t, functions f, items i, hosts h'.
+				' WHERE t.triggerid=f.triggerid '.
+					' AND f.itemid=i.itemid '.
+					' AND i.status=0 '.
+					' AND i.hostid=h.hostid '.
+					' AND h.status='.HOST_STATUS_MONITORED;
+					
 		$row=DBfetch(DBselect($sql));
 		$status["triggers_count"]=$row["cnt"];
 
@@ -1159,7 +1167,11 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		$row=DBfetch(DBselect($sql." and t.status=0 and t.value=2"));
 		$status["triggers_count_unknown"]=$row["cnt"];
 // items 
-		$sql = "select count(i.itemid) as cnt from items i, hosts h where i.hostid=h.hostid and h.status=".HOST_STATUS_MONITORED;
+		$sql = 'SELECT COUNT(i.itemid) as cnt '.
+				' FROM items i, hosts h '.
+				' WHERE i.hostid=h.hostid '.
+					' AND h.status='.HOST_STATUS_MONITORED;
+					
 		$row=DBfetch(DBselect($sql));
 		$status["items_count"]=$row["cnt"];
 
