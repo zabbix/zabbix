@@ -21,11 +21,6 @@
 <?php
 // TODO !!! Correcr the help links !!! TODO
 
-	require_once 	"include/defines.inc.php";
-	require_once 	"include/classes/graph.inc.php";
-	require_once 	"include/users.inc.php";
-	require_once 	"include/db.inc.php";
-
 	function	insert_slideshow_form()
 	{
 		global $_REQUEST;

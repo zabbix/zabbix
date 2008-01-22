@@ -651,7 +651,6 @@ class Chart extends Graph{
 	}
 
 	function selectData(){
-		global $DB_TYPE;
 
 		$this->data = array();
 
@@ -683,7 +682,7 @@ class Chart extends Graph{
 				$to_time	= $this->to_time;
 			}
 			
-			$calc_field = 'round('.$x.'*(mod(clock+'.$z.','.$p.'))/('.$p.'),0)'; /* required for 'group by' support of Oracle */
+			$calc_field = 'round('.$x.'*(mod('.zbx_dbcast_2bigint('clock').'+'.$z.','.$p.'))/('.$p.'),0)';  /* required for 'group by' support of Oracle */
 			$sql_arr = array();
 			
 			if(($this->period / $this->sizeX) <= (ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL)){
@@ -713,7 +712,7 @@ class Chart extends Graph{
 					
 				$this->items[$i]['delay'] = max(($this->items[$i]['delay']*ZBX_GRAPH_MAX_DELAY),ZBX_MAX_TREND_DIFF)/ZBX_GRAPH_MAX_DELAY + 1;
 			}
-
+//SDI($sql_arr);
 			$curr_data = &$this->data[$this->items[$i]["itemid"]][$type];
 			$curr_data->count = NULL;
 			$curr_data->min = NULL;

@@ -438,23 +438,39 @@
 
 /* string value prepearing */
 if(isset($DB_TYPE) && $DB_TYPE == "ORACLE") {
-	function	zbx_dbstr($var)	{
+	function zbx_dbstr($var)	{
 		return "'".ereg_replace('\'','\'\'',$var)."'";	
+	}
+	
+	function zbx_dbcast_2bigint($field){
+		return ' CAST('.$field.' AS NUMBER(20)) ';
 	}
 }
 else if(isset($DB_TYPE) && $DB_TYPE == "MYSQL") {
-	function	zbx_dbstr($var)	{
+	function zbx_dbstr($var)	{
 		return "'".mysql_real_escape_string($var)."'";
+	}
+	
+	function zbx_dbcast_2bigint($field){
+		return ' CAST('.$field.' AS UNSIGNED) ';
 	}
 }
 else if(isset($DB_TYPE) && $DB_TYPE == "POSTGRESQL") {
-	function	zbx_dbstr($var)	{
+	function zbx_dbstr($var)	{
 		return "'".pg_escape_string($var)."'";
+	}
+	
+	function zbx_dbcast_2bigint($field){
+		return ' CAST('.$field.' AS BIGINT) ';
 	}
 }
 else {			
-	function	zbx_dbstr($var)	{
+	function zbx_dbstr($var)	{
 		return "'".addslashes($var)."'";
+	}
+	
+	function zbx_dbcast_2bigint($field){
+		return ' CAST('.$field.' AS BIGINT) ';
 	}
 } 
 
