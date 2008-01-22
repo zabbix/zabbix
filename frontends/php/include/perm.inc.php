@@ -19,8 +19,6 @@
 **/
 ?>
 <?php
-	require_once "include/db.inc.php";
-
 	function	permission2str($group_permission)
 	{
 		$str_perm[PERM_READ_WRITE]	= S_READ_WRITE;

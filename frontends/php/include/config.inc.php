@@ -60,7 +60,7 @@ function TODO($msg) { echo "TODO: ".$msg.BR; }  // DEBUG INFO!!!
 	require_once("include/classes/ciframe.inc.php");
 	require_once("include/classes/cpumenu.inc.php");
 	require_once("include/classes/graph.inc.php");
-require_once('include/classes/ctree.inc.php');
+	require_once('include/classes/ctree.inc.php');
 
 // Include Tactical Overview modules
 
@@ -71,7 +71,6 @@ require_once('include/classes/ctree.inc.php');
 	include_once("include/classes/cserverinfo.mod.php");
 	include_once("include/classes/cflashclock.mod.php");
 
-	require_once 	"include/db.inc.php";
 	require_once 	"include/perm.inc.php";
 	require_once 	"include/audit.inc.php";
 	require_once 	"include/js.inc.php";
@@ -103,7 +102,8 @@ require_once('include/classes/ctree.inc.php');
 	if(file_exists($ZBX_CONFIGURATION_FILE) && !isset($_COOKIE['ZBX_CONFIG']))
 	{
 		include $ZBX_CONFIGURATION_FILE;
-
+		require_once 	"include/db.inc.php";
+		
 		$error = '';
 		if(!DBconnect($error))
 		{
@@ -137,14 +137,16 @@ require_once('include/classes/ctree.inc.php');
 	}
 	else
 	{
-		if(file_exists($ZBX_CONFIGURATION_FILE))
+		if(file_exists($ZBX_CONFIGURATION_FILE)){
 			include $ZBX_CONFIGURATION_FILE;
-
+			require_once 	"include/db.inc.php";
+		}
 		define('ZBX_PAGE_NO_AUTHERIZATION', true);
 		define('ZBX_DISTRIBUTED', false);
 		$show_setup = true;
 	}
-
+	
+	
 	if(!defined('ZBX_PAGE_NO_AUTHERIZATION'))
 	{
 		check_authorisation();
