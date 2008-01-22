@@ -221,7 +221,7 @@ else if(isset($_REQUEST['next'])){
 			$valueTo=$value;
 		}
 		
-		if(function_exists('mb_convert_encoding'))
+		if(function_exists('mb_convert_encoding')){
 			$value = mb_convert_encoding($value,'UTF-8',mb_detect_encoding($value,'UTF-8, iso-8859-1, GB2312'));
 			$valueTo = mb_convert_encoding($valueTo,'UTF-8',mb_detect_encoding($valueTo,'UTF-8, iso-8859-1, GB2312'));
 		}
