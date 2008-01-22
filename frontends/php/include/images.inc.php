@@ -19,8 +19,7 @@
 **/
 ?>
 <?php
-	function	get_image_by_imageid($imageid)
-	{
+	function	get_image_by_imageid($imageid){
 		/*global $DB;
 
 		$st = sqlite3_query($DB, 'select * from images where imageid='.$imageid);
@@ -28,32 +27,26 @@
 		info(sqlite3_column_type($st,3));
 		info(SQLITE3_INTEGER.','.SQLITE3_FLOAT.','.SQLITE3_TEXT.','.SQLITE3_BLOB.','.SQLITE3_NULL);
 		return 0;*/
-
+		global $DB_TYPE;
+		
 		$result = DBselect('select * from images where imageid='.$imageid);
 		$row = DBfetch($result);
-		if($row)
-		{
-			global $DB_TYPE;
-
-			if($DB_TYPE == "ORACLE")
-			{
+		if($row){
+			if($DB_TYPE == "ORACLE"){
 				if(!isset($row['image']))
 					return 0;
 
 				$row['image'] = $row['image']->load();
 			}
-			else if($DB_TYPE == "POSTGRESQL")
-			{
+			else if($DB_TYPE == "POSTGRESQL"){
 				$row['image'] = pg_unescape_bytea($row['image']);
 			}
-			else if($DB_TYPE == "SQLITE3")
-			{
+			else if($DB_TYPE == "SQLITE3"){
 				$row['image'] = pack('H*', $row['image']);
 			}
 			return	$row;
 		}
-		else
-		{
+		else{
 			return 0;
 		}
 	}
