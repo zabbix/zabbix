@@ -21,6 +21,8 @@
 <?php
 // TODO !!! Correcr the help links !!! TODO
 
+	require_once 	"include/users.inc.php";
+
 	function	insert_slideshow_form()
 	{
 		global $_REQUEST;
