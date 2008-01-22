@@ -49,8 +49,7 @@ include_once "include/page_header.php";
 		$th_height = get_request("height",0);
 	}
 
-	if(!($row = get_image_by_imageid($_REQUEST["imageid"])))
-	{
+	if(!($row = get_image_by_imageid($_REQUEST["imageid"]))){
 		error('Incorrect image index');
 		include_once "include/page_footer.php";
 	}
