@@ -67,8 +67,6 @@ function AddItem($itemid, $calc_fnc=CALC_FNC_AVG,$color=null, $type=null, $perio
 
 
 function selectData(){
-	global $DB_TYPE;
-
 	$this->data = array();
 
 	$now = time(NULL);
