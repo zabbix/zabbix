@@ -1,5 +1,6 @@
 Changes for 1.5:
 
+ - [DEV-97] added screen for easier creation of locales (Artem)
  - [DEV-96] added availability to disable default user "guest" (Artem)
  - [DEV-95] added user status enabled/disabled (Artem)
  - [DEV-94] added processing of the "database down" event (Artem)
@@ -41,6 +42,7 @@ Changes for 1.5:
 
 Changes for 1.4.5:
 
+ - [ZBX-283] fixed SQL statement where INTEGER exceeds allowed range (Artem)
  - [ZBX-277] fixed possible server crash when evaluating functions str(), regexp() and iregexp() (Alexei)
  - [ZBX-271] added support of system.boottime[] for OpenBSD & FreeBSD agents (Sasha)
  - [ZBX-268] added support of proc.num[], proc.mem[] & system.cpu.num[] for OpenBSD agents (Sasha)
