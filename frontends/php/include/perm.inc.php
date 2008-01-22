@@ -19,8 +19,6 @@
 **/
 ?>
 <?php
-	require_once "include/db.inc.php";
-
 	function	permission2str($group_permission)
 	{
 		$str_perm[PERM_READ_WRITE]	= S_READ_WRITE;
@@ -55,7 +53,7 @@
 						' AND s.userid=u.userid'.
 						' AND ((s.lastaccess+u.autologout>'.time().') OR (u.autologout=0))'.
 						' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID).
-						' AND status='.USER_STATUS_ENABLED))))
+						' AND u.status='.USER_STATUS_ENABLED))))
 			{
 				zbx_unsetcookie('zbx_sessionid');
 				DBexecute("delete from sessions where sessionid=".zbx_dbstr($sessionid));
@@ -74,7 +72,7 @@
 			if(!($USER_DETAILS = DBfetch(DBselect('SELECT u.* FROM users u '.
 							' WHERE u.alias='.zbx_dbstr(ZBX_GUEST_USER).
 								' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID).
-								' AND status='.USER_STATUS_ENABLED))))
+								' AND u.status='.USER_STATUS_ENABLED))))
 			{
 				$missed_user_guest = true;
 			}

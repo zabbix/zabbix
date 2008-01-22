@@ -72,7 +72,6 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	include_once("include/classes/cserverinfo.mod.php");
 	include_once("include/classes/cflashclock.mod.php");
 
-	require_once 	"include/db.inc.php";
 	require_once 	"include/perm.inc.php";
 	require_once 	"include/audit.inc.php";
 	require_once 	"include/js.inc.php";
@@ -105,7 +104,8 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 	if(file_exists($ZBX_CONFIGURATION_FILE) && !isset($_COOKIE['ZBX_CONFIG'])){
 		include $ZBX_CONFIGURATION_FILE;
-
+		require_once 	"include/db.inc.php";
+		
 		$error = '';
 		if(!DBconnect($error)){
 			$_REQUEST['message'] = $error;
@@ -133,9 +133,11 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		unset($error);
 	}
 	else{
-		if(file_exists($ZBX_CONFIGURATION_FILE))
+		if(file_exists($ZBX_CONFIGURATION_FILE)){
 			include $ZBX_CONFIGURATION_FILE;
-
+			require_once 	"include/db.inc.php";
+		}
+		
 		define('ZBX_PAGE_NO_AUTHERIZATION', true);
 		define('ZBX_DISTRIBUTED', false);
 		$show_setup = true;
