@@ -20,6 +20,8 @@
 #include "common.h"
 #include "zbxjson.h"
 
+#define ZBX_JSON_READABLE
+
 int	zbx_json_init(struct zbx_json *j, size_t allocate)
 {
 	assert(j);
@@ -51,7 +53,7 @@ printf("zbx_json_free()\n");
 	return SUCCEED;
 }
 
-int	zbx_json_realloc(struct zbx_json *j, size_t need)
+static int	__zbx_json_realloc(struct zbx_json *j, size_t need)
 {
 	int	realloc = 0;
 
@@ -64,14 +66,14 @@ int	zbx_json_realloc(struct zbx_json *j, size_t need)
 	}
 
 	if (1 == realloc)/* {
-printf("zbx_json_realloc() %d\n", j->buffer_allocated);*/
+printf("----- zbx_json_realloc() [need:%zd] [allocated:%zd]\n", need, j->buffer_allocated);*/
 		j->buffer = zbx_realloc(j->buffer, j->buffer_allocated);
 /*	}*/
 
 	return SUCCEED;
 }
 
-size_t	zbx_json_stringsize(const char *string, int type_string)
+static size_t	__zbx_json_stringsize(const char *string, zbx_json_type_t type)
 {
 	size_t		len;
 	const char	*sptr;
@@ -88,73 +90,85 @@ size_t	zbx_json_stringsize(const char *string, int type_string)
 		case '\n': /* newline */
 		case '\r': /* carriage return */
 		case '\t': /* horizontal tab */
-			len++;
+			len += 2;
 			break;
+		default:
+			if ((u_char)*sptr < 32)
+				len += 6;
+			else
+				len++;
 		}
-		len++;
 	}
 
-	if (NULL != string && 0 != type_string)
+	if (NULL != string && type == ZBX_JSON_TYPE_STRING)
 		len += 2; /* "" */
 	
 	return len;
 }
 
-char	*zbx_json_insstring(char *p, const char *string, int type_string)
+static char	*__zbx_json_insstring(char *p, const char *string, zbx_json_type_t type)
 {
-	size_t		len;
 	const char	*sptr;
 	char		buffer[] = {"null"};
 
-	if (NULL != string && 0 != type_string)
-		*p++ = '\"';
+	if (NULL != string && type == ZBX_JSON_TYPE_STRING)
+		*p++ = '"';
 	
 	for (sptr = (NULL != string) ? string : buffer; *sptr != '\0'; sptr++) {
 		switch (*sptr) {
-		case '"':  /* quatation mark */
-		case '\\': /* reverse solidus */
-		case '/':  /* solidus */
-		case '\b': /* backspace */
-		case '\f': /* formfeed */
-		case '\n': /* newline */
-		case '\r': /* carriage return */
-		case '\t': /* horizontal tab */
-			*p++ = '\\';
-			break;
-		}
-		switch (*sptr) {
-		case '\b': *p++ = 'b'; break; /* backspace */
-		case '\f': *p++ = 'f'; break; /* formfeed */
-		case '\n': *p++ = 'n'; break; /* newline */
-		case '\r': *p++ = 'r'; break; /* carriage return */
-		case '\t': *p++ = 't'; break; /* horizontal tab */
+		case '"': *p++ = '\\'; *p++ = '"'; break; /* quatation mark */
+		case '\\': *p++ = '\\'; *p++ = '\\'; break; /* reverse solidus */
+		case '/': *p++ = '\\'; *p++ = '/'; break; /* solidus */
+		case '\b': *p++ = '\\'; *p++ = 'b'; break; //* backspace */
+		case '\f': *p++ = '\\'; *p++ = 'f'; break; /* formfeed */
+		case '\n': *p++ = '\\'; *p++ = 'n'; break; /* newline */
+		case '\r': *p++ = '\\'; *p++ = 'r'; break; /* carriage return */
+		case '\t': *p++ = '\\'; *p++ = 't'; break; /* horizontal tab */
 		default:
-			*p++ = *sptr;
+			if ((u_char)*sptr < 32) {
+				*p++ = '\\';
+				*p++ = 'u';
+				*p++ = '0';
+				*p++ = '0';
+				*p++ = zbx_num2hex( (*sptr >> 4) & 0xf );
+				*p++ = zbx_num2hex( *sptr & 0xf );
+			} else
+				*p++ = *sptr;
 		}
 	}
 
-	if (NULL != string && 0 != type_string)
-		*p++ = '\"';
+	if (NULL != string && type == ZBX_JSON_TYPE_STRING)
+		*p++ = '"';
 
 	return p;
 }
 
-int	___zbx_json_addobject(struct zbx_json *j, const char *name, char lbracket, char rbracket)
+static int	___zbx_json_addobject(struct zbx_json *j, const char *name, char lbracket, char rbracket)
 {
 	size_t	len = 2; /* brackets */
 	char	*p, *psrc, *pdst;
+#ifdef ZBX_JSON_READABLE
+	int	i;
+#endif
 
 	assert(j);
+
+#ifdef ZBX_JSON_READABLE
+	len += j->level + 1;
+#endif
 
 	if (j->status == ZBX_JSON_COMMA)
 		len++; /* , */
 
 	if (NULL != name) {
-		len += zbx_json_stringsize(name, 1);
+#ifdef ZBX_JSON_READABLE
+		len += j->level + 1;
+#endif
+		len += __zbx_json_stringsize(name, 1);
 		len += 1; /* : */
 	}
 	
-	zbx_json_realloc(j, j->buffer_size + len + 1/*'\0'*/);
+	__zbx_json_realloc(j, j->buffer_size + len + 1/*'\0'*/);
 
 	psrc = j->buffer + j->buffer_offset;
 	pdst = j->buffer + j->buffer_offset + len;
@@ -167,20 +181,32 @@ int	___zbx_json_addobject(struct zbx_json *j, const char *name, char lbracket, c
 		*p++ = ',';
 
 	if (NULL != name) {
-		p = zbx_json_insstring(p, name, 1);
+#ifdef ZBX_JSON_READABLE
+		*p++ = '\n';
+		for (i = 0; i < j->level; i ++)
+			*p++ = '\t';
+#endif
+		p = __zbx_json_insstring(p, name, 1);
 		*p++ = ':';
 	}
 
 	*p++ = lbracket;
+#ifdef ZBX_JSON_READABLE
+	*p++ = '\n';
+	for (i = 0; i < j->level; i ++)
+		*p++ = '\t';
+#endif
 	*p = rbracket;
 
 	j->buffer_offset = p - j->buffer;
+#ifdef ZBX_JSON_READABLE
+	j->buffer_offset -= j->level; /*'\t'*/
+	j->buffer_offset--; /*'\n'*/
+#endif
 	j->buffer_size += len;
 	j->level++;
 	j->status = ZBX_JSON_EMPTY;
-/*
-printf("zbx_json_addobject() [sizeof:%4d] [size:%4d] [offset:%4d] [status:%d] %s\n", j->buffer_allocated, j->buffer_size, j->buffer_offset, j->status, j->buffer);
-*/
+
 	return SUCCEED;
 }
 
@@ -196,23 +222,30 @@ int	zbx_json_addarray(struct zbx_json *j, const char *name)
 	return  ___zbx_json_addobject(j, name, '[', ']');
 }
 
-int	__zbx_json_addstring(struct zbx_json *j, const char *name, const char *string, int type_string)
+static int	__zbx_json_addstring(struct zbx_json *j, const char *name, const char *string, zbx_json_type_t type)
 {
 	size_t	len = 0;
 	char	*p, *psrc, *pdst;
+#ifdef ZBX_JSON_READABLE
+	int	i;
+#endif
 
 	assert(j);
 
 	if (j->status == ZBX_JSON_COMMA)
 		len++; /* , */
 
+#ifdef ZBX_JSON_READABLE
+	len += j->level + 1;
+#endif
+
 	if (NULL != name) {
-		len += zbx_json_stringsize(name, 1);
+		len += __zbx_json_stringsize(name, 1);
 		len += 1; /* : */
 	}
-	len += zbx_json_stringsize(string, type_string);
+	len += __zbx_json_stringsize(string, type);
 	
-	zbx_json_realloc(j, j->buffer_size + len + 1/*'\0'*/);
+	__zbx_json_realloc(j, j->buffer_size + len + 1/*'\0'*/);
 
 	psrc = j->buffer + j->buffer_offset;
 	pdst = j->buffer + j->buffer_offset + len;
@@ -221,21 +254,25 @@ int	__zbx_json_addstring(struct zbx_json *j, const char *name, const char *strin
 
 	p = psrc;
 
-	if (j->status == ZBX_JSON_COMMA)
+	if (j->status == ZBX_JSON_COMMA) {
 		*p++ = ',';
+	}
+#ifdef ZBX_JSON_READABLE
+	*p++ = '\n';
+	for (i = 0; i < j->level; i ++)
+		*p++ = '\t';
+#endif
 
 	if (NULL != name) {
-		p = zbx_json_insstring(p, name, 1);
+		p = __zbx_json_insstring(p, name, 1);
 		*p++ = ':';
 	}
-	p = zbx_json_insstring(p, string, type_string);
+	p = __zbx_json_insstring(p, string, type);
 
 	j->buffer_offset = p - j->buffer;
 	j->buffer_size += len;
 	j->status = ZBX_JSON_COMMA;
-/*
-printf("zbx_json_addstring() [sizeof:%4d] [size:%4d] [offset:%4d] [status:%d] %s\n", j->buffer_allocated, j->buffer_size, j->buffer_offset, j->status, j->buffer);
-*/
+
 	return SUCCEED;
 }
 
@@ -244,10 +281,10 @@ int	zbx_json_addstring(struct zbx_json *j, const char *name, const char *string)
 	return __zbx_json_addstring(j, name, string, 1);
 }
 
-int	zbx_json_adduint64(struct zbx_json *j, const char *name, const zbx_uint64_t *value)
+/*int	zbx_json_adduint64(struct zbx_json *j, const char *name, const zbx_uint64_t *value)
 {
-	char	buffer[21]; /* strlen("18446744073709551615") == 20 */
-	char	*string = NULL;
+	char	buffer[21];*/ /* strlen("18446744073709551615") == 20 */
+/*	char	*string = NULL;
 
 	if (NULL != value) {
 		zbx_snprintf(buffer, sizeof(buffer), ZBX_FS_UI64, *value);
@@ -269,15 +306,161 @@ int	zbx_json_adddouble(struct zbx_json *j, const char *name, const double *value
 	
 	return __zbx_json_addstring(j, name, string, 0);
 }
-
+*/
 int	zbx_json_return(struct zbx_json *j)
 {
+#ifdef ZBX_JSON_READABLE
+	char	*p;
+#endif
+
 	if (j->level == 1)
 		return FAIL;
 
 	j->level--;
+#ifdef ZBX_JSON_READABLE
+	p = j->buffer + j->buffer_offset;
+	while (*p == '\t' || *p == '\n') {
+		p++;
+		j->buffer_offset++;
+	}
+#endif
 	j->buffer_offset++;
 	j->status = ZBX_JSON_COMMA;
 
 	return SUCCEED;
+}
+
+int	zbx_json_open(const char *buffer, struct zbx_json_parse *jp)
+{
+	const char	*p;
+
+	p = buffer;
+
+	jp->start = NULL;
+	jp->end = NULL;
+
+	if (*p == '{')
+		jp->start = p + 1;
+	else
+		return FAIL;
+
+	while (*++p != '\0')
+		;
+	
+	if (*--p == '}')
+		jp->end = p;
+	else
+		return FAIL;
+/*fprintf(stderr, "----- [%s] [%s] [%c]\n", jp->start, jp->end, *p);*/
+
+	return SUCCEED;
+}
+
+const char	*zbx_json_nextfield(struct zbx_json_parse *jp, const char *p)
+{
+	int	level = 0;
+	int	state = 0; /* o - outside string; 1 - inside string */
+
+/*fprintf(stderr, "----- [%s]\n", jp->pair_start);*/
+	while (p <= jp->end) {
+/*fprintf(stderr, "----- [level:%d] [state:%d] [%c]\n", level, state, *jp->pair_end);*/
+		switch (*p) {
+		case '"':
+			state = (0 == state) ? 1 : 0;
+			break;
+		case '\\':
+			if (1 == state)
+				p++;
+			break;
+		case '[':
+		case '{':
+			if (0 == state)
+				level++;
+			break;
+		case ']':
+		case '}':
+			if (0 == state) {
+				if (0 == level)
+					return NULL;
+				level--;
+			}
+			break;
+		case ',':
+			if (0 == state)
+				if (0 == level)
+					return ++p;
+			break;
+		}
+		p++;
+	}
+	return NULL;
+}
+
+const char	*zbx_json_decodestring(const char *p, char *string, size_t len)
+{
+	int	state = 0; /* 0 - init; 1 - inside string */
+	char	*o = string;
+	u_char	c;
+
+	if ('"' != *p)
+		return NULL;
+
+	while (*p != '\0') { /* this should never happen */
+		if (*p == '"') {
+			if (state == 1) {
+				*o = '\0';
+				return ++p;
+			}
+			state = 1;
+		} else if (state == 1 && o - string < len - 1/* '\0' */) {
+			if (*p == '\\') {
+				switch (*++p) {
+				case '"': 
+				case '\\': 
+				case '/': *o++ = *p; break;
+				case 'b': *o++ = '\b'; break;
+				case 'f': *o++ = '\f'; break;
+				case 'n': *o++ = '\n'; break;
+				case 'r': *o++ = '\r'; break;
+				case 't': *o++ = '\t'; break;
+				case 'u':
+					p += 2; /* '00' */
+					c = zbx_hex2num( *p++ ) << 4;
+					c += zbx_hex2num( *p );
+					*o++ = (char)c;
+					break;
+				default:
+					/* this should never happen */;
+				}
+			} else
+				*o++ = *p;
+		}
+		p++;
+	}
+	return NULL;
+}
+
+const char	*zbx_json_getvalue_ptr(struct zbx_json_parse *jp, const char *name)
+{
+	char		buffer[MAX_STRING_LEN];
+	const char	*p;
+
+	for (p = jp->start; p != NULL; p = zbx_json_nextfield(jp, p)) {
+		if (NULL == (p = zbx_json_decodestring(p, buffer, sizeof(buffer))))
+			return NULL;
+		       
+		if (0 == strcmp(name, buffer))
+			return *p == ':' ? ++p : NULL;
+	}
+/*fprintf(stderr, "----- [%s] FAIL\n", name);*/
+	return NULL;
+}
+
+zbx_json_type_t	zbx_json_getvalue_type(const char *p)
+{
+	if (p[0] == '"')
+		return ZBX_JSON_TYPE_STRING;
+	if (p[0] == 'n' && p[1] == 'u' && p[2] == 'l' && p[3] == 'l')
+		return ZBX_JSON_TYPE_NULL;
+	return ZBX_JSON_TYPE_UNKNOWN;
 }
