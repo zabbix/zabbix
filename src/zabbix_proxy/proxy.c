@@ -310,10 +310,7 @@ printf("[sizeof:%4d] [size:%4d] [offset:%4d] [status:%d] [time:%d]\n", j.buffer_
  ******************************************************************************/
 int main(int argc, char **argv)
 {
-	zbx_task_t	task  = ZBX_TASK_START;
 	char    ch      = '\0';
-
-	int	nodeid;
 
 	progname = argv[0];
 
