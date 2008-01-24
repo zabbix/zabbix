@@ -97,7 +97,6 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	$ZBX_LOCMASTERID = 0;
 
 	$ZBX_CONFIGURATION_FILE = './conf/zabbix.conf.php';
-
 	$ZBX_CONFIGURATION_FILE = realpath(dirname($ZBX_CONFIGURATION_FILE)).'/'.basename($ZBX_CONFIGURATION_FILE);
 
 	unset($show_setup);
@@ -135,14 +134,15 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	else{
 		if(file_exists($ZBX_CONFIGURATION_FILE)){
 			include $ZBX_CONFIGURATION_FILE;
-			require_once 	"include/db.inc.php";
 		}
+		
+		require_once("include/db.inc.php");
 		
 		define('ZBX_PAGE_NO_AUTHERIZATION', true);
 		define('ZBX_DISTRIBUTED', false);
 		$show_setup = true;
 	}
-
+	
 	if(!defined('ZBX_PAGE_NO_AUTHERIZATION')){
 		check_authorisation();
 
@@ -159,6 +159,16 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 				"name"  =>'- unknown -',
 				"nodeid"=>0));
 	}
+	
+// INIT MB Strings if it's available
+	init_mbstrings();
+/*
+//Require MB strings, otherwise show warning page.
+	if(!isset($show_setup) && !isset($show_warning) && !init_mbstrings()){
+		$_REQUEST['warning_msg'] = S_ZABBIX_VER.SPACE.S_REQUIRE_MB_STRING_MODULE;
+		$show_warning = true;
+	}
+//*/
 
 	if(isset($show_setup)){
 		unset($show_setup);
@@ -297,6 +307,39 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		show_error_message(S_NO_PERMISSIONS);
 
 		include_once "include/page_footer.php";
+	}
+	
+	function zbx_strlen(&$str){
+		if(!$strlen = strlen($str)) return $strlen;
+		
+		$reallen = 0;
+		$fbin= 1 << 7;
+		$sbin= 1 << 6;
+	
+	// check first byte for 11xxxxxx or 0xxxxxxx
+		for($i=0; $i < $strlen; $i++){
+			if(((ord($str[$i]) & $fbin) && (ord($str[$i]) & $sbin)) || !(ord($str[$i]) & $fbin)) $reallen++;
+		}
+	return $reallen;
+	}
+	
+	function zbx_strstr($haystack,$needle){
+		$pos = strpos($haystack,$needle);
+		if($pos !== FALSE){
+			$pos = substr($haystack,$pos);
+		}
+	return $pos;
+	}
+	
+	function zbx_stristr($haystack,$needle){
+		$haystack_B = strtoupper($haystack);
+		$needle = strtoupper($needle);
+		
+		$pos = strpos($haystack_B,$needle);
+		if($pos !== FALSE){
+			$pos = substr($haystack,$pos);
+		}
+	return $pos;
 	}
 	
 	function uint_in_array($needle,$haystack){
@@ -1104,7 +1147,6 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		else{
 			$status["zabbix_server"] = S_NO;
 		}
-
 // history & trends
 /*		if ($DB_TYPE == "MYSQL")
 		{
@@ -1142,7 +1184,6 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		$row=DBfetch(DBselect("select count(alertid) as cnt from alerts"));
 		$status["alerts_count"]=$row["cnt"];
 // triggers
-//		$sql = 'SELECT COUNT(DISTINCT t.triggerid) as cnt '.
 		$sql = 'SELECT COUNT(t.triggerid) as cnt '.
 				' FROM triggers t, functions f, items i, hosts h'.
 				' WHERE t.triggerid=f.triggerid '.
@@ -1650,10 +1691,9 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	 * description:
 	 *      unset and clear cookies.
 	 *
-	 * author: Eugene Grigorjev
+	 * author: Aly
 	 */
-	function	zbx_unsetcookie($name)
-	{
+	function	zbx_unsetcookie($name){
 		zbx_setcookie($name, null, -99999);
 	}
 	
@@ -1700,8 +1740,6 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 	function	inarr_isset($keys, $array=null)
 	{
-		global $_REQUEST;
-
 		if(is_null($array)) $array =& $_REQUEST;
 
 		if(is_array($keys))

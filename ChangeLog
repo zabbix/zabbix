@@ -1,5 +1,6 @@
 Changes for 1.5:
 
+ - [DEV-102] added support of UTF8 for GUI (Artem)
  - [DEV-97] added screen for easier creation of locales (Artem)
  - [DEV-96] added availability to disable default user "guest" (Artem)
  - [DEV-95] added user status enabled/disabled (Artem)

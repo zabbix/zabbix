@@ -434,15 +434,25 @@
 	define('RARR',	'&rArr;');
 
 	define('ZBX_EREG_SPACES', '([[:space:]]+){0,1}');
-	define('ZBX_EREG_INTERNAL_NAMES', '([0-9a-zA-Z_.[:space:][.-.]$]+)');
-	define('ZBX_EREG_KEY_NAME', '([0-9a-zA-Z_.,[.:.][:space:][.-.]$]+)');
+
+// affects multibyte strings [in mb_ereg char "-" must be backslashed]!!!
+if((ini_get('mbstring.func_overload') > 5)){
+	define('ZBX_MBSTRINGS_OVERLOADED',1);
+	define('ZBX_EREG_SPACE_SYMB','\-');
+}else{
+	define('ZBX_EREG_SPACE_SYMB','-');
+}
+	define('ZBX_EREG_INTERNAL_NAMES', '([0-9a-zA-Z_.[:space:][.'.ZBX_EREG_SPACE_SYMB.'.]$]+)');
+	define('ZBX_EREG_KEY_NAME', '([0-9a-zA-Z_.,[.:.][:space:][.'.ZBX_EREG_SPACE_SYMB.'.]$]+)');
 	define('ZBX_EREG_PARAMS', '([[:print:]]+){0,1}');
-	define('ZBX_EREG_SIGN', '([&|><=+*/#[.-.]])');
-	define('ZBX_EREG_NUMBER', '([[.-.]+]*[0-9]+[.]{0,1}[0-9]*[A-Z]{0,1})');
+	define('ZBX_EREG_SIGN', '([&|><=+*/#[.'.ZBX_EREG_SPACE_SYMB.'.]])');
+	define('ZBX_EREG_NUMBER', '([[.'.ZBX_EREG_SPACE_SYMB.'.]+]*[0-9]+[.]{0,1}[0-9]*[A-Z]{0,1})');
+//-------
 
 	/* Character '-' must be last in the list of symbols, otherwise it won't be accepted */
-	define('ZBX_EREG_DNS_FORMAT', '([0-9a-zA-Z\_\.\$[.-.]]+)');
+	define('ZBX_EREG_DNS_FORMAT', '([0-9a-zA-Z\_\.\$[.'.ZBX_EREG_SPACE_SYMB.'.]]+)');
 	define('ZBX_EREG_HOST_FORMAT', ZBX_EREG_INTERNAL_NAMES);
+	
 	define('ZBX_EREG_NODE_FORMAT', ZBX_EREG_INTERNAL_NAMES);
 	define('ZBX_EREG_ITEM_KEY_FORMAT', '('.ZBX_EREG_KEY_NAME.'(\['.ZBX_EREG_PARAMS.'\]){0,1})');
 	define('ZBX_KEY_ID', 1);

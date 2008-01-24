@@ -170,6 +170,7 @@
 	'S_NEW_INSTALLATION_BIG'=>		'NEW INSTALLATION',
 	'S_INSTALLATION_UPDATE'=>		'Installation/Update',
 	'S_ZABBIX_IS_UNAVAILABLE'=>		'ZABBIX is temporary unavailable',
+	'S_REQUIRE_MB_STRING_MODULE'=>	'Require Multibyte String module to run FrontEnd',
 	
 //	node.php
 	'S_TIME_ZONE'=>				'Time zone',

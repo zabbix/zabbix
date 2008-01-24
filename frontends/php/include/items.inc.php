@@ -1139,8 +1139,8 @@ COpt::profiling_stop('prepare table');
 			if($row)
 			{
 				$lastvalue=/*nbsp(htmlspecialchars(*/$row["value"]/*))*/;
-				if(utf8_strlen($lastvalue) > 20)
-					$lastvalue = utf8_strtop($lastvalue,20)." ...";
+				if(strlen($lastvalue) > 20)
+					$lastvalue = substr($lastvalue,0,20)." ...";
 				$lastvalue = nbsp(htmlspecialchars($lastvalue));
 			}
 			else

@@ -173,11 +173,11 @@ function selectData(){
 		}
 		
 		$this->sum += $item_value;
-		$strvaluelenght = max($strvaluelenght,strlen($item_value));
+		$strvaluelength = max($strvaluelength,strlen($item_value));
 	}
 	
 	if(isset($graph_sum)) $this->sum = $graph_sum;
-	$this->shiftlegendright += $strvaluelenght * 7;
+	$this->shiftlegendright += $strvaluelength * 7;
 }
 
 

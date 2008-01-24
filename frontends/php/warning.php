@@ -34,6 +34,7 @@ $refresh_rate = 30; //seconds
 <?php
 	$fields=array(
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+		"warning_msg"=>	array(T_ZBX_STR, O_OPT,	NULL,			NULL,	NULL),
 		"message"=>		array(T_ZBX_STR, O_OPT,	NULL,			NULL,	NULL),
 		"retry"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"cancel"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL)
@@ -51,8 +52,6 @@ $refresh_rate = 30; //seconds
 $USER_DETAILS["refresh"] = $refresh_rate;
 include_once "include/page_header.php";
 unset($USER_DETAILS);
-
-//	if(isset($_REQUEST['message']))	show_error_message($_REQUEST['message']);
 	
 	insert_showhint_javascript();
 
@@ -66,8 +65,10 @@ unset($USER_DETAILS);
 		
 	$table->AddRow(SPACE);
 	
+	$warning_msg=(isset($_REQUEST['warning_msg']))?($_REQUEST['warning_msg']):(S_ZABBIX_IS_UNAVAILABLE.'!');
+	
 	$img = new CImg('./images/general/warning16r.gif','warning',16,16,'img');
-	$msg = new CSpan(bold(SPACE.S_ZABBIX_IS_UNAVAILABLE.'!'));
+	$msg = new CSpan(bold(SPACE.$warning_msg));
 	$msg->AddOption('style','line-height: 20px; vertical-align: top;');
 	
 	$table->AddRow(new CCol(array(
