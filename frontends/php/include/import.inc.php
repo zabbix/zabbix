@@ -420,7 +420,7 @@
 							info('Trigger ['.$data['description'].'] skipped - user rule for host');
 							break; // case
 						}
-						if(strstr($data['expression'],'{HOSTNAME}'))
+						if(zbx_strstr($data['expression'],'{HOSTNAME}'))
 						{
 							error('Trigger ['.$data['description'].'] skipped - missed host');
 							break; // case
@@ -506,7 +506,7 @@
 						}
 						foreach($data['items'] as $id)
 
-						if(strstr($data['name'],'{HOSTNAME}'))
+						if(zbx_strstr($data['name'],'{HOSTNAME}'))
 						{
 							error('Graph ['.$data['name'].'] skipped - missed host');
 							break; // case

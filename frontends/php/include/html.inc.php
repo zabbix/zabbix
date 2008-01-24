@@ -49,17 +49,6 @@
 		return str_replace(" ",SPACE,$str);
 	}
 
-	function utf8_strlen($s)
-	{
-		return preg_match_all('/([\x01-\x7f]|([\xc0-\xff][\x80-\xbf]{1,5}))/', $s, $tmp);
-	}
-
-	function utf8_strtop($s, $len)
-	{
-		preg_match('/^([\x01-\x7f]|([\xc0-\xff][\x80-\xbf]{1,5})){0,'.$len.'}/', $s, $tmp);
-		return (isset($tmp[0])) ? $tmp[0] : false;
-	}
-
 	function url1_param($parameter)
 	{
 		if(isset($_REQUEST[$parameter]))

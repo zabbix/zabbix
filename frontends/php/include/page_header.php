@@ -22,7 +22,6 @@
 	require_once("include/config.inc.php");
 	require_once("include/perm.inc.php");
 
-
 	global $USER_DETAILS;
 	global $ZBX_LOCALNODEID, $ZBX_LOCMASTERID;
 	global $ZBX_CURMASTERID;

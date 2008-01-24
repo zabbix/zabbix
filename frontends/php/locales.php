@@ -32,6 +32,8 @@ else{
 	$page['hist_arg'] = array('');
 }
 
+define('ZBX_ALLOW_UNICODE',1);
+
 include_once "include/page_header.php";
 
 //---------------------------------- CHECKS ------------------------------------
@@ -210,6 +212,7 @@ else if(isset($_REQUEST['next'])){
 	foreach($transFrom as $key => $value){
 		if(isset($transTo[$key]) && !empty($transTo[$key])){
 			$valueTo = $transTo[$key];
+			unset($transTo[$key]);
 		}
 		else if(($_REQUEST['extlang'] != 'new') && ($fill == 0)){
 			continue;
@@ -221,9 +224,9 @@ else if(isset($_REQUEST['next'])){
 			$valueTo=$value;
 		}
 		
-		if(function_exists('mb_convert_encoding')){
-			$value = mb_convert_encoding($value,'UTF-8',mb_detect_encoding($value,'UTF-8, iso-8859-1, GB2312'));
-			$valueTo = mb_convert_encoding($valueTo,'UTF-8',mb_detect_encoding($valueTo,'UTF-8, iso-8859-1, GB2312'));
+		if(defined('ZBX_MBSTRINGS_ENABLED')){
+			$value = mb_convert_encoding($value,'UTF-8',mb_detect_encoding($value));
+			$valueTo = mb_convert_encoding($valueTo,'UTF-8',mb_detect_encoding($valueTo));
 		}
 		
 		$frmLcls->AddRow($value, new Ctextbox('langTo['.$key.']',$valueTo,80));

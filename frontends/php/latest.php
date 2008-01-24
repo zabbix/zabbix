@@ -216,7 +216,7 @@ include_once "include/page_header.php";
 		while($db_item = DBfetch($db_items)){
 			$description = item_description($db_item["description"],$db_item["key_"]);
 
-			if( '' != $_REQUEST["select"] && !stristr($description, $_REQUEST["select"]) ) continue;
+			if( '' != $_REQUEST["select"] && !zbx_stristr($description, $_REQUEST["select"]) ) continue;
 
 			++$item_cnt;
 			if(!uint_in_array($db_app["applicationid"],$_REQUEST["applications"]) && !isset($show_all_apps)) continue;
@@ -324,7 +324,7 @@ include_once "include/page_header.php";
 		while($db_item = DBfetch($db_items)){
 			$description = item_description($db_item["description"],$db_item["key_"]);
 	
-			if( '' != $_REQUEST["select"] && !stristr($description, $_REQUEST["select"]) ) continue;
+			if( '' != $_REQUEST["select"] && !zbx_stristr($description, $_REQUEST["select"]) ) continue;
 	
 			++$item_cnt;
 			if(!uint_in_array(0,$_REQUEST["applications"]) && $any_app_exist && !isset($show_all_apps)) continue;

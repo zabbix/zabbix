@@ -332,7 +332,7 @@
 					{
 						foreach($row as $id => $name)
 						{
-							if(!strstr($id,'.')) continue;
+							if(!zbx_strstr($id,'.')) continue;
 							$ids = explode('.',$id);
 							$row[array_pop($ids)] = $row[$id];
 							unset($row[$id]);

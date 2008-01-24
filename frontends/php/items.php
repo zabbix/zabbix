@@ -768,7 +768,7 @@ include_once "include/page_header.php";
 
 			$item_description = item_description($db_item["description"],$db_item["key_"]);
 
-			if( $_REQUEST['external_filter'] && isset($_REQUEST['with_description']) && !stristr($item_description, $_REQUEST['with_description']) ) continue;
+			if( $_REQUEST['external_filter'] && isset($_REQUEST['with_description']) && !zbx_stristr($item_description, $_REQUEST['with_description']) ) continue;
 
 			if($db_item["templateid"])
 			{
