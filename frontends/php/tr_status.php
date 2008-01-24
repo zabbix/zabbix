@@ -423,7 +423,7 @@ include_once "include/page_header.php";
 
 		$description = expand_trigger_description($row['triggerid']);
 
-		if(isset($_REQUEST["btnSelect"]) && '' != $txt_select && ((stristr($description, $txt_select)) == ($_REQUEST["btnSelect"]=="Inverse select"))) continue;
+		if(isset($_REQUEST["btnSelect"]) && '' != $txt_select && ((zbx_stristr($description, $txt_select)) == ($_REQUEST["btnSelect"]=="Inverse select"))) continue;
 
 		if($row["url"] != "")
 		{

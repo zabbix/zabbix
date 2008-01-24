@@ -364,7 +364,7 @@ include_once "include/page_header.php";
 
 				if(isset($_REQUEST["filter"]) && $_REQUEST["filter"]!="")
 				{
-					$contain = stristr($row["value"],$_REQUEST["filter"]) ? TRUE : FALSE;
+					$contain = zbx_stristr($row["value"],$_REQUEST["filter"]) ? TRUE : FALSE;
 
 					if(!isset($_REQUEST["mark_color"])) $_REQUEST["mark_color"] = MARK_COLOR_RED;
 

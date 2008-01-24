@@ -240,7 +240,7 @@
 					!isset($ZBX_CONFIG['allowed_db']['no']),
 					'Required any databases support [MySQL or PostgreSQL or Oracle]'));
 
-			/* Check BC math */
+/* Check BC math */
 			$bcmath_fnc_exist = 
 				function_exists('bcadd') &&
 				function_exists('bccomp') &&
@@ -248,7 +248,7 @@
 				function_exists('bcmod') &&
 				function_exists('bcmul') &&
 				function_exists('bcpow') &&
-				/* This function is supported by PHP5 only */
+/* This function is supported by PHP5 only */
 /*				function_exists('bcpowmod') &&*/
 				function_exists('bcscale') &&
 				function_exists('bcsqrt') &&
@@ -260,6 +260,17 @@
 					$bcmath_fnc_exist ? 'yes' : 'no',
 					$bcmath_fnc_exist,
 					'Required bcmath module [configured PHP with --enable-bcmath]'));
+					
+/* Check mb-strings 
+			$mbstrings_fnc_exist = mbstrings_available();
+			$table->AddRow(
+				$this->get_test_result(
+					$final_result,
+					'PHP MB String support',
+					$mbstrings_fnc_exist ? 'yes' : 'no',
+					$mbstrings_fnc_exist,
+					'Required Multibyte String module [configured PHP with --enable-mbstring]'));
+//*/
 
 			/* Check GD existence */
 			$gd_version = S_NO;
