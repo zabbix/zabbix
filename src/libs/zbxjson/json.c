@@ -211,7 +211,7 @@ int	zbx_json_addarray(struct zbx_json *j, const char *name)
 	return  ___zbx_json_addobject(j, name, 0);
 }
 
-static int	__zbx_json_addstring(struct zbx_json *j, const char *name, const char *string, zbx_json_type_t type)
+int	zbx_json_addstring(struct zbx_json *j, const char *name, const char *string, zbx_json_type_t type)
 {
 	size_t	len = 0;
 	char	*p, *psrc, *pdst;
@@ -264,11 +264,6 @@ static int	__zbx_json_addstring(struct zbx_json *j, const char *name, const char
 	return SUCCEED;
 }
 
-int	zbx_json_addstring(struct zbx_json *j, const char *name, const char *string)
-{
-	return __zbx_json_addstring(j, name, string, 1);
-}
-
 /*int	zbx_json_adduint64(struct zbx_json *j, const char *name, const zbx_uint64_t *value)
 {
 	char	buffer[21];*/ /* strlen("18446744073709551615") == 20 */
@@ -279,7 +274,7 @@ int	zbx_json_addstring(struct zbx_json *j, const char *name, const char *string)
 		string = buffer;
 	}
 	
-	return __zbx_json_addstring(j, name, string, 0);
+	return zbx_json_addstring(j, name, string, 0);
 }
 
 int	zbx_json_adddouble(struct zbx_json *j, const char *name, const double *value)
@@ -292,7 +287,7 @@ int	zbx_json_adddouble(struct zbx_json *j, const char *name, const double *value
 		string = buffer;
 	}
 	
-	return __zbx_json_addstring(j, name, string, 0);
+	return zbx_json_addstring(j, name, string, 0);
 }
 */
 int	zbx_json_return(struct zbx_json *j)
