@@ -26,6 +26,7 @@ typedef enum
 {
 	ZBX_JSON_TYPE_UNKNOWN = 0,
 	ZBX_JSON_TYPE_STRING,
+	ZBX_JSON_TYPE_INT,
 	ZBX_JSON_TYPE_NULL
 } zbx_json_type_t;
 
@@ -53,7 +54,7 @@ int	zbx_json_init(struct zbx_json *j, size_t allocate);
 int	zbx_json_free(struct zbx_json *j);
 int	zbx_json_addobject(struct zbx_json *j, const char *name);
 int	zbx_json_addarray(struct zbx_json *j, const char *name);
-int	zbx_json_addstring(struct zbx_json *j, const char *name, const char *string);
+int	zbx_json_addstring(struct zbx_json *j, const char *name, const char *string, zbx_json_type_t type);
 /*int	zbx_json_addunit64(struct zbx_json *j, const char *name, zbx_uint64_t value);
 int	zbx_json_adddouble(struct zbx_json *j, const char *name, const double *value);*/
 int	zbx_json_return(struct zbx_json *j);
