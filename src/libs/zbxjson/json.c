@@ -143,7 +143,7 @@ static char	*__zbx_json_insstring(char *p, const char *string, zbx_json_type_t t
 	return p;
 }
 
-static int	___zbx_json_addobject(struct zbx_json *j, const char *name, char lbracket, char rbracket)
+static int	___zbx_json_addobject(struct zbx_json *j, const char *name, int object)
 {
 	size_t	len = 2; /* brackets */
 	char	*p, *psrc, *pdst;
@@ -154,16 +154,15 @@ static int	___zbx_json_addobject(struct zbx_json *j, const char *name, char lbra
 	assert(j);
 
 #ifdef ZBX_JSON_READABLE
-	len += j->level + 1;
+	len += j->level;
+	if (j->level)
+		len++;
 #endif
 
 	if (j->status == ZBX_JSON_COMMA)
 		len++; /* , */
 
 	if (NULL != name) {
-#ifdef ZBX_JSON_READABLE
-		len += j->level + 1;
-#endif
 		len += __zbx_json_stringsize(name, 1);
 		len += 1; /* : */
 	}
@@ -180,29 +179,21 @@ static int	___zbx_json_addobject(struct zbx_json *j, const char *name, char lbra
 	if (j->status == ZBX_JSON_COMMA)
 		*p++ = ',';
 
-	if (NULL != name) {
 #ifdef ZBX_JSON_READABLE
+	if (j->level)
 		*p++ = '\n';
-		for (i = 0; i < j->level; i ++)
-			*p++ = '\t';
+	for (i = 0; i < j->level; i ++)
+		*p++ = '\t';
 #endif
+	if (NULL != name) {
 		p = __zbx_json_insstring(p, name, 1);
 		*p++ = ':';
 	}
 
-	*p++ = lbracket;
-#ifdef ZBX_JSON_READABLE
-	*p++ = '\n';
-	for (i = 0; i < j->level; i ++)
-		*p++ = '\t';
-#endif
-	*p = rbracket;
+	*p++ = object ? '{' : '[';
+	*p = object ? '}' : ']';
 
 	j->buffer_offset = p - j->buffer;
-#ifdef ZBX_JSON_READABLE
-	j->buffer_offset -= j->level; /*'\t'*/
-	j->buffer_offset--; /*'\n'*/
-#endif
 	j->buffer_size += len;
 	j->level++;
 	j->status = ZBX_JSON_EMPTY;
@@ -212,14 +203,12 @@ static int	___zbx_json_addobject(struct zbx_json *j, const char *name, char lbra
 
 int	zbx_json_addobject(struct zbx_json *j, const char *name)
 {
-	return  ___zbx_json_addobject(j, name, '{', '}');
+	return  ___zbx_json_addobject(j, name, 1);
 }
 
 int	zbx_json_addarray(struct zbx_json *j, const char *name)
 {
-	assert(name);
-
-	return  ___zbx_json_addobject(j, name, '[', ']');
+	return  ___zbx_json_addobject(j, name, 0);
 }
 
 static int	__zbx_json_addstring(struct zbx_json *j, const char *name, const char *string, zbx_json_type_t type)
@@ -235,13 +224,12 @@ static int	__zbx_json_addstring(struct zbx_json *j, const char *name, const char
 	if (j->status == ZBX_JSON_COMMA)
 		len++; /* , */
 
-#ifdef ZBX_JSON_READABLE
-	len += j->level + 1;
-#endif
-
 	if (NULL != name) {
 		len += __zbx_json_stringsize(name, 1);
 		len += 1; /* : */
+#ifdef ZBX_JSON_READABLE
+		len += j->level + 1;
+#endif
 	}
 	len += __zbx_json_stringsize(string, type);
 	
@@ -257,13 +245,13 @@ static int	__zbx_json_addstring(struct zbx_json *j, const char *name, const char
 	if (j->status == ZBX_JSON_COMMA) {
 		*p++ = ',';
 	}
-#ifdef ZBX_JSON_READABLE
-	*p++ = '\n';
-	for (i = 0; i < j->level; i ++)
-		*p++ = '\t';
-#endif
 
 	if (NULL != name) {
+#ifdef ZBX_JSON_READABLE
+		*p++ = '\n';
+		for (i = 0; i < j->level; i ++)
+			*p++ = '\t';
+#endif
 		p = __zbx_json_insstring(p, name, 1);
 		*p++ = ':';
 	}
@@ -309,43 +297,44 @@ int	zbx_json_adddouble(struct zbx_json *j, const char *name, const double *value
 */
 int	zbx_json_return(struct zbx_json *j)
 {
-#ifdef ZBX_JSON_READABLE
-	char	*p;
-#endif
-
 	if (j->level == 1)
 		return FAIL;
 
 	j->level--;
-#ifdef ZBX_JSON_READABLE
-	p = j->buffer + j->buffer_offset;
-	while (*p == '\t' || *p == '\n') {
-		p++;
-		j->buffer_offset++;
-	}
-#endif
 	j->buffer_offset++;
 	j->status = ZBX_JSON_COMMA;
 
 	return SUCCEED;
 }
 
-int	zbx_json_open(const char *buffer, struct zbx_json_parse *jp)
+int	zbx_json_open(char *buffer, struct zbx_json_parse *jp)
 {
-	const char	*p;
-
-	p = buffer;
+	char	*p;
+#ifdef ZBX_JSON_READABLE
+	char	*i;
+#endif
 
 	jp->start = NULL;
 	jp->end = NULL;
 
-	if (*p == '{')
-		jp->start = p + 1;
+	if (*buffer == '{')
+		jp->start = buffer + 1;
 	else
 		return FAIL;
-
+	
+	p = buffer;
+#ifdef ZBX_JSON_READABLE
+	i = buffer;
+	while (*i != '\0') {
+		if (*i != '\t' && *i != '\n')
+			*p++ = *i;
+		i++;
+	}
+	*p = '\0';
+#else
 	while (*++p != '\0')
 		;
+#endif
 	
 	if (*--p == '}')
 		jp->end = p;
