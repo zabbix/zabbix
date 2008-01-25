@@ -58,7 +58,7 @@ int	zbx_json_addstring(struct zbx_json *j, const char *name, const char *string)
 int	zbx_json_adddouble(struct zbx_json *j, const char *name, const double *value);*/
 int	zbx_json_return(struct zbx_json *j);
 
-int		zbx_json_open(const char *buffer, struct zbx_json_parse *jp);
+int		zbx_json_open(char *buffer, struct zbx_json_parse *jp);
 const char	*zbx_json_decodestring(const char *p, char *string, size_t len);
 const char	*zbx_json_getvalue_ptr(struct zbx_json_parse *jp, const char *name);
 zbx_json_type_t	zbx_json_getvalue_type(const char *p);
