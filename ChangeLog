@@ -43,6 +43,7 @@ Changes for 1.5:
 
 Changes for 1.4.5:
 
+ - [ZBX-287] fixed compilation under FreeBSD 4.1 with older GCC (Alexei)
  - [ZBX-283] fixed SQL statement where INTEGER exceeds allowed range (Artem)
  - [ZBX-277] fixed possible server crash when evaluating functions str(), regexp() and iregexp() (Alexei)
  - [ZBX-271] added support of system.boottime[] for OpenBSD & FreeBSD agents (Sasha)

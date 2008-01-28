@@ -98,12 +98,18 @@ static int	VM_MEMORY_BUFFERS(const char *cmd, const char *param, unsigned flags,
 
 static int	VM_MEMORY_SHARED(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
+#ifdef HAVE_SYSINFO_SHAREDRAM
+	struct sysinfo info;
+#elif defined(HAVE_SYS_VMMETER_VMTOTAL)
+	int mib[2],len;
+	struct vmtotal v;
+#endif
+
 	assert(result);
 
         init_result(result);
 		
 #ifdef HAVE_SYSINFO_SHAREDRAM
-	struct sysinfo info;
 
 	if( 0 == sysinfo(&info))
 	{
@@ -119,8 +125,6 @@ static int	VM_MEMORY_SHARED(const char *cmd, const char *param, unsigned flags, 
 		return SYSINFO_RET_FAIL;
 	}
 #elif defined(HAVE_SYS_VMMETER_VMTOTAL)
-	int mib[2],len;
-	struct vmtotal v;
 
 	len=sizeof(struct vmtotal);
 	mib[0]=CTL_VM;
@@ -137,13 +141,25 @@ static int	VM_MEMORY_SHARED(const char *cmd, const char *param, unsigned flags, 
 
 static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
+#if defined(HAVE_SYS_PSTAT_H)
+	struct	pst_static pst;
+	long	page;
+#elif defined(HAVE_SYSINFO_TOTALRAM)
+	struct sysinfo info;
+#elif defined(HAVE_SYS_VMMETER_VMTOTAL)
+	int mib[2], len, total;
+#elif defined(HAVE_SYS_SYSCTL_H)
+	static int mib[] = { CTL_HW, HW_PHYSMEM };
+	size_t len;
+	unsigned int memory;
+	int ret;
+#endif
+
 	assert(result);
 
         init_result(result);
 		
 #if defined(HAVE_SYS_PSTAT_H)
-	struct	pst_static pst;
-	long	page;
 
 	if(pstat_getstatic(&pst, sizeof(pst), (size_t)1, 0) == -1)
 	{
@@ -158,7 +174,6 @@ static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, A
 		return SYSINFO_RET_OK;
 	}
 #elif defined(HAVE_SYSINFO_TOTALRAM)
-	struct sysinfo info;
 
 	if( 0 == sysinfo(&info))
 	{
@@ -174,7 +189,6 @@ static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, A
 		return SYSINFO_RET_FAIL;
 	}
 #elif defined(HAVE_SYS_VMMETER_VMTOTAL)
-	int mib[2], len, total;
 
 	len = sizeof(total);
 	mib[0]=CTL_HW;
@@ -184,10 +198,6 @@ static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, A
 	SET_UI64_RESULT(result, total);
 	return SYSINFO_RET_OK;
 #elif defined(HAVE_SYS_SYSCTL_H)
-	static int mib[] = { CTL_HW, HW_PHYSMEM };
-	size_t len;
-	unsigned int memory;
-	int ret;
 	
 	len=sizeof(memory);
 
@@ -208,14 +218,28 @@ static int	VM_MEMORY_TOTAL(const char *cmd, const char *param, unsigned flags, A
 
 static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AGENT_RESULT *result)
 {
+#if defined(HAVE_SYS_PSTAT_H)
+	struct	pst_static pst;
+	struct	pst_dynamic dyn;
+	long	page;
+#elif defined(HAVE_SYSINFO_FREERAM)
+	struct sysinfo info;
+#elif defined(HAVE_SYS_VMMETER_VMTOTAL)
+	int mib[2],len;
+	struct vmtotal v;
+#elif defined(HAVE_MACH_HOST_INFO_H)
+	vm_statistics_data_t page_info;
+	vm_size_t pagesize;
+	mach_msg_type_number_t count;
+	kern_return_t kret;
+	int ret;
+#endif
+
 	assert(result);
 
         init_result(result);
 		
 #if defined(HAVE_SYS_PSTAT_H)
-	struct	pst_static pst;
-	struct	pst_dynamic dyn;
-	long	page;
 
 	if(pstat_getstatic(&pst, sizeof(pst), (size_t)1, 0) == -1)
 	{
@@ -250,7 +274,6 @@ static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AG
 		}
 	}
 #elif defined(HAVE_SYSINFO_FREERAM)
-	struct sysinfo info;
 
 	if( 0 == sysinfo(&info))
 	{
@@ -266,8 +289,6 @@ static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AG
 		return SYSINFO_RET_FAIL;
 	}
 #elif defined(HAVE_SYS_VMMETER_VMTOTAL)
-	int mib[2],len;
-	struct vmtotal v;
 
 	len=sizeof(struct vmtotal);
 	mib[0]=CTL_VM;
@@ -279,11 +300,6 @@ static int	VM_MEMORY_FREE(const char *cmd, const char *param, unsigned flags, AG
 	return SYSINFO_RET_OK;
 /* OS/X */
 #elif defined(HAVE_MACH_HOST_INFO_H)
-	vm_statistics_data_t page_info;
-	vm_size_t pagesize;
-	mach_msg_type_number_t count;
-	kern_return_t kret;
-	int ret;
 	
 	pagesize = 0;
 	kret = host_page_size (mach_host_self(), &pagesize);
