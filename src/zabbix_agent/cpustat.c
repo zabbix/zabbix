@@ -270,12 +270,17 @@ static int	get_cpustat(
 	char	line[1024];
 	char	cpu_name[10];
 	
-    #elif defined(HAVE_SYS_PSTAT_H) /* not HAVE_PROC_STAT */
+    #elif defined(HAVE_SYS_PSTAT_H)
 	
 	struct	pst_dynamic stats;
-	struct pst_processor psp;
-	
-    #else /* not HAVE_SYS_PSTAT_H */
+	struct	pst_processor psp;
+
+    #elif defined(HAVE_FUNCTION_SYSCTLBYNAME)
+
+	static long	cp_time[5];
+	size_t		nlen = sizeof(cp_time);
+ 	
+    #else /* not HAVE_FUNCTION_SYSCTLBYNAME */
 
 	return 1;
 	

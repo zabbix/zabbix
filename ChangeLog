@@ -46,6 +46,7 @@ Changes for 1.4.5:
  - [ZBX-250] 100% CPU on server side after connection loss (Sasha)
  - [ZBX-243] speed improvement for windows agent for eventlog[] processing (Sasha)
  - [DEV-92] added supprt of multiple windows agents, service description (Sasha)
+ - [ZBX-7] added support of system.cpu.util[] for FreeBSD agents, thanks to 'brick' (Sasha)
 
 Changes for 1.4.4:
 
