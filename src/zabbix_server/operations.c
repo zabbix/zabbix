@@ -104,6 +104,37 @@ static	void	send_to_user_medias(DB_EVENT *event,DB_OPERATION *operation, zbx_uin
 
 /******************************************************************************
  *                                                                            *
+ * Function: check_user_active                                                *
+ *                                                                            *
+ * Purpose: checks if user in any users_disabled group                        *
+ *                                                                            *
+ * Parameters: userid - user id                                               *
+ *                                                                            *
+ * Return value: int SUCCEED / FAIL-if user disabled                          *
+ *                                                                            *
+ * Author: Aly                                                                *
+ *                                                                            *
+ * Comments:                    			                      *
+ *                                                                            *
+ ******************************************************************************/
+int check_user_active(zbx_uint64_t userid){
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		rtrn = SUCCEED;
+
+	result = DBselect("SELECT COUNT(g.usrgrpid) FROM users_groups ug, usrgrp g WHERE ug.userid=" ZBX_FS_UI64 " AND g.usrgrpid=ug.usrgrpid AND g.users_status=%d", userid, GROUP_STATUS_DISABLED);
+	
+	row = DBfetch(result);
+	if(row && (DBis_null(row[0])!=SUCCEED) && (atoi(row[0])>0)) 
+		rtrn=FAIL;
+
+	DBfree_result(result);
+
+return rtrn;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: op_notify_user                                                   *
  *                                                                            *
  * Purpose: send notifications to user or user groupd                         *
@@ -128,19 +159,15 @@ void	op_notify_user(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation)
 
 	if(operation->object == OPERATION_OBJECT_USER)
 	{
-		result = DBselect("SELECT count(u.userid) as user_cnt FROM users u WHERE u.userid= " ZBX_FS_UI64 " and u.status=%d",
-			operation->objectid, USER_STATUS_ACTIVE);
-		row = DBfetch(result);
-		if(row && (DBis_null(row[0])!=SUCCEED) && (atoi(row[0])>0))
+		if(check_user_active(operation->objectid) == SUCCEED)
 		{
 			send_to_user_medias(event, operation, operation->objectid);
 		}
-		DBfree_result(result);
 	}
 	else if(operation->object == OPERATION_OBJECT_GROUP)
 	{
-		result = DBselect("select u.userid from users u, users_groups ug where ug.usrgrpid=" ZBX_FS_UI64 " and ug.userid=u.userid and u.status=%d",
-			operation->objectid,USER_STATUS_ACTIVE);
+		result = DBselect("select u.userid from users u, users_groups ug, usrgrp g where ug.usrgrpid=" ZBX_FS_UI64 " and ug.userid=u.userid and g.usrgrpid=ug.usrgrpid and g.users_status=%d",
+			operation->objectid,GROUP_STATUS_ACTIVE);
 		while((row=DBfetch(result)))
 		{
 			ZBX_STR2UINT64(userid, row[0]);

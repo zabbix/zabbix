@@ -1297,6 +1297,8 @@
 	'S_GROUP_DELETED'=>			'Group deleted',
 	'S_CANNOT_DELETE_GROUP'=>		'Cannot delete group',
 	'S_USER_CANNOT_DISABLE_ITSELF'=>	'User cannot disable itself',
+	'S_USER_CANNOT_CHANGE_STATUS'=>		'User cannot change status to itself',
+	'S_USER_CANNOT_CHANGE_GUI_ACCESS'=>		'User cannot change GUI access to itself',
 	'S_USER_CANNOT_DELETE_ITSELF'=>		'User cannot delete itself',
 	'S_CONFIGURATION_OF_USERS_AND_USER_GROUPS'=>'CONFIGURATION OF USERS AND USER GROUPS',
 	'S_USER_GROUPS_BIG'=>			'USER GROUPS',
@@ -1316,6 +1318,8 @@
 	'S_PERMISSION'=>			'Permission',
 	'S_RIGHT'=>				'Right',
 	'S_RIGHTS'=>				'Rights',
+	'S_GUI_ACCESS'=>			'GUI access',
+	'S_USERS_STATUS'=>			'Users status',
 	'S_NO_RIGHTS_DEFINED'=>			'No rights defined',
 	'S_RESOURCE_NAME'=>			'Resource name',
 	'S_READ_ONLY'=>				'Read only',
@@ -1332,6 +1336,9 @@
 	'S_CREATE_GROUP'=>			'Create Group',
 	'S_DELETE_SELECTED_USERS_Q'=>		'Delete selected users?',
 	'S_NO_ACCESSIBLE_RESOURCES'=>		'No accessibles resources',
+	'S_ADD_TO'=>						'Add to',
+	'S_REMOVE_FROM'=>					'Remove from',
+	'S_STATUS_DISABLED'=>				'Status disabled',
 
 //scripts.php
 	'S_SCRIPTS'=>				'Scripts',

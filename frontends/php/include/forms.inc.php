@@ -702,7 +702,6 @@
 			$autologout	= $user["autologout"];
 			$lang		= $user["lang"];
 			$refresh	= $user["refresh"];
-			$status		= $user["status"];
 			$user_type	= $user["type"];
 
 			$user_groups	= array();
@@ -743,7 +742,6 @@
 			$autologout	= get_request("autologout",900);
 			$lang		= get_request("lang","en_gb");
 			$refresh	= get_request("refresh",30);
-			$status		= get_request('status',0);
 			$user_type	= get_request("user_type",USER_TYPE_ZABBIX_USER);;
 			$user_groups	= get_request("user_groups",array());
 			$change_password = get_request("change_password", null);
@@ -883,18 +881,6 @@
 		$frmUser->AddRow(S_URL_AFTER_LOGIN,	new CTextBox("url",$url,50));
 		$frmUser->AddRow(S_SCREEN_REFRESH,	new CNumericBox("refresh",$refresh,4));
 
-		if((bccomp($USER_DETAILS['userid'],$userid) == 0)){
-			$frmUser->AddVar('status',USER_STATUS_ENABLED);
-			$frmUser->AddRow(S_STATUS, new CSpan(S_ENABLED,'green'));
-		}
-		else{
-			$cmbStat = new CComboBox('status',$status);		
-			$cmbStat->AddItem(USER_STATUS_ENABLED,S_ENABLED);
-			$cmbStat->AddItem(USER_STATUS_DISABLED,S_DISABLED);
-			
-			$frmUser->AddRow(S_STATUS, $cmbStat);
-		}
-		
 		if($profile==0)
 		{
 			$frmUser->AddVar('perm_details', $perm_details);
@@ -964,7 +950,7 @@
 	# Insert form for User Groups
 	function	insert_usergroups_form()
 	{
-		global  $_REQUEST;
+		global  $USER_DETAILS;
 
 		$frm_title = S_USER_GROUP;
 		if(isset($_REQUEST["usrgrpid"]))
@@ -975,8 +961,11 @@
 
 		if(isset($_REQUEST["usrgrpid"]) && !isset($_REQUEST["form_refresh"]))
 		{
-			$name	= $usrgrp["name"];
+			$name	= $usrgrp['name'];
 
+			$users_status = $usrgrp['users_status'];
+			$gui_access = $usrgrp['gui_access'];
+			
 			$group_users = array();
 			$db_users=DBselect("SELECT distinct u.userid,u.alias FROM users u,users_groups ug ".
 				"where u.userid=ug.userid AND ug.usrgrpid=".$_REQUEST["usrgrpid"].
@@ -1012,7 +1001,9 @@
 		}
 		else
 		{
-			$name		= get_request("gname","");
+			$name	=			get_request("gname","");
+			$users_status = 	get_request('users_status',0);
+			$gui_access = 		get_request('gui_access',0);
 			$group_users	= get_request("group_users",array());
 			$group_rights	= get_request("group_rights",array());
 		}
@@ -1054,6 +1045,33 @@
 				(count($group_users) > 0) ? new CButton('del_group_user',S_DELETE_SELECTED) : null
 			));
 
+		$granted = true;		
+		if(isset($_REQUEST['usrgrpid'])){
+			$granted = granted2update_group($_REQUEST['usrgrpid']);
+		}
+
+		if($granted){
+			$cmbGUI = new CComboBox('gui_access',$gui_access);		
+			$cmbGUI->AddItem(GROUP_GUI_ACCESS_ENABLED,S_ENABLED);
+			$cmbGUI->AddItem(GROUP_GUI_ACCESS_DISABLED,S_DISABLED);
+			
+			$frmUserG->AddRow(S_GUI_ACCESS, $cmbGUI);
+			
+			$cmbStat = new CComboBox('users_status',$users_status);		
+			$cmbStat->AddItem(GROUP_STATUS_ENABLED,S_ENABLED);
+			$cmbStat->AddItem(GROUP_STATUS_DISABLED,S_DISABLED);
+			
+			$frmUserG->AddRow(S_USERS_STATUS, $cmbStat);
+
+		}
+		else{
+			$frmUserG->AddVar('gui_access',GROUP_GUI_ACCESS_ENABLED);
+			$frmUserG->AddRow(S_GUI_ACCESS, new CSpan(S_ENABLED,'green'));
+
+			$frmUserG->AddVar('users_status',GROUP_STATUS_ENABLED);
+			$frmUserG->AddRow(S_USERS_STATUS, new CSpan(S_ENABLED,'green'));
+		}
+		
 		$table_Rights = new CTable(S_NO_RIGHTS_DEFINED,'right_table');
 
 		$lstWrite = new CListBox('right_to_del[read_write][]'	,null	,20);

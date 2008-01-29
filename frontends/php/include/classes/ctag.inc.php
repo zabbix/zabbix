@@ -221,7 +221,7 @@
 		{
 			unset($this->options[$name]);
 		}
-		function &GetOption($name)
+		function GetOption($name)
 		{
 			$ret = NULL;
 			if(isset($this->options[$name]))
@@ -256,13 +256,20 @@
 
 		function AddAction($name, $value)
 		{
-			if(!empty($value))
+			if(is_object($value)){
+				$this->options[$name] = unpack_object($value);
+			}
+			else if(!empty($value)){
 				$this->options[$name] = htmlentities(str_replace(array("\r", "\n"), '', strval($value)),ENT_COMPAT,S_HTML_CHARSET); 
+			}
 		}
 
 		function AddOption($name, $value)
 		{
-			if(isset($value))
+			if(is_object($value)){
+				$this->options[$name] = unpack_object($value);
+			}
+			else if(isset($value))
 				$this->options[$name] = htmlspecialchars(strval($value)); 
 			else
 				unset($this->options[$name]);
