@@ -1,9 +1,10 @@
 Changes for 1.5:
 
+ - [DEV-103] added support of disabling login rights for a users group (Artem)
  - [DEV-102] added support of UTF8 for GUI (Artem)
  - [DEV-97] added screen for easier creation of locales (Artem)
  - [DEV-96] added availability to disable default user "guest" (Artem)
- - [DEV-95] added user status enabled/disabled (Artem)
+ - [DEV-95] added group status enabled/disabled (Artem)
  - [DEV-94] added processing of the "database down" event (Artem)
  - [DEV-93] added availability to select all hosts in specified group in "Monitoring" section (Artem)
  - [DEV-91] added printable view for pages (Artem)

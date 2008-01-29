@@ -338,8 +338,11 @@
 	define('USER_TYPE_ZABBIX_ADMIN',	2);
 	define('USER_TYPE_SUPER_ADMIN',		3);
 
-	define('USER_STATUS_DISABLED', 1);	
-	define('USER_STATUS_ENABLED', 0);
+	define('GROUP_STATUS_DISABLED', 1);	
+	define('GROUP_STATUS_ENABLED', 0);
+	
+	define('GROUP_GUI_ACCESS_DISABLED', 1);	
+	define('GROUP_GUI_ACCESS_ENABLED', 0);	
 
 	define('PERM_MAX',		3);
 	define('PERM_READ_WRITE',	3);

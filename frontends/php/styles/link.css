@@ -17,6 +17,11 @@ A.disabled:visited 	{	color:#AA0000;	text-decoration: none; }
 A.disabled:hover 	{	color:#AA0000;	text-decoration: underline; }
 A.disabled:active 	{	color:#AA0000;	text-decoration: underline;}
 
+A.orange:link		{	color:#EE7000;	text-decoration: none; }
+A.orange:visited 	{	color:#EE7000;	text-decoration: none; }
+A.orange:hover 		{	color:#EE7000;	text-decoration: underline; }
+A.orange:active 	{	color:#EE7000;	text-decoration: underline;}
+
 A.unknown:link		{	color:#AAAAAA;	text-decoration: none; }
 A.unknown:visited 	{	color:#AAAAAA;	text-decoration: none; }
 A.unknown:hover 	{	color:#AAAAAA;	text-decoration: underline; }

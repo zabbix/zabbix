@@ -48,21 +48,25 @@
 
 		if( !is_null($sessionid))
 		{
-			if(!($USER_DETAILS = DBfetch(DBselect('SELECT u.*,s.* FROM sessions s,users u'.
-					' WHERE s.sessionid='.zbx_dbstr($sessionid).
-						' AND s.userid=u.userid'.
-						' AND ((s.lastaccess+u.autologout>'.time().') OR (u.autologout=0))'.
-						' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID).
-						' AND u.status='.USER_STATUS_ENABLED))))
-			{
+			$login = $USER_DETAILS = DBfetch(DBselect('SELECT u.*,s.* FROM sessions s,users u'.
+						' WHERE s.sessionid='.zbx_dbstr($sessionid).
+							' AND s.userid=u.userid'.
+							' AND ((s.lastaccess+u.autologout>'.time().') OR (u.autologout=0))'.
+							' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID)));
+			if($login){
+				$login = (check_perm2login($USER_DETAILS['userid']) && check_perm2system($USER_DETAILS['userid']));
+			}
+			
+			if(!$login){
+				$USER_DETAILS = NULL;
+				
 				zbx_unsetcookie('zbx_sessionid');
 				DBexecute("delete from sessions where sessionid=".zbx_dbstr($sessionid));
 				unset($sessionid);
 
 				$incorrect_session = true;
 			}
-			else
-			{
+			else{
 				zbx_setcookie("zbx_sessionid",$sessionid);
 				DBexecute("update sessions set lastaccess=".time()." where sessionid=".zbx_dbstr($sessionid));
 			}
@@ -71,8 +75,7 @@
 		if(!$USER_DETAILS){
 			if(!($USER_DETAILS = DBfetch(DBselect('SELECT u.* FROM users u '.
 							' WHERE u.alias='.zbx_dbstr(ZBX_GUEST_USER).
-								' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID).
-								' AND u.status='.USER_STATUS_ENABLED))))
+								' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID)))))
 			{
 				$missed_user_guest = true;
 			}
@@ -112,6 +115,52 @@
 			include('index.php');
 			exit;
 		}
+	}
+
+/***********************************************
+	CHECK USER ACCESS TO SYSTEM STATUS
+************************************************/
+/* Function: check_perm2system()
+ *
+ * Description:
+ * 		Checking user permissions to access system (affects server side: no notification will be sent)
+ * 
+ * Comments:
+ *		return true if permission is positive
+ *
+ * Author: Aly
+ */
+	function  check_perm2system($userid){
+		$sql = 'SELECT COUNT(g.usrgrpid) as grp_count '.
+			' FROM usrgrp g, users_groups ug '.
+			' WHERE ug.userid = '.zbx_dbstr($userid).
+				' AND g.usrgrpid = ug.usrgrpid '.
+				' AND g.users_status = '.GROUP_STATUS_DISABLED;
+		$res = DBFetch(DBSelect($sql));
+
+	return ($res['grp_count'] == 0)?true:false;
+	}
+
+/* Function: check_perm2login()
+ *
+ * Description:
+ * 		Checking user permissions to Login in frontend
+ * 
+ * Comments:
+ *		return true if permission is positive
+ * 
+ * Author: Aly
+ */
+
+	function  check_perm2login($userid){
+		$sql = 'SELECT COUNT(g.usrgrpid) as grp_count '.
+			' FROM usrgrp g, users_groups ug '.
+			' WHERE ug.userid = '.zbx_dbstr($userid).
+				' AND g.usrgrpid = ug.usrgrpid '.
+				' AND g.gui_access = '.GROUP_GUI_ACCESS_DISABLED;
+		$res = DBFetch(DBSelect($sql));
+
+	return ($res['grp_count'] == 0)?true:false;
 	}
 
 /***********************************************
