@@ -471,10 +471,11 @@ function mitem_getstyle (n_pos, n_state) {
 	if (typeof(a_oclass) == 'string')
 		return a_oclass;
 
+
 	// inherit class from previous state if not explicitly defined
-	for (var n_currst = n_state; n_currst >= 0; n_currst--)
-		if (a_oclass[n_currst])
-			return a_oclass[n_currst];
+	for (var n_currst = n_state; n_currst >= 0; n_currst--){
+		if(a_oclass[n_currst]) return a_oclass[n_currst];
+	}
 }
 
 // ------------------------------------------------------------------------------------------

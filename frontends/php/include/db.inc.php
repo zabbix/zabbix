@@ -408,10 +408,10 @@
 		switch($DB_TYPE)
 		{
 			case "MYSQL":
-				$result = mysql_fetch_array($cursor);
+				$result = mysql_fetch_assoc($cursor);
 				break;
 			case "POSTGRESQL":
-				$result = pg_fetch_array($cursor);
+				$result = pg_fetch_assoc($cursor);
 				break;
 			case "ORACLE":
 				if(ocifetchinto($cursor, $row, OCI_ASSOC+OCI_NUM+OCI_RETURN_NULLS))

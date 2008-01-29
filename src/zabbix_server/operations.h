@@ -31,6 +31,7 @@ void	op_group_del(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation);
 void	op_host_add(DB_EVENT *event);
 void	op_host_del(DB_EVENT *event);
 void	op_run_commands(DB_EVENT *event, DB_OPERATION *operation);
+int	check_user_active(zbx_uint64_t userid);
 void	op_notify_user(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation);
 
 #endif

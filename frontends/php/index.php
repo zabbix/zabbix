@@ -61,14 +61,16 @@
 		$name = get_request("name","");
 		$password = md5(get_request("password",""));
 
-		$row = DBfetch(DBselect('SELECT u.userid,u.alias,u.name,u.surname,u.url,u.refresh '.
+		$login = $row = DBfetch(DBselect('SELECT u.userid,u.alias,u.name,u.surname,u.url,u.refresh '.
 						' FROM users u, users_groups ug, usrgrp g '.
  						' WHERE u.alias='.zbx_dbstr($name).
 							' AND u.passwd='.zbx_dbstr($password).
-							' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID).
-							' AND u.status='.USER_STATUS_ENABLED));
+							' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID)));
+		if($login){
+			$login = (check_perm2login($row['userid']) && check_perm2system($row['userid']));
+		}
 
-		if($row){
+		if($login){
 			$sessionid = md5(time().$password.$name.rand(0,10000000));
 			zbx_setcookie('zbx_sessionid',$sessionid);
 			
@@ -88,8 +90,9 @@
 			die();
 //			return;
 		}
-		else
-		{
+		else{
+			$row = NULL;
+			
 			$_REQUEST['message'] = "Login name or password is incorrect";
 			add_audit(AUDIT_ACTION_LOGIN,AUDIT_RESOURCE_USER,"Login failed [".$name."]");
 		}
