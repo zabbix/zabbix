@@ -22,12 +22,51 @@
 
 #define ZBX_JSON_READABLE
 
-int	zbx_json_init(struct zbx_json *j, size_t allocate)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_json_strerror                                                *
+ *                                                                            *
+ * Purpose: return string describing of json error                            *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: pointer to the null terminated string                        *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+#define ZBX_JSON_MAX_STRERROR	255
+
+static char zbx_json_strerror_message[ZBX_JSON_MAX_STRERROR];
+
+char	*zbx_json_strerror(void)
+{
+	zbx_json_strerror_message[ZBX_JSON_MAX_STRERROR - 1] = '\0'; /* forse terminate string */
+	return (&zbx_json_strerror_message[0]);
+}
+
+#ifdef HAVE___VA_ARGS__
+#	define zbx_set_json_strerror(fmt, ...) __zbx_zbx_set_json_strerror(ZBX_CONST_STRING(fmt), ##__VA_ARGS__)
+#else
+#	define zbx_set_json_strerror __zbx_zbx_set_json_strerror
+#endif /* HAVE___VA_ARGS__ */
+static void __zbx_zbx_set_json_strerror(const char *fmt, ...)
+{
+	va_list args;
+
+	va_start(args, fmt);
+
+	zbx_vsnprintf(zbx_json_strerror_message, sizeof(zbx_json_strerror_message), fmt, args);
+
+	va_end(args);
+}
+
+void	zbx_json_init(struct zbx_json *j, size_t allocate)
 {
 	assert(j);
-/*
-printf("zbx_json_init()\n");
-*/
+
 	j->buffer = NULL;
 	j->buffer_allocated = allocate;
 	j->buffer = zbx_malloc(j->buffer, j->buffer_allocated);
@@ -36,21 +75,15 @@ printf("zbx_json_init()\n");
 	j->status = ZBX_JSON_EMPTY;
 	j->level = 0;
 	*j->buffer = '\0';
-/*
-printf("zbx_json_init()      [sizeof:%4d] [size:%4d] [offset:%4d] [status:%d] %s\n", j->buffer_allocated, j->buffer_size, j->buffer_offset, j->status, j->buffer);
-*/
-	return zbx_json_addobject(j, NULL);
+
+	zbx_json_addobject(j, NULL);
 }
 
-int	zbx_json_free(struct zbx_json *j)
+void	zbx_json_free(struct zbx_json *j)
 {
 	assert(j);
 
 	zbx_free(j->buffer);
-/*
-printf("zbx_json_free()\n");
-*/
-	return SUCCEED;
 }
 
 static int	__zbx_json_realloc(struct zbx_json *j, size_t need)
@@ -143,7 +176,7 @@ static char	*__zbx_json_insstring(char *p, const char *string, zbx_json_type_t t
 	return p;
 }
 
-static int	___zbx_json_addobject(struct zbx_json *j, const char *name, int object)
+static void	__zbx_json_addobject(struct zbx_json *j, const char *name, int object)
 {
 	size_t	len = 2; /* brackets */
 	char	*p, *psrc, *pdst;
@@ -197,21 +230,19 @@ static int	___zbx_json_addobject(struct zbx_json *j, const char *name, int objec
 	j->buffer_size += len;
 	j->level++;
 	j->status = ZBX_JSON_EMPTY;
-
-	return SUCCEED;
 }
 
-int	zbx_json_addobject(struct zbx_json *j, const char *name)
+void	zbx_json_addobject(struct zbx_json *j, const char *name)
 {
-	return  ___zbx_json_addobject(j, name, 1);
+	__zbx_json_addobject(j, name, 1);
 }
 
-int	zbx_json_addarray(struct zbx_json *j, const char *name)
+void	zbx_json_addarray(struct zbx_json *j, const char *name)
 {
-	return  ___zbx_json_addobject(j, name, 0);
+	__zbx_json_addobject(j, name, 0);
 }
 
-int	zbx_json_addstring(struct zbx_json *j, const char *name, const char *string, zbx_json_type_t type)
+void	zbx_json_addstring(struct zbx_json *j, const char *name, const char *string, zbx_json_type_t type)
 {
 	size_t	len = 0;
 	char	*p, *psrc, *pdst;
@@ -260,14 +291,14 @@ int	zbx_json_addstring(struct zbx_json *j, const char *name, const char *string,
 	j->buffer_offset = p - j->buffer;
 	j->buffer_size += len;
 	j->status = ZBX_JSON_COMMA;
-
-	return SUCCEED;
 }
 
-int	zbx_json_return(struct zbx_json *j)
+int	zbx_json_close(struct zbx_json *j)
 {
-	if (j->level == 1)
+	if (j->level == 1) {
+		zbx_set_json_strerror("Can't close top level object");
 		return FAIL;
+	}
 
 	j->level--;
 	j->buffer_offset++;
@@ -278,7 +309,7 @@ int	zbx_json_return(struct zbx_json *j)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_json_rbracket                                                *
+ * Function: __zbx_json_rbracket                                                *
  *                                                                            *
  * Purpose: return position of right bracket                                  *
  *                                                                            *
@@ -292,7 +323,7 @@ int	zbx_json_return(struct zbx_json *j)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-const char	*zbx_json_rbracket(const char *p)
+static const char	*__zbx_json_rbracket(const char *p)
 {
 	int	level = 0;
 	int	state = 0; /* o - outside string; 1 - inside string */
@@ -365,7 +396,7 @@ fprintf(stderr, "----- [%zd] [%s]\n", strlen(buffer), buffer);
 	if (*buffer == '{')
 		jp->start = buffer;
 	else
-		return FAIL;
+		goto error;
 	
 #ifdef ZBX_JSON_READABLE
 	o = buffer;
@@ -378,10 +409,15 @@ fprintf(stderr, "----- [%zd] [%s]\n", strlen(buffer), buffer);
 /*	
 fprintf(stderr, "----- [%zd] [%s]\n",  strlen(buffer), buffer);
 */
-	if (NULL == (jp->end = zbx_json_rbracket(buffer)))
-		return FAIL;
+	if (NULL == (jp->end = __zbx_json_rbracket(buffer)))
+		goto error;
 
 	return SUCCEED;
+error:
+	zbx_set_json_strerror("Can't open JSON object \"%.64s\"",
+		buffer);
+
+	return FAIL;
 }
 
 /******************************************************************************
@@ -526,12 +562,17 @@ const char	*zbx_json_pair_next(struct zbx_json_parse *jp, const char *p, char *n
 		return NULL;
 
 	if (ZBX_JSON_TYPE_STRING != zbx_json_type(p))
-		return NULL;
+		goto error;
 
 	if (NULL == (p = zbx_json_decodestring(p, name, len)))
-		return NULL;
-		       
-	return *p == ':' ? ++p : NULL;
+		goto error;
+	
+	if (*p != ':')
+		goto error;
+
+	return ++p;
+error:	       
+	return NULL;
 }
 
 /******************************************************************************
@@ -555,14 +596,14 @@ const char	*zbx_json_pair_by_name(struct zbx_json_parse *jp, const char *name)
 {
 	char		buffer[MAX_STRING_LEN];
 	size_t		len;
-	const char	*p;
+	const char	*p = NULL;
 
 	len = sizeof(buffer);
 
-	for (p = zbx_json_pair_next(jp, NULL, buffer, len); p != NULL; p = zbx_json_pair_next(jp, p, buffer, len))
+	while (NULL != (p = zbx_json_pair_next(jp, p, buffer, len)))
 		if (0 == strcmp(name, buffer))
 			return p;
-/*fprintf(stderr, "----- [%s] FAIL\n", name);*/
+
 	return NULL;
 }
 
@@ -584,8 +625,11 @@ const char	*zbx_json_pair_by_name(struct zbx_json_parse *jp, const char *name)
  ******************************************************************************/
 int	zbx_json_brackets_open(const char *p, struct zbx_json_parse *jp)
 {
-	if (NULL == (jp->end = zbx_json_rbracket(p)))
+	if (NULL == (jp->end = __zbx_json_rbracket(p))) {
+		zbx_set_json_strerror("Can't open JSON object or array \"%.64s\"",
+			p);
 		return FAIL;
+	}
 
 	jp->start = p;
 
@@ -619,5 +663,9 @@ zbx_json_type_t	zbx_json_type(const char *p)
 		return ZBX_JSON_TYPE_OBJECT;
 	if (p[0] == 'n' && p[1] == 'u' && p[2] == 'l' && p[3] == 'l')
 		return ZBX_JSON_TYPE_NULL;
+
+	zbx_set_json_strerror("Invalid type of JSON value \"%.64s\"",
+		p);
+
 	return ZBX_JSON_TYPE_UNKNOWN;
 }
