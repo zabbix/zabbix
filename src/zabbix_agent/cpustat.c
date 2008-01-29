@@ -270,17 +270,17 @@ static int	get_cpustat(
 	char	line[1024];
 	char	cpu_name[10];
 	
-    #elif defined(HAVE_SYS_PSTAT_H) /* not HAVE_PROC_STAT */
+    #elif defined(HAVE_SYS_PSTAT_H)
 	
 	struct	pst_dynamic stats;
-	struct pst_processor psp;
+	struct	pst_processor psp;
 
-    #elif defined(HAVE_SYS_SYSCTL_H) /* HAVE_SYS_SYSCTL_H */
+    #elif defined(HAVE_FUNCTION_SYSCTLBYNAME)
 
-	static long cp_time[5];
-	size_t nlen = sizeof(cp_time);
+	static long	cp_time[5];
+	size_t		nlen = sizeof(cp_time);
  	
-    #else /* not HAVE_SYS_SYSCTL_H */
+    #else /* not HAVE_FUNCTION_SYSCTLBYNAME */
 
 	return 1;
 	
@@ -353,6 +353,7 @@ static int	get_cpustat(
 	*cpu_idle = (zbx_uint64_t)cp_time[4];
  	
     #endif /* HAVE_FUNCTION_SYSCTLBYNAME */
+
 	return 0;
 }
 
