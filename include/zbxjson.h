@@ -52,12 +52,14 @@ struct zbx_json_parse {
 	const char		*end;
 };
 
-int	zbx_json_init(struct zbx_json *j, size_t allocate);
-int	zbx_json_free(struct zbx_json *j);
-int	zbx_json_addobject(struct zbx_json *j, const char *name);
-int	zbx_json_addarray(struct zbx_json *j, const char *name);
-int	zbx_json_addstring(struct zbx_json *j, const char *name, const char *string, zbx_json_type_t type);
-int	zbx_json_return(struct zbx_json *j);
+char	*zbx_json_strerror(void);
+
+void	zbx_json_init(struct zbx_json *j, size_t allocate);
+void	zbx_json_free(struct zbx_json *j);
+void	zbx_json_addobject(struct zbx_json *j, const char *name);
+void	zbx_json_addarray(struct zbx_json *j, const char *name);
+void	zbx_json_addstring(struct zbx_json *j, const char *name, const char *string, zbx_json_type_t type);
+int	zbx_json_close(struct zbx_json *j);
 
 int		zbx_json_open(char *buffer, struct zbx_json_parse *jp);
 const char	*zbx_json_decodevalue(const char *p, char *string, size_t len);
