@@ -7,4 +7,6 @@ libzbxtrapper_a_SOURCES = \
 	trapper.c trapper.h \
 	nodesync.c nodesync.h \
 	nodehistory.c nodehistory.h \
-	nodecommand.c nodecommand.h
+	nodecommand.c nodecommand.h \
+	../nodewatcher/nodesender.c ../nodewatcher/nodesender.h \
+	proxyconfig.c proxyconfig.h

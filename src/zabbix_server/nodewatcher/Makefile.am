@@ -6,4 +6,5 @@ libzbxnodewatcher_a_SOURCES = \
 	nodewatcher.c nodewatcher.h \
 	nodesender.c nodesender.h \
 	nodecomms.c nodecomms.h \
-	history.c history.h
+	history.c history.h \
+	../trapper/nodesync.c ../trapper/nodesync.h
