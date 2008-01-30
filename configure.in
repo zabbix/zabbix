@@ -1076,7 +1076,7 @@ AC_OUTPUT([
 	src/zabbix_proxy/discoverer/Makefile
 	src/zabbix_proxy/housekeeper/Makefile
 	src/zabbix_proxy/httppoller/Makefile
-	src/zabbix_proxy/nodewatcher/Makefile
+	src/zabbix_proxy/proxyconfig/Makefile
 	src/zabbix_proxy/pinger/Makefile
 	src/zabbix_proxy/poller/Makefile
 	src/zabbix_proxy/trapper/Makefile

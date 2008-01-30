@@ -17,10 +17,15 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
+#ifndef ZABBIX_PROXYCONFIG_H
+#define ZABBIX_PROXYCONFIG_H
 
-#ifndef ZABBIX_NODECOMMAND_H
-#define ZABBIX_NODECOMMAND_H
+/*#include "mutexs.h"
 
-int	node_process_command(zbx_sock_t *sock, const char *data);
+extern	ZBX_MUTEX node_sync_access;*/
+
+/*void	node_sync_lock(int nodeid);
+void	node_sync_unlock(int nodeid);*/
+void	main_proxyconfig_loop(int server_num);
 
 #endif
