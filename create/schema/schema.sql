@@ -387,12 +387,12 @@ INDEX		|1		|name
 TABLE|hosts|hostid|ZBX_SYNC
 FIELD		|hostid		|t_id		|'0'	|NOT NULL	|0
 FIELD		|proxyid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|host		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|dns		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|useip		|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
-FIELD		|ip		|t_varchar(39)	|'127.0.0.1'|NOT NULL	|ZBX_SYNC
-FIELD		|port		|t_integer	|'10050'|NOT NULL	|ZBX_SYNC
-FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|host		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|dns		|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|useip		|t_integer	|'1'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|ip		|t_varchar(39)	|'127.0.0.1'|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|port		|t_integer	|'10050'|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|disable_until	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|error		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|available	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
@@ -442,39 +442,39 @@ INDEX		|1		|imagetype,name
 
 TABLE|items|itemid|ZBX_SYNC
 FIELD		|itemid		|t_id		|'0'	|NOT NULL	|0
-FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|snmp_community	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|snmp_oid	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|snmp_port	|t_integer	|'161'	|NOT NULL	|ZBX_SYNC
-FIELD		|hostid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|description	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|delay		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|history	|t_integer	|'90'	|NOT NULL	|ZBX_SYNC
-FIELD		|trends		|t_integer	|'365'	|NOT NULL	|ZBX_SYNC
-FIELD		|nextcheck	|t_time		|'0'	|NOT NULL	|0
+FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|snmp_community	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|snmp_oid	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|snmp_port	|t_integer	|'161'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|hostid		|t_id		|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|description	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|key_		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|delay		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|history	|t_integer	|'90'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|trends		|t_integer	|'365'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|nextcheck	|t_time		|'0'	|NOT NULL	|ZBX_PROXY
 FIELD		|lastvalue	|t_varchar(255)	|	|NULL		|0
 FIELD		|lastclock	|t_time		|	|NULL		|0
 FIELD		|prevvalue	|t_varchar(255)	|	|NULL		|0
-FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|value_type	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|trapper_hosts	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|units		|t_varchar(10)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|multiplier	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|delta		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|value_type	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|trapper_hosts	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|units		|t_varchar(10)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|multiplier	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|delta		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|prevorgvalue	|t_varchar(255)	|	|NULL		|0
-FIELD		|snmpv3_securityname|t_varchar(64)|''	|NOT NULL	|ZBX_SYNC
-FIELD		|snmpv3_securitylevel|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|snmpv3_authpassphrase|t_varchar(64)|''	|NOT NULL	|ZBX_SYNC
-FIELD		|snmpv3_privpassphrase|t_varchar(64)|''	|NOT NULL	|ZBX_SYNC
-FIELD		|formula	|t_varchar(255)	|'1'	|NOT NULL	|ZBX_SYNC
+FIELD		|snmpv3_securityname|t_varchar(64)|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|snmpv3_securitylevel|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|snmpv3_authpassphrase|t_varchar(64)|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|snmpv3_privpassphrase|t_varchar(64)|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|formula	|t_varchar(255)	|'1'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|error		|t_varchar(128)	|''	|NOT NULL	|ZBX_SYNC
 FIELD		|lastlogsize	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|logtimefmt	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|templateid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|valuemapid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|delay_flex	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|params		|t_item_param	|''	|NOT NULL	|ZBX_SYNC
+FIELD		|logtimefmt	|t_varchar(64)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|templateid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|valuemapid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|delay_flex	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|params		|t_item_param	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 UNIQUE		|1		|hostid,key_
 INDEX		|2		|nextcheck
 INDEX		|3		|status

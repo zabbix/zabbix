@@ -84,14 +84,25 @@ ZBX_FIELD
 	int	flags;
 };
 
+#define ZBX_MAX_FIELDS 64
 #define ZBX_TABLE struct zbx_table_type
 ZBX_TABLE
 {
 	char    	*table;
 	char		*recid;
 	int		flags;
-	ZBX_FIELD	fields[64];
+	ZBX_FIELD	fields[ZBX_MAX_FIELDS];
 };
+
+#ifdef HAVE_ORACLE
+#	define ZBX_DBTYPE_INT64 \"number(20)\"
+#elif HAVE_POSTGRESQL
+#	define ZBX_DBTYPE_INT64 \"bigint\"
+#elif HAVE_MYSQL
+#	define ZBX_DBTYPE_INT64 \"bigint unsigned\"
+#elif HAVE_SQLITE3
+#	define ZBX_DBTYPE_INT64 \"bigint\"
+#endif
 
 static	ZBX_TABLE	tables[]={
 ";
@@ -198,6 +209,9 @@ sub process_table
 		{
 			$flags="0";
 		}
+		for ($flags) {
+			s/,/ \| /;
+		}
 		print "\t{\"${table_name}\",\t\"${pkey}\",\t${flags},\n\t\t{\n";
 	}
 	else
@@ -234,7 +248,9 @@ sub process_field
 				$flags="ZBX_NOTNULL";
 			}
 		}
-			
+		for ($flags) {
+			s/,/ \| /;
+		}
 		print "\t\t{\"${name}\",\t$type,\t${flags}}";
 	}
 	else
