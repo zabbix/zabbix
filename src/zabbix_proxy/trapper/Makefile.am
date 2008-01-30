@@ -4,7 +4,4 @@ noinst_LIBRARIES = libzbxtrapper.a
 
 libzbxtrapper_a_SOURCES = \
 	active.c active.h \
-	trapper.c trapper.h \
-	nodesync.c nodesync.h \
-	nodehistory.c nodehistory.h \
-	nodecommand.c nodecommand.h
+	trapper.c trapper.h
