@@ -457,6 +457,7 @@ typedef enum
 #define ZBX_HISTORY		0x04
 #define ZBX_HISTORY_SYNC	0x08
 #define ZBX_HISTORY_TRENDS	0x10
+#define ZBX_PROXY		0x20
 
 /* Types of nodes */
 #define	ZBX_NODE_TYPE_REMOTE	0
