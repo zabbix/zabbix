@@ -210,7 +210,7 @@ static int	process_proxyconfig_table(struct zbx_json_parse *jp, const char *tabl
 			table->recid))
 		goto db_error;
 
-	if (ZBX_DB_OK > DBexecute("drop table %s_%s_tmp1",
+	if (ZBX_DB_OK > DBexecute("drop table %s_%s_tmp",
 			table->table,
 			table->recid))
 		goto db_error;
