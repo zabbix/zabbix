@@ -34,21 +34,21 @@ INSERT INTO scripts VALUES (2,'Traceroute','/usr/bin/traceroute {HOST.CONN}',0);
 -- Dumping data for table `users`
 --
 
-INSERT INTO users VALUES (1,'Admin','Zabbix','Administrator','d41d8cd98f00b204e9800998ecf8427e','',900,'en_gb',30,3,0);
-INSERT INTO users VALUES (2,'guest','Default','User','d41d8cd98f00b204e9800998ecf8427e','',900,'en_gb',30,1,0);
+INSERT INTO users VALUES (1,'Admin','Zabbix','Administrator','d41d8cd98f00b204e9800998ecf8427e','',900,'en_gb',30,3);
+INSERT INTO users VALUES (2,'guest','Default','User','d41d8cd98f00b204e9800998ecf8427e','',900,'en_gb',30,1);
 
 --
 -- Dumping data for table `usrgrp`
 --
 
-INSERT INTO usrgrp VALUES (1,'UNIX administrators');
-INSERT INTO usrgrp VALUES (2,'Database administrators');
-INSERT INTO usrgrp VALUES (3,'Network administrators');
-INSERT INTO usrgrp VALUES (4,'Security specialists');
-INSERT INTO usrgrp VALUES (5,'WEB administrators');
-INSERT INTO usrgrp VALUES (6,'Head of IT department');
-INSERT INTO usrgrp VALUES (7,'Zabbix administrators');
-INSERT INTO usrgrp VALUES (8,'Guests');
+INSERT INTO usrgrp VALUES (1,'UNIX administrators',0,0);
+INSERT INTO usrgrp VALUES (2,'Database administrators',0,0);
+INSERT INTO usrgrp VALUES (3,'Network administrators',0,0);
+INSERT INTO usrgrp VALUES (4,'Security specialists',0,0);
+INSERT INTO usrgrp VALUES (5,'WEB administrators',0,0);
+INSERT INTO usrgrp VALUES (6,'Head of IT department',0,0);
+INSERT INTO usrgrp VALUES (7,'Zabbix administrators',0,0);
+INSERT INTO usrgrp VALUES (8,'Guests',0,0);
 
 --
 -- Dumping data for table `users_groups`
