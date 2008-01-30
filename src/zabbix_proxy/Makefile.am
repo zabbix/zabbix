@@ -5,7 +5,7 @@ SUBDIRS = \
 	discoverer \
 	housekeeper \
 	httppoller \
-	nodewatcher \
+	proxyconfig \
 	pinger \
 	poller \
 	trapper
@@ -26,7 +26,7 @@ zabbix_proxy_LDADD = \
 	discoverer/libzbxdiscoverer.a \
 	housekeeper/libzbxhousekeeper.a \
 	httppoller/libzbxhttppoller.a \
-	nodewatcher/libzbxnodewatcher.a \
+	proxyconfig/libzbxproxyconfig.a \
 	pinger/libzbxpinger.a \
 	poller/libzbxpoller.a \
 	trapper/libzbxtrapper.a \
