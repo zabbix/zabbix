@@ -25,6 +25,7 @@
 #include "db.h"
 #include "log.h"
 #include "zlog.h"
+#include "zbxjson.h"
 
 #include "../functions.h"
 #include "../expression.h"
@@ -36,6 +37,7 @@
 #include "trapper.h"
 #include "active.h"
 #include "nodecommand.h"
+#include "proxyconfig.h"
 
 #include "daemon.h"
 
@@ -55,13 +57,29 @@ static int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 	int	ret=SUCCEED, res;
 	size_t	datalen;
 
+	struct 		zbx_json_parse jp;
+	const char 	*p;
+	char		value[MAX_STRING_LEN];
+
+/*
 	zbx_rtrim(s, " \r\n\0");
 
 	datalen = strlen(s);
 	zabbix_log( LOG_LEVEL_DEBUG, "Trapper got [%s] len %zd",
 		s,
 		datalen);
+*/
+
+	if (SUCCEED == zbx_json_open(s, &jp)) {
+		if (NULL != (p = zbx_json_pair_by_name(&jp, "request"))
+				&& NULL != zbx_json_decodevalue(p, value, sizeof(value))) {
+			if (0 == strcmp(value, "ZBX_PROXY_CONFIG"))
+				send_proxyconfig(sock, &jp);
+		}
 /* Request for list of active checks */
+	}
+	return ret;
+	
 	if (strncmp(s,"ZBX_GET_ACTIVE_CHECKS", 21) == 0) {
 		line=strtok(s,"\n");
 		host=strtok(NULL,"\n");
