@@ -37,6 +37,7 @@ frontends/php/audio/trigger_on_high.wav -text
 frontends/php/audio/trigger_on_warning.wav -text
 frontends/php/chart6.php -text
 frontends/php/chart7.php -text
+frontends/php/conf/maintenance.inc.php -text
 frontends/php/images/flash/zbxclock.swf -text svneol=unset#unset
 frontends/php/images/general/bar/arrow_down.gif -text
 frontends/php/images/general/bar/arrow_l.gif -text

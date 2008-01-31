@@ -494,8 +494,6 @@ if((ini_get('mbstring.func_overload') > 5)){
 
 	define('ZBX_HAVE_IPV6', 1);
 
-	global $_GET, $_POST, $_COOKIE, $_REQUEST;
-
 /* Support for PHP5. PHP5 does not have $HTTP_..._VARS */
 	if (!function_exists('version_compare'))
 	{
