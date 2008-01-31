@@ -37,10 +37,26 @@ initialize: function(url){
 			}
 			this.host=this.host.substring(atIndex+1);
 		}
-		var portColonIndex=this.host.indexOf(':');
-		if(portColonIndex>=0){
-			this.port=this.host.substring(portColonIndex);
-			this.host=this.host.substring(0,portColonIndex);
+		
+		var host_ipv6 = this.host.indexOf(']');
+		if(host_ipv6>=0){
+			if(host_ipv6 < (this.host.length-1)){
+				host_ipv6++;
+				var host_less = this.host.substring(host_ipv6);
+
+				var portColonIndex=host_less.indexOf(':');
+				if(portColonIndex>=0){
+					this.port=host_less.substring(portColonIndex);
+					this.host=this.host.substring(0,host_ipv6);
+				}
+			}
+		}
+		else{
+			var portColonIndex=this.host.indexOf(':');
+			if(portColonIndex>=0){
+				this.port=this.host.substring(portColonIndex);
+				this.host=this.host.substring(0,portColonIndex);
+			}
 		}
 		this.file=this.url.substring(protocolSepIndex+3);
 		this.file=this.file.substring(this.file.indexOf('/'));
@@ -95,13 +111,14 @@ return a;
 
 getUrl: function(){
 	var uri = (this.protocol.length > 0)?(this.protocol+'://'):'';
-	uri +=  (this.username.length > 0)?(this.username):'';
-	uri +=  (this.password.length > 0)?(':'+this.password):'';
+	uri +=  encodeURI((this.username.length > 0)?(this.username):'');
+	uri +=  encodeURI((this.password.length > 0)?(':'+this.password):'');
 	uri +=  (this.host.length > 0)?(this.host):'';
-	uri +=  (this.path.length > 0)?(this.path):'';
-	uri +=  (this.query.length > 0)?('?'+this.query):'';
-	uri +=  (this.reference.length > 0)?('#'+this.reference):'';
-return encodeURI(uri);
+	uri +=  encodeURI((this.path.length > 0)?(this.path):'');
+	uri +=  encodeURI((this.query.length > 0)?('?'+this.query):'');
+	uri +=  encodeURI((this.reference.length > 0)?('#'+this.reference):'');
+//	alert(uri.getProtocol()+' : '+uri.getHost()+' : '+uri.getPort()+' : '+uri.getPath()+' : '+uri.getQuery());
+return uri;
 },
 
 setArgument: function(key,value){
