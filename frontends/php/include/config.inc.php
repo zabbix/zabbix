@@ -27,7 +27,8 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	require_once 	"include/defines.inc.php";
 	require_once 	"include/html.inc.php";
 	require_once	"include/copt.lib.php";
-
+	require_once	"conf/maintenance.inc.php";
+	
 // GLOBALS
 	global $USER_DETAILS, $USER_RIGHTS;
 
@@ -100,8 +101,19 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	$ZBX_CONFIGURATION_FILE = realpath(dirname($ZBX_CONFIGURATION_FILE)).'/'.basename($ZBX_CONFIGURATION_FILE);
 
 	unset($show_setup);
+	
+	
+	if(defined('ZBX_DENY_GUI_ACCESS')){
+		if(isset($ZBX_GUI_ACCESS_IP_RANGE) && is_array($ZBX_GUI_ACCESS_IP_RANGE)){
+			$user_ip = (isset($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_X_FORWARDED_FOR']))?($_SERVER['HTTP_X_FORWARDED_FOR']):($_SERVER['REMOTE_ADDR']);			
+			if(!str_in_array($user_ip,$ZBX_GUI_ACCESS_IP_RANGE)) $DENY_GUI = TRUE;
+		}
+		else{
+			$DENY_GUI = TRUE;
+		}
+	}
 
-	if(file_exists($ZBX_CONFIGURATION_FILE) && !isset($_COOKIE['ZBX_CONFIG'])){
+	if(file_exists($ZBX_CONFIGURATION_FILE) && !isset($_COOKIE['ZBX_CONFIG']) && !isset($DENY_GUI)){
 		include $ZBX_CONFIGURATION_FILE;
 		require_once 	"include/db.inc.php";
 		
@@ -170,6 +182,11 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	}
 //*/
 
+	if(isset($DENY_GUI)){
+		unset($show_warning);
+		include_once "warning.php";
+	}
+
 	if(isset($show_setup)){
 		unset($show_setup);
 		include_once "setup.php";
@@ -191,7 +208,6 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 		$ZBX_CURRENT_SUBNODES = array();
 		$ZBX_NODES = array();
-
 		if(!defined('ZBX_PAGE_NO_AUTHERIZATION') && ZBX_DISTRIBUTED)
 		{
 			$ZBX_CURRENT_NODEID = get_cookie('zbx_current_nodeid', $ZBX_LOCALNODEID); // Selected node

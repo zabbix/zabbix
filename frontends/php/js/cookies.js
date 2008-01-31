@@ -1,3 +1,4 @@
+//Javascript document
 /*
 ** ZABBIX
 ** Copyright (C) 2000-2005 SIA Zabbix
@@ -16,7 +17,10 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/ 
-// JavaScript Document
+// Title: cookies class
+// Description: to manipulate cookies on client side
+// Author: Aly
+
 var cookie ={
 cookies: new Array(),
 

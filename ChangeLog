@@ -1,5 +1,6 @@
 Changes for 1.5:
 
+ - [DEV-104] added maintenance mode (Artem)
  - [DEV-103] added support of disabling login rights for a users group (Artem)
  - [DEV-102] added support of UTF8 for GUI (Artem)
  - [DEV-97] added screen for easier creation of locales (Artem)
