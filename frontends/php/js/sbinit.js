@@ -73,11 +73,13 @@ function graphsubmit(){
 	var scrl = $('scroll');
 
 	scrl.style.display = 'none';
+	
 	var uri = new url(location.href);
 	
 	uri.setArgument('stime', SCROLL_BAR.getsTime());
 	uri.setArgument('period', SCROLL_BAR.getPeriod());
 	location.href = uri.getUrl();
+
 }
 
 function gmenuload(){
@@ -157,7 +159,7 @@ function sboxload(){
 	
 	uri.setArgument('stime', stime);
 	uri.setArgument('period', this.period);
-	
+
 	location.href = uri.getUrl();
 }
 
