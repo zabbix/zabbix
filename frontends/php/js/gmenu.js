@@ -18,6 +18,9 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **
 */
+// Title: graph period menu class
+// Author: Aly
+
 <!--
 
 var G_MENU;						//gmenu obj reference

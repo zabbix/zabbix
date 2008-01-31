@@ -22,7 +22,6 @@
 require_once "include/config.inc.php";
 require_once "include/setup.inc.php";
 /* TMP !!! */
-
 global $DB_SERVER;
 
 /* ******** */

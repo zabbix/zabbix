@@ -18,6 +18,9 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **
 */
+// Title: selection box uppon graphs
+// Author: Aly
+
 <!--
 
 var A_SBOX = new Array();		//selection box obj reference
