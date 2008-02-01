@@ -358,29 +358,13 @@
 	 * Comments:
 	 *
 	 */
-	function	&get_triggers_by_hostid($hostid, $show_mixed = "yes")
-	{
-		$db_triggers = DBselect("select distinct t.* from triggers t, functions f, items i".
-			" where i.hostid=$hostid and f.itemid=i.itemid and f.triggerid=t.triggerid");
-
-		if($show_mixed == "yes")
-			return $db_triggers;
-
-		$triggers = array();
-		while($db_trigger = DBfetch($db_triggers))
-		{
-			$db_hosts = get_hosts_by_triggerid($db_trigger["triggerid"]);
-			if(DBfetch($db_hosts))
-			{
-				array_push($triggers,$db_trigger["triggerid"]);
-			}
-		}
-		$sql = "select distinct * from triggers where triggerid=0";
-		foreach($triggers as $triggerid)
-		{
-			$sql .= " or triggerid=$triggerid";
-		}
-		return DBselect($sql);
+	function	&get_triggers_by_hostid($hostid){
+		$db_triggers = DBselect('SELECT DISTINCT t.* '.
+								' FROM triggers t, functions f, items i '.
+								' WHERE i.hostid='.$hostid.
+									' AND f.itemid=i.itemid '.
+									' AND f.triggerid=t.triggerid');
+	return $db_triggers;
 	}
 
 	function	&get_triggers_by_templateid($triggerid)
@@ -790,13 +774,23 @@
 				get_trigger_dependences_by_triggerid($triggerid),
 				$hostid);
 
-		$host_triggers = get_triggers_by_hostid($hostid, "no");
-		while($host_trigger = DBfetch($host_triggers))
-		{
-			if($host_trigger["templateid"] != 0)				continue;
-			if(cmp_triggers($triggerid, $host_trigger["triggerid"]))	continue;
-
+		$sql='SELECT t2.triggerid, t2.expression '.
+				' FROM triggers t2, functions f1, functions f2, items i1, items i2 '.
+				' WHERE f1.triggerid='.$triggerid.
+					' AND i1.itemid=f1.itemid '.
+					' AND f2.function=f1.function '.
+					' AND f2.parameter=f1.parameter '.
+					' AND i2.itemid=f2.itemid '.
+					' AND i2.key_=i1.key_ '.
+					' AND i2.hostid='.$hostid.
+					' AND t2.triggerid=f2.triggerid '.
+					' AND t2.templateid=0 ';
+		
+		$host_triggers = DBSelect($sql);
+		while($host_trigger = DBfetch($host_triggers)){
+			if(cmp_triggers_exressions($triggerid, $host_trigger["triggerid"]))	continue;
 			// link not linked trigger with same expression
+			
 			return update_trigger(
 				$host_trigger["triggerid"],
 				NULL,	// expression
@@ -809,14 +803,13 @@
 				$copy_mode ? 0 : $triggerid);
 		}
 
-		$newtriggerid=get_dbid("triggers","triggerid");
+		$newtriggerid=get_dbid('triggers','triggerid');
 
-		$result = DBexecute("insert into triggers".
-			" (triggerid,description,priority,status,comments,url,value,expression,templateid)".
-			" values ($newtriggerid,".zbx_dbstr($trigger["description"]).",".$trigger["priority"].",".
-			$trigger["status"].",".zbx_dbstr($trigger["comments"]).",".
-			zbx_dbstr($trigger["url"]).",2,'{???:???}',".
-			($copy_mode ? 0 : $triggerid).")");
+		$result = DBexecute('INSERT INTO triggers'.
+					' (triggerid,description,priority,status,comments,url,value,expression,templateid)'.
+				' VALUES ('.$newtriggerid.','.zbx_dbstr($trigger['description']).','.$trigger['priority'].','.
+					$trigger["status"].','.zbx_dbstr($trigger["comments"]).','.
+					zbx_dbstr($trigger["url"]).",2,'{???:???}',".($copy_mode ? 0 : $triggerid).')');
 
 		if(!$result)
 			return $result;
@@ -1605,12 +1598,44 @@
 		}
 		return	TRUE;
 	}
+	
+	/*
+	 * Function: cmp_triggers_exressions
+	 *
+	 * Description: 
+	 * 		Warning: function compares ONLY expressions,there is no check on functions and items
+	 *     
+	 * Author: 
+	 *     Aly
+	 *
+	 * Comments: 
+	 *
+	 */
+	function	cmp_triggers_exressions($triggerid1, $triggerid2)	// compare EXPRESSION !!!
+	{
+		$trig1 = get_trigger_by_triggerid($triggerid1);
+		$trig2 = get_trigger_by_triggerid($triggerid2);
+
+		$trig_fnc1 = get_functions_by_triggerid($triggerid1);
+		$expr1 = $trig1["expression"];
+		while($fnc1 = DBfetch($trig_fnc1)){
+			$trig_fnc2 = get_functions_by_triggerid($triggerid2);
+			while($fnc2 = DBfetch($trig_fnc2)){
+				$expr1 = str_replace(
+					"{".$fnc1["functionid"]."}",
+					"{".$fnc2["functionid"]."}",
+					$expr1);
+				break;
+			}
+		}
+		return strcmp($expr1,$trig2["expression"]);
+	}
 
 	/*
 	 * Function: cmp_triggers
 	 *
 	 * Description: 
-	 *     compate triggers by expression
+	 *     compare triggers by expression
 	 *     
 	 * Author: 
 	 *     Eugene Grigorjev (eugene.grigorjev@zabbix.com)
