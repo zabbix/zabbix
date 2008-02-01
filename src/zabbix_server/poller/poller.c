@@ -511,12 +511,18 @@ int get_values(void)
 
 void main_poller_loop(int type, int num)
 {
+	struct	sigaction phan;
 	int	now;
 	int	nextcheck,sleeptime;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In main_poller_loop(type:%d,num:%d)",
 		type,
 		num);
+
+	phan.sa_handler = child_signal_handler;
+	sigemptyset(&phan.sa_mask);
+	phan.sa_flags = 0;
+	sigaction(SIGALRM, &phan, NULL);
 
 	poller_type = type;
 	poller_num = num;
