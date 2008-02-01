@@ -22,7 +22,6 @@
 
 extern	int	CONFIG_DISABLE_HOUSEKEEPING;
 extern	int	CONFIG_HOUSEKEEPING_FREQUENCY;
-extern	char	*CONFIG_FPING_LOCATION;
 
 int main_housekeeper_loop();
 
