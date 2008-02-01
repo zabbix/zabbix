@@ -412,11 +412,11 @@
 		{
 			while($tmp = DBFetch($res)) $grp_list.= "'".$tmp['usrgrpid']."'".',';
 		}
-		$grp_list=rtrim($grp_list,',').')';
+		$grp_list.="'0')";
 		
 		$res = DBselect('SELECT DISTINCT g.usrgrpid, g.name, g.gui_access, g.users_status'.
 			' FROM usrgrp g'.
-			' WHERE g.usrgrpid NOT IN'.$grp_list.
+			' WHERE g.usrgrpid NOT IN '.$grp_list.
 				' AND '.DBin_node('g.usrgrpid', get_current_nodeid(false)).
 			' ORDER BY g.name');
 
@@ -481,7 +481,8 @@
 			{
 				while($tmp = DBFetch($res)) $grp_list.= "'".$tmp['usrgrpid']."'".',';
 			}
-			$grp_list=rtrim($grp_list,',').')';
+			$grp_list.="'0')";
+//			$grp_list=rtrim($grp_list,',').')';
 			
 			$res = DBselect('SELECT DISTINCT g.usrgrpid, g.name'.
 				' FROM usrgrp g'.
@@ -532,7 +533,8 @@
 			{
 				while($tmp = DBFetch($res)) $grp_list.= "'".$tmp['usrgrpid']."'".',';
 			}
-			$grp_list=rtrim($grp_list,',').')';
+			$grp_list.="'0')";
+//			$grp_list=rtrim($grp_list,',').')';
 			
 			$res = DBselect('SELECT DISTINCT g.usrgrpid, g.name'.
 				' FROM usrgrp g'.
