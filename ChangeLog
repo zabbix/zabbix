@@ -45,6 +45,7 @@ Changes for 1.5:
 
 Changes for 1.4.5:
 
+ - [HAN-2] improved speed on coping triggers to host (Artem)
  - [ZBX-290] fixed possible server crash if host dns name is unknown (Sasha)
  - [ZBX-288] fixed compilation of the agent under Solaris 2.6 (Alexei)
  - [ZBX-287] fixed compilation under FreeBSD 4.1 with older GCC (Alexei)
