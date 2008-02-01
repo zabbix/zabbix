@@ -233,6 +233,141 @@ int	calculate_item_nextcheck(zbx_uint64_t itemid, int item_type, int delay, char
 	return i;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: is_ip4                                                           *
+ *                                                                            *
+ * Purpose: is string IPv4 address                                            *
+ *                                                                            *
+ * Parameters: ip - string                                                    *
+ *                                                                            *
+ * Return value: SUCCEED - is IPv4 address                                    * 
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ * Author: Alexei Vladishev, Aleksander Vladishev                             *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	is_ip4(const char *ip)
+{
+	const char	*p = ip;
+	int		nums, dots, res = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In is_ip4() [%s]",
+			ip);
+
+	nums = 0;
+	dots = 0;
+	while ('\0' != *p) {
+		if (*p >= '0' && *p <= '9') {
+			nums++;
+		} else if (*p == '.') {
+			if (nums == 0 || nums > 3)
+				break;
+			nums = 0;
+			dots++;
+		} else {
+			nums = 0;
+			break;
+		}
+		p++;
+	}
+	if (dots == 3 && nums >= 1 && nums <= 3)
+		res = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of is_ip4(result:%d)",
+			res);
+
+	return res;
+}
+
+#if defined(HAVE_IPV6)
+/******************************************************************************
+ *                                                                            *
+ * Function: is_ip6                                                           *
+ *                                                                            *
+ * Purpose: is string IPv6 address                                            *
+ *                                                                            *
+ * Parameters: ip - string                                                    *
+ *                                                                            *
+ * Return value: SUCCEED - is IPv6 address                                    * 
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ * Author: Aleksader Vladishev                                                *
+ *                                                                            *
+ * Comments: could be improved (not supported x:x:x:x:x:x:d.d.d.d addresses)  *
+ *                                                                            *
+ ******************************************************************************/
+static int	is_ip6(const char *ip)
+{
+	const char	*p = ip;
+	int		nums, is_nums, colons, dcolons, res = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In is_ip6() [%s]",
+			ip);
+
+	nums = 0;
+	is_nums = 0;
+	colons = 0;
+	dcolons = 0;
+	while ('\0' != *p) {
+		if ((*p >= '0' && *p <= '9') || (*p >= 'A' && *p <= 'F') || (*p >= 'a' && *p <= 'f')) {
+			nums++;
+			is_nums = 1;
+		} else if (*p == ':') {
+			if (nums == 0 && colons > 0)
+				dcolons++;
+			if (nums > 4 || dcolons > 1)
+				break;
+			nums = 0;
+			colons++;
+		} else {
+			is_nums = 0;
+			break;
+		}
+		p++;
+	}
+	if (colons >= 2 && colons <= 7 && nums <= 4 && is_nums == 1)
+		res = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of is_ip6(result:%d)",
+			res);
+
+	return res;
+}
+#endif /*HAVE_IPV6*/
+
+/******************************************************************************
+ *                                                                            *
+ * Function: is_ip                                                            *
+ *                                                                            *
+ * Purpose: is string IP address                                              *
+ *                                                                            *
+ * Parameters: ip - string                                                    *
+ *                                                                            *
+ * Return value: SUCCEED - is IP address                                      * 
+ *               FAIL - otherwise                                             *
+ *                                                                            *
+ * Author: Aleksader Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	is_ip(const char *ip)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In is_ip() [%s]",
+			ip);
+
+	if (SUCCEED == is_ip4(ip))
+		return SUCCEED;
+#if defined(HAVE_IPV6)
+	if (SUCCEED == is_ip6(ip))
+		return SUCCEED;
+#endif /*HAVE_IPV6*/
+	return FAIL;
+}
+
 #if defined(HAVE_IPV6)
 /******************************************************************************
  *                                                                            *
