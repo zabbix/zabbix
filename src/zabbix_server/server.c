@@ -142,6 +142,7 @@ int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 char	*CONFIG_ALERT_SCRIPTS_PATH	= NULL;
 char	*CONFIG_EXTERNALSCRIPTS		= NULL;
 char	*CONFIG_FPING_LOCATION		= NULL;
+char	*CONFIG_FPING6_LOCATION		= NULL;
 char	*CONFIG_DBHOST			= NULL;
 char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBUSER			= NULL;
@@ -194,6 +195,7 @@ void	init_config(void)
 		{"SenderFrequency",&CONFIG_SENDER_FREQUENCY,0,TYPE_INT,PARM_OPT,5,3600},
 		{"PingerFrequency",&CONFIG_PINGER_FREQUENCY,0,TYPE_INT,PARM_OPT,1,3600},
 		{"FpingLocation",&CONFIG_FPING_LOCATION,0,TYPE_STRING,PARM_OPT,0,0},
+		{"Fping6Location",&CONFIG_FPING6_LOCATION,0,TYPE_STRING,PARM_OPT,0,0},
 		{"Timeout",&CONFIG_TIMEOUT,0,TYPE_INT,PARM_OPT,1,30},
 		{"TrapperTimeout",&CONFIG_TRAPPER_TIMEOUT,0,TYPE_INT,PARM_OPT,1,30},
 		{"UnreachablePeriod",&CONFIG_UNREACHABLE_PERIOD,0,TYPE_INT,PARM_OPT,1,3600},
@@ -243,6 +245,10 @@ void	init_config(void)
 	if(CONFIG_FPING_LOCATION == NULL)
 	{
 		CONFIG_FPING_LOCATION=strdup("/usr/sbin/fping");
+	}
+	if(CONFIG_FPING6_LOCATION == NULL)
+	{
+		CONFIG_FPING6_LOCATION=strdup("/usr/sbin/fping6");
 	}
 	if(CONFIG_EXTERNALSCRIPTS == NULL)
 	{
@@ -642,7 +648,6 @@ void test_trigger_description()
 	
 	DBclose();
 }
-*/
 
 void test_zbx_tcp_connect(void)
 {
@@ -656,9 +661,7 @@ ZBX_TEST_TCP_CONNECT
 ZBX_TEST_TCP_CONNECT expressions[]=
 {
 	{"127.0.00.1",   80},
-	{"www.iscentrs.lv",	80},/*81.198.60.94*/
 	{"81.171.84.52",	80},
-	{"64.233.183.103",	80},/*nf-in-f103.google.com*/
 	{"::1",   80},
 	{"::1",   22},
 	{"12fc::5",	80},
@@ -696,7 +699,7 @@ ZBX_TEST_TCP_CONNECT expressions[]=
 		printf("\n");
 	}
 }
-/*
+
 static void test_child_signal_handler(int sig)
 {
 	printf( "sdfsdfsdfsf" );
