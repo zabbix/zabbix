@@ -1728,10 +1728,11 @@
 				update_trigger($chd_trigger_data['triggerid'],
 					/*$expression*/		NULL,
 					/*$description*/	NULL,
+					/*$type*/			NULL,
 					/*$priority*/		NULL,
-					/*$status*/		NULL,
+					/*$status*/			NULL,
 					/*$comments*/		NULL,
-					/*$url*/		NULL,
+					/*$url*/			NULL,
 					replace_template_dependences(
 						get_trigger_dependences_by_triggerid($trigger_data['triggerid']),
 						$hostid),
