@@ -45,7 +45,7 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 {
 	zbx_sock_t	s;
 
-	char
+	char	*addr,
 		*buf,
 		packet[MAX_STRING_LEN],
 		error[MAX_STRING_LEN];
@@ -54,12 +54,13 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 
 	init_result(result);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_agent(host:%s,ip:%s,key:%s",
-		item->host_name,
-		item->host_ip,
-		item->key );
+	addr = (item->useip == 1) ? item->host_ip : item->host_dns;
+	zabbix_log( LOG_LEVEL_DEBUG, "In get_value_agent(host:%s,addr:%s,key:%s)",
+			item->host_name,
+			addr,
+			item->key);
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, item->useip==1 ? item->host_ip : item->host_dns, item->port, 0))) {
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, addr, item->port, 0))) {
 		zbx_snprintf(packet, sizeof(packet), "%s\n",item->key);
 		zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", packet);
 

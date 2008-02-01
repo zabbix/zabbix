@@ -140,7 +140,8 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
 		goto out;
 	}
 out:
-	freeaddrinfo(ai);
+	if (NULL != ai)
+		freeaddrinfo(ai);
 }
 #else
 void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
@@ -321,8 +322,8 @@ int	zbx_tcp_connect(zbx_sock_t *s,
 	int		timeout
 	)
 {
-	int	ret=SUCCEED;
-	struct	addrinfo *ai, hints;
+	int	ret = FAIL;
+	struct	addrinfo *ai = NULL, hints;
 	char	service[MAX_STRING_LEN];
 
 	ZBX_TCP_START();
@@ -334,15 +335,13 @@ int	zbx_tcp_connect(zbx_sock_t *s,
 	hints.ai_family = PF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 
-	if (0 != getaddrinfo (ip, service, &hints, &ai)) {
+	if (0 != getaddrinfo(ip, service, &hints, &ai)) {
 		zbx_set_tcp_strerror("Cannot resolve [%s]", ip);
-		ret=FAIL;
 		goto out;
 	}
 
 	if (ZBX_SOCK_ERROR == (s->socket = socket(ai->ai_family, ai->ai_socktype, ai->ai_protocol))) {
 		zbx_set_tcp_strerror("Cannot create socket [%s]:%d [%s]", ip, port ,strerror_from_system(zbx_sock_last_error()));
-		ret=FAIL;
 		goto out;
 	}
 
@@ -363,11 +362,13 @@ int	zbx_tcp_connect(zbx_sock_t *s,
 	if (ZBX_TCP_ERROR == connect(s->socket, ai->ai_addr, ai->ai_addrlen)) {
 		zbx_set_tcp_strerror("*** Cannot connect to [%s]:%d [%s]", ip, port, strerror_from_system(zbx_sock_last_error()));
 		zbx_tcp_close(s);
-		ret=FAIL;
 		goto out;
 	}
+
+	ret = SUCCEED;
 out:
-	freeaddrinfo (ai);
+	if (NULL != ai)
+		freeaddrinfo(ai);
 	return ret;
 }
 #else
@@ -538,7 +539,7 @@ int zbx_tcp_listen(
 {
 	struct		addrinfo hints, *ai = NULL, *current_ai;
 	char		port[MAX_STRING_LEN];
-	int		e, on;
+	int		e, on, ret = FAIL;
 
 	ZBX_TCP_START();
 
@@ -552,7 +553,7 @@ int zbx_tcp_listen(
 	if(0 != (e = getaddrinfo(listen_ip, port, &hints, &ai)))
 	{
 		zbx_set_tcp_strerror("Cannot resolve address [[%s]:%u], error %d: %s", listen_ip, listen_port, e, gai_strerror(e));
-		return FAIL;
+		goto out;
 	}
 
 	for(s->num_socks = 0, current_ai = ai; current_ai != NULL; current_ai = current_ai->ai_next)
@@ -594,13 +595,16 @@ int zbx_tcp_listen(
 
 		s->num_socks++;
 	}
-	freeaddrinfo(ai);
 
 	if(s->num_socks == 0) {
 		zbx_set_tcp_strerror("zbx_tcp_listen() Fatal error: unable to serve on any address. [[%s]:%u]", listen_ip, listen_port);
-		return FAIL;
+		goto out;
 	}
-	return SUCCEED;
+	ret = SUCCEED;
+out:
+	if (NULL != ai)
+		freeaddrinfo(ai);
+	return ret;
 }
 #else
 int zbx_tcp_listen(
@@ -1035,8 +1039,8 @@ int	zbx_tcp_check_security(
 							}
 					}
 				}
+				freeaddrinfo(ai);
 			}
-			freeaddrinfo(ai);
 #else
 			if( 0 != (hp = zbx_gethost(start)))
 			{
