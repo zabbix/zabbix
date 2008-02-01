@@ -240,7 +240,7 @@ static int do_ping(ZBX_FPING_HOST *hosts, int hosts_count)
 			CONFIG_FPING6_LOCATION,
 			filename);
 #else /* HAVE_IPV6 */
-	zbx_snprintf(tmp, sizeof(tmp), "%s -e 2>/dev/null <%s"
+	zbx_snprintf(tmp, sizeof(tmp), "%s -e 2>/dev/null <%s",
 			CONFIG_FPING_LOCATION,
 			filename);
 #endif /* HAVE_IPV6 */
