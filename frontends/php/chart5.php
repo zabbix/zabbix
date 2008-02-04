@@ -112,7 +112,6 @@ include_once "include/page_header.php";
 			$period_end = time();
 
 		$stat = calculate_service_availability($_REQUEST["serviceid"],$period_start,$period_end);
-		
 		$problem[$i]=$stat["problem"];
 		$ok[$i]=$stat["ok"];
 		$count_now[$i]=1;
@@ -142,8 +141,8 @@ include_once "include/page_header.php";
 	for($i=1;$i<=52;$i++)
 	{
 		if(!isset($ok[$i-1])) continue;
+		$x2=($sizeX/52)*($i-1-$minX)*$sizeX/($maxX-$minX);
 
-		$x2=(900/52)*$sizeX*($i-$minX-1)/($maxX-$minX);
 		$y2=$sizeY*($ok[$i-1]-$minY)/($maxY-$minY);
 		$y2=$sizeY-$y2;
 
