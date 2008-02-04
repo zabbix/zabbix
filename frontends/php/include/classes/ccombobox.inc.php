@@ -87,8 +87,14 @@
 //			if($enabled=='no') return;	/* disable item method 1 */
 			if(is_null($selected)){
 				$selected = 'no';
-				if((strcmp($value,$this->value) == 0) || (is_array($this->value) && str_in_array($value, $this->value)))
+				if(is_array($this->value)) {
+					if(str_in_array($value,$this->value))
+						$selected = 'yes';
+				}
+				else if(strcmp($value,$this->value) == 0)
+				{
 					$selected = 'yes';
+				}
 			}
 
 			parent::AddItem(new CComboItem($value,$caption,$selected,$enabled));
@@ -183,8 +189,14 @@
 		{
 			if(is_null($selected))
 			{
-				if((strcmp($value,$this->value) == 0) || (is_array($this->value) && str_in_array($value, $this->value)))
+				if(is_array($this->value)) {
+					if(str_in_array($value,$this->value))
+						$this->value_exist = 1;
+				}
+				else if(strcmp($value,$this->value) == 0)
+				{
 					$this->value_exist = 1;
+				}
 			}
 
 			parent::AddItem($value,$caption,$selected,$enabled);
