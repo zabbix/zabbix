@@ -266,7 +266,7 @@ include_once "include/page_header.php";
 			
 			show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
 			if($result){
-				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_USER,
+				add_audit(AUDIT_ACTION_ADD,AUDIT_RESOURCE_GROUP,
 					"User alias [".$user["alias"]."] name [".$user["name"]."] surname [".$user["surname"]."]");
 				
 				unset($_REQUEST["usrgrpid"]);
@@ -285,7 +285,7 @@ include_once "include/page_header.php";
 			
 			show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
 			if($result){
-				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_USER,
+				add_audit(AUDIT_ACTION_DELETE,AUDIT_RESOURCE_GROUP,
 					"User alias [".$user["alias"]."] name [".$user["name"]."] surname [".$user["surname"]."]");
 
 				unset($_REQUEST["usrgrpid"]);
