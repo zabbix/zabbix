@@ -68,12 +68,31 @@ include_once "include/page_header.php";
 	{
 		if($i<$start)	continue;
 
-		if($row["action"]==AUDIT_ACTION_ADD)			$action = S_ADDED;
-		else if($row["action"]==AUDIT_ACTION_UPDATE)		$action = S_UPDATED;
-		else if($row["action"]==AUDIT_ACTION_DELETE)		$action = S_DELETED;
-		else if($row["action"]==AUDIT_ACTION_LOGIN)		$action = S_LOGIN;
-		else if($row["action"]==AUDIT_ACTION_LOGOUT)		$action = S_LOGOUT;
-		else							$action = S_UNKNOWN_ACTION;
+		switch($row["action"]){
+			case AUDIT_ACTION_ADD:			
+				$action = S_ADDED; 
+				break;
+			case AUDIT_ACTION_UPDATE:
+				$action = S_UPDATED;
+				break;
+			case AUDIT_ACTION_DELETE:
+				$action = S_DELETED;
+				break;
+			case AUDIT_ACTION_LOGIN:
+				$action = S_LOGIN;
+				break;
+			case AUDIT_ACTION_LOGOUT:
+				$action = S_LOGOUT;
+				break;
+			case AUDIT_ACTION_ENABLE:
+				$action = S_ENABLED;
+				break;
+			case AUDIT_ACTION_DISABLE:
+				$action = S_DISABLED;
+				break;
+			default:
+				$action = S_UNKNOWN_ACTION;
+		}
 
 		$table->addRow(array(
 			date("Y.M.d H:i:s",$row["clock"]),
