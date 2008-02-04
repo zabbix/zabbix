@@ -1996,8 +1996,13 @@
 			}
 		}
 
-		$result=DBselect('select clock,value from events where objectid='.$triggerid.' and object='.EVENT_OBJECT_TRIGGER
-			.' and clock>='.$min.' and clock<='.$max);
+		$result=DBselect('SELECT clock,value '.
+						' FROM events '.
+						' WHERE objectid='.$triggerid.
+							' AND object='.EVENT_OBJECT_TRIGGER.
+							' AND clock>='.$min.
+							' AND clock<='.$max.
+						' ORDER BY clock ASC');
 
 		$state		= -1;
 		$true_time	= 0;
@@ -2016,7 +2021,6 @@
 			$value=$row["value"];
 
 			$diff=$clock-$time;
-
 			$time=$clock;
 
 			if($state==-1)
@@ -2058,7 +2062,7 @@
 			$trigger = get_trigger_by_triggerid($triggerid);
 			$state = $trigger['value'];
 		}
-		
+
 		if($state==0)
 		{
 			$false_time=$false_time+$max-$time;
@@ -2071,7 +2075,6 @@
 		{
 			$unknown_time=$unknown_time+$max-$time;
 		}
-
 		$total_time=$true_time+$false_time+$unknown_time;
 
 		if($total_time==0)

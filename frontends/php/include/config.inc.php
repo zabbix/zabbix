@@ -1854,7 +1854,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 	function make_sorting_link($obj,$tabfield,$url=''){
 		global $page;
 		
-		$sortorder = ($_REQUEST['sortorder'] == ZBX_SORT_UP)?ZBX_SORT_DOWN:ZBX_SORT_UP;
+		$sortorder = (isset($_REQUEST['sortorder']) && ($_REQUEST['sortorder'] == ZBX_SORT_UP))?ZBX_SORT_DOWN:ZBX_SORT_UP;
 		
 		if(empty($url)){
 			$url='?';
@@ -1873,7 +1873,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		
 		$link = new CLink($obj,$url.'sort='.$tabfield.'&sortorder='.$sortorder);
 		
-		if($tabfield == $_REQUEST['sort']){
+		if(isset($_REQUEST['sort']) && ($tabfield == $_REQUEST['sort'])){
 			if($sortorder == ZBX_SORT_UP){
 				$img = new CImg('images/general/sort_downw.gif','down',10,10);
 			}
