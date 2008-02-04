@@ -2019,7 +2019,7 @@
 		}
 
 		$result=DBselect('select clock,value from events where objectid='.$triggerid.' and object='.EVENT_OBJECT_TRIGGER
-			.' and clock>='.$min.' and clock<='.$max);
+			.' and clock>='.$min.' and clock<='.$max.' order by clock asc');
 
 		$state		= -1;
 		$true_time	= 0;
