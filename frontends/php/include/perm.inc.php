@@ -43,6 +43,7 @@
 		global	$ZBX_LOCALNODEID;
 
 		$USER_DETAILS = NULL;
+		$login = FALSE;
 		
 		$sessionid = get_cookie("zbx_sessionid");
 
@@ -71,16 +72,16 @@
 			$login = (check_perm2login($USER_DETAILS['userid']) && check_perm2system($USER_DETAILS['userid']));
 		}
 
-		if(!$login){
+		if($login){
+			zbx_setcookie("zbx_sessionid",$sessionid);
+			DBexecute("update sessions set lastaccess=".time()." where sessionid=".zbx_dbstr($sessionid));
+		}
+		else{
 			$USER_DETAILS = NULL;
 			
 			zbx_unsetcookie('zbx_sessionid');
 			DBexecute("delete from sessions where sessionid=".zbx_dbstr($sessionid));
 			unset($sessionid);
-		}
-		else{
-			zbx_setcookie("zbx_sessionid",$sessionid);
-			DBexecute("update sessions set lastaccess=".time()." where sessionid=".zbx_dbstr($sessionid));
 		}
 
 		if($USER_DETAILS){
