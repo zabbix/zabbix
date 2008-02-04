@@ -46,39 +46,41 @@
 		
 		$sessionid = get_cookie("zbx_sessionid");
 
-		if( !is_null($sessionid))
+		if(!is_null($sessionid))
 		{
 			$login = $USER_DETAILS = DBfetch(DBselect('SELECT u.*,s.* FROM sessions s,users u'.
 						' WHERE s.sessionid='.zbx_dbstr($sessionid).
 							' AND s.userid=u.userid'.
 							' AND ((s.lastaccess+u.autologout>'.time().') OR (u.autologout=0))'.
 							' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID)));
-			if($login){
-				$login = (check_perm2login($USER_DETAILS['userid']) && check_perm2system($USER_DETAILS['userid']));
-			}
-			
-			if(!$login){
-				$USER_DETAILS = NULL;
-				
-				zbx_unsetcookie('zbx_sessionid');
-				DBexecute("delete from sessions where sessionid=".zbx_dbstr($sessionid));
-				unset($sessionid);
-
-				$incorrect_session = true;
-			}
-			else{
-				zbx_setcookie("zbx_sessionid",$sessionid);
-				DBexecute("update sessions set lastaccess=".time()." where sessionid=".zbx_dbstr($sessionid));
+			if(!$USER_DETAILS){
+				$incorect_session = true;
 			}
 		}
 		
 		if(!$USER_DETAILS){
-			if(!($USER_DETAILS = DBfetch(DBselect('SELECT u.* FROM users u '.
-							' WHERE u.alias='.zbx_dbstr(ZBX_GUEST_USER).
-								' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID)))))
-			{
+			$login = $USER_DETAILS = DBfetch(DBselect('SELECT u.* FROM users u '.
+										' WHERE u.alias='.zbx_dbstr(ZBX_GUEST_USER).
+											' AND '.DBin_node('u.userid', $ZBX_LOCALNODEID)));
+			if(!$USER_DETAILS){
 				$missed_user_guest = true;
 			}
+		}
+		
+		if($login){
+			$login = (check_perm2login($USER_DETAILS['userid']) && check_perm2system($USER_DETAILS['userid']));
+		}
+
+		if(!$login){
+			$USER_DETAILS = NULL;
+			
+			zbx_unsetcookie('zbx_sessionid');
+			DBexecute("delete from sessions where sessionid=".zbx_dbstr($sessionid));
+			unset($sessionid);
+		}
+		else{
+			zbx_setcookie("zbx_sessionid",$sessionid);
+			DBexecute("update sessions set lastaccess=".time()." where sessionid=".zbx_dbstr($sessionid));
 		}
 
 		if($USER_DETAILS){
@@ -100,7 +102,7 @@
 					"nodeid"=>0));
 		}
 		
-		if(isset($incorrect_session) || isset($missed_user_guest))
+		if(!$login || isset($incorrect_session) || isset($missed_user_guest))
 		{
 			if(isset($incorrect_session))		$message = "Session was ended, please relogin!";
 			else if(isset($missed_user_guest)){
