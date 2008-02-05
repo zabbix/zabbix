@@ -56,13 +56,14 @@ include_once "include/page_header.php";
 <?php
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 	$fields=array(
-		// 0 - hosts; 1 - groups; 2 - linkages; 3 - templates; 4 - applications
-		"config"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1,2,3,4"),	NULL), 
+		// 0 - hosts; 1 - groups; 2 - linkages; 3 - templates; 4 - applications; 5 - Proxies
+		"config"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	IN("0,1,2,3,4,5"),	NULL), 
 
 /* ARAYS */
 		"hosts"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 		"groups"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 		"applications"=>array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
+		"proxies"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID, NULL),
 /* host */
 		"hostid"=>	array(T_ZBX_INT, O_OPT,	P_SYS,  DB_ID,		'(isset({config})&&({config}==0))&&(isset({form})&&({form}=="update"))'),
 		"host"=>	array(T_ZBX_STR, O_OPT,	NULL,   NOT_EMPTY,	'isset({config})&&({config}==0||{config}==3)&&isset({save})'),
@@ -113,6 +114,10 @@ include_once "include/page_header.php";
 		"delete"=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"delete_and_clear"=>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	NULL,	NULL),
 		"cancel"=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
+/* proxy */
+		"proxyid"=>	array(T_ZBX_INT, O_OPT,	P_SYS,	DB_ID,		'(isset({config})&&({config}==5))&&(isset({form})&&({form}=="update"))'),
+		"pname"=>	array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,	'(isset({config})&&({config}==5))&&isset({save})'),
+
 /* other */
 		"form"=>	array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		"form_refresh"=>array(T_ZBX_STR, O_OPT, NULL,	NULL,	NULL)
@@ -538,7 +543,112 @@ include_once "include/page_header.php";
 		}
 		(isset($_REQUEST["activate"]))?show_messages($result, S_ITEMS_ACTIVATED, null):show_messages($result, S_ITEMS_DISABLED, null);
 	}
-	
+	elseif($_REQUEST["config"]==5 && isset($_REQUEST["save"]))
+	{
+		$hosts = get_request("hosts",array());
+		if(isset($_REQUEST["proxyid"]))
+		{
+			$result		= update_proxy($_REQUEST["proxyid"], $_REQUEST["pname"], $hosts);
+			$action		= AUDIT_ACTION_UPDATE;
+			$msg_ok		= S_PROXY_UPDATED;
+			$msg_fail	= S_CANNOT_UPDATE_PROXY;
+			$proxyid	= $_REQUEST["proxyid"];
+		} else {
+			if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))
+				access_deny();
+
+			$proxyid	= add_proxy($_REQUEST["pname"], $hosts);
+			$action		= AUDIT_ACTION_ADD;
+			$msg_ok		= S_PROXY_ADDED;
+			$msg_fail	= S_CANNOT_ADD_PROXY;
+			$result		= $proxyid;
+		}
+		show_messages($result, $msg_ok, $msg_fail);
+		if ($result) {
+			add_audit($action,
+					AUDIT_RESOURCE_PROXY,
+					"[".$_REQUEST["pname"]." ] [".$proxyid."]");
+
+			unset($_REQUEST["form"]);
+		}
+		unset($_REQUEST["save"]);
+	}
+	elseif($_REQUEST["config"]==5 && isset($_REQUEST["delete"]))
+	{
+		$result = false;
+
+		if(isset($_REQUEST["proxyid"])){
+			if ($proxy = get_proxy_by_proxyid($_REQUEST["proxyid"]))
+				$result = delete_proxy($_REQUEST["proxyid"]);
+
+			if ($result)
+				add_audit(AUDIT_ACTION_DELETE,
+						AUDIT_RESOURCE_PROXY,
+						"[".$proxy["name"]." ] [".$proxy['proxyid']."]");
+
+			unset($_REQUEST["form"]);
+
+			show_messages($result, S_PROXY_DELETED, S_CANNOT_DELETE_PROXY);
+
+			unset($_REQUEST["proxyid"]);
+		} else {
+			$proxies = get_request("proxies",array());
+
+			foreach ($proxies as $proxyid) {
+				$proxy = get_proxy_by_proxyid($proxyid);
+
+				if (false == ($result = delete_proxy($proxyid)))
+					break;
+
+				add_audit(AUDIT_ACTION_DELETE,
+						AUDIT_RESOURCE_PROXY,
+						"[".$proxy["name"]." ] [".$proxy['proxyid']."]");
+			}
+
+			show_messages($result, S_PROXY_DELETED, NULL);
+		}
+		unset($_REQUEST["delete"]);
+	}
+	elseif($_REQUEST["config"]==5 && isset($_REQUEST["clone"]) && isset($_REQUEST["proxyid"]))
+	{
+		unset($_REQUEST["proxyid"]);
+		$_REQUEST["form"] = "clone";
+	}
+	elseif($_REQUEST["config"]==5 && (isset($_REQUEST["activate"]) || isset($_REQUEST["disable"])))
+	{
+		$result = false;
+
+		$status = isset($_REQUEST["activate"]) ? HOST_STATUS_MONITORED : HOST_STATUS_NOT_MONITORED;
+
+		$proxies = get_request("proxies",array());
+
+		foreach ($proxies as $proxyid) {
+			$db_hosts = DBselect("select hostid,status from hosts where".
+					" proxyid=".$proxyid." and ".DBin_node('hostid'));
+			while ($db_host = DBfetch($db_hosts)) {
+				$old_status = $db_host["status"];
+				if ($old_status == $status)
+					continue;
+
+				if (false == ($result = update_host_status($db_host["hostid"], $status)))
+					continue;
+
+				$result = 1;
+
+				add_audit(AUDIT_ACTION_UPDATE,
+						AUDIT_RESOURCE_HOST,
+						"Old status [".$old_status."] "."New status [".$status."] [".$db_host["hostid"]."]");
+			}
+		}
+		show_messages($result, S_HOST_STATUS_UPDATED, NULL);
+
+		if (isset($_REQUEST["activate"]))
+			unset($_REQUEST["activate"]);
+		else
+			unset($_REQUEST["disable"]);
+	}
+
+
 	$available_hosts = get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,get_current_nodeid()); /* update available_hosts after ACTIONS */
 ?>
 <?php
@@ -548,6 +658,7 @@ include_once "include/page_header.php";
 	$cmbConf = new CComboBox("config",$_REQUEST["config"],"submit()");
 	$cmbConf->AddItem(0,S_HOSTS);
 	$cmbConf->AddItem(3,S_TEMPLATES);
+	$cmbConf->AddItem(5,S_PROXIES);
 	$cmbConf->AddItem(1,S_HOST_GROUPS);
 	$cmbConf->AddItem(2,S_TEMPLATE_LINKAGE);
 	$cmbConf->AddItem(4,S_APPLICATIONS);
@@ -560,6 +671,9 @@ include_once "include/page_header.php";
 		case 3:
 			$btn = new CButton("form",S_CREATE_TEMPLATE);
 			$frmForm->AddVar("groupid",get_request("groupid",0));
+			break;
+		case 5:
+			$btn = new CButton("form",S_CREATE_PROXY);
 			break;
 		case 1: 
 			$btn = new CButton("form",S_CREATE_GROUP);
@@ -1030,6 +1144,79 @@ include_once "include/page_header.php";
 				SPACE,
 				new CButtonQMessage('delete',S_DELETE_SELECTED,S_DELETE_SELECTED_APPLICATIONS_Q)
 			)));
+			$form->AddItem($table);
+			$form->Show();
+		}
+	}
+	elseif($_REQUEST["config"]==5) /* Proxies */
+	{
+		if(isset($_REQUEST["form"]))
+		{
+			insert_proxies_form(get_request("proxyid",NULL));
+		} else {
+			show_table_header(S_PROXIES_BIG);
+
+			$form = new CForm('hosts.php');
+			$form->SetMethod('get');
+			
+			$form->SetName('proxies');
+			$form->AddVar("config",get_request("config",0));
+
+			$table = new CTableInfo(S_NO_PROXIES_DEFINED);
+
+			$table->setHeader(array(
+				array(	new CCheckBox("all_proxies",NULL,
+						"CheckAll('".$form->GetName()."','all_proxies');"),
+					SPACE,
+					make_sorting_link(S_NAME,'g.name')),
+				' # ',
+				S_MEMBERS));
+
+			$available_groups = get_accessible_groups_by_user($USER_DETAILS,PERM_READ_WRITE,null,null,get_current_nodeid());
+
+			$db_proxies=DBselect('SELECT proxyid,name '.
+							' FROM proxies'.
+							order_by('name'));
+			while($db_proxy=DBfetch($db_proxies))
+			{
+				$db_hosts = DBselect('SELECT DISTINCT host,status'.
+						' FROM hosts'.
+						' WHERE proxyid='.$db_proxy['proxyid'].
+						' AND hostid in ('.$available_hosts.')'.
+						' AND status not in ('.HOST_STATUS_DELETED.') '.
+						' order by host'
+						);
+
+				$hosts = array();
+				$count = 0;
+				while($db_host=DBfetch($db_hosts)){
+					$style = $db_host["status"]==HOST_STATUS_MONITORED ? NULL: ( 
+						$db_host["status"]==HOST_STATUS_TEMPLATE ? "unknown" :
+						"on");
+					array_push($hosts, empty($hosts) ? '' : ',', new CSpan($db_host["host"], $style));
+					$count++;
+				}
+
+				$table->AddRow(array(
+					array(
+						new CCheckBox("proxies[]", NULL, NULL, $db_proxy["proxyid"]),
+						SPACE,
+						new CLink($db_proxy["name"],
+								"hosts.php?form=update&proxyid=".$db_proxy["proxyid"].url_param("config"),
+								'action')
+					),
+					$count,
+					$hosts
+					));
+			}
+			$table->SetFooter(new CCol(array(
+				new CButtonQMessage('activate',S_ACTIVATE_SELECTED,S_ACTIVATE_SELECTED_HOSTS_Q),
+				SPACE,
+				new CButtonQMessage('disable',S_DISABLE_SELECTED,S_DISABLE_SELECTED_HOSTS_Q),
+				SPACE,
+				new CButtonQMessage('delete',S_DELETE_SELECTED,S_DELETE_SELECTED_GROUPS_Q)
+			)));
+
 			$form->AddItem($table);
 			$form->Show();
 		}

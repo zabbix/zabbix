@@ -4480,6 +4480,74 @@ include_once 'include/discovery.inc.php';
 		$frmHostG->Show();
 	}
 
+	# Insert form for Proxies
+	function	insert_proxies_form()
+	{
+		global  $_REQUEST;
+		global	$USER_DETAILS;
+
+		$hosts = array();
+		$frm_title = S_PROXY;
+		if(isset($_REQUEST["proxyid"]))
+		{
+			$proxy = get_proxy_by_proxyid($_REQUEST["proxyid"]);
+			$frm_title = S_PROXY." \"".$proxy["name"]."\"";
+		}
+		if(isset($_REQUEST["proxyid"]) && !isset($_REQUEST["form_refresh"]))
+		{
+			$name=$proxy["name"];
+			$db_hosts=DBselect("SELECT hostid FROM hosts".
+				" WHERE status not in (".HOST_STATUS_DELETED.") ".
+				" AND proxyid=".$_REQUEST["proxyid"]);
+			while($db_host=DBfetch($db_hosts))
+				array_push($hosts, $db_host["hostid"]);
+		}
+		else
+		{
+			$name=get_request("pname","");
+		}
+		$frmHostG = new CFormTable($frm_title,"hosts.php");
+		$frmHostG->SetHelp("web.proxy.php");
+		$frmHostG->AddVar("config",get_request("config",5));
+		if(isset($_REQUEST["proxyid"]))
+		{
+			$frmHostG->AddVar("proxyid",$_REQUEST["proxyid"]);
+		}
+
+		$frmHostG->AddRow(S_PROXY_NAME,new CTextBox("pname",$name,30));
+
+		$cmbHosts = new CListBox("hosts[]",$hosts,10);
+		$db_hosts=DBselect("SELECT hostid,proxyid,host FROM hosts".
+			" WHERE status not in (".HOST_STATUS_DELETED.") ".
+			" AND hostid in (".get_accessible_hosts_by_user($USER_DETAILS,PERM_READ_ONLY,null,null,get_current_nodeid()).")".
+			" order by host");
+		while($db_host=DBfetch($db_hosts))
+		{
+			$cmbHosts->AddItem(
+					$db_host["hostid"],
+					get_node_name_by_elid($db_host["hostid"]).$db_host["host"],
+					NULL,
+					$db_host["proxyid"] == 0 || (isset($_REQUEST["proxyid"]) && $db_host["proxyid"] == $_REQUEST["proxyid"]));
+		}
+		$frmHostG->AddRow(S_HOSTS,$cmbHosts);
+
+		$frmHostG->AddItemToBottomRow(new CButton("save",S_SAVE));
+		if(isset($_REQUEST["proxyid"]))
+		{
+			$frmHostG->AddItemToBottomRow(SPACE);
+			$frmHostG->AddItemToBottomRow(new CButton("clone",S_CLONE));
+			$frmHostG->AddItemToBottomRow(SPACE);
+			$frmHostG->AddItemToBottomRow(
+				new CButtonDelete("Delete selected proxy?",
+					url_param("form").url_param("config").url_param("proxyid")
+				)
+			);
+		}
+		$frmHostG->AddItemToBottomRow(SPACE);
+		$frmHostG->AddItemToBottomRow(new CButtonCancel(url_param("config")));
+		$frmHostG->Show();
+	}
+
 	# Insert host profile ReadOnly form
 	function	insert_host_profile_form()
 	{
