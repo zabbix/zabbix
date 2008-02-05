@@ -493,6 +493,88 @@ require_once "include/items.inc.php";
 		return  false;
 	}
 
+	function	db_save_proxy($name,$proxyid=null)
+	{
+		if(!is_string($name)){
+			error("incorrect parameters for 'db_save_proxy'");
+			return false;
+		}
+	
+		if($proxyid==null)
+			$result = DBselect("select * from proxies where ".DBin_node('proxyid')." AND name=".zbx_dbstr($name));
+		else
+			$result = DBselect("select * from proxies where ".DBin_node('proxyid')." AND name=".zbx_dbstr($name).
+				" and proxyid<>$proxyid");
+		
+		if(DBfetch($result))
+		{
+			error("Group '$name' already exists");
+			return false;
+		}
+		if($proxyid==null)
+		{
+			$proxyid=get_dbid("proxies","proxyid");
+			if(!DBexecute("insert into proxies (proxyid,name) values (".$proxyid.",".zbx_dbstr($name).")"))
+				return false;
+			return $proxyid;
+
+		}
+		else
+			return DBexecute("update proxies set name=".zbx_dbstr($name)." where proxyid=$proxyid");
+	}
+
+	function	delete_proxy($proxyid)
+	{
+		if(!DBexecute("update hosts set proxyid=0 where proxyid=$proxyid"))
+			return false;
+
+		return DBexecute("delete from proxies where proxyid=$proxyid");
+	}
+
+	function	update_hosts_by_proxyid($proxyid,$hosts=array())
+	{
+		DBexecute('update hosts set proxyid=0 where proxyid='.$proxyid);
+
+		foreach($hosts as $hostid)
+		{
+			DBexecute('update hosts set proxyid='.$proxyid.' where hostid='.$hostid);
+		}
+	}
+
+	function	add_proxy($name,$hosts=array())
+	{
+		$proxyid = db_save_proxy($name);
+		if(!$proxyid)
+			return	$proxyid;
+
+		update_hosts_by_proxyid($proxyid,$hosts);
+
+		return $proxyid;
+	}
+
+	function	update_proxy($proxyid,$name,$hosts)
+	{
+		$result = db_save_proxy($name,$proxyid);
+		if(!$result)
+			return	$result;
+
+		update_hosts_by_proxyid($proxyid,$hosts);
+
+		return $result;
+	}
+
+	function	get_proxy_by_proxyid($proxyid)
+	{
+		$result=DBselect("select * from proxies where proxyid=".$proxyid);
+		$row=DBfetch($result);
+		if($row)
+		{
+			return $row;
+		}
+		error("No proxies with proxyid=[$proxyid]");
+		return  false;
+	}
+
 	function get_host_by_itemid($itemid)
 	{
 		$sql="select h.* from hosts h, items i where i.hostid=h.hostid and i.itemid=$itemid";

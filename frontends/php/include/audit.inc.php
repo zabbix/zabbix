@@ -42,6 +42,7 @@
 		$str_resource[AUDIT_RESOURCE_SCENARIO]		= S_SCENARIO;
 		$str_resource[AUDIT_RESOURCE_DISCOVERY_RULE]	= S_DISCOVERY_RULE;
 		$str_resource[AUDIT_RESOURCE_SLIDESHOW]		= S_SLIDESHOW;
+		$str_resource[AUDIT_RESOURCE_PROXY]		= S_PROXY;
 
 		if(isset($str_resource[$resource_type]))
 			return $str_resource[$resource_type];
