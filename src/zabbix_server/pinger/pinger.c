@@ -33,10 +33,9 @@ int pinger_num;
 #define ZBX_FPING_HOST struct zbx_fipng_host
 ZBX_FPING_HOST
 {
-	char		*host;
 	char		ip[HOST_IP_LEN_MAX];
 	char		dns[HOST_DNS_LEN_MAX];
-	int		alive;
+	int		alive, useip;
 	double		mseconds;
 };
 
@@ -67,16 +66,16 @@ static int process_value(char *key, ZBX_FPING_HOST *host, AGENT_RESULT *value)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_value(%s@%s)",
 			key,
-			host->host);
+			host->useip ? host->ip : host->dns);
 
 	result = DBselect("select %s where h.status=%d and h.hostid=i.hostid"
 			" and h.useip=%d and h.%s='%s' and i.key_='%s' and i.status=%d"
 			" and i.type=%d and" ZBX_COND_NODEID,
 			ZBX_SQL_ITEM_SELECT,
 			HOST_STATUS_MONITORED,
-			host->host == host->ip ? 1 : 0,
-			host->host == host->ip ? "ip" : "dns",
-			host->host,
+			host->useip,
+			host->useip ? "ip" : "dns",
+			host->useip ? host->ip : host->dns,
 			key,
 			ITEM_STATUS_ACTIVE,
 			ITEM_TYPE_SIMPLE,
@@ -136,14 +135,14 @@ static int get_pinger_hosts(ZBX_FPING_HOST **hosts, int *hosts_allocated, int *h
 	while (NULL != (row = DBfetch(result))) {
 		if (*hosts_count == *hosts_allocated) {
 			*hosts_allocated *= 2;
-			*hosts = zbx_realloc(*hosts, *hosts_allocated);
+			*hosts = zbx_realloc(*hosts, *hosts_allocated * sizeof(ZBX_FPING_HOST));
 		}
 
 		host = &(*hosts)[*hosts_count];
 
 		memset(host, '\0', sizeof(ZBX_FPING_HOST));
 		strscpy(host->ip, row[0]);
-		host->host = host->ip;
+		host->useip = 1;
 
 		(*hosts_count)++;
 
@@ -167,14 +166,14 @@ static int get_pinger_hosts(ZBX_FPING_HOST **hosts, int *hosts_allocated, int *h
 	while (NULL != (row = DBfetch(result))) {
 		if (*hosts_count == *hosts_allocated) {
 			*hosts_allocated *= 2;
-			*hosts = zbx_realloc(*hosts, *hosts_allocated);
+			*hosts = zbx_realloc(*hosts, *hosts_allocated * sizeof(ZBX_FPING_HOST));
 		}
 
 		host = &(*hosts)[*hosts_count];
 
 		memset(host, '\0', sizeof(ZBX_FPING_HOST));
 		strscpy(host->dns, row[0]);
-		host->host = host->dns;
+		host->useip = 0;
 
 		(*hosts_count)++;
 
@@ -231,7 +230,7 @@ static int do_ping(ZBX_FPING_HOST *hosts, int hosts_count)
 	}
 
 	for (i = 0; i < hosts_count; i++)
-		fprintf(f, "%s\n", hosts[i].host);
+		fprintf(f, "%s\n", hosts[i].useip ? hosts[i].ip : hosts[i].dns);
 
 	fclose(f);
 
@@ -259,7 +258,7 @@ static int do_ping(ZBX_FPING_HOST *hosts, int hosts_count)
 		if (c != NULL) {
 			*c = '\0';
 			for (i = 0; i < hosts_count; i++)
-				if (0 == strcmp(tmp, hosts[i].host)) {
+				if (0 == strcmp(tmp, hosts[i].useip ? hosts[i].ip : hosts[i].dns)) {
 					host = &hosts[i];
 					break;
 				}
@@ -283,7 +282,7 @@ static int do_ping(ZBX_FPING_HOST *hosts, int hosts_count)
 
 	for (i = 0; i < hosts_count; i++) {
 		zabbix_log(LOG_LEVEL_DEBUG, "Host [%s] alive [%d]",
-				hosts[i].host,
+				hosts[i].useip ? hosts[i].ip : hosts[i].dns,
 				hosts[i].alive);
 
 		init_result(&value);
