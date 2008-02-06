@@ -20,12 +20,6 @@
 #ifndef ZABBIX_PROXYCONFIG_H
 #define ZABBIX_PROXYCONFIG_H
 
-/*#include "mutexs.h"
-
-extern	ZBX_MUTEX node_sync_access;*/
-
-/*void	node_sync_lock(int nodeid);
-void	node_sync_unlock(int nodeid);*/
 void	main_proxyconfig_loop(int server_num);
 
 #endif

@@ -244,29 +244,28 @@ db_error:
  ******************************************************************************/
 static int	process_proxyconfig(struct zbx_json_parse *jp)
 {
-	char		tablename[MAX_STRING_LEN];
-	size_t		len = sizeof(tablename);
+	char		buf[MAX_STRING_LEN];
+	size_t		len = sizeof(buf);
 	const char	*p = NULL;
 	int		res = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_proxyconfig()");
 
 	DBbegin();
-
 /*
  * {"hosts":{"fields":["hostid","host",...],"data":[[1,"zbx01",...],[2,"zbx02",...],...]},"items":{...},...} 
  *          ^
  */
-	while (NULL != (p = zbx_json_pair_next(jp, p, tablename, len)) && res == SUCCEED) {
+	while (NULL != (p = zbx_json_pair_next(jp, p, buf, len)) && res == SUCCEED) {
 		if (ZBX_JSON_TYPE_OBJECT != zbx_json_type(p)) {
 			zabbix_log(LOG_LEVEL_WARNING, "Invalid type of data for table \"%s\" \"%.40s...\"",
-					tablename,
+					buf,
 					p);
 			res = FAIL;
 			break;
 		}
 
-		res = process_proxyconfig_table(jp, tablename, p);
+		res = process_proxyconfig_table(jp, buf, p);
 	}
 	if (res == SUCCEED)
 		DBcommit();
@@ -275,46 +274,6 @@ static int	process_proxyconfig(struct zbx_json_parse *jp)
 
 	return res;
 }
-
-/******************************************************************************
- *                                                                            *
- * Function: node_sync_lock                                                   *
- *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              * 
- *                                                                            *
- * Author: Aleksander Vladishev                                               *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-/*void node_sync_lock(int nodeid)
-{
-	zbx_mutex_lock(&node_sync_access);
-}*/
-
-/******************************************************************************
- *                                                                            *
- * Function: node_sync_unlock                                                 *
- *                                                                            *
- * Purpose:                                                                   *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value:                                                              * 
- *                                                                            *
- * Author: Aleksander Vladishev                                               *
- *                                                                            *
- * Comments:                                                                  *
- *                                                                            *
- ******************************************************************************/
-/*void node_sync_unlock(int nodeid)
-{
-	zbx_mutex_unlock(&node_sync_access);
-}*/
 
 /******************************************************************************
  *                                                                            *
