@@ -194,9 +194,6 @@ src/zabbix_proxy/httppoller/httptest.c -text
 src/zabbix_proxy/httppoller/httptest.h -text
 src/zabbix_proxy/operations.c -text
 src/zabbix_proxy/operations.h -text
-src/zabbix_proxy/pinger/Makefile.am -text
-src/zabbix_proxy/pinger/pinger.c -text
-src/zabbix_proxy/pinger/pinger.h -text
 src/zabbix_proxy/poller/Makefile.am -text
 src/zabbix_proxy/poller/checks_agent.c -text
 src/zabbix_proxy/poller/checks_agent.h -text
