@@ -67,7 +67,7 @@ static int process_value(char *key, ZBX_FPING_HOST *host, AGENT_RESULT *value)
 
 	result = DBselect("select %s where h.hostid=i.hostid and h.proxyid=0 and h.status=%d"
 			" and h.useip=%d and h.%s='%s' and i.key_='%s' and i.status=%d"
-			" and i.type=%d and" ZBX_COND_NODEID,
+			" and i.type=%d" DB_NODE,
 			ZBX_SQL_ITEM_SELECT,
 			HOST_STATUS_MONITORED,
 			host->useip,
@@ -76,7 +76,7 @@ static int process_value(char *key, ZBX_FPING_HOST *host, AGENT_RESULT *value)
 			key,
 			ITEM_STATUS_ACTIVE,
 			ITEM_TYPE_SIMPLE,
-			LOCAL_NODE("h.hostid"));
+			DBnode_local("h.hostid"));
 
 	while (NULL != (row = DBfetch(result))) {
 		DBget_item_from_db(&item, row);
@@ -118,7 +118,7 @@ static int get_pinger_hosts(int pinger_num, ZBX_FPING_HOST **hosts, int *hosts_a
 	/* Select hosts monitored by IP */
 	result = DBselect("select distinct h.ip from hosts h,items i where " ZBX_SQL_MOD(h.hostid,%d) "=%d"
 			" and i.hostid=h.hostid and h.proxyid=0 and h.status=%d and i.key_ in ('%s','%s')"
-			" and i.type=%d and i.status=%d and h.useip=1 and" ZBX_COND_NODEID,
+			" and i.type=%d and i.status=%d and h.useip=1" DB_NODE, 
 			CONFIG_PINGER_FORKS,
 			pinger_num - 1,
 			HOST_STATUS_MONITORED,
@@ -126,7 +126,7 @@ static int get_pinger_hosts(int pinger_num, ZBX_FPING_HOST **hosts, int *hosts_a
 			SERVER_ICMPPINGSEC_KEY,
 			ITEM_TYPE_SIMPLE,
 			ITEM_STATUS_ACTIVE,
-			LOCAL_NODE("h.hostid"));
+			DBnode_local("h.hostid"));
 
 	while (NULL != (row = DBfetch(result))) {
 		if (*hosts_count == *hosts_allocated) {
@@ -149,7 +149,7 @@ static int get_pinger_hosts(int pinger_num, ZBX_FPING_HOST **hosts, int *hosts_a
 	/* Select hosts monitored by hostname */
 	result = DBselect("select distinct h.dns from hosts h,items i where " ZBX_SQL_MOD(h.hostid,%d) "=%d"
 			" and i.hostid=h.hostid and h.proxyid=0 and h.status=%d and i.key_ in ('%s','%s')"
-			" and i.type=%d and i.status=%d and h.useip=0 and" ZBX_COND_NODEID,
+			" and i.type=%d and i.status=%d and h.useip=0" DB_NODE,
 			CONFIG_PINGER_FORKS,
 			pinger_num - 1,
 			HOST_STATUS_MONITORED,
@@ -157,7 +157,7 @@ static int get_pinger_hosts(int pinger_num, ZBX_FPING_HOST **hosts, int *hosts_a
 			SERVER_ICMPPINGSEC_KEY,
 			ITEM_TYPE_SIMPLE,
 			ITEM_STATUS_ACTIVE,
-			LOCAL_NODE("h.hostid"));
+			DBnode_local("h.hostid"));
 
 	while (NULL != (row = DBfetch(result))) {
 		if (*hosts_count == *hosts_allocated) {
