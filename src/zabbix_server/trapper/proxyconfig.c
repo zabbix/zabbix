@@ -146,14 +146,16 @@ static int	get_proxyconfig_data(zbx_uint64_t proxyid, struct zbx_json *j)
 	static const struct proxytable_t pt[]={
 		{"hosts",	NULL,		NULL},
 		{"items",	"hosts",	"hostid"},
-		{"nodes",       NULL,           NULL},
 		{NULL}
 	};
-	int	t, p;
-	int	ret = SUCCEED;
+	int	t, p, ret = SUCCEED;
+	char	tmp[11];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In get_proxyconfig_data() [proxyid:"ZBX_FS_UI64"]",
 			proxyid);
+
+	zbx_snprintf(tmp, sizeof(tmp), "%d", CONFIG_NODEID);
+	zbx_json_addstring(j, "NodeId", tmp, ZBX_JSON_TYPE_STRING);
 
 	for (t = 0; tables[t].table != 0; t++) {
 		for (p = 0; pt[p].table != NULL; p++) {
