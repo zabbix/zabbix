@@ -155,7 +155,7 @@ static int	get_proxyconfig_data(zbx_uint64_t proxyid, struct zbx_json *j)
 			proxyid);
 
 	zbx_snprintf(tmp, sizeof(tmp), "%d", CONFIG_NODEID);
-	zbx_json_addstring(j, "NodeId", tmp, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(j, "nodeid", tmp, ZBX_JSON_TYPE_STRING);
 
 	for (t = 0; tables[t].table != 0; t++) {
 		for (p = 0; pt[p].table != NULL; p++) {
