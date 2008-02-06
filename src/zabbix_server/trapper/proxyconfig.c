@@ -146,6 +146,7 @@ static int	get_proxyconfig_data(zbx_uint64_t proxyid, struct zbx_json *j)
 	static const struct proxytable_t pt[]={
 		{"hosts",	NULL,		NULL},
 		{"items",	"hosts",	"hostid"},
+		{"nodes",       NULL,           NULL},
 		{NULL}
 	};
 	int	t, p;
@@ -185,7 +186,8 @@ static int	get_proxyconfig_data(zbx_uint64_t proxyid, struct zbx_json *j)
  ******************************************************************************/
 int	send_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 {
-	char		hostname[MAX_STRING_LEN];
+	char		hostname[MAX_STRING_LEN],
+			host_esc[MAX_STRING_LEN];
 	const char	*p;
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -201,8 +203,9 @@ int	send_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 	if (NULL == zbx_json_decodevalue(p, hostname, sizeof(hostname)))
 		return res;
 
+	DBescape_string(hostname, host_esc, MAX_STRING_LEN);
 	result = DBselect("select proxyid from proxies where name='%s' and"ZBX_COND_NODEID,
-		hostname,
+		host_esc,
 		LOCAL_NODE("proxyid"));
 
 	if (NULL != (row = DBfetch(result))) {
@@ -210,7 +213,6 @@ int	send_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 
 		zbx_json_init(&j, 512*1024);
 		if (SUCCEED == get_proxyconfig_data(proxyid, &j)) {
-			zabbix_log(LOG_LEVEL_WARNING, "\n%s", j.buffer);
 			zabbix_log(LOG_LEVEL_WARNING, "Sending configuration data to proxy \"%s\" datalen %zd",
 					hostname,
 					j.buffer_size);
