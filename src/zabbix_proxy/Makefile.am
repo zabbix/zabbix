@@ -6,7 +6,7 @@ SUBDIRS = \
 	housekeeper \
 	httppoller \
 	proxyconfig \
-	pinger \
+	../zabbix_server/pinger \
 	poller \
 	trapper
 
@@ -27,7 +27,7 @@ zabbix_proxy_LDADD = \
 	housekeeper/libzbxhousekeeper.a \
 	httppoller/libzbxhttppoller.a \
 	proxyconfig/libzbxproxyconfig.a \
-	pinger/libzbxpinger.a \
+	$(top_srcdir)/src/zabbix_server/pinger/libzbxpinger.a \
 	poller/libzbxpoller.a \
 	trapper/libzbxtrapper.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \

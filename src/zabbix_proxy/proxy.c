@@ -29,7 +29,6 @@
 #include "log.h"
 #include "zlog.h"
 #include "zbxgetopt.h"
-#include "mutexs.h"
 
 #ifdef ZABBIX_TEST
 #include "zbxjson.h"
@@ -45,7 +44,7 @@
 #include "discoverer/discoverer.h"
 #include "httppoller/httppoller.h"
 #include "housekeeper/housekeeper.h"
-#include "pinger/pinger.h"
+#include "../zabbix_server/pinger/pinger.h"
 #include "poller/poller.h"
 #include "poller/checks_snmp.h"
 #include "trapper/trapper.h"
@@ -140,6 +139,7 @@ int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 char	*CONFIG_ALERT_SCRIPTS_PATH	= NULL;
 char	*CONFIG_EXTERNALSCRIPTS		= NULL;
 char	*CONFIG_FPING_LOCATION		= NULL;
+char	*CONFIG_FPING6_LOCATION		= NULL;
 char	*CONFIG_DBHOST			= NULL;
 char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBUSER			= NULL;
@@ -151,7 +151,7 @@ int	CONFIG_ENABLE_REMOTE_COMMANDS	= 0;
 char	*CONFIG_SERVER			= NULL;
 int	CONFIG_SERVER_PORT		= 10050;
 char	*CONFIG_HOSTNAME		= NULL;
-int	CONFIG_NODEID			= 0;
+int	CONFIG_NODEID			= -1;
 int	CONFIG_MASTER_NODEID		= 0;
 int	CONFIG_NODE_NOHISTORY		= 0;
 
@@ -163,9 +163,6 @@ int	CONFIG_REFRESH_UNSUPPORTED	= 0;
 
 /* Zabbix server sturtup time */
 int     CONFIG_SERVER_STARTUP_TIME      = 0;
-
-/* Mutex for node syncs */
-ZBX_MUTEX	node_sync_access;
 
 /******************************************************************************
  *                                                                            *
@@ -201,6 +198,7 @@ void	init_config(void)
 		{"SenderFrequency",&CONFIG_SENDER_FREQUENCY,0,TYPE_INT,PARM_OPT,5,3600},
 		{"PingerFrequency",&CONFIG_PINGER_FREQUENCY,0,TYPE_INT,PARM_OPT,1,3600},
 		{"FpingLocation",&CONFIG_FPING_LOCATION,0,TYPE_STRING,PARM_OPT,0,0},
+		{"Fping6Location",&CONFIG_FPING6_LOCATION,0,TYPE_STRING,PARM_OPT,0,0},
 		{"Timeout",&CONFIG_TIMEOUT,0,TYPE_INT,PARM_OPT,1,30},
 		{"TrapperTimeout",&CONFIG_TRAPPER_TIMEOUT,0,TYPE_INT,PARM_OPT,1,30},
 		{"UnreachablePeriod",&CONFIG_UNREACHABLE_PERIOD,0,TYPE_INT,PARM_OPT,1,3600},
@@ -223,7 +221,6 @@ void	init_config(void)
 		{"DBPassword",&CONFIG_DBPASSWORD,0,TYPE_STRING,PARM_OPT,0,0},
 		{"DBSocket",&CONFIG_DBSOCKET,0,TYPE_STRING,PARM_OPT,0,0},
 		{"DBPort",&CONFIG_DBPORT,0,TYPE_INT,PARM_OPT,1024,65535},
-		{"NodeID",&CONFIG_NODEID,0,TYPE_INT,PARM_OPT,0,65535},
 		{0}
 	};
 
@@ -248,6 +245,10 @@ void	init_config(void)
 	if(CONFIG_FPING_LOCATION == NULL)
 	{
 		CONFIG_FPING_LOCATION=strdup("/usr/sbin/fping");
+	}
+	if(CONFIG_FPING6_LOCATION == NULL)
+	{
+		CONFIG_FPING6_LOCATION=strdup("/usr/sbin/fping6");
 	}
 	if(CONFIG_EXTERNALSCRIPTS == NULL)
 	{
@@ -376,9 +377,6 @@ int main(int argc, char **argv)
 
 int MAIN_ZABBIX_ENTRY(void)
 {
-        DB_RESULT       result;
-        DB_ROW          row;
-
 	int	i;
 	pid_t	pid;
 
@@ -428,26 +426,6 @@ int MAIN_ZABBIX_ENTRY(void)
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
 
-	result = DBselect("select refresh_unsupported from config where " ZBX_COND_NODEID,
-		LOCAL_NODE("configid"));
-	row = DBfetch(result);
-
-	if( (row != NULL) && DBis_null(row[0]) != SUCCEED)
-	{
-		CONFIG_REFRESH_UNSUPPORTED = atoi(row[0]);
-	}
-	DBfree_result(result);
-
-	result = DBselect("select masterid from nodes where nodeid=%d",
-		CONFIG_NODEID);
-	row = DBfetch(result);
-
-	if( (row != NULL) && DBis_null(row[0]) != SUCCEED)
-	{
-		CONFIG_MASTER_NODEID = atoi(row[0]);
-	}
-	DBfree_result(result);
-
 /* Need to set trigger status to UNKNOWN since last run */
 /* DBconnect() already made in init_config() */
 /*	DBconnect();*/
@@ -458,11 +436,6 @@ int MAIN_ZABBIX_ENTRY(void)
 /*	DBconnect(ZBX_DB_CONNECT_EXIT);*/
 /* Do not close database. It is required for database cache */
 /*	DBclose();*/
-
-	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&node_sync_access, ZBX_MUTEX_NODE_SYNC)) {
-		zbx_error("Unable to create mutex for node syncs");
-		exit(FAIL);
-	}
 
 	threads = calloc(1+CONFIG_POLLER_FORKS+CONFIG_TRAPPERD_FORKS+CONFIG_PINGER_FORKS
 		+CONFIG_HOUSEKEEPER_FORKS+CONFIG_UNREACHABLE_POLLER_FORKS
@@ -522,10 +495,9 @@ int MAIN_ZABBIX_ENTRY(void)
 /*		child_trapper_make(server_num, listenfd, addrlen); */
 	} else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [ICMP pinger]",
-			server_num);
-		main_pinger_loop(server_num-(CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS));
-	} else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS
+		main_pinger_loop(server_num, server_num - (CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS));
+	}
+	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS
 			+CONFIG_HOUSEKEEPER_FORKS)
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Housekeeper]",
@@ -546,9 +518,8 @@ int MAIN_ZABBIX_ENTRY(void)
 			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
 			+ CONFIG_NODEWATCHER_FORKS)
 	{
-zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Node watcher. Node ID:%d]",
-				server_num,
-				CONFIG_NODEID);
+zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Node watcher. Node ID:]",
+				server_num);
 		main_nodewatcher_loop();*/
 	} else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS
 			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
@@ -620,7 +591,6 @@ void	zbx_on_exit()
 		free_database_cache();
 	}
 	DBclose();
-	zbx_mutex_destroy(&node_sync_access);
 	zabbix_close_log();
 	
 #ifdef  HAVE_SQLITE3
