@@ -414,12 +414,12 @@
 				$result = pg_fetch_assoc($cursor);
 				break;
 			case "ORACLE":
-				if(ocifetchinto($cursor, $row, OCI_ASSOC+OCI_NUM+OCI_RETURN_NULLS))
-				{
+				if(ocifetchinto($cursor, $row, (OCI_ASSOC+OCI_RETURN_NULLS))){
 					$result = array();
-					$keys = (array_keys($row));
-					foreach($keys as $k) $result[strtolower($k)] = $row[$k];
-				} 
+					foreach($row as $key => $value){
+						$result[strtolower($key)] = $value;
+					}
+				}
 				break;
 			case "SQLITE3":
 				if($cursor)

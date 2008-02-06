@@ -713,12 +713,14 @@ include_once "include/page_header.php";
 			$cmbGroups = new CComboBox("groupid",get_request("groupid",0),"submit()");
 			$cmbGroups->AddItem(0,S_ALL_SMALL);
 
-			$result=DBselect("select distinct g.groupid,g.name from groups g,hosts_groups hg,hosts h".
-					" where h.hostid in (".$available_hosts.") ".
-					" and g.groupid=hg.groupid and h.hostid=hg.hostid".$status_filter.
-					" order by g.name");
-			while($row=DBfetch($result))
-			{
+			$result=DBselect('SELECT DISTINCT g.groupid,g.name '.
+							' FROM groups g,hosts_groups hg,hosts h '.
+							' WHERE h.hostid in ('.$available_hosts.') '.
+								' AND g.groupid=hg.groupid '.
+								' AND h.hostid=hg.hostid'.
+								$status_filter.
+							' ORDER BY g.name');
+			while($row=DBfetch($result)){
 				$cmbGroups->AddItem($row["groupid"],$row["name"]);
 				if((bccomp($row["groupid"], $_REQUEST["groupid"]) == 0)) $correct_host = 1;
 			}
