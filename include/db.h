@@ -466,6 +466,9 @@ DB_HTTPTESTITEM
 	zbx_httpitem_type_t	type;
 };
 
+#define DB_NODE "%s"
+#define DBnode_local(fieldid) DBnode(fieldid, CONFIG_NODEID)
+const char *DBnode(const char *fieldid, const int nodeid);
 
 int	DBping(void);
 

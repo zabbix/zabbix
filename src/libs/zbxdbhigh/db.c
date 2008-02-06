@@ -38,6 +38,21 @@
 #include "threads.h"
 #include "dbcache.h"
 
+const char *DBnode(const char *fieldid, const int nodeid)
+{
+	static char	dbnode[256];
+
+	if (nodeid == -1)
+		*dbnode = '\0';
+	else
+		zbx_snprintf(dbnode, sizeof(dbnode), " and %s between %d00000000000000 and %d99999999999999",
+				fieldid,
+				nodeid,
+				nodeid);
+
+	return dbnode;
+}
+
 void	DBclose(void)
 {
 	zbx_db_close();
