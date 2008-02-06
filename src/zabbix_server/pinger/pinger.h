@@ -27,6 +27,6 @@ extern	char	*CONFIG_FPING6_LOCATION;
 
 extern	void	signal_handler( int sig );
 
-void main_pinger_loop(int num);
+void	main_pinger_loop(int server_num, int pinger_num);
 
 #endif
