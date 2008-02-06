@@ -152,7 +152,6 @@
                                                 $this->evenRowClass);
 			}/**/
 			return $item;
-//			return $item->ToString();
 		}
 
 		function SetHeader($value=NULL,$class=NULL){
