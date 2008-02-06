@@ -28,8 +28,6 @@
 
 #include "pinger.h"
 
-int pinger_num;
-
 #define ZBX_FPING_HOST struct zbx_fipng_host
 ZBX_FPING_HOST
 {
@@ -67,7 +65,7 @@ static int process_value(char *key, ZBX_FPING_HOST *host, AGENT_RESULT *value)
 			key,
 			host->useip ? host->ip : host->dns);
 
-	result = DBselect("select %s where h.status=%d and h.hostid=i.hostid"
+	result = DBselect("select %s where h.hostid=i.hostid and h.proxyid=0 and h.status=%d"
 			" and h.useip=%d and h.%s='%s' and i.key_='%s' and i.status=%d"
 			" and i.type=%d and" ZBX_COND_NODEID,
 			ZBX_SQL_ITEM_SELECT,
@@ -109,7 +107,7 @@ static int process_value(char *key, ZBX_FPING_HOST *host, AGENT_RESULT *value)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int get_pinger_hosts(ZBX_FPING_HOST **hosts, int *hosts_allocated, int *hosts_count)
+static int get_pinger_hosts(int pinger_num, ZBX_FPING_HOST **hosts, int *hosts_allocated, int *hosts_count)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -119,7 +117,7 @@ static int get_pinger_hosts(ZBX_FPING_HOST **hosts, int *hosts_allocated, int *h
 
 	/* Select hosts monitored by IP */
 	result = DBselect("select distinct h.ip from hosts h,items i where " ZBX_SQL_MOD(h.hostid,%d) "=%d"
-			" and i.hostid=h.hostid and h.status=%d and (i.key_='%s' or i.key_='%s')"
+			" and i.hostid=h.hostid and h.proxyid=0 and h.status=%d and i.key_ in ('%s','%s')"
 			" and i.type=%d and i.status=%d and h.useip=1 and" ZBX_COND_NODEID,
 			CONFIG_PINGER_FORKS,
 			pinger_num - 1,
@@ -150,7 +148,7 @@ static int get_pinger_hosts(ZBX_FPING_HOST **hosts, int *hosts_allocated, int *h
 
 	/* Select hosts monitored by hostname */
 	result = DBselect("select distinct h.dns from hosts h,items i where " ZBX_SQL_MOD(h.hostid,%d) "=%d"
-			" and i.hostid=h.hostid and h.status=%d and (i.key_='%s' or i.key_='%s')"
+			" and i.hostid=h.hostid and h.proxyid=0 and h.status=%d and i.key_ in ('%s','%s')"
 			" and i.type=%d and i.status=%d and h.useip=0 and" ZBX_COND_NODEID,
 			CONFIG_PINGER_FORKS,
 			pinger_num - 1,
@@ -322,18 +320,19 @@ static int do_ping(ZBX_FPING_HOST *hosts, int hosts_count)
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-void main_pinger_loop(int num)
+void main_pinger_loop(int server_num, int pinger_num)
 {
 	int		start, sleeptime;
 	ZBX_FPING_HOST	*hosts = NULL;
 	int		hosts_allocated = 16, hosts_count;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_pinger_loop(num:%d)",
-			num);
+			pinger_num);
+
+	zabbix_log(LOG_LEVEL_WARNING, "server #%d started [ICMP pinger]",
+			server_num);
 
 	hosts = zbx_malloc(hosts, hosts_allocated * sizeof(ZBX_FPING_HOST));
-
-	pinger_num = num;
 
 	for(;;) {
 		start = time(NULL);
@@ -343,7 +342,7 @@ void main_pinger_loop(int num)
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 	
 		hosts_count = 0;
-		if (SUCCEED == get_pinger_hosts(&hosts, &hosts_allocated, &hosts_count)) {
+		if (SUCCEED == get_pinger_hosts(pinger_num, &hosts, &hosts_allocated, &hosts_count)) {
 			zbx_setproctitle("pinging hosts");
 
 			do_ping(hosts, hosts_count);

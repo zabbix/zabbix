@@ -1122,9 +1122,7 @@ int MAIN_ZABBIX_ENTRY(void)
 	}
 	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [ICMP pinger]",
-			server_num);
-		main_pinger_loop(server_num-(CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS));
+		main_pinger_loop(server_num, server_num - (CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS));
 	}
 	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS)
 	{
