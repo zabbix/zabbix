@@ -780,6 +780,17 @@ include_once "include/page_header.php";
 		
 			while($row=DBfetch($result))
 			{
+				$description = array();
+
+				if ($row["proxyid"]) {
+					$proxy = get_proxy_by_proxyid($row["proxyid"]);
+					array_push($description,$proxy["name"],":");
+				}
+			
+				array_push($description,
+						new CLink($row["host"], "hosts.php?form=update&hostid=".
+                                                $row["hostid"].url_param("groupid").url_param("config"), 'action'));
+
 				$add_to = array();
 				$delete_from = array();
 
@@ -788,9 +799,7 @@ include_once "include/page_header.php";
 				$host=new CCol(array(
 					new CCheckBox("hosts[]",NULL,NULL,$row["hostid"]),
 					SPACE,
-					new CLink($row["host"],"hosts.php?form=update&hostid=".
-						$row["hostid"].url_param("groupid").url_param("config"), 'action')
-					));
+					$description));
 		
 				
 				if($show_only_tmp)
