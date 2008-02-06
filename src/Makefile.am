@@ -20,7 +20,9 @@ SERVER_SUBDIRS = zabbix_server
 endif
 
 if PROXY
-PROXY_SUBDIRS = zabbix_proxy
+PROXY_SUBDIRS = \
+	zabbix_proxy \
+	zabbix_server/pinger
 endif
 
 SUBDIRS = \
