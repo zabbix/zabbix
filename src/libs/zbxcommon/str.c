@@ -1466,3 +1466,101 @@ int	str_in_list(char *list, const char *value, const char delimiter)
 	}
 	return ret;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_key_param                                                    *
+ *                                                                            *
+ * Purpose: return parameter by index (num) from parameter list (param)       *
+ *          to be used for keys: key[param1,param2]                           *
+ *                                                                            *
+ * Parameters:                                                                *
+ * 	param  - parameter list                                               *
+ *      num    - requested parameter index                                    *
+ *      buf    - pointer of output buffer                                     *
+ *      maxlem - size of output buffer                                        *
+ *                                                                            *
+ * Return value:                                                              *
+ *      1 - requested parameter missed                                        *
+ *      0 - requested parameter found (value - 'buf' can be empty string)     *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:  delimeter for parameters is ','                                 *
+ *                                                                            *
+ ******************************************************************************/
+int	get_key_param(char *param, int num, char *buf, int maxlen)
+{
+	int	ret = 0;
+
+	char *pl, *pr;
+
+	pl = strchr(param, '[');
+	pr = strrchr(param, ']');
+
+	if(pl > pr)
+		return 1;
+
+	if(!pl || !pr || (pl && !pr) || (!pl && pr))
+		return 1;
+	
+	if(pr != NULL)
+		pr[0] = 0;
+
+	ret = get_param(pl+1, num, buf, maxlen);
+
+	if(pr != NULL)
+		pr[0]=']';
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: num_key_param                                                    *
+ *                                                                            *
+ * Purpose: calculate count of parameters from parameter list (param)         *
+ *          to be used for keys: key[param1,param2]                           *
+ *                                                                            *
+ * Parameters:                                                                *
+ * 	param  - parameter list                                               *
+ *                                                                            *
+ * Return value: count of parameters                                          *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:  delimeter vor parameters is ','                                 *
+ *                                                                            *
+ ******************************************************************************/
+int	num_key_param(char *param)
+{
+	int	ret = 1;
+
+	char *pl, *pr;
+
+	if(param == NULL) 
+		return 0;
+
+	pl = strchr(param, '[');
+	pr = strrchr(param, ']');
+
+	if(pl > pr)
+		return 0;
+
+	if(!pl || !pr || (pl && !pr) || (!pl && pr))
+		return 0;
+
+	if(pl != NULL)
+		pl[0] = 0;
+	if(pr != NULL)
+		pr[0] = 0;
+
+	ret = num_param(pl+1);
+
+	if(pl != NULL)
+		pl[0]='[';
+	if(pr != NULL)
+		pr[0]=']';
+
+	return ret;
+}
