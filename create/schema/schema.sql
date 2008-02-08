@@ -45,11 +45,11 @@ FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 
 TABLE|dchecks|dcheckid|ZBX_SYNC
 FIELD		|dcheckid	|t_id		|'0'	|NOT NULL	|0
-FIELD		|druleid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|key_		|t_varchar(255)	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|snmp_community	|t_varchar(255)	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|ports		|t_varchar(255)	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|druleid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|key_		|t_varchar(255)	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|snmp_community	|t_varchar(255)	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|ports		|t_varchar(255)	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 
 TABLE|dhosts|dhostid|ZBX_SYNC
 FIELD		|dhostid	|t_id		|'0'	|NOT NULL	|0
