@@ -6381,7 +6381,7 @@ INSERT INTO operations VALUES (6,3,6,0,10002,'','');
 --
 
 
-INSERT INTO drules VALUES (2,'Local network','192.168.1.1-255',3600,0,1);
+INSERT INTO drules VALUES (2,0,'Local network','192.168.1.1-255',3600,0,1);
 
 --
 -- Dumping data for table `dchecks`
