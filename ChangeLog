@@ -1,5 +1,7 @@
 Changes for 1.5:
 
+ - [DEV-114] special processing of simple SNMP OIDs like ifDescr, ifInOctets, etc (Alexei)
+ - [DEV-114] monitoring of SNMP objects having flexible Index (Alexei)
  - [DEV-104] added maintenance mode (Artem)
  - [DEV-103] added support of disabling login rights for a users group (Artem)
  - [DEV-102] added support of UTF8 for GUI (Artem)

@@ -60,7 +60,9 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 			addr,
 			item->key);
 
+			zabbix_log(LOG_LEVEL_DEBUG, "Before zbx_tcp_connect");
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, addr, item->port, 0))) {
+			zabbix_log(LOG_LEVEL_DEBUG, "After1 zbx_tcp_connect");
 		zbx_snprintf(packet, sizeof(packet), "%s\n",item->key);
 		zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", packet);
 
@@ -72,6 +74,7 @@ int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result)
 			ret = zbx_tcp_recv_ext(&s, &buf, ZBX_TCP_READ_UNTIL_CLOSE);
 		}
 	}
+			zabbix_log(LOG_LEVEL_DEBUG, "After2 zbx_tcp_connect");
 
 	if( SUCCEED == ret )
 	{
