@@ -36,11 +36,12 @@ INDEX		|slides_1	|slideshowid
 
 TABLE|drules|druleid|ZBX_SYNC
 FIELD		|druleid	|t_id		|'0'	|NOT NULL	|0
-FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|iprange	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC
-FIELD		|delay		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|proxyid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|iprange	|t_varchar(255)	|''	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
+FIELD		|delay		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 FIELD		|nextcheck	|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
-FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|status		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC,ZBX_PROXY
 
 TABLE|dchecks|dcheckid|ZBX_SYNC
 FIELD		|dcheckid	|t_id		|'0'	|NOT NULL	|0
