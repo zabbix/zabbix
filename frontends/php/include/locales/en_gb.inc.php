@@ -377,6 +377,11 @@
 	'S_YELLOW'=>				'Yellow',
 
 //	config.php
+	'S_THEMES'=>					'Themes',
+	'S_SYSTEM_DEFAULT'=>			'System default',
+	'S_BLACK_AND_BLUE'=>			'Black & Blue',
+	'S_ORIGINAL_BLUE'=>				'Original blue',
+	'S_DEFAULT_THEME'=>				'Default theme',
 	'S_EVENT_ACKNOWLEDGES'=>		'Event acknowledges',
 	'S_DAYS'=>						'Days',
 	'S_SHOW_EVENTS_NOT_OLDER'=>			'Show events not older',
@@ -1395,6 +1400,7 @@
 	'S_USER_PROFILE_BIG'=>			'USER PROFILE',
 	'S_USER_PROFILE'=>			'User profile',
 	'S_LANGUAGE'=>				'Language',
+	'S_THEME'=>					'Theme',
 	'S_ENGLISH_GB'=>			'English (GB)',
 	'S_FRENCH_FR'=>				'French (FR)',
 	'S_GERMAN_DE'=>				'German (DE)',

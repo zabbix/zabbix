@@ -330,6 +330,7 @@ FIELD		|alert_usrgrpid	|t_id		|'0'	|NOT NULL	|ZBX_SYNC
 FIELD		|event_ack_enable|t_integer	|'1'	|NOT NULL	|ZBX_SYNC
 FIELD		|event_expire	|t_integer	|'7'	|NOT NULL	|ZBX_SYNC
 FIELD		|event_show_max	|t_integer	|'100'	|NOT NULL	|ZBX_SYNC
+FIELD		|default_theme	|t_varchar(128)	|'default.css'	|NOT NULL	|ZBX_SYNC
 
 TABLE|functions|functionid|ZBX_SYNC
 FIELD		|functionid	|t_id		|'0'	|NOT NULL	|0
@@ -661,6 +662,7 @@ FIELD		|autologout	|t_integer	|'900'	|NOT NULL	|ZBX_SYNC
 FIELD		|lang		|t_varchar(5)	|'en_gb'|NOT NULL	|ZBX_SYNC
 FIELD		|refresh	|t_integer	|'30'	|NOT NULL	|ZBX_SYNC
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|ZBX_SYNC
+FIELD		|theme		|t_varchar(128)	|'default.css'	|NOT NULL	|ZBX_SYNC
 INDEX		|1		|alias
 
 TABLE|usrgrp|usrgrpid|ZBX_SYNC

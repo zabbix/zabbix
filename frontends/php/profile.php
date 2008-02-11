@@ -41,6 +41,7 @@ include_once "include/page_header.php";
 		"password1"=>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})&&isset({form})&&({form}!="update")&&isset({change_password})'),
 		"password2"=>	array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})&&isset({form})&&({form}!="update")&&isset({change_password})'),
 		"lang"=>	array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})'),
+		"theme"=>		array(T_ZBX_STR, O_OPT,	null,	NOT_EMPTY,	'isset({save})'),
 		"autologout"=>  array(T_ZBX_INT, O_OPT, null,   BETWEEN(0,3600),'isset({save})'),
 		"url"=>		array(T_ZBX_STR, O_OPT,	null,	null,		'isset({save})'),
 		"refresh"=>	array(T_ZBX_INT, O_OPT,	null,	BETWEEN(0,3600),'isset({save})'),
@@ -72,7 +73,7 @@ include_once "include/page_header.php";
 		}
 		elseif($_REQUEST["password1"]==$_REQUEST["password2"])
 		{
-			$result=update_user_profile($USER_DETAILS["userid"],$_REQUEST["password1"],$_REQUEST["url"],$_REQUEST["autologout"],$_REQUEST["lang"],$_REQUEST["refresh"]);
+			$result=update_user_profile($USER_DETAILS["userid"],$_REQUEST["password1"],$_REQUEST["url"],$_REQUEST["autologout"],$_REQUEST["lang"],$_REQUEST['theme'],$_REQUEST["refresh"]);
 			show_messages($result, S_USER_UPDATED, S_CANNOT_UPDATE_USER);
 			if($result)
 				add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_USER,

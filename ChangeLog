@@ -1,5 +1,6 @@
 Changes for 1.5:
 
+ - [DEV-112] added themes option in frontend (Artem)
  - [DEV-114] special processing of simple SNMP OIDs like ifDescr, ifInOctets, etc (Alexei)
  - [DEV-114] monitoring of SNMP objects having flexible Index (Alexei)
  - [DEV-104] added maintenance mode (Artem)

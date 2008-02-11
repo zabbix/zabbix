@@ -305,7 +305,7 @@ function ScaleChartToParenElement(obj_name)
 function insert_sizeable_graph(graph_id,url){
 	if(isset(ZBX_G_WIDTH)) url += "&amp;width="+ZBX_G_WIDTH;
 
-	document.write('<img id="'+graph_id+'" src="'+url+'" alt="graph" /><br /><br />');
+	document.write('<img id="'+graph_id+'" src="'+url+'" alt="graph" /><br />');
 }
 
 function remove_childs(form_name,rmvbyname,tag){

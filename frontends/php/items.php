@@ -664,7 +664,7 @@ include_once "include/page_header.php";
 			
 			$form->AddItem(array('[', 
 				new CLink($showdisabled ? S_HIDE_DISABLED_ITEMS : S_SHOW_DISABLED_ITEMS,
-					'?showdisabled='.($showdisabled ? 0 : 1),'action'),
+					'?showdisabled='.($showdisabled ? 0 : 1),null),
 				']', SPACE));
 
 			$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit();");

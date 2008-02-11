@@ -310,7 +310,7 @@ include_once "include/page_header.php";
 	$r_form->SetMethod('get');
 	$r_form->AddItem(array('[', 
 		new CLink($showdisabled ? S_HIDE_DISABLED_TRIGGERS : S_SHOW_DISABLED_TRIGGERS,
-			'triggers.php?showdisabled='.($showdisabled ? 0 : 1),'action'),
+			'triggers.php?showdisabled='.($showdisabled ? 0 : 1),NULL),
 		']', SPACE));
 
 	$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit()");
