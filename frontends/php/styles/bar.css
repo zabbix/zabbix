@@ -65,7 +65,7 @@ img#scroll_calendar:hover{
 
 div#scrolltableft{
 	position:absolute;
-	top: -14px;
+	top: -15px;
 	left: 18px;
 	font-family:Verdana, Arial, Helvetica, sans-serif;
 	font-size:10px;
@@ -75,7 +75,7 @@ div#scrolltableft{
 
 div#scrolltabright{
 	position:absolute;
-	top: -13px;
+	top: -15px;
 	right: 0px;
 	font-family:Verdana, Arial, Helvetica, sans-serif;
 	font-size:10px;	
@@ -91,12 +91,20 @@ div#scroll_left{
 	float: left;
 }
 
+div#scroll_left:hover{
+	cursor:pointer;
+}
+
 div#scroll_right{
 	background-image: url(../images/general/bar/right.gif); 
 	background-repeat:no-repeat; 
 	width:17px; 
 	height: 17px; 
 	float: left;
+}
+
+div#scroll_right:hover{
+	cursor:pointer;
 }
 
 div#scroll_middle{
@@ -111,6 +119,11 @@ div#scroll_bar{
 	left: 17px;
 }
 
+div#scroll_bar:hover{
+	cursor:pointer;
+}
+
+
 div#arrow_l{
 	position:absolute;
 	bottom: 0px;
@@ -121,6 +134,10 @@ div#arrow_l{
 	height:17px;
 }
 
+div#arrow_l:hover{
+	cursor:pointer;
+}
+
 div#arrow_r{
 	position:absolute;
 	bottom: 0px;
@@ -129,6 +146,10 @@ div#arrow_r{
 	background-repeat:no-repeat; 
 	width: 12px; 
 	height:17px;
+}
+
+div#arrow_r:hover{
+	cursor:pointer;
 }
 
 div#bar_left{

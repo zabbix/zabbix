@@ -489,6 +489,7 @@ if((ini_get('mbstring.func_overload') > 5)){
 	define('ZBX_HISTORY_COUNT',5);
 	
 	define('ZBX_GUEST_USER','guest');
+	define('ZBX_DEFAULT_CSS','default.css');
 
 /* Define if your logs are in non-standard format */
 /*	define('ZBX_LOG_ENCODING_DEFAULT', 'Shift_JIS');*/

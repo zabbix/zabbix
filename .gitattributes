@@ -80,12 +80,19 @@ frontends/php/images/general/warning16r.gif -text
 frontends/php/images/general/warning_small.gif -text
 frontends/php/images/general/zabbix.ico -text
 frontends/php/images/general/zabbix.png -text svneol=unset#unset
+frontends/php/images/general/zabbix_bb.ico -text
+frontends/php/images/general/zabbix_bb.png -text
+frontends/php/images/general/zabbix_ob.ico -text
 frontends/php/images/gradients/blink1.gif -text svneol=unset#unset
 frontends/php/images/gradients/blink2.gif -text svneol=unset#unset
 frontends/php/images/gradients/button.gif -text svneol=unset#unset
+frontends/php/images/gradients/gradient.png -text
 frontends/php/images/gradients/menu_not_active.gif -text svneol=unset#unset
+frontends/php/images/gradients/menu_not_active_bb.gif -text
 frontends/php/images/gradients/table_head.gif -text svneol=unset#unset
 frontends/php/images/gradients/table_head2.gif -text svneol=unset#unset
+frontends/php/images/gradients/table_head2_bb.gif -text
+frontends/php/images/gradients/table_head_bb.gif -text
 frontends/php/images/sysmaps/Hub.png -text svneol=unset#unset
 frontends/php/images/sysmaps/Hub_small.png -text svneol=unset#unset
 frontends/php/images/sysmaps/Network.png -text svneol=unset#unset
@@ -139,6 +146,9 @@ frontends/php/popup_link_tr.php -text
 frontends/php/scripts.php -text
 frontends/php/scripts_exec.php -text
 frontends/php/styles/bar.css -text
+frontends/php/styles/css_bb.css -text
+frontends/php/styles/css_ob.css -text
+frontends/php/styles/default.css -text
 frontends/php/styles/div.css -text
 frontends/php/styles/form.css -text
 frontends/php/styles/gmenu.css -text

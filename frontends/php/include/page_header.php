@@ -357,9 +357,37 @@ COpt::profiling_start("page");
 		echo '<meta http-equiv="refresh" content="'.$USER_DETAILS["refresh"].'" />';
 	}
  ?>
-    <link rel="stylesheet" href="css.css" />
-    <link rel="shortcut icon" href="images/general/zabbix.ico">
     <meta name="Author" content="ZABBIX SIA" />
+    <link rel="stylesheet" href="css.css" />
+<?php
+	global $DB;
+	if(!is_null($DB)){
+		$css = false;
+		$config=select_config();		
+		if(isset($config['default_theme']) && file_exists('styles/'.$config['default_theme'])){
+			$css = $config['default_theme'];
+		}
+		
+		if(isset($USER_DETAILS['theme']) && ($USER_DETAILS['theme']!=ZBX_DEFAULT_CSS)){
+			if(file_exists('styles/'.$USER_DETAILS['theme'])){
+				$css = $USER_DETAILS['theme'];
+			}
+		}
+		
+		if($css){
+			echo '<link rel="stylesheet" href="styles/'.$css.'" />';
+			$ico = ereg_replace('.*(\_[a-z]+).*',"\\1",$css);
+			if(file_exists('images/general/zabbix'.$ico.'.ico'))
+				echo '<link rel="shortcut icon" href="images/general/zabbix'.$ico.'.ico">';
+			else
+				echo '<link rel="shortcut icon" href="images/general/zabbix.ico">';
+		}
+		else{
+			echo '<link rel="shortcut icon" href="images/general/zabbix.ico">';
+		}
+	}
+?>
+
     <script type="text/javascript" src="js/common.js"></script>
 <?php
 	if(isset($page['scripts']) && is_array($page['scripts'])){
@@ -404,7 +432,7 @@ COpt::compare_files_with_menu($ZBX_MENU);
 		$support->SetTarget('_blank');
 		$printview = new CLink(S_PRINT, $_SERVER['REQUEST_URI'].(empty($_GET)?'?':'&').'print=1', 'small_font');
 		
-		$page_header_r_col = array($help,'|', $support,'|',$printview);
+		$page_header_r_col = array($help,'|',$support,'|',$printview);
 
 		if($USER_DETAILS["alias"]!=ZBX_GUEST_USER){
 			$page_header_r_col[] = array("|", 
@@ -414,10 +442,13 @@ COpt::compare_files_with_menu($ZBX_MENU);
 			$page_header_r_col[] = array("|", new CLink(S_LOGIN, "index.php?reconnect=1", "small_font"));
 		}
 
-		$logo = new CLink(new CImg("images/general/zabbix.png","ZABBIX"),"http://www.zabbix.com");
+		$logo = new CLink(new CDiv(SPACE,'zabbix_logo'),"http://www.zabbix.com");
 		$logo->SetTarget('_blank');
-
-		$top_page_row	= array(new CCol($logo, "page_header_l"), new CCol($page_header_r_col, "page_header_r"));
+//		$logo = new CSpan(SPACE,'zabbix_logo');
+		$td_r = new CCol($page_header_r_col, "page_header_r");
+		$td_r->AddOption('width','100%');
+//		$top_page_row	= array(new CCol($logo, "page_header_l"), new CCol($page_header_r_col, "page_header_r"));
+		$top_page_row	= array(new CCol($logo, "page_header_l"), $td_r);
 		unset($logo, $page_header_r_col, $help, $support);
 
 		$table = new CTable(NULL,"page_header");

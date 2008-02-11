@@ -712,7 +712,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 				default:
 					$p = new CTag('p','yes');
 					$p->AddOption('align','center');
-					$p->AddOption('style','color: '.((!$bool)?'#AA0000;':'#223344;'));
+					$p->AddOption('class',((!$bool)?'msgerror':'msgok'));
 					$p->AddItem(bold('['.$msg.']'));
 					$p->Show();
 					break;
@@ -1016,60 +1016,34 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 
 	# Update configuration
 
-	function	update_config($event_history,$alert_history,$refresh_unsupported,$work_period,$alert_usrgrpid,$event_ack_enable,$event_expire,$event_show_max)
+	function	update_config($configs)
 	{
 		$update = array();
-
-		if(!is_null($event_history))
-		{
-			$update[] = 'event_history='.$event_history;
-		}
-		if(!is_null($alert_history))
-		{
-			$update[] = 'alert_history='.$alert_history;
-		}
-		if(!is_null($refresh_unsupported))
-		{
-			$update[] = 'refresh_unsupported='.$refresh_unsupported;
-		}
-		if(!is_null($work_period))
-		{
-			if( !validate_period($work_period) )
-			{
+		
+		if(isset($configs['work_period']) && !is_null($configs['work_period'])){
+			if(!validate_period($configs['work_period'])){
 				error(S_ICORRECT_WORK_PERIOD);
 				return NULL;
 			}
-			$update[] = 'work_period='.zbx_dbstr($work_period);
 		}
-		if(!is_null($alert_usrgrpid))
-		{
-			if($alert_usrgrpid != 0 && !DBfetch(DBselect('select usrgrpid from usrgrp where usrgrpid='.$alert_usrgrpid)))
-			{
+		if(isset($configs['alert_usrgrpid']) && !is_null($configs['alert_usrgrpid'])){
+			if(($configs['alert_usrgrpid'] != 0) && !DBfetch(DBselect('select usrgrpid from usrgrp where usrgrpid='.$configs['alert_usrgrpid']))){
 				error(S_INCORRECT_GROUP);;
 				return NULL;
 			}
-			$update[] = 'alert_usrgrpid='.$alert_usrgrpid;
 		}
-		if(!is_null($event_ack_enable))
-		{
-			$update[] = 'event_ack_enable='.$event_ack_enable;
+		
+		foreach($configs as $key => $value){
+			if(!is_null($value)) 
+				$update[] = $key.'='.zbx_dbstr($value);
 		}
-		if(!is_null($event_expire))
-		{
-			$update[] = 'event_expire='.$event_expire;
-		}
-		if(!is_null($event_show_max))
-		{
-			$update[] = 'event_show_max='.$event_show_max;
-		}
-		if(count($update) == 0)
-		{
+
+		if(count($update) == 0){
 			error(S_NOTHING_TO_DO);
 			return NULL;
 		}
 
-		return	DBexecute('update config set '.implode(',',$update).
-			' where '.DBin_node('configid', get_current_nodeid(false)));
+	return	DBexecute('update config set '.implode(',',$update).' where '.DBin_node('configid', get_current_nodeid(false)));
 	}
 	
 /* Function: 
@@ -1149,6 +1123,7 @@ function TODO($msg) { echo "TODO: ".$msg.SBR; }  // DEBUG INFO!!!
 		$table->AddRow($tr);
 		
 		$table->Show();
+		echo SBR;
 	}
 
 

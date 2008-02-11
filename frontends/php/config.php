@@ -34,7 +34,7 @@ include_once "include/page_header.php";
 	$fields=array(
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 
-		"config"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,3,5,6,7,8"),	NULL),
+		"config"=>		array(T_ZBX_INT, O_OPT,	NULL,	IN("0,3,5,6,7,8,9"),	NULL),
 
 // other form
 		"alert_history"=>	array(T_ZBX_INT, O_NO,	NULL,	BETWEEN(0,65535),		'isset({config})&&({config}==0)&&isset({save})'),
@@ -65,6 +65,8 @@ include_once "include/page_header.php";
 		'event_ack_enable'=>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	IN("0,1"),	'isset({config})&&({config}==8)&&isset({save})'),
 		'event_expire'=> 		array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1,65535),	'isset({config})&&({config}==8)&&isset({save})'),
 		'event_show_max'=> 		array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(1,65535),	'isset({config})&&({config}==8)&&isset({save})'),
+/* Themes */
+		'default_theme'=>		array(T_ZBX_STR, O_OPT,	NULL,	NOT_EMPTY,				'isset({config})&&({config}==9)&&isset({save})'),
 /* other */
 		"form"=>		array(T_ZBX_STR, O_OPT, P_SYS,	NULL,	NULL),
 		"form_refresh"=>	array(T_ZBX_INT, O_OPT,	NULL,	NULL,	NULL)
@@ -132,16 +134,12 @@ include_once "include/page_header.php";
 			access_deny();
 
 /* OTHER ACTIONS */
-		$result=update_config(
-			get_request('event_history'),
-			get_request('alert_history'),
-			get_request('refresh_unsupported'),
-			get_request('work_period'),
-			get_request('alert_usrgrpid'),
-			get_request('event_ack_enable'),
-			get_request('event_expire'),
-			get_request('event_show_max')
+		$configs = array(
+				'event_ack_enable' => get_request('event_ack_enable'),
+				'event_expire' => get_request('event_expire'),
+				'event_show_max' => get_request('event_show_max')
 			);
+		$result=update_config($configs);
 
 		show_messages($result, S_CONFIGURATION_UPDATED, S_CONFIGURATION_WAS_NOT_UPDATED);
 
@@ -158,6 +156,23 @@ include_once "include/page_header.php";
 			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,implode('; ',$msg));
 		}		
 	}
+	elseif(isset($_REQUEST["save"]) && ($_REQUEST["config"]==9)){
+		if(count(get_accessible_nodes_by_user($USER_DETAILS,PERM_READ_WRITE,PERM_MODE_LT,PERM_RES_IDS_ARRAY,get_current_nodeid())))
+			access_deny();
+
+/* OTHER ACTIONS */
+		$configs = array(
+				'default_theme' => get_request('default_theme')
+			);
+		$result=update_config($configs);
+
+		show_messages($result, S_CONFIGURATION_UPDATED, S_CONFIGURATION_WAS_NOT_UPDATED);
+
+		if($result){
+			$msg = S_DEFAULT_THEME.' ['.get_request('default_theme').']';
+			add_audit(AUDIT_ACTION_UPDATE,AUDIT_RESOURCE_ZABBIX_CONFIG,$msg);
+		}		
+	}
 	elseif(isset($_REQUEST["save"])&&uint_in_array($_REQUEST["config"],array(0,5,7)))
 	{
 
@@ -165,16 +180,14 @@ include_once "include/page_header.php";
 			access_deny();
 
 /* OTHER ACTIONS */
-		$result=update_config(
-			get_request('event_history'),
-			get_request('alert_history'),
-			get_request('refresh_unsupported'),
-			get_request('work_period'),
-			get_request('alert_usrgrpid'),
-			get_request('event_ack_enable'),
-			get_request('event_expire'),
-			get_request('event_show_max')
+		$configs = array(
+				'event_history' => get_request('event_history'),
+				'alert_history' => get_request('alert_history'),
+				'refresh_unsupported' => get_request('refresh_unsupported'),
+				'work_period' => get_request('work_period'),
+				'alert_usrgrpid' => get_request('alert_usrgrpid')
 			);
+		$result=update_config($configs);
 
 		show_messages($result, S_CONFIGURATION_UPDATED, S_CONFIGURATION_WAS_NOT_UPDATED);
 		if($result)
@@ -295,6 +308,7 @@ include_once "include/page_header.php";
 	$cmbConfig->AddItem(0,S_HOUSEKEEPER);
 //	$cmbConfig->AddItem(2,S_ESCALATION_RULES);
 	$cmbConfig->AddItem(3,S_IMAGES);
+	$cmbConfig->AddItem(9,S_THEMES);
 //	$cmbConfig->AddItem(4,S_AUTOREGISTRATION);
 	$cmbConfig->AddItem(6,S_VALUE_MAPPING);
 	$cmbConfig->AddItem(7,S_WORKING_TIME);
@@ -331,6 +345,10 @@ include_once "include/page_header.php";
 	elseif($_REQUEST["config"]==8)
 	{
 		insert_event_ack_form();
+	}
+	elseif($_REQUEST["config"]==9)
+	{
+		insert_themes_form();
 	}
 	elseif($_REQUEST["config"]==3)
 	{

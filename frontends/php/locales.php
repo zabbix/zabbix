@@ -250,21 +250,21 @@ else{
 	foreach($ZBX_LOCALES as $id => $name){
 		$cmbLang->AddItem($id,$name);
 	}
-	$frmLcls->AddRow('Take for default locale:',$cmbLang);
+	$frmLcls->AddRow('Take for default locale',$cmbLang);
 	
 	$cmbExtLang = new CComboBox('extlang',get_request('extlang','new'));
 	$cmbExtLang->AddItem('new',S_CREATE.SPACE.S_NEW_SMALL);
 	foreach($ZBX_LOCALES as $id => $name){
 		$cmbExtLang->AddItem($id,$name);
 	}
-	$frmLcls->AddRow('Locale to extend:',$cmbExtLang);
+	$frmLcls->AddRow('Locale to extend',$cmbExtLang);
 	
 	$cmbFill = new CComboBox('fill',get_request('fill',1));
 		$cmbFill->AddItem('0',S_DO_NOT_ADD);
 		$cmbFill->AddItem('1',S_LEAVE_EMPTY);
 		$cmbFill->AddItem('2',S_FILL_WITH_DEFAULT_VALUE);
 
-	$frmLcls->AddRow('New entries:', $cmbFill);
+	$frmLcls->AddRow('New entries', $cmbFill);
 
 	$frmLcls->AddItemToBottomRow(new CButton('next',S_NEXT));
 	$frmLcls->Show();
