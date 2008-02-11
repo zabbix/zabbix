@@ -701,6 +701,7 @@
 			$url		= $user["url"];
 			$autologout	= $user["autologout"];
 			$lang		= $user["lang"];
+			$theme 		= $user['theme'];
 			$refresh	= $user["refresh"];
 			$user_type	= $user["type"];
 
@@ -741,6 +742,7 @@
 			$url 		= get_request("url","");
 			$autologout	= get_request("autologout",900);
 			$lang		= get_request("lang","en_gb");
+			$theme 		= get_request('theme','default.css');
 			$refresh	= get_request("refresh",30);
 			$user_type	= get_request("user_type",USER_TYPE_ZABBIX_USER);;
 			$user_groups	= get_request("user_groups",array());
@@ -876,6 +878,13 @@
 		}
 		
 		$frmUser->AddRow(S_LANGUAGE, $cmbLang);
+		
+		$cmbTheme = new CComboBox('theme',$theme);
+			$cmbTheme->AddItem(ZBX_DEFAULT_CSS,S_SYSTEM_DEFAULT);
+			$cmbTheme->AddItem('css_ob.css',S_ORIGINAL_BLUE);
+			$cmbTheme->AddItem('css_bb.css',S_BLACK_AND_BLUE);
+		
+		$frmUser->AddRow(S_THEME, $cmbTheme);
 
 		$frmUser->AddRow(S_AUTO_LOGOUT_IN_SEC,	new CNumericBox("autologout",$autologout,4));
 		$frmUser->AddRow(S_URL_AFTER_LOGIN,	new CTextBox("url",$url,50));
@@ -4090,8 +4099,24 @@ include_once 'include/discovery.inc.php';
 		$frmHouseKeep->AddItemToBottomRow(new CButton("save",S_SAVE));
 		$frmHouseKeep->Show();
 	}
+	
+	function insert_themes_form(){
+		$config=select_config();
+		
+		$frmThemes = new CFormTable(S_THEMES,"config.php");
+		$frmThemes->AddVar("config",get_request("config",9));
+			
+		$cmbTheme = new CComboBox('default_theme',$config['default_theme']);
+			$cmbTheme->AddItem('css_ob.css',S_ORIGINAL_BLUE);
+			$cmbTheme->AddItem('css_bb.css',S_BLACK_AND_BLUE);
 
-	function	insert_event_ack_form()
+		$frmThemes->AddRow(S_DEFAULT_THEME,$cmbTheme);
+			
+		$frmThemes->AddItemToBottomRow(new CButton("save",S_SAVE));
+		$frmThemes->Show();
+	}
+
+	function insert_event_ack_form()
 	{
 		$config=select_config();
 		

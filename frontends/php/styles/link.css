@@ -22,10 +22,10 @@ A.orange:visited 	{	color:#EE7000;	text-decoration: none; }
 A.orange:hover 		{	color:#EE7000;	text-decoration: underline; }
 A.orange:active 	{	color:#EE7000;	text-decoration: underline;}
 
-A.unknown:link		{	color:#AAAAAA;	text-decoration: none; }
-A.unknown:visited 	{	color:#AAAAAA;	text-decoration: none; }
+A.unknown:link		{	color:#777777;	text-decoration: none; }
+A.unknown:visited 	{	color:#777777;	text-decoration: none; }
 A.unknown:hover 	{	color:#AAAAAA;	text-decoration: underline; }
-A.unknown:active 	{	color:#AAAAAA;	text-decoration: underline;}
+A.unknown:active 	{	color:#777777;	text-decoration: underline;}
 
 A.off:link	{	color:#00AA00;	text-decoration: none; }
 A.off:visited 	{	color:#00AA00;	text-decoration: none; }

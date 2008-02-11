@@ -58,25 +58,24 @@ table.page_footer
 	background: #5C7099 url('../images/gradients/table_head.gif') repeat-x top left;
 	border-color: #000000;
 	font-weight: bold; 
-	border-width:0px;
+
+	border-color: 	#E5E5E5;
+
+	border-top-width: 17px;
 	border-top-style: solid;
-	border-left-style: solid;
-	border-right-style: solid;
-	border-bottom-style: solid;
-	margin-top: 15px;
 	width: 100%;
 }
 table.page_footer tr td.page_footer_l
 {
-        font-family:verdana, arial, helvetica, sans-serif;
-        font-size:10px;
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-size:10px;
 	height: 24px;
 	text-align: center;
 }
 table.page_footer tr td.page_footer_r
 {
-        font-family:verdana, arial, helvetica, sans-serif;
-        font-size:10px;
+	font-family:verdana, arial, helvetica, sans-serif;
+	font-size:10px;
 	height: 24px;
 	text-align: right;
 }

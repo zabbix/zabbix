@@ -256,7 +256,6 @@ include_once 'include/page_header.php';
 				' AND h.hostid=i.hostid '.
 				' AND hg.groupid='.$_REQUEST['groupid'].
 				' AND hg.hostid=h.hostid '.
-//				' AND h.hostid NOT IN ('.$denyed_hosts.') '.
 				' AND h.hostid IN ('.$availiable_hosts.') '.
 				' AND i.itemid=gi.itemid'.
 			' ORDER BY h.host';
@@ -267,7 +266,6 @@ include_once 'include/page_header.php';
 			' WHERE h.status='.HOST_STATUS_MONITORED.
 				' AND i.status='.ITEM_STATUS_ACTIVE.
 				' AND h.hostid=i.hostid'.
-//				' AND h.hostid NOT IN ('.$denyed_hosts.') '.
 				' AND h.hostid IN ('.$availiable_hosts.') '.
 				' AND i.itemid=gi.itemid'.
 			' ORDER BY h.host';
@@ -290,7 +288,6 @@ include_once 'include/page_header.php';
 				' AND g.graphid=gi.graphid '.
 				' AND i.hostid='.$_REQUEST['hostid'].
 				' AND '.DBin_node('g.graphid').
-//				' AND i.hostid NOT IN ('.$denyed_hosts.') '.
 				' AND i.hostid IN ('.$availiable_hosts.') '.
 			' ORDER BY g.name';
 	}
@@ -304,7 +301,6 @@ include_once 'include/page_header.php';
 				' AND i.hostid=h.hostid '.
 				' AND h.status='.HOST_STATUS_MONITORED.
 				' AND '.DBin_node('g.graphid').
-//				' AND h.hostid NOT IN ('.$denyed_hosts.') '.
 				' AND h.hostid IN ('.$availiable_hosts.') '.
 			' ORDER BY g.name';
 	}
@@ -316,7 +312,6 @@ include_once 'include/page_header.php';
 				' AND i.hostid=h.hostid '.
 				' AND h.status='.HOST_STATUS_MONITORED.
 				' AND '.DBin_node('g.graphid').
-//				' AND h.hostid NOT IN ('.$denyed_hosts.') '.
 				' AND h.hostid IN ('.$availiable_hosts.') '.
 			' ORDER BY g.name';
 	}
@@ -395,7 +390,7 @@ include_once 'include/page_header.php';
 				//ZBX_G_WIDTH-= '.($shiftXleft+$shiftXright+27).';
 				
 				document.write(\'<img id="'.$dom_graph_id.'" src="chart2.php?graphid='.$_REQUEST['graphid'].url_param('stime').
-				'&period='.$effectiveperiod.'&width=\'+ZBX_G_WIDTH+\'" /><br /><br />\');
+				'&period='.$effectiveperiod.'&width=\'+ZBX_G_WIDTH+\'" /><br />\');
 				-->
 				</script>'."\n";
 		}
@@ -403,7 +398,8 @@ include_once 'include/page_header.php';
 		$table->AddRow(new CScript($row));
 	}
 	$table->Show();
-
+	echo SBR;
+	
 	if($_REQUEST['graphid'] > 0)
 	{
 // NAV BAR

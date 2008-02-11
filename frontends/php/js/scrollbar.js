@@ -436,6 +436,7 @@ barmovetoX: function(x){
 	this.bar.setStyle({left: (x+17) +'px'});
 	
 	this.settabinfo(x);
+	if(IE) this.bar.setStyle({width: this.barW +'px'});
 },
 //-------------------------------
 

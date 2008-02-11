@@ -357,7 +357,7 @@ include_once "include/page_header.php";
 		
 		$form->AddItem(array('[', 
 			new CLink($showdisabled ? S_HIDE_DISABLED_SCENARIOS: S_SHOW_DISABLED_SCENARIOS,
-				'?showdisabled='.($showdisabled ? 0 : 1),'action'),
+				'?showdisabled='.($showdisabled ? 0 : 1),NULL),
 			']', SPACE));
 		
 		$cmbGroup = new CComboBox("groupid",$_REQUEST["groupid"],"submit();");
@@ -475,7 +475,7 @@ include_once "include/page_header.php";
 			
 			array_push($name, new CLink($httptest_data["name"],"?form=update&httptestid=".
 				$httptest_data["httptestid"].url_param("hostid").url_param("groupid"),
-				'action'));
+				NULL));
 
 			$status=new CCol(new CLink(httptest_status2str($httptest_data["status"]),
 					"?group_httptestid%5B%5D=".$httptest_data["httptestid"].
@@ -486,8 +486,8 @@ include_once "include/page_header.php";
 
 			$chkBox = new CCheckBox("group_httptestid[]",null,null,$httptest_data["httptestid"]);
 			
-			$step_cout = DBfetch(DBselect('select count(*) from httpstep where httptestid='.$httptest_data["httptestid"]));
-			$step_cout = $step_cout[0];
+			$step_cout = DBfetch(DBselect('select count(*) as cnt from httpstep where httptestid='.$httptest_data["httptestid"]));
+			$step_cout = $step_cout['cnt'];
 
 			/* if($httptest_data["templateid"] > 0) $chkBox->SetEnabled(false); // for future use */
 			

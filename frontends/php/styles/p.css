@@ -9,6 +9,9 @@ P:active 	{color:black; text-decoration: none;}
 
 p.uppercase	{text-transform: uppercase}
 p.margin	{margin-left: 10pt}
+
+p.msgerror	{	color: #CC0000; }
+p.msgok		{	color: #223344;	}
 	
 p.info
 {

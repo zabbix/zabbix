@@ -204,8 +204,8 @@ include_once "include/page_header.php";
 
 			array_push($name, new CLink($httptest_data["name"],"httpdetails.php?httptestid=".$httptest_data['httptestid'],'action'));
 	
-			$step_cout = DBfetch(DBselect('select count(*) from httpstep where httptestid='.$httptest_data["httptestid"]));
-			$step_cout = $step_cout[0];
+			$step_cout = DBfetch(DBselect('select count(*) as cnt from httpstep where httptestid='.$httptest_data["httptestid"]));
+			$step_cout = $step_cout['cnt'];
 
 			if(isset($httptest_data["lastcheck"]))
 				$lastcheck = date(S_DATE_FORMAT_YMDHMS,$httptest_data["lastcheck"]);
