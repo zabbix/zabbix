@@ -24,7 +24,6 @@
 #include "db.h"
 #include "log.h"
 #include "sysinfo.h"
-#include "zlog.h"
 
 #include "daemon.h"
 #include "discoverer.h"
@@ -305,12 +304,13 @@ static void register_host(DB_DHOST *host,DB_DCHECK *check, zbx_uint64_t druleid,
 	assert(ip);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In register_host(ip:%s)",
-		ip);
+			ip);
 
 	host->dhostid=0;
-	result = DBselect("select dhostid,druleid,ip,status,lastup,lastdown from dhosts where ip='%s' and " ZBX_COND_NODEID,
-		ip,
-		LOCAL_NODE("dhostid"));
+	result = DBselect("select dhostid,druleid,ip,status,lastup,lastdown from dhosts where ip='%s'" DB_NODE,
+			ip,
+			DBnode_local("dhostid"));
+
 	row=DBfetch(result);
 	if(!row || DBis_null(row[0])==SUCCEED)
 	{
@@ -318,7 +318,8 @@ static void register_host(DB_DHOST *host,DB_DCHECK *check, zbx_uint64_t druleid,
 		if(check->status == DOBJECT_STATUS_UP)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "New host discovered at %s",
-				ip);
+					ip);
+
 			host->dhostid = DBget_maxid("dhosts","dhostid");
 			DBexecute("insert into dhosts (dhostid,druleid,ip) values (" ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s')",
 				host->dhostid,
@@ -861,40 +862,46 @@ static void process_rule(DB_DRULE *rule)
  ******************************************************************************/
 void main_discoverer_loop(int num)
 {
-	int	now;
-
+	struct		sigaction phan;
+	int		now;
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_DRULE	rule;
 
 	zabbix_log( LOG_LEVEL_DEBUG, "In main_discoverer_loop(num:%d)",
-		num);
+			num);
+
+	phan.sa_handler = child_signal_handler;
+	sigemptyset(&phan.sa_mask);
+	phan.sa_flags = 0;
+	sigaction(SIGALRM, &phan, NULL);
 
 	discoverer_num = num;
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	for(;;)
-	{
-		now=time(NULL);
+	for(;;) {
+		now = time(NULL);
 
-		result = DBselect("select druleid,iprange,delay,nextcheck,name,status from drules where status=%d and nextcheck<=%d and " ZBX_SQL_MOD(druleid,%d) "=%d and" ZBX_COND_NODEID,
-			DRULE_STATUS_MONITORED,
-			now,
-			CONFIG_DISCOVERER_FORKS,
-			discoverer_num-1,
-			LOCAL_NODE("druleid"));
-		while((row=DBfetch(result)))
-		{
+		result = DBselect("select druleid,iprange,delay,nextcheck,name,status from drules"
+				" where proxyid=0 and status=%d and nextcheck<=%d"
+				" and " ZBX_SQL_MOD(druleid,%d) "=%d" DB_NODE,
+				DRULE_STATUS_MONITORED,
+				now,
+				CONFIG_DISCOVERER_FORKS,
+				discoverer_num - 1,
+				DBnode_local("druleid"));
+
+		while (NULL != (row = DBfetch(result))) {
 			memset(&rule, 0, sizeof(DB_DRULE));
 
 			ZBX_STR2UINT64(rule.druleid,row[0]);
-			rule.iprange 		= row[1];
-			rule.delay		= atoi(row[2]);
-			rule.nextcheck		= atoi(row[3]);
-			rule.name		= row[4];
-			rule.status		= atoi(row[5]);
-			
+			rule.iprange 	= row[1];
+			rule.delay	= atoi(row[2]);
+			rule.nextcheck	= atoi(row[3]);
+			rule.name	= row[4];
+			rule.status	= atoi(row[5]);
+
 			process_rule(&rule);
 		}
 		DBfree_result(result);
@@ -903,5 +910,4 @@ void main_discoverer_loop(int num)
 
 		sleep(30);
 	}
-	DBclose();
 }
