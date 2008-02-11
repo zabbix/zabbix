@@ -56,8 +56,7 @@ void main_timer_loop()
 	DB_RESULT	result;
 	DB_ROW	row;
 
-	for(;;)
-	{
+	for (;;) {
 		zbx_setproctitle("updating nodata() functions");
 
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
@@ -71,14 +70,15 @@ void main_timer_loop()
 #endif
 	*/
 
-		result = DBselect("select distinct %s, functions f where h.hostid=i.hostid and h.status=%d and i.status=%d and f.function in ('nodata','date','dayofweek','time','now') and i.itemid=f.itemid and" ZBX_COND_NODEID,
-			ZBX_SQL_ITEM_SELECT,
-			HOST_STATUS_MONITORED,
-			ITEM_STATUS_ACTIVE,
-			LOCAL_NODE("h.hostid"));
+		result = DBselect("select distinct %s, functions f where h.hostid=i.hostid and h.status=%d"
+				" and i.status=%d and f.function in ('nodata','date','dayofweek','time','now')"
+				" and i.itemid=f.itemid" DB_NODE,
+				ZBX_SQL_ITEM_SELECT,
+				HOST_STATUS_MONITORED,
+				ITEM_STATUS_ACTIVE,
+				DBnode_local("h.hostid"));
 
-		while((row=DBfetch(result)))
-		{
+		while (NULL != (row = DBfetch(result))) {
 			DBget_item_from_db(&item,row);
 
 			DBbegin();
