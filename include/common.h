@@ -354,6 +354,13 @@ typedef enum
        GROUP_STATUS_DISABLED
 } zbx_group_status_type_t;
 
+/* process type */
+typedef enum
+{
+	ZBX_PROCESS_SERVER = 0,
+	ZBX_PROCESS_PROXY
+} zbx_process_t;
+
 /* HTTP Tests statuses */
 #define HTTPTEST_STATUS_MONITORED	0
 #define HTTPTEST_STATUS_NOT_MONITORED	1
