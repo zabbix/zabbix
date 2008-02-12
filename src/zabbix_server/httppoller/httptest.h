@@ -39,9 +39,9 @@ S_ZBX_HTTPSTAT
 };
 
 #ifdef	HAVE_LIBCURL
-	void process_httptests(int now);
+	void process_httptests(zbx_process_t p, int now);
 #else
-#	define process_httptests(now)
+#	define process_httptests(p, now)
 #endif /* HAVE_LIBCURL */
 
 extern	int	httppoller_num;

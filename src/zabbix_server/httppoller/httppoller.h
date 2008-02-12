@@ -20,11 +20,8 @@
 #ifndef ZABBIX_HTTPPOLLER_H
 #define ZABBIX_HTTPPOLLER_H
 
-extern	void	signal_handler(int);
-extern  int     server_num;
-
 extern  int     CONFIG_HTTPPOLLER_FORKS;
 
-void main_httppoller_loop(int num);
+void	main_httppoller_loop(zbx_process_t p, int num);
 
 #endif
