@@ -20,6 +20,10 @@
 #ifndef ZABBIX_POLLER_H
 #define ZABBIX_POLLER_H
 
+#include "common.h"
+#include "db.h"
+#include "sysinfo.h"
+
 extern	void	signal_handler(int);
 extern  int     server_num;
 
@@ -30,10 +34,7 @@ extern  int     CONFIG_UNAVAILABLE_DELAY;
 extern  int     CONFIG_UNREACHABLE_PERIOD;
 extern  int     CONFIG_UNREACHABLE_DELAY;
 
-void main_poller_loop(int type, int num);
-
-#include "db.h"
-#include "sysinfo.h"
+void	main_poller_loop(zbx_process_t p, int type, int num);
 
 int	get_value(DB_ITEM *item, AGENT_RESULT *result);
 

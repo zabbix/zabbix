@@ -20,9 +20,7 @@
 #ifndef ZABBIX_CHECKS_AGGREGATE_H
 #define ZABBIX_CHECKS_AGGREGATE_H
 
-#include "common.h"
 #include "db.h"
-#include "log.h"
 #include "sysinfo.h"
 
 extern	int	get_value_aggregate(DB_ITEM *item, AGENT_RESULT *result);
