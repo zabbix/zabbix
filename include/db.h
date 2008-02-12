@@ -504,7 +504,9 @@ zbx_uint64_t	DBget_maxid(char *table, char *field);
 
 int	DBget_function_result(char **result,char *functionid);
 void	DBupdate_host_availability(zbx_uint64_t hostid,int available,int clock,char *error);
+void	DBproxy_update_host_availability(zbx_uint64_t hostid, int available, int clock);
 int	DBupdate_item_status_to_notsupported(zbx_uint64_t itemid, const char *error);
+int	DBproxy_update_item_status_to_notsupported(zbx_uint64_t itemid);
 int	DBadd_service_alarm(zbx_uint64_t serviceid,int status,int clock);
 int	DBadd_alert(zbx_uint64_t actionid, zbx_uint64_t triggerid, zbx_uint64_t userid, zbx_uint64_t mediatypeid, char *sendto, char *subject, char *message);
 void	DBupdate_triggers_status_after_restart(void);
