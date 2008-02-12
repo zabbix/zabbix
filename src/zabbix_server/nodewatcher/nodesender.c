@@ -107,12 +107,14 @@ int calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id
 				case ZBX_TYPE_INT	:
 				case ZBX_TYPE_UINT	:
 					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
-						"case when %s is null then 'NULL' else %1$s end",
+						"case when %s is null then 'NULL' else %s end",
+						tables[t].fields[f].name,
 						tables[t].fields[f].name);
 					break;
 				default	:
 					zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
-						"case when %s is null then 'NULL' else md5(%1$s) end",
+						"case when %s is null then 'NULL' else md5(%s) end",
+						tables[t].fields[f].name,
 						tables[t].fields[f].name);
 					break;
 				}
@@ -139,9 +141,9 @@ int calculate_checksums(int nodeid, const char *tablename, const zbx_uint64_t id
 		}
 
 		zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 512,
-			" from %s where"ZBX_COND_NODEID,
+			" from %s where 1=1" DB_NODE,
 			tables[t].table,
-			ZBX_NODE(tables[t].recid,nodeid));
+			DBnode(tables[t].recid, nodeid));
 
 		if (0 != id) {
 			zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128,
@@ -280,7 +282,8 @@ char *get_config_data(int nodeid, int dest_nodetype)
 
 			if (r[0] == NULL || r[1] == NULL || (dest_nodetype == ZBX_NODE_SLAVE && *s != c) ||
 				(dest_nodetype == ZBX_NODE_MASTER && *(s+1) != c) || strcmp(r[0], r[1]) != 0) {
-				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, "%s,length(%1$s),", 
+				zbx_snprintf_alloc(&sql, &sql_allocated, &sql_offset, 128, "%s,length(%s),", 
+					tables[t].fields[f].name,
 					tables[t].fields[f].name);
 			}
 			s += 2;
