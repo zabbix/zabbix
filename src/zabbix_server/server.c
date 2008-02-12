@@ -1113,8 +1113,11 @@ int MAIN_ZABBIX_ENTRY(void)
 	}
 	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS)
 	{
+		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [Trapper]",
+				server_num);
+
 /* Run trapper processes then do housekeeping */
-		child_trapper_main(server_num, &listen_sock);
+		child_trapper_main(ZBX_PROCESS_SERVER, &listen_sock);
 
 /*		threads[i] = child_trapper_make(i, listenfd, addrlen); */
 /*		child_trapper_make(server_num, listenfd, addrlen); */
