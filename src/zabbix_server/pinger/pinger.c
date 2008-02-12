@@ -24,6 +24,7 @@
 #include "../functions.h"
 #include "log.h"
 #include "zlog.h"
+#include "sysinfo.h"
 #include "threads.h"
 
 #include "pinger.h"
@@ -37,9 +38,11 @@ ZBX_FPING_HOST
 	double		mseconds;
 };
 
+static zbx_process_t zbx_process;
+
 /******************************************************************************
  *                                                                            *
- * Function: process_new_value                                                *
+ * Function: process_value                                                    *
  *                                                                            *
  * Purpose: process new item value                                            *
  *                                                                            *
@@ -82,8 +85,15 @@ static int process_value(char *key, ZBX_FPING_HOST *host, AGENT_RESULT *value)
 		DBget_item_from_db(&item, row);
 
 		DBbegin();
-		process_new_value(&item, value);
-		update_triggers(item.itemid);
+		switch (zbx_process) {
+		case ZBX_PROCESS_SERVER:
+			process_new_value(&item, value);
+			update_triggers(item.itemid);
+			break;
+		case ZBX_PROCESS_PROXY:
+			proxy_process_new_value(&item, value);
+			break;
+		}
 		DBcommit();
 	}
 	DBfree_result(result);
@@ -320,7 +330,7 @@ static int do_ping(ZBX_FPING_HOST *hosts, int hosts_count)
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-void main_pinger_loop(int server_num, int pinger_num)
+void main_pinger_loop(zbx_process_t p, int pinger_num)
 {
 	int		start, sleeptime;
 	ZBX_FPING_HOST	*hosts = NULL;
@@ -329,8 +339,7 @@ void main_pinger_loop(int server_num, int pinger_num)
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_pinger_loop(num:%d)",
 			pinger_num);
 
-	zabbix_log(LOG_LEVEL_WARNING, "server #%d started [ICMP pinger]",
-			server_num);
+	zbx_process = p;
 
 	hosts = zbx_malloc(hosts, hosts_allocated * sizeof(ZBX_FPING_HOST));
 
