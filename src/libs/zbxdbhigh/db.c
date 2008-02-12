@@ -33,7 +33,6 @@
 #include "log.h"
 #include "zlog.h"
 #include "common.h"
-#include "actions.h"
 #include "events.h"
 #include "threads.h"
 #include "dbcache.h"
@@ -938,6 +937,58 @@ void DBupdate_host_availability(zbx_uint64_t hostid,int available,int clock, cha
 	return;
 }
 
+void	DBproxy_update_host_availability(zbx_uint64_t hostid, int available, int clock)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		disable_until;
+
+	zabbix_log(LOG_LEVEL_DEBUG,"In DBproxy_update_host_availability()");
+
+	result = DBselect("select available,disable_until from hosts where hostid=" ZBX_FS_UI64,
+			hostid);
+
+	if (NULL == (row = DBfetch(result))) {
+		zabbix_log(LOG_LEVEL_ERR, "Cannot select host with hostid [" ZBX_FS_UI64 "]",
+				hostid);
+		zabbix_syslog("Cannot select host with hostid [" ZBX_FS_UI64 "]",
+				hostid);
+		goto out;
+	}
+
+	disable_until = atoi(row[1]);
+
+	if (available == atoi(row[0])) {
+		zabbix_log(LOG_LEVEL_DEBUG, "Host already has availability [%d]",
+				available);
+		goto out;
+	}
+
+	switch (available) {
+	case HOST_AVAILABLE_TRUE:
+		DBexecute("update hosts set available=%d,errors_from=0 where hostid=" ZBX_FS_UI64,
+				HOST_AVAILABLE_TRUE,
+				hostid);
+		break;
+	case HOST_AVAILABLE_FALSE:
+		DBexecute("update hosts set available=%d where hostid=" ZBX_FS_UI64,
+				HOST_AVAILABLE_FALSE,
+				hostid);
+		break;
+	default:
+		zabbix_log( LOG_LEVEL_ERR, "Unknown host availability [%d] for hostid [" ZBX_FS_UI64 "]",
+				available,
+				hostid);
+	}
+
+out:
+	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG,"End of DBproxy_update_host_availability()");
+
+	return;
+}
+
 int	DBupdate_item_status_to_notsupported(zbx_uint64_t itemid, const char *error)
 {
 	char	error_esc[MAX_STRING_LEN];
@@ -961,6 +1012,22 @@ int	DBupdate_item_status_to_notsupported(zbx_uint64_t itemid, const char *error)
 		ITEM_STATUS_NOTSUPPORTED,
 		CONFIG_REFRESH_UNSUPPORTED+now,
 		error_esc,
+		itemid);
+
+	return SUCCEED;
+}
+
+int	DBproxy_update_item_status_to_notsupported(zbx_uint64_t itemid)
+{
+	int	now;
+
+	zabbix_log(LOG_LEVEL_DEBUG,"In DBproxy_update_item_status_to_notsupported()");
+
+	now = time(NULL);
+
+	DBexecute("update items set status=%d,nextcheck=%d where itemid=" ZBX_FS_UI64,
+		ITEM_STATUS_NOTSUPPORTED,
+		CONFIG_REFRESH_UNSUPPORTED+now,
 		itemid);
 
 	return SUCCEED;
