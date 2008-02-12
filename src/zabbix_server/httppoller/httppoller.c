@@ -20,10 +20,8 @@
 #include "common.h"
 
 #include "cfg.h"
-#include "pid.h"
 #include "db.h"
 #include "log.h"
-#include "zlog.h"
 
 #include "../functions.h"
 #include "../expression.h"
@@ -32,7 +30,7 @@
 
 #include "daemon.h"
 
-int	httppoller_num;
+int httppoller_num;
 
 /******************************************************************************
  *                                                                            *
@@ -56,11 +54,11 @@ static int get_minnextcheck(int now)
 
 	int		res;
 
-	result = DBselect("select count(*),min(nextcheck) from httptest t where t.status=%d and " ZBX_SQL_MOD(t.httptestid,%d) "=%d and " ZBX_COND_NODEID,
+	result = DBselect("select count(*),min(nextcheck) from httptest t where t.status=%d and " ZBX_SQL_MOD(t.httptestid,%d) "=%d" DB_NODE,
 		HTTPTEST_STATUS_MONITORED,
 		CONFIG_HTTPPOLLER_FORKS,
 		httppoller_num-1,
-		LOCAL_NODE("t.httptestid"));
+		DBnode_local("t.httptestid"));
 
 	row=DBfetch(result);
 
@@ -100,7 +98,7 @@ static int get_minnextcheck(int now)
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-void main_httppoller_loop(int num)
+void main_httppoller_loop(zbx_process_t p, int num)
 {
 	int	now;
 	int	nextcheck,sleeptime;
@@ -117,7 +115,7 @@ void main_httppoller_loop(int num)
 		zbx_setproctitle("http poller [getting values]");
 
 		now=time(NULL);
-		process_httptests(now);
+		process_httptests(p, now);
 
 		zabbix_log( LOG_LEVEL_DEBUG, "Spent %d seconds while processing HTTP tests",
 			(int)time(NULL)-now);
