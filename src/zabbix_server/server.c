@@ -1164,9 +1164,10 @@ int MAIN_ZABBIX_ENTRY(void)
 			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
 			+ CONFIG_NODEWATCHER_FORKS)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Node watcher. Node ID:%d]",
+		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [Node watcher. Node ID:%d]",
 				server_num,
 				CONFIG_NODEID);
+
 		main_nodewatcher_loop();
 	}
 	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS

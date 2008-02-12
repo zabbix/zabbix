@@ -211,17 +211,18 @@ void	process_history_table_data(ZBX_TABLE *table, int master_nodeid, int nodeid)
 
 		zbx_snprintf_alloc(&tmp, &tmp_allocated, &tmp_offset, 1024, " from %s where"
 			" (itemid>"ZBX_FS_UI64" or (itemid="ZBX_FS_UI64" and clock>%d)) and clock<%d"
-			" and"ZBX_COND_NODEID"order by itemid,clock",
+			DB_NODE " order by itemid,clock",
 			table->table,
 			lastid, lastid, lastclock, clock,
-			ZBX_NODE("itemid", nodeid));
+			DBnode("itemid", nodeid));
 	} else { /* ZBX_HISTORY */
 		zbx_snprintf_alloc(&tmp, &tmp_allocated, &tmp_offset, 1024, " from %s where %s>"ZBX_FS_UI64
-			" and"ZBX_COND_NODEID"order by %2$s",
+			DB_NODE " order by %s",
 			table->table,
 			table->recid,
 			lastid,
-			ZBX_NODE(table->recid, nodeid));
+			DBnode(table->recid, nodeid),
+			table->recid);
 	}
 
 	result = DBselectN(tmp, 10000);
