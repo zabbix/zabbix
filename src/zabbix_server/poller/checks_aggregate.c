@@ -18,6 +18,8 @@
 **/
 
 #include "common.h"
+#include "log.h"
+
 #include "checks_aggregate.h"
 
 static	int	evaluate_one(double *result, int *num, char *grpfunc, char const *value_str, int valuetype)
@@ -111,12 +113,14 @@ static int	evaluate_aggregate(AGENT_RESULT *res,char *grpfunc, char *hostgroup, 
 	DBescape_string(hostgroup,hostgroup_esc,MAX_STRING_LEN);
 /* Get list of affected item IDs */
 	strscpy(items,"0");
-	result = DBselect("select itemid from items i,hosts_groups hg,hosts h,groups g where hg.groupid=g.groupid and i.hostid=h.hostid and hg.hostid=h.hostid and g.name='%s' and i.key_='%s' and i.status=%d and h.status=%d and" ZBX_COND_NODEID,
+	result = DBselect("select i.itemid from items i,hosts_groups hg,hosts h,groups g"
+			" where hg.groupid=g.groupid and i.hostid=h.hostid and hg.hostid=h.hostid"
+			" and g.name='%s' and i.key_='%s' and i.status=%d and h.status=%d" DB_NODE,
 		hostgroup_esc,
 		itemkey_esc,
 		ITEM_STATUS_ACTIVE,
 		HOST_STATUS_MONITORED,
-		LOCAL_NODE("h.hostid"));
+		DBnode_local("h.hostid"));
 
 	while((row=DBfetch(result)))
 	{

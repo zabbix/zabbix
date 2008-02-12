@@ -20,12 +20,8 @@
 #ifndef ZABBIX_CHECKS_AGENT_H
 #define ZABBIX_CHECKS_AGENT_H
 
-#include "common.h"
 #include "db.h"
-#include "log.h"
 #include "sysinfo.h"
-
-extern  int     CONFIG_NOTIMEWAIT;
 
 extern	int	get_value_agent(DB_ITEM *item, AGENT_RESULT *result);
 

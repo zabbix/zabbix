@@ -20,13 +20,7 @@
 #ifndef ZABBIX_CHECKS_EXTERNAL_H
 #define ZABBIX_CHECKS_EXTERNAL_H
 
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-#include "common.h"
 #include "db.h"
-#include "log.h"
 #include "sysinfo.h"
 
 extern  char	*CONFIG_EXTERNALSCRIPTS;
