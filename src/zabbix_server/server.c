@@ -1125,8 +1125,9 @@ int MAIN_ZABBIX_ENTRY(void)
 	}
 	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Alerter]",
-			server_num);
+		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [Alerter]",
+				server_num);
+
 		main_alerter_loop();
 	}
 	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS
@@ -1188,7 +1189,7 @@ int MAIN_ZABBIX_ENTRY(void)
 		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Discoverer. SNMP:"SNMP_FEATURE_STATUS"]",
 				server_num);
 
-		main_discoverer_loop(ZBX_PROCESS_SERVER, server_num - CONFIG_POLLER_FORKS - CONFIG_TRAPPERD_FORKS
+		main_discoverer_loop(server_num - CONFIG_POLLER_FORKS - CONFIG_TRAPPERD_FORKS
 				- CONFIG_PINGER_FORKS - CONFIG_ALERTER_FORKS - CONFIG_HOUSEKEEPER_FORKS - CONFIG_TIMER_FORKS
 				- CONFIG_UNREACHABLE_POLLER_FORKS - CONFIG_NODEWATCHER_FORKS - CONFIG_HTTPPOLLER_FORKS);
 	}
