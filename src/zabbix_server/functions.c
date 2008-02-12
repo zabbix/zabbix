@@ -290,15 +290,16 @@ int	process_data(zbx_sock_t *sock,char *server,char *key,char *value,char *lastl
 	DBescape_string(server, server_esc, MAX_STRING_LEN);
 	DBescape_string(key, key_esc, MAX_STRING_LEN);
 
-	result = DBselect("select %s where h.status=%d and h.hostid=i.hostid and h.host='%s' and i.key_='%s' and i.status in (%d,%d) and i.type in (%d,%d) and" ZBX_COND_NODEID,
-		ZBX_SQL_ITEM_SELECT,
-		HOST_STATUS_MONITORED,
-		server_esc,
-		key_esc,
-		ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
-		ITEM_TYPE_TRAPPER,
-		ITEM_TYPE_ZABBIX_ACTIVE,
-		LOCAL_NODE("h.hostid"));
+	result = DBselect("select %s where h.status=%d and h.hostid=i.hostid and h.host='%s' and i.key_='%s'"
+			" and i.status in (%d,%d) and i.type in (%d,%d)" DB_NODE,
+			ZBX_SQL_ITEM_SELECT,
+			HOST_STATUS_MONITORED,
+			server_esc,
+			key_esc,
+			ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
+			ITEM_TYPE_TRAPPER,
+			ITEM_TYPE_ZABBIX_ACTIVE,
+			DBnode_local("h.hostid"));
 
 	row=DBfetch(result);
 
@@ -813,4 +814,168 @@ void	process_new_value(DB_ITEM *item, AGENT_RESULT *value)
 	add_history(item, value, now);
 	update_item(item, value, now);
 	update_functions( item );
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: proxy_add_history                                                *
+ *                                                                            *
+ * Purpose: add new value to history                                          *
+ *                                                                            *
+ * Parameters: item - item data                                               *
+ *             value - new value of the item                                  *
+ *             now   - new value of the item                                  *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	proxy_add_history(DB_ITEM *item, AGENT_RESULT *value, int now)
+{
+	int ret = SUCCEED;
+
+	zabbix_log( LOG_LEVEL_DEBUG, "In proxy_add_history(key:%s,value_type:%X,type:%X)",
+		item->key,
+		item->value_type,
+		value->type);
+
+	if (value->type & AR_UINT64)
+		zabbix_log( LOG_LEVEL_DEBUG, "In proxy_add_history(itemid:" ZBX_FS_UI64 ",UINT64:" ZBX_FS_UI64 ")",
+			item->itemid,
+			value->ui64);
+	if (value->type & AR_STRING)
+		zabbix_log( LOG_LEVEL_DEBUG, "In proxy_add_history(itemid:" ZBX_FS_UI64 ",STRING:%s)",
+			item->itemid,
+			value->str);
+	if (value->type & AR_DOUBLE)
+		zabbix_log( LOG_LEVEL_DEBUG, "In proxy_add_history(itemid:" ZBX_FS_UI64 ",DOUBLE:" ZBX_FS_DBL ")",
+			item->itemid,
+			value->dbl);
+	if (value->type & AR_TEXT)
+		zabbix_log( LOG_LEVEL_DEBUG, "In proxy_add_history(itemid:" ZBX_FS_UI64 ",TEXT:[%s])",
+			item->itemid,
+			value->text);
+
+	if(item->value_type==ITEM_VALUE_TYPE_UINT64)
+	{
+		if(GET_UI64_RESULT(value))
+			DBadd_history_uint(item->itemid,value->ui64,now);
+	}
+	else if(item->value_type==ITEM_VALUE_TYPE_FLOAT)
+	{
+		if(GET_DBL_RESULT(value))
+			DBadd_history(item->itemid,value->dbl,now);
+	}
+	else if(item->value_type==ITEM_VALUE_TYPE_STR)
+	{
+		if(GET_STR_RESULT(value))
+			DBadd_history_str(item->itemid,value->str,now);
+	}
+	else if(item->value_type==ITEM_VALUE_TYPE_LOG)
+	{
+		if(GET_STR_RESULT(value))
+			DBadd_history_log(0, item->itemid,value->str,now,item->timestamp,item->eventlog_source,item->eventlog_severity);
+	}
+	else if(item->value_type==ITEM_VALUE_TYPE_TEXT)
+	{
+		if(GET_TEXT_RESULT(value))
+			DBadd_history_text(item->itemid,value->text,now);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Unknown value type [%d] for itemid [" ZBX_FS_UI64 "]",
+			item->value_type,
+			item->itemid);
+	}
+
+	zabbix_log( LOG_LEVEL_DEBUG, "End of proxy_add_history");
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: proxy_update_item                                                *
+ *                                                                            *
+ * Purpose: update item info after new value is received                      *
+ *                                                                            *
+ * Parameters: item - item data                                               *
+ *             value - new value of the item                                  *
+ *             now   - current timestamp                                      * 
+ *                                                                            *
+ * Author: Alexei Vladishev, Eugene Grigorjev                                 *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	proxy_update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
+{
+	zabbix_log( LOG_LEVEL_DEBUG, "In proxy_update_item()");
+
+	if (item->value_type == ITEM_VALUE_TYPE_LOG) {
+		DBexecute("update items set nextcheck=%d,lastlogsize=%d where itemid=" ZBX_FS_UI64,
+			calculate_item_nextcheck(item->itemid, item->type, item->delay, item->delay_flex, now),
+			item->lastlogsize,
+			item->itemid);
+	} else {
+		DBexecute("update items set nextcheck=%d where itemid=" ZBX_FS_UI64,
+			calculate_item_nextcheck(item->itemid, item->type, item->delay, item->delay_flex, now),
+			item->itemid);
+	}
+
+	item->prevvalue_str	= item->lastvalue_str;
+	item->prevvalue_dbl	= item->lastvalue_dbl;
+	item->prevvalue_uint64	= item->lastvalue_uint64;
+	item->prevvalue_null	= item->lastvalue_null;
+
+	item->lastvalue_uint64	= value->ui64;
+	item->lastvalue_dbl	= value->dbl;
+	item->lastvalue_str	= value->str;
+	item->lastvalue_null	= 0;
+
+	if (item->status == ITEM_STATUS_NOTSUPPORTED) {
+		zabbix_log( LOG_LEVEL_WARNING, "Parameter [%s] became supported by agent on host [%s]",
+			item->key,
+			item->host_name);
+		zabbix_syslog("Parameter [%s] became supported by agent on host [%s]",
+			item->key,
+			item->host_name);
+		item->status = ITEM_STATUS_ACTIVE;
+		DBexecute("update items set status=%d where itemid=" ZBX_FS_UI64,
+			ITEM_STATUS_ACTIVE,
+			item->itemid);
+	}
+
+	/* Required for nodata() */
+	item->lastclock = now;
+
+	zabbix_log( LOG_LEVEL_DEBUG, "End proxy_update_item()");
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: proxy_process_new_value                                          *
+ *                                                                            *
+ * Purpose: process new item value                                            *
+ *                                                                            *
+ * Parameters: item - item data                                               *
+ *             value - new value of the item                                  *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments: for trapper poller process                                       *
+ *                                                                            *
+ ******************************************************************************/
+void	proxy_process_new_value(DB_ITEM *item, AGENT_RESULT *value)
+{
+	time_t 	now;
+
+	zabbix_log( LOG_LEVEL_DEBUG, "In proxy_process_new_value(%s)",
+		item->key);
+
+	now = time(NULL);
+
+	proxy_add_history(item, value, now);
+	proxy_update_item(item, value, now);
 }
