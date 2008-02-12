@@ -204,9 +204,9 @@ int	send_proxyconfig(zbx_sock_t *sock, struct zbx_json_parse *jp)
 		return res;
 
 	DBescape_string(hostname, host_esc, MAX_STRING_LEN);
-	result = DBselect("select proxyid from proxies where name='%s' and"ZBX_COND_NODEID,
+	result = DBselect("select proxyid from proxies where name='%s'" DB_NODE,
 		host_esc,
-		LOCAL_NODE("proxyid"));
+		DBnode_local("proxyid"));
 
 	if (NULL != (row = DBfetch(result))) {
 		ZBX_STR2UINT64(proxyid, row[0]);

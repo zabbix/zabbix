@@ -41,6 +41,8 @@
 
 #include "daemon.h"
 
+static zbx_process_t	zbx_process;
+
 static int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 {
 	char	*line,*host;
@@ -137,7 +139,7 @@ static int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 		{
 			if (NULL != (p = zbx_json_pair_by_name(&jp, "request"))
 					&& NULL != zbx_json_decodevalue(p, value, sizeof(value))) {
-				if (0 == strcmp(value, "ZBX_PROXY_CONFIG"))
+				if (0 == strcmp(value, "ZBX_PROXY_CONFIG") && zbx_process == ZBX_PROCESS_SERVER)
 					send_proxyconfig(sock, &jp);
 			}
 			return ret;
@@ -225,16 +227,15 @@ void	process_trapper_child(zbx_sock_t *sock)
 		(double)(tv.tv_usec-msec)/1000000 );*/
 }
 
-void	child_trapper_main(int i, zbx_sock_t *s)
+void	child_trapper_main(zbx_process_t p, zbx_sock_t *s)
 {
 	zabbix_log( LOG_LEVEL_DEBUG, "In child_trapper_main()");
 
-	zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Trapper]", i);
+	zbx_process = p;
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-	for(;;)
-	{
+	for (;;) {
 		zbx_setproctitle("waiting for connection");
 		zbx_tcp_accept(s);
 
