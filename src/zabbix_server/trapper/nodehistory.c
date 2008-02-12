@@ -24,7 +24,6 @@
 #include "common.h"
 #include "db.h"
 #include "log.h"
-#include "zlog.h"
 
 #include "../events.h"
 #include "../nodewatcher/nodecomms.h"
@@ -88,10 +87,10 @@ int	send_history_last_id(zbx_sock_t *sock, const char *data)
 
 	tmp_offset= 0;
 	zbx_snprintf_alloc(&tmp, &tmp_allocated, &tmp_offset, 256, "select MAX(%s) "
-		"from %s where"ZBX_COND_NODEID,
+		"from %s where 1=1" DB_NODE,
 		fieldname,
 		tablename,
-		ZBX_NODE(fieldname, nodeid));
+		DBnode(fieldname, nodeid));
 
 	tmp_offset= 0;
 	result = DBselect("%s", tmp);
@@ -178,9 +177,9 @@ int	send_trends_last_id(zbx_sock_t *sock, const char *data)
 
 	tmp_offset= 0;
 	zbx_snprintf_alloc(&tmp, &tmp_allocated, &tmp_offset, 256, "select itemid,clock "
-		"from %s where"ZBX_COND_NODEID"order by itemid desc,clock desc",
+		"from %s where 1=1" DB_NODE " order by itemid desc,clock desc",
 		tablename,
-		ZBX_NODE("itemid", nodeid));
+		DBnode("itemid", nodeid));
 
 	tmp_offset= 0;
 	result = DBselectN(tmp, 1);

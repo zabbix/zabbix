@@ -20,12 +20,9 @@
 #ifndef ZABBIX_TRAPPER_H
 #define ZABBIX_TRAPPER_H
 
-extern	int	server_num;
+#include "common.h"
+#include "comms.h"
 
-extern	int	CONFIG_TIMEOUT;
-
-extern	void	signal_handler( int sig );
-
-void	child_trapper_main(int i, zbx_sock_t *s);
+void	child_trapper_main(zbx_process_t p, zbx_sock_t *s);
 
 #endif
