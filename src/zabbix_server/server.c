@@ -1104,13 +1104,12 @@ int MAIN_ZABBIX_ENTRY(void)
 	{
 #ifdef HAVE_SNMP
 		init_snmp("zabbix_server");
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Poller. SNMP:ON]",
-			server_num);
-#else
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Poller. SNMP:OFF]",
-			server_num);
-#endif
-		main_poller_loop(ZBX_POLLER_TYPE_NORMAL, server_num);
+#endif /* HAVE_SNMP */
+
+		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [Poller. SNMP:"SNMP_FEATURE_STATUS"]",
+				server_num);
+
+		main_poller_loop(ZBX_PROCESS_SERVER, ZBX_POLLER_TYPE_NORMAL, server_num);
 	}
 	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS)
 	{
@@ -1138,27 +1137,26 @@ int MAIN_ZABBIX_ENTRY(void)
 		main_housekeeper_loop();
 	}
 	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS
-			+CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS)
+			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Timer]",
-			server_num);
+		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [Timer]",
+				server_num);
+
 		main_timer_loop();
 	}
 	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS
-			+CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS)
+			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS)
 	{
-/*		zabbix_log( LOG_LEVEL_WARNING, "%d<=%d",server_num,  CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS+CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS); */
 #ifdef HAVE_SNMP
 		init_snmp("zabbix_server");
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Poller for unreachable hosts. SNMP:ON]",
-			server_num);
-#else
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Poller for unreachable hosts. SNMP:OFF]",
-			server_num);
-#endif
-/*		zabbix_log( LOG_LEVEL_WARNING, "Before main_poller_loop(%d,%d)",ZBX_POLLER_TYPE_UNREACHABLE,server_num - (CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS +CONFIG_ALERTER_FORKS+CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS)); */
-		main_poller_loop(ZBX_POLLER_TYPE_UNREACHABLE,
-				server_num - (CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS+CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS));
+#endif /* HAVE_SNMP */
+
+		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [Poller for unreachable hosts. SNMP:"SNMP_FEATURE_STATUS"]",
+				server_num);
+
+		main_poller_loop(ZBX_PROCESS_SERVER, ZBX_POLLER_TYPE_UNREACHABLE, server_num - (CONFIG_POLLER_FORKS
+				+ CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS
+				+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS));
 	}
 	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS
 			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
