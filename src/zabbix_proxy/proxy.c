@@ -45,8 +45,7 @@
 #include "../zabbix_server/httppoller/httppoller.h"
 #include "housekeeper/housekeeper.h"
 #include "../zabbix_server/pinger/pinger.h"
-#include "poller/poller.h"
-#include "poller/checks_snmp.h"
+#include "../zabbix_server/poller/poller.h"
 #include "../zabbix_server/trapper/trapper.h"
 #include "proxyconfig/proxyconfig.h"
 
@@ -483,10 +482,11 @@ int MAIN_ZABBIX_ENTRY(void)
 #ifdef HAVE_SNMP
 		init_snmp("zabbix_server");
 #endif /* HAVE_SNMP */
-		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [Poller. SNMP:%s]",
-			server_num,
-			SNMP_FEATURE_STATUS);
-		main_poller_loop(ZBX_POLLER_TYPE_NORMAL, server_num);
+
+		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [Poller. SNMP:"SNMP_FEATURE_STATUS"]",
+				server_num);
+
+		main_poller_loop(ZBX_PROCESS_PROXY, ZBX_POLLER_TYPE_NORMAL, server_num);
 	}
 	else if (server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS)
 	{
@@ -509,15 +509,16 @@ int MAIN_ZABBIX_ENTRY(void)
 		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Housekeeper]",
 			server_num);
 		main_housekeeper_loop();
-	} else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS
-			+CONFIG_HOUSEKEEPER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS)
+	}
+	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS
+			+ CONFIG_UNREACHABLE_POLLER_FORKS)
 	{
 #ifdef HAVE_SNMP
 		init_snmp("zabbix_server");
 #endif /* HAVE_SNMP */
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Poller for unreachable hosts. SNMP:%s]",
-			server_num,
-			SNMP_FEATURE_STATUS);
+
+		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [Poller for unreachable hosts. SNMP:"SNMP_FEATURE_STATUS"]",
+				server_num);
 
 		main_poller_loop(ZBX_POLLER_TYPE_UNREACHABLE, server_num - (CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS
 				+ CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS));

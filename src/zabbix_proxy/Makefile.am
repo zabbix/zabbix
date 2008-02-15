@@ -7,7 +7,7 @@ SUBDIRS = \
 	../zabbix_server/httppoller \
 	proxyconfig \
 	../zabbix_server/pinger \
-	poller \
+	../zabbix_server/poller \
 	../zabbix_server/trapper
 
 sbin_PROGRAMS = zabbix_proxy
@@ -28,7 +28,7 @@ zabbix_proxy_LDADD = \
 	$(top_srcdir)/src/zabbix_server/httppoller/libzbxhttppoller.a \
 	proxyconfig/libzbxproxyconfig.a \
 	$(top_srcdir)/src/zabbix_server/pinger/libzbxpinger.a \
-	poller/libzbxpoller.a \
+	$(top_srcdir)/src/zabbix_server/poller/libzbxpoller.a \
 	$(top_srcdir)/src/zabbix_server/trapper/libzbxtrapper.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspecsysinfo.a \
