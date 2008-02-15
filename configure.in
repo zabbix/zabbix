@@ -1072,7 +1072,6 @@ AC_OUTPUT([
 	src/zabbix_server/utils/Makefile
 	src/zabbix_server/watchdog/Makefile
 	src/zabbix_proxy/Makefile
-	src/zabbix_proxy/dbsyncer/Makefile
 	src/zabbix_proxy/discoverer/Makefile
 	src/zabbix_proxy/housekeeper/Makefile
 	src/zabbix_proxy/httppoller/Makefile

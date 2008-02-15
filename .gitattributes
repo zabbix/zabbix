@@ -178,9 +178,6 @@ src/libs/zbxjson/json.c -text
 src/libs/zbxsysinfo/freebsd/boottime.c -text
 src/libs/zbxsysinfo/openbsd/boottime.c -text
 src/zabbix_proxy/Makefile.am -text
-src/zabbix_proxy/dbsyncer/Makefile.am -text
-src/zabbix_proxy/dbsyncer/dbsyncer.c -text
-src/zabbix_proxy/dbsyncer/dbsyncer.h -text
 src/zabbix_proxy/discoverer/Makefile.am -text
 src/zabbix_proxy/discoverer/discoverer.c -text
 src/zabbix_proxy/discoverer/discoverer.h -text

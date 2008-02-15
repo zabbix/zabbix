@@ -40,7 +40,7 @@
 
 #include "daemon.h"
 
-#include "dbsyncer/dbsyncer.h"
+#include "../zabbix_server/dbsyncer/dbsyncer.h"
 #include "discoverer/discoverer.h"
 #include "httppoller/httppoller.h"
 #include "housekeeper/housekeeper.h"
@@ -543,12 +543,13 @@ zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Node watcher. Node ID:]",
 		main_discoverer_loop(server_num - CONFIG_POLLER_FORKS - CONFIG_TRAPPERD_FORKS -CONFIG_PINGER_FORKS
 				- CONFIG_HOUSEKEEPER_FORKS
 				- CONFIG_UNREACHABLE_POLLER_FORKS - /*CONFIG_NODEWATCHER_FORKS - */CONFIG_HTTPPOLLER_FORKS);
-	} else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS
-			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
-			+ /*CONFIG_NODEWATCHER_FORKS + */CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS + CONFIG_DBSYNCER_FORKS)
+	} else if (server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS
+			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_HTTPPOLLER_FORKS
+			+ CONFIG_DISCOVERER_FORKS + CONFIG_DBSYNCER_FORKS)
 	{
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [DB Syncer]",
+		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [DB Syncer]",
 				server_num);
+
 		main_dbsyncer_loop();
 	}
 
