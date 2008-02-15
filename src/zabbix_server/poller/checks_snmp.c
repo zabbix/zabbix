@@ -55,7 +55,6 @@ static int snmp_get_index (DB_ITEM * item, char *OID, char *value, int *idx)
 	int status;
 	int running;
 
-	unsigned char *ip;
 	int ret = NOTSUPPORTED;
 
 	zabbix_log (LOG_LEVEL_DEBUG, "In %s(oid:%s)",

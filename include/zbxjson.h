@@ -22,6 +22,19 @@
 
 #include <stdarg.h>
 
+#define	ZBX_PROTO_TAG_DATA	"data"
+#define	ZBX_PROTO_TAG_HOST	"host"
+#define	ZBX_PROTO_TAG_INFO	"info"
+#define	ZBX_PROTO_TAG_KEY	"key"
+#define	ZBX_PROTO_TAG_REQUEST	"request"
+#define	ZBX_PROTO_TAG_RESPONSE	"response"
+#define	ZBX_PROTO_TAG_VALUE	"value"
+
+#define	ZBX_PROTO_VALUE_FAILED	"failed"
+#define	ZBX_PROTO_VALUE_SUCCESS	"success"
+
+#define	ZBX_PROTO_VALUE_SENDER_DATA	"sender data"
+
 typedef enum
 {
 	ZBX_JSON_TYPE_UNKNOWN = 0,
