@@ -42,7 +42,7 @@
 
 #include "../zabbix_server/dbsyncer/dbsyncer.h"
 #include "../zabbix_server/discoverer/discoverer.h"
-#include "httppoller/httppoller.h"
+#include "../zabbix_server/httppoller/httppoller.h"
 #include "housekeeper/housekeeper.h"
 #include "../zabbix_server/pinger/pinger.h"
 #include "poller/poller.h"
@@ -518,24 +518,18 @@ int MAIN_ZABBIX_ENTRY(void)
 		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Poller for unreachable hosts. SNMP:%s]",
 			server_num,
 			SNMP_FEATURE_STATUS);
-		main_poller_loop(ZBX_POLLER_TYPE_UNREACHABLE,
-				server_num - (CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS));
-/*	} else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS
-			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
-			+ CONFIG_NODEWATCHER_FORKS)
-	{
-zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Node watcher. Node ID:]",
-				server_num);
-		main_nodewatcher_loop();*/
-	} else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS
-			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
-			+ /*CONFIG_NODEWATCHER_FORKS + */CONFIG_HTTPPOLLER_FORKS)
+
+		main_poller_loop(ZBX_POLLER_TYPE_UNREACHABLE, server_num - (CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS
+				+ CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS));
+	}
+	else if (server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS
+			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_HTTPPOLLER_FORKS)
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [HTTP Poller]",
 				server_num);
-		main_httppoller_loop(server_num - CONFIG_POLLER_FORKS - CONFIG_TRAPPERD_FORKS -CONFIG_PINGER_FORKS
-				- CONFIG_HOUSEKEEPER_FORKS
-				- CONFIG_UNREACHABLE_POLLER_FORKS/* - CONFIG_NODEWATCHER_FORKS*/);
+
+		main_httppoller_loop(server_num - CONFIG_POLLER_FORKS - CONFIG_TRAPPERD_FORKS - CONFIG_PINGER_FORKS
+				- CONFIG_HOUSEKEEPER_FORKS - CONFIG_UNREACHABLE_POLLER_FORKS);
 	}
 	else if (server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS
 			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS)
