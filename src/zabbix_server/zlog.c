@@ -65,11 +65,11 @@ void __zbx_zabbix_syslog(const char *fmt, ...)
 	/* This is made to disable writing to database for watchdog */
 	if(CONFIG_ENABLE_LOG == 0)	return;
 
-	result = DBselect("select %s where h.hostid=i.hostid and i.key_='%s' and i.value_type=%d and" ZBX_COND_NODEID,
+	result = DBselect("select %s where h.hostid=i.hostid and i.key_='%s' and i.value_type=%d" DB_NODE,
 		ZBX_SQL_ITEM_SELECT,
 		SERVER_ZABBIXLOG_KEY,
 		ITEM_VALUE_TYPE_STR,
-		LOCAL_NODE("h.hostid"));
+		DBnode_local("h.hostid"));
 
 	while((row=DBfetch(result)))
 	{

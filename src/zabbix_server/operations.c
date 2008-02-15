@@ -221,9 +221,9 @@ static void run_remote_command(char* host_name, char* command)
 		host_name,
 		command);
 
-	result = DBselect("select distinct host,ip,useip,port,dns from hosts where host='%s' and " ZBX_COND_NODEID,
+	result = DBselect("select distinct host,ip,useip,port,dns from hosts where host='%s'" DB_NODE,
 			host_name,
-			LOCAL_NODE("hostid"));
+			DBnode_local("hostid"));
 	row = DBfetch(result);
 	if(row)
 	{
@@ -377,9 +377,9 @@ void	op_run_commands(DB_EVENT *event, DB_OPERATION *operation)
 		if(alias == '\0' || command == '\0') continue;
 		if(is_group)
 		{
-			result = DBselect("select distinct h.host from hosts_groups hg,hosts h, groups g where hg.hostid=h.hostid and hg.groupid=g.groupid and g.name='%s' and" ZBX_COND_NODEID,
+			result = DBselect("select distinct h.host from hosts_groups hg,hosts h, groups g where hg.hostid=h.hostid and hg.groupid=g.groupid and g.name='%s'" DB_NODE,
 				alias,
-				LOCAL_NODE("h.hostid"));
+				DBnode_local("h.hostid"));
 			while((row=DBfetch(result)))
 			{
 				run_remote_command(row[0], command);
@@ -513,9 +513,9 @@ static zbx_uint64_t	add_discovered_host(zbx_uint64_t dhostid)
 
 		DBescape_string(host, host_esc, sizeof(host_esc));
 
-		result2 = DBselect("select hostid from hosts where ip='%s' and " ZBX_COND_NODEID,
+		result2 = DBselect("select hostid from hosts where ip='%s'" DB_NODE,
 			ip,
-			LOCAL_NODE("hostid"));
+			DBnode_local("hostid"));
 		row2 = DBfetch(result2);
 		if(!row2 || DBis_null(row2[0]) == SUCCEED)
 		{
