@@ -41,7 +41,7 @@
 #include "daemon.h"
 
 #include "../zabbix_server/dbsyncer/dbsyncer.h"
-#include "discoverer/discoverer.h"
+#include "../zabbix_server/discoverer/discoverer.h"
 #include "httppoller/httppoller.h"
 #include "housekeeper/housekeeper.h"
 #include "../zabbix_server/pinger/pinger.h"
@@ -530,22 +530,23 @@ zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Node watcher. Node ID:]",
 		main_httppoller_loop(server_num - CONFIG_POLLER_FORKS - CONFIG_TRAPPERD_FORKS -CONFIG_PINGER_FORKS
 				- CONFIG_HOUSEKEEPER_FORKS
 				- CONFIG_UNREACHABLE_POLLER_FORKS/* - CONFIG_NODEWATCHER_FORKS*/);
-	} else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS
-			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
-			/*+ CONFIG_NODEWATCHER_FORKS */+ CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS)
+	}
+	else if (server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS
+			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS)
 	{
 #ifdef HAVE_SNMP
 		init_snmp("zabbix_server");
 #endif /* HAVE_SNMP */
-		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Discoverer. SNMP:%s]",
-			server_num,
-			SNMP_FEATURE_STATUS);
-		main_discoverer_loop(server_num - CONFIG_POLLER_FORKS - CONFIG_TRAPPERD_FORKS -CONFIG_PINGER_FORKS
-				- CONFIG_HOUSEKEEPER_FORKS
-				- CONFIG_UNREACHABLE_POLLER_FORKS - /*CONFIG_NODEWATCHER_FORKS - */CONFIG_HTTPPOLLER_FORKS);
-	} else if (server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS
-			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_HTTPPOLLER_FORKS
-			+ CONFIG_DISCOVERER_FORKS + CONFIG_DBSYNCER_FORKS)
+
+		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Discoverer. SNMP:"SNMP_FEATURE_STATUS"]",
+				server_num);
+
+		main_discoverer_loop(server_num - CONFIG_POLLER_FORKS - CONFIG_TRAPPERD_FORKS - CONFIG_PINGER_FORKS
+				- CONFIG_HOUSEKEEPER_FORKS - CONFIG_UNREACHABLE_POLLER_FORKS - CONFIG_HTTPPOLLER_FORKS);
+	}
+	else if (server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS
+			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS
+			+ CONFIG_DBSYNCER_FORKS)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [DB Syncer]",
 				server_num);

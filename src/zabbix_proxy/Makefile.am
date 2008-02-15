@@ -2,7 +2,7 @@
 
 SUBDIRS = \
 	../zabbix_server/dbsyncer \
-	discoverer \
+	../zabbix_server/discoverer \
 	housekeeper \
 	httppoller \
 	proxyconfig \
@@ -23,7 +23,7 @@ zabbix_proxy_SOURCES = \
 
 zabbix_proxy_LDADD = \
 	$(top_srcdir)/src/zabbix_server/dbsyncer/libzbxdbsyncer.a \
-	discoverer/libzbxdiscoverer.a \
+	$(top_srcdir)/src/zabbix_server/discoverer/libzbxdiscoverer.a \
 	housekeeper/libzbxhousekeeper.a \
 	httppoller/libzbxhttppoller.a \
 	proxyconfig/libzbxproxyconfig.a \
