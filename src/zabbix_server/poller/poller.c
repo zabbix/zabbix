@@ -124,8 +124,8 @@ static int get_minnextcheck(int now)
 		result = DBselect("select count(*),min(nextcheck) as nextcheck from items i,hosts h"
 				" where " ZBX_SQL_MOD(h.hostid,%d) "=%d and i.nextcheck<=%d and i.status in (%d)"
 				" and i.type not in (%d,%d,%d) and h.status=%d and h.disable_until<=%d"
-				" and h.errors_from!=0 and h.hostid=i.hostid and i.key_ not in ('%s','%s','%s','%s')"
-				DB_NODE " order by nextcheck",
+				" and h.errors_from!=0 and h.hostid=i.hostid and h.proxyid=0"
+				" and i.key_ not in ('%s','%s','%s','%s')" DB_NODE " order by nextcheck",
 			CONFIG_UNREACHABLE_POLLER_FORKS,
 			poller_num-1,
 			now,
@@ -142,7 +142,7 @@ static int get_minnextcheck(int now)
 		{
 			result = DBselect("select count(*),min(nextcheck) from items i,hosts h"
 					" where h.status=%d and h.disable_until<%d and h.errors_from=0"
-					" and h.hostid=i.hostid and i.status in (%d,%d) and i.type not in (%d,%d,%d)"
+					" and h.hostid=i.hostid and h.proxyid=0 and i.status in (%d,%d) and i.type not in (%d,%d,%d)"
 					" and " ZBX_SQL_MOD(i.itemid,%d) "=%d and i.key_ not in ('%s','%s','%s','%s')" DB_NODE,
 				HOST_STATUS_MONITORED,
 				now,
@@ -157,7 +157,7 @@ static int get_minnextcheck(int now)
 		{
 			result = DBselect("select count(*),min(nextcheck) from items i,hosts h"
 					" where h.status=%d and h.disable_until<%d and h.errors_from=0"
-					" and h.hostid=i.hostid and i.status in (%d) and i.type not in (%d,%d,%d)"
+					" and h.hostid=i.hostid and h.proxyid=0 and i.status in (%d) and i.type not in (%d,%d,%d)"
 					" and " ZBX_SQL_MOD(i.itemid,%d) "=%d and i.key_ not in ('%s','%s','%s','%s')" DB_NODE,
 				HOST_STATUS_MONITORED,
 				now,
