@@ -1090,7 +1090,7 @@ int MAIN_ZABBIX_ENTRY(void)
 
 /*	zabbix_log( LOG_LEVEL_WARNING, "zabbix_server #%d started",server_num); */
 	/* Main process */
-	if(server_num == 0)
+	if (server_num == 0)
 	{
 		init_main_process();
 		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Watchdog]",
@@ -1100,7 +1100,7 @@ int MAIN_ZABBIX_ENTRY(void)
 	}
 
 
-	if(server_num <= CONFIG_POLLER_FORKS)
+	if (server_num <= CONFIG_POLLER_FORKS)
 	{
 #ifdef HAVE_SNMP
 		init_snmp("zabbix_server");
@@ -1111,7 +1111,7 @@ int MAIN_ZABBIX_ENTRY(void)
 
 		main_poller_loop(ZBX_PROCESS_SERVER, ZBX_POLLER_TYPE_NORMAL, server_num);
 	}
-	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS)
+	else if (server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [Trapper]",
 				server_num);
@@ -1122,21 +1122,21 @@ int MAIN_ZABBIX_ENTRY(void)
 /*		threads[i] = child_trapper_make(i, listenfd, addrlen); */
 /*		child_trapper_make(server_num, listenfd, addrlen); */
 	}
-	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS)
+	else if (server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [ICMP pinger]",
 				server_num);
 
 		main_pinger_loop(ZBX_PROCESS_SERVER, server_num - (CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS));
 	}
-	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS)
+	else if (server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [Alerter]",
 				server_num);
 
 		main_alerter_loop();
 	}
-	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS
+	else if (server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS
 			+ CONFIG_HOUSEKEEPER_FORKS)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [Housekeeper]",
@@ -1144,7 +1144,7 @@ int MAIN_ZABBIX_ENTRY(void)
 
 		main_housekeeper_loop();
 	}
-	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS
+	else if (server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS
 			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [Timer]",
@@ -1152,7 +1152,7 @@ int MAIN_ZABBIX_ENTRY(void)
 
 		main_timer_loop();
 	}
-	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS
+	else if (server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS
 			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS)
 	{
 #ifdef HAVE_SNMP
@@ -1166,7 +1166,7 @@ int MAIN_ZABBIX_ENTRY(void)
 				+ CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS
 				+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS));
 	}
-	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS
+	else if (server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS
 			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
 			+ CONFIG_NODEWATCHER_FORKS)
 	{
@@ -1176,7 +1176,7 @@ int MAIN_ZABBIX_ENTRY(void)
 
 		main_nodewatcher_loop();
 	}
-	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS
+	else if (server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_ALERTER_FORKS
 			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS
 			+ CONFIG_NODEWATCHER_FORKS + CONFIG_HTTPPOLLER_FORKS)
 	{

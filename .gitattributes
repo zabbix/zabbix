@@ -221,11 +221,6 @@ src/zabbix_proxy/proxyconfig/proxyconfig.c -text
 src/zabbix_proxy/proxyconfig/proxyconfig.h -text
 src/zabbix_proxy/proxyconfig/servercomms.c -text
 src/zabbix_proxy/proxyconfig/servercomms.h -text
-src/zabbix_proxy/trapper/Makefile.am -text
-src/zabbix_proxy/trapper/active.c -text
-src/zabbix_proxy/trapper/active.h -text
-src/zabbix_proxy/trapper/trapper.c -text
-src/zabbix_proxy/trapper/trapper.h -text
 src/zabbix_proxy/zlog.c -text
 src/zabbix_server/dbsyncer/Makefile.am -text
 src/zabbix_server/dbsyncer/dbsyncer.c -text

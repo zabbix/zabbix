@@ -47,7 +47,7 @@
 #include "../zabbix_server/pinger/pinger.h"
 #include "poller/poller.h"
 #include "poller/checks_snmp.h"
-#include "trapper/trapper.h"
+#include "../zabbix_server/trapper/trapper.h"
 #include "proxyconfig/proxyconfig.h"
 
 /*
@@ -487,13 +487,19 @@ int MAIN_ZABBIX_ENTRY(void)
 			server_num,
 			SNMP_FEATURE_STATUS);
 		main_poller_loop(ZBX_POLLER_TYPE_NORMAL, server_num);
-	} else if (server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS) {
+	}
+	else if (server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [Trapper]",
+				server_num);
+
 /* Run trapper processes then do housekeeping */
-		child_trapper_main(server_num, &listen_sock);
+		child_trapper_main(ZBX_PROCESS_PROXY, &listen_sock);
 
 /*		threads[i] = child_trapper_make(i, listenfd, addrlen); */
 /*		child_trapper_make(server_num, listenfd, addrlen); */
-	} else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS)
+	}
+	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS)
 	{
 		main_pinger_loop(server_num, server_num - (CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS));
 	}
