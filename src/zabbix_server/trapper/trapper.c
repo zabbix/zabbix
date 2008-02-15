@@ -43,6 +43,145 @@
 
 static zbx_process_t	zbx_process;
 
+/******************************************************************************
+ *                                                                            *
+ * Function: send_result                                                      *
+ *                                                                            *
+ * Purpose: send json SUCCEED or FAIL to socket along with an info message    *
+ *                                                                            *
+ * Parameters: result SUCCEED or FAIL                                         *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occured                                     *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	send_result(zbx_sock_t *sock, int result, char *info)
+{
+	int	ret = SUCCEED;
+	struct	zbx_json json;
+
+	zbx_json_init(&json, 1024);
+
+	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, SUCCEED == result ? ZBX_PROTO_VALUE_SUCCESS : ZBX_PROTO_VALUE_FAILED, ZBX_JSON_TYPE_STRING);
+	if(info != NULL && info[0]!='\0')
+	{
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_INFO, info, ZBX_JSON_TYPE_STRING);
+	}
+	ret = zbx_tcp_send(sock, json.buffer);
+
+	zbx_json_free(&json);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: process_new_values                                               *
+ *                                                                            *
+ * Purpose: process values sent by active agents and senders                  *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occured                                     *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *json)
+{
+	struct zbx_json_parse   jp_data, jp_row;
+	const char		*p, *pf;
+	char			host[MAX_STRING_LEN], key[MAX_STRING_LEN], value[MAX_STRING_LEN];
+	char			info[MAX_STRING_LEN];
+	int			ret = SUCCEED;
+	int			processed_ok = 0, processed_fail = 0;
+
+	double	sec;
+
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In process_new_values(json:%.*s)",
+				json->end - json->start + 1,
+				json->start);
+
+	sec = zbx_time();
+
+/* {"request":"ZBX_SENDER_DATA","data":[{"key":"system.cpu.num",...,...},{...},...]} 
+ *                                     ^
+ */	if (NULL == (p = zbx_json_pair_by_name(json, ZBX_PROTO_TAG_DATA)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Can't find \"data\" pair");
+		ret = FAIL;
+	}
+
+	if(SUCCEED == ret)
+	{
+/* {"request":"ZBX_SENDER_DATA","data":[{"key":"system.cpu.num",...,...},{...},...]} 
+ *                                     ^------------------------------------------^
+ */		if (FAIL == (ret = zbx_json_brackets_open(p, &jp_data)))
+			zabbix_log(LOG_LEVEL_WARNING, "Can't proceed jason request. %s",
+					zbx_json_strerror());
+	}
+
+/* {"request":"ZBX_SENDER_DATA","data":[{"key":"system.cpu.num",...,...},{...},...]} 
+ *                                      ^
+ */	p = NULL;
+	while (SUCCEED == ret && NULL != (p = zbx_json_next(&jp_data, p)))
+	{
+/* {"request":"ZBX_SENDER_DATA","data":[{"key":"system.cpu.num",...,...},{...},...]} 
+ *                                      ^------------------------------^
+ */ 		if (FAIL == (ret = zbx_json_brackets_open(p, &jp_row)))
+			break;
+
+/*		zabbix_log(LOG_LEVEL_WARNING, "Next \"%.*s\"",
+				jp_row.end - jp_row.start + 1,
+				jp_row.start);*/
+
+		if (NULL == (pf = zbx_json_pair_by_name(&jp_row, ZBX_PROTO_TAG_HOST)) ||
+				NULL == (pf = zbx_json_decodevalue(pf, host, sizeof(host))))
+			continue;
+
+		if (NULL == (pf = zbx_json_pair_by_name(&jp_row, ZBX_PROTO_TAG_KEY)) ||
+				NULL == (pf = zbx_json_decodevalue(pf, key, sizeof(key))))
+			continue;
+
+		if (NULL == (pf = zbx_json_pair_by_name(&jp_row, ZBX_PROTO_TAG_VALUE)) ||
+				NULL == (pf = zbx_json_decodevalue(pf, value, sizeof(value))))
+			continue;
+
+		DBbegin();
+		if(SUCCEED == process_data(sock,host,key,value,NULL,NULL,NULL,NULL))
+		{
+			processed_ok++;
+		}
+		else
+		{
+			processed_fail++;
+		}
+		DBcommit();
+	}
+
+	zbx_snprintf(info,sizeof(info),"Processed %d Failed %d Total %d Seconds spent " ZBX_FS_DBL,
+			processed_ok,
+			processed_fail,
+			processed_ok+processed_fail,
+			(double)(zbx_time()-sec));
+
+	if(send_result(sock, ret, info) != SUCCEED)
+	{
+		zabbix_log( LOG_LEVEL_WARNING, "Error sending result back");
+		zabbix_syslog("Trapper: error sending result back");
+	}
+
+	return ret;
+}
+
 static int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 {
 	char	*line,*host;
@@ -137,10 +276,17 @@ static int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 		/* JSON protocol? */
 		else if (SUCCEED == zbx_json_open(s, &jp))
 		{
-			if (NULL != (p = zbx_json_pair_by_name(&jp, "request"))
-					&& NULL != zbx_json_decodevalue(p, value, sizeof(value))) {
+			if (NULL != (p = zbx_json_pair_by_name(&jp, ZBX_PROTO_TAG_REQUEST))
+					&& NULL != zbx_json_decodevalue(p, value, sizeof(value)))
+			{
 				if (0 == strcmp(value, "ZBX_PROXY_CONFIG") && zbx_process == ZBX_PROCESS_SERVER)
+				{
 					send_proxyconfig(sock, &jp);
+				}
+				else if (0 == strcmp(value, ZBX_PROTO_VALUE_SENDER_DATA) && zbx_process == ZBX_PROCESS_SERVER)
+				{
+					ret = process_new_values(sock, &jp);
+				}
 			}
 			return ret;
 		}
