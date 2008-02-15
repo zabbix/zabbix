@@ -24,12 +24,13 @@
 #include "cfg.h"
 #include "log.h"
 #include "zbxgetopt.h"
+#include "zbxjson.h"
 
 char *progname = NULL;
 
 char title_message[] = "ZABBIX send";
 
-char usage_message[] = "[-Vhv] {[-zps] -ko | -i <file>} [-c <file>]";
+char usage_message[] = "[-Vhv] {[-zps] -ko | [-p] -z<ZABBIX server> -i <file>} [-c <file>]";
 
 #ifdef HAVE_GETOPT_LONG
 char *help_message[] = {
@@ -135,10 +136,62 @@ typedef struct zbx_active_metric_type
 {
 	char*	server;
 	unsigned short	port;
-	char*	hostname;
-	char*	key;
-	char*	key_value;
+	struct zbx_json json;
 } ZBX_THREAD_SENDVAL_ARGS;
+
+/******************************************************************************
+ *                                                                            *
+ * Function: check_response                                                   *
+ *                                                                            *
+ * Purpose: Check if json response is SUCCEED                                 *
+ *                                                                            *
+ * Parameters: result SUCCEED or FAIL                                         *
+ *                                                                            *
+ * Return value:  SUCCEED - processed successfully                            *
+ *                FAIL - an error occured                                     *
+ *                                                                            *
+ * Author: Alexei Vladishev                                                   *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+static int	check_response(char *response)
+{
+	struct 		zbx_json_parse jp;
+	const char 	*p;
+	char		value[MAX_STRING_LEN];
+	char		info[MAX_STRING_LEN];
+
+	int	ret = SUCCEED;
+
+	ret = zbx_json_open(response, &jp);
+
+	if(SUCCEED == ret)
+	{
+		if (NULL == (p = zbx_json_pair_by_name(&jp, ZBX_PROTO_TAG_RESPONSE))
+				|| NULL == zbx_json_decodevalue(p, value, sizeof(value)))
+		{
+			ret = FAIL;
+		}
+	}
+
+	if(SUCCEED == ret)
+	{
+		if(strcmp(value, ZBX_PROTO_VALUE_SUCCESS) != 0)
+		{
+			ret = FAIL;
+		}
+	}
+
+	if (NULL != (p = zbx_json_pair_by_name(&jp, ZBX_PROTO_TAG_INFO))
+			&& NULL != zbx_json_decodevalue(p, info, sizeof(info)))
+	{
+		printf("Info from server: \"%s\"\n",
+			info);
+	}
+
+	return ret;
+}
 
 static ZBX_THREAD_ENTRY(send_value, args)
 {
@@ -156,14 +209,6 @@ static ZBX_THREAD_ENTRY(send_value, args)
 
 	sentdval_args = ((ZBX_THREAD_SENDVAL_ARGS *)args);
 
-	zabbix_log( LOG_LEVEL_DEBUG, "Send to: '%s:%i' As: '%s' Key: '%s' Value: '%s'", 
-		sentdval_args->server,
-		sentdval_args->port,
-		sentdval_args->hostname,
-		sentdval_args->key,
-		sentdval_args->key_value
-		);
-
 #if !defined(_WINDOWS)
 	signal( SIGINT,  send_signal_handler );
 	signal( SIGTERM, send_signal_handler );
@@ -172,20 +217,22 @@ static ZBX_THREAD_ENTRY(send_value, args)
 #endif /* NOT _WINDOWS */
 	
 	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, sentdval_args->server, sentdval_args->port, SENDER_TIMEOUT))) {
-		tosend = comms_create_request(sentdval_args->hostname, sentdval_args->key, sentdval_args->key_value,
+/*		tosend = comms_create_request(sentdval_args->server, sentdval_args->server, sentdval_args->server,
 			NULL, NULL, NULL, NULL);
 
-		zabbix_log( LOG_LEVEL_DEBUG, "Send data: '%s'", tosend);
+		zabbix_log( LOG_LEVEL_DEBUG, "Send data: '%s'", tosend);*/
 
-		tcp_ret = zbx_tcp_send(&sock, tosend);
+/*		tcp_ret = zbx_tcp_send(&sock, tosend); */
+		tcp_ret = zbx_tcp_send(&sock, sentdval_args->json.buffer);
 
-		zbx_free(tosend);
+/*		zbx_free(tosend);*/
 
 		if( SUCCEED == tcp_ret )
 		{
 			if( SUCCEED == (tcp_ret = zbx_tcp_recv(&sock, &answer)) )
 			{
-				if( !answer || strcmp(answer,"OK") )
+				zabbix_log( LOG_LEVEL_DEBUG, "Answer [%s]", answer);
+				if( !answer || check_response(answer) != SUCCEED )
 				{
 					zabbix_log( LOG_LEVEL_WARNING, "Incorrect answer from server [%s]", answer);
 				}
@@ -305,6 +352,12 @@ static zbx_task_t parse_commandline(int argc, char **argv)
 				break;
 		}
 
+	if(ZABBIX_SERVER == NULL)
+	{
+		usage();
+		exit(FAIL);
+	}
+
 	return task;
 }
 
@@ -313,8 +366,10 @@ int main(int argc, char **argv)
 	FILE	*in;
 
 	char	in_line[MAX_STRING_LEN],
-		*str_port,
-		*s;
+		*s,
+		*hostname,
+		*key,
+		*key_value;
 
 	int	task = ZBX_TASK_START,
 		total_count = 0,
@@ -337,51 +392,38 @@ int main(int argc, char **argv)
 		{
 			zabbix_log( LOG_LEVEL_WARNING, "Cannot open [%s] [%s]", INPUT_FILE, strerror(errno));
 			return FAIL;
-		}	
+		}
+
+		zbx_json_init(&sentdval_args.json, 8*1024);
+		zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA, ZBX_JSON_TYPE_STRING);
+		zbx_json_addarray(&sentdval_args.json, ZBX_PROTO_TAG_DATA);
 
 		while(fgets(in_line, sizeof(in_line), in) != NULL)
 		{ /* <zabbix_server> <hostname> <port> <key> <value> */
 			total_count++; /* also used as inputline */
+
 	
-			sentdval_args.server = in_line;
+			hostname = in_line;
 
-			if( !(sentdval_args.hostname = strchr(sentdval_args.server, ' ')) )
-			{
-				zabbix_log( LOG_LEVEL_WARNING, "[line %i] 'Server' required", total_count);
-				continue;
-			}
-
-			*sentdval_args.hostname = '\0';
-			sentdval_args.hostname++;
-
-			if( !(str_port = strchr(sentdval_args.hostname, ' ')) )
-			{
-				zabbix_log( LOG_LEVEL_WARNING, "[line %i] 'Server port' required", total_count);
-				continue;
-			}
-
-			*str_port = '\0';
-			str_port++;
-
-			if( !(sentdval_args.key = strchr(str_port, ' ')) )
+			if( !(key = strchr(hostname, ' ')) )
 			{
 				zabbix_log( LOG_LEVEL_WARNING, "[line %i] 'Key' required", total_count);
 				continue;
 			}
 
-			*sentdval_args.key = '\0';
-			sentdval_args.key++;
+			*key = '\0';
+			key++;
 
-			if( !(sentdval_args.key_value = strchr(sentdval_args.key, ' ')) )
+			if( !(key_value = strchr(key, ' ')) )
 			{
 				zabbix_log( LOG_LEVEL_WARNING, "[line %i] 'Key value' required", total_count);
 				continue;
 			}
 
-			*sentdval_args.key_value = '\0';
-			sentdval_args.key_value++;
+			*key_value = '\0';
+			key_value++;
 
-			for(s = sentdval_args.key_value; s && *s; s++)
+			for(s = key_value; s && *s; s++)
 			{
 				if(*s == '\r' || *s == '\n' )
 				{
@@ -391,14 +433,12 @@ int main(int argc, char **argv)
 			}
 
 			if( ZABBIX_SERVER )		sentdval_args.server	= ZABBIX_SERVER;
-			if( ZABBIX_HOSTNAME )		sentdval_args.hostname	= ZABBIX_HOSTNAME;
-			if( ZABBIX_KEY )		sentdval_args.key	= ZABBIX_KEY;
-			if( ZABBIX_KEY_VALUE )		sentdval_args.key_value	= ZABBIX_KEY_VALUE;
+			if( ZABBIX_HOSTNAME )		hostname	= ZABBIX_HOSTNAME;
+			if( ZABBIX_KEY )		key		= ZABBIX_KEY;
+			if( ZABBIX_KEY_VALUE )		key_value	= ZABBIX_KEY_VALUE;
 
 			if( ZABBIX_SERVER_PORT )
 				sentdval_args.port	= ZABBIX_SERVER_PORT;
-			else
-				sentdval_args.port	= (unsigned short)atoi(str_port);
 
 			if( MIN_ZABBIX_PORT > sentdval_args.port /* || sentdval_args.port > MAX_ZABBIX_PORT (MAX_ZABBIX_PORT == max unsigned short) */)
 			{
@@ -406,7 +446,17 @@ int main(int argc, char **argv)
 					total_count, sentdval_args.port, MIN_ZABBIX_PORT, MAX_ZABBIX_PORT);
 				continue;
 			}
-			
+			zbx_json_addobject(&sentdval_args.json, NULL);
+			zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_HOST, hostname, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_KEY, key, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_VALUE, key_value, ZBX_JSON_TYPE_STRING);
+			zbx_json_close(&sentdval_args.json);
+
+			succeed_count++;
+		}
+
+		if(succeed_count > 0)
+		{
 			if( SUCCEED == zbx_thread_wait(
 				zbx_thread_start(
 					send_value,
@@ -414,11 +464,17 @@ int main(int argc, char **argv)
 					)
 				)
 			)
-				succeed_count++;
-
+			{
+				printf("sent: %i; skipped: %i; total: %i\n", succeed_count, (total_count - succeed_count), total_count);
+			}
+			else
+			{
+				printf("Sending failed. Use option -vv for more detailed output.\n");
+			}
 		}
 
 		fclose(in);
+		zbx_json_free(&sentdval_args.json);
 	}
 	else
 	{
@@ -442,9 +498,21 @@ int main(int argc, char **argv)
 
 			sentdval_args.server	= ZABBIX_SERVER;
 			sentdval_args.port	= ZABBIX_SERVER_PORT;
-			sentdval_args.hostname	= ZABBIX_HOSTNAME;
-			sentdval_args.key	= ZABBIX_KEY;
-			sentdval_args.key_value	= ZABBIX_KEY_VALUE;
+			hostname	= ZABBIX_HOSTNAME;
+			key		= ZABBIX_KEY;
+			key_value	= ZABBIX_KEY_VALUE;
+
+			zbx_json_init(&sentdval_args.json, 8*1024);
+			zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA, ZBX_JSON_TYPE_STRING);
+			zbx_json_addarray(&sentdval_args.json, ZBX_PROTO_TAG_DATA);
+
+			zbx_json_addobject(&sentdval_args.json, NULL);
+			zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_HOST, hostname, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_KEY, key, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_VALUE, key_value, ZBX_JSON_TYPE_STRING);
+			zbx_json_close(&sentdval_args.json);
+
+			succeed_count++;
 
 			if( SUCCEED == zbx_thread_wait(
 				zbx_thread_start(
@@ -453,12 +521,18 @@ int main(int argc, char **argv)
 					)
 				)
 			)
-				succeed_count++;
+			{
+				printf("sent: %i; skipped: %i; total: %i\n", succeed_count, (total_count - succeed_count), total_count);
+			}
+			else
+			{
+				printf("Sending failed. Use option -vv for more detailed outputs.\n");
+			}
+			zbx_json_free(&sentdval_args.json);
 		}
 		while(0); /* try block simulation */
 	}
 
-	printf("sent: %i; failed: %i; total: %i\n", succeed_count, (total_count - succeed_count), total_count);
 
 	zabbix_close_log();
 
