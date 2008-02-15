@@ -189,13 +189,6 @@ src/zabbix_proxy/functions.h -text
 src/zabbix_proxy/housekeeper/Makefile.am -text
 src/zabbix_proxy/housekeeper/housekeeper.c -text
 src/zabbix_proxy/housekeeper/housekeeper.h -text
-src/zabbix_proxy/httppoller/Makefile.am -text
-src/zabbix_proxy/httppoller/httpmacro.c -text
-src/zabbix_proxy/httppoller/httpmacro.h -text
-src/zabbix_proxy/httppoller/httppoller.c -text
-src/zabbix_proxy/httppoller/httppoller.h -text
-src/zabbix_proxy/httppoller/httptest.c -text
-src/zabbix_proxy/httppoller/httptest.h -text
 src/zabbix_proxy/operations.c -text
 src/zabbix_proxy/operations.h -text
 src/zabbix_proxy/poller/Makefile.am -text
