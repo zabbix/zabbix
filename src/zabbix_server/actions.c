@@ -755,10 +755,10 @@ void	process_actions(DB_EVENT *event)
 		(event->source == EVENT_SOURCE_TRIGGERS)?"TRIGGERS":"DISCOVERY",
 		event->eventid);
 
-	result = DBselect("select actionid,evaltype,status,eventsource from actions where status=%d and eventsource=%d and" ZBX_COND_NODEID,
+	result = DBselect("select actionid,evaltype,status,eventsource from actions where status=%d and eventsource=%d" DB_NODE,
 		ACTION_STATUS_ACTIVE,
 		event->source,
-		LOCAL_NODE("actionid"));
+		DBnode_local("actionid"));
 
 	while((row=DBfetch(result)))
 	{

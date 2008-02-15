@@ -1017,8 +1017,8 @@ int MAIN_ZABBIX_ENTRY(void)
 
 	DBconnect(ZBX_DB_CONNECT_EXIT);
 
-	result = DBselect("select refresh_unsupported from config where " ZBX_COND_NODEID,
-		LOCAL_NODE("configid"));
+	result = DBselect("select refresh_unsupported from config where 1=1" DB_NODE,
+		DBnode_local("configid"));
 	row = DBfetch(result);
 
 	if( (row != NULL) && DBis_null(row[0]) != SUCCEED)

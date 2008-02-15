@@ -508,9 +508,9 @@ void    *zbx_realloc(void *src, size_t size);
 #define zbx_fclose(f) { if(f){ fclose(f); f = NULL; } }
 
 /*#define ZBX_COND_NODEID " %s>=100000000000000*%d and %s<=(100000000000000*%d+99999999999999) "*/
-#define ZBX_COND_NODEID " %s>=%d00000000000000 and %s<=%d99999999999999 "
+/*#define ZBX_COND_NODEID " %s>=%d00000000000000 and %s<=%d99999999999999 "
 #define LOCAL_NODE(fieldid) fieldid, CONFIG_NODEID, fieldid, CONFIG_NODEID
-#define ZBX_NODE(fieldid,nodeid) fieldid, nodeid, fieldid, nodeid
+#define ZBX_NODE(fieldid,nodeid) fieldid, nodeid, fieldid, nodeid*/
 
 #define MIN_ZABBIX_PORT 1024u
 #define MAX_ZABBIX_PORT 65535u
