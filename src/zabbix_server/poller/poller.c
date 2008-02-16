@@ -23,9 +23,8 @@
 #include "db.h"
 #include "sysinfo.h"
 #include "daemon.h"
+#include "zbxserver.h"
 
-#include "../functions.h"
-#include "../expression.h"
 #include "poller.h"
 
 #include "checks_agent.h"

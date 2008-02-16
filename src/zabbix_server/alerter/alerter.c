@@ -21,7 +21,6 @@
 
 #include "cfg.h"
 #include "db.h"
-#include "../functions.h"
 #include "log.h"
 #include "zlog.h"
 #include "email.h"
@@ -30,6 +29,7 @@
 #	include "jabber.h"
 #endif
 #include "daemon.h"
+#include "zbxserver.h"
 
 #include "alerter.h"
 

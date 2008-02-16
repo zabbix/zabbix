@@ -24,8 +24,8 @@
 #include "db.h"
 #include "log.h"
 #include "zlog.h"
+#include "zbxserver.h"
 
-#include "../functions.h"
 #include "httpmacro.h"
 #include "httptest.h"
 

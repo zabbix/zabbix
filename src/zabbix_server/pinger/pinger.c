@@ -21,11 +21,11 @@
 
 #include "cfg.h"
 #include "db.h"
-#include "../functions.h"
 #include "log.h"
 #include "zlog.h"
 #include "sysinfo.h"
 #include "threads.h"
+#include "zbxserver.h"
 
 #include "pinger.h"
 

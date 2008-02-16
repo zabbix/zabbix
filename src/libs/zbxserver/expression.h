@@ -18,19 +18,15 @@
 **/
 
 
-#ifndef ZABBIX_OPERATIONS_H
-#define ZABBIX_OPERATIONS_H
+#ifndef ZABBIX_EXPRESSION_H
+#define ZABBIX_EXPRESSION_H
 
 #include "common.h"
 #include "db.h"
 
-void	op_template_add(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation);
-void	op_template_del(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation);
-void	op_group_add(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation);
-void	op_group_del(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation);
-void	op_host_add(DB_EVENT *event);
-void	op_host_del(DB_EVENT *event);
-void	op_run_commands(DB_EVENT *event, DB_OPERATION *operation);
-void	op_notify_user(DB_EVENT *event, DB_ACTION *action, DB_OPERATION *operation);
+int	cmp_double(double a,double b);
+int	find_char(char *str,char c);
+int	evaluate_expression(int *result,char **expression, int triggger_value, char *error, int maxerrlen);
+void	delete_reol(char *c);
 
 #endif

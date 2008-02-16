@@ -26,9 +26,7 @@
 #include "log.h"
 #include "zlog.h"
 #include "zbxjson.h"
-
-#include "../functions.h"
-#include "../expression.h"
+#include "zbxserver.h"
 
 #include "../nodewatcher/nodecomms.h"
 #include "../nodewatcher/nodesender.h"
