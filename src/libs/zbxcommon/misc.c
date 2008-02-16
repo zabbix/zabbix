@@ -456,7 +456,7 @@ int	expand_ipv6(const char *ip, char *str, size_t str_len )
 	zbx_snprintf(str, str_len, "%04x:%04x:%04x:%04x:%04x:%04x:%04x:%04x", i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7]);
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End expand_ipv6(ip:%s,str:%s,ret:%s)", ip, str, ret == SUCCEED ? "SUCCEED" : "FAIL");
+	zabbix_log(LOG_LEVEL_DEBUG, "End expand_ipv6(ip:%s):%s", ip, ret == SUCCEED ? "SUCCEED" : "FAIL");
 
 	return ret;
 }
