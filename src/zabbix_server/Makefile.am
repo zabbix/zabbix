@@ -17,13 +17,10 @@ SUBDIRS = \
 sbin_PROGRAMS = zabbix_server
 
 zabbix_server_SOURCES = \
-	evalfunc.c evalfunc.h \
-	expression.c expression.h \
 	actions.c actions.h \
 	operations.c operations.h \
 	events.c events.h \
 	zlog.c \
-	functions.c functions.h \
 	server.c
 
 if JABBER 
@@ -60,6 +57,7 @@ zabbix_server_LDADD = \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
+	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
 	$(JABBER_LDADD) \
 	@SERVER_LIBS@
 

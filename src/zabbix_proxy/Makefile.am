@@ -8,17 +8,14 @@ SUBDIRS = \
 	proxyconfig \
 	../zabbix_server/pinger \
 	../zabbix_server/poller \
-	../zabbix_server/trapper
+	../zabbix_server/trapper \
+	../zabbix_server/nodewatcher
 
 sbin_PROGRAMS = zabbix_proxy
 
 zabbix_proxy_SOURCES = \
-	evalfunc.c evalfunc.h \
-	expression.c expression.h \
-	operations.c operations.h \
 	events.c events.h \
 	zlog.c \
-	functions.c functions.h \
 	proxy.c
 
 zabbix_proxy_LDADD = \
@@ -30,6 +27,7 @@ zabbix_proxy_LDADD = \
 	$(top_srcdir)/src/zabbix_server/pinger/libzbxpinger.a \
 	$(top_srcdir)/src/zabbix_server/poller/libzbxpoller.a \
 	$(top_srcdir)/src/zabbix_server/trapper/libzbxtrapper.a \
+	$(top_srcdir)/src/zabbix_server/nodewatcher/libzbxnodewatcher.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspecsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
@@ -45,9 +43,11 @@ zabbix_proxy_LDADD = \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
+	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
 	@PROXY_LIBS@
 
 zabbix_proxy_LDFLAGS = \
 	@PROXY_LDFLAGS@
 
-zabbix_proxy_CFLAGS = -DZABBIX_DAEMON
+zabbix_proxy_CFLAGS = \
+	-DZABBIX_DAEMON

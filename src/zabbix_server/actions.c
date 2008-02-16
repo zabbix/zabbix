@@ -41,11 +41,10 @@
 #include "common.h"
 #include "db.h"
 #include "log.h"
-#include "zlog.h"
+#include "zbxserver.h"
 
 #include "actions.h"
 #include "operations.h"
-#include "expression.h"
 
 #include "poller/poller.h"
 #include "poller/checks_agent.h"
