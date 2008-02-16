@@ -30,8 +30,9 @@
 #include <time.h>
 
 #include "common.h"
-#include "functions.h"
 #include "log.h"
+#include "zbxserver.h"
+
 #include "zlog.h"
 
 /******************************************************************************

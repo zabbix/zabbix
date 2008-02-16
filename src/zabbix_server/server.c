@@ -30,9 +30,8 @@
 #include "zbxgetopt.h"
 #include "mutexs.h"
 
-#include "functions.h"
-#include "expression.h"
 #include "sysinfo.h"
+#include "zbxserver.h"
 
 #include "daemon.h"
 

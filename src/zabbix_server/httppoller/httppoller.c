@@ -23,8 +23,6 @@
 #include "db.h"
 #include "log.h"
 
-#include "../functions.h"
-#include "../expression.h"
 #include "httptest.h"
 #include "httppoller.h"
 

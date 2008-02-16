@@ -23,15 +23,13 @@
 #include <string.h>
 #include <math.h>
 
+#include "zbxserver.h"
 #include "expression.h"
-#include "functions.h"
 #include "evalfunc.h"
 #include "common.h"
 #include "db.h"
 #include "log.h"
 #include "zlog.h"
-
-
 
 /******************************************************************************
  *                                                                            *

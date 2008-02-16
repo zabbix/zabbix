@@ -24,9 +24,9 @@
 #include "db.h"
 #include "log.h"
 #include "zlog.h"
+#include "zbxserver.h"
 
 #include "timer.h"
-#include "../functions.h"
 
 /******************************************************************************
  *                                                                            *

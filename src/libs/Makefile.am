@@ -16,14 +16,16 @@ DIST_SUBDIRS = \
 	zbxplugin \
 	zbxsys \
 	zbxjabber \
-	zbxjson
+	zbxjson \
+	zbxserver
 
 if PROXY
 PROXY_SUBDIRS = \
 	zbxdb \
 	zbxdbcache \
 	zbxdbhigh \
-	zbxjson
+	zbxjson \
+	zbxserver
 endif
 
 if SERVER
@@ -33,7 +35,8 @@ SERVER_SUBDIRS = \
 	zbxdbhigh \
 	zbxemail \
 	zbxsms \
-	zbxjson
+	zbxjson \
+	zbxserver
 endif
 
 if JABBER

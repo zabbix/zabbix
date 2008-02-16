@@ -42,9 +42,9 @@
 #include "db.h"
 #include "log.h"
 #include "zlog.h"
+#include "zbxserver.h"
 
 #include "actions.h"
-#include "functions.h"
 #include "events.h"
 
 /******************************************************************************

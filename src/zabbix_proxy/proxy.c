@@ -29,14 +29,14 @@
 #include "log.h"
 #include "zlog.h"
 #include "zbxgetopt.h"
+#include "mutexs.h"
 
 #ifdef ZABBIX_TEST
 #include "zbxjson.h"
 #endif
 
-#include "functions.h"
-#include "expression.h"
 #include "sysinfo.h"
+#include "zbxserver.h"
 
 #include "daemon.h"
 
@@ -162,6 +162,9 @@ int	CONFIG_REFRESH_UNSUPPORTED	= 0;
 
 /* Zabbix server sturtup time */
 int     CONFIG_SERVER_STARTUP_TIME      = 0;
+
+/* Mutex for node syncs */
+ZBX_MUTEX	node_sync_access;
 
 /******************************************************************************
  *                                                                            *
@@ -436,6 +439,11 @@ int MAIN_ZABBIX_ENTRY(void)
 /* Do not close database. It is required for database cache */
 /*	DBclose();*/
 
+	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&node_sync_access, ZBX_MUTEX_NODE_SYNC)) {
+		zbx_error("Unable to create mutex for node syncs");
+		exit(FAIL);
+	}
+
 	threads = calloc(1+CONFIG_POLLER_FORKS+CONFIG_TRAPPERD_FORKS+CONFIG_PINGER_FORKS
 		+CONFIG_HOUSEKEEPER_FORKS+CONFIG_UNREACHABLE_POLLER_FORKS
 		+/*CONFIG_NODEWATCHER_FORKS+*/CONFIG_HTTPPOLLER_FORKS+CONFIG_DISCOVERER_FORKS,
@@ -520,8 +528,8 @@ int MAIN_ZABBIX_ENTRY(void)
 		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [Poller for unreachable hosts. SNMP:"SNMP_FEATURE_STATUS"]",
 				server_num);
 
-		main_poller_loop(ZBX_POLLER_TYPE_UNREACHABLE, server_num - (CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS
-				+ CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS));
+		main_poller_loop(ZBX_PROCESS_PROXY, ZBX_POLLER_TYPE_UNREACHABLE, server_num - (CONFIG_POLLER_FORKS
+				       + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS));
 	}
 	else if (server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS
 			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_HTTPPOLLER_FORKS)
@@ -529,8 +537,8 @@ int MAIN_ZABBIX_ENTRY(void)
 		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [HTTP Poller]",
 				server_num);
 
-		main_httppoller_loop(server_num - CONFIG_POLLER_FORKS - CONFIG_TRAPPERD_FORKS - CONFIG_PINGER_FORKS
-				- CONFIG_HOUSEKEEPER_FORKS - CONFIG_UNREACHABLE_POLLER_FORKS);
+		main_httppoller_loop(ZBX_PROCESS_PROXY, server_num - CONFIG_POLLER_FORKS - CONFIG_TRAPPERD_FORKS
+				- CONFIG_PINGER_FORKS - CONFIG_HOUSEKEEPER_FORKS - CONFIG_UNREACHABLE_POLLER_FORKS);
 	}
 	else if (server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS
 			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS)
@@ -594,6 +602,7 @@ void	zbx_on_exit()
 		free_database_cache();
 	}
 	DBclose();
+	zbx_mutex_destroy(&node_sync_access);
 	zabbix_close_log();
 	
 #ifdef  HAVE_SQLITE3
