@@ -27,6 +27,6 @@ extern	int	CONFIG_PINGER_FREQUENCY;
 extern	char	*CONFIG_FPING_LOCATION;
 extern	char	*CONFIG_FPING6_LOCATION;
 
-void	main_pinger_loop(zbx_process_t p, int pinger_num);
+void	main_pinger_loop(zbx_process_t p, int num);
 
 #endif
