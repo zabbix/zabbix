@@ -38,7 +38,8 @@ ZBX_FPING_HOST
 	double		mseconds;
 };
 
-static zbx_process_t zbx_process;
+static zbx_process_t	zbx_process;
+static int		pinger_num;
 
 /******************************************************************************
  *                                                                            *
@@ -119,7 +120,7 @@ static int process_value(char *key, ZBX_FPING_HOST *host, AGENT_RESULT *value)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int get_pinger_hosts(int pinger_num, ZBX_FPING_HOST **hosts, int *hosts_allocated, int *hosts_count)
+static int get_pinger_hosts(ZBX_FPING_HOST **hosts, int *hosts_allocated, int *hosts_count)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -332,16 +333,17 @@ static int do_ping(ZBX_FPING_HOST *hosts, int hosts_count)
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-void main_pinger_loop(zbx_process_t p, int pinger_num)
+void main_pinger_loop(zbx_process_t p, int num)
 {
 	int		start, sleeptime;
 	ZBX_FPING_HOST	*hosts = NULL;
 	int		hosts_allocated = 16, hosts_count;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In main_pinger_loop(num:%d)",
-			pinger_num);
+			num);
 
 	zbx_process = p;
+	pinger_num = num;
 
 	hosts = zbx_malloc(hosts, hosts_allocated * sizeof(ZBX_FPING_HOST));
 
@@ -353,7 +355,7 @@ void main_pinger_loop(zbx_process_t p, int pinger_num)
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 	
 		hosts_count = 0;
-		if (SUCCEED == get_pinger_hosts(pinger_num, &hosts, &hosts_allocated, &hosts_count)) {
+		if (SUCCEED == get_pinger_hosts(&hosts, &hosts_allocated, &hosts_count)) {
 			zbx_setproctitle("pinging hosts");
 
 			do_ping(hosts, hosts_count);
