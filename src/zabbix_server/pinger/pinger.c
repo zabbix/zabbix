@@ -67,10 +67,12 @@ static int process_value(char *key, ZBX_FPING_HOST *host, AGENT_RESULT *value)
 			key,
 			host->useip ? host->ip : host->dns);
 
-	result = DBselect("select %s where h.status=%d and h.hostid=i.hostid"
+	result = DBselect("select %s where " ZBX_SQL_MOD(h.hostid,%d) "=%d and h.status=%d and h.hostid=i.hostid"
 			" and h.useip=%d and h.%s='%s' and i.key_='%s' and i.status=%d"
 			" and i.type=%d and" ZBX_COND_NODEID,
 			ZBX_SQL_ITEM_SELECT,
+			CONFIG_PINGER_FORKS,
+			pinger_num - 1,
 			HOST_STATUS_MONITORED,
 			host->useip,
 			host->useip ? "ip" : "dns",
