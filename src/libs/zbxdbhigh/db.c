@@ -1300,30 +1300,31 @@ lbl_exit:
 #endif
 }
 
-
-int	DBadd_history_log(zbx_uint64_t id, zbx_uint64_t itemid, char *value, int clock, int timestamp,char *source, int severity)
+int	DBadd_history_log(zbx_uint64_t id, zbx_uint64_t itemid, char *value, int clock, int timestamp, char *source, int severity)
 {
-	char		value_esc[MAX_STRING_LEN];
-	char		source_esc[MAX_STRING_LEN];
+	char	value_esc[MAX_STRING_LEN];
+	char	source_esc[MAX_STRING_LEN];
 
-	zabbix_log(LOG_LEVEL_DEBUG,"In add_history_log()");
+	zabbix_log(LOG_LEVEL_DEBUG, "In add_history_log()");
 
 	DBescape_string(value,value_esc,MAX_STRING_LEN);
 	DBescape_string(source,source_esc,MAX_STRING_LEN);
+
 	if(id == 0)
 		id = DBget_maxid("history_log", "id");
-	DBexecute("insert into history_log (id,clock,itemid,timestamp,value,source,severity) values (" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",%d,'%s','%s',%d)",
-		id,
-		clock,
-		itemid,
-		timestamp,
-		value_esc,
-		source_esc,
-		severity);
+
+	DBexecute("insert into history_log (id,clock,itemid,timestamp,value,source,severity)"
+			" values (" ZBX_FS_UI64 ",%d," ZBX_FS_UI64 ",%d,'%s','%s',%d)",
+			id,
+			clock,
+			itemid,
+			timestamp,
+			value_esc,
+			source_esc,
+			severity);
 
 	return SUCCEED;
 }
-
 
 int	DBget_items_count(void)
 {
@@ -1835,7 +1836,7 @@ zbx_uint64_t DBget_maxid(char *tablename, char *fieldname)
 	DB_ROW		row;
 	zbx_uint64_t	ret1,ret2;
 	zbx_uint64_t	min, max;
-	int		found  = FAIL, dbres;
+	int		found  = FAIL, dbres, nodeid;
 	const ZBX_TABLE	*table;
 
 	zabbix_log(LOG_LEVEL_DEBUG,"In DBget_maxid(%s,%s)",
@@ -1843,18 +1844,19 @@ zbx_uint64_t DBget_maxid(char *tablename, char *fieldname)
 		fieldname);
 
 	table = DBget_table(tablename);
+	nodeid = CONFIG_NODEID >= 0 ? CONFIG_NODEID : 0;
 
 	if (table->flags & ZBX_SYNC) {
-		min = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)CONFIG_NODEID+(zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)CONFIG_NODEID;
-		max = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)CONFIG_NODEID+(zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)CONFIG_NODEID+(zbx_uint64_t)__UINT64_C(99999999999);
+		min = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid+(zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)nodeid;
+		max = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid+(zbx_uint64_t)__UINT64_C(100000000000)*(zbx_uint64_t)nodeid+(zbx_uint64_t)__UINT64_C(99999999999);
 	} else {
-		min = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)CONFIG_NODEID;
-		max = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)CONFIG_NODEID+(zbx_uint64_t)__UINT64_C(99999999999999);
+		min = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid;
+		max = (zbx_uint64_t)__UINT64_C(100000000000000)*(zbx_uint64_t)nodeid+(zbx_uint64_t)__UINT64_C(99999999999999);
 	}
 
 	do {
 		result = DBselect("select nextid from ids where nodeid=%d and table_name='%s' and field_name='%s'",
-			CONFIG_NODEID,
+			nodeid,
 			tablename,
 			fieldname);
 
@@ -1879,7 +1881,7 @@ zbx_uint64_t DBget_maxid(char *tablename, char *fieldname)
 			DBfree_result(result);
 
 			dbres = DBexecute("insert into ids (nodeid,table_name,field_name,nextid) values (%d,'%s','%s',"ZBX_FS_UI64")",
-				CONFIG_NODEID,
+				nodeid,
 				tablename,
 				fieldname,
 				ret1);
@@ -1887,13 +1889,13 @@ zbx_uint64_t DBget_maxid(char *tablename, char *fieldname)
 			if (dbres < ZBX_DB_OK) {
 				/* reshenie problemi nevidimosti novoj zapisi, sozdannoj v parallel'noj tranzakcii */
 				DBexecute("update ids set nextid=nextid+1 where nodeid=%d and table_name='%s' and field_name='%s'",
-					CONFIG_NODEID,
+					nodeid,
 					tablename,
 					fieldname);
 			}
 
 			DBexecute("insert into ids (nodeid,table_name,field_name,nextid) values (%d,'%s','%s',"ZBX_FS_UI64")",
-				CONFIG_NODEID,
+				nodeid,
 				tablename,
 				fieldname,
 				ret1);
@@ -1904,19 +1906,19 @@ zbx_uint64_t DBget_maxid(char *tablename, char *fieldname)
 
 			if((ret1 < min) || (ret1 >= max)) {
 				DBexecute("delete from ids where nodeid=%d and table_name='%s' and field_name='%s'",
-					CONFIG_NODEID,
+					nodeid,
 					tablename,
 					fieldname);
 				continue;
 			}
 
 			DBexecute("update ids set nextid=nextid+1 where nodeid=%d and table_name='%s' and field_name='%s'",
-				CONFIG_NODEID,
+				nodeid,
 				tablename,
 				fieldname);
 
 			result = DBselect("select nextid from ids where nodeid=%d and table_name='%s' and field_name='%s'",
-				CONFIG_NODEID,
+				nodeid,
 				tablename,
 				fieldname);
 			row = DBfetch(result);
@@ -1975,4 +1977,44 @@ zbx_uint64_t DBget_maxid(char *tablename, char *fieldname)
 	}
 
 	return ret;*/
+}
+
+int	DBproxy_add_history(zbx_uint64_t itemid, double value, int clock)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In proxy_add_history()");
+
+	DBexecute("insert into history (clock,itemid,value) values (%d," ZBX_FS_UI64 "," ZBX_FS_DBL ")",
+			clock,
+			itemid,
+			value);
+
+	return SUCCEED;
+}
+
+int	DBproxy_add_history_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In proxy_add_history_uint()");
+
+	DBexecute("insert into history_uint (clock,itemid,value) values (%d," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
+			clock,
+			itemid,
+			value);
+
+	return SUCCEED;
+}
+
+int	DBproxy_add_history_str(zbx_uint64_t itemid, char *value, int clock)
+{
+	char	value_esc[MAX_STRING_LEN];
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In proxy_add_history_str()");
+
+	DBescape_string(value, value_esc, MAX_STRING_LEN);
+
+	DBexecute("insert into history_str (clock,itemid,value) values (%d," ZBX_FS_UI64 ",'%s')",
+			clock,
+			itemid,
+			value_esc);
+
+	return SUCCEED;
 }

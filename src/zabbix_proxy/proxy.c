@@ -447,10 +447,10 @@ int MAIN_ZABBIX_ENTRY(void)
 /* Do not close database. It is required for database cache */
 /*	DBclose();*/
 
-	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&node_sync_access, ZBX_MUTEX_NODE_SYNC)) {
+/*	if (ZBX_MUTEX_ERROR == zbx_mutex_create_force(&node_sync_access, ZBX_MUTEX_NODE_SYNC)) {
 		zbx_error("Unable to create mutex for node syncs");
 		exit(FAIL);
-	}
+	}*/
 
 	threads = calloc(1+CONFIG_POLLER_FORKS+CONFIG_TRAPPERD_FORKS+CONFIG_PINGER_FORKS
 		+CONFIG_HOUSEKEEPER_FORKS+CONFIG_UNREACHABLE_POLLER_FORKS
@@ -517,13 +517,17 @@ int MAIN_ZABBIX_ENTRY(void)
 	}
 	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS)
 	{
-		main_pinger_loop(server_num, server_num - (CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS));
+		zabbix_log(LOG_LEVEL_WARNING, "server #%d started [ICMP pinger]",
+				server_num);
+
+		main_pinger_loop(ZBX_PROCESS_PROXY, server_num - (CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS));
 	}
 	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS
-			+CONFIG_HOUSEKEEPER_FORKS)
+			+ CONFIG_HOUSEKEEPER_FORKS)
 	{
 		zabbix_log( LOG_LEVEL_WARNING, "server #%d started [Housekeeper]",
-			server_num);
+				server_num);
+
 		main_housekeeper_loop();
 	}
 	else if(server_num <= CONFIG_POLLER_FORKS + CONFIG_TRAPPERD_FORKS + CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS
@@ -610,7 +614,7 @@ void	zbx_on_exit()
 		free_database_cache();
 	}
 	DBclose();
-	zbx_mutex_destroy(&node_sync_access);
+/*	zbx_mutex_destroy(&node_sync_access);*/
 	zabbix_close_log();
 	
 #ifdef  HAVE_SQLITE3
