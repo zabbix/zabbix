@@ -49,6 +49,7 @@ Changes for 1.5:
 
 Changes for 1.4.5:
 
+ - [ZBX-313] fixed problem with sqlite3 sepamhore (Sasha)
  - [ZBX-292] fixed negative values in availability report issue (Artem)
  - [ZBX-182] fixed processing of icmpping if dns name cannot be resolved (Sasha)
  - [HAN-2] improved speed on coping triggers to host (Artem)

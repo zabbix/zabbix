@@ -60,7 +60,7 @@ void	zbx_db_close(void)
 	sqlite_transaction_started = 0;
 	sqlite3_close(conn);
 	conn = NULL;
-	php_sem_remove(&sqlite_access);
+/*	php_sem_remove(&sqlite_access);*/
 #endif
 }
 
@@ -194,11 +194,11 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	/* Do not return SQLITE_BUSY immediately, wait for N ms */
 	sqlite3_busy_timeout(conn, 60*1000);
 
-	if(ZBX_MUTEX_ERROR == php_sem_get(&sqlite_access, dbname))
+/*	if(ZBX_MUTEX_ERROR == php_sem_get(&sqlite_access, dbname))
 	{
 		zbx_error("Unable to create mutex for sqlite");
 		exit(FAIL);
-	}
+	}*/
 
 	sqlite_transaction_started = 0;
 
