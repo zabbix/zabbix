@@ -1826,7 +1826,7 @@
 			$row['host'] = get_node_name_by_elid($row['hostid']).$row['host'];
 			$row['description'] = expand_trigger_description_constants($row['description'], $row);
 
-			$hosts[$row['host']] = $row['host'];
+			$hosts[strtolower($row['host'])] = $row['host'];
 			$triggers[$row['description']][$row['host']] = array(
 				'hostid'	=> $row['hostid'], 
 				'triggerid'	=> $row['triggerid'], 
@@ -1838,7 +1838,7 @@
 		{
 			return $table;
 		}
-		sort($hosts);
+		ksort($hosts);
 
 		$header=array(new CCol(S_TRIGGERS,'center'));
 		foreach($hosts as $hostname)
