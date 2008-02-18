@@ -426,6 +426,14 @@ int MAIN_ZABBIX_ENTRY(void)
 	zabbix_log( LOG_LEVEL_WARNING, "IPv6 support:          " IPV6_FEATURE_STATUS	);
 	zabbix_log( LOG_LEVEL_WARNING, "**************************");
 
+#ifdef  HAVE_SQLITE3
+	if(ZBX_MUTEX_ERROR == php_sem_get(&sqlite_access, CONFIG_DBNAME))
+	{
+		zbx_error("Unable to create mutex for sqlite");
+		exit(FAIL);
+	}
+#endif /* HAVE_SQLITE3 */
+
 	DBconnect(ZBX_DB_CONNECT_EXIT);
 
 /* Need to set trigger status to UNKNOWN since last run */
