@@ -33,6 +33,7 @@
 #define ZBX_PROTO_TAG_TIMESTAMP	"timestamp"
 #define ZBX_PROTO_TAG_SOURCE	"source"
 #define ZBX_PROTO_TAG_SEVERITY	"severity"
+#define ZBX_PROTO_TAG_PROXY	"proxy"
 
 #define ZBX_PROTO_VALUE_FAILED	"failed"
 #define ZBX_PROTO_VALUE_SUCCESS	"success"
