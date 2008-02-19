@@ -22,24 +22,30 @@
 
 #include <stdarg.h>
 
-#define	ZBX_PROTO_TAG_DATA	"data"
-#define	ZBX_PROTO_TAG_HOST	"host"
-#define	ZBX_PROTO_TAG_INFO	"info"
-#define	ZBX_PROTO_TAG_KEY	"key"
-#define	ZBX_PROTO_TAG_REQUEST	"request"
-#define	ZBX_PROTO_TAG_RESPONSE	"response"
-#define	ZBX_PROTO_TAG_VALUE	"value"
+#define ZBX_PROTO_TAG_DATA	"data"
+#define ZBX_PROTO_TAG_HOST	"host"
+#define ZBX_PROTO_TAG_INFO	"info"
+#define ZBX_PROTO_TAG_KEY	"key"
+#define ZBX_PROTO_TAG_REQUEST	"request"
+#define ZBX_PROTO_TAG_RESPONSE	"response"
+#define ZBX_PROTO_TAG_VALUE	"value"
+#define ZBX_PROTO_TAG_CLOCK	"clock"
+#define ZBX_PROTO_TAG_TIMESTAMP	"timestamp"
+#define ZBX_PROTO_TAG_SOURCE	"source"
+#define ZBX_PROTO_TAG_SEVERITY	"severity"
 
-#define	ZBX_PROTO_VALUE_FAILED	"failed"
-#define	ZBX_PROTO_VALUE_SUCCESS	"success"
+#define ZBX_PROTO_VALUE_FAILED	"failed"
+#define ZBX_PROTO_VALUE_SUCCESS	"success"
 
-#define	ZBX_PROTO_VALUE_SENDER_DATA	"sender data"
+#define ZBX_PROTO_VALUE_PROXY_CONFIG	"ZBX_PROXY_CONFIG"
+#define ZBX_PROTO_VALUE_SENDER_DATA	"sender data"
 
 typedef enum
 {
 	ZBX_JSON_TYPE_UNKNOWN = 0,
 	ZBX_JSON_TYPE_STRING,
 	ZBX_JSON_TYPE_INT,
+	ZBX_JSON_TYPE_FLOAT,
 	ZBX_JSON_TYPE_ARRAY,
 	ZBX_JSON_TYPE_OBJECT,
 	ZBX_JSON_TYPE_NULL
@@ -79,6 +85,7 @@ const char	*zbx_json_decodevalue(const char *p, char *string, size_t len);
 const char	*zbx_json_next(struct zbx_json_parse *jp, const char *p);
 const char	*zbx_json_pair_next(struct zbx_json_parse *jp, const char *p, char *name, size_t len);
 const char	*zbx_json_pair_by_name(struct zbx_json_parse *jp, const char *name);
+int		zbx_json_value_by_name(struct zbx_json_parse *jp, const char *name, char *string, size_t len);
 int		zbx_json_brackets_open(const char *p, struct zbx_json_parse *jp);
 zbx_json_type_t	zbx_json_type(const char *p);
 
