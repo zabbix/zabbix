@@ -308,8 +308,8 @@ static int	send_result(zbx_sock_t *sock, int result, char *info)
 static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *json)
 {
 	struct zbx_json_parse   jp_data, jp_row;
-	const char		*p, *pf;
-	char			host[MAX_STRING_LEN], key[MAX_STRING_LEN], value[MAX_STRING_LEN];
+	const char		*p;
+	char			host[MAX_HOST_HOST_LEN], key[MAX_ITEM_KEY_LEN], value[MAX_STRING_LEN];
 	char			info[MAX_STRING_LEN];
 	int			ret = SUCCEED;
 	int			processed_ok = 0, processed_fail = 0;
@@ -354,16 +354,13 @@ static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *json)
 				jp_row.end - jp_row.start + 1,
 				jp_row.start);*/
 
-		if (NULL == (pf = zbx_json_pair_by_name(&jp_row, ZBX_PROTO_TAG_HOST)) ||
-				NULL == (pf = zbx_json_decodevalue(pf, host, sizeof(host))))
+		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOST, host, sizeof(host)))
 			continue;
 
-		if (NULL == (pf = zbx_json_pair_by_name(&jp_row, ZBX_PROTO_TAG_KEY)) ||
-				NULL == (pf = zbx_json_decodevalue(pf, key, sizeof(key))))
+		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_KEY, key, sizeof(key)))
 			continue;
 
-		if (NULL == (pf = zbx_json_pair_by_name(&jp_row, ZBX_PROTO_TAG_VALUE)) ||
-				NULL == (pf = zbx_json_decodevalue(pf, value, sizeof(value))))
+		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_VALUE, value, sizeof(value)))
 			continue;
 
 		DBbegin();
@@ -410,7 +407,6 @@ static int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 	size_t	datalen;
 
 	struct 		zbx_json_parse jp;
-	const char 	*p;
 	char		value[MAX_STRING_LEN];
 
 	zbx_rtrim(s, " \r\n\0");
@@ -487,10 +483,8 @@ static int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 		/* JSON protocol? */
 		else if (SUCCEED == zbx_json_open(s, &jp))
 		{
-			if (NULL != (p = zbx_json_pair_by_name(&jp, ZBX_PROTO_TAG_REQUEST))
-					&& NULL != zbx_json_decodevalue(p, value, sizeof(value)))
-			{
-				if (0 == strcmp(value, "ZBX_PROXY_CONFIG") && zbx_process == ZBX_PROCESS_SERVER)
+			if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_REQUEST, value, sizeof(value))) {
+				if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_CONFIG) && zbx_process == ZBX_PROCESS_SERVER)
 				{
 					send_proxyconfig(sock, &jp);
 				}
