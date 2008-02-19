@@ -604,7 +604,40 @@ const char	*zbx_json_pair_by_name(struct zbx_json_parse *jp, const char *name)
 		if (0 == strcmp(name, buffer))
 			return p;
 
+	zbx_set_json_strerror("Can't find pair with name \"%s\"",
+			name);
+
 	return NULL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_json_value_by_name                                           *
+ *                                                                            *
+ * Purpose: return value by pair name                                         *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: pointer to value                                             * 
+ *        {"name":["a","b",...]}                                              *
+ *                ^ - returned pointer                                        *
+ *                                                                            *
+ * Author: Aleksander Vladishev                                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_json_value_by_name(struct zbx_json_parse *jp, const char *name, char *string, size_t len)
+{
+	const char	*p = NULL;
+
+	if (NULL == (p = zbx_json_pair_by_name(jp, name)))
+		return FAIL;
+
+	if (NULL == zbx_json_decodevalue(p, string, len))
+		return FAIL;
+
+	return SUCCEED;
 }
 
 /******************************************************************************
