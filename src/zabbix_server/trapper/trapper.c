@@ -329,7 +329,8 @@ static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *json)
 	const char		*p;
 	char			proxy[PROXY_NAME_LEN_MAX], host[HOST_HOST_LEN_MAX], key[ITEM_KEY_LEN_MAX],
 				value[MAX_STRING_LEN], info[MAX_STRING_LEN], lastlogsize[MAX_STRING_LEN],
-				timestamp[MAX_STRING_LEN], source[MAX_STRING_LEN], severity[MAX_STRING_LEN];
+				timestamp[MAX_STRING_LEN], source[MAX_STRING_LEN], severity[MAX_STRING_LEN],
+				clock[MAX_STRING_LEN];
 	int			ret = SUCCEED;
 	int			processed_ok = 0, processed_fail = 0;
 	DB_RESULT		result;
@@ -354,10 +355,8 @@ static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *json)
 
 	}
 
-	if (SUCCEED == zbx_json_value_by_name(json, ZBX_PROTO_TAG_CLOCK, timestamp, sizeof(timestamp)))
-		now = atoi(timestamp);
-
-zabbix_log(LOG_LEVEL_DEBUG, "In process_new_values(proxyid:" ZBX_FS_UI64 ", clock:%d)", proxyid, now);
+	if (SUCCEED == zbx_json_value_by_name(json, ZBX_PROTO_TAG_CLOCK, clock, sizeof(clock)))
+		now = atoi(clock);
 
 /* {"request":"ZBX_SENDER_DATA","data":[{"key":"system.cpu.num",...,...},{...},...]} 
  *                                     ^
@@ -398,6 +397,9 @@ zabbix_log(LOG_LEVEL_DEBUG, "In process_new_values(proxyid:" ZBX_FS_UI64 ", cloc
 		*source = '\0';
 		*severity = '\0';
 		
+		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_CLOCK, clock, sizeof(clock)))
+			now = time(NULL) - (now - atoi(clock));
+
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOST, host, sizeof(host)))
 			continue;
 
@@ -407,12 +409,13 @@ zabbix_log(LOG_LEVEL_DEBUG, "In process_new_values(proxyid:" ZBX_FS_UI64 ", cloc
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_VALUE, value, sizeof(value)))
 			continue;
 
-		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_CLOCK, timestamp, sizeof(timestamp)))
-			now = time(NULL) - (now - atoi(timestamp));
+		zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_LOGLASTSIZE, lastlogsize, sizeof(lastlogsize));
 
-		zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_VALUE, source, sizeof(severity));
+		zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_LOGTIMESTAMP, timestamp, sizeof(timestamp));
 
-		zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_VALUE, severity, sizeof(severity));
+		zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_LOGSOURCE, source, sizeof(source));
+
+		zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_LOGSEVERITY, severity, sizeof(severity));
 
 		DBbegin();
 		if(SUCCEED == process_data(sock, proxyid, now, host, key, value, lastlogsize, timestamp, source, severity))

@@ -103,13 +103,6 @@ typedef enum {
 #define DB_HTTPSTEPITEM	struct zbx_httpstepitem_type
 #define DB_HTTPTESTITEM	struct zbx_httptestitem_type
 
-#define	MAX_HOST_HOST_LEN	64
-
-#define	MAX_ITEM_KEY_LEN	255
-#define	MAX_ITEM_IP_LEN		39
-#define	MAX_ITEM_SNMP_COMMUNITY_LEN	64
-#define	MAX_ITEM_SNMP_OID_LEN	255
-
 #define	MAX_HISTORY_STR_LEN	255
 
 /* Trigger related defines */
@@ -139,7 +132,7 @@ typedef enum {
 #define HOST_ERROR_LEN			128
 #define HOST_ERROR_LEN_MAX		HOST_ERROR_LEN+1
 
-#define ITEM_KEY_LEN			256
+#define ITEM_KEY_LEN			255
 #define ITEM_KEY_LEN_MAX		ITEM_KEY_LEN+1
 
 #define GRAPH_NAME_LEN			128
@@ -206,7 +199,7 @@ DB_DSERVICE
 	int		lastup;
 	int		lastdown;
 	char		value[DSERVICE_VALUE_LEN_MAX];
-	char		key_[MAX_ITEM_KEY_LEN];
+	char		key_[ITEM_KEY_LEN_MAX];
 };
 
 DB_EVENT
