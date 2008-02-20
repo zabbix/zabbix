@@ -353,13 +353,13 @@ void main_pinger_loop(zbx_process_t p, int num)
 	for(;;) {
 		start = time(NULL);
 
-		zbx_setproctitle("connecting to the database");
+		zbx_setproctitle("pinger [connecting to the database]");
 
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 	
 		hosts_count = 0;
 		if (SUCCEED == get_pinger_hosts(&hosts, &hosts_allocated, &hosts_count)) {
-			zbx_setproctitle("pinging hosts");
+			zbx_setproctitle("pinger [pinging hosts]");
 
 			do_ping(hosts, hosts_count);
 		}

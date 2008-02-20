@@ -17,20 +17,9 @@
 ** Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 **/
 
-#ifndef ZABBIX_SERVERCOMMS_H
-#define ZABBIX_SERVERCOMMS_H
+#ifndef ZABBIX_DATASENDER_H
+#define ZABBIX_DATASENDER_H
 
-extern char	*CONFIG_SERVER;
-extern int	CONFIG_SERVER_PORT;
-extern char	*CONFIG_HOSTNAME;
-
-#include "comms.h"
-
-int	connect_to_server(zbx_sock_t *sock);
-/*int	send_data_to_server(zbx_sock_t *sock, const char *data);
-int	recv_data_from_server(zbx_sock_t *sock, char **data);*/
-void	disconnect_server(zbx_sock_t *sock);
-
-int	get_data_from_server(zbx_sock_t *sock, const char *name, const char *request, char **data);
+int	main_datasender_loop();
 
 #endif
