@@ -59,7 +59,7 @@ static int		pinger_num;
  * Comments: can be done in process_data()                                    *
  *                                                                            *
  ******************************************************************************/
-static int process_value(char *key, ZBX_FPING_HOST *host, AGENT_RESULT *value)
+static int process_value(char *key, ZBX_FPING_HOST *host, AGENT_RESULT *value, time_t now)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
@@ -90,11 +90,11 @@ static int process_value(char *key, ZBX_FPING_HOST *host, AGENT_RESULT *value)
 		DBbegin();
 		switch (zbx_process) {
 		case ZBX_PROCESS_SERVER:
-			process_new_value(&item, value);
+			process_new_value(&item, value, now);
 			update_triggers(item.itemid);
 			break;
 		case ZBX_PROCESS_PROXY:
-			proxy_process_new_value(&item, value);
+			proxy_process_new_value(&item, value, now);
 			break;
 		}
 		DBcommit();
@@ -221,6 +221,7 @@ static int do_ping(ZBX_FPING_HOST *hosts, int hosts_count)
 	char		*c;
 	ZBX_FPING_HOST	*host;
 	AGENT_RESULT	value;
+	time_t		now;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In do_ping() [hosts_count:%d]",
 			hosts_count);
@@ -297,6 +298,8 @@ static int do_ping(ZBX_FPING_HOST *hosts, int hosts_count)
 
 	unlink(filename);
 
+	now = time(NULL);
+
 	for (i = 0; i < hosts_count; i++) {
 		zabbix_log(LOG_LEVEL_DEBUG, "Host [%s] alive [%d]",
 				hosts[i].useip ? hosts[i].ip : hosts[i].dns,
@@ -304,12 +307,12 @@ static int do_ping(ZBX_FPING_HOST *hosts, int hosts_count)
 
 		init_result(&value);
 		SET_UI64_RESULT(&value, hosts[i].alive);
-		process_value(SERVER_ICMPPING_KEY, &hosts[i], &value);
+		process_value(SERVER_ICMPPING_KEY, &hosts[i], &value, now);
 		free_result(&value);
 				
 		init_result(&value);
 		SET_DBL_RESULT(&value, hosts[i].mseconds/1000);
-		process_value(SERVER_ICMPPINGSEC_KEY, &hosts[i], &value);
+		process_value(SERVER_ICMPPINGSEC_KEY, &hosts[i], &value, now);
 		free_result(&value);
 	}
 
