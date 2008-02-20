@@ -80,7 +80,7 @@ void	disconnect_server(zbx_sock_t *sock)
 
 /******************************************************************************
  *                                                                            *
- * Function: get_server_data                                                  *
+ * Function: get_data_from_server                                             *
  *                                                                            *
  * Purpose: get configuration and othed data from server                      *
  *                                                                            *
@@ -94,14 +94,13 @@ void	disconnect_server(zbx_sock_t *sock)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-int	get_data_from_server(zbx_sock_t *sock, const char *name, const char *request, char **data)
+int	get_data_from_server(zbx_sock_t *sock, /*const char *name, */const char *request, char **data)
 {
 	int		ret = FAIL;
 	struct zbx_json	j;
 
-	zabbix_log (LOG_LEVEL_DEBUG, "In get_server_data() [name:%s] [request:%s]",
-		name,
-		request);
+	zabbix_log(LOG_LEVEL_DEBUG, "In get_data_from_server() [request:%s]",
+			request);
 
 	zbx_json_init(&j, 128);
 	zbx_json_addstring(&j, "request", request, ZBX_JSON_TYPE_STRING);
@@ -113,8 +112,8 @@ int	get_data_from_server(zbx_sock_t *sock, const char *name, const char *request
 	if (FAIL == recv_data_from_server(sock, data))
 		goto exit;
 
-	zabbix_log (LOG_LEVEL_WARNING, "Received %s from server",
-		name);
+/*	zabbix_log (LOG_LEVEL_WARNING, "Received %s from server",
+		name);*/
 
 	ret = SUCCEED;
 exit:
@@ -123,3 +122,39 @@ exit:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: put_data_to_server                                               *
+ *                                                                            *
+ * Purpose: send data from server                                             *
+ *                                                                            *
+ * Parameters:                                                                *
+ *                                                                            *
+ * Return value: SUCCESS - processed succesfully                              * 
+ *               FAIL - an error occured                                      *
+ *                                                                            *
+ * Author: Alksander Vladishev                                                *
+ *                                                                            *
+ * Comments:                                                                  *
+ *                                                                            *
+ ******************************************************************************/
+int	put_data_to_server(zbx_sock_t *sock, /*const char *name, */struct zbx_json *j, char **answer)
+{
+	int	ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In put_data_to_server() [datalen:%zd]",
+			j->buffer_size);
+
+	if (FAIL == send_data_to_server(sock, j->buffer))
+		goto exit;
+
+	if (FAIL == recv_data_from_server(sock, answer))
+		goto exit;
+
+/*	zabbix_log(LOG_LEVEL_WARNING, "Received %s from server",
+			name);*/
+
+	ret = SUCCEED;
+exit:
+	return ret;
+}
