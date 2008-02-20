@@ -544,14 +544,10 @@ static void	update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
  * Comments: for trapper poller process                                       *
  *                                                                            *
  ******************************************************************************/
-void	process_new_value(DB_ITEM *item, AGENT_RESULT *value)
+void	process_new_value(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 {
-	time_t 	now;
-
 	zabbix_log( LOG_LEVEL_DEBUG, "In process_new_value(%s)",
 		item->key);
-
-	now = time(NULL);
 
 	if( ITEM_MULTIPLIER_USE == item->multiplier )
 	{
@@ -582,7 +578,7 @@ void	process_new_value(DB_ITEM *item, AGENT_RESULT *value)
 
 	add_history(item, value, now);
 	update_item(item, value, now);
-	update_functions( item );
+	update_functions(item);
 }
 
 /******************************************************************************
@@ -736,14 +732,10 @@ static void	proxy_update_item(DB_ITEM *item, AGENT_RESULT *value, time_t now)
  * Comments: for trapper poller process                                       *
  *                                                                            *
  ******************************************************************************/
-void	proxy_process_new_value(DB_ITEM *item, AGENT_RESULT *value)
+void	proxy_process_new_value(DB_ITEM *item, AGENT_RESULT *value, time_t now)
 {
-	time_t 	now;
-
 	zabbix_log( LOG_LEVEL_DEBUG, "In proxy_process_new_value(%s)",
 		item->key);
-
-	now = time(NULL);
 
 	proxy_add_history(item, value, now);
 	proxy_update_item(item, value, now);

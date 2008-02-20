@@ -32,8 +32,8 @@
 
 void    update_triggers (zbx_uint64_t itemid);
 void	update_functions(DB_ITEM *item);
-void	process_new_value(DB_ITEM *item, AGENT_RESULT *value);
-void	proxy_process_new_value(DB_ITEM *item, AGENT_RESULT *value);
+void	process_new_value(DB_ITEM *item, AGENT_RESULT *value, time_t now);
+void	proxy_process_new_value(DB_ITEM *item, AGENT_RESULT *value, time_t now);
 
 void	substitute_simple_macros(DB_EVENT *event, DB_ACTION *action, char **data, int macro_type);
 void	substitute_macros(DB_EVENT *event, DB_ACTION *action, char **data);
