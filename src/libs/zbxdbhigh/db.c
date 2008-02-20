@@ -1670,7 +1670,7 @@ void	DBget_item_from_db(DB_ITEM *item,DB_ROW row)
 
 	ZBX_STR2UINT64(item->itemid, row[0]);
 /*	item->itemid=atoi(row[0]); */
-	zbx_snprintf(item->key, ITEM_KEY_LEN, "%s", row[1]);
+	zbx_snprintf(item->key, ITEM_KEY_LEN_MAX, "%s", row[1]);
 	item->host_name=row[2];
 	item->port=atoi(row[3]);
 	item->delay=atoi(row[4]);
