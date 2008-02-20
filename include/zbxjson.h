@@ -22,23 +22,24 @@
 
 #include <stdarg.h>
 
-#define ZBX_PROTO_TAG_DATA	"data"
-#define ZBX_PROTO_TAG_HOST	"host"
-#define ZBX_PROTO_TAG_INFO	"info"
-#define ZBX_PROTO_TAG_KEY	"key"
-#define ZBX_PROTO_TAG_REQUEST	"request"
-#define ZBX_PROTO_TAG_RESPONSE	"response"
-#define ZBX_PROTO_TAG_VALUE	"value"
-#define ZBX_PROTO_TAG_CLOCK	"clock"
-#define ZBX_PROTO_TAG_TIMESTAMP	"timestamp"
-#define ZBX_PROTO_TAG_SOURCE	"source"
-#define ZBX_PROTO_TAG_SEVERITY	"severity"
-#define ZBX_PROTO_TAG_PROXY	"proxy"
+#define ZBX_PROTO_TAG_CLOCK		"clock"
+#define ZBX_PROTO_TAG_DATA		"data"
+#define ZBX_PROTO_TAG_HOST		"host"
+#define ZBX_PROTO_TAG_INFO		"info"
+#define ZBX_PROTO_TAG_KEY		"key"
+#define ZBX_PROTO_TAG_LOGLASTSIZE	"lastlogsize"
+#define ZBX_PROTO_TAG_LOGTIMESTAMP	"timestamp"
+#define ZBX_PROTO_TAG_LOGSOURCE		"source"
+#define ZBX_PROTO_TAG_LOGSEVERITY	"severity"
+#define ZBX_PROTO_TAG_PROXY		"proxy"
+#define ZBX_PROTO_TAG_REQUEST		"request"
+#define ZBX_PROTO_TAG_RESPONSE		"response"
+#define ZBX_PROTO_TAG_VALUE		"value"
 
-#define ZBX_PROTO_VALUE_FAILED	"failed"
-#define ZBX_PROTO_VALUE_SUCCESS	"success"
+#define ZBX_PROTO_VALUE_FAILED		"failed"
+#define ZBX_PROTO_VALUE_SUCCESS		"success"
 
-#define ZBX_PROTO_VALUE_PROXY_CONFIG	"ZBX_PROXY_CONFIG"
+#define ZBX_PROTO_VALUE_PROXY_CONFIG	"proxy config"
 #define ZBX_PROTO_VALUE_SENDER_DATA	"sender data"
 
 typedef enum
