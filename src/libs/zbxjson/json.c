@@ -481,7 +481,7 @@ const char	*zbx_json_next(struct zbx_json_parse *jp, const char *p)
 	return NULL;
 }
 
-const char	*zbx_json_decodestring(const char *p, char *string, size_t len)
+static const char	*zbx_json_decodestring(const char *p, char *string, size_t len)
 {
 	int	state = 0; /* 0 - init; 1 - inside string */
 	char	*o = string;
@@ -525,7 +525,7 @@ const char	*zbx_json_decodestring(const char *p, char *string, size_t len)
 	return NULL;
 }
 
-const char	*zbx_json_decodeint(const char *p, char *string, size_t len)
+static const char	*zbx_json_decodeint(const char *p, char *string, size_t len)
 {
 	char	*o = string;
 
@@ -533,7 +533,7 @@ const char	*zbx_json_decodeint(const char *p, char *string, size_t len)
 		if (*p < '0' || *p > '9') {
 			*o = '\0';
 			return p;
-		} else if( o - string < len - 1/*'\0'*/)
+		} else if (o - string < len - 1/*'\0'*/)
 			*o++ = *p;
 		p++;
 	}
@@ -686,13 +686,13 @@ int	zbx_json_brackets_open(const char *p, struct zbx_json_parse *jp)
  ******************************************************************************/
 zbx_json_type_t	zbx_json_type(const char *p)
 {
-	if (p[0] == '"')
+	if (*p == '"')
 		return ZBX_JSON_TYPE_STRING;
-	if (p[0] >= '0' && p[0] <= '9')
+	if (*p >= '0' && *p <= '9')
 		return ZBX_JSON_TYPE_INT;
-	if (p[0] == '[')
+	if (*p == '[')
 		return ZBX_JSON_TYPE_ARRAY;
-	if (p[0] == '{')
+	if (*p == '{')
 		return ZBX_JSON_TYPE_OBJECT;
 	if (p[0] == 'n' && p[1] == 'u' && p[2] == 'l' && p[3] == 'l')
 		return ZBX_JSON_TYPE_NULL;
