@@ -135,14 +135,15 @@ static void	calc_timestamp(char *line,int *timestamp, char *format)
  * Comments: for trapper server process                                       *
  *                                                                            *
  ******************************************************************************/
-static int	process_data(zbx_sock_t *sock,char *server,char *key,char *value,char *lastlogsize, char *timestamp,
-				char *source, char *severity)
+static int	process_data(zbx_sock_t *sock, zbx_uint64_t proxyid, time_t now, char *server, char *key, char *value,
+				char *lastlogsize, char *timestamp, char *source, char *severity)
 {
 	AGENT_RESULT	agent;
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_ITEM		item;
 	char		server_esc[MAX_STRING_LEN], key_esc[MAX_STRING_LEN];
+	char		item_types[32];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_data([%s],[%s],[%s],[%s])",
 			server,
@@ -153,15 +154,32 @@ static int	process_data(zbx_sock_t *sock,char *server,char *key,char *value,char
 	DBescape_string(server, server_esc, MAX_STRING_LEN);
 	DBescape_string(key, key_esc, MAX_STRING_LEN);
 
-	result = DBselect("select %s where h.status=%d and h.hostid=i.hostid and h.host='%s' and h.proxyid=0"
-			" and i.key_='%s' and i.status in (%d,%d) and i.type in (%d,%d)" DB_NODE,
+	if (proxyid == 0) {
+		zbx_snprintf(item_types, sizeof(item_types), "%d,%d",
+				ITEM_TYPE_TRAPPER,
+				ITEM_TYPE_ZABBIX_ACTIVE);
+	} else {
+		zbx_snprintf(item_types, sizeof(item_types), "%d,%d,%d,%d,%d,%d,%d,%d,%d",
+				ITEM_TYPE_ZABBIX,
+				ITEM_TYPE_SNMPv1,
+				ITEM_TYPE_TRAPPER,
+				ITEM_TYPE_SIMPLE,
+				ITEM_TYPE_SNMPv2c,
+				ITEM_TYPE_SNMPv3,
+				ITEM_TYPE_ZABBIX_ACTIVE,
+				ITEM_TYPE_HTTPTEST,
+				ITEM_TYPE_EXTERNAL);
+	}
+
+	result = DBselect("select %s where h.status=%d and h.hostid=i.hostid and h.host='%s' and h.proxyid=" ZBX_FS_UI64
+			" and i.key_='%s' and i.status in (%d,%d) and i.type in (%s)" DB_NODE,
 			ZBX_SQL_ITEM_SELECT,
 			HOST_STATUS_MONITORED,
 			server_esc,
+			proxyid,
 			key_esc,
 			ITEM_STATUS_ACTIVE, ITEM_STATUS_NOTSUPPORTED,
-			ITEM_TYPE_TRAPPER,
-			ITEM_TYPE_ZABBIX_ACTIVE,
+			item_types,
 			DBnode_local("h.hostid"));
 
 	if (NULL == (row = DBfetch(result))) {
@@ -214,8 +232,8 @@ static int	process_data(zbx_sock_t *sock,char *server,char *key,char *value,char
 				item.key,
 				item.host_name);
 		zabbix_syslog("Active parameter [%s] is not supported by agent on host [%s]",
-			item.key,
-					item.host_name);
+				item.key,
+				item.host_name);
 		DBupdate_item_status_to_notsupported(item.itemid, "Not supported by ZABBIX agent");
 	} else {
 		if (0 == strncmp(item.key, "log[", 4) || 0 == strncmp(item.key, "eventlog[", 9)) {
@@ -235,7 +253,7 @@ static int	process_data(zbx_sock_t *sock,char *server,char *key,char *value,char
 		init_result(&agent);
 
 		if( SUCCEED == set_result_type(&agent, item.value_type, value)) {
-			process_new_value(&item, &agent);
+			process_new_value(&item, &agent, now);
 			update_triggers(item.itemid);
 		} else {
 			zabbix_log( LOG_LEVEL_WARNING, "Type of received value [%s] is not suitable for [%s@%s]",
@@ -309,19 +327,37 @@ static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *json)
 {
 	struct zbx_json_parse   jp_data, jp_row;
 	const char		*p;
-	char			host[MAX_HOST_HOST_LEN], key[MAX_ITEM_KEY_LEN], value[MAX_STRING_LEN];
-	char			info[MAX_STRING_LEN];
+	char			proxy[PROXY_NAME_LEN_MAX], host[HOST_HOST_LEN_MAX], key[ITEM_KEY_LEN_MAX],
+				value[MAX_STRING_LEN], info[MAX_STRING_LEN], lastlogsize[MAX_STRING_LEN],
+				timestamp[MAX_STRING_LEN], source[MAX_STRING_LEN], severity[MAX_STRING_LEN];
 	int			ret = SUCCEED;
 	int			processed_ok = 0, processed_fail = 0;
-
-	double	sec;
-
+	DB_RESULT		result;
+	DB_ROW			row;
+	double			sec;
+	zbx_uint64_t		proxyid = 0;
+	time_t			now = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In process_new_values(json:%.*s)",
 				json->end - json->start + 1,
 				json->start);
 
 	sec = zbx_time();
+
+	if (SUCCEED == zbx_json_value_by_name(json, ZBX_PROTO_TAG_PROXY, proxy, sizeof(proxy))) {
+		result = DBselect("select proxyid from proxies where name='%s'",
+				proxy);
+
+		if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
+			proxyid = zbx_atoui64(row[0]);
+		DBfree_result(result);
+
+	}
+
+	if (SUCCEED == zbx_json_value_by_name(json, ZBX_PROTO_TAG_CLOCK, timestamp, sizeof(timestamp)))
+		now = atoi(timestamp);
+
+zabbix_log(LOG_LEVEL_DEBUG, "In process_new_values(proxyid:" ZBX_FS_UI64 ", clock:%d)", proxyid, now);
 
 /* {"request":"ZBX_SENDER_DATA","data":[{"key":"system.cpu.num",...,...},{...},...]} 
  *                                     ^
@@ -350,27 +386,42 @@ static int	process_new_values(zbx_sock_t *sock, struct zbx_json_parse *json)
  */ 		if (FAIL == (ret = zbx_json_brackets_open(p, &jp_row)))
 			break;
 
-/*		zabbix_log(LOG_LEVEL_WARNING, "Next \"%.*s\"",
+		zabbix_log(LOG_LEVEL_WARNING, "Next \"%.*s\"",
 				jp_row.end - jp_row.start + 1,
-				jp_row.start);*/
+				jp_row.start);
 
-		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOST, host, sizeof(host)))
+		*host = '\0';
+		*key = '\0';
+		*value = '\0';
+		*lastlogsize = '\0';
+		*timestamp = '\0';
+		*source = '\0';
+		*severity = '\0';
+		
+		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_HOST, host, sizeof(host)))
 			continue;
 
-		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_KEY, key, sizeof(key)))
+		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_KEY, key, sizeof(key)))
 			continue;
 
-		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_VALUE, value, sizeof(value)))
+		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_VALUE, value, sizeof(value)))
 			continue;
+
+		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_CLOCK, timestamp, sizeof(timestamp)))
+			now = time(NULL) - (now - atoi(timestamp));
+
+		zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_VALUE, source, sizeof(severity));
+
+		zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_VALUE, severity, sizeof(severity));
 
 		DBbegin();
-		if(SUCCEED == process_data(sock,host,key,value,NULL,NULL,NULL,NULL))
+		if(SUCCEED == process_data(sock, proxyid, now, host, key, value, lastlogsize, timestamp, source, severity))
 		{
-			processed_ok++;
+			processed_ok ++;
 		}
 		else
 		{
-			processed_fail++;
+			processed_fail ++;
 		}
 		DBcommit();
 	}
@@ -539,7 +590,7 @@ static int	process_trap(zbx_sock_t	*sock,char *s, int max_len)
 		zabbix_log( LOG_LEVEL_DEBUG, "Value [%s]", value_string);
 
 		DBbegin();
-		ret=process_data(sock,server,key,value_string,lastlogsize,timestamp,source,severity);
+		ret=process_data(sock, 0, time(NULL), server, key, value_string, lastlogsize, timestamp, source, severity);
 		DBcommit();
 		
 		if( zbx_tcp_send_raw(sock, SUCCEED == ret ? "OK" : "NOT OK") != SUCCEED)

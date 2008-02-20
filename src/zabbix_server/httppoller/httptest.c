@@ -57,6 +57,7 @@ static int process_value(zbx_uint64_t itemid, AGENT_RESULT *value)
 	DB_RESULT	result;
 	DB_ROW		row;
 	DB_ITEM		item;
+	time_t		now;
 
 	INIT_CHECK_MEMORY();
 
@@ -81,14 +82,16 @@ static int process_value(zbx_uint64_t itemid, AGENT_RESULT *value)
 
 	DBget_item_from_db(&item,row);
 
+	now = time(NULL);
+
 	DBbegin();
 	switch (zbx_process) {
 	case ZBX_PROCESS_SERVER:
-		process_new_value(&item, value);
+		process_new_value(&item, value, now);
 		update_triggers(item.itemid);
 		break;
 	case ZBX_PROCESS_PROXY:
-		proxy_process_new_value(&item, value);
+		proxy_process_new_value(&item, value, now);
 		break;
 	}
 	DBcommit();

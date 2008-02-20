@@ -193,7 +193,7 @@ static int get_minnextcheck(int now)
 }
 
 /* Update special host's item - "status" */
-static void update_key_status(zbx_uint64_t hostid,int host_status)
+static void update_key_status(zbx_uint64_t hostid, int host_status, time_t now)
 {
 /*	char		value_str[MAX_STRING_LEN];*/
 	AGENT_RESULT	agent;
@@ -227,11 +227,11 @@ static void update_key_status(zbx_uint64_t hostid,int host_status)
 
 			switch (zbx_process) {
 			case ZBX_PROCESS_SERVER:
-				process_new_value(&item, &agent);
+				process_new_value(&item, &agent, now);
 				update_triggers(item.itemid);
 				break;
 			case ZBX_PROCESS_PROXY:
-				proxy_process_new_value(&item, &agent);
+				proxy_process_new_value(&item, &agent, now);
 				break;
 			}
 
@@ -254,7 +254,7 @@ static void enable_host(DB_ITEM *item, time_t now, char *error)
 	switch (zbx_process) {
 	case ZBX_PROCESS_SERVER:
 		DBupdate_host_availability(item->hostid, HOST_AVAILABLE_TRUE, now, error);
-		update_key_status(item->hostid, HOST_STATUS_MONITORED); /* 0 */
+		update_key_status(item->hostid, HOST_STATUS_MONITORED, now); /* 0 */
 		break;
 	case ZBX_PROCESS_PROXY:
 		DBproxy_update_host_availability(item->hostid, HOST_AVAILABLE_TRUE, now);
@@ -278,7 +278,7 @@ static void disable_host(DB_ITEM *item, time_t now, char *error)
 	switch (zbx_process) {
 	case ZBX_PROCESS_SERVER:
 		DBupdate_host_availability(item->hostid, HOST_AVAILABLE_FALSE, now, error);
-		update_key_status(item->hostid, HOST_AVAILABLE_FALSE); /* 2 */
+		update_key_status(item->hostid, HOST_AVAILABLE_FALSE, now); /* 2 */
 		break;
 	case ZBX_PROCESS_PROXY:
 		DBproxy_update_host_availability(item->hostid, HOST_AVAILABLE_FALSE, now);
@@ -314,7 +314,7 @@ int get_values(void)
 	DB_ROW	row;
 	DB_ROW	row2;
 
-	int		now;
+	time_t		now;
 	int		delay;
 	int		res;
 	DB_ITEM		item;
@@ -430,14 +430,16 @@ int get_values(void)
 
 		DBbegin();
 		
+		now = time(NULL);
+
 		if(res == SUCCEED )
 		{
 			switch (zbx_process) {
 			case ZBX_PROCESS_SERVER:
-				process_new_value(&item, &agent);
+				process_new_value(&item, &agent, now);
 				break;
 			case ZBX_PROCESS_PROXY:
-				proxy_process_new_value(&item, &agent);
+				proxy_process_new_value(&item, &agent, now);
 				break;
 			}
 
@@ -462,7 +464,6 @@ int get_values(void)
 		}
 		else if(res == NOTSUPPORTED || res == AGENT_ERROR)
 		{
-			now = time(NULL);
 			if(item.status == ITEM_STATUS_NOTSUPPORTED)
 			{
 				/* It is not correct */
@@ -500,8 +501,6 @@ int get_values(void)
 		}
 		else if(res == NETWORK_ERROR)
 		{
-			now = time(NULL);
-
 			/* First error */
 			if(item.host_errors_from==0)
 			{

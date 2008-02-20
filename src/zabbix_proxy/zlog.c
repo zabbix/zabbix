@@ -56,9 +56,9 @@ void __zbx_zabbix_syslog(const char *fmt, ...)
 
 	DB_ITEM		item;
 	DB_RESULT	result;
-	DB_ROW	row;
-
+	DB_ROW		row;
 	AGENT_RESULT	agent;
+	time_t		now;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In zabbix_log()");
 
@@ -71,6 +71,8 @@ void __zbx_zabbix_syslog(const char *fmt, ...)
 		ITEM_VALUE_TYPE_STR,
 		DBnode_local("h.hostid"));
 
+	now = time(NULL);
+
 	while((row=DBfetch(result)))
 	{
 		DBget_item_from_db(&item,row);
@@ -82,7 +84,7 @@ void __zbx_zabbix_syslog(const char *fmt, ...)
 
 		init_result(&agent);
 		SET_STR_RESULT(&agent, strdup(value_str));
-		process_new_value(&item,&agent);
+		process_new_value(&item, &agent, now);
 		free_result(&agent);
 
 		update_triggers(item.itemid);
