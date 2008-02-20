@@ -73,9 +73,9 @@ static const ZBX_HISTORY_TABLE ht[]={
 	{"history_log",
 		{
 		{"clock",	ZBX_PROTO_TAG_CLOCK},
-		{"timestamp",	ZBX_PROTO_TAG_TIMESTAMP},
-		{"source",	ZBX_PROTO_TAG_SOURCE},
-		{"severity",	ZBX_PROTO_TAG_SEVERITY},
+		{"timestamp",	ZBX_PROTO_TAG_LOGTIMESTAMP},
+		{"source",	ZBX_PROTO_TAG_LOGSOURCE},
+		{"severity",	ZBX_PROTO_TAG_LOGSEVERITY},
 		{"value",	ZBX_PROTO_TAG_VALUE},
 		{NULL}
 		}
